@@ -67,7 +67,7 @@ void gnrc_sixlowpan_dispatch_recv(gnrc_pktsnip_t *pkt, void *context,
 
     (void)context;
     (void)page;
-#ifdef MODULE_CCNLITE
+#ifndef MODULE_GNRC_IPV6
     type = GNRC_NETTYPE_UNDEF;
     for (gnrc_pktsnip_t *ptr = pkt; (ptr || (type == GNRC_NETTYPE_UNDEF));
          ptr = ptr->next) {
@@ -75,11 +75,10 @@ void gnrc_sixlowpan_dispatch_recv(gnrc_pktsnip_t *pkt, void *context,
             type = ptr->type;
         }
     }
-    assert(network_snip);
-#else   /* MODULE_CCNLITE */
+#else   /* MODULE_GNRC_IPV6 */
     /* just assume normal IPv6 traffic */
     type = GNRC_NETTYPE_IPV6;
-#endif  /* MODULE_CCNLITE */
+#endif  /* MODULE_GNRC_IPV6 */
     if (!gnrc_netapi_dispatch_receive(type,
                                       GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
         DEBUG("6lo: No receivers for this packet found\n");
@@ -200,7 +199,13 @@ static void _receive(gnrc_pktsnip_t *pkt)
         }
 
         pkt = gnrc_pktbuf_remove_snip(pkt, sixlowpan);
+#if defined(MODULE_CCN_LITE)
+        payload->type = GNRC_NETTYPE_CCN;
+#elif defined(MODULE_GNRC_IPV6)
         payload->type = GNRC_NETTYPE_IPV6;
+#else
+        payload->type = GNRC_NETTYPE_UNDEF;
+#endif
     }
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
     else if (sixlowpan_frag_is((sixlowpan_frag_t *)dispatch)) {
@@ -246,7 +251,6 @@ static inline bool _add_uncompr_disp(gnrc_pktsnip_t *pkt)
 
 static void _send(gnrc_pktsnip_t *pkt)
 {
-    gnrc_netif_hdr_t *hdr;
     gnrc_pktsnip_t *tmp;
     gnrc_netif_t *netif;
     /* datagram_size: pure IPv6 packet without 6LoWPAN dispatches or compression */
@@ -258,11 +262,13 @@ static void _send(gnrc_pktsnip_t *pkt)
         return;
     }
 
+#ifdef MODULE_GNRC_IPV6
     if ((pkt->next == NULL) || (pkt->next->type != GNRC_NETTYPE_IPV6)) {
         DEBUG("6lo: Sending packet has no IPv6 header\n");
         gnrc_pktbuf_release(pkt);
         return;
     }
+#endif
 
     tmp = gnrc_pktbuf_start_write(pkt);
 
@@ -272,8 +278,7 @@ static void _send(gnrc_pktsnip_t *pkt)
         return;
     }
     pkt = tmp;
-    hdr = pkt->data;
-    netif = gnrc_netif_get_by_pid(hdr->if_pid);
+    netif = gnrc_netif_hdr_get_netif(pkt->data);
     datagram_size = gnrc_pkt_len(pkt->next);
 
     if (netif == NULL) {

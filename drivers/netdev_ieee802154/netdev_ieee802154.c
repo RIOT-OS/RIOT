@@ -33,18 +33,20 @@ static int _get_iid(netdev_ieee802154_t *dev, eui64_t *value, size_t max_len)
 {
     (void)max_len;
 
-    uint8_t *addr;
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
     uint16_t addr_len;
 
     assert(max_len >= sizeof(eui64_t));
 
-    if (dev->flags & NETDEV_IEEE802154_SRC_MODE_LONG) {
-        addr_len = IEEE802154_LONG_ADDRESS_LEN;
-        addr = dev->long_addr;
+    dev->netdev.driver->get(&dev->netdev, NETOPT_SRC_LEN, &addr_len,
+                            sizeof(addr_len));
+    if (addr_len == IEEE802154_LONG_ADDRESS_LEN) {
+        dev->netdev.driver->get(&dev->netdev, NETOPT_ADDRESS_LONG, addr,
+                                addr_len);
     }
     else {
-        addr_len = IEEE802154_SHORT_ADDRESS_LEN;
-        addr = dev->short_addr;
+        dev->netdev.driver->get(&dev->netdev, NETOPT_ADDRESS, addr,
+                                addr_len);
     }
     ieee802154_get_iid(value, addr, addr_len);
 
@@ -63,6 +65,10 @@ void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
 #elif MODULE_GNRC
     dev->proto = GNRC_NETTYPE_UNDEF;
 #endif
+
+    /* Initialize PAN ID and call netdev::set to propagate it */
+    dev->pan = IEEE802154_DEFAULT_PANID;
+    dev->netdev.driver->set(&dev->netdev, NETOPT_NID, &dev->pan, sizeof(dev->pan));
 }
 
 int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,

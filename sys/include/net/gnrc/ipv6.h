@@ -46,6 +46,13 @@
 extern "C" {
 #endif
 
+
+/**
+ * @defgroup    net_gnrc_ipv6_conf  GNRC IPv6 compile configurations
+ * @ingroup     net_gnrc_ipv6
+ * @ingroup     config
+ * @{
+ */
 /**
  * @brief   Default stack size to use for the IPv6 thread
  */
@@ -85,6 +92,7 @@ extern "C" {
  */
 #define GNRC_IPV6_STATIC_LLADDR
 #endif /* DOXYGEN */
+/** @} */
 
 /**
  * @brief   The PID to the IPv6 thread.
@@ -126,32 +134,6 @@ extern fib_table_t gnrc_ipv6_fib_table;
  * @return  -EEXIST, if IPv6 was already initialized.
  */
 kernel_pid_t gnrc_ipv6_init(void);
-
-/**
- * @brief   Demultiplexes a packet according to @p nh.
- *
- * @internal
- *
- * **Do not use outside this module or its submodules!!!**
- * Public access needed for Extension Headers.
- *
- * About `current` and `pkt`:
- *
- *                     current     pkt
- *                     |           |
- *                     v           v
- * IPv6 <- IPv6_EXT <- IPv6_EXT <- UNDEF
- *
- * This situation may happen when the packet has a source routing extension
- * header (RFC 6554), and the packet is forwarded from an interface to another.
- *
- * @param[in] netif     The receiving interface.
- * @param[in] current   A snip to process.
- * @param[in] pkt       A packet.
- * @param[in] nh        A protocol number (see @ref net_protnum) of the current snip.
- */
-void gnrc_ipv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *current,
-                     gnrc_pktsnip_t *pkt, uint8_t nh);
 
 /**
  * @brief   Get the IPv6 header from a given list of @ref gnrc_pktsnip_t

@@ -29,11 +29,18 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup    net_gnrc_ipv6_whitelist_conf GNRC IPv6 address whitelisting compile configurations
+ * @ingroup     net_gnrc_ipv6_whitelist
+ * @ingroup     config
+ * @{
+ */
+/**
  * Maximum size of the whitelist.
  */
 #ifndef GNRC_IPV6_WHITELIST_SIZE
 #define GNRC_IPV6_WHITELIST_SIZE    (8)
 #endif
+/** @} */
 
 /**
  * @brief   Adds an IPv6 address to the whitelist.

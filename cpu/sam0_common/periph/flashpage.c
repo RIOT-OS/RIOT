@@ -68,7 +68,7 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
             ((unsigned)data % FLASHPAGE_RAW_ALIGNMENT)));
 
     /* ensure the length doesn't exceed the actual flash size */
-    assert(((unsigned)target_addr + len) <
+    assert(((unsigned)target_addr + len) <=
            (CPU_FLASH_BASE + (FLASHPAGE_SIZE * FLASHPAGE_NUMOF)));
 
     uint32_t *dst = (uint32_t *)target_addr;
@@ -103,7 +103,18 @@ void flashpage_write(int page, const void *data)
 
     /* write data to page */
     if (data != NULL) {
-        flashpage_write_raw(page_addr, data, FLASHPAGE_SIZE);
+        /* One RIOT page is FLASHPAGE_PAGES_PER_ROW SAM0 flash pages (a row) as
+         * defined in the file cpu/sam0_common/include/cpu_conf.h, therefore we
+         * have to split the write into FLASHPAGE_PAGES_PER_ROW raw calls
+         * underneath, each writing a physical page in chunks of 4 bytes (see
+         * flashpage_write_raw)
+         * The erasing is done once as a full row is always reased.
+         */
+        for (unsigned curpage = 0; curpage < FLASHPAGE_PAGES_PER_ROW; curpage++) {
+            flashpage_write_raw(page_addr + (curpage * NVMCTRL_PAGE_SIZE / 4),
+                                (void *) ((uint32_t *) data + (curpage * NVMCTRL_PAGE_SIZE / 4)),
+                                NVMCTRL_PAGE_SIZE);
+        }
     }
 
 }

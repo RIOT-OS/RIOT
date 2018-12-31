@@ -20,20 +20,11 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "cpu.h"
-#include "periph_conf.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Xtimer configuration
- * @{
- */
-#define XTIMER_WIDTH                (24)
-#define XTIMER_BACKOFF              (40)
-/** @} */
 
 /**
  * @name    LED matrix pin configuration
@@ -69,7 +60,6 @@ extern "C" {
  */
 #define MMA8X5X_PARAM_I2C           I2C_DEV(0)
 #define MMA8X5X_PARAM_ADDR          0x1d
-#define MMA8X5X_PARAM_TYPE          0x5a
 /** @} */
 
 /**
@@ -79,11 +69,6 @@ extern "C" {
 #define MAG3110_PARAM_I2C           I2C_DEV(0)
 #define MAG3110_PARAM_ADDR          0x0e
 /** @} */
-
-/**
- * @brief   Initialize the board, also triggers the CPU initialization
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

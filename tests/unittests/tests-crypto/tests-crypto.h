@@ -34,13 +34,21 @@ extern "C" {
 void tests_crypto(void);
 
 /**
+ * @brief   Generates tests for helper functions
+ *
+ * @return  embUnit tests
+ */
+Test *tests_crypto_helper_tests(void);
+/**
  * @brief   Generates tests for crypto/chacha.h
  *
  * @return  embUnit tests if successful, NULL if not.
  */
 Test *tests_crypto_chacha_tests(void);
 
-static inline int compare(uint8_t *a, uint8_t *b, uint8_t len)
+Test *tests_crypto_poly1305_tests(void);
+
+static inline int compare(const uint8_t *a, const uint8_t *b, uint8_t len)
 {
     int result = 1;
 

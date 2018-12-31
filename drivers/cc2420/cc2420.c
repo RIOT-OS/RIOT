@@ -58,7 +58,6 @@ int cc2420_init(cc2420_t *dev)
     addr[0] |= 0x02;
     cc2420_set_addr_short(dev, &addr[6]);
     cc2420_set_addr_long(dev, addr);
-    cc2420_set_pan(dev, CC2420_PANID_DEFAULT);
     cc2420_set_chan(dev, CC2420_CHAN_DEFAULT);
     cc2420_set_txpower(dev, CC2420_TXPOWER_DEFAULT);
 

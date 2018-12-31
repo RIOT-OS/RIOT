@@ -16,11 +16,11 @@ ifeq ($(PROGRAMMER),cc2538-bsl)
   export FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
   export FFLAGS  = -p "$(PORT_BSL)" -e -w -v -b 115200 $(HEXFILE)
 else ifeq ($(PROGRAMMER),jlink)
-  export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+  export FLASHER = $(RIOTBOARD)/common/remote/dist/flash.sh
   export FFLAGS  = $(BINDIR) $(HEXFILE)
-  export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+  export DEBUGGER = $(RIOTBOARD)/common/remote/dist/debug.sh
   export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
-  export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+  export RESET = $(RIOTBOARD)/common/remote/dist/reset.sh
   export RESET_FLAGS = $(BINDIR)
 endif
 

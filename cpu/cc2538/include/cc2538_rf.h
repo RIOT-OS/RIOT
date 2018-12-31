@@ -57,7 +57,6 @@ extern "C" {
 
 #define CC2538_RF_POWER_DEFAULT     (IEEE802154_DEFAULT_TXPOWER)    /**< Default output power in dBm */
 #define CC2538_RF_CHANNEL_DEFAULT   (IEEE802154_DEFAULT_CHANNEL)
-#define CC2538_RF_PANID_DEFAULT     (IEEE802154_DEFAULT_PANID)
 
 #define OUTPUT_POWER_MIN            (-24)  /**< Min output power in dBm */
 #define OUTPUT_POWER_MAX            (7)    /**< Max output power in dBm */

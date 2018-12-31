@@ -235,6 +235,7 @@ Further information                                      {#further-information}
  - @ref getting-started
  - @ref creating-an-application
  - @ref creating-modules
+ - @ref advanced-build-system-tricks
 
 <!--
 Idea for this section: just name each of RIOT's main features/concepts and link

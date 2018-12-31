@@ -50,6 +50,16 @@ typedef struct {
 } mega_timer_t;
 
 /**
+ * @brief   8-bit timer register map
+ */
+typedef struct {
+    REG8    CRA;            /**< control A */
+    REG8    CRB;            /**< control B */
+    REG8    CNT;            /**< counter */
+    REG8    OCR[2];         /**< output compare */
+} mini_timer_t;
+
+/**
  * @brief   UART register map
  */
 typedef struct {
@@ -65,9 +75,19 @@ typedef struct {
  * @brief    Timer register definitions and instances
  * @{
  */
+#if defined(TCCR0A)
+#define MINI_TIMER0             ((mini_timer_t *)(uint16_t *)(&TCCR0A))
+#define MINI_TIMER0_DIV         TIMER_DIV1_8_64_128_1024
+#endif
+
 #if defined(TCCR1A)
 #define MEGA_TIMER1_BASE        (uint16_t *)(&TCCR1A)
 #define MEGA_TIMER1             ((mega_timer_t *)MEGA_TIMER1_BASE)
+#endif
+
+#if defined(TCCR2A)
+#define MINI_TIMER2             ((mini_timer_t *)(uint16_t *)(&TCCR2A))
+#define MINI_TIMER2_DIV         TIMER_DIV1_8_32_64_128_256_1024
 #endif
 
 #if defined(TCCR3A)

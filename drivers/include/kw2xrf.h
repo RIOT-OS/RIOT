@@ -43,11 +43,6 @@ extern "C" {
 #define KW2XRF_MAX_PKT_LENGTH           (IEEE802154_FRAME_LEN_MAX)
 
 /**
- * @brief   Default PAN ID used after initialization
- */
-#define KW2XRF_DEFAULT_PANID            (IEEE802154_DEFAULT_PANID)
-
-/**
  * @name    Default channel used after initialization
  *
  * @{

@@ -96,6 +96,9 @@ extern "C" {
 typedef enum {
     APB1,           /**< APB1 bus */
     APB2,           /**< APB2 bus */
+#if defined(CPU_FAM_STM32L4)
+    APB12,          /**< AHB1 bus, second register */
+#endif
 #if defined(CPU_FAM_STM32L0)
     AHB,            /**< AHB bus */
     IOP,            /**< IOP bus */
@@ -156,6 +159,11 @@ typedef uint32_t gpio_t;
 #define PERIPH_I2C_NEED_READ_REG
 /** Use write reg function from periph common */
 #define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
+    defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F4)
+#define PERIPH_I2C_NEED_WRITE_REGS
+#endif
 /** @} */
 
 /**
@@ -333,6 +341,14 @@ typedef struct {
 } qdec_conf_t;
 
 /**
+ * @brief UART hardware module types
+ */
+typedef enum {
+    STM32_USART,            /**< STM32 USART module type */
+    STM32_LPUART,           /**< STM32 Low-power UART (LPUART) module type */
+} uart_type_t;
+
+/**
  * @brief   Structure for UART configuration data
  */
 typedef struct {
@@ -357,6 +373,10 @@ typedef struct {
     gpio_af_t cts_af;       /**< alternate function for CTS pin */
     gpio_af_t rts_af;       /**< alternate function for RTS pin */
 #endif
+#endif
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4)
+    uart_type_t type;       /**< hardware module type (USART or LPUART) */
+    uint32_t clk_src;       /**< clock source used for UART */
 #endif
 } uart_conf_t;
 

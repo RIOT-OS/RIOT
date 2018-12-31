@@ -297,7 +297,6 @@ static int _init(netdev_t *netdev)
 
     assert(dev != NULL);
     dev->netdev.chan = IEEE802154_DEFAULT_CHANNEL;
-    dev->netdev.pan = IEEE802154_DEFAULT_PANID;
 
     return 0;
 }

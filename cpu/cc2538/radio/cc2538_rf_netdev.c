@@ -50,6 +50,24 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     }
 
     switch (opt) {
+        case NETOPT_ADDRESS:
+            if (max_len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            else {
+                *(uint16_t*)value = cc2538_get_addr_short();
+            }
+            return sizeof(uint16_t);
+
+        case NETOPT_ADDRESS_LONG:
+            if (max_len < sizeof(uint64_t)) {
+                return -EOVERFLOW;
+            }
+            else {
+                *(uint64_t*)value = cc2538_get_addr_long();
+            }
+            return sizeof(uint64_t);
+
         case NETOPT_AUTOACK:
             if (RFCORE->XREG_FRMCTRL0bits.AUTOACK) {
                 *((netopt_enable_t *)value) = NETOPT_ENABLE;
@@ -58,6 +76,13 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
                 *((netopt_enable_t *)value) = NETOPT_DISABLE;
             }
             return sizeof(netopt_enable_t);
+
+        case NETOPT_CHANNEL:
+            if (max_len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint16_t *)value) = (uint16_t)cc2538_get_chan();
+            return sizeof(uint16_t);
 
         case NETOPT_CHANNEL_PAGE:
             if (max_len < sizeof(uint16_t)) {
@@ -139,6 +164,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
             }
             else {
                 cc2538_set_addr_short(*((const uint16_t*)value));
+                res = sizeof(uint16_t);
             }
             break;
 
@@ -148,6 +174,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
             }
             else {
                 cc2538_set_addr_long(*((const uint64_t*)value));
+                res = sizeof(uint64_t);
             }
             break;
 
@@ -168,6 +195,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
                 }
                 else {
                     cc2538_set_chan(chan);
+                    res = sizeof(uint16_t);
                 }
             }
             break;
@@ -353,7 +381,6 @@ static int _init(netdev_t *netdev)
     cc2538_rf_t *dev = (cc2538_rf_t *) netdev;
     _dev = netdev;
 
-    uint16_t pan = cc2538_get_pan();
     uint16_t chan = cc2538_get_chan();
     uint16_t addr_short = cc2538_get_addr_short();
     uint64_t addr_long = cc2538_get_addr_long();
@@ -361,8 +388,6 @@ static int _init(netdev_t *netdev)
     netdev_ieee802154_reset(&dev->netdev);
 
     /* Initialise netdev_ieee802154_t struct */
-    netdev_ieee802154_set(&dev->netdev, NETOPT_NID,
-                          &pan, sizeof(pan));
     netdev_ieee802154_set(&dev->netdev, NETOPT_CHANNEL,
                           &chan, sizeof(chan));
     netdev_ieee802154_set(&dev->netdev, NETOPT_ADDRESS,

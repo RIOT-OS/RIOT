@@ -46,6 +46,8 @@ extern "C" {
 #define BLE_CHAN_NUMOF          (40U)   /**< number of available channels */
 #define BLE_CHAN_ADV_NUMOF      (3U)    /**< number of advertising channels */
 #define BLE_CHAN_DAT_NUMOF      (37U)   /**< number of data channels */
+#define BLE_ADV_PDU_LEN         (31U)   /**< max size of legacy ADV packets */
+#define BLE_ADV_PDU_LEN_EXT     (251U)  /**< max size of extended ADV packets */
 /** @} */
 
 /**
@@ -323,6 +325,55 @@ extern "C" {
  */
 #define BLE_ATT_FORMAT_U16      (0x01)  /**< used in FIND_INFO_RESP */
 #define BLE_ATT_FORMAT_U128     (0x02)  /**< used in FIND_INFO_RESP */
+/** @} */
+
+/**
+ * @name    GAP advertisement data type values
+ *
+ * @see https://www.bluetooth.com/specifications/assigned-numbers/generic-access-profile
+ * @{
+ */
+#define BLE_GAP_AD_FLAGS                    (0x01)
+#define BLE_GAP_AD_UUID16_INCOMP            (0x02)
+#define BLE_GAP_AD_UUID16_COMP              (0x03)
+#define BLE_GAP_AD_UUID32_INCOMP            (0x04)
+#define BLE_GAP_AD_UUID32_COMP              (0x05)
+#define BLE_GAP_AD_UUID128_INCOMP           (0x06)
+#define BLE_GAP_AD_UUID128_COMP             (0x07)
+#define BLE_GAP_AD_NAME_SHORT               (0x08)
+#define BLE_GAP_AD_NAME                     (0x09)
+#define BLE_GAP_AD_TX_POWER_LEVEL           (0x0a)
+#define BLE_GAP_AD_CLASS_OF_DEVICE          (0x0d)
+#define BLE_GAP_AD_PAIRING_HASH_192         (0x0e)
+#define BLE_GAP_AD_PAIRING_RAND_192         (0x0f)
+#define BLE_GAP_AD_DEVICE_ID                (0x10)
+#define BLE_GAP_AD_SEC_MANAGER_TK_VAL       (0x10)
+#define BLE_GAP_AD_SEC_MANAGER_OOB_FLAGS    (0x11)
+#define BLE_GAP_AD_SLAVE_CON_INTERVAL       (0x12)
+#define BLE_GAP_AD_LIST_SOL_UUID_16         (0x14)
+#define BLE_GAP_AD_LIST_SOL_UUID_128        (0x15)
+#define BLE_GAP_AD_SERVICE_DATA             (0x16)
+#define BLE_GAP_AD_SERVICE_DATA_UUID16      (0x16)
+#define BLE_GAP_AD_ADDR_PUBLIC              (0x17)
+#define BLE_GAP_AD_ADDR_RANDOM              (0x18)
+#define BLE_GAP_AD_APPEARANCE               (0x19)
+#define BLE_GAP_AD_ADV_INTERVAL             (0x1a)
+#define BLE_GAP_AD_LE_DEVICE_ADDR           (0x1b)
+#define BLE_GAP_AD_LE_ROLE                  (0x1c)
+#define BLE_GAP_AD_PAIRING_HASH_256         (0x1d)
+#define BLE_GAP_AD_PAIRING_RAND_256         (0x1e)
+#define BLE_GAP_AD_LIST_SOL_UUID_32         (0x1f)
+#define BLE_GAP_AD_SERVICE_DATA_32          (0x20)
+#define BLE_GAP_AD_SERVICE_DATA_128         (0x21)
+#define BLE_GAP_AD_LE_SEC_CON_CONF_VAL      (0x22)
+#define BLE_GAP_AD_LE_SEC_CON_RAND_VAL      (0x23)
+#define BLE_GAP_AD_URI                      (0x24)
+#define BLE_GAP_AD_INDOOR_POSITIONING       (0x25)
+#define BLE_GAP_AD_TRANSPORT_DISC_DATA      (0x26)
+#define BLE_GAP_AD_LE_SUP_FEATURES          (0x27)
+#define BLE_GAP_AD_CHAN_MAP_UPDATE_IND      (0x28)
+#define BLE_GAP_AD_3D_INFO_DATA             (0x3d)
+#define BLE_GAP_AD_VENDOR                   (0xff)
 /** @} */
 
 /**

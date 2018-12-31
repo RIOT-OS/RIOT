@@ -8,7 +8,7 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := blackpill bluepill calliope-mini cc2650-launchpad \
                              cc2650stk lobaro-lorabox maple-mini microbit \
-                             nrf51dongle nucleo-f030r8 nucleo-f031k6 \
+                             nrf51dk nrf51dongle nucleo-f030r8 nucleo-f031k6 \
                              nucleo-f042k6 nucleo-f070rb nucleo-f072rb \
                              nucleo-f103rb nucleo-f302r8 nucleo-f303k8 \
                              nucleo-f334r8 nucleo-f410rb nucleo-l031k6 \
@@ -36,13 +36,7 @@ endif
 
 USEPKG += lua
 
-include $(RIOTBASE)/Makefile.include
-
-# The code below generates a header file from any .lua scripts in the
-# example directory. The header file contains a byte array of the
-# ASCII characters in the .lua script.
-
-LUA_PATH := $(BINDIR)/lua
+LUA_PATH = $(BINDIR)/lua
 
 # add directory of generated *.lua.h files to include path
 CFLAGS += -I$(LUA_PATH)
@@ -50,14 +44,20 @@ CFLAGS += -I$(LUA_PATH)
 # generate .lua.h header files of .lua files
 LUA = $(wildcard *.lua)
 
-LUA_H := $(LUA:%.lua=$(LUA_PATH)/%.lua.h)
+LUA_H = $(LUA:%.lua=$(LUA_PATH)/%.lua.h)
+
+BUILDDEPS += $(LUA_H) $(LUA_PATH)/
+
+include $(RIOTBASE)/Makefile.include
+
+# The code below generates a header file from any .lua scripts in the
+# example directory. The header file contains a byte array of the
+# ASCII characters in the .lua script.
 
 $(LUA_PATH)/:
-	@mkdir -p $@
+	$(Q)mkdir -p $@
 
-$(LUA_H): | $(LUA_PATH)/
-$(LUA_H): $(LUA_PATH)/%.lua.h: %.lua
-
-	xxd -i $< | sed 's/^unsigned/const unsigned/g' > $@
-
-$(RIOTBUILD_CONFIG_HEADER_C): $(LUA_H)
+# FIXME: This way of embedding lua code is not robust. A proper script will
+#        be included later.
+$(LUA_H): $(LUA_PATH)/%.lua.h: %.lua | $(LUA_PATH)/
+	$(Q)xxd -i $< | sed 's/^unsigned/const unsigned/g' > $@

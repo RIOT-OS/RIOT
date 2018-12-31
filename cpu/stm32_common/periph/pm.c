@@ -57,7 +57,7 @@ void pm_set(unsigned mode)
             /* Enable WKUP pin to use for wakeup from standby mode */
 #if defined(CPU_FAM_STM32L0)
             PWR->CSR |= (PWR_CSR_EWUP1 | PWR_CSR_EWUP2);
-#if !defined(CPU_MODEL_STM32L053R8)
+#if !defined(CPU_LINE_STM32L053xx)
             /* STM32L053 only have 2 wake pins */
             PWR->CSR |= PWR_CSR_EWUP3;
 #endif

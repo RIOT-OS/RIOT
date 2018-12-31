@@ -1,0 +1,19 @@
+# define the used CPU
+export CPU_MODEL = nrf51x22xxac
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+
+# use openocd by default to program this board
+PROGRAMMER ?= openocd
+
+# dap debug adapter is required for openocd
+ifeq (openocd,$(PROGRAMMER))
+  DEBUG_ADAPTER = dap
+else ifeq (pyocd, $(PROGRAMMER)) # this boards is also supported by PyOCD
+  include $(RIOTMAKE)/tools/pyocd.inc.mk
+endif
+
+# include nrf51 boards common configuration
+include $(RIOTBOARD)/common/nrf51/Makefile.include

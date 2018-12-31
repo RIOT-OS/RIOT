@@ -7,7 +7,7 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := blackpill bluepill calliope-mini cc2650-launchpad \
-                             cc2650stk maple-mini microbit nrf51dongle \
+                             cc2650stk maple-mini microbit nrf51dk nrf51dongle \
                              nucleo-f030r8 nucleo-f031k6 nucleo-f042k6 \
                              nucleo-f070rb nucleo-f072rb nucleo-f103rb \
                              nucleo-f302r8 nucleo-f303k8 nucleo-f334r8 \
@@ -23,9 +23,9 @@ BOARD_INSUFFICIENT_MEMORY := blackpill bluepill calliope-mini cc2650-launchpad \
                              saml21-xpro samr21-xpro samr30-xpro \
                              seeeduino_arch-pro sensebox_samd21 slstk3401a \
                              sltb001a slwstk6220a sodaq-autonomo sodaq-explorer \
-                             sodaq-one stk3600 stm32f3discovery yunjia-nrf51822 \
-                             esp8266-esp-12x esp8266-olimex-mod esp8266-sparkfun-thing \
-                             firefly
+                             sodaq-one sodaq-sara-aff stk3600 stm32f3discovery \
+                             yunjia-nrf51822 esp8266-esp-12x esp8266-olimex-mod \
+                             esp8266-sparkfun-thing firefly
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno \
                    chronos hifive1 jiminy-mega256rfr2 mega-xplained mips-malta \
@@ -51,13 +51,7 @@ CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+7000)'
 
 USEPKG += lua
 
-include $(RIOTBASE)/Makefile.include
-
-# The code below generates a header file from any .lua scripts in the
-# example directory. The header file contains a byte array of the
-# ASCII characters in the .lua script.
-
-LUA_PATH := $(BINDIR)/lua
+LUA_PATH = $(BINDIR)/lua
 
 # add directory of generated *.lua.h files to include path
 CFLAGS += -I$(LUA_PATH)
@@ -65,16 +59,20 @@ CFLAGS += -I$(LUA_PATH)
 # generate .lua.h header files of .lua files
 LUA = $(wildcard *.lua)
 
-LUA_H := $(LUA:%.lua=$(LUA_PATH)/%.lua.h)
+LUA_H = $(LUA:%.lua=$(LUA_PATH)/%.lua.h)
+
+BUILDDEPS += $(LUA_H) $(LUA_PATH)/
+
+include $(RIOTBASE)/Makefile.include
+
+# The code below generates a header file from any .lua scripts in the
+# example directory. The header file contains a byte array of the
+# ASCII characters in the .lua script.
 
 $(LUA_PATH)/:
-	@mkdir -p $@
+	$(Q)mkdir -p $@
 
 # FIXME: This way of embedding lua code is not robust. A proper script will
 #        be included later.
-
-$(LUA_H): | $(LUA_PATH)/
-$(LUA_H): $(LUA_PATH)/%.lua.h: %.lua
-	xxd -i $< | sed 's/^unsigned/const unsigned/g' > $@
-
-$(RIOTBUILD_CONFIG_HEADER_C): $(LUA_H)
+$(LUA_H): $(LUA_PATH)/%.lua.h: %.lua | $(LUA_PATH)/
+	$(Q)xxd -i $< | sed 's/^unsigned/const unsigned/g' > $@

@@ -286,8 +286,8 @@ gnrc_pktsnip_t *gnrc_pktbuf_reverse_snips(gnrc_pktsnip_t *pkt);
  *        The original snip is keeped as is except `users` decremented.
  *
  * @deprecated  This function breaks the abstraction of `gnrc_pktbuf` and its
- *              only user within the RIOT code base `gnrc_ipv6_ext` is going to
- *              be reworked so it isn't needed anymore.
+ *              only user within the RIOT code base `gnrc_ipv6_ext` was reworked
+ *              so it isn't needed anymore.
  *              It will be removed after the 2019.04 release.
  *
  * @param[in,out] pkt   The snip to duplicate.
@@ -297,6 +297,60 @@ gnrc_pktsnip_t *gnrc_pktbuf_reverse_snips(gnrc_pktsnip_t *pkt);
  * @return NULL, if no space is left in the packet buffer.
  */
 gnrc_pktsnip_t *gnrc_pktbuf_duplicate_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type);
+
+/**
+ * @brief   Merge pktsnip chain to single pktsnip.
+ *
+ * Specifically it calls @ref gnrc_pktbuf_realloc_data() on @p pkt, then copies
+ * the data of all following packet snips into that reallocated space, and
+ * removes the packet snip the data was copied from afterwards.
+ *
+ * ### Example
+ * #### Input
+ *
+ *                                                         buffer
+ *     +---------------------------+                      +------+
+ *     | size = 8                  | data       +-------->|      |
+ *     | type = NETTYPE_IPV6       |------------+         +------+
+ *     +---------------------------+                      .      .
+ *           | next                                       .      .
+ *           v                                            .      .
+ *     +---------------------------+                      +------+
+ *     | size = 40                 | data    +----------->|      |
+ *     | type = NETTYPE_UDP        |---------+            +------+
+ *     +---------------------------+                      .      .
+ *           | next                                       .      .
+ *           v
+ *     +---------------------------+                      +------+
+ *     | size = 14                 | data +-------------->|      |
+ *     | type = NETTYPE_UNDEF      |------+               +------+
+ *     +---------------------------+                      .      .
+ *
+ *
+ * #### Output
+ *
+ *                                                         buffer
+ *     +---------------------------+                      +------+
+ *     | size = 62                 | data       +-------->|      |
+ *     | type = NETTYPE_IPV6       |------------+         |      |
+ *     +---------------------------+                      |      |
+ *                                                        |      |
+ *                                                        |      |
+ *                                                        |      |
+ *                                                        +------+
+ *                                                                 .      .
+ *
+ * @warning @p pkt needs to write protected before calling this function.
+ * @note    Packets in receive order need to call
+ *          @ref gnrc_pktbuf_reverse_snips() first to get the data in the
+ *          correct order.
+ *
+ * @param[in,out] pkt   The snip to merge.
+ *
+ * @return  0, on success
+ * @return  ENOMEM, if no space is left in the packet buffer.
+ */
+int gnrc_pktbuf_merge(gnrc_pktsnip_t *pkt);
 
 #ifdef DEVELHELP
 /**

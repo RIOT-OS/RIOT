@@ -1,16 +1,19 @@
-# define the used CPU
-export CPU = nrf51
+# define the used CPU model
 export CPU_MODEL = nrf51x22xxaa
+
+# include common nrf51 boards module into the build
+USEMODULE += boards_common_nrf51
 
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
+# This board uses an ST-Link v2 debug adapter
 export DEBUG_ADAPTER ?= stlink
 export STLINK_VERSION ?= 2
 
-# this board uses openocd
-include $(RIOTMAKE)/tools/openocd.inc.mk
+# use openocd to program this board
+PROGRAMMER = openocd
+
+# import nrf51 boards common configuration
+include $(RIOTBOARD)/common/nrf51/Makefile.include

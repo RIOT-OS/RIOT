@@ -335,6 +335,9 @@ static int cmd_test_last_raw(int argc, char **argv)
     /* try to align */
     memcpy(raw_buf, "test12344321tset", 16);
 
+    /* erase the page first */
+    flashpage_write(((int)FLASHPAGE_NUMOF - 2), NULL);
+
     flashpage_write_raw((void*) ((int)CPU_FLASH_BASE + (int)FLASHPAGE_SIZE * ((int)FLASHPAGE_NUMOF - 2)), raw_buf, strlen(raw_buf));
 
     puts("wrote raw short buffer to last flash page");

@@ -275,12 +275,23 @@ void _nib_nc_remove(_nib_onl_entry_t *node)
     _nib_onl_clear(node);
 }
 
-static inline void _get_l2addr_from_ipv6(uint8_t *l2addr,
-                                         const ipv6_addr_t *ipv6)
+#if GNRC_IPV6_NIB_CONF_6LN || !GNRC_IPV6_NIB_CONF_ARSM
+static inline int _get_l2addr_from_ipv6(const gnrc_netif_t *netif,
+                                        const _nib_onl_entry_t *node,
+                                        gnrc_ipv6_nib_nc_t *nce)
 {
-    memcpy(l2addr, &ipv6->u64[1], sizeof(uint64_t));
-    l2addr[0] ^= 0x02;
+    int res = gnrc_netif_ipv6_iid_to_addr(netif,
+                                          (eui64_t *)&node->ipv6.u64[1],
+                                          nce->l2addr);
+    if (res >= 0) {
+        DEBUG("nib: resolve address %s%%%u by reverse translating to ",
+              ipv6_addr_to_str(addr_str, &node->ipv6, sizeof(addr_str)),
+              (unsigned)netif->pid);
+        nce->l2addr_len = res;
+    }
+    return res;
 }
+#endif /* GNRC_IPV6_NIB_CONF_6LN || !GNRC_IPV6_NIB_CONF_ARSM */
 
 void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce)
 {
@@ -293,22 +304,19 @@ void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce)
         gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
         assert(netif != NULL);
         (void)netif;    /* flag-checkers might evaluate just to constants */
-        if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_rtr(netif)) {
-            _get_l2addr_from_ipv6(nce->l2addr, &node->ipv6);
-            nce->l2addr_len = sizeof(uint64_t);
+        if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_rtr(netif) &&
+            (_get_l2addr_from_ipv6(netif, node, nce) >= 0)) {
             return;
         }
     }
-#else   /* GNRC_IPV6_NIB_CONF_6LN */
-    /* Prevent unused function error thrown by clang */
-    (void)_get_l2addr_from_ipv6;
 #endif  /* GNRC_IPV6_NIB_CONF_6LN */
     nce->l2addr_len = node->l2addr_len;
     memcpy(&nce->l2addr, &node->l2addr, node->l2addr_len);
 #else   /* GNRC_IPV6_NIB_CONF_ARSM */
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
     assert(ipv6_addr_is_link_local(&nce->ipv6));
-    _get_l2addr_from_ipv6(nce->l2addr, &node->ipv6);
-    nce->l2addr_len = sizeof(uint64_t);
+    assert(netif != NULL);
+    _get_l2addr_from_ipv6(netif, node, nce);
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
 }
 

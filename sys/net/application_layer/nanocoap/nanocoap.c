@@ -128,9 +128,6 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     }
 
 #ifdef MODULE_GCOAP
-    coap_get_uri_path(pkt, pkt->url);
-    pkt->content_type = coap_get_content_type(pkt);
-
     if (coap_get_option_uint(pkt, COAP_OPT_OBSERVE, &pkt->observe_value) != 0) {
         pkt->observe_value = UINT32_MAX;
     }
@@ -309,14 +306,10 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
 
     unsigned method_flag = coap_method2flag(coap_get_code_detail(pkt));
 
-#ifdef MODULE_GCOAP
-    uint8_t *uri = pkt->url;
-#else
     uint8_t uri[NANOCOAP_URI_MAX];
     if (coap_get_uri_path(pkt, uri) <= 0) {
         return -EBADMSG;
     }
-#endif
     DEBUG("nanocoap: URI path: \"%s\"\n", uri);
 
     for (unsigned i = 0; i < coap_resources_numof; i++) {
@@ -653,10 +646,15 @@ size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
 
     while (len) {
         size_t part_len;
-        uripos++;
+        if (*uripos == separator) {
+            uripos++;
+        }
         uint8_t *part_start = (uint8_t *)uripos;
 
-        while (len--) {
+        while (len) {
+            /* must decrement separately from while loop test to ensure
+             * the value remains non-negative */
+            len--;
             if ((*uripos == separator) || (*uripos == '\0')) {
                 break;
             }
@@ -710,10 +708,15 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
 
     while (unread_len) {
         size_t part_len;
-        uripos++;
+        if (*uripos == separator) {
+            uripos++;
+        }
         uint8_t *part_start = (uint8_t *)uripos;
 
-        while (unread_len--) {
+        while (unread_len) {
+            /* must decrement separately from while loop test to ensure
+             * the value remains non-negative */
+            unread_len--;
             if ((*uripos == separator) || (*uripos == '\0')) {
                 break;
             }

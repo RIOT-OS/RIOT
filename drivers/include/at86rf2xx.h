@@ -68,13 +68,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Default PAN ID
- *
- * @todo    Read some global network stack specific configuration value
- */
-#define AT86RF2XX_DEFAULT_PANID         (IEEE802154_DEFAULT_PANID)
-
-/**
  * @brief   Default TX power (0dBm)
  */
 #define AT86RF2XX_DEFAULT_TXPOWER       (IEEE802154_DEFAULT_TXPOWER)

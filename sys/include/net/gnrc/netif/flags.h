@@ -119,18 +119,6 @@ enum {
 #define GNRC_NETIF_FLAGS_6LO_BACKBONE              (0x00000800U)
 
 /**
- * @brief   Mask for @ref gnrc_mac_tx_feedback_t
- */
-#define GNRC_NETIF_FLAGS_MAC_TX_FEEDBACK_MASK      (0x00006000U)
-
-/**
- * @brief   Flag to track if a transmission might have corrupted a received
- *          packet
- */
-#define GNRC_NETIF_FLAGS_MAC_RX_STARTED            (0x00008000U)
-/** @} */
-
-/**
  * @brief   Network interface is configured in raw mode
  */
 #define GNRC_NETIF_FLAGS_RAWMODE                   (0x00010000U)

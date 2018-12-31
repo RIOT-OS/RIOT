@@ -415,6 +415,62 @@ static inline bool gnrc_netif_is_6lbr(const gnrc_netif_t *netif)
 #define gnrc_netif_is_6lbr(netif)               (false)
 #endif
 
+#if defined(MODULE_GNRC_IPV6) || defined(DOXYGEN)
+/**
+ * @brief   Converts a given hardware address to an IPv6 IID.
+ *
+ * @attention When the link-layer of the interface has link-layer addresses, and
+ *            `NDEBUG` is not defined, the node fails with an assertion instead
+ *            returning `-ENOTSUP`.
+ *
+ * @param[in] netif     The network interface @p addr came from (either as
+ *                      gnrc_netif_t::l2addr or from a packet that came over
+ *                      it).
+ * @param[in] addr      A hardware address.
+ * @param[in] addr_len  Number of bytes in @p addr.
+ * @param[out] iid      The IID based on gnrc_netif_t::device_type
+ *
+ * @return  `sizeof(eui64_t)` on success.
+ * @return  `-ENOTSUP`, when gnrc_netif_t::device_type of @p netif does not
+ *          support IID conversion.
+ * @return  `-EINVAL`, when @p addr_len is invalid for the
+ *          gnrc_netif_t::device_type of @p netif.
+ */
+int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
+                                  const uint8_t *addr, size_t addr_len,
+                                  eui64_t *iid);
+
+/**
+ * @brief   Converts an IPv6 IID to a hardware address
+ *
+ * @pre `netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR`
+ * @pre @p iid was based on a hardware address
+ * @pre The number of bytes available at @p addr is less or equal to
+ *      @ref GNRC_NETIF_L2ADDR_MAXLEN.
+ *
+ * @attention   When `NDEBUG` is not defined, the node fails with an assertion
+ *              instead of returning `-ENOTSUP`
+ *
+ * @param[in] netif     The network interface @p iid came from (either because
+ *                      it is paset on gnrc_netif_t::l2addr or from a packet
+ *                      that came over it).
+ * @param[in] iid       An IID based on gnrc_netif_t::device_type.
+ * @param[out] addr     The hardware address. It is assumed that @p iid was
+ *                      based on a hardware address and that the available bytes
+ *                      in @p addr are less or equal to
+ *                      `GNRC_NETIF_L2ADDR_MAXLEN`.
+ *
+ * @return  Length of resulting @p addr on success.
+ * @return  `-ENOTSUP`, when gnrc_netif_t::device_type of @p netif does not
+ *          support reverse IID conversion.
+ */
+int gnrc_netif_ipv6_iid_to_addr(const gnrc_netif_t *netif, const eui64_t *iid,
+                                uint8_t *addr);
+#else   /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
+#define gnrc_netif_ipv6_iid_from_addr(netif, addr, addr_len, iid) (-ENOTSUP)
+#define gnrc_netif_ipv6_iid_to_addr(netif, iid, addr)         (-ENOTSUP)
+#endif  /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
+
 #ifdef __cplusplus
 }
 #endif

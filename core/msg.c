@@ -296,7 +296,7 @@ static int _msg_receive(msg_t *m, int block)
 
     int queue_index = -1;
 
-    if (me->msg_array) {
+    if (thread_has_msg_queue(me)) {
         queue_index = cib_get(&(me->msg_queue));
     }
 
@@ -381,7 +381,7 @@ int msg_avail(void)
 
     int queue_index = -1;
 
-    if (me->msg_array) {
+    if (thread_has_msg_queue(me)) {
         queue_index = cib_avail(&(me->msg_queue));
     }
 

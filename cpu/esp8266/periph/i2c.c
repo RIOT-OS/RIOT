@@ -75,21 +75,21 @@ typedef struct
 
 static _i2c_bus_t _i2c_bus[] =
 {
-  #if defined(I2C0_SDA) && defined(I2C0_SDA)
+  #if defined(I2C0_SDA) && defined(I2C0_SCL)
   {
     .speed = I2C0_SPEED,
     .sda = I2C0_SDA,
     .scl = I2C0_SCL
   },
   #endif
-  #if defined(I2C1_SDA) && defined(I2C1_SDA)
+  #if defined(I2C1_SDA) && defined(I2C1_SCL)
   {
     .speed = I2C1_SPEED,
     .sda = I2C1_SDA,
     .scl = I2C1_SCL
   },
   #endif
-  #if defined(I2C2_SDA) && defined(I2C2_SDA)
+  #if defined(I2C2_SDA) && defined(I2C2_SCL)
   {
     .speed = I2C2_SPEED,
     .sda = I2C2_SDA,

@@ -34,11 +34,8 @@ endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
   DIRS += netapi
 endif
-ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+ifneq (,$(filter gnrc_netif gnrc_netif_%,$(USEMODULE)))
     DIRS += netif
-endif
-ifneq (,$(filter gnrc_netif_hdr,$(USEMODULE)))
-  DIRS += netif/hdr
 endif
 ifneq (,$(filter gnrc_netreg,$(USEMODULE)))
   DIRS += netreg

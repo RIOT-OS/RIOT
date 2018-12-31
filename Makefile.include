@@ -1,6 +1,11 @@
 # 'Makefile.include' directory, must be evaluated before other 'include'
 _riotbase := $(dir $(lastword $(MAKEFILE_LIST)))
 
+# include RIOT_MAKEFILES_GLOBAL_PRE configuration files
+# allows setting user specific system wide configuration parsed before the body
+# of $(RIOTBASE)/Makefile.include
+include $(RIOT_MAKEFILES_GLOBAL_PRE)
+
 # Globally set default goal to `all`
 .DEFAULT_GOAL := all
 
@@ -352,10 +357,6 @@ include $(RIOTBASE)/sys/Makefile.include
 include $(RIOTBASE)/drivers/Makefile.include
 
 # include Makefile.includes for packages in $(USEPKG)
-$(RIOTPKG)/%/Makefile.include::
-	$(Q)"$(MAKE)" -C $(RIOTPKG)/$* Makefile.include
-
-$(USEPKG:%=$(RIOTPKG)/%/Makefile.include): FORCE
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 
 # include external modules configuration
@@ -433,6 +434,11 @@ else
   _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
 endif # BUILDOSXNATIVE
 
+# include bootloaders support. When trying to overwrite one variable
+# like HEXFILE, the value will already have been evaluated when declaring
+# the link target. Therefore, it must be placed before `link`.
+include $(RIOTMAKE)/boot/riotboot.mk
+
 ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
 else
@@ -483,7 +489,7 @@ endef
 
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(BUILDDEPS): clean
+    all $(BASELIBS) $(BUILDDEPS) ..in-docker-container: clean
 endif
 
 .PHONY: pkg-prepare pkg-build pkg-build-%
@@ -511,16 +517,19 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
-# if make target != 'flash-only', add target 'all' to ensure build before flash
-ifeq (,$(filter flash-only, $(MAKECMDGOALS)))
-  BUILD_BEFORE_FLASH = all
-endif
+define flash-recipe
+  $(call check_cmd,$(FLASHER),Flash program)
+  $(FLASHER) $(FFLAGS)
+endef
 
-flash: $(BUILD_BEFORE_FLASH) $(FLASHDEPS)
-	$(call check_cmd,$(FLASHER),Flash program)
-	$(FLASHER) $(FFLAGS)
+# Do not add dependencies to "flash" directly, use FLASHDEPS, as this is shared
+# with flash-only too
 
-flash-only: flash
+flash: all $(FLASHDEPS)
+	$(flash-recipe)
+
+flash-only: $(FLASHDEPS)
+	$(flash-recipe)
 
 preflash: $(BUILD_BEFORE_FLASH)
 	$(PREFLASHER) $(PREFFLAGS)
@@ -565,15 +574,8 @@ objdump:
 	$(call check_cmd,$(OBJDUMP),Objdump program)
 	$(OBJDUMP) $(OBJDUMPFLAGS) $(ELFFILE) | less
 
-# Generate an XML file containing all macro definitions and include paths for
-# use in Eclipse CDT
-.PHONY: eclipsesym eclipsesym.xml
-eclipsesym: $(CURDIR)/eclipsesym.xml
-eclipsesym.xml: $(CURDIR)/eclipsesym.xml
-
-$(CURDIR)/eclipsesym.xml: FORCE
-	$(Q)printf "%s\n" $(CC) $(CFLAGS_WITH_MACROS) $(INCLUDES) | \
-		$(RIOTTOOLS)/eclipsesym/cmdline2xml.sh > $@
+# Support Eclipse IDE.
+include $(RIOTMAKE)/eclipse.inc.mk
 
 # Export variables used throughout the whole make system:
 include $(RIOTMAKE)/vars.inc.mk
@@ -737,3 +739,8 @@ ifneq ($(_BASELIBS_VALUE_BEFORE_USAGE),$(BASELIBS))
 endif
 
 endif # BOARD=none
+
+# include RIOT_MAKEFILES_GLOBAL_POST configuration files
+# allows setting user specific system wide configuration parsed after the body
+# of $(RIOTBASE)/Makefile.include
+include $(RIOT_MAKEFILES_GLOBAL_POST)

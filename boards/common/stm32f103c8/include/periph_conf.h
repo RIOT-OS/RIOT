@@ -155,15 +155,16 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
+ * @note    This board may require external pullup resistors for i2c operation.
  * @{
  */
 static const i2c_conf_t i2c_config[] = {
     {
         .dev            = I2C1,
         .speed          = I2C_SPEED_NORMAL,
-        .scl_pin        = GPIO_PIN(PORT_B, 8),
-        .sda_pin        = GPIO_PIN(PORT_B, 9),
+        .scl_pin        = GPIO_PIN(PORT_B, 6),
+        .sda_pin        = GPIO_PIN(PORT_B, 7),
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR_I2C1EN,
         .clk            = CLOCK_APB1,

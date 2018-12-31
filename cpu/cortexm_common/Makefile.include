@@ -24,3 +24,11 @@ TOOLCHAINS_SUPPORTED = gnu llvm
 LINKFLAGS += $(if $(ROM_OFFSET),$(LINKFLAGPREFIX)--defsym=_rom_offset=$(ROM_OFFSET))
 # FW_ROM_LEN: rom length to use for firmware linking. Allows linking only in a section of the rom.
 LINKFLAGS += $(if $(FW_ROM_LEN),$(LINKFLAGPREFIX)--defsym=_fw_rom_length=$(FW_ROM_LEN))
+
+
+# Configure riotboot bootloader and slot lengths
+# 4KB are currently enough
+RIOTBOOT_LEN ?= 0x1000
+# Take the whole flash minus RIOTBOOT_LEN
+SLOT0_LEN ?= $(shell printf "0x%x" $$(($(ROM_LEN:%K=%*1024)-$(RIOTBOOT_LEN))))
+SLOT0_LEN := $(SLOT0_LEN)

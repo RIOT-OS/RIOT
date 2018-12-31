@@ -2,11 +2,5 @@ USEMODULE += fatfs_diskio_mtd
 USEMODULE += auto_init_storage
 USEMODULE += mtd
 
-include $(RIOTBASE)/boards/$(BOARD)/Makefile.features
-
-#if periph_rtc is available use it. Otherwise use static timestamps
-ifneq (, $(filter periph_rtc, $(FEATURES_PROVIDED)))
-  CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=0
-else
-  CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=1
-endif
+# Use RTC for timestamps if available
+FEATURES_OPTIONAL += periph_rtc

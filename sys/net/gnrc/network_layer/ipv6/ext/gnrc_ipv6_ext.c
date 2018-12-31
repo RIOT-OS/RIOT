@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2015 Cenk Gündoğan <cnkgndgn@gmail.com>
+ * Copyright (C) 2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,13 +11,17 @@
  * @{
  *
  * @file
+ * @author Cenk Gündoğan <cnkgndgn@gmail.com>
+ * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
 
 #include <errno.h>
 
 #include "utlist.h"
 #include "net/gnrc/netif.h"
+#include "net/gnrc/netreg.h"
 #include "net/gnrc/pktbuf.h"
+#include "net/gnrc/icmpv6/error.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ipv6/ext/rh.h"
 
@@ -25,116 +30,151 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#ifdef MODULE_GNRC_IPV6_EXT_RH
-static int _handle_rh(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt)
-{
-    gnrc_pktsnip_t *ipv6;
-    ipv6_ext_t *ext = (ipv6_ext_t *) current->data;
-    size_t current_offset;
-    ipv6_hdr_t *hdr;
-    int res;
-
-    /* check seg_left early to avoid duplicating the packet */
-    if (((ipv6_ext_rh_t *)ext)->seg_left == 0) {
-        return GNRC_IPV6_EXT_RH_AT_DST;
-    }
-
-    /* We cannot use `gnrc_pktbuf_start_write` since it duplicates only
-       the head. `ipv6_ext_rh_process` modifies the IPv6 header as well as
-       the extension header */
-
-    current_offset = gnrc_pkt_len_upto(current->next, GNRC_NETTYPE_IPV6);
-
-    if (pkt->users != 1) {
-        if ((ipv6 = gnrc_pktbuf_duplicate_upto(pkt, GNRC_NETTYPE_IPV6)) == NULL) {
-            DEBUG("ipv6: could not get a copy of pkt\n");
-            gnrc_pktbuf_release(pkt);
-            return GNRC_IPV6_EXT_RH_ERROR;
-        }
-        pkt = ipv6;
-        hdr = ipv6->data;
-        ext = (ipv6_ext_t *)(((uint8_t *)ipv6->data) + current_offset);
-    }
-    else {
-        ipv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
-        hdr = ipv6->data;
-    }
-
-    switch ((res = gnrc_ipv6_ext_rh_process(hdr, (ipv6_ext_rh_t *)ext))) {
-        case GNRC_IPV6_EXT_RH_ERROR:
-            /* TODO: send ICMPv6 error codes */
-            gnrc_pktbuf_release(pkt);
-            break;
-
-        case GNRC_IPV6_EXT_RH_FORWARDED:
-            /* forward packet */
-            if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
-                DEBUG("ipv6: could not dispatch packet to the ipv6 thread\n");
-                gnrc_pktbuf_release(pkt);
-            }
-            break;
-
-        case GNRC_IPV6_EXT_RH_AT_DST:
-            /* this should not happen since we checked seg_left early */
-            gnrc_pktbuf_release(pkt);
-            break;
-    }
-
-    return res;
-}
-#endif  /* MODULE_GNRC_IPV6_EXT_RH */
+/**
+ * @brief   Checks if @p protnum is a duplicate @ref PROTNUM_IPV6_EXT_HOPOPT.
+ *
+ * If @p protnum is @ref PROTNUM_IPV6_EXT_HOPOPT, the function sends a parameter
+ * problem message (if @ref net_gnrc_icmpv6_error is available), releases the
+ * packet with error `EINVAL`, and returns `false`.
+ *
+ * @note    This function should only be called *after* the first hop-by-hop
+ *          option header in the packet was parsed (if it exists) or if the
+ *          first extension header wasn't a hop-by-hop option header.
+ *
+ * @param[in] pkt       A packet in receive order to be checked with the current
+ *                      extension header (of type @p protnum) as its payload.
+ * @param[in] protnum   The protocol number of the header in
+ *                      gnrc_pktsnip_t::data of @p pkt.
+ *
+ * @return  true, when @p protnum == @ref PROTNUM_IPV6_EXT_HOPOPT.
+ * @return  false, when @p protnum != @ref PROTNUM_IPV6_EXT_HOPOPT.
+ */
+static bool _duplicate_hopopt(gnrc_pktsnip_t *pkt, unsigned protnum);
 
 /**
- * @brief marks IPv6 extension header if needed.
- *   updates pkt and returns next header.
- * @param[in] current  The current header
- * @param[in,out] pkt  The whole packet
- * @return The next header
- * @return NULL on error
+ * @brief   Demultiplex an extension header according to @p protnum.
+ *
+ * This includes dispatching it to interested parties in the
+ * @ref net_gnrc_netreg.
+ *
+ * @param[in] pkt       A packet with the first snip pointing to the extension
+ *                      header to process.
+ * @param[in] protnum   Protocol number of @p pkt.
+ *
+ * @return  The packet for further processing.
+ * @return  NULL, on error or if packet was consumed (by e.g. forwarding via
+ *          a routing header). @p pkt is released in case of error.
  */
-static gnrc_pktsnip_t *_mark_extension_header(gnrc_pktsnip_t *current,
-                                              gnrc_pktsnip_t **pkt)
+static gnrc_pktsnip_t *_demux(gnrc_pktsnip_t *pkt, unsigned protnum);
+
+gnrc_pktsnip_t *gnrc_ipv6_ext_process_hopopt(gnrc_pktsnip_t *pkt,
+                                             uint8_t *protnum)
 {
-    gnrc_pktsnip_t *tmp, *next;
-    ipv6_ext_t *ext = (ipv6_ext_t *) current->data;
-    size_t offset = ((ext->len * IPV6_EXT_LEN_UNIT) + IPV6_EXT_LEN_UNIT);
-
-    if (current == *pkt) {
-        gnrc_pktsnip_t *ext_snip;
-        if ((tmp = gnrc_pktbuf_start_write(*pkt)) == NULL) {
-            DEBUG("ipv6: could not get a copy of pkt\n");
-            gnrc_pktbuf_release(*pkt);
+    if ((*protnum == PROTNUM_IPV6_EXT_HOPOPT) && (pkt != NULL)) {
+        /* if a hop-by-hop options header is within the IPv6 packet it comes
+         * immediately after the IPv6 header and it must be processed before
+         * the packet is forwarded
+         * (see https://tools.ietf.org/html/rfc8200#section-4.1) */
+        if ((pkt = _demux(pkt, *protnum)) == NULL) {
+            DEBUG("ipv6 ext: packet was consumed in extension header "
+                  "handling\n");
             return NULL;
         }
-        *pkt = tmp;
-
-        ext_snip = gnrc_pktbuf_mark(*pkt, offset, GNRC_NETTYPE_IPV6_EXT);
-        next = *pkt;
-
-        if (ext_snip == NULL) {
-            gnrc_pktbuf_release(*pkt);
+        /* packet can only be unmarked (since we are the first one to
+         * process this packet and 6LoWPAN only provides packets unmarked)
+         *
+         * pkt -----------> pkt->next --------> pkt->next->next
+         *  v                     v                         v
+         * next header          hop-by-hop option       IPv6 header */
+        assert((pkt->next != NULL) && (pkt->next->next != NULL) &&
+               (pkt->next->next->type == GNRC_NETTYPE_IPV6));
+        *protnum = ((ipv6_ext_t *)pkt->next->data)->nh;
+        if (_duplicate_hopopt(pkt, *protnum)) {
             return NULL;
         }
     }
-    else {
-        /* the header is already marked */
-
-        next = NULL;
-
-        for (tmp = *pkt; tmp != NULL; tmp = tmp->next) {
-            if (tmp->next == current) {
-                next = tmp;
-                break;
-            }
-        }
-
-        assert(next != NULL);
-    }
-
-    return next;
+    return pkt;
 }
 
-static inline bool _has_valid_size(gnrc_pktsnip_t *pkt, uint8_t nh)
+gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
+                                          uint8_t *protnum)
+{
+    bool is_ext = true;
+    while (is_ext) {
+        switch (*protnum) {
+            case PROTNUM_IPV6_EXT_DST:
+            case PROTNUM_IPV6_EXT_RH:
+            case PROTNUM_IPV6_EXT_FRAG:
+            case PROTNUM_IPV6_EXT_AH:
+            case PROTNUM_IPV6_EXT_ESP:
+            case PROTNUM_IPV6_EXT_MOB: {
+                ipv6_ext_t *ext_hdr;
+
+                DEBUG("ipv6: handle extension header (protnum = %u)\n",
+                      *protnum);
+                ext_hdr = pkt->data;
+                if ((pkt = _demux(pkt, *protnum)) == NULL) {
+                    DEBUG("ipv6: packet was consumed by extension header "
+                          "handling\n");
+                    return NULL;
+                }
+                *protnum = ext_hdr->nh;
+                if (_duplicate_hopopt(pkt, *protnum)) {
+                    return NULL;
+                }
+                break;
+            }
+            default:
+                is_ext = false;
+                break;
+        }
+    }
+    return pkt;
+}
+
+static bool _duplicate_hopopt(gnrc_pktsnip_t *pkt, unsigned protnum)
+{
+    if (protnum == PROTNUM_IPV6_EXT_HOPOPT) {
+        DEBUG("ipv6: duplicate Hop-by-Hop header\n");
+#ifdef MODULE_GNRC_ICMPV6_ERROR
+        gnrc_icmpv6_error_param_prob_send(
+                ICMPV6_ERROR_PARAM_PROB_NH,
+                &((ipv6_ext_t *)pkt->next->data)->nh, pkt
+            );
+#endif
+        gnrc_pktbuf_release_error(pkt, EINVAL);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @brief       Marks an IPv6 extension header according to the length field
+ *              provided by the extension header itself.
+ *
+ * @param[in] pkt   The packet, with the extension header that is to be marked
+ *                  as first snip
+ *
+ * @return  The marked snip
+ * @return  NULL when no space in packet buffer left or the length field of
+ *          the extension header results in a number of bytes greater than
+ *          gnrc_pktsnip_t::size of @p pkt. In both error cases, @p pkt is
+ *          released.
+ */
+static gnrc_pktsnip_t *_mark_extension_header(gnrc_pktsnip_t *pkt)
+{
+    ipv6_ext_t *ext = (ipv6_ext_t *)pkt->data;
+    size_t hdr_size = ((ext->len * IPV6_EXT_LEN_UNIT) + IPV6_EXT_LEN_UNIT);
+    gnrc_pktsnip_t *ext_snip = gnrc_pktbuf_mark(pkt, hdr_size,
+                                                GNRC_NETTYPE_IPV6_EXT);
+
+    if (ext_snip == NULL) {
+        gnrc_pktbuf_release(pkt);
+    }
+    return ext_snip;
+}
+
+static inline bool _has_valid_size(gnrc_pktsnip_t *pkt, uint8_t protnum)
 {
     ipv6_ext_t *ext;
 
@@ -144,7 +184,7 @@ static inline bool _has_valid_size(gnrc_pktsnip_t *pkt, uint8_t nh)
 
     ext = pkt->data;
 
-    switch (nh) {
+    switch (protnum) {
         case PROTNUM_IPV6_EXT_RH:
         case PROTNUM_IPV6_EXT_HOPOPT:
         case PROTNUM_IPV6_EXT_DST:
@@ -159,94 +199,80 @@ static inline bool _has_valid_size(gnrc_pktsnip_t *pkt, uint8_t nh)
     }
 }
 
-/*
- *         current                 pkt
- *         |                       |
- *         v                       v
- * IPv6 <- IPv6_EXT <- IPv6_EXT <- UNDEF
- */
-void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
-                         gnrc_pktsnip_t *current,
-                         gnrc_pktsnip_t *pkt,
-                         uint8_t nh)
+static gnrc_pktsnip_t *_demux(gnrc_pktsnip_t *pkt, unsigned protnum)
 {
-    ipv6_ext_t *ext;
+    DEBUG("ipv6_ext: next header = %u\n", protnum);
+    if (!_has_valid_size(pkt, protnum)) {
+        DEBUG("ipv6_ext: invalid size\n");
+        gnrc_pktbuf_release(pkt);
+        return NULL;
+    }
+    if (gnrc_netreg_num(GNRC_NETTYPE_IPV6, protnum) > 0) {
+        gnrc_pktsnip_t *sub_pkt;
 
-    while (true) {
-        ext = (ipv6_ext_t *) current->data;
-
-        switch (nh) {
-            case PROTNUM_IPV6_EXT_RH:
-#ifdef MODULE_GNRC_IPV6_EXT_RH
-                /* if current != pkt, size is already checked */
-                if (current == pkt && !_has_valid_size(pkt, nh)) {
-                    DEBUG("ipv6_ext: invalid size\n");
-                    gnrc_pktbuf_release(pkt);
-                    return;
-                }
-
-                switch (_handle_rh(current, pkt)) {
-                    case GNRC_IPV6_EXT_RH_AT_DST:
-                        /* We are the final destination. So proceeds like normal packet. */
-                        nh = ext->nh;
-                        DEBUG("ipv6_ext: next header = %" PRIu8 "\n", nh);
-
-                        if ((current = _mark_extension_header(current, &pkt)) == NULL) {
-                            return;
-                        }
-
-                        gnrc_ipv6_demux(netif, current, pkt, nh); /* demultiplex next header */
-
-                        return;
-
-                    case GNRC_IPV6_EXT_RH_ERROR:
-                        /* already released by _handle_rh, so no release here */
-                        return;
-
-                    case GNRC_IPV6_EXT_RH_FORWARDED:
-                        /* the packet is forwarded and released. finish processing */
-                        return;
-                }
-
-                break;
-#endif  /* MODULE_GNRC_IPV6_EXT_RH */
-
-            case PROTNUM_IPV6_EXT_HOPOPT:
-            case PROTNUM_IPV6_EXT_DST:
-            case PROTNUM_IPV6_EXT_FRAG:
-            case PROTNUM_IPV6_EXT_AH:
-            case PROTNUM_IPV6_EXT_ESP:
-            case PROTNUM_IPV6_EXT_MOB:
-                /* TODO: add handling of types */
-
-                /* if current != pkt, size is already checked */
-                if (current == pkt && !_has_valid_size(pkt, nh)) {
-                    DEBUG("ipv6_ext: invalid size\n");
-                    gnrc_pktbuf_release(pkt);
-                    return;
-                }
-
-                nh = ext->nh;
-                DEBUG("ipv6_ext: next header = %" PRIu8 "\n", nh);
-
-                if ((current = _mark_extension_header(current, &pkt)) == NULL) {
-                    return;
-                }
-
-                gnrc_pktbuf_hold(pkt, 1);   /* don't release on next dispatch */
-                if (gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, nh, pkt) == 0) {
-                    gnrc_pktbuf_release(pkt);
-                }
-
-                break;
-
-            default:
-                gnrc_ipv6_demux(netif, current, pkt, nh); /* demultiplex next header */
-                return;
+        /* enforce duplication so we can dispatch packet to subscriber(s) and
+         * handle the packet */
+        gnrc_pktbuf_hold(pkt, 1);
+        sub_pkt = gnrc_pktbuf_start_write(pkt);
+        if (sub_pkt != NULL) {
+            /* check in case subscriber unregistered in the meantime */
+            if (gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, protnum,
+                                             sub_pkt) == 0) {
+                gnrc_pktbuf_release(sub_pkt);
+            };
+        }
+        else {
+            gnrc_pktbuf_release(pkt);
+            /* try to keep handling, the sockets aren't *that* important anyway :-P */
         }
     }
+    switch (protnum) {
+        case PROTNUM_IPV6_EXT_RH:
+#ifdef MODULE_GNRC_IPV6_EXT_RH
+            switch (gnrc_ipv6_ext_rh_process(pkt)) {
+                case GNRC_IPV6_EXT_RH_AT_DST:
+                    /* We are the final destination of the route laid out in
+                     * the routing header. So proceeds like normal packet. */
+                    if (_mark_extension_header(pkt) == NULL) {
+                        /* we couldn't mark the routing header though, return
+                         * an error */
+                        return NULL;
+                    }
+                    break;
 
-    assert(false); /* never reaches here */
+                default:
+                    /* unexpected return value => error */
+                    gnrc_pktbuf_release(pkt);
+                    /* Intentionally falls through */
+                case GNRC_IPV6_EXT_RH_ERROR:
+                    /* already released by gnrc_ipv6_ext_rh_process, so no
+                     * release here */
+                case GNRC_IPV6_EXT_RH_FORWARDED:
+                    /* the packet is forwarded and released. finish processing */
+                    return NULL;
+            }
+
+            break;
+#endif  /* MODULE_GNRC_IPV6_EXT_RH */
+
+        case PROTNUM_IPV6_EXT_HOPOPT:
+        case PROTNUM_IPV6_EXT_DST:
+        case PROTNUM_IPV6_EXT_FRAG:
+        case PROTNUM_IPV6_EXT_AH:
+        case PROTNUM_IPV6_EXT_ESP:
+        case PROTNUM_IPV6_EXT_MOB:
+            DEBUG("ipv6_ext: skipping over unsupported extension header\n");
+            if (_mark_extension_header(pkt) == NULL) {
+                /* unable mark it though to get it out of the way of the
+                 * payload, so return an error */
+                return NULL;
+            }
+            break;
+
+        default:
+            break;
+    }
+    return pkt;
 }
 
 gnrc_pktsnip_t *gnrc_ipv6_ext_build(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *next,
@@ -290,6 +316,5 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_build(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *next,
 
     return snip;
 }
-
 
 /** @} */

@@ -55,6 +55,7 @@ PSEUDOMODULES += pktqueue
 PSEUDOMODULES += printf_float
 PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
+PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_default
 PSEUDOMODULES += saul_gpio
@@ -79,6 +80,9 @@ PSEUDOMODULES += bme280
 PSEUDOMODULES += adc081c
 PSEUDOMODULES += adc101c
 PSEUDOMODULES += adc121c
+
+# full featured version of CCS811 driver as pseudo module
+PSEUDOMODULES += ccs811_full
 
 # include variants of SX127X drivers as pseudo modules
 PSEUDOMODULES += sx1272

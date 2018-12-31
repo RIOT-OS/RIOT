@@ -19,9 +19,9 @@
 #include <stdbool.h>
 
 #include "byteorder.h"
-#include "net/ieee802154.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/frag.h"
@@ -232,6 +232,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     assert(sixlo != NULL);
     gnrc_pktsnip_t *ipv6, *netif;
     gnrc_netif_hdr_t *netif_hdr;
+    gnrc_netif_t *iface;
     ipv6_hdr_t *ipv6_hdr;
     uint8_t *iphc_hdr = sixlo->data;
     size_t payload_offset = SIXLOWPAN_IPHC_HDR_LEN;
@@ -331,6 +332,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     netif = gnrc_pktsnip_search_type(sixlo, GNRC_NETTYPE_NETIF);
     assert(netif != NULL);
     netif_hdr = netif->data;
+    iface = gnrc_netif_hdr_get_netif(netif_hdr);
     switch (iphc_hdr[IPHC2_IDX] & (SIXLOWPAN_IPHC2_SAC | SIXLOWPAN_IPHC2_SAM)) {
 
         case IPHC_SAC_SAM_FULL:
@@ -354,9 +356,13 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
             break;
 
         case IPHC_SAC_SAM_L2:
-            ieee802154_get_iid((eui64_t *)(&ipv6_hdr->src.u64[1]),
-                               gnrc_netif_hdr_get_src_addr(netif_hdr),
-                               netif_hdr->src_l2addr_len);
+            if (gnrc_netif_hdr_ipv6_iid_from_src(
+                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->src.u64[1])
+                    ) < 0) {
+                DEBUG("6lo iphc: could not get source's IID\n");
+                _recv_error_release(sixlo, ipv6, rbuf);
+                return;
+            }
             ipv6_addr_set_link_local_prefix(&ipv6_hdr->src);
             break;
 
@@ -384,9 +390,13 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
 
         case IPHC_SAC_SAM_CTX_L2:
             assert(ctx != NULL);
-            ieee802154_get_iid((eui64_t *)(&ipv6_hdr->src.u64[1]),
-                               gnrc_netif_hdr_get_src_addr(netif_hdr),
-                               netif_hdr->src_l2addr_len);
+            if (gnrc_netif_hdr_ipv6_iid_from_src(
+                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->src.u64[1])
+                    ) < 0) {
+                DEBUG("6lo iphc: could not get source's IID\n");
+                _recv_error_release(sixlo, ipv6, rbuf);
+                return;
+            }
             ipv6_addr_init_prefix(&ipv6_hdr->src, &ctx->prefix,
                                   ctx->prefix_len);
             break;
@@ -433,9 +443,13 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
             break;
 
         case IPHC_M_DAC_DAM_U_L2:
-            ieee802154_get_iid((eui64_t *)(&ipv6_hdr->dst.u64[1]),
-                               gnrc_netif_hdr_get_dst_addr(netif_hdr),
-                               netif_hdr->dst_l2addr_len);
+            if (gnrc_netif_hdr_ipv6_iid_from_dst(
+                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->dst.u64[1])
+                    ) < 0) {
+                DEBUG("6lo iphc: could not get destination's IID\n");
+                _recv_error_release(sixlo, ipv6, rbuf);
+                return;
+            }
             ipv6_addr_set_link_local_prefix(&ipv6_hdr->dst);
             break;
 
@@ -456,9 +470,13 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
             break;
 
         case IPHC_M_DAC_DAM_U_CTX_L2:
-            ieee802154_get_iid((eui64_t *)(&ipv6_hdr->dst.u64[1]),
-                               gnrc_netif_hdr_get_dst_addr(netif_hdr),
-                               netif_hdr->dst_l2addr_len);
+            if (gnrc_netif_hdr_ipv6_iid_from_dst(
+                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->dst.u64[1])
+                    ) < 0) {
+                DEBUG("6lo iphc: could not get destination's IID\n");
+                _recv_error_release(sixlo, ipv6, rbuf);
+                return;
+            }
             ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
                                   ctx->prefix_len);
             break;
@@ -641,6 +659,7 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     assert(pkt != NULL);
     gnrc_netif_hdr_t *netif_hdr = pkt->data;
     ipv6_hdr_t *ipv6_hdr;
+    gnrc_netif_t *iface = gnrc_netif_hdr_get_netif(netif_hdr);
     uint8_t *iphc_hdr;
     gnrc_sixlowpan_ctx_t *src_ctx = NULL, *dst_ctx = NULL;
     gnrc_pktsnip_t *dispatch, *ptr = pkt->next;
@@ -816,18 +835,14 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
             eui64_t iid;
             iid.uint64.u64 = 0;
 
-            if ((netif_hdr->src_l2addr_len == 2) ||
-                (netif_hdr->src_l2addr_len == 4) ||
-                (netif_hdr->src_l2addr_len == 8)) {
-                /* prefer to create IID from netif header if available */
-                ieee802154_get_iid(&iid, gnrc_netif_hdr_get_src_addr(netif_hdr),
-                                   netif_hdr->src_l2addr_len);
+            gnrc_netif_acquire(iface);
+            if (gnrc_netif_ipv6_get_iid(iface, &iid) < 0) {
+                DEBUG("6lo iphc: could not get interface's IID\n");
+                gnrc_netif_release(iface);
+                gnrc_pktbuf_release(pkt);
+                return;
             }
-            else {
-                /* but take from driver otherwise */
-                gnrc_netapi_get(netif_hdr->if_pid, NETOPT_IPV6_IID, 0, &iid,
-                                sizeof(eui64_t));
-            }
+            gnrc_netif_release(iface);
 
             if ((ipv6_hdr->src.u64[1].u64 == iid.uint64.u64) ||
                 _context_overlaps_iid(src_ctx, &ipv6_hdr->src, &iid)) {
@@ -941,8 +956,11 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
             }
         }
 
-        ieee802154_get_iid(&iid, gnrc_netif_hdr_get_dst_addr(netif_hdr),
-                           netif_hdr->dst_l2addr_len);
+        if (gnrc_netif_hdr_ipv6_iid_from_dst(iface, netif_hdr, &iid) < 0) {
+            DEBUG("6lo iphc: could not get destination's IID\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
 
         if ((ipv6_hdr->dst.u64[1].u64 == iid.uint64.u64) ||
             _context_overlaps_iid(dst_ctx, &(ipv6_hdr->dst), &iid)) {
@@ -1011,7 +1029,7 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     dispatch->next = pkt->next;
     pkt->next = dispatch;
 
-    gnrc_netif_t *netif = gnrc_netif_get_by_pid(netif_hdr->if_pid);
+    gnrc_netif_t *netif = gnrc_netif_hdr_get_netif(netif_hdr);
     assert(netif != NULL);
     gnrc_sixlowpan_multiplex_by_size(pkt, orig_datagram_size, netif, page);
 }

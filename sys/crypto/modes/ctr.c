@@ -22,7 +22,7 @@
 #include "crypto/modes/ctr.h"
 
 int cipher_encrypt_ctr(cipher_t* cipher, uint8_t nonce_counter[16],
-                       uint8_t nonce_len, uint8_t* input, size_t length,
+                       uint8_t nonce_len, const uint8_t* input, size_t length,
                        uint8_t* output)
 {
     size_t offset = 0;
@@ -50,7 +50,7 @@ int cipher_encrypt_ctr(cipher_t* cipher, uint8_t nonce_counter[16],
 }
 
 int cipher_decrypt_ctr(cipher_t* cipher, uint8_t nonce_counter[16],
-                       uint8_t nonce_len, uint8_t* input, size_t length,
+                       uint8_t nonce_len, const uint8_t* input, size_t length,
                        uint8_t* output)
 {
     return cipher_encrypt_ctr(cipher, nonce_counter, nonce_len, input,

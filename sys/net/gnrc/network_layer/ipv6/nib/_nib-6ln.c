@@ -36,56 +36,6 @@ static inline bool _is_iface_eui64(gnrc_netif_t *netif, const eui64_t *eui64)
            (memcmp(&netif->l2addr, eui64, netif->l2addr_len) == 0);
 }
 
-static inline uint8_t _reverse_iid(const ipv6_addr_t *dst,
-                                   const gnrc_netif_t *netif, uint8_t *l2addr)
-{
-    switch (netif->device_type) {
-#ifdef MODULE_NETDEV_ETH
-        case NETDEV_TYPE_ETHERNET:
-            l2addr[0] = dst->u8[8] ^ 0x02;
-            l2addr[1] = dst->u8[9];
-            l2addr[2] = dst->u8[10];
-            l2addr[3] = dst->u8[13];
-            l2addr[4] = dst->u8[14];
-            l2addr[5] = dst->u8[15];
-            return ETHERNET_ADDR_LEN;
-#endif  /* MODULE_NETDEV_ETH */
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
-        case NETDEV_TYPE_IEEE802154:
-            /* assume address was based on EUI-64
-             * (see https://tools.ietf.org/html/rfc6775#section-5.2) */
-            memcpy(l2addr, &dst->u64[1], sizeof(dst->u64[1]));
-            l2addr[0] ^= 0x02;
-            return sizeof(dst->u64[1]);
-#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
-#ifdef MODULE_NRFMIN
-        case NETDEV_TYPE_NRFMIN:
-            l2addr[0] = dst->u8[14];
-            l2addr[1] = dst->u8[15];
-            return sizeof(uint16_t);
-#endif  /* MODULE_NETDEV_IEEE802154 */
-#ifdef MODULE_CC110X
-        case NETDEV_TYPE_CC110X:
-            l2addr[0] = dst->u8[15];
-            return sizeof(uint8_t);
-#endif  /* MODULE_CC110X */
-#ifdef MODULE_ESP_NOW
-        case NETDEV_TYPE_RAW:
-            l2addr[0] = dst->u8[8] ^ 0x02;
-            l2addr[1] = dst->u8[9];
-            l2addr[2] = dst->u8[10];
-            l2addr[3] = dst->u8[13];
-            l2addr[4] = dst->u8[14];
-            l2addr[5] = dst->u8[15];
-            return ETHERNET_ADDR_LEN;
-#endif  /* MODULE_ESP_NOW */
-        default:
-            (void)dst;
-            (void)l2addr;
-            return 0;
-    }
-}
-
 bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                              gnrc_ipv6_nib_nc_t *nce)
 {
@@ -95,7 +45,9 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,
     if (res) {
         uint8_t l2addr_len;
 
-        if ((l2addr_len = _reverse_iid(dst, netif, nce->l2addr)) > 0) {
+        if ((l2addr_len = gnrc_netif_ipv6_iid_to_addr(netif,
+                                                      (eui64_t *)&dst->u64[1],
+                                                      nce->l2addr)) > 0) {
             DEBUG("nib: resolve address %s%%%u by reverse translating to ",
                   ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),
                   (unsigned)netif->pid);

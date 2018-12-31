@@ -20,9 +20,7 @@
 #ifndef NET_GNRC_IPV6_EXT_RH_H
 #define NET_GNRC_IPV6_EXT_RH_H
 
-#include "net/ipv6/hdr.h"
-
-#include "net/ipv6/ext/rh.h"
+#include "net/gnrc/pkt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,14 +54,14 @@ enum {
 /**
  * @brief   Process the routing header of an IPv6 packet.
  *
- * @param[in, out] ipv6     An IPv6 packet.
- * @param[in] ext           A routing header of @p ipv6.
+ * @param[in] pkt   An IPv6 packet containing the routing header in the first
+ *                  snip
  *
  * @return  @ref GNRC_IPV6_EXT_RH_AT_DST, on success
  * @return  @ref GNRC_IPV6_EXT_RH_FORWARDED, when @p pkt was forwarded
  * @return  @ref GNRC_IPV6_EXT_RH_ERROR, on error
  */
-int gnrc_ipv6_ext_rh_process(ipv6_hdr_t *ipv6, ipv6_ext_rh_t *ext);
+int gnrc_ipv6_ext_rh_process(gnrc_pktsnip_t *pkt);
 
 #ifdef __cplusplus
 }

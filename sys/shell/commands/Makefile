@@ -70,7 +70,7 @@ ifneq (,$(filter cord_ep,$(USEMODULE)))
   SRC += sc_cord_ep.c
 endif
 
-ifneq (,$(filter periph_rtc,$(FEATURES_PROVIDED)))
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
   SRC += sc_rtc.c
 endif
 

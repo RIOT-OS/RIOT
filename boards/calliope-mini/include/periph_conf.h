@@ -21,25 +21,11 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "cfg_clock_16_0.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Clock configuration
- *
- * @note    The radio will not work with the internal RC oscillator!
- *
- * @{
- */
-#define CLOCK_HFCLK         (16U)           /* set to  0: internal RC oscillator
-                                                      16: 16MHz crystal
-                                                      32: 32MHz crystal */
-#define CLOCK_LFCLK         (0)             /* set to  0: internal RC oscillator
-                                             *         1: 32.768 kHz crystal
-                                             *         2: derived from HFCLK */
-/** @} */
 
 /**
  * @name    Timer configuration
@@ -102,15 +88,6 @@ static const i2c_conf_t i2c_config[] = {
 };
 
 #define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
-/** @} */
-
-/**
- * @name    ADC configuration
- *
- * The configuration consists simply of a list of channels that should be used
- * @{
- */
-#define ADC_NUMOF          (0)
 /** @} */
 
 /**

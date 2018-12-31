@@ -1,21 +1,17 @@
 # define the used CPU
-export CPU = nrf51
 export CPU_MODEL = nrf51x22xxaa
 
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
-# define flash and debugging environment
-export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
-export DEBUGSERVER = JLinkGDBServer -device nrf51822 -if SWD
-export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+# use jlink to program this board
+PROGRAMMER ?= jlink
 
-HEXFILE = $(BINFILE)
-export FFLAGS = $(BINDIR) $(HEXFILE)
-export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
-export RESET_FLAGS = $(BINDIR)
+# set required debug adapter for openocd if it's used
+ifeq (openocd,$(PROGRAMMER))
+  DEBUG_ADAPTER = jlink
+endif
 
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
+# include nrf51 boards common configuration
+include $(RIOTBOARD)/common/nrf51/Makefile.include

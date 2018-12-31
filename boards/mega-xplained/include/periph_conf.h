@@ -51,6 +51,7 @@ extern "C" {
  * @{
  */
 #define TIMER_NUMOF         (2U)
+#define TIMER_CHANNELS      (2)
 
 #define TIMER_0             MEGA_TIMER1
 #define TIMER_0_MASK        &TIMSK1

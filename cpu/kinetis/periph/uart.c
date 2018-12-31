@@ -58,9 +58,14 @@
 #endif
 #endif
 
-#ifndef LPUART_OVERSAMPLING_RATE
-/* Use 16x oversampling by default (hardware defaults) */
-#define LPUART_OVERSAMPLING_RATE (16)
+#ifndef LPUART_OVERSAMPLING_RATE_MIN
+/* Use 10x oversampling at minimum, this will be iterated to achieve a better
+ * baud rate match than otherwise possible with a fixed oversampling rate */
+/* Hardware reset default value is an oversampling rate of 16 */
+#define LPUART_OVERSAMPLING_RATE_MIN (10)
+#endif
+#ifndef LPUART_OVERSAMPLING_RATE_MAX
+#define LPUART_OVERSAMPLING_RATE_MAX (32)
 #endif
 
 /* Default LPUART clock setting to avoid compilation failures, define this in
@@ -318,7 +323,6 @@ void UART_4_ISR(void)
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 {
     LPUART_Type *dev = uart_config[uart].dev;
-    uint32_t clk = uart_config[uart].freq;
 
     /* Set LPUART clock source */
 #ifdef SIM_SOPT2_LPUART0SRC
@@ -339,10 +343,23 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
     dev->CTRL = uart_config[uart].mode;
 
     /* calculate baud rate divisor */
-    uint32_t div = clk / (baudrate * LPUART_OVERSAMPLING_RATE);
+    uint32_t clk = uart_config[uart].freq;
+    uint32_t best_err = baudrate;
+    uint32_t best_osr = LPUART_OVERSAMPLING_RATE_MIN;
+    /* Use the oversampling rate as a baud rate fine adjust tool */
+    for (uint32_t osr = LPUART_OVERSAMPLING_RATE_MIN; osr <= LPUART_OVERSAMPLING_RATE_MAX; ++osr) {
+        uint32_t div = clk / (osr * baudrate);
+        uint32_t actual_baud = clk / (osr * div);
+        uint32_t err = ((actual_baud > baudrate) ? actual_baud - baudrate : baudrate - actual_baud);
+        if (err < best_err) {
+            best_err = err;
+            best_osr = osr;
+        }
+    }
 
+    uint32_t sbr = clk / (best_osr * baudrate);
     /* set baud rate */
-    dev->BAUD = LPUART_BAUD_OSR(LPUART_OVERSAMPLING_RATE - 1) | LPUART_BAUD_SBR(div);
+    dev->BAUD = LPUART_BAUD_OSR(best_osr - 1) | LPUART_BAUD_SBR(sbr);
 
     /* enable transmitter and receiver + RX interrupt */
     dev->CTRL |= LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK | LPUART_CTRL_RIE_MASK;

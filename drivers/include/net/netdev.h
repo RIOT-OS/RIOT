@@ -195,6 +195,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <errno.h>
 
 #include "iolist.h"
 #include "net/netopt.h"
@@ -216,6 +217,7 @@ enum {
     NETDEV_TYPE_LORA,
     NETDEV_TYPE_NRFMIN,
     NETDEV_TYPE_SLIP,
+    NETDEV_TYPE_ESP_NOW,
 };
 
 /**
@@ -308,18 +310,25 @@ typedef struct netdev_driver {
     int (*send)(netdev_t *dev, const iolist_t *iolist);
 
     /**
-     * @brief Get a received frame
+     * @brief Drop a received frame, **OR** get the length of a received frame,
+     *        **OR** get a received frame.
      *
      * @pre `(dev != NULL)`
-     * @pre `(buf != NULL) && (len > 0)`
      *
      * Supposed to be called from
      * @ref netdev_t::event_callback "netdev->event_callback()"
      *
-     * If @p buf == NULL and @p len == 0, returns the packet size without
-     * dropping it.
+     * If @p buf == NULL and @p len == 0, returns the packet size -- or an upper
+     * bound estimation of the size -- without dropping the packet.
      * If @p buf == NULL and @p len > 0, drops the packet and returns the packet
      * size.
+     *
+     * If called with @p buf != NULL and @p len is smaller than the received
+     * packet:
+     *  - The received packet is dropped
+     *  - The content in @p buf becomes invalid. (The driver may use the memory
+     *    to implement the dropping - or may not change it.)
+     *  - `-ENOBUFS` is returned
      *
      * @param[in]   dev     network device descriptor. Must not be NULL.
      * @param[out]  buf     buffer to write into or NULL to return the packet
@@ -333,7 +342,7 @@ typedef struct netdev_driver {
      *
      * @return `-ENOBUFS` if supplied buffer is too small
      * @return number of bytes read if buf != NULL
-     * @return packet size if buf == NULL
+     * @return packet size (or upper bound estimation) if buf == NULL
      */
     int (*recv)(netdev_t *dev, void *buf, size_t len, void *info);
 
@@ -412,6 +421,47 @@ typedef struct netdev_driver {
     int (*set)(netdev_t *dev, netopt_t opt,
                const void *value, size_t value_len);
 } netdev_driver_t;
+
+/**
+ * @brief   Convenience function for declaring get() as not supported in general
+ *
+ * @param[in] dev           ignored
+ * @param[in] opt           ignored
+ * @param[in] value         ignored
+ * @param[in] max_len       ignored
+ *
+ * @return  always returns `-ENOTSUP`
+ */
+static inline int netdev_get_notsup(netdev_t *dev, netopt_t opt,
+                                    void *value, size_t max_len)
+{
+    (void)dev;
+    (void)opt;
+    (void)value;
+    (void)max_len;
+    return -ENOTSUP;
+}
+
+/**
+ * @brief   Convenience function for declaring set() as not supported in general
+ *
+ * @param[in] dev           ignored
+ * @param[in] opt           ignored
+ * @param[in] value         ignored
+ * @param[in] value_len     ignored
+ *
+ * @return  always returns `-ENOTSUP`
+ */
+static inline int netdev_set_notsup(netdev_t *dev, netopt_t opt,
+                                    const void *value, size_t value_len)
+{
+    (void)dev;
+    (void)opt;
+    (void)value;
+    (void)value_len;
+    return -ENOTSUP;
+}
+
 
 #ifdef __cplusplus
 }

@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "net/nanocoap.h"
+#include "net/nanocoap_sock.h"
 #include "net/sock/udp.h"
 
 #define ENABLE_DEBUG (0)

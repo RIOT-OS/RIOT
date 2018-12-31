@@ -230,16 +230,6 @@ static int _netdev_get(netdev_t *netdev, netopt_t opt,
     return res;
 }
 
-static int _netdev_set(netdev_t *netdev, netopt_t opt,
-                       const void *value, size_t value_len)
-{
-    (void)netdev;
-    (void)opt;
-    (void)value;
-    (void)value_len;
-    return -ENOTSUP;
-}
-
 static int _netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     (void)netif;
@@ -282,7 +272,7 @@ static const netdev_driver_t _ble_netdev_driver = {
     .init = _netdev_init,
     .isr  =  NULL,
     .get  = _netdev_get,
-    .set  = _netdev_set,
+    .set  = netdev_set_notsup,
 };
 
 static netdev_t _ble_dummy_dev = {

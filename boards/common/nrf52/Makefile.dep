@@ -1,0 +1,3 @@
+ifneq (,$(filter skald,$(USEMODULE)))
+  USEMODULE += nrfble
+endif

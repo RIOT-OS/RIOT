@@ -105,7 +105,9 @@ static const uart_conf_t uart_config[] = {
         .rx_af      = GPIO_AF3,
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
-        .irqn       = USART2_IRQn
+        .irqn       = USART2_IRQn,
+        .type       = STM32_USART,
+        .clk_src    = 0, /* Use APB clock */
     },
     {
         .dev        = USART1,
@@ -115,7 +117,9 @@ static const uart_conf_t uart_config[] = {
         .rx_af      = GPIO_AF7,
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
-        .irqn       = USART1_IRQn
+        .irqn       = USART1_IRQn,
+        .type       = STM32_USART,
+        .clk_src    = 0, /* Use APB clock */
     },
 };
 

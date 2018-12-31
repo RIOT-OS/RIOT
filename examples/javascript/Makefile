@@ -9,7 +9,7 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 blackpill bluepill calliope-mini \
                              cc2650-launchpad cc2650stk hifive1 lobaro-lorabox \
-                             maple-mini microbit nrf51dongle nrf6310 \
+                             maple-mini microbit nrf51dk nrf51dongle nrf6310 \
                              nucleo-f030r8 nucleo-f070rb nucleo-f072rb \
                              nucleo-f103rb nucleo-f302r8 nucleo-f334r8 \
                              nucleo-f410rb nucleo-l053r8 nucleo-l073rz \
@@ -35,21 +35,21 @@ endif
 # Add the package for Jerryscript
 USEPKG += jerryscript
 
-include $(RIOTBASE)/Makefile.include
+JS_PATH = $(BINDIR)/js/$(MODULE)
 
-JS_PATH := $(BINDIR)/js/$(MODULE)
 # add directory of generated *.js.h files to include path
 CFLAGS += -I$(JS_PATH)
 
 # generate .js.h header files of .js files
 JS = $(wildcard *.js)
-JS_H := $(JS:%.js=$(JS_PATH)/%.js.h)
+JS_H = $(JS:%.js=$(JS_PATH)/%.js.h)
+
+BUILDDEPS += $(JS_H) $(JS_PATH)/
+
+include $(RIOTBASE)/Makefile.include
 
 $(JS_PATH)/:
-	@mkdir -p $@
+	$(Q)mkdir -p $@
 
-$(JS_H): | $(JS_PATH)/
-$(JS_H): $(JS_PATH)/%.js.h: %.js
-	xxd -i $< | sed 's/^unsigned/const unsigned/g' > $@
-
-$(RIOTBUILD_CONFIG_HEADER_C): $(JS_H)
+$(JS_H): $(JS_PATH)/%.js.h: %.js | $(JS_PATH)/
+	$(Q)xxd -i $< | sed 's/^unsigned/const unsigned/g' > $@

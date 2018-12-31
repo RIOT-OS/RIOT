@@ -27,7 +27,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "net/gnrc/netif.h"
 #include "net/gnrc/pkt.h"
 #include "net/ipv6/ext.h"
 
@@ -38,31 +37,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   Demultiplex extension headers according to @p nh.
- *
- * About `current` and `pkt`:
- *
- *                     current     pkt
- *                     |           |
- *                     v           v
- * IPv6 <- IPv6_EXT <- IPv6_EXT <- UNDEF
- *
- * This situation may happen when the packet has a source routing extension
- * header (RFC 6554), and the packet is forwarded from an interface to another.
- *
- * @internal
- *
- * @param[in] netif     The receiving interface.
- * @param[in] current   A snip to process.
- * @param[in] pkt       A packet.
- * @param[in] nh        A protocol number (see @ref net_protnum) of the current snip.
- */
-void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
-                         gnrc_pktsnip_t *current,
-                         gnrc_pktsnip_t *pkt,
-                         uint8_t nh);
 
 /**
  * @brief   Builds an extension header for sending.
@@ -78,6 +52,77 @@ void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
  */
 gnrc_pktsnip_t *gnrc_ipv6_ext_build(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *next,
                                     uint8_t nh, size_t size);
+
+#if     defined(MODULE_GNRC_IPV6_EXT) || defined(DOXYGEN)
+/**
+ * @brief   Processes a packet's payload as hop-by-hop option if @p protnum is
+ *          pointing to a value equal to @ref PROTNUM_IPV6_EXT_HOPOPT.
+ *
+ * @note    Should be called by @ref net_gnrc_ipv6 before any further processing
+ *          (even forwarding-related) is done to @p pkt.
+ *
+ * @param[in] pkt           An IPv6 packet in receive order. It assumed that
+ *                          gnrc_pktsnip_t::data points to a hop-by-hop option
+ *                          when @p protnum points to value equal to
+ *                          @ref PROTNUM_IPV6_EXT_HOPOPT.
+ * @param[in,out] protnum   **In:** The @ref net_protnum of gnrc_pktsnip_t::data
+ *                          of @p pkt. <br />
+ *                          **Out:** If @p protnum was
+ *                          @ref PROTNUM_IPV6_EXT_HOPOPT on in and the return
+ *                          value is not NULL it points to the value of the next
+ *                          header field of the processed hop-by-hop option
+ *                          header. Since the hop-by-hop option header is now
+ *                          marked, gnrc_pktsnip_t::data of @p pkt will then be
+ *                          identified by @p protnum. <br />
+ *                          If @p protnum was @ref PROTNUM_IPV6_EXT_HOPOPT on in
+ *                          and the return value is NULL the value @p protnum is
+ *                          pointing to is undefined. <br />
+ *                          If @p protnum unequal to
+ *                          @ref PROTNUM_IPV6_EXT_HOPOPT on in the value
+ *                          @p protnum is pointing to remains unchanged.
+ *
+ * @return  @p pkt with the hop-by-hop option marked on success.
+ * @return  NULL, if the packet was consumed by the option handling.
+ * @return  NULL, on error. @p pkt is released with EINVAL in that case.
+ */
+gnrc_pktsnip_t *gnrc_ipv6_ext_process_hopopt(gnrc_pktsnip_t *pkt,
+                                             uint8_t *protnum);
+
+/**
+ * @brief   Processes a packet's extension headers after a potential initial
+ *          hop-by-hop header.
+ *
+ * @note    Should be called by @ref net_gnrc_ipv6 after @ref
+ *          gnrc_ipv6_ext_process_hopopt(), i.e. the (first) hop-by-hop option
+ *          should already be marked in @p pkt. If a hop-by-hop option is found
+ *          in gnrc_pktsnip_t::data of @p pkt, the function will return an
+ *          error.
+ *
+ * @param[in] pkt           An IPv6 packet in receive order.
+ * @param[in,out] protnum   **In:** The @ref net_protnum of gnrc_pktsnip_t::data
+ *                          of @p pkt (i.e. the first extension header to be
+ *                          processed). <br />
+ *                          **Out:** The @ref net_protnum of header in
+ *                          gnrc_pktsnip_t::data of @p pkt. The extension
+ *                          headers are now marked, so their data can be found
+ *                          in gnrc_pktsnip_t::next of @p pkt and the following.
+ *                          <br />
+ *                          If the return value is NULL, the value of @p protnum
+ *                          is undefined.
+ *
+ * @return  @p pkt with all extension headers marked until the first
+ *          non-extension header.
+ * @return  NULL, if packet was consumed by the extension header handling.
+ * @return  NULL, on error (including if one of the extension headers was a
+ *          hop-by-hop option). @p pkt is released with EINVAL in that case.
+ */
+gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
+                                          uint8_t *protnum);
+#else   /* defined(MODULE_GNRC_IPV6_EXT) || defined(DOXYGEN) */
+/* NOPs to make the usage code more readable */
+#define gnrc_ipv6_ext_process_hopopt(pkt, protnum)  (pkt)
+#define gnrc_ipv6_ext_process_all(pkt, protnum)     (pkt)
+#endif  /* defined(MODULE_GNRC_IPV6_EXT) || defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }

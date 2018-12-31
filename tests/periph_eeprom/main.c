@@ -139,6 +139,74 @@ static int cmd_write_byte(int argc, char **argv)
     return 0;
 }
 
+static int cmd_set(int argc, char **argv)
+{
+    if (argc < 4) {
+        printf("usage: %s <pos> <char> <count>\n", argv[0]);
+        return 1;
+    }
+
+    uint32_t pos = atoi(argv[1]);
+    uint32_t count = atoi(argv[3]);
+
+    if (strlen(argv[2]) != 1) {
+        puts("Failed: char must be a single digit");
+        return 1;
+    }
+
+    uint8_t c = (uint8_t)argv[2][0];
+
+    if (pos + count > EEPROM_SIZE) {
+        puts("Failed: cannot clear out of eeprom bounds");
+        return 1;
+    }
+
+    size_t ret = eeprom_set(pos, c, count);
+    printf("%d bytes set to %c in EEPROM\n", (int)ret, c);
+
+    return 0;
+}
+
+static int cmd_clear(int argc, char **argv)
+{
+    if (argc < 3) {
+        printf("usage: %s <pos> <count>\n", argv[0]);
+        return 1;
+    }
+
+    uint32_t pos = atoi(argv[1]);
+    uint32_t count = atoi(argv[2]);
+
+    if (pos + count > EEPROM_SIZE) {
+        puts("Failed: cannot clear out of eeprom bounds");
+        return 1;
+    }
+
+    size_t ret = eeprom_clear(pos, count);
+    printf("%d bytes cleared in EEPROM\n", (int)ret);
+
+    return 0;
+}
+
+static int cmd_erase(int argc, char **argv)
+{
+    if (argc != 1) {
+        printf("usage: %s\n", argv[0]);
+        return 1;
+    }
+
+    size_t ret = eeprom_erase();
+    if (ret == EEPROM_SIZE) {
+        puts("EEPROM erased with success");
+    }
+    else {
+        puts("EEPROM erase failed");
+        return 1;
+    }
+
+    return 0;
+}
+
 static int cmd_test(int argc, char **argv)
 {
     (void)argv;
@@ -148,24 +216,25 @@ static int cmd_test(int argc, char **argv)
         return 1;
     }
 
-    const char *test = "test";
+    const char *expected = "test";
 
     /* test read/write function */
 
     /* read/write from beginning of EEPROM */
-    size_t ret = eeprom_write(0, (uint8_t *)test, 4);
+    size_t ret = eeprom_write(0, (uint8_t *)expected, 4);
     assert(ret == 4);
 
-    char *expected[4];
-    ret = eeprom_read(0, (uint8_t *)expected, 4);
-    assert(strncmp((const char *)expected, (const char *)test, 4) == 0);
+    char *result[4];
+    ret = eeprom_read(0, (uint8_t *)result, 4);
+    assert(strncmp((const char *)result, (const char *)expected, 4) == 0);
     assert(ret == 4);
 
     /* read/write at end of EEPROM */
-    ret = eeprom_write(EEPROM_SIZE - 4, (uint8_t *)test, 4);
+    ret = eeprom_write(EEPROM_SIZE - 4, (uint8_t *)expected, 4);
     assert(ret == 4);
-    ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)expected, 4);
-    assert(strncmp((const char *)expected, test, 4) == 0);
+    memset(result, 0, 4);
+    ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
+    assert(strncmp((const char *)result, expected, 4) == 0);
     assert(ret == 4);
 
     /* read/write single byte */
@@ -175,6 +244,30 @@ static int cmd_test(int argc, char **argv)
     assert(eeprom_read_byte(EEPROM_SIZE - 1) == 'A');
     eeprom_write_byte(EEPROM_SIZE / 2, 'A');
     assert(eeprom_read_byte(EEPROM_SIZE / 2) == 'A');
+
+    /* clear some bytes */
+    eeprom_clear(0, 4);
+    memset(result, 0, 4);
+    ret = eeprom_read(0, (uint8_t *)result, 4);
+    assert(strncmp((const char *)result, "", 4) == 0);
+    assert(ret == 4);
+
+    eeprom_clear(EEPROM_SIZE - 4, 4);
+    ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
+    assert(strncmp((const char *)result, "", 4) == 0);
+    assert(ret == 4);
+
+    /* set some bytes */
+    eeprom_set(0, 'A', 4);
+    ret = eeprom_read(0, (uint8_t *)result, 4);
+    assert(strncmp((const char *)result, "AAAA", 4) == 0);
+    assert(ret == 4);
+
+    memset(result, 0, 4);
+    eeprom_set(EEPROM_SIZE - 4, 'A', 4);
+    ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
+    assert(strncmp((const char *)result, "AAAA", 4) == 0);
+    assert(ret == 4);
 
     puts("SUCCESS");
     return 0;
@@ -187,6 +280,9 @@ static const shell_command_t shell_commands[] = {
     { "write", "Write bytes to eeprom", cmd_write },
     { "read_byte", "Read a single byte from eeprom", cmd_read_byte },
     { "write_byte", "Write a single byte to eeprom", cmd_write_byte },
+    { "set", "Set bytes to eeprom", cmd_set},
+    { "clear", "Clear bytes to eeprom", cmd_clear},
+    { "erase", "Erase whole eeprom", cmd_erase},
     { "test", "Test the EEPROM implementation", cmd_test },
     { NULL, NULL, NULL }
 };

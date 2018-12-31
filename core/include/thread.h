@@ -154,6 +154,7 @@
 #define STATUS_FLAG_BLOCKED_ANY     6   /**< waiting for any flag from flag_mask*/
 #define STATUS_FLAG_BLOCKED_ALL     7   /**< waiting for all flags in flag_mask */
 #define STATUS_MBOX_BLOCKED         8   /**< waiting for get/put on mbox        */
+#define STATUS_COND_BLOCKED         9   /**< waiting for a condition variable   */
 /** @} */
 
 /**
@@ -162,8 +163,8 @@
  */
 #define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
                                                  `st >= STATUS_ON_RUNQUEUE`             */
-#define STATUS_RUNNING          9               /**< currently running                  */
-#define STATUS_PENDING         10               /**< waiting to be scheduled to run     */
+#define STATUS_RUNNING         10               /**< currently running                  */
+#define STATUS_PENDING         11               /**< waiting to be scheduled to run     */
 /** @} */
 
 /**
@@ -526,6 +527,26 @@ void thread_stack_print(void);
  * @brief   Prints human readable, ps-like thread information for debugging purposes
  */
 void thread_print_stack(void);
+
+/**
+ * @brief   Checks if a thread has an initialized message queue
+ *
+ * @see @ref msg_init_queue()
+ *
+ * @param[in] thread    The thread to check for
+ *
+ * @return  `== 0`, if @p thread has no initialized message queue
+ * @return  `!= 0`, if @p thread has its message queue initialized
+ */
+static inline int thread_has_msg_queue(const volatile struct _thread *thread)
+{
+#if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
+    return (thread->msg_array != NULL);
+#else
+    (void)thread;
+    return 0;
+#endif
+}
 
 #ifdef __cplusplus
 }
