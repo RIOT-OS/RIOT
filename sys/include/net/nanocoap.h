@@ -188,7 +188,6 @@ extern "C" {
 /** @} */
 
 #ifdef MODULE_GCOAP
-#define NANOCOAP_URL_MAX        NANOCOAP_URI_MAX
 #define NANOCOAP_QS_MAX         (64)
 #endif
 
