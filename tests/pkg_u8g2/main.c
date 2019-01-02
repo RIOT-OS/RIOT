@@ -72,6 +72,7 @@
 
 #include "xtimer.h"
 #include "u8g2.h"
+#include "u8x8_riotos.h"
 
 /**
  * @brief   RIOT-OS logo, 64x32 pixels at 8 pixels per byte.
@@ -101,47 +102,6 @@ static const uint8_t logo[] = {
     0x00, 0x00, 0x00, 0x00
 };
 
-#if (TEST_OUTPUT == TEST_OUTPUT_SPI)
-/**
- * @brief   RIOT-OS pin maping of U8g2 pin numbers to RIOT-OS GPIO pins.
- * @note    To minimize the overhead, you can implement an alternative for
- *          u8x8_gpio_and_delay_riotos.
- */
-static gpio_t pins[] = {
-    [U8X8_PIN_CS] = TEST_PIN_CS,
-    [U8X8_PIN_DC] = TEST_PIN_DC,
-    [U8X8_PIN_RESET] = TEST_PIN_RESET
-};
-
-/**
- * @brief   Bit mapping to indicate which pins are set.
- */
-static uint32_t pins_enabled = (
-    (1 << U8X8_PIN_CS) +
-    (1 << U8X8_PIN_DC) +
-    (1 << U8X8_PIN_RESET)
-);
-#endif
-
-#if (TEST_OUTPUT == TEST_OUTPUT_I2C)
-/**
- * @brief   RIOT-OS pin maping of U8g2 pin numbers to RIOT-OS GPIO pins.
- * @note    To minimize the overhead, you can implement an alternative for
- *          u8x8_gpio_and_delay_riotos.
- */
-	gpio_t pins[] = {
-	    [U8X8_PIN_RESET] = TEST_PIN_RESET
-	};
-
-/**
- * @brief   Bit mapping to indicate which pins are set.
- */
-	uint32_t pins_enabled = (
-	    (1 << U8X8_PIN_RESET)
-	);
-#endif
-
-
 int main(void)
 {
     uint32_t screen = 0;
@@ -167,9 +127,17 @@ int main(void)
 
     TEST_DISPLAY(&u8g2, U8G2_R0, u8x8_byte_riotos_hw_spi, u8x8_gpio_and_delay_riotos);
 
-    u8g2_SetPins(&u8g2, pins, pins_enabled);
-    u8g2_SetDevice(&u8g2, SPI_DEV(TEST_SPI));
+    u8x8_riotos_t user_data =
+    {
+        .device_index = TEST_SPI,
+        .pin_cs = TEST_PIN_CS,
+        .pin_dc = TEST_PIN_DC,
+        .pin_reset = TEST_PIN_RESET,
+    };
+
+    u8g2_SetUserPtr(&u8g2, &user_data);
 #endif
+
 
     /* initialize to I2C */
 #if TEST_OUTPUT == TEST_OUTPUT_I2C
@@ -177,9 +145,15 @@ int main(void)
 
     TEST_DISPLAY(&u8g2, U8G2_R0, u8x8_byte_riotos_hw_i2c, u8x8_gpio_and_delay_riotos);
 
-    u8g2_SetPins(&u8g2, pins, pins_enabled);
-    u8g2_SetDevice(&u8g2, I2C_DEV(TEST_I2C));
-    u8g2_SetI2CAddress(&u8g2, TEST_ADDR);
+    u8x8_riotos_t user_data =
+    {
+        .device_index = TEST_I2C,
+        .pin_cs = TEST_PIN_CS,
+        .pin_dc = TEST_PIN_DC,
+        .pin_reset = TEST_PIN_RESET,
+    };
+
+    u8g2_SetUserPtr(&u8g2, &user_data);
 #endif
 
     /* initialize the display */

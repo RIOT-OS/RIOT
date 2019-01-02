@@ -10,7 +10,7 @@
  * @ingroup     pkg_u8g2
  * @{
  *
- * @file
+ * @file        u8g2_riotos.h
  * @brief       U8g2 driver for interacting with RIOT-OS drivers
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
@@ -22,16 +22,17 @@
 #include <string.h>
 
 #include "u8g2.h"
-
+#include "log.h"
 #include "xtimer.h"
 #include "periph/spi.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
+#include "u8x8_riotos.h"
 
 #ifdef MODULE_PERIPH_SPI
 static spi_clk_t u8x8_pulse_width_to_spi_speed(uint32_t pulse_width)
 {
-    uint32_t cycle_time = 2 * pulse_width;
+    const uint32_t cycle_time = 2 * pulse_width;
 
     if (cycle_time < 100) {
         return SPI_CLK_10MHZ;
@@ -54,20 +55,34 @@ static spi_mode_t u8x8_spi_mode_to_spi_conf(uint32_t spi_mode)
 }
 #endif /* MODULE_PERIPH_SPI */
 
-static void u8x8_enable_pins(gpio_t* pins, uint32_t pins_enabled)
-{
-    uint8_t i;
+/*
+- mention in readme that the scope of user ptr must be at least the scope of the u8g2
+*/
 
-    for (i = 0; i < 32; i++) {
-        if (pins_enabled & (1 << i)) {
-            if (pins[i] != GPIO_UNDEF) {
-                if (i < U8X8_PIN_OUTPUT_CNT) {
-                    gpio_init(pins[i], GPIO_OUT);
-                } else {
-                    gpio_init(pins[i], GPIO_IN);
-                }
-            }
-        }
+/**
+ * Enable the selected pins in RIOT-OS.
+ */
+static void u8x8_enable_pins(const u8x8_riotos_t *u8x8_riot_ptr)
+{
+    // No hw peripheral is being used, nothing to be done
+    if (NULL == u8x8_riot_ptr)
+    {
+        return;
+    }
+
+    if (GPIO_UNDEF != u8x8_riot_ptr->pin_cs)
+    {
+        gpio_init(u8x8_riot_ptr->pin_cs, GPIO_OUT);
+    }
+
+    if (GPIO_UNDEF != u8x8_riot_ptr->pin_dc)
+    {
+        gpio_init(u8x8_riot_ptr->pin_dc, GPIO_OUT);
+    }
+
+    if (GPIO_UNDEF != u8x8_riot_ptr->pin_reset)
+    {
+        gpio_init(u8x8_riot_ptr->pin_reset, GPIO_OUT);
     }
 }
 
@@ -75,9 +90,11 @@ uint8_t u8x8_gpio_and_delay_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, v
 {
     (void) arg_ptr;
 
+    const u8x8_riotos_t *u8x8_riot_ptr = u8g2->user_ptr;
+
     switch (msg) {
         case U8X8_MSG_GPIO_AND_DELAY_INIT:
-            u8x8_enable_pins(u8g2->pins, u8g2->pins_enabled);
+            u8x8_enable_pins(u8x8_riot_ptr);
             break;
         case U8X8_MSG_DELAY_MILLI:
             xtimer_usleep(arg_int * 1000);
@@ -89,18 +106,18 @@ uint8_t u8x8_gpio_and_delay_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, v
             xtimer_nanosleep(arg_int * 100);
             break;
         case U8X8_MSG_GPIO_CS:
-            if (u8g2->pins_enabled & (1 << U8X8_PIN_CS)) {
-                gpio_write(u8g2->pins[U8X8_PIN_CS], arg_int);
+            if (NULL != u8x8_riot_ptr && GPIO_UNDEF != u8x8_riot_ptr->pin_cs) {
+                gpio_write(u8x8_riot_ptr->pin_cs, arg_int);
             }
             break;
         case U8X8_MSG_GPIO_DC:
-            if (u8g2->pins_enabled & (1 << U8X8_PIN_DC)) {
-                gpio_write(u8g2->pins[U8X8_PIN_DC], arg_int);
+            if (NULL != u8x8_riot_ptr && GPIO_UNDEF != u8x8_riot_ptr->pin_dc) {
+                gpio_write(u8x8_riot_ptr->pin_dc, arg_int);
             }
             break;
         case U8X8_MSG_GPIO_RESET:
-            if (u8g2->pins_enabled & (1 << U8X8_PIN_RESET)) {
-                gpio_write(u8g2->pins[U8X8_PIN_RESET], arg_int);
+            if (NULL != u8x8_riot_ptr && GPIO_UNDEF != u8x8_riot_ptr->pin_reset) {
+                gpio_write(u8x8_riot_ptr->pin_reset, arg_int);
             }
             break;
         default:
@@ -113,7 +130,16 @@ uint8_t u8x8_gpio_and_delay_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, v
 #ifdef MODULE_PERIPH_SPI
 uint8_t u8x8_byte_riotos_hw_spi(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
-    spi_t dev = (spi_t) u8g2->dev;
+    const u8x8_riotos_t *u8x8_riot_ptr = u8g2->user_ptr;
+
+    // Check that user_ptr is correctly set
+    if (NULL == u8x8_riot_ptr)
+    {
+        LOG_ERROR("u8x8_riot_ptr cannot be NULL");
+        return 1;
+    }
+
+    spi_t dev = SPI_DEV(u8x8_riot_ptr->device_index);
 
     switch (msg) {
         case U8X8_MSG_BYTE_SEND:
@@ -121,7 +147,6 @@ uint8_t u8x8_byte_riotos_hw_spi(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void
                                arg_ptr, NULL, (size_t)arg_int);
             break;
         case U8X8_MSG_BYTE_INIT:
-            spi_init_pins(dev);
             break;
         case U8X8_MSG_BYTE_SET_DC:
             u8x8_gpio_SetDC(u8g2, arg_int);
@@ -151,20 +176,30 @@ uint8_t u8x8_byte_riotos_hw_spi(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void
 #ifdef MODULE_PERIPH_I2C
 uint8_t u8x8_byte_riotos_hw_i2c(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
-    static uint8_t buffer[255];
-    static uint8_t index;
+    static uint8_t buffer[32]; /* u8g2/u8x8 will never send more than 32 bytes between START_TRANSFER and END_TRANSFER */
+    static size_t index;
 
-    i2c_t dev = (i2c_t) u8g2->dev;
+    const u8x8_riotos_t u8x8_riot_ptr = u8g2->user_ptr;
+
+    // Check that user_ptr is correctly set
+    if (NULL == u8x8_riot_ptr)
+    {
+        LOG_ERROR("u8x8_riot_ptr cannot be NULL");
+        return 1;
+    }
+
+    i2c_t dev = I2C_DEV(u8x8_riot_ptr->device_index);
 
     switch (msg) {
         case U8X8_MSG_BYTE_SEND:
             memcpy(&buffer[index], arg_ptr, arg_int);
             index += arg_int;
+            assert(index <= sizeof(buffer));
             break;
         case U8X8_MSG_BYTE_INIT:
             break;
         case U8X8_MSG_BYTE_SET_DC:
-            break;
+          break;
         case U8X8_MSG_BYTE_START_TRANSFER:
             i2c_acquire(dev);
             index = 0;

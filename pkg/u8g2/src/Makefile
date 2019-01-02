@@ -20,5 +20,8 @@ CFLAGS += -Wno-empty-translation-unit \
           -Wno-unused \
           -Wno-overlength-strings \
           -Wno-pointer-arith
+          
+# Enable user_ptr for u8g2 for smooth RIOT-OS port          
+CFLAGS += -DU8X8_WITH_USER_PTR
 
 include $(RIOTBASE)/Makefile.base

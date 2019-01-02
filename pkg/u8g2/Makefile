@@ -8,7 +8,8 @@ PKG_LICENSE=BSD-2-Clause
 all: git-download
 	cp $(RIOTBASE)/pkg/u8g2/src/Makefile $(PKG_BUILDDIR)/Makefile
 	cp $(RIOTBASE)/pkg/u8g2/src/csrc/Makefile $(PKG_BUILDDIR)/csrc/Makefile
-	cp $(RIOTBASE)/pkg/u8g2/src/csrc/u8g2_riotos.c $(PKG_BUILDDIR)/csrc/u8g2_riotos.c
+	cp $(RIOTBASE)/pkg/u8g2/src/csrc/u8x8_riotos.c $(PKG_BUILDDIR)/csrc/u8x8_riotos.c
+	cp $(RIOTBASE)/pkg/u8g2/src/csrc/u8x8_riotos.h $(PKG_BUILDDIR)/csrc/u8x8_riotos.h
 	cp $(RIOTBASE)/pkg/u8g2/src/sys/sdl/common/Makefile $(PKG_BUILDDIR)/sys/sdl/common/Makefile
 	cp $(RIOTBASE)/pkg/u8g2/src/sys/utf8/common/Makefile $(PKG_BUILDDIR)/sys/utf8/common/Makefile
 	"$(MAKE)" -C $(PKG_BUILDDIR)
