@@ -36,6 +36,7 @@
 #include <errno.h>
 
 #include "cpu.h"
+#include "stmclk.h"
 #include "mutex.h"
 
 #include "cpu_conf_stm32_common.h"
@@ -55,6 +56,14 @@
 #define I2C_FLAG_WRITE  (0)
 
 #define CLEAR_FLAG      (I2C_ICR_NACKCF | I2C_ICR_ARLOCF | I2C_ICR_BERRCF | I2C_ICR_ADDRCF)
+
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+#define I2C_CLOCK_SRC_REG       (RCC->CFGR3)
+#elif defined(CPU_FAM_STM32L4)
+#define I2C_CLOCK_SRC_REG       (RCC->CCIPR)
+#elif defined(CPU_FAM_STM32F7)
+#define I2C_CLOCK_SRC_REG       (RCC->DCKCFGR2)
+#endif
 
 /* static function definitions */
 static inline void _i2c_init(I2C_TypeDef *i2c, uint32_t timing);
@@ -84,9 +93,14 @@ void i2c_init(i2c_t dev)
     NVIC_SetPriority(i2c_config[dev].irqn, I2C_IRQ_PRIO);
     NVIC_EnableIRQ(i2c_config[dev].irqn);
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
-    /* Set I2CSW bits to enable I2C clock source */
-    RCC->CFGR3 |= i2c_config[dev].rcc_sw_mask;
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7)
+    stmclk_enable_hsi();
+#endif
+
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
+    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7)
+    /* select I2C clock source */
+    I2C_CLOCK_SRC_REG |= i2c_config[dev].rcc_sw_mask;
 #endif
 
     DEBUG("[i2c] init: configuring pins\n");

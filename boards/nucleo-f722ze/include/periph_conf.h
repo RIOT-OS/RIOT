@@ -150,6 +150,7 @@ static const i2c_conf_t i2c_config[] = {
         .sda_af         = GPIO_AF4,
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR_I2C1EN,
+        .rcc_sw_mask    = RCC_DCKCFGR2_I2C1SEL_1, /* HSI (16 MHz) */
         .irqn           = I2C1_ER_IRQn,
     }
 };
