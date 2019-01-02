@@ -42,8 +42,13 @@
 /**
  * @brief temperature base value and divider for norming temperature output
  */
+#if MODULE_LPS331AP || MODULE_LPS25HB
 #define TEMP_BASE           (42.5f)
 #define TEMP_DIVIDER        (480U)
+#else
+#define TEMP_BASE           (0.0f)
+#define TEMP_DIVIDER        (100U)
+#endif
 
 #define DEV_I2C      (dev->params.i2c)
 #define DEV_ADDR     (dev->params.addr)
@@ -71,6 +76,26 @@ int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t * params)
 
     uint8_t tmp;
 
+#if MODULE_LPS22HB
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_CTRL_REG2, &tmp, 0) < 0) {
+        i2c_release(DEV_I2C);
+        DEBUG("[lpsxxx] init: cannot read LPSXXX_REG_CTRL_REG2 register\n");
+        return -LPSXXX_ERR_I2C;
+    }
+
+    /* Disable automatic increment of register address during byte access
+       (recommanded in datasheet (section 9.6 CTRL_REG2) */
+    tmp &= ~LPSXXX_CTRL_REG2_ID_ADD_INC;
+
+    DEBUG("[lpsxxx] init: update reg2, %02X\n", tmp);
+
+    if (i2c_write_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_CTRL_REG2, tmp, 0) < 0) {
+        i2c_release(DEV_I2C);
+        DEBUG("[lpsxxx] init: cannot write in CTRL_REG2 register\n");
+        return -LPSXXX_ERR_I2C;
+    }
+#endif
+
     /* configure device, for simple operation only CTRL_REG1 needs to be touched */
 #if MODULE_LPS331AP
     tmp = LPSXXX_CTRL_REG1_DBDU | LPSXXX_CTRL_REG1_PD |
@@ -78,6 +103,9 @@ int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t * params)
 #elif MODULE_LPS25HB
     tmp = LPSXXX_CTRL_REG1_BDU | LPSXXX_CTRL_REG1_PD |
             (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
+#elif MODULE_LPS22HB
+    tmp = LPSXXX_CTRL_REG1_EN_LPFP | /* Low-pass filter configuration: ODR/9 */
+            LPSXXX_CTRL_REG1_BDU | (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
 #endif
 
     DEBUG("[lpsxxx] init: update reg1, value: %02X\n", tmp);
@@ -179,7 +207,13 @@ int lpsxxx_enable(const lpsxxx_t *dev)
         DEBUG("[lpsxxx] enable: cannot read CTRL_REG1 register\n");
         return -LPSXXX_ERR_I2C;
     }
+#if MODULE_LPS331AP || MODULE_LPS25HB
     tmp |= LPSXXX_CTRL_REG1_PD;
+#else
+    tmp |= LPSXXX_CTRL_REG1_EN_LPFP | /* Low-pass filter configuration: ODR/9 */
+            LPSXXX_CTRL_REG1_BDU | (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
+#endif
+
 
     DEBUG("[lpsxxx] enable: update reg1 with %02X\n", tmp);
 
@@ -203,7 +237,11 @@ int lpsxxx_disable(const lpsxxx_t *dev)
         DEBUG("[lpsxxx] disable: cannot read CTRL_REG1 register\n");
         return -LPSXXX_ERR_I2C;
     }
+#if MODULE_LPS331AP || MODULE_LPS25HB
+    tmp &= ~LPSXXX_CTRL_REG1_PD;
+#else
     tmp &= ~(7 << LPSXXX_CTRL_REG1_ODR_POS);
+#endif
 
     DEBUG("[lpsxxx] disable: update reg1 with %02X\n", tmp);
 

@@ -268,7 +268,7 @@ ifneq (,$(filter lpd8808,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
 endif
 
-ifneq (,$(filter lps331ap lps25hb,$(USEMODULE)))
+ifneq (,$(filter lps331ap lps2%hb,$(USEMODULE)))
   USEMODULE += lpsxxx
 endif
 

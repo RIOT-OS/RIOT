@@ -8,10 +8,10 @@
  */
 
 /**
- * @defgroup    drivers_lpsxxx LPS331AP/LPS25HB Pressure Sensors Driver
+ * @defgroup    drivers_lpsxxx LPS331AP/LPS25HB/LPS22HB Pressure Sensors Driver
  * @ingroup     drivers_sensors
  * @ingroup     drivers_saul
- * @brief       Device driver for the LPSXXX pressure sensor family
+ * @brief       Device driver for the LPSXXX pressure sensor family (LPS331AP/LPS25HB/LPS22HB)
  *
  * This driver provides @ref drivers_saul capabilities.
  *
@@ -36,9 +36,12 @@ extern "C" {
 #include <stdint.h>
 #include "periph/i2c.h"
 
- /**
-  * @brief   The sensors default I2C address
-  */
+/**
+ * @brief   The sensors default I2C address
+ *
+ * Default address corresponds to SDO/SA0 pad connected to ground. If SDO/SA0
+ * pad is connected to power supply, I2C address is 0x5C.
+ */
 #define LPSXXX_DEFAULT_ADDRESS  (0x5d)
 
 /**
@@ -63,8 +66,22 @@ typedef enum {
     LPSXXX_RATE_7HZ = 2,        /**< sample with 7Hz, default */
     LPSXXX_RATE_12HZ5 = 3,      /**< sample with 12.5Hz */
     LPSXXX_RATE_25HZ = 4        /**< sample with 25Hz */
+#elif MODULE_LPS22HB
+    LPSXXX_RATE_10HZ = 2,       /**< sample with 10Hz */
+    LPSXXX_RATE_25HZ = 3,       /**< sample with 25Hz, default */
+    LPSXXX_RATE_50HZ = 4,       /**< sample with 50Hz */
+    LPSXXX_RATE_75HZ = 5        /**< sample with 75Hz */
 #endif
 } lpsxxx_rate_t;
+
+/**
+ * @brief   The sensors default output data rate (ODR)
+ */
+#if MODULE_LPS331AP || MODULE_LPS25HB
+#define LPSXXX_DEFAULT_RATE     (LPSXXX_RATE_7HZ)
+#else /* MODULE_LPS22HB */
+#define LPSXXX_DEFAULT_RATE     (LPSXXX_RATE_25HZ)
+#endif
 
 /**
  * @brief   Struct holding all parameters needed for device initialization

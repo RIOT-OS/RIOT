@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       LPSXXX (LPS331ap/LPS25HB) adaption to SAUL interface
+ * @brief       LPSXXX (LPS331ap/LPS25HB/LPS22HB) adaption to SAUL interface
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>

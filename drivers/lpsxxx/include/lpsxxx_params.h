@@ -40,7 +40,7 @@ extern "C" {
 #define LPSXXX_PARAM_ADDR               (LPSXXX_DEFAULT_ADDRESS)
 #endif
 #ifndef LPSXXX_PARAM_RATE
-#define LPSXXX_PARAM_RATE               (LPSXXX_RATE_7HZ)
+#define LPSXXX_PARAM_RATE               (LPSXXX_DEFAULT_RATE)
 #endif
 
 #ifndef LPSXXX_PARAMS
@@ -53,6 +53,8 @@ extern "C" {
 #define LPSXXX_SAUL_NAME    "lps331ap"
 #elif MODULE_LPS25HB
 #define LPSXXX_SAUL_NAME    "lps25hb"
+#elif MODULE_LPS22HB
+#define LPSXXX_SAUL_NAME    "lps22hb"
 #endif
 #ifndef LPSXXX_SAUL_INFO
 #define LPSXXX_SAUL_INFO                { .name = LPSXXX_SAUL_NAME }
