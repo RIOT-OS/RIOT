@@ -121,7 +121,54 @@ extern "C" {
  */
 #define LPSXXX_WHO_AM_I                 (0xbd)
 
-#endif /* MODULE_LPS25HB */
+#elif MODULE_LPS22HB
+
+/**
+ * @name    LPS22HB registers
+ * @{
+ */
+#define LPSXXX_REG_INT_CFG              (0x0b)
+#define LPSXXX_REG_THS_P_L              (0x0c)
+#define LPSXXX_REG_THS_P_H              (0x0d)
+#define LPSXXX_REG_REF_P_XL             (0x15)
+#define LPSXXX_REG_RES_CONF             (0x1a)
+#define LPSXXX_REG_CTRL_REG1            (0x10)
+#define LPSXXX_REG_CTRL_REG2            (0x11)
+#define LPSXXX_REG_CTRL_REG3            (0x13)
+#define LPSXXX_REG_FIFO_CTRL            (0x2e)
+#define LPSXXX_REG_REF_P_XL             (0x15)
+#define LPSXXX_REG_REF_P_L              (0x16)
+#define LPSXXX_REG_REF_P_H              (0x17)
+#define LPSXXX_REG_RPDS_L               (0x18)
+#define LPSXXX_REG_RPDS_H               (0x19)
+#define LPSXXX_REG_RES_CONF             (0x1a)
+#define LPSXXX_REG_INT_SOURCE           (0x25)
+#define LPSXXX_REG_FIFO_STATUS          (0x26)
+#define LPSXXX_REG_LPFP_RES             (0x33)
+/** @} */
+
+/**
+ * @name    LPS22HB CTRL_REG1 bitfields
+ * @{
+ */
+#define LPSXXX_CTRL_REG1_EN_LPFP        (0x08)
+#define LPSXXX_CTRL_REG1_LPFP_CFG       (0x04)
+#define LPSXXX_CTRL_REG1_BDU            (0x02)
+/** @} */
+
+/**
+ * @name    LPS22HB CTRL_REG2 bitfields
+ * @{
+ */
+#define LPSXXX_CTRL_REG2_ID_ADD_INC     (0x10)
+/** @} */
+
+/**
+ * @brief   LPS22HB WHO_AM_I register value
+ */
+#define LPSXXX_WHO_AM_I                 (0xb1)
+
+#endif /* MODULE_LPS22HB */
 
 #ifdef __cplusplus
 }
