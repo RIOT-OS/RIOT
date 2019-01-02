@@ -38,13 +38,25 @@ static const i2c_conf_t i2c_config[] = {
         .scl_af         = GPIO_AF4,
         .sda_af         = GPIO_AF4,
         .bus            = APB1,
+#if CPU_FAM_STM32F4
         .rcc_mask       = RCC_APB1ENR_I2C1EN,
         .clk            = CLOCK_APB1,
-        .irqn           = I2C1_EV_IRQn
+        .irqn           = I2C1_EV_IRQn,
+#elif CPU_FAM_STM32L4
+        .rcc_mask       = RCC_APB1ENR1_I2C1EN,
+        .irqn           = I2C1_ER_IRQn,
+#elif CPU_FAM_STM32F7
+        .rcc_mask       = RCC_APB1ENR_I2C1EN,
+        .irqn           = I2C1_ER_IRQn,
+#endif
     }
 };
 
+#if CPU_FAM_STM32F4
 #define I2C_0_ISR           isr_i2c1_ev
+#elif CPU_FAM_STM32L4 || CPU_FAM_STM32F7
+#define I2C_0_ISR           isr_i2c1_er
+#endif
 
 #define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
