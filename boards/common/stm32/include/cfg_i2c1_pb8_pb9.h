@@ -35,10 +35,15 @@ static const i2c_conf_t i2c_config[] = {
         .speed          = I2C_SPEED_NORMAL,
         .scl_pin        = GPIO_PIN(PORT_B, 8),
         .sda_pin        = GPIO_PIN(PORT_B, 9),
+#if CPU_FAM_STM32F0
+        .scl_af         = GPIO_AF1,
+        .sda_af         = GPIO_AF1,
+#else
         .scl_af         = GPIO_AF4,
         .sda_af         = GPIO_AF4,
+#endif
         .bus            = APB1,
-#if CPU_FAM_STM32F4
+#if CPU_FAM_STM32F4 || CPU_FAM_STM32F2
         .rcc_mask       = RCC_APB1ENR_I2C1EN,
         .clk            = CLOCK_APB1,
         .irqn           = I2C1_EV_IRQn,
@@ -48,14 +53,20 @@ static const i2c_conf_t i2c_config[] = {
 #elif CPU_FAM_STM32F7
         .rcc_mask       = RCC_APB1ENR_I2C1EN,
         .irqn           = I2C1_ER_IRQn,
+#elif CPU_FAM_STM32F0
+        .rcc_mask       = RCC_APB1ENR_I2C1EN,
+        .rcc_sw_mask    = RCC_CFGR3_I2C1SW,
+        .irqn           = I2C1_IRQn,
 #endif
     }
 };
 
-#if CPU_FAM_STM32F4
+#if CPU_FAM_STM32F4 || CPU_FAM_STM32F2
 #define I2C_0_ISR           isr_i2c1_ev
 #elif CPU_FAM_STM32L4 || CPU_FAM_STM32F7
 #define I2C_0_ISR           isr_i2c1_er
+#elif CPU_FAM_STM32F0
+#define I2C_0_ISR           isr_i2c1
 #endif
 
 #define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
