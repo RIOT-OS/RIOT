@@ -103,11 +103,25 @@ riotboot/combined-slot0: $(RIOTBOOT_COMBINED_BIN)
 $(RIOTBOOT_COMBINED_BIN): $(BOOTLOADER_BIN)/riotboot.extended.bin $(SLOT0_RIOT_BIN)
 	$(Q)cat $^ > $@
 
-# Flashing rule for edbg to flash combined binaries
+RIOTBOOT_EXTENDED_BIN = $(BINDIR_APP)-slot0-extended.bin
+
+# Generate a binary file from slot 0 which covers slot 1 riot_hdr
+# in order to invalidate slot 1
+$(RIOTBOOT_EXTENDED_BIN): $(RIOTBOOT_COMBINED_BIN)
+	$(Q)cp $^ $@.tmp
+	$(Q)truncate -s $$(($(SLOT0_OFFSET) + $(SLOT0_LEN) + $(RIOTBOOT_HDR_LEN))) $@.tmp
+	$(Q)mv $@.tmp $@
+
+# Flashing rule for edbg to flash combined/extended binaries
 riotboot/flash-combined-slot0: HEXFILE=$(RIOTBOOT_COMBINED_BIN)
-# Flashing rule for openocd to flash combined binaries
+riotboot/flash-extended-slot0: HEXFILE=$(RIOTBOOT_EXTENDED_BIN)
+# Flashing rule for openocd to flash combined/extended binaries
 riotboot/flash-combined-slot0: ELFFILE=$(RIOTBOOT_COMBINED_BIN)
+riotboot/flash-extended-slot0: ELFFILE=$(RIOTBOOT_EXTENDED_BIN)
 riotboot/flash-combined-slot0: $(RIOTBOOT_COMBINED_BIN) $(FLASHDEPS)
+	$(FLASHER) $(FFLAGS)
+
+riotboot/flash-extended-slot0: $(RIOTBOOT_EXTENDED_BIN) $(FLASHDEPS)
 	$(FLASHER) $(FFLAGS)
 
 # Flashing rule for slot 0
