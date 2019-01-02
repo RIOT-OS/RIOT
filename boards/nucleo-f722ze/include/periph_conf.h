@@ -159,13 +159,6 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
-/**
- * @name    ADC configuration
- * @{
- */
-#define ADC_NUMOF           (0)
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
