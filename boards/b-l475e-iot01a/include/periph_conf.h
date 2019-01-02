@@ -229,13 +229,6 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
- * @name    ADC configuration
- * @{
- */
-#define ADC_NUMOF           (0)
-/** @} */
-
-/**
  * @name    RTT configuration
  *
  * On the STM32Lx platforms, we always utilize the LPTIM1.
