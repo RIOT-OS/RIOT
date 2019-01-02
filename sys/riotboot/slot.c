@@ -33,6 +33,9 @@
  */
 const riotboot_hdr_t * const riotboot_slots[] = {
     (riotboot_hdr_t*)(CPU_FLASH_BASE + SLOT0_OFFSET),   /* First slot address -> firmware image */
+#if NUM_SLOTS == 2
+    (riotboot_hdr_t*)(CPU_FLASH_BASE + SLOT1_OFFSET),   /* Second slot address -> firmware image */
+#endif
 };
 
 /* Calculate the number of slots */
