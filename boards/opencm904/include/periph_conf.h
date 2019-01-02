@@ -124,13 +124,6 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
-/**
- * @name I2C configuration
- * @{
- */
-#define I2C_NUMOF           (0)
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
