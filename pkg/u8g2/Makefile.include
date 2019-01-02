@@ -1,5 +1,8 @@
 INCLUDES += -I$(PKGDIRBASE)/u8g2/csrc
 
+# The RIOT-OS interface needs this to store peripheral information.
+CFLAGS += -DU8X8_WITH_USER_PTR
+
 # Link SDL if enabled.
 ifneq (,$(filter u8g2_sdl,$(USEMODULE)))
   LINKFLAGS += `sdl2-config --libs`
