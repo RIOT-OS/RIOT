@@ -577,6 +577,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     if (len < size) {
         /* buffer is smaller than the number of received bytes */
         DEBUG("[esp_now] No space in receive buffers\n");
+        /* newest API requires to drop the frame in that case */
+        ringbuffer_remove(&dev->rx_buf, 1 + size);
         mutex_unlock(&dev->dev_lock);
         return -ENOBUFS;
     }
