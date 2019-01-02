@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Test application for the LPS331AP/LPS25HB pressure sensor
+ * @brief       Test application for the LPS331AP/LPS25HB/LPS22HB pressure sensor
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
@@ -30,7 +30,7 @@ int main(void)
 {
     lpsxxx_t dev;
 
-    puts("Test application for %s pressure sensor\n\n", LPSXXX_SAUL_NAME);
+    printf("Test application for %s pressure sensor\n\n", LPSXXX_SAUL_NAME);
     printf("Initializing %s sensor\n", LPSXXX_SAUL_NAME);
     if (lpsxxx_init(&dev, &lpsxxx_params[0]) != LPSXXX_OK) {
         puts("Initialization failed");
