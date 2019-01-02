@@ -564,69 +564,48 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         ? 0
         : (ringbuffer_peek_one(&dev->rx_buf) + ESP_NOW_ADDR_LEN);
 
-    if (size && dev->rx_buf.avail < size) {
-        /* this should never happen unless this very function messes up */
-        mutex_unlock(&dev->rx_lock);
-        return -EIO;
-    }
-
-    if (!buf && !len) {
-        /* return the size without dropping received data */
-        mutex_unlock(&dev->rx_lock);
-        return size;
-    }
-
-    if (!buf && len) {
-        /* return the size and drop received data */
-        if (size) {
+    if (!buf) {
+        /* get the size of the frame */
+        if (len > 0 && size) {
+            /* if len also drop the frame */
             ringbuffer_remove(&dev->rx_buf, 1 + size);
         }
         mutex_unlock(&dev->rx_lock);
         return size;
     }
 
-    if (buf && len && !size) {
-        mutex_unlock(&dev->rx_lock);
-        return 0;
+    if (len < size) {
+        /* buffer is smaller than the number of received bytes */
+        DEBUG("[esp_now] No space in receive buffers\n");
+        mutex_unlock(&dev->dev_lock);
+        return -ENOBUFS;
     }
 
-    if (buf && len && size) {
-        if (size > len) {
-            DEBUG("[esp_now] No space in receive buffers\n");
-            mutex_unlock(&dev->rx_lock);
-            return -ENOBUFS;
-        }
+    /* remove already peeked size byte */
+    ringbuffer_remove(&dev->rx_buf, 1);
+    ringbuffer_get(&dev->rx_buf, buf, size);
+    uint8_t *mac = buf;
 
-        /* remove already peeked size byte */
-        ringbuffer_remove(&dev->rx_buf, 1);
-        ringbuffer_get(&dev->rx_buf, buf, size);
-
-        uint8_t *mac = buf;
-
-        DEBUG("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
-              __func__, size - ESP_NOW_ADDR_LEN,
-              mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    DEBUG("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
+          __func__, size - ESP_NOW_ADDR_LEN,
+          mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 #if defined(MODULE_OD) && ENABLE_DEBUG
-        od_hex_dump(buf + ESP_NOW_ADDR_LEN, size - ESP_NOW_ADDR_LEN, OD_WIDTH_DEFAULT);
+    od_hex_dump(buf + ESP_NOW_ADDR_LEN, size - ESP_NOW_ADDR_LEN, OD_WIDTH_DEFAULT);
 #endif
 
 #if ESP_NOW_UNICAST
-        if (esp_now_is_peer_exist(mac) <= 0) {
-            _esp_now_add_peer(mac, esp_now_params.channel, esp_now_params.key);
-        }
+    if (esp_now_is_peer_exist(mac) <= 0) {
+        _esp_now_add_peer(mac, esp_now_params.channel, esp_now_params.key);
+    }
 #endif
 
 #ifdef MODULE_NETSTATS_L2
-        netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += size;
+    netdev->stats.rx_count++;
+    netdev->stats.rx_bytes += size;
 #endif
 
-        mutex_unlock(&dev->rx_lock);
-        return size;
-    }
-
     mutex_unlock(&dev->rx_lock);
-    return -EINVAL;
+    return size;
 }
 
 static inline int _get_iid(esp_now_netdev_t *dev, eui64_t *value, size_t max_len)
