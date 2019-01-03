@@ -80,7 +80,7 @@ typedef struct {
  * @return      0 on success
  * @return      -1 if unable to speak to the device
  */
-int bh1750fvi_init(bh1750fvi_t *dev, bh1750fvi_params_t *params);
+int bh1750fvi_init(bh1750fvi_t *dev, const bh1750fvi_params_t *params);
 
 /**
  * @brief   Read a ambient light value from the given device [in LUX]
