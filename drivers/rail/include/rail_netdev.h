@@ -16,7 +16,6 @@
  * @author      Kai Beckmann <kai.beckmann@hs-rm.de>
  */
 
-
 #ifndef RAIL_NETDEV_H
 #define RAIL_NETDEV_H
 

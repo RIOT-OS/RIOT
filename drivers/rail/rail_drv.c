@@ -136,7 +136,6 @@ RAIL_DECLARE_TX_POWER_VBAT_CURVES(piecewiseSegments, curvesSg, curves24Hp, curve
 /* tx buffer */
 static uint8_t _transmit_buffer[IEEE802154_FRAME_LEN_MAX + 1];
 
-
 /********************* LOKAL VARIABLES ******************************/
 
 /* ref to rail_t/ netdev_t struct for this driver
@@ -168,7 +167,6 @@ void rail_setup(rail_t *dev, const rail_params_t *params)
 
     /* init dev with params */
     memcpy(&dev->params, params, sizeof(rail_params_t));
-
 
     DEBUG("rail->setup called\n");
 
@@ -261,7 +259,6 @@ int _rail_PA_init(rail_t *dev)
     return 0;
 }
 
-
 int rail_init(rail_t *dev)
 {
 
@@ -337,7 +334,6 @@ int rail_init(rail_t *dev)
 
     /* configure the channels for 802.15.4 */
 
-
 #if RAIL_RADIO_BAND == 2400
     /* for 2.4 GHz the RAIL API provides a std conform default config */
     DEBUG("using 2.4GHz radio band\n");
@@ -401,7 +397,6 @@ int rail_init(rail_t *dev)
     /* TODO
          - how to figure out if this device is the PAN coord?
      */
-
 
     /* get mac addr from SoC */
     eui64_t eui = rail_helper_get_hw_EUI();
@@ -507,7 +502,6 @@ int rail_transmit_frame(rail_t *dev, uint8_t *data_ptr, size_t data_length)
      */
     RAIL_Idle(dev->rhandle, RAIL_IDLE_ABORT, true);
 
-
     /* write packet payload in the buffer of the rail driver blob*/
     RAIL_WriteTxFifo(dev->rhandle, data_ptr, data_length + 1, true);
 
@@ -604,7 +598,6 @@ static void _rail_radio_event_handler(RAIL_Handle_t rhandle, RAIL_Events_t event
 
     event_msg.event_count = dev->event_count;
 
-
     /* rail events are a bitmask, therefore multible events within this call
        are possible -> TODO
      */
@@ -683,8 +676,6 @@ static void _rail_radio_event_handler(RAIL_Handle_t rhandle, RAIL_Events_t event
     }
 
     /* debug events */
-
-
 
     if (event & RAIL_EVENT_TX_START_CCA) {
 

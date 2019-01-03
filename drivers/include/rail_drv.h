@@ -22,7 +22,6 @@
  * @author      Kai Beckmann <kai.beckmann@hs-rm.de>
  */
 
-
 #ifndef RAIL_DRV_H
 #define RAIL_DRV_H
 
@@ -46,7 +45,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /**
  * @name    Channel configuration
@@ -76,15 +74,14 @@ extern "C" {
     - use enum?
     - use !
  */
-#define RAIL_TRANSCEIVER_STATE_UNINITIALIZED    0x00
-#define RAIL_TRANSCEIVER_STATE_IDLE             0x01
-#define RAIL_TRANSCEIVER_STATE_SLEEP            0x02
-#define RAIL_TRANSCEIVER_STATE_OFF              0x03
-#define RAIL_TRANSCEIVER_STATE_RX               0x04
-#define RAIL_TRANSCEIVER_STATE_TX               0x05
+#define RAIL_TRANSCEIVER_STATE_UNINITIALIZED    (0x00)
+#define RAIL_TRANSCEIVER_STATE_IDLE             (0x01)
+#define RAIL_TRANSCEIVER_STATE_SLEEP            (0x02)
+#define RAIL_TRANSCEIVER_STATE_OFF              (0x03)
+#define RAIL_TRANSCEIVER_STATE_RX               (0x04)
+#define RAIL_TRANSCEIVER_STATE_TX               (0x05)
 
 /** @} */
-
 
 /**
  * @brief default panid for rail
@@ -98,8 +95,7 @@ extern "C" {
 /**
  * @brief default CSMA retries
  */
-#define RAIL_DEFAULT_CSMA_TRIES     5
-
+#define RAIL_DEFAULT_CSMA_TRIES     (5)
 
 /**
  * @brief enum for the three supported radio bands
@@ -115,6 +111,7 @@ enum rail_transceiver_config_frequency {
  */
 typedef struct rail_params {
     enum rail_transceiver_config_frequency freq;    /**< radio band to operate */
+    /* TODO possible other options for future extension: */
     /* RAIL_RADIO_PA_VOLTAGE */
     /* RAIL_DEFAULT_TXPOWER */
     /* RAIL_DEFAULT_PANID */
@@ -124,8 +121,6 @@ typedef struct rail_params {
     /* auto ack timeout */
 
 } rail_params_t;
-
-
 
 /**
  * @brief   Device descriptor for Silabs EFR32 rail radio devices
@@ -149,7 +144,6 @@ typedef struct {
     bool promiscuousMode;           /**< flag if set to promiscuous mode */
 } rail_t;
 
-
 /**
  * @brief   Setup an Silabs EFR32 rail based device
  *
@@ -157,7 +151,6 @@ typedef struct {
  * @param[in]  params       parameters for device initialization
  */
 void rail_setup(rail_t *dev, const rail_params_t *params);
-
 
 /**
  * @brief   configures radio with default values

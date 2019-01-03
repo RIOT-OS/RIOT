@@ -6,7 +6,6 @@
  * directory for more details.
  */
 
-
 #include <string.h>
 
 #include "rail.h"
@@ -63,7 +62,6 @@ const netdev_driver_t rail_driver = {
     .set = _set,
 };
 
-
 static inline int rail_map_rail_status2errno(RAIL_Status_t code)
 {
     switch (code) {
@@ -108,7 +106,6 @@ static int _init(netdev_t *netdev)
     dev->netdev.proto = GNRC_NETTYPE_UNDEF;
 #endif
 
-
     netdev->driver = &rail_driver;
 
     int ret;
@@ -123,10 +120,6 @@ static int _init(netdev_t *netdev)
     if (ret < 0) {
         return ret;
     }
-
-    /* TODO state of the driver */
-
-
 
     return 0;
 }
@@ -167,7 +160,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     int ret = rail_transmit_frame(dev, frame, len);
 
     if (ret != 0) {
-        LOG_ERROR("Can not send data\n");
+        DEBUG("Can not send data\n");
         return ret;
     }
 
@@ -180,7 +173,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     DEBUG("rail_netdev->recv called\n");
 
     rail_t *dev = (rail_t *)netdev;
-
 
     RAIL_Status_t ret;
 
@@ -262,7 +254,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         return -ENOBUFS;
     }
 
-
     /* get more infos about the packet */
     RAIL_RxPacketDetails_t pack_details;
     /* clear info struct */
@@ -271,7 +262,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     ret = RAIL_GetRxPacketDetails(dev->rhandle, event_msg.rx_packet, &pack_details);
 
     if (ret != RAIL_STATUS_NO_ERROR) {
-        LOG_ERROR("Error receiving new packet / frame - msg %s\n", rail_error2str(ret));
+        LOG_ERROR("Error receiving new packet / frame - msg: %s\n", rail_error2str(ret));
         return -1;
     }
 
@@ -346,7 +337,7 @@ static void _isr(netdev_t *netdev)
 
     /* this shouldn't happen, if it does there is a race condition */
     if (event == RAIL_EVENTS_NONE) {
-        LOG_ERROR("[rail] netdev-isr called, but no event occurred -> "
+        LOG_INFO("[rail] netdev-isr called, but no event occurred -> "
                   "race condition, please file a bug report\n");
         return;
     }
@@ -360,7 +351,6 @@ static void _isr(netdev_t *netdev)
         return;
     }
 
-
     /* no need to keep the event_msg in the queue for the other possible events */
     rail_event_queue_poll(&(dev->event_queue), NULL);
 
@@ -369,6 +359,7 @@ static void _isr(netdev_t *netdev)
     /* rail events are a bitmask, therefore multible events within this call
        possible
      */
+
     /* Occurs when a packet was sent */
     if (event & RAIL_EVENT_TX_PACKET_SENT) {
         DEBUG("Rail event Tx packet sent \n");
@@ -377,7 +368,6 @@ static void _isr(netdev_t *netdev)
         return;
         /* TODO set state? */
     }
-
 
     /* Notifies the application when searching for an ack packet has timed out */
     if (event & RAIL_EVENT_RX_ACK_TIMEOUT) {
@@ -403,9 +393,6 @@ static void _isr(netdev_t *netdev)
     /* Occurs when a packet is aborted, but a more specific reason (such as
        RAIL_EVENT_RX_ADDRESS_FILTERED) isn't known.
      */
-
-
-
 
     /* TODO RAIL_EVENT_TXACK_PACKET_SENT */
     /* Occurs when an ack packet was sent. */
@@ -445,17 +432,15 @@ static void _isr(netdev_t *netdev)
     /* Occurs when the transmit buffer underflows. */
     if (event & RAIL_EVENT_TX_UNDERFLOW) {
         LOG_INFO("Rail event Tx underflow - > should not happen: race condition"
-                 " while transmitting new package\n");
+                 " while transmitting new package, please file a bug report\n");
         /* should not happen as long as the packet is written as whole into the
            RAIL driver blob buffer*/
     }
 
-    /* RAIL_EVENT_TXACK_UNDERFLOW */
-
+    /* TODO RAIL_EVENT_TXACK_UNDERFLOW */
     /* Occurs when the ack transmit buffer underflows.*/
-
-
 }
+
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
 
@@ -562,14 +547,11 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
         return ret;
     }
 
-    /*DEBUG("ieee802.15.4 could not handle netopt opt %s \n", netopt2str(opt));*/
-
     return ret;
 }
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 {
-
 
     if (netdev == NULL) {
         return -ENODEV;
@@ -600,7 +582,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 }
             }
             else if (dev->params.freq == RAIL_TRANSCEIVER_FREQUENCY_868MHZ) {
-                /* 868MHz has only one channel, channel 0! */
+                /* 868MHz has only one channel at channel page 0 -> channel 0! */
                 if (chan != RAIL_868MHZ_DEFAULT_CHANNEL) {
                     res = -EINVAL;
                     break;
@@ -614,7 +596,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             }
             else {
                 res = -EINVAL;
-                LOG_ERROR("Unknown radio frequency configured\n");
+                DEBUG("Unknown radio frequency configured\n");
                 assert(false);
                 break;
             }
@@ -627,6 +609,9 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             break;
         case (NETOPT_CHANNEL_PAGE):
             /* TODO?? */
+            /* channel page is only relevant for sub ghz radio 
+               2.4 GHz supports only channel page 0
+            */
             break;
         case (NETOPT_ADDRESS):
             assert(len <= sizeof(uint16_t));
@@ -641,7 +626,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             rail_ret = RAIL_IEEE802154_SetShortAddress(dev->rhandle, le_u16, 0);
 
             if (rail_ret != RAIL_STATUS_NO_ERROR) {
-                LOG_ERROR("[rail] error setting short address: msg: %s\n",
+                DEBUG("[rail] error setting short address: msg: %s\n",
                           rail_error2str(rail_ret));
                 res = -EFAULT;
                 break;
@@ -659,11 +644,10 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                "over the air byte order", therefore little endian again ... */
             le_u64 = byteorder_swapll(*((const uint64_t *)val));
 
-
             rail_ret = RAIL_IEEE802154_SetLongAddress(dev->rhandle, (uint8_t *)&le_u64, 0);
 
             if (rail_ret != RAIL_STATUS_NO_ERROR) {
-                LOG_ERROR("[rail] error setting long address: msg: %s\n",
+                DEBUG("[rail] error setting long address: msg: %s\n",
                           rail_error2str(rail_ret));
                 res = -EFAULT;
                 break;
@@ -677,7 +661,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             rail_ret = RAIL_IEEE802154_SetPanId(dev->rhandle, *((const uint16_t *)val), 0);
 
             if (rail_ret != RAIL_STATUS_NO_ERROR) {
-                LOG_ERROR("[rail] error setting NIB/pan id: msg: %s\n",
+                DEBUG("[rail] error setting NIB/pan id: msg: %s\n",
                           rail_error2str(rail_ret));
                 res = -EFAULT;
                 break;
@@ -695,7 +679,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             rail_ret = RAIL_SetTxPowerDbm(dev->rhandle, ddBm);
 
             if (rail_ret != RAIL_STATUS_NO_ERROR) {
-                LOG_ERROR("[rail] error setting NIB/pan id: msg: %s\n",
+                DEBUG("[rail] error setting NIB/pan id: msg: %s\n",
                           rail_error2str(rail_ret));
                 res = -EFAULT;
                 break;
@@ -720,7 +704,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             rail_ret = RAIL_IEEE802154_SetPromiscuousMode(dev->rhandle, dev->promiscuousMode);
 
             if (rail_ret != RAIL_STATUS_NO_ERROR) {
-                LOG_ERROR("[rail] error setting promiscuous mode: msg: %s\n",
+                DEBUG("[rail] error setting promiscuous mode: msg: %s\n",
                           rail_error2str(rail_ret));
                 res = -EFAULT;
                 break;
@@ -757,7 +741,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             rail_ret = RAIL_SetCcaThreshold(dev->rhandle, *((const int8_t *)val));
 
             if (rail_ret != RAIL_STATUS_NO_ERROR) {
-                LOG_ERROR("[rail] error CCA threshold: msg: %s\n",
+                DEBUG("[rail] error CCA threshold: msg: %s\n",
                           rail_error2str(rail_ret));
                 res = -EFAULT;
                 break;
@@ -789,7 +773,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
               RAIL_IEEE802154_SetPanCoordinator (bool isPanCoordinator)
         - NETOPT_IPV6_ADDR_REMOVE
             -  Set to 0x00 00 00 00 00 00 00 00 to disable for this index.
-
 
      */
 

@@ -32,14 +32,12 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief Reads and converts the EUI of the transceiver
  *
  * @return the EUI
  */
 eui64_t rail_helper_get_hw_EUI(void);
-
 
 /**
  *
@@ -48,7 +46,6 @@ eui64_t rail_helper_get_hw_EUI(void);
  *
  * @author  Kai Beckmann <kai.beckmann@hs-rm.de>
  */
-
 
 /**
  * @brief count of possible events to hold in queue
@@ -82,7 +79,6 @@ typedef struct {
     uint8_t _buffer[sizeof(rail_event_msg_t) * RAIL_EVENT_MSG_COUNT]; /**< memory to hold the ringbuffer */
 
 } rail_event_queue_t;
-
 
 /**
  * @brief Initialise an event queue for rail events
@@ -170,7 +166,6 @@ const char *rail_radioState2str(RAIL_RadioState_t state);
  * @return String
  */
 const char *rail_event2str(RAIL_Events_t event);
-
 
 /** @} */
 

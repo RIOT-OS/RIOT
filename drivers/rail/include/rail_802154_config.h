@@ -19,7 +19,6 @@
 #ifndef RAIL_802154_CONFIG_H
 #define RAIL_802154_CONFIG_H
 
-
 #include "rail_radio.h"
 
 #ifdef __cplusplus
@@ -192,11 +191,9 @@ extern "C" {
 #endif /* (RAIL_RADIO_BAND == 868) || (RAIL_RADIO_BAND == 915) */
 /** @} */
 
-
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* RAIL_802154_CONFIG_H */
 /** @} */

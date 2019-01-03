@@ -41,7 +41,6 @@ static const rail_params_t rail_params[] = {
     RAIL_PARAMS
 };
 
-
 #ifdef __cplusplus
 }
 #endif

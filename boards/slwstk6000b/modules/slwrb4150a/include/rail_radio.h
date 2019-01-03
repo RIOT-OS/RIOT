@@ -54,7 +54,6 @@ extern "C" {
  */
 #define RAIL_RADIO_PA_VOLTAGE (1800)
 
-
 /**
   * @brief Packet Trace Interface
   *
@@ -71,7 +70,7 @@ extern "C" {
  */
 #if !defined(RAIL_PTI_CONFIG)
 #define RAIL_PTI_CONFIG                                                    \
-    {                                                                        \
+    {                                                                      \
         RAIL_PTI_MODE_UART, /* Only supported output mode for the WSTK*/   \
         1600000,            /* Choose 1.6 MHz for best the WSTK */         \
         6,                  /* WSTK uses location 6 for DOUT PB12 */       \
@@ -85,7 +84,6 @@ extern "C" {
         13,                 /* RC_DOUT#6 is PB13 */                        \
     }
 #endif
-
 
 #ifdef __cplusplus
 }
