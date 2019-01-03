@@ -157,20 +157,62 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Timing parameters
+ * @defgroup net_coap_conf    CoAP compile configurations
+ * @ingroup  net_coap
+ * @ingroup  config
  * @{
  */
-#define COAP_ACK_TIMEOUT        (2U)
-#define COAP_RANDOM_FACTOR      (1.5)
 /**
- * @brief   Maximum variation for confirmable timeout.
+ * @name    Timing parameters
+ *
+ * These parameters are defined as configurable in [RFC 7252, section 4.8.1]
+ * (https://tools.ietf.org/html/rfc7252#section-4.8.1).
+ * @{
+ */
+/**
+ * @brief    Timeout in seconds for a response to a confirmable request
+ *
+ * This value is for the response to the *initial* confirmable message. The
+ * timeout doubles for subsequent retries. To avoid synchronization of resends
+ * across hosts, the actual timeout is chosen randomly between
+ * @ref COAP_ACK_TIMEOUT and (@ref COAP_ACK_TIMEOUT * @ref COAP_RANDOM_FACTOR).
+ */
+#ifndef COAP_ACK_TIMEOUT
+#define COAP_ACK_TIMEOUT        (2U)
+#endif
+
+/** @brief   Used to calculate upper bound for timeout; see @ref COAP_ACK_TIMEOUT */
+#ifndef COAP_RANDOM_FACTOR
+#define COAP_RANDOM_FACTOR      (1.5)
+#endif
+
+/**
+ * @brief   Approximation for maximum variation for confirmable timeout
  *
  * Must be an integer, defined as:
  *
  *     (COAP_ACK_TIMEOUT * COAP_RANDOM_FACTOR) - COAP_ACK_TIMEOUT
+ *
+ * Like @ref COAP_ACK_TIMEOUT, this value is valid for the initial confirmable
+ * message, and doubles for subsequent retries.
+ *
+ * This parameter is nanocoap-specific, and is not defined in RFC 7252.
  */
+#ifndef COAP_ACK_VARIANCE
 #define COAP_ACK_VARIANCE       (1U)
+#endif
+
+/** @brief   Maximum number of retransmissions for a confirmable request */
+#ifndef COAP_MAX_RETRANSMIT
 #define COAP_MAX_RETRANSMIT     (4)
+#endif
+/** @} */
+/** @} */
+
+/**
+ * @name    Fixed timing parameters
+ * @{
+ */
 #define COAP_NSTART             (1)
 #define COAP_DEFAULT_LEISURE    (5)
 /** @} */
