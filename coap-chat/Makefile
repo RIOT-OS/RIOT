@@ -5,7 +5,7 @@ APPLICATION = coap_chat
 BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../../RIOT
+RIOTBASE ?= $(CURDIR)/../RIOT
 
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
