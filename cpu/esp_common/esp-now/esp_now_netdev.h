@@ -82,8 +82,9 @@ typedef struct
 
     uint8_t addr[ESP_NOW_ADDR_LEN];  /**< device addr (MAC address) */
 
-    uint8_t rx_mem_len;              /**< number of bytes in buffer */
-    uint8_t rx_mem[ESP_NOW_BUFSIZE]; /**< memory holding one incoming frame */
+    uint8_t rx_len;                  /**< number of bytes received */
+    uint8_t* rx_mac;                 /**< source mac of received data */
+    uint8_t* rx_data;                /**< received */
 
     uint8_t tx_mem[ESP_NOW_MAX_SIZE_RAW]; /**< memory holding outgoing package */
 

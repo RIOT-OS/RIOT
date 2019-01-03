@@ -228,25 +228,24 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
      * the functions netif::_ recv and esp_now_netdev::_ recv are called
      * directly in the same thread context, neither a mutual exclusion has to
      * be realized nor have the interrupts to be deactivated.
-     * Therefore we only need a buffer which contains one frame and its source
-     * mac address.
+     * Therefore we can read directly from the `buf` and don't need a receive
+     * buffer.
      */
-    if (_esp_now_dev.rx_mem_len) {
+    if (_esp_now_dev.rx_len) {
         DEBUG("%s: buffer full, dropping incoming packet of %d bytes\n", __func__, len);
         _in_recv_cb = false;
         return;
     }
 
-    memcpy(_esp_now_dev.rx_mem, mac, ESP_NOW_ADDR_LEN);
-    memcpy(_esp_now_dev.rx_mem + ESP_NOW_ADDR_LEN, data, len);
-    _esp_now_dev.rx_mem_len = ESP_NOW_ADDR_LEN + len;
+    _esp_now_dev.rx_mac = (uint8_t*)mac;
+    _esp_now_dev.rx_data = (uint8_t*)data;
+    _esp_now_dev.rx_len = len;
 
     /*
      * Since we are not in the interrupt context, we do not have to pass
      * `NETDEV_EVENT_ISR` first. We can call the receive function directly.
      * But we have to unlock the mutex and enable interrupts before.
      */
-
     if (_esp_now_dev.netdev.event_callback) {
         _esp_now_dev.netdev.event_callback((netdev_t*)&_esp_now_dev,
                                            NETDEV_EVENT_RX_COMPLETE);
@@ -337,7 +336,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     mutex_init(&g_intr_lock_mux);
 
     /* initialize buffer */
-    dev->rx_mem_len = 0;
+    dev->rx_len = 0;
 
     esp_system_event_add_handler(_esp_system_event_handler, NULL);
 
@@ -576,13 +575,14 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     esp_now_netdev_t* dev = (esp_now_netdev_t*)netdev;
 
-    uint16_t size = dev->rx_mem_len;
+    /* we store source mac address and received data in `buf` */
+    uint16_t size = dev->rx_len ? ESP_NOW_ADDR_LEN + dev->rx_len : 0;
 
     if (!buf) {
         /* get the size of the frame */
         if (len > 0 && size) {
-            /* if len also drop the frame */
-            dev->rx_mem_len = 0;
+            /* if len > 0, drop the frame */
+            dev->rx_len = 0;
         }
         return size;
     }
@@ -591,13 +591,14 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         /* buffer is smaller than the number of received bytes */
         DEBUG("[esp_now] No space in receive buffers\n");
         /* newest API requires to drop the frame in that case */
-        dev->rx_mem_len = 0;
+        dev->rx_len = 0;
         return -ENOBUFS;
     }
 
     /* copy the buffer */
-    dev->rx_mem_len = 0;
-    memcpy(buf, &dev->rx_mem, size);
+    memcpy(buf, dev->rx_mac, ESP_NOW_ADDR_LEN);
+    memcpy((char *)buf + ESP_NOW_ADDR_LEN, dev->rx_data, dev->rx_len);
+    dev->rx_len = 0;
 
     uint8_t *mac = buf;
     DEBUG("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
