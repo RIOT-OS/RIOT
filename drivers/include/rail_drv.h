@@ -66,6 +66,34 @@ extern "C" {
 
 /** @} */
 
+
+
+#if (_SILICON_LABS_EFR32_RADIO_TYPE == _SILICON_LABS_EFR32_RADIO_SUBGHZ)
+#define RAIL_RADIO_HAS_SUBGHZ
+#endif
+#if (_SILICON_LABS_EFR32_RADIO_TYPE == _SILICON_LABS_EFR32_RADIO_DUALBAND)
+#define RAIL_RADIO_HAS_SUBGHZ
+#define RAIL_RADIO_HAS_2G4HZ
+#define RAIL_RADIO_HAS_SUBGHZ
+#endif
+#if (_SILICON_LABS_EFR32_RADIO_TYPE == _SILICON_LABS_EFR32_RADIO_2G4HZ)
+#define RAIL_RADIO_HAS_2G4HZ
+#endif
+
+#ifdef DOXYGEN
+/**
+  * @brief Set if radio transceiver supports 2.4 GHz
+  *
+  */
+#define RAIL_RADIO_HAS_2G4HZ
+/**
+  * @brief Set if radio transceiver supports sub GHz
+  *
+  */
+#define RAIL_RADIO_HAS_SUBGHZ
+
+#endif
+
 /**
  * @name radio transceiver states
  * @{
@@ -142,6 +170,10 @@ typedef struct {
     uint32_t event_count;           /**< stat / debug info, how many rail events have occured */
 
     bool promiscuousMode;           /**< flag if set to promiscuous mode */
+
+#if defined(RAIL_RADIO_HAS_SUBGHZ) || defined(DOXYGEN)
+    uint8_t channel_page;           /**< current configured channel page */
+#endif
 } rail_t;
 
 /**

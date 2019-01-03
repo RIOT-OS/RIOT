@@ -152,11 +152,6 @@ static rail_t *_rail_dev = NULL;
  */
 static void _rail_radio_event_handler(RAIL_Handle_t rhandle, RAIL_Events_t event);
 
-/*
- * TODO docu
- *
- * TODO what shall be the difference between setup and init?
- */
 void rail_setup(rail_t *dev, const rail_params_t *params)
 {
 
@@ -178,8 +173,12 @@ void rail_setup(rail_t *dev, const rail_params_t *params)
     /* TODO config for 868/912MHz different? */
     dev->csma_config = _rail_csma_default_config;
 
-    dev->event_count = 0;
+#ifdef RAIL_RADIO_HAS_SUBGHZ
+    /* set default channel page, only relevant if sub ghz channel is set */
+    dev->channel_page = RAIL_SUBGHZ_DEFAULT_PAGE;
+#endif
 
+    dev->event_count = 0;
 }
 
 /* init Packet Trace (PTI) functionality -> usefull for debugging */

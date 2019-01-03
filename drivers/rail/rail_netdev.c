@@ -346,7 +346,6 @@ static void _isr(netdev_t *netdev)
        Now only the upper layer have to be informed
      */
     if (event & RAIL_EVENT_RX_PACKET_RECEIVED) {
-
         netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
         return;
     }
@@ -468,7 +467,14 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             ret = sizeof(uint16_t);
             break;
         case (NETOPT_CHANNEL_PAGE):
-            /* TODO */
+            assert(max_len >= sizeof(uint16_t));
+            ((uint8_t *)val)[1] = 0;
+#ifdef RAIL_RADIO_HAS_SUBGHZ
+            ((uint8_t *)val)[0] = dev->channel_page;
+#else
+            ((uint8_t *)val)[0] = 0; /* for only 2.4GHz there is only channel page 0 possible */
+#endif
+            return sizeof(uint16_t);
             break;
         case (NETOPT_STATE):
             assert(max_len >= sizeof(netopt_state_t));
@@ -572,6 +578,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case (NETOPT_CHANNEL):
             /* since we have to provide the channel for each tx or rx, just
                change the attribute in the netdev struct */
+
             assert(len == sizeof(uint16_t));
             uint8_t chan = (((const uint16_t *)val)[0]) & UINT8_MAX;
 
@@ -582,6 +589,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 }
             }
             else if (dev->params.freq == RAIL_TRANSCEIVER_FREQUENCY_868MHZ) {
+                /* TODO for SUB GHZ -> support channel page != 0 */
                 /* 868MHz has only one channel at channel page 0 -> channel 0! */
                 if (chan != RAIL_868MHZ_DEFAULT_CHANNEL) {
                     res = -EINVAL;
@@ -589,6 +597,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 }
             }
             else if (dev->params.freq == RAIL_TRANSCEIVER_FREQUENCY_912MHZ) {
+                /* TODO for SUB GHZ -> support channel page != 0 */
                 if (chan > RAIL_912MHZ_MAX_CHANNEL) {
                     res = -EINVAL;
                     break;
@@ -608,10 +617,26 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
             break;
         case (NETOPT_CHANNEL_PAGE):
-            /* TODO?? */
-            /* channel page is only relevant for sub ghz radio 
-               2.4 GHz supports only channel page 0
-            */
+            assert(len == sizeof(uint16_t));
+            uint8_t page = (((const uint16_t *)val)[0]) & UINT8_MAX;
+#ifdef RAIL_RADIO_HAS_SUBGHZ
+            /* TODO support channel pages > 0 */
+            if ((page != 0) ) {
+                res = -EINVAL;
+            }
+            else {
+                dev->channel_page = page;
+                res = sizeof(uint16_t);
+            }
+#else
+            /* 2.4 GHz only supports page 0 */
+            if (page != 0) {
+                res = -EINVAL;
+            }
+            else {
+                res = sizeof(uint16_t);
+            }
+#endif
             break;
         case (NETOPT_ADDRESS):
             assert(len <= sizeof(uint16_t));
@@ -691,8 +716,10 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             res = _set_state(dev, *((const netopt_state_t *)val));
             break;
         case (NETOPT_AUTOACK):
+            /* TODO set auto ack */
             break;
         case (NETOPT_RETRANS):
+            /* TODO set retransmissions */
             break;
         case (NETOPT_PROMISCUOUSMODE):
 
@@ -761,9 +788,14 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
     /* TODO
 
-        - NETOPT_CHANNEL_PAGE // how? what is it? relevant?
         - NETOPT_AUTOACK
         - NETOPT_RETRANS
+        - NETOPT_ACK_PENDING  ?
+        - NETOPT_PRELOADING ?
+        - NETOPT_RX_START_IRQ ?
+        - NETOPT_RX_END_IRQ ?
+        - NETOPT_TX_START_IRQ ?
+        - NETOPT_TX_END_IRQ ?
 
         - bool     RAIL_IEEE802154_IsEnabled (void) ?
         - void  RAIL_EnableTxHoldOff (RAIL_Handle_t railHandle, bool enable)
@@ -773,7 +805,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
               RAIL_IEEE802154_SetPanCoordinator (bool isPanCoordinator)
         - NETOPT_IPV6_ADDR_REMOVE
             -  Set to 0x00 00 00 00 00 00 00 00 to disable for this index.
-
      */
 
     DEBUG("rail_netdev->set called opt %s val %p len %d \n", netopt2str(opt), val, len);
