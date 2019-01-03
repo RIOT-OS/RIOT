@@ -228,30 +228,18 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
      * the functions netif::_ recv and esp_now_netdev::_ recv are called
      * directly in the same thread context, neither a mutual exclusion has to
      * be realized nor have the interrupts to be deactivated.
+     * Therefore we only need a buffer which contains one frame and its source
+     * mac address.
      */
-
-    /*
-     * The ring buffer uses a single byte for the pkt length, followed by the mac address,
-     * followed by the actual packet data. The MTU for ESP-NOW is 250 bytes, so len will never
-     * exceed the limits of a byte as the mac address length is not included.
-     */
-    if ((int)ringbuffer_get_free(&_esp_now_dev.rx_buf) < 1 + ESP_NOW_ADDR_LEN + len) {
+    if (_esp_now_dev.rx_mem_len) {
         DEBUG("%s: buffer full, dropping incoming packet of %d bytes\n", __func__, len);
         _in_recv_cb = false;
         return;
     }
 
-#if 0 /* don't printf anything in ISR */
-    printf("%s\n", __func__);
-    printf("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
-           __func__, len,
-           mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-    od_hex_dump(data, len, OD_WIDTH_DEFAULT);
-#endif
-
-    ringbuffer_add_one(&_esp_now_dev.rx_buf, len);
-    ringbuffer_add(&_esp_now_dev.rx_buf, (char*)mac, ESP_NOW_ADDR_LEN);
-    ringbuffer_add(&_esp_now_dev.rx_buf, (char*)data, len);
+    memcpy(_esp_now_dev.rx_mem, mac, ESP_NOW_ADDR_LEN);
+    memcpy(_esp_now_dev.rx_mem + ESP_NOW_ADDR_LEN, data, len);
+    _esp_now_dev.rx_mem_len = ESP_NOW_ADDR_LEN + len;
 
     /*
      * Since we are not in the interrupt context, we do not have to pass
@@ -348,7 +336,8 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     extern portMUX_TYPE g_intr_lock_mux;
     mutex_init(&g_intr_lock_mux);
 
-    ringbuffer_init(&dev->rx_buf, (char*)dev->rx_mem, sizeof(dev->rx_mem));
+    /* initialize buffer */
+    dev->rx_mem_len = 0;
 
     esp_system_event_add_handler(_esp_system_event_handler, NULL);
 
@@ -587,15 +576,13 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     esp_now_netdev_t* dev = (esp_now_netdev_t*)netdev;
 
-    uint16_t size = ringbuffer_empty(&dev->rx_buf)
-        ? 0
-        : (ringbuffer_peek_one(&dev->rx_buf) + ESP_NOW_ADDR_LEN);
+    uint16_t size = dev->rx_mem_len;
 
     if (!buf) {
         /* get the size of the frame */
         if (len > 0 && size) {
             /* if len also drop the frame */
-            ringbuffer_remove(&dev->rx_buf, 1 + size);
+            dev->rx_mem_len = 0;
         }
         return size;
     }
@@ -604,15 +591,15 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         /* buffer is smaller than the number of received bytes */
         DEBUG("[esp_now] No space in receive buffers\n");
         /* newest API requires to drop the frame in that case */
-        ringbuffer_remove(&dev->rx_buf, 1 + size);
+        dev->rx_mem_len = 0;
         return -ENOBUFS;
     }
 
-    /* remove already peeked size byte */
-    ringbuffer_remove(&dev->rx_buf, 1);
-    ringbuffer_get(&dev->rx_buf, buf, size);
-    uint8_t *mac = buf;
+    /* copy the buffer */
+    dev->rx_mem_len = 0;
+    memcpy(buf, &dev->rx_mem, size);
 
+    uint8_t *mac = buf;
     DEBUG("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
           __func__, size - ESP_NOW_ADDR_LEN,
           mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
