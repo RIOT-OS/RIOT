@@ -284,6 +284,11 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     thread->msg_array = NULL;
 #endif
 
+#ifdef MODULE_THREAD_PER_STDIO
+    thread->f_stdin = stdin;
+    thread->f_stdout = stdout;
+#endif
+
     sched_num_threads++;
 
     DEBUG("Created thread %s. PID: %" PRIkernel_pid ". Priority: %u.\n", name,

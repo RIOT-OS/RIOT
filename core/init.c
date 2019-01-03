@@ -71,6 +71,12 @@ void kernel_init(void)
 {
     irq_disable();
 
+    /* For some reason, stdin and stdout are not set yet. We need them to be
+     * set before the first thread is created. This puts() will cause them
+     * to be set somehow. It also makes a clean newline to print the first
+     * output on later. */
+    puts("");
+
     thread_create(idle_stack, sizeof(idle_stack),
                   THREAD_PRIORITY_IDLE,
                   THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,

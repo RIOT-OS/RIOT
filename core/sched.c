@@ -20,6 +20,7 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
 
 #include "sched.h"
 #include "clist.h"
@@ -137,6 +138,11 @@ int __attribute__((used)) sched_run(void)
         );
 
     mpu_enable();
+#endif
+
+#ifdef MODULE_THREAD_PER_STDIO
+    stdin = sched_active_thread->f_stdin;
+    stdout = sched_active_thread->f_stdout;
 #endif
 
     DEBUG("sched_run: done, changed sched_active_thread.\n");

@@ -125,6 +125,8 @@
 #include "cpu_conf.h"
 #include "sched.h"
 
+#include <stdio.h>
+
 #ifdef MODULE_CORE_THREAD_FLAGS
 #include "thread_flags.h"
 #endif
@@ -178,6 +180,11 @@ struct _thread {
 #endif
 #ifdef HAVE_THREAD_ARCH_T
     thread_arch_t arch;             /**< architecture dependent part    */
+#endif
+
+#ifdef MODULE_THREAD_PER_STDIO
+    FILE *f_stdin;
+    FILE *f_stdout;
 #endif
 };
 
