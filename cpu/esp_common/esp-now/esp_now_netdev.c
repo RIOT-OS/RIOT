@@ -223,8 +223,12 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
     }
     _in_recv_cb = true;
 
-    mutex_lock(&_esp_now_dev.rx_lock);
-    critical_enter();
+    /*
+     * Since it is not possible to reenter the function `esp_now_recv_cb`, and
+     * the functions netif::_ recv and esp_now_netdev::_ recv are called
+     * directly in the same thread context, neither a mutual exclusion has to
+     * be realized nor have the interrupts to be deactivated.
+     */
 
     /*
      * The ring buffer uses a single byte for the pkt length, followed by the mac address,
@@ -232,8 +236,6 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
      * exceed the limits of a byte as the mac address length is not included.
      */
     if ((int)ringbuffer_get_free(&_esp_now_dev.rx_buf) < 1 + ESP_NOW_ADDR_LEN + len) {
-        critical_exit();
-        mutex_unlock(&_esp_now_dev.rx_lock);
         DEBUG("%s: buffer full, dropping incoming packet of %d bytes\n", __func__, len);
         _in_recv_cb = false;
         return;
@@ -256,9 +258,6 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
      * `NETDEV_EVENT_ISR` first. We can call the receive function directly.
      * But we have to unlock the mutex and enable interrupts before.
      */
-
-    critical_exit();
-    mutex_unlock(&_esp_now_dev.rx_lock);
 
     if (_esp_now_dev.netdev.event_callback) {
         _esp_now_dev.netdev.event_callback((netdev_t*)&_esp_now_dev,
@@ -451,7 +450,6 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     dev->scan_event = 0;
 
     mutex_init(&dev->dev_lock);
-    mutex_init(&dev->rx_lock);
 
     /* initialize ESP-NOW and register callback functions */
     result = esp_now_init();
@@ -589,8 +587,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     esp_now_netdev_t* dev = (esp_now_netdev_t*)netdev;
 
-    mutex_lock(&dev->rx_lock);
-
     uint16_t size = ringbuffer_empty(&dev->rx_buf)
         ? 0
         : (ringbuffer_peek_one(&dev->rx_buf) + ESP_NOW_ADDR_LEN);
@@ -601,7 +597,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             /* if len also drop the frame */
             ringbuffer_remove(&dev->rx_buf, 1 + size);
         }
-        mutex_unlock(&dev->rx_lock);
         return size;
     }
 
@@ -610,7 +605,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         DEBUG("[esp_now] No space in receive buffers\n");
         /* newest API requires to drop the frame in that case */
         ringbuffer_remove(&dev->rx_buf, 1 + size);
-        mutex_unlock(&dev->dev_lock);
         return -ENOBUFS;
     }
 
@@ -637,7 +631,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     netdev->stats.rx_bytes += size;
 #endif
 
-    mutex_unlock(&dev->rx_lock);
     return size;
 }
 
