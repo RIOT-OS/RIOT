@@ -94,7 +94,7 @@ extern "C" {
  * @name    User button configuration
  * @{
  */
-#define BTN0_PIN            P2IN
+#define BTN0_PIN            GPIO_PIN(2, 5)
 #define BTN0_MASK           (0x20)
 #define BTN0_MODE           GPIO_IN
 
