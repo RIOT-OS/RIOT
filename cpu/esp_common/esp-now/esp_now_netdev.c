@@ -180,7 +180,7 @@ static void IRAM_ATTR esp_now_scan_peers_timer_cb(void* arg)
     esp_now_netdev_t* dev = (esp_now_netdev_t*)arg;
 
     if (dev->netdev.event_callback) {
-        dev->scan_event = true;
+        dev->scan_event++;
         dev->netdev.event_callback((netdev_t*)dev, NETDEV_EVENT_ISR);
     }
 }
@@ -228,7 +228,7 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
     ringbuffer_add(&_esp_now_dev.rx_buf, (char*)data, len);
 
     if (_esp_now_dev.netdev.event_callback) {
-        _esp_now_dev.recv_event = true;
+        _esp_now_dev.recv_event++;
         _esp_now_dev.netdev.event_callback((netdev_t*)&_esp_now_dev, NETDEV_EVENT_ISR);
     }
 
@@ -416,8 +416,8 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     dev->netdev.driver = &_esp_now_driver;
 
     /* initialize netdev data structure */
-    dev->recv_event = false;
-    dev->scan_event = false;
+    dev->recv_event = 0;
+    dev->scan_event = 0;
 
     mutex_init(&dev->dev_lock);
     mutex_init(&dev->rx_lock);
@@ -733,12 +733,16 @@ static void _isr(netdev_t *netdev)
 
     esp_now_netdev_t *dev = (esp_now_netdev_t*)netdev;
 
+    critical_enter();
+
     if (dev->recv_event) {
-        dev->recv_event = false;
+        dev->recv_event--;
+        critical_exit();
         dev->netdev.event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
     }
     else if (dev->scan_event) {
-        dev->scan_event = false;
+        dev->scan_event--;
+        critical_exit();
         esp_now_scan_peers_start();
     }
     return;
