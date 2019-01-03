@@ -133,7 +133,7 @@ static int cmd_init(int argc, char **argv)
     if (dev < 0) {
         return 1;
     }
-    baud = atoi(argv[2]);
+    baud = strtol(argv[2], NULL, 0);
 
     /* initialize UART */
     res = uart_init(UART_DEV(dev), baud, rx_cb, (void *)dev);
@@ -145,7 +145,7 @@ static int cmd_init(int argc, char **argv)
         puts("Error: Unable to initialize UART device\n");
         return 1;
     }
-    printf("Success: Successfully initialized UART_DEV(%i)\n", dev);
+    printf("Success: Initialized UART_DEV(%i) at BAUD %"PRIu32"\n", dev, baud);
 
     /* also test if poweron() and poweroff() work (or at least don't break
      * anything) */
