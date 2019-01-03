@@ -191,6 +191,8 @@ static const uint8_t _esp_now_mac[6] = { 0x82, 0x73, 0x79, 0x84, 0x79, 0x83 }; /
 
 #endif /* ESP_NOW_UNICAST */
 
+static bool _in_recv_cb = false;
+
 static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, int len)
 {
 #if ESP_NOW_UNICAST
@@ -199,6 +201,27 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
         return;
     }
 #endif
+
+    /*
+     * The function `esp_now_recv_cb` is executed in the context of the `wifi`
+     * thread. The ISRs handling the hardware interrupts from the WiFi
+     * interface pass events to a message queue of the `wifi` thread which is
+     * sequentially processed by the `wifi` thread to asynchronously execute
+     * callback functions such as `esp_now_recv_cb`.
+     *
+     * It should be therefore not possible to reenter function
+     * `esp_now_recv_cb`. To avoid inconsistencies this is checked by an
+     * additional boolean variable . This can not be realized by a mutex
+     * because `esp_now_recv_cb` would be reentered from same thread context.
+     * If the NDEBUG macro is undefined, an assertion is used instead for
+     * debugging purposes.
+     */
+    assert(!_in_recv_cb);
+
+    if (_in_recv_cb) {
+        return;
+    }
+    _in_recv_cb = true;
 
     mutex_lock(&_esp_now_dev.rx_lock);
     critical_enter();
@@ -212,6 +235,7 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
         critical_exit();
         mutex_unlock(&_esp_now_dev.rx_lock);
         DEBUG("%s: buffer full, dropping incoming packet of %d bytes\n", __func__, len);
+        _in_recv_cb = false;
         return;
     }
 
@@ -234,6 +258,7 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
 
     critical_exit();
     mutex_unlock(&_esp_now_dev.rx_lock);
+    _in_recv_cb = false;
 }
 
 static volatile int _esp_now_sending = 0;
