@@ -1,34 +1,33 @@
-/**************************************************************************//**
- * @file efm32pg12b_adc.h
+/***************************************************************************//**
+ * @file
  * @brief EFM32PG12B_ADC register and bit field definitions
- * @version 5.4.0
- ******************************************************************************
+ * @version 5.7.0
+ *******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
- ******************************************************************************
+ * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software.@n
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.@n
+ *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * DISCLAIMER OF WARRANTY/LIMITATION OF REMEDIES: Silicon Laboratories, Inc.
- * has no obligation to support this Software. Silicon Laboratories, Inc. is
- * providing the Software "AS IS", with no express or implied warranties of any
- * kind, including, but not limited to, any implied warranties of
- * merchantability or fitness for any particular purpose or warranties against
- * infringement of any proprietary rights of a third party.
- *
- * Silicon Laboratories, Inc. will not be liable for any consequential,
- * incidental, or special damages, or any other relief, or for any claim by
- * any third party, arising from your use of this Software.
- *
- *****************************************************************************/
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,19 +40,19 @@ extern "C" {
 #pragma clang system_header  /* Treat file as system include file. */
 #endif
 
-/**************************************************************************//**
-* @addtogroup Parts
-* @{
-******************************************************************************/
-/**************************************************************************//**
+/***************************************************************************//**
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/***************************************************************************//**
  * @defgroup EFM32PG12B_ADC ADC
  * @{
  * @brief EFM32PG12B_ADC Register Declaration
- *****************************************************************************/
+ ******************************************************************************/
 /** ADC Register Declaration */
 typedef struct {
   __IOM uint32_t CTRL;            /**< Control Register  */
-  uint32_t       RESERVED0[1];    /**< Reserved for future use **/
+  uint32_t       RESERVED0[1U];   /**< Reserved for future use **/
   __IOM uint32_t CMD;             /**< Command Register  */
   __IM uint32_t  STATUS;          /**< Status Register  */
   __IOM uint32_t SINGLECTRL;      /**< Single Channel Control Register  */
@@ -74,11 +73,11 @@ typedef struct {
   __IM uint32_t  SCANDATA;        /**< Scan Conversion Result Data  */
   __IM uint32_t  SINGLEDATAP;     /**< Single Conversion Result Data Peek Register  */
   __IM uint32_t  SCANDATAP;       /**< Scan Sequence Result Data Peek Register  */
-  uint32_t       RESERVED1[4];    /**< Reserved for future use **/
+  uint32_t       RESERVED1[4U];   /**< Reserved for future use **/
   __IM uint32_t  SCANDATAX;       /**< Scan Sequence Result Data + Data Source Register  */
   __IM uint32_t  SCANDATAXP;      /**< Scan Sequence Result Data + Data Source Peek Register  */
 
-  uint32_t       RESERVED2[3];    /**< Reserved for future use **/
+  uint32_t       RESERVED2[3U];   /**< Reserved for future use **/
   __IM uint32_t  APORTREQ;        /**< APORT Request Status Register  */
   __IM uint32_t  APORTCONFLICT;   /**< APORT Conflict Status Register  */
   __IM uint32_t  SINGLEFIFOCOUNT; /**< Single FIFO Count Register  */
@@ -88,12 +87,12 @@ typedef struct {
   __IOM uint32_t APORTMASTERDIS;  /**< APORT Bus Master Disable Register  */
 } ADC_TypeDef;                    /** @} */
 
-/**************************************************************************//**
+/***************************************************************************//**
  * @addtogroup EFM32PG12B_ADC
  * @{
  * @defgroup EFM32PG12B_ADC_BitFields  ADC Bit Fields
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 
 /* Bit fields for ADC CTRL */
 #define _ADC_CTRL_RESETVALUE                               0x001F0000UL                                  /**< Default value for ADC_CTRL */
@@ -499,12 +498,12 @@ typedef struct {
 #define _ADC_SINGLECTRL_POSSEL_APORT4YCH30                 0x0000009EUL                               /**< Mode APORT4YCH30 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_POSSEL_APORT4XCH31                 0x0000009FUL                               /**< Mode APORT4XCH31 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_POSSEL_AVDD                        0x000000E0UL                               /**< Mode AVDD for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_POSSEL_BU                          0x000000E1UL                               /**< Mode BU for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_POSSEL_AREG                        0x000000E2UL                               /**< Mode AREG for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_POSSEL_VREGOUTPA                   0x000000E3UL                               /**< Mode VREGOUTPA for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_POSSEL_PDBU                        0x000000E4UL                               /**< Mode PDBU for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_POSSEL_IO0                         0x000000E5UL                               /**< Mode IO0 for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_POSSEL_IO1                         0x000000E6UL                               /**< Mode IO1 for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_POSSEL_BUVDD                       0x000000E1UL                               /**< Mode BUVDD for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_POSSEL_DVDD                        0x000000E2UL                               /**< Mode DVDD for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_POSSEL_PAVDD                       0x000000E3UL                               /**< Mode PAVDD for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_POSSEL_DECOUPLE                    0x000000E4UL                               /**< Mode DECOUPLE for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_POSSEL_IOVDD                       0x000000E5UL                               /**< Mode IOVDD for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_POSSEL_IOVDD1                      0x000000E6UL                               /**< Mode IOVDD1 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_POSSEL_VSP                         0x000000E7UL                               /**< Mode VSP for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_POSSEL_OPA2                        0x000000F2UL                               /**< Mode OPA2 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_POSSEL_TEMP                        0x000000F3UL                               /**< Mode TEMP for ADC_SINGLECTRL */
@@ -678,12 +677,12 @@ typedef struct {
 #define ADC_SINGLECTRL_POSSEL_APORT4YCH30                  (_ADC_SINGLECTRL_POSSEL_APORT4YCH30 << 8)  /**< Shifted mode APORT4YCH30 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_POSSEL_APORT4XCH31                  (_ADC_SINGLECTRL_POSSEL_APORT4XCH31 << 8)  /**< Shifted mode APORT4XCH31 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_POSSEL_AVDD                         (_ADC_SINGLECTRL_POSSEL_AVDD << 8)         /**< Shifted mode AVDD for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_POSSEL_BU                           (_ADC_SINGLECTRL_POSSEL_BU << 8)           /**< Shifted mode BU for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_POSSEL_AREG                         (_ADC_SINGLECTRL_POSSEL_AREG << 8)         /**< Shifted mode AREG for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_POSSEL_VREGOUTPA                    (_ADC_SINGLECTRL_POSSEL_VREGOUTPA << 8)    /**< Shifted mode VREGOUTPA for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_POSSEL_PDBU                         (_ADC_SINGLECTRL_POSSEL_PDBU << 8)         /**< Shifted mode PDBU for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_POSSEL_IO0                          (_ADC_SINGLECTRL_POSSEL_IO0 << 8)          /**< Shifted mode IO0 for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_POSSEL_IO1                          (_ADC_SINGLECTRL_POSSEL_IO1 << 8)          /**< Shifted mode IO1 for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_POSSEL_BUVDD                        (_ADC_SINGLECTRL_POSSEL_BUVDD << 8)        /**< Shifted mode BUVDD for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_POSSEL_DVDD                         (_ADC_SINGLECTRL_POSSEL_DVDD << 8)         /**< Shifted mode DVDD for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_POSSEL_PAVDD                        (_ADC_SINGLECTRL_POSSEL_PAVDD << 8)        /**< Shifted mode PAVDD for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_POSSEL_DECOUPLE                     (_ADC_SINGLECTRL_POSSEL_DECOUPLE << 8)     /**< Shifted mode DECOUPLE for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_POSSEL_IOVDD                        (_ADC_SINGLECTRL_POSSEL_IOVDD << 8)        /**< Shifted mode IOVDD for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_POSSEL_IOVDD1                       (_ADC_SINGLECTRL_POSSEL_IOVDD1 << 8)       /**< Shifted mode IOVDD1 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_POSSEL_VSP                          (_ADC_SINGLECTRL_POSSEL_VSP << 8)          /**< Shifted mode VSP for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_POSSEL_OPA2                         (_ADC_SINGLECTRL_POSSEL_OPA2 << 8)         /**< Shifted mode OPA2 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_POSSEL_TEMP                         (_ADC_SINGLECTRL_POSSEL_TEMP << 8)         /**< Shifted mode TEMP for ADC_SINGLECTRL */
