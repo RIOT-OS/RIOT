@@ -632,6 +632,14 @@ size_t coap_opt_put_block2(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t 
     return coap_put_option_block(buf, lastonum, blknum, szx, more, COAP_OPT_BLOCK2);
 }
 
+size_t coap_opt_add_block1(coap_pkt_t *pkt, coap_block1_t *block1)
+{
+    uint32_t val = (block1->blknum << 4) | block1->szx | (block1->more ? 0x8 : 0);
+    _encode_uint(&val);
+
+    return coap_opt_add_uint(pkt, COAP_OPT_BLOCK1, val);
+}
+
 size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
                            const char *string, char separator)
 {

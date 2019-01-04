@@ -645,6 +645,20 @@ ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
 size_t coap_opt_put_block2(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *slicer, bool more);
 
 /**
+ * @brief   Add the given block1 option into pkt
+ *
+ * @post pkt.payload advanced to first byte after option
+ * @post pkt.payload_len reduced by option length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     block1      struct with block values
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 reserved for error but not implemented yet
+ */
+size_t coap_opt_add_block1(coap_pkt_t *pkt, coap_block1_t *block1);
+
+/**
  * @brief   Get content type from packet
  *
  * @param[in]   pkt     packet to work on
