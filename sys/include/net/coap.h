@@ -86,6 +86,7 @@ extern "C" {
 #define COAP_CODE_204          ((2 << 5) | 4)
 #define COAP_CODE_CONTENT      ((2 << 5) | 5)
 #define COAP_CODE_205          ((2 << 5) | 5)
+#define COAP_CODE_CONTINUE     ((2 << 5) | 31)
 #define COAP_CODE_231          ((2 << 5) | 31)
 /** @} */
 
@@ -103,9 +104,9 @@ extern "C" {
 #define COAP_CODE_METHOD_NOT_ALLOWED         ((4 << 5) | 5)
 #define COAP_CODE_NOT_ACCEPTABLE             ((4 << 5) | 6)
 #define COAP_CODE_REQUEST_ENTITY_INCOMPLETE  ((4 << 5) | 8)
-#define COAP_CODE_PRECONDITION_FAILED        ((4 << 5) | 0xC)
-#define COAP_CODE_REQUEST_ENTITY_TOO_LARGE   ((4 << 5) | 0xD)
-#define COAP_CODE_UNSUPPORTED_CONTENT_FORMAT ((4 << 5) | 0xF)
+#define COAP_CODE_PRECONDITION_FAILED        ((4 << 5) | 12)
+#define COAP_CODE_REQUEST_ENTITY_TOO_LARGE   ((4 << 5) | 13)
+#define COAP_CODE_UNSUPPORTED_CONTENT_FORMAT ((4 << 5) | 15)
 /** @} */
 
 /**
