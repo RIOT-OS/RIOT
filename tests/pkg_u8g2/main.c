@@ -154,6 +154,7 @@ int main(void)
     };
 
     u8g2_SetUserPtr(&u8g2, &user_data);
+    u8g2_SetI2CAddress(&u8g2, TEST_ADDR);
 #endif
 
     /* initialize the display */
