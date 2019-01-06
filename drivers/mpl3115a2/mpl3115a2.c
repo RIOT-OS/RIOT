@@ -46,7 +46,7 @@ int mpl3115a2_init(mpl3115a2_t *dev, const mpl3115a2_params_t *params)
     assert(params);
 
     /* write device descriptor */
-    memcpy(dev, params, sizeof(mpl3115a2_params_t));
+    dev->params = *params;
 
     i2c_acquire(BUS);
     /* test device */
