@@ -483,7 +483,7 @@ void xbee_setup(xbee_t *dev, const xbee_params_t *params)
     dev->context = dev;
 
     /* set peripherals to use */
-    memcpy(&dev->p, params, sizeof(xbee_params_t));
+    dev->p = *params;
 
     /* initialize pins */
     if (dev->p.pin_reset != GPIO_UNDEF) {
