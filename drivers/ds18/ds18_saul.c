@@ -26,7 +26,7 @@
 
 static int read_temperature(const void *dev, phydat_t *res)
 {
-    if (ds18_get_temperature((ds18_t *)dev, &res->val[0]) == DS18_ERROR) {
+    if (ds18_get_temperature(dev, &res->val[0]) == DS18_ERROR) {
         return -ECANCELED;
     }
 
