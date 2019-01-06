@@ -70,7 +70,7 @@ int tmp006_init(tmp006_t *dev, const tmp006_params_t *params)
     uint16_t tmp;
 
     /* initialize the device descriptor */
-    memcpy(&dev->p, params, sizeof(tmp006_params_t));
+    dev->p = *params;
 
     if (dev->p.rate > TMP006_CONFIG_CR_AS16) {
         LOG_ERROR("tmp006_init: invalid conversion rate!\n");
