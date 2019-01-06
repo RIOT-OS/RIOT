@@ -812,6 +812,52 @@ static inline size_t coap_opt_put_block2(uint8_t *buf, uint16_t lastonum,
 }
 
 /**
+ * @brief   Insert block option into buffer from block struct
+ *
+ * @param[in]   buf         buffer to write to
+ * @param[in]   lastonum    last option number (must be < @p option)
+ * @param[in]   block       block option attribute struct
+ * @param[in]   option      option number (block1 or block2)
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+size_t coap_opt_put_block_object(uint8_t *buf, uint16_t lastonum,
+                                 coap_block1_t *block, uint16_t option);
+
+/**
+ * @brief   Insert block1 option into buffer in control usage
+ *
+ * @param[in]   buf         buffer to write to
+ * @param[in]   lastonum    last option number (must be < 27)
+ * @param[in]   block       block option attribute struct
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+static inline size_t coap_opt_put_block1_control(uint8_t *buf, uint16_t lastonum,
+                                                 coap_block1_t *block)
+{
+    return coap_opt_put_block_object(buf, lastonum, block, COAP_OPT_BLOCK1);
+}
+
+/**
+ * @brief   Insert block2 option into buffer in control usage
+ *
+ * Forces value of block 'more' attribute to zero, per spec.
+ *
+ * @param[in]   buf         buffer to write to
+ * @param[in]   lastonum    last option number (must be < 27)
+ * @param[in]   block       block option attribute struct
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+static inline size_t coap_opt_put_block2_control(uint8_t *buf, uint16_t lastonum,
+                                                 coap_block1_t *block)
+{
+    block->more = 0;
+    return coap_opt_put_block_object(buf, lastonum, block, COAP_OPT_BLOCK2);
+}
+
+/**
  * @brief   Encode the given string as multi-part option into buffer
  *
  * @param[out]  buf         buffer to write to
