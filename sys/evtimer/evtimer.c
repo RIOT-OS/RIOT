@@ -209,10 +209,11 @@ void evtimer_init(evtimer_t *evtimer, evtimer_callback_t handler)
 void evtimer_print(const evtimer_t *evtimer)
 {
     evtimer_event_t *list = evtimer->events;
+    int nr = 0;
 
-    while (list->next) {
-        evtimer_event_t *list_entry = list->next;
-        printf("ev offset=%u\n", (unsigned)list_entry->offset);
+    while (list) {
+        nr++;
+        printf("ev #%d offset=%u\n", nr, (unsigned)list->offset);
         list = list->next;
     }
 }
