@@ -181,7 +181,7 @@ uint32_t IRAM ets_post (uint32_t prio, ETSSignal sig, ETSParam par)
         system_soft_wdt_feed();
     }
 
-    if (ets_thread) {
+    if (ets_thread && irom_cache_enabled()) {
         thread_flags_set((thread_t*)ets_thread, THREAD_FLAG_ETS_THREAD);
     }
 
