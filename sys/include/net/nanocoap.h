@@ -752,6 +752,45 @@ ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
  */
 /**@{*/
 /**
+ * @brief   Insert block option into buffer
+ *
+ * When calling this function to initialize a packet with a block option, the
+ * more flag must be set to prevent the creation of an option with a length too
+ * small to contain the size bit.
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in]   lastonum    number of previous option, must be < @p option
+ * @param[in]   slicer      coap blockwise slicer helper struct
+ * @param[in]   more        more flag (1 or 0)
+ * @param[in]   option      option number (block1 or block2)
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+size_t coap_opt_put_block(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *slicer,
+                          bool more, uint16_t option);
+
+/**
+ * @brief   Insert block1 option into buffer
+ *
+ * When calling this function to initialize a packet with a block1 option, the
+ * more flag must be set to prevent the creation of an option with a length too
+ * small to contain the size bit.
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in]   lastonum    number of previous option (for delta calculation),
+ *                          must be < 27
+ * @param[in]   slicer      coap blockwise slicer helper struct
+ * @param[in]   more        more flag (1 or 0)
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+static inline size_t coap_opt_put_block1(uint8_t *buf, uint16_t lastonum,
+                                         coap_block_slicer_t *slicer, bool more)
+{
+    return coap_opt_put_block(buf, lastonum, slicer, more, COAP_OPT_BLOCK1);
+}
+
+/**
  * @brief   Insert block2 option into buffer
  *
  * When calling this function to initialize a packet with a block2 option, the
@@ -766,7 +805,11 @@ ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
  *
  * @returns     amount of bytes written to @p buf
  */
-size_t coap_opt_put_block2(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *slicer, bool more);
+static inline size_t coap_opt_put_block2(uint8_t *buf, uint16_t lastonum,
+                                         coap_block_slicer_t *slicer, bool more)
+{
+    return coap_opt_put_block(buf, lastonum, slicer, more, COAP_OPT_BLOCK2);
+}
 
 /**
  * @brief   Encode the given string as multi-part option into buffer

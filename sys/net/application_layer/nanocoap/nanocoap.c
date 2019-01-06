@@ -707,13 +707,17 @@ size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t last
     }
 }
 
-size_t coap_opt_put_block2(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *slicer, bool more)
+size_t coap_opt_put_block(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *slicer,
+                          bool more, uint16_t option)
 {
     unsigned szx = _size2szx(slicer->end - slicer->start);
     unsigned blknum = _slicer_blknum(slicer);
 
+    uint32_t blkopt = (blknum << 4) | szx | (more ? 0x8 : 0);
+    size_t olen = _encode_uint(&blkopt);
+
     slicer->opt = buf;
-    return coap_put_option_block(buf, lastonum, blknum, szx, more, COAP_OPT_BLOCK2);
+    return coap_put_option(buf, lastonum, option, (uint8_t *)&blkopt, olen);
 }
 
 size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
