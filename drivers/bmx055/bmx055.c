@@ -54,7 +54,7 @@ int bmx055_init(bmx055_t *dev, const bmx055_params_t *params)
 
     uint8_t tmp;
 
-    memcpy(&dev->p, params, sizeof(bmx055_params_t));
+    dev->p = *params;
 
     /* bring magnetometer from suspend mode to sleep mode just in case
      * and try to read magnetometer id
