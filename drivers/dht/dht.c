@@ -69,7 +69,7 @@ int dht_init(dht_t *dev, const dht_params_t *params)
     assert(dev && params &&
            ((dev->type == DHT11) || (dev->type == DHT22) || (dev->type == DHT21)));
 
-    memcpy(dev, params, sizeof(dht_t));
+    *dev = *params;
 
     gpio_init(dev->pin, GPIO_OUT);
     gpio_set(dev->pin);
