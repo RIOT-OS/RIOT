@@ -271,6 +271,11 @@ void auto_init(void)
     auto_init_ethos();
 #endif
 
+#ifdef MODULE_DOSE
+    extern void auto_init_dose(void);
+    auto_init_dose();
+#endif
+
 #ifdef MODULE_SLIPDEV
     extern void auto_init_slipdev(void);
     auto_init_slipdev();

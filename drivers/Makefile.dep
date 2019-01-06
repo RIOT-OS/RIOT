@@ -193,6 +193,15 @@ ifneq (,$(filter ethos,$(USEMODULE)))
   USEMODULE += tsrb
 endif
 
+ifneq (,$(filter dose,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+  USEMODULE += iolist
+  USEMODULE += netdev_eth
+  USEMODULE += random
+  USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_gpio_irq
+endif
+
 ifneq (,$(filter feetech,$(USEMODULE)))
   USEMODULE += uart_half_duplex
 endif
