@@ -44,7 +44,7 @@ int mma8x5x_init(mma8x5x_t *dev, const mma8x5x_params_t *params)
     assert(dev && params);
 
     /* write device descriptor */
-    memcpy(dev, params, sizeof(mma8x5x_params_t));
+    dev->params = *params;
 
     /* acquire the I2C bus */
     i2c_acquire(BUS);
