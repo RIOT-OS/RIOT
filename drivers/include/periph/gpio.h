@@ -173,7 +173,7 @@ void gpio_toggle_cpu(gpio_t pin);
 void gpio_write_cpu(gpio_t pin, int value);
 /** @} */
 
-#if MODULE_EXTEND_ADC || DOXYGEN
+#if MODULE_EXTEND_GPIO || DOXYGEN
 /**
  * @brief   Redirecting versions of the GPIO functions
  *
@@ -191,7 +191,7 @@ void gpio_clear_redir(gpio_t pin);
 void gpio_toggle_redir(gpio_t pin);
 void gpio_write_redir(gpio_t pin, int value);
 /** @} */
-#endif /* MODULE_EXTEND_ADC || DOXYGEN */
+#endif /* MODULE_EXTEND_GPIO || DOXYGEN */
 
 /**
  * @brief   Initialize the given pin as general purpose input or output
