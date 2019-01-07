@@ -47,7 +47,8 @@ static int check_and_read(const void *dev, phydat_t *res, int16_t *val, uint8_t 
     }
 
     res->val[0] = *val;
-    memset(&res->val[1], 0, 2 * sizeof(int16_t));
+    res->val[1] = 0;
+    res->val[2] = 0;
     res->unit = unit;
     res->scale = -1;
     return 1;
