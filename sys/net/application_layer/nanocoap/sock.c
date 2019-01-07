@@ -128,17 +128,17 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
     }
 
     ssize_t res = sock_udp_create(&sock, local, NULL, 0);
-    if (res == -1) {
+    if (res != 0) {
         return -1;
     }
 
     while (1) {
         res = sock_udp_recv(&sock, buf, bufsize, -1, &remote);
-        if (res == -1) {
+        if (res < 0) {
             DEBUG("error receiving UDP packet\n");
             return -1;
         }
-        else {
+        else if (res > 0) {
             coap_pkt_t pkt;
             if (coap_parse(&pkt, (uint8_t *)buf, res) < 0) {
                 DEBUG("error parsing packet\n");
