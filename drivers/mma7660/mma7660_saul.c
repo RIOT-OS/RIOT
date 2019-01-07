@@ -26,7 +26,7 @@
 
 static int read_acc(const void *dev, phydat_t *res)
 {
-    mma7660_read((const mma7660_t *)dev, (mma7660_data_t *)res);
+    mma7660_read((const mma7660_t *)dev, (mma7660_data_t *)res->val);
 
     res->unit = UNIT_G;
     res->scale = -3;
