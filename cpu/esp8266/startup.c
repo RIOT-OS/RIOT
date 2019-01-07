@@ -69,7 +69,7 @@ extern uint8_t _eheap;
 #define ETS_TASK_PRIORITY   (1)
 
 /* stack for the ETS task */
-static char ets_task_stack[THREAD_STACKSIZE_DEFAULT];
+static char ets_task_stack[ETS_THREAD_STACKSIZE];
 /* ETS task code */
 extern void *ets_task_func(void *arg);
 
