@@ -384,10 +384,6 @@ typedef struct {
 #endif
     uint8_t bus;            /**< APB bus */
     uint8_t irqn;           /**< IRQ channel */
-#ifdef MODULE_PERIPH_DMA
-    dma_t dma;              /**< Logical DMA stream used for TX */
-    uint8_t dma_chan;       /**< DMA channel used for TX */
-#endif
 #ifdef MODULE_STM32_PERIPH_UART_HW_FC
     gpio_t cts_pin;         /**< CTS pin - set to GPIO_UNDEF when not using HW flow control */
     gpio_t rts_pin;         /**< RTS pin */
@@ -399,6 +395,10 @@ typedef struct {
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4)
     uart_type_t type;       /**< hardware module type (USART or LPUART) */
     uint32_t clk_src;       /**< clock source used for UART */
+#endif
+#ifdef MODULE_PERIPH_DMA
+    dma_t dma;              /**< Logical DMA stream used for TX */
+    uint8_t dma_chan;       /**< DMA channel used for TX */
 #endif
 } uart_conf_t;
 
