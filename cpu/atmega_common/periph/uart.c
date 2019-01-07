@@ -97,6 +97,7 @@ static void _set_brr(uart_t uart, uint32_t baudrate)
         return;
     }
 #endif
+/* brr calculation is different from the datasheet to provide better rounding */
 #if defined(UART_DOUBLE_SPEED)
     brr = (CLOCK_CORECLOCK + 4UL * baudrate) / (8UL * baudrate) - 1UL;
     _update_brr(uart, brr, true);
