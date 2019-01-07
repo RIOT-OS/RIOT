@@ -1114,6 +1114,9 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
 bool gnrc_netif_is_6ln(const gnrc_netif_t *netif)
 {
     switch (netif->device_type) {
+#ifdef MODULE_GNRC_SIXLOENC
+        case NETDEV_TYPE_ETHERNET:
+#endif
         case NETDEV_TYPE_IEEE802154:
         case NETDEV_TYPE_CC110X:
         case NETDEV_TYPE_BLE:
@@ -1177,7 +1180,9 @@ static void _init_from_device(gnrc_netif_t *netif)
     assert(res == sizeof(tmp));
     netif->device_type = (uint8_t)tmp;
     switch (netif->device_type) {
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN) || defined(MODULE_XBEE) || defined(MODULE_ESP_NOW)
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN) || \
+    defined(MODULE_XBEE) || defined(MODULE_ESP_NOW) || \
+    defined(MODULE_GNRC_SIXLOENC)
         case NETDEV_TYPE_IEEE802154:
         case NETDEV_TYPE_NRFMIN:
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
@@ -1201,6 +1206,9 @@ static void _init_from_device(gnrc_netif_t *netif)
         case NETDEV_TYPE_ETHERNET:
 #ifdef MODULE_GNRC_IPV6
             netif->ipv6.mtu = ETHERNET_DATA_LEN;
+#endif
+#if defined(MODULE_GNRC_SIXLOWPAN_IPHC) && defined(MODULE_GNRC_SIXLOENC)
+            netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
 #endif
             break;
 #endif
