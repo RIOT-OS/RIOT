@@ -622,24 +622,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     return size;
 }
 
-static inline int _get_iid(esp_now_netdev_t *dev, eui64_t *value, size_t max_len)
-{
-    CHECK_PARAM_RET(max_len >= sizeof(eui64_t), -EOVERFLOW);
-
-    /* interface id according to */
-    /* https://tools.ietf.org/html/rfc4291#section-2.5.1 */
-    value->uint8[0] = dev->addr[0] ^ 0x02; /* invert bit1 */
-    value->uint8[1] = dev->addr[1];
-    value->uint8[2] = dev->addr[2];
-    value->uint8[3] = 0xff;
-    value->uint8[4] = 0xfe;
-    value->uint8[5] = dev->addr[3];
-    value->uint8[6] = dev->addr[4];
-    value->uint8[7] = dev->addr[5];
-
-    return sizeof(eui64_t);
-}
-
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
     DEBUG("%s: %s %p %p %u\n", __func__, netopt2str(opt), netdev, val, max_len);
@@ -683,10 +665,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             CHECK_PARAM_RET(max_len >= sizeof(dev->addr), -EOVERFLOW);
             memcpy(val, dev->addr, sizeof(dev->addr));
             res = sizeof(dev->addr);
-            break;
-
-        case NETOPT_IPV6_IID:
-            res = _get_iid(dev, val, max_len);
             break;
 
 #ifdef MODULE_NETSTATS_L2
