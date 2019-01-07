@@ -30,7 +30,7 @@
 /**
  * @brief   This function sets the IRQ disable bit in the status register
  *
- * @return  Previous value of status register. The return value should not
+ * @return  Previous value of status register. The return value should not be
  *          interpreted as a boolean value. The actual value is only
  *          significant for irq_restore().
  *
@@ -41,7 +41,7 @@ unsigned irq_disable(void);
 /**
  * @brief   This function clears the IRQ disable bit in the status register
  *
- * @return  Previous value of status register. The return value should not
+ * @return  Previous value of status register. The return value should not be
  *          interpreted as a boolean value. The actual value is only
  *          significant for irq_restore().
  *
