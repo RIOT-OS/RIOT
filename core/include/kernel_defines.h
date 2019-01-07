@@ -8,7 +8,7 @@
  */
 
 /**
- * @addtogroup  core_internal
+ * @ingroup     core_internal
  * @{
  *
  * @file
