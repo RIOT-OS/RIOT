@@ -13,7 +13,7 @@
  *
  * This module is for usage with the @ref net_gnrc_netapi
  *
- * # NETAPI command documentation
+ * # Supported NETAPI commands
  *
  * This module handles the following @ref net_gnrc_netapi message types:
  *
