@@ -160,9 +160,6 @@ static void IRAM_ATTR esp_now_scan_peers_done(void)
 
     _esp_now_scan_peers_done = true;
 
-    /* set the time for next scan */
-    xtimer_set(&_esp_now_scan_peers_timer, esp_now_params.scan_period);
-
     mutex_unlock(&_esp_now_dev.dev_lock);
 }
 
@@ -170,7 +167,10 @@ static void esp_now_scan_peers_start(void)
 {
     DEBUG("%s\n", __func__);
 
+    /* start the scan */
     esp_wifi_scan_start(&scan_cfg, false);
+    /* set the time for next scan */
+    xtimer_set(&_esp_now_scan_peers_timer, esp_now_params.scan_period);
 }
 
 static void IRAM_ATTR esp_now_scan_peers_timer_cb(void* arg)
