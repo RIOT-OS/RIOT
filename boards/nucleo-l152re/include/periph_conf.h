@@ -63,6 +63,27 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    DMA streams configuration
+ * @{
+ */
+#ifdef MODULE_PERIPH_DMA
+static const dma_conf_t dma_config[] = {
+    { .stream = 1 },    /* DMA1 Channel 2 - SPI1_RX / USART3_TX */
+    { .stream = 2 },    /* DMA1 Channel 3 - SPI1_TX */
+    { .stream = 6 },    /* DMA1 Channel 7 - USART2_TX */
+    { .stream = 4 },    /* DMA1 Channel 4 - USART1_TX */
+};
+
+#define DMA_0_ISR  isr_dma1_ch2
+#define DMA_1_ISR  isr_dma1_ch3
+#define DMA_2_ISR  isr_dma1_ch7
+#define DMA_3_ISR  isr_dma1_ch4
+
+#define DMA_NUMOF           (sizeof(dma_config) / sizeof(dma_config[0]))
+#endif
+/** @} */
+
+/**
  * @name   Timer configuration
  * @{
  */
@@ -101,7 +122,11 @@ static const uart_conf_t uart_config[] = {
         .rx_af    = GPIO_AF7,
         .tx_af    = GPIO_AF7,
         .bus      = APB1,
-        .irqn     = USART2_IRQn
+        .irqn     = USART2_IRQn,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 2,
+        .dma_chan   = 2
+#endif
     },
     {
         .dev      = USART1,
@@ -111,7 +136,11 @@ static const uart_conf_t uart_config[] = {
         .rx_af    = GPIO_AF7,
         .tx_af    = GPIO_AF7,
         .bus      = APB2,
-        .irqn     = USART1_IRQn
+        .irqn     = USART1_IRQn,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 3,
+        .dma_chan   = 2
+#endif
     },
     {
         .dev      = USART3,
@@ -121,7 +150,11 @@ static const uart_conf_t uart_config[] = {
         .rx_af    = GPIO_AF7,
         .tx_af    = GPIO_AF7,
         .bus      = APB1,
-        .irqn     = USART3_IRQn
+        .irqn     = USART3_IRQn,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 0,
+        .dma_chan   = 2
+#endif
     },
 };
 
@@ -195,7 +228,13 @@ static const spi_conf_t spi_config[] = {
         .cs_pin   = GPIO_UNDEF,
         .af       = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2
+        .apbbus   = APB2,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma   = 1,
+        .tx_dma_chan = 1,
+        .rx_dma   = 0,
+        .rx_dma_chan = 1,
+#endif
     }
 };
 
