@@ -8,13 +8,13 @@
  */
 
 /**
- * @defgroup    core_sync Synchronization
+ * @defgroup    core_sync_mutex Mutex
+ * @ingroup     core_sync
  * @brief       Mutex for thread synchronization
- * @ingroup     core
  * @{
  *
  * @file
- * @brief       RIOT synchronization API
+ * @brief       Mutex for thread synchronization
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
