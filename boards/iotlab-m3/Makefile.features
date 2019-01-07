@@ -1,3 +1,5 @@
 include $(RIOTBOARD)/common/iotlab/Makefile.features
 
+FEATURES_PROVIDED += periph_dma
+
 include $(RIOTCPU)/stm32f1/Makefile.features

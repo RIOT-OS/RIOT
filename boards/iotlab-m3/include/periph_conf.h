@@ -39,7 +39,13 @@ static const spi_conf_t spi_config[] = {
         .sclk_pin = GPIO_PIN(PORT_A, 5),
         .cs_pin   = GPIO_UNDEF,
         .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2
+        .apbbus   = APB2,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma   = 1,
+        .tx_dma_chan = 1,
+        .rx_dma   = 0,
+        .rx_dma_chan = 1,
+#endif
     }
 };
 
