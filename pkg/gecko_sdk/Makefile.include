@@ -1,2 +1,8 @@
 INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/emlib/inc
 INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/emlib-extra/inc
+
+ifneq (,$(filter gecko_sdk_librail,$(USEMODULE)))
+  CFLAGS_FPU = -mfloat-abi=softfp -mfpu=fpv4-sp-d16
+  # Blacklisted for llvm because `CFLAGS_FPU` is used before its final value set here
+  TOOLCHAINS_BLACKLIST += llvm
+endif
