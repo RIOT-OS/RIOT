@@ -281,16 +281,16 @@ static int threshold = 0;
 /* Dummy implementation of `get` handler.
    For both configuration parameters, it copies the value to a `val` variable.
 */
-char *my_get_handler(int argc, char **argv, char *val, int val_len_max)
+int my_get_handler(int argc, char **argv, char *val, int val_len_max)
 {
     if (argc) {
         if (!strcmp("is_enabled", argv[0])) {
             /* Copy the value of `is_enabled` to `val` so the user can read it */
-            memcpy(val, &is_enabled, sizeof(int));
+            memcpy(val, &is_enabled, sizeof(is_enabled));
         }
         else if (!strcmp("threshold", argv[0])) {
             /* Copy the value of `is_enabled` to `val` so the user can read it */
-            memcpy(val, &threshold, sizeof(int));
+            memcpy(val, &threshold, sizeof(threshold));
         }
     }
     /* ... */
@@ -299,20 +299,24 @@ char *my_get_handler(int argc, char **argv, char *val, int val_len_max)
 /* Dummy implementation of `set` handler.
    For both configuration parameters, it sets the value from `val`.
 */
-char *my_set_handler(int argc, char **argv, char *val)
+int my_set_handler(int argc, char **argv, char *val)
 {
     if (argc) {
         if (!strcmp("is_enabled", argv[0])) {
             /* Set the value of `is_enabled` from `val` */
-            memcpy(&is_enabled, val, sizeof(int));
+            memcpy(&is_enabled, val, sizeof(is_enabled));
         }
         else if (!strcmp("threshold", argv[0])) {
+            /* Validate threshold */
+            if(atoi(val) > MAX_THRESHOLD)
+                return -EINVAL;
+
             /* Set the value of `theshold` from `val` */
-            memcpy(&threshold, val, sizeof(int));
+            memcpy(&threshold, val, sizeof(threshold));
         }
     }
     /* ... */
-    return NULL;
+    return 0;
 }
 
 /* Dummy implementation of `commit` handler.
@@ -320,7 +324,7 @@ char *my_set_handler(int argc, char **argv, char *val)
    to be applied. Because of this, it's possible to implement transactions or
    protect against faulty combinations of configs, race conditions, etc.
 */
-char *my_commit_handler(int argc, char **argv, char *val)
+int my_commit_handler(int argc, char **argv, char *val)
 {
     /* Do something if the module is enable */
     if(is_enabled) {
@@ -340,13 +344,13 @@ char *my_commit_handler(int argc, char **argv, char *val)
    There can be different behaviors depending on the export function (e.g printing all configs
    to STDOUT, save them in a non-volatile storage device, etc)
 */
-int my_export_handler(int (*export_func)(const char *name, char *val), int argc,
+void my_export_handler(int (*export_func)(const char *name, char *val), int argc,
                    char **argv)
 {
     /* argc  and argv can be used to export only one parameter */
     (void)argv;
     (void)argc;
-    char buf[sizeof(int)];
+    char buf[INT_STRING_SIZE];
 
     /* We export every parameter with the export function */
     
@@ -356,7 +360,6 @@ int my_export_handler(int (*export_func)(const char *name, char *val), int argc,
     /* Prepare `buf` to contain threshold in a string representation */
     /* ... */
     export_func("my_handler/threshold", buf);
-    return 0;
 }
 ```
 
