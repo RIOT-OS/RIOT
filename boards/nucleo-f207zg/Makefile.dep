@@ -1,1 +1,3 @@
+FEATURES_REQUIRED += periph_dma
+
 include $(RIOTBOARD)/common/nucleo/Makefile.dep
