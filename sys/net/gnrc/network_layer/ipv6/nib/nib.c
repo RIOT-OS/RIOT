@@ -1383,6 +1383,16 @@ static void _remove_prefix(const ipv6_addr_t *pfx, unsigned pfx_len)
 }
 
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+static inline bool _multihop_p6c(gnrc_netif_t *netif, _nib_abr_entry_t *abr)
+{
+    (void)netif;    /* gnrc_netif_is_6lr() might resolve to a NOP */
+    return (gnrc_netif_is_6lr(netif) && (abr != NULL));
+}
+#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#define _multihop_p6c(netif, abr)   (false)
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
 static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
                             const ndp_opt_pi_t *pio, _nib_abr_entry_t *abr)
 #else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
@@ -1415,7 +1425,7 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
     if (pio->flags & NDP_OPT_PI_FLAGS_A) {
         _auto_configure_addr(netif, &pio->prefix, pio->prefix_len);
     }
-    if ((pio->flags & NDP_OPT_PI_FLAGS_L) || gnrc_netif_is_6lr(netif)) {
+    if ((pio->flags & NDP_OPT_PI_FLAGS_L) || _multihop_p6c(netif, abr)) {
         _nib_offl_entry_t *pfx;
 
         if (pio->valid_ltime.u32 == 0) {
@@ -1442,8 +1452,9 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
         if ((pfx = _nib_pl_add(netif->pid, &pio->prefix, pio->prefix_len,
                                valid_ltime, pref_ltime))) {
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
-            assert(abr != NULL);    /* should have been set in _handle_abro() */
-            _nib_abr_add_pfx(abr, pfx);
+            if (abr != NULL) {
+                _nib_abr_add_pfx(abr, pfx);
+            }
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
             if (pio->flags & NDP_OPT_PI_FLAGS_L) {
                 pfx->flags |= _PFX_ON_LINK;
