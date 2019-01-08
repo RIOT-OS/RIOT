@@ -8,8 +8,6 @@
 
 /**
  * @ingroup     drivers_ltc4150
- * @brief       Driver for the Linear Tech LTC4150 Coulomb Counter
- *              (a.k.a. battery gauge sensor or power consumption sensor)
  * @{
  *
  * @file
@@ -30,11 +28,10 @@
 
 static void update_data(ltc4150_dev_t *dev)
 {
-    timex_t now;
+    uint32_t now = xtimer_now_usec64() / US_PER_SEC;
 
-    xtimer_now_timex(&now);
     /* For every ten seconds passed since last update: */
-    while (dev->last_update_sec + 10 < now.seconds) {
+    while (dev->last_update_sec + 10 < now) {
         /* Update charged transferred last minute */
 #ifdef MODULE_LTC4150_BIDIRECTIONAL
         dev->charged.last_min += dev->charged.counter;
@@ -83,8 +80,6 @@ static void pulse_cb(void *_dev)
 
 int ltc4150_init(ltc4150_dev_t *dev, const ltc4150_params_t *params)
 {
-    timex_t now;
-
     if (!dev || !params) {
         return -EINVAL;
     }
@@ -121,9 +116,7 @@ int ltc4150_init(ltc4150_dev_t *dev, const ltc4150_params_t *params)
         return -EIO;
     }
 
-    xtimer_now_timex(&now);
-    dev->last_update_sec = now.seconds;
-    dev->start_sec = now.seconds;
+    dev->last_update_sec = dev->start_sec = xtimer_now_usec64() / US_PER_SEC;
 
     DEBUG("[ltc4150] Initialized successfully");
     return 0;
@@ -220,7 +213,7 @@ int ltc4150_last_minute_charge(ltc4150_dev_t *dev, int32_t *charged,
 
 int ltc4150_avg_current(ltc4150_dev_t *dev, int16_t *dest)
 {
-    timex_t now;
+    uint32_t now;
     int32_t duration, charged, discharged;;
     int retval;
 
@@ -229,8 +222,8 @@ int ltc4150_avg_current(ltc4150_dev_t *dev, int16_t *dest)
         return retval;
     }
 
-    xtimer_now_timex(&now);
-    duration = now.seconds - dev->start_sec;
+    now = xtimer_now_usec64() / US_PER_SEC;
+    duration = now - dev->start_sec;
     if (!duration) {
         /* Called before at least one second of data acquired. Prevent division
          * by zero by returning -EAGAIN.

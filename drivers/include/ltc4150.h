@@ -9,13 +9,8 @@
 /**
  * @defgroup    drivers_ltc4150 LTC4150 coulomb counter
  * @ingroup     drivers_sensors
- * @brief       Driver for LTC4150 coulomb counter
- * @{
- *
- * @file
- * @brief       LTC4150 coulomb counter
- *
- * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @brief       Driver for the Linear Tech LTC4150 Coulomb Counter
+ *              (a.k.a. battery gauge sensor or power consumption sensor)
  *
  * # Wiring the LTC4150
  * Hint: M Grusin thankfully created an
@@ -56,15 +51,22 @@
  * routing is quite short and even when used outside of specification less than
  * 20 ticks per second will occur. Hence, this effect should hopefully be
  * negligible.
+ *
+ * @{
+ *
+ * @file
+ * @brief       LTC4150 coulomb counter
+ *
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
 #ifndef LTC4150_H
 #define LTC4150_H
 
-#include <mutex.h>
-#include <periph/gpio.h>
-#include <ringbuffer.h>
 #include <stdint.h>
+
+#include "mutex.h"
+#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -8,8 +8,8 @@
 
 /**
  * @ingroup     drivers_ltc4150
- *
  * @{
+ *
  * @file
  * @brief       Default configuration for LTC4150 coulomb counters
  *
@@ -53,7 +53,7 @@ extern "C" {
                                         .pulses_per_ah = LTC4150_PARAM_PULSES, \
                                         .flags = LTC4150_PARAM_FLAGS }
 #endif
-/**@}*/
+/** @} */
 
 /**
  * @name    Set default SAUL info text for the LTC4150
@@ -64,8 +64,7 @@ extern "C" {
                                       { .name = "LTC4150 last minute charge" }, \
                                       { .name = "LTC4150 average current" }
 #endif
-
-/**@}*/
+/** @} */
 
 /**
  * @brief   Configure LTC4150 devices
