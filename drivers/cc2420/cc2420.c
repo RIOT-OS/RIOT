@@ -190,8 +190,11 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
         cc2420_fifo_read(dev, &len, 1);
         len -= 2;   /* subtract RSSI and FCF */
 
-        /* if a buffer is given, read (and drop) the packet */
-        len = (len > max_len) ? max_len : len;
+        if (len > max_len) {
+            DEBUG("cc2420: recv: Supplied buffer to small\n");
+            _flush_rx_fifo(dev);
+            return -ENOBUFS;
+        }
 
         /* read fifo contents */
         DEBUG("cc2420: recv: reading %i byte of the packet\n", (int)len);
