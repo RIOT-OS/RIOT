@@ -64,9 +64,27 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size);
 static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                          const void *dst, size_t dst_len,
                          size_t size, uint16_t tag, unsigned page);
+/* internal add to repeat add when fragments overlapped */
+static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
+                     size_t offset, unsigned page);
+
+/* status codes for _rbuf_add() */
+enum {
+    RBUF_ADD_SUCCESS,
+    RBUF_ADD_ERROR,
+    RBUF_ADD_REPEAT,
+};
 
 void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
               size_t offset, unsigned page)
+{
+    if (_rbuf_add(netif_hdr, pkt, offset, page) == RBUF_ADD_REPEAT) {
+        _rbuf_add(netif_hdr, pkt, offset, page);
+    }
+}
+
+static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
+                     size_t offset, unsigned page)
 {
     rbuf_t *entry;
     sixlowpan_frag_t *frag = pkt->data;
@@ -83,7 +101,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     if (entry == NULL) {
         DEBUG("6lo rbuf: reassembly buffer full.\n");
         gnrc_pktbuf_release(pkt);
-        return;
+        return RBUF_ADD_ERROR;
     }
 
     ptr = entry->ints;
@@ -104,7 +122,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
         gnrc_pktbuf_release(entry->super.pkt);
         rbuf_rm(entry);
-        return;
+        return RBUF_ADD_ERROR;
     }
 
     /* If the fragment overlaps another fragment and differs in either the size
@@ -119,9 +137,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             /* "A fresh reassembly may be commenced with the most recently
              * received link fragment"
              * https://tools.ietf.org/html/rfc4944#section-5.3 */
-            rbuf_add(netif_hdr, pkt, offset, page);
-
-            return;
+            return RBUF_ADD_REPEAT;
         }
 
         ptr = ptr->next;
@@ -139,10 +155,10 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                     gnrc_pktbuf_release(entry->super.pkt);
                     gnrc_pktbuf_release(pkt);
                     rbuf_rm(entry);
-                    return;
+                    return RBUF_ADD_ERROR;
                 }
                 gnrc_sixlowpan_iphc_recv(pkt, &entry->super, 0);
-                return;
+                return RBUF_ADD_SUCCESS;
             }
             else
 #endif
@@ -155,6 +171,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
     gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(&entry->super, netif_hdr);
     gnrc_pktbuf_release(pkt);
+    return RBUF_ADD_SUCCESS;
 }
 
 static inline bool _rbuf_int_overlap_partially(rbuf_int_t *i, uint16_t start, uint16_t end)
