@@ -50,7 +50,7 @@ This is the pinout of the expansion header on the right side of the board. PIN 1
 | PD0  | 4   | 3   | PC0  |
 | VMCU | 2   | 1   | GND  |
 
-**Note**: not all starter kits by Silicon Labs share the same pinout!
+**Note:** not all starter kits by Silicon Labs share the same pinout!
 
 **Note:** some pins are connected to the board controller, when enabled!
 
