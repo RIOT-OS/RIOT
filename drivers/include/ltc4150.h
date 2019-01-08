@@ -185,7 +185,7 @@ typedef struct {
      * @brief `NULL` or a `NULL`-terminated array of data recorders
      * @pre   If not `NULL`, the last element of the array must be `NULL`
      */
-    ltc4150_recorder_t **recorders;
+    const ltc4150_recorder_t **recorders;
     /**
      * @brief `NULL` or an array of the user defined data for each recorder
      * @pre   If @see ltc4150_params_t::recorders is not `NULL`, this must point
@@ -206,6 +206,35 @@ struct ltc4150_dev {
     uint32_t charged;           /**< # of pulses for charging (POL=high) */
     uint32_t discharged;        /**< # of pulses for discharging (POL=low) */
 };
+
+/**
+ * @brief Data structure used by @ref ltc4150_last_minute
+ */
+typedef struct {
+    uint32_t last_rotate_sec;   /**< Time stamp of the last ring "rotation" */
+    /**
+     * @brief Pulses in charging direction recorded in the last minute
+     */
+    uint16_t charged;
+    /**
+     * @brief Pulses in discharging direction recorded in the last minute
+     */
+    uint16_t discharged;
+    /**
+     * @brief Ring-buffer to store charge information in 10 sec resolution
+     */
+    uint8_t buf_charged[7];
+    /**
+     * @brief As above, but in discharging direction
+     */
+    uint8_t buf_discharged[7];
+    uint8_t ring_pos;           /**< Position in the ring buffer */
+} ltc4150_last_minute_data_t;
+
+/**
+ * @brief Records the charge transferred within the last minute using
+ */
+extern const ltc4150_recorder_t ltc4150_last_minute;
 
 /**
  * @brief             Initialize the LTC4150 driver
@@ -275,6 +304,42 @@ int ltc4150_charge(ltc4150_dev_t *dev, uint32_t *charged, uint32_t *discharged);
  */
 int ltc4150_avg_current(ltc4150_dev_t *dev, int16_t *dest);
 
+/**
+ * @brief                  Get the measured charge in the last minute
+ *
+ * @param dev              The LTC4150 device to read data from
+ * @param data             The data recorded by @ref ltc4150_last_minute
+ * @param[out] charged     The charge transferred in charging direction
+ * @param[out] discharged  The charge transferred in discharging direction
+ *
+ * @retval 0                Success
+ * @retval -EINVAL          Called with an invalid argument
+ *
+ * @warning The returned data may be outdated up to ten seconds
+ *
+ * Passing `NULL` for `charged` or `discharged` is allowed, if only one
+ * information is of interest.
+ */
+int ltc4150_last_minute_charge(ltc4150_dev_t *dev,
+                               ltc4150_last_minute_data_t *data,
+                               uint32_t *charged, uint32_t *discharged);
+
+/**
+ * @brief Convert the raw data (# pulses) acquired by the LTC4150 device to
+ *        charge information in millicoulomb
+ * @note  This function will make writing data recorders (see
+ *        @ref ltc4150_recorder_t) easier, but is not intended for end users
+ *
+ * @param dev                 LTC4150 device the data was received from
+ * @param[out] charged        Charge in charging direction is stored here
+ * @param[out] discharged     Charge in discharging direction is stored here
+ * @param[in] raw_charged     Number of pulses in charging direction
+ * @param[in] raw_discharged  Number of pulses in discharging direction
+ */
+void ltc4150_pulses2c(const ltc4150_dev_t *dev,
+                      uint32_t *charged, uint32_t *discharged,
+                      uint32_t raw_charged,
+                      uint32_t raw_discharged);
 #ifdef __cplusplus
 }
 #endif

@@ -139,20 +139,10 @@ int ltc4150_shutdown(ltc4150_dev_t *dev)
     return 0;
 }
 
-/**
- * @brief Convert the raw data (# pulses) acquired by the LTC4150 device to
- *        charge information in millicoulomb
- *
- * @param dev                 LTC4150 device the data was received from
- * @param[out] charged        Charge in charging direction is stored here
- * @param[out] discharged     Charge in discharging direction is stored here
- * @param[in] raw_charged     Number of pulses in charging direction
- * @param[in] raw_discharged  Number of pulses in discharging direction
- */
-static void get_coulomb(const ltc4150_dev_t *dev,
-                        uint32_t *charged, uint32_t *discharged,
-                        uint32_t raw_charged,
-                        uint32_t raw_discharged)
+void ltc4150_pulses2c(const ltc4150_dev_t *dev,
+                      uint32_t *charged, uint32_t *discharged,
+                      uint32_t raw_charged,
+                      uint32_t raw_discharged)
 {
     uint64_t tmp;
 
@@ -180,7 +170,7 @@ int ltc4150_charge(ltc4150_dev_t *dev, uint32_t *charged, uint32_t *discharged)
     }
 
     gpio_irq_disable(dev->params.interrupt);
-    get_coulomb(dev, charged, discharged, dev->charged, dev->discharged);
+    ltc4150_pulses2c(dev, charged, discharged, dev->charged, dev->discharged);
     gpio_irq_enable(dev->params.interrupt);
     return 0;
 }
