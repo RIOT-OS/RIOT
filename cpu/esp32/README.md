@@ -69,21 +69,16 @@ Parameter | Short Description                      | Type*
 [I2C1_SDA](#esp32_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(1) | o
 [PWM0_GPIOS](#esp32_pwm_channels)       | GPIOs that can be used at channels of PWM_DEV(0) | o
 [PWM1_GPIOS](#esp32_pwm_channels)       | GPIOs that can be used at channels of PWM_DEV(1) | o
-[SPI0_DEV](#esp32_spi_interfaces)  | SPI Interface used as SPI_DEV(0), can be ```VSPI``` ```HSPI``` (```FSPI```) | o
+[SPI0_CTRL](#esp32_spi_interfaces)  | SPI Controller used for SPI_DEV(0), can be ```VSPI``` ```HSPI``` | o
 [SPI0_SCK](#esp32_spi_interfaces)  | GPIO used as SCK for SPI_DEV(0)        | o
 [SPI0_MOSI](#esp32_spi_interfaces) | GPIO used as MOSI for SPI_DEV(0)       | o
 [SPI0_MISO](#esp32_spi_interfaces) | GPIO used as MISO for SPI_DEV(0)       | o
 [SPI0_CS0](#esp32_spi_interfaces)  | GPIO used as default CS for SPI_DEV(0) | o
-[SPI1_DEV](#esp32_spi_interfaces)  | SPI Interface used as SPI_DEV(1), can be ```VSPI``` ```HSPI``` (```FSPI```) | o
+[SPI1_CTRL](#esp32_spi_interfaces) | SPI Controller used for SPI_DEV(1), can be ```VSPI``` ```HSPI``` | o
 [SPI1_SCK](#esp32_spi_interfaces)  | GPIO used as SCK for SPI_DEV(1)        | o
 [SPI1_MOSI](#esp32_spi_interfaces) | GPIO used as MOSI for SPI_DEV(1)       | o
 [SPI1_MISO](#esp32_spi_interfaces) | GPIO used as MISO for SPI_DEV(1)       | o
 [SPI1_CS0](#esp32_spi_interfaces)  | GPIO used as default CS for SPI_DEV(1) | o
-[SPI2_DEV](#esp32_spi_interfaces)  | SPI Interface used as SPI_DEV(2), can be ```VSPI``` ```HSPI``` (```FSPI```) | o
-[SPI2_SCK](#esp32_spi_interfaces)  | GPIO used as SCK for SPI_DEV(2)        | o
-[SPI2_MOSI](#esp32_spi_interfaces) | GPIO used as MOSI for SPI_DEV(2)       | o
-[SPI2_MISO](#esp32_spi_interfaces) | GPIO used as MISO for SPI_DEV(2)       | o
-[SPI2_CS0](#esp32_spi_interfaces)  | GPIO used as default CS for SPI_DEV(2) | o
 [UART1_TXD](#esp32_uart_interfaces) | GPIO used as TxD for UART_DEV(1) | o
 [UART1_RXD](#esp32_uart_interfaces) | GPIO used as RxD for UART_DEV(1) | o
 [UART2_TXD](#esp32_uart_interfaces) | GPIO used as TxD for UART_DEV(2) | o
@@ -137,7 +132,7 @@ ADCs        | 2 x SAR-ADC with up to 18 x 12 bit channels total | yes
 DACs        | 2 x DAC with 8 bit | yes
 GPIOs       | 34 (6 of them are only inputs) | yes
 I2Cs        | 2 | yes
-SPIs        | 4 | yes
+SPIs        | 4 | yes (2)
 UARTs       | 3 | yes
 WiFi        | IEEE 802.11 b/g/n built in | yes
 Bluetooth   | v4.2 BR/EDR and BLE | no
@@ -648,43 +643,37 @@ The order of the listed GPIOs determines the mapping between RIOT's PWM channels
 
 ESP32 integrates four SPI controllers:
 
-- controller SPI0 is reserved for accessing flash memory
-- controller SPI1 realizes interface <b>```FSPI```</b> and shares its signals with SPI0
+- controller SPI0 is reserved for caching the flash memory
+- controller SPI1 is reserved for interface <b>```FSPI```</b> to external memories like flash and PSRAM
 - controller SPI2 realizes interface <b>```HSPI```</b> that can be used for peripherals
 - controller SPI3 realizes interface <b>```VSPI```</b> that can be used for peripherals
 
-Since controller SPI0 is used to access flash and other external memories, at most three interfaces can be used:
+Thus, a maximum of two SPI controllers can be used as peripheral interfaces:
 
-- <b>```VSPI```</b>: with configurable pin definitions
-- <b>```HSPI```</b>: with configurable pin definitions
-- <b>```FSPI```</b>: with fixed pin definitions except the CS signal.
+- <b>```VSPI```</b>
+- <b>```HSPI```</b>
 
 All SPI interfaces could be used in quad SPI mode, but RIOT's low level device driver doesn't support it.
 
-**Please note:**
-- Since the ```FSPI``` interface shares its bus signals with the controller that implements the flash memory interface, we use the name FSPI for this interface. In the technical reference, this interface is misleadingly simply referred to as SPI.
-- Since the ```FSPI``` interface shares its bus signals with flash memory interface and optionally other external memories, you can only use this SPI interface to attach external memory with same SPI mode and same bus speed but with a different CS. It is strictly not recommended to use this interface for other peripherals.
-- Using ```FSPI``` for anything else can disturb flash memory access which causes a number of problems. If not really necessary, you should not use this interface.
-
 The board-specific configuration of the SPI interface <b>```SPI_DEV(n)```</b> requires the definition of
 
-- <b>```SPIn_DEV```</b>, the interface used for ```SPI_DEV(n)```, can be ```VSPI```, ```HSPI```, or ```FSPI```,
-- <b>```SPIn_SCK```</b>, the GPIO used as clock signal for ```SPI_DEV(n)``` (fixed for ```FSPI```),
-- <b>```SPIn_MISO```</b>, the GPIO used as MISO signal for ```SPI_DEV(n)``` (fixed for ```FSPI```),
-- <b>```SPIn_MOSI```</b>, the GPIO used as MOSI signal for ```SPI_DEV(n)``` (fixed for ```FSPI```), and
-- <b>```SPIn_CS0```</b>, the GPIO used as CS signal for ```SPI_DEV(n)``` when cs parameter in spi_acquire is ```GPIO_UNDEF```,
+- <b>```SPIn_CTRL```</b>, the SPI controller which is used for ```SPI_DEV(n)```, can be ```VSPI``` or ```HSPI```,
+- <b>```SPIn_SCK```</b>, the GPIO used as clock signal for ```SPI_DEV(n)```,
+- <b>```SPIn_MISO```</b>, the GPIO used as MISO signal for ```SPI_DEV(n)```,
+- <b>```SPIn_MOSI```</b>, the GPIO used as MOSI signal for ```SPI_DEV(n)```, and
+- <b>```SPIn_CS0```</b>, the GPIO used as CS signal for ```SPI_DEV(n)``` when the cs parameter in spi_acquire is ```GPIO_UNDEF```,
 
-where ```n``` can be 0, 1 or 2. If they are not defined, the SPI interface ```SPI_DEV(n)``` is not used.
+where ```n``` can be 0 or 1. If they are not defined, the SPI interface ```SPI_DEV(n)``` is not used.
 
 Example:
 ```
-#define SPI0_DEV    VSPI
+#define SPI0_CTRL    VSPI
 #define SPI0_SCK    GPIO18      /* SCK  Periphery */
 #define SPI0_MISO   GPIO19      /* MISO Periphery */
 #define SPI0_MOSI   GPIO23      /* MOSI Periphery */
 #define SPI0_CS0    GPIO5       /* CS0  Periphery */
 
-#define SPI1_DEV    HSPI
+#define SPI1_CTRL    HSPI
 #define SPI1_SCK    GPIO14      /* SCK  Camera */
 #define SPI1_MISO   GPIO12      /* MISO Camera */
 #define SPI1_MOSI   GPIO13      /* MOSI Camera */
@@ -694,8 +683,8 @@ Example:
 The pin configuration of ```VSPI``` interface and the ```HSPI``` interface can be changed by [application specific configurations](#esp32_application_specific_configurations).
 
 **Please note:**
-- The configuration of the SPI interfaces ```SPI_DEV(n)``` must be in continuous ascending order of ```n```.
-- The order in which the interfaces ```VSPI```, ```HSPI```, and ```FSPI``` are used doesn't matter. For example, while one board may only use the ```HSPI``` interface as ```SPI_DEV(0)```, another board may use the ```VSPI``` interface as ```SPI_DEV(0)``` and the ```HSPI``` interface as ```SPI_DEV(1)```.
+- The configuration of the SPI interfaces ```SPI_DEV(n)``` should be in continuous ascending order of ```n```.
+- The order in which the interfaces ```VSPI``` and ```HSPI``` are used doesn't matter. For example, while one board may only use the ```HSPI``` interface as ```SPI_DEV(0)```, another board may use the ```VSPI``` interface as ```SPI_DEV(0)``` and the ```HSPI``` interface as ```SPI_DEV(1)```.
 - The GPIOs listed in the configuration are first initialized as SPI signals when the corresponding SPI interface is used by calling either the ```spi_init_cs``` function or the ```spi_acquire``` function. That is, they are not allocated as SPI signals before and can be used for other purposes as long as the SPI interface is not used.
 - GPIO2 becomes the MISO signal in SPI mode on boards that use the HSPI as the SD card interface in 4-bit SD mode. Because of the bootstrapping functionality of the GPIO2, it can be necessary to either press the **Boot** button, remove the SD card or remove the peripheral hardware to flash RIOT.
 
@@ -707,20 +696,20 @@ The following table shows the pin configuration used for most boards, even thoug
 
 Device|Signal|Pin     |Symbol         | Remarks
 :-----|:----:|:-------|:-------------:|:---------------------------
-VSPI  | SCK  | GPIO18 |```SPI0_SCK``` | optional, can be overridden
-VSPI  | MISO | GPIO19 |```SPI0_MISO```| optional, can be overridden
-VSPI  | MOSI | GPIO23 |```SPI0_MOSI```| optional, can be overridden
-VSPI  | CS0  | GPIO18 |```SPI0_CS0``` | optional, can be overridden
-HSPI  | SCK  | GPIO14 |```SPI1_SCK``` | optional, can be overridden
-HSPI  | MISO | GPIO12 |```SPI1_MISO```| optional, can be overridden
-HSPI  | MOSI | GPIO13 |```SPI1_MOSI```| optional, can be overridden
-HSPI  | CS0  | GPIO15 |```SPI1_CS0``` | optional, can be overridden
-FSPI  | SCK  | GPIO6  |-              | not configurable
-FSPI  | CMD  | GPIO11 |-              | not configurable
-FSPI  | SD0  | GPIO7  |-              | not configurable
-FSPI  | SD1  | GPIO8  |-              | not configurable
-FSPI  | SD2  | GPIO9  |-              | not configurable, only used in ```qio``` or ```qout``` mode
-FSPI  | SD3  | GPIO10 |-              | not configurable, only used in ```qio``` or ```qout``` mode
+VSPI  | SCK  | GPIO18 |```SPI0_SCK``` | can be used for peripherals
+VSPI  | MISO | GPIO19 |```SPI0_MISO```| can be used for peripherals
+VSPI  | MOSI | GPIO23 |```SPI0_MOSI```| can be used for peripherals
+VSPI  | CS0  | GPIO18 |```SPI0_CS0``` | can be used for peripherals
+HSPI  | SCK  | GPIO14 |```SPI1_SCK``` | can be used for peripherals
+HSPI  | MISO | GPIO12 |```SPI1_MISO```| can be used for peripherals
+HSPI  | MOSI | GPIO13 |```SPI1_MOSI```| can be used for peripherals
+HSPI  | CS0  | GPIO15 |```SPI1_CS0``` | can be used for peripherals
+FSPI  | SCK  | GPIO6  |-              | reserved for flash and PSRAM
+FSPI  | CMD  | GPIO11 |-              | reserved for flash and PSRAM
+FSPI  | SD0  | GPIO7  |-              | reserved for flash and PSRAM
+FSPI  | SD1  | GPIO8  |-              | reserved for flash and PSRAM
+FSPI  | SD2  | GPIO9  |-              | reserved for flash and PSRAM (only in ```qio``` or ```qout``` mode)
+FSPI  | SD3  | GPIO10 |-              | reserved for flash and PSRAM (only in ```qio``` or ```qout``` mode)
 
 </center>
 

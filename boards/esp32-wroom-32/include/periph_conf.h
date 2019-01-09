@@ -135,8 +135,8 @@ extern "C" {
  * be used for other purposes as long as the SPI interface is not used.
  * @{
  */
-#ifndef SPI0_DEV
-#define SPI0_DEV    VSPI    /**< VSPI is used as SPI_DEV(0) */
+#ifndef SPI0_CTRL
+#define SPI0_CTRL   VSPI    /**< VSPI is used as SPI_DEV(0) */
 #endif
 #ifndef SPI0_SCK
 #define SPI0_SCK    GPIO18  /**< VSPI SCK */
@@ -151,8 +151,8 @@ extern "C" {
 #define SPI0_CS0    GPIO5   /**< VSPI CS0 */
 #endif
 
-#ifndef SPI1_DEV
-#define SPI1_DEV    HSPI    /**< HSPI is used as SPI_DEV(1) */
+#ifndef SPI1_CTRL
+#define SPI1_CTRL   HSPI    /**< HSPI is used as SPI_DEV(1) */
 #endif
 #ifndef SPI1_SCK
 #define SPI1_SCK    GPIO14  /**< HSPI SCK */
