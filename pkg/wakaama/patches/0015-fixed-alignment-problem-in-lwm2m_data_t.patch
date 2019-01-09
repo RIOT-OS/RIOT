@@ -1,0 +1,32 @@
+From 5d0fd8783b734e8adeec3b9393e84dc8f4f7eb1e Mon Sep 17 00:00:00 2001
+From: Christian Manal <moenoel@informatik.uni-bremen.de>
+Date: Wed, 16 May 2018 11:30:02 +0200
+Subject: [PATCH] fixed alignment problem in lwm2m_data_t
+
+---
+ core/liblwm2m.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/core/liblwm2m.h b/core/liblwm2m.h
+index 3f16a6d..53616bf 100644
+--- a/core/liblwm2m.h
++++ b/core/liblwm2m.h
+@@ -299,7 +299,6 @@ typedef struct _lwm2m_data_t lwm2m_data_t;
+ 
+ struct _lwm2m_data_t
+ {
+-    lwm2m_data_type_t type;
+     uint16_t    id;
+     union
+     {
+@@ -322,6 +321,7 @@ struct _lwm2m_data_t
+             uint16_t objectInstanceId;
+         } asObjLink;
+     } value;
++    lwm2m_data_type_t type;
+ };
+ 
+ typedef enum
+-- 
+2.1.4
+

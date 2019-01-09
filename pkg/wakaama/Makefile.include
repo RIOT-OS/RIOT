@@ -1,1 +1,1 @@
-INCLUDES += -I$(RIOTPKG)/wakaama/wakaama
+INCLUDES += -I$(PKGDIRBASE)/wakaama/riotbuild

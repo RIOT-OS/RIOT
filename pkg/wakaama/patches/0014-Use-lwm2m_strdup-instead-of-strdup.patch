@@ -1,0 +1,25 @@
+From 47d78e80ceb80a06e0cb9b0b7f7c959d04bd2c22 Mon Sep 17 00:00:00 2001
+From: Christian Manal <moenoel@informatik.uni-bremen.de>
+Date: Mon, 5 Feb 2018 15:52:10 +0100
+Subject: [PATCH] Use lwm2m_strdup() instead of strdup()
+
+---
+ examples/client/object_security.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/examples/client/object_security.c b/examples/client/object_security.c
+index bfb5f85..d91f6e5 100644
+--- a/examples/client/object_security.c
++++ b/examples/client/object_security.c
+@@ -540,7 +540,7 @@ lwm2m_object_t * get_security_object(int serverId,
+             targetP->securityMode = LWM2M_SECURITY_MODE_PRE_SHARED_KEY;
+             if (bsPskId)
+             {
+-                targetP->publicIdentity = strdup(bsPskId);
++                targetP->publicIdentity = lwm2m_strdup(bsPskId);
+                 targetP->publicIdLen = strlen(bsPskId);
+             }
+             if (pskLen > 0)
+-- 
+2.1.4
+
