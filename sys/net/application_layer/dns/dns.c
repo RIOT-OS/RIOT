@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "net/dns.h"
 #include "net/sock/udp.h"
 #include "net/sock/dns.h"
 
@@ -114,7 +115,8 @@ static int _parse_dns_reply(uint8_t *buf, size_t len, void* addr_out, int family
             return tmp;
         }
         bufpos += tmp;
-        bufpos += 4;    /* skip type and class of query */
+        /* skip type and class of query */
+        bufpos += (RR_TYPE_LENGTH + RR_CLASS_LENGTH);
     }
 
     for (unsigned n = 0; n < ntohs(hdr->ancount); n++) {
@@ -123,14 +125,14 @@ static int _parse_dns_reply(uint8_t *buf, size_t len, void* addr_out, int family
             return tmp;
         }
         bufpos += tmp;
-        if ((bufpos + 2 + 2 + 4) >= buflim) {
+        if ((bufpos + RR_TYPE_LENGTH + RR_CLASS_LENGTH + RR_TTL_LENGTH) >= buflim) {
             return -EBADMSG;
         }
         uint16_t _type = ntohs(_get_short(bufpos));
-        bufpos += 2;
+        bufpos += RR_TYPE_LENGTH;
         uint16_t class = ntohs(_get_short(bufpos));
-        bufpos += 2;
-        bufpos += 4; /* skip ttl */
+        bufpos += RR_CLASS_LENGTH;
+        bufpos += RR_TTL_LENGTH; /* skip ttl */
 
         unsigned addrlen = ntohs(_get_short(bufpos));
         /* skip unwanted answers */
@@ -154,7 +156,7 @@ static int _parse_dns_reply(uint8_t *buf, size_t len, void* addr_out, int family
              (family == AF_UNSPEC))) {
             return -EBADMSG;
         }
-        bufpos += 2;
+        bufpos += RR_RDLENGTH_LENGTH;
         if ((bufpos + addrlen) >= buflim) {
             return -EBADMSG;
         }
