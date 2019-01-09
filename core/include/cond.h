@@ -5,12 +5,9 @@
  */
 
 /**
+ * @defgroup    core_sync_cond Condition Variable
+ * @ingroup     core_sync
  * @brief       Condition variable for thread synchronization
- * @ingroup     core, core_sync
- * @{
- *
- * @file
- * @brief       RIOT synchronization API
  *
  * This file contains a condition variable with Mesa-style semantics.
  *
@@ -128,6 +125,11 @@
  *
  * Note that this could actually be written with a single condition variable.
  * However, the example includes two for didactic reasons.
+ *
+ * @{
+ *
+ * @file
+ * @brief       Condition variable for thread synchronization
  *
  * @author      Sam Kumar <samkumar@berkeley.edu>
  */

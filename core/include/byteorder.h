@@ -7,13 +7,13 @@
  */
 
 /**
- * @addtogroup     core_util
+ * @ingroup     core_util
  * @{
  *
  * @file
- * @brief          Functions to work with different byte orders.
+ * @brief       Functions to work with different byte orders.
  *
- * @author         René Kijewski <rene.kijewski@fu-berlin.de>
+ * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
 #ifndef BYTEORDER_H
