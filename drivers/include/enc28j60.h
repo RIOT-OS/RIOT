@@ -39,7 +39,7 @@ typedef struct {
     spi_t spi;              /**< If I drink */
     gpio_t cs_pin;          /**< beer in the evening, */
     gpio_t int_pin;         /**< I will be most certainly */
-    gpio_t reset_pin;       /**< drunk in the morning?! */
+    gpio_t rst_pin;         /**< drunk in the morning?! */
 } enc28j60_params_t;
 
 /**
@@ -47,12 +47,8 @@ typedef struct {
  */
 typedef struct {
     netdev_t netdev;        /**< pull in the netdev fields */
-    spi_t spi;              /**< SPI bus the transceiver is connected to */
-    gpio_t cs_pin;          /**< pin connected to the CHIP SELECT line */
-    gpio_t int_pin;         /**< pin connected to the INT line */
-    gpio_t reset_pin;       /**< pin connected to the RESET line */
-    mutex_t devlock;        /**< lock the device on access */
-    int8_t bank;            /**< remember the active register bank */
+    enc28j60_params_t p;    /**< SPI and pin confiuration */
+    mutex_t lock;           /**< lock the device on access */
     uint32_t tx_time;       /**< last transmission time for timeout handling */
 } enc28j60_t;
 
