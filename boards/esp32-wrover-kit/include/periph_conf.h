@@ -146,8 +146,8 @@
  * @{
  */
 
-#ifndef SPI0_DEV
-#define SPI0_DEV    HSPI    /**< HSPI is configured as SPI_DEV(0) */
+#ifndef SPI0_CTRL
+#define SPI0_CTRL   HSPI    /**< HSPI is configured as SPI_DEV(0) */
 #endif
 
 #ifndef SPI0_SCK
@@ -174,8 +174,8 @@
  * be used for other purposes as long as the SPI interface is not used.
  *
  */
-#ifndef SPI1_DEV
-#define SPI1_DEV    VSPI
+#ifndef SPI1_CTRL
+#define SPI1_CTRL   VSPI
 #endif
 
 #ifndef SPI1_SCK

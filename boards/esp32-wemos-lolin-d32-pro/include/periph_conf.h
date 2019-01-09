@@ -140,8 +140,8 @@
  *
  * @{
  */
-#ifndef SPI0_DEV
-#define SPI0_DEV    VSPI    /**< VSPI is used as SPI_DEV(0) */
+#ifndef SPI0_CTRL
+#define SPI0_CTRL   VSPI    /**< VSPI is used as SPI_DEV(0) */
 #endif
 #ifndef SPI0_SCK
 #define SPI0_SCK    GPIO18  /**< VSPI SCK */

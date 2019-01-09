@@ -165,8 +165,8 @@ extern "C" {
  * function. That is, they are not allocated as SPI signals before and can
  * be used for other purposes as long as the SPI interface is not used.
  */
-#ifndef SPI0_DEV
-#define SPI0_DEV    HSPI
+#ifndef SPI0_CTRL
+#define SPI0_CTRL   HSPI
 #endif
 
 #ifndef SPI0_SCK
