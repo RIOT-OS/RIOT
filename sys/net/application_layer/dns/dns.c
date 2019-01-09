@@ -212,7 +212,6 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
 
     ssize_t res = sock_udp_create(&sock_dns, NULL, &sock_dns_server, 0);
     if (res) {
-            puts("a");
         goto out;
     }
 
