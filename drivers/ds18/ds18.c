@@ -30,20 +30,20 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static void ds18_low(ds18_t *dev)
+static void ds18_low(const ds18_t *dev)
 {
     /* Set gpio as output and clear pin */
-    gpio_init(dev->pin, GPIO_OUT);
-    gpio_clear(dev->pin);
+    gpio_init(dev->params.pin, GPIO_OUT);
+    gpio_clear(dev->params.pin);
 }
 
-static void ds18_release(ds18_t *dev)
+static void ds18_release(const ds18_t *dev)
 {
     /* Init pin as input */
-    gpio_init(dev->pin, dev->in_mode);
+    gpio_init(dev->params.pin, dev->params.in_mode);
 }
 
-static void ds18_write_bit(ds18_t *dev, uint8_t bit)
+static void ds18_write_bit(const ds18_t *dev, uint8_t bit)
 {
     /* Initiate write slot */
     ds18_low(dev);
@@ -59,7 +59,7 @@ static void ds18_write_bit(ds18_t *dev, uint8_t bit)
     xtimer_usleep(1);
 }
 
-static int ds18_read_bit(ds18_t *dev, uint8_t *bit)
+static int ds18_read_bit(const ds18_t *dev, uint8_t *bit)
 {
     /* Initiate read slot */
     ds18_low(dev);
@@ -67,7 +67,7 @@ static int ds18_read_bit(ds18_t *dev, uint8_t *bit)
 
 #if defined(MODULE_DS18_OPTIMIZED)
     xtimer_usleep(DS18_SAMPLE_TIME);
-    *bit = gpio_read(dev->pin);
+    *bit = gpio_read(dev->params.pin);
     xtimer_usleep(DS18_DELAY_R_RECOVER);
     return DS18_OK;
 #else
@@ -75,7 +75,7 @@ static int ds18_read_bit(ds18_t *dev, uint8_t *bit)
 
     /* Measure time low of device pin, timeout after slot time*/
     start = xtimer_now_usec();
-    while (!gpio_read(dev->pin) && measurement < DS18_DELAY_SLOT) {
+    while (!gpio_read(dev->params.pin) && measurement < DS18_DELAY_SLOT) {
         measurement = xtimer_now_usec() - start;
     }
 
@@ -94,7 +94,7 @@ static int ds18_read_bit(ds18_t *dev, uint8_t *bit)
 #endif
 }
 
-static int ds18_read_byte(ds18_t *dev, uint8_t *byte)
+static int ds18_read_byte(const ds18_t *dev, uint8_t *byte)
 {
     uint8_t bit = 0;
     *byte = 0;
@@ -111,14 +111,14 @@ static int ds18_read_byte(ds18_t *dev, uint8_t *byte)
     return DS18_OK;
 }
 
-static void ds18_write_byte(ds18_t *dev, uint8_t byte)
+static void ds18_write_byte(const ds18_t *dev, uint8_t byte)
 {
     for (int i = 0; i < 8; i++) {
         ds18_write_bit(dev, byte & (0x01 << i));
     }
 }
 
-static int ds18_reset(ds18_t *dev)
+static int ds18_reset(const ds18_t *dev)
 {
     int res;
 
@@ -131,7 +131,7 @@ static int ds18_reset(ds18_t *dev)
     xtimer_usleep(DS18_DELAY_PRESENCE);
 
     /* Check device presence */
-    res = gpio_read(dev->pin);
+    res = gpio_read(dev->params.pin);
 
     /* Sleep for reset delay */
     xtimer_usleep(DS18_DELAY_RESET);
@@ -139,7 +139,7 @@ static int ds18_reset(ds18_t *dev)
     return res;
 }
 
-int ds18_trigger(ds18_t *dev)
+int ds18_trigger(const ds18_t *dev)
 {
     int res;
 
@@ -156,7 +156,7 @@ int ds18_trigger(ds18_t *dev)
     return DS18_OK;
 }
 
-int ds18_read(ds18_t *dev, int16_t *temperature)
+int ds18_read(const ds18_t *dev, int16_t *temperature)
 {
     int res;
     uint8_t b1 = 0, b2 = 0;
@@ -190,7 +190,7 @@ int ds18_read(ds18_t *dev, int16_t *temperature)
     return DS18_OK;
 }
 
-int ds18_get_temperature(ds18_t *dev, int16_t *temperature)
+int ds18_get_temperature(const ds18_t *dev, int16_t *temperature)
 {
 
     DEBUG("[DS18] Convert T\n");
@@ -208,14 +208,14 @@ int ds18_init(ds18_t *dev, const ds18_params_t *params)
 {
     int res;
 
+    dev->params = *params;
+
     /* Deduct the input mode from the output mode. If pull-up resistors are
      * used for output then will be used for input as well. */
-    dev->in_mode = (params->out_mode == GPIO_OD_PU) ? GPIO_IN_PU : GPIO_IN;
+    dev->params.in_mode = (dev->params.out_mode == GPIO_OD_PU) ? GPIO_IN_PU : GPIO_IN;
 
     /* Initialize the device and the pin */
-    dev->pin = params->pin;
-    dev->out_mode = params->out_mode;
-    res = gpio_init(dev->pin, dev->in_mode) == 0 ? DS18_OK : DS18_ERROR;
+    res = gpio_init(dev->params.pin, dev->params.in_mode) == 0 ? DS18_OK : DS18_ERROR;
 
     return res;
 }
