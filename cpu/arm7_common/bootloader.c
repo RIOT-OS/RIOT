@@ -28,34 +28,36 @@
 #include <stdlib.h>
 #include "thread.h"
 
+#include "log.h"
+
 void FIQ_Routine(void)   __attribute__((interrupt("FIQ")));
 //void SWI_Routine (void)   __attribute__((interrupt("SWI")));
 void UNDEF_Routine(void) __attribute__((interrupt("UNDEF")));
 
 void IRQ_Routine(void)
 {
-    printf("Kernel Panic,\nEarly IRQ call\n");
+    LOG_ERROR("Kernel Panic,\nEarly IRQ call\n");
 
     while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 void FIQ_Routine(void)
 {
-    printf("Kernel Panic,\nEarly FIQ call\n");
+    LOG_ERROR("Kernel Panic,\nEarly FIQ call\n");
 
     while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 void SWI_Routine(void)
 {
-    printf("Kernel Panic,\nEarly SWI call\n");
+    LOG_ERROR("Kernel Panic,\nEarly SWI call\n");
 
     while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 void DEBUG_Routine(void)
 {
-    printf("DEBUG hit.");
+    LOG_ERROR("DEBUG hit.");
 
     while (1) {};
 }
@@ -75,7 +77,7 @@ void abtorigin(const char *vector, unsigned long *lnk_ptr1)
     __asm__ __volatile__("mov %0, sp" : "=r"(sp));              // copy sp
     __asm__ __volatile__("msr cpsr_c, %0" :: "r"(cpsr));        // switch back to abt mode
 
-    printf("#!%s abort at %p (0x%08lX) originating from %p (0x%08lX) in mode 0x%X\n",
+    LOG_ERROR("#!%s abort at %p (0x%08lX) originating from %p (0x%08lX) in mode 0x%X\n",
            vector, (void *)lnk_ptr1, *(lnk_ptr1), (void *)lnk_ptr2, *(lnk_ptr2), spsr
           );
 
