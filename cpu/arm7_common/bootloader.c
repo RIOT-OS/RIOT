@@ -81,7 +81,7 @@ void abtorigin(const char *vector, unsigned long *lnk_ptr1)
            vector, (void *)lnk_ptr1, *(lnk_ptr1), (void *)lnk_ptr2, *(lnk_ptr2), spsr
           );
 
-    exit(1);
+    while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 void UNDEF_Routine(void)
@@ -96,7 +96,7 @@ void UNDEF_Routine(void)
         abtorigin("undef", lnk_ptr);
     }
 
-    exit(1);
+    while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 void PABT_Routine(void)
@@ -111,7 +111,7 @@ void PABT_Routine(void)
         abtorigin("pabt", lnk_ptr);
     }
 
-    exit(1);
+    while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 void DABT_Routine(void)
@@ -126,7 +126,7 @@ void DABT_Routine(void)
         abtorigin("data", lnk_ptr);
     }
 
-    exit(1);
+    while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 static inline void
