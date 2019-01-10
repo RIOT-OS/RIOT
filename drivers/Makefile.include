@@ -250,6 +250,10 @@ ifneq (,$(filter tmp006,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tmp006/include
 endif
 
+ifneq (,$(filter tps6274x,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tps6274x/include
+endif
+
 ifneq (,$(filter tsl2561,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tsl2561/include
 endif
