@@ -213,11 +213,7 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
      * `esp_now_recv_cb`. To avoid inconsistencies this is checked by an
      * additional boolean variable . This can not be realized by a mutex
      * because `esp_now_recv_cb` would be reentered from same thread context.
-     * If the NDEBUG macro is undefined, an assertion is used instead for
-     * debugging purposes.
      */
-    assert(!_in_recv_cb);
-
     if (_in_recv_cb) {
         return;
     }
