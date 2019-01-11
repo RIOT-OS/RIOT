@@ -63,6 +63,22 @@ static void *recorder_data[] = {
 #include "ltc4150_params.h"
 
 /**
+ * @brief Like `puts()`, but do not append a newline
+ *
+ * Normally I would just use `fputs(str, stdout)` directly, but the msp430
+ * toolchain lacks `fputs()`. This wrapper allows to add a less efficient
+ * fallback to printf()
+ */
+static inline void puts_no_nl(const char *s)
+{
+#ifndef NO_FPUTS
+    fputs(s, stdout);
+#else
+    printf("%s", s);
+#endif
+}
+
+/**
  * @brief Callback function to reset/initialize the recorder data
  */
 static void reset_cb(ltc4150_dev_t *dev, uint64_t now_usec, void *_data)
@@ -142,11 +158,11 @@ static void print_spaces(size_t number)
 {
     static const char *spaces = "                ";
     while (number > 16) {
-        fputs(spaces, stdout);
+        puts_no_nl(spaces);
         number -= 16;
     }
 
-    fputs(spaces + 16 - number, stdout);
+    puts_no_nl(spaces + 16 - number);
 }
 
 /**
@@ -164,7 +180,7 @@ static void print_col_u32(uint32_t number, size_t width)
     if (width > slen) {
         print_spaces(width - slen);
     }
-    fputs(sbuf, stdout);
+    puts_no_nl(sbuf);
 }
 
 /**
@@ -188,7 +204,7 @@ static void print_col_i32(int32_t number, size_t width)
     if (width > slen) {
         print_spaces(width - slen);
     }
-    fputs(sbuf, stdout);
+    puts_no_nl(sbuf);
 }
 
 /**
@@ -204,7 +220,7 @@ static void print_current(int32_t current, size_t width)
     sbuf[0] = '.';
     sbuf[1] = '0' + current % 10;
     sbuf[2] = '\0';
-    fputs(sbuf, stdout);
+    puts_no_nl(sbuf);
 }
 
 int main(void)
@@ -220,7 +236,7 @@ int main(void)
     ltc4150_pulses2c(&ltc4150, &ten_uc_per_pulse, NULL, 10000, 0);
 
     if (retval) {
-        fputs("Failed to initialize LTC4150 driver:", stdout);
+        puts_no_nl("Failed to initialize LTC4150 driver:");
         switch (retval) {
             case -EINVAL:
                 puts("Invalid parameter");
@@ -291,11 +307,11 @@ int main(void)
             puts("ltc4150_charge() failed!");
             return -1;
         }
-        fputs("| ", stdout);
+        puts_no_nl("| ");
         print_col_u32(charged, 13);
-        fputs(" | ", stdout);
+        puts_no_nl(" | ");
         print_col_u32(discharged, 13);
-        fputs(" | ", stdout);
+        puts_no_nl(" | ");
 
         /* Get & print avg current */
         if (ltc4150_avg_current(&ltc4150, &avg_current)) {
@@ -303,7 +319,7 @@ int main(void)
             return -1;
         }
         print_current(avg_current, 7);
-        fputs(" | ", stdout);
+        puts_no_nl(" | ");
 
         /* Get & print last minute current */
         if (ltc4150_last_minute_charge(&ltc4150, &last_minute_data,
@@ -315,7 +331,7 @@ int main(void)
         current = (int32_t)discharged - (int32_t)charged;
         current /= 60;
         print_col_i32(current, 11);
-        fputs(" | ", stdout);
+        puts_no_nl(" | ");
 
         /* Calculate & print the current between the last two pulses */
         current = (int32_t)((test_data.now_usec - test_data.last_usec) / MS_PER_SEC);
