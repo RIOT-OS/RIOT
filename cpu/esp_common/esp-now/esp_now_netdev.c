@@ -240,7 +240,6 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
     /*
      * Since we are not in the interrupt context, we do not have to pass
      * `NETDEV_EVENT_ISR` first. We can call the receive function directly.
-     * But we have to unlock the mutex and enable interrupts before.
      */
     if (_esp_now_dev.netdev.event_callback) {
         _esp_now_dev.netdev.event_callback((netdev_t*)&_esp_now_dev,
