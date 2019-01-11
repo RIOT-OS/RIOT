@@ -26,7 +26,7 @@
 
 static int read_adc(const void *dev, phydat_t *res)
 {
-    if (adcxx1c_read_raw((const adcxx1c_t *)dev, res->val)) {
+    if (adcxx1c_read_raw((const adcxx1c_t *)dev, &res->val[0])) {
         return -ECANCELED;
     }
 
