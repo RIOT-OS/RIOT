@@ -1,30 +1,32 @@
 # `gnrc_ipv6_ext` test
 
-This test sends a packet to itself with extension headers. This is based on gnrc_networking example.
+This test utilizes [scapy] to test the IPv6 Extension header parsing.
 
-Enable debug output of `gnrc_ipv6.c` before run. When the test is run, it should show the following debug output:
+It is intended to just test the basic parsing functionality. For specific
+extension header types please provide a separate test application.
+
+To test, compile and flash the application to any board of your liking (since
+`ethos` is used to communicate with non-native boards it really doesn't matter
+as long as the application fits).
 
 ```
-ipv6: Received (src = fd01::1, dst = fd01::2, next header = 0, length = 42)
-ipv6: forward nh = 0 to other threads
-ipv6: handle extension header (nh = 0)
-ipv6: waiting for incoming message.
-ipv6: GNRC_NETAPI_MSG_TYPE_RCV received
-ipv6: Received (src = fd01::1, dst = fd01::3, next header = 0, length = 42)
-ipv6: forward nh = 0 to other threads
-ipv6: handle extension header (nh = 0)
-ipv6: waiting for incoming message.
-ipv6: GNRC_NETAPI_MSG_TYPE_RCV received
-ipv6: Received (src = fd01::1, dst = fd01::2, next header = 0, length = 42)
-ipv6: forward nh = 0 to other threads
-ipv6: handle extension header (nh = 0)
-ipv6: forward nh = 17 to other threads
-ipv6: waiting for incoming message.
-pkt->users: 0
+make flash
 ```
 
-It configures the network interface with addresses fd01::02 and fd01::03. Then it sends a packet to fd01::02 with a routing extension header containing addresses fd01::03 and fd01::02. So the packet should be forwarded from fd01::02 to fd01::03, then to fd01::02 again.
+And run the tests using
 
-The packet has a Hop-by-Hop extension header that should be ignored.
+```
+sudo make test
+```
 
-The test also asserts that the packet is released.
+Note that root privileges are required since `scapy` needs to construct Ethernet
+frames to properly communicate over the TAP interface.
+
+The tests succeeds if you see the string `SUCCESS`.
+
+If any problems are encountered (i.e. if the test prints the sting `FAILED`),
+set the echo parameter in the `run()` function at the bottom of the test script
+(tests/01-run.py) to `True`. The test script will then offer a more detailed
+output.
+
+[scapy]: https://scapy.readthedocs.io/en/latest/
