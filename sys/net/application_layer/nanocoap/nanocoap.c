@@ -106,6 +106,11 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
             DEBUG("option count=%u nr=%u len=%i\n", option_count, option_nr, option_len);
 
             if (option_delta) {
+                if (option_count >= NANOCOAP_NOPTS_MAX) {
+                    DEBUG("nanocoap: max nr of options exceeded\n");
+                    return -ENOMEM;
+                }
+
                 optpos->opt_num = option_nr;
                 optpos->offset = (uintptr_t)option_start - (uintptr_t)hdr;
                 DEBUG("optpos option_nr=%u %u\n", (unsigned)option_nr, (unsigned)optpos->offset);
