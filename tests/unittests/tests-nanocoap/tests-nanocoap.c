@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "embUnit.h"
 
@@ -433,6 +434,53 @@ static void test_nanocoap__server_reply_simple_con(void)
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_ACK, coap_get_type(&pkt));
 }
 
+static void test_nanocoap__server_option_count_overflow_check(void)
+{
+    /* this test passes a forged CoAP packet containing 42 options (provided by
+     * @nmeum in #10753) to coap_parse().  The used coap_pkt_t is part of a
+     * struct, followed by an array of 42 coap_option_t.  The array is cleared
+     * before the call to coap_parse().  If the overflow protection is working,
+     * the array must still be clear after parsing the packet, and the proper
+     * error code (-ENOMEM) is returned.  Otherwise, the parsing wrote past
+     * scratch.pkt, thus the array is not zeroed anymore.
+     */
+
+     static uint8_t pkt_data[] = {
+        0x40, 0x01, 0x09, 0x26, 0x01, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17 };
+
+    /* ensure NANOCOAP_NOPTS_MAX is actually lower than 42 */
+    TEST_ASSERT(NANOCOAP_NOPTS_MAX < 42);
+
+    struct {
+      coap_pkt_t pkt;
+      uint8_t guard_data[42 * sizeof(coap_optpos_t)];
+    } scratch;
+
+    memset(&scratch, 0, sizeof(scratch));
+
+    int res = coap_parse(&scratch.pkt, pkt_data, sizeof(pkt_data));
+
+    /* check if any byte of the guard_data array is non-zero */
+    int dirty = 0;
+    volatile uint8_t *pos = scratch.guard_data;
+    for (size_t i = 0; i < sizeof(scratch.guard_data); i++) {
+        if (*pos) {
+            dirty = 1;
+            break;
+        }
+    }
+
+    TEST_ASSERT_EQUAL_INT(0, dirty);
+    TEST_ASSERT_EQUAL_INT(-ENOMEM, res);
+}
+
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -450,6 +498,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__server_reply_simple),
         new_TestFixture(test_nanocoap__server_get_req_con),
         new_TestFixture(test_nanocoap__server_reply_simple_con),
+        new_TestFixture(test_nanocoap__server_option_count_overflow_check),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);
