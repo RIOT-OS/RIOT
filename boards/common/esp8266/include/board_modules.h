@@ -17,9 +17,11 @@
  * All ESP8266 boards can be used with different off-board hardware modules.
  * This file contains the default configurations for those external hardware
  * modules that have been tested with the ESP8266 and are preconfigured here.
- * Most of these configurations can be overridden by application-specific
- * configurations. The configuration for a hardware module is only used if the
- * corresponding driver modules are used.
+ * Most of these configurations can be overridden by an
+ * \ref esp8266_app_spec_conf "application-specific configuration".
+ *
+ * The configurations of the respective hardware modules only take place if
+ * the corresponding driver modules are used.
  *
  * @file
  * @author      Gunar Schorcht <gunar@schorcht.net>
@@ -27,11 +29,6 @@
  */
 
 #include <stdint.h>
-
-#include "cpu.h"
-#include "periph_conf.h"
-#include "periph_conf_common.h"
-#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +56,7 @@ extern "C" {
 #define ENC28J60_PARAM_CS       GPIO4       /**< ENC28J60 CS signal (can be overriden) */
 #endif
 #ifndef ENC28J60_PARAM_INT
-#define ENC28J60_PARAM_INT      GPIO9       /**< ENC28J60 CS signal (can be overriden) */
+#define ENC28J60_PARAM_INT      GPIO9       /**< ENC28J60 INT signal (can be overriden) */
 #endif
 #ifndef ENC28J60_PARAM_RESET
 #define ENC28J60_PARAM_RESET    GPIO10      /**< ENC28J60 RESET signal (can be overriden) */
@@ -91,7 +88,7 @@ extern "C" {
 #define MRF24J40_PARAM_CS       GPIO16          /**< MRF24J40 CS signal (can be overriden) */
 #endif
 #ifndef MRF24J40_PARAM_INT
-#define MRF24J40_PARAM_INT      GPIO0           /**< MRF24J40 CS signal (can be overriden) */
+#define MRF24J40_PARAM_INT      GPIO0           /**< MRF24J40 INT signal (can be overriden) */
 #endif
 #ifndef MRF24J40_PARAM_RESET
 #define MRF24J40_PARAM_RESET    GPIO2           /**< MRF24J40 RESET signal (can be overriden) */
