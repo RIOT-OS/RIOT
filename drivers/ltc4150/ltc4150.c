@@ -154,22 +154,25 @@ static void get_coulomb(const ltc4150_dev_t *dev,
 #endif
                         uint32_t raw_discharged)
 {
+    uint64_t tmp;
     if (charged != NULL) {
 #ifdef MODULE_LTC4150_BIDIRECTIONAL
-        *charged = raw_charged;
-        *charged *= 3600000;
-        *charged += dev->params.pulses_per_ah >> 1;
-        *charged /= dev->params.pulses_per_ah;
+        tmp = raw_charged;
+        tmp *= 3600000;
+        tmp += dev->params.pulses_per_ah >> 1;
+        tmp /= dev->params.pulses_per_ah;
+        *charged = tmp;
 #else
         *charged = 0;
 #endif
     }
 
     if (discharged != NULL) {
-        *discharged = raw_discharged;
-        *discharged *= 3600000;
-        *discharged += dev->params.pulses_per_ah >> 1;
-        *discharged /= dev->params.pulses_per_ah;
+        tmp = raw_discharged;
+        tmp *= 3600000;
+        tmp += dev->params.pulses_per_ah >> 1;
+        tmp /= dev->params.pulses_per_ah;
+        *discharged = tmp;
     }
 }
 
