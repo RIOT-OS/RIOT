@@ -160,9 +160,6 @@ static void IRAM_ATTR esp_now_scan_peers_done(void)
 
     _esp_now_scan_peers_done = true;
 
-    /* set the time for next scan */
-    xtimer_set(&_esp_now_scan_peers_timer, esp_now_params.scan_period);
-
     mutex_unlock(&_esp_now_dev.dev_lock);
 }
 
@@ -170,7 +167,10 @@ static void esp_now_scan_peers_start(void)
 {
     DEBUG("%s\n", __func__);
 
+    /* start the scan */
     esp_wifi_scan_start(&scan_cfg, false);
+    /* set the time for next scan */
+    xtimer_set(&_esp_now_scan_peers_timer, esp_now_params.scan_period);
 }
 
 static void IRAM_ATTR esp_now_scan_peers_timer_cb(void* arg)
@@ -180,7 +180,7 @@ static void IRAM_ATTR esp_now_scan_peers_timer_cb(void* arg)
     esp_now_netdev_t* dev = (esp_now_netdev_t*)arg;
 
     if (dev->netdev.event_callback) {
-        dev->scan_event = true;
+        dev->scan_event++;
         dev->netdev.event_callback((netdev_t*)dev, NETDEV_EVENT_ISR);
     }
 }
@@ -191,6 +191,8 @@ static const uint8_t _esp_now_mac[6] = { 0x82, 0x73, 0x79, 0x84, 0x79, 0x83 }; /
 
 #endif /* ESP_NOW_UNICAST */
 
+static bool _in_recv_cb = false;
+
 static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, int len)
 {
 #if ESP_NOW_UNICAST
@@ -200,40 +202,51 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
     }
 #endif
 
-    mutex_lock(&_esp_now_dev.rx_lock);
-    critical_enter();
+    /*
+     * The function `esp_now_recv_cb` is executed in the context of the `wifi`
+     * thread. The ISRs handling the hardware interrupts from the WiFi
+     * interface pass events to a message queue of the `wifi` thread which is
+     * sequentially processed by the `wifi` thread to asynchronously execute
+     * callback functions such as `esp_now_recv_cb`.
+     *
+     * It should be therefore not possible to reenter function
+     * `esp_now_recv_cb`. To avoid inconsistencies this is checked by an
+     * additional boolean variable . This can not be realized by a mutex
+     * because `esp_now_recv_cb` would be reentered from same thread context.
+     */
+    if (_in_recv_cb) {
+        return;
+    }
+    _in_recv_cb = true;
 
     /*
-     * The ring buffer uses a single byte for the pkt length, followed by the mac address,
-     * followed by the actual packet data. The MTU for ESP-NOW is 250 bytes, so len will never
-     * exceed the limits of a byte as the mac address length is not included.
+     * Since it is not possible to reenter the function `esp_now_recv_cb`, and
+     * the functions netif::_ recv and esp_now_netdev::_ recv are called
+     * directly in the same thread context, neither a mutual exclusion has to
+     * be realized nor have the interrupts to be deactivated.
+     * Therefore we can read directly from the `buf` and don't need a receive
+     * buffer.
      */
-    if ((int)ringbuffer_get_free(&_esp_now_dev.rx_buf) < 1 + ESP_NOW_ADDR_LEN + len) {
-        critical_exit();
-        mutex_unlock(&_esp_now_dev.rx_lock);
+    if (_esp_now_dev.rx_len) {
         DEBUG("%s: buffer full, dropping incoming packet of %d bytes\n", __func__, len);
+        _in_recv_cb = false;
         return;
     }
 
-#if 0 /* don't printf anything in ISR */
-    printf("%s\n", __func__);
-    printf("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
-           __func__, len,
-           mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-    od_hex_dump(data, len, OD_WIDTH_DEFAULT);
-#endif
+    _esp_now_dev.rx_mac = (uint8_t*)mac;
+    _esp_now_dev.rx_data = (uint8_t*)data;
+    _esp_now_dev.rx_len = len;
 
-    ringbuffer_add_one(&_esp_now_dev.rx_buf, len);
-    ringbuffer_add(&_esp_now_dev.rx_buf, (char*)mac, ESP_NOW_ADDR_LEN);
-    ringbuffer_add(&_esp_now_dev.rx_buf, (char*)data, len);
-
+    /*
+     * Since we are not in the interrupt context, we do not have to pass
+     * `NETDEV_EVENT_ISR` first. We can call the receive function directly.
+     */
     if (_esp_now_dev.netdev.event_callback) {
-        _esp_now_dev.recv_event = true;
-        _esp_now_dev.netdev.event_callback((netdev_t*)&_esp_now_dev, NETDEV_EVENT_ISR);
+        _esp_now_dev.netdev.event_callback((netdev_t*)&_esp_now_dev,
+                                           NETDEV_EVENT_RX_COMPLETE);
     }
 
-    critical_exit();
-    mutex_unlock(&_esp_now_dev.rx_lock);
+    _in_recv_cb = false;
 }
 
 static volatile int _esp_now_sending = 0;
@@ -317,7 +330,8 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     extern portMUX_TYPE g_intr_lock_mux;
     mutex_init(&g_intr_lock_mux);
 
-    ringbuffer_init(&dev->rx_buf, (char*)dev->rx_mem, sizeof(dev->rx_mem));
+    /* initialize buffer */
+    dev->rx_len = 0;
 
     esp_system_event_add_handler(_esp_system_event_handler, NULL);
 
@@ -416,11 +430,9 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     dev->netdev.driver = &_esp_now_driver;
 
     /* initialize netdev data structure */
-    dev->recv_event = false;
-    dev->scan_event = false;
+    dev->scan_event = 0;
 
     mutex_init(&dev->dev_lock);
-    mutex_init(&dev->rx_lock);
 
     /* initialize ESP-NOW and register callback functions */
     result = esp_now_init();
@@ -558,93 +570,51 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     esp_now_netdev_t* dev = (esp_now_netdev_t*)netdev;
 
-    mutex_lock(&dev->rx_lock);
+    /* we store source mac address and received data in `buf` */
+    uint16_t size = dev->rx_len ? ESP_NOW_ADDR_LEN + dev->rx_len : 0;
 
-    uint16_t size = ringbuffer_empty(&dev->rx_buf)
-        ? 0
-        : (ringbuffer_peek_one(&dev->rx_buf) + ESP_NOW_ADDR_LEN);
-
-    if (size && dev->rx_buf.avail < size) {
-        /* this should never happen unless this very function messes up */
-        mutex_unlock(&dev->rx_lock);
-        return -EIO;
-    }
-
-    if (!buf && !len) {
-        /* return the size without dropping received data */
-        mutex_unlock(&dev->rx_lock);
+    if (!buf) {
+        /* get the size of the frame */
+        if (len > 0 && size) {
+            /* if len > 0, drop the frame */
+            dev->rx_len = 0;
+        }
         return size;
     }
 
-    if (!buf && len) {
-        /* return the size and drop received data */
-        if (size) {
-            ringbuffer_remove(&dev->rx_buf, 1 + size);
-        }
-        mutex_unlock(&dev->rx_lock);
-        return size;
+    if (len < size) {
+        /* buffer is smaller than the number of received bytes */
+        DEBUG("[esp_now] No space in receive buffers\n");
+        /* newest API requires to drop the frame in that case */
+        dev->rx_len = 0;
+        return -ENOBUFS;
     }
 
-    if (buf && len && !size) {
-        mutex_unlock(&dev->rx_lock);
-        return 0;
-    }
+    /* copy the buffer */
+    memcpy(buf, dev->rx_mac, ESP_NOW_ADDR_LEN);
+    memcpy((char *)buf + ESP_NOW_ADDR_LEN, dev->rx_data, dev->rx_len);
+    dev->rx_len = 0;
 
-    if (buf && len && size) {
-        if (size > len) {
-            DEBUG("[esp_now] No space in receive buffers\n");
-            mutex_unlock(&dev->rx_lock);
-            return -ENOBUFS;
-        }
-
-        /* remove already peeked size byte */
-        ringbuffer_remove(&dev->rx_buf, 1);
-        ringbuffer_get(&dev->rx_buf, buf, size);
-
-        uint8_t *mac = buf;
-
-        DEBUG("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
-              __func__, size - ESP_NOW_ADDR_LEN,
-              mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    uint8_t *mac = buf;
+    DEBUG("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
+          __func__, size - ESP_NOW_ADDR_LEN,
+          mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 #if defined(MODULE_OD) && ENABLE_DEBUG
-        od_hex_dump(buf + ESP_NOW_ADDR_LEN, size - ESP_NOW_ADDR_LEN, OD_WIDTH_DEFAULT);
+    od_hex_dump(buf + ESP_NOW_ADDR_LEN, size - ESP_NOW_ADDR_LEN, OD_WIDTH_DEFAULT);
 #endif
 
 #if ESP_NOW_UNICAST
-        if (esp_now_is_peer_exist(mac) <= 0) {
-            _esp_now_add_peer(mac, esp_now_params.channel, esp_now_params.key);
-        }
+    if (esp_now_is_peer_exist(mac) <= 0) {
+        _esp_now_add_peer(mac, esp_now_params.channel, esp_now_params.key);
+    }
 #endif
 
 #ifdef MODULE_NETSTATS_L2
-        netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += size;
+    netdev->stats.rx_count++;
+    netdev->stats.rx_bytes += size;
 #endif
 
-        mutex_unlock(&dev->rx_lock);
-        return size;
-    }
-
-    mutex_unlock(&dev->rx_lock);
-    return -EINVAL;
-}
-
-static inline int _get_iid(esp_now_netdev_t *dev, eui64_t *value, size_t max_len)
-{
-    CHECK_PARAM_RET(max_len >= sizeof(eui64_t), -EOVERFLOW);
-
-    /* interface id according to */
-    /* https://tools.ietf.org/html/rfc4291#section-2.5.1 */
-    value->uint8[0] = dev->addr[0] ^ 0x02; /* invert bit1 */
-    value->uint8[1] = dev->addr[1];
-    value->uint8[2] = dev->addr[2];
-    value->uint8[3] = 0xff;
-    value->uint8[4] = 0xfe;
-    value->uint8[5] = dev->addr[3];
-    value->uint8[6] = dev->addr[4];
-    value->uint8[7] = dev->addr[5];
-
-    return sizeof(eui64_t);
+    return size;
 }
 
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
@@ -690,10 +660,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             CHECK_PARAM_RET(max_len >= sizeof(dev->addr), -EOVERFLOW);
             memcpy(val, dev->addr, sizeof(dev->addr));
             res = sizeof(dev->addr);
-            break;
-
-        case NETOPT_IPV6_IID:
-            res = _get_iid(dev, val, max_len);
             break;
 
 #ifdef MODULE_NETSTATS_L2
@@ -752,12 +718,11 @@ static void _isr(netdev_t *netdev)
 
     esp_now_netdev_t *dev = (esp_now_netdev_t*)netdev;
 
-    if (dev->recv_event) {
-        dev->recv_event = false;
-        dev->netdev.event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
-    }
-    else if (dev->scan_event) {
-        dev->scan_event = false;
+    critical_enter();
+
+    if (dev->scan_event) {
+        dev->scan_event--;
+        critical_exit();
         esp_now_scan_peers_start();
     }
     return;

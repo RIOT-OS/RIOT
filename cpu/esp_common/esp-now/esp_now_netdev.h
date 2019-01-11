@@ -21,7 +21,6 @@
 #define ESP_NOW_NETDEV_H
 
 #include "net/netdev.h"
-#include "ringbuffer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,11 +49,10 @@ extern "C" {
 /**
  * @brief   buffer size used for RX buffering
  *
- * Reduce this value if your expected traffic does not include full IPv6 MTU
- * sized packets.
+ * The buffer is use to store a ESP-NOW packet and the source MAC address.
  */
 #ifndef ESP_NOW_BUFSIZE
-#define ESP_NOW_BUFSIZE (1500)
+#define ESP_NOW_BUFSIZE (ESP_NOW_MAX_SIZE_RAW + ESP_NOW_ADDR_LEN)
 #endif
 
 /**
@@ -84,8 +82,9 @@ typedef struct
 
     uint8_t addr[ESP_NOW_ADDR_LEN];  /**< device addr (MAC address) */
 
-    uint8_t rx_mem[ESP_NOW_BUFSIZE]; /**< memory holding incoming packages */
-    ringbuffer_t rx_buf;             /**< ringbuffer for incoming packages */
+    uint8_t rx_len;                  /**< number of bytes received */
+    uint8_t* rx_mac;                 /**< source mac of received data */
+    uint8_t* rx_data;                /**< received */
 
     uint8_t tx_mem[ESP_NOW_MAX_SIZE_RAW]; /**< memory holding outgoing package */
 
@@ -94,10 +93,8 @@ typedef struct
 #endif
 
     mutex_t dev_lock;                /**< device is already in use */
-    mutex_t rx_lock;                 /**< rx_buf handling in progress */
 
-    bool recv_event;                 /**< ESP-NOW frame received */
-    bool scan_event;                 /**< ESP-NOW peers have to be scannged */
+    uint8_t scan_event;              /**< ESP-NOW peers have to be scannged */
 
 } esp_now_netdev_t;
 
