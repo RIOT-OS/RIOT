@@ -55,19 +55,19 @@ This is the pinout of the expansion header on the right side of the board. PIN 1
 **Note:** some pins are connected to the board controller, when enabled!
 
 ### Peripheral mapping
-| Peripheral | Number  | Hardware        | Pins                            | Comments                                                  |
-|------------|---------|-----------------|---------------------------------|-----------------------------------------------------------|
-| ADC        | 0       | ADC0            | CHAN0: internal temperature     | Ports are fixed, 14/16-bit resolution not supported       |
-| I2C        | 0       | I2C0            | SDA: PC10, CLK: PC11            | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate  |
-| HWCRYPTO   | &mdash; | &mdash;         |                                 | AES128/AES256, SHA1, SHA256                               |
-| HWRNG      | &mdash; | TNRG0           |                                 | Hardware-based true random number generator               |
-| RTT        | &mdash; | RTCC            |                                 | 1 Hz interval. Either RTT or RTC (see below)              |
-| RTC        | &mdash; | RTCC            |                                 | 1 Hz interval. Either RTC or RTT (see below)              |
-| SPI        | 0       | USART1          | MOSI: PC6, MISO: PC7, CLK: PC8  |                                                           |
-| Timer      | 0       | TIMER0 + TIMER1 |                                 | TIMER0 is used as prescaler (must be adjecent)            |
-| UART       | 0       | USART0          | RX: PA1, TX: PA0                | Default STDIO output                                      |
-|            | 1       | USART1          | RX: PC6, TX: PC7                |                                                           |
-|            | 2       | LEUART0         | RX: PD11, TX: PD10              | Baud rate limited (see below)                             |
+| Peripheral | Number  | Hardware          | Pins                            | Comments                                                  |
+|------------|---------|-------------------|---------------------------------|-----------------------------------------------------------|
+| ADC        | 0       | ADC0              | CHAN0: internal temperature     | Ports are fixed, 14/16-bit resolution not supported       |
+| I2C        | 0       | I2C0              | SDA: PC10, CLK: PC11            | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate  |
+| HWCRYPTO   | &mdash; | &mdash;           |                                 | AES128/AES256, SHA1, SHA256                               |
+| HWRNG      | &mdash; | TNRG0             |                                 | Hardware-based true random number generator               |
+| RTT        | &mdash; | RTCC              |                                 | 1 Hz interval. Either RTT or RTC (see below)              |
+| RTC        | &mdash; | RTCC              |                                 | 1 Hz interval. Either RTC or RTT (see below)              |
+| SPI        | 0       | USART1            | MOSI: PC6, MISO: PC7, CLK: PC8  |                                                           |
+| Timer      | 0       | WTIMER0 + WTIMER1 |                                 | WTIMER0 is used as prescaler (must be adjecent)            |
+| UART       | 0       | USART0            | RX: PA1, TX: PA0                | Default STDIO output                                      |
+|            | 1       | USART1            | RX: PC6, TX: PC7                |                                                           |
+|            | 2       | LEUART0           | RX: PD11, TX: PD10              | Baud rate limited (see below)                             |
 
 ### User interface
 | Peripheral | Mapped to | Pin  | Comments   |

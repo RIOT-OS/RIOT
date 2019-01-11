@@ -1,34 +1,33 @@
-/**************************************************************************//**
- * @file efr32mg12p_cmu.h
+/***************************************************************************//**
+ * @file
  * @brief EFR32MG12P_CMU register and bit field definitions
- * @version 5.4.0
- ******************************************************************************
+ * @version 5.7.0
+ *******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
- ******************************************************************************
+ * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software.@n
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.@n
+ *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * DISCLAIMER OF WARRANTY/LIMITATION OF REMEDIES: Silicon Laboratories, Inc.
- * has no obligation to support this Software. Silicon Laboratories, Inc. is
- * providing the Software "AS IS", with no express or implied warranties of any
- * kind, including, but not limited to, any implied warranties of
- * merchantability or fitness for any particular purpose or warranties against
- * infringement of any proprietary rights of a third party.
- *
- * Silicon Laboratories, Inc. will not be liable for any consequential,
- * incidental, or special damages, or any other relief, or for any claim by
- * any third party, arising from your use of this Software.
- *
- *****************************************************************************/
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,56 +40,56 @@ extern "C" {
 #pragma clang system_header  /* Treat file as system include file. */
 #endif
 
-/**************************************************************************//**
-* @addtogroup Parts
-* @{
-******************************************************************************/
-/**************************************************************************//**
+/***************************************************************************//**
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/***************************************************************************//**
  * @defgroup EFR32MG12P_CMU CMU
  * @{
  * @brief EFR32MG12P_CMU Register Declaration
- *****************************************************************************/
+ ******************************************************************************/
 /** CMU Register Declaration */
 typedef struct {
   __IOM uint32_t CTRL;                /**< CMU Control Register  */
 
-  uint32_t       RESERVED0[3];        /**< Reserved for future use **/
+  uint32_t       RESERVED0[3U];       /**< Reserved for future use **/
   __IOM uint32_t HFRCOCTRL;           /**< HFRCO Control Register  */
 
-  uint32_t       RESERVED1[1];        /**< Reserved for future use **/
+  uint32_t       RESERVED1[1U];       /**< Reserved for future use **/
   __IOM uint32_t AUXHFRCOCTRL;        /**< AUXHFRCO Control Register  */
 
-  uint32_t       RESERVED2[1];        /**< Reserved for future use **/
+  uint32_t       RESERVED2[1U];       /**< Reserved for future use **/
   __IOM uint32_t LFRCOCTRL;           /**< LFRCO Control Register  */
   __IOM uint32_t HFXOCTRL;            /**< HFXO Control Register  */
 
-  uint32_t       RESERVED3[1];        /**< Reserved for future use **/
+  uint32_t       RESERVED3[1U];       /**< Reserved for future use **/
   __IOM uint32_t HFXOSTARTUPCTRL;     /**< HFXO Startup Control  */
   __IOM uint32_t HFXOSTEADYSTATECTRL; /**< HFXO Steady State Control  */
   __IOM uint32_t HFXOTIMEOUTCTRL;     /**< HFXO Timeout Control  */
   __IOM uint32_t LFXOCTRL;            /**< LFXO Control Register  */
 
-  uint32_t       RESERVED4[1];        /**< Reserved for future use **/
+  uint32_t       RESERVED4[1U];       /**< Reserved for future use **/
   __IOM uint32_t DPLLCTRL;            /**< DPLL Control Register  */
   __IOM uint32_t DPLLCTRL1;           /**< DPLL Control Register  */
-  uint32_t       RESERVED5[2];        /**< Reserved for future use **/
+  uint32_t       RESERVED5[2U];       /**< Reserved for future use **/
   __IOM uint32_t CALCTRL;             /**< Calibration Control Register  */
   __IOM uint32_t CALCNT;              /**< Calibration Counter Register  */
-  uint32_t       RESERVED6[2];        /**< Reserved for future use **/
+  uint32_t       RESERVED6[2U];       /**< Reserved for future use **/
   __IOM uint32_t OSCENCMD;            /**< Oscillator Enable/Disable Command Register  */
   __IOM uint32_t CMD;                 /**< Command Register  */
-  uint32_t       RESERVED7[2];        /**< Reserved for future use **/
+  uint32_t       RESERVED7[2U];       /**< Reserved for future use **/
   __IOM uint32_t DBGCLKSEL;           /**< Debug Trace Clock Select  */
   __IOM uint32_t HFCLKSEL;            /**< High Frequency Clock Select Command Register  */
-  uint32_t       RESERVED8[2];        /**< Reserved for future use **/
+  uint32_t       RESERVED8[2U];       /**< Reserved for future use **/
   __IOM uint32_t LFACLKSEL;           /**< Low Frequency A Clock Select Register  */
   __IOM uint32_t LFBCLKSEL;           /**< Low Frequency B Clock Select Register  */
   __IOM uint32_t LFECLKSEL;           /**< Low Frequency E Clock Select Register  */
 
-  uint32_t       RESERVED9[1];        /**< Reserved for future use **/
+  uint32_t       RESERVED9[1U];       /**< Reserved for future use **/
   __IM uint32_t  STATUS;              /**< Status Register  */
   __IM uint32_t  HFCLKSTATUS;         /**< HFCLK Status Register  */
-  uint32_t       RESERVED10[1];       /**< Reserved for future use **/
+  uint32_t       RESERVED10[1U];      /**< Reserved for future use **/
   __IM uint32_t  HFXOTRIMSTATUS;      /**< HFXO Trim Status  */
   __IM uint32_t  IF;                  /**< Interrupt Flag Register  */
   __IOM uint32_t IFS;                 /**< Interrupt Flag Set Register  */
@@ -98,57 +97,57 @@ typedef struct {
   __IOM uint32_t IEN;                 /**< Interrupt Enable Register  */
   __IOM uint32_t HFBUSCLKEN0;         /**< High Frequency Bus Clock Enable Register 0  */
 
-  uint32_t       RESERVED11[3];       /**< Reserved for future use **/
+  uint32_t       RESERVED11[3U];      /**< Reserved for future use **/
   __IOM uint32_t HFPERCLKEN0;         /**< High Frequency Peripheral Clock Enable Register 0  */
 
-  uint32_t       RESERVED12[7];       /**< Reserved for future use **/
+  uint32_t       RESERVED12[7U];      /**< Reserved for future use **/
   __IOM uint32_t LFACLKEN0;           /**< Low Frequency a Clock Enable Register 0  (Async Reg)  */
-  uint32_t       RESERVED13[1];       /**< Reserved for future use **/
+  uint32_t       RESERVED13[1U];      /**< Reserved for future use **/
   __IOM uint32_t LFBCLKEN0;           /**< Low Frequency B Clock Enable Register 0 (Async Reg)  */
 
-  uint32_t       RESERVED14[1];       /**< Reserved for future use **/
+  uint32_t       RESERVED14[1U];      /**< Reserved for future use **/
   __IOM uint32_t LFECLKEN0;           /**< Low Frequency E Clock Enable Register 0 (Async Reg)  */
-  uint32_t       RESERVED15[3];       /**< Reserved for future use **/
+  uint32_t       RESERVED15[3U];      /**< Reserved for future use **/
   __IOM uint32_t HFPRESC;             /**< High Frequency Clock Prescaler Register  */
 
-  uint32_t       RESERVED16[1];       /**< Reserved for future use **/
+  uint32_t       RESERVED16[1U];      /**< Reserved for future use **/
   __IOM uint32_t HFCOREPRESC;         /**< High Frequency Core Clock Prescaler Register  */
   __IOM uint32_t HFPERPRESC;          /**< High Frequency Peripheral Clock Prescaler Register  */
 
-  uint32_t       RESERVED17[1];       /**< Reserved for future use **/
+  uint32_t       RESERVED17[1U];      /**< Reserved for future use **/
   __IOM uint32_t HFEXPPRESC;          /**< High Frequency Export Clock Prescaler Register  */
 
-  uint32_t       RESERVED18[2];       /**< Reserved for future use **/
+  uint32_t       RESERVED18[2U];      /**< Reserved for future use **/
   __IOM uint32_t LFAPRESC0;           /**< Low Frequency a Prescaler Register 0 (Async Reg)  */
-  uint32_t       RESERVED19[1];       /**< Reserved for future use **/
+  uint32_t       RESERVED19[1U];      /**< Reserved for future use **/
   __IOM uint32_t LFBPRESC0;           /**< Low Frequency B Prescaler Register 0  (Async Reg)  */
-  uint32_t       RESERVED20[1];       /**< Reserved for future use **/
+  uint32_t       RESERVED20[1U];      /**< Reserved for future use **/
   __IOM uint32_t LFEPRESC0;           /**< Low Frequency E Prescaler Register 0  (Async Reg)  */
 
-  uint32_t       RESERVED21[3];       /**< Reserved for future use **/
+  uint32_t       RESERVED21[3U];      /**< Reserved for future use **/
   __IM uint32_t  SYNCBUSY;            /**< Synchronization Busy Register  */
   __IOM uint32_t FREEZE;              /**< Freeze Register  */
-  uint32_t       RESERVED22[2];       /**< Reserved for future use **/
+  uint32_t       RESERVED22[2U];      /**< Reserved for future use **/
   __IOM uint32_t PCNTCTRL;            /**< PCNT Control Register  */
 
-  uint32_t       RESERVED23[2];       /**< Reserved for future use **/
+  uint32_t       RESERVED23[2U];      /**< Reserved for future use **/
   __IOM uint32_t ADCCTRL;             /**< ADC Control Register  */
 
-  uint32_t       RESERVED24[4];       /**< Reserved for future use **/
+  uint32_t       RESERVED24[4U];      /**< Reserved for future use **/
   __IOM uint32_t ROUTEPEN;            /**< I/O Routing Pin Enable Register  */
   __IOM uint32_t ROUTELOC0;           /**< I/O Routing Location Register  */
   __IOM uint32_t ROUTELOC1;           /**< I/O Routing Location Register  */
-  uint32_t       RESERVED25[1];       /**< Reserved for future use **/
+  uint32_t       RESERVED25[1U];      /**< Reserved for future use **/
   __IOM uint32_t LOCK;                /**< Configuration Lock Register  */
   __IOM uint32_t HFRCOSS;             /**< HFRCO Spread Spectrum Register  */
 } CMU_TypeDef;                        /** @} */
 
-/**************************************************************************//**
+/***************************************************************************//**
  * @addtogroup EFR32MG12P_CMU
  * @{
  * @defgroup EFR32MG12P_CMU_BitFields  CMU Bit Fields
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 
 /* Bit fields for CMU CTRL */
 #define _CMU_CTRL_RESETVALUE                              0x00300000UL                          /**< Default value for CMU_CTRL */

@@ -1,34 +1,33 @@
-/**************************************************************************//**
- * @file efm32pg1b_usart.h
+/***************************************************************************//**
+ * @file
  * @brief EFM32PG1B_USART register and bit field definitions
- * @version 5.4.0
- ******************************************************************************
+ * @version 5.7.0
+ *******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
- ******************************************************************************
+ * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software.@n
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.@n
+ *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * DISCLAIMER OF WARRANTY/LIMITATION OF REMEDIES: Silicon Laboratories, Inc.
- * has no obligation to support this Software. Silicon Laboratories, Inc. is
- * providing the Software "AS IS", with no express or implied warranties of any
- * kind, including, but not limited to, any implied warranties of
- * merchantability or fitness for any particular purpose or warranties against
- * infringement of any proprietary rights of a third party.
- *
- * Silicon Laboratories, Inc. will not be liable for any consequential,
- * incidental, or special damages, or any other relief, or for any claim by
- * any third party, arising from your use of this Software.
- *
- *****************************************************************************/
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,57 +40,57 @@ extern "C" {
 #pragma clang system_header  /* Treat file as system include file. */
 #endif
 
-/**************************************************************************//**
-* @addtogroup Parts
-* @{
-******************************************************************************/
-/**************************************************************************//**
+/***************************************************************************//**
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/***************************************************************************//**
  * @defgroup EFM32PG1B_USART USART
  * @{
  * @brief EFM32PG1B_USART Register Declaration
- *****************************************************************************/
+ ******************************************************************************/
 /** USART Register Declaration */
 typedef struct {
-  __IOM uint32_t CTRL;         /**< Control Register  */
-  __IOM uint32_t FRAME;        /**< USART Frame Format Register  */
-  __IOM uint32_t TRIGCTRL;     /**< USART Trigger Control Register  */
-  __IOM uint32_t CMD;          /**< Command Register  */
-  __IM uint32_t  STATUS;       /**< USART Status Register  */
-  __IOM uint32_t CLKDIV;       /**< Clock Control Register  */
-  __IM uint32_t  RXDATAX;      /**< RX Buffer Data Extended Register  */
-  __IM uint32_t  RXDATA;       /**< RX Buffer Data Register  */
-  __IM uint32_t  RXDOUBLEX;    /**< RX Buffer Double Data Extended Register  */
-  __IM uint32_t  RXDOUBLE;     /**< RX FIFO Double Data Register  */
-  __IM uint32_t  RXDATAXP;     /**< RX Buffer Data Extended Peek Register  */
-  __IM uint32_t  RXDOUBLEXP;   /**< RX Buffer Double Data Extended Peek Register  */
-  __IOM uint32_t TXDATAX;      /**< TX Buffer Data Extended Register  */
-  __IOM uint32_t TXDATA;       /**< TX Buffer Data Register  */
-  __IOM uint32_t TXDOUBLEX;    /**< TX Buffer Double Data Extended Register  */
-  __IOM uint32_t TXDOUBLE;     /**< TX Buffer Double Data Register  */
-  __IM uint32_t  IF;           /**< Interrupt Flag Register  */
-  __IOM uint32_t IFS;          /**< Interrupt Flag Set Register  */
-  __IOM uint32_t IFC;          /**< Interrupt Flag Clear Register  */
-  __IOM uint32_t IEN;          /**< Interrupt Enable Register  */
-  __IOM uint32_t IRCTRL;       /**< IrDA Control Register  */
-  uint32_t       RESERVED0[1]; /**< Reserved for future use **/
-  __IOM uint32_t INPUT;        /**< USART Input Register  */
-  __IOM uint32_t I2SCTRL;      /**< I2S Control Register  */
-  __IOM uint32_t TIMING;       /**< Timing Register  */
-  __IOM uint32_t CTRLX;        /**< Control Register Extended  */
-  __IOM uint32_t TIMECMP0;     /**< Used to Generate Interrupts and Various Delays  */
-  __IOM uint32_t TIMECMP1;     /**< Used to Generate Interrupts and Various Delays  */
-  __IOM uint32_t TIMECMP2;     /**< Used to Generate Interrupts and Various Delays  */
-  __IOM uint32_t ROUTEPEN;     /**< I/O Routing Pin Enable Register  */
-  __IOM uint32_t ROUTELOC0;    /**< I/O Routing Location Register  */
-  __IOM uint32_t ROUTELOC1;    /**< I/O Routing Location Register  */
-} USART_TypeDef;               /** @} */
+  __IOM uint32_t CTRL;          /**< Control Register  */
+  __IOM uint32_t FRAME;         /**< USART Frame Format Register  */
+  __IOM uint32_t TRIGCTRL;      /**< USART Trigger Control Register  */
+  __IOM uint32_t CMD;           /**< Command Register  */
+  __IM uint32_t  STATUS;        /**< USART Status Register  */
+  __IOM uint32_t CLKDIV;        /**< Clock Control Register  */
+  __IM uint32_t  RXDATAX;       /**< RX Buffer Data Extended Register  */
+  __IM uint32_t  RXDATA;        /**< RX Buffer Data Register  */
+  __IM uint32_t  RXDOUBLEX;     /**< RX Buffer Double Data Extended Register  */
+  __IM uint32_t  RXDOUBLE;      /**< RX FIFO Double Data Register  */
+  __IM uint32_t  RXDATAXP;      /**< RX Buffer Data Extended Peek Register  */
+  __IM uint32_t  RXDOUBLEXP;    /**< RX Buffer Double Data Extended Peek Register  */
+  __IOM uint32_t TXDATAX;       /**< TX Buffer Data Extended Register  */
+  __IOM uint32_t TXDATA;        /**< TX Buffer Data Register  */
+  __IOM uint32_t TXDOUBLEX;     /**< TX Buffer Double Data Extended Register  */
+  __IOM uint32_t TXDOUBLE;      /**< TX Buffer Double Data Register  */
+  __IM uint32_t  IF;            /**< Interrupt Flag Register  */
+  __IOM uint32_t IFS;           /**< Interrupt Flag Set Register  */
+  __IOM uint32_t IFC;           /**< Interrupt Flag Clear Register  */
+  __IOM uint32_t IEN;           /**< Interrupt Enable Register  */
+  __IOM uint32_t IRCTRL;        /**< IrDA Control Register  */
+  uint32_t       RESERVED0[1U]; /**< Reserved for future use **/
+  __IOM uint32_t INPUT;         /**< USART Input Register  */
+  __IOM uint32_t I2SCTRL;       /**< I2S Control Register  */
+  __IOM uint32_t TIMING;        /**< Timing Register  */
+  __IOM uint32_t CTRLX;         /**< Control Register Extended  */
+  __IOM uint32_t TIMECMP0;      /**< Used to Generate Interrupts and Various Delays  */
+  __IOM uint32_t TIMECMP1;      /**< Used to Generate Interrupts and Various Delays  */
+  __IOM uint32_t TIMECMP2;      /**< Used to Generate Interrupts and Various Delays  */
+  __IOM uint32_t ROUTEPEN;      /**< I/O Routing Pin Enable Register  */
+  __IOM uint32_t ROUTELOC0;     /**< I/O Routing Location Register  */
+  __IOM uint32_t ROUTELOC1;     /**< I/O Routing Location Register  */
+} USART_TypeDef;                /** @} */
 
-/**************************************************************************//**
+/***************************************************************************//**
  * @addtogroup EFM32PG1B_USART
  * @{
  * @defgroup EFM32PG1B_USART_BitFields  USART Bit Fields
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 
 /* Bit fields for USART CTRL */
 #define _USART_CTRL_RESETVALUE                  0x00000000UL                             /**< Default value for USART_CTRL */

@@ -60,13 +60,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name ADC configuration
- * @{
- */
-#define ADC_NUMOF           (0)
-/** @} */
-
-/**
  * @name   Timer configuration
  * @{
  */
@@ -129,13 +122,6 @@ static const uart_conf_t uart_config[] = {
 #define UART_2_ISR          isr_usart3
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
-/** @} */
-
-/**
- * @name I2C configuration
- * @{
- */
-#define I2C_NUMOF           (0)
 /** @} */
 
 #ifdef __cplusplus

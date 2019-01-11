@@ -28,7 +28,7 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-int bh1750fvi_init(bh1750fvi_t *dev, bh1750fvi_params_t *params)
+int bh1750fvi_init(bh1750fvi_t *dev, const bh1750fvi_params_t *params)
 {
     int res;
 

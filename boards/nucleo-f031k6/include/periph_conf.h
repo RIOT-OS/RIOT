@@ -176,17 +176,6 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name RTC configuration
- * @{
- */
-/**
- * Nucleo-f031 does not have any LSE, current RTC driver does not support LSI as
- * clock source, so disabling RTC.
- */
-#define RTC_NUMOF           (0U)
-/** @} */
-
-/**
  * @name   ADC configuration
  * @{
  */

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2013 Freie Universität Berlin
- * Copyright (C) 2015 INRIA
+ *               2015 INRIA
+ *               2018 RWTH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -48,4 +49,13 @@
  * @defgroup    drivers_soft_periph Soft Peripheral Driver Interface
  * @ingroup     drivers
  * @brief       Software emulated @ref drivers_periph for UART, SPI, etc
+ */
+
+ /**
+ * @defgroup    drivers_power Power Supply Drivers
+ * @ingroup     drivers
+ * @brief       Drivers for power supply devices
+ *
+ * The group of power supply drivers indludes all kinds of AC/DC, DC/DC supply devices
+ * or charger ICs which can be controlled from the host e.g by config pin settings or by bus.
  */

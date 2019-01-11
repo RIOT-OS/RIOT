@@ -22,40 +22,36 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "f2/cfg_clock_120_8_1.h"
+#include "cfg_i2c1_pb8_pb9.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @name    Clock settings
- *
- * @note    This is auto-generated from
- *          `cpu/stm32_common/dist/clk_conf/clk_conf.c`
+ * @name    DMA streams configuration
  * @{
  */
-/* give the target core clock (HCLK) frequency [in Hz],
- * maximum: 120MHz */
-#define CLOCK_CORECLOCK     (120000000U)
-/* 0: no external high speed crystal available
- * else: actual crystal frequency [in Hz] */
-#define CLOCK_HSE           (8000000U)
-/* 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (1)
-/* peripheral clock setup */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4     /* max 30MHz */
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2     /* max 60MHz */
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
+#ifdef MODULE_PERIPH_DMA
+static const dma_conf_t dma_config[] = {
+    { .stream = 10 },   /* DMA2 Stream 2 - SPI1_RX */
+    { .stream = 11 },   /* DMA2 Stream 3 - SPI1_TX */
+    { .stream = 3 },    /* DMA1 Stream 3 - SPI2_RX/USART3_TX */
+    { .stream = 4 },    /* DMA1 Stream 4 - SPI2_TX */
+    { .stream = 14 },   /* DMA2 Stream 6 - USART6_TX */
+    { .stream = 6 },    /* DMA1 Stream 6 - USART2_TX */
+};
 
-/* Main PLL factors */
-#define CLOCK_PLL_M          (4)
-#define CLOCK_PLL_N          (120)
-#define CLOCK_PLL_P          (2)
-#define CLOCK_PLL_Q          (5)
+#define DMA_0_ISR  isr_dma2_stream2
+#define DMA_1_ISR  isr_dma2_stream3
+#define DMA_2_ISR  isr_dma1_stream3
+#define DMA_3_ISR  isr_dma1_stream4
+#define DMA_4_ISR  isr_dma2_stream6
+#define DMA_5_ISR  isr_dma1_stream6
+
+#define DMA_NUMOF           (sizeof(dma_config) / sizeof(dma_config[0]))
+#endif
 /** @} */
 
 /**
@@ -129,8 +125,8 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART3_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 3,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 2,
         .dma_chan   = 4
 #endif
     },
@@ -143,9 +139,9 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 6,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 4,
+        .dma_chan   = 5
 #endif
     },
     {
@@ -157,21 +153,16 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 7,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 5,
         .dma_chan   = 4
 #endif
     },
 };
 
 #define UART_0_ISR          (isr_usart3)
-#define UART_0_DMA_ISR      (isr_dma1_stream3)
-
 #define UART_1_ISR          (isr_usart6)
-#define UART_1_DMA_ISR      (isr_dma1_stream6)
-
 #define UART_2_ISR          (isr_usart2)
-#define UART_2_DMA_ISR      (isr_dma1_stream7)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
@@ -209,7 +200,13 @@ static const spi_conf_t spi_config[] = {
         .cs_pin   = GPIO_PIN(PORT_A, 4),
         .af       = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2
+        .apbbus   = APB2,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma   = 1,
+        .tx_dma_chan = 3,
+        .rx_dma   = 0,
+        .rx_dma_chan = 3,
+#endif
     },
     {
         .dev      = SPI2,
@@ -219,35 +216,17 @@ static const spi_conf_t spi_config[] = {
         .cs_pin   = GPIO_PIN(PORT_B, 12),
         .af       = GPIO_AF5,
         .rccmask  = RCC_APB1ENR_SPI2EN,
-        .apbbus   = APB1
+        .apbbus   = APB1,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma   = 3,
+        .tx_dma_chan = 0,
+        .rx_dma   = 2,
+        .rx_dma_chan = 0,
+#endif
     }
 };
 
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
-/** @} */
-
-/**
- * @name    I2C configuration
- * @{
- */
-static const i2c_conf_t i2c_config[] = {
-    {
-        .dev            = I2C1,
-        .speed          = I2C_SPEED_NORMAL,
-        .scl_pin        = GPIO_PIN(PORT_B, 8),
-        .sda_pin        = GPIO_PIN(PORT_B, 9),
-        .scl_af         = GPIO_AF4,
-        .sda_af         = GPIO_AF4,
-        .bus            = APB1,
-        .rcc_mask       = RCC_APB1ENR_I2C1EN,
-        .clk            = CLOCK_APB1,
-        .irqn           = I2C1_EV_IRQn
-    }
-};
-
-#define I2C_0_ISR           isr_i2c1_ev
-
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 /**

@@ -55,7 +55,7 @@ void auto_init_ds18(void)
 
         LOG_DEBUG("[auto_init_saul] initializing ds18 #%u\n", i);
 
-        if (ds18_init(&ds18_devs[i], (ds18_params_t *) p) < 0) {
+        if (ds18_init(&ds18_devs[i], p) < 0) {
             LOG_ERROR("[auto_init_saul] error initializing ds18 #%u\n", i);
             return;
         }

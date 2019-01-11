@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup  core_util
+ * @ingroup     core_util
  * @{
  *
  * @file

@@ -11,10 +11,80 @@
  * @ingroup     net_gnrc
  * @brief       GNRC's IPv6 implementation
  *
- * The IPv6 control thread understands messages of type
+ * This module is for usage with the @ref net_gnrc_netapi
  *
- *  * @ref GNRC_NETAPI_MSG_TYPE_RCV, and
- *  * @ref GNRC_NETAPI_MSG_TYPE_SND,
+ * # Supported NETAPI commands
+ *
+ * This module handles the following @ref net_gnrc_netapi message types:
+ *
+ * ## `GNRC_NETAPI_MSG_TYPE_RCV`
+ *
+ * @ref GNRC_NETAPI_MSG_TYPE_RCV expects a @ref net_gnrc_pkt (referred to as
+ * "packet" in the following) in receive order (payload first, headers ordered
+ * down the stack). It must at least contain a link-layer payload starting
+ * with a valid @ref net_ipv6_hdr. If it contains a @ref net_gnrc_netif_hdr this
+ * header will be taken into account.
+ *
+ * If the link-layer payload is not an IPv6 packet (starting with a 0x6
+ * half-byte) or the module is not able to parse it correctly it will be
+ * dropped. If the packet can't be forwarded (either to another node or an upper
+ * layer) it will be dropped. Otherwise, there are two scenarios of success:
+ *
+ * 1. If the destination address is an address on this host, and a suitable
+ *    upper layer is registered the packet will be forwarded to that upper
+ *    layer. An upper layer is suitable with its registration if
+ *
+ *      - it is registered with a tuple (@ref GNRC_NETTYPE_IPV6, `nh`), or
+ *      - it is registered with a tuple (@ref gnrc_nettype_from_protnum(`nh`),
+ *        @ref GNRC_NETREG_DEMUX_CTX_ALL).
+ *
+ *    In both cases `nh` is the [next header field of one of the IPv6 header]
+ *    (@ref ipv6_hdr_t::nh) or the [next header field of one of the IPv6
+ *    extension headers](@ref ipv6_ext_t::nh) within the packet. The IPv6 header
+ *    and every IPv6 extension header between the IPv6 header and the payload
+ *    will be marked as separate @ref gnrc_pktsnip_t (i.e. the IPv6 payload will
+ *    be the first snip due to receive order). Note, that IPv6-internal headers
+ *    (such as ICMPv6 and extension headers) are handled within this module. If
+ *    the [`gnrc_ipv6_ext`](@ref net_gnrc_ipv6_ext) module is not present, IPv6
+ *    extension headers can't be parsed, so the packet might not be read
+ *    properly.
+ * 2. If the receiving network interface (indicated by the
+ *    gnrc_netif_hdr_t::if_pid if provided or the destination address in the
+ *    IPv6 header) is configured as a forwarding interface, the destination is
+ *    not an address on this host, and a route is configured for the destination
+ *    the packet will be forwarded. In consequence, the module will emit a
+ *    @ref GNRC_NETAPI_MSG_TYPE_SND with the packet reversed into send order and
+ *    the (if necessary prepended) gnrc_netif_hdr_t::if_pid has the appropriate
+ *    link-layer destination addresses to the next hop towards the destination.
+ *
+ * ## `GNRC_NETAPI_MSG_TYPE_SND`
+ *
+ * @ref GNRC_NETAPI_MSG_TYPE_SND expects a @ref net_gnrc_pkt (referred to as
+ * "packet" in the following) in send order (headers ordered up the stack,
+ * payload last). It must at least contain a snip of type @ref GNRC_NETTYPE_IPV6
+ * as its first or second snip. If the first snip is not of type
+ * @ref GNRC_NETTYPE_IPV6, it must be of type @ref GNRC_NETTYPE_NETIF.
+ *
+ * If the destination address within the @ref GNRC_NETTYPE_IPV6 snip is an
+ * address on this host or the loopback address `::1`, the packet will be
+ * [reversed](@ref gnrc_pktbuf_reverse_snips()) and
+ * [merged](@ref gnrc_pktbuf_merge()) so that it has a format as though it came
+ * from a network interface. It will then be handled as a received packet
+ * ("looped back") by the IPv6 module (see previous section).
+ *
+ * Otherwise, if a route (or neighbor cache entry) to the IPv6 destination
+ * address exists, the IPv6 header will be filled for fields that were not set
+ * by upper layers and handed over to the link-layer (L2) with the L2
+ * destination address set to the L2 address associated to that IPv6 destination
+ * address.
+ *
+ * ## `GNRC_NETAPI_MSG_TYPE_SET`
+ *
+ * `GNRC_NETAPI_MSG_TYPE_SET` is not supported.
+ *
+ * ## `GNRC_NETAPI_MSG_TYPE_GET`
+ *
+ * `GNRC_NETAPI_MSG_TYPE_GET` is not supported.
  *
  * @{
  *

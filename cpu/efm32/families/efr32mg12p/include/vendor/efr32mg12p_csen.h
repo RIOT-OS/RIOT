@@ -1,34 +1,33 @@
-/**************************************************************************//**
- * @file efr32mg12p_csen.h
+/***************************************************************************//**
+ * @file
  * @brief EFR32MG12P_CSEN register and bit field definitions
- * @version 5.4.0
- ******************************************************************************
+ * @version 5.7.0
+ *******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
- ******************************************************************************
+ * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software.@n
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.@n
+ *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * DISCLAIMER OF WARRANTY/LIMITATION OF REMEDIES: Silicon Laboratories, Inc.
- * has no obligation to support this Software. Silicon Laboratories, Inc. is
- * providing the Software "AS IS", with no express or implied warranties of any
- * kind, including, but not limited to, any implied warranties of
- * merchantability or fitness for any particular purpose or warranties against
- * infringement of any proprietary rights of a third party.
- *
- * Silicon Laboratories, Inc. will not be liable for any consequential,
- * incidental, or special damages, or any other relief, or for any claim by
- * any third party, arising from your use of this Software.
- *
- *****************************************************************************/
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,15 +40,15 @@ extern "C" {
 #pragma clang system_header  /* Treat file as system include file. */
 #endif
 
-/**************************************************************************//**
-* @addtogroup Parts
-* @{
-******************************************************************************/
-/**************************************************************************//**
+/***************************************************************************//**
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/***************************************************************************//**
  * @defgroup EFR32MG12P_CSEN CSEN
  * @{
  * @brief EFR32MG12P_CSEN Register Declaration
- *****************************************************************************/
+ ******************************************************************************/
 /** CSEN Register Declaration */
 typedef struct {
   __IOM uint32_t CTRL;          /**< Control  */
@@ -72,19 +71,19 @@ typedef struct {
   __IOM uint32_t DMCFG;         /**< Delta Modulation Configuration  */
   __IOM uint32_t ANACTRL;       /**< Analog Control  */
 
-  uint32_t       RESERVED0[2];  /**< Reserved for future use **/
+  uint32_t       RESERVED0[2U]; /**< Reserved for future use **/
   __IM uint32_t  IF;            /**< Interrupt Flag  */
   __IOM uint32_t IFS;           /**< Interrupt Flag Set  */
   __IOM uint32_t IFC;           /**< Interrupt Flag Clear  */
   __IOM uint32_t IEN;           /**< Interrupt Enable  */
 } CSEN_TypeDef;                 /** @} */
 
-/**************************************************************************//**
+/***************************************************************************//**
  * @addtogroup EFR32MG12P_CSEN
  * @{
  * @defgroup EFR32MG12P_CSEN_BitFields  CSEN Bit Fields
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 
 /* Bit fields for CSEN CTRL */
 #define _CSEN_CTRL_RESETVALUE                                0x00030000UL                               /**< Default value for CSEN_CTRL */

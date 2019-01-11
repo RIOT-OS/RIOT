@@ -523,6 +523,9 @@ static void _netif_list(kernel_pid_t iface)
 #endif
     line_thresh = _netif_list_flag(iface, NETOPT_IPV6_SND_RTR_ADV, "RTR_ADV  ",
                                    line_thresh);
+#ifdef MODULE_GNRC_SIXLOWPAN
+    line_thresh = _netif_list_flag(iface, NETOPT_6LO, "6LO  ", line_thresh);
+#endif
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
     line_thresh += _LINE_THRESHOLD + 1; /* enforce linebreak after this option */
     line_thresh = _netif_list_flag(iface, NETOPT_6LO_IPHC, "IPHC  ",

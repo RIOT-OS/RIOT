@@ -158,6 +158,15 @@ void cc2420_tx_exec(cc2420_t *dev)
     }
 }
 
+static inline void _flush_rx_fifo(cc2420_t *dev)
+{
+    /* as stated in the CC2420 datasheet (section 14.3), the SFLUSHRX command
+     * strobe should be issued twice to ensure that the SFD pin goes back to its
+     * idle state */
+    cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
+    cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
+}
+
 int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
 {
     (void)info;
@@ -171,14 +180,21 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
         cc2420_ram_read(dev, CC2420_RAM_RXFIFO, &len, 1);
         len -= 2;   /* subtract RSSI and FCF */
         DEBUG("cc2420: recv: packet of length %i in RX FIFO\n", (int)len);
+        if (max_len != 0) {
+            DEBUG("cc2420: recv: Dropping frame as requested\n");
+            _flush_rx_fifo(dev);
+        }
     }
     else {
         /* read length byte */
         cc2420_fifo_read(dev, &len, 1);
         len -= 2;   /* subtract RSSI and FCF */
 
-        /* if a buffer is given, read (and drop) the packet */
-        len = (len > max_len) ? max_len : len;
+        if (len > max_len) {
+            DEBUG("cc2420: recv: Supplied buffer to small\n");
+            _flush_rx_fifo(dev);
+            return -ENOBUFS;
+        }
 
         /* read fifo contents */
         DEBUG("cc2420: recv: reading %i byte of the packet\n", (int)len);
@@ -202,8 +218,7 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
         }
 
         /* finally flush the FIFO */
-        cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
-        cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
+        _flush_rx_fifo(dev);
     }
 
     return (int)len;

@@ -29,7 +29,7 @@ static int read(const ccs811_t *dev, uint16_t *iaq_tvoc, uint16_t *iaq_eco2)
 {
     if (!_data_ready) {
         /* if no data were ready yet, test for new data */
-        if (ccs811_data_ready((ccs811_t *)dev) == CCS811_OK) {
+        if (ccs811_data_ready(dev) == CCS811_OK) {
             _data_ready = true;
         }
         else {
@@ -37,7 +37,7 @@ static int read(const ccs811_t *dev, uint16_t *iaq_tvoc, uint16_t *iaq_eco2)
         }
     }
 
-    int res = ccs811_read_iaq((ccs811_t *)dev, iaq_tvoc, iaq_eco2, NULL, NULL);
+    int res = ccs811_read_iaq(dev, iaq_tvoc, iaq_eco2, NULL, NULL);
 
     /* in case of CCS811_ERROR_NO_NEW_DATA last valid data are returned */
     return (res == CCS811_OK ||

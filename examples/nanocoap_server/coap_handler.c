@@ -121,7 +121,7 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context
     sha256_update(&sha256, pkt->payload, pkt->payload_len);
 
     if (block1.more == 1) {
-        result = COAP_CODE_231;
+        result = COAP_CODE_CONTINUE;
     }
 
     size_t result_len = 0;

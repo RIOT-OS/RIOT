@@ -135,8 +135,8 @@ extern "C" {
  * be used for other purposes as long as the SPI interface is not used.
  * @{
  */
-#ifndef SPI0_DEV
-#define SPI0_DEV    VSPI    /**< VSPI is used as SPI_DEV(0) */
+#ifndef SPI0_CTRL
+#define SPI0_CTRL   VSPI    /**< VSPI is used as SPI_DEV(0) */
 #endif
 #ifndef SPI0_SCK
 #define SPI0_SCK    GPIO18  /**< VSPI SCK */
@@ -151,8 +151,8 @@ extern "C" {
 #define SPI0_CS0    GPIO5   /**< VSPI CS0 */
 #endif
 
-#ifndef SPI1_DEV
-#define SPI1_DEV    HSPI    /**< HSPI is used as SPI_DEV(1) */
+#ifndef SPI1_CTRL
+#define SPI1_CTRL   HSPI    /**< HSPI is used as SPI_DEV(1) */
 #endif
 #ifndef SPI1_SCK
 #define SPI1_SCK    GPIO14  /**< HSPI SCK */
@@ -179,8 +179,8 @@ extern "C" {
  *
  * @{
  */
-#define UART0_TXD   GPIO10 /**< direct I/O pin for UART_DEV(0) TxD, can't be changed */
-#define UART0_RXD   GPIO9  /**< direct I/O pin for UART_DEV(0) RxD, can't be changed */
+#define UART0_TXD   GPIO1  /**< direct I/O pin for UART_DEV(0) TxD, can't be changed */
+#define UART0_RXD   GPIO3  /**< direct I/O pin for UART_DEV(0) RxD, can't be changed */
 
 #if FLASH_MODE_DOUT || FLASH_MODE_DIO || DOXYGEN
 #ifndef UART1_TXD

@@ -107,7 +107,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_netif_hdr_t *hdr = netif_snip->data;
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
-            hdr->if_pid = thread_getpid();
+            hdr->if_pid = netif->pid;
             LL_APPEND(pkt, netif_snip);
         }
         else {

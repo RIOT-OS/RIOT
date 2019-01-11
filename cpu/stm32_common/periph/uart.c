@@ -34,6 +34,21 @@
 #include "periph/gpio.h"
 #include "pm_layered.h"
 
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) \
+    || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) \
+    || defined(CPU_FAM_STM32F7)
+#define ISR_REG     ISR
+#define ISR_TXE     USART_ISR_TXE
+#define ISR_TC      USART_ISR_TC
+#define TDR_REG     TDR
+#else
+#define ISR_REG     SR
+#define ISR_TXE     USART_SR_TXE
+#define ISR_TC      USART_SR_TC
+#define TDR_REG     DR
+
+#endif
+
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE)
 
 /**
@@ -189,26 +204,13 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 
 static inline void send_byte(uart_t uart, uint8_t byte)
 {
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) \
-    || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) \
-    || defined(CPU_FAM_STM32F7)
-    while (!(dev(uart)->ISR & USART_ISR_TXE)) {}
-    dev(uart)->TDR = byte;
-#else
-    while (!(dev(uart)->SR & USART_SR_TXE)) {}
-    dev(uart)->DR = byte;
-#endif
+    while (!(dev(uart)->ISR_REG & ISR_TXE)) {}
+    dev(uart)->TDR_REG = byte;
 }
 
 static inline void wait_for_tx_complete(uart_t uart)
 {
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) \
-    || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) \
-    || defined(CPU_FAM_STM32F7)
-    while (!(dev(uart)->ISR & USART_ISR_TC)) {}
-#else
-    while (!(dev(uart)->SR & USART_SR_TC)) {}
-#endif
+    while (!(dev(uart)->ISR_REG & ISR_TC)) {}
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
@@ -248,7 +250,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
             dma_acquire(uart_config[uart].dma);
             dev(uart)->CR3 |= USART_CR3_DMAT;
             dma_transfer(uart_config[uart].dma, uart_config[uart].dma_chan, data,
-                         (void *)&dev(uart)->DR, len, DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR);
+                         (void *)&dev(uart)->TDR_REG, len, DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR);
             dma_release(uart_config[uart].dma);
 
             /* make sure the function is synchronous by waiting for the transfer to

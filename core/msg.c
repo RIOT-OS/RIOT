@@ -406,7 +406,7 @@ void msg_queue_print(void)
 
     printf("Message queue of thread %" PRIkernel_pid "\n", thread->pid);
     printf("    size: %u (avail: %d)\n", msg_queue->mask + 1,
-           cib_avail((cib_t *)msg_queue));
+           cib_avail(msg_queue));
 
     for (; i != (msg_queue->write_count & msg_queue->mask);
          i = (i + 1) & msg_queue->mask) {

@@ -23,6 +23,7 @@
 
 #include "periph_cpu.h"
 #include "f4/cfg_clock_180_8_1.h"
+#include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_spi_divtable.h"
 
 #ifdef __cplusplus
@@ -155,37 +156,6 @@ static const spi_conf_t spi_config[] = {
 };
 
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
-/** @} */
-
-/**
- * @name    I2C configuration
- * @{
- */
-static const i2c_conf_t i2c_config[] = {
-    {
-        .dev            = I2C1,
-        .speed          = I2C_SPEED_NORMAL,
-        .scl_pin        = GPIO_PIN(PORT_B, 8),
-        .sda_pin        = GPIO_PIN(PORT_B, 9),
-        .scl_af         = GPIO_AF4,
-        .sda_af         = GPIO_AF4,
-        .bus            = APB1,
-        .rcc_mask       = RCC_APB1ENR_I2C1EN,
-        .clk            = CLOCK_APB1,
-        .irqn           = I2C1_EV_IRQn
-    }
-};
-
-#define I2C_0_ISR           isr_i2c1_ev
-
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
-/** @} */
-
-/**
- * @name    ADC configuration
- * @{
- */
-#define ADC_NUMOF          (0)
 /** @} */
 
 #ifdef __cplusplus

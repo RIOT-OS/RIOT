@@ -146,8 +146,8 @@
  * @{
  */
 
-#ifndef SPI0_DEV
-#define SPI0_DEV    HSPI    /**< HSPI is configured as SPI_DEV(0) */
+#ifndef SPI0_CTRL
+#define SPI0_CTRL   HSPI    /**< HSPI is configured as SPI_DEV(0) */
 #endif
 
 #ifndef SPI0_SCK
@@ -174,8 +174,8 @@
  * be used for other purposes as long as the SPI interface is not used.
  *
  */
-#ifndef SPI1_DEV
-#define SPI1_DEV    VSPI
+#ifndef SPI1_CTRL
+#define SPI1_CTRL   VSPI
 #endif
 
 #ifndef SPI1_SCK
@@ -203,8 +203,8 @@
  * UART_DEV(2) is not available.<br>
  * @{
  */
-#define UART0_TXD   GPIO10 /**< direct I/O pin for UART_DEV(0) TxD, can't be changed */
-#define UART0_RXD   GPIO9  /**< direct I/O pin for UART_DEV(0) RxD, can't be changed */
+#define UART0_TXD   GPIO1  /**< direct I/O pin for UART_DEV(0) TxD, can't be changed */
+#define UART0_RXD   GPIO3  /**< direct I/O pin for UART_DEV(0) RxD, can't be changed */
 /** @} */
 
 

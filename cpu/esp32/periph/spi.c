@@ -42,6 +42,7 @@
 
 #define SPI_BLOCK_SIZE  64  /* number of bytes per SPI transfer */
 
+#define CSPI    (0)         /* controller SPI0 realizes interface CSPI */
 #define FSPI    (1)         /* controller SPI1 realizes interface FSPI */
 #define HSPI    (2)         /* controller SPI2 realizes interface HSPI */
 #define VSPI    (3)         /* controller SPI3 realizes interface VSPI */
@@ -70,57 +71,25 @@ struct _spi_bus_t {
 };
 
 static struct _spi_bus_t _spi[] = {
-    #ifdef SPI0_DEV
+    #ifdef SPI0_CTRL
     {
-        .controller = SPI0_DEV,
+        .controller = SPI0_CTRL,
         .pin_cs = SPI0_CS0,
-        #if SPI0_DEV != FSPI
         .pin_sck  = SPI0_SCK,
         .pin_mosi = SPI0_MOSI,
         .pin_miso = SPI0_MISO,
-        #else
-        .pin_sck  = FSPI_SCK,
-        .pin_mosi = FSPI_MOSI,
-        .pin_miso = FSPI_MISO,
-        #endif
         .initialized = false,
         .pins_initialized = false,
         .lock = MUTEX_INIT
     },
     #endif
-
-    #ifdef SPI1_DEV
+    #ifdef SPI1_CTRL
     {
-        .controller = SPI1_DEV,
+        .controller = SPI1_CTRL,
         .pin_cs = SPI1_CS0,
-        #if SPI1_DEV != FSPI
         .pin_sck  = SPI1_SCK,
         .pin_mosi = SPI1_MOSI,
         .pin_miso = SPI1_MISO,
-        #else
-        .pin_sck  = FSPI_SCK,
-        .pin_mosi = FSPI_MOSI,
-        .pin_miso = FSPI_MISO,
-        #endif
-        .initialized = false,
-        .pins_initialized = false,
-        .lock = MUTEX_INIT
-    },
-    #endif
-
-    #ifdef SPI2_DEV
-    {
-        .controller = SPI2_DEV,
-        .pin_cs = SPI2_CS0,
-        #if SPI2_DEV != FSPI
-        .pin_sck  = SPI2_SCK,
-        .pin_mosi = SPI2_MOSI,
-        .pin_miso = SPI2_MISO,
-        #else
-        .pin_sck  = FSPI_SCK,
-        .pin_mosi = FSPI_MOSI,
-        .pin_miso = FSPI_MISO,
-        #endif
         .initialized = false,
         .pins_initialized = false,
         .lock = MUTEX_INIT
@@ -161,13 +130,6 @@ void IRAM_ATTR spi_init (spi_t bus)
     CHECK_PARAM(bus < spi_bus_num);
 
     switch (_spi[bus].controller) {
-        case FSPI:  _spi[bus].regs = &SPI1;
-                    _spi[bus].mod = PERIPH_SPI_MODULE;
-                    _spi[bus].int_src = ETS_SPI1_INTR_SOURCE;
-                    _spi[bus].signal_sck  = SPICLK_OUT_IDX;
-                    _spi[bus].signal_mosi = SPID_OUT_IDX;
-                    _spi[bus].signal_miso = SPIQ_IN_IDX;
-                    break;
         case HSPI:  _spi[bus].regs = &SPI2;
                     _spi[bus].mod = PERIPH_HSPI_MODULE;
                     _spi[bus].int_src = ETS_SPI2_INTR_SOURCE;
@@ -412,7 +374,7 @@ void IRAM_ATTR spi_release(spi_t bus)
     mutex_unlock(&_spi[bus].lock);
 }
 
-static const char* _spi_names[] = { "SSPI", "FSPI", "HSPI", "VSPI"  };
+static const char* _spi_names[] = { "CSPI", "FSPI", "HSPI", "VSPI"  };
 
 void spi_print_config(void)
 {

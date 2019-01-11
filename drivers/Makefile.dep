@@ -452,6 +452,10 @@ ifneq (,$(filter tcs37727,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter tps6274x,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+endif
+
 ifneq (,$(filter tja1042,$(USEMODULE)))
   USEMODULE += can_trx
   FEATURES_REQUIRED += periph_gpio

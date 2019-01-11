@@ -150,19 +150,19 @@ static const spi_dev_t spi_config[] = {
 static const timer_conf_t timer_config[] = {
     {
         {
-            .dev = TIMER0,
-            .cmu = cmuClock_TIMER0
+            .dev = WTIMER0,
+            .cmu = cmuClock_WTIMER0
         },
         {
-            .dev = TIMER1,
-            .cmu = cmuClock_TIMER1
+            .dev = WTIMER1,
+            .cmu = cmuClock_WTIMER1
         },
-        .irq = TIMER1_IRQn
+        .irq = WTIMER1_IRQn
     }
 };
 
 #define TIMER_NUMOF         PERIPH_NUMOF(timer_config)
-#define TIMER_0_ISR         isr_timer1
+#define TIMER_0_ISR         isr_wtimer1
 /** @} */
 
 /**

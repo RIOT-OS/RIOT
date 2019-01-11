@@ -203,10 +203,26 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name    ADC configuration
+ * @name I2C configuration
  * @{
  */
-#define ADC_NUMOF           (0)
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev            = I2C1,
+        .speed          = I2C_SPEED_NORMAL,
+        .scl_pin        = GPIO_PIN(PORT_B, 8),
+        .sda_pin        = GPIO_PIN(PORT_B, 7),
+        .scl_af         = GPIO_AF4,
+        .sda_af         = GPIO_AF4,
+        .bus            = APB1,
+        .rcc_mask       = RCC_APB1ENR1_I2C1EN,
+        .irqn           = I2C1_ER_IRQn
+    },
+};
+
+#define I2C_0_ISR           isr_i2c1_er
+
+#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 /**

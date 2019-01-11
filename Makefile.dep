@@ -154,7 +154,7 @@ ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter ieee802154 nrfmin esp_now,$(USEMODULE)))
+ifneq (,$(filter ieee802154 nrfmin esp_now gnrc_sixloenc,$(USEMODULE)))
   ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
     USEMODULE += gnrc_sixlowpan
   endif
@@ -689,6 +689,7 @@ endif
 
 ifneq (,$(filter sock_dns,$(USEMODULE)))
   USEMODULE += sock_util
+  USEMODULE += posix
 endif
 
 ifneq (,$(filter sock_util,$(USEMODULE)))

@@ -37,7 +37,8 @@ application's Makefile.
 ### Pitfalls ###
 
 The `MODULE` name should be unique or build breaks as modules overwrite the
-same output file.
+same output file. This might for example lead to `undefined reference to` errors
+in the linker which can be hard to track down.
 
 This problem happened in the past for:
 

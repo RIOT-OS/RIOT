@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    net_gcoap  CoAP
+ * @defgroup    net_gcoap  Gcoap
  * @ingroup     net
  * @brief       High-level interface to CoAP messaging
  *
@@ -232,6 +232,12 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup net_gcoap_conf    Gcoap compile configurations
+ * @ingroup  net_gcoap
+ * @ingroup  config
+ * @{
+ */
+/**
  * @brief  Size for module message queue
  */
 #ifndef GCOAP_MSG_QUEUE_SIZE
@@ -258,6 +264,7 @@ extern "C" {
 #ifndef GCOAP_REQ_WAITING_MAX
 #define GCOAP_REQ_WAITING_MAX   (2)
 #endif
+/** @} */
 
 /**
  * @brief   Maximum length in bytes for a token
@@ -270,7 +277,10 @@ extern "C" {
 #define GCOAP_HEADER_MAXLEN     (sizeof(coap_hdr_t) + GCOAP_TOKENLEN_MAX)
 
 /**
- * @brief   Length in bytes for a token; use 2 if not defined
+ * @ingroup net_gcoap_conf
+ * @brief   Length in bytes for a token
+ *
+ * Value must be in the range 0 to @ref GCOAP_TOKENLEN_MAX.
  */
 #ifndef GCOAP_TOKENLEN
 #define GCOAP_TOKENLEN          (2)
@@ -298,6 +308,7 @@ extern "C" {
 #define GCOAP_SEND_LIMIT_NON    (-1)
 
 /**
+ * @ingroup net_gcoap_conf
  * @brief   Time in usec that the event loop waits for an incoming CoAP message
  */
 #ifndef GCOAP_RECV_TIMEOUT
@@ -305,6 +316,7 @@ extern "C" {
 #endif
 
 /**
+ * @ingroup net_gcoap_conf
  * @brief   Default time to wait for a non-confirmable response [in usec]
  *
  * Set to 0 to disable timeout.
@@ -327,15 +339,16 @@ extern "C" {
 #define GCOAP_MSG_TYPE_INTR     (0x1502)
 
 /**
- * @brief   Maximum number of Observe clients; use 2 if not defined
+ * @ingroup net_gcoap_conf
+ * @brief   Maximum number of Observe clients
  */
 #ifndef GCOAP_OBS_CLIENTS_MAX
 #define GCOAP_OBS_CLIENTS_MAX   (2)
 #endif
 
 /**
- * @brief   Maximum number of registrations for Observable resources; use 2 if
- *          not defined
+ * @ingroup net_gcoap_conf
+ * @brief   Maximum number of registrations for Observable resources
  */
 #ifndef GCOAP_OBS_REGISTRATIONS_MAX
 #define GCOAP_OBS_REGISTRATIONS_MAX     (2)
@@ -351,6 +364,7 @@ extern "C" {
 /** @} */
 
 /**
+ * @ingroup net_gcoap_conf
  * @brief   Width in bytes of the Observe option value for a notification
  *
  * This width is used to determine the length of the 'tick' used to measure
@@ -402,6 +416,7 @@ extern "C" {
 #endif
 
 /**
+ * @ingroup net_gcoap_conf
  * @brief   Count of PDU buffers available for resending confirmable messages
  */
 #ifndef GCOAP_RESEND_BUFS_MAX

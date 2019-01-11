@@ -1,34 +1,33 @@
-/**************************************************************************//**
- * @file efm32pg1b_crypto.h
+/***************************************************************************//**
+ * @file
  * @brief EFM32PG1B_CRYPTO register and bit field definitions
- * @version 5.4.0
- ******************************************************************************
+ * @version 5.7.0
+ *******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
- ******************************************************************************
+ * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software.@n
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.@n
+ *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * DISCLAIMER OF WARRANTY/LIMITATION OF REMEDIES: Silicon Laboratories, Inc.
- * has no obligation to support this Software. Silicon Laboratories, Inc. is
- * providing the Software "AS IS", with no express or implied warranties of any
- * kind, including, but not limited to, any implied warranties of
- * merchantability or fitness for any particular purpose or warranties against
- * infringement of any proprietary rights of a third party.
- *
- * Silicon Laboratories, Inc. will not be liable for any consequential,
- * incidental, or special damages, or any other relief, or for any claim by
- * any third party, arising from your use of this Software.
- *
- *****************************************************************************/
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,84 +40,84 @@ extern "C" {
 #pragma clang system_header  /* Treat file as system include file. */
 #endif
 
-/**************************************************************************//**
-* @addtogroup Parts
-* @{
-******************************************************************************/
-/**************************************************************************//**
+/***************************************************************************//**
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/***************************************************************************//**
  * @defgroup EFM32PG1B_CRYPTO CRYPTO
  * @{
  * @brief EFM32PG1B_CRYPTO Register Declaration
- *****************************************************************************/
+ ******************************************************************************/
 /** CRYPTO Register Declaration */
 typedef struct {
-  __IOM uint32_t CTRL;           /**< Control Register  */
-  __IOM uint32_t WAC;            /**< Wide Arithmetic Configuration  */
-  __IOM uint32_t CMD;            /**< Command Register  */
-  uint32_t       RESERVED0[1];   /**< Reserved for future use **/
-  __IM uint32_t  STATUS;         /**< Status Register  */
-  __IM uint32_t  DSTATUS;        /**< Data Status Register  */
-  __IM uint32_t  CSTATUS;        /**< Control Status Register  */
-  uint32_t       RESERVED1[1];   /**< Reserved for future use **/
-  __IOM uint32_t KEY;            /**< KEY Register Access  */
-  __IOM uint32_t KEYBUF;         /**< KEY Buffer Register Access  */
-  uint32_t       RESERVED2[2];   /**< Reserved for future use **/
-  __IOM uint32_t SEQCTRL;        /**< Sequence Control  */
-  __IOM uint32_t SEQCTRLB;       /**< Sequence Control B  */
-  uint32_t       RESERVED3[2];   /**< Reserved for future use **/
-  __IM uint32_t  IF;             /**< AES Interrupt Flags  */
-  __IOM uint32_t IFS;            /**< Interrupt Flag Set Register  */
-  __IOM uint32_t IFC;            /**< Interrupt Flag Clear Register  */
-  __IOM uint32_t IEN;            /**< Interrupt Enable Register  */
-  __IOM uint32_t SEQ0;           /**< Sequence Register 0  */
-  __IOM uint32_t SEQ1;           /**< Sequence Register 1  */
-  __IOM uint32_t SEQ2;           /**< Sequence Register 2  */
-  __IOM uint32_t SEQ3;           /**< Sequence Register 3  */
-  __IOM uint32_t SEQ4;           /**< Sequence Register 4  */
-  uint32_t       RESERVED4[7];   /**< Reserved for future use **/
-  __IOM uint32_t DATA0;          /**< DATA0 Register Access  */
-  __IOM uint32_t DATA1;          /**< DATA1 Register Access  */
-  __IOM uint32_t DATA2;          /**< DATA2 Register Access  */
-  __IOM uint32_t DATA3;          /**< DATA3 Register Access  */
-  uint32_t       RESERVED5[4];   /**< Reserved for future use **/
-  __IOM uint32_t DATA0XOR;       /**< DATA0XOR Register Access  */
-  uint32_t       RESERVED6[3];   /**< Reserved for future use **/
-  __IOM uint32_t DATA0BYTE;      /**< DATA0 Register Byte Access  */
-  __IOM uint32_t DATA1BYTE;      /**< DATA1 Register Byte Access  */
-  uint32_t       RESERVED7[1];   /**< Reserved for future use **/
-  __IOM uint32_t DATA0XORBYTE;   /**< DATA0 Register Byte XOR Access  */
-  __IOM uint32_t DATA0BYTE12;    /**< DATA0 Register Byte 12 Access  */
-  __IOM uint32_t DATA0BYTE13;    /**< DATA0 Register Byte 13 Access  */
-  __IOM uint32_t DATA0BYTE14;    /**< DATA0 Register Byte 14 Access  */
-  __IOM uint32_t DATA0BYTE15;    /**< DATA0 Register Byte 15 Access  */
-  uint32_t       RESERVED8[12];  /**< Reserved for future use **/
-  __IOM uint32_t DDATA0;         /**< DDATA0 Register Access  */
-  __IOM uint32_t DDATA1;         /**< DDATA1 Register Access  */
-  __IOM uint32_t DDATA2;         /**< DDATA2 Register Access  */
-  __IOM uint32_t DDATA3;         /**< DDATA3 Register Access  */
-  __IOM uint32_t DDATA4;         /**< DDATA4 Register Access  */
-  uint32_t       RESERVED9[7];   /**< Reserved for future use **/
-  __IOM uint32_t DDATA0BIG;      /**< DDATA0 Register Big Endian Access  */
-  uint32_t       RESERVED10[3];  /**< Reserved for future use **/
-  __IOM uint32_t DDATA0BYTE;     /**< DDATA0 Register Byte Access  */
-  __IOM uint32_t DDATA1BYTE;     /**< DDATA1 Register Byte Access  */
-  __IOM uint32_t DDATA0BYTE32;   /**< DDATA0 Register Byte 32 Access  */
-  uint32_t       RESERVED11[13]; /**< Reserved for future use **/
-  __IOM uint32_t QDATA0;         /**< QDATA0 Register Access  */
-  __IOM uint32_t QDATA1;         /**< QDATA1 Register Access  */
-  uint32_t       RESERVED12[7];  /**< Reserved for future use **/
-  __IOM uint32_t QDATA1BIG;      /**< QDATA1 Register Big Endian Access  */
-  uint32_t       RESERVED13[6];  /**< Reserved for future use **/
-  __IOM uint32_t QDATA0BYTE;     /**< QDATA0 Register Byte Access  */
-  __IOM uint32_t QDATA1BYTE;     /**< QDATA1 Register Byte Access  */
-} CRYPTO_TypeDef;                /** @} */
+  __IOM uint32_t CTRL;            /**< Control Register  */
+  __IOM uint32_t WAC;             /**< Wide Arithmetic Configuration  */
+  __IOM uint32_t CMD;             /**< Command Register  */
+  uint32_t       RESERVED0[1U];   /**< Reserved for future use **/
+  __IM uint32_t  STATUS;          /**< Status Register  */
+  __IM uint32_t  DSTATUS;         /**< Data Status Register  */
+  __IM uint32_t  CSTATUS;         /**< Control Status Register  */
+  uint32_t       RESERVED1[1U];   /**< Reserved for future use **/
+  __IOM uint32_t KEY;             /**< KEY Register Access  */
+  __IOM uint32_t KEYBUF;          /**< KEY Buffer Register Access  */
+  uint32_t       RESERVED2[2U];   /**< Reserved for future use **/
+  __IOM uint32_t SEQCTRL;         /**< Sequence Control  */
+  __IOM uint32_t SEQCTRLB;        /**< Sequence Control B  */
+  uint32_t       RESERVED3[2U];   /**< Reserved for future use **/
+  __IM uint32_t  IF;              /**< AES Interrupt Flags  */
+  __IOM uint32_t IFS;             /**< Interrupt Flag Set Register  */
+  __IOM uint32_t IFC;             /**< Interrupt Flag Clear Register  */
+  __IOM uint32_t IEN;             /**< Interrupt Enable Register  */
+  __IOM uint32_t SEQ0;            /**< Sequence Register 0  */
+  __IOM uint32_t SEQ1;            /**< Sequence Register 1  */
+  __IOM uint32_t SEQ2;            /**< Sequence Register 2  */
+  __IOM uint32_t SEQ3;            /**< Sequence Register 3  */
+  __IOM uint32_t SEQ4;            /**< Sequence Register 4  */
+  uint32_t       RESERVED4[7U];   /**< Reserved for future use **/
+  __IOM uint32_t DATA0;           /**< DATA0 Register Access  */
+  __IOM uint32_t DATA1;           /**< DATA1 Register Access  */
+  __IOM uint32_t DATA2;           /**< DATA2 Register Access  */
+  __IOM uint32_t DATA3;           /**< DATA3 Register Access  */
+  uint32_t       RESERVED5[4U];   /**< Reserved for future use **/
+  __IOM uint32_t DATA0XOR;        /**< DATA0XOR Register Access  */
+  uint32_t       RESERVED6[3U];   /**< Reserved for future use **/
+  __IOM uint32_t DATA0BYTE;       /**< DATA0 Register Byte Access  */
+  __IOM uint32_t DATA1BYTE;       /**< DATA1 Register Byte Access  */
+  uint32_t       RESERVED7[1U];   /**< Reserved for future use **/
+  __IOM uint32_t DATA0XORBYTE;    /**< DATA0 Register Byte XOR Access  */
+  __IOM uint32_t DATA0BYTE12;     /**< DATA0 Register Byte 12 Access  */
+  __IOM uint32_t DATA0BYTE13;     /**< DATA0 Register Byte 13 Access  */
+  __IOM uint32_t DATA0BYTE14;     /**< DATA0 Register Byte 14 Access  */
+  __IOM uint32_t DATA0BYTE15;     /**< DATA0 Register Byte 15 Access  */
+  uint32_t       RESERVED8[12U];  /**< Reserved for future use **/
+  __IOM uint32_t DDATA0;          /**< DDATA0 Register Access  */
+  __IOM uint32_t DDATA1;          /**< DDATA1 Register Access  */
+  __IOM uint32_t DDATA2;          /**< DDATA2 Register Access  */
+  __IOM uint32_t DDATA3;          /**< DDATA3 Register Access  */
+  __IOM uint32_t DDATA4;          /**< DDATA4 Register Access  */
+  uint32_t       RESERVED9[7U];   /**< Reserved for future use **/
+  __IOM uint32_t DDATA0BIG;       /**< DDATA0 Register Big Endian Access  */
+  uint32_t       RESERVED10[3U];  /**< Reserved for future use **/
+  __IOM uint32_t DDATA0BYTE;      /**< DDATA0 Register Byte Access  */
+  __IOM uint32_t DDATA1BYTE;      /**< DDATA1 Register Byte Access  */
+  __IOM uint32_t DDATA0BYTE32;    /**< DDATA0 Register Byte 32 Access  */
+  uint32_t       RESERVED11[13U]; /**< Reserved for future use **/
+  __IOM uint32_t QDATA0;          /**< QDATA0 Register Access  */
+  __IOM uint32_t QDATA1;          /**< QDATA1 Register Access  */
+  uint32_t       RESERVED12[7U];  /**< Reserved for future use **/
+  __IOM uint32_t QDATA1BIG;       /**< QDATA1 Register Big Endian Access  */
+  uint32_t       RESERVED13[6U];  /**< Reserved for future use **/
+  __IOM uint32_t QDATA0BYTE;      /**< QDATA0 Register Byte Access  */
+  __IOM uint32_t QDATA1BYTE;      /**< QDATA1 Register Byte Access  */
+} CRYPTO_TypeDef;                 /** @} */
 
-/**************************************************************************//**
+/***************************************************************************//**
  * @addtogroup EFM32PG1B_CRYPTO
  * @{
  * @defgroup EFM32PG1B_CRYPTO_BitFields  CRYPTO Bit Fields
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 
 /* Bit fields for CRYPTO CTRL */
 #define _CRYPTO_CTRL_RESETVALUE                      0x00000000UL                               /**< Default value for CRYPTO_CTRL */

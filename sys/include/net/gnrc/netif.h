@@ -76,7 +76,7 @@ typedef struct {
      * @see net_gnrc_netif_flags
      */
     uint32_t flags;
-#if (GNRC_NETIF_L2ADDR_MAXLEN > 0)
+#if (GNRC_NETIF_L2ADDR_MAXLEN > 0) || DOXYGEN
     /**
      * @brief   The link-layer address currently used as the source address
      *          on this interface.

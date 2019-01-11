@@ -22,6 +22,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "cfg_i2c1_pb8_pb9.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -134,13 +135,6 @@ static const uart_conf_t uart_config[] = {
 #define UART_2_DMA_ISR      (isr_dma1_stream4)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
-/** @} */
-
-/**
- * @name    ADC configuration
- * @{
- */
-#define ADC_NUMOF           (0)
 /** @} */
 
 #ifdef __cplusplus
