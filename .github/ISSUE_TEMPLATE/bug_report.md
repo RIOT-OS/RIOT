@@ -10,8 +10,9 @@ IF YOUR ISSUE IS RELATED TO SECURITY
 ====================================
 please submit it to the security mailing-list security@riot-os.org.
 
-If your issue is a usage question, please submit it to the user mailing-list
-users@riot-os.org or to the developer mailing-list devel@riot-os.org.
+If your issue is a question related to the usage of RIOT, please submit it to
+the user mailing-list users@riot-os.org or to the developer mailing-list
+devel@riot-os.org.
 -->
 
 #### Description
