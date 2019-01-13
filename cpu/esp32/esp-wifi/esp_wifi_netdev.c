@@ -356,7 +356,7 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
             esp_wifi_get_mac(ESP_MAC_WIFI_STA,(uint8_t *)val);
             return ETHERNET_ADDR_LEN;
         case NETOPT_IS_WIRED:
-            return true;
+            return false;
         case NETOPT_LINK_CONNECTED:
             return dev->connected;
         default:
