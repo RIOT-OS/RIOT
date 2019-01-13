@@ -602,6 +602,10 @@ ifneq (,$(filter saul,$(USEMODULE)))
   USEMODULE += phydat
 endif
 
+ifneq (,$(filter saul_nrf_temperature,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_temperature
+endif
+
 ifneq (,$(filter phydat,$(USEMODULE)))
   USEMODULE += fmt
 endif
