@@ -358,7 +358,10 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
         case NETOPT_IS_WIRED:
             return false;
         case NETOPT_LINK_CONNECTED:
-            return dev->connected;
+            assert(max_len == 1);
+            *((netopt_enable_t *)val) = (dev->connected) ? NETOPT_ENABLE
+                                                         : NETOPT_DISABLE;
+            return 1;
         default:
             return netdev_eth_get(netdev, opt, val, max_len);
     }
