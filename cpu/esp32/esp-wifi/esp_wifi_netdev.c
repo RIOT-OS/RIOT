@@ -137,6 +137,19 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
 #define CONFIG_WIFI_STA_RSSI        -127
 #define CONFIG_WIFI_STA_AUTHMODE    WIFI_AUTH_WPA_WPA2_PSK
 
+/* we use predefined station configuration */
+static wifi_config_t wifi_config_sta = {
+    .sta = {
+        .ssid = CONFIG_WIFI_STA_SSID,
+        .password = CONFIG_WIFI_STA_PASSWORD,
+        .channel = CONFIG_WIFI_STA_CHANNEL,
+        .scan_method = CONFIG_WIFI_STA_SCAN_METHOD,
+        .sort_method = CONFIG_WIFI_STA_SORT_METHOD,
+        .threshold.rssi = CONFIG_WIFI_STA_RSSI,
+        .threshold.authmode = CONFIG_WIFI_STA_AUTHMODE
+    }
+};
+
 static void esp_wifi_setup (esp_wifi_netdev_t* dev)
 {
     DEBUG("%s: %p\n", __func__, dev);
@@ -170,19 +183,6 @@ static void esp_wifi_setup (esp_wifi_netdev_t* dev)
     #ifdef CONFIG_WIFI_COUNTRY
     /* TODO */
     #endif
-
-    /* we use predefined station configuration */
-    wifi_config_t wifi_config_sta = {
-        .sta = {
-            .ssid = CONFIG_WIFI_STA_SSID,
-            .password = CONFIG_WIFI_STA_PASSWORD,
-            .channel = CONFIG_WIFI_STA_CHANNEL,
-            .scan_method = CONFIG_WIFI_STA_SCAN_METHOD,
-            .sort_method = CONFIG_WIFI_STA_SORT_METHOD,
-            .threshold.rssi = CONFIG_WIFI_STA_RSSI,
-            .threshold.authmode = CONFIG_WIFI_STA_AUTHMODE
-        }
-    };
 
     result = esp_wifi_set_mode(WIFI_MODE_STA);
     if (result != ESP_OK) {
