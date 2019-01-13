@@ -144,6 +144,21 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             _esp_wifi_dev.event = SYSTEM_EVENT_ETH_DISCONNECTED;
             _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
 
+            /* call disconnect to reset internal state */
+            result = esp_wifi_disconnect();
+            if (result != ESP_OK) {
+                LOG_TAG_ERROR("esp_wifi", "esp_wifi_disconnect failed with "
+                             "return value %d\n", result);
+                return result;
+            }
+
+            /* try to reconnect */
+            result = esp_wifi_connect();
+            if (result != ESP_OK) {
+               LOG_TAG_ERROR("esp_wifi", "esp_wifi_connect failed with "
+                             "return value %d\n", result);
+            }
+
             break;
 
         default:
@@ -313,6 +328,7 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
     }
 
     mutex_unlock(&dev->dev_lock);
+
     return ret;
 }
 
