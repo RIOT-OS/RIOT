@@ -74,12 +74,22 @@ esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
 {
     DEBUG("%s: buf=%p len=%d eb=%p\n", __func__, buffer, len, eb);
 
-    CHECK_PARAM_RET (buffer != NULL, -EINVAL);
-    CHECK_PARAM_RET (len <= ETHERNET_DATA_LEN, -EINVAL);
+    if ((buffer == NULL) || (len >= ETHERNET_DATA_LEN)) {
+        if (eb != NULL) {
+            esp_wifi_internal_free_rx_buffer(eb);
+        }
+        return ESP_ERR_INVALID_ARG;
+    }
 
     mutex_lock(&_esp_wifi_dev.dev_lock);
 
+    /* copy the buffer and free WiFi driver buffer */
     memcpy(_esp_wifi_dev.rx_buf, buffer, len);
+    if (eb) {
+      esp_wifi_internal_free_rx_buffer(eb);
+    }
+
+    /* trigger netdev event to read the data */
     _esp_wifi_dev.rx_len = len;
     _esp_wifi_dev.event = SYSTEM_EVENT_WIFI_RX_DONE;
     _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
