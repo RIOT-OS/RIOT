@@ -128,13 +128,16 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             break;
 
         case SYSTEM_EVENT_STA_DISCONNECTED:
-            DEBUG("%s WiFi disconnected\n", __func__);
+            DEBUG("%s WiFi disconnected from ssid %s, reason %d\n", __func__,
+                  event->event_info.disconnected.ssid,
+                  event->event_info.disconnected.reason);
             _esp_wifi_dev.connected = false;
             _esp_wifi_dev.event = SYSTEM_EVENT_ETH_DISCONNECTED;
             _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
             break;
 
         default:
+            DEBUG("%s event %d\n", __func__, event->event_id);
             break;
     }
     return ESP_OK;
