@@ -62,6 +62,7 @@ PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_default
 PSEUDOMODULES += saul_gpio
+PSEUDOMODULES += saul_nrf_temperature
 PSEUDOMODULES += schedstatistics
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_ip
