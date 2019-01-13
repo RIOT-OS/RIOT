@@ -104,25 +104,36 @@ esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
  */
 static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *event)
 {
+    esp_err_t result;
+
     switch(event->event_id) {
         case SYSTEM_EVENT_STA_START:
             DEBUG("%s WiFi started\n", __func__);
+            result = esp_wifi_connect();
+            if (result != ESP_OK) {
+                LOG_TAG_ERROR("esp_wifi", "esp_wifi_connect failed with return "
+                              "value %d\n", result);
+            }
             break;
+
         case SYSTEM_EVENT_SCAN_DONE:
             DEBUG("%s WiFi scan done\n", __func__);
             break;
+
         case SYSTEM_EVENT_STA_CONNECTED:
             DEBUG("%s WiFi connected\n", __func__);
             _esp_wifi_dev.connected = true;
             _esp_wifi_dev.event = SYSTEM_EVENT_ETH_CONNECTED;
             _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
             break;
+
         case SYSTEM_EVENT_STA_DISCONNECTED:
             DEBUG("%s WiFi disconnected\n", __func__);
             _esp_wifi_dev.connected = false;
             _esp_wifi_dev.event = SYSTEM_EVENT_ETH_DISCONNECTED;
             _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
             break;
+
         default:
             break;
     }
@@ -224,12 +235,6 @@ static void esp_wifi_setup (esp_wifi_netdev_t* dev)
     dev->connected = false;
 
     mutex_init(&dev->dev_lock);
-
-    result = esp_wifi_connect();
-    if (result != ESP_OK) {
-       LOG_TAG_ERROR("esp_wifi", "esp_wifi_connect failed with return value %d\n", result);
-        return;
-    }
 }
 
 static int _esp_wifi_init(netdev_t *netdev)
