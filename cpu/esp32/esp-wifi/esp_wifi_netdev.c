@@ -127,7 +127,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, _esp_wifi_rx_cb);
 
             _esp_wifi_dev.connected = true;
-            _esp_wifi_dev.event = SYSTEM_EVENT_ETH_CONNECTED;
+            _esp_wifi_dev.event = SYSTEM_EVENT_STA_CONNECTED;
             _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
 
             break;
@@ -141,7 +141,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, NULL);
 
             _esp_wifi_dev.connected = false;
-            _esp_wifi_dev.event = SYSTEM_EVENT_ETH_DISCONNECTED;
+            _esp_wifi_dev.event = SYSTEM_EVENT_STA_DISCONNECTED;
             _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
 
             /* call disconnect to reset internal state */
