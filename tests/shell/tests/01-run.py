@@ -33,9 +33,9 @@ EXPECTED_PS = (
 # When using a board (with miniterm.py) it is not a problem.
 
 if os.environ['BOARD'] == 'native':
-    CONTROL_C = '\x16\x03'
+    DLE = '\x16'
 else:
-    CONTROL_C = '\x03'
+    DLE = ''
 
 CMDS = (
     ('start_test', ('[TEST_START]')),
@@ -49,9 +49,9 @@ CMDS = (
     ('echo a string', ('\"echo\"\"a\"\"string\"')),
     ('ps', EXPECTED_PS),
     ('reboot', ('test_shell.')),
-    (CONTROL_C, ('shell exited (1)')),
+    (DLE+'\x03', ('shell exited (1)')),
     ('echo', ('"echo"')),
-    ('\x04', ('shell exited (2)'))
+    (DLE+'\x04', ('shell exited (2)'))
 )
 
 
@@ -68,6 +68,13 @@ def testfunc(child):
     # loop other defined commands and expected output
     for cmd, expected in CMDS:
         check_cmd(child, cmd, expected)
+
+    child.expect_exact("Shell call bad command 1=1")
+    child.expect_exact('"echo""one""two""three"')
+    child.expect_exact("Shell call good command 1=1")
+
+    child.sendline('reboot')
+    child.expect('test_shell.')
 
 
 if __name__ == "__main__":

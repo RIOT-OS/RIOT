@@ -59,6 +59,9 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
+char *fake_command[] = {"fake_command"};
+char *real_command[] = {"echo", "one", "two", "three"};
+
 int main(void)
 {
 
@@ -78,6 +81,16 @@ int main(void)
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     puts("shell exited (2)");
+
+    printf("Shell call bad command 1=%d\n",
+           shell_call(shell_commands, 1, fake_command)<0? 1:0);
+
+    printf("Shell call good command 1=%d\n",
+           shell_call(shell_commands, sizeof(real_command)/sizeof(*real_command),
+                      real_command)>=0? 1:0);
+
+    /* Start the shell again so that the node may be reset by a command */
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     /* or use only system shell commands */
     /*
