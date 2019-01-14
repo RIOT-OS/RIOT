@@ -388,12 +388,14 @@ typedef struct {
 /* This will be our "storage device" */
 dummy_store_storage_t dummy_store[DUMMY_STORE_CAPACITY];
 
+/* The store argument is the descriptor of the storage facility */
 static int registry_dummy_load(registry_store_t *store, load_cb_t cb,
                                void *cb_arg);
 static int registry_dummy_store(registry_store_t *store, const char *name,
 const char *value);
 
-/* Storage Facility descriptor to be registered in the RIOT Registry */
+/* Storage Facility interface descriptor to be registered in the RIOT
+Registry */
 static registry_store_itf_t interface = {
     .load = registry_dummy_load,
     .store = registry_dummy_store
