@@ -7,7 +7,10 @@
  */
 
 /**
+ * @defgroup    cpu_esp8266_conf ESP8266 compile configurations
  * @ingroup     cpu_esp8266
+ * @ingroup     config
+ * @brief       Compile-time configuration macros for ESP8266 modules
  * @{
  *
  * @file
