@@ -1,6 +1,6 @@
 PKG_NAME=u8g2
 PKG_URL=https://github.com/olikraus/u8g2
-PKG_VERSION=f08ff974c03e5c848bc5d2ae3fddb6a97897881a
+PKG_VERSION=45ac4e0edc76c6bc3d808304fccb73c543535ded
 PKG_LICENSE=BSD-2-Clause
 
 .PHONY: all
