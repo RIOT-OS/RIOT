@@ -14,5 +14,6 @@ before_script:
 
 script:
   - docker run -a STDIN -a STDOUT -a STDERR --rm -u "$(id -u)"
+      -e CI_BASE_BRANCH="${TRAVIS_BRANCH}"
       -v "${PWD}:/data/riotbuild" -v /etc/localtime:/etc/localtime:ro
       riot/riotbuild make static-test
