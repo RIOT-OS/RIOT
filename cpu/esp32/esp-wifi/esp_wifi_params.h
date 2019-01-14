@@ -25,14 +25,33 @@
  * @name    Set default configuration parameters for the ESP WiFi netdev driver
  * @{
  */
+
+/**
+ * @brief   The size of the stack used for the ESP WIFI netdev driver thread.
+ */
 #ifndef ESP_WIFI_STACKSIZE
-/** The size of the stack used for the ESP WiFi netdev driver thread */
-#define ESP_WIFI_STACKSIZE    THREAD_STACKSIZE_DEFAULT
+#define ESP_WIFI_STACKSIZE  (THREAD_STACKSIZE_DEFAULT)
 #endif
 
+/**
+ * @brief   The priority of the ESP WiFi netdev driver thread. Should not be changed.
+ */
 #ifndef ESP_WIFI_PRIO
-/** The priority of the ESP WiFi netdev driver thread */
-#define ESP_WIFI_PRIO         GNRC_NETIF_PRIO
+#define ESP_WIFI_PRIO       (GNRC_NETIF_PRIO)
+#endif
+
+/**
+ * @brief   SSID of the AP to be used.
+ */
+#ifndef ESP_WIFI_SSID
+#define ESP_WIFI_SSID       "RIOT_AP"
+#endif
+
+/**
+ * @brief   Passphrase used for the AP as clear text (max. 64 chars).
+ */
+#ifndef ESP_WIFI_PASS
+#define ESP_WIFI_PASS       "ThisistheRIOTporttoESP"
 #endif
 
 /**@}*/

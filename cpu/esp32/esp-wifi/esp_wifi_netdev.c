@@ -168,34 +168,16 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
     return ESP_OK;
 }
 
-/** TODO better place
- * Default WiFi configuration, overwrite them with your configs
- */
-#ifndef CONFIG_WIFI_STA_SSID
-#define CONFIG_WIFI_STA_SSID        "RIOT_AP"
-#endif
-#ifndef CONFIG_WIFI_STA_PASSWORD
-#define CONFIG_WIFI_STA_PASSWORD    "ThisistheRIOTporttoESP"
-#endif
-#ifndef CONFIG_WIFI_STA_CHANNEL
-#define CONFIG_WIFI_STA_CHANNEL     0
-#endif
-
-#define CONFIG_WIFI_STA_SCAN_METHOD WIFI_ALL_CHANNEL_SCAN
-#define CONFIG_WIFI_STA_SORT_METHOD WIFI_CONNECT_AP_BY_SIGNAL
-#define CONFIG_WIFI_STA_RSSI        -127
-#define CONFIG_WIFI_STA_AUTHMODE    WIFI_AUTH_WPA_WPA2_PSK
-
 /* we use predefined station configuration */
 static wifi_config_t wifi_config_sta = {
     .sta = {
-        .ssid = CONFIG_WIFI_STA_SSID,
-        .password = CONFIG_WIFI_STA_PASSWORD,
-        .channel = CONFIG_WIFI_STA_CHANNEL,
-        .scan_method = CONFIG_WIFI_STA_SCAN_METHOD,
-        .sort_method = CONFIG_WIFI_STA_SORT_METHOD,
-        .threshold.rssi = CONFIG_WIFI_STA_RSSI,
-        .threshold.authmode = CONFIG_WIFI_STA_AUTHMODE
+        .ssid = ESP_WIFI_SSID,
+        .password = ESP_WIFI_PASS,
+        .channel = 0,
+        .scan_method = WIFI_ALL_CHANNEL_SCAN,
+        .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
+        .threshold.rssi = -127,
+        .threshold.authmode = WIFI_AUTH_WPA_WPA2_PSK
     }
 };
 
