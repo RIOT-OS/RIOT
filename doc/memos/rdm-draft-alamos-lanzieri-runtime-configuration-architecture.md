@@ -73,14 +73,15 @@ data representations.
 This document specifies the proposed architecture by the
 Configuration Task Force (CFT) to implement a secure and reliable Runtime
 Configuration System (RCS) focusing on modularity, reuse of existing
-technologies in RIOT (network stack, storage interface) and standard compliance.
+technologies in RIOT (network stack, storage interface) and standards
+compliance.
 
 # 2. Architecture
 The proposed RCS architecture is formed by a
-[configuration manager](4-configuration-manager) and the
-[RIOT Registry](3-the-riot-registry) and its sub-components:
-one or more [Registry Handlers](4-registry-handlers) and one or more
-[storage facilities](5-storage-facilities). 
+[configuration manager](#4-configuration-manager) and the
+[RIOT Registry](#3-the-riot-registry) and its sub-components:
+one or more [Registry Handlers](#31-registry-handlers) and one or more
+[storage facilities](#32-storage-facilities).
 
 A RIOT Application may interact with the Configuration Manager in order to
 modify access control rules or enable different communication interfaces.
@@ -185,7 +186,7 @@ _export_ configurations using a user-defined callback function
 
 Note these functions don't interact with SF, so
 configuration changes are not reflected in the non-volatile storage devices
-unless `registry_store` is called (see [Load and store configurations][#5.3 Load and store configurations])
+unless `registry_store` is called (see [Load and store configurations](#load-and-store-configurations))
 
 The following diagram shows the process of each function. It's assumed there
 are 2 RH registered in the RIOT Registry: a _cord_ configuration
