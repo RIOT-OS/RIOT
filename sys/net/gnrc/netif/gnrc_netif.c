@@ -183,9 +183,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             break;
         case NETOPT_IPV6_IID:
             assert(opt->data_len >= sizeof(eui64_t));
-            if (gnrc_netif_ipv6_get_iid(netif, opt->data) == 0) {
-                res = sizeof(eui64_t);
-            }
+            res = gnrc_netif_ipv6_get_iid(netif, opt->data);
             break;
         case NETOPT_MAX_PACKET_SIZE:
             if (opt->context == GNRC_NETTYPE_IPV6) {
@@ -811,28 +809,6 @@ int gnrc_netif_ipv6_group_idx(gnrc_netif_t *netif, const ipv6_addr_t *addr)
     idx = _group_idx(netif, addr);
     gnrc_netif_release(netif);
     return idx;
-}
-
-int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
-{
-#if GNRC_NETIF_L2ADDR_MAXLEN > 0
-    if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
-        /* the device driver abstraction should be able to provide us with the
-         * IPV6_IID, so we try this first */
-        int res = netif->dev->driver->get(netif->dev, NETOPT_IPV6_IID,
-                                          eui64, sizeof(eui64_t));
-        if (res == sizeof(eui64_t)) {
-            return 0;
-        }
-        res = gnrc_netif_ipv6_iid_from_addr(netif,
-                                            netif->l2addr, netif->l2addr_len,
-                                            eui64);
-        if (res > 0) {
-            return 0;
-        }
-    }
-#endif /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
-    return -ENOTSUP;
 }
 
 static inline bool _addr_anycast(const gnrc_netif_t *netif, unsigned idx)
