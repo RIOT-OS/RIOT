@@ -34,6 +34,8 @@
 #define TM_YEAR_OFFSET      (1900)
 
 static unsigned cnt = 0;
+static uint32_t start_usecs = 0;
+static uint32_t alarm_expected_usecs = 0;
 
 static void print_time(const char *label, const struct tm *time)
 {
@@ -58,13 +60,18 @@ static void cb(void *arg)
 {
     (void)arg;
 
-    puts("Alarm!");
+    uint32_t now_usecs = xtimer_now_usec();
+    printf("[%" PRIu32 "] Alarm! after %" PRIu32 " microseconds (error %" PRId32 " microseconds)\n",
+           now_usecs,
+           now_usecs - start_usecs,
+           (int32_t)now_usecs - alarm_expected_usecs);
 
     if (++cnt < REPEAT) {
         struct tm time;
         rtc_get_alarm(&time);
         inc_secs(&time, PERIOD);
         rtc_set_alarm(&time, cb, NULL);
+        alarm_expected_usecs += US_PER_SEC * PERIOD;
     }
 }
 
@@ -86,20 +93,27 @@ int main(void)
     /* set RTC */
     print_time("  Setting clock to ", &time);
     rtc_set_time(&time);
+    start_usecs = xtimer_now_usec();
 
     /* read RTC to confirm value */
-    rtc_get_time(&time);
-    print_time("Clock value is now ", &time);
+    struct tm time_now;
+    rtc_get_time(&time_now);
+    print_time("Clock value is now ", &time_now);
 
     /* set initial alarm */
     inc_secs(&time, PERIOD);
     print_time("  Setting alarm to ", &time);
     rtc_set_alarm(&time, cb, NULL);
+    alarm_expected_usecs = start_usecs + US_PER_SEC * PERIOD;
 
     /* verify alarm */
     rtc_get_alarm(&time);
     print_time("   Alarm is set to ", &time);
     puts("");
+
+    printf("[%" PRIu32 "] First alarm expected at %" PRIu32 " microseconds\n",
+           xtimer_now_usec(),
+           alarm_expected_usecs);
 
     return 0;
 }
