@@ -14,6 +14,7 @@ CFLAGS += -Wno-extra
 # tell LLVM/clang not to be so pedantic with this.
 ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-unused-function
+  CFLAGS += -Wno-address-of-packed-member
 endif
 
 .PHONY: all

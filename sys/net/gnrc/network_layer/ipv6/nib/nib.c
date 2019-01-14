@@ -240,7 +240,7 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                 gnrc_netif_acquire(netif);
             }
             node = _nib_onl_get(&route.next_hop,
-                                (netif == NULL) ? netif->pid : 0);
+                                (netif != NULL) ? netif->pid : 0);
             if (_resolve_addr(&route.next_hop, netif, pkt, nce, node)) {
                 _call_route_info_cb(netif,
                                     GNRC_IPV6_NIB_ROUTE_INFO_TYPE_RN,
@@ -1151,6 +1151,19 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                 gnrc_pktqueue_t *queue_entry = _alloc_queue_entry(pkt);
 
                 if (queue_entry != NULL) {
+                    if (netif != NULL) {
+                        gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(
+                                NULL, 0, NULL, 0
+                            );
+                        if (netif_hdr == NULL) {
+                            DEBUG("nib: can't allocate netif header for queue\n");
+                            gnrc_pktbuf_release(pkt);
+                            queue_entry->pkt = NULL;
+                            return false;
+                        }
+                        ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = netif->pid;
+                        LL_PREPEND(queue_entry->pkt, netif_hdr);
+                    }
                     gnrc_pktqueue_add(&entry->pktqueue, queue_entry);
                 }
             }
