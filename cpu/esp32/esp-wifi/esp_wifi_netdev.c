@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Netdev interface for the ESP WiFi AP-based communication
+ * @brief       Network device driver for the ESP32 WiFi interface
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */

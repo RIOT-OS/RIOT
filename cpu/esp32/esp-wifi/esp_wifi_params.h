@@ -8,10 +8,11 @@
 
 /**
  * @ingroup     cpu_esp32_esp_wifi
+ * @ingroup     cpu_esp32_conf
  * @{
  *
  * @file
- * @brief       Parameters for the netdev interface for ESP WiFi module
+ * @brief       Parameters for the ESP32 WiFi netdev interface
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
