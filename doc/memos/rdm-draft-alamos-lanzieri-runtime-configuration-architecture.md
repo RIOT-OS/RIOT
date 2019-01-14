@@ -28,10 +28,10 @@ These parameters might have constraints, like a specific order to be applied
 The main advantages of having such a system are:
 - Easy to apply per-node configuration during deployment
 - No need to implement a special mechanism for per-node configurations during
-  firmware updates (only in the case of migration)
+  firmware updates (only in the case of migration), as the parameters persist.
 - Common interface for modules to expose their runtime configuration parameters
   and handle them
-- Transparent interface for storing configuration parameters in non-volatile
+- Common interface for storing configuration parameters in non-volatile
   storage devices
 
 ## Status
@@ -53,20 +53,20 @@ and the following acronyms and definitions:
 - SF: Storage Facility
 
 ### Definitions
-- Configuration group: A set of key-value configurations under the same name
-  scheme and scope. E.g `LIGHT_SENSOR_THRESHOLD` and `TRANSMISSION_PERIOD`
-configuration parameters can be contained in an _Application_ configuration
-group, as well as `IEEE802154_CHANNEL` and `IEEE802154_TX_POWER` in a
-_IEEE802.15.4 Radio_ configuration group. Within RIOT, a Configuration Group
-is represented by a Registry Handler.
+- Configuration group: A set of key-value configurations with the same naming
+ scheme and under the same scope. E.g `LIGHT_SENSOR_THRESHOLD` and
+`TRANSMISSION_PERIOD` configuration parameters can be contained in an
+_Application_ configuration group, as well as `IEEE802154_CHANNEL` and
+`IEEE802154_TX_POWER` in a _IEEE802.15.4 Radio_ configuration group.
+Within RIOT, each Configuration Group is represented by a Registry Handler.
 
 - Registry Handler: A descriptor that acts as an interface between the RIOT
 Registry and a module that exposes configurations. It provides a common
-interface to get, set, apply and export configurations.
+interface to `get`, `set`, `commit` and `export` configurations.
 
 - Storage Facility: A descriptor that acts as an interface between the RIOT
-Registry and a non-volatile storage device. It provides a common interface for
-load/store key-value data from storage devices that might have different
+Registry and a non-volatile storage device. It provides a common interface to
+`load` and `store` key-value data from storage devices that might have different
 data representations.
 
 # 1. Introduction
@@ -84,19 +84,20 @@ one or more [Registry Handlers](4-registry-handlers) and one or more
 
 A RIOT Application may interact with the Configuration Manager in order to
 modify access control rules or enable different communication interfaces.
-Also, it may interact with the RIOT Registry directly if it's
-required to load/store a persistent configuration.
+Also, it may interact with the RIOT Registry directly if it needs to load or
+store a persistent configuration.
 
 ![](./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/architecture.svg "Runtime Configuration Architecture")
 
 # 3. The RIOT Registry
 The RIOT Registry is a module for interacting with 
-**persistent key-value configurations**. It's heavily inspired in the
+**persistent key-value configurations**. It's heavily inspired by the
 [Mynewt Config subsystem](https://mynewt.apache.org/latest/os/modules/config/config.html)
 
 The Registry interacts with RIOT components via Registry Handlers, and with
-non-volatile storage devices via Storage Facilities. This way the Registry is
-independent to the functionality of the module or storage device.
+non-volatile storage devices via Storage Facilities. This way the functionality
+if the Registry is independent of the functionality of the module or storage
+device.
 
 <img src="./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/riot-registry-diagram.svg" />
 
@@ -105,8 +106,9 @@ The API of the RIOT Registry allows to:
 - Register source and destination SF.
 - Get or set configuration parameters for a given configuration group.
 - Commit changes (transactionally apply configurations)
-- Load and store configuration parameters from a persistent storage device
 - Export configuration parameters (e.g copy to a buffer, print, etc)
+- Load and store configuration parameters from and to a persistent storage
+  device
 
 Any mechanism of security (access control, encryption of configurations) is NOT
 directly in the scope of the Registry but in the Configuration Manager and the
@@ -125,11 +127,11 @@ interacting with the configuration parameters of the configuration group.
 These handlers are:
 - `set`: Sets a value to a configuration parameter. This handler MUST take care
   of any logic to apply the value (e.g. data validation) or cache it until the
-commit handler is called
-- `get`: Gets the current value of a configuration parameter
-- `commit`: To be called when configuration parameters have been loaded from
-  storage. It could be use for special needed logic on applying configuration
-parameters (e.g dependencies)
+  commit handler is called, if needed.
+- `get`: Gets the current value of a configuration parameter.
+- `commit`: To be called once configuration parameters have been `set`, in order
+  to apply any further logic required to make them effective (e.g. handling
+  dependencies).
 - `export`: Calls an `export function` for each configuration parameter, with
   its name and value. Depending on the behavior of `export function`, this can
 be used for printing out all configurations, saving them in a persistent
@@ -156,8 +158,8 @@ Any kind of storage encryption mechanism is not in the scope of this document,
 and up to the implementation of `load` and `store` or intrinsic encryption
 functionalities in the storage.
 
-A minimal RIOT Registry setup requires at least one source SF from where
-configurations are loaded and exactly one SF destination from where
+A minimal RIOT Registry setup requires at least one source SF from which
+configurations are loaded and exactly one SF destination to which
 configurations are stored. Having multiple SF sources can be useful when it's
 required to migrate the data between storage facilities (e.g to migrate all
 configurations from SF A to B, register B as source and destination and add
@@ -331,10 +333,10 @@ int my_commit_handler(int argc, char **argv, char *val)
         trigger_something();
     }
     
-    /* As stated before, the application crashes if `set_threashold` is called when is_enabled is false.
+    /* As stated before, the application crashes if `set_threshold` is called when is_enabled is false.
     We protect it here */
     if(is_enabled) {
-        /* We can safely set the theshold without crashing the app */
+        /* We can safely set the threshold without crashing the app */
         set_threshold(threshold);
     }
 }
@@ -356,9 +358,12 @@ void my_export_handler(int (*export_func)(const char *name, char *val), int argc
     
     /* Prepare `buf` to contain is_enabled in a string representation */
     /* ... */
+
     export_func("my_handler/is_enabled", buf);
+
     /* Prepare `buf` to contain threshold in a string representation */
     /* ... */
+
     export_func("my_handler/threshold", buf);
 }
 ```
