@@ -34,6 +34,9 @@ The main advantages of having such a system are:
 - Common interface for storing configuration parameters in non-volatile
   storage devices
 
+Throughout this document a tentative API is used, but the main goal of this
+is to describe the desired functionality of the final implementation.
+
 ## Status
 This document is currently under open discussion. This document is a product of
 [Configuration Task
@@ -95,7 +98,7 @@ The RIOT Registry is a module for interacting with
 **persistent key-value configurations**. It's heavily inspired by the
 [Mynewt Config subsystem](https://mynewt.apache.org/latest/os/modules/config/config.html)
 
-The Registry interacts with RIOT components via Registry Handlers, and with
+The Registry interacts with RIOT modules via Registry Handlers, and with
 non-volatile storage devices via Storage Facilities. This way the functionality
 if the Registry is independent of the functionality of the module or storage
 device.
@@ -405,7 +408,6 @@ static int registry_dummy_load(registry_store_t *store, load_cb_t cb,
     char name[REGISTRY_MAX_NAME_LEN];
     char val[REGISTRY_MAX_NAME_LEN];
 
-    puts("[registry_store_dummy] Loading...");
     for (int i = 0; i < DUMMY_STORE_CAPACITY; i++) {
         if (strlen(dummy_store[i].name)) {
             strcpy(name, dummy_store[i].name);
@@ -424,19 +426,15 @@ static int registry_dummy_store(registry_store_t *store, const char *name,
     int free_slot = -1;
     (void)store;
 
-    printf("[registry_store_dummy] Saving: %s = %s\n", name, value);
     for (int i = 0; i < DUMMY_STORE_CAPACITY; i++) {
         if (strlen(dummy_store[i].name)) {
-            printf("[registr_store_dummy]: Checking slot with name %s\n",dummy_store[i].name);
             if (!strcmp(name, dummy_store[i].name)) {
-                printf("[registry_store_dummy] Saved in slot: %d\n", i);
                 strcpy(dummy_store[i].val, value);
                 return 0;
             }
         }
         else {
             if (free_slot == -1) {
-                printf("[registry_store_dummy]: Free slot in: %d\n", i);
                 free_slot = i;
             }
         }
