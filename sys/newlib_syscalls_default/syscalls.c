@@ -58,7 +58,11 @@ char *heap_top = &_sheap + 4;
  */
 void _init(void)
 {
+    /* FIXME: this logic should be moved to newlib_syscalls_riot_serial_rw,
+     *        newlib_syscalls_riot_serial_vfs, or even better, a separate submodule*/
+#if !(MODULE_NEWLIB_STUBS_RW)
     stdio_init();
+#endif
 }
 
 /**

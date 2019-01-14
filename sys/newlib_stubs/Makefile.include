@@ -9,3 +9,7 @@ endif
 ifneq (,$(filter newlib_stubs_fs,$(USEMODULE)))
   UNDEF += $(BINDIR)/newlib_stubs/fs.o
 endif
+
+ifneq (,$(filter newlib_stubs_rw,$(USEMODULE)))
+  UNDEF += $(BINDIR)/newlib_stubs/rw.o
+endif
