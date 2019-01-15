@@ -232,32 +232,36 @@ int _icmpv6_ping(int argc, char **argv)
     ping_start = xtimer_now_usec64();
 
     while ((remaining--) > 0) {
-        gnrc_pktsnip_t *pkt;
+        gnrc_pktsnip_t *pkt, *payload;
         uint32_t start, timeout = 1 * US_PER_SEC;
 
-        pkt = gnrc_icmpv6_echo_build(ICMPV6_ECHO_REQ, id, ++max_seq_expected,
-                                     NULL, payload_len);
+        payload = gnrc_icmpv6_echo_build(ICMPV6_ECHO_REQ, id,
+                                         ++max_seq_expected,
+                                         NULL, payload_len);
 
-        if (pkt == NULL) {
+        if (payload == NULL) {
             puts("error: packet buffer full");
             continue;
         }
 
-        _set_payload(pkt->data, payload_len);
+        _set_payload(payload->data, payload_len);
 
-        pkt = gnrc_ipv6_hdr_build(pkt, NULL, &addr);
+        pkt = gnrc_ipv6_hdr_build(payload, NULL, &addr);
 
         if (pkt == NULL) {
             puts("error: packet buffer full");
+            gnrc_pktbuf_release(payload);
             continue;
         }
 
         if (src_iface != KERNEL_PID_UNDEF) {
-            pkt = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_netif_hdr_t),
+            payload = pkt;
+            pkt = gnrc_pktbuf_add(payload, NULL, sizeof(gnrc_netif_hdr_t),
                                   GNRC_NETTYPE_NETIF);
 
             if (pkt == NULL) {
                 puts("error: packet buffer full");
+                gnrc_pktbuf_release(payload);
                 continue;
             }
 
