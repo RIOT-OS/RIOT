@@ -63,7 +63,7 @@ get_os_info() {
         osname="$(sw_vers -productName)"
         osvers="$(sw_vers -productVersion)"
     fi
-    printf "%s %s" "$osname" "$osvers"
+    printf "%s %s" "$osname" "$osvers" | tr [:space:] " "
 }
 
 newlib_version() {
