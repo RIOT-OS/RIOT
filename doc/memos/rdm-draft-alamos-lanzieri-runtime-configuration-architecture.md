@@ -81,15 +81,17 @@ compliance.
 
 # 2. Architecture
 The proposed RCS architecture is formed by one or more
-[configuration managers](#4-configuration-managers) and the
-[RIOT Registry](#3-the-riot-registry) and its sub-components:
-one or more [Registry Handlers](#31-registry-handlers) and one or more
-[storage facilities](#32-storage-facilities).
+[Configuration Managers](#4-configuration-managers) and the
+[RIOT Registry](#3-the-riot-registry).
+
+The RIOT Registry acts as common interface to access Runtime Configurations and
+store them in non-volatile devices.
+
+All runtime configuration can be accessed either from the RIOT Application or
+the interfaces exposed by the Configuration Managers, via the RIOT Registry.
 
 A RIOT Application may interact with a Configuration Manager in order to
-modify access control rules or enable different communication interfaces.
-Also, it may interact with the RIOT Registry directly if it needs to load or
-store a persistent configuration.
+modify access control rules or enable different exposed interfaces.
 
 ![](./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/architecture.svg "Runtime Configuration Architecture")
 
@@ -98,10 +100,11 @@ The RIOT Registry is a module for interacting with
 **persistent key-value configurations**. It's heavily inspired by the
 [Mynewt Config subsystem](https://mynewt.apache.org/latest/os/modules/config/config.html)
 
-The Registry interacts with RIOT modules via Registry Handlers, and with
-non-volatile storage devices via Storage Facilities. This way the functionality
-if the Registry is independent of the functionality of the module or storage
-device.
+The RIOT Registry interacts with RIOT modules via
+[Registry Handlers](#31-Registry-handlers), and with non-volatile storage
+devices via [Storage Facilities](#32-Storage-facilities). This way the
+functionality if the RIOT Registry is independent of the functionality of the
+module or storage device.
 
 <img src="./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/riot-registry-diagram.svg" />
 
@@ -213,30 +216,45 @@ The following diagram shows these processes:
 <img src="./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/registry-storage.svg" />
 
 # 4. Configuration managers
-A configuration manager is a pseudo-module that allows a RIOT node to be
+Configuration managers are modules that allow a RIOT node to be
 configured from one or more communication interfaces. Examples of these
 communication interfaces could be UART, SPI or higher layers like PPP, IPv6,
 UDP, CoAP, etc.
 
 These are some examples of Configuration Managers:
+- [OMA LWM2M](https://www.omaspecworks.org/what-is-oma-specworks/iot/lightweight-m2m-lwm2m/)
+- [Newt Manager](https://mynewt.apache.org/master/os/modules/devmgmt/newtmgr.html)
+  via interfaces like NFC, BLE, Serial, etc.
 - A UART shell with special commands for interacting with configurations (CLI)
-- CoAP configuration resources
-- An NFC entrypoint for configuring RIOT from a master NFC device.
 
-A Configuration Manager may interact with the RIOT
-Registry for interacting with persistent configurations.
+A Configuration Manager may interact with the RIOT Registry to access Runtime
+Configurations.
 
-A Configuration Manager MAY take the form of any existing Device Management
-system like [Newt Manager](https://mynewt.apache.org/master/os/modules/devmgmt/newtmgr.html)
- or [OMA LWM2M](https://www.omaspecworks.org/what-is-oma-specworks/iot/lightweight-m2m-lwm2m/)
-
-A configuration manager SHOULD provide an access control mechanism for
-restricting access to configurations or restricting configuration interfaces.
-Extra security can be implemented in lower layers like the ones mentioned above
-(e.g CoAP and DTLS, CHAP on PPP, etc)
+If access control mechanisms are needed they have to be implemented by the
+Configuration Managers. Extra security can also be
+implemented in lower layers like the ones mentioned above (e.g CoAP and DTLS,
+CHAP on PPP, etc).
 
 The Configuration Manager API MUST provide helpers to modify access control
 settings as well as enabling/disabling communication interfaces.
+
+## 4.1 Configuration CLI
+As a simple Configuration Manager, the `Config CLI` is proposed. The main
+use cases for this implementation are prototyping (development or demos) and
+configuration bootstrapping (deployment).
+
+There are two commands to be implemented by the CLI:
+- `Read`: Read the current value of all or a specific configuration parameter
+- `Write`: Write a new value of a configuration parameter.
+
+| Command | On success | On failure |
+| :-----: | :--------: | :--------: |
+| `read` | List of parameters + Current values | - |
+| `read <parameter>` | Parameter + Current value | `ENOTFOUND` |
+| `write <parameter> <value>` | Parameter + Written value | `ENOTFOUND`, `EINVAL` |
+
+The serialization format for the responses and error codes is out of the scope
+of this document.
 
 ## Acknowledgements
 
@@ -245,6 +263,7 @@ settings as well as enabling/disabling communication interfaces.
 Force](https://github.com/RIOT-OS/RIOT/wiki/Configuration-Task-Force-(CTF))
 - [Mynewt OS config module
   documentation](https://mynewt.apache.org/latest/os/modules/config/config.html)
+- [Zephyr settings subsystem](https://docs.zephyrproject.org/latest/subsystems/settings/settings.html)
 - [Newt Manager](https://mynewt.apache.org/master/os/modules/devmgmt/newtmgr.html)
 - [OMA LWM2M](https://www.omaspecworks.org/what-is-oma-specworks/iot/lightweight-m2m-lwm2m/)
 
