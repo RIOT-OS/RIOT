@@ -1,0 +1,16 @@
+*** Settings ***
+Library     Process
+Library     OperatingSystem
+Library     String
+Library     Collections
+
+*** Variables ***
+${RIOTTOOLS}            %{RIOTBASE}/dist/tools
+
+*** Keywords ***
+Reset Application
+    [Documentation]     Reset the test application
+    [Arguments]         ${sleep_before}=3  ${sleep_after}=3
+    Sleep               ${sleep_before}
+    Run Process         make reset  shell=True  cwd=%{APPDIR}
+    Sleep               ${sleep_after}

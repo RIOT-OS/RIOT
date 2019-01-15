@@ -1,0 +1,45 @@
+*** Settings ***
+Library     String
+Library     Collections
+
+*** Keywords ***
+API Call Expect
+    [Documentation]     Fails if the result of the given ``call`` does not
+    ...                 match the expected outcome.
+    [Arguments]         ${expect}  ${call}  @{args}  &{kwargs}
+    ${RESULT}=          Run Keyword  ${call}  @{args}  &{kwargs}
+    Set Suite Variable  ${RESULT}
+    Should Contain      ${RESULT['result']}  ${expect}
+
+API Call Should Succeed
+    [Documentation]     Fails if the given API ``call`` does not succeed.
+    [Arguments]         ${call}  @{args}  &{kwargs}
+    API Call Expect     Success  ${call}  @{args}  &{kwargs}
+
+API Call Should Timeout
+    [Documentation]     Fails if the given API ``call`` does not timeout.
+    [Arguments]         ${call}  @{args}  &{kwargs}
+    API Call Expect     Timeout  ${call}  @{args}  &{kwargs}
+
+API Call Should Error
+    [Documentation]     Fails if the given API ``call`` does not fail.
+    [Arguments]         ${call}  @{args}  &{kwargs}
+    API Call Expect     Error  ${call}  @{args}  &{kwargs}
+
+API Call Get Result As Integer
+    [Documentation]     Return result of last API call as an integer
+    ${ret}=             Convert to Integer  ${RESULT['data'][0]}
+    [Return]            ${ret}
+
+Repeat API Call on Timeout
+    [Documentation]     Repeats the given API ``call`` up to 5 times on timeout.
+    [Arguments]         ${call}  @{args}  &{kwargs}
+    :FOR    ${i}    IN RANGE  0  5
+    \   Run Keyword And Ignore Error  API Call Should Timeout  ${call}  @{args}  &{kwargs}
+    \   Run Keyword If  "${RESULT['result']}"!="Timeout"  Exit For Loop
+    Should Contain      ${RESULT['result']}   Success
+
+DUT Must Have API Firmware
+    [Documentation]     Verify that the DUT runs the required API test firmware
+    API Call Should Succeed  Get Metadata
+    Should Contain      ${RESULT['msg']}  %{APPLICATION}
