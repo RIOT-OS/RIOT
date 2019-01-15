@@ -92,10 +92,12 @@ void i2c_init(i2c_t dev)
         case I2C_SPEED_NORMAL:
             /* 100Kbit/s */
             ccr = i2c_config[dev].clk / 200000;
+            ccr &= ~I2C_CCR_FS;
             break;
 
         case I2C_SPEED_FAST:
             ccr = i2c_config[dev].clk / 800000;
+            ccr |= I2C_CCR_FS;
             break;
 
         default:
