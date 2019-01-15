@@ -7,4 +7,6 @@ FEATURES_REQUIRED = periph_i2c
 
 USEMODULE += shell
 
+CFLAGS += -DRIOT_APPLICATION=\"$(APPLICATION)\"
+
 include $(RIOTBASE)/Makefile.include

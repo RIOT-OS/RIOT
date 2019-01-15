@@ -437,11 +437,13 @@ int cmd_i2c_get_devs(int argc, char **argv)
     return 0;
 }
 
-int cmd_i2c_get_id(int argc, char **argv)
+int cmd_get_metadata(int argc, char **argv)
 {
     (void)argv;
     (void)argc;
-    puts("Success: [periph_i2c]");
+
+    printf("Success: [%s, %s]\n", RIOT_BOARD, RIOT_APPLICATION);
+
     return 0;
 }
 
@@ -457,7 +459,7 @@ static const shell_command_t shell_commands[] = {
     { "i2c_write_reg", "Write byte to register", cmd_i2c_write_reg },
     { "i2c_write_regs", "Write bytes to registers", cmd_i2c_write_regs },
     { "i2c_get_devs", "Gets amount of supported i2c devices", cmd_i2c_get_devs },
-    { "i2c_get_id", "Get the id of the fw", cmd_i2c_get_id },
+    { "get_metadata", "Get the metadata of the test firmware", cmd_get_metadata },
     { NULL, NULL, NULL }
 };
 

@@ -7,14 +7,17 @@
 This module handles parsing of information from RIOT periph_i2c test.
 """
 import logging
-try:
-    from riot_pal import DutShell
-except ImportError:
-    raise ImportError('Cannot find riot_pal, try "pip install riot_pal"')
+
+from riot_pal import DutShell
+from robot.version import get_version
 
 
-class PeriphI2CIf(DutShell):
+class I2Cdevice(DutShell):
     """Interface to the a node with periph_i2c firmware."""
+
+    ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
+    ROBOT_LIBRARY_VERSION = get_version()
+
     FW_ID = 'periph_i2c'
     DEFAULT_DEV = 0
     DEFAULT_ADDR = 85
@@ -95,15 +98,15 @@ class PeriphI2CIf(DutShell):
         """Gets amount of supported i2c devices."""
         return self.send_cmd('i2c_get_devs')
 
-    def i2c_get_id(self):
-        """Get the id of the fw."""
-        return self.send_cmd('i2c_get_id')
+    def get_metadata(self):
+        """Get the metadata of the firmware."""
+        return self.send_cmd('get_metadata')
 
     def get_command_list(self):
         """List of all commands."""
         cmds = list()
+        cmds.append(self.get_metadata)
         cmds.append(self.i2c_get_devs)
-        cmds.append(self.i2c_get_id)
         cmds.append(self.i2c_acquire)
         cmds.append(self.i2c_read_reg)
         cmds.append(self.i2c_read_regs)
@@ -122,7 +125,7 @@ def main():
 
     logging.getLogger().setLevel(logging.DEBUG)
     try:
-        i2c = PeriphI2CIf()
+        i2c = I2Cdevice()
         cmds = i2c.get_command_list()
         logging.debug("======================================================")
         for cmd in cmds:

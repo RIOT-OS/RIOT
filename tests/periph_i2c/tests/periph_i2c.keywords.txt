@@ -1,0 +1,12 @@
+*** Settings ***
+Library             I2Cdevice  port=%{PORT}  baudrate=%{BAUD}  timeout=${10}
+
+Resource            api_shell.keywords.txt
+Resource            philip.keywords.txt
+
+*** Keywords ***
+I2C Write Bytes To Register Should Succeed
+    [Arguments]                 ${reg}  ${data}  ${len}
+    API Call Should Succeed     I2C Write Regs  reg=${reg}  data=${data}
+    API Call Should Succeed     I2C Read Bytes  leng=${len}
+    Should Be Equal             ${RESULT['data']}  ${data}
