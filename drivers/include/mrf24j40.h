@@ -169,14 +169,15 @@ void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params);
 void mrf24j40_reset(mrf24j40_t *dev);
 
 /**
- * @brief   Trigger a clear channel assessment
+ * @brief   Trigger a clear channel assessment & retrieve RSSI
  *
  * @param[in] dev           device to use
+ * @param[in] rssi          RSSI value from register in dBm
  *
  * @return                  true if channel is clear
  * @return                  false if channel is busy
  */
-bool mrf24j40_cca(mrf24j40_t *dev);
+bool mrf24j40_cca(mrf24j40_t *dev, int8_t *rssi);
 
 /**
  * @brief   Get the short address of the given device
