@@ -74,16 +74,12 @@ extern "C" {
  */
 #ifdef MODULE_PERIPH_DMA
 static const dma_conf_t dma_config[] = {
-    { .stream = 1 },    /* DMA1 Channel 2 - SPI1_RX */
-    { .stream = 2 },    /* DMA1 Channel 3 - SPI1_TX */
     { .stream = 3 },    /* DMA1 Channel 4 - USART1_TX */
     { .stream = 5 },    /* DMA1 Channel 6 - USART2_TX */
 };
 
-#define DMA_0_ISR  isr_dma1_channel2
-#define DMA_1_ISR  isr_dma1_channel3
-#define DMA_2_ISR  isr_dma1_channel4
-#define DMA_3_ISR  isr_dma1_channel6
+#define DMA_0_ISR  isr_dma1_channel4
+#define DMA_1_ISR  isr_dma1_channel6
 
 #define DMA_NUMOF           (sizeof(dma_config) / sizeof(dma_config[0]))
 #endif
@@ -129,7 +125,7 @@ static const uart_conf_t uart_config[] = {
         .bus      = APB2,
         .irqn     = USART1_IRQn,
 #ifdef MODULE_PERIPH_DMA
-        .dma        = 2,
+        .dma        = 0,
         .dma_chan   = 2
 #endif
     },
@@ -141,7 +137,7 @@ static const uart_conf_t uart_config[] = {
         .bus      = APB1,
         .irqn     = USART2_IRQn,
 #ifdef MODULE_PERIPH_DMA
-        .dma        = 3,
+        .dma        = 1,
         .dma_chan   = 2
 #endif
     }
