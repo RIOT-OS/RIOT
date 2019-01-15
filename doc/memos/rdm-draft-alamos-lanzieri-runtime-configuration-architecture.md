@@ -80,13 +80,13 @@ technologies in RIOT (network stack, storage interface) and standards
 compliance.
 
 # 2. Architecture
-The proposed RCS architecture is formed by a
-[configuration manager](#4-configuration-manager) and the
+The proposed RCS architecture is formed by one or more
+[configuration managers](#4-configuration-managers) and the
 [RIOT Registry](#3-the-riot-registry) and its sub-components:
 one or more [Registry Handlers](#31-registry-handlers) and one or more
 [storage facilities](#32-storage-facilities).
 
-A RIOT Application may interact with the Configuration Manager in order to
+A RIOT Application may interact with a Configuration Manager in order to
 modify access control rules or enable different communication interfaces.
 Also, it may interact with the RIOT Registry directly if it needs to load or
 store a persistent configuration.
@@ -115,10 +115,10 @@ The API of the RIOT Registry allows to:
   device
 
 Any mechanism of security (access control, encryption of configurations) is NOT
-directly in the scope of the Registry but in the Configuration Manager and the
+directly in the scope of the Registry but in the Configuration Managers and the
 specific implementation of the RH and SF.
 
-See [3.3 RIOT Registry Usage Flow](#3.3. RIOT Registry Usage Flow) for more
+See [3.3 RIOT Registry Usage Flow](#33-RIOT-Registry-Usage-Flow) for more
 information.
 
 ## 3.1. Registry handlers
@@ -142,7 +142,7 @@ be used for printing out all configurations, saving them in a persistent
 storage, etc.
 
 A conceptual example of a RH implementation can be found in the
-Appendix.
+[Appendix](#Appendix).
 
 ## 3.2. Storage facilities
 Storage facilities MUST implement the **storage
@@ -169,19 +169,19 @@ required to migrate the data between storage facilities (e.g to migrate all
 configurations from SF A to B, register B as source and destination and add
 A as a source).
 
-A conceptual example of a SF can be found in the Appendix.
+A conceptual example of a SF can be found in the [Appendix](#Appendix).
 
 ## 3.3. RIOT Registry Usage Flow
 
 ### Registry Initialization
 Modules declare and register **RH** for configuration groups
 in the RIOT Registry. **Storage facilities** are registered as sources and/or
- destinations of configurations in the RIOT Registry.
+destinations of configurations in the RIOT Registry.
 
 <img align="center" src="./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/registry-boot.svg" width="300" />
 
 ### Get, set, apply and export configurations
-At any time, the application or the configuration manager can _retrieve_ a
+At any time, the application or a configuration manager can _retrieve_ a
 configuration value (`registry_get_value`), _set_ a configuration value
 (`registry_set_value`), _apply_ configuration changes (`registry_commit`) or
 _export_ configurations using a user-defined callback function
@@ -199,7 +199,7 @@ _Application_ configuration group with a `foo` configuration parameter.
 <img src="./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/registry-rh.svg" />
 
 ### Load and store configurations
-At any time, the application or the configuration manager can _load_ all
+At any time, the application or a configuration manager can _load_ all
 configurations from all SF sources (`registry_load` function) or
 _store_ them in the SF destination (`registry_store` function).
 
@@ -212,26 +212,25 @@ The following diagram shows these processes:
 
 <img src="./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/registry-storage.svg" />
 
-# 4. Configuration manager
-The configuration manager is a pseudo-module that allows a RIOT node to be
+# 4. Configuration managers
+A configuration manager is a pseudo-module that allows a RIOT node to be
 configured from one or more communication interfaces. Examples of these
 communication interfaces could be UART, SPI or higher layers like PPP, IPv6,
-UDP, CoAP, etc. 
+UDP, CoAP, etc.
 
-These are some examples of configuration mechanisms that could be provided by 
-the Configuration Manager
-- A UART shell with special commands for interacting with configurations
+These are some examples of Configuration Managers:
+- A UART shell with special commands for interacting with configurations (CLI)
 - CoAP configuration resources
 - An NFC entrypoint for configuring RIOT from a master NFC device.
 
-The Configuration Manager may interact with the RIOT
+A Configuration Manager may interact with the RIOT
 Registry for interacting with persistent configurations.
 
-The Configuration Manager MAY be replaced by any existing Device Management
+A Configuration Manager MAY take the form of any existing Device Management
 system like [Newt Manager](https://mynewt.apache.org/master/os/modules/devmgmt/newtmgr.html)
  or [OMA LWM2M](https://www.omaspecworks.org/what-is-oma-specworks/iot/lightweight-m2m-lwm2m/)
 
-The configuration manager SHOULD provide an access control mechanism for
+A configuration manager SHOULD provide an access control mechanism for
 restricting access to configurations or restricting configuration interfaces.
 Extra security can be implemented in lower layers like the ones mentioned above
 (e.g CoAP and DTLS, CHAP on PPP, etc)
