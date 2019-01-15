@@ -580,6 +580,15 @@ test: $(TEST_DEPS)
 test/available:
 	$(Q)test -n "$(strip $(TESTS))"
 
+# this target only makes sense if an ELFFILE is actually created, thus guard by
+# RIOTNOLINK="".
+ifeq (,$(RIOTNOLINK))
+test-input-hash: $(TESTS) $(ELFFILE)
+	sha1sum $^ > $(BINDIR)/test-input-hash.sha1
+else
+test-input-hash:
+	true
+endif
 
 # Default OBJDUMPFLAGS for platforms which do not specify it:
 OBJDUMPFLAGS ?= -S -D -h
