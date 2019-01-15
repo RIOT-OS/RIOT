@@ -40,7 +40,7 @@ get_kernel_info() {
 
 have_lsb_release() {
     lsb_release >/dev/null 2>&1
-    if [ $? == 127 ] ; then
+    if [ $? -eq 127 ] ; then
         return 1
     else
         return 0
