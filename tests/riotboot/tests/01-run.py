@@ -11,9 +11,9 @@ from testrunner import run
 
 
 def testfunc(child):
-    # Ask for current slot, should be 0 (riotboot slot)
+    # Ask for current slot, should be 0 or 1
     child.sendline("curslotnr")
-    child.expect_exact("Current slot=0")
+    child.expect("Current slot=[0-1]")
     child.expect('>')
 
     # Ask for current slot header info and checks for basic output integrity

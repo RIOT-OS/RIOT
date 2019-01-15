@@ -27,14 +27,29 @@
 
 void kernel_init(void)
 {
-    /* bootloader boots only slot 0 if it is valid */
-    unsigned slot = 0;
+    uint32_t version = 0;
+    int slot = -1;
 
-    if (riotboot_slot_validate(slot) == 0) {
+    for (unsigned i = 0; i < riotboot_slot_numof; i++) {
+        const riotboot_hdr_t *riot_hdr = riotboot_slot_get_hdr(i);
+        if (riotboot_slot_validate(i)) {
+            /* skip slot if metadata broken */
+            continue;
+        }
+        if (riot_hdr->start_addr != riotboot_slot_get_image_startaddr(i)) {
+            continue;
+        }
+        if (slot == -1 || riot_hdr->version > version) {
+            version = riot_hdr->version;
+            slot = i;
+        }
+    }
+
+    if (slot != -1) {
         riotboot_slot_jump(slot);
     }
 
-    /* serious trouble! */
+    /* serious trouble! nothing to boot */
     while (1) {}
 }
 

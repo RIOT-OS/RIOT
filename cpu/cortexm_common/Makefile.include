@@ -29,6 +29,10 @@ LINKFLAGS += $(if $(FW_ROM_LEN),$(LINKFLAGPREFIX)--defsym=_fw_rom_length=$(FW_RO
 # Configure riotboot bootloader and slot lengths
 # 4KB are currently enough
 RIOTBOOT_LEN ?= 0x1000
-# Take the whole flash minus RIOTBOOT_LEN
-SLOT0_LEN ?= $(shell printf "0x%x" $$(($(ROM_LEN:%K=%*1024)-$(RIOTBOOT_LEN))))
+# Currently 2 slots are supported by default, equals in length
+NUM_SLOTS ?= 2
+# Take the whole flash minus RIOTBOOT_LEN and divide it by NUM_SLOTS
+SLOT0_LEN ?= $(shell printf "0x%x" $$((($(ROM_LEN:%K=%*1024)-$(RIOTBOOT_LEN)) / $(NUM_SLOTS))))
+SLOT1_LEN ?= $(SLOT0_LEN)
 SLOT0_LEN := $(SLOT0_LEN)
+SLOT1_LEN := $(SLOT1_LEN)
