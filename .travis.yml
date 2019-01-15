@@ -6,9 +6,9 @@ services:
   - docker
 
 before_install:
-  - docker pull riot/riotbuild
+  - docker pull jcarrano/riotdocker
 
 script:
   - docker run -a STDIN -a STDOUT -a STDERR --rm -u "$(id -u)"
       -v "${PWD}:/data/riotbuild" -v /etc/localtime:/etc/localtime:ro
-      riot/riotbuild make static-test
+      jcarrano/riotdocker make static-test
