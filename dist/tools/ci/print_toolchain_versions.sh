@@ -38,13 +38,27 @@ get_kernel_info() {
     uname -mprs
 }
 
+have_lsb_release() {
+    lsb_release >/dev/null 2>&1
+    if [ $? == 127 ] ; then
+        return 1
+    else
+        return 0
+    fi
+}
+
 get_os_info() {
     local os="$(uname -s)"
     local osname="unknown"
     local osvers="unknown"
     if [ "$os" = "Linux" ]; then
-        osname="$(cat /etc/os-release | grep ^NAME= | awk -F'=' '{print $2}')"
-        osvers="$(cat /etc/os-release | grep ^VERSION= | awk -F'=' '{print $2}')"
+        if have_lsb_release ; then
+            osname="$(lsb_release -si)"
+            osvers="$(lsb_release -src)"
+        else
+            osname="Unknown Linux"
+            osvers="(please install lsb_release)"
+        fi
     elif [ "$os" = "Darwin" ]; then
         osname="$(sw_vers -productName)"
         osvers="$(sw_vers -productVersion)"
