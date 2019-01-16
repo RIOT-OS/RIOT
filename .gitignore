@@ -9,6 +9,8 @@ doc/doxygen/*.db
 doc/doxygen/*.tmp
 # Built binaries
 *bin
+# Build directory
+/build
 # Backup files
 *~
 *.orig

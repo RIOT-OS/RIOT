@@ -108,14 +108,18 @@ ETC_LOCALTIME = $(realpath /etc/localtime)
 # hardware which may not be reachable from inside the container.
 ..in-docker-container:
 	@$(COLOR_ECHO) '$(COLOR_GREEN)Launching build container using image "$(DOCKER_IMAGE)".$(COLOR_RESET)'
+	@# HACK: Handle directory creation here until it is provided globally
+	$(Q)mkdir -p $(BUILD_DIR)
 	$(DOCKER) run $(DOCKER_FLAGS) -t -u "$$(id -u)" \
 	    -v '$(RIOTBASE):$(DOCKER_BUILD_ROOT)/riotbase' \
+	    -v '$(BUILD_DIR):$(DOCKER_BUILD_ROOT)/build' \
 	    -v '$(RIOTCPU):$(DOCKER_BUILD_ROOT)/riotcpu' \
 	    -v '$(RIOTBOARD):$(DOCKER_BUILD_ROOT)/riotboard' \
 	    -v '$(RIOTMAKE):$(DOCKER_BUILD_ROOT)/riotmake' \
 	    -v '$(RIOTPROJECT):$(DOCKER_BUILD_ROOT)/riotproject' \
 	    -v '$(ETC_LOCALTIME):/etc/localtime:ro' \
 	    -e 'RIOTBASE=$(DOCKER_BUILD_ROOT)/riotbase' \
+	    -e 'BUILD_DIR=$(DOCKER_BUILD_ROOT)/build' \
 	    -e 'CCACHE_BASEDIR=$(DOCKER_BUILD_ROOT)/riotbase' \
 	    -e 'RIOTCPU=$(DOCKER_BUILD_ROOT)/riotcpu' \
 	    -e 'RIOTBOARD=$(DOCKER_BUILD_ROOT)/riotboard' \
