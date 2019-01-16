@@ -46,8 +46,9 @@
     2. [SPIFFS Device](#esp32_spiffs_device)
 8. [Network Interfaces](#esp32_network_interfaces)
     1. [Ethernet MAC Network Interface](#esp32_ethernet_network_interface)
-    2. [ESP-NOW Network Interface](#esp32_esp_now_network_interface)
-    3. [Other Network Devices](#esp32_other_network_devices)
+    2. [WiFi Network Interface](#esp32_wifi_network_interface)
+    3. [ESP-NOW Network Interface](#esp32_esp_now_network_interface)
+    4. [Other Network Devices](#esp32_other_network_devices)
 10. [Application-Specific Configurations](#esp32_application_specific_configurations)
     1. [Make Variable ```CONFIGS```](#esp32_config_make_variable)
     2. [Application-Specific Board Configuration](#esp32_application_specific_board_configuration)
@@ -108,8 +109,8 @@ The following table gives a short reference  in alphabetical order of modules th
 
 Module    | Default  | Short description
 ----------|----------|-------------------
-[esp_can](#esp32_can_interfaces) | not used | enable the ESP32 CAN device
-[esp_eth](#esp32_ethernet_network_interface) | not used | enable the ESP32 EMAC network device
+[esp_can](#esp32_can_interfaces) | not used | enable the CAN device
+[esp_eth](#esp32_ethernet_network_interface) | not used | enable the Ethernet MAC (EMAC) network device
 [esp_gdb](#esp32_debugging) | not used | enable the compilation with debug information for debugging
 [esp_hw_counter](#esp32_timers) | not used | use hardware counters for RIOT timers
 [esp_i2c_hw](#esp32_i2c_interfaces) | not used  | use the i2C hardware implementation
@@ -117,6 +118,7 @@ Module    | Default  | Short description
 [esp_now](#esp32_esp_now_network_interface) | not used  | enable the ESP-NOW network device
 [esp_spi_ram](#esp32_spi_ram) | not used |  enable SPI RAM
 [esp_spiffs](#esp32_spiffs_device) | not used  |  enable SPIFFS for on-board flash memory
+[esp_wifi](#esp32_wifi_network_interface) | not used  | enable the Wifi network device
 
 </center>
 
@@ -390,14 +392,15 @@ Optional features of ESP32 can be enabled by ```USEMODULE``` definitions in the 
 
 Module | Description
 -------|------------
-esp_now | Use the built-in WiFi module with the ESP-NOW protocol as ```netdev``` network device, see section [ESP-NOW Network Interface](#esp32_esp_now_network_interface).
-esp_eth | Use the Ethernet MAC (EMAC) interface as ```netdev``` network device, see section [Ethernet Network Interface](#esp32_ethernet_network_interface).
+esp_can | Enable the CAN device, see section [CAN Interfaces](#esp32_can_interfaces).
+esp_eth | Enable the Ethernet MAC (EMAC) interface as `netdev` network device, see section [Ethernet Network Interface](#esp32_ethernet_network_interface).
 esp_gdb | Enable the compilation with debug information for debugging with [QEMU and GDB](#esp32_qemu_mode_and_gdb) (```QEMU=1```) or via [JTAG interface with OpenOCD](#esp32_jtag_debugging).
 esp_i2c_hw | Use the hardware I2C implementation, see section [I2C Interfaces](#esp32_i2c_interfaces).
 esp_idf_heap | Use the ESP-IDF heap implementation, see section [ESP-IDF Heap Implementation](#esp32_esp_idf_heap_implementation).
+esp_now | Enable the built-in WiFi module with the ESP-NOW protocol as `netdev` network device, see section [ESP-NOW Network Interface](#esp32_esp_now_network_interface).
 esp_spiffs  | Enable the optional SPIFFS drive in on-board flash memory, see section [SPIFFS Device](#esp32_spiffs_device).
 esp_spi_ram | Enable the optional SPI RAM, see section [SPI RAM Modules](#esp32_spi_ram).
-esp_can | Enable the ESP32 CAN device, see section [CAN Interfaces](#esp32_can_interfaces).
+esp_wifi | Use the built-in WiFi module as `netdev` network device, see section [WiFi Network Interface](#esp32_wifi_network_interface).
 
 </center>
 
@@ -906,6 +909,50 @@ Otherwise, the application has to add the ```esp_eth``` module in its makefile w
 @note
 The board has to have one of the supported PHY modules to be able to use the Ethernet MAC module.
 
+\anchor esp32_wifi_network_interface
+## <a name="esp32_wifi_network_interface"> WiFi Network Interface </a> &nbsp;[[TOC](#esp32_toc)]
+
+The RIOT port for ESP32 implements in module `esp_wifi` a `netdev` driver for
+the built-in WiFi interface.
+
+@note Due to symbol conflicts with the `crypto` and `hash` modules of RIOT
+in module `esp_idf_wpa_supplicant_crypto`, which is required by module
+`esp_wifi`, `esp_wifi` cannot be used for applications that use these modules.
+Therefore, module `esp_wifi` is not automatically enabled when module
+`netdev_default` is used. Instead, if necessary, the application has to add
+the module `esp_wifi` in the Makefile.
+
+```
+USEMODULE += esp_wifi
+```
+
+Furthermore, the following configuration parameters have to be defined:
+
+<center>
+
+Parameter          | Default                   | Description
+:------------------|:--------------------------|:------------
+ESP_WIFI_SSID      | "RIOT_AP"                 | SSID of the AP to be used.
+ESP_WIFI_PASS      | "ThisistheRIOTporttoESP"  | Passphrase used for the AP as clear text (max. 64 chars).
+ESP_WIFI_STACKSIZE | #THREAD_STACKSIZE_DEFAULT |Stack size used for the WiFi netdev driver thread.
+
+</center>
+
+These configuration parameter definitions, as well as enabling the `esp_wifi`
+module, can be done either in the makefile of the project or at make command
+line, e.g.:
+
+```
+USEMODULE=esp_wifi \
+CFLAGS='-DESP_WIFI_SSID=\"MySSID\" -DESP_WIFI_PASS=\"MyPassphrase\"' \
+make -C examples/gnrc_networking BOARD=...
+```
+
+@note The Wifi network interface (module `esp_wifi`) and the
+[ESP-NOW network interface](#esp32_esp_now_network_interface) (module `esp_now`)
+can be used simultaneously, for example, to realize a border router for
+a mesh network which uses ESP-NOW.
+
 \anchor esp32_esp_now_network_interface
 ## <a name="esp32_esp_now_network_interface"> ESP-NOW Network Interface </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -927,12 +974,16 @@ The following parameters are defined for ESP-NOW nodes. These parameters can be 
 Parameter | Default | Description
 :---------|:--------|:-----------
 ESP_NOW_SCAN_PERIOD | 10000000UL | Defines the period in us at which an node scans for other nodes in its range. The default period is 10 s.
-ESP_NOW_SOFT_AP_PASSPHRASE | ThisistheRIOTporttoESP | Defines the passphrase (max. 64 chars) that is used for the SoftAP interface of an nodes. It has to be same for all nodes in one network.
+ESP_NOW_SOFT_AP_PASS | "ThisistheRIOTporttoESP" | Defines the passphrase as clear text (max. 64 chars) that is used for the SoftAP interface of ESP-NOW nodes. It has to be same for all nodes in one network.
 ESP_NOW_CHANNEL | 6 | Defines the channel that is used as the broadcast medium by all nodes together.
 ESP_NOW_KEY | NULL | Defines a key that is used for encrypted communication between nodes. If it is NULL, encryption is disabled. The key has to be of type ```uint8_t[16]``` and has to be exactly 16 bytes long.
 
 </center>
 
+@note The ESP-NOW network interface (module `esp_now`) and the
+[Wifi network interface](#esp32_wifi_network_interface) (module `esp_wifi`)
+can be used simultaneously, for example, to realize a border router for
+a mesh network which uses ESP-NOW.
 
 ## <a name="esp32_other_network_devices"> Other Network Devices </a> &nbsp;[[TOC](#esp32_toc)]
 
