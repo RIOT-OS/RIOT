@@ -471,7 +471,12 @@ static const u32 Td0[256] = {
     #define Td1(n)  ((Td0[n] >>  8) | (Td0[n] << 24))
     #define Td2(n)  ((Td0[n] >> 16) | (Td0[n] << 16))
     #define Td3(n)  ((Td0[n] >> 24) | (Td0[n] <<  8))
-    #define Td4(n)  (Td4[n] | (Td4[n] << 8) | (Td4[n] << 16) | (Td4[n] << 24))
+
+    /* helper to prevent the u8 to be promoted to signed int, which would turn
+     * left shift by 24 into undefined behaviour */
+    #define Td4u(n) ((u32)Td4[n])
+
+    #define Td4(n)  (Td4u(n) | (Td4u(n) << 8) | (Td4u(n) << 16) | (Td4u(n)  << 24))
 
 static const u8 Td4[256] = {
     0x52U, 0x09U, 0x6aU, 0xd5U, 0x30U, 0x36U, 0xa5U, 0x38U,
