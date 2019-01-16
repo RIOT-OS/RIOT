@@ -1,4 +1,5 @@
 DEVELHELP=0
+
 include ../Makefile.tests_common
 
 USEMODULE += shell
@@ -11,5 +12,9 @@ DISABLE_MODULE += auto_init
 BOARD_BLACKLIST += chronos
 
 TEST_ON_CI_WHITELIST += all
+
+ifneq ($(BOARD), native)
+	TERMPROG=$(abspath miniterm.sh)
+endif
 
 include $(RIOTBASE)/Makefile.include

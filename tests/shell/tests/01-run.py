@@ -7,6 +7,7 @@
 # directory for more details.
 
 import sys
+import os
 from testrunner import run
 
 
@@ -26,6 +27,16 @@ EXPECTED_PS = (
     '\t  2 | running  Q |   7'
 )
 
+# In native we are directly executing the binary (no terminal program). We must
+# therefore use Ctrl-V (DLE or "data link escape") before Ctrl-C to send a
+# literal ETX instead of SIGINT.
+# When using a board (with miniterm.py) it is not a problem.
+
+if os.environ['BOARD'] == 'native':
+    CONTROL_C = '\x16\x03'
+else:
+    CONTROL_C = '\x03'
+
 CMDS = (
     ('start_test', ('[TEST_START]')),
     ('end_test', ('[TEST_END]')),
@@ -37,7 +48,10 @@ CMDS = (
     ('help', EXPECTED_HELP),
     ('echo a string', ('\"echo\"\"a\"\"string\"')),
     ('ps', EXPECTED_PS),
-    ('reboot', ('test_shell.'))
+    ('reboot', ('test_shell.')),
+    (CONTROL_C, ('shell exited (1)')),
+    ('echo', ('"echo"')),
+    ('\x04', ('shell exited (2)'))
 )
 
 
