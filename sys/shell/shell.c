@@ -33,6 +33,8 @@
 #include "shell_commands.h"
 
 #define ETX '\x03'  /** ASCII "End-of-Text", or ctrl-C */
+#define EOT '\x04'  /** ASCII "End-of-Transmission", or ctrl-D */
+
 #if !defined(SHELL_NO_ECHO) || !defined(SHELL_NO_PROMPT)
 #ifdef MODULE_NEWLIB
 /* use local copy of putchar, as it seems to be inlined,
@@ -237,7 +239,7 @@ static int readline(char *buf, size_t size)
         }
 
         int c = getchar();
-        if (c < 0) {
+        if (c < 0 || c == EOT) {
             return EOF;
         }
 
