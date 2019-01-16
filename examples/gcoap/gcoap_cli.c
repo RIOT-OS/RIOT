@@ -243,7 +243,14 @@ int gcoap_cli_cmd(int argc, char **argv)
         ((argc == apos + 4) && (code_pos != 0))) {
         gcoap_req_init(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE, code_pos+1, argv[apos+2]);
         if (argc == apos + 4) {
-            memcpy(pdu.payload, argv[apos+3], strlen(argv[apos+3]));
+            /* must be 'greater than' to account for payload marker byte */
+            if (pdu.payload_len > strlen(argv[apos+3])) {
+                memcpy(pdu.payload, argv[apos+3], strlen(argv[apos+3]));
+            }
+            else {
+                puts("gcoap_cli: msg buffer too small");
+                return 1;
+            }
         }
         coap_hdr_set_type(pdu.hdr, msg_type);
 
