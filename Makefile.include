@@ -269,6 +269,9 @@ TOOLCHAINS_SUPPORTED ?= gnu
 # Import all toolchain settings
 include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 
+# include undefined behaviour sanitizer (UBSAN) support
+include $(RIOTMAKE)/ubsan.inc.mk
+
 # Tell ccache to pass the original file to the compiler, instead of passing the
 # preprocessed code. Without this setting, the compilation will fail with
 # -Wimplicit-fallthrough warnings even when the fall through case is properly
