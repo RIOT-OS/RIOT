@@ -30,18 +30,6 @@
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
-/**
- * @brief   Determines supposed link-layer address from interface and option
- *          length
- *
- * @param[in] netif A network interface.
- * @param[in] opt   A SL2AO or TL2AO.
- *
- * @return  The length of the L2 address carried in @p opt.
- */
-static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
-                                       const ndp_opt_t *opt);
-
 void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
              const ipv6_addr_t *src, const ipv6_addr_t *dst)
 {
@@ -104,10 +92,10 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 {
     assert(netif != NULL);
     _nib_onl_entry_t *nce = _nib_onl_get(&ipv6->src, netif->pid);
-    unsigned l2addr_len;
+    int l2addr_len;
 
-    l2addr_len = _get_l2addr_len(netif, sl2ao);
-    if (l2addr_len == 0U) {
+    l2addr_len = gnrc_netif_ndp_addr_len_from_l2ao(netif, sl2ao);
+    if (l2addr_len < 0) {
         DEBUG("nib: Unexpected SL2AO length. Ignoring SL2AO\n");
         return;
     }
@@ -171,43 +159,6 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             memcpy(nce->l2addr, sl2ao + 1, l2addr_len);
         }
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
-    }
-}
-
-static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
-                                       const ndp_opt_t *opt)
-{
-    switch (netif->device_type) {
-#ifdef MODULE_CC110X
-        case NETDEV_TYPE_CC110X:
-            (void)opt;
-            return sizeof(uint8_t);
-#endif  /* MODULE_CC110X */
-#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW)
-        case NETDEV_TYPE_ETHERNET:
-        case NETDEV_TYPE_ESP_NOW:
-            (void)opt;
-            return ETHERNET_ADDR_LEN;
-#endif  /* defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) */
-#ifdef MODULE_NRFMIN
-        case NETDEV_TYPE_NRFMIN:
-            (void)opt;
-            return sizeof(uint16_t);
-#endif  /* MODULE_NRFMIN */
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
-        case NETDEV_TYPE_IEEE802154:
-            switch (opt->len) {
-                case 1U:
-                    return IEEE802154_SHORT_ADDRESS_LEN;
-                case 2U:
-                    return IEEE802154_LONG_ADDRESS_LEN;
-                default:
-                    return 0U;
-            }
-#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
-        default:
-            (void)opt;
-            return 0U;
     }
 }
 
@@ -379,13 +330,13 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
 void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
                     const icmpv6_hdr_t *icmpv6, const ndp_opt_t *tl2ao)
 {
-    unsigned l2addr_len = 0;
+    int l2addr_len = 0;
 
     assert(nce != NULL);
     assert(netif != NULL);
     if (tl2ao != NULL) {
-        l2addr_len = _get_l2addr_len(netif, tl2ao);
-        if (l2addr_len == 0U) {
+        l2addr_len = gnrc_netif_ndp_addr_len_from_l2ao(netif, tl2ao);
+        if (l2addr_len < 0) {
             DEBUG("nib: Unexpected TL2AO length. Ignoring TL2AO\n");
             return;
         }

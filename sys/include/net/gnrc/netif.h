@@ -46,6 +46,7 @@
 #endif
 #include "net/ndp.h"
 #include "net/netdev.h"
+#include "net/netopt.h"
 #include "rmutex.h"
 
 #ifdef __cplusplus
