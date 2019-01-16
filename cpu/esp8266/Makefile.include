@@ -33,6 +33,12 @@ ifneq (, $(filter esp_sw_timer, $(USEMODULE)))
     USEMODULE += esp_sdk
 endif
 
+ifneq (, $(filter esp_now esp_wifi, $(USEMODULE)))
+    $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
+    USEMODULE += esp_sdk
+    USEMODULE += netopt
+endif
+
 ifneq (, $(filter esp_gdbstub, $(USEMODULE)))
     USEMODULE += esp_gdb
 endif

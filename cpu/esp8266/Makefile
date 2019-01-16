@@ -7,4 +7,8 @@ DIRS += periph
 DIRS += sdk
 DIRS += vendor
 
+ifneq (, $(filter esp_wifi, $(USEMODULE)))
+    DIRS += esp-wifi
+endif
+
 include $(RIOTBASE)/Makefile.base

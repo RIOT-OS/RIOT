@@ -10,6 +10,12 @@ ifneq (, $(filter esp_spiffs, $(USEMODULE)))
     USEMODULE += vfs
 endif
 
+ifneq (, $(filter esp_wifi, $(USEMODULE)))
+    CFLAGS += -DLWIP_OPEN_SRC
+    LINKFLAGS += -Wl,-wrap=ethernet_input
+    USEMODULE += netdev_eth
+endif
+
 ifneq (, $(filter lua, $(USEPKG)))
     USEMODULE += newlib_syscalls_default
     USEMODULE += xtimer
