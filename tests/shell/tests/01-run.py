@@ -27,6 +27,18 @@ EXPECTED_PS = (
     '\t  2 | running  Q |   7'
 )
 
+# In native we are directly executing the binary (no terminal program). We must
+# therefore use Ctrl-V (DLE or "data link escape") before Ctrl-C to send a
+# literal ETX instead of SIGINT.
+# When using a board it is also a problem because we are using a "user friendly"
+# terminal that interprets Ctrl-C. So until we have rawterm we must also use
+# ctrl-v in boards.
+
+DLE = '\x16'
+
+CONTROL_C = DLE+'\x03'
+CONTROL_D = DLE+'\x04'
+
 CMDS = (
     ('start_test', ('[TEST_START]')),
     ('end_test', ('[TEST_END]')),
@@ -38,6 +50,8 @@ CMDS = (
     ('help', EXPECTED_HELP),
     ('echo a string', ('\"echo\"\"a\"\"string\"')),
     ('ps', EXPECTED_PS),
+    ('garbage1234'+CONTROL_C, ('>')),  # test cancelling a line
+    ('help', EXPECTED_HELP),
     ('reboot', ('test_shell.'))
 )
 
