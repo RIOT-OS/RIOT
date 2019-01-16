@@ -380,11 +380,11 @@ static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size
             _pktbuf_free(pkt, sizeof(gnrc_pktsnip_t));
             return NULL;
         }
+        if (data != NULL) {
+            memcpy(_data, data, size);
+        }
     }
     _set_pktsnip(pkt, next, _data, size, type);
-    if (data != NULL) {
-        memcpy(_data, data, size);
-    }
     return pkt;
 }
 
