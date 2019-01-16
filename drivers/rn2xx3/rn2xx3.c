@@ -141,7 +141,7 @@ void rn2xx3_setup(rn2xx3_t *dev, const rn2xx3_params_t *params)
     assert(dev && (params->uart < UART_NUMOF));
 
     /* initialize device parameters */
-    memcpy(&dev->p, params, sizeof(rn2xx3_params_t));
+    dev->p = *params;
 
     /* initialize pins and perform hardware reset */
     if (dev->p.pin_reset != GPIO_UNDEF) {

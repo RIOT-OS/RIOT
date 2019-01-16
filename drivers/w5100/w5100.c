@@ -118,7 +118,7 @@ void w5100_setup(w5100_t *dev, const w5100_params_t *params)
     dev->nd.context = dev;
 
     /* initialize the device descriptor */
-    memcpy(&dev->p, params, sizeof(w5100_params_t));
+    dev->p = *params;
 
     /* initialize the chip select pin and the external interrupt pin */
     spi_init_cs(dev->p.spi, dev->p.cs);

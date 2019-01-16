@@ -44,7 +44,7 @@ int tcs37727_init(tcs37727_t *dev, const tcs37727_params_t *params)
     assert(dev && params);
 
     /* initialize the device descriptor */
-    memcpy(&dev->p, params, sizeof(tcs37727_params_t));
+    dev->p = *params;
 
     /* setup the I2C bus */
     i2c_acquire(BUS);

@@ -239,7 +239,7 @@ static void _poweroff(const ata8520e_t *dev)
 int ata8520e_init(ata8520e_t *dev, const ata8520e_params_t *params)
 {
     /* write config params to device descriptor */
-    memcpy(&dev->params, params, sizeof(ata8520e_params_t));
+    dev->params = *params;
 
     /* Initialize pins*/
     if (gpio_init_int(INTPIN, GPIO_IN_PD,

@@ -142,7 +142,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
         return -1;
     }
 
-    memcpy(&_native_rtc_alarm, time, sizeof(_native_rtc_alarm));
+    _native_rtc_alarm = *time;
 
     warnx("rtc_set_alarm: not implemented");
 
@@ -162,7 +162,7 @@ int rtc_get_alarm(struct tm *time)
         return -1;
     }
 
-    memcpy(time, &_native_rtc_alarm, sizeof(_native_rtc_alarm));
+    *time = _native_rtc_alarm;
 
     return 0;
 }

@@ -61,7 +61,7 @@ void sx127x_setup(sx127x_t *dev, const sx127x_params_t *params)
 {
     netdev_t *netdev = (netdev_t*) dev;
     netdev->driver = &sx127x_driver;
-    memcpy(&dev->params, params, sizeof(sx127x_params_t));
+    dev->params = *params;
 }
 
 int sx127x_reset(const sx127x_t *dev)
