@@ -26,19 +26,19 @@ EXPECTED_PS = (
     '\t  2 | running  Q |   7'
 )
 
-CMDS = {
-    'start_test': ('[TEST_START]'),
-    'end_test': ('[TEST_END]'),
-    '\n': ('>'),
-    '123456789012345678901234567890123456789012345678901234567890':
+CMDS = (
+    ('start_test', ('[TEST_START]')),
+    ('end_test', ('[TEST_END]')),
+    ('\n', ('>')),
+    ('123456789012345678901234567890123456789012345678901234567890',
         ('shell: command not found: '
-         '123456789012345678901234567890123456789012345678901234567890'),
-    'unknown_command': ('shell: command not found: unknown_command'),
-    'help': EXPECTED_HELP,
-    'echo a string': ('\"echo\"\"a\"\"string\"'),
-    'ps': EXPECTED_PS,
-    'reboot': ('test_shell.')
-}
+         '123456789012345678901234567890123456789012345678901234567890')),
+    ('unknown_command', ('shell: command not found: unknown_command')),
+    ('help', EXPECTED_HELP),
+    ('echo a string', ('\"echo\"\"a\"\"string\"')),
+    ('ps', EXPECTED_PS),
+    ('reboot', ('test_shell.'))
+)
 
 
 def check_cmd(child, cmd, expected):
@@ -52,7 +52,7 @@ def testfunc(child):
     child.expect('test_shell.')
 
     # loop other defined commands and expected output
-    for cmd, expected in CMDS.items():
+    for cmd, expected in CMDS:
         check_cmd(child, cmd, expected)
 
 
