@@ -137,8 +137,15 @@ static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, vo
     (void)ctx;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     /* write the RIOT board name in the response buffer */
-    memcpy(pdu->payload, RIOT_BOARD, strlen(RIOT_BOARD));
-    return gcoap_finish(pdu, strlen(RIOT_BOARD), COAP_FORMAT_TEXT);
+    /* must be 'greater than' to account for payload marker byte */
+    if (pdu->payload_len > strlen(RIOT_BOARD)) {
+        memcpy(pdu->payload, RIOT_BOARD, strlen(RIOT_BOARD));
+        return gcoap_finish(pdu, strlen(RIOT_BOARD), COAP_FORMAT_TEXT);
+    }
+    else {
+        puts("gcoap_cli: msg buffer too small");
+        return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
+    }
 }
 
 static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
