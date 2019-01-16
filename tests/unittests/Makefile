@@ -1,6 +1,9 @@
 DEVELHELP ?= 0
 include ../Makefile.tests_common
 
+# enable trap on undefined behaviour
+UBSAN_ENABLE ?= 1
+
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-duemilanove \
                              arduino-mega2560 \
