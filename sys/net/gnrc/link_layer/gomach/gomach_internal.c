@@ -343,8 +343,8 @@ int gnrc_gomach_send_preamble_ack(gnrc_netif_t *netif, gnrc_gomach_packet_info_t
     assert(netif != NULL);
     assert(info != NULL);
 
+    gnrc_pktsnip_t *pkt;
     gnrc_pktsnip_t *gomach_pkt = NULL;
-    gnrc_pktsnip_t *pkt = NULL;
     gnrc_netif_hdr_t *nethdr_preamble_ack = NULL;
 
     /* Start assemble the preamble-ACK packet according to preamble packet info. */
