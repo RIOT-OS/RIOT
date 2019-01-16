@@ -227,7 +227,7 @@ static int readline(char *buf, size_t size)
         }
 
         int c = getchar();
-        if (c < 0) {
+        if (c < 0 || c == '\x03' || c == '\x04') {
             return EOF;
         }
 
