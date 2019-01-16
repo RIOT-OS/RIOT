@@ -16,13 +16,13 @@ endef
 
 MAKEFILES_UTILS = $(RIOTMAKE)/utils
 
-TESTS = test-ensure_value test-ensure_value-negative
+COMPILE_TESTS = test-ensure_value test-ensure_value-negative
 
 # Tests will be run both in the host machine and in `docker`
 all: build-system-utils-tests
 
-build-system-utils-tests: $(TESTS)
-.PHONY: build-system-utils-tests $(TESTS)
+build-system-utils-tests: $(COMPILE_TESTS)
+.PHONY: build-system-utils-tests $(COMPILE_TESTS)
 
 
 # tests for 'ensure_value'
