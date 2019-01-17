@@ -1,5 +1,3 @@
-FEATURES_REQUIRED += periph_dma
-
 ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += sx1276
 endif
