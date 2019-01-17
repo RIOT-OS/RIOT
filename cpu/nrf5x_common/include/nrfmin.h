@@ -163,16 +163,6 @@ uint16_t nrfmin_get_addr(void);
 void nrfmin_set_addr(uint16_t addr);
 
 /**
- * @brief   Get a pseudo 64-bit long address (needed by IPv6 and 6LoWPAN)
- *
- * As we do not support 64-bit addresses, we just make one up, for this we
- * simply return 4 times concatenated the 16-bit address.
- *
- * @param[out] addr     64-bit pseudo long address, as array of 4 * 16-bit
- */
-void nrfmin_get_pseudo_long_addr(uint16_t *addr);
-
-/**
  * @brief   Get the IID build from the 16-bit node address
  *
  * @param[out] iid      the 64-bit IID, as array of 4 * 16-bit

@@ -188,13 +188,6 @@ uint16_t nrfmin_get_addr(void)
     return my_addr;
 }
 
-void nrfmin_get_pseudo_long_addr(uint16_t *addr)
-{
-    for (int i = 0; i < 4; i++) {
-        addr[i] = my_addr;
-    }
-}
-
 void nrfmin_get_iid(uint16_t *iid)
 {
     iid[0] = 0;
@@ -487,10 +480,6 @@ static int nrfmin_get(netdev_t *dev, netopt_t opt, void *val, size_t max_len)
             assert(max_len >= sizeof(uint16_t));
             *((uint16_t *)val) = NRFMIN_PAYLOAD_MAX;
             return sizeof(uint16_t);
-        case NETOPT_ADDRESS_LONG:
-            assert(max_len >= sizeof(uint64_t));
-            nrfmin_get_pseudo_long_addr((uint16_t *)val);
-            return sizeof(uint64_t);
         case NETOPT_ADDR_LEN:
             assert(max_len >= sizeof(uint16_t));
             *((uint16_t *)val) = 2;
