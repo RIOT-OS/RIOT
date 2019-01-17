@@ -1,8 +1,14 @@
 DEVELHELP ?= 0
 include ../Makefile.tests_common
 
-# enable trap on undefined behaviour
-UBSAN_ENABLE ?= 1
+ifeq (native, $(BOARD))
+  # enable undefined behaviour runtime detection
+  UBSAN_ENABLE ?= 1
+  # if UB is detected, print error, then exit
+  UBSAN_MODE ?= msg_exit
+  # In order to locate the location where the undefined behaviour was
+  # triggered, recompile with UBSAN_MODE=trap and run in gdb.
+endif
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-duemilanove \
