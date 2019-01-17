@@ -295,14 +295,9 @@ static NORETURN void IRAM system_init (void)
     srand(hwrand());
 
     #if defined(MODULE_NEWLIB_SYSCALLS_DEFAULT)
-    /*
-     * initialization as it should be called from newlibc (includes the
-     * execution of stdio_init)
-    */
+    /* initialization as it should be called from newlibc */
     extern void _init(void);
     _init();
-    #elif defined(MODULE_STDIO_UART)
-    stdio_init();
     #endif
 
     /* add SPI RAM to heap if enabled */

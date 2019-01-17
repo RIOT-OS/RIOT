@@ -21,7 +21,6 @@
 #include "cpu.h"
 #include "irq.h"
 #include "board.h"
-#include "stdio_base.h"
 #include "periph_conf.h"
 #include "msp430.h"
 #include "debug.h"
@@ -198,7 +197,4 @@ void board_init(void)
     msb_ports_init();
 
     msp430_set_cpu_speed(CLOCK_CORECLOCK);
-
-    /* finally initialize STDIO */
-    stdio_init();
 }
