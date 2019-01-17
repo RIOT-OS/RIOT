@@ -38,17 +38,33 @@ get_kernel_info() {
     uname -mprs
 }
 
+# On windows systems, return OS name and OS version, each in a separate line.
+get_windows_info() {
+    systeminfo | grep '\(^OS Name\)\|\(^OS Version\)' | cut -d: -f2 | sed 's/^[[:space:]]*//'
+}
+
 get_os_info() {
+    local osname
+    local osvers
+
     local os="$(uname -s)"
-    local osname="unknown"
-    local osvers="unknown"
-    if [ "$os" = "Linux" ]; then
-        osname="$(cat /etc/os-release | grep ^NAME= | awk -F'=' '{print $2}')"
-        osvers="$(cat /etc/os-release | grep ^VERSION= | awk -F'=' '{print $2}')"
-    elif [ "$os" = "Darwin" ]; then
-        osname="$(sw_vers -productName)"
-        osvers="$(sw_vers -productVersion)"
-    fi
+    case "$os" in
+        Linux)
+            osname="$(cat /etc/os-release | grep ^NAME= | awk -F'=' '{print $2}')"
+            osvers="$(cat /etc/os-release | grep ^VERSION= | awk -F'=' '{print $2}')"
+            ;;
+        Darwin)
+            osname="$(sw_vers -productName)"
+            osvers="$(sw_vers -productVersion)"
+            ;;
+        MINGW*)
+            read -r osname osvers <<<$(get_windows_info)
+            ;;
+        *)
+            osname="unknown"
+            osvers="unknown"
+            ;;
+    esac
     printf "%s %s" "$osname" "$osvers"
 }
 
