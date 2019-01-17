@@ -26,17 +26,22 @@ USEMODULE += esp_now
 
 For ESP-NOW, ESP32 nodes are used in WiFi SoftAP + Station mode to advertise their SSID and become visible to other ESP32 nodes. The SSID of an ESP32 node is the concatenation of the prefix ```RIOT_ESP_``` with the MAC address of its SoftAP WiFi interface. The driver periodically scans all visible ESP32 nodes.
 
-The following parameters are defined for ESP-NOW nodes. These parameters can be overriden by [application-specific board configurations](#esp32_application_specific_board_configuration).
+The following parameters are defined for ESP-NOW nodes.
 
 <center>
 
 Parameter | Default | Description
 :---------|:--------|:-----------
 ESP_NOW_SCAN_PERIOD | 10000000UL | Defines the period in us at which an node scans for other nodes in its range. The default period is 10 s.
-ESP_NOW_SOFT_AP_PASSPHRASE | ThisistheRIOTporttoESP | Defines the passphrase (max. 64 chars) that is used for the SoftAP interface of an nodes. It has to be same for all nodes in one network.
+ESP_NOW_SOFT_AP_PASS | "ThisistheRIOTporttoESP" | Defines the passphrase as clear text (max. 64 chars) that is used for the SoftAP interface of ESP-NOW nodes. It has to be same for all nodes in one network.
 ESP_NOW_CHANNEL | 6 | Defines the channel that is used as the broadcast medium by all nodes together.
 ESP_NOW_KEY | NULL | Defines a key that is used for encrypted communication between nodes. If it is NULL, encryption is disabled. The key has to be of type ```uint8_t[16]``` and has to be exactly 16 bytes long.
 
 </center>
+
+@note The ESP-NOW network interface (module `esp_now`) and the
+Wifi network interface (module `esp_wifi`)
+can be used simultaneously, for example, to realize a border router for
+a mesh network which uses ESP-NOW.
 
  */
