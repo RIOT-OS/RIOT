@@ -192,7 +192,6 @@ The RIOT-OS for ESP32 SoCs supports the following features at the moment:
 The implementation of RIOT-OS for ESP32 SOCs has the following limitations at the moment:
 
 - Only <b>one core</b> (the PRO CPU) is used because RIOT does not support running multiple threads  simultaneously.
-- <b>AP-based WiFi</b> is experimental and not stable.
 - RIOT modules <b>crypto</b> and <b>hashes</b> cannot be used together with modules <b>esp_now</b> and <b>esp_wifi</b>
 - <b>Bluetooth</b> cannot be used at the moment.
 - <b>Flash encryption</b> is not yet supported.
@@ -400,7 +399,7 @@ esp_idf_heap | Use the ESP-IDF heap implementation, see section [ESP-IDF Heap Im
 esp_now | Enable the built-in WiFi module with the ESP-NOW protocol as `netdev` network device, see section [ESP-NOW Network Interface](#esp32_esp_now_network_interface).
 esp_spiffs  | Enable the optional SPIFFS drive in on-board flash memory, see section [SPIFFS Device](#esp32_spiffs_device).
 esp_spi_ram | Enable the optional SPI RAM, see section [SPI RAM Modules](#esp32_spi_ram).
-esp_wifi | Use the built-in WiFi module as `netdev` network device, see section [WiFi Network Interface](#esp32_wifi_network_interface).
+esp_wifi | Enable the built-in WiFi module as `netdev` network device, see section [WiFi Network Interface](#esp32_wifi_network_interface).
 
 </center>
 
@@ -887,7 +886,7 @@ Please refer file ```$RIOTBASE/tests/unittests/test-spiffs/tests-spiffs.c``` for
 ESP32 provides different built-in possibilities to realize network devices:
 
 - <b>EMAC</b>, an Ethernet MAC implementation (requires an external PHY module)
-- <b>ESP WiFi</b>, usual AP-based wireless LAN (not yet supported)
+- <b>ESP WiFi</b>, usual AP-based wireless LAN
 - <b>ESP-NOW</b>, a WiFi based AP-less and connectionless peer to peer communication protocol
 - <b>ESP-MESH</b>, a WiFi based mesh technology (not yet supported)
 
