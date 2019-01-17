@@ -72,6 +72,11 @@ extern esp_err_t esp_system_event_add_handler (system_event_cb_t handler,
 
 esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
 {
+    /*
+     * This callback function is executed in interrupt context but in the
+     * context of the wifi thread. That is, mutex_lock or msg_send can block.
+     */
+
     DEBUG("%s: buf=%p len=%d eb=%p\n", __func__, buffer, len, eb);
 
     if ((buffer == NULL) || (len >= ETHERNET_DATA_LEN)) {
@@ -82,18 +87,33 @@ esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
     }
 
     mutex_lock(&_esp_wifi_dev.dev_lock);
+    critical_enter();
 
     /* copy the buffer and free WiFi driver buffer */
     memcpy(_esp_wifi_dev.rx_buf, buffer, len);
     if (eb) {
-      esp_wifi_internal_free_rx_buffer(eb);
+        esp_wifi_internal_free_rx_buffer(eb);
     }
+
+    /*
+     * Because this function is not executed in interrupt context but in thread
+     * context, following msg_send could block on heavy network load, if frames
+     * are coming in faster than the ISR events can be handled. To avoid
+     * blocking during msg_send, we pretend we are in an ISR by incrementing
+     * the IRQ nesting counter. If IRQ nesting counter is greater 0, function
+     * irq_is_in returns true and the non-blocking version of msg_send is used.
+     */
+    irq_interrupt_nesting++;
 
     /* trigger netdev event to read the data */
     _esp_wifi_dev.rx_len = len;
     _esp_wifi_dev.event = SYSTEM_EVENT_WIFI_RX_DONE;
     _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
 
+    /* reset IRQ nesting counter */
+    irq_interrupt_nesting--;
+
+    critical_exit();
     mutex_unlock(&_esp_wifi_dev.dev_lock);
 
     return ESP_OK;
