@@ -265,25 +265,33 @@ size_t fmt_u16_dec(char *out, uint16_t val)
 size_t fmt_s64_dec(char *out, int64_t val)
 {
     unsigned negative = (val < 0);
+    uint64_t sval;
     if (negative) {
         if (out) {
             *out++ = '-';
         }
-        val = -val;
+        sval = -(uint64_t)(val);
     }
-    return fmt_u64_dec(out, val) + negative;
+    else {
+        sval = +(uint64_t)(val);
+    }
+    return fmt_u64_dec(out, sval) + negative;
 }
 
 size_t fmt_s32_dec(char *out, int32_t val)
 {
     unsigned negative = (val < 0);
+    uint32_t sval;
     if (negative) {
         if (out) {
             *out++ = '-';
         }
-        val = -val;
+        sval = -((uint32_t)(val));
     }
-    return fmt_u32_dec(out, val) + negative;
+    else {
+        sval = +((uint32_t)(val));
+    }
+    return fmt_u32_dec(out, sval) + negative;
 }
 
 size_t fmt_s16_dec(char *out, int16_t val)
