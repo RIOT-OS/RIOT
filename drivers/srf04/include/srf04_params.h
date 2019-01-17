@@ -52,6 +52,9 @@ static const srf04_params_t srf04_params[] = {
     SRF04_PARAMS
 };
 
+/**
+ * @brief   Number of SRF04 devices
+ */
 #define SRF04_NUMOF     (sizeof(srf04_params) / sizeof(srf04_params[0]))
 
 #ifdef __cplusplus
