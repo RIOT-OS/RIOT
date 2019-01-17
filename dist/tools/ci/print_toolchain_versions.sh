@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 get_cmd_version() {
     if [ -z "$1" ]; then
