@@ -32,9 +32,8 @@ extern "C" {
 /**
  * @brief   Data type to represent an EUI-48
  */
-typedef union {
+typedef struct {
     uint8_t uint8[6];            /**< split into 6 8-bit words. */
-    network_uint16_t uint16[3];  /**< split into 3 16-bit words. */
 } eui48_t;
 
 /**
