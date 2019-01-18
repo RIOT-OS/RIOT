@@ -43,16 +43,15 @@ void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
     if ((src != NULL) && gnrc_netif_is_6ln(netif) &&
         (_nib_onl_get_if(dr->next_hop) == (unsigned)netif->pid) &&
         ipv6_addr_equal(&dr->next_hop->ipv6, dst)) {
-        netdev_t *dev = netif->dev;
-        uint8_t l2src[GNRC_NETIF_L2ADDR_MAXLEN];
-        size_t l2src_len = (uint16_t)dev->driver->get(dev, NETOPT_ADDRESS_LONG,
-                                                      l2src, sizeof(l2src));
-        if (l2src_len != sizeof(eui64_t)) {
+        eui64_t eui64;
+        int res = gnrc_netif_get_eui64(netif, &eui64);
+
+        if (res != sizeof(eui64_t)) {
             DEBUG("nib: can't get EUI-64 of the interface for ARO\n");
             return;
         }
         ext_opt = gnrc_sixlowpan_nd_opt_ar_build(0, GNRC_SIXLOWPAN_ND_AR_LTIME,
-                                                 (eui64_t *)l2src, NULL);
+                                                 &eui64, NULL);
         if (ext_opt == NULL) {
             DEBUG("nib: error allocating ARO.\n");
             return;
