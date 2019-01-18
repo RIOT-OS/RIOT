@@ -298,9 +298,11 @@ int gnrc_netif_ndp_addr_len_from_l2ao(gnrc_netif_t *netif,
             (void)opt;
             return sizeof(uint8_t);
 #endif  /* MODULE_CC110X */
-#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW)
+#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) || \
+    defined(MODULE_NORDIC_SOFTDEVICE_BLE)
         case NETDEV_TYPE_ETHERNET:
         case NETDEV_TYPE_ESP_NOW:
+        case NETDEV_TYPE_BLE:
             /* see https://tools.ietf.org/html/rfc2464#section-6*/
             if (opt->len == 1U) {
                 return ETHERNET_ADDR_LEN;
