@@ -426,6 +426,59 @@ static inline bool gnrc_netif_is_6lbr(const gnrc_netif_t *netif)
  */
 netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif);
 
+/**
+ * @brief   Converts a given hardware address to an EUI-64.
+ *
+ * @attention When the link-layer of the interface has link-layer addresses, and
+ *            `NDEBUG` is not defined, the node fails with an assertion instead
+ *            returning `-ENOTSUP`.
+ *
+ * @param[in] netif     The network interface @p addr came from (either as
+ *                      gnrc_netif_t::l2addr or from a packet that came over
+ *                      it).
+ * @param[in] addr      A hardware address.
+ * @param[in] addr_len  Number of bytes in @p addr.
+ * @param[out] eui64    The EUI-64 based on gnrc_netif_t::device_type
+ *
+ * @return  `sizeof(eui64_t)` on success.
+ * @return  `-ENOTSUP`, when gnrc_netif_t::device_type of @p netif does not
+ *          support IID conversion.
+ * @return  `-EINVAL`, when @p addr_len is invalid for the
+ *          gnrc_netif_t::device_type of @p netif.
+ */
+int gnrc_netif_eui64_from_addr(const gnrc_netif_t *netif,
+                               const uint8_t *addr, size_t addr_len,
+                               eui64_t *eui64);
+
+/**
+ * @brief   Converts an interface EUI-64 from an interface's hardware address
+ *
+ * @param[in] netif     The network interface @p eui64 came from
+ * @param[out] eui64    The EUI-64 based on gnrc_netif_t::device_type
+ *
+ * @note    This wraps around @ref gnrc_netif_eui64_from_addr by using by using
+ *          gnrc_netif_t::l2addr and gnrc_netif_t::l2addr_len of @p netif.
+ *
+ * @return  `sizeof(eui64_t)` on success.
+ * @return  `-ENOTSUP`, if interface has no link-layer address or if
+ *          gnrc_netif_t::device_type is not supported.
+ * @return  `-EINVAL`, when gnrc_netif_t::l2addr_len of @p netif is invalid for
+ *          the gnrc_netif_t::device_type of @p netif.
+ */
+static inline int gnrc_netif_get_eui64(gnrc_netif_t *netif, eui64_t *eui64)
+{
+#if GNRC_NETIF_L2ADDR_MAXLEN > 0
+    if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
+        return gnrc_netif_eui64_from_addr(netif,
+                                          netif->l2addr, netif->l2addr_len,
+                                          eui64);
+    }
+#endif /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
+    (void)netif;
+    (void)eui64;
+    return -ENOTSUP;
+}
+
 #if defined(MODULE_GNRC_IPV6) || defined(DOXYGEN)
 /**
  * @brief   Initialize IPv6 MTU and other packet length related members of
@@ -438,6 +491,9 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif);
 /**
  * @brief   Converts a given hardware address to an IPv6 IID.
  *
+ * @note      The IPv6 IID is derived from the EUI-64 for most link-layers by
+ *            flipping the U/L bit.
+ * @see       [RFC 2464, section 4](https://tools.ietf.org/html/rfc2464#section-4)
  * @attention When the link-layer of the interface has link-layer addresses, and
  *            `NDEBUG` is not defined, the node fails with an assertion instead
  *            returning `-ENOTSUP`.
@@ -492,6 +548,9 @@ int gnrc_netif_ipv6_iid_to_addr(const gnrc_netif_t *netif, const eui64_t *iid,
  * @param[in] netif     The network interface @p iid came from
  * @param[out] iid      The IID based on gnrc_netif_t::device_type
  *
+ * @note    The IPv6 IID is derived from the EUI-64 for most link-layers by
+ *          flipping the U/L bit.
+ * @see     [RFC 2464, section 4](https://tools.ietf.org/html/rfc2464#section-4)
  * @note    This wraps around @ref gnrc_netif_ipv6_iid_from_addr by using
  *          by using gnrc_netif_t::l2addr and gnrc_netif_t::l2addr_len of
  *          @p netif.
