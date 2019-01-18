@@ -717,8 +717,14 @@ static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, uint8_t *val,
             ? pkt->options[pkt->options_len - 1].opt_num : 0;
     assert(optnum >= lastonum);
 
-    size_t optlen = coap_put_option(pkt->payload, lastonum, optnum, val, val_len);
-    assert(pkt->payload_len > optlen);
+    /* calculate option length */
+    uint8_t dummy[3];
+    size_t optlen = _put_delta_optlen(dummy, 1, 4, optnum - lastonum);
+    optlen += _put_delta_optlen(dummy, 0, 0, val_len);
+    optlen += val_len;
+    assert(pkt->payload_len >= optlen);
+
+    coap_put_option(pkt->payload, lastonum, optnum, val, val_len);
 
     pkt->options[pkt->options_len].opt_num = optnum;
     pkt->options[pkt->options_len].offset = pkt->payload - (uint8_t *)pkt->hdr;
