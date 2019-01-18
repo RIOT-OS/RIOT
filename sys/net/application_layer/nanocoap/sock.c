@@ -46,19 +46,14 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *r
 
     /* TODO: timeout random between between ACK_TIMEOUT and (ACK_TIMEOUT *
      * ACK_RANDOM_FACTOR) */
-    uint32_t timeout = COAP_ACK_TIMEOUT * (1000000U);
-    int tries = 0;
-    while (tries++ < COAP_MAX_RETRANSMIT) {
-        if (!tries) {
-            DEBUG("nanocoap: maximum retries reached.\n");
-            res = -ETIMEDOUT;
-            goto out;
-        }
+    uint32_t timeout = COAP_ACK_TIMEOUT * US_PER_SEC;
+    unsigned tries_left = COAP_MAX_RETRANSMIT + 1;  /* add 1 for initial transmit */
+    while (tries_left) {
 
         res = sock_udp_send(&sock, buf, pdu_len, NULL);
         if (res <= 0) {
-            DEBUG("nanocoap: error sending coap request\n");
-            goto out;
+            DEBUG("nanocoap: error sending coap request, %d\n", (int)res);
+            break;
         }
 
         res = sock_udp_recv(&sock, buf, len, timeout, NULL);
@@ -67,9 +62,13 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *r
                 DEBUG("nanocoap: timeout\n");
 
                 timeout *= 2;
+                tries_left--;
+                if (!tries_left) {
+                    DEBUG("nanocoap: maximum retries reached\n");
+                }
                 continue;
             }
-            DEBUG("nanocoap: error receiving coap request\n");
+            DEBUG("nanocoap: error receiving coap response, %d\n", (int)res);
             break;
         }
         else {
@@ -81,7 +80,6 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *r
         }
     }
 
-out:
     sock_udp_close(&sock);
 
     return res;
