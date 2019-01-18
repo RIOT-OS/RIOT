@@ -499,7 +499,35 @@ static size_t _encode_uint(uint32_t *val)
     return size;
 }
 
-static unsigned _put_delta_optlen(uint8_t *buf, unsigned offset, unsigned shift, unsigned val)
+/*
+ * Writes CoAP Option header. Expected to be called twice to write an option:
+ *
+ * 1. write delta, using offset 1, shift 4
+ * 2. write length, using offset n, shift 0, where n is the return value from
+ *    the first invocation of this function
+ *
+ *     0   1   2   3   4   5   6   7
+ *   +---------------+---------------+
+ *   |  Option Delta | Option Length |   1 byte
+ *   +---------------+---------------+
+ *   /         Option Delta          /   0-2 bytes
+ *   \          (extended)           \
+ *   +-------------------------------+
+ *   /         Option Length         /   0-2 bytes
+ *   \          (extended)           \
+ *   +-------------------------------+
+ *
+ *   From RFC 7252, Figure 8
+ *
+ * param[out] buf       addr of byte 0 of header
+ * param[in]  offset    offset from buf to write any extended header
+ * param[in]  shift     bit shift for byte 0 value
+ * param[in]  value     delta/length value to write to header
+ *
+ * return     offset from byte 0 of next byte to write
+ */
+static unsigned _put_delta_optlen(uint8_t *buf, unsigned offset, unsigned shift,
+                                  unsigned val)
 {
     if (val < 13) {
         *buf |= (val << shift);
