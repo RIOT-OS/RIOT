@@ -44,6 +44,9 @@ extern "C" {
  * @}
  */
 
+/**
+ * @brief   socket_zep configurations
+ */
 extern socket_zep_params_t socket_zep_params[SOCKET_ZEP_MAX];
 
 #ifdef __cplusplus
