@@ -19,3 +19,18 @@ They can be checked with:
 
     find results/ -name '*.failed'
     find results/ -name 'test.success'
+
+
+Implementation TODO
+-------------------
+
+The script was developed for being used outside of RIOT so does not currently
+simply adapt to be used from within RIOT.
+
+* Provide another script for new interface?
+* Provide a RIOT/Makefile integration
+* Save output files into `${BUILD_DIR}/output/compile_and_test` directory by
+  default
+* tox file to run `doctests/pylint/flake8`. Add tests.
+* Implement the `board_is_supported`/`board_has_enough_memory`/`has_tests` to
+  make targets instead of fiddling to get the value
