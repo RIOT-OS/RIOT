@@ -97,7 +97,7 @@ include $(RIOTMAKE)/color.inc.mk
 # include concurrency helpers
 include $(RIOTMAKE)/info-nproc.inc.mk
 
-GLOBAL_GOALS := buildtest info-boards-supported info-boards-features-missing info-buildsizes info-buildsizes-diff
+GLOBAL_GOALS += buildtest info-boards-supported info-boards-features-missing info-buildsizes info-buildsizes-diff
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
   BOARD=none
 endif
