@@ -595,3 +595,18 @@ void system_wdt_start (void)
     TIMERG0.wdt_wprotect = 0;     /* enable write protection */
     xt_ints_on(BIT(CPU_INUM_WDT));
 }
+
+__attribute__((weak)) void
+_system_prevent_memset_lto(void *const  s, int c, const size_t n)
+{
+    (void) s;
+    (void) c;
+    (void) n;
+}
+
+void *system_secure_memset(void *s, int c, size_t n)
+{
+    memset(s, c, n);
+    _system_prevent_memset_lto(s, c, n);
+    return s;
+}

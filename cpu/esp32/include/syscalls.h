@@ -23,6 +23,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "esp_common.h"
@@ -60,6 +61,9 @@ void system_wdt_stop (void);
 
 /** reset the system watchdog timer */
 void system_wdt_feed (void);
+
+/** memset version that the compiler should not be allowed to optimize this */
+void *system_secure_memset(void *s, int c, size_t n);
 
 #ifdef __cplusplus
 }
