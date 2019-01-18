@@ -137,8 +137,15 @@ static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, vo
     (void)ctx;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     /* write the RIOT board name in the response buffer */
-    memcpy(pdu->payload, RIOT_BOARD, strlen(RIOT_BOARD));
-    return gcoap_finish(pdu, strlen(RIOT_BOARD), COAP_FORMAT_TEXT);
+    /* must be 'greater than' to account for payload marker byte */
+    if (pdu->payload_len > strlen(RIOT_BOARD)) {
+        memcpy(pdu->payload, RIOT_BOARD, strlen(RIOT_BOARD));
+        return gcoap_finish(pdu, strlen(RIOT_BOARD), COAP_FORMAT_TEXT);
+    }
+    else {
+        puts("gcoap_cli: msg buffer too small");
+        return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
+    }
 }
 
 static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
@@ -243,7 +250,14 @@ int gcoap_cli_cmd(int argc, char **argv)
         ((argc == apos + 4) && (code_pos != 0))) {
         gcoap_req_init(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE, code_pos+1, argv[apos+2]);
         if (argc == apos + 4) {
-            memcpy(pdu.payload, argv[apos+3], strlen(argv[apos+3]));
+            /* must be 'greater than' to account for payload marker byte */
+            if (pdu.payload_len > strlen(argv[apos+3])) {
+                memcpy(pdu.payload, argv[apos+3], strlen(argv[apos+3]));
+            }
+            else {
+                puts("gcoap_cli: msg buffer too small");
+                return 1;
+            }
         }
         coap_hdr_set_type(pdu.hdr, msg_type);
 
