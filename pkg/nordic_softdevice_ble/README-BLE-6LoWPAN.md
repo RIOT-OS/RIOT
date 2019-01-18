@@ -6,13 +6,13 @@ Prerequisites
 In general, any device capable of running Linux operating system, can be used
 as a BLE router provided the following conditions are met:
 
-* Linux Kernel >3.18 is used
+* Linux Kernel >3.18 and <=4.12 is used
 * bluez, libcap-ng0, radvd tools are present.
 
 If a built-in Bluetooth device is not available then Bluetooth 4.0 compatible
 USB dongle can be used.
 
-The following procedures have been tested on Ubuntu 15.10.
+The following procedures have been tested on Ubuntu 15.10 and Ubuntu 16.04.
 
 Establishing an IPv6 connection
 ===============================
