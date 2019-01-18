@@ -68,14 +68,8 @@ static inline void eui48_to_eui64(eui64_t *eui64, const eui48_t *addr)
  */
 static inline void eui48_to_ipv6_iid(eui64_t *iid, const eui48_t *addr)
 {
-    iid->uint8[0] = addr->uint8[0] ^ 0x02;
-    iid->uint8[1] = addr->uint8[1];
-    iid->uint8[2] = addr->uint8[2];
-    iid->uint8[3] = 0xff;
-    iid->uint8[4] = 0xfe;
-    iid->uint8[5] = addr->uint8[3];
-    iid->uint8[6] = addr->uint8[4];
-    iid->uint8[7] = addr->uint8[5];
+    eui48_to_eui64(iid, addr);
+    iid->uint8[0] ^= 0x02;
 }
 
 /**
