@@ -204,19 +204,6 @@ int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
 #if GNRC_NETIF_L2ADDR_MAXLEN > 0
     if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
         switch (netif->device_type) {
-#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) || \
-    defined(MODULE_NORDIC_SOFTDEVICE_BLE)
-            case NETDEV_TYPE_ETHERNET:
-            case NETDEV_TYPE_ESP_NOW:
-            case NETDEV_TYPE_BLE:
-                if (addr_len == sizeof(eui48_t)) {
-                    eui48_to_ipv6_iid(iid, (const eui48_t *)addr);
-                    return sizeof(eui64_t);
-                }
-                else {
-                    return -EINVAL;
-                }
-#endif  /* defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) */
 #if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
             case NETDEV_TYPE_IEEE802154:
                 if (ieee802154_get_iid(iid, addr, addr_len) != NULL) {
@@ -231,22 +218,24 @@ int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
             case NETDEV_TYPE_NRFMIN:
                 if (addr_len <= 3) {
                     _create_eui64_from_short(addr, addr_len, iid);
+                    /* since this address conversion is based on the IEEE
+                     * 802.15.4 address conversion for short addresses, the
+                     * U/L bit doesn't need to be flipped.
+                     * see https://tools.ietf.org/html/rfc6282#section-3.2.2 */
                     return sizeof(eui64_t);
                 }
                 else {
                     return -EINVAL;
                 }
 #endif  /* defined(MODULE_CC110X) || defined(MODULE_NRFMIN) */
-            default:
-                (void)addr;
-                (void)addr_len;
-                (void)iid;
-#ifdef DEVELHELP
-                LOG_ERROR("gnrc_netif: can't convert hardware address to IID "
-                          "on interface %u\n", netif->pid);
-#endif  /* DEVELHELP */
-                assert(false);
-                break;
+            default: {
+                int res = gnrc_netif_eui64_from_addr(netif, addr, addr_len,
+                                                     iid);
+                if (res == sizeof(eui64_t)) {
+                    iid->uint8[0] ^= 0x02;
+                }
+                return res;
+            }
         }
     }
 #endif /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
