@@ -490,9 +490,9 @@ static int nrfmin_get(netdev_t *dev, netopt_t opt, void *val, size_t max_len)
             return sizeof(uint16_t);
 #ifdef MODULE_GNRC_SIXLOWPAN
         case NETOPT_PROTO:
-            assert(max_len >= sizeof(uint16_t));
-            *((uint16_t *)val) = GNRC_NETTYPE_SIXLOWPAN;
-            return sizeof(uint16_t);
+            assert(max_len == sizeof(gnrc_nettype_t));
+            *((gnrc_nettype_t *)val) = GNRC_NETTYPE_SIXLOWPAN;
+            return sizeof(gnrc_nettype_t);
 #endif
         case NETOPT_DEVICE_TYPE:
             assert(max_len >= sizeof(uint16_t));
