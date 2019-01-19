@@ -163,7 +163,7 @@ static void test_creation(void)
         TEST_ASSERT_NOT_NULL(netifs[i]->ops);
         TEST_ASSERT_NOT_NULL(netifs[i]->dev);
         TEST_ASSERT_EQUAL_INT(GNRC_NETIF_DEFAULT_HL, netifs[i]->cur_hl);
-        TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_UNKNOWN, netifs[i]->device_type);
+        TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_TEST, netifs[i]->device_type);
         TEST_ASSERT(netifs[i]->pid > KERNEL_PID_UNDEF);
         TEST_ASSERT(thread_has_msg_queue(sched_threads[netifs[i]->pid]));
         TEST_ASSERT_EQUAL_INT(i + SPECIAL_DEVS + 1, gnrc_netif_numof());
