@@ -124,9 +124,17 @@ static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len
         *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
     }
     else {
-        *((uint16_t *)value) = NETDEV_TYPE_UNKNOWN;
+        *((uint16_t *)value) = NETDEV_TYPE_TEST;
     }
     return sizeof(uint16_t);
+}
+
+static int _get_netdev_proto(netdev_t *dev, void *value, size_t max_len)
+{
+    assert(dev == ieee802154_dev);
+    assert(max_len == sizeof(gnrc_nettype_t));
+    *((gnrc_nettype_t *)value) = GNRC_NETTYPE_UNDEF;
+    return sizeof(gnrc_nettype_t);
 }
 
 static int _get_netdev_max_packet_size(netdev_t *netdev, void *value, size_t max_len)
@@ -166,6 +174,8 @@ void _tests_init(void)
     netdev_test_set_isr_cb((netdev_test_t *)ieee802154_dev, _netdev_isr);
     netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev, NETOPT_DEVICE_TYPE,
                            _get_netdev_device_type);
+    netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev, NETOPT_PROTO,
+                           _get_netdev_proto);
     netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev,
                            NETOPT_MAX_PDU_SIZE, _get_netdev_max_packet_size);
     for (intptr_t i = SPECIAL_DEVS; i < GNRC_NETIF_NUMOF; i++) {
