@@ -47,9 +47,19 @@ static int init(int argc, char **argv)
     uint8_t uart = atoi(argv[1]);
     uint32_t baudrate = atoi(argv[2]);
 
-    at_dev_init(&at_dev, UART_DEV(uart), baudrate, buf, sizeof(buf));
+    int res = at_dev_init(&at_dev, UART_DEV(uart), baudrate, buf, sizeof(buf));
 
-    return 0;
+    /* check the UART initialization return value and respond as needed */
+    if (res == UART_NODEV) {
+        puts("Invalid UART device given!");
+        return 1;
+    }
+    else if (res == UART_NOBAUD) {
+        puts("Baudrate is not applicable!");
+        return 1;
+    }
+
+    return res;
 }
 
 static int send(int argc, char **argv)

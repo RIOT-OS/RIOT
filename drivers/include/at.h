@@ -124,8 +124,8 @@ typedef struct {
  * @param[in]   buf         input buffer
  * @param[in]   bufsize     size of @p buf
  *
- * @returns     0 on success
- * @returns     <0 otherwise
+ * @returns     success code UART_OK on success
+ * @returns     error code UART_NODEV or UART_NOBAUD otherwise
  */
 int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize);
 
