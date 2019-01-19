@@ -12,6 +12,7 @@ endif
 
 ifneq (, $(filter esp_wifi, $(USEMODULE)))
     CFLAGS += -DLWIP_OPEN_SRC
+    INCLUDES += -I$(ESP8266_SDK_DIR)/third_party/include
     LINKFLAGS += -Wl,-wrap=ethernet_input
     USEMODULE += netdev_eth
 endif

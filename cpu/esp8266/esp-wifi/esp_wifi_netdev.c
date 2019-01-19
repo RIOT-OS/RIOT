@@ -41,7 +41,6 @@
 #include "lwip/igmp.h"
 #include "lwip/udp.h"
 
-#include "espconn.h"
 #include "esp_wifi_params.h"
 #include "esp_wifi_netdev.h"
 
