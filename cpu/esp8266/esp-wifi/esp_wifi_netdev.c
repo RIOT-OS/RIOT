@@ -251,15 +251,18 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
     esp_wifi_netdev_t *dev = (esp_wifi_netdev_t*)netdev;
 
+    critical_enter();
     if (!dev->connected) {
         ESP_WIFI_DEBUG("WiFi is still not connected to AP, cannot send");
         _in_send = false;
+        critical_exit();
         return -EIO;
     }
 
     if (wifi_get_opmode() != ESP_WIFI_STATION_MODE) {
         ESP_WIFI_DEBUG("WiFi is not in station mode, cannot send");
         _in_send = false;
+        critical_exit();
         return -EIO;
     }
 
@@ -277,6 +280,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         ESP_WIFI_DEBUG("frame length exceeds maximum (%u > %u)",
                        iol_len, ETHERNET_MAX_LEN);
         _in_send = false;
+        critical_exit();
         return -EBADMSG;
     }
 
@@ -284,6 +288,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         ESP_WIFI_DEBUG("frame length is less than the size of an Ethernet"
                        "header (%u < %u)", iol_len, sizeof(ethernet_hdr_t));
         _in_send = false;
+        critical_exit();
         return -EBADMSG;
     }
 
@@ -293,6 +298,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     struct pbuf *pb = pbuf_alloc(PBUF_LINK, iol_len, PBUF_RAM);
     if (pb == NULL || pb->tot_len < iol_len) {
         ESP_WIFI_DEBUG("could not allocate buffer to send %d bytes ", iol_len);
+        critical_exit();
         _in_send = false;
         return -EIO;
     }
@@ -339,6 +345,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
 #endif
         _in_send = false;
+        critical_exit();
         return iol_len;
     }
     else {
@@ -346,6 +353,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         netdev->stats.tx_failed++;
 #endif
         _in_send = false;
+        critical_exit();
         return -EIO;
     }
 }
@@ -401,8 +409,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     netdev->stats.rx_bytes += size;
 #endif
 
-   mutex_unlock(&dev->dev_lock);
-         return size;
+    mutex_unlock(&dev->dev_lock);
+    return size;
 }
 
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
