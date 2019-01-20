@@ -36,10 +36,12 @@ typedef struct
     uint8_t mac[ETHERNET_ADDR_LEN];   /**< MAC address of the device */
     ip_addr_t ip;                     /**< IPv4 address of the device */
 
-    struct pbuf *rx_pbuf;             /**< lwIP receive buffer reference */
+    uint8_t rx_buf[ETHERNET_DATA_LEN];/**< receive buffer */
     uint16_t rx_len;                  /**< number of bytes received from lwIP */
 
-    bool connected;        /**< indicates the connection state to the AP */
+    bool connected;   /**< indicates the connection state to the AP */
+
+    mutex_t dev_lock; /**< for exclusive access to buffer in receive functions */
 
 } esp_wifi_netdev_t;
 

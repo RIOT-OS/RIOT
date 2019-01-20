@@ -102,50 +102,71 @@ void _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
      * callback functions such as `esp_wifi_recv_cb`.
      *
      * It should be therefore not possible to reenter function
-     * `esp_wifi_recv_cb`. To avoid inconsistencies this is checked by an
-     * additional boolean variable . This can not be realized by a mutex
-     * because `esp_wifi_recv_cb` would be reentered from same thread context.
+     * `esp_wifi_recv_cb`. If it does occur inspite of that, we use a
+     * protection variable to avoid inconsistencies. This can not be realized
+     * by a mutex because `esp_wifi_recv_cb` would be reentered from same
+     * thread context.
      */
-
     if (_in_esp_wifi_recv_cb) {
+        pbuf_free(pb);
         return;
     }
     _in_esp_wifi_recv_cb = true;
 
-    /*
-     * Since it is not possible to reenter the function `esp_wifi_recv_cb`, and
-     * the functions netif::_ recv and esp_wifi_netdev::_ recv are called
-     * directly in the same thread context, neither a mutual exclusion has to
-     * be realized nor have the interrupts to be deactivated.
-     * Therefore we can read directly from the `data` and don't need a receive
-     * buffer.
-     */
+    /* avoid concurrent access to the receive buffer */
+    mutex_lock(&_esp_wifi_dev.dev_lock);
+
+    critical_enter();
 
     /* check the first packet buffer for the minimum packet size */
     if (pb->len < sizeof(ethernet_hdr_t)) {
         ESP_WIFI_DEBUG("frame length is less than the size of an Ethernet"
                        "header (%u < %u)", pb->len, sizeof(ethernet_hdr_t));
-        _in_esp_wifi_recv_cb = false;
         pbuf_free(pb);
+        _in_esp_wifi_recv_cb = false;
+        critical_exit();
+        mutex_unlock(&_esp_wifi_dev.dev_lock);
         return;
     }
 
-    if (_esp_wifi_dev.rx_pbuf) {
+    /* check whether the receive buffer is already holding a frame */
+    if (_esp_wifi_dev.rx_len) {
         ESP_WIFI_DEBUG("buffer used, dropping incoming frame of %d bytes",
                        pb->tot_len);
-        _in_esp_wifi_recv_cb = false;
         pbuf_free(pb);
+        _in_esp_wifi_recv_cb = false;
+        critical_exit();
+        mutex_unlock(&_esp_wifi_dev.dev_lock);
         return;
     }
 
-    _esp_wifi_dev.rx_pbuf = pb;
+    /* store the frame in the buffer and free lwIP pbuf */
+    _esp_wifi_dev.rx_len = pb->tot_len;
+    pbuf_copy_partial(pb, _esp_wifi_dev.rx_buf, _esp_wifi_dev.rx_len, 0);
+    pbuf_free(pb);
 
+    /*
+     * Because this function is not executed in interrupt context but in thread
+     * context, following msg_send could block on heavy network load, if frames
+     * are coming in faster than the ISR events can be handled. To avoid
+     * blocking during msg_send, we pretend we are in an ISR by incrementing
+     * the IRQ nesting counter. If IRQ nesting counter is greater 0, function
+     * irq_is_in returns true and the non-blocking version of msg_send is used.
+     */
+    irq_interrupt_nesting++;
+
+    /* trigger netdev event to read the data */
     if (_esp_wifi_dev.netdev.event_callback) {
         _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev,
-                                            NETDEV_EVENT_RX_COMPLETE);
+                                            NETDEV_EVENT_ISR);
     }
 
+    /* reset IRQ nesting counter */
+    irq_interrupt_nesting--;
+
     _in_esp_wifi_recv_cb = false;
+    critical_exit();
+    mutex_unlock(&_esp_wifi_dev.dev_lock);
 }
 
 /**
@@ -318,16 +339,18 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     esp_wifi_netdev_t* dev = (esp_wifi_netdev_t*)netdev;
 
-    /* we store received data in `buf` */
-    uint16_t size = dev->rx_pbuf->tot_len ? dev->rx_pbuf->tot_len : 0;
+    /* avoid concurrent access to the receive buffer */
+    mutex_lock(&dev->dev_lock);
+
+    uint16_t size = dev->rx_len ? dev->rx_len : 0;
 
     if (!buf) {
         /* get the size of the frame */
         if (len > 0 && size) {
             /* if len > 0, drop the frame */
-            pbuf_free(dev->rx_pbuf);
-            dev->rx_pbuf = NULL;
+            dev->rx_len = 0;
         }
+        mutex_unlock(&dev->dev_lock);
         return size;
     }
 
@@ -335,15 +358,14 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         /* buffer is smaller than the number of received bytes */
         ESP_WIFI_DEBUG("not enough space in receive buffer");
         /* newest API requires to drop the frame in that case */
-        pbuf_free(dev->rx_pbuf);
-        dev->rx_pbuf = NULL;
+        dev->rx_len = 0;
+        mutex_unlock(&dev->dev_lock);
         return -ENOBUFS;
     }
 
     /* copy the buffer and free */
-    pbuf_copy_partial(dev->rx_pbuf, buf, dev->rx_pbuf->tot_len, 0);
-    pbuf_free(dev->rx_pbuf);
-    dev->rx_pbuf = NULL;
+    memcpy(buf, dev->rx_buf, dev->rx_len);
+    dev->rx_len = 0;
 
 #if ENABLE_DEBUG
     ethernet_hdr_t *hdr = (ethernet_hdr_t *)buf;
@@ -360,7 +382,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     netdev->stats.rx_bytes += size;
 #endif
 
-    return size;
+   mutex_unlock(&dev->dev_lock);
+         return size;
 }
 
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
@@ -424,6 +447,12 @@ static void _isr(netdev_t *netdev)
     ESP_WIFI_DEBUG("%p", netdev);
 
     assert(netdev != NULL);
+
+    esp_wifi_netdev_t *dev = (esp_wifi_netdev_t *)netdev;
+
+    if (dev->rx_len) {
+        dev->netdev.event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+    }
 }
 
 /** override lwIP ethernet_intput to get ethernet frames */
@@ -457,8 +486,10 @@ static void _esp_wifi_setup(void)
     }
 
     /* initialize netdev data structure */
-    dev->rx_pbuf = NULL;
+    dev->rx_len = 0;
     dev->connected = false;
+
+    mutex_init(&dev->dev_lock);
 
     /* set the netdev driver */
     dev->netdev.driver = &_esp_wifi_driver;
