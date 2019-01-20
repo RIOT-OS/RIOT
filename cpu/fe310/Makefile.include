@@ -8,6 +8,9 @@ USEMODULE += periph
 USEMODULE += periph_common
 USEMODULE += periph_pm
 
+# include common periph drivers
+USEMODULE += periph_common
+
 CFLAGS += -Wno-pedantic
 
 include $(RIOTMAKE)/arch/riscv.inc.mk

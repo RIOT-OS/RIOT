@@ -29,6 +29,15 @@ extern "C" {
 #define CPUID_LEN           (12U)
 
 /**
+ * @name    This CPU makes use of the following shared SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE  1
+#define PERIPH_SPI_NEEDS_TRANSFER_REG   1
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS  1
+/** @} */
+
+/**
  * @brief   Prevent shared timer functions from being used
  */
 #define PERIPH_TIMER_PROVIDES_SET

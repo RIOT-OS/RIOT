@@ -19,6 +19,8 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -76,6 +78,24 @@ extern "C" {
  * @{
  */
 #define PWM_NUMOF                   (3)
+/** @} */
+
+/**
+ * @name    SPI device configuration
+ *
+ * @{
+ */
+/* DIV_UP is division which rounds up instead of down */
+#define DIV_UP(a,b) (((a) + ((b) - 1)) / (b))
+static const uint32_t spi_clk_config[] = {
+    DIV_UP(CLOCK_CORECLOCK, 2 *   100000) - 1,
+    DIV_UP(CLOCK_CORECLOCK, 2 *   400000) - 1,
+    DIV_UP(CLOCK_CORECLOCK, 2 *  1000000) - 1,
+    DIV_UP(CLOCK_CORECLOCK, 2 *  5000000) - 1,
+    DIV_UP(CLOCK_CORECLOCK, 2 * 10000000) - 1,
+};
+#undef DIV_UP
+#define SPI_NUMOF                   (1)
 /** @} */
 
 /**
