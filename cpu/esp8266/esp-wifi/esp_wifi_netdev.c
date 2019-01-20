@@ -298,7 +298,19 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     struct pbuf *pb = pbuf_alloc(PBUF_LINK, iol_len, PBUF_RAM);
     if (pb == NULL || pb->tot_len < iol_len) {
         ESP_WIFI_DEBUG("could not allocate buffer to send %d bytes ", iol_len);
+        /*
+         * The memory of EPS8266 is quite small. Therefore, it may happen on
+         * haevy network load that we run into out of memory and we have
+         * to wait until lwIP pbuf has been flushed. For that purpose, we
+         * have to disconnect from AP and slow down sending. The node will
+         * then reconnect to AP automatically.
+         */
         critical_exit();
+        /* disconnect from AP */
+        wifi_station_disconnect();
+        /* wait 20 ms */
+        xtimer_usleep(20 * US_PER_MS);
+
         _in_send = false;
         return -EIO;
     }
@@ -354,6 +366,13 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 #endif
         _in_send = false;
         critical_exit();
+        /*
+         * This error usually happens because we run into out of memory. We have
+         * to wait until lwIP pbuf has been flushed. For that purpose, we
+         * have to disconnect from AP and wait for a short time. The node will
+         * then reconnect to AP automatically.
+         */
+        wifi_station_disconnect();
         return -EIO;
     }
 }
