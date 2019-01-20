@@ -50,6 +50,12 @@
 #define ESP_WIFI_DEBUG(f, ...) \
         DEBUG("[esp_wifi] %s: " f "\n", __func__, ## __VA_ARGS__)
 
+#define ESP_WIFI_LOG_INFO(f, ...) \
+        LOG_INFO("[esp_wifi] " f "\n", ## __VA_ARGS__)
+
+#define ESP_WIFI_LOG_ERROR(f, ...) \
+        LOG_ERROR("[esp_wifi] " f "\n", ## __VA_ARGS__)
+
 #define ESP_WIFI_STATION_MODE       (STATION_MODE)
 #define ESP_WIFI_AP_MODE            (SOFTAP_MODE)
 #define ESP_WIFI_STATION_AP_MODE    (STATIONAP_MODE)
@@ -102,7 +108,7 @@ void _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
      *
      * It should be therefore not possible to reenter function
      * `esp_wifi_recv_cb`. If it does occur inspite of that, we use a
-     * protection variable to avoid inconsistencies. This can not be realized
+     * guard variable to avoid inconsistencies. This can not be realized
      * by a mutex because `esp_wifi_recv_cb` would be reentered from same
      * thread context.
      */
@@ -177,16 +183,16 @@ static void _esp_wifi_handle_event_cb(System_Event_t *evt)
 
     switch (evt->event) {
         case EVENT_STAMODE_CONNECTED:
-            ESP_WIFI_DEBUG("connect to ssid %s, channel %d",
-                           evt->event_info.connected.ssid,
-                           evt->event_info.connected.channel);
+            ESP_WIFI_LOG_INFO("connected to ssid %s, channel %d",
+                              evt->event_info.connected.ssid,
+                              evt->event_info.connected.channel);
             _esp_wifi_dev.connected = true;
             break;
 
         case EVENT_STAMODE_DISCONNECTED:
-            ESP_WIFI_DEBUG("disconnect from ssid %s, reason %d",
-                           evt->event_info.disconnected.ssid,
-                           evt->event_info.disconnected.reason);
+            ESP_WIFI_LOG_INFO("disconnected from ssid %s, reason %d",
+                              evt->event_info.disconnected.ssid,
+                              evt->event_info.disconnected.reason);
             _esp_wifi_dev.connected = false;
             break;
 
@@ -495,19 +501,19 @@ static void _esp_wifi_setup(void)
 
     /* set the WiFi interface to Station mode without DHCP */
     if (!wifi_set_opmode_current(ESP_WIFI_STATION_MODE)) {
-        ESP_WIFI_DEBUG("could not set WiFi working mode");
+        ESP_WIFI_LOG_ERROR("could not set WiFi working mode");
         return;
     }
 
     /* set the WiFi configuration */
     if (!wifi_station_set_config_current((struct station_config *)&station_cfg)) {
-        ESP_WIFI_DEBUG("could not set WiFi configuration");
+        ESP_WIFI_LOG_ERROR("could not set WiFi configuration");
         return;
     }
 
     /* get station mac address and store it in device address */
     if (!wifi_get_macaddr(ESP_WIFI_STATION_IF, dev->mac)) {
-        ESP_WIFI_DEBUG("could not get MAC address of WiFi interface");
+        ESP_WIFI_LOG_ERROR("could not get MAC address of WiFi interface");
         return;
     }
     ESP_WIFI_DEBUG("own MAC addr is " MAC_STR, MAC_STR_ARG(dev->mac));
