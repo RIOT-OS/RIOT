@@ -79,7 +79,7 @@ esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
 
     DEBUG("%s: buf=%p len=%d eb=%p\n", __func__, buffer, len, eb);
 
-    if ((buffer == NULL) || (len >= ETHERNET_DATA_LEN)) {
+    if ((buffer == NULL) || (len >= ETHERNET_MAX_LEN)) {
         if (eb != NULL) {
             esp_wifi_internal_free_rx_buffer(eb);
         }
@@ -298,7 +298,7 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
 
     /* load packet data into TX buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
-        if (dev->tx_len + iol->iol_len > ETHERNET_DATA_LEN) {
+        if (dev->tx_len + iol->iol_len > ETHERNET_MAX_LEN) {
             mutex_unlock(&dev->dev_lock);
             return -EOVERFLOW;
         }
