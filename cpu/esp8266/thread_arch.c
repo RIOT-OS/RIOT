@@ -208,9 +208,6 @@ void  thread_yield_higher(void)
     /* reset hardware watchdog */
     system_soft_wdt_feed();
 
-    /* handle pending ets tasks first to keep system alive */
-    ets_tasks_run();
-
     /* yield next task */
     #if defined(ENABLE_DEBUG) && defined(DEVELHELP)
     if (sched_active_thread) {
