@@ -40,8 +40,8 @@ typedef struct
     uint16_t rx_len;                     /**< number of bytes received */
     uint16_t tx_len;                     /**< number of bytes in transmit buffer */
 
-    uint8_t  rx_buf[ETHERNET_DATA_LEN];  /**< receive buffer */
-    uint8_t  tx_buf[ETHERNET_DATA_LEN];  /**< transmit buffer */
+    uint8_t  rx_buf[ETHERNET_MAX_LEN];  /**< receive buffer */
+    uint8_t  tx_buf[ETHERNET_MAX_LEN];  /**< transmit buffer */
 
     uint32_t event;                     /**< received event */
     bool     link_up;                   /**< indicates whether link is up */
