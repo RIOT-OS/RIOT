@@ -44,7 +44,7 @@
 #define BUSSTATE_OWNER SERCOM_I2CM_STATUS_BUSSTATE(2)
 #define BUSSTATE_BUSY SERCOM_I2CM_STATUS_BUSSTATE(3)
 
-#if defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
+#if defined(CPU_SAML21) || defined(CPU_SAML1X)
 #define SERCOM_I2CM_CTRLA_MODE_I2C_MASTER SERCOM_I2CM_CTRLA_MODE(5)
 #endif
 
@@ -98,6 +98,10 @@ void i2c_init(i2c_t dev)
                   SERCOM0_GCLK_ID_SLOW : SERCOM5_GCLK_ID_SLOW)].reg =
     (GCLK_PCHCTRL_CHEN | i2c_config[dev].gclk_src  );
     while (GCLK->SYNCBUSY.bit.GENCTRL) {}
+#elif defined (CPU_SAML1X)
+    GCLK->PCHCTRL[SERCOM0_GCLK_ID_SLOW].reg = (GCLK_PCHCTRL_CHEN |
+                                              i2c_config[dev].gclk_src  );
+     while (GCLK->SYNCBUSY.bit.GENCTRL0) {}
 #else
     /* GCLK_SERCOMx_SLOW is shared for all sercom */
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
