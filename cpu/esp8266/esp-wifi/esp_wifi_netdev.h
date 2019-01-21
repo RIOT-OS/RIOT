@@ -36,7 +36,7 @@ typedef struct
     uint8_t mac[ETHERNET_ADDR_LEN];   /**< MAC address of the device */
     ip_addr_t ip;                     /**< IPv4 address of the device */
 
-    uint8_t rx_buf[ETHERNET_DATA_LEN];/**< receive buffer */
+    uint8_t rx_buf[ETHERNET_MAX_LEN]; /**< receive buffer */
     uint16_t rx_len;                  /**< number of bytes received from lwIP */
 
     bool connected;   /**< indicates the connection state to the AP */

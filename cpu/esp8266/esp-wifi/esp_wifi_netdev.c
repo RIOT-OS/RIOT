@@ -145,6 +145,17 @@ void _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
         return;
     }
 
+    /* check whether packet buffer fits into receive buffer */
+    if (pb->len > ETHERNET_MAX_LEN) {
+        ESP_WIFI_DEBUG("frame length is greater than the maximum size of an "
+                       "Ethernet frame (%u > %u)", pb->len, ETHERNET_MAX_LEN);
+        pbuf_free(pb);
+        _in_esp_wifi_recv_cb = false;
+        critical_exit();
+        mutex_unlock(&_esp_wifi_dev.dev_lock);
+        return;
+    }
+
     /* store the frame in the buffer and free lwIP pbuf */
     _esp_wifi_dev.rx_len = pb->tot_len;
     pbuf_copy_partial(pb, _esp_wifi_dev.rx_buf, _esp_wifi_dev.rx_len, 0);
@@ -277,7 +288,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
     /* limit checks */
     if (iol_len > ETHERNET_MAX_LEN) {
-        ESP_WIFI_DEBUG("frame length exceeds maximum (%u > %u)",
+        ESP_WIFI_DEBUG("frame length exceeds the maximum (%u > %u)",
                        iol_len, ETHERNET_MAX_LEN);
         _in_send = false;
         critical_exit();
