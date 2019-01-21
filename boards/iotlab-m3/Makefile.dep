@@ -1,7 +1,5 @@
 include $(RIOTBOARD)/common/iotlab/Makefile.dep
 
-FEATURES_REQUIRED += periph_dma
-
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += isl29020
   USEMODULE += lps331ap
