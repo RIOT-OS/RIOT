@@ -51,7 +51,11 @@ static void test_atomic_inc_negative(void)
         TEST_ASSERT_EQUAL_INT(i + 1, atomic_load(&res));
     }
 }
-
+/* Prevent compiler optimization for SAML1X because of gcc internal bug */
+#ifdef CPU_SAML1X
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+#endif
 static void test_atomic_inc_rollover(void)
 {
     atomic_int res = ATOMIC_VAR_INIT(INT_MAX - 30);
@@ -67,7 +71,9 @@ static void test_atomic_inc_rollover(void)
     TEST_ASSERT_EQUAL_INT(INT_MIN + 1, atomic_fetch_add(&res, 1));
     TEST_ASSERT_EQUAL_INT(INT_MIN + 2, atomic_load(&res));
 }
-
+#ifdef CPU_SAML1X
+#pragma GCC pop_options
+#endif
 /* Test atomic_fetch_sub */
 static void test_atomic_dec_negative(void)
 {
