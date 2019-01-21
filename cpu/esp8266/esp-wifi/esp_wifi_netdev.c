@@ -92,7 +92,7 @@ extern struct netif * eagle_lwip_getif(uint8 index);
 static bool _in_esp_wifi_recv_cb = false;
 
 /**
- * @brief   Callback when UDP packet is received
+ * @brief   Callback when ethernet frame is received. Has to run in IRAM.
  */
 void _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
 {
@@ -100,10 +100,10 @@ void _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
     assert(netif != NULL);
 
     /*
-     * The function `esp_wifi_recv_cb` is executed in the context of the `wifi`
+     * The function `esp_wifi_recv_cb` is executed in the context of the `ets`
      * thread. The ISRs handling the hardware interrupts from the WiFi
-     * interface pass events to a message queue of the `wifi` thread which is
-     * sequentially processed by the `wifi` thread to asynchronously execute
+     * interface pass events to a message queue of the `ets` thread which is
+     * sequentially processed by the `ets` thread to asynchronously execute
      * callback functions such as `esp_wifi_recv_cb`.
      *
      * It should be therefore not possible to reenter function
@@ -123,7 +123,7 @@ void _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
 
     critical_enter();
 
-    /* check the first packet buffer for the minimum packet size */
+    /* first, check packet buffer for the minimum packet size */
     if (pb->len < sizeof(ethernet_hdr_t)) {
         ESP_WIFI_DEBUG("frame length is less than the size of an Ethernet"
                        "header (%u < %u)", pb->len, sizeof(ethernet_hdr_t));
@@ -311,7 +311,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         ESP_WIFI_DEBUG("could not allocate buffer to send %d bytes ", iol_len);
         /*
          * The memory of EPS8266 is quite small. Therefore, it may happen on
-         * haevy network load that we run into out of memory and we have
+         * heavy network load that we run into out of memory and we have
          * to wait until lwIP pbuf has been flushed. For that purpose, we
          * have to disconnect from AP and slow down sending. The node will
          * then reconnect to AP automatically.
