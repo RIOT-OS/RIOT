@@ -214,7 +214,7 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
 /**
  * @brief   Receives bytes into @p bytes buffer until the string pattern
  * @p string is received or the buffer is full.
- * 
+ *
  * @param[in] dev               device to operate on
  * @param[in] string            string pattern to expect
  * @param[out] bytes            buffer to store received bytes
