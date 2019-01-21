@@ -80,6 +80,34 @@ ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout)
     return (resp_pos - bytes);
 }
 
+int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
+                               char *bytes, size_t *bytes_len, uint32_t timeout)
+{
+    size_t len = 0;
+    char *_string = (char *)string;
+
+    while (*_string && len < *bytes_len) {
+        int res;
+        char c;
+        if ((res = isrpipe_read_timeout(&dev->isrpipe, &c, 1, timeout)) == 1) {
+            if (AT_PRINT_INCOMING) {
+                print(&c, 1);
+            }
+            if (c == *_string) {
+                _string++;
+            }
+            bytes[len] = c;
+            len++;
+        }
+        else {
+            *bytes_len = len;
+            return res;
+        }
+    }
+    *bytes_len = len;
+    return 0;
+}
+
 int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
 {
     size_t cmdlen = strlen(command);
