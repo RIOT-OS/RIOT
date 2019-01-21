@@ -52,6 +52,7 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
+    (void) bus;
     assert(bus == 0);
 
     const gpio_t spi1_pins =
