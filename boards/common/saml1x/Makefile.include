@@ -1,0 +1,12 @@
+# define the cpu used by the saml11 board
+export CPU = saml1x
+
+# set edbg device type
+EDBG_DEVICE_TYPE = mchp_cm23
+
+USEMODULE += boards_common_saml1x
+
+include $(RIOTMAKE)/boards/sam0.inc.mk
+
+# add the common header files to the include path
+INCLUDES += -I$(RIOTBOARD)/common/saml1x/include
