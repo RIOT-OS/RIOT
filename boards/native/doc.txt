@@ -17,4 +17,6 @@ OS/RIOT/images/Native.jpg)
 - UART: Runtime configurable - `/dev/tty*` are supported
 - Timers: Host timer
 - LEDs: One red and one green LED - state changes are printed to the UART
+- PWM: Dummy PWM
+- QDEC: Emulated according to PWM
  */
