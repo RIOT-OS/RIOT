@@ -69,7 +69,11 @@ typedef uint32_t gpio_t;
  * @brief   Macro for accessing GPIO pins
  * @{
  */
+#ifdef CPU_FAM_SAML11
+#define GPIO_PIN(x, y)      (((gpio_t)(&PORT_SEC->Group[x])) | y)
+#else
 #define GPIO_PIN(x, y)      (((gpio_t)(&PORT->Group[x])) | y)
+#endif
 
 /**
  * @brief   Available ports on the SAMD21 & SAML21
@@ -94,7 +98,11 @@ enum {
  * @name    Power mode configuration
  * @{
  */
+#ifdef CPU_FAM_SAML11
+#define PM_NUM_MODES        (2)
+#else
 #define PM_NUM_MODES        (3)
+#endif
 /** @} */
 
 #ifndef DOXYGEN
@@ -127,6 +135,7 @@ typedef enum {
 /**
  * @brief   Available MUX values for configuring a pin's alternate function
  */
+#ifndef SAM_MUX_T
 typedef enum {
     GPIO_MUX_A = 0x0,       /**< select peripheral function A */
     GPIO_MUX_B = 0x1,       /**< select peripheral function B */
@@ -137,6 +146,7 @@ typedef enum {
     GPIO_MUX_G = 0x6,       /**< select peripheral function G */
     GPIO_MUX_H = 0x7,       /**< select peripheral function H */
 } gpio_mux_t;
+#endif
 
 /**
  * @brief   Available values for SERCOM UART RX pad selection
@@ -298,6 +308,8 @@ static inline int sercom_id(void *sercom)
 {
 #if defined(CPU_FAM_SAMD21)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
+#elif defined (CPU_FAM_SAML10) || defined (CPU_FAM_SAML11)
+    return ((((uint32_t)sercom) >> 10) & 0x7) - 1;
 #elif defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
     /* Left side handles SERCOM0-4 while right side handles unaligned address of SERCOM5 */
     return ((((uint32_t)sercom) >> 10) & 0x7) + ((((uint32_t)sercom) >> 22) & 0x04);
@@ -313,12 +325,15 @@ static inline void sercom_clk_en(void *sercom)
 {
 #if defined(CPU_FAM_SAMD21)
     PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << sercom_id(sercom));
-#elif defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
+#else
     if (sercom_id(sercom) < 5) {
         MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << sercom_id(sercom));
-    } else {
+    }
+#if defined(CPU_FAM_SAML21)
+    else {
         MCLK->APBDMASK.reg |= (MCLK_APBDMASK_SERCOM5);
     }
+#endif /* CPU_FAM_SAML21 */
 #endif
 }
 
@@ -331,12 +346,15 @@ static inline void sercom_clk_dis(void *sercom)
 {
 #if defined(CPU_FAM_SAMD21)
     PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << sercom_id(sercom));
-#elif defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
+#else
     if (sercom_id(sercom) < 5) {
         MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << sercom_id(sercom));
-    } else {
+    }
+#if defined (CPU_FAM_SAML21)
+    else {
         MCLK->APBDMASK.reg &= ~(MCLK_APBDMASK_SERCOM5);
     }
+#endif /* CPU_FAM_SAML21 */
 #endif
 }
 
@@ -352,14 +370,17 @@ static inline void sercom_set_gen(void *sercom, uint32_t gclk)
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | gclk |
                          (SERCOM0_GCLK_ID_CORE + sercom_id(sercom)));
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-#elif defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
+#else
     if (sercom_id(sercom) < 5) {
         GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + sercom_id(sercom)].reg =
                                                     (GCLK_PCHCTRL_CHEN | gclk);
-    } else {
+    }
+#if defined(CPU_FAM_SAML21)
+    else {
         GCLK->PCHCTRL[SERCOM5_GCLK_ID_CORE].reg =
                                                     (GCLK_PCHCTRL_CHEN | gclk);
     }
+#endif /* CPU_FAM_SAML21 */
 #endif
 }
 

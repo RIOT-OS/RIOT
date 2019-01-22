@@ -121,7 +121,11 @@ static int _adc_configure(adc_res_t res)
     }
 #else /* CPU_SAML21 */
     /* Power on */
+#ifdef CPU_SAML1X
+    MCLK->APBCMASK.reg |= MCLK_APBCMASK_ADC;
+#else
     MCLK->APBDMASK.reg |= MCLK_APBDMASK_ADC;
+#endif
     /* GCLK Setup */
     GCLK->PCHCTRL[ADC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
     /* Set Voltage Reference */

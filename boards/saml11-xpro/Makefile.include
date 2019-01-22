@@ -1,0 +1,5 @@
+export CPU_FAM  = saml11
+export CPU_MODEL = saml11e16a
+export CFLAGS += -D__SAML11E16A__
+
+include $(RIOTBOARD)/common/saml1x/Makefile.include
