@@ -92,23 +92,6 @@ void i2c_init(i2c_t dev)
 
     /* I2C using CLK GEN 0 */
     sercom_set_gen(bus(dev),i2c_config[dev].gclk_src);
-#if defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
-    /* GCLK_ID_SLOW is shared for SERCOM[0..4] */
-    GCLK->PCHCTRL[(sercom_id(bus(dev)) < 5 ?
-                  SERCOM0_GCLK_ID_SLOW : SERCOM5_GCLK_ID_SLOW)].reg =
-    (GCLK_PCHCTRL_CHEN | i2c_config[dev].gclk_src  );
-    while (GCLK->SYNCBUSY.bit.GENCTRL) {}
-#elif defined (CPU_SAML1X)
-    GCLK->PCHCTRL[SERCOM0_GCLK_ID_SLOW].reg = (GCLK_PCHCTRL_CHEN |
-                                              i2c_config[dev].gclk_src  );
-     while (GCLK->SYNCBUSY.bit.GENCTRL0) {}
-#else
-    /* GCLK_SERCOMx_SLOW is shared for all sercom */
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
-                         i2c_config[dev].gclk_src |
-                         SERCOM0_GCLK_ID_SLOW);
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
-#endif
 
     /* Check if module is enabled. */
     if (bus(dev)->CTRLA.reg & SERCOM_I2CM_CTRLA_ENABLE) {
