@@ -13,6 +13,7 @@ from traceback import print_tb
 import pexpect
 
 from .spawn import find_exc_origin, setup_child, teardown_child
+from .unittest import PexpectTestCase   # noqa, F401 expose to users
 
 
 def run(testfunc, timeout=10, echo=True, traceback=False):
