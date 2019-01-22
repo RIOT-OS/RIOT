@@ -79,7 +79,7 @@ LOG_HANDLER.setFormatter(logging.Formatter(logging.BASIC_FORMAT))
 LOG_LEVELS = ('debug', 'info', 'warning', 'error', 'fatal', 'critical')
 
 
-class TestError(Exception):
+class ErrorInTest(Exception):
     """Custom exception for a failed test.
 
     It contains the step that failed in 'message', the 'application' and the
@@ -264,7 +264,7 @@ class RIOTApplication():
         try:
             self.compilation_and_test(**test_kwargs)
             return None
-        except TestError as err:
+        except ErrorInTest as err:
             self.logger.error('Failed during: %s', err)
             return (str(err), err.application.appdir, err.errorfile)
 
@@ -283,7 +283,7 @@ class RIOTApplication():
         succeeds.
 
         :param incremental: Do not rerun successful compilation and tests
-        :raises TestError: on execution failed during one step
+        :raises ErrorInTest: on execution failed during one step
         """
 
         # Ignore incompatible APPS
@@ -301,7 +301,7 @@ class RIOTApplication():
         create_directory(self.resultdir, clean=not incremental)
 
         # Run compilation and flash+test
-        # It raises TestError on error which is handled outside
+        # It raises ErrorInTest on error which is handled outside
 
         compilation_cmd = list(self.COMPILE_TARGETS)
         if jobs is not None:
@@ -415,7 +415,7 @@ class RIOTApplication():
 
         self.logger.warning(output)
         self.logger.error('Error during %s, writing to %s', name, outfile)
-        raise TestError(name, self, outfile)
+        raise ErrorInTest(name, self, outfile)
 
     def _write_resultfile(self, name, status, body=''):
         """Write `body` to result file `name.status`.
