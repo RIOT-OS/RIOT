@@ -1,6 +1,11 @@
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# check and set flash and debug parameters if required, only
+FLASH_DEBUG_GOALS := flash flash-only debug debug-server
+ifneq (, $(filter $(FLASH_DEBUG_GOALS), $(MAKECMDGOALS)))
+
 # Use DEBUG_ADAPTER_ID to specify the programmer serial number to use:
 # export DEBUG_ADAPTER_ID="ATML..."
 
@@ -39,3 +44,5 @@ endif
 
 # this board uses openocd for debug and possibly flashing
 include $(RIOTMAKE)/tools/openocd.inc.mk
+
+endif # FLASH_DEBUG_GOALS
