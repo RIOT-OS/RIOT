@@ -300,7 +300,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
         }
 
         /* if there is a free spot: remember it */
-        if ((res == NULL) && (rbuf[i].super.pkt == NULL)) {
+        if ((res == NULL) && rbuf_entry_empty(&rbuf[i])) {
             res = &(rbuf[i]);
         }
 
@@ -314,8 +314,9 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
     /* entry not in buffer and no empty spot found */
     if (res == NULL) {
         assert(oldest != NULL);
-        /* if oldest->pkt == NULL, res must not be NULL */
-        assert(oldest->super.pkt != NULL);
+        /* if oldest is not empty, res must not be NULL (because otherwise
+         * oldest could have been picked as res) */
+        assert(!rbuf_entry_empty(oldest));
         DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
         gnrc_pktbuf_release(oldest->super.pkt);
         rbuf_rm(oldest);
@@ -363,5 +364,25 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
     return res;
 }
+
+#ifdef TEST_SUITES
+void rbuf_reset(void)
+{
+    xtimer_remove(&_gc_timer);
+    memset(rbuf_int, 0, sizeof(rbuf_int));
+    for (unsigned int i = 0; i < RBUF_SIZE; i++) {
+        if ((rbuf[i].super.pkt != NULL) &&
+            (rbuf[i].super.pkt->users > 0)) {
+            gnrc_pktbuf_release(rbuf[i].super.pkt);
+        }
+    }
+    memset(rbuf, 0, sizeof(rbuf));
+}
+
+const rbuf_t *rbuf_array(void)
+{
+    return &rbuf[0];
+}
+#endif
 
 /** @} */
