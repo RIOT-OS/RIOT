@@ -20,11 +20,21 @@
 #define ESP_WIFI_NETDEV_H
 
 #include "net/netdev.h"
-#include "lwip/udp.h"
+#include "ringbuffer.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   State of the WiFi interface
+ */
+typedef enum {
+    ESP_WIFI_NOT_WORKING,   /**< interface is not working correctly */
+    ESP_WIFI_DISCONNECTED,  /**< interface is not associated to the AP */
+    ESP_WIFI_CONNECTING,    /**< interface is trying an association to the AP */
+    ESP_WIFI_CONNECTED      /**< interface is not associated to the AP */
+} esp_wifi_state_t;
 
 /**
  * @brief   Device descriptor for ESP infrastructure mode WIFI device
@@ -34,15 +44,14 @@ typedef struct
     netdev_t netdev;                  /**< netdev parent struct */
 
     uint8_t mac[ETHERNET_ADDR_LEN];   /**< MAC address of the device */
-    ip_addr_t ip;                     /**< IPv4 address of the device */
 
     uint8_t rx_buf[ETHERNET_MAX_LEN]; /**< receive buffer */
     uint16_t rx_len;                  /**< number of bytes received from lwIP */
 
-    bool connected;   /**< indicates the connection state to the AP */
+    esp_wifi_state_t state;           /**< indicates the interface state */
 
-    mutex_t dev_lock; /**< for exclusive access to buffer in receive functions */
-
+    mutex_t dev_lock;                 /**< for exclusive access to buffer in
+                                           receive functions */
 } esp_wifi_netdev_t;
 
 #ifdef __cplusplus

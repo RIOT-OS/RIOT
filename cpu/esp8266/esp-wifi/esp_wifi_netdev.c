@@ -197,14 +197,14 @@ static void _esp_wifi_handle_event_cb(System_Event_t *evt)
             ESP_WIFI_LOG_INFO("connected to ssid %s, channel %d",
                               evt->event_info.connected.ssid,
                               evt->event_info.connected.channel);
-            _esp_wifi_dev.connected = true;
+            _esp_wifi_dev.state = ESP_WIFI_CONNECTED;
             break;
 
         case EVENT_STAMODE_DISCONNECTED:
             ESP_WIFI_LOG_INFO("disconnected from ssid %s, reason %d",
                               evt->event_info.disconnected.ssid,
                               evt->event_info.disconnected.reason);
-            _esp_wifi_dev.connected = false;
+            _esp_wifi_dev.state = ESP_WIFI_DISCONNECTED;
 
             /* call disconnect to reset internal state */
             if (!wifi_station_disconnect()) {
@@ -263,7 +263,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     esp_wifi_netdev_t *dev = (esp_wifi_netdev_t*)netdev;
 
     critical_enter();
-    if (!dev->connected) {
+    if (dev->state != ESP_WIFI_CONNECTED) {
         ESP_WIFI_DEBUG("WiFi is still not connected to AP, cannot send");
         _in_send = false;
         critical_exit();
@@ -459,7 +459,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_LINK_CONNECTED:
             assert(max_len == 1);
-            if (dev->connected) {
+            if (dev->state == ESP_WIFI_CONNECTED) {
                 *((netopt_enable_t *)val) = NETOPT_ENABLE;
             }
             else {
@@ -544,7 +544,7 @@ static void _esp_wifi_setup(void)
 
     /* initialize netdev data structure */
     dev->rx_len = 0;
-    dev->connected = false;
+    dev->state = ESP_WIFI_DISCONNECTED;
 
     mutex_init(&dev->dev_lock);
 
