@@ -63,8 +63,12 @@
 #define ESP_WIFI_STATION_IF         (STATION_IF)
 #define ESP_WIFI_SOFTAP_IF          (SOFTAP_IF)
 
+#define ESP_WIFI_RECONNECT_TIME     (20 * US_PER_SEC)
 #define MAC_STR                     "%02x:%02x:%02x:%02x:%02x:%02x"
 #define MAC_STR_ARG(m)              m[0], m[1], m[2], m[3], m[4], m[5]
+/** Timer used to reconnect automatically after 20 seconds if not connected */
+static xtimer_t _esp_wifi_reconnect_timer;
+
 /**
  * There is only one ESP WIFI device. We define it as static device variable
  * to have accesss to the device inside ESP WIFI interrupt routines which do
@@ -93,6 +97,26 @@ static bool _in_send = false;
 
 /** guard variable to avoid reentrance to _esp_wifi_recv_cb */
 static bool _in_esp_wifi_recv_cb = false;
+
+/**
+ * @brief   Reconnect function called back by the reconnect timer
+ */
+static void IRAM _esp_wifi_reconnect_timer_cb(void* arg)
+{
+    DEBUG("%s\n", __func__);
+
+    esp_wifi_netdev_t* dev = (esp_wifi_netdev_t*)arg;
+
+    if (dev->state == ESP_WIFI_DISCONNECTED ||
+        dev->state == ESP_WIFI_CONNECTING) {
+        wifi_station_disconnect();
+        wifi_station_connect();
+        dev->state = ESP_WIFI_CONNECTING;
+    }
+
+    /* set the time for next connection check */
+    xtimer_set(&_esp_wifi_reconnect_timer, ESP_WIFI_RECONNECT_TIME);
+}
 
 /**
  * @brief   Callback when ethernet frame is received. Has to run in IRAM.
@@ -573,6 +597,13 @@ static void _esp_wifi_setup(void)
 
     /* register callbacks */
     wifi_set_event_handler_cb(_esp_wifi_handle_event_cb);
+
+    /* reconnect timer initialization */
+    _esp_wifi_reconnect_timer.callback = &_esp_wifi_reconnect_timer_cb;
+    _esp_wifi_reconnect_timer.arg = dev;
+
+    /* set the the reconnect timer */
+    xtimer_set(&_esp_wifi_reconnect_timer, ESP_WIFI_RECONNECT_TIME);
 
     /* connect */
     wifi_station_connect();
