@@ -110,6 +110,8 @@ void rtt_set_counter(uint32_t counter)
 {
     /* Disable time counter before writing to the timestamp register */
     bit_clear32(&RTC->SR, RTC_SR_TCE_SHIFT);
+    RTC->TPR = 0;
+    /* write TSR after TPR, as clearing TPR bit 14 will increment TSR */
     RTC->TSR = counter;
     /* Enable when done */
     bit_set32(&RTC->SR, RTC_SR_TCE_SHIFT);
