@@ -514,7 +514,12 @@ extern err_t __real_ethernet_input(struct pbuf *pb, struct netif* netif);
 err_t __wrap_ethernet_input(struct pbuf *pb, struct netif* netif)
 {
     ESP_WIFI_DEBUG("%p %p", pb, netif);
-    _esp_wifi_recv_cb(pb, netif);
+    if (_esp_wifi_dev.state == ESP_WIFI_CONNECTED) {
+        _esp_wifi_recv_cb(pb, netif);
+    }
+    else {
+        __real_ethernet_input(pb, netif);
+    }
     return ERR_OK;
 }
 
