@@ -68,6 +68,9 @@
 
 #define MAC_STR                     "%02x:%02x:%02x:%02x:%02x:%02x"
 #define MAC_STR_ARG(m)              m[0], m[1], m[2], m[3], m[4], m[5]
+
+#define PBUF_IEEE80211_HLEN         (36)
+
 /** Timer used to reconnect automatically after 20 seconds if not connected */
 static xtimer_t _esp_wifi_reconnect_timer;
 
@@ -328,7 +331,7 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
     struct netif *sta_netif = (struct netif *)eagle_lwip_getif(ESP_WIFI_STATION_IF);
     netif_set_default(sta_netif);
 
-    struct pbuf *pb = pbuf_alloc(PBUF_LINK, iol_len, PBUF_RAM);
+    struct pbuf *pb = pbuf_alloc(PBUF_LINK, iol_len + PBUF_IEEE80211_HLEN, PBUF_RAM);
     if (pb == NULL || pb->tot_len < iol_len) {
         ESP_WIFI_DEBUG("could not allocate buffer to send %d bytes ", iol_len);
         /*
