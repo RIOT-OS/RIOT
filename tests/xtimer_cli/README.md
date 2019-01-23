@@ -7,6 +7,8 @@ Consult the 'help' shell command for available actions.
 
 The automated tests are based on RobotFramework and thus depend on additional
 Python packages, namely `robotframework` and `riot_pal`.
+See also the RobotFramework [README.md](../../dist/robotframework/README.md)
+for more details.
 
 ## Background
 

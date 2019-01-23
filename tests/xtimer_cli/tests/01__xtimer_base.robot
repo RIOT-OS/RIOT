@@ -1,15 +1,19 @@
 *** Settings ***
 Documentation       Basic tests to verify functionality of the Xtimer API.
 
+# reset application and check DUT has correct firmware, skip all tests on error
 Suite Setup         Run Keywords    Reset Application
 ...                                 DUT Must Have API Firmware
+# reset application and check DUT is up again befor every test case
 Test Setup          Run Keywords    Reset Application
 ...                                 DUT Must Have API Firmware
 
+# import libs and keywords
 Library             Xtimer  port=%{PORT}  baudrate=%{BAUD}  timeout=${10}
 Resource            api_shell.keywords.txt
 Resource            riot_base.keywords.txt
 
+# add default tags to all tests
 Force Tags          xtimer
 
 *** Test Cases ***
