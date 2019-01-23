@@ -364,7 +364,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
     unsigned tkl = coap_get_token_len(pkt);
     unsigned len = sizeof(coap_hdr_t) + tkl;
 
-    if ((len + payload_len + 1) > rlen) {
+    if ((len + payload_len) > rlen) {
         return -ENOSPC;
     }
 
