@@ -207,18 +207,14 @@ static void _esp_wifi_handle_event_cb(System_Event_t *evt)
             _esp_wifi_dev.state = ESP_WIFI_DISCONNECTED;
 
             /* call disconnect to reset internal state */
-            if (!wifi_station_disconnect()) {
-                ESP_WIFI_LOG_ERROR("could not disconnect from to AP %s",
-                                   ESP_WIFI_SSID);
-                return;
+            if (evt->event_info.disconnected.reason != REASON_ASSOC_LEAVE) {
+                wifi_station_disconnect();
             }
 
             /* try to reconnect */
-            if (!wifi_station_connect()) {
-                ESP_WIFI_LOG_ERROR("could not start connection to AP %s",
-                                   ESP_WIFI_SSID);
-                return;
-            }
+            wifi_station_connect();
+            _esp_wifi_dev.state = ESP_WIFI_CONNECTING;
+
             break;
 
         default:
@@ -574,10 +570,8 @@ static void _esp_wifi_setup(void)
     wifi_set_event_handler_cb(_esp_wifi_handle_event_cb);
 
     /* connect */
-    if (!wifi_station_connect()) {
-        ESP_WIFI_LOG_ERROR("could not start connection to AP %s", ESP_WIFI_SSID);
-        return;
-    }
+    wifi_station_connect();
+    _esp_wifi_dev.state = ESP_WIFI_CONNECTING;
 
     return;
 }
