@@ -322,8 +322,11 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len);
  *
  * This function can be used to create a reply to any CoAP request packet.  It
  * will create the reply packet header based on parameters from the request
- * (e.g., id, token).  Passing a non-zero @p payload_len will ensure the payload
- * fits into the buffer along with the header.
+ * (e.g., id, token).
+ *
+ * Passing a non-zero @p payload_len will ensure the payload fits into the
+ * buffer along with the header. For this validation, payload_len must include
+ * any options, the payload marker, as well as the payload proper.
  *
  * @param[in]   pkt         packet to reply to
  * @param[in]   code        reply code (e.g., COAP_CODE_204)
@@ -333,6 +336,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len);
  *
  * @returns     size of reply packet on success
  * @returns     <0 on error
+ * @returns     -ENOSPC if @p rbuf too small
  */
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                          uint8_t *rbuf, unsigned rlen, unsigned payload_len);
@@ -343,7 +347,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
  * This is a simple wrapper that allows for building CoAP replies for simple
  * use-cases.
  *
- * The reply will be written to @p buf. Is @p payload and @p payload_len
+ * The reply will be written to @p buf. If @p payload and @p payload_len are
  * non-zero, the payload will be copied into the resulting reply packet.
  *
  * @param[in]   pkt         packet to reply to
@@ -356,6 +360,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
  *
  * @returns     size of reply packet on success
  * @returns     <0 on error
+ * @returns     -ENOSPC if @p buf too small
  */
 ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
