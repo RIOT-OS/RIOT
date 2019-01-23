@@ -220,6 +220,21 @@ do_reset() {
                     -commandfile '${RIOTTOOLS}/jlink/reset.seg'"
 }
 
+_wait_rtt_server()
+{
+    _host="$1"
+    _port="$2"
+    for _ in $(seq 0 10); do
+        # Use 'timeout' around 'netcat' as it got stuck some time when
+        # connecting too many times
+        timeout 0.1 nc -q 1 -z "${_host}" "${_port}" && return
+        sleep 0.1
+    done
+    echo "Timeout waiting for RTT server on ${_host}:${_port}" >&2
+    echo "Keep going anyway if it is just a wrapper issue" >&2
+    return
+}
+
 do_term() {
     test_config
     test_serial
@@ -246,6 +261,8 @@ do_term() {
             -jtagconf -1,-1 \
             -commandfile '${RIOTTOOLS}/jlink/term.seg' >/dev/null & \
             echo  \$! > $JLINK_PIDFILE" &
+
+    _wait_rtt_server localhost "${_JLINK_TERMPORT}"
 
     sh -c "${JLINK_TERMPROG} ${JLINK_TERMFLAGS}"
 }
