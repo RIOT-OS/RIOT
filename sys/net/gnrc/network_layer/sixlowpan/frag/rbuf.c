@@ -121,6 +121,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     if ((offset + frag_size) > entry->super.pkt->size) {
         DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
         gnrc_pktbuf_release(entry->super.pkt);
+        gnrc_pktbuf_release(pkt);
         rbuf_rm(entry);
         return RBUF_ADD_ERROR;
     }
