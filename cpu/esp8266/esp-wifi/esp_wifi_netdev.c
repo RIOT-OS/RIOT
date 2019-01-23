@@ -64,6 +64,8 @@
 #define ESP_WIFI_SOFTAP_IF          (SOFTAP_IF)
 
 #define ESP_WIFI_RECONNECT_TIME     (20 * US_PER_SEC)
+#define ESP_WIFI_SEND_TIMEOUT       (MS_PER_SEC)
+
 #define MAC_STR                     "%02x:%02x:%02x:%02x:%02x:%02x"
 #define MAC_STR_ARG(m)              m[0], m[1], m[2], m[3], m[4], m[5]
 /** Timer used to reconnect automatically after 20 seconds if not connected */
@@ -380,9 +382,22 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
 #endif /* ENABLE_DEBUG */
 
     int res = ieee80211_output_pbuf(sta_netif, pb);
+
+    /*
+     * Attempting to send the next frame before completing the transmission
+     * of the previous frame may result in a complete blockage of the send
+     * function. To avoid this blockage, we have to wait here until the frame
+     * has been sent. The frame has been sent when pb->ref becomes 1.
+     * We wait for a maximum time of ESP_WIFI_SEND_TIMEOUT milliseconds.
+     */
+    unsigned _timeout = ESP_WIFI_SEND_TIMEOUT;
+    while (pb->ref > 1 && --_timeout && dev->state == ESP_WIFI_CONNECTED) {
+        xtimer_usleep(US_PER_MS);
+    }
     pbuf_free(pb);
 
-    if (res == ERR_OK) {
+    if (res == ERR_OK && _timeout) {
+        /* There was no ieee80211_output_pbuf error and no send timeout. */
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.tx_bytes += iol_len;
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
@@ -392,16 +407,17 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
         return iol_len;
     }
     else {
+        /* There was either a ieee80211_output_pbuf error or send timed out. */
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.tx_failed++;
 #endif
         _in_send = false;
         critical_exit();
         /*
-         * This error usually happens because we run into out of memory. We have
-         * to wait until lwIP pbuf has been flushed. For that purpose, we
-         * have to disconnect from AP and wait for a short time. The node will
-         * then reconnect to AP automatically.
+         * ieee80211_output_pbuf usually happens because we run into out of
+         * memory. We have to wait until lwIP pbuf has been flushed. For that
+         * purpose, we have to disconnect from AP and wait for a short time.
+         * The node will then reconnect to AP automatically.
          */
         wifi_station_disconnect();
         return -EIO;
