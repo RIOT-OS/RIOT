@@ -97,7 +97,7 @@ static bool _in_esp_wifi_recv_cb = false;
 /**
  * @brief   Callback when ethernet frame is received. Has to run in IRAM.
  */
-void _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
+void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
 {
     assert(pb != NULL);
     assert(netif != NULL);
@@ -244,8 +244,7 @@ uint8_t _send_pkt_buf[ETHERNET_MAX_LEN];
 /** function used to send an ethernet frame over WiFi */
 extern err_t ieee80211_output_pbuf(struct netif *netif, struct pbuf *p);
 
-/** guard variable to avoid reentrance to _send */
-static int _send(netdev_t *netdev, const iolist_t *iolist)
+static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
 {
     ESP_WIFI_DEBUG("%p %p", netdev, iolist);
 
