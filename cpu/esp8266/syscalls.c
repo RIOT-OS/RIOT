@@ -27,6 +27,7 @@
 #include <sys/reent.h>
 #include <sys/stat.h>
 
+#include <malloc.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -87,13 +88,13 @@ int /* IRAM */ printf(const char* format, ...)
     return ret;
 }
 
-#ifdef SDK_HEAP_USED
+#ifdef MODULE_ESP_SDK
 /**
  * Map memory management functions to SDK memory management functions.
  * This is necessary to use the same heap as the SDK internally does.
- * Furthermore, these functions do at least avoid interrupts during the
- * execution of memory management functions. Memory management function
- * of ETS are not used and have not to considered therefore.
+ * Furthermore, these functions at least avoid interrupts during the
+ * execution of memory management functions. Memory management functions
+ * of ETS are not used and have not to be considered therefore.
  */
 extern void *pvPortMalloc (size_t size, const char *, unsigned);
 extern void vPortFree (void *ptr, const char *, unsigned);
@@ -102,7 +103,16 @@ extern void *pvPortCalloc (size_t nmemb, size_t size, const char *, unsigned);
 extern void *pvPortRealloc (void *ptr, size_t size, const char *, unsigned);
 extern unsigned int xPortGetFreeHeapSize(void);
 
-void* IRAM malloc(size_t size)
+void *__real_malloc(size_t size);
+void  __real_free(void *ptr);
+void *__real_calloc(size_t nmemb, size_t size);
+void *__real_realloc(void *ptr, size_t size);
+void *__real__malloc_r (struct _reent *r, size_t size);
+void  __real__free_r (struct _reent *r, void *ptr);
+void *__real__realloc_r (struct _reent *r, void *ptr, size_t size);
+struct mallinfo __real_mallinfo(void);
+
+void* IRAM __wrap_malloc(size_t size)
 {
     #if MEMLEAK_DEBUG
     static const char mem_debug_file[] ICACHE_RODATA_ATTR STORE_ATTR = __FILE__;
@@ -112,7 +122,7 @@ void* IRAM malloc(size_t size)
     #endif
 }
 
-void IRAM free(void *ptr)
+void IRAM __wrap_free(void *ptr)
 {
     #if MEMLEAK_DEBUG
     static const char mem_debug_file[] ICACHE_RODATA_ATTR STORE_ATTR = __FILE__;
@@ -122,7 +132,7 @@ void IRAM free(void *ptr)
     #endif
 }
 
-void* IRAM calloc(size_t nmemb, size_t size)
+void* IRAM __wrap_calloc(size_t nmemb, size_t size)
 {
     #if MEMLEAK_DEBUG
     static const char mem_debug_file[] ICACHE_RODATA_ATTR STORE_ATTR = __FILE__;
@@ -132,7 +142,7 @@ void* IRAM calloc(size_t nmemb, size_t size)
     #endif
 }
 
-void* IRAM realloc(void *ptr, size_t size)
+void* IRAM __wrap_realloc(void *ptr, size_t size)
 {
     #if MEMLEAK_DEBUG
     static const char mem_debug_file[] ICACHE_RODATA_ATTR STORE_ATTR = __FILE__;
@@ -142,14 +152,19 @@ void* IRAM realloc(void *ptr, size_t size)
     #endif
 }
 
-void* IRAM _malloc_r (struct _reent *r, size_t size)
+void* IRAM __wrap__malloc_r (struct _reent *r, size_t size)
 {
-    return malloc (size);
+    return __wrap_malloc (size);
 }
 
-void IRAM _free_r (struct _reent *r, void *ptr)
+void IRAM __wrap__free_r (struct _reent *r, void *ptr)
 {
-    free (ptr);
+    __wrap_free (ptr);
+}
+
+void IRAM *__wrap__realloc_r (struct _reent *r, void *ptr, size_t size)
+{
+    return __wrap_realloc (ptr, size);
 }
 
 unsigned int get_free_heap_size (void)
@@ -157,14 +172,37 @@ unsigned int get_free_heap_size (void)
     return xPortGetFreeHeapSize();
 }
 
-void IRAM syscalls_init (void) {}
+extern uint8_t  _eheap;     /* end of heap (defined in esp8266.riot-os.app.ld) */
+extern uint8_t  _sheap;     /* start of heap (defined in esp8266.riot-os.app.ld) */
 
-#else   /* SDK_HEAP_USED */
+struct mallinfo __wrap_mallinfo(void)
+{
+    struct mallinfo mi;
+
+    mi.arena = &_eheap - &_sheap;
+    mi.fordblks = get_free_heap_size();
+    mi.uordblks = mi.arena - mi.fordblks;
+    mi.keepcost = mi.fordblks;
+    return mi;
+}
+
+void heap_stats(void)
+{
+    struct mallinfo minfo = __wrap_mallinfo();
+    ets_printf("heap: %d (used %d, free %d)\n",
+               minfo.arena, minfo.uordblks, minfo.fordblks);
+}
+
+void IRAM syscalls_init (void)
+{
+}
+
+#else   /* MODULE_ESP_SDK */
 /*
- * To use the same heap SDK memory management functions have to be replaced by
- * newlib memory functions. In that case the _malloc_lock/_unlock functions
- * have to be defined. Memory management functions of ETS are not used and
- * have not to considered here.
+ * To use the same heap as SDK internally does, SDK memory management
+ * functions have to be replaced by newlib memory functions. In that case,
+ * the _malloc_lock/_unlock functions have to be defined. Memory management
+ * functions of ETS are not used and have not to be considered here.
  */
 
 void* IRAM pvPortMalloc (size_t size, const char *file, unsigned line)
@@ -227,9 +265,11 @@ size_t IRAM xPortGetFreeHeapSize (void)
 }
 
 /*
- * Following function implement the lock mechanism in newlib. The only static
+ * Following functions implement the lock mechanism in newlib. The only static
  * mutex defined here is the __malloc_recursive_mutex to avoid that memory
  * management functions try to lock before RIOT's threads are running.
+ * These lock/unlock functions cannot be used in the SDK version since some ISR
+ * in SDK use malloc/free which does not work in interrupt context.
  */
 
 extern _lock_t __malloc_recursive_mutex;
@@ -342,6 +382,7 @@ void IRAM _lock_release_recursive(_lock_t *lock)
 
 extern char *heap_top;
 extern char _eheap;     /* end of heap (defined in esp8266.riot-os.app.ld) */
+extern char _sheap;     /* start of heap (defined in esp8266.riot-os.app.ld) */
 
 #else /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
 
@@ -380,8 +421,6 @@ void* IRAM _sbrk_r (struct _reent *r, ptrdiff_t incr)
     return (void*) _cheap_old;
 }
 
-
-
 #endif  /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
 
 unsigned int IRAM get_free_heap_size (void)
@@ -389,7 +428,15 @@ unsigned int IRAM get_free_heap_size (void)
     return (_cheap) ? &_eheap - _cheap : 0;
 }
 
-#endif /* SDK_HEAP_USED */
+void heap_stats(void)
+{
+    struct mallinfo minfo = mallinfo();
+    ets_printf("heap: %u (free %u), ", &_eheap - &_sheap, get_free_heap_size());
+    ets_printf("sysmem: %d (used %d, free %d)\n",
+               minfo.arena, minfo.uordblks, minfo.fordblks);
+}
+
+#endif /* MODULE_ESP_SDK */
 
 #if !defined(MODULE_NEWLIB_SYSCALLS_DEFAULT)
 
