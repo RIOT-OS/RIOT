@@ -88,6 +88,9 @@ static const struct station_config station_cfg = {
 
 extern struct netif * eagle_lwip_getif(uint8 index);
 
+/** guard variable to avoid reentrance to _send */
+static bool _in_send = false;
+
 /** guard variable to avoid reentrance to _esp_wifi_recv_cb */
 static bool _in_esp_wifi_recv_cb = false;
 
@@ -112,7 +115,7 @@ void _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
      * by a mutex because `esp_wifi_recv_cb` would be reentered from same
      * thread context.
      */
-    if (_in_esp_wifi_recv_cb) {
+    if (_in_esp_wifi_recv_cb || _in_send) {
         pbuf_free(pb);
         return;
     }
@@ -242,8 +245,6 @@ uint8_t _send_pkt_buf[ETHERNET_MAX_LEN];
 extern err_t ieee80211_output_pbuf(struct netif *netif, struct pbuf *p);
 
 /** guard variable to avoid reentrance to _send */
-static bool _in_send = false;
-
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     ESP_WIFI_DEBUG("%p %p", netdev, iolist);
