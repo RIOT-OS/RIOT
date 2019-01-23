@@ -62,7 +62,8 @@ _JLINK_IF=SWD
 _JLINK_SPEED=2000
 # default terminal frontend
 _JLINK_TERMPROG=${RIOTTOOLS}/pyterm/pyterm
-_JLINK_TERMFLAGS="-ts 19021"
+_JLINK_TERMPORT=19021
+_JLINK_TERMFLAGS="-ts ${_JLINK_TERMPORT}"
 
 #
 # a couple of tests for certain configuration options
