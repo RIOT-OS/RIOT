@@ -59,6 +59,7 @@
 #define ESP_WIFI_STATION_MODE       (STATION_MODE)
 #define ESP_WIFI_AP_MODE            (SOFTAP_MODE)
 #define ESP_WIFI_STATION_AP_MODE    (STATIONAP_MODE)
+#define ESP_WIFI_MODE               (STATIONAP_MODE)
 
 #define ESP_WIFI_STATION_IF         (STATION_IF)
 #define ESP_WIFI_SOFTAP_IF          (SOFTAP_IF)
@@ -94,6 +95,32 @@ static const struct station_config station_cfg = {
         .ssid = ESP_WIFI_SSID,
         .password = ESP_WIFI_PASS,
 };
+
+#ifndef MODULE_ESP_NOW
+/**
+ * Static const configuration for the SoftAP which is used to configure the 
+ * SoftAP interface if ESP-NOW is not enabled.
+ *
+ * Since we need to use the WiFi interface in SoftAP + Station mode for
+ * stability reasons, although in fact only the station interface is required,
+ * we make the SoftAP interface invisible and unusable. This configuration
+ *
+ * - uses the same hidden SSID that the station interface uses to
+ *   connect to the AP,
+ * - uses the same channel that the station interface uses to connect to the AP,
+ * - defines a very long beacon interval
+ * - doesn't allow any connection.
+ */
+static const struct softap_config softap_cfg = {
+        .ssid = ESP_WIFI_SSID,
+        .ssid_len = sizeof(ESP_WIFI_SSID) / sizeof(ESP_WIFI_SSID[0]),
+        .ssid_hidden = 1,               /* don't make the AP visible */
+        .password = ESP_WIFI_PASS,
+        .authmode = AUTH_WPA2_PSK,
+        .max_connection = 0,            /* don't allow connections */
+        .beacon_interval = 60000,       /* send beacon only every 60 s */
+};
+#endif
 
 extern struct netif * eagle_lwip_getif(uint8 index);
 
@@ -249,6 +276,12 @@ static void _esp_wifi_handle_event_cb(System_Event_t *evt)
 
             break;
 
+        case EVENT_SOFTAPMODE_STACONNECTED:
+            ESP_WIFI_LOG_INFO("station " MACSTR " join, aid %d",
+                              MAC2STR(evt->event_info.sta_connected.mac),
+                              evt->event_info.sta_connected.aid);
+            break;
+
         default:
             break;
     }
@@ -295,8 +328,8 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
         return -EIO;
     }
 
-    if (wifi_get_opmode() != ESP_WIFI_STATION_MODE) {
-        ESP_WIFI_DEBUG("WiFi is not in station mode, cannot send");
+    if (wifi_get_opmode() != ESP_WIFI_MODE) {
+        ESP_WIFI_DEBUG("WiFi is not in correct mode, cannot send");
         _in_send = false;
         critical_exit();
         return -EIO;
@@ -595,13 +628,21 @@ static void _esp_wifi_setup(void)
     /* set the netdev driver */
     dev->netdev.driver = &_esp_wifi_driver;
 
-    /* set the WiFi interface to Station mode without DHCP */
-    if (!wifi_set_opmode_current(ESP_WIFI_STATION_MODE)) {
+#ifndef MODULE_ESP_NOW
+    /* set the WiFi interface mode */
+    if (!wifi_set_opmode_current(ESP_WIFI_MODE)) {
         ESP_WIFI_LOG_ERROR("could not set WiFi working mode");
         return;
     }
 
-    /* set the WiFi configuration */
+    /* set the WiFi SoftAP configuration */
+    if (!wifi_softap_set_config_current((struct softap_config *)&softap_cfg)) {
+        ESP_WIFI_LOG_ERROR("could not set WiFi configuration");
+        return;
+    }
+#endif
+
+    /* set the WiFi station configuration */
     if (!wifi_station_set_config_current((struct station_config *)&station_cfg)) {
         ESP_WIFI_LOG_ERROR("could not set WiFi configuration");
         return;
