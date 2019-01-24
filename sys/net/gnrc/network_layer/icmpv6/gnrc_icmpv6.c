@@ -78,7 +78,7 @@ void gnrc_icmpv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     if (_calc_csum(icmpv6, ipv6, pkt)) {
         DEBUG("icmpv6: wrong checksum.\n");
-        /* don't release: IPv6 does this */
+        gnrc_pktbuf_release(pkt);
         return;
     }
 
