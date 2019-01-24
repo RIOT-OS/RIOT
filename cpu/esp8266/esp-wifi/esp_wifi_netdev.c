@@ -185,9 +185,9 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
     critical_enter();
 
     /* first, check packet buffer for the minimum packet size */
-    if (pb->len < sizeof(ethernet_hdr_t)) {
+    if (pb->tot_len < sizeof(ethernet_hdr_t)) {
         ESP_WIFI_DEBUG("frame length is less than the size of an Ethernet"
-                       "header (%u < %u)", pb->len, sizeof(ethernet_hdr_t));
+                       "header (%u < %u)", pb->tot_len, sizeof(ethernet_hdr_t));
         pbuf_free(pb);
         _in_esp_wifi_recv_cb = false;
         critical_exit();
@@ -207,9 +207,9 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
     }
 
     /* check whether packet buffer fits into receive buffer */
-    if (pb->len > ETHERNET_MAX_LEN) {
+    if (pb->tot_len > ETHERNET_MAX_LEN) {
         ESP_WIFI_DEBUG("frame length is greater than the maximum size of an "
-                       "Ethernet frame (%u > %u)", pb->len, ETHERNET_MAX_LEN);
+                       "Ethernet frame (%u > %u)", pb->tot_len, ETHERNET_MAX_LEN);
         pbuf_free(pb);
         _in_esp_wifi_recv_cb = false;
         critical_exit();
