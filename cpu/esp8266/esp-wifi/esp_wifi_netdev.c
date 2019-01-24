@@ -141,6 +141,8 @@ static void IRAM _esp_wifi_reconnect_timer_cb(void* arg)
 
     if (dev->state == ESP_WIFI_DISCONNECTED ||
         dev->state == ESP_WIFI_CONNECTING) {
+        ESP_WIFI_LOG_INFO("trying to reconnect to ssid " ESP_WIFI_SSID);
+
         wifi_station_disconnect();
         wifi_station_connect();
         dev->state = ESP_WIFI_CONNECTING;
