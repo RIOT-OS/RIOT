@@ -104,24 +104,27 @@ void i2c_init(i2c_t dev)
 
 int i2c_acquire(i2c_t dev)
 {
-    assert(dev < I2C_NUMOF);
+    if (dev < I2C_NUMOF) {
+        mutex_lock(&locks[dev]);
+        bus(dev)->ENABLE = TWIM_ENABLE_ENABLE_Enabled;
 
-    mutex_lock(&locks[dev]);
-    bus(dev)->ENABLE = TWIM_ENABLE_ENABLE_Enabled;
-
-    DEBUG("[i2c] acquired dev %i\n", (int)dev);
-    return 0;
+        DEBUG("[i2c] acquired dev %i\n", (int)dev);
+        return 0;
+    }
+    return -1;
 }
 
 int i2c_release(i2c_t dev)
 {
-    assert(dev < I2C_NUMOF);
+    if (dev < I2C_NUMOF) {
 
-    bus(dev)->ENABLE = TWIM_ENABLE_ENABLE_Disabled;
-    mutex_unlock(&locks[dev]);
+        bus(dev)->ENABLE = TWIM_ENABLE_ENABLE_Disabled;
+        mutex_unlock(&locks[dev]);
 
-    DEBUG("[i2c] released dev %i\n", (int)dev);
-    return 0;
+        DEBUG("[i2c] released dev %i\n", (int)dev);
+        return 0;
+    }
+    return -1;
 }
 
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
