@@ -161,9 +161,9 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
     assert(netif != NULL);
 
     /*
-     * The function `esp_wifi_recv_cb` is executed in the context of the `ets`
-     * thread. The ISRs handling the hardware interrupts from the WiFi
-     * interface pass events to a message queue of the `ets` thread which is
+     * Function `esp_wifi_recv_cb` is executed in the context of the `ets`
+     * thread. ISRs which handle hardware interrupts from the WiFi interface
+     * simply pass events to a message queue of the `ets` thread which are then
      * sequentially processed by the `ets` thread to asynchronously execute
      * callback functions such as `esp_wifi_recv_cb`.
      *
@@ -211,29 +211,24 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
         return;
     }
 
-    /* store the frame in the buffer and free lwIP pbuf */
+    /* we have to store the frame in the buffer and free lwIP pbuf immediatly */
     _esp_wifi_dev.rx_len = pb->tot_len;
     pbuf_copy_partial(pb, _esp_wifi_dev.rx_buf, _esp_wifi_dev.rx_len, 0);
     pbuf_free(pb);
 
     /*
-     * Because this function is not executed in interrupt context but in thread
-     * context, following msg_send could block on heavy network load, if frames
-     * are coming in faster than the ISR events can be handled. To avoid
-     * blocking during msg_send, we pretend we are in an ISR by incrementing
-     * the IRQ nesting counter. If IRQ nesting counter is greater 0, function
-     * irq_is_in returns true and the non-blocking version of msg_send is used.
+     * Since _esp_wifi_recv_cb is not executed in interrupt context but in
+     * the context of the `ets` thread, it is not necessary to pass the
+     * `NETDEV_EVENT_ISR` event first. Instead, the receive function can be
+     * called directly which result in much faster handling, a less frame lost
+     * rate and more robustness. There is no need for a mutex anymore to
+     * synchronize the access to the receive buffer between _esp_wifi_recv_cb
+     * and _recv function.
      */
-    irq_interrupt_nesting++;
-
-    /* trigger netdev event to read the data */
     if (_esp_wifi_dev.netdev.event_callback) {
         _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev,
-                                            NETDEV_EVENT_ISR);
+                                            NETDEV_EVENT_RX_COMPLETE);
     }
-
-    /* reset IRQ nesting counter */
-    irq_interrupt_nesting--;
 
     _in_esp_wifi_recv_cb = false;
     critical_exit();
@@ -565,12 +560,6 @@ static void _isr(netdev_t *netdev)
     ESP_WIFI_DEBUG("%p", netdev);
 
     assert(netdev != NULL);
-
-    esp_wifi_netdev_t *dev = (esp_wifi_netdev_t *)netdev;
-
-    if (dev->rx_len) {
-        dev->netdev.event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
-    }
 }
 
 /** override lwIP ethernet_intput to get ethernet frames */
