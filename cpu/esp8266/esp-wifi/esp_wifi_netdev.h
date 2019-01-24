@@ -49,8 +49,6 @@ typedef struct
 
     esp_wifi_state_t state;           /**< indicates the interface state */
 
-    mutex_t dev_lock;                 /**< for exclusive access to buffer in
-                                           receive functions */
 } esp_wifi_netdev_t;
 
 #ifdef __cplusplus
