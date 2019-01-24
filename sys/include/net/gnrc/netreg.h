@@ -107,15 +107,15 @@ typedef enum {
  *
  * @param[in] demux_ctx The @ref gnrc_netreg_entry_t::demux_ctx "demux context"
  *                      for the netreg entry
- * @param[in] mbox      Target @ref core_mbox "mailbox" for the registry entry
+ * @param[in] _mbox      Target @ref core_mbox "mailbox" for the registry entry
  *
  * @note    Only available with @ref net_gnrc_netapi_mbox.
  *
  * @return  An initialized netreg entry
  */
-#define GNRC_NETREG_ENTRY_INIT_MBOX(demux_ctx, mbox) { NULL, demux_ctx, \
+#define GNRC_NETREG_ENTRY_INIT_MBOX(demux_ctx, _mbox) { NULL, demux_ctx, \
                                                        GNRC_NETREG_TYPE_MBOX, \
-                                                       { .mbox = mbox } }
+                                                       { .mbox = _mbox } }
 #endif
 
 #if defined(MODULE_GNRC_NETAPI_CALLBACKS) || defined(DOXYGEN)
@@ -124,15 +124,15 @@ typedef enum {
  *
  * @param[in] demux_ctx The @ref gnrc_netreg_entry_t::demux_ctx "demux context"
  *                      for the netreg entry
- * @param[in] cbd       Target callback for the registry entry
+ * @param[in] _cbd       Target callback for the registry entry
  *
  * @note    Only available with @ref net_gnrc_netapi_callbacks.
  *
  * @return  An initialized netreg entry
  */
-#define GNRC_NETREG_ENTRY_INIT_CB(demux_ctx, cbd)   { NULL, demux_ctx, \
+#define GNRC_NETREG_ENTRY_INIT_CB(demux_ctx, _cbd)   { NULL, demux_ctx, \
                                                       GNRC_NETREG_TYPE_CB, \
-                                                      { .cbd = cbd } }
+                                                      { .cbd = _cbd } }
 /** @} */
 
 /**
