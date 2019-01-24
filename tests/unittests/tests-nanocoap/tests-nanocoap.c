@@ -331,6 +331,29 @@ static void test_nanocoap__get_multi_query(void)
 }
 
 /*
+ * Builds on get_req test, to test building a PDU that completely fills the
+ * buffer.
+ */
+static void test_nanocoap__option_add_buffer_max(void)
+{
+    uint8_t buf[70];    /* header 4, token 2, path 64 */
+    coap_pkt_t pkt;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+    char path[] = "/23456789012345678901234567890123456789012345678901234567890123";
+
+    size_t uri_opt_len = 64;    /* option hdr 2, option value 62 */
+
+    size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                &token[0], 2, COAP_METHOD_GET, msgid);
+
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
+}
+
+/*
  * Helper for server_get tests below.
  * GET Request for nanocoap server example /riot/value resource.
  * Includes 2-byte token; non-confirmable.
@@ -531,6 +554,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__get_path_too_long),
         new_TestFixture(test_nanocoap__get_query),
         new_TestFixture(test_nanocoap__get_multi_query),
+        new_TestFixture(test_nanocoap__option_add_buffer_max),
         new_TestFixture(test_nanocoap__server_get_req),
         new_TestFixture(test_nanocoap__server_reply_simple),
         new_TestFixture(test_nanocoap__server_get_req_con),
