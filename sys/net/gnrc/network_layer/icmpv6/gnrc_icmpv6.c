@@ -69,6 +69,7 @@ void gnrc_icmpv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     if (icmpv6->size < sizeof(icmpv6_hdr_t)) {
         DEBUG("icmpv6: packet too short.\n");
+        gnrc_pktbuf_release(pkt);
         return;
     }
 
