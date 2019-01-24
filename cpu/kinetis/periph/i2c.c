@@ -108,21 +108,24 @@ static i2c_state_t i2c_state[I2C_NUMOF];
 
 int i2c_acquire(i2c_t dev)
 {
-    assert((unsigned)dev < I2C_NUMOF);
-    mutex_lock(&i2c_state[dev].mtx);
-    i2c_state[dev].pid = thread_getpid();
-    return 0;
+    if (dev < I2C_NUMOF) {
+        mutex_lock(&i2c_state[dev].mtx);
+        i2c_state[dev].pid = thread_getpid();
+        return 0;
+    }
+    return -1;
 }
 
 int i2c_release(i2c_t dev)
 {
-    /* Check that the bus was properly stopped before releasing */
-    /* It is a programming error to release the bus after sending a start
-     * condition but before sending a stop condition */
-    assert(i2c_state[dev].active == 0);
-
-    mutex_unlock(&i2c_state[dev].mtx);
-    return 0;
+    /* The 2nd condition checks that the bus was properly stopped before
+     * releasing it. It is a programming error to release the bus after
+     * sending a start condition but before sending a stop condition */
+    if ((dev < I2C_NUMOF) && (i2c_state[dev].active == 0)) {
+        mutex_unlock(&i2c_state[dev].mtx);
+        return 0;
+    }
+    return -1;
 }
 
 static uint8_t i2c_find_divider(unsigned freq, unsigned speed)
