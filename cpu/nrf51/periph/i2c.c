@@ -133,18 +133,20 @@ void i2c_init(i2c_t dev)
 
 int i2c_acquire(i2c_t dev)
 {
-    assert(dev < I2C_NUMOF);
-
-    mutex_lock(&locks[dev]);
-    return 0;
+    if (dev < I2C_NUMOF) {
+        mutex_lock(&locks[dev]);
+        return 0;
+    }
+    return -1;
 }
 
 int i2c_release(i2c_t dev)
 {
-    assert(dev < I2C_NUMOF);
-
-    mutex_unlock(&locks[dev]);
-    return 0;
+    if (dev < I2C_NUMOF) {
+        mutex_unlock(&locks[dev]);
+        return 0;
+    }
+    return -1;
 }
 
 int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
