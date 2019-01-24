@@ -179,9 +179,6 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
     }
     _in_esp_wifi_recv_cb = true;
 
-    /* avoid concurrent access to the receive buffer */
-    mutex_lock(&_esp_wifi_dev.dev_lock);
-
     critical_enter();
 
     /* first, check packet buffer for the minimum packet size */
@@ -191,7 +188,6 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
         pbuf_free(pb);
         _in_esp_wifi_recv_cb = false;
         critical_exit();
-        mutex_unlock(&_esp_wifi_dev.dev_lock);
         return;
     }
 
@@ -202,7 +198,6 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
         pbuf_free(pb);
         _in_esp_wifi_recv_cb = false;
         critical_exit();
-        mutex_unlock(&_esp_wifi_dev.dev_lock);
         return;
     }
 
@@ -213,7 +208,6 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
         pbuf_free(pb);
         _in_esp_wifi_recv_cb = false;
         critical_exit();
-        mutex_unlock(&_esp_wifi_dev.dev_lock);
         return;
     }
 
@@ -243,7 +237,6 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
 
     _in_esp_wifi_recv_cb = false;
     critical_exit();
-    mutex_unlock(&_esp_wifi_dev.dev_lock);
 }
 
 /**
@@ -470,9 +463,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     esp_wifi_netdev_t* dev = (esp_wifi_netdev_t*)netdev;
 
-    /* avoid concurrent access to the receive buffer */
-    mutex_lock(&dev->dev_lock);
-
     uint16_t size = dev->rx_len ? dev->rx_len : 0;
 
     if (!buf) {
@@ -481,7 +471,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             /* if len > 0, drop the frame */
             dev->rx_len = 0;
         }
-        mutex_unlock(&dev->dev_lock);
         return size;
     }
 
@@ -490,7 +479,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         ESP_WIFI_DEBUG("not enough space in receive buffer");
         /* newest API requires to drop the frame in that case */
         dev->rx_len = 0;
-        mutex_unlock(&dev->dev_lock);
         return -ENOBUFS;
     }
 
@@ -513,7 +501,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     netdev->stats.rx_bytes += size;
 #endif
 
-    mutex_unlock(&dev->dev_lock);
     return size;
 }
 
@@ -624,8 +611,6 @@ static void _esp_wifi_setup(void)
     /* initialize netdev data structure */
     dev->rx_len = 0;
     dev->state = ESP_WIFI_DISCONNECTED;
-
-    mutex_init(&dev->dev_lock);
 
     /* set the netdev driver */
     dev->netdev.driver = &_esp_wifi_driver;
