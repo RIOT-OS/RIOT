@@ -47,6 +47,9 @@ extern "C" {
 #define THREAD_STACKSIZE_MAIN         (3072)
 #endif
 
+#ifndef GNRC_IPV6_STACK_SIZE
+#define GNRC_IPV6_STACK_SIZE          (1536)
+#endif
 #ifndef GNRC_PKTDUMP_STACKSIZE
 #define GNRC_PKTDUMP_STACKSIZE        (THREAD_STACKSIZE_DEFAULT)
 #endif
@@ -74,6 +77,9 @@ extern "C" {
 #define THREAD_STACKSIZE_MAIN         (3072)
 #endif
 
+#ifndef GNRC_IPV6_STACK_SIZE
+#define GNRC_IPV6_STACK_SIZE          (1536)
+#endif
 #ifndef GNRC_PKTDUMP_STACKSIZE
 #define GNRC_PKTDUMP_STACKSIZE        (THREAD_STACKSIZE_DEFAULT)
 #endif
