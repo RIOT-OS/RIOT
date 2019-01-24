@@ -176,33 +176,30 @@ static void _i2c_init(I2C_TypeDef *i2c, uint32_t clk, uint32_t ccr)
 
 int i2c_acquire(i2c_t dev)
 {
-    assert(dev < I2C_NUMOF);
-
-    mutex_lock(&locks[dev]);
-
+    if (dev < I2C_NUMOF) {
+        mutex_lock(&locks[dev]);
 #ifdef STM32_PM_STOP
-    /* block STOP mode */
-    pm_block(STM32_PM_STOP);
+        /* block STOP mode */
+        pm_block(STM32_PM_STOP);
 #endif
-
-    periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
-
-    return 0;
+        periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
+        return 0;
+    }
+    return -1;
 }
 
 int i2c_release(i2c_t dev)
 {
-    assert(dev < I2C_NUMOF);
-
-    periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
-
+    if (dev < I2C_NUMOF) {
+        periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
 #ifdef STM32_PM_STOP
-    /* unblock STOP mode */
-    pm_unblock(STM32_PM_STOP);
+        /* unblock STOP mode */
+        pm_unblock(STM32_PM_STOP);
 #endif
-
-    mutex_unlock(&locks[dev]);
-    return 0;
+        mutex_unlock(&locks[dev]);
+        return 0;
+    }
+    return -1;
 }
 
 int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,

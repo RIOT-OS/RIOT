@@ -135,23 +135,22 @@ static void _i2c_init(I2C_TypeDef *i2c, uint32_t timing)
 
 int i2c_acquire(i2c_t dev)
 {
-    assert(dev < I2C_NUMOF);
-
-    mutex_lock(&locks[dev]);
-
-    periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
-
-    return 0;
+    if (dev < I2C_NUMOF) {
+        mutex_lock(&locks[dev]);
+        periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
+        return 0;
+    }
+    return -1;
 }
 
 int i2c_release(i2c_t dev)
 {
-    assert(dev < I2C_NUMOF);
-
-    periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
-
-    mutex_unlock(&locks[dev]);
-    return 0;
+    if (dev < I2C_NUMOF) {
+        periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
+        mutex_unlock(&locks[dev]);
+        return 0;
+    }
+    return -1;
 }
 
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
