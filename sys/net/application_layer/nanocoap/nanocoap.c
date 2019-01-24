@@ -350,12 +350,17 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
     if (payload_len) {
         bufpos += coap_put_option_ct(bufpos, 0, ct);
         *bufpos++ = 0xff;
-
-        memcpy(bufpos, payload, payload_len);
-        bufpos += payload_len;
     }
 
-    return coap_build_reply(pkt, code, buf, len, bufpos - payload_start);
+    ssize_t res = coap_build_reply(pkt, code, buf, len,
+                                   bufpos - payload_start + payload_len);
+
+    if (payload_len && (res > 0)) {
+        assert(payload);
+        memcpy(bufpos, payload, payload_len);
+    }
+
+    return res;
 }
 
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
@@ -364,7 +369,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
     unsigned tkl = coap_get_token_len(pkt);
     unsigned len = sizeof(coap_hdr_t) + tkl;
 
-    if ((len + payload_len + 1) > rlen) {
+    if ((len + payload_len) > rlen) {
         return -ENOSPC;
     }
 
