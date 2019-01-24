@@ -30,6 +30,9 @@ extern "C" {
 #ifndef GNRC_IPV6_NIB_CONF_6LBR
 #define GNRC_IPV6_NIB_CONF_6LBR         (1)
 #endif
+#ifndef GNRC_IPV6_NIB_CONF_SLAAC
+#define GNRC_IPV6_NIB_CONF_SLAAC        (1)
+#endif
 #ifndef GNRC_IPV6_NIB_NUMOF
 #define GNRC_IPV6_NIB_NUMOF             (16)
 #endif
