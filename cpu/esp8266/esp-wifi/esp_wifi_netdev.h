@@ -20,7 +20,6 @@
 #define ESP_WIFI_NETDEV_H
 
 #include "net/netdev.h"
-#include "ringbuffer.h"
 
 #ifdef __cplusplus
 extern "C" {
