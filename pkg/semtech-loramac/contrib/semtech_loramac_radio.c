@@ -96,7 +96,7 @@ void SX127XSetRxConfig(RadioModems_t modem, uint32_t bandwidth,
     sx127x_set_freq_hop(&sx127x, freqHopOn);
     sx127x_set_hop_period(&sx127x, hopPeriod);
     sx127x_set_iq_invert(&sx127x, iqInverted);
-    sx127x_set_symbol_timeout(&sx127x, 2 * symbTimeout);
+    sx127x_set_symbol_timeout(&sx127x, symbTimeout);
     sx127x_set_rx_single(&sx127x, !rxContinuous);
 }
 

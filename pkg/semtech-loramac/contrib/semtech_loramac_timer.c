@@ -60,12 +60,7 @@ void TimerSetValue(TimerEvent_t *obj, uint32_t value)
         xtimer_remove(&(obj->dev));
     }
 
-    /* According to the lorawan specifications, the data sent from the gateway
-       could arrive with a short shift in time of +/- 20ms. Here the timeout is
-       triggered 50ms in advance to make sure the radio switches to RX mode on
-       time and doesn't miss any downlink messages, taking in consideration
-       possible xtimer inaccuracies. */
-    obj->timeout = (value - 50) * US_PER_MS;
+    obj->timeout = value * US_PER_MS;
 }
 
 TimerTime_t TimerGetCurrentTime(void)
