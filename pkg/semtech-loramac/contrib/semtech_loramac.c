@@ -433,10 +433,14 @@ void _init_loramac(semtech_loramac_t *mac,
     semtech_loramac_set_class(mac, LORAMAC_DEFAULT_DEVICE_CLASS);
     semtech_loramac_set_tx_port(mac, LORAMAC_DEFAULT_TX_PORT);
     semtech_loramac_set_tx_mode(mac, LORAMAC_DEFAULT_TX_MODE);
+    semtech_loramac_set_system_max_rx_error(mac,
+            LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR);
+    semtech_loramac_set_min_rx_symbols(mac, LORAMAC_DEFAULT_MIN_RX_SYMBOLS);
     mac->link_chk.available = false;
 #ifdef MODULE_PERIPH_EEPROM
     _read_loramac_config(mac);
 #endif
+
 }
 
 static void _join_otaa(semtech_loramac_t *mac)
