@@ -43,9 +43,6 @@ extern "C" {
 #define SPI_MOSISEL         (dev(bus)->PSEL.MOSI)
 #define SPI_MISOSEL         (dev(bus)->PSEL.MISO)
 #ifndef CPU_MODEL_NRF52840XXAA
-#define UART_PIN_RTS        (GPIO_UNDEF)
-#define UART_PIN_CTS        (GPIO_UNDEF)
-#define UART_HWFLOWCTRL     (0)
 #define UART_IRQN           (UARTE0_UART0_IRQn)
 #endif
 /** @} */
