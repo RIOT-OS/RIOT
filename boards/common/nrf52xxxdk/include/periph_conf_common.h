@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
+#ifndef PERIPH_CONF_COMMON_H
+#define PERIPH_CONF_COMMON_H
 
 #include "periph_cpu.h"
 #include "cfg_clock_32_1.h"
@@ -29,15 +29,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    UART configuration
- * @{
- */
-#define UART_NUMOF          (1U)
-#define UART_PIN_RX         GPIO_PIN(0,8)
-#define UART_PIN_TX         GPIO_PIN(0,6)
-/** @} */
 
 /**
  * @name    SPI configuration
@@ -84,5 +75,5 @@ static const pwm_conf_t pwm_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
+#endif /* PERIPH_CONF_COMMON_H */
 /** @} */
