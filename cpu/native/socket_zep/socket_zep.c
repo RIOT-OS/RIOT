@@ -35,6 +35,9 @@
 #include "debug.h"
 
 #define _UNIX_NTP_ERA_OFFSET    (2208988800U)
+/* can't use timex.h's US_PER_SEC as timeval's tv_usec is signed long
+ * (https://pubs.opengroup.org/onlinepubs/9699919799.2016edition/basedefs/time.h.html) */
+#define TV_USEC_PER_SEC         (1000000L)
 
 static size_t _zep_hdr_fill_v2_data(socket_zep_t *dev, zep_v2_data_hdr_t *hdr,
                                     size_t payload_len)
@@ -49,7 +52,10 @@ static size_t _zep_hdr_fill_v2_data(socket_zep_t *dev, zep_v2_data_hdr_t *hdr,
     hdr->lqi_mode = 1;
     hdr->lqi_val = 0xff;                /* TODO: set */
     hdr->time.seconds = byteorder_htonl(tv.tv_sec + _UNIX_NTP_ERA_OFFSET);
-    hdr->time.fraction = byteorder_htonl((tv.tv_usec * 1000000) / 232);
+    assert(tv.tv_usec < TV_USEC_PER_SEC);
+    hdr->time.fraction = byteorder_htonl(
+            (uint32_t)((uint64_t)tv.tv_usec * TV_USEC_PER_SEC) / 232U
+        );
     hdr->seq = byteorder_htonl(dev->seq);
     memset(hdr->resv, 0, sizeof(hdr->resv));
     hdr->length = payload_len;
