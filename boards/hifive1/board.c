@@ -96,7 +96,7 @@ void board_init_clock(void)
      /* Note: The range is limited to ~100MHz and depends on PLL settings */
     PRCI_set_hfrosctrim_for_f_cpu(CPU_DESIRED_FREQ, PRCI_FREQ_UNDERSHOOT);
 
-     /* disable uncrustify *INDENT-OFF* */
+     /* begin{code-style-ignore} */
     SPI0_REG(SPI_REG_FFMT) =               /* setup "Fast Read Dual I/O" 1-1-2              */
         SPI_INSN_CMD_EN         |          /* Enable memory-mapped flash                    */
         SPI_INSN_ADDR_LEN(3)    |          /* 25LP128 read commands have 3 address bytes    */
@@ -106,7 +106,7 @@ void board_init_clock(void)
         SPI_INSN_DATA_PROTO(SPI_PROTO_D) | /*  data protocol for given instruction          */
         SPI_INSN_CMD_CODE(0xbb) |          /* Set the instruction to "Fast Read Dual I/O"   */
         SPI_INSN_PAD_CODE(0x00);           /* Dummy cycle sends 0 value bits                */
-    /* *INDENT-ON* */
+    /* end{code-style-ignore} */
 
     SPI0_REG(SPI_REG_SCKDIV) = SCKDIV;
 }
