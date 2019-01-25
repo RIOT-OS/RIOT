@@ -20,6 +20,7 @@
 #define RBUF_H
 
 #include <inttypes.h>
+#include <stdbool.h>
 
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pkt.h"
@@ -90,6 +91,30 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *frag,
 void rbuf_gc(void);
 
 void rbuf_rm(rbuf_t *rbuf);
+
+static inline bool rbuf_entry_empty(const rbuf_t *rbuf) {
+    return (rbuf->super.pkt == NULL);
+}
+
+#if defined(TEST_SUITES) || defined(DOXYGEN)
+/**
+ * @brief   Resets the packet buffer to a clean state
+ *
+ * @note    Only available when @ref TEST_SUITES is defined
+ */
+void rbuf_reset(void);
+
+/**
+ * @brief   Returns a pointer to the array representing the reassembly buffer.
+ *
+ * @note    Only available when @ref TEST_SUITES is defined
+ *
+ * @return  The first element of the reassembly buffer. `const`, so that write
+ *          access is immediately spotted at compile time of tests. The `const`
+ *          qualifier may however be discarded if required by the tests.
+ */
+const rbuf_t *rbuf_array(void);
+#endif
 
 #ifdef __cplusplus
 }
