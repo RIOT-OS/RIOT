@@ -247,6 +247,9 @@ static void mac_set(enc28j60_t *dev, uint8_t *mac)
 
 static void on_int(void *arg)
 {
+    /* disable gobal interupt enable bit to avoid loosing interupts */
+    cmd_bfc((enc28j60_t *)arg, REG_EIE, -1, EIE_INTIE);
+
     netdev_t *netdev = (netdev_t *)arg;
     netdev->event_callback(arg, NETDEV_EVENT_ISR);
 }
@@ -333,6 +336,9 @@ static int nd_recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
     next = (uint16_t)((head[1] << 8) | head[0]);
     size = (uint16_t)((head[3] << 8) | head[2]) - 4;  /* discard CRC */
 
+    DEBUG("[enc28j60] recv: size=%i next=%i buf=%p len=%d\n",
+          (int)size, (int)next, buf, max_len);
+
     if (buf != NULL) {
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.rx_count++;
@@ -346,6 +352,12 @@ static int nd_recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
             size = 0;
         }
         /* release memory */
+        cmd_w_addr(dev, ADDR_RX_READ, NEXT_TO_ERXRDPT(next));
+        cmd_bfs(dev, REG_ECON2, -1, ECON2_PKTDEC);
+    }
+    else if (max_len != 0) {
+        /* drop the packet */
+        DEBUG("[enc28j60] recv: drop packet - no buffer to receive\n");
         cmd_w_addr(dev, ADDR_RX_READ, NEXT_TO_ERXRDPT(next));
         cmd_bfs(dev, REG_ECON2, -1, ECON2_PKTDEC);
     }
@@ -489,6 +501,8 @@ static void nd_isr(netdev_t *netdev)
         }
         eir = cmd_rcr(dev, REG_EIR, -1);
     }
+    /* enable gobal interupt enable bit again */
+    cmd_bfs(dev, REG_EIE, -1, EIE_INTIE);
 }
 
 static int nd_get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
