@@ -254,16 +254,6 @@ static void _esp_wifi_handle_event_cb(System_Event_t *evt)
                               evt->event_info.disconnected.ssid,
                               evt->event_info.disconnected.reason);
             _esp_wifi_dev.state = ESP_WIFI_DISCONNECTED;
-
-            /* call disconnect to reset internal state */
-            if (evt->event_info.disconnected.reason != REASON_ASSOC_LEAVE) {
-                wifi_station_disconnect();
-            }
-
-            /* try to reconnect */
-            wifi_station_connect();
-            _esp_wifi_dev.state = ESP_WIFI_CONNECTING;
-
             break;
 
         case EVENT_SOFTAPMODE_STACONNECTED:
@@ -630,6 +620,10 @@ static void _esp_wifi_setup(void)
         return;
     }
     ESP_WIFI_DEBUG("own MAC addr is " MAC_STR, MAC_STR_ARG(dev->mac));
+
+    /* set auto reconnect policy */
+    wifi_station_set_reconnect_policy(true);
+    wifi_station_set_auto_connect(true);
 
     /* register callbacks */
     wifi_set_event_handler_cb(_esp_wifi_handle_event_cb);
