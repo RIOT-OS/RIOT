@@ -1171,6 +1171,12 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                     }
                     gnrc_pktqueue_add(&entry->pktqueue, queue_entry);
                 }
+                else {
+                    DEBUG("nib: can't allocate entry for packet queue "
+                          "dropping packet\n");
+                    gnrc_pktbuf_release(pkt);
+                    return false;
+                }
             }
             else {
                 gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR,
