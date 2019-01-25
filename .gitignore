@@ -58,3 +58,6 @@ Makefile.local
 
 # scan-build artifacts
 scan-build/
+
+# compile_and_test_for_boards default "results" directory
+results/
