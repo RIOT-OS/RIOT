@@ -233,6 +233,41 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
     critical_exit();
 }
 
+#define BEACON_TIMEOUT      (200)
+#define HANDSHAKE_TIMEOUT   (204)
+
+static const char *_esp_wifi_disc_reasons [] = {
+    "INVALID",                     /* 0 */
+    "UNSPECIFIED",                 /* 1 */
+    "AUTH_EXPIRE",                 /* 2 */
+    "AUTH_LEAVE",                  /* 3 */
+    "ASSOC_EXPIRE",                /* 4 */
+    "ASSOC_TOOMANY",               /* 5 */
+    "NOT_AUTHED",                  /* 6 */
+    "NOT_ASSOCED",                 /* 7 */
+    "ASSOC_LEAVE",                 /* 8 */
+    "ASSOC_NOT_AUTHED",            /* 9 */
+    "DISASSOC_PWRCAP_BAD",         /* 10 (11h) */
+    "DISASSOC_SUPCHAN_BAD",        /* 11 (11h) */
+    "IE_INVALID",                  /* 13 (11i) */
+    "MIC_FAILURE",                 /* 14 (11i) */
+    "4WAY_HANDSHAKE_TIMEOUT",      /* 15 (11i) */
+    "GROUP_KEY_UPDATE_TIMEOUT",    /* 16 (11i) */
+    "IE_IN_4WAY_DIFFERS",          /* 17 (11i) */
+    "GROUP_CIPHER_INVALID",        /* 18 (11i) */
+    "PAIRWISE_CIPHER_INVALID",     /* 19 (11i) */
+    "AKMP_INVALID",                /* 20 (11i) */
+    "UNSUPP_RSN_IE_VERSION",       /* 21 (11i) */
+    "INVALID_RSN_IE_CAP",          /* 22 (11i) */
+    "802_1X_AUTH_FAILED",          /* 23 (11i) */
+    "CIPHER_SUITE_REJECTED",       /* 24 (11i) */
+    "BEACON_TIMEOUT",              /* 200 */
+    "NO_AP_FOUND",                 /* 201 */
+    "AUTH_FAIL",                   /* 202 */
+    "ASSOC_FAIL",                  /* 203 */
+    "HANDSHAKE_TIMEOUT"            /* 204 */
+};
+
 /**
  * @brief   Event handler for esp system events.
  */
@@ -240,19 +275,33 @@ static void _esp_wifi_handle_event_cb(System_Event_t *evt)
 {
     ESP_WIFI_DEBUG("event %d", evt->event);
 
+    uint8_t reason;
+    const char* reason_str = "UNKNOWN";
+
     switch (evt->event) {
         case EVENT_STAMODE_CONNECTED:
             ESP_WIFI_LOG_INFO("connected to ssid %s, channel %d",
                               evt->event_info.connected.ssid,
                               evt->event_info.connected.channel);
             _esp_wifi_dev.state = ESP_WIFI_CONNECTED;
+            _esp_wifi_dev.event = EVENT_STAMODE_CONNECTED;
+            _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
             break;
 
         case EVENT_STAMODE_DISCONNECTED:
-            ESP_WIFI_LOG_INFO("disconnected from ssid %s, reason %d",
+            reason = evt->event_info.disconnected.reason;
+            if (reason < REASON_BEACON_TIMEOUT) {
+                reason_str = _esp_wifi_disc_reasons[reason];
+            }
+            else if (reason <= REASON_HANDSHAKE_TIMEOUT) {
+                reason_str = _esp_wifi_disc_reasons[reason - REASON_BEACON_TIMEOUT];
+            }
+            ESP_WIFI_LOG_INFO("disconnected from ssid %s, reason %d (%s)",
                               evt->event_info.disconnected.ssid,
-                              evt->event_info.disconnected.reason);
+                              evt->event_info.disconnected.reason, reason_str);
             _esp_wifi_dev.state = ESP_WIFI_DISCONNECTED;
+            _esp_wifi_dev.event = EVENT_STAMODE_DISCONNECTED;
+            _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
             break;
 
         case EVENT_SOFTAPMODE_STACONNECTED:
