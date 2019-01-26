@@ -350,13 +350,9 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
         /*
          * The memory of EPS8266 is quite small. Therefore, it may happen on
          * heavy network load that we run into out of memory and we have
-         * to wait until lwIP pbuf has been flushed. For that purpose, we
-         * have to disconnect from AP and slow down sending. The node will
-         * then reconnect to AP automatically.
+         * to wait until lwIP pbuf has been flushed. We slow down sending a bit.
          */
         critical_exit();
-        /* disconnect from AP */
-        wifi_station_disconnect();
         /* wait 20 ms */
         xtimer_usleep(20 * US_PER_MS);
 
