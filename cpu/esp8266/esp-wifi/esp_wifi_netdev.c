@@ -574,6 +574,22 @@ static void _isr(netdev_t *netdev)
     ESP_WIFI_DEBUG("%p", netdev);
 
     assert(netdev != NULL);
+
+    esp_wifi_netdev_t *dev = (esp_wifi_netdev_t *) netdev;
+
+    switch (dev->event) {
+        case EVENT_STAMODE_CONNECTED:
+            dev->netdev.event_callback(netdev, NETDEV_EVENT_LINK_UP);
+            break;
+        case EVENT_STAMODE_DISCONNECTED:
+            dev->netdev.event_callback(netdev, NETDEV_EVENT_LINK_DOWN);
+            break;
+        default:
+            break;
+    }
+    _esp_wifi_dev.event = EVENT_MAX; /* no event */
+
+    return;
 }
 
 /** override lwIP ethernet_intput to get ethernet frames */
@@ -614,6 +630,7 @@ static void _esp_wifi_setup(void)
     /* initialize netdev data structure */
     dev->rx_len = 0;
     dev->state = ESP_WIFI_DISCONNECTED;
+    dev->event = EVENT_MAX;
 
     /* set the netdev driver */
     dev->netdev.driver = &_esp_wifi_driver;

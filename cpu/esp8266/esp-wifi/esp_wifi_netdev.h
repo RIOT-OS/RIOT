@@ -48,6 +48,7 @@ typedef struct
     uint16_t rx_len;                  /**< number of bytes received from lwIP */
 
     esp_wifi_state_t state;           /**< indicates the interface state */
+    uint32_t event;                   /**< received event */
 
 } esp_wifi_netdev_t;
 
