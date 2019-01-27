@@ -93,7 +93,11 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
         *dst++ = *data_addr++;
     }
     _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_WP);
-
+#ifdef CPU_SAML1X
+    while(!_NVMCTRL->STATUS.bit.READY) {}
+#else
+    while (!_NVMCTRL->INTFLAG.bit.READY) {}
+#endif
     _lock();
 }
 
