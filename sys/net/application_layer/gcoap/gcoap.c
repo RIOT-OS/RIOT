@@ -496,15 +496,18 @@ static void _expire_request(gcoap_request_memo_t *memo)
  * Handler for /.well-known/core. Lists registered handlers, except for
  * /.well-known/core itself.
  */
-static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+                                        void *ctx)
 {
     (void)ctx;
-   /* write header */
+
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
-    int plen = gcoap_get_resource_list(pdu->payload, (size_t)pdu->payload_len,
-                                      COAP_FORMAT_LINK);
-    /* response content */
-    return gcoap_finish(pdu, (size_t)plen, COAP_FORMAT_LINK);
+    coap_opt_add_format(pdu, COAP_FORMAT_LINK);
+    ssize_t plen = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
+
+    plen += gcoap_get_resource_list(pdu->payload, (size_t)pdu->payload_len,
+                                    COAP_FORMAT_LINK);
+    return plen;
 }
 
 /*
