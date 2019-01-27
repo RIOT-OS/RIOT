@@ -582,7 +582,7 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                     unsigned code, char *path)
 {
     return (gcoap_req_init(pdu, buf, len, code, path) == 0)
-                ? gcoap_finish(pdu, 0, COAP_FORMAT_NONE)
+                ? coap_opt_finish(pdu, COAP_OPT_FINISH_NONE)
                 : -1;
 }
 
@@ -648,7 +648,7 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf,
                                      size_t len, unsigned code)
 {
     return (gcoap_resp_init(pdu, buf, len, code) == 0)
-                ? gcoap_finish(pdu, 0, COAP_FORMAT_NONE)
+                ? coap_opt_finish(pdu, COAP_OPT_FINISH_NONE)
                 : -1;
 }
 
