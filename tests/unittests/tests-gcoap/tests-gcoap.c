@@ -140,10 +140,11 @@ static void test_gcoap__client_put_req(void)
     char payload[] = "1";
 
     gcoap_req_init(&pdu, buf, GCOAP_PDU_BUF_SIZE, COAP_METHOD_PUT, path);
+    coap_opt_add_format(&pdu, COAP_FORMAT_TEXT);
+    len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
     memcpy(pdu.payload, payload, 1);
-    len = gcoap_finish(&pdu, 1, COAP_FORMAT_TEXT);
 
-    coap_parse(&pdu, buf, len);
+    coap_parse(&pdu, buf, len + 1);
 
     TEST_ASSERT_EQUAL_INT(COAP_METHOD_PUT, coap_get_code(&pdu));
     TEST_ASSERT_EQUAL_INT(1, pdu.payload_len);
@@ -172,7 +173,7 @@ static void test_gcoap__client_get_query(void)
     optlen = gcoap_add_qstring(&pdu, key2, NULL);
     TEST_ASSERT_EQUAL_INT(2, optlen);
 
-    size_t len = gcoap_finish(&pdu, 0, COAP_FORMAT_NONE);
+    size_t len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
 
     coap_parse(&pdu, buf, len);
 
@@ -198,7 +199,7 @@ static void test_gcoap__client_get_path_defer(void)
     coap_opt_add_string(&pdu, COAP_OPT_URI_PATH, path, '/');
     optlen = 6;
 
-    len = gcoap_finish(&pdu, 0, COAP_FORMAT_NONE);
+    len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
     TEST_ASSERT_EQUAL_INT(len, sizeof(coap_hdr_t) + GCOAP_TOKENLEN + optlen);
 
     coap_parse(&pdu, buf, len);
@@ -262,9 +263,11 @@ static void test_gcoap__server_get_resp(void)
 
     /* generate response */
     gcoap_resp_init(&pdu, &buf[0], sizeof(buf), COAP_CODE_CONTENT);
+    coap_opt_add_format(&pdu, COAP_FORMAT_TEXT);
+    ssize_t res = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
+
     char resp_payload[]  = "2";
     memcpy(&pdu.payload[0], &resp_payload[0], strlen(resp_payload));
-    ssize_t res = gcoap_finish(&pdu, strlen(resp_payload), COAP_FORMAT_TEXT);
 
     uint8_t resp_data[] = {
         0x52, 0x45, 0x20, 0xb6, 0x35, 0x61, 0xc0, 0xff,
@@ -275,8 +278,7 @@ static void test_gcoap__server_get_resp(void)
     TEST_ASSERT_EQUAL_INT(2, coap_get_token_len(&pdu));
     TEST_ASSERT_EQUAL_INT(4 + 2, coap_get_total_hdr_len(&pdu));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_NON, coap_get_type(&pdu));
-    TEST_ASSERT_EQUAL_INT(strlen(resp_payload), pdu.payload_len);
-    TEST_ASSERT_EQUAL_INT(sizeof(resp_data), res);
+    TEST_ASSERT_EQUAL_INT(sizeof(resp_data), res + 1);
 
     for (size_t i = 0; i < strlen(resp_payload); i++) {
         TEST_ASSERT_EQUAL_INT(resp_payload[i], pdu.payload[i]);
@@ -326,9 +328,11 @@ static void test_gcoap__server_con_resp(void)
 
     /* generate response */
     gcoap_resp_init(&pdu, &buf[0], sizeof(buf), COAP_CODE_CONTENT);
+    coap_opt_add_format(&pdu, COAP_FORMAT_TEXT);
+    ssize_t res = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
+
     char resp_payload[]  = "2";
     memcpy(&pdu.payload[0], &resp_payload[0], strlen(resp_payload));
-    ssize_t res = gcoap_finish(&pdu, strlen(resp_payload), COAP_FORMAT_TEXT);
 
     uint8_t resp_data[] = {
         0x62, 0x45, 0x8e, 0x03, 0x35, 0x61, 0xc0, 0xff,
@@ -337,7 +341,7 @@ static void test_gcoap__server_con_resp(void)
 
     TEST_ASSERT_EQUAL_INT(COAP_CLASS_SUCCESS, coap_get_code_class(&pdu));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_ACK, coap_get_type(&pdu));
-    TEST_ASSERT_EQUAL_INT(sizeof(resp_data), res);
+    TEST_ASSERT_EQUAL_INT(sizeof(resp_data), res + 1);
 }
 
 /*
