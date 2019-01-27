@@ -91,9 +91,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *******************************************************************************/
 
 #include "xtensa_context.h"
-
-#ifndef MODULE_ESP_SDK_INT_HANDLING
-
 #include "xtensa_rtos.h"
 
 /* Enable stack backtrace across exception/interrupt - see below */
@@ -962,12 +959,6 @@ _xt_user_exc:
     rsync                                   /* ensure PS and EPC written */
     rfe                                     /* PS.EXCM is cleared */
 
-#else
-
-    .text
-
-#endif /* MODULE_ESP_SDK_INT_HANDLING */
-
 /*
 --------------------------------------------------------------------------------
   Exit point for dispatch. Saved in interrupt stack frame at XT_STK_EXIT
@@ -988,7 +979,6 @@ _xt_user_exit:
     rsync                                   /* ensure PS and EPC written */
     rfe                                     /* PS.EXCM is cleared */
 
-#ifndef MODULE_ESP_SDK_INT_HANDLING
 /*
 --------------------------------------------------------------------------------
 Syscall Exception Handler (jumped to from User Exception Handler).
@@ -2232,5 +2222,3 @@ _WindowUnderflow12:
     rfwu
 
 #endif /* XCHAL_HAVE_WINDOWED */
-
-#endif /* MODULE_ESP_SDK_INT_HANDLING */

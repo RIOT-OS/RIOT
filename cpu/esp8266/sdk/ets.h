@@ -39,7 +39,6 @@ extern "C" {
 #define ETS_WDT_INUM   8    /* SDK watchdog timer */
 #define ETS_FRC2_INUM  10   /* SDK FRC2 timer interrupt */
 
-#ifndef MODULE_ESP_SDK_INT_HANDLING
 /*
  * The following functions are mappings or dummies for source code
  * compatibility of SDK and NON-SDK version
@@ -52,16 +51,6 @@ extern "C" {
 #define ets_isr_attach(i,f,a)   xt_set_interrupt_handler(i,f,a)
 
 #define _xtos_set_exception_handler(n,f)    xt_set_exception_handler(n,f)
-
-#else /* MODULE_ESP_SDK_INT_HANDLING */
-
-extern void ets_isr_mask(uint32_t);
-extern void ets_isr_unmask(uint32_t);
-
-typedef void (_xtos_handler_t)(void*);
-extern void _xtos_set_exception_handler(int n, _xtos_handler_t* f);
-
-#endif /* MODULE_ESP_SDK_INT_HANDLING */
 
 #ifndef MODULE_ESP_SDK
 extern void ets_delay_us(uint16_t us);

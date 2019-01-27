@@ -27,11 +27,7 @@ extern "C" {
  * @brief   Xtensa ASM code specific default stack sizes
  * @{
  */
-#if defined(MODULE_ESP_SDK_INT_HANDLING)
-#define ISR_STACKSIZE                 (8)
-#else
 #define ISR_STACKSIZE                 (2048)
-#endif
 /** @} */
 
 #ifdef __cplusplus
