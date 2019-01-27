@@ -73,6 +73,7 @@ USEMODULE += random
 USEMODULE += stdio_uart
 USEMODULE += xtensa
 
+INCLUDES += -I$(RIOTCPU)/esp_common/vendor/
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/esp32
