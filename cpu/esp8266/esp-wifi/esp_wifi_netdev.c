@@ -394,7 +394,7 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
 
     struct pbuf *pb = pbuf_alloc(PBUF_LINK, iol_len + PBUF_IEEE80211_HLEN, PBUF_RAM);
     if (pb == NULL || pb->tot_len < iol_len) {
-        ESP_WIFI_DEBUG("could not allocate buffer to send %d bytes ", iol_len);
+        ESP_WIFI_LOG_ERROR("could not allocate buffer to send %d bytes ", iol_len);
         /*
          * The memory of EPS8266 is quite small. Therefore, it may happen on
          * heavy network load that we run into out of memory and we have
