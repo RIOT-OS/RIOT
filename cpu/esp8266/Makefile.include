@@ -69,6 +69,7 @@ endif
 
 INCLUDES += -I$(ESP8266_NEWLIB_DIR)/$(TARGET_ARCH)/include
 INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
+INCLUDES += -I$(RIOTCPU)/esp_common/vendor/
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/espressif
