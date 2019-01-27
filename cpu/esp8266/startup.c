@@ -102,11 +102,9 @@ void ets_run(void)
     ets_tasks_init();
 
     /* enable interrupts used by ETS/SDK */
-    #ifndef MODULE_ESP_SDK_INT_HANDLING
     ets_isr_unmask(BIT(ETS_FRC2_INUM));
     ets_isr_unmask(BIT(ETS_WDEV_INUM));
     ets_isr_unmask(BIT(ETS_WDT_INUM));
-    #endif
 
     #ifdef MODULE_ESP_GDBSTUB
     gdbstub_init();

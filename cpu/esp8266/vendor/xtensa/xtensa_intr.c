@@ -26,8 +26,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   Also see xtensa_intr_asm.S.
 ******************************************************************************/
 
-#ifndef MODULE_ESP_SDK_INT_HANDLING /* not needed in SDK task handling version of RIOT */
-
 #include <stdlib.h>
 
 #include <xtensa/config/core.h>
@@ -137,5 +135,3 @@ xt_handler xt_set_interrupt_handler(int n, xt_handler f, void * arg)
 
 
 #endif /* XCHAL_HAVE_INTERRUPTS */
-
-#endif /* MODULE_ESP_SDK_INT_HANDLING */
