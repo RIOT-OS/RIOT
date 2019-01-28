@@ -162,6 +162,10 @@ ifneq (,$(filter lsm6dsl,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lsm6dsl/include
 endif
 
+ifneq (,$(filter ltc4150,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ltc4150/include
+endif
+
 ifneq (,$(filter mag3110,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mag3110/include
 endif
