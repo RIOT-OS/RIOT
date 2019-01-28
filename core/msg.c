@@ -330,6 +330,7 @@ static int _msg_receive(msg_t *m, int block)
             thread_yield_higher();
 
             /* sender copied message */
+            assert(sched_active_thread->status != STATUS_RECEIVE_BLOCKED);
         }
         else {
             irq_restore(state);
