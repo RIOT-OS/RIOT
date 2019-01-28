@@ -1,0 +1,2 @@
+# Use the current setup.py for requirements
+.
