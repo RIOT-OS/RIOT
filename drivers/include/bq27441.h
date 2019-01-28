@@ -39,9 +39,9 @@ extern "C" {
  * @{
  */
 typedef enum {
-	AVG,  /**< Average Current (DEFAULT) */
-	STBY, /**< Standby Current */
-	MAX   /**< Mx Current */
+    AVG,  /**< Average Current (DEFAULT) */
+    STBY, /**< Standby Current */
+    MAX   /**< Mx Current */
 } current_measure;
 /** @} */
 
@@ -50,15 +50,15 @@ typedef enum {
  * @{
  */
 typedef enum {
-	REMAIN,     /**< Remaining Capacity (DEFAULT) */
-	FULL,       /**< Full Capacity */
-	AVAIL,      /**< Available Capacity */
-	AVAIL_FULL, /**< Full Available Capacity */
-	REMAIN_F,   /**< Remaining Capacity Filtered */
-	REMAIN_UF,  /**< Remaining Capacity Unfiltered */
-	FULL_F,     /**< Full Capacity Filtered */
-	FULL_UF,    /**< Full Capacity Unfiltered */
-	DESIGN      /**< Design Capacity */
+    REMAIN,     /**< Remaining Capacity (DEFAULT) */
+    FULL,       /**< Full Capacity */
+    AVAIL,      /**< Available Capacity */
+    AVAIL_FULL, /**< Full Available Capacity */
+    REMAIN_F,   /**< Remaining Capacity Filtered */
+    REMAIN_UF,  /**< Remaining Capacity Unfiltered */
+    FULL_F,     /**< Full Capacity Filtered */
+    FULL_UF,    /**< Full Capacity Unfiltered */
+    DESIGN      /**< Design Capacity */
 } capacity_measure;
 /** @} */
 
@@ -67,8 +67,8 @@ typedef enum {
  * @{
  */
 typedef enum {
-	FILTERED,  /**< State of Charge Filtered (DEFAULT) */
-	UNFILTERED /**< State of Charge Unfiltered */
+    FILTERED,  /**< State of Charge Filtered (DEFAULT) */
+    UNFILTERED /**< State of Charge Unfiltered */
 } soc_measure;
 /** @} */
 
@@ -77,8 +77,8 @@ typedef enum {
  * @{
  */
 typedef enum {
-	PERCENT,  /**< State of Health Percentage (DEFAULT) */
-	SOH_STAT  /**< State of Health Status Bits */
+    PERCENT,  /**< State of Health Percentage (DEFAULT) */
+    SOH_STAT  /**< State of Health Status Bits */
 } soh_measure;
 /** @} */
 
@@ -87,8 +87,8 @@ typedef enum {
  * @{
  */
 typedef enum {
-	BATTERY,      /**< Battery Temperature (DEFAULT) */
-	INTERNAL_TEMP /**< Internal IC Temperature */
+    BATTERY,      /**< Battery Temperature (DEFAULT) */
+    INTERNAL_TEMP /**< Internal IC Temperature */
 } temp_measure;
 /** @} */
 
@@ -97,8 +97,8 @@ typedef enum {
  * @{
  */
 typedef enum {
-	SOC_INT, /**< Set GPOUT to SOC_INT functionality */
-	BAT_LOW  /**< Set GPOUT to BAT_LOW functionality */
+    SOC_INT, /**< Set GPOUT to SOC_INT functionality */
+    BAT_LOW  /**< Set GPOUT to BAT_LOW functionality */
 } gpout_function;
 /** @} */
 
