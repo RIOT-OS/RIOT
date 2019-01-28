@@ -12,7 +12,11 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # define jlink as default programmer, but overridable
 PROGRAMMER ?= jlink
 
-ifeq (jlink,$(PROGRAMMER))
+ifeq ($(PROGRAMMER),openocd)
+  # use common openocd configuration for nrf52
+  export OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
+  include $(RIOTMAKE)/tools/openocd.inc.mk
+else ifeq (jlink,$(PROGRAMMER))
   # setup JLink for flashing
   export JLINK_DEVICE := nrf52
 
