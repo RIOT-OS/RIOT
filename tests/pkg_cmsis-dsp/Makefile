@@ -36,6 +36,3 @@ BOARD_WHITELIST := \
   #
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	$(CURDIR)/tests/01-run.py
