@@ -80,7 +80,7 @@ technologies in RIOT (network stack, storage interface) and standards
 compliance.
 
 # 2. Architecture
-The proposed RCS architecture is formed by one or more
+The proposed RCS architecture, as shown in Figure 01, is formed by one or more
 [Configuration Managers](#4-configuration-managers) and the
 [RIOT Registry](#3-the-riot-registry).
 
@@ -93,7 +93,10 @@ the interfaces exposed by the Configuration Managers, via the RIOT Registry.
 A RIOT Application may interact with a Configuration Manager in order to
 modify access control rules or enable different exposed interfaces.
 
-![](./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/architecture.svg "Runtime Configuration Architecture")
+![Figure 01](./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/architecture.svg "Runtime Configuration Architecture")
+<p align="center">
+Figure 01 - Runtime Configuration System architecture
+</p>
 
 # 3. The RIOT Registry
 The RIOT Registry is a module for interacting with 
@@ -106,7 +109,14 @@ devices via [Storage Facilities](#32-Storage-facilities). This way the
 functionality if the RIOT Registry is independent of the functionality of the
 module or storage device.
 
+In Figure 02 can be seen an example of an application and a 'IEEE802.15.4'
+module that register a configuration group each one. Also, there are two Storage
+Facilities available: EEPROM and FAT.
+
 <img src="./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/riot-registry-diagram.svg" />
+<p align="center">
+Figure 02 - The RIOT Registry components
+</p>
 
 The API of the RIOT Registry allows to:
 - Register a RH to expose a configuration group in the RIOT Registry.
@@ -177,11 +187,14 @@ A conceptual example of a SF can be found in the [Appendix](#Appendix).
 ## 3.3. RIOT Registry Usage Flow
 
 ### Registry Initialization
-Modules declare and register **RH** for configuration groups
-in the RIOT Registry. **Storage facilities** are registered as sources and/or
-destinations of configurations in the RIOT Registry.
+As described in the flow in Figure 03, modules declare and register **RH** for
+configuration groups in the RIOT Registry. **Storage facilities** are registered
+as sources and/or destinations of configurations in the RIOT Registry.
 
 <img align="center" src="./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/registry-boot.svg" width="300" />
+<p align="center">
+Figure 03 - Usage flow of the RIOT Registry
+</p>
 
 ### Get, set, apply and export configurations
 At any time, the application or a configuration manager can _retrieve_ a
@@ -200,6 +213,9 @@ group with a Resource Directory Server IP Address (`rd_ip_addr`) and an
 _Application_ configuration group with a `foo` configuration parameter.
 
 <img src="./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/registry-rh.svg" />
+<p align="center">
+Figure 04 - Behavioral flow of the basic API of the RIOT Registry
+</p>
 
 ### Load and store configurations
 At any time, the application or a configuration manager can _load_ all
@@ -211,9 +227,12 @@ handler with `registry_set_value` as callback. In the a similar way,
 `registry_store` will navigate through all RH and call their
 _export_ function with the SF _store_ handler as callback.  
 
-The following diagram shows these processes:
+Figure 05 shows the above described processes.
 
 <img src="./files/rdm-draft-alamos-lanzieri-runtime-configuration-architecture/registry-storage.svg" />
+<p align="center">
+Figure 05 - Behavioral flow of the load and store calls
+</p>
 
 # 4. Configuration managers
 Configuration managers are modules that allow a RIOT node to be
@@ -227,16 +246,14 @@ These are some examples of Configuration Managers:
   via interfaces like NFC, BLE, Serial, etc.
 - A UART shell with special commands for interacting with configurations (CLI)
 
-A Configuration Manager may interact with the RIOT Registry to access Runtime
+A Configuration Manager interacts only with the RIOT Registry to access Runtime
 Configurations.
 
 If access control mechanisms are needed they have to be implemented by the
-Configuration Managers. Extra security can also be
-implemented in lower layers like the ones mentioned above (e.g CoAP and DTLS,
-CHAP on PPP, etc).
-
-The Configuration Manager API MUST provide helpers to modify access control
-settings as well as enabling/disabling communication interfaces.
+Configuration Managers. Extra security can also be implemented in lower layers
+like the ones mentioned above (e.g CoAP and DTLS, CHAP on PPP, etc).
+Configuration Managers MAY also provide means to modify access control settings
+as well as enabling/disabling communication interfaces.
 
 ## 4.1 Configuration CLI
 As a simple Configuration Manager, the `Config CLI` is proposed. The main
