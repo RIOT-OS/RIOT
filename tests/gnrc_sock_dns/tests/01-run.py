@@ -6,6 +6,7 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+import base64
 import os
 import re
 import socket
@@ -148,6 +149,126 @@ def test_success(child):
     assert(successful_dns_request(child, TEST_NAME, TEST_AAAA_DATA))
 
 
+def test_timeout(child):
+    # listen but send no reply
+    server.listen()
+    assert(not successful_dns_request(child, TEST_NAME, TEST_AAAA_DATA))
+
+
+def test_too_short_response(child):
+    server.listen(Raw(b"\x00\x00\x81\x00"))
+    assert(not successful_dns_request(child, TEST_NAME))
+
+
+def test_qdcount_too_large1(child):
+    # as reported in https://github.com/RIOT-OS/RIOT/issues/10739
+    server.listen(base64.b64decode("AACEAwkmAAAAAAAAKioqKioqKioqKioqKioqKioqKio="))
+    assert(not successful_dns_request(child, TEST_NAME))
+
+
+def test_qdcount_too_large2(child):
+    server.listen(DNS(qr=1, qdcount=40961, ancount=TEST_ANCOUNT,
+                      qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
+                          DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
+                      an=(DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_AAAA,
+                                rdlen=DNS_RR_TYPE_AAAA_DLEN,
+                                rdata=TEST_AAAA_DATA) /
+                          DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_A,
+                                rdlen=DNS_RR_TYPE_A_DLEN, rdata=TEST_A_DATA))))
+    assert(not successful_dns_request(child, TEST_NAME))
+
+
+def test_ancount_too_large1(child):
+    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=2714,
+                      qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
+                          DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
+                      an=(DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_AAAA,
+                                rdlen=DNS_RR_TYPE_AAAA_DLEN,
+                                rdata=TEST_AAAA_DATA) /
+                          DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_A,
+                                rdlen=DNS_RR_TYPE_A_DLEN, rdata=TEST_A_DATA))))
+    assert(not successful_dns_request(child, TEST_NAME, TEST_AAAA_DATA))
+
+
+def test_ancount_too_large2(child):
+    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=19888,
+                      qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
+                          DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
+                      an="\0"))
+    assert(not successful_dns_request(child, TEST_NAME))
+
+
+def test_bad_compressed_message_query(child):
+    server.listen(DNS(qr=1, qdcount=1, ancount=1,
+                      qd=DNS_MSG_COMP_MASK))
+    assert(not successful_dns_request(child, TEST_NAME))
+
+
+def test_bad_compressed_message_answer(child):
+    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=TEST_ANCOUNT,
+                      qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
+                          DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
+                      an=DNS_MSG_COMP_MASK))
+    assert(not successful_dns_request(child, TEST_NAME))
+
+
+def test_malformed_hostname_query(child):
+    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=0,
+                      qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
+                          # need to use byte string here to induce wrong label
+                          # lengths
+                          b"\xafexample\x03org\x00\x00\x1c\x00\x01")))
+    assert(not successful_dns_request(child, TEST_NAME))
+
+
+def test_malformed_hostname_answer(child):
+    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=TEST_ANCOUNT,
+                      qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
+                          DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
+                      # need to use byte string here to induce wrong label
+                      # lengths
+                      an=(b"\xaftest\x00\x00\x1c\x00\x01\x00\x00\x00\x00\x00\x10"
+                          b"\x20\x01\x0d\xb8\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+                          b"\x00\x00\x01" /
+                          DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A))))
+    assert(not successful_dns_request(child, TEST_NAME))
+
+
+def test_addrlen_too_large(child):
+    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=TEST_ANCOUNT,
+                      qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
+                          DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
+                      an=(DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_AAAA,
+                                rdlen=18549, rdata=TEST_AAAA_DATA) /
+                          DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_A,
+                                rdlen=DNS_RR_TYPE_A_DLEN, rdata=TEST_A_DATA))))
+    assert(not successful_dns_request(child, TEST_NAME, TEST_AAAA_DATA))
+
+
+def test_addrlen_wrong_ip6(child):
+    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=TEST_ANCOUNT,
+                      qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
+                          DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
+                      an=(DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_AAAA,
+                                rdlen=DNS_RR_TYPE_AAAA_DLEN + 1,
+                                rdata=(TEST_AAAA_DATA)) /
+                          DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_A,
+                                rdlen=DNS_RR_TYPE_A_DLEN, rdata=TEST_A_DATA))))
+    assert(not successful_dns_request(child, TEST_NAME, TEST_AAAA_DATA))
+
+
+def test_addrlen_wrong_ip4(child):
+    server.listen(DNS(qr=1, qdcount=TEST_QDCOUNT, ancount=TEST_ANCOUNT,
+                      qd=(DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_AAAA) /
+                          DNSQR(qname=TEST_NAME, qtype=DNS_RR_TYPE_A)),
+                      an=(DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_A,
+                                rdlen=DNS_RR_TYPE_A - 1, rdata=TEST_A_DATA) /
+                          DNSRR(rrname=TEST_NAME, type=DNS_RR_TYPE_AAAA,
+                                rdlen=DNS_RR_TYPE_AAAA_DLEN,
+                                rdata=TEST_AAAA_DATA))))
+    assert(not successful_dns_request(child, TEST_NAME, TEST_AAAA_DATA))
+
+
 def testfunc(child):
     global server
     tap = get_bridge(os.environ["TAP"])
@@ -172,6 +293,19 @@ def testfunc(child):
                     raise e
 
         run(test_success)
+        run(test_timeout)
+        run(test_too_short_response)
+        run(test_qdcount_too_large1)
+        run(test_qdcount_too_large2)
+        run(test_ancount_too_large1)
+        run(test_ancount_too_large2)
+        run(test_bad_compressed_message_query)
+        run(test_bad_compressed_message_answer)
+        run(test_malformed_hostname_query)
+        run(test_malformed_hostname_answer)
+        run(test_addrlen_too_large)
+        run(test_addrlen_wrong_ip6)
+        run(test_addrlen_wrong_ip4)
         print("SUCCESS")
     finally:
         if server is not None:
