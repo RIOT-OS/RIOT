@@ -508,7 +508,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
                     break;
 
                 case MSG_TYPE_USER_SPEC_TIMEOUT:
-                    DEBUG("gnrc_tcp.c : gnrc_tcp_send() : USER_SPEC_TIMEOUT\n");
+                    DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : USER_SPEC_TIMEOUT\n");
                     _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
                     ret = -ETIMEDOUT;
                     break;
