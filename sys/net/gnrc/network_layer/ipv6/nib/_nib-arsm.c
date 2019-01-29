@@ -460,18 +460,10 @@ bool _is_reachable(_nib_onl_entry_t *entry)
 static inline uint32_t _exp_backoff_retrans_timer(uint8_t ns_sent,
                                                   uint32_t retrans_timer)
 {
-    uint32_t tmp = random_uint32_range(NDP_MIN_RANDOM_FACTOR,
-                                       NDP_MAX_RANDOM_FACTOR);
+    uint32_t factor = random_uint32_range(NDP_MIN_RANDOM_FACTOR,
+                                          NDP_MAX_RANDOM_FACTOR);
 
-    /* backoff according to  https://tools.ietf.org/html/rfc7048 with
-     * BACKOFF_MULTIPLE == 2 */
-    tmp = (uint32_t)(((uint64_t)(((uint32_t) 1) << ns_sent) * retrans_timer *
-                     tmp) / US_PER_MS);
-    /* random factors were statically multiplied with 1000 ^ */
-    if (tmp > NDP_MAX_RETRANS_TIMER_MS) {
-        tmp = NDP_MAX_RETRANS_TIMER_MS;
-    }
-    return tmp;
+    return _exp_backoff_retrans_timer_factor(ns_sent, retrans_timer, factor);
 }
 
 #if GNRC_IPV6_NIB_CONF_REDIRECT
