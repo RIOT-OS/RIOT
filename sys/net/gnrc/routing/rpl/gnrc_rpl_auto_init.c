@@ -19,6 +19,7 @@
 
 #ifdef MODULE_AUTO_INIT_GNRC_RPL
 
+#include "log.h"
 #include "net/gnrc.h"
 #include "net/gnrc/rpl.h"
 
@@ -29,7 +30,10 @@ void auto_init_gnrc_rpl(void)
 {
 #if (GNRC_NETIF_NUMOF == 1)
     gnrc_netif_t *netif = gnrc_netif_iter(NULL);
-    assert(netif != NULL);
+    if (netif == NULL) {
+        LOG_INFO("Unable to auto-initialize RPL. No interfaces found.\n");
+        return;
+    }
     DEBUG("auto_init_gnrc_rpl: initializing RPL on interface %" PRIkernel_pid "\n",
           netif->pid);
     gnrc_rpl_init(netif->pid);
