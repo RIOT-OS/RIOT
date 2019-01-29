@@ -461,6 +461,11 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         mutex_unlock(&(tcb->function_lock));
         return -ENOTCONN;
     }
+    /* Check if the remote host closed the connection */
+    if (tcb->state == FSM_STATE_CLOSE_WAIT) {
+        mutex_unlock(&(tcb->function_lock));
+        return 0;
+    }
 
     /* If this call is non-blocking (timeout_duration_us == 0): Try to read data and return */
     if (timeout_duration_us == 0) {
@@ -491,6 +496,11 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         /* Check if the connections state is closed. If so, a reset was received */
         if (tcb->state == FSM_STATE_CLOSED) {
             ret = -ECONNRESET;
+            break;
+        }
+        /* Check if the remote host closed the connection */
+        if (tcb->state == FSM_STATE_CLOSE_WAIT) {
+            ret = 0;
             break;
         }
 
