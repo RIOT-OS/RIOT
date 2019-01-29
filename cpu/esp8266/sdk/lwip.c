@@ -22,6 +22,8 @@
  * @}
  */
 
+#ifdef MODULE_ESP_SDK
+
 #include "lwip/err.h"
 #include "lwip/ip_addr.h"
 #include "lwip/netif.h"
@@ -207,3 +209,5 @@ uint32_t espconn_init(uint32 arg)
     (void)arg;
     return 1;
 }
+
+#endif /* MODULE_ESP_SDK */
