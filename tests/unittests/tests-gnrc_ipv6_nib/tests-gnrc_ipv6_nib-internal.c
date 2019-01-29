@@ -21,6 +21,7 @@
 #include "net/gnrc/ipv6/nib.h"
 
 #include "_nib-internal.h"
+#include "_nib-arsm.h"
 
 #include "unittests-constants.h"
 
@@ -1909,6 +1910,58 @@ static void test_nib_abr_iter__three_elem_middle_removed(void)
 }
 #endif
 
+static void test_retrans_exp_backoff(void)
+{
+    TEST_ASSERT_EQUAL_INT(0,
+            _exp_backoff_retrans_timer_factor(0, 0, NDP_MIN_RANDOM_FACTOR));
+    /* factor 1000 means multiplied by 1 */
+    TEST_ASSERT_EQUAL_INT(NDP_RETRANS_TIMER_MS,
+            _exp_backoff_retrans_timer_factor(0, NDP_RETRANS_TIMER_MS, 1000));
+    TEST_ASSERT_EQUAL_INT(2 * NDP_RETRANS_TIMER_MS,     /* 2^1 = 2 */
+            _exp_backoff_retrans_timer_factor(1, NDP_RETRANS_TIMER_MS, 1000));
+    TEST_ASSERT_EQUAL_INT(4 * NDP_RETRANS_TIMER_MS,     /* 2^2 = 4 */
+            _exp_backoff_retrans_timer_factor(2, NDP_RETRANS_TIMER_MS, 1000));
+    TEST_ASSERT_EQUAL_INT(8 * NDP_RETRANS_TIMER_MS,     /* 2^3 = 8 */
+            _exp_backoff_retrans_timer_factor(3, NDP_RETRANS_TIMER_MS, 1000));
+    TEST_ASSERT_EQUAL_INT(16 * NDP_RETRANS_TIMER_MS,    /* 2^4 = 16 */
+            _exp_backoff_retrans_timer_factor(4, NDP_RETRANS_TIMER_MS, 1000));
+    TEST_ASSERT_EQUAL_INT(32 * NDP_RETRANS_TIMER_MS,    /* 2^5 = 32 */
+            _exp_backoff_retrans_timer_factor(5, NDP_RETRANS_TIMER_MS, 1000));
+    TEST_ASSERT_EQUAL_INT(NDP_MAX_RETRANS_TIMER_MS,
+            _exp_backoff_retrans_timer_factor(6, NDP_RETRANS_TIMER_MS, 1000));
+    TEST_ASSERT_EQUAL_INT(NDP_MAX_RETRANS_TIMER_MS,
+            _exp_backoff_retrans_timer_factor(0, UINT32_MAX,
+                                              NDP_MIN_RANDOM_FACTOR));
+    TEST_ASSERT_EQUAL_INT(NDP_MAX_RETRANS_TIMER_MS,
+            _exp_backoff_retrans_timer_factor(0, UINT32_MAX,
+                                              NDP_MAX_RANDOM_FACTOR - 1));
+    TEST_ASSERT_EQUAL_INT(NDP_MAX_RETRANS_TIMER_MS,
+            _exp_backoff_retrans_timer_factor(NDP_MAX_NS_NUMOF, UINT32_MAX,
+                                              NDP_MAX_RANDOM_FACTOR - 1));
+    TEST_ASSERT_EQUAL_INT(NDP_MAX_RETRANS_TIMER_MS,
+            _exp_backoff_retrans_timer_factor(NDP_MAX_NS_NUMOF,
+                                              NDP_RETRANS_TIMER_MS,
+                                              NDP_MAX_RANDOM_FACTOR - 1));
+    TEST_ASSERT_EQUAL_INT(NDP_MAX_RETRANS_TIMER_MS,
+            _exp_backoff_retrans_timer_factor(NDP_MAX_NS_NUMOF,
+                                              NDP_RETRANS_TIMER_MS,
+                                              NDP_MIN_RANDOM_FACTOR));
+    TEST_ASSERT_EQUAL_INT(NDP_MAX_RETRANS_TIMER_MS,
+            _exp_backoff_retrans_timer_factor(NDP_MAX_NS_NUMOF,
+                                              NDP_MAX_RETRANS_TIMER_MS,
+                                              NDP_MAX_RANDOM_FACTOR - 1));
+    TEST_ASSERT_EQUAL_INT(32768,
+            _exp_backoff_retrans_timer_factor(NDP_MAX_NS_NUMOF - 1, 1,
+                                              NDP_MIN_RANDOM_FACTOR));
+    TEST_ASSERT_EQUAL_INT(47653,
+            _exp_backoff_retrans_timer_factor(5U, 1118U, 1332));
+    TEST_ASSERT_EQUAL_INT(47653,
+            _exp_backoff_retrans_timer_factor(5U, 1118U, 1332));
+    /* test 64-bit overfrow */
+    TEST_ASSERT_EQUAL_INT(NDP_MAX_RETRANS_TIMER_MS,
+            _exp_backoff_retrans_timer_factor(NDP_MAX_NS_NUMOF, 32768, 1024));
+}
+
 Test *tests_gnrc_ipv6_nib_internal_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -2007,6 +2060,7 @@ Test *tests_gnrc_ipv6_nib_internal_tests(void)
         new_TestFixture(test_nib_abr_iter__three_elem),
         new_TestFixture(test_nib_abr_iter__three_elem_middle_removed),
 #endif
+        new_TestFixture(test_retrans_exp_backoff),
     };
 
     EMB_UNIT_TESTCALLER(tests, set_up, NULL,
