@@ -81,6 +81,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     if (_rbuf_add(netif_hdr, pkt, offset, page) == RBUF_ADD_REPEAT) {
         _rbuf_add(netif_hdr, pkt, offset, page);
     }
+    gnrc_pktbuf_release(pkt);
 }
 
 static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
@@ -105,7 +106,6 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 
     if (entry == NULL) {
         DEBUG("6lo rbuf: reassembly buffer full.\n");
-        gnrc_pktbuf_release(pkt);
         return RBUF_ADD_ERROR;
     }
 
@@ -126,7 +126,6 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     if ((offset + frag_size) > entry->super.pkt->size) {
         DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
         gnrc_pktbuf_release(entry->super.pkt);
-        gnrc_pktbuf_release(pkt);
         rbuf_rm(entry);
         return RBUF_ADD_ERROR;
     }
@@ -148,7 +147,6 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         /* End was already checked in overlap check */
         if (ptr->start == offset) {
             DEBUG("6lo rbuf: fragment already in reassembly buffer");
-            gnrc_pktbuf_release(pkt);
             return RBUF_ADD_SUCCESS;
         }
         ptr = ptr->next;
@@ -164,7 +162,6 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                         sizeof(sixlowpan_frag_t), GNRC_NETTYPE_SIXLOWPAN);
                 if (frag_hdr == NULL) {
                     gnrc_pktbuf_release(entry->super.pkt);
-                    gnrc_pktbuf_release(pkt);
                     rbuf_rm(entry);
                     return RBUF_ADD_ERROR;
                 }
@@ -181,7 +178,6 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                frag_size);
     }
     gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(&entry->super, netif_hdr);
-    gnrc_pktbuf_release(pkt);
     return RBUF_ADD_SUCCESS;
 }
 
