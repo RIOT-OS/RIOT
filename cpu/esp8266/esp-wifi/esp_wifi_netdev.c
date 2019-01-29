@@ -65,6 +65,7 @@
 #define ESP_WIFI_SOFTAP_IF          (SOFTAP_IF)
 
 #define ESP_WIFI_RECONNECT_TIME     (20 * US_PER_SEC)
+#define ESP_WIFI_HEAP_MARGIN        (2 * ETHERNET_MAX_LEN)
 
 #define MAC_STR                     "%02x:%02x:%02x:%02x:%02x:%02x"
 #define MAC_STR_ARG(m)              m[0], m[1], m[2], m[3], m[4], m[5]
@@ -334,6 +335,9 @@ uint8_t _send_pkt_buf[ETHERNET_MAX_LEN];
 /** function used to send an ethernet frame over WiFi */
 extern err_t ieee80211_output_pbuf(struct netif *netif, struct pbuf *p);
 
+/** function to get free heap */
+unsigned int IRAM get_free_heap_size (void);
+
 static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
 {
     ESP_WIFI_DEBUG("%p %p", netdev, iolist);
@@ -392,8 +396,11 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
     struct netif *sta_netif = (struct netif *)eagle_lwip_getif(ESP_WIFI_STATION_IF);
     netif_set_default(sta_netif);
 
-    struct pbuf *pb = pbuf_alloc(PBUF_LINK, iol_len + PBUF_IEEE80211_HLEN, PBUF_RAM);
-    if (pb == NULL || pb->tot_len < iol_len) {
+    struct pbuf *pb;
+
+    if (get_free_heap_size() < ESP_WIFI_HEAP_MARGIN ||
+        (pb = pbuf_alloc(PBUF_LINK, iol_len, PBUF_RAM)) == NULL ||
+        (pb->tot_len < iol_len)) {
         ESP_WIFI_LOG_ERROR("could not allocate buffer to send %d bytes ", iol_len);
         /*
          * The memory of EPS8266 is quite small. Therefore, it may happen on
@@ -442,6 +449,7 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
 #endif /* ENABLE_DEBUG */
 
     critical_exit();
+    /* sta_netif->linkoutput = ieee80211_output_pbuf */
     err_t res = sta_netif->linkoutput(sta_netif, pb);
     pbuf_free(pb);
 
