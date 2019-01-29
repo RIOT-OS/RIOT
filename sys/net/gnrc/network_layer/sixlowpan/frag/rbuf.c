@@ -73,15 +73,19 @@ enum {
     RBUF_ADD_SUCCESS,
     RBUF_ADD_ERROR,
     RBUF_ADD_REPEAT,
+    RBUF_ADD_HANDOVER,
 };
 
 void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
               size_t offset, unsigned page)
 {
-    if (_rbuf_add(netif_hdr, pkt, offset, page) == RBUF_ADD_REPEAT) {
-        _rbuf_add(netif_hdr, pkt, offset, page);
+    int res;
+    if ((res = _rbuf_add(netif_hdr, pkt, offset, page)) == RBUF_ADD_REPEAT) {
+        res = _rbuf_add(netif_hdr, pkt, offset, page);
     }
-    gnrc_pktbuf_release(pkt);
+    if (res != RBUF_ADD_HANDOVER) {
+        gnrc_pktbuf_release(pkt);
+    }
 }
 
 static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
@@ -166,7 +170,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                     return RBUF_ADD_ERROR;
                 }
                 gnrc_sixlowpan_iphc_recv(pkt, &entry->super, 0);
-                return RBUF_ADD_SUCCESS;
+                return RBUF_ADD_HANDOVER;
             }
             else
 #endif
