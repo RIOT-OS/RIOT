@@ -221,9 +221,15 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
             continue;
         }
         res = sock_udp_recv(&sock_dns, reply_buf, sizeof(reply_buf), 1000000LU, NULL);
-        if ((res > 0) && (res > (int)DNS_MIN_REPLY_LEN)) {
-            if ((res = _parse_dns_reply(reply_buf, res, addr_out, family)) > 0) {
-                goto out;
+        if (res > 0) {
+            if (res > (int)DNS_MIN_REPLY_LEN) {
+                if ((res = _parse_dns_reply(reply_buf, res, addr_out,
+                                            family)) > 0) {
+                    goto out;
+                }
+            }
+            else {
+                res = -EBADMSG;
             }
         }
     }
