@@ -683,6 +683,7 @@ endif
 
 ifneq (,$(filter sock_dns,$(USEMODULE)))
   USEMODULE += sock_util
+  USEMODULE += posix
 endif
 
 ifneq (,$(filter sock_util,$(USEMODULE)))
