@@ -123,6 +123,10 @@ void ets_run(void)
     ets_isr_unmask(BIT(ETS_SOFT_INUM));
     #endif
 
+    /* initialize dummy lwIP library to link it even if esp_wifi is not used */
+    extern void esp_lwip_init(void);
+    esp_lwip_init();
+
     thread_create(ets_task_stack, sizeof(ets_task_stack),
             ETS_TASK_PRIORITY,
             THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
