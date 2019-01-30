@@ -54,6 +54,81 @@ netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif)
     return res;
 }
 
+#if defined(MODULE_CC110X) || defined(MODULE_NRFMIN)
+static void _create_eui64_from_short(const uint8_t *addr, size_t addr_len,
+                                     eui64_t *eui64)
+{
+    const unsigned offset = sizeof(eui64_t) - addr_len;
+
+    memset(eui64->uint8, 0, sizeof(eui64->uint8));
+    eui64->uint8[3] = 0xff;
+    eui64->uint8[4] = 0xfe;
+    memcpy(&eui64->uint8[offset], addr, addr_len);
+}
+#endif /* defined(MODULE_CC110X) || defined(MODULE_NRFMIN) */
+
+int gnrc_netif_eui64_from_addr(const gnrc_netif_t *netif,
+                               const uint8_t *addr, size_t addr_len,
+                               eui64_t *eui64)
+{
+#if GNRC_NETIF_L2ADDR_MAXLEN > 0
+    if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
+        switch (netif->device_type) {
+#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) || \
+    defined(MODULE_NORDIC_SOFTDEVICE_BLE)
+            case NETDEV_TYPE_ETHERNET:
+            case NETDEV_TYPE_ESP_NOW:
+            case NETDEV_TYPE_BLE:
+                if (addr_len == sizeof(eui48_t)) {
+                    eui48_to_eui64(eui64, (const eui48_t *)addr);
+                    return sizeof(eui64_t);
+                }
+                else {
+                    return -EINVAL;
+                }
+#endif  /* defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) */
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
+            case NETDEV_TYPE_IEEE802154:
+                switch (addr_len) {
+                    case IEEE802154_SHORT_ADDRESS_LEN: {
+                        netdev_t *dev = netif->dev;
+                        return dev->driver->get(dev, NETOPT_ADDRESS_LONG, eui64,
+                                                sizeof(eui64_t));
+                    }
+                    case IEEE802154_LONG_ADDRESS_LEN:
+                        memcpy(eui64, addr, addr_len);
+                        return sizeof(eui64_t);
+                    default:
+                        return -EINVAL;
+                }
+#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
+#if defined(MODULE_CC110X) || defined(MODULE_NRFMIN)
+            case NETDEV_TYPE_CC110X:
+            case NETDEV_TYPE_NRFMIN:
+                if (addr_len <= 3) {
+                    _create_eui64_from_short(addr, addr_len, eui64);
+                    return sizeof(eui64_t);
+                }
+                else {
+                    return -EINVAL;
+                }
+#endif  /* defined(MODULE_CC110X) || defined(MODULE_NRFMIN) */
+            default:
+                (void)addr;
+                (void)addr_len;
+                (void)eui64;
+#ifdef DEVELHELP
+                LOG_ERROR("gnrc_netif: can't convert hardware address to EUI-64"
+                          " on interface %u\n", netif->pid);
+#endif  /* DEVELHELP */
+                assert(false);
+                break;
+        }
+    }
+#endif /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
+    return -ENOTSUP;
+}
+
 #ifdef MODULE_GNRC_IPV6
 void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
 {
@@ -122,19 +197,6 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
 #endif
 }
 
-#if defined(MODULE_CC110X) || defined(MODULE_NRFMIN)
-static void _create_iid_from_short(const uint8_t *addr, size_t addr_len,
-                                   eui64_t *iid)
-{
-    const unsigned offset = sizeof(eui64_t) - addr_len;
-
-    memset(iid->uint8, 0, sizeof(iid->uint8));
-    iid->uint8[3] = 0xff;
-    iid->uint8[4] = 0xfe;
-    memcpy(&iid->uint8[offset], addr, addr_len);
-}
-#endif /* defined(MODULE_CC110X) || defined(MODULE_NRFMIN) */
-
 int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
                                   const uint8_t *addr, size_t addr_len,
                                   eui64_t *iid)
@@ -142,19 +204,6 @@ int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
 #if GNRC_NETIF_L2ADDR_MAXLEN > 0
     if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
         switch (netif->device_type) {
-#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) || \
-    defined(MODULE_NORDIC_SOFTDEVICE_BLE)
-            case NETDEV_TYPE_ETHERNET:
-            case NETDEV_TYPE_ESP_NOW:
-            case NETDEV_TYPE_BLE:
-                if (addr_len == sizeof(eui48_t)) {
-                    eui48_to_ipv6_iid(iid, (const eui48_t *)addr);
-                    return sizeof(eui64_t);
-                }
-                else {
-                    return -EINVAL;
-                }
-#endif  /* defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) */
 #if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
             case NETDEV_TYPE_IEEE802154:
                 if (ieee802154_get_iid(iid, addr, addr_len) != NULL) {
@@ -168,23 +217,25 @@ int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
             case NETDEV_TYPE_CC110X:
             case NETDEV_TYPE_NRFMIN:
                 if (addr_len <= 3) {
-                    _create_iid_from_short(addr, addr_len, iid);
+                    _create_eui64_from_short(addr, addr_len, iid);
+                    /* since this address conversion is based on the IEEE
+                     * 802.15.4 address conversion for short addresses, the
+                     * U/L bit doesn't need to be flipped.
+                     * see https://tools.ietf.org/html/rfc6282#section-3.2.2 */
                     return sizeof(eui64_t);
                 }
                 else {
                     return -EINVAL;
                 }
 #endif  /* defined(MODULE_CC110X) || defined(MODULE_NRFMIN) */
-            default:
-                (void)addr;
-                (void)addr_len;
-                (void)iid;
-#ifdef DEVELHELP
-                LOG_ERROR("gnrc_netif: can't convert hardware address to IID "
-                          "on interface %u\n", netif->pid);
-#endif  /* DEVELHELP */
-                assert(false);
-                break;
+            default: {
+                int res = gnrc_netif_eui64_from_addr(netif, addr, addr_len,
+                                                     iid);
+                if (res == sizeof(eui64_t)) {
+                    iid->uint8[0] ^= 0x02;
+                }
+                return res;
+            }
         }
     }
 #endif /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
