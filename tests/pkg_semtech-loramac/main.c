@@ -414,15 +414,23 @@ static int _cmd_loramac(int argc, char **argv)
         switch (semtech_loramac_send(&loramac,
                                      (uint8_t *)argv[2], strlen(argv[2]))) {
             case SEMTECH_LORAMAC_NOT_JOINED:
-                puts("Failed: not joined");
+                puts("Cannot send: not joined");
+                return 1;
+
+            case SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED:
+                puts("Cannot send: dutycycle restriction");
                 return 1;
 
             case SEMTECH_LORAMAC_BUSY:
-                puts("Failed: mac is busy");
+                puts("Cannot send: MAC is busy");
+                return 1;
+
+            case SEMTECH_LORAMAC_TX_ERROR:
+                puts("Cannot send: error");
                 return 1;
         }
 
-        /* clear the rx buffer of the mac */
+        /* wait for receive windows */
         switch (semtech_loramac_recv(&loramac)) {
             case SEMTECH_LORAMAC_DATA_RECEIVED:
                 loramac.rx_data.payload[loramac.rx_data.payload_len] = 0;
