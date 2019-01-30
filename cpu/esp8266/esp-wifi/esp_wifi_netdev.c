@@ -684,6 +684,9 @@ static void _esp_wifi_setup(void)
     /* set the the reconnect timer */
     xtimer_set(&_esp_wifi_reconnect_timer, ESP_WIFI_RECONNECT_TIME);
 
+    /* avoid the WiFi modem going into sleep mode */
+    wifi_set_sleep_type(NONE_SLEEP_T);
+
     /* connect */
     wifi_station_connect();
     _esp_wifi_dev.state = ESP_WIFI_CONNECTING;
