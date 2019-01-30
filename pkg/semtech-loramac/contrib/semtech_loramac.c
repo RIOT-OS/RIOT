@@ -828,6 +828,9 @@ uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
         return SEMTECH_LORAMAC_NOT_JOINED;
     }
 
+    /* Correctly set the caller pid */
+    mac->caller_pid = thread_getpid();
+
     loramac_send_params_t params;
     params.payload = data;
     params.len = len;
