@@ -67,9 +67,15 @@ static void _prepare_next_alarm(void)
 static void _send_message(void)
 {
     printf("Sending: %s\n", message);
-    /* The send call blocks until done */
-    semtech_loramac_send(&loramac, (uint8_t *)message, strlen(message));
-    /* Wait until the send cycle has completed */
+    /* Try to send the message */
+    uint8_t ret = semtech_loramac_send(&loramac,
+                                       (uint8_t *)message, strlen(message));
+    if (ret != SEMTECH_LORAMAC_TX_OK) {
+        printf("Cannot send message '%s', ret code: %d\n", message, ret);
+        return;
+    }
+    /* The send was successfully scheduled, now wait until the send cycle has
+       completed and a reply is received from the MAC */
     semtech_loramac_recv(&loramac);
 }
 
