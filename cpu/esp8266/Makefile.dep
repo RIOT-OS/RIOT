@@ -2,6 +2,7 @@
 
 ifneq (, $(filter esp_sdk, $(USEMODULE)))
     USEMODULE += core_thread_flags
+    INCLUDES += -I$(ESP8266_SDK_DIR)/third_party/include
     LINKFLAGS += -Wl,-wrap=malloc
     LINKFLAGS += -Wl,-wrap=free
     LINKFLAGS += -Wl,-wrap=calloc
@@ -20,7 +21,6 @@ endif
 
 ifneq (, $(filter esp_wifi, $(USEMODULE)))
     CFLAGS += -DLWIP_OPEN_SRC
-    INCLUDES += -I$(ESP8266_SDK_DIR)/third_party/include
     LINKFLAGS += -Wl,-wrap=ethernet_input
     USEMODULE += netdev_eth
 endif

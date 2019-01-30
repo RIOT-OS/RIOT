@@ -65,7 +65,7 @@
 #define ESP_WIFI_SOFTAP_IF          (SOFTAP_IF)
 
 #define ESP_WIFI_RECONNECT_TIME     (20 * US_PER_SEC)
-#define ESP_WIFI_SEND_TIMEOUT       (MS_PER_SEC)
+#define ESP_WIFI_HEAP_MARGIN        (2 * ETHERNET_MAX_LEN)
 
 #define MAC_STR                     "%02x:%02x:%02x:%02x:%02x:%02x"
 #define MAC_STR_ARG(m)              m[0], m[1], m[2], m[3], m[4], m[5]
@@ -161,9 +161,9 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
     assert(netif != NULL);
 
     /*
-     * The function `esp_wifi_recv_cb` is executed in the context of the `ets`
-     * thread. The ISRs handling the hardware interrupts from the WiFi
-     * interface pass events to a message queue of the `ets` thread which is
+     * Function `esp_wifi_recv_cb` is executed in the context of the `ets`
+     * thread. ISRs which handle hardware interrupts from the WiFi interface
+     * simply pass events to a message queue of the `ets` thread which are then
      * sequentially processed by the `ets` thread to asynchronously execute
      * callback functions such as `esp_wifi_recv_cb`.
      *
@@ -179,9 +179,6 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
     }
     _in_esp_wifi_recv_cb = true;
 
-    /* avoid concurrent access to the receive buffer */
-    mutex_lock(&_esp_wifi_dev.dev_lock);
-
     critical_enter();
 
     /* first, check packet buffer for the minimum packet size */
@@ -191,7 +188,6 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
         pbuf_free(pb);
         _in_esp_wifi_recv_cb = false;
         critical_exit();
-        mutex_unlock(&_esp_wifi_dev.dev_lock);
         return;
     }
 
@@ -202,7 +198,6 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
         pbuf_free(pb);
         _in_esp_wifi_recv_cb = false;
         critical_exit();
-        mutex_unlock(&_esp_wifi_dev.dev_lock);
         return;
     }
 
@@ -213,38 +208,66 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
         pbuf_free(pb);
         _in_esp_wifi_recv_cb = false;
         critical_exit();
-        mutex_unlock(&_esp_wifi_dev.dev_lock);
         return;
     }
 
-    /* store the frame in the buffer and free lwIP pbuf */
+    /* we have to store the frame in the buffer and free lwIP pbuf immediatly */
     _esp_wifi_dev.rx_len = pb->tot_len;
     pbuf_copy_partial(pb, _esp_wifi_dev.rx_buf, _esp_wifi_dev.rx_len, 0);
     pbuf_free(pb);
 
     /*
-     * Because this function is not executed in interrupt context but in thread
-     * context, following msg_send could block on heavy network load, if frames
-     * are coming in faster than the ISR events can be handled. To avoid
-     * blocking during msg_send, we pretend we are in an ISR by incrementing
-     * the IRQ nesting counter. If IRQ nesting counter is greater 0, function
-     * irq_is_in returns true and the non-blocking version of msg_send is used.
+     * Since _esp_wifi_recv_cb is not executed in interrupt context but in
+     * the context of the `ets` thread, it is not necessary to pass the
+     * `NETDEV_EVENT_ISR` event first. Instead, the receive function can be
+     * called directly which result in much faster handling, a less frame lost
+     * rate and more robustness. There is no need for a mutex anymore to
+     * synchronize the access to the receive buffer between _esp_wifi_recv_cb
+     * and _recv function.
      */
-    irq_interrupt_nesting++;
-
-    /* trigger netdev event to read the data */
     if (_esp_wifi_dev.netdev.event_callback) {
         _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev,
-                                            NETDEV_EVENT_ISR);
+                                            NETDEV_EVENT_RX_COMPLETE);
     }
-
-    /* reset IRQ nesting counter */
-    irq_interrupt_nesting--;
 
     _in_esp_wifi_recv_cb = false;
     critical_exit();
-    mutex_unlock(&_esp_wifi_dev.dev_lock);
 }
+
+#define BEACON_TIMEOUT      (200)
+#define HANDSHAKE_TIMEOUT   (204)
+
+static const char *_esp_wifi_disc_reasons [] = {
+    "INVALID",                     /* 0 */
+    "UNSPECIFIED",                 /* 1 */
+    "AUTH_EXPIRE",                 /* 2 */
+    "AUTH_LEAVE",                  /* 3 */
+    "ASSOC_EXPIRE",                /* 4 */
+    "ASSOC_TOOMANY",               /* 5 */
+    "NOT_AUTHED",                  /* 6 */
+    "NOT_ASSOCED",                 /* 7 */
+    "ASSOC_LEAVE",                 /* 8 */
+    "ASSOC_NOT_AUTHED",            /* 9 */
+    "DISASSOC_PWRCAP_BAD",         /* 10 (11h) */
+    "DISASSOC_SUPCHAN_BAD",        /* 11 (11h) */
+    "IE_INVALID",                  /* 13 (11i) */
+    "MIC_FAILURE",                 /* 14 (11i) */
+    "4WAY_HANDSHAKE_TIMEOUT",      /* 15 (11i) */
+    "GROUP_KEY_UPDATE_TIMEOUT",    /* 16 (11i) */
+    "IE_IN_4WAY_DIFFERS",          /* 17 (11i) */
+    "GROUP_CIPHER_INVALID",        /* 18 (11i) */
+    "PAIRWISE_CIPHER_INVALID",     /* 19 (11i) */
+    "AKMP_INVALID",                /* 20 (11i) */
+    "UNSUPP_RSN_IE_VERSION",       /* 21 (11i) */
+    "INVALID_RSN_IE_CAP",          /* 22 (11i) */
+    "802_1X_AUTH_FAILED",          /* 23 (11i) */
+    "CIPHER_SUITE_REJECTED",       /* 24 (11i) */
+    "BEACON_TIMEOUT",              /* 200 */
+    "NO_AP_FOUND",                 /* 201 */
+    "AUTH_FAIL",                   /* 202 */
+    "ASSOC_FAIL",                  /* 203 */
+    "HANDSHAKE_TIMEOUT"            /* 204 */
+};
 
 /**
  * @brief   Event handler for esp system events.
@@ -253,29 +276,33 @@ static void _esp_wifi_handle_event_cb(System_Event_t *evt)
 {
     ESP_WIFI_DEBUG("event %d", evt->event);
 
+    uint8_t reason;
+    const char* reason_str = "UNKNOWN";
+
     switch (evt->event) {
         case EVENT_STAMODE_CONNECTED:
             ESP_WIFI_LOG_INFO("connected to ssid %s, channel %d",
                               evt->event_info.connected.ssid,
                               evt->event_info.connected.channel);
             _esp_wifi_dev.state = ESP_WIFI_CONNECTED;
+            _esp_wifi_dev.event = EVENT_STAMODE_CONNECTED;
+            _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
             break;
 
         case EVENT_STAMODE_DISCONNECTED:
-            ESP_WIFI_LOG_INFO("disconnected from ssid %s, reason %d",
-                              evt->event_info.disconnected.ssid,
-                              evt->event_info.disconnected.reason);
-            _esp_wifi_dev.state = ESP_WIFI_DISCONNECTED;
-
-            /* call disconnect to reset internal state */
-            if (evt->event_info.disconnected.reason != REASON_ASSOC_LEAVE) {
-                wifi_station_disconnect();
+            reason = evt->event_info.disconnected.reason;
+            if (reason < REASON_BEACON_TIMEOUT) {
+                reason_str = _esp_wifi_disc_reasons[reason];
             }
-
-            /* try to reconnect */
-            wifi_station_connect();
-            _esp_wifi_dev.state = ESP_WIFI_CONNECTING;
-
+            else if (reason <= REASON_HANDSHAKE_TIMEOUT) {
+                reason_str = _esp_wifi_disc_reasons[reason - REASON_BEACON_TIMEOUT];
+            }
+            ESP_WIFI_LOG_INFO("disconnected from ssid %s, reason %d (%s)",
+                              evt->event_info.disconnected.ssid,
+                              evt->event_info.disconnected.reason, reason_str);
+            _esp_wifi_dev.state = ESP_WIFI_DISCONNECTED;
+            _esp_wifi_dev.event = EVENT_STAMODE_DISCONNECTED;
+            _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
             break;
 
         case EVENT_SOFTAPMODE_STACONNECTED:
@@ -307,6 +334,9 @@ uint8_t _send_pkt_buf[ETHERNET_MAX_LEN];
 
 /** function used to send an ethernet frame over WiFi */
 extern err_t ieee80211_output_pbuf(struct netif *netif, struct pbuf *p);
+
+/** function to get free heap */
+unsigned int IRAM get_free_heap_size (void);
 
 static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
 {
@@ -366,19 +396,18 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
     struct netif *sta_netif = (struct netif *)eagle_lwip_getif(ESP_WIFI_STATION_IF);
     netif_set_default(sta_netif);
 
-    struct pbuf *pb = pbuf_alloc(PBUF_LINK, iol_len + PBUF_IEEE80211_HLEN, PBUF_RAM);
-    if (pb == NULL || pb->tot_len < iol_len) {
-        ESP_WIFI_DEBUG("could not allocate buffer to send %d bytes ", iol_len);
+    struct pbuf *pb;
+
+    if (get_free_heap_size() < ESP_WIFI_HEAP_MARGIN ||
+        (pb = pbuf_alloc(PBUF_LINK, iol_len, PBUF_RAM)) == NULL ||
+        (pb->tot_len < iol_len)) {
+        ESP_WIFI_LOG_ERROR("could not allocate buffer to send %d bytes ", iol_len);
         /*
          * The memory of EPS8266 is quite small. Therefore, it may happen on
          * heavy network load that we run into out of memory and we have
-         * to wait until lwIP pbuf has been flushed. For that purpose, we
-         * have to disconnect from AP and slow down sending. The node will
-         * then reconnect to AP automatically.
+         * to wait until lwIP pbuf has been flushed. We slow down sending a bit.
          */
         critical_exit();
-        /* disconnect from AP */
-        wifi_station_disconnect();
         /* wait 20 ms */
         xtimer_usleep(20 * US_PER_MS);
 
@@ -419,29 +448,18 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
 #endif /* MODULE_OD */
 #endif /* ENABLE_DEBUG */
 
-    int res = ieee80211_output_pbuf(sta_netif, pb);
-
-    /*
-     * Attempting to send the next frame before completing the transmission
-     * of the previous frame may result in a complete blockage of the send
-     * function. To avoid this blockage, we have to wait here until the frame
-     * has been sent. The frame has been sent when pb->ref becomes 1.
-     * We wait for a maximum time of ESP_WIFI_SEND_TIMEOUT milliseconds.
-     */
-    unsigned _timeout = ESP_WIFI_SEND_TIMEOUT;
-    while (pb->ref > 1 && --_timeout && dev->state == ESP_WIFI_CONNECTED) {
-        xtimer_usleep(US_PER_MS);
-    }
+    critical_exit();
+    /* sta_netif->linkoutput = ieee80211_output_pbuf */
+    err_t res = sta_netif->linkoutput(sta_netif, pb);
     pbuf_free(pb);
 
-    if (res == ERR_OK && _timeout) {
+    if (res == ERR_OK) {
         /* There was no ieee80211_output_pbuf error and no send timeout. */
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.tx_bytes += iol_len;
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
 #endif
         _in_send = false;
-        critical_exit();
         return iol_len;
     }
     else {
@@ -450,14 +468,6 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
         netdev->stats.tx_failed++;
 #endif
         _in_send = false;
-        critical_exit();
-        /*
-         * ieee80211_output_pbuf usually happens because we run into out of
-         * memory. We have to wait until lwIP pbuf has been flushed. For that
-         * purpose, we have to disconnect from AP and wait for a short time.
-         * The node will then reconnect to AP automatically.
-         */
-        wifi_station_disconnect();
         return -EIO;
     }
 }
@@ -470,9 +480,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     esp_wifi_netdev_t* dev = (esp_wifi_netdev_t*)netdev;
 
-    /* avoid concurrent access to the receive buffer */
-    mutex_lock(&dev->dev_lock);
-
     uint16_t size = dev->rx_len ? dev->rx_len : 0;
 
     if (!buf) {
@@ -481,7 +488,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             /* if len > 0, drop the frame */
             dev->rx_len = 0;
         }
-        mutex_unlock(&dev->dev_lock);
         return size;
     }
 
@@ -490,7 +496,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         ESP_WIFI_DEBUG("not enough space in receive buffer");
         /* newest API requires to drop the frame in that case */
         dev->rx_len = 0;
-        mutex_unlock(&dev->dev_lock);
         return -ENOBUFS;
     }
 
@@ -513,7 +518,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     netdev->stats.rx_bytes += size;
 #endif
 
-    mutex_unlock(&dev->dev_lock);
     return size;
 }
 
@@ -579,11 +583,21 @@ static void _isr(netdev_t *netdev)
 
     assert(netdev != NULL);
 
-    esp_wifi_netdev_t *dev = (esp_wifi_netdev_t *)netdev;
+    esp_wifi_netdev_t *dev = (esp_wifi_netdev_t *) netdev;
 
-    if (dev->rx_len) {
-        dev->netdev.event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+    switch (dev->event) {
+        case EVENT_STAMODE_CONNECTED:
+            dev->netdev.event_callback(netdev, NETDEV_EVENT_LINK_UP);
+            break;
+        case EVENT_STAMODE_DISCONNECTED:
+            dev->netdev.event_callback(netdev, NETDEV_EVENT_LINK_DOWN);
+            break;
+        default:
+            break;
     }
+    _esp_wifi_dev.event = EVENT_MAX; /* no event */
+
+    return;
 }
 
 /** override lwIP ethernet_intput to get ethernet frames */
@@ -624,8 +638,7 @@ static void _esp_wifi_setup(void)
     /* initialize netdev data structure */
     dev->rx_len = 0;
     dev->state = ESP_WIFI_DISCONNECTED;
-
-    mutex_init(&dev->dev_lock);
+    dev->event = EVENT_MAX;
 
     /* set the netdev driver */
     dev->netdev.driver = &_esp_wifi_driver;
@@ -657,6 +670,10 @@ static void _esp_wifi_setup(void)
     }
     ESP_WIFI_DEBUG("own MAC addr is " MAC_STR, MAC_STR_ARG(dev->mac));
 
+    /* set auto reconnect policy */
+    wifi_station_set_reconnect_policy(true);
+    wifi_station_set_auto_connect(true);
+
     /* register callbacks */
     wifi_set_event_handler_cb(_esp_wifi_handle_event_cb);
 
@@ -666,6 +683,9 @@ static void _esp_wifi_setup(void)
 
     /* set the the reconnect timer */
     xtimer_set(&_esp_wifi_reconnect_timer, ESP_WIFI_RECONNECT_TIME);
+
+    /* avoid the WiFi modem going into sleep mode */
+    wifi_set_sleep_type(NONE_SLEEP_T);
 
     /* connect */
     wifi_station_connect();
