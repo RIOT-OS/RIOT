@@ -48,9 +48,8 @@ typedef struct
     uint16_t rx_len;                  /**< number of bytes received from lwIP */
 
     esp_wifi_state_t state;           /**< indicates the interface state */
+    uint32_t event;                   /**< received event */
 
-    mutex_t dev_lock;                 /**< for exclusive access to buffer in
-                                           receive functions */
 } esp_wifi_netdev_t;
 
 #ifdef __cplusplus
