@@ -210,4 +210,11 @@ uint32_t espconn_init(uint32 arg)
     return 1;
 }
 
+extern struct netif * eagle_lwip_getif(uint8_t index);
+
+void esp_lwip_init(void)
+{
+    netif_set_default((struct netif *)eagle_lwip_getif(0));
+}
+
 #endif /* MODULE_ESP_SDK */
