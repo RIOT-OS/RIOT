@@ -68,9 +68,13 @@ value is `stm32f103c8`. These two CPU models basically only have one
 major difference, the latter has 128 KB flash while the former has 64
 KB. You may also set `STM32F103C8_FLASH_HACK` as environment variable.
 
-If you want to flash a binary compiled this way you either need to
-figure out how to adjust the OpenOCD configuration to make it use 128 KB
-flash or use this [stlink fork][caboStlink] which has a
+The OpenOCD configuration overrides the flash size to 128 KB, but this is - as
+of January 2019 - only supported by the development version of OpenOCD. If
+you have this version installed, you can flash your board using:
+
+    $ make BOARD=bluepill flash
+
+Otherwise you can use this [stlink fork][caboStlink] which has a
 [patch][caboPatch] to make use of the entire 128 KB flash using:
 
     $ C8T6HACK=1 st-flash write /dev/sgX $pathToHexFile 0x8000000
