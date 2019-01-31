@@ -527,6 +527,10 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
                       "esp_wifi_start failed with return value %d\n", result);
         return NULL;
     }
+#if !ESP_NOW_UNICAST
+    /* all ESP-NOW nodes get the shared mac address on their station interface */
+    esp_wifi_set_mac(ESP_IF_WIFI_STA, (uint8_t*)_esp_now_mac);
+#endif
 
 #else /* MCU_ESP32 */
 
@@ -556,12 +560,12 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
 
     wifi_softap_set_config_current(&ap_conf);
 
-#endif /* MCU_ESP32 */
-
 #if !ESP_NOW_UNICAST
     /* all ESP-NOW nodes get the shared mac address on their station interface */
-    esp_wifi_set_mac(ESP_IF_WIFI_STA, (uint8_t*)_esp_now_mac);
+    wifi_set_macaddr(ESP_IF_WIFI_STA, (uint8_t*)_esp_now_mac);
 #endif
+
+#endif /* MCU_ESP32 */
 
     /* set the netdev driver */
     dev->netdev.driver = &_esp_now_driver;
@@ -592,8 +596,8 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     esp_now_scan_peers_start();
 
 #else /* ESP_NOW_UNICAST */
-    bool res = _esp_now_add_peer(_esp_now_mac, esp_now_params.channel,
-                                               esp_now_params.key);
+    bool res = _esp_now_add_peer((uint8_t*)_esp_now_mac, esp_now_params.channel,
+                                                         esp_now_params.key);
     DEBUG("%s: multicast node add %s\n", __func__, res ? "success" : "error");
 #endif /* ESP_NOW_UNICAST */
 
@@ -672,7 +676,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     _esp_now_sending = 1;
 
     /* send the packet to the peer(s) mac address */
-    if (esp_now_send(_esp_now_dst, dev->tx_mem, data_len) == ESP_OK) {
+    if (esp_now_send((uint8_t*)_esp_now_dst, dev->tx_mem, data_len) == ESP_OK) {
         while (_esp_now_sending > 0) {
             thread_yield_higher();
         }
@@ -837,7 +841,9 @@ static void _isr(netdev_t *netdev)
     if (dev->scan_event) {
         dev->scan_event--;
         critical_exit();
+#if ESP_NOW_UNICAST
         esp_now_scan_peers_start();
+#endif
     }
     return;
 }
