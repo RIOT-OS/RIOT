@@ -59,7 +59,8 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
             break;
         case SX127X_MODEM_LORA:
             /* Initializes the payload size */
-            sx127x_set_payload_length(dev, size);
+            if (!sx127x_get_fixed_header_len_mode(dev))
+                sx127x_set_payload_length(dev, size);
 
             /* Full buffer used for Tx */
             sx127x_reg_write(dev, SX127X_REG_LR_FIFOTXBASEADDR, 0x00);
