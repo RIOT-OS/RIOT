@@ -3,6 +3,10 @@ ifneq (,$(filter registry,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter registry_store_eeprom,$(USEMODULE)))
+  USEMODULE += eepreg
+endif
+
 ifneq (,$(filter eepreg,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eeprom
 endif
