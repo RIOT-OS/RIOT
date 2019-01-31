@@ -69,7 +69,14 @@ extern "C" {
  * @note Not to be be confused with the USB version number
  */
 #ifndef USB_CONFIG_PRODUCT_BCDVERSION
-#define USB_CONFIG_PRODUCT_BCDVERSION   "0x0100"
+#define USB_CONFIG_PRODUCT_BCDVERSION   0x0100
+#endif
+
+/**
+ * @brief USB specification version
+ */
+#ifndef USB_CONFIG_SPEC_BCDVERSION
+#define USB_CONFIG_SPEC_BCDVERSION      0x0200
 #endif
 
 /**
