@@ -240,6 +240,7 @@ static void _isr(netdev_t *netdev)
 
             case SX127X_RF_LORA_IRQFLAGS_CADDETECTED:
             case SX127X_RF_LORA_IRQFLAGS_CADDONE:
+            case SX127X_RF_LORA_IRQFLAGS_VALIDHEADER:
                 irq = SX127X_IRQ_DIO3;
                 break;
 
@@ -689,23 +690,44 @@ void _on_dio3_irq(void *arg)
     sx127x_t *dev = (sx127x_t *) arg;
     netdev_t *netdev = (netdev_t *) dev;
 
-    switch (dev->settings.modem) {
-        case SX127X_MODEM_FSK:
-            break;
-        case SX127X_MODEM_LORA:
-            /* Clear IRQ */
-            sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS,
-                             SX127X_RF_LORA_IRQFLAGS_CADDETECTED |
-                             SX127X_RF_LORA_IRQFLAGS_CADDONE);
+    switch (dev->settings.state) {
+        case SX127X_RF_CAD:
+            switch (dev->settings.modem) {
+                case SX127X_MODEM_FSK:
+                    break;
+                case SX127X_MODEM_LORA:
+                    /* Clear IRQ */
+                    sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS,
+                                     SX127X_RF_LORA_IRQFLAGS_CADDETECTED |
+                                     SX127X_RF_LORA_IRQFLAGS_CADDONE);
 
-            /* Send event message */
-            dev->_internal.is_last_cad_success = ((sx127x_reg_read(dev, SX127X_REG_LR_IRQFLAGS) &
-                                                   SX127X_RF_LORA_IRQFLAGS_CADDETECTED) ==
-                                                  SX127X_RF_LORA_IRQFLAGS_CADDETECTED);
-            netdev->event_callback(netdev, NETDEV_EVENT_CAD_DONE);
+                    /* Send event message */
+                    dev->_internal.is_last_cad_success = ((sx127x_reg_read(dev, SX127X_REG_LR_IRQFLAGS) &
+                                                           SX127X_RF_LORA_IRQFLAGS_CADDETECTED) ==
+                                                          SX127X_RF_LORA_IRQFLAGS_CADDETECTED);
+                    netdev->event_callback(netdev, NETDEV_EVENT_CAD_DONE);
+                    break;
+                default:
+                    puts("[sx127x] netdev: sx127x_on_dio3: unknown modem");
+                    break;
+            }
+            break;
+        case SX127X_RF_RX_RUNNING:
+            switch (dev->settings.modem) {
+                case SX127X_MODEM_FSK:
+                    break;
+                case SX127X_MODEM_LORA:
+                    /* Clear IRQ */
+                    sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS, SX127X_RF_LORA_IRQFLAGS_VALIDHEADER);
+
+                    netdev->event_callback(netdev, NETDEV_EVENT_RX_STARTED);
+                    break;
+                default:
+                    break;
+            }
             break;
         default:
-            puts("[sx127x] netdev: sx127x_on_dio3: unknown modem");
+            DEBUG("[sx127x] netdev: sx127x_on_dio3: unknown state");
             break;
     }
 }
