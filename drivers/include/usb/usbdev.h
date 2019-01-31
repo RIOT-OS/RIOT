@@ -76,6 +76,28 @@ typedef struct usbdev usbdev_t;
 typedef struct usbdev_ep usbdev_ep_t;
 
 /**
+ * Statically allocated buffer space for endpoints.
+ *
+ * When the device doesn't have dedicated memory for endpoint buffers, a
+ * buffer of this size is allocated to contain the endpoint buffers. Only
+ * needs to be as big as the total buffer space required by all endpoints
+ */
+#ifndef USBDEV_EP_BUF_SPACE
+#define USBDEV_EP_BUF_SPACE     1024
+#endif
+
+/**
+ * Number of USB IN and OUT endpoints allocated
+ *
+ * Configures the number of endpoints allocated. An equal number of IN and OUT
+ * endpoints are allocated
+ */
+#ifndef USBDEV_NUM_ENDPOINTS
+#define USBDEV_NUM_ENDPOINTS       8
+#endif
+
+
+/**
  * @brief   Possible event types that are send from the device driver to the
  *          upper layer
  */
