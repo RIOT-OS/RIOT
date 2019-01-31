@@ -415,6 +415,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     /* initialize buffer */
     dev->rx_len = 0;
 
+    /* set the event handler */
     esp_system_event_add_handler(_esp_system_event_handler, NULL);
 
     esp_err_t result;
@@ -427,6 +428,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     }
 #endif /* CONFIG_ESP32_WIFI_NVS_ENABLED */
 
+    /* initialize the WiFi driver with default configuration */
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     result = esp_wifi_init(&cfg);
     if (result != ESP_OK) {
@@ -469,7 +471,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     wifi_config_ap.ap.max_connection = 4;
     wifi_config_ap.ap.beacon_interval = 100;
 
-    /* set the WiFi interface to Station + SoftAP mode without DHCP */
+    /* set the WiFi interface to Station + SoftAP */
     result = esp_wifi_set_mode(WIFI_MODE_STA | WIFI_MODE_AP);
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
@@ -488,7 +490,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     result = esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config_ap);
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
-                      "esp_wifi_set_mode softap failed with return value %d\n",
+                      "esp_wifi_set_config softap failed with return value %d\n",
                       result);
         return NULL;
     }
