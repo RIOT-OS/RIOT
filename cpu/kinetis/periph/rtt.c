@@ -150,6 +150,11 @@ void rtt_clear_alarm(void)
     bit_clear32(&RTC->IER, RTC_IER_TAIE_SHIFT);
 }
 
+void rtt_set_compensation(int8_t adjust, uint8_t interval)
+{
+    RTC->TCR = RTC_TCR_TCR(adjust) | RTC_TCR_CIR(interval);
+}
+
 /* RTC module has independent power suply. We can not really turn it on/off. */
 
 void rtt_poweron(void)

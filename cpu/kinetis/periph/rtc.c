@@ -92,6 +92,11 @@ void rtc_clear_alarm(void)
     rtc_callback.cb = NULL;
 }
 
+void rtc_set_compensation(int8_t adjust, uint8_t interval)
+{
+    rtt_set_compensation(adjust, interval);
+}
+
 void rtc_poweron(void)
 {
     rtt_poweron();

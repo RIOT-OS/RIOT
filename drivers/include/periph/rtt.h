@@ -155,6 +155,8 @@ uint32_t rtt_get_alarm(void);
  */
 void rtt_clear_alarm(void);
 
+void rtt_set_compensation(int8_t adjust, uint8_t interval);
+
 /**
  * @brief Turn the RTT hardware module on
  */
