@@ -219,15 +219,18 @@ static void esp_wifi_setup (esp_wifi_netdev_t* dev)
     #if CONFIG_ESP32_WIFI_NVS_ENABLED
     result = nvs_flash_init();
     if (result != ESP_OK) {
-       LOG_TAG_ERROR("esp_wifi", "nfs_flash_init failed with return value %d\n", result);
+        LOG_TAG_ERROR("esp_wifi", "nfs_flash_init failed "
+                      "with return value %d\n", result);
         return;
     }
     #endif
 
+    /* initialize the WiFi driver with default configuration */
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     result = esp_wifi_init(&cfg);
     if (result != ESP_OK) {
-       LOG_TAG_ERROR("esp_wifi", "esp_wifi_init failed with return value %d\n", result);
+        LOG_TAG_ERROR("esp_wifi", "esp_wifi_init failed "
+                      "with return value %d\n", result);
         return;
     }
 
@@ -237,21 +240,24 @@ static void esp_wifi_setup (esp_wifi_netdev_t* dev)
 
     result = esp_wifi_set_mode(WIFI_MODE_STA);
     if (result != ESP_OK) {
-       LOG_TAG_ERROR("esp_wifi", "esp_wifi_set_mode failed with return value %d\n", result);
+        LOG_TAG_ERROR("esp_wifi", "esp_wifi_set_mode failed "
+                      "with return value %d\n", result);
         return;
     }
 
-    /* set the Station and SoftAP configuration */
+    /* set the Station configuration */
     result = esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config_sta);
     if (result != ESP_OK) {
-       LOG_TAG_ERROR("esp_wifi", "esp_wifi_set_config station failed with return value %d\n", result);
+        LOG_TAG_ERROR("esp_wifi", "esp_wifi_set_config station failed "
+                      "with return value %d\n", result);
         return;
     }
 
     /* start the WiFi driver */
     result = esp_wifi_start();
     if (result != ESP_OK) {
-       LOG_TAG_ERROR("esp_wifi", "esp_wifi_start failed with return value %d\n", result);
+        LOG_TAG_ERROR("esp_wifi", "esp_wifi_start failed "
+                      "with return value %d\n", result);
         return;
     }
 
