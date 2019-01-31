@@ -34,7 +34,7 @@ extern "C" {
 
 /**
  * @brief File storage facility descriptor.
- * 
+ *
  * @note A file name must be defined in order to use this storage facility.
  */
 typedef struct {
@@ -45,7 +45,7 @@ typedef struct {
 /**
  * @brief Registers a file storage facility as a source of configurations on the
  *        @ref sys_registry "RIOT Registry".
- * 
+ *
  * @param[in] file  Pointer to the descriptor of the file storage
  * @return 0 on success, non-zero on failure
  */
@@ -54,7 +54,7 @@ int registry_file_src(registry_file_t *file);
 /**
  * @brief Registers a file storage facility as the destination of configurations
  *        on the @ref sys_registry "RIOT Registry".
- * 
+ *
  * @param[in] file  Pointer to the descriptor of the file storage
  * @return 0 on success, non-zero on failure
  */

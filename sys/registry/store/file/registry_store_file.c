@@ -94,7 +94,6 @@ static int registry_file_line_find(registry_store_t *store, const char *name,
     char *name_str = NULL;
     char *val_str = NULL;
     int file;
-    int res;
     off_t current_loc = 0;
     off_t prev_loc = 0;
     registry_file_t *file_store = (registry_file_t *)store;
@@ -108,6 +107,7 @@ static int registry_file_line_find(registry_store_t *store, const char *name,
     }
 
     while(1) {
+        int res;
         prev_loc = current_loc;
         res = registry_file_line_get(&file, buf, sizeof(buf), &current_loc);
         if (current_loc == 0) {
@@ -140,11 +140,11 @@ static int registry_file_line_make(char *buf, int buf_len, const char *name,
     int vlen = 0;
     int off;
 
-    nlen = strlen(name);
+    assert(name != NULL);
+    assert(value != NULL);
 
-    if (value) {
-        vlen = strlen(value);
-    }
+    nlen = strlen(name);
+    vlen = strlen(value);
 
     if (nlen + vlen + REGISTRY_EXTRA_LEN > buf_len) {
         return -1;

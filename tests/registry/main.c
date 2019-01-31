@@ -29,6 +29,56 @@
 registry_dummy_t registry_dummy_storage;
 #endif /* MODULE_REGISTRY_STORE_DUMMY */
 
+#ifdef MODULE_REGISTRY_STORE_FILE
+#include "registry/store/registry_store_file.h"
+#include "mtd.h"
+#include "fs/fatfs.h"
+
+#ifdef MODULE_MTD_SDCARD
+#include "mtd_sdcard.h"
+#include "sdcard_spi.h"
+#include "sdcard_spi_params.h"
+#endif
+
+/* Flash mount point */
+#define FLASH_MOUNT_POINT   "/sda"
+
+static fatfs_desc_t fs_desc = {
+    .vol_idx = 0
+};
+
+/* provide mtd devices for use within diskio layer of fatfs */
+mtd_dev_t *fatfs_mtd_devs[FF_VOLUMES];
+
+#define FS_DRIVER fatfs_file_system
+
+/* this structure defines the vfs mount point:
+ *  - fs field is set to the file system driver
+ *  - mount_point field is the mount point name
+ *  - private_data depends on the underlying file system. For both spiffs and
+ *  littlefs, it needs to be a pointer to the file system descriptor */
+static vfs_mount_t flash_mount = {
+    .fs = &FS_DRIVER,
+    .mount_point = FLASH_MOUNT_POINT,
+    .private_data = &fs_desc,
+};
+
+registry_file_t registry_file_storage = {
+    .file_name="/sda/reg"
+};
+
+#ifdef MODULE_MTD_NATIVE
+/* mtd device for native is provided in boards/native/board_init.c */
+extern mtd_dev_t *mtd0;
+#elif MODULE_MTD_SDCARD
+#define SDCARD_SPI_NUM (sizeof(sdcard_spi_params) / sizeof(sdcard_spi_params[0]))
+extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
+mtd_sdcard_t mtd_sdcard_devs[SDCARD_SPI_NUM];
+/* always default to first sdcard*/
+static mtd_dev_t *mtd1 = (mtd_dev_t*)&mtd_sdcard_devs[0];
+#endif
+#endif /* MODULE_REGISTRY_STORE_FILE */
+
 /* Size of the test_bytes configuration parameter */
 #ifndef BYTES_LENGTH
 #define BYTES_LENGTH    16
@@ -249,6 +299,9 @@ int cmd_dump(int argc, char **argv)
 #if defined(MODULE_REGISTRY_STORE_DUMMY)
     registry_dummy_storage.store.itf->load(&registry_dummy_storage.store,
                                            _dump_cb, NULL);
+#elif defined(MODULE_REGISTRY_STORE_FILE)
+    registry_file_storage.store.itf->load(&registry_file_storage.store,
+                                           _dump_cb, NULL);
 #else
     printf("ERROR: No store defined\n");
     return 1;
@@ -280,6 +333,32 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
+#if defined(MODULE_REGISTRY_STORE_FILE)
+/* Determines which MTD device to use and initializes it if needed */
+static void filesystem_setup(void)
+{
+#if MODULE_MTD_SDCARD
+    for(unsigned int i = 0; i < SDCARD_SPI_NUM; i++){
+        mtd_sdcard_devs[i].base.driver = &mtd_sdcard_driver;
+        mtd_sdcard_devs[i].sd_card = &sdcard_spi_devs[i];
+        mtd_sdcard_devs[i].params = &sdcard_spi_params[i];
+        fatfs_mtd_devs[i] = &mtd_sdcard_devs[i].base;
+        mtd_init(&mtd_sdcard_devs[i].base);
+    }
+#endif
+
+#ifdef MODULE_MTD_NATIVE
+    fatfs_mtd_devs[fs_desc.vol_idx] = mtd0;
+#else
+    fatfs_mtd_devs[fs_desc.vol_idx] = mtd1;
+#endif
+
+    if (vfs_mount(&flash_mount) < 0) {
+        DEBUG("[registry_file_src] Failed to mount FS\n");
+    }
+}
+#endif
+
 int main(void)
 {
 
@@ -294,6 +373,11 @@ int main(void)
     DEBUG("Using dummy registry store\n");
     registry_dummy_src(&registry_dummy_storage);
     registry_dummy_dst(&registry_dummy_storage);
+#elif defined(MODULE_REGISTRY_STORE_FILE)
+    DEBUG("Using File registry store\n");
+    filesystem_setup();
+    registry_file_src(&registry_file_storage);
+    registry_file_dst(&registry_file_storage);
 #else
 #error "You should choose a store for registry"
 #endif

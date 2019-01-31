@@ -13,4 +13,5 @@ content of the storage can be dumped.
 | app | bytes | bytes |
 
 ### Storage facility
-By default the `dummy` (RAM) 'storage' is used to test the registry.
+By default the `dummy` (RAM) 'storage' is used to test the registry, to change
+to another of the implemented storages (e.g. FILE) modify the Makefile.
