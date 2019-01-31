@@ -29,6 +29,11 @@
 registry_dummy_t registry_dummy_storage;
 #endif /* MODULE_REGISTRY_STORE_DUMMY */
 
+#ifdef MODULE_REGISTRY_STORE_EEPROM
+#include "registry/store/registry_store_eeprom.h"
+registry_eeprom_t registry_eeprom_storage;
+#endif /* MODULE_REGISTRY_STORE_EEPROM */
+
 /* Size of the test_bytes configuration parameter */
 #ifndef BYTES_LENGTH
 #define BYTES_LENGTH    16
@@ -249,6 +254,9 @@ int cmd_dump(int argc, char **argv)
 #if defined(MODULE_REGISTRY_STORE_DUMMY)
     registry_dummy_storage.store.itf->load(&registry_dummy_storage.store,
                                            _dump_cb, NULL);
+#elif defined(MODULE_REGISTRY_STORE_EEPROM)
+    registry_eeprom_storage.store.itf->load(&registry_eeprom_storage.store,
+                                           _dump_cb, NULL);
 #else
     printf("ERROR: No store defined\n");
     return 1;
@@ -294,6 +302,10 @@ int main(void)
     DEBUG("Using dummy registry store\n");
     registry_dummy_src(&registry_dummy_storage);
     registry_dummy_dst(&registry_dummy_storage);
+#elif defined(MODULE_REGISTRY_STORE_EEPROM)
+    DEBUG("Using EEPROM registry store\n");
+    registry_eeprom_src(&registry_eeprom_storage);
+    registry_eeprom_dst(&registry_eeprom_storage);
 #else
 #error "You should choose a store for registry"
 #endif

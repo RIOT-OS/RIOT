@@ -12,6 +12,9 @@ CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(2*THREAD_STACKSIZE_DEFAULT\)
 # USE DUMMY STORAGE (RAM)
 USEMODULE += registry_store_dummy
 
+# # USE EEPROM STORAGE
+#USEMODULE += registry_store_eeprom
+
 ifneq (,$(filter registry_store_dummy,$(USEMODULE)))
   DIRS += dummy
 endif
