@@ -72,17 +72,14 @@ typedef enum {
      * @brief   (usbopt_enable_t) Enable or disable the endpoint
      */
     USBOPT_EP_ENABLE,
-
     /**
      * @brief   (uint8_t*) Configure the endpoint buffer address
      */
     USBOPT_EP_BUF_ADDR,
-
     /**
      * @brief   (size_t) Configure the endpoint buffer size
      */
     USBOPT_EP_BUF_SIZE,
-
     /**
      * @brief   (usbopt_enable_t) Enable or disable stall replies for endpoint
      */
@@ -91,7 +88,7 @@ typedef enum {
     /**
      * @brief   (usbopt_enable_t) Signal data ready or not ready anymore
      */
-    USBOPT_EP_DATA_READY,
+    USBOPT_EP_READY,
 
     /**
      * @brief   (size_t) Retrieve number of bytes available on endpoint.
