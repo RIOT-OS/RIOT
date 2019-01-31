@@ -394,6 +394,10 @@ ifneq (,$(filter sdcard_spi,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter sds011,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+endif
+
 ifneq (,$(filter servo,$(USEMODULE)))
   FEATURES_REQUIRED += periph_pwm
 endif

@@ -102,6 +102,7 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_PERCENT:  return "%";
         case UNIT_CTS:      return "cts";
         case UNIT_COULOMB:  return "C";
+        case UNIT_GPM3:     return "g/m^3";
         default:            return "";
     }
 }

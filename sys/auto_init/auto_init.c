@@ -449,6 +449,10 @@ void auto_init(void)
     extern void auto_init_sht3x(void);
     auto_init_sht3x();
 #endif
+#ifdef MODULE_SDS011
+    extern void auto_init_sds011(void);
+    auto_init_sds011();
+#endif
 #ifdef MODULE_SI114X
     extern void auto_init_si114x(void);
     auto_init_si114x();
