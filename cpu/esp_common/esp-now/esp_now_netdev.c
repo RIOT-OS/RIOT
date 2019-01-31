@@ -437,6 +437,15 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
         return NULL;
     }
 
+    /* set configuration storage type */
+    result = esp_wifi_set_storage(WIFI_STORAGE_RAM);
+    if (result != ESP_OK) {
+        LOG_TAG_ERROR("esp_now",
+                      "esp_wifi_set_storage failed with return value %d\n",
+                      result);
+        return NULL;
+    }
+
 #ifdef CONFIG_WIFI_COUNTRY
     /* TODO */
 #endif /* CONFIG_WIFI_COUNTRY */
