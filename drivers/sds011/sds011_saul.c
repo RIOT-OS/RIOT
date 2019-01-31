@@ -36,7 +36,7 @@ static int _read(const void *dev, phydat_t *res)
        res->scale = -7;
        return 2;
     }
-    return ECANCELED;
+    return -ECANCELED;
 }
 
 const saul_driver_t sds011_saul_driver = {
