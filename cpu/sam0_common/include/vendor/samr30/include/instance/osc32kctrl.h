@@ -66,6 +66,6 @@
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for OSC32KCTRL peripheral ========== */
-#define OSC32KCTRL_OSC32K_COARSE_CALIB_MSB 6
+#define OSC32KCTRL_OSC32K_COARSE_CALIB_MSB 6       
 
 #endif /* _SAMR30_OSC32KCTRL_INSTANCE_ */
