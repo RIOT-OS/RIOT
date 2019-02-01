@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018 Freie Universität Berlin
- * Copyright (C) 2018 Inria
+ * Copyright (C) 2019 Koen Zandberg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,17 +7,14 @@
  */
 
 /**
- * @defgroup    sys_uuid RFC 4122 compliant UUID's
- * @ingroup     sys
- * @brief       Provides RFC 4122 compliant UUID's
- *
- * This module provides RFC 4122 compliant UUID generation. The UUID stored in
- * @ref uuid_t struct is stored in network byte order.
+ * @defgroup    cpu_sam0_common_usb sam0 USB peripheral
+ * @ingroup     cpu_sam0_common
+ * @brief       USB interface functions for the sam0 class devices
  *
  * @{
  *
  * @file
- * @brief       [RFC 4122](https://tools.ietf.org/html/rfc4122) UUID functions
+ * @brief       USB interface functions for the sam0 class devices
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */

@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup sam0_common
+ * @ingroup cpu_sam0_common_usb
  * @{
  * @file
- * @brief   USB interface functions for the sam0 class devices
+ * @brief   Low level USB interface functions for the sam0 class devices
  *
  * @author  Koen Zandberg <koen@bergzand.net>
  * @}
@@ -449,8 +449,8 @@ usbopt_enable_t _ep_get_stall(usbdev_ep_t *ep)
     UsbDeviceEndpoint *ep_reg = &USB->DEVICE.DeviceEndpoint[ep->num];
 
     if (ep->dir == USB_EP_DIR_IN) {
-        res = ep_reg->EPSTATUSSET.bit.STALLRQ1 
-            ? USBOPT_ENABLE 
+        res = ep_reg->EPSTATUSSET.bit.STALLRQ1
+            ? USBOPT_ENABLE
             : USBOPT_DISABLE;
     }
     else {
