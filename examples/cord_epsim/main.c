@@ -34,9 +34,11 @@ static ssize_t text_resp(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                          const char *text, unsigned format)
 {
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    coap_opt_add_format(pdu, format);
+    ssize_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
     size_t slen = strlen(text);
     memcpy(pdu->payload, text, slen);
-    return gcoap_finish(pdu, slen, format);
+    return resp_len + slen;
 }
 
 static ssize_t handler_info(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
