@@ -372,10 +372,20 @@ define uniq
   $(seen)
 endef
 
+# for each variable listed here, collect additions from used modules.  For
+# example, if CFLAGS.some_module is set and some_module is in USEMODULE, the
+# equivalent of CFLAGS += $(CFLAGS.some_module) will happen.
+MODULE_VARS += CFLAGS LINKFLAGS INCLUDES USEMODULE_INCLUDES
+
+define collect_var =
+  $(1) += $$(foreach module,$$(USEMODULE),$$($(1).$$(module)))
+endef
+
+$(foreach var,$(MODULE_VARS),$(eval $(call collect_var,$(var))))
+
+# add all paths in USEMODULE_INCLUDES to INCLUDES with "-I" prefix
 USEMODULE_INCLUDES_ = $(strip $(call uniq,$(USEMODULE_INCLUDES)))
-
 INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
-
 
 # include bindist target
 include $(RIOTMAKE)/bindist.inc.mk
