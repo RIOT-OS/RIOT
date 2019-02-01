@@ -41,6 +41,16 @@
 #define _NVMCTRL NVMCTRL
 #endif
 
+static inline void wait_nvm_is_ready(void) __attribute__((always_inline));
+static inline void wait_nvm_is_ready(void)
+{
+#ifdef CPU_SAML1X
+    while (!_NVMCTRL->STATUS.bit.READY) {}
+#else
+    while (!_NVMCTRL->INTFLAG.bit.READY) {}
+#endif
+}
+
 static void _unlock(void)
 {
     /* remove peripheral access lock for the NVMCTRL peripheral */
@@ -89,11 +99,12 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     _unlock();
 
     _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_PBC);
+    wait_nvm_is_ready();
     for (unsigned i = 0; i < len; i++) {
         *dst++ = *data_addr++;
     }
     _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_WP);
-
+    wait_nvm_is_ready();
     _lock();
 }
 
@@ -112,11 +123,7 @@ void flashpage_write(int page, const void *data)
     _NVMCTRL->ADDR.reg = (((uint32_t)page_addr) >> 1);
 #endif
     _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_ER);
-#ifdef CPU_SAML1X
-    while(!_NVMCTRL->STATUS.bit.READY) {}
-#else
-    while (!_NVMCTRL->INTFLAG.bit.READY) {}
-#endif
+    wait_nvm_is_ready();
     _lock();
 
     /* write data to page */
