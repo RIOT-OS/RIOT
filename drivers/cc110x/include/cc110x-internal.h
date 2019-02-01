@@ -45,6 +45,7 @@ extern "C" {
 #define MAX_CHANNR                  (24)    /**< Maximum channel number */
 
 #define CC110X_PACKET_LENGTH        (0xFF)  /**< max packet length = 255b */
+#define CC110X_L2_HDR_SIZE          (3)     /**< Layer 2 header size */
 #define CC110X_SYNC_WORD_TX_TIME    (90000) /**< loop count (max. timeout ~15ms)
                                                  to wait for sync word to be
                                                  transmitted (GDO2 from low to
