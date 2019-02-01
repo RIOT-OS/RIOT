@@ -520,9 +520,6 @@ int usbdev_ep_get(usbdev_ep_t *ep, usbopt_ep_t opt,
     int res = -ENOTSUP;
     assert(ep != NULL);
     switch (opt) {
-        case USBOPT_EP_ENABLE:
-        case USBOPT_EP_BUF_ADDR:
-            break;
         case USBOPT_EP_STALL:
             *(usbopt_enable_t *)value = _ep_get_stall(ep);
             res = sizeof(usbopt_enable_t);
