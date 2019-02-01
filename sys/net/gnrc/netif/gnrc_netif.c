@@ -25,7 +25,7 @@
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6.h"
 #endif /* MODULE_GNRC_IPV6_NIB */
-#ifdef MODULE_NETSTATS_IPV6
+#ifdef MODULE_NETSTATS
 #include "net/netstats.h"
 #endif
 #include "fmt.h"
@@ -125,6 +125,13 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
                     assert(opt->data_len == sizeof(netstats_t *));
                     *((netstats_t **)opt->data) = &netif->ipv6.stats;
                     res = sizeof(&netif->ipv6.stats);
+                    break;
+#endif
+#ifdef MODULE_NETSTATS_L2
+                case NETSTATS_LAYER2:
+                    assert(opt->data_len == sizeof(netstats_t *));
+                    *((netstats_t **)opt->data) = &netif->stats;
+                    res = sizeof(&netif->stats);
                     break;
 #endif
                 default:
@@ -1196,6 +1203,9 @@ static void *_gnrc_netif_thread(void *args)
     if (netif->ops->init) {
         netif->ops->init(netif);
     }
+#ifdef MODULE_NETSTATS_L2
+    memset(&netif->stats, 0, sizeof(netstats_t));
+#endif
     /* now let rest of GNRC use the interface */
     gnrc_netif_release(netif);
 
@@ -1215,6 +1225,11 @@ static void *_gnrc_netif_thread(void *args)
                     DEBUG("gnrc_netif: error sending packet %p (code: %u)\n",
                           msg.content.ptr, res);
                 }
+#ifdef MODULE_NETSTATS_L2
+                else {
+                    netif->stats.tx_bytes += res;
+                }
+#endif
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
                 opt = msg.content.ptr;
@@ -1287,25 +1302,24 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
     }
     else {
         DEBUG("gnrc_netif: event triggered -> %i\n", event);
+        gnrc_pktsnip_t *pkt = NULL;
         switch (event) {
-            case NETDEV_EVENT_RX_COMPLETE: {
-                    gnrc_pktsnip_t *pkt = netif->ops->recv(netif);
-
-                    if (pkt) {
-                        _pass_on_packet(pkt);
-                    }
+            case NETDEV_EVENT_RX_COMPLETE:
+                pkt = netif->ops->recv(netif);
+                if (pkt) {
+                    _pass_on_packet(pkt);
                 }
                 break;
 #ifdef MODULE_NETSTATS_L2
             case NETDEV_EVENT_TX_MEDIUM_BUSY:
                 /* we are the only ones supposed to touch this variable,
                  * so no acquire necessary */
-                dev->stats.tx_failed++;
+                netif->stats.tx_failed++;
                 break;
             case NETDEV_EVENT_TX_COMPLETE:
                 /* we are the only ones supposed to touch this variable,
                  * so no acquire necessary */
-                dev->stats.tx_success++;
+                netif->stats.tx_success++;
                 break;
 #endif
             default:

@@ -271,10 +271,6 @@ static int _esp_wifi_init(netdev_t *netdev)
 {
     DEBUG("%s: %p\n", __func__, netdev);
 
-    #ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0x00, sizeof(netstats_t));
-    #endif
-
     return 0;
 }
 
@@ -315,17 +311,10 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
 
     /* send the the packet to the peer(s) mac address */
     if (esp_wifi_internal_tx(ESP_IF_WIFI_STA, dev->tx_buf, dev->tx_len) == ESP_OK) {
-        #ifdef MODULE_NETSTATS_L2
-        netdev->stats.tx_success++;
-        netdev->stats.tx_bytes += dev->tx_len;
-        #endif
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     }
     else {
         DEBUG("%s: sending WiFi packet failed\n", __func__);
-        #ifdef MODULE_NETSTATS_L2
-        netdev->stats.tx_failed++;
-        #endif
         ret = -EIO;
     }
 
@@ -373,11 +362,6 @@ static int _esp_wifi_recv(netdev_t *netdev, void *buf, size_t len, void *info)
         /* copy received date and reset the receive length */
         memcpy(buf, dev->rx_buf, dev->rx_len);
         dev->rx_len = 0;
-
-        #ifdef MODULE_NETSTATS_L2
-        netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += size;
-        #endif
 
         mutex_unlock(&dev->dev_lock);
         return size;

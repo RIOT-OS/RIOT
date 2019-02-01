@@ -95,6 +95,11 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_pktbuf_release(pkt);
             return NULL;
         }
+#ifdef MODULE_NETSTATS_L2
+        netif->stats.rx_count++;
+        netif->stats.rx_bytes += nread;
+#endif
+
         if (netif->flags & GNRC_NETIF_FLAGS_RAWMODE) {
             /* Raw mode, skip packet processing, but provide rx_info via
              * GNRC_NETTYPE_NETIF */
@@ -241,10 +246,10 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 #ifdef MODULE_NETSTATS_L2
     if (netif_hdr->flags &
             (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-        netif->dev->stats.tx_mcast_count++;
+        netif->stats.tx_mcast_count++;
     }
     else {
-        netif->dev->stats.tx_unicast_count++;
+        netif->stats.tx_unicast_count++;
     }
 #endif
 #ifdef MODULE_GNRC_MAC

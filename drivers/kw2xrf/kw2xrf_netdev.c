@@ -81,10 +81,6 @@ static int _init(netdev_t *netdev)
         return -1;
     }
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
-
     /* reset device to default values and put it into RX state */
     kw2xrf_reset_phy(dev);
 
@@ -169,9 +165,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     _send_last_fcf = dev->buf[1];
 
     kw2xrf_write_fifo(dev, dev->buf, dev->buf[0]);
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += len;
-#endif
 
     /* send data out directly if pre-loading id disabled */
     if (!(dev->netdev.flags & KW2XRF_OPT_PRELOADING)) {
@@ -193,11 +186,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     if (buf == NULL) {
         return pkt_len + 1;
     }
-
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += pkt_len;
-#endif
 
     if (pkt_len > len) {
         /* not enough space in buf */
