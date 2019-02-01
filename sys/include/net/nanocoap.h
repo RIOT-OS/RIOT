@@ -641,7 +641,8 @@ size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t last
  * @param[in]     separator   character used in @p string to separate parts
  *
  * @return        number of bytes written to buffer
- * @return        -ENOSPC if no available options
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
  */
 ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string, char separator);
 
@@ -656,7 +657,8 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
  * @param[in]     value       uint to encode
  *
  * @return        number of bytes written to buffer
- * @return        <0 reserved for error but not implemented yet
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
  */
 ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value);
 
@@ -670,7 +672,8 @@ ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value);
  * @param[in]     format      COAP_FORMAT_xxx to use
  *
  * @return        number of bytes written to buffer
- * @return        <0 reserved for error but not implemented yet
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
  */
 static inline ssize_t coap_opt_add_format(coap_pkt_t *pkt, uint16_t format)
 {

@@ -653,25 +653,19 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                (GCOAP_TOKENLEN - i >= 4) ? 4 : GCOAP_TOKENLEN - i);
     }
     uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
-    ssize_t hdrlen = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &token[0], GCOAP_TOKENLEN,
-                                    code, msgid);
+    ssize_t res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &token[0], GCOAP_TOKENLEN,
+                                 code, msgid);
 #else
     uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
-    ssize_t hdrlen = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, NULL, GCOAP_TOKENLEN,
-                                    code, msgid);
+    ssize_t res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, NULL, GCOAP_TOKENLEN,
+                                 code, msgid);
 #endif
 
-    if (hdrlen > 0) {
-        coap_pkt_init(pdu, buf, len - GCOAP_REQ_OPTIONS_BUF, hdrlen);
-        if (path != NULL) {
-            coap_opt_add_string(pdu, COAP_OPT_URI_PATH, path, '/');
-        }
-        return 0;
+    coap_pkt_init(pdu, buf, len - GCOAP_REQ_OPTIONS_BUF, res);
+    if (path != NULL) {
+        res = coap_opt_add_string(pdu, COAP_OPT_URI_PATH, path, '/');
     }
-    else {
-        /* reason for negative hdrlen is not defined, so we also are vague */
-        return -1;
-    }
+    return (res > 0) ? 0 : res;
 }
 
 /*
