@@ -111,7 +111,7 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
             return sizeof(uint8_t);
         case NETOPT_MAX_PACKET_SIZE:
             assert(value_len > 0);
-            *((uint16_t *)value) = CC110X_PACKET_LENGTH;
+            *((uint16_t *)value) = CC110X_PACKET_LENGTH - CC110X_L2_HDR_SIZE;
             return sizeof(uint16_t);
         case NETOPT_IPV6_IID:
             return _get_iid(dev, value, value_len);
