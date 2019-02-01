@@ -37,23 +37,23 @@ extern "C" {
 extern uint32_t irq_interrupt_nesting;
 
 /**
- * @brief   Macros that have to be used on entry into and exit from an ISR
+ * @name   Macros to enter and exit an ISR
  *
- * In non-SDK interrupt handling all stuff is done in _frxt_int_enter
- * and _frxt_int_exit. These macros do therefore nothing and are kept only
+ * In non-SDK interrupt handling all stuff is done in `_frxt_int_enter`
+ * and `_frxt_int_exit`. These macros do therefore nothing and are kept only
  * for source code compatibility.
+ *
+ * @{
  */
-#define irq_isr_enter() /* int _irq_state = irq_disable (); \
-                           irq_interrupt_nesting++; */
-
-#define irq_isr_exit()  /* if (irq_interrupt_nesting) \
-                               irq_interrupt_nesting--; \
-                           irq_restore (_irq_state); */
+#define irq_isr_enter()
+#define irq_isr_exit()
+/** @} */
 
 /**
- * @brief   Macros to enter and exit from critical region
+ * @name   Macros to enter and exit a critical region
  *
- * NOTE: since they use a local variable they can be used only in same function
+ * @note since they use a local variable they can be used only in same function
+ *
  * @{
  */
 #define critical_enter()   int _irq_state = irq_disable ()
