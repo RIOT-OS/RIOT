@@ -234,7 +234,7 @@ static void _print_netopt(netopt_t opt)
             break;
 
         case NETOPT_HOP_LIMIT:
-            printf("MTU");
+            printf("hop limit");
             break;
 
         case NETOPT_MAX_PACKET_SIZE:
