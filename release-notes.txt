@@ -1,3 +1,22 @@
+RIOT-2018.10.1 - Release Notes
+==============================
+This is a bug fixing release for the RIOT 2018.10 release.
+The following bugs were fixed:
+
+#10757: sock_dns: fix out-of-bound errors
+    - sock_dns: remove out-of-place puts() call
+    - sock_dns: remove some magic numbers
+    - sock_dns: fix out-of-bound errors
+
+#10759: 2018.10 compile fixes
+    - pkg/jerryscript: disable -Wconversion for llvm
+    - pkg/nimble: disable -Waddress-of-packed-member for llvm
+    - pkg/tinycrypt: update commit hash after upstream rewrote history
+
+#10285: at86rf2xx: release framebuffer on recv with (len > 0) && (buf == NULL)
+    - at86rf2xx: correct framebuffer release
+
+
 RIOT-2018.10 - Release Notes
 ============================
 RIOT is a multi-threading operating system which enables soft real-time
