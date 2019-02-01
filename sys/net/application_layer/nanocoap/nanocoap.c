@@ -716,7 +716,9 @@ size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
 static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, uint8_t *val,
                             size_t val_len)
 {
-    assert(pkt->options_len < NANOCOAP_NOPTS_MAX);
+    if (pkt->options_len >= NANOCOAP_NOPTS_MAX) {
+        return -ENOSPC;
+    }
 
     uint16_t lastonum = (pkt->options_len)
             ? pkt->options[pkt->options_len - 1].opt_num : 0;
@@ -727,7 +729,9 @@ static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, uint8_t *val,
     size_t optlen = _put_delta_optlen(dummy, 1, 4, optnum - lastonum);
     optlen += _put_delta_optlen(dummy, 0, 0, val_len);
     optlen += val_len;
-    assert(pkt->payload_len >= optlen);
+    if (pkt->payload_len < optlen) {
+        return -ENOSPC;
+    }
 
     coap_put_option(pkt->payload, lastonum, optnum, val, val_len);
 
@@ -772,10 +776,11 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
         /* Creates empty option if part for Uri-Path or Uri-Location contains
          * only a trailing slash, except for root path ("/"). */
         if (part_len || ((separator == '/') && write_len)) {
-            if (pkt->options_len == NANOCOAP_NOPTS_MAX) {
-                return -ENOSPC;
+            ssize_t optlen = _add_opt_pkt(pkt, optnum, part_start, part_len);
+            if (optlen < 0) {
+                return optlen;
             }
-            write_len += _add_opt_pkt(pkt, optnum, part_start, part_len);
+            write_len += optlen;
         }
     }
 
