@@ -81,6 +81,9 @@
 
 #endif /* MCU_ESP8266 */
 
+#if MODULE_ESP_WIFI && !ESP_NOW_UNICAST
+#error If module esp_wifi is used, module esp_now has to be used in unicast mode
+#endif
 
 /**
  * There is only one ESP-NOW device. We define it as static device variable
@@ -404,13 +407,6 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     }
 
 #ifdef MCU_ESP32
-    /*
-     * Init the WiFi driver. TODO It is not only required before ESP_NOW is
-     * initialized but also before other WiFi functions are used. Once other
-     * WiFi functions are realized it has to be moved to a more common place.
-     */
-    extern portMUX_TYPE g_intr_lock_mux;
-    mutex_init(&g_intr_lock_mux);
 
     /* initialize buffer */
     dev->rx_len = 0;
@@ -418,7 +414,12 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     /* set the event handler */
     esp_system_event_add_handler(_esp_system_event_handler, NULL);
 
+    /* init the WiFi driver */
+    extern portMUX_TYPE g_intr_lock_mux;
+    mutex_init(&g_intr_lock_mux);
+
     esp_err_t result;
+
 #if CONFIG_ESP32_WIFI_NVS_ENABLED
     result = nvs_flash_init();
     if (result != ESP_OK) {
@@ -504,7 +505,8 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
         return NULL;
     }
 
-    /* start the WiFi driver */
+#ifndef MODULE_ESP_WIFI
+    /* start WiFi if esp_wifi is not used, otherwise it is done by esp_wifi */
     result = esp_wifi_start();
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
@@ -515,6 +517,8 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     /* all ESP-NOW nodes get the shared mac address on their station interface */
     esp_wifi_set_mac(ESP_IF_WIFI_STA, (uint8_t*)_esp_now_mac);
 #endif
+
+#endif /* MODULE_ESP_WIFI */
 
 #else /* MCU_ESP32 */
 

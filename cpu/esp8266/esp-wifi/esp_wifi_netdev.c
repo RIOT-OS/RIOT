@@ -356,12 +356,14 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
         return -EIO;
     }
 
+#ifndef MODULE_ESP_NOW
     if (wifi_get_opmode() != ESP_WIFI_MODE) {
         ESP_WIFI_DEBUG("WiFi is not in correct mode, cannot send");
         _in_send = false;
         critical_exit();
         return -EIO;
     }
+#endif
 
     const iolist_t *iol = iolist;
     size_t iol_len = 0;
@@ -688,7 +690,12 @@ void auto_init_esp_wifi(void)
 
     /* create netif */
     gnrc_netif_ethernet_create(_esp_wifi_stack, ESP_WIFI_STACKSIZE,
-                               ESP_WIFI_PRIO, "esp_wifi",
+#ifdef MODULE_ESP_NOW
+                               ESP_WIFI_PRIO - 1,
+#else
+                               ESP_WIFI_PRIO,
+#endif
+                               "esp-wifi",
                                (netdev_t *)&_esp_wifi_dev);
 }
 
