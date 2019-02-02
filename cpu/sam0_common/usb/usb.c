@@ -46,19 +46,19 @@ static void _ep_address(usbdev_ep_t *ep);
 static void _ep_size(usbdev_ep_t *ep);
 static int _ep_unready(usbdev_ep_t *ep);
 
-static inline unsigned _get_ep_num(unsigned num, usb_ep_dir_t dir)
+static inline unsigned _ep_num(unsigned num, usb_ep_dir_t dir)
 {
     return 2 * num + (dir == USB_EP_DIR_OUT ? 0 : 1);
 }
 
-static inline unsigned _get_ep_num2(usbdev_ep_t *ep)
+static inline UsbDeviceDescBank* _bank_from_ep(usbdev_ep_t *ep)
 {
-    return 2 * ep->num + (ep->dir == USB_EP_DIR_OUT ? 0 : 1);
+    return &banks[_ep_num(ep->num, ep->dir)];
 }
 
 static inline usbdev_ep_t *_get_ep(unsigned num, usb_ep_dir_t dir)
 {
-    return &endpoints[_get_ep_num(num, dir)];
+    return &endpoints[_ep_num(num, dir)];
 }
 
 static inline void _enable_irq(void)
@@ -265,12 +265,12 @@ void isr_usb(void)
         unsigned ep_num = bitarithm_lsb(USB->DEVICE.EPINTSMRY.reg);
         UsbDeviceEndpoint *ep_reg = &USB->DEVICE.DeviceEndpoint[ep_num];
         if (_ep_in_flags_set(ep_reg)) {
-            usbdev_ep_t *ep = &endpoints[_get_ep_num(ep_num, USB_EP_DIR_IN)];
+            usbdev_ep_t *ep = _get_ep(ep_num, USB_EP_DIR_IN);
             _disable_ep_irq(ep);
             ep->cb(ep, USBDEV_EVENT_ESR);
         }
         else if (_ep_out_flags_set(ep_reg)) {
-            usbdev_ep_t *ep = &endpoints[_get_ep_num(ep_num, USB_EP_DIR_OUT)];
+            usbdev_ep_t *ep = _get_ep(ep_num, USB_EP_DIR_OUT);
             _disable_ep_irq(ep);
             ep->cb(ep, USBDEV_EVENT_ESR);
         }
@@ -416,7 +416,7 @@ void usbdev_esr(usbdev_t *dev)
 
 static void _ep_address(usbdev_ep_t *ep)
 {
-    UsbDeviceDescBank *bank = &banks[_get_ep_num(ep->num, ep->dir)];
+    UsbDeviceDescBank *bank = _bank_from_ep(ep);
 
     bank->ADDR.reg = (uint32_t)ep->buf;
 }
@@ -464,7 +464,7 @@ usbopt_enable_t _ep_get_stall(usbdev_ep_t *ep)
 
 static void _ep_size(usbdev_ep_t *ep)
 {
-    UsbDeviceDescBank *bank = &banks[_get_ep_num(ep->num, ep->dir)];
+    UsbDeviceDescBank *bank = _bank_from_ep(ep);
     unsigned val = 0x00;
 
     switch (ep->len) {
@@ -505,10 +505,7 @@ static void usbdev_ep_init(usbdev_ep_t *ep)
 
 size_t _ep_get_available(usbdev_ep_t *ep)
 {
-    UsbDeviceDescBank *bank = &banks[_get_ep_num(ep->num, ep->dir)];
-
-    return (size_t)bank->PCKSIZE.bit.BYTE_COUNT;
-
+    return _bank_from_ep(ep)->PCKSIZE.bit.BYTE_COUNT;
 }
 
 int usbdev_ep_get(usbdev_ep_t *ep, usbopt_ep_t opt,
@@ -597,7 +594,7 @@ static int _ep_unready(usbdev_ep_t *ep)
 static int usbdev_ep_ready(usbdev_ep_t *ep, size_t len)
 {
     _ep_set_stall(ep, USBOPT_DISABLE);
-    UsbDeviceDescBank *bank = &banks[_get_ep_num(ep->num, ep->dir)];
+    UsbDeviceDescBank *bank = _bank_from_ep(ep);
     UsbDeviceEndpoint *ep_reg = &USB->DEVICE.DeviceEndpoint[ep->num];
     if (ep->dir == USB_EP_DIR_IN) {
         bank->PCKSIZE.bit.BYTE_COUNT = len;
