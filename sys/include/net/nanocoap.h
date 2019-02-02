@@ -669,6 +669,7 @@ static inline ssize_t coap_opt_add_format(coap_pkt_t *pkt, uint16_t format)
  * @param[in]     flags       see COAP_OPT_FINISH... macros
  *
  * @return        total number of bytes written to buffer
+ * @return        -ENOSPC if no buffer space for payload marker
  */
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
 
