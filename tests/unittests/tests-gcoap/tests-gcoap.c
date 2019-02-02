@@ -133,7 +133,7 @@ static void test_gcoap__client_get_resp(void)
  */
 static void test_gcoap__client_put_req(void)
 {
-    uint8_t buf[GCOAP_PDU_BUF_SIZE];
+    uint8_t buf[GCOAP_PDU_BUF_SIZE]; /* header 4, token 2, path 11 */
     coap_pkt_t pdu;
     size_t len;
     char path[] = "/riot/value";
@@ -149,6 +149,27 @@ static void test_gcoap__client_put_req(void)
     TEST_ASSERT_EQUAL_INT(COAP_METHOD_PUT, coap_get_code(&pdu));
     TEST_ASSERT_EQUAL_INT(1, pdu.payload_len);
     TEST_ASSERT_EQUAL_INT('1', (char)*pdu.payload);
+}
+
+/*
+ * Builds on client_put_req to test overfill on coap_opt_finish().
+ */
+static void test_gcoap__client_put_req_overfill(void)
+{
+    /* header 4, token 2, path 11, format 1, marker 1 = 19 */
+    uint8_t buf[18+GCOAP_REQ_OPTIONS_BUF];
+    coap_pkt_t pdu;
+    ssize_t len;
+    char path[] = "/riot/value";
+
+    gcoap_req_init(&pdu, buf, sizeof(buf), COAP_METHOD_PUT, path);
+    TEST_ASSERT_EQUAL_INT(1, pdu.payload_len);
+
+    coap_opt_add_format(&pdu, COAP_FORMAT_TEXT);
+    TEST_ASSERT_EQUAL_INT(0, pdu.payload_len);
+
+    len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
+    TEST_ASSERT_EQUAL_INT(-ENOSPC, len);
 }
 
 /*
@@ -375,6 +396,7 @@ Test *tests_gcoap_tests(void)
         new_TestFixture(test_gcoap__client_get_req),
         new_TestFixture(test_gcoap__client_get_resp),
         new_TestFixture(test_gcoap__client_put_req),
+        new_TestFixture(test_gcoap__client_put_req_overfill),
         new_TestFixture(test_gcoap__client_get_query),
         new_TestFixture(test_gcoap__client_get_path_defer),
         new_TestFixture(test_gcoap__server_get_req),
