@@ -69,10 +69,13 @@
  *
  * - **minimal API** requires only a reference to the buffer for the message.
  * However, the caller must provide the last option number written as well as
- * the buffer position.
+ * the buffer position. The caller is primarily responsible for tracking and
+ * managing the space remaining in the buffer.
  *
  * - **struct-based API** uses a coap_pkt_t struct to conveniently track each
- * option as it is written and prepare for any payload.
+ * option as it is written and prepare for any payload. The caller must monitor
+ * space remaining in the buffer; however, the API *will not* write past the
+ * end of the buffer, and returns -ENOSPC when it is full.
  *
  * You must use one API exclusively for a given message. For either API, the
  * caller must write options in order by option number (see "CoAP option
@@ -89,6 +92,9 @@
  * option. These functions require the position in the buffer to start writing,
  * and return the number of bytes written.
  *
+ * @note You must ensure the buffer has enough space remaining to write each
+ * option. The API does not verify the safety of writing an option.
+ *
  * If there is a payload, append a payload marker (0xFF). Then write the
  * payload to within the maximum length remaining in the buffer.
  *
@@ -101,6 +107,10 @@
  * Next, use the coap_opt_add_xxx() functions to write each option, like
  * coap_opt_add_uint(). When all options have been added, call
  * coap_opt_finish().
+ *
+ * @note You must ensure the buffer has enough space remaining to write each
+ * option. You can monitor `coap_pkt_t.payload_len` for remaining space, or
+ * watch for a -ENOSPC return value from the API.
  *
  * Finally, write any message payload at the coap_pkt_t _payload_ pointer
  * attribute. The _payload_len_ attribute provides the available length in the
