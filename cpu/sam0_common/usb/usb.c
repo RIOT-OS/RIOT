@@ -130,7 +130,7 @@ static bool _ep_in_flags_set(UsbDeviceEndpoint *ep_reg)
 
 static bool usb_enable_syncing(void)
 {
-    if (USB->DEVICE.SYNCBUSY.reg & USB_SYNCBUSY_ENABLE) {
+    if (USB->DEVICE.SYNCBUSY.bit.ENABLE) {
         return true;
     }
     return false;
@@ -138,7 +138,7 @@ static bool usb_enable_syncing(void)
 
 static bool usb_swrst_syncing(void)
 {
-    if (USB->DEVICE.SYNCBUSY.reg & USB_SYNCBUSY_SWRST) {
+    if (USB->DEVICE.SYNCBUSY.bit.SWRST) {
         return true;
     }
     return false;
@@ -192,7 +192,7 @@ static inline void poweron(void)
                                    GCLK_CLKCTRL_GEN_GCLK0 |
                                    (GCLK_CLKCTRL_ID(USB_GCLK_ID)));
 #elif defined(CPU_FAM_SAML21)
-    MCLK->AHBMASK.reg |= (MCLK_AHBMASK_USB);
+    MCLK->AHBMASK.reg |= MCLK_AHBMASK_USB;
     GCLK->PCHCTRL[USB_GCLK_ID].reg = GCLK_PCHCTRL_CHEN |
                                      GCLK_PCHCTRL_GEN_GCLK0;
 #endif
@@ -249,13 +249,11 @@ void usbdev_init(usbdev_t *dev)
 
 void usb_attach(void)
 {
-    /* Datasheet is not clear whether device starts detached */
     USB->DEVICE.CTRLB.reg &= ~USB_DEVICE_CTRLB_DETACH;
 }
 
 void usb_detach(void)
 {
-    /* Datasheet is not clear whether device starts detached */
     USB->DEVICE.CTRLB.reg |= USB_DEVICE_CTRLB_DETACH;
 }
 
