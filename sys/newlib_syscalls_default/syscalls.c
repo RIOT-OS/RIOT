@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <reent.h>
 #include <errno.h>
+#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -121,6 +122,24 @@ void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
     irq_restore(state);
     return res;
 }
+
+/**
+ * @brief Print heap statistics
+ *
+ * If the CPU does not provide its own heap handling and heap_stats function,
+ * but instead uses the newlib_syscall_default function, this function outputs
+ * the heap statistics. If the CPU provides its own heap_stats function, it
+ * should define HAVE_HEAP_STATS in its cpu_conf.h file.
+ */
+#ifndef HAVE_HEAP_STATS
+__attribute__((weak)) void heap_stats(void)
+{
+    struct mallinfo minfo = mallinfo();
+    long int heap_size = &_eheap - &_sheap;
+    printf("heap: %ld (used %d, free %ld) [bytes]\n",
+           heap_size, minfo.uordblks, heap_size - minfo.uordblks);
+}
+#endif /* HAVE_HEAP_STATS */
 
 #endif /*__mips__*/
 

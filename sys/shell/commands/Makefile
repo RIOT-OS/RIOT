@@ -11,6 +11,9 @@ endif
 ifneq (,$(filter ps,$(USEMODULE)))
   SRC += sc_ps.c
 endif
+ifneq (,$(filter heap_cmd,$(USEMODULE)))
+  SRC += sc_heap.c
+endif
 ifneq (,$(filter sht1x,$(USEMODULE)))
   SRC += sc_sht1x.c
 endif
