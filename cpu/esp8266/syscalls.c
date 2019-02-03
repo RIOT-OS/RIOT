@@ -74,7 +74,9 @@ void *__real_realloc(void *ptr, size_t size);
 void *__real__malloc_r (struct _reent *r, size_t size);
 void  __real__free_r (struct _reent *r, void *ptr);
 void *__real__realloc_r (struct _reent *r, void *ptr, size_t size);
-struct mallinfo __real_mallinfo(void);
+
+extern uint8_t  _eheap;     /* end of heap (defined in esp8266.riot-os.app.ld) */
+extern uint8_t  _sheap;     /* start of heap (defined in esp8266.riot-os.app.ld) */
 
 void* IRAM __wrap_malloc(size_t size)
 {
@@ -134,27 +136,6 @@ void IRAM *__wrap__realloc_r (struct _reent *r, void *ptr, size_t size)
 unsigned int get_free_heap_size (void)
 {
     return xPortGetFreeHeapSize();
-}
-
-extern uint8_t  _eheap;     /* end of heap (defined in esp8266.riot-os.app.ld) */
-extern uint8_t  _sheap;     /* start of heap (defined in esp8266.riot-os.app.ld) */
-
-struct mallinfo __wrap_mallinfo(void)
-{
-    struct mallinfo mi;
-
-    mi.arena = &_eheap - &_sheap;
-    mi.fordblks = get_free_heap_size();
-    mi.uordblks = mi.arena - mi.fordblks;
-    mi.keepcost = mi.fordblks;
-    return mi;
-}
-
-void heap_stats(void)
-{
-    struct mallinfo minfo = __wrap_mallinfo();
-    ets_printf("heap: %d (used %d, free %d)\n",
-               minfo.arena, minfo.uordblks, minfo.fordblks);
 }
 
 void IRAM syscalls_init (void)
@@ -347,15 +328,17 @@ extern char _sheap;     /* start of heap (defined in esp8266.riot-os.app.ld) */
 
 unsigned int IRAM get_free_heap_size (void)
 {
-    return (_cheap) ? &_eheap - _cheap : 0;
+    struct mallinfo minfo = mallinfo();
+    return &_eheap - &_sheap - minfo.uordblks;
 }
+
+#endif /* MODULE_ESP_SDK */
 
 void heap_stats(void)
 {
-    struct mallinfo minfo = mallinfo();
-    ets_printf("heap: %u (free %u), ", &_eheap - &_sheap, get_free_heap_size());
-    ets_printf("sysmem: %d (used %d, free %d)\n",
-               minfo.arena, minfo.uordblks, minfo.fordblks);
+    ets_printf("heap: %u (used %d, free %u) [bytes]\n",
+               &_eheap - &_sheap, &_eheap - &_sheap - get_free_heap_size(),
+               get_free_heap_size());
 }
 
 #endif /* MODULE_ESP_SDK */

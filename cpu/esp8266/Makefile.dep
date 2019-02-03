@@ -10,7 +10,6 @@ ifneq (, $(filter esp_sdk, $(USEMODULE)))
     LINKFLAGS += -Wl,-wrap=_malloc_r
     LINKFLAGS += -Wl,-wrap=_free_r
     LINKFLAGS += -Wl,-wrap=_realloc_r
-    LINKFLAGS += -Wl,-wrap=mallinfo
 endif
 
 ifneq (, $(filter esp_spiffs, $(USEMODULE)))
