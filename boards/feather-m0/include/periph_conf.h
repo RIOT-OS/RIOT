@@ -200,9 +200,10 @@ static const adc_conf_chan_t adc_channels[] = {
     { GPIO_PIN(PA, 4), ADC_INPUTCTRL_MUXPOS_PIN4 },     /* A3 */
     { GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5 },     /* A4 */
     { GPIO_PIN(PB, 2), ADC_INPUTCTRL_MUXPOS_PIN10 },    /* A5 */
+    { GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS_PIN7 },     /* A7 */
 };
 
-#define ADC_0_CHANNELS                     (6U)
+#define ADC_0_CHANNELS                     (7U)
 #define ADC_NUMOF                          ADC_0_CHANNELS
 /** @} */
 
