@@ -256,7 +256,7 @@ static uint16_t _tftp_get_maximum_block_size(void)
     uint16_t tmp;
     gnrc_netif_t *netif = gnrc_netif_iter(NULL);
 
-    if ((netif != NULL) && gnrc_netapi_get(netif->pid, NETOPT_MAX_PACKET_SIZE,
+    if ((netif != NULL) && gnrc_netapi_get(netif->pid, NETOPT_MAX_PDU_SIZE,
                                            0, &tmp, sizeof(uint16_t)) >= 0) {
         /* TODO calculate proper block size */
         return tmp - sizeof(udp_hdr_t) - sizeof(ipv6_hdr_t) - 10;
