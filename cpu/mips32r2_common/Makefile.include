@@ -11,6 +11,7 @@ ifeq ($(USE_UHI_SYSCALLS),1)
   #Use UHI to handle syscalls
   export LINKFLAGS += -luhi
   export USEMODULE += newlib_syscalls_mips_uhi
+  CFLAGS += -DHAVE_HEAP_STATS
 else
   #Use RIOT to handle syscalls (default)
   export USEMODULE += newlib_syscalls_default
