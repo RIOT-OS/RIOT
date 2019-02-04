@@ -15,22 +15,7 @@ work for the time being.
 
 ## Flash the board
 
-By default, the board is flashed with via the on-board Segger JLink adapter.
-
-To flash the board, use `BOARD=nrf52840dk` with the `make` command.<br/>
-Example with `hello-world` application:
-```
-    make BOARD=nrf52840dk -C examples/hello-world flash
-```
-
-OpenOCD can also be used. For the moment, the latest stable version of OpenOCD
-(0.10) doesn't contain any support for nrf52 but versions built against the
-actual development version can be used.
-
-To flash the board with OpenOCD, use the `PROGRAMMER` variable:
-```
-    PROGRAMMER=openocd make BOARD=nrf52840dk -C examples/hello-world flash
-```
+See the `Flashing` section in @ref boards_common_nrf52.
 
 ## Accessing STDIO via UART
 

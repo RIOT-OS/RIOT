@@ -2,4 +2,9 @@
 @defgroup    boards_thingy52 Nordic Thingy:52
 @ingroup     boards
 @brief       Support for the Nordic Thingy:52 board
+
+## Flash the board
+
+See the `Flashing` section in @ref boards_common_nrf52.
+
  */
