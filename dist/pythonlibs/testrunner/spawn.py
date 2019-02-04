@@ -28,9 +28,9 @@ def list_until(l, cond):
     return l[:([i for i, e in enumerate(l) if cond(e)][0])]
 
 
-def find_exc_origin(exc_info):
+def find_exc_origin(exc_info, pexpect_path=PEXPECT_PATH):
     pos = list_until(extract_tb(exc_info),
-                     lambda frame: frame[0].startswith(PEXPECT_PATH)
+                     lambda frame: frame[0].startswith(pexpect_path)
                      )[-1]
     return (pos[3], os.path.relpath(os.path.abspath(pos[0]), RIOTBASE), pos[1])
 
