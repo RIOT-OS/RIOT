@@ -309,12 +309,12 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
             dev(uart)->CR3 |= USART_CR3_DMAT;
             dma_transfer(uart_config[uart].dma, uart_config[uart].dma_chan, data,
                          (void *)&dev(uart)->TDR_REG, len, DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR);
-            dma_release(uart_config[uart].dma);
 
             /* make sure the function is synchronous by waiting for the transfer to
              * finish */
             wait_for_tx_complete(uart);
             dev(uart)->CR3 &= ~USART_CR3_DMAT;
+            dma_release(uart_config[uart].dma);
         }
         return;
     }
