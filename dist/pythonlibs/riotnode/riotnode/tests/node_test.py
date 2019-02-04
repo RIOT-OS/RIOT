@@ -176,6 +176,9 @@ def test_expect_value(app_pidfile_env):
         assert exc_info.value.value == 'UPPERCASE'
         assert exc_info.value.pexpect_value.startswith('Timeout exceeded.')
 
+        # check the context is removed (should be only 2 levels)
+        assert len(exc_info.traceback) == 2
+
         child.sendline('lowercase')
         with pytest.raises(pexpect.TIMEOUT) as exc_info:
             child.expect_exact('UPPERCASE', timeout=0.5)

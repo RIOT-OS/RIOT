@@ -24,6 +24,7 @@ class TermSpawn(pexpect.spawn):
       * default timeout
     * tweak exception:
       * replace the value with the called pattern
+      * remove exception context from inside pexpect implementation
     """
 
     def __init__(self,  # pylint:disable=too-many-arguments
@@ -52,9 +53,14 @@ class TermSpawn(pexpect.spawn):
         """Tweak pexpect exception.
 
         * Put the calling 'pattern' as value
+        * Remove exception context
         """
         exc.pexpect_value = exc.value
         exc.value = pattern
+
+        # Remove exception context
+        exc.__cause__ = None
+        exc.__traceback__ = None
         return exc
 
 
