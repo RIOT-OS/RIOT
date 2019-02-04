@@ -20,3 +20,6 @@ to your Makefile.
 
 Examples of using the uECC API can be found in the `test` folder of the
 Micro-ECC upstream.
+
+**WARNING** For `uECC_make_key` and `uECC_sign` to be secure, the
+random module is expected to be seeded with a high entropy random seed.
