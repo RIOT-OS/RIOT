@@ -432,6 +432,10 @@ typedef struct {
     gpio_af_t rx_af;        /**< alternate function for RX pin */
     gpio_af_t tx_af;        /**< alternate function for TX pin */
 #endif
+#ifdef MODULE_STM32_PERIPH_UART_PIN_INVERSION
+    uint8_t rx_pin_inv;          /**< RX pin inversion flag */
+    uint8_t tx_pin_inv;          /**< TX pin inversion flag */
+#endif
     uint8_t bus;            /**< APB bus */
     uint8_t irqn;           /**< IRQ channel */
 #ifdef MODULE_STM32_PERIPH_UART_HW_FC

@@ -126,6 +126,13 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev(uart)->CR2 = 0;
     dev(uart)->CR3 = 0;
 
+#if defined(MODULE_STM32_PERIPH_UART_PIN_INVERSION) && defined(USART_CR2_RXINV)
+    if (uart_config[uart].rx_pin_inv)
+        dev(uart)->CR2 |= USART_CR2_RXINV;
+    if (uart_config[uart].tx_pin_inv)
+        dev(uart)->CR2 |= USART_CR2_TXINV;
+#endif
+
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4)
     switch (uart_config[uart].type) {
         case STM32_USART:
