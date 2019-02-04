@@ -473,7 +473,7 @@ static int nrfmin_get(netdev_t *dev, netopt_t opt, void *val, size_t max_len)
             assert(max_len >= sizeof(int16_t));
             *((int16_t *)val) = nrfmin_get_txpower();
             return sizeof(int16_t);
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             assert(max_len >= sizeof(uint16_t));
             *((uint16_t *)val) = NRFMIN_PAYLOAD_MAX;
             return sizeof(uint16_t);
