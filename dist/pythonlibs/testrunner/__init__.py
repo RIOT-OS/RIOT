@@ -28,13 +28,13 @@ def run(testfunc, timeout=TIMEOUT, echo=True, traceback=False):
     try:
         testfunc(child)
     except pexpect.TIMEOUT:
-        trace = find_exc_origin(sys.exc_info()[2])
+        trace = find_exc_origin(sys.exc_info()[2], pexpect_path=pexpect_path)
         print("Timeout in expect script at \"%s\" (%s:%d)" % trace)
         if traceback:
             print_tb(sys.exc_info()[2])
         return 1
     except pexpect.EOF:
-        trace = find_exc_origin(sys.exc_info()[2])
+        trace = find_exc_origin(sys.exc_info()[2], pexpect_path=pexpect_path)
         print("Unexpected end of file in expect script at \"%s\" (%s:%d)" %
               trace)
         if traceback:

@@ -22,6 +22,8 @@ class TermSpawn(pexpect.spawn):
       * disable local 'echo' to not match send messages
       * 'utf-8/replace' by default
       * default timeout
+    * tweak exception:
+      * replace the value with the called pattern
     """
 
     def __init__(self,  # pylint:disable=too-many-arguments
@@ -30,6 +32,30 @@ class TermSpawn(pexpect.spawn):
         super().__init__(command, timeout=timeout, echo=echo,
                          encoding=encoding, codec_errors=codec_errors,
                          **kwargs)
+
+    def expect(self, pattern, *args, **kwargs):
+        # pylint:disable=arguments-differ
+        try:
+            return super().expect(pattern, *args, **kwargs)
+        except (pexpect.TIMEOUT, pexpect.EOF) as exc:
+            raise self._pexpect_exception(exc, pattern)
+
+    def expect_exact(self, pattern, *args, **kwargs):
+        # pylint:disable=arguments-differ
+        try:
+            return super().expect_exact(pattern, *args, **kwargs)
+        except (pexpect.TIMEOUT, pexpect.EOF) as exc:
+            raise self._pexpect_exception(exc, pattern)
+
+    @staticmethod
+    def _pexpect_exception(exc, pattern):
+        """Tweak pexpect exception.
+
+        * Put the calling 'pattern' as value
+        """
+        exc.pexpect_value = exc.value
+        exc.value = pattern
+        return exc
 
 
 class RIOTNode():
