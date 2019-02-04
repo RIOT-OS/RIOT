@@ -119,3 +119,30 @@ def test_expect_not_matching_stdin(app_pidfile_env):
         matched = child.expect_exact([pexpect.TIMEOUT, msg], timeout=1)
         assert matched == 0
         # This would have matched with `node.run_term(echo=True)`
+
+
+def test_expect_value(app_pidfile_env):
+    """Test that expect value is being changed to the pattern."""
+    env = {'BOARD': 'board', 'APPLICATION': './echo.py'}
+    env.update(app_pidfile_env)
+
+    node = riotnode.node.RIOTNode(APPLICATIONS_DIR, env)
+    node.TERM_STARTED_DELAY = 1
+
+    with node.run_term(logfile=sys.stdout) as child:
+        child.expect_exact('Starting RIOT node')
+
+        # Exception is 'exc_info.value' and pattern is in 'exc.value'
+        child.sendline('lowercase')
+        with pytest.raises(pexpect.TIMEOUT) as exc_info:
+            child.expect('UPPERCASE', timeout=0.5)
+        assert str(exc_info.value) == 'UPPERCASE'
+
+        # value updated and old value saved
+        assert exc_info.value.value == 'UPPERCASE'
+        assert exc_info.value.pexpect_value.startswith('Timeout exceeded.')
+
+        child.sendline('lowercase')
+        with pytest.raises(pexpect.TIMEOUT) as exc_info:
+            child.expect_exact('UPPERCASE', timeout=0.5)
+        assert str(exc_info.value) == 'UPPERCASE'
