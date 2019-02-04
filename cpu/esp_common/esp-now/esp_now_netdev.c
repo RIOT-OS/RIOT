@@ -627,7 +627,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 #endif
 
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             CHECK_PARAM_RET(max_len >= sizeof(uint16_t), -EOVERFLOW);
             *((uint16_t *)val) = ESP_NOW_MAX_SIZE;
             res = sizeof(uint16_t);
