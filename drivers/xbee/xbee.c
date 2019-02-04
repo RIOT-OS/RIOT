@@ -770,7 +770,7 @@ static int xbee_get(netdev_t *ndev, netopt_t opt, void *value, size_t max_len)
             return sizeof(eui64_t);
         case NETOPT_CHANNEL:
             return _get_channel(dev, (uint8_t *)value, max_len);
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
