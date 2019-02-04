@@ -191,6 +191,7 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
             mutex_unlock(&_list_tcb_lock);
             break;
 
+        case FSM_STATE_SYN_RCVD:
         case FSM_STATE_ESTABLISHED:
         case FSM_STATE_CLOSE_WAIT:
             tcb->status |= STATUS_NOTIFY_USER;
