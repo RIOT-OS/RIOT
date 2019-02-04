@@ -150,7 +150,7 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
             res = sizeof(l2filter_t **);
             break;
 #endif
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             assert(max_len >= sizeof(int16_t));
             *((uint16_t *)value) = (IEEE802154_FRAME_LEN_MAX -
                                   IEEE802154_MAX_HDR_LEN) -
