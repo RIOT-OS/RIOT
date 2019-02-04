@@ -333,7 +333,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             *((uint8_t*) val) = sx127x_get_coding_rate(dev);
             return sizeof(uint8_t);
 
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             assert(max_len >= sizeof(uint8_t));
             *((uint8_t*) val) = sx127x_get_max_payload_len(dev);
             return sizeof(uint8_t);
@@ -437,7 +437,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             sx127x_set_coding_rate(dev, cr);
             return sizeof(uint8_t);
 
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             assert(len <= sizeof(uint8_t));
             sx127x_set_max_payload_len(dev, *((const uint8_t*) val));
             return sizeof(uint8_t);
