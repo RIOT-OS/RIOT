@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include <malloc.h>
 
 #include "thread.h"
 #include "irq.h"
@@ -343,4 +344,18 @@ void thread_yield_higher(void)
 {
     /* Use SW intr to schedule context switch */
     CLINT_REG(CLINT_MSIP) = 1;
+}
+
+/**
+ * @brief Print heap statistics
+ */
+void heap_stats(void)
+{
+    extern char _heap_start; /* defined in linker script */
+    extern char _heap_end;   /* defined in linker script */
+
+    long int heap_size = &_heap_end - &_heap_start;
+    struct mallinfo minfo = mallinfo();
+    printf("heap: %ld (used %u, free %ld) [bytes]\n",
+           heap_size, minfo.uordblks, heap_size - minfo.uordblks);
 }
