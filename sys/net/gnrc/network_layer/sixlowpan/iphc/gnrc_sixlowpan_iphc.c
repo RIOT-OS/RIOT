@@ -647,8 +647,8 @@ static inline bool _compressible(gnrc_pktsnip_t *hdr)
         case GNRC_NETTYPE_IPV6:
 #if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && defined(MODULE_GNRC_UDP)
         case GNRC_NETTYPE_UDP:
-            return true;
 #endif
+            return true;
         default:
             return false;
     }
@@ -705,6 +705,9 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
         dispatch = ptr; /* use dispatch as temporary point for prev */
         ptr = ptr->next;
     }
+    /* there should be at least one compressible header in `pkt`, otherwise this
+     * function should not be called */
+    assert(dispatch_size > 0);
     ipv6_hdr = pkt->next->data;
     dispatch = gnrc_pktbuf_add(NULL, NULL, dispatch_size,
                                GNRC_NETTYPE_SIXLOWPAN);
