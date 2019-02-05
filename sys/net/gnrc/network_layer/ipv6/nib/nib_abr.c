@@ -13,11 +13,15 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <stdio.h>
+
 #include "net/gnrc/ipv6/nib/abr.h"
 
+#include "_nib-6ln.h"
 #include "_nib-internal.h"
 
-#if GNRC_IPV6_NIB_CONF_6LBR && GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if GNRC_IPV6_NIB_CONF_6LBR
 int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr)
 {
     _nib_abr_entry_t *abr;
@@ -28,6 +32,7 @@ int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr)
         mutex_unlock(&_nib_mutex);
         return -ENOMEM;
     }
+    abr->valid_until = 0U;
     while ((offl = _nib_offl_iter(offl))) {
         if (offl->mode & _PL) {
             _nib_abr_add_pfx(abr, offl);
@@ -39,7 +44,7 @@ int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr)
             bf_set(abr->ctxs, id);
         }
     }
-#endif
+#endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
     mutex_unlock(&_nib_mutex);
     return 0;
 }
@@ -50,8 +55,39 @@ void gnrc_ipv6_nib_abr_del(const ipv6_addr_t *addr)
     _nib_abr_remove(addr);
     mutex_unlock(&_nib_mutex);
 }
+#endif  /* GNRC_IPV6_NIB_CONF_6LBR */
+
+bool gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *entry)
+{
+    _nib_abr_entry_t *abr = *state;
+
+    mutex_lock(&_nib_mutex);
+    while ((abr = _nib_abr_iter(abr)) != NULL) {
+        if (!ipv6_addr_is_unspecified(&abr->addr)) {
+            memcpy(&entry->addr, &abr->addr, sizeof(entry->addr));
+            entry->version = abr->version;
+            entry->valid_until = abr->valid_until;
+            break;
+        }
+    }
+    mutex_unlock(&_nib_mutex);
+    *state = abr;
+    return (*state != NULL);
+}
+
+void gnrc_ipv6_nib_abr_print(gnrc_ipv6_nib_abr_t *abr)
+{
+    char addr_str[IPV6_ADDR_MAX_STR_LEN];
+    uint32_t now = _now_min();
+
+    printf("%s v%" PRIu32 " expires %" PRIu32 "min\n",
+           ipv6_addr_to_str(addr_str, &abr->addr, sizeof(addr_str)),
+           abr->version,
+           (abr->valid_until != 0) ? (abr->valid_until - now) :
+                                     SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT);
+}
 #else
 typedef int dont_be_pedantic;
-#endif
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
 
 /** @} */
