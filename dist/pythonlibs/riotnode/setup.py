@@ -43,6 +43,6 @@ setup(
                  'Intended Audience :: End Users/Desktop',
                  'Environment :: Console',
                  'Topic :: Utilities', ],
-    install_requires=[],
+    install_requires=['pexpect'],
     python_requires='>=3.5',
 )
