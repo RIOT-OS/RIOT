@@ -66,7 +66,7 @@ extern int _read_bytes(int argc, char **argv);
 
 #ifdef MODULE_GNRC_ICMPV6_ECHO
 #ifdef MODULE_XTIMER
-extern int _icmpv6_ping(int argc, char **argv);
+extern int _gnrc_icmpv6_ping(int argc, char **argv);
 #endif
 #endif
 
@@ -170,7 +170,7 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GNRC_ICMPV6_ECHO
 #ifdef MODULE_XTIMER
-    { "ping6", "Ping via ICMPv6", _icmpv6_ping },
+    { "ping6", "Ping via ICMPv6", _gnrc_icmpv6_ping },
 #endif
 #endif
 #ifdef MODULE_RANDOM
