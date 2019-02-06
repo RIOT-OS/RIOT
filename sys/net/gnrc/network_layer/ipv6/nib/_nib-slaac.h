@@ -45,7 +45,7 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #define _auto_configure_addr(netif, pfx, pfx_len) \
     (void)netif; (void)pfx; (void)pfx_len;
 #endif  /* GNRC_IPV6_NIB_CONF_6LN || GNRC_IPV6_NIB_CONF_SLAAC */
-#if GNRC_IPV6_NIB_CONF_SLAAC || defined(DOXYGE)
+#if GNRC_IPV6_NIB_CONF_SLAAC || defined(DOXYGEN)
 /**
  * @brief   Removes a tentative address from the interface and tries to
  *          reconfigure a new address
