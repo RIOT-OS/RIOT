@@ -182,6 +182,12 @@ void auto_init(void)
     auto_init_loramac();
 #endif
 
+/* initialize USB devices */
+#ifdef MODULE_AUTO_INIT_USBUS
+    extern void auto_init_usb(void);
+    auto_init_usb();
+#endif
+
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
 
