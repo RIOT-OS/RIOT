@@ -75,24 +75,19 @@ typedef struct gnrc_sixlowpan_rbuf_int {
 } gnrc_sixlowpan_rbuf_int_t;
 
 /**
- * @brief   An entry in the 6LoWPAN reassembly buffer.
- *
- * A recipient of a fragment SHALL use
+ * @brief   Base class for both reassembly buffer and virtual reassembly buffer
  *
  * 1. the source address,
  * 2. the destination address,
- * 3. the datagram size (gnrc_pktsnip_t::size of rbuf_t::pkt), and
+ * 3. the datagram size, and
  * 4. the datagram tag
  *
  * to identify all fragments that belong to the given datagram.
  *
  * @see [RFC 4944, section 5.3](https://tools.ietf.org/html/rfc4944#section-5.3)
+ * @see https://tools.ietf.org/html/draft-ietf-lwig-6lowpan-virtual-reassembly-01
  */
 typedef struct {
-    /**
-     * @brief   The reassembled packet in the packet buffer
-     */
-    gnrc_pktsnip_t *pkt;
     gnrc_sixlowpan_rbuf_int_t *ints;            /**< intervals of already received fragments */
     uint8_t src[IEEE802154_LONG_ADDRESS_LEN];   /**< source address */
     uint8_t dst[IEEE802154_LONG_ADDRESS_LEN];   /**< destination address */
@@ -105,6 +100,20 @@ typedef struct {
      * @brief   The number of bytes currently received of the complete datagram
      */
     uint16_t current_size;
+} gnrc_sixlowpan_rbuf_base_t;
+
+/**
+ * @brief   An entry in the 6LoWPAN reassembly buffer.
+ *
+ * A recipient of a fragment SHALL use
+ *
+ */
+typedef struct {
+    gnrc_sixlowpan_rbuf_base_t super;           /**< base class */
+    /**
+     * @brief   The reassembled packet in the packet buffer
+     */
+    gnrc_pktsnip_t *pkt;
 } gnrc_sixlowpan_rbuf_t;
 
 /**
