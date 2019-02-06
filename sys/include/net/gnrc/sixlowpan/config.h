@@ -115,6 +115,37 @@ extern "C" {
 #define GNRC_SIXLOWPAN_ND_AR_LTIME          (15U)
 #endif
 
+/**
+ * @brief   Size of the virtual reassembly buffer
+ *
+ * @see     https://tools.ietf.org/html/draft-ietf-lwig-6lowpan-virtual-reassembly-01
+ *
+ * @note    Only applicable with
+ *          [gnrc_sixlowpan_frag_vrb](@ref net_gnrc_sixlowpan_frag_vrb) module,
+ *          but has also a direct influence on the number of available
+ *          gnrc_sixlowpan_rbuf_int_t entries (even when
+ *          `gnrc_sixlowpan_frag_vrb` is not compiled in).
+ */
+#ifndef GNRC_SIXLOWPAN_FRAG_VRB_SIZE
+#if defined(MODULE_GNRC_SIXLOWPAN_FRAG_VRB) || defined(DOXYGEN)
+#define GNRC_SIXLOWPAN_FRAG_VRB_SIZE        (16U)
+#else   /* defined(MODULE_GNRC_SIXLOWPAN_FRAG_VRB) || defined(DOXYGEN) */
+#define GNRC_SIXLOWPAN_FRAG_VRB_SIZE        (0U)
+#endif  /* defined(MODULE_GNRC_SIXLOWPAN_FRAG_VRB) || defined(DOXYGEN) */
+#endif  /* GNRC_SIXLOWPAN_FRAG_VRB_SIZE */
+
+/**
+ * @brief   Timeout for a VRB entry in microseconds
+ *
+ * @see     https://tools.ietf.org/html/draft-ietf-lwig-6lowpan-virtual-reassembly-01
+ *
+ * @note    Only applicable with
+ *          [gnrc_sixlowpan_frag_vrb](@ref net_gnrc_sixlowpan_frag_vrb) module.
+ */
+#ifndef GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US
+#define GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US  (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)
+#endif  /* GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US */
+
 #ifdef __cplusplus
 }
 #endif
