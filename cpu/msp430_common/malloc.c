@@ -224,6 +224,10 @@ free(void *p)
 
     state = irq_disable();
 
+    if (__brkval == NULL) {
+        __brkval = __malloc_heap_start;
+    }
+
     /* ISO C says free(NULL) must be a no-op */
     if (p == NULL) {
         irq_restore(state);
@@ -455,6 +459,28 @@ calloc(size_t nele, size_t size)
     }
     memset(p, 0, nele * size);
     return p;
+}
+
+void heap_stats(void)
+{
+    if (__brkval == NULL) {
+        __brkval = __malloc_heap_start;
+    }
+
+    long int heap_size = __malloc_heap_end - __malloc_heap_start;
+    long int free = __malloc_heap_end - __brkval;
+    struct __freelist *fp;
+    for (fp = __flp; fp; fp = fp->nx) {
+        free += fp->sz;
+    }
+    printf("heap: %ld (used %ld, free %ld) [bytes]\n",
+           heap_size, heap_size - free, free);
+}
+
+#else
+
+void heap_stats(void) {
+    puts("heap statistics are not supported");
 }
 
 #endif /* MODULE_MSP430_MALLOC */
