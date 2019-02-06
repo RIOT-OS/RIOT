@@ -7,8 +7,9 @@ ifeq (native,$(BOARD))
   PORT ?= tap1
 endif
 
-TCP_TARGET_ADDR ?= fe80::affe%5
-TCP_TARGET_PORT ?= 80
+TCP_SERVER_ADDR ?= 2001:db8::affe:0001
+TCP_SERVER_PORT ?= 80
+TCP_CLIENT_ADDR ?= 2001:db8::affe:0002
 TCP_TEST_CYCLES ?= 3
 
 # Mark Boards with insufficient memory
@@ -21,15 +22,21 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
                              waspmote-pro wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
 
 # Target Address, Target Port and number of Test Cycles
-CFLAGS += -DTARGET_ADDR=\"$(TCP_TARGET_ADDR)\"
-CFLAGS += -DTARGET_PORT=$(TCP_TARGET_PORT)
+CFLAGS += -DSERVER_ADDR=\"$(TCP_SERVER_ADDR)\"
+CFLAGS += -DSERVER_PORT=$(TCP_SERVER_PORT)
+CFLAGS += -DCLIENT_ADDR=\"$(TCP_CLIENT_ADDR)\"
 CFLAGS += -DCYCLES=$(TCP_TEST_CYCLES)
 CFLAGS += -DGNRC_NETIF_IPV6_GROUPS_NUMOF=3
+CFLAGS += -DGNRC_IPV6_NIB_CONF_ARSM=1
+CFLAGS += -DGNRC_IPV6_NIB_CONF_QUEUE_PKT=1
 
 # Modules to include
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_tcp
+
+# include this for IP address manipulation
+USEMODULE += shell_commands
 
 include $(RIOTBASE)/Makefile.include
