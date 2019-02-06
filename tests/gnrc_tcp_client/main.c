@@ -11,6 +11,7 @@
 #include "thread.h"
 #include "net/af.h"
 #include "net/gnrc/ipv6.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/tcp.h"
 
 #define ENABLE_DEBUG (0)
@@ -43,8 +44,26 @@ void *cli_thread(void *arg);
 
 int main(void)
 {
-    printf("\nStarting Client Threads. TARGET_ADDR=%s, TARGET_PORT=%d, ", TARGET_ADDR, TARGET_PORT);
-    printf("CONNS=%d, NBYTE=%d, CYCLES=%d\n\n", CONNS, NBYTE, CYCLES );
+    gnrc_netif_t *netif;
+    ipv6_addr_t addr;
+
+    if (!(netif = gnrc_netif_iter(NULL))) {
+        printf("No valid network interface found\n");
+        return -1;
+    }
+
+    if (ipv6_addr_from_str(&addr, CLIENT_ADDR) == NULL) {
+        printf("Can't convert given string to IPv6 Address\n");
+        return -1;
+    }
+
+    if (gnrc_netif_ipv6_addr_add(netif, &addr, 64, GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID) < 0) {
+        printf("Can't assign given IPv6 Address\n");
+        return -1;
+    }
+
+    printf("\nStarting Client Threads. SERVER_ADDR=%s, SERVER_PORT=%d, ", SERVER_ADDR, SERVER_PORT);
+    printf("CONNS=%d, NBYTE=%d, CYCLES=%d\n\n", CONNS, NBYTE, CYCLES);
 
     /* Start connection handling threads */
     for (int i = 0; i < CONNS; i += 1) {
@@ -70,8 +89,8 @@ void *cli_thread(void *arg)
 
         /* Copy peer address information. NOTE: This test uses link-local addresses
          * -> The Device identifier is removed from target_addr in each iteration! */
-        char target_addr[] = TARGET_ADDR;
-        uint16_t target_port = TARGET_PORT;
+        char target_addr[] = SERVER_ADDR;
+        uint16_t target_port = SERVER_PORT;
 
         /* Initialize TCB */
         gnrc_tcp_tcb_init(&tcb);

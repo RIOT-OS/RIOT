@@ -40,28 +40,32 @@
 uint8_t bufs[CONNS][NBYTE];
 uint8_t stacks[CONNS][THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF];
 
-/* "ifconfig" shell command */
-extern int _gnrc_netif_config(int argc, char **argv);
-
 /* Server thread */
 void *srv_thread(void *arg);
 
 int main(void)
 {
+    /* Set pre-configured IP address */
     gnrc_netif_t *netif;
+    ipv6_addr_t addr;
 
     if (!(netif = gnrc_netif_iter(NULL))) {
         printf("No valid network interface found\n");
         return -1;
     }
 
-    /* Set pre-configured IP address */
-    char if_pid[] = {netif->pid + '0', '\0'};
-    char *cmd[] = {"ifconfig", if_pid, "add", "unicast", LOCAL_ADDR};
-    _gnrc_netif_config(5, cmd);
+    if (ipv6_addr_from_str(&addr, SERVER_ADDR) == NULL) {
+        printf("Can't convert given string to IPv6 Address\n");
+        return -1;
+    }
+
+    if (gnrc_netif_ipv6_addr_add(netif, &addr, 64, GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID) < 0) {
+        printf("Can't assign given IPv6 Address\n");
+        return -1;
+    }
 
     /* Test configuration */
-    printf("\nStarting server: LOCAL_ADDR=%s, LOCAL_PORT=%d, ", LOCAL_ADDR, LOCAL_PORT);
+    printf("\nStarting server: SERVER_ADDR=%s, SERVER_PORT=%d, ", SERVER_ADDR, SERVER_PORT);
     printf("CONNS=%d, NBYTE=%d, CYCLES=%d\n\n",  CONNS, NBYTE, CYCLES);
 
     /* Start Threads to handle connections */
@@ -89,7 +93,7 @@ void *srv_thread(void *arg)
         gnrc_tcp_tcb_init(&tcb);
 
         /* Connect to peer */
-        int ret = gnrc_tcp_open_passive(&tcb, AF_INET6, NULL, LOCAL_PORT);
+        int ret = gnrc_tcp_open_passive(&tcb, AF_INET6, NULL, SERVER_PORT);
         switch (ret) {
             case 0:
                 DEBUG("TID=%d : gnrc_tcp_open_passive() : 0 : ok\n", tid);
