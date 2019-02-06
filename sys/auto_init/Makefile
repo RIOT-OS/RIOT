@@ -14,4 +14,8 @@ ifneq (,$(filter auto_init_can,$(USEMODULE)))
   DIRS += can
 endif
 
+ifneq (,$(filter auto_init_usbus,$(USEMODULE)))
+  DIRS += usb
+endif
+
 include $(RIOTBASE)/Makefile.base
