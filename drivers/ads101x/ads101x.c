@@ -35,6 +35,7 @@
 #define ADS101X_READ_DELAY (8 * US_PER_MS)    /* Compatible with 128SPS */
 #endif
 
+#undef I2C
 #define I2C (dev->params.i2c)
 #define ADDR (dev->params.addr)
 

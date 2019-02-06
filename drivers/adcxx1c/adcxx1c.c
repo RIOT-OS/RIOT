@@ -27,6 +27,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#undef I2C
 #define I2C (dev->params.i2c)
 #define ADDR (dev->params.addr)
 
