@@ -370,6 +370,7 @@ typedef enum {
     STM32_LPUART,           /**< STM32 Low-power UART (LPUART) module type */
 } uart_type_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Invalid UART mode mask
  *
@@ -419,6 +420,7 @@ typedef enum {
    UART_STOP_BITS_2 = USART_CR2_STOP_1,   /**< 2 stop bits */
 } uart_stop_bits_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Structure for UART configuration data
