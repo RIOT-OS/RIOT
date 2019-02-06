@@ -577,7 +577,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
            ((uint8_t *)sixlo->data) + payload_offset,
            sixlo->size - payload_offset);
     if (rbuf != NULL) {
-        rbuf->current_size += (uncomp_hdr_len - payload_offset);
+        rbuf->super.current_size += (uncomp_hdr_len - payload_offset);
         gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(rbuf, netif_hdr);
     }
     else {

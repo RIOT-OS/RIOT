@@ -345,11 +345,11 @@ void gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(gnrc_sixlowpan_rbuf_t *rbuf
 {
     assert(rbuf);
     assert(netif_hdr);
-    if (rbuf->current_size == rbuf->pkt->size) {
-        gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(rbuf->src,
-                                                     rbuf->src_len,
-                                                     rbuf->dst,
-                                                     rbuf->dst_len);
+    if (rbuf->super.current_size == rbuf->pkt->size) {
+        gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(rbuf->super.src,
+                                                     rbuf->super.src_len,
+                                                     rbuf->super.dst,
+                                                     rbuf->super.dst_len);
 
         if (netif == NULL) {
             DEBUG("6lo rbuf: error allocating netif header\n");

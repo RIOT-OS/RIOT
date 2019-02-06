@@ -223,20 +223,22 @@ static void _test_entry(const gnrc_sixlowpan_rbuf_t *entry,
     TEST_ASSERT_NOT_NULL(entry);
     TEST_ASSERT_NOT_NULL(entry->pkt);
     TEST_ASSERT_EQUAL_INT(TEST_DATAGRAM_SIZE, entry->pkt->size);
-    TEST_ASSERT_EQUAL_INT(sizeof(_test_netif_hdr_src), entry->src_len);
-    TEST_ASSERT_MESSAGE(memcmp(entry->src, _test_netif_hdr_src,
-                               entry->src_len) == 0,
-                        "entry->src != TEST_NETIF_HDR_SRC");
-    TEST_ASSERT_EQUAL_INT(sizeof(_test_netif_hdr_dst), entry->dst_len);
-    TEST_ASSERT_MESSAGE(memcmp(entry->dst, _test_netif_hdr_dst,
-                               entry->dst_len) == 0,
-                        "entry->dst != TEST_NETIF_HDR_DST");
-    TEST_ASSERT_EQUAL_INT(TEST_TAG, entry->tag);
-    TEST_ASSERT_EQUAL_INT(exp_current_size, entry->current_size);
-    TEST_ASSERT_NOT_NULL(entry->ints);
-    TEST_ASSERT_NULL(entry->ints->next);
-    TEST_ASSERT_EQUAL_INT(exp_int_start, entry->ints->start);
-    TEST_ASSERT_EQUAL_INT(exp_int_end, entry->ints->end);
+    TEST_ASSERT_EQUAL_INT(sizeof(_test_netif_hdr_src),
+                          entry->super.src_len);
+    TEST_ASSERT_MESSAGE(memcmp(entry->super.src, _test_netif_hdr_src,
+                               entry->super.src_len) == 0,
+                        "entry->super.src != TEST_NETIF_HDR_SRC");
+    TEST_ASSERT_EQUAL_INT(sizeof(_test_netif_hdr_dst),
+                          entry->super.dst_len);
+    TEST_ASSERT_MESSAGE(memcmp(entry->super.dst, _test_netif_hdr_dst,
+                               entry->super.dst_len) == 0,
+                        "entry->super.dst != TEST_NETIF_HDR_DST");
+    TEST_ASSERT_EQUAL_INT(TEST_TAG, entry->super.tag);
+    TEST_ASSERT_EQUAL_INT(exp_current_size, entry->super.current_size);
+    TEST_ASSERT_NOT_NULL(entry->super.ints);
+    TEST_ASSERT_NULL(entry->super.ints->next);
+    TEST_ASSERT_EQUAL_INT(exp_int_start, entry->super.ints->start);
+    TEST_ASSERT_EQUAL_INT(exp_int_end, entry->super.ints->end);
 }
 
 static void _check_pktbuf(const gnrc_sixlowpan_rbuf_t *entry)
@@ -513,7 +515,7 @@ static void test_rbuf_gc__manually(void)
     entry = (gnrc_sixlowpan_rbuf_t *)_first_non_empty_rbuf();
     TEST_ASSERT_NOT_NULL(entry);
     /* set arrival RBUF_TIMEOUT into the past */
-    entry->arrival -= RBUF_TIMEOUT;
+    entry->super.arrival -= RBUF_TIMEOUT;
     rbuf_gc();
     /* reassembly buffer is now empty */
     TEST_ASSERT_NULL(_first_non_empty_rbuf());
