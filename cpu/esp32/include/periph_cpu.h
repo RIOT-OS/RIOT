@@ -218,6 +218,8 @@ typedef enum {
  *
  * @{
  */
+
+#ifndef DOXYGEN
 /**
  * @brief   Possible ADC resolution settings
  */
@@ -233,6 +235,7 @@ typedef enum {
     ADC_RES_16BIT = 0xf3,   /**< ADC resolution: 16 bit is not supported */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief  Number of ADC cahnnels that could be used at maximum

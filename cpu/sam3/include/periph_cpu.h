@@ -176,6 +176,7 @@ typedef enum {
 } spi_clk_t;
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override ADC resolution values
  * @{
@@ -190,6 +191,7 @@ typedef enum {
     ADC_RES_16BIT = 0x8                     /**< not applicable */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Timer configuration data

@@ -74,6 +74,7 @@ static const int8_t exti_config[2][32] = {
 };
 #endif /* CPU_MODEL_SAML21E */
 
+#ifndef DOXYGEN
 #define HAVE_ADC_RES_T
 typedef enum {
     ADC_RES_6BIT  = 0xff,                       /**< not supported */
@@ -84,6 +85,8 @@ typedef enum {
     ADC_RES_16BIT = 0xfd                        /**< not supported */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
+
 #ifdef __cplusplus
 }
 #endif

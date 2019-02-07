@@ -67,6 +67,7 @@ enum {
     NRF52_VDD  = 8,         /**< VDD, not useful if VDD is reference... */
 };
 
+#ifndef DOXYGEN
 /**
  * @brief   Override ADC resolution values
  * @{
@@ -81,6 +82,7 @@ typedef enum {
     ADC_RES_16BIT = 0xf2    /**< not supported by hardware */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Override I2C speed settings

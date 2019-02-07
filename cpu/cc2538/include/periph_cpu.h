@@ -284,6 +284,7 @@ typedef struct {
     uint_fast8_t cfg;   /**< timer config word */
 } timer_conf_t;
 
+#ifndef DOXYGEN
 /**
  * @name   Override resolution options
  * @{
@@ -300,6 +301,7 @@ typedef enum {
     ADC_RES_16BIT =             (0xd00),    /**< not supported by hardware */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief ADC configuration wrapper
