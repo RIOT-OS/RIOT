@@ -30,6 +30,8 @@
 #include "cpu_conf_kinetis_v.h"
 #elif defined(KINETIS_SERIES_W)
 #include "cpu_conf_kinetis_w.h"
+#elif defined(KINETIS_SERIES_EA)
+#include "cpu_conf_kinetis_ea.h"
 #endif /* defined(KINETIS_SERIES_x) */
 
 #ifndef MCU_MEM_MAP_VERSION
