@@ -320,10 +320,6 @@ static int _init(netdev_t *netdev)
 {
     ESP_WIFI_DEBUG("%p", netdev);
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0x00, sizeof(netstats_t));
-#endif
-
     return 0;
 }
 
@@ -455,18 +451,12 @@ static int IRAM _send(netdev_t *netdev, const iolist_t *iolist)
 
     if (res == ERR_OK) {
         /* There was no ieee80211_output_pbuf error and no send timeout. */
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.tx_bytes += iol_len;
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-#endif
         _in_send = false;
         return iol_len;
     }
     else {
         /* There was either a ieee80211_output_pbuf error or send timed out. */
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.tx_failed++;
-#endif
         _in_send = false;
         return -EIO;
     }
@@ -512,11 +502,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     od_hex_dump(buf, size, OD_WIDTH_DEFAULT);
 #endif /* MODULE_OD */
 #endif /* ENABLE_DEBUG */
-
-#if MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += size;
-#endif
 
     return size;
 }
