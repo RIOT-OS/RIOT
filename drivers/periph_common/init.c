@@ -55,7 +55,7 @@ void periph_init(void)
 #ifdef MODULE_AVR_LIBC_EXTRA
     atmega_stdio_init();
 #endif /* MODULE_AVR_LIBC_EXTRA */
-#else
+#elif defined(MODULE_STDIO_UART) || defined(MODULE_STDIO_RTT)
     stdio_init();
 #ifdef CPU_FE310
     setvbuf(stdout, NULL, _IONBF, 0);
