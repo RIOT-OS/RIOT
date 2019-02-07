@@ -55,15 +55,15 @@ this board.
 | MCU        | samd21    | partly    | Energy saving modes not fully utilized|
 | Low-level driver | GPIO    | yes       | |
 |        | PWM       | yes       | |
-|        | UART      | yes           | two UARTs by now|
+|        | UART      | yes       | two UARTs by now|
 |        | I2C       | yes       | |
 |        | SPI       | yes       | |
-|               | ADC           | yes           | PA04 & PA05 disabled by default due to EDBG's use of them for UART, can be enabled from `periph_conf.h`|
+|        | ADC       | yes       | PA04 & PA05 disabled by default due to EDBG's use of them for UART, can be enabled from `periph_conf.h`|
 |        | USB       | no        | |
 |        | RTT       | yes       | |
-|        | RTC       | yes       |  |
+|        | RTC       | yes       | |
 |        | RNG       | no        | no HW module |
-|        | Timer     | yes           | |
+|        | Timer     | yes       | |
 
 
 
@@ -93,14 +93,15 @@ Besides the SAMD21 the board has the following features:
 
 ## Flashing the device
 
-The Autonomo has a 10 pin header compatible with the Atmel-ICE.  The standard
-method for flashing RIOT to the sodaq-autonomo is using OpenOCD. For this to
-work properly, **you have to make sure to use a very recent version of
-OpenOCD**.  Arduino-IDE comes with openocd v0.9.0  which is known to work.  Also
-Ubuntu 16.04 has openocd v0.9.0.
+1. Put the board in bootloader mode by double tapping the reset button.<br/>
+   When the board is in bootloader mode, the user led (green) oscillates
+   smoothly.
 
-Refer to https://github.com/RIOT-OS/RIOT/wiki/OpenOCD for building OpenOCD
-and make sure "cmsis-dap" and "hidapi-libusb" are enabled.
+2. Use `BOARD=sodaq-autonomo` with the `make` command.<br/>
+   Example with `hello-world` application:
+```
+     make BOARD=sodaq-autonomo -C examples/hello-world flash
+```
 
 ## Supported Toolchains
 
