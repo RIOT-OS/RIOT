@@ -51,12 +51,18 @@ info-buildsizes:
 	    echo "$$(BOARD=$${board} $(MAKE) --no-print-directory info-buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${board}"; \
 	done;
 
+OLDELF := $(shell find ${OLDBIN} -name *.elf | head -1 | xargs basename)
+NEWELF := $(shell find ${NEWBIN} -name *.elf | head -1 | xargs basename)
+
 info-buildsizes-diff: SHELL=bash
 info-buildsizes-diff:
 	@echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
 	for board in $(BOARDS); do \
-	  for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
-	      BINDIRBASE=$${BINDIRBASE} BOARD=$${board} $(MAKE) info-buildsize --no-print-directory 2>/dev/null | tail -n-1 | cut -f-4; \
+	  if [[ ! -d "${OLDBIN}/$${board}" && ! -d "${NEWBIN}/$${board}" ]]; then \
+	    continue; \
+	  fi ;\
+	  for ELFFILE in "${OLDBIN}/$${board}/$(OLDELF)" "${NEWBIN}/$${board}/$(NEWELF)"; do \
+	    $(MAKE) ELFFILE=$${ELFFILE} BOARD=$${board} info-buildsize --no-print-directory 2>/dev/null | tail -n-1 | cut -f-4 ; \
 	  done | \
 	  while read -a OLD && read -a NEW; do \
 	    for I in 0 1 2 3; do \
@@ -65,7 +71,7 @@ info-buildsizes-diff:
 	        if [[ "$${DIFF}" -gt 0 ]]; then $(COLOR_ECHO) -n "$(COLOR_RED)"; fi; \
 	        if [[ "$${DIFF}" -lt 0 ]]; then $(COLOR_ECHO) -n "$(COLOR_GREEN)"; fi; \
 	      else \
-	        DIFF="$(COLOR_RED)ERR"; \
+	        continue ; \
 	      fi; \
 	      echo -ne "$${DIFF}\t$(COLOR_RESET)"; \
 	    done; \
