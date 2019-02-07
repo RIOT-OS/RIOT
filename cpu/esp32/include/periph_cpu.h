@@ -82,6 +82,7 @@ typedef unsigned int gpio_t;
 #define GPIO_PIN_NUMOF      (40)
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override mode flank selection values
  *
@@ -117,6 +118,7 @@ typedef enum {
     GPIO_IN_OD_PU   /**< input and open-drain output */
 } gpio_mode_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 /** @} */
 
 /**

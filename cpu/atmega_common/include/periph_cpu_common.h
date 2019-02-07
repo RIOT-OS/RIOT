@@ -56,6 +56,7 @@ typedef uint8_t gpio_t;
  */
 #define GPIO_PIN(x, y)          ((x << 4) | y)
 
+#ifndef DOXYGEN
 /**
  * @brief   Override the GPIO flanks
  *
@@ -73,6 +74,7 @@ typedef enum {
     GPIO_RISING,       /**< emit interrupt on rising flank */
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Use some common SPI functions
