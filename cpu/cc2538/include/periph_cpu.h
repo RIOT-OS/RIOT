@@ -106,6 +106,7 @@ void gpio_init_mux(gpio_t pin, uint8_t over, uint8_t sel, uint8_t func);
 #define PERIPH_I2C_NEED_WRITE_REGS
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @name   Override I2C clock speed values
  * @{
@@ -119,6 +120,8 @@ typedef enum {
     I2C_SPEED_HIGH      = 0x03,     /**< not supported */
 } i2c_speed_t;
 /** @} */
+#endif /* ndef DOXYGEN */
+
 /**
  * @brief   I2C configuration options
  */

@@ -40,6 +40,7 @@ extern "C" {
 #define SPI_MISOSEL         (dev(bus)->PSELMISO)
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override I2C speed settings
  * @{
@@ -53,6 +54,7 @@ typedef enum {
     I2C_SPEED_HIGH      = 0x03,                         /**< not supported */
 } i2c_speed_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @name    Use the shared I2C functions

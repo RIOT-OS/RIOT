@@ -305,6 +305,7 @@ typedef enum {
  * @{
  */
 
+#ifndef DOXYGEN
 /**
  * @brief    Override I2C clock speed values
  *
@@ -320,6 +321,7 @@ typedef enum {
     I2C_SPEED_HIGH,         /**< not supported */
 } i2c_speed_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   I2C configuration structure type

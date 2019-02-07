@@ -281,6 +281,7 @@ typedef enum {
     I2C_FLAG_RUN_STANDBY     = 0x1,    /**< run SERCOM in standby mode */
 } i2c_flag_t;
 
+#ifndef DOXYGEN
 /**
  * @name    Override I2C clock speed values
  * @{
@@ -294,6 +295,7 @@ typedef enum {
     I2C_SPEED_HIGH      = 3400000U,    /**< high speed mode:   ~3.4Mbit/s */
 } i2c_speed_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   I2C device configuration

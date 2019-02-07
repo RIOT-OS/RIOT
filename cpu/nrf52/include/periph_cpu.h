@@ -84,6 +84,7 @@ typedef enum {
 /** @} */
 #endif /* ndef DOXYGEN */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override I2C speed settings
  * @{
@@ -97,6 +98,7 @@ typedef enum {
     I2C_SPEED_HIGH      = 0xfd,                         /**< not supported */
 } i2c_speed_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   I2C (TWI) configuration options
