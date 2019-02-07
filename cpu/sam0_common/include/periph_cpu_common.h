@@ -228,6 +228,7 @@ typedef enum {
     SPI_PAD_MOSI_0_SCK_3 = 0x3, /**< use pad 0 for MOSI, pad 3 for SCK */
 } spi_mosipad_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Override SPI modes
  * @{
@@ -254,6 +255,7 @@ typedef enum {
     SPI_CLK_10MHZ  = 10000000U  /**< drive the SPI bus with 10MHz */
 } spi_clk_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   SPI device configuration

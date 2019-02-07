@@ -84,6 +84,7 @@ typedef enum {
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   SPI mode select macro
  *
@@ -131,6 +132,7 @@ typedef enum {
     SPI_CLK_10MHZ  = SPI_CLK_SEL(1, 0, 0)       /**< 16/2   -> 8MHz */
 } spi_clk_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief  Bitmasks indicating which are the possible dividers for a timer

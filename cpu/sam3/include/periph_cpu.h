@@ -149,6 +149,7 @@ typedef enum {
     GPIO_MUX_B = 1,         /**< alternate function B */
 } gpio_mux_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Override default SPI modes
  * @{
@@ -175,6 +176,7 @@ typedef enum {
     SPI_CLK_10MHZ  = (10000000)                     /**< 10MHz */
 } spi_clk_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 #ifndef DOXYGEN
 /**

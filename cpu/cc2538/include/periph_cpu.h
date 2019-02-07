@@ -206,7 +206,6 @@ typedef enum {
    UART_STOP_BITS_2 = UART_LCRH_STP2,     /**< 2 stop bits */
 } uart_stop_bits_t;
 /** @} */
-#endif /* DOXYGEN */
 
 /**
  * @name   Override SPI mode settings
@@ -234,6 +233,7 @@ typedef enum {
     SPI_CLK_10MHZ  = 4      /**< drive the SPI bus with 10MHz */
 } spi_clk_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Datafields for static SPI clock configuration values
