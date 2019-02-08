@@ -17,8 +17,8 @@
  * can also measure relative humidity in %.
  *
  * For more information, see the datasheets:
- * * [BMP280](https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BMP280-DS001-18.pdf)
- * * [BME280](https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME280_DS001-11.pdf)
+ * * [BMP280](https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BMP280-DS001.pdf)
+ * * [BME280](https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME280-DS002.pdf)
  *
  * This driver provides @ref drivers_saul capabilities.
  *
