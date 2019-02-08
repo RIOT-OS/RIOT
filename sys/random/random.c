@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       PRNG seeding
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @}
  */
 
@@ -24,6 +26,9 @@
 #include "random.h"
 #ifdef MODULE_PUF_SRAM
 #include "puf_sram.h"
+#endif
+#ifdef MODULE_PERIPH_HWRNG
+#include "periph/hwrng.h"
 #endif
 #ifdef MODULE_PERIPH_CPUID
 #include "periph/cpuid.h"
@@ -41,6 +46,8 @@ void auto_init_random(void)
         LOG_WARNING("random: PUF SEED not fresh\n");
     }
     seed = puf_sram_seed;
+#elif defined (MODULE_PERIPH_HWRNG)
+    hwrng_read(&seed, 4);
 #elif defined (MODULE_PERIPH_CPUID)
     luid_get(&seed, 4);
 #else
