@@ -47,8 +47,4 @@ USEMODULE += periph_mcg
 endif
 USEMODULE += periph_wdog
 
-# Define a recipe to build the watchdog disable binary, used when flashing
-$(RIOTCPU)/$(CPU)/dist/wdog-disable.bin: $(RIOTCPU)/$(CPU)/dist/wdog-disable.s
-	$(Q)$(MAKE) -C $(RIOTCPU)/$(CPU)/dist/ $(notdir $@)
-
 include $(RIOTMAKE)/arch/cortexm.inc.mk
