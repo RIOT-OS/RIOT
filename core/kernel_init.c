@@ -40,6 +40,7 @@
 #include <auto_init.h>
 #endif
 
+#ifdef MODULE_CORE_MAIN
 extern int main(void);
 static void *main_trampoline(void *arg)
 {
@@ -59,6 +60,7 @@ static void *main_trampoline(void *arg)
     main();
     return NULL;
 }
+#endif /* MODULE_CORE_MAIN */
 
 static void *idle_thread(void *arg)
 {
@@ -71,11 +73,13 @@ static void *idle_thread(void *arg)
     return NULL;
 }
 
-const char *main_name = "main";
 const char *idle_name = "idle";
-
-static char main_stack[THREAD_STACKSIZE_MAIN];
 static char idle_stack[THREAD_STACKSIZE_IDLE];
+
+#ifdef MODULE_CORE_MAIN
+const char *main_name = "main";
+static char main_stack[THREAD_STACKSIZE_MAIN];
+#endif
 
 void kernel_init(void)
 {
@@ -86,10 +90,12 @@ void kernel_init(void)
             THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
             idle_thread, NULL, idle_name);
 
+#ifdef MODULE_CORE_MAIN
     thread_create(main_stack, sizeof(main_stack),
             THREAD_PRIORITY_MAIN,
             THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
             main_trampoline, NULL, main_name);
+#endif
 
     cpu_switch_context_exit();
 }
