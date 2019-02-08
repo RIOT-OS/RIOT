@@ -272,6 +272,8 @@ void _nib_nc_remove(_nib_onl_entry_t *node)
         entry->pkt = NULL;
     }
 #endif  /* GNRC_IPV6_NIB_CONF_QUEUE_PKT */
+    /* remove from cache-out procedure */
+    clist_remove(&_next_removable, (clist_node_t *)node);
     _nib_onl_clear(node);
 }
 
