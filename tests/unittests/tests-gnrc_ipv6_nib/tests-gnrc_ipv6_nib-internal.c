@@ -493,6 +493,40 @@ static void test_nib_nc_add__success_full_but_garbage_collectible(void)
 }
 
 /*
+ * Creates GNRC_IPV6_NIB_NUMOF neighbor cache entries with different IP
+ * addresses and a garbage-collectible AR state and then tries to add
+ * 3 more after removing two.
+ * Expected result: should not crash
+ *
+ * See https://github.com/RIOT-OS/RIOT/pull/10975
+ */
+static void test_nib_nc_add__cache_out_crash(void)
+{
+    _nib_onl_entry_t *node1, *node2;
+    ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                  { .u64 = TEST_UINT64 } } };
+
+    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF - 2; i++) {
+        TEST_ASSERT_NOT_NULL(_nib_nc_add(&addr, IFACE,
+                                         GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE));
+        addr.u64[1].u64++;
+    }
+    TEST_ASSERT_NOT_NULL((node1 = _nib_nc_add(&addr, IFACE,
+                                             GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE)));
+    addr.u64[1].u64++;
+    TEST_ASSERT_NOT_NULL((node2 = _nib_nc_add(&addr, IFACE,
+                                             GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE)));
+    addr.u64[1].u64++;
+    _nib_nc_remove(node1);
+    _nib_nc_remove(node2);
+    for (int i = 0; i < 3; i++) {
+        TEST_ASSERT_NOT_NULL(_nib_nc_add(&addr, IFACE,
+                                         GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE));
+        addr.u64[1].u64++;
+    }
+}
+
+/*
  * Creates a neighbor cache entry and sets it reachable
  * Expected result: node->info flags set to NUD_STATE_REACHABLE and NIB's event
  * timer contains a GNRC_IPV6_NIB_MSG_NUD_SET_STALE event
@@ -1935,6 +1969,7 @@ Test *tests_gnrc_ipv6_nib_internal_tests(void)
         new_TestFixture(test_nib_nc_add__success_duplicate),
         new_TestFixture(test_nib_nc_add__success),
         new_TestFixture(test_nib_nc_add__success_full_but_garbage_collectible),
+        new_TestFixture(test_nib_nc_add__cache_out_crash),
         new_TestFixture(test_nib_nc_remove__uncleared),
         new_TestFixture(test_nib_nc_remove__cleared),
         new_TestFixture(test_nib_nc_set_reachable__success),
