@@ -16,6 +16,7 @@
  */
 
 #include <stdio.h>
+#include <assert.h>
 
 #include "thread.h"
 #include "sched.h"
@@ -32,7 +33,7 @@
 #endif
 
 /* list of states copied from tcb.h */
-static const char *state_names[] = {
+static const char *state_names[STATUS_NUMOF] = {
     [STATUS_RUNNING] = "running",
     [STATUS_PENDING] = "pending",
     [STATUS_STOPPED] = "stopped",
@@ -47,6 +48,28 @@ static const char *state_names[] = {
     [STATUS_MBOX_BLOCKED] = "bl mbox",
     [STATUS_COND_BLOCKED] = "bl cond",
 };
+
+#define STATE_NAME_UNKNOWN "unknown"
+
+/**
+ * Convert a thread state code to a human readable string.
+ *
+ * This function should be used instead of a direct array lookup: if ever
+ * state_names and the actual states in tcb.h get out of sync, a hole will be
+ * left in the lookup table. If compiling with NDEBUG not defined, this will
+ * generate an assertion which should make it clear that the table needs
+ * updating. With NDEBUG, any missing code will result in the string "unknown"
+ * (while direct access would return a NULL, possibly causing a crash.)
+ */
+static const char *state_to_string(thread_status_t state)
+{
+    const char *name = state_names[state] ? state_names[state] : NULL;
+
+    assert(name != NULL); /* if compiling with assertions, this is an error that
+                            indicates that the table above is incomplete */
+
+    return (name != NULL) ? name : STATE_NAME_UNKNOWN;
+}
 
 /**
  * @brief Prints a list of running threads including stack usage to stdout.
@@ -104,7 +127,7 @@ void ps(void)
 
         if (p != NULL) {
             thread_status_t state = p->status;                                     /* copy state */
-            const char *sname = state_names[state];                                /* get state name */
+            const char *sname = state_to_string(state);                            /* get state name */
             const char *queued = &queued_name[(int)(state >= STATUS_ON_RUNQUEUE)]; /* get queued flag */
 #ifdef DEVELHELP
             int stacksz = p->stack_size;                                           /* get stack size */
