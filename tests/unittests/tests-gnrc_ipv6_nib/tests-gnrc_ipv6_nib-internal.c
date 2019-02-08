@@ -302,6 +302,10 @@ static void test_nib_iter__three_elem_middle_removed(void)
     addr.u64[1].u64++;
     TEST_ASSERT_NOT_NULL((node3 = _nib_onl_alloc(&addr, IFACE)));
     node3->mode = _DRL;
+    /* cppcheck-suppress redundantAssignment
+     * (reason: we assigned _FT before so _nib_onl_alloc would recognize node2
+     *          as used, now we want to clear it, so we need to set it to
+     *          _EMPTY... we are testing internals of data structures here) */
     node2->mode = _EMPTY;
     TEST_ASSERT(_nib_onl_clear(node2));
     TEST_ASSERT_NOT_NULL((res = _nib_onl_iter(NULL)));
