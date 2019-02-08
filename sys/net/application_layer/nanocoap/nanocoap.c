@@ -710,14 +710,14 @@ size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t last
 size_t coap_opt_put_block(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *slicer,
                           bool more, uint16_t option)
 {
-    unsigned szx = _size2szx(slicer->end - slicer->start);
-    unsigned blknum = _slicer_blknum(slicer);
+    coap_block1_t block;
 
-    uint32_t blkopt = (blknum << 4) | szx | (more ? 0x8 : 0);
-    size_t olen = _encode_uint(&blkopt);
+    coap_block_object_init(&block, _slicer_blknum(slicer),
+                           slicer->end - slicer->start, more);
 
     slicer->opt = buf;
-    return coap_put_option(buf, lastonum, option, (uint8_t *)&blkopt, olen);
+
+    return coap_opt_put_block_object(buf, lastonum, &block, option);
 }
 
 size_t coap_opt_put_block_object(uint8_t *buf, uint16_t lastonum,
