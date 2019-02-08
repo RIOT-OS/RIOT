@@ -21,10 +21,12 @@
 
 #include "log.h"
 #include "luid.h"
-#include "periph/cpuid.h"
 #include "random.h"
 #ifdef MODULE_PUF_SRAM
 #include "puf_sram.h"
+#endif
+#ifdef MODULE_PERIPH_CPUID
+#include "periph/cpuid.h"
 #endif
 
 #define ENABLE_DEBUG (0)
