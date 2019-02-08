@@ -875,6 +875,14 @@ ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
     return pkt->payload - (uint8_t *)pkt->hdr;
 }
 
+void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
+                            int more)
+{
+    block->szx = _size2szx(blksize);
+    block->blknum = blknum;
+    block->more = more;
+}
+
 void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
 {
     uint32_t blknum;
