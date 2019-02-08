@@ -7,13 +7,13 @@
  */
 
  /**
- * @ingroup sys_random
+ * @ingroup     sys_random
  * @{
  * @file
  *
- * @brief PRNG seeding
+ * @brief       PRNG seeding
  *
- * @author Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @}
  */
 
