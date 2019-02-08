@@ -3,19 +3,10 @@ include $(RIOTBOARD)/common/arduino-atmega/Makefile.dep
 
 INCLUDES += -I$(RIOTBOARD)/common/arduino-atmega/include
 
-# refine serial port information
-export BAUD ?= 9600
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-export FLASHER = avrdude
-export DIST_PATH = $(RIOTBOARD)/$(BOARD)/dist
-export DEBUGSERVER_PORT = 4242
-export DEBUGSERVER = $(DIST_PATH)/debug_srv.sh
-export DEBUGSERVER_FLAGS = "-g -j usb :$(DEBUGSERVER_PORT)"
-export DEBUGGER_FLAGS = "-x $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)"
-export DEBUGGER = $(DIST_PATH)/debug.sh $(DEBUGSERVER_FLAGS) $(DIST_PATH) $(DEBUGSERVER_PORT)
+# Disable auto erase for flash and avoid error if signature doesn't match
+FFLAGS_EXTRA += -F -D
 
-export PROGRAMMER_FLAGS = -P $(PORT) -b $(PROGRAMMER_SPEED)
-
-OFLAGS += -j .text -j .data
-export FFLAGS += -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -D -U flash:w:$(HEXFILE)
+# include avrdude flashing tool
+include $(RIOTMAKE)/tools/avrdude.inc.mk
