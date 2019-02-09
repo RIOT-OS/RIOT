@@ -105,16 +105,43 @@ SECTIONS
     _data_end = ABSOLUTE(.);
   } >dram0_0_seg :dram0_0_phdr
 
+  /*
+   * .rodata sections that are placed in RAM
+   *
+   * Usually, all .rodata sections are placed in RAM by the Espressif SDK
+   * since IROM (flash) access requires 32-bit word aligned reads.
+   *
+   * However, thanks to the LoadStoreError handler from esp-open-rtos which is
+   * also used in RIOT-OS, it is possible to place .rodata sections in IROM
+   * (flash) to save RAM resources.
+   *
+   * Only .rodata data sections of compilation units that may be executed
+   * while SPI flash is not mapped have to be stored in RAM. These are IRAM
+   * functions that are called from interrupt context or SPI flash management
+   * functions. Such compilation units have to be listed here.
+   *
+   * Furthermore, compilation units with constant data that are performance-
+   * critical should be listed here as well.
+   */
+
   .rodata : ALIGN(4)
   {
     _rodata_start = ABSOLUTE(.);
     *(.sdk.version)
-    /* TODO put only necessary .rodata to dram
-    *libc.a:*.o(.rodata.* .rodata)
+
     *core.a:*(.rodata.* .rodata)
     *cpu.a:*(.rodata .rodata.*)
-    */
-    *(.rodata .rodata.*)
+    *esp.a:*(.rodata .rodata.*)
+    *esp_now.a:*(.rodata .rodata.*)
+    *esp_wifi.a:*(.rodata .rodata.*)
+    *periph.a:*(.rodata.* .rodata)
+    *sdk.a:*(.rodata .rodata.*)
+    *xtensa.a:*(.rodata .rodata.*)
+
+    *libc.a:*.o(.rodata.* .rodata)
+    *libpp.a:wdev.o(.rodata.* .rodata)
+    *libmain.a:spi_flash.o(.rodata.* .rodata)
+
     *(.gnu.linkonce.r.*)
     *(.rodata1)
     __XT_EXCEPTION_TABLE__ = ABSOLUTE(.);
@@ -205,6 +232,8 @@ SECTIONS
     LONG(0)
     LONG(0)
     LONG(0)
+    . = ALIGN (16);
+    *(.UserExceptionTrampoline.text)
     . = ALIGN (16);
     *(.entry.text)
     *(.init.literal)
