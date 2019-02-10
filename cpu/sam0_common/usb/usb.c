@@ -356,6 +356,7 @@ void isr_usb(void)
 static int usbdev_get(usbdev_t *usbdev, usbopt_t opt, void *value, size_t max_len)
 {
     (void)usbdev;
+    (void)max_len;
     int res = -ENOTSUP;
     switch (opt) {
         case USBOPT_MAX_VERSION:
@@ -379,6 +380,7 @@ int usbdev_set(usbdev_t *usbdev, usbopt_t opt,
                const void *value, size_t value_len)
 {
     (void)usbdev;
+    (void)value_len;
     int res = -ENOTSUP;
     switch (opt) {
         case USBOPT_ADDRESS:
@@ -530,8 +532,8 @@ static int usbdev_ep_get(usbdev_ep_t *ep, usbopt_ep_t opt,
                   void *value, size_t max_len)
 {
     assert(ep);
+    (void)max_len;
     int res = -ENOTSUP;
-    assert(ep != NULL);
     switch (opt) {
         case USBOPT_EP_STALL:
             assert(max_len == sizeof(usbopt_enable_t));
@@ -554,6 +556,7 @@ static int usbdev_ep_set(usbdev_ep_t *ep, usbopt_ep_t opt,
                   const void *value, size_t value_len)
 {
     assert(ep);
+    (void)value_len;
     int res = -ENOTSUP;
     switch (opt) {
         case USBOPT_EP_ENABLE:
