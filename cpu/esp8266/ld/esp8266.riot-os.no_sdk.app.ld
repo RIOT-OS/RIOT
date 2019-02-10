@@ -206,6 +206,8 @@ SECTIONS
     LONG(0)
     LONG(0)
     . = ALIGN (16);
+    *(.UserExceptionTrampoline.text)
+    . = ALIGN (16);
     *(.entry.text)
     *(.init.literal)
     *(.init)
