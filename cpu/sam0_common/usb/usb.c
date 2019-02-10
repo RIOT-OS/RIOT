@@ -369,7 +369,7 @@ static int usbdev_get(usbdev_t *usbdev, usbopt_t opt, void *value, size_t max_le
             res = sizeof(usb_speed_t);
             break;
         default:
-            DEBUG("Unhandled set call: 0x%x\n", opt);
+            DEBUG("Unhandled get call: 0x%x\n", opt);
             break;
     }
     return res;
@@ -529,21 +529,22 @@ static size_t _ep_get_available(usbdev_ep_t *ep)
 static int usbdev_ep_get(usbdev_ep_t *ep, usbopt_ep_t opt,
                   void *value, size_t max_len)
 {
-    (void)ep;
-    (void)value;
-    (void)max_len;
+    assert(ep);
     int res = -ENOTSUP;
     assert(ep != NULL);
     switch (opt) {
         case USBOPT_EP_STALL:
+            assert(max_len == sizeof(usbopt_enable_t));
             *(usbopt_enable_t *)value = _ep_get_stall(ep);
             res = sizeof(usbopt_enable_t);
             break;
         case USBOPT_EP_AVAILABLE:
+            assert(max_len == sizeof(size_t));
             *(size_t *)value = _ep_get_available(ep);
             res = sizeof(size_t);
             break;
         default:
+            DEBUG("Unhandled get call: 0x%x\n", opt);
             break;
     }
     return res;
@@ -582,6 +583,7 @@ static int usbdev_ep_set(usbdev_ep_t *ep, usbopt_ep_t opt,
             res = sizeof(usbopt_enable_t);
             break;
         default:
+            DEBUG("Unhandled set call: 0x%x\n", opt);
             break;
     }
     return res;
