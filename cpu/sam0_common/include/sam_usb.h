@@ -49,10 +49,13 @@ typedef struct {
     uint8_t buffer[SAM_USB_BUF_SPACE];  /**< Buffer space */
 } sam0_common_usb_t;
 
-void usb_init(void);
+/**
+ * @brief sam0 common device state setup function
+ *
+ * @param samusb    sam usb context to initialize
+ */
+void sam_usbdev_setup(sam0_common_usb_t *samusb);
 
-void usb_attach(void);
-void usb_detach(void);
 #ifdef __cplusplus
 }
 #endif
