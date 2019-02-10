@@ -13,70 +13,20 @@
  * @ingroup     net
  * @brief       CoAP library optimized for minimal resource usage
  *
- * nanocoap provides a granular, low-level interface for writing CoAP messages
- * via RIOT's sock networking API.
+ * nanocoap is a toolbox for reading and writing CoAP messages. It provides
+ * functions for core header attributes like message type and code. It also
+ * provides high and low level interfaces to CoAP options, including Block.
  *
- * ## Server Operation ##
+ * nanocoap includes the core structs to store message information. It also
+ * also provides support for sending and receiving messages, such as
+ * coap_parse() to read an incoming message.
  *
- * See the nanocoap_server example, which is built on the nanocoap_server()
- * function. A server must define an array of coap_resource_t resources for
- * which it responds. See the declarations of `coap_resources` and
- * `coap_resources_numof`. The array contents must be ordered by the resource
- * path, specifically the ASCII encoding of the path characters (digit and
- * capital precede lower case). nanocoap provides the
- * COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER entry for `/.well-known/core`.
+ * The documentation here mostly categorizes and lists the contents of
+ * nanocoap. To use nanocoap in an application, see the APIs that are built
+ * with it: [nanocoap sock](group__net__nanosock.html) and
+ * [gcoap](group__net__gcoap.html).
  *
- * ### Path matching ###
- * By default the URI-path of an incoming request should match exactly one of
- * the registered resources. But also, a resource can be configured to
- * match just a prefix of the URI-path of the request by adding the
- * @ref COAP_MATCH_SUBTREE option to coap_resource_t::methods.
- *
- * For example, if a resource is configured with a
- * @ref coap_resource_t::path "path" `/resource01` and the
- * @ref COAP_MATCH_SUBTREE option is used it would match any of `/resource01/`,
- * `/resource01/sub/path`, `/resource01alt`.
- *
- * If the behavior of matching `/resource01alt` is not wanted and only subtrees
- * are wanted to match, the path should be `/resource01/`.
- *
- * If in addition just `/resource01` is wanted to match, together with any
- * subtrees of `/resource01/`, then a first resource with the path `/resource01`
- * and exact matching should be register, and then a second one with the path
- * `/resource01/` and subtree matching.
- *
- * ### Handler functions ###
- *
- * For each resource, you must implement a ::coap_handler_t handler function.
- * nanocoap provides functions to help implement the handler. If the handler
- * is called via nanocoap_server(), the response buffer provided to the handler
- * reuses the buffer for the request. So, your handler must read the request
- * thoroughly before writing the response.
- *
- * To read the request, use the functions in the _Header attributes_ and
- * _Options_ sections below. If the pkt _payload_len_ attribute is a positive
- * value, start to read it at the _payload_ pointer attribute.
- *
- * If a response does not require specific CoAP options, use
- * coap_reply_simple(). If there is a payload, it writes a Content-Format
- * option with the provided value.
- *
- * For a response with additional CoAP options, start by calling
- * coap_build_reply(). Then choose either the Buffer API or the Packet
- * API to write the rest of the response. See the instructions in the section
- * _Write Options and Payload_ below.
- *
- * ## Client Operation ##
- *
- * Choose either the Buffer API or the Packet API to write a request.
- * Follow the instructions in the section _Write Options and Payload_ below.
- *
- * To send the message and await the response, see nanocoap_request() as well
- * as nanocoap_get(), which additionally copies the response payload to a user
- * supplied buffer. Finally, read the response as described above in the server
- * _Handler functions_ section for reading a request.
- *
- * ## Write Options and Payload ##
+ * ## Option APIs
  *
  * For both server responses and client requests, CoAP uses an Option mechanism
  * to encode message metadata that is not required for each message. For
@@ -95,68 +45,25 @@
  * space remaining in the buffer; however, the API *will not* write past the
  * end of the buffer, and returns -ENOSPC when it is full.
  *
- * You must use one API exclusively for a given message. For either API, the
- * caller must write options in order by option number (see "CoAP option
- * numbers" in [CoAP defines](group__net__coap.html)).
+ * ## Server path matching
  *
- * ### Buffer API ###
+ * By default the URI-path of an incoming request should match exactly one of
+ * the registered resources. But also, a resource can be configured to
+ * match just a prefix of the URI-path of the request by adding the
+ * @ref COAP_MATCH_SUBTREE option to coap_resource_t::methods.
  *
- * Before starting, ensure the CoAP header has been initialized with
- * coap_build_hdr(). For a response, coap_build_reply() includes a call to
- * coap_build_hdr(). Use the returned length to track the next position in the
- * buffer to write and remaining length.
+ * For example, if a resource is configured with a
+ * @ref coap_resource_t::path "path" `/resource01` and the
+ * @ref COAP_MATCH_SUBTREE option is used it would match any of `/resource01/`,
+ * `/resource01/sub/path`, `/resource01alt`.
  *
- * Next, use the functions in the  _Buffer API Options_ section to write each
- * option. These functions require the position in the buffer to start writing,
- * and return the number of bytes written.
+ * If the behavior of matching `/resource01alt` is not wanted and only subtrees
+ * are wanted to match, the path should be `/resource01/`.
  *
- * @note You must ensure the buffer has enough space remaining to write each
- * option. The API does not verify the safety of writing an option.
- *
- * If there is a payload, append a payload marker (0xFF). Then write the
- * payload to within the maximum length remaining in the buffer.
- *
- * ### Packet API ###
- *
- * As with the Buffer API, first ensure the CoAP header has been initialized
- * with coap_build_hdr(). Then use coap_pkt_init() to initialize the coap_pkt_t
- * struct.
- *
- * Next, write any options with the functions in the _Packet API Options_
- * section. When all options have been added, call coap_opt_finish().
- *
- * @note You must ensure the buffer has enough space remaining to write each
- * option. You can monitor `coap_pkt_t.payload_len` for remaining space, or
- * watch for a -ENOSPC return value from the API.
- *
- * Finally, write any message payload at the coap_pkt_t _payload_ pointer
- * attribute. The _payload_len_ attribute provides the available length in the
- * buffer. The option functions keep these values current as they are used.
- *
- * # Create a Block-wise Response (Block2)
- *
- * Block-wise is a CoAP extension (RFC 7959) to divide a large payload across
- * multiple physical packets. This section describes how to write a block-wise
- * payload for a response, and is known as Block2. (Block1 is for a block-wise
- * payload in a request.) See _riot_board_handler() in the nanocoap_server
- * example for an example handler implementation.
- *
- * Start with coap_block2_init() to read the client request and initialize a
- * coap_slicer_t struct with the size and location for this slice of the
- * overall payload. Then write the block2 option in the response with
- * coap_opt_put_block2(). The option includes an indicator ("more") that a
- * slice completes the overall payload transfer. You may not know the value for
- * _more_ at this point, but you must initialize the space in the packet for
- * the option before writing the payload. The option is rewritten later.
- *
- * Next, use the coap_blockwise_put_xxx() functions to write the payload
- * content. These functions use the coap_block_slicer_t to enable or disable
- * actually writing the content, depending on the current position within the
- * overall payload transfer.
- *
- * Finally, use the convenience function coap_block2_build_reply(), which
- * finalizes the packet and calls coap_block2_finish() internally to update
- * the block2 option.
+ * If in addition just `/resource01` is wanted to match, together with any
+ * subtrees of `/resource01/`, then a first resource with the path `/resource01`
+ * and exact matching should be register, and then a second one with the path
+ * `/resource01/` and subtree matching.
  *
  * @{
  *
