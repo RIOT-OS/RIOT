@@ -53,10 +53,9 @@
  * reuses the buffer for the request. So, your handler must read the request
  * thoroughly before writing the response.
  *
- * To read the request, use the coap_get_xxx() functions to read the header and
- * options. Use the coap_opt_get_xxx() functions to read an option generically
- * by data type. If the pkt _payload_len_ attribute is a positive value, start
- * to read it at the _payload_ pointer attribute.
+ * To read the request, use the functions in the _Header attributes_ and
+ * _Options_ sections below. If the pkt _payload_len_ attribute is a positive
+ * value, start to read it at the _payload_ pointer attribute.
  *
  * If a response does not require specific CoAP options, use
  * coap_reply_simple(). If there is a payload, it writes a Content-Format
@@ -107,7 +106,7 @@
  * coap_build_hdr(). Use the returned length to track the next position in the
  * buffer to write and remaining length.
  *
- * Next, use the coap_opt_put_xxx() and coap_put_xxx() functions to write each
+ * Next, use the functions in the  _Minimal API Options_ section to write each
  * option. These functions require the position in the buffer to start writing,
  * and return the number of bytes written.
  *
@@ -123,9 +122,8 @@
  * with coap_build_hdr(). Then use coap_pkt_init() to initialize the coap_pkt_t
  * struct.
  *
- * Next, use the coap_opt_add_xxx() functions to write each option, like
- * coap_opt_add_uint(). When all options have been added, call
- * coap_opt_finish().
+ * Next, write any options with the functions in the _Struct-based API Options_
+ * section. When all options have been added, call coap_opt_finish().
  *
  * @note You must ensure the buffer has enough space remaining to write each
  * option. You can monitor `coap_pkt_t.payload_len` for remaining space, or
