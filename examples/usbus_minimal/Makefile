@@ -13,6 +13,7 @@ RIOTBASE ?= $(CURDIR)/../..
 DEVELHELP ?= 1
 
 USEMODULE += usbus
+USEMODULE += auto_init_usbus
 
 # USB device vendor and product ID
 USB_VID ?= 1209
