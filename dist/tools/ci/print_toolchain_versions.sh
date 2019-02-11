@@ -52,6 +52,44 @@ get_os_info() {
     printf "%s %s" "$osname" "$osvers"
 }
 
+extract_shell_version() {
+    SHELL_NAME=$"(basename $1)"
+    SHELL_VERSION="$($1 --version 2>/dev/null)"
+    ERR=$?
+    if [ $ERR -ne 0 ] ; then # if it does not like the --version switch, it is probably dash
+        printf "%s" "$1"
+        # we do not say "probably dash" if we are sure it IS dash
+        if [ "$SHELL_NAME" != dash ] ; then
+            printf " (probably dash)"
+        fi
+    else
+        printf "%s" "$(echo "$SHELL_VERSION" | head -n 1)"
+    fi
+}
+
+get_sys_shell() {
+    case "$(uname -s)" in
+        MINGW*)
+            # MINGW has no realpath, but also no (meaningful) symlinks
+            SH_PATH=/bin/sh
+            ;;
+        *)
+            SH_PATH="$(realpath /bin/sh)"
+            ;;
+    esac
+    extract_shell_version "$SH_PATH"
+}
+
+_get_make_shell() {
+    make -sf - 2>/dev/null <<MAKEFILE
+\$(info \$(realpath \$(SHELL)))
+MAKEFILE
+}
+
+get_make_shell() {
+    extract_shell_version "$(_get_make_shell)"
+}
+
 newlib_version() {
     if [ -z "$1" ]; then
         printf "%s" "error"
@@ -76,6 +114,8 @@ printf "%s\n" "Operating System Environment"
 printf "%s\n" "-----------------------------"
 printf "%23s: %s\n" "Operating System" "$(get_os_info)"
 printf "%23s: %s\n" "Kernel" "$(get_kernel_info)"
+printf "%23s: %s\n" "System shell" "$(get_sys_shell)"
+printf "%23s: %s\n" "make's SHELL" "$(get_make_shell)"
 printf "\n"
 
 printf "%s\n" "Installed compiler toolchains"
