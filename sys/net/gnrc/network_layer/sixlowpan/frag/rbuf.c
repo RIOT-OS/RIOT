@@ -126,7 +126,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         data++; /* FRAGN header is one byte longer (offset) */
     }
 
-    if ((offset + frag_size) > entry->pkt->size) {
+    if ((offset + frag_size) > entry->super.datagram_size) {
         DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
         gnrc_pktbuf_release(entry->pkt);
         gnrc_pktbuf_release(pkt);
@@ -244,7 +244,7 @@ static bool _rbuf_update_ints(gnrc_sixlowpan_rbuf_t *entry, uint16_t offset,
     DEBUG("%s, %u, %u)\n", gnrc_netif_addr_to_str(entry->super.dst,
                                                   entry->super.dst_len,
                                                   l2addr_str),
-          (unsigned)entry->pkt->size, entry->super.tag);
+          (unsigned)entry->super.datagram_size, entry->super.tag);
 
     LL_PREPEND(entry->super.ints, new);
 
@@ -268,7 +268,7 @@ void rbuf_gc(void)
                   gnrc_netif_addr_to_str(rbuf[i].super.dst,
                                          rbuf[i].super.dst_len,
                                          l2addr_str),
-                  (unsigned)rbuf[i].pkt->size, rbuf[i].super.tag);
+                  (unsigned)rbuf[i].super.datagram_size, rbuf[i].super.tag);
 
             gnrc_pktbuf_release(rbuf[i].pkt);
             rbuf_rm(&(rbuf[i]));
@@ -291,7 +291,7 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
     for (unsigned int i = 0; i < RBUF_SIZE; i++) {
         /* check first if entry already available */
-        if ((rbuf[i].pkt != NULL) && (rbuf[i].pkt->size == size) &&
+        if ((rbuf[i].pkt != NULL) && (rbuf[i].super.datagram_size == size) &&
             (rbuf[i].super.tag == tag) && (rbuf[i].super.src_len == src_len) &&
             (rbuf[i].super.dst_len == dst_len) &&
             (memcmp(rbuf[i].super.src, src, src_len) == 0) &&
@@ -304,7 +304,7 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
                   gnrc_netif_addr_to_str(rbuf[i].super.dst,
                                          rbuf[i].super.dst_len,
                                          l2addr_str),
-                  (unsigned)rbuf[i].pkt->size, rbuf[i].super.tag);
+                  (unsigned)rbuf[i].super.datagram_size, rbuf[i].super.tag);
             rbuf[i].super.arrival = now_usec;
             _set_rbuf_timeout();
             return &(rbuf[i]);
@@ -363,6 +363,7 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
     *((uint64_t *)res->pkt->data) = 0;  /* clean first few bytes for later
                                                * look-ups */
+    res->super.datagram_size = size;
     res->super.arrival = now_usec;
     memcpy(res->super.src, src, src_len);
     memcpy(res->super.dst, dst, dst_len);
@@ -376,7 +377,7 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
                                  l2addr_str));
     DEBUG("%s, %u, %u) created\n",
           gnrc_netif_addr_to_str(res->super.dst, res->super.dst_len,
-                                 l2addr_str), (unsigned)res->pkt->size,
+                                 l2addr_str), res->super.datagram_size,
           res->super.tag);
 
     _set_rbuf_timeout();
