@@ -99,6 +99,8 @@ typedef struct {
     uint8_t src_len;                            /**< length of gnrc_sixlowpan_rbuf_t::src */
     uint8_t dst_len;                            /**< length of gnrc_sixlowpan_rbuf_t::dst */
     uint16_t tag;                               /**< the datagram's tag */
+    uint32_t arrival;                           /**< time in microseconds of arrival of
+                                                 *   last received fragment */
     /**
      * @brief   The number of bytes currently received of the complete datagram
      */

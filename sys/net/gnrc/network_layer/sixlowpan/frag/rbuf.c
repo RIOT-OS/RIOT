@@ -256,7 +256,7 @@ void rbuf_gc(void)
     for (i = 0; i < RBUF_SIZE; i++) {
         /* since pkt occupies pktbuf, aggressivly collect garbage */
         if ((rbuf[i].super.pkt != NULL) &&
-              ((now_usec - rbuf[i].arrival) > RBUF_TIMEOUT)) {
+              ((now_usec - rbuf[i].super.arrival) > RBUF_TIMEOUT)) {
             DEBUG("6lo rfrag: entry (%s, ",
                   gnrc_netif_addr_to_str(rbuf[i].super.src,
                                          rbuf[i].super.src_len,
@@ -301,7 +301,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                                          rbuf[i].super.dst_len,
                                          l2addr_str),
                   (unsigned)rbuf[i].super.pkt->size, rbuf[i].super.tag);
-            rbuf[i].arrival = now_usec;
+            rbuf[i].super.arrival = now_usec;
             _set_rbuf_timeout();
             return &(rbuf[i]);
         }
@@ -313,7 +313,8 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
         /* remember oldest slot */
         /* note that xtimer_now will overflow in ~1.2 hours */
-        if ((oldest == NULL) || (oldest->arrival - rbuf[i].arrival < UINT32_MAX / 2)) {
+        if ((oldest == NULL) ||
+            (oldest->super.arrival - rbuf[i].super.arrival < UINT32_MAX / 2)) {
             oldest = &(rbuf[i]);
         }
     }
@@ -358,7 +359,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
     *((uint64_t *)res->super.pkt->data) = 0;  /* clean first few bytes for later
                                                * look-ups */
-    res->arrival = now_usec;
+    res->super.arrival = now_usec;
     memcpy(res->super.src, src, src_len);
     memcpy(res->super.dst, dst, dst_len);
     res->super.src_len = src_len;
