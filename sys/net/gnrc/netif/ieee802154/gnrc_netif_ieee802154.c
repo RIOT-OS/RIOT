@@ -73,6 +73,20 @@ static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
     return snip;
 }
 
+#if MODULE_GNRC_NETIF_DEDUP
+static inline bool _already_received(gnrc_netif_t *netif,
+                                     gnrc_netif_hdr_t *netif_hdr,
+                                     uint8_t *mhr)
+{
+    const uint8_t seq = ieee802154_get_seq(mhr);
+
+    return  (netif->last_pkt.seq == seq) &&
+            (netif->last_pkt.src_len == netif_hdr->src_l2addr_len) &&
+            (memcmp(netif->last_pkt.src, gnrc_netif_hdr_get_src_addr(netif_hdr),
+                    netif_hdr->src_l2addr_len) == 0);
+}
+#endif /* MODULE_GNRC_NETIF_DEDUP */
+
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
@@ -155,6 +169,18 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
                 return NULL;
             }
 #endif
+#ifdef MODULE_GNRC_NETIF_DEDUP
+            if (_already_received(netif, hdr, ieee802154_hdr->data)) {
+                gnrc_pktbuf_release(pkt);
+                gnrc_pktbuf_release(netif_hdr);
+                DEBUG("_recv_ieee802154: packet dropped by deduplication\n");
+                return NULL;
+            }
+            memcpy(netif->last_pkt.src, gnrc_netif_hdr_get_src_addr(hdr),
+                   hdr->src_l2addr_len);
+            netif->last_pkt.src_len = hdr->src_l2addr_len;
+            netif->last_pkt.seq = ieee802154_get_seq(ieee802154_hdr->data);
+#endif /* MODULE_GNRC_NETIF_DEDUP */
 
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
