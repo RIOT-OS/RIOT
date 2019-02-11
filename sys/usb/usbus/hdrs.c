@@ -68,11 +68,16 @@ static size_t _num_endpoints_alt(usbus_interface_alt_t *alt)
     return num;
 }
 
+static inline size_t call_get_header_len(usbus_t *usbus, usbus_hdr_gen_t *hdr)
+{
+    return hdr->funcs->get_header_len(usbus, hdr->arg);
+}
+
 size_t _hdr_gen_size(usbus_t *usbus, usbus_hdr_gen_t *hdr)
 {
     size_t len = 0;
     for (; hdr; hdr = hdr->next) {
-        len += hdr->hdr_len(usbus, hdr->arg);
+        len += call_get_header_len(usbus, hdr);
     }
     return len;
 }
@@ -118,11 +123,16 @@ size_t usbus_hdrs_fmt_hdrs(usbus_t *usbus)
     return usbus_hdrs_fmt_additional(usbus, usbus->hdr_gen);
 }
 
+static inline size_t call_get_header(usbus_t *usbus, usbus_hdr_gen_t *hdr)
+{
+    return hdr->funcs->get_header(usbus, hdr->arg);
+}
+
 size_t usbus_hdrs_fmt_additional(usbus_t *usbus, usbus_hdr_gen_t *hdr)
 {
     size_t len = 0;
     for (; hdr; hdr = hdr->next) {
-        len += hdr->gen_hdr(usbus, hdr->arg);
+        len += call_get_header(usbus, hdr);
     }
     return len;
 }
