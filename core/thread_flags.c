@@ -100,7 +100,7 @@ thread_flags_t thread_flags_wait_all(thread_flags_t mask)
 
 inline int __attribute__((always_inline)) thread_flags_wake(thread_t *thread)
 {
-    unsigned wakeup = 0;
+    unsigned wakeup;
     thread_flags_t mask = (uint16_t)(unsigned)thread->wait_data;
     switch(thread->status) {
         case STATUS_FLAG_BLOCKED_ANY:
@@ -108,6 +108,9 @@ inline int __attribute__((always_inline)) thread_flags_wake(thread_t *thread)
             break;
         case STATUS_FLAG_BLOCKED_ALL:
             wakeup = ((thread->flags & mask) == mask);
+            break;
+        default:
+            wakeup = 0;
             break;
     }
 

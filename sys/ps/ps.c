@@ -96,7 +96,7 @@ void ps(void)
         thread_t *p = (thread_t *)sched_threads[i];
 
         if (p != NULL) {
-            int state = p->status;                                                 /* copy state */
+            thread_state_t state = p->status;                                      /* copy state */
             const char *sname = state_names[state];                                /* get state name */
             const char *queued = &queued_name[(int)(state >= STATUS_ON_RUNQUEUE)]; /* get queued flag */
 #ifdef DEVELHELP

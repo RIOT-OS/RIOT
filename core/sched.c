@@ -158,7 +158,7 @@ void sched_register_cb(void (*callback)(uint32_t, uint32_t))
 }
 #endif
 
-void sched_set_status(thread_t *process, unsigned int status)
+void sched_set_status(thread_t *process, thread_state_t status)
 {
     if (status >= STATUS_ON_RUNQUEUE) {
         if (!(process->status >= STATUS_ON_RUNQUEUE)) {
