@@ -337,7 +337,7 @@ void gnrc_sixlowpan_frag_rbuf_gc(void)
 void gnrc_sixlowpan_frag_rbuf_remove(gnrc_sixlowpan_rbuf_t *rbuf)
 {
     assert(rbuf != NULL);
-    rbuf_rm((rbuf_t *)rbuf);
+    rbuf_rm(rbuf);
 }
 
 void gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(gnrc_sixlowpan_rbuf_t *rbuf,
