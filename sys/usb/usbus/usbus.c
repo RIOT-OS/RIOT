@@ -36,11 +36,6 @@
 
 #define _USBUS_MSG_QUEUE_SIZE    (8)
 
-static usbus_t _usbus;
-extern const usbdev_driver_t driver;
-static sam0_common_usb_t usbdev;
-static char _stack[USBUS_STACKSIZE];
-
 void _event_cb(usbdev_t *usbdev, usbdev_event_t event);
 void _event_ep0_cb(usbdev_ep_t *ep, usbdev_event_t event);
 void _event_ep_cb(usbdev_ep_t *ep, usbdev_event_t event);
