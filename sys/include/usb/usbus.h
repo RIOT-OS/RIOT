@@ -31,6 +31,7 @@
 
 #include "kernel_types.h"
 #include "msg.h"
+#include "thread.h"
 
 #ifdef __cplusplus
 extern "C" {
