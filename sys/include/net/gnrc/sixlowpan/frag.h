@@ -56,6 +56,25 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Fragment intervals to identify limits of fragments and duplicates.
+ *
+ * @note    Fragments MUST NOT overlap and overlapping fragments are to be
+ *          discarded
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.3">
+ *          RFC 4944, section 5.3
+ *      </a>
+ */
+typedef struct gnrc_sixlowpan_rbuf_int {
+    /**
+     * @brief   next element in fragment interval list
+     */
+    struct gnrc_sixlowpan_rbuf_int *next;
+    uint16_t start;             /**< start byte of the fragment interval */
+    uint16_t end;               /**< end byte of the fragment interval */
+} gnrc_sixlowpan_rbuf_int_t;
+
+/**
  * @brief   An entry in the 6LoWPAN reassembly buffer.
  *
  * A recipient of a fragment SHALL use

@@ -42,7 +42,7 @@
 #define RBUF_INT_SIZE (DIV_CEIL(IPV6_MIN_MTU, GNRC_SIXLOWPAN_FRAG_SIZE) * RBUF_SIZE)
 #endif
 
-static rbuf_int_t rbuf_int[RBUF_INT_SIZE];
+static gnrc_sixlowpan_rbuf_int_t rbuf_int[RBUF_INT_SIZE];
 
 static rbuf_t rbuf[RBUF_SIZE];
 
@@ -55,9 +55,10 @@ static msg_t _gc_timer_msg = { .type = GNRC_SIXLOWPAN_MSG_FRAG_GC_RBUF };
  * internal function definitions
  * ------------------------------------*/
 /* checks whether start and end overlaps, but not identical to, given interval i */
-static inline bool _rbuf_int_overlap_partially(rbuf_int_t *i, uint16_t start, uint16_t end);
+static inline bool _rbuf_int_overlap_partially(gnrc_sixlowpan_rbuf_int_t *i,
+                                               uint16_t start, uint16_t end);
 /* gets a free entry from interval buffer */
-static rbuf_int_t *_rbuf_int_get_free(void);
+static gnrc_sixlowpan_rbuf_int_t *_rbuf_int_get_free(void);
 /* update interval buffer of entry */
 static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size);
 /* gets an entry identified by its tupel */
@@ -88,7 +89,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 {
     rbuf_t *entry;
     sixlowpan_frag_n_t *frag = pkt->data;
-    rbuf_int_t *ptr;
+    gnrc_sixlowpan_rbuf_int_t *ptr;
     uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
     size_t frag_size;
 
@@ -185,14 +186,15 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     return RBUF_ADD_SUCCESS;
 }
 
-static inline bool _rbuf_int_overlap_partially(rbuf_int_t *i, uint16_t start, uint16_t end)
+static inline bool _rbuf_int_overlap_partially(gnrc_sixlowpan_rbuf_int_t *i,
+                                               uint16_t start, uint16_t end)
 {
     /* start and ends are both inclusive, so using <= for both */
     return ((i->start <= end) && (start <= i->end)) && /* overlaps */
         ((start != i->start) || (end != i->end)); /* not identical */
 }
 
-static rbuf_int_t *_rbuf_int_get_free(void)
+static gnrc_sixlowpan_rbuf_int_t *_rbuf_int_get_free(void)
 {
     for (unsigned int i = 0; i < RBUF_INT_SIZE; i++) {
         if (rbuf_int[i].end == 0) { /* start must be smaller than end anyways*/
@@ -206,7 +208,7 @@ static rbuf_int_t *_rbuf_int_get_free(void)
 void rbuf_rm(rbuf_t *entry)
 {
     while (entry->ints != NULL) {
-        rbuf_int_t *next = entry->ints->next;
+        gnrc_sixlowpan_rbuf_int_t *next = entry->ints->next;
 
         entry->ints->start = 0;
         entry->ints->end = 0;
@@ -219,7 +221,7 @@ void rbuf_rm(rbuf_t *entry)
 
 static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
 {
-    rbuf_int_t *new;
+    gnrc_sixlowpan_rbuf_int_t *new;
     uint16_t end = (uint16_t)(offset + frag_size - 1);
 
     new = _rbuf_int_get_free();
