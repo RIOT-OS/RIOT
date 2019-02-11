@@ -260,7 +260,7 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     /* Check whether to send the first or an Nth fragment */
     if (fragment_msg->offset == 0) {
         /* increment tag for successive, fragmented datagrams */
-        _tag++;
+        gnrc_sixlowpan_frag_next_tag();
         if ((res = _send_1st_fragment(iface, fragment_msg->pkt, payload_len,
                                       fragment_msg->datagram_size)) == 0) {
             /* error sending first fragment */
@@ -318,6 +318,11 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     }
 
     rbuf_add(hdr, pkt, offset, page);
+}
+
+uint16_t gnrc_sixlowpan_frag_next_tag(void)
+{
+    return (++_tag);
 }
 
 void gnrc_sixlowpan_frag_rbuf_gc(void)
