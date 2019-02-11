@@ -515,7 +515,7 @@ static void test_rbuf_gc__manually(void)
     entry = (rbuf_t *)_first_non_empty_rbuf();
     TEST_ASSERT_NOT_NULL(entry);
     /* set arrival RBUF_TIMEOUT into the past */
-    entry->arrival -= RBUF_TIMEOUT;
+    entry->super.arrival -= RBUF_TIMEOUT;
     rbuf_gc();
     /* reassembly buffer is now empty */
     TEST_ASSERT_NULL(_first_non_empty_rbuf());
