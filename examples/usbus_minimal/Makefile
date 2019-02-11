@@ -13,7 +13,10 @@ RIOTBASE ?= $(CURDIR)/../..
 DEVELHELP ?= 1
 
 USEMODULE += usbus
+USEMODULE += auto_init_usbus
 USEMODULE += shell
+USEMODULE += shell_commands
+USEMODULE += ps
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
