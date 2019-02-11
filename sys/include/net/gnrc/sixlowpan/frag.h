@@ -93,6 +93,7 @@ typedef struct {
      * @brief   The reassembled packet in the packet buffer
      */
     gnrc_pktsnip_t *pkt;
+    gnrc_sixlowpan_rbuf_int_t *ints;            /**< intervals of already received fragments */
     uint8_t src[IEEE802154_LONG_ADDRESS_LEN];   /**< source address */
     uint8_t dst[IEEE802154_LONG_ADDRESS_LEN];   /**< destination address */
     uint8_t src_len;                            /**< length of gnrc_sixlowpan_rbuf_t::src */

@@ -51,7 +51,6 @@ extern "C" {
  */
 typedef struct {
     gnrc_sixlowpan_rbuf_t super;        /**< exposed part of the reassembly buffer */
-    gnrc_sixlowpan_rbuf_int_t *ints;    /**< intervals of the fragment */
     uint32_t arrival;                   /**< time in microseconds of arrival of
                                          *   last received fragment */
 } rbuf_t;

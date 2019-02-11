@@ -110,7 +110,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         return RBUF_ADD_ERROR;
     }
 
-    ptr = entry->ints;
+    ptr = entry->super.ints;
 
     /* dispatches in the first fragment are ignored */
     if (offset == 0) {
@@ -207,13 +207,13 @@ static gnrc_sixlowpan_rbuf_int_t *_rbuf_int_get_free(void)
 
 void rbuf_rm(rbuf_t *entry)
 {
-    while (entry->ints != NULL) {
-        gnrc_sixlowpan_rbuf_int_t *next = entry->ints->next;
+    while (entry->super.ints != NULL) {
+        gnrc_sixlowpan_rbuf_int_t *next = entry->super.ints->next;
 
-        entry->ints->start = 0;
-        entry->ints->end = 0;
-        entry->ints->next = NULL;
-        entry->ints = next;
+        entry->super.ints->start = 0;
+        entry->super.ints->end = 0;
+        entry->super.ints->next = NULL;
+        entry->super.ints = next;
     }
 
     entry->super.pkt = NULL;
@@ -243,7 +243,7 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
                                                   l2addr_str),
           (unsigned)entry->super.pkt->size, entry->super.tag);
 
-    LL_PREPEND(entry->ints, new);
+    LL_PREPEND(entry->super.ints, new);
 
     return true;
 }

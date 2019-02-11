@@ -234,10 +234,10 @@ static void _test_entry(const rbuf_t *entry, unsigned exp_current_size,
                         "entry->super.dst != TEST_NETIF_HDR_DST");
     TEST_ASSERT_EQUAL_INT(TEST_TAG, entry->super.tag);
     TEST_ASSERT_EQUAL_INT(exp_current_size, entry->super.current_size);
-    TEST_ASSERT_NOT_NULL(entry->ints);
-    TEST_ASSERT_NULL(entry->ints->next);
-    TEST_ASSERT_EQUAL_INT(exp_int_start, entry->ints->start);
-    TEST_ASSERT_EQUAL_INT(exp_int_end, entry->ints->end);
+    TEST_ASSERT_NOT_NULL(entry->super.ints);
+    TEST_ASSERT_NULL(entry->super.ints->next);
+    TEST_ASSERT_EQUAL_INT(exp_int_start, entry->super.ints->start);
+    TEST_ASSERT_EQUAL_INT(exp_int_end, entry->super.ints->end);
 }
 
 static void _check_pktbuf(const rbuf_t *entry)
