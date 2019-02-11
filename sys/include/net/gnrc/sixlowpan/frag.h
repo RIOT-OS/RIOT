@@ -130,6 +130,13 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 
 /**
+ * @brief   Generate a new datagram tag for sending
+ *
+ * @return  A new datagram tag.
+ */
+uint16_t gnrc_sixlowpan_frag_next_tag(void);
+
+/**
  * @brief   Garbage collect reassembly buffer.
  */
 void gnrc_sixlowpan_frag_rbuf_gc(void);
