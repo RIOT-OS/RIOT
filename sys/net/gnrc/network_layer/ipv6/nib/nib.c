@@ -757,31 +757,46 @@ static inline size_t _get_l2src(const gnrc_netif_t *netif, uint8_t *l2src)
 #endif  /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
 }
 
+static gnrc_pktsnip_t *_check_release_pkt(gnrc_pktsnip_t *pkt,
+                                          gnrc_pktsnip_t *payload)
+{
+    if (pkt == NULL) {
+        DEBUG("nib: No space left in packet buffer. Not replying NS");
+        gnrc_pktbuf_release(payload);
+    }
+    return pkt;
+}
+
 static void _send_delayed_nbr_adv(const gnrc_netif_t *netif,
                                   const ipv6_addr_t *tgt,
-                                  const ipv6_addr_t *dst,
-                                  gnrc_pktsnip_t *reply_aro)
+                                  const ipv6_hdr_t *ipv6_hdr,
+                                  gnrc_pktsnip_t *payload)
 {
-    gnrc_pktsnip_t *nbr_adv, *extra_opts = reply_aro;
+    gnrc_pktsnip_t *pkt;
     _nib_onl_entry_t *nce;
     uint8_t reply_flags = NDP_NBR_ADV_FLAGS_S;
 
+    nce = _nib_onl_get(tgt, netif->pid);
+    if ((nce == NULL) || !(nce->mode & _NC)) {
+        /* usually this should be the case, but when NCE is full, just
+         * ignore the sending. Other nodes in this anycast group are
+         * then preferred */
+        gnrc_pktbuf_release(payload);
+        return;
+    }
 #if GNRC_IPV6_NIB_CONF_ROUTER
     if (gnrc_netif_is_rtr(netif)) {
         reply_flags |= NDP_NBR_ADV_FLAGS_R;
     }
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
 #if GNRC_NETIF_L2ADDR_MAXLEN > 0
-    if (ipv6_addr_is_multicast(dst)) {
+    if (ipv6_addr_is_multicast(&ipv6_hdr->dst)) {
         uint8_t l2addr[GNRC_NETIF_L2ADDR_MAXLEN];
         size_t l2addr_len = _get_l2src(netif, l2addr);
 
         if (l2addr_len > 0) {
-            extra_opts = gnrc_ndp_opt_tl2a_build(l2addr, l2addr_len,
-                                                 extra_opts);
-            if (extra_opts == NULL) {
-                DEBUG("nib: No space left in packet buffer. Not replying NS");
-                gnrc_pktbuf_release(reply_aro);
+            pkt = gnrc_ndp_opt_tl2a_build(l2addr, l2addr_len, payload);
+            if ((payload = _check_release_pkt(pkt, payload)) == NULL) {
                 return;
             }
         }
@@ -796,20 +811,23 @@ static void _send_delayed_nbr_adv(const gnrc_netif_t *netif,
     reply_flags |= NDP_NBR_ADV_FLAGS_O;
 #endif  /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
     /* discard const qualifier */
-    nbr_adv = gnrc_ndp_nbr_adv_build(tgt, reply_flags, extra_opts);
-    if (nbr_adv == NULL) {
-        DEBUG("nib: No space left in packet buffer. Not replying NS");
-        gnrc_pktbuf_release(extra_opts);
+    pkt = gnrc_ndp_nbr_adv_build(tgt, reply_flags, payload);
+    if ((payload = _check_release_pkt(pkt, payload)) == NULL) {
         return;
     }
-    nce = _nib_onl_get(tgt, netif->pid);
-    if ((nce != NULL) && (nce->mode & _NC)) {
-        /* usually this should be the case, but when NCE is full, just
-         * ignore the sending. Other nodes in this anycast group are
-         * then preferred */
-        _evtimer_add(nce, GNRC_IPV6_NIB_SND_NA, &nce->snd_na,
-                     random_uint32_range(0, NDP_MAX_ANYCAST_MS_DELAY));
+    pkt = gnrc_ipv6_hdr_build(payload, NULL, &ipv6_hdr->src);
+    if ((payload = _check_release_pkt(pkt, payload)) == NULL) {
+        return;
     }
+    ((ipv6_hdr_t *)payload->data)->hl = 255;
+    pkt = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+    if ((pkt = _check_release_pkt(pkt, payload)) == NULL) {
+        return;
+    }
+    ((gnrc_netif_hdr_t *)pkt->data)->if_pid = netif->pid;
+    LL_PREPEND(payload, pkt);
+    _evtimer_add(pkt, GNRC_IPV6_NIB_SND_NA, &nce->snd_na,
+                 random_uint32_range(0, NDP_MAX_ANYCAST_MS_DELAY));
 }
 
 static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
@@ -935,7 +953,7 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         reply_aro = _copy_and_handle_aro(netif, ipv6, nbr_sol, aro, sl2ao);
         /* check if target address is anycast */
         if (netif->ipv6.addrs_flags[tgt_idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST) {
-            _send_delayed_nbr_adv(netif, &nbr_sol->tgt, &ipv6->dst, reply_aro);
+            _send_delayed_nbr_adv(netif, &nbr_sol->tgt, ipv6, reply_aro);
         }
         else {
             gnrc_ndp_nbr_adv_send(&nbr_sol->tgt, netif, &ipv6->src,
