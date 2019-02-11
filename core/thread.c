@@ -41,7 +41,7 @@ volatile thread_t *thread_get(kernel_pid_t pid)
 int thread_getstatus(kernel_pid_t pid)
 {
     volatile thread_t *t = thread_get(pid);
-    return t ? (int) t->status : STATUS_NOT_FOUND;
+    return t ? (int)t->status : (int)STATUS_NOT_FOUND;
 }
 
 const char *thread_getname(kernel_pid_t pid)
@@ -93,7 +93,7 @@ int thread_wakeup(kernel_pid_t pid)
     }
 
     irq_restore(old_state);
-    return STATUS_NOT_FOUND;
+    return (int)STATUS_NOT_FOUND;
 }
 
 void thread_yield(void)
@@ -224,7 +224,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 #endif
 
     cb->priority = priority;
-    cb->status = 0;
+    cb->status = STATUS_STOPPED;
 
     cb->rq_entry.next = NULL;
 
