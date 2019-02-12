@@ -226,7 +226,7 @@ static int cmd_test(int argc, char **argv)
 
     char result[4];
     ret = eeprom_read(0, (uint8_t *)result, 4);
-    assert(strncmp(result, expected, 4) == 0);
+    assert(memcmp(result, expected, 4) == 0);
     assert(ret == 4);
 
     /* read/write at end of EEPROM */
@@ -234,7 +234,7 @@ static int cmd_test(int argc, char **argv)
     assert(ret == 4);
     memset(result, 0, 4);
     ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
-    assert(strncmp(result, expected, 4) == 0);
+    assert(memcmp(result, expected, 4) == 0);
     assert(ret == 4);
 
     /* read/write single byte */
@@ -260,13 +260,13 @@ static int cmd_test(int argc, char **argv)
     /* set some bytes */
     eeprom_set(0, 'A', 4);
     ret = eeprom_read(0, (uint8_t *)result, 4);
-    assert(strncmp(result, "AAAA", 4) == 0);
+    assert(memcmp(result, "AAAA", 4) == 0);
     assert(ret == 4);
 
     memset(result, 0, 4);
     eeprom_set(EEPROM_SIZE - 4, 'A', 4);
     ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
-    assert(strncmp(result, "AAAA", 4) == 0);
+    assert(memcmp(result, "AAAA", 4) == 0);
     assert(ret == 4);
 
     puts("SUCCESS");
