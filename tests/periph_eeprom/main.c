@@ -246,7 +246,10 @@ static int cmd_test(int argc, char **argv)
     assert(eeprom_read_byte(EEPROM_SIZE / 2) == 'A');
 
     /* clear some bytes */
-    const uint8_t cleared[4] = {0, 0, 0, 0,};
+    const uint8_t cleared[4] = {
+        EEPROM_CLEAR_BYTE, EEPROM_CLEAR_BYTE,
+        EEPROM_CLEAR_BYTE, EEPROM_CLEAR_BYTE,
+    };
     eeprom_clear(0, 4);
     memset(result, 0, 4);
     ret = eeprom_read(0, (uint8_t *)result, 4);
