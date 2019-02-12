@@ -44,7 +44,7 @@ static uint16_t _tag;
 
 static inline uint16_t _floor8(uint16_t length)
 {
-    return length & 0xf8U;
+    return length & 0xfff8U;
 }
 
 static inline size_t _min(size_t a, size_t b)
