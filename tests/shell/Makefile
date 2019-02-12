@@ -12,4 +12,10 @@ BOARD_BLACKLIST += chronos
 
 TEST_ON_CI_WHITELIST += all
 
+# In order to properly test and debug the shell it is better to use a terminal
+# program that does not modify the input and output streams and has no buffering.
+ifneq ($(BOARD), native)
+  RIOT_TERMINAL?=miniterm.py
+endif
+
 include $(RIOTBASE)/Makefile.include
