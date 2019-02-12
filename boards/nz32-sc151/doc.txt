@@ -3,7 +3,7 @@
 @ingroup     boards
 @brief       Support for the Modtronix nz32-sc151 board.
 
-This board provider is [modtronix](www.modtronix.com). They don't supply data
+This board provider is [modtronix](http://modtronix.com). They don't supply data
 sheet's but there wiki can be found
 [HERE](http://wiki.modtronix.com/doku.php?id=products:nz-stm32:nz32-sc151). The
 schematic for there board can be found
@@ -70,7 +70,7 @@ sudo apt-get install dfu-util
 ```
 
 but most repos install older versions, therefore you should clone from [dfu-
-util](git clone git://git.code.sf.net/p/dfu-util/dfu-util) and follow building
+util](https://sourceforge.net/p/dfu-util/dfu-util/ci/master/tree/) and follow building
 instructions [HERE](
 http://dfu-util.sourceforge.net/build.html).
 
