@@ -170,6 +170,13 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 uint16_t gnrc_sixlowpan_frag_next_tag(void);
 
 /**
+ * @brief   Remove base entry
+ *
+ * @param[in,out] entry Entry to remove
+ */
+void gnrc_sixlowpan_frag_rbuf_base_rm(gnrc_sixlowpan_rbuf_base_t *entry);
+
+/**
  * @brief   Garbage collect reassembly buffer.
  */
 void gnrc_sixlowpan_frag_rbuf_gc(void);

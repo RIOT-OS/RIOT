@@ -60,8 +60,8 @@ static inline bool _rbuf_int_overlap_partially(gnrc_sixlowpan_rbuf_int_t *i,
 /* gets a free entry from interval buffer */
 static gnrc_sixlowpan_rbuf_int_t *_rbuf_int_get_free(void);
 /* update interval buffer of entry */
-static bool _rbuf_update_ints(gnrc_sixlowpan_rbuf_t *entry, uint16_t offset,
-                              size_t frag_size);
+static bool _rbuf_update_ints(gnrc_sixlowpan_rbuf_base_t *entry,
+                              uint16_t offset, size_t frag_size);
 /* gets an entry identified by its tupel */
 static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
                                         const void *dst, size_t dst_len,
@@ -76,7 +76,34 @@ enum {
     RBUF_ADD_SUCCESS,
     RBUF_ADD_ERROR,
     RBUF_ADD_REPEAT,
+    RBUF_ADD_DUPLICATE,
 };
+
+static int _check_fragments(gnrc_sixlowpan_rbuf_base_t *entry,
+                            size_t frag_size, size_t offset)
+{
+    gnrc_sixlowpan_rbuf_int_t *ptr = entry->ints;
+
+    /* If the fragment overlaps another fragment and differs in either the size
+     * or the offset of the overlapped fragment, discards the datagram
+     * https://tools.ietf.org/html/rfc4944#section-5.3 */
+    while (ptr != NULL) {
+        if (_rbuf_int_overlap_partially(ptr, offset, offset + frag_size - 1)) {
+
+            /* "A fresh reassembly may be commenced with the most recently
+             * received link fragment"
+             * https://tools.ietf.org/html/rfc4944#section-5.3 */
+            return RBUF_ADD_REPEAT;
+        }
+        /* End was already checked in overlap check */
+        if (ptr->start == offset) {
+            DEBUG("6lo rbuf: fragment already in reassembly buffer");
+            return RBUF_ADD_DUPLICATE;
+        }
+        ptr = ptr->next;
+    }
+    return RBUF_ADD_SUCCESS;
+}
 
 void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
               size_t offset, unsigned page)
@@ -91,7 +118,6 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 {
     gnrc_sixlowpan_rbuf_t *entry;
     sixlowpan_frag_n_t *frag = pkt->data;
-    gnrc_sixlowpan_rbuf_int_t *ptr;
     uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
     size_t frag_size;
 
@@ -111,8 +137,6 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         gnrc_pktbuf_release(pkt);
         return RBUF_ADD_ERROR;
     }
-
-    ptr = entry->super.ints;
 
     /* dispatches in the first fragment are ignored */
     if (offset == 0) {
@@ -134,30 +158,20 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         return RBUF_ADD_ERROR;
     }
 
-    /* If the fragment overlaps another fragment and differs in either the size
-     * or the offset of the overlapped fragment, discards the datagram
-     * https://tools.ietf.org/html/rfc4944#section-5.3 */
-    while (ptr != NULL) {
-        if (_rbuf_int_overlap_partially(ptr, offset, offset + frag_size - 1)) {
+    switch (_check_fragments(&entry->super, frag_size, offset)) {
+        case RBUF_ADD_REPEAT:
             DEBUG("6lo rfrag: overlapping intervals, discarding datagram\n");
             gnrc_pktbuf_release(entry->pkt);
             rbuf_rm(entry);
-
-            /* "A fresh reassembly may be commenced with the most recently
-             * received link fragment"
-             * https://tools.ietf.org/html/rfc4944#section-5.3 */
             return RBUF_ADD_REPEAT;
-        }
-        /* End was already checked in overlap check */
-        if (ptr->start == offset) {
-            DEBUG("6lo rbuf: fragment already in reassembly buffer");
+        case RBUF_ADD_DUPLICATE:
             gnrc_pktbuf_release(pkt);
             return RBUF_ADD_SUCCESS;
-        }
-        ptr = ptr->next;
+        default:
+            break;
     }
 
-    if (_rbuf_update_ints(entry, offset, frag_size)) {
+    if (_rbuf_update_ints(&entry->super, offset, frag_size)) {
         DEBUG("6lo rbuf: add fragment data\n");
         entry->super.current_size += (uint16_t)frag_size;
         if (offset == 0) {
@@ -209,20 +223,12 @@ static gnrc_sixlowpan_rbuf_int_t *_rbuf_int_get_free(void)
 
 void rbuf_rm(gnrc_sixlowpan_rbuf_t *entry)
 {
-    while (entry->super.ints != NULL) {
-        gnrc_sixlowpan_rbuf_int_t *next = entry->super.ints->next;
-
-        entry->super.ints->start = 0;
-        entry->super.ints->end = 0;
-        entry->super.ints->next = NULL;
-        entry->super.ints = next;
-    }
-
+    gnrc_sixlowpan_frag_rbuf_base_rm(&entry->super);
     entry->pkt = NULL;
 }
 
-static bool _rbuf_update_ints(gnrc_sixlowpan_rbuf_t *entry, uint16_t offset,
-                              size_t frag_size)
+static bool _rbuf_update_ints(gnrc_sixlowpan_rbuf_base_t *entry,
+                              uint16_t offset, size_t frag_size)
 {
     gnrc_sixlowpan_rbuf_int_t *new;
     uint16_t end = (uint16_t)(offset + frag_size - 1);
@@ -238,15 +244,15 @@ static bool _rbuf_update_ints(gnrc_sixlowpan_rbuf_t *entry, uint16_t offset,
     new->end = end;
 
     DEBUG("6lo rfrag: add interval (%" PRIu16 ", %" PRIu16 ") to entry (%s, ",
-          new->start, new->end, gnrc_netif_addr_to_str(entry->super.src,
-                                                       entry->super.src_len,
+          new->start, new->end, gnrc_netif_addr_to_str(entry->src,
+                                                       entry->src_len,
                                                        l2addr_str));
-    DEBUG("%s, %u, %u)\n", gnrc_netif_addr_to_str(entry->super.dst,
-                                                  entry->super.dst_len,
+    DEBUG("%s, %u, %u)\n", gnrc_netif_addr_to_str(entry->dst,
+                                                  entry->dst_len,
                                                   l2addr_str),
-          (unsigned)entry->super.datagram_size, entry->super.tag);
+          entry->datagram_size, entry->tag);
 
-    LL_PREPEND(entry->super.ints, new);
+    LL_PREPEND(entry->ints, new);
 
     return true;
 }
