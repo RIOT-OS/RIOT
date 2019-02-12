@@ -246,15 +246,16 @@ static int cmd_test(int argc, char **argv)
     assert(eeprom_read_byte(EEPROM_SIZE / 2) == 'A');
 
     /* clear some bytes */
+    const uint8_t cleared[4] = {0, 0, 0, 0,};
     eeprom_clear(0, 4);
     memset(result, 0, 4);
     ret = eeprom_read(0, (uint8_t *)result, 4);
-    assert(strncmp(result, "", 4) == 0);
+    assert(memcmp(result, cleared, 4) == 0);
     assert(ret == 4);
 
     eeprom_clear(EEPROM_SIZE - 4, 4);
     ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
-    assert(strncmp(result, "", 4) == 0);
+    assert(memcmp(result, cleared, 4) == 0);
     assert(ret == 4);
 
     /* set some bytes */
