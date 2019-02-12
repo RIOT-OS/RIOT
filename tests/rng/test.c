@@ -154,7 +154,7 @@ void test_distributions(uint32_t samples)
 
         /* count bits */
         for (int i = 0; i < 32; i++) {
-            if (value & (1 << i)) {
+            if (value & (UINT32_C(1) << i)) {
                 distributions[i]++;
             }
         }
