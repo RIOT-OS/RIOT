@@ -146,7 +146,8 @@ static inline _nib_onl_entry_t *_cache_out_onl_entry(const ipv6_addr_t *addr,
             res->mode = _NC;
         }
         /* requeue if not garbage collectible at the moment or queueing
-         * newly created NCE */
+         * newly created NCE or in case entry becomes garbage collectible
+         * again */
         clist_rpush(&_next_removable, (clist_node_t *)tmp);
         if (res == NULL) {
             /* no new entry created yet, get next entry in FIFO */
