@@ -224,7 +224,7 @@ static int cmd_test(int argc, char **argv)
     size_t ret = eeprom_write(0, (uint8_t *)expected, 4);
     assert(ret == 4);
 
-    char *result[4];
+    char result[4];
     ret = eeprom_read(0, (uint8_t *)result, 4);
     assert(strncmp((const char *)result, (const char *)expected, 4) == 0);
     assert(ret == 4);
