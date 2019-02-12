@@ -81,6 +81,43 @@ void _snd_uc_ns(_nib_onl_entry_t *nbr, bool reset);
 void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                    const icmpv6_hdr_t *icmpv6, const ndp_opt_t *sl2ao);
 
+/**
+ * @brief   Calculates truncated exponential back-off for retransmission timer
+ *          for neighbor solicitations based on a randomized factor
+ *
+ * The truncation is at @ref NDP_MAX_RETRANS_TIMER_MS. as suggested in
+ * [RFC 7048, section 3](https://tools.ietf.org/html/rfc7048#section-3).
+ *
+ * @param[in] ns_sent       Neighbor solicitations sent up until now. Must be
+ *                          lesser than or equal to @ref NDP_MAX_NS_NUMOF.
+ * @param[in] retrans_timer Currently configured retransmission timer in ms.
+ * @param[in] factor        An equally distributed factor between
+ *                          @ref NDP_MIN_RANDOM_FACTOR and (exclusive)
+ *                          @ref NDP_MAX_RANDOM_FACTOR.
+ *
+ * @pre (NDP_MIN_RANDOM_FACTOR <= factor < NDP_MAX_RANDOM_FACTOR)
+ * @pre (ns_sent <= NDP_MAX_NS_NUMOF)
+ *
+ * @return  exponential back-off of the retransmission timer
+ */
+static inline uint32_t _exp_backoff_retrans_timer_factor(uint8_t ns_sent,
+                                                         uint32_t retrans_timer,
+                                                         uint32_t factor)
+{
+    assert(NDP_MIN_RANDOM_FACTOR <= factor);
+    assert(factor < NDP_MAX_RANDOM_FACTOR);
+    assert(ns_sent <= NDP_MAX_NS_NUMOF);
+    /* backoff according to  https://tools.ietf.org/html/rfc7048 with
+     * BACKOFF_MULTIPLE == 2 */
+    uint32_t res = (uint32_t)(((uint64_t)(((uint32_t) 1) << ns_sent) *
+                               retrans_timer * factor) / US_PER_MS);
+    /* random factors were statically multiplied with 1000 */
+    if (res > NDP_MAX_RETRANS_TIMER_MS) {
+        res = NDP_MAX_RETRANS_TIMER_MS;
+    }
+    return res;
+}
+
 #if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
 /**
  * @brief   Handler for @ref GNRC_IPV6_NIB_SND_UC_NS and
