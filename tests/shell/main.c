@@ -78,6 +78,14 @@ int main(void)
     /* define own shell commands */
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
+    puts("shell exited (1)");
+
+    /* Restart the shell after the previous one exits, so that we can test
+     * ctrl-D exit */
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+
+    puts("shell exited (2)");
+
     /* or use only system shell commands */
     /*
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);

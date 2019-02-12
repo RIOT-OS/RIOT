@@ -50,6 +50,8 @@ CMDS = (
     ('help', EXPECTED_HELP),
     ('echo a string', ('\"echo\"\"a\"\"string\"')),
     ('ps', EXPECTED_PS),
+    ('reboot', ('test_shell.')),
+    (CONTROL_D, ('shell exited (1)')),
     ('garbage1234'+CONTROL_C, ('>')),  # test cancelling a line
     ('help', EXPECTED_HELP),
     ('reboot', ('test_shell.'))
