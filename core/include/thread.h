@@ -314,6 +314,39 @@ struct _thread {
 /** @} */
 
 /**
+ * @name Types and macros used for thread signaling
+ * @{
+ */
+
+/**
+ * @brief   Static initializer for @ref thread_signal_t
+ * @warning The active thread will be marked as received when this initializer
+ *          is used
+ */
+#define THREAD_SIGNAL_INIT              { .pid = sched_active_pid, .status = THREAD_AWAIT_SIGNAL }
+
+/**
+ * @brief Status used to control whether @ref thread_await_signal will block or
+ *        return right away
+ */
+typedef enum {
+    THREAD_AWAIT_SIGNAL,            /**< @ref thread_await_signal will await the signal */
+    THREAD_SIGNAL_RECEIVED,         /**< signal received, no waiting required */
+    THREAD_SIGNAL_STATUS_NUMOF      /**< number of elements */
+} thread_signal_status_t;
+
+/**
+ * @brief Structure holding the data used by @ref thread_signal and
+ *        @ref thread_await_signal
+ */
+typedef struct {
+    kernel_pid_t pid;               /**< Thread to signal */
+    thread_signal_status_t status;  /**< Was signal received already? */
+} thread_signal_t;
+
+/** @} */
+
+/**
  * @brief Creates a new thread.
  *
  * For an in-depth discussion of thread priorities, behavior and and flags,
@@ -365,9 +398,23 @@ volatile thread_t *thread_get(kernel_pid_t pid);
 int thread_getstatus(kernel_pid_t pid);
 
 /**
+ * @brief   Wait to be signaled via @ref thread_signal unless the signal already
+ *          came in
+ *
+ * @param[in,out]   signal  Structure used to pass the signal
+ *
+ * If @p signal indicates at least one signal was already received since last
+ * call this function will return directly.
+ */
+void thread_await_signal(thread_signal_t *signal);
+
+/**
  * @brief Puts the current thread into sleep mode. Has to be woken up externally.
  */
-void thread_sleep(void);
+static inline void thread_sleep(void)
+{
+    thread_await_signal(NULL);
+}
 
 /**
  * @brief   Lets current thread yield.
@@ -397,6 +444,31 @@ void thread_yield(void);
 void thread_yield_higher(void);
 
 /**
+ * @brief Signal a thread that waits using @ref thread_await_signal
+ *
+ * @param[in,out]   signal  Structure used to pass the signal
+ * @retval          1       Woke awaiting thread up
+ * @retval          0       Thread not awaiting signal yet, next call to
+ *                          @ref thread_await_signal will return immediately
+ * @retval          -ESRCH  Thread to be signaled not found
+ *
+ * If the signaled thread is not yet awaiting the signal yet, @p signal will be
+ * modified so that the next call to @ref thread_await_signal
+ */
+int thread_signal(thread_signal_t *signal);
+
+/**
+ * @brief Initialize the signal data structure
+ * @param[out]  signal      Structure to initialize
+ * @param[in]   pid         PID of the thread that will await the signal
+ */
+static inline void thread_signal_init(thread_signal_t *signal, kernel_pid_t pid)
+{
+    signal->status = THREAD_AWAIT_SIGNAL;
+    signal->pid = pid;
+}
+
+/**
  * @brief Wakes up a sleeping thread.
  *
  * @param[in] pid   the PID of the thread to be woken up
@@ -404,7 +476,11 @@ void thread_yield_higher(void);
  * @return          `1` on success
  * @return          `STATUS_NOT_FOUND` if pid is unknown or not sleeping
  */
-int thread_wakeup(kernel_pid_t pid);
+static inline int thread_wakeup(kernel_pid_t pid)
+{
+    thread_signal_t sig = { .pid = pid, .status = THREAD_AWAIT_SIGNAL };
+    return (thread_signal(&sig) >= 0) ? 1 : STATUS_NOT_FOUND;
+}
 
 /**
  * @brief Returns the process ID of the currently running thread

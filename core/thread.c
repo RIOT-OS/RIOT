@@ -55,45 +55,56 @@ const char *thread_getname(kernel_pid_t pid)
 #endif
 }
 
-void thread_sleep(void)
+void thread_await_signal(thread_signal_t *signal)
 {
     if (irq_is_in()) {
         return;
     }
 
     unsigned state = irq_disable();
+    if (signal) {
+        signal->pid = sched_active_pid;
+        if (signal->status == THREAD_SIGNAL_RECEIVED) {
+            irq_restore(state);
+            return;
+        }
+    }
     sched_set_status((thread_t *)sched_active_thread, STATUS_SLEEPING);
     irq_restore(state);
     thread_yield_higher();
 }
 
-int thread_wakeup(kernel_pid_t pid)
+int thread_signal(thread_signal_t *signal)
 {
-    DEBUG("thread_wakeup: Trying to wakeup PID %" PRIkernel_pid "...\n", pid);
-
+    assert(signal);
+    DEBUG("thread_signal: Trying to wakeup PID %" PRIkernel_pid "...\n",
+          signal->pid);
     unsigned old_state = irq_disable();
+    int retval = 0;
 
-    thread_t *other_thread = (thread_t *) thread_get(pid);
+    thread_t *other_thread = (thread_t *) thread_get(signal->pid);
+
+    signal->status = THREAD_SIGNAL_RECEIVED;
 
     if (!other_thread) {
-        DEBUG("thread_wakeup: Thread does not exist!\n");
+        DEBUG("thread_signal: Thread does not exist!\n");
+        retval = -ESRCH;
     }
     else if (other_thread->status == STATUS_SLEEPING) {
-        DEBUG("thread_wakeup: Thread is sleeping.\n");
+        DEBUG("thread_signal: Thread is sleeping.\n");
 
         sched_set_status(other_thread, STATUS_RUNNING);
-
         irq_restore(old_state);
         sched_switch(other_thread->priority);
 
         return 1;
     }
     else {
-        DEBUG("thread_wakeup: Thread is not sleeping!\n");
+        DEBUG("thread_signal: Thread is not sleeping.\n");
     }
 
     irq_restore(old_state);
-    return (int)STATUS_NOT_FOUND;
+    return retval;
 }
 
 void thread_yield(void)
