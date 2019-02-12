@@ -152,7 +152,11 @@ static inline _nib_onl_entry_t *_cache_out_onl_entry(const ipv6_addr_t *addr,
             /* no new entry created yet, get next entry in FIFO */
             tmp = (_nib_onl_entry_t *)clist_lpop(&_next_removable);
         }
-    } while ((tmp != first) && (res != NULL));
+    } while ((tmp != first) && (res == NULL));
+    if (res == NULL) {
+        /* we did not find any removable entry => requeue current one */
+        clist_rpush(&_next_removable, (clist_node_t *)tmp);
+    }
     return res;
 }
 
