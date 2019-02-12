@@ -86,7 +86,7 @@ Following image shows the pinout of all WEMOS LOLIN D1 mini boards. It is compat
 
 ## <a name="nodemcu_devkit_esp8266"> NodeMCU DEVKIT </a>
 
-NodeMCU DEVKIT is an open-source hardware project hosted on [GitHub](ttps://github.com/nodemcu/nodemcu-devkit-v1.0). Therefore, there are a lot of clones available. The board was originally designed for NodeMCU firmware development.
+NodeMCU DEVKIT is an open-source hardware project hosted on [GitHub](https://github.com/nodemcu/nodemcu-devkit-v1.0). Therefore, there are a lot of clones available. The board was originally designed for NodeMCU firmware development.
 
 As the other boards described here, NodeMCU ESP12 is generic board that uses ESP-12E module and breaks out all available GPIO pins. It has a Micro-USB port including a flash/boot/reset logic which makes flashing much easier.
 
