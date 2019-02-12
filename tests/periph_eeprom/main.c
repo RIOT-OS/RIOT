@@ -224,9 +224,9 @@ static int cmd_test(int argc, char **argv)
     size_t ret = eeprom_write(0, (uint8_t *)expected, 4);
     assert(ret == 4);
 
-    char *result[4];
+    char result[4];
     ret = eeprom_read(0, (uint8_t *)result, 4);
-    assert(strncmp((const char *)result, (const char *)expected, 4) == 0);
+    assert(memcmp(result, expected, 4) == 0);
     assert(ret == 4);
 
     /* read/write at end of EEPROM */
@@ -234,7 +234,7 @@ static int cmd_test(int argc, char **argv)
     assert(ret == 4);
     memset(result, 0, 4);
     ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
-    assert(strncmp((const char *)result, expected, 4) == 0);
+    assert(memcmp(result, expected, 4) == 0);
     assert(ret == 4);
 
     /* read/write single byte */
@@ -246,27 +246,31 @@ static int cmd_test(int argc, char **argv)
     assert(eeprom_read_byte(EEPROM_SIZE / 2) == 'A');
 
     /* clear some bytes */
+    const uint8_t cleared[4] = {
+        EEPROM_CLEAR_BYTE, EEPROM_CLEAR_BYTE,
+        EEPROM_CLEAR_BYTE, EEPROM_CLEAR_BYTE,
+    };
     eeprom_clear(0, 4);
     memset(result, 0, 4);
     ret = eeprom_read(0, (uint8_t *)result, 4);
-    assert(strncmp((const char *)result, "", 4) == 0);
+    assert(memcmp(result, cleared, 4) == 0);
     assert(ret == 4);
 
     eeprom_clear(EEPROM_SIZE - 4, 4);
     ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
-    assert(strncmp((const char *)result, "", 4) == 0);
+    assert(memcmp(result, cleared, 4) == 0);
     assert(ret == 4);
 
     /* set some bytes */
     eeprom_set(0, 'A', 4);
     ret = eeprom_read(0, (uint8_t *)result, 4);
-    assert(strncmp((const char *)result, "AAAA", 4) == 0);
+    assert(memcmp(result, "AAAA", 4) == 0);
     assert(ret == 4);
 
     memset(result, 0, 4);
     eeprom_set(EEPROM_SIZE - 4, 'A', 4);
     ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
-    assert(strncmp((const char *)result, "AAAA", 4) == 0);
+    assert(memcmp(result, "AAAA", 4) == 0);
     assert(ret == 4);
 
     puts("SUCCESS");
