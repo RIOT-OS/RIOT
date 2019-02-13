@@ -351,7 +351,7 @@ static int _handler_ep0_event(usbus_t *usbus, usbus_handler_t *handler, uint16_t
             /* Configure address if we have received one and handled the zlp */
             if (ep0_handler->setup_state == USBUS_SETUPRQ_INACK && ep->dir == USB_EP_DIR_IN) {
                 if (usbus->addr && usbus->state == USBUS_STATE_RESET) {
-                    usbdev_set(usbus->dev, USBOPT_ADDRESS, &usbus->addr, sizeof(uint8_t));
+                    usbdev_set(usbus->dev, USBOPT_ADDRESS, &usbus->addr, sizeof(usbus->addr));
                     /* Address configured */
                     usbus->state = USBUS_STATE_ADDR;
                     DEBUG("Setting addres %u\n", usbus->addr);
