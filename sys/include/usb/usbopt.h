@@ -35,10 +35,12 @@ extern "c" {
  * data type to use for the argument when getting/setting the value of the option.
  */
 typedef enum {
+
     /**
      * @brief   (uint8_t) USB device address, limited to 7 bit by the protocol
      */
     USBOPT_ADDRESS,
+
     /**
      * @brief   (usbopt_enable_t) Attach/detach USB peripheral to host
      *
@@ -46,18 +48,21 @@ typedef enum {
      * on one of the data lines.
      */
     USBOPT_ATTACH,
+
     /**
      * @brief   (usb_version_t) Highest USB version supported by peripheral
      *
      * Setting this option must return -ENOTSUP
      */
     USBOPT_MAX_VERSION,
+
     /**
      * @brief   (usb_version_t) Highest USB speed supported by peripheral
      *
      * Setting this option must return -ENOTSUP
      */
     USBOPT_MAX_SPEED,
+
     /* expand list if required */
 } usbopt_t;
 
@@ -68,18 +73,12 @@ typedef enum {
  * data type to use for the argument when getting/setting the value of the option.
  */
 typedef enum {
+
     /**
      * @brief   (usbopt_enable_t) Enable or disable the endpoint
      */
     USBOPT_EP_ENABLE,
-    /**
-     * @brief   (uint8_t*) Configure the endpoint buffer address
-     */
-    USBOPT_EP_BUF_ADDR,
-    /**
-     * @brief   (size_t) Configure the endpoint buffer size
-     */
-    USBOPT_EP_BUF_SIZE,
+
     /**
      * @brief   (usbopt_enable_t) Enable or disable stall replies for endpoint
      */
@@ -94,6 +93,7 @@ typedef enum {
      * @brief   (size_t) Retrieve number of bytes available on endpoint.
      */
     USBOPT_EP_AVAILABLE,
+
     /* expand list if required */
 } usbopt_ep_t;
 
