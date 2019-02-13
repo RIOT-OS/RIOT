@@ -219,7 +219,7 @@ size_t usbus_hdrs_fmt_conf(usbus_t *usbus)
 {
     size_t len = 0;
     usb_descriptor_configuration_t conf;
-    memset(&conf, 0,sizeof(usb_descriptor_configuration_t));
+    memset(&conf, 0, sizeof(usb_descriptor_configuration_t));
     conf.length = sizeof(usb_descriptor_configuration_t);
     conf.type = USB_TYPE_DESCRIPTOR_CONFIGURATION;
     conf.total_length = sizeof(usb_descriptor_configuration_t);
