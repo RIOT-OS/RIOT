@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include "cpu.h"
 #include "usb/usbdev.h"
 
 #ifdef __cplusplus
@@ -42,19 +43,26 @@ extern "C" {
  */
 #define SAM_USB_NUM_EP      USBDEV_NUM_ENDPOINTS
 
+/**
+ * @brief sam0 usb peripheral device context
+ */
 typedef struct {
-    usbdev_t usbdev;
-    size_t used;                        /**< Number of bytes from the
-                                             buffer that are used */
-    uint8_t buffer[SAM_USB_BUF_SPACE];  /**< Buffer space */
+    usbdev_t usbdev;                             /**< Inherited usbdev struct */
+    UsbDeviceDescBank banks[2 * SAM_USB_NUM_EP]; /**< Device descriptor banks */
+    usbdev_ep_t endpoints[2 * SAM_USB_NUM_EP];   /**< Endpoints */
+    UsbDevice *device;                           /**< Ptr to sam0 usb device
+                                                      registers */
+    size_t used;                                 /**< Number of bytes from the
+                                                      buffer that are used */
+    uint8_t buffer[SAM_USB_BUF_SPACE];           /**< Buffer space */
 } sam0_common_usb_t;
 
 /**
  * @brief sam0 common device state setup function
  *
- * @param samusb    sam usb context to initialize
+ * @param usbdev    usb device context to initialize
  */
-void sam_usbdev_setup(sam0_common_usb_t *samusb);
+void sam_usbdev_setup(sam0_common_usb_t *usbdev);
 
 #ifdef __cplusplus
 }
