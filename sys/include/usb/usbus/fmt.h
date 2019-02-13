@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    usb_usbus_hdrs USBUS header functions
+ * @defgroup    usb_usbus_fmt USBUS descriptor formatter functions
  * @ingroup     usb_usbus
  *
  * @{
  *
  * @file
- * @brief       USBUS header formatter functions
+ * @brief       USBUS descriptor formatter functions
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
@@ -29,11 +29,13 @@
 extern "C" {
 #endif
 
-size_t usbus_hdrs_config_size(usbus_t *usbus);
-size_t usbus_hdrs_fmt_hdrs(usbus_t *usbus);
-size_t usbus_hdrs_fmt_additional(usbus_t *usbus, usbus_hdr_gen_t *hdr);
-size_t usbus_hdrs_fmt_ifaces(usbus_t *usbus);
-size_t usbus_hdrs_fmt_endpoints(usbus_t *usbus, usbus_endpoint_t *ep);
+/**
+ * @brief generator for the USB configuration descriptor
+ *
+ * @param[in]   usbus   USBUS context
+ *
+ * @return      the generated descriptor size in bytes
+ */
 size_t usbus_hdrs_fmt_conf(usbus_t *usbus);
 
 #ifdef __cplusplus
