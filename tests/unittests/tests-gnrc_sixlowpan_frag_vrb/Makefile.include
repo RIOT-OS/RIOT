@@ -1,0 +1,2 @@
+USEMODULE += gnrc_sixlowpan_frag_vrb
+USEMODULE += xtimer
