@@ -326,9 +326,9 @@ struct usbus {
     usbus_interface_t *iface;     /**< List of USB interfaces                */
     usbus_handler_t *handlers;    /**< List of event callback handlers       */
     kernel_pid_t pid;             /**< PID of the usb manager's thread       */
-    uint16_t addr;                /**< Address of the USB peripheral         */
-    usbus_state_t state;          /**< Current state                         */
     uint16_t str_idx;             /**< Number of strings registered          */
+    usbus_state_t state;          /**< Current state                         */
+    uint8_t addr;                 /**< Address of the USB peripheral         */
 };
 
 /**
