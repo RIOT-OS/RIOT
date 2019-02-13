@@ -46,7 +46,7 @@ static void *_usbus_thread(void *args);
 void usbus_init(usbus_t *usbus, usbdev_t *usbdev)
 {
     /* TODO: Check if memset works/is necessary */
-    memset(usbus, 0, sizeof(usbus));
+    memset(usbus, 0, sizeof(usbus_t));
     usbus->dev = usbdev;
 }
 
