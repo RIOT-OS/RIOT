@@ -62,7 +62,8 @@ extern "c" {
 /**
  * @brief USB peripheral device version
  *
- * Should not be confused with the USB version
+ * This is the version number of this peripheral
+ * @note Not to be be confused with the USB version number
  */
 #ifndef USB_CONFIG_PRODUCT_BCDVERSION
 #define USB_CONFIG_PRODUCT_BCDVERSION   "0x0100"
@@ -88,22 +89,6 @@ extern "c" {
 #ifndef USB_CONFIG_DEFAULT_LANGID
 #define USB_CONFIG_DEFAULT_LANGID   0x0409 /* EN-US */
 #endif
-
-/**
- * @brief USB device class numbers
- * @{
- */
-#define USB_CLASS_AUDIO             0x01    /**< Audio device               */
-#define USB_CLASS_CDC_CONTROL       0x02    /**< CDC control interface      */
-#define USB_CLASS_HID               0x03    /**< Human Interface device     */
-#define USB_CLASS_PHYSICAL          0x05    /**< Physical device class      */
-#define USB_CLASS_IMAGE             0x06    /**< Image device class         */
-#define USB_CLASS_PRINTER           0x07    /**< Printer device class       */
-#define USB_CLASS_MASS_STORAGE      0x08    /**< Mass storage device class  */
-#define USB_CLASS_CDC_DATA          0x0a    /**< CDC data specification     */
-#define USB_CLASS_VENDOR            0xff    /**< Vendor specific class      */
-/** @} */
-
 
 /**
  * @brief USB version definitions
