@@ -66,7 +66,7 @@ void *dma_memcpy(void *dst, const void *src, size_t len)
         /* Both dst and src are odd, copy one byte and copy the rest */
         /* word-aligned                                              */
         *(char *)dst++ = *(char *)src++;
-        --len;
+        --(char *)len;
 
         // word transfer
         dma0sz = len / 2;
