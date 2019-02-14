@@ -440,12 +440,13 @@ static void _handle_rtr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     assert(netif != NULL);
     /* check validity, see: https://tools.ietf.org/html/rfc4861#section-6.1.1 */
     /* checksum is checked by GNRC's ICMPv6 module */
-    if (!(gnrc_netif_is_rtr(netif)) || (ipv6->hl != 255U) ||
+    if (!(gnrc_netif_is_rtr(netif)) || (ipv6->hl != NDP_HOP_LIMIT) ||
         (rtr_sol->code != 0U) || (icmpv6_len < sizeof(ndp_rtr_sol_t))) {
         DEBUG("nib: Received router solicitation is invalid (or interface %i "
               "is not a forwarding interface). Discarding silently\n",
               netif->pid);
-        DEBUG("     - IP Hop Limit: %u (should be 255)\n", ipv6->hl);
+        DEBUG("     - IP Hop Limit: %u (should be %u)\n", ipv6->hl,
+              NDP_HOP_LIMIT);
         DEBUG("     - ICMP code: %u (should be 0)\n", rtr_sol->code);
         DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
               (unsigned)sizeof(ndp_rtr_sol_t));
@@ -549,13 +550,14 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     /* check validity, see: https://tools.ietf.org/html/rfc4861#section-6.1.1 */
     /* checksum is checked by GNRC's ICMPv6 module */
     if (!(ipv6_addr_is_link_local(&ipv6->src)) ||
-        (ipv6->hl != 255U) || (rtr_adv->code != 0U) ||
+        (ipv6->hl != NDP_HOP_LIMIT) || (rtr_adv->code != 0U) ||
         (icmpv6_len < sizeof(ndp_rtr_adv_t)) ||
         (!gnrc_netif_is_6ln(netif) &&
          (byteorder_ntohs(rtr_adv->ltime) > NDP_RTR_ADV_LTIME_SEC_MAX))) {
         DEBUG("nib: Received router advertisement is invalid. "
               "Discarding silently\n");
-        DEBUG("     - IP Hop Limit: %u (should be 255)\n", ipv6->hl);
+        DEBUG("     - IP Hop Limit: %u (should be %u)\n", ipv6->hl,
+              NDP_HOP_LIMIT);
         DEBUG("     - ICMP code: %u (should be 0)\n", rtr_adv->code);
         DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
               (unsigned)sizeof(ndp_rtr_adv_t));
@@ -819,7 +821,7 @@ static void _send_delayed_nbr_adv(const gnrc_netif_t *netif,
     if ((payload = _check_release_pkt(pkt, payload)) == NULL) {
         return;
     }
-    ((ipv6_hdr_t *)payload->data)->hl = 255;
+    ((ipv6_hdr_t *)payload->data)->hl = NDP_HOP_LIMIT;
     pkt = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
     if ((pkt = _check_release_pkt(pkt, payload)) == NULL) {
         return;
@@ -839,13 +841,14 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 
     /* check validity, see: https://tools.ietf.org/html/rfc4861#section-7.1.1 */
     /* checksum is checked by GNRC's ICMPv6 module */
-    if ((ipv6->hl != 255U) || (nbr_sol->code != 0U) ||
+    if ((ipv6->hl != NDP_HOP_LIMIT) || (nbr_sol->code != 0U) ||
         (icmpv6_len < sizeof(ndp_nbr_sol_t)) ||
         ipv6_addr_is_multicast(&nbr_sol->tgt) ||
         (ipv6_addr_is_unspecified(&ipv6->src) &&
          !ipv6_addr_is_solicited_node(&ipv6->dst))) {
         DEBUG("nib: Received neighbor solicitation is invalid. Discarding silently\n");
-        DEBUG("     - IP Hop Limit: %u (should be 255)\n", ipv6->hl);
+        DEBUG("     - IP Hop Limit: %u (should be %u)\n", ipv6->hl,
+              NDP_HOP_LIMIT);
         DEBUG("     - ICMP code: %u (should be 0)\n", nbr_sol->code);
         DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
               (unsigned)sizeof(ndp_nbr_sol_t));
@@ -972,13 +975,14 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 
     /* check validity, see: https://tools.ietf.org/html/rfc4861#section-7.1.2 */
     /* checksum is checked by GNRC's ICMPv6 module */
-    if ((ipv6->hl != 255U) || (nbr_adv->code != 0U) ||
+    if ((ipv6->hl != NDP_HOP_LIMIT) || (nbr_adv->code != 0U) ||
         (icmpv6_len < sizeof(ndp_nbr_adv_t)) ||
         ipv6_addr_is_multicast(&nbr_adv->tgt) ||
         (ipv6_addr_is_multicast(&ipv6->dst) &&
          (nbr_adv->flags & NDP_NBR_ADV_FLAGS_S))) {
         DEBUG("nib: Received neighbor advertisement is invalid. Discarding silently\n");
-        DEBUG("     - IP Hop Limit: %u (should be 255)\n", ipv6->hl);
+        DEBUG("     - IP Hop Limit: %u (should be %u)\n", ipv6->hl,
+              NDP_HOP_LIMIT);
         DEBUG("     - ICMP code: %u (should be 0)\n", nbr_adv->code);
         DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
               (unsigned)sizeof(ndp_nbr_adv_t));

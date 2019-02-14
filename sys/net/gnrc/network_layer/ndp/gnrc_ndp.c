@@ -601,7 +601,7 @@ static gnrc_pktsnip_t *_build_headers(gnrc_netif_t *netif,
         DEBUG("ndp: error allocating IPv6 header.\n");
         return NULL;
     }
-    ((ipv6_hdr_t *)iphdr->data)->hl = 255;
+    ((ipv6_hdr_t *)iphdr->data)->hl = NDP_HOP_LIMIT;
     /* add netif header for send interface specification */
     l2hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
     if (l2hdr == NULL) {

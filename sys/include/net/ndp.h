@@ -194,6 +194,18 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Hop-limit required for most NDP messages to ensure link-local
+ *          communication
+ *
+ * @see     [RFC 4861, section 4.1](https://tools.ietf.org/html/rfc4861#section-4.1)
+ * @see     [RFC 4861, section 4.2](https://tools.ietf.org/html/rfc4861#section-4.2)
+ * @see     [RFC 4861, section 4.3](https://tools.ietf.org/html/rfc4861#section-4.3)
+ * @see     [RFC 4861, section 4.4](https://tools.ietf.org/html/rfc4861#section-4.4)
+ * @see     [RFC 4861, section 4.5](https://tools.ietf.org/html/rfc4861#section-4.5)
+ */
+#define NDP_HOP_LIMIT               (255U)
+
+/**
  * @brief   Router solicitation message format.
  * @extends icmpv6_hdr_t
  *
