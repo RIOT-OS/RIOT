@@ -1,0 +1,9 @@
+/**
+ * @defgroup        cpu_msp430fr59xx MSP430FR59XX
+ * @ingroup         cpu
+ * @brief           TI MSP430FR MCU specific implementation.
+ *
+ * This module contains MSP430FR specific code and definition.
+ *
+ * @see cpu_msp430_common
+ */
