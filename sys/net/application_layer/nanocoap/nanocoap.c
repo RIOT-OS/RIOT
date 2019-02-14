@@ -901,7 +901,7 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
     slicer->cur = 0;
 }
 
-void coap_block2_finish(coap_block_slicer_t *slicer)
+void coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
 {
     assert(slicer->opt);
 
@@ -910,9 +910,16 @@ void coap_block2_finish(coap_block_slicer_t *slicer)
      * it's already in the buffer. So just point past the option. */
     uint8_t *pos = slicer->opt + 1;
     uint16_t delta = _decode_value(*slicer->opt >> 4, &pos, slicer->opt + 3);
-    int more = (slicer->cur > slicer->end) ? 1 : 0;
 
-    coap_opt_put_block2(slicer->opt, COAP_OPT_BLOCK2 - delta, slicer, more);
+    /* Calculate the block uint value inline here rather than through
+     * coap_opt_put_block(). Conserves stack and avoids importing Buffer API
+     * functions when using Packet API. */
+    uint32_t blkopt = (_slicer_blknum(slicer) << 4);
+    blkopt |= _size2szx(slicer->end - slicer->start);
+    blkopt |= ((slicer->cur > slicer->end) ? 0x8 : 0);
+    size_t olen = _encode_uint(&blkopt);
+
+    coap_put_option(slicer->opt, option - delta, option, (uint8_t *)&blkopt, olen);
 }
 
 ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,

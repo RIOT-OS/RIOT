@@ -554,17 +554,50 @@ void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
                             int more);
 
 /**
+ * @brief Finish a block request (block1 or block2)
+ *
+ * This function finalizes the block response header
+ *
+ * Checks whether the `more` bit should be set in the block option and
+ * sets/clears it if required.  Doesn't return the number of bytes, as this
+ * function overwrites bytes in the packet rather than adding new.
+ *
+ * @param[in]     slicer      Preallocated slicer struct to use
+ * @param[in]     option      option number (block1 or block2)
+ */
+void coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
+
+/**
+ * @brief Finish a block1 request
+ *
+ * This function finalizes the block1 response header
+ *
+ * Checks whether the `more` bit should be set in the block1 option and
+ * sets/clears it if required.  Doesn't return the number of bytes, as this
+ * function overwrites bytes in the packet rather than adding new.
+ *
+ * @param[in]     slicer      Preallocated slicer struct to use
+ */
+static inline void coap_block1_finish(coap_block_slicer_t *slicer)
+{
+    coap_block_finish(slicer, COAP_OPT_BLOCK1);
+}
+
+/**
  * @brief Finish a block2 response
  *
  * This function finalizes the block2 response header
  *
  * Checks whether the `more` bit should be set in the block2 option and
- * sets/clears it if required.  Doesn't return the number of bytes as this
- * overwrites bytes in the packet, it doesn't add new bytes to the packet.
+ * sets/clears it if required.  Doesn't return the number of bytes, as this
+ * function overwrites bytes in the packet rather than adding new.
  *
- * @param[inout]  slicer      Preallocated slicer struct to use
+ * @param[in]     slicer      Preallocated slicer struct to use
  */
-void coap_block2_finish(coap_block_slicer_t *slicer);
+static inline void coap_block2_finish(coap_block_slicer_t *slicer)
+{
+    coap_block_finish(slicer, COAP_OPT_BLOCK2);
+}
 
 /**
  * @brief Initialize a block2 slicer struct for writing the payload
