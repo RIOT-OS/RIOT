@@ -53,20 +53,20 @@ typedef uint16_t gpio_t;
  */
 #define HAVE_GPIO_ISR_CTX_T
 typedef struct {
-    void (*cb)(void *arg);   /**< interrupt callback */
-    void *arg;               /**< optional argument */
-    bool both_edges;         /**< detect both rising and falling edges */
+    void (*cb)(void *arg);      /**< interrupt callback */
+    void *arg;                  /**< optional argument */
+    bool both_edges;            /**< detect both rising and falling edges */
 } gpio_isr_ctx_t;
 
 /**
  * @brief   Available ports on MSP430 platforms
  */
 enum {
-    P1 = 1,                 /**< PORT 1 */
-    P2 = 2,                 /**< PORT 2 */
-    P3 = 3,                 /**< PORT 3 */
-    P4 = 4,                 /**< PORT 4 */
-    PJ = 5,                 /**< PORT J */
+    P1  = 1,                /**< PORT 1 */
+    P2  = 2,                /**< PORT 2 */
+    P3  = 3,                /**< PORT 3 */
+    P4  = 4,                /**< PORT 4 */
+    PJ  = 5,                /**< PORT J */
 };
 
 /**

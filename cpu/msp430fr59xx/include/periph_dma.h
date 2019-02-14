@@ -29,7 +29,7 @@
 extern "C" {
 #endif
 
-/** 
+/**
  * @brief Fill the first 'len' bytes of 'dst' with the constant byte 'val'
  *
  * The CPU is halted during the DMA transfer.
@@ -37,9 +37,9 @@ extern "C" {
  * @return                  'dst' on success
  * @return                  NULL  on failure (wrong size, alignment)
  */
-void* dma_memset(void* dst, unsigned char val, size_t len);
+void *dma_memset(void *dst, unsigned char val, size_t len);
 
-/** 
+/**
  * @brief Copy 'len' bytes from 'src' to 'dst' via DMA
  *
  * The memory areas must not overlap. The CPU is halted during the DMA transfer.
@@ -47,7 +47,7 @@ void* dma_memset(void* dst, unsigned char val, size_t len);
  * @return                  'dst' on success
  * @return                  NULL  on failure (wrong size, alignment)
  */
-void* dma_memcpy(void* dst, const void* src, size_t len);
+void *dma_memcpy(void *dst, const void *src, size_t len);
 
 #ifdef __cplusplus
 }
