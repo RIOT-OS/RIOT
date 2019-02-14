@@ -35,6 +35,8 @@ extern "C" {
 #define SEEK_CUR	1	/* Seek from current position.  */
 #define SEEK_END	2	/* Seek from end of file.  */
 
+// getchar is a define in MSP430-ELF-GCC
+#undef getchar
 int getchar(void);
 
 #ifdef __cplusplus

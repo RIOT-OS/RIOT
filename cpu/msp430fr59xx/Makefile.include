@@ -1,0 +1,4 @@
+include $(RIOTCPU)/msp430_common/Makefile.include
+
+export USEMODULE += periph periph_common periph_gpio periph_gpio_irq newlib_syscalls_default
+export FEATURES_REQUIRED += periph_dma 
