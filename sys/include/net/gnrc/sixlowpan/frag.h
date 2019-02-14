@@ -92,7 +92,6 @@ typedef struct {
     size_t datagram_size;   /**< Length of just the (uncompressed) IPv6 packet to be fragmented */
     uint16_t offset;        /**< Offset of the Nth fragment from the beginning of the
                              *   payload datagram */
-    kernel_pid_t pid;       /**< PID of the interface */
 } gnrc_sixlowpan_msg_frag_t;
 
 /**
