@@ -47,9 +47,9 @@ extern "C"
  * @name    DMA configuration
  * @{
  */
-#define DMA_MODULE  ((msp_dma_t*)DMA_BASE)
+#define DMA_MODULE  ((msp_dma_t *)DMA_BASE)
 #define DMA_CHAN    3
-#define DMA_CHAN_0   ((msp_dma_channel_t*)(((char*)DMA_BASE) + 0x10))
+#define DMA_CHAN_0   ((msp_dma_channel_t *)(((char *)DMA_BASE) + 0x10))
 /** @} */
 
 /**
@@ -57,7 +57,7 @@ extern "C"
  * @{
  */
 #define TIMER_NUMOF         1U
-#define TIMER_BASE          ((msp_timer_t*)TIMER_A0_BASE)
+#define TIMER_BASE          ((msp_timer_t *)TIMER_A0_BASE)
 #define TIMER_CHAN          3
 #define TIMER_ISR_CC0       TIMER0_A0_VECTOR
 #define TIMER_ISR_CCX       TIMER0_A1_VECTOR
@@ -72,7 +72,7 @@ extern "C"
 #define UART_0_EN           (1U)
 
 #define UART_USE_USCI
-#define UART_BASE           ((msp_usci_t*)EUSCI_A0_BASE)
+#define UART_BASE           ((msp_usci_t *)EUSCI_A0_BASE)
 #define UART_IE             UCA0IE
 #define UART_IE_RX_BIT      UCRXIE
 #define UART_IE_TX_BIT      UCTXIE

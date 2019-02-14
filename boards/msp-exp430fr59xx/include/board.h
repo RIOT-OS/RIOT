@@ -15,11 +15,11 @@
  * @ingroup     boards
  * @brief       Support for the Wolverine board.
  *
-<h2>Components</h2>
-\li MSP430FR5969
+   <h2>Components</h2>
+   \li MSP430FR5969
 
-* @{
-*
+ * @{
+ *
  * @file
  * @brief       Wolverine board configuration
  *
@@ -51,13 +51,13 @@ extern "C" {
 #define LED0_PIN        GPIO_PIN(P4, 6)
 #define LED1_PIN        GPIO_PIN(P1, 0)
 
-#define LED0_ON()       do { P4OUT |= BIT6; } while(0)
-#define LED0_OFF()      do { P4OUT &= ~BIT6; } while(0)
-#define LED0_TOGGLE()   do { P4OUT ^= BIT6; } while(0)
+#define LED0_ON()       do { P4OUT |= BIT6; } while (0)
+#define LED0_OFF()      do { P4OUT &= ~BIT6; } while (0)
+#define LED0_TOGGLE()   do { P4OUT ^= BIT6; } while (0)
 
-#define LED1_ON()       do { P1OUT |= BIT0; } while(0)
-#define LED1_OFF()      do { P1OUT &= ~BIT0; } while(0)
-#define LED1_TOGGLE()   do { P1OUT ^= BIT0; } while(0)
+#define LED1_ON()       do { P1OUT |= BIT0; } while (0)
+#define LED1_OFF()      do { P1OUT &= ~BIT0; } while (0)
+#define LED1_TOGGLE()   do { P1OUT ^= BIT0; } while (0)
 /** @} */
 
 /**
