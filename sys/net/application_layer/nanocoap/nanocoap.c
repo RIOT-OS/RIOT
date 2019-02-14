@@ -883,6 +883,14 @@ void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
     block->more = more;
 }
 
+void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
+                            size_t blksize)
+{
+    slicer->start = blknum * blksize;
+    slicer->end = slicer->start + blksize;
+    slicer->cur = 0;
+}
+
 void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
 {
     uint32_t blknum;
@@ -896,9 +904,8 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
             szx = NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
         }
     }
-    slicer->start = blknum * coap_szx2size(szx);
-    slicer->end = slicer->start + coap_szx2size(szx);
-    slicer->cur = 0;
+
+    coap_block_slicer_init(slicer, blknum, coap_szx2size(szx));
 }
 
 void coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)

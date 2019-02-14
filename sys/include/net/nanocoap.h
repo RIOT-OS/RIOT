@@ -611,6 +611,18 @@ static inline void coap_block2_finish(coap_block_slicer_t *slicer)
 void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
 
 /**
+ * @brief Initialize a block slicer struct from content information
+ *
+ * @param[out]   slicer     slicer struct to initialize
+ * @param[in]    blknum     offset from the beginning of content, in terms of
+                            @p blksize byte blocks
+ * @param[in]    blksize    size of each block; must be a power of 2 between 16
+ *                          and 2 raised to #NANOCOAP_BLOCK_SIZE_EXP_MAX
+ */
+void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
+                            size_t blksize);
+
+/**
  * @brief Add a byte array to a block2 reply.
  *
  * This function is used to add an array of bytes to a CoAP block2 reply. it
