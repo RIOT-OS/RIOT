@@ -42,6 +42,7 @@ static int init_base(uart_t uart, uint32_t baudrate);
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     int res = init_base(uart, baudrate);
+
     if (res != UART_OK) {
         return res;
     }
@@ -72,15 +73,16 @@ static int init_base(uart_t uart, uint32_t baudrate)
     const uint32_t divFracX8 = divFracNumX8 / baudrate;
 
     unsigned int brsVal;
-    
-    if(((divFracNumX8 - (divFracX8 * baudrate)) * 10) / baudrate < 5) {
+
+    if (((divFracNumX8 - (divFracX8 * baudrate)) * 10) / baudrate < 5) {
         brsVal = divFracX8 << 1;
-    } else {
+    }
+    else {
         brsVal = (divFracX8 + 1) << 1;
     }
 
     /* get the default UART for now -> TODO: enable for multiple devices */
-    msp_usci_t* dev = UART_BASE;
+    msp_usci_t *dev = UART_BASE;
 
     // Configure pins USCI_A0 UART operation
     gpio_init(UART_RX_PIN, GPIO_IN);
@@ -90,12 +92,12 @@ static int init_base(uart_t uart, uint32_t baudrate)
     gpio_periph_mode(UART_TX_PIN, false, true, false);
 
     dev->CTLW0 = USCI_CTL0_SWRST;
-    
+
     dev->CTLW0 |= USCI_CTL0_SSEL_SMCLK;
     dev->BR0 = divInt & 0x00ff;
     dev->BR1 = (divInt >> 8) & 0xff;
     dev->MCTLW |= brsVal;
-    
+
     dev->CTLW0 &= ~USCI_CTL0_SWRST;
 
     return UART_OK;
@@ -106,7 +108,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     (void)uart;
 
     for (size_t i = 0; i < len; i++) {
-        while(!(UART_IF & UART_IFG_TX_BIT));
+        while (!(UART_IF & UART_IFG_TX_BIT)) {}
         UART_BASE->TXBUF = data[i];
     }
 }
@@ -127,13 +129,12 @@ ISR(UART_RX_ISR, isr_uart_0_rx)
 {
     __enter_isr();
 
-    switch(UART_BASE->IV)
-    {
-    case USCI_IV_RXIFG:
-        ctx_rx_cb(ctx_isr_arg, (uint8_t)UART_BASE->RXBUF);
-        break;
-    default:
-        break;
+    switch (UART_BASE->IV) {
+        case USCI_IV_RXIFG:
+            ctx_rx_cb(ctx_isr_arg, (uint8_t)UART_BASE->RXBUF);
+            break;
+        default:
+            break;
     }
 
     UART_IF &= ~UART_IE_RX_BIT;

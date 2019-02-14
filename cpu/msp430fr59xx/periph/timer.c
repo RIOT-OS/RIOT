@@ -42,7 +42,7 @@ static timer_cb_t isr_cb;
  */
 static void *isr_arg;
 
-int timer_init(tim_t timer, unsigned long freq, timer_cb_t cb, void* arg)
+int timer_init(tim_t timer, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* using fixed TIMER_BASE for now */
     if (timer != 0) {
@@ -53,21 +53,25 @@ int timer_init(tim_t timer, unsigned long freq, timer_cb_t cb, void* arg)
     isr_cb = cb;
     isr_arg = arg;
 
-    msp_timer_t* const dev = TIMER_BASE;
+    msp_timer_t *const dev = TIMER_BASE;
 
     /* reset the timer A configuration */
     dev->CTL = TIMER_CTL_CLR;
     dev->CTL |= TIMER_CTL_TASSEL_SMCLK;
 
-    if(CLOCK_CMCLK == freq) {
+    if (CLOCK_CMCLK == freq) {
         dev->CTL |= TIMER_CTL_ID_DIV1;
-    } else if(CLOCK_CMCLK / 2 == freq) {
+    }
+    else if (CLOCK_CMCLK / 2 == freq) {
         dev->CTL |= TIMER_CTL_ID_DIV2;
-    } else if(CLOCK_CMCLK / 4 == freq) {
+    }
+    else if (CLOCK_CMCLK / 4 == freq) {
         dev->CTL |= TIMER_CTL_ID_DIV4;
-    } else if(CLOCK_CMCLK / 8 == freq) {
+    }
+    else if (CLOCK_CMCLK / 8 == freq) {
         dev->CTL |= TIMER_CTL_ID_DIV8;
-    } else {
+    }
+    else {
         return -1;
     }
 

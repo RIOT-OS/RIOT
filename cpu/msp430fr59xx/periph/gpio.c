@@ -40,10 +40,9 @@
  */
 static gpio_isr_ctx_t isr_ctx[ISR_NUMOF];
 
-static msp_port_t* _port(gpio_t pin)
+static msp_port_t *_port(gpio_t pin)
 {
-    switch (pin >> 8)
-    {
+    switch (pin >> 8) {
         case P1:
         case P2:
             return PORT_A;
@@ -57,9 +56,10 @@ static msp_port_t* _port(gpio_t pin)
     }
 }
 
-static inline msp_port_t* _isr_port(gpio_t pin)
+static inline msp_port_t *_isr_port(gpio_t pin)
 {
-    msp_port_t* const p = _port(pin);
+    msp_port_t *const p = _port(pin);
+
     if (p != PORT_J) {
         return p;
     }
@@ -79,12 +79,13 @@ static inline uint8_t _port_index(gpio_t pin)
 static int _ctx(gpio_t pin)
 {
     const int i = bitarithm_lsb(_pin(pin));
+
     return ((pin >> 8) - 1) * PINS_PER_PORT + i;
 }
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    msp_port_t* const port = _port(pin);
+    msp_port_t *const port = _port(pin);
 
     /* check if port is valid and mode applicable */
     if ((port == NULL) || ((mode != GPIO_IN) && (mode != GPIO_OUT))) {
@@ -107,7 +108,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
 void gpio_irq_enable(gpio_t pin)
 {
-    msp_port_t* const port = _isr_port(pin);
+    msp_port_t *const port = _isr_port(pin);
+
     if (port) {
         port->IE[_port_index(pin)] |= _pin(pin);
     }
@@ -115,7 +117,8 @@ void gpio_irq_enable(gpio_t pin)
 
 void gpio_irq_disable(gpio_t pin)
 {
-    msp_port_t* const port = _isr_port(pin);
+    msp_port_t *const port = _isr_port(pin);
+
     if (port) {
         port->IE[_port_index(pin)] &= ~(_pin(pin));
     }
@@ -123,7 +126,7 @@ void gpio_irq_disable(gpio_t pin)
 
 int gpio_read(gpio_t pin)
 {
-    msp_port_t* const port = _port(pin);
+    msp_port_t *const port = _port(pin);
     const uint8_t portindex = _port_index(pin);
 
     if (port->DIR[portindex] & _pin(pin)) {
@@ -135,9 +138,9 @@ int gpio_read(gpio_t pin)
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                    gpio_cb_t cb, void *arg)
+                  gpio_cb_t cb, void *arg)
 {
-    msp_port_t* const port = _isr_port(pin);
+    msp_port_t *const port = _isr_port(pin);
 
     /* check if port, pull resistor and flank configuration are valid */
     if (port == NULL) {
@@ -155,21 +158,22 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     }
 
     /* save ISR context */
-    gpio_isr_ctx_t* const ctx = &isr_ctx[_ctx(pin)];
+    gpio_isr_ctx_t *const ctx = &isr_ctx[_ctx(pin)];
     ctx->cb = cb;
     ctx->arg = arg;
     ctx->both_edges = (flank == GPIO_BOTH);
 
     /* configure flank */
-    if(ctx->both_edges) {
+    if (ctx->both_edges) {
         port->REN[portindex] &= ~_pin(pin);
         port->OD[portindex] &= ~_pin(pin);
-    } else {
+    }
+    else {
         port->REN[portindex] |= _pin(pin);
         port->OD[portindex] |= _pin(pin);
     }
 
-    if(flank != GPIO_RISING) {
+    if (flank != GPIO_RISING) {
         port->IES[portindex] |= _pin(pin);
     }
     else {
@@ -185,26 +189,26 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_periph_mode(gpio_t pin, bool sel0, bool sel1, bool selComp)
 {
-    msp_port_t* const port = _port(pin);
+    msp_port_t *const port = _port(pin);
     const uint8_t portindex = _port_index(pin);
 
     if (port) {
 
-        if(sel0) {
+        if (sel0) {
             port->SEL0[portindex] |= _pin(pin);
         }
         else {
             port->SEL0[portindex] &= ~_pin(pin);
         }
 
-        if(sel1) {
+        if (sel1) {
             port->SEL1[portindex] |= _pin(pin);
         }
         else {
             port->SEL1[portindex] &= ~_pin(pin);
         }
 
-        if(selComp) {
+        if (selComp) {
             port->SELC[portindex] |= _pin(pin);
         }
         else {
@@ -244,15 +248,13 @@ void gpio_reset_edge(gpio_t pin)
     _port(pin)->IES[_port_index(pin)] |= _pin(pin);
 }
 
-static inline void isr_handler(msp_port_t* port, uint8_t portindex, int ctx)
+static inline void isr_handler(msp_port_t *port, uint8_t portindex, int ctx)
 {
-    for (unsigned i = 0; i < PINS_PER_PORT; i++)
-    {
-        if ((port->IE[portindex] & (1 << i)) && (port->IFG[portindex] & (1 << i)))
-        {
-            const gpio_isr_ctx_t* const ictx = &isr_ctx[i + ctx];
+    for (unsigned i = 0; i < PINS_PER_PORT; i++) {
+        if ((port->IE[portindex] & (1 << i)) && (port->IFG[portindex] & (1 << i))) {
+            const gpio_isr_ctx_t *const ictx = &isr_ctx[i + ctx];
 
-            if(ictx->both_edges) {
+            if (ictx->both_edges) {
                 port->IES[portindex] ^= (1 << i);
             }
 
