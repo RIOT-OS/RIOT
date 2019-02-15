@@ -91,6 +91,7 @@ typedef struct {
 typedef struct {
     gnrc_pktsnip_t *pkt;    /**< Pointer to the IPv6 packet to be fragmented */
     uint16_t datagram_size; /**< Length of just the (uncompressed) IPv6 packet to be fragmented */
+    uint16_t tag;           /**< Tag used for the fragment */
     uint16_t offset;        /**< Offset of the Nth fragment from the beginning of the
                              *   payload datagram */
 } gnrc_sixlowpan_msg_frag_t;
