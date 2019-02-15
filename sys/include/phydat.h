@@ -96,6 +96,7 @@ enum {
     UNIT_GS,        /**< gauss */
     UNIT_DBM,       /**< decibel-milliwatts */
     UNIT_COULOMB,   /**< coulomb */
+    UNIT_F,         /**< Farad */
     /* pressure */
     UNIT_BAR,       /**< Beer? */
     UNIT_PA,        /**< Pascal */
