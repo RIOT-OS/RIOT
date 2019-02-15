@@ -321,6 +321,10 @@ void auto_init(void)
     extern void auto_init_gpio(void);
     auto_init_gpio();
 #endif
+#ifdef MODULE_AD7746
+    extern void auto_init_ad7746(void);
+    auto_init_ad7746();
+#endif
 #ifdef MODULE_ADCXX1C
     extern void auto_init_adcxx1c(void);
     auto_init_adcxx1c();
