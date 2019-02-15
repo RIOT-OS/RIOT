@@ -63,8 +63,8 @@ void *dma_memcpy(void *dst, const void *src, size_t len)
     }
 
     if (((size_t)dst & 0x1) && ((size_t)src & 0x1)) {
-    	char *cdst = (char *)dst;
-    	char *csrc = (char *)src;
+        char *cdst = (char *)dst;
+        char *csrc = (char *)src;
         /* Both dst and src are odd, copy one byte and copy the rest */
         /* word-aligned                                              */
         *cdst++ = *csrc++;
