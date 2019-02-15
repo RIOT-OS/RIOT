@@ -50,25 +50,29 @@ static inline size_t _min(size_t a, size_t b)
     return (a < b) ? a : b;
 }
 
-static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt, size_t payload_len,
-                                       size_t size)
+static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt,
+                                       gnrc_sixlowpan_msg_frag_t *fragment_msg,
+                                       size_t payload_len, size_t size)
 {
-    gnrc_netif_hdr_t *hdr = pkt->data, *new_hdr;
+    sixlowpan_frag_t *frag_hdr;
+    gnrc_netif_hdr_t *netif_hdr = pkt->data, *new_netif_hdr;
     gnrc_pktsnip_t *netif, *frag;
 
-    netif = gnrc_netif_hdr_build(gnrc_netif_hdr_get_src_addr(hdr), hdr->src_l2addr_len,
-                                 gnrc_netif_hdr_get_dst_addr(hdr), hdr->dst_l2addr_len);
+    netif = gnrc_netif_hdr_build(gnrc_netif_hdr_get_src_addr(netif_hdr),
+                                 netif_hdr->src_l2addr_len,
+                                 gnrc_netif_hdr_get_dst_addr(netif_hdr),
+                                 netif_hdr->dst_l2addr_len);
 
     if (netif == NULL) {
         DEBUG("6lo frag: error allocating new link-layer header\n");
         return NULL;
     }
 
-    new_hdr = netif->data;
-    new_hdr->if_pid = hdr->if_pid;
-    new_hdr->flags = hdr->flags;
-    new_hdr->rssi = hdr->rssi;
-    new_hdr->lqi = hdr->lqi;
+    new_netif_hdr = netif->data;
+    new_netif_hdr->if_pid = netif_hdr->if_pid;
+    new_netif_hdr->flags = netif_hdr->flags;
+    new_netif_hdr->rssi = netif_hdr->rssi;
+    new_netif_hdr->lqi = netif_hdr->lqi;
 
     frag = gnrc_pktbuf_add(NULL, NULL, _min(size, payload_len),
                            GNRC_NETTYPE_SIXLOWPAN);
@@ -78,6 +82,11 @@ static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt, size_t payload_len,
         gnrc_pktbuf_release(netif);
         return NULL;
     }
+    frag_hdr = frag->data;
+    /* XXX: truncation of datagram_size > 4095 may happen here */
+    frag_hdr->disp_size = byteorder_htons(fragment_msg->datagram_size);
+    frag_hdr->tag = byteorder_htons(fragment_msg->tag);
+
 
     LL_PREPEND(frag, netif);
 
@@ -102,7 +111,7 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *iface,
 
     DEBUG("6lo frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
 
-    frag = _build_frag_pkt(pkt, payload_len,
+    frag = _build_frag_pkt(pkt, fragment_msg, payload_len,
                            max_frag_size + sizeof(sixlowpan_frag_t));
 
     if (frag == NULL) {
@@ -111,10 +120,7 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *iface,
 
     hdr = frag->next->data;
     data = (uint8_t *)(hdr + 1);
-
-    hdr->disp_size = byteorder_htons(fragment_msg->datagram_size);
     hdr->disp_size.u8[0] |= SIXLOWPAN_FRAG_1_DISP;
-    hdr->tag = byteorder_htons(fragment_msg->tag);
 
     /* Tell the link layer that we will send more fragments */
     gnrc_netif_hdr_t *netif_hdr = frag->data;
@@ -156,7 +162,7 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface,
 
     DEBUG("6lo frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
 
-    frag = _build_frag_pkt(pkt,
+    frag = _build_frag_pkt(pkt, fragment_msg,
                            payload_len - offset + sizeof(sixlowpan_frag_n_t),
                            max_frag_size + sizeof(sixlowpan_frag_n_t));
 
@@ -166,11 +172,7 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface,
 
     hdr = frag->next->data;
     data = (uint8_t *)(hdr + 1);
-
-    /* XXX: truncation of datagram_size > 4095 may happen here */
-    hdr->disp_size = byteorder_htons(fragment_msg->datagram_size);
     hdr->disp_size.u8[0] |= SIXLOWPAN_FRAG_N_DISP;
-    hdr->tag = byteorder_htons(fragment_msg->tag);
     /* don't mention payload diff in offset */
     hdr->offset = (uint8_t)((offset +
                              (fragment_msg->datagram_size - payload_len)) >> 3);
