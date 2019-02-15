@@ -89,16 +89,16 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *iface,
                                    size_t payload_len)
 {
     gnrc_pktsnip_t *frag, *pkt = fragment_msg->pkt;
-    uint16_t local_offset = 0;
+    sixlowpan_frag_t *hdr;
+    uint8_t *data;
     /* payload_len: actual size of the packet vs
      * datagram_size: size of the uncompressed IPv6 packet */
     int payload_diff = (fragment_msg->datagram_size - payload_len);
+    uint16_t local_offset = 0;
     /* virtually add payload_diff to flooring to account for offset (must be divisable by 8)
      * in uncompressed datagram */
     uint16_t max_frag_size = _floor8(iface->sixlo.max_frag_size + payload_diff -
                                      sizeof(sixlowpan_frag_t)) - payload_diff;
-    sixlowpan_frag_t *hdr;
-    uint8_t *data;
 
     DEBUG("6lo frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
 
@@ -148,11 +148,11 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface,
 {
     gnrc_pktsnip_t *frag, *pkt = fragment_msg->pkt;
     sixlowpan_frag_n_t *hdr;
+    uint8_t *data;
+    uint16_t local_offset = 0, offset_count = 0, offset = fragment_msg->offset;
     /* since dispatches aren't supposed to go into subsequent fragments, we need not account
      * for payload difference as for the first fragment */
     uint16_t max_frag_size = _floor8(iface->sixlo.max_frag_size - sizeof(sixlowpan_frag_n_t));
-    uint16_t local_offset = 0, offset_count = 0, offset = fragment_msg->offset;
-    uint8_t *data;
 
     DEBUG("6lo frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
 
