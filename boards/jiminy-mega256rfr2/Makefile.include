@@ -28,3 +28,4 @@ BOOTLOADER_SIZE ?= 4K
 ROM_RESERVED ?= $(BOOTLOADER_SIZE)
 
 include $(RIOTMAKE)/tools/avrdude.inc.mk
+include $(RIOTBOARD)/common/atmega/Makefile.include
