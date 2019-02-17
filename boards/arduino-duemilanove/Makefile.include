@@ -1,8 +1,6 @@
 # define the cpu used by the ardudino duemilanove board
 export CPU = atmega328p
 
-USEMODULE += boards_common_arduino-atmega
-
 # configure the terminal program
 PORT_LINUX  ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))

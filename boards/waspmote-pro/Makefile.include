@@ -25,3 +25,4 @@ FFLAGS_EXTRA += -b 115200
 FFLAGS_EXTRA += -F
 
 include $(RIOTMAKE)/tools/avrdude.inc.mk
+include $(RIOTBOARD)/common/atmega/Makefile.include

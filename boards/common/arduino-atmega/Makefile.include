@@ -1,6 +1,3 @@
-# include optional dependencies
-include $(RIOTBOARD)/common/arduino-atmega/Makefile.dep
-
 INCLUDES += -I$(RIOTBOARD)/common/arduino-atmega/include
 
 include $(RIOTMAKE)/tools/serial.inc.mk
@@ -10,3 +7,4 @@ FFLAGS_EXTRA += -F -D
 
 # include avrdude flashing tool
 include $(RIOTMAKE)/tools/avrdude.inc.mk
+include $(RIOTBOARD)/common/atmega/Makefile.include
