@@ -54,6 +54,12 @@ static gcoap_listener_t _listener = {
     NULL
 };
 
+/* Retain request path to re-request if response includes block. User must not
+ * start a new request (with a new path) until any blockwise transfer
+ * completes or times out. */
+#define _LAST_REQ_PATH_MAX (32)
+static char _last_req_path[_LAST_REQ_PATH_MAX];
+
 /* Counts requests sent by CLI. */
 static uint16_t req_count = 0;
 
@@ -92,6 +98,11 @@ static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
         return;
     }
 
+    coap_block1_t block;
+    if (coap_get_block2(pdu, &block) && block.blknum == 0) {
+        puts("--- blockwise start ---");
+    }
+
     char *class_str = (coap_get_code_class(pdu) == COAP_CLASS_SUCCESS)
                             ? "Success" : "Error";
     printf("gcoap: response %s, code %1u.%02u", class_str,
@@ -114,6 +125,30 @@ static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
     }
     else {
         printf(", empty payload\n");
+    }
+
+    /* ask for next block if present */
+    if (coap_get_block2(pdu, &block)) {
+        if (block.more) {
+            unsigned msg_type = coap_get_type(pdu);
+            if (block.blknum == 0 && !strlen(_last_req_path)) {
+                puts("Path too long; can't complete blockwise");
+                return;
+            }
+
+            gcoap_req_init(pdu, (uint8_t *)pdu->hdr, GCOAP_PDU_BUF_SIZE,
+                           COAP_METHOD_GET, _last_req_path);
+            if (msg_type == COAP_TYPE_ACK) {
+                coap_hdr_set_type(pdu->hdr, COAP_TYPE_CON);
+            }
+            block.blknum++;
+            coap_opt_add_block2_control(pdu, &block);
+            int len = coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+            gcoap_req_send((uint8_t *)pdu->hdr, len, remote, _resp_handler);
+        }
+        else {
+            puts("--- blockwise complete ---");
+        }
     }
 }
 
@@ -279,6 +314,11 @@ int gcoap_cli_cmd(int argc, char **argv)
         ((argc == apos + 4) && (code_pos != 0))) {
         gcoap_req_init(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE, code_pos+1, argv[apos+2]);
         coap_hdr_set_type(pdu.hdr, msg_type);
+
+        memset(_last_req_path, 0, _LAST_REQ_PATH_MAX);
+        if (strlen(argv[apos+2]) < _LAST_REQ_PATH_MAX) {
+            memcpy(_last_req_path, argv[apos+2], strlen(argv[apos+2]));
+        }
 
         size_t paylen = (argc == apos + 4) ? strlen(argv[apos+3]) : 0;
         if (paylen) {
