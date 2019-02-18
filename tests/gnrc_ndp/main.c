@@ -973,7 +973,7 @@ static int _test_netif_get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             return sizeof(uint64_t);
         case NETOPT_IS_WIRED:
             return 1;
-        case NETOPT_MAX_PACKET_SIZE: {
+        case NETOPT_MAX_PDU_SIZE: {
                 uint16_t *val = opt->data;
                 if (opt->data_len != sizeof(uint16_t)) {
                     return -EOVERFLOW;
