@@ -61,7 +61,7 @@ static inline void _get_iid(uint8_t *iid)
 
 static int _get_max_pkt_size(netdev_t *dev, void *value, size_t max_len)
 {
-    return netdev_eth_get(dev, NETOPT_MAX_PACKET_SIZE, value, max_len);
+    return netdev_eth_get(dev, NETOPT_MAX_PDU_SIZE, value, max_len);
 }
 
 static int _get_src_len(netdev_t *dev, void *value, size_t max_len)
@@ -174,7 +174,7 @@ void _net_init(void)
 
     netdev_test_setup(&netdev, NULL);
     netdev_test_set_get_cb(&netdev, NETOPT_SRC_LEN, _get_src_len);
-    netdev_test_set_get_cb(&netdev, NETOPT_MAX_PACKET_SIZE,
+    netdev_test_set_get_cb(&netdev, NETOPT_MAX_PDU_SIZE,
                             _get_max_pkt_size);
     netdev_test_set_get_cb(&netdev, NETOPT_ADDRESS, _get_addr);
     netdev_test_set_get_cb(&netdev, NETOPT_ADDR_LEN,
