@@ -1366,7 +1366,7 @@ int _mock_netif_get(gnrc_netapi_opt_t *opt)
             return sizeof(_loc_l2);
         case NETOPT_IS_WIRED:
             return 1;
-        case NETOPT_MAX_PACKET_SIZE: {
+        case NETOPT_MAX_PDU_SIZE: {
                 uint16_t *val = opt->data;
                 if (opt->data_len != sizeof(uint16_t)) {
                     return -EOVERFLOW;
