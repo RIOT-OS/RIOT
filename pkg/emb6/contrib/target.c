@@ -50,7 +50,7 @@ uint8_t hal_getrand(void)
 {
 #if defined(MODULE_PERIPH_HWRNG)
     uint8_t res;
-    hwnrg_read((char *)&res, sizeof(res));
+    hwrng_read((char *)&res, sizeof(res));
     return res;
 #elif defined(MODULE_RANDOM)
     return (uint8_t)(random_uint32() % UINT8_MAX);
