@@ -8,7 +8,6 @@ import time
 import logging
 import subprocess
 import contextlib
-import signal
 
 import pexpect
 
@@ -85,7 +84,6 @@ class RIOTNode():
     """
 
     TERM_SPAWN_CLASS = TermSpawn
-    TERM_STOP_SIGNAL = signal.SIGKILL
     TERM_STARTED_DELAY = int(os.environ.get('RIOT_TERM_START_DELAY') or 3)
 
     MAKE_ARGS = ()
@@ -179,16 +177,6 @@ class RIOTNode():
             # Not sure how to cover this in a test
             # 'make term' is not killed by 'term.close()'
             self.logger.critical('Could not close make term')
-
-    def _kill_term(self):
-        """Kill the current terminal."""
-        # killpg(SIGKILL) was taken from `testrunner`.
-        # I do not really like direct `SIGKILL` as it prevents script cleanup.
-        # I kept it as I do not want to break an edge case that rely on it.
-
-        # Using 'killpg' shows that our shell script do not correctly kill
-        # programs they started. So this is more a hack than a real solution.
-        os.killpg(os.getpgid(self.term.pid), self.TERM_STOP_SIGNAL)
 
     def make_run(self, targets, *runargs, **runkwargs):
         """Call make `targets` for current RIOTNode context.
