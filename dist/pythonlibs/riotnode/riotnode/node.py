@@ -169,14 +169,16 @@ class RIOTNode():
         Handles possible exceptions.
         """
         try:
-            self._kill_term()
+            self.term.close()
         except AttributeError:
             # Not initialized
-            return
+            pass
         except ProcessLookupError:
             self.logger.warning('Process already stopped')
-
-        self.term.close()
+        except pexpect.ExceptionPexpect:
+            # Not sure how to cover this in a test
+            # 'make term' is not killed by 'term.close()'
+            self.logger.critical('Could not close make term')
 
     def _kill_term(self):
         """Kill the current terminal."""
