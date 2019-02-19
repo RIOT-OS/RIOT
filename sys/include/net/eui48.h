@@ -32,14 +32,34 @@ extern "C" {
 /**
  * @brief   Data type to represent an EUI-48
  */
-typedef union {
+typedef struct {
     uint8_t uint8[6];            /**< split into 6 8-bit words. */
-    network_uint16_t uint16[3];  /**< split into 3 16-bit words. */
 } eui48_t;
+
+/**
+ * @brief   Generates an EUI-64 from a 48-bit device address
+ *
+ * @see     [RFC 2464, section 4](https://tools.ietf.org/html/rfc2464#section-4)
+ *
+ * @param[out] eui64    the resulting EUI-64.
+ * @param[in]  addr     a 48-bit device address
+ */
+static inline void eui48_to_eui64(eui64_t *eui64, const eui48_t *addr)
+{
+    eui64->uint8[0] = addr->uint8[0];
+    eui64->uint8[1] = addr->uint8[1];
+    eui64->uint8[2] = addr->uint8[2];
+    eui64->uint8[3] = 0xff;
+    eui64->uint8[4] = 0xfe;
+    eui64->uint8[5] = addr->uint8[3];
+    eui64->uint8[6] = addr->uint8[4];
+    eui64->uint8[7] = addr->uint8[5];
+}
 
 /**
  * @brief   Generates an IPv6 interface identifier from a 48-bit device address
  *
+ * @note    The IPv6 IID is derived from the EUI-64 by flipping the U/L bit.
  * @see     [RFC 2464, section 4](https://tools.ietf.org/html/rfc2464#section-4)
  * @see     [RFC 4291, section 2.5.1](https://tools.ietf.org/html/rfc4291#section-2.5.1)
  *
@@ -48,14 +68,8 @@ typedef union {
  */
 static inline void eui48_to_ipv6_iid(eui64_t *iid, const eui48_t *addr)
 {
-    iid->uint8[0] = addr->uint8[0] ^ 0x02;
-    iid->uint8[1] = addr->uint8[1];
-    iid->uint8[2] = addr->uint8[2];
-    iid->uint8[3] = 0xff;
-    iid->uint8[4] = 0xfe;
-    iid->uint8[5] = addr->uint8[3];
-    iid->uint8[6] = addr->uint8[4];
-    iid->uint8[7] = addr->uint8[5];
+    eui48_to_eui64(iid, addr);
+    iid->uint8[0] ^= 0x02;
 }
 
 /**

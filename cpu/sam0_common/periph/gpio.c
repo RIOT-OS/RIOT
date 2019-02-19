@@ -37,10 +37,24 @@
 #define MODE_PINCFG_MASK            (0x06)
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
+
 /**
  * @brief   Number of external interrupt lines
  */
+#ifdef CPU_SAML1X
+#define NUMOF_IRQS                  (8U)
+#else
 #define NUMOF_IRQS                  (16U)
+#endif
+
+/**
+ * @brief   External Interrupts Controller selection macros
+ */
+#ifdef CPU_FAM_SAML11
+#define _EIC EIC_SEC
+#else
+#define _EIC EIC
+#endif
 
 static gpio_isr_ctx_t gpio_config[NUMOF_IRQS];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
@@ -181,26 +195,31 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_EIC;
     GCLK->PCHCTRL[EIC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
     /* disable the EIC module*/
-    EIC->CTRLA.reg = 0;
-    while (EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE) {}
+    _EIC->CTRLA.reg = 0;
+    while (_EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE) {}
 #endif
     /* configure the active flank */
-    EIC->CONFIG[exti >> 3].reg &= ~(0xf << ((exti & 0x7) * 4));
-    EIC->CONFIG[exti >> 3].reg |=  (flank << ((exti & 0x7) * 4));
+    _EIC->CONFIG[exti >> 3].reg &= ~(0xf << ((exti & 0x7) * 4));
+    _EIC->CONFIG[exti >> 3].reg |=  (flank << ((exti & 0x7) * 4));
     /* enable the global EIC interrupt */
+#ifdef CPU_SAML1X
+    /* EXTI[4..7] are binded to EIC_OTHER_IRQn */
+    NVIC_EnableIRQ((exti > 3 )? EIC_OTHER_IRQn : (EIC_0_IRQn + exti));
+#else
     NVIC_EnableIRQ(EIC_IRQn);
+#endif
     /* clear interrupt flag and enable the interrupt line and line wakeup */
-    EIC->INTFLAG.reg = (1 << exti);
-    EIC->INTENSET.reg = (1 << exti);
+    _EIC->INTFLAG.reg = (1 << exti);
+    _EIC->INTENSET.reg = (1 << exti);
 #ifdef CPU_FAM_SAMD21
-    EIC->WAKEUP.reg |= (1 << exti);
+    _EIC->WAKEUP.reg |= (1 << exti);
     /* enable the EIC module*/
-    EIC->CTRL.reg = EIC_CTRL_ENABLE;
-    while (EIC->STATUS.reg & EIC_STATUS_SYNCBUSY) {}
+    _EIC->CTRL.reg = EIC_CTRL_ENABLE;
+    while (_EIC->STATUS.reg & EIC_STATUS_SYNCBUSY) {}
 #else /* CPU_FAM_SAML21 */
     /* enable the EIC module*/
-    EIC->CTRLA.reg = EIC_CTRLA_ENABLE;
-    while (EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE) {}
+    _EIC->CTRLA.reg = EIC_CTRLA_ENABLE;
+    while (_EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE) {}
 #endif
     return 0;
 }
@@ -211,7 +230,7 @@ void gpio_irq_enable(gpio_t pin)
     if (exti == -1) {
         return;
     }
-    EIC->INTENSET.reg = (1 << exti);
+    _EIC->INTENSET.reg = (1 << exti);
 }
 
 void gpio_irq_disable(gpio_t pin)
@@ -220,17 +239,45 @@ void gpio_irq_disable(gpio_t pin)
     if (exti == -1) {
         return;
     }
-    EIC->INTENCLR.reg = (1 << exti);
+    _EIC->INTENCLR.reg = (1 << exti);
 }
 
 void isr_eic(void)
 {
     for (unsigned i = 0; i < NUMOF_IRQS; i++) {
-        if (EIC->INTFLAG.reg & (1 << i)) {
-            EIC->INTFLAG.reg = (1 << i);
+        if (_EIC->INTFLAG.reg & (1 << i)) {
+            _EIC->INTFLAG.reg = (1 << i);
             gpio_config[i].cb(gpio_config[i].arg);
         }
     }
     cortexm_isr_end();
 }
+
+#ifdef CPU_SAML1X
+void isr_eic0(void)
+{
+    isr_eic();
+}
+
+void isr_eic1(void)
+{
+    isr_eic();
+}
+
+void isr_eic2(void)
+{
+    isr_eic();
+}
+
+void isr_eic3(void)
+{
+    isr_eic();
+}
+
+void isr_eic_other(void)
+{
+    isr_eic();
+}
+#endif /* CPU_SAML1X */
+
 #endif /* MODULE_PERIPH_GPIO_IRQ */

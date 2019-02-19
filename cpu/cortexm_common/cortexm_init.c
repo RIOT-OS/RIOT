@@ -65,7 +65,8 @@ void cortexm_init(void)
     /* configure the vector table location to internal flash */
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
     defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7) || \
-    (defined(CPU_ARCH_CORTEX_M0PLUS) && (__VTOR_PRESENT == 1))
+    (defined(CPU_ARCH_CORTEX_M0PLUS) || defined(CPU_ARCH_CORTEX_M23) \
+    && (__VTOR_PRESENT == 1))
     SCB->VTOR = (uint32_t)&_isr_vectors;
 #endif
 

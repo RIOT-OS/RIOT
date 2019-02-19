@@ -7,6 +7,7 @@
  * details.
  */
 
+#ifdef MODULE_PERIPH_MCG /* please doxygen by hiding dangling references */
 /**
  * @defgroup    cpu_kinetis_mcg Kinetis MCG
  * @ingroup     cpu_kinetis
@@ -116,6 +117,7 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
+#endif /* MODULE_PERIPH_MCG */
 
 #ifndef MCG_H
 #define MCG_H

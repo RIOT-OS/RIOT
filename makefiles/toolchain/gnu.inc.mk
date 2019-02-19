@@ -13,7 +13,7 @@ export NM         = $(PREFIX)nm
 export LINK       = $(PREFIX)gcc
 export LINKXX     = $(PREFIX)g++
 export SIZE       = $(PREFIX)size
-export OBJCOPY   ?= $(shell command -v $(PREFIX)objcopy gobjcopy objcopy | head -n 1)
+export OBJCOPY   ?= $(shell command -v $(PREFIX)objcopy || command -v gobjcopy || command -v objcopy)
 ifeq ($(OBJCOPY),)
 $(warning objcopy not found. Hex file will not be created.)
 export OBJCOPY    = true

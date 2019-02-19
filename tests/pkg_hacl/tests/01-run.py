@@ -10,8 +10,13 @@ import sys
 from testrunner import run
 
 
+# increase the default timeout to 30s, on samr30-xpro this test takes 20s to
+# complete.
+TIMEOUT = 30
+
+
 def testfunc(child):
-    child.expect('OK \(\d+ tests\)')
+    child.expect('OK \(\d+ tests\)', timeout=TIMEOUT)
 
 
 if __name__ == "__main__":

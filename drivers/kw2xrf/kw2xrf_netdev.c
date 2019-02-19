@@ -81,10 +81,6 @@ static int _init(netdev_t *netdev)
         return -1;
     }
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
-
     /* reset device to default values and put it into RX state */
     kw2xrf_reset_phy(dev);
 
@@ -169,9 +165,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     _send_last_fcf = dev->buf[1];
 
     kw2xrf_write_fifo(dev, dev->buf, dev->buf[0]);
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += len;
-#endif
 
     /* send data out directly if pre-loading id disabled */
     if (!(dev->netdev.flags & KW2XRF_OPT_PRELOADING)) {
@@ -193,11 +186,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     if (buf == NULL) {
         return pkt_len + 1;
     }
-
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += pkt_len;
-#endif
 
     if (pkt_len > len) {
         /* not enough space in buf */
@@ -258,6 +246,20 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     }
 
     switch (opt) {
+        case NETOPT_ADDRESS:
+            if (len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint16_t *)value) = kw2xrf_get_addr_short(dev);
+            return sizeof(uint16_t);
+
+        case NETOPT_ADDRESS_LONG:
+            if (len < sizeof(uint64_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint64_t *)value) = kw2xrf_get_addr_long(dev);
+            return sizeof(uint64_t);
+
         case NETOPT_STATE:
             if (len < sizeof(netopt_state_t)) {
                 return -EOVERFLOW;
@@ -392,7 +394,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
             }
             else {
                 kw2xrf_set_addr_short(dev, *((uint16_t *)value));
-                /* don't set res to set netdev_ieee802154_t::short_addr */
+                res = sizeof(uint16_t);
             }
             break;
 
@@ -402,7 +404,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
             }
             else {
                 kw2xrf_set_addr_long(dev, *((uint64_t *)value));
-                /* don't set res to set netdev_ieee802154_t::short_addr */
+                res = sizeof(uint64_t);
             }
             break;
 

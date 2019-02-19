@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       event test application
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -25,22 +27,30 @@
 #include "event/timeout.h"
 #include "event/callback.h"
 
-static unsigned order;
+#define STACKSIZE       THREAD_STACKSIZE_DEFAULT
+#define PRIO            (THREAD_PRIORITY_MAIN - 1)
+
+static char stack[STACKSIZE];
+
+static unsigned order = 0;
 static uint32_t before;
 
 static void callback(event_t *arg);
 static void custom_callback(event_t *event);
 static void timed_callback(void *arg);
 static void forbidden_callback(void *arg);
-
+static void delayed_callback1(event_t *arg);
+static void delayed_callback2(event_t *arg);
 
 static event_t event = { .handler = callback };
 static event_t event2 = { .handler = callback };
+static event_t delayed_event1 = { .handler = delayed_callback1 };
+static event_t delayed_event2 = { .handler = delayed_callback2 };
 
 static void callback(event_t *arg)
 {
     order++;
-    assert(order == 1);
+    assert(order == 3);
     assert(arg == &event);
     printf("triggered 0x%08x\n", (unsigned)arg);
 }
@@ -57,7 +67,7 @@ static event_callback_t noevent_callback = EVENT_CALLBACK_INIT(forbidden_callbac
 static void custom_callback(event_t *event)
 {
     order++;
-    assert(order == 2);
+    assert(order == 4);
     assert(event == (event_t *)&custom_event);
     custom_event_t *custom_event = (custom_event_t *)event;
     printf("triggered custom event with text: \"%s\"\n", custom_event->text);
@@ -66,7 +76,7 @@ static void custom_callback(event_t *event)
 static void timed_callback(void *arg)
 {
     order++;
-    assert(order == 3);
+    assert(order == 5);
     assert(arg == event_callback.arg);
     uint32_t now = xtimer_now_usec();
     assert((now - before >= 100000LU));
@@ -85,11 +95,54 @@ static void forbidden_callback(void *arg)
     }
 }
 
+static void delayed_callback1(event_t *arg)
+{
+    order++;
+    assert(order == 1);
+    assert(arg == &delayed_event1);
+    printf("triggered delayed event %p\n", (void *)arg);
+}
+
+static void delayed_callback2(event_t *arg)
+{
+    order++;
+    assert(order == 2);
+    assert(arg == &delayed_event2);
+    printf("triggered delayed event %p\n", (void *)arg);
+}
+
+static void *claiming_thread(void *arg)
+{
+    event_queue_t *dq = (event_queue_t *)arg;
+
+    printf("claiming event queue %p\n", (void *)dq);
+    event_queue_claim(dq);
+    printf("launching event queue %p\n", (void *)dq);
+    event_loop(dq);
+
+    return NULL;
+}
+
 int main(void)
 {
     puts("[START] event test application.\n");
 
-    event_queue_t queue = { .waiter = (thread_t *)sched_active_thread };
+    /* test creation of delayed claiming of a detached event queue */
+    event_queue_t dq;
+    printf("initializing detached event queue %p\n", (void *)&dq);
+    event_queue_init_detached(&dq);
+
+    printf("posting %p\n", (void *)&delayed_event1);
+    event_post(&dq, &delayed_event1);
+    printf("posting %p\n", (void *)&delayed_event2);
+    event_post(&dq, &delayed_event2);
+
+    printf("running thread that will claim event queue %p\n", (void *)&dq);
+    thread_create(stack, sizeof(stack), PRIO, 0, claiming_thread, &dq, "ct");
+
+    /* test posting different kind of events in order to a statically
+     * initialized queue */
+    event_queue_t queue = EVENT_QUEUE_INIT;
     printf("posting 0x%08x\n", (unsigned)&event);
     event_post(&queue, &event);
 

@@ -128,6 +128,8 @@ else ifeq ($(CPU_ARCH),cortex-m4f)
 export CFLAGS += -DARM_MATH_CM4
 else ifeq ($(CPU_ARCH),cortex-m7)
 export CFLAGS += -DARM_MATH_CM7
+else ifeq ($(CPU_ARCH),cortex-m23)
+export CFLAGS += -DARM_MATH_CM23
 endif
 endif
 

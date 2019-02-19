@@ -29,6 +29,7 @@ endif
 ifneq (,$(filter gnrc_mac,$(USEMODULE)))
   USEMODULE += gnrc_priority_pktqueue
   USEMODULE += csma_sender
+  USEMODULE += evtimer
 endif
 
 ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
@@ -542,6 +543,10 @@ ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
   USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
 endif
 
+ifneq (,$(filter gnrc_netif_%,$(USEMODULE)))
+  USEMODULE += gnrc_netif
+endif
+
 ifneq (,$(filter netstats_%, $(USEMODULE)))
   USEMODULE += netstats
 endif
@@ -654,6 +659,10 @@ ifneq (,$(filter random,$(USEMODULE)))
 
   ifneq (,$(filter prng_sha1prng,$(USEMODULE)))
     USEMODULE += hashes
+  endif
+
+  ifeq (,$(filter puf_sram,$(USEMODULE)))
+    FEATURES_OPTIONAL += periph_hwrng
   endif
 
   USEMODULE += luid

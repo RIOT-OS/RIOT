@@ -96,7 +96,7 @@ int my9221_init(my9221_t *dev, const my9221_params_t *params)
     assert(dev);
     assert(params);
     /* write config params to device descriptor */
-    memcpy(&dev->params, params, sizeof(my9221_params_t));
+    dev->params = *params;
     /* init clock and data pins as output */
     gpio_init(PIN_CLK, GPIO_OUT);
     gpio_init(PIN_DAT, GPIO_OUT);

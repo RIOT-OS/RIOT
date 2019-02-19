@@ -1,0 +1,30 @@
+From da78a3a713c2431f32685da0c28b574bfb93bd4b Mon Sep 17 00:00:00 2001
+From: Martine Lenders <m.lenders@fu-berlin.de>
+Date: Thu, 6 Dec 2018 14:09:00 +0100
+Subject: [PATCH 1/2] [PATCH] arm_math: add clang branch for optimization
+ macros
+
+---
+ CMSIS/DSP/Include/arm_math.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/CMSIS/DSP/Include/arm_math.h b/CMSIS/DSP/Include/arm_math.h
+index ea9dd26a..6e4d9116 100644
+--- a/CMSIS/DSP/Include/arm_math.h
++++ b/CMSIS/DSP/Include/arm_math.h
+@@ -7074,6 +7074,12 @@ void arm_rfft_fast_f32(
+   #define IAR_ONLY_LOW_OPTIMIZATION_ENTER
+   #define IAR_ONLY_LOW_OPTIMIZATION_EXIT
+ 
++#elif defined(__clang__)
++  #define LOW_OPTIMIZATION_ENTER __attribute__(( optnone ))
++  #define LOW_OPTIMIZATION_EXIT
++  #define IAR_ONLY_LOW_OPTIMIZATION_ENTER
++  #define IAR_ONLY_LOW_OPTIMIZATION_EXIT
++
+ #elif defined ( __GNUC__ )
+   #define LOW_OPTIMIZATION_ENTER \
+        __attribute__(( optimize("-O1") ))
+-- 
+2.17.1
+

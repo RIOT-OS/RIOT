@@ -146,13 +146,18 @@ static inline _nib_onl_entry_t *_cache_out_onl_entry(const ipv6_addr_t *addr,
             res->mode = _NC;
         }
         /* requeue if not garbage collectible at the moment or queueing
-         * newly created NCE */
+         * newly created NCE or in case entry becomes garbage collectible
+         * again */
         clist_rpush(&_next_removable, (clist_node_t *)tmp);
         if (res == NULL) {
             /* no new entry created yet, get next entry in FIFO */
             tmp = (_nib_onl_entry_t *)clist_lpop(&_next_removable);
         }
-    } while ((tmp != first) && (res != NULL));
+    } while ((tmp != first) && (res == NULL));
+    if (res == NULL) {
+        /* we did not find any removable entry => requeue current one */
+        clist_rpush(&_next_removable, (clist_node_t *)tmp);
+    }
     return res;
 }
 
@@ -272,6 +277,8 @@ void _nib_nc_remove(_nib_onl_entry_t *node)
         entry->pkt = NULL;
     }
 #endif  /* GNRC_IPV6_NIB_CONF_QUEUE_PKT */
+    /* remove from cache-out procedure */
+    clist_remove(&_next_removable, (clist_node_t *)node);
     _nib_onl_clear(node);
 }
 

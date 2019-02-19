@@ -87,11 +87,16 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                      size_t offset, unsigned page)
 {
     rbuf_t *entry;
-    sixlowpan_frag_t *frag = pkt->data;
+    sixlowpan_frag_n_t *frag = pkt->data;
     rbuf_int_t *ptr;
     uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
     size_t frag_size;
 
+    /* check if provided offset is the same as in fragment */
+    assert(((((frag->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) ==
+                SIXLOWPAN_FRAG_1_DISP)) && (offset == 0)) ||
+           ((((frag->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) ==
+                SIXLOWPAN_FRAG_N_DISP)) && (offset == (frag->offset * 8U))));
     rbuf_gc();
     entry = _rbuf_get(gnrc_netif_hdr_get_src_addr(netif_hdr), netif_hdr->src_l2addr_len,
                       gnrc_netif_hdr_get_dst_addr(netif_hdr), netif_hdr->dst_l2addr_len,
@@ -121,6 +126,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     if ((offset + frag_size) > entry->super.pkt->size) {
         DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
         gnrc_pktbuf_release(entry->super.pkt);
+        gnrc_pktbuf_release(pkt);
         rbuf_rm(entry);
         return RBUF_ADD_ERROR;
     }
@@ -139,7 +145,12 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
              * https://tools.ietf.org/html/rfc4944#section-5.3 */
             return RBUF_ADD_REPEAT;
         }
-
+        /* End was already checked in overlap check */
+        if (ptr->start == offset) {
+            DEBUG("6lo rbuf: fragment already in reassembly buffer");
+            gnrc_pktbuf_release(pkt);
+            return RBUF_ADD_SUCCESS;
+        }
         ptr = ptr->next;
     }
 
@@ -294,7 +305,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
         }
 
         /* if there is a free spot: remember it */
-        if ((res == NULL) && (rbuf[i].super.pkt == NULL)) {
+        if ((res == NULL) && rbuf_entry_empty(&rbuf[i])) {
             res = &(rbuf[i]);
         }
 
@@ -308,8 +319,9 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
     /* entry not in buffer and no empty spot found */
     if (res == NULL) {
         assert(oldest != NULL);
-        /* if oldest->pkt == NULL, res must not be NULL */
-        assert(oldest->super.pkt != NULL);
+        /* if oldest is not empty, res must not be NULL (because otherwise
+         * oldest could have been picked as res) */
+        assert(!rbuf_entry_empty(oldest));
         DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
         gnrc_pktbuf_release(oldest->super.pkt);
         rbuf_rm(oldest);
@@ -357,5 +369,25 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
     return res;
 }
+
+#ifdef TEST_SUITES
+void rbuf_reset(void)
+{
+    xtimer_remove(&_gc_timer);
+    memset(rbuf_int, 0, sizeof(rbuf_int));
+    for (unsigned int i = 0; i < RBUF_SIZE; i++) {
+        if ((rbuf[i].super.pkt != NULL) &&
+            (rbuf[i].super.pkt->users > 0)) {
+            gnrc_pktbuf_release(rbuf[i].super.pkt);
+        }
+    }
+    memset(rbuf, 0, sizeof(rbuf));
+}
+
+const rbuf_t *rbuf_array(void)
+{
+    return &rbuf[0];
+}
+#endif
 
 /** @} */

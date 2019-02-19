@@ -147,7 +147,7 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
             LOG_DEBUG("cc110x: received packet from=%u to=%u payload len=%u\n",
                       (unsigned)pkt_buf->packet.phy_src,
                       (unsigned)pkt_buf->packet.address,
-                      pkt_buf->packet.length - 3);
+                      pkt_buf->packet.length - CC110X_L2_HDR_SIZE);
             /* let someone know that we've got a packet */
             callback(arg);
 
@@ -157,7 +157,8 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
             DEBUG("%s:%s:%u crc-error\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
             dev->cc110x_statistic.packets_in_crc_fail++;
 #if defined(MODULE_OD) && ENABLE_DEBUG
-            od_hex_dump(pkt_buf->packet.data, pkt_buf->packet.length - 3,
+            od_hex_dump(pkt_buf->packet.data,
+                        pkt_buf->packet.length - CC110X_L2_HDR_SIZE,
                         OD_WIDTH_DEFAULT);
 #endif
             _rx_abort(dev);
@@ -273,7 +274,8 @@ void cc110x_isr_handler(cc110x_t *dev, void(*callback)(void*), void*arg)
 int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
 {
     DEBUG("cc110x: snd pkt to %u payload_length=%u\n",
-            (unsigned)packet->address, (unsigned)packet->length-3);
+            (unsigned)packet->address,
+            (unsigned)packet->length - CC110X_L2_HDR_SIZE);
     unsigned size;
 
     switch (dev->radio_state) {

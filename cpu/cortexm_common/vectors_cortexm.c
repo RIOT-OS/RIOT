@@ -188,7 +188,8 @@ __attribute__((naked)) void hard_fault_default(void)
         " use_psp:                          \n" /* else {                     */
         "mrs r0, psp                        \n" /*   r0 = psp                 */
         " out:                              \n" /* }                          */
-#if (__CORTEX_M == 0)
+#if defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS) \
+    || defined(CPU_ARCH_CORTEX_M23)
         "push {r4-r7}                       \n" /* save r4..r7 to the stack   */
         "mov r3, r8                         \n" /*                            */
         "mov r4, r9                         \n" /*                            */
@@ -208,9 +209,10 @@ __attribute__((naked)) void hard_fault_default(void)
     );
 }
 
-#if (__CORTEX_M == 0)
-/* Cortex-M0 and Cortex-M0+ lack the extended fault status registers found in
- * Cortex-M3 and above. */
+#if defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS) \
+    || defined(CPU_ARCH_CORTEX_M23)
+/* Cortex-M0, Cortex-M0+ and Cortex-M23 lack the extended fault status
+   registers found in Cortex-M3 and above. */
 #define CPU_HAS_EXTENDED_FAULT_REGISTERS 0
 #else
 #define CPU_HAS_EXTENDED_FAULT_REGISTERS 1
@@ -261,11 +263,12 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
 
         /* Reconstruct original stack pointer before fault occurred */
         orig_sp = sp + 8;
+#ifdef SCB_CCR_STKALIGN_Msk
         if (psr & SCB_CCR_STKALIGN_Msk) {
             /* Stack was not 8-byte aligned */
             orig_sp += 1;
         }
-
+#endif /* SCB_CCR_STKALIGN_Msk */
         puts("\nContext before hardfault:");
 
         /* TODO: printf in ISR context might be a bad idea */
@@ -315,7 +318,8 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
             "mov lr, r1\n"
             "mov sp, %[orig_sp]\n"
             "mov r1, %[extra_stack]\n"
-#if (__CORTEX_M == 0)
+#if defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS) \
+    || defined(CPU_ARCH_CORTEX_M23)
             "ldm r1!, {r4-r7}\n"
             "mov r8, r4\n"
             "mov r9, r5\n"

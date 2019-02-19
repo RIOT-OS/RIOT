@@ -11,6 +11,3 @@ ifeq (,$(filter jiminy-mega256rfr2,$(BOARD)))
   FEATURES_PROVIDED += arduino
   FEATURES_PROVIDED += periph_pwm
 endif
-
-# The board MPU family (used for grouping by the CI system)
-FEATURES_MCU_GROUP = avr8

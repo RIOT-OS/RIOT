@@ -31,9 +31,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-static gnrc_sixlowpan_msg_frag_t _fragment_msg = {
-        NULL, 0, 0, KERNEL_PID_UNDEF
-    };
+static gnrc_sixlowpan_msg_frag_t _fragment_msg;
 
 #if ENABLE_DEBUG
 /* For PRIu16 etc. */
@@ -44,7 +42,7 @@ static uint16_t _tag;
 
 static inline uint16_t _floor8(uint16_t length)
 {
-    return length & 0xf8U;
+    return length & 0xfff8U;
 }
 
 static inline size_t _min(size_t a, size_t b)
@@ -238,7 +236,7 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
 {
     assert(ctx != NULL);
     gnrc_sixlowpan_msg_frag_t *fragment_msg = ctx;
-    gnrc_netif_t *iface = gnrc_netif_get_by_pid(fragment_msg->pid);
+    gnrc_netif_t *iface;
     uint16_t res;
     /* payload_len: actual size of the packet vs
      * datagram_size: size of the uncompressed IPv6 packet */
@@ -248,6 +246,7 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     assert((fragment_msg->pkt == pkt) || (pkt == NULL));
     (void)page;
     (void)pkt;
+    iface = gnrc_netif_hdr_get_netif(fragment_msg->pkt->data);
 #if defined(DEVELHELP) && ENABLE_DEBUG
     if (iface == NULL) {
         DEBUG("6lo frag: iface == NULL, expect segmentation fault.\n");

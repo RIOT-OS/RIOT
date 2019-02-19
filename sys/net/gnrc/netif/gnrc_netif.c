@@ -25,7 +25,7 @@
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6.h"
 #endif /* MODULE_GNRC_IPV6_NIB */
-#ifdef MODULE_NETSTATS_IPV6
+#ifdef MODULE_NETSTATS
 #include "net/netstats.h"
 #endif
 #include "fmt.h"
@@ -127,6 +127,13 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
                     res = sizeof(&netif->ipv6.stats);
                     break;
 #endif
+#ifdef MODULE_NETSTATS_L2
+                case NETSTATS_LAYER2:
+                    assert(opt->data_len == sizeof(netstats_t *));
+                    *((netstats_t **)opt->data) = &netif->stats;
+                    res = sizeof(&netif->stats);
+                    break;
+#endif
                 default:
                     /* take from device */
                     break;
@@ -183,9 +190,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             break;
         case NETOPT_IPV6_IID:
             assert(opt->data_len >= sizeof(eui64_t));
-            if (gnrc_netif_ipv6_get_iid(netif, opt->data) == 0) {
-                res = sizeof(eui64_t);
-            }
+            res = gnrc_netif_ipv6_get_iid(netif, opt->data);
             break;
         case NETOPT_MAX_PACKET_SIZE:
             if (opt->context == GNRC_NETTYPE_IPV6) {
@@ -813,28 +818,6 @@ int gnrc_netif_ipv6_group_idx(gnrc_netif_t *netif, const ipv6_addr_t *addr)
     return idx;
 }
 
-int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
-{
-#if GNRC_NETIF_L2ADDR_MAXLEN > 0
-    if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
-        /* the device driver abstraction should be able to provide us with the
-         * IPV6_IID, so we try this first */
-        int res = netif->dev->driver->get(netif->dev, NETOPT_IPV6_IID,
-                                          eui64, sizeof(eui64_t));
-        if (res == sizeof(eui64_t)) {
-            return 0;
-        }
-        res = gnrc_netif_ipv6_iid_from_addr(netif,
-                                            netif->l2addr, netif->l2addr_len,
-                                            eui64);
-        if (res > 0) {
-            return 0;
-        }
-    }
-#endif /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
-    return -ENOTSUP;
-}
-
 static inline bool _addr_anycast(const gnrc_netif_t *netif, unsigned idx)
 {
     return (netif->ipv6.addrs_flags[idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST);
@@ -1133,27 +1116,8 @@ static void _update_l2addr_from_dev(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     int res;
-    netopt_t opt = NETOPT_ADDRESS;
+    netopt_t opt = gnrc_netif_get_l2addr_opt(netif);
 
-    switch (netif->device_type) {
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) \
-    || defined(MODULE_NORDIC_SOFTDEVICE_BLE)
-        case NETDEV_TYPE_BLE:
-        case NETDEV_TYPE_IEEE802154: {
-                uint16_t tmp;
-
-                res = dev->driver->get(dev, NETOPT_SRC_LEN, &tmp, sizeof(tmp));
-                assert(res == sizeof(tmp));
-                netif->l2addr_len = (uint8_t)tmp;
-                if (tmp == IEEE802154_LONG_ADDRESS_LEN) {
-                    opt = NETOPT_ADDRESS_LONG;
-                }
-            }
-            break;
-#endif
-        default:
-            break;
-    }
     res = dev->driver->get(dev, opt, netif->l2addr,
                            sizeof(netif->l2addr));
     if (res != -ENOTSUP) {
@@ -1179,60 +1143,7 @@ static void _init_from_device(gnrc_netif_t *netif)
     (void)res;
     assert(res == sizeof(tmp));
     netif->device_type = (uint8_t)tmp;
-    switch (netif->device_type) {
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN) || \
-    defined(MODULE_XBEE) || defined(MODULE_ESP_NOW) || \
-    defined(MODULE_GNRC_SIXLOENC)
-        case NETDEV_TYPE_IEEE802154:
-        case NETDEV_TYPE_NRFMIN:
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-            netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
-#endif
-            /* intentionally falls through */
-        case NETDEV_TYPE_ESP_NOW:
-#ifdef MODULE_GNRC_IPV6
-            res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE, &tmp, sizeof(tmp));
-            assert(res == sizeof(tmp));
-#ifdef MODULE_GNRC_SIXLOWPAN
-            netif->ipv6.mtu = IPV6_MIN_MTU;
-            netif->sixlo.max_frag_size = tmp;
-#else
-            netif->ipv6.mtu = tmp;
-#endif
-#endif
-            break;
-#endif  /* MODULE_NETDEV_IEEE802154 */
-#ifdef MODULE_NETDEV_ETH
-        case NETDEV_TYPE_ETHERNET:
-#ifdef MODULE_GNRC_IPV6
-            netif->ipv6.mtu = ETHERNET_DATA_LEN;
-#endif
-#if defined(MODULE_GNRC_SIXLOWPAN_IPHC) && defined(MODULE_GNRC_SIXLOENC)
-            netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
-#endif
-            break;
-#endif
-#ifdef MODULE_NORDIC_SOFTDEVICE_BLE
-        case NETDEV_TYPE_BLE:
-            netif->ipv6.mtu = IPV6_MIN_MTU;
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-            netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
-#endif
-            break;
-#endif
-        default:
-#ifdef MODULE_GNRC_IPV6
-            res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE, &tmp, sizeof(tmp));
-            if (res < 0) {
-                /* assume maximum possible transition unit */
-                netif->ipv6.mtu = UINT16_MAX;
-            }
-            else {
-                netif->ipv6.mtu = tmp;
-            }
-#endif
-            break;
-    }
+    gnrc_netif_ipv6_init_mtu(netif);
     _update_l2addr_from_dev(netif);
 }
 
@@ -1292,6 +1203,9 @@ static void *_gnrc_netif_thread(void *args)
     if (netif->ops->init) {
         netif->ops->init(netif);
     }
+#ifdef MODULE_NETSTATS_L2
+    memset(&netif->stats, 0, sizeof(netstats_t));
+#endif
     /* now let rest of GNRC use the interface */
     gnrc_netif_release(netif);
 
@@ -1311,6 +1225,11 @@ static void *_gnrc_netif_thread(void *args)
                     DEBUG("gnrc_netif: error sending packet %p (code: %u)\n",
                           msg.content.ptr, res);
                 }
+#ifdef MODULE_NETSTATS_L2
+                else {
+                    netif->stats.tx_bytes += res;
+                }
+#endif
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
                 opt = msg.content.ptr;
@@ -1383,25 +1302,24 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
     }
     else {
         DEBUG("gnrc_netif: event triggered -> %i\n", event);
+        gnrc_pktsnip_t *pkt = NULL;
         switch (event) {
-            case NETDEV_EVENT_RX_COMPLETE: {
-                    gnrc_pktsnip_t *pkt = netif->ops->recv(netif);
-
-                    if (pkt) {
-                        _pass_on_packet(pkt);
-                    }
+            case NETDEV_EVENT_RX_COMPLETE:
+                pkt = netif->ops->recv(netif);
+                if (pkt) {
+                    _pass_on_packet(pkt);
                 }
                 break;
 #ifdef MODULE_NETSTATS_L2
             case NETDEV_EVENT_TX_MEDIUM_BUSY:
                 /* we are the only ones supposed to touch this variable,
                  * so no acquire necessary */
-                dev->stats.tx_failed++;
+                netif->stats.tx_failed++;
                 break;
             case NETDEV_EVENT_TX_COMPLETE:
                 /* we are the only ones supposed to touch this variable,
                  * so no acquire necessary */
-                dev->stats.tx_success++;
+                netif->stats.tx_success++;
                 break;
 #endif
             default:

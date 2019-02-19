@@ -120,9 +120,11 @@ extern "C"
 /** Enable LPTMR clock gate */
 #define LPTMR_CLKEN()  (bit_set32(&SIM->SCGC5, SIM_SCGC5_LPTMR_SHIFT))
 #endif
-#ifdef SIM_SCGC6_PIT_SHIFT
+#if defined(SIM_SCGC6_PIT_SHIFT)
 /** Enable PIT clock gate */
 #define PIT_CLKEN()    (bit_set32(&SIM->SCGC6, SIM_SCGC6_PIT_SHIFT))
+#elif defined(SIM_SCGC_PIT_SHIFT)
+#define PIT_CLKEN()    (bit_set32(&SIM->SCGC, SIM_SCGC_PIT_SHIFT))
 #endif
 #ifdef SIM_SCGC6_RTC_SHIFT
 /** Enable RTC clock gate */

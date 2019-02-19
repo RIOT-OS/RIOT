@@ -28,6 +28,7 @@ endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
     # add additional modules used for any WiFi interface
+    USEMODULE += esp_idf_heap
     USEMODULE += esp_idf_wpa_supplicant_crypto
     USEMODULE += esp_idf_wpa_supplicant_port
     USEMODULE += esp_idf_nvs_flash

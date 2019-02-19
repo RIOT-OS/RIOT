@@ -60,7 +60,7 @@ void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
 
     netdev->driver = &kw2xrf_driver;
     /* initialize device descriptor */
-    memcpy(&dev->params, params, sizeof(kw2xrf_params_t));
+    dev->params = *params;
     dev->idle_state = XCVSEQ_RECEIVE;
     dev->state = 0;
     dev->pending_tx = 0;

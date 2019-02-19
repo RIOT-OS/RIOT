@@ -10,7 +10,7 @@ import sys
 from testrunner import run
 
 
-def test1(term):
+def _test1(term):
     term.expect_exact("######################### TEST1:")
     term.expect_exact("first: sem_init")
     term.expect_exact("first: thread create")
@@ -33,7 +33,7 @@ def test1(term):
     term.expect_exact("first: end")
 
 
-def test2(term):
+def _test2(term):
     term.expect_exact("######################### TEST2:")
     term.expect_exact("first: sem_init")
     term.expect_exact("first: thread create: 5")
@@ -64,7 +64,7 @@ def test2(term):
     term.expect_exact("Back in main thread.")
 
 
-def test3(term):
+def _test3(term):
     term.expect_exact("######################### TEST3:")
     term.expect_exact("first: sem_init s1")
     term.expect_exact("first: sem_init s2")
@@ -81,7 +81,7 @@ def test3(term):
     term.expect_exact("Thread 2 woke up after waiting for s1.")
 
 
-def test4(term):
+def _test4(term):
     term.expect_exact("######################### TEST4:")
     term.expect_exact("first: sem_init s1")
     term.expect_exact("first: wait 1 sec for s1")
@@ -90,10 +90,10 @@ def test4(term):
 
 
 def testfunc(child):
-    test1(child)
-    test2(child)
-    test3(child)
-    test4(child)
+    _test1(child)
+    _test2(child)
+    _test3(child)
+    _test4(child)
     child.expect("######################### DONE")
 
 

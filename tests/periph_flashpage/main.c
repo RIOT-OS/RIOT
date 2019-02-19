@@ -310,7 +310,7 @@ static int cmd_test_last(int argc, char **argv)
         }
     }
 
-    if (flashpage_write_and_verify((int)FLASHPAGE_NUMOF - 2, page_mem) != FLASHPAGE_OK) {
+    if (flashpage_write_and_verify((int)FLASHPAGE_NUMOF - 1, page_mem) != FLASHPAGE_OK) {
         puts("error verifying the content of last page");
         return 1;
     }
@@ -336,9 +336,15 @@ static int cmd_test_last_raw(int argc, char **argv)
     memcpy(raw_buf, "test12344321tset", 16);
 
     /* erase the page first */
-    flashpage_write(((int)FLASHPAGE_NUMOF - 2), NULL);
+    flashpage_write(((int)FLASHPAGE_NUMOF - 1), NULL);
 
-    flashpage_write_raw((void*) ((int)CPU_FLASH_BASE + (int)FLASHPAGE_SIZE * ((int)FLASHPAGE_NUMOF - 2)), raw_buf, strlen(raw_buf));
+    flashpage_write_raw(flashpage_addr((int)FLASHPAGE_NUMOF - 1), raw_buf, strlen(raw_buf));
+
+    /* verify that previous write_raw effectively wrote the desired data */
+    if (memcmp(flashpage_addr((int)FLASHPAGE_NUMOF - 1), raw_buf, strlen(raw_buf)) != 0) {
+        puts("error verifying the content of last page");
+        return 1;
+    }
 
     puts("wrote raw short buffer to last flash page");
     return 0;

@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "embUnit.h"
 
@@ -330,6 +331,29 @@ static void test_nanocoap__get_multi_query(void)
 }
 
 /*
+ * Builds on get_req test, to test building a PDU that completely fills the
+ * buffer.
+ */
+static void test_nanocoap__option_add_buffer_max(void)
+{
+    uint8_t buf[70];    /* header 4, token 2, path 64 */
+    coap_pkt_t pkt;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+    char path[] = "/23456789012345678901234567890123456789012345678901234567890123";
+
+    size_t uri_opt_len = 64;    /* option hdr 2, option value 62 */
+
+    size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                &token[0], 2, COAP_METHOD_GET, msgid);
+
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
+}
+
+/*
  * Helper for server_get tests below.
  * GET Request for nanocoap server example /riot/value resource.
  * Includes 2-byte token; non-confirmable.
@@ -433,6 +457,90 @@ static void test_nanocoap__server_reply_simple_con(void)
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_ACK, coap_get_type(&pkt));
 }
 
+static void test_nanocoap__server_option_count_overflow_check(void)
+{
+    /* this test passes a forged CoAP packet containing 42 options (provided by
+     * @nmeum in #10753, 42 is a random number which just needs to be higher
+     * than NANOCOAP_NOPTS_MAX) to coap_parse().  The used coap_pkt_t is part
+     * of a struct, followed by an array of 42 coap_option_t.  The array is
+     * cleared before the call to coap_parse().  If the overflow protection is
+     * working, the array must still be clear after parsing the packet, and the
+     * proper error code (-ENOMEM) is returned.  Otherwise, the parsing wrote
+     * past scratch.pkt, thus the array is not zeroed anymore.
+     */
+
+     static uint8_t pkt_data[] = {
+        0x40, 0x01, 0x09, 0x26, 0x01, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17, 0x11, 0x17,
+        0x11, 0x17, 0x11, 0x17 };
+
+    /* ensure NANOCOAP_NOPTS_MAX is actually lower than 42 */
+    TEST_ASSERT(NANOCOAP_NOPTS_MAX < 42);
+
+    struct {
+      coap_pkt_t pkt;
+      uint8_t guard_data[42 * sizeof(coap_optpos_t)];
+    } scratch;
+
+    memset(&scratch, 0, sizeof(scratch));
+
+    int res = coap_parse(&scratch.pkt, pkt_data, sizeof(pkt_data));
+
+    /* check if any byte of the guard_data array is non-zero */
+    int dirty = 0;
+    volatile uint8_t *pos = scratch.guard_data;
+    for (size_t i = 0; i < sizeof(scratch.guard_data); i++) {
+        if (*pos) {
+            dirty = 1;
+            break;
+        }
+    }
+
+    TEST_ASSERT_EQUAL_INT(0, dirty);
+    TEST_ASSERT_EQUAL_INT(-ENOMEM, res);
+}
+
+/*
+ * Verifies that coap_parse() recognizes inclusion of too many options.
+ */
+static void test_nanocoap__server_option_count_overflow(void)
+{
+    /* base pkt is a GET for /riot/value, which results in two options for the
+     * path, but only 1 entry in the options array.
+     * Size buf to accept an extra 2-byte option */
+    unsigned base_len = 17;
+    uint8_t buf[17 + (2 * NANOCOAP_NOPTS_MAX)] = {
+        0x42, 0x01, 0xbe, 0x16, 0x35, 0x61, 0xb4, 0x72,
+        0x69, 0x6f, 0x74, 0x05, 0x76, 0x61, 0x6c, 0x75,
+        0x65
+    };
+    coap_pkt_t pkt;
+
+    /* nonsense filler option that contains a single byte of data */
+    uint8_t fill_opt[] = { 0x11, 0x01 };
+
+    /* fill pkt with maximum options; should succeed */
+    int i = 0;
+    for (; i < (2 * (NANOCOAP_NOPTS_MAX - 1)); i+=2) {
+        memcpy(&buf[base_len+i], fill_opt, 2);
+    }
+
+    /* don't read final two bytes, where overflow option will be added later */
+    int res = coap_parse(&pkt, buf, sizeof(buf) - 2);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    /* add option to overflow */
+    memcpy(&buf[base_len+i], fill_opt, 2);
+
+    res = coap_parse(&pkt, buf, sizeof(buf));
+    TEST_ASSERT(res < 0);
+}
+
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -446,10 +554,13 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__get_path_too_long),
         new_TestFixture(test_nanocoap__get_query),
         new_TestFixture(test_nanocoap__get_multi_query),
+        new_TestFixture(test_nanocoap__option_add_buffer_max),
         new_TestFixture(test_nanocoap__server_get_req),
         new_TestFixture(test_nanocoap__server_reply_simple),
         new_TestFixture(test_nanocoap__server_get_req_con),
         new_TestFixture(test_nanocoap__server_reply_simple_con),
+        new_TestFixture(test_nanocoap__server_option_count_overflow_check),
+        new_TestFixture(test_nanocoap__server_option_count_overflow),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);

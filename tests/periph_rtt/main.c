@@ -14,7 +14,7 @@
  * @brief       Test for low-level Real Time Timer drivers
  *
  * This test will initialize the real-time timer and trigger an alarm printing
- * 'Hello' every 10 seconds
+ * 'Hello' every 5 seconds
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -29,7 +29,7 @@
 #include "periph_conf.h"
 #include "periph/rtt.h"
 
-#define TICKS_TO_WAIT       (10 * RTT_FREQUENCY)
+#define TICKS_TO_WAIT       (5 * RTT_FREQUENCY)
 
 static volatile uint32_t last;
 
@@ -47,7 +47,7 @@ void cb(void *arg)
 int main(void)
 {
     puts("\nRIOT RTT low-level driver test");
-    puts("This test will display 'Hello' every 10 seconds\n");
+    puts("This test will display 'Hello' every 5 seconds\n");
 
     puts("Initializing the RTT driver");
     rtt_init();
@@ -56,7 +56,7 @@ int main(void)
     printf("RTT now: %" PRIu32 "\n", now);
 
     last = (now + TICKS_TO_WAIT) & RTT_MAX_VALUE;
-    printf("Setting initial alarm to now + 10 s (%" PRIu32 ")\n", last);
+    printf("Setting initial alarm to now + 5 s (%" PRIu32 ")\n", last);
     rtt_set_alarm(last, cb, 0);
 
     puts("Done setting up the RTT, wait for many Hellos");

@@ -9,7 +9,7 @@ The Jiminy board is a development of the
 (IAS) of the [RWTH Aachen University](https://www.rwth-aachen.de/). We started the project by porting
 RIOT OS to the [Pinoccio.io](https://github.com/Pinoccio/hardware-pinoccio) board. As there where severe
 limitations we designed the Jiminy board which has the the
-[ATmega256rfr2](www.atmel.com/Images/Atmel-8393-MCU_Wireless-ATmega256RFR2-ATmega128RFR2-ATmega64RFR2_Datasheet.pdf)
+[ATmega256rfr2](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8393-MCU_Wireless-ATmega256RFR2-ATmega128RFR2-ATmega64RFR2_Datasheet.pdf)
 MCU as common feature.
 
 It is Arduino like and features USB programming. The [Bootloader](https://github.com/Josar/arduino_stk500v2)
@@ -48,12 +48,12 @@ The jiminy board has following ICs and features.
 | Features | Details |  Datasheet |
 |:------------- |:--------------------- |:------------- |
 | USB2Serial| ATmega16U2, High-performance, low-power AVR 8-Bit Advanced RISC Architecture | [Link](http://www.microchip.com/wwwproducts/en/ATmega16u2) |
-| MCU | ATmega256, AVR 8-Bit Advanced RISC Architecture |[Link](www.atmel.com/Images/Atmel-8393-MCU_Wireless-ATmega256RFR2-ATmega128RFR2-ATmega64RFR2_Datasheet.pdf) |
+| MCU | ATmega256, AVR 8-Bit Advanced RISC Architecture |[Link](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8393-MCU_Wireless-ATmega256RFR2-ATmega128RFR2-ATmega64RFR2_Datasheet.pdf) |
 | Transceiver | High performance RF-CMOS 2.4 GHz radio transceiver targeted for IEEE802.15.4, ZigBee, IPv6 / 6LoWPAN, RF4CE, SP100, WirelessHART and ISM applications | above |
-| Li-ion Charger and Power Path | bq24298 , 3A Single Cell USB Charger With Power Path Management|[Link](www.ti.com/lit/ds/symlink/bq24298.pdf) |
-| Fuel Gauge| LC709203F, Fuel Gauge for a single lithium ion battery which provides accurate RSOC information even under unstable conditions (e.g. changes of battery temperature, loading, aging and self-discharge) |[Link](www.onsemi.com/pub/Collateral/LC709203F-D.PDF) |
-| AC Converter | TPS6274x, Output voltage selectable within a range from 1.8V to 3.3V in 100mV steps, output currents up to 300mA | [Link](www.ti.com/lit/ds/symlink/tps62740.pdf) |
-| RGB LED | Cree LED, hardware PWM controlled  |[Link](www.cree.com/led-components/media/documents/CLVBAFKA.pdf) |
+| Li-ion Charger and Power Path | bq24298 , 3A Single Cell USB Charger With Power Path Management|[Link](http://www.ti.com/lit/ds/symlink/bq24298.pdf) |
+| Fuel Gauge| LC709203F, Fuel Gauge for a single lithium ion battery which provides accurate RSOC information even under unstable conditions (e.g. changes of battery temperature, loading, aging and self-discharge) |[Link](https://www.onsemi.com/pub/Collateral/LC709203F-D.PDF) |
+| AC Converter | TPS6274x, Output voltage selectable within a range from 1.8V to 3.3V in 100mV steps, output currents up to 300mA | [Link](http://www.ti.com/lit/ds/symlink/tps62740.pdf) |
+| RGB LED | Cree LED, hardware PWM controlled  |[Link](https://www.cree.com/led-components/media/documents/ds-CLVBA-FKA.pdf) |
 
 
 ## MCU Details
@@ -74,7 +74,7 @@ The jiminy board has following ICs and features.
 | SPIs		| 3 (1 SPI & 2 USART SPI) |
 | I2Cs		| 1 (called TWI)	|
 | Vcc		| 1.8V - 3.6V		|
-| Datasheet / Reference Manual | [Datasheet and Reference Manual](www.atmel.com/Images/Atmel-8393-MCU_Wireless-ATmega256RFR2-ATmega128RFR2-ATmega64RFR2_Datasheet.pdf) |
+| Datasheet / Reference Manual | [Datasheet and Reference Manual](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8393-MCU_Wireless-ATmega256RFR2-ATmega128RFR2-ATmega64RFR2_Datasheet.pdf) |
 | Board Manual	|  |
 | Pins          |  |
 

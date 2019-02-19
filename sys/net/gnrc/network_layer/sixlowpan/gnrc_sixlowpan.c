@@ -73,6 +73,7 @@ void gnrc_sixlowpan_dispatch_recv(gnrc_pktsnip_t *pkt, void *context,
          ptr = ptr->next) {
         if ((ptr->next) && (ptr->next->type == GNRC_NETTYPE_NETIF)) {
             type = ptr->type;
+            break;
         }
     }
 #else   /* MODULE_GNRC_IPV6 */
@@ -128,7 +129,6 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
             gnrc_pktbuf_release_error(pkt, ENOMEM);
             return;
         }
-        fragment_msg->pid = netif->pid;
         fragment_msg->pkt = pkt;
         fragment_msg->datagram_size = orig_datagram_size;
         /* Sending the first fragment has an offset==0 */

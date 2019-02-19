@@ -30,18 +30,6 @@
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
-/**
- * @brief   Determines supposed link-layer address from interface and option
- *          length
- *
- * @param[in] netif A network interface.
- * @param[in] opt   A SL2AO or TL2AO.
- *
- * @return  The length of the L2 address carried in @p opt.
- */
-static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
-                                       const ndp_opt_t *opt);
-
 void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
              const ipv6_addr_t *src, const ipv6_addr_t *dst)
 {
@@ -55,16 +43,15 @@ void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
     if ((src != NULL) && gnrc_netif_is_6ln(netif) &&
         (_nib_onl_get_if(dr->next_hop) == (unsigned)netif->pid) &&
         ipv6_addr_equal(&dr->next_hop->ipv6, dst)) {
-        netdev_t *dev = netif->dev;
-        uint8_t l2src[GNRC_NETIF_L2ADDR_MAXLEN];
-        size_t l2src_len = (uint16_t)dev->driver->get(dev, NETOPT_ADDRESS_LONG,
-                                                      l2src, sizeof(l2src));
-        if (l2src_len != sizeof(eui64_t)) {
+        eui64_t eui64;
+        int res = gnrc_netif_get_eui64(netif, &eui64);
+
+        if (res != sizeof(eui64_t)) {
             DEBUG("nib: can't get EUI-64 of the interface for ARO\n");
             return;
         }
         ext_opt = gnrc_sixlowpan_nd_opt_ar_build(0, GNRC_SIXLOWPAN_ND_AR_LTIME,
-                                                 (eui64_t *)l2src, NULL);
+                                                 &eui64, NULL);
         if (ext_opt == NULL) {
             DEBUG("nib: error allocating ARO.\n");
             return;
@@ -104,10 +91,10 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 {
     assert(netif != NULL);
     _nib_onl_entry_t *nce = _nib_onl_get(&ipv6->src, netif->pid);
-    unsigned l2addr_len;
+    int l2addr_len;
 
-    l2addr_len = _get_l2addr_len(netif, sl2ao);
-    if (l2addr_len == 0U) {
+    l2addr_len = gnrc_netif_ndp_addr_len_from_l2ao(netif, sl2ao);
+    if (l2addr_len < 0) {
         DEBUG("nib: Unexpected SL2AO length. Ignoring SL2AO\n");
         return;
     }
@@ -171,43 +158,6 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             memcpy(nce->l2addr, sl2ao + 1, l2addr_len);
         }
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
-    }
-}
-
-static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
-                                       const ndp_opt_t *opt)
-{
-    switch (netif->device_type) {
-#ifdef MODULE_CC110X
-        case NETDEV_TYPE_CC110X:
-            (void)opt;
-            return sizeof(uint8_t);
-#endif  /* MODULE_CC110X */
-#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW)
-        case NETDEV_TYPE_ETHERNET:
-        case NETDEV_TYPE_ESP_NOW:
-            (void)opt;
-            return ETHERNET_ADDR_LEN;
-#endif  /* defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) */
-#ifdef MODULE_NRFMIN
-        case NETDEV_TYPE_NRFMIN:
-            (void)opt;
-            return sizeof(uint16_t);
-#endif  /* MODULE_NRFMIN */
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
-        case NETDEV_TYPE_IEEE802154:
-            switch (opt->len) {
-                case 1U:
-                    return IEEE802154_SHORT_ADDRESS_LEN;
-                case 2U:
-                    return IEEE802154_LONG_ADDRESS_LEN;
-                default:
-                    return 0U;
-            }
-#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
-        default:
-            (void)opt;
-            return 0U;
     }
 }
 
@@ -379,13 +329,13 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
 void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
                     const icmpv6_hdr_t *icmpv6, const ndp_opt_t *tl2ao)
 {
-    unsigned l2addr_len = 0;
+    int l2addr_len = 0;
 
     assert(nce != NULL);
     assert(netif != NULL);
     if (tl2ao != NULL) {
-        l2addr_len = _get_l2addr_len(netif, tl2ao);
-        if (l2addr_len == 0U) {
+        l2addr_len = gnrc_netif_ndp_addr_len_from_l2ao(netif, tl2ao);
+        if (l2addr_len < 0) {
             DEBUG("nib: Unexpected TL2AO length. Ignoring TL2AO\n");
             return;
         }
@@ -510,17 +460,10 @@ bool _is_reachable(_nib_onl_entry_t *entry)
 static inline uint32_t _exp_backoff_retrans_timer(uint8_t ns_sent,
                                                   uint32_t retrans_timer)
 {
-    uint32_t tmp = random_uint32_range(NDP_MIN_RANDOM_FACTOR,
-                                       NDP_MAX_RANDOM_FACTOR);
+    uint32_t factor = random_uint32_range(NDP_MIN_RANDOM_FACTOR,
+                                          NDP_MAX_RANDOM_FACTOR);
 
-    /* backoff according to  https://tools.ietf.org/html/rfc7048 with
-     * BACKOFF_MULTIPLE == 2 */
-    tmp = ((1 << ns_sent) * retrans_timer * tmp) / US_PER_MS;
-    /* random factors were statically multiplied with 1000 ^ */
-    if (tmp > NDP_MAX_RETRANS_TIMER_MS) {
-        tmp = NDP_MAX_RETRANS_TIMER_MS;
-    }
-    return tmp;
+    return _exp_backoff_retrans_timer_factor(ns_sent, retrans_timer, factor);
 }
 
 #if GNRC_IPV6_NIB_CONF_REDIRECT

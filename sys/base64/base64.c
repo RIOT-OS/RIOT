@@ -60,7 +60,7 @@ int base64_encode(const void *data_in, size_t data_in_size,
                   unsigned char *base64_out, size_t *base64_out_size)
 {
     const unsigned char *in = data_in;
-    size_t required_size = 4 * ((data_in_size + 2) / 3);
+    size_t required_size = base64_estimate_encode_size(data_in_size);
 
     if (data_in == NULL) {
         return BASE64_ERROR_DATA_IN;
@@ -164,7 +164,7 @@ int base64_decode(const unsigned char *base64_in, size_t base64_in_size,
                   void *data_out, size_t *data_out_size)
 {
     unsigned char *out = data_out;
-    size_t required_size = ((base64_in_size / 4) * 3);
+    size_t required_size = base64_estimate_decode_size(base64_in_size);
 
     if (base64_in == NULL) {
         return BASE64_ERROR_DATA_IN;

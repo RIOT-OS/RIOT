@@ -125,7 +125,7 @@ enum {
  */
 #define HTS221_REGS_CTRL_REG2_BOOT      (1 << 7)    /**< Reboot memory content */
 #define HTS221_REGS_CTRL_REG2_HEATER    (1 << 1)    /**< Heater ON */
-#define HTS221_REGS_CTRL_REG2_OS_EN     (1 << 2)    /**< One-shot enable, start new dataset */
+#define HTS221_REGS_CTRL_REG2_OS_EN     (1 << 0)    /**< One-shot enable, start new dataset */
 /** @} */
 
 /**

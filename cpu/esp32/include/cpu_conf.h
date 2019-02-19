@@ -7,7 +7,10 @@
  */
 
 /**
+ * @defgroup    cpu_esp32_conf ESP32 compile configurations
  * @ingroup     cpu_esp32
+ * @ingroup     config
+ * @brief       Compile-time configuration macros for ESP32 modules
  * @{
  *
  * @file
@@ -29,7 +32,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Stack size configuration
+ * @name   Stack size configuration
  * @{
  */
 #define THREAD_EXTRA_STACKSIZE_PRINTF (1024)

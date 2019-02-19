@@ -1,5 +1,9 @@
 # driver dependencies (in alphabetical order)
 
+ifneq (,$(filter ad7746,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter adc%1c,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_i2c
@@ -118,6 +122,10 @@ endif
 
 ifneq (,$(filter ds1307,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter ds3234,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
 endif
 
 ifneq (,$(filter dsp0401,$(USEMODULE)))
@@ -273,6 +281,16 @@ ifneq (,$(filter lsm6dsl,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter ltc4150_bidirectional,$(USEMODULE)))
+  USEMODULE += ltc4150
+endif
+
+ifneq (,$(filter ltc4150,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter mag3110,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
@@ -384,6 +402,10 @@ ifneq (,$(filter sdcard_spi,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter sds011,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+endif
+
 ifneq (,$(filter servo,$(USEMODULE)))
   FEATURES_REQUIRED += periph_pwm
 endif
@@ -392,6 +414,11 @@ ifneq (,$(filter sht1%,$(USEMODULE)))
   USEMODULE += sht1x
   FEATURES_REQUIRED += periph_gpio
   USEMODULE += xtimer
+endif
+
+ifneq (,$(filter sht2x,$(USEMODULE)))
+  USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_i2c
 endif
 
 ifneq (,$(filter sht3x,$(USEMODULE)))

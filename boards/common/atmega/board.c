@@ -31,8 +31,13 @@ void led_init(void);
 
 void board_init(void)
 {
+
     atmega_set_prescaler(CPU_ATMEGA_CLK_SCALE_INIT);
+
+#ifdef MODULE_AVR_LIBC_EXTRA
     atmega_stdio_init();
+#endif
+
     cpu_init();
     led_init();
     irq_enable();

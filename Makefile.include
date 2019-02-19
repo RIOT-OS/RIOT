@@ -23,6 +23,7 @@ RIOTTOOLS      ?= $(RIOTBASE)/dist/tools
 RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 GITCACHE       ?= $(RIOTTOOLS)/git/git-cache
 GIT_CACHE_DIR  ?= $(HOME)/.gitcache
+BUILD_DIR      ?= $(RIOTBASE)/build
 APPDIR         ?= $(CURDIR)
 BINDIRBASE     ?= $(APPDIR)/bin
 BINDIR         ?= $(BINDIRBASE)/$(BOARD)
@@ -39,6 +40,7 @@ __DIRECTORY_VARIABLES := \
   RIOTTOOLS \
   RIOTPROJECT \
   APPDIR \
+  BUILD_DIR \
   BINDIRBASE \
   BINDIR \
   CCACHE_BASEDIR \
@@ -58,6 +60,7 @@ override RIOTTOOLS      := $(abspath $(RIOTTOOLS))
 override RIOTPROJECT    := $(abspath $(RIOTPROJECT))
 override GITCACHE       := $(abspath $(GITCACHE))
 override APPDIR         := $(abspath $(APPDIR))
+override BUILD_DIR      := $(abspath $(BUILD_DIR))
 override BINDIRBASE     := $(abspath $(BINDIRBASE))
 override BINDIR         := $(abspath $(BINDIR))
 override PKGDIRBASE     := $(abspath $(PKGDIRBASE))
@@ -94,7 +97,7 @@ include $(RIOTMAKE)/color.inc.mk
 # include concurrency helpers
 include $(RIOTMAKE)/info-nproc.inc.mk
 
-GLOBAL_GOALS := buildtest info-boards-supported info-boards-features-missing info-buildsizes info-buildsizes-diff
+GLOBAL_GOALS += buildtest info-boards-supported info-boards-features-missing info-buildsizes info-buildsizes-diff
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
   BOARD=none
 endif
@@ -150,8 +153,6 @@ export WPEDANTIC
 ifeq ($(WPEDANTIC),1)
   CFLAGS += -Wpedantic
 endif
-
-ifneq (10,$(if $(RIOT_VERSION),1,0)$(if $(__RIOTBUILD_FLAG),1,0))
 
 # Provide a shallow sanity check. You cannot call `make` in a module directory.
 export __RIOTBUILD_FLAG := RIOT
@@ -286,10 +287,11 @@ ifneq ($(GNRC_NETIF_NUMOF),1)
   CFLAGS += -DGNRC_NETIF_NUMOF=$(GNRC_NETIF_NUMOF)
 endif
 
+# handle removal of default modules
+USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
+
 # process dependencies
 include $(RIOTBASE)/Makefile.dep
-
-USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
@@ -651,35 +653,6 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   ifneq (, $(EXPECT_ERRORS))
     $(shell $(COLOR_ECHO) "\n\n$(COLOR_RED)EXPECT ERRORS!$(COLOR_RESET)\n\n" 1>&2)
   endif
-
-endif
-
-else # RIOT_VERSION
-
-  export __RIOTBUILD_FLAG := RIOT
-
-  NUM_RIOT_VERSION := $(shell cd $(RIOTBASE) && git rev-parse --verify --short "$(RIOT_VERSION)" 2>/dev/null)
-  ifeq (, $(NUM_RIOT_VERSION))
-    $(error The supplied RIOT_VERSION=$(RIOT_VERSION) is invalid!)
-  endif
-
-  all $(filter-out clean, $(MAKECMDGOALS)): ..delegate
-  ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    all $(filter-out clean, $(MAKECMDGOALS)): clean
-  endif
-
-  clean:
-	-$(Q)rm -rf $(BINDIR)
-
-  $(BINDIR)/riot-version/$(NUM_RIOT_VERSION)/Makefile.include:
-	$(Q)rm -rf $(@D)
-	$(Q)mkdir -p $(@D)
-	$(Q)cd $(RIOTBASE) && git archive --format=tar $(NUM_RIOT_VERSION) | ( cd $(@D) && tar x 1>&2 )
-
-  ..delegate: $(BINDIR)/riot-version/$(NUM_RIOT_VERSION)/Makefile.include
-	@$(COLOR_ECHO) '$(COLOR_GREEN)Using RIOT_VERSION=$(NUM_RIOT_VERSION)$(COLOR_RESET)' 1>&2
-	@$(COLOR_ECHO)
-	$(MAKE) RIOTBASE=$(<D) $(filter-out clean, $(MAKECMDGOALS))
 
 endif
 

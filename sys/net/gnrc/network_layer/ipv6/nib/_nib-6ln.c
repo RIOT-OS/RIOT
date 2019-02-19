@@ -29,11 +29,12 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 extern void _handle_search_rtr(gnrc_netif_t *netif);
 
-static inline bool _is_iface_eui64(gnrc_netif_t *netif, const eui64_t *eui64)
+static bool _is_iface_eui64(gnrc_netif_t *netif, const eui64_t *eui64)
 {
-    /* TODO: adapt for short addresses */
-    return (netif->l2addr_len == sizeof(eui64_t)) &&
-           (memcmp(&netif->l2addr, eui64, netif->l2addr_len) == 0);
+    eui64_t iface_eui64;
+    int res = gnrc_netif_get_eui64(netif, &iface_eui64);
+    return (res == sizeof(eui64_t)) &&
+           (iface_eui64.uint64.u64 == eui64->uint64.u64);
 }
 
 bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,

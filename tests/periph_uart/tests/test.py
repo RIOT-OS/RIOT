@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2018 Kevin Weiss <kevin.weiss@haw-hamburg.de>
+# Copyright (c) 2018 Kevin Weiss, for HAW Hamburg  <kevin.weiss@haw-hamburg.de>
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -17,7 +17,7 @@ import random
 import string
 
 from periph_uart_if import PeriphUartIf
-from if_lib import PhilipIf
+from riot_pal import LLMemMapIf, PHILIP_MEM_MAP_PATH
 
 
 def kwexpect(val1, val2, level="WARN"):
@@ -120,7 +120,7 @@ def setup_test(bpt, t):
     bpt.reset_mcu()
     t.manual_test("Reset BPT")
 
-    bpt.set_uart_baud(115200)
+    bpt.write_reg('uart.baud', 115200)
     bpt.execute_changes()
     t.manual_test("BPT: setup default baudrate")
 
@@ -154,6 +154,119 @@ def echo_test(bpt, uart, dut_uart, support_reset=False):
     return t
 
 
+def even_parity_8_bits_test(bpt, uart, dut_uart, support_reset=False):
+    cmd_log = list()
+    t = Test('even parity and 8 bits test',
+             'Tests DUT receive/transmit functionality with enabled even parity and 8 bits',
+             cmd_log)
+
+    setup_test(bpt, t)
+
+    bpt.write_reg('uart.ctrl.parity', 1)
+    bpt.execute_changes()
+
+    t.run_test(uart.uart_init(dut_uart, 115200), "Success")
+    t.run_test(uart.uart_mode(dut_uart, 8, "E", 1), "Success")
+    t.run_test(uart.uart_send_string(dut_uart, "t111"), "Success", ["t111"])
+
+    t.run_test(uart.uart_init(dut_uart, 115200), "Success")
+    t.run_test(uart.uart_mode(dut_uart, 8, "O", 1), "Success")
+    t.run_test(uart.uart_send_string(dut_uart, "t111"), "Timeout")
+
+    return t
+
+
+def odd_parity_8_bits_test(bpt, uart, dut_uart, support_reset=False):
+    cmd_log = list()
+    t = Test('odd parity and 8 bits test',
+             'Tests DUT receive/transmit functionality with enabled odd parity and 8 bits',
+             cmd_log)
+
+    setup_test(bpt, t)
+
+    bpt.write_reg('uart.ctrl.parity', 2)
+    bpt.execute_changes()
+
+    t.run_test(uart.uart_init(dut_uart, 115200), "Success")
+    t.run_test(uart.uart_mode(dut_uart, 8, "O", 1), "Success")
+    t.run_test(uart.uart_send_string(dut_uart, "t111"), "Success", ["t111"])
+
+    t.run_test(uart.uart_init(dut_uart, 115200), "Success")
+    t.run_test(uart.uart_mode(dut_uart, 8, "E", 1), "Success")
+    t.run_test(uart.uart_send_string(dut_uart, "t111"), "Timeout")
+
+    return t
+
+
+def even_parity_7_bits_test(bpt, uart, dut_uart, support_reset=False):
+    cmd_log = list()
+    t = Test('even parity and 7 bits test',
+             'Tests DUT receive/transmit functionality with enabled even parity and 7 bits',
+             cmd_log)
+
+    setup_test(bpt, t)
+
+    bpt.write_reg('uart.ctrl.parity', 1)
+    bpt.write_reg('uart.ctrl.data_bits', 1)
+    bpt.execute_changes()
+
+    t.run_test(uart.uart_init(dut_uart, 115200), "Success")
+    t.run_test(uart.uart_mode(dut_uart, 7, "E", 1), "Success")
+    t.run_test(uart.uart_send_string(dut_uart, "t111"), "Success", ["t111"])
+
+    t.run_test(uart.uart_init(dut_uart, 115200), "Success")
+    t.run_test(uart.uart_mode(dut_uart, 7, "O", 1), "Success")
+    t.run_test(uart.uart_send_string(dut_uart, "t111"), "Timeout")
+
+    return t
+
+
+def odd_parity_7_bits_test(bpt, uart, dut_uart, support_reset=False):
+    cmd_log = list()
+    t = Test('odd parity and 7 bits test',
+             'Tests DUT receive/transmit functionality with enabled odd parity and 7 bits',
+             cmd_log)
+
+    setup_test(bpt, t)
+
+    bpt.write_reg('uart.ctrl.parity', 2)
+    bpt.write_reg('uart.ctrl.data_bits', 1)
+    bpt.execute_changes()
+
+    t.run_test(uart.uart_init(dut_uart, 115200), "Success")
+    t.run_test(uart.uart_mode(dut_uart, 7, "O", 1), "Success")
+    t.run_test(uart.uart_send_string(dut_uart, "t111"), "Success", ["t111"])
+
+    t.run_test(uart.uart_init(dut_uart, 115200), "Success")
+    t.run_test(uart.uart_mode(dut_uart, 7, "E", 1), "Success")
+    t.run_test(uart.uart_send_string(dut_uart, "t111"), "Timeout")
+
+    return t
+
+
+def two_stop_bits_test(bpt, uart, dut_uart, support_reset=False):
+    cmd_log = list()
+    t = Test('two stop bits test',
+             'Tests DUT receive/transmit functionality with two stop bits',
+             cmd_log)
+
+    setup_test(bpt, t)
+
+    bpt.write_reg('uart.ctrl.parity', 2)
+    bpt.write_reg('uart.ctrl.data_bits', 0)
+    bpt.execute_changes()
+
+    t.run_test(uart.uart_init(dut_uart, 115200), "Success")
+    t.run_test(uart.uart_mode(dut_uart, 8, "N", 2), "Success")
+    t.run_test(uart.uart_send_string(dut_uart, "tttt"), "Success", ["tttt"])
+
+    t.run_test(uart.uart_init(dut_uart, 115200), "Success")
+    t.run_test(uart.uart_mode(dut_uart, 8, "N", 1), "Success")
+    t.run_test(uart.uart_send_string(dut_uart, "tttt"), "Timeout")
+
+    return t
+
+
 def echo_ext_test(bpt, uart, dut_uart, support_reset=False):
     cmd_log = list()
     t = Test('echo ext test',
@@ -162,7 +275,7 @@ def echo_ext_test(bpt, uart, dut_uart, support_reset=False):
 
     setup_test(bpt, t)
 
-    bpt.set_uart_mode(1)
+    bpt.write_reg('uart.mode', 1)
     bpt.execute_changes()
     t.manual_test("BPT: set echo ext mode")
 
@@ -182,13 +295,15 @@ def register_read_test(bpt, uart, dut_uart, support_reset=False):
 
     setup_test(bpt, t)
 
-    bpt.set_uart_mode(2)
+    bpt.write_reg('uart.mode', 2)
     bpt.execute_changes()
     t.manual_test("BPT: set echo ext mode")
 
     t.run_test(uart.uart_init(dut_uart, 115200), "Success")
     t.run_test(uart.uart_send_string(
-        dut_uart, "\"rr 152 10\""), "Success", ["0,0x09080706050403020100"])
+        dut_uart, "\"wr 1 10 1\""), "Success")
+    t.run_test(uart.uart_send_string(
+        dut_uart, "\"rr 1 1\""), "Success", ["0,0x0A"])
     t.run_test(uart.uart_send_string(
         dut_uart, "\"rr -1 10\""), "Success", [errno.EINVAL])
 
@@ -250,12 +365,22 @@ def main():
             raise ValueError('Invalid log level: %s' % loglevel)
         logging.basicConfig(level=loglevel)
 
-    bpt = PhilipIf(port=args.bpt_port)
+    bpt = LLMemMapIf(PHILIP_MEM_MAP_PATH, 'serial', args.bpt_port)
     uart = PeriphUartIf(port=args.dut_port)
 
     print('Starting Test periph_uart')
     test_list = list()
     test_list.append(echo_test(bpt, uart, args.dut_uart))
+    print_full_result(test_list[-1])
+    test_list.append(even_parity_8_bits_test(bpt, uart, args.dut_uart))
+    print_full_result(test_list[-1])
+    test_list.append(odd_parity_8_bits_test(bpt, uart, args.dut_uart))
+    print_full_result(test_list[-1])
+    test_list.append(even_parity_7_bits_test(bpt, uart, args.dut_uart))
+    print_full_result(test_list[-1])
+    test_list.append(odd_parity_7_bits_test(bpt, uart, args.dut_uart))
+    print_full_result(test_list[-1])
+    test_list.append(two_stop_bits_test(bpt, uart, args.dut_uart))
     print_full_result(test_list[-1])
     test_list.append(echo_ext_test(bpt, uart, args.dut_uart))
     print_full_result(test_list[-1])

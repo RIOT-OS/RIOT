@@ -29,6 +29,7 @@ export RIOTPROJECT           # Top level git root of the project being built, or
 export RIOTMAKE              # Location of all supplemental Makefiles (such as this file)
 export BINDIRBASE            # This is the folder where the application should be built in. For each BOARD a different subfolder is used.
 export BINDIR                # This is the folder where the application should be built in.
+export BUILD_DIR             # This is the base folder to store common build files and artifacts, e.g. test results.
 export APPDIR                # The base folder containing the application
 export PKGDIRBASE            # The base folder for building packages
 
@@ -55,7 +56,7 @@ export ARFLAGS               # Command-line options to pass to AR, default `rcs`
 export AS                    # The assembler.
 export ASFLAGS               # Flags for the assembler.
 export LINK                  # The command used to link the files. Must take the same parameters as GCC, i.e. "ld" won't work.
-export LINKFLAGS             # Flags to supply in the linking step.
+# LINKFLAGS                  # Flags to supply in the linking step.
 export LTOFLAGS              # extra CFLAGS for compiling with link time optimization
 export OBJCOPY               # The command used to create the HEXFILE.
 export OFLAGS                # The parameter for OBJCOPY, e.g. to strip the debug information.

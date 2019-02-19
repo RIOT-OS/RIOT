@@ -259,6 +259,36 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Reduce payload length by this value for a request
+ *
+ * Accommodates writing Content-Format option in gcoap_finish(). May set to
+ * zero if function not used.
+ */
+#ifndef GCOAP_REQ_OPTIONS_BUF
+#define GCOAP_REQ_OPTIONS_BUF   (4)
+#endif
+
+/**
+ * @brief   Reduce payload length by this value for a response
+ *
+ * Accommodates writing Content-Format option in gcoap_finish(). May set to
+ * zero if function not used.
+ */
+#ifndef GCOAP_RESP_OPTIONS_BUF
+#define GCOAP_RESP_OPTIONS_BUF  (4)
+#endif
+
+/**
+ * @brief   Reduce payload length by this value for an observe notification
+ *
+ * Accommodates writing Content-Format option in gcoap_finish(). May set to
+ * zero if function not used.
+ */
+#ifndef GCOAP_OBS_OPTIONS_BUF
+#define GCOAP_OBS_OPTIONS_BUF   (4)
+#endif
+
+/**
  * @brief   Maximum number of requests awaiting a response
  */
 #ifndef GCOAP_REQ_WAITING_MAX

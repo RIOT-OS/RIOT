@@ -108,7 +108,7 @@ static bool _try_addr_reconfiguration(gnrc_netif_t *netif)
     eui64_t orig_iid;
     bool remove_old = false, hwaddr_reconf;
 
-    if (gnrc_netif_ipv6_get_iid(netif, &orig_iid) == 0) {
+    if (gnrc_netif_ipv6_get_iid(netif, &orig_iid) > 0) {
         remove_old = true;
     }
     /* seize netif to netif thread since _try_l2addr_reconfiguration uses

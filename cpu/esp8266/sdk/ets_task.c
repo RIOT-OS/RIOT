@@ -8,6 +8,37 @@
  * PLEASE NOTE: This file is only used in SDK version
  */
 
+/*
+ * Internally, the SDK uses its own priority-based multitasking system,
+ * the *ETS*, to handle hardware components such as the WiFi interface, or to
+ * implement event-driven functions such as software timers. ETS periodically
+ * executes all ETS tasks with pending events in an infinite loop with the ROM
+ * function *ets_run*.
+ *
+ * ETS doesn't process interrupts directly in interrupt service routines.
+ * Instead, they use the *ets_post* ROM function to send an event to one of the
+ * ETS tasks, which then processes the interrupts asynchronously. Context
+ * switches are not possible in interrupt service routines.
+ *
+ * To use SDK functions and keep the system alive, ETS tasks with pending
+ * events have to be handled. For that purpose
+ *
+ * - the *ets_task_func* RIOT thread with highest possible priority is used
+ * - the ROM functions *ets_run* and *ets_post* are overwritten.
+ *
+ * The *ets_task_func* RIOT thread is waiting for a thread flag, which is set
+ * by the *ets_post function* at the end of an ETS interrupt service routine.
+ * The flag indicates that there are ETS tasks with pending events that need
+ * to be executed. The *ets_task_func* RIOT thread then calls the *ets_run*
+ * function, which performs all ETS tasks with pending events exactly once.
+ *
+ * Thus, when a hardware component used by the SDK triggers an interrupt, e.g.
+ * the WiFi interface, the interrupt sevice routine posts an event to the ETS
+ * task by calling the *ets_post* function. The overwritten version of this
+ * function sets the thread flag of the *ets_task_func* thread. The thread
+ * then calls function *ets_run* to process pending events.
+ */
+
 #ifdef MODULE_ESP_SDK
 
 #define ENABLE_DEBUG 0
@@ -21,21 +52,19 @@
 #include "sdk/ets_task.h"
 #include "sdk/sdk.h"
 
-#define TIMER_TASK_PRIORITY 31
-
 static uint8_t min_prio = 0;
 
+/* helper function for *ets_run* */
 uint8_t ets_highest_1_bit (uint32_t mask)
 {
     __asm__ volatile ("nsau %0, %1;" :"=r"(mask) : "r"(mask));
     return 32 - mask;
 }
 
-/**
- * @brief   Perform execution of all pending ETS system tasks.
- *
- * This is necessary to keep the underlying ETS system used by the
- * SDK alive.
+/*
+ * Perform the execution of all pending ETS tasks. This is necessary to
+ * keep the underlying ETS system used by the SDK alive. It is called from
+ * the RIOT thread *ets_task_func*.
  */
 void IRAM ets_tasks_run (void)
 {
@@ -81,56 +110,54 @@ void IRAM ets_tasks_run (void)
     system_soft_wdt_feed();
 }
 
-/**
- * To realize event-driven SDK functions such as WiFi functions and software
- * timers, and to keep the system alive, the SDK internally uses its own
- * tasks (SDK tasks) and its own scheduling mechanism. For this purpose, the
- * SDK regularly executes SDK tasks with pending events in an endless loop
- * using the ROM function *ets_run*.
- *
- * Interrupt service routines do not process interrupts directly but use
- * the *ets_post* ROM function to send an event to one of these SDK tasks,
- * which then processes the interrupts asynchronously. A context switch is
- * not possible in the interrupt service routines.
- *
- * In the RIOT port, the task management of the SDK is replaced by the task
- * management of the RIOT. To handle SDK tasks with pending events so that
- * the SDK functions work and the system keeps alive, the ROM functions
- * *ets_run* and *ets_post* are overwritten. The *ets_run* function performs
- * all SDK tasks with pending events exactly once. It is executed at the end
- * of the *ets_post* function and thus usually at the end of an SDK interrupt
- * service routine or before the system goes into the lowest power mode.
- *
- * PLEASE REMEBER: we are doing that in interrupt context
- *
- * -> it must not take to much time (how can we ensure that)?
- *
- * -> we have to indicate that we are in interrupt context see *irq_is_in*
- *    and *irq_interrupt_nesting* (as realized by the level 1 exception handler
- *    in non SDK task handling environment, option MODULE_ESP_SDK_INT_HANDLING=0,
- *    the default)
- *
- * -> we must not execute a context switch or we have to execute the context
- *    switch from interrupt as following (as realized by the level 1
- *    interrupt exception handler in non SDK task handling environment, option
- *    MODULE_ESP_SDK_INT_HANDLING=0, the default)
- *      _frxt_int_enter();
- *      _frxt_switch_context();
- *      _frxt_int_exit();
+
+#define THREAD_FLAG_ETS_THREAD (1 << 0)
+static volatile thread_t* ets_thread = NULL;
+
+/*
+ * Thread *ets_task_func* is waiting for the thread flag THREAD_FLAG_ETS_THREAD
+ * indicating that ETS tasks have pending events and need to be executed. When
+ * the thread flag is set, it calls the *ets_run* function, which performs
+ * all ETS tasks with pending events exactly once. The thread flag is set by
+ * the *ets_post* function, which is called at the end of an ETS interrupt
+ * service routine.
  */
+void *ets_task_func(void *arg)
+{
+    (void) arg;
 
+    ets_thread = sched_active_thread;
+    while (1) {
+        thread_flags_wait_one(THREAD_FLAG_ETS_THREAD);
+        ets_tasks_run();
+    }
+
+    return NULL;
+}
+
+/* helper macro for *ets_post */
+#define irom_cache_enabled() (*((uint32_t*)0x60000208) & (1 << 17))
+
+/* ETS timer task priority */
+#define TIMER_TASK_PRIORITY 31
+
+/* reference to the *ets_post* ROM function */
 typedef uint32_t (*ets_post_function_t)(uint32_t prio, ETSSignal sig, ETSParam par);
-
 static ets_post_function_t ets_post_rom = (ets_post_function_t)0x40000e24;
 
-#ifdef MODULE_ESP_SDK
-#define irom_cache_enabled() (*((uint32_t*)0x60000208) & (1 << 17))
-#else
-#define irom_cache_enabled() (1)
-#endif
-
+/*
+ * Overwritten version of ROM function *ets_post*.
+ *
+ * ETS doesn't process interrupts directly in interrupt service routines.
+ * Instead, they use the *ets_post* ROM function to send an event to one of the
+ * ETS tasks, which then processes the interrupts asynchronously. Context
+ * switches are not possible in interrupt service routines.
+ *
+ * Please note: *ets_post* is executed in interrupt context
+ */
 uint32_t IRAM ets_post (uint32_t prio, ETSSignal sig, ETSParam par)
 {
+    /* This function is executed in interrupt context */
     uint32_t ret;
 
     critical_enter();
@@ -154,6 +181,10 @@ uint32_t IRAM ets_post (uint32_t prio, ETSSignal sig, ETSParam par)
         system_soft_wdt_feed();
     }
 
+    if (ets_thread && irom_cache_enabled()) {
+        thread_flags_set((thread_t*)ets_thread, THREAD_FLAG_ETS_THREAD);
+    }
+
     critical_exit();
 
     return ret;
@@ -161,7 +192,7 @@ uint32_t IRAM ets_post (uint32_t prio, ETSSignal sig, ETSParam par)
 
 void ets_tasks_init(void)
 {
-    /* there is nothing to do at the moment */
+    /* there is nothing to be done here at the moment */
 }
 
 #endif /* MODULE_ESP_SDK */

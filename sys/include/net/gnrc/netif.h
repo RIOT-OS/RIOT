@@ -37,6 +37,9 @@
 #ifdef MODULE_GNRC_SIXLOWPAN
 #include "net/gnrc/netif/6lo.h"
 #endif
+#if defined(MODULE_GNRC_NETIF_DEDUP) && (GNRC_NETIF_L2ADDR_MAXLEN > 0)
+#include "net/gnrc/netif/dedup.h"
+#endif
 #include "net/gnrc/netif/flags.h"
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/netif/ipv6.h"
@@ -46,6 +49,10 @@
 #endif
 #include "net/ndp.h"
 #include "net/netdev.h"
+#include "net/netopt.h"
+#ifdef MODULE_NETSTATS_L2
+#include "net/netstats.h"
+#endif
 #include "rmutex.h"
 
 #ifdef __cplusplus
@@ -64,6 +71,9 @@ typedef struct {
     const gnrc_netif_ops_t *ops;            /**< Operations of the network interface */
     netdev_t *dev;                          /**< Network device of the network interface */
     rmutex_t mutex;                         /**< Mutex of the interface */
+#ifdef MODULE_NETSTATS_L2
+    netstats_t stats;                       /**< transceiver's statistics */
+#endif
 #if defined(MODULE_GNRC_IPV6) || DOXYGEN
     gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */
 #endif
@@ -91,6 +101,14 @@ typedef struct {
      * @note    Only available if @ref GNRC_NETIF_L2ADDR_MAXLEN > 0
      */
     uint8_t l2addr_len;
+#if defined(MODULE_GNRC_NETIF_DEDUP) || DOXYGEN
+    /**
+     * @brief   Last received packet information
+     *
+     * @note    Only available with @ref net_gnrc_netif_dedup.
+     */
+    gnrc_netif_dedup_t last_pkt;
+#endif
 #endif
 #if defined(MODULE_GNRC_SIXLOWPAN) || DOXYGEN
     gnrc_netif_6lo_t sixlo;                 /**< 6Lo component */

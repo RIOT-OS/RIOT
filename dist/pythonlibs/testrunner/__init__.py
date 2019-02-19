@@ -16,8 +16,9 @@ from traceback import extract_tb, print_tb
 import pexpect
 
 PEXPECT_PATH = os.path.dirname(pexpect.__file__)
-RIOTBASE = os.environ['RIOTBASE'] or \
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+RIOTBASE = (os.environ.get('RIOTBASE') or
+            os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                         "..", "..", "..")))
 
 # Setting an empty 'TESTRUNNER_START_DELAY' environment variable use the
 # default value (3)

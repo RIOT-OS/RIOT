@@ -13,7 +13,8 @@ It provides a radio device with Bluetooth Low Energy and/or IEEE
 802.15.4.
 
 There's also available an HDL1010 High Accuracy Digital Humidity sensor, a
-CCS811 IAQ gas sensor and a TCS37727 RGB Light sensor.
+CCS811 IAQ gas sensor, a MMA8652FC accelerometer and a TCS37727 RGB Light
+sensor.
 
 There board also provides an SSD1673 Active Matrix EPD 150x200 Display Driver
  with Controller on board.
@@ -35,11 +36,10 @@ To flash the board using OpenOCD:
 
 ### Current support
 
-Only the TCS37727 RGB Light sensor is supported. There's ongoing work
-on [IEEE802.15.4 radio support for KW41Z][radio-support] and
-[CCS811 gas sensor][gas-sensor]
+The TCS37727 RGB Light sensor, the MMA8652FC accelerometer and the CCS811
+digital gas sensor are supported. There's ongoing work on
+[IEEE802.15.4 radio support for KW41Z][radio-support]
 
 [radio-support]: https://github.com/RIOT-OS/RIOT/pull/7107
-[gas-sensor]: https://github.com/RIOT-OS/RIOT/pull/10033
 
  */

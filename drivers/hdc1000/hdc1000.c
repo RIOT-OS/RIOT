@@ -40,7 +40,7 @@ int hdc1000_init(hdc1000_t *dev, const hdc1000_params_t *params)
     uint16_t tmp;
 
     /* write device descriptor */
-    memcpy(&dev->p, params, sizeof(hdc1000_params_t));
+    dev->p = *params;
 
     /* try if we can interact with the device by reading its manufacturer ID */
     i2c_acquire(dev->p.i2c);

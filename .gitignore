@@ -9,6 +9,8 @@ doc/doxygen/*.db
 doc/doxygen/*.tmp
 # Built binaries
 *bin
+# Build directory
+/build
 # Backup files
 *~
 *.orig
@@ -56,3 +58,6 @@ Makefile.local
 
 # scan-build artifacts
 scan-build/
+
+# compile_and_test_for_boards default "results" directory
+results/

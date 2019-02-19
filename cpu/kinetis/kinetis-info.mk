@@ -122,6 +122,9 @@ else ifeq ($(KINETIS_SERIES),W)
     # TODO: KW35/36
     $(error Unknown Kinetis W)
   endif
+else ifeq ($(KINETIS_SERIES),EA)
+  KINETIS_RAMSIZE = $(KINETIS_ROMSIZE)/8
+  KINETIS_SRAM_L_SIZE = $(KINETIS_RAMSIZE)/4
 endif
 export KINETIS_RAMSIZE
 export KINETIS_SRAM_L_SIZE

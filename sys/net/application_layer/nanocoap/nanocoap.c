@@ -106,6 +106,11 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
             DEBUG("option count=%u nr=%u len=%i\n", option_count, option_nr, option_len);
 
             if (option_delta) {
+                if (option_count >= NANOCOAP_NOPTS_MAX) {
+                    DEBUG("nanocoap: max nr of options exceeded\n");
+                    return -ENOMEM;
+                }
+
                 optpos->opt_num = option_nr;
                 optpos->offset = (uintptr_t)option_start - (uintptr_t)hdr;
                 DEBUG("optpos option_nr=%u %u\n", (unsigned)option_nr, (unsigned)optpos->offset);
@@ -345,12 +350,17 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
     if (payload_len) {
         bufpos += coap_put_option_ct(bufpos, 0, ct);
         *bufpos++ = 0xff;
-
-        memcpy(bufpos, payload, payload_len);
-        bufpos += payload_len;
     }
 
-    return coap_build_reply(pkt, code, buf, len, bufpos - payload_start);
+    ssize_t res = coap_build_reply(pkt, code, buf, len,
+                                   bufpos - payload_start + payload_len);
+
+    if (payload_len && (res > 0)) {
+        assert(payload);
+        memcpy(bufpos, payload, payload_len);
+    }
+
+    return res;
 }
 
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
@@ -359,7 +369,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
     unsigned tkl = coap_get_token_len(pkt);
     unsigned len = sizeof(coap_hdr_t) + tkl;
 
-    if ((len + payload_len + 1) > rlen) {
+    if ((len + payload_len) > rlen) {
         return -ENOSPC;
     }
 
@@ -494,7 +504,35 @@ static size_t _encode_uint(uint32_t *val)
     return size;
 }
 
-static unsigned _put_delta_optlen(uint8_t *buf, unsigned offset, unsigned shift, unsigned val)
+/*
+ * Writes CoAP Option header. Expected to be called twice to write an option:
+ *
+ * 1. write delta, using offset 1, shift 4
+ * 2. write length, using offset n, shift 0, where n is the return value from
+ *    the first invocation of this function
+ *
+ *     0   1   2   3   4   5   6   7
+ *   +---------------+---------------+
+ *   |  Option Delta | Option Length |   1 byte
+ *   +---------------+---------------+
+ *   /         Option Delta          /   0-2 bytes
+ *   \          (extended)           \
+ *   +-------------------------------+
+ *   /         Option Length         /   0-2 bytes
+ *   \          (extended)           \
+ *   +-------------------------------+
+ *
+ *   From RFC 7252, Figure 8
+ *
+ * param[out] buf       addr of byte 0 of header
+ * param[in]  offset    offset from buf to write any extended header
+ * param[in]  shift     bit shift for byte 0 value
+ * param[in]  value     delta/length value to write to header
+ *
+ * return     offset from byte 0 of next byte to write
+ */
+static unsigned _put_delta_optlen(uint8_t *buf, unsigned offset, unsigned shift,
+                                  unsigned val)
 {
     if (val < 13) {
         *buf |= (val << shift);
@@ -684,8 +722,14 @@ static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, uint8_t *val,
             ? pkt->options[pkt->options_len - 1].opt_num : 0;
     assert(optnum >= lastonum);
 
-    size_t optlen = coap_put_option(pkt->payload, lastonum, optnum, val, val_len);
-    assert(pkt->payload_len > optlen);
+    /* calculate option length */
+    uint8_t dummy[3];
+    size_t optlen = _put_delta_optlen(dummy, 1, 4, optnum - lastonum);
+    optlen += _put_delta_optlen(dummy, 0, 0, val_len);
+    optlen += val_len;
+    assert(pkt->payload_len >= optlen);
+
+    coap_put_option(pkt->payload, lastonum, optnum, val, val_len);
 
     pkt->options[pkt->options_len].opt_num = optnum;
     pkt->options[pkt->options_len].offset = pkt->payload - (uint8_t *)pkt->hdr;

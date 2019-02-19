@@ -1,39 +1,9 @@
-# Target architecture for the build. Use avr if you are unsure.
-export TARGET_ARCH ?= avr
-
-export CFLAGS_CPU = -mmcu=$(CPU) $(CFLAGS_FPU)
-export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
-export CFLAGS_DBG  ?= -ggdb -g3
-export CFLAGS_OPT  ?= -Os
-
-export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
-export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
-export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -e reset_handler -Wl,--gc-sections
-
-# export the peripheral drivers to be linked into the final binary
-export USEMODULE += atmega_common_periph
-export USEMODULE += periph_common
-
-# the atmel port uses stdio_uart
-export USEMODULE += stdio_uart
-
 # include module specific includes
-export INCLUDES += -I$(RIOTCPU)/atmega_common/include -isystem$(RIOTCPU)/atmega_common/include/vendor
+export INCLUDES += -I$(RIOTCPU)/atmega_common/include \
+                   -isystem$(RIOTCPU)/atmega_common/avr_libc_extra/include \
+                   -isystem$(RIOTCPU)/atmega_common/avr_libc_extra/include/vendor
 
-ifeq ($(LTO),1)
-  # avr-gcc <4.8.3 has a bug when using LTO which causes a warning to be printed always:
-  # '_vector_25' appears to be a misspelled signal handler [enabled by default]
-  # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59396
-  export LINKFLAGS += -Wno-error
-endif
+# avr libc needs some RIOT-specific support code
+USEMODULE += avr_libc_extra
 
-# Use ROM_LEN and RAM_LEN during link
-$(if $(ROM_LEN),,$(error ROM_LEN is not defined))
-$(if $(RAM_LEN),,$(error RAM_LEN is not defined))
-LINKFLAGS += $(LINKFLAGPREFIX)--defsym=__TEXT_REGION_LENGTH__=$(ROM_LEN)$(if $(ROM_RESERVED),-$(ROM_RESERVED))
-LINKFLAGS += $(LINKFLAGPREFIX)--defsym=__DATA_REGION_LENGTH__=$(RAM_LEN)
-
-# Use newer linker script to have ROM/RAM configuration symbols in binutils<2.26
-LDSCRIPT_COMPAT = $(if $(shell $(TARGET_ARCH)-ld --verbose | grep __TEXT_REGION_LENGTH__),,\
-                    -T$(RIOTCPU)/$(CPU)/ldscripts_compat/avr_2.26.ld)
-LINKFLAGS += $(LDSCRIPT_COMPAT)
+include $(RIOTMAKE)/arch/atmega.inc.mk

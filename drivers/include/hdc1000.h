@@ -161,8 +161,9 @@ int hdc1000_read(const hdc1000_t *dev, int16_t *temp, int16_t *hum);
  * @brief   Extended read function including caching capability
  *
  * This function will return cached values if they are within the sampling
- * period (HDC1000_RENEW_INTERVAL), or will trigger a new conversion, wait for
- * the conversion to be finished and the get the results from the device.
+ * period (HDC1000_PARAM_RENEW_INTERVAL), or will trigger a new conversion,
+ * wait for the conversion to be finished and the get the results from the
+ * device.
  *
  * @param[in]  dev          device descriptor of sensor
  * @param[out] temp         temperature [in 100 * degree centigrade]

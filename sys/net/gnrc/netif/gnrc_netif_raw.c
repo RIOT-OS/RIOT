@@ -70,6 +70,11 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_pktbuf_release(pkt);
             return NULL;
         }
+#ifdef MODULE_NETSTATS_L2
+        netif->stats.rx_count++;
+        netif->stats.rx_bytes += nread;
+#endif
+
         if (nread < bytes_expected) {
             /* we've got less then the expected packet size,
              * so free the unused space.*/
@@ -102,7 +107,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     netdev_t *dev = netif->dev;
 
 #ifdef MODULE_NETSTATS_L2
-    dev->stats.tx_unicast_count++;
+    netif->stats.tx_unicast_count++;
 #endif
 
     res = dev->driver->send(dev, (iolist_t *)pkt);

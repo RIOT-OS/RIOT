@@ -27,14 +27,17 @@
     6. [Timers](#esp8266_timers)
     7. [SPIFFS Device](#esp8266_spiffs_device)
     8. [Other Peripherals](#esp8266_other_peripherals)
-6. [Preconfigured Devices](#esp8266_preconfigured_devices)
+6. [Network Interfaces](#esp8266_network_interfaces)
+    1. [WiFi Network Interface](#esp8266_wifi_network_interface)
+    2. [ESP-NOW Network Interface](#esp8266_esp_now_network_interface)
+7. [Preconfigured Devices](#esp8266_preconfigured_devices)
     1. [Network Devices](#esp8266_network_devices)
     2. [SD-Card Device](#esp8266_sd_card_device)
-7. [Application-Specific Configurations](#esp8266_application_specific_configurations)
+8. [Application-Specific Configurations](#esp8266_application_specific_configurations)
     1. [Application-Specific Board Configuration](#esp8266_application_specific_board_configuration)
     2. [Application-Specific Driver Configuration](#esp8266_application_specific_driver_configuration)
-8. [SDK Task Handling](#esp8266_sdk_task_handling)
-9. [QEMU Mode and GDB](#esp8266_qemu_mode_and_gdb)
+9. [SDK Task Handling](#esp8266_sdk_task_handling)
+10. [QEMU Mode and GDB](#esp8266_qemu_mode_and_gdb)
 
 # <a name="esp8266_overview"> Overview </a> &nbsp;&nbsp; [[TOC](#esp8266_toc)]
 
@@ -353,9 +356,11 @@ Optional features of ESP8266 can be enabled by ```USEMODULE``` definitions in th
 Module | Description
 -------|------------
 [esp_gdb](#esp8266_qemu_mode_and_gdb) | Enable the compilation with debug information, which is equivalent to using ```ENABLE_GDB=1```
+[esp_now](#esp8266_esp_now_network_interface) | Enable the built-in WiFi module with the ESP-NOW protocol as `netdev` network device
 [esp_sdk](#esp8266_sdk_task_handling) | Enable the SDK version, which is equivalent to using ```USE_SDK=1```
 [esp_spiffs](#esp8266_spiffs_device) | Enable the SPIFFS drive in on-board flash memory
 [esp_sw_timer](#esp8266_timers) | Enable software timer implementation, implies the setting ```USE_SDK=1``` (module ```esp_sdk```)
+[esp_wifi](#esp8266_wifi_network_interface) | Use the built-in WiFi module as `netdev` network device
 
 </center><br>
 
@@ -563,6 +568,104 @@ The ESP8266 port of RIOT also supports
 
 RTC is not yet implemented.
 
+# <a name="esp8266_network_interfaces"> Network Interfaces </a> &nbsp;[[TOC](#esp8266_toc)]
+
+ESP8266 provides different built-in possibilities to realize network devices:
+
+- <b>ESP WiFi</b>, usual AP-based wireless LAN (not yet supported)
+- <b>ESP-NOW</b>, a WiFi based AP-less and connectionless peer to peer communication protocol
+
+\anchor esp8266_wifi_network_interface
+## <a name="esp8266_wifi_network_interface"> WiFi Network Interface </a> &nbsp;[[TOC](#esp8266_toc)]
+
+The RIOT port for ESP8266 implements in module `esp_wifi` a `netdev` driver for
+the built-in WiFi interface.
+
+@note Due to symbol conflicts with the `crypto` and `hash` modules of RIOT
+in vendor library `libwpa.so`, which is required by module
+`esp_wifi`, `esp_wifi` cannot be used for applications that use these modules.
+Therefore, module `esp_wifi` is not automatically enabled when module
+`netdev_default` is used. Instead, if necessary, the application has to add
+the module `esp_wifi` in the Makefile.
+
+```
+USEMODULE += esp_wifi
+```
+
+Furthermore, the following configuration parameters have to be defined:
+
+<center>
+
+Parameter          | Default                   | Description
+:------------------|:--------------------------|:------------
+ESP_WIFI_SSID      | "RIOT_AP"                 | SSID of the AP to be used.
+ESP_WIFI_PASS      | "ThisistheRIOTporttoESP"  | Passphrase used for the AP as clear text (max. 64 chars).
+ESP_WIFI_STACKSIZE | #THREAD_STACKSIZE_DEFAULT |Stack size used for the WiFi netdev driver thread.
+
+</center>
+
+These configuration parameter definitions, as well as enabling the `esp_wifi`
+module, can be done either in the makefile of the project or at make command
+line, e.g.:
+
+```
+USEMODULE=esp_wifi \
+CFLAGS='-DESP_WIFI_SSID=\"MySSID\" -DESP_WIFI_PASS=\"MyPassphrase\"' \
+make -C examples/gnrc_networking BOARD=...
+```
+
+@note The Wifi network interface (module `esp_wifi`) and the
+[ESP-NOW network interface](#esp8266_esp_now_network_interface)
+(module `esp_now`) can be used simultaneously, for example, to realize a
+border router for a mesh network which uses ESP-NOW.
+
+\anchor esp8266_esp_now_network_interface
+## <a name="esp8266_esp_now_network_interface"> ESP-NOW Network Interface </a> &nbsp;[[TOC](#esp8266_toc)]
+
+With ESP-NOW, the ESP8266 provides a connectionless communication technology,
+featuring short packet transmission. It applies the IEEE802.11 Action Vendor
+frame technology, along with the IE function developed by Espressif, and CCMP
+encryption technology, realizing a secure, connectionless communication solution.
+
+The RIOT port for ESP8266 implements in module `esp_now` a `netdev` driver
+which uses ESP-NOW to provide a link layer interface to a meshed network of
+ESP8266 nodes. In this network, each node can send short packets with up to
+250 data bytes to all other nodes that are visible in its range.
+
+@note Due to symbol conflicts in vendor library `libwpa.so` used by the
+`esp_now` with RIOT's `crypto` and `hashes` modules, ESP-NOW cannot be used
+for application that use these modules. Therefore, the module `esp_now` is
+not enabled automatically if the `netdev_default` module is used. Instead,
+the application has to add the `esp_now` module in its makefile when needed.<br>
+```
+USEMODULE += esp_now
+```
+
+For ESP-NOW, ESP8266 nodes are used in WiFi SoftAP + Station mode to advertise
+their SSID and become visible to other ESP8266 nodes. The SSID of an ESP8266
+node is the concatenation of the prefix `RIOT_ESP_` with the MAC address of
+its SoftAP WiFi interface. The driver periodically scans all visible ESP8266
+nodes.
+
+The following parameters are defined for ESP-NOW nodes. These parameters can
+be overriden by [application-specific board configurations](#esp8266_application_specific_board_configuration).
+
+<center>
+
+Parameter | Default | Description
+:---------|:--------|:-----------
+ESP_NOW_SCAN_PERIOD | 10000000UL | Defines the period in us at which an node scans for other nodes in its range. The default period is 10 s.
+ESP_NOW_SOFT_AP_PASS | "ThisistheRIOTporttoESP" | Defines the passphrase as clear text (max. 64 chars) that is used for the SoftAP interface of ESP-NOW nodes. It has to be same for all nodes in one network.
+ESP_NOW_CHANNEL | 6 | Defines the channel that is used as the broadcast medium by all nodes together.
+ESP_NOW_KEY | NULL | Defines a key that is used for encrypted communication between nodes. If it is NULL, encryption is disabled. The key has to be of type ```uint8_t[16]``` and has to be exactly 16 bytes long.
+
+</center>
+
+@note The ESP-NOW network interface (module `esp_now`) and the
+[Wifi network interface](#esp8266_wifi_network_interface) (module `esp_wifi`)
+can be used simultaneously, for example, to realize a border router for
+a mesh network which uses ESP-NOW.
+
 # <a name="esp8266_preconfigured_devices"> Preconfigured Devices </a> &nbsp;[[TOC](#esp8266_toc)]
 
 The ESP8266 port of RIOT has been tested with several common external devices that can be connected to ESP8266 boards and are preconfigured accordingly.
@@ -710,13 +813,43 @@ INCLUDES += -I$(APPDIR)
 
 # <a name="esp8266_sdk_task_handling"> SDK Task Handling </a> &nbsp;[[TOC](#esp8266_toc)]
 
-With make command variable ```USE_SDK=1``` the Espressif SDK is used. This is necessary, for example, if you want to use the built-in WLAN module. The SDK internally uses its own tasks (SDK tasks) and its own scheduling mechanism to realize event-driven SDK functions such as WiFi functions and software timers, and to keep the system alive. For this purpose, the SDK regularly executes SDK tasks with pending events in an endless loop using the ROM function ```ets_run```.
+With make command variable `USE_SDK=1`, the Espressif SDK is used. This is
+necessary, for example, if you want to use the built-in WLAN module. The
+SDK is also used automatically when software timers are used by activating
+the `esp_sw_timer` module.
 
-Interrupt service routines do not process interrupts directly but use the ```ets_post``` ROM function to send an event to one of these SDK tasks, which then processes the interrupts asynchronously. A context switch is not possible in the interrupt service routines.
+Internally, the SDK uses its own priority-based multitasking sytsem,
+the **ETS**, to handle hardware components such as the WiFi interface, or to
+implement event-driven functions such as software timers. ETS periodically
+executes all ETS tasks with pending events in an infinite loop with the ROM
+function `ets_run`.
 
-In the RIOT port, the task management of the SDK is replaced by the task management of the RIOT. To handle SDK tasks with pending events so that the SDK functions work and the system keeps alive, the ROM functions ```ets_run``` and ```ets_post``` are overwritten. The ```ets_run``` function performs all SDK tasks with pending events exactly once. It is executed at the end of the ```ets_post``` function and thus usually at the end of an SDK interrupt service routine or before the system goes into the lowest power mode.
+ETS doesn't process interrupts directly in interrupt service routines.
+Instead, they use the `ets_post` ROM function to send an event to one of the
+ETS tasks, which then processes the interrupts asynchronously. Context
+switches are not possible in interrupt service routines.
 
-@note Since the non-SDK version of RIOT is much smaller and faster than the SDK version, you should always compile your application without the SDK (```USE_SDK=0```, the default) if you don't need the built-in WiFi module.
+To use SDK functions and keep the system alive, ETS tasks with pending events
+have to be handled. For that purpose
+
+- the `ets_task_func` RIOT thread with highest possible priority is used
+- the ROM functions `ets_run` and `ets_post` are overwritten.
+
+The `ets_task_func` RIOT thread is waiting for a thread flag, which is set
+by the `ets_post` function at the end of an ETS interrupt service routine.
+The flag indicates that there are ETS tasks with pending events that need
+to be executed. The `ets_task_func` RIOT thread then calls the `ets_run`
+function, which performs all ETS tasks with pending events exactly once.
+
+Thus, when a hardware component used by the SDK triggers an interrupt, e.g.
+the WiFi interface, the interrupt sevice routine posts an event to the ETS
+task by calling the `ets_post` function. The overwritten version of this
+function sets the thread flag of the `ets_task_func` thread. The thread
+then calls function `ets_run` to process pending events.
+
+@note Since the non-SDK version of RIOT is much smaller and faster than the
+SDK version, you should always compile your application without the SDK
+(```USE_SDK=0```, the default) if you don't need the built-in WiFi module.
 
 # <a name="esp8266_qemu_mode_and_gdb"> QEMU Mode and GDB </a> &nbsp;[[TOC](#esp8266_toc)]
 

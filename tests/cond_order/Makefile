@@ -6,6 +6,3 @@ BOARD_INSUFFICIENT_MEMORY := nucleo32-f031 nucleo32-f042 nucleo32-l031 nucleo-f0
 							 nucleo-l031k6 nucleo-l053r8
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	tests/01-run.py

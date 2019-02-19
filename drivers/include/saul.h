@@ -72,34 +72,39 @@ extern "C" {
  * This list is not exhaustive, extend to your needs!
  */
 enum {
-    SAUL_CLASS_UNDEF    = 0x00,     /**< device class undefined */
-    SAUL_ACT_ANY        = 0x40,     /**< any actuator - wildcard */
-    SAUL_ACT_LED_RGB    = 0x42,     /**< actuator: RGB LED */
-    SAUL_ACT_SERVO      = 0x43,     /**< actuator: servo motor */
-    SAUL_ACT_MOTOR      = 0x44,     /**< actuator: motor */
-    SAUL_ACT_SWITCH     = 0x45,     /**< actuator: simple on/off switch */
-    SAUL_ACT_DIMMER     = 0x46,     /**< actuator: dimmable switch */
-    SAUL_SENSE_ANY      = 0x80,     /**< any sensor - wildcard */
-    SAUL_SENSE_BTN      = 0x81,     /**< sensor: simple button */
-    SAUL_SENSE_TEMP     = 0x82,     /**< sensor: temperature */
-    SAUL_SENSE_HUM      = 0x83,     /**< sensor: humidity */
-    SAUL_SENSE_LIGHT    = 0x84,     /**< sensor: light */
-    SAUL_SENSE_ACCEL    = 0x85,     /**< sensor: accelerometer */
-    SAUL_SENSE_MAG      = 0x86,     /**< sensor: magnetometer */
-    SAUL_SENSE_GYRO     = 0x87,     /**< sensor: gyroscope */
-    SAUL_SENSE_COLOR    = 0x88,     /**< sensor: (light) color */
-    SAUL_SENSE_PRESS    = 0x89,     /**< sensor: pressure */
-    SAUL_SENSE_ANALOG   = 0x8a,     /**< sensor: raw analog value */
-    SAUL_SENSE_UV       = 0x8b,     /**< sensor: UV index */
-    SAUL_SENSE_OBJTEMP  = 0x8c,     /**< sensor: object temperature */
-    SAUL_SENSE_COUNT    = 0x8d,     /**< sensor: pulse counter */
-    SAUL_SENSE_DISTANCE = 0x8e,     /**< sensor: distance */
-    SAUL_SENSE_CO2      = 0x8f,     /**< sensor: CO2 Gas */
-    SAUL_SENSE_TVOC     = 0x90,     /**< sensor: TVOC Gas */
-    SAUL_SENSE_OCCUP    = 0x91,     /**< sensor: occupancy */
-    SAUL_SENSE_PROXIMITY= 0x92,     /**< sensor: proximity */
-    SAUL_SENSE_RSSI     = 0x93,     /**< sensor: RSSI */
-    SAUL_CLASS_ANY      = 0xff      /**< any device - wildcard */
+    SAUL_CLASS_UNDEF       = 0x00,     /**< device class undefined */
+    SAUL_ACT_ANY           = 0x40,     /**< any actuator - wildcard */
+    SAUL_ACT_LED_RGB       = 0x42,     /**< actuator: RGB LED */
+    SAUL_ACT_SERVO         = 0x43,     /**< actuator: servo motor */
+    SAUL_ACT_MOTOR         = 0x44,     /**< actuator: motor */
+    SAUL_ACT_SWITCH        = 0x45,     /**< actuator: simple on/off switch */
+    SAUL_ACT_DIMMER        = 0x46,     /**< actuator: dimmable switch */
+    SAUL_SENSE_ANY         = 0x80,     /**< any sensor - wildcard */
+    SAUL_SENSE_BTN         = 0x81,     /**< sensor: simple button */
+    SAUL_SENSE_TEMP        = 0x82,     /**< sensor: temperature */
+    SAUL_SENSE_HUM         = 0x83,     /**< sensor: humidity */
+    SAUL_SENSE_LIGHT       = 0x84,     /**< sensor: light */
+    SAUL_SENSE_ACCEL       = 0x85,     /**< sensor: accelerometer */
+    SAUL_SENSE_MAG         = 0x86,     /**< sensor: magnetometer */
+    SAUL_SENSE_GYRO        = 0x87,     /**< sensor: gyroscope */
+    SAUL_SENSE_COLOR       = 0x88,     /**< sensor: (light) color */
+    SAUL_SENSE_PRESS       = 0x89,     /**< sensor: pressure */
+    SAUL_SENSE_ANALOG      = 0x8a,     /**< sensor: raw analog value */
+    SAUL_SENSE_UV          = 0x8b,     /**< sensor: UV index */
+    SAUL_SENSE_OBJTEMP     = 0x8c,     /**< sensor: object temperature */
+    SAUL_SENSE_COUNT       = 0x8d,     /**< sensor: pulse counter */
+    SAUL_SENSE_DISTANCE    = 0x8e,     /**< sensor: distance */
+    SAUL_SENSE_CO2         = 0x8f,     /**< sensor: CO2 Gas */
+    SAUL_SENSE_TVOC        = 0x90,     /**< sensor: TVOC Gas */
+    SAUL_SENSE_OCCUP       = 0x91,     /**< sensor: occupancy */
+    SAUL_SENSE_PROXIMITY   = 0x92,     /**< sensor: proximity */
+    SAUL_SENSE_RSSI        = 0x93,     /**< sensor: RSSI */
+    SAUL_SENSE_CHARGE      = 0x94,     /**< sensor: coulomb counter */
+    SAUL_SENSE_CURRENT     = 0x95,     /**< sensor: ammeter */
+    SAUL_SENSE_PM          = 0x96,     /**< sensor: particulate matter */
+    SAUL_SENSE_CAPACITANCE = 0x97,     /**< sensor: capacitance */
+    SAUL_SENSE_VOLTAGE     = 0x98,     /**< sensor: voltage */
+    SAUL_CLASS_ANY         = 0xff      /**< any device - wildcard */
     /* extend this list as needed... */
 };
 

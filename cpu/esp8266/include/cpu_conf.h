@@ -7,7 +7,10 @@
  */
 
 /**
+ * @defgroup    cpu_esp8266_conf ESP8266 compile configurations
  * @ingroup     cpu_esp8266
+ * @ingroup     config
+ * @brief       Compile-time configuration macros for ESP8266 modules
  * @{
  *
  * @file
@@ -26,18 +29,70 @@ extern "C" {
 #endif
 
 /**
- * @brief   Stack size configuration
+ * @name   Stack size configuration
  * @{
  */
 #ifdef MODULE_ESP_SDK_INT_HANDLING
+
+#ifndef THREAD_EXTRA_STACKSIZE_PRINTF
 #define THREAD_EXTRA_STACKSIZE_PRINTF (0)
-#define THREAD_STACKSIZE_DEFAULT      (2048)
-#define THREAD_STACKSIZE_IDLE         (2048)
-#else
-#define THREAD_EXTRA_STACKSIZE_PRINTF (0)
-#define THREAD_STACKSIZE_DEFAULT      (2048)
-#define THREAD_STACKSIZE_IDLE         (2048)
 #endif
+#ifndef THREAD_STACKSIZE_DEFAULT
+#define THREAD_STACKSIZE_DEFAULT      (1536)
+#endif
+#ifndef THREAD_STACKSIZE_IDLE
+#define THREAD_STACKSIZE_IDLE         (1536)
+#endif
+#ifndef THREAD_STACKSIZE_MAIN
+#define THREAD_STACKSIZE_MAIN         (3072)
+#endif
+
+#ifndef GNRC_IPV6_STACK_SIZE
+#define GNRC_IPV6_STACK_SIZE          (1536)
+#endif
+#ifndef GNRC_PKTDUMP_STACKSIZE
+#define GNRC_PKTDUMP_STACKSIZE        (THREAD_STACKSIZE_DEFAULT)
+#endif
+
+#ifndef ESP_NOW_STACKSIZE
+#define ESP_NOW_STACKSIZE             (2560)
+#endif
+
+#ifndef ETS_THREAD_STACKSIZE
+#define ETS_THREAD_STACKSIZE          (2048)
+#endif
+
+#else /* MODULE_ESP_SDK_INT_HANDLING */
+
+#ifndef THREAD_EXTRA_STACKSIZE_PRINTF
+#define THREAD_EXTRA_STACKSIZE_PRINTF (0)
+#endif
+#ifndef THREAD_STACKSIZE_DEFAULT
+#define THREAD_STACKSIZE_DEFAULT      (1024)
+#endif
+#ifndef THREAD_STACKSIZE_IDLE
+#define THREAD_STACKSIZE_IDLE         (1024)
+#endif
+#ifndef THREAD_STACKSIZE_MAIN
+#define THREAD_STACKSIZE_MAIN         (3072)
+#endif
+
+#ifndef GNRC_IPV6_STACK_SIZE
+#define GNRC_IPV6_STACK_SIZE          (1536)
+#endif
+#ifndef GNRC_PKTDUMP_STACKSIZE
+#define GNRC_PKTDUMP_STACKSIZE        (THREAD_STACKSIZE_DEFAULT)
+#endif
+
+#ifndef ESP_NOW_STACKSIZE
+#define ESP_NOW_STACKSIZE             (2560)
+#endif
+
+#ifndef ETS_THREAD_STACKSIZE
+#define ETS_THREAD_STACKSIZE          (1536)
+#endif
+
+#endif /* MODULE_ESP_SDK_INT_HANDLING */
 /** @} */
 
 /**
@@ -57,7 +112,7 @@ extern "C" {
 
 #ifdef __cplusplus
 }
-#endif /* CPU_CONF_H */
+#endif
 
 #endif /* CPU_CONF_H */
 /** @} */

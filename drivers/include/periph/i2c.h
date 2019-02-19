@@ -388,8 +388,8 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
  * @brief   Convenience function for writing one byte to a given
  *          register address
  *
- * @note    This function is using a repeated start sequence for writing to the
- *          specified register address.
+ * @note    This function is using a continuous sequence for writing to the
+ *          specified register address. It first writes the register then data.
  *
  * @pre     i2c_acquire must be called before accessing the bus
  *
@@ -414,8 +414,8 @@ int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
 /**
  * @brief   Convenience function for writing data to a given register address
  *
- * @note    This function is using a repeated start sequence for writing to the
- *          specified register address.
+ * @note    This function is using a continuous sequence for writing to the
+ *          specified register address. It first writes the register then data.
  *
  * @pre     i2c_acquire must be called before accessing the bus
  *
