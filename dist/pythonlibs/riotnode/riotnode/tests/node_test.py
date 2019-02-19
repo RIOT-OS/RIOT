@@ -2,6 +2,7 @@
 
 import os
 import sys
+import signal
 import tempfile
 
 import pytest
@@ -146,3 +147,22 @@ def test_expect_value(app_pidfile_env):
         with pytest.raises(pexpect.TIMEOUT) as exc_info:
             child.expect_exact('UPPERCASE', timeout=0.5)
         assert str(exc_info.value) == 'UPPERCASE'
+
+
+def test_killing_a_broken_term(app_pidfile_env):
+    """Test killing a terminal that can only be killed with SIGKILL."""
+    env = {'BOARD': 'board', 'APPLICATION': './sigkill_script.py'}
+    env.update(app_pidfile_env)
+
+    node = riotnode.node.RIOTNode(APPLICATIONS_DIR, env)
+    node.TERM_STARTED_DELAY = 1
+
+    with node.run_term(logfile=sys.stdout) as child:
+        child.expect_exact('Kill me with SIGKILL!')
+        child.expect(r'My PID: (\d+)')
+        term_pid = int(child.match.group(1))
+
+    # Send a SIGKILL to the process, it should raise an error as it is stopped
+    # And if it was running, it will be cleaned
+    with pytest.raises(ProcessLookupError):
+        os.kill(term_pid, signal.SIGKILL)
