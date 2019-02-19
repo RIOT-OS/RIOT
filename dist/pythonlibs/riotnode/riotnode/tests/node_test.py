@@ -149,6 +149,31 @@ def test_expect_value(app_pidfile_env):
         assert str(exc_info.value) == 'UPPERCASE'
 
 
+def test_term_cleanup(app_pidfile_env):
+    """Test a terminal that does a cleanup after kill.
+
+    The term process should be able to run its cleanup.
+    """
+    # Always run as 'deleted=True' to deleted even on early exception
+    # File must exist at the end of the context manager
+    with tempfile.NamedTemporaryFile(delete=True) as tmpfile:
+        env = {'BOARD': 'board'}
+        env.update(app_pidfile_env)
+        env['APPLICATION'] = './create_file.py %s' % tmpfile.name
+
+        node = riotnode.node.RIOTNode(APPLICATIONS_DIR, env)
+        node.TERM_STARTED_DELAY = 1
+        with node.run_term(logfile=sys.stdout) as child:
+            child.expect_exact('Running')
+            # Ensure script is started correctly
+            content = open(tmpfile.name, 'r', encoding='utf-8').read()
+            assert content == 'Running\n'
+
+        # File should not exist anymore so no error to create one
+        # File must exist to be cleaned by tempfile
+        open(tmpfile.name, 'x')
+
+
 def test_killing_a_broken_term(app_pidfile_env):
     """Test killing a terminal that can only be killed with SIGKILL."""
     env = {'BOARD': 'board', 'APPLICATION': './sigkill_script.py'}
