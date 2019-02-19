@@ -12,6 +12,8 @@ import signal
 
 import pexpect
 
+from . import utils
+
 DEVNULL = open(os.devnull, 'w')
 
 
@@ -151,9 +153,15 @@ class RIOTNode():
         # on many platforms, the termprog needs a short while to be ready
         time.sleep(self.TERM_STARTED_DELAY)
 
+    def _term_pid(self):
+        """Terminal pid or None."""
+        return getattr(self.term, 'pid', None)
+
     def stop_term(self):
         """Stop the terminal."""
-        self._safe_term_close()
+        with utils.ensure_all_subprocesses_stopped(self._term_pid(),
+                                                   self.logger):
+            self._safe_term_close()
 
     def _safe_term_close(self):
         """Safe 'term.close'.

@@ -166,3 +166,27 @@ def test_killing_a_broken_term(app_pidfile_env):
     # And if it was running, it will be cleaned
     with pytest.raises(ProcessLookupError):
         os.kill(term_pid, signal.SIGKILL)
+
+
+def test_killing_a_broken_term_when_kill_is_sigterm(app_pidfile_env):
+    """Test killing a terminal that can only be killed with SIGKILL."""
+    env = {'BOARD': 'board', 'APPLICATION': './sigkill_script.py'}
+    env.update(app_pidfile_env)
+
+    node = riotnode.node.RIOTNode(APPLICATIONS_DIR, env)
+    node.TERM_STARTED_DELAY = 1
+    node.TERM_STOP_SIGNAL = signal.SIGTERM
+
+    with node.run_term(logfile=sys.stdout) as child:
+        child.expect_exact('Kill me with SIGKILL!')
+        child.expect(r'My PID: (\d+)')
+        term_pid = int(child.match.group(1))
+
+        msg = 'Some term process where not stopped'
+        with pytest.raises(RuntimeError, match=msg):
+            node.stop_term()
+
+    # Send a SIGKILL to the process, it should raise an error as it is stopped
+    # And if it was running, it will be cleaned
+    with pytest.raises(ProcessLookupError):
+        os.kill(term_pid, signal.SIGKILL)
