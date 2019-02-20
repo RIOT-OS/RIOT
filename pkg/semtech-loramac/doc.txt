@@ -32,6 +32,7 @@
  * set at compile time. Example for EU868:
  * ```
  *     CFLAGS += -DREGION_EU868
+ *     CFLAGS += -DLORAMAC_ACTIVE_REGION=LORAMAC_REGION_EU868
  * ```
  *
  * # Using the package API
