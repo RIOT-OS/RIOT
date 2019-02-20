@@ -15,8 +15,6 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # using avrdude. Can be overridden for debugging (which requires changes
 # that require to use an ISP)
 PROGRAMMER ?= wiring
-# set mcu model for avrdude (mandatory)
-FFLAGS += -p atmega256rfr2
 # Serial Baud rate for flasher is configured to 500kBaud
 # see /usr/include/asm-generic/termbits.h for availabel baudrates on your linux system
 FFLAGS_EXTRA += -b 0010005

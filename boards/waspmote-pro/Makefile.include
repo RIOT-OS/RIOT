@@ -17,8 +17,6 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # using avrdude. Can be overridden for debugging (which requires changes
 # that require to use an ISP)
 PROGRAMMER ?= stk500v1
-# set mcu model for avrdude
-FFLAGS += -p m1281
 # configure programmer speed in baud
 FFLAGS_EXTRA += -b 115200
 # avoid error if mcu signature doesn't match

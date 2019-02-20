@@ -12,8 +12,6 @@ BAUD        ?= 9600
 # using avrdude. Can be overridden for debugging (which requires changes
 # that require to use an ISP)
 PROGRAMMER ?= stk500v2
-# set mcu model for avrdude
-FFLAGS += -p m2560
 # configure programmer speed in baud
 FFLAGS_EXTRA += -b 115200
 
