@@ -5,15 +5,8 @@ export STRIP_FROM_INC_PATH_LIST=$(shell \
     grep '/include$$' |\
     sed 's/.*/\"$(subst /,\/,$(RIOTBASE))\/\0\"/')
 
-# use lessc (http://lesscss.org/#using-less) for compiling CSS, alternatively
-# fall back to lesscpy (https://github.com/lesscpy/lesscpy)
-ifeq (,$(LESSC))
-  ifneq (,$(shell command -v lessc 2>/dev/null))
-    LESSC=lessc
-  else ifneq (,$(shell command -v lesscpy 2>/dev/null))
-    LESSC=lesscpy
-  endif
-endif
+# use lessc (http://lesscss.org/#using-less) for compiling CSS
+LESSC ?= $(shell command -v lessc 2>/dev/null)
 
 .PHONY: doc
 doc: html
