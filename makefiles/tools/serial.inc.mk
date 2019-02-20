@@ -14,9 +14,9 @@ export BAUD ?= 115200
 
 RIOT_TERMINAL ?= pyterm
 ifeq ($(RIOT_TERMINAL),pyterm)
-    export TERMPROG  ?= $(RIOTTOOLS)/pyterm/pyterm
-    export TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)"
+  export TERMPROG  ?= $(RIOTTOOLS)/pyterm/pyterm
+  export TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)"
 else ifeq ($(RIOT_TERMINAL),picocom)
-    export TERMPROG  ?= picocom
-    export TERMFLAGS ?= --nolock --imap lfcrlf --echo --baud "$(BAUD)" "$(PORT)"
+  export TERMPROG  ?= picocom
+  export TERMFLAGS ?= --nolock --imap lfcrlf --echo --baud "$(BAUD)" "$(PORT)"
 endif
