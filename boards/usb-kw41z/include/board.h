@@ -20,6 +20,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "board_common.h"
 #include "periph_conf.h"
 
 #ifdef __cplusplus
@@ -99,11 +100,6 @@ extern "C"
 #define XTIMER_HZ                   (32768ul)
 #endif
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and standard I/O
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

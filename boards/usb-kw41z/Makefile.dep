@@ -1,6 +1,1 @@
-ifneq (,$(filter saul_default,$(USEMODULE)))
-  USEMODULE += saul_adc
-  USEMODULE += saul_gpio
-endif
-
-include $(RIOTCPU)/kinetis/Makefile.dep
+include $(RIOTBOARD)/common/kw41z/Makefile.dep
