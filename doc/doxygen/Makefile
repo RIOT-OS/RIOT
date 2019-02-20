@@ -6,6 +6,7 @@ export STRIP_FROM_INC_PATH_LIST=$(shell \
     sed 's/.*/\"$(subst /,\/,$(RIOTBASE))\/\0\"/')
 
 # use lessc (http://lesscss.org/#using-less) for compiling CSS
+# It can also be installed in ubuntu with the `node-less` package
 LESSC ?= $(shell command -v lessc 2>/dev/null)
 
 .PHONY: doc
