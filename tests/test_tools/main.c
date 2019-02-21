@@ -15,6 +15,8 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 
 #include "shell_commands.h"
 #include "shell.h"
@@ -65,9 +67,40 @@ static int cmd_shellping(int argc, char **argv)
 }
 
 
+/**
+ * @brief Uppercase the first word
+ *
+ * First argument is read, converted to uppercase and printed with a newline.
+ *
+ * @param[in] argc  Number of arguments
+ * @param[in] argv  Array of arguments
+ *
+ * @return  0 on success
+ *
+ */
+static int cmd_toupper(int argc, char **argv)
+{
+    if (argc != 2) {
+        puts("Invalid number of argument");
+        printf("Usage: %s <word>\n", argv[0]);
+        return 1;
+    }
+
+    size_t len = strlen(argv[1]);
+    for (size_t i = 0; i < len; i++) {
+        char c = toupper(argv[1][i]);
+        putchar(c);
+    }
+    putchar('\n');
+
+    return 0;
+}
+
+
 static const shell_command_t shell_commands[] = {
     { "shellping", "Just print 'shellpong'", cmd_shellping },
     { "true", "do nothing, successfully", cmd_true },
+    { "toupper", "uppercase first argument", cmd_toupper },
     { NULL, NULL, NULL }
 };
 

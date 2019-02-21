@@ -38,12 +38,20 @@ def _test_no_local_echo(child):
     assert res == 0, "There should have been a timeout and not match stdin"
 
 
+def _test_clean_output(child):
+    """Verify that only what the nodes sends is received."""
+    child.sendline('toupper lowercase')
+    retline = child.readline()
+    assert retline.strip() == 'LOWERCASE'
+
+
 def testfunc(child):
     """Run some tests to verify the board under test behaves correctly.
 
     It currently tests:
 
     * local echo
+    * getting some test output without other messages
     """
     child.expect_exact("Running 'tests_tools' application")
 
@@ -54,6 +62,9 @@ def testfunc(child):
 
     # The node should still answer after the previous one
     _shellping(child)
+
+    # Check that the output is clean without extra terminal output
+    _test_clean_output(child)
 
 
 if __name__ == "__main__":
