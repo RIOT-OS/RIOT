@@ -8,6 +8,8 @@ USEMODULE += bloom
 USEMODULE += random
 USEMODULE += xtimer
 
+USEMODULE += fmt
+
 DISABLE_MODULE += auto_init
 
 TEST_ON_CI_WHITELIST += all
