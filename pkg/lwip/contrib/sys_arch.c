@@ -146,7 +146,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
     start = xtimer_now_usec64();
     if (timeout > 0) {
         uint64_t u_timeout = (timeout * US_PER_MS);
-        _xtimer_set64(&timer, (uint32_t)u_timeout, (uint32_t)(u_timeout >> 32));
+        xtimer_set64(&timer, u_timeout);
     }
     mbox_get(&mbox->mbox, &m);
     stop = xtimer_now_usec64();
