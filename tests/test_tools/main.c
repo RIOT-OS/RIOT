@@ -65,7 +65,53 @@ static int cmd_shellping(int argc, char **argv)
 }
 
 
+static void cmd_increment_usage(char * name)
+{
+    printf("Usage: %s <uint8_t>\n", name);
+    puts("Increments given <uint8_t>");
+}
+
+static void cmd_increment_usage(char * name);
+/**
+ * @brief increment given argument by one
+ *
+ * First argument is read with scanf as an uint8_t and icremented
+ * It will overflow to 0 on UINT8_MAX.
+ *
+ * @param[in] argc  Number of arguments
+ * @param[in] argv  Array of arguments
+ *
+ * @return  0 on success
+ *
+ */
+static int cmd_increment(int argc, char **argv)
+{
+    if (argc != 2) {
+        puts("Invalid number of argument");
+        cmd_increment_usage(argv[0]);
+        return 1;
+    }
+
+    /* It cannot be an uint8_t otherwise it crashes on samr21-xpro...
+     * Do the uint8_t conversion explicitely */
+    unsigned int value;
+    if (1 != sscanf(argv[1], "%u", &value)) {
+        puts("Invalid argument");
+        cmd_increment_usage(argv[0]);
+        return 1;
+    }
+    value = UINT8_MAX & value;
+
+    /* Increment and manually handle overflow */
+    value = (value == UINT8_MAX ? 0 : value +1);
+    printf("%u\n", value);
+
+    return 0;
+}
+
+
 static const shell_command_t shell_commands[] = {
+    { "inc8", "increment first argument uint8_t", cmd_increment },
     { "shellping", "Just print 'shellpong'", cmd_shellping },
     { "true", "do nothing, successfully", cmd_true },
     { NULL, NULL, NULL }
