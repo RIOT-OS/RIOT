@@ -53,7 +53,11 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     isr_cb = cb;
     isr_arg = arg;
 
-    /* No other configuration */
+
+    /* reset timer counter */
+    volatile uint64_t *mtime = (uint64_t *) (CLINT_CTRL_ADDR + CLINT_MTIME);
+    *mtime = 0;
+
     return 0;
 }
 
