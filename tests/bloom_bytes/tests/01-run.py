@@ -20,7 +20,7 @@ def testfunc(child):
     child.expect(r"checking 10000 elements took \d+ms", timeout=TIMEOUT)
     child.expect(r"\d+ elements probably in the filter.")
     child.expect(r"\d+ elements not in the filter.")
-    child.expect(".+ false positive rate.")
+    child.expect(r"0\.\d+ false positive rate.")
     child.expect_exact("All done!")
 
 
