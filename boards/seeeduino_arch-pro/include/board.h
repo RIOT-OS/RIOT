@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_seeduino_arch-pro Seeeduino Arch Pro development kit
- * @ingroup     boards
- * @brief       Support for the Seeeduino Arch Pro board
+ * @ingroup     boards_seeduino_arch-pro
  * @{
  *
  * @file

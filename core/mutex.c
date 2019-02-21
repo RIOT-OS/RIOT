@@ -74,8 +74,8 @@ void mutex_unlock(mutex_t *mutex)
 {
     unsigned irqstate = irq_disable();
 
-    DEBUG("mutex_unlock(): queue.next: 0x%08x pid: %" PRIkernel_pid "\n",
-          (unsigned)mutex->queue.next, sched_active_pid);
+    DEBUG("mutex_unlock(): queue.next: %p pid: %" PRIkernel_pid "\n",
+          (void *)mutex->queue.next, sched_active_pid);
 
     if (mutex->queue.next == NULL) {
         /* the mutex was not locked */
@@ -109,8 +109,8 @@ void mutex_unlock(mutex_t *mutex)
 
 void mutex_unlock_and_sleep(mutex_t *mutex)
 {
-    DEBUG("PID[%" PRIkernel_pid "]: unlocking mutex. queue.next: 0x%08x, and "
-          "taking a nap\n", sched_active_pid, (unsigned)mutex->queue.next);
+    DEBUG("PID[%" PRIkernel_pid "]: unlocking mutex. queue.next: %p, and "
+          "taking a nap\n", sched_active_pid, (void *)mutex->queue.next);
     unsigned irqstate = irq_disable();
 
     if (mutex->queue.next) {

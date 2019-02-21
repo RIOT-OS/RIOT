@@ -28,8 +28,15 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "cpu.h"
+#include "bitarithm.h"
 #include "bit.h"
 #include "periph/gpio.h"
+
+/* Single-port MCU*/
+#if !defined(PORTA_BASE) && defined(PORT_BASE)
+#  define PORTA_BASE PORT_BASE
+#  define PORTA PORT
+#endif
 
 #ifndef PORT_PCR_ODE_MASK
 /* For compatibility with Kinetis CPUs without open drain GPIOs (e.g. KW41Z) */
@@ -77,6 +84,7 @@
  */
 #define PINS_PER_PORT       (32)
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   Calculate the needed memory (in byte) needed to save 4 bits per MCU
  *          pin
@@ -114,6 +122,7 @@ static isr_ctx_t isr_ctx[CTX_NUMOF];
 static uint32_t isr_map[ISR_MAP_SIZE];
 
 static const uint8_t port_irqs[] = PORT_IRQS;
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 static inline PORT_Type *port(gpio_t pin)
 {
@@ -135,10 +144,7 @@ static inline int pin_num(gpio_t pin)
     return (int)(pin & 0x3f);
 }
 
-static inline void clk_en(gpio_t pin)
-{
-    bit_set32(&SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT + port_num(pin));
-}
+#ifdef MODULE_PERIPH_GPIO_IRQ
 
 /**
  * @brief   Get context for a specific pin
@@ -176,13 +182,28 @@ static void write_map(int port, int pin, int ctx)
 static void ctx_clear(int port, int pin)
 {
     int ctx = get_ctx(port, pin);
+
     write_map(port, pin, ctx);
+}
+#endif /* MODULE_PERIPH_GPIO_IRQ */
+
+static inline void clk_en(gpio_t pin)
+{
+#if defined(SIM_SCGC5_PORTA_SHIFT)
+    bit_set32(&SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT + port_num(pin));
+#else
+    /* In some cases GPIO is always clocked */
+    (void) pin;
+#endif
+
 }
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
+#ifdef KINETIS_HAVE_PCR
     /* set pin to analog mode while configuring it */
     gpio_init_port(pin, GPIO_AF_ANALOG);
+#endif
 
     /* set pin direction */
     if (mode & MODE_OUT) {
@@ -192,38 +213,10 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
         gpio(pin)->PDDR &= ~(1 << pin_num(pin));
     }
 
+#ifdef KINETIS_HAVE_PCR
     /* enable GPIO function */
     port(pin)->PCR[pin_num(pin)] = (GPIO_AF_GPIO | (mode & MODE_PCR_MASK));
-    return 0;
-}
-
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
-{
-    if (gpio_init(pin, mode) < 0) {
-        return -1;
-    }
-
-    /* try go grab a free spot in the context array */
-    int ctx_num = get_free_ctx();
-    if (ctx_num < 0) {
-        return -1;
-    }
-
-    /* save interrupt context */
-    isr_ctx[ctx_num].cb = cb;
-    isr_ctx[ctx_num].arg = arg;
-    isr_ctx[ctx_num].state = flank;
-    write_map(port_num(pin), pin_num(pin), ctx_num);
-
-    /* clear interrupt flags */
-    port(pin)->ISFR &= ~(1 << pin_num(pin));
-
-    /* enable global port interrupts in the NVIC */
-    NVIC_EnableIRQ(port_irqs[port_num(pin)]);
-
-    /* finally, enable the interrupt for the selected pin */
-    port(pin)->PCR[pin_num(pin)] |= flank;
+#endif
     return 0;
 }
 
@@ -232,29 +225,26 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
     /* enable PORT clock in case it was not active before */
     clk_en(pin);
 
+#ifdef KINETIS_HAVE_PCR
+#ifdef MODULE_PERIPH_GPIO_IRQ
     /* if the given interrupt was previously configured as interrupt source, we
      * need to free its interrupt context. We to this only after we
      * re-configured the pin in case an event is happening just in between... */
     uint32_t isr_state = port(pin)->PCR[pin_num(pin)];
+#endif /* MODULE_PERIPH_GPIO_IRQ */
+
     /* set new PCR value */
     port(pin)->PCR[pin_num(pin)] = pcr;
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
     /* and clear the interrupt context if needed */
     if (isr_state & PORT_PCR_IRQC_MASK) {
         ctx_clear(port_num(pin), pin_num(pin));
     }
-}
-
-void gpio_irq_enable(gpio_t pin)
-{
-    int ctx = get_ctx(port_num(pin), pin_num(pin));
-    port(pin)->PCR[pin_num(pin)] |= isr_ctx[ctx].state;
-}
-
-void gpio_irq_disable(gpio_t pin)
-{
-    int ctx = get_ctx(port_num(pin), pin_num(pin));
-    isr_ctx[ctx].state = port(pin)->PCR[pin_num(pin)] & PORT_PCR_IRQC_MASK;
-    port(pin)->PCR[pin_num(pin)] &= ~(PORT_PCR_IRQC_MASK);
+#endif /* MODULE_PERIPH_GPIO_IRQ */
+#else
+    (void) pcr;
+#endif /* KINETIS_HAVE_PCR */
 }
 
 int gpio_read(gpio_t pin)
@@ -292,25 +282,76 @@ void gpio_write(gpio_t pin, int value)
     }
 }
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                  gpio_cb_t cb, void *arg)
+{
+    if (gpio_init(pin, mode) < 0) {
+        return -1;
+    }
+
+    /* try go grab a free spot in the context array */
+    int ctx_num = get_free_ctx();
+    if (ctx_num < 0) {
+        return -1;
+    }
+
+    /* save interrupt context */
+    isr_ctx[ctx_num].cb = cb;
+    isr_ctx[ctx_num].arg = arg;
+    isr_ctx[ctx_num].state = flank;
+    write_map(port_num(pin), pin_num(pin), ctx_num);
+
+    /* clear interrupt flags */
+    port(pin)->ISFR &= ~(1 << pin_num(pin));
+
+    /* enable global port interrupts in the NVIC */
+    NVIC_EnableIRQ(port_irqs[port_num(pin)]);
+
+    /* finally, enable the interrupt for the selected pin */
+    port(pin)->PCR[pin_num(pin)] |= flank;
+    return 0;
+}
+
+void gpio_irq_enable(gpio_t pin)
+{
+    int ctx = get_ctx(port_num(pin), pin_num(pin));
+    port(pin)->PCR[pin_num(pin)] |= isr_ctx[ctx].state;
+}
+
+void gpio_irq_disable(gpio_t pin)
+{
+    int ctx = get_ctx(port_num(pin), pin_num(pin));
+    isr_ctx[ctx].state = port(pin)->PCR[pin_num(pin)] & PORT_PCR_IRQC_MASK;
+    port(pin)->PCR[pin_num(pin)] &= ~(PORT_PCR_IRQC_MASK);
+}
+
 static inline void irq_handler(PORT_Type *port, int port_num)
 {
     /* take interrupt flags only from pins which interrupt is enabled */
     uint32_t status = port->ISFR;
 
-    for (int i = 0; i < 32; i++) {
-        if ((status & (1u << i)) && (port->PCR[i] & PORT_PCR_IRQC_MASK)) {
-            port->ISFR = (1u << i);
-            int ctx = get_ctx(port_num, i);
-            isr_ctx[ctx].cb(isr_ctx[ctx].arg);
+    while (status) {
+        /* get position of first bit set in status */
+        unsigned pin = bitarithm_lsb(status);
+        /* clear it */
+        status &= ~(1 << pin);
+        if (port->PCR[pin] & PORT_PCR_IRQC_MASK) {
+            port->ISFR = (1u << pin);
+            int ctx = get_ctx(port_num, pin);
+            gpio_cb_t cb = isr_ctx[ctx].cb;
+            if (cb) {
+                cb(isr_ctx[ctx].arg);
+            }
         }
     }
-    cortexm_isr_end();
 }
 
 #ifdef PORTA_BASE
 void isr_porta(void)
 {
     irq_handler(PORTA, 0);
+    cortexm_isr_end();
 }
 #endif /* PORTA_BASE */
 
@@ -318,6 +359,7 @@ void isr_porta(void)
 void isr_portb(void)
 {
     irq_handler(PORTB, 1);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_B */
 
@@ -325,6 +367,7 @@ void isr_portb(void)
 void isr_portc(void)
 {
     irq_handler(PORTC, 2);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_C */
 
@@ -332,6 +375,7 @@ void isr_portc(void)
 void isr_portd(void)
 {
     irq_handler(PORTD, 3);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_D */
 
@@ -339,6 +383,7 @@ void isr_portd(void)
 void isr_porte(void)
 {
     irq_handler(PORTE, 4);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_E */
 
@@ -346,6 +391,7 @@ void isr_porte(void)
 void isr_portf(void)
 {
     irq_handler(PORTF, 5);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_F */
 
@@ -353,6 +399,7 @@ void isr_portf(void)
 void isr_portg(void)
 {
     irq_handler(PORTG, 6);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_G */
 
@@ -362,5 +409,7 @@ void isr_portb_portc(void)
 {
     irq_handler(PORTB, 1);
     irq_handler(PORTC, 2);
+    cortexm_isr_end();
 }
 #endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */

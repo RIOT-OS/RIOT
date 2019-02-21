@@ -45,10 +45,9 @@ extern "C" {
  * @brief A ChaCha cipher stream context.
  * @details Initialize with chacha_init().
  */
-typedef struct
-{
+typedef struct {
     uint32_t state[16]; /**< The current state of the stream. */
-    uint8_t rounds; /**< Number of iterations. */
+    uint8_t rounds;     /**< Number of iterations. */
 } chacha_ctx;
 
 /**
@@ -60,8 +59,8 @@ typedef struct
  * @param[in]  keylen  Length (in bytes) of @p key. Must be 16 or 32.
  * @param[in]  nonce   IV / nonce to use.
  *
- * @returns `== 0` on success.
- * @returns `< 0` if an illegal value for @p rounds or @p keylen was suppplied.
+ * @return     `== 0` on success.
+ * @return     `< 0` if an illegal value for @p rounds or @p keylen was suppplied.
  */
 int chacha_init(chacha_ctx *ctx,
                 unsigned rounds,
@@ -74,7 +73,7 @@ int chacha_init(chacha_ctx *ctx,
  * @details If you want to seek inside the cipher steam, then you have to
  *          update the clock in `ctx->state[13]:ctx->state[12]` manually.
  *
- * @warning You need to re-initialized the context with a new nonce after 2^64
+ * @warning You need to re-initialize the context with a new nonce after 2^64
  *          encrypted blocks, or the keystream will repeat!
  *
  * @param[in,out] ctx The ChaCha context
@@ -88,7 +87,7 @@ void chacha_keystream_bytes(chacha_ctx *ctx, void *x);
  * @details @p m is always the input regardless if it is the plaintext or ciphertext,
  *          and @p c vice verse.
  *
- * @warning You need to re-initialized the context with a new nonce after 2^64
+ * @warning You need to re-initialize the context with a new nonce after 2^64
  *          encrypted blocks, or the keystream will repeat!
  *
  * @param[in,out] ctx The ChaCha context.
@@ -130,6 +129,8 @@ void chacha_prng_seed(const void *data, size_t bytes);
  *
  * @warning After you have read 2^68 numbers you have to re-seed the PRNG.
  *          Otherwise the sequence will repeat.
+ *
+ * @return The random value
  */
 uint32_t chacha_prng_next(void);
 

@@ -42,8 +42,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define _MAX_MHR_OVERHEAD           (25)
-
 #define _MACACKWAITDURATION         (864 / 16) /* 864us * 62500Hz */
 
 #define KW2XRF_THREAD_FLAG_ISR      (1 << 8)
@@ -82,10 +80,6 @@ static int _init(netdev_t *netdev)
         LOG_ERROR("[kw2xrf] unable to initialize device\n");
         return -1;
     }
-
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
 
     /* reset device to default values and put it into RX state */
     kw2xrf_reset_phy(dev);
@@ -171,9 +165,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     _send_last_fcf = dev->buf[1];
 
     kw2xrf_write_fifo(dev, dev->buf, dev->buf[0]);
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += len;
-#endif
 
     /* send data out directly if pre-loading id disabled */
     if (!(dev->netdev.flags & KW2XRF_OPT_PRELOADING)) {
@@ -195,11 +186,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     if (buf == NULL) {
         return pkt_len + 1;
     }
-
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += pkt_len;
-#endif
 
     if (pkt_len > len) {
         /* not enough space in buf */
@@ -260,13 +246,19 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     }
 
     switch (opt) {
-        case NETOPT_MAX_PACKET_SIZE:
-            if (len < sizeof(int16_t)) {
+        case NETOPT_ADDRESS:
+            if (len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
-
-            *((uint16_t *)value) = KW2XRF_MAX_PKT_LENGTH - _MAX_MHR_OVERHEAD;
+            *((uint16_t *)value) = kw2xrf_get_addr_short(dev);
             return sizeof(uint16_t);
+
+        case NETOPT_ADDRESS_LONG:
+            if (len < sizeof(uint64_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint64_t *)value) = kw2xrf_get_addr_long(dev);
+            return sizeof(uint64_t);
 
         case NETOPT_STATE:
             if (len < sizeof(netopt_state_t)) {
@@ -327,6 +319,13 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
             *((netopt_enable_t *)value) =
                 !!(dev->netdev.flags & KW2XRF_OPT_AUTOCCA);
             return sizeof(netopt_enable_t);
+
+        case NETOPT_CHANNEL:
+            if (len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint16_t *)value) = kw2xrf_get_channel(dev);
+            return sizeof(uint16_t);
 
         case NETOPT_TX_POWER:
             if (len < sizeof(int16_t)) {
@@ -395,7 +394,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
             }
             else {
                 kw2xrf_set_addr_short(dev, *((uint16_t *)value));
-                /* don't set res to set netdev_ieee802154_t::short_addr */
+                res = sizeof(uint16_t);
             }
             break;
 
@@ -405,7 +404,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
             }
             else {
                 kw2xrf_set_addr_long(dev, *((uint64_t *)value));
-                /* don't set res to set netdev_ieee802154_t::short_addr */
+                res = sizeof(uint64_t);
             }
             break;
 
@@ -430,8 +429,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
                     res = -EINVAL;
                     break;
                 }
-                dev->netdev.chan = chan;
-                /* don't set res to set netdev_ieee802154_t::chan */
+                res = sizeof(uint16_t);
             }
             break;
 

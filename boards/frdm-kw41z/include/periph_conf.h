@@ -128,16 +128,24 @@ static const uart_conf_t uart_config[] = {
  */
 static const adc_conf_t adc_config[] = {
     /* dev, pin, channel */
-    [ 0] = { ADC0, GPIO_UNDEF, 26 },       /* internal: temperature sensor */
+    /* ADC0_DP-ADC0_DM differential reading (Arduino A5 - A0) */
+    [ 0] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan =  0 | ADC_SC1_DIFF_MASK, .avg = ADC_AVG_MAX },
+    /* ADC0_DP single ended reading (Arduino A5) */
+    [ 1] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan =  0, .avg = ADC_AVG_MAX },
+    /* PTB2 (Arduino A2) */
+    [ 2] = { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  2), .chan =  3, .avg = ADC_AVG_MAX },
+    /* PTB3 (Arduino A3) */
+    [ 3] = { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  3), .chan =  2, .avg = ADC_AVG_MAX },
+    /* internal: temperature sensor */
+    /* The temperature sensor has a very high output impedance, it must not be
+     * sampled using hardware averaging, or the sampled values will be garbage */
+    [ 4] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 26, .avg = ADC_AVG_NONE },
     /* Note: the band gap buffer uses a bit of current and is turned off by default,
      * Set PMC->REGSC |= PMC_REGSC_BGBE_MASK before reading or the input will be floating */
-    [ 1] = { ADC0, GPIO_UNDEF, 27 },       /* internal: band gap */
-    [ 2] = { ADC0, GPIO_UNDEF, 29 },       /* internal: V_REFH */
-    [ 3] = { ADC0, GPIO_UNDEF, 30 },       /* internal: V_REFL */
-    [ 4] = { ADC0, GPIO_UNDEF, 23 },       /* internal: DCDC divided battery level */
-    [ 5] = { ADC0, GPIO_UNDEF,  0 | ADC_SC1_DIFF_MASK }, /* ADC0_DP-ADC0_DM differential reading */
-    [ 6] = { ADC0, GPIO_PIN(PORT_B,  3),  2 }, /* ADC0_SE2 */
-    [ 7] = { ADC0, GPIO_PIN(PORT_B,  2),  3 }, /* ADC0_SE3 */
+    /* internal: band gap */
+    [ 5] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 27, .avg = ADC_AVG_MAX },
+    /* internal: DCDC divided battery level */
+    [ 6] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 23, .avg = ADC_AVG_MAX },
 };
 #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /*
@@ -238,16 +246,6 @@ static const spi_conf_t spi_config[] = {
 */
 static const i2c_conf_t i2c_config[] = {
     {
-        .i2c = I2C0,
-        .scl_pin = GPIO_PIN(PORT_B, 0),
-        .sda_pin = GPIO_PIN(PORT_B, 1),
-        .freq = CLOCK_BUSCLOCK,
-        .speed = I2C_SPEED_FAST,
-        .irqn = I2C0_IRQn,
-        .scl_pcr = (PORT_PCR_MUX(3)),
-        .sda_pcr = (PORT_PCR_MUX(3)),
-    },
-    {
         .i2c = I2C1,
         .scl_pin = GPIO_PIN(PORT_C, 2),
         .sda_pin = GPIO_PIN(PORT_C, 3),
@@ -259,8 +257,7 @@ static const i2c_conf_t i2c_config[] = {
     },
 };
 #define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
-#define I2C_0_ISR           (isr_i2c0)
-#define I2C_1_ISR           (isr_i2c1)
+#define I2C_0_ISR           (isr_i2c1)
 /** @} */
 
 /**

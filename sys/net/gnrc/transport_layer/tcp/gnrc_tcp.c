@@ -18,8 +18,9 @@
  */
 
 #include <errno.h>
-#include <utlist.h>
 #include <string.h>
+#include <utlist.h>
+
 #include "net/af.h"
 #include "net/gnrc.h"
 #include "net/gnrc/tcp.h"
@@ -202,14 +203,33 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t targe
            tcb->state != FSM_STATE_CLOSE_WAIT) {
         mbox_get(&(tcb->mbox), &msg);
         switch (msg.type) {
-            case MSG_TYPE_CONNECTION_TIMEOUT:
-                DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : CONNECTION_TIMEOUT\n");
-                _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
-                ret = -ETIMEDOUT;
-                break;
-
             case MSG_TYPE_NOTIFY_USER:
                 DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : MSG_TYPE_NOTIFY_USER\n");
+
+                /* Setup a timeout to be able to revert back to LISTEN state, in case the
+                 * send SYN+ACK we received upon entering SYN_RCVD is never acknowledged
+                 * by the peer. */
+                if ((tcb->state == FSM_STATE_SYN_RCVD) && (tcb->status & STATUS_PASSIVE)) {
+                    _setup_timeout(&connection_timeout, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+                                   _cb_mbox_put_msg, &connection_timeout_arg);
+                }
+                break;
+
+            case MSG_TYPE_CONNECTION_TIMEOUT:
+                DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : CONNECTION_TIMEOUT\n");
+
+                /* The connection establishment attempt timed out:
+                 * 1) Active connections return -ETIMEOUT.
+                 * 2) Passive connections stop the ongoing retransmissions and repeat the
+                 *    open call to wait for the next connection attempt. */
+                if (tcb->status & STATUS_PASSIVE) {
+                    _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
+                    _fsm(tcb, FSM_EVENT_CALL_OPEN, NULL, NULL, 0);
+                }
+                else {
+                    _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                    ret = -ETIMEDOUT;
+                }
                 break;
 
             default:

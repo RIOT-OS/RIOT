@@ -5,8 +5,7 @@ endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
+  USEMODULE += mma8x5x
 endif
 
-ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
-  USEMODULE += nrfmin
-endif
+include $(RIOTBOARD)/common/nrf51/Makefile.dep

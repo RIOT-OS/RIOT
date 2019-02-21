@@ -22,10 +22,6 @@
 #include "thread.h"
 #include "kernel_types.h"
 
-#ifdef MODULE_SCHEDSTATISTICS
-#include "xtimer.h"
-#endif
-
 #ifdef MODULE_TLSF_MALLOC
 #include "tlsf.h"
 #include "tlsf-malloc.h"
@@ -44,6 +40,7 @@ static const char *state_names[] = {
     [STATUS_FLAG_BLOCKED_ANY] = "bl anyfl",
     [STATUS_FLAG_BLOCKED_ALL] = "bl allfl",
     [STATUS_MBOX_BLOCKED] = "bl mbox",
+    [STATUS_COND_BLOCKED] = "bl cond",
 };
 
 /**

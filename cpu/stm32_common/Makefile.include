@@ -8,12 +8,6 @@ USEMODULE += periph_common
 # include stm32 common functions and stm32 common periph drivers
 USEMODULE += stm32_common stm32_common_periph
 
-# flashpage and eeprom periph implementations share flash lock/unlock functions
-# in periph_flash_common
-ifneq (,$(filter periph_flashpage periph_eeprom,$(FEATURES_REQUIRED)))
-  FEATURES_REQUIRED += periph_flash_common
-endif
-
 # For stm32 cpu's we use the stm32_common.ld linker script
 export LINKFLAGS += -L$(RIOTCPU)/stm32_common/ldscripts
 LINKER_SCRIPT ?= stm32_common.ld

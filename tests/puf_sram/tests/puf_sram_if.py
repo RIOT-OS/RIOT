@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2018 Kevin Weiss <kevin.weiss@haw-hamburg.de>
+# Copyright (c) 2018 Kevin Weiss, for HAW Hamburg  <kevin.weiss@haw-hamburg.de>
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -12,12 +12,12 @@ import time
 
 class PufSram:
 
-    def __init__(self, port='/dev/ttyUSB0', baud=115200):
+    def __init__(self, port, baud):
         self.__dev = serial.Serial(port, baud, timeout=10)
         if(self.__dev.isOpen() is False):
             self.__dev.open()
 
-    def repower(self, shutdown_time=1):
+    def repower(self, shutdown_time):
         self.__dev.setRTS(True)
         time.sleep(shutdown_time)
         self.__dev.setRTS(False)
@@ -38,7 +38,7 @@ class PufSram:
                 return data
         return None
 
-    def get_seed_list(self, n=10000, off_time=1, allow_print=False):
+    def get_seed_list(self, n, off_time, allow_print):
         data = list()
         for i in range(0, n):
             self.repower(off_time)

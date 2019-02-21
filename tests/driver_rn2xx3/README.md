@@ -18,7 +18,7 @@ of the Bee-like module to your board:
 NOTE: when you use an Arduino Wireless Proto shield, the RN2483/RN2903 module
 can potentially be connected to the same UART as RIOTs standard out. This is the
 case for Arduino UNO, and most of the Nucleo 64 boards.
-In this case you must redefine `UART_STDIO_DEV` to another UART interface in
+In this case you must redefine `STDIO_UART_DEV` to another UART interface in
 the `board.h` and connect a UART-to-USB adapter to that UART.
 This is not the case with Arduino-zero or some Nucleo144 boards.
 

@@ -68,13 +68,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Default PAN ID
- *
- * @todo    Read some global network stack specific configuration value
- */
-#define AT86RF2XX_DEFAULT_PANID         (IEEE802154_DEFAULT_PANID)
-
-/**
  * @brief   Default TX power (0dBm)
  */
 #define AT86RF2XX_DEFAULT_TXPOWER       (IEEE802154_DEFAULT_TXPOWER)
@@ -94,6 +87,28 @@ extern "C" {
 #   define RSSI_BASE_VAL                   (-91)
 #endif
 
+/**
+ * @brief   Max Receiver sensitivity value in dBm
+ */
+#if MODULE_AT86RF233
+#   define MAX_RX_SENSITIVITY              (-52)
+#elif MODULE_AT86RF212B
+#   define MAX_RX_SENSITIVITY              (-54)
+#else
+#   define MAX_RX_SENSITIVITY              (-49)
+#endif
+
+/**
+ * @brief   Min Receiver sensitivity value in dBm
+ */
+#if MODULE_AT86RF233
+#   define MIN_RX_SENSITIVITY              (-101)
+#elif MODULE_AT86RF212B
+#   define MIN_RX_SENSITIVITY              (-110)
+#else
+#   define MIN_RX_SENSITIVITY              (-101)
+#endif
+
 #if defined(DOXYGEN) || defined(MODULE_AT86RF232) || defined(MODULE_AT86RF233)
 /**
  * @brief   Frame retry counter reporting
@@ -106,6 +121,22 @@ extern "C" {
 #define AT86RF2XX_HAVE_RETRIES             (1)
 #else
 #define AT86RF2XX_HAVE_RETRIES             (0)
+#endif
+
+/**
+ * @brief   Smart idle listening feature
+ *
+ * This feature optimizes radio operation in the listening mode, reducing
+ * current consumption by ~50%. It is supported by only at86rf233. The reference
+ * manual recommends to disable this feature for RSSI measurements or random number
+ * generation (Section 8.4 and Section 11.2).
+ */
+#ifdef MODULE_AT86RF233
+#ifndef AT86RF2XX_SMART_IDLE_LISTENING
+#define AT86RF2XX_SMART_IDLE_LISTENING     (1)
+#endif
+#else
+#define AT86RF2XX_SMART_IDLE_LISTENING     (0)
 #endif
 
 /**
@@ -129,29 +160,24 @@ extern "C" {
 
 /**
  * @name    Internal device option flags
- *
- * `0x00ff` is reserved for general IEEE 802.15.4 flags
- * (see @ref netdev_ieee802154_t)
- *
  * @{
  */
-#define AT86RF2XX_OPT_SRC_ADDR_LONG  (NETDEV_IEEE802154_SRC_MODE_LONG)  /**< legacy define */
-#define AT86RF2XX_OPT_RAWDUMP        (NETDEV_IEEE802154_RAW)            /**< legacy define */
-#define AT86RF2XX_OPT_AUTOACK        (NETDEV_IEEE802154_ACK_REQ)        /**< legacy define */
-#define AT86RF2XX_OPT_ACK_PENDING    (NETDEV_IEEE802154_FRAME_PEND)     /**< legacy define */
-
-#define AT86RF2XX_OPT_CSMA           (0x0100)       /**< CSMA active */
-#define AT86RF2XX_OPT_PROMISCUOUS    (0x0200)       /**< promiscuous mode
+#define AT86RF2XX_OPT_TELL_TX_START  (0x0001)       /**< notify MAC layer on TX
+                                                     *   start */
+#define AT86RF2XX_OPT_TELL_TX_END    (0x0002)       /**< notify MAC layer on TX
+                                                     *   finished */
+#define AT86RF2XX_OPT_TELL_RX_START  (0x0004)       /**< notify MAC layer on RX
+                                                     *   start */
+#define AT86RF2XX_OPT_TELL_RX_END    (0x0008)       /**< notify MAC layer on RX
+                                                     *   finished */
+#define AT86RF2XX_OPT_CSMA           (0x0010)       /**< CSMA active */
+#define AT86RF2XX_OPT_PROMISCUOUS    (0x0020)       /**< promiscuous mode
                                                      *   active */
-#define AT86RF2XX_OPT_PRELOADING     (0x0400)       /**< preloading enabled */
-#define AT86RF2XX_OPT_TELL_TX_START  (0x0800)       /**< notify MAC layer on TX
-                                                     *   start */
-#define AT86RF2XX_OPT_TELL_TX_END    (0x1000)       /**< notify MAC layer on TX
-                                                     *   finished */
-#define AT86RF2XX_OPT_TELL_RX_START  (0x2000)       /**< notify MAC layer on RX
-                                                     *   start */
-#define AT86RF2XX_OPT_TELL_RX_END    (0x4000)       /**< notify MAC layer on RX
-                                                     *   finished */
+#define AT86RF2XX_OPT_PRELOADING     (0x0040)       /**< preloading enabled */
+#define AT86RF2XX_OPT_AUTOACK        (0x0080)       /**< Auto ACK active */
+#define AT86RF2XX_OPT_ACK_PENDING    (0x0100)       /**< ACK frames with data
+                                                     *   pending */
+
 /** @} */
 
 /**
@@ -175,6 +201,7 @@ typedef struct {
     netdev_ieee802154_t netdev;             /**< netdev parent struct */
     /* device specific fields */
     at86rf2xx_params_t params;              /**< parameters for initialization */
+    uint16_t flags;                         /**< Device specific flags */
     uint8_t state;                          /**< current state of the radio */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */
 #ifdef MODULE_AT86RF212B
@@ -313,6 +340,28 @@ int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev);
  * @param[in] txpower       transmission power in dBm
  */
 void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower);
+
+/**
+ * @brief   Get the configured receiver sensitivity of the given device [in dBm]
+ *
+ * @param[in] dev           device to read from
+ *
+ * @return                  configured receiver sensitivity in dBm
+ */
+int16_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev);
+
+/**
+ * @brief   Set the receiver sensitivity of the given device [in dBm]
+ *
+ * If the device does not support the exact dBm value given, it will set a value
+ * as close as possible to the given value. If the given value is larger or
+ * lower then the maximal or minimal possible value, the min or max value is
+ * set, respectively.
+ *
+ * @param[in] dev           device to write to
+ * @param[in] rxsens        rx sensitivity in dBm
+ */
+void at86rf2xx_set_rxsensitivity(const at86rf2xx_t *dev, int16_t rxsens);
 
 /**
  * @brief   Get the maximum number of retransmissions

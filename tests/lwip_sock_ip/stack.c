@@ -189,17 +189,24 @@ void _net_init(void)
     assert(netdev.netdev.driver);
 #if LWIP_IPV4
     ip4_addr_t local4, mask4, gw4;
-    local4.addr = htonl(_TEST_ADDR4_LOCAL);
-    mask4.addr = htonl(_TEST_ADDR4_MASK);
-    gw4.addr = htonl(_TEST_ADDR4_GW);
+    local4.addr = _TEST_ADDR4_LOCAL;
+    mask4.addr = _TEST_ADDR4_MASK;
+    gw4.addr = _TEST_ADDR4_GW;
     netif_add(&netif, &local4, &mask4, &gw4, &netdev, lwip_netdev_init, tcpip_input);
 #else
     netif_add(&netif, &netdev, lwip_netdev_init, tcpip_input);
 #endif
 #if LWIP_IPV6
-    static const uint8_t local6[] = _TEST_ADDR6_LOCAL;
+    static const uint8_t local6_a[] = _TEST_ADDR6_LOCAL;
+    /* XXX need to copy into a stack variable. Otherwise, when just using
+     * `local6_a` this leads to weird alignment problems on some platforms with
+     * netif_add_ip6_address() below */
+    ip6_addr_t local6;
     s8_t idx;
-    netif_add_ip6_address(&netif, (ip6_addr_t *)&local6, &idx);
+
+    memcpy(&local6.addr, local6_a, sizeof(local6_a));
+    ip6_addr_clear_zone(&local6);
+    netif_add_ip6_address(&netif, &local6, &idx);
     for (int i = 0; i <= idx; i++) {
         netif.ip6_addr_state[i] |= IP6_ADDR_VALID;
     }
@@ -222,7 +229,7 @@ void _prepare_send_checks(void)
 
     netdev_test_set_send_cb(&netdev, _netdev_send);
 #if LWIP_ARP
-    const ip4_addr_t remote4 = { .addr = htonl(_TEST_ADDR4_REMOTE) };
+    const ip4_addr_t remote4 = { .addr = _TEST_ADDR4_REMOTE };
     assert(ERR_OK == etharp_add_static_entry(&remote4, (struct eth_addr *)mac));
 #endif
 #if LWIP_IPV6
@@ -234,7 +241,9 @@ void _prepare_send_checks(void)
         struct nd6_neighbor_cache_entry *nc = &neighbor_cache[i];
         if (nc->state == ND6_NO_ENTRY) {
             nc->state = ND6_REACHABLE;
-            memcpy(&nc->next_hop_address, remote6, sizeof(ip6_addr_t));
+            memcpy(&nc->next_hop_address, remote6, sizeof(remote6));
+            ip6_addr_assign_zone(&nc->next_hop_address,
+                                 IP6_UNICAST, &netif);
             memcpy(&nc->lladdr, mac, 6);
             nc->netif = &netif;
             nc->counter.reachable_time = UINT32_MAX;
@@ -261,8 +270,8 @@ bool _inject_4packet(uint32_t src, uint32_t dst, uint8_t proto, void *data,
     IPH_LEN_SET(ip_hdr, htons(sizeof(struct ip_hdr) + data_len));
     IPH_TTL_SET(ip_hdr, 64);
     IPH_PROTO_SET(ip_hdr, proto);
-    ip_hdr->src.addr = htonl(src);
-    ip_hdr->dest.addr = htonl(dst);
+    ip_hdr->src.addr = src;
+    ip_hdr->dest.addr = dst;
     IPH_CHKSUM_SET(ip_hdr, 0);
     IPH_CHKSUM_SET(ip_hdr, inet_chksum(ip_hdr, sizeof(struct ip_hdr)));
 
@@ -321,7 +330,7 @@ bool _check_4packet(uint32_t src, uint32_t dst, uint8_t proto,
                     void *data, size_t data_len, uint16_t netif)
 {
 #if LWIP_IPV4
-    msg_t msg;
+    msg_t msg = { .content = { .value = 0 } };
 
     (void)netif;
     while (data_len != (msg.content.value - sizeof(struct ip_hdr))) {
@@ -349,7 +358,7 @@ bool _check_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                     uint8_t proto, void *data, size_t data_len, uint16_t netif)
 {
 #if LWIP_IPV6
-    msg_t msg;
+    msg_t msg = { .content = { .value = 0 } };
 
     (void)netif;
     while (data_len != (msg.content.value - sizeof(ipv6_hdr_t))) {

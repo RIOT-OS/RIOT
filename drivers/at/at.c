@@ -22,11 +22,16 @@
 #define AT_PRINT_INCOMING (0)
 #endif
 
+static void _isrpipe_write_one_wrapper(void *_isrpipe, uint8_t data)
+{
+    isrpipe_write_one(_isrpipe, (char)data);
+}
+
 int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize)
 {
     dev->uart = uart;
     isrpipe_init(&dev->isrpipe, buf, bufsize);
-    uart_init(uart, baudrate, (uart_rx_cb_t) isrpipe_write_one,
+    uart_init(uart, baudrate, _isrpipe_write_one_wrapper,
               &dev->isrpipe);
 
     return 0;
@@ -56,6 +61,24 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
 void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len)
 {
     uart_write(dev->uart, (const uint8_t *)bytes, len);
+}
+
+ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout)
+{
+    char *resp_pos = bytes;
+
+    while (len) {
+        int read_res;
+        if ((read_res = isrpipe_read_timeout(&dev->isrpipe, resp_pos, 1, timeout)) == 1) {
+            resp_pos += read_res;
+            len -= read_res;
+        }
+        else if (read_res == -ETIMEDOUT) {
+            break;
+        }
+    }
+
+    return (resp_pos - bytes);
 }
 
 int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
@@ -121,14 +144,16 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
     size_t bytes_left = len - 1;
     char *pos = resp_buf;
 
-    memset(resp_buf, '\0', len);
-
     at_drain(dev);
 
     res = at_send_cmd(dev, command, timeout);
     if (res) {
         goto out;
     }
+
+    /* only clear the response buffer after sending the command,
+     * so the same buffer can be used for command and response */
+    memset(resp_buf, '\0', len);
 
     while (1) {
         res = at_readline(dev, pos, bytes_left, keep_eol, timeout);

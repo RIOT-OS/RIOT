@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f031k6 \
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno \
+                             chronos msb-430 msb-430h nucleo-f031k6 \
                              nucleo-f303k8
 
 DISABLE_MODULE += auto_init
@@ -20,8 +21,5 @@ PROBLEM ?= 12
 CFLAGS += -DPROBLEM=$(PROBLEM)
 
 TEST_ON_CI_WHITELIST += all
-
-test:
-	./tests/01-run.py
 
 include $(RIOTBASE)/Makefile.include

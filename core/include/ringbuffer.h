@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup  core_util
+ * @ingroup     core_util
  * @{
  * @file
  * @author Kaspar Schleiser <kaspar@schleiser.de>

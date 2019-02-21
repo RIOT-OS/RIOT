@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f031k6 STM32 Nucleo-F031K6
- * @ingroup     boards_common_nucleo32
- * @brief       Support for the STM32 Nucleo-F031K6
+ * @ingroup     boards_nucleo-f031k6
  * @{
  *
  * @file
@@ -175,17 +173,6 @@ static const spi_conf_t spi_config[] = {
 };
 
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
-/** @} */
-
-/**
- * @name RTC configuration
- * @{
- */
-/**
- * Nucleo-f031 does not have any LSE, current RTC driver does not support LSI as
- * clock source, so disabling RTC.
- */
-#define RTC_NUMOF           (0U)
 /** @} */
 
 /**

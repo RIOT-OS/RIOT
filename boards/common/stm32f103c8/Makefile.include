@@ -1,6 +1,11 @@
 ## the cpu to build for
 export CPU = stm32f1
-export CPU_MODEL = stm32f103c8
+STM32F103C8_FLASH_HACK ?= 0
+ifneq ($(STM32F103C8_FLASH_HACK),0)
+  export CPU_MODEL = stm32f103cb
+else
+  export CPU_MODEL = stm32f103c8
+endif
 
 INCLUDES += -I$(RIOTBOARD)/common/stm32f103c8/include
 
@@ -23,12 +28,18 @@ ifeq ($(PROGRAMMER),dfu-util)
   export RESET = # dfu-util has no support for resetting the device
 
   HEXFILE = $(BINFILE)
-  export FFLAGS = -d 1d50:6017 -s 0x08002000:leave -D "$(HEXFILE)"
+  export FFLAGS = -d 1eaf:0003 -a 2 -D "$(HEXFILE)"
+  # for older bootloader versions use this:
+  #export FFLAGS = -d 1d50:6017 -s 0x08002000:leave -D "$(HEXFILE)"
 else
 
   # this board uses openocd by default
   export DEBUG_ADAPTER ?= stlink
   export STLINK_VERSION ?= 2
+
+  # call a 'reset halt' command before starting the debugger
+  # it is required as `connect_assert_srst` is set
+  export OPENOCD_DBG_START_CMD = -c 'reset halt'
 
   include $(RIOTMAKE)/tools/openocd.inc.mk
 endif

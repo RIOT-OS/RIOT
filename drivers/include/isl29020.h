@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_isl29020 ISL29020 light sensor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver for the ISL29020 light sensor
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

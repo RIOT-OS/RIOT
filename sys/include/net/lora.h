@@ -29,61 +29,75 @@ extern "C" {
 #endif
 
 /**
- * @name    LoRa modulation default values
+ * @defgroup net_lora_conf  LoRa modulation compile configurations
+ * @ingroup  config
  * @{
  */
-#ifndef LORA_FREQUENCY_RESOLUTION_DEFAULT
 /** @brief Frequency resolution in Hz */
+#ifndef LORA_FREQUENCY_RESOLUTION_DEFAULT
 #define LORA_FREQUENCY_RESOLUTION_DEFAULT      (61.03515625)
 #endif
+
+/** @brief Preamble length, same for Tx and Rx */
 #ifndef LORA_PREAMBLE_LENGTH_DEFAULT
-/**< @brief Preamble length, same for Tx and Rx */
 #define LORA_PREAMBLE_LENGTH_DEFAULT           (8U)
 #endif
-#ifndef LORA_SYMBOL_TIMEOUT_DEFAULT
+
 /** @brief Symbols timeout (s) */
+#ifndef LORA_SYMBOL_TIMEOUT_DEFAULT
 #define LORA_SYMBOL_TIMEOUT_DEFAULT            (10U)
 #endif
-#ifndef LORA_BW_DEFAULT
+
 /** @brief Set default bandwidth to 125kHz */
+#ifndef LORA_BW_DEFAULT
 #define LORA_BW_DEFAULT                        (LORA_BW_125_KHZ)
 #endif
-#ifndef LORA_SF_DEFAULT
+
 /** @brief Set default spreading factor to 12 */
+#ifndef LORA_SF_DEFAULT
 #define LORA_SF_DEFAULT                        (LORA_SF12)
 #endif
-#ifndef LORA_CR_DEFAULT
+
 /** @brief Set default coding rate to 8 */
+#ifndef LORA_CR_DEFAULT
 #define LORA_CR_DEFAULT                        (LORA_CR_4_8)
 #endif
-#ifndef LORA_FIX_LENGTH_PAYLOAD_ON_DEFAULT
+
 /** @brief Set fixed payload length on */
+#ifndef LORA_FIX_LENGTH_PAYLOAD_ON_DEFAULT
 #define LORA_FIX_LENGTH_PAYLOAD_ON_DEFAULT     (false)
 #endif
-#ifndef LORA_IQ_INVERTED_DEFAULT
+
 /** @brief Set inverted IQ on */
+#ifndef LORA_IQ_INVERTED_DEFAULT
 #define LORA_IQ_INVERTED_DEFAULT               (false)
 #endif
-#ifndef LORA_FREQUENCY_HOPPING_DEFAULT
+
 /** @brief Frequency hopping on */
+#ifndef LORA_FREQUENCY_HOPPING_DEFAULT
 #define LORA_FREQUENCY_HOPPING_DEFAULT         (false)
 #endif
-#ifndef LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT
+
 /** @brief Frequency hopping period */
+#ifndef LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT
 #define LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT  (0U)
 #endif
-#ifndef LORA_FIXED_HEADER_LEN_MODE_DEFAULT
+
 /** @brief Set fixed header length mode (implicit header) */
+#ifndef LORA_FIXED_HEADER_LEN_MODE_DEFAULT
 #define LORA_FIXED_HEADER_LEN_MODE_DEFAULT     (false)
 #endif
-#ifndef LORA_PAYLOAD_CRC_ON_DEFAULT
+
 /** @brief Enable payload CRC, optional */
+#ifndef LORA_PAYLOAD_CRC_ON_DEFAULT
 #define LORA_PAYLOAD_CRC_ON_DEFAULT            (true)
 #endif
-#ifndef LORA_PAYLOAD_LENGTH_DEFAULT
+
 /** @brief Set payload length, unused with implicit header */
+#ifndef LORA_PAYLOAD_LENGTH_DEFAULT
 #define LORA_PAYLOAD_LENGTH_DEFAULT            (0U)
 #endif
+
 /** @} */
 
 /**

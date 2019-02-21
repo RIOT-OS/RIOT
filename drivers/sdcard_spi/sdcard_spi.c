@@ -62,7 +62,7 @@ static int (*_dyn_spi_rxtx_byte)(sdcard_spi_t *card, char out, char *in);
 int sdcard_spi_init(sdcard_spi_t *card, const sdcard_spi_params_t *params)
 {
     sd_init_fsm_state_t state = SD_INIT_START;
-    memcpy(&card->params, params, sizeof(sdcard_spi_params_t));
+    card->params = *params;
     card->spi_clk = SD_CARD_SPI_SPEED_PREINIT;
 
     do {
@@ -1009,7 +1009,7 @@ uint64_t sdcard_spi_get_capacity(sdcard_spi_t *card)
         return blocknr * block_len;
     }
     else if (card->csd_structure == SD_CSD_V2) {
-        return (card->csd.v2.C_SIZE + 1) * (uint64_t)(SD_HC_BLOCK_SIZE << 10);
+        return (card->csd.v2.C_SIZE + 1) * (((uint64_t)SD_HC_BLOCK_SIZE) << 10);
     }
     return 0;
 }

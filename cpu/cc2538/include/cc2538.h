@@ -675,14 +675,6 @@ typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IE
 #define SMWDTHROSC_STCV2            ( *(cc2538_reg_t*)0x400d5064 ) /**< Sleep Timer Capture value byte 2 */
 #define SMWDTHROSC_STCV3            ( *(cc2538_reg_t*)0x400d5068 ) /**< Sleep Timer Capture value byte 3 */
 #define ANA_REGS_IVCTRL             ( *(cc2538_reg_t*)0x400d6004 ) /**< Analog control register */
-#define SOC_ADC_ADCCON1             ( *(cc2538_reg_t*)0x400d7000 ) /**< ADC Control Register 1 */
-#define SOC_ADC_ADCCON2             ( *(cc2538_reg_t*)0x400d7004 ) /**< ADC Control Register 2 */
-#define SOC_ADC_ADCCON3             ( *(cc2538_reg_t*)0x400d7008 ) /**< ADC Control Register 3 */
-#define SOC_ADC_ADCL                ( *(cc2538_reg_t*)0x400d700c ) /**< Least-significant part of ADC conversion result. */
-#define SOC_ADC_ADCH                ( *(cc2538_reg_t*)0x400d7010 ) /**< Most-significant part of ADC conversion result. */
-#define SOC_ADC_RNDL                ( *(cc2538_reg_t*)0x400d7014 ) /**< Random-number-generator data; low byte. */
-#define SOC_ADC_RNDH                ( *(cc2538_reg_t*)0x400d7018 ) /**< Random-number-generator data; high byte. */
-#define SOC_ADC_CMPCTL              ( *(cc2538_reg_t*)0x400d7024 ) /**< Analog comparator control and status register. */
 #define GPIO_A_DATA                 ( *(cc2538_reg_t*)0x400d9000 ) /**< GPIO_A Data Register */
 #define GPIO_A_DIR                  ( *(cc2538_reg_t*)0x400d9400 ) /**< GPIO_A data direction register */
 #define GPIO_A_IS                   ( *(cc2538_reg_t*)0x400d9404 ) /**< GPIO_A Interrupt Sense register */

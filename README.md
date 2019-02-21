@@ -53,7 +53,7 @@ but not limited to:
 * a preemptive, tickless scheduler with priorities
 * flexible memory management
 * high resolution, long-term timers
-* support 100+ boards based on AVR, MSP430, MIPS, ARM7 and ARM Cortex-M
+* support 100+ boards based on AVR, MSP430, ESP8266, MIPS, ARM7 and ARM Cortex-M
 * the native port allows to run RIOT as-is on Linux, BSD, and MacOS. Multiple
   instances of RIOT running on a single machine can also be interconnected via
   a simple virtual Ethernet bridge
@@ -64,19 +64,19 @@ but not limited to:
 * CoAP
 * CCN-Lite
 * Sigfox
-* LoRaWAN (Experimental)
+* LoRaWAN
 
 
 ## GETTING STARTED
 * You want to start the RIOT? Just follow our
-[quickstart guide](http://doc.riot-os.org/index.html#the-quickest-start) or
+[quickstart guide](https://doc.riot-os.org/index.html#the-quickest-start) or
 try this
 [tutorial](https://github.com/RIOT-OS/Tutorials/blob/master/README.md).
 For specific toolchain installation, follow instructions in the
-[getting started](http://doc.riot-os.org/getting-started.html) page.
+[getting started](https://doc.riot-os.org/getting-started.html) page.
 * The RIOT API itself can be built from the code using doxygen. The latest
   version of the documentation is uploaded daily to
-  [riot-os.org/api](http://riot-os.org/api).
+  [riot-os.org/api](https://riot-os.org/api).
 
 ### USING THE NATIVE PORT WITH NETWORKING
 If you compile RIOT for the native cpu and include the `netdev_tap` module,
@@ -94,20 +94,19 @@ To create a bridge and two (or `count` at your option) tap interfaces:
 
 ## CONTRIBUTE
 
-To contribute something to RIOT, please refer to the [development
-procedures](https://github.com/RIOT-OS/RIOT/wiki/Development-procedures) and
-read all notes for best practice.
+To contribute something to RIOT, please refer to our
+[contributing document](CONTRIBUTING.md).
 
 ## MAILING LISTS
 * RIOT OS kernel developers list
- * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+ * devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
- * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+ * users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
- * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+ * commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
  * notifications@riot-os.org
-   (http://lists.riot-os.org/mailman/listinfo/notifications)
+   (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 ## LICENSE
 * Most of the code developed by the RIOT community is licensed under the GNU
@@ -120,10 +119,10 @@ All code files contain licensing information.
 
 For more information, see the RIOT website:
 
-http://www.riot-os.org
+https://www.riot-os.org
 
 
 [master-ci-badge]: https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/badge.svg
-[master-ci-link]: https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/output.html
+[master-ci-link]: https://ci.riot-os.org/nightlies.html#master
 [irc-badge]: https://img.shields.io/badge/IRC-join%20chat%20%E2%86%92-blue.svg
-[irc-link]: http://webchat.freenode.net?channels=%23riot-os
+[irc-link]: https://webchat.freenode.net?channels=%23riot-os

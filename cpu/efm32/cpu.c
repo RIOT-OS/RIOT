@@ -56,9 +56,13 @@
  */
 static void dcdc_init(void)
 {
+#ifdef EMU_DCDCINIT_OFF
+    EMU_DCDCPowerOff();
+#else
     EMU_DCDCInit_TypeDef init_dcdc = EMU_DCDCINIT;
 
     EMU_DCDCInit(&init_dcdc);
+#endif
 }
 #endif
 

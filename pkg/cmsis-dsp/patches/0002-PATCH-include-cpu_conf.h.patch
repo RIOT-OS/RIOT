@@ -1,0 +1,25 @@
+From fdd48d357dcf09933b3bee28b510386b7cb98b34 Mon Sep 17 00:00:00 2001
+From: Vincent Dupont <vincent@otakeys.com>
+Date: Tue, 15 Jan 2019 17:32:56 +0100
+Subject: [PATCH 2/2] [PATCH] include cpu_conf.h
+
+---
+ CMSIS/DSP/Include/arm_math.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/CMSIS/DSP/Include/arm_math.h b/CMSIS/DSP/Include/arm_math.h
+index 6e4d9116..6af24bab 100644
+--- a/CMSIS/DSP/Include/arm_math.h
++++ b/CMSIS/DSP/Include/arm_math.h
+@@ -289,6 +289,8 @@
+ #ifndef _ARM_MATH_H
+ #define _ARM_MATH_H
+ 
++#include "cpu_conf.h"
++
+ /* Compiler specific diagnostic adjustment */
+ #if   defined ( __CC_ARM )
+ 
+-- 
+2.17.1
+

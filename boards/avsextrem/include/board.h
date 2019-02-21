@@ -9,9 +9,7 @@
 
 
 /**
- * @defgroup    boards_avsextrem Avsextrem
- * @ingroup     boards
- * @brief       Support for the Avsextrem board
+ * @ingroup     boards_avsextrem
  * @{
  *
  * @file

@@ -19,7 +19,7 @@
 
 /**
  * @defgroup    sys_hashes_md5 MD5
- * @ingroup     sys_hashes
+ * @ingroup     sys_hashes_unkeyed
  * @brief       Implementation of the MD5 hashing function
  *
  *  None of this will make any sense unless you're studying RFC 1321 as you

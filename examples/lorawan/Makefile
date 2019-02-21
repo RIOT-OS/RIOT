@@ -28,6 +28,7 @@ FEATURES_REQUIRED += periph_rtc
 
 CFLAGS += -DREGION_$(REGION)
 CFLAGS += -DDEVEUI=\"$(DEVEUI)\" -DAPPEUI=\"$(APPEUI)\" -DAPPKEY=\"$(APPKEY)\"
+CFLAGS += -DLORAMAC_ACTIVE_REGION=LORAMAC_REGION_$(REGION)
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

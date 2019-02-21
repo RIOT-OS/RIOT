@@ -1,0 +1,20 @@
+/**
+@defgroup    boards_native Native Board
+@ingroup     boards
+@brief       Support for running RIOT in native
+
+[Family: native](https://github.com/RIOT-OS/RIOT/wiki/Family:-native)
+
+# Overview
+![Terminal running RIOT native](https://raw.githubusercontent.com/wiki/RIOT-
+OS/RIOT/images/Native.jpg)
+
+# Hardware
+- CPU: Host CPU
+- RAM: Host RAM
+- Flash: Host file system
+- Network: Tap Interface
+- UART: Runtime configurable - `/dev/tty*` are supported
+- Timers: Host timer
+- LEDs: One red and one green LED - state changes are printed to the UART
+ */

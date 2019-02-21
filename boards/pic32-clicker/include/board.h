@@ -9,9 +9,7 @@
  */
 
 /**
- * @defgroup    boards_pic32-clicker MikroE PIC32 Clicker
- * @ingroup     boards
- * @brief       Support for the MikroE PIC32 Clicker
+ * @ingroup     boards_pic32-clicker
  * @details
  * see:
  * http://www.mikroe.com/pic32/pic32mx-clicker/

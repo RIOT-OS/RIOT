@@ -29,6 +29,11 @@ extern "C" {
 #define CPUID_LEN           (12U)
 
 /**
+ * @brief   Prevent shared timer functions from being used
+ */
+#define PERIPH_TIMER_PROVIDES_SET
+
+/**
  * @brief   Timer ISR
  */
 void timer_isr(void);

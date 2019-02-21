@@ -7,7 +7,7 @@ DIRS := $(sort $(abspath $(DIRS)))
 
 MODULE ?= $(shell basename $(CURDIR))
 
-.PHONY: all $(DIRS:%=ALL--%) $(DIRS:%=CLEAN--%)
+.PHONY: all clean $(DIRS:%=ALL--%) $(DIRS:%=CLEAN--%)
 
 all: $(BINDIR)/$(MODULE).a ..nothing
 

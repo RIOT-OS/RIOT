@@ -4,6 +4,7 @@ APPLICATION = filesystem
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
+
 # Blacklisting msp430-based boards, as file syscalls are not supported
 BOARD_BLACKLIST :=  chronos \
                     msb-430 \
@@ -14,7 +15,7 @@ BOARD_BLACKLIST :=  chronos \
                     z1 \
                     #
 
-BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -47,7 +48,7 @@ USEMODULE += constfs
 
 # Set file systems specific variables
 ifneq (,$(filter littlefs, $(USEMODULE)))
-    CFLAGS += -DVFS_FILE_BUFFER_SIZE=52 -DVFS_DIR_BUFFER_SIZE=44
+    CFLAGS += -DVFS_FILE_BUFFER_SIZE=56 -DVFS_DIR_BUFFER_SIZE=44
 else ifneq (,$(filter spiffs, $(USEMODULE)))
     SPIFFS_NB_FD ?= 8
     CFLAGS += '-DSPIFFS_FS_FD_SPACE_SIZE=(32 * $(SPIFFS_NB_FD))'

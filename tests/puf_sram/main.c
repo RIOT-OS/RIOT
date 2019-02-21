@@ -17,6 +17,7 @@
  *
  * @}
  */
+#include <inttypes.h>
 #include <stdio.h>
 #include "puf_sram.h"
 
@@ -24,7 +25,7 @@ int main(void)
 {
     puts("Start: Test random number generator");
 
-    printf("Success: Data for puf_sram_seed: [0x%08lX]", puf_sram_seed);
+    printf("Success: Data for puf_sram_seed: [0x%08" PRIX32 "]", puf_sram_seed);
 
     puts("End: Test finished");
     return 0;

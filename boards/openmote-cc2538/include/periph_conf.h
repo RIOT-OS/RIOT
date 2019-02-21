@@ -69,7 +69,7 @@ static const timer_conf_t timer_config[] = {
  * @name ADC configuration
  * @{
  */
-#define SOC_ADC_ADCCON_REF  SOC_ADC_ADCCON_REF_AVDD5
+#define SOC_ADC_ADCCON3_EREF  SOC_ADC_ADCCON3_EREF_AVDD5
 
 static const adc_conf_t adc_config[] = {
     GPIO_PIN(0, 2), /**< GPIO_PA2 = AD4_PIN */
@@ -121,31 +121,16 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
- * @brief   Pre-calculated clock divider values based on a CLOCK_CORECLOCK (32MHz)
- *
- * Calculated with (CPSR * (SCR + 1)) = (CLOCK_CORECLOCK / bus_freq), where
- * 1 < CPSR < 255 and
- * 0 < SCR  < 256
- */
-static const spi_clk_conf_t spi_clk_config[] = {
-    { .cpsr = 10, .scr = 31 },  /* 100khz */
-    { .cpsr =  2, .scr = 39 },  /* 400khz */
-    { .cpsr =  2, .scr = 15 },  /* 1MHz */
-    { .cpsr =  2, .scr =  2 },  /* ~4.5MHz */
-    { .cpsr =  2, .scr =  1 }   /* ~10.7MHz */
-};
-
-/**
  * @name    SPI configuration
  * @{
  */
 static const spi_conf_t spi_config[] = {
     {
-        .dev      = SSI0,
-        .mosi_pin = GPIO_PA5,
-        .miso_pin = GPIO_PA4,
-        .sck_pin  = GPIO_PA2,
-        .cs_pin   = GPIO_PA3,
+        .num      = 0,
+        .mosi_pin = GPIO_PIN(0, 5),
+        .miso_pin = GPIO_PIN(0, 4),
+        .sck_pin  = GPIO_PIN(0, 2),
+        .cs_pin   = GPIO_PIN(0, 3)
     },
 };
 

@@ -264,26 +264,23 @@ OT_COMMAND ot_state(otInstance* ot_instance, void* arg, void* answer) {
     (void)arg;
 
     if (answer != NULL) {
-        uint8_t state = otThreadGetDeviceRole(ot_instance);
-        *((uint8_t *) answer) = state;
+        otDeviceRole state = otThreadGetDeviceRole(ot_instance);
+        *((otDeviceRole *) answer) = state;
         DEBUG("state: ");
         switch (state) {
-            case kDeviceRoleOffline:
-                puts("offline");
-                break;
-            case kDeviceRoleDisabled:
+            case OT_DEVICE_ROLE_DISABLED:
                 puts("disabled");
                 break;
-            case kDeviceRoleDetached:
+            case OT_DEVICE_ROLE_DETACHED:
                 puts("detached");
                 break;
-            case kDeviceRoleChild:
+            case OT_DEVICE_ROLE_CHILD:
                 puts("child");
                 break;
-            case kDeviceRoleRouter:
+            case OT_DEVICE_ROLE_ROUTER:
                 puts("router");
                 break;
-            case kDeviceRoleLeader:
+            case OT_DEVICE_ROLE_LEADER:
                 puts("leader");
                 break;
             default:

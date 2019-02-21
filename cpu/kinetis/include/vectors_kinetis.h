@@ -49,6 +49,8 @@ void isr_can1_ored_message_buffer(void); /**< CAN1 OR'd message buffers interrup
 void isr_can1_rx_warning(void); /**< CAN1 Rx warning interrupt handler */
 void isr_can1_tx_warning(void); /**< CAN1 Tx warning interrupt handler */
 void isr_can1_wake_up(void); /**< CAN1 wake up interrupt handler */
+void isr_mscan_rx(void);     /**< MSCAN RX interrupt handler */
+void isr_mscan_tx(void);     /**< MSCAN TX/Err/Wake-up interrupt handler */
 void isr_cmp0(void);         /**< CMP0 interrupt handler */
 void isr_cmp1(void);         /**< CMP1 interrupt handler */
 void isr_cmp2(void);         /**< CMP2 interrupt handler */
@@ -147,17 +149,23 @@ void isr_tpm1(void);         /**< TPM1 interrupt handler */
 void isr_tpm2(void);         /**< TPM2 interrupt handler */
 void isr_trng0(void);        /**< TRNG0 interrupt handler */
 void isr_tsi0(void);         /**< TSI0 interrupt handler */
+void isr_uart0(void);        /**< UART0 unified interrupt handler */
 void isr_uart0_err(void);    /**< UART0 error interrupt handler */
 void isr_uart0_lon(void);    /**< UART0 LON interrupt handler */
 void isr_uart0_rx_tx(void);  /**< UART0 receive/transmit interrupt handler */
+void isr_uart1(void);        /**< UART1 unified interrupt handler */
 void isr_uart1_err(void);    /**< UART1 error interrupt handler */
 void isr_uart1_rx_tx(void);  /**< UART1 receive/transmit interrupt handler */
+void isr_uart2(void);        /**< UART2 unified interrupt handler */
 void isr_uart2_err(void);    /**< UART2 error interrupt handler */
 void isr_uart2_rx_tx(void);  /**< UART2 receive/transmit interrupt handler */
+void isr_uart3(void);        /**< UART3 unified interrupt handler */
 void isr_uart3_err(void);    /**< UART3 error interrupt handler */
 void isr_uart3_rx_tx(void);  /**< UART3 receive/transmit interrupt handler */
+void isr_uart4(void);        /**< UART4 unified interrupt handler */
 void isr_uart4_err(void);    /**< UART4 error interrupt handler */
 void isr_uart4_rx_tx(void);  /**< UART4 receive/transmit interrupt handler */
+void isr_uart5(void);        /**< UART5 unified interrupt handler */
 void isr_uart5_err(void);    /**< UART5 error interrupt handler */
 void isr_uart5_rx_tx(void);  /**< UART5 receive/transmit interrupt handler */
 void isr_usb0(void);         /**< USB0 interrupt handler */

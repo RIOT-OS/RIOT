@@ -1,7 +1,5 @@
 include ../Makefile.tests_common
 
-FEATURES_REQUIRED = periph_adc
-
 USEMODULE += mq3
 USEMODULE += xtimer
 

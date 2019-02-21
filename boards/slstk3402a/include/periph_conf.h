@@ -89,7 +89,16 @@ static const adc_chan_conf_t adc_channel_config[] = {
  * @{
  */
 static const i2c_conf_t i2c_config[] = {
-
+    {
+        .dev = I2C0,
+        .sda_pin = GPIO_PIN(PC, 10),
+        .scl_pin = GPIO_PIN(PC, 11),
+        .loc = I2C_ROUTELOC0_SDALOC_LOC15 |
+               I2C_ROUTELOC0_SCLLOC_LOC15,
+        .cmu = cmuClock_I2C0,
+        .irq = I2C0_IRQn,
+        .speed = I2C_SPEED_NORMAL
+    }
 };
 
 #define I2C_NUMOF           PERIPH_NUMOF(i2c_config)
@@ -141,19 +150,19 @@ static const spi_dev_t spi_config[] = {
 static const timer_conf_t timer_config[] = {
     {
         {
-            .dev = TIMER0,
-            .cmu = cmuClock_TIMER0
+            .dev = WTIMER0,
+            .cmu = cmuClock_WTIMER0
         },
         {
-            .dev = TIMER1,
-            .cmu = cmuClock_TIMER1
+            .dev = WTIMER1,
+            .cmu = cmuClock_WTIMER1
         },
-        .irq = TIMER1_IRQn
+        .irq = WTIMER1_IRQn
     }
 };
 
 #define TIMER_NUMOF         PERIPH_NUMOF(timer_config)
-#define TIMER_0_ISR         isr_timer1
+#define TIMER_0_ISR         isr_wtimer1
 /** @} */
 
 /**

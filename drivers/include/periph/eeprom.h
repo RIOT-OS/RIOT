@@ -24,7 +24,6 @@
 
 #include <stdint.h>
 
-#include "cpu.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
@@ -33,6 +32,13 @@ extern "C" {
 
 #ifndef EEPROM_SIZE
 #error "periph/eeprom: EEPROM_SIZE is not defined"
+#endif
+
+/**
+ * @brief   Default value of the EEPROM clear byte
+ */
+#ifndef EEPROM_CLEAR_BYTE
+#define EEPROM_CLEAR_BYTE 0x00
 #endif
 
 /**
@@ -46,6 +52,9 @@ uint8_t eeprom_read_byte(uint32_t pos);
 
 /**
  * @brief   Read @p len bytes from the given position
+ *
+ * This function must be implemented by each CPU that provides an internal
+ * EEPROM.
  *
  * @param[in]  pos      start position in eeprom
  * @param[out] data     output byte array to write to
@@ -66,6 +75,9 @@ void eeprom_write_byte(uint32_t pos, uint8_t data);
 /**
  * @brief   Write @p len bytes at the given position
  *
+ * This function must be implemented by each CPU that provides an internal
+ * EEPROM.
+ *
  * @param[in] pos       start position in eeprom
  * @param[in] data      input byte array to read into
  * @param[in] len       the number of bytes to read
@@ -73,6 +85,36 @@ void eeprom_write_byte(uint32_t pos, uint8_t data);
  * @return the number of bytes written
  */
 size_t eeprom_write(uint32_t pos, const uint8_t *data, size_t len);
+
+/**
+ * @brief   Set @p len bytes from the given position @p pos with value @p val
+ *
+ * @param[in] pos       start position in eeprom
+ * @param[in] val       the value to set
+ * @param[in] len       the number of bytes to set
+ *
+ * @return the number of bytes set
+ */
+size_t eeprom_set(uint32_t pos, uint8_t val, size_t len);
+
+/**
+ * @brief   Clear @p len bytes from the given position @p pos
+ *
+ * Clearing a byte in EEPROM simply consists in setting it to 0
+ *
+ * @param[in] pos       start position in eeprom
+ * @param[in] len       the number of bytes to clear
+ *
+ * @return the number of bytes cleared
+ */
+size_t eeprom_clear(uint32_t pos, size_t len);
+
+/**
+ * @brief   Erase the whole EEPROM content
+ *
+ * @return the EEPROM_SIZE
+ */
+size_t eeprom_erase(void);
 
 #ifdef __cplusplus
 }

@@ -34,14 +34,14 @@ static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 
-/* CoAP resources */
+/* CoAP resources. Must be sorted by path (ASCII order). */
 static const coap_resource_t _resources[] = {
     { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler, NULL },
     { "/riot/board", COAP_GET, _riot_board_handler, NULL },
 };
 
 static gcoap_listener_t _listener = {
-    (coap_resource_t *)&_resources[0],
+    &_resources[0],
     sizeof(_resources) / sizeof(_resources[0]),
     NULL
 };
@@ -72,8 +72,9 @@ static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
                                                 coap_get_code_class(pdu),
                                                 coap_get_code_detail(pdu));
     if (pdu->payload_len) {
-        if (pdu->content_type == COAP_FORMAT_TEXT
-                || pdu->content_type == COAP_FORMAT_LINK
+        unsigned content_type = coap_get_content_type(pdu);
+        if (content_type == COAP_FORMAT_TEXT
+                || content_type == COAP_FORMAT_LINK
                 || coap_get_code_class(pdu) == COAP_CLASS_CLIENT_FAILURE
                 || coap_get_code_class(pdu) == COAP_CLASS_SERVER_FAILURE) {
             /* Expecting diagnostic payload in failure cases */
@@ -136,8 +137,15 @@ static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, vo
     (void)ctx;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     /* write the RIOT board name in the response buffer */
-    memcpy(pdu->payload, RIOT_BOARD, strlen(RIOT_BOARD));
-    return gcoap_finish(pdu, strlen(RIOT_BOARD), COAP_FORMAT_TEXT);
+    /* must be 'greater than' to account for payload marker byte */
+    if (pdu->payload_len > strlen(RIOT_BOARD)) {
+        memcpy(pdu->payload, RIOT_BOARD, strlen(RIOT_BOARD));
+        return gcoap_finish(pdu, strlen(RIOT_BOARD), COAP_FORMAT_TEXT);
+    }
+    else {
+        puts("gcoap_cli: msg buffer too small");
+        return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
+    }
 }
 
 static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
@@ -233,10 +241,23 @@ int gcoap_cli_cmd(int argc, char **argv)
         apos++;
     }
 
-    if (argc == apos + 3 || argc == apos + 4) {
+    /*
+     * "get" (code_pos 0) must have exactly apos + 3 arguments
+     * while "post" (code_pos 1) and "put" (code_pos 2) and must have exactly
+     * apos + 4 arguments
+     */
+    if (((argc == apos + 3) && (code_pos == 0)) ||
+        ((argc == apos + 4) && (code_pos != 0))) {
         gcoap_req_init(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE, code_pos+1, argv[apos+2]);
         if (argc == apos + 4) {
-            memcpy(pdu.payload, argv[apos+3], strlen(argv[apos+3]));
+            /* must be 'greater than' to account for payload marker byte */
+            if (pdu.payload_len > strlen(argv[apos+3])) {
+                memcpy(pdu.payload, argv[apos+3], strlen(argv[apos+3]));
+            }
+            else {
+                puts("gcoap_cli: msg buffer too small");
+                return 1;
+            }
         }
         coap_hdr_set_type(pdu.hdr, msg_type);
 

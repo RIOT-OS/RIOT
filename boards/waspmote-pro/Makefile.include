@@ -1,37 +1,27 @@
 # define the cpu used by the waspmote pro board
 export CPU = atmega1281
 
+# Bootloader uses stk500v1 protocol, which usually is implemented in
+# bootloaders of 2K size.
+# http://www.libelium.com/products/waspmote/hardware/
+BOOTLOADER_SIZE ?= 2K
+ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+
 # configure the terminal program
 PORT_LINUX  ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 BAUD        ?= 9600
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-# define tools used for building the project
-export PREFIX = avr-
-export CC = $(PREFIX)gcc
-export CXX = $(PREFIX)c++
-export AR = $(PREFIX)ar
-export AS = $(PREFIX)as
-export LINK = $(PREFIX)gcc
-export SIZE = $(PREFIX)size
-export OBJCOPY = $(PREFIX)objcopy
+# PROGRAMMER defaults to stk500v1 which is the internal flasher via USB
+# using avrdude. Can be overridden for debugging (which requires changes
+# that require to use an ISP)
+PROGRAMMER ?= stk500v1
+# set mcu model for avrdude
+FFLAGS += -p m1281
+# configure programmer speed in baud
+FFLAGS_EXTRA += -b 115200
+# avoid error if mcu signature doesn't match
+FFLAGS_EXTRA += -F
 
-export FLASHER = avrdude
-export DIST_PATH = $(RIOTBOARD)/$(BOARD)/dist
-export DEBUGSERVER_PORT = 4242
-export DEBUGSERVER = $(DIST_PATH)/debug_srv.sh
-export DEBUGSERVER_FLAGS = "-g -j usb :$(DEBUGSERVER_PORT)"
-export DEBUGGER_FLAGS = "-x $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)"
-export DEBUGGER = $(DIST_PATH)/debug.sh $(DEBUGSERVER_FLAGS) $(DIST_PATH) $(DEBUGSERVER_PORT)
-
-# PROGRAMMER defaults to stk500v1 which is the internal flasher via USB. Can be
-# overridden for debugging (which requires changes that require to use an ISP)
-export PROGRAMMER ?= stk500v1
-
-ifeq ($(PROGRAMMER), stk500v1)
-  export PROGRAMMER_FLAGS = -P $(PORT) -b 115200
-endif
-
-OFLAGS += -j .text -j .data
-export FFLAGS += -p m1281 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -U flash:w:$(HEXFILE)
+include $(RIOTMAKE)/tools/avrdude.inc.mk

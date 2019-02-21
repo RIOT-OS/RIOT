@@ -15,7 +15,8 @@
 
 #include "embUnit.h"
 
-#include "net/gnrc/pkt.h"
+#include "net/gnrc/pktbuf.h"
+#include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/mac/internal.h"
 
 #include "unittests-constants.h"

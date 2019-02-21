@@ -11,9 +11,44 @@
  * @ingroup     net_gnrc
  * @brief       GNRC's 6LoWPAN implementation
  *
- * This module is for usage with the @ref net_gnrc_netapi.
+ * # Internal API and sub-modules
  *
- * # NETAPI command documentation
+ * Internally, @ref net_gnrc_sixlowpan is sub-divided into several sub-modules.
+ * They implement certain features of the 6LoWPAN standard. Currently
+ * implemented are
+ *
+ * - [Fragmentation](https://tools.ietf.org/html/rfc4944#section-5.3)
+ *   ([gnrc_sixlowpan_frag](@ref net_gnrc_sixlowpan_frag))
+ * - [Uncompressed IPv6](https://tools.ietf.org/html/rfc4944#section-5.1)
+ *   (as part of the main @ref net_gnrc_sixlowpan module)
+ * - IPv6 datagram compression according to [RFC 6282](https://tools.ietf.org/html/rfc6282)
+ *   aka IPHC ([gnrc_sixlowpan_iphc](@ref net_gnrc_sixlowpan_iphc), IPv6
+ *   extension header NHC currently missing)
+ *
+ * Each sub-module has a `send` and `recv` function prefixed by their
+ * respective sub-module name with the following signatures
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * void send(gnrc_pktsnip_t *pkt, void *ctx, uint8_t page);
+ * void recv(gnrc_pktsnip_t *pkt, void *ctx, uint8_t page);
+ * ~~~~~~~~~~~~~~~~~~~~~
+ *
+ * A 6LoWPAN frame `pkt` must pass the sub-modules sequentially in the order of
+ * its dispatches on receive or the step that makes most sense next on send.
+ * After it was passed into another sub-module using the respective
+ * `send`/`recv` function a sub-module must not operate on the `pkt` anymore.
+ *
+ * The `ctx` parameter can be used to provide data structures of a sub-module to
+ * the next sub-module if that needs to modify or read them (e.g. reassembly
+ * buffer state for IPHC) otherwise, leave it `NULL`.
+ *
+ * Finally, the `page` parameter is to provide a sub-module the current parsing
+ * page context according to [RFC 8025](https://tools.ietf.org/html/rfc8025).
+ *
+ * # Supported NETAPI commands
+ *
+ * To interact with other modules this module handles the following
+ * @ref net_gnrc_netapi message types:
  *
  * ## `GNRC_NETAPI_MSG_TYPE_RCV`
  *
@@ -42,9 +77,9 @@
  *      to @ref GNRC_NETTYPE_IPV6 with demultiplex context @ref GNRC_NETREG_DEMUX_CTX_ALL
  *      immediately, but it will be checked first if @ref sixlowpan_iphc_is() is true for its
  *      payload. If false it will be send to the @ref GNRC_NETTYPE_IPV6 subscribers as usual. If
- *      true the IPHC dispatch will be decompressed to a full IPv6 header first. The IPv6 header
- *      will be included as a new @ref gnrc_pktsnip_t to the packet directly behind the payload.
- *      The IPHC dispatch will be removed. The resulting packet will then be issued to the
+ *      true the IPHC dispatch will be decompressed to a full IPv6 header first. The IPHC dispatch
+ *      will be replaced by the uncompressed IPHC header, any NHC dispatch will be replaced by their
+ *      respective uncompressed header. The resulting packet will then be issued to the
  *      @ref GNRC_NETTYPE_IPV6 subscribers as usual.
  *  3.  If both @ref net_gnrc_sixlowpan_frag and @ref net_gnrc_sixlowpan_iphc are included the
  *      and @ref sixlowpan_frag_is() is true for the packet, the fragmented datagram will be
@@ -55,7 +90,7 @@
  *      directly after decompression. If @ref sixlowpan_iphc_is() is false, reassembly is handled
  *      completely as described in (1). It is assumed that a fragment can fit a full compression
  *      header (including inlined fields and possibly NHC/GHC headers) as specified in
- *      <a href="https://tools.ietf.org/html/rfc6282#section-2">RFC 6282, section 2</a>.
+ *      [RFC 6282, section 2](https://tools.ietf.org/html/rfc6282#section-2).
  *
  * ## `GNRC_NETAPI_MSG_TYPE_SND`
  *
@@ -68,18 +103,18 @@
  * set to a legal, 6LoWPAN compatible interface referred to as `netif` in the
  * following, otherwise the packet will be discarded.
  *
- * If @ref net_gnrc_sixlowpan_iphc is included and gnrc_sixlowpan_netif_t::iphc_enable of `netif`
- * is true the @ref GNRC_NETTYPE_IPV6 header will be compressed according to
- * <a href="https://tools.ietf.org/html/rfc6282">RFC 6282</a>. If it is false the
+ * If @ref net_gnrc_sixlowpan_iphc is included and @ref GNRC_NETIF_FLAGS_6LO_HC is enabled for
+ * `netif` the @ref GNRC_NETTYPE_IPV6 header will be compressed according to
+ * [RFC 6282, section 3](https://tools.ietf.org/html/rfc6282#section-3). If it is false the
  * @ref SIXLOWPAN_UNCOMP dispatch will be appended as a new @ref gnrc_pktsnip_t to the packet.
  * The false case also applies if @ref net_gnrc_sixlowpan_iphc is not included.
  *
  * If the packet without @ref GNRC_NETTYPE_NETIF header is shorter than
  * gnrc_netif_t::sixlo::max_frag_size of `netif` the packet will be send to the `netif`'s
  * thread. Otherwise if @ref net_gnrc_sixlowpan_frag is included the packet will be fragmented
- * according to <a href="https://tools.ietf.org/html/rfc4944">RFC 4944</a> if the packet is without
- * @ref GNRC_NETTYPE_NETIF header shorter than @ref SIXLOWPAN_FRAG_MAX_LEN. If none of these cases
- * apply, the packet will be discarded silently.
+ * according to [RFC 4944, section 5.3](https://tools.ietf.org/html/rfc4944#section-5.3) if the
+ * packet is without @ref GNRC_NETTYPE_NETIF header shorter than @ref SIXLOWPAN_FRAG_MAX_LEN. If
+ * none of these cases apply, the packet will be discarded silently.
  *
  * ## `GNRC_NETAPI_MSG_TYPE_SET`
  *

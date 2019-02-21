@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_waspmote-pro Waspmote PRO v1.2
- * @ingroup     boards
- * @brief       Support for the Waspmote PRO v1.2 board.
+ * @ingroup     boards_waspmote-pro
  * @{
  *
  * @file
@@ -33,7 +31,7 @@ extern "C" {
 * @brief   As the CPU is too slow to handle 115200 baud, we set the default
 *          baudrate to 9600 for this board
 */
-#define UART_STDIO_BAUDRATE  (9600U)
+#define STDIO_UART_BAUDRATE  (9600U)
 
 /**
  * @brief   Use the UART 0 for STDIO on this board, if the XBee socket is not
@@ -41,9 +39,9 @@ extern "C" {
  */
 #ifdef XBEE_UART
 #if XBEE_UART == 0
-#define UART_STDIO_DEV       (UART_DEV(1))
+#define STDIO_UART_DEV       (UART_DEV(1))
 #else
-#define UART_STDIO_DEV       (UART_DEV(0))
+#define STDIO_UART_DEV       (UART_DEV(0))
 #endif
 #endif
 
@@ -78,6 +76,13 @@ extern "C" {
 #define LED_RED_ON           LED0_ON
 #define LED_RED_OFF          LED0_OFF
 #define LED_RED_TOGGLE       LED0_TOGGLE
+/** @} */
+
+/**
+ * @name    Usage of LED to turn on when a kernel panic occurs.
+ * @{
+ */
+#define LED_PANIC            LED_RED_ON
 /** @} */
 
 /**
@@ -143,6 +148,13 @@ extern "C" {
 #define SET_MUX_SOCKET0              MUX_PW_ENABLE_PORT; MUX_PW_ON; \
                                      MUX_USB_XBEE_ENABLE_PORT; \
                                      MUX_USB_XBEE_ON
+/** @} */
+
+/**
+ * @name CPU clock scale for waspmote-pro
+ *
+ */
+#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
 /** @} */
 
 /**

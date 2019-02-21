@@ -68,6 +68,11 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief   Attribute for memory sections required by SRAM PUF
+ */
+#define PUF_SRAM_ATTRIBUTES __attribute__((used, section(".puf")))
+
 #ifdef __cplusplus
 }
 #endif

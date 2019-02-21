@@ -1,0 +1,44 @@
+/**
+@defgroup    boards_chronos Chronos
+@ingroup     boards
+@brief       Support for the chronos board
+
+# Hardware
+
+![TI eZ430-Chronos running RIOT](http://riot-os.org/images/hardware-watch-
+riot.png)
+
+# MCU
+| MCU        | TI CC430F6137     |
+|:------------- |:--------------------- |
+| Family | MSP430    |
+| Vendor | Texas Instruments |
+| Package       | 64VQFN |
+| RAM        | 4Kb   |
+| Flash      | 32Kb          |
+| Frequency  | 20MHz |
+| FPU        | no                |
+| Timers | 2 (2x 16bit)  |
+| ADCs       | 1x 8 channel 12-bit           |
+| UARTs      | 1                 |
+| SPIs       | 2 |
+| I2Cs       | 1     |
+| Vcc        | 2.0V - 3.6V           |
+| Datasheet / Reference Manual   | [Datasheet](http://www.ti.com/lit/gpn/cc430f6137) |
+| Board Manual   | [User Guide](http://www.ti.com/lit/pdf/slau292)|
+
+## Flashing RIOT
+
+Flashing RIOT on the eZ430-Chronos is quite straight forward, just connect
+your eZ430-Chronos using the USB programming dongle to your host computer and
+type:
+
+`make flash`
+
+This should take care of everything!
+
+# Vendor information
+
+[TI Wiki](http://processors.wiki.ti.com/index.php/EZ430-Chronos)
+[MCU information](http://www.ti.com/product/cc430f6137)
+ */

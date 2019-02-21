@@ -33,11 +33,6 @@
 #include "net/eui64.h"
 #include "net/ethernet.h"
 
-#ifdef MODULE_NETSTATS_L2
-#include <string.h>
-#include "net/netstats.h"
-#endif
-
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -285,9 +280,6 @@ static int _init(netdev_t *encdev)
 
     unlock(dev);
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&encdev->stats, 0, sizeof(netstats_t));
-#endif
     return 0;
 }
 
@@ -316,10 +308,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist) {
     /* wait for sending to complete */
     /* (not sure if it is needed, keeping the line uncommented) */
     /*while ((reg_get(dev, ENC_ECON1) & ENC_TXRTS)) {}*/
-
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += len;
-#endif
 
     unlock(dev);
 
@@ -367,10 +355,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             unlock(dev);
             return -ENOBUFS;
         }
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += payload_len;
-#endif
         /* read packet (without 4 bytes checksum) */
         sram_op(dev, ENC_RRXDATA, 0xFFFF, buf, payload_len);
 

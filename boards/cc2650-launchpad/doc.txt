@@ -1,5 +1,5 @@
 /**
- * @defgroup        boards_cc2650_launchpad TI CC2650 LaunchPad XL
- * @ingroup         boards
- * @brief           Texas Instruments SimpleLink(TM) CC2650 Wireless MCU LaunchPad(TM) Kit
+@defgroup        boards_cc2650_launchpad TI CC2650 LaunchPad XL
+@ingroup         boards
+@brief           Texas Instruments SimpleLink(TM) CC2650 Wireless MCU LaunchPad(TM) Kit
  */

@@ -10,14 +10,17 @@
 /**
  * @defgroup    drivers_mma8x5x MMA8x5x Accelerometer
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the Freescale MMA8x5x 3-Axis accelerometer.
- *              The driver will initialize the accelerometer for best
- *              resolution. After the initialization the accelerometer will make
- *              measurements at periodic times. The measurements period and
- *              scale range can be determined by accelerometer initialization.
- *              This driver only implements basic functionality (i.e. no support
- *              for external interrupt pins).
  *
+ * The driver will initialize the accelerometer for best resolution. After the
+ * initialization the accelerometer will make measurements at periodic times.
+ * The measurements period and scale range can be determined by accelerometer
+ * initialization.
+ * This driver only implements basic functionality (i.e. no support
+ * for external interrupt pins).
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
@@ -92,7 +95,6 @@ enum {
 typedef struct {
     i2c_t i2c;                  /**< I2C bus the device is connected to */
     uint8_t addr;               /**< I2C bus address of the device */
-    uint8_t type;               /**< device type */
     uint8_t rate;               /**< sampling rate to use */
     uint8_t range;              /**< scale range to use */
     uint8_t offset[3];          /**< data offset in X, Y, and Z direction */

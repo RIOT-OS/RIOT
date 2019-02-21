@@ -20,6 +20,7 @@
 
 #ifdef MODULE_SI70XX
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "si70xx.h"

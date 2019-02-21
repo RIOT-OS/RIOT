@@ -43,6 +43,32 @@ export USEMODULE += newlib
 # set default for CPU_MODEL
 export CPU_MODEL ?= $(CPU)
 
+
+# extract version inside the first parentheses
+ARM_GCC_VERSION = $(shell $(TARGET_ARCH)-gcc --version | sed -n '1 s/[^(]*(\([^\)]*\)).*/\1/p')
+
+# Ubuntu bionic gcc-arm-none-eabi compiler is not supported
+# Both when using gnu and llvm toolchains
+#
+#     /usr/bin/arm-none-eabi-gcc --version | head -n 1
+#     arm-none-eabi-gcc (15:6.3.1+svn253039-1build1) 6.3.1 20170620
+#
+ARM_GCC_UNSUPPORTED += 15:6.3.1%  # ubuntu bionic, ignore 'svn' build part
+
+# Should not raise an error on the host system version when building in docker
+ifneq (1,$(BUILD_IN_DOCKER))
+  ifneq (,$(filter $(ARM_GCC_UNSUPPORTED),$(ARM_GCC_VERSION)))
+    $(warning $(TARGET_ARCH)-gcc version not supported)
+    $(warning $(shell $(TARGET_ARCH)-gcc --version | head -n 1))
+    $(warning The currently recommanded version is the one installed in the riotdocker image)
+    $(warning https://github.com/RIOT-OS/riotdocker/blob/master/Dockerfile)
+    ifeq (1,$(WERROR))
+      $(error This check can be ignored by building with 'WERROR=0')
+    endif # WERROR
+  endif # ARM_GCC_UNSUPPORTED
+endif # BUILD_IN_DOCKER
+
+
 # Temporary LLVM/Clang Workaround:
 # report cortex-m0 instead of cortex-m0plus if llvm/clang (<= 3.6.2) is used
 # llvm/clang version 3.6.2 still does not support the cortex-m0plus mcpu type
@@ -63,14 +89,29 @@ ARCH = $(shell echo $(CPU_ARCH) | tr 'a-z-' 'A-Z_')
 export CFLAGS += -DCPU_ARCH_$(ARCH)
 
 # set the compiler specific CPU and FPU options
-ifeq ($(CPU_ARCH),cortex-m4f)
-# TODO: enable hard floating points for the M4F once the context save/restore
-#       code is adjusted to take care of FPU registers
-#export CFLAGS_FPU += -mfloat-abi=hard -mfpu=fpv4-sp-d16
-export MCPU := cortex-m4
-endif
+ifneq (,$(filter $(CPU_ARCH),cortex-m4f cortex-m7))
+    ifneq (,$(filter cortexm_fpu,$(DISABLE_MODULE)))
+        export CFLAGS_FPU ?= -mfloat-abi=soft
+    else
+        USEMODULE += cortexm_fpu
+        # clang assumes there is an FPU
+        ifneq (llvm,$(TOOLCHAIN))
+            ifeq ($(CPU_ARCH),cortex-m7)
+                export CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv5-d16
+            else
+                export CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv4-sp-d16
+            endif
+        endif
+    endif
+    ifeq ($(CPU_ARCH),cortex-m4f)
+        export MCPU := cortex-m4
+    else
+        export MCPU ?= $(CPU_ARCH)
+    endif
+else
 CFLAGS_FPU ?= -mfloat-abi=soft
 export MCPU ?= $(CPU_ARCH)
+endif
 
 # CMSIS DSP needs to know about the CPU core
 ifneq (,$(filter cmsis-dsp,$(USEPKG)))
@@ -87,6 +128,8 @@ else ifeq ($(CPU_ARCH),cortex-m4f)
 export CFLAGS += -DARM_MATH_CM4
 else ifeq ($(CPU_ARCH),cortex-m7)
 export CFLAGS += -DARM_MATH_CM7
+else ifeq ($(CPU_ARCH),cortex-m23)
+export CFLAGS += -DARM_MATH_CM23
 endif
 endif
 

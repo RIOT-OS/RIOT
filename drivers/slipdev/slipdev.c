@@ -188,29 +188,19 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     }
 }
 
-static int _set(netdev_t *netdev, netopt_t opt, const void *value,
-                size_t value_len)
-{
-    (void)netdev;
-    (void)opt;
-    (void)value;
-    (void)value_len;
-    return -ENOTSUP;
-}
-
 static const netdev_driver_t slip_driver = {
     .send = _send,
     .recv = _recv,
     .init = _init,
     .isr = _isr,
     .get = _get,
-    .set = _set,
+    .set = netdev_set_notsup,
 };
 
 void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params)
 {
     /* set device descriptor fields */
-    memcpy(&dev->config, params, sizeof(dev->config));
+    dev->config = *params;
     dev->inesc = 0U;
     dev->netdev.driver = &slip_driver;
 }

@@ -6,25 +6,23 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os
 import sys
+from testrunner import run
 
 
 def testfunc(child):
     child.expect_exact("[START]")
 
     for i in range(5):
-        child.expect(u"now = \d+, prev_now = \d+, diff = \d+")
+        child.expect(u"now = \\d+, t = \\d+")
 
     child.expect_exact("[TRICKLE_RESET]")
 
     for i in range(7):
-        child.expect(u"now = \d+, prev_now = \d+, diff = \d+")
+        child.expect(u"now = \\d+, t = \\d+")
 
     child.expect_exact("[SUCCESS]")
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTTOOLS'], 'testrunner'))
-    from testrunner import run
     sys.exit(run(testfunc))

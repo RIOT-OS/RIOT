@@ -1,0 +1,26 @@
+/**
+@defgroup    boards_mbed_lpc1768 mbed LPC1768 development kit
+@ingroup     boards
+@brief       Support for the mbed LPC1762 board
+
+# Overview
+
+*missing*
+
+# Hardware
+| MCU        | LPC1768       |
+|:------------- |:--------------------- |
+| Family | ARM Cortex-M3     |
+| Vendor | NXP   |
+| RAM        | 64kB SRAM     |
+| Flash      | 512kB         |
+| Frequency  | up to 100MHz |
+| Datasheet  | [Datasheet](http://www.nxp.com/documents/data_sheet/LPC1769_68_67_66_65_64_63.pdf) |
+| User Manual    | [User Manual](http://www.nxp.com/documents/user_manual/UM10360.pdf)|
+
+*missing*
+
+# Known Issues
+* Does not compile with the mentor graphics toolchain (compare
+https://github.com/RIOT-OS/RIOT/issues/751)
+ */

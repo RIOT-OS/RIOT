@@ -2,6 +2,8 @@ include ../Makefile.tests_common
 
 BOARD ?= native
 
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
+
 FEATURES_OPTIONAL += periph_rtc
 
 # this list is composed of boards that support spi/gpio + native
@@ -17,10 +19,11 @@ BOARD_WHITELIST := airfy-beacon arduino-due arduino-duemilanove arduino-mega2560
                    nucleo-f303re nucleo-f334r8 nucleo-f401re nucleo-f410rb nucleo-f411re \
                    nucleo-f446re nucleo-l053r8 nucleo-l073rz nucleo-l152re nucleo-l476rg \
                    nz32-sc151 openmote-cc2538 pba-d-01-kw2x remote-pa remote-reva \
-                   remote-revb samd21-xpro saml21-xpro samr21-xpro sltb001a \
-                   sodaq-autonomo sodaq-explorer spark-core stm32f0discovery \
-                   stm32f3discovery stm32f4discovery telosb udoo waspmote-pro \
-                   wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1 native
+                   remote-revb samd21-xpro saml21-xpro samr21-xpro \
+                   sensebox_samd21 sltb001a sodaq-autonomo \
+                   sodaq-explorer spark-core stm32f0discovery stm32f3discovery \
+                   stm32f4discovery telosb udoo waspmote-pro wsn430-v1_3b \
+                   wsn430-v1_4 yunjia-nrf51822 z1 native
 
 USEMODULE += shell
 USEMODULE += fatfs_diskio_mtd

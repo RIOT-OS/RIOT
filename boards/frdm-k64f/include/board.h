@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_frdm-k64f NXP FRDM-K64F Board
- * @ingroup     boards
- * @brief       Support for the NXP FRDM-K64F
+ * @ingroup     boards_frdm-k64f
  * @{
  *
  * @file
@@ -53,6 +51,20 @@ extern "C"
 #define LED2_ON            (GPIOB->PCOR = LED2_MASK)
 #define LED2_OFF           (GPIOB->PSOR = LED2_MASK)
 #define LED2_TOGGLE        (GPIOB->PTOR = LED2_MASK)
+/** @} */
+
+/**
+ * @name    Button pin definitions
+ * @{
+ */
+/* SW2, SW3 will short these pins to ground when pushed. PTA4 has an external
+ * pull-up resistor to VDD, but there is no external pull resistor on PTC6 */
+/* BTN0 is mapped to SW2 */
+#define BTN0_PIN            GPIO_PIN(PORT_C,  6)
+#define BTN0_MODE           GPIO_IN_PU
+/* BTN1 is mapped to SW3 */
+#define BTN1_PIN            GPIO_PIN(PORT_A,  4)
+#define BTN1_MODE           GPIO_IN_PU
 /** @} */
 
 /**

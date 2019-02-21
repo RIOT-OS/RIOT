@@ -197,7 +197,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
                 network_uint32_t mss_option = byteorder_htonl(_option_build_mss(GNRC_TCP_MSS));
                 memcpy(opt_ptr, &mss_option, sizeof(mss_option));
             }
-            /* Increase opt_ptr and decrease opt_ptr, if other options are added */
+            /* Increase opt_ptr and decrease opt_left, if other options are added */
             /* NOTE: Add additional options here */
         }
         *(out_pkt) = tcp_snp;

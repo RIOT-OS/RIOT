@@ -8,7 +8,7 @@
 /**
  * @defgroup pkg_tlsf_malloc TLSF-based malloc.
  * @ingroup  pkg
- * @ingroup  sys
+ * @ingroup  sys_memory_management
  *
  * @brief    TLSF-based global memory allocator.
  *

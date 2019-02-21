@@ -147,7 +147,7 @@ int hts221_init(hts221_t *dev, const hts221_params_t *params)
 {
     uint8_t reg;
 
-    memcpy(&dev->p, params, sizeof(hts221_params_t));
+    dev->p = *params;
 
     i2c_acquire(BUS);
     /* try if we can interact with the device by reading its manufacturer ID */

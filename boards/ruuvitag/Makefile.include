@@ -2,7 +2,7 @@
 CPU_MODEL = nrf52832xxaa
 
 # for this board, we are using Segger's RTT as default terminal interface
-USEMODULE += rtt_stdio
+USEMODULE += stdio_rtt
 TERMPROG = $(RIOTTOOLS)/jlink/jlink.sh
 TERMFLAGS = term_rtt
 

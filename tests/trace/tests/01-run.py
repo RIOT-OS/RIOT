@@ -6,8 +6,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os
 import sys
+from testrunner import run
 
 
 def testfunc(child):
@@ -20,6 +20,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTTOOLS'], 'testrunner'))
-    import testrunner
-    sys.exit(testrunner.run(testfunc, timeout=1, echo=True, traceback=True))
+    sys.exit(run(testfunc, timeout=1, echo=True, traceback=True))

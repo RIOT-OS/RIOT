@@ -243,6 +243,8 @@ int i2c_release(i2c_t dev);
  * @note    This function is using a repeated start sequence for reading from
  *          the specified register address.
  *
+ * @pre     i2c_acquire must be called before accessing the bus
+ *
  * @param[in]  dev          I2C peripheral device
  * @param[in]  reg          register address to read from (8- or 16-bit,
  *                          right-aligned)
@@ -269,6 +271,8 @@ int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
  * @note    This function is using a repeated start sequence for reading from
  *          the specified register address.
  *
+ * @pre     i2c_acquire must be called before accessing the bus
+ *
  * @param[in]  dev          I2C peripheral device
  * @param[in]  reg          register address to read from (8- or 16-bit,
  *                          right-aligned)
@@ -294,6 +298,8 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
  * @note    This function is using a repeated start sequence for reading from
  *          the specified register address.
  *
+ * @pre     i2c_acquire must be called before accessing the bus
+ *
  * @param[in]  dev          I2C peripheral device
  * @param[in]  addr         7-bit or 10-bit device address (right-aligned)
  * @param[out] data         memory location to store received data
@@ -316,6 +322,8 @@ int i2c_read_byte(i2c_t dev, uint16_t addr, void *data, uint8_t flags);
  * @note    This function is using a repeated start sequence for reading from
  *          the specified register address.
  *
+ * @pre     i2c_acquire must be called before accessing the bus
+ *
  * @param[in]  dev          I2C peripheral device
  * @param[in]  addr         7-bit or 10-bit device address (right-aligned)
  * @param[out] data         memory location to store received data
@@ -337,6 +345,8 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr,
 /**
  * @brief   Convenience function for writing a single byte onto the bus
  *
+ * @pre     i2c_acquire must be called before accessing the bus
+ *
  * @param[in] dev           I2C peripheral device
  * @param[in] addr          7-bit or 10-bit device address (right-aligned)
  * @param[in] data          byte to write to the device
@@ -354,6 +364,8 @@ int i2c_write_byte(i2c_t dev, uint16_t addr, uint8_t data, uint8_t flags);
 
 /**
  * @brief   Convenience function for writing several bytes onto the bus
+ *
+ * @pre     i2c_acquire must be called before accessing the bus
  *
  * @param[in] dev           I2C peripheral device
  * @param[in] addr          7-bit or 10-bit device address (right-aligned)
@@ -376,8 +388,10 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
  * @brief   Convenience function for writing one byte to a given
  *          register address
  *
- * @note    This function is using a repeated start sequence for writing to the
- *          specified register address.
+ * @note    This function is using a continuous sequence for writing to the
+ *          specified register address. It first writes the register then data.
+ *
+ * @pre     i2c_acquire must be called before accessing the bus
  *
  * @param[in]  dev          I2C peripheral device
  * @param[in]  reg          register address to read from (8- or 16-bit,
@@ -400,8 +414,10 @@ int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
 /**
  * @brief   Convenience function for writing data to a given register address
  *
- * @note    This function is using a repeated start sequence for writing to the
- *          specified register address.
+ * @note    This function is using a continuous sequence for writing to the
+ *          specified register address. It first writes the register then data.
+ *
+ * @pre     i2c_acquire must be called before accessing the bus
  *
  * @param[in]  dev          I2C peripheral device
  * @param[in]  reg          register address to read from (8- or 16-bit,

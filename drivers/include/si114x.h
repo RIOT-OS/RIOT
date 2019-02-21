@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_si114x Si1145/6/7 UV/Ambient light/Proximity sensors
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver for the Si1145/6/7 sensors family
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

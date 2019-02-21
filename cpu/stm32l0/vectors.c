@@ -83,10 +83,10 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [25] = isr_spi1,                 /* [25] SPI1 Interrupt */
     [28] = isr_usart2,               /* [28] USART2 Interrupt */
 
-#if defined(CPU_MODEL_STM32L031K6)
+#if defined(CPU_LINE_STM32L031xx)
     [ 4] = isr_rcc,                  /* [ 4] RCC Interrupt */
     [29] = isr_lpuart1,              /* [29] LPUART1 Interrupt */
-#elif defined(CPU_MODEL_STM32L053R8)
+#elif defined(CPU_LINE_STM32L053xx)
     [ 4] = isr_rcc_crs,              /* [ 4] RCC and CRS Interrupts */
     [ 8] = isr_tsc,                  /* [ 8] TSC Interrupt */
     [17] = isr_tim6_dac,             /* [17] TIM6 and DAC Interrupts */
@@ -96,7 +96,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [29] = isr_rng_lpuart1,          /* [29] RNG and LPUART1 Interrupts */
     [30] = isr_lcd,                  /* [30] LCD Interrupt */
     [31] = isr_usb,                  /* [31] USB global Interrupt */
-#elif defined(CPU_MODEL_STM32L072CZ)
+#elif defined(CPU_LINE_STM32L072xx)
     [ 4] = isr_rcc_crs,              /* [ 4] RCC and CRS Interrupts */
     [ 8] = isr_tsc,                  /* [ 8] TSC Interrupt */
     [14] = isr_usart4_5,             /* [14] USART4 and USART5 Interrupt */
@@ -109,7 +109,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [27] = isr_usart1,               /* [27] USART1 Interrupt */
     [29] = isr_rng_lpuart1,          /* [29] RNG and LPUART1 Interrupts */
     [31] = isr_usb,                  /* [31] USB global Interrupt */
-#elif defined(CPU_MODEL_STM32L073RZ)
+#elif defined(CPU_LINE_STM32L073xx)
     [ 4] = isr_rcc_crs,              /* [ 4] RCC and CRS Interrupts */
     [ 8] = isr_tsc,                  /* [ 8] TSC Interrupt */
     [14] = isr_usart4_5,             /* [14] USART4 and USART5 Interrupt */

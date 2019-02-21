@@ -40,6 +40,18 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Configuration parameters for the W5100 driver
+ * @{
+ */
+#ifndef W5100_PARAM_CS
+#define W5100_PARAM_CS          (ARDUINO_PIN_10)
+#endif
+#ifndef W5100_PARAM_EVT
+#define W5100_PARAM_EVT         (ARDUINO_PIN_2)
+#endif
+/** @} */
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);

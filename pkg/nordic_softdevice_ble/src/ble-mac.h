@@ -51,34 +51,34 @@ typedef enum {
 #define BLE_IFACE_ADDED             (10000)
 
 #define BLE_SIXLOWPAN_MTU           (1280U)
-#define BLE_SIXLOWPAN_L2_ADDR_LEN   (8)
+#define BLE_L2_ADDR_LEN             (6U)
 
+#ifndef IPV6_IID_FLIP_VALUE
 #define IPV6_IID_FLIP_VALUE         (0x02)
-
-#include "net/eui64.h"
+#endif
 
 /**
  * @brief   Get BLE EUI64 from EUI48
  *
- * @param[out] eui64                   The output EUI64 (8 bytes long)
- * @param[in] eui48                    The input EUI48 (6 bytes long)
+ * @param[out] eui48                   The output EUI48 (big-endian,
+ *                                     6 bytes long)
+ * @param[in] ble_addr                 The input BLE address (little-endian,
+ *                                     6 bytes long)
  * @param[in] _public                  True if public interface, false otherwise
  */
-static inline void ble_eui64_from_eui48(uint8_t eui64[8], uint8_t eui48[6], int _public)
+static inline void ble_eui48(uint8_t *eui48, const uint8_t *ble_addr, int _public)
 {
-    eui64[0] = eui48[5];
-    eui64[1] = eui48[4];
-    eui64[2] = eui48[3];
-    eui64[3] = 0xFF;
-    eui64[4] = 0xFE;
-    eui64[5] = eui48[2];
-    eui64[6] = eui48[1];
-    eui64[7] = eui48[0];
+    eui48[0] = ble_addr[5];
+    eui48[1] = ble_addr[4];
+    eui48[2] = ble_addr[3];
+    eui48[3] = ble_addr[2];
+    eui48[4] = ble_addr[1];
+    eui48[5] = ble_addr[0];
     if (_public) {
-        eui64[0] &= ~(IPV6_IID_FLIP_VALUE);
+        eui48[0] &= ~(IPV6_IID_FLIP_VALUE);
     }
     else {
-        eui64[0] |= IPV6_IID_FLIP_VALUE;
+        eui48[0] |= IPV6_IID_FLIP_VALUE;
     }
 }
 
@@ -86,8 +86,8 @@ static inline void ble_eui64_from_eui48(uint8_t eui64[8], uint8_t eui48[6], int 
  * @brief   Structure handling a received BLE mac packet
  */
 typedef struct {
-    uint8_t src[8];                      /**< Source address of the packet */
     uint8_t payload[BLE_SIXLOWPAN_MTU];  /**< Payload of the packet */
+    uint8_t src[BLE_L2_ADDR_LEN];        /**< Source address of the packet */
     uint16_t len;                        /**< Length of the packet */
     int8_t rssi;                         /**< RSSI of the received packet */
 } ble_mac_inbuf_t;
@@ -114,7 +114,8 @@ void ble_mac_init(ble_mac_callback_t callback);
  * @return 0 if send is successful
  * @return <0 if send failed
  */
-int ble_mac_send(uint8_t dest[8], void *data, size_t len);
+int ble_mac_send(uint8_t dest[BLE_L2_ADDR_LEN], void *data,
+                 size_t len);
 
 extern volatile int ble_mac_busy_tx;    /**< Flag is set to 1 when the driver
                                              is busy transmitting a packet. */

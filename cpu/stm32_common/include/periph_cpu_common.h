@@ -96,6 +96,9 @@ extern "C" {
 typedef enum {
     APB1,           /**< APB1 bus */
     APB2,           /**< APB2 bus */
+#if defined(CPU_FAM_STM32L4)
+    APB12,          /**< AHB1 bus, second register */
+#endif
 #if defined(CPU_FAM_STM32L0)
     AHB,            /**< AHB bus */
     IOP,            /**< IOP bus */
@@ -156,6 +159,11 @@ typedef uint32_t gpio_t;
 #define PERIPH_I2C_NEED_READ_REG
 /** Use write reg function from periph common */
 #define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
+    defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F4)
+#define PERIPH_I2C_NEED_WRITE_REGS
+#endif
 /** @} */
 
 /**
@@ -233,7 +241,29 @@ typedef enum {
  * @brief   DMA configuration
  */
 typedef struct {
-    int stream;            /**< DMA stream */
+    /** DMA stream on stm32f2/4/7, channel on others
+     * STM32F2/4/7:
+     *  - 0: DMA1 / Stream0
+     *  - 1: DMA1 / Stream1
+     *  - ...
+     *  - 7: DMA1 / Stream7
+     *  - 8: DAM2 / Stream0
+     *  - ...
+     *  - 15: DMA2 / Stream7
+     * STM32F0/1/L0/1/4:
+     *  - 0: DMA1 / Channel1
+     *  - ...
+     *  - 4: DMA1 / Channel5
+     *  - ...
+     *  - 6: DMA1 / Channel7
+     *  - 7: Reserved
+     *  - 8: DMA2 / Channel1
+     *  - ...
+     *  - 12: DMA2 / Channel5
+     *  - ...
+     *  - 14: DMA2 / Channel7
+     */
+    int stream;
 } dma_conf_t;
 
 /**
@@ -333,6 +363,66 @@ typedef struct {
 } qdec_conf_t;
 
 /**
+ * @brief UART hardware module types
+ */
+typedef enum {
+    STM32_USART,            /**< STM32 USART module type */
+    STM32_LPUART,           /**< STM32 Low-power UART (LPUART) module type */
+} uart_type_t;
+
+#ifndef DOXYGEN
+/**
+ * @brief   Invalid UART mode mask
+ *
+ * This mask is also used to force data_bits_t to be uint32_t type
+ * since it may be assigned a uint32_t variable in uart_mode
+ */
+#define UART_INVALID_MODE   (0x8000000)
+
+/**
+ * @brief   Override parity values
+ * @{
+ */
+#define HAVE_UART_PARITY_T
+typedef enum {
+   UART_PARITY_NONE = 0,                               /**< no parity */
+   UART_PARITY_EVEN = USART_CR1_PCE,                   /**< even parity */
+   UART_PARITY_ODD = (USART_CR1_PCE | USART_CR1_PS),   /**< odd parity */
+   UART_PARITY_MARK = UART_INVALID_MODE | 4,           /**< not supported */
+   UART_PARITY_SPACE = UART_INVALID_MODE  | 5          /**< not supported */
+} uart_parity_t;
+/** @} */
+
+/**
+ * @brief   Override data bits length values
+ * @{
+ */
+#define HAVE_UART_DATA_BITS_T
+typedef enum {
+    UART_DATA_BITS_5 = UART_INVALID_MODE | 1,   /**< not supported */
+    UART_DATA_BITS_6 = UART_INVALID_MODE | 2,   /**< not supported unless parity is set */
+#if defined(USART_CR1_M1)
+    UART_DATA_BITS_7 = USART_CR1_M1,            /**< 7 data bits */
+#else
+    UART_DATA_BITS_7 = UART_INVALID_MODE | 3,   /**< not supported unless parity is set */
+#endif
+    UART_DATA_BITS_8 = 0,                       /**< 8 data bits */
+} uart_data_bits_t;
+/** @} */
+
+/**
+ * @brief   Override stop bits length values
+ * @{
+ */
+#define HAVE_UART_STOP_BITS_T
+typedef enum {
+   UART_STOP_BITS_1 = 0,                  /**< 1 stop bit */
+   UART_STOP_BITS_2 = USART_CR2_STOP_1,   /**< 2 stop bits */
+} uart_stop_bits_t;
+/** @} */
+#endif /* ndef DOXYGEN */
+
+/**
  * @brief   Structure for UART configuration data
  */
 typedef struct {
@@ -346,10 +436,6 @@ typedef struct {
 #endif
     uint8_t bus;            /**< APB bus */
     uint8_t irqn;           /**< IRQ channel */
-#ifdef MODULE_PERIPH_DMA
-    dma_t dma;              /**< Logical DMA stream used for TX */
-    uint8_t dma_chan;       /**< DMA channel used for TX */
-#endif
 #ifdef MODULE_STM32_PERIPH_UART_HW_FC
     gpio_t cts_pin;         /**< CTS pin - set to GPIO_UNDEF when not using HW flow control */
     gpio_t rts_pin;         /**< RTS pin */
@@ -357,6 +443,14 @@ typedef struct {
     gpio_af_t cts_af;       /**< alternate function for CTS pin */
     gpio_af_t rts_af;       /**< alternate function for RTS pin */
 #endif
+#endif
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4)
+    uart_type_t type;       /**< hardware module type (USART or LPUART) */
+    uint32_t clk_src;       /**< clock source used for UART */
+#endif
+#ifdef MODULE_PERIPH_DMA
+    dma_t dma;              /**< Logical DMA stream used for TX */
+    uint8_t dma_chan;       /**< DMA channel used for TX */
 #endif
 } uart_conf_t;
 
@@ -516,7 +610,7 @@ void dma_init(void);
  * function which configure, start, wait and stop a DMA transfer.
  *
  * @param[in]  dma     logical DMA stream
- * @param[in]  chan    DMA channel
+ * @param[in]  chan    DMA channel (on stm32f2/4/7, CxS or unused on others)
  * @param[in]  src     source buffer
  * @param[out] dst     destination buffer
  * @param[in]  len     length to transfer
@@ -525,7 +619,7 @@ void dma_init(void);
  *
  * @return < 0 on error, the number of transfered bytes otherwise
  */
-int dma_transfer(dma_t dma, int chan, const void *src, void *dst, size_t len,
+int dma_transfer(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
                  dma_mode_t mode, uint8_t flags);
 
 /**
@@ -587,7 +681,7 @@ void dma_wait(dma_t dma);
  * @brief   Configure a DMA stream for a new transfer
  *
  * @param[in]  dma     logical DMA stream
- * @param[in]  chan    DMA channel
+ * @param[in]  chan    DMA channel (on stm32f2/4/7, CxS or unused on others)
  * @param[in]  src     source buffer
  * @param[out] dst     destination buffer
  * @param[in]  len     length to transfer
@@ -596,147 +690,9 @@ void dma_wait(dma_t dma);
  *
  * @return < 0 on error, 0 on success
  */
-int dma_configure(dma_t dma, int chan, const void *src, void *dst, size_t len,
+int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
                   dma_mode_t mode, uint8_t flags);
 
-/**
- * @brief   Get DMA base register
- *
- * For simplifying DMA stream handling, we map the DMA channels transparently to
- * one integer number, such that DMA1 stream0 equals 0, DMA2 stream0 equals 8,
- * DMA2 stream 7 equals 15 and so on.
- *
- * @param[in] stream    physical DMA stream
- */
-static inline DMA_TypeDef *dma_base(int stream)
-{
-    return (stream < 8) ? DMA1 : DMA2;
-}
-
-/**
- * @brief   Power on the DMA device the given stream belongs to
- *
- * @param[in] stream    physical DMA stream
- */
-static inline void dma_poweron(int stream)
-{
-    if (stream < 8) {
-        periph_clk_en(AHB1, RCC_AHB1ENR_DMA1EN);
-    }
-    else {
-        periph_clk_en(AHB1, RCC_AHB1ENR_DMA2EN);
-    }
-}
-
-/**
- * @brief   Get the DMA stream base address
- *
- * @param[in] stream    physical DMA stream
- *
- * @return  base address for the selected DMA stream
- */
-static inline DMA_Stream_TypeDef *dma_stream(int stream)
-{
-    uint32_t base = (uint32_t)dma_base(stream);
-
-    return (DMA_Stream_TypeDef *)(base + (0x10 + (0x18 * (stream & 0x7))));
-}
-
-/**
- * @brief   Select high or low DMA interrupt register based on stream number
- *
- * @param[in] stream    physical DMA stream
- *
- * @return  0 for streams 0-3, 1 for streams 3-7
- */
-static inline int dma_hl(int stream)
-{
-    return ((stream & 0x4) >> 2);
-}
-
-/**
- * @brief   Get the interrupt flag clear bit position in the DMA LIFCR register
- *
- * @param[in] stream    physical DMA stream
- */
-static inline uint32_t dma_ifc(int stream)
-{
-    switch (stream & 0x3) {
-        case 0:
-            return (1 << 5);
-        case 1:
-            return (1 << 11);
-        case 2:
-            return (1 << 21);
-        case 3:
-            return (1 << 27);
-        default:
-            return 0;
-    }
-}
-
-/**
- * @brief   Enable the interrupt of a given stream
- *
- * @param[in] stream    physical DMA stream
- */
-static inline void dma_isr_enable(int stream)
-{
-    if (stream < 7) {
-        NVIC_EnableIRQ((IRQn_Type)((int)DMA1_Stream0_IRQn + stream));
-    }
-    else if (stream == 7) {
-        NVIC_EnableIRQ(DMA1_Stream7_IRQn);
-    }
-    else if (stream < 13) {
-        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + (stream - 8)));
-    }
-    else if (stream < 16) {
-        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream - 13)));
-    }
-}
-
-/**
- * @brief   Disable the interrupt of a given stream
- *
- * @param[in] stream    physical DMA stream
- */
-static inline void dma_isr_disable(int stream)
-{
-    if (stream < 7) {
-        NVIC_DisableIRQ((IRQn_Type)((int)DMA1_Stream0_IRQn + stream));
-    }
-    else if (stream == 7) {
-        NVIC_DisableIRQ(DMA1_Stream7_IRQn);
-    }
-    else if (stream < 13) {
-        NVIC_DisableIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + (stream - 8)));
-    }
-    else if (stream < 16) {
-        NVIC_DisableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream - 13)));
-    }
-}
-
-/**
- * @brief   Clear the interrupt of a given stream
- *
- * @param[in] stream    physical DMA stream
- */
-static inline void dma_isr_clear(int stream)
-{
-    if (stream < 7) {
-        NVIC_ClearPendingIRQ((IRQn_Type)((int)DMA1_Stream0_IRQn + stream));
-    }
-    else if (stream == 7) {
-        NVIC_ClearPendingIRQ((IRQn_Type)DMA1_Stream7_IRQn);
-    }
-    else if (stream < 13) {
-        NVIC_ClearPendingIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + (stream - 8)));
-    }
-    else if (stream < 16) {
-        NVIC_ClearPendingIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream - 13)));
-    }
-}
 #endif /* MODULE_PERIPH_DMA */
 
 #ifdef __cplusplus

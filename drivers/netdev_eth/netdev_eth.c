@@ -22,6 +22,7 @@
 #include <errno.h>
 
 #include "net/netdev.h"
+#include "net/eui48.h"
 #include "net/eui64.h"
 #include "net/ethernet.h"
 
@@ -34,9 +35,9 @@ static int _get_iid(netdev_t *netdev, eui64_t *value, size_t max_len)
         return -EOVERFLOW;
     }
 
-    uint8_t addr[ETHERNET_ADDR_LEN];
-    netdev->driver->get(netdev, NETOPT_ADDRESS, addr, ETHERNET_ADDR_LEN);
-    ethernet_get_iid(value, addr);
+    eui48_t mac;
+    netdev->driver->get(netdev, NETOPT_ADDRESS, mac.uint8, sizeof(eui48_t));
+    eui48_to_ipv6_iid(value, &mac);
 
     return sizeof(eui64_t);
 }
@@ -79,15 +80,6 @@ int netdev_eth_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             {
                 return _get_iid(dev, value, max_len);
             }
-#ifdef MODULE_NETSTATS_L2
-        case NETOPT_STATS:
-            {
-                assert(max_len >= sizeof(uintptr_t));
-                *((netstats_t**)value) = &dev->stats;
-                res = sizeof(uintptr_t);
-                break;
-            }
-#endif
 #ifdef MODULE_L2FILTER
         case NETOPT_L2FILTER:
             {

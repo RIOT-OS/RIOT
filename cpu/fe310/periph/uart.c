@@ -80,7 +80,8 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* Calculate buadrate divisor given current CPU clk rate
      * Ignore the first run (icache needs to be warm) */
     uartDiv = PRCI_measure_mcycle_freq(1000, RTC_FREQ);
-    /* cppcheck-suppress redundantAssignment */
+    /* cppcheck-suppress redundantAssignment
+     * (reason: should ignore first cycle to get correct values) */
     uartDiv = PRCI_measure_mcycle_freq(1000, RTC_FREQ);
     uartDiv = uartDiv / baudrate;
 

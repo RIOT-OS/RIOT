@@ -21,7 +21,12 @@
 
 int main(void)
 {
-    puts("DMA dummy test app");
+    /*
+    This test is checking that DMA on UART is not broken when stdio UART is
+    configured with DMA.
+    Note that this message is also printed on 'normal' stdio UART (without DMA).
+    */
+    puts("DMA is working");
 
     return 0;
 }

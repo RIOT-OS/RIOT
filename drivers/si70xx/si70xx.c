@@ -148,7 +148,7 @@ static int _test_device(const si70xx_t *dev)
 int si70xx_init(si70xx_t *dev, const si70xx_params_t *params)
 {
     /* initialize the device descriptor */
-    memcpy(&dev->params, params, sizeof(si70xx_params_t));
+    dev->params = *params;
 
     /* setup the i2c bus */
     i2c_acquire(SI70XX_I2C);

@@ -48,7 +48,7 @@
 int mma7660_init(mma7660_t *dev, const mma7660_params_t *params)
 {
     /* write device descriptor */
-    memcpy(&dev->params, params, sizeof(mma7660_params_t));
+    dev->params = *params;
 
     if (mma7660_set_mode(dev, 0, 0, 0, 0) != MMA7660_OK) {
         DEBUG("mma7660_set_mode failed!\n");

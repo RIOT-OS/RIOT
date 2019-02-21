@@ -1,0 +1,62 @@
+# additional modules dependencies
+
+ifneq (, $(filter esp_sdk, $(USEMODULE)))
+    USEMODULE += core_thread_flags
+    INCLUDES += -I$(ESP8266_SDK_DIR)/third_party/include
+    LINKFLAGS += -Wl,-wrap=malloc
+    LINKFLAGS += -Wl,-wrap=free
+    LINKFLAGS += -Wl,-wrap=calloc
+    LINKFLAGS += -Wl,-wrap=realloc
+    LINKFLAGS += -Wl,-wrap=_malloc_r
+    LINKFLAGS += -Wl,-wrap=_free_r
+    LINKFLAGS += -Wl,-wrap=_realloc_r
+    LINKFLAGS += -Wl,-wrap=mallinfo
+endif
+
+ifneq (, $(filter esp_spiffs, $(USEMODULE)))
+    export SPIFFS_STD_OPTION = -std=c99
+    USEMODULE += spiffs
+    USEMODULE += vfs
+endif
+
+ifneq (, $(filter esp_wifi, $(USEMODULE)))
+    CFLAGS += -DLWIP_OPEN_SRC
+    LINKFLAGS += -Wl,-wrap=ethernet_input
+    USEMODULE += netdev_eth
+endif
+
+ifneq (, $(filter lua, $(USEPKG)))
+    USEMODULE += newlib_syscalls_default
+    USEMODULE += xtimer
+endif
+
+ifneq (, $(filter lwip%, $(USEMODULE)))
+    USEMODULE += newlib_syscalls_default
+endif
+
+ifneq (,$(filter ndn-riot,$(USEPKG)))
+    USEMODULE += crypto
+    USEMODULE += cipher_modes
+endif
+
+ifneq (, $(filter posix%, $(USEMODULE)))
+    USEMODULE += newlib_syscalls_default
+endif
+
+ifneq (, $(filter shell, $(USEMODULE)))
+    USEMODULE += newlib_syscalls_default
+    USEMODULE += xtimer
+endif
+
+ifneq (, $(filter xtimer, $(USEMODULE)))
+    USEMODULE += newlib_syscalls_default
+endif
+
+ifneq (, $(filter vfs, $(USEMODULE)))
+    USEMODULE += newlib_syscalls_default
+    USEMODULE += xtimer
+endif
+
+ifneq (, $(filter newlib_syscalls_default, $(USEMODULE)))
+    USEMODULE += stdio_uart
+endif

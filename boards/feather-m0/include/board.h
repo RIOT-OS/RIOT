@@ -8,7 +8,6 @@
 
 /**
  * @ingroup     boards_feather-m0
- * @brief       Support for the Adafruit Feather M0
  *
  * @{
  *

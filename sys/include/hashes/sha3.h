@@ -3,7 +3,7 @@
  * Joan Daemen, Michaël Peeters, Gilles Van Assche and Ronny Van Keer, hereby
  * denoted as "the implementer".
  *
- * RIOT-OS adaptaion by Mathias Tausig
+ * RIOT-OS adaptation by Mathias Tausig
  *
  * This software is released under the Creative Commons CC0 1.0 license.
  * To the extent possible under law, the implementer has waived all copyright
@@ -12,7 +12,9 @@
  */
 
 /**
- * @ingroup     sys_hashes
+ * @defgroup    sys_hashes_sha3 SHA-3
+ * @ingroup     sys_hashes_unkeyed
+ * @brief       Implementation of the SHA-3 hashing function
  * @{
  *
  * @file
@@ -31,8 +33,19 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Length of SHA256 digests in bytes
+ */
 #define SHA3_256_DIGEST_LENGTH 32
+
+/**
+ * @brief   Length of SHA384 digests in bytes
+ */
 #define SHA3_384_DIGEST_LENGTH 48
+
+/**
+ * @brief   Length of SHA512 digests in bytes
+ */
 #define SHA3_512_DIGEST_LENGTH 64
 
 /**

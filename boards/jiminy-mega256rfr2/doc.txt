@@ -1,0 +1,176 @@
+/**
+ * @defgroup    boards_jiminy-mega256rfr2 Jiminy- Mega256rfr2
+ * @ingroup     boards
+ * @brief       Support for the Jiminy Mega 256rfr2 board
+
+# Overview
+The Jiminy board is a development of the
+[Chair of Integrated Analog Circuits and RF Systems](http://www.ias.rwth-aachen.de/cms/~gair/IAS/?lidx=1)
+(IAS) of the [RWTH Aachen University](https://www.rwth-aachen.de/). We started the project by porting
+RIOT OS to the [Pinoccio.io](https://github.com/Pinoccio/hardware-pinoccio) board. As there where severe
+limitations we designed the Jiminy board which has the the
+[ATmega256rfr2](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8393-MCU_Wireless-ATmega256RFR2-ATmega128RFR2-ATmega64RFR2_Datasheet.pdf)
+MCU as common feature.
+
+It is Arduino like and features USB programming. The [Bootloader](https://github.com/Josar/arduino_stk500v2)
+is a fork of the Arduino Bootloader with added functionality for internal clock calibration and automatic baud
+rate detection.
+
+The Jiminy is design as a core board featuring a MCU, RF-transceiver, battery charger and power path management
+IC, a fuel gauge, an adjustable power supply between 1.8V to 3.3V (100mV Steps) and an RGB LED. All unused Pins
+are connected to pin headers.
+
+An USB C connector is used to connect to the computer or the charger. As USB C supports up to 3 ampere the board
+was designed in regard of fast charging and when connected to the grid or usage of big batteries high current
+supply capability for the shield.
+
+The shields can be powered either directly from the Charger/battery or from the adjustable converter, the
+converter supply pin can be enabled or disabled by the application. By connecting shields to the core Jiminy
+board, a multitude of wireless applications can be created.
+
+A first shield for temperature, humidity and soil moisture measurement is also developed at the IAS.
+
+If there is demand for devices please contact the author of this page for more details.
+
+![jimminy-atmegarfr2](https://raw.githubusercontent.com/Josar/RIOT/jimminy-atmegarfr2/boards/jiminy-mega256rfr2/jimini-core-board.jpg)
+
+![jimminy-plant-sensor](https://raw.githubusercontent.com/Josar/RIOT/jimminy-atmegarfr2/boards/jiminy-mega256rfr2/plant-sensor.jpg)
+
+
+# Hardware
+## Pinout
+
+![jiminy-pinout](https://raw.githubusercontent.com/Josar/RIOT/master/boards/jiminy-mega256rfr2/Pinout.svg?sanitize=true)
+
+## Board
+The jiminy board has following ICs and features.
+
+| Features | Details |  Datasheet |
+|:------------- |:--------------------- |:------------- |
+| USB2Serial| ATmega16U2, High-performance, low-power AVR 8-Bit Advanced RISC Architecture | [Link](http://www.microchip.com/wwwproducts/en/ATmega16u2) |
+| MCU | ATmega256, AVR 8-Bit Advanced RISC Architecture |[Link](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8393-MCU_Wireless-ATmega256RFR2-ATmega128RFR2-ATmega64RFR2_Datasheet.pdf) |
+| Transceiver | High performance RF-CMOS 2.4 GHz radio transceiver targeted for IEEE802.15.4, ZigBee, IPv6 / 6LoWPAN, RF4CE, SP100, WirelessHART and ISM applications | above |
+| Li-ion Charger and Power Path | bq24298 , 3A Single Cell USB Charger With Power Path Management|[Link](http://www.ti.com/lit/ds/symlink/bq24298.pdf) |
+| Fuel Gauge| LC709203F, Fuel Gauge for a single lithium ion battery which provides accurate RSOC information even under unstable conditions (e.g. changes of battery temperature, loading, aging and self-discharge) |[Link](https://www.onsemi.com/pub/Collateral/LC709203F-D.PDF) |
+| AC Converter | TPS6274x, Output voltage selectable within a range from 1.8V to 3.3V in 100mV steps, output currents up to 300mA | [Link](http://www.ti.com/lit/ds/symlink/tps62740.pdf) |
+| RGB LED | Cree LED, hardware PWM controlled  |[Link](https://www.cree.com/led-components/media/documents/ds-CLVBA-FKA.pdf) |
+
+
+## MCU Details
+| MCU 		| ATmega256RFR2         |
+|:------------- |:--------------------- |
+| Family	| ATmega 	        |
+| Vendor	| Atmel	                |
+| Package       | QFN/MLF               |
+| SRAM		| 32Kb 	                |
+| Flash		| 256Kb                 |
+| EEPROM        | 8K                    |
+| Core Frequency | 8MHz (16MHz no power save mode) |
+| Oscillators   | 32.768 kHz & 16 MHz   |
+| Timers	| 6 ( 2x8bit & 4x16bit ) |
+|Analog Comparator |   1    |
+| ADCs		| 1x 15 channel 6 to 12-bit |
+| USARTs        | 2 			|
+| SPIs		| 3 (1 SPI & 2 USART SPI) |
+| I2Cs		| 1 (called TWI)	|
+| Vcc		| 1.8V - 3.6V		|
+| Datasheet / Reference Manual | [Datasheet and Reference Manual](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8393-MCU_Wireless-ATmega256RFR2-ATmega128RFR2-ATmega64RFR2_Datasheet.pdf) |
+| Board Manual	|  |
+| Pins          |  |
+
+
+# Implementation Status
+Is an ongoing process ...
+
+## Jimini Core
+| Driver | Status | Comment |
+|:------------- |:--------------------- |:--------------------- |
+| GPIO (LED) | OK | |
+| Timers | OK | |
+| UART | OK | |
+| TWI, I2C | OK | |
+| PWM | OK | only PWM_left implemented yet |
+| Comparator | OK | |
+
+
+| Module | Status | Comment |
+|:------------- |:--------------------- |:--------------------- |
+| Stdio| OK | Output to USB Bridge, used as Terminal |
+| xTimer | OK | |
+| PWM LED | OK | |
+| RTC| OK | |
+| Power Path | OK | |
+| Fuel Gauge| OK | |
+| RF core | Work in progress | |
+
+| CoAP | Status | Comment |
+|:------------- |:--------------------- |:--------------------- |
+|Device|  |  |
+|LED|  |  |
+| Battery | ok | only RSOC so far |
+
+## Jimini Plant Sensor Shield
+
+| Module | Status | Comment |
+|:------------- |:--------------------- |:--------------------- |
+| SHT21 | OK | |
+| Soil moisture | OK | |
+
+
+| CoAP | Status | Comment |
+|:------------- |:--------------------- |:--------------------- |
+| Temperature | ok |  |
+| Humidity | ok |  |
+| Soil moisture | ok | when requested the first time the returned value is wrong, after that the correct value is returned |
+
+# Flashing RIOT
+Flashing RIOT on the Jiminy is quite straight forward, just connect your Jiminy using the USB port
+to your host computer and type:
+
+`make flash BOARD=jiminy-mega256rfr2`
+
+This should take care of everything!
+
+RIOT's Makefile are configured to flash the jiminy using AVRDUDE. The bootloader automatically matches
+to the configured baud rate which is set for AVRDUDE. Rates of up to 500kBaud can be used.
+
+# Fuse Settings
+Reading out the fuses can be done with
+`avrdude -c wiring -p m256rfr2 -P /dev/ttyACM0 -b 0010005 -v`
+
+The last line should read
+`avrdude: safemode: Fuses OK (E:FE, H:D0, L:E2)`
+
+Which describes the fuses as follows:
+E: extended fuse = FE
+H: high fuse     = D0
+L: low fuse      = E2
+
+To program the fuses an JTAG programer (Atmel-ICE, Dragon) is needed, they can not be set with the bootloader.
+Connect the programmer JTAG pins with the board pins F4 JTAG TCK, F5 JTAG TMS, F6 JTAG TDO, F7 JTAG TDI,
+GND and VDD with V+ m256rfr2. Alternatively use a pogo pin connector ( e.g. SparkFun ISP Pogo Adapter)
+on the backside of the board.
+
+To program the fuses default setting execute following line
+`avrdude -c atmelice -p m256rfr2 -U lfuse:w:0xe2:m -U hfuse:w:0xd0:m -U efuse:w:0xfe:m`
+
+Attention: the default setting above has brown-out detection enabled,
+see troubleshooting when using the board with 1.8V supply.
+
+# Troubleshooting
+
+## Using 1.8V as board Voltage
+
+Setting the TPS6274x output voltage to 1.8V may lead to an undervoltage and thus triggers the brown-out reset.
+Disabling the brown-out detection by setting the extended fuse bit is recommended when a 1.8V supply is used.
+
+`avrdude -c atmelice -p m256rfr2 -U efuse:w:0xff:m`
+
+## Using the external crystal oscillator (Transceiver Crystal Oscillator) and deep sleep
+
+When the external crystal oscillator is used as system clock and the device is put into deep sleep mode it seems that
+the clocks for all peripherals are enabled and set to the smallest divider (highest frequency). This leads to a higher
+power consumption. When the device should be put into deep sleep it is recommended to use the internal RC oscillator
+as system clock source.
+
+ */

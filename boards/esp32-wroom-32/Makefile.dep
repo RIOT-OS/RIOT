@@ -1,0 +1,49 @@
+include $(RIOTBOARD)/common/esp32/Makefile.dep
+
+# default parameter definitions when module enc28j60 is used
+ifneq (, $(filter enc28j60, $(USEMODULE)))
+
+    # avoid multiple definitions when package depenedencies are resolved recursively
+    ifndef ENC28J60_PARAM_DEFINED
+        export ENC28J60_PARAM_DEFINED = 1
+
+        # default definitions
+        ENC28J60_PARAM_SPI   ?= SPI_DEV\(0\)
+        ENC28J60_PARAM_CS    ?= GPIO32
+        ENC28J60_PARAM_INT   ?= GPIO35
+        ENC28J60_PARAM_RESET ?= GPIO33
+        CFLAGS += -DENC28J60_PARAM_SPI=$(ENC28J60_PARAM_SPI)
+        CFLAGS += -DENC28J60_PARAM_CS=$(ENC28J60_PARAM_CS)
+        CFLAGS += -DENC28J60_PARAM_INT=$(ENC28J60_PARAM_INT)
+        CFLAGS += -DENC28J60_PARAM_RESET=$(ENC28J60_PARAM_RESET)
+
+        # to satisfy variable defintions in tests/driver_enc28j60/Makefile
+        ENC_SPI = $(ENC28J60_PARAM_SPI)
+        ENC_CS  = $(ENC28J60_PARAM_CS)
+        ENC_INT = $(ENC28J60_PARAM_INT)
+        ENC_RST = $(ENC28J60_PARAM_RESET)
+
+    endif
+endif
+
+# default parameter definitions when module mfr24j40 is used
+ifneq (, $(filter mrf24j40, $(USEMODULE)))
+
+    # avoid multiple definitions when package depenedencies are resolved recursively
+    ifndef MRF24J40_PARAM_DEFINED
+        export MRF24J40_PARAM_DEFINED = 1
+
+        # default definitions
+        MRF24J40_PARAM_SPI     = SPI_DEV\(0\)
+        MRF24J40_PARAM_SPI_CLK = SPI_CLK_1MHZ
+        MRF24J40_PARAM_CS     ?= GPIO16
+        MRF24J40_PARAM_INT    ?= GPIO34
+        MRF24J40_PARAM_RESET  ?= GPIO17
+        CFLAGS += -DMRF24J40_PARAM_SPI=$(MRF24J40_PARAM_SPI)
+        CFLAGS += -DMRF24J40_PARAM_SPI_CLK=$(MRF24J40_PARAM_SPI_CLK)
+        CFLAGS += -DMRF24J40_PARAM_CS=$(MRF24J40_PARAM_CS)
+        CFLAGS += -DMRF24J40_PARAM_INT=$(MRF24J40_PARAM_INT)
+        CFLAGS += -DMRF24J40_PARAM_RESET=$(MRF24J40_PARAM_RESET)
+
+    endif
+endif

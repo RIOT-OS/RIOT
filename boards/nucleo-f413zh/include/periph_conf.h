@@ -24,52 +24,12 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "f4/cfg_clock_100_8_1.h"
+#include "cfg_i2c1_pb8_pb9.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Clock settings
- *
- * @note    This is auto-generated from
- *          `cpu/stm32_common/dist/clk_conf/clk_conf.c`
- * @{
- */
-/* give the target core clock (HCLK) frequency [in Hz],
- * maximum: 100MHz */
-#define CLOCK_CORECLOCK     (100000000U)
-/* 0: no external high speed crystal available
- * else: actual crystal frequency [in Hz] */
-#define CLOCK_HSE           (8000000U)
-/* 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (1)
-/* peripheral clock setup */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV2     /* max 50MHz */
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 2)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1     /* max 100MHz */
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
-
-/* Main PLL factors */
-#define CLOCK_PLL_M          (4)
-#define CLOCK_PLL_N          (200)
-#define CLOCK_PLL_P          (4)
-#define CLOCK_PLL_Q          (0)
-
-/* PLL I2S configuration */
-#define CLOCK_ENABLE_PLL_I2S (1)
-#define CLOCK_PLL_I2S_SRC    (0)
-#define CLOCK_PLL_I2S_M      (4)
-#define CLOCK_PLL_I2S_N      (216)
-#define CLOCK_PLL_I2S_P      (0)
-#define CLOCK_PLL_I2S_Q      (9)
-
-/* Use alternative source for 48MHz clock */
-#define CLOCK_USE_ALT_48MHZ  (1)
-/** @} */
 
 /**
  * @name    DMA streams configuration
@@ -246,30 +206,6 @@ static const spi_conf_t spi_config[] = {
 };
 
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
-/** @} */
-
-/**
- * @name    I2C configuration
- * @{
- */
-static const i2c_conf_t i2c_config[] = {
-    {
-        .dev            = I2C1,
-        .speed          = I2C_SPEED_NORMAL,
-        .scl_pin        = GPIO_PIN(PORT_B, 8),
-        .sda_pin        = GPIO_PIN(PORT_B, 9),
-        .scl_af         = GPIO_AF4,
-        .sda_af         = GPIO_AF4,
-        .bus            = APB1,
-        .rcc_mask       = RCC_APB1ENR_I2C1EN,
-        .clk            = CLOCK_APB1,
-        .irqn           = I2C1_EV_IRQn
-    }
-};
-
-#define I2C_0_ISR           isr_i2c1_ev
-
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 /**

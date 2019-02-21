@@ -69,6 +69,23 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    DMA streams configuration
+ * @{
+ */
+#ifdef MODULE_PERIPH_DMA
+static const dma_conf_t dma_config[] = {
+    { .stream = 3 },    /* DMA1 Channel 4 - USART1_TX */
+    { .stream = 5 },    /* DMA1 Channel 6 - USART2_TX */
+};
+
+#define DMA_0_ISR  isr_dma1_channel4
+#define DMA_1_ISR  isr_dma1_channel6
+
+#define DMA_NUMOF           (sizeof(dma_config) / sizeof(dma_config[0]))
+#endif
+/** @} */
+
+/**
  * @name    Timer configuration
  * @{
  */
@@ -106,7 +123,11 @@ static const uart_conf_t uart_config[] = {
         .rx_pin   = GPIO_PIN(PORT_A, 10),
         .tx_pin   = GPIO_PIN(PORT_A, 9),
         .bus      = APB2,
-        .irqn     = USART1_IRQn
+        .irqn     = USART1_IRQn,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 0,
+        .dma_chan   = 2
+#endif
     },
     {
         .dev      = USART2,
@@ -114,7 +135,11 @@ static const uart_conf_t uart_config[] = {
         .rx_pin   = GPIO_PIN(PORT_A, 3),
         .tx_pin   = GPIO_PIN(PORT_A, 2),
         .bus      = APB1,
-        .irqn     = USART2_IRQn
+        .irqn     = USART2_IRQn,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 1,
+        .dma_chan   = 2
+#endif
     }
 };
 

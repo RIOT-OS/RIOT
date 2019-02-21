@@ -17,6 +17,8 @@
  */
 
 #include <stdbool.h>
+#include <string.h>
+
 #include "net/af.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/netif/internal.h"

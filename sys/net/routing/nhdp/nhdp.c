@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <string.h>
+
 #include "net/sock/udp.h"
 #include "msg.h"
 #include "net/gnrc/netapi.h"

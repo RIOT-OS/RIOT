@@ -7,8 +7,9 @@
  */
 
 /**
- * @defgroup    net_gnrc_ipv6_nib_conf  Configuration macros
+ * @defgroup    net_gnrc_ipv6_nib_conf  GNRC IPv6 NIB compile configurations
  * @ingroup     net_gnrc_ipv6_nib
+ * @ingroup     config
  * @brief       Configuration macros for neighbor information base
  * @{
  *
@@ -28,6 +29,9 @@ extern "C" {
 #ifdef MODULE_GNRC_IPV6_NIB_6LBR
 #ifndef GNRC_IPV6_NIB_CONF_6LBR
 #define GNRC_IPV6_NIB_CONF_6LBR         (1)
+#endif
+#ifndef GNRC_IPV6_NIB_CONF_SLAAC
+#define GNRC_IPV6_NIB_CONF_SLAAC        (1)
 #endif
 #ifndef GNRC_IPV6_NIB_NUMOF
 #define GNRC_IPV6_NIB_NUMOF             (16)
@@ -214,6 +218,15 @@ extern "C" {
  */
 #ifndef GNRC_IPV6_NIB_CONF_REACH_TIME_RESET
 #define GNRC_IPV6_NIB_CONF_REACH_TIME_RESET (7200000U)
+#endif
+
+/**
+ * @brief   Disable router solicitations
+ *
+ * @warning Only do this if you know what you're doing
+ */
+#ifndef GNRC_IPV6_NIB_CONF_NO_RTR_SOL
+#define GNRC_IPV6_NIB_CONF_NO_RTR_SOL       (0)
 #endif
 
 /**

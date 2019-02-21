@@ -28,6 +28,7 @@
 #include "cpu.h"
 #include "context_frame.h"
 #include "periph_cpu.h"
+#include "periph/init.h"
 #include "panic.h"
 #include "vendor/encoding.h"
 #include "vendor/platform.h"
@@ -88,6 +89,9 @@ void cpu_init(void)
 
     /*  Set default state of mstatus */
     set_csr(mstatus, MSTATUS_DEFAULT);
+
+    /* trigger static peripheral initialization */
+    periph_init();
 }
 
 /**

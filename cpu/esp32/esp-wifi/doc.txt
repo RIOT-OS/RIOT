@@ -1,0 +1,52 @@
+/*
+ * Copyright (C) 2018 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup        cpu_esp32_esp_wifi ESP32 WiFi netdev interface
+ * @ingroup         cpu_esp32
+ * @brief           Network device driver for the ESP32 WiFi interface
+ *
+ * @author      Gunar Schorcht <gunar@schorcht.net>
+
+This module realizes a `netdev` interface for the built-in WiFi interface
+of ESP32. To enable the WiFi interface, module `esp_wifi` has to be used.
+
+@note Due to symbol conflicts with the `crypto` and `hash` modules of RIOT
+in module `esp_idf_wpa_supplicant_crypto`, which is required by module
+`esp_wifi`, `esp_wifi` cannot be used for applications that use these modules.
+Therefore, module `esp_wifi` is not automatically enabled when module
+`netdev_default` is used. Instead, if necessary, the application has to add
+the module `esp_wifi` in the Makefile.
+
+```
+USEMODULE += esp_wifi
+```
+
+Furthermore, the following configuration parameters have to be defined:
+
+Configuration Parameter | Description
+------------------------|------------
+ESP_WIFI_SSID           | SSID of the AP to be used.
+ESP_WIFI_PASS           | Passphrase used for the AP as clear text (max. 64 chars).
+ESP_WIFI_STACKSIZE      | Stack size used for the WiFi netdev driver thread.
+
+These configuration parameter definitions, as well as enabling the `esp_wifi`
+module, can be done either in the makefile of the project or at make command
+line, e.g.:
+
+```
+USEMODULE=esp_wifi \
+CFLAGS='-DESP_WIFI_SSID=\"MySSID\" -DESP_WIFI_PASS=\"MyPassphrase\"' \
+make -C examples/gnrc_networking BOARD=...
+```
+
+@note The Wifi network interface (module `esp_wifi`) and the
+\ref esp32_esp_now_network_interface "ESP-NOW network interface" (module `esp_now`)
+can be used simultaneously, for example, to realize a border router for
+a mesh network which uses ESP-NOW.
+ */

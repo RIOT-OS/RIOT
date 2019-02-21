@@ -15,7 +15,7 @@
  */
 
 /**
- * @defgroup    core_util Kernel utilities
+ * @defgroup    core_util Kernel Utilities
  * @ingroup     core
  * @brief       Utilities and data structures used by the kernel
  */
@@ -25,3 +25,9 @@
  * @ingroup     core
  * @brief       Configuration data and startup code for the kernel
  */
+
+ /**
+  * @defgroup    core_sync Thread Synchronization
+  * @ingroup     core
+  * @brief       Thread synchronization mechanisms of the kernel
+  */

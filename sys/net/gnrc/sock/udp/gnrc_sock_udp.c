@@ -16,6 +16,7 @@
  */
 
 #include <errno.h>
+#include <string.h>
 
 #include "byteorder.h"
 #include "net/af.h"
@@ -214,8 +215,9 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
         return -EPROTO;
     }
     memcpy(data, pkt->data, pkt->size);
+    res = (int)pkt->size;
     gnrc_pktbuf_release(pkt);
-    return (int)pkt->size;
+    return res;
 }
 
 ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,

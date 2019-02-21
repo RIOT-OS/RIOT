@@ -1,6 +1,6 @@
 Expected result
 ===============
-When everything works as expected, you should see a hello message popping up every 10 seconds.
+When everything works as expected, you should see a hello message popping up every 5 seconds.
 
 Background
 ==========

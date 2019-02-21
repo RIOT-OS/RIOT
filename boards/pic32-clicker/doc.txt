@@ -1,0 +1,18 @@
+/**
+@defgroup    boards_pic32-clicker MikroE PIC32 Clicker
+@ingroup     boards
+@brief       Support for the MikroE PIC32 Clicker
+
+For instructions on reflashing see:
+
+https://docs.creatordev.io/clicker/guides/quick-start-guide/#programming-a-6lowpan-clicker
+
+The RIOT build generates a hexfile compatible with MPLAB-IPE.
+
+More general information on the board and related documentation can be found
+here:
+
+https://docs.creatordev.io/clicker/guides/quick-start-guide/#introduction
+
+
+ */

@@ -3,7 +3,7 @@ export CPU = fe310
 export CPU_MODEL = fe310
 
 # Uses UART0 for stdio input/output (comment out to disable)
-USEMODULE += uart_stdio
+USEMODULE += stdio_uart
 
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyUSB1

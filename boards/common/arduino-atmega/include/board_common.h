@@ -37,7 +37,7 @@ extern "C" {
  * baudrate to 9600 for this board
  * @{
  */
-#define UART_STDIO_BAUDRATE (9600U)
+#define STDIO_UART_BAUDRATE (9600U)
 /** @} */
 
 /**
@@ -60,12 +60,38 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Usage of LED to turn on when a kernel panic occurs.
+ * @{
+ */
+#define LED_PANIC           LED0_ON
+/** @} */
+
+/**
+ * @name CPU clock scale for arduino boards
+ *
+ */
+#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
+/** @} */
+
+/**
  * @name    xtimer configuration values
  * @{
  */
 #define XTIMER_WIDTH                (16)
 #define XTIMER_HZ                   (250000UL)
 #define XTIMER_BACKOFF              (40)
+/** @} */
+
+/**
+ * @name    Configuration parameters for the W5100 driver
+ * @{
+ */
+#ifndef W5100_PARAM_CS
+#define W5100_PARAM_CS          (ARDUINO_PIN_10)
+#endif
+#ifndef W5100_PARAM_EVT
+#define W5100_PARAM_EVT         (ARDUINO_PIN_2)
+#endif
 /** @} */
 
 /**

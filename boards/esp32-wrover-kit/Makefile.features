@@ -1,0 +1,15 @@
+# common board and CPU features
+include $(RIOTBOARD)/common/esp32/Makefile.features
+
+# additional features provided by the board
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_dac
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_spi
+
+# unique features provided by the board
+FEATURES_PROVIDED += sdcard_spi
+FEATURES_PROVIDED += esp_spi_ram
+
+FEATURES_PROVIDED += arduino

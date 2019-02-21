@@ -38,8 +38,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define _MAX_MHR_OVERHEAD   (25)
-
 static int _send(netdev_t *netdev, const iolist_t *iolist);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *netdev);
@@ -139,10 +137,6 @@ static int _init(netdev_t *netdev)
         return -1;
     }
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
-
     return cc2420_init((cc2420_t *)dev);
 }
 
@@ -187,11 +181,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             assert(max_len >= 8);
             cc2420_get_addr_long(dev, val);
             return 8;
-
-        case NETOPT_MAX_PACKET_SIZE:
-            assert(max_len >= sizeof(int16_t));
-            *((uint16_t *)val) = CC2420_PKT_MAXLEN - _MAX_MHR_OVERHEAD;
-            return sizeof(int16_t);
 
         case NETOPT_NID:
             assert(max_len >= sizeof(uint16_t));

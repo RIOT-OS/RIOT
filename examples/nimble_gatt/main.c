@@ -23,41 +23,26 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "nimble_riot.h"
+#include "net/bluetil/ad.h"
 
-#include "nimble/nimble_port.h"
 #include "host/ble_hs.h"
 #include "host/util/util.h"
+#include "host/ble_gatt.h"
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
-static const char device_name[] = "NimBLE on RIOT";
+static const char *device_name = "NimBLE on RIOT";
 static uint8_t own_addr_type;
-
 
 static void start_advertise(void);
 
-static void put_ad(uint8_t ad_type, uint8_t ad_len, const void *ad, uint8_t *buf,
-                   uint8_t *len)
-{
-    buf[(*len)++] = ad_len + 1;
-    buf[(*len)++] = ad_type;
-
-    memcpy(&buf[*len], ad, ad_len);
-
-    *len += ad_len;
-}
-
 static void update_ad(void)
 {
-    uint8_t ad[BLE_HS_ADV_MAX_SZ];
-    uint8_t ad_len = 0;
-    uint8_t ad_flags = BLE_HS_ADV_F_DISC_GEN | BLE_HS_ADV_F_BREDR_UNSUP;
-
-    put_ad(BLE_HS_ADV_TYPE_FLAGS, 1, &ad_flags, ad, &ad_len);
-    put_ad(BLE_HS_ADV_TYPE_COMP_NAME, sizeof(device_name), device_name, ad, &ad_len);
-
-    ble_gap_adv_set_data(ad, ad_len);
+    uint8_t buf[BLE_HS_ADV_MAX_SZ];
+    bluetil_ad_t ad;
+    bluetil_ad_init_with_flags(&ad, buf, sizeof(buf), BLUETIL_AD_FLAGS_DEFAULT);
+    bluetil_ad_add_name(&ad, device_name);
+    ble_gap_adv_set_data(ad.buf, ad.pos);
 }
 
 static int gap_event_cb(struct ble_gap_event *event, void *arg)
@@ -90,46 +75,38 @@ static void start_advertise(void)
     rc = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER,
                            &advp, gap_event_cb, NULL);
     assert(rc == 0);
-}
-
-static void app_ble_sync_cb(void)
-{
-    int rc;
-
-    rc = ble_hs_util_ensure_addr(0);
-    assert(rc == 0);
-
-    rc = ble_hs_id_infer_auto(0, &own_addr_type);
-    assert(rc == 0);
-
-    /* generate the advertising data */
-    update_ad();
-
-    start_advertise();
+    (void)rc;
 }
 
 int main(void)
 {
     puts("NimBLE GATT Server Example");
 
-    /* initialize NimBLE's controller */
-    nimble_riot_controller_init();
-
-    /* register the synchronization callback that is triggered once the host has
-     * finished its initialization */
-    ble_hs_cfg.sync_cb = app_ble_sync_cb;
-
-    /* initialize NimBLE porting layer and the default GATT and GAP services*/
-    nimble_port_init();
-    ble_svc_gap_init();
-    ble_svc_gatt_init();
-
     /* set the device name */
     ble_svc_gap_device_name_set(device_name);
 
-    /* and finally run NimBLE's host event loop. The event loop contains a pre-
-     * configured event which will trigger the hosts initialization */
-    nimble_port_run();
+    /* initialize the GAP and GATT services */
+    ble_svc_gap_init();
+    ble_svc_gatt_init();
+    /* XXX: seems to be needed to apply the added services */
+    ble_gatts_start();
+
+    /* make sure synchronization of host and controller is done, this should
+     * always be the case */
+    while (!ble_hs_synced()) {}
+
+    /* configure device address */
+    int rc = ble_hs_util_ensure_addr(0);
+    assert(rc == 0);
+    rc = ble_hs_id_infer_auto(0, &own_addr_type);
+    assert(rc == 0);
+    (void)rc;
+
+    /* generate the advertising data */
+    update_ad();
+
+    /* start to advertise this node */
+    start_advertise();
 
     return 0;
 }

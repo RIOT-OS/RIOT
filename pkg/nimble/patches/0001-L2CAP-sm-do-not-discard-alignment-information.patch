@@ -1,0 +1,86 @@
+From 5986ec94d49cb4121e37114def029255e2b73b05 Mon Sep 17 00:00:00 2001
+From: Juan Carrano <j.carrano@fu-berlin.de>
+Date: Thu, 29 Nov 2018 13:40:36 +0100
+Subject: [PATCH] L2CAP sm: do not discard alignment information.
+
+ble_sm_gen_ediv and ble_sm_gen_master_id_rand took a simple pointer to
+integers, but were being called with pointers to members of a packed
+struct. This discarded the alignment information.
+
+Not only did it produce an error with clang's -Wno-address-of-packed-member,
+but it may also cause an error in a platform with alignment requirements.
+
+The solution was to modify both procedures to take a pointer to the whole
+structure instead of only the members.
+---
+ nimble/host/src/ble_sm.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/nimble/host/src/ble_sm.c b/nimble/host/src/ble_sm.c
+index c2cf97aa..09b33bf5 100644
+--- a/nimble/host/src/ble_sm.c
++++ b/nimble/host/src/ble_sm.c
+@@ -261,19 +261,19 @@ ble_sm_gen_pair_rand(uint8_t *pair_rand)
+ }
+ 
+ static int
+-ble_sm_gen_ediv(uint16_t *ediv)
++ble_sm_gen_ediv(struct ble_sm_master_id *master_id)
+ {
+     int rc;
+ 
+ #if MYNEWT_VAL(BLE_HS_DEBUG)
+     if (ble_sm_dbg_next_ediv_set) {
+         ble_sm_dbg_next_ediv_set = 0;
+-        *ediv = ble_sm_dbg_next_ediv;
++        master_id->ediv = ble_sm_dbg_next_ediv;
+         return 0;
+     }
+ #endif
+ 
+-    rc = ble_hs_hci_util_rand(ediv, sizeof *ediv);
++    rc = ble_hs_hci_util_rand(&master_id->ediv, sizeof master_id->ediv);
+     if (rc != 0) {
+         return rc;
+     }
+@@ -282,19 +282,19 @@ ble_sm_gen_ediv(uint16_t *ediv)
+ }
+ 
+ static int
+-ble_sm_gen_master_id_rand(uint64_t *master_id_rand)
++ble_sm_gen_master_id_rand(struct ble_sm_master_id *master_id)
+ {
+     int rc;
+ 
+ #if MYNEWT_VAL(BLE_HS_DEBUG)
+     if (ble_sm_dbg_next_master_id_rand_set) {
+         ble_sm_dbg_next_master_id_rand_set = 0;
+-        *master_id_rand = ble_sm_dbg_next_master_id_rand;
++        master_id->rand_val = ble_sm_dbg_next_master_id_rand;
+         return 0;
+     }
+ #endif
+ 
+-    rc = ble_hs_hci_util_rand(master_id_rand, sizeof *master_id_rand);
++    rc = ble_hs_hci_util_rand(&master_id->rand_val, sizeof master_id->rand_val);
+     if (rc != 0) {
+         return rc;
+     }
+@@ -2051,12 +2051,12 @@ ble_sm_key_exch_exec(struct ble_sm_proc *proc, struct ble_sm_result *res,
+             goto err;
+         }
+ 
+-        rc = ble_sm_gen_ediv(&master_id->ediv);
++        rc = ble_sm_gen_ediv(master_id);
+         if (rc != 0) {
+             os_mbuf_free_chain(txom);
+             goto err;
+         }
+-        rc = ble_sm_gen_master_id_rand(&master_id->rand_val);
++        rc = ble_sm_gen_master_id_rand(master_id);
+         if (rc != 0) {
+             os_mbuf_free_chain(txom);
+             goto err;
+-- 
+2.19.2
+

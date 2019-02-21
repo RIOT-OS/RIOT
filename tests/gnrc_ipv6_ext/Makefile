@@ -1,31 +1,52 @@
+DEVELHELP := 1
 # name of your application
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f030r8 \
-                             nucleo-f031k6 nucleo-f042k6 nucleo-f303k8 \
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
+                             hifive1 mega-xplained msb-430 msb-430h \
+                             nucleo-f030r8 nucleo-f031k6 nucleo-f042k6 \
+                             nucleo-f070rb nucleo-f072rb nucleo-f303k8 \
                              nucleo-f334r8 nucleo-l031k6 nucleo-l053r8 \
-                             stm32f0discovery
+                             stm32f0discovery telosb thingy52 waspmote-pro \
+                             wsn430-v1_3b wsn430-v1_4 z1
+# chronos, mips-malta, and ruuvitag boards don't support ethos
+BOARD_BLACKLIST := chronos mips-malta ruuvitag
+
+export TAP ?= tap0
 
 # use Ethernet as link-layer protocol
-USEMODULE += netdev_eth
-USEMODULE += netdev_test
+ifeq (native,$(BOARD))
+  USEMODULE += netdev_tap
+
+  TERMFLAGS ?= $(TAP)
+else
+  USEMODULE += ethos
+
+  ETHOS_BAUDRATE ?= 115200
+  CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE) -DUSE_ETHOS_FOR_STDIO
+  TERMDEPS += ethos
+  TERMPROG ?= sudo $(RIOTTOOLS)/ethos/ethos
+  TERMFLAGS ?= $(TAP) $(PORT) $(ETHOS_BAUDRATE)
+endif
+USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6
 USEMODULE += gnrc_ipv6_router_default
+USEMODULE += gnrc_icmpv6_error
+USEMODULE += gnrc_pktdump
+USEMODULE += gnrc_pktbuf_cmd
 # IPv6 extension headers
 USEMODULE += gnrc_ipv6_ext
-USEMODULE += gnrc_rpl_srh
-USEMODULE += gnrc_sixlowpan_iphc_nhc
-# UDP
-USEMODULE += gnrc_udp
+USEMODULE += od
 # Add also the shell, some shell commands
+USEMODULE += shell
+USEMODULE += shell_commands
 USEMODULE += ps
 
-CFLAGS += -DGNRC_NETIF_IPV6_ADDRS_NUMOF=3
+# TEST_ON_CI_WHITELIST += all
 
-TEST_ON_CI_WHITELIST += all
+.PHONY: ethos
+
+ethos:
+	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)/ethos
 
 include $(RIOTBASE)/Makefile.include
-
-# The test can check more things with ENABLE_DEBUG set to 1 in gnrc_ipv6.c
-test:
-	tests/01-run.py

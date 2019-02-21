@@ -69,6 +69,7 @@ void gnrc_icmpv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     if (icmpv6->size < sizeof(icmpv6_hdr_t)) {
         DEBUG("icmpv6: packet too short.\n");
+        gnrc_pktbuf_release(pkt);
         return;
     }
 
@@ -78,7 +79,7 @@ void gnrc_icmpv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     if (_calc_csum(icmpv6, ipv6, pkt)) {
         DEBUG("icmpv6: wrong checksum.\n");
-        /* don't release: IPv6 does this */
+        gnrc_pktbuf_release(pkt);
         return;
     }
 

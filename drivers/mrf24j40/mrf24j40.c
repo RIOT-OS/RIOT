@@ -37,7 +37,7 @@ void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params)
 
     netdev->driver = &mrf24j40_driver;
     /* initialize device descriptor */
-    memcpy(&dev->params, params, sizeof(mrf24j40_params_t));
+    dev->params = *params;
 }
 
 void mrf24j40_reset(mrf24j40_t *dev)
@@ -56,8 +56,6 @@ void mrf24j40_reset(mrf24j40_t *dev)
     mrf24j40_set_addr_long(dev, ntohll(addr_long.uint64.u64));
     mrf24j40_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
 
-    /* set default PAN id */
-    mrf24j40_set_pan(dev, IEEE802154_DEFAULT_PANID);
     mrf24j40_set_chan(dev, IEEE802154_DEFAULT_CHANNEL);
 
     /* configure Immediate Sleep and Wake-Up mode */

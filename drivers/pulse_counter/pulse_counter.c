@@ -55,24 +55,24 @@ int pulse_counter_init(pulse_counter_t *dev, const pulse_counter_params_t *param
 }
 
 /* Return the accumulated pulse counts and reset the count to zero */
-int16_t pulse_counter_read_with_reset(const void *dev)
+int16_t pulse_counter_read_with_reset(pulse_counter_t *dev)
 {
     int16_t pulse_count_output = 0;
     int16_t reset_value = 0;
 
     /* Use atomic operations to avoid messing with IRQ flags */
-    __atomic_exchange(&(((pulse_counter_t *)dev)->pulse_count), &reset_value, &pulse_count_output, __ATOMIC_SEQ_CST);
+    __atomic_exchange(&(dev->pulse_count), &reset_value, &pulse_count_output, __ATOMIC_SEQ_CST);
     return pulse_count_output;
 }
 
 /* Return the accumulated pulse counts */
-int16_t pulse_counter_read_without_reset(const void *dev)
+int16_t pulse_counter_read_without_reset(const pulse_counter_t *dev)
 {
-    return ((pulse_counter_t *)dev)->pulse_count;
+    return dev->pulse_count;
 }
 
 /* Reset the pulse count value to zero */
-void pulse_counter_reset(const void *dev)
+void pulse_counter_reset(pulse_counter_t *dev)
 {
-    ((pulse_counter_t *)dev)->pulse_count = 0;
+    dev->pulse_count = 0;
 }

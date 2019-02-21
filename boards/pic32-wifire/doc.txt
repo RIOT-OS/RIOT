@@ -1,0 +1,21 @@
+/**
+@defgroup    boards_pic32-wifire Digilent PIC32 WiFire
+@ingroup     boards
+@brief       Support for the Digilent PIC32 WiFire
+
+For instructions on reflashing see:
+
+https://docs.creatordev.io/wifire/guides/wifire-programming/
+
+The RIOT build generates a hexfile compatible with MPLAB-IPE.
+
+More general information on the board and related documentation can be found
+here:
+
+https://creatordev.io/wifire.html
+
+https://docs.creatordev.io/wifire/
+
+
+
+ */

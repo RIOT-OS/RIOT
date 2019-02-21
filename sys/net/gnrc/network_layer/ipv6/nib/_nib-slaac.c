@@ -24,9 +24,9 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#if GNRC_IPV6_NIB_CONF_6LN || GNRC_IPV6_NIB_CONF_SLAAC
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
-#if GNRC_IPV6_NIB_CONF_6LN || GNRC_IPV6_NIB_CONF_SLAAC
 void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                           uint8_t pfx_len)
 {
@@ -108,7 +108,7 @@ static bool _try_addr_reconfiguration(gnrc_netif_t *netif)
     eui64_t orig_iid;
     bool remove_old = false, hwaddr_reconf;
 
-    if (gnrc_netif_ipv6_get_iid(netif, &orig_iid) == 0) {
+    if (gnrc_netif_ipv6_get_iid(netif, &orig_iid) > 0) {
         remove_old = true;
     }
     /* seize netif to netif thread since _try_l2addr_reconfiguration uses

@@ -191,6 +191,7 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
             mutex_unlock(&_list_tcb_lock);
             break;
 
+        case FSM_STATE_SYN_RCVD:
         case FSM_STATE_ESTABLISHED:
         case FSM_STATE_CLOSE_WAIT:
             tcb->status |= STATUS_NOTIFY_USER;
@@ -482,7 +483,8 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                 if (ipv6_addr_is_link_local((ipv6_addr_t *) tcb->peer_addr)) {
                     gnrc_pktsnip_t *tmp = NULL;
                     LL_SEARCH_SCALAR(in_pkt, tmp, type, GNRC_NETTYPE_NETIF);
-                    /* cppcheck-suppress knownConditionTrueFalse */
+                    /* cppcheck-suppress knownConditionTrueFalse
+                     * (reason: tmp *can* be != NULL after LL_SEARCH_SCALAR) */
                     if (tmp == NULL) {
                         DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() :\
                                incomming packet had no netif header\n");

@@ -35,7 +35,11 @@ static char print_buf[LORAMAC_APPKEY_LEN * 2 + 1];
 
 static void _loramac_usage(void)
 {
-    puts("Usage: loramac <get|set|join|tx|link_check>");
+    puts("Usage: loramac <get|set|join|tx|link_check"
+#ifdef MODULE_PERIPH_EEPROM
+         "|save|erase"
+#endif
+         ">");
 }
 
 static void _loramac_join_usage(void)
@@ -352,12 +356,26 @@ static int _cmd_loramac(int argc, char **argv)
             return 1;
         }
 
-        if (semtech_loramac_join(&loramac, join_type) != SEMTECH_LORAMAC_JOIN_SUCCEEDED) {
-            puts("Join procedure failed!");
-            return 1;
+        switch (semtech_loramac_join(&loramac, join_type)) {
+            case SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED:
+                puts("Cannot join: dutycycle restriction");
+                return 1;
+            case SEMTECH_LORAMAC_BUSY:
+                puts("Cannot join: mac is busy");
+                return 1;
+            case SEMTECH_LORAMAC_JOIN_FAILED:
+                puts("Join procedure failed!");
+                return 1;
+            case SEMTECH_LORAMAC_ALREADY_JOINED:
+                puts("Warning: already joined!");
+                return 1;
+            case SEMTECH_LORAMAC_JOIN_SUCCEEDED:
+                puts("Join procedure succeeded!");
+                break;
+            default: /* should not happen */
+                break;
         }
-
-        puts("Join procedure succeeded!");
+        return 0;
     }
     else if (strcmp(argv[1], "tx") == 0) {
         if (argc < 3) {
@@ -396,15 +414,23 @@ static int _cmd_loramac(int argc, char **argv)
         switch (semtech_loramac_send(&loramac,
                                      (uint8_t *)argv[2], strlen(argv[2]))) {
             case SEMTECH_LORAMAC_NOT_JOINED:
-                puts("Failed: not joined");
+                puts("Cannot send: not joined");
+                return 1;
+
+            case SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED:
+                puts("Cannot send: dutycycle restriction");
                 return 1;
 
             case SEMTECH_LORAMAC_BUSY:
-                puts("Failed: mac is busy");
+                puts("Cannot send: MAC is busy");
+                return 1;
+
+            case SEMTECH_LORAMAC_TX_ERROR:
+                puts("Cannot send: error");
                 return 1;
         }
 
-        /* clear the rx buffer of the mac */
+        /* wait for receive windows */
         switch (semtech_loramac_recv(&loramac)) {
             case SEMTECH_LORAMAC_DATA_RECEIVED:
                 loramac.rx_data.payload[loramac.rx_data.payload_len] = 0;
@@ -412,9 +438,17 @@ static int _cmd_loramac(int argc, char **argv)
                        (char *)loramac.rx_data.payload, loramac.rx_data.port);
                 break;
 
-            case SEMTECH_LORAMAC_TX_CNF_FAILED:
-                puts("Confirmable TX failed");
-                break;
+            case SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED:
+                puts("Cannot send: dutycycle restriction");
+                return 1;
+
+            case SEMTECH_LORAMAC_BUSY:
+                puts("Cannot send: MAC is busy");
+                return 1;
+
+            case SEMTECH_LORAMAC_TX_ERROR:
+                puts("Cannot send: error");
+                return 1;
 
             case SEMTECH_LORAMAC_TX_DONE:
                 puts("TX complete, no data received");
@@ -440,6 +474,24 @@ static int _cmd_loramac(int argc, char **argv)
         semtech_loramac_request_link_check(&loramac);
         puts("Link check request scheduled");
     }
+#ifdef MODULE_PERIPH_EEPROM
+    else if (strcmp(argv[1], "save") == 0) {
+        if (argc > 2) {
+            _loramac_usage();
+            return 1;
+        }
+
+        semtech_loramac_save_config(&loramac);
+    }
+    else if (strcmp(argv[1], "erase") == 0) {
+        if (argc > 2) {
+            _loramac_usage();
+            return 1;
+        }
+
+        semtech_loramac_erase_config();
+    }
+#endif
     else {
         _loramac_usage();
         return 1;

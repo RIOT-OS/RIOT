@@ -70,6 +70,27 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    DMA streams configuration
+ * @{
+ */
+#ifdef MODULE_PERIPH_DMA
+static const dma_conf_t dma_config[] = {
+    { .stream = 1 },    /* DMA1 Channel 2 - SPI1_RX */
+    { .stream = 2 },    /* DMA1 Channel 3 - SPI1_TX */
+    { .stream = 3 },    /* DMA1 Channel 4 - USART1_TX */
+    { .stream = 10 },   /* DMA2 Channel 3 - UART4_TX */
+};
+
+#define DMA_0_ISR  isr_dma1_channel2
+#define DMA_1_ISR  isr_dma1_channel3
+#define DMA_2_ISR  isr_dma1_channel4
+#define DMA_3_ISR  isr_dma2_channel3
+
+#define DMA_NUMOF           (sizeof(dma_config) / sizeof(dma_config[0]))
+#endif
+/** @} */
+
+/**
  * @name    Timer configuration
  * @{
  */
@@ -102,9 +123,11 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
         .irqn       = USART1_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 6,
-        .dma_chan   = 4
+        .type       = STM32_USART,
+        .clk_src    = 0, /* Use APB clock */
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 2,
+        .dma_chan   = 2
 #endif
     },
     {
@@ -116,9 +139,11 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB1,
         .irqn       = UART4_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 5,
-        .dma_chan   = 4
+        .type       = STM32_USART,
+        .clk_src    = 0, /* Use APB clock */
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 3,
+        .dma_chan   = 2
 #endif
     }
 };
@@ -182,7 +207,13 @@ static const spi_conf_t spi_config[] = {
         .cs_pin   = GPIO_UNDEF,
         .af       = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2
+        .apbbus   = APB2,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma   = 1,
+        .tx_dma_chan = 1,
+        .rx_dma   = 0,
+        .rx_dma_chan = 1,
+#endif
     }
 };
 
@@ -204,19 +235,24 @@ static const i2c_conf_t i2c_config[] = {
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR1_I2C1EN,
         .irqn           = I2C1_ER_IRQn,
-    }
+    },
+    {
+        .dev            = I2C2,
+        .speed          = I2C_SPEED_NORMAL,
+        .scl_pin        = GPIO_PIN(PORT_B, 10),
+        .sda_pin        = GPIO_PIN(PORT_B, 11),
+        .scl_af         = GPIO_AF4,
+        .sda_af         = GPIO_AF4,
+        .bus            = APB1,
+        .rcc_mask       = RCC_APB1ENR1_I2C2EN,
+        .irqn           = I2C2_ER_IRQn,
+    },
 };
 
 #define I2C_0_ISR           isr_i2c1_er
+#define I2C_1_ISR           isr_i2c2_er
 
 #define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
-/** @} */
-
-/**
- * @name    ADC configuration
- * @{
- */
-#define ADC_NUMOF           (0)
 /** @} */
 
 /**

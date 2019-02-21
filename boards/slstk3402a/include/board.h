@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_slstk3402a Silicon Labs SLSTK3402A starter kit
- * @ingroup     boards
- * @brief       Support for the Silicon Labs SLSTK3402A starter kit
+ * @ingroup     boards_slstk3402a
  * @{
  *
  * @file
@@ -33,12 +31,10 @@ extern "C" {
 
 /**
  * @name    Xtimer configuration
- *
- * The timer runs at 250 KHz to increase accuracy.
  * @{
  */
-#define XTIMER_HZ           (250000UL)
-#define XTIMER_WIDTH        (16)
+#define XTIMER_HZ           (1000000UL)
+#define XTIMER_WIDTH        (32)
 /** @} */
 
 /**

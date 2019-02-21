@@ -49,7 +49,7 @@ void apa102_init(apa102_t *dev, const apa102_params_t *params)
 {
     assert(dev && params);
 
-    memcpy(dev, params, sizeof(apa102_params_t));
+    *dev = *params;
 
     gpio_init(dev->data_pin, GPIO_OUT);
     gpio_init(dev->clk_pin, GPIO_OUT);

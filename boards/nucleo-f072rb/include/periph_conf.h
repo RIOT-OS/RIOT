@@ -23,6 +23,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "cfg_i2c1_pb8_pb9.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -193,7 +194,17 @@ static const spi_conf_t spi_config[] = {
         .af       = GPIO_AF0,
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2
-    }
+    },
+    {
+        .dev      = SPI2,
+        .mosi_pin = GPIO_PIN(PORT_B, 15),
+        .miso_pin = GPIO_PIN(PORT_B, 14),
+        .sclk_pin = GPIO_PIN(PORT_B, 13),
+        .cs_pin   = GPIO_PIN(PORT_B, 12),
+        .af       = GPIO_AF0,
+        .rccmask  = RCC_APB1ENR_SPI2EN,
+        .apbbus   = APB1
+    },
 };
 
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))

@@ -37,7 +37,7 @@ ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
 ifneq (,$(filter xtimer,$(USEMODULE)))
-  SRC += sc_icmpv6_echo.c
+  SRC += sc_gnrc_icmpv6_echo.c
 endif
 endif
 ifneq (,$(filter gnrc_pktbuf_cmd,$(USEMODULE)))
@@ -66,8 +66,11 @@ endif
 ifneq (,$(filter conn_can,$(USEMODULE)))
   SRC += sc_can.c
 endif
+ifneq (,$(filter cord_ep,$(USEMODULE)))
+  SRC += sc_cord_ep.c
+endif
 
-ifneq (,$(filter periph_rtc,$(FEATURES_PROVIDED)))
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
   SRC += sc_rtc.c
 endif
 

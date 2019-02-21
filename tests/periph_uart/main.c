@@ -28,7 +28,7 @@
 #include "msg.h"
 #include "ringbuffer.h"
 #include "periph/uart.h"
-#include "uart_stdio.h"
+#include "stdio_uart.h"
 #include "xtimer.h"
 
 #define SHELL_BUFSIZE       (128U)
@@ -39,8 +39,8 @@
 
 #define POWEROFF_DELAY      (250U * US_PER_MS)      /* quarter of a second */
 
-#ifndef UART_STDIO_DEV
-#define UART_STDIO_DEV      (UART_UNDEF)
+#ifndef STDIO_UART_DEV
+#define STDIO_UART_DEV      (UART_UNDEF)
 #endif
 
 typedef struct {
@@ -53,6 +53,15 @@ static uart_ctx_t ctx[UART_NUMOF];
 static kernel_pid_t printer_pid;
 static char printer_stack[THREAD_STACKSIZE_MAIN];
 
+#ifdef MODULE_PERIPH_UART_MODECFG
+static uart_data_bits_t data_bits_lut[] = { UART_DATA_BITS_5, UART_DATA_BITS_6,
+                                            UART_DATA_BITS_7, UART_DATA_BITS_8 };
+static int data_bits_lut_len = sizeof(data_bits_lut)/sizeof(data_bits_lut[0]);
+
+static uart_stop_bits_t stop_bits_lut[] = { UART_STOP_BITS_1, UART_STOP_BITS_2 };
+static int stop_bits_lut_len = sizeof(stop_bits_lut)/sizeof(stop_bits_lut[0]);
+#endif
+
 static int parse_dev(char *arg)
 {
     unsigned dev = atoi(arg);
@@ -60,7 +69,7 @@ static int parse_dev(char *arg)
         printf("Error: Invalid UART_DEV device specified (%u).\n", dev);
         return -1;
     }
-    else if (UART_DEV(dev) == UART_STDIO_DEV) {
+    else if (UART_DEV(dev) == STDIO_UART_DEV) {
         printf("Error: The selected UART_DEV(%u) is used for the shell!\n", dev);
         return -2;
     }
@@ -133,7 +142,7 @@ static int cmd_init(int argc, char **argv)
     if (dev < 0) {
         return 1;
     }
-    baud = atoi(argv[2]);
+    baud = strtol(argv[2], NULL, 0);
 
     /* initialize UART */
     res = uart_init(UART_DEV(dev), baud, rx_cb, (void *)dev);
@@ -142,10 +151,10 @@ static int cmd_init(int argc, char **argv)
         return 1;
     }
     else if (res != UART_OK) {
-        puts("Error: Unable to initialize UART device\n");
+        puts("Error: Unable to initialize UART device");
         return 1;
     }
-    printf("Success: Successfully initialized UART_DEV(%i)\n", dev);
+    printf("Success: Initialized UART_DEV(%i) at BAUD %"PRIu32"\n", dev, baud);
 
     /* also test if poweron() and poweroff() work (or at least don't break
      * anything) */
@@ -153,6 +162,74 @@ static int cmd_init(int argc, char **argv)
 
     return 0;
 }
+
+#ifdef MODULE_PERIPH_UART_MODECFG
+static int cmd_mode(int argc, char **argv)
+{
+    int dev, data_bits_arg, stop_bits_arg;
+    uart_data_bits_t data_bits;
+    uart_parity_t  parity;
+    uart_stop_bits_t  stop_bits;
+
+    if (argc < 5) {
+        printf("usage: %s <dev> <data bits> <parity> <stop bits>\n", argv[0]);
+        return 1;
+    }
+
+    dev = parse_dev(argv[1]);
+    if (dev < 0) {
+        return 1;
+    }
+
+    data_bits_arg = atoi(argv[2]) - 5;
+    if (data_bits_arg >= 0 && data_bits_arg < data_bits_lut_len) {
+        data_bits = data_bits_lut[data_bits_arg];
+    }
+    else {
+        printf("Error: Invalid number of data_bits (%i).\n", data_bits_arg + 5);
+        return 1;
+    }
+
+    argv[3][0] &= ~0x20;
+    switch (argv[3][0]) {
+        case 'N':
+            parity = UART_PARITY_NONE;
+            break;
+        case 'E':
+            parity = UART_PARITY_EVEN;
+            break;
+        case 'O':
+            parity = UART_PARITY_ODD;
+            break;
+        case 'M':
+            parity = UART_PARITY_MARK;
+            break;
+        case 'S':
+            parity = UART_PARITY_SPACE;
+            break;
+        default:
+            printf("Error: Invalid parity (%c).\n", argv[3][0]);
+            return 1;
+    }
+
+    stop_bits_arg = atoi(argv[4]) - 1;
+    if (stop_bits_arg >= 0 && stop_bits_arg < stop_bits_lut_len) {
+        stop_bits = stop_bits_lut[stop_bits_arg];
+    }
+    else {
+        printf("Error: Invalid number of stop bits (%i).\n", stop_bits_arg + 1);
+        return 1;
+    }
+
+    if (uart_mode(UART_DEV(dev), data_bits, parity, stop_bits) != UART_OK) {
+        puts("Error: Unable to apply UART settings");
+        return 1;
+    }
+    printf("Success: Successfully applied UART_DEV(%i) settings\n", dev);
+
+    return 0;
+}
+#endif /* MODULE_PERIPH_UART_MODECFG */
 
 static int cmd_send(int argc, char **argv)
 {
@@ -177,6 +254,9 @@ static int cmd_send(int argc, char **argv)
 
 static const shell_command_t shell_commands[] = {
     { "init", "Initialize a UART device with a given baudrate", cmd_init },
+#ifdef MODULE_PERIPH_UART_MODECFG
+    { "mode", "Setup data bits, stop bits and parity for a given UART device", cmd_mode },
+#endif
     { "send", "Send a string through given UART device", cmd_send },
     { NULL, NULL, NULL }
 };
@@ -196,14 +276,14 @@ int main(void)
          "NOTE: all strings need to be '\\n' terminated!\n");
 
     /* do sleep test for UART used as STDIO. There is a possibility that the
-     * value given in UART_STDIO_DEV is not a numeral (depends on the CPU
+     * value given in STDIO_UART_DEV is not a numeral (depends on the CPU
      * implementation), so we rather break the output by printing a
      * non-numerical value instead of breaking the UART device descriptor */
-    sleep_test(UART_STDIO_DEV, UART_STDIO_DEV);
+    sleep_test(STDIO_UART_DEV, STDIO_UART_DEV);
 
     puts("\nUART INFO:");
     printf("Available devices:               %i\n", UART_NUMOF);
-    printf("UART used for STDIO (the shell): UART_DEV(%i)\n\n", UART_STDIO_DEV);
+    printf("UART used for STDIO (the shell): UART_DEV(%i)\n\n", STDIO_UART_DEV);
 
     /* initialize ringbuffers */
     for (unsigned i = 0; i < UART_NUMOF; i++) {

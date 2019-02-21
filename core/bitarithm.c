@@ -57,6 +57,17 @@ unsigned bitarithm_bits_set(unsigned v)
     return c;
 }
 
+#if !ARCH_32_BIT
+uint8_t bitarithm_bits_set_u32(uint32_t v)
+{
+    uint8_t c;
+    for (c = 0; v; c++) {
+        v &= v - 1; /* clear the least significant bit set */
+    }
+    return c;
+}
+#endif
+
 const uint8_t MultiplyDeBruijnBitPosition[32] =
 {
     0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,

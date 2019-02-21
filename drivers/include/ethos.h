@@ -21,6 +21,8 @@
 #ifndef ETHOS_H
 #define ETHOS_H
 
+#include <stdbool.h>
+
 #include "kernel_types.h"
 #include "periph/uart.h"
 #include "net/netdev.h"
@@ -31,14 +33,14 @@
 extern "C" {
 #endif
 
-/* if using ethos + stdio, use UART_STDIO values unless overridden */
+/* if using ethos + stdio, use STDIO_UART values unless overridden */
 #ifdef USE_ETHOS_FOR_STDIO
-#include "uart_stdio.h"
+#include "stdio_uart.h"
 #ifndef ETHOS_UART
-#define ETHOS_UART     UART_STDIO_DEV
+#define ETHOS_UART     STDIO_UART_DEV
 #endif
 #ifndef ETHOS_BAUDRATE
-#define ETHOS_BAUDRATE UART_STDIO_BAUDRATE
+#define ETHOS_BAUDRATE STDIO_UART_BAUDRATE
 #endif
 #endif
 
@@ -78,6 +80,7 @@ typedef struct {
     unsigned frametype;     /**< type of currently incoming frame */
     size_t last_framesize;  /**< size of last completed frame */
     mutex_t out_mutex;      /**< mutex used for locking concurrent sends */
+    bool accept_new;        /**< incoming frame can be stored or not */
 } ethos_t;
 
 /**

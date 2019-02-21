@@ -57,13 +57,9 @@ else:
 
 
 # Reading command line
-# if len(sys.argv) != 3:
-#     exit('! Usage: robotis-loader.py <serial-port> <binary>')
-# pgm, port, binary = sys.argv
-
-pgm = sys.argv[0]
-port = os.environ["PORT"]
-binary = os.environ["HEXFILE"]
+if len(sys.argv) != 3:
+    exit('! Usage: robotis-loader.py <serial-port> <binary>')
+pgm, port, binary = sys.argv
 
 
 def progressBar(percent, precision=65):

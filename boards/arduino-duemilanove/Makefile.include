@@ -3,15 +3,21 @@ export CPU = atmega328p
 
 USEMODULE += boards_common_arduino-atmega
 
-#export needed for flash rule
-export PORT_LINUX ?= /dev/ttyUSB0
-export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-export PROGRAMMER_SPEED ?= 57600
+# configure the terminal program
+PORT_LINUX  ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+BAUD        ?= 9600
 
-export FFLAGS += -p m328p
+# PROGRAMMER defaults to arduino which is the internal flasher via USB
+# using avrdude. Can be overridden for debugging (which requires changes
+# that require to use an ISP)
+PROGRAMMER ?= arduino
+# set mcu model for avrdude
+FFLAGS += -p m328p
+# configure programmer speed in baud
+FFLAGS_EXTRA += -b 57600
 
-# PROGRAMMER defaults to arduino which is the internal flasher via USB. Can be
-# overridden for debugging (which requires changes that require to use an ISP)
-export PROGRAMMER ?= arduino
+BOOTLOADER_SIZE ?= 2K
+ROM_RESERVED ?= $(BOOTLOADER_SIZE)
 
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

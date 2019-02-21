@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_frdm-k22f NXP FRDM-K22F Board
- * @ingroup     boards
- * @brief       Support for the NXP FRDM-K22F
+ * @ingroup     boards_frdm-k22f
  * @{
  *
  * @file
@@ -52,6 +50,20 @@ extern "C"
 #define LED2_ON            (GPIOD->PCOR = LED2_MASK)
 #define LED2_OFF           (GPIOD->PSOR = LED2_MASK)
 #define LED2_TOGGLE        (GPIOD->PTOR = LED2_MASK)
+/** @} */
+
+/**
+ * @name    Button pin definitions
+ * @{
+ */
+/* SW2, SW3 will short these pins to ground when pushed. Both pins have external
+ * pull-up resistors to VDD */
+/* BTN0 is mapped to SW2 */
+#define BTN0_PIN            GPIO_PIN(PORT_C,  1)
+#define BTN0_MODE           GPIO_IN
+/* BTN1 is mapped to SW3 */
+#define BTN1_PIN            GPIO_PIN(PORT_B, 17)
+#define BTN1_MODE           GPIO_IN
 /** @} */
 
 /**

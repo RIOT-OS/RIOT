@@ -78,6 +78,15 @@ static void _usage_nib_route(char **argv)
     printf("       %s %s show [iface]\n", argv[0], argv[1]);
 }
 
+static inline gnrc_netif_t *_get_iface(unsigned iface)
+{
+     /* To prevent integer overflow we can't use pid_is_valid() since it
+      * itself would cause an overflow due to the cast to `kernel_pid_t` */
+    return (iface <= ((unsigned)KERNEL_PID_LAST))
+           ? gnrc_netif_get_by_pid(iface)
+           : NULL;
+}
+
 static int _nib_neigh(int argc, char **argv)
 {
     if ((argc == 2) || (strcmp(argv[2], "show") == 0)) {
@@ -101,6 +110,10 @@ static int _nib_neigh(int argc, char **argv)
         size_t l2addr_len = 0;
         unsigned iface = atoi(argv[3]);
 
+        if (_get_iface(iface) == NULL) {
+            printf("Interface %u does not exist\n", iface);
+            return 1;
+        }
         if (ipv6_addr_from_str(&ipv6_addr, argv[4]) == NULL) {
             _usage_nib_neigh(argv);
             return 1;
@@ -116,6 +129,10 @@ static int _nib_neigh(int argc, char **argv)
         ipv6_addr_t ipv6_addr;
         unsigned iface = atoi(argv[3]);
 
+        if (_get_iface(iface) == NULL) {
+            printf("Interface %u does not exist\n", iface);
+            return 1;
+        }
         if (ipv6_addr_from_str(&ipv6_addr, argv[4]) == NULL) {
             _usage_nib_neigh(argv);
             return 1;
@@ -138,6 +155,10 @@ static int _nib_prefix(int argc, char **argv)
 
         if (argc > 3) {
             iface = atoi(argv[3]);
+            if (_get_iface(iface) == NULL) {
+                printf("Interface %u does not exist\n", iface);
+                return 1;
+            }
         }
         while (gnrc_ipv6_nib_pl_iter(iface, &state, &entry)) {
             gnrc_ipv6_nib_pl_print(&entry);
@@ -152,6 +173,10 @@ static int _nib_prefix(int argc, char **argv)
         unsigned pfx_len = ipv6_addr_split_prefix(argv[4]);
         uint32_t valid_ltime = UINT32_MAX, pref_ltime = UINT32_MAX;
 
+        if (_get_iface(iface) == NULL) {
+            printf("Interface %u does not exist\n", iface);
+            return 1;
+        }
         if (ipv6_addr_from_str(&pfx, argv[4]) == NULL) {
             _usage_nib_prefix(argv);
             return 1;
@@ -175,6 +200,10 @@ static int _nib_prefix(int argc, char **argv)
         unsigned iface = atoi(argv[3]);
         unsigned pfx_len = ipv6_addr_split_prefix(argv[4]);
 
+        if (_get_iface(iface) == NULL) {
+            printf("Interface %u does not exist\n", iface);
+            return 1;
+        }
         if (ipv6_addr_from_str(&pfx, argv[4]) == NULL) {
             _usage_nib_prefix(argv);
             return 1;
@@ -197,6 +226,10 @@ static int _nib_route(int argc, char **argv)
 
         if (argc > 3) {
             iface = atoi(argv[3]);
+            if (_get_iface(iface) == NULL) {
+                printf("Interface %u does not exist\n", iface);
+                return 1;
+            }
         }
         while (gnrc_ipv6_nib_ft_iter(NULL, iface, &state, &entry)) {
             gnrc_ipv6_nib_ft_print(&entry);
@@ -211,6 +244,10 @@ static int _nib_route(int argc, char **argv)
         unsigned pfx_len = ipv6_addr_split_prefix(argv[4]);
         uint16_t ltime = 0;
 
+        if (_get_iface(iface) == NULL) {
+            printf("Interface %u does not exist\n", iface);
+            return 1;
+        }
         if (ipv6_addr_from_str(&pfx, argv[4]) == NULL) {
             /* check if string equals "default"
              * => keep pfx as unspecified address == default route */

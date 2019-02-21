@@ -36,16 +36,15 @@ extern "C" {
  * @name    Definitions for messages exchanged between the MAC and call threads
  * @{
  */
-#define MSG_TYPE_ISR                   (0x3456)  /**< radio device ISR */
-#define MSG_TYPE_RX_TIMEOUT            (0x3457)  /**< radio driver RX timeout */
-#define MSG_TYPE_TX_TIMEOUT            (0x3458)  /**< radio driver TX timeout */
-#define MSG_TYPE_MAC_TIMEOUT           (0x3459)  /**< MAC timers timeout */
-#define MSG_TYPE_LORAMAC_CMD           (0x3460)  /**< Command sent to the MAC */
-#define MSG_TYPE_LORAMAC_JOIN          (0x3461)  /**< MAC join event */
-#define MSG_TYPE_LORAMAC_TX_DONE       (0x3462)  /**< MAC TX completes */
-#define MSG_TYPE_LORAMAC_RX            (0x3463)  /**< Some data received */
-#define MSG_TYPE_LORAMAC_LINK_CHECK    (0x3464)  /**< Link check info received */
-#define MSG_TYPE_LORAMAC_TX_CNF_FAILED (0x3465)  /**< MAC TX confirmed failed */
+#define MSG_TYPE_ISR                   (0x3456) /**< radio device ISR */
+#define MSG_TYPE_RX_TIMEOUT            (0x3457) /**< radio driver RX timeout */
+#define MSG_TYPE_TX_TIMEOUT            (0x3458) /**< radio driver TX timeout */
+#define MSG_TYPE_MAC_TIMEOUT           (0x3459) /**< MAC timers timeout */
+#define MSG_TYPE_LORAMAC_CMD           (0x3460) /**< Command sent to the MAC */
+#define MSG_TYPE_LORAMAC_JOIN          (0x3461) /**< MAC join event */
+#define MSG_TYPE_LORAMAC_TX_STATUS     (0x3462) /**< MAC TX status */
+#define MSG_TYPE_LORAMAC_RX            (0x3463) /**< Some data received */
+#define MSG_TYPE_LORAMAC_LINK_CHECK    (0x3464) /**< Link check info received */
 /** @} */
 
 /**
@@ -57,14 +56,18 @@ extern "C" {
  * @brief   LoRaMAC return status
  */
 enum {
-    SEMTECH_LORAMAC_JOIN_SUCCEEDED,              /**< Join procedure succeeded */
-    SEMTECH_LORAMAC_JOIN_FAILED,                 /**< Join procedure failed */
-    SEMTECH_LORAMAC_NOT_JOINED,                  /**< MAC is not joined */
-    SEMTECH_LORAMAC_TX_SCHEDULED,                /**< TX data scheduled */
-    SEMTECH_LORAMAC_TX_DONE,                     /**< Transmission completed */
-    SEMTECH_LORAMAC_TX_CNF_FAILED,               /**< Confirmable transmission failed */
-    SEMTECH_LORAMAC_DATA_RECEIVED,               /**< Data received */
-    SEMTECH_LORAMAC_BUSY                         /**< Internal MAC is busy */
+    SEMTECH_LORAMAC_JOIN_SUCCEEDED,             /**< Join procedure succeeded */
+    SEMTECH_LORAMAC_JOIN_FAILED,                /**< Join procedure failed */
+    SEMTECH_LORAMAC_NOT_JOINED,                 /**< MAC is not joined */
+    SEMTECH_LORAMAC_ALREADY_JOINED,             /**< MAC is already joined */
+    SEMTECH_LORAMAC_TX_OK,                      /**< Transmission is in progress */
+    SEMTECH_LORAMAC_TX_SCHEDULE,                /**< TX needs reschedule */
+    SEMTECH_LORAMAC_TX_DONE,                    /**< Transmission completed */
+    SEMTECH_LORAMAC_TX_CNF_FAILED,              /**< Confirmable transmission failed */
+    SEMTECH_LORAMAC_TX_ERROR,                   /**< Error in TX (invalid param, unknown service) */
+    SEMTECH_LORAMAC_DATA_RECEIVED,              /**< Data received */
+    SEMTECH_LORAMAC_BUSY,                       /**< Internal MAC is busy */
+    SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED        /**< Restricted access to channels */
 };
 
 /**
@@ -106,7 +109,6 @@ typedef struct {
  */
 typedef struct {
     mutex_t lock;                                /**< loramac access lock */
-    uint8_t state;                               /**< internal loramac state */
     uint8_t caller_pid;                          /**< pid of caller thread */
     uint8_t port;                                /**< application TX port */
     uint8_t cnf;                                 /**< enable/disable confirmable messages */
@@ -147,17 +149,22 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type);
 /**
  * @brief   Sends data to the LoRaWAN network
  *
- * This function returns immediately and leave the mac in busy state until a
- * message is received from the network (with RX1 and RX2 receive windows).
+ * This function returns after TX status is replied from the MAC. To receive
+ * potential messages sent from the network an explicit call to
+ * @ref semtech_loramac_recv must be done after this function if it returned
+ * @ref SEMTECH_LORAMAC_TX_OK and within the RX windows delays.
+ *
  * @see semtech_loramac_recv
  *
  * @param[in] mac          Pointer to the mac
  * @param[in] data         The TX data
  * @param[in] len          The length of the TX data
  *
+ * @return SEMTECH_LORAMAC_TX_OK when the message can be transmitted
  * @return SEMTECH_LORAMAC_NOT_JOINED when the network is not joined
  * @return SEMTECH_LORAMAC_BUSY when the mac is already active (join or tx in progress)
- * @return SEMTECH_LORAMAC_TX_SCHEDULED when the TX is scheduled in the mac
+ * @return SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED when the send is rejected because of dutycycle restriction
+ * @return SEMTECH_LORAMAC_TX_ERROR when an invalid parameter is given
  */
 uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len);
 
@@ -169,6 +176,9 @@ uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
  * With a class A device, a message can only be received after a send. With a
  * class C device, a message can be received at any time. In this case, this
  * function can be used in a dedicated listener thread.
+ *
+ * Be sure to call this function before the end of the RX windows otherwise it
+ * may block the calling thread.
  *
  * @see semtech_loramac_send
  *
@@ -387,6 +397,22 @@ uint8_t semtech_loramac_get_tx_power(semtech_loramac_t *mac);
 void semtech_loramac_set_tx_port(semtech_loramac_t *mac, uint8_t port);
 
 /**
+ * @brief   Sets the maximum system overall timing error for RX (in ms)
+ *
+ * @param[in] mac          Pointer to the mac
+ * @param[in] error        The maximum rx timing error
+ */
+void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, int error);
+
+/**
+ * @brief   Sets the minimum required number of symbols to detect a frame
+ *
+ * @param[in] mac          Pointer to the mac
+ * @param[in] min_rx       The minimum rx symbols
+ */
+void semtech_loramac_set_min_rx_symbols(semtech_loramac_t *mac, int min_rx);
+
+/**
  * @brief   Gets the TX application port
  *
  * @param[in] mac          Pointer to the mac
@@ -441,6 +467,41 @@ void semtech_loramac_set_rx2_dr(semtech_loramac_t *mac, uint8_t dr);
  * @return                 The RX2 datarate
  */
 uint8_t semtech_loramac_get_rx2_dr(semtech_loramac_t *mac);
+
+#ifdef MODULE_PERIPH_EEPROM
+/**
+ * @brief   The magic number used to identify the LoRaWAN configuration
+ */
+#ifndef SEMTECH_LORAMAC_EEPROM_MAGIC
+#define SEMTECH_LORAMAC_EEPROM_MAGIC        {0x52, 0x49, 0x4F, 0x54} /* RIOT */
+#endif
+
+/**
+ * @brief   The magic number length used to identify the LoRaWAN configuration
+ */
+#ifndef SEMTECH_LORAMAC_EEPROM_MAGIC_LEN
+#define SEMTECH_LORAMAC_EEPROM_MAGIC_LEN    4
+#endif
+
+/**
+ * @brief   Start position of LoRaWAN configuration stored in eeprom
+ */
+#ifndef SEMTECH_LORAMAC_EEPROM_START
+#define SEMTECH_LORAMAC_EEPROM_START        (0)
+#endif
+
+/**
+ * @brief   Saves the current LoRaWAN configuration to the internal EEPROM
+ *
+ * @param[in] mac           Pointer to the mac
+ */
+void semtech_loramac_save_config(semtech_loramac_t *mac);
+
+/**
+ * @brief   Erases any stored LoRaWAN configuration from the internal EEPROM
+ */
+void semtech_loramac_erase_config(void);
+#endif
 
 #ifdef __cplusplus
 }

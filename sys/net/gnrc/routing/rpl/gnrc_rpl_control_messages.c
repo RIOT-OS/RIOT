@@ -16,6 +16,8 @@
  * @author Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
+#include <string.h>
+
 #include "net/af.h"
 #include "net/icmpv6.h"
 #include "net/ipv6/hdr.h"
@@ -314,7 +316,6 @@ void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination,
                        gnrc_rpl_internal_opt_t **options, size_t num_opts)
 {
     gnrc_pktsnip_t *pkt = NULL, *tmp;
-    icmpv6_hdr_t *icmp;
     gnrc_rpl_dis_t *dis;
 
     /* No options provided to be attached to the DIS, so we PadN 2 bytes */
@@ -358,6 +359,9 @@ void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination,
         return;
     }
     pkt = tmp;
+    dis = (gnrc_rpl_dis_t *)pkt->data;
+    dis->flags = 0;
+    dis->reserved = 0;
 
     if ((tmp = gnrc_icmpv6_build(pkt, ICMPV6_RPL_CTRL, GNRC_RPL_ICMPV6_CODE_DIS,
                                  sizeof(icmpv6_hdr_t))) == NULL) {
@@ -366,12 +370,6 @@ void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination,
         return;
     }
     pkt = tmp;
-
-    icmp = (icmpv6_hdr_t *)pkt->data;
-    dis = (gnrc_rpl_dis_t *)(icmp + 1);
-    dis->flags = 0;
-    dis->reserved = 0;
-
 #ifdef MODULE_NETSTATS_RPL
     gnrc_rpl_netstats_tx_DIS(&gnrc_rpl_netstats, gnrc_pkt_len(pkt),
                              (destination && !ipv6_addr_is_multicast(destination)));
@@ -606,8 +604,9 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
             if (gnrc_rpl_instances[i].state != 0) {
 
                 uint32_t included_opts = 0;
+                size_t opt_len = len - sizeof(gnrc_rpl_dis_t) - sizeof(icmpv6_hdr_t);
                 if(!_parse_options(GNRC_RPL_ICMPV6_CODE_DIS, &gnrc_rpl_instances[i],
-                                   (gnrc_rpl_opt_t *)(dis + 1), len, src, &included_opts)) {
+                                   (gnrc_rpl_opt_t *)(dis + 1), opt_len, src, &included_opts)) {
                     DEBUG("RPL: DIS option parsing error - skip processing the DIS\n");
                     continue;
                 }

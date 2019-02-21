@@ -121,7 +121,11 @@ static int _adc_configure(adc_res_t res)
     }
 #else /* CPU_SAML21 */
     /* Power on */
+#ifdef CPU_SAML1X
+    MCLK->APBCMASK.reg |= MCLK_APBCMASK_ADC;
+#else
     MCLK->APBDMASK.reg |= MCLK_APBDMASK_ADC;
+#endif
     /* GCLK Setup */
     GCLK->PCHCTRL[ADC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
     /* Set Voltage Reference */
@@ -152,6 +156,10 @@ static int _adc_configure(adc_res_t res)
 
 int adc_init(adc_t line)
 {
+    if (line >= ADC_NUMOF) {
+        DEBUG("adc: line arg not applicable\n");
+        return -1;
+    }
     _prep();
     gpio_init(adc_channels[line].pin, GPIO_IN);
     gpio_init_mux(adc_channels[line].pin, GPIO_MUX_B);

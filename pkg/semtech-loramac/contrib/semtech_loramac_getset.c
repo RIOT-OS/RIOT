@@ -24,7 +24,6 @@
 
 #include "net/loramac.h"
 
-#include "semtech-loramac/board.h"
 #include "LoRaMac.h"
 
 #define ENABLE_DEBUG (0)
@@ -252,6 +251,26 @@ void semtech_loramac_set_tx_mode(semtech_loramac_t *mac, uint8_t mode)
 uint8_t semtech_loramac_get_tx_mode(semtech_loramac_t *mac)
 {
     return mac->cnf;
+}
+
+void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, int error)
+{
+    MibRequestConfirm_t mibReq;
+    mutex_lock(&mac->lock);
+    mibReq.Type = MIB_SYSTEM_MAX_RX_ERROR;
+    mibReq.Param.SystemMaxRxError = error;
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
+}
+
+void semtech_loramac_set_min_rx_symbols(semtech_loramac_t *mac, int min_rx)
+{
+    MibRequestConfirm_t mibReq;
+    mutex_lock(&mac->lock);
+    mibReq.Type = MIB_MIN_RX_SYMBOLS;
+    mibReq.Param.MinRxSymbols = min_rx;
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
 }
 
 static void _semtech_loramac_set_rx2_params(semtech_loramac_channel_params_t params)

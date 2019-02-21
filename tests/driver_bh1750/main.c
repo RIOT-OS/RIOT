@@ -35,7 +35,7 @@ int main(void)
     puts("BH1750FVI ambient light sensor test\n");
 
     /* initialize the device */
-    res = bh1750fvi_init(&dev, (bh1750fvi_params_t *)(&bh1750fvi_params));
+    res = bh1750fvi_init(&dev, &bh1750fvi_params[0]);
     if (res != BH1750FVI_OK) {
         puts("error: unable to initialize sensor [I2C initialization error]");
         return 1;

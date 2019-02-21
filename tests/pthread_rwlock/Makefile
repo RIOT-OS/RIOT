@@ -16,6 +16,3 @@ BOARD_INSUFFICIENT_MEMORY += chronos msb-430 msb-430h nucleo-f031k6 \
                              stm32f0discovery
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	tests/01-run.py

@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_stm32f3discovery STM32F3Discovery
- * @ingroup     boards
- * @brief       Support for the STM32F3Discovery board
+ * @ingroup     boards_stm32f3discovery
  * @{
  *
  * @file

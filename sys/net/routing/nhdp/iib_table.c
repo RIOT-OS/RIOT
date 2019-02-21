@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <string.h>
+
 #include "mutex.h"
 #include "timex.h"
 #include "xtimer.h"

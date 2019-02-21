@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Eistec AB
+ *               2018 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,46 +15,103 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+/* Default is smaller implementation */
+#ifndef PHYDAT_FIT_TRADE_PRECISION_FOR_ROM
+#define PHYDAT_FIT_TRADE_PRECISION_FOR_ROM 1
+#endif
+
 static void test_phydat_fit(void)
 {
-    /* verify that these big numbers are scaled to fit in phydat_t::val which is int16_t */
-    long val0 =   100445;
-    long val1 =  2000954;
-    long val2 = 30000455;
-    long val4 =  1234567;
-    phydat_t dat;
-    dat.scale = -6;
-    dat.unit = UNIT_V;
-    uint8_t res = phydat_fit(&dat, val0, 0, 0);
-    /* Check that the result was rescaled to 10044e-5 */
-    /* The scaled number is rounded toward zero */
-    TEST_ASSERT_EQUAL_INT(1, res);
-    TEST_ASSERT_EQUAL_INT(UNIT_V, dat.unit);
-    TEST_ASSERT_EQUAL_INT(-5, dat.scale);
-    TEST_ASSERT_EQUAL_INT( 10044, dat.val[0]);
-    /* Fit the next value in the phydat vector */
-    res = phydat_fit(&dat, val1, 1, res);
-    TEST_ASSERT_EQUAL_INT(2, res);
-    TEST_ASSERT_EQUAL_INT(UNIT_V, dat.unit);
-    TEST_ASSERT_EQUAL_INT(-4, dat.scale);
-    TEST_ASSERT_EQUAL_INT(  1004, dat.val[0]);
-    TEST_ASSERT_EQUAL_INT( 20009, dat.val[1]);
-    /* Fit the third value in the phydat vector */
-    res = phydat_fit(&dat, val2, 2, res);
-    TEST_ASSERT_EQUAL_INT(3, res);
-    TEST_ASSERT_EQUAL_INT(UNIT_V, dat.unit);
-    TEST_ASSERT_EQUAL_INT(-3, dat.scale);
-    TEST_ASSERT_EQUAL_INT(   100, dat.val[0]);
-    TEST_ASSERT_EQUAL_INT(  2000, dat.val[1]);
-    TEST_ASSERT_EQUAL_INT( 30000, dat.val[2]);
-    /* Overwrite the second value in the phydat vector */
-    res = phydat_fit(&dat, val4, 1, res);
-    TEST_ASSERT_EQUAL_INT(3, res);
-    TEST_ASSERT_EQUAL_INT(UNIT_V, dat.unit);
-    TEST_ASSERT_EQUAL_INT(-3, dat.scale);
-    TEST_ASSERT_EQUAL_INT(   100, dat.val[0]);
-    TEST_ASSERT_EQUAL_INT(  1234, dat.val[1]);
-    TEST_ASSERT_EQUAL_INT( 30000, dat.val[2]);
+    /* Input values for each test: */
+    static const int32_t values[][3] = {
+        { 100445, -1, -1 },
+        { -5, 2000954, 3 },
+        { 30000449, -30000450, 30000500 },
+        { -30000449, -30000499, -30000500 },
+        { 0, 0, 1234567 },
+        { 32768, 32768, 32768 },
+        { 32767, 32767, 32767 },
+        { 32766, 32766, 32766 },
+        { -32769, -32769, -32769 },
+        { -32768, -32768, -32768 },
+        { -32767, -32767, -32767 },
+        { -32766, -32766, -32766 },
+    };
+    static const int8_t scales[] = {
+        -6,
+        42,
+        0,
+        -1,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    };
+    static const unsigned int dims[] = {
+        1,
+        2,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+    };
+    static const uint8_t units[] = {
+        UNIT_V,
+        UNIT_A,
+        UNIT_NONE,
+        UNIT_LUX,
+        UNIT_M,
+        UNIT_NONE,
+        UNIT_NONE,
+        UNIT_NONE,
+        UNIT_NONE,
+        UNIT_NONE,
+        UNIT_NONE,
+        UNIT_NONE,
+    };
+    /* Expected output values for each test: */
+    static const phydat_t expected[] = {
+        { .val = {  10045,     -1,     -1 }, .unit = UNIT_V,    .scale = -5 },
+        { .val = {      0,  20010,     -1 }, .unit = UNIT_A,    .scale = 44 },
+        { .val = {  30000, -30000,  30001 }, .unit = UNIT_NONE, .scale =  3 },
+        { .val = { -30000, -30000, -30001 }, .unit = UNIT_LUX,  .scale =  2 },
+        { .val = {      0,      0,  12346 }, .unit = UNIT_M,    .scale =  7 },
+        { .val = {   3277,   3277,   3277 }, .unit = UNIT_NONE, .scale =  1 },
+        { .val = {  32767,  32767,  32767 }, .unit = UNIT_NONE, .scale =  0 },
+        { .val = {  32766,  32766,  32766 }, .unit = UNIT_NONE, .scale =  0 },
+        { .val = {  -3277,  -3277,  -3277 }, .unit = UNIT_NONE, .scale =  1 },
+#if PHYDAT_FIT_TRADE_PRECISION_FOR_ROM
+        { .val = {  -3277,  -3277,  -3277 }, .unit = UNIT_NONE, .scale =  1 },
+#else
+        { .val = { -32768, -32768, -32768 }, .unit = UNIT_NONE, .scale =  0 },
+#endif
+        { .val = { -32767, -32767, -32767 }, .unit = UNIT_NONE, .scale =  0 },
+        { .val = { -32766, -32766, -32766 }, .unit = UNIT_NONE, .scale =  0 },
+    };
+
+    for (unsigned int i = 0; i < sizeof(dims) / sizeof(dims[0]); i++) {
+        phydat_t dat = {
+            .val = { -1, -1, -1 },
+            .scale = scales[i],
+            .unit = units[i]
+        };
+        phydat_fit(&dat, values[i], dims[i]);
+        TEST_ASSERT_EQUAL_INT(expected[i].val[0], dat.val[0]);
+        TEST_ASSERT_EQUAL_INT(expected[i].val[1], dat.val[1]);
+        TEST_ASSERT_EQUAL_INT(expected[i].val[2], dat.val[2]);
+        TEST_ASSERT_EQUAL_INT(expected[i].scale, dat.scale);
+        TEST_ASSERT_EQUAL_INT(expected[i].unit, dat.unit);
+    }
 }
 
 Test *tests_phydat_tests(void)

@@ -3,11 +3,13 @@ include ../Makefile.tests_common
 # lwIP's memory management doesn't seem to work on non 32-bit platforms at the
 # moment.
 BOARD_BLACKLIST := arduino-uno arduino-duemilanove arduino-mega2560 chronos \
+                   esp8266-esp-12x esp8266-olimex-mod esp8266-sparkfun-thing \
                    msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b \
                    wsn430-v1_4 z1 jiminy-mega256rfr2 mega-xplained
-BOARD_INSUFFICIENT_MEMORY = nucleo-f031k6 nucleo-f042k6 nucleo-l031k6 nucleo-f030r8 \
+BOARD_INSUFFICIENT_MEMORY = blackpill bluepill nucleo-f031k6 nucleo-f042k6 \
+                            nucleo-l031k6 nucleo-f030r8 nucleo-f302r8 \
                             nucleo-f303k8 nucleo-f334r8 nucleo-l053r8 \
-                            stm32f0discovery
+                            saml10-xpro saml11-xpro stm32f0discovery
 
 LWIP_IPV4 ?= 0
 
@@ -27,7 +29,7 @@ ifneq (0, $(LWIP_IPV6))
 endif
 
 USEMODULE += inet_csum
-USEMODULE += lwip_ethernet lwip_netdev
+USEMODULE += lwip_netdev
 USEMODULE += lwip_sock_tcp
 USEMODULE += netdev_eth
 USEMODULE += netdev_test
@@ -42,6 +44,3 @@ CFLAGS += -DLWIP_NETIF_LOOPBACK=1
 CFLAGS += -DLWIP_HAVE_LOOPIF=1
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	./tests/01-run.py

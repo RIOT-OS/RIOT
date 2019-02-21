@@ -9,7 +9,7 @@
 #include "dynamixel.h"
 #include "shell.h"
 #include "shell_commands.h"
-#include "uart_stdio.h"
+#include "stdio_uart.h"
 #include "board.h"
 #include "periph/gpio.h"
 
@@ -101,7 +101,7 @@ static int parse_uart(char *arg)
         printf("Error: Invalid UART_DEV device specified (%u).\n", uart);
         return -1;
     }
-    else if (UART_DEV(uart) == UART_STDIO_DEV) {
+    else if (UART_DEV(uart) == STDIO_UART_DEV) {
         printf("Error: The selected UART_DEV(%u) is used for the shell!\n", uart);
         return -2;
     }

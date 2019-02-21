@@ -12,6 +12,8 @@
  * @file
  */
 
+#include <string.h>
+
 #include "net/eui64.h"
 #include "net/icmpv6.h"
 #include "net/gnrc/ipv6.h"

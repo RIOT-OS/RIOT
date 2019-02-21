@@ -10,16 +10,19 @@
 /**
  * @defgroup    drivers_mag3110 MAG3110 3-Axis Digital Magnetometer
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the Freescale MAG3110 magnetometer.
- *              After initialization and set activ the magnetometer
- *              will make measurements at periodic times.
- *              The output rate and over sample ratio
- *              can be determined by magnetometer initialization.
- *              The measured values of magnetic field strength and
- *              die temperature have uncalibrated offsets.
- *              To get correct measurement values, the individual
- *              offsets must be measured and set accordingly.
  *
+ * After initialization and set activ the magnetometer will make measurements
+ * at periodic times.
+ * The output rate and over sample ratio can be determined by magnetometer
+ * initialization.
+ * The measured values of magnetic field strength and die temperature have
+ * uncalibrated offsets.
+ * To get correct measurement values, the individual offsets must be measured
+ * and set accordingly.
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

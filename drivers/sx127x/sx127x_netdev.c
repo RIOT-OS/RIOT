@@ -194,7 +194,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             }
 
             xtimer_remove(&dev->_internal.rx_timeout_timer);
-
             /* Read the last packet from FIFO */
             uint8_t last_rx_addr = sx127x_reg_read(dev, SX127X_REG_LR_FIFORXCURRENTADDR);
             sx127x_reg_write(dev, SX127X_REG_LR_FIFOADDRPTR, last_rx_addr);
@@ -240,6 +239,37 @@ static void _isr(netdev_t *netdev)
     sx127x_t *dev = (sx127x_t *) netdev;
 
     uint8_t irq = dev->irq;
+
+#ifdef SX127X_USE_DIO_MULTI
+    /* if the IRQ is from an OR'd pin check the actual IRQ on the registers */
+    if (irq == SX127X_IRQ_DIO_MULTI) {
+        uint8_t interruptReg = sx127x_reg_read(dev, SX127X_REG_LR_IRQFLAGS);
+
+        switch (interruptReg) {
+            case SX127X_RF_LORA_IRQFLAGS_TXDONE:
+            case SX127X_RF_LORA_IRQFLAGS_RXDONE:
+                irq = SX127X_IRQ_DIO0;
+                break;
+
+            case SX127X_RF_LORA_IRQFLAGS_RXTIMEOUT:
+                irq = SX127X_IRQ_DIO1;
+                break;
+
+            case SX127X_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL:
+                irq = SX127X_IRQ_DIO2;
+                break;
+
+            case SX127X_RF_LORA_IRQFLAGS_CADDETECTED:
+            case SX127X_RF_LORA_IRQFLAGS_CADDONE:
+                irq = SX127X_IRQ_DIO3;
+                break;
+
+            default:
+                break;
+        }
+    }
+#endif
+
     dev->irq = 0;
 
     switch (irq) {

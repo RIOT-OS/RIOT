@@ -1,0 +1,73 @@
+/**
+@defgroup    boards_nucleo-f303k8 STM32 Nucleo-F303K8
+@ingroup     boards_common_nucleo32
+@brief       Support for the STM32 Nucleo-F303K8
+
+## Overview
+
+The Nucleo-F303 is a board from ST's Nucleo family supporting a ARM Cortex-M4
+STM32F303RE
+microcontroller with 64Kb of RAM and 512Kb of ROM.
+
+## Hardware
+
+![nucleo image](http://media.digikey.com/Photos/STMicro%20Photos/MFG_NUCLEO.jpg)
+![nucleo-f303 pinout](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/nucleo-f303_pinout.png)
+
+
+### MCU
+| MCU        | STM32F303RE           |
+|:------------- |:--------------------- |
+| Family | ARM Cortex-M4     |
+| Vendor | ST Microelectronics   |
+| RAM        | 64Kb                  |
+| Flash      | 512Kb         |
+| Frequency  | up to 72MHz) |
+| FPU        | yes               |
+| Timers | 14 (13x 16-bit, 1x 32-bit [TIM2]) |
+| ADCs       | 4x 12-bit         |
+| UARTs      | 5                 |
+| SPIs       | 4                 |
+| I2Cs       | 3                 |
+| RTC        | 1                 |
+| Vcc        | 2.0V - 3.6V           |
+| Datasheet  | [Datasheet](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00118585.pdf) |
+| Reference Manual | [Reference Manual](http://www.st.com/web/en/resource/technical/document/reference_manual/DM00043574.pdf) |
+| Programming Manual | [Programming Manual](http://www.st.com/web/en/resource/technical/document/programming_manual/DM00046982.pdf) |
+| Board Manual   | [Board Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/DM00105823.pdf)|
+
+
+
+## Implementation Status
+| Device | ID        | Supported | Comments  |
+|:------------- |:------------- |:------------- |:------------- |
+| MCU        | STM32F303RE   | partly    | Energy saving modes not fully utilized |
+| Low-level driver | GPIO    | yes       | |
+|        | PWM       | one PWM   | |
+|        | UART      | three UART    | |
+|        | I2C       | two I2C   | |
+|        | SPI       | two SPI   | |
+|        | USB       | no        | |
+|        | Timer     | one 32 timer  | |
+
+
+## Flashing the device
+The ST Nucleo-F303RE board includes an on-board ST-LINK V2 programmer.
+The easiest way to program the board is to use OpenOCD. Once you have
+installed OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD)
+for installation instructions), you can flash the board simply by typing.
+
+```
+make flash
+```
+and debug via GDB by simply typing
+```
+make debug
+```
+
+
+## Supported Toolchains
+For using the ST Nucleo-F303RE board we strongly recommend the usage of the
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
+toolchain.
+ */

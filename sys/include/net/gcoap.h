@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    net_gcoap  CoAP
+ * @defgroup    net_gcoap  Gcoap
  * @ingroup     net
  * @brief       High-level interface to CoAP messaging
  *
@@ -45,9 +45,10 @@
  *
  * gcoap allows an application to specify a collection of request resource paths
  * it wants to be notified about. Create an array of resources (coap_resource_t
- * structs). Note that the elements must be ordered alphabetically with respect
- * to the resource path. Use gcoap_register_listener() at application startup
- * to pass in these resources, wrapped in a gcoap_listener_t.
+ * structs) ordered by the resource path, specifically the ASCII encoding of
+ * the path characters (digit and capital precede lower case). Use
+ * gcoap_register_listener() at application startup to pass in these resources,
+ * wrapped in a gcoap_listener_t.
  *
  * gcoap itself defines a resource for `/.well-known/core` discovery, which
  * lists all of the registered paths.
@@ -231,6 +232,12 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup net_gcoap_conf    Gcoap compile configurations
+ * @ingroup  net_gcoap
+ * @ingroup  config
+ * @{
+ */
+/**
  * @brief  Size for module message queue
  */
 #ifndef GCOAP_MSG_QUEUE_SIZE
@@ -252,26 +259,34 @@ extern "C" {
 #endif
 
 /**
- * @brief   Size of the buffer used to write options, other than Uri-Path, in a
- *          request
+ * @brief   Reduce payload length by this value for a request
  *
- * Accommodates Content-Format and Uri-Queries
+ * Accommodates writing Content-Format option in gcoap_finish(). May set to
+ * zero if function not used.
  */
-#define GCOAP_REQ_OPTIONS_BUF   (40)
+#ifndef GCOAP_REQ_OPTIONS_BUF
+#define GCOAP_REQ_OPTIONS_BUF   (4)
+#endif
 
 /**
- * @brief   Size of the buffer used to write options in a response
+ * @brief   Reduce payload length by this value for a response
  *
- * Accommodates Content-Format.
+ * Accommodates writing Content-Format option in gcoap_finish(). May set to
+ * zero if function not used.
  */
-#define GCOAP_RESP_OPTIONS_BUF  (8)
+#ifndef GCOAP_RESP_OPTIONS_BUF
+#define GCOAP_RESP_OPTIONS_BUF  (4)
+#endif
 
 /**
- * @brief   Size of the buffer used to write options in an Observe notification
+ * @brief   Reduce payload length by this value for an observe notification
  *
- * Accommodates Content-Format and Observe.
+ * Accommodates writing Content-Format option in gcoap_finish(). May set to
+ * zero if function not used.
  */
-#define GCOAP_OBS_OPTIONS_BUF   (8)
+#ifndef GCOAP_OBS_OPTIONS_BUF
+#define GCOAP_OBS_OPTIONS_BUF   (4)
+#endif
 
 /**
  * @brief   Maximum number of requests awaiting a response
@@ -279,6 +294,7 @@ extern "C" {
 #ifndef GCOAP_REQ_WAITING_MAX
 #define GCOAP_REQ_WAITING_MAX   (2)
 #endif
+/** @} */
 
 /**
  * @brief   Maximum length in bytes for a token
@@ -291,7 +307,10 @@ extern "C" {
 #define GCOAP_HEADER_MAXLEN     (sizeof(coap_hdr_t) + GCOAP_TOKENLEN_MAX)
 
 /**
- * @brief   Length in bytes for a token; use 2 if not defined
+ * @ingroup net_gcoap_conf
+ * @brief   Length in bytes for a token
+ *
+ * Value must be in the range 0 to @ref GCOAP_TOKENLEN_MAX.
  */
 #ifndef GCOAP_TOKENLEN
 #define GCOAP_TOKENLEN          (2)
@@ -319,6 +338,7 @@ extern "C" {
 #define GCOAP_SEND_LIMIT_NON    (-1)
 
 /**
+ * @ingroup net_gcoap_conf
  * @brief   Time in usec that the event loop waits for an incoming CoAP message
  */
 #ifndef GCOAP_RECV_TIMEOUT
@@ -326,6 +346,7 @@ extern "C" {
 #endif
 
 /**
+ * @ingroup net_gcoap_conf
  * @brief   Default time to wait for a non-confirmable response [in usec]
  *
  * Set to 0 to disable timeout.
@@ -348,15 +369,16 @@ extern "C" {
 #define GCOAP_MSG_TYPE_INTR     (0x1502)
 
 /**
- * @brief   Maximum number of Observe clients; use 2 if not defined
+ * @ingroup net_gcoap_conf
+ * @brief   Maximum number of Observe clients
  */
 #ifndef GCOAP_OBS_CLIENTS_MAX
 #define GCOAP_OBS_CLIENTS_MAX   (2)
 #endif
 
 /**
- * @brief   Maximum number of registrations for Observable resources; use 2 if
- *          not defined
+ * @ingroup net_gcoap_conf
+ * @brief   Maximum number of registrations for Observable resources
  */
 #ifndef GCOAP_OBS_REGISTRATIONS_MAX
 #define GCOAP_OBS_REGISTRATIONS_MAX     (2)
@@ -372,6 +394,7 @@ extern "C" {
 /** @} */
 
 /**
+ * @ingroup net_gcoap_conf
  * @brief   Width in bytes of the Observe option value for a notification
  *
  * This width is used to determine the length of the 'tick' used to measure
@@ -423,6 +446,7 @@ extern "C" {
 #endif
 
 /**
+ * @ingroup net_gcoap_conf
  * @brief   Count of PDU buffers available for resending confirmable messages
  */
 #ifndef GCOAP_RESEND_BUFS_MAX
@@ -433,10 +457,10 @@ extern "C" {
  * @brief   A modular collection of resources for a server
  */
 typedef struct gcoap_listener {
-    coap_resource_t *resources;     /**< First element in the array of
-                                     *   resources; must order alphabetically */
-    size_t resources_len;           /**< Length of array */
-    struct gcoap_listener *next;    /**< Next listener in list */
+    const coap_resource_t *resources;   /**< First element in the array of
+                                         *   resources; must order alphabetically */
+    size_t resources_len;               /**< Length of array */
+    struct gcoap_listener *next;        /**< Next listener in list */
 } gcoap_listener_t;
 
 /**
@@ -480,7 +504,7 @@ typedef struct {
  */
 typedef struct {
     sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
-    coap_resource_t *resource;          /**< Entity being observed */
+    const coap_resource_t *resource;    /**< Entity being observed */
     uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
     unsigned token_len;                 /**< Actual length of token attribute */
 } gcoap_observe_memo_t;
@@ -509,11 +533,10 @@ void gcoap_register_listener(gcoap_listener_t *listener);
  * @param[out] pdu      Request metadata
  * @param[out] buf      Buffer containing the PDU
  * @param[in] len       Length of the buffer
- * @param[in] code      Request code: GCOAP_[GET|POST|PUT|DELETE]
- * @param[in] path      Resource path, *must* start with '/'
+ * @param[in] code      Request code, one of COAP_METHOD_XXX
+ * @param[in] path      Resource path, may be NULL
  *
- * @pre @p path not `NULL`
- * @pre @p path must start with `/`
+ * @pre @p path must start with `/` if not NULL
  *
  * @return  0 on success
  * @return  < 0 on error
@@ -524,8 +547,14 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 /**
  * @brief   Finishes formatting a CoAP PDU after the payload has been written
  *
- * Assumes the PDU has been initialized with gcoap_req_init() or
- * gcoap_resp_init().
+ * Assumes the PDU has been initialized with a gcoap_xxx_init() function, like
+ * gcoap_req_init().
+ *
+ * @warning To use this function, you only may have added an Option with
+ * option number less than COAP_OPT_CONTENT_FORMAT. Otherwise, use the
+ * struct-based API described with @link net_nanocoap nanocoap. @endlink With
+ * this API, you specify the format with coap_opt_add_uint(), prepare for the
+ * payload with coap_opt_finish(), and then write the payload.
  *
  * @param[in,out] pdu       Request metadata
  * @param[in] payload_len   Length of the payload, or 0 if none

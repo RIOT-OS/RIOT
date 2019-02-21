@@ -103,13 +103,6 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name    ADC configuration
- * @{
- */
-#define ADC_NUMOF           (0)
-/** @} */
-
-/**
  * @name    RTC configuration
  * @{
  */

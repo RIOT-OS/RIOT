@@ -11,9 +11,7 @@
 #define BOARD_H
 
 /**
- * @defgroup    boards_z1 Zolertia Z1
- * @ingroup     boards
- * @brief       Support for the Zolertia Z1 board.
+ * @ingroup     boards_z1
  *
 <h2>Components</h2>
 \li MSP430F2617
@@ -96,7 +94,7 @@ extern "C" {
  * @name    User button configuration
  * @{
  */
-#define BTN0_PIN            P2IN
+#define BTN0_PIN            GPIO_PIN(2, 5)
 #define BTN0_MASK           (0x20)
 #define BTN0_MODE           GPIO_IN
 

@@ -30,7 +30,8 @@ extern "C" {
 #endif
 
 /**
- * @name    LoRaMAC default parameters
+ * @defgroup net_loramac_conf   LoRaMAC compile configurations
+ * @ingroup config
  * @{
  */
 /**
@@ -105,69 +106,69 @@ extern "C" {
  * @brief   Default device class (A, B or C)
  */
 #ifndef LORAMAC_DEFAULT_DEVICE_CLASS
-#define LORAMAC_DEFAULT_DEVICE_CLASS    (LORAMAC_CLASS_A)
+#define LORAMAC_DEFAULT_DEVICE_CLASS           (LORAMAC_CLASS_A)
 #endif
 
 /**
  * @brief   Default NetID (only valid with ABP join procedure)
  */
 #ifndef LORAMAC_DEFAULT_NETID
-#define LORAMAC_DEFAULT_NETID           (1U)
+#define LORAMAC_DEFAULT_NETID                  (1U)
 #endif
 
 /**
  * @brief   Default network type (public or private)
  */
 #ifndef LORAMAC_DEFAULT_PUBLIC_NETWORK
-#define LORAMAC_DEFAULT_PUBLIC_NETWORK  (true)
+#define LORAMAC_DEFAULT_PUBLIC_NETWORK         (true)
 #endif
 /**
  * @brief   Default datarate (only valid for EU)
  */
 #ifndef LORAMAC_DEFAULT_DR
-#define LORAMAC_DEFAULT_DR             (LORAMAC_DR_0)
+#define LORAMAC_DEFAULT_DR                     (LORAMAC_DR_0)
 #endif
 
 /**
  * @brief   Default MAC TX power (14dBm in EU)
  */
 #ifndef LORAMAC_DEFAULT_TX_POWER
-#define LORAMAC_DEFAULT_TX_POWER       (LORAMAC_TX_PWR_1)
+#define LORAMAC_DEFAULT_TX_POWER               (LORAMAC_TX_PWR_1)
 #endif
 
 /**
  * @brief   Default MAC TX port (from 1 to 223)
  */
 #ifndef LORAMAC_DEFAULT_TX_PORT
-#define LORAMAC_DEFAULT_TX_PORT        (2U)
+#define LORAMAC_DEFAULT_TX_PORT                (2U)
 #endif
 
 /**
  * @brief   Default MAC TX mode (confirmable or unconfirmable)
  */
  #ifndef LORAMAC_DEFAULT_TX_MODE
- #define LORAMAC_DEFAULT_TX_MODE        (LORAMAC_TX_CNF)
+ #define LORAMAC_DEFAULT_TX_MODE               (LORAMAC_TX_CNF)
  #endif
 
 /**
  * @brief   Default MAC TX power (14dBm in EU)
  */
 #ifndef LORAMAC_DEFAULT_TX_POWER
-#define LORAMAC_DEFAULT_TX_POWER       (LORAMAC_TX_PWR_1)
+#define LORAMAC_DEFAULT_TX_POWER               (LORAMAC_TX_PWR_1)
 #endif
 
 /**
  * @brief   Default adaptive datarate state
  */
 #ifndef LORAMAC_DEFAULT_ADR
-#define LORAMAC_DEFAULT_ADR            (false)
+#define LORAMAC_DEFAULT_ADR                    (false)
 #endif
 
 /**
  * @brief   Default uplink retransmission
  */
 #ifndef LORAMAC_DEFAULT_RETX
-#define LORAMAC_DEFAULT_RETX           (5U)
+#define LORAMAC_DEFAULT_RETX                   (5U)
 #endif
 
 /**
@@ -176,89 +177,103 @@ extern "C" {
  *          0 means the link check process is disabled
  */
 #ifndef LORAMAC_DEFAULT_LINKCHK
-#define LORAMAC_DEFAULT_LINKCHK        (0U)
+#define LORAMAC_DEFAULT_LINKCHK                (0U)
 #endif
 
 /**
- * @brief   Default first RX window delay (in s)
+ * @brief   Default first RX window delay (in ms)
  */
 #ifndef LORAMAC_DEFAULT_RX1_DELAY
-#define LORAMAC_DEFAULT_RX1_DELAY      (1U)
+#define LORAMAC_DEFAULT_RX1_DELAY              (1000U)
 #endif
 
 /**
- * @brief   Default first RX window delay (in s)
+ * @brief   Default second RX window delay (in ms)
  */
-#define LORAMAC_DEFAULT_RX2_DELAY      (1U + LORAMAC_DEFAULT_RX1_DELAY)
+#define LORAMAC_DEFAULT_RX2_DELAY              (1000U + LORAMAC_DEFAULT_RX1_DELAY)
 
 /**
  * @brief   Default automatic reply status
  */
 #ifndef LORAMAC_DEFAULT_AR
-#define LORAMAC_DEFAULT_AR             (false)
+#define LORAMAC_DEFAULT_AR                     (false)
 #endif
 
 /**
  * @brief   Default second RX window datarate index
  */
 #ifndef LORAMAC_DEFAULT_RX2_DR
-#define LORAMAC_DEFAULT_RX2_DR         (LORAMAC_DR_0)
+#define LORAMAC_DEFAULT_RX2_DR                 (LORAMAC_DR_0)
 #endif
 
 /**
  * @brief   Default second RX window frequency (in Hz)
  */
 #ifndef LORAMAC_DEFAULT_RX2_FREQ
-#define LORAMAC_DEFAULT_RX2_FREQ       (869525000UL)
+#define LORAMAC_DEFAULT_RX2_FREQ               (869525000UL)
 #endif
 
 /**
  * @brief   Default LoRaMAC join procedure
  */
 #ifndef LORAMAC_DEFAULT_JOIN_PROCEDURE
-#define LORAMAC_DEFAULT_JOIN_PROCEDURE (LORAMAC_JOIN_OTAA)
+#define LORAMAC_DEFAULT_JOIN_PROCEDURE         (LORAMAC_JOIN_OTAA)
 #endif
 
 /**
  * @brief   Default LoRaMAC join accept delay 1 (in seconds)
  */
 #ifndef LORAMAC_DEFAULT_JOIN_DELAY1
-#define LORAMAC_DEFAULT_JOIN_DELAY1    (5U)
+#define LORAMAC_DEFAULT_JOIN_DELAY1            (5U)
 #endif
 
 /**
  * @brief   Default LoRaMAC join accept delay 2
  */
 #ifndef LORAMAC_DEFAULT_JOIN_DELAY2
-#define LORAMAC_DEFAULT_JOIN_DELAY2    (6U)
+#define LORAMAC_DEFAULT_JOIN_DELAY2            (6U)
 #endif
 
 /**
  * @brief   Default max FCNT gap
  */
 #ifndef LORAMAC_DEFAULT_MAX_FCNT_GAP
-#define LORAMAC_DEFAULT_MAX_FCNT_GAP   (16384U)
+#define LORAMAC_DEFAULT_MAX_FCNT_GAP           (16384U)
 #endif
 
 /**
  * @brief   Default adaptive datarate ACK limit (in s)
  */
 #ifndef LORAMAC_DEFAULT_ADR_ACK_LIMIT
-#define LORAMAC_DEFAULT_ADR_ACK_LIMIT  (64U)
+#define LORAMAC_DEFAULT_ADR_ACK_LIMIT          (64U)
 #endif
 
 /**
  * @brief   Default adaptive datarate ACK delay (in s)
  */
 #ifndef LORAMAC_DEFAULT_ADR_ACK_DELAY
-#define LORAMAC_DEFAULT_ADR_ACK_DELAY  (32U)
+#define LORAMAC_DEFAULT_ADR_ACK_DELAY          (32U)
 #endif
 
 /**
  * @brief   Default adaptive datarate timeout
  */
 #ifndef LORAMAC_DEFAULT_ADR_TIMEOUT
-#define LORAMAC_DEFAULT_ADR_TIMEOUT    (3U)
+#define LORAMAC_DEFAULT_ADR_TIMEOUT            (3U)
+#endif
+
+/**
+ * @brief   Default maximum system overall timing error
+ */
+#ifndef LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR
+#define LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR    (50)
+#endif
+
+/**
+ * @brief   Default minimum RX symbols to detect a frame
+ */
+#ifndef LORAMAC_DEFAULT_MIN_RX_SYMBOLS
+#define LORAMAC_DEFAULT_MIN_RX_SYMBOLS         (12)
 #endif
 /** @} */
 

@@ -95,12 +95,46 @@ void test_uuid_v5(void)
     TEST_ASSERT_EQUAL_INT(uuid_version(&uuid_next), UUID_V5);
 }
 
+void test_uuid_str(void)
+{
+    char str[40];
+    const char dns[] = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
+    uuid_to_string(&uuid_namespace_dns, str);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(dns, str, sizeof(dns)));
+
+    const char url[] = "6ba7b811-9dad-11d1-80b4-00c04fd430c8";
+    uuid_to_string(&uuid_namespace_url, str);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(url, str, sizeof(dns)));
+
+    const char iso[] = "6ba7b812-9dad-11d1-80b4-00c04fd430c8";
+    uuid_to_string(&uuid_namespace_iso, str);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(iso, str, sizeof(dns)));
+
+    const char x500[] = "6ba7b814-9dad-11d1-80b4-00c04fd430c8";
+    uuid_to_string(&uuid_namespace_x500, str);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(x500, str, sizeof(dns)));
+
+    uuid_t uuid;
+    TEST_ASSERT_EQUAL_INT(0, uuid_from_string(&uuid, dns));
+    TEST_ASSERT_EQUAL_INT(true, uuid_equal(&uuid, &uuid_namespace_dns));
+
+    TEST_ASSERT_EQUAL_INT(0, uuid_from_string(&uuid, url));
+    TEST_ASSERT_EQUAL_INT(true, uuid_equal(&uuid, &uuid_namespace_url));
+
+    TEST_ASSERT_EQUAL_INT(0, uuid_from_string(&uuid, iso));
+    TEST_ASSERT_EQUAL_INT(true, uuid_equal(&uuid, &uuid_namespace_iso));
+
+    TEST_ASSERT_EQUAL_INT(0, uuid_from_string(&uuid, x500));
+    TEST_ASSERT_EQUAL_INT(true, uuid_equal(&uuid, &uuid_namespace_x500));
+}
+
 Test *tests_uuid_all(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_uuid_v3),
         new_TestFixture(test_uuid_v4),
         new_TestFixture(test_uuid_v5),
+        new_TestFixture(test_uuid_str),
     };
 
     EMB_UNIT_TESTCALLER(uuid_tests, NULL, NULL, fixtures);

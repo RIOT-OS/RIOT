@@ -1,34 +1,33 @@
-/**************************************************************************//**
- * @file efm32pg12b_emu.h
+/***************************************************************************//**
+ * @file
  * @brief EFM32PG12B_EMU register and bit field definitions
- * @version 5.4.0
- ******************************************************************************
+ * @version 5.7.0
+ *******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
- ******************************************************************************
+ * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software.@n
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.@n
+ *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * DISCLAIMER OF WARRANTY/LIMITATION OF REMEDIES: Silicon Laboratories, Inc.
- * has no obligation to support this Software. Silicon Laboratories, Inc. is
- * providing the Software "AS IS", with no express or implied warranties of any
- * kind, including, but not limited to, any implied warranties of
- * merchantability or fitness for any particular purpose or warranties against
- * infringement of any proprietary rights of a third party.
- *
- * Silicon Laboratories, Inc. will not be liable for any consequential,
- * incidental, or special damages, or any other relief, or for any claim by
- * any third party, arising from your use of this Software.
- *
- *****************************************************************************/
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,15 +40,15 @@ extern "C" {
 #pragma clang system_header  /* Treat file as system include file. */
 #endif
 
-/**************************************************************************//**
-* @addtogroup Parts
-* @{
-******************************************************************************/
-/**************************************************************************//**
+/***************************************************************************//**
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/***************************************************************************//**
  * @defgroup EFM32PG12B_EMU EMU
  * @{
  * @brief EFM32PG12B_EMU Register Declaration
- *****************************************************************************/
+ ******************************************************************************/
 /** EMU Register Declaration */
 typedef struct {
   __IOM uint32_t CTRL;                  /**< Control Register  */
@@ -58,7 +57,7 @@ typedef struct {
   __IOM uint32_t RAM0CTRL;              /**< Memory Control Register  */
   __IOM uint32_t CMD;                   /**< Command Register  */
 
-  uint32_t       RESERVED0[1];          /**< Reserved for future use **/
+  uint32_t       RESERVED0[1U];         /**< Reserved for future use **/
   __IOM uint32_t EM4CTRL;               /**< EM4 Control Register  */
   __IOM uint32_t TEMPLIMITS;            /**< Temperature Limits for Interrupt Generation  */
   __IM uint32_t  TEMP;                  /**< Value of Last Temperature Measurement  */
@@ -71,48 +70,48 @@ typedef struct {
   __IOM uint32_t PWRCTRL;               /**< Power Control Register  */
   __IOM uint32_t DCDCCTRL;              /**< DCDC Control  */
 
-  uint32_t       RESERVED1[2];          /**< Reserved for future use **/
+  uint32_t       RESERVED1[2U];         /**< Reserved for future use **/
   __IOM uint32_t DCDCMISCCTRL;          /**< DCDC Miscellaneous Control Register  */
   __IOM uint32_t DCDCZDETCTRL;          /**< DCDC Power Train NFET Zero Current Detector Control Register  */
   __IOM uint32_t DCDCCLIMCTRL;          /**< DCDC Power Train PFET Current Limiter Control Register  */
   __IOM uint32_t DCDCLNCOMPCTRL;        /**< DCDC Low Noise Compensator Control Register  */
   __IOM uint32_t DCDCLNVCTRL;           /**< DCDC Low Noise Voltage Register  */
 
-  uint32_t       RESERVED2[1];          /**< Reserved for future use **/
+  uint32_t       RESERVED2[1U];         /**< Reserved for future use **/
   __IOM uint32_t DCDCLPVCTRL;           /**< DCDC Low Power Voltage Register  */
 
-  uint32_t       RESERVED3[1];          /**< Reserved for future use **/
+  uint32_t       RESERVED3[1U];         /**< Reserved for future use **/
   __IOM uint32_t DCDCLPCTRL;            /**< DCDC Low Power Control Register  */
   __IOM uint32_t DCDCLNFREQCTRL;        /**< DCDC Low Noise Controller Frequency Control  */
 
-  uint32_t       RESERVED4[1];          /**< Reserved for future use **/
+  uint32_t       RESERVED4[1U];         /**< Reserved for future use **/
   __IM uint32_t  DCDCSYNC;              /**< DCDC Read Status Register  */
 
-  uint32_t       RESERVED5[5];          /**< Reserved for future use **/
+  uint32_t       RESERVED5[5U];         /**< Reserved for future use **/
   __IOM uint32_t VMONAVDDCTRL;          /**< VMON AVDD Channel Control  */
   __IOM uint32_t VMONALTAVDDCTRL;       /**< Alternate VMON AVDD Channel Control  */
   __IOM uint32_t VMONDVDDCTRL;          /**< VMON DVDD Channel Control  */
   __IOM uint32_t VMONIO0CTRL;           /**< VMON IOVDD0 Channel Control  */
 
-  uint32_t       RESERVED6[5];          /**< Reserved for future use **/
+  uint32_t       RESERVED6[5U];         /**< Reserved for future use **/
   __IOM uint32_t RAM1CTRL;              /**< Memory Control Register  */
   __IOM uint32_t RAM2CTRL;              /**< Memory Control Register  */
 
-  uint32_t       RESERVED7[12];         /**< Reserved for future use **/
+  uint32_t       RESERVED7[12U];        /**< Reserved for future use **/
   __IOM uint32_t DCDCLPEM01CFG;         /**< Configuration Bits for Low Power Mode to Be Applied During EM01, This Field is Only Relevant If LP Mode is Used in EM01  */
 
-  uint32_t       RESERVED8[4];          /**< Reserved for future use **/
+  uint32_t       RESERVED8[4U];         /**< Reserved for future use **/
   __IOM uint32_t EM23PERNORETAINCMD;    /**< Clears Corresponding Bits in EM23PERNORETAINSTATUS Unlocking Access to Peripheral  */
   __IM uint32_t  EM23PERNORETAINSTATUS; /**< Status Indicating If Peripherals Were Powered Down in EM23, Subsequently Locking Access to It  */
   __IOM uint32_t EM23PERNORETAINCTRL;   /**< When Set Corresponding Peripherals May Get Powered Down in EM23  */
 } EMU_TypeDef;                          /** @} */
 
-/**************************************************************************//**
+/***************************************************************************//**
  * @addtogroup EFM32PG12B_EMU
  * @{
  * @defgroup EFM32PG12B_EMU_BitFields  EMU Bit Fields
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 
 /* Bit fields for EMU CTRL */
 #define _EMU_CTRL_RESETVALUE                                 0x00000000UL                                /**< Default value for EMU_CTRL */
@@ -132,7 +131,7 @@ typedef struct {
 #define _EMU_CTRL_EM01LD_MASK                                0x8UL                                       /**< Bit mask for EMU_EM01LD */
 #define _EMU_CTRL_EM01LD_DEFAULT                             0x00000000UL                                /**< Mode DEFAULT for EMU_CTRL */
 #define EMU_CTRL_EM01LD_DEFAULT                              (_EMU_CTRL_EM01LD_DEFAULT << 3)             /**< Shifted mode DEFAULT for EMU_CTRL */
-#define EMU_CTRL_EM23VSCALEAUTOWSEN                          (0x1UL << 4)                                /**< Automatically Configures Flash, Ram and Frequency to Wakeup From EM2 or EM3 at Low Voltage */
+#define EMU_CTRL_EM23VSCALEAUTOWSEN                          (0x1UL << 4)                                /**< Automatically Configures Flash and Frequency to Wakeup From EM2 or EM3 at Low Voltage */
 #define _EMU_CTRL_EM23VSCALEAUTOWSEN_SHIFT                   4                                           /**< Shift value for EMU_EM23VSCALEAUTOWSEN */
 #define _EMU_CTRL_EM23VSCALEAUTOWSEN_MASK                    0x10UL                                      /**< Bit mask for EMU_EM23VSCALEAUTOWSEN */
 #define _EMU_CTRL_EM23VSCALEAUTOWSEN_DEFAULT                 0x00000000UL                                /**< Mode DEFAULT for EMU_CTRL */
@@ -1400,11 +1399,11 @@ typedef struct {
 #define _EMU_EM23PERNORETAINCTRL_I2C1DIS_MASK                0x40UL                                               /**< Bit mask for EMU_I2C1DIS */
 #define _EMU_EM23PERNORETAINCTRL_I2C1DIS_DEFAULT             0x00000000UL                                         /**< Mode DEFAULT for EMU_EM23PERNORETAINCTRL */
 #define EMU_EM23PERNORETAINCTRL_I2C1DIS_DEFAULT              (_EMU_EM23PERNORETAINCTRL_I2C1DIS_DEFAULT << 6)      /**< Shifted mode DEFAULT for EMU_EM23PERNORETAINCTRL */
-#define EMU_EM23PERNORETAINCTRL_DAC0DIS                      (0x1UL << 7)                                         /**< Allow Power Down of DAC0 During EM23 */
-#define _EMU_EM23PERNORETAINCTRL_DAC0DIS_SHIFT               7                                                    /**< Shift value for EMU_DAC0DIS */
-#define _EMU_EM23PERNORETAINCTRL_DAC0DIS_MASK                0x80UL                                               /**< Bit mask for EMU_DAC0DIS */
-#define _EMU_EM23PERNORETAINCTRL_DAC0DIS_DEFAULT             0x00000000UL                                         /**< Mode DEFAULT for EMU_EM23PERNORETAINCTRL */
-#define EMU_EM23PERNORETAINCTRL_DAC0DIS_DEFAULT              (_EMU_EM23PERNORETAINCTRL_DAC0DIS_DEFAULT << 7)      /**< Shifted mode DEFAULT for EMU_EM23PERNORETAINCTRL */
+#define EMU_EM23PERNORETAINCTRL_VDAC0DIS                     (0x1UL << 7)                                         /**< Allow Power Down of DAC0 During EM23 */
+#define _EMU_EM23PERNORETAINCTRL_VDAC0DIS_SHIFT              7                                                    /**< Shift value for EMU_VDAC0DIS */
+#define _EMU_EM23PERNORETAINCTRL_VDAC0DIS_MASK               0x80UL                                               /**< Bit mask for EMU_VDAC0DIS */
+#define _EMU_EM23PERNORETAINCTRL_VDAC0DIS_DEFAULT            0x00000000UL                                         /**< Mode DEFAULT for EMU_EM23PERNORETAINCTRL */
+#define EMU_EM23PERNORETAINCTRL_VDAC0DIS_DEFAULT             (_EMU_EM23PERNORETAINCTRL_VDAC0DIS_DEFAULT << 7)     /**< Shifted mode DEFAULT for EMU_EM23PERNORETAINCTRL */
 #define EMU_EM23PERNORETAINCTRL_IDAC0DIS                     (0x1UL << 8)                                         /**< Allow Power Down of IDAC0 During EM23 */
 #define _EMU_EM23PERNORETAINCTRL_IDAC0DIS_SHIFT              8                                                    /**< Shift value for EMU_IDAC0DIS */
 #define _EMU_EM23PERNORETAINCTRL_IDAC0DIS_MASK               0x100UL                                              /**< Bit mask for EMU_IDAC0DIS */

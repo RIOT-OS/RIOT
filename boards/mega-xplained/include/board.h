@@ -39,15 +39,15 @@ extern "C" {
  * baudrate to 9600 for this board
  * @{
  */
-#ifndef UART_STDIO_BAUDRATE
-#define UART_STDIO_BAUDRATE (9600U)
+#ifndef STDIO_UART_BAUDRATE
+#define STDIO_UART_BAUDRATE (9600U)
 #endif
 /** @} */
 
 /**
  * @brief   Use the UART 1 for STDIO on this board
  */
-#define UART_STDIO_DEV       (UART_DEV(1))
+#define STDIO_UART_DEV       (UART_DEV(1))
 
 /**
  * @name    xtimer configuration values
@@ -91,6 +91,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Usage of LED to turn on when a kernel panic occurs.
+ * @{
+ */
+#define LED_PANIC           LED1_ON
+/** @} */
+
+/**
  * @name    Button pin configuration
  * @{
  */
@@ -109,6 +116,13 @@ extern "C" {
 #define NTC_OUTPUT             GPIO_PIN(PORT_A, 5)
 #define LIGHT_SENSOR_OUTPUT    GPIO_PIN(PORT_A, 6)
 #define FILTER_OUTPUT          GPIO_PIN(PORT_A, 7)
+/** @} */
+
+/**
+ * @name CPU clock scale for mega-xplained
+ *
+ */
+#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
 /** @} */
 
 /**

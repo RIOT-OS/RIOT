@@ -57,13 +57,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name ADC configuration
- * @{
- */
-#define ADC_NUMOF           (0)
-/** @} */
-
-/**
  * @name   Timer configuration
  * @{
  */
@@ -144,7 +137,8 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
+ * @note    This board may require external pullup resistors for i2c operation.
  * @{
  */
 static const i2c_conf_t i2c_config[] = {

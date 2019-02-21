@@ -88,6 +88,7 @@ static const char *_netopt_strmap[] = {
     [NETOPT_FIXED_HEADER]          = "NETOPT_FIXED_HEADER",
     [NETOPT_IQ_INVERT]             = "NETOPT_IQ_INVERT",
     [NETOPT_TX_RETRIES_NEEDED]     = "NETOPT_TX_RETRIES_NEEDED",
+    [NETOPT_6LO]                   = "NETOPT_6LO",
     [NETOPT_6LO_IPHC]              = "NETOPT_6LO_IPHC",
     [NETOPT_BLE_CTX]               = "NETOPT_BLE_CTX",
     [NETOPT_CHECKSUM]              = "NETOPT_CHECKSUM",

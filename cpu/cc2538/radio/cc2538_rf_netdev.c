@@ -31,8 +31,6 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-#define _MAX_MHR_OVERHEAD   (25)
-
 /* Reference pointer for the IRQ handler */
 static netdev_t *_dev;
 
@@ -52,6 +50,24 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     }
 
     switch (opt) {
+        case NETOPT_ADDRESS:
+            if (max_len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            else {
+                *(uint16_t*)value = cc2538_get_addr_short();
+            }
+            return sizeof(uint16_t);
+
+        case NETOPT_ADDRESS_LONG:
+            if (max_len < sizeof(uint64_t)) {
+                return -EOVERFLOW;
+            }
+            else {
+                *(uint64_t*)value = cc2538_get_addr_long();
+            }
+            return sizeof(uint64_t);
+
         case NETOPT_AUTOACK:
             if (RFCORE->XREG_FRMCTRL0bits.AUTOACK) {
                 *((netopt_enable_t *)value) = NETOPT_ENABLE;
@@ -60,6 +76,13 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
                 *((netopt_enable_t *)value) = NETOPT_DISABLE;
             }
             return sizeof(netopt_enable_t);
+
+        case NETOPT_CHANNEL:
+            if (max_len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint16_t *)value) = (uint16_t)cc2538_get_chan();
+            return sizeof(uint16_t);
 
         case NETOPT_CHANNEL_PAGE:
             if (max_len < sizeof(uint16_t)) {
@@ -87,13 +110,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 
         case NETOPT_IS_WIRED:
             return -ENOTSUP;
-
-        case NETOPT_MAX_PACKET_SIZE:
-            if (max_len < sizeof(int16_t)) {
-                return -EOVERFLOW;
-            }
-            *((uint16_t *)value) = CC2538_RF_MAX_DATA_LEN - _MAX_MHR_OVERHEAD;
-            return sizeof(uint16_t);
 
         case NETOPT_PROMISCUOUSMODE:
             if (cc2538_get_monitor()) {
@@ -148,6 +164,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
             }
             else {
                 cc2538_set_addr_short(*((const uint16_t*)value));
+                res = sizeof(uint16_t);
             }
             break;
 
@@ -157,6 +174,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
             }
             else {
                 cc2538_set_addr_long(*((const uint64_t*)value));
+                res = sizeof(uint64_t);
             }
             break;
 
@@ -177,6 +195,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
                 }
                 else {
                     cc2538_set_chan(chan);
+                    res = sizeof(uint16_t);
                 }
             }
             break;
@@ -264,10 +283,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         rfcore_write_fifo(iol->iol_base, iol->iol_len);
     }
 
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += pkt_len;
-#endif
-
     /* Set first byte of TX FIFO to the packet length */
     rfcore_poke_tx_fifo(0, pkt_len + CC2538_AUTOCRC_LEN);
 
@@ -314,10 +329,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         pkt_len = len;
     }
 
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += pkt_len;
-#endif
     rfcore_read_fifo(buf, pkt_len);
 
     if (info != NULL && RFCORE->XREG_RSSISTATbits.RSSI_VALID) {
@@ -362,7 +373,6 @@ static int _init(netdev_t *netdev)
     cc2538_rf_t *dev = (cc2538_rf_t *) netdev;
     _dev = netdev;
 
-    uint16_t pan = cc2538_get_pan();
     uint16_t chan = cc2538_get_chan();
     uint16_t addr_short = cc2538_get_addr_short();
     uint64_t addr_long = cc2538_get_addr_long();
@@ -370,8 +380,6 @@ static int _init(netdev_t *netdev)
     netdev_ieee802154_reset(&dev->netdev);
 
     /* Initialise netdev_ieee802154_t struct */
-    netdev_ieee802154_set(&dev->netdev, NETOPT_NID,
-                          &pan, sizeof(pan));
     netdev_ieee802154_set(&dev->netdev, NETOPT_CHANNEL,
                           &chan, sizeof(chan));
     netdev_ieee802154_set(&dev->netdev, NETOPT_ADDRESS,
@@ -380,10 +388,6 @@ static int _init(netdev_t *netdev)
                           &addr_long, sizeof(addr_long));
 
     cc2538_set_state(dev, NETOPT_STATE_IDLE);
-
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
 
     return 0;
 }

@@ -37,8 +37,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define _MAX_MHR_OVERHEAD   (25)
-
 static void _irq_handler(void *arg)
 {
     netdev_t *dev = (netdev_t *) arg;
@@ -59,9 +57,6 @@ static int _init(netdev_t *netdev)
     gpio_set(dev->params.reset_pin);
     gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
     /* reset device to default values and put it into RX state */
     mrf24j40_reset(dev);
     return 0;
@@ -82,10 +77,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
                   (unsigned)len + 2);
             return -EOVERFLOW;
         }
-
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.tx_bytes += len;
-#endif
         len = mrf24j40_tx_load(dev, iol->iol_base, iol->iol_len, len);
         /* only on first iteration: */
         if (iol == iolist) {
@@ -138,10 +129,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             mrf24j40_rx_fifo_read(dev, phr + 2, &(rssi_scalar), 1);
             radio_info->rssi = mrf24j40_dbm_from_reg(rssi_scalar);
         }
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += pkt_len;
-#endif
         res = pkt_len;
     }
     /* Turn on reception of packets off the air */
@@ -176,6 +163,26 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     int res;
     switch (opt) {
+        case NETOPT_ADDRESS:
+            if (max_len < sizeof(uint16_t)) {
+                res = -EOVERFLOW;
+            }
+            else {
+                *(uint16_t*)val = mrf24j40_get_addr_short(dev);
+                res = sizeof(uint16_t);
+            }
+            break;
+
+        case NETOPT_ADDRESS_LONG:
+            if (max_len < sizeof(uint64_t)) {
+                res = -EOVERFLOW;
+            }
+            else {
+                *(uint64_t*)val = mrf24j40_get_addr_long(dev);
+                res = sizeof(uint64_t);
+            }
+            break;
+
         case NETOPT_CHANNEL_PAGE:
             if (max_len < sizeof(uint16_t)) {
                 res = -EOVERFLOW;
@@ -183,16 +190,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             else {
                 ((uint8_t *)val)[1] = 0;
                 ((uint8_t *)val)[0] = 0;
-                res = sizeof(uint16_t);
-            }
-            break;
-
-        case NETOPT_MAX_PACKET_SIZE:
-            if (max_len < sizeof(int16_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                *((uint16_t *)val) = IEEE802154_FRAME_LEN_MAX - _MAX_MHR_OVERHEAD;
                 res = sizeof(uint16_t);
             }
             break;
@@ -363,7 +360,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             }
             else {
                 mrf24j40_set_addr_short(dev, *((const uint16_t *)val));
-                /* don't set res to set netdev_ieee802154_t::short_addr */
+                res = sizeof(uint16_t);
             }
             break;
 
@@ -373,7 +370,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             }
             else {
                 mrf24j40_set_addr_long(dev, *((const uint64_t *)val));
-                /* don't set res to set netdev_ieee802154_t::long_addr */
+                res = sizeof(uint64_t);
             }
             break;
 

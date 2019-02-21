@@ -78,7 +78,7 @@ int main(void)
 
     puts("On-board LED test\n");
     /* cppcheck-suppress knownConditionTrueFalse
-     * rationale: board-dependent ifdefs */
+     * (reason: board-dependent ifdefs) */
     if (numof == 0) {
         puts("NO LEDs AVAILABLE");
     }

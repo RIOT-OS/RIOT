@@ -44,18 +44,25 @@ int mma8x5x_init(mma8x5x_t *dev, const mma8x5x_params_t *params)
     assert(dev && params);
 
     /* write device descriptor */
-    memcpy(dev, params, sizeof(mma8x5x_params_t));
+    dev->params = *params;
 
     /* acquire the I2C bus */
     i2c_acquire(BUS);
 
     /* test if the target device responds */
     i2c_read_reg(BUS, ADDR, MMA8X5X_WHO_AM_I, &reg, 0);
-    if (reg != dev->params.type) {
-        i2c_release(BUS);
-        DEBUG("[mma8x5x] init - error: invalid WHO_AM_I value [0x%02x]\n",
-               (int)reg);
-        return MMA8X5X_NODEV;
+    switch (reg) {
+        case MMA8X5X_TYPE_MMA8451:
+        case MMA8X5X_TYPE_MMA8452:
+        case MMA8X5X_TYPE_MMA8453:
+        case MMA8X5X_TYPE_MMA8652:
+        case MMA8X5X_TYPE_MMA8653:
+            break;
+        default: /* invalid device type */
+            i2c_release(BUS);
+            DEBUG("[mma8x5x] init - error: invalid WHO_AM_I value [0x%02x]\n",
+                  (int)reg);
+            return MMA8X5X_NODEV;
     }
 
     /* reset the device */

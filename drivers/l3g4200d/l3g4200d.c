@@ -1,4 +1,4 @@
-#/*
+/*
  * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser

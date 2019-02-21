@@ -1,7 +1,7 @@
 /**
  * @defgroup pkg_cayenne-lpp Cayenne Low Power Payload (LPP)
  * @ingroup  pkg
- * @ingroup  sys
+ * @ingroup  sys_serialization
  * @brief    Provides a RIOT support for Cayenne LPP format
  *
  * The Cayenne Low Power Payload (LPP) provides a convenient and easy way to

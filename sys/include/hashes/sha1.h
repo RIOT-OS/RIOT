@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    sys_hashes_sha1 SHA-1
- * @ingroup     sys_hashes
+ * @ingroup     sys_hashes_unkeyed
  * @brief       Implementation of the SHA-1 hashing function
 
  * @{

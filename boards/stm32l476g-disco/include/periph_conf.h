@@ -102,6 +102,8 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
+        .type       = STM32_USART,
+        .clk_src    = 0, /* Use APB clock */
 #ifdef UART_USE_DMA
         .dma_stream = 6,
         .dma_chan   = 4
@@ -112,13 +114,6 @@ static const uart_conf_t uart_config[] = {
 #define UART_0_ISR          (isr_usart2)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
-/** @} */
-
-/**
- * @name    ADC configuration
- * @{
- */
-#define ADC_NUMOF           (0)
 /** @} */
 
 /**

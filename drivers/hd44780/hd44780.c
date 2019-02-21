@@ -32,7 +32,7 @@
 
 static inline void _command(const hd44780_t *dev, uint8_t value);
 static void _pulse(const hd44780_t *dev);
-static void _send(const hd44780_t *dev, uint8_t value, uint8_t mode);
+static void _send(const hd44780_t *dev, uint8_t value, hd44780_state_t state);
 static void _write_bits(const hd44780_t *dev, uint8_t bits, uint8_t value);
 
 /**
@@ -101,7 +101,7 @@ static void _write_bits(const hd44780_t *dev, uint8_t bits, uint8_t value)
 int hd44780_init(hd44780_t *dev, const hd44780_params_t *params)
 {
     /* write config params to device descriptor */
-    memcpy(&dev->p, params, sizeof(hd44780_params_t));
+    dev->p = *params;
     /* verify cols and rows */
     if ((dev->p.cols > HD44780_MAX_COLS) || (dev->p.rows > HD44780_MAX_ROWS)
                                          || (dev->p.rows * dev->p.cols > 80)) {

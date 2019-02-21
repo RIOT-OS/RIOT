@@ -1,6 +1,3 @@
 USEMODULE += boards_common_iotlab
 
 include $(RIOTBOARD)/common/iotlab/Makefile.include
-
-# add iotlab-a8-m3 include path
-INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

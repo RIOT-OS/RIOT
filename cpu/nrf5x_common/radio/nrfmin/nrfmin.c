@@ -178,21 +178,11 @@ void nrfmin_setup(void)
     nrfmin_dev.driver = &nrfmin_netdev;
     nrfmin_dev.event_callback = NULL;
     nrfmin_dev.context = NULL;
-#ifdef MODULE_NETSTATS_L2
-    memset(&nrfmin_dev.stats, 0, sizeof(netstats_t));;
-#endif
 }
 
 uint16_t nrfmin_get_addr(void)
 {
     return my_addr;
-}
-
-void nrfmin_get_pseudo_long_addr(uint16_t *addr)
-{
-    for (int i = 0; i < 4; i++) {
-        addr[i] = my_addr;
-    }
 }
 
 void nrfmin_get_iid(uint16_t *iid)
@@ -487,10 +477,6 @@ static int nrfmin_get(netdev_t *dev, netopt_t opt, void *val, size_t max_len)
             assert(max_len >= sizeof(uint16_t));
             *((uint16_t *)val) = NRFMIN_PAYLOAD_MAX;
             return sizeof(uint16_t);
-        case NETOPT_ADDRESS_LONG:
-            assert(max_len >= sizeof(uint64_t));
-            nrfmin_get_pseudo_long_addr((uint16_t *)val);
-            return sizeof(uint64_t);
         case NETOPT_ADDR_LEN:
             assert(max_len >= sizeof(uint16_t));
             *((uint16_t *)val) = 2;
@@ -501,9 +487,9 @@ static int nrfmin_get(netdev_t *dev, netopt_t opt, void *val, size_t max_len)
             return sizeof(uint16_t);
 #ifdef MODULE_GNRC_SIXLOWPAN
         case NETOPT_PROTO:
-            assert(max_len >= sizeof(uint16_t));
-            *((uint16_t *)val) = GNRC_NETTYPE_SIXLOWPAN;
-            return sizeof(uint16_t);
+            assert(max_len == sizeof(gnrc_nettype_t));
+            *((gnrc_nettype_t *)val) = GNRC_NETTYPE_SIXLOWPAN;
+            return sizeof(gnrc_nettype_t);
 #endif
         case NETOPT_DEVICE_TYPE:
             assert(max_len >= sizeof(uint16_t));

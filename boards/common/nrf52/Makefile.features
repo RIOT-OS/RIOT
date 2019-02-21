@@ -1,0 +1,9 @@
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_timer
+
+# Various other features (if any)
+FEATURES_PROVIDED += radio_ble
+FEATURES_PROVIDED += radio_nrfble
+
+include $(RIOTCPU)/nrf52/Makefile.features

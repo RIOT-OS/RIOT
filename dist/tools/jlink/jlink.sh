@@ -18,23 +18,25 @@
 #
 # The script supports the following actions:
 #
-# flash:        flash a given hex file to the target.
-#               hexfile is expected in ihex format and is pointed to
-#               by BINFILE environment variable
+# flash:        flash <binfile>
+#
+#               flash given binary format file to the target.
 #
 #               options:
-#               BINFILE: path to the binary file that is flashed
+#               <binfile>:      path to the binary file that is flashed
 #
-# debug:        starts JLink as GDB server in the background and
+# debug:        debug <elffile>
+#
+#               starts JLink as GDB server in the background and
 #               connects to the server with the GDB client specified by
 #               the board (DBG environment variable)
 #
 #               options:
+#               <elffile>:      path to the ELF file to debug
 #               GDB_PORT:       port opened for GDB connections
 #               TELNET_PORT:    port opened for telnet connections
 #               DBG:            debugger client command, default: 'gdb -q'
 #               TUI:            if TUI!=null, the -tui option will be used
-#               ELFFILE:        path to the ELF file to debug
 #
 # debug-server: starts JLink as GDB server, but does not connect to
 #               to it with any frontend. This might be useful when using
@@ -66,12 +68,6 @@ _JLINK_TERMFLAGS="-ts 19021"
 # a couple of tests for certain configuration options
 #
 test_config() {
-    if [ -z "${HEXFILE}" ]; then
-        echo "no hexfile"
-    else
-        echo "HEXFILE found"
-    fi
-
     if [ -z "${JLINK}" ]; then
         JLINK=${_JLINK}
     fi
@@ -94,10 +90,10 @@ test_config() {
     fi
 }
 
-test_hexfile() {
-    if [ ! -f "${HEXFILE}" ]; then
-        echo "Error: Unable to locate HEXFILE"
-        echo "       (${HEXFILE})"
+test_binfile() {
+    if [ ! -f "${BINFILE}" ]; then
+        echo "Error: Unable to locate BINFILE"
+        echo "       (${BINFILE})"
         exit 1
     fi
 }
@@ -151,16 +147,17 @@ test_term() {
 # now comes the actual actions
 #
 do_flash() {
+    BINFILE=$1
     test_config
     test_serial
-    test_hexfile
+    test_binfile
     # clear any existing contents in burn file
     /bin/echo -n "" > ${BINDIR}/burn.seg
     # create temporary burn file
     if [ ! -z "${JLINK_PRE_FLASH}" ]; then
         printf "${JLINK_PRE_FLASH}\n" >> ${BINDIR}/burn.seg
     fi
-    echo "loadbin ${HEXFILE} ${FLASH_ADDR}" >> ${BINDIR}/burn.seg
+    echo "loadbin ${BINFILE} ${FLASH_ADDR}" >> ${BINDIR}/burn.seg
     if [ ! -z "${JLINK_POST_FLASH}" ]; then
         printf "${JLINK_POST_FLASH}\n" >> ${BINDIR}/burn.seg
     fi
@@ -175,6 +172,7 @@ do_flash() {
 }
 
 do_debug() {
+    ELFFILE=$1
     test_config
     test_serial
     test_elffile
@@ -240,12 +238,12 @@ do_term() {
     # don't trapon Ctrl+C, because JLink keeps running
     trap '' INT
     # start Jlink as RTT server
-    setsid sh -c "${JLINK} ${JLINK_SERIAL} \
+    sh -c "${JLINK} ${JLINK_SERIAL} \
             -device '${JLINK_DEVICE}' \
             -speed '${JLINK_SPEED}' \
             -if '${JLINK_IF}' \
             -jtagconf -1,-1 \
-            -commandfile '${RIOTTOOLS}/jlink/term.seg' & \
+            -commandfile '${RIOTTOOLS}/jlink/term.seg' >/dev/null & \
             echo  \$! > $JLINK_PIDFILE" &
 
     sh -c "${JLINK_TERMPROG} ${JLINK_TERMFLAGS}"
@@ -281,5 +279,7 @@ case "${ACTION}" in
     ;;
   *)
     echo "Usage: $0 {flash|debug|debug-server|reset}"
+    echo "          flash <binfile>"
+    echo "          debug <elffile>"
     ;;
 esac

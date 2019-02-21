@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_bluepill Bluepill board
- * @ingroup     boards
- * @brief       Support for the stm32f103c8 based bluepill board.
+ * @ingroup     boards_bluepill
  *
  * This board can be bought very cheaply on sides like eBay or
  * AliExpress. Although the MCU nominally has 64 KiB ROM, most of them
@@ -56,7 +54,7 @@ void board_init(void);
 /**
  * @brief   Use the 2nd UART for STDIO on this board
  */
-#define UART_STDIO_DEV      UART_DEV(1)
+#define STDIO_UART_DEV      UART_DEV(1)
 
 /**
  * @name    xtimer configuration

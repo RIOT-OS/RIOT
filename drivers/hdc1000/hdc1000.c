@@ -31,10 +31,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#ifndef HDC1000_RENEW_INTERVAL
-#define HDC1000_RENEW_INTERVAL     (1000000ul)
-#endif
-
 static int16_t temp_cached, hum_cached;
 static uint32_t last_read_time;
 
@@ -44,7 +40,7 @@ int hdc1000_init(hdc1000_t *dev, const hdc1000_params_t *params)
     uint16_t tmp;
 
     /* write device descriptor */
-    memcpy(&dev->p, params, sizeof(hdc1000_params_t));
+    dev->p = *params;
 
     /* try if we can interact with the device by reading its manufacturer ID */
     i2c_acquire(dev->p.i2c);
@@ -144,7 +140,7 @@ int hdc1000_read_cached(const hdc1000_t *dev, int16_t *temp, int16_t *hum)
     uint32_t now = xtimer_now_usec();
 
     /* check if readings are outdated */
-    if (now - last_read_time > HDC1000_RENEW_INTERVAL) {
+    if (now - last_read_time > dev->p.renew_interval) {
         /* update last_read_time */
         if (hdc1000_read(dev, &temp_cached, &hum_cached) != HDC1000_OK) {
             return HDC1000_BUSERR;

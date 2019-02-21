@@ -19,15 +19,18 @@
 #
 # The script supports the following actions:
 #
-# flash:        flash a given ELF file to the target.
+# flash:        flash <image_file>
+#               flash given file to the target.
 #
 #               options:
-#               IMAGE_FILE: Filename of the file that will be flashed
+#               <image_file>:   Filename of the file that will be flashed
 #               PRE_FLASH_CHECK_SCRIPT: a command to run before flashing to
-#               verify the integrity of the image to be flashed. ELFFILE is
+#               verify the integrity of the image to be flashed. <image_file> is
 #               passed as a command line argument to this command.
-#               Even though the file name variable is named ELFFILE, flashing
-#               works with any file format recognized by OpenOCD (elf, ihex, s19, bin).
+#
+#               Flashing works with any file format recognized by OpenOCD
+#               (elf, ihex, s19, bin).
+#
 #
 # @author       Hauke Peteresen <hauke.petersen@fu-berlin.de>
 # @author       Joakim Nohlgård <joakim.nohlgard@eistec.se>
@@ -42,10 +45,6 @@
 # Default offset is 0, meaning the image will be flashed at the address that it
 # was linked at.
 : ${IMAGE_OFFSET:=0}
-# Image file used for flashing. Must be in a format that OpenOCD can handle (ELF,
-# Intel hex, S19, or raw binary)
-# Default is to use $ELFFILE
-: ${IMAGE_FILE:=${ELFFILE}}
 # Type of image, leave empty to let OpenOCD automatically detect the type from
 # the file (default).
 # Valid values: elf, hex, s19, bin (see OpenOCD manual for more information)
@@ -84,6 +83,7 @@ test_imagefile() {
 # now comes the actual actions
 #
 do_flash() {
+    IMAGE_FILE=$1
     test_config
     test_imagefile
     if [ -n "${PRE_FLASH_CHECK_SCRIPT}" ]; then
@@ -119,14 +119,15 @@ do_flash() {
 # parameter dispatching
 #
 ACTION="$1"
+shift # pop $1 from $@
 
 case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
-    do_flash
+    do_flash "$@"
     ;;
   *)
-    echo "Usage: $0 flash"
+    echo "Usage: $0 flash <flashfile>"
     exit 2
     ;;
 esac

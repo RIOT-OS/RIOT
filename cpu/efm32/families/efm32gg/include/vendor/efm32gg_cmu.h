@@ -1,34 +1,33 @@
-/**************************************************************************//**
- * @file efm32gg_cmu.h
+/***************************************************************************//**
+ * @file
  * @brief EFM32GG_CMU register and bit field definitions
- * @version 5.4.0
- ******************************************************************************
+ * @version 5.7.0
+ *******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
- ******************************************************************************
+ * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software.@n
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.@n
+ *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * DISCLAIMER OF WARRANTY/LIMITATION OF REMEDIES: Silicon Laboratories, Inc.
- * has no obligation to support this Software. Silicon Laboratories, Inc. is
- * providing the Software "AS IS", with no express or implied warranties of any
- * kind, including, but not limited to, any implied warranties of
- * merchantability or fitness for any particular purpose or warranties against
- * infringement of any proprietary rights of a third party.
- *
- * Silicon Laboratories, Inc. will not be liable for any consequential,
- * incidental, or special damages, or any other relief, or for any claim by
- * any third party, arising from your use of this Software.
- *
- *****************************************************************************/
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,56 +40,56 @@ extern "C" {
 #pragma clang system_header  /* Treat file as system include file. */
 #endif
 
-/**************************************************************************//**
-* @addtogroup Parts
-* @{
-******************************************************************************/
-/**************************************************************************//**
+/***************************************************************************//**
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/***************************************************************************//**
  * @defgroup EFM32GG_CMU
  * @{
  * @brief EFM32GG_CMU Register Declaration
- *****************************************************************************/
+ ******************************************************************************/
 typedef struct {
-  __IOM uint32_t CTRL;         /**< CMU Control Register  */
-  __IOM uint32_t HFCORECLKDIV; /**< High Frequency Core Clock Division Register  */
-  __IOM uint32_t HFPERCLKDIV;  /**< High Frequency Peripheral Clock Division Register  */
-  __IOM uint32_t HFRCOCTRL;    /**< HFRCO Control Register  */
-  __IOM uint32_t LFRCOCTRL;    /**< LFRCO Control Register  */
-  __IOM uint32_t AUXHFRCOCTRL; /**< AUXHFRCO Control Register  */
-  __IOM uint32_t CALCTRL;      /**< Calibration Control Register  */
-  __IOM uint32_t CALCNT;       /**< Calibration Counter Register  */
-  __IOM uint32_t OSCENCMD;     /**< Oscillator Enable/Disable Command Register  */
-  __IOM uint32_t CMD;          /**< Command Register  */
-  __IOM uint32_t LFCLKSEL;     /**< Low Frequency Clock Select Register  */
-  __IM uint32_t  STATUS;       /**< Status Register  */
-  __IM uint32_t  IF;           /**< Interrupt Flag Register  */
-  __IOM uint32_t IFS;          /**< Interrupt Flag Set Register  */
-  __IOM uint32_t IFC;          /**< Interrupt Flag Clear Register  */
-  __IOM uint32_t IEN;          /**< Interrupt Enable Register  */
-  __IOM uint32_t HFCORECLKEN0; /**< High Frequency Core Clock Enable Register 0  */
-  __IOM uint32_t HFPERCLKEN0;  /**< High Frequency Peripheral Clock Enable Register 0  */
-  uint32_t       RESERVED0[2]; /**< Reserved for future use **/
-  __IM uint32_t  SYNCBUSY;     /**< Synchronization Busy Register  */
-  __IOM uint32_t FREEZE;       /**< Freeze Register  */
-  __IOM uint32_t LFACLKEN0;    /**< Low Frequency A Clock Enable Register 0  (Async Reg)  */
-  uint32_t       RESERVED1[1]; /**< Reserved for future use **/
-  __IOM uint32_t LFBCLKEN0;    /**< Low Frequency B Clock Enable Register 0 (Async Reg)  */
+  __IOM uint32_t CTRL;          /**< CMU Control Register  */
+  __IOM uint32_t HFCORECLKDIV;  /**< High Frequency Core Clock Division Register  */
+  __IOM uint32_t HFPERCLKDIV;   /**< High Frequency Peripheral Clock Division Register  */
+  __IOM uint32_t HFRCOCTRL;     /**< HFRCO Control Register  */
+  __IOM uint32_t LFRCOCTRL;     /**< LFRCO Control Register  */
+  __IOM uint32_t AUXHFRCOCTRL;  /**< AUXHFRCO Control Register  */
+  __IOM uint32_t CALCTRL;       /**< Calibration Control Register  */
+  __IOM uint32_t CALCNT;        /**< Calibration Counter Register  */
+  __IOM uint32_t OSCENCMD;      /**< Oscillator Enable/Disable Command Register  */
+  __IOM uint32_t CMD;           /**< Command Register  */
+  __IOM uint32_t LFCLKSEL;      /**< Low Frequency Clock Select Register  */
+  __IM uint32_t  STATUS;        /**< Status Register  */
+  __IM uint32_t  IF;            /**< Interrupt Flag Register  */
+  __IOM uint32_t IFS;           /**< Interrupt Flag Set Register  */
+  __IOM uint32_t IFC;           /**< Interrupt Flag Clear Register  */
+  __IOM uint32_t IEN;           /**< Interrupt Enable Register  */
+  __IOM uint32_t HFCORECLKEN0;  /**< High Frequency Core Clock Enable Register 0  */
+  __IOM uint32_t HFPERCLKEN0;   /**< High Frequency Peripheral Clock Enable Register 0  */
+  uint32_t       RESERVED0[2U]; /**< Reserved for future use **/
+  __IM uint32_t  SYNCBUSY;      /**< Synchronization Busy Register  */
+  __IOM uint32_t FREEZE;        /**< Freeze Register  */
+  __IOM uint32_t LFACLKEN0;     /**< Low Frequency A Clock Enable Register 0  (Async Reg)  */
+  uint32_t       RESERVED1[1U]; /**< Reserved for future use **/
+  __IOM uint32_t LFBCLKEN0;     /**< Low Frequency B Clock Enable Register 0 (Async Reg)  */
 
-  uint32_t       RESERVED2[1]; /**< Reserved for future use **/
-  __IOM uint32_t LFAPRESC0;    /**< Low Frequency A Prescaler Register 0 (Async Reg)  */
-  uint32_t       RESERVED3[1]; /**< Reserved for future use **/
-  __IOM uint32_t LFBPRESC0;    /**< Low Frequency B Prescaler Register 0  (Async Reg)  */
-  uint32_t       RESERVED4[1]; /**< Reserved for future use **/
-  __IOM uint32_t PCNTCTRL;     /**< PCNT Control Register  */
-  __IOM uint32_t LCDCTRL;      /**< LCD Control Register  */
-  __IOM uint32_t ROUTE;        /**< I/O Routing Register  */
-  __IOM uint32_t LOCK;         /**< Configuration Lock Register  */
-} CMU_TypeDef;                 /**< CMU Register Declaration *//** @} */
+  uint32_t       RESERVED2[1U]; /**< Reserved for future use **/
+  __IOM uint32_t LFAPRESC0;     /**< Low Frequency A Prescaler Register 0 (Async Reg)  */
+  uint32_t       RESERVED3[1U]; /**< Reserved for future use **/
+  __IOM uint32_t LFBPRESC0;     /**< Low Frequency B Prescaler Register 0  (Async Reg)  */
+  uint32_t       RESERVED4[1U]; /**< Reserved for future use **/
+  __IOM uint32_t PCNTCTRL;      /**< PCNT Control Register  */
+  __IOM uint32_t LCDCTRL;       /**< LCD Control Register  */
+  __IOM uint32_t ROUTE;         /**< I/O Routing Register  */
+  __IOM uint32_t LOCK;          /**< Configuration Lock Register  */
+} CMU_TypeDef;                  /**< CMU Register Declaration *//** @} */
 
-/**************************************************************************//**
+/***************************************************************************//**
  * @defgroup EFM32GG_CMU_BitFields
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 
 /* Bit fields for CMU CTRL */
 #define _CMU_CTRL_RESETVALUE                        0x000C062CUL                                /**< Default value for CMU_CTRL */

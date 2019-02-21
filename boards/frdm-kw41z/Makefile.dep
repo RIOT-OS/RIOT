@@ -1,6 +1,7 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
   USEMODULE += saul_adc
+  USEMODULE += fxos8700
 endif
 
 include $(RIOTCPU)/kinetis/Makefile.dep

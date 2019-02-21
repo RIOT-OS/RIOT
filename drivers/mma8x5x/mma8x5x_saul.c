@@ -27,7 +27,7 @@
 
 static int read_acc(const void *dev, phydat_t *res)
 {
-    mma8x5x_read((const mma8x5x_t *)dev, (mma8x5x_data_t *)res);
+    mma8x5x_read((const mma8x5x_t *)dev, (mma8x5x_data_t *)res->val);
 
     res->unit = UNIT_G;
     res->scale = -3;

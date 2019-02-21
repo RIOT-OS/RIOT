@@ -58,8 +58,7 @@ export OPENOCD_PRE_VERIFY_CMDS += \
   -c 'resume 0x20000000'
 export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield-elf.sh
 
-.PHONY: flash
-flash: $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin
+FLASHDEPS += $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin
 
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk

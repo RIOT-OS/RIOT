@@ -21,6 +21,7 @@
 
 #ifdef MODULE_ADXL345
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "adxl345.h"

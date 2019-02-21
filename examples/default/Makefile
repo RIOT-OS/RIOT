@@ -7,6 +7,8 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
+
 # Uncomment these lines if you want to use platform support from external
 # repositories:
 #RIOTCPU ?= $(CURDIR)/../../RIOT/thirdparty_cpu
@@ -35,7 +37,7 @@ USEMODULE += ps
 USEMODULE += saul_default
 
 BOARD_PROVIDES_NETIF := acd52832 airfy-beacon b-l072z-lrwan1 cc2538dk fox iotlab-m3 iotlab-a8-m3 mulle \
-        microbit native nrf51dongle nrf52dk nrf6310 openmote-cc2538 pba-d-01-kw2x \
+        microbit native nrf51dk nrf51dongle nrf52dk nrf6310 openmote-cc2538 pba-d-01-kw2x \
         remote-pa remote-reva samr21-xpro \
         spark-core telosb yunjia-nrf51822 z1
 
@@ -59,11 +61,7 @@ endif
 
 FEATURES_OPTIONAL += periph_rtc
 
-ifneq (,$(filter msb-430,$(BOARD)))
-  USEMODULE += sht11
-endif
 ifneq (,$(filter msba2,$(BOARD)))
-  USEMODULE += sht11
   USEMODULE += mci
   USEMODULE += random
 endif

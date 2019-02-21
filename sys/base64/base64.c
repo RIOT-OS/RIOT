@@ -56,10 +56,11 @@ static char getsymbol(unsigned char code)
     return (char)BASE64_NOT_DEFINED;
 }
 
-int base64_encode(unsigned char *data_in, size_t data_in_size, \
+int base64_encode(const void *data_in, size_t data_in_size,
                   unsigned char *base64_out, size_t *base64_out_size)
 {
-    size_t required_size = 4 * ((data_in_size + 2) / 3);
+    const unsigned char *in = data_in;
+    size_t required_size = base64_estimate_encode_size(data_in_size);
 
     if (data_in == NULL) {
         return BASE64_ERROR_DATA_IN;
@@ -86,7 +87,7 @@ int base64_encode(unsigned char *data_in, size_t data_in_size, \
     for (int i = 0; i < (int)(data_in_size); ++i) {
         unsigned char tmpval;
         njump++;
-        tmpval = *(data_in + i);
+        tmpval = *(in + i);
 
         nNum = (tmpval >> (2 * njump));
 
@@ -159,10 +160,11 @@ static int getcode(char symbol)
     return BASE64_NOT_DEFINED;
 }
 
-int base64_decode(unsigned char *base64_in, size_t base64_in_size, \
-                  unsigned char *data_out, size_t *data_out_size)
+int base64_decode(const unsigned char *base64_in, size_t base64_in_size,
+                  void *data_out, size_t *data_out_size)
 {
-    size_t required_size = ((base64_in_size / 4) * 3);
+    unsigned char *out = data_out;
+    size_t required_size = base64_estimate_decode_size(base64_in_size);
 
     if (base64_in == NULL) {
         return BASE64_ERROR_DATA_IN;
@@ -200,13 +202,13 @@ int base64_decode(unsigned char *base64_in, size_t base64_in_size, \
         nNum = nLst + ((code & (0xFF & nm)) >> (2 * mask));
         nLst = (code & (0xFF & ~nm)) << (8 - (2 * mask));
 
-        (mask != 3) ? data_out[iterate_data_buffer++] = nNum : nNum;
+        (mask != 3) ? out[iterate_data_buffer++] = nNum : nNum;
         (mask == 0) ? mask = 3 : mask--;
     }
 
     if (code == BASE64_EQUALS) {
         /* add the last character to the data_out buffer */
-        data_out[iterate_data_buffer] = nNum;
+        out[iterate_data_buffer] = nNum;
     }
 
     *data_out_size = iterate_data_buffer;
