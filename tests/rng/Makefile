@@ -8,7 +8,6 @@ BOARD_INSUFFICIENT_MEMORY += arduino-duemilanove arduino-uno
 # USEMODULE += prng_minstd
 
 USEMODULE += fmt
-USEMODULE += printf_float
 USEMODULE += random
 USEMODULE += shell
 USEMODULE += xtimer
