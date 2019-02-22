@@ -65,6 +65,12 @@ extern "C" {
 /** @} */
 
 /**
+  * @brief We route STDIO via UART3 on this board,
+  *        this is the UART connected to the MikroBUS
+  */
+#define STDIO_UART_DEV      UART_DEV(3)
+
+/**
  * @brief   Board level initialization
  */
 void board_init(void);

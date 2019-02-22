@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "periph/gpio.h"
-#include "periph/uart.h"
 #include "bitarithm.h"
 #include "board.h"
 #include "cpu.h"
@@ -25,11 +24,6 @@ void board_init(void)
      */
     U3RXR =    0x2;          /*connect pin RPF5 to UART3 RX*/
     RPF4R =    0x1;          /*connect pin RPF4 to UART3 TX*/
-
-    /* intialise UART used for debug (printf) */
-#ifdef DEBUG_VIA_UART
-    uart_init(DEBUG_VIA_UART, DEBUG_UART_BAUD, NULL, 0);
-#endif
 
     /* Turn off all LED's */
     gpio_init(LED1_PIN, GPIO_OUT);

@@ -46,15 +46,11 @@ extern "C" {
 /**
   * @name    UART Definitions
   *          There are 4 UARTS available on this CPU.
-  *          We route debug via UART3 on this board,
-  *          this is the UART connected to the MikroBUS
   *
   *          Note Microchip number the UARTS 1->4
   * @{
   */
 #define UART_NUMOF          (4)
-#define DEBUG_VIA_UART      (3)
-#define DEBUG_UART_BAUD     (9600)
 /** @} */
 
 #ifdef __cplusplus
