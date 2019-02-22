@@ -104,54 +104,16 @@ init_ports(void)
     P2IE = 0;
 }
 
-/*---------------------------------------------------------------------------*/
-/* msp430-ld may align _end incorrectly. Workaround in cpu_init. */
-extern int _end;        /* Not in sys/unistd.h */
-static char *cur_break = (char *) &_end;
-
 void msp430_cpu_init(void)
 {
     irq_disable();
     init_ports();
     irq_enable();
-
-    periph_init();
-
-    if ((uintptr_t)cur_break & 1) { /* Workaround for msp430-ld bug!*/
-        cur_break++;
-    }
 }
 /*---------------------------------------------------------------------------*/
 #define asmv(arg) __asm__ __volatile__(arg)
 
-#define STACK_EXTRA 32
 
-
-/*
- * Allocate memory from the heap. Check that we don't collide with the
- * stack right now (some other routine might later). A watchdog might
- * be used to check if cur_break and the stack pointer meet during
- * runtime.
- */
-void *sbrk(int incr)
-{
-    char *stack_pointer;
-
-    asmv("mov r1, %0" : "=r"(stack_pointer));
-    stack_pointer -= STACK_EXTRA;
-
-    if (incr > (stack_pointer - cur_break)) {
-        return (void *) - 1;    /* ENOMEM */
-    }
-
-    void *old_break = cur_break;
-    cur_break += incr;
-    /*
-     * If the stack was never here then [old_break .. cur_break] should
-     * be filled with zeros.
-    */
-    return old_break;
-}
 /*---------------------------------------------------------------------------*/
 /*
  * Mask all interrupts that can be masked.
@@ -177,18 +139,6 @@ splx_(int sr)
     /* If GIE was set, restore it. */
     asmv("bis %0, r2" : : "r"(sr));
     asmv("nop");
-}
-/*---------------------------------------------------------------------------*/
-
-size_t strnlen(const char *s, size_t maxlen)
-{
-    size_t len;
-
-    for (len = 0; len < maxlen; len++, s++) {
-        if (!*s)
-            break;
-    }
-    return (len);
 }
 
 extern void board_init(void);
