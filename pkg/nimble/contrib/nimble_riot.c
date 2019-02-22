@@ -26,11 +26,15 @@
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
+#ifdef MODULE_NIMBLE_CONTROLLER
 #ifdef CPU_FAM_NRF52
 #include "nrf_clock.h"
 #endif
 
 static char _stack_controller[NIMBLE_CONTROLLER_STACKSIZE];
+#endif
+
+#ifdef MODULE_NIMBLE_HOST
 static char _stack_host[NIMBLE_HOST_STACKSIZE];
 
 static void *_host_thread(void *arg)
@@ -43,9 +47,11 @@ static void *_host_thread(void *arg)
     /* never reached */
     return NULL;
 }
+#endif
 
 void nimble_riot_init(void)
 {
+#ifdef MODULE_NIMBLE_CONTROLLER
     /* XXX: NimBLE needs the nRF5x's LF clock to run */
 #ifdef CPU_FAM_NRF52
     clock_start_lf();
@@ -61,11 +67,14 @@ void nimble_riot_init(void)
                   THREAD_CREATE_STACKTEST,
                   (thread_task_func_t)nimble_port_ll_task_func, NULL,
                   "nimble_ctrl");
+#endif
 
+#ifdef MODULE_NIMBLE_HOST
     /* and finally initialize and run the host */
     thread_create(_stack_host, sizeof(_stack_host),
                   NIMBLE_HOST_PRIO,
                   THREAD_CREATE_STACKTEST,
                   _host_thread, NULL,
                   "nimble_host");
+#endif
 }

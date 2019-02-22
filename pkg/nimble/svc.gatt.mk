@@ -1,3 +1,3 @@
-MODULE = nimble_npl_riot
+MODULE = nimble_svc_gatt
 
 include $(RIOTBASE)/Makefile.base
