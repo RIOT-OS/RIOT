@@ -43,15 +43,11 @@ extern "C" {
 /**
   * @name    UART Definitions
   *          There are 6 UARTS available on this CPU.
-  *          We route debug via UART4 on this board,
-  *          this is the UART connected to the FTDI USB <-> UART device.
   *
-  *          Note Microchip number the UARTS 1->4.
+  *          Note Microchip number the UARTS 1->6.
   * @{
   */
 #define UART_NUMOF          (6)
-#define DEBUG_VIA_UART      (4)
-#define DEBUG_UART_BAUD     (9600)
 /** @} */
 
 #ifdef __cplusplus
