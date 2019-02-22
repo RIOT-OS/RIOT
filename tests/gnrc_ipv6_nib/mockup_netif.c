@@ -74,7 +74,7 @@ void _tests_init(void)
     netdev_test_setup(&_mock_netdev, 0);
     netdev_test_set_get_cb(&_mock_netdev, NETOPT_DEVICE_TYPE,
                            _get_device_type);
-    netdev_test_set_get_cb(&_mock_netdev, NETOPT_MAX_PACKET_SIZE,
+    netdev_test_set_get_cb(&_mock_netdev, NETOPT_MAX_PDU_SIZE,
                            _get_max_packet_size);
     netdev_test_set_get_cb(&_mock_netdev, NETOPT_ADDRESS,
                            _get_address);

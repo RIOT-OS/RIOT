@@ -237,7 +237,7 @@ static void _print_netopt(netopt_t opt)
             printf("hop limit");
             break;
 
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             printf("MTU");
             break;
 
@@ -505,13 +505,13 @@ static void _netif_list(kernel_pid_t iface)
                                    line_thresh);
     line_thresh = _netif_list_flag(iface, NETOPT_CHANNEL_HOP, "CHAN_HOP",
                                    line_thresh);
-    res = gnrc_netapi_get(iface, NETOPT_MAX_PACKET_SIZE, 0, &u16, sizeof(u16));
+    res = gnrc_netapi_get(iface, NETOPT_MAX_PDU_SIZE, 0, &u16, sizeof(u16));
     if (res > 0) {
         printf("L2-PDU:%" PRIu16 " ", u16);
         line_thresh++;
     }
 #ifdef MODULE_GNRC_IPV6
-    res = gnrc_netapi_get(iface, NETOPT_MAX_PACKET_SIZE, GNRC_NETTYPE_IPV6, &u16, sizeof(u16));
+    res = gnrc_netapi_get(iface, NETOPT_MAX_PDU_SIZE, GNRC_NETTYPE_IPV6, &u16, sizeof(u16));
     if (res > 0) {
         printf("MTU:%" PRIu16 "  ", u16);
         line_thresh++;
@@ -1040,7 +1040,7 @@ static int _netif_set(char *cmd_name, kernel_pid_t iface, char *key, char *value
     }
 #ifdef MODULE_GNRC_IPV6
     else if (strcmp("mtu", key) == 0) {
-        return _netif_set_u16(iface, NETOPT_MAX_PACKET_SIZE, GNRC_NETTYPE_IPV6,
+        return _netif_set_u16(iface, NETOPT_MAX_PDU_SIZE, GNRC_NETTYPE_IPV6,
                               value);
     }
 #endif

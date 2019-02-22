@@ -1075,11 +1075,9 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
             TEST_ASSERT((_PIO_PFX_LTIME / MS_PER_SEC) < prefix.pref_until);
         }
     }
-    if (!pio) {
-        if (!pio) {
-            TEST_ASSERT_EQUAL_INT(exp_addr_count,
-                                  _netif_addr_count(_mock_netif));
-        }
+    else {
+        TEST_ASSERT_EQUAL_INT(exp_addr_count,
+                              _netif_addr_count(_mock_netif));
         TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_pl_iter(0, &state, &prefix),
                             "There is an unexpected prefix list entry");
     }
@@ -1333,7 +1331,7 @@ int _mock_netif_get(gnrc_netapi_opt_t *opt)
             return sizeof(_loc_iid);
         case NETOPT_IS_WIRED:
             return 1;
-        case NETOPT_MAX_PACKET_SIZE: {
+        case NETOPT_MAX_PDU_SIZE: {
                 uint16_t *val = opt->data;
                 if (opt->data_len != sizeof(uint16_t)) {
                     return -EOVERFLOW;

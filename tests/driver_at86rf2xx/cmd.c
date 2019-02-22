@@ -61,7 +61,7 @@ int ifconfig_list(int idx)
     }
     printf(", Source address length: %u", (unsigned)u16_val);
 
-    res = get((netdev_t *)dev, NETOPT_MAX_PACKET_SIZE, &u16_val,
+    res = get((netdev_t *)dev, NETOPT_MAX_PDU_SIZE, &u16_val,
               sizeof(u16_val));
     if (res < 0) {
         puts("(err)");

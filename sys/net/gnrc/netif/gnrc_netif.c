@@ -192,7 +192,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             assert(opt->data_len >= sizeof(eui64_t));
             res = gnrc_netif_ipv6_get_iid(netif, opt->data);
             break;
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             if (opt->context == GNRC_NETTYPE_IPV6) {
                 assert(opt->data_len == sizeof(uint16_t));
                 *((uint16_t *)opt->data) = netif->ipv6.mtu;
@@ -285,7 +285,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             gnrc_netif_ipv6_group_leave_internal(netif, opt->data);
             res = sizeof(ipv6_addr_t);
             break;
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             if (opt->context == GNRC_NETTYPE_IPV6) {
                 assert(opt->data_len == sizeof(uint16_t));
                 netif->ipv6.mtu = *((uint16_t *)opt->data);
