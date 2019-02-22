@@ -44,6 +44,8 @@ static void _putchar(int c) {
 #endif
 #endif
 
+#define SHELL_LINE_TOO_LONG (-2)
+
 static void flush_if_needed(void)
 {
 #ifdef MODULE_NEWLIB
@@ -230,7 +232,7 @@ static int readline(char *buf, size_t size)
 
     while (1) {
         if ((line_buf_ptr - buf) >= ((int) size) - 1) {
-            return -1;
+            return SHELL_LINE_TOO_LONG;
         }
 
         int c = getchar();

@@ -55,6 +55,14 @@ def testfunc(child):
     for cmd, expected in CMDS.items():
         check_cmd(child, cmd, expected)
 
+    # Test for a quite long line (400 bytes) that would overflow the shell buffer.
+    # Exact response depends on buffer length so check is done without an
+    # expect_exact here but we just check that shell is still alive
+    child.sendline('test' * 100)
+    child.expect('>')
+    child.sendline('')
+    child.expect('>')
+
 
 if __name__ == "__main__":
     sys.exit(run(testfunc))
