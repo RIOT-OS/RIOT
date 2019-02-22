@@ -28,7 +28,6 @@
 
 #include "sched.h"
 #include "thread.h"
-#include "msp430_types.h"
 #include "cpu_conf.h"
 
 #ifdef __cplusplus
