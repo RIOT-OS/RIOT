@@ -24,15 +24,18 @@
  * port, which supports RFC 6282 compression. Internally, gcoap depends on the
  * nanocoap package for base level structs and functionality.
  *
- * gcoap also supports the Observe extension (RFC 7641) for a server. gcoap
- * provides functions to generate and send an observe notification that are
- * similar to the functions to send a client request.
+ * gcoap supports the Observe extension (RFC 7641) for a server. gcoap provides
+ * functions to generate and send an observe notification that are similar to
+ * the functions to send a client request. gcoap also supports the Block
+ * extension (RFC 7959) with block-specific option functions as well as some
+ * helpers.
  *
  * *Contents*
  *
  * - Server Operation
  * - Client Operation
  * - Observe Server Operation
+ * - Block Operation
  * - Implementation Notes
  * - Implementation Status
  *
@@ -186,6 +189,106 @@
  * To cancel registration, the server expects to receive a GET request with
  * the Observe option value set to 1. The server does not support cancellation
  * via a reset (RST) response to a non-confirmable notification.
+ *
+ * ## Block Operation ##
+ *
+ * gcoap provides for both server side and client side blockwise messaging for
+ * requests and responses. This section outlines how to write a message for
+ * each situation.
+ *
+ * ### CoAP server GET handling ###
+ *
+ * The server must slice the full response body into smaller payloads, and
+ * identify the slice with a Block2 option. This implementation toggles the
+ * actual writing of data as it passes over the code for the full response
+ * body. See the _riot_block2_handler() example in
+ * [gcoap-block-server](https://github.com/kb2ma/riot-apps/blob/kb2ma-master/gcoap-block-server/gcoap_block.c),
+ * which implements the sequence described below.
+ *
+ * - Use coap_block2_init() to initialize a _slicer_ struct from the Block2
+ *   option in the request. The slicer tracks boundaries while writing the
+ *   payload. If no option present in the initial request, the init function
+ *   defaults to a payload size of 16 bytes.
+ * - Use gcoap_resp_init() to begin the response.
+ * - Use coap_opt_add_block2() to write the Block2 option from the slicer. Use
+ *   1 as a default for the _more_ parameter. At this point, we don't know yet
+ *   if this message will be the last in the block exchange. However, we must
+ *   add the block option at this location in the message.
+ * - Use coap_opt_finish() to add a payload marker.
+ * - Add the payload using the `coap_blockwise_put_xxx()` functions. The slicer
+ *   knows the current position in the overall body of the response. It writes
+ *   only the portion of the body specified by the block number and block size
+ *   in the slicer.
+ * - Finally, use coap_block2_finish() to finalize the block option with the
+ *   proper value for the _more_ parameter.
+ *
+ * ### CoAP server PUT/POST handling ###
+ *
+ * The server must ack each blockwise portion of the response body received
+ * from the client by writing a Block1 option in the response. See the
+ * _sha256_handler() example in
+ * [gcoap-block-server](https://github.com/kb2ma/riot-apps/blob/kb2ma-master/gcoap-block-server/gcoap_block.c),
+ * which implements the sequence described below.
+ *
+ * - Use coap_get_block1() to initialize a block1 struct from the request.
+ * - Determine the response code. If the block1 _more_ attribute is 1, use
+ *   COAP_CODE_CONTINUE to request more responses. Otherwise, use
+ *   COAP_CODE_CHANGED to indicate a successful transfer.
+ * - Use gcoap_resp_init() to begin the response, including the response code.
+ * - Use coap_opt_add_block1_control() to write the Block1 option.
+ * - Use coap_opt_finish() to determine the length of the PDU. If appropriate,
+ *   use the COAP_OPT_FINISH_PAYLOAD parameter and then write the payload.
+ *
+ * ### CoAP client GET request ###
+ *
+ * The client requests a specific blockwise payload from the overall body by
+ * writing a Block2 option in the request. See _resp_handler() in the
+ * [gcoap](https://github.com/RIOT-OS/RIOT/blob/master/examples/gcoap/gcoap_cli.c)
+ * example in the RIOT distribution, which implements the sequence described
+ * below.
+ *
+ * - For the first request, use coap_block_object_init() to initialize a new
+ *   block1 struct. For subsequent requests, first use coap_get_block2() to
+ *   read the Block2 option in the response to the previous request. If the
+ *   _more_ attribute indicates no more blocks, you are done.
+ *   - The gcoap example actually does _not_ include a Block2 option in the
+ *     original request, but the server response includes a blockwise response
+ *     with a Block2 option anyway. On the other hand, this example shows how
+ *     blockwise messaging can be supported in a generic way.
+ * - If more blocks are available, use gcoap_req_init() to create a new
+ *   request.
+ * - Increment the _blknum_ attribute in the block1 struct from the previous
+ *   response to request the next blockwise payload.
+ * - Use coap_opt_put_block2_control() to write the Block2 option to the
+ *   request.
+ * - Use coap_opt_finish() to determine the length of the PDU.
+ *
+ * ### CoAP client PUT/POST request ###
+ *
+ * The client pushes a specific blockwise payload from the overall body to the
+ * server by writing a Block1 option in the request. See _do_block_post() in
+ * the [gcoap-block-client](https://github.com/kb2ma/riot-apps/blob/kb2ma-master/gcoap-block-client/gcoap_block.c)
+ * example, which implements the sequence described below.
+ *
+ * - For the first request, use coap_block_slicer_init() to initialize a
+ *   _slicer_ struct with the desired block number and block size. For
+ *   subsequent requests, first read the response from the server to the
+ *   previous request. If the response code is COAP_CODE_CONTINUE, then
+ *   increment the last block number sent when initializing the slicer struct
+ *   for the next request.
+ * - Use gcoap_req_init() to initialize the request.
+ * - Use coap_opt_add_block1() to add the Block1 option from the slicer. Use 1
+ *   as a default for the _more_ parameter. At this point, we don't know yet if
+ *   this message will be the last in the block exchange. However, we must add
+ *   the block option at this location in the message.
+ * - Use coap_opt_finish() with COAP_OPT_FINISH_PAYLOAD to write the payload
+ *   marker.
+ * - Add the payload using the `coap_blockwise_put_xxx()` functions. The slicer
+ *   knows the current position in the overall body of the response. It writes
+ *   only the portion of the body specified by the block number and block size
+ *   in the slicer.
+ * - Finally, use coap_block1_finish() to finalize the block option with the
+ *   proper value for the _more_ parameter.
  *
  * ## Implementation Notes ##
  *
