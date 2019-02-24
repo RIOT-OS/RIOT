@@ -1077,7 +1077,8 @@ size_t coap_opt_put_block_object(uint8_t *buf, uint16_t lastonum,
 static inline size_t coap_opt_put_block1_control(uint8_t *buf, uint16_t lastonum,
                                                  coap_block1_t *block)
 {
-    return coap_opt_put_block_object(buf, lastonum, block, COAP_OPT_BLOCK1);
+    return coap_opt_put_uint(buf, lastonum, COAP_OPT_BLOCK1,
+                             (block->blknum << 4) | block->szx | (block->more ? 0x8 : 0));
 }
 
 /**
@@ -1094,8 +1095,9 @@ static inline size_t coap_opt_put_block1_control(uint8_t *buf, uint16_t lastonum
 static inline size_t coap_opt_put_block2_control(uint8_t *buf, uint16_t lastonum,
                                                  coap_block1_t *block)
 {
-    block->more = 0;
-    return coap_opt_put_block_object(buf, lastonum, block, COAP_OPT_BLOCK2);
+    /* block.more must be zero, so no need to 'or' it in */
+    return coap_opt_put_uint(buf, lastonum, COAP_OPT_BLOCK2,
+                             (block->blknum << 4) | block->szx);
 }
 
 /**
@@ -1230,7 +1232,12 @@ size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, const uin
  *
  * @returns     amount of bytes written to @p buf
  */
-size_t coap_put_option_block1(uint8_t *buf, uint16_t lastonum, unsigned blknum, unsigned szx, int more);
+static inline size_t coap_put_option_block1(uint8_t *buf, uint16_t lastonum,
+                                            unsigned blknum, unsigned szx, int more)
+{
+    return coap_opt_put_uint(buf, lastonum, COAP_OPT_BLOCK1,
+                             (blknum << 4) | szx | (more ? 0x8 : 0));
+}
 
 /**
  * @brief   Insert content type option into buffer
@@ -1242,7 +1249,11 @@ size_t coap_put_option_block1(uint8_t *buf, uint16_t lastonum, unsigned blknum, 
  *
  * @returns     amount of bytes written to @p buf
  */
-size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum, uint16_t content_type);
+static inline size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum,
+                                        uint16_t content_type)
+{
+    return coap_opt_put_uint(buf, lastonum, COAP_OPT_CONTENT_FORMAT, content_type);
+}
 /**@}*/
 
 

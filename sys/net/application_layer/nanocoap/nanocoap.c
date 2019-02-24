@@ -653,20 +653,6 @@ size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, const uin
     return (size_t)n;
 }
 
-size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum, uint16_t content_type)
-{
-    if (content_type == 0) {
-        return coap_put_option(buf, lastonum, COAP_OPT_CONTENT_FORMAT, NULL, 0);
-    }
-    else if (content_type <= 255) {
-        uint8_t tmp = content_type;
-        return coap_put_option(buf, lastonum, COAP_OPT_CONTENT_FORMAT, &tmp, sizeof(tmp));
-    }
-    else {
-        return coap_put_option(buf, lastonum, COAP_OPT_CONTENT_FORMAT, (uint8_t *)&content_type, sizeof(content_type));
-    }
-}
-
 static unsigned _size2szx(size_t size)
 {
     unsigned szx = 0;
@@ -694,46 +680,30 @@ static unsigned _slicer_blknum(coap_block_slicer_t *slicer)
     return blknum;
 }
 
-static size_t coap_put_option_block(uint8_t *buf, uint16_t lastonum, unsigned blknum, unsigned szx, int more, uint16_t option)
-{
-    uint32_t blkopt = (blknum << 4) | szx | (more ? 0x8 : 0);
-    size_t olen = _encode_uint(&blkopt);
-
-    return coap_put_option(buf, lastonum, option, (uint8_t *)&blkopt, olen);
-}
-
-size_t coap_put_option_block1(uint8_t *buf, uint16_t lastonum, unsigned blknum, unsigned szx, int more)
-{
-    return coap_put_option_block(buf, lastonum, blknum, szx, more, COAP_OPT_BLOCK1);
-}
-
-int coap_get_block(coap_pkt_t *pkt, coap_block1_t *block, uint16_t blkopt)
+int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block1)
 {
     uint32_t blknum;
     unsigned szx;
 
-    block->more = coap_get_blockopt(pkt, blkopt, &blknum, &szx);
-    if (block->more >= 0) {
-        block->offset = blknum << (szx + 4);
+    block1->more = coap_get_blockopt(pkt, COAP_OPT_BLOCK1, &blknum, &szx);
+    if (block1->more >= 0) {
+        block1->offset = blknum << (szx + 4);
     }
     else {
-        block->offset = 0;
+        block1->offset = 0;
     }
 
-    block->blknum = blknum;
-    block->szx = szx;
+    block1->blknum = blknum;
+    block1->szx = szx;
 
-    return (block->more >= 0);
+    return (block1->more >= 0);
 }
 
-int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block)
+int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block2)
 {
-    return coap_get_block(pkt, block, COAP_OPT_BLOCK1);
-}
-
-int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block)
-{
-    return coap_get_block(pkt, block, COAP_OPT_BLOCK2);
+    block2->more = coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &block2->blknum,
+                                     &block2->szx);
+    return (block2->more >= 0);
 }
 
 size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t lastonum)
