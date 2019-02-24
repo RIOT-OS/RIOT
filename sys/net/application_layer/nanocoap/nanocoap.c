@@ -725,15 +725,6 @@ size_t coap_opt_put_block(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *
     return coap_opt_put_uint(buf, lastonum, option, _slicer2blkopt(slicer, more));
 }
 
-size_t coap_opt_put_block_object(uint8_t *buf, uint16_t lastonum,
-                                 coap_block1_t *block, uint16_t option)
-{
-    uint32_t blkopt = (block->blknum << 4) | block->szx | (block->more ? 0x8 : 0);
-    size_t olen = _encode_uint(&blkopt);
-
-    return coap_put_option(buf, lastonum, option, (uint8_t *)&blkopt, olen);
-}
-
 size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
                            const char *string, char separator)
 {
