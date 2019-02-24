@@ -1039,6 +1039,20 @@ static inline size_t coap_opt_put_block2(uint8_t *buf, uint16_t lastonum,
 }
 
 /**
+ * @brief   Encode the given uint option into buffer
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in]   lastonum    number of previous option (for delta calculation),
+ *                          or 0 for first option
+ * @param[in]   onum        number of option
+ * @param[in]   value       value to encode
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+size_t coap_opt_put_uint(uint8_t *buf, uint16_t lastonum, uint16_t onum,
+                         uint32_t value);
+
+/**
  * @brief   Insert block option into buffer from block struct
  *
  * @param[in]   buf         buffer to write to

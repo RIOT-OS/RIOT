@@ -810,6 +810,14 @@ size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
     return bufpos - buf;
 }
 
+size_t coap_opt_put_uint(uint8_t *buf, uint16_t lastonum, uint16_t onum,
+                         uint32_t value)
+{
+    unsigned uint_len = _encode_uint(&value);
+
+    return coap_put_option(buf, lastonum, onum, (uint8_t *)&value, uint_len);
+}
+
 /* Common functionality for addition of an option */
 static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val,
                             size_t val_len)
