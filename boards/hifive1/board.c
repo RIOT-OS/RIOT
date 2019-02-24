@@ -114,8 +114,8 @@ void board_init_clock(void)
 void board_init(void)
 {
     /* Initialize CPU and clocks */
-    cpu_init();
     board_init_clock();
+    cpu_init();
 
     /* Configure pin muxing for UART0 */
     GPIO_REG(GPIO_OUTPUT_VAL) |= IOF0_UART0_MASK;
