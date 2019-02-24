@@ -681,30 +681,17 @@ static unsigned _slicer2blkopt(coap_block_slicer_t *slicer, bool more)
     return (blknum << 4) | _size2szx(blksize) | (more ? 0x8 : 0);
 }
 
-int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block1)
+int coap_get_block(coap_pkt_t *pkt, coap_block1_t *block, uint16_t option)
 {
-    uint32_t blknum;
-    unsigned szx;
-
-    block1->more = coap_get_blockopt(pkt, COAP_OPT_BLOCK1, &blknum, &szx);
-    if (block1->more >= 0) {
-        block1->offset = blknum << (szx + 4);
+    block->more = coap_get_blockopt(pkt, option, &block->blknum, &block->szx);
+    if (block->more >= 0) {
+        block->offset = block->blknum << (block->szx + 4);
     }
     else {
-        block1->offset = 0;
+        block->offset = 0;
     }
 
-    block1->blknum = blknum;
-    block1->szx = szx;
-
-    return (block1->more >= 0);
-}
-
-int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block2)
-{
-    block2->more = coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &block2->blknum,
-                                     &block2->szx);
-    return (block2->more >= 0);
+    return (block->more >= 0);
 }
 
 size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t lastonum)

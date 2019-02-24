@@ -718,6 +718,26 @@ size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
 size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, uint8_t *bufpos, char c);
 
 /**
+ * @brief    Block option getter
+ *
+ * This function gets a CoAP packet's block option and parses it into a helper
+ * structure.
+ *
+ * If no block option is present in @p pkt, the values in @p block will be
+ * initialized with zero. That implies both block->offset and block->more are
+ * also valid in that case, as packet with offset==0 and more==0 means it contains
+ * all the payload for the corresponding request.
+ *
+ * @param[in]   pkt     pkt to work on
+ * @param[out]  block   ptr to preallocated coap_block1_t structure
+ * @param[in]   option  block1 or block2
+ *
+ * @returns     0 if block option not present
+ * @returns     1 if structure has been filled
+ */
+int coap_get_block(coap_pkt_t *pkt, coap_block1_t *block, uint16_t option);
+
+/**
  * @brief    Block1 option getter
  *
  * This function gets a CoAP packet's block1 option and parses it into a helper
@@ -729,23 +749,29 @@ size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, uint8_t *bufpos, cha
  * all the payload for the corresponding request.
  *
  * @param[in]   pkt     pkt to work on
- * @param[out]  block1  ptr to preallocated coap_block1_t structure
+ * @param[out]  block   ptr to preallocated coap_block1_t structure
  *
  * @returns     0 if block1 option not present
  * @returns     1 if structure has been filled
  */
-int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block1);
+static inline int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block)
+{
+    return coap_get_block(pkt, block, COAP_OPT_BLOCK1);
+}
 
 /**
  * @brief    Block2 option getter
  *
  * @param[in]   pkt     pkt to work on
- * @param[out]  block2  ptr to preallocated coap_block1_t structure
+ * @param[out]  block   ptr to preallocated coap_block1_t structure
  *
  * @returns     0 if block2 option not present
  * @returns     1 if structure has been filled
  */
-int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block2);
+static inline int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block)
+{
+    return coap_get_block(pkt, block, COAP_OPT_BLOCK2);
+}
 
 /**
  * @brief    Generic block option getter
