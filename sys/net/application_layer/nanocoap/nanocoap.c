@@ -880,6 +880,7 @@ void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
     block->szx = _size2szx(blksize);
     block->blknum = blknum;
     block->more = more;
+    block->offset = block->blknum << (block->szx + 4);
 }
 
 void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
