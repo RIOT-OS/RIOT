@@ -170,6 +170,7 @@ do_flash() {
     cat ${RIOTTOOLS}/jlink/reset.seg >> ${BINDIR}/burn.seg
     # flash device
     sh -c "${JLINK} ${JLINK_SERIAL} \
+                    -ExitOnError 1 \
                     -device '${JLINK_DEVICE}' \
                     -speed '${JLINK_SPEED}' \
                     -if '${JLINK_IF}' \
@@ -218,6 +219,7 @@ do_reset() {
     test_serial
     # reset the board
     sh -c "${JLINK} ${JLINK_SERIAL} \
+                    -ExitOnError 1 \
                     -device '${JLINK_DEVICE}' \
                     -speed '${JLINK_SPEED}' \
                     -if '${JLINK_IF}' \
@@ -245,6 +247,7 @@ do_term() {
     trap '' INT
     # start Jlink as RTT server
     sh -c "${JLINK} ${JLINK_SERIAL} \
+            -ExitOnError 1 \
             -device '${JLINK_DEVICE}' \
             -speed '${JLINK_SPEED}' \
             -if '${JLINK_IF}' \
