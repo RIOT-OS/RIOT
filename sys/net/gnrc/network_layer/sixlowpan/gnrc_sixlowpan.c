@@ -134,6 +134,9 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
         fragment_msg->tag = gnrc_sixlowpan_frag_next_tag();
         /* Sending the first fragment has an offset==0 */
         fragment_msg->offset = 0;
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+        fragment_msg->hint.fragsz = 0;
+#endif
 
         gnrc_sixlowpan_frag_send(pkt, fragment_msg, page);
     }
