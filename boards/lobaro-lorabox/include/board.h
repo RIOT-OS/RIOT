@@ -28,7 +28,6 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
-#define AUTO_INIT_LED0
 #define LED0_PORT           GPIOA
 #define LED0_PIN            GPIO_PIN(PORT_A, 1)
 #define LED0_MASK           (1 << 1)
