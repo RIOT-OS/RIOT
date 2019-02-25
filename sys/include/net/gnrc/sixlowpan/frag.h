@@ -29,9 +29,10 @@
 #include <stdbool.h>
 
 #include "byteorder.h"
-#include "kernel_types.h"
+#include "msg.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/netif/hdr.h"
+#include "net/gnrc/sixlowpan/internal.h"
 #include "net/ieee802154.h"
 #include "net/sixlowpan.h"
 
@@ -132,6 +133,29 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
  * @brief   Garbage collect reassembly buffer.
  */
 void gnrc_sixlowpan_frag_rbuf_gc(void);
+
+/**
+ * @brief   Sends a message to pass a further fragment down the network stack
+ *
+ * @see GNRC_SIXLOWPAN_MSG_FRAG_SND
+ *
+ * @param[in] fragment_msg  A @ref gnrc_sixlowpan_msg_frag_t object
+ *
+ * @return  true, when the message was sent
+ * @return  false when sending the message failed.
+ */
+static inline bool gnrc_sixlowpan_frag_send_msg(gnrc_sixlowpan_msg_frag_t *fragment_msg)
+{
+    msg_t msg;
+
+    msg.content.ptr = fragment_msg;
+    msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND;
+#ifdef TEST_SUITES
+    return (msg_try_send(&msg, gnrc_sixlowpan_get_pid()) > 0);
+#else
+    return (msg_send_to_self(&msg) != 0);
+#endif
+}
 
 #if defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(DOXYGEN)
 /**

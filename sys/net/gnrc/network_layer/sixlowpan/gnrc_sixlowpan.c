@@ -55,6 +55,11 @@ kernel_pid_t gnrc_sixlowpan_init(void)
     return _pid;
 }
 
+kernel_pid_t gnrc_sixlowpan_get_pid(void)
+{
+    return _pid;
+}
+
 void gnrc_sixlowpan_dispatch_recv(gnrc_pktsnip_t *pkt, void *context,
                                   unsigned page)
 {
