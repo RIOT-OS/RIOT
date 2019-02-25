@@ -221,7 +221,12 @@ static size_t _6lo_frag_size(gnrc_pktsnip_t *pkt, size_t offset, uint8_t *data)
 static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                      size_t offset, unsigned page)
 {
-    gnrc_sixlowpan_frag_rb_t *entry;
+    union {
+        gnrc_sixlowpan_frag_rb_base_t *super;
+        gnrc_sixlowpan_frag_rb_t *rbuf;
+    } entry;
+    const uint8_t *src = gnrc_netif_hdr_get_src_addr(netif_hdr);
+    const uint8_t *dst = gnrc_netif_hdr_get_dst_addr(netif_hdr);
     uint8_t *data;
     size_t frag_size;
     int res;
@@ -236,29 +241,27 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     datagram_tag = sixlowpan_frag_datagram_tag(pkt->data);
 
     gnrc_sixlowpan_frag_rb_gc();
-    res = _rbuf_get(gnrc_netif_hdr_get_src_addr(netif_hdr), netif_hdr->src_l2addr_len,
-                    gnrc_netif_hdr_get_dst_addr(netif_hdr), netif_hdr->dst_l2addr_len,
-                    datagram_size, datagram_tag, page);
-
-    if (res < 0) {
+    if ((res = _rbuf_get(src, netif_hdr->src_l2addr_len,
+                         dst, netif_hdr->dst_l2addr_len,
+                         datagram_size, datagram_tag, page)) < 0) {
         DEBUG("6lo rbuf: reassembly buffer full.\n");
         gnrc_pktbuf_release(pkt);
         return RBUF_ADD_ERROR;
     }
-    entry = &rbuf[res];
-    if ((offset + frag_size) > entry->super.datagram_size) {
+    entry.rbuf = &rbuf[res];
+    if ((offset + frag_size) > entry.super->datagram_size) {
         DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
-        gnrc_pktbuf_release(entry->pkt);
+        gnrc_pktbuf_release(entry.rbuf->pkt);
         gnrc_pktbuf_release(pkt);
-        gnrc_sixlowpan_frag_rb_remove(entry);
+        gnrc_sixlowpan_frag_rb_remove(entry.rbuf);
         return RBUF_ADD_ERROR;
     }
 
-    switch (_check_fragments(&entry->super, frag_size, offset)) {
+    switch (_check_fragments(entry.super, frag_size, offset)) {
         case RBUF_ADD_REPEAT:
             DEBUG("6lo rfrag: overlapping intervals, discarding datagram\n");
-            gnrc_pktbuf_release(entry->pkt);
-            gnrc_sixlowpan_frag_rb_remove(entry);
+            gnrc_pktbuf_release(entry.rbuf->pkt);
+            gnrc_sixlowpan_frag_rb_remove(entry.rbuf);
             return RBUF_ADD_REPEAT;
         case RBUF_ADD_DUPLICATE:
             gnrc_pktbuf_release(pkt);
@@ -267,9 +270,9 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             break;
     }
 
-    if (_rbuf_update_ints(&entry->super, offset, frag_size)) {
+    if (_rbuf_update_ints(entry.super, offset, frag_size)) {
         DEBUG("6lo rbuf: add fragment data\n");
-        entry->super.current_size += (uint16_t)frag_size;
+        entry.super->current_size += (uint16_t)frag_size;
         if (offset == 0) {
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
             if (sixlowpan_iphc_is(data)) {
@@ -279,17 +282,17 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                 if (frag_hdr == NULL) {
                     DEBUG("6lo rbuf: unable to mark fragment header. "
                           "aborting reassembly.\n");
-                    gnrc_pktbuf_release(entry->pkt);
+                    gnrc_pktbuf_release(entry.rbuf->pkt);
                     gnrc_pktbuf_release(pkt);
-                    gnrc_sixlowpan_frag_rb_remove(entry);
+                    gnrc_sixlowpan_frag_rb_remove(entry.rbuf);
                     return RBUF_ADD_ERROR;
                 }
                 else {
                     DEBUG("6lo rbuf: handing over to IPHC reception.\n");
                     /* `pkt` released in IPHC */
-                    gnrc_sixlowpan_iphc_recv(pkt, entry, 0);
+                    gnrc_sixlowpan_iphc_recv(pkt, entry.rbuf, 0);
                     /* check if entry was deleted in IPHC (error case) */
-                    if (gnrc_sixlowpan_frag_rb_entry_empty(entry)) {
+                    if (gnrc_sixlowpan_frag_rb_entry_empty(entry.rbuf)) {
                         res = RBUF_ADD_ERROR;
                     }
                     return res;
@@ -302,13 +305,13 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                 data++;
             }
         }
-        memcpy(((uint8_t *)entry->pkt->data) + offset, data,
+        memcpy(((uint8_t *)entry.rbuf->pkt->data) + offset, data,
                frag_size);
     }
     else {
         /* no space left in rbuf interval buffer*/
-        gnrc_pktbuf_release(entry->pkt);
-        gnrc_sixlowpan_frag_rb_remove(entry);
+        gnrc_pktbuf_release(entry.rbuf->pkt);
+        gnrc_sixlowpan_frag_rb_remove(entry.rbuf);
         res = RBUF_ADD_ERROR;
     }
     /* no errors and not consumed => release packet */
