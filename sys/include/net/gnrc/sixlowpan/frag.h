@@ -32,6 +32,9 @@
 #include "msg.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/netif/hdr.h"
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+#include "net/gnrc/sixlowpan/frag/hint.h"
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
 #include "net/gnrc/sixlowpan/internal.h"
 #include "net/ieee802154.h"
 #include "net/sixlowpan.h"
@@ -94,6 +97,13 @@ typedef struct {
     uint16_t tag;           /**< Tag used for the fragment */
     uint16_t offset;        /**< Offset of the Nth fragment from the beginning of the
                              *   payload datagram */
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+    /**
+     * @brief   Hint for the size (smaller than link-layer PDU) for the next
+     *          fragment to sent
+     */
+    gnrc_sixlowpan_frag_hint_t hint;
+#endif /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
 } gnrc_sixlowpan_msg_frag_t;
 
 /**
