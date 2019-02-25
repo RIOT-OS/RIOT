@@ -63,6 +63,13 @@
 #ifdef MODULE_MSP430_COMMON
 #define _sheap __heap_start__
 #define _eheap __heap_end__
+
+/* the msp430 linker script needs the heap to be explicitly defined,
+ * otherwise the section ends up empty.*/
+#ifndef CONFIG_MSP430_NEWLIB_HEAPSIZE
+#define CONFIG_MSP430_NEWLIB_HEAPSIZE 512
+#endif
+char __attribute__((used, section(".heap"))) _heap[CONFIG_MSP430_NEWLIB_HEAPSIZE];
 #endif
 
 /**
