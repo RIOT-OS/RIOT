@@ -20,7 +20,11 @@
  */
 
 #include <stdio.h>
+
+#include "periph_conf.h"
+#include "periph/init.h"
 #include "kernel_init.h"
+#include "stdio_base.h"
 #include "irq.h"
 #include "log.h"
 
@@ -28,12 +32,19 @@ extern void board_init(void);
 
 __attribute__((constructor)) static void startup(void)
 {
-    /* use putchar so the linker links it in: */
-    putchar('\n');
-
     board_init();
 
-    LOG_INFO("RIOT MSP430 hardware initialization complete.\n");
+#ifdef MODULE_NEWLIB
+    void _init(void);
+    _init();
+#endif
 
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
+    /* trigger static peripheral initialization */
+    periph_init();
+    /* continue with kernel initialization */
     kernel_init();
+
+    __builtin_unreachable();
 }
