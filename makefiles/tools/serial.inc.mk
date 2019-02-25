@@ -14,13 +14,13 @@ export BAUD ?= 115200
 
 RIOT_TERMINAL ?= pyterm
 ifeq ($(RIOT_TERMINAL),pyterm)
-  export TERMPROG  ?= $(RIOTTOOLS)/pyterm/pyterm
-  export TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)"
+  TERMPROG  ?= $(RIOTTOOLS)/pyterm/pyterm
+  TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)"
 else ifeq ($(RIOT_TERMINAL),socat)
   SOCAT_OUTPUT ?= -
-  export TERMPROG ?= $(RIOT_TERMINAL)
-  export TERMFLAGS ?= $(SOCAT_OUTPUT) open:$(PORT),b$(BAUD),echo=0,raw
+  TERMPROG ?= $(RIOT_TERMINAL)
+  TERMFLAGS ?= $(SOCAT_OUTPUT) open:$(PORT),b$(BAUD),echo=0,raw
 else ifeq ($(RIOT_TERMINAL),picocom)
-  export TERMPROG  ?= picocom
-  export TERMFLAGS ?= --nolock --imap lfcrlf --echo --baud "$(BAUD)" "$(PORT)"
+  TERMPROG  ?= picocom
+  TERMFLAGS ?= --nolock --imap lfcrlf --echo --baud "$(BAUD)" "$(PORT)"
 endif
