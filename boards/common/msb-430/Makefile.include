@@ -18,6 +18,6 @@ FFLAGS = $(MSPDEBUGFLAGS) "prog $(FLASHFILE)"
 DEBUGSERVER = $(FLASHER)
 DEBUGSERVER_FLAGS = $(MSPDEBUGFLAGS) gdb
 DEBUGGER = $(PREFIX)gdb
-DEBUGGER_FLAGS = --tui --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(ELFFILE)
+DEBUGGER_FLAGS = --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(ELFFILE)
 
 INCLUDES += -I$(RIOTBOARD)/common/msb-430/include
