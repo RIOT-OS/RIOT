@@ -15,7 +15,6 @@ export RESET = # dfu-util has no support for resetting the device
 
 HEXFILE = $(BINFILE)
 export FFLAGS = -d $(ID) -a 0 -s 0x08000000:leave -D "$(HEXFILE)"
-export TERMFLAGS = -p $(PORT)
 
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
