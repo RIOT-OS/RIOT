@@ -21,3 +21,7 @@ DEBUGGER = $(PREFIX)gdb
 DEBUGGER_FLAGS = --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(ELFFILE)
 
 INCLUDES += -I$(RIOTBOARD)/common/msb-430/include
+
+# setup reset tool
+RESET ?= mspdebug
+RESET_FLAGS ?= $(MSPDEBUGFLAGS) reset
