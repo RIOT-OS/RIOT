@@ -54,6 +54,10 @@ unsigned _native_rng_read_hq(uint8_t *buf, unsigned num);
 void hwrng_init(void)
 {
     DEBUG("hwrng_init: initializing\n");
+
+    if (initialized)
+        return;
+
     switch (_native_rng_mode) {
         case 0:
             _native_rng_init_hq();

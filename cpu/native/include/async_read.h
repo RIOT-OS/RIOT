@@ -58,6 +58,15 @@ void native_async_read_cleanup(void);
 void native_async_read_continue(int fd);
 
 /**
+ * @brief   helper for read continue with select
+ *
+ * Call this function after reading file descriptors.
+ *
+ * @param[in] fd  The file descriptor to monitor
+ */
+void native_async_continue_reading(int fd);
+
+/**
  * @brief   start monitoring of file descriptor
  *
  * @param[in] fd       The file descriptor to monitor

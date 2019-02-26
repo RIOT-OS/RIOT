@@ -286,6 +286,11 @@ void auto_init(void)
     auto_init_sx127x();
 #endif
 
+#ifdef MODULE_NETDEV_RAW802154
+    extern void auto_init_netdev_raw802154(void);
+    auto_init_netdev_raw802154();
+#endif
+
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
 #ifdef MODULE_GNRC_UHCPC

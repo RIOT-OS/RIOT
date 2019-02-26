@@ -35,6 +35,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef __MACH__
+#include "net/if_var.h"
+#else
+#include "net/if.h"
+#endif
+
+#include "async_read.h"
+
 #include "kernel_init.h"
 #include "cpu.h"
 #include "irq.h"
@@ -82,6 +90,10 @@ netdev_tap_params_t netdev_tap_params[NETDEV_TAP_MAX];
 
 socket_zep_params_t socket_zep_params[SOCKET_ZEP_MAX];
 #endif
+#ifdef MODULE_NETDEV_RAW802154
+char raw802154_ifname_str[IFNAMSIZ];
+char *raw802154_ifname = NULL;
+#endif
 
 static const char short_opts[] = ":hi:s:deEoc:"
 #ifdef MODULE_MTD_NATIVE
@@ -92,6 +104,9 @@ static const char short_opts[] = ":hi:s:deEoc:"
 #endif
 #ifdef MODULE_SOCKET_ZEP
     "z:"
+#endif
+#ifdef MODULE_NETDEV_RAW802154
+    "w:"
 #endif
     "";
 
@@ -112,6 +127,9 @@ static const struct option long_opts[] = {
 #endif
 #ifdef MODULE_SOCKET_ZEP
     { "zep", required_argument, NULL, 'z' },
+#endif
+#ifdef MODULE_NETDEV_RAW802154
+    { "wpan", required_argument, NULL, 'w' },
 #endif
     { NULL, 0, NULL, '\0' },
 };
@@ -281,6 +299,9 @@ void usage_exit(int status)
 "        and remote address and port (default local: [::]:17754).\n"
 "        Required to be provided SOCKET_ZEP_MAX times\n"
 #endif
+#ifdef MODULE_NETDEV_RAW802154
+"    -w <ifname> specify IEEE 802.15.4 wpan interface\n"
+#endif
     );
 #ifdef MODULE_MTD_NATIVE
     real_printf(
@@ -385,6 +406,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 #ifdef MODULE_SOCKET_ZEP
     unsigned zeps = 0;
 #endif
+#ifdef MODULE_NETDEV_RAW802154
+    char *wpan_ifname = NULL;
+#endif
     bool dmn = false, force_stderr = false;
     _stdiotype_t stderrtype = _STDIOTYPE_STDIO;
     _stdiotype_t stdouttype = _STDIOTYPE_STDIO;
@@ -454,6 +478,11 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 #ifdef MODULE_SOCKET_ZEP
             case 'z':
                 _zep_params_setup(optarg, zeps++);
+                break;
+#endif
+#ifdef MODULE_NETDEV_RAW802154
+            case 'w':
+                wpan_ifname = optarg;
                 break;
 #endif
             default:
@@ -533,8 +562,18 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     native_cpu_init();
     native_interrupt_init();
 #ifdef MODULE_NETDEV_TAP
-    for (int i = 0; i < NETDEV_TAP_MAX; i++) {
+    /* configure signal handler for fds */
+    native_async_read_setup();
+
+for (int i = 0; i < NETDEV_TAP_MAX; i++) {
         netdev_tap_params[i].tap_name = &argv[optind + i];
+    }
+#endif
+#ifdef MODULE_NETDEV_RAW802154
+    if (wpan_ifname) {
+        native_async_read_setup();
+        strncpy(raw802154_ifname_str, wpan_ifname, IFNAMSIZ);
+        raw802154_ifname = raw802154_ifname_str;
     }
 #endif
 
