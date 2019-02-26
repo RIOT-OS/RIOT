@@ -31,6 +31,8 @@ void auto_init_gnrc_rpl(void)
 #if (GNRC_NETIF_NUMOF == 1)
     gnrc_netif_t *netif = gnrc_netif_iter(NULL);
     if (netif == NULL) {
+        /* XXX this is just a work-around ideally this would happen with
+         * an `up` event of the interface */
         LOG_INFO("Unable to auto-initialize RPL. No interfaces found.\n");
         return;
     }
@@ -45,10 +47,14 @@ void auto_init_gnrc_rpl(void)
         gnrc_rpl_init(GNRC_RPL_DEFAULT_NETIF);
         return;
     }
+    /* XXX this is just a work-around ideally this would happen with
+     * an `up` event of the GNRC_RPL_DEFAULT_NETIF */
     DEBUG("auto_init_gnrc_rpl: could not initialize RPL on interface %" PRIkernel_pid" - "
           "interface does not exist\n", GNRC_RPL_DEFAULT_NETIF);
     return;
 #else
+    /* XXX this is just a work-around ideally this should be defined in some
+     * run-time interface configuration */
     DEBUG("auto_init_gnrc_rpl: please specify an interface by setting GNRC_RPL_DEFAULT_NETIF\n");
 #endif
 }
