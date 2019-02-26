@@ -123,6 +123,7 @@
 #include "cib.h"
 #include "msg.h"
 #include "cpu_conf.h"
+#include "mutex.h"
 #include "sched.h"
 
 #ifdef MODULE_CORE_THREAD_FLAGS
@@ -314,6 +315,25 @@ struct _thread {
 /** @} */
 
 /**
+ * @name Types and macros used for thread signaling
+ * @{
+ */
+
+/**
+ * @brief   Static initializer for @ref thread_signal_t
+ * @warning The active thread will be marked as received when this initializer
+ *          is used
+ */
+#define THREAD_SIGNAL_INIT              MUTEX_INIT_LOCKED
+
+/**
+ * @brief Datatype used by @ref thread_signal and @ref thread_await_signal
+ */
+typedef mutex_t thread_signal_t;
+
+/** @} */
+
+/**
  * @brief Creates a new thread.
  *
  * For an in-depth discussion of thread priorities, behavior and and flags,
@@ -365,6 +385,20 @@ volatile thread_t *thread_get(kernel_pid_t pid);
 int thread_getstatus(kernel_pid_t pid);
 
 /**
+ * @brief   Wait to be signaled via @ref thread_signal unless the signal already
+ *          came in
+ *
+ * @param[in,out]   signal  Structure used to pass the signal
+ *
+ * If @p signal indicates at least one signal was already received since last
+ * call this function will return directly.
+ */
+static inline void thread_await_signal(thread_signal_t *signal)
+{
+    mutex_lock(signal);
+}
+
+/**
  * @brief Puts the current thread into sleep mode. Has to be woken up externally.
  */
 void thread_sleep(void);
@@ -395,6 +429,29 @@ void thread_yield(void);
  * @see     thread_yield()
  */
 void thread_yield_higher(void);
+
+/**
+ * @brief Signal a thread that waits using @ref thread_await_signal
+ *
+ * @param[in,out]   signal  Structure used to pass the signal
+ *
+ * If the signaled thread is not yet awaiting the signal yet, the next call to
+ * @ref thread_await_signal returns immediately
+ */
+static inline void thread_signal(thread_signal_t *signal)
+{
+    mutex_unlock(signal);
+}
+
+/**
+ * @brief Initialize the signal data structure
+ * @param[out]  signal      Structure to initialize
+ * @param[in]   pid         PID of the thread that will await the signal
+ */
+static inline void thread_signal_init(thread_signal_t *signal)
+{
+    signal->queue.next = MUTEX_LOCKED;
+}
 
 /**
  * @brief Wakes up a sleeping thread.
