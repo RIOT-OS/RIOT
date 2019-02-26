@@ -589,11 +589,24 @@ static int _rbuf_get(const void *src, size_t src_len,
         default:
             reass_type = GNRC_NETTYPE_UNDEF;
     }
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
-    res->pkt = gnrc_pktbuf_add(NULL, NULL, 0, reass_type);
-#else   /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
-    res->pkt = gnrc_pktbuf_add(NULL, NULL, size, reass_type);
-#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
+    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_VRB)) {
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC)) {
+            /* only allocate enough space to decompress IPv6 header
+             * for forwarding information */
+            res->pkt = gnrc_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
+                                       reass_type);
+        }
+        else {
+            /* try fragment forwarding without IPHC. Since `res->pkt == NULL`
+             * is not a valid value for a reassembly buffer entry, we need to
+             * set it to at least a packet snip for now */
+            res->pkt = gnrc_pktbuf_add(NULL, NULL, 0, reass_type);
+        }
+    }
+    else {
+        /* reassemble whole datagram without direct fragment forwarding */
+        res->pkt = gnrc_pktbuf_add(NULL, NULL, size, reass_type);
+    }
     if (res->pkt == NULL) {
         DEBUG("6lo rfrag: can not allocate reassembly buffer space.\n");
         return -1;

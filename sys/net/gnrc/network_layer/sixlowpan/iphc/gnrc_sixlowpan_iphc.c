@@ -824,6 +824,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
                        payload_offset - sizeof(ipv6_hdr_t));
     }
     if ((rbuf == NULL) &&
+        /* (rbuf == NULL) => forwarding is not affected by this */
         (gnrc_pktbuf_realloc_data(ipv6, uncomp_hdr_len + payload_len) != 0)) {
         DEBUG("6lo iphc: no space left to copy payload\n");
         _recv_error_release(sixlo, ipv6, rbuf);
@@ -852,6 +853,12 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
                 }
             }
             if ((ipv6 == NULL) || (res < 0)) {
+                /* TODO: There is a potential to fall-back to classic reassembly
+                 * when ipv6 != NULL. However, since `ipv6` was reversed in
+                 * `_encode_frag_for_forwarding`, that step needs to be reversed
+                 * or a version of the old ipv6 needs to be held in the buffer.
+                 * For now, just drop the packet all together in an error case
+                 */
                 gnrc_sixlowpan_frag_vrb_rm(vrbe);
             }
             gnrc_pktbuf_release(sixlo);
