@@ -23,6 +23,7 @@
 #include <inttypes.h>
 
 #include "xtimer.h"
+#include "fmt.h"
 
 #include "hashes.h"
 #include "bloom.h"
@@ -109,7 +110,14 @@ int main(void)
     printf("%d elements probably in the filter.\n", in);
     printf("%d elements not in the filter.\n", not_in);
     double false_positive_rate = (double) in / (double) lenA;
-    printf("%f false positive rate.\n", false_positive_rate);
+    /* Use 'fmt/print_float' to work on all platforms (atmega)
+     * Stdout should be flushed before to prevent garbled output. */
+#ifdef MODULE_NEWLIB
+    /* no fflush on msp430 */
+    fflush(stdout);
+#endif
+    print_float(false_positive_rate, 6);
+    puts(" false positive rate.");
 
     bloom_del(&bloom);
     printf("\nAll done!\n");
