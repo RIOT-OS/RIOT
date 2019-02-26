@@ -47,6 +47,17 @@ extern "C" {
 #endif
 
 /**
+ * @brief       Message queue size for network interface threads
+ *
+ * @attention   This has influence on the used stack memory of the thread, so
+ *              the thread's stack size might need to be adapted if this is
+ *              changed.
+ */
+#ifndef GNRC_NETIF_MSG_QUEUE_SIZE
+#define GNRC_NETIF_MSG_QUEUE_SIZE  (8U)
+#endif
+
+/**
  * @brief   Number of multicast addresses needed for @ref net_gnrc_rpl "RPL".
  *
  * @note    Used for calculation of @ref GNRC_NETIF_IPV6_GROUPS_NUMOF

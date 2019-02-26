@@ -38,8 +38,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define _NETIF_NETAPI_MSG_QUEUE_SIZE    (8)
-
 static gnrc_netif_t _netifs[GNRC_NETIF_NUMOF];
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);
@@ -1170,7 +1168,7 @@ static void *_gnrc_netif_thread(void *args)
     netdev_t *dev;
     int res;
     msg_t reply = { .type = GNRC_NETAPI_MSG_TYPE_ACK };
-    msg_t msg, msg_queue[_NETIF_NETAPI_MSG_QUEUE_SIZE];
+    msg_t msg, msg_queue[GNRC_NETIF_MSG_QUEUE_SIZE];
 
     DEBUG("gnrc_netif: starting thread %i\n", sched_active_pid);
     netif = args;
@@ -1178,7 +1176,7 @@ static void *_gnrc_netif_thread(void *args)
     dev = netif->dev;
     netif->pid = sched_active_pid;
     /* setup the link-layer's message queue */
-    msg_init_queue(msg_queue, _NETIF_NETAPI_MSG_QUEUE_SIZE);
+    msg_init_queue(msg_queue, GNRC_NETIF_MSG_QUEUE_SIZE);
     /* register the event callback with the device driver */
     dev->event_callback = _event_cb;
     dev->context = netif;
