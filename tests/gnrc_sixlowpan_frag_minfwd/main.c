@@ -70,6 +70,20 @@
 #define TEST_NTH_FRAG_SIZE                          (32U)
 #define TEST_NTH_FRAG_OFFSET_POS                    (4U)
 #define TEST_NTH_FRAG_PAYLOAD_POS                   (5U)
+#define TEST_SEND_DATAGRAM_SIZE                     (148U)
+#define TEST_SEND_DATAGRAM_TAG                      (0x22ddU)
+#define TEST_SEND_LL_PAYLOAD_POS                    (4U)
+#define TEST_SEND_LL_PAYLOAD_SIZE                   (7U)
+#define TEST_SEND_FRAG1_PAYLOAD_POS                 (4U)
+#define TEST_SEND_FRAG1_PAYLOAD_SIZE                (35U)
+#define TEST_SEND_FRAG2_OFFSET_POS                  (4U)
+#define TEST_SEND_FRAG2_OFFSET                      (5U)
+#define TEST_SEND_FRAG2_PAYLOAD_POS                 (5U)
+#define TEST_SEND_FRAG2_PAYLOAD_SIZE                (96U)
+#define TEST_SEND_FRAG3_OFFSET_POS                  (4U)
+#define TEST_SEND_FRAG3_OFFSET                      (17U)
+#define TEST_SEND_FRAG3_PAYLOAD_POS                 (5U)
+#define TEST_SEND_FRAG3_PAYLOAD_SIZE                (12U)
 
 enum {
     FIRST_FRAGMENT = 0,
@@ -109,6 +123,86 @@ static const uint8_t _test_nth_frag[] = {
         0x56, 0x44, 0x4a, 0x84, 0xd1, 0x83, 0xb9, 0xdb,
         0x0e, 0x0d, 0xd6, 0x6a, 0x83, 0x31, 0x1d, 0x94,
     };
+static const uint8_t _test_send_ipv6[] = {
+        /* IPv6 header: payload length = 108,
+         * next header = ICMPv6 (58), hop limit = 64 */
+        0x60, 0x00, 0x00, 0x00, 0x00, 0x6c, 0x3a, 0x40,
+        /* Source: LOC_GB */
+        0x20, 0x01, 0x0d, 0xb8, 0xd3, 0x35, 0x91, 0x7e,
+        _LL0 ^ 0x2, _LL1, _LL2, _LL3, _LL4, _LL5, _LL6, _LL7,
+        /* Destination: REM_GB */
+        0x20, 0x01, 0x0d, 0xb8, 0xd3, 0x35, 0x91, 0x7e,
+        _LL0 ^ 0x2, _LL1, _LL2, _LL3, _LL4, _LL5, _LL6, _LL7 + 1,
+    };
+static const uint8_t _test_send_icmpv6[] = {
+        /* ICMPv6 Echo request (128), Code 0, (Random) checksum: 0x7269,
+         * random identifier: 0x59be, random sequence number: 15804 */
+        0x80, 0x00, 0x72, 0x69, 0x59, 0xbe, 0x3d, 0xbc,
+        /* random payload */
+        0x49, 0x19, 0xe8, 0x0b, 0x25, 0xbb, 0x00, 0x13,
+        0x45, 0x85, 0xbd, 0x4a, 0xbb, 0xf1, 0x3d, 0xe3,
+        0x36, 0xff, 0x52, 0xea, 0xe8, 0xec, 0xec, 0x82,
+        0x94, 0x5f, 0xa4, 0x30, 0x1f, 0x46, 0x28, 0xc7,
+        0x41, 0xff, 0x50, 0x84, 0x00, 0x41, 0xc7, 0x8d,
+        0xb0, 0xdc, 0x18, 0xff, 0xcd, 0xfa, 0xa7, 0x72,
+        0x4b, 0xcf, 0x7c, 0xf7, 0x7c, 0x8b, 0x65, 0x78,
+        0xb0, 0xa8, 0xe7, 0x8f, 0xbc, 0x1e, 0xba, 0x4a,
+        0x92, 0x13, 0x81, 0x5e, 0x23, 0xd1, 0xde, 0x09,
+        0x84, 0x8a, 0xd0, 0xe2, 0xdd, 0x01, 0xc8, 0xd7,
+        0x08, 0x4c, 0xd8, 0xc2, 0x21, 0x5c, 0x21, 0xb9,
+        0x43, 0xea, 0x52, 0xbd, 0x6a, 0x9a, 0xac, 0x48,
+        0x94, 0x98, 0xd1, 0x95
+    };
+static const uint8_t _test_send_ll[] = {
+        0xc0, 0x94, /* 1st fragment | datagram size: TEST_SEND_DATAGRAM_SIZE */
+        0x22, 0xdd, /* tag: TEST_SEND_DATAGRAM_TAG */
+        /* IPHC: TF: 0b11, NH: 0b0 (inline), HLIM: 0b10 (64), CID: 0b0,
+         * Source: uncompressed (SAC: 0b0, SAM: 0b11),
+         * Destination: uncompressed (M:0, DAC: 0b0, DAM: 0b11) */
+        0x7a, 0x33,
+        /* Next header: ICMPv6 (58) */
+        0x3a,
+    };
+static const uint8_t _test_send_frag1[] = {
+        0xc0, 0x94, /* 1st fragment | datagram size: TEST_SEND_DATAGRAM_SIZE */
+        0x22, 0xdd, /* tag: TEST_SEND_DATAGRAM_TAG */
+        /* IPHC: TF: 0b11, NH: 0b0 (inline), HLIM: 0b10 (64), CID: 0b0,
+         * Source: uncompressed (SAC: 0b0, SAM: 0b00),
+         * Destination: uncompressed (M:0, DAC: 0b0, DAM: 0b00) */
+        0x7a, 0x00,
+        /* Next header: ICMPv6 (58) */
+        0x3a,
+        /* (uncompressed) Source: LOC_GB */
+        0x20, 0x01, 0x0d, 0xb8, 0xd3, 0x35, 0x91, 0x7e,
+        _LL0 ^ 0x2, _LL1, _LL2, _LL3, _LL4, _LL5, _LL6, _LL7,
+        /* (uncompressed) Destination: REM_GB */
+        0x20, 0x01, 0x0d, 0xb8, 0xd3, 0x35, 0x91, 0x7e,
+        _LL0 ^ 0x2, _LL1, _LL2, _LL3, _LL4, _LL5, _LL6, _LL7 + 1,
+    };
+static const uint8_t _test_send_frag2[] = {
+        0xe0, 0x94, /* nth fragment | datagram size: TEST_SEND_DATAGRAM_SIZE */
+        0x22, 0xdd, /* tag: TEST_SEND_DATAGRAM_TAG */
+        0x05,       /* offset: 40 (divided by 8) */
+        0x80, 0x00, 0x72, 0x69, 0x59, 0xbe, 0x3d, 0xbc,
+        0x49, 0x19, 0xe8, 0x0b, 0x25, 0xbb, 0x00, 0x13,
+        0x45, 0x85, 0xbd, 0x4a, 0xbb, 0xf1, 0x3d, 0xe3,
+        0x36, 0xff, 0x52, 0xea, 0xe8, 0xec, 0xec, 0x82,
+        0x94, 0x5f, 0xa4, 0x30, 0x1f, 0x46, 0x28, 0xc7,
+        0x41, 0xff, 0x50, 0x84, 0x00, 0x41, 0xc7, 0x8d,
+        0xb0, 0xdc, 0x18, 0xff, 0xcd, 0xfa, 0xa7, 0x72,
+        0x4b, 0xcf, 0x7c, 0xf7, 0x7c, 0x8b, 0x65, 0x78,
+        0xb0, 0xa8, 0xe7, 0x8f, 0xbc, 0x1e, 0xba, 0x4a,
+        0x92, 0x13, 0x81, 0x5e, 0x23, 0xd1, 0xde, 0x09,
+        0x84, 0x8a, 0xd0, 0xe2, 0xdd, 0x01, 0xc8, 0xd7,
+        0x08, 0x4c, 0xd8, 0xc2, 0x21, 0x5c, 0x21, 0xb9,
+    };
+static const uint8_t _test_send_frag3[] = {
+        0xe0, 0x94, /* nth fragment | datagram size: TEST_ASSERT_EQUAL_INT */
+        0x22, 0xdd, /* tag: TEST_SEND_DATAGRAM_TAG */
+        0x11,       /* offset: 136 (divided by 8) */
+        0x43, 0xea, 0x52, 0xbd, 0x6a, 0x9a, 0xac, 0x48,
+        0x94, 0x98, 0xd1, 0x95
+    };
 static const ipv6_addr_t _rem_ll = { .u8 = REM_LL };
 static const ipv6_addr_t _rem_gb = { .u8 = REM_GB };
 static const uint8_t _rem_l2[] = REM_L2;
@@ -132,10 +226,14 @@ static gnrc_pktsnip_t *_create_ipv6_hdr(const ipv6_hdr_t *hdr);
 static gnrc_pktsnip_t *_create_recv_frag(const void *frag_data,
                                          size_t frag_size);
 static int _set_route_and_nce(const ipv6_addr_t *route, unsigned pfx_len);
+static gnrc_pktsnip_t *_create_send_datagram(bool compressed, bool payload);
 static size_t _wait_for_packet(size_t exp_size);
 static void _check_vrbe_values(gnrc_sixlowpan_frag_vrb_t *vrbe,
                                size_t mhr_len, int frag_type);
 static void _check_1st_frag_uncomp(size_t mhr_len, uint8_t exp_hl_diff);
+static void _check_send_frag1(size_t mhr_len, bool check_tag);
+static void _check_send_frag2(size_t mhr_len, bool check_tag);
+static void _check_send_frag3(size_t mhr_len, bool check_tag);
 static const gnrc_sixlowpan_frag_rb_t *_first_non_empty_rbuf(void);
 static int _mock_netdev_send(netdev_t *dev, const iolist_t *iolist);
 
@@ -417,6 +515,113 @@ static void test_minfwd_forward__ENOMEM__netif_hdr_build_fail(void)
                                                                       0));
     gnrc_pktbuf_release(frag);  /* delete separated fragment header */
     gnrc_pktbuf_release(filled_space);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+}
+
+static void test_minfwd_frag_iphc__success(void)
+{
+    gnrc_sixlowpan_frag_fb_t *fbuf;
+    gnrc_pktsnip_t *pkt;
+    size_t mhr_len;
+
+    TEST_ASSERT_NOT_NULL((pkt = _create_send_datagram(true, true)));
+
+    TEST_ASSERT_NOT_NULL((fbuf = gnrc_sixlowpan_frag_fb_get()));
+    fbuf->datagram_size = TEST_SEND_DATAGRAM_SIZE;
+    fbuf->tag = TEST_SEND_DATAGRAM_TAG;
+
+    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+                            _mock_netdev_send);
+    TEST_ASSERT_EQUAL_INT(
+            0, gnrc_sixlowpan_frag_minfwd_frag_iphc(pkt,
+                                                    TEST_SEND_DATAGRAM_SIZE,
+                                                    &_rem_gb, fbuf)
+        );
+    TEST_ASSERT((mhr_len = _wait_for_packet(sizeof(_test_send_frag1))));
+    _check_send_frag1(mhr_len, true);
+    TEST_ASSERT((mhr_len = _wait_for_packet(sizeof(_test_send_frag2))));
+    _check_send_frag2(mhr_len, true);
+    TEST_ASSERT((mhr_len = _wait_for_packet(sizeof(_test_send_frag3))));
+    _check_send_frag3(mhr_len, true);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+}
+
+static void test_minfwd_frag_iphc__no_frag(void)
+{
+    gnrc_sixlowpan_frag_fb_t *fbuf;
+    gnrc_pktsnip_t *pkt, *netif;
+    gnrc_netif_hdr_t *netif_hdr;
+
+    pkt = gnrc_pktbuf_add(NULL,
+                          &_test_send_frag1[TEST_SEND_FRAG1_PAYLOAD_POS],
+                          TEST_SEND_FRAG1_PAYLOAD_SIZE,
+                          GNRC_NETTYPE_SIXLOWPAN);
+    TEST_ASSERT_NOT_NULL(pkt);
+    netif = gnrc_netif_hdr_build(_vrbe_base.src, _vrbe_base.src_len,
+                                 _vrbe_base.dst, _vrbe_base.dst_len);
+    TEST_ASSERT_NOT_NULL(netif);
+    netif_hdr = netif->data;
+    TEST_ASSERT_NOT_NULL(netif_hdr);
+    netif_hdr->if_pid = _mock_netif->pid;
+    LL_PREPEND(pkt, netif);
+
+    TEST_ASSERT_NOT_NULL((fbuf = gnrc_sixlowpan_frag_fb_get()));
+    fbuf->datagram_size = TEST_SEND_FRAG1_PAYLOAD_SIZE;
+    fbuf->tag = TEST_SEND_DATAGRAM_TAG;
+
+    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+                            _mock_netdev_send);
+    TEST_ASSERT_EQUAL_INT(
+            -1, gnrc_sixlowpan_frag_minfwd_frag_iphc(pkt,
+                                                     TEST_SEND_DATAGRAM_SIZE,
+                                                     &_rem_gb, fbuf)
+        );
+    /* should time out (as the packet should be handled by normal fragmentation)
+     * now */
+    TEST_ASSERT_EQUAL_INT(0, _wait_for_packet(sizeof(_test_send_frag1)));
+    TEST_ASSERT_NULL(fbuf->pkt);
+    gnrc_pktbuf_release(pkt);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+}
+
+static void test_minfwd_frag_iphc__ll_dst(void)
+{
+    gnrc_sixlowpan_frag_fb_t *fbuf;
+    gnrc_pktsnip_t *pkt, *netif;
+    gnrc_netif_hdr_t *netif_hdr;
+
+    pkt = gnrc_pktbuf_add(NULL,
+                          &_test_send_ll[TEST_SEND_LL_PAYLOAD_POS],
+                          TEST_SEND_LL_PAYLOAD_SIZE,
+                          GNRC_NETTYPE_SIXLOWPAN);
+    TEST_ASSERT_NOT_NULL(pkt);
+    netif = gnrc_netif_hdr_build(_vrbe_base.src, _vrbe_base.src_len,
+                                 _vrbe_base.dst, _vrbe_base.dst_len);
+    TEST_ASSERT_NOT_NULL(netif);
+    netif_hdr = netif->data;
+    TEST_ASSERT_NOT_NULL(netif_hdr);
+    netif_hdr->if_pid = _mock_netif->pid;
+    LL_PREPEND(pkt, netif);
+
+    TEST_ASSERT_NOT_NULL((fbuf = gnrc_sixlowpan_frag_fb_get()));
+    fbuf->datagram_size = TEST_SEND_FRAG1_PAYLOAD_SIZE;
+    fbuf->tag = TEST_SEND_DATAGRAM_TAG;
+
+    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+                            _mock_netdev_send);
+    TEST_ASSERT_EQUAL_INT(
+            -1, gnrc_sixlowpan_frag_minfwd_frag_iphc(pkt,
+                                                     TEST_SEND_DATAGRAM_SIZE,
+                                                     &_rem_ll, fbuf)
+        );
+    /* should time out (as the packet should be handled by normal fragmentation)
+     * now */
+    TEST_ASSERT_EQUAL_INT(0, _wait_for_packet(sizeof(_test_send_frag1)));
+    TEST_ASSERT_NULL(fbuf->pkt);
+    gnrc_pktbuf_release(pkt);
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
@@ -734,6 +939,29 @@ static void test_sixlo_recv__nth_frag__overlap(void)
         ));
 }
 
+static void test_sixlo_send(void)
+{
+    gnrc_pktsnip_t *pkt;
+    size_t mhr_len;
+
+    TEST_ASSERT_NOT_NULL((pkt = _create_send_datagram(false, true)));
+
+    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+                            _mock_netdev_send);
+    TEST_ASSERT(0 < gnrc_netapi_dispatch_send(GNRC_NETTYPE_SIXLOWPAN,
+                                              GNRC_NETREG_DEMUX_CTX_ALL,
+                                              pkt));
+    TEST_ASSERT((mhr_len = _wait_for_packet(sizeof(_test_send_frag1))));
+    /* tags are generated by the stack so don't check */
+    _check_send_frag1(mhr_len, false);
+    TEST_ASSERT((mhr_len = _wait_for_packet(sizeof(_test_send_frag2))));
+    _check_send_frag2(mhr_len, false);
+    TEST_ASSERT((mhr_len = _wait_for_packet(sizeof(_test_send_frag3))));
+    _check_send_frag3(mhr_len, false);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+}
+
 static Test *tests_gnrc_sixlowpan_frag_minfwd_api(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -747,6 +975,9 @@ static Test *tests_gnrc_sixlowpan_frag_minfwd_api(void)
         new_TestFixture(test_minfwd_forward__success__nth_frag_incomplete),
         new_TestFixture(test_minfwd_forward__success__nth_frag_complete),
         new_TestFixture(test_minfwd_forward__ENOMEM__netif_hdr_build_fail),
+        new_TestFixture(test_minfwd_frag_iphc__success),
+        new_TestFixture(test_minfwd_frag_iphc__no_frag),
+        new_TestFixture(test_minfwd_frag_iphc__ll_dst),
     };
 
     EMB_UNIT_TESTCALLER(tests, _set_up, _tear_down, fixtures);
@@ -765,6 +996,7 @@ static Test *tests_gnrc_sixlowpan_frag_minfwd_integration(void)
         new_TestFixture(test_sixlo_recv__nth_frag__no_vrbe),
         new_TestFixture(test_sixlo_recv__nth_frag__duplicate),
         new_TestFixture(test_sixlo_recv__nth_frag__overlap),
+        new_TestFixture(test_sixlo_send),
     };
 
     EMB_UNIT_TESTCALLER(tests, _set_up, _tear_down, fixtures);
@@ -819,6 +1051,46 @@ static int _set_route_and_nce(const ipv6_addr_t *route, unsigned pfx_len)
         return -1;
     }
     return 0;
+}
+
+static gnrc_pktsnip_t *_create_send_datagram(bool compressed, bool payload)
+{
+    gnrc_pktsnip_t *pkt1 = NULL, *pkt2;
+    gnrc_netif_hdr_t *netif_hdr;
+
+    if (payload) {
+        pkt1 = gnrc_pktbuf_add(NULL, _test_send_icmpv6, sizeof(_test_send_icmpv6),
+                               GNRC_NETTYPE_ICMPV6);
+        if (pkt1 == NULL) {
+            return NULL;
+        }
+    }
+    if (compressed) {
+        /* Use IPHC header from expected data */
+        pkt2 = gnrc_pktbuf_add(pkt1,
+                               &_test_send_frag1[TEST_SEND_FRAG1_PAYLOAD_POS],
+                               TEST_SEND_FRAG1_PAYLOAD_SIZE,
+                               GNRC_NETTYPE_SIXLOWPAN);
+    }
+    else {
+        pkt2 = gnrc_pktbuf_add(pkt1, _test_send_ipv6, sizeof(_test_send_ipv6),
+                               GNRC_NETTYPE_IPV6);
+    }
+    if (pkt2 == NULL) {
+        return NULL;
+    }
+    pkt1 = gnrc_netif_hdr_build(_vrbe_base.src, _vrbe_base.src_len,
+                                _vrbe_base.dst, _vrbe_base.dst_len);
+    if (pkt1 == NULL) {
+        return NULL;
+    }
+    netif_hdr = pkt1->data;
+    if (netif_hdr == NULL) {
+        return NULL;
+    }
+    netif_hdr->if_pid = _mock_netif->pid;
+    LL_PREPEND(pkt2, pkt1);
+    return pkt2;
 }
 
 static size_t _wait_for_packet(size_t exp_size)
@@ -920,6 +1192,74 @@ static void _check_1st_frag_uncomp(size_t mhr_len, uint8_t exp_hl_diff)
             memcmp(&_test_1st_frag_uncomp[TEST_1ST_FRAG_UNCOMP_IPV6_PAYLOAD_POS],
                    ipv6_hdr + 1, TEST_1ST_FRAG_UNCOMP_IPV6_PAYLOAD_SIZE) == 0,
             "unexpected forwarded packet payload"
+        );
+}
+
+static void _check_send_frag_datagram_fields(size_t mhr_len, bool check_tag)
+{
+    sixlowpan_frag_t *frag_hdr = (sixlowpan_frag_t *)&_target_buf[mhr_len];
+
+    TEST_ASSERT_EQUAL_INT(TEST_SEND_DATAGRAM_SIZE,
+                          byteorder_ntohs(frag_hdr->disp_size) &
+                          SIXLOWPAN_FRAG_SIZE_MASK);
+    if (check_tag) {
+        TEST_ASSERT_EQUAL_INT(TEST_SEND_DATAGRAM_TAG,
+                              byteorder_ntohs(frag_hdr->tag));
+    }
+}
+
+static void _check_send_frag1(size_t mhr_len, bool check_tag)
+{
+    TEST_ASSERT_EQUAL_INT(
+            SIXLOWPAN_FRAG_1_DISP,
+            _target_buf[mhr_len] & SIXLOWPAN_FRAG_DISP_MASK
+        );
+    _check_send_frag_datagram_fields(mhr_len, check_tag);
+    TEST_ASSERT_MESSAGE(
+            memcmp(&_test_send_frag1[TEST_SEND_FRAG1_PAYLOAD_POS],
+                   &_target_buf[TEST_SEND_FRAG1_PAYLOAD_POS + mhr_len],
+                   TEST_SEND_FRAG1_PAYLOAD_SIZE) == 0,
+            "unexpected IPHC header"
+        );
+}
+
+static void _check_send_frag2(size_t mhr_len, bool check_tag)
+{
+    sixlowpan_frag_n_t *frag_hdr;
+
+    TEST_ASSERT_EQUAL_INT(
+            SIXLOWPAN_FRAG_N_DISP,
+            _target_buf[mhr_len] & SIXLOWPAN_FRAG_DISP_MASK
+        );
+    frag_hdr = (sixlowpan_frag_n_t *)&_target_buf[mhr_len];
+    _check_send_frag_datagram_fields(mhr_len, check_tag);
+    TEST_ASSERT_EQUAL_INT(TEST_SEND_FRAG2_OFFSET,
+                          frag_hdr->offset);
+    TEST_ASSERT_MESSAGE(
+            memcmp(&_test_send_frag2[TEST_SEND_FRAG2_PAYLOAD_POS],
+                   &_target_buf[TEST_SEND_FRAG2_PAYLOAD_POS + mhr_len],
+                   TEST_SEND_FRAG2_PAYLOAD_SIZE) == 0,
+            "unexpected send packet payload"
+        );
+}
+
+static void _check_send_frag3(size_t mhr_len, bool check_tag)
+{
+    sixlowpan_frag_n_t *frag_hdr;
+
+    TEST_ASSERT_EQUAL_INT(
+            SIXLOWPAN_FRAG_N_DISP,
+            _target_buf[mhr_len] & SIXLOWPAN_FRAG_DISP_MASK
+        );
+    frag_hdr = (sixlowpan_frag_n_t *)&_target_buf[mhr_len];
+    _check_send_frag_datagram_fields(mhr_len, check_tag);
+    TEST_ASSERT_EQUAL_INT(TEST_SEND_FRAG3_OFFSET,
+                          frag_hdr->offset);
+    TEST_ASSERT_MESSAGE(
+            memcmp(&_test_send_frag3[TEST_SEND_FRAG3_PAYLOAD_POS],
+                   &_target_buf[TEST_SEND_FRAG3_PAYLOAD_POS + mhr_len],
+                   TEST_SEND_FRAG3_PAYLOAD_SIZE) == 0,
+            "unexpected send packet payload"
         );
 }
 

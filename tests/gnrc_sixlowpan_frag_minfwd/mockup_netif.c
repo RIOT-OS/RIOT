@@ -86,6 +86,14 @@ int _get_address_long(netdev_t *dev, void *value, size_t max_len)
     return sizeof(addr);
 }
 
+int _get_proto(netdev_t *dev, void *value, size_t max_len)
+{
+    (void)dev;
+    assert(max_len == sizeof(gnrc_nettype_t));
+    *((gnrc_nettype_t *)value) = GNRC_NETTYPE_SIXLOWPAN;
+    return sizeof(gnrc_nettype_t);
+}
+
 void _tests_init(void)
 {
     int res;
@@ -102,6 +110,8 @@ void _tests_init(void)
                            _get_src_len);
     netdev_test_set_get_cb(&_mock_netdev, NETOPT_ADDRESS_LONG,
                            _get_address_long);
+    netdev_test_set_get_cb(&_mock_netdev, NETOPT_PROTO,
+                           _get_proto);
     res = gnrc_netif_ieee802154_create(
            &_netif, _mock_netif_stack, THREAD_STACKSIZE_DEFAULT,
            GNRC_NETIF_PRIO, "mockup_wpan", &_mock_netdev.netdev.netdev
