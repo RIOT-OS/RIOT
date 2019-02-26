@@ -11,13 +11,13 @@
  * @{
  *
  * @file
- * @brief       Configure STM32F4 clock to 168MHz using PLL with LSE
+ * @brief       Configure STM32F4 clock to 168MHz using PLL and without LSE
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef F4_CFG_CLOCK_168_8_1_H
-#define F4_CFG_CLOCK_168_8_1_H
+#ifndef F4_CFG_CLOCK_168_8_0_H
+#define F4_CFG_CLOCK_168_8_0_H
 
 #include "f4/cfg_clock_168_8_common.h"
 
@@ -31,11 +31,11 @@ extern "C" {
  * 0: no external low speed crystal available,
  * 1: external crystal available (always 32.768kHz)
  */
-#define CLOCK_LSE           (1)
+#define CLOCK_LSE           (0)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* F4_CFG_CLOCK_168_8_1_H */
+#endif /* F4_CFG_CLOCK_168_8_0_H */
 /** @} */
