@@ -110,6 +110,7 @@ static const uint8_t _test_nth_frag[] = {
         0x0e, 0x0d, 0xd6, 0x6a, 0x83, 0x31, 0x1d, 0x94,
     };
 static const ipv6_addr_t _rem_ll = { .u8 = REM_LL };
+static const ipv6_addr_t _rem_gb = { .u8 = REM_GB };
 static const uint8_t _rem_l2[] = REM_L2;
 static const gnrc_sixlowpan_frag_rb_base_t _vrbe_base = {
         .src = { 0xde, 0x71, 0x2b, 0x85, 0x08, 0x2f, 0x75, 0xfb },
@@ -128,11 +129,14 @@ static mutex_t _target_buf_filled = MUTEX_INIT_LOCKED;
 static mutex_t _target_buf_barrier = MUTEX_INIT;
 
 static gnrc_pktsnip_t *_create_ipv6_hdr(const ipv6_hdr_t *hdr);
+static gnrc_pktsnip_t *_create_recv_frag(const void *frag_data,
+                                         size_t frag_size);
 static int _set_route_and_nce(const ipv6_addr_t *route, unsigned pfx_len);
 static size_t _wait_for_packet(size_t exp_size);
 static void _check_vrbe_values(gnrc_sixlowpan_frag_vrb_t *vrbe,
                                size_t mhr_len, int frag_type);
 static void _check_1st_frag_uncomp(size_t mhr_len, uint8_t exp_hl_diff);
+static const gnrc_sixlowpan_frag_rb_t *_first_non_empty_rbuf(void);
 static int _mock_netdev_send(netdev_t *dev, const iolist_t *iolist);
 
 static void _set_up(void)
@@ -417,6 +421,319 @@ static void test_minfwd_forward__ENOMEM__netif_hdr_build_fail(void)
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
+static void test_sixlo_recv__1st_frag_uncomp(void)
+{
+    gnrc_sixlowpan_frag_vrb_t *vrbe;
+    gnrc_pktsnip_t *frag;
+    size_t mhr_len;
+
+    TEST_ASSERT_NOT_NULL(
+            (frag = _create_recv_frag(_test_1st_frag_uncomp,
+                                      sizeof(_test_1st_frag_uncomp)))
+        );
+    /* configure route to destination of IP header in frag */
+    TEST_ASSERT_EQUAL_INT(0, _set_route_and_nce(&_rem_gb, REM_GB_PFX_LEN));
+    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+                            _mock_netdev_send);
+    TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
+                                                 GNRC_NETREG_DEMUX_CTX_ALL,
+                                                 frag));
+    TEST_ASSERT((mhr_len = _wait_for_packet(sizeof(_test_1st_frag_uncomp))));
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+    /* reassembly buffer remains empty */
+    TEST_ASSERT_NULL(_first_non_empty_rbuf());
+    /* but there was a VRB entry created */
+    TEST_ASSERT_NOT_NULL((vrbe = gnrc_sixlowpan_frag_vrb_get(
+            _vrbe_base.src, _vrbe_base.src_len, _vrbe_base.tag
+        )));
+    _check_vrbe_values(vrbe, mhr_len, FIRST_FRAGMENT);
+    TEST_ASSERT_EQUAL_INT(TEST_1ST_FRAG_UNCOMP_SIZE,
+                          vrbe->super.current_size);
+    /* only the received fragment is registered */
+    TEST_ASSERT_NOT_NULL(vrbe->super.ints);
+    TEST_ASSERT_NULL(vrbe->super.ints->next);
+    TEST_ASSERT(_target_buf[0] & IEEE802154_FCF_FRAME_PEND);
+    _check_1st_frag_uncomp(mhr_len, 1U);
+}
+
+static void test_sixlo_recv__1st_frag_uncomp__no_route(void)
+{
+    const gnrc_sixlowpan_frag_rb_t *rbuf;
+    gnrc_pktsnip_t *frag;
+
+    TEST_ASSERT_NOT_NULL(
+            (frag = _create_recv_frag(_test_1st_frag_uncomp,
+                                      sizeof(_test_1st_frag_uncomp)))
+        );
+    TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
+                                                 GNRC_NETREG_DEMUX_CTX_ALL,
+                                                 frag));
+    /* should time out */
+    TEST_ASSERT_EQUAL_INT(0, _wait_for_packet(sizeof(_test_1st_frag_uncomp)));
+    /* normal reassembly should have started */
+    /* reassembly buffer entry should have been created */
+    TEST_ASSERT_NOT_NULL((rbuf = _first_non_empty_rbuf()));
+    /* and VRB remains empty */
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(
+            _vrbe_base.src, _vrbe_base.src_len, _vrbe_base.tag
+        ));
+    TEST_ASSERT_EQUAL_INT(_vrbe_base.datagram_size, rbuf->pkt->size);
+    gnrc_pktbuf_release(rbuf->pkt);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+    /* This is normal reassembly so the rest should have be tested in the
+     * test for normal reassembly ;-) */
+}
+
+static void test_sixlo_recv__1st_frag_uncomp__after_nth_frag(void)
+{
+    const gnrc_sixlowpan_frag_rb_t *rbuf;
+    gnrc_pktsnip_t *frag;
+
+    TEST_ASSERT_NOT_NULL(
+            (frag = _create_recv_frag(_test_nth_frag, sizeof(_test_nth_frag)))
+        );
+    /* configure route to destination of IP header in frag */
+    TEST_ASSERT_EQUAL_INT(0, _set_route_and_nce(&_rem_gb, REM_GB_PFX_LEN));
+    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+                            _mock_netdev_send);
+    TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
+                                                 GNRC_NETREG_DEMUX_CTX_ALL,
+                                                 frag));
+
+    /* should time out */
+    TEST_ASSERT_EQUAL_INT(0, _wait_for_packet(sizeof(_test_nth_frag)));
+    /* reassembly buffer entry should have been created */
+    TEST_ASSERT_NOT_NULL(_first_non_empty_rbuf());
+    /* and VRB remains empty */
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(
+            _vrbe_base.src, _vrbe_base.src_len, _vrbe_base.tag
+        ));
+    TEST_ASSERT_NOT_NULL(
+            (frag = _create_recv_frag(_test_1st_frag_uncomp,
+                                      sizeof(_test_1st_frag_uncomp)))
+        );
+    TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
+                                                 GNRC_NETREG_DEMUX_CTX_ALL,
+                                                 frag));
+    /* should time out */
+    TEST_ASSERT_EQUAL_INT(0, _wait_for_packet(sizeof(_test_1st_frag_uncomp)));
+    /* reassembly buffer entry should still exist */
+    TEST_ASSERT_NOT_NULL((rbuf = _first_non_empty_rbuf()));
+    /* and VRB still remains empty */
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(
+            _vrbe_base.src, _vrbe_base.src_len, _vrbe_base.tag
+        ));
+    TEST_ASSERT_EQUAL_INT(_vrbe_base.datagram_size, rbuf->pkt->size);
+    gnrc_pktbuf_release(rbuf->pkt);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+    /* This is normal reassembly so the rest should have be tested in the
+     * test for normal reassembly ;-) */
+}
+
+static void test_sixlo_recv__nth_frag(void)
+{
+    gnrc_sixlowpan_frag_vrb_t *vrbe;
+    gnrc_pktsnip_t *frag;
+    size_t mhr_len;
+
+    TEST_ASSERT_NOT_NULL(
+            (frag = _create_recv_frag(_test_nth_frag, sizeof(_test_nth_frag)))
+        );
+    TEST_ASSERT_NOT_NULL(
+            (vrbe = gnrc_sixlowpan_frag_vrb_add(&_vrbe_base, _mock_netif,
+                                                _rem_l2, sizeof(_rem_l2)))
+        );
+    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+                            _mock_netdev_send);
+    TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
+                                                 GNRC_NETREG_DEMUX_CTX_ALL,
+                                                 frag));
+    TEST_ASSERT((mhr_len = _wait_for_packet(sizeof(_test_nth_frag))));
+    /* reassembly buffer remains empty */
+    TEST_ASSERT_NULL(_first_non_empty_rbuf());
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+    _check_vrbe_values(vrbe, mhr_len, NTH_FRAGMENT);
+    TEST_ASSERT(_target_buf[0] & IEEE802154_FCF_FRAME_PEND);
+    TEST_ASSERT_MESSAGE(
+            memcmp(&_test_nth_frag[TEST_NTH_FRAG_PAYLOAD_POS],
+                   &_target_buf[mhr_len + sizeof(sixlowpan_frag_n_t)],
+                   TEST_NTH_FRAG_SIZE) == 0,
+            "unexpected forwarded packet payload"
+        );
+    /* VRB entry should not have been removed */
+    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_vrb_get(_vrbe_base.src,
+                                                     _vrbe_base.src_len,
+                                                     _vrbe_base.tag));
+}
+
+static void test_sixlo_recv__nth_frag__datagram_complete(void)
+{
+    gnrc_sixlowpan_frag_vrb_t *vrbe;
+    gnrc_pktsnip_t *frag;
+    size_t mhr_len;
+
+    TEST_ASSERT_NOT_NULL(
+            (frag = _create_recv_frag(_test_nth_frag, sizeof(_test_nth_frag)))
+        );
+    TEST_ASSERT_NOT_NULL(
+            (vrbe = gnrc_sixlowpan_frag_vrb_add(&_vrbe_base, _mock_netif,
+                                                _rem_l2, sizeof(_rem_l2)))
+        );
+    /* simulate current_size only missing the created fragment */
+    vrbe->super.current_size = _vrbe_base.datagram_size - TEST_NTH_FRAG_SIZE;
+    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+                            _mock_netdev_send);
+    TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
+                                                 GNRC_NETREG_DEMUX_CTX_ALL,
+                                                 frag));
+    TEST_ASSERT((mhr_len = _wait_for_packet(sizeof(_test_nth_frag))));
+    /* reassembly buffer remains empty */
+    TEST_ASSERT_NULL(_first_non_empty_rbuf());
+    /* VRB entry should have been removed */
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(
+            _vrbe_base.src, _vrbe_base.src_len, _vrbe_base.tag
+        ));
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+    /* VRB entry should have been removed, so don't check */
+    TEST_ASSERT(!(_target_buf[0] & IEEE802154_FCF_FRAME_PEND));
+    TEST_ASSERT_MESSAGE(
+            memcmp(&_test_nth_frag[TEST_NTH_FRAG_PAYLOAD_POS],
+                   &_target_buf[mhr_len + sizeof(sixlowpan_frag_n_t)],
+                   TEST_NTH_FRAG_SIZE) == 0,
+            "unexpected forwarded packet payload"
+        );
+}
+
+static void test_sixlo_recv__nth_frag__no_vrbe(void)
+{
+    const gnrc_sixlowpan_frag_rb_t *rbuf;
+    gnrc_pktsnip_t *frag;
+
+    TEST_ASSERT_NOT_NULL(
+            (frag = _create_recv_frag(_test_nth_frag, sizeof(_test_nth_frag)))
+        );
+    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+                            _mock_netdev_send);
+    TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
+                                                 GNRC_NETREG_DEMUX_CTX_ALL,
+                                                 frag));
+    /* should time out */
+    TEST_ASSERT_EQUAL_INT(0, _wait_for_packet(sizeof(_test_nth_frag)));
+    /* normal reassembly should have started */
+    /* reassembly buffer entry should have been created */
+    TEST_ASSERT_NOT_NULL((rbuf = _first_non_empty_rbuf()));
+    /* and VRB remains empty */
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(
+            _vrbe_base.src, _vrbe_base.src_len, _vrbe_base.tag
+        ));
+    TEST_ASSERT_EQUAL_INT(_vrbe_base.datagram_size, rbuf->pkt->size);
+    gnrc_pktbuf_release(rbuf->pkt);
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+    /* This is normal reassembly so the rest should have be tested in the
+     * test for normal reassembly ;-) */
+}
+
+static void test_sixlo_recv__nth_frag__duplicate(void)
+{
+    gnrc_sixlowpan_frag_vrb_t *vrbe;
+    gnrc_pktsnip_t *frag;
+    uint16_t exp_current_size;
+
+    TEST_ASSERT_NOT_NULL(
+            (frag = _create_recv_frag(_test_nth_frag, sizeof(_test_nth_frag)))
+        );
+    TEST_ASSERT_NOT_NULL(
+            (vrbe = gnrc_sixlowpan_frag_vrb_add(&_vrbe_base, _mock_netif,
+                                                _rem_l2, sizeof(_rem_l2)))
+        );
+    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+                            _mock_netdev_send);
+    TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
+                                                 GNRC_NETREG_DEMUX_CTX_ALL,
+                                                 frag));
+    TEST_ASSERT(_wait_for_packet(sizeof(_test_nth_frag)));
+    /* reassembly buffer remains empty */
+    TEST_ASSERT_NULL(_first_non_empty_rbuf());
+    /* VRB entry should not have been removed */
+    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_vrb_get(_vrbe_base.src,
+                                                     _vrbe_base.src_len,
+                                                     _vrbe_base.tag));
+    /* rest was already tested */
+    exp_current_size = vrbe->super.current_size;
+
+    /* generate and receive duplicate */
+    TEST_ASSERT_NOT_NULL(
+            (frag = _create_recv_frag(_test_nth_frag, sizeof(_test_nth_frag)))
+        );
+    TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
+                                                 GNRC_NETREG_DEMUX_CTX_ALL,
+                                                 frag));
+    _target_buf_len = 0;
+    /* should time out */
+    TEST_ASSERT_EQUAL_INT(0, _wait_for_packet(sizeof(_test_nth_frag)));
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+    /* reassembly buffer remains empty */
+    TEST_ASSERT_NULL(_first_non_empty_rbuf());
+    /* VRB entry should not have been removed */
+    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_vrb_get(_vrbe_base.src,
+                                                     _vrbe_base.src_len,
+                                                     _vrbe_base.tag));
+    TEST_ASSERT_EQUAL_INT(exp_current_size, vrbe->super.current_size);
+}
+
+static void test_sixlo_recv__nth_frag__overlap(void)
+{
+    gnrc_sixlowpan_frag_vrb_t *vrbe;
+    gnrc_pktsnip_t *frag;
+    sixlowpan_frag_n_t *frag_hdr;
+
+    TEST_ASSERT_NOT_NULL(
+            (frag = _create_recv_frag(_test_nth_frag, sizeof(_test_nth_frag)))
+        );
+    TEST_ASSERT_NOT_NULL(
+            (vrbe = gnrc_sixlowpan_frag_vrb_add(&_vrbe_base, _mock_netif,
+                                                _rem_l2, sizeof(_rem_l2)))
+        );
+    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+                            _mock_netdev_send);
+    TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
+                                                 GNRC_NETREG_DEMUX_CTX_ALL,
+                                                 frag));
+    TEST_ASSERT(_wait_for_packet(sizeof(_test_nth_frag)));
+    /* reassembly buffer remains empty */
+    TEST_ASSERT_NULL(_first_non_empty_rbuf());
+    /* rest was already tested */
+
+    /* generate and receive overlapping fragment */
+    TEST_ASSERT_NOT_NULL(
+            (frag = _create_recv_frag(_test_nth_frag, sizeof(_test_nth_frag)))
+        );
+    frag_hdr = frag->data;
+    /* move offset to simulate overlap*/
+    frag_hdr->offset--;
+    TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
+                                                 GNRC_NETREG_DEMUX_CTX_ALL,
+                                                 frag));
+    _target_buf_len = 0;
+    /* should time out */
+    TEST_ASSERT_EQUAL_INT(0, _wait_for_packet(sizeof(_test_nth_frag)));
+    TEST_ASSERT(gnrc_pktbuf_is_sane());
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+    /* reassembly buffer remains empty */
+    TEST_ASSERT_NULL(_first_non_empty_rbuf());
+    /* VRB entry was removed due to overlap error */
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(
+            _vrbe_base.src, _vrbe_base.src_len, _vrbe_base.tag
+        ));
+}
+
 static Test *tests_gnrc_sixlowpan_frag_minfwd_api(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -437,12 +754,31 @@ static Test *tests_gnrc_sixlowpan_frag_minfwd_api(void)
     return (Test *)&tests;
 }
 
+static Test *tests_gnrc_sixlowpan_frag_minfwd_integration(void)
+{
+    EMB_UNIT_TESTFIXTURES(fixtures) {
+        new_TestFixture(test_sixlo_recv__1st_frag_uncomp),
+        new_TestFixture(test_sixlo_recv__1st_frag_uncomp__no_route),
+        new_TestFixture(test_sixlo_recv__1st_frag_uncomp__after_nth_frag),
+        new_TestFixture(test_sixlo_recv__nth_frag),
+        new_TestFixture(test_sixlo_recv__nth_frag__datagram_complete),
+        new_TestFixture(test_sixlo_recv__nth_frag__no_vrbe),
+        new_TestFixture(test_sixlo_recv__nth_frag__duplicate),
+        new_TestFixture(test_sixlo_recv__nth_frag__overlap),
+    };
+
+    EMB_UNIT_TESTCALLER(tests, _set_up, _tear_down, fixtures);
+
+    return (Test *)&tests;
+}
+
 int main(void)
 {
     _tests_init();
 
     TESTS_START();
     TESTS_RUN(tests_gnrc_sixlowpan_frag_minfwd_api());
+    TESTS_RUN(tests_gnrc_sixlowpan_frag_minfwd_integration());
     TESTS_END();
     return 0;
 }
@@ -450,6 +786,24 @@ int main(void)
 static gnrc_pktsnip_t *_create_ipv6_hdr(const ipv6_hdr_t *hdr)
 {
     return gnrc_pktbuf_add(NULL, hdr, sizeof(*hdr), GNRC_NETTYPE_IPV6);
+}
+
+static gnrc_pktsnip_t *_create_recv_frag(const void *frag_data,
+                                         size_t frag_size)
+{
+    gnrc_pktsnip_t *netif;
+    gnrc_netif_hdr_t *netif_hdr;
+
+    netif = gnrc_netif_hdr_build(_vrbe_base.src, _vrbe_base.src_len,
+                                 _vrbe_base.dst, _vrbe_base.dst_len);
+    if (netif == NULL) {
+        return NULL;
+    }
+    netif_hdr = netif->data;
+    netif_hdr->if_pid = _mock_netif->pid;
+    netif_hdr->flags = GNRC_NETIF_HDR_FLAGS_MORE_DATA;
+    return gnrc_pktbuf_add(netif, frag_data, frag_size,
+                           GNRC_NETTYPE_SIXLOWPAN);
 }
 
 static int _set_route_and_nce(const ipv6_addr_t *route, unsigned pfx_len)
@@ -567,6 +921,18 @@ static void _check_1st_frag_uncomp(size_t mhr_len, uint8_t exp_hl_diff)
                    ipv6_hdr + 1, TEST_1ST_FRAG_UNCOMP_IPV6_PAYLOAD_SIZE) == 0,
             "unexpected forwarded packet payload"
         );
+}
+
+static const gnrc_sixlowpan_frag_rb_t *_first_non_empty_rbuf(void)
+{
+    const gnrc_sixlowpan_frag_rb_t *rbuf = gnrc_sixlowpan_frag_rb_array();
+
+    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+        if (!gnrc_sixlowpan_frag_rb_entry_empty(&rbuf[i])) {
+            return rbuf;
+        }
+    }
+    return NULL;
 }
 
 static int _mock_netdev_send(netdev_t *dev, const iolist_t *iolist)
