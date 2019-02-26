@@ -1,0 +1,22 @@
+/*
+ * Copyright (C) 2018 Acutam Automation, LLC
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    drivers_extend Peripheral Driver Extension Interface
+ * @ingroup     drivers
+ * @brief       Peripheral extensions for intercepting API calls and redirecting
+ *              to non-peripheral drivers
+ *
+ * The extension interface makes handling of non-CPU devices invisible to code
+ * using the periph APIs (periph/*.h). This is accomplished by reserving part of
+ * the range of values of that API's identifier. When a call to the periph API
+ * uses an identifier that falls within this range, it is parsed into a device
+ * ID that is looked up in an extension list and the call is redirected to the
+ * corresponding device.
+ *
+ */
