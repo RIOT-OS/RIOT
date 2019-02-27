@@ -16,14 +16,14 @@
  *
  * @author  Koen Zandberg <koen@bergzand.net>
  */
-#ifndef USB_MESSAGE_H
-#define USB_MESSAGE_H
+#ifndef USB_DESCRIPTOR_H
+#define USB_DESCRIPTOR_H
 
 #include <stdint.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
-extern "c" {
+extern "C" {
 #endif
 
 /**
@@ -217,5 +217,5 @@ static inline bool usb_setup_is_read(usb_setup_t *pkt)
 }
 #endif
 
-#endif /* USB_MESSAGE_H */
+#endif /* USB_DESCRIPTOR_H */
 /** @} */
