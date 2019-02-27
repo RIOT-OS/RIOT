@@ -24,6 +24,11 @@
 
 #include "usb/usbus.h"
 
+#ifdef MODULE_USBUS_CDC_ECM
+#include "usb/usbus/cdc/ecm.h"
+usbus_cdcecm_device_t cdcecm;
+#endif
+
 static char _stack[USBUS_STACKSIZE];
 static usbus_t usbus;
 
@@ -36,6 +41,10 @@ void auto_init_usb(void)
     /* Initialize basic usbus struct, don't start the thread yet */
     usbus_init(&usbus, usbdev);
 
+    /* USBUS function handlers initialization */
+#ifdef MODULE_USBUS_CDC_ECM
+    usbus_cdcecm_init(&usbus, &cdcecm);
+#endif
 
     /* Finally initialize USBUS thread */
     usbus_create(_stack, USBUS_STACKSIZE, USBUS_PRIO, USBUS_TNAME, &usbus);
