@@ -42,7 +42,7 @@
  * peripheral or from a buffer allocated by the peripheral specific usbdev
  * struct. Received data from the host ends up at this buffer automatically
  * by the low level drivers. Signalling that the data at the specified address
- * is ready to be reused is done with the @ref usbdev_ep_ready function by 
+ * is ready to be reused is done with the @ref usbdev_ep_ready function by
  * supplying a size of 0 for the @p len argument.
  *
  * For transmitting data back to the host, a similar approach is used. The data
