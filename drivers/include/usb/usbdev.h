@@ -71,16 +71,16 @@
 #ifndef USB_USBDEV_H
 #define USB_USBDEV_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
 #include <stddef.h>
 
 #include "assert.h"
 #include "usb.h"
 #include "usb/usbopt.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief usbdev_t forward declaration
@@ -125,6 +125,22 @@ typedef enum {
     USBDEV_EVENT_ESR = 1,
 
     /**
+     * @brief Host connection detected
+     *
+     * A host has connected to the device. Detection should happen by detecting
+     * the USB power, but other detection mechanisms might be used.
+     */
+    USBDEV_EVENT_HOST_CONNECT,
+
+    /**
+     * @brief Host disconnected from the device
+     *
+     * Similar to @ref USBDEV_EVENT_HOST_CONNECT, except that the host
+     * disconnected instead.
+     */
+    USBDEV_EVENT_HOST_DISCONNECT,
+
+    /**
      * @brief Line reset occured
      *
      * A line reset is a host initiated USB reset to the peripheral
@@ -163,7 +179,7 @@ typedef enum {
     /**
      * @brief Transaction fail event.
      *
-     * An endpoint should emit this event after a nack reply to the host
+     * An endpoint should emit this event after a nack reply to the host.
      */
     USBDEV_EVENT_TR_FAIL,
     /* expand list if required */
