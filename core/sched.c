@@ -47,9 +47,9 @@
 
 volatile int sched_num_threads = 0;
 
-volatile unsigned int sched_context_switch_request;
+unsigned int sched_context_switch_request;
 
-volatile thread_t *sched_threads[KERNEL_PID_LAST + 1];
+thread_t *sched_threads[KERNEL_PID_LAST + 1];
 thread_t *sched_active_thread;
 
 kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
