@@ -22,11 +22,11 @@
 #ifndef USB_USBOPT_H
 #define USB_USBOPT_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "c" {
 #endif
-
-#include <stdint.h>
 
 /**
  * @brief   List of configuration settings for USB peripherals
@@ -48,6 +48,13 @@ typedef enum {
      * on one of the data lines.
      */
     USBOPT_ATTACH,
+
+    /**
+     * @brief (usbopt_enable_t) Whether a USB host connection is detected
+     *
+     * Setting this option must return -ENOTSUP
+     */
+    USBOPT_CONNECTED,
 
     /**
      * @brief   (usb_version_t) Highest USB version supported by peripheral
@@ -111,5 +118,5 @@ typedef enum
 }
 #endif
 
-#endif /* USB_H */
+#endif /* USB_USBOPT_H */
 /** @} */
