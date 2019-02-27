@@ -41,6 +41,10 @@ void auto_init_usb(void)
     extern usbdev_t *get_context_sam(void);
     usbdev = get_context_sam();
 #endif
+#ifdef MODULE_NRFUSB
+    extern usbdev_t *get_context_nrfusb(void);
+    usbdev = get_context_nrfusb();
+#endif
     /*Append other usb modules here */
 
     /* usbdev should be valid here or we have nothing to initialize from */
