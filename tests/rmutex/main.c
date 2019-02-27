@@ -25,7 +25,7 @@
 
 #define THREAD_NUMOF            (5U)
 
-extern volatile thread_t *sched_active_thread;
+extern thread_t *sched_active_thread;
 
 static char stacks[THREAD_NUMOF][THREAD_STACKSIZE_MAIN];
 
@@ -36,7 +36,7 @@ static rmutex_t testlock;
 
 static void lock_recursive(char n, char depth)
 {
-    volatile thread_t *t = sched_active_thread;
+    thread_t *t = sched_active_thread;
 
     printf("T%i (prio %i, depth %i): trying to lock rmutex now\n",
         (int)t->pid, (int)t->priority, (int)n);
