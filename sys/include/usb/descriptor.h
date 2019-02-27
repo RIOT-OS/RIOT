@@ -40,6 +40,7 @@ extern "C" {
 #define USB_SETUP_REQ_SET_CONFIGURATION     0x09    /**< Set configuration     */
 #define USB_SETUP_REQ_GET_INTERFACE         0x0a    /**< Get interface         */
 #define USB_SETUP_REQ_SET_INTERFACE         0x0b    /**< Set interface         */
+#define USB_SETUP_REQ_SYNCH_FRAME           0x0c    /**< Synch frame           */
 /** @} */
 
 /**
