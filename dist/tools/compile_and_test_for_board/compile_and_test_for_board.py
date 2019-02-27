@@ -190,6 +190,24 @@ def create_directory(directory, clean=False, mode=0o755):
     os.makedirs(directory, mode=mode, exist_ok=True)
 
 
+def is_in_directory(path, directory):
+    """Return if `path` is inside `directory`.
+
+    >>> is_in_directory('RIOT/a/b/c', 'RIOT')
+    True
+    >>> is_in_directory('RIOT/../a', 'RIOT')
+    False
+
+    # Also work if path is absolute but not the directory
+    >>> curdir = os.path.abspath(os.curdir)
+    >>> is_in_directory(os.path.join(curdir, 'RIOT', 'a'), 'RIOT')
+    True
+    """
+    directory = os.path.abspath(directory)
+    path = os.path.abspath(path)
+    return path.startswith(directory)
+
+
 class RIOTApplication():
     """RIOT Application representation.
 
