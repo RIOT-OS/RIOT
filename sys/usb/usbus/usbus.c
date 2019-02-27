@@ -33,7 +33,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define _USBUS_MSG_QUEUE_SIZE    (8)
+#define _USBUS_MSG_QUEUE_SIZE    (16)
 extern const usbus_handler_driver_t _ep0_driver;
 
 /* Forward declaration of the generic USBUS event callback */
@@ -45,7 +45,6 @@ static void *_usbus_thread(void *args);
 
 void usbus_init(usbus_t *usbus, usbdev_t *usbdev)
 {
-    /* TODO: Check if memset works/is necessary */
     memset(usbus, 0, sizeof(usbus_t));
     usbus->dev = usbdev;
 }
@@ -228,7 +227,7 @@ static void *_usbus_thread(void *args)
                 }
               break;
             default:
-                DEBUG("usbus: unhandled event\n");
+                DEBUG("usbus: unhandled event %x\n", msg.type);
                 break;
         }
     }
@@ -265,7 +264,7 @@ static void _event_cb(usbdev_t *usbdev, usbdev_event_t event)
                 }
                 break;
             default:
-                DEBUG("usbus: unhandled event\n");
+                DEBUG("usbus: unhandled event %x\n", event);
                 break;
         }
     }
@@ -291,11 +290,6 @@ static void _event_ep_cb(usbdev_ep_t *ep, usbdev_event_t event)
                     if (handler) {
                         handler->driver->event_handler(usbus, handler, USBUS_MSG_TYPE_TR_COMPLETE, ep);
                     }
-                    /* Reset ready signal for out endpoints */
-                    if (ep->dir == USB_EP_DIR_OUT)
-                    {
-                        usbdev_ep_ready(ep, 0);
-                    }
                 }
                 break;
             case USBDEV_EVENT_TR_FAIL:
@@ -317,7 +311,7 @@ static void _event_ep_cb(usbdev_ep_t *ep, usbdev_event_t event)
                 }
                 break;
             default:
-                puts("unhandled event");
+                DEBUG("unhandled event: %x\n", event);
                 break;
         }
     }

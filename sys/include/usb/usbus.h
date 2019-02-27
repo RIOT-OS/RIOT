@@ -341,6 +341,17 @@ typedef struct {
 } usbus_ep0_handler_t;
 
 /**
+ * @Add a string descriptor to the USBUS thread context
+ *
+ * @param[in] usbus   USBUS context
+ * @param[in] desc    string descriptor context
+ * @param[in] str     C string to use
+ *
+ * @return            Index of the string descriptor
+ */
+uint16_t usbus_add_string_descriptor(usbus_t *usbus, usbus_string_t *desc, const char *str);
+
+/**
  * @brief Add an interface to the USBUS thread context
  *
  * @param[in] usbus   USBUS context

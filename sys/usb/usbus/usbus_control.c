@@ -256,11 +256,13 @@ static int _recv_dev_setup(usbus_t *usbus, usb_setup_t *pkt)
     else{
         switch (pkt->request) {
             case USB_SETUP_REQ_SET_ADDRESS:
+                DEBUG("Setting address\n");
                 usbus->addr = (uint8_t)pkt->value;
                 break;
             case USB_SETUP_REQ_SET_CONFIGURATION:
                 /* Nothing configuration dependent to do here, only one
                  * configuration supported */
+                 usbus->state = USBUS_STATE_CONFIGURED;
                 _activate_endpoints(usbus);
                 break;
             default:
@@ -287,6 +289,7 @@ static int _recv_interface_setup(usbus_t *usbus, usb_setup_t *pkt)
 static void _recv_setup(usbus_t *usbus, usbus_ep0_handler_t *handler)
 {
     usb_setup_t *pkt = &handler->setup;
+    DEBUG("Received setup %x %x\n", pkt->type, pkt->request);
     if (usb_setup_is_read(pkt)) {
         handler->setup_state = USBUS_SETUPRQ_INDATA;
     }
@@ -320,6 +323,8 @@ static void _recv_setup(usbus_t *usbus, usbus_ep0_handler_t *handler)
 static void _usbus_config_ep0(usbus_t *usbus)
 {
     static const usbopt_enable_t enable = USBOPT_ENABLE;
+    usbdev_ep_init(usbus->in);
+    usbdev_ep_init(usbus->out);
     usbdev_ep_set(usbus->in, USBOPT_EP_ENABLE, &enable, sizeof(usbopt_enable_t));
     usbdev_ep_set(usbus->out, USBOPT_EP_ENABLE, &enable, sizeof(usbopt_enable_t));
     usbdev_ep_ready(usbus->out, 0);
@@ -335,9 +340,6 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus->in = usbdev_new_ep(usbus->dev, USB_EP_TYPE_CONTROL, USB_EP_DIR_IN, USBUS_EP0_SIZE);
     usbus->out = usbdev_new_ep(usbus->dev, USB_EP_TYPE_CONTROL, USB_EP_DIR_OUT, USBUS_EP0_SIZE);
 
-    usbdev_ep_init(usbus->in);
-    usbdev_ep_init(usbus->out);
-    _usbus_config_ep0(usbus);
     DEBUG("initialized EP0 at 0x%x (IN) and 0x%x (OUT)\n", usbus->in->num, usbus->out->num);
 }
 
@@ -360,8 +362,6 @@ static int _handler_ep0_event(usbus_t *usbus, usbus_handler_t *handler, uint16_t
             }
             else if (ep0_handler->setup_state == USBUS_SETUPRQ_OUTACK && ep->dir == USB_EP_DIR_OUT) {
                 memset(&usbus->slicer, 0, sizeof(usbus_controlslicer_t));
-                static const usbopt_enable_t disable = USBOPT_DISABLE;
-                usbdev_ep_set(usbus->in, USBOPT_EP_READY, &disable, sizeof(usbopt_enable_t));
                 ep0_handler->setup_state = USBUS_SETUPRQ_READY;
             }
             else if (ep0_handler->setup_state == USBUS_SETUPRQ_INDATA && ep->dir == USB_EP_DIR_IN) {
@@ -371,6 +371,7 @@ static int _handler_ep0_event(usbus_t *usbus, usbus_handler_t *handler, uint16_t
                 }
                 else {
                     /* Ready out ZLP */
+                    usbdev_ep_ready(usbus->out, 0);
                     ep0_handler->setup_state = USBUS_SETUPRQ_OUTACK;
                 }
             }
@@ -383,7 +384,6 @@ static int _handler_ep0_event(usbus_t *usbus, usbus_handler_t *handler, uint16_t
                 memset(&usbus->slicer, 0, sizeof(usbus_controlslicer_t));
                 memcpy(&ep0_handler->setup, usbus->out->buf, sizeof(usb_setup_t));
                 usbus->slicer.reqlen = ep0_handler->setup.length;
-                usbdev_ep_ready(usbus->out, 0);
                 _recv_setup(usbus, ep0_handler);
             }
             break;
