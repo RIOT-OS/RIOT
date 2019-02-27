@@ -413,7 +413,7 @@ int thread_wakeup(kernel_pid_t pid);
  */
 static inline kernel_pid_t thread_getpid(void)
 {
-    extern volatile kernel_pid_t sched_active_pid;
+    extern kernel_pid_t sched_active_pid;
     return sched_active_pid;
 }
 

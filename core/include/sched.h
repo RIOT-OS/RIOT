@@ -181,7 +181,7 @@ extern volatile thread_t *sched_threads[KERNEL_PID_LAST + 1];
 /**
  *  Currently active thread
  */
-extern volatile thread_t *sched_active_thread;
+extern thread_t *sched_active_thread;
 
 /**
  *  Number of running (non-terminated) threads
@@ -191,7 +191,7 @@ extern volatile int sched_num_threads;
 /**
  *  Process ID of active thread
  */
-extern volatile kernel_pid_t sched_active_pid;
+extern kernel_pid_t sched_active_pid;
 
 /**
  * List of runqueues per priority level

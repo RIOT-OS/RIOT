@@ -50,9 +50,9 @@ volatile int sched_num_threads = 0;
 volatile unsigned int sched_context_switch_request;
 
 volatile thread_t *sched_threads[KERNEL_PID_LAST + 1];
-volatile thread_t *sched_active_thread;
+thread_t *sched_active_thread;
 
-volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
+kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
 
 clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
@@ -134,7 +134,7 @@ int __attribute__((used)) sched_run(void)
 
     next_thread->status = STATUS_RUNNING;
     sched_active_pid = next_thread->pid;
-    sched_active_thread = (volatile thread_t *) next_thread;
+    sched_active_thread = next_thread;
 
 #ifdef MODULE_MPU_STACK_GUARD
     mpu_configure(
