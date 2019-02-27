@@ -341,7 +341,7 @@ typedef struct {
 } usbus_ep0_handler_t;
 
 /**
- * @Add a string descriptor to the USBUS thread context
+ * @brief Add a string descriptor to the USBUS thread context
  *
  * @param[in] usbus   USBUS context
  * @param[in] desc    string descriptor context

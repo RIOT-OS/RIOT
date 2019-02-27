@@ -18,8 +18,8 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef USB_USBUS_HDRS_H
-#define USB_USBUS_HDRS_H
+#ifndef USB_USBUS_FMT_H
+#define USB_USBUS_FMT_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -41,5 +41,5 @@ size_t usbus_hdrs_fmt_conf(usbus_t *usbus);
 #ifdef __cplusplus
 }
 #endif
-#endif /* USB_USBUS_HDRS_H */
+#endif /* USB_USBUS_FMT_H */
 /** @} */
