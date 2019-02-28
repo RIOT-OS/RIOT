@@ -33,36 +33,46 @@ Usage
 
 ```
 usage: compile_and_test_for_board.py [-h] [--applications APPLICATIONS]
-                                     [--applications-exclude
-                                      APPLICATIONS_EXCLUDE]
+                                     [--applications-exclude APPLICATIONS_EXCLUDE]
                                      [--no-test]
-                                     [--loglevel {debug,info,warning,error,
-                                                  fatal,critical}]
+                                     [--loglevel {debug,info,warning,error,fatal,critical}]
                                      [--incremental] [--clean-after]
+                                     [--compile-targets COMPILE_TARGETS]
+                                     [--test-targets TEST_TARGETS]
                                      [--jobs JOBS]
                                      riot_directory board [result_directory]
 
 positional arguments:
   riot_directory        RIOT directory to test
   board                 Board to test
-  result_directory      Result directory, by default "results"
+  result_directory      Result directory, by default "results" (default:
+                        results)
 
 optional arguments:
   -h, --help            show this help message and exit
   --applications APPLICATIONS
                         List of applications to test, overwrites default
-                        configuration of testing all applications
+                        configuration of testing all applications (default:
+                        None)
   --applications-exclude APPLICATIONS_EXCLUDE
                         List of applications to exclude from tested
                         applications. Also applied after "--applications".
-  --no-test             Disable executing tests
+                        (default: None)
+  --no-test             Disable executing tests (default: False)
   --loglevel {debug,info,warning,error,fatal,critical}
-                        Python logger log level, defauts to "info"
+                        Python logger log level, defauts to "info" (default:
+                        info)
   --incremental         Do not rerun successful compilation and tests
-  --clean-after         Clean after running each test
+                        (default: False)
+  --clean-after         Clean after running each test (default: False)
+  --compile-targets COMPILE_TARGETS
+                        List of make targets to compile (default: clean all)
+  --test-targets TEST_TARGETS
+                        List of make targets to run test (default: test)
   --jobs JOBS, -j JOBS  Parallel building (0 means not limit, like '--jobs')
+                        (default: None)
 ```
-"""
+"""  # noqa
 
 import os
 import sys
