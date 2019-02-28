@@ -23,4 +23,7 @@ else ifeq ($(RIOT_TERMINAL),socat)
 else ifeq ($(RIOT_TERMINAL),picocom)
   TERMPROG  ?= picocom
   TERMFLAGS ?= --nolock --imap lfcrlf --baud "$(BAUD)" "$(PORT)"
+else ifeq ($(RIOT_TERMINAL),custom)
+  # Do nothing. This name is reserved so that TERMFLAGS does not get
+  # set if the user wants to override TERMPROG.
 endif

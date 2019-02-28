@@ -543,8 +543,10 @@ flash-only: $(FLASHDEPS)
 preflash: $(BUILD_BEFORE_FLASH)
 	$(PREFLASHER) $(PREFFLAGS)
 
+rawterm: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
+	$(RAWTERMPROG) $(RAWTERMFLAGS)
+
 term: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
-	$(call check_cmd,$(TERMPROG),Terminal program)
 	$(TERMPROG) $(TERMFLAGS)
 
 list-ttys:

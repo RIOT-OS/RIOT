@@ -80,6 +80,8 @@ info-build:
 	@echo ''
 	@echo 'TERMPROG:  $(TERMPROG)'
 	@echo 'TERMFLAGS: $(TERMFLAGS)'
+	@echo 'RAWTERMPROG:  $(RAWTERMPROG)'
+	@echo 'RAWTERMFLAGS: $(RAWTERMFLAGS)'
 	@echo 'PORT:      $(PORT)'
 	@echo ''
 	@echo 'DEBUGGER:       $(DEBUGGER)'

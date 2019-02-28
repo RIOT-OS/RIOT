@@ -72,8 +72,24 @@ export GIT_CACHE_DIR         # path to git-cache cache directory
 export FLASHER               # The command to call on "make flash".
 export FFLAGS                # The parameters to supply to FLASHER.
 export FLASH_ADDR            # Define an offset to flash code into ROM memory.
-# TERMPROG                   # The command to call on "make term".
+
+# --- Terminal Access --- #
+
+# RIOT_TERMINAL              # Preset to use for the "user friendly" terminal.
+                             # TERMPROG and TERMFLAGS will be set according to
+                             # RIOT_TERMINAL. The special name "custom" can be
+                             # used to leave these variables undefined.
+# TERMPROG                   # The command to call on "make term". This should be
+                             # "user friendly" terminal, with line editing-history, etc.
+                             # By default, rlwrap is used around the RAWTERM program.
 # TERMFLAGS                  # Additional parameters to supply to TERMPROG.
+
+# RIOT_RAWTERMINAL           # Like RIOT_TERMINAL but for the raw/testing terminal.
+# RAWTERMPROG                # The command to call on "make rawterm". This terminal
+                             # is used for testing. It should have no buffering,
+                             # and no translation or modification of input or output.
+# RAWTERMFLAGS               # Additional parameters to supply to RAWTERMPROG.
+
 export PORT                  # The port to connect the TERMPROG to.
 export ELFFILE               # The unstripped result of the compilation.
 export HEXFILE               # The stripped result of the compilation.
