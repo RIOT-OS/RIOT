@@ -177,7 +177,10 @@ docker_environ_mapping = $(addprefix -e ,$(call docker_cmdline_mapping,$1,$2,$3)
 docker_cmdline_mapping = $(if $($1),'$1=$(call path_in_docker,$($1),$2,$3)')
 
 
-DOCKER_APPDIR = $(DOCKER_BUILD_ROOT)/riotproject/$(BUILDRELPATH)
+# Application directory relative to either riotbase or riotproject
+DOCKER_RIOTPROJECT = $(call path_in_docker,$(RIOTPROJECT),,riotproject)
+DOCKER_APPDIR = $(DOCKER_RIOTPROJECT)/$(BUILDRELPATH)
+
 
 # Directory mapping in docker and directories environment variable configuration
 DOCKER_VOLUMES_AND_ENV += -v '$(ETC_LOCALTIME):/etc/localtime:ro'
@@ -188,8 +191,7 @@ DOCKER_VOLUMES_AND_ENV += -e 'CCACHE_BASEDIR=$(DOCKER_RIOTBASE)'
 DOCKER_VOLUMES_AND_ENV += -v '$(BUILD_DIR):$(DOCKER_BUILD_ROOT)/build'
 DOCKER_VOLUMES_AND_ENV += -e 'BUILD_DIR=$(DOCKER_BUILD_ROOT)/build'
 
-DOCKER_VOLUMES_AND_ENV += -v '$(RIOTPROJECT):$(DOCKER_BUILD_ROOT)/riotproject'
-DOCKER_VOLUMES_AND_ENV += -e 'RIOTPROJECT=$(DOCKER_BUILD_ROOT)/riotproject'
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTPROJECT,,riotproject)
 
 DOCKER_VOLUMES_AND_ENV += -v '$(RIOTCPU):$(DOCKER_BUILD_ROOT)/riotcpu'
 DOCKER_VOLUMES_AND_ENV += -e 'RIOTCPU=$(DOCKER_BUILD_ROOT)/riotcpu'
