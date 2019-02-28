@@ -9,3 +9,8 @@ export FFLAGS ?= flash $(FLASHFILE)
 export DEBUGGER_FLAGS ?= debug $(ELFFILE)
 export DEBUGSERVER_FLAGS ?= debug-server
 export RESET_FLAGS ?= reset
+
+ifeq ($(RIOT_RAWTERMINAL),jlink)
+  RAWTERMPROG  ?= $(RIOTTOOLS)/jlink/jlink.sh
+  RAWTERMFLAGS ?= term_rtt
+endif
