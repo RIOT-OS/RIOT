@@ -16,6 +16,11 @@ RIOT_TERMINAL ?= pyterm
 ifeq ($(RIOT_TERMINAL),pyterm)
   TERMPROG  ?= $(RIOTTOOLS)/pyterm/pyterm
   TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)"
+else ifeq ($(RIOT_TERMINAL),rlwrap)
+  TERMPROG  ?= $(RIOT_TERMINAL)
+  RLWRAP_PROMPT ?= -pPurple -S 'RIOT $$ '
+  RLWRAP_FLAGS ?= -a -C RIOT-$(BOARD)
+  TERMFLAGS  ?= $(RLWRAP_PROMPT) $(RLWRAP_FLAGS) $(RAWTERMPROG) $(RAWTERMFLAGS)
 else ifeq ($(RIOT_TERMINAL),picocom)
   TERMPROG  ?= picocom
   TERMFLAGS ?= --nolock --imap lfcrlf --baud "$(BAUD)" "$(PORT)"
