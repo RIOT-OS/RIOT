@@ -71,7 +71,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   IL3829 Waiting estimates in microseconds
+ * @name    IL3829 Waiting estimates in microseconds
  * @{
  */
 #define IL3829_WAIT_UPDATE_FULL (1200 * US_PER_MS)

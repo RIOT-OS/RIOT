@@ -23,7 +23,7 @@
 #include "il3829_params.h"
 #include "il3829_internal.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 int il3829_init(il3829_t *dev, const spi_display_params_t *params,
