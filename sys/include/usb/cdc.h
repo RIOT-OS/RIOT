@@ -91,6 +91,21 @@ extern "C" {
  */
 
 /**
+ * @brief Set line character formatting properties
+ */
+#define USB_CDC_MGNT_REQUEST_SET_LINE_CODING            (0x20)
+
+/**
+ * @brief Request the currently configured line coding
+ */
+#define USB_CDC_MGNT_REQUEST_GET_LINE_CODING            (0x21)
+
+/**
+ * @brief Set the control line state
+ */
+#define USB_CDC_MGNT_REQUEST_SET_CONTROL_LINE_STATE     (0x22)
+
+/**
  * @brief Set ethernet multicast filter request
  */
 #define USB_CDC_MGNT_REQUEST_SET_ETH_MULTICAST_FILTER   0x40
@@ -114,6 +129,22 @@ extern "C" {
  * @brief Get ethernet statistics
  */
 #define USB_CDC_MGNT_REQUEST_GET_ETH_STATISTICS         0x44
+/** @} */
+
+/**
+ * @name USB CDC ACM control line state flags
+ * @{
+ */
+
+/**
+ * @brief DTE (e.g. a PC) is present and listening
+ */
+#define USB_CDC_ACM_CONTROL_LINE_DTE            (0x01)
+
+/**
+ * @brief Activate carrier control for half duplex modems
+ */
+#define USB_CDC_ACM_CONTROL_LINE_CARRIER        (0x02)
 /** @} */
 
 /**
@@ -237,6 +268,36 @@ typedef struct __attribute__((packed)) {
     uint32_t down;      /**< Downlink bit rate */
     uint32_t up;        /**< Uplink bit rate */
 } usb_desc_cdcecm_speed_t;
+
+/**
+ * @name USB CDC ACM line coding setup defines
+ * @{
+ */
+
+/**
+ * @brief USB CDC ACM line coding setup content
+ * @see USB CDC 1.2 PSTN subclass spec section 6.3.11
+ */
+typedef struct __attribute__((packed)) {
+    uint32_t baud;      /**< Requested baud rate                    */
+    uint8_t format;     /**< Stop bits settings                     */
+    uint8_t parity;     /**< Parity settings                        */
+    uint8_t databits;   /**< Number of data bits (5, 6, 7, 8 or 16) */
+} usb_req_cdcacm_coding_t;
+
+#define USB_CDC_ACM_CODING_STOP_BITS_1      0 /**< 1 stop bit    */
+#define USB_CDC_ACM_CODING_STOP_BITS_1_5    1 /**< 1.5 stop bits */
+#define USB_CDC_ACM_CODING_STOP_BITS_2      2 /**< 2 stop bits   */
+
+#define USB_CDC_ACM_CODING_PARITY_NONE      0 /**< No parity bit */
+#define USB_CDC_ACM_CODING_PARITY_ODD       1 /**< Odd parity    */
+#define USB_CDC_ACM_CODING_PARITY_EVEN      2 /**< Even parity   */
+#define USB_CDC_ACM_CODING_PARITY_MARK      3 /**< Mark parity   */
+#define USB_CDC_ACM_CODING_PARITY_SPACE     4 /**< Space parity  */
+/** @} */
+
+
+/** @} */
 
 #ifdef __cplusplus
 }
