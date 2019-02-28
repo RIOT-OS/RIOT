@@ -27,5 +27,6 @@ usbdev_t *get_context_nrfusb(void)
     return &usbdev.usbdev;
 }
 
+#else                                                                           
+typedef int dont_be_pedantic;                                                   
 #endif /* MODULE_NRFUSB */
-
