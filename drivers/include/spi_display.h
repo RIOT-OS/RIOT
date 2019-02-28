@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     drivers_periph_spi_display
+ * @defgroup    drivers_spi_display Driver elements for SPI driven displays
+ * @ingroup     drivers_actuators
+ * @brief       Common device driver elements for SPI driven displays
  *
  * @{
  * @file

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_periph_spi_display
+ * @ingroup     drivers_spi_display
  *
  * @{
  * @file
