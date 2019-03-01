@@ -35,8 +35,7 @@ SLOT0_RIOT_BIN = $(BINDIR_APP)-slot0.riot.bin
 SLOT1_RIOT_BIN = $(BINDIR_APP)-slot1.riot.bin
 SLOT_RIOT_BINS = $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 
-# For slot generation only link is needed
-$(BINDIR_APP)-%.elf: link
+$(BINDIR_APP)-%.elf: $(BASELIBS)
 	$(Q)$(_LINK) -o $@
 
 # Slot 0 and 1 firmware offset, after header
