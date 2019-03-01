@@ -44,6 +44,7 @@ info-build:
 	@echo ''
 	@echo 'ELFFILE: $(ELFFILE)'
 	@echo 'HEXFILE: $(HEXFILE)'
+	@echo 'FLASHFILE: $(FLASHFILE)'
 	@echo ''
 	@echo 'FEATURES_REQUIRED (excl. optional features):'
 	@echo '         $(or $(sort $(filter-out $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED))), -none-)'
