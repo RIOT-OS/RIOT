@@ -19,6 +19,8 @@ PORT_LINUX ?= /dev/ttyUSB0
 # This does not make a lot of sense, but it has the same value as the previous code
 PORT_DARWIN ?= /dev/tty.usbserial-ARM
 
+# The -tg option is specific to pyterm so we are forced to use it.
+RIOT_TERMINAL = pyterm
 TERMFLAGS += -tg -p "$(PORT)"
 include $(RIOTMAKE)/tools/serial.inc.mk
 
