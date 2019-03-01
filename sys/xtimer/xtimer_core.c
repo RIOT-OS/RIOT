@@ -177,6 +177,7 @@ static inline void _lltimer_set(uint32_t target)
 
 int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
 {
+    unsigned state = irq_disable();
     uint32_t now = _xtimer_now();
     int res = 0;
 
@@ -199,16 +200,17 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
           now, target, offset);
 
     if (now >= target) {
+        irq_restore(state);
         _shoot(timer);
         return 0;
     } else if (offset <= XTIMER_BACKOFF) {
         /* backoff */
+        irq_restore(state);
         _xtimer_spin(offset);
         _shoot(timer);
         return 0;
     }
 
-    unsigned state = irq_disable();
     if (_is_set(timer)) {
         _remove(timer);
     }
