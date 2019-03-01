@@ -10,6 +10,8 @@ PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
 # setup serial terminal
+# The --set-rts option is specific to pyterm so we are forced to use it.
+RIOT_TERMINAL = pyterm
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 FLASHER = $(RIOTTOOLS)/stm32loader/stm32loader.py
