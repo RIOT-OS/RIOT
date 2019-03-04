@@ -46,21 +46,12 @@ static void *_host_thread(void *arg)
     (void)arg;
 
     nimble_port_init();
-    nimble_port_run();
 
-    /* never reached */
-    return NULL;
-}
-#endif
-
-void nimble_riot_init(void)
-{
 #ifdef MODULE_NIMBLE_CONTROLLER
     /* XXX: NimBLE needs the nRF5x's LF clock to run */
 #ifdef CPU_FAM_NRF52
     clock_start_lf();
 #endif
-
     /* Run the controller
      *
      * Create task where NimBLE LL will run. This one is required as LL has its
@@ -73,14 +64,21 @@ void nimble_riot_init(void)
                   "nimble_ctrl");
 #endif
 
-#ifdef MODULE_NIMBLE_HOST
+    nimble_port_run();
+
+    /* never reached */
+    return NULL;
+}
+#endif
+
+void nimble_riot_init(void)
+{
     /* and finally initialize and run the host */
     thread_create(_stack_host, sizeof(_stack_host),
                   NIMBLE_HOST_PRIO,
                   THREAD_CREATE_STACKTEST,
                   _host_thread, NULL,
                   "nimble_host");
-#endif
 
     /* make sure synchronization of host and controller is done, this should
      * always be the case at this point */
