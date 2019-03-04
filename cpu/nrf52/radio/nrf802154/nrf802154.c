@@ -230,8 +230,9 @@ static int _init(netdev_t *dev)
     NRF_RADIO->CRCINIT = 0;
 
     /* assign default addresses */
-    luid_get(nrf802154_dev.short_addr, IEEE802154_SHORT_ADDRESS_LEN);
     luid_get(nrf802154_dev.long_addr, IEEE802154_LONG_ADDRESS_LEN);
+    memcpy(nrf802154_dev.short_addr, &nrf802154_dev.long_addr[6],
+           IEEE802154_SHORT_ADDRESS_LEN);
 
     /* set default channel */
     _set_chan(nrf802154_dev.chan);
