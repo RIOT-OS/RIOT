@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2016-2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -176,6 +176,21 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
  */
 int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *value,
                           size_t value_len);
+
+/**
+ * @brief  This funtion compares destination address and pan id with addresses
+ * and pan id of the device
+ *
+ * this funciton is meant top be used by drivers that do not support address
+ * filtering in hw
+ *
+ * @param[in] dev       network device descriptor
+ * @param[in] mhr       mac header
+ *
+ * @return 0            successfull if packet is for the device
+ * @return 1            fails if packet is not for the device or pan
+ */
+int netdev_ieee802154_dst_filter(netdev_ieee802154_t *dev, const uint8_t *mhr);
 
 #ifdef __cplusplus
 }

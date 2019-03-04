@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-16 Freie Universität Berlin
+ * Copyright (C) 2015-2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -30,6 +30,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Default start frame delimiter
+ */
+#define IEEE802154_SFD                      (0xa7)
 
 /**
  * @brief IEEE 802.15.4 address lengths
@@ -142,6 +147,13 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
  */
 #ifndef IEEE802154_DEFAULT_PANID
 #define IEEE802154_DEFAULT_PANID            (0x0023U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 Broadcast PANID
+ */
+#ifndef IEEE802154_PANID_BCAST
+#define IEEE802154_PANID_BCAST              { 0xff, 0xff }
 #endif
 
 /**
