@@ -90,6 +90,10 @@ export FLASH_ADDR            # Define an offset to flash code into ROM memory.
                              # and no translation or modification of input or output.
 # RAWTERMFLAGS               # Additional parameters to supply to RAWTERMPROG.
 
+# --- Native-specific --- #
+# NATIVE_EXEC                # Executable for native builds.
+# NATIVE_FLAGS               # Command line arguments for the native executable.
+
 export PORT                  # The port to connect the TERMPROG to.
 export ELFFILE               # The unstripped result of the compilation.
 export HEXFILE               # The stripped result of the compilation.
