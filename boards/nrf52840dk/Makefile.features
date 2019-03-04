@@ -1,1 +1,5 @@
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.features
+
+# Various other features (if any)
+FEATURES_PROVIDED += radio_nrf802154
+FEATURES_PROVIDED += periph_pwm
