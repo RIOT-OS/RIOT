@@ -37,7 +37,7 @@ USEMODULE += ps
 USEMODULE += saul_default
 
 BOARD_PROVIDES_NETIF := acd52832 airfy-beacon b-l072z-lrwan1 cc2538dk fox iotlab-m3 iotlab-a8-m3 mulle \
-        microbit native nrf51dk nrf51dongle nrf52dk nrf6310 openmote-cc2538 pba-d-01-kw2x \
+        microbit native nrf51dk nrf51dongle nrf52dk nrf52840dk nrf6310 openmote-cc2538 pba-d-01-kw2x \
         remote-pa remote-reva samr21-xpro \
         spark-core telosb yunjia-nrf51822 z1
 
