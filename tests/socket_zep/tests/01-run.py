@@ -54,7 +54,7 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    os.environ['TERMFLAGS'] = "-z [%s]:%d,[%s]:%d" % (
+    os.environ['NATIVE_FLAGS'] = "-z [%s]:%d,[%s]:%d" % (
             zep_params['local_addr'], zep_params['local_port'],
             zep_params['remote_addr'], zep_params['remote_port'])
     s = socket.socket(family=socket.AF_INET6, type=socket.SOCK_DGRAM)

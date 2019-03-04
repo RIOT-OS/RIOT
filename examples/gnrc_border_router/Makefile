@@ -35,7 +35,7 @@ ifeq (,$(filter native,$(BOARD)))
   CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE) -DUSE_ETHOS_FOR_STDIO
 else
   GNRC_NETIF_NUMOF := 2
-  TERMFLAGS += -z [::1]:17754
+  NATIVE_FLAGS += -z [::1]:17754
   USEMODULE += socket_zep
 endif
 

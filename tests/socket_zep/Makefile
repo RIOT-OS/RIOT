@@ -10,6 +10,6 @@ USEMODULE += socket_zep
 
 CFLAGS += -DDEVELHELP
 
-TERMFLAGS ?= -z [::1]:17754
+NATIVE_FLAGS ?= -z [::1]:17754
 
 include $(RIOTBASE)/Makefile.include
