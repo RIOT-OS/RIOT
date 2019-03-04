@@ -14,10 +14,13 @@ endif
 # Set offset according to IMAGE_OFFSET if it's defined
 EDBG_ARGS += $(if $(IMAGE_OFFSET),--offset $(IMAGE_OFFSET))
 
-FFLAGS ?= $(EDBG_ARGS) -t $(EDBG_DEVICE_TYPE) -b -v -p -f $(HEXFILE)
+FFLAGS_BASE ?= $(EDBG_ARGS) -t $(EDBG_DEVICE_TYPE) -b -v -f $(HEXFILE)
+FFLAGS ?= $(FFLAGS_BASE) -p
 
 ifeq ($(RIOT_EDBG),$(FLASHER))
   FLASHDEPS += $(RIOT_EDBG)
 endif
 RESET ?= $(EDBG)
 RESET_FLAGS ?= $(EDBG_ARGS) -t $(EDBG_DEVICE_TYPE)
+FLASHER_VERIFY ?= $(EDBG)
+FFLAGS_VERIFY ?= $(FFLAGS_BASE)
