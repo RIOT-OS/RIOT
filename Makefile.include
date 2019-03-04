@@ -519,9 +519,12 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
+FLASHER_VERIFY ?= false
+
 define flash-recipe
+  $(call check_cmd,$(FLASHER_VERIFY),Flash verification program)
   $(call check_cmd,$(FLASHER),Flash program)
-  $(FLASHER) $(FFLAGS)
+  $(FLASHER_VERIFY) $(FFLAGS_VERIFY) || $(FLASHER) $(FFLAGS)
 endef
 
 # Do not add dependencies to "flash" directly, use FLASHDEPS, as this is shared
