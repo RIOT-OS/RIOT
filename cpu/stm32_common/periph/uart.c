@@ -26,6 +26,7 @@
  * @}
  */
 
+#include <errno.h>
 #include "cpu.h"
 #include "sched.h"
 #include "thread.h"
@@ -50,10 +51,7 @@
 #endif
 
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE)
-
-#ifndef UART_MAX_WAIT
-#define UART_MAX_WAIT 10000
-#endif
+#define TICK_TIMEOUT        (0xFFFF)
 
 /**
  * @brief   Allocate memory to store the callback functions
@@ -261,35 +259,41 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 #endif /* MODULE_PERIPH_LPUART */
 #endif /* STM32L0 || STM32L4 */
 
-static inline void send_byte(uart_t uart, uint8_t byte)
+static inline int send_byte(uart_t uart, uint8_t byte)
 {
-    int wait = UART_MAX_WAIT;
-    while (!(dev(uart)->ISR_REG & ISR_TXE) && wait != 0) {
-        wait--;
+    uint16_t tick = TICK_TIMEOUT;
+    while (!(dev(uart)->ISR_REG & ISR_TXE) && tick--) {
+        if (!tick) {
+            return -ETIMEDOUT;
+        }
     }
     dev(uart)->TDR_REG = byte;
+    return 0;
 }
 
-static inline void wait_for_tx_complete(uart_t uart)
+static inline int wait_for_tx_complete(uart_t uart)
 {
-    int wait = UART_MAX_WAIT;
-    while (!(dev(uart)->ISR_REG & ISR_TC) && wait != 0) {
-        wait--;
+    uint16_t tick = TICK_TIMEOUT;
+    while (!(dev(uart)->ISR_REG & ISR_TC) && tick--) {
+        if (!tick) {
+            return -ETIMEDOUT;
+        }
     }
+    return 0;
 }
 
-void uart_write(uart_t uart, const uint8_t *data, size_t len)
+int uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     assert(uart < UART_NUMOF);
 #if DEVELHELP
     /* If tx is not enabled don't try to send */
     if (!(dev(uart)->CR1 & USART_CR1_TE)) {
-        return;
+        return 0;
     }
 #endif
 #ifdef MODULE_PERIPH_DMA
     if (!len) {
-        return;
+        return 0;
     }
     if (uart_config[uart].dma != DMA_STREAM_UNDEF) {
         if (irq_is_in()) {
@@ -303,10 +307,16 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
                 dev(uart)->CR3 &= ~USART_CR3_DMAT;
             }
             for (unsigned i = 0; i < len; i++) {
-                send_byte(uart, data[i]);
+                int ret = send_byte(uart, data[i]);
+                if (ret < 0) {
+                    return ret;
+                }
             }
             if (todo > 0) {
-                wait_for_tx_complete(uart);
+                int ret = wait_for_tx_complete(uart);
+                if (ret < 0) {
+                    return ret;
+                }
                 dev(uart)->CR3 |= USART_CR3_DMAT;
                 dma_resume(uart_config[uart].dma, todo);
             }
@@ -320,18 +330,24 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
             /* make sure the function is synchronous by waiting for the transfer to
              * finish */
-            wait_for_tx_complete(uart);
+            int ret = wait_for_tx_complete(uart);
+            if (ret < 0) {
+                return ret;
+            }
             dev(uart)->CR3 &= ~USART_CR3_DMAT;
         }
         return;
     }
 #endif
     for (size_t i = 0; i < len; i++) {
-        send_byte(uart, data[i]);
+        int ret = send_byte(uart, data[i]);
+        if (ret < 0) {
+            return ret;
+        }
     }
     /* make sure the function is synchronous by waiting for the transfer to
      * finish */
-    wait_for_tx_complete(uart);
+    return wait_for_tx_complete(uart);
 }
 
 void uart_poweron(uart_t uart)

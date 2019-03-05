@@ -196,8 +196,10 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
  * @param[in] data          data buffer to send
  * @param[in] len           number of bytes to send
  *
+ * @return                  0 on success
+ * @return                  -ETIMEDOUT on timeout
  */
-void uart_write(uart_t uart, const uint8_t *data, size_t len);
+int uart_write(uart_t uart, const uint8_t *data, size_t len);
 
 /**
  * @brief   Power on the given UART device
