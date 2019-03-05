@@ -407,6 +407,11 @@ ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
 BINFILE ?= $(ELFFILE:.elf=.bin)
 
+# include bootloaders support. It should be included early to allow using
+# variables defined in `riotboot.mk` for `FLASHFILE` before it is evaluated.
+# It should be included after defining 'BINFILE' for 'riotboot.bin' handling.
+include $(RIOTMAKE)/boot/riotboot.mk
+
 # Targets to get given file
 elffile: $(ELFFILE)
 hexfile: $(HEXFILE)
@@ -441,11 +446,6 @@ ifeq ($(BUILDOSXNATIVE),1)
 else
   _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
 endif # BUILDOSXNATIVE
-
-# include bootloaders support. When trying to overwrite one variable
-# like HEXFILE, the value will already have been evaluated when declaring
-# the link target. Therefore, it must be placed before `link`.
-include $(RIOTMAKE)/boot/riotboot.mk
 
 ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
