@@ -51,6 +51,10 @@
 
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE)
 
+#ifndef UART_MAX_WAIT
+#define UART_MAX_WAIT 10000
+#endif
+
 /**
  * @brief   Allocate memory to store the callback functions
  *
@@ -259,13 +263,19 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 
 static inline void send_byte(uart_t uart, uint8_t byte)
 {
-    while (!(dev(uart)->ISR_REG & ISR_TXE)) {}
+    int wait = UART_MAX_WAIT;
+    while (!(dev(uart)->ISR_REG & ISR_TXE) && wait != 0) {
+        wait--;
+    }
     dev(uart)->TDR_REG = byte;
 }
 
 static inline void wait_for_tx_complete(uart_t uart)
 {
-    while (!(dev(uart)->ISR_REG & ISR_TC)) {}
+    int wait = UART_MAX_WAIT;
+    while (!(dev(uart)->ISR_REG & ISR_TC) && wait != 0) {
+        wait--;
+    }
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
