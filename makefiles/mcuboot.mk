@@ -42,13 +42,11 @@ $(MCUBOOT_BIN):
 
 .PHONY: mcuboot-flash-bootloader mcuboot-flash
 
-mcuboot-flash-bootloader: HEXFILE = $(MCUBOOT_BIN)
 mcuboot-flash-bootloader: FLASHFILE = $(MCUBOOT_BIN)
 mcuboot-flash-bootloader: export FLASH_ADDR = 0x0
 mcuboot-flash-bootloader: $(MCUBOOT_BIN) $(FLASHDEPS)
 	$(flash-recipe)
 
-mcuboot-flash: HEXFILE = $(SIGN_BINFILE)
 mcuboot-flash: FLASHFILE = $(SIGN_BINFILE)
 mcuboot-flash: export FLASH_ADDR = $(MCUBOOT_SLOT0_SIZE)
 mcuboot-flash: mcuboot $(FLASHDEPS) mcuboot-flash-bootloader
