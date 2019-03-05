@@ -7,5 +7,3 @@ REALMODULES = $(filter-out $(PSEUDOMODULES), $(sort $(USEMODULE) $(USEPKG))) $(N
 export BASELIBS += $(REALMODULES:%=$(BINDIR)/%.a)
 
 CFLAGS += $(EXTDEFINES)
-
-export USEMODULE
