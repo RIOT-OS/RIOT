@@ -249,7 +249,7 @@ DISABLE_MODULE += auto_init
 -include $(UNIT_TESTS:%=$(RIOTBASE)/tests/unittests/%/Makefile.include)
 
 DIRS += $(UNIT_TESTS)
-BASELIBS += $(UNIT_TESTS:%=$(BINDIR)/%.a)
+BASELIBS += $(UNIT_TESTS:%=$(BINDIR)/%.o)
 
 INCLUDES += -I$(RIOTBASE)/tests/unittests/common
 

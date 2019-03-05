@@ -348,7 +348,7 @@ endif
 APPLICATION_MODULE ?= application_$(APPLICATION)
 
 # the binaries to link
-BASELIBS += $(BINDIR)/$(APPLICATION_MODULE).a
+BASELIBS += $(BINDIR)/$(APPLICATION_MODULE).o
 BASELIBS += $(APPDEPS)
 
 
@@ -437,9 +437,9 @@ _BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
 # Linker rule
 $(ELFFILE): FORCE
 ifeq ($(BUILDOSXNATIVE),1)
-  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
+  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
-  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
+  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
 endif # BUILDOSXNATIVE
 
 # include bootloaders support. When trying to overwrite one variable
@@ -459,13 +459,13 @@ endif # RIOTNOLINK
 $(ELFFILE): $(BASELIBS)
 	$(Q)$(_LINK) -o $@
 
-$(BINDIR)/$(APPLICATION_MODULE).a: pkg-build $(BUILDDEPS)
+$(BINDIR)/$(APPLICATION_MODULE).o: pkg-build $(BUILDDEPS)
 	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
-$(BINDIR)/$(APPLICATION_MODULE).a: FORCE
+$(BINDIR)/$(APPLICATION_MODULE).o: FORCE
 
 # Other modules are built by application.inc.mk and packages building
-_SUBMAKE_LIBS = $(filter-out $(BINDIR)/$(APPLICATION_MODULE).a $(APPDEPS), $(BASELIBS))
-$(_SUBMAKE_LIBS): $(BINDIR)/$(APPLICATION_MODULE).a pkg-build
+_SUBMAKE_LIBS = $(filter-out $(BINDIR)/$(APPLICATION_MODULE).o $(APPDEPS), $(BASELIBS))
+$(_SUBMAKE_LIBS): $(BINDIR)/$(APPLICATION_MODULE).o pkg-build
 
 # 'print-size' triggers a rebuild. Use 'info-buildsize' if you do not need to rebuild.
 print-size: $(ELFFILE)
@@ -516,7 +516,7 @@ clean:
 # Remove intermediates, but keep the .elf, .hex and .map etc.
 clean-intermediates:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
-	-@rm -rf $(BINDIR)/*.a $(BINDIR)/*/
+	-@rm -rf $(BINDIR)/*.o $(BINDIR)/*.a $(BINDIR)/*/
 
 clean-pkg:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
