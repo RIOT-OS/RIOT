@@ -31,6 +31,13 @@ ifneq (,$(filter oneway_malloc,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/oneway-malloc/include
 endif
 
+ifneq (,$(filter app_metadata,$(USEMODULE)))
+  # Overwrite the interface version
+  ifdef APP_SHELL_FMT
+    CFLAGS += -DAPP_SHELL_FMT=\"$(APP_SHELL_FMT)\"
+  endif
+endif
+
 ifneq (,$(filter vfs,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
