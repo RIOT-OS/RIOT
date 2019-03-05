@@ -312,6 +312,7 @@ endif
 BOARDDEF := $(shell echo $(BOARD) | tr 'a-z' 'A-Z' | tr '-' '_')
 CPUDEF := $(shell echo $(CPU) | tr 'a-z' 'A-Z' | tr '-' '_')
 MCUDEF := $(shell echo $(MCU) | tr 'a-z' 'A-Z' | tr '-' '_')
+CFLAGS += -DRIOT_APPLICATION=\"$(APPLICATION)\"
 CFLAGS += -DBOARD_$(BOARDDEF)=\"$(BOARD)\" -DRIOT_BOARD=BOARD_$(BOARDDEF)
 CFLAGS += -DCPU_$(CPUDEF)=\"$(CPU)\" -DRIOT_CPU=CPU_$(CPUDEF)
 CFLAGS += -DMCU_$(MCUDEF)=\"$(MCU)\" -DRIOT_MCU=MCU_$(MCUDEF)
