@@ -33,9 +33,9 @@ extern "C" {
  *          say semantics defined in a RDM or schema, that could be specified
  *          by adding APP_SHELL_FMT="RDM001_v1", that would inform anything
  *          using the shell that the formatting should follow what is dictated.
- *          This define is only for documentation, to use the APP_SHELL_FMT
- *          add it to the application makefile with APP_SHELL_FMT=<your value>
- *          or when calling make such as `APP_SHELL_FMT=<your value> make flash`
+ * @note    This define is only for documentation, to use the APP_SHELL_FMT
+ *          add it to the application makefile with APP_SHELL_FMT=your_value
+ *          or when calling make such as `APP_SHELL_FMT=your_value make flash`
  */
 #define APP_SHELL_FMT
 #endif

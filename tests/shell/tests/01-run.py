@@ -17,7 +17,8 @@ EXPECTED_HELP = (
     'end_test             ends a test',
     'echo                 prints the input command',
     'reboot               Reboot the node',
-    'ps                   Prints information about running threads.'
+    'ps                   Prints information about running threads.',
+    'app_metadata         Returns application metadata'
 )
 
 EXPECTED_PS = (
