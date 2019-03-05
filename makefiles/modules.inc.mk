@@ -6,6 +6,6 @@ EXTDEFINES = $(addprefix -D,$(shell echo '$(ED)' | tr 'a-z-' 'A-Z_'))
 CFLAGS += $(EXTDEFINES)
 
 # filter "pseudomodules" from "real modules", but not "no_pseudomodules"
-NO_PSEUDOMODULES := $(filter $(NO_PSEUDOMODULES), $(_ALLMODULES))
-REALMODULES = $(filter-out $(PSEUDOMODULES), $(_ALLMODULES)) $(NO_PSEUDOMODULES)
+REALMODULES += $(filter-out $(PSEUDOMODULES), $(_ALLMODULES))
+REALMODULES += $(filter $(NO_PSEUDOMODULES), $(_ALLMODULES))
 BASELIBS += $(REALMODULES:%=$(BINDIR)/%.a)
