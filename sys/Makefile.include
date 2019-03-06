@@ -31,6 +31,16 @@ ifneq (,$(filter oneway_malloc,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/oneway-malloc/include
 endif
 
+ifneq (,$(filter app_metadata,$(USEMODULE)))
+  # Overwrite the application shell formats.
+  # This is an optional macro that can be used to coordinate
+  # standardized shell formats, as an example it can point to an RDM
+  # that specifies semantics.
+  ifdef APP_SHELL_FMT
+    CFLAGS += -DAPP_SHELL_FMT=\"$(APP_SHELL_FMT)\"
+  endif
+endif
+
 ifneq (,$(filter vfs,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
