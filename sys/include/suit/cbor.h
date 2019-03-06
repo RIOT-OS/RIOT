@@ -39,6 +39,7 @@
 #include <unistd.h>
 
 #include "cbor.h"
+#include "uuid.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -82,16 +83,6 @@ extern "C" {
  * @brief TinyCBOR validation mode to use
  */
 #define SUIT_TINYCBOR_VALIDATION_MODE       CborValidateStrictMode
-
-/**
- * @brief suit parser error codes
- */
-typedef enum {
-    SUIT_OK                     = 0,    /**< Manifest parsed and validated */
-    SUIT_ERR_INVALID_MANIFEST   = -1,   /**< Unexpected CBOR structure detected */
-    SUIT_ERR_NOT_SUPPORTED      = -2,   /**< Unsupported manifest features detected */
-    SUIT_ERR_COND               = -3,   /**< Conditionals evaluate to false */
-} suit_error_t;
 
 /**
  * @brief SUIT conditionals
@@ -264,6 +255,29 @@ int suit_cbor_payload_get_storid(const suit_cbor_manifest_t *manifest, uint8_t *
  */
 int suit_cbor_payload_get_digest(const suit_cbor_manifest_t *manifest,
                                  suit_cbor_digest_type_t digest, uint8_t *buf, size_t *len);
+
+
+int suit_cbor_validator_verify_conditions(suit_cbor_manifest_t *manifest, uint64_t curtime);
+
+/**
+ * @brief Initialize the UUID's for conditionals
+ */
+void suit_cbor_uuid_init(void);
+
+const uuid_t *suit_cbor_get_uuid_vendor(void);
+const uuid_t *suit_cbor_get_uuid_class(void);
+const uuid_t *suit_cbor_get_uuid_device(void);
+
+/**
+ * Check if a manifest is a valid update compared to the old manifest
+ *
+ * @param   old     Current manifest to compare
+ * @param   new     New manifest to compare
+ *
+ * @return          True when the new manifest is a newer manifest
+ */
+bool suit_cbor_manifest_isnewer(const suit_cbor_manifest_t *old,
+                                const suit_cbor_manifest_t *cur);
 
 #ifdef __cplusplus
 }

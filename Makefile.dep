@@ -813,8 +813,16 @@ ifneq (,$(filter riotboot_hdr, $(USEMODULE)))
   USEMODULE += riotboot
 endif
 
+ifneq (,$(filter suit_%,$(USEMODULE)))
+  USEMODULE += suit
+endif
+
 ifneq (,$(filter suit_cbor,$(USEMODULE)))
   USEPKG += tinycbor
+endif
+
+ifneq (,$(filter suit,$(USEMODULE)))
+  USEMODULE += uuid
 endif
 
 # Enable periph_gpio when periph_gpio_irq is enabled

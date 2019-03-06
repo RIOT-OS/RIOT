@@ -1,1 +1,2 @@
 USEMODULE += suit_cbor
+USEMODULE += suit

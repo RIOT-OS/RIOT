@@ -23,6 +23,7 @@
 #include <stdbool.h>
 
 #include "suit/cbor.h"
+#include "suit.h"
 #include "cbor.h"
 
 #define ENABLE_DEBUG (0)

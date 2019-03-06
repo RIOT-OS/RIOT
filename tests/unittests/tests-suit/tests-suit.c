@@ -12,6 +12,7 @@
 
 #include "tests-suit.h"
 #include "suit/cbor.h"
+#include "suit.h"
 
 /**
  * A nice example CBOR-encoded manifest:
