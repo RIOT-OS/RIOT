@@ -94,7 +94,7 @@ typedef struct {
     void *arg;              /**< optional argument */
 } gpio_isr_ctx_pcint_t;
 
-static gpio_t pcint_mapping[] = AVR_PCINT_GPIO_LIST; //wäre schöner wenn das nicht die ganze Zeit im Speicher liegt....
+static gpio_t pcint_mapping[] = AVR_PCINT_GPIO_LIST;
 static gpio_isr_ctx_pcint_t pcint_config[ sizeof(pcint_mapping) / sizeof(gpio_t) ]; 
 static int8_t pcint_lookup[ GPIO_PC_INT_NUMOF ] = { [0 ... (GPIO_PC_INT_NUMOF-1) ] = -1 };
 #endif /* GPIO_PC_INT_NUMOF */
