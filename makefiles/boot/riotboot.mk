@@ -120,11 +120,11 @@ riotboot/flash-extended-slot0: ELFFILE=$(RIOTBOOT_EXTENDED_BIN)
 
 riotboot/flash-combined-slot0: FLASHFILE=$(RIOTBOOT_COMBINED_BIN)
 riotboot/flash-combined-slot0: $(RIOTBOOT_COMBINED_BIN) $(FLASHDEPS)
-	$(FLASHER) $(FFLAGS)
+	$(flash-recipe)
 
 riotboot/flash-extended-slot0: FLASHFILE=$(RIOTBOOT_EXTENDED_BIN)
 riotboot/flash-extended-slot0: $(RIOTBOOT_EXTENDED_BIN) $(FLASHDEPS)
-	$(FLASHER) $(FFLAGS)
+	$(flash-recipe)
 
 # Flashing rule for slot 0
 riotboot/flash-slot0: export IMAGE_OFFSET=$(SLOT0_OFFSET)
@@ -134,7 +134,7 @@ riotboot/flash-slot0: HEXFILE=$(SLOT0_RIOT_BIN)
 riotboot/flash-slot0: ELFFILE=$(SLOT0_RIOT_BIN)
 riotboot/flash-slot0: FLASHFILE=$(SLOT0_RIOT_BIN)
 riotboot/flash-slot0: $(SLOT0_RIOT_BIN) $(FLASHDEPS)
-	$(FLASHER) $(FFLAGS)
+	$(flash-recipe)
 
 # Flashing rule for slot 1
 riotboot/flash-slot1: export IMAGE_OFFSET=$(SLOT1_OFFSET)
@@ -144,7 +144,7 @@ riotboot/flash-slot1: HEXFILE=$(SLOT1_RIOT_BIN)
 riotboot/flash-slot1: ELFFILE=$(SLOT1_RIOT_BIN)
 riotboot/flash-slot1: FLASHFILE=$(SLOT1_RIOT_BIN)
 riotboot/flash-slot1: $(SLOT1_RIOT_BIN) $(FLASHDEPS)
-	$(FLASHER) $(FFLAGS)
+	$(flash-recipe)
 
 # Targets to generate only slots binary
 riotboot/slot0: $(SLOT0_RIOT_BIN)
