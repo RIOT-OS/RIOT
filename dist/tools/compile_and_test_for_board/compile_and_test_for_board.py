@@ -45,8 +45,7 @@ usage: compile_and_test_for_board.py [-h] [--applications APPLICATIONS]
 positional arguments:
   riot_directory        RIOT directory to test
   board                 Board to test
-  result_directory      Result directory, by default "results" (default:
-                        results)
+  result_directory      Result directory (default: results)
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -60,8 +59,7 @@ optional arguments:
                         (default: None)
   --no-test             Disable executing tests (default: False)
   --loglevel {debug,info,warning,error,fatal,critical}
-                        Python logger log level, defauts to "info" (default:
-                        info)
+                        Python logger log level (default: info)
   --incremental         Do not rerun successful compilation and tests
                         (default: False)
   --clean-after         Clean after running each test (default: False)
@@ -549,7 +547,7 @@ PARSER = argparse.ArgumentParser(
 PARSER.add_argument('riot_directory', help='RIOT directory to test')
 PARSER.add_argument('board', help='Board to test', type=_strip_board_equal)
 PARSER.add_argument('result_directory', nargs='?', default='results',
-                    help='Result directory, by default "results"')
+                    help='Result directory')
 PARSER.add_argument(
     '--applications', type=list_from_string,
     help=('List of applications to test, overwrites default configuration of'
@@ -563,7 +561,7 @@ PARSER.add_argument(
 PARSER.add_argument('--no-test', action='store_true', default=False,
                     help='Disable executing tests')
 PARSER.add_argument('--loglevel', choices=LOG_LEVELS, default='info',
-                    help='Python logger log level, defauts to "info"')
+                    help='Python logger log level')
 PARSER.add_argument('--incremental', action='store_true', default=False,
                     help='Do not rerun successful compilation and tests')
 PARSER.add_argument('--clean-after', action='store_true', default=False,
