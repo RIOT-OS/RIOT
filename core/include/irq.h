@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2013,2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +16,7 @@
  * @brief       IRQ driver interface
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef IRQ_H
@@ -66,6 +67,17 @@ MAYBE_INLINE unsigned irq_enable(void);
  * @see     irq_disable
  */
 MAYBE_INLINE void irq_restore(unsigned state);
+
+/**
+ * @brief   Test if IRQs are currently enabled
+ *
+ * @warning Use this function from thread context only. When used in interrupt
+ *          context the returned state may be incorrect.
+ *
+ * @return  0 (false) if IRQs are currently disabled
+ * @return  != 0 (true) if IRQs are currently enabled
+ */
+MAYBE_INLINE int irq_is_enabled(void);
 
 /**
  * @brief   Check whether called from interrupt service routine
