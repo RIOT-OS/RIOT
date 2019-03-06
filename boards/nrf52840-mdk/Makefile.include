@@ -10,6 +10,8 @@ ifeq (pyocd,$(PROGRAMMER))
   # option is passed explicitly
   export FLASH_TARGET_TYPE ?= -t $(CPU)
   include $(RIOTMAKE)/tools/pyocd.inc.mk
+else ifeq (openocd,$(PROGRAMMER))
+  DEBUG_ADAPTER = dap
 endif
 
 include $(RIOTBOARD)/common/nrf52/Makefile.include
