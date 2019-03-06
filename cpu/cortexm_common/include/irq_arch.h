@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Freie Universität Berlin
+ * Copyright (C) 2014-2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -58,6 +58,17 @@ static inline __attribute__((always_inline)) void irq_restore(
     unsigned int state)
 {
     __set_PRIMASK(state);
+}
+
+/**
+ * @brief See if IRQs are currently enabled
+ */
+static inline __attribute__((always_inline)) int irq_is_enabled(void)
+{
+    /* so far, all existing Cortex-M are only using the least significant bit
+     * in the PRIMARK register. If ever any other bit is used for different
+     * purposes, this function will not work properly anymore. */
+    return (__get_PRIMASK() == 0);
 }
 
 /**
