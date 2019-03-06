@@ -103,6 +103,21 @@ __attribute__((always_inline)) static inline int irq_is_in(void)
     return (state & AVR8_STATE_FLAG_ISR);
 }
 
+/**
+ * @brief Test if interrupts are currently enabled
+ */
+__attribute__((always_inline)) static inline int irq_is_enabled(void)
+{
+    uint8_t mask;
+    __asm__ volatile(
+        "in %[dest], __SREG__"      "\n\t"
+        : [dest]    "=r"(mask)
+        : /* no inputs */
+        : "memory"
+    );
+    return mask & (1 << 7);
+}
+
 #ifdef __cplusplus
 }
 #endif
