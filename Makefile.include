@@ -498,6 +498,49 @@ print-size: $(ELFFILE)
 
 endif # BUILD_IN_DOCKER
 
+# Rules to check the correctness of thin archives.
+
+relpath = $(shell realpath --relative-to=$(abspath .) $(1))
+
+# Each ARCHECK file contains all the absolute paths found inside the archive.
+BASELIB_ARCHECKS = $(patsubst %.a,%.a-check,$(filter %.a,$(BASELIBS)))
+
+# For each a file, print the absolute paths found inside it
+# If "ar t" is called with an absolute path it will print an abs path regardless
+# of how the archive is internally
+# In case of a malformed archive, ar prints to stderr (and sets an error code).
+# Doing `2>&1` is hacky, the correct thing would be to get the exit code.
+# The `| %.a` is necessary to be able to check file produced in docker.
+%.a-check: %.a
+	$(Q)$(AR) t $(call relpath,$<) 2>&1 | grep '^/' | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
+
+# There's no point on keeping files whose content is later copied to another file
+.INTERMEDIATE: $(BASELIB_ARCHECKS)
+
+ARCHIVE_CHECK = $(BINDIR)/$(APPLICATION).archive-check
+
+$(ARCHIVE_CHECK): $(BASELIB_ARCHECKS)
+	$(Q)cat $^ | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
+
+# Rule to check if thin archives are correctly produced, that is, with a correct
+# relative path.
+ifeq ($(BUILD_IN_DOCKER),1)
+archive-check: ..in-docker-container
+else
+archive-check: $(ARCHIVE_CHECK) FORCE
+	@if [ -s '$<' ] ; then \
+		$(COLOR_ECHO) '$(COLOR_RED)Found the following absolute paths in archives' ;\
+		cat '$<';\
+		$(COLOR_ECHO) '$(COLOR_RESET)' ;\
+		exit 1;\
+	elif [ -f '$<' ] ; then \
+		$(COLOR_ECHO) '$(COLOR_GREEN)Archives correctly formed$(COLOR_RESET)' ;\
+	else \
+		$(COLOR_ECHO) '$(COLOR_RED)Unexpected error (file not found)$(COLOR_RESET)' ;\
+		exit 1;\
+	fi
+endif # BUILD_IN_DOCKER
+
 # Check given command is available in the path
 #   check_cmd 'command' 'description'
 define check_cmd
