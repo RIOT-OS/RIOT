@@ -387,34 +387,26 @@ static inline void pcint_handler(uint8_t port_num, volatile uint8_t *mask_reg)
 /*
  * PCINT0 is always defined, if GPIO_PC_INT_NUMOF is defined
  */
-#if PCINT0_vect_num != AVR_CONTEXT_SWAP_INTERRUPT_VECT_NUM
 ISR(PCINT0_vect, ISR_BLOCK) {
     pcint_handler(0, &PCMSK0);
 }
-#endif /* AVR_CONTEXT_SWAP_INTERRUPT_VECT */
 
 #if defined(PCINT1_vect)
-#if PCINT1_vect_num != AVR_CONTEXT_SWAP_INTERRUPT_VECT_NUM
 ISR(PCINT1_vect, ISR_BLOCK) {
     pcint_handler(1, &PCMSK1);
 }
-#endif  /* AVR_CONTEXT_SWAP_INTERRUPT_VECT */
 #endif  /* PCINT1_vect */
 
 #if defined(PCINT2_vect)
-#if PCINT2_vect_num != AVR_CONTEXT_SWAP_INTERRUPT_VECT_NUM
 ISR(PCINT2_vect, ISR_BLOCK) {
     pcint_handler(2, &PCMSK2);
 }
-#endif  /* AVR_CONTEXT_SWAP_INTERRUPT_VECT */
 #endif  /* PCINT2_vect */
 
 #if defined(PCINT3_vect)
-#if PCINT3_vect_num != AVR_CONTEXT_SWAP_INTERRUPT_VECT_NUM
 ISR(PCINT3_vect, ISR_BLOCK) {
     pcint_handler(3, &PCMSK3);
 }
-#endif  /* AVR_CONTEXT_SWAP_INTERRUPT_VECT */
 #endif  /* PCINT3_vect */
 
 #endif /* GPIO_PC_INT_NUMOF */
