@@ -23,6 +23,7 @@
 #ifndef IRQ_ARCH_H
 #define IRQ_ARCH_H
 
+#include <msp430.h>
 #include "irq.h"
 
 #ifdef __cplusplus
@@ -85,6 +86,19 @@ __attribute__((always_inline)) static inline void irq_restore(unsigned int state
 __attribute__((always_inline)) static inline int irq_is_in(void)
 {
     return __irq_is_in;
+}
+
+__attribute__((always_inline)) static inline int irq_is_enabled(void)
+{
+    unsigned int state;
+    __asm__ volatile(
+        "mov.w r2,%[state]"                   "\n\t"
+        : [state]   "=r"(state)
+        : /* no inputs */
+        : "memory"
+    );
+
+    return (state & GIE);
 }
 
 #ifdef __cplusplus
