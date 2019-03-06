@@ -240,7 +240,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     if (int_num < 0) {
 	    /* If pin change interrupts are enabled, enable mask and interrupt */
         #ifdef GPIO_PC_INT_NUMOF
-        uint8_t broke = 0;
+        uint8_t found = 0;
         uint8_t pin_num = _pin_num(pin);
         uint8_t mapping_size = sizeof(pcint_mapping) / sizeof(gpio_t);
         for(uint8_t i=0 ; i<mapping_size ; i++) {
@@ -252,11 +252,11 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                 pcint_config[i].flank   = flank;
                 pcint_config[i].arg     = arg;
                 pcint_config[i].cb      = cb;
-                broke = 1; 
+                found = 1; 
                 break;
             }
         }
-        if(broke != 1)
+        if(found != 1)
         {
             return -1;
         }
