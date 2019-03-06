@@ -119,6 +119,8 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+#include <stdbool.h>
+
 #include "clist.h"
 #include "cib.h"
 #include "msg.h"
@@ -323,17 +325,7 @@ struct _thread {
  * @warning The active thread will be marked as received when this initializer
  *          is used
  */
-#define THREAD_SIGNAL_INIT              { .pid = sched_active_pid, .status = THREAD_AWAIT_SIGNAL }
-
-/**
- * @brief Status used to control whether @ref thread_await_signal will block or
- *        return right away
- */
-typedef enum {
-    THREAD_AWAIT_SIGNAL,            /**< @ref thread_await_signal will await the signal */
-    THREAD_SIGNAL_RECEIVED,         /**< signal received, no waiting required */
-    THREAD_SIGNAL_STATUS_NUMOF      /**< number of elements */
-} thread_signal_status_t;
+#define THREAD_SIGNAL_INIT              { .pid = sched_active_pid, .signal_received = false }
 
 /**
  * @brief Structure holding the data used by @ref thread_signal and
@@ -341,7 +333,7 @@ typedef enum {
  */
 typedef struct {
     kernel_pid_t pid;               /**< Thread to signal */
-    thread_signal_status_t status;  /**< Was signal received already? */
+    bool signal_received;           /**< Was signal received already? */
 } thread_signal_t;
 
 /** @} */
@@ -464,7 +456,7 @@ int thread_signal(thread_signal_t *signal);
  */
 static inline void thread_signal_init(thread_signal_t *signal, kernel_pid_t pid)
 {
-    signal->status = THREAD_AWAIT_SIGNAL;
+    signal->signal_received = false;
     signal->pid = pid;
 }
 
@@ -478,7 +470,7 @@ static inline void thread_signal_init(thread_signal_t *signal, kernel_pid_t pid)
  */
 static inline int thread_wakeup(kernel_pid_t pid)
 {
-    thread_signal_t sig = { .pid = pid, .status = THREAD_AWAIT_SIGNAL };
+    thread_signal_t sig = { .pid = pid, .signal_received = false };
     return (thread_signal(&sig) >= 0) ? 1 : STATUS_NOT_FOUND;
 }
 

@@ -64,7 +64,8 @@ void thread_await_signal(thread_signal_t *signal)
     unsigned state = irq_disable();
     if (signal) {
         signal->pid = sched_active_pid;
-        if (signal->status == THREAD_SIGNAL_RECEIVED) {
+        if (signal->signal_received) {
+            signal->signal_received = false;
             irq_restore(state);
             return;
         }
@@ -72,6 +73,7 @@ void thread_await_signal(thread_signal_t *signal)
     sched_set_status((thread_t *)sched_active_thread, STATUS_SLEEPING);
     irq_restore(state);
     thread_yield_higher();
+    signal->signal_received = false;
 }
 
 int thread_signal(thread_signal_t *signal)
@@ -84,7 +86,7 @@ int thread_signal(thread_signal_t *signal)
 
     thread_t *other_thread = (thread_t *) thread_get(signal->pid);
 
-    signal->status = THREAD_SIGNAL_RECEIVED;
+    signal->signal_received = true;
 
     if (!other_thread) {
         DEBUG("thread_signal: Thread does not exist!\n");
