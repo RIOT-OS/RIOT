@@ -14,6 +14,8 @@
 #include "suit/cbor.h"
 #include "suit.h"
 
+#include "uuid.h"
+
 /**
  * A nice example CBOR-encoded manifest:
  *
@@ -66,6 +68,23 @@ static const uint8_t cond[][16] = {
       0x26, 0xa3, 0xa9, 0xcd },
     { 0x54, 0x8a, 0xb6, 0xc8, 0xdf, 0x58, 0x53, 0x2d, 0xbe, 0x0e, 0x0a, 0x1d,
       0xc9, 0x0d, 0xcf, 0xeb },
+};
+
+static uint8_t test_suit_cbor_conditions[] = {
+    0x89, 0x01, 0xf6, 0x48, 0xc4, 0x3e, 0x39, 0x32, 0xee, 0x2e, 0x15, 0x10,
+    0x1a, 0x5b, 0x0c, 0x15, 0x29, 0x83, 0x82, 0x01, 0x50,
+    /* First conditional (index 21)*/
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x82, 0x02, 0x50,
+    /* Second conditional (index 40)*/
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x82, 0x03, 0x50,
+    /* Third conditional (index 59)*/
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0xf6, 0xf6, 0xf6, 0xf6
 };
 
 static const char test_uri[] = "coap://[ff02::1]/fw/test";
@@ -147,10 +166,46 @@ void test_suit_cbor_parse(void)
     TEST_ASSERT_EQUAL_INT(memcmp(test_storid, storid, storid_len), 0);
 }
 
+void test_suit_conditions(void)
+{
+    suit_cbor_manifest_t manifest;
+    suit_init_conditions();
+    
+    int res = suit_parse(&manifest, test_suit_cbor_conditions,
+                         sizeof(test_suit_cbor_conditions));
+    TEST_ASSERT_EQUAL_INT(SUIT_OK, res);
+
+    res = suit_validate_manifest(&manifest, 0);
+    TEST_ASSERT_EQUAL_INT(SUIT_ERR_COND, res);
+
+    /* Copy binary uuid values into the manifest */
+    uuid_t *uuid = suit_get_vendor_id();
+    memcpy(&test_suit_cbor_conditions[21], uuid, sizeof(uuid_t));
+    
+    res = suit_validate_manifest(&manifest, 0);
+    TEST_ASSERT_EQUAL_INT(SUIT_ERR_COND, res);
+    
+    uuid = suit_get_class_id();
+    memcpy(&test_suit_cbor_conditions[40], uuid, sizeof(uuid_t));
+    
+    res = suit_validate_manifest(&manifest, 0);
+    TEST_ASSERT_EQUAL_INT(SUIT_ERR_COND, res);
+    
+    uuid = suit_get_device_id();
+    memcpy(&test_suit_cbor_conditions[59], uuid, sizeof(uuid_t));
+
+    /* The manifest validation must only return SUIT_OK after copying a valid
+     * value in all conditions in the manifest
+     */
+    res = suit_validate_manifest(&manifest, 0);
+    TEST_ASSERT_EQUAL_INT(SUIT_OK, res);
+}
+
 Test *tests_suit_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_suit_cbor_parse),
+        new_TestFixture(test_suit_conditions),
     };
 
     EMB_UNIT_TESTCALLER(suit_cbor_tests, NULL, NULL, fixtures);
