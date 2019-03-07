@@ -19,5 +19,11 @@ FFLAGS ?= $(EDBG_ARGS) -t $(EDBG_DEVICE_TYPE) -b -v -p -f $(HEXFILE)
 ifeq ($(RIOT_EDBG),$(FLASHER))
   FLASHDEPS += $(RIOT_EDBG)
 endif
-RESET ?= $(EDBG)
-RESET_FLAGS ?= $(EDBG_ARGS) -t $(EDBG_DEVICE_TYPE)
+
+## A few commits ago edbg changed its behavior and now it resets the board
+## twice. This makes some tests fail, as the start on the first reset, but
+## shortly after the board is reset again.
+## See: https://github.com/ataradov/edbg/issues/77
+## Commenting this out causes RESET to be provided by OpenOCD instead.
+# RESET ?= $(EDBG)
+# RESET_FLAGS ?= $(EDBG_ARGS) -t $(EDBG_DEVICE_TYPE)
