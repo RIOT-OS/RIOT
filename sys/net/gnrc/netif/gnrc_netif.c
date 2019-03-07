@@ -1238,6 +1238,7 @@ static void _test_options(gnrc_netif_t *netif)
             assert(netif->ipv6.mtu < UINT16_MAX);
 #endif  /* MODULE_GNRC_IPV6 */
             break;
+        case NETDEV_TYPE_LORA: /* LoRa doesn't provide L2 ADDR */
         case NETDEV_TYPE_SLIP:
             assert(!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR));
             assert(0U == netif->l2addr_len);
