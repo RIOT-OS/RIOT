@@ -280,7 +280,8 @@ static int _send(netdev_t *dev,  const iolist_t *iolist)
     DEBUG("[nrf802154] send: putting %i byte into the ether\n", len);
 
     /* set interframe spacing based on packet size */
-    unsigned int ifs = (len > SIFS_MAXPKTSIZE) ? LIFS : SIFS;
+    unsigned int ifs = (len + IEEE802154_FCS_LEN > SIFS_MAXPKTSIZE) ? LIFS
+                                                                    : SIFS;
     timer_set_absolute(NRF802154_TIMER, 0, ifs);
 
     return len;
