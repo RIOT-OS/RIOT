@@ -287,7 +287,7 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND,
     msg.content.ptr = fragment_msg;
     if (msg_send_to_self(&msg) == 0) {
-        printf("6lo frag: message queue full, can't issue next fragment "
+        DEBUG("6lo frag: message queue full, can't issue next fragment "
               "sending\n");
         goto error;
     }
