@@ -52,8 +52,9 @@ static mtd_spi_nor_t mulle_nor_dev = {
     .base = {
         .driver = &mtd_spi_nor_driver,
         .page_size = 256,
-        .pages_per_sector = 256,
+        .sector_size = 65536,
         .sector_count = 32,
+        .min_erase_size = 65536,
     },
     .opcode = &mtd_spi_nor_opcode_default,
     .spi = MULLE_NOR_SPI_DEV,

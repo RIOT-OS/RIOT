@@ -42,8 +42,8 @@ static int _init(mtd_dev_t *dev)
         if (!f) {
             return -EIO;
         }
-        size_t size = dev->sector_count * dev->pages_per_sector * dev->page_size;
-        for (size_t i = 0; i < size; i++) {
+        size_t mtd_size = dev->sector_count * dev->sector_size;
+        for (size_t i = 0; i < mtd_size; i++) {
             real_fputc(0xff, f);
         }
     }
@@ -56,7 +56,7 @@ static int _init(mtd_dev_t *dev)
 static int _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
 {
     mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
-    size_t mtd_size = dev->sector_count * dev->pages_per_sector * dev->page_size;
+    size_t mtd_size = dev->sector_count * dev->sector_size;
 
     DEBUG("mtd_native: read from page %" PRIu32 " count %" PRIu32 "\n", addr, size);
 
@@ -78,7 +78,7 @@ static int _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
 static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
 {
     mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
-    size_t mtd_size = dev->sector_count * dev->pages_per_sector * dev->page_size;
+    size_t mtd_size = dev->sector_count * dev->sector_size;
 
     DEBUG("mtd_native: write from 0x%" PRIx32 " count %" PRIu32 "\n", addr, size);
 
@@ -107,15 +107,14 @@ static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size
 static int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 {
     mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
-    size_t mtd_size = dev->sector_count * dev->pages_per_sector * dev->page_size;
-    size_t sector_size = dev->pages_per_sector * dev->page_size;
+    size_t mtd_size = dev->sector_count * dev->sector_size;
 
     DEBUG("mtd_native: erase from sector %" PRIu32 " count %" PRIu32 "\n", addr, size);
 
     if (addr + size > mtd_size) {
         return -EOVERFLOW;
     }
-    if (((addr % sector_size) != 0) || ((size % sector_size) != 0)) {
+    if (((addr % dev->min_erase_size) != 0) || ((size % dev->min_erase_size) != 0)) {
         return -EOVERFLOW;
     }
 

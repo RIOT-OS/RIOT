@@ -39,7 +39,8 @@ static mtd_native_dev_t mtd0_dev = {
     .dev = {
         .driver = &native_flash_driver,
         .sector_count = MTD_SECTOR_NUM,
-        .pages_per_sector = MTD_SECTOR_SIZE / MTD_PAGE_SIZE,
+        .sector_size = MTD_SECTOR_SIZE,
+        .min_erase_size = MTD_SECTOR_SIZE,
         .page_size = MTD_PAGE_SIZE,
     },
     .fname = MTD_NATIVE_FILENAME,

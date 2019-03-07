@@ -52,11 +52,12 @@ static int mtd_sdcard_init(mtd_dev_t *dev)
         (sdcard_spi_init(mtd_sd->sd_card, mtd_sd->params) == 0)) {
         /* erasing whole sectors is handled internally by the card so you can
            delete single blocks (i.e. pages) */
-        dev->pages_per_sector = 1;
         dev->sector_count     = sdcard_spi_get_sector_count(mtd_sd->sd_card);
 
         /* sdcard_spi always uses the fixed block size of SD-HC cards */
         dev->page_size        = SD_HC_BLOCK_SIZE;
+        dev->min_erase_size   = SD_HC_BLOCK_SIZE;
+        dev->sector_size      = SD_HC_BLOCK_SIZE;
         return 0;
     }
     return -EIO;

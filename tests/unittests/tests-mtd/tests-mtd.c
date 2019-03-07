@@ -31,16 +31,19 @@
 #else
 /* Test mock object implementing a simple RAM-based mtd */
 #ifndef SECTOR_COUNT
-#define SECTOR_COUNT 4
+#define SECTOR_COUNT    4
 #endif
-#ifndef PAGE_PER_SECTOR
-#define PAGE_PER_SECTOR 4
+#ifndef SECTOR_SIZE
+#define SECTOR_SIZE     512
+#endif
+#ifndef MIN_ERASE_SIZE
+#define MIN_ERASE_SIZE  256
 #endif
 #ifndef PAGE_SIZE
-#define PAGE_SIZE 128
+#define PAGE_SIZE       128
 #endif
 
-static uint8_t dummy_memory[PAGE_PER_SECTOR * PAGE_SIZE * SECTOR_COUNT];
+static uint8_t dummy_memory[SECTOR_SIZE * SECTOR_COUNT];
 
 static int init(mtd_dev_t *dev)
 {
@@ -72,7 +75,10 @@ static int write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
     if (((addr % PAGE_SIZE) + size) > PAGE_SIZE) {
         return -EOVERFLOW;
     }
-    memcpy(dummy_memory + addr, buff, size);
+    const uint8_t *p = buff;
+    for (size_t i = 0; i < size; i++) {
+        dummy_memory[addr + i] &= p[i];
+    }
 
     return size;
 }
@@ -81,10 +87,10 @@ static int erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 {
     (void)dev;
 
-    if (size % (PAGE_PER_SECTOR * PAGE_SIZE) != 0) {
+    if (size % (MIN_ERASE_SIZE) != 0) {
         return -EOVERFLOW;
     }
-    if (addr % (PAGE_PER_SECTOR * PAGE_SIZE) != 0) {
+    if (addr % (MIN_ERASE_SIZE) != 0) {
         return -EOVERFLOW;
     }
     if (addr + size > sizeof(dummy_memory)) {
@@ -113,7 +119,8 @@ static const mtd_desc_t driver = {
 static mtd_dev_t _dev = {
     .driver = &driver,
     .sector_count = SECTOR_COUNT,
-    .pages_per_sector = PAGE_PER_SECTOR,
+    .sector_size = SECTOR_SIZE,
+    .min_erase_size = MIN_ERASE_SIZE,
     .page_size = PAGE_SIZE,
 };
 
@@ -121,9 +128,9 @@ static mtd_dev_t *dev = (mtd_dev_t*) &_dev;
 
 #endif /* MTD_0 */
 
-static void setup_teardown(void)
+static void teardown(void)
 {
-    mtd_erase(dev, 0, dev->pages_per_sector * dev->page_size);
+    mtd_erase(dev, 0, dev->sector_count * dev->sector_size);
 }
 
 static void test_mtd_init(void)
@@ -135,7 +142,10 @@ static void test_mtd_init(void)
 static void test_mtd_erase(void)
 {
     /* Erase first sector */
-    int ret = mtd_erase(dev, 0, dev->pages_per_sector * dev->page_size);
+    int ret = mtd_erase(dev, 0, dev->sector_size);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    ret = mtd_erase(dev, 0, dev->min_erase_size);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
     /* Erase with wrong size (les than sector size) */
@@ -147,14 +157,49 @@ static void test_mtd_erase(void)
     TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
 
     /* Erase 2nd - 3rd sector */
-    ret = mtd_erase(dev, dev->pages_per_sector * dev->page_size,
-                    dev->pages_per_sector * dev->page_size * 2);
+    ret = mtd_erase(dev, dev->min_erase_size,
+                    dev->min_erase_size * 2);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
     /* Erase out of memory area */
-    ret = mtd_erase(dev, dev->pages_per_sector * dev->page_size * dev->sector_count,
-                    dev->pages_per_sector * dev->page_size);
+    ret = mtd_erase(dev, dev->sector_count * dev->sector_size,
+                    dev->min_erase_size);
     TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+}
+
+static void test_mtd_erase_read(void)
+{
+    int ret;
+    uint8_t buf[32];
+    memset(buf, 0x55, sizeof(buf));
+
+    /* Fill in 4 sectors */
+    size_t i = 0;
+    while (i < 4 * dev->sector_size) {
+        ret = mtd_write(dev, buf, i, sizeof(buf));
+        i += sizeof(buf);
+        TEST_ASSERT_EQUAL_INT(sizeof(buf), ret);
+    }
+
+    /* Erase 2 sectors, starting from second erasable unit */
+    ret = mtd_erase(dev, dev->min_erase_size, 2 * dev->sector_size);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    /* First erasable unit is not erased */
+    memset(buf, 0, sizeof(buf));
+    ret = mtd_read(dev, buf, dev->min_erase_size - sizeof(buf), sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(sizeof(buf), ret);
+    for (unsigned j = 0; j < sizeof(buf); j++) {
+        TEST_ASSERT_EQUAL_INT(0x55, buf[j]);
+    }
+
+    /* Second erasable unit of third sector is not erased */
+    memset(buf, 0, sizeof(buf));
+    ret = mtd_read(dev, buf, 2 * dev->sector_size + dev->min_erase_size, sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(sizeof(buf), ret);
+    for (unsigned j = 0; j < sizeof(buf); j++) {
+        TEST_ASSERT_EQUAL_INT(0x55, buf[j]);
+    }
 }
 
 static void test_mtd_write_erase(void)
@@ -167,7 +212,7 @@ static void test_mtd_write_erase(void)
     int ret = mtd_write(dev, buf, sizeof(buf_empty), sizeof(buf));
     TEST_ASSERT_EQUAL_INT(sizeof(buf), ret);
 
-    ret = mtd_erase(dev, 0, dev->pages_per_sector * dev->page_size);
+    ret = mtd_erase(dev, 0, dev->min_erase_size);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
     uint8_t expected[sizeof(buf_read)];
@@ -204,12 +249,12 @@ static void test_mtd_write_read(void)
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf, buf_read + sizeof(buf_empty), sizeof(buf)));
 
     /* out of bounds write (addr) */
-    ret = mtd_write(dev, buf, dev->pages_per_sector * dev->page_size * dev->sector_count,
+    ret = mtd_write(dev, buf, dev->sector_count * dev->sector_size,
                     sizeof(buf));
     TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
 
     /* out of bounds write (addr + count) */
-    ret = mtd_write(dev, buf, (dev->pages_per_sector * dev->page_size * dev->sector_count)
+    ret = mtd_write(dev, buf, (dev->sector_count * dev->sector_size)
                     - (sizeof(buf) / 2), sizeof(buf));
     TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
 
@@ -226,7 +271,6 @@ static void test_mtd_write_read(void)
     TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
 }
 
-#ifdef MTD_0
 static void test_mtd_write_read_flash(void)
 {
     const uint8_t buf1[] = {0xee, 0xdd, 0xcc};
@@ -249,7 +293,6 @@ static void test_mtd_write_read_flash(void)
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf_expected, buf_read, sizeof(buf_expected)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf_empty, buf_read + sizeof(buf_expected), sizeof(buf_empty)));
 }
-#endif
 
 #if MODULE_VFS
 static void test_mtd_vfs(void)
@@ -285,17 +328,16 @@ Test *tests_mtd_tests(void)
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_mtd_init),
         new_TestFixture(test_mtd_erase),
+        new_TestFixture(test_mtd_erase_read),
         new_TestFixture(test_mtd_write_erase),
         new_TestFixture(test_mtd_write_read),
-#ifdef MTD_0
         new_TestFixture(test_mtd_write_read_flash),
-#endif
 #if MODULE_VFS
         new_TestFixture(test_mtd_vfs),
 #endif
     };
 
-    EMB_UNIT_TESTCALLER(mtd_tests, setup_teardown, setup_teardown, fixtures);
+    EMB_UNIT_TESTCALLER(mtd_tests, NULL, teardown, fixtures);
 
     return (Test *)&mtd_tests;
 }

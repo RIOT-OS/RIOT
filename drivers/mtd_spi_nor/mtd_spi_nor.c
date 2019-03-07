@@ -284,12 +284,13 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
 
     DEBUG("mtd_spi_nor_init: %" PRIu32 " bytes "
           "(%" PRIu32 " sectors, %" PRIu32 " bytes/sector, "
-          "%" PRIu32 " pages, "
-          "%" PRIu32 " pages/sector, %" PRIu32 " bytes/page)\n",
-          mtd->pages_per_sector * mtd->sector_count * mtd->page_size,
-          mtd->sector_count, mtd->pages_per_sector * mtd->page_size,
-          mtd->pages_per_sector * mtd->sector_count,
-          mtd->pages_per_sector, mtd->page_size);
+          "%" PRIu32 " pages, %" PRIu32 " bytes/page,"
+          "Min erase size %" PRIu32 ")\n",
+          mtd->sector_count * mtd->sector_size,
+          mtd->sector_count, mtd->sector_size,
+          (mtd->sector_count * mtd->sector_size) / mtd->page_size,
+          mtd->page_size,
+          mtd->min_erase_size);
     DEBUG("mtd_spi_nor_init: Using %u byte addresses\n", dev->addr_width);
 
     if (dev->addr_width == 0) {
@@ -334,7 +335,7 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
 
     mask = 0;
     shift = 0;
-    uint32_t sector_size = mtd->page_size * mtd->pages_per_sector;
+    uint32_t sector_size = mtd->sector_size;
     if ((sector_size & (sector_size - 1)) == 0) {
         while ((sector_size >> shift) > 1) {
             ++shift;
@@ -343,6 +344,19 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     }
     dev->sec_addr_mask = mask;
     dev->sec_addr_shift = shift;
+
+    if (dev->flag & SPI_NOR_F_SECT_4K) {
+        dev->min_erase_addr_mask = UINT32_MAX << 12;
+        dev->min_erase_addr_shift = 12;
+    }
+    else if (dev->flag & SPI_NOR_F_SECT_32K) {
+        dev->min_erase_addr_mask = UINT32_MAX << 15;
+        dev->min_erase_addr_shift = 15;
+    }
+    else {
+        dev->min_erase_addr_mask = dev->sec_addr_mask;
+        dev->min_erase_addr_shift = dev->sec_addr_shift;
+    }
 
     DEBUG("mtd_spi_nor_init: sec_addr_mask = 0x%08" PRIx32 ", sec_addr_shift = %u\n",
           mask, (unsigned int)shift);
@@ -355,8 +369,9 @@ static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t 
     DEBUG("mtd_spi_nor_read: %p, %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
           (void *)mtd, dest, addr, size);
     const mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
-    size_t chipsize = mtd->page_size * mtd->pages_per_sector * mtd->sector_count;
+    size_t chipsize = mtd->sector_size * mtd->sector_count;
     if (addr > chipsize) {
+        DEBUG("mtd_spi_nor_read: ERR: reading outside memory!\n");
         return -EOVERFLOW;
     }
     if (size > mtd->page_size) {
@@ -384,7 +399,7 @@ static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t 
 
 static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t size)
 {
-    uint32_t total_size = mtd->page_size * mtd->pages_per_sector * mtd->sector_count;
+    uint32_t total_size = mtd->sector_size * mtd->sector_count;
 
     DEBUG("mtd_spi_nor_write: %p, %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
           (void *)mtd, src, addr, size);
@@ -402,6 +417,7 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
         return -EOVERFLOW;
     }
     if (addr + size > total_size) {
+        DEBUG("mtd_spi_nor_write: ERR: writing outside memory!\n");
         return -EOVERFLOW;
     }
     be_uint32_t addr_be = byteorder_htonl(addr);
@@ -422,25 +438,29 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
 
 static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 {
+    int res = 0;
     DEBUG("mtd_spi_nor_erase: %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
           (void *)mtd, addr, size);
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
-    uint32_t sector_size = mtd->page_size * mtd->pages_per_sector;
-    uint32_t total_size = sector_size * mtd->sector_count;
+    uint32_t total_size = mtd->sector_size * mtd->sector_count;
 
-    if (dev->sec_addr_mask &&
-        ((addr & ~dev->sec_addr_mask) != 0)) {
+    if (dev->min_erase_addr_mask &&
+        ((addr & ~dev->min_erase_addr_mask) != 0)) {
         /* This is not a requirement in hardware, but it helps in catching
          * software bugs (the erase-all-your-files kind) */
-        DEBUG("addr = %" PRIx32 " ~dev->erase_addr_mask = %" PRIx32 "", addr, ~dev->sec_addr_mask);
+        DEBUG("addr = %" PRIx32 " ~dev->min_erase_addr_mask = %" PRIx32 "",
+              addr, ~dev->min_erase_addr_mask);
         DEBUG("mtd_spi_nor_erase: ERR: erase addr not aligned on %" PRIu32 " byte boundary.\n",
-              sector_size);
+              mtd->min_erase_size);
         return -EOVERFLOW;
     }
     if (addr + size > total_size) {
+        DEBUG("mtd_spi_nor_erase: ERR: erasing outside memory!\n");
         return -EOVERFLOW;
     }
-    if (size % sector_size != 0) {
+    if (size % mtd->min_erase_size != 0) {
+        DEBUG("mtd_spi_nor_erase: ERR: size is not aligned on %" PRIu32 " byte boundary\n",
+              mtd->min_erase_size);
         return -EOVERFLOW;
     }
 
@@ -453,6 +473,11 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         if (size == total_size) {
             mtd_spi_cmd(dev, dev->opcode->chip_erase);
             size -= total_size;
+        }
+        else if ((size >= mtd->sector_size) && ((addr & ~dev->sec_addr_mask) == 0)){
+            mtd_spi_cmd_addr_write(dev, dev->opcode->block_erase, addr_be, NULL, 0);
+            addr += mtd->sector_size;
+            size -= mtd->sector_size;
         }
         else if ((dev->flag & SPI_NOR_F_SECT_32K) && (size >= MTD_32K) &&
                  ((addr & MTD_32K_ADDR_MASK) == 0)) {
@@ -469,9 +494,11 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
             size -= MTD_4K;
         }
         else {
-            mtd_spi_cmd_addr_write(dev, dev->opcode->block_erase, addr_be, NULL, 0);
-            addr += sector_size;
-            size -= sector_size;
+            DEBUG("mtd_spi_nor_erase: ERR: remaining size is not aligned on %" PRIu32 " byte boundary\n",
+                  mtd->min_erase_size);
+            mtd_spi_cmd(dev, dev->opcode->wrdi);
+            res = -EOVERFLOW;
+            break;
         }
 
         /* waiting for the command to complete before continuing */
@@ -479,7 +506,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
     }
     spi_release(dev->spi);
 
-    return 0;
+    return res;
 }
 
 static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
