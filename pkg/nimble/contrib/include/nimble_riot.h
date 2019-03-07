@@ -54,6 +54,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Export our own address type for later usage
+ */
+extern uint8_t nimble_riot_own_addr_type;
+
+/**
  * @brief   Setup and run NimBLE's controller and host threads
  */
 void nimble_riot_init(void);
