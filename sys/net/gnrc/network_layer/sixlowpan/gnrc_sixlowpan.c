@@ -27,11 +27,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
-/* For PRIu16 etc. */
-#include <inttypes.h>
-#endif
-
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 
 #if ENABLE_DEBUG
@@ -222,8 +217,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
     }
 #endif
     else {
-        DEBUG("6lo: dispatch %02" PRIx8 " ... is not supported\n",
-              dispatch[0]);
+        DEBUG("6lo: dispatch %02x... is not supported\n", dispatch[0]);
         gnrc_pktbuf_release(pkt);
         return;
     }
