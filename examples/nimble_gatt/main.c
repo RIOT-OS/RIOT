@@ -132,15 +132,6 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
     },
 };
 
-static void update_ad(void)
-{
-    uint8_t buf[BLE_HS_ADV_MAX_SZ];
-    bluetil_ad_t ad;
-    bluetil_ad_init_with_flags(&ad, buf, sizeof(buf), BLUETIL_AD_FLAGS_DEFAULT);
-    bluetil_ad_add_name(&ad, device_name);
-    ble_gap_adv_set_data(ad.buf, ad.pos);
-}
-
 static int gap_event_cb(struct ble_gap_event *event, void *arg)
 {
     (void)arg;
@@ -346,8 +337,12 @@ int main(void)
     assert(rc == 0);
     (void)rc;
 
-    /* generate the advertising data */
-    update_ad();
+    /* configure and set the advertising data */
+    uint8_t buf[BLE_HS_ADV_MAX_SZ];
+    bluetil_ad_t ad;
+    bluetil_ad_init_with_flags(&ad, buf, sizeof(buf), BLUETIL_AD_FLAGS_DEFAULT);
+    bluetil_ad_add_name(&ad, device_name);
+    ble_gap_adv_set_data(ad.buf, ad.pos);
 
     /* start to advertise this node */
     start_advertise();
