@@ -93,4 +93,12 @@ void nimble_riot_init(void)
     res = ble_hs_id_infer_auto(0, &nimble_riot_own_addr_type);
     assert(res == 0);
     (void)res;
+
+    /* initialize the configured, build-in services */
+#ifdef MODULE_NIMBLE_SVC_GAP
+    ble_svc_gap_init();
+#endif
+#ifdef MODULE_NIMBLE_SVC_GATT
+    ble_svc_gatt_init();
+#endif
 }
