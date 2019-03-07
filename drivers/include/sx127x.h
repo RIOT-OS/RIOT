@@ -95,6 +95,9 @@ extern "C" {
 #ifdef SX127X_USE_DIO_MULTI
 #define SX127X_IRQ_DIO_MULTI             (1<<6)  /**< DIO MULTI IRQ */
 #endif
+#ifndef SX127X_DIO_PULL_MODE
+#define SX127X_DIO_PULL_MODE             (GPIO_IN_PD) /**< pull down DIOx */
+#endif
 /** @} */
 
 /**

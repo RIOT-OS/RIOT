@@ -234,8 +234,8 @@ static int _init_gpios(sx127x_t *dev)
 #ifndef SX127X_USE_DIO_MULTI
     /* Check if DIO0 pin is defined */
     if (dev->params.dio0_pin != GPIO_UNDEF) {
-        res = gpio_init_int(dev->params.dio0_pin, GPIO_IN, GPIO_RISING,
-                                sx127x_on_dio0_isr, dev);
+        res = gpio_init_int(dev->params.dio0_pin, SX127X_DIO_PULL_MODE,
+                            GPIO_RISING, sx127x_on_dio0_isr, dev);
         if (res < 0) {
             DEBUG("[sx127x] error: failed to initialize DIO0 pin\n");
             return res;
@@ -249,8 +249,8 @@ static int _init_gpios(sx127x_t *dev)
 
     /* Check if DIO1 pin is defined */
     if (dev->params.dio1_pin != GPIO_UNDEF) {
-        res = gpio_init_int(dev->params.dio1_pin, GPIO_IN, GPIO_RISING,
-                                sx127x_on_dio1_isr, dev);
+        res = gpio_init_int(dev->params.dio1_pin, SX127X_DIO_PULL_MODE,
+                            GPIO_RISING, sx127x_on_dio1_isr, dev);
         if (res < 0) {
             DEBUG("[sx127x] error: failed to initialize DIO1 pin\n");
             return res;
@@ -259,8 +259,8 @@ static int _init_gpios(sx127x_t *dev)
 
     /* check if DIO2 pin is defined */
     if (dev->params.dio2_pin != GPIO_UNDEF) {
-        res = gpio_init_int(dev->params.dio2_pin, GPIO_IN, GPIO_RISING,
-                            sx127x_on_dio2_isr, dev);
+        res = gpio_init_int(dev->params.dio2_pin, SX127X_DIO_PULL_MODE,
+                            GPIO_RISING, sx127x_on_dio2_isr, dev);
         if (res < 0) {
             DEBUG("[sx127x] error: failed to initialize DIO2 pin\n");
             return res;
@@ -269,8 +269,8 @@ static int _init_gpios(sx127x_t *dev)
 
     /* check if DIO3 pin is defined */
     if (dev->params.dio3_pin != GPIO_UNDEF) {
-        res = gpio_init_int(dev->params.dio3_pin, GPIO_IN, GPIO_RISING,
-                            sx127x_on_dio3_isr, dev);
+        res = gpio_init_int(dev->params.dio3_pin, SX127X_DIO_PULL_MODE,
+                            GPIO_RISING, sx127x_on_dio3_isr, dev);
         if (res < 0) {
             DEBUG("[sx127x] error: failed to initialize DIO3 pin\n");
             return res;
@@ -279,8 +279,8 @@ static int _init_gpios(sx127x_t *dev)
 #else
     if (dev->params.dio_multi_pin != GPIO_UNDEF) {
         DEBUG("[sx127x] info: Trying to initialize DIO MULTI pin\n");
-        res = gpio_init_int(dev->params.dio_multi_pin, GPIO_IN, GPIO_RISING,
-                                sx127x_on_dio_multi_isr, dev);
+        res = gpio_init_int(dev->params.dio_multi_pin, SX127X_DIO_PULL_MODE,
+                            GPIO_RISING, sx127x_on_dio_multi_isr, dev);
         if (res < 0) {
             DEBUG("[sx127x] error: failed to initialize DIO MULTI pin\n");
             return res;
