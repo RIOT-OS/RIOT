@@ -58,6 +58,9 @@ endif
 ifneq (,$(filter gnrc_pktbuf_malloc,$(USEMODULE)))
     DIRS += pktbuf_malloc
 endif
+ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
+    DIRS += link_layer/lorawan
+endif
 ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
     DIRS += link_layer/gomach
 endif
