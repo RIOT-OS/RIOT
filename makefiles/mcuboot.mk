@@ -27,9 +27,7 @@ mcuboot: mcuboot-create-key link
 	@$(COLOR_ECHO)
 	@$(COLOR_ECHO) '$(COLOR_PURPLE)Re-linking for MCUBoot at $(MCUBOOT_SLOT0_SIZE)...$(COLOR_RESET)'
 	@$(COLOR_ECHO)
-	$(Q)$(_LINK) $(LINKFLAGPREFIX)--defsym=offset="$$(($(MCUBOOT_SLOT0_SIZE) + $(IMAGE_HDR_SIZE)))" \
-	$(LINKFLAGPREFIX)--defsym=length="$$(($(MCUBOOT_SLOT1_SIZE) - $(IMAGE_HDR_SIZE)))" \
-	$(LINKFLAGPREFIX)--defsym=image_header="$(IMAGE_HDR_SIZE)" -o $(ELFFILE) && \
+	$(Q)$(_LINK) -o $(ELFFILE) && \
 	$(OBJCOPY) $(OFLAGS) -Obinary $(ELFFILE) $(BINFILE) && \
 	$(IMGTOOL) sign --key $(MCUBOOT_KEYFILE) --version $(IMAGE_VERSION) --align \
 	$(MCUBOOT_IMAGE_ALIGN) -H $(IMAGE_HDR_SIZE) $(BINFILE) $(SIGN_BINFILE)
