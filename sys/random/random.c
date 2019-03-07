@@ -22,7 +22,6 @@
 #include <stdint.h>
 
 #include "log.h"
-#include "luid.h"
 #include "random.h"
 #ifdef MODULE_PUF_SRAM
 #include "puf_sram.h"
@@ -31,7 +30,7 @@
 #include "periph/hwrng.h"
 #endif
 #ifdef MODULE_PERIPH_CPUID
-#include "periph/cpuid.h"
+#include "luid.h"
 #endif
 
 #define ENABLE_DEBUG (0)
