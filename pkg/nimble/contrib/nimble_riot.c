@@ -77,4 +77,8 @@ void nimble_riot_init(void)
                   _host_thread, NULL,
                   "nimble_host");
 #endif
+
+    /* make sure synchronization of host and controller is done, this should
+     * always be the case at this point */
+    while (!ble_hs_synced()) {}
 }
