@@ -22,6 +22,7 @@ $(MCUBOOT_KEYFILE):
 	$(Q)$(IMGTOOL) keygen -k $@ -t rsa-2048
 endif
 
+mcuboot: ROM_OFFSET=$$(($(MCUBOOT_SLOT0_SIZE) + $(IMAGE_HDR_SIZE)))
 mcuboot: mcuboot-create-key link
 	@$(COLOR_ECHO)
 	@$(COLOR_ECHO) '$(COLOR_PURPLE)Re-linking for MCUBoot at $(MCUBOOT_SLOT0_SIZE)...$(COLOR_RESET)'
