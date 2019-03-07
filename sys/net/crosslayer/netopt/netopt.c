@@ -107,6 +107,7 @@ static const char *_netopt_strmap[] = {
     [NETOPT_LORAWAN_MAX_RX_ERROR]  = "NETOPT_LORAWAN_MAX_RX_ERROR",
     [NETOPT_LORAWAN_MIN_RX_SYMBOL] = "NETOPT_LORAWAN_MIN_RX_SYMBOL",
     [NETOPT_SYNCWORD]              = "NETOPT_SYNCWORD",
+    [NETOPT_RANDOM]                = "NETOPT_RANDOM",
     [NETOPT_NUMOF]                 = "NETOPT_NUMOF",
 };
 

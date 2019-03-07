@@ -650,6 +650,13 @@ typedef enum {
      */
     NETOPT_SYNCWORD,
 
+    /**
+     * @brief  (uint32_t) Get a random value from the device
+     *
+     * Nothing happens when set
+     */
+    NETOPT_RANDOM,
+
     /* add more options if needed */
 
     /**

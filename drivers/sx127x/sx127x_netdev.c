@@ -356,6 +356,11 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             *((uint8_t*) val) = (uint8_t) sx127x_get_syncword(dev);
             return sizeof(uint8_t);
 
+        case NETOPT_RANDOM:
+            assert(max_len >= sizeof(uint32_t));
+            *((uint32_t*) val) = (uint32_t) sx127x_random(dev);
+            return sizeof(uint32_t);
+
         case NETOPT_IQ_INVERT:
             assert(max_len >= sizeof(uint8_t));
             *((netopt_enable_t*) val) = sx127x_get_iq_invert(dev) ? NETOPT_ENABLE : NETOPT_DISABLE;
