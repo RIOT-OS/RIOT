@@ -645,6 +645,11 @@ typedef enum {
      */
     NETOPT_LORAWAN_MIN_RX_SYMBOL,
 
+    /**
+     * @brief   (uint8_t*) phy layer syncword
+     */
+    NETOPT_SYNCWORD,
+
     /* add more options if needed */
 
     /**
