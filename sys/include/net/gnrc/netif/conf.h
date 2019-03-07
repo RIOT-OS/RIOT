@@ -54,7 +54,7 @@ extern "C" {
  *              changed.
  */
 #ifndef GNRC_NETIF_MSG_QUEUE_SIZE
-#define GNRC_NETIF_MSG_QUEUE_SIZE  (8U)
+#define GNRC_NETIF_MSG_QUEUE_SIZE  (16U)
 #endif
 
 /**
