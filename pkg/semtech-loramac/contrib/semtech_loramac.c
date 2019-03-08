@@ -31,6 +31,7 @@
 #include "mutex.h"
 
 #include "net/netdev.h"
+#include "net/netdev/lora.h"
 #include "net/loramac.h"
 
 #include "sx127x.h"
@@ -579,7 +580,7 @@ static void _semtech_loramac_call(semtech_loramac_func_t func, void *arg)
 
 static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
 {
-    netdev_sx127x_lora_packet_info_t packet_info;
+    netdev_lora_rx_info_t packet_info;
 
     msg_t msg;
     msg.content.ptr = dev;
