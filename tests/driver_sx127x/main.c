@@ -326,6 +326,10 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         size_t len;
         netdev_sx127x_lora_packet_info_t packet_info;
         switch (event) {
+            case NETDEV_EVENT_RX_STARTED:
+                puts("Data reception started");
+                break;
+
             case NETDEV_EVENT_RX_COMPLETE:
                 len = dev->driver->recv(dev, NULL, 0, 0);
                 dev->driver->recv(dev, message, len, &packet_info);
