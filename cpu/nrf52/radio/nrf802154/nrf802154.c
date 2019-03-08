@@ -68,7 +68,7 @@ static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 #define LIFS                (40U)
 #define SIFS                (12U)
 #define SIFS_MAXPKTSIZE     (18U)
-#define TIMER_FREQ          (250000UL)
+#define TIMER_FREQ          (62500UL)
 static volatile uint8_t _state;
 static mutex_t _txlock;
 
