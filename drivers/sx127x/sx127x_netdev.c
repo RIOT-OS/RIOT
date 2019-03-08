@@ -460,6 +460,11 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             sx127x_set_rx_single(dev, *((const netopt_enable_t*) val) ? true : false);
             return sizeof(netopt_enable_t);
 
+        case NETOPT_RX_SYMBOL_TIMEOUT:
+            assert(len <= sizeof(uint16_t));
+            sx127x_set_symbol_timeout(dev, *((const uint16_t*) val));
+            return sizeof(uint16_t);
+
         case NETOPT_RX_TIMEOUT:
             assert(len <= sizeof(uint32_t));
             sx127x_set_rx_timeout(dev, *((const uint32_t*) val));
