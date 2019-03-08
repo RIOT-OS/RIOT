@@ -93,6 +93,11 @@ ifeq (1,$(USE_NEWLIB_NANO))
   NEWLIB_NANO_INCLUDE_DIR ?= $(firstword $(wildcard $(NEWLIB_INCLUDE_DIR)/newlib-nano \
                                                     $(NEWLIB_INCLUDE_DIR)/newlib/nano \
                                                     $(NEWLIB_INCLUDE_DIR)/nano))
+
+  ifeq (,$(NEWLIB_NANO_INCLUDE_DIR))
+    $(error USE_NEWLIB_NANO==1 but nano include folder not found!)
+  endif
+
   # newlib-nano overrides newlib.h and its include dir should therefore go before
   # the regular system include dirs.
   INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(INCLUDES)
