@@ -23,6 +23,7 @@
 
 #include "net/netopt.h"
 #include "net/netdev.h"
+#include "net/netdev/lora.h"
 #include "net/lora.h"
 
 #include "sx127x_registers.h"
@@ -138,10 +139,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                 return -EBADMSG;
             }
 
-            netdev_sx127x_lora_packet_info_t *packet_info = info;
+            netdev_lora_rx_info_t *packet_info = info;
             if (packet_info) {
-                /* there is no LQI for LoRa */
-                packet_info->lqi = 0;
                 uint8_t snr_value = sx127x_reg_read(dev, SX127X_REG_LR_PKTSNRVALUE);
                 if (snr_value & 0x80) { /* The SNR is negative */
                     /* Invert and divide by 4 */
