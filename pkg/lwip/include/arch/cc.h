@@ -29,6 +29,10 @@
 #include "byteorder.h"
 #include "mutex.h"
 
+#ifdef MODULE_LOG
+#include "log.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
