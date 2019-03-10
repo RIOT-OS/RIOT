@@ -69,7 +69,7 @@ static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 #define SIFS                (12U)
 #define SIFS_MAXPKTSIZE     (18U)
 #define TIMER_FREQ          (62500UL)
-static volatile uint8_t _state;
+static volatile uint8_t _event_flags;
 static mutex_t _txlock;
 
 /**
@@ -130,7 +130,7 @@ static void _enable_tx(void)
     }
 
     /* reset RX state and listen for new packets */
-    _state &= ~RX_COMPLETE;
+    _event_flags &= ~RX_COMPLETE;
     NRF_RADIO->TASKS_START = 1;
  }
 
@@ -206,7 +206,7 @@ static int _init(netdev_t *dev)
     /* reset buffer */
     rxbuf[0] = 0;
     txbuf[0] = 0;
-    _state = 0;
+    _event_flags = 0;
 
     /* power on peripheral */
     NRF_RADIO->POWER = 1;
@@ -301,7 +301,7 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
     size_t pktlen = (size_t)rxbuf[0] - IEEE802154_FCS_LEN;
 
     /* check if packet data is readable */
-    if (!(_state & RX_COMPLETE)) {
+    if (!(_event_flags & RX_COMPLETE)) {
         DEBUG("[nrf802154] recv: no packet data available\n");
         return 0;
     }
@@ -350,12 +350,12 @@ static void _isr(netdev_t *dev)
     if (!nrf802154_dev.netdev.event_callback) {
         return;
     }
-    if (_state & RX_COMPLETE) {
+    if (_event_flags & RX_COMPLETE) {
         nrf802154_dev.netdev.event_callback(dev, NETDEV_EVENT_RX_COMPLETE);
     }
-    if (_state & TX_COMPLETE) {
+    if (_event_flags & TX_COMPLETE) {
         nrf802154_dev.netdev.event_callback(dev, NETDEV_EVENT_TX_COMPLETE);
-        _state &= ~TX_COMPLETE;
+        _event_flags &= ~TX_COMPLETE;
     }
 }
 
@@ -427,7 +427,7 @@ void isr_radio(void)
                     (NRF_RADIO->CRCSTATUS == 1) &&
                     (netdev_ieee802154_dst_filter(&nrf802154_dev,
                                                   &rxbuf[1]) == 0)) {
-                    _state |= RX_COMPLETE;
+                    _event_flags |= RX_COMPLETE;
                 }
                 else {
                     _reset_rx();
@@ -438,7 +438,7 @@ void isr_radio(void)
             case RADIO_STATE_STATE_TxDisable:
                 timer_start(NRF802154_TIMER);
                 DEBUG("[nrf802154] TX state: %x\n", (uint8_t)NRF_RADIO->STATE);
-                _state |= TX_COMPLETE;
+                _event_flags |= TX_COMPLETE;
                 _enable_rx();
                 break;
             default:
