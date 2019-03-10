@@ -50,13 +50,15 @@ int main(void)
         }
         if (bq27441_get_gpout_polarity(&dev)) {
             printf("GPOUT set to active-HIGH \n");
-        } else {
+        }
+        else {
             printf("GPOUT set to active-LOW \n");
         }
 
         if (bq27441_get_gpout_function(&dev)) {
             printf("GPOUT function set to BAT_LOW \n");
-        } else {
+        }
+        else {
             printf("GPOUT function set to SOC_INT \n");
         }
         printf("SOCI Delta: 0x%02x \n", bq27441_get_soc_int_delta(&dev));
@@ -64,11 +66,11 @@ int main(void)
         printf("Testing GPOUT Pulse\n");
 
         bq27441_pulse_gpout(&dev);
-        int timeout = 10000; // The pulse can take a while to occur. Set max to 10s
-        while ((gpio_read(out_pin)) && timeout--)
-            xtimer_sleep(1); // Wait for GPOUT to go high, or timeout to occur
-        if (timeout > 0)
-        {
+        int timeout = 10000;    // The pulse can take a while to occur. Set max to 10s
+        while ((gpio_read(out_pin)) && timeout--) {
+            xtimer_sleep(1);    // Wait for GPOUT to go high, or timeout to occur
+        }
+        if (timeout > 0) {
             // If GPOUT pulsed, print success message.
             printf("GPOUT test successful!");
             printf("( %d )", (10000 - timeout));
@@ -77,8 +79,7 @@ int main(void)
             printf("Or when the battery changes from\n");
             printf(" charging to discharging, or vice-versa.\n");
         }
-        else
-        {
+        else {
             // If GPOUT didn't pulse, something went wrong. Print error message
             // and loop forever.
             printf("GPOUT didn't pulse.\n");

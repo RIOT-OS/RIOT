@@ -39,9 +39,9 @@ extern "C" {
  * @{
  */
 typedef enum {
-    AVG,  /**< Average Current (DEFAULT) */
-    STBY, /**< Standby Current */
-    MAX   /**< Mx Current */
+    AVG,    /**< Average Current (DEFAULT) */
+    STBY,   /**< Standby Current */
+    MAX     /**< Mx Current */
 } current_measure;
 /** @} */
 
@@ -67,8 +67,8 @@ typedef enum {
  * @{
  */
 typedef enum {
-    FILTERED,  /**< State of Charge Filtered (DEFAULT) */
-    UNFILTERED /**< State of Charge Unfiltered */
+    FILTERED,   /**< State of Charge Filtered (DEFAULT) */
+    UNFILTERED  /**< State of Charge Unfiltered */
 } soc_measure;
 /** @} */
 
@@ -77,8 +77,8 @@ typedef enum {
  * @{
  */
 typedef enum {
-    PERCENT,  /**< State of Health Percentage (DEFAULT) */
-    SOH_STAT  /**< State of Health Status Bits */
+    PERCENT,    /**< State of Health Percentage (DEFAULT) */
+    SOH_STAT    /**< State of Health Status Bits */
 } soh_measure;
 /** @} */
 
@@ -87,8 +87,8 @@ typedef enum {
  * @{
  */
 typedef enum {
-    BATTERY,      /**< Battery Temperature (DEFAULT) */
-    INTERNAL_TEMP /**< Internal IC Temperature */
+    BATTERY,        /**< Battery Temperature (DEFAULT) */
+    INTERNAL_TEMP   /**< Internal IC Temperature */
 } temp_measure;
 /** @} */
 
@@ -97,8 +97,8 @@ typedef enum {
  * @{
  */
 typedef enum {
-    SOC_INT, /**< Set GPOUT to SOC_INT functionality */
-    BAT_LOW  /**< Set GPOUT to BAT_LOW functionality */
+    SOC_INT,    /**< Set GPOUT to SOC_INT functionality */
+    BAT_LOW     /**< Set GPOUT to BAT_LOW functionality */
 } gpout_function;
 /** @} */
 
@@ -143,7 +143,7 @@ typedef struct {
  * @param[in]   *params     pointer to bq27441_params_t struct containing the interrupt pin and callback
  *
  * @return                  true if communication was successful.
-*/
+ */
 bool bq27441_init(bq27441_t *dev, const bq27441_param_t *params);
 
 /**
@@ -153,7 +153,7 @@ bool bq27441_init(bq27441_t *dev, const bq27441_param_t *params);
  * @param[in]   capacity    capacity of battery (unsigned 16-bit value)
  *
  * @return                  true if capacity successfully set.
-*/
+ */
 bool bq27441_set_capacity(bq27441_t *dev, uint16_t capacity);
 
 /**
@@ -162,7 +162,7 @@ bool bq27441_set_capacity(bq27441_t *dev, uint16_t capacity);
  * @param[in]   *dev        pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      battery voltage in mV
-*/
+ */
 uint16_t bq27441_get_voltage(const bq27441_t *dev);
 
 /**
@@ -172,7 +172,7 @@ uint16_t bq27441_get_voltage(const bq27441_t *dev);
  * @param[in]   type    enum specifying current value to be read
  *
  * @return              specified current measurement in mA. >0 indicates charging.
-*/
+ */
 int16_t bq27441_get_current(const bq27441_t *dev, current_measure type);
 
 /**
@@ -182,7 +182,7 @@ int16_t bq27441_get_current(const bq27441_t *dev, current_measure type);
  * @param[in]   type    enum specifying capacity value to be read
  *
  * @return              specified capacity measurement in mAh.
-*/
+ */
 uint16_t bq27441_get_capacity(const bq27441_t *dev, capacity_measure type);
 
 /**
@@ -191,7 +191,7 @@ uint16_t bq27441_get_capacity(const bq27441_t *dev, capacity_measure type);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      average power in mAh. >0 indicates charging.
-*/
+ */
 int16_t bq27441_get_power(const bq27441_t *dev);
 
 /**
@@ -201,7 +201,7 @@ int16_t bq27441_get_power(const bq27441_t *dev);
  * @param[in]   type    enum specifying filtered or unfiltered measurement
  *
  * @return              specified state of charge measurement in %
-*/
+ */
 uint16_t bq27441_get_soc(const bq27441_t *dev, soc_measure type);
 
 /**
@@ -211,7 +211,7 @@ uint16_t bq27441_get_soc(const bq27441_t *dev, soc_measure type);
  * @param[in]   type    enum specifying filtered or unfiltered measurement
  *
  * @return              specified state of health measurement in %, or status bits
-*/
+ */
 uint8_t bq27441_get_soh(const bq27441_t *dev, soh_measure type);
 
 /**
@@ -221,7 +221,7 @@ uint8_t bq27441_get_soh(const bq27441_t *dev, soh_measure type);
  * @param[in]   type    enum specifying internal or battery measurement
  *
  * @return              specified temperature measurement in degrees C
-*/
+ */
 uint16_t bq27441_get_temperature(const bq27441_t *dev, temp_measure type);
 
 /**
@@ -230,7 +230,7 @@ uint16_t bq27441_get_temperature(const bq27441_t *dev, temp_measure type);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      true if active-high, false if active-low
-*/
+ */
 bool bq27441_get_gpout_polarity(const bq27441_t *dev);
 
 /**
@@ -240,7 +240,7 @@ bool bq27441_get_gpout_polarity(const bq27441_t *dev);
  * @param[in]   activeHigh  is true if active-high, false if active-low
  *
  * @return                  true on success
-*/
+ */
 bool bq27441_set_gpout_polarity(bq27441_t *dev, bool activeHigh);
 
 /**
@@ -249,7 +249,7 @@ bool bq27441_set_gpout_polarity(bq27441_t *dev, bool activeHigh);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      true if BAT_LOW or false if SOC_INT
-*/
+ */
 bool bq27441_get_gpout_function(const bq27441_t *dev);
 
 /**
@@ -259,7 +259,7 @@ bool bq27441_get_gpout_function(const bq27441_t *dev);
  * @param[in]   function    should be either BAT_LOW or SOC_INT
  *
  * @return                  true on success
-*/
+ */
 bool bq27441_set_gpout_function(bq27441_t *dev, gpout_function function);
 
 /**
@@ -268,7 +268,7 @@ bool bq27441_set_gpout_function(bq27441_t *dev, gpout_function function);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      state of charge value between 0 and 100%
-*/
+ */
 uint8_t bq27441_get_soc1_set_threshold(bq27441_t *dev);
 
 /**
@@ -277,7 +277,7 @@ uint8_t bq27441_get_soc1_set_threshold(bq27441_t *dev);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      state of charge value between 0 and 100%
-*/
+ */
 uint8_t bq27441_get_soc1_clear_threshold(bq27441_t *dev);
 
 /**
@@ -288,7 +288,7 @@ uint8_t bq27441_get_soc1_clear_threshold(bq27441_t *dev);
  * @param[in]   clear   percentage between 0 and 100. clear > set.
  *
  * @return              true on success
-*/
+ */
 bool bq27441_set_soc1_thresholds(bq27441_t *dev, uint8_t set, uint8_t clear);
 
 /**
@@ -297,7 +297,7 @@ bool bq27441_set_soc1_thresholds(bq27441_t *dev, uint8_t set, uint8_t clear);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      state of charge value between 0 and 100%
-*/
+ */
 uint8_t bq27441_get_socf_set_threshold(bq27441_t *dev);
 
 /**
@@ -306,7 +306,7 @@ uint8_t bq27441_get_socf_set_threshold(bq27441_t *dev);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      state of charge value between 0 and 100%
-*/
+ */
 uint8_t bq27441_get_socf_clear_threshold(bq27441_t *dev);
 
 /**
@@ -317,7 +317,7 @@ uint8_t bq27441_get_socf_clear_threshold(bq27441_t *dev);
  * @param[in]   clear   percentage between 0 and 100. clear > set.
  *
  * @return              true on success
-*/
+ */
 bool bq27441_set_socf_thresholds(bq27441_t *dev, uint8_t set, uint8_t clear);
 
 /**
@@ -326,7 +326,7 @@ bool bq27441_set_socf_thresholds(bq27441_t *dev, uint8_t set, uint8_t clear);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      true if flag is set
-*/
+ */
 bool bq27441_get_soc1_flag(const bq27441_t *dev);
 
 /**
@@ -335,16 +335,16 @@ bool bq27441_get_soc1_flag(const bq27441_t *dev);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      true if flag is set
-*/
+ */
 bool bq27441_get_socf_flag(const bq27441_t *dev);
 
 /**
  * @brief       Get the SOC_INT interval delta
- *s
+ * s
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      interval percentage value between 1 and 100
-*/
+ */
 uint8_t bq27441_get_soc_int_delta(bq27441_t *dev);
 
 /**
@@ -354,7 +354,7 @@ uint8_t bq27441_get_soc_int_delta(bq27441_t *dev);
  * @param[in]   delta   interval percentage value between 1 and 100
  *
  * @return              true on success
-*/
+ */
 bool bq27441_set_soc_int_delta(bq27441_t *dev, uint8_t delta);
 
 /**
@@ -363,7 +363,7 @@ bool bq27441_set_soc_int_delta(bq27441_t *dev, uint8_t delta);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      true on success
-*/
+ */
 bool bq27441_pulse_gpout(const bq27441_t *dev);
 
 /**
@@ -372,7 +372,7 @@ bool bq27441_pulse_gpout(const bq27441_t *dev);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return 16-bit value read from DEVICE_TYPE subcommand
-*/
+ */
 uint16_t bq27441_get_device_type(const bq27441_t *dev);
 
 /**
@@ -382,7 +382,7 @@ uint16_t bq27441_get_device_type(const bq27441_t *dev);
  * @param[in]   userControl     true if the Arduino sketch is handling entering and exiting config mode (should be false in library calls).
  *
  * @return                      true on success
-*/
+ */
 bool bq27441_enter_config_mode(bq27441_t *dev, bool userControl);
 
 /**
@@ -392,7 +392,7 @@ bool bq27441_enter_config_mode(bq27441_t *dev, bool userControl);
  * @param[in]   resim   true if resimulation should be performed after exiting
  *
  * @return              true on success
-*/
+ */
 bool bq27441_exit_config_mode(const bq27441_t *dev, bool resim);
 
 /**
@@ -401,7 +401,7 @@ bool bq27441_exit_config_mode(const bq27441_t *dev, bool resim);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      16-bit representation of flags() command register
-*/
+ */
 uint16_t bq27441_get_flags(const bq27441_t *dev);
 
 /**
@@ -410,7 +410,7 @@ uint16_t bq27441_get_flags(const bq27441_t *dev);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      16-bit representation of CONTROL_STATUS subcommand
-*/
+ */
 uint16_t bq27441_get_status(const bq27441_t *dev);
 
 /**
@@ -419,7 +419,7 @@ uint16_t bq27441_get_status(const bq27441_t *dev);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      true if the chip is sealed
-*/
+ */
 bool _bq27441_sealed(const bq27441_t *dev);
 
 /**
@@ -428,7 +428,7 @@ bool _bq27441_sealed(const bq27441_t *dev);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return true on success
-*/
+ */
 bool _bq27441_seal(const bq27441_t *dev);
 
 /**
@@ -437,7 +437,7 @@ bool _bq27441_seal(const bq27441_t *dev);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      true on success
-*/
+ */
 bool _bq27441_unseal(const bq27441_t *dev);
 
 /**
@@ -446,7 +446,7 @@ bool _bq27441_unseal(const bq27441_t *dev);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      opConfig register contents
-*/
+ */
 uint16_t _bq27441_get_opConfig(const bq27441_t *dev);
 
 /**
@@ -456,7 +456,7 @@ uint16_t _bq27441_get_opConfig(const bq27441_t *dev);
  * @param[in]   value   16-bit value for opConfig
  *
  * @return              true on success
-*/
+ */
 bool _bq27441_write_op_config(bq27441_t *dev, uint16_t value);
 
 /**
@@ -465,7 +465,7 @@ bool _bq27441_write_op_config(bq27441_t *dev, uint16_t value);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      true on success
-*/
+ */
 bool _bq27441_soft_reset(const bq27441_t *dev);
 
 /**
@@ -475,7 +475,7 @@ bool _bq27441_soft_reset(const bq27441_t *dev);
  * @param[in]   subAddress  command to be read from
  *
  * @return                  16-bit value of the command's contents
-*/
+ */
 uint16_t _bq27441_read_word(const bq27441_t *dev, uint16_t subAddress);
 
 /**
@@ -485,7 +485,7 @@ uint16_t _bq27441_read_word(const bq27441_t *dev, uint16_t subAddress);
  * @param[in]   function    subcommand of control() to be read
  *
  * @return                  16-bit value of the subcommand's contents
-*/
+ */
 uint16_t _bq27441_read_control_word(const bq27441_t *dev, uint16_t function);
 
 /**
@@ -495,7 +495,7 @@ uint16_t _bq27441_read_control_word(const bq27441_t *dev, uint16_t function);
  * @param[in]   function    subcommand of control() to be executed
  *
  * @return                  true on success
-*/
+ */
 bool _bq27441_execute_control_word(const bq27441_t *dev, uint16_t function);
 
 /**
@@ -504,7 +504,7 @@ bool _bq27441_execute_control_word(const bq27441_t *dev, uint16_t function);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      true on success
-*/
+ */
 bool _bq27441_block_data_control(const bq27441_t *dev);
 
 /**
@@ -514,7 +514,7 @@ bool _bq27441_block_data_control(const bq27441_t *dev);
  * @param[in]   id  id number of the class
  *
  * @return          true on success
-*/
+ */
 bool _bq27441_block_data_class(const bq27441_t *dev, uint8_t id);
 
 /**
@@ -524,7 +524,7 @@ bool _bq27441_block_data_class(const bq27441_t *dev, uint8_t id);
  * @param[in]   offset  offset of the data block
  *
  * @return              true on success
-*/
+ */
 bool _bq27441_block_data_offset(const bq27441_t *dev, uint8_t offset);
 
 /**
@@ -533,7 +533,7 @@ bool _bq27441_block_data_offset(const bq27441_t *dev, uint8_t offset);
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      true on success
-*/
+ */
 uint8_t _bq27441_block_data_checksum(const bq27441_t *dev);
 
 /**
@@ -543,7 +543,7 @@ uint8_t _bq27441_block_data_checksum(const bq27441_t *dev);
  * @param[in]   offset  offset of data block byte to be read
  *
  * @return              true on success
-*/
+ */
 uint8_t _bq27441_read_block_data(const bq27441_t *dev, uint8_t offset);
 
 /**
@@ -554,7 +554,7 @@ uint8_t _bq27441_read_block_data(const bq27441_t *dev, uint8_t offset);
  * @param[in]   data    value to be written
  *
  * @return              true on success
-*/
+ */
 bool _bq27441_write_block_data(const bq27441_t *dev, uint8_t offset, uint8_t data);
 
 /**
@@ -563,7 +563,7 @@ bool _bq27441_write_block_data(const bq27441_t *dev, uint8_t offset, uint8_t dat
  * @param[in]   *dev    pointer to bq27441_t struct containing the i2c device and the address
  *
  * @return      8-bit checksum value calculated based on loaded data
-*/
+ */
 uint8_t _bq27441_compute_block_checksum(const bq27441_t *dev);
 
 /**
@@ -573,7 +573,7 @@ uint8_t _bq27441_compute_block_checksum(const bq27441_t *dev);
  * @param[in]   csum i  8-bit checksum to be written
  *
  * @return      true on success
-*/
+ */
 bool _bq27441_write_block_checksum(const bq27441_t *dev, uint8_t csum);
 
 /**
@@ -584,7 +584,7 @@ bool _bq27441_write_block_checksum(const bq27441_t *dev, uint8_t csum);
  * @param[in]   offset      byte position of the byte to be read
  *
  * @return                  8-bit value of specified data
-*/
+ */
 uint8_t _bq27441_read_extended_data(bq27441_t *dev, uint8_t classID, uint8_t offset);
 
 /**
@@ -597,8 +597,8 @@ uint8_t _bq27441_read_extended_data(bq27441_t *dev, uint8_t classID, uint8_t off
  * @param[in]   len         number of bytes to be written
  *
  * @return                  true on success
-*/
-bool _bq27441_write_extended_data(bq27441_t *dev, uint8_t classID, uint8_t offset, uint8_t * data, uint8_t len);
+ */
+bool _bq27441_write_extended_data(bq27441_t *dev, uint8_t classID, uint8_t offset, uint8_t *data, uint8_t len);
 
 /**
  * @brief       Read a specified number of bytes over I2C at a given subAddress
@@ -609,8 +609,8 @@ bool _bq27441_write_extended_data(bq27441_t *dev, uint8_t classID, uint8_t offse
  * @param[in]   count       number of bytes to be read
  *
  * @return                  true on success
-*/
-int16_t _bq27441_read_bytes_i2c(const bq27441_t *dev, uint8_t subAddress, uint8_t * dest, uint8_t count);
+ */
+int16_t _bq27441_read_bytes_i2c(const bq27441_t *dev, uint8_t subAddress, uint8_t *dest, uint8_t count);
 
 /**
  * @brief       Write a specified number of bytes over I2C to a given subAddress
@@ -621,8 +621,8 @@ int16_t _bq27441_read_bytes_i2c(const bq27441_t *dev, uint8_t subAddress, uint8_
  * @param[in]   count       number of bytes to be written
  *
  * @return true on success
-*/
-uint16_t _bq27441_write_bytes_i2c(const bq27441_t *dev, uint8_t subAddress, uint8_t * src, uint8_t count);
+ */
+uint16_t _bq27441_write_bytes_i2c(const bq27441_t *dev, uint8_t subAddress, uint8_t *src, uint8_t count);
 
 #endif /* BQ27441_H */
 /** @} */

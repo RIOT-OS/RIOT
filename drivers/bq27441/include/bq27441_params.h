@@ -44,8 +44,8 @@ extern "C" {
 
 #ifndef BQ27441_PARAMS
 #define BQ27441_PARAMS            { .alarm_pin = BQ27441_PARAMS_ALARM_PIN, \
-                                      .bus  = BQ27441_PARAMS_I2C, \
-                                      .addr = BQ27441_PARAMS_ADDR }
+                                    .bus = BQ27441_PARAMS_I2C, \
+                                    .addr = BQ27441_PARAMS_ADDR }
 #endif
 /** @} */
 /**
@@ -53,9 +53,9 @@ extern "C" {
  */
 static const bq27441_param_t params_default[] = {
     #ifdef BQ27441_PARAMS_BOARD
-        BQ27441_PARAMS_BOARD
+    BQ27441_PARAMS_BOARD
     #else
-        BQ27441_PARAMS
+    BQ27441_PARAMS
     #endif
 };
 
