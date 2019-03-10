@@ -35,6 +35,9 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+/* Internal device option flags */
+#define NRF802154_OPT_AUTOACK        (0x0080)      /**< Auto ACK active */
+
 static const netdev_driver_t nrf802154_netdev_driver;
 
 netdev_ieee802154_t nrf802154_dev = {
@@ -59,6 +62,9 @@ netdev_ieee802154_t nrf802154_dev = {
 
 static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
+static uint8_t aackbuf[4];
+
+static uint8_t last_seq_no;
 
 #define ED_RSSISCALE        (4U)
 #define ED_RSSIOFFS         (92U)
@@ -69,8 +75,37 @@ static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 #define SIFS                (12U)
 #define SIFS_MAXPKTSIZE     (18U)
 #define TIMER_FREQ          (62500UL)
+static nrf802154_state_t _state;
 static volatile uint8_t _event_flags;
 static mutex_t _txlock;
+static uint16_t _setting_flags;
+
+static inline bool _setting_isset(uint16_t flag)
+{
+    return _setting_flags & flag;
+}
+
+static inline void _setting_enable(uint16_t flag)
+{
+    _setting_flags |= flag;
+}
+
+static inline void _setting_disable(uint16_t flag)
+{
+    _setting_flags &= ~flag;
+}
+
+static inline bool _ack_xmit_required(void)
+{
+    return (_setting_isset(NRF802154_OPT_AUTOACK) &&
+            rxbuf[1] & IEEE802154_FCF_ACK_REQ);
+}
+
+static inline void _set_and_start_timer(unsigned timeout)
+{
+    timer_set(NRF802154_TIMER, 0, timeout);
+    timer_start(NRF802154_TIMER);
+}
 
 /**
  * @brief   Set radio into DISABLED state
@@ -96,6 +131,7 @@ static void _enable_rx(void)
     if (NRF_RADIO->STATE != RADIO_STATE_STATE_RxIdle) {
         _disable();
     }
+    _state = NRF802154_STATE_RX;
     NRF_RADIO->PACKETPTR = (uint32_t)rxbuf;
     NRF_RADIO->EVENTS_RXREADY = 0;
     NRF_RADIO->TASKS_RXEN = 1;
@@ -108,6 +144,7 @@ static void _enable_rx(void)
  */
 static void _enable_tx(void)
 {
+    _state = NRF802154_STATE_TX;
     DEBUG("[nrf802154] Set device state to TXIDLE\n");
     /* set device into TXIDLE state */
     if (NRF_RADIO->STATE != RADIO_STATE_STATE_TxIdle) {
@@ -133,6 +170,22 @@ static void _enable_tx(void)
     _event_flags &= ~RX_COMPLETE;
     NRF_RADIO->TASKS_START = 1;
  }
+
+static void _send_ack(void)
+{
+    aackbuf[0] = 5;                       /* Length including 2 byte fcs */
+    aackbuf[1] = IEEE802154_FCF_TYPE_ACK; /* Ack type */
+    aackbuf[2] = 0;                       /* Other bits zeroed */
+    aackbuf[3] = last_seq_no;             /* Sequence number */
+    /* We should be in the Rx state, transitioning to disabled should be 0 us */
+    if (NRF_RADIO->STATE != RADIO_STATE_STATE_TxIdle) {
+        _disable();
+    }
+    NRF_RADIO->PACKETPTR = (uint32_t)aackbuf;
+    NRF_RADIO->EVENTS_TXREADY = 0;
+    NRF_RADIO->TASKS_TXEN = 1;
+    while (!(NRF_RADIO->EVENTS_TXREADY)) {};
+}
 
 static void _set_chan(uint16_t chan)
 {
@@ -187,8 +240,16 @@ static void _timer_cb(void *arg, int chan)
 {
     (void)arg;
     (void)chan;
-    mutex_unlock(&_txlock);
     timer_stop(NRF802154_TIMER);
+    switch (_state) {
+        case NRF802154_STATE_AACK:
+            /* Transmit ack */
+            _send_ack();
+            break;
+        default:
+            mutex_unlock(&_txlock);
+            break;
+    }
 }
 
 static int _init(netdev_t *dev)
@@ -197,6 +258,7 @@ static int _init(netdev_t *dev)
 
     int result = timer_init(NRF802154_TIMER, TIMER_FREQ, _timer_cb, NULL);
     assert(result >= 0);
+    timer_stop(NRF802154_TIMER);
     (void)result;
     timer_stop(NRF802154_TIMER);
 
@@ -207,6 +269,11 @@ static int _init(netdev_t *dev)
     rxbuf[0] = 0;
     txbuf[0] = 0;
     _event_flags = 0;
+    _setting_flags = 0;
+    static const netopt_enable_t enable = NETOPT_ENABLE;
+    /* Use the setter here to ensure setting propagates to netdev_ieee802154 */
+    nrf802154_dev.netdev.driver->set(&nrf802154_dev.netdev, NETOPT_AUTOACK,
+            &enable, sizeof(enable));
 
     /* power on peripheral */
     NRF_RADIO->POWER = 1;
@@ -378,6 +445,11 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             assert(max_len >= sizeof(int16_t));
             *((int16_t *)value) = _get_txpower();
             return sizeof(int16_t);
+        case NETOPT_AUTOACK:
+            assert(max_len >= sizeof(netopt_enable_t));
+            *(netopt_enable_t*)value = _setting_isset(NRF802154_OPT_AUTOACK);
+            return sizeof(netopt_enable_t);
+
 
         default:
             return netdev_ieee802154_get((netdev_ieee802154_t *)dev,
@@ -405,6 +477,11 @@ static int _set(netdev_t *dev, netopt_t opt,
             assert(value_len == sizeof(int16_t));
             _set_txpower(*((int16_t *)value));
             return sizeof(int16_t);
+        case NETOPT_AUTOACK:
+            assert(value_len == sizeof(netopt_enable_t));
+            *(netopt_enable_t*)value ? _setting_enable(NRF802154_OPT_AUTOACK)
+                                     : _setting_disable(NRF802154_OPT_AUTOACK);
+            return sizeof(netopt_enable_t);
 
         default:
             return netdev_ieee802154_set((netdev_ieee802154_t *)dev,
@@ -423,11 +500,23 @@ void isr_radio(void)
         switch(state) {
             case RADIO_STATE_STATE_RxIdle:
                 /* only process packet if event callback is set and CRC is valid */
-                if ((nrf802154_dev.netdev.event_callback) &&
-                    (NRF_RADIO->CRCSTATUS == 1) &&
-                    (netdev_ieee802154_dst_filter(&nrf802154_dev,
-                                                  &rxbuf[1]) == 0)) {
-                    _event_flags |= RX_COMPLETE;
+                if (_state == NRF802154_STATE_RX) {
+                    if ((nrf802154_dev.netdev.event_callback) &&
+                        (NRF_RADIO->CRCSTATUS == 1) &&
+                        (netdev_ieee802154_dst_filter(&nrf802154_dev,
+                                                      &rxbuf[1]) == 0)) {
+                        _event_flags |= RX_COMPLETE;
+                        if (_ack_xmit_required()) {
+                            last_seq_no = ieee802154_get_seq(&rxbuf[1]);
+                            _state = NRF802154_STATE_AACK;
+                            _set_and_start_timer(SIFS);
+                        }
+                        nrf802154_dev.netdev.event_callback(&nrf802154_dev.netdev, NETDEV_EVENT_ISR);
+                    }
+                    else {
+                        _reset_rx();
+                    }
+                    nrf802154_dev.netdev.event_callback(&nrf802154_dev.netdev, NETDEV_EVENT_ISR);
                 }
                 else {
                     _reset_rx();
@@ -436,16 +525,16 @@ void isr_radio(void)
             case RADIO_STATE_STATE_Tx:
             case RADIO_STATE_STATE_TxIdle:
             case RADIO_STATE_STATE_TxDisable:
-                timer_start(NRF802154_TIMER);
-                DEBUG("[nrf802154] TX state: %x\n", (uint8_t)NRF_RADIO->STATE);
-                _event_flags |= TX_COMPLETE;
+                if (_state == NRF802154_STATE_TX) {
+                    timer_start(NRF802154_TIMER);
+                    DEBUG("[nrf802154] TX state: %x\n", (uint8_t)NRF_RADIO->STATE);
+                    _event_flags |= TX_COMPLETE;
+                    nrf802154_dev.netdev.event_callback(&nrf802154_dev.netdev, NETDEV_EVENT_ISR);
+                }
                 _enable_rx();
                 break;
             default:
                 DEBUG("[nrf802154] Unhandled state: %x\n", (uint8_t)NRF_RADIO->STATE);
-        }
-        if (_state) {
-            nrf802154_dev.netdev.event_callback(&nrf802154_dev.netdev, NETDEV_EVENT_ISR);
         }
     }
     else {

@@ -42,6 +42,13 @@
 extern "C" {
 #endif
 
+typedef enum {
+    NRF802154_STATE_DISABLED,
+    NRF802154_STATE_RX,
+    NRF802154_STATE_TX,
+    NRF802154_STATE_AACK,
+} nrf802154_state_t;
+
 /**
  * @brief   Export the netdev device descriptor
  */
