@@ -232,6 +232,9 @@ static int _init(netdev_t *dev)
     NRF_RADIO->CRCPOLY = 0x011021;
     NRF_RADIO->CRCINIT = 0;
 
+    /* Disable the hardware IFS handling  */
+    NRF_RADIO->MODECNF0 |= RADIO_MODECNF0_RU_Msk;
+
     /* assign default addresses */
     luid_get(nrf802154_dev.long_addr, IEEE802154_LONG_ADDRESS_LEN);
     memcpy(nrf802154_dev.short_addr, &nrf802154_dev.long_addr[6],
