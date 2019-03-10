@@ -17,6 +17,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Dimitri Nahm <dimitri.nahm@haw-hamburg.de>
  * @author      Semjon Kerner <semjon.kerner@fu-berlin.de>
+ * @author      Koen Zandberg <koen@bergzand.net>
  * @}
  */
 
@@ -35,8 +36,20 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+/**
+ * @brief Default number of retransmissions
+ */
+#define NRF802154_DEFAULT_RETRANS    (3U)
+
+/**
+ * @brief Maximum number of retransmissions as per IEEE802.15.4
+ */
+#define NRF802154_MAX_RETRANS        (7U)
+
 /* Internal device option flags */
 #define NRF802154_OPT_AUTOACK        (0x0080)      /**< Auto ACK active */
+#define NRF802154_OPT_ACK_REQUEST    (0x0100)      /**< Transmit unicast with
+                                                    *   Ack request set */
 
 static const netdev_driver_t nrf802154_netdev_driver;
 
@@ -65,6 +78,13 @@ static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 static uint8_t aackbuf[4];
 
 static uint8_t last_seq_no;
+/* Max number of retransmission attempts configured */
+static uint8_t retrans_max;
+/* Retransmission counter, the retrans_max + 1 indicates all retransmissions
+ * failed */
+static uint8_t retransmissions;
+/* Number of retransmissions required for the last transmission */
+static uint8_t retrans_used;
 
 #define ED_RSSISCALE        (4U)
 #define ED_RSSIOFFS         (92U)
@@ -73,6 +93,7 @@ static uint8_t last_seq_no;
 #define TX_COMPLETE         (0x2)
 #define LIFS                (40U)
 #define SIFS                (12U)
+#define TACK                (54U) /* Ack timeout in symbols */
 #define SIFS_MAXPKTSIZE     (18U)
 #define TIMER_FREQ          (62500UL)
 static nrf802154_state_t _state;
@@ -95,6 +116,12 @@ static inline void _setting_disable(uint16_t flag)
     _setting_flags &= ~flag;
 }
 
+static inline bool _ack_expected(void)
+{
+    return (_setting_isset(NRF802154_OPT_ACK_REQUEST) &&
+            txbuf[1] & IEEE802154_FCF_ACK_REQ);
+}
+
 static inline bool _ack_xmit_required(void)
 {
     return (_setting_isset(NRF802154_OPT_AUTOACK) &&
@@ -105,6 +132,11 @@ static inline void _set_and_start_timer(unsigned timeout)
 {
     timer_set(NRF802154_TIMER, 0, timeout);
     timer_start(NRF802154_TIMER);
+}
+
+static inline unsigned _get_tx_ifs(void)
+{
+    return (txbuf[0] > SIFS_MAXPKTSIZE) ? LIFS : SIFS;
 }
 
 /**
@@ -122,21 +154,48 @@ static void _disable(void)
 }
 
 /**
- * @brief   Set radio into RXIDLE state
+ * @brief   Set the radio in RXIDLE
  */
-static void _enable_rx(void)
+static void _enable_listen(void)
 {
     DEBUG("[nrf802154] Set device state to RXIDLE\n");
+    NRF_RADIO->PACKETPTR = (uint32_t)rxbuf;
+    NRF_RADIO->EVENTS_RXREADY = 0;
     /* set device into RXIDLE state */
     if (NRF_RADIO->STATE != RADIO_STATE_STATE_RxIdle) {
         _disable();
     }
-    _state = NRF802154_STATE_RX;
-    NRF_RADIO->PACKETPTR = (uint32_t)rxbuf;
-    NRF_RADIO->EVENTS_RXREADY = 0;
+    else {
+        NRF_RADIO->TASKS_RXEN = 1;
+        return;
+    }
     NRF_RADIO->TASKS_RXEN = 1;
     while (!(NRF_RADIO->EVENTS_RXREADY)) {};
     DEBUG("[nrf802154] Device state: RXIDLE\n");
+}
+
+/**
+ * @brief   Set radio into RXIDLE state and start listening for new frames
+ */
+static void _enable_rx(void)
+{
+    _state = NRF802154_STATE_RX;
+    _enable_listen();
+}
+
+static void _load_tx(void)
+{
+    NRF_RADIO->PACKETPTR = (uint32_t)txbuf;
+    NRF_RADIO->EVENTS_TXREADY = 0;
+}
+
+static void _isr_tx_complete(void)
+{
+    _set_and_start_timer(_get_tx_ifs());
+    _event_flags |= TX_COMPLETE;
+    retrans_used = retransmissions;
+    nrf802154_dev.netdev.event_callback(&nrf802154_dev.netdev, NETDEV_EVENT_ISR);
+    _enable_rx();
 }
 
 /**
@@ -150,11 +209,8 @@ static void _enable_tx(void)
     if (NRF_RADIO->STATE != RADIO_STATE_STATE_TxIdle) {
         _disable();
     }
-    NRF_RADIO->PACKETPTR = (uint32_t)txbuf;
-    NRF_RADIO->EVENTS_TXREADY = 0;
+    _load_tx();
     NRF_RADIO->TASKS_TXEN = 1;
-    while (!(NRF_RADIO->EVENTS_TXREADY)) {};
-    DEBUG("[nrf802154] Device state: TXIDLE\n");
 }
 
 /**
@@ -184,7 +240,6 @@ static void _send_ack(void)
     NRF_RADIO->PACKETPTR = (uint32_t)aackbuf;
     NRF_RADIO->EVENTS_TXREADY = 0;
     NRF_RADIO->TASKS_TXEN = 1;
-    while (!(NRF_RADIO->EVENTS_TXREADY)) {};
 }
 
 static void _set_chan(uint16_t chan)
@@ -246,6 +301,17 @@ static void _timer_cb(void *arg, int chan)
             /* Transmit ack */
             _send_ack();
             break;
+        case NRF802154_STATE_ACKWAIT:
+            /* Timeout waiting for ACK, TACK is more than SIFS and LIFS, no
+             * need to wait addionally */
+            if (retransmissions >= retrans_max) {
+                _isr_tx_complete();
+            }
+            else {
+                _enable_tx();
+            }
+            retransmissions++;
+            break;
         default:
             mutex_unlock(&_txlock);
             break;
@@ -270,9 +336,13 @@ static int _init(netdev_t *dev)
     txbuf[0] = 0;
     _event_flags = 0;
     _setting_flags = 0;
+    retrans_max = NRF802154_DEFAULT_RETRANS;
+
     static const netopt_enable_t enable = NETOPT_ENABLE;
     /* Use the setter here to ensure setting propagates to netdev_ieee802154 */
     nrf802154_dev.netdev.driver->set(&nrf802154_dev.netdev, NETOPT_AUTOACK,
+            &enable, sizeof(enable));
+    nrf802154_dev.netdev.driver->set(&nrf802154_dev.netdev, NETOPT_ACK_REQ,
             &enable, sizeof(enable));
 
     /* power on peripheral */
@@ -332,6 +402,8 @@ static int _send(netdev_t *dev,  const iolist_t *iolist)
     assert(iolist);
 
     mutex_lock(&_txlock);
+
+    retransmissions = 0;
 
     /* copy packet data into the transmit buffer */
     unsigned int len = 0;
@@ -421,7 +493,12 @@ static void _isr(netdev_t *dev)
         nrf802154_dev.netdev.event_callback(dev, NETDEV_EVENT_RX_COMPLETE);
     }
     if (_event_flags & TX_COMPLETE) {
-        nrf802154_dev.netdev.event_callback(dev, NETDEV_EVENT_TX_COMPLETE);
+        if (retrans_used > retrans_max) {
+            nrf802154_dev.netdev.event_callback(dev, NETDEV_EVENT_TX_NOACK);
+        }
+        else {
+            nrf802154_dev.netdev.event_callback(dev, NETDEV_EVENT_TX_COMPLETE);
+        }
         _event_flags &= ~TX_COMPLETE;
     }
 }
@@ -449,7 +526,19 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             assert(max_len >= sizeof(netopt_enable_t));
             *(netopt_enable_t*)value = _setting_isset(NRF802154_OPT_AUTOACK);
             return sizeof(netopt_enable_t);
-
+        case NETOPT_RETRANS:
+            assert(max_len >= sizeof(uint8_t));
+            *(uint8_t*)value = retrans_max;
+            return sizeof(uint8_t);
+        case NETOPT_ACK_REQ:
+            assert(max_len >= sizeof(netopt_enable_t));
+            *(netopt_enable_t*)value = _setting_isset(NRF802154_OPT_ACK_REQUEST);
+            return sizeof(netopt_enable_t);
+        case NETOPT_TX_RETRIES_NEEDED:
+            assert(max_len >= sizeof(uint8_t));
+            *(uint8_t*)value = retrans_used > retrans_max ? retrans_max
+                                                          : retrans_used;
+            return sizeof(uint8_t);
 
         default:
             return netdev_ieee802154_get((netdev_ieee802154_t *)dev,
@@ -482,7 +571,20 @@ static int _set(netdev_t *dev, netopt_t opt,
             *(netopt_enable_t*)value ? _setting_enable(NRF802154_OPT_AUTOACK)
                                      : _setting_disable(NRF802154_OPT_AUTOACK);
             return sizeof(netopt_enable_t);
-
+        case NETOPT_RETRANS:
+            assert(value_len == sizeof(uint8_t));
+            if (*(uint8_t*)value > NRF802154_MAX_RETRANS) {
+                return -EINVAL;
+            }
+            else {
+                retrans_max = *(uint8_t*)value;
+            }
+            return sizeof(uint8_t);
+        case NETOPT_ACK_REQ:
+            assert(value_len == sizeof(netopt_enable_t));
+            *(netopt_enable_t*)value ? _setting_enable(NRF802154_OPT_ACK_REQUEST)
+                                     : _setting_disable(NRF802154_OPT_ACK_REQUEST);
+            /* Intentionally falls through */
         default:
             return netdev_ieee802154_set((netdev_ieee802154_t *)dev,
                                           opt, value, value_len);
@@ -516,9 +618,15 @@ void isr_radio(void)
                     else {
                         _reset_rx();
                     }
-                    nrf802154_dev.netdev.event_callback(&nrf802154_dev.netdev, NETDEV_EVENT_ISR);
                 }
-                else {
+                else if (_state == NRF802154_STATE_ACKWAIT) {
+                    /* Check if this is the expected ACK frame */
+                    if (txbuf[3] == ieee802154_get_seq(&rxbuf[1]) &&
+                        ((rxbuf[1] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_ACK)) {
+                        timer_stop(NRF802154_TIMER);
+                        _state = NRF802154_STATE_TX;
+                        _isr_tx_complete();
+                    }
                     _reset_rx();
                 }
                 break;
@@ -526,12 +634,18 @@ void isr_radio(void)
             case RADIO_STATE_STATE_TxIdle:
             case RADIO_STATE_STATE_TxDisable:
                 if (_state == NRF802154_STATE_TX) {
-                    timer_start(NRF802154_TIMER);
-                    DEBUG("[nrf802154] TX state: %x\n", (uint8_t)NRF_RADIO->STATE);
-                    _event_flags |= TX_COMPLETE;
-                    nrf802154_dev.netdev.event_callback(&nrf802154_dev.netdev, NETDEV_EVENT_ISR);
+                    if (_ack_expected()) {
+                        _state = NRF802154_STATE_ACKWAIT;
+                        _set_and_start_timer(TACK);
+                        _enable_listen();
+                    }
+                    else {
+                        _isr_tx_complete();
+                    }
                 }
-                _enable_rx();
+                else if (_state == NRF802154_STATE_AACK) {
+                    _enable_rx();
+                }
                 break;
             default:
                 DEBUG("[nrf802154] Unhandled state: %x\n", (uint8_t)NRF_RADIO->STATE);

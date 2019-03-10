@@ -47,6 +47,7 @@ typedef enum {
     NRF802154_STATE_RX,
     NRF802154_STATE_TX,
     NRF802154_STATE_AACK,
+    NRF802154_STATE_ACKWAIT,
 } nrf802154_state_t;
 
 /**
