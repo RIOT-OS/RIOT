@@ -63,15 +63,23 @@ The link-layer address in this case is "fe80::e42a:1aff:feca:10ec", the only
 Testing
 =======
 
-The CoAP server exposes 3 different resources:
+The CoAP server exposes 6 different resources:
 
 * `/.well-known/core`: returns the list of available resources on the server.
 This is part of the CoAP specifications. It works only with GET requests.
+* `/echo/`: will match any request that begins with '/echo/' and will echo
+  the remaining part of the URI path. Meant to show how the prefix works. It
+  works only with GET requests.
 * `/riot/board`: returns the name of the board running the server. It works
 only with GET requests.
 * `/riot/value`: returns the value of an internal variable of the server. It
 works with GET requests and also with PUT and POST requests, which means that
 this value can be updated from a client.
+* `/riot/ver`: returns the current RIOT version. Meant to show a block2 reply.
+  It works only with GET requests.
+* `/sha256`: creates a hash with the received payloads. It is meant to show
+  block1 support. It returns the hash when no more blocks are pending. Only
+  works with POST.
 
 There are multiple external CoAP clients you can use to easily test the server
 running on native.
