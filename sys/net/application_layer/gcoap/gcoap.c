@@ -399,7 +399,7 @@ static int _find_resource(coap_pkt_t *pdu, const coap_resource_t **resource_ptr,
                 resource++;
             }
 
-            int res = strcmp((char *)&uri[0], resource->path);
+            int res = coap_match_path(resource, uri);
             if (res > 0) {
                 continue;
             }
