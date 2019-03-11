@@ -27,9 +27,7 @@
 
 #define SUIT_DEVID_BYTES 32
 
-static uuid_t vendor;
-static uuid_t class;
-static uuid_t device;
+static suit_condition_params_t _conditions;
 
 static int _validate_uuid(const suit_cbor_manifest_t *manifest,
                           size_t idx, uuid_t *uuid)
@@ -51,11 +49,11 @@ static int _validate_condition(const suit_cbor_manifest_t *manifest,
 {
     switch (type) {
         case SUIT_COND_VENDOR_ID:
-            return _validate_uuid(manifest, idx, &vendor);
+            return _validate_uuid(manifest, idx, &_conditions.vendor);
         case SUIT_COND_CLASS_ID:
-            return _validate_uuid(manifest, idx, &class);
+            return _validate_uuid(manifest, idx, &_conditions.class);
         case SUIT_COND_DEV_ID:
-            return _validate_uuid(manifest, idx, &device);
+            return _validate_uuid(manifest, idx, &_conditions.device);
         case SUIT_COND_BEST_BEFORE:
             DEBUG("suit: best before condition not supported\n");
             return SUIT_ERR_UNSUPPORTED;
@@ -87,16 +85,17 @@ void suit_init_conditions(void)
     /* Generate UUID's following the instructions from
      * https://tools.ietf.org/html/draft-moran-suit-manifest-03#section-7.7.1
      */
-    uuid_v5(&vendor, &uuid_namespace_dns,
+    uuid_v5(&_conditions.vendor, &uuid_namespace_dns,
             (uint8_t *)SUIT_VENDOR_DOMAIN, sizeof(SUIT_VENDOR_DOMAIN));
 
-    uuid_v5(&class, &vendor, (uint8_t *)SUIT_CLASS_ID, sizeof(SUIT_CLASS_ID));
+    uuid_v5(&_conditions.class, &_conditions.vendor, (uint8_t *)SUIT_CLASS_ID,
+            sizeof(SUIT_CLASS_ID));
 
     uint8_t devid[SUIT_DEVID_BYTES];
     /* Use luid_base to ensure an identical ID independent of previous luid
      * calls */
     luid_base(devid, SUIT_DEVID_BYTES);
-    uuid_v5(&device, &vendor, devid, SUIT_DEVID_BYTES);
+    uuid_v5(&_conditions.device, &_conditions.vendor, devid, SUIT_DEVID_BYTES);
 }
 
 int suit_parse(suit_cbor_manifest_t *manifest, uint8_t *buf, size_t len)
@@ -137,15 +136,15 @@ int suit_validate_manifest(const suit_cbor_manifest_t *manifest,
 
 uuid_t *suit_get_vendor_id(void)
 {
-    return &vendor;
+    return &_conditions.vendor;
 }
 
 uuid_t *suit_get_class_id(void)
 {
-    return &class;
+    return &_conditions.class;
 }
 
 uuid_t *suit_get_device_id(void)
 {
-    return &device;
+    return &_conditions.device;
 }

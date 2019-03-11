@@ -72,10 +72,23 @@ typedef enum {
 } suit_error_t;
 
 /**
+ * @brief SUIT condition parameters
+ */
+typedef struct {
+    uuid_t vendor;  /**< Vendor url as UUID                  */
+    uuid_t class;   /**< Device class UUID                   */
+    uuid_t device;  /**< Device specific information as UUID */
+} suit_condition_params_t;
+
+/**
  * @brief Initialize boot-time conditions for SUIT manifests
  *
  * This initializes the device-based conditions for validating manifest
  * preconditions
+ *
+ * Vendor url as UUID:   UUID5(DNS_PREFIX, SUIT_VENDOR_DOMAIN)
+ * Device class UUID:    UUID5(vendor, SUIT_CLASS_ID)
+ * Device specific UUID: UUID5(vendor, Device ID)
  */
 void suit_init_conditions(void);
 
