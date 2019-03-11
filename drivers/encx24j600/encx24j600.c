@@ -386,13 +386,18 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             }
             break;
         case NETOPT_LINK_CONNECTED:
-            if (reg_get((encx24j600_t *)dev, ENC_ESTAT) & ENC_PHYLNK) {
-                *((netopt_enable_t *)value) = NETOPT_ENABLE;
+            {
+                encx24j600_t * encdev = (encx24j600_t *) dev;
+                lock(encdev);
+                if (reg_get(encdev, ENC_ESTAT) & ENC_PHYLNK) {
+                    *((netopt_enable_t *)value) = NETOPT_ENABLE;
+                }
+                else {
+                    *((netopt_enable_t *)value) = NETOPT_DISABLE;
+                }
+                unlock(encdev);
+                return sizeof(netopt_enable_t);
             }
-            else {
-                *((netopt_enable_t *)value) = NETOPT_DISABLE;
-            }
-            return sizeof(netopt_enable_t);
         default:
             res = netdev_eth_get(dev, opt, value, max_len);
             break;
