@@ -69,7 +69,7 @@ void stmclk_init_sysclk(void)
     RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLDIV | RCC_CFGR_PLLMUL);
     /* Reset HSION, HSEON, CSSON and PLLON bits */
     RCC->CR &= ~(RCC_CR_HSION | RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON);
-    /* Disable all interrupts */
+    /* Clear all interrupts */
 
 #if defined(CPU_FAM_STM32L0)
     RCC->CICR = 0x0;
@@ -92,6 +92,8 @@ void stmclk_init_sysclk(void)
     FLASH->ACR |= FLASH_ACR_PRFTEN;
     /* Flash 1 wait state */
     FLASH->ACR |= CLOCK_FLASH_LATENCY;
+     /* Wait for flash to become ready */
+    while (!(FLASH->SR & FLASH_SR_READY)) {}
     /* Select the Voltage Range 1 (1.8 V) */
     PWR->CR = PWR_CR_VOS_0;
     /* Wait Until the Voltage Regulator is ready */
