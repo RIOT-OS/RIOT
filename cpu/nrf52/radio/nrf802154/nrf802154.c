@@ -82,9 +82,9 @@ static uint8_t _last_seq_no;
 static uint8_t _retrans_max;
 /* Retransmission counter, the retrans_max + 1 indicates all retransmissions
  * failed */
-static uint8_t retransmissions;
+static uint8_t _retransmissions;
 /* Number of retransmissions required for the last transmission */
-static uint8_t retrans_used;
+static uint8_t _retrans_used;
 
 #define ED_RSSISCALE        (4U)
 #define ED_RSSIOFFS         (92U)
@@ -193,7 +193,7 @@ static void _isr_tx_complete(void)
 {
     _set_and_start_timer(_get_tx_ifs());
     _event_flags |= TX_COMPLETE;
-    retrans_used = retransmissions;
+    _retrans_used = _retransmissions;
     nrf802154_dev.netdev.event_callback(&nrf802154_dev.netdev, NETDEV_EVENT_ISR);
     _enable_rx();
 }
@@ -304,13 +304,13 @@ static void _timer_cb(void *arg, int chan)
         case NRF802154_STATE_ACKWAIT:
             /* Timeout waiting for ACK, TACK is more than SIFS and LIFS, no
              * need to wait addionally */
-            if (retransmissions >= retrans_max) {
+            if (_retransmissions >= _retrans_max) {
                 _isr_tx_complete();
             }
             else {
                 _enable_tx();
             }
-            retransmissions++;
+            _retransmissions++;
             break;
         default:
             mutex_unlock(&_txlock);
@@ -336,7 +336,7 @@ static int _init(netdev_t *dev)
     txbuf[0] = 0;
     _event_flags = 0;
     _setting_flags = 0;
-    retrans_max = NRF802154_DEFAULT_RETRANS;
+    _retrans_max = NRF802154_DEFAULT_RETRANS;
 
     static const netopt_enable_t enable = NETOPT_ENABLE;
     /* Use the setter here to ensure setting propagates to netdev_ieee802154 */
@@ -403,7 +403,7 @@ static int _send(netdev_t *dev,  const iolist_t *iolist)
 
     mutex_lock(&_txlock);
 
-    retransmissions = 0;
+    _retransmissions = 0;
 
     /* copy packet data into the transmit buffer */
     unsigned int len = 0;
@@ -493,7 +493,7 @@ static void _isr(netdev_t *dev)
         nrf802154_dev.netdev.event_callback(dev, NETDEV_EVENT_RX_COMPLETE);
     }
     if (_event_flags & TX_COMPLETE) {
-        if (retrans_used > retrans_max) {
+        if (_retrans_used > _retrans_max) {
             nrf802154_dev.netdev.event_callback(dev, NETDEV_EVENT_TX_NOACK);
         }
         else {
@@ -528,7 +528,7 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             return sizeof(netopt_enable_t);
         case NETOPT_RETRANS:
             assert(max_len >= sizeof(uint8_t));
-            *(uint8_t*)value = retrans_max;
+            *(uint8_t*)value = _retrans_max;
             return sizeof(uint8_t);
         case NETOPT_ACK_REQ:
             assert(max_len >= sizeof(netopt_enable_t));
@@ -536,8 +536,8 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             return sizeof(netopt_enable_t);
         case NETOPT_TX_RETRIES_NEEDED:
             assert(max_len >= sizeof(uint8_t));
-            *(uint8_t*)value = retrans_used > retrans_max ? retrans_max
-                                                          : retrans_used;
+            *(uint8_t*)value = _retrans_used > _retrans_max ? _retrans_max
+                                                            : _retrans_used;
             return sizeof(uint8_t);
 
         default:
@@ -577,7 +577,7 @@ static int _set(netdev_t *dev, netopt_t opt,
                 return -EINVAL;
             }
             else {
-                retrans_max = *(uint8_t*)value;
+                _retrans_max = *(uint8_t*)value;
             }
             return sizeof(uint8_t);
         case NETOPT_ACK_REQ:
