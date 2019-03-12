@@ -1,0 +1,51 @@
+# This is an include file for Makefiles. It provides rules for building
+# .pb.c and .pb.h files out of .proto, as well the path to nanopb core.
+
+# Path to the nanopb root directory
+NANOPB_DIR := $(PKG_BUILDDIR)
+
+# Files for the nanopb core
+NANOPB_OBJ = pb_encode pb_decode pb_common
+#NANOPB_CORE = $(NANOPB_DIR)/pb_encode.c $(NANOPB_DIR)/pb_decode.c $(NANOPB_DIR)/pb_common.c
+
+PROTOBUF_OBJ = $(subst .proto,,$(PROTO_FILES))
+
+# Todo: Not sure if that really works on Windows. Somebody should test it.
+# Check if we are running on Windows
+ifdef windir
+WINDOWS = 1
+endif
+ifdef WINDIR
+WINDOWS = 1
+endif
+
+# Check whether to use binary version of nanopb_generator or the
+# system-supplied python interpreter.
+ifneq "$(wildcard $(NANOPB_DIR)/generator-bin)" ""
+	# Binary package
+	PROTOC = $(NANOPB_DIR)/generator-bin/protoc
+	PROTOC_OPTS =
+else
+	# Source only or git checkout
+	PROTOC = protoc
+	ifdef WINDOWS
+		PROTOC_OPTS = --plugin=protoc-gen-nanopb=$(NANOPB_DIR)/generator/protoc-gen-nanopb.bat
+	else
+		PROTOC_OPTS = --plugin=protoc-gen-nanopb=$(NANOPB_DIR)/generator/protoc-gen-nanopb
+	endif
+endif
+
+$(PROTO_FILES):
+	$(PROTOC) $(PROTOC_OPTS) --proto_path=$(PROTO_DIR) --nanopb_out=$(PROTO_BUILD_DIR) $(PROTO_FILES:%=$(PROTO_DIR)/%)
+
+$(PROTOBUF_OBJ):%:$(PROTOBUF_OBJ).proto
+	$(CC) $(CFLAGS) -I$(NANOPB_DIR) -c -o $(NANOPB_DIR)/$@.o $(PROTO_BUILD_DIR)/$@.pb.c
+
+$(NANOPB_OBJ):%:$(NANOPB_DIR)/%.c
+	$(CC) $(CFLAGS) -c -o $(NANOPB_DIR)/$@.o $<
+
+proto: $(PROTOBUF_OBJ)
+	ar -rs -o $(NANOPB_DIR)/libnanopb.a $(PROTOBUF_OBJ:%=$(NANOPB_DIR)/%.o)
+
+lib: $(NANOPB_OBJ)
+	ar -rs -o $(NANOPB_DIR)/libnanopb.a $(NANOPB_OBJ:%=$(NANOPB_DIR)/%.o)
