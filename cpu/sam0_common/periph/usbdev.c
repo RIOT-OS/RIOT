@@ -229,17 +229,24 @@ static bool _syncbusy_swrst(sam0_common_usb_t *dev)
 
 static inline void _poweron(void)
 {
-#if defined(CPU_FAM_SAMD21)
+#if defined(MCLK)
+    MCLK->AHBMASK.reg |= MCLK_AHBMASK_USB;
+    MCLK->APBBMASK.reg |= MCLK_APBBMASK_USB;
+#else
     PM->AHBMASK.reg |= PM_AHBMASK_USB;
     PM->APBBMASK.reg |= PM_APBBMASK_USB;
+#endif
+
+#if defined(CPU_FAM_SAMD21)
     GCLK->CLKCTRL.reg = (uint32_t)(GCLK_CLKCTRL_CLKEN |
                                    GCLK_CLKCTRL_GEN_GCLK0 |
                                    (GCLK_CLKCTRL_ID(USB_GCLK_ID)));
 #elif defined(CPU_FAM_SAML21)
-    MCLK->AHBMASK.reg |= MCLK_AHBMASK_USB;
-    MCLK->APBBMASK.reg |= MCLK_APBBMASK_USB;
     GCLK->PCHCTRL[USB_GCLK_ID].reg = GCLK_PCHCTRL_CHEN |
                                      GCLK_PCHCTRL_GEN_GCLK0;
+#elif defined(CPU_FAM_SAMD5X)
+    GCLK->PCHCTRL[USB_GCLK_ID].reg = GCLK_PCHCTRL_CHEN |
+                                     GCLK_PCHCTRL_GEN_GCLK6;
 #else
 #error "Unknown CPU family for sam0 common usbdev driver"
 #endif
@@ -356,7 +363,14 @@ static void _usbdev_init(usbdev_t *dev)
     _block_pm();
     usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_HOST_CONNECT);
     /* Interrupt configuration */
+#ifdef CPU_FAM_SAMD5X
+    NVIC_EnableIRQ(USB_0_IRQn);
+    NVIC_EnableIRQ(USB_1_IRQn);
+    NVIC_EnableIRQ(USB_2_IRQn);
+    NVIC_EnableIRQ(USB_3_IRQn);
+#else
     NVIC_EnableIRQ(USB_IRQn);
+#endif
 }
 
 static void usb_attach(sam0_common_usb_t *dev)
@@ -502,6 +516,24 @@ void isr_usb(void)
         dev->usbdev.cb(&dev->usbdev, USBDEV_EVENT_ESR);
     }
     cortexm_isr_end();
+}
+
+void isr_usb0(void)
+{
+    isr_usb();
+}
+
+void isr_usb1(void)
+{
+    isr_usb();
+}
+void isr_usb2(void)
+{
+    isr_usb();
+}
+void isr_usb3(void)
+{
+    isr_usb();
 }
 
 static void _usbdev_esr(usbdev_t *dev)

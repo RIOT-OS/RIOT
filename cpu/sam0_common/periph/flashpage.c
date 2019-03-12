@@ -47,7 +47,7 @@
 static inline void wait_nvm_is_ready(void) __attribute__((always_inline));
 static inline void wait_nvm_is_ready(void)
 {
-#ifdef CPU_SAML1X
+#if defined(CPU_SAML1X) || defined(CPU_SAMD5X)
     while (!_NVMCTRL->STATUS.bit.READY) {}
 #else
     while (!_NVMCTRL->INTFLAG.bit.READY) {}
@@ -57,7 +57,7 @@ static inline void wait_nvm_is_ready(void)
 static void _unlock(void)
 {
     /* remove peripheral access lock for the NVMCTRL peripheral */
-#if defined(CPU_FAM_SAML21) || defined(CPU_SAML1X)
+#ifdef REG_PAC_WRCTRL
     PAC->WRCTRL.reg = (PAC_WRCTRL_KEY_CLR | ID_NVMCTRL);
 #else
     if (PAC1->WPSET.reg & NVMCTRL_PAC_BIT) {
@@ -69,7 +69,7 @@ static void _unlock(void)
 static void _lock(void)
 {
     /* put peripheral access lock for the NVMCTRL peripheral */
-#if defined(CPU_FAM_SAML21) || defined(CPU_SAML1X)
+#ifdef REG_PAC_WRCTRL
     PAC->WRCTRL.reg = (PAC_WRCTRL_KEY_SET | ID_NVMCTRL);
 #else
     if (PAC1->WPCLR.reg & NVMCTRL_PAC_BIT) {
@@ -113,7 +113,11 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     len /= 4;
 
     _unlock();
+#ifdef NVMCTRL_CTRLB_CMDEX_KEY
+    _NVMCTRL->CTRLB.reg = (NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_PBC);
+#else
     _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_PBC);
+#endif
     wait_nvm_is_ready();
     for (unsigned i = 0; i < len; i++) {
         *dst++ = *data_addr++;
@@ -128,7 +132,11 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
 #endif
     } else {
 #endif
+#ifdef NVMCTRL_CTRLB_CMDEX_KEY
+        _NVMCTRL->CTRLB.reg = (NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_WP);
+#else
         _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_WP);
+#endif
 #ifdef FLASHPAGE_RWWEE_NUMOF
     }
 #endif
@@ -156,7 +164,7 @@ void flashpage_write(int page, const void *data)
 
     /* erase given page (the ADDR register uses 16-bit addresses) */
     _unlock();
-#ifdef CPU_SAML1X
+#if defined(CPU_SAML1X) || defined(CPU_SAMD5X)
     /* Ensure address alignment */
     _NVMCTRL->ADDR.reg = (((uint32_t)page_addr) & 0xfffffffe);
 #else
@@ -172,7 +180,11 @@ void flashpage_write(int page, const void *data)
 #endif
     } else {
 #endif
+#ifdef NVMCTRL_CTRLB_CMDEX_KEY
+        _NVMCTRL->CTRLB.reg = (NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_EB);
+#else
         _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_ER);
+#endif
 #ifdef FLASHPAGE_RWWEE_NUMOF
     }
 #endif
