@@ -96,6 +96,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     netdev_ieee802154_rx_info_t rx_info;
+    memset(&rx_info, 0, sizeof(netdev_ieee802154_rx_info_t));
     gnrc_pktsnip_t *pkt = NULL;
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
 
