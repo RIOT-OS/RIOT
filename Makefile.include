@@ -454,11 +454,19 @@ else
 ifeq (,$(RIOTNOLINK))
 link: ..compiler-check ..build-message $(ELFFILE) $(FLASHFILE) $(HEXFILE) print-size
 else
-link: ..compiler-check ..build-message $(BASELIBS)
+link: ..compiler-check ..build-message $(ELFFILE).nolink
 endif # RIOTNOLINK
 
 $(ELFFILE): $(BASELIBS)
 	$(Q)$(_LINK) -o $@
+
+# Try to link and ensure it fails
+$(ELFFILE).nolink: FORCE
+$(ELFFILE).nolink: $(BASELIBS)
+	$(Q)\
+	  $(_LINK) -o $(ELFFILE) 2>&1 > $@; \
+	  ret=$$?; cat $@; \
+	  test $$ret -ne 0 || { echo 'Error, linking should have failed because of not enough memory but did not'; false; }
 
 $(BINDIR)/$(APPLICATION_MODULE).a: pkg-build $(BUILDDEPS)
 	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
