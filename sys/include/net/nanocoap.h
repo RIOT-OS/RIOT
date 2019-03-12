@@ -640,6 +640,23 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
 ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value);
 
 /**
+ * @brief   Append a Content-Format option to the pkt buffer
+ *
+ * @post pkt.payload advanced to first byte after option
+ * @post pkt.payload_len reduced by option length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     format      COAP_FORMAT_xxx to use
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 reserved for error but not implemented yet
+ */
+static inline ssize_t coap_opt_add_format(coap_pkt_t *pkt, uint16_t format)
+{
+    return coap_opt_add_uint(pkt, COAP_OPT_CONTENT_FORMAT, format);
+}
+
+/**
  * @brief   Finalizes options as required and prepares for payload
  *
  * @post pkt.payload advanced to first available byte after options

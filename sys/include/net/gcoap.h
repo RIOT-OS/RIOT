@@ -17,9 +17,7 @@
  * application only needs to focus on request/response handling. For a server,
  * gcoap accepts a list of resource paths with callbacks for writing the
  * response. For a client, gcoap provides a function to send a request, with a
- * callback for reading the server response. Generation of the request or
- * response requires from one to three well-defined steps, depending on
- * inclusion of a payload.
+ * callback for reading the server response.
  *
  * gcoap allocates a RIOT message processing thread, so a single instance can
  * serve multiple applications. This approach also means gcoap uses a single UDP
@@ -56,35 +54,37 @@
  * ### Creating a response ###
  *
  * An application resource includes a callback function, a coap_handler_t. After
- * reading the request, the callback must use one or two functions provided by
- * gcoap to format the response, as described below. The callback *must* read
- * the request thoroughly before calling the functions, because the response
- * buffer likely reuses the request buffer. See `examples/gcoap/gcoap_cli.c`
- * for a simple example of a callback.
+ * reading the request, the callback must use functions provided by gcoap to
+ * format the response, as described below. The callback *must* read the request
+ * thoroughly before calling the functions, because the response buffer likely
+ * reuses the request buffer. See `examples/gcoap/gcoap_cli.c` for a simple
+ * example of a callback.
  *
  * Here is the expected sequence for a callback function:
  *
  * Read request completely and parse request payload, if any. Use the
  * coap_pkt_t _payload_ and _payload_len_ attributes.
  *
- * If there is a payload, follow the three steps below.
+ * If there is a payload, follow the steps below.
  *
  * -# Call gcoap_resp_init() to initialize the response.
+ * -# Use the coap_opt_add_xxx() functions to include any Options, for example
+ *    coap_opt_add_format() for Content-Format of the payload.
+ * -# Call coap_opt_finish() to complete the PDU metadata. Retain the returned
+ *    metadata length.
  * -# Write the response payload, starting at the updated _payload_ pointer
- *    in the coap_pkt_t. If some error occurs, return a negative errno
- *    code from the handler, and gcoap will send a server error (5.00).
- * -# Call gcoap_finish() to complete the PDU after writing the payload,
- *    and return the result. gcoap will send the message.
+ *    in the coap_pkt_t, for up to _payload_len_ bytes.
+ * -# Return the sum of the metadata length and payload length. If some error
+ *    has occurred, return a negative errno code from the handler, and gcoap
+ *    will send a server error (5.00).
  *
- * If no payload, call only gcoap_response() to write the full response.
- * Alternatively, you still can use gcoap_resp_init() and gcoap_finish(), as
- * described above. In fact, the gcoap_response() function is inline, and uses
- * those two functions.
+ * If no payload, call only gcoap_response() to write the full response. If you
+ * need to add Options, follow the first three steps in the list above instead.
  *
  * ## Client Operation ##
  *
- * Client operation includes two phases:  creating and sending a request, and
- * handling the response aynchronously in a client supplied callback.  See
+ * Client operation includes two phases: creating and sending a request, and
+ * handling the response aynchronously in a client supplied callback. See
  * `examples/gcoap/gcoap_cli.c` for a simple example of sending a request and
  * reading the response.
  *
@@ -97,19 +97,21 @@
  * If there is a payload, follow the steps below.
  *
  * -# Call gcoap_req_init() to initialize the request.
- *    -# Optionally, mark the request confirmable by calling
- *       coap_hdr_set_type() with COAP_TYPE_CON.
+ * -# Optionally, mark the request confirmable by calling coap_hdr_set_type()
+ *    with COAP_TYPE_CON.
+ * -# Use the coap_opt_add_xxx() functions to include any Options beyond
+ *    Uri-Path, which was added in the first step.
+ * -# Call coap_opt_finish() to complete the PDU metadata. Retain the returned
+ *    metadata length.
  * -# Write the request payload, starting at the updated _payload_ pointer
- *    in the coap_pkt_t.
- * -# Call gcoap_finish(), which updates the packet for the payload.
+ *    in the coap_pkt_t, for up to _payload_len_ bytes.
  *
- * If no payload, call only gcoap_request() to write the full request.
- * Alternatively, you still can use gcoap_req_init() and gcoap_finish(),
- * as described above. The gcoap_request() function is inline, and uses those
- * two functions.
+ * If no payload, call only gcoap_request() to write the full request. If you
+ * need to add Options, follow the first four steps in the list above instead.
  *
- * Finally, call gcoap_req_send2() for the destination endpoint, as well as a
- * callback function for the host's response.
+ * Finally, call gcoap_req_send2() with the sum of the metadata length and
+ * payload length, the destination endpoint, and a callback function for the
+ * host's response.
  *
  * ### Handling the response ###
  *
@@ -147,11 +149,15 @@
  * -# Call gcoap_obs_init() to initialize the notification for a resource.
  *    Test the return value, which may indicate there is not an observer for
  *    the resource. If so, you are done.
+ * -# Use the coap_opt_add_xxx() functions to include any Options, for example
+ *    coap_opt_add_format() for Content-Format of the payload.
+ * -# Call coap_opt_finish() to complete the PDU metadata. Retain the returned
+ *    metadata length.
  * -# Write the notification payload, starting at the updated _payload_ pointer
- *    in the coap_pkt_t.
- * -# Call gcoap_finish(), which updates the packet for the payload.
+ *    in the coap_pkt_t, for up to _payload_len_ bytes.
  *
- * Finally, call gcoap_obs_send() for the resource.
+ * Finally, call gcoap_obs_send() for the resource, with the sum of the
+ * metadata length and payload length for the representation.
  *
  * ### Other considerations ###
  *
@@ -170,17 +176,6 @@
  * via a reset (RST) response to a non-confirmable notification.
  *
  * ## Implementation Notes ##
- *
- * ### Building a packet ###
- *
- * The sequence and functions described above to build a request or response
- * is designed to provide a relatively simple API for the user.
- *
- * The structure of a CoAP PDU requires that options are placed between the
- * header and the payload. So, gcoap provides space in the buffer for them in
- * the request/response ...init() function, and then writes them during
- * gcoap_finish(). We trade some inefficiency/work in the buffer for
- * simplicity in the API.
  *
  * ### Waiting for a response ###
  *
@@ -582,7 +577,7 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                     unsigned code, char *path)
 {
     return (gcoap_req_init(pdu, buf, len, code, path) == 0)
-                ? gcoap_finish(pdu, 0, COAP_FORMAT_NONE)
+                ? coap_opt_finish(pdu, COAP_OPT_FINISH_NONE)
                 : -1;
 }
 
@@ -648,7 +643,7 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf,
                                      size_t len, unsigned code)
 {
     return (gcoap_resp_init(pdu, buf, len, code) == 0)
-                ? gcoap_finish(pdu, 0, COAP_FORMAT_NONE)
+                ? coap_opt_finish(pdu, COAP_OPT_FINISH_NONE)
                 : -1;
 }
 
