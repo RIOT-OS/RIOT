@@ -232,7 +232,7 @@ void gnrc_pktbuf_release_error(gnrc_pktsnip_t *pkt, uint32_t err)
 gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt)
 {
     mutex_lock(&_mutex);
-    if ((pkt == NULL) || (pkt->size == 0)) {
+    if (pkt == NULL) {
         mutex_unlock(&_mutex);
         return NULL;
     }
