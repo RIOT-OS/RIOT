@@ -88,6 +88,11 @@ extern "C" {
  *          @ref IEEE802154_FCF_FRAME_PEND
  */
 #define GNRC_NETIF_HDR_FLAGS_MORE_DATA  (0x10)
+
+/**
+ * @brief   Link-layer checksum was valid on receive
+ */
+#define GNRC_NETIF_HDR_FLAGS_CRC_VALID  (0x01)
 /**
  * @}
  */

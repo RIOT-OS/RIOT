@@ -90,7 +90,7 @@ static inline bool _already_received(gnrc_netif_t *netif,
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
-    netdev_ieee802154_rx_info_t rx_info;
+    netdev_ieee802154_rx_info_t rx_info = { .crc_valid = 0 };
     gnrc_pktsnip_t *pkt = NULL;
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
 
@@ -184,6 +184,9 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
+            if (rx_info.crc_valid) {
+                hdr->flags |= GNRC_NETIF_HDR_FLAGS_CRC_VALID;
+            }
             hdr->if_pid = thread_getpid();
             dev->driver->get(dev, NETOPT_PROTO, &pkt->type, sizeof(pkt->type));
 #if ENABLE_DEBUG
