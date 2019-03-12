@@ -206,13 +206,13 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
 
         /* fetch and check if CRC_OK bit (MSB) is set */
         cc2420_fifo_read(dev, &crc_corr, 1);
-        if (!(crc_corr & 0x80)) {
-            DEBUG("cc2420: recv: CRC_OK bit not set, dropping packet\n");
-            /* drop the corrupted frame from the RXFIFO */
-            len = 0;
+        if (!(crc_corr & 0x80) && (len > CC2420_PKT_MAXLEN)) {
+            len = CC2420_PKT_MAXLEN;
         }
+
         if (info != NULL) {
             netdev_ieee802154_rx_info_t *radio_info = info;
+            radio_info->crc_valid = (crc_corr & 0x80);
             radio_info->rssi = CC2420_RSSI_OFFSET + rssi;
             radio_info->lqi = crc_corr & CC2420_CRCCOR_COR_MASK;
         }
