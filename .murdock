@@ -109,7 +109,14 @@ get_supported_toolchains() {
 # supported board and toolchain. Only print for boards in $BOARDS.
 get_app_board_toolchain_pairs() {
     local appdir=$1
-    for board in $(get_supported_boards $appdir)
+    local boards="$(get_supported_boards $appdir)"
+
+    if [ "$boards" = makefile_broken ]; then
+        echo "$appdir makefile_broken"
+        return
+    fi
+
+    for board in ${boards}
     do
         for toolchain in $(get_supported_toolchains $appdir $board)
         do
