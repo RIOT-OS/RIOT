@@ -58,13 +58,8 @@ void pm_set(unsigned mode)
             PWR->CR |= (PWR_CR_PDDS | PWR_CR_CWUF | PWR_CR_CSBF);
             /* Enable WKUP pin to use for wakeup from standby mode */
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
-            /* Regarding ULP, it's up to the user to configure it :
-             * 0: Internal Vref enabled during Deepsleep/Sleep/Low-power run mode
-             * 1: Disable internal voltage reference
-             *    Deepsleep/Sleep/Low-power run mode
-             */
             /* Enable Ultra Low Power mode */
-            // PWR->CR |= PWR_CR_ULP;
+            PWR->CR |= PWR_CR_ULP;
 
             PWR->CSR |= PWR_CSR_EWUP1;
 #if !defined(CPU_LINE_STM32L053xx)
@@ -81,24 +76,13 @@ void pm_set(unsigned mode)
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
             /* Clear Wakeup flag */
             PWR->CR |= PWR_CR_CWUF;
-            /* Clear PDDS to enter stop mode on */
-            /*
-             * Regarding LPSDSR, it's up to the user to configure it :
-             * 0: Voltage regulator on during Deepsleep/Sleep/Low-power run mode
-             * 1: Voltage regulator in low-power mode during
-             *    Deepsleep/Sleep/Low-power run mode
-             * Regarding ULP, it's up to the user to configure it :
-             * 0: Internal Vref enabled during Deepsleep/Sleep/Low-power run mode
-             * 1: Disable internal voltage reference
-             *    Deepsleep/Sleep/Low-power run mode
-             */
+            /* Clear PDDS to enter stop mode on  */
             PWR->CR &= ~(PWR_CR_PDDS);
-
             /* Regulator in LP mode */
-            // PWR->CR |= PWR_CR_LPSDSR;
+            PWR->CR |= PWR_CR_LPSDSR;
 
             /* Enable Ultra Low Power mode*/
-            // PWR->CR |= PWR_CR_ULP;
+            PWR->CR |= PWR_CR_ULP;
 #else
             /* Clear PDDS and LPDS bits to enter stop mode on */
             /* deepsleep with voltage regulator on */
