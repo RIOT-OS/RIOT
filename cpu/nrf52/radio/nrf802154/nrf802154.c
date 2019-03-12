@@ -77,9 +77,9 @@ static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 static uint8_t aackbuf[4];
 
-static uint8_t last_seq_no;
+static uint8_t _last_seq_no;
 /* Max number of retransmission attempts configured */
-static uint8_t retrans_max;
+static uint8_t _retrans_max;
 /* Retransmission counter, the retrans_max + 1 indicates all retransmissions
  * failed */
 static uint8_t retransmissions;
@@ -232,7 +232,7 @@ static void _send_ack(void)
     aackbuf[0] = 5;                       /* Length including 2 byte fcs */
     aackbuf[1] = IEEE802154_FCF_TYPE_ACK; /* Ack type */
     aackbuf[2] = 0;                       /* Other bits zeroed */
-    aackbuf[3] = last_seq_no;             /* Sequence number */
+    aackbuf[3] = _last_seq_no;            /* Sequence number */
     /* We should be in the Rx state, transitioning to disabled should be 0 us */
     if (NRF_RADIO->STATE != RADIO_STATE_STATE_TxIdle) {
         _disable();
@@ -609,7 +609,7 @@ void isr_radio(void)
                                                       &rxbuf[1]) == 0)) {
                         _event_flags |= RX_COMPLETE;
                         if (_ack_xmit_required()) {
-                            last_seq_no = ieee802154_get_seq(&rxbuf[1]);
+                            _last_seq_no = ieee802154_get_seq(&rxbuf[1]);
                             _state = NRF802154_STATE_AACK;
                             _set_and_start_timer(SIFS);
                         }
