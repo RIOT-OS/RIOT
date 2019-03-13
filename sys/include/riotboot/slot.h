@@ -39,6 +39,13 @@ extern "C" {
 int riotboot_slot_current(void);
 
 /**
+ * @brief  Get currently not running image slot
+ *
+ * @returns nr of currently inactive slot
+ */
+int riotboot_slot_other(void);
+
+/**
  * @brief  Get jump-to address of image slot
  *
  * @param[in]   slot    slot nr to work on
