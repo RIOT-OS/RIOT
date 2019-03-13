@@ -27,6 +27,7 @@
  */
 
 #include <stdint.h>
+#include <string.h>
 
 #include "cpu.h"
 #include "periph/uart.h"
@@ -46,6 +47,14 @@
 #define UART_HWFLOWCTRL (uart_config[uart].rts_pin != (uint8_t)GPIO_UNDEF && \
                          uart_config[uart].cts_pin != (uint8_t)GPIO_UNDEF)
 #define ISR_CTX         isr_ctx[uart]
+#define RAM_MASK        (0x20000000)
+
+/**
+ * @brief Chunk size used for transferring data from ROM [in bytes]
+ */
+#ifndef NRF_UARTE_CHUNK_SIZE
+#define NRF_UARTE_CHUNK_SIZE    (32U)
+#endif
 
 /**
  * @brief Allocate memory for the interrupt context
@@ -213,11 +222,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 
 #ifdef CPU_MODEL_NRF52840XXAA /* nrf52840 (using EasyDMA) */
-
-void uart_write(uart_t uart, const uint8_t *data, size_t len)
+static void _write_buf(uart_t uart, const uint8_t *data, size_t len)
 {
-    assert(uart < UART_NUMOF);
-
     /* reset endtx flag */
     dev(uart)->EVENTS_ENDTX = 0;
     /* set data to transfer to DMA TX pointer */
@@ -227,6 +233,30 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     dev(uart)->TASKS_STARTTX = 1;
     /* wait for the end of transmission */
     while (dev(uart)->EVENTS_ENDTX == 0) {}
+}
+
+void uart_write(uart_t uart, const uint8_t *data, size_t len)
+{
+    assert(uart < UART_NUMOF);
+
+    /* EasyDMA can only transfer data from RAM (see ref. manual, sec. 6.34.1).
+     * So if the given `data` buffer resides in ROM, we need to copy it to RAM
+     * before being able to transfer it. To make sure the stack does not
+     * overflow, we do this chunk-wise. */
+    if (!((uint32_t)data & RAM_MASK)) {
+        size_t pos = 0;
+        while (pos < len) {
+            uint8_t tmp[NRF_UARTE_CHUNK_SIZE];
+            size_t off = len - pos;
+            off = (off > NRF_UARTE_CHUNK_SIZE) ? NRF_UARTE_CHUNK_SIZE : off;
+            memcpy(tmp, data + pos, off);
+            _write_buf(uart, tmp, off);
+            pos += off;
+        }
+    }
+    else {
+        _write_buf(uart, data, len);
+    }
 }
 
 void uart_poweron(uart_t uart)
