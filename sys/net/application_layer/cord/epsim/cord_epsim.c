@@ -59,7 +59,7 @@ int cord_epsim_register(void)
         return CORD_EPSIM_ERROR;
     }
     /* finish, we don't have any payload */
-    ssize_t len = gcoap_finish(&pkt, 0, COAP_FORMAT_NONE);
+    ssize_t len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
     if (gcoap_req_send2(buf, len, &remote, NULL) == 0) {
         return CORD_EPSIM_ERROR;
     }
