@@ -26,7 +26,8 @@
 #include "irq.h"
 #include "periph/pm.h"
 #if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L0)
+    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L1)
 #include "stmclk.h"
 #endif
 
@@ -49,13 +50,17 @@ void pm_set(unsigned mode)
 /* I just copied it from stm32f1/2/4, but I suppose it would work for the
  * others... /KS */
 #if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L0)
+    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L1)
     switch (mode) {
         case STM32_PM_STANDBY:
             /* Set PDDS to enter standby mode on deepsleep and clear flags */
             PWR->CR |= (PWR_CR_PDDS | PWR_CR_CWUF | PWR_CR_CSBF);
             /* Enable WKUP pin to use for wakeup from standby mode */
-#if defined(CPU_FAM_STM32L0)
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
+            /* Enable Ultra Low Power mode */
+            PWR->CR |= PWR_CR_ULP;
+
             PWR->CSR |= PWR_CSR_EWUP1;
 #if !defined(CPU_LINE_STM32L053xx)
             /* STM32L053 only have 2 wake pins */
@@ -68,15 +73,16 @@ void pm_set(unsigned mode)
             deep = 1;
             break;
         case STM32_PM_STOP:
-#if defined(CPU_FAM_STM32L0)
-            /* Clear PDDS to enter stop mode on */
-            /*
-             * Regarding LPSDSR, it's up to the user to configure it :
-             * 0: Voltage regulator on during Deepsleep/Sleep/Low-power run mode
-             * 1: Voltage regulator in low-power mode during
-             *    Deepsleep/Sleep/Low-power run mode
-             */
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
+            /* Clear Wakeup flag */
+            PWR->CR |= PWR_CR_CWUF;
+            /* Clear PDDS to enter stop mode on  */
             PWR->CR &= ~(PWR_CR_PDDS);
+            /* Regulator in LP mode */
+            PWR->CR |= PWR_CR_LPSDSR;
+
+            /* Enable Ultra Low Power mode*/
+            PWR->CR |= PWR_CR_ULP;
 #else
             /* Clear PDDS and LPDS bits to enter stop mode on */
             /* deepsleep with voltage regulator on */
@@ -94,7 +100,8 @@ void pm_set(unsigned mode)
     cortexm_sleep(deep);
 
 #if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L0)
+    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L1)
     if (deep) {
         /* Re-init clock after STOP */
         stmclk_init_sysclk();
@@ -103,7 +110,8 @@ void pm_set(unsigned mode)
 }
 
 #if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L0)
+    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L1)
 void pm_off(void)
 {
     irq_disable();
