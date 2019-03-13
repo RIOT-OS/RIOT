@@ -446,7 +446,6 @@ static inline void thread_signal(thread_signal_t *signal)
 /**
  * @brief Initialize the signal data structure
  * @param[out]  signal      Structure to initialize
- * @param[in]   pid         PID of the thread that will await the signal
  */
 static inline void thread_signal_init(thread_signal_t *signal)
 {
