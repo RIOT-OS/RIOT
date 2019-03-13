@@ -6,6 +6,9 @@ ifeq ($(TOOLCHAIN), llvm)
   CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function
 endif
 
+INCLUDES += -I$(RIOTBASE)/pkg/tinydtls/include
+DIRS += $(RIOTBASE)/pkg/tinydtls/contrib
+
 ifneq (,$(filter tinydtls,$(USEMODULE)))
   INCLUDES += -I$(PKG_BUILDDIR)
   # Mandatory for tinyDTLS

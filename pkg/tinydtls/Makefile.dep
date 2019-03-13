@@ -1,5 +1,6 @@
 ifneq (,$(filter tinydtls,$(USEPKG)))
   USEMODULE += tinydtls
+  USEMODULE += tinydtls_contrib
 endif
 
 ifneq (,$(filter tinydtls,$(USEMODULE)))
