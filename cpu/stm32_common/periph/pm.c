@@ -3,6 +3,7 @@
  *               2015 Freie Universität Berlin
  *               2015 Engineering-Spirit
  *               2017-2019 OTA keys S.A.
+ *               2019 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -21,6 +22,7 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  * @}
  */
@@ -42,6 +44,10 @@
 #define PM_STOP_CONFIG  (PWR_CR_LPDS)
 #elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 #define PM_STOP_CONFIG  (PWR_CR_LPSDSR | PWR_CR_ULP)
+#elif defined(CPU_FAM_STM32L4)
+#define PM_STOP_CONFIG  (PWR_CR1_LPMS_STOP1)
+#elif defined(CPU_FAM_STM32F7)
+#define PM_STOP_CONFIG  (PWR_CR1_LPDS | PWR_CR1_FPDS | PWR_CR1_LPUDS)
 #else
 #define PM_STOP_CONFIG  (PWR_CR_LPDS | PWR_CR_FPDS)
 #endif
@@ -55,9 +61,29 @@
  */
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 #define PM_STANDBY_CONFIG   (PWR_CR_PDDS | PWR_CR_CWUF | PWR_CR_CSBF | PWR_CR_ULP)
+#elif defined(CPU_FAM_STM32L4)
+#define PM_STANDBY_CONFIG   (PWR_CR1_LPMS_STANDBY)
+#elif defined(CPU_FAM_STM32F7)
+#define PM_STANDBY_CONFIG   (PWR_CR1_PDDS | PWR_CR1_CSBF)
 #else
 #define PM_STANDBY_CONFIG   (PWR_CR_PDDS | PWR_CR_CWUF | PWR_CR_CSBF)
 #endif
+#endif
+
+#if defined(CPU_FAM_STM32L4)
+#define PWR_CR_REG     PWR->CR1
+#define PWR_WUP_REG    PWR->CR3
+/* Allow overridable SRAM2 retention mode using CFLAGS */
+#ifndef STM32L4_SRAM2_RETENTION
+/* Disable SRAM2 retention by default for maximum power saving */
+#define STM32L4_SRAM2_RETENTION  (0)
+#endif
+#elif defined(CPU_FAM_STM32F7)
+#define PWR_CR_REG     PWR->CR1
+#define PWR_WUP_REG    PWR->CSR2
+#else
+#define PWR_CR_REG     PWR->CR
+#define PWR_WUP_REG    PWR->CSR
 #endif
 
 void pm_set(unsigned mode)
@@ -67,18 +93,27 @@ void pm_set(unsigned mode)
     switch (mode) {
 #ifdef STM32_PM_STANDBY
         case STM32_PM_STANDBY:
-            PWR->CR &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
-            PWR->CR |= PM_STANDBY_CONFIG;
+            PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
+            PWR_CR_REG |= PM_STANDBY_CONFIG;
+#if defined(CPU_FAM_STM32L4)
+#if STM32L4_SRAM2_RETENTION
+            PWR->CR3 |= PWR_CR3_RRS;
+#else
+            PWR->CR3 &= ~PWR_CR3_RRS;
+#endif
+            /* Clear flags */
+            PWR->SCR |= PWR_SCR_CSBF;
+#endif
             /* Enable WKUP pin to use for wakeup from standby mode */
-            PWR->CSR |= PM_EWUP_CONFIG;
+            PWR_WUP_REG |= PM_EWUP_CONFIG;
             /* Set SLEEPDEEP bit of system control block */
             deep = 1;
             break;
 #endif
 #ifdef STM32_PM_STOP
         case STM32_PM_STOP:
-            PWR->CR &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
-            PWR->CR |= PM_STOP_CONFIG;
+            PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
+            PWR_CR_REG |= PM_STOP_CONFIG;
             /* Set SLEEPDEEP bit of system control block */
             deep = 1;
             break;
