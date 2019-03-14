@@ -953,3 +953,38 @@ unsigned coap_get_len(coap_pkt_t *pkt)
     }
     return pktlen;
 }
+
+ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+                             void *context)
+{
+    uint8_t uri[NANOCOAP_URI_MAX];
+
+    unsigned method_flag = coap_method2flag(coap_get_code_detail(pkt));
+
+    if (coap_get_uri_path(pkt, uri) > 0) {
+        coap_resource_subtree_t *subtree = context;
+
+        /* TODO: refactor into function, use both here and above */
+        for (unsigned i = 0; i < subtree->resources_numof; i++) {
+            const coap_resource_t *resource = &subtree->resources[i];
+
+            if (!(resource->methods & method_flag)) {
+                continue;
+            }
+
+            int res = coap_match_path(resource, uri);
+            if (res > 0) {
+                continue;
+            }
+            else if (res < 0) {
+                break;
+            }
+            else {
+                return resource->handler(pkt, buf, len, resource->context);
+            }
+        }
+    }
+
+    return coap_reply_simple(pkt, COAP_CODE_INTERNAL_SERVER_ERROR, buf,
+                             len, COAP_FORMAT_TEXT, NULL, 0);
+}
