@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY += arduino-uno arduino-duemilanove
+BOARD_INSUFFICIENT_MEMORY += arduino-uno arduino-nano arduino-duemilanove
 
 BOARD ?= msba2
 

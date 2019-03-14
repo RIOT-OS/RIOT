@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-mkr1000 \
                              arduino-mkrfox1200 \
                              arduino-mkrzero \
+                             arduino-nano \
                              arduino-uno \
                              arduino-zero \
                              avsextrem \
