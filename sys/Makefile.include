@@ -88,6 +88,10 @@ ifneq (,$(filter printf_float,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter riotboot_%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/riotboot/Makefile.include
+endif
+
 ifneq (,$(filter ssp,$(USEMODULE)))
   include $(RIOTBASE)/sys/ssp/Makefile.include
 endif

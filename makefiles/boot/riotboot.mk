@@ -10,22 +10,8 @@ HEADER_TOOL_DIR = $(RIOTBASE)/dist/tools/riotboot_gen_hdr
 HEADER_TOOL ?= $(HEADER_TOOL_DIR)/bin/genhdr
 BINDIR_APP = $(BINDIR)/$(APPLICATION)
 
-# Indicate the reserved space for a header, 256B by default
-# Notice that it must be 256B aligned. This is restricted by
-# the Cortex-M0+/3/4/7 architecture
-RIOTBOOT_HDR_LEN ?= 0x100
-
-# Export variables for 'riotboot_slot'
-export SLOT0_LEN
-export SLOT1_LEN
-export NUM_SLOTS
-
-# By default, slot 0 is found just after RIOTBOOT_LEN. Slot 1 after
-# slot 0. The values might be overridden to add more or less offset
-# if needed.
-export SLOT0_OFFSET ?= $(RIOTBOOT_LEN)
-# export does not work properly with variables using '$((  ))' so evaluate it in a shell
-export SLOT1_OFFSET ?= $(shell echo $$(($(SLOT0_OFFSET) + $(SLOT0_LEN))))
+#
+export SLOT0_OFFSET SLOT0_LEN SLOT1_OFFSET SLOT1_LEN
 
 # Mandatory APP_VER, set to epoch by default
 APP_VER ?= $(shell date +%s)
