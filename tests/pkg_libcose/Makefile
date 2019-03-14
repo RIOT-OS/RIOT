@@ -1,9 +1,10 @@
 include ../Makefile.tests_common
 
 # HACL* only compiles on 32bit platforms
-BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno \
-                   jiminy-mega256rfr2 mega-xplained waspmote-pro \
-                   chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
+BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-nano \
+                   arduino-uno chronos jiminy-mega256rfr2 mega-xplained \
+                   msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b \
+                   wsn430-v1_4 z1
 
 BOARD_INSUFFICIENT_MEMORY := nucleo-f030r8 nucleo-f031k6 nucleo-f042k6 \
                              nucleo-l031k6 nucleo-l053r8 stm32f0discovery
