@@ -1,7 +1,8 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             chronos mega-xplained msb-430 msb-430h nucleo-f030r8 \
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-nano \
+                             arduino-uno chronos mega-xplained msb-430 \
+                             msb-430h nucleo-f030r8 \
                              nucleo-f031k6 nucleo-f042k6 nucleo-f303k8 \
                              nucleo-f334r8 nucleo-l031k6 nucleo-l053r8 \
                              stm32f0discovery telosb waspmote-pro z1

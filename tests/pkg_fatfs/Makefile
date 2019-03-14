@@ -2,7 +2,7 @@ include ../Makefile.tests_common
 
 BOARD ?= native
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-nano arduino-uno
 
 FEATURES_OPTIONAL += periph_rtc
 

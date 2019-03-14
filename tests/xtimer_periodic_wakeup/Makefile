@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno chronos
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-nano  arduino-uno \
+                             chronos
 
 USEMODULE += xtimer
 
