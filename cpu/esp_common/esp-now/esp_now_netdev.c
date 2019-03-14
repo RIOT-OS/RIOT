@@ -652,11 +652,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
                   data_len + iolist->iol_len, ESP_NOW_MAX_SIZE_RAW);
             return -EBADMSG;
         }
-
-        memcpy(data_pos, iolist->iol_base, iolist->iol_len);
-        data_pos += iolist->iol_len;
-        data_len += iolist->iol_len;
-
+        if (iolist->iol_len) {
+            memcpy(data_pos, iolist->iol_base, iolist->iol_len);
+            data_pos += iolist->iol_len;
+            data_len += iolist->iol_len;
+        }
         iolist = iolist->iol_next;
     }
 
