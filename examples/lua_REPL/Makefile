@@ -27,7 +27,7 @@ BOARD_INSUFFICIENT_MEMORY := blackpill bluepill calliope-mini cc2650-launchpad \
                              yunjia-nrf51822 esp8266-esp-12x esp8266-olimex-mod \
                              esp8266-sparkfun-thing firefly
 
-BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno \
+BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-nano arduino-uno \
                    chronos hifive1 jiminy-mega256rfr2 mega-xplained mips-malta \
                    msb-430 msb-430h pic32-clicker pic32-wifire telosb \
                    waspmote-pro wsn430-v1_3b wsn430-v1_4 z1

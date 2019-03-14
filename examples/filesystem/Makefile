@@ -15,7 +15,8 @@ BOARD_BLACKLIST :=  chronos \
                     z1 \
                     #
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-nano arduino-uno \
+                             nucleo-f031k6
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
