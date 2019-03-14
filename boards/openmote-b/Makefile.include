@@ -26,7 +26,6 @@ else ifeq ($(PROGRAMMER),jlink)
   export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 endif
 
-export OFLAGS    = -O binary
 export HEXFILE = $(ELFFILE:.elf=.bin)
 export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 export RESET_FLAGS = $(BINDIR)
