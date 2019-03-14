@@ -8,6 +8,7 @@
 
 /**
  * @defgroup    drivers_ds3234  DS3234 Extremely Accurate SPI RTC
+ * @ingroup     drivers_sensors
 
  * @brief       Driver for Maxim DS3234 Extremely Accurate SPI Bus RTC with
  *              Integrated Crystal and SRAM
