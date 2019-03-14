@@ -22,6 +22,7 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  * @}
  */
@@ -45,6 +46,8 @@
 #define PM_STOP_CONFIG  (PWR_CR_LPSDSR | PWR_CR_ULP)
 #elif defined(CPU_FAM_STM32L4)
 #define PM_STOP_CONFIG  (PWR_CR1_LPMS_STOP1)
+#elif defined(CPU_FAM_STM32F7)
+#define PM_STOP_CONFIG  (PWR_CR1_LPDS | PWR_CR1_FPDS | PWR_CR1_LPUDS)
 #else
 #define PM_STOP_CONFIG  (PWR_CR_LPDS | PWR_CR_FPDS)
 #endif
@@ -60,6 +63,8 @@
 #define PM_STANDBY_CONFIG   (PWR_CR_PDDS | PWR_CR_CWUF | PWR_CR_CSBF | PWR_CR_ULP)
 #elif defined(CPU_FAM_STM32L4)
 #define PM_STANDBY_CONFIG   (PWR_CR1_LPMS_STANDBY)
+#elif defined(CPU_FAM_STM32F7)
+#define PM_STANDBY_CONFIG   (PWR_CR1_PDDS | PWR_CR1_CSBF)
 #else
 #define PM_STANDBY_CONFIG   (PWR_CR_PDDS | PWR_CR_CWUF | PWR_CR_CSBF)
 #endif
@@ -68,6 +73,9 @@
 #if defined(CPU_FAM_STM32L4)
 #define PWR_CR_REG     PWR->CR1
 #define PWR_WUP_REG    PWR->CR3
+#elif defined(CPU_FAM_STM32F7)
+#define PWR_CR_REG     PWR->CR1
+#define PWR_WUP_REG    PWR->CSR2
 #else
 #define PWR_CR_REG     PWR->CR
 #define PWR_WUP_REG    PWR->CSR
