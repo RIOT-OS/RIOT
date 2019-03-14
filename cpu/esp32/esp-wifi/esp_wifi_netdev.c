@@ -298,8 +298,10 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
             mutex_unlock(&dev->dev_lock);
             return -EOVERFLOW;
         }
-        memcpy (dev->tx_buf + dev->tx_len, iol->iol_base, iol->iol_len);
-        dev->tx_len += iol->iol_len;
+        if (iol->iol_len) {
+            memcpy (dev->tx_buf + dev->tx_len, iol->iol_base, iol->iol_len);
+            dev->tx_len += iol->iol_len;
+        }
     }
 
     #if ENABLE_DEBUG
