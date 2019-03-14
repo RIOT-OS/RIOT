@@ -27,8 +27,8 @@ export SLOT0_OFFSET ?= $(RIOTBOOT_LEN)
 # export does not work properly with variables using '$((  ))' so evaluate it in a shell
 export SLOT1_OFFSET ?= $(shell echo $$(($(SLOT0_OFFSET) + $(SLOT0_LEN))))
 
-# Mandatory APP_VER, set to 0 by default
-APP_VER ?= 0
+# Mandatory APP_VER, set to epoch by default
+APP_VER ?= $(shell date +%s)
 
 # Final target for slot 0 with riot_hdr
 SLOT0_RIOT_BIN = $(BINDIR_APP)-slot0.riot.bin
