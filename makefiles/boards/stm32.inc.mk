@@ -46,13 +46,5 @@ ifeq (dfu-util,$(PROGRAMMER))
   ifeq (,$(DFU_USB_ID))
     $(error DFU_USB_ID is not set)
   endif
-  # Skip the space needed by the embedded bootloader
-  ROM_OFFSET ?= 0x2000
-  FLASHER = dfu-util
-  DEBUGGER = # no debugger
-  RESET ?= # dfu-util has no support for resetting the device
-
-  FLASHFILE ?= $(BINFILE)
-  DFU_FLAGS ?= -a 2
-  FFLAGS = -d $(DFU_USB_ID) $(DFU_FLAGS) -D $(FLASHFILE)
+  include $(RIOTMAKE)/tools/dfu.inc.mk
 endif
