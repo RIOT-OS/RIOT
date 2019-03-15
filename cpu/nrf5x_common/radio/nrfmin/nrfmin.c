@@ -328,12 +328,20 @@ static int nrfmin_send(netdev_t *dev, const iolist_t *iolist)
     /* copy packet data into the transmit buffer */
     int pos = 0;
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
-        if ((pos + iol->iol_len) > NRFMIN_PKT_MAX) {
-            DEBUG("[nrfmin] send: unable to do so, packet is too large!\n");
-            return -EOVERFLOW;
+        /* ignore list elements that contain no data */
+        if (iol->iol_len > 0) {
+            if ((pos + iol->iol_len) > NRFMIN_PKT_MAX) {
+                DEBUG("[nrfmin] send: unable to do so, packet is too large!\n");
+                return -EOVERFLOW;
+            }
+            memcpy(&tx_buf.raw[pos], iol->iol_base, iol->iol_len);
+            pos += iol->iol_len;
         }
-        memcpy(&tx_buf.raw[pos], iol->iol_base, iol->iol_len);
-        pos += iol->iol_len;
+    }
+
+    /* if there is not data to send at all, we abort here */
+    if (pos == 0) {
+        return 0;
     }
 
     /* set output buffer and destination address */
