@@ -19,4 +19,4 @@ PROGRAMMER_FLAGS += $(FFLAGS_EXTRA)
 
 # don't force to flash HEXFILE, but set it as default
 FLASHFILE ?= $(HEXFILE)
-FFLAGS += -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -U flash:w:$(HEXFILE)
+FFLAGS += -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -U flash:w:$(FLASHFILE)
