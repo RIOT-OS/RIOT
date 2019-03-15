@@ -653,6 +653,7 @@ static void test_pktbuf_realloc_data__success3(void)
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
+#ifndef MODULE_GNRC_PKTBUF_MALLOC
 static void test_pktbuf_merge_data__memfull(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, (GNRC_PKTBUF_SIZE / 4),
@@ -664,6 +665,7 @@ static void test_pktbuf_merge_data__memfull(void)
     gnrc_pktbuf_release(pkt);
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
+#endif /* MODULE_GNRC_PKTBUF_MALLOC */
 
 static void test_pktbuf_merge_data__success1(void)
 {
@@ -811,6 +813,7 @@ static void test_pktbuf_start_write__pkt_users_2(void)
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
+#ifndef MODULE_GNRC_PKTBUF_MALLOC
 static void test_pktbuf_reverse_snips__too_full(void)
 {
     gnrc_pktsnip_t *pkt, *pkt_next, *pkt_huge;
@@ -832,6 +835,7 @@ static void test_pktbuf_reverse_snips__too_full(void)
     gnrc_pktbuf_release(pkt_next);
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
+#endif /* MODULE_GNRC_PKTBUF_MALLOC */
 
 static void test_pktbuf_reverse_snips__success(void)
 {
@@ -888,7 +892,9 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_realloc_data__success),
         new_TestFixture(test_pktbuf_realloc_data__success2),
         new_TestFixture(test_pktbuf_realloc_data__success3),
+#ifndef MODULE_GNRC_PKTBUF_MALLOC
         new_TestFixture(test_pktbuf_merge_data__memfull),
+#endif /* MODULE_GNRC_PKTBUF_MALLOC */
         new_TestFixture(test_pktbuf_merge_data__success1),
         new_TestFixture(test_pktbuf_merge_data__success2),
         new_TestFixture(test_pktbuf_hold__pkt_null),
@@ -900,7 +906,9 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_start_write__NULL),
         new_TestFixture(test_pktbuf_start_write__pkt_users_1),
         new_TestFixture(test_pktbuf_start_write__pkt_users_2),
+#ifndef MODULE_GNRC_PKTBUF_MALLOC
         new_TestFixture(test_pktbuf_reverse_snips__too_full),
+#endif /* MODULE_GNRC_PKTBUF_MALLOC */
         new_TestFixture(test_pktbuf_reverse_snips__success),
     };
 
