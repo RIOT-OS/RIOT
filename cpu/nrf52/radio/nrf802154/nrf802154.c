@@ -245,7 +245,8 @@ static void _send_ack(void)
 static bool _ack_frame_filter(void)
 {
     size_t psdu_len = rxbuf[0];
-    return ((psdu_len == (IEEE802154_FCF_LEN + 1)) &&
+    return ((NRF_RADIO->CRCSTATUS == 1) &&
+            (psdu_len == (IEEE802154_FCF_LEN + 1)) &&
             ((rxbuf[1] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_ACK) &&
             txbuf[3] == ieee802154_get_seq(&rxbuf[1]));
 }
