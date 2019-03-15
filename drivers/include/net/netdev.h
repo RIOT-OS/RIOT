@@ -297,7 +297,11 @@ typedef struct netdev_driver {
      * @pre `(dev != NULL) && (iolist != NULL`
      *
      * @param[in] dev       Network device descriptor. Must not be NULL.
-     * @param[in] iolist    io vector list to send
+     * @param[in] iolist    IO vector list to send. Elements of this list may
+     *                      have iolist_t::iol_data == NULL or
+     *                      iolist_t::iol_size == 0. However, unless otherwise
+     *                      specified by the device, the *first* element
+     *                      must contain data.
      *
      * @return negative errno on error
      * @return number of bytes sent
