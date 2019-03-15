@@ -242,6 +242,14 @@ static void _send_ack(void)
     NRF_RADIO->TASKS_TXEN = 1;
 }
 
+static bool _ack_frame_filter(void)
+{
+    size_t psdu_len = rxbuf[0];
+    return ((psdu_len == (IEEE802154_FCF_LEN + 1)) &&
+            ((rxbuf[1] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_ACK) &&
+            txbuf[3] == ieee802154_get_seq(&rxbuf[1]));
+}
+
 static void _set_chan(uint16_t chan)
 {
     assert((chan >= IEEE802154_CHANNEL_MIN) && (chan <= IEEE802154_CHANNEL_MAX));
@@ -621,8 +629,7 @@ void isr_radio(void)
                 }
                 else if (_state == NRF802154_STATE_ACKWAIT) {
                     /* Check if this is the expected ACK frame */
-                    if (txbuf[3] == ieee802154_get_seq(&rxbuf[1]) &&
-                        ((rxbuf[1] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_ACK)) {
+                    if (_ack_frame_filter()) {
                         timer_stop(NRF802154_TIMER);
                         _state = NRF802154_STATE_TX;
                         _isr_tx_complete();
