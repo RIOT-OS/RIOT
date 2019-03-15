@@ -5,7 +5,12 @@ ifneq ("$(wildcard $(UNIFLASH_PATH)/dslite.sh)","")
   export FLASHER ?= $(UNIFLASH_PATH)/dslite.sh
   export FFLAGS  = --config $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml $(ELFFILE)
   # configure uniflash for resetting target
-  export RESET = $(UNIFLASH_PATH)/simplelink/gen2/bin/xds110reset
+  # xds110reset path changed in version UniFlash v4.4.0
+  # Try to detect the newest one and fallback to only 'xds110reset'
+  _XDS110RESET_4_0_4_3 ?= $(UNIFLASH_PATH)/simplelink/gen2/bin/xds110reset
+  _XDS110RESET ?= $(UNIFLASH_PATH)/simplelink/imagecreator/bin/xds110reset
+  XDS110RESET ?= $(firstword $(wildcard $(_XDS110RESET) $(_XDS110RESET_4_0_4_3)) xds110reset)
+  export RESET = $(XDS110RESET)
   export RESET_FLAGS
 else
   export FLASHER = $(UNIFLASH_PATH)/uniflash.sh
