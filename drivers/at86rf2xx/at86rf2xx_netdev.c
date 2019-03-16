@@ -106,7 +106,9 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
                   (unsigned)len + 2);
             return -EOVERFLOW;
         }
-        len = at86rf2xx_tx_load(dev, iol->iol_base, iol->iol_len, len);
+        if (iol->iol_len) {
+            len = at86rf2xx_tx_load(dev, iol->iol_base, iol->iol_len, len);
+        }
     }
 
     /* send data out directly if pre-loading id disabled */
