@@ -181,7 +181,11 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
                 isr_ctx[uart].data_mask = 0x7F;
                 break;
             case UART_DATA_BITS_8:
+#ifdef USART_CR1_M0
+                data_bits = USART_CR1_M0;
+#else
                 data_bits = USART_CR1_M;
+#endif
                 break;
             default:
                 return UART_NOMODE;
@@ -196,7 +200,6 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
         return UART_INTERR;
     }
     dev(uart)->CR1 &= ~(USART_CR1_UE | USART_CR1_TE);
-    dev(uart)->CR1 &= ~USART_CR1_M1;
 #endif
 
     dev(uart)->CR2 &= ~USART_CR2_STOP;
