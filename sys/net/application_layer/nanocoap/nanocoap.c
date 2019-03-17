@@ -146,6 +146,21 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     return 0;
 }
 
+int coap_match_path(const coap_resource_t *resource, uint8_t *uri)
+{
+    assert(resource && uri);
+    int res;
+
+    if (resource->methods & COAP_MATCH_SUBTREE) {
+        int len = strlen(resource->path);
+        res = strncmp((char *)uri, resource->path, len);
+    }
+    else {
+        res = strcmp((char *)uri, resource->path);
+    }
+    return res;
+}
+
 uint8_t *coap_find_option(const coap_pkt_t *pkt, unsigned opt_num)
 {
     const coap_optpos_t *optpos = pkt->options;
@@ -323,7 +338,7 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
             continue;
         }
 
-        int res = strcmp((char *)uri, resource->path);
+        int res = coap_match_path(resource, uri);
         if (res > 0) {
             continue;
         }
