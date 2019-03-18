@@ -17,7 +17,8 @@ export SLOT0_OFFSET SLOT0_LEN SLOT1_OFFSET SLOT1_LEN
 ifeq (1, RIOT_CI_BUILD)
   APP_VER ?= 0
 else
-  APP_VER ?= $(shell date +%s)
+  EPOCH := $(shell date +%s)
+  APP_VER ?= $(EPOCH)
 endif
 
 # Final target for slot 0 with riot_hdr
