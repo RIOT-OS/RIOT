@@ -13,6 +13,7 @@
 # JLINK_IF:         Interface used by JLink, default: "SWD"
 # JLINK_SPEED:      Interface clock speed to use (in kHz), default "2000"
 # FLASH_ADDR:       Starting address of the target's flash memory, default: "0"
+# IMAGE_OFFSET:     Offset from the targets flash memory, for flashing the image
 # JLINK_PRE_FLASH:  Additional JLink commands to execute before flashing
 # JLINK_POST_FLASH: Additional JLink commands to execute after flashing
 #
@@ -50,6 +51,9 @@
 #
 #
 # @author       Hauke Peteresen <hauke.petersen@fu-berlin.de>
+
+# Set IMAGE_OFFSET to zero by default.
+: ${IMAGE_OFFSET:=0}
 
 # default GDB port
 _GDB_PORT=3333
@@ -157,7 +161,9 @@ do_flash() {
     if [ ! -z "${JLINK_PRE_FLASH}" ]; then
         printf "${JLINK_PRE_FLASH}\n" >> ${BINDIR}/burn.seg
     fi
-    echo "loadbin ${BINFILE} ${FLASH_ADDR}" >> ${BINDIR}/burn.seg
+    # address to flash is hex formatted, as required by JLink
+    ADDR_TO_FLASH=$(printf "0x%08x\n" "$((${FLASH_ADDR} + ${IMAGE_OFFSET}))")
+    echo "loadbin ${BINFILE} ${ADDR_TO_FLASH}" >> ${BINDIR}/burn.seg
     if [ ! -z "${JLINK_POST_FLASH}" ]; then
         printf "${JLINK_POST_FLASH}\n" >> ${BINDIR}/burn.seg
     fi
@@ -258,7 +264,7 @@ shift # pop $1 from $@
 case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
-    echo "### Flashing at address ${FLASH_ADDR} ###"
+    echo "### Flashing at base address ${FLASH_ADDR} with offset ${IMAGE_OFFSET} ###"
     do_flash "$@"
     ;;
   debug)
