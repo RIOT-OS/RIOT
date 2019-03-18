@@ -282,7 +282,9 @@ struct _thread {
  * @def THREAD_PRIORITY_MAIN
  * @brief Priority of the main thread
  */
+#ifndef THREAD_PRIORITY_MAIN
 #define THREAD_PRIORITY_MAIN           (THREAD_PRIORITY_MIN - (SCHED_PRIO_LEVELS/2))
+#endif
 
 /**
  * @name Optional flags for controlling a threads initial state
