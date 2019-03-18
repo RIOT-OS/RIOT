@@ -60,6 +60,11 @@ int riotboot_slot_current(void)
     return -1;
 }
 
+int riotboot_slot_other(void)
+{
+    return riotboot_slot_current() ? 0 : 1;
+}
+
 void riotboot_slot_jump(unsigned slot)
 {
     _riotboot_slot_jump_to_image(riotboot_slot_get_hdr(slot));
