@@ -29,6 +29,8 @@
 
 #ifdef MODULE_XTIMER_ON_ZTIMER
 #include "ztimer.h"
+#elif defined(MODULE_XTIMER_ON_RTT)
+#include "periph/rtt.h"
 #else
 #include "periph/timer.h"
 #endif
@@ -52,12 +54,13 @@ extern volatile uint64_t _xtimer_current_time;
  */
 static inline uint32_t _xtimer_lltimer_now(void)
 {
-#ifndef MODULE_XTIMER_ON_ZTIMER
-    return timer_read(XTIMER_DEV);
-#else
+#if defined(MODULE_XTIMER_ON_ZTIMER)
     return ztimer_now(ZTIMER_USEC);
+#elif defined(MODULE_XTIMER_ON_RTT)
+    return rtt_get_counter();
+#else
+    return timer_read(XTIMER_DEV);
 #endif
-
 }
 
 /**

@@ -26,10 +26,12 @@
 #include <stdint.h>
 #include <string.h>
 
-#ifndef MODULE_XTIMER_ON_ZTIMER
+#if !defined(MODULE_XTIMER_ON_ZTIMER) && !defined(MODULE_XTIMER_ON_RTT)
 #include "board.h"
 #include "periph/timer.h"
 #include "periph_conf.h"
+#elif defined(MODULE_XTIMER_ON_RTT)
+#include "periph/rtt.h"
 #endif
 
 #include "assert.h"
@@ -56,20 +58,26 @@ static inline void _schedule_earliest_lltimer(uint32_t now);
 
 static void _timer_callback(void);
 
-#ifndef MODULE_XTIMER_ON_ZTIMER
-static void _periph_timer_callback(void *arg, int chan);
-#else
+#if defined(MODULE_XTIMER_ON_RTT)
+static void _lptim_callback(void *arg);
+#elif defined(MODULE_XTIMER_ON_ZTIMER)
 static void _ztimer_callback(void *arg);
 static ztimer_t _ztimer = { .callback=_ztimer_callback };
+#else
+static void _periph_timer_callback(void *arg, int chan);
 #endif
 
 void xtimer_init(void)
 {
 #ifndef MODULE_XTIMER_ON_ZTIMER
     /* initialize low-level timer */
+#ifndef MODULE_XTIMER_ON_RTT
     int ret = timer_init(XTIMER_DEV, XTIMER_HZ, _periph_timer_callback, NULL);
     (void)ret;
     assert(ret == 0);
+#else
+    rtt_init();
+#endif
 #endif
 
     /* register initial overflow tick */
@@ -122,17 +130,23 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
     irq_restore(state);
 }
 
-#ifndef MODULE_XTIMER_ON_ZTIMER
+#if defined(MODULE_XTIMER_ON_ZTIMER)
+static void _ztimer_callback(void *arg)
+{
+    (void)arg;
+    _timer_callback();
+}
+#elif defined(MODULE_XTIMER_ON_RTT)
+static void _lptim_callback(void *arg)
+{
+    (void)arg;
+    _timer_callback();
+}
+#else
 static void _periph_timer_callback(void *arg, int chan)
 {
     (void)arg;
     (void)chan;
-    _timer_callback();
-}
-#else
-static void _ztimer_callback(void *arg)
-{
-    (void)arg;
     _timer_callback();
 }
 #endif
@@ -164,10 +178,12 @@ static inline void _schedule_earliest_lltimer(uint32_t now)
     }
 
     DEBUG("_schedule_earliest_lltimer(): setting %" PRIu32 "\n", _xtimer_lltimer_mask(target));
-#ifndef MODULE_XTIMER_ON_ZTIMER
-    timer_set_absolute(XTIMER_DEV, XTIMER_CHAN, _xtimer_lltimer_mask(target));
-#else
+#if defined(MODULE_XTIMER_ON_ZTIMER)
     ztimer_set(ZTIMER_USEC, &_ztimer, target - ztimer_now(ZTIMER_USEC));
+#elif defined(MODULE_XTIMER_ON_RTT)
+    rtt_set_alarm(_xtimer_lltimer_mask(target), (rtt_cb_t)_lptim_callback, 0);
+#else
+    timer_set_absolute(XTIMER_DEV, XTIMER_CHAN, _xtimer_lltimer_mask(target));
 #endif
     _lltimer_ongoing = true;
 }
