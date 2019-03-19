@@ -530,63 +530,12 @@ void print_byte_hex(uint8_t byte)
     print(buf, sizeof(buf));
 }
 
-#if LESS_CODE_SIZE_BUT_HARD_TO_UNDERSTAND
 void print_byte_dec(uint8_t byte)
 {
-    char str[3] = {0};
-    uint8_t dec = 2;
-
-    str[2] = 0x30;
-    if (byte >= 200) {
-        str[0] = 0x32;
-        byte -= 200;
-    }
-    else if (byte >= 100) {
-        str[0] = 0x31;
-        byte -= 100;
-    }
-    else if (byte >= 10) {
-        dec = 1;
-    }
-    else {
-        dec = 0;
-    }
-    while(byte >= 10) {
-        str[dec - 1]++;
-        byte -= 10;
-    }
-    if (dec) {
-        str[dec - 1] |= str[2];
-    }
-    str[dec] = byte | 0x30;
-    print(str, dec + 1);
+    char buf[3]; /* "255" */
+    size_t len = fmt_u32_dec(buf, byte);
+    print(buf, len);
 }
-#else
-void print_byte_dec(uint8_t byte)
-{
-    char val = 0;
-    if (byte >= 200) {
-        print("2", 1);
-        byte -= 200;
-        val |= 0x30;
-    }
-    else if (byte >= 100) {
-        print("1", 1);
-        byte -= 100;
-        val |= 0x30;
-    }
-    while(byte >= 10) {
-        val++;
-        byte -= 10;
-    }
-    if (val) {
-        val |= 0x30;
-        print((char*)&val, 1);
-    }
-    byte |= 0x30;
-    print((char*)&byte, 1);
-}
-#endif
 
 void print_u32_hex(uint32_t val)
 {

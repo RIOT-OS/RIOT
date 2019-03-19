@@ -25,7 +25,10 @@
 int main(void)
 {
     print_str("If you can read this:\n");
+    for (int i = 0; i < 256; i++) {
+        print_byte_dec((uint8_t)i);
+        print_str("\n");
+    }
     print_str("Test successful.\n");
-
     return 0;
 }
