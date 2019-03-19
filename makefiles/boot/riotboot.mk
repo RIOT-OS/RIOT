@@ -22,8 +22,8 @@ else
 endif
 
 # Final target for slot 0 with riot_hdr
-SLOT0_RIOT_BIN = $(BINDIR_APP)-slot0.riot.bin
-SLOT1_RIOT_BIN = $(BINDIR_APP)-slot1.riot.bin
+SLOT0_RIOT_BIN = $(BINDIR_APP)-slot0.$(APP_VER).riot.bin
+SLOT1_RIOT_BIN = $(BINDIR_APP)-slot1.$(APP_VER).riot.bin
 SLOT_RIOT_BINS = $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 
 # if RIOTBOOT_SKIP_COMPILE is set to 1, "make riotboot/slot[01](-flash)"
@@ -54,7 +54,7 @@ link: $(SLOT_RIOT_ELFS)
 endif
 
 # Create binary target with RIOT header
-$(SLOT_RIOT_BINS): %.riot.bin: %.hdr %.bin
+$(SLOT_RIOT_BINS): %.$(APP_VER).riot.bin: %.hdr %.bin
 	@echo "creating $@..."
 	$(Q)cat $^ > $@
 
