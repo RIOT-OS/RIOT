@@ -811,59 +811,6 @@ static void test_pktbuf_start_write__pkt_users_2(void)
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
-static void test_pktbuf_get_iovec__1_elem(void)
-{
-    struct iovec *vec;
-    size_t len;
-    gnrc_pktsnip_t *snip = gnrc_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
-                                           GNRC_NETTYPE_UNDEF);
-    snip = gnrc_pktbuf_get_iovec(snip, &len);
-    vec = (struct iovec *)snip->data;
-
-    TEST_ASSERT_EQUAL_INT(sizeof(struct iovec), snip->size);
-    TEST_ASSERT_EQUAL_INT(1, len);
-    TEST_ASSERT(snip->next->data == vec[0].iov_base);
-    TEST_ASSERT_EQUAL_INT(snip->next->size, vec[0].iov_len);
-
-    gnrc_pktbuf_release(snip);
-    TEST_ASSERT(gnrc_pktbuf_is_empty());
-}
-
-static void test_pktbuf_get_iovec__3_elem(void)
-{
-    struct iovec *vec;
-    size_t len;
-    gnrc_pktsnip_t *snip = gnrc_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
-                                           GNRC_NETTYPE_UNDEF);
-    snip = gnrc_pktbuf_add(snip, TEST_STRING8, sizeof(TEST_STRING8), GNRC_NETTYPE_UNDEF);
-    snip = gnrc_pktbuf_add(snip, TEST_STRING4, sizeof(TEST_STRING4), GNRC_NETTYPE_UNDEF);
-    snip = gnrc_pktbuf_get_iovec(snip, &len);
-    vec = (struct iovec *)snip->data;
-
-    TEST_ASSERT_EQUAL_INT((sizeof(struct iovec) * 3), snip->size);
-    TEST_ASSERT_EQUAL_INT(3, len);
-    TEST_ASSERT(snip->next->data == vec[0].iov_base);
-    TEST_ASSERT(snip->next->next->data == vec[1].iov_base);
-    TEST_ASSERT(snip->next->next->next->data == vec[2].iov_base);
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING4), vec[0].iov_len);
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), vec[1].iov_len);
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING16), vec[2].iov_len);
-
-    gnrc_pktbuf_release(snip);
-    TEST_ASSERT(gnrc_pktbuf_is_empty());
-}
-
-static void test_pktbuf_get_iovec__null(void)
-{
-    gnrc_pktsnip_t *res;
-    size_t len;
-
-    res = gnrc_pktbuf_get_iovec(NULL, &len);
-
-    TEST_ASSERT(res == NULL);
-    TEST_ASSERT_EQUAL_INT(0, len);
-}
-
 static void test_pktbuf_reverse_snips__too_full(void)
 {
     gnrc_pktsnip_t *pkt, *pkt_next, *pkt_huge;
@@ -953,9 +900,6 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_start_write__NULL),
         new_TestFixture(test_pktbuf_start_write__pkt_users_1),
         new_TestFixture(test_pktbuf_start_write__pkt_users_2),
-        new_TestFixture(test_pktbuf_get_iovec__1_elem),
-        new_TestFixture(test_pktbuf_get_iovec__3_elem),
-        new_TestFixture(test_pktbuf_get_iovec__null),
         new_TestFixture(test_pktbuf_reverse_snips__too_full),
         new_TestFixture(test_pktbuf_reverse_snips__success),
     };
