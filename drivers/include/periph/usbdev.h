@@ -159,6 +159,16 @@ typedef enum {
     USBDEV_EVENT_SOF,
 
     /**
+     * @brief USB suspend condition active
+     */
+    USBDEV_EVENT_SUSPEND,
+
+    /**
+     * @brief USB suspend condition no longer active
+     */
+    USBDEV_EVENT_RESUME,
+
+    /**
      * @brief Transaction completed event.
      *
      * An endpoint must emit this event after a transaction with the host
