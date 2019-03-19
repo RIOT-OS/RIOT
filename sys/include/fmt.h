@@ -413,6 +413,13 @@ void print_u32_dec(uint32_t val);
 void print_s32_dec(int32_t val);
 
 /**
+ * @brief Print byte value as dec to stdout
+ *
+ * @param[in]  byte Byte value to print
+ */
+void print_byte_dec(const uint8_t byte);
+
+/**
  * @brief Print byte value as hex to stdout
  *
  * @param[in]  byte Byte value to print
