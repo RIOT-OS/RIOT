@@ -38,7 +38,9 @@
  *
  * Available values can be found in reference manual, PWR section, register CR.
  */
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
+#if defined(CPU_FAM_STM32F0)
+#define PM_STOP_CONFIG  (PWR_CR_LPDS)
+#elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 #define PM_STOP_CONFIG  (PWR_CR_LPSDSR | PWR_CR_ULP)
 #else
 #define PM_STOP_CONFIG  (PWR_CR_LPDS | PWR_CR_FPDS)
