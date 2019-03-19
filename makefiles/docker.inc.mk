@@ -1,4 +1,4 @@
-export DOCKER_IMAGE ?= riot/riotbuild:latest
+export DOCKER_IMAGE ?= riot/riotbuild
 export DOCKER_BUILD_ROOT ?= /data/riotbuild
 DOCKER_RIOTBASE ?= $(DOCKER_BUILD_ROOT)/riotbase
 export DOCKER_FLAGS ?= --rm
@@ -8,9 +8,11 @@ export DOCKER_MAKECMDGOALS_POSSIBLE = \
   buildtest-indocker \
   scan-build \
   scan-build-analyze \
+  term-% \
   tests-% \
   archive-check \
   #
+
 export DOCKER_MAKECMDGOALS = $(filter $(DOCKER_MAKECMDGOALS_POSSIBLE),$(MAKECMDGOALS))
 
 # Docker creates the files .dockerinit and .dockerenv in the root directory of
@@ -19,6 +21,15 @@ ifneq (,$(wildcard /.dockerinit /.dockerenv))
   export INSIDE_DOCKER := 1
 else
   export INSIDE_DOCKER := 0
+endif
+
+# Add interactive mode to use terminal
+# Add Plugdev and dialout group
+# Mount device
+ifneq (,$(filter term-%,$(DOCKER_MAKECMDGOALS)))
+  DOCKER_FLAGS += -i
+  DOCKER_FLAGS += --group-add plugdev --group-add dialout
+  DOCKER_DEVICE = --device=$(PORT)
 endif
 
 # Default target for building inside a Docker container if nothing was given
@@ -46,6 +57,7 @@ export DOCKER_ENV_VARS += \
   CXX \
   CXXEXFLAGS \
   CXXUWFLAGS \
+  DEBUG_ADAPTER_ID \
   ELFFILE \
   HEXFILE \
   FLASHFILE \
@@ -56,6 +68,7 @@ export DOCKER_ENV_VARS += \
   OBJCOPY \
   OFLAGS \
   PREFIX \
+  PROGRAMMER \
   QUIET \
   WERROR \
   PROGRAMMER \
@@ -275,11 +288,12 @@ DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),$(call docker_volume,$(GIT_WO
 # container.
 # The `flash`, `term`, `debugserver` etc. targets usually require access to
 # hardware which may not be reachable from inside the container.
+
 ..in-docker-container:
 	@$(COLOR_ECHO) '$(COLOR_GREEN)Launching build container using image "$(DOCKER_IMAGE)".$(COLOR_RESET)'
 	@# HACK: Handle directory creation here until it is provided globally
 	$(Q)mkdir -p $(BUILD_DIR)
-	$(DOCKER) run $(DOCKER_FLAGS) -t -u "$$(id -u)" \
+	$(DOCKER) run $(DOCKER_FLAGS) $(DOCKER_DEVICE) -t -u "$$(id -u)" \
 	    $(DOCKER_VOLUMES_AND_ENV) \
 	    $(DOCKER_ENVIRONMENT_CMDLINE) \
 	    -w '$(DOCKER_APPDIR)' \

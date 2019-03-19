@@ -410,7 +410,7 @@ include $(RIOTMAKE)/bindist.inc.mk
 include $(RIOTMAKE)/modules.inc.mk
 
 
-.PHONY: all link clean flash flash-only termdeps term doc debug debug-server reset objdump help info-modules
+.PHONY: all link clean flash flash-only termdeps term term-indocker doc debug debug-server reset objdump help info-modules
 .PHONY: print-size elffile binfile hexfile flashfile
 .PHONY: ..in-docker-container
 
@@ -474,6 +474,10 @@ ifeq ($(BUILDOSXNATIVE),1)
 else
   _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
 endif # BUILDOSXNATIVE
+
+ifeq ($(ALL_IN_DOCKER),1)
+  BUILD_IN_DOCKER = 1
+endif
 
 ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
@@ -616,9 +620,21 @@ preflash: $(BUILD_BEFORE_FLASH)
 
 termdeps: $(TERMDEPS)
 
-term: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
+term: $(filter flash flash-only, $(MAKECMDGOALS)) $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	$(TERMPROG) $(TERMFLAGS)
+
+# Define 'term-indocker' to run term in the container.
+ifeq ($(BUILD_IN_DOCKER),1)
+  term-indocker: ..in-docker-container
+else
+ifeq ($(INSIDE_DOCKER),1)
+  term-indocker: term
+else
+  term-indocker:
+	$(error $@ must be run with `BUILD_IN_DOCKER=1`)
+endif # INSIDE_DOCKER
+endif # BUILD_IN_DOCKER
 
 list-ttys:
 	$(Q)$(RIOTTOOLS)/usb-serial/list-ttys.sh
