@@ -217,12 +217,14 @@ static void cmd_rbm(enc28j60_t *dev, uint8_t *data, size_t len)
 
 static void cmd_wbm(enc28j60_t *dev, uint8_t *data, size_t len)
 {
-    /* start transaction */
-    spi_acquire(SPI_BUS, CS_PIN, SPI_MODE_0, SPI_CLK);
-    /* transfer data */
-    spi_transfer_regs(SPI_BUS, CS_PIN, CMD_WBM, data, NULL, len);
-    /* finish SPI transaction */
-    spi_release(SPI_BUS);
+    if (len) {
+        /* start transaction */
+        spi_acquire(SPI_BUS, CS_PIN, SPI_MODE_0, SPI_CLK);
+        /* transfer data */
+        spi_transfer_regs(SPI_BUS, CS_PIN, CMD_WBM, data, NULL, len);
+        /* finish SPI transaction */
+        spi_release(SPI_BUS);
+    }
 }
 
 static void mac_get(enc28j60_t *dev, uint8_t *mac)
