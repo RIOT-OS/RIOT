@@ -76,5 +76,8 @@ endif
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   SRC += sc_rtc.c
 endif
+ifneq (,$(filter test_helper,$(USEMODULE)))
+  SRC += sc_print_echo.c
+endif
 
 include $(RIOTBASE)/Makefile.base

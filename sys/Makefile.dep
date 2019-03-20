@@ -5,3 +5,10 @@ endif
 ifneq (,$(filter prng_fortuna,$(USEMODULE)))
   CFLAGS += -DCRYPTO_AES
 endif
+
+ifneq (,$(filter test_helper,$(USEMODULE)))
+  USEMODULE += app_metadata
+  USEMODULE += shell
+  USEMODULE += shell_commands
+  USEMODULE += fmt
+endif
