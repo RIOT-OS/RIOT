@@ -279,7 +279,7 @@ void test4(void)
     }
 
     uint64_str[fmt_u64_dec(uint64_str, elapsed)] = '\0';
-    if (elapsed < (exp - 100)) {
+    if (elapsed < exp) {
         printf("first: waited only %s usec => FAILED\n", uint64_str);
     }
     else if (elapsed > (exp + TEST4_TIMEOUT_EXCEEDED_MARGIN)) {
