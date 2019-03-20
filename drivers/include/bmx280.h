@@ -25,21 +25,33 @@
  *
  * ## Usage
  *
- * Add the following to your makefile:
+ * To include this driver to your application, simply add one of the following
+ * to the application's Makefile:
  *
  * ```make
- * # For BME280
- * USEMODULE += bme280
+ * # BME280 connected via SPI
+ * USEMODULE += bme280_spi
+ * # BME280 connected via I2C
+ * USEMODULE += bme280_i2c
+ * # BMP280 via SPI
+ * USEMODULE += bmp280_spi
+ * # BMP280 via I2C
+ * USEMODULE += bmp280_i2c
  *
  * # When using I2C, specify the default I2C device to use,
  * # and the BME280's address (see datasheet).
  * # The values below are the defaults:
  * CFLAGS += -DBMX280_PARAM_I2C_DEV=I2C_DEV\(0\)
  * CFLAGS += -DBMX280_PARAM_I2C_ADDR=0x77
+ *
+ * # Using SPI, you can override the default configuration by specifying the
+ * # used SPI bus and the ship select pin:
+ * CFLAGS += -DBMX280_PARAM_SPI_DEV=SPI_DEV\(x\)
+ * CFLAGS += -DBMX280_PARAM_CS=GPIO_PIN\(y,z\)
  * ```
  *
- * This allows initialisation with the default parameters in `BMX280_PARAMS_DEFAULT`
- * from `bmx280_params.h`.
+ * This way the default parameters in `drivers/bmx280/include/bmx280_params.h`
+ * are replaced by these new values.
  *
  * @{
  * @file
