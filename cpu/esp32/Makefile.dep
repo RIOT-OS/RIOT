@@ -77,7 +77,7 @@ ifneq (,$(filter ndn-riot,$(USEPKG)))
     USEMODULE += cipher_modes
 endif
 
-ifneq (,$(findstring posix,$(USEMODULE)))
+ifneq (,$(findstring posix_headers,$(USEMODULE)))
     USEMODULE += newlib_syscalls_default
 endif
 

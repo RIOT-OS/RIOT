@@ -2,9 +2,6 @@ ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/nhdp
 endif
 
-ifneq (,$(filter fib,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
-endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/gnrc/netif/include
 endif
@@ -14,15 +11,11 @@ ifneq (,$(filter gnrc_sock,$(USEMODULE)))
     CFLAGS += -DSOCK_HAS_IPV6
   endif
 endif
-ifneq (,$(filter posix,$(USEMODULE)))
+
+ifneq (,$(filter posix_headers,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
-ifneq (,$(filter posix_semaphore,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
-endif
-ifneq (,$(filter posix_sockets,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
-endif
+
 ifneq (,$(filter pthread,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/pthread/include
 endif
@@ -39,10 +32,6 @@ ifneq (,$(filter app_metadata,$(USEMODULE)))
   ifdef APP_SHELL_FMT
     CFLAGS += -DAPP_SHELL_FMT=\"$(APP_SHELL_FMT)\"
   endif
-endif
-
-ifneq (,$(filter vfs,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
 
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))

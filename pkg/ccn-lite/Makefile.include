@@ -2,6 +2,5 @@ INCLUDES += -I$(PKGDIRBASE)/ccn-lite/src/ccnl-riot/include
 INCLUDES += -I$(PKGDIRBASE)/ccn-lite/src/ccnl-core/include
 INCLUDES += -I$(PKGDIRBASE)/ccn-lite/src/ccnl-pkt/include
 INCLUDES += -I$(PKGDIRBASE)/ccn-lite/src/ccnl-fwd/include
-INCLUDES += -I$(RIOTBASE)/sys/posix/include
 
 CFLAGS += -DCCNL_RIOT

@@ -8,7 +8,7 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-nano \
 
 BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6
 
-USEMODULE += posix
+USEMODULE += posix_headers
 USEMODULE += pthread
 USEMODULE += xtimer
 

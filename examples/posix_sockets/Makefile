@@ -26,6 +26,7 @@ USEMODULE += gnrc_udp
 USEMODULE += gnrc_sock_udp
 USEMODULE += posix_sockets
 USEMODULE += posix_time
+USEMODULE += posix_inet
 # Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_commands
