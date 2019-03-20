@@ -94,7 +94,7 @@ BaseType_t xSemaphoreTake (SemaphoreHandle_t xSemaphore,
         case queueQUEUE_TYPE_MUTEX:
         {
             if (xTicksToWait == 0) {
-                return (mutex_trylock(mutex) == 0) ? pdTRUE : pdFALSE;
+                return (mutex_trylock(mutex) == 1) ? pdTRUE : pdFALSE;
             }
             else {
                 mutex_lock(mutex);
