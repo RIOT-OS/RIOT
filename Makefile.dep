@@ -397,6 +397,9 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   ifeq (,$(filter newlib_stubs_rw stdio_rtt,$(USEMODULE)))
     USEMODULE += stdio_uart
   endif
+  ifeq (,$(filter vfs newlib_syscalls_riot_vfs,$(USEMODULE)))
+      USEMODULE += newlib_stubs_fs
+  endif
 endif
 
 ifneq (,$(filter newlib_syscalls_riot_serial_rw,$(USEMODULE)))
