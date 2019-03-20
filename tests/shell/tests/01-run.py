@@ -15,10 +15,10 @@ EXPECTED_HELP = (
     '---------------------------------------',
     'start_test           starts a test',
     'end_test             ends a test',
-    'echo                 prints the input command',
     'reboot               Reboot the node',
     'ps                   Prints information about running threads.',
-    'app_metadata         Returns application metadata'
+    'app_metadata         Returns application metadata',
+    'print_echo           Echos input data'
 )
 
 EXPECTED_PS = (
@@ -36,7 +36,7 @@ CMDS = {
          '123456789012345678901234567890123456789012345678901234567890'),
     'unknown_command': ('shell: command not found: unknown_command'),
     'help': EXPECTED_HELP,
-    'echo a string': ('\"echo\"\"a\"\"string\"'),
+    'print_echo a string': ('a string'),
     'ps': EXPECTED_PS,
     'reboot': ('test_shell.')
 }

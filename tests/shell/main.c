@@ -20,9 +20,11 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "shell_commands.h"
 #include "shell.h"
+#include "test_helper.h"
 
 static int print_teststart(int argc, char **argv)
 {
@@ -42,28 +44,15 @@ static int print_testend(int argc, char **argv)
     return 0;
 }
 
-static int print_echo(int argc, char **argv)
-{
-    for (int i = 0; i < argc; ++i) {
-        printf("\"%s\"", argv[i]);
-    }
-    puts("");
-
-    return 0;
-}
-
 static const shell_command_t shell_commands[] = {
     { "start_test", "starts a test", print_teststart },
     { "end_test", "ends a test", print_testend },
-    { "echo", "prints the input command", print_echo },
     { NULL, NULL, NULL }
 };
 
 int main(void)
 {
-
     printf("test_shell.\n");
-
 
     /* define buffer to be used by the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];

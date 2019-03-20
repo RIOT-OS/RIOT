@@ -1,10 +1,8 @@
 DEVELHELP=0
 include ../Makefile.tests_common
 
-USEMODULE += app_metadata
-USEMODULE += shell
-USEMODULE += shell_commands
 USEMODULE += ps
+USEMODULE += test_helper
 
 DISABLE_MODULE += auto_init
 
