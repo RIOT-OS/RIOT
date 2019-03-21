@@ -15,4 +15,8 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# Disable support for multi-tasking, which is not needed for this trivial
+# application
+DISABLE_MODULE += multi_tasking core_msg
+
 include $(RIOTBASE)/Makefile.include
