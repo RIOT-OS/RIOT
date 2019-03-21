@@ -42,6 +42,7 @@ PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
 PSEUDOMODULES += lora
 PSEUDOMODULES += mpu_stack_guard
+PSEUDOMODULES += multi_tasking
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += netdev_default
 PSEUDOMODULES += netif

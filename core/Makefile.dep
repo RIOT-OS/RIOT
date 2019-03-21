@@ -1,0 +1,29 @@
+MODS_MULTI_TASKING += core_cond
+MODS_MULTI_TASKING += core_kernel_init
+MODS_MULTI_TASKING += core_mutex
+MODS_MULTI_TASKING += core_rmutex
+MODS_MULTI_TASKING += core_sched
+MODS_MULTI_TASKING += core_thread
+
+MODS_REQUIRE_MT += core_mbox
+MODS_REQUIRE_MT += core_msg
+MODS_REQUIRE_MT += core_thread_flags
+
+MODS_SINGLE_TASKING += core_st_kernel_init
+MODS_SINGLE_TASKING += core_st_mutex
+MODS_SINGLE_TASKING += core_st_sched
+MODS_SINGLE_TASKING += core_st_thread
+
+# Any of these modules requires multi-tasking support
+ifneq (,$(filter $(MODS_MULTI_TASKING) $(MODS_REQUIRE_MT),$(USEMODULE)))
+  USEMODULE += multi_tasking
+endif
+
+ifeq (,$(filter multi_tasking,$(USEMODULE)))
+  USEMODULE += $(MODS_SINGLE_TASKING)
+else
+  ifneq (,$(filter $(MODS_SINGLE_TASKING),$(USEMODULE)))
+    $(error Multi-tasking both enabled and disabled!)
+  endif
+  USEMODULE += $(MODS_MULTI_TASKING)
+endif

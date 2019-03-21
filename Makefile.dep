@@ -9,7 +9,8 @@ OLD_USEPKG := $(sort $(USEPKG))
 # processed before RIOT ones to be evaluated before the 'default' rules.
 -include $(EXTERNAL_MODULE_DIRS:%=%/Makefile.dep)
 
-# pull dependencies from sys and drivers
+# pull dependencies from core, sys and drivers
+include $(RIOTBASE)/core/Makefile.dep
 include $(RIOTBASE)/sys/Makefile.dep
 include $(RIOTBASE)/drivers/Makefile.dep
 
@@ -529,6 +530,7 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc,$(USEMODULE)))
+  USEMODULE += multi_tasking
   USEMODULE += gnrc_netapi
   USEMODULE += gnrc_netreg
   USEMODULE += gnrc_netif

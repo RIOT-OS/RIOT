@@ -23,6 +23,7 @@
 #define MUTEX_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 #include "list.h"
 
@@ -33,6 +34,7 @@
 /**
  * @brief Mutex structure. Must never be modified by the user.
  */
+#if defined(MODULE_MULTI_TASKING) || defined(DOXYGEN)
 typedef struct {
     /**
      * @brief   The process waiting queue of the mutex. **Must never be changed
@@ -41,24 +43,38 @@ typedef struct {
      */
     list_node_t queue;
 } mutex_t;
+#else
+typedef uint8_t mutex_t;
+#endif
+
 
 /**
  * @brief Static initializer for mutex_t.
  * @details This initializer is preferable to mutex_init().
  */
+#if defined(MODULE_MULTI_TASKING) || defined(DOXYGEN)
 #define MUTEX_INIT { { NULL } }
+#else
+#define MUTEX_INIT 0
+#endif
 
 /**
  * @brief Static initializer for mutex_t with a locked mutex
  */
+#if defined(MODULE_MULTI_TASKING) || defined(DOXYGEN)
 #define MUTEX_INIT_LOCKED { { MUTEX_LOCKED } }
+#else
+#define MUTEX_INIT_LOCKED 1
+#endif
 
 /**
  * @cond INTERNAL
  * @brief This is the value of the mutex when locked and no threads are waiting
  *        for it
  */
+#if defined(MODULE_MULTI_TASKING) || defined(DOXYGEN)
 #define MUTEX_LOCKED ((list_node_t *)-1)
+#endif
 /**
  * @endcond
  */
@@ -69,10 +85,17 @@ typedef struct {
  *          Only use the function call for dynamically allocated mutexes.
  * @param[out] mutex    pre-allocated mutex structure, must not be NULL.
  */
+#if defined(MODULE_MULTI_TASKING) || defined(DOXYGEN)
 static inline void mutex_init(mutex_t *mutex)
 {
     mutex->queue.next = NULL;
 }
+#else
+static inline void mutex_init(mutex_t *mutex)
+{
+    *mutex = MUTEX_INIT;
+}
+#endif
 
 /**
  * @brief Lock a mutex, blocking or non-blocking.
