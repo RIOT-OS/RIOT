@@ -55,7 +55,6 @@ void *thread_isr_stack_start(void)
 
 NORETURN void cpu_switch_context_exit(void)
 {
-    sched_active_thread = sched_threads[0];
     sched_run();
 
     __restore_context();
