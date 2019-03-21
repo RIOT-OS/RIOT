@@ -43,7 +43,8 @@
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
 #define PM_STOP_CONFIG  (PWR_CR_LPDS)
 #elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
-#define PM_STOP_CONFIG  (PWR_CR_LPSDSR | PWR_CR_ULP)
+/* Enable ultra low-power and clear wakeup flags */
+#define PM_STOP_CONFIG  (PWR_CR_LPSDSR | PWR_CR_ULP | PWR_CR_CWUF)
 #elif defined(CPU_FAM_STM32L4)
 #define PM_STOP_CONFIG  (PWR_CR1_LPMS_STOP1)
 #elif defined(CPU_FAM_STM32F7)
