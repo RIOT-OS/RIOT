@@ -52,12 +52,15 @@ struct uart_hw_t {
     uart_dev_t* regs;       /* pointer to register data struct of the UART device */
     uint8_t  pin_txd;       /* TxD pin */
     uint8_t  pin_rxd;       /* RxD pin */
+    bool     used;          /* indicates whether UART is used */
+    uint32_t baudrate;      /* used baudrate */
+    uart_data_bits_t data;  /* used data bits */
+    uart_stop_bits_t stop;  /* used stop bits */
+    uart_parity_t  parity;  /* used parity bits */
+    uart_isr_ctx_t isr_ctx; /* callback functions */
     uint8_t  signal_txd;    /* TxD signal from the controller */
     uint8_t  signal_rxd;    /* RxD signal to the controller */
-    uint32_t baudrate;      /* used baudrate */
-    bool     used;          /* indicates whether UART is used */
     uint8_t  int_src;       /* peripheral interrupt source used by the UART device */
-    uart_isr_ctx_t isr_ctx; /* callback functions */
 };
 
 /* hardware ressources */
