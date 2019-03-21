@@ -34,7 +34,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "cpu_conf.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/neterr.h"
 #include "net/gnrc/nettype.h"
