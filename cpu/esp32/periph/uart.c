@@ -69,20 +69,26 @@ static struct uart_hw_t _uarts[] = {
         .regs = &UART0,
         .pin_txd = GPIO1,
         .pin_rxd = GPIO3,
+        .used = false,
+        .baudrate = STDIO_UART_BAUDRATE,
+        .data = UART_DATA_BITS_8,
+        .stop = UART_STOP_BITS_1,
+        .parity = UART_PARITY_NONE,
         .signal_txd = U0TXD_OUT_IDX,
         .signal_rxd = U0RXD_IN_IDX,
-        .baudrate = STDIO_UART_BAUDRATE,
-        .used = false,
         .int_src = ETS_UART0_INTR_SOURCE
     },
     #if defined(UART1_TXD) && defined(UART1_RXD)
     {   .regs = &UART1,
         .pin_txd = UART1_TXD,
         .pin_rxd = UART1_RXD,
+        .used = false,
+        .baudrate = STDIO_UART_BAUDRATE,
+        .data = UART_DATA_BITS_8,
+        .stop = UART_STOP_BITS_1,
+        .parity = UART_PARITY_NONE,
         .signal_txd = U1TXD_OUT_IDX,
         .signal_rxd = U1RXD_IN_IDX,
-        .baudrate = STDIO_UART_BAUDRATE,
-        .used = false,
         .int_src = ETS_UART1_INTR_SOURCE
     },
     #endif
@@ -90,10 +96,13 @@ static struct uart_hw_t _uarts[] = {
     {   .regs = &UART2,
         .pin_txd = UART2_TXD,
         .pin_rxd = UART2_RXD,
+        .used = false,
+        .baudrate = STDIO_UART_BAUDRATE,
+        .data = UART_DATA_BITS_8,
+        .stop = UART_STOP_BITS_1,
+        .parity = UART_PARITY_NONE,
         .signal_txd = U2TXD_OUT_IDX,
         .signal_rxd = U2RXD_IN_IDX,
-        .baudrate = STDIO_UART_BAUDRATE,
-        .used = false,
         .int_src = ETS_UART2_INTR_SOURCE
     }
     #endif
