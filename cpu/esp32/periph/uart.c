@@ -200,6 +200,23 @@ void uart_poweroff (uart_t uart)
     }
 }
 
+/* systemwide UART initializations */
+void uart_system_init (void)
+{
+    for (unsigned uart = 0; uart < UART_NUMOF; uart++) {
+        /* reset all UART interrupt status registers */
+        _uarts[uart].regs->int_clr.val = ~0;
+    }
+}
+
+void uart_print_config(void)
+{
+    for (unsigned uart = 0; uart < UART_NUMOF; uart++) {
+        ets_printf("\tUART_DEV(%d)\ttxd=%d rxd=%d\n", uart,
+                   _uarts[uart].pin_txd, _uarts[uart].pin_rxd);
+    }
+}
+
 void IRAM _uart_intr_handler (void *arg)
 {
     /* to satisfy the compiler */
@@ -298,23 +315,6 @@ static void _uart_config (uart_t uart)
         /* we have to enable therefore the CPU interrupt here */
         xt_set_interrupt_handler(CPU_INUM_UART, _uart_intr_handler, NULL);
         xt_ints_on(BIT(CPU_INUM_UART));
-    }
-}
-
-/* systemwide UART initializations */
-void uart_system_init (void)
-{
-    for (unsigned uart = 0; uart < UART_NUMOF; uart++) {
-        /* reset all UART interrupt status registers */
-        _uarts[uart].regs->int_clr.val = ~0;
-    }
-}
-
-void uart_print_config(void)
-{
-    for (unsigned uart = 0; uart < UART_NUMOF; uart++) {
-        ets_printf("\tUART_DEV(%d)\ttxd=%d rxd=%d\n", uart,
-                   _uarts[uart].pin_txd, _uarts[uart].pin_rxd);
     }
 }
 
