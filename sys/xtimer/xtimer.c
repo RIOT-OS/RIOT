@@ -139,6 +139,7 @@ out:
     *last_wakeup = target;
 }
 
+#ifdef MODULE_CORE_MSG
 static void _callback_msg(void* arg)
 {
     msg_t *msg = (msg_t*)arg;
@@ -164,35 +165,6 @@ void _xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_
 {
     _setup_msg(timer, msg, target_pid);
     _xtimer_set64(timer, offset, offset >> 32);
-}
-
-static void _callback_wakeup(void* arg)
-{
-    thread_wakeup((kernel_pid_t)((intptr_t)arg));
-}
-
-void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
-{
-    timer->callback = _callback_wakeup;
-    timer->arg = (void*) ((intptr_t)pid);
-
-    _xtimer_set(timer, offset);
-}
-
-void _xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
-{
-    timer->callback = _callback_wakeup;
-    timer->arg = (void*) ((intptr_t)pid);
-
-    _xtimer_set64(timer, offset, offset >> 32);
-}
-
-void xtimer_now_timex(timex_t *out)
-{
-    uint64_t now = xtimer_usec_from_ticks64(xtimer_now64());
-
-    out->seconds = div_u64_by_1000000(now);
-    out->microseconds = now - (out->seconds * US_PER_SEC);
 }
 
 /* Prepares the message to trigger the timeout.
@@ -235,6 +207,36 @@ int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout_ticks)
     _setup_timer_msg(&tmsg, &t);
     _xtimer_set_msg(&t, timeout_ticks, &tmsg, sched_active_pid);
     return _msg_wait(msg, &tmsg, &t);
+}
+#endif /* MODULE_CORE_MSG */
+
+static void _callback_wakeup(void* arg)
+{
+    thread_wakeup((kernel_pid_t)((intptr_t)arg));
+}
+
+void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
+{
+    timer->callback = _callback_wakeup;
+    timer->arg = (void*) ((intptr_t)pid);
+
+    _xtimer_set(timer, offset);
+}
+
+void _xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
+{
+    timer->callback = _callback_wakeup;
+    timer->arg = (void*) ((intptr_t)pid);
+
+    _xtimer_set64(timer, offset, offset >> 32);
+}
+
+void xtimer_now_timex(timex_t *out)
+{
+    uint64_t now = xtimer_usec_from_ticks64(xtimer_now64());
+
+    out->seconds = div_u64_by_1000000(now);
+    out->microseconds = now - (out->seconds * US_PER_SEC);
 }
 
 static void _mutex_timeout(void *arg)
