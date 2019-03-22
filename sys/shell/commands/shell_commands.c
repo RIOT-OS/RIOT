@@ -145,6 +145,10 @@ extern int _cord_ep_handler(int argc, char **argv);
 extern int _app_metadata_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_I2C_SCAN
+extern int _i2c_scan(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -237,6 +241,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_APP_METADATA
     {"app_metadata", "Returns application metadata", _app_metadata_handler },
+#endif
+#ifdef MODULE_I2C_SCAN
+    { "i2c_scan", "Performs an I2C bus scan", _i2c_scan },
 #endif
     {NULL, NULL, NULL}
 };
