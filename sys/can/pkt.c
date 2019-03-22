@@ -69,21 +69,21 @@ static can_pkt_t *_pkt_alloc(int ifnum, const struct can_frame *frame)
     return pkt;
 }
 
-static void _init_pkt(can_pkt_t *pkt, int tx)
+static void _init_rx_pkt(can_pkt_t *pkt)
 {
-    if (tx) {
-        mutex_lock(&_mutex);
-        pkt->handle = handle++;
-        if (handle == INT_MAX) {
-            handle = 1;
-        }
-        pkt->entry.next = NULL;
-        mutex_unlock(&_mutex);
+    pkt->handle = 0;
+    atomic_store(&pkt->ref_count, 0);
+}
+
+static void _init_tx_pkt(can_pkt_t *pkt)
+{
+    mutex_lock(&_mutex);
+    pkt->handle = handle++;
+    if (handle == INT_MAX) {
+        handle = 1;
     }
-    else {
-        pkt->handle = 0;
-        atomic_store(&pkt->ref_count, 0);
-    }
+    pkt->entry.next = NULL;
+    mutex_unlock(&_mutex);
 }
 
 can_pkt_t *can_pkt_alloc_tx(int ifnum, const struct can_frame *frame, kernel_pid_t tx_pid)
@@ -94,7 +94,7 @@ can_pkt_t *can_pkt_alloc_tx(int ifnum, const struct can_frame *frame, kernel_pid
         return NULL;
     }
 
-    _init_pkt(pkt, 1);
+    _init_tx_pkt(pkt);
     pkt->entry.target.pid = tx_pid;
 #ifdef MODULE_CAN_MBOX
     pkt->entry.type = CAN_TYPE_DEFAULT;
@@ -111,7 +111,7 @@ can_pkt_t *can_pkt_alloc_rx(int ifnum, const struct can_frame *frame)
         return NULL;
     }
 
-    _init_pkt(pkt, 0);
+    _init_rx_pkt(pkt);
 
     return pkt;
 }
@@ -125,7 +125,7 @@ can_pkt_t *can_pkt_alloc_mbox_tx(int ifnum, const struct can_frame *frame, mbox_
         return NULL;
     }
 
-    _init_pkt(pkt, 1);
+    _init_tx_pkt(pkt);
     pkt->entry.target.mbox = tx_mbox;
     pkt->entry.type = CAN_TYPE_MBOX;
 
@@ -135,9 +135,7 @@ can_pkt_t *can_pkt_alloc_mbox_tx(int ifnum, const struct can_frame *frame, mbox_
 
 void can_pkt_free(can_pkt_t *pkt)
 {
-    if (!pkt) {
-        return;
-    }
+    assert(pkt);
 
     DEBUG("can_pkt_free: free pkt=%p\n", (void*)pkt);
 
@@ -172,6 +170,8 @@ void can_pkt_free_rx_data(can_rx_data_t *data)
     if (!data) {
         return;
     }
+
+    DEBUG("can_pkt_free_rx_data: rx=%p\n", (void *)data);
 
     mutex_lock(&_mutex);
     memarray_free(&_pkt_array, data);
