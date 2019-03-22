@@ -18,6 +18,9 @@
  * @}
  */
 
+#include <reent.h>
+#include <errno.h>
+#include <sys/time.h>
 #include <time.h>
 
 #include "periph/rtc.h"
@@ -37,6 +40,7 @@
  *                  deprecated and must be set to null in new code.
  *
  * @return  Number of seconds since 1970-01-01 00:00:00 +0000 (UTC).
+ *          On error, return -1, cast to time_t.
  */
 time_t time(time_t *tloc)
 {
@@ -53,4 +57,40 @@ time_t time(time_t *tloc)
         *tloc = r;
 
     return r;
+}
+
+/**
+ * Current time in seconds since epoch.
+ *
+ * This call is provided so gettimeofday() works. This is because some code
+ * in pkg claims to be written in C99, yet uses some POSIX functions.
+ *
+ * Note that according to POSIX:
+ * "The gettimeofday() function shall return 0 and no value shall be reserved
+ * to indicate an error."
+ *
+ * @param[out]  r    Reentrant structure.
+ * @param[out]  tp   Wall time. Because of limitations of the RIOT RTC, the
+ *                   tv_usec component will always be zero.
+ * @param  tpz       Timezone. MUST be NULL. If it is not, EINVAL will result.
+ *
+ * @return  0 on success, -1 on failure. The only failure is if tpz is not
+ *          null.
+ */
+int _gettimeofday_r(struct _reent *r, struct timeval *restrict tp,
+                    void *restrict tzp)
+{
+    if (tzp) {
+        r->_errno = EINVAL;
+        return -1;
+    }
+
+    /* The linux docs seem to imply that it is not an error if tp is null, so
+     * let's do the same for compatibility .*/
+    if (tp) {
+        tp->tv_sec = time(NULL);
+        tp->tv_usec = 0;
+    }
+
+    return 0;
 }
