@@ -13,12 +13,83 @@ OLD_USEPKG := $(sort $(USEPKG))
 include $(RIOTBASE)/sys/Makefile.dep
 include $(RIOTBASE)/drivers/Makefile.dep
 
-ifneq (,$(filter ndn-riot,$(USEPKG)))
-  USEMODULE += gnrc
+ifneq (,$(filter arduino,$(USEMODULE)))
+  FEATURES_REQUIRED += arduino
   USEMODULE += xtimer
+endif
+
+ifneq (,$(filter asymcute,$(USEMODULE)))
+  USEMODULE += sock_udp
+  USEMODULE += sock_util
   USEMODULE += random
-  USEMODULE += hashes
-  USEPKG += micro-ecc
+  USEMODULE += event_timeout
+  USEMODULE += event_callback
+endif
+
+ifneq (,$(filter benchmark,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter can,$(USEMODULE)))
+  USEMODULE += can_raw
+  USEMODULE += auto_init_can
+  ifneq (,$(filter can_mbox,$(USEMODULE)))
+    USEMODULE += core_mbox
+  endif
+  USEMODULE += gnrc_pktbuf_static
+endif
+
+ifneq (,$(filter can_isotp,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter can_linux,$(USEMODULE)))
+  LINKFLAGS += -lsocketcan
+endif
+
+ifneq (,$(filter conn_can,$(USEMODULE)))
+  USEMODULE += can
+  USEMODULE += can_mbox
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter constfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
+ifneq (,$(filter cord_common,$(USEMODULE)))
+  USEMODULE += fmt
+  USEMODULE += luid
+endif
+
+ifneq (,$(filter cord_ep,$(USEMODULE)))
+  USEMODULE += cord_common
+  USEMODULE += core_thread_flags
+  USEMODULE += gcoap
+  ifneq (,$(filter shell_commands,$(USEMODULE)))
+    USEMODULE += sock_util
+  endif
+endif
+
+ifneq (,$(filter cord_ep_standalone,$(USEMODULE)))
+  USEMODULE += cord_ep
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter cord_epsim,$(USEMODULE)))
+  USEMODULE += cord_common
+  USEMODULE += gcoap
+endif
+
+ifneq (,$(filter cord_epsim_standalone,$(USEMODULE)))
+  USEMODULE += cord_epsim
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter cpp11-compat,$(USEMODULE)))
+  USEMODULE += xtimer
+  USEMODULE += timex
+  FEATURES_REQUIRED += cpp
 endif
 
 ifneq (,$(filter csma_sender,$(USEMODULE)))
@@ -26,10 +97,63 @@ ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter gnrc_mac,$(USEMODULE)))
-  USEMODULE += gnrc_priority_pktqueue
-  USEMODULE += csma_sender
-  USEMODULE += evtimer
+ifneq (,$(filter devfs,$(USEMODULE)))
+  USEMODULE += vfs
+endif
+
+ifneq (,$(filter ecc_%,$(USEMODULE)))
+  USEMODULE += ecc
+endif
+
+ifneq (,$(filter emcute,$(USEMODULE)))
+  USEMODULE += core_thread_flags
+  USEMODULE += sock_udp
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter event,$(USEMODULE)))
+  USEMODULE += core_thread_flags
+endif
+
+ifneq (,$(filter event_%,$(USEMODULE)))
+  USEMODULE += event
+endif
+
+ifneq (,$(filter event_timeout,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter evtimer,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
+  USEPKG += fatfs
+  USEMODULE += vfs
+endif
+
+ifneq (,$(filter fib,$(USEMODULE)))
+  USEMODULE += universal_address
+  USEMODULE += xtimer
+  USEMODULE += posix_headers
+endif
+
+ifneq (,$(filter gcoap,$(USEMODULE)))
+  USEMODULE += nanocoap
+  USEMODULE += gnrc_sock_udp
+  USEMODULE += sock_util
+endif
+
+ifneq (,$(filter gnrc,$(USEMODULE)))
+  USEMODULE += gnrc_netapi
+  USEMODULE += gnrc_netreg
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_netif_hdr
+  USEMODULE += gnrc_pktbuf
+endif
+
+ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
+  USEMODULE += gnrc
 endif
 
 ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
@@ -40,15 +164,111 @@ ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
 
-ifneq (,$(filter nhdp,$(USEMODULE)))
-  USEMODULE += sock_udp
-  USEMODULE += xtimer
-  USEMODULE += oonf_rfc5444
+ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
+  USEMODULE += inet_csum
+  USEMODULE += gnrc_ipv6
+  USEMODULE += icmpv6
 endif
 
-ifneq (,$(filter sntp,$(USEMODULE)))
-  USEMODULE += gnrc_sock_udp
-  USEMODULE += xtimer
+ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
+endif
+
+ifneq (,$(filter gnrc_icmpv6_error,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
+endif
+
+ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
+  USEMODULE += inet_csum
+  USEMODULE += ipv6_addr
+  USEMODULE += gnrc_ipv6_hdr
+  USEMODULE += gnrc_ipv6_nib
+  USEMODULE += gnrc_netif
+endif
+
+ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
+  USEMODULE += ipv6_addr
+endif
+
+ifneq (,$(filter gnrc_ipv6_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_icmpv6
+endif
+
+ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
+endif
+
+ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_ext
+endif
+
+ifneq (,$(filter gnrc_ipv6_hdr,$(USEMODULE)))
+  USEMODULE += ipv6_hdr
+  USEMODULE += gnrc_pktbuf
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
+  USEMODULE += evtimer
+  USEMODULE += gnrc_ndp
+  USEMODULE += gnrc_netif
+  USEMODULE += ipv6_addr
+  USEMODULE += random
+  ifneq (,$(filter sock_dns,$(USEMODULE)))
+    USEMODULE += gnrc_ipv6_nib_dns
+  endif
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_6ln,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib
+  USEMODULE += gnrc_sixlowpan_nd
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_6lbr,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_6lr
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_6lr,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_6ln
+  USEMODULE += gnrc_ipv6_nib_router
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_dns,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_router,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib
+endif
+
+ifneq (,$(filter gnrc_ipv6_router,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_ipv6_nib_router
+endif
+
+ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_router
+  USEMODULE += gnrc_icmpv6
+endif
+
+ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
+  USEMODULE += ipv6_addr
+endif
+
+ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_mac
+  FEATURES_REQUIRED += periph_rtt
+endif
+
+ifneq (,$(filter gnrc_mac,$(USEMODULE)))
+  USEMODULE += gnrc_priority_pktqueue
+  USEMODULE += csma_sender
+  USEMODULE += evtimer
+endif
+
+ifneq (,$(filter gnrc_netapi_mbox,$(USEMODULE)))
+  USEMODULE += core_mbox
 endif
 
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
@@ -56,41 +276,121 @@ ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += gnrc_netif
 endif
 
-ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
-  USEMODULE += ieee802154
-  USEMODULE += random
-endif
-
-ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
-  USEMODULE += uhcpc
-  USEMODULE += gnrc_sock_udp
+ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+  USEMODULE += netif
   USEMODULE += fmt
-endif
-
-ifneq (,$(filter uhcpc,$(USEMODULE)))
-  USEMODULE += posix_inet
-endif
-
-ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
-  USEMODULE += softdevice_handler
-  USEMODULE += ble_common
-  USEMODULE += ble_6lowpan
-  USEMODULE += gnrc_sixlowpan
-  USEMODULE += gnrc_sixlowpan_iphc
-  USEMODULE += gnrc_ipv6_nib_6ln
-  USEMODULE += gnrc_ipv6_default
-  # prevent application from being a router
-  # TODO: maybe find a nicer solution in future build system update
-  _ROUTER_MODULES = gnrc_ipv6_router% gnrc_rpl netstats_rpl auto_init_gnrc_rpl
-  ifneq (,$(filter $(_ROUTER_MODULES),$(USEMODULE)))
-    $(warning nordic_softdevice_ble: Disabling router modules:\
-      $(filter $(_ROUTER_MODULES),$(USEMODULE)))
+  ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
+    USEMODULE += gnrc_netif_ieee802154
   endif
-  USEMODULE := $(filter-out $(_ROUTER_MODULES),$(USEMODULE))
+  ifneq (,$(filter netdev_eth,$(USEMODULE)))
+    USEMODULE += gnrc_netif_ethernet
+  endif
 endif
 
-ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
-  USEMODULE += gnrc
+ifneq (,$(filter gnrc_netif_%,$(USEMODULE)))
+  USEMODULE += gnrc_netif
+endif
+
+ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
+  USEMODULE += gnrc_netapi
+  USEMODULE += gnrc_netreg
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_pktbuf
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_netif
+endif
+
+ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
+  ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+    USEMODULE += gnrc_pktbuf_static
+  endif
+  ifeq (gnrc_pktbuf_cmd,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+    USEMODULE += gnrc_pktbuf_static
+  endif
+  USEMODULE += gnrc_pkt
+endif
+
+ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+  USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
+endif
+
+ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
+  USEMODULE += gnrc_pktbuf
+  USEMODULE += od
+endif
+
+ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ipv6_nib
+  USEMODULE += trickle
+  USEMODULE += xtimer
+  USEMODULE += evtimer
+endif
+
+ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
+  USEMODULE += gnrc_rpl
+endif
+
+ifneq (,$(filter gnrc_rpl_srh,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_ext_rh
+endif
+
+ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
+  USEMODULE += sixlowpan
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_border_router_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_6lbr
+  USEMODULE += gnrc_ipv6_router_default
+  USEMODULE += gnrc_sixlowpan_router
+  USEMODULE += gnrc_sixlowpan_frag
+  USEMODULE += gnrc_sixlowpan_iphc
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
+  USEMODULE += ipv6_addr
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_default
+  USEMODULE += gnrc_ipv6_nib_6ln
+  USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_frag
+  USEMODULE += gnrc_sixlowpan_iphc
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_ctx
+  USEMODULE += gnrc_sixlowpan_iphc_nhc
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_router,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_router
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_router_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_router_default
+  USEMODULE += gnrc_ipv6_nib_6lr
+  USEMODULE += gnrc_sixlowpan_router
+  USEMODULE += gnrc_sixlowpan_frag
+  USEMODULE += gnrc_sixlowpan_iphc
+endif
+
+ifneq (,$(filter gnrc_sock,$(USEMODULE)))
+  USEMODULE += gnrc_netapi_mbox
+  USEMODULE += sock
 endif
 
 ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
@@ -107,19 +407,12 @@ ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
   USEMODULE += sock_udp
 endif
 
-ifneq (,$(filter gnrc_sock,$(USEMODULE)))
-  USEMODULE += gnrc_netapi_mbox
-  USEMODULE += sock
-endif
-
-ifneq (,$(filter gnrc_netapi_mbox,$(USEMODULE)))
+ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
+  USEMODULE += inet_csum
+  USEMODULE += random
+  USEMODULE += tcp
+  USEMODULE += xtimer
   USEMODULE += core_mbox
-endif
-
-ifneq (,$(filter netdev_tap,$(USEMODULE)))
-  USEMODULE += netif
-  USEMODULE += netdev_eth
-  USEMODULE += iolist
 endif
 
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
@@ -127,32 +420,15 @@ ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
-  USEMODULE += gnrc_rpl
+ifneq (,$(filter gnrc_udp,$(USEMODULE)))
+  USEMODULE += inet_csum
+  USEMODULE += udp
 endif
 
-ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
-  USEMODULE += gnrc_icmpv6
-  USEMODULE += gnrc_ipv6_nib
-  USEMODULE += trickle
-  USEMODULE += xtimer
-  USEMODULE += evtimer
-endif
-
-ifneq (,$(filter trickle,$(USEMODULE)))
-  USEMODULE += random
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter gnrc_netif,$(USEMODULE)))
-  USEMODULE += netif
+ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
+  USEMODULE += uhcpc
+  USEMODULE += gnrc_sock_udp
   USEMODULE += fmt
-  ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
-    USEMODULE += gnrc_netif_ieee802154
-  endif
-  ifneq (,$(filter netdev_eth,$(USEMODULE)))
-    USEMODULE += gnrc_netif_ethernet
-  endif
 endif
 
 ifneq (,$(filter ieee802154 nrfmin esp_now gnrc_sixloenc,$(USEMODULE)))
@@ -173,273 +449,77 @@ ifneq (,$(filter ieee802154 nrfmin esp_now gnrc_sixloenc,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_default
-  USEMODULE += gnrc_ipv6_nib_6ln
-  USEMODULE += gnrc_sixlowpan
-  USEMODULE += gnrc_sixlowpan_frag
-  USEMODULE += gnrc_sixlowpan_iphc
-endif
-
-ifneq (,$(filter gnrc_sixlowpan_router_default,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_router_default
-  USEMODULE += gnrc_ipv6_nib_6lr
-  USEMODULE += gnrc_sixlowpan_router
-  USEMODULE += gnrc_sixlowpan_frag
-  USEMODULE += gnrc_sixlowpan_iphc
-endif
-
-ifneq (,$(filter gnrc_sixlowpan_border_router_default,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_nib_6lbr
-  USEMODULE += gnrc_ipv6_router_default
-  USEMODULE += gnrc_sixlowpan_router
-  USEMODULE += gnrc_sixlowpan_frag
-  USEMODULE += gnrc_sixlowpan_iphc
-endif
-
-ifneq (,$(filter gnrc_sixlowpan_router,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_router
-endif
-
-ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
-  USEMODULE += gnrc_sixlowpan
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
-  USEMODULE += gnrc_sixlowpan
-  USEMODULE += gnrc_sixlowpan_ctx
-  USEMODULE += gnrc_sixlowpan_iphc_nhc
-endif
-
-ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6
-  USEMODULE += sixlowpan
-endif
-
-ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
-  USEMODULE += ipv6_addr
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter gnrc_ipv6_default,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6
-  USEMODULE += gnrc_icmpv6
-endif
-
-ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_router
-  USEMODULE += gnrc_icmpv6
-endif
-
-ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
-  USEMODULE += gnrc_icmpv6
-  USEMODULE += gnrc_netif
-endif
-
-ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
-  USEMODULE += gnrc_icmpv6
-endif
-
-ifneq (,$(filter gnrc_icmpv6_error,$(USEMODULE)))
-  USEMODULE += gnrc_icmpv6
-endif
-
-ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
-  USEMODULE += inet_csum
-  USEMODULE += gnrc_ipv6
-  USEMODULE += icmpv6
-endif
-
-ifneq (,$(filter gnrc_rpl_srh,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_ext_rh
-endif
-
-ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_ext
-endif
-
-ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6
-endif
-
-ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
-  USEMODULE += ipv6_addr
-endif
-
-ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
-  USEMODULE += ipv6_addr
-endif
-
-ifneq (,$(filter gnrc_ipv6_router,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6
-  USEMODULE += gnrc_ipv6_nib_router
-endif
-
-ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
-  USEMODULE += inet_csum
-  USEMODULE += ipv6_addr
-  USEMODULE += gnrc_ipv6_hdr
-  USEMODULE += gnrc_ipv6_nib
-  USEMODULE += gnrc_netif
-endif
-
-ifneq (,$(filter gnrc_ipv6_hdr,$(USEMODULE)))
-  USEMODULE += ipv6_hdr
-  USEMODULE += gnrc_pktbuf
-endif
-
-ifneq (,$(filter sixlowpan,$(USEMODULE)))
-  USEMODULE += ipv6_hdr
-endif
-
 ifneq (,$(filter ipv6_hdr,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += ipv6_addr
-endif
-
-ifneq (,$(filter gnrc_ipv6_nib_6lbr,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_nib_6lr
-endif
-
-ifneq (,$(filter gnrc_ipv6_nib_6lr,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_nib_6ln
-  USEMODULE += gnrc_ipv6_nib_router
-endif
-
-ifneq (,$(filter gnrc_ipv6_nib_6ln,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_nib
-  USEMODULE += gnrc_sixlowpan_nd
-endif
-
-ifneq (,$(filter gnrc_ipv6_nib_dns,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_nib
-endif
-
-ifneq (,$(filter gnrc_ipv6_nib_router,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_nib
-endif
-
-ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
-  USEMODULE += evtimer
-  USEMODULE += gnrc_ndp
-  USEMODULE += gnrc_netif
-  USEMODULE += ipv6_addr
-  USEMODULE += random
-  ifneq (,$(filter sock_dns,$(USEMODULE)))
-    USEMODULE += gnrc_ipv6_nib_dns
-  endif
-endif
-
-ifneq (,$(filter gnrc_udp,$(USEMODULE)))
-  USEMODULE += inet_csum
-  USEMODULE += udp
-endif
-
-ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
-  USEMODULE += inet_csum
-  USEMODULE += random
-  USEMODULE += tcp
-  USEMODULE += xtimer
-  USEMODULE += core_mbox
-endif
-
-ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
-  USEMODULE += gnrc_netapi
-  USEMODULE += gnrc_netreg
-  USEMODULE += gnrc_netif
-  USEMODULE += gnrc_pktbuf
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
-  USEMODULE += gnrc_pktbuf
-  USEMODULE += od
-endif
-
-ifneq (,$(filter od,$(USEMODULE)))
-  USEMODULE += fmt
-endif
-
-ifneq (,$(filter od_string,$(USEMODULE)))
-  USEMODULE += od
-endif
-
-ifneq (,$(filter newlib_gnu_source,$(USEMODULE)))
-  USEMODULE += newlib
-endif
-
-ifneq (,$(filter newlib_nano,$(USEMODULE)))
-  USEMODULE += newlib
-endif
-
-ifneq (,$(filter newlib,$(USEMODULE)))
-  # allow custom newlib syscalls implementations by adding
-  # newlib_syscalls_XXX to USEMODULE
-  ifeq (,$(filter newlib_syscalls_%,$(USEMODULE)))
-    USEMODULE += newlib_syscalls_default
-  endif
-  ifeq (,$(filter stdio_rtt,$(USEMODULE)))
-    USEMODULE += stdio_uart
-  endif
-endif
-
-ifneq (,$(filter posix_sockets,$(USEMODULE)))
-  USEMODULE += bitfield
-  USEMODULE += random
-  USEMODULE += vfs
-  USEMODULE += posix_headers
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter stdio_rtt,$(USEMODULE)))
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter stdio_uart,$(USEMODULE)))
-  USEMODULE += isrpipe
-  FEATURES_REQUIRED += periph_uart
 endif
 
 ifneq (,$(filter isrpipe,$(USEMODULE)))
   USEMODULE += tsrb
 endif
 
-ifneq (,$(filter shell_commands,$(USEMODULE)))
-  ifneq (,$(filter fib,$(USEMODULE)))
-    USEMODULE += posix_inet
+ifneq (,$(filter l2filter_%,$(USEMODULE)))
+  USEMODULE += l2filter
+endif
+
+ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
+  USEPKG += libfixmath
+  USEMODULE += libfixmath
+endif
+
+ifneq (,$(filter littlefs,$(USEMODULE)))
+  USEPKG += littlefs
+  USEMODULE += vfs
+  USEMODULE += littlefs_fs
+  USEMODULE += mtd
+endif
+
+# if any log_* is used, also use LOG pseudomodule
+ifneq (,$(filter log_%,$(USEMODULE)))
+  USEMODULE += log
+endif
+
+ifneq (,$(filter luid,$(USEMODULE)))
+  FEATURES_OPTIONAL += periph_cpuid
+endif
+
+ifneq (,$(filter lwip_%,$(USEMODULE)))
+  USEPKG += lwip
+  USEMODULE += core_mbox
+  USEMODULE += lwip_api
+  USEMODULE += lwip_contrib
+  USEMODULE += lwip_core
+  USEMODULE += lwip_netif
+  ifeq (,$(filter lwip_ipv4 lwip_ipv6,$(USEMODULE)))
+    USEMODULE += lwip_ipv4
+  endif
+  ifeq (,$(filter lwip_tcp lwip_udp lwip_udplite,$(USEMODULE)))
+    USEMODULE += lwip_raw
+  endif
+  ifneq (,$(filter netdev_eth,$(USEMODULE)))
+    USEMODULE += lwip_ethernet
   endif
 endif
 
-ifneq (,$(filter posix_semaphore,$(USEMODULE)))
+ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   USEMODULE += sema
   USEMODULE += xtimer
-  USEMODULE += posix_headers
-endif
-
-ifneq (,$(filter posix_time,$(USEMODULE)))
-  USEMODULE += xtimer
-  USEMODULE += posix_headers
-endif
-
-ifneq (,$(filter posix_inet,$(USEMODULE)))
-  USEMODULE += posix_headers
-endif
-
-ifneq (,$(filter lwip_sixlowpan,$(USEMODULE)))
-  USEMODULE += lwip_ipv6_autoconfig
-endif
-
-ifneq (,$(filter lwip_ipv6_autoconfig lwip_ipv6_mld,$(USEMODULE)))
-  USEMODULE += lwip_ipv6
 endif
 
 ifneq (,$(filter lwip_ipv6,$(USEMODULE)))
   USEMODULE += random
 endif
 
-ifneq (,$(filter lwip_udplite,$(USEMODULE)))
-  USEMODULE += lwip_udp
+ifneq (,$(filter lwip_ipv6_autoconfig lwip_ipv6_mld,$(USEMODULE)))
+  USEMODULE += lwip_ipv6
+endif
+
+ifneq (,$(filter lwip_ppp,$(USEMODULE)))
+  USEMODULE += lwip_polarssl
+endif
+
+ifneq (,$(filter lwip_sixlowpan,$(USEMODULE)))
+  USEMODULE += lwip_ipv6_autoconfig
 endif
 
 ifneq (,$(filter lwip_sock_%,$(USEMODULE)))
@@ -461,55 +541,86 @@ ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
   USEMODULE += sock_udp
 endif
 
-ifneq (,$(filter lwip_%,$(USEMODULE)))
-  USEPKG += lwip
-  USEMODULE += core_mbox
-  USEMODULE += lwip_api
-  USEMODULE += lwip_contrib
-  USEMODULE += lwip_core
-  USEMODULE += lwip_netif
-  ifeq (,$(filter lwip_ipv4 lwip_ipv6,$(USEMODULE)))
-    USEMODULE += lwip_ipv4
-  endif
-  ifeq (,$(filter lwip_tcp lwip_udp lwip_udplite,$(USEMODULE)))
-    USEMODULE += lwip_raw
-  endif
-  ifneq (,$(filter netdev_eth,$(USEMODULE)))
-    USEMODULE += lwip_ethernet
-  endif
+ifneq (,$(filter lwip_udplite,$(USEMODULE)))
+  USEMODULE += lwip_udp
 endif
 
-ifneq (,$(filter lwip_ppp,$(USEMODULE)))
-  USEMODULE += lwip_polarssl
+ifneq (,$(filter nanocoap_%,$(USEMODULE)))
+  USEMODULE += nanocoap
 endif
 
-ifneq (,$(filter lwip_contrib,$(USEMODULE)))
-  USEMODULE += sema
+ifneq (,$(filter ndn-riot,$(USEPKG)))
+  USEMODULE += gnrc
   USEMODULE += xtimer
+  USEMODULE += random
+  USEMODULE += hashes
+  USEPKG += micro-ecc
 endif
 
-ifneq (,$(filter sema,$(USEMODULE)))
+ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
+  USEMODULE += ieee802154
+  USEMODULE += random
+endif
+
+ifneq (,$(filter netdev_tap,$(USEMODULE)))
+  USEMODULE += netif
+  USEMODULE += netdev_eth
+  USEMODULE += iolist
+endif
+
+ifneq (,$(filter netstats_%, $(USEMODULE)))
+  USEMODULE += netstats
+endif
+
+ifneq (,$(filter newlib,$(USEMODULE)))
+  # allow custom newlib syscalls implementations by adding
+  # newlib_syscalls_XXX to USEMODULE
+  ifeq (,$(filter newlib_syscalls_%,$(USEMODULE)))
+    USEMODULE += newlib_syscalls_default
+  endif
+  ifeq (,$(filter stdio_rtt,$(USEMODULE)))
+    USEMODULE += stdio_uart
+  endif
+endif
+
+ifneq (,$(filter newlib_gnu_source,$(USEMODULE)))
+  USEMODULE += newlib
+endif
+
+ifneq (,$(filter newlib_nano,$(USEMODULE)))
+  USEMODULE += newlib
+endif
+
+ifneq (,$(filter nhdp,$(USEMODULE)))
+  USEMODULE += sock_udp
   USEMODULE += xtimer
+  USEMODULE += oonf_rfc5444
 endif
 
-
-ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
-  USEPKG += libfixmath
-  USEMODULE += libfixmath
+ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
+  USEMODULE += softdevice_handler
+  USEMODULE += ble_common
+  USEMODULE += ble_6lowpan
+  USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_iphc
+  USEMODULE += gnrc_ipv6_nib_6ln
+  USEMODULE += gnrc_ipv6_default
+  # prevent application from being a router
+  # TODO: maybe find a nicer solution in future build system update
+  _ROUTER_MODULES = gnrc_ipv6_router% gnrc_rpl netstats_rpl auto_init_gnrc_rpl
+  ifneq (,$(filter $(_ROUTER_MODULES),$(USEMODULE)))
+    $(warning nordic_softdevice_ble: Disabling router modules:\
+      $(filter $(_ROUTER_MODULES),$(USEMODULE)))
+  endif
+  USEMODULE := $(filter-out $(_ROUTER_MODULES),$(USEMODULE))
 endif
 
-ifneq (,$(filter luid,$(USEMODULE)))
-  FEATURES_OPTIONAL += periph_cpuid
+ifneq (,$(filter od,$(USEMODULE)))
+  USEMODULE += fmt
 endif
 
-ifneq (,$(filter fib,$(USEMODULE)))
-  USEMODULE += universal_address
-  USEMODULE += xtimer
-  USEMODULE += posix_headers
-endif
-
-ifneq (,$(filter oonf_rfc5444,$(USEMODULE)))
-  USEMODULE += oonf_common
+ifneq (,$(filter od_string,$(USEMODULE)))
+  USEMODULE += od
 endif
 
 ifneq (,$(filter oonf_common,$(USEMODULE)))
@@ -517,131 +628,40 @@ ifneq (,$(filter oonf_common,$(USEMODULE)))
   USEMODULE += posix_sockets
 endif
 
-# if any log_* is used, also use LOG pseudomodule
-ifneq (,$(filter log_%,$(USEMODULE)))
-  USEMODULE += log
-endif
-
-ifneq (,$(filter cpp11-compat,$(USEMODULE)))
-  USEMODULE += xtimer
-  USEMODULE += timex
-  FEATURES_REQUIRED += cpp
-endif
-
-ifneq (,$(filter gnrc,$(USEMODULE)))
-  USEMODULE += gnrc_netapi
-  USEMODULE += gnrc_netreg
-  USEMODULE += gnrc_netif
-  USEMODULE += gnrc_netif_hdr
-  USEMODULE += gnrc_pktbuf
-endif
-
-ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
-  ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
-    USEMODULE += gnrc_pktbuf_static
-  endif
-  ifeq (gnrc_pktbuf_cmd,$(filter gnrc_pktbuf_%, $(USEMODULE)))
-    USEMODULE += gnrc_pktbuf_static
-  endif
-  USEMODULE += gnrc_pkt
-endif
-
-ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
-  USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
-endif
-
-ifneq (,$(filter gnrc_netif_%,$(USEMODULE)))
-  USEMODULE += gnrc_netif
-endif
-
-ifneq (,$(filter netstats_%, $(USEMODULE)))
-  USEMODULE += netstats
-endif
-
-ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
-  USEMODULE += gnrc_netif
-  USEMODULE += gnrc_mac
-  FEATURES_REQUIRED += periph_rtt
-endif
-
-ifneq (,$(filter pthread,$(USEMODULE)))
-  USEMODULE += xtimer
-  USEMODULE += timex
-endif
-
-ifneq (,$(filter schedstatistics,$(USEMODULE)))
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter arduino,$(USEMODULE)))
-  FEATURES_REQUIRED += arduino
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter xtimer,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_timer
-  USEMODULE += div
-endif
-
-ifneq (,$(filter saul,$(USEMODULE)))
-  USEMODULE += phydat
-endif
-
-ifneq (,$(filter saul_reg,$(USEMODULE)))
-  USEMODULE += saul
-endif
-
-ifneq (,$(filter saul_default,$(USEMODULE)))
-  USEMODULE += saul
-  USEMODULE += saul_reg
-  USEMODULE += auto_init_saul
-endif
-
-ifneq (,$(filter saul_adc,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_adc
-endif
-
-ifneq (,$(filter saul_gpio,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_gpio
-endif
-
-ifneq (,$(filter saul,$(USEMODULE)))
-  USEMODULE += phydat
-endif
-
-ifneq (,$(filter saul_nrf_temperature,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_temperature
+ifneq (,$(filter oonf_rfc5444,$(USEMODULE)))
+  USEMODULE += oonf_common
 endif
 
 ifneq (,$(filter phydat,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter evtimer,$(USEMODULE)))
+ifneq (,$(filter posix_inet,$(USEMODULE)))
+  USEMODULE += posix_headers
+endif
+
+ifneq (,$(filter posix_semaphore,$(USEMODULE)))
+  USEMODULE += sema
+  USEMODULE += xtimer
+  USEMODULE += posix_headers
+endif
+
+ifneq (,$(filter posix_sockets,$(USEMODULE)))
+  USEMODULE += bitfield
+  USEMODULE += random
+  USEMODULE += vfs
+  USEMODULE += posix_headers
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter can_linux,$(USEMODULE)))
-  LINKFLAGS += -lsocketcan
-endif
-
-ifneq (,$(filter can,$(USEMODULE)))
-  USEMODULE += can_raw
-  USEMODULE += auto_init_can
-  ifneq (,$(filter can_mbox,$(USEMODULE)))
-    USEMODULE += core_mbox
-  endif
-  USEMODULE += gnrc_pktbuf_static
-endif
-
-ifneq (,$(filter can_isotp,$(USEMODULE)))
+ifneq (,$(filter posix_time,$(USEMODULE)))
   USEMODULE += xtimer
+  USEMODULE += posix_headers
 endif
 
-ifneq (,$(filter conn_can,$(USEMODULE)))
-  USEMODULE += can
-  USEMODULE += can_mbox
+ifneq (,$(filter pthread,$(USEMODULE)))
   USEMODULE += xtimer
+  USEMODULE += timex
 endif
 
 ifneq (,$(filter puf_sram,$(USEMODULE)))
@@ -664,10 +684,6 @@ ifneq (,$(filter random,$(USEMODULE)))
     USEMODULE += xtimer
   endif
 
-  ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
-    USEMODULE += tinymt32
-  endif
-
   ifneq (,$(filter prng_sha1prng,$(USEMODULE)))
     USEMODULE += hashes
   endif
@@ -676,36 +692,84 @@ ifneq (,$(filter random,$(USEMODULE)))
     FEATURES_OPTIONAL += periph_hwrng
   endif
 
+  ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
+    USEMODULE += tinymt32
+  endif
+
   USEMODULE += luid
 endif
 
-ifneq (,$(filter asymcute,$(USEMODULE)))
-  USEMODULE += sock_udp
-  USEMODULE += sock_util
-  USEMODULE += random
-  USEMODULE += event_timeout
-  USEMODULE += event_callback
+ifneq (,$(filter riotboot_flashwrite, $(USEMODULE)))
+  USEMODULE += riotboot_slot
+  FEATURES_REQUIRED += periph_flashpage
 endif
 
-ifneq (,$(filter emcute,$(USEMODULE)))
-  USEMODULE += core_thread_flags
-  USEMODULE += sock_udp
+ifneq (,$(filter riotboot_hdr, $(USEMODULE)))
+  USEMODULE += checksum
+  USEMODULE += riotboot
+endif
+
+ifneq (,$(filter riotboot_slot, $(USEMODULE)))
+  USEMODULE += riotboot_hdr
+endif
+
+ifneq (,$(filter saul,$(USEMODULE)))
+  USEMODULE += phydat
+endif
+
+ifneq (,$(filter saul_adc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc
+endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul
+  USEMODULE += saul_reg
+  USEMODULE += auto_init_saul
+endif
+
+ifneq (,$(filter saul_gpio,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+endif
+
+ifneq (,$(filter saul_nrf_temperature,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_temperature
+endif
+
+ifneq (,$(filter saul_reg,$(USEMODULE)))
+  USEMODULE += saul
+endif
+
+ifneq (,$(filter schedstatistics,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter constfs,$(USEMODULE)))
-  USEMODULE += vfs
+ifneq (,$(filter sema,$(USEMODULE)))
+  USEMODULE += xtimer
 endif
 
-ifneq (,$(filter devfs,$(USEMODULE)))
-  USEMODULE += vfs
-endif
-
-ifneq (,$(filter vfs,$(USEMODULE)))
-  USEMODULE += posix_headers
-  ifeq (native, $(BOARD))
-    USEMODULE += native_vfs
+ifneq (,$(filter shell_commands,$(USEMODULE)))
+  ifneq (,$(filter fib,$(USEMODULE)))
+    USEMODULE += posix_inet
   endif
+endif
+
+ifneq (,$(filter sixlowpan,$(USEMODULE)))
+  USEMODULE += ipv6_hdr
+endif
+
+ifneq (,$(filter skald,$(USEMODULE)))
+  FEATURES_REQUIRED += radio_ble
+  USEMODULE += xtimer
+  USEMODULE += random
+endif
+
+ifneq (,$(filter skald_%,$(USEMODULE)))
+  USEMODULE += skald
+endif
+
+ifneq (,$(filter sntp,$(USEMODULE)))
+  USEMODULE += gnrc_sock_udp
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter sock_dns,$(USEMODULE)))
@@ -719,99 +783,33 @@ ifneq (,$(filter sock_util,$(USEMODULE)))
   USEMODULE += sock_udp
 endif
 
-ifneq (,$(filter event_%,$(USEMODULE)))
-  USEMODULE += event
-endif
-
-ifneq (,$(filter event_timeout,$(USEMODULE)))
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter event,$(USEMODULE)))
-  USEMODULE += core_thread_flags
-endif
-
 ifneq (,$(filter spiffs,$(USEMODULE)))
   USEPKG += spiffs
   USEMODULE += vfs
   USEMODULE += spiffs_fs
   USEMODULE += mtd
 endif
-ifneq (,$(filter littlefs,$(USEMODULE)))
-  USEPKG += littlefs
-  USEMODULE += vfs
-  USEMODULE += littlefs_fs
-  USEMODULE += mtd
-endif
 
-ifneq (,$(filter l2filter_%,$(USEMODULE)))
-  USEMODULE += l2filter
-endif
-
-ifneq (,$(filter gcoap,$(USEMODULE)))
-  USEMODULE += nanocoap
-  USEMODULE += gnrc_sock_udp
-  USEMODULE += sock_util
-endif
-
-ifneq (,$(filter luid,$(USEMODULE)))
-  FEATURES_OPTIONAL += periph_cpuid
-endif
-
-ifneq (,$(filter nanocoap_%,$(USEMODULE)))
-  USEMODULE += nanocoap
-endif
-
-ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
-  USEPKG += fatfs
-  USEMODULE += vfs
-endif
-
-ifneq (,$(filter benchmark,$(USEMODULE)))
+ifneq (,$(filter stdio_rtt,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter skald_%,$(USEMODULE)))
-  USEMODULE += skald
-endif
-
-ifneq (,$(filter skald,$(USEMODULE)))
-  FEATURES_REQUIRED += radio_ble
-  USEMODULE += xtimer
-  USEMODULE += random
-endif
-
-ifneq (,$(filter cord_epsim_standalone,$(USEMODULE)))
-  USEMODULE += cord_epsim
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter cord_epsim,$(USEMODULE)))
-  USEMODULE += cord_common
-  USEMODULE += gcoap
-endif
-
-ifneq (,$(filter cord_ep_standalone,$(USEMODULE)))
-  USEMODULE += cord_ep
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter cord_ep,$(USEMODULE)))
-  USEMODULE += cord_common
-  USEMODULE += core_thread_flags
-  USEMODULE += gcoap
-  ifneq (,$(filter shell_commands,$(USEMODULE)))
-    USEMODULE += sock_util
-  endif
-endif
-
-ifneq (,$(filter cord_common,$(USEMODULE)))
-  USEMODULE += fmt
-  USEMODULE += luid
+ifneq (,$(filter stdio_uart,$(USEMODULE)))
+  USEMODULE += isrpipe
+  FEATURES_REQUIRED += periph_uart
 endif
 
 ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
   USEPKG += tlsf
+endif
+
+ifneq (,$(filter trickle,$(USEMODULE)))
+  USEMODULE += random
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter uhcpc,$(USEMODULE)))
+  USEMODULE += posix_inet
 endif
 
 ifneq (,$(filter uuid,$(USEMODULE)))
@@ -820,18 +818,16 @@ ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter riotboot_flashwrite, $(USEMODULE)))
-  USEMODULE += riotboot_slot
-  FEATURES_REQUIRED += periph_flashpage
+ifneq (,$(filter vfs,$(USEMODULE)))
+  USEMODULE += posix_headers
+  ifeq (native, $(BOARD))
+    USEMODULE += native_vfs
+  endif
 endif
 
-ifneq (,$(filter riotboot_slot, $(USEMODULE)))
-  USEMODULE += riotboot_hdr
-endif
-
-ifneq (,$(filter riotboot_hdr, $(USEMODULE)))
-  USEMODULE += checksum
-  USEMODULE += riotboot
+ifneq (,$(filter xtimer,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_timer
+  USEMODULE += div
 endif
 
 # Enable periph_gpio when periph_gpio_irq is enabled
@@ -861,8 +857,4 @@ USEMODULE := $(sort $(USEMODULE))
 USEPKG := $(sort $(USEPKG))
 ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
   include $(RIOTBASE)/Makefile.dep
-endif
-
-ifneq (,$(filter ecc_%,$(USEMODULE)))
-  USEMODULE += ecc
 endif
