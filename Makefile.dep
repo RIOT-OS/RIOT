@@ -400,6 +400,7 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   ifeq (,$(filter vfs newlib_syscalls_riot_vfs,$(USEMODULE)))
       USEMODULE += newlib_stubs_fs
   endif
+   USEMODULE += newlib_syscalls_riot_sbrk
 endif
 
 ifneq (,$(filter newlib_syscalls_riot_serial_rw,$(USEMODULE)))

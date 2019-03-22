@@ -13,3 +13,7 @@ endif
 ifneq (,$(filter newlib_syscalls_riot_serial_rw,$(USEMODULE)))
   UNDEF += $(BINDIR)/newlib_syscalls_riot/serial_rw.o
 endif
+
+ifneq (,$(filter newlib_syscalls_riot_sbrk,$(USEMODULE)))
+  UNDEF += $(BINDIR)/newlib_syscalls_riot/sbrk.o
+endif

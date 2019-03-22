@@ -27,4 +27,5 @@
  * - sys_newlib_syscalls_riot_time
  * - sys_newlib_syscalls_riot_vfs
  * - sys_newlib_syscalls_riot_serial_rw
+ * - sys_newlib_syscalls_riot_sbrk
  */

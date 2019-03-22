@@ -44,13 +44,6 @@
 
 #include "stdio_base.h"
 
-/**
- * @brief manage the heap
- */
-extern char _sheap;                 /* start of the heap */
-extern char _eheap;                 /* end of the heap */
-char *heap_top = &_sheap + 4;
-
 /* MIPS newlib crt implements _init,_fini and _exit and manages the heap */
 #ifndef __mips__
 /**
@@ -87,32 +80,6 @@ void _exit(int n)
     LOG_INFO("#! exit %i: powering off\n", n);
     pm_off();
     while(1);
-}
-
-/**
- * @brief Allocate memory from the heap.
- *
- * The current heap implementation is very rudimentary, it is only able to allocate
- * memory. But it does not have any means to free memory again
- *
- * @return      pointer to the newly allocated memory on success
- * @return      pointer set to address `-1` on failure
- */
-void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
-{
-    unsigned int state = irq_disable();
-    void *res = heap_top;
-
-    if ((heap_top + incr > &_eheap) || (heap_top + incr < &_sheap)) {
-        r->_errno = ENOMEM;
-        res = (void *)-1;
-    }
-    else {
-        heap_top += incr;
-    }
-
-    irq_restore(state);
-    return res;
 }
 
 #endif /*__mips__*/
