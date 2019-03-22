@@ -1,5 +1,5 @@
-LoRaWAN
-=======
+LoRaWAN - OTAA
+==============
 
 Description
 -----------
@@ -9,7 +9,7 @@ This application shows a simple use case of LoRaWAN with RIOT.
 By using the real time clock and low-power capabilities of a board, this
 application shows how to program a LoRaWAN Class A device using RIOT.
 
-This application is using the Over-The-Air Activation procedure.
+This application is using the Over-The-Air Activation (OTAA) procedure.
 
 Usage
 -----
