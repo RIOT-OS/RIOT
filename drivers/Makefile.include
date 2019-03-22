@@ -290,6 +290,14 @@ ifneq (,$(filter veml6070,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/veml6070/include
 endif
 
+ifneq (,$(filter vl53l1x,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/vl53l1x/include
+endif
+
+ifneq (,$(filter vl53l1x_st_api,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(PKGDIRBASE)/driver_vl53l1x_st_api/vl53l1x-st-api
+endif
+
 ifneq (,$(filter w5100,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/w5100/include
 endif

@@ -118,6 +118,10 @@ PSEUDOMODULES += vcnl4010
 PSEUDOMODULES += vcnl4020
 PSEUDOMODULES += vcnl4040
 
+# include variants of VL53L1X drivers as pseudo modules
+PSEUDOMODULES += vl53l1x_basic
+PSEUDOMODULES += vl53l1x_st_api
+
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
 

@@ -502,6 +502,10 @@ void auto_init(void)
     extern void auto_init_veml6070(void);
     auto_init_veml6070();
 #endif
+#ifdef MODULE_VL53L1X
+    extern void auto_init_vl53l1x(void);
+    auto_init_vl53l1x();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 
