@@ -13,6 +13,13 @@ OLD_USEPKG := $(sort $(USEPKG))
 include $(RIOTBASE)/sys/Makefile.dep
 include $(RIOTBASE)/drivers/Makefile.dep
 
+################################################################################
+#                               !!! README !!!                                 #
+# Add rules to handle inter-module dependencies below this comment, sorted     #
+# alphabetically by the module that pulls in other modules. This will help     #
+# detecting duplicate rules and combining them                                 #
+################################################################################
+
 ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_REQUIRED += arduino
   USEMODULE += xtimer
@@ -830,6 +837,11 @@ ifneq (,$(filter xtimer,$(USEMODULE)))
   USEMODULE += div
 endif
 
+################################################################################
+#                               !!! README !!!                                 #
+# Add rules to handle inter-module dependencies above this comment.            #
+################################################################################
+
 # Enable periph_gpio when periph_gpio_irq is enabled
 ifneq (,$(filter periph_gpio_irq,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
@@ -852,6 +864,11 @@ FEATURES_USED := $(sort $(FEATURES_REQUIRED) $(filter $(FEATURES_OPTIONAL),$(FEA
 # all periph features correspond to a periph submodule
 USEMODULE += $(filter periph_%,$(FEATURES_USED))
 
+################################################################################
+#                               !!! README !!!                                 #
+# Don't change anything below this comment unless you're 100% sure you know    #
+# what you're doing!                                                           #
+################################################################################
 # recursively catch transitive dependencies
 USEMODULE := $(sort $(USEMODULE))
 USEPKG := $(sort $(USEPKG))
