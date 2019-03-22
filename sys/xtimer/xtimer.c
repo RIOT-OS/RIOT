@@ -233,6 +233,7 @@ int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout_ticks)
     return _msg_wait(msg, &tmsg, &t);
 }
 
+#ifdef MODULE_MULTI_TASKING
 static void _mutex_timeout(void *arg)
 {
     mutex_thread_t *mt = (mutex_thread_t *)arg;
@@ -262,6 +263,7 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
     xtimer_remove(&t);
     return -mt.timeout;
 }
+#endif /* MODULE_MULTI_TASKING */
 
 #ifdef MODULE_CORE_THREAD_FLAGS
 static void _set_timeout_flag_callback(void* arg)
