@@ -75,40 +75,6 @@ int isrpipe_write_one(isrpipe_t *isrpipe, char c);
  */
 int isrpipe_read(isrpipe_t *isrpipe, char *buf, size_t count);
 
-/**
- * @brief   Read data from isrpipe (with timeout, blocking)
- *
- * Currently, the timeout parameter is applied on every underlying read, which
- * might be *per single byte*.
- *
- * @note This function might return less than @p count bytes
- *
- * @param[in]   isrpipe    isrpipe object to operate on
- * @param[in]   buf        buffer to write to
- * @param[in]   count      number of bytes to read
- * @param[in]   timeout    timeout in microseconds
- *
- * @returns     number of bytes read
- * @returns     -ETIMEDOUT on timeout
- */
-int isrpipe_read_timeout(isrpipe_t *isrpipe, char *buf, size_t count, uint32_t timeout);
-
-/**
- * @brief   Read data from isrpipe (with timeout, blocking, wait until all read)
- *
- * This function is like @ref isrpipe_read_timeout, but will only return on
- * timeout or when @p count bytes have been received.
- *
- * @param[in]   isrpipe    isrpipe object to operate on
- * @param[in]   buf        buffer to write to
- * @param[in]   count      number of bytes to read
- * @param[in]   timeout    timeout in microseconds
- *
- * @returns     number of bytes read
- * @returns     -ETIMEDOUT on timeout
- */
-int isrpipe_read_all_timeout(isrpipe_t *isrpipe, char *buf, size_t count, uint32_t timeout);
-
 #ifdef __cplusplus
 }
 #endif

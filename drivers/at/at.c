@@ -12,6 +12,7 @@
 #include "at.h"
 #include "fmt.h"
 #include "isrpipe.h"
+#include "isrpipe/read_timeout.h"
 #include "periph/uart.h"
 #include "xtimer.h"
 

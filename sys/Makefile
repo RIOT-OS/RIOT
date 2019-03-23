@@ -4,6 +4,9 @@ endif
 ifneq (,$(filter eepreg,$(USEMODULE)))
   DIRS += eepreg
 endif
+ifneq (,$(filter isrpipe_read_timeout,$(USEMODULE)))
+  DIRS += isrpipe/read_timeout
+endif
 ifneq (,$(filter posix_inet,$(USEMODULE)))
   DIRS += posix/inet
 endif

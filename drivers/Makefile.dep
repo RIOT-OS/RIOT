@@ -34,6 +34,7 @@ ifneq (,$(filter at,$(USEMODULE)))
   USEMODULE += fmt
   USEMODULE += xtimer
   USEMODULE += isrpipe
+  USEMODULE += isrpipe_read_timeout
 endif
 
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
