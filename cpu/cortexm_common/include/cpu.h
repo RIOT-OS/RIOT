@@ -217,10 +217,11 @@ static inline void cpu_jump_to_image(uint32_t image_address)
     __asm("BX %0" :: "r" (destination_address));
 }
 
-/* The following register is only present for Cortex-M0+, -M3, -M4 and -M7 CPUs */
+/* The following register is only present for
+   Cortex-M0+, -M3, -M4, -M7 and -M23 CPUs */
 #if defined(CPU_ARCH_CORTEX_M0PLUS) || defined(CPU_ARCH_CORTEX_M3) || \
     defined(CPU_ARCH_CORTEX_M4) || defined(CPU_ARCH_CORTEX_M4F) || \
-    defined(CPU_ARCH_CORTEX_M7)
+    defined(CPU_ARCH_CORTEX_M7) || defined(CPU_ARCH_CORTEX_M23)
 static inline uint32_t cpu_get_image_baseaddr(void)
 {
     return SCB->VTOR;

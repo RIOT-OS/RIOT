@@ -10,7 +10,6 @@ FEATURES_PROVIDED += periph_uart
 # Put other features on these boards (in alphabetical order)
 FEATURES_PROVIDED += riotboot
 
-
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = cortex_m23
 
