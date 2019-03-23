@@ -31,6 +31,7 @@
  * clist_find_before()  | O(n)    | find node return node pointing to node
  * clist_remove()       | O(n)    | remove and return node
  * clist_sort()         | O(NlogN)| sort list (stable)
+ * clist_count()        | O(n)    | count the number of elements in a list
  *
  * clist can be used as a traditional list, a queue (FIFO) and a stack (LIFO) using
  * fast O(1) operations.
@@ -417,6 +418,27 @@ static inline void clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
     if (list->next) {
         list->next = _clist_sort(list->next->next, cmp);
     }
+}
+
+/**
+ * @brief   Count the number of items in the given list
+ *
+ * @param[in]   list    ptr to the first element of the list
+ *
+ * @return  the number of elements in the given list
+ */
+static inline size_t clist_count(clist_node_t *list)
+{
+    clist_node_t *node = list->next;
+    size_t cnt = 0;
+    if (node) {
+        do {
+            node = node->next;
+            ++cnt;
+        } while (node != list->next);
+    }
+
+    return cnt;
 }
 
 #ifdef __cplusplus
