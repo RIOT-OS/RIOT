@@ -20,3 +20,10 @@ testing.
 From the test application directory run:
 
     BOARD=<board_of_your_choice> make flash test
+
+
+An automated way of knowing if a test is available is to execute the
+'test/available' target from the test application directory.
+It executes without error if tests run by 'make test' are present.
+
+    make test/available
