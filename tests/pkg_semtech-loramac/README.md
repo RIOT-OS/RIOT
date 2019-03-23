@@ -66,6 +66,11 @@ for US915 region.
 
 The default region is `EU868`.
 
+**For testing purpose**, it is possible to disable the duty-cycle restriction
+implemented in the MAC layer with the `DISABLE_LORAMAC_DUTYCYCLE` macro:
+
+      CFLAGS=-DDISABLE_LORAMAC_DUTYCYCLE LORA_REGION=US915 LORA_DRIVER=sx1272 make ...
+
 ## Using the shell
 
 This application provides the `loramac` command for configuring the MAC,
