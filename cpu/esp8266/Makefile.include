@@ -131,7 +131,6 @@ endif
 
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/eagle.rom.addr.v6.ld
 LINKFLAGS += -nostdlib -lgcc -u ets_run -Wl,-gc-sections # -Wl,--print-gc-sections
-LINKFLAGS += -Wl,--warn-unresolved-symbols
 
 # configure preflasher to convert .elf to .bin before flashing
 FLASH_SIZE = -fs 8m
