@@ -8,8 +8,7 @@
  */
 
 /**
- * @defgroup    sys_riotboot_slot   Helpers to manipulate partitions (slots)
- *                              on internal flash
+ * @defgroup    sys_riotboot_slot   Helpers to manipulate partitions (slots) on internal flash
  * @ingroup     sys
  * @{
  *
