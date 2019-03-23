@@ -569,6 +569,7 @@ reset:
 	$(call check_cmd,$(RESET),Reset program)
 	$(RESET) $(RESET_FLAGS)
 
+.PHONY: test
 TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*),\
                         $(shell test -f $(file) -a -x $(file) && echo $(file)))
 test: $(TEST_DEPS)
