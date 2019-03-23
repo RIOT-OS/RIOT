@@ -132,7 +132,6 @@ LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.peripherals.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.nanofmt.ld
 LINKFLAGS += -nostdlib -lgcc -u putchar -Wl,-gc-sections
-LINKFLAGS += -Wl,--warn-unresolved-symbols
 
 # configure preflasher to convert .elf to .bin before flashing
 FLASH_MODE ?= dout  # FIX configuration, DO NOT CHANGE
