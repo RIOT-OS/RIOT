@@ -54,6 +54,13 @@ saml11: `Atmel.SAML11_DFP.1.0.91.atpack`
 Each atpack has an include subdirectory with the files we copy into
 RIOT. The files are copied unmodified.
 
+## SAMR34 files
+
+samr34: `Atmel.SAMR34_DFP.1.0.11.atpacks`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
 ### sam23.h
 
 A SAML1x based CPU should include `sam23.h` in this directory, which will
