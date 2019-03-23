@@ -9,3 +9,5 @@ endif
 ifneq (,$(filter prng_fortuna,$(USEMODULE)))
   CFLAGS += -DCRYPTO_AES
 endif
+
+include $(RIOTBASE)/sys/test_utils/Makefile.dep

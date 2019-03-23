@@ -1,0 +1,3 @@
+ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
+  USEMODULE += stdin
+endif
