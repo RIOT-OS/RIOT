@@ -38,8 +38,10 @@ void fill_memory(struct node *head)
         printf("Allocated %d Bytes at 0x%p, total %d\n", CHUNK_SIZE, head->ptr, total += CHUNK_SIZE);
         memset(head->ptr, '@', CHUNK_SIZE);
         head = head->next = malloc(sizeof(struct node));
-        head->ptr =  0;
-        head->next = 0;
+        if (head) {
+            head->ptr =  0;
+            head->next = 0;
+        }
         total += sizeof(struct node);
     }
 }
