@@ -94,10 +94,12 @@ class RIOTNode():
         self.make_run(self.RESET_TARGETS, stdout=DEVNULL, stderr=DEVNULL)
 
     @contextlib.contextmanager
-    def run_term(self, **startkwargs):
+    def run_term(self, reset=True, **startkwargs):
         """Terminal context manager."""
         try:
             self.start_term(**startkwargs)
+            if reset:
+                self.reset()
             yield self.term
         finally:
             self.stop_term()
@@ -116,7 +118,6 @@ class RIOTNode():
 
         # on many platforms, the termprog needs a short while to be ready
         time.sleep(self.TERM_STARTED_DELAY)
-        self.reset()
 
     def stop_term(self):
         """Stop the terminal."""
