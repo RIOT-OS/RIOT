@@ -391,7 +391,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
                 probe_timeout_duration_us = tcb->rto;
             }
             /* Setup probe timeout */
-            _setup_timeout(&probe_timeout, timeout_duration_us, _cb_mbox_put_msg,
+            _setup_timeout(&probe_timeout, probe_timeout_duration_us, _cb_mbox_put_msg,
                            &probe_timeout_arg);
         }
 
