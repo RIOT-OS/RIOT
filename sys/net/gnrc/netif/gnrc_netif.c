@@ -1212,12 +1212,12 @@ static void _test_options(gnrc_netif_t *netif)
             assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
             assert((IEEE802154_SHORT_ADDRESS_LEN == netif->l2addr_len) ||
                    (IEEE802154_LONG_ADDRESS_LEN == netif->l2addr_len));
-            assert(-ENOTSUP != netif->dev->driver->get(netif->dev, NETOPT_PROTO,
-                                                       &tmp, sizeof(tmp)));
 #ifdef MODULE_GNRC_IPV6
 #ifdef MODULE_GNRC_SIXLOWPAN
             assert(netif->ipv6.mtu == IPV6_MIN_MTU);
             assert(netif->sixlo.max_frag_size > 0);
+            assert(-ENOTSUP != netif->dev->driver->get(netif->dev, NETOPT_PROTO,
+                                                       &tmp, sizeof(tmp)));
 #else   /* MODULE_GNRC_SIXLOWPAN */
             assert(netif->ipv6.mtu < UINT16_MAX);
 #endif  /* MODULE_GNRC_SIXLOWPAN */
