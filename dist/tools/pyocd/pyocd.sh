@@ -70,6 +70,12 @@
 # CPU Target type.
 # Use `-t` followed by value. Example: -t nrf51
 : ${FLASH_TARGET_TYPE:=}
+# This is an optional offset to the base address that can be used to flash an
+# image in a different location than it is linked at. This feature can be useful
+# when flashing images for firmware swapping/remapping boot loaders.
+# Default offset is 0, meaning the image will be flashed at the address that it
+# was linked at.
+: ${IMAGE_OFFSET:=0}
 
 #
 # Examples of alternative debugger configurations
@@ -112,8 +118,13 @@ test_hexfile() {
 do_flash() {
     HEX_FILE=$1
     test_hexfile
+
+    if [ "${IMAGE_OFFSET}" != "0" ]; then
+        echo "Flashing with IMAGE_OFFSET: ${IMAGE_OFFSET}"
+    fi
+
     # flash device
-    sh -c "${PYOCD_FLASH} ${FLASH_TARGET_TYPE} \"${HEX_FILE}\"" &&
+    sh -c "${PYOCD_FLASH} ${FLASH_TARGET_TYPE} -a ${IMAGE_OFFSET} \"${HEX_FILE}\"" &&
     echo 'Done flashing'
 }
 
