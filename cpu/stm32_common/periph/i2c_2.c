@@ -329,7 +329,7 @@ static int _start(I2C_TypeDef *i2c, uint8_t address_byte, uint8_t flags,
         ret = _is_sr1_mask_set(i2c, I2C_SR1_ADDR, flags & ~I2C_NOSTOP);
         if (ret == -EIO){
             /* Since NACK happened during start it means no device connected */
-            ret = -ENXIO;
+            return -ENXIO;
         }
         /* Needed to clear address bit */
         i2c->SR2;
