@@ -14,7 +14,6 @@
 #include "isrpipe.h"
 #include "isrpipe/read_timeout.h"
 #include "periph/uart.h"
-#include "xtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
