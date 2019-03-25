@@ -27,6 +27,9 @@
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6.h"
 #endif /* MODULE_GNRC_IPV6_NIB */
+#ifdef MODULE_GNRC_NETIF_PKTQ
+#include "net/gnrc/netif/pktq.h"
+#endif
 #ifdef MODULE_NETSTATS
 #include "net/netstats.h"
 #endif
@@ -1241,7 +1244,7 @@ static void _configure_netdev(netdev_t *dev)
     if (res < 0) {
         DEBUG("gnrc_netif: enable NETOPT_RX_END_IRQ failed: %d\n", res);
     }
-#ifdef MODULE_NETSTATS_L2
+#if defined(MODULE_NETSTATS_L2) || defined(MODULE_GNRC_NETIF_PKTQ)
     res = dev->driver->set(dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
     if (res < 0) {
         DEBUG("gnrc_netif: enable NETOPT_TX_END_IRQ failed: %d\n", res);
@@ -1457,6 +1460,87 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
         DEBUG("gnrc_netif: waiting for incoming messages\n");
         msg_receive(msg);
     }
+
+}
+static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool requeue);
+
+#ifdef MODULE_GNRC_NETIF_PKTQ
+static void _send_queued_pkt(gnrc_netif_t *netif)
+{
+    gnrc_pktsnip_t *pkt = gnrc_netif_pktq_get(netif);
+
+    if (pkt != NULL) {
+        _send(netif, pkt, true);
+    }
+}
+#else   /* MODULE_GNRC_NETIF_PKTQ */
+#define _send_queued_pkt(netif) (void)netif
+#endif  /* MODULE_GNRC_NETIF_PKTQ */
+
+static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool requeue)
+{
+#ifdef MODULE_GNRC_NETIF_PKTQ
+    /* send queued packets first to keep order */
+    if (!requeue && !gnrc_netif_pktq_empty(netif)) {
+        int put_res;
+
+        put_res = gnrc_netif_pktq_put(netif, pkt);
+        if (put_res == 0) {
+            DEBUG("gnrc_netif: (re-)queued pkt %p\n", (void *)pkt);
+            _send_queued_pkt(netif);
+            return;
+        }
+        else {
+            LOG_WARNING("gnrc_netif: can't queue packet for sending\n");
+            /* try to send anyway */
+        }
+    }
+    /* hold in case device was busy to not having to rewrite *all* the link
+     * layer implementations in case `gnrc_netif_pktq` is included */
+    gnrc_pktbuf_hold(pkt, 1);
+#else
+    (void)requeue;
+#endif  /* MODULE_GNRC_NETIF_PKTQ */
+    int res = netif->ops->send(netif, pkt);
+#ifdef MODULE_GNRC_NETIF_PKTQ
+    if (res == -EBUSY) {
+        int put_res;
+
+        /* Lower layer was busy.
+         * Since "busy" could also mean that the lower layer is currently
+         * receiving, trying to wait for the device not being busy any more
+         * could run into the risk of overriding the received packet on send
+         * Rather, queue the packet within the netif now and try to send them
+         * again after the device completed its busy state. */
+        if (requeue) {
+            put_res = gnrc_netif_pktq_push(netif, pkt);
+        }
+        else {
+            put_res = gnrc_netif_pktq_put(netif, pkt);
+        }
+        if (put_res == 0) {
+            DEBUG("gnrc_netif: (re-)queued pkt %p\n", (void *)pkt);
+            return; /* early return to not release */
+        }
+        else {
+            LOG_ERROR("gnrc_netif: can't queue packet for sending\n");
+        }
+        return;
+    }
+    else {
+        /* remove previously held packet */
+        gnrc_pktbuf_release(pkt);
+    }
+#endif  /* MODULE_GNRC_NETIF_PKTQ */
+    if (res < 0) {
+        DEBUG("gnrc_netif: error sending packet %p (code: %i)\n",
+              (void *)pkt, res);
+    }
+#ifdef MODULE_NETSTATS_L2
+    else {
+        netif->stats.tx_bytes += res;
+    }
+#endif
 }
 
 static void *_gnrc_netif_thread(void *args)
@@ -1526,16 +1610,7 @@ static void *_gnrc_netif_thread(void *args)
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
-                res = netif->ops->send(netif, msg.content.ptr);
-                if (res < 0) {
-                    DEBUG("gnrc_netif: error sending packet %p (code: %i)\n",
-                          msg.content.ptr, res);
-                }
-#ifdef MODULE_NETSTATS_L2
-                else {
-                    netif->stats.tx_bytes += res;
-                }
-#endif
+                _send(netif, msg.content.ptr, false);
 #if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
                 xtimer_periodic_wakeup(
                         &last_wakeup,
@@ -1627,20 +1702,42 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         switch (event) {
             case NETDEV_EVENT_RX_COMPLETE:
                 pkt = netif->ops->recv(netif);
+                /* send packet previously queued within netif due to the lower
+                 * layer being busy.
+                 * Further packets will be sent on later TX_COMPLETE */
+                _send_queued_pkt(netif);
                 if (pkt) {
                     _pass_on_packet(pkt);
                 }
                 break;
-#ifdef MODULE_NETSTATS_L2
-            case NETDEV_EVENT_TX_MEDIUM_BUSY:
-                /* we are the only ones supposed to touch this variable,
-                 * so no acquire necessary */
-                netif->stats.tx_failed++;
-                break;
+#if defined(MODULE_NETSTATS_L2) || defined(MODULE_GNRC_NETIF_PKTQ)
             case NETDEV_EVENT_TX_COMPLETE:
+                /* send packet previously queued within netif due to the lower
+                 * layer being busy.
+                 * Further packets will be sent on later TX_COMPLETE or
+                 * TX_MEDIUM_BUSY */
+                _send_queued_pkt(netif);
+#ifdef MODULE_NETSTATS_L2
                 /* we are the only ones supposed to touch this variable,
                  * so no acquire necessary */
                 netif->stats.tx_success++;
+#endif
+                break;
+#endif
+#ifdef MODULE_NETSTATS_L2
+#endif
+#if defined(MODULE_NETSTATS_L2) || defined(MODULE_GNRC_NETIF_PKTQ)
+            case NETDEV_EVENT_TX_MEDIUM_BUSY:
+                /* send packet previously queued within netif due to the lower
+                 * layer being busy.
+                 * Further packets will be sent on later TX_COMPLETE or
+                 * TX_MEDIUM_BUSY */
+                _send_queued_pkt(netif);
+#ifdef MODULE_NETSTATS_L2
+                /* we are the only ones supposed to touch this variable,
+                 * so no acquire necessary */
+                netif->stats.tx_failed++;
+#endif
                 break;
 #endif
             default:
