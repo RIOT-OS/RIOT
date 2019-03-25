@@ -69,6 +69,15 @@ static void _irq_handler(void *arg)
 }
 #endif
 
+static inline bool _is_busy(at86rf2xx_t *dev)
+{
+    uint8_t state = at86rf2xx_get_status(dev);
+
+    return (state == AT86RF2XX_STATE_BUSY_RX_AACK) ||
+           (state == AT86RF2XX_STATE_BUSY_TX_ARET) ||
+           (state == AT86RF2XX_STATE_IN_PROGRESS);
+}
+
 static int _init(netdev_t *netdev)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
@@ -114,6 +123,9 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
     size_t len = 0;
 
+    if (_is_busy(dev)) {
+        return -EBUSY;
+    }
     at86rf2xx_tx_prepare(dev);
 
     /* load packet data into FIFO */
