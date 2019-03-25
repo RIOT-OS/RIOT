@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     net_bluetil_ad
+ * @ingroup     ble_bluetil_ad
  * @{
  *
  * @file
