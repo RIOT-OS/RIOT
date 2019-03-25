@@ -24,6 +24,7 @@
 #include "periph_cpu.h"
 #include "f7/cfg_clock_216_8_1.h"
 #include "cfg_i2c1_pb8_pb9.h"
+#include "cfg_spi_divtable.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -121,6 +122,29 @@ static const uart_conf_t uart_config[] = {
 #define UART_2_ISR          (isr_usart2)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+/** @} */
+
+/**
+ * @name   SPI configuration
+ *
+ * @note    The spi_divtable is auto-generated from
+ *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
+ * @{
+ */
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_A, 7),
+        .miso_pin = GPIO_PIN(PORT_A, 6),
+        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .cs_pin   = GPIO_UNDEF,
+        .af       = GPIO_AF5,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2
+    },
+};
+
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 #ifdef __cplusplus
