@@ -781,6 +781,10 @@ ifneq (,$(filter skald,$(USEMODULE)))
   USEMODULE += random
 endif
 
+ifneq (,$(filter bluetil_addr,$(USEMODULE)))
+  USEMODULE += fmt
+endif
+
 ifneq (,$(filter cord_epsim_standalone,$(USEMODULE)))
   USEMODULE += cord_epsim
   USEMODULE += xtimer
