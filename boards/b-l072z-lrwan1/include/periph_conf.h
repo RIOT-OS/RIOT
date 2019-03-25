@@ -221,6 +221,17 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
+ * @name    RTT configuration
+ *
+ * On the STM32Lx platforms, we always utilize the LPTIM1.
+ * @{
+ */
+#define RTT_NUMOF           (1)
+#define RTT_FREQUENCY       (1024U)             /* 32768 / 2^n */
+#define RTT_MAX_VALUE       (0x0000ffff)        /* 16-bit timer */
+/** @} */
+
+/**
  * @name    RTC configuration
  * @{
  */
