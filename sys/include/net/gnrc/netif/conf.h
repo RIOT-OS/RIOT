@@ -55,6 +55,30 @@ extern "C" {
 #endif
 
 /**
+ * @brief       Packet queue pool size for all network interfaces
+ *
+ * @note        With @ref net_gnrc_sixlowpan_frag the queue should fit at least
+ *              all fragments of the minimum MTU.
+ * @see         net_gnrc_netif_pktq
+ */
+#ifndef CONFIG_GNRC_NETIF_PKTQ_POOL_SIZE
+#define CONFIG_GNRC_NETIF_PKTQ_POOL_SIZE      (16U)
+#endif
+
+/**
+ * @brief       Time in microseconds for when to try send a queued packet at the
+ *              latest
+ *
+ * Set to -1 to deactivate dequeing by timer. For this it has to be ensured that
+ * none of the notifications by the driver are missed!
+ *
+ * @see         net_gnrc_netif_pktq
+ */
+#ifndef CONFIG_GNRC_NETIF_PKTQ_TIMER_US
+#define CONFIG_GNRC_NETIF_PKTQ_TIMER_US       (5000U)
+#endif
+
+/**
  * @brief   Number of multicast addresses needed for @ref net_gnrc_rpl "RPL".
  *
  * @note    Used for calculation of @ref GNRC_NETIF_IPV6_GROUPS_NUMOF

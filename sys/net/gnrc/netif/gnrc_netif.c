@@ -1161,7 +1161,7 @@ static void _configure_netdev(netdev_t *dev)
     if (res < 0) {
         DEBUG("gnrc_netif: enable NETOPT_RX_END_IRQ failed: %d\n", res);
     }
-#ifdef MODULE_NETSTATS_L2
+#if defined(MODULE_NETSTATS_L2) || defined(MODULE_GNRC_NETIF_PKTQ)
     res = dev->driver->set(dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
     if (res < 0) {
         DEBUG("gnrc_netif: enable NETOPT_TX_END_IRQ failed: %d\n", res);
@@ -1291,6 +1291,8 @@ void gnrc_netif_default_init(gnrc_netif_t *netif)
     gnrc_ipv6_nib_init_iface(netif);
 #endif
 }
+
+static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool requeue);
 
 #if IS_USED(MODULE_GNRC_NETIF_EVENTS)
 /**
@@ -1547,10 +1549,21 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         switch (event) {
             case NETDEV_EVENT_RX_COMPLETE:
                 pkt = netif->ops->recv(netif);
+                /* send packet previously queued within netif due to the lower
+                 * layer being busy.
+                 * Further packets will be sent on later TX_COMPLETE */
+                _send_queued_pkt(netif);
                 if (pkt) {
                     _pass_on_packet(pkt);
                 }
                 break;
+#if defined(MODULE_NETSTATS_L2) || defined(MODULE_GNRC_NETIF_PKTQ)
+            case NETDEV_EVENT_TX_COMPLETE:
+                /* send packet previously queued within netif due to the lower
+                 * layer being busy.
+                 * Further packets will be sent on later TX_COMPLETE or
+                 * TX_MEDIUM_BUSY */
+                _send_queued_pkt(netif);
 #ifdef MODULE_NETSTATS_L2
             case NETDEV_EVENT_TX_MEDIUM_BUSY:
                 /* we are the only ones supposed to touch this variable,
