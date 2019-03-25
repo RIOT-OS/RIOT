@@ -55,6 +55,17 @@ extern "C" {
 #endif
 
 /**
+ * @brief       Packet queue pool size for all network interfaces
+ *
+ * @note        With @ref net_gnrc_sixlowpan_frag the queue should fit at least
+ *              all fragments of the minimum MTU.
+ * @see         net_gnrc_netif_pktq
+ */
+#ifndef GNRC_NETIF_PKTQ_POOL_SIZE
+#define GNRC_NETIF_PKTQ_POOL_SIZE  (16U)
+#endif
+
+/**
  * @brief   Number of multicast addresses needed for @ref net_gnrc_rpl "RPL".
  *
  * @note    Used for calculation of @ref GNRC_NETIF_IPV6_GROUPS_NUMOF
