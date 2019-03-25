@@ -193,7 +193,7 @@ static const spi_conf_t spi_config[] = {
         .cs = SPI1_CS0,
     },
 #endif
-};    
+};
 
 /**
  * @brief Number of SPI interfaces

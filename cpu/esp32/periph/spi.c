@@ -44,11 +44,6 @@
 
 #define SPI_BLOCK_SIZE  64  /* number of bytes per SPI transfer */
 
-#define CSPI    (0)         /* controller SPI0 realizes interface CSPI */
-#define FSPI    (1)         /* controller SPI1 realizes interface FSPI */
-#define HSPI    (2)         /* controller SPI2 realizes interface HSPI */
-#define VSPI    (3)         /* controller SPI3 realizes interface VSPI */
-
 /* pins of FSI are fixed */
 #define FSPI_SCK    GPIO6
 #define FSPI_MISO   GPIO7
@@ -99,6 +94,7 @@ static struct _spi_bus_t _spi[] = {
         return error; \
     } \
 }
+
 /*
  * GPIOs that were once initialized as SPI interface pins can not be used
  * afterwards for anything else. Therefore, SPI interfaces are not initialized
@@ -128,7 +124,9 @@ void IRAM_ATTR spi_init (spi_t bus)
                     _spi[bus].signal_mosi = VSPID_OUT_IDX;
                     _spi[bus].signal_miso = VSPIQ_IN_IDX;
                     break;
-        default:    break;
+        default:    LOG_TAG_ERROR("spi", "invalid SPI interface controller "
+                                         "used for SPI_DEV(%d)\n");
+                    break;
     }
     return;
 }

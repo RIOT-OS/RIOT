@@ -688,7 +688,7 @@ static /* IRAM */ int _i2c_read_byte(_i2c_bus_t* bus, uint8_t *byte, bool ack)
         if (res != 0) {
             return res;
         }
-        *byte = (*byte << 1) | bit;
+        *byte = (*byte << 1) | (bit ? 1 : 0);
     }
 
     /* write acknowledgement flag */

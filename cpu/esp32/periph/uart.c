@@ -49,7 +49,8 @@
 #define UART_CLK_FREQ   rtc_clk_apb_freq_get() /* APB_CLK is used */
 
 struct uart_hw_t {
-    uart_dev_t* regs;       /* pointer to register data struct of the UART device */
+    uart_dev_t* regs;       /* pointer to register data struct of used UART device */
+    uint8_t  mod;           /* peripheral hardware module of the UART interface */
     uint8_t  signal_txd;    /* TxD signal from the controller */
     uint8_t  signal_rxd;    /* RxD signal to the controller */
     uint32_t baudrate;      /* used baudrate */
@@ -62,30 +63,31 @@ struct uart_hw_t {
 static struct uart_hw_t _uarts[] = {
     {
         .regs = &UART0,
+        .mod = PERIPH_UART0_MODULE,
         .signal_txd = U0TXD_OUT_IDX,
         .signal_rxd = U0RXD_IN_IDX,
         .baudrate = STDIO_UART_BAUDRATE,
-        .used = false,
-        .int_src = ETS_UART0_INTR_SOURCE
+        .int_src = ETS_UART0_INTR_SOURCE,
+        .used = false
     },
-    #if defined(UART1_TXD) && defined(UART1_RXD)
-    {   .regs = &UART1,
+    {
+        .regs = &UART1,
+        .mod = PERIPH_UART1_MODULE,
         .signal_txd = U1TXD_OUT_IDX,
         .signal_rxd = U1RXD_IN_IDX,
         .baudrate = STDIO_UART_BAUDRATE,
-        .used = false,
-        .int_src = ETS_UART1_INTR_SOURCE
+        .int_src = ETS_UART1_INTR_SOURCE,
+        .used = false
     },
-    #endif
-    #if defined(UART2_TXD) && defined(UART2_RXD)
-    {   .regs = &UART2,
+    {
+        .regs = &UART2,
+        .mod = PERIPH_UART2_MODULE,
         .signal_txd = U2TXD_OUT_IDX,
         .signal_rxd = U2RXD_IN_IDX,
         .baudrate = STDIO_UART_BAUDRATE,
-        .used = false,
-        .int_src = ETS_UART2_INTR_SOURCE
+        .int_src = ETS_UART2_INTR_SOURCE,
+        .used = false
     }
-    #endif
 };
 
 /* declaration of external functions */
@@ -128,7 +130,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
         /* connect TxD pin to the TxD output signal through the GPIO matrix */
         GPIO.func_out_sel_cfg[uart_config[uart].txd].func_sel = _uarts[uart].signal_txd;
-
         /* connect RxD input signal to the RxD pin through the GPIO matrix */
         GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].sig_in_sel = 1;
         GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].sig_in_inv = 0;
@@ -157,28 +158,17 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
 void uart_poweron (uart_t uart)
 {
-    switch (uart) {
-        case 0:  periph_module_enable(PERIPH_UART0_MODULE);
-                 _uart_config(uart);
-                 break;
-        case 1:  periph_module_enable(PERIPH_UART1_MODULE);
-                 _uart_config(uart);
-                 break;
-        case 2:  periph_module_enable(PERIPH_UART2_MODULE);
-                 _uart_config(uart);
-                 break;
-        default: break;
-    }
+    CHECK_PARAM (uart < UART_NUMOF);
+
+    periph_module_enable(_uarts[uart].mod);
+    __uart_config(uart);
 }
 
 void uart_poweroff (uart_t uart)
 {
-    switch (uart) {
-        case 0: periph_module_disable(PERIPH_UART0_MODULE); break;
-        case 1: periph_module_disable(PERIPH_UART1_MODULE); break;
-        case 2: periph_module_disable(PERIPH_UART2_MODULE); break;
-        default: break;
-    }
+    CHECK_PARAM (uart < UART_NUMOF);
+
+    periph_module_disable(_uarts[uart].mod);
 }
 
 /* systemwide UART initializations */
