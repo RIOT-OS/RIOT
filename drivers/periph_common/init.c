@@ -35,6 +35,9 @@
 #ifdef MODULE_PERIPH_HWRNG
 #include "periph/hwrng.h"
 #endif
+#ifdef MODULE_PERIPH_USBDEV
+#include "periph/usbdev.h"
+#endif
 
 void periph_init(void)
 {
@@ -64,5 +67,9 @@ void periph_init(void)
 
 #ifdef MODULE_PERIPH_HWRNG
     hwrng_init();
+#endif
+
+#ifdef MODULE_PERIPH_USBDEV
+    usbdev_init_lowlevel();
 #endif
 }

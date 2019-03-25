@@ -356,6 +356,22 @@ typedef struct usbdev_driver {
 } usbdev_driver_t;
 
 /**
+ * @brief Low level USB peripheral driver initialization
+ *
+ * This function prepares all usbdev peripherals available for initialization
+ */
+void usbdev_init_lowlevel(void);
+
+/**
+ * @brief Retrieve usbdev context from the peripheral
+ *
+ * @param num   usbdev peripheral number to retrieve
+ *
+ * @returns     the usbdev context at index @p num
+ */
+usbdev_t *usbdev_get_ctx(unsigned num);
+
+/**
  * @brief Initialize the USB peripheral device
  *
  * @see @ref usbdev_driver_t::init
