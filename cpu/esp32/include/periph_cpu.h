@@ -55,20 +55,68 @@ typedef unsigned int gpio_t;
 /** @} */
 
 /**
- * @brief   Available ports on the ESP32
+ * @brief   Definition of a fitting UNDEF value
  * @{
  */
-#define PORT_GPIO 0       /**< port GPIO */
+#define GPIO_UNDEF          (0xffffffff)
+/** @} */
+
+/**
+ * @brief   Define a CPU specific GPIO pin generator macro
+ * @{
+ */
+#define GPIO_PIN(x, y)      ((x & 0) | y)
+/** @} */
+
+/**
+ * @brief   Available GPIO ports on ESP32
+ * @{
+ */
+#define PORT_GPIO           (0)
 /** @} */
 
 /**
  * @brief   Define CPU specific number of GPIO pins
  * @{
  */
-#define GPIO_PIN_NUMOF  40
-#ifndef GPIO_PIN_COUNT
-#define GPIO_PIN_COUNT  GPIO_PIN_NUMOF
-#endif
+#define GPIO_PIN_NUMOF      (40)
+/** @} */
+
+/**
+ * @brief   Override mode flank selection values
+ *
+ * @{
+ */
+#define HAVE_GPIO_FLANK_T
+typedef enum {
+    GPIO_NONE    = 0,
+    GPIO_RISING  = 1,        /**< emit interrupt on rising flank  */
+    GPIO_FALLING = 2,        /**< emit interrupt on falling flank */
+    GPIO_BOTH    = 3,        /**< emit interrupt on both flanks   */
+    GPIO_LOW     = 4,        /**< emit interrupt on low level     */
+    GPIO_HIGH    = 5         /**< emit interrupt on low level     */
+} gpio_flank_t;
+
+/** @} */
+
+/**
+ * @brief   Override GPIO modes
+ *
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN,        /**< input */
+    GPIO_IN_PD,     /**< input with pull-down */
+    GPIO_IN_PU,     /**< input with pull-up */
+    GPIO_OUT,       /**< output */
+    GPIO_OD,        /**< open-drain output */
+    GPIO_OD_PU,     /**< open-drain output with pull-up */
+    GPIO_IN_OUT,    /**< input and output */
+    GPIO_IN_OD,     /**< input and open-drain output */
+    GPIO_IN_OD_PU   /**< input and open-drain output */
+} gpio_mode_t;
+/** @} */
 /** @} */
 
 /**
@@ -113,43 +161,6 @@ typedef unsigned int gpio_t;
 #define GPIO37      (GPIO_PIN(PORT_GPIO,37))
 #define GPIO38      (GPIO_PIN(PORT_GPIO,38))
 #define GPIO39      (GPIO_PIN(PORT_GPIO,39))
-/** @} */
-
-/**
- * @brief   Override mode flank selection values
- *
- * @{
- */
-#define HAVE_GPIO_FLANK_T
-typedef enum {
-    GPIO_NONE    = 0,
-    GPIO_RISING  = 1,        /**< emit interrupt on rising flank  */
-    GPIO_FALLING = 2,        /**< emit interrupt on falling flank */
-    GPIO_BOTH    = 3,        /**< emit interrupt on both flanks   */
-    GPIO_LOW     = 4,        /**< emit interrupt on low level     */
-    GPIO_HIGH    = 5         /**< emit interrupt on low level     */
-} gpio_flank_t;
-
-/** @} */
-
-/**
- * @brief   Override GPIO modes
- *
- * @{
- */
-#define HAVE_GPIO_MODE_T
-typedef enum {
-    GPIO_IN,        /**< input */
-    GPIO_IN_PD,     /**< input with pull-down */
-    GPIO_IN_PU,     /**< input with pull-up */
-    GPIO_OUT,       /**< output */
-    GPIO_OD,        /**< open-drain output */
-    GPIO_OD_PU,     /**< open-drain output with pull-up */
-    GPIO_IN_OUT,    /**< input and output */
-    GPIO_IN_OD,     /**< input and open-drain output */
-    GPIO_IN_OD_PU   /**< input and open-drain output */
-} gpio_mode_t;
-/** @} */
 /** @} */
 
 /**
@@ -363,8 +374,8 @@ typedef struct {
  *
  * ESP32 has four SPI controllers:
  *
- * - controller SPI0 is reserved for caching the flash memory
- * - controller SPI1 is reserved for external memories like flash and PSRAM
+ * - controller SPI0 is reserved for caching the flash memory (CPSI)
+ * - controller SPI1 is reserved for external memories like flash and PSRAM (FSPI)
  * - controller SPI2 realizes interface HSPI that can be used for peripherals
  * - controller SPI3 realizes interface VSPI that can be used for peripherals
  *
@@ -386,17 +397,15 @@ typedef struct {
  * - SPIn_CS0, the GPIO used as CS signal when the cs parameter in spi_aquire
  *   is GPIO_UNDEF,
  *
- * where n can be 0 or 1.
- *
- * @note The configuration of the SPI interfaces SPI_DEV(n) should be in
- * continuous ascending order of n.
+ * where n can be 0 or 1. If they are not defined, the according SPI interface
+ * SPI_DEV(n) is not used.
  *
  * SPI_NUMOF is determined automatically from the board-specific peripheral
  * definitions of SPIn_*.
  */
 
 /**
- * @brief   SPI controller used for peripheral interfaces
+ * @brief   SPI controllers that can be used for peripheral interfaces
  */
 typedef enum {
     HSPI = 2,         /**< HSPI interface controller */
@@ -449,20 +458,20 @@ typedef struct {
  * configuration and is always available. All ESP32 boards use it as standard
  * configuration for the console.
  *
- * UART_DEV(0).TXD      GPIO1
- * UART_DEV(0).RXD      GPIO3
+ *      UART_DEV(0).TXD      GPIO1
+ *      UART_DEV(0).RXD      GPIO3
  *
  * The pin configuration of UART_DEV(1) and UART_DEV(2) are defined in
  * board specific peripheral configuration by
  *
- * UARTn_TXD, the GPIO used as TxD signal, and
- * UARTn_RXD, the GPIO used as RxD signal,
+ * - UARTn_TXD, the GPIO used as TxD signal, and
+ * - UARTn_RXD, the GPIO used as RxD signal,
  *
- * where n can be 2 or 3. If they are not defined, the UART interface
+ * where n can be 1 or 2. If they are not defined, the according UART interface
  * UART_DEV(n) is not used.
  *
  * UART_NUMOF is determined automatically from the board-specific peripheral
- * definitions of UARTn_TXD and UARTn_RXD.
+ * definitions of UARTn_*.
  *
  * @{
  */
@@ -474,8 +483,8 @@ typedef struct {
     gpio_t txd;             /**< GPIO used as TxD pin */
     gpio_t rxd;             /**< GPIO used as RxD pin */
 } uart_conf_t;
-/** @} */
 
+/** @} */
 
 #ifdef __cplusplus
 }
