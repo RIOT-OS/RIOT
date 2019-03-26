@@ -125,8 +125,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         }
 
         /* try to initialize the pins as GPIOs first */
-        if (gpio_init (_uarts[uart].pin_txd, GPIO_OUT) ||
-            gpio_init (_uarts[uart].pin_rxd, GPIO_IN)) {
+        if (gpio_init (_uarts[uart].pin_rxd, GPIO_IN) ||
+            gpio_init (_uarts[uart].pin_txd, GPIO_OUT)) {
             return -1;
         }
 
