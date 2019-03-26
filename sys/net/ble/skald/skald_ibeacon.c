@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     net_skald_ibeacon
+ * @ingroup     ble_skald_ibeacon
  * @{
  *
  * @file
