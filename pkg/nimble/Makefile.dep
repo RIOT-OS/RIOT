@@ -30,3 +30,7 @@ ifneq (,$(filter nimble_controller,$(USEMODULE)))
     USEMODULE += nimble_drivers_nrf52
   endif
 endif
+
+ifneq (,$(filter nimble_addr,$(USEMODULE)))
+  USEMODULE += bluetil_addr
+endif
