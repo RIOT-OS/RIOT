@@ -120,19 +120,20 @@ endif
 LINKFLAGS += -L$(ESP32_SDK_DIR)/components/esp32
 LINKFLAGS += -L$(ESP32_SDK_DIR)/components/esp32/lib
 
+BASELIBS += -lhal -lg -lc -lgcc
+
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
     BASELIBS += -lcore -lrtc -lnet80211 -lpp -lsmartconfig -lcoexist
     BASELIBS += -lwps -lwpa -lwpa2 -lespnow -lmesh -lphy -lstdc++
 endif
 
-LINKFLAGS += -lhal -lg -lc
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.common.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.peripherals.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.nanofmt.ld
-LINKFLAGS += -nostdlib -lgcc -u putchar -Wl,-gc-sections
+LINKFLAGS += -nostdlib -Wl,-gc-sections -Wl,-static
 
 # configure preflasher to convert .elf to .bin before flashing
 FLASH_MODE ?= dout  # FIX configuration, DO NOT CHANGE
