@@ -71,4 +71,7 @@ nimble_addr:
 nimble_scanlist:
 	"$(MAKE)" -C $(TDIR)/scanlist
 
+nimble_scanner:
+	"$(MAKE)" -C $(TDIR)/scanner
+
 include $(RIOTBASE)/pkg/pkg.mk
