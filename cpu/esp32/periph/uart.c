@@ -103,50 +103,8 @@ extern void uart_div_modify(uint8_t uart_no, uint32_t div);
 static uint8_t IRAM _uart_rx_one_char (uart_t uart);
 static void _uart_tx_one_char(uart_t uart, uint8_t data);
 static void _uart_intr_enable (uart_t uart);
+static void _uart_config (uart_t uart);
 static void IRAM _uart_intr_handler (void *para);
-
-void _uart_config (uart_t uart)
-{
-    CHECK_PARAM (uart < UART_NUMOF);
-
-    /* setup the baudrate */
-    if (uart == UART_DEV(0) || uart == UART_DEV(1)) {
-        /* for UART0 and UART1, we can us the ROM function */
-        uart_div_modify(uart, (UART_CLK_FREQ << 4) / _uarts[uart].baudrate);
-    }
-    else {
-        /* for UART2, we have to control it by registers */
-        _uarts[uart].regs->conf0.tick_ref_always_on = 1; /* use APB_CLK */
-        /* compute and set the integral and the decimal part */
-        uint32_t clk = (UART_CLK_FREQ << 4) / _uarts[uart].baudrate;
-        _uarts[uart].regs->clk_div.div_int  = clk >> 4;
-        _uarts[uart].regs->clk_div.div_frag = clk & 0xf;
-    }
-
-    /* set 8 data bits */
-    _uarts[uart].regs->conf0.bit_num = 3;
-    /* reset the FIFOs */
-    _uarts[uart].regs->conf0.rxfifo_rst = 1;
-    _uarts[uart].regs->conf0.rxfifo_rst = 0;
-    _uarts[uart].regs->conf0.txfifo_rst = 1;
-    _uarts[uart].regs->conf0.txfifo_rst = 0;
-
-    if (_uarts[uart].isr_ctx.rx_cb) {
-        /* since reading can only be done byte by byte, we set
-           UART_RXFIFO_FULL_THRHD interrupt level to 1 byte */
-        _uarts[uart].regs->conf1.rxfifo_full_thrhd = 1;
-
-        /* enable the RX FIFO FULL interrupt */
-        _uart_intr_enable (uart);
-
-        /* route all UART interrupt sources to same the CPU interrupt */
-        intr_matrix_set(PRO_CPU_NUM, _uarts[uart].int_src, CPU_INUM_UART);
-
-        /* we have to enable therefore the CPU interrupt here */
-        xt_set_interrupt_handler(CPU_INUM_UART, _uart_intr_handler, NULL);
-        xt_ints_on(BIT(CPU_INUM_UART));
-    }
-}
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
@@ -305,6 +263,48 @@ static void _uart_intr_enable(uart_t uart)
     _uarts[uart].used = true;
 
     DEBUG("%s %08x\n", __func__, _uarts[uart].regs->int_ena.val);
+}
+
+static void _uart_config (uart_t uart)
+{
+    CHECK_PARAM (uart < UART_NUMOF);
+
+    /* setup the baudrate */
+    if (uart == UART_DEV(0) || uart == UART_DEV(1)) {
+        /* for UART0 and UART1, we can us the ROM function */
+        uart_div_modify(uart, (UART_CLK_FREQ << 4) / _uarts[uart].baudrate);
+    }
+    else if (uart_set_baudrate(uart, _uarts[uart].baudrate) != UART_OK) {
+        return;
+    }
+
+    /* set number of data bits, stop bits and parity mode */
+    if (uart_mode(uart, _uarts[uart].data, _uarts[uart].stop,
+                                           _uarts[uart].parity) != UART_OK) {
+        return;
+    }
+
+    /* reset the FIFOs */
+    _uarts[uart].regs->conf0.rxfifo_rst = 1;
+    _uarts[uart].regs->conf0.rxfifo_rst = 0;
+    _uarts[uart].regs->conf0.txfifo_rst = 1;
+    _uarts[uart].regs->conf0.txfifo_rst = 0;
+
+    if (_uarts[uart].isr_ctx.rx_cb) {
+        /* since reading can only be done byte by byte, we set
+           UART_RXFIFO_FULL_THRHD interrupt level to 1 byte */
+        _uarts[uart].regs->conf1.rxfifo_full_thrhd = 1;
+
+        /* enable the RX FIFO FULL interrupt */
+        _uart_intr_enable (uart);
+
+        /* route all UART interrupt sources to same the CPU interrupt */
+        intr_matrix_set(PRO_CPU_NUM, _uarts[uart].int_src, CPU_INUM_UART);
+
+        /* we have to enable therefore the CPU interrupt here */
+        xt_set_interrupt_handler(CPU_INUM_UART, _uart_intr_handler, NULL);
+        xt_ints_on(BIT(CPU_INUM_UART));
+    }
 }
 
 /* systemwide UART initializations */
