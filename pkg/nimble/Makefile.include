@@ -76,3 +76,6 @@ endif
 ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/scanlist/include
 endif
+ifneq (,$(filter nimble_scanner,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/nimble/scanner/include
+endif
