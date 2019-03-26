@@ -241,7 +241,6 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     /* payload_len: actual size of the packet vs
      * datagram_size: size of the uncompressed IPv6 packet */
     size_t payload_len = gnrc_pkt_len(fragment_msg->pkt->next);
-    msg_t msg;
 
     assert((fragment_msg->pkt == pkt) || (pkt == NULL));
     (void)page;
@@ -284,9 +283,7 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
         goto error;
     }
     fragment_msg->offset += res;
-    msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND,
-    msg.content.ptr = fragment_msg;
-    if (msg_send_to_self(&msg) == 0) {
+    if (!gnrc_sixlowpan_frag_send_msg(fragment_msg)) {
         DEBUG("6lo frag: message queue full, can't issue next fragment "
               "sending\n");
         goto error;
