@@ -168,6 +168,14 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return UART_OK;
 }
 
+#if MODULE_PERIPH_UART_MODECFG
+int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
+              uart_stop_bits_t stop_bits)
+{
+    return _uart_set_mode(uart, data_bits, parity, stop_bits);
+}
+#endif
+
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     CHECK_PARAM (uart < UART_NUMOF);
