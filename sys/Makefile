@@ -128,7 +128,7 @@ ifneq (,$(filter nanocoap,$(USEMODULE)))
   DIRS += net/application_layer/nanocoap
 endif
 ifneq (,$(filter skald,$(USEMODULE)))
-  DIRS += net/skald
+  DIRS += net/ble/skald
 endif
 ifneq (,$(filter cord_common,$(USEMODULE)))
   DIRS += net/application_layer/cord/common
