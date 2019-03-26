@@ -457,7 +457,7 @@ static void _ep_enable(usbdev_ep_t *ep)
         case USB_EP_TYPE_INTERRUPT:
             type = 0x04;
             break;
-        case default:
+        default:
             /* Must never happen */
             assert(false);
     }
