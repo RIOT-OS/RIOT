@@ -1328,7 +1328,7 @@ static void *_gnrc_netif_thread(void *args)
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
                 res = netif->ops->send(netif, msg.content.ptr);
                 if (res < 0) {
-                    DEBUG("gnrc_netif: error sending packet %p (code: %u)\n",
+                    DEBUG("gnrc_netif: error sending packet %p (code: %i)\n",
                           msg.content.ptr, res);
                 }
 #ifdef MODULE_NETSTATS_L2
