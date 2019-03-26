@@ -112,7 +112,7 @@ riotboot/flash-extended-slot0: $(RIOTBOOT_EXTENDED_BIN) $(FLASHDEPS)
 # Flashing rule for slot 0
 riotboot/flash-slot0: export IMAGE_OFFSET=$(SLOT0_OFFSET)
 # openocd
-riotboot/flash-slot1: ELFFILE=$(SLOT1_RIOT_BIN)
+riotboot/flash-slot0: ELFFILE=$(SLOT0_RIOT_BIN)
 riotboot/flash-slot0: FLASHFILE=$(SLOT0_RIOT_BIN)
 riotboot/flash-slot0: $(SLOT0_RIOT_BIN) $(FLASHDEPS)
 	$(flash-recipe)
