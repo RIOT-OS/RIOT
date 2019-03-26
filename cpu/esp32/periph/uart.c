@@ -217,7 +217,7 @@ void uart_print_config(void)
     }
 }
 
-void IRAM _uart_intr_handler (void *arg)
+static void IRAM _uart_intr_handler (void *arg)
 {
     /* to satisfy the compiler */
     (void)arg;
