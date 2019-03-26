@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     net_skald_eddystone
+ * @ingroup     ble_skald_eddystone
  * @{
  *
  * @file

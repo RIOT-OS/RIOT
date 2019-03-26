@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     net_skald
+ * @ingroup     ble_skald
  * @{
  *
  * @file
