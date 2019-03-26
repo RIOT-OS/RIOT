@@ -29,10 +29,6 @@ endif
 # SPECIAL module dependencies
 # cannot be done in Makefile.dep since Makefile.dep is included too late
 
-ifneq (,$(findstring core_thread_flags,$(USEMODULE)))
-    USEMODULE += pthread
-endif
-
 ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
     USEMODULE += esp_gdb
 endif
