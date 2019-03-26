@@ -100,6 +100,7 @@ static struct uart_hw_t _uarts[] = {
 extern void uart_div_modify(uint8_t uart_no, uint32_t div);
 
 /* forward declaration of internal functions */
+static int _uart_set_baudrate(uart_t uart, uint32_t baudrate);
 static uint8_t IRAM _uart_rx_one_char (uart_t uart);
 static void _uart_tx_one_char(uart_t uart, uint8_t data);
 static void _uart_intr_enable (uart_t uart);
@@ -291,7 +292,7 @@ static void _uart_config (uart_t uart)
         /* for UART0 and UART1, we can us the ROM function */
         uart_div_modify(uart, (UART_CLK_FREQ << 4) / _uarts[uart].baudrate);
     }
-    else if (uart_set_baudrate(uart, _uarts[uart].baudrate) != UART_OK) {
+    else if (_uart_set_baudrate(uart, _uarts[uart].baudrate) != UART_OK) {
         return;
     }
 
@@ -324,11 +325,18 @@ static void _uart_config (uart_t uart)
     }
 }
 
-int uart_set_baudrate(uart_t uart, uint32_t baudrate)
+static int _uart_set_baudrate(uart_t uart, uint32_t baudrate)
 {
     DEBUG("%s uart=%d, rate=%d\n", __func__, uart, baudrate);
 
     CHECK_PARAM_RET (uart < UART_NUMOF, -1);
+
+    /* wait until TX FIFO is empty */
+    while (_uarts[uart].regs->status.txfifo_cnt != 0) { }
+
+    critical_enter();
+
+    _uarts[uart].baudrate = baudrate;
 
     /* use APB_CLK */
     _uarts[uart].regs->conf0.tick_ref_always_on = 1;
@@ -337,5 +345,6 @@ int uart_set_baudrate(uart_t uart, uint32_t baudrate)
     _uarts[uart].regs->clk_div.div_int  = clk >> 4;
     _uarts[uart].regs->clk_div.div_frag = clk & 0xf;
 
+    critical_exit();
     return UART_OK;
 }
