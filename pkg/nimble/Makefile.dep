@@ -34,3 +34,8 @@ endif
 ifneq (,$(filter nimble_addr,$(USEMODULE)))
   USEMODULE += bluetil_addr
 endif
+
+ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
+  USEMODULE += nimble_addr
+  USEMODULE += bluetil_ad
+endif
