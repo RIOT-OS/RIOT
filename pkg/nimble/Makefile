@@ -67,4 +67,8 @@ nimble_drivers_nrf52:
 # additional, RIOT specific nimble modules
 nimble_addr:
 	"$(MAKE)" -C $(TDIR)/addr/
+
+nimble_scanlist:
+	"$(MAKE)" -C $(TDIR)/scanlist
+
 include $(RIOTBASE)/pkg/pkg.mk
