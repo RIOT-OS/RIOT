@@ -314,6 +314,23 @@ static void test_clist_sort(void)
     }
 }
 
+static void test_clist_count(void)
+{
+    size_t n = clist_count(&test_clist);
+    TEST_ASSERT(n == 0);
+
+    for (unsigned i = 1; i <= TEST_CLIST_LEN; i++) {
+        clist_rpush(&test_clist, &tests_clist_buf[i - 1]);
+        n = clist_count(&test_clist);
+        TEST_ASSERT(n == i);
+    }
+    for (unsigned i = TEST_CLIST_LEN; i > 0; i--) {
+        clist_lpop(&test_clist);
+        n = clist_count(&test_clist);
+        TEST_ASSERT(n == (i - 1));
+    }
+}
+
 Test *tests_core_clist_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -331,6 +348,7 @@ Test *tests_core_clist_tests(void)
         new_TestFixture(test_clist_foreach),
         new_TestFixture(test_clist_sort_empty),
         new_TestFixture(test_clist_sort),
+        new_TestFixture(test_clist_count),
     };
 
     EMB_UNIT_TESTCALLER(core_clist_tests, set_up, NULL,
