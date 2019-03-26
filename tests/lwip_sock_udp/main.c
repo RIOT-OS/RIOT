@@ -285,6 +285,32 @@ static void test_sock_udp_recv4__socketed_with_remote(void)
     assert(_check_net());
 }
 
+static void test_sock_udp_recv4__socketed_with_port0(void)
+{
+    static sock_udp_ep_t local = { .family = AF_INET, .port = 0 };
+    static const sock_udp_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+                                          .family = AF_INET,
+                                          .port = _TEST_PORT_REMOTE };
+    sock_udp_ep_t result;
+
+    assert(0 == sock_udp_create(&_sock, &local, &remote, SOCK_FLAGS_REUSE_EP));
+    assert(0 == sock_udp_get_local(&_sock, &local));
+    assert(0 != local.port);
+    assert(_inject_4packet(_TEST_ADDR4_REMOTE, _TEST_ADDR4_LOCAL, _TEST_PORT_REMOTE,
+                           local.port, "ABCD", sizeof("ABCD"),
+                           _TEST_NETIF));
+    assert(sizeof("ABCD") == sock_udp_recv(&_sock, _test_buffer,
+                                           sizeof(_test_buffer),
+                                           SOCK_NO_TIMEOUT, &result));
+    assert(AF_INET == result.family);
+    assert(_TEST_ADDR4_REMOTE == result.addr.ipv4_u32);
+    assert(_TEST_PORT_REMOTE == result.port);
+#if LWIP_NETBUF_RECVINFO
+    assert(_TEST_NETIF == result.netif);
+#endif
+    assert(_check_net());
+}
+
 static void test_sock_udp_recv4__unsocketed(void)
 {
     static const sock_udp_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
@@ -889,6 +915,34 @@ static void test_sock_udp_recv6__socketed_with_remote(void)
     assert(_check_net());
 }
 
+static void test_sock_udp_recv6__socketed_with_port0(void)
+{
+    static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR6_REMOTE };
+    static const ipv6_addr_t dst_addr = { .u8 = _TEST_ADDR6_LOCAL };
+    static sock_udp_ep_t local = { .family = AF_INET6, .port = 0 };
+    static const sock_udp_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR6_REMOTE },
+                                          .family = AF_INET6,
+                                          .port = _TEST_PORT_REMOTE };
+    sock_udp_ep_t result;
+
+    assert(0 == sock_udp_create(&_sock, &local, &remote, SOCK_FLAGS_REUSE_EP));
+    assert(0 == sock_udp_get_local(&_sock, &local));
+    assert(0 != local.port);
+    assert(_inject_6packet(&src_addr, &dst_addr, _TEST_PORT_REMOTE,
+                           local.port, "ABCD", sizeof("ABCD"),
+                           _TEST_NETIF));
+    assert(sizeof("ABCD") == sock_udp_recv(&_sock, _test_buffer,
+                                           sizeof(_test_buffer),
+                                           SOCK_NO_TIMEOUT, &result));
+    assert(AF_INET6 == result.family);
+    assert(memcmp(&result.addr, &src_addr, sizeof(result.addr)) == 0);
+    assert(_TEST_PORT_REMOTE == result.port);
+#if LWIP_NETBUF_RECVINFO
+    assert(_TEST_NETIF == result.netif);
+#endif
+    assert(_check_net());
+}
+
 static void test_sock_udp_recv6__unsocketed(void)
 {
     static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR6_REMOTE };
@@ -1301,6 +1355,7 @@ int main(void)
     CALL(test_sock_udp_recv4__ETIMEDOUT());
     CALL(test_sock_udp_recv4__socketed());
     CALL(test_sock_udp_recv4__socketed_with_remote());
+    CALL(test_sock_udp_recv4__socketed_with_port0());
     CALL(test_sock_udp_recv4__unsocketed());
     CALL(test_sock_udp_recv4__unsocketed_with_remote());
     CALL(test_sock_udp_recv4__with_timeout());
@@ -1347,6 +1402,7 @@ int main(void)
     CALL(test_sock_udp_recv6__ETIMEDOUT());
     CALL(test_sock_udp_recv6__socketed());
     CALL(test_sock_udp_recv6__socketed_with_remote());
+    CALL(test_sock_udp_recv6__socketed_with_port0());
     CALL(test_sock_udp_recv6__unsocketed());
     CALL(test_sock_udp_recv6__unsocketed_with_remote());
     CALL(test_sock_udp_recv6__with_timeout());
