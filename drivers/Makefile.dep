@@ -32,8 +32,8 @@ endif
 ifneq (,$(filter at,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
   USEMODULE += fmt
-  USEMODULE += xtimer
   USEMODULE += isrpipe
+  USEMODULE += isrpipe_read_timeout
 endif
 
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
