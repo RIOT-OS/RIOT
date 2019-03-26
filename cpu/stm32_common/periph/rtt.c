@@ -67,6 +67,23 @@
 #endif
 #endif
 
+#if defined(CPU_FAM_STM32L4)
+#define IMR_REG             IMR2
+#define EXTI_IMR_BIT        EXTI_IMR2_IM32
+#elif defined(CPU_FAM_STM32L0)
+#define IMR_REG             IMR
+#define EXTI_IMR_BIT        EXTI_IMR_IM29
+#else
+#define IMR_REG             IMR
+#define FTSR_REG            FTSR
+#define RTSR_REG            RTSR
+#define PR_REG              PR
+#define EXTI_FTSR_BIT       EXTI_FTSR_TR23
+#define EXTI_RTSR_BIT       EXTI_RTSR_TR23
+#define EXTI_IMR_BIT        EXTI_IMR_MR23
+#define EXTI_PR_BIT         EXTI_PR_PR23
+#endif
+
 
 /* allocate memory for overflow and alarm callbacks + args */
 static rtt_cb_t ovf_cb = NULL;
@@ -91,6 +108,14 @@ void rtt_init(void)
     LPTIM1->CFGR = PRE;
     /* enable overflow and compare interrupts */
     LPTIM1->IER = (LPTIM_IER_ARRMIE | LPTIM_IER_CMPMIE);
+    /* configure the EXTI channel, as RTT interrupts are routed through it.
+     * Needs to be configured to trigger on rising edges. */
+    EXTI->IMR_REG |= EXTI_IMR_BIT;
+#if !defined(CPU_FAM_STM32L4) && !defined(CPU_FAM_STM32L0)
+    EXTI->FTSR_REG &= ~(EXTI_FTSR_BIT);
+    EXTI->RTSR_REG |= EXTI_RTSR_BIT;
+    EXTI->PR_REG |= EXTI_PR_BIT;
+#endif
     NVIC_EnableIRQ(LPTIM1_IRQn);
     /* enable timer */
     LPTIM1->CR = LPTIM_CR_ENABLE;
@@ -178,6 +203,9 @@ void isr_lptim1(void)
         }
     }
     LPTIM1->ICR = (LPTIM_ICR_ARRMCF | LPTIM_ICR_CMPMCF);
+#if !defined(CPU_FAM_STM32L4) && !defined(CPU_FAM_STM32L0)
+    EXTI->PR_REG |= EXTI_PR_BIT;
+#endif
 
     cortexm_isr_end();
 }
