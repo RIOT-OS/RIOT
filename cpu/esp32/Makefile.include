@@ -135,6 +135,17 @@ LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.nanofmt.ld
 LINKFLAGS += -nostdlib -Wl,-gc-sections -Wl,-static
 
+ifneq (, $(filter esp_idf_heap, $(USEMODULE)))
+    LINKFLAGS += -Wl,-wrap=malloc
+    LINKFLAGS += -Wl,-wrap=free
+    LINKFLAGS += -Wl,-wrap=calloc
+    LINKFLAGS += -Wl,-wrap=realloc
+    LINKFLAGS += -Wl,-wrap=_malloc_r
+    LINKFLAGS += -Wl,-wrap=_calloc_r
+    LINKFLAGS += -Wl,-wrap=_free_r
+    LINKFLAGS += -Wl,-wrap=_realloc_r
+endif
+
 # configure preflasher to convert .elf to .bin before flashing
 FLASH_MODE ?= dout  # FIX configuration, DO NOT CHANGE
 FLASH_FREQ  = 40m   # FIX configuration, DO NOT CHANGE

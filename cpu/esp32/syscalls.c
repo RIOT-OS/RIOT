@@ -114,18 +114,15 @@ int IRAM printf(const char* format, ...)
 }
 
 #ifndef MODULE_PTHREAD
-
-#define PTHREAD_CANCEL_DISABLE 1
 /*
  * This is a dummy function to avoid undefined references when linking
  * against newlib and module pthread is not used.
  */
 int pthread_setcancelstate(int state, int *oldstate)
 {
-    if (oldstate) {
-        *oldstate = PTHREAD_CANCEL_DISABLE;
-    }
-    return 0;
+    (void)state;
+    (void)oldstate;
+    return -EINVAL;
 }
 #endif /*  MODULE_PTHREAD*/
 
@@ -243,28 +240,57 @@ void IRAM _lock_release_recursive(_lock_t *lock)
 extern void *heap_caps_malloc_default( size_t size );
 extern void *heap_caps_realloc_default( void *ptr, size_t size );
 
-void* IRAM_ATTR _malloc_r(struct _reent *r, size_t size)
+extern void *__real_malloc(size_t size);
+extern void *__real_calloc(size_t nmemb, size_t size);
+extern void *__real_realloc(void *ptr, size_t size);
+extern void  __real_free(void *ptr);
+extern void *__real__malloc_r(struct _reent *r, size_t size);
+extern void *__real__calloc_r(struct _reent *r, size_t nmemb, size_t size);
+extern void *__real__realloc_r(struct _reent *r, void *ptr, size_t size);
+extern void  __real__free_r(struct _reent *r, void *ptr);
+
+void* IRAM_ATTR __wrap_malloc(size_t size)
 {
     return heap_caps_malloc_default( size );
 }
 
-void IRAM_ATTR _free_r(struct _reent *r, void* ptr)
-{
-    heap_caps_free( ptr );
-}
-
-void* IRAM_ATTR _realloc_r(struct _reent *r, void* ptr, size_t size)
+void* IRAM_ATTR __wrap_realloc(void* ptr, size_t size)
 {
     return heap_caps_realloc_default( ptr, size );
 }
 
-void* IRAM_ATTR _calloc_r(struct _reent *r, size_t count, size_t size)
+void* IRAM_ATTR __wrap_calloc(size_t count, size_t size)
 {
     void* result = heap_caps_malloc_default(count * size);
     if (result) {
         bzero(result, count * size);
     }
     return result;
+}
+
+void IRAM_ATTR __wrap_free(void* ptr)
+{
+    heap_caps_free( ptr );
+}
+
+void* __wrap__malloc_r(struct _reent *r, size_t size)
+{
+    return __wrap_malloc(size);
+}
+
+void* __wrap__calloc_r(struct _reent *r, size_t count, size_t size)
+{
+    return __wrap_calloc(count, size);
+}
+
+void *__wrap__realloc_r (struct _reent *r, void *ptr, size_t size)
+{
+    return __wrap_realloc(ptr, size);
+}
+
+void __wrap__free_r(struct _reent *r, void *ptr)
+{
+    __wrap_free(ptr);
 }
 
 #ifndef MODULE_NEWLIB_SYSCALLS_DEFAULT
