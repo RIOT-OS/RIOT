@@ -19,6 +19,8 @@
 #ifndef NIMBLE_RIOT_H
 #define NIMBLE_RIOT_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
