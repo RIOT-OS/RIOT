@@ -20,13 +20,9 @@
  * @}
  */
 
-#ifdef MODULE_NEWLIB_SYSCALLS_FE310
-#include <stdio.h>
-#endif
-
-#ifdef MODULE_ATMEGA_COMMON
 #include "cpu.h"
-#else
+
+#ifndef HAVE_ARCH_STDIO_INIT
 #include "stdio_base.h"
 #endif
 #ifdef MODULE_PERIPH_I2C
@@ -45,22 +41,26 @@
 #include "periph/hwrng.h"
 #endif
 
+#ifndef HAVE_ARCH_STDIO_INIT
+/**
+ * @brief Initializes stdio
+ *
+ * @details This function can be overwritten by `#define`ing
+ * `HAVE_ARCH_STDIO_INIT` in cpu.h and declaring a function with the same
+ * signature there. This allows handling architecture specific stuff if needed.
+ */
+static inline void arch_stdio_init(void)
+{
+    stdio_init();
+}
+#endif /* HAVE_ARCH_STDIO_INIT */
 
 void periph_init(void)
 {
     /* initialize stdio first to allow DEBUG() during later stages */
-#ifdef CPU_NATIVE
-    /* nothing to do for native */
-#elif defined(MODULE_ATMEGA_COMMON)
-#ifdef MODULE_AVR_LIBC_EXTRA
-    atmega_stdio_init();
-#endif /* MODULE_AVR_LIBC_EXTRA */
-#elif defined(MODULE_STDIO_UART) || defined(MODULE_STDIO_RTT)
-    stdio_init();
-#ifdef CPU_FE310
-    setvbuf(stdout, NULL, _IONBF, 0);
-#endif /* CPU_FE310 */
-#endif /* CPU_NATIVE */
+#if defined(MODULE_STDIO_UART) || defined(MODULE_STDIO_RTT)
+    arch_stdio_init();
+#endif
 
     /* initialize configured I2C devices */
 #ifdef MODULE_PERIPH_I2C

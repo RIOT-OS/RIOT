@@ -41,7 +41,7 @@ static int _uart_getchar(FILE *stream)
     return (int)c;
 }
 
-void atmega_stdio_init(void)
+void arch_stdio_init(void)
 {
     stdio_init();
 

@@ -25,9 +25,26 @@
 #ifndef CPU_H
 #define CPU_H
 
+#include <stdio.h>
+#include "stdio_base.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief  Declare that a custom arch_stdio_init is provided
+ */
+#define HAVE_ARCH_STDIO_INIT
+
+/**
+ * @brief Initializes stdio
+ */
+static inline void arch_stdio_init(void)
+{
+    stdio_init();
+    setvbuf(stdout, NULL, _IONBF, 0);
+}
 
 /**
  * @brief   Initialization of the CPU

@@ -27,6 +27,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief  Declare that a custom arch_stdio_init is provided
+ */
+#define HAVE_ARCH_STDIO_INIT
+
+/**
  * @brief   Prints the address the callee will return to
  */
 __attribute__((always_inline)) static inline void cpu_print_last_instruction(void)
@@ -35,6 +40,11 @@ __attribute__((always_inline)) static inline void cpu_print_last_instruction(voi
      * will return to - since cpu_print_last_instruction is forced inline,
      * it is the return address of the user of this function */
     printf("%p\n", __builtin_return_address(0));
+}
+
+static inline void arch_stdio_init(void)
+{
+    /* nothing to do here */
 }
 
 #ifdef __cplusplus

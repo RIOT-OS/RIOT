@@ -59,6 +59,11 @@ extern "C"
 /** @} */
 
 /**
+ * @brief  Declare that a custom arch_stdio_init is provided
+ */
+#define HAVE_ARCH_STDIO_INIT
+
+/**
  * @brief global in-ISR state variable
  */
 extern volatile uint8_t __in_isr;
@@ -150,7 +155,7 @@ static inline void atmega_set_prescaler(uint8_t clk_scale)
 /**
  * @brief   Initializes avrlibc stdio
  */
-void atmega_stdio_init(void);
+void arch_stdio_init(void);
 
 #ifdef __cplusplus
 }
