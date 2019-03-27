@@ -62,6 +62,9 @@ endif
 ifneq (,$(filter nimble_svc_ias,$(USEMODULE)))
   INCLUDES += $(NIMIBASE)/nimble/host/services/ias/include
 endif
+ifneq (,$(filter nimble_svc_ipss,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/host/services/ipss/include
+endif
 ifneq (,$(filter nimble_svc_lls,$(USEMODULE)))
   INCLUDES += $(NIMIBASE)/nimble/host/services/lls/include
 endif
