@@ -75,8 +75,8 @@ int gnrc_netif_eui64_from_addr(const gnrc_netif_t *netif,
                     default:
                         break;
                 }
-                /* Intentionally falls through */
 #endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
+                /* Intentionally falls through */
             default:
                 return l2util_eui64_from_addr(netif->device_type, addr,
                                               addr_len, eui64);
