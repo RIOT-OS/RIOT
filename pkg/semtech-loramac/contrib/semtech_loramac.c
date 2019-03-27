@@ -40,6 +40,7 @@
 
 #include "semtech_loramac.h"
 #include "LoRaMac.h"
+#include "LoRaMacTest.h"
 #include "region/Region.h"
 
 #ifdef MODULE_PERIPH_EEPROM
@@ -427,6 +428,9 @@ void _init_loramac(semtech_loramac_t *mac,
     primitives->MacMlmeIndication = mlme_indication;
     LoRaMacInitialization(&semtech_loramac_radio_events, primitives, callbacks,
                           LORAMAC_ACTIVE_REGION);
+#ifdef DISABLE_LORAMAC_DUTYCYCLE
+    LoRaMacTestSetDutyCycleOn(false);
+#endif
     mutex_unlock(&mac->lock);
 
     semtech_loramac_set_dr(mac, LORAMAC_DEFAULT_DR);
