@@ -22,6 +22,7 @@
 #define NET_GNRC_NETIF_INTERNAL_H
 
 #include "net/gnrc/netif.h"
+#include "net/l2util.h"
 #include "net/netopt.h"
 
 #ifdef MODULE_GNRC_IPV6_NIB
@@ -539,8 +540,12 @@ int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
  * @return  `-ENOTSUP`, when gnrc_netif_t::device_type of @p netif does not
  *          support reverse IID conversion.
  */
-int gnrc_netif_ipv6_iid_to_addr(const gnrc_netif_t *netif, const eui64_t *iid,
-                                uint8_t *addr);
+static inline int gnrc_netif_ipv6_iid_to_addr(const gnrc_netif_t *netif,
+                                              const eui64_t *iid, uint8_t *addr)
+{
+    assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
+    return l2util_ipv6_iid_to_addr(netif->device_type, iid, addr);
+}
 
 /**
  * @brief   Converts an interface IID of an interface's hardware address
@@ -602,8 +607,12 @@ static inline int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *iid)
  * @return  `-EINVAL` if `opt->len` was an invalid value for the given
  *          gnrc_netif_t::device_type of @p netif.
  */
-int gnrc_netif_ndp_addr_len_from_l2ao(gnrc_netif_t *netif,
-                                      const ndp_opt_t *opt);
+static inline int gnrc_netif_ndp_addr_len_from_l2ao(gnrc_netif_t *netif,
+                                                    const ndp_opt_t *opt)
+{
+    assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
+    return l2util_ndp_addr_len_from_l2ao(netif->device_type, opt);
+}
 #else   /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
 #define gnrc_netif_ipv6_init_mtu(netif)                             (void)netif
 #define gnrc_netif_ipv6_iid_from_addr(netif, addr, addr_len, iid)   (-ENOTSUP)
