@@ -94,11 +94,30 @@ static const gpio_t dac_channels[] = DAC_GPIOS;
 #define DAC_NUMOF   (sizeof(dac_channels) / sizeof(dac_channels[0]))
 /** @} */
 
-
 /**
  * @name   I2C configuration
  * @{
  */
+
+/**
+ * @brief   Static array with configuration for declared I2C devices
+ */
+static const i2c_conf_t i2c_config[] = {
+    #if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
+    {
+        .speed = I2C0_SPEED,
+        .scl = I2C0_SCL,
+        .sda = I2C0_SDA,
+    },
+    #endif
+    #if defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
+    {
+        .speed = I2C1_SPEED,
+        .scl = I2C1_SCL,
+        .sda = I2C1_SDA,
+    },
+    #endif
+};
 
 /**
  * @brief Number of I2C interfaces
@@ -108,7 +127,7 @@ static const gpio_t dac_channels[] = DAC_GPIOS;
  *
  * @note I2C_NUMOF definition must not be changed.
  */
-#define I2C_NUMOF   (i2c_bus_num)
+#define I2C_NUMOF   (sizeof(i2c_config) / sizeof(i2c_config[0]))
 
 /** @} */
 
