@@ -119,8 +119,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         }
 
         /* try to initialize the pins as GPIOs first */
-        if (gpio_init (uart_config[uart].txd, GPIO_OUT) ||
-            gpio_init (uart_config[uart].rxd, GPIO_IN)) {
+        if (gpio_init (uart_config[uart].rxd, GPIO_IN) ||
+            gpio_init (uart_config[uart].txd, GPIO_OUT)) {
             return -1;
         }
 
@@ -161,7 +161,7 @@ void uart_poweron (uart_t uart)
     CHECK_PARAM (uart < UART_NUMOF);
 
     periph_module_enable(_uarts[uart].mod);
-    __uart_config(uart);
+    _uart_config(uart);
 }
 
 void uart_poweroff (uart_t uart)
@@ -184,7 +184,7 @@ void uart_print_config(void)
 {
     for (unsigned uart = 0; uart < UART_NUMOF; uart++) {
         ets_printf("\tUART_DEV(%d)\ttxd=%d rxd=%d\n", uart,
-                   _uarts[uart].pin_txd, _uarts[uart].pin_rxd);
+                   uart_config[uart].txd, uart_config[uart].rxd);
     }
 }
 
