@@ -374,8 +374,8 @@ typedef struct {
  *
  * ESP32 has four SPI controllers:
  *
- * - controller SPI0 is reserved for caching the flash memory
- * - controller SPI1 is reserved for external memories like flash and PSRAM
+ * - controller SPI0 is reserved for caching the flash memory (CPSI)
+ * - controller SPI1 is reserved for external memories like flash and PSRAM (FSPI)
  * - controller SPI2 realizes interface HSPI that can be used for peripherals
  * - controller SPI3 realizes interface VSPI that can be used for peripherals
  *
@@ -397,17 +397,31 @@ typedef struct {
  * - SPIn_CS0, the GPIO used as CS signal when the cs parameter in spi_aquire
  *   is GPIO_UNDEF,
  *
- * where n can be 0 or 1.
- *
- * @note The configuration of the SPI interfaces SPI_DEV(n) should be in
- * continuous ascending order of n.
+ * where n can be 0 or 1. If they are not defined, the according SPI interface
+ * SPI_DEV(n) is not used.
  *
  * SPI_NUMOF is determined automatically from the board-specific peripheral
  * definitions of SPIn_*.
  */
 
-/** Number of SPI interfaces determined from SPI_* definitions */
-extern const unsigned spi_bus_num;
+/**
+ * @brief   SPI controllers that can be used for peripheral interfaces
+ */
+typedef enum {
+    HSPI = 2,         /**< HSPI interface controller */
+    VSPI = 3,         /**< VSPI interface controller */
+} spi_ctrl_t;
+
+/**
+ * @brief   SPI configuration structure type
+ */
+typedef struct {
+    spi_ctrl_t ctrl;        /**< SPI controller used for the interface */
+    gpio_t sck;             /**< GPIO used as SCK pin */
+    gpio_t mosi;            /**< GPIO used as MOSI pin */
+    gpio_t miso;            /**< GPIO used as MISO pin */
+    gpio_t cs;              /**< GPIO used as CS0 pin */
+} spi_conf_t;
 
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE  /**< requires function spi_transfer_byte */
 #define PERIPH_SPI_NEEDS_TRANSFER_REG   /**< requires function spi_transfer_reg */
