@@ -144,6 +144,35 @@ static const gpio_t adc_channels[] = ADC_GPIOS;
  * @name   UART configuration
  */
 
+#ifndef UART0_TXD
+#define UART0_TXD   (GPIO1)  /**< TxD of UART_DEV(0) used on all ESP32 boards */
+#endif
+#ifndef UART0_RXD
+#define UART0_RXD   (GPIO3)  /**< RxD of UART_DEV(0) used on all ESP32 boards */
+#endif
+
+/**
+ * @brief   Static array with configuration for declared I2C devices
+ */
+static const uart_conf_t uart_config[] = {
+    {
+        .txd = UART0_TXD,
+        .rxd = UART0_RXD,
+    },
+    #if defined(UART1_TXD) && defined(UART1_RXD)
+    {
+        .txd = UART1_TXD,
+        .rxd = UART1_RXD,
+    },
+    #endif
+    #if defined(UART2_TXD) && defined(UART2_RXD)
+    {
+        .txd = UART2_TXD,
+        .rxd = UART2_RXD,
+    },
+    #endif
+};
+
 /**
  * @brief Number of UART interfaces
  *
