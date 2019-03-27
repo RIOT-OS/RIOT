@@ -423,25 +423,33 @@ extern const unsigned spi_bus_num;
  * configuration and is always available. All ESP32 boards use it as standard
  * configuration for the console.
  *
- * UART_DEV(0).TXD      GPIO1
- * UART_DEV(0).RXD      GPIO3
+ *      UART_DEV(0).TXD      GPIO1
+ *      UART_DEV(0).RXD      GPIO3
  *
  * The pin configuration of UART_DEV(1) and UART_DEV(2) are defined in
  * board specific peripheral configuration by
  *
- * UARTn_TXD, the GPIO used as TxD signal, and
- * UARTn_RXD, the GPIO used as RxD signal,
+ * - UARTn_TXD, the GPIO used as TxD signal, and
+ * - UARTn_RXD, the GPIO used as RxD signal,
  *
- * where n can be 2 or 3. If they are not defined, the UART interface
+ * where n can be 1 or 2. If they are not defined, the according UART interface
  * UART_DEV(n) is not used.
  *
  * UART_NUMOF is determined automatically from the board-specific peripheral
- * definitions of UARTn_TXD and UARTn_RXD.
+ * definitions of UARTn_*.
  *
  * @{
  */
-/** @} */
 
+/**
+ * @brief   UART configuration structure type
+ */
+typedef struct {
+    gpio_t txd;             /**< GPIO used as TxD pin */
+    gpio_t rxd;             /**< GPIO used as RxD pin */
+} uart_conf_t;
+
+/** @} */
 
 #ifdef __cplusplus
 }
