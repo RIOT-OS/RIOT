@@ -113,6 +113,19 @@ static const gpio_t adc_channels[] = ADC_GPIOS;
  */
 
 /**
+ * @brief   Static array of GPIOs that can be used as channels of PWM0
+ */
+#ifdef PWM0_GPIOS
+static const gpio_t pwm0_channels[] = PWM0_GPIOS;
+#endif
+/**
+ * @brief   Static array of GPIOs that can be used as channels of PWM0
+ */
+#ifdef PWM1_GPIOS
+static const gpio_t pwm1_channels[] = PWM1_GPIOS;
+#endif
+
+/**
  * @brief   Number of PWM devices
  *
  * The number of PWM devices is determined from the PWM0_GPIOS and PWM1_GPIOS
@@ -120,7 +133,13 @@ static const gpio_t adc_channels[] = ADC_GPIOS;
  *
  * @note PWM_NUMOF definition must not be changed.
  */
-#define PWM_NUMOF   (pwm_dev_num)
+#if defined(PWM0_GPIOS) && defined(PWM1_GPIOS)
+#define PWM_NUMOF  (2)
+#elif defined(PWM0_GPIOS) || defined(PWM1_GPIOS)
+#define PWM_NUMOF  (1)
+#else
+#define PWM_NUMOF  (0)
+#endif
 
 /** @} */
 
