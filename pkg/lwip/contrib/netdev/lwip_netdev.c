@@ -156,7 +156,9 @@ err_t lwip_netdev_init(struct netif *netif)
              * with full IIDs, so let's do it ourselves */
             addr = &(netif->ip6_addr[0]);
             /* addr->addr is a uint32_t array */
-            if (netdev->driver->get(netdev, NETOPT_IPV6_IID, &addr->addr[2], sizeof(eui64_t)) < 0) {
+            if (l2util_ipv6_iid_from_addr(dev_type,
+                                          netif->hwaddr, netif->hwaddr_len,
+                                          (eui64_t *)&addr->addr[2]) < 0) {
                 return ERR_IF;
             }
             ipv6_addr_set_link_local_prefix((ipv6_addr_t *)&addr->addr[0]);
