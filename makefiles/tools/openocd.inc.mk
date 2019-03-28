@@ -3,7 +3,8 @@ export DEBUGGER = $(RIOTTOOLS)/openocd/openocd.sh
 export DEBUGSERVER = $(RIOTTOOLS)/openocd/openocd.sh
 export RESET ?= $(RIOTTOOLS)/openocd/openocd.sh
 
-export FFLAGS ?= flash $(ELFFILE)
+FLASHFILE ?= $(ELFFILE)
+export FFLAGS ?= flash $(FLASHFILE)
 export DEBUGGER_FLAGS ?= debug $(ELFFILE)
 export DEBUGSERVER_FLAGS ?= debug-server
 export RESET_FLAGS ?= reset
