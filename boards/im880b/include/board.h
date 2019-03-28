@@ -50,6 +50,8 @@ extern "C" {
 /* stm32l1xxx Errata: Pull-up on PB7 when configured in analog mode */
 #define SX127X_PARAM_DIO3                   GPIO_PIN(PORT_B, 7)
 
+#define SX127X_PARAM_PASELECT               (SX127X_PA_BOOST)
+
 #define SX127X_PARAM_RX_SWITCH              GPIO_PIN(PORT_C, 13)
 #define SX127X_PARAM_TX_SWITCH              GPIO_PIN(PORT_A, 4)
 /** @} */
