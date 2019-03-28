@@ -52,12 +52,15 @@ struct uart_hw_t {
     uart_dev_t* regs;       /* pointer to register data struct of the UART device */
     uint8_t  pin_txd;       /* TxD pin */
     uint8_t  pin_rxd;       /* RxD pin */
+    bool     used;          /* indicates whether UART is used */
+    uint32_t baudrate;      /* used baudrate */
+    uart_data_bits_t data;  /* used data bits */
+    uart_stop_bits_t stop;  /* used stop bits */
+    uart_parity_t  parity;  /* used parity bits */
+    uart_isr_ctx_t isr_ctx; /* callback functions */
     uint8_t  signal_txd;    /* TxD signal from the controller */
     uint8_t  signal_rxd;    /* RxD signal to the controller */
-    uint32_t baudrate;      /* used baudrate */
-    bool     used;          /* indicates whether UART is used */
     uint8_t  int_src;       /* peripheral interrupt source used by the UART device */
-    uart_isr_ctx_t isr_ctx; /* callback functions */
 };
 
 /* hardware ressources */
@@ -66,20 +69,26 @@ static struct uart_hw_t _uarts[] = {
         .regs = &UART0,
         .pin_txd = GPIO1,
         .pin_rxd = GPIO3,
+        .used = false,
+        .baudrate = STDIO_UART_BAUDRATE,
+        .data = UART_DATA_BITS_8,
+        .stop = UART_STOP_BITS_1,
+        .parity = UART_PARITY_NONE,
         .signal_txd = U0TXD_OUT_IDX,
         .signal_rxd = U0RXD_IN_IDX,
-        .baudrate = STDIO_UART_BAUDRATE,
-        .used = false,
         .int_src = ETS_UART0_INTR_SOURCE
     },
     #if defined(UART1_TXD) && defined(UART1_RXD)
     {   .regs = &UART1,
         .pin_txd = UART1_TXD,
         .pin_rxd = UART1_RXD,
+        .used = false,
+        .baudrate = STDIO_UART_BAUDRATE,
+        .data = UART_DATA_BITS_8,
+        .stop = UART_STOP_BITS_1,
+        .parity = UART_PARITY_NONE,
         .signal_txd = U1TXD_OUT_IDX,
         .signal_rxd = U1RXD_IN_IDX,
-        .baudrate = STDIO_UART_BAUDRATE,
-        .used = false,
         .int_src = ETS_UART1_INTR_SOURCE
     },
     #endif
@@ -87,10 +96,13 @@ static struct uart_hw_t _uarts[] = {
     {   .regs = &UART2,
         .pin_txd = UART2_TXD,
         .pin_rxd = UART2_RXD,
+        .used = false,
+        .baudrate = STDIO_UART_BAUDRATE,
+        .data = UART_DATA_BITS_8,
+        .stop = UART_STOP_BITS_1,
+        .parity = UART_PARITY_NONE,
         .signal_txd = U2TXD_OUT_IDX,
         .signal_rxd = U2RXD_IN_IDX,
-        .baudrate = STDIO_UART_BAUDRATE,
-        .used = false,
         .int_src = ETS_UART2_INTR_SOURCE
     }
     #endif
@@ -101,6 +113,8 @@ extern void uart_div_modify(uint8_t uart_no, uint32_t div);
 
 /* forward declaration of internal functions */
 static int _uart_set_baudrate(uart_t uart, uint32_t baudrate);
+static int _uart_set_mode(uart_t uart, uart_data_bits_t data_bits,
+                          uart_parity_t parity, uart_stop_bits_t stop_bits);
 static uint8_t IRAM _uart_rx_one_char (uart_t uart);
 static void _uart_tx_one_char(uart_t uart, uint8_t data);
 static void _uart_intr_enable (uart_t uart);
@@ -153,6 +167,14 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     return UART_OK;
 }
+
+#if MODULE_PERIPH_UART_MODECFG
+int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
+              uart_stop_bits_t stop_bits)
+{
+    return _uart_set_mode(uart, data_bits, parity, stop_bits);
+}
+#endif
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
@@ -296,6 +318,12 @@ static void _uart_config (uart_t uart)
         return;
     }
 
+    /* set number of data bits, stop bits and parity mode */
+    if (_uart_set_mode(uart, _uarts[uart].data, _uarts[uart].stop,
+                             _uarts[uart].parity) != UART_OK) {
+        return;
+    }
+
     /* reset the FIFOs */
     _uarts[uart].regs->conf0.rxfifo_rst = 1;
     _uarts[uart].regs->conf0.rxfifo_rst = 0;
@@ -338,6 +366,77 @@ static int _uart_set_baudrate(uart_t uart, uint32_t baudrate)
     uint32_t clk = (UART_CLK_FREQ << 4) / baudrate;
     _uarts[uart].regs->clk_div.div_int  = clk >> 4;
     _uarts[uart].regs->clk_div.div_frag = clk & 0xf;
+
+    critical_exit();
+    return UART_OK;
+}
+
+static int _uart_set_mode(uart_t uart, uart_data_bits_t data_bits,
+                          uart_parity_t parity, uart_stop_bits_t stop_bits)
+{
+    DEBUG("%s uart=%d, data_bits=%d parity=%d stop_bits=%d\n", __func__,
+          uart, data_bits, parity, stop_bits);
+
+    CHECK_PARAM_RET (uart < UART_NUMOF, UART_NODEV);
+
+    critical_enter();
+
+    /* set number of data bits */
+    switch (data_bits) {
+        case UART_DATA_BITS_5: _uarts[uart].regs->conf0.bit_num = 0; break;
+        case UART_DATA_BITS_6: _uarts[uart].regs->conf0.bit_num = 1; break;
+        case UART_DATA_BITS_7: _uarts[uart].regs->conf0.bit_num = 2; break;
+        case UART_DATA_BITS_8: _uarts[uart].regs->conf0.bit_num = 3; break;
+        default: LOG_TAG_ERROR("uart", "invalid number of data bits\n");
+                 critical_exit();
+                 return UART_NOMODE;
+    }
+    /* store changed number of data bits in configuration */
+    _uarts[uart].data = data_bits;
+
+    /* set number of stop bits */
+    #ifdef MCU_ESP32
+    /* workaround for hardware bug when stop bits are set to 2-bit mode. */
+    switch (stop_bits) {
+        case UART_STOP_BITS_1: _uarts[uart].regs->conf0.stop_bit_num = 1;
+                               _uarts[uart].regs->rs485_conf.dl1_en = 0;
+                               break;
+        case UART_STOP_BITS_2: _uarts[uart].regs->conf0.stop_bit_num = 1;
+                               _uarts[uart].regs->rs485_conf.dl1_en = 1;
+                               break;
+        default: LOG_TAG_ERROR("uart", "invalid number of stop bits\n");
+                 critical_exit();
+                 return UART_NOMODE;
+    }
+    #else
+    switch (stop_bits) {
+        case UART_STOP_BITS_1: _uarts[uart].regs->conf0.stop_bit_num = 1; break;
+        case UART_STOP_BITS_2: _uarts[uart].regs->conf0.stop_bit_num = 3; break;
+        default: LOG_TAG_ERROR("uart", "invalid number of stop bits\n");
+                 critical_exit();
+                 return UART_NOMODE;
+    }
+    #endif
+
+    /* store changed number of stop bits in configuration */
+    _uarts[uart].stop = stop_bits;
+
+    /* set parity mode */
+    switch (parity) {
+        case UART_PARITY_NONE: _uarts[uart].regs->conf0.parity_en = 0;
+                               break;
+        case UART_PARITY_EVEN: _uarts[uart].regs->conf0.parity = 0;
+                               _uarts[uart].regs->conf0.parity_en = 1;
+                               break;
+        case UART_PARITY_ODD: _uarts[uart].regs->conf0.parity = 1;
+                              _uarts[uart].regs->conf0.parity_en = 1;
+                              break;
+        default: LOG_TAG_ERROR("uart", "invalid or unsupported parity mode\n");
+                 critical_exit();
+                 return UART_NOMODE;
+    }
+    /* store changed parity in configuration */
+    _uarts[uart].parity = parity;
 
     critical_exit();
     return UART_OK;
