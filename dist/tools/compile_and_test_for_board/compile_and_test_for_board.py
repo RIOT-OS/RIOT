@@ -39,6 +39,7 @@ usage: compile_and_test_for_board.py [-h] [--applications APPLICATIONS]
                                      [--incremental] [--clean-after]
                                      [--compile-targets COMPILE_TARGETS]
                                      [--test-targets TEST_TARGETS]
+                                     [--test-available-targets TEST_AVAILABLE_TARGETS]
                                      [--jobs JOBS]
                                      riot_directory board [result_directory]
 
@@ -67,6 +68,9 @@ optional arguments:
                         List of make targets to compile (default: clean all)
   --test-targets TEST_TARGETS
                         List of make targets to run test (default: test)
+  --test-available-targets TEST_AVAILABLE_TARGETS
+                        List of make targets to know if a test is present
+                        (default: test/available)
   --jobs JOBS, -j JOBS  Parallel building (0 means not limit, like '--jobs')
                         (default: None)
 ```
@@ -201,6 +205,7 @@ class RIOTApplication():
 
     COMPILE_TARGETS = ('clean', 'all',)
     TEST_TARGETS = ('test',)
+    TEST_AVAILABLE_TARGETS = ('test/available',)
 
     def __init__(self, board, riotdir, appdir, resultdir):
         self.board = board
@@ -220,13 +225,14 @@ class RIOTApplication():
     def has_test(self):
         """Detect if the application has tests.
 
-        Use '--silent' to disable the message from packages:
-
-            make[1]: Nothing to be done for 'Makefile.include'
+        Check TEST_AVAILABLE_TARGETS execute without error.
         """
-        tests = self.make(['--silent', 'info-debug-variable-TESTS'],
-                          log_error=True).strip()
-        return bool(tests)
+        try:
+            self.make(self.TEST_AVAILABLE_TARGETS)
+        except subprocess.CalledProcessError:
+            return False
+        else:
+            return True
 
     def board_is_supported(self):
         """Return if current board is supported."""
@@ -573,6 +579,9 @@ PARSER.add_argument('--compile-targets', type=list_from_string,
 PARSER.add_argument('--test-targets', type=list_from_string,
                     default=' '.join(RIOTApplication.TEST_TARGETS),
                     help='List of make targets to run test')
+PARSER.add_argument('--test-available-targets', type=list_from_string,
+                    default=' '.join(RIOTApplication.TEST_AVAILABLE_TARGETS),
+                    help='List of make targets to know if a test is present')
 
 PARSER.add_argument(
     '--jobs', '-j', type=int, default=None,
@@ -607,6 +616,7 @@ def main():
     # Overwrite the compile/test targets from command line arguments
     RIOTApplication.COMPILE_TARGETS = args.compile_targets
     RIOTApplication.TEST_TARGETS = args.test_targets
+    RIOTApplication.TEST_AVAILABLE_TARGETS = args.test_available_targets
 
     # List of applications for board
     applications = [RIOTApplication(board, args.riot_directory, app_dir,
