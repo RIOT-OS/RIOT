@@ -138,6 +138,14 @@
  * offset of 100 years. */
 #define YEAR_OFFSET         (100)
 
+/* Use a magic number to determine the initial RTC source. This will be used
+   to know if a reset of the RTC is required at initialization. */
+#if CLOCK_LSE
+#define MAGIC_CLCK_NUMBER       (0x1970)
+#else
+#define MAGIC_CLCK_NUMBER       (0x1971)
+#endif
+
 static struct {
     rtc_alarm_cb_t cb;          /**< callback called from RTC interrupt */
     void *arg;                  /**< argument passed to the callback */
@@ -186,6 +194,19 @@ static inline void rtc_lock(void)
 
 void rtc_init(void)
 {
+    stmclk_dbp_unlock();
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
+    /* Compare the stored magic number with the current one. If it's different
+       it means the clock source has changed and thus a RTC reset is
+       required. */
+    if (RTC->BKP0R != MAGIC_CLCK_NUMBER) {
+        RCC->CSR |= RCC_CSR_RTCRST;
+        RCC->CSR &= ~RCC_CSR_RTCRST;
+        RTC->BKP0R = MAGIC_CLCK_NUMBER; /* Store the new magic number */
+    }
+#endif
+    stmclk_dbp_lock();
+
     /* enable low frequency clock */
     stmclk_enable_lfclk();
 
