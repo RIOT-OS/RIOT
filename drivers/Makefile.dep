@@ -268,7 +268,11 @@ ifneq (,$(filter lpd8808,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
 endif
 
-ifneq (,$(filter lps331ap,$(USEMODULE)))
+ifneq (,$(filter lps331ap lps2%hb,$(USEMODULE)))
+  USEMODULE += lpsxxx
+endif
+
+ifneq (,$(filter lpsxxx,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
