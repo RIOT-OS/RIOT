@@ -30,7 +30,26 @@ extern "C" {
 #undef LITTLE_ENDIAN
 #endif
 
-#if   defined(CPU_MODEL_SAME54N19A)
+#if defined(CPU_MODEL_SAMD51G18A)
+  #include "vendor/samd51/include/samd51g18a.h"
+#elif defined(CPU_MODEL_SAMD51G19A)
+  #include "vendor/samd51/include/samd51g19a.h"
+#elif defined(CPU_MODEL_SAMD51J18A)
+  #include "vendor/samd51/include/samd51j18a.h"
+#elif defined(CPU_MODEL_SAMD51J19A)
+  #include "vendor/samd51/include/samd51j19a.h"
+#elif defined(CPU_MODEL_SAMD51J20A)
+  #include "vendor/samd51/include/samd51j20a.h"
+#elif defined(CPU_MODEL_SAMD51N19A)
+  #include "vendor/samd51/include/samd51n19a.h"
+#elif defined(CPU_MODEL_SAMD51N20A)
+  #include "vendor/samd51/include/samd51n20a.h"
+#elif defined(CPU_MODEL_SAMD51P19A)
+  #include "vendor/samd51/include/samd51p19a.h"
+#elif defined(CPU_MODEL_SAMD51P20A)
+  #include "vendor/samd51/include/samd51p20a.h"
+
+#elif defined(CPU_MODEL_SAME54N19A)
   #include "vendor/same54/include/same54n19a.h"
 #elif defined(CPU_MODEL_SAME54N20A)
   #include "vendor/same54/include/same54n20a.h"
