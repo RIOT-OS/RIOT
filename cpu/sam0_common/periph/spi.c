@@ -48,20 +48,12 @@ static inline SercomSpi *dev(spi_t bus)
 
 static inline void poweron(spi_t bus)
 {
-#if defined(CPU_FAM_SAMD21)
-    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#elif defined(CPU_SAML21) || defined(CPU_SAML1X)
-    MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#endif
+    sercom_clk_en(dev(bus));
 }
 
 static inline void poweroff(spi_t bus)
 {
-#if defined(CPU_FAM_SAMD21)
-    PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#elif defined(CPU_SAML21) || defined(CPU_SAML1X)
-    MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#endif
+    sercom_clk_dis(dev(bus));
 }
 
 void spi_init(spi_t bus)
