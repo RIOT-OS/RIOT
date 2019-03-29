@@ -20,6 +20,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \
+    im880b \
     lsn50 \
     maple-mini \
     mega-xplained \

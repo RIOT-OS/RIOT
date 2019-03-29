@@ -23,6 +23,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     hamilton \
     i-nucleo-lrwan1 \
     ikea-tradfri \
+    im880b \
     limifrog-v1 \
     lobaro-lorabox \
     lsn50 \

@@ -10,6 +10,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     chronos \
     derfmega128 \
     i-nucleo-lrwan1 \
+    im880b \
     mega-xplained \
     microduino-corerf \
     msb-430 \
