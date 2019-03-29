@@ -323,16 +323,42 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
  *
  * @return              numeric id of the given SERCOM device
  */
-static inline int sercom_id(void *sercom)
+static inline int sercom_id(const void *sercom)
 {
-#if defined(CPU_FAM_SAMD21)
-    return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
-#elif defined (CPU_FAM_SAML10) || defined (CPU_FAM_SAML11)
-    return ((((uint32_t)sercom) >> 10) & 0x7) - 1;
-#elif defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
-    /* Left side handles SERCOM0-4 while right side handles unaligned address of SERCOM5 */
-    return ((((uint32_t)sercom) >> 10) & 0x7) + ((((uint32_t)sercom) >> 22) & 0x04);
+#ifdef SERCOM0
+    if (sercom == SERCOM0)
+        return 0;
 #endif
+#ifdef SERCOM1
+    if (sercom == SERCOM1)
+        return 1;
+#endif
+#ifdef SERCOM2
+    if (sercom == SERCOM2)
+        return 2;
+#endif
+#ifdef SERCOM3
+    if (sercom == SERCOM3)
+        return 3;
+#endif
+#ifdef SERCOM4
+    if (sercom == SERCOM4)
+        return 4;
+#endif
+#ifdef SERCOM5
+    if (sercom == SERCOM5)
+        return 5;
+#endif
+#ifdef SERCOM6
+    if (sercom == SERCOM6)
+        return 6;
+#endif
+#ifdef SERCOM7
+    if (sercom == SERCOM7)
+        return 7;
+#endif
+
+    return -1;
 }
 
 /**
