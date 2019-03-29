@@ -95,14 +95,20 @@ void rtt_init(void)
     /* enable timer */
     LPTIM1->CR = LPTIM_CR_ENABLE;
     /* set auto-reload value (timer needs to be enabled for this) */
+    LPTIM1->ICR = LPTIM_ICR_ARROKCF;
     LPTIM1->ARR = RTT_MAX_VALUE;
+    while (!(LPTIM1->ISR & LPTIM_ISR_ARROK)) {}
     /* start the timer */
     LPTIM1->CR |= LPTIM_CR_CNTSTRT;
 }
 
 uint32_t rtt_get_counter(void)
 {
-    return (uint32_t)LPTIM1->CNT;
+    uint32_t cnt;
+    do {
+        cnt = LPTIM1->CNT;
+    } while (cnt != LPTIM1->CNT);
+    return cnt;
 }
 
 void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
@@ -125,9 +131,11 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     assert(cb && !(alarm & ~RTT_MAX_VALUE));
 
     unsigned is = irq_disable();
+    LPTIM1->ICR = LPTIM_ICR_CMPOKCF;
     to_cb  = cb;
     to_arg = arg;
     LPTIM1->CMP = (uint16_t)alarm;
+    while (!(LPTIM1->ISR & LPTIM_ISR_CMPOK)) {}
     irq_restore(is);
 }
 
