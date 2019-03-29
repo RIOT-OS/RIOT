@@ -22,6 +22,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "cfg_rtt_default.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -223,17 +224,6 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_0_ISR           isr_i2c1_er
 
 #define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
-/** @} */
-
-/**
- * @name    RTT configuration
- *
- * On the STM32Lx platforms, we always utilize the LPTIM1.
- * @{
- */
-#define RTT_NUMOF           (1)
-#define RTT_FREQUENCY       (1024U)             /* 32768 / 2^n */
-#define RTT_MAX_VALUE       (0x0000ffff)        /* 16-bit timer */
 /** @} */
 
 /**
