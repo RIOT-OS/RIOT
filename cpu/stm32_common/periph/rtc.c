@@ -241,7 +241,7 @@ int rtc_set_time(struct tm *time)
 {
     rtc_unlock();
     RTC->DR = (val2bcd((time->tm_year % 100), RTC_DR_YU_Pos, DR_Y_MASK) |
-               val2bcd(time->tm_mon,  RTC_DR_MU_Pos, DR_M_MASK) |
+               val2bcd(time->tm_mon + 1,  RTC_DR_MU_Pos, DR_M_MASK) |
                val2bcd(time->tm_mday, RTC_DR_DU_Pos, DR_D_MASK));
     RTC->TR = (val2bcd(time->tm_hour, RTC_TR_HU_Pos, TR_H_MASK) |
                val2bcd(time->tm_min,  RTC_TR_MNU_Pos, TR_M_MASK) |
@@ -258,7 +258,7 @@ int rtc_get_time(struct tm *time)
     uint32_t tr = RTC->TR;
     uint32_t dr = RTC->DR;
     time->tm_year = bcd2val(dr, RTC_DR_YU_Pos, DR_Y_MASK) + YEAR_OFFSET;
-    time->tm_mon  = bcd2val(dr, RTC_DR_MU_Pos, DR_M_MASK);
+    time->tm_mon  = bcd2val(dr, RTC_DR_MU_Pos, DR_M_MASK) - 1;
     time->tm_mday = bcd2val(dr, RTC_DR_DU_Pos, DR_D_MASK);
     time->tm_hour = bcd2val(tr, RTC_TR_HU_Pos, TR_H_MASK);
     time->tm_min  = bcd2val(tr, RTC_TR_MNU_Pos, TR_M_MASK);
