@@ -124,6 +124,10 @@ PSEUDOMODULES += cc1101
 PSEUDOMODULES += mpu9150
 PSEUDOMODULES += mpu9250
 
+# include variants of INA2xx drivers as pseudo modules
+PSEUDOMODULES += ina219
+PSEUDOMODULES += ina220
+
 # include variants of mrf24j40 drivers as pseudo modules
 PSEUDOMODULES += mrf24j40m%
 
