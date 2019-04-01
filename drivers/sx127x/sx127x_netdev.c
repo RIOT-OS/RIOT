@@ -54,6 +54,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
     uint8_t size = iolist_size(iolist);
 
+    /* Ignore send if packet size is 0 */
+    if (size == 0) {
+        return 0;
+    }
+
     switch (dev->settings.modem) {
         case SX127X_MODEM_FSK:
             /* todo */
@@ -77,7 +82,9 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
             /* Write payload buffer */
             for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
-                sx127x_write_fifo(dev, iol->iol_base, iol->iol_len);
+                if(iol->iol_len > 0) {
+                    sx127x_write_fifo(dev, iol->iol_base, iol->iol_len);
+                }
             }
             break;
         default:
