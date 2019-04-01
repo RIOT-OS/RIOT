@@ -205,6 +205,10 @@ static void sram_op(encx24j600_t *dev, uint16_t cmd, uint16_t addr, char *ptr, i
     char* in = NULL;
     char* out = NULL;
 
+    if (!len) {
+        return;
+    }
+
     /* determine pointer addr
      *
      * all SRAM access commands have an
