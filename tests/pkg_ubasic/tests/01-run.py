@@ -12,8 +12,8 @@ from testrunner import run
 
 def testfunc(child):
     for i in range(1,6):
-        child.expect(r"Running test #{}... done. Run time: \d.\d+ s".format(i))
+        child.expect(r"Running test #{}... done. Run time: [0-9.]* s".format(i))
 
 
 if __name__ == "__main__":
-    sys.exit(run(testfunc))
+    sys.exit(run(testfunc, timeout=120))
