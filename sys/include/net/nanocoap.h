@@ -289,6 +289,10 @@ typedef struct {
     unsigned methods;               /**< OR'ed methods this resource allows */
     coap_handler_t handler;         /**< ptr to resource handler            */
     void *context;                  /**< ptr to user defined context data   */
+#if defined(NANOCOAP_CLIF_STATIC) || defined(DOXYGEN)
+    const char *clif_params;        /**< link format attributes @see Resource
+                                         description section of net_gcoap */
+#endif
 } coap_resource_t;
 
 /**

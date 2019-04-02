@@ -74,9 +74,9 @@ static ssize_t _handler_info(coap_pkt_t *pdu,
 }
 
 static const coap_resource_t _resources[] = {
-    { "/node/info",  COAP_GET, _handler_info, NULL },
-    { "/sense/hum",  COAP_GET, _handler_dummy, NULL },
-    { "/sense/temp", COAP_GET, _handler_dummy, NULL }
+    { .path = "/node/info",  .methods = COAP_GET, .handler = _handler_info,  .context = NULL },
+    { .path = "/sense/hum",  .methods = COAP_GET, .handler = _handler_dummy, .context = NULL },
+    { .path = "/sense/temp", .methods = COAP_GET, .handler = _handler_dummy, .context = NULL }
 };
 
 static gcoap_listener_t _listener = {

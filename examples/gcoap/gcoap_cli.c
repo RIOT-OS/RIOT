@@ -36,8 +36,12 @@ static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, vo
 
 /* CoAP resources. Must be sorted by path (ASCII order). */
 static const coap_resource_t _resources[] = {
-    { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler, NULL },
-    { "/riot/board", COAP_GET, _riot_board_handler, NULL },
+    { .path = "/cli/stats", .methods = COAP_GET | COAP_PUT, .handler = _stats_handler, .context = NULL },
+    { .path = "/riot/board", .methods = COAP_GET, .handler = _riot_board_handler, .context = NULL,
+#ifdef NANOCOAP_CLIF_STATIC
+      .clif_params = "rt=\"info\";ct=0"
+#endif
+    },
 };
 
 static gcoap_listener_t _listener = {

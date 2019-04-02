@@ -57,7 +57,7 @@ static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
 
 /* Internal variables */
 const coap_resource_t _default_resources[] = {
-    { "/.well-known/core", COAP_GET, _well_known_core_handler, NULL },
+    { .path = "/.well-known/core", .methods = COAP_GET, .handler = _well_known_core_handler, .context = NULL, },
 };
 
 static gcoap_listener_t _default_listener = {

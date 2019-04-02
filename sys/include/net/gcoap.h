@@ -51,6 +51,21 @@
  * gcoap itself defines a resource for `/.well-known/core` discovery, which
  * lists all of the registered paths.
  *
+ *
+ * ### Resource description ###
+ *
+ * By default resources have no description, but by defining
+ * `NANOCOAP_CLIF_STATIC` a CoRE Link Format
+ * [(RFC 6690)](https://tools.ietf.org/html/rfc6690) string of parameters can
+ * be added to them (coap_resource_t::clif_params). This Link Format parameters
+ * are used for resource discovery and registration in resource directories.
+ * 
+ * So, if a CoAP resource represents a temperature sensor, it could have the
+ * following atributes:
+ * ```
+ * rt="temperature-c";if="sensor"
+ * ```
+ *
  * ### Creating a response ###
  *
  * An application resource includes a callback function, a coap_handler_t. After
