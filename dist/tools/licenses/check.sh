@@ -23,6 +23,11 @@ TMP="${CHECKROOT}/.tmp"
 # Needed for compatibility with BSD sed
 TAB_CHAR="$(printf '\t')"
 
+# License files must contain a single line
+line_count() {
+    wc -l < "${1}"
+}
+
 # Get the file where licenses are collected
 license_dest() {
     echo "${OUTPUT}/""$(basename "${LICENSE}")"
@@ -39,6 +44,10 @@ EXIT_CODE=0
 rm -fr "${OUTPUT}"
 mkdir -p "${OUTPUT}"
 for LICENSE in ${LICENSES}; do
+    if [ "$(line_count "${LICENSE}")" != 1 ] ; then
+        echo "License must be contained in a single line: ${LICENSE}"
+        exit "${ERROR_EXIT_CODE}"
+    fi
     echo -n '' > "$(license_dest "${LICENSE}")"
 done
 
