@@ -54,6 +54,8 @@ static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
                                                        coap_pkt_t *pdu);
 static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
                                    const coap_resource_t *resource);
+static ssize_t _encode_resource(char *buf, size_t maxlen,
+                                const coap_resource_t *res, uint8_t cf);
 
 /* Internal variables */
 const coap_resource_t _default_resources[] = {
@@ -934,23 +936,18 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
         const coap_resource_t *resource = listener->resources;
 
         for (unsigned i = 0; i < listener->resources_len; i++) {
-            size_t path_len = strlen(resource->path);
-            if (out) {
-                /* only add new resources if there is space in the buffer */
-                if ((pos + path_len + 3) > maxlen) {
+            if (pos) {
+                if (pos + 1 > maxlen) {
                     break;
                 }
-                if (pos) {
-                    out[pos++] = ',';
-                }
-                out[pos++] = '<';
-                memcpy(&out[pos], resource->path, path_len);
-                pos += path_len;
-                out[pos++] = '>';
+                out[pos++] = ',';
+            }
+            ssize_t res = _encode_resource(&out[pos], maxlen - pos, resource, cf);
+            if (res > 0) {
+                pos += res;
             }
             else {
-                pos += (pos) ? 3 : 2;
-                pos += path_len;
+                break;
             }
             ++resource;
         }
@@ -959,6 +956,38 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
     }
 
     return (int)pos;
+}
+
+static ssize_t _encode_resource(char *buf, size_t maxlen,
+                                const coap_resource_t *res, uint8_t cf)
+{
+    (void)cf;
+    size_t path_len = strlen(res->path);
+    size_t pos = 0;
+    size_t exp_size = path_len + 2; /* count target separators */
+
+#ifdef NANOCOAP_CLIF_STATIC
+    if (res->clif_params) {
+        exp_size += strlen(res->clif_params) + 1; /* count param separator */
+    }
+#endif
+
+    if (buf) {
+        if (exp_size > maxlen) {
+            return -1;
+        }
+        buf[pos++] = '<';
+        memcpy(&buf[pos], res->path, path_len);
+        pos += path_len;
+        buf[pos++] = '>';
+#ifdef NANOCOAP_CLIF_STATIC
+        if (res->clif_params) {
+            buf[pos++] = ';';
+            strcpy(&buf[pos], res->clif_params);
+        }
+#endif
+    }
+    return exp_size;
 }
 
 int gcoap_add_qstring(coap_pkt_t *pdu, const char *key, const char *val)
