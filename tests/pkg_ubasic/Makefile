@@ -8,8 +8,3 @@ USEPKG += ubasic
 CFLAGS += -Wno-implicit-function-declaration
 
 include $(RIOTBASE)/Makefile.include
-
-clean: ..rm-main
-
-..rm-main:
-	@rm main.c
