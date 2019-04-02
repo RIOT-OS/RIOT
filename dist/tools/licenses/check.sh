@@ -23,9 +23,14 @@ TMP="${CHECKROOT}/.tmp"
 # Needed for compatibility with BSD sed
 TAB_CHAR="$(printf '\t')"
 
+# Get the file where licenses are collected
+license_dest() {
+    echo "${OUTPUT}/""$(basename "${LICENSE}")"
+}
+
 # prepare
 ROOT=$(git rev-parse --show-toplevel)
-LICENSES=$(ls "${LICENSEDIR}")
+LICENSES="${LICENSEDIR}/*"
 EXIT_CODE=0
 
 : ${ERROR_EXIT_CODE:=1}
@@ -34,7 +39,7 @@ EXIT_CODE=0
 rm -fr "${OUTPUT}"
 mkdir -p "${OUTPUT}"
 for LICENSE in ${LICENSES}; do
-    echo -n '' > "${OUTPUT}/${LICENSE}"
+    echo -n '' > "$(license_dest "${LICENSE}")"
 done
 
 FILES=$(FILEREGEX='\.([sSch]|cpp)$' changed_files)
@@ -44,8 +49,8 @@ for FILE in ${FILES}; do
     FAIL=1
     head -100 "${ROOT}/${FILE}" | sed -e 's/[\/\*'"${TAB_CHAR}"']/ /g' -e 's/$/ /' | tr -d '\r\n' | sed -e 's/  */ /g' > "${TMP}"
     for LICENSE in ${LICENSES}; do
-        if pcregrep -q -f "${LICENSEDIR}/${LICENSE}" "${TMP}"; then
-            echo "${FILE}" >> "${OUTPUT}/${LICENSE}"
+        if pcregrep -q -f "${LICENSE}" "${TMP}"; then
+            echo "${FILE}" >> "$(license_dest "${LICENSE}")"
             FAIL=0
             break
         fi
