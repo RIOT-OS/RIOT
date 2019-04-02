@@ -17,7 +17,7 @@ include $(RIOTBASE)/Makefile.include
 $(CURDIR)/main.c: $(PKGDIRBASE)/$(PKG_UNDER_TEST)/$(PKG_TEST_FILE)
 	@cp $< $@
 
-(PKGDIRBASE)/$(PKG_UNDER_TEST)/$(PKG_TEST_FILE): | pkg-prepare
+$(PKGDIRBASE)/$(PKG_UNDER_TEST)/$(PKG_TEST_FILE): | pkg-prepare
 
 clean: ..rm-main
 
