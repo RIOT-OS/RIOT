@@ -633,7 +633,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     uint8_t* _esp_now_dst = NULL;
 
     for (uint8_t i = 0; i < ESP_NOW_ADDR_LEN; i++) {
-        if (((uint8_t*)iolist->iol_base)[i] != 0xff) {
+        if ((iolist->iol_base != NULL) && (((uint8_t*)iolist->iol_base)[i] != 0xff)) {
             _esp_now_dst = iolist->iol_base;
             break;
         }
@@ -652,11 +652,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
                   data_len + iolist->iol_len, ESP_NOW_MAX_SIZE_RAW);
             return -EBADMSG;
         }
-
-        memcpy(data_pos, iolist->iol_base, iolist->iol_len);
-        data_pos += iolist->iol_len;
-        data_len += iolist->iol_len;
-
+        if (iolist->iol_len) {
+            memcpy(data_pos, iolist->iol_base, iolist->iol_len);
+            data_pos += iolist->iol_len;
+            data_len += iolist->iol_len;
+        }
         iolist = iolist->iol_next;
     }
 
