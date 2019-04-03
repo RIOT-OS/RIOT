@@ -50,13 +50,18 @@ ifneq (,$(filter riot_freertos,$(USEMODULE)))
     USEMODULE += xtimer
 endif
 
-ifneq (,$(filter esp_i2c_hw,$(USEMODULE)))
-    USEMODULE += xtimer
-else
-    # PLEASE NOTE: because of the very poor and faulty hardware implementation
-    # we use software implementation by default for the moment (if module
-    # esp_i2c_hw is not explicitly used)
-    USEMODULE += esp_i2c_sw
+ifneq (,$(filter periph_i2c,$(USEMODULE)))
+    ifneq (,$(filter esp_i2c_hw,$(USEMODULE)))
+        USEMODULE += core_thread_flags
+        USEMODULE += xtimer
+        USEMODULE += periph_i2c_hw
+    else
+        # PLEASE NOTE: because of the very poor and faulty hardware implementation
+        # we use software implementation by default for the moment (if module
+        # esp_i2c_hw is not explicitly used)
+        USEMODULE += esp_i2c_sw
+        USEMODULE += periph_i2c_sw
+    endif
 endif
 
 ifneq (, $(filter esp_spi_ram, $(DISABLE_MODULE)))
