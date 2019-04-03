@@ -67,7 +67,12 @@ USEMODULE += esp_idf_esp32
 USEMODULE += esp_idf_soc
 USEMODULE += log
 USEMODULE += periph
+USEMODULE += periph_adc_ctrl
 USEMODULE += periph_common
+USEMODULE += periph_hwrng
+USEMODULE += periph_flash
+USEMODULE += periph_rtc
+USEMODULE += periph_uart
 USEMODULE += random
 USEMODULE += xtensa
 
