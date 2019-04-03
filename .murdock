@@ -109,7 +109,14 @@ get_supported_toolchains() {
 # supported board and toolchain. Only print for boards in $BOARDS.
 get_app_board_toolchain_pairs() {
     local appdir=$1
-    for board in $(get_supported_boards $appdir)
+    local boards="$(get_supported_boards $appdir)"
+
+    if [ "$boards" = makefile_broken ]; then
+        echo "$appdir makefile_broken"
+        return
+    fi
+
+    for board in ${boards}
     do
         for toolchain in $(get_supported_toolchains $appdir $board)
         do
@@ -137,7 +144,12 @@ compile() {
     local board=$(echo $2 | cut -f 1 -d':')
     local toolchain=$(echo $2 | cut -f 2 -d':')
 
-    [ "$board" = "makefile_broken" ] && error "$0: Makefile in \"$appdir\" seems to be broken!"
+    [ "$board" = "makefile_broken" ] && {
+        echo "$0: There seems to be a problem in \"$appdir\" while getting supported boards!"
+        echo "$0: testing \"make -C$appdir info-boards-supported\"..."
+        make -C$appdir info-boards-supported && echo "$0: success. no idea what's wrong." || echo "$0: failed!"
+        exit 1
+    }
 
     # set build directory. CI ensures only one build at a time in $(pwd).
     export BINDIR="$(pwd)/build"
