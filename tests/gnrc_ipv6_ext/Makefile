@@ -9,8 +9,8 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-nano \
                              nucleo-f303k8 nucleo-f334r8 nucleo-l031k6 \
                              nucleo-l053r8 stm32f0discovery telosb thingy52 \
                              waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
-# chronos, mips-malta, and ruuvitag boards don't support ethos
-BOARD_BLACKLIST := chronos mips-malta ruuvitag
+# chronos, hamilton, mips-malta, and ruuvitag boards don't support ethos
+BOARD_BLACKLIST := chronos hamilton mips-malta ruuvitag
 
 export TAP ?= tap0
 
