@@ -78,16 +78,6 @@ int adc_set_attenuation(adc_t line, adc_attenuation_t atten);
  */
 int adc_vref_to_gpio25 (void);
 
-/**
-  * @brief  Configure sleep mode for an GPIO pin if the pin is an RTCIO pin
-  * @param  pin     GPIO pin
-  * @param  mode    active in sleep mode if true
-  * @param  input   as input if true, as output otherwise
-  * @return 0 success
-  * @return -1 on invalid pin
-  */
-int rtcio_config_sleep_mode (gpio_t pin, bool mode, bool input);
-
 #ifdef __cplusplus
 }
 #endif
