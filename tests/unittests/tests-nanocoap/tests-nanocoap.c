@@ -332,7 +332,7 @@ static void test_nanocoap__get_multi_query(void)
 
 /*
  * Builds on get_req test, to test building a PDU that completely fills the
- * buffer.
+ * buffer, and one that tries to overfill the buffer.
  */
 static void test_nanocoap__option_add_buffer_max(void)
 {
@@ -344,13 +344,19 @@ static void test_nanocoap__option_add_buffer_max(void)
 
     size_t uri_opt_len = 64;    /* option hdr 2, option value 62 */
 
-    size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
-                                &token[0], 2, COAP_METHOD_GET, msgid);
+    ssize_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                 &token[0], 2, COAP_METHOD_GET, msgid);
 
     coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
 
     len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
     TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
+
+    /* shrink buffer to attempt overfill */
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf) - 1, len);
+
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    TEST_ASSERT_EQUAL_INT(-ENOSPC, len);
 }
 
 /*

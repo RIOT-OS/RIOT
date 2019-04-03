@@ -88,10 +88,13 @@
  *
  * - **minimal API** requires only a reference to the buffer for the message.
  * However, the caller must provide the last option number written as well as
- * the buffer position.
+ * the buffer position. The caller is primarily responsible for tracking and
+ * managing the space remaining in the buffer.
  *
  * - **struct-based API** uses a coap_pkt_t struct to conveniently track each
- * option as it is written and prepare for any payload.
+ * option as it is written and prepare for any payload. The caller must monitor
+ * space remaining in the buffer; however, the API *will not* write past the
+ * end of the buffer, and returns -ENOSPC when it is full.
  *
  * You must use one API exclusively for a given message. For either API, the
  * caller must write options in order by option number (see "CoAP option
@@ -108,6 +111,9 @@
  * option. These functions require the position in the buffer to start writing,
  * and return the number of bytes written.
  *
+ * @note You must ensure the buffer has enough space remaining to write each
+ * option. The API does not verify the safety of writing an option.
+ *
  * If there is a payload, append a payload marker (0xFF). Then write the
  * payload to within the maximum length remaining in the buffer.
  *
@@ -120,6 +126,10 @@
  * Next, use the coap_opt_add_xxx() functions to write each option, like
  * coap_opt_add_uint(). When all options have been added, call
  * coap_opt_finish().
+ *
+ * @note You must ensure the buffer has enough space remaining to write each
+ * option. You can monitor `coap_pkt_t.payload_len` for remaining space, or
+ * watch for a -ENOSPC return value from the API.
  *
  * Finally, write any message payload at the coap_pkt_t _payload_ pointer
  * attribute. The _payload_len_ attribute provides the available length in the
@@ -641,7 +651,8 @@ size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t last
  * @param[in]     separator   character used in @p string to separate parts
  *
  * @return        number of bytes written to buffer
- * @return        -ENOSPC if no available options
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
  */
 ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string, char separator);
 
@@ -656,7 +667,8 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
  * @param[in]     value       uint to encode
  *
  * @return        number of bytes written to buffer
- * @return        <0 reserved for error but not implemented yet
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
  */
 ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value);
 
@@ -670,7 +682,8 @@ ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value);
  * @param[in]     format      COAP_FORMAT_xxx to use
  *
  * @return        number of bytes written to buffer
- * @return        <0 reserved for error but not implemented yet
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
  */
 static inline ssize_t coap_opt_add_format(coap_pkt_t *pkt, uint16_t format)
 {
@@ -687,6 +700,7 @@ static inline ssize_t coap_opt_add_format(coap_pkt_t *pkt, uint16_t format)
  * @param[in]     flags       see COAP_OPT_FINISH... macros
  *
  * @return        total number of bytes written to buffer
+ * @return        -ENOSPC if no buffer space for payload marker
  */
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
 
