@@ -1,6 +1,6 @@
-From 2d37e015c9fbf3711a7f931564983b20f2267da4 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Joakim=20Nohlg=C3=A5rd?= <joakim.nohlgard@eistec.se>
-Date: Tue, 15 May 2018 13:24:16 +0200
+From ed69076abbe83ed256f1e1fbdf74726961c9071e Mon Sep 17 00:00:00 2001
+From: Kaspar Schleiser <kaspar@schleiser.de>
+Date: Fri, 5 Jul 2019 14:51:09 +0200
 Subject: [PATCH] RIOT: Use RIOT random_bytes function instead of randombytes
 
 ---
@@ -8,10 +8,10 @@ Subject: [PATCH] RIOT: Use RIOT random_bytes function instead of randombytes
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/crypt/hacl.c b/src/crypt/hacl.c
-index a16dbd7e30..cb4808d684 100644
+index c24d751732..3bdcabf95e 100644
 --- a/src/crypt/hacl.c
 +++ b/src/crypt/hacl.c
-@@ -18,10 +18,10 @@
+@@ -19,10 +19,10 @@
  #include <stdint.h>
  #include <stdlib.h>
  #include <string.h>
@@ -21,9 +21,9 @@ index a16dbd7e30..cb4808d684 100644
  extern bool Hacl_Ed25519_verify(uint8_t *public, uint8_t *msg, uint32_t len1, uint8_t *signature);
 -extern void randombytes(uint8_t *target, uint64_t n);
  
+ #ifdef CRYPTO_HACL_INCLUDE_CHACHAPOLY
  int cose_crypto_aead_encrypt_chachapoly(uint8_t *c,
-                                         size_t *clen,
-@@ -65,7 +65,7 @@ ssize_t cose_crypto_keygen_chachapoly(uint8_t *sk, size_t len)
+@@ -67,7 +67,7 @@ COSE_ssize_t cose_crypto_keygen_chachapoly(uint8_t *sk, size_t len)
      if (len < COSE_CRYPTO_AEAD_CHACHA20POLY1305_KEYBYTES) {
          return COSE_ERR_NOMEM;
      }
@@ -32,7 +32,7 @@ index a16dbd7e30..cb4808d684 100644
      return COSE_CRYPTO_AEAD_CHACHA20POLY1305_KEYBYTES;
  }
  
-@@ -74,7 +74,7 @@ size_t cose_crypto_aead_nonce_chachapoly(uint8_t *nonce, size_t len)
+@@ -76,7 +76,7 @@ size_t cose_crypto_aead_nonce_chachapoly(uint8_t *nonce, size_t len)
      if (len < COSE_CRYPTO_AEAD_CHACHA20POLY1305_NONCEBYTES) {
          return 0;
      }
@@ -40,7 +40,7 @@ index a16dbd7e30..cb4808d684 100644
 +    random_bytes(nonce, COSE_CRYPTO_AEAD_CHACHA20POLY1305_NONCEBYTES);
      return COSE_CRYPTO_AEAD_CHACHA20POLY1305_NONCEBYTES;
  }
- 
+ #endif /* CRYPTO_HACL_INCLUDE_CHACHAPOLY */
 -- 
-2.17.0
+2.22.0
 
