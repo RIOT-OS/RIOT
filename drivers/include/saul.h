@@ -105,7 +105,7 @@ enum {
     SAUL_SENSE_CAPACITANCE = 0x97,     /**< sensor: capacitance */
     SAUL_SENSE_VOLTAGE     = 0x98,     /**< sensor: voltage */
     SAUL_SENSE_PH          = 0x99,     /**< sensor: pH */
-    SAUL_SENSE_POWER       = 0x9A,     /**< sensor: (electrical) power */
+    SAUL_SENSE_POWER       = 0x9a,     /**< sensor: power */
     SAUL_CLASS_ANY         = 0xff      /**< any device - wildcard */
     /* extend this list as needed... */
 };
