@@ -5,6 +5,25 @@
 
 ## Flash the board
 
-See the `Flashing` section in @ref boards_common_nrf52.
+Use the J-Link Segger to flash the board. See the `Flashing` section in @ref
+boards_common_nrf52.
+
+## Term into the board
+
+A shell into RIOT can be accessed via the J-Link Segger and its RTT (real time
+transfer) technology. This allows serial data to be passed to/from the Segger
+via (non-UART supporting) memory locations.
+
+To use this, you need to run a debug client (e.g. gdb), a debug server (e.g.
+JLinkExe), and a terminal client (e.g., PyTerm). The terminal client connects
+to the debug server on port 19021. If you want to use the standard RIOT
+toolchain, flash the board, open two terminal windows, and input the
+following, all in your application directory:
+
+Window 1: `BOARD=ruuvitag make debug`
+Window 2: `BOARD=ruuvitag make term`
+Window 1: (gdb) `c`
+
+You will then be able to communicate with the RIOT shell in window 2.
 
  */
