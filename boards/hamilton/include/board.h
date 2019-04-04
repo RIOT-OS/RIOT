@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup    boards_hamilton HamiltonIoT Hamilton
- * @ingroup     boards
+ * @ingroup     boards_hamilton
  * @brief       Support for the HamiltonIoT Hamilton board.
  * @{
  *
