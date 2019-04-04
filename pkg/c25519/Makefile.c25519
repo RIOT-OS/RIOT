@@ -1,0 +1,11 @@
+MODULE := c25519
+
+SRC += c25519.c
+SRC += ed25519.c
+SRC += edsign.c
+SRC += f25519.c
+SRC += fprime.c
+SRC += morph25519.c
+SRC += sha512.c
+
+include $(RIOTBASE)/Makefile.base
