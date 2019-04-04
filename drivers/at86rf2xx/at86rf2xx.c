@@ -98,7 +98,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_1, tmp);
 
     /* configure smart idle listening feature */
-#if AT86RF2XX_SMART_IDLE_LISTENING
+#if AT86RF2XX_SMART_IDLE_LISTENING && !defined(MODULE_AT86RF212B)
     tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_RPC);
     tmp |= (AT86RF2XX_TRX_RPC_MASK__RX_RPC_EN |
             AT86RF2XX_TRX_RPC_MASK__PDT_RPC_EN |
