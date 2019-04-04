@@ -22,6 +22,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              ek-lm4f120xl \
                              feather-m0 \
                              firefly \
+                             hamilton \
                              ikea-tradfri \
                              limifrog-v1 maple-mini \
                              lobaro-lorabox \
