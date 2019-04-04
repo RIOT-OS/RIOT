@@ -14,88 +14,90 @@
  * @brief       Test application for the INA2XX sensor driver
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
  * @}
  */
 
-#ifndef TEST_INA2XX_I2C
-#error "TEST_INA2XX_I2C not defined"
-#endif
-#ifndef TEST_INA2XX_ADDR
-#error "TEST_INA2XX_ADDR not defined"
-#endif
+#include <errno.h>
+#include <stdlib.h>
 
-#include <stdio.h>
-
-#include "xtimer.h"
+#include "fmt.h"
+#include "fmt_table.h"
 #include "ina2xx.h"
-
-/* Use the following configuration:
- *
- *  - Continuous measurements, both shunt and bus voltage
- *  - +/- 320 mV Vshunt range
- *  - 32 V maximum bus voltage
- *  - 12 bit ADC resolution, no hardware averaging
- */
-#define CONFIG   (INA2XX_MODE_CONTINUOUS_SHUNT_BUS | INA2XX_RANGE_320MV | \
-                  INA2XX_BRNG_32V_FSR | INA2XX_SADC_12BIT | INA2XX_BADC_12BIT)
-#define CALIBRATION (4096)
-#define SLEEP_USEC    (100 * 1000U)
+#include "ina2xx_params.h"
 
 int main(void)
 {
     ina2xx_t dev;
-    int16_t val;
 
-    puts("INA2XX sensor driver test application\n");
+    print_str("INA2XX sensor driver test application\n\n");
 
-    printf("Initializing INA2XX sensor at I2C_%i, address 0x%02x... ",
-        TEST_INA2XX_I2C, TEST_INA2XX_ADDR);
-    if (ina2xx_init(&dev, TEST_INA2XX_I2C, TEST_INA2XX_ADDR) == 0) {
-        puts("[OK]\n");
+    print_str("Initializing INA2XX sensor at I2C_");
+    print_s32_dec(ina2xx_params[0].i2c);
+    print_str(", address 0x");
+    print_u32_hex(ina2xx_params[0].addr);
+    print_str("\n");
+    if (ina2xx_init(&dev, &ina2xx_params[0]) == 0) {
+        print_str("[OK]\n");
     } else {
-        puts("[Failed]");
-        return 1;
-    }
-    puts("Set configuration register");
-    if (ina2xx_set_config(&dev, CONFIG) == 0) {
-        puts("[OK]\n");
-    } else {
-        puts("[Failed]");
-        return 1;
+        print_str("[Failed]\n");
+        return EXIT_FAILURE;
     }
 
-    puts("Set calibration register");
-    if (ina2xx_set_calibration(&dev, CALIBRATION) == 0) {
-        puts("[OK]\n");
-    } else {
-        puts("[Failed]");
-        return 1;
-    }
+    const char *line = "+------------+--------------+----------+--------+\n";
+    print_str(line);
+    print_str("| U_Bus [mV] | U_Shunt [µV] |  I [µA]  | P [µW] |\n");
+    print_str(line);
 
     while (1) {
-        /* Read shunt resistor voltage, in millivolts */
-        ina2xx_read_shunt(&dev, &val);
-        printf("shunt: %6d", val);
+        uint16_t u_bus;
+        int16_t u_shunt;
+        int32_t i_shunt;
+        uint32_t p;
 
-        /* Read VBUS voltage, in millivolts */
-        ina2xx_read_bus(&dev, &val);
-        /* The bus voltage is found in the topmost 13 bits of the bus voltage
-         * register */
-        val = (val >> INA2XX_BUS_VOLTAGE_SHIFT);
-        printf("\tbus: %6d", val);
+        /* Read bus voltage until flag indicates new value is present */
+        switch (ina2xx_read_bus(&dev, &u_bus)){
+            case 0:
+                /* No measurement available yet */
+                continue;
+            case 1:
+                /* New measurement available, continue */
+                break;
+            case -EDOM:
+                print_str("[WARNING]: INA2xx detected math overflow ==> data "
+                          "will be incorrect\n");
+                break;
+            default:
+                /* Error */
+                print_str("Error while reading bus voltage\n");
+                return EXIT_FAILURE;
+        }
 
-        /* Read current register, the scale depends on the value of the
-         * calibration register */
-        ina2xx_read_current(&dev, &val);
-        printf("\tcurrent: %6d", val);
+        if (ina2xx_read_shunt(&dev, &u_shunt) < 0) {
+            print_str("Error while reading shunt voltage\n");
+            return EXIT_FAILURE;
+        }
 
-        /* Read power register, the scale depends on the value of the
-         * calibration register */
-        ina2xx_read_power(&dev, &val);
-        printf("\tpower: %6d\n", val);
+        if (ina2xx_read_current(&dev, &i_shunt) < 0) {
+            print_str("Error while reading current\n");
+            return EXIT_FAILURE;
+        }
 
-        xtimer_usleep(SLEEP_USEC);
+        if (ina2xx_read_power(&dev, &p) < 0) {
+            print_str("Error while reading power\n");
+            return EXIT_FAILURE;
+        }
+
+        print_str("| ");
+        print_col_u32_dec(u_bus, 10);
+        print_str(" | ");
+        print_col_s32_dec(10 * (int32_t)u_shunt, 12);
+        print_str(" | ");
+        print_col_s32_dec(10 * i_shunt, 8);
+        print_str(" | ");
+        print_col_u32_dec(100 * p, 6);
+        print_str(" |\n");
     }
 
     return 0;
