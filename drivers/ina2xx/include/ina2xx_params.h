@@ -21,6 +21,7 @@
 
 #include "board.h"
 #include "ina2xx.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,6 +93,16 @@ extern "C" {
 #endif
 /**@}*/
 
+/**
+ * @name    Set default SAUL info for the INA2XX
+ * @{
+ */
+#ifndef INA2XX_SAULINFO
+#define INA2XX_SAULINFO             { .name = "INA2XX current" }, \
+                                    { .name = "INA2XX power" }, \
+                                    { .name = "INA2XX voltage" }
+#endif
+/**@}*/
 
 /**
  * @brief   Configure INA2XX devices
@@ -99,6 +110,14 @@ extern "C" {
 static const ina2xx_params_t ina2xx_params[] =
 {
     INA2XX_PARAMS
+};
+
+/**
+ * @brief   Allocate and configure entries to the SAUL registry
+ */
+static const saul_reg_info_t ina2xx_saul_info[] =
+{
+    INA2XX_SAULINFO
 };
 
 #ifdef __cplusplus

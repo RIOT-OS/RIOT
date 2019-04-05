@@ -422,10 +422,14 @@ void auto_init(void)
     extern void auto_init_hts221(void);
     auto_init_hts221();
 #endif
+#ifdef MODULE_INA2XX
+    extern void auto_init_ina2xx(void);
+    auto_init_ina2xx();
+#endif
 #ifdef MODULE_INA3221
     extern void auto_init_ina3221(void);
     auto_init_ina3221();
- #endif
+#endif
 #ifdef MODULE_IO1_XPLAINED
     extern void auto_init_io1_xplained(void);
     auto_init_io1_xplained();
