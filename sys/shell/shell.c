@@ -304,3 +304,17 @@ void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
         print_prompt();
     }
 }
+
+#ifdef MODULE_SHELL_COMMANDS
+/* Provide standard system() function */
+int system(const char *command)
+{
+    int len = strlen(command);
+    char tmpstring[len+1];
+
+    strncpy(tmpstring, command, len+1);
+
+    handle_input_line(_shell_command_list, tmpstring);
+    return 0;
+}
+#endif /* MODULE_SHELL_COMMANDS */
