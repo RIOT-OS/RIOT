@@ -11,7 +11,15 @@ from testrunner import run
 
 
 def testfunc(child):
-    for i in range(1,6):
+    for i in range(1,4):
+        child.expect(r"Running test #{}... done. Run time: [0-9.]* s".format(i))
+
+    child.expect(r"Running test #{}... xxx".format(4))
+    child.expect(r"yyy")
+    child.expect(r"zzz")
+    child.expect(r"done. Run time: [0-9.]* s")
+
+    for i in range(5,7):
         child.expect(r"Running test #{}... done. Run time: [0-9.]* s".format(i))
 
 
