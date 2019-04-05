@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <stdio.h>
 #include "periph/pm.h"
 
 int _reboot_handler(int argc, char **argv)
@@ -26,6 +27,21 @@ int _reboot_handler(int argc, char **argv)
     (void) argv;
 
     pm_reboot();
+
+    return 0;
+}
+
+int _echo_handler(int argc, char **argv)
+{
+    argc--;
+    argv++;
+    while(argc) {
+        fputs(*(argv++), stdout);
+        argc--;
+        if (argc)
+            putchar(' ');
+    }
+    putchar('\n');
 
     return 0;
 }
