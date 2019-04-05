@@ -12,7 +12,10 @@ import sys
 
 
 def testfunc(child):
-    child.expect(r"OK \(2 tests\)")
+    board = os.environ['BOARD']
+    # Increase timeout on "real" hardware
+    timeout = 20 if board is not 'native' else -1
+    child.expect(r"OK \(2 tests\)", timeout=timeout)
 
 
 if __name__ == "__main__":
