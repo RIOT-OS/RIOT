@@ -116,11 +116,7 @@ extern "C" {
 #endif
 /* Minimum delay for relative timers, should usually work with any value */
 #ifndef TEST_MIN_REL
-#if TEST_XTIMER
 #define TEST_MIN_REL (TEST_MIN)
-#else
-#define TEST_MIN_REL (0)
-#endif
 #endif
 /* Number of test values */
 #define TEST_NUM ((TEST_MAX) - (TEST_MIN) + 1)
