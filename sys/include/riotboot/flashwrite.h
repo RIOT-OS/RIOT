@@ -169,6 +169,20 @@ static inline int riotboot_flashwrite_finish(riotboot_flashwrite_t *state)
  */
 size_t riotboot_flashwrite_slotsize(const riotboot_flashwrite_t *state);
 
+/**
+ * @brief       Verify the digest of an image
+ *
+ * @param[in]   sha256_digest   content of the image digest
+ * @param[in]   img_size        the size of the image
+ * @param[in]   target_slot     the image slot number
+ *
+ * @returns     -1 when image is too small
+ * @returns     0 if the digest is valid
+ * @returns     1 if the digest is invalid
+ */
+int riotboot_flashwrite_verify_sha256(const uint8_t *sha256_digest,
+                                      size_t img_size, int target_slot);
+
 #ifdef __cplusplus
 }
 #endif
