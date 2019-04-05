@@ -1,0 +1,118 @@
+From 92e166b6e0b2be14c081dd5b63509a077bfa16bc Mon Sep 17 00:00:00 2001
+From: Juan Carrano <j.carrano@fu-berlin.de>
+Date: Fri, 5 Apr 2019 15:01:05 +0200
+Subject: [PATCH 4/6] Do not call exit() on error.
+
+---
+ runfile.c |  7 ++++++-
+ ubasic.c  | 16 +++++++++++-----
+ ubasic.h  |  4 +++-
+ 3 files changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/runfile.c b/runfile.c
+index ac84ea8..ef427f7 100644
+--- a/runfile.c
++++ b/runfile.c
+@@ -78,7 +78,12 @@ int main(int argc, char *argv[])
+         ubasic_run();
+     } while(!ubasic_finished());
+ 
+-    result = ubasic_get_variable(0);
++    if (ubasic_finished() == UBASIC_ERROR) {
++        fprintf(stderr, "Error in script\n");
++        result = 2;
++    } else {
++        result = ubasic_get_variable(0);
++    }
+ 
+ release_mem:
+     free(source_buf);
+diff --git a/ubasic.c b/ubasic.c
+index baf56d7..8832812 100644
+--- a/ubasic.c
++++ b/ubasic.c
+@@ -42,7 +42,7 @@
+ #include "tokenizer.h"
+ 
+ #include <stdio.h> /* printf() */
+-#include <stdlib.h> /* exit() */
++#include <stdlib.h>
+ 
+ static char const *program_ptr;
+ #define MAX_STRINGLEN 40
+@@ -73,6 +73,7 @@ struct line_index *line_index_current = NULL;
+ static VARIABLE_TYPE variables[MAX_VARNUM];
+ 
+ static int ended;
++static int error;
+ 
+ static VARIABLE_TYPE expr(void);
+ static void line_statement(void);
+@@ -91,6 +92,7 @@ ubasic_init(const char *program)
+   index_free();
+   tokenizer_init(program);
+   ended = 0;
++  error = 0;
+ }
+ /*---------------------------------------------------------------------------*/
+ static void
+@@ -100,7 +102,8 @@ accept(int token)
+     DEBUG_PRINTF("Token not what was expected (expected %d, got %d)\n",
+                 token, tokenizer_token());
+     tokenizer_error_print();
+-    exit(1);
++    error = 1;
++    return;
+   }
+   DEBUG_PRINTF("Expected %d, got it\n", token);
+   tokenizer_next();
+@@ -581,7 +584,8 @@ statement(void)
+     break;
+   default:
+     DEBUG_PRINTF("ubasic.c: statement(): not implemented %d\n", token);
+-    exit(1);
++    error = 1;
++    return;
+   }
+ }
+ /*---------------------------------------------------------------------------*/
+@@ -606,10 +610,12 @@ ubasic_run(void)
+   line_statement();
+ }
+ /*---------------------------------------------------------------------------*/
+-int
++enum UBASIC_STATUS
+ ubasic_finished(void)
+ {
+-  return ended || tokenizer_finished();
++  return error? UBASIC_ERROR
++                : ((ended || tokenizer_finished())? UBASIC_FINISHED
++                                                  : UBASIC_RUNNING);
+ }
+ /*---------------------------------------------------------------------------*/
+ void
+diff --git a/ubasic.h b/ubasic.h
+index 8d11ea1..f1fdaf2 100644
+--- a/ubasic.h
++++ b/ubasic.h
+@@ -32,6 +32,8 @@
+ 
+ #include "vartype.h"
+ 
++enum UBASIC_STATUS {UBASIC_RUNNING, UBASIC_FINISHED, UBASIC_ERROR};
++
+ typedef VARIABLE_TYPE (*peek_func)(VARIABLE_TYPE);
+ typedef void (*poke_func)(VARIABLE_TYPE, VARIABLE_TYPE);
+ 
+@@ -40,7 +42,7 @@ extern poke_func poke_function;
+ 
+ void ubasic_init(const char *program);
+ void ubasic_run(void);
+-int ubasic_finished(void);
++enum UBASIC_STATUS ubasic_finished(void);
+ 
+ VARIABLE_TYPE ubasic_get_variable(int varnum);
+ void ubasic_set_variable(int varum, VARIABLE_TYPE value);
+-- 
+2.21.0
+

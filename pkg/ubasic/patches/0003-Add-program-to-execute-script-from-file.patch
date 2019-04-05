@@ -1,0 +1,123 @@
+From 29ba5d0e1ba18afd1072bd8c07f7b036bfce870f Mon Sep 17 00:00:00 2001
+From: Juan Carrano <j.carrano@fu-berlin.de>
+Date: Fri, 5 Apr 2019 15:00:35 +0200
+Subject: [PATCH 3/6] Add program to execute script from file.
+
+---
+ Makefile  |  3 +-
+ runfile.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 93 insertions(+), 1 deletion(-)
+ create mode 100644 runfile.c
+
+diff --git a/Makefile b/Makefile
+index b99c040..6ba5596 100644
+--- a/Makefile
++++ b/Makefile
+@@ -4,5 +4,6 @@ endif
+ 
+ tests: tests.o ubasic.o tokenizer.o
+ use-ubasic: use-ubasic.o ubasic.o tokenizer.o
++runfile: runfile.o ubasic.o tokenizer.o
+ clean:
+-	rm *.o tests use-ubasic
++	rm -f *.o tests use-ubasic runfile
+diff --git a/runfile.c b/runfile.c
+new file mode 100644
+index 0000000..ac84ea8
+--- /dev/null
++++ b/runfile.c
+@@ -0,0 +1,91 @@
++/*
++ * Copyright (c) 2019, Freie Universität Berlin
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. Neither the name of the author nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ *
++ */
++
++#include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++#include <errno.h>
++#include "ubasic.h"
++
++int main(int argc, char *argv[])
++{
++    int result = 1;
++    FILE *source;
++    size_t file_size;
++    char *source_buf;
++
++    if (argc != 2 || (argc==2 && !strcmp(argv[1], "-h"))) {
++        fprintf(stderr, "Usage: %s <script_file>\n", argv[0]);
++        goto end;
++    }
++
++    source = fopen(argv[1], "r");
++
++    if (source == NULL) {
++        fprintf(stderr, "Error: failed to open file %d: %s\n", errno,
++                strerror(errno));
++        goto end;
++    }
++
++    fseek(source, 0, SEEK_END);
++    file_size = ftell(source);
++    source_buf = malloc(file_size + 1);
++
++    if (source_buf == NULL) {
++        fprintf(stderr, "Error: allocation failed\n");
++        goto close_file;
++    }
++
++    rewind(source);
++
++    if (fread(source_buf, 1, file_size, source) != file_size) {
++        fprintf(stderr, "Error: failed to read file\n");
++        goto release_mem;
++    }
++
++    source_buf[file_size] = 0;
++
++    ubasic_init(source_buf);
++
++    do {
++        ubasic_run();
++    } while(!ubasic_finished());
++
++    result = ubasic_get_variable(0);
++
++release_mem:
++    free(source_buf);
++
++close_file:
++    fclose(source);
++
++end:
++    return result;
++}
+-- 
+2.21.0
+

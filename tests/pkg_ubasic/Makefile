@@ -4,8 +4,9 @@ TEST_ON_CI_WHITELIST += all
 
 USEPKG += ubasic
 USEMODULE += ubasic_tests
+USEMODULE += shell
+USEMODULE += shell_commands
+USEMODULE += printf_float
 
-# ubasic_init_peek_poke used in those tests is not exposed
-CFLAGS += -Wno-implicit-function-declaration
 
 include $(RIOTBASE)/Makefile.include

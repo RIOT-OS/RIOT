@@ -1,0 +1,39 @@
+From c5f3c586893767c71d1ba4258b52f04f36fb4a44 Mon Sep 17 00:00:00 2001
+From: Juan Carrano <j.carrano@fu-berlin.de>
+Date: Fri, 5 Apr 2019 15:45:23 +0200
+Subject: [PATCH 2/6] Allow setting debug option from shell
+
+---
+ Makefile | 4 ++++
+ ubasic.c | 2 ++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 50eedc9..b99c040 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,3 +1,7 @@
++ifeq (1,$(DEBUG))
++  CFLAGS += -DDEBUG=1
++endif
++
+ tests: tests.o ubasic.o tokenizer.o
+ use-ubasic: use-ubasic.o ubasic.o tokenizer.o
+ clean:
+diff --git a/ubasic.c b/ubasic.c
+index bbfe8a7..baf56d7 100644
+--- a/ubasic.c
++++ b/ubasic.c
+@@ -28,7 +28,9 @@
+  *
+  */
+ 
++#ifndef DEBUG
+ #define DEBUG 0
++#endif
+ 
+ #if DEBUG
+ #define DEBUG_PRINTF(...)  printf(__VA_ARGS__)
+-- 
+2.21.0
+

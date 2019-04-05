@@ -1,0 +1,126 @@
+From 44c3838277545846bddf2bbe62e643f820317cec Mon Sep 17 00:00:00 2001
+From: Juan Carrano <j.carrano@fu-berlin.de>
+Date: Fri, 5 Apr 2019 15:56:44 +0200
+Subject: [PATCH 5/6] Add shell command
+
+also, add shell command to tests.
+---
+ tests.c     |  8 ++++++++
+ tokenizer.c |  1 +
+ tokenizer.h |  1 +
+ ubasic.c    | 35 +++++++++++++++++++++++++++++++++++
+ 4 files changed, 45 insertions(+)
+
+diff --git a/tests.c b/tests.c
+index 0464575..b4ac79a 100644
+--- a/tests.c
++++ b/tests.c
+@@ -58,6 +58,12 @@ rem 45 print a, i, j, k\n\
+ 70 next i\n\
+ 80 end\n";
+ 
++static const char program_shell[] =
++"10 shell \"echo xxx\"\n\
++20 shell \"echo yyy\"\n\
++30 shell \"echo zzz\"\n\
++40 end\n";
++
+ static const char program_fibs[] =
+ "20 let a = 1\n\
+ 40 let b = 1\n\
+@@ -124,6 +130,8 @@ main(void)
+   run(program_loop);
+   assert(ubasic_get_variable(0) == (VARIABLE_TYPE)(126 * 126 * 10));
+ 
++  run(program_shell);
++
+   run(program_fibs);
+   assert(ubasic_get_variable(1) == 89);
+ 
+diff --git a/tokenizer.c b/tokenizer.c
+index 3321079..4e01f93 100644
+--- a/tokenizer.c
++++ b/tokenizer.c
+@@ -65,6 +65,7 @@ static const struct keyword_token keywords[] = {
+   {"gosub", TOKENIZER_GOSUB},
+   {"return", TOKENIZER_RETURN},
+   {"call", TOKENIZER_CALL},
++  {"shell", TOKENIZER_SHELL},
+   {"rem", TOKENIZER_REM},
+   {"peek", TOKENIZER_PEEK},
+   {"poke", TOKENIZER_POKE},
+diff --git a/tokenizer.h b/tokenizer.h
+index d520ae8..608b6de 100644
+--- a/tokenizer.h
++++ b/tokenizer.h
+@@ -50,6 +50,7 @@ enum {
+   TOKENIZER_GOSUB,
+   TOKENIZER_RETURN,
+   TOKENIZER_CALL,
++  TOKENIZER_SHELL,
+   TOKENIZER_REM,
+   TOKENIZER_PEEK,
+   TOKENIZER_POKE,
+diff --git a/ubasic.c b/ubasic.c
+index 8832812..759127a 100644
+--- a/ubasic.c
++++ b/ubasic.c
+@@ -42,6 +42,7 @@
+ #include "tokenizer.h"
+ 
+ #include <stdio.h> /* printf() */
++#include <string.h>
+ #include <stdlib.h>
+ 
+ static char const *program_ptr;
+@@ -377,6 +378,37 @@ print_statement(void)
+ }
+ /*---------------------------------------------------------------------------*/
+ static void
++shell_statement(void)
++{
++  accept(TOKENIZER_SHELL);
++  DEBUG_PRINTF("shell: found statement\n");
++
++  if(tokenizer_token() == TOKENIZER_STRING) {
++    tokenizer_string(string, sizeof(string));
++    DEBUG_PRINTF("shell: found command line %s\n", string);
++    tokenizer_next();
++  } else {
++    DEBUG_PRINTF("shell: unexpected token: %d\n", tokenizer_token());
++    error = 1;
++    return;
++  }
++
++  if (tokenizer_token() != TOKENIZER_CR &&
++      tokenizer_token() != TOKENIZER_ENDOFINPUT) {
++    DEBUG_PRINTF("shell: too many tokens: %d\n", tokenizer_token());
++    error = 1;
++    return;
++  }
++
++  DEBUG_PRINTF("shell: calling command\n");
++  system(string);
++
++  DEBUG_PRINTF("shell: end\n");
++
++  tokenizer_next();
++}
++/*---------------------------------------------------------------------------*/
++static void
+ if_statement(void)
+ {
+   int r;
+@@ -549,6 +581,9 @@ statement(void)
+   case TOKENIZER_PRINT:
+     print_statement();
+     break;
++  case TOKENIZER_SHELL:
++    shell_statement();
++    break;
+   case TOKENIZER_IF:
+     if_statement();
+     break;
+-- 
+2.21.0
+

@@ -1,0 +1,67 @@
+From 0a283e015e806dcb40efaadc1b4d6c74654cf23d Mon Sep 17 00:00:00 2001
+From: Juan Carrano <j.carrano@fu-berlin.de>
+Date: Fri, 5 Apr 2019 16:06:32 +0200
+Subject: [PATCH 1/6] Remove ubasic_init_peek_poke.
+
+Expose pointers directly via extern.
+---
+ tests.c  |  4 +++-
+ ubasic.c | 12 ------------
+ ubasic.h |  3 +++
+ 3 files changed, 6 insertions(+), 13 deletions(-)
+
+diff --git a/tests.c b/tests.c
+index 96f60b8..0464575 100644
+--- a/tests.c
++++ b/tests.c
+@@ -97,7 +97,9 @@ void run(const char program[]) {
+ 
+   start_t = clock();
+ 
+-  ubasic_init_peek_poke(program, &peek, &poke);
++  peek_function = peek;
++  poke_function = poke;
++  ubasic_init(program);
+ 
+   do {
+     ubasic_run();
+diff --git a/ubasic.c b/ubasic.c
+index 36eade4..bbfe8a7 100644
+--- a/ubasic.c
++++ b/ubasic.c
+@@ -91,18 +91,6 @@ ubasic_init(const char *program)
+   ended = 0;
+ }
+ /*---------------------------------------------------------------------------*/
+-void
+-ubasic_init_peek_poke(const char *program, peek_func peek, poke_func poke)
+-{
+-  program_ptr = program;
+-  for_stack_ptr = gosub_stack_ptr = 0;
+-  index_free();
+-  peek_function = peek;
+-  poke_function = poke;
+-  tokenizer_init(program);
+-  ended = 0;
+-}
+-/*---------------------------------------------------------------------------*/
+ static void
+ accept(int token)
+ {
+diff --git a/ubasic.h b/ubasic.h
+index 43399c8..8d11ea1 100644
+--- a/ubasic.h
++++ b/ubasic.h
+@@ -35,6 +35,9 @@
+ typedef VARIABLE_TYPE (*peek_func)(VARIABLE_TYPE);
+ typedef void (*poke_func)(VARIABLE_TYPE, VARIABLE_TYPE);
+ 
++extern peek_func peek_function;
++extern poke_func poke_function;
++
+ void ubasic_init(const char *program);
+ void ubasic_run(void);
+ int ubasic_finished(void);
+-- 
+2.21.0
+
