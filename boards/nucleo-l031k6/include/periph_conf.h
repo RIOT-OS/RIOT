@@ -147,13 +147,6 @@ static const spi_conf_t spi_config[] = {
 #define ADC_NUMOF           (7U)
 /** @} */
 
-/**
- * @name    RTC configuration
- * @{
- */
-#define RTC_NUMOF           (1U)
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif

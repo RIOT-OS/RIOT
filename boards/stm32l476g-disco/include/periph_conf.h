@@ -117,13 +117,6 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
-/**
- * @name   RTC configuration
- * @{
- */
-#define RTC_NUMOF           (1)
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
