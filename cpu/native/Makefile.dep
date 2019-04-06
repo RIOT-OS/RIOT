@@ -1,0 +1,3 @@
+ifneq (,$(filter periph_spi,$(USEMODULE)))
+  USEMODULE += periph_spidev_linux
+endif

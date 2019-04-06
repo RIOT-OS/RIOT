@@ -45,6 +45,52 @@ extern "C" {
 #define PROVIDES_PM_SET_LOWEST
 /** @} */
 
+/* Configuration for the wrapper around the Linux SPI API (periph_spidev_linux)
+ *
+ * Needs to go here, otherwise the SPI_NEEDS_ are defined after inclusion of
+ * spi.h.
+ */
+#if defined(MODULE_PERIPH_SPIDEV_LINUX) || defined(DOXYGEN)
+
+/**
+ * @name SPI Configuration
+ */
+
+/**
+ * @brief   Use the common `transfer_byte` SPI function
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+/**
+ * @brief   Use the common `transfer_reg` SPI function
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+/**
+ * @brief   Use the common `transfer_regs` SPI function
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+
+/**
+ * @brief   Use a custom clock speed type
+ */
+#define HAVE_SPI_CLK_T
+/**
+ * @brief   SPI clock speed values
+ *
+ * The Linux userspace driver takes values in Hertz, which values are available
+ * can only be determined at runtime.
+ * @{
+ */
+typedef enum {
+    SPI_CLK_100KHZ = (100000U),
+    SPI_CLK_400KHZ = (400000U),
+    SPI_CLK_1MHZ   = (1000000U),
+    SPI_CLK_5MHZ   = (5000000U),
+    SPI_CLK_10MHZ  = (10000000U)
+} spi_clk_t;
+/** @} */
+
+#endif /* MODULE_PERIPH_SPI | DOXYGEN */
+
 #ifdef __cplusplus
 }
 #endif

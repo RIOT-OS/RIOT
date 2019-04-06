@@ -76,7 +76,9 @@ netdev_tap_params_t netdev_tap_params[NETDEV_TAP_MAX];
 #ifdef MODULE_CAN_LINUX
 #include "candev_linux.h"
 #endif
-
+#ifdef MODULE_PERIPH_SPIDEV_LINUX
+#include "spidev_linux.h"
+#endif
 #ifdef MODULE_SOCKET_ZEP
 #include "socket_zep_params.h"
 
@@ -92,6 +94,9 @@ static const char short_opts[] = ":hi:s:deEoc:"
 #endif
 #ifdef MODULE_SOCKET_ZEP
     "z:"
+#endif
+#ifdef MODULE_PERIPH_SPIDEV_LINUX
+    "p:"
 #endif
     "";
 
@@ -112,6 +117,9 @@ static const struct option long_opts[] = {
 #endif
 #ifdef MODULE_SOCKET_ZEP
     { "zep", required_argument, NULL, 'z' },
+#endif
+#ifdef MODULE_PERIPH_SPIDEV_LINUX
+    { "spi", required_argument, NULL, 'p' },
 #endif
     { NULL, 0, NULL, '\0' },
 };
@@ -251,6 +259,9 @@ void usage_exit(int status)
         real_printf(" -z <laddr>:<lport>,<raddr>:<rport>\n");
     }
 #endif
+#ifdef MODULE_PERIPH_SPIDEV_LINUX
+    real_printf(" [-p <b>:<d>:<spidev>]\n");
+#endif
 
     real_printf(" help: %s -h\n\n", _progname);
 
@@ -292,6 +303,15 @@ void usage_exit(int status)
 "    -n <ifnum>:<ifname>, --can <ifnum>:<ifname>\n"
 "        specify CAN interface <ifname> to use for CAN device #<ifnum>\n"
 "        max number of CAN device: %d\n", CAN_DLL_NUMOF);
+#endif
+#ifdef MODULE_PERIPH_SPIDEV_LINUX
+    real_printf(
+"    -p <b>:<d>:<spidev>, --spi=<b>:<d>:<spidev>\n"
+"        specify Linux SPI device to use for CS line d on bus b (in RIOT)\n"
+"        Example: --spi=0:1:/dev/spidev0.0 will assign the file spidev0.0 to\n"
+"                 SPI_DEV(0) and SPI_HWCS(1).\n"
+"        Supports up to %d busses with %d CS lines each.\n", SPI_NUMOF, SPI_MAXCS
+    );
 #endif
     real_exit(status);
 }
@@ -454,6 +474,22 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 #ifdef MODULE_SOCKET_ZEP
             case 'z':
                 _zep_params_setup(optarg, zeps++);
+                break;
+#endif
+#ifdef MODULE_PERIPH_SPIDEV_LINUX
+            case 'p': {
+                    long bus = strtol(optarg, &optarg, 10);
+                    if (*optarg != ':') {
+                        usage_exit(EXIT_FAILURE);
+                    }
+                    long cs = strtol(++optarg, &optarg, 10);
+                    if (*optarg != ':') {
+                        usage_exit(EXIT_FAILURE);
+                    }
+                    if (spidev_linux_setup(bus, cs, ++optarg) < 0) {
+                        usage_exit(EXIT_FAILURE);
+                    }
+                }
                 break;
 #endif
             default:
