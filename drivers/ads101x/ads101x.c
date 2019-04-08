@@ -35,7 +35,7 @@
 #define ADS101X_READ_DELAY (8 * US_PER_MS)    /* Compatible with 128SPS */
 #endif
 
-#define I2C (dev->params.i2c)
+#define DEV (dev->params.i2c)
 #define ADDR (dev->params.addr)
 
 static int _ads101x_init_test(i2c_t i2c, uint8_t addr);
@@ -46,7 +46,7 @@ int ads101x_init(ads101x_t *dev, const ads101x_params_t *params)
 
     dev->params = *params;
 
-    return _ads101x_init_test(I2C, ADDR);
+    return _ads101x_init_test(DEV, ADDR);
 }
 
 int ads101x_alert_init(ads101x_alert_t *dev,
@@ -62,7 +62,7 @@ int ads101x_alert_init(ads101x_alert_t *dev,
     ads101x_set_alert_parameters(dev, dev->params.low_limit,
                                  dev->params.high_limit);
 
-    return _ads101x_init_test(I2C, ADDR);
+    return _ads101x_init_test(DEV, ADDR);
 }
 
 static int _ads101x_init_test(i2c_t i2c, uint8_t addr)
@@ -106,9 +106,9 @@ int ads101x_set_mux_gain(const ads101x_t *dev, uint8_t mux_gain)
 {
     uint8_t regs[2];
 
-    i2c_acquire(I2C);
+    i2c_acquire(DEV);
 
-    i2c_read_regs(I2C, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
+    i2c_read_regs(DEV, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
 
     /* Zero mux and gain */
     regs[0] &= ~ADS101X_MUX_MASK;
@@ -117,9 +117,9 @@ int ads101x_set_mux_gain(const ads101x_t *dev, uint8_t mux_gain)
     /* Write mux and gain */
     regs[0] |= mux_gain;
 
-    i2c_write_regs(I2C, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
+    i2c_write_regs(DEV, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
 
-    i2c_release(I2C);
+    i2c_release(DEV);
 
     return ADS101X_OK;
 }
@@ -128,25 +128,25 @@ int ads101x_read_raw(const ads101x_t *dev, int16_t *raw)
 {
     uint8_t regs[2];
 
-    i2c_acquire(I2C);
+    i2c_acquire(DEV);
 
     /* Read control register */
-    i2c_read_regs(I2C, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
+    i2c_read_regs(DEV, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
 
     /* Tell the ADC to aquire a single-shot sample */
     regs[0] |= ADS101X_CONF_OS_CONV;
-    i2c_write_regs(I2C, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
+    i2c_write_regs(DEV, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
 
     /* Wait for the sample to be aquired */
     xtimer_usleep(ADS101X_READ_DELAY);
 
     /* Read the sample */
-    if (i2c_read_regs(I2C, ADDR, ADS101X_CONV_RES_ADDR, &regs, 2, 0x0) < 0) {
-        i2c_release(I2C);
+    if (i2c_read_regs(DEV, ADDR, ADS101X_CONV_RES_ADDR, &regs, 2, 0x0) < 0) {
+        i2c_release(DEV);
         return ADS101X_NODATA;
     }
 
-    i2c_release(I2C);
+    i2c_release(DEV);
 
     /* If all okay, change raw value */
     *raw = (int16_t)(regs[0] << 8) | (int16_t)(regs[1]);
@@ -164,14 +164,14 @@ int ads101x_enable_alert(ads101x_alert_t *dev,
     }
 
     /* Read control register */
-    i2c_acquire(I2C);
-    i2c_read_regs(I2C, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
+    i2c_acquire(DEV);
+    i2c_read_regs(DEV, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
 
     /* Enable alert comparator */
     regs[1] &= ~ADS101X_CONF_COMP_DIS;
-    i2c_write_regs(I2C, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
+    i2c_write_regs(DEV, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
 
-    i2c_release(I2C);
+    i2c_release(DEV);
 
     /* Enable interrupt */
     dev->arg = arg;
@@ -186,20 +186,20 @@ int ads101x_set_alert_parameters(const ads101x_alert_t *dev,
 {
     uint8_t regs[2];
 
-    i2c_acquire(I2C);
+    i2c_acquire(DEV);
 
     /* Set up low_limit */
     regs[0] = (uint8_t)(low_limit >> 8);
     regs[1] = (uint8_t)low_limit;
-    i2c_write_regs(I2C, ADDR, ADS101X_LOW_LIMIT_ADDR, &regs, 2, 0x0);
+    i2c_write_regs(DEV, ADDR, ADS101X_LOW_LIMIT_ADDR, &regs, 2, 0x0);
 
     /* Set up high_limit */
     regs[0] = (uint8_t)(high_limit >> 8);
     regs[1] = (uint8_t)high_limit;
-    i2c_write_regs(I2C, ADDR, ADS101X_HIGH_LIMIT_ADDR, &regs, 2, 0x0);
+    i2c_write_regs(DEV, ADDR, ADS101X_HIGH_LIMIT_ADDR, &regs, 2, 0x0);
 
     /* Read control register */
-    i2c_read_regs(I2C, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
+    i2c_read_regs(DEV, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
 
     /* Set up window mode */
     if (low_limit != 0) {
@@ -210,9 +210,9 @@ int ads101x_set_alert_parameters(const ads101x_alert_t *dev,
         /* Disable window mode */
         regs[1] &= ~ADS101X_CONF_COMP_MODE_WIND;
     }
-    i2c_write_regs(I2C, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
+    i2c_write_regs(DEV, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
 
-    i2c_release(I2C);
+    i2c_release(DEV);
 
     return ADS101X_OK;
 }
