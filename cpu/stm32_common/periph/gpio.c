@@ -257,6 +257,70 @@ void isr_exti(void)
 }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
+
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F2) || \
+    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || \
+    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L1)
+
+#define AHBENR_LOWER_MASK      (0x0000FFFF)
+#define AHBENR_UPPER_MASK      (0xFFFF0000)
+#define AHB1ENR_LOWER_MASK     (0x0000FFFF)
+
+#define STM32_CPU_MAX_GPIOS    (12U)
+
+void gpio_pm_init_ain(void)
+{
+    uint32_t ahb_gpio_clocks;
+
+    /* enable GPIO clock and save GPIO clock configuration */
+#if defined(CPU_FAM_STM32L1)
+    ahb_gpio_clocks = RCC->AHBENR & AHBENR_LOWER_MASK;
+    periph_clk_en(AHB, AHBENR_LOWER_MASK);
+#elif defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F0)
+    ahb_gpio_clocks = RCC->AHBENR & AHBENR_UPPER_MASK;
+    periph_clk_en(AHB, AHBENR_UPPER_MASK);
+#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
+      defined(CPU_FAM_STM32F7)
+    ahb_gpio_clocks = RCC->AHB1ENR & AHBENR_LOWER_MASK;
+    periph_clk_en(AHB1, AHB1ENR_LOWER_MASK);
+#endif
+    /* switch all GPIOs to AIN mode to minimize power consumption */
+    for (uint8_t i = 0; i < STM32_CPU_MAX_GPIOS; i++) {
+        GPIO_TypeDef *port;
+        port = (GPIO_TypeDef *)(GPIOA_BASE + i*(GPIOB_BASE - GPIOA_BASE));
+        if (IS_GPIO_ALL_INSTANCE(port)) {
+#if !defined (DISABLE_JTAG)
+            switch (i) {
+                /* preserve JTAG pins on PORTA and PORTB */
+                case 0:
+                    port->MODER = 0xABFFFFFF;
+                    break;
+                case 1:
+                    port->MODER = 0xFFFFFEBF;
+                    break;
+                default:
+                    port->MODER = 0xFFFFFFFF;
+                    break;
+            }
+#else
+            port->MODER = 0xFFFFFFFF;
+#endif
+        }
+        else {
+            break;
+        }
+    }
+    /* restore GPIO clock */
+#if defined(CPU_FAM_STM32L1)
+    periph_clk_en(AHB, ((RCC->AHBENR & ~((uint32_t)AHBENR_LOWER_MASK)) | ahb_gpio_clocks));
+#elif defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F0)
+    periph_clk_en(AHB, ((RCC->AHBENR & ~((uint32_t)AHBENR_UPPER_MASK)) | ahb_gpio_clocks));
+#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
+      defined(CPU_FAM_STM32F7)
+    periph_clk_en(AHB1, ((RCC->AHB1ENR & ~((uint32_t)AHB1ENR_LOWER_MASK)) | ahb_gpio_clocks));
+#endif
+}
+#endif
 #else
 typedef int dont_be_pedantic;
 #endif
