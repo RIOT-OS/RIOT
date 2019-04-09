@@ -274,6 +274,9 @@ gnrc_sixlowpan_msg_frag_t *gnrc_sixlowpan_msg_frag_get(void)
             return &_fragment_msg[i];
         }
     }
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+    gnrc_sixlowpan_frag_stats_get()->frag_full++;
+#endif
     return NULL;
 }
 

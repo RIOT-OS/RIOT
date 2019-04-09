@@ -82,6 +82,15 @@ enum {
     RBUF_ADD_DUPLICATE,
 };
 
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+static gnrc_sixlowpan_frag_stats_t _stats;
+
+gnrc_sixlowpan_frag_stats_t *gnrc_sixlowpan_frag_stats_get(void)
+{
+    return &_stats;
+}
+#endif
+
 static int _check_fragments(gnrc_sixlowpan_rbuf_base_t *entry,
                             size_t frag_size, size_t offset)
 {
@@ -348,8 +357,15 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
             gnrc_pktbuf_release(oldest->pkt);
             rbuf_rm(oldest);
             res = oldest;
+#if GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE && \
+    defined(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
+            _stats.rbuf_full++;
+#endif
         }
         else {
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+            _stats.rbuf_full++;
+#endif
             return NULL;
         }
     }

@@ -138,6 +138,31 @@ typedef struct {
 #endif /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
 } gnrc_sixlowpan_msg_frag_t;
 
+#if defined(MODULE_GNRC_SIXLOWPAN_FRAG_STATS) || DOXYGEN
+/**
+ * @brief   Statistics on fragmentation and reassembly
+ *
+ * @note    Only available with the `gnrc_sixlowpan_frag_stats` module
+ */
+typedef struct {
+    unsigned rbuf_full;     /**< counts the number of events where the
+                             *   reassembly buffer is full */
+    unsigned frag_full;     /**< counts the number of events that there where
+                             *   no @ref gnrc_sixlowpan_msg_frag_t available */
+#if defined(MODULE_GNRC_SIXLOWPAN_FRAG_VRB) || DOXYGEN
+    unsigned vrb_full;      /**< counts the number of events where the virtual
+                             *   reassembly buffer is full */
+#endif
+} gnrc_sixlowpan_frag_stats_t;
+
+/**
+ * @brief   Get the current statistics on fragmentation and reassembly
+ *
+ * @return  The current statistics on fragmentation and reassembly
+ */
+gnrc_sixlowpan_frag_stats_t *gnrc_sixlowpan_frag_stats_get(void);
+#endif
+
 /**
  * @brief   Allocates a @ref gnrc_sixlowpan_msg_frag_t object
  *
