@@ -85,4 +85,8 @@ ifneq (,$(filter semtech-loramac,$(USEPKG)))
   SRC += sc_loramac.c
 endif
 
+ifneq (,$(filter syslog,$(USEMODULE)))
+  SRC += syslog.c
+endif
+
 include $(RIOTBASE)/Makefile.base
