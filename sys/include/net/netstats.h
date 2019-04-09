@@ -48,6 +48,7 @@ typedef struct {
                                      (either acknowledged or unconfirmed
                                      sending operation, e.g. multicast) */
     uint32_t tx_failed;         /**< failed sending operations */
+    uint32_t tx_retrans;        /**< total number of retransmissions */
     uint32_t tx_bytes;          /**< sent bytes */
     uint32_t rx_count;          /**< received (data) packets */
     uint32_t rx_bytes;          /**< received bytes */
