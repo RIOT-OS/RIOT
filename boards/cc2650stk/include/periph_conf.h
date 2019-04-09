@@ -78,6 +78,15 @@ static const timer_conf_t timer_config[] = {
 #define UART_TX_PIN         (29)
 /** @} */
 
+/**
+ * @name    I2C configuration
+ * @{
+ */
+#define I2C_NUMOF           (1)
+#define I2C_SDA_PIN         (5)
+#define I2C_SCL_PIN         (6)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
