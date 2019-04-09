@@ -50,8 +50,9 @@ void rtc_init(void);
  *
  * @param[in] time          Pointer to the struct holding the time to set.
  *
- * @return  0 for success
- * @return -1 an error occurred
+ * @retval  0               Success
+ * @retval -EINVAL          Either @p time is `NULL`, or does not specify a valid time
+ * @retval -1               An error occurred while setting the time
  */
 int rtc_set_time(struct tm *time);
 
@@ -60,8 +61,9 @@ int rtc_set_time(struct tm *time);
  *
  * @param[out] time         Pointer to the struct to write the time to.
  *
- * @return  0 for success
- * @return -1 an error occurred
+ * @retval  0       Success
+ * @retval -EINVAL  @p time is `NULL`
+ * @retval -1       An error occurred while retrieving the time
  */
 int rtc_get_time(struct tm *time);
 
@@ -74,9 +76,11 @@ int rtc_get_time(struct tm *time);
  * @param[in] cb            Callback executed when alarm is hit.
  * @param[in] arg           Argument passed to callback when alarm is hit.
  *
- * @return  0 for success
- * @return -2 invalid `time` parameter
- * @return -1 other errors
+ * @retval  0               Success
+ * @retval -EINVAL          @p time or @p cb is `NULL`
+ * @retval -EINVAL          @p time does not contain a valid time
+ * @retval -ETIME           @p time refers to the past (alarm would never trigger)
+ * @retval -1               Other errors
  */
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg);
 
@@ -85,8 +89,10 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg);
  *
  * @param[out]  time        Pointer to structure to receive alarm time
  *
- * @return  0 for success
- * @return -1 an error occurred
+ * @retval  0               Success
+ * @retval -EINVAL          @p time is `NULL`
+ * @retval -ENODATA         No alarm is pending
+ * @retval -1               An error occurred while retrieving the alarm
  */
 int rtc_get_alarm(struct tm *time);
 
