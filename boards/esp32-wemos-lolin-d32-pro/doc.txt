@@ -144,7 +144,7 @@ MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network i
 #define ENC28J80_PARAM_CS       GPIO15      /* ENC28J80 CS signal    */
 #define ENC28J80_PARAM_RESET    GPIO2       /* ENC28J80 RESET signal */
 #define ENC28J80_PARAM_INT      GPIO13      /* ENC28J80 INT signal   */
-endif
+#endif
 
 #endif
 ```
