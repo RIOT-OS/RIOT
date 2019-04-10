@@ -105,6 +105,10 @@ void cpu_init(void)
     wdt_reset();   /* should not be nececessary as done in bootloader */
     wdt_disable(); /* but when used without bootloader this is needed */
 
+    /* Initialize stdio before periph_init() to allow use of DEBUG() there */
+#ifdef MODULE_AVR_LIBC_EXTRA
+    atmega_stdio_init();
+#endif
     /* Initialize peripherals for which modules are included in the makefile.*/
     /* spi_init */
     /* rtc_init */
