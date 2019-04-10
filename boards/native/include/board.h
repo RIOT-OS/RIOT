@@ -127,6 +127,7 @@ extern mtd_dev_t *mtd0;
 /** @} */
 #endif
 
+#if MODULE_PERIPH_QDEC
 /**
  * @brief Simulate QDEC on motor_set() calls
  *
@@ -182,6 +183,7 @@ static const motor_driver_config_t motor_driver_config[] = {
 
 #define MOTOR_DRIVER_NUMOF           ARRAY_SIZE(motor_driver_config)
 /** @} */
+#endif
 
 /**
  * @name    ztimer configuration
