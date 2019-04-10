@@ -13,6 +13,7 @@ import socket
 import sys
 import subprocess
 import threading
+import time
 
 from scapy.all import DNS, DNSQR, DNSRR, Raw, raw
 from testrunner import run
@@ -274,6 +275,7 @@ def testfunc(child):
     tap = get_bridge(os.environ["TAP"])
     lladdr = get_host_lladdr(tap)
 
+    time.sleep(3)
     try:
         server = Server(family=socket.AF_INET6, type=socket.SOCK_DGRAM,
                         bind_addr=lladdr + "%" + tap, bind_port=SERVER_PORT)
