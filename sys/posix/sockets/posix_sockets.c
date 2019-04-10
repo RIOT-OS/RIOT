@@ -928,7 +928,7 @@ static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
             return res;
         }
     }
-#if defined(MODULE_SOCK_IP) || defined(MODULE_SOCK_UDP)
+#if defined(MODULE_SOCK_IP)
     if ((res = _sockaddr_to_ep(address, address_len, &ep)) < 0)
         return res;
 #endif
@@ -959,7 +959,13 @@ static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
 #endif
 #ifdef MODULE_SOCK_UDP
         case SOCK_DGRAM:
-            if ((res = sock_udp_send(&s->sock->udp, buffer, length, &ep)) < 0) {
+            if (address == NULL) {
+                res = sock_udp_get_remote(&s->sock->udp, &ep);
+            } else {
+                res = _sockaddr_to_ep(address, address_len, &ep);
+            }
+            if ((res < 0) ||
+                (res = sock_udp_send(&s->sock->udp, buffer, length, &ep)) < 0) {
                 errno = -res;
                 res = -1;
             }
