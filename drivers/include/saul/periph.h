@@ -57,7 +57,6 @@ typedef struct {
  * @brief   Direct mapped ADC configuration values
  */
 typedef struct {
-    const char *name;       /**< name of the device connected to this pin */
     adc_t line;             /**< ADC line to initialize and expose */
     adc_res_t res;          /**< ADC resolution */
 } saul_adc_params_t;

@@ -21,6 +21,7 @@
 
 #ifdef MODULE_SAUL_ADC
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "saul/periph.h"
@@ -31,6 +32,11 @@
  * @brief   Define the number of configured sensors
  */
 #define SAUL_ADC_NUMOF    (sizeof(saul_adc_params)/sizeof(saul_adc_params[0]))
+
+/**
+ * @brief   Define the number of saul info
+ */
+#define SAUL_ADC_INFO_NUMOF (sizeof(saul_adc_info) / sizeof(saul_adc_info[0]))
 
 /**
  * @brief   Allocate memory for pointers to the ADC parameter structs
@@ -52,6 +58,8 @@ extern saul_driver_t adc_saul_driver;
 
 void auto_init_adc(void)
 {
+    assert(SAUL_ADC_NUMOF == SAUL_ADC_INFO_NUMOF);
+
     for (unsigned i = 0; i < SAUL_ADC_NUMOF; i++) {
         const saul_adc_params_t *p = &saul_adc_params[i];
         saul_adcs[i] = p;
@@ -59,7 +67,7 @@ void auto_init_adc(void)
         LOG_DEBUG("[auto_init_saul] initializing direct ADC #%u\n", i);
 
         saul_reg_entries[i].dev = &saul_adcs[i];
-        saul_reg_entries[i].name = p->name;
+        saul_reg_entries[i].name = saul_adc_info[i].name;
         saul_reg_entries[i].driver = &adc_saul_driver;
         /* initialize the ADC line */
         adc_init(p->line);
