@@ -35,7 +35,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-
 uint8_t sx127x_get_state(const sx127x_t *dev)
 {
     return dev->settings.state;
@@ -225,6 +224,13 @@ void sx127x_set_rx(sx127x_t *dev)
 {
     DEBUG("[sx127x] Set RX\n");
 
+#ifdef SX127X_USE_TX_SWITCH
+    gpio_clear(dev->params.tx_switch_pin);
+#endif
+#ifdef SX127X_USE_RX_SWITCH
+    gpio_set(dev->params.rx_switch_pin);
+#endif
+
     switch (dev->settings.modem) {
         case SX127X_MODEM_FSK:
             /* todo */
@@ -328,6 +334,13 @@ void sx127x_set_rx(sx127x_t *dev)
 
 void sx127x_set_tx(sx127x_t *dev)
 {
+#ifdef SX127X_USE_RX_SWITCH
+    gpio_clear(dev->params.rx_switch_pin);
+#endif
+#ifdef SX127X_USE_TX_SWITCH
+    gpio_set(dev->params.tx_switch_pin);
+#endif
+
      switch (dev->settings.modem) {
         case SX127X_MODEM_FSK:
             /* todo */

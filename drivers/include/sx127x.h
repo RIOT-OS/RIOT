@@ -217,6 +217,10 @@ typedef struct {
 #ifdef SX127X_USE_DIO_MULTI
     gpio_t dio_multi_pin;              /**< Interrupt line for multiple IRQs */
 #endif
+#if defined(SX127X_USE_TX_SWITCH) || defined(SX127X_USE_RX_SWITCH)
+    gpio_t rx_switch_pin;              /**< Rx antenna switch */
+    gpio_t tx_switch_pin;              /**< Tx antenna switch */
+#endif
     uint8_t paselect;                  /**< Power amplifier mode (RFO or PABOOST) */
 } sx127x_params_t;
 
