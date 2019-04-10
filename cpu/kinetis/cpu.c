@@ -19,6 +19,7 @@
 
 #include "cpu.h"
 #include "periph/init.h"
+#include "stdio_base.h"
 #ifdef MODULE_PERIPH_MCG
 #include "mcg.h"
 #endif
@@ -41,6 +42,10 @@ void cpu_init(void)
     /* initialize the CPU clocking provided by the MCG module */
     kinetis_mcg_init();
 #endif
+
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
+
     /* trigger static peripheral initialization */
     periph_init();
 }

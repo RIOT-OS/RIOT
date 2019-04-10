@@ -33,6 +33,7 @@
  */
 
 #include "cpu.h"
+#include "stdio_base.h"
 #include "stmclk.h"
 #include "periph_cpu.h"
 #include "periph/init.h"
@@ -160,6 +161,8 @@ void cpu_init(void)
     /*  initialize DMA streams */
     dma_init();
 #endif
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
     /* trigger static peripheral initialization */
     periph_init();
 }

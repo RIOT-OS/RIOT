@@ -20,6 +20,7 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph/init.h"
+#include "stdio_base.h"
 
 static void xosc32k_init(void)
 {
@@ -136,6 +137,9 @@ void cpu_init(void)
 #ifdef MODULE_PERIPH_USBDEV
     gclk_connect(6, GCLK_SOURCE_DFLL, 0);
 #endif
+
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
 
     /* trigger static peripheral initialization */
     periph_init();
