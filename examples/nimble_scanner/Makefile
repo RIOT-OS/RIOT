@@ -5,7 +5,8 @@ APPLICATION = nimble_scanner
 BOARD ?= nrf52dk
 
 # So far, NimBLE only works on nRF52 based platforms
-BOARD_WHITELIST := nrf52dk nrf52840dk
+BOARD_WHITELIST := acd52832 nrf52dk nrf52840dk nrf52832-mdk nrf52840-mdk \
+                   reel ruuvitag thingy52
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
