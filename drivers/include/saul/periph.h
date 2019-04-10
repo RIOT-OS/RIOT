@@ -45,7 +45,6 @@ typedef enum {
  * @brief   Direct mapped GPIO configuration values
  */
 typedef struct {
-    const char *name;           /**< name of the device connected to this pin */
     gpio_t pin;                 /**< GPIO pin to initialize and expose */
     gpio_mode_t mode;           /**< pin mode to use */
     saul_gpio_flags_t flags;    /**< Configuration flags */

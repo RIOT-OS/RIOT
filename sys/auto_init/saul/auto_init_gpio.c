@@ -21,6 +21,7 @@
 
 #ifdef MODULE_SAUL_GPIO
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "saul/periph.h"
@@ -39,6 +40,10 @@ void auto_init_gpio(void)
 #else
 #define SAUL_GPIO_NUMOF (sizeof(saul_gpio_params)/sizeof(saul_gpio_params[0]))
 
+/**
+ * @brief   Define the number of saul info
+ */
+#define SAUL_GPIO_INFO_NUMOF (sizeof(saul_gpio_info) / sizeof(saul_gpio_info[0]))
 
 /**
  * @brief   Memory for the registry entries
@@ -58,13 +63,15 @@ extern saul_driver_t gpio_out_saul_driver;
 
 void auto_init_gpio(void)
 {
+    assert(SAUL_GPIO_NUMOF == SAUL_GPIO_INFO_NUMOF);
+
     for (unsigned int i = 0; i < SAUL_GPIO_NUMOF; i++) {
         const saul_gpio_params_t *p = &saul_gpio_params[i];
 
         LOG_DEBUG("[auto_init_saul] initializing GPIO #%u\n", i);
 
         saul_reg_entries[i].dev = (void *)p;
-        saul_reg_entries[i].name = p->name;
+        saul_reg_entries[i].name = saul_gpio_info[i].name;
         if ((p->mode == GPIO_IN) || (p->mode == GPIO_IN_PD) ||
             (p->mode == GPIO_IN_PU)) {
             saul_reg_entries[i].driver = &gpio_in_saul_driver;
