@@ -21,6 +21,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,90 +33,97 @@ extern "C" {
 static const  saul_adc_params_t saul_adc_params[] =
 {
     {
-        .name = "k60temp",
         .line = ADC_LINE(0),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "k60vrefsh",
         .line = ADC_LINE(2),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "k60vrefsl",
         .line = ADC_LINE(3),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "k60bandgap",
         .line = ADC_LINE(1),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "DAC0feedback",
         .line = ADC_LINE(4),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "VREFfeedback",
         .line = ADC_LINE(5),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "Vbat",
         .line = MULLE_VBAT_ADC_LINE,
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "Vchr",
         .line = MULLE_VCHR_ADC_LINE,
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "PGA0_DP",
         .line = ADC_LINE(8),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "PGA0_DM",
         .line = ADC_LINE(9),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "PTA17",
         .line = ADC_LINE(10),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "PTB0",
         .line = ADC_LINE(11),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "PTC0",
         .line = ADC_LINE(12),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "PTC8",
         .line = ADC_LINE(13),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "PTC9",
         .line = ADC_LINE(14),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "PTC10",
         .line = ADC_LINE(15),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "PTC11",
         .line = ADC_LINE(16),
         .res  = ADC_RES_16BIT,
     },
+};
+
+/**
+ * @brief   ADC information for SAUL registry
+ */
+static const saul_reg_info_t saul_adc_info[] =
+{
+    { .name = "k60temp" },
+    { .name = "k60vrefsh" },
+    { .name = "k60vrefsl" },
+    { .name = "k60bandgap" },
+    { .name = "DAC0feedback" },
+    { .name = "VREFfeedback" },
+    { .name = "Vbat" },
+    { .name = "Vchr" },
+    { .name = "PGA0_DP" },
+    { .name = "PGA0_DM" },
+    { .name = "PTA17" },
+    { .name = "PTB0" },
+    { .name = "PTC0" },
+    { .name = "PTC8" },
+    { .name = "PTC9" },
+    { .name = "PTC10" },
+    { .name = "PTC11" }
 };
 
 #ifdef __cplusplus

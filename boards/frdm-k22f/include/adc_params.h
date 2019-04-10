@@ -21,6 +21,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,46 +33,54 @@ extern "C" {
 static const  saul_adc_params_t saul_adc_params[] =
 {
     {
-        .name = "ADC0_DP",
         .line = ADC_LINE(0),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "ADC0_DM",
         .line = ADC_LINE(1),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "ADC1_DP",
         .line = ADC_LINE(2),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "ADC1_DM",
         .line = ADC_LINE(3),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "A0",
         .line = ADC_LINE(4),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "A1",
         .line = ADC_LINE(5),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "A2",
         .line = ADC_LINE(6),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "A3",
         .line = ADC_LINE(7),
         .res  = ADC_RES_16BIT,
     },
 };
+
+/**
+ * @brief   ADC information for SAUL registry
+ */
+static const saul_reg_info_t saul_adc_info[] =
+{
+    { .name = "ADC0_DP" },
+    { .name = "ADC0_DM" },
+    { .name = "ADC1_DP" },
+    { .name = "ADC1_DM" },
+    { .name = "A0" },
+    { .name = "A1" },
+    { .name = "A2" },
+    { .name = "A3" }
+};
+
 
 #ifdef __cplusplus
 }

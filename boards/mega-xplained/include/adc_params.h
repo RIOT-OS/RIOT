@@ -23,6 +23,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,20 +35,27 @@ extern "C" {
 static const  saul_adc_params_t saul_adc_params[] =
 {
     {
-        .name = "NTC thermistor",
         .line = NTC_OUTPUT,
         .res  = ADC_RES_10BIT,
     },
     {
-        .name = "Light sensor",
         .line = LIGHT_SENSOR_OUTPUT,
         .res  = ADC_RES_10BIT,
     },
     {
-        .name = "RC filter",
         .line = FILTER_OUTPUT,
         .res  = ADC_RES_10BIT,
     }
+};
+
+/**
+ * @brief   ADC information for SAUL registry
+ */
+static const saul_reg_info_t saul_adc_info[] =
+{
+    { .name = "NTC thermistor" },
+    { .name = "Light sensor" },
+    { .name = "RC filter" }
 };
 
 #ifdef __cplusplus

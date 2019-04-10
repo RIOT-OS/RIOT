@@ -21,6 +21,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,40 +33,47 @@ extern "C" {
 static const  saul_adc_params_t saul_adc_params[] =
 {
     {
-        .name = "ADC0_DP-DM",
         .line = ADC_LINE(0),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "ADC0_DP",
         .line = ADC_LINE(1),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "PTB2",
         .line = ADC_LINE(2),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "PTB3",
         .line = ADC_LINE(3),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "coretemp",
         .line = ADC_LINE(4),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "corebandgap",
         .line = ADC_LINE(5),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "dcdcvbat",
         .line = ADC_LINE(6),
         .res  = ADC_RES_16BIT,
     },
+};
+
+/**
+ * @brief   ADC information for SAUL registry
+ */
+static const saul_reg_info_t saul_adc_info[] =
+{
+    { .name = "ADC0_DP-DM" },
+    { .name = "ADC0_DP" },
+    { .name = "PTB2" },
+    { .name = "PTB3" },
+    { .name = "coretemp" },
+    { .name = "corebandgap" },
+    { .name = "dcdcvbat" }
 };
 
 #ifdef __cplusplus
