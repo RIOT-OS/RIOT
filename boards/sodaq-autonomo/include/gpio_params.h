@@ -21,6 +21,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,10 +33,17 @@ extern "C" {
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
     {
-        .name = "LED(green)",
         .pin = LED0_PIN,
         .mode = GPIO_OUT
     },
+};
+
+/**
+ * @brief GPIO information for SAUL registry
+ */
+static const saul_reg_info_t saul_gpio_info[] =
+{
+    { .name = "LED(green)" }
 };
 
 #ifdef __cplusplus

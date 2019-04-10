@@ -21,6 +21,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,41 +38,48 @@ static const  saul_gpio_params_t saul_gpio_params[] =
     /* LED1 and LED2 on the board are wired to the target CPU reset pin, and the
      * power supply line and are not software controllable */
     {
-        .name = "LED3",
         .pin = LED0_PIN,
         .mode = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
     {
-        .name = "LED4_R",
         .pin = LED1_PIN,
         .mode = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
     {
-        .name = "LED4_G",
         .pin = LED2_PIN,
         .mode = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
     {
-        .name = "LED4_B",
         .pin = LED3_PIN,
         .mode = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
     {
-        .name = "SW3",
         .pin = BTN0_PIN,
         .mode = BTN0_MODE,
         .flags = (SAUL_GPIO_INVERTED),
     },
     {
-        .name = "SW4",
         .pin = BTN1_PIN,
         .mode = BTN1_MODE,
         .flags = (SAUL_GPIO_INVERTED),
     },
+};
+
+/**
+ * @brief GPIO information for SAUL registry
+ */
+static const saul_reg_info_t saul_gpio_info[] =
+{
+    { .name = "LED3" },
+    { .name = "LED4_R" },
+    { .name = "LED4_G" },
+    { .name = "LED4_B" },
+    { .name = "SW3" },
+    { .name = "SW4" }
 };
 
 #ifdef __cplusplus

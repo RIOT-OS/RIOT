@@ -23,6 +23,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +38,6 @@ static const  saul_gpio_params_t saul_gpio_params[] =
      * RGB LED (D10). The RGB LED is configured with 3 LEDx macros. */
 #ifdef LED0_PIN
     {
-        .name = "D2 (Orange)",
         .pin = LED0_PIN,
         .mode = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
@@ -45,7 +45,6 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #endif /* LED0_PIN */
 #ifdef LED1_PIN
     {
-        .name = "D10 RGB (Red)",
         .pin = LED1_PIN,
         .mode = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
@@ -53,26 +52,43 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #endif /* LED1_PIN */
 #ifdef LED2_PIN
     {
-        .name = "D10 RGB (Green)",
         .pin = LED2_PIN,
         .mode = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
-#endif /* LED1_PIN */
+#endif /* LED2_PIN */
 #ifdef LED3_PIN
     {
-        .name = "D10 RGB (Blue)",
         .pin = LED3_PIN,
         .mode = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
-#endif /* LED1_PIN */
+#endif /* LED3_PIN */
     {
-        .name = "S2 (Button)",
         .pin = BTN0_PIN,
         .mode = BTN0_MODE,
         .flags = (SAUL_GPIO_INVERTED),
     },
+};
+
+/**
+ * @brief GPIO information for SAUL registry
+ */
+static const saul_reg_info_t saul_gpio_info[] =
+{
+#ifdef LED0_PIN
+    { .name = "D2 (Orange)" },
+#endif /* LED0_PIN */
+#ifdef LED1_PIN
+    { .name = "D10 RGB (Red)" },
+#endif /* LED1_PIN */
+#ifdef LED2_PIN
+    { .name = "D10 RGB (Green)" },
+#endif /* LED2_PIN */
+#ifdef LED3_PIN
+    { .name = "D10 RGB (Blue)" },
+#endif /* LED3_PIN */
+    { .name = "S2 (Button)" }
 };
 
 #ifdef __cplusplus

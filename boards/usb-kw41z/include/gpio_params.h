@@ -21,6 +21,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,7 +37,6 @@ static const  saul_gpio_params_t saul_gpio_params[] =
      * been applied. See boards/usb-kw41z/include/board.h */
 #ifdef LED0_PIN
     {
-        .name = "D2",
         .pin = LED0_PIN,
         .mode = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
@@ -44,19 +44,32 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #endif /* LED0_PIN */
 #ifdef LED1_PIN
     {
-        .name = "D3",
         .pin = LED1_PIN,
         .mode = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
 #endif /* LED1_PIN */
     {
-        .name = "SW1",
         .pin = BTN0_PIN,
         .mode = BTN0_MODE,
         .flags = (SAUL_GPIO_INVERTED),
     },
 };
+
+/**
+ * @brief GPIO information for SAUL registry
+ */
+static const saul_reg_info_t saul_gpio_info[] =
+{
+#ifdef LED0_PIN
+    { .name = "D2" },
+#endif /* LED0_PIN */
+#ifdef LED1_PIN
+    { .name = "D3" },
+#endif /* LED1_PIN */
+    { .name = "SW1" }
+};
+
 
 #ifdef __cplusplus
 }

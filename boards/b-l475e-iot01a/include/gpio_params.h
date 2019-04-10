@@ -21,6 +21,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,22 +36,31 @@ static const  saul_gpio_params_t saul_gpio_params[] =
     /* The LED pin is also used for SPI, so we enable it
        only if explicitly wanted by the user */
     {
-        .name = "LD1",
         .pin = LED0_PIN,
         .mode = GPIO_OUT
     },
 #endif
     {
-        .name = "LD2",
         .pin = LED1_PIN,
         .mode = GPIO_OUT
     },
     {
-        .name = "Button(B1 User)",
         .pin = BTN_B1_PIN,
         .mode = GPIO_IN_PU,
         .flags = SAUL_GPIO_INVERTED
     }
+};
+
+/**
+ * @brief GPIO information for SAUL registry
+ */
+static const saul_reg_info_t saul_gpio_info[] =
+{
+#ifdef AUTO_INIT_LED0
+    { .name = "LD1" },
+#endif
+    { .name = "LD2" },
+    { .name = "Button(B1 User)" }
 };
 
 #ifdef __cplusplus

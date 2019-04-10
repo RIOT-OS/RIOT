@@ -22,6 +22,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,25 +34,32 @@ extern "C" {
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
     {
-        .name = "LD1(green)",
         .pin = LED0_PIN,
         .mode = GPIO_OUT
     },
     {
-        .name = "LD2(blue)",
         .pin = LED1_PIN,
         .mode = GPIO_OUT
     },
     {
-        .name = "LD3(red)",
         .pin = LED2_PIN,
         .mode = GPIO_OUT
     },
     {
-        .name = "B1(User button)",
         .pin  = BTN0_PIN,
         .mode = BTN0_MODE
     }
+};
+
+/**
+ * @brief GPIO information for SAUL registry
+ */
+static const saul_reg_info_t saul_gpio_info[] =
+{
+    { .name = "LD1(green)" },
+    { .name = "LD2(blue)" },
+    { .name = "LD3(red)" },
+    { .name = "B1(User button)" }
 };
 
 #ifdef __cplusplus

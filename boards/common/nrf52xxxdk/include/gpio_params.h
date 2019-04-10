@@ -22,6 +22,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,14 +34,12 @@ extern "C" {
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
     {
-        .name  = "LED 1",
         .pin   = LED0_PIN,
         .mode  = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
 #ifdef LED1_PIN
     {
-        .name  = "LED 2",
         .pin   = LED1_PIN,
         .mode  = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
@@ -48,7 +47,6 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #endif
 #ifdef LED2_PIN
     {
-        .name  = "LED 3",
         .pin   = LED2_PIN,
         .mode  = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
@@ -56,7 +54,6 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #endif
 #ifdef LED3_PIN
     {
-        .name  = "LED 4",
         .pin   = LED3_PIN,
         .mode  = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
@@ -64,7 +61,6 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #endif
 #ifdef BTN0_PIN
     {
-        .name  = "Button 1",
         .pin   = BTN0_PIN,
         .mode  = BTN0_MODE,
         .flags = SAUL_GPIO_INVERTED,
@@ -72,7 +68,6 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #endif
 #ifdef BTN1_PIN
     {
-        .name  = "Button 2",
         .pin   = BTN1_PIN,
         .mode  = BTN1_MODE,
         .flags = SAUL_GPIO_INVERTED,
@@ -80,7 +75,6 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #endif
 #ifdef BTN2_PIN
     {
-        .name  = "Button 3",
         .pin   = BTN2_PIN,
         .mode  = BTN2_MODE,
         .flags = SAUL_GPIO_INVERTED,
@@ -88,7 +82,6 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #endif
 #ifdef BTN3_PIN
     {
-        .name  = "Button 4",
         .pin   = BTN3_PIN,
         .mode  = BTN3_MODE,
         .flags = SAUL_GPIO_INVERTED,
@@ -96,6 +89,34 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #endif
 };
 
+/**
+ * @brief GPIO information for SAUL registry
+ */
+static const saul_reg_info_t saul_gpio_info[] =
+{
+    { .name = "LED 1" },
+#ifdef LED1_PIN
+    { .name = "LED 2" },
+#endif
+#ifdef LED2_PIN
+    { .name = "LED 3" },
+#endif
+#ifdef LED3_PIN
+    { .name = "LED 4" },
+#endif
+#ifdef BTN0_PIN
+    { .name = "Button 1" },
+#endif
+#ifdef BTN1_PIN
+    { .name = "Button 2" },
+#endif
+#ifdef BTN2_PIN
+    { .name = "Button 3" },
+#endif
+#ifdef BTN3_PIN
+    { .name = "Button 4" },
+#endif
+};
 
 #ifdef __cplusplus
 }

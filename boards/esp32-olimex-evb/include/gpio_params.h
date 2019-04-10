@@ -19,6 +19,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,18 +32,27 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 {
     #if MODULE_OLIMEX_ESP32_GATEWAY
     {
-        .name = "LED",
         .pin = LED0_PIN,
         .mode = GPIO_OUT,
         .flags = SAUL_GPIO_INIT_CLEAR
     },
     #endif
     {
-        .name = "BUT1",
         .pin = BUTTON0_PIN,
         .mode = GPIO_IN,
         .flags = SAUL_GPIO_INVERTED
     },
+};
+
+/**
+ * @brief GPIO information for SAUL registry
+ */
+static const saul_reg_info_t saul_gpio_info[] =
+{
+#if MODULE_OLIMEX_ESP32_GATEWAY
+    { .name = "LED" },
+#endif
+    { .name = "BUT1" }
 };
 
 #ifdef __cplusplus

@@ -19,6 +19,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,7 +32,6 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 {
 #ifdef LED0_PIN
     {
-        .name = "LED red",
         .pin = LED0_PIN,
         .mode = GPIO_OUT,
         .flags = SAUL_GPIO_INIT_CLEAR
@@ -39,7 +39,6 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #endif
 #ifdef LED1_PIN
     {
-        .name = "LED blue",
         .pin = LED1_PIN,
         .mode = GPIO_OUT,
         .flags = SAUL_GPIO_INIT_CLEAR
@@ -47,11 +46,26 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #endif
 #ifdef LED2_PIN
     {
-        .name = "LED green",
         .pin = LED2_PIN,
         .mode = GPIO_OUT,
         .flags = SAUL_GPIO_INIT_CLEAR
     }
+#endif
+};
+
+/**
+ * @brief GPIO information for SAUL registry
+ */
+static const saul_reg_info_t saul_gpio_info[] =
+{
+#ifdef LED0_PIN
+    { .name = "LED red" },
+#endif
+#ifdef LED1_PIN
+    { .name = "LED blue" },
+#endif
+#ifdef LED2_PIN
+    { .name = "LED green" },
 #endif
 };
 
