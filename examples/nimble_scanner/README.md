@@ -17,7 +17,7 @@ Example output:
 2019-03-26 15:00:29,216 - INFO # usage: scan [timeout in ms]
 > scan 50
 2019-03-26 14:59:41,289 - INFO #  scan 50
-2019-03-26 14:59:41,343 - INFO # Scanning for 50ms now ... dome
+2019-03-26 14:59:41,343 - INFO # Scanning for 50ms now ... done
 2019-03-26 14:59:41,343 - INFO #
 2019-03-26 14:59:41,344 - INFO # Results:
 2019-03-26 14:59:41,351 - INFO # [ 0] 3c:8a:28:86:40:90 (RANDOM)  "undefined", adv_msg_cnt: 1, adv_int: 0us, last_rssi: -59
