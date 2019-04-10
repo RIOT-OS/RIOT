@@ -113,5 +113,5 @@
  *
  * The library is using the BSD 3-clause license.
  *
- * @see      github.com/Lora-net/LoRaMac-node
+ * @see      https://github.com/Lora-net/LoRaMac-node
  */
