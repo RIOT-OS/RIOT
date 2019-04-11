@@ -7,7 +7,7 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo arduino-mega2560 \
 # AVR platform: unknown type name: clockid_t
 # hifive1: not enough memory for thread stacks
 
-BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6
+BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6 hifive1
 
 USEMODULE += posix_headers
 USEMODULE += pthread
