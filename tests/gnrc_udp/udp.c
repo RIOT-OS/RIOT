@@ -60,7 +60,7 @@ static void *_eventloop(void *arg)
 
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
-                printf("Packets received: %d\n", ++rcv_count);
+                printf("Packets received: %u\n", ++rcv_count);
                 gnrc_pktbuf_release(msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_GET:
