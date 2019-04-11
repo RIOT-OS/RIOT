@@ -243,6 +243,13 @@ void test3(void)
 /* nrf51 based boards needs a slightly higher margin value. Using 105us makes
  test4 result more reliable. */
 #define TEST4_TIMEOUT_EXCEEDED_MARGIN (105)
+#elif defined(CPU_FE310)
+/*
+ * the fe310 used on Hifive1 only offers a 32kHZ RTC, which xtimer uses by
+ * default.  There seem to be inaccuracies getting introduced somewhere, in the order of 2 to 8 ticks.
+ * Thus allow for 8 * (1000000/32768) us.
+ */
+#define TEST4_TIMEOUT_EXCEEDED_MARGIN (245)
 #else
 #define TEST4_TIMEOUT_EXCEEDED_MARGIN (100)
 #endif /* BOARD_NATIVE */
