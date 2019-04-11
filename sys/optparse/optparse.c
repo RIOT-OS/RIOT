@@ -28,8 +28,11 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #include "optparse.h"
+
+#define DEVELHELP
 
 #define TERM '\0'   /**< String terminator character */
 #define OPT '-'     /**< The character that marks an option */
@@ -40,13 +43,10 @@
 #ifndef DEVELHELP
 
 #define P_DEBUG(...)
-#define LAZY_LOAD(var, value) do { if ((var) != NULL) { *(var) = (value); } } while (0)
 
 #else /* DEVELHELP */
 
 #define P_DEBUG P_ERR
-#define LAZY_LOAD(var, value) do { if ((var) != NULL) { *(var) = (value); } \
-                                  else { P_DEBUG("Warning! NULL pointer:" #var "%c\n", ' '); } } while (0)
 
 #endif /*DEVELHELP */
 
@@ -88,9 +88,12 @@ char *my_strdup(const char *s)
 
 #define _MSK(x) (1 << (x))
 const uint16_t need_value_mask = _MSK(OPTPARSE_IGNORE)
-                                 | _MSK(OPTPARSE_CUSTOM_ACTION) | _MSK(OPTPARSE_INT)
+                                 | _MSK(OPTPARSE_CUSTOM_ACTION)
+                                 | _MSK(OPTPARSE_INT)
+                                 | _MSK(OPTPARSE_UINT)
                                  | _MSK(OPTPARSE_FLOAT)
-                                 | _MSK(OPTPARSE_STR) | _MSK(OPTPARSE_STR_NOCOPY);
+                                 | _MSK(OPTPARSE_STR)
+                                 | _MSK(OPTPARSE_STR_NOCOPY);
 
 #define NEEDS_VALUE(rule) (!!(_MSK((rule)->action) & need_value_mask))
 
@@ -118,7 +121,53 @@ static bool str_notempty(const char *str)
     return str != NULL && str[0] != TERM;
 }
 
+/**
+ * Return true if the action indicates a positional argument.
+ */
+static bool _is_argument(enum OPTPARSE_ACTIONS action)
+{
+    return action == OPTPARSE_POSITIONAL || action == OPTPARSE_POSITIONAL_OPT;
+}
+
+/**
+ * Return true if the action indicates an optional argument OR option.
+ */
+static bool _is_optional(enum OPTPARSE_ACTIONS action)
+{
+    return action != OPTPARSE_POSITIONAL;
+}
+
+static void _option_help(const opt_rule_t *rule)
+{
+    safe_fputc('-', HELP_STREAM);
+    safe_fputc(rule->action_data.option.short_id, HELP_STREAM);
+    safe_fputs("\t--", HELP_STREAM);
+    safe_fputs(rule->action_data.option.long_id, HELP_STREAM);
+    safe_fputc('\t', HELP_STREAM);
+    safe_fputs(rule->desc, HELP_STREAM);
+    safe_fputc('\n', HELP_STREAM);
+}
+
+static void _argument_help(const opt_rule_t *rule)
+{
+    if (_is_optional(rule->action)) {
+        safe_fputc('[', HELP_STREAM);
+    }
+
+    safe_fputs(rule->action_data.argument.name, HELP_STREAM);
+
+    if (_is_optional(rule->action)) {
+        safe_fputc(']', HELP_STREAM);
+    }
+
+    safe_fputc('\t', HELP_STREAM);
+    safe_fputs(rule->desc, HELP_STREAM);
+
+    safe_fputc('\n', HELP_STREAM);
+}
+
 /* TODO: make help stream into an argument */
+/* TODO: Expose this function in the public API */
 static void do_help(const opt_conf_t *config)
 {
     int rule_i;
@@ -127,79 +176,135 @@ static void do_help(const opt_conf_t *config)
     safe_fputc('\n', HELP_STREAM);
 
     for (rule_i = 0; rule_i < config->n_rules; rule_i++) {
-        safe_fputc('-', HELP_STREAM);
-        safe_fputc(config->rules[rule_i].short_id, HELP_STREAM);
-        safe_fputs("\t--", HELP_STREAM);
-        safe_fputs(config->rules[rule_i].long_id, HELP_STREAM);
-        safe_fputc('\t', HELP_STREAM);
-        safe_fputs(config->rules[rule_i].desc, HELP_STREAM);
-        safe_fputc('\n', HELP_STREAM);
+        const opt_rule_t *rule = config->rules + rule_i;
+
+        if (_is_argument(rule->action)) {
+            _argument_help(rule);
+        }
+        else {
+            _option_help(rule);
+        }
     }
+}
+
+#ifndef NDEBUG
+/**
+ * Check that there are no optional arguments before non optional ones.
+ */
+static bool sanity_check(const opt_conf_t *config)
+{
+   int rule_i;
+   bool found_optional = false;
+
+    for (rule_i = 0; rule_i < config->n_rules; rule_i++) {
+        bool is_positional = _is_argument(config->rules[rule_i].action);
+        bool is_optional = _is_optional(config->rules[rule_i].action);
+
+        if (!is_positional)
+            continue;
+
+        if (found_optional && !is_optional)
+            return false;
+
+        found_optional = found_optional || !is_optional;
+    }
+
+    return true;
+}
+#endif
+
+static int do_user_callback(const opt_rule_t *rule, opt_data_t *dest,
+                            int positional_idx, const char *value)
+{
+    union opt_key key;
+    struct opt_positionalkey pkey;
+    int ret;
+
+    if (_is_argument(rule->action)) {
+        pkey.position = positional_idx;
+        pkey.name = rule->action_data.argument.name;
+        key.argument = &pkey;
+    } else {
+        key.option = &rule->action_data.option;
+    }
+
+    const char *custom_message = NULL;
+    ret = rule->default_value._thin_callback(key, value,
+                                             dest, &custom_message);
+    if (custom_message != NULL) {
+        STR_ERR(custom_message);
+    }
+
+    return ret;
 }
 
 /**
  * Execute the action associated with an argument.
  *
- * key is only used for custom commands.
+ * positional_idx is only used for custom commands in positional arguments.
  * value is only used for commands that need it.
  * This assumes key and value are not null if they should not be.
  *
  * @return  An exit code from OPTPARSE_RESULT.
  */
-static int do_action(opt_rule_t *rule, const char *key, const char *value)
+static int do_action(const opt_rule_t *rule,
+                     opt_data_t *dest,
+                     int positional_idx, const char *value)
 {
     int ret = OPTPARSE_OK;
+    char *end_of_conversion;
+    enum OPTPARSE_ACTIONS action = _is_argument(rule->action)?
+                                    rule->action_data.argument.pos_action
+                                  : rule->action;
 
-    switch (rule->action) {
+    switch (action) {
         case OPTPARSE_IGNORE: case OPTPARSE_IGNORE_SWITCH:
             break;
         case OPTPARSE_INT:
-            LAZY_LOAD(rule->data.d_int, strtol(value, NULL, 0));
+            dest->d_int = strtol(value, &end_of_conversion, 0);
+            if (*end_of_conversion != '\0')
+                ret = -OPTPARSE_BADSYNTAX;
+            break;
+        case OPTPARSE_UINT:
+            dest->d_uint = strtoul(value, &end_of_conversion, 0);
+            if (*end_of_conversion != '\0')
+                ret = -OPTPARSE_BADSYNTAX;
             break;
         case OPTPARSE_FLOAT:
-            LAZY_LOAD(rule->data.d_float, strtof(value, NULL));
+            dest->d_float = strtof(value, &end_of_conversion);
+            if (*end_of_conversion != '\0')
+                ret = -OPTPARSE_BADSYNTAX;
             break;
         case OPTPARSE_STR_NOCOPY:
-            LAZY_LOAD(rule->data.d_cstr, value);
+            dest->d_cstr = value;
             break;
         case OPTPARSE_SET_BOOL:
-            LAZY_LOAD(rule->data.d_bool, true);
+            dest->d_bool = true;
             break;
         case OPTPARSE_UNSET_BOOL:
-            LAZY_LOAD(rule->data.d_bool, false);
+            dest->d_bool = false;
             break;
         case OPTPARSE_COUNT:
-            LAZY_LOAD(rule->data.d_int, *rule->data.d_int + 1);
+            dest->d_int++;
             break;
         case OPTPARSE_STR:
-        {
-            char *copied_str = NULL;
-            LAZY_LOAD(rule->data.d_str, (copied_str = my_strdup(value)));
-            if (copied_str == NULL) {
-                P_DEBUG("OPTPARSE_STR failed: d_str: %p,", (void *)rule->data.d_str);
-                P_DEBUG(" copied_str %p\n", (void *)copied_str);
-                if (rule->data.d_str == NULL) {
-                    ret = -OPTPARSE_BADCONFIG;
-                }
-                else {
+            {
+                /* avoid memory leak if the option is given multiple times. */
+                free(dest->d_str);
+                dest->d_str = my_strdup(value);
+                if (dest->d_str == NULL) {
+                    P_DEBUG("OPTPARSE_STR failed: out of memory\n");
                     ret = -OPTPARSE_NOMEM;
                 }
             }
-        }
-        break;
+            break;
         case OPTPARSE_DO_HELP:
             P_DEBUG("do_action found OPTPARSE_DO_HELP\n");
+            assert(0);
             break; /*this is a meta-action and has to be implemented in generic_parser*/
         case OPTPARSE_CUSTOM_ACTION:
-        {
-            const char *custom_message = NULL;
-            ret = rule->data.d_custom.callback(key, value,
-                                               rule->data.d_custom.data, &custom_message);
-            if (custom_message != NULL) {
-                STR_ERR(custom_message);
-            }
-        }
-        break;
+            ret = do_user_callback(rule, dest, positional_idx, value);
+            break;
         default:
             P_DEBUG("Unknown action: %d\n", rule->action);
             ret = -OPTPARSE_BADCONFIG;
@@ -209,21 +314,31 @@ static int do_action(opt_rule_t *rule, const char *key, const char *value)
     return ret;
 }
 
+static bool _match_optionkey(struct opt_optionkey opt_key,
+                             const char *long_id, char short_id)
+{
+    return (short_id && opt_key.short_id == short_id)
+           || ((long_id != NULL) && (opt_key.long_id != NULL)
+               && strcmp(long_id, opt_key.long_id) == 0);
+}
+
 /**
  * Find a rule with the given short id or long id.
  *
  * A short id of 0 never matches. A NULL long id never matches.
  */
-static opt_rule_t *find_rule(opt_conf_t *config, const char *long_id,
-                             char short_id)
+static const opt_rule_t *find_opt_rule(const opt_conf_t *config,
+                                       const char *long_id,
+                                       char short_id)
 {
     int rule_i;
 
     for (rule_i = 0; rule_i < config->n_rules; rule_i++) {
-        if ((short_id
-             && config->rules[rule_i].short_id == short_id)
-            || ((long_id != NULL) && (config->rules[rule_i].long_id != NULL)
-                && strcmp(long_id, config->rules[rule_i].long_id) == 0)) {
+        const opt_rule_t this_rule = config->rules[rule_i];
+
+        if (!_is_argument(this_rule.action)
+            && _match_optionkey(this_rule.action_data.option, long_id,
+                                short_id)) {
             return config->rules + rule_i;
         }
     }
@@ -231,24 +346,162 @@ static opt_rule_t *find_rule(opt_conf_t *config, const char *long_id,
     return NULL;
 }
 
-int optparse_cmd(opt_conf_t *config, int argc, const char * const argv[])
+/**
+ * Find the positional argument handler for the arg_n-th position (arg_n counts
+ * from zero).
+ *
+ * If repeat_last is true, if arg_n is greater than or equal to the number of
+ * available handler, the last one (if any) is returned.
+ *
+ * @returns     pointer to the matching rule, or NULL if none is found.
+ */
+static const opt_rule_t *find_arg_rule(const opt_conf_t *config, int arg_n)
+{
+    int rule_i;
+    int last_handler;
+    int handlers_found = 0;
+    bool repeat_last = !!(config->tune | OPTPARSE_COLLECT_LAST_POS);
+
+    for (rule_i = 0; rule_i < config->n_rules; rule_i++) {
+        const opt_rule_t this_rule = config->rules[rule_i];
+
+        if (_is_argument(this_rule.action)) {
+            handlers_found++;
+            last_handler = rule_i;
+            if (handlers_found > arg_n) {
+                return config->rules + rule_i;
+            }
+        }
+    }
+
+    return (repeat_last && handlers_found) ? config->rules + last_handler
+           : NULL;
+}
+
+/**
+ * Get the memory location where the parse result should be stored.
+ */
+static opt_data_t *get_destination(const opt_conf_t *config,
+                                   const opt_rule_t *rule,
+                                   opt_data_t *result_base)
+{
+    return result_base + (rule - config->rules);
+}
+
+/**
+ * Copy over the default values from the rules array to the result array.
+ *
+ * For custom actions, the callback will be called with value = NULL.
+ *
+ * This procedure also counts the number of required positional arguments and
+ * returns it in n_required (which must NOT be null).
+ *
+ * On error, n_required may not be accurate.
+ *
+ * This procedure ensures guarantees that no result item will have a wild
+ * pointer in d_str (i.e, it will point to an allocated block or be NULL.)
+ */
+static int assign_default(const opt_conf_t *config, opt_data_t *result,
+                          int *n_required)
+{
+    int rule_i;
+    int error = 0;
+    int positional_idx = 0;
+    int _required = 0;
+
+    for (rule_i = 0; !error && rule_i < config->n_rules; rule_i++) {
+        enum OPTPARSE_ACTIONS action;
+        const opt_rule_t *this_rule = config->rules + rule_i;
+
+        if (!_is_optional(this_rule->action)) {
+            _required++;
+        }
+
+        if (_is_argument(this_rule->action)) {
+            positional_idx++;
+            action = this_rule->action_data.argument.pos_action;
+        }
+        else {
+            action = this_rule->action;
+        }
+
+        if (config->rules[rule_i].action == OPTPARSE_STR
+           && this_rule->default_value.d_str != NULL) {
+            result[rule_i].d_str = my_strdup(this_rule->default_value.d_str);
+            if (result[rule_i].d_str == NULL) {
+                P_DEBUG("initialization failed: out of memory\n");
+                error = -OPTPARSE_NOMEM;
+            }
+        }
+        else if (action != OPTPARSE_CUSTOM_ACTION) {
+            result[rule_i] = this_rule->default_value;
+        }
+        else {
+            error = do_user_callback(this_rule, result + rule_i,
+                                     positional_idx, NULL);
+            if (error) {
+                P_DEBUG("User cb at index %d failed in init with code %d.\n",
+                        rule_i, error);
+            }
+        }
+    }
+
+    /* If we exited early, ensure that we do not leave any wild. We will have
+     * to free them later. */
+    for (; rule_i < config->n_rules; rule_i++) {
+        if (config->rules[rule_i].action == OPTPARSE_STR) {
+            result[rule_i].d_str = NULL;
+        }
+    }
+
+    *n_required = _required;
+
+    return error;
+}
+
+
+void optparse_free_strings(const opt_conf_t *config, opt_data_t *result)
+{
+    int rule_i;
+
+    for (rule_i = 0; rule_i < config->n_rules; rule_i++) {
+        if (config->rules[rule_i].action == OPTPARSE_STR) {
+            free(result[rule_i].d_str);
+            result[rule_i].d_str = NULL;
+        }
+    }
+}
+
+int optparse_cmd(const opt_conf_t *config,
+                 opt_data_t *result,
+                 int argc, const char * const argv[])
 {
     int error = 0, i, no_more_options = 0;
+    /* Index of the next positional argument */
+    int positional_idx = 0;
+    int n_required;
     /* Used for handling combined switches like -axf (equivalent to -a -x -f)
      * Instead of advancing argv, we keep reading from the string*/
     const char *pending_opt = NULL;
 
+    assert(sanity_check(config));
+
     i = (config->tune & OPTPARSE_IGNORE_ARGV0) ? 1 : 0;
+
+    error = assign_default(config, result, &n_required);
+    if (error) {
+        P_ERR("Error initializing default values.\n");
+    }
 
     while (error >= OPTPARSE_OK && i < argc) {
         const char *key, *value;
+        const opt_rule_t *curr_rule = NULL;
 
         if (!no_more_options
             && ((pending_opt != NULL)
                 || str_notempty(key = strip_dash(argv[i])))) {
 
             bool is_long;
-            opt_rule_t *curr_rule;
 
             if (pending_opt == NULL) {
                 const char *tmp_key;
@@ -270,8 +523,8 @@ int optparse_cmd(opt_conf_t *config, int argc, const char * const argv[])
                                        if the current option is a switch*/
             }
 
-            curr_rule = find_rule(config, is_long ? key : NULL,
-                                  (!is_long) ? key[0] : 0);
+            curr_rule = find_opt_rule(config, is_long ? key : NULL,
+                                      (!is_long) ? key[0] : 0);
 
             if (curr_rule != NULL) {
                 if (curr_rule->action == OPTPARSE_DO_HELP) {
@@ -281,7 +534,7 @@ int optparse_cmd(opt_conf_t *config, int argc, const char * const argv[])
                 else if (NEEDS_VALUE(curr_rule)) {
                     if (!is_long && key[1] != TERM) {
                         /* This allows one to write the option value like -d12.6 */
-                        value = &key[1];
+                        value = key + 1;
                     }
                     else if (i < (argc - 1)) {
                         /* "i" is only incremented here and at the end of the loop */
@@ -297,12 +550,8 @@ int optparse_cmd(opt_conf_t *config, int argc, const char * const argv[])
                 else {     /* Handle switches (no arguments) */
                     value = NULL;
                     if (!is_long && key[1] != TERM) {
-                        pending_opt = &key[1];
+                        pending_opt = key + 1;
                     }
-                }
-
-                if (error >= OPTPARSE_OK) {
-                    error = do_action(curr_rule, key, value); /* BYE???? <==> */
                 }
             }
             else {
@@ -310,15 +559,26 @@ int optparse_cmd(opt_conf_t *config, int argc, const char * const argv[])
                 error = -OPTPARSE_BADSYNTAX;
             }
         }
-        else if (config->arg_parser != NULL) {
-            /* BYE???? <===========> */
-            error = config->arg_parser(i, argv[i], config->arg_parser_data);
-        }
         else {
-            P_ERR("Argument %s missing key\n", argv[i] );
-            if (!(config->tune & OPTPARSE_NULL_ARGPARSER)) {
+            curr_rule = find_arg_rule(config, positional_idx);
+            value = argv[i];
+            positional_idx++;
+
+            if (!positional_idx) {
+                P_ERR("Maximum number if arguments (%d) exceeded\n", UCHAR_MAX);
+                error = -OPTPARSE_BADSYNTAX;
+            }
+
+            if (curr_rule == NULL) {
+                P_ERR("Argument %s missing key\n", argv[i] );
                 error = -OPTPARSE_BADSYNTAX; /* BYE! <===========> */
             }
+        }
+
+        if (error >= OPTPARSE_OK && curr_rule != NULL) {
+            error = do_action(curr_rule,
+                              get_destination(config, curr_rule, result),
+                              positional_idx, value); /* BYE???? <==> */
         }
 parse_loop_end:
         if (pending_opt == NULL) {
@@ -326,60 +586,17 @@ parse_loop_end:
         }
     }
 
-    return error;
-}
-
-void opt_conf_init(opt_conf_t *conf,
-                   opt_rule_t *rules, size_t n_rules, char *helpstr,
-                   optparse_tune tune, int (*arg_parser)(int, const char *, void *),
-                   void *arg_parser_data)
-{
-    conf->helpstr = helpstr;
-    conf->n_rules = n_rules;
-    conf->rules = rules;
-    conf->tune = tune;
-    conf->arg_parser = arg_parser;
-    conf->arg_parser_data = arg_parser_data;
-}
-
-void set_parse_meta(opt_rule_t *rule, char short_id, const char *long_id,
-                    const char *desc)
-{
-    rule->short_id = short_id;
-    rule->long_id = long_id;
-    rule->desc = desc;
-}
-
-#define SET_ACTION(rule, action_) (rule)->action = (action_)
-#define MK_SETTER1(name, action, type, var) \
-    void name(opt_rule_t * rule, type * data) { \
-        SET_ACTION(rule, action); \
-        rule->data.var = data; \
+    if (error >= OPTPARSE_OK && n_required > positional_idx) {
+        P_ERR("%d argument required but only %d given\n", n_required,
+              positional_idx);
+        error = -OPTPARSE_BADSYNTAX;
     }
 
-#define MK_SETTER0(name, action) \
-    void name(opt_rule_t * rule) { \
-        SET_ACTION(rule, action); \
+    if (error < OPTPARSE_OK) {
+        optparse_free_strings(config, result);
     }
 
-void set_parse_custom(opt_rule_t *rule,
-                      int (*callback)(const char *, const char *, void *, const char **), void *data)
-{
-    SET_ACTION(rule, OPTPARSE_CUSTOM_ACTION);
-    rule->data.d_custom.callback = callback;
-    rule->data.d_custom.data = data;
+    return error >= OPTPARSE_OK? positional_idx : error;
 }
-
-MK_SETTER0(set_parse_ignore, OPTPARSE_IGNORE)
-MK_SETTER0(set_parse_ignore_sw, OPTPARSE_IGNORE_SWITCH)
-MK_SETTER0(set_parse_help, OPTPARSE_DO_HELP)
-
-MK_SETTER1(set_parse_int, OPTPARSE_INT, int, d_int)
-MK_SETTER1(set_parse_float, OPTPARSE_FLOAT, float, d_float)
-MK_SETTER1(set_parse_bool, OPTPARSE_SET_BOOL, bool, d_bool)
-MK_SETTER1(set_parse_bool_unset, OPTPARSE_UNSET_BOOL, bool, d_bool)
-MK_SETTER1(set_parse_count, OPTPARSE_COUNT, int, d_int)
-MK_SETTER1(set_parse_str, OPTPARSE_STR, char *, d_str)
-MK_SETTER1(set_parse_str_nocopy, OPTPARSE_STR_NOCOPY, const char *, d_cstr)
 
 /** @} */
