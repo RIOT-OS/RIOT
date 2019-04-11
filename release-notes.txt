@@ -1,3 +1,380 @@
+RIOT-2019.04 - Release Notes
+============================
+RIOT is a multi-threading operating system which enables soft real-time
+capabilities and comes with support for a range of devices that are typically
+found in the Internet of Things: 8-bit and 16-bit microcontrollers as well as
+light-weight 32-bit processors.
+
+RIOT is based on the following design principles: energy-efficiency, soft
+real-time capabilities, small memory footprint, modularity, and uniform API
+access, independent of the underlying hardware (with partial POSIX compliance).
+
+RIOT is developed by an international open-source community which is
+independent of specific vendors (e.g. similarly to the Linux community) and is
+licensed with a non-viral copyleft license (LGPLv2.1), which allows indirect
+business models around the free open-source software platform provided by RIOT.
+
+
+About this release:
+===================
+
+The 2019.04 release includes a number of new features including porting of
+riotboot to a number of new platforms, 802.15.4 support on the nRF52, and the
+ability for firmware to flash images into a separate boot slot. Support for
+several new boards and new sensors was added. Additionally, this release
+contains a number of bug fixes and test improvements.
+
+About 320 pull requests with about 569 commits have been merged since the last
+release and about 40 issues have been solved. 44 people contributed with code
+in 88 days. Approximately 825 files have been touched with 32716 insertions
+and 5149 deletions.
+
+
+Notations used below:
+=====================
+    + means new feature/item
+    * means modified feature/item
+    - means removed feature/item
+
+New features and changes
+========================
+
+System libraries
+----------------
+    + riotboot_flashwrite: added module to reliably write a firmware image to
+      flash
+    + crypto: added support for chacha20poly1305 AEAD symmetric key cypher
+      algorithm
+    * threads: added usage of thread_state_t enum to define thread states,
+      instead of an integer
+    * random: added usage of hwrng as seed if available
+    + app_metadata: added module to print application metadata
+    + unaligned.h: added functions to safely read values from potentially
+      unaligned pointers
+    + isrpipe: split isrpipe_read_timeout to isolate xtimer dependency
+
+Networking
+----------
+    * gnrc_ipv6: adapted ping6 to original-ping-like implementation
+    * gnrc_ipv6: allowed sending empty IPv6 packets
+    + gnrc_netif_ieee802154: optional support to drop duplicate broadcast
+      packets
+    - gnrc_pktbuf: removed deprecated gnrc_pktbuf_get_iovec() function
+    + l2util: initial import of a general IPv6 over X helper module
+    + NimBLE: added Bluetooth device scanner
+    + NimBLE: added helper functions for address printing
+    * NimBLE: updated package to the latest version
+
+Packages
+--------
+    + c25519: add support (embedded x25519 crypto library)
+
+Boards
+------
+    + Arduino nano: added support
+    + nrf52832-mdk: added support
+    + PhyTec reel board: added support
+    + MicroPython pyboard v1.1: added support
+    + Hamilton: added support
+    + saml10-xpro and saml11-xpro: added riotboot support
+    + nrf52: added riotboot support
+    + ESP32 and stm32: added command to allow runtime configuration of uart mode
+    + ESP32 and ESP8266: add support for ESP-NOW network device driver
+    * ESP8266: freed up RAM by moving most .rodata sections from DRAM to IROM
+    + Arduino: added test to verify pin mappings
+    + b-l072z-lrwan1: enabled RTT feature
+    + STM32l0: added support for dual bank flashing with OpenOCD
+    * Autonomo: changed flasher to BOSSA
+    * stm32: rework common clock configuration for stm32f4
+    * stm32f3discovery: Fix no external low speed crystal
+
+CPU
+---
+    + stm32l0: added riotboot support
+    + stm32f0: added support for periph_pm
+    + stm32f3, f7, l1 and l4: added stop and standby low power modes. All
+      STM32 families now provide periph_pm
+    + samd21: enabled idle modes
+    + sam0: added support for RWWEE on-chip memory
+    + Kinetis: added support for EA series and S9KEAZ129 MCU
+    + TI CC2650: added I2C periph implementation
+
+Device Drivers
+--------------
+    + i2c: added slave scan shell command
+    + USB: added device driver initialization function and API definition
+    + USB: added peripheral driver for sam0_common
+    + nrf5x temperature sensor: added driver
+    + nrf52: added initial 802.15.4 support
+    + add7746 capacitance sensor: added driver
+    + ds323x extremely accurate RTC: added driver
+    + ltc4150 coulomb counter: added driver
+    + sht2x temperature and humidity sensor: added driver
+    + sds011 dust sensor: added driver
+    + added high level driver for H bridge ICs to drive DC motors
+    * lpsxxx pressure and temperature sensor: add support for lps22hb and
+      lps25hb
+
+Build System / Tooling
+----------------------
+    + nrf52: added support for openocd
+    * improved avrdude integration
+    + added support for socat as a RIOT terminal
+    + added script for backporting PRs during release testing
+    * pyterm: specified use of python3 by default
+    * flasher: support for flashing images at offset addresses `pyocd`, `jlink`
+    * Texas Instruments UniFlash: put configuration in common
+    * makefiles: introduce FLASHFILE
+      * Use FLASHFILE for `riotboot` and `mcuboot`
+      * Update flashers `avrdude`, `edbg`, `jlink`, lpc2k_pgm`, `openocd`
+    * makefiles/docker.inc.mk: Use directories in RIOT when possible
+    * make: unexport `TERM*` variables
+    * msba2: compile 'lpc2k_pgm' when flashing
+
+Testing
+-------
+    + documentation: added initial guide to running tests
+    + Makefile.include: add a 'test/available' target
+    * testrunner: Fix bug matching local echo
+    * tests/rng: replace printf_float with fmt/print_float
+    * tests/bloom_bytes: replace %f with fmt/print_float
+    * tests/posix_semaphore: sem_timedwait should not return before abstime
+
+Known issues
+============
+
+Networking related issues
+-------------------------
+#11295: RFC 3306 Unicast-Prefix-based-IPv6 Multicast with BorderRouter
+#11212: POSIX TCP API: bad file descriptor
+#11091: gnrc_minimal on nRF52DK do not work anymore
+#11033: 6lo: RIOT does not receive packets from Linux when short_addr is set
+#10969: net: netdev_driver_t::send() doc unclear
+#10927: gnrc_tftp: Missing minimum length check
+#10878: nrfmin can get stuck and never reach RX (while TX works)
+#10861: cpu/esp8266: Tracking open problems of esp_wifi netdev driver
+#10809: openthread: does not build on current Arch
+#10410: Missing drop implementations in netdev_driver_t::recv
+#10389: gnrc_sock_udp: Possible Race condition on copy in application buffer
+#10380: netdev_ieee802154: Mismatch between radio ll address and in memory
+        address
+#10370: gomach: Resetting netif with cli doesn't return
+#10338: xbee: setting PAN ID sometimes fails
+#9709: examples: failed assertion in dtls-echo example
+#9656: gnrc/netif: various problems after resetting interface a second time
+#8779: CC2538 RF overlapping PIN usage
+#8752: mrf24j40: does not link for examples/default
+#8631: at86rf2xx/kw2xrf: scalar NETOPT options checked as arrays
+#8271: app/netdev: application stops working after receiving frames with
+       assertion or completely without error
+#8242: at86rf2xx: Dead lock when sending while receiving
+#8199: gcoap example request on tap I/F fails with NIB issue
+#8172: gnrc_netif, gnrc_uhcpc: Replacing prefix on border router results in no
+       configured prefix
+#8130: gcoap: can't build with network stacks other than GNRC
+#8086: gnrc_rpl_p2p: port to nib and fix compile errors
+#7737: pkg: libcoap is partially broken and outdated
+#7474: 6lo gnrc fragmentation expects driver to block on TX
+#6018: nRF52 gnrc 6lowpan ble memory leak
+#5863: OSX +  SAMR21-xpro: shell cannot handle command inputs larger than 64 chars
+#5748: gnrc: nodes crashing with too small packet buffer
+#5486: at86rf2xx: lost interrupts
+#5230: gnrc ipv6: multicast packets are not dispatched to the upper layers
+#5051: Forwarding a packet back to its link layer source should not be allowed
+#5016: gnrc_rpl: Rejoining RPL instance as root after reboot messes up routing
+#4527: gnrc_ipv6: Multicast is not forwarded if routing node listens to the
+       address
+
+Timer related issues
+--------------------
+#10545: periph_timer: systematic proportional error in timer_set
+#10523: saml21 system time vs rtc
+#10351: samd21/periph/rtt: Interrupt flags are not correctly cleared
+#10073: xtimer_usleep wrong delay time
+#9187: sys/newlib: gettimeofday() returns time since boot, not current wall time
+#9052: misc issues with tests/trickle
+#9049: xtimer mis-scaling with long sleep times
+#8746: stm32_common/periph/rtc: current implementation broken/poor accuracy
+#8388: xtimer_periodic_wakeup is not interrupt safe
+#8251: telosb: xtimer config wrong when running on a tmote sky
+#7347: xtimer_usleep stuck for small values
+#7114: xtimer: add's items to the wrong list if the timer overflows between
+       _xtimer_now()  and irq_disable()
+#6442: cpu/native: timer interrupt issue
+#6052: tests: xtimer_drift gets stuck
+#5338: xtimer: xtimer_now() not ISR safe
+#5103: xtimer: weird behavior of tests/xtimer_drift, bug?
+
+Drivers related issues
+----------------------
+#11405: nrfmin: communication not possible after multicast ping with no interval
+#10559: I2C API write_regs does not fit implementation
+#9546: dht: driver for dht11 sensor sometimes stuck in dht_read() on Atmel SAMR21
+#9419: cpu/msp430: GPIO driver doesn't work properly
+#8213: at86rf2xx: Basic mode and NETOPT_AUTOACK
+#8045: stm32/periph/uart: extra byte transmitted on first transmission
+#8028: diskio: failed assertion in send_cmd() on lpc2387
+#4876: at86rf2xx: Simultaneous use of different transceiver types is not
+       supported
+#3366: periph/i2c: handle NACK
+
+Native related issues
+---------------------
+#7206: native: race-condition in IPC
+#5796: native: tlsf: early malloc will lead to a crash
+#495: native not float safe
+
+Other platform related issues
+-----------------------------
+#11354: ESP32: `write(STDIO_FILENO, ...)` not working
+#11104: STM32: SPI clock not returning to idle state and generating additional
+        clock cycles
+#11059: board/sltb001a: cannot flash with JLink when 'hello-world' is running
+        and no error
+#11043: boards/z1: tests/rng resets board
+#10979: Missing SPI pre-scalars for STM32F7
+#10842: Preemption of malloc on AVR
+#10258: Incorrect default $PORT building for esp32-wroom-32 on macOS
+#10122: Indeterministic hard fault in _mutex_lock(), with nRF52 SoftDevice
+#10076: cpu/cortexm_common: irq_enable returns the current state of interrupts
+        (not previous)
+#8408: pkg/fatfs: linker error when build tests/pkg_fatfs_vfs for msb430 based
+       boards
+#8052: mips: several issues
+#7753: pic32-wifire: race-condition when linking in concurrent build
+#7667: sam0 flashpage_write issue
+#7020: isr_rfcoreerrors while pinging between CC2538DKs
+#6567: periph/spi: Switching between CPOL=0,1 problems on Kinetis with software CS
+#5774: cpu: cortexm_common: context switching code breaks when compiling with LTO
+#4954: chronos: compiling with -O0 breaks
+#4612: pkg: TLSF does not build for 16 bit platforms
+#1891: newlib-nano: Printf formatting does not work properly for some numeric
+       types
+
+Build system related issues
+---------------------------
+#11343: RTT: `make term` without `make debug`
+#11344: RTT: `make test` not working
+#11179: stm32l4: can't flash bin files
+#10857: frdm-kw41z: error with `SLOT_LEN` handling and flasher not working
+#10850: Tracking: remove harmfull use of `export` in make and immediate
+        evaluation
+#10459: make: `make clean all` does not make sense and should be removed
+#10047: Make warns to expect errors when disabling optional modules
+#9913: Dependencies processing order issues
+#9742: `buildtest` uses wrong build directory
+#9645: Different build behavior between `murdock` and `riot/riotbuild:latest`
+       image
+#9589: application/Makefile: environment settings after inclusion of
+       Makefile.include
+#8913: make: use of immediate value of variables before they have their final
+       value
+#8122: doxygen: riot.css modified by 'make doc'
+#7918: Usage of GCC extension for binary constants
+#6120: Windows AVR Mega development makefile Error
+#5848: arduino: Race condition in sys/arduino/Makefile.include
+#5776: make: Predefining CFLAGS are parsed weirdly
+#4053: macros: RIOT_FILE_RELATIVE printing wrong file name for headers
+
+Other issues
+------------
+#11274: riotboot_flashwrite: Failure on the nrf52
+#11243: sys/riotboot: documentation issues
+#10800: iotlab-m3: thread tests failing
+#10751: Possible memset optimized out in crypto code
+#10731: nanocoap: incomplete response to /.well-known/core request
+#10639: sys/stdio_uart: dropped data when received at once
+#10510: xtimer_set_msg: crash when using same message for 2 timers
+#10468: Tinycryt upstream rewrote history in master branch
+#10175: No error returned from aes_init when a key with a bad size is used
+#10121: RIOT cannot compile with the latest version of macOS (10.14) and Xcode 10
+#9882: sys/tsrb is not thread safe on AVR
+#9518: periph/i2c: tracking bugs and untested acks
+#9371: assert: c99 static_assert macro doesn't function for multiple
+       static_asserts in the same scope
+#8975: dist/tools/openocd: cannot debug some stlink based boards
+#8653: msba2: default example fails on assert
+#8589: Why using -F in avrdude?
+#8436: Kinetis PhyNode: failed to flash binary > 256K
+#8107: crypto/ccm: bugs in the implementation of CCM mode
+#7220: sys/fmt: Missing tests for fmt_float, fmt_lpad
+#6874: SAMD21: possible CMSIS bug ?
+#6533: tests/lwip target board for python test is hardcoded to native
+#5218: some use of asm keyword might be missing volatile
+#5009: RIOT is saw-toothing in energy consumption (even when idling)
+#4866: periph: GPIO drivers are not thread safe
+#4512: pkg: tests: RELIC unittests fail on iotlab-m3
+#4488: Making the newlib thread-safe
+#3256: make: Setting constants on compile time doesn't really set them
+       everywhere
+#2346: Tracker: Reduce scope on unintended COMMON variables
+#1263: sys: the TLSF implementation contains (a) read-before-write error(s)
+
+Fixed Issues from the last release (2019.01)
+============================================
+
+#11163: netdev: iolist not checked for empty elements on send
+#11162: nrfmin is broken when DEVELHELP is activated
+#11151: drivers/l3g42000d: scale has wrong data type
+#11147: 6LoWPAN over BLE: Device not pingable
+#11113: RPL global DODAG repair
+#11101: `nib route add` for routing to Raspberry Pi gateway not working
+#11052: tests/bloom_bytes does not print float
+#11051: NimBLE port should be always building all NimBLE files
+#11029: Default example does not work on stm32f4discovery
+#11013: hts221: wrong bit for "one-shot enable" register
+#10956: tests/gnrc_tcp_*: #2 not working on 6Lo-based boards
+#10972: examples/nanocoap_server hangs after > 256 bytes packet
+#10463: stm32f4discovery isn't visible as ttyUSB after flashing with tests/leds
+#10427: doxygen: *_params.h files are excluded
+#10341: driver_my9221 prevents further flashing of nucleo-l073rz
+#10294: tests/leds doesn't work on Nucleo-F401RE
+#10206: Lua_basic example doesn't flash in b-l072z-lrwan1
+#9387: shell `ping6` doesn't display duplicate packages
+#8663: /sys/random/seed: why not use hwrng if available?
+#8523: tools: need backport script
+#6123: gnrc: crash with (excessive) traffic in native
+
+
+You can get the complete detail in the git history and in the release milestone
+[Release 2019.04](https://github.com/RIOT-OS/RIOT/milestone/26?closed=1).
+
+
+Acknowledgements
+================
+We would like to thank all companies (vendors) that provided us with (their)
+hardware for porting and testing RIOT-OS. Further thanks go to companies and
+institutions that directly sponsored development time. And finally, big thanks
+to all of you contributing in so many different ways to make RIOT worthwhile!
+
+More information
+================
+http://www.riot-os.org
+
+Mailing lists
+-------------
+* RIOT OS kernel developers list
+  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list
+  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits
+  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications
+  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+IRC
+---
+* Join the RIOT IRC channel at: irc.freenode.net, #riot-os
+
+License
+=======
+* The code developed by the RIOT community is licensed under the GNU Lesser
+  General Public License (LGPL) version 2.1 as published by the Free Software
+  Foundation.
+* Some external sources and packages are published under a separate license.
+
+All code files contain licensing information.
+
 RIOT-2019.01 - Release Notes
 ============================
 RIOT is a multi-threading operating system which enables soft real-time
