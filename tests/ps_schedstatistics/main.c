@@ -56,7 +56,7 @@ int main(void)
 {
     for (unsigned i = 0; i < NB_THREADS; ++i) {
         pids[i] = thread_create(stacks[i], sizeof(stacks[i]),
-                                THREAD_PRIORITY_MAIN - 1,
+                                THREAD_PRIORITY_MAIN + 1,
                                 THREAD_CREATE_STACKTEST,
                                 _thread_fn, (void *)i, "thread");
     }
