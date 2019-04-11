@@ -66,9 +66,11 @@ USEMODULE += esp_idf_driver
 USEMODULE += esp_idf_esp32
 USEMODULE += esp_idf_soc
 USEMODULE += log
+USEMODULE += newlib_syscalls_default
 USEMODULE += periph
 USEMODULE += periph_common
 USEMODULE += random
+USEMODULE += stdio_uart
 USEMODULE += xtensa
 
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/
