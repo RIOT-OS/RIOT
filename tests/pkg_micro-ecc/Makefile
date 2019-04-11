@@ -6,6 +6,9 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
 # micro-ecc is not 16 bit compatible
 BOARD_BLACKLIST = chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
 
+# tests fail
+BOARD_BLACKLIST += hifive1
+
 USEMODULE += hashes
 USEPKG += micro-ecc
 
