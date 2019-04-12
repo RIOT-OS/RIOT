@@ -566,7 +566,7 @@ static unsigned _put_delta_optlen(uint8_t *buf, unsigned offset, unsigned shift,
     return offset;
 }
 
-size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, uint8_t *odata, size_t olen)
+size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, const uint8_t *odata, size_t olen)
 {
     assert(lastonum <= onum);
 
@@ -728,7 +728,7 @@ size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
 }
 
 /* Common functionality for addition of an option */
-static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, uint8_t *val,
+static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val,
                             size_t val_len)
 {
     if (pkt->options_len >= NANOCOAP_NOPTS_MAX) {
@@ -802,7 +802,7 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
     return write_len;
 }
 
-ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, uint8_t *val, size_t val_len)
+ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val, size_t val_len)
 {
     return _add_opt_pkt(pkt, optnum, val, val_len);
 }
