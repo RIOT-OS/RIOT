@@ -32,8 +32,6 @@
 
 #include "optparse.h"
 
-#define DEVELHELP
-
 #define TERM '\0'   /**< String terminator character */
 #define OPT '-'     /**< The character that marks an option */
 
@@ -186,20 +184,22 @@ static void do_help(const opt_conf_t *config)
  */
 static bool sanity_check(const opt_conf_t *config)
 {
-   int rule_i;
-   bool found_optional = false;
+    int rule_i;
+    bool found_optional = false;
 
     for (rule_i = 0; rule_i < config->n_rules; rule_i++) {
         bool is_positional = _is_argument(config->rules[rule_i].action);
         bool is_optional = _is_optional(config->rules[rule_i].action);
 
-        if (!is_positional)
+        if (!is_positional) {
             continue;
+        }
 
-        if (found_optional && !is_optional)
+        if (found_optional && !is_optional) {
             return false;
+        }
 
-        found_optional = found_optional || !is_optional;
+        found_optional = found_optional || is_optional;
     }
 
     return true;
