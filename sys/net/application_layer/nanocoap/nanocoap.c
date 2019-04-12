@@ -802,6 +802,11 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
     return write_len;
 }
 
+ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, uint8_t *val, size_t val_len)
+{
+    return _add_opt_pkt(pkt, optnum, val, val_len);
+}
+
 ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value)
 {
     uint32_t tmp = value;
