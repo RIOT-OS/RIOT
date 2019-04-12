@@ -89,13 +89,13 @@ int count_letters(union opt_key key, const char *value,
                   const char **message)
 {
     bool valid;
+    (void)message;
 
     /* If the value is null, we are being requested the default value. */
     if (value == NULL) {
         dest->d_uint = 402;
     } else {
         dest->d_uint = strlen(value);
-        *message = "counted letters!\n";
     }
 
     /* Test error handling. */
@@ -246,6 +246,52 @@ static void test_optparse_default(void)
 }
 
 /**
+ * Test number syntax errors (int)
+ */
+static void test_optparse_int_err(void)
+{
+    opt_data_t results[N_RULES];
+    int parse_result;
+    static const char *argv[] = { NULL, "x1", "x2", "-c", "45."};
+
+    /* first check that without the -c option it works */
+    parse_result = optparse_cmd(&cfg, results,
+                                sizeof(argv) / sizeof(*argv) - 2, argv);
+
+    TEST_ASSERT_EQUAL_INT(2, parse_result);
+
+    /* Now check that the -c option with invalid argument fails */
+    parse_result = optparse_cmd(&cfg, results,
+                                 sizeof(argv) / sizeof(*argv), argv);
+
+
+    TEST_ASSERT_EQUAL_INT(-OPTPARSE_BADSYNTAX, parse_result);
+}
+
+/**
+ * Test number syntax errors (float)
+ */
+static void test_optparse_float_err(void)
+{
+    opt_data_t results[N_RULES];
+    int parse_result;
+    static const char *argv[] = { NULL, "x1", "x2", "-f", "46.7.9"};
+
+    /* first check that without the -f option it works */
+    parse_result = optparse_cmd(&cfg, results,
+                                sizeof(argv) / sizeof(*argv) - 2, argv);
+
+    TEST_ASSERT_EQUAL_INT(2, parse_result);
+
+    /* Now check that the -f option with invalid argument fails */
+    parse_result = optparse_cmd(&cfg, results,
+                                 sizeof(argv) / sizeof(*argv), argv);
+
+
+    TEST_ASSERT_EQUAL_INT(-OPTPARSE_BADSYNTAX, parse_result);
+}
+
+/**
  * Test invalid numbers
  */
 
@@ -256,6 +302,8 @@ Test *tests_optparse_tests(void)
         new_TestFixture(test_optparse_basic),
         new_TestFixture(test_optparse_help),
         new_TestFixture(test_optparse_default),
+        new_TestFixture(test_optparse_int_err),
+        new_TestFixture(test_optparse_float_err),
     };
 
     EMB_UNIT_TESTCALLER(optparse_tests, NULL, NULL, fixtures);
