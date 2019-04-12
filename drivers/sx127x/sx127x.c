@@ -345,6 +345,9 @@ static int _init_spi(sx127x_t *dev)
         return -1;
     }
 
+    /* Minimize power consumption of NSS pin */
+    gpio_init(dev->params.nss_pin, SX127X_DIO_PULL_MODE);
+
     DEBUG("[sx127x] SPI_%i initialized with success\n", dev->params.spi);
     return 0;
 }

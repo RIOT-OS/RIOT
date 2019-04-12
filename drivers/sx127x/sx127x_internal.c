@@ -81,6 +81,9 @@ uint8_t sx127x_reg_read(const sx127x_t *dev, uint8_t addr)
 void sx127x_reg_write_burst(const sx127x_t *dev, uint8_t addr, uint8_t *buffer,
                             uint8_t size)
 {
+    /* Restore NSS pin working state */
+    gpio_init(dev->params.nss_pin, GPIO_OUT);
+
     spi_acquire(dev->params.spi, SPI_CS_UNDEF, SX127X_SPI_MODE, SX127X_SPI_SPEED);
 
     gpio_clear(dev->params.nss_pin);
@@ -88,11 +91,17 @@ void sx127x_reg_write_burst(const sx127x_t *dev, uint8_t addr, uint8_t *buffer,
     gpio_set(dev->params.nss_pin);
 
     spi_release(dev->params.spi);
+
+    /* Minimize power consumption of NSS pin */
+    gpio_init(dev->params.nss_pin, SX127X_DIO_PULL_MODE);
 }
 
 void sx127x_reg_read_burst(const sx127x_t *dev, uint8_t addr, uint8_t *buffer,
                            uint8_t size)
 {
+    /* Restore NSS pin working state */
+    gpio_init(dev->params.nss_pin, GPIO_OUT);
+
     spi_acquire(dev->params.spi, SPI_CS_UNDEF, SX127X_SPI_MODE, SX127X_SPI_SPEED);
 
     gpio_clear(dev->params.nss_pin);
@@ -100,6 +109,9 @@ void sx127x_reg_read_burst(const sx127x_t *dev, uint8_t addr, uint8_t *buffer,
     gpio_set(dev->params.nss_pin);
 
     spi_release(dev->params.spi);
+
+    /* Minimize power consumption of NSS pin */
+    gpio_init(dev->params.nss_pin, SX127X_DIO_PULL_MODE);
 }
 
 void sx127x_write_fifo(const sx127x_t *dev, uint8_t *buffer, uint8_t size)
