@@ -132,9 +132,9 @@ extern "C" {
 #define SD_DATA_TOKEN_RETRY_CNT    1000000
 #define INIT_CMD_RETRY_CNT         1000000
 #define INIT_CMD0_RETRY_CNT        3
-#define SD_WAIT_FOR_NOT_BUSY_CNT   1000000 /* use -1 for full blocking till the card isn't busy */
-#define SD_BLOCK_READ_CMD_RETRIES  10     /* only affects sending of cmd not whole transaction! */
-#define SD_BLOCK_WRITE_CMD_RETRIES 10    /* only affects sending of cmd not whole transaction! */
+#define SD_WAIT_FOR_NOT_BUSY_CNT   2000    /* use -1 for full blocking till the card isn't busy */
+#define SD_BLOCK_READ_CMD_RETRIES  10      /* only affects sending of cmd not whole transaction! */
+#define SD_BLOCK_WRITE_CMD_RETRIES 10      /* only affects sending of cmd not whole transaction! */
 
 /* memory capacity in bytes = (C_SIZE+1) * SD_CSD_V2_C_SIZE_BLOCK_MULT * BLOCK_LEN */
 #define SD_CSD_V2_C_SIZE_BLOCK_MULT 1024
