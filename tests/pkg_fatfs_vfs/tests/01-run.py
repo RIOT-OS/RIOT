@@ -9,26 +9,15 @@
 import sys
 from testrunner import run
 
-
-class TestFailed(Exception):
-    pass
-
-
 def testfunc(child):
 
     child.expect(u"Tests for FatFs over VFS - test results will be printed in "
                  "the format test_name:result\r\n")
 
-    while True:
-        res = child.expect([u"[^\n]*:\[OK\]\r\n",
-                            u"Test end.\r\n",
-                            u".[^\n]*:\[FAILED\]\r\n",
-                            u".*\r\n"])
-        if res > 1:
-            raise TestFailed(child.after.split(':', 1)[0] + " test failed!")
-        elif res == 1:
-            break
-
+    child.expect([u"[^\n]*:\[OK\]\r\n",
+                  u"Test end.\r\n",
+                  u".[^\n]*:\[FAILED\]\r\n",
+                  u".*\r\n"])
 
 if __name__ == "__main__":
     sys.exit(run(testfunc))
