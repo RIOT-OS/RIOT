@@ -76,7 +76,7 @@ UARTs       | 3 | yes
 WiFi        | IEEE 802.11 b/g/n built in | yes
 Bluetooth   | v4.2 BR/EDR and BLE | no
 Ethernet    | MAC interface with dedicated DMA and IEEE 1588 support | yes
-CAN         | version 2.0 | no
+CAN         | version 2.0 | yes
 IR          | up to 8 channels TX/RX | no
 Motor PWM   | 2 devices x 6 channels | yes
 LED PWM     | 16 channels | no
