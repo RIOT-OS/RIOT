@@ -130,13 +130,7 @@ enum OPTPARSE_RESULT {
  * Built-in actions for options.
  */
 enum OPTPARSE_ACTIONS {
-    OPTPARSE_IGNORE_SWITCH, /**< Ignore a switch. Takes 0 arguments */
     OPTPARSE_IGNORE,        /**< Ignore a key and its value. Takes 1 argument. */
-
-    OPTPARSE_SET_BOOL,      /**< Set opt_data::d_bool to true. Takes 0 arguments.*/
-    OPTPARSE_UNSET_BOOL,    /**< Set opt_data::d_bool to false. Takes 0 arguments.*/
-    OPTPARSE_COUNT,         /**< Count the number of occurences. Increments data::d_int
-                             *  each time the option is found. */
 
     OPTPARSE_CUSTOM_ACTION, /**< Delegate the action to a callback
                              * int _thin_callback(union opt_key key,
@@ -160,6 +154,13 @@ enum OPTPARSE_ACTIONS {
                              * copy of the string. It should not be used if the
                              * strings will be modified.
                              */
+    _OPTPARSE_MAX_NEEDS_VALUE_END, /**< Marker for the end of options that need a value.*/
+    OPTPARSE_IGNORE_SWITCH=_OPTPARSE_MAX_NEEDS_VALUE_END,
+                            /**< Ignore a switch. Takes 0 arguments */
+    OPTPARSE_SET_BOOL,      /**< Set opt_data::d_bool to true. Takes 0 arguments.*/
+    OPTPARSE_UNSET_BOOL,    /**< Set opt_data::d_bool to false. Takes 0 arguments.*/
+    OPTPARSE_COUNT,         /**< Count the number of occurences. Increments data::d_int
+                             *  each time the option is found. */
 
     OPTPARSE_DO_HELP,       /**< Print the following string, except if they are NULL:
                              * - opt_conf::helpstr
@@ -169,7 +170,9 @@ enum OPTPARSE_ACTIONS {
                              * In addition it causes the parser to exit with code
                              * OPTPARSE_REQHELP.
                              */
-    OPTPARSE_POSITIONAL,    /**< Indicates that the rule is a mandatory
+    _OPTPARSE_POSITIONAL_START,
+    OPTPARSE_POSITIONAL=_OPTPARSE_POSITIONAL_START,
+                                /**< Indicates that the rule is a mandatory
                                  positional argument and not an option. */
     OPTPARSE_POSITIONAL_OPT /**< Indicates that the rule is an optional
                                  positional argument and not an option. */

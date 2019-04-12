@@ -54,18 +54,20 @@
 
 /**
  * Like fputs, but the string can be null.
+ *
+ * Returning void saves a bit on code size.
  */
-static int safe_fputs(const char *s, FILE *stream)
+static void safe_fputs(const char *s, FILE *stream)
 {
-    return (s != NULL) ? fputs(s, stream) : 0;
+    (s != NULL) ? fputs(s, stream) : 0;
 }
 
 /**
  * Like fputc, but nothing is printed if the character is the terminator.
  */
-static int safe_fputc(int c, FILE *stream)
+static void safe_fputc(int c, FILE *stream)
 {
-    return (c != TERM) ? fputc(c, stream) : 0;
+    (c != TERM) ? fputc(c, stream) : 0;
 }
 
 #if (_XOPEN_SOURCE >= 500) || (_POSIX_C_SOURCE > 200809L)
@@ -86,16 +88,7 @@ char *my_strdup(const char *s)
 
 #endif /* no posix source */
 
-#define _MSK(x) (1 << (x))
-const uint16_t need_value_mask = _MSK(OPTPARSE_IGNORE)
-                                 | _MSK(OPTPARSE_CUSTOM_ACTION)
-                                 | _MSK(OPTPARSE_INT)
-                                 | _MSK(OPTPARSE_UINT)
-                                 | _MSK(OPTPARSE_FLOAT)
-                                 | _MSK(OPTPARSE_STR)
-                                 | _MSK(OPTPARSE_STR_NOCOPY);
-
-#define NEEDS_VALUE(rule) (!!(_MSK((rule)->action) & need_value_mask))
+#define NEEDS_VALUE(rule) ((rule)->action < _OPTPARSE_MAX_NEEDS_VALUE_END)
 
 /**
  * If the string stri starts with a dash, remove it and return a string to
@@ -126,7 +119,7 @@ static bool str_notempty(const char *str)
  */
 static bool _is_argument(enum OPTPARSE_ACTIONS action)
 {
-    return action == OPTPARSE_POSITIONAL || action == OPTPARSE_POSITIONAL_OPT;
+    return action >= _OPTPARSE_POSITIONAL_START;
 }
 
 /**
@@ -331,16 +324,18 @@ static const opt_rule_t *find_opt_rule(const opt_conf_t *config,
                                        const char *long_id,
                                        char short_id)
 {
-    int rule_i;
+    const opt_rule_t *this_rule = config->rules;
+    int i = config->n_rules;
 
-    for (rule_i = 0; rule_i < config->n_rules; rule_i++) {
-        const opt_rule_t this_rule = config->rules[rule_i];
-
-        if (!_is_argument(this_rule.action)
-            && _match_optionkey(this_rule.action_data.option, long_id,
+    /* This iteration seems weird but it provides perceptible code size savings
+     * in both gcc and clang (at least in cortexm/thumb).*/
+    while(i--) {
+        if (!_is_argument(this_rule->action)
+            && _match_optionkey(this_rule->action_data.option, long_id,
                                 short_id)) {
-            return config->rules + rule_i;
+            return this_rule;
         }
+        this_rule++;
     }
 
     return NULL;
@@ -462,13 +457,18 @@ static int assign_default(const opt_conf_t *config, opt_data_t *result,
 
 void optparse_free_strings(const opt_conf_t *config, opt_data_t *result)
 {
-    int rule_i;
+    const opt_rule_t *this_rule = config->rules;
+    int i = config->n_rules;
 
-    for (rule_i = 0; rule_i < config->n_rules; rule_i++) {
-        if (config->rules[rule_i].action == OPTPARSE_STR) {
-            free(result[rule_i].d_str);
-            result[rule_i].d_str = NULL;
+    /* This iteration seems weird but it provides perceptible code size savings
+     * in both gcc and clang (at least in cortexm/thumb).*/
+    while(i--) {
+        if (this_rule->action == OPTPARSE_STR) {
+            free(result->d_str);
+            result->d_str = NULL;
         }
+        result++;
+        this_rule++;
     }
 }
 
@@ -542,8 +542,8 @@ int optparse_cmd(const opt_conf_t *config,
                     }
                     else {
                         (is_long) ?
-                        P_ERR("Option is missing value: %s\n", key)
-                        : P_ERR("Option is missing value: %c\n", key[0]);
+                        P_ERR("Option needs value: %s\n", key)
+                        : P_ERR("Option needs value: %c\n", key[0]);
                         error = -OPTPARSE_BADSYNTAX; /* BYE! <===========> */
                     }
                 }
@@ -555,7 +555,9 @@ int optparse_cmd(const opt_conf_t *config,
                 }
             }
             else {
-                P_ERR("Unknown option: %s\n", key);
+                (is_long) ?
+                        P_ERR("Unknown option: %s\n", key)
+                        : P_ERR("Unknown option: %c\n", key[0]);
                 error = -OPTPARSE_BADSYNTAX;
             }
         }
@@ -564,8 +566,8 @@ int optparse_cmd(const opt_conf_t *config,
             value = argv[i];
             positional_idx++;
 
-            if (!positional_idx) {
-                P_ERR("Maximum number if arguments (%d) exceeded\n", UCHAR_MAX);
+            if (!positional_idx) { /*check for overflow */
+                P_ERR("Max number of arguments (%d) exceeded\n", UCHAR_MAX);
                 error = -OPTPARSE_BADSYNTAX;
             }
 
