@@ -23,6 +23,9 @@ USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
+USEMODULE += optparse
+
+CFLAGS+=-DDEBUG_ASSERT_VERBOSE
 
 include $(RIOTBASE)/Makefile.include
 
