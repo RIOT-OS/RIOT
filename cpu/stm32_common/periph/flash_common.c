@@ -14,6 +14,7 @@
  * @brief       Low-level flash lock/unlock implementation
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Oleg Artamonov <oleg@unwds.com>
  *
  * @}
  */
@@ -54,5 +55,18 @@ void _lock(void)
     if (!(CNTRL_REG & CNTRL_REG_LOCK)) {
         DEBUG("[flash-common] locking the flash module\n");
         CNTRL_REG |= CNTRL_REG_LOCK;
+    }
+}
+
+void _wait_for_pending_operations(void)
+{
+    if (FLASH->SR & FLASH_SR_BSY) {
+        DEBUG("[flash-common] waiting for any pending operation to finish\n");
+        while (FLASH->SR & FLASH_SR_BSY) {}
+    }
+
+    /* Clear 'end of operation' bit in status register */
+    if (FLASH->SR & FLASH_SR_EOP) {
+        FLASH->SR &= ~(FLASH_SR_EOP);
     }
 }

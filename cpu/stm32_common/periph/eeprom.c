@@ -15,6 +15,7 @@
  * @brief       Low-level eeprom driver implementation
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Oleg Artamonov <oleg@unwds.com>
  *
  * @}
  */
@@ -29,6 +30,7 @@
 
 extern void _lock(void);
 extern void _unlock(void);
+extern void _wait_for_pending_operations(void);
 
 #ifndef EEPROM_START_ADDR
 #error "periph/eeprom: EEPROM_START_ADDR is not defined"
@@ -42,6 +44,7 @@ size_t eeprom_read(uint32_t pos, uint8_t *data, size_t len)
 
     DEBUG("Reading data from EEPROM at pos %" PRIu32 ": ", pos);
     for (size_t i = 0; i < len; i++) {
+        _wait_for_pending_operations();
         *p++ = *(uint8_t *)(EEPROM_START_ADDR + pos++);
         DEBUG("0x%02X ", *p);
     }
@@ -59,6 +62,7 @@ size_t eeprom_write(uint32_t pos, const uint8_t *data, size_t len)
     _unlock();
 
     for (size_t i = 0; i < len; i++) {
+        _wait_for_pending_operations();
         *(uint8_t *)(EEPROM_START_ADDR + pos++) = *p++;
     }
 
