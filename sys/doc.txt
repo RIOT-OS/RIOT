@@ -40,3 +40,9 @@
  * @ingroup     sys
  * @brief       Utilities for data serialization
  */
+
+/**
+ * @defgroup    net_lorawan LoRaWAN
+ * @ingroup     net
+ * @brief       Provides utilities and helpers for LoRaWAN packets
+ */
