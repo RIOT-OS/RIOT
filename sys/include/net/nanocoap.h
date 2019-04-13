@@ -463,7 +463,7 @@ void coap_pkt_init(coap_pkt_t *pkt, uint8_t *buf, size_t len, size_t header_len)
  *
  * @returns     amount of bytes written to @p buf
  */
-size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, uint8_t *odata, size_t olen);
+size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, const uint8_t *odata, size_t olen);
 
 /**
  * @brief   Insert content type option into buffer
@@ -655,6 +655,23 @@ size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t last
  * @return        -ENOSPC if no available options or insufficient buffer space
  */
 ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string, char separator);
+
+/**
+ * @brief   Encode the given buffer as an opaque data option into pkt
+ *
+ * @post pkt.payload advanced to first byte after option(s)
+ * @post pkt.payload_len reduced by option(s) length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     optnum      option number to use
+ * @param[in]     val         pointer to the value to be set
+ * @param[in]     val_len     length of val
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options
+ */
+ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val, size_t val_len);
 
 /**
  * @brief   Encode the given uint option into pkt
