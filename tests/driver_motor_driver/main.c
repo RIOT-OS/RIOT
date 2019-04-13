@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2018 Gilles DOFFE <g.doffe@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     tests
+ * @{
+ *
+ * @file
+ * @brief       High-level driver for DC motors test application
+ *
+ * @author      Gilles DOFFE <g.doffe@gmail.com>
+ * @}
+ */
+
 #include <stdio.h>
 #include <string.h>
 
