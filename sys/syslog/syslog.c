@@ -20,7 +20,6 @@
 
 #include <string.h>
 #include <unistd.h>
-#include <arpa/inet.h>
 
 #ifdef CPU_NATIVE
 #include <netdb.h>
@@ -30,9 +29,9 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#ifdef MODULE_GNRC_NETIF
+#ifdef MODULE_GNRC_NETIF_IPV6
 #include "net/gnrc/netif.h"
-#endif
+#endif /* MODULE_GNRC_NETIF_IPV6 */
 
 #include "syslog/syslog.h"
 #include "mutex.h"
@@ -41,7 +40,9 @@
 static char hostname[HOST_NAME_MAX];
 #endif /* CPU_NATIVE */
 
+#ifdef MODULE_GNRC_NETIF_IPV6
 static char addr_str[INET6_ADDRSTRLEN];
+#endif /* MODULE_GNRC_NETIF_IPV6 */
 
 static mutex_t syslog_mutex = MUTEX_INIT;
 static int cfree = -1;
@@ -54,7 +55,7 @@ static int get_pri_numeric(int facility, int priority) {
 }
 
 static char *syslog_get_addr(void) {
-#ifdef MODULE_GNRC_NETIF
+#ifdef MODULE_GNRC_NETIF_IPV6
    for (gnrc_netif_t *iface = gnrc_netif_iter(NULL); iface != NULL; iface = gnrc_netif_iter(iface))
     {
       for (int e = 0; e < GNRC_NETIF_IPV6_ADDRS_NUMOF;e++) {
@@ -68,7 +69,7 @@ static char *syslog_get_addr(void) {
         }
       }
     }
-#endif
+#endif /* MODULE_GNRC_NETIF_IPV6 */
     return SYSLOG_NILVALUE;
 }
 

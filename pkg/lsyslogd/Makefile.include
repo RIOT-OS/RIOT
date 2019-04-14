@@ -1,1 +1,5 @@
 INCLUDES += -I$(PKGDIRBASE)/lsyslogd/include/
+
+ifneq (,$(filter lsyslogd_riot_ipc_input,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lsyslogd/input/
+endif

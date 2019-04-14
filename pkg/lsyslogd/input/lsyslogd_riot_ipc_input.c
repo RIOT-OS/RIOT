@@ -17,8 +17,6 @@
  *
  * @}
  */
-#ifdef LSYSLOGD_FEATURE_INPUT_RIOT_IPC
-
 #include <string.h>
 #include "lsyslogd.h"
 #include "msg.h"
@@ -67,6 +65,3 @@ static int syslog_riot_ipc_init(char *opt) {
 }
 
 syslog_input_t lsyslogd_riot_ipc_input = {._read = syslog_riot_ipc_read, ._init = syslog_riot_ipc_init};
-#else
-typedef int dont_be_pedantic;
-#endif //LSYSLOGD_FEATURE_INPUT_RIOT_IPC
