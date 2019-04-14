@@ -79,6 +79,8 @@ extern "C" {
   #define LOG_MASK_TEST(mask,x) OPT_MASK_TEST(mask,LOG_MASK(x))
 #endif
 
+/** Syslog NILVALUE according to https://tools.ietf.org/html/rfc5424#section-6 */
+#define SYSLOG_NILVALUE "-"
 
 /**
  * @brief Possible syslog facilities as used in the glibc implementation

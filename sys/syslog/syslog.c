@@ -20,15 +20,29 @@
 
 #include <string.h>
 #include <unistd.h>
+#include <arpa/inet.h>
+
+#ifdef CPU_NATIVE
 #include <netdb.h>
+#endif /* CPU_NATIVE */
+
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#ifdef MODULE_GNRC_NETIF
+#include "net/gnrc/netif.h"
+#endif
+
 #include "syslog/syslog.h"
 #include "mutex.h"
 
+#ifdef CPU_NATIVE
 static char hostname[HOST_NAME_MAX];
+#endif /* CPU_NATIVE */
+
+static char addr_str[INET6_ADDRSTRLEN];
+
 static mutex_t syslog_mutex = MUTEX_INIT;
 static int cfree = -1;
 kernel_pid_t syslog_pid = -1;
@@ -39,10 +53,39 @@ static int get_pri_numeric(int facility, int priority) {
   return ((facility << 3) + priority);
 }
 
-static char *get_fqdn(void) {
-  gethostname(hostname, sizeof(hostname));
-  struct hostent *host = gethostbyname(hostname);
-  return host->h_name;
+static char *syslog_get_addr(void) {
+#ifdef MODULE_GNRC_NETIF
+   for (gnrc_netif_t *iface = gnrc_netif_iter(NULL); iface != NULL; iface = gnrc_netif_iter(iface))
+    {
+      for (int e = 0; e < GNRC_NETIF_IPV6_ADDRS_NUMOF;e++) {
+        if ((ipv6_addr_is_link_local(&iface->ipv6.addrs[e]))) {
+          ipv6_addr_to_str(addr_str, &iface->ipv6.addrs[e], sizeof(addr_str));
+          uint8_t ipv6_addrs_flags = iface->ipv6.addrs_flags[e];
+          if ((ipv6_addrs_flags & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK) == GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID)
+          {
+            return addr_str;
+          }
+        }
+      }
+    }
+#endif
+    return SYSLOG_NILVALUE;
+}
+
+static char *syslog_get_hostname(void) {
+#ifdef CPU_NATIVE
+  if(gethostname(hostname, sizeof(hostname)) == 0) {
+    struct hostent *host = gethostbyname(hostname);
+    if(host) {
+      return host->h_name;
+    }
+  } else {
+    return syslog_get_addr();
+  }
+#else /* !CPU_NATIVE */
+  return syslog_get_addr();
+#endif
+  return SYSLOG_NILVALUE;
 }
 
 static syslog_client_t *get_client(kernel_pid_t pid) {
@@ -53,6 +96,18 @@ static syslog_client_t *get_client(kernel_pid_t pid) {
   }
   return NULL;
 }
+
+static int syslog_msg_send(msg_t *m, kernel_pid_t target_pid) {
+DEBUG("syslog_msg_send: Send ");
+#ifdef SYSLOG_SEND_NONBLOCK
+  DEBUG("non-blocking\n");
+  return msg_try_send(m, target_pid);
+#else
+  DEBUG("blocking\n");
+  return msg_send(m, target_pid);
+#endif
+}
+
 
 void openlog (const char *ident, int option, int facility) {
   syslog_client_t *c = NULL;
@@ -99,7 +154,7 @@ void openlog (const char *ident, int option, int facility) {
   } else {
     strncpy(c->ident, ident, IDENT_MAX_LEN);
   }
-  c->ident[IDENT_MAX_LEN] = 0;
+  c->ident[IDENT_MAX_LEN-1] = 0;
   c->facility = facility;
   c->mask     = LOG_MASK_ALL;
   DEBUG("openlog: New client with pid %d facility %d and ident \"%s\"\n", c->pid, c->facility, c->ident);
@@ -131,7 +186,7 @@ void vsyslog(int facility_priority, const char *format, va_list ap) {
     return;
   }
   mutex_lock(&syslog_mutex);
-  i = snprintf(c->buf, SYSLOG_MAX_LEN, "<%d> %d - %s %s %d %d ", get_pri_numeric(c->facility, facility_priority), SYSLOG_VERSION, get_fqdn(), c->ident, 0, 0);
+  i = snprintf(c->buf, SYSLOG_MAX_LEN, "<%d> %d - %s %s %d %d ", get_pri_numeric(c->facility, facility_priority), SYSLOG_VERSION, syslog_get_hostname(), c->ident, 0, 0);
   if(i<0) {
     DEBUG("vsyslog: Encoding error on writing the header\n");
     mutex_unlock(&syslog_mutex);
@@ -154,8 +209,10 @@ void vsyslog(int facility_priority, const char *format, va_list ap) {
     c->msg.ptr = c->buf;
     msg.content.ptr = &c->msg;
     DEBUG("vsyslog: Try to send syslog msg with %d bytes content\n", c->msg.len);
-    if (msg_try_send(&msg, syslog_pid) == 0) {
-      DEBUG("vsyslog: Syslog receiver queue full.\n");
+
+    if (syslog_msg_send(&msg, syslog_pid) == 0)
+    {
+      DEBUG("vsyslog: Syslog receiver unable to receive message\n");
     }
   } else {
     if(OPT_MASK_TEST(c->opt,LOG_CONS)) {

@@ -27,9 +27,16 @@
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
+#ifndef LSYSLOGD_RIOT_IPC_INPUT_RCV_QUEUE_SIZE
+    #define LSYSLOGD_RIOT_IPC_INPUT_RCV_QUEUE_SIZE RCV_QUEUE_SIZE
+#endif
 
-static char rcv_stack[THREAD_STACKSIZE_DEFAULT];
-static msg_t rcv_queue[RCV_QUEUE_SIZE];
+#ifndef LSYSLOGD_RIOT_IPC_INPUT_STACKSIZE
+    #define LSYSLOGD_RIOT_IPC_INPUT_STACKSIZE THREAD_STACKSIZE_DEFAULT
+#endif
+
+static char rcv_stack[LSYSLOGD_RIOT_IPC_INPUT_STACKSIZE];
+static msg_t rcv_queue[LSYSLOGD_RIOT_IPC_INPUT_RCV_QUEUE_SIZE];
 extern kernel_pid_t syslog_pid;
 
 static int syslog_riot_ipc_read(char *buf, int len)

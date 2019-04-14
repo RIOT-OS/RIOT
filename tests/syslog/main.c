@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include "shell_commands.h"
 #include "shell.h"
 #include "lsyslogd.h"
