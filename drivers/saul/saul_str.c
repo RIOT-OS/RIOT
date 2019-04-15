@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2019 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,56 +15,83 @@
  * @brief       SAUL string functions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
  * @}
  */
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "saul.h"
 
-/*
- * This is surely not the most beautiful implementation of a stringification
- * function, but works...
- */
+static const char *actuators[] = {
+    [SAUL_ACT_ID_ANY]           = "ACT_ANY",
+    [SAUL_ACT_ID_LED_RGB]       = "ACT_LED_RGB",
+    [SAUL_ACT_ID_SERVO]         = "ACT_SERVO",
+    [SAUL_ACT_ID_MOTOR]         = "ACT_MOTOR",
+    [SAUL_ACT_ID_SWITCH]        = "ACT_SWITCH",
+    [SAUL_ACT_ID_DIMMER]        = "ACT_DIMMER",
+};
+
+static const char *sensors[] = {
+    [SAUL_SENSE_ID_ANY]         = "SENSE_ANY",
+    [SAUL_SENSE_ID_BTN]         = "SENSE_BTN",
+    [SAUL_SENSE_ID_TEMP]        = "SENSE_TEMP",
+    [SAUL_SENSE_ID_HUM]         = "SENSE_HUM",
+    [SAUL_SENSE_ID_LIGHT]       = "SENSE_LIGHT",
+    [SAUL_SENSE_ID_ACCEL]       = "SENSE_ACCEL",
+    [SAUL_SENSE_ID_MAG]         = "SENSE_MAG",
+    [SAUL_SENSE_ID_GYRO]        = "SENSE_GYRO",
+    [SAUL_SENSE_ID_COLOR]       = "SENSE_COLOR",
+    [SAUL_SENSE_ID_PRESS]       = "SENSE_PRESS",
+    [SAUL_SENSE_ID_ANALOG]      = "SENSE_ANALOG",
+    [SAUL_SENSE_ID_UV]          = "SENSE_UV",
+    [SAUL_SENSE_ID_OBJTEMP]     = "SENSE_OBJTEMP",
+    [SAUL_SENSE_ID_COUNT]       = "SENSE_PULSE_COUNT",
+    [SAUL_SENSE_ID_DISTANCE]    = "SENSE_DISTANCE",
+    [SAUL_SENSE_ID_CO2]         = "SENSE_CO2",
+    [SAUL_SENSE_ID_TVOC]        = "SENSE_TVOC",
+    [SAUL_SENSE_ID_PROXIMITY]   = "SENSE_PROXIMITY",
+    [SAUL_SENSE_ID_RSSI]        = "SENSE_RSSI",
+    [SAUL_SENSE_ID_CHARGE]      = "SENSE_CHARGE",
+    [SAUL_SENSE_ID_CURRENT]     = "SENSE_CURRENT",
+    [SAUL_SENSE_ID_OCCUP]       = "SENSE_OCCUP",
+    [SAUL_SENSE_ID_PM]          = "SENSE_PM",
+    [SAUL_SENSE_ID_CAPACITANCE] = "SENSE_CAPACITANCE",
+    [SAUL_SENSE_ID_VOLTAGE]     = "SENSE_VOLTAGE",
+    [SAUL_SENSE_ID_PH]          = "SENSE_PH",
+    [SAUL_SENSE_ID_POWER]       = "SENSE_POWER",
+};
+
 const char *saul_class_to_str(const uint8_t class_id)
 {
-    switch (class_id) {
-        case SAUL_CLASS_UNDEF:       return "CLASS_UNDEF";
-        case SAUL_ACT_ANY:           return "ACT_ANY";
-        case SAUL_ACT_LED_RGB:       return "ACT_LED_RGB";
-        case SAUL_ACT_SERVO:         return "ACT_SERVO";
-        case SAUL_ACT_MOTOR:         return "ACT_MOTOR";
-        case SAUL_ACT_SWITCH:        return "ACT_SWITCH";
-        case SAUL_ACT_DIMMER:        return "ACT_DIMMER";
-        case SAUL_SENSE_ANY:         return "SENSE_ANY";
-        case SAUL_SENSE_BTN:         return "SENSE_BTN";
-        case SAUL_SENSE_TEMP:        return "SENSE_TEMP";
-        case SAUL_SENSE_HUM:         return "SENSE_HUM";
-        case SAUL_SENSE_LIGHT:       return "SENSE_LIGHT";
-        case SAUL_SENSE_ACCEL:       return "SENSE_ACCEL";
-        case SAUL_SENSE_MAG:         return "SENSE_MAG";
-        case SAUL_SENSE_GYRO:        return "SENSE_GYRO";
-        case SAUL_SENSE_COLOR:       return "SENSE_COLOR";
-        case SAUL_SENSE_PRESS:       return "SENSE_PRESS";
-        case SAUL_SENSE_ANALOG:      return "SENSE_ANALOG";
-        case SAUL_SENSE_UV:          return "SENSE_UV";
-        case SAUL_SENSE_OBJTEMP:     return "SENSE_OBJTEMP";
-        case SAUL_SENSE_COUNT:       return "SENSE_PULSE_COUNT";
-        case SAUL_SENSE_DISTANCE:    return "SENSE_DISTANCE";
-        case SAUL_SENSE_CO2:         return "SENSE_CO2";
-        case SAUL_SENSE_TVOC:        return "SENSE_TVOC";
-        case SAUL_SENSE_PROXIMITY:   return "SENSE_PROXIMITY";
-        case SAUL_SENSE_RSSI:        return "SENSE_RSSI";
-        case SAUL_SENSE_CHARGE:      return "SENSE_CHARGE";
-        case SAUL_SENSE_CURRENT:     return "SENSE_CURRENT";
-        case SAUL_SENSE_OCCUP:       return "SENSE_OCCUP";
-        case SAUL_SENSE_PM:          return "SENSE_PM";
-        case SAUL_SENSE_CAPACITANCE: return "SENSE_CAPACITANCE";
-        case SAUL_SENSE_VOLTAGE:     return "SENSE_VOLTAGE";
-        case SAUL_SENSE_PH:          return "SENSE_PH";
-        case SAUL_SENSE_POWER:       return "SENSE_POWER";
-        case SAUL_CLASS_ANY:         return "CLASS_ANY";
-        default:                     return "CLASS_UNKNOWN";
+    const char *result = NULL;
+    uint8_t id = class_id & SAUL_ID_MASK;
+    uint8_t cat = class_id & SAUL_CAT_MASK;
+    switch (cat) {
+        case SAUL_CAT_UNDEF:
+            return "CLASS_UNDEF";
+        case SAUL_CAT_ACT:
+            if (id < SAUL_ACT_NUMOF) {
+                result = actuators[id];
+            }
+            break;
+        case SAUL_CAT_SENSE:
+            if (id < SAUL_SENSE_NUMOF) {
+                result = sensors[id];
+            }
+            break;
+        default:
+            if (class_id == SAUL_CLASS_ANY) {
+                return "CLASS_ANY";
+            }
+            break;
     }
+
+    if (result == NULL) {
+        result = "CLASS_UNKNOWN";
+    }
+
+    return result;
 }
