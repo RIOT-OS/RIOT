@@ -355,7 +355,7 @@ static const opt_rule_t *find_arg_rule(const opt_conf_t *config, int arg_n)
     int rule_i;
     int last_handler;
     int handlers_found = 0;
-    bool repeat_last = !!(config->tune | OPTPARSE_COLLECT_LAST_POS);
+    bool repeat_last = !!(config->tune & OPTPARSE_COLLECT_LAST_POS);
 
     for (rule_i = 0; rule_i < config->n_rules; rule_i++) {
         const opt_rule_t this_rule = config->rules[rule_i];
