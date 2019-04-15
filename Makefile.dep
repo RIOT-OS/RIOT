@@ -592,6 +592,7 @@ endif
 
 ifneq (,$(filter saul,$(USEMODULE)))
   USEMODULE += phydat
+  USEMODULE += fmt
 endif
 
 ifneq (,$(filter saul_reg,$(USEMODULE)))

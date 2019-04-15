@@ -20,11 +20,11 @@
  */
 
 #include <stddef.h>
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include "saul_reg.h"
+#include "fmt.h"
 
 /* this function does not check, if the given device is valid */
 static void probe(int num, saul_reg_t *dev)
@@ -34,12 +34,19 @@ static void probe(int num, saul_reg_t *dev)
 
     dim = saul_reg_read(dev, &res);
     if (dim <= 0) {
-        printf("error: failed to read from device #%i\n", num);
+        print_str("error: failed to read from device #");
+        print_s32_dec(num);
+        print_str("\n");
         return;
     }
     /* print results */
-    printf("Reading from #%i (%s|%s)\n", num, dev->name,
-           saul_class_to_str(dev->driver->type));
+    print_str("Reading from #");
+    print_s32_dec(num);
+    print_str(" (");
+    print_str(dev->name);
+    print_str("|");
+    print_str(saul_class_to_str(dev->driver->type));
+    print_str(")\n");
     phydat_dump(&res, dim);
 }
 
@@ -50,7 +57,7 @@ static void probe_all(void)
 
     while (dev) {
         probe(i++, dev);
-        puts("");
+        print_str("\n");
         dev = dev->next;
     }
 }
@@ -61,14 +68,19 @@ static void list(void)
     int i = 0;
 
     if (dev) {
-        puts("ID\tClass\t\tName");
+        print_str("ID\tClass\t\tName\n");
     }
     else {
-        puts("No devices found");
+        print_str("No devices found\n");
     }
     while (dev) {
-        printf("#%i\t%s\t%s\n",
-               i++, saul_class_to_str(dev->driver->type), dev->name);
+        print_str("#");
+        print_s32_dec(i++);
+        print_str("\t");
+        print_str(saul_class_to_str(dev->driver->type));
+        print_str("\t");
+        print_str(dev->name);
+        print_str("\n");
         dev = dev->next;
     }
 }
@@ -79,7 +91,11 @@ static void read(int argc, char **argv)
     saul_reg_t *dev;
 
     if (argc < 3) {
-        printf("usage: %s %s <device id>|all\n", argv[0], argv[1]);
+        print_str("usage: ");
+        print_str(argv[0]);
+        print_str(" ");
+        print_str(argv[1]);
+        print_str(" <device id>|all\n");
         return;
     }
     if (strcmp(argv[2], "all") == 0) {
@@ -90,7 +106,7 @@ static void read(int argc, char **argv)
     num = atoi(argv[2]);
     dev = saul_reg_find_nth(num);
     if (dev == NULL) {
-        puts("error: undefined device id given");
+        print_str("error: undefined device id given\n");
         return;
     }
     probe(num, dev);
@@ -103,14 +119,17 @@ static void write(int argc, char **argv)
     phydat_t data;
 
     if (argc < 4) {
-        printf("usage: %s %s <device id> <value 0> [<value 1> [<value 2]]\n",
-               argv[0], argv[1]);
+        print_str("usage: ");
+        print_str(argv[0]);
+        print_str(" ");
+        print_str(argv[1]);
+        print_str(" <device id> <value 0> [<value 1> [<value 2]]\n");
         return;
     }
     num = atoi(argv[2]);
     dev = saul_reg_find_nth(num);
     if (dev == NULL) {
-        puts("error: undefined device given");
+        print_str("error: undefined device given\n");
         return;
     }
     /* parse value(s) */
@@ -120,20 +139,30 @@ static void write(int argc, char **argv)
         data.val[i] = atoi(argv[i + 3]);
     }
     /* print values before writing */
-    printf("Writing to device #%i - %s\n", num, dev->name);
+    print_str("Writing to device #");
+    print_s32_dec(num);
+    print_str(" - ");
+    print_str(dev->name);
+    print_str("\n");
     phydat_dump(&data, dim);
     /* write values to device */
     dim = saul_reg_write(dev, &data);
     if (dim <= 0) {
         if (dim == -ENOTSUP) {
-            printf("error: device #%i is not writable\n", num);
+            print_str("error: device #");
+            print_s32_dec(num);
+            print_str(" is not writable\n");
         }
         else {
-            printf("error: failure to write to device #%i\n", num);
+            print_str("error: failure to write to device #");
+            print_s32_dec(num);
+            print_str("\n");
         }
         return;
     }
-    printf("data successfully written to device #%i\n", num);
+    print_str("data successfully written to device #");
+    print_s32_dec(num);
+    print_str("\n");
 }
 
 int _saul(int argc, char **argv)
@@ -149,7 +178,9 @@ int _saul(int argc, char **argv)
             write(argc, argv);
         }
         else {
-            printf("usage: %s read|write\n", argv[0]);
+            print_str("usage: ");
+            print_str(argv[0]);
+            print_str(" read|write\n");
         }
     }
     return 0;
