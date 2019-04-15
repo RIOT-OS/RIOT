@@ -17,6 +17,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <inttypes.h>
 
 #include "msg.h"
@@ -59,7 +60,7 @@ static void *_eventloop(void *arg)
 
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
-                printf("Packets received: %d\n", ++rcv_count);
+                printf("Packets received: %u\n", ++rcv_count);
                 gnrc_pktbuf_release(msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_GET:
@@ -82,6 +83,7 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
                  unsigned int delay)
 {
     int iface;
+    char *conversion_end;
     uint16_t port;
     ipv6_addr_t addr;
     size_t data_len;
@@ -103,8 +105,8 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
         return;
     }
 
-    data_len = atoi(data_len_str);
-    if (data_len == 0) {
+    data_len = strtoul(data_len_str, &conversion_end, 0);
+    if (*conversion_end != '\0') {
         puts("Error: unable to parse data_len");
         return;
     }
