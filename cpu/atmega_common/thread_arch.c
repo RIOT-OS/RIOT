@@ -203,6 +203,12 @@ void cpu_switch_context_exit(void)
     __enter_thread_mode();
 }
 
+#define STACK_POINTER  ((char *)AVR_STACK_POINTER_REG)
+extern size_t __malloc_margin;
+extern char * __malloc_heap_start;
+extern char * __malloc_heap_end;
+extern char *__brkval;
+
 /**
  * @brief Set the MCU into Thread-Mode and load the initial task from the stack and run it
  */
@@ -210,6 +216,19 @@ void NORETURN __enter_thread_mode(void) __attribute__((naked));
 void NORETURN __enter_thread_mode(void)
 {
     irq_enable();
+
+    /*
+     * Save the current stack pointer to __malloc_heap_end. Since
+     * context_restore is always inline, there is no function call and the
+     * current stack pointer is the lowest possible stack address outside the
+     * thread-mode. Therefore, it can be considered as the top of the heap.
+     */
+    __malloc_heap_end = STACK_POINTER - __malloc_margin;
+    /* __brkval has to be initialized if necessary */
+    if (__brkval == NULL) {
+        __brkval = __malloc_heap_start;
+    }
+
     __context_restore();
     __asm__ volatile ("ret");
 
