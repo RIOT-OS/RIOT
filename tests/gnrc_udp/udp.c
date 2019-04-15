@@ -80,27 +80,6 @@ static void *_eventloop(void *arg)
     return NULL;
 }
 
-static int parse_portn(union opt_key key, const char *value,
-                union opt_data *dest,
-                const char **message)
-{
-    char *end_of_conv;
-
-    (void)key;
-
-    dest->d_uint = value == NULL ? 0 : strtoul(value, &end_of_conv, 0);
-
-    if (value != NULL &&
-        (*end_of_conv != '\0' || dest->d_uint <= 0
-        || dest->d_uint > UINT16_MAX)) {
-        *message = "Port number (p) : p ∈ ℕ ∧ p < 2¹⁶";
-        return -OPTPARSE_BADSYNTAX;
-    }
-    else {
-        return -OPTPARSE_OK;
-    }
-}
-
 typedef struct {
     ipv6_addr_t addr;
     int iface;
@@ -120,6 +99,7 @@ static int parse_ip6addr(union opt_key key, const char *value,
         return -OPTPARSE_OK;
     }
 
+    /* ipv6_addr_split_iface modifies the string, so this is not allowed here. */
     addr_if->iface = 0;// ipv6_addr_split_iface(value);
 
     if (ipv6_addr_from_str(&addr_if->addr, value) == NULL) {
@@ -137,7 +117,7 @@ int udp_client_send(int argc, const char *argv[])
 
     static const opt_rule_t rules[] = {
         [UDP_ADDR] = OPTPARSE_P(CUSTOM_ACTION, "addr", "Destination addrress", parse_ip6addr),
-        [UDP_PORT] = OPTPARSE_P(CUSTOM_ACTION, "port", "Destination port", parse_portn),
+        [UDP_PORT] = OPTPARSE_P(UINT, "port", "Destination port", 0),
         [UDP_BYTES] = OPTPARSE_P_OPT(UINT, "bytes", "Packet size", 0),
         [UDP_NUM] = OPTPARSE_O(UINT, 'n', "num", "Number of packets", 1),
         [UDP_HELP] = OPTPARSE_O(DO_HELP, 'h', "help", "Show this help", 0),
@@ -160,6 +140,11 @@ int udp_client_send(int argc, const char *argv[])
 
     if ((addr_if.iface < 0) && (gnrc_netif_numof() == 1)) {
         addr_if.iface = gnrc_netif_iter(NULL)->pid;
+    }
+
+    if (! (0 < args[UDP_PORT].d_uint && args[UDP_PORT].d_uint <= UINT16_MAX)) {
+        puts("Error: ¬(0 < port < 2¹⁶)");
+        return 2;
     }
 
     for (unsigned int i = 0; i < args[UDP_NUM].d_uint; i++) {
@@ -214,7 +199,7 @@ int udp_client_send(int argc, const char *argv[])
 int udp_server_start(int argc, const char *argv[])
 {
     static const opt_rule_t rules[] = {
-        OPTPARSE_P(CUSTOM_ACTION, "port", "Listen on this port number", parse_portn)
+        OPTPARSE_P(UINT, "port", "Listen on this port number", 0)
     };
     static const opt_conf_t cfg = {.helpstr="Listen on UDP ports",
                                     .rules=rules, .n_rules=1,
@@ -224,6 +209,11 @@ int udp_server_start(int argc, const char *argv[])
 
     if (optparse_cmd(&cfg, &port, argc, argv) < 0) {
         return 1;
+    }
+
+    if (! (0 < port.d_uint && port.d_uint <= UINT16_MAX)) {
+        puts("Error: ¬(0 < port < 2¹⁶)");
+        return 2;
     }
 
     /* check if server is already running */
