@@ -114,6 +114,39 @@ void mrf24j40_update_tasks(mrf24j40_t *dev);
  */
 void mrf24j40_hardware_reset(mrf24j40_t *dev);
 
+/**
+ * @brief   Enable automatic External Power Amplifier & Low Noise Amplifier control
+ *
+ * @param[in] dev       device to enable the PA & LNA on
+ */
+#if MRF24J40_USE_EXT_PA_LNA
+void mrf24j40_enable_auto_pa_lna(mrf24j40_t *dev);
+#else
+static inline void mrf24j40_enable_auto_pa_lna(mrf24j40_t *dev) { (void) dev; }
+#endif
+
+/**
+ * @brief   Disable automatic External Power Amplifier & Low Noise Amplifier control
+ *
+ * @param[in] dev       device to disable the PA & LNA on
+ */
+#if MRF24J40_USE_EXT_PA_LNA
+void mrf24j40_disable_auto_pa_lna(mrf24j40_t *dev);
+#else
+static inline void mrf24j40_disable_auto_pa_lna(mrf24j40_t *dev) { (void) dev; }
+#endif
+
+/**
+ * @brief   Enable only the External Low Noise Amplifier
+ *
+ * @param[in] dev       device enable the LNA on
+ */
+#if MRF24J40_USE_EXT_PA_LNA
+void mrf24j40_enable_lna(mrf24j40_t *dev);
+#else
+static inline void mrf24j40_enable_lna(mrf24j40_t *dev) { (void) dev; }
+#endif
+
 #ifdef __cplusplus
 }
 #endif
