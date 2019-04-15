@@ -143,7 +143,9 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 #endif
             size_t mhr_len = ieee802154_get_frame_hdr_len(pkt->data);
 
-            if (mhr_len == 0) {
+            /* nread was checked for <= 0 before so we can safely cast it to
+             * unsigned */
+            if ((mhr_len == 0) || ((size_t)nread < mhr_len)) {
                 DEBUG("_recv_ieee802154: illegally formatted frame received\n");
                 gnrc_pktbuf_release(pkt);
                 return NULL;
