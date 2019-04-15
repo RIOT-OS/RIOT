@@ -18,7 +18,6 @@
  * @}
  */
 
-#include <stdio.h>
 #include <stdint.h>
 
 #include "fmt.h"
@@ -27,10 +26,10 @@
 void phydat_dump(phydat_t *data, uint8_t dim)
 {
     if (data == NULL || dim > PHYDAT_DIM) {
-        puts("Unable to display data object");
+        print_str("Unable to display data object\n");
         return;
     }
-    printf("Data:");
+    print_str("Data:");
     for (uint8_t i = 0; i < dim; i++) {
         char scale_prefix;
 
@@ -50,30 +49,36 @@ void phydat_dump(phydat_t *data, uint8_t dim)
                 scale_prefix = phydat_prefix_from_scale(data->scale);
         }
 
-        printf("\t");
+        print_str("\t");
         if (dim > 1) {
-            printf("[%u] ", (unsigned int)i);
+            print_str("[");
+            print_u32_dec(i);
+            print_str("] ");
         }
         else {
-            printf("     ");
+            print_str("     ");
         }
         if (scale_prefix) {
-            printf("%6d %c", (int)data->val[i], scale_prefix);
+            print_s32_dec(data->val[i]);
+            print_str(" ");
+            print(&scale_prefix, 1);
         }
         else if (data->scale == 0) {
-            printf("%6d", (int)data->val[i]);
+            print_s32_dec(data->val[i]);
         }
         else if ((data->scale > -5) && (data->scale < 0)) {
             char num[8];
             size_t len = fmt_s16_dfp(num, data->val[i], data->scale);
-            num[len] = '\0';
-            printf("%s", num);
+            print(num, len);
         }
         else {
-            printf("%iE%i", (int)data->val[i], (int)data->scale);
+            print_s32_dec(data->val[i]);
+            print_str("E");
+            print_s32_dec(data->scale);
         }
 
-        printf("%s\n", phydat_unit_to_str(data->unit));
+        print_str(phydat_unit_to_str(data->unit));
+        print_str("\n");
     }
 }
 
