@@ -36,7 +36,6 @@
 #define OPT '-'     /**< The character that marks an option */
 
 #define P_ERR(...) fprintf(stderr, __VA_ARGS__)
-#define STR_ERR(s) fputs(s, stderr)
 
 #ifndef DEVELHELP
 
@@ -134,27 +133,15 @@ static void _option_help(const opt_rule_t *rule)
     safe_fputc(rule->action_data.option.short_id, HELP_STREAM);
     safe_fputs("\t--", HELP_STREAM);
     safe_fputs(rule->action_data.option.long_id, HELP_STREAM);
-    safe_fputc('\t', HELP_STREAM);
-    safe_fputs(rule->desc, HELP_STREAM);
-    safe_fputc('\n', HELP_STREAM);
 }
 
 static void _argument_help(const opt_rule_t *rule)
 {
-    if (_is_optional(rule->action)) {
-        safe_fputc('[', HELP_STREAM);
-    }
-
     safe_fputs(rule->action_data.argument.name, HELP_STREAM);
 
     if (_is_optional(rule->action)) {
-        safe_fputc(']', HELP_STREAM);
+        safe_fputc('?', HELP_STREAM);
     }
-
-    safe_fputc('\t', HELP_STREAM);
-    safe_fputs(rule->desc, HELP_STREAM);
-
-    safe_fputc('\n', HELP_STREAM);
 }
 
 /* TODO: make help stream into an argument */
@@ -175,6 +162,10 @@ static void do_help(const opt_conf_t *config)
         else {
             _option_help(rule);
         }
+
+        safe_fputc('\t', HELP_STREAM);
+        safe_fputs(rule->desc, HELP_STREAM);
+        safe_fputc('\n', HELP_STREAM);
     }
 }
 
@@ -207,7 +198,8 @@ static bool sanity_check(const opt_conf_t *config)
 #endif
 
 static int do_user_callback(const opt_rule_t *rule, opt_data_t *dest,
-                            int positional_idx, const char *value)
+                            int positional_idx, const char *value,
+                            const char **custom_message)
 {
     union opt_key key;
     struct opt_positionalkey pkey;
@@ -221,12 +213,8 @@ static int do_user_callback(const opt_rule_t *rule, opt_data_t *dest,
         key.option = &rule->action_data.option;
     }
 
-    const char *custom_message = NULL;
     ret = rule->default_value._thin_callback(key, value,
-                                             dest, &custom_message);
-    if (custom_message != NULL) {
-        STR_ERR(custom_message);
-    }
+                                             dest, custom_message);
 
     return ret;
 }
@@ -242,7 +230,8 @@ static int do_user_callback(const opt_rule_t *rule, opt_data_t *dest,
  */
 static int do_action(const opt_rule_t *rule,
                      opt_data_t *dest,
-                     int positional_idx, const char *value)
+                     int positional_idx, const char *value,
+                     const char **msg)
 {
     int ret = OPTPARSE_OK;
     char *end_of_conversion;
@@ -255,18 +244,24 @@ static int do_action(const opt_rule_t *rule,
             break;
         case OPTPARSE_INT:
             dest->d_int = strtol(value, &end_of_conversion, 0);
-            if (*end_of_conversion != '\0')
+            if (*end_of_conversion != '\0') {
+                *msg = "Expected integer";
                 ret = -OPTPARSE_BADSYNTAX;
+            }
             break;
         case OPTPARSE_UINT:
             dest->d_uint = strtoul(value, &end_of_conversion, 0);
-            if (*end_of_conversion != '\0')
+            if (*end_of_conversion != '\0') {
+                *msg = "Expected integer";
                 ret = -OPTPARSE_BADSYNTAX;
+            }
             break;
         case OPTPARSE_FLOAT:
             dest->d_float = strtof(value, &end_of_conversion);
-            if (*end_of_conversion != '\0')
+            if (*end_of_conversion != '\0') {
+                *msg = "Expected real number";
                 ret = -OPTPARSE_BADSYNTAX;
+            }
             break;
         case OPTPARSE_STR_NOCOPY:
             dest->d_cstr = value;
@@ -286,7 +281,7 @@ static int do_action(const opt_rule_t *rule,
                 free(dest->d_str);
                 dest->d_str = my_strdup(value);
                 if (dest->d_str == NULL) {
-                    P_DEBUG("OPTPARSE_STR failed: out of memory\n");
+                    *msg = "Parser out of memory";
                     ret = -OPTPARSE_NOMEM;
                 }
             }
@@ -296,7 +291,7 @@ static int do_action(const opt_rule_t *rule,
             assert(0);
             break; /*this is a meta-action and has to be implemented in generic_parser*/
         case OPTPARSE_CUSTOM_ACTION:
-            ret = do_user_callback(rule, dest, positional_idx, value);
+            ret = do_user_callback(rule, dest, positional_idx, value, msg);
             break;
         default:
             P_DEBUG("Unknown action: %d\n", rule->action);
@@ -407,6 +402,7 @@ static int assign_default(const opt_conf_t *config, opt_data_t *result,
     for (rule_i = 0; !error && rule_i < config->n_rules; rule_i++) {
         enum OPTPARSE_ACTIONS action;
         const opt_rule_t *this_rule = config->rules + rule_i;
+        const char *msg = NULL;
 
         if (!_is_optional(this_rule->action)) {
             _required++;
@@ -433,7 +429,8 @@ static int assign_default(const opt_conf_t *config, opt_data_t *result,
         }
         else {
             error = do_user_callback(this_rule, result + rule_i,
-                                     positional_idx, NULL);
+                                     positional_idx, NULL, &msg);
+            safe_fputs(msg, HELP_STREAM);
             if (error) {
                 P_DEBUG("User cb at index %d failed in init with code %d.\n",
                         rule_i, error);
@@ -494,7 +491,7 @@ int optparse_cmd(const opt_conf_t *config,
     }
 
     while (error >= OPTPARSE_OK && i < argc) {
-        const char *key, *value;
+        const char *key, *value, *msg = NULL;
         const opt_rule_t *curr_rule = NULL;
 
         if (!no_more_options
@@ -541,9 +538,7 @@ int optparse_cmd(const opt_conf_t *config,
                         value = argv[++i];
                     }
                     else {
-                        (is_long) ?
-                        P_ERR("Option needs value: %s\n", key)
-                        : P_ERR("Option needs value: %c\n", key[0]);
+                        msg = "Option needs value";
                         error = -OPTPARSE_BADSYNTAX; /* BYE! <===========> */
                     }
                 }
@@ -555,9 +550,7 @@ int optparse_cmd(const opt_conf_t *config,
                 }
             }
             else {
-                (is_long) ?
-                        P_ERR("Unknown option: %s\n", key)
-                        : P_ERR("Unknown option: %c\n", key[0]);
+                msg = "Unknown option";
                 error = -OPTPARSE_BADSYNTAX;
             }
         }
@@ -567,12 +560,12 @@ int optparse_cmd(const opt_conf_t *config,
             positional_idx++;
 
             if (!positional_idx) { /*check for overflow */
-                P_ERR("Max number of arguments (%d) exceeded\n", UCHAR_MAX);
+                msg = "Max number of arguments exceeded";
                 error = -OPTPARSE_BADSYNTAX;
             }
 
             if (curr_rule == NULL) {
-                P_ERR("Argument %s missing key\n", argv[i] );
+                msg = "Too many arguments";
                 error = -OPTPARSE_BADSYNTAX; /* BYE! <===========> */
             }
         }
@@ -580,8 +573,13 @@ int optparse_cmd(const opt_conf_t *config,
         if (error >= OPTPARSE_OK && curr_rule != NULL) {
             error = do_action(curr_rule,
                               get_destination(config, curr_rule, result),
-                              positional_idx, value); /* BYE???? <==> */
+                              positional_idx, value, &msg); /* BYE???? <==> */
         }
+
+        if (msg) {
+            P_ERR("%s: %s\n", msg, argv[i]);
+        }
+
 parse_loop_end:
         if (pending_opt == NULL) {
             i++; /* "i" is only incremented here and above */
