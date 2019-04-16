@@ -423,6 +423,7 @@ int can_dll_dispatch_bus_off(kernel_pid_t pid)
     while (entry) {
         can_pkt_t *pkt = container_of(entry, can_pkt_t, entry);
         can_router_dispatch_tx_error(pkt);
+        can_pkt_free(pkt);
         LL_DELETE(tx_list[ifnum], entry);
         entry = tx_list[ifnum];
     }
