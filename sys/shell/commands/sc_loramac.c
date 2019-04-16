@@ -26,7 +26,7 @@
 #include "net/loramac.h"
 #include "semtech_loramac.h"
 
-semtech_loramac_t loramac;
+extern semtech_loramac_t loramac;
 
 /* Application key is 16 bytes long (e.g. 32 hex chars), and thus the longest
    possible size (with application session and network session keys) */
