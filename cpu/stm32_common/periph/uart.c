@@ -335,6 +335,16 @@ void uart_poweron(uart_t uart)
         pm_block(STM32_PM_STOP);
     }
 #endif
+#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+    if (uart_config[uart].cts_pin != GPIO_UNDEF) {
+        gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
+#ifdef CPU_FAM_STM32F1
+        gpio_init_af(uart_config[uart].rts_pin, GPIO_AF_OUT_PP);
+#else
+        gpio_init_af(uart_config[uart].rts_pin, uart_config[uart].rts_af);
+#endif
+    }
+#endif
     periph_clk_en(uart_config[uart].bus, uart_config[uart].rcc_mask);
 }
 
@@ -343,6 +353,12 @@ void uart_poweroff(uart_t uart)
     assert(uart < UART_NUMOF);
 
     periph_clk_dis(uart_config[uart].bus, uart_config[uart].rcc_mask);
+#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+    if (uart_config[uart].cts_pin != GPIO_UNDEF) {
+        gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
+        gpio_set(uart_config[uart].rts_pin);
+    }
+#endif
 #ifdef STM32_PM_STOP
     if (isr_ctx[uart].rx_cb) {
         pm_unblock(STM32_PM_STOP);
