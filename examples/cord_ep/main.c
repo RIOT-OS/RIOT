@@ -30,6 +30,8 @@
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
+#define NODE_INFO  "SOME NODE INFORMATION"
+
 /* we will use a custom event handler for dumping cord_ep events */
 static void _on_ep_event(cord_ep_standalone_event_t event)
 {
@@ -68,8 +70,8 @@ static ssize_t _handler_info(coap_pkt_t *pdu,
 
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
-    size_t slen = sizeof("SOME NODE INFOMRATION");
-    memcpy(pdu->payload, "SOME NODE INFOMRATION", slen);
+    size_t slen = sizeof(NODE_INFO);
+    memcpy(pdu->payload, NODE_INFO, slen);
     return resp_len + slen;
 }
 
