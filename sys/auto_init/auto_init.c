@@ -177,6 +177,10 @@ void auto_init(void)
     extern void nimble_riot_init(void);
     nimble_riot_init();
 #endif
+#ifdef MODULE_AUTO_INIT_LORAMAC
+    extern void auto_init_loramac(void);
+    auto_init_loramac();
+#endif
 
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
@@ -276,7 +280,7 @@ void auto_init(void)
     auto_init_w5100();
 #endif
 
-#ifdef MODULE_SX127X
+#if defined(MODULE_SX127X) && !defined(MODULE_SEMTECH_LORAMAC)
     extern void auto_init_sx127x(void);
     auto_init_sx127x();
 #endif
