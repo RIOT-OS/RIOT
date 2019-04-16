@@ -68,8 +68,8 @@ static ssize_t _handler_info(coap_pkt_t *pdu,
 
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
-    size_t slen = sizeof("SOME NODE INFOMRATION");
-    memcpy(pdu->payload, "SOME NODE INFOMRATION", slen);
+    size_t slen = sizeof("SOME NODE INFORMATION");
+    memcpy(pdu->payload, "SOME NODE INFORMATION", slen);
     return resp_len + slen;
 }
 
