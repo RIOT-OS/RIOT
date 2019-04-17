@@ -138,6 +138,7 @@
 
 #include "kernel_types.h"
 
+#include "net/gnrc/sixlowpan/config.h"
 #include "net/gnrc/sixlowpan/frag.h"
 #include "net/gnrc/sixlowpan/internal.h"
 #include "net/gnrc/sixlowpan/iphc.h"
@@ -145,27 +146,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-/**
- * @brief   Default stack size to use for the 6LoWPAN thread.
- */
-#ifndef GNRC_SIXLOWPAN_STACK_SIZE
-#define GNRC_SIXLOWPAN_STACK_SIZE       (THREAD_STACKSIZE_DEFAULT)
-#endif
-
-/**
- * @brief   Default priority for the 6LoWPAN thread.
- */
-#ifndef GNRC_SIXLOWPAN_PRIO
-#define GNRC_SIXLOWPAN_PRIO             (THREAD_PRIORITY_MAIN - 4)
-#endif
-
-/**
- * @brief   Default message queue size to use for the 6LoWPAN thread.
- */
-#ifndef GNRC_SIXLOWPAN_MSG_QUEUE_SIZE
-#define GNRC_SIXLOWPAN_MSG_QUEUE_SIZE   (8U)
 #endif
 
 /**
