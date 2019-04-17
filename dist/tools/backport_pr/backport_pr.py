@@ -173,17 +173,27 @@ def main():
                       new_branch,
                       WORKTREE_SUBDIR,
                       "{}/{}".format(upstream_remote, release_fullname))
-    bp_repo = git.Repo(worktree_dir)
-    # Apply commits
-    for commit in commits:
-        bp_repo.git.cherry_pick('-x', commit['sha'])
-    # Push to github
-    print("Pushing branch {} to origin".format(new_branch))
-    if not args.noop:
-        repo.git.push('origin', '{0}:{0}'.format(new_branch))
-    # Delete worktree
-    print("Pruning temporary workdir at {}".format(worktree_dir))
-    _delete_worktree(repo, worktree_dir)
+    try:
+        bp_repo = git.Repo(worktree_dir)
+        # Apply commits
+        for commit in commits:
+            bp_repo.git.cherry_pick('-x', commit['sha'])
+        # Push to github
+        print("Pushing branch {} to origin".format(new_branch))
+        if not args.noop:
+            repo.git.push('origin', '{0}:{0}'.format(new_branch))
+    except Exception as exc:
+        # Delete worktree
+        print("Pruning temporary workdir at {}".format(worktree_dir))
+        _delete_worktree(repo, worktree_dir)
+        # also delete branch created by worktree; this is only possible after
+        # the worktree was deleted
+        repo.delete_head(new_branch)
+        raise exc
+    else:
+        # Delete worktree
+        print("Pruning temporary workdir at {}".format(worktree_dir))
+        _delete_worktree(repo, worktree_dir)
 
     labels = _get_labels(pulldata)
     merger = pulldata['merged_by']['login']
