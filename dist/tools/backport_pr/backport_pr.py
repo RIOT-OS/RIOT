@@ -74,11 +74,17 @@ def _get_latest_release(branches):
     return (release_short, release_fullname)
 
 
-def _get_upstream(repo):
+def _find_remote(repo, user, repo_name):
     for remote in repo.remotes:
-        if (remote.url.endswith("{}/{}.git".format(ORG, REPO)) or
-                remote.url.endswith("{}/{}".format(ORG, REPO))):
+        if (remote.url.endswith("{}/{}.git".format(user, repo_name)) or
+                remote.url.endswith("{}/{}".format(user, repo_name))):
             return remote
+    raise ValueError("Could not find remote with URL ending in {}/{}.git"
+                     .format(user, repo_name))
+
+
+def _get_upstream(repo):
+    return _find_remote(repo, ORG, REPO)
 
 
 def _delete_worktree(repo, workdir):
