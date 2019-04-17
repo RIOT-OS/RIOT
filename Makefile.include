@@ -570,7 +570,7 @@ reset:
 	$(RESET) $(RESET_FLAGS)
 
 .PHONY: test test/available
-TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*),\
+TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*[^~]),\
                         $(shell test -f $(file) -a -x $(file) && echo $(file)))
 test: $(TEST_DEPS)
 	$(Q) for t in $(TESTS); do \
