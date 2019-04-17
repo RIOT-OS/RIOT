@@ -50,7 +50,7 @@ extern "C" {
 /**
  * @name    LED (on-board) configuration
  *
- * Olimex ESP32-GATEWAY has an ob-board LED.
+ * Olimex ESP32-GATEWAY has an on-board LED.
  * @{
  */
 #if MODULE_OLIMEX_ESP32_GATEWAY
