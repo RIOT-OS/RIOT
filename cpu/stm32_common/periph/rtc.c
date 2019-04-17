@@ -239,7 +239,11 @@ void rtc_init(void)
 
 int rtc_set_time(struct tm *time)
 {
+    /* normalize input */
+    rtc_tm_normalize(time);
+
     rtc_unlock();
+
     RTC->DR = (val2bcd((time->tm_year % 100), RTC_DR_YU_Pos, DR_Y_MASK) |
                val2bcd(time->tm_mon + 1,  RTC_DR_MU_Pos, DR_M_MASK) |
                val2bcd(time->tm_mday, RTC_DR_DU_Pos, DR_D_MASK));
@@ -269,6 +273,9 @@ int rtc_get_time(struct tm *time)
 
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
+    /* normalize input */
+    rtc_tm_normalize(time);
+
     rtc_unlock();
 
     /* disable existing alarm (if enabled) */
