@@ -73,7 +73,6 @@ static void _restore_uicr(void)
     NRF_UICR->APPROTECT = _buf.APPROTECT;
     NRF_UICR->NFCPINS = _buf.NFCPINS;
 #ifdef CPU_MODEL_NRF52840XXAA
-    NRF_UICR->EXTSUPPLY = _buf.EXTSUPPLY;
     NRF_UICR->REGOUT0 = _buf.REGOUT0;
 #endif
 
