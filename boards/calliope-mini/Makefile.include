@@ -17,7 +17,7 @@ ifeq (fscopy,$(PROGRAMMER))
   export DEBUGGER =
   export DEBUGSERVER =
 else ifeq (openocd,$(PROGRAMMER))
-  DEBUG_ADAPTER = jlink
+  DEBUG_ADAPTER = dap
 endif
 
 # include nrf51 boards common configuration
