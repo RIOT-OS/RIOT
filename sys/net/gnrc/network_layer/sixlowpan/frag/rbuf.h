@@ -25,14 +25,20 @@
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pkt.h"
 
+#include "net/gnrc/sixlowpan/config.h"
 #include "net/gnrc/sixlowpan/frag.h"
 #ifdef __cplusplus
 
 extern "C" {
 #endif
 
-#define RBUF_SIZE           (4U)               /**< size of the reassembly buffer */
-#define RBUF_TIMEOUT        (3U * US_PER_SEC) /**< timeout for reassembly in microseconds */
+/**
+ * @name Legacy defines
+ * @{
+ */
+#define RBUF_SIZE           (GNRC_SIXLOWPAN_FRAG_RBUF_SIZE)
+#define RBUF_TIMEOUT        (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS)
+/** @} */
 
 /**
  * @brief   Fragment intervals to identify limits of fragments.
