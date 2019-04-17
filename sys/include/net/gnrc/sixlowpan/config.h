@@ -21,6 +21,8 @@
 #ifndef NET_GNRC_SIXLOWPAN_CONFIG_H
 #define NET_GNRC_SIXLOWPAN_CONFIG_H
 
+#include "timex.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,6 +46,26 @@ extern "C" {
  */
 #ifndef GNRC_SIXLOWPAN_MSG_QUEUE_SIZE
 #define GNRC_SIXLOWPAN_MSG_QUEUE_SIZE       (8U)
+#endif
+
+/**
+ * @brief   Size of the reassembly buffer
+ *
+ * @note    Only applicable with
+ *          [gnrc_sixlowpan_frag](@ref net_gnrc_sixlowpan_frag) module
+ */
+#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_SIZE
+#define GNRC_SIXLOWPAN_FRAG_RBUF_SIZE       (4U)
+#endif
+
+/**
+ * @brief   Timeout for reassembly buffer entries in microseconds
+ *
+ * @note    Only applicable with
+ *          [gnrc_sixlowpan_frag](@ref net_gnrc_sixlowpan_frag) module
+ */
+#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS
+#define GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS (3U * US_PER_SEC)
 #endif
 
 /**
