@@ -185,9 +185,10 @@ def main():
         for commit in commits:
             bp_repo.git.cherry_pick('-x', commit['sha'])
         # Push to github
-        print("Pushing branch {} to origin".format(new_branch))
+        origin = _find_remote(repo, username, REPO)
+        print("Pushing branch {} to {}".format(new_branch, origin))
         if not args.noop:
-            repo.git.push('origin', '{0}:{0}'.format(new_branch))
+            repo.git.push(origin, '{0}:{0}'.format(new_branch))
     except Exception as exc:
         # Delete worktree
         print("Pruning temporary workdir at {}".format(worktree_dir))
