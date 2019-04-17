@@ -174,6 +174,9 @@ def main():
     # Build topic branch in temp dir
     new_branch = args.backport_branch_fmt.format(release=release_shortname,
                                                  origbranch=orig_branch)
+    if new_branch in repo.branches:
+        print("ERROR: Branch {} already exists".format(new_branch))
+        sys.exit(1)
     worktree_dir = os.path.join(args.gitdir, WORKTREE_SUBDIR)
     repo.git.worktree("add", "-b",
                       new_branch,
