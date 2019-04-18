@@ -139,7 +139,7 @@ LINKFLAGS += -Wl,--warn-unresolved-symbols
 # configure preflasher to convert .elf to .bin before flashing
 FLASH_MODE ?= dout  # FIX configuration, DO NOT CHANGE
 FLASH_FREQ  = 40m   # FIX configuration, DO NOT CHANGE
-FLASH_SIZE ?= 16m
+FLASH_SIZE ?= 2MB
 export PREFLASHER = $(ESPTOOL)
 export PREFFLAGS  = --chip esp32 elf2image
 export PREFFLAGS += -fm $(FLASH_MODE) -fs $(FLASH_SIZE) -ff $(FLASH_FREQ)
