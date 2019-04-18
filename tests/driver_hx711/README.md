@@ -1,0 +1,1 @@
+Check the hx711_driver_calibration for further details about how to calibrate the sensor.

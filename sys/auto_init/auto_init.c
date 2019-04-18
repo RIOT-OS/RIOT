@@ -381,6 +381,10 @@ void auto_init(void)
     extern void auto_init_hts221(void);
     auto_init_hts221();
 #endif
+#ifdef MODULE_HX711
+    extern void auto_init_hx711(void);
+    auto_init_hx711();
+#endif
 #ifdef MODULE_IO1_XPLAINED
     extern void auto_init_io1_xplained(void);
     auto_init_io1_xplained();
