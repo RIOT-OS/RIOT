@@ -25,14 +25,20 @@
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pkt.h"
 
+#include "net/gnrc/sixlowpan/config.h"
 #include "net/gnrc/sixlowpan/frag.h"
 #ifdef __cplusplus
 
 extern "C" {
 #endif
 
-#define RBUF_SIZE           (4U)               /**< size of the reassembly buffer */
-#define RBUF_TIMEOUT        (3U * US_PER_SEC) /**< timeout for reassembly in microseconds */
+/**
+ * @name Legacy defines
+ * @{
+ */
+#define RBUF_SIZE           (GNRC_SIXLOWPAN_FRAG_RBUF_SIZE)
+#define RBUF_TIMEOUT        (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS)
+/** @} */
 
 /**
  * @brief   Fragment intervals to identify limits of fragments.
@@ -90,8 +96,28 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *frag,
  */
 void rbuf_gc(void);
 
+/**
+ * @brief   Unsets a reassembly buffer entry (but does not free
+ *          rbuf_t::super::pkt)
+ *
+ * This functions sets rbuf_t::super::pkt to NULL and removes all rbuf::ints.
+ *
+ * @param[in] rbuf  A reassembly buffer entry
+ *
+ * @internal
+ */
 void rbuf_rm(rbuf_t *rbuf);
 
+/**
+ * @brief   Checks if a reassembly buffer entry is unset
+ *
+ * @param[in] rbuf  A reassembly buffer entry
+ *
+ * @return  true, if @p rbuf is empty (i.e. rbuf->super.pkt is NULL).
+ * @return  false, if @p rbuf is in use.
+ *
+ * @internal
+ */
 static inline bool rbuf_entry_empty(const rbuf_t *rbuf) {
     return (rbuf->super.pkt == NULL);
 }
