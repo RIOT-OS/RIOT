@@ -46,7 +46,8 @@
  * structs) ordered by the resource path, specifically the ASCII encoding of
  * the path characters (digit and capital precede lower case). Use
  * gcoap_register_listener() at application startup to pass in these resources,
- * wrapped in a gcoap_listener_t.
+ * wrapped in a gcoap_listener_t. Also see _Server path matching_ in the base
+ * [nanocoap](group__net__nanocoap.html) documentation.
  *
  * gcoap itself defines a resource for `/.well-known/core` discovery, which
  * lists all of the registered paths.
