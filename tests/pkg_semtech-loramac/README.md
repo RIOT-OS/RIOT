@@ -50,7 +50,7 @@ board.
 Depending on the type of radio device, set the `LORA_DRIVER` variable accordingly:
 For example:
 
-    LORA_DRIVER=sx1272 make BOARD=nucleo-f411re -C pkg/semtech-loramac flash term
+    LORA_DRIVER=sx1272 make BOARD=nucleo-f411re -C tests/pkg_semtech-loramac flash term
 
 will build the application for a nucleo-f411re with an SX1272 based mbed LoRa shield.
 
@@ -59,7 +59,7 @@ The SX1276 is the default value.
 The other parameter that has to be set at build time is the geographic region:
 `EU868`, `US915`, etc. See LoRaWAN regional parameters for more information.
 
-    LORA_REGION=US915 LORA_DRIVER=sx1272 make BOARD=nucleo-f411re -C pkg/semtech-loramac flash term
+    LORA_REGION=US915 LORA_DRIVER=sx1272 make BOARD=nucleo-f411re -C tests/pkg_semtech-loramac flash term
 
 will build the application for a nucleo-f411re with an SX1272 based mbed LoRa shield
 for US915 region.
