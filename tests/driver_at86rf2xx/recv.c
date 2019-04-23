@@ -111,7 +111,7 @@ void recv(netdev_t *dev)
         }
     }
     printf("\n");
-    printf("RSSI: %u, LQI: %u\n\n", rx_info.rssi, rx_info.lqi);
+    printf("RSSI: %i, LQI: %u\n\n", rx_info.rssi, rx_info.lqi);
 }
 
 /** @} */
