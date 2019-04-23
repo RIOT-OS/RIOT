@@ -6,8 +6,9 @@ RIOTBASE ?= .
 # 3. use patsubst to drop possible leading "./"
 # 4. sort
 APPLICATION_DIRS := $(sort $(patsubst ./%,%,$(patsubst %/,%,$(dir $(wildcard \
-	$(RIOTBASE)/examples/*/Makefile \
-	$(RIOTBASE)/tests/*/Makefile    \
+	$(RIOTBASE)/bootloaders/*/Makefile \
+	$(RIOTBASE)/examples/*/Makefile    \
+	$(RIOTBASE)/tests/*/Makefile       \
 	)))))
 
 info-applications:
