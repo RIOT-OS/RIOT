@@ -33,4 +33,3 @@ clean::
 
 distclean::
 	rm -rf $(PKG_BUILDDIR) $(PKGDIRBASE)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
-	rm -rf $(PKG_SHAFILE)
