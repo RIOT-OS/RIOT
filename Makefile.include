@@ -526,10 +526,12 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
-define flash-recipe
+# Define flash-recipe with a default value
+define default-flash-recipe
   $(call check_cmd,$(FLASHER),Flash program)
   $(FLASHER) $(FFLAGS)
 endef
+flash-recipe ?= $(default-flash-recipe)
 
 # Do not add dependencies to "flash" directly, use FLASHDEPS, as this is shared
 # with flash-only too
