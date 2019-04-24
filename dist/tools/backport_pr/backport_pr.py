@@ -182,6 +182,8 @@ def main():
                       new_branch,
                       WORKTREE_SUBDIR,
                       "{}/{}".format(upstream_remote, release_fullname))
+    # transform branch name into Head object for later configuring
+    new_branch = repo.branches[new_branch]
     try:
         bp_repo = git.Repo(worktree_dir)
         # Apply commits
