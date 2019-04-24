@@ -7,7 +7,8 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-nano \
                    esp8266-sparkfun-thing jiminy-mega256rfr2 mega-xplained \
                    msb-430 msb-430h telosb waspmote-pro \
                    wsn430-v1_3b wsn430-v1_4 z1
-BOARD_INSUFFICIENT_MEMORY = blackpill bluepill nucleo-f031k6 nucleo-f042k6 \
+BOARD_INSUFFICIENT_MEMORY = blackpill bluepill i-nucleo-lrwan1 \
+                            nucleo-f031k6 nucleo-f042k6 \
                             nucleo-l031k6 nucleo-f030r8 nucleo-f302r8 \
                             nucleo-f303k8 nucleo-f334r8 nucleo-l053r8 \
                             saml10-xpro saml11-xpro stm32f0discovery

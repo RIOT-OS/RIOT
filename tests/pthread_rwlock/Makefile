@@ -10,7 +10,8 @@ USEMODULE += pthread
 USEMODULE += xtimer
 USEMODULE += random
 
-BOARD_INSUFFICIENT_MEMORY += chronos msb-430 msb-430h nucleo-f031k6 \
+BOARD_INSUFFICIENT_MEMORY += chronos i-nucleo-lrwan1 \
+                             msb-430 msb-430h nucleo-f031k6 \
                              nucleo-f042k6 nucleo-l031k6 nucleo-f030r8 \
                              nucleo-f303k8 nucleo-f334r8 nucleo-l053r8 \
                              stm32f0discovery
