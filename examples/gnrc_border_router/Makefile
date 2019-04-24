@@ -10,7 +10,7 @@ RIOTBASE ?= $(CURDIR)/../..
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
                              arduino-nano arduino-uno b-l072z-lrwan1 blackpill \
                              bluepill calliope-mini cc2650-launchpad cc2650stk \
-                             hifive1 lsn50 maple-mini mega-xplained microbit msb-430 \
+                             hifive1 i-nucleo-lrwan1 lsn50 maple-mini mega-xplained microbit msb-430 \
                              msb-430h nrf51dk nrf51dongle nrf6310 \
                              nucleo-f031k6 nucleo-f042k6 \
                              nucleo-f303k8 nucleo-l031k6 nucleo-f030r8 \
