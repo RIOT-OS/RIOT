@@ -1,7 +1,8 @@
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-nano arduino-uno \
-                             chronos msb-430 msb-430h nucleo-f030r8 \
+                             chronos i-nucleo-lrwan1 \
+                             msb-430 msb-430h nucleo-f030r8 \
                              nucleo-l053r8 nucleo-f031k6 nucleo-f042k6 \
                              nucleo-l031k6 stm32f0discovery telosb \
                              wsn430-v1_3b wsn430-v1_4 z1
