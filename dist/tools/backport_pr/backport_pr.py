@@ -26,7 +26,7 @@ WORKTREE_SUBDIR = "backport_temp"
 RELEASE_PREFIX = ""
 RELEASE_SUFFIX = "-branch"
 
-LABELS_REMOVE = ['Process: needs backport']
+LABELS_REMOVE = ['Process: needs backport', 'Reviewed: ']
 LABELS_ADD = ['Process: release backport']
 
 BACKPORT_BRANCH = 'backport/{release}/{origbranch}'
@@ -36,14 +36,16 @@ def _get_labels(pr):
     """
     >>> _get_labels({'labels': [{'name': 'test'}, {'name': 'abcd'}]})
     ['Process: release backport', 'abcd', 'test']
+    >>> _get_labels({'labels': [{'name': 'Reviewed: what'}, {'name': 'Reviewed: 3-testing'}]})
+    ['Process: release backport']
     >>> _get_labels({'labels': [{'name': 'Process: release backport'}]})
     ['Process: release backport']
     >>> _get_labels({'labels': [{'name': 'Process: needs backport'}]})
     ['Process: release backport']
     """
-    labels = {label['name'] for label in pr['labels']}
-    for remove in LABELS_REMOVE:
-        labels.discard(remove)
+    labels = set(label['name'] for label in pr['labels']
+                 if all(not label['name'].startswith(remove)
+                        for remove in LABELS_REMOVE))
     labels.update(LABELS_ADD)
     return sorted(list(labels))
 
