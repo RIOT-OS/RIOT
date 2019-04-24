@@ -256,6 +256,21 @@ unsigned coap_get_content_type(coap_pkt_t *pkt)
     return content_type;
 }
 
+size_t coap_opt_by_index(const coap_pkt_t *pkt, uint16_t index,
+                            uint8_t **start)
+{
+    assert(pkt && index < pkt->options_len);
+
+    const coap_optpos_t *optslot = &pkt->options[index];
+    uint8_t *opt_pos = (uint8_t*)pkt->hdr + optslot->offset;
+    int opt_len;
+    uint16_t delta;
+
+    *start = _parse_option(pkt, opt_pos, &delta, &opt_len);
+
+    return opt_len;
+}
+
 ssize_t coap_opt_get_string(const coap_pkt_t *pkt, uint16_t optnum,
                             uint8_t *target, size_t max_len, char separator)
 {

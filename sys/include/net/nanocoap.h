@@ -749,6 +749,27 @@ size_t coap_opt_put_block2(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t 
 unsigned coap_get_content_type(coap_pkt_t *pkt);
 
 /**
+ * @brief   Access an option by its struct offset
+ *
+ * This function is for accessing arbitrary options in a message that was
+ * received, or was built using the struct-based API. It is useful for reading
+ * opaque options, updating values after they have been added (e.g. putting a
+ * value into a pre-allocated ETag after the payload was calculate), and when
+ * iterating over a message's options.
+ *
+ * It is up to the caller to ensure that optnum is valid, i.e. that `0 <= optnum
+ * < pkt->options_len`.
+ *
+ * @param[in]   pkt         packet to read from
+ * @param[in]   index       absolute option number
+ * @param[out]  start       pointer to the start of the option value
+ *
+ * @return      number of bytes available at @p start
+ */
+size_t coap_opt_by_index(const coap_pkt_t *pkt, uint16_t index,
+                            uint8_t **start);
+
+/**
  * @brief   Read a full option as null terminated string into the target buffer
  *
  * This function is for reading and concatenating string based, multi-part CoAP
