@@ -13,6 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-nano \
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_router_default
+USEMODULE += gnrc_pktbuf_cmd
 USEMODULE += gnrc_udp
 USEMODULE += gnrc_rpl
 USEMODULE += auto_init_gnrc_rpl
