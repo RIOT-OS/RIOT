@@ -33,6 +33,14 @@ BACKPORT_BRANCH = 'backport/{release}/{origbranch}'
 
 
 def _get_labels(pr):
+    """
+    >>> _get_labels({'labels': [{'name': 'test'}, {'name': 'abcd'}]})
+    ['Process: release backport', 'abcd', 'test']
+    >>> _get_labels({'labels': [{'name': 'Process: release backport'}]})
+    ['Process: release backport']
+    >>> _get_labels({'labels': [{'name': 'Process: needs backport'}]})
+    ['Process: release backport']
+    """
     labels = {label['name'] for label in pr['labels']}
     for remove in LABELS_REMOVE:
         labels.discard(remove)
