@@ -50,7 +50,8 @@
  * [nanocoap](group__net__nanocoap.html) documentation.
  *
  * gcoap itself defines a resource for `/.well-known/core` discovery, which
- * lists all of the registered paths.
+ * lists all of the registered paths. See the _Resource list creation_ section
+ * below for more.
  *
  * ### Creating a response ###
  *
@@ -81,6 +82,16 @@
  *
  * If no payload, call only gcoap_response() to write the full response. If you
  * need to add Options, follow the first three steps in the list above instead.
+ *
+ * ### Resource list creation ###
+ *
+ * gcoap allows customization of the function that provides the list of registered
+ * resources for `/.well-known/core` and CoRE Resource Directory registration.
+ * By default gcoap provides gcoap_encode_link(), which lists only the target
+ * path for each link. However, an application may specify a custom function in
+ * the gcoap_listener_t it registers with gcoap. For example, this function may
+ * add parameters to provide more information about the resource, as described
+ * in RFC 6690. See the gcoap example for use of a custom encoder function.
  *
  * ## Client Operation ##
  *
@@ -450,12 +461,45 @@ extern "C" {
 #endif
 
 /**
+ * @name Bitwise positional flags for encoding resource links
+ * @{
+ */
+#define COAP_LINK_FLAG_INIT_RESLIST  (1)  /**< initialize as for first resource
+                                           *   in a list */
+/** @} */
+
+/**
+ * @brief   Context information required to write a resource link
+ */
+typedef struct {
+    unsigned content_format;            /**< link format */
+    size_t link_pos;                    /**< position of link within listener */
+    uint16_t flags;                     /**< encoder switches; see GCOAP_LINK_FLAG_*
+                                             constants */
+} coap_link_encoder_ctx_t;
+
+/**
+ * @brief   Handler function to write a resource link
+ *
+ * @param[in] resource      Resource for link
+ * @param[out] buf          Buffer on which to write; may be null
+ * @param[in] maxlen        Remaining length for @p buf
+ * @param[in] context       Contextual information on what/how to write
+ *
+ * @return  count of bytes written to @p buf (or writable if @p buf is null)
+ * @return  -1 on error
+ */
+typedef ssize_t (*gcoap_link_encoder_t)(const coap_resource_t *resource, char *buf,
+                                        size_t maxlen, coap_link_encoder_ctx_t *context);
+
+/**
  * @brief   A modular collection of resources for a server
  */
 typedef struct gcoap_listener {
     const coap_resource_t *resources;   /**< First element in the array of
                                          *   resources; must order alphabetically */
     size_t resources_len;               /**< Length of array */
+    gcoap_link_encoder_t link_encoder;  /**< Writes a link for a resource */
     struct gcoap_listener *next;        /**< Next listener in list */
 } gcoap_listener_t;
 
@@ -714,6 +758,22 @@ uint8_t gcoap_op_state(void);
  * @return  -1 on error
  */
 int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf);
+
+/**
+ * @brief   Writes a resource in CoRE Link Format to a provided buffer.
+ *
+ * This default implementation only writes the resource path.
+ *
+ * @param[in]  resource  resource to write
+ * @param[out] buf       output buffer to write link into, may be null
+ * @param[in]  maxlen    length of @p buf, ignored if @p buf is NULL
+ * @param[in]  context   other parameters that affect how link is written
+ *
+ * @return  count of bytes written to @p buf (or writable if @p buf is null)
+ * @return  -1 on error
+ */
+ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
+                          size_t maxlen, coap_link_encoder_ctx_t *context);
 
 /**
  * @brief   Adds a single Uri-Query option to a CoAP request
