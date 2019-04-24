@@ -192,6 +192,8 @@ def main():
                       new_branch,
                       WORKTREE_SUBDIR,
                       "{}/{}".format(upstream_remote, release_fullname))
+    # transform branch name into Head object for later configuring
+    new_branch = repo.branches[new_branch]
     try:
         bp_repo = git.Repo(worktree_dir)
         # Apply commits
@@ -201,7 +203,8 @@ def main():
         origin = _find_remote(repo, username, REPO)
         print("Pushing branch {} to {}".format(new_branch, origin))
         if not args.noop:
-            repo.git.push(origin, '{0}:{0}'.format(new_branch))
+            push_info = origin.push('{0}:{0}'.format(new_branch))
+            new_branch.set_tracking_branch(push_info[0].remote_ref)
     except Exception as exc:
         # Delete worktree
         print("Pruning temporary workdir at {}".format(worktree_dir))
