@@ -10,6 +10,9 @@ which to listen. Provides these resources:
 `/value`<br>
 Reads/Writes an unsigned 8-bit integer.
 
+`/req-opts`<br>
+Hex-dumps all options in the request message into a response.
+
 `/.well-known/core`<br>
 Reads the list of resources. Expects a block2 based request or else returns at
 most the first 16 bytes of the list.

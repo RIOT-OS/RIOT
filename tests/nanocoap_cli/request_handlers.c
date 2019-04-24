@@ -71,9 +71,43 @@ static ssize_t _value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *c
             COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
 }
 
+static ssize_t _reqopts_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+{
+    (void) context;
+
+    ssize_t p = 0;
+    char rsp[128];
+
+    for (uint16_t i = 0; i < pkt->options_len; ++i) {
+        uint16_t optnum = pkt->options[i].opt_num;
+        p += snprintf(&rsp[p], sizeof(rsp) - p, "%d: ", optnum);
+        if ((size_t)p >= sizeof(rsp))
+            goto error;
+        uint8_t *optcursor;
+        size_t length = coap_opt_by_index(pkt, i, &optcursor);
+        for (size_t j = 0; j < length; ++j) {
+            p += snprintf(&rsp[p], sizeof(rsp) - p, "%02x", optcursor[j]);
+            if ((size_t)p >= sizeof(rsp))
+                goto error;
+        }
+        p += snprintf(&rsp[p], sizeof(rsp) - p, "\n");
+        if ((size_t)p >= sizeof(rsp))
+            goto error;
+    }
+
+    return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
+            COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
+
+error:
+    rsp[sizeof(rsp) - 1] = '_';
+    return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
+            COAP_FORMAT_TEXT, (uint8_t*)rsp, sizeof(rsp));
+}
+
 /* must be sorted by path (ASCII order) */
 const coap_resource_t coap_resources[] = {
     COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER,
+    { "/req-opts", COAP_GET, _reqopts_handler, NULL },
     { "/value", COAP_GET | COAP_PUT | COAP_POST, _value_handler, NULL },
 };
 
