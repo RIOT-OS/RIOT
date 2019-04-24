@@ -157,6 +157,17 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context
     return pkt_pos - (uint8_t*)pkt->hdr;
 }
 
+/* example for having a subtree of coap resources handled by
+ * coap_subtree_handler */
+const coap_resource_t _subtree_example[] = {
+    { "/subtree/riot/ver", COAP_GET, _riot_block2_handler, NULL },
+};
+
+const coap_resource_subtree_t _subtree = {
+    _subtree_example,
+    1   /* number of entries in _subtree_example */
+};
+
 /* must be sorted by path (ASCII order) */
 const coap_resource_t coap_resources[] = {
     COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER,
@@ -165,6 +176,7 @@ const coap_resource_t coap_resources[] = {
     { "/riot/value", COAP_GET | COAP_PUT | COAP_POST, _riot_value_handler, NULL },
     { "/riot/ver", COAP_GET, _riot_block2_handler, NULL },
     { "/sha256", COAP_POST, _sha256_handler, NULL },
+    { "/subtree", COAP_GET | COAP_MATCH_SUBTREE, coap_subtree_handler, (void *)&_subtree },
 };
 
 const unsigned coap_resources_numof = sizeof(coap_resources) / sizeof(coap_resources[0]);
