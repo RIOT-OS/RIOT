@@ -597,23 +597,6 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
                        gcoap_resp_handler_t resp_handler);
 
 /**
- * @brief  Sends a buffer containing a CoAP request to the provided host/port
- *
- * @deprecated  Please use @ref gcoap_req_send2() instead
- *
- * @param[in] buf           Buffer containing the PDU
- * @param[in] len           Length of the buffer
- * @param[in] addr          Destination for the packet
- * @param[in] port          Port at the destination
- * @param[in] resp_handler  Callback when response received, may be NULL
- *
- * @return  length of the packet
- * @return  0 if cannot send
- */
-size_t gcoap_req_send(const uint8_t *buf, size_t len, const ipv6_addr_t *addr,
-                      uint16_t port, gcoap_resp_handler_t resp_handler);
-
-/**
  * @brief   Initializes a CoAP response packet on a buffer
  *
  * Initializes payload location within the buffer based on packet setup.
