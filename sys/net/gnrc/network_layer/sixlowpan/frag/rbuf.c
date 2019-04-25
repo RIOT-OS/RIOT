@@ -322,10 +322,17 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
         /* if oldest is not empty, res must not be NULL (because otherwise
          * oldest could have been picked as res) */
         assert(!rbuf_entry_empty(oldest));
-        DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
-        gnrc_pktbuf_release(oldest->super.pkt);
-        rbuf_rm(oldest);
-        res = oldest;
+        if (GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE ||
+            ((now_usec - oldest->arrival) >
+            GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS)) {
+            DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
+            gnrc_pktbuf_release(oldest->super.pkt);
+            rbuf_rm(oldest);
+            res = oldest;
+        }
+        else {
+            return NULL;
+        }
     }
 
     /* now we have an empty spot */
