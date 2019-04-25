@@ -29,6 +29,10 @@
 #include "clist.h"
 #include "thread.h"
 
+#ifdef MODULE_XTIMER
+#include "xtimer.h"
+#endif
+
 void event_queue_init_detached(event_queue_t *queue)
 {
     assert(queue);
@@ -109,6 +113,30 @@ event_t *event_wait(event_queue_t *queue)
     result->list_node.next = NULL;
     return result;
 }
+
+#ifdef MODULE_XTIMER
+event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout)
+{
+    assert(queue);
+    event_t *result;
+    xtimer_t timer;
+    thread_flags_t flags = 0;
+
+    xtimer_set_timeout_flag(&timer, timeout);
+    do {
+        result = event_get(queue);
+        if (result == NULL) {
+            flags = thread_flags_wait_any(THREAD_FLAG_EVENT | THREAD_FLAG_TIMEOUT);
+        }
+    } while ((result == NULL) && (flags & THREAD_FLAG_EVENT));
+
+    if (result) {
+        xtimer_remove(&timer);
+    }
+
+    return result;
+}
+#endif
 
 void event_loop(event_queue_t *queue)
 {
