@@ -113,15 +113,23 @@ static void write(int argc, char **argv)
         puts("error: undefined device given");
         return;
     }
+    /* get the 'undefined value for the device */
+    int undef = saul_reg_get_undef_value(dev);
+
     /* parse value(s) */
     memset(&data, 0, sizeof(data));
     dim = ((argc - 3) > (int)PHYDAT_DIM) ? (int)PHYDAT_DIM : (argc - 3);
-    for (int i = 0; i < dim; i++) {
-        data.val[i] = atoi(argv[i + 3]);
+    for (int i = 0; i < (int)PHYDAT_DIM; i++) {
+        if (i < dim) {
+            data.val[i] = atoi(argv[i + 3]);
+        }
+        else {
+            data.val[i] = undef;
+        }
     }
     /* print values before writing */
     printf("Writing to device #%i - %s\n", num, dev->name);
-    phydat_dump(&data, dim);
+    phydat_dump(&data, PHYDAT_DIM);
     /* write values to device */
     dim = saul_reg_write(dev, &data);
     if (dim <= 0) {
