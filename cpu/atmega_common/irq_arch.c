@@ -52,7 +52,7 @@ __attribute__((always_inline)) inline void __set_interrupt_state(uint8_t state)
                       "out __SREG__, r15 \n\t"
                       :
                       : "g"(state)
-                      : "r15", "r16");
+                      : "r15", "r16", "memory");
 }
 
 /**
@@ -61,7 +61,7 @@ __attribute__((always_inline)) inline void __set_interrupt_state(uint8_t state)
 unsigned int irq_disable(void)
 {
     uint8_t mask = __get_interrupt_state();
-    cli();
+    cli(); /* <-- acts as memory barrier, see doc of avr-libc */
     return (unsigned int) mask;
 }
 
@@ -71,7 +71,7 @@ unsigned int irq_disable(void)
 unsigned int irq_enable(void)
 {
     uint8_t mask = __get_interrupt_state();
-    sei();
+    sei(); /* <-- acts as memory barrier, see doc of avr-libc */
     return mask;
 }
 
@@ -88,5 +88,7 @@ void irq_restore(unsigned int state)
  */
 int irq_is_in(void)
 {
-    return __in_isr;
+    int result = __in_isr;
+    __asm__ volatile("" ::: "memory");
+    return result;
 }
