@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2017 Inria
  *               2017 Kaspar Schleiser <kaspar@schleiser.de>
- *               2018 Freie Universität Berlin
+ *               2018-2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -230,6 +230,19 @@ event_t *event_get(event_queue_t *queue);
  * @returns     pointer to next event
  */
 event_t *event_wait(event_queue_t *queue);
+
+#if defined(MODULE_XTIMER) || defined(DOXYGEN)
+/**
+ * @brief   Get next event from event queue, blocking until timeout expires
+ *
+ * @param[in]   queue    queue to query for an event
+ * @param[in]   timeout  maximum time to wait for an event to be posted in us
+ *
+ * @return      pointer to next event if event was taken from the queue
+ * @return      NULL if timeout expired before an event was posted
+ */
+event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout);
+#endif
 
 /**
  * @brief   Simple event loop
