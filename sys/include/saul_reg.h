@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2019 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,6 +20,7 @@
  * @brief       SAUL registry interface definition
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
 #ifndef SAUL_REG_H
@@ -134,6 +136,19 @@ int saul_reg_read(saul_reg_t *dev, phydat_t *res);
  * @return      -ECANCELED on device errors
  */
 int saul_reg_write(saul_reg_t *dev, phydat_t *data);
+
+/**
+ * @brief   Get the value that represents 'undefined' for a given device.
+ *          When that value is used in one dimension during a write operation,
+ *          it will be ignored by the device.
+ *
+ * @param[in] dev       device from which to get the value
+ *
+ * @return      the 'undefined' value for the device
+ */
+static inline int saul_reg_get_undef_value(saul_reg_t *dev) {
+    return dev->driver->undef_value;
+}
 
 #ifdef __cplusplus
 }
