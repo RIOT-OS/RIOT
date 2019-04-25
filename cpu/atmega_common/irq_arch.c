@@ -70,8 +70,9 @@ unsigned int irq_disable(void)
  */
 unsigned int irq_enable(void)
 {
+    uint8_t mask = __get_interrupt_state();
     sei();
-    return __get_interrupt_state();
+    return mask;
 }
 
 /**
