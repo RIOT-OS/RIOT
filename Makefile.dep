@@ -663,6 +663,10 @@ ifneq (,$(filter gnrc_netif_%,$(USEMODULE)))
   USEMODULE += gnrc_netif
 endif
 
+ifneq (,$(filter gnrc_netif_pktq,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter netstats_%, $(USEMODULE)))
   USEMODULE += netstats
 endif

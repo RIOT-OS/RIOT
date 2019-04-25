@@ -66,6 +66,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief       Time in microseconds for when to try send a queued packet at the
+ *              latest
+ *
+ * @see         net_gnrc_netif_pktq
+ */
+#ifndef GNRC_NETIF_PKTQ_TIMER_US
+#define GNRC_NETIF_PKTQ_TIMER_US   (5000U)
+#endif
+
+/**
  * @brief   Number of multicast addresses needed for @ref net_gnrc_rpl "RPL".
  *
  * @note    Used for calculation of @ref GNRC_NETIF_IPV6_GROUPS_NUMOF

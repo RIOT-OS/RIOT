@@ -70,6 +70,9 @@
 #endif
 #include "rmutex.h"
 #include "net/netif.h"
+#ifdef MODULE_GNRC_NETIF_PKTQ
+#include "xtimer.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -182,6 +185,8 @@ typedef struct {
      * @note    Only available with @ref net_gnrc_netif_pktq.
      */
     gnrc_pktqueue_t *send_queue;
+    msg_t dequeue_msg;                      /**< message for gnrc_netif_t::dequeue_timer to send */
+    xtimer_t dequeue_timer;                 /**< timer to schedule next sending of queued packets */
 #endif
     uint8_t cur_hl;                         /**< Current hop-limit for out-going packets */
     uint8_t device_type;                    /**< Device type */
