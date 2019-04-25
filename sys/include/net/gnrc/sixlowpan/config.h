@@ -69,6 +69,22 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Aggressively override reassembly buffer when full
+ *
+ * @note    Only applicable with
+ *          [gnrc_sixlowpan_frag](@ref net_gnrc_sixlowpan_frag) module
+ *
+ * When set to a non-zero value this will cause the reassembly buffer to
+ * override the oldest entry no matter what. When set to zero only the oldest
+ * entry that is older than @ref GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS will be
+ * overwritten (they will still timeout normally if reassembly buffer is not
+ * full).
+ */
+#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE
+#define GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE    (1)
+#endif
+
+/**
  * @brief   Registration lifetime in minutes for the address registration option
  *
  * This value should be adapted to the devices power-lifecycle so that it is
