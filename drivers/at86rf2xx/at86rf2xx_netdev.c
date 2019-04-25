@@ -122,11 +122,19 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
     size_t len = 0;
+    uint8_t state;
 
     if (_is_busy(dev)) {
         return -EBUSY;
     }
-    at86rf2xx_tx_prepare(dev);
+    /* at86rf2xx_tx_prepare unrolled and re-ordered for quick state
+     * transition */
+    state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
+    if (state != AT86RF2XX_STATE_TX_ARET_ON) {
+        dev->idle_state = state;
+    }
+    dev->pending_tx++;
+    dev->tx_frame_len = IEEE802154_FCS_LEN;
 
     /* load packet data into FIFO */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
