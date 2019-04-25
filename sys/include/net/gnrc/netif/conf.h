@@ -137,6 +137,17 @@ extern "C" {
 #define GNRC_NETIF_DEFAULT_HL      (64U)   /**< default hop limit */
 #endif
 
+/**
+ * @brief   Minimum wait time in microseconds after a send operation
+ *
+ * @experimental
+ *
+ * This is purely meant as a debugging feature to slow down a radios sending.
+ */
+#ifndef GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
+#define GNRC_NETIF_MIN_WAIT_AFTER_SEND_US   (0U)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
