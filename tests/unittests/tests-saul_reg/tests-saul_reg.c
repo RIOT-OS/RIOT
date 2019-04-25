@@ -25,10 +25,10 @@
 #include "saul_reg.h"
 #include "tests-saul_reg.h"
 
-static const saul_driver_t s0_dri = { NULL, NULL, SAUL_ACT_SERVO };
-static const saul_driver_t s1_dri = { NULL, NULL, SAUL_SENSE_TEMP };
-static const saul_driver_t s2_dri = { NULL, NULL, SAUL_SENSE_LIGHT };
-static const saul_driver_t s3_dri = { NULL, NULL, SAUL_ACT_LED_RGB };
+static const saul_driver_t s0_dri = { NULL, NULL, SAUL_ACT_SERVO,   0 };
+static const saul_driver_t s1_dri = { NULL, NULL, SAUL_SENSE_TEMP,  0 };
+static const saul_driver_t s2_dri = { NULL, NULL, SAUL_SENSE_LIGHT, 0 };
+static const saul_driver_t s3_dri = { NULL, NULL, SAUL_ACT_LED_RGB, 0 };
 
 static saul_reg_t s0 = { NULL, NULL, "S0", &s0_dri };
 static saul_reg_t s1 = { NULL, NULL, "S1", &s1_dri };

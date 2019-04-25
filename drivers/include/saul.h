@@ -138,6 +138,12 @@ typedef int(*saul_read_t)(const void *dev, phydat_t *res);
  * For actuators this function is used to influence the actuators state, e.g.
  * switching a switch or setting the speed of a motor.
  *
+ * If a dimension of @p data should be ignored by the device, its value should
+ * be @ref saul_driver_t::undef_value "'undefined'". The 'undefined' value
+ * depends on the device.
+ *
+ * @see saul_reg_get_undef_value
+ *
  * @param[in] dev       device descriptor of the target device
  * @param[in] data      data to write to the device
  *
@@ -154,7 +160,14 @@ typedef struct {
     saul_read_t read;       /**< read function pointer */
     saul_write_t write;     /**< write function pointer */
     uint8_t type;           /**< device class the device belongs to */
+    int16_t undef_value;    /**< value used to ignore a dimension during writing */
 } saul_driver_t;
+
+/**
+ * @brief   Default value to be used in the write operation when a dimension
+ *          should be ignored
+ */
+#define SAUL_DEFAULT_UNDEF_VAL  (0)
 
 /**
  * @brief   Default not supported function
