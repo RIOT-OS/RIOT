@@ -597,6 +597,27 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
                       gcoap_resp_handler_t resp_handler);
 
 /**
+ * @brief   Sends a buffer containing a CoAP request to the provided endpoint
+ *
+ * @deprecated  Migration alias for @ref gcoap_req_send(). Will be removed after
+ *              the 2020.01 release.
+ *
+ * @param[in] buf           Buffer containing the PDU
+ * @param[in] len           Length of the buffer
+ * @param[in] remote        Destination for the packet
+ * @param[in] resp_handler  Callback when response received, may be NULL
+ *
+ * @return  length of the packet
+ * @return  0 if cannot send
+ */
+static inline size_t gcoap_req_send2(const uint8_t *buf, size_t len,
+                                     const sock_udp_ep_t *remote,
+                                     gcoap_resp_handler_t resp_handler)
+{
+    return gcoap_req_send(buf, len, remote, resp_handler);
+}
+
+/**
  * @brief   Initializes a CoAP response packet on a buffer
  *
  * Initializes payload location within the buffer based on packet setup.
