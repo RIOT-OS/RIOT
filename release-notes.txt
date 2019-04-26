@@ -226,6 +226,7 @@ Native related issues
 
 Other platform related issues
 -----------------------------
+#11447: frdm-k64f: hwrng support broken, applications using RNG crash
 #11354: ESP32: `write(STDIO_FILENO, ...)` not working
 #11104: STM32: SPI clock not returning to idle state and generating additional
         clock cycles
