@@ -183,7 +183,7 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 
     uint32_t *p;
 
-    p = (uint32_t *)(((uint32_t)(top_of_stack + 1) - XT_CP_SIZE) & ~0xf);
+    p = (uint32_t *)(((uint32_t)(top_of_stack + 1) - XT_CP_SIZE));
     p[0] = 0;
     p[1] = 0;
     p[2] = (((uint32_t) p) + 12 + XCHAL_TOTAL_SA_ALIGN - 1) & -XCHAL_TOTAL_SA_ALIGN;
