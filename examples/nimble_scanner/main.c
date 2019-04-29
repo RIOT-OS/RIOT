@@ -57,7 +57,7 @@ int _cmd_scan(int argc, char **argv)
 }
 
 static const shell_command_t _commands[] = {
-    { "scan", "trigger a BLE scann", _cmd_scan },
+    { "scan", "trigger a BLE scan", _cmd_scan },
     { NULL, NULL, NULL }
 };
 
