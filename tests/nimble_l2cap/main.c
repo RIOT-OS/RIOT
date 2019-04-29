@@ -29,6 +29,8 @@
 
 #include "assert.h"
 #include "shell.h"
+#include "thread.h"
+#include "thread_flags.h"
 #include "net/bluetil/ad.h"
 
 #include "nimble_l2cap_test_conf.h"
@@ -36,8 +38,9 @@
 #define ENABLE_DEBUG        (1)
 #include "debug.h"
 
-#define FLAG_UP         (1u << 0)
-#define FLAG_SYNC       (1u << 1)
+#define FLAG_UP             (1u << 0)
+#define FLAG_SYNC           (1u << 1)
+#define FLAG_TX_UNSTALLED   (1u << 2)
 
 /* synchronization state */
 static thread_t *_main;
@@ -95,6 +98,9 @@ static int _on_l2cap_evt(struct ble_l2cap_event *event, void *arg)
             break;
         case BLE_L2CAP_EVENT_COC_DATA_RECEIVED:
             _on_data(event);
+            break;
+        case BLE_L2CAP_EVENT_COC_TX_UNSTALLED:
+            thread_flags_set(_main, FLAG_TX_UNSTALLED);
             break;
         case BLE_L2CAP_EVENT_COC_ACCEPT:
             /* this event should never be triggered for the L2CAP client */
@@ -191,9 +197,12 @@ static void _send(uint32_t type, uint32_t seq, size_t len)
 
     do {
         res = ble_l2cap_send(_coc, txd);
+        if (res == BLE_HS_EBUSY) {
+            thread_flags_wait_all(FLAG_TX_UNSTALLED);
+        }
     } while (res == BLE_HS_EBUSY);
 
-    if (res != 0) {
+    if ((res != 0) && (res != BLE_HS_ESTALLED)) {
         printf("# err: failed to send (%i)\n", res);
         assert(0);
     }
