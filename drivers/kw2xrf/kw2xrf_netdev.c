@@ -73,6 +73,14 @@ static int _init(netdev_t *netdev)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
 
+    /* fill transceiver capabilities */
+    netdev_ieee802154_t *ieee802154_dev = (netdev_ieee802154_t*) netdev;
+    ieee802154_dev->caps = NETDEV_IEEE802154_CAPS_TX_CHECKSUM    |
+                           NETDEV_IEEE802154_CAPS_CSMA           |
+                           NETDEV_IEEE802154_CAPS_ADDRESS_FILTER |
+                           NETDEV_IEEE802154_CAPS_AUTO_ACK       |
+                           NETDEV_IEEE802154_CAPS_PROMISCUOUS;
+
     dev->thread = (thread_t *)thread_get(thread_getpid());
 
     /* initialize SPI and GPIOs */
