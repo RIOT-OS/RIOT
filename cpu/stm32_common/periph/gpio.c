@@ -237,9 +237,9 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     SYSCFG->EXTICR[pin_num >> 2] |= (port_num << ((pin_num & 0x03) * 4));
 
     /* clear any pending requests */
-    EXTI->PR = (1 << pin);
+    EXTI->PR = (1 << pin_num);
     /* unmask the pins interrupt channel */
-    EXTI->IMR |= (1 << pin);
+    EXTI->IMR |= (1 << pin_num);
 
     return 0;
 }
