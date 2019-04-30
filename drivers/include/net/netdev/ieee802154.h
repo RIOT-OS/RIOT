@@ -20,6 +20,7 @@
 #ifndef NET_NETDEV_IEEE802154_H
 #define NET_NETDEV_IEEE802154_H
 
+#include <stdbool.h>
 #include "net/ieee802154.h"
 #include "net/gnrc/nettype.h"
 #include "net/netopt.h"
@@ -79,6 +80,66 @@ typedef enum {
 } netdev_ieee802154_cca_mode_t;
 
 /**
+ * @name IEEE 802.15.4 radio caps
+ * @brief Flags that indicate IEEE 802.15.4 capabilities on transceivers
+ *
+ * @{
+ */
+
+/**
+ * @brief Transceiver calculates FCS on transmission
+ */
+#define NETDEV_IEEE802154_CAPS_TX_CHECKSUM              (1<<0)
+
+/**
+ * @brief Transceiver supports CSMA
+ */
+#define NETDEV_IEEE802154_CAPS_CSMA                     (1<<1)
+
+/**
+ * @brief Transceiver supports energy scan
+ */
+#define NETDEV_IEEE802154_CAPS_ENERGY_SCAN              (1<<2)
+
+/**
+ * @brief Transceiver supports automatic retransmission of frames (with CSMA)
+ */
+#define NETDEV_IEEE802154_CAPS_FRAME_RETRIES            (1<<3)
+
+/**
+ * @brief Transceiver handles ACK automatically
+ */
+#define NETDEV_IEEE802154_CAPS_AUTO_ACK                 (1<<4)
+
+/**
+ * @brief Transceiver removes FCS on received packet
+ */
+#define NETDEV_IEEE802154_CAPS_RX_OMIT_CHECKSUM         (1<<5)
+
+/**
+ * @brief Transceiver drops packet on bad checksum
+ */
+#define NETDEV_IEEE802154_CAPS_RX_DROP_BAD_CHECKSUM     (1<<6)
+
+/**
+ * @brief Transceiver supports address filtering
+ */
+#define NETDEV_IEEE802154_CAPS_ADDRESS_FILTER           (1<<7)
+
+/**
+ * @brief Transceiver supports promiscuous mode
+ */
+#define NETDEV_IEEE802154_CAPS_PROMISCUOUS              (1<<8)
+/**
+ * @}
+ */
+
+/**
+ * @brief IEEE 802.15.4 transceiver capabilites type definition
+ */
+typedef uint16_t netdev_ieee802154_trx_caps_t;
+
+/**
  * @brief Extended structure to hold IEEE 802.15.4 driver state
  *
  * @extends netdev_t
@@ -115,6 +176,7 @@ typedef struct {
     uint8_t page;                           /**< channel page */
     uint16_t flags;                         /**< flags as defined above */
     int16_t txpower;                        /**< tx power in dBm */
+    netdev_ieee802154_trx_caps_t caps;      /**< radio capabilities flags */
     /** @} */
 } netdev_ieee802154_t;
 
@@ -133,6 +195,20 @@ typedef struct netdev_radio_rx_info netdev_ieee802154_rx_info_t;
  */
 void netdev_ieee802154_reset(netdev_ieee802154_t *dev);
 
+/**
+ * @brief   Check if the IEEE802.15.4 radio supports a given capability
+ *
+ * @param[in] netdev    IEEE802.15.4 device descriptor
+ * @param[in] cap       Capability to be checked
+ *
+ * @return              true if the radio supports the given cap.
+ * @return              false otherwise
+ */
+static inline bool netdev_ieee802154_has_cap(netdev_ieee802154_t *netdev,
+        netdev_ieee802154_trx_caps_t cap)
+{
+    return netdev->caps & cap;
+}
 
 /**
  * @brief   Fallback function for netdev IEEE 802.15.4 devices' _get function
