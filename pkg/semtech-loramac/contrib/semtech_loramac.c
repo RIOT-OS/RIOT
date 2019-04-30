@@ -31,6 +31,7 @@
 #include "mutex.h"
 
 #include "net/netdev.h"
+#include "net/netdev/lora.h"
 #include "net/loramac.h"
 
 #include "sx127x.h"
@@ -39,6 +40,7 @@
 
 #include "semtech_loramac.h"
 #include "LoRaMac.h"
+#include "LoRaMacTest.h"
 #include "region/Region.h"
 
 #ifdef MODULE_PERIPH_EEPROM
@@ -426,6 +428,9 @@ void _init_loramac(semtech_loramac_t *mac,
     primitives->MacMlmeIndication = mlme_indication;
     LoRaMacInitialization(&semtech_loramac_radio_events, primitives, callbacks,
                           LORAMAC_ACTIVE_REGION);
+#ifdef DISABLE_LORAMAC_DUTYCYCLE
+    LoRaMacTestSetDutyCycleOn(false);
+#endif
     mutex_unlock(&mac->lock);
 
     semtech_loramac_set_dr(mac, LORAMAC_DEFAULT_DR);
@@ -579,7 +584,7 @@ static void _semtech_loramac_call(semtech_loramac_func_t func, void *arg)
 
 static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
 {
-    netdev_sx127x_lora_packet_info_t packet_info;
+    netdev_lora_rx_info_t packet_info;
 
     msg_t msg;
     msg.content.ptr = dev;
@@ -630,12 +635,18 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
 
         case NETDEV_EVENT_FHSS_CHANGE_CHANNEL:
             DEBUG("[semtech-loramac] FHSS channel change\n");
-            semtech_loramac_radio_events.FhssChangeChannel(((sx127x_t *)dev)->_internal.last_channel);
+            if(semtech_loramac_radio_events.FhssChangeChannel) {
+                semtech_loramac_radio_events.FhssChangeChannel((
+                            (sx127x_t *)dev)->_internal.last_channel);
+            }
             break;
 
         case NETDEV_EVENT_CAD_DONE:
             DEBUG("[semtech-loramac] test: CAD done\n");
-            semtech_loramac_radio_events.CadDone(((sx127x_t *)dev)->_internal.is_last_cad_success);
+            if(semtech_loramac_radio_events.CadDone) {
+                semtech_loramac_radio_events.CadDone((
+                            (sx127x_t *)dev)->_internal.is_last_cad_success);
+            }
             break;
 
         default:

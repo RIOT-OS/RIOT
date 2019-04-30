@@ -71,7 +71,7 @@ UARTs       | 3 | yes
 WiFi        | IEEE 802.11 b/g/n built in | yes
 Bluetooth   | v4.2 BR/EDR and BLE | no
 Ethernet    | MAC interface with dedicated DMA and IEEE 1588 support | yes
-CAN         | version 2.0 | no
+CAN         | version 2.0 | yes
 IR          | up to 8 channels TX/RX | no
 Motor PWM   | 2 devices x 6 channels | yes
 LED PWM     | 16 channels | no
@@ -215,7 +215,7 @@ MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network i
 #define ENC28J80_PARAM_CS       GPIO9       /* ENC28J80 CS signal    */
 #define ENC28J80_PARAM_INT      GPIO10      /* ENC28J80 INT signal   */
 #define ENC28J80_PARAM_RESET    GPIO12      /* ENC28J80 RESET signal */
-endif
+#endif
 
 #endif
 ```

@@ -6,19 +6,36 @@ USEMODULE += xtimer
 # glue code
 USEMODULE += nimble_riot_contrib
 
-# nimble sub-modules that we build
-USEMODULE += nimble_tinycrypt
-USEMODULE += nimble_host
-USEMODULE += nimble_host_services_gap
-USEMODULE += nimble_host_services_gatt
-USEMODULE += nimble_host_util
-USEMODULE += nimble_host_store_ram
+# RIOT port
 USEMODULE += nimble_porting_nimble
 USEMODULE += nimble_npl_riot
 
-# nimble controller specific sub-modules
-USEMODULE += nimble_controller
-USEMODULE += nimble_transport_ram
-ifeq (nrf52,$(CPU_FAM))
-  USEMODULE += nimble_drivers_nrf52
+# if nothing else is specified, we build the host and controller
+ifeq (,$(filter nimble_host nimble_controller,$(USEMODULE)))
+  USEMODULE += nimble_host
+  USEMODULE += nimble_controller
+endif
+
+# include host dependencies
+ifneq (,$(filter nimble_host,$(USEMODULE)))
+  USEMODULE += nimble_host_util
+  USEMODULE += nimble_tinycrypt
+  USEMODULE += nimble_host_store_ram
+endif
+
+# nimble controller dependencies
+ifneq (,$(filter nimble_controller,$(USEMODULE)))
+  USEMODULE += nimble_transport_ram
+  ifeq (nrf52,$(CPU_FAM))
+    USEMODULE += nimble_drivers_nrf52
+  endif
+endif
+
+ifneq (,$(filter nimble_addr,$(USEMODULE)))
+  USEMODULE += bluetil_addr
+endif
+
+ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
+  USEMODULE += nimble_addr
+  USEMODULE += bluetil_ad
 endif

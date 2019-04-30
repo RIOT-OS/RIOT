@@ -38,8 +38,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define _NETIF_NETAPI_MSG_QUEUE_SIZE    (8)
-
 static gnrc_netif_t _netifs[GNRC_NETIF_NUMOF];
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);
@@ -192,7 +190,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             assert(opt->data_len >= sizeof(eui64_t));
             res = gnrc_netif_ipv6_get_iid(netif, opt->data);
             break;
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             if (opt->context == GNRC_NETTYPE_IPV6) {
                 assert(opt->data_len == sizeof(uint16_t));
                 *((uint16_t *)opt->data) = netif->ipv6.mtu;
@@ -285,7 +283,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             gnrc_netif_ipv6_group_leave_internal(netif, opt->data);
             res = sizeof(ipv6_addr_t);
             break;
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             if (opt->context == GNRC_NETTYPE_IPV6) {
                 assert(opt->data_len == sizeof(uint16_t));
                 netif->ipv6.mtu = *((uint16_t *)opt->data);
@@ -1163,6 +1161,111 @@ static void _configure_netdev(netdev_t *dev)
 #endif
 }
 
+#ifdef DEVELHELP
+/* checks if a device supports all required options and functions */
+static void _test_options(gnrc_netif_t *netif)
+{
+    uint8_t dummy_addr[GNRC_NETIF_L2ADDR_MAXLEN] = { 0 };
+    ndp_opt_t dummy_opt = { .len = 1U };
+    uint64_t tmp64 = 0ULL;
+
+    (void)dummy_addr;
+    (void)dummy_opt;
+    (void)tmp64;
+#if (GNRC_NETIF_L2ADDR_MAXLEN > 0)
+    /* check if address was set in _update_l2addr_from_dev()
+     * (NETOPT_DEVICE_TYPE already tested in _configure_netdev()) and
+     * if MTU and max. fragment size was set properly by
+     * gnrc_netif_ipv6_init_mtu()
+     * all checked types below have link-layer addresses so we don't need to
+     * check `GNRC_NETIF_FLAGS_HAS_L2ADDR` */
+    switch (netif->device_type) {
+#ifdef TEST_SUITES
+        case NETDEV_TYPE_TEST:
+            /* make no assumptions about test devices */
+            break;
+#endif
+        case NETDEV_TYPE_BLE:
+        case NETDEV_TYPE_ETHERNET:
+        case NETDEV_TYPE_ESP_NOW:
+            assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
+            assert(ETHERNET_ADDR_LEN == netif->l2addr_len);
+#ifdef MODULE_GNRC_IPV6
+            switch (netif->device_type) {
+                case NETDEV_TYPE_BLE:
+                    assert(netif->ipv6.mtu == IPV6_MIN_MTU);
+                    break;
+                case NETDEV_TYPE_ETHERNET:
+                    assert(netif->ipv6.mtu == ETHERNET_DATA_LEN);
+                    break;
+                case NETDEV_TYPE_ESP_NOW:
+                    assert(netif->ipv6.mtu <= ETHERNET_DATA_LEN);
+            }
+#endif  /* MODULE GNRC_IPV6 */
+            break;
+        case NETDEV_TYPE_IEEE802154:
+        case NETDEV_TYPE_NRFMIN: {
+            gnrc_nettype_t tmp;
+
+            /* in case assert() evaluates to NOP */
+            (void)tmp;
+            assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
+            assert((IEEE802154_SHORT_ADDRESS_LEN == netif->l2addr_len) ||
+                   (IEEE802154_LONG_ADDRESS_LEN == netif->l2addr_len));
+#ifdef MODULE_GNRC_IPV6
+#ifdef MODULE_GNRC_SIXLOWPAN
+            assert(netif->ipv6.mtu == IPV6_MIN_MTU);
+            assert(netif->sixlo.max_frag_size > 0);
+            assert(-ENOTSUP != netif->dev->driver->get(netif->dev, NETOPT_PROTO,
+                                                       &tmp, sizeof(tmp)));
+#else   /* MODULE_GNRC_SIXLOWPAN */
+            assert(netif->ipv6.mtu < UINT16_MAX);
+#endif  /* MODULE_GNRC_SIXLOWPAN */
+#endif  /* MODULE_GNRC_IPV6 */
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+            assert((netif->device_type != NETDEV_TYPE_IEEE802154) ||
+                   (-ENOTSUP != netif->dev->driver->get(netif->dev,
+                                                        NETOPT_ADDRESS_LONG,
+                                                        &dummy_addr,
+                                                        sizeof(dummy_addr))));
+#endif  /* MODULE_GNRC_SIXLOWPAN_ND */
+            break;
+        }
+        case NETDEV_TYPE_CC110X:
+            assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
+            assert(1U == netif->l2addr_len);
+#ifdef MODULE_GNRC_IPV6
+            assert(netif->ipv6.mtu < UINT16_MAX);
+#endif  /* MODULE_GNRC_IPV6 */
+            break;
+        case NETDEV_TYPE_LORA: /* LoRa doesn't provide L2 ADDR */
+        case NETDEV_TYPE_SLIP:
+            assert(!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR));
+            assert(0U == netif->l2addr_len);
+            /* don't check MTU here for now since I'm not sure the current
+             * one is correct ^^" "*/
+            break;
+        default:
+            /* device type not supported yet, please amend case above when
+             * porting new device type */
+            assert(false);
+    }
+    /* These functions only apply to network devices having link-layers */
+    if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
+#ifdef MODULE_GNRC_IPV6
+        assert(-ENOTSUP != gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&tmp64));
+        assert(-ENOTSUP != gnrc_netif_ndp_addr_len_from_l2ao(netif,
+                                                             &dummy_opt));
+#endif  /* MODULE_GNRC_IPV6 */
+#if GNRC_IPV6_NIB_CONF_6LN
+        assert(-ENOTSUP != gnrc_netif_ipv6_iid_to_addr(netif, (eui64_t *)&tmp64,
+                                                       dummy_addr));
+#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+    }
+#endif /* (GNRC_NETIF_L2ADDR_MAXLEN > 0) */
+}
+#endif /* DEVELHELP */
+
 static void *_gnrc_netif_thread(void *args)
 {
     gnrc_netapi_opt_t *opt;
@@ -1170,7 +1273,7 @@ static void *_gnrc_netif_thread(void *args)
     netdev_t *dev;
     int res;
     msg_t reply = { .type = GNRC_NETAPI_MSG_TYPE_ACK };
-    msg_t msg, msg_queue[_NETIF_NETAPI_MSG_QUEUE_SIZE];
+    msg_t msg, msg_queue[GNRC_NETIF_MSG_QUEUE_SIZE];
 
     DEBUG("gnrc_netif: starting thread %i\n", sched_active_pid);
     netif = args;
@@ -1178,7 +1281,7 @@ static void *_gnrc_netif_thread(void *args)
     dev = netif->dev;
     netif->pid = sched_active_pid;
     /* setup the link-layer's message queue */
-    msg_init_queue(msg_queue, _NETIF_NETAPI_MSG_QUEUE_SIZE);
+    msg_init_queue(msg_queue, GNRC_NETIF_MSG_QUEUE_SIZE);
     /* register the event callback with the device driver */
     dev->event_callback = _event_cb;
     dev->context = netif;
@@ -1196,6 +1299,9 @@ static void *_gnrc_netif_thread(void *args)
     }
     _configure_netdev(dev);
     _init_from_device(netif);
+#ifdef DEVELHELP
+    _test_options(netif);
+#endif
     netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
 #ifdef MODULE_GNRC_IPV6_NIB
     gnrc_ipv6_nib_init_iface(netif);
@@ -1222,7 +1328,7 @@ static void *_gnrc_netif_thread(void *args)
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
                 res = netif->ops->send(netif, msg.content.ptr);
                 if (res < 0) {
-                    DEBUG("gnrc_netif: error sending packet %p (code: %u)\n",
+                    DEBUG("gnrc_netif: error sending packet %p (code: %i)\n",
                           msg.content.ptr, res);
                 }
 #ifdef MODULE_NETSTATS_L2

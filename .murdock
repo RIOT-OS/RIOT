@@ -1,17 +1,18 @@
 #!/bin/sh
 
-: ${TEST_BOARDS_AVAILABLE:="samr21-xpro"}
+: ${TEST_BOARDS_AVAILABLE:="nrf52dk samr21-xpro"}
 : ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
 
 export RIOT_CI_BUILD=1
 export STATIC_TESTS=${STATIC_TESTS:-1}
 export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
+export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
 
 NIGHTLY=${NIGHTLY:-0}
 RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
 
-DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS"
+DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE -E TEST_HASH"
 
 check_label() {
     local label="${1}"
@@ -22,6 +23,10 @@ check_label() {
 
 [ "$RUN_TESTS" != "1" ] && {
     check_label "CI: run tests" && RUN_TESTS=1
+}
+
+[ "$ENABLE_TEST_CACHE" = "1" ] && {
+    check_label "CI: disable test cache" && export ENABLE_TEST_CACHE=0
 }
 
 error() {
@@ -109,7 +114,14 @@ get_supported_toolchains() {
 # supported board and toolchain. Only print for boards in $BOARDS.
 get_app_board_toolchain_pairs() {
     local appdir=$1
-    for board in $(get_supported_boards $appdir)
+    local boards="$(get_supported_boards $appdir)"
+
+    if [ "$boards" = makefile_broken ]; then
+        echo "$appdir makefile_broken"
+        return
+    fi
+
+    for board in ${boards}
     do
         for toolchain in $(get_supported_toolchains $appdir $board)
         do
@@ -131,13 +143,42 @@ print_worker() {
         echo "-- running on worker ${DWQ_WORKER} thread ${DWQ_WORKER_THREAD}, build number $DWQ_WORKER_BUILDNUM."
 }
 
+test_hash_calc() {
+    local bindir=$1
+
+    # Why two times cut?
+    # "test-input-hash.sha1" contains a list of lines containing
+    # "<hash> <filename>" on each line.
+    # We need to filter out the filename, as it contains the full path name,
+    # which differs depending on the build machine.
+    #
+    # After piping through sha1sum, we get "<hash> -". " -" has to go so we save the
+    # hassle of escaping the resulting hash.
+
+    cat ${bindir}/test-input-hash.sha1 | cut -f1 -d' ' | sha1sum | cut -f1 -d' '
+}
+
+test_cache_get() {
+    test "${ENABLE_TEST_CACHE}" = "1" || return 1
+    test -n "$(redis-cli get $1)" > /dev/null
+}
+
+test_cache_put() {
+    redis-cli set "$1" ok
+}
+
 # compile one app for one board with one toolchain. delete intermediates.
 compile() {
     local appdir=$1
     local board=$(echo $2 | cut -f 1 -d':')
     local toolchain=$(echo $2 | cut -f 2 -d':')
 
-    [ "$board" = "makefile_broken" ] && error "$0: Makefile in \"$appdir\" seems to be broken!"
+    [ "$board" = "makefile_broken" ] && {
+        echo "$0: There seems to be a problem in \"$appdir\" while getting supported boards!"
+        echo "$0: testing \"make -C$appdir info-boards-supported\"..."
+        make -C$appdir info-boards-supported && echo "$0: success. no idea what's wrong." || echo "$0: failed!"
+        exit 1
+    }
 
     # set build directory. CI ensures only one build at a time in $(pwd).
     export BINDIR="$(pwd)/build"
@@ -155,7 +196,7 @@ compile() {
 
     # compile
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
-        make -C${appdir} clean all -j${JOBS:-4}
+        make -C${appdir} clean all test-input-hash -j${JOBS:-4}
     RES=$?
 
     # run tests
@@ -166,8 +207,15 @@ compile() {
                     BOARD=$board make -C${appdir} test
                     RES=$?
                 elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
-                    BOARD=$board TOOLCHAIN=$toolchain make -C${appdir} test-murdock
-                    RES=$?
+                    test_hash=$(test_hash_calc "$BINDIR")
+                    echo "-- test_hash=$test_hash"
+                    if test_cache_get $test_hash; then
+                        echo "-- skipping test due to positive cache hit"
+                    else
+                        BOARD=$board TOOLCHAIN=$toolchain TEST_HASH=$test_hash \
+                            make -C${appdir} test-murdock
+                        RES=$?
+                    fi
                 fi
             fi
         fi
@@ -212,6 +260,14 @@ run_test() {
     echo "-- executing tests for $appdir on $board (compiled with $toolchain toolchain):"
     hook run_test_pre
     BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only test
+    RES=$?
+
+    if [ $RES -eq 0 -a -n "$TEST_HASH" ]; then
+        echo -n "-- saving test result to cache: "
+        test_cache_put $TEST_HASH
+    fi
+
+    return $RES
 }
 
 # execute static tests

@@ -204,8 +204,16 @@ extern "C" {
 #include "net/l2filter.h"
 #endif
 
+/**
+ * @name        Network device types
+ * @anchor      net_netdev_type
+ * @attention   When implementing a new type that is able to carry IPv6, have
+ *              a look if you need to update @ref net_l2util as well.
+ * @{
+ */
 enum {
     NETDEV_TYPE_UNKNOWN,
+    NETDEV_TYPE_TEST,
     NETDEV_TYPE_RAW,
     NETDEV_TYPE_ETHERNET,
     NETDEV_TYPE_IEEE802154,
@@ -216,6 +224,7 @@ enum {
     NETDEV_TYPE_SLIP,
     NETDEV_TYPE_ESP_NOW,
 };
+/** @} */
 
 /**
  * @brief   Possible event types that are send from the device driver to the
@@ -296,7 +305,11 @@ typedef struct netdev_driver {
      * @pre `(dev != NULL) && (iolist != NULL`
      *
      * @param[in] dev       Network device descriptor. Must not be NULL.
-     * @param[in] iolist    io vector list to send
+     * @param[in] iolist    IO vector list to send. Elements of this list may
+     *                      have iolist_t::iol_data == NULL or
+     *                      iolist_t::iol_size == 0. However, unless otherwise
+     *                      specified by the device, the *first* element
+     *                      must contain data.
      *
      * @return negative errno on error
      * @return number of bytes sent

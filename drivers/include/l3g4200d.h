@@ -95,8 +95,8 @@ typedef struct {
  * @brief   Device descriptor for L3G4200D sensors
  */
 typedef struct {
-    l3g4200d_params_t params; /**< device initialization parameters */
-    int scale;                /**< internal scaling factor to normalize results */
+    l3g4200d_params_t params;     /**< device initialization parameters */
+    int32_t scale;                /**< internal scaling factor to normalize results */
 } l3g4200d_t;
 
 /**

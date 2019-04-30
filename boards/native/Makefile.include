@@ -40,7 +40,7 @@ else
   export DEBUGGER ?= gdb
 endif
 
-export TERMPROG ?= $(ELFFILE)
+TERMPROG ?= $(ELFFILE)
 export FLASHER = true
 export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
@@ -100,7 +100,7 @@ else
   export PORT =
 endif
 
-export TERMFLAGS := $(PORT) $(TERMFLAGS)
+TERMFLAGS := $(PORT) $(TERMFLAGS)
 
 export ASFLAGS =
 ifeq ($(shell basename $(DEBUGGER)),lldb)
@@ -117,16 +117,16 @@ debug-valgrind-server: export VALGRIND_FLAGS ?= --vgdb=yes --vgdb-error=0 -v \
 	--leak-check=full --track-origins=yes --fullpath-after=$(RIOTBASE) \
 	--read-var-info=yes
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
-term-gprof: export TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELFFILE)
-all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g
+term-gprof: TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELFFILE)
+all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g3
 all-valgrind: export NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
-all-debug: export CFLAGS += -g
-all-cachegrind: export CFLAGS += -g
+all-debug: export CFLAGS += -g3
+all-cachegrind: export CFLAGS += -g3
 all-gprof: export CFLAGS += -pg
 all-gprof: export LINKFLAGS += -pg
-all-asan: export CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g
+all-asan: export CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
 all-asan: export CFLAGS += -DNATIVE_IN_CALLOC
-all-asan: export LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g
+all-asan: export LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
 
 export INCLUDES += $(NATIVEINCLUDES)
 

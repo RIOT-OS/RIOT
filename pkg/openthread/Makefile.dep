@@ -5,6 +5,7 @@ endif
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
   USEMODULE += openthread_contrib_netdev
+  USEMODULE += l2util
   USEMODULE += xtimer
   FEATURES_REQUIRED += cpp
 endif

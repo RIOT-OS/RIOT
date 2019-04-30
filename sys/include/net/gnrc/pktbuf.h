@@ -191,23 +191,6 @@ static inline void gnrc_pktbuf_release(gnrc_pktsnip_t *pkt)
 gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt);
 
 /**
- * @brief   Create a IOVEC representation of the packet pointed to by *pkt*
- *
- * @pre `(len != NULL)`
- *
- * @details This function will create a new packet snip in the packet buffer,
- *          which points to the given *pkt* and contains a IOVEC representation
- *          of the referenced packet in its data section.
- *
- * @param[in]  pkt  Packet to export as IOVEC
- * @param[out] len  Number of elements in the IOVEC
- *
- * @return  Pointer to the 'IOVEC packet snip'
- * @return  NULL, if packet is empty of the packet buffer is full
- */
-gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len);
-
-/**
  * @brief   Deletes a snip from a packet and the packet buffer.
  *
  * @param[in] pkt   A packet.

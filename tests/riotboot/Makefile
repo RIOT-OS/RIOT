@@ -18,17 +18,9 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-all: riotboot
+# Target 'all' will generate the combined file directly.
+# It also makes 'flash' and 'flash-only' work without specific command.
+FLASHFILE = $(RIOTBOOT_COMBINED_BIN)
 
 include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include
-
-# Make 'flash' and 'flash-only' work without specific command.
-# This is currently hacky as there is no way of specifiying a FLASHFILE
-all: riotboot/combined-slot0
-# openocd
-ELFFILE = $(BINDIR_APP)-slot0-combined.bin
-# edbg
-HEXFILE = $(BINDIR_APP)-slot0-combined.bin
-# murdock uses ':=' to get the flashfile variable so should also be overwritten
-FLASHFILE = $(BINDIR_APP)-slot0-combined.bin

@@ -32,6 +32,7 @@
  * set at compile time. Example for EU868:
  * ```
  *     CFLAGS += -DREGION_EU868
+ *     CFLAGS += -DLORAMAC_ACTIVE_REGION=LORAMAC_REGION_EU868
  * ```
  *
  * # Using the package API
@@ -88,7 +89,11 @@
  *
  *     /* 4. send some data */
  *     char *message = "This is RIOT";
- *     semtech_loramac_send(&loramac, (uint8_t *)message, strlen(message));
+ *     if (semtech_loramac_send(&loramac,
+ *                              (uint8_t *)message, strlen(message)) != SEMTECH_LORAMAC_TX_OK) {
+           printf("Cannot send message '%s'\n", message);
+ *         return 1;
+ *     }
  *
  *     /* 5. wait for any potentially received data */
  *     if (semtech_loramac_recv(&loramac) == SEMTECH_LORAMAC_DATA_RECEIVED) {
@@ -108,5 +113,5 @@
  *
  * The library is using the BSD 3-clause license.
  *
- * @see      github.com/Lora-net/LoRaMac-node
+ * @see      https://github.com/Lora-net/LoRaMac-node
  */

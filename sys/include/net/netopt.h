@@ -30,6 +30,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief       A deprecated alias for @ref NETOPT_MAX_PDU_SIZE
+ *
+ * @deprecated  Please use @ref NETOPT_MAX_PDU_SIZE instead of
+ *              `NETOPT_MAX_PACKET_SIZE`
+ */
+#define NETOPT_MAX_PACKET_SIZE NETOPT_MAX_PDU_SIZE
+
+/**
  * @brief   Global list of configuration options available throughout the
  *          network stack, e.g. by netdev and netapi
  *
@@ -102,6 +110,8 @@ typedef enum {
      *
      * @deprecated  Do not implement this in a network device. Other APIs
      *              utilizing [netopt](@ref net_netopt) may still implement it.
+     *              Existing support of drivers will be dropped after the
+     *              2019.07 release.
      *
      * The generation of the interface identifier is dependent on the link-layer.
      * Please refer to the appropriate IPv6 over `<link>` specification for
@@ -171,9 +181,9 @@ typedef enum {
      */
     NETOPT_TX_POWER,
     /**
-     * @brief   (uint16_t) maximum packet size a network module can handle
+     * @brief   (uint16_t) maximum protocol data unit
      */
-    NETOPT_MAX_PACKET_SIZE,
+    NETOPT_MAX_PDU_SIZE,
     /**
      * @brief   (@ref netopt_enable_t) frame preloading
      *

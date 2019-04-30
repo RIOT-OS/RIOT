@@ -102,11 +102,9 @@ void ets_run(void)
     ets_tasks_init();
 
     /* enable interrupts used by ETS/SDK */
-    #ifndef MODULE_ESP_SDK_INT_HANDLING
     ets_isr_unmask(BIT(ETS_FRC2_INUM));
     ets_isr_unmask(BIT(ETS_WDEV_INUM));
     ets_isr_unmask(BIT(ETS_WDT_INUM));
-    #endif
 
     #ifdef MODULE_ESP_GDBSTUB
     gdbstub_init();
@@ -122,6 +120,10 @@ void ets_run(void)
     ets_isr_attach(ETS_SOFT_INUM, thread_yield_isr, NULL);
     ets_isr_unmask(BIT(ETS_SOFT_INUM));
     #endif
+
+    /* initialize dummy lwIP library to link it even if esp_wifi is not used */
+    extern void esp_lwip_init(void);
+    esp_lwip_init();
 
     thread_create(ets_task_stack, sizeof(ets_task_stack),
             ETS_TASK_PRIORITY,

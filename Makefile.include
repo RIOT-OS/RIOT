@@ -312,6 +312,7 @@ endif
 BOARDDEF := $(shell echo $(BOARD) | tr 'a-z' 'A-Z' | tr '-' '_')
 CPUDEF := $(shell echo $(CPU) | tr 'a-z' 'A-Z' | tr '-' '_')
 MCUDEF := $(shell echo $(MCU) | tr 'a-z' 'A-Z' | tr '-' '_')
+CFLAGS += -DRIOT_APPLICATION=\"$(APPLICATION)\"
 CFLAGS += -DBOARD_$(BOARDDEF)=\"$(BOARD)\" -DRIOT_BOARD=BOARD_$(BOARDDEF)
 CFLAGS += -DCPU_$(CPUDEF)=\"$(CPU)\" -DRIOT_CPU=CPU_$(CPUDEF)
 CFLAGS += -DMCU_$(MCUDEF)=\"$(MCU)\" -DRIOT_MCU=MCU_$(MCUDEF)
@@ -385,7 +386,7 @@ include $(RIOTMAKE)/modules.inc.mk
 
 
 .PHONY: all link clean flash flash-only term doc debug debug-server reset objdump help info-modules
-.PHONY: print-size elffile binfile hexfile
+.PHONY: print-size elffile binfile hexfile flashfile
 .PHONY: ..in-docker-container
 
 # Targets that depend on FORCE will always be rebuilt. Contrary to a .PHONY
@@ -407,10 +408,21 @@ ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
 BINFILE ?= $(ELFFILE:.elf=.bin)
 
+# include bootloaders support. It should be included early to allow using
+# variables defined in `riotboot.mk` for `FLASHFILE` before it is evaluated.
+# It should be included after defining 'BINFILE' for 'riotboot.bin' handling.
+include $(RIOTMAKE)/boot/riotboot.mk
+
 # Targets to get given file
 elffile: $(ELFFILE)
 hexfile: $(HEXFILE)
 binfile: $(BINFILE)
+# # # FLASHFILE Being introduced, only supported if bsp define FLASHFILE # # #
+# # # Not all boards use this file for the moment
+#
+# FLASHFILE is the file used by the flasher
+# (can be overwritten to $(HEXFILE), $(BINFILE))
+flashfile: $(FLASHFILE)
 
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
@@ -436,16 +448,11 @@ else
   _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
 endif # BUILDOSXNATIVE
 
-# include bootloaders support. When trying to overwrite one variable
-# like HEXFILE, the value will already have been evaluated when declaring
-# the link target. Therefore, it must be placed before `link`.
-include $(RIOTMAKE)/boot/riotboot.mk
-
 ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
 else
 ifeq (,$(RIOTNOLINK))
-link: ..compiler-check ..build-message $(ELFFILE) $(HEXFILE) print-size
+link: ..compiler-check ..build-message $(ELFFILE) $(FLASHFILE) $(HEXFILE) print-size
 else
 link: ..compiler-check ..build-message $(BASELIBS)
 endif # RIOTNOLINK
@@ -562,12 +569,26 @@ reset:
 	$(call check_cmd,$(RESET),Reset program)
 	$(RESET) $(RESET_FLAGS)
 
-TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*),\
+.PHONY: test test/available
+TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*[^~]),\
                         $(shell test -f $(file) -a -x $(file) && echo $(file)))
 test: $(TEST_DEPS)
 	$(Q) for t in $(TESTS); do \
 		$$t || exit 1; \
 	done
+
+test/available:
+	$(Q)test -n "$(strip $(TESTS))"
+
+# this target only makes sense if an ELFFILE is actually created, thus guard by
+# RIOTNOLINK="".
+ifeq (,$(RIOTNOLINK))
+test-input-hash: $(TESTS) $(ELFFILE)
+	sha1sum $^ > $(BINDIR)/test-input-hash.sha1
+else
+test-input-hash:
+	true
+endif
 
 # Default OBJDUMPFLAGS for platforms which do not specify it:
 OBJDUMPFLAGS ?= -S -D -h

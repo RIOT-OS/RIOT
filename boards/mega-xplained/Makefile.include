@@ -14,8 +14,6 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 # PROGRAMMER defaults to the external flasher Bus Pirate ISP using avrdude.
 PROGRAMMER  ?= buspirate
-# set mcu model for avrdude
-FFLAGS += -p m1284p
 # set serial port for avrdude with buspirate
 ifeq ($(OS),Linux)
   AVRDUDE_PORT ?= /dev/ttyUSB0
@@ -26,3 +24,4 @@ endif
 FFLAGS_EXTRA += -F
 
 include $(RIOTMAKE)/tools/avrdude.inc.mk
+include $(RIOTBOARD)/common/atmega/Makefile.include

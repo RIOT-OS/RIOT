@@ -31,6 +31,7 @@ extern "C" {
  */
 #define CLOCK_HSI           (16000000U)         /* internal oscillator */
 #define CLOCK_CORECLOCK     (32000000U)         /* desired core clock frequency */
+#define CLOCK_LSE           (1)                 /* enable low speed external oscillator */
 
 /* configuration of PLL prescaler and multiply values */
 /* CORECLOCK := HSI / CLOCK_PLL_DIV * CLOCK_PLL_MUL */
@@ -218,6 +219,17 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_0_ISR           isr_i2c1
 
 #define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+/** @} */
+
+/**
+ * @name    RTT configuration
+ *
+ * On the STM32Lx platforms, we always utilize the LPTIM1.
+ * @{
+ */
+#define RTT_NUMOF           (1)
+#define RTT_FREQUENCY       (1024U)             /* 32768 / 2^n */
+#define RTT_MAX_VALUE       (0x0000ffff)        /* 16-bit timer */
 /** @} */
 
 /**

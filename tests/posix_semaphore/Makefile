@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno \
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-nano arduino-uno \
                              chronos mbed_lpc1768 msb-430 msb-430h nrf6310 \
                              nucleo-f031k6 nucleo-f042k6 nucleo-l031k6 \
                              nucleo-f030r8 nucleo-f303k8 nucleo-f334r8 \

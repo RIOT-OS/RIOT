@@ -20,10 +20,12 @@
  */
 
 #include <stdint.h>
+#include <assert.h>
 
 #include "log.h"
-#include "luid.h"
 #include "random.h"
+#include "bitarithm.h"
+
 #ifdef MODULE_PUF_SRAM
 #include "puf_sram.h"
 #endif
@@ -31,7 +33,7 @@
 #include "periph/hwrng.h"
 #endif
 #ifdef MODULE_PERIPH_CPUID
-#include "periph/cpuid.h"
+#include "luid.h"
 #endif
 
 #define ENABLE_DEBUG (0)

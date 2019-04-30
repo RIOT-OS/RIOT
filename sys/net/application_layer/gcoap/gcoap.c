@@ -399,7 +399,7 @@ static int _find_resource(coap_pkt_t *pdu, const coap_resource_t **resource_ptr,
                 resource++;
             }
 
-            int res = strcmp((char *)&uri[0], resource->path);
+            int res = coap_match_path(resource, uri);
             if (res > 0) {
                 continue;
             }
@@ -496,15 +496,18 @@ static void _expire_request(gcoap_request_memo_t *memo)
  * Handler for /.well-known/core. Lists registered handlers, except for
  * /.well-known/core itself.
  */
-static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+                                        void *ctx)
 {
     (void)ctx;
-   /* write header */
+
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
-    int plen = gcoap_get_resource_list(pdu->payload, (size_t)pdu->payload_len,
-                                      COAP_FORMAT_LINK);
-    /* response content */
-    return gcoap_finish(pdu, (size_t)plen, COAP_FORMAT_LINK);
+    coap_opt_add_format(pdu, COAP_FORMAT_LINK);
+    ssize_t plen = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
+
+    plen += gcoap_get_resource_list(pdu->payload, (size_t)pdu->payload_len,
+                                    COAP_FORMAT_LINK);
+    return plen;
 }
 
 /*
@@ -650,25 +653,19 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                (GCOAP_TOKENLEN - i >= 4) ? 4 : GCOAP_TOKENLEN - i);
     }
     uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
-    ssize_t hdrlen = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &token[0], GCOAP_TOKENLEN,
-                                    code, msgid);
+    ssize_t res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &token[0], GCOAP_TOKENLEN,
+                                 code, msgid);
 #else
     uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
-    ssize_t hdrlen = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, NULL, GCOAP_TOKENLEN,
-                                    code, msgid);
+    ssize_t res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, NULL, GCOAP_TOKENLEN,
+                                 code, msgid);
 #endif
 
-    if (hdrlen > 0) {
-        coap_pkt_init(pdu, buf, len - GCOAP_REQ_OPTIONS_BUF, hdrlen);
-        if (path != NULL) {
-            coap_opt_add_string(pdu, COAP_OPT_URI_PATH, path, '/');
-        }
-        return 0;
+    coap_pkt_init(pdu, buf, len - GCOAP_REQ_OPTIONS_BUF, res);
+    if (path != NULL) {
+        res = coap_opt_add_string(pdu, COAP_OPT_URI_PATH, path, '/');
     }
-    else {
-        /* reason for negative hdrlen is not defined, so we also are vague */
-        return -1;
-    }
+    return (res > 0) ? 0 : res;
 }
 
 /*

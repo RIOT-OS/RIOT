@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Freie Universität Berlin
+ * Copyright (C) 2017-2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,6 +20,7 @@
 
 #include <string.h>
 
+#include "assert.h"
 #include "net/gcoap.h"
 #include "net/cord/epsim.h"
 #include "net/cord/config.h"
@@ -33,18 +34,23 @@
 static coap_pkt_t pkt;
 static uint8_t buf[BUFSIZE];
 
-int cord_epsim_register(void)
-{
-    sock_udp_ep_t remote = {
-        .family    = AF_INET6,
-        .netif     = SOCK_ADDR_ANY_NETIF,
-        .port      = CORD_SERVER_PORT,
-    };
+/* keep state of the latest registration attempt */
+static int _state = CORD_EPSIM_ERROR;
 
-    /* parse RD server address */
-    if (ipv6_addr_from_str((ipv6_addr_t *)&remote.addr.ipv6,
-                           CORD_SERVER_ADDR) == NULL) {
-        return CORD_EPSIM_NOADDR;
+static void _req_handler(unsigned req_state, coap_pkt_t* pdu,
+                         sock_udp_ep_t *remote)
+{
+    (void)remote;
+    (void)pdu;
+    _state = (req_state == GCOAP_MEMO_RESP) ? CORD_EPSIM_OK : CORD_EPSIM_ERROR;
+}
+
+int cord_epsim_register(const sock_udp_ep_t *rd_ep)
+{
+    assert(rd_ep);
+
+    if (_state == CORD_EPSIM_BUSY) {
+        return CORD_EPSIM_BUSY;
     }
 
     /* build the initial CON packet */
@@ -60,9 +66,15 @@ int cord_epsim_register(void)
     }
     /* finish, we don't have any payload */
     ssize_t len = gcoap_finish(&pkt, 0, COAP_FORMAT_NONE);
-    if (gcoap_req_send2(buf, len, &remote, NULL) == 0) {
+    _state = CORD_EPSIM_BUSY;
+    if (gcoap_req_send2(buf, len, rd_ep, _req_handler) == 0) {
         return CORD_EPSIM_ERROR;
     }
 
     return CORD_EPSIM_OK;
+}
+
+int cord_epsim_state(void)
+{
+    return _state;
 }

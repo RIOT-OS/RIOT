@@ -133,7 +133,7 @@ static const uint8_t _ascii[][5] = {
     {0x10, 0x08, 0x08, 0x10, 0x08},/* 7e ~ */
 };
 
-static const char _riot[] = {
+static const uint8_t _riot[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -209,12 +209,12 @@ static inline void done(const pcd8544_t *dev)
     spi_release(dev->spi);
 }
 
-static void _write(const pcd8544_t *dev, uint8_t is_data, char data)
+static void _write(const pcd8544_t *dev, uint8_t is_data, uint8_t data)
 {
     /* set command or data mode */
     gpio_write(dev->mode, is_data);
     /* write byte to LCD */
-    spi_transfer_bytes(dev->spi, dev->cs, false, (uint8_t *)&data, NULL, 1);
+    spi_transfer_bytes(dev->spi, dev->cs, false, &data, NULL, 1);
 }
 
 static inline void _set_x(const pcd8544_t *dev, uint8_t x)
@@ -307,7 +307,7 @@ void pcd8544_riot(const pcd8544_t *dev)
     pcd8544_write_img(dev, _riot);
 }
 
-void pcd8544_write_img(const pcd8544_t *dev, const char img[])
+void pcd8544_write_img(const pcd8544_t *dev, const uint8_t img[])
 {
     /* set initial position */
     lock(dev);

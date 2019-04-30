@@ -2,9 +2,6 @@ ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/nhdp
 endif
 
-ifneq (,$(filter fib,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
-endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/gnrc/netif/include
 endif
@@ -14,15 +11,11 @@ ifneq (,$(filter gnrc_sock,$(USEMODULE)))
     CFLAGS += -DSOCK_HAS_IPV6
   endif
 endif
-ifneq (,$(filter posix,$(USEMODULE)))
+
+ifneq (,$(filter posix_headers,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
-ifneq (,$(filter posix_semaphore,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
-endif
-ifneq (,$(filter posix_sockets,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
-endif
+
 ifneq (,$(filter pthread,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/pthread/include
 endif
@@ -31,8 +24,14 @@ ifneq (,$(filter oneway_malloc,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/oneway-malloc/include
 endif
 
-ifneq (,$(filter vfs,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
+ifneq (,$(filter app_metadata,$(USEMODULE)))
+  # Overwrite the application shell formats.
+  # This is an optional macro that can be used to coordinate
+  # standardized shell formats, as an example it can point to an RDM
+  # that specifies semantics.
+  ifdef APP_SHELL_FMT
+    CFLAGS += -DAPP_SHELL_FMT=\"$(APP_SHELL_FMT)\"
+  endif
 endif
 
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
@@ -76,6 +75,10 @@ ifneq (,$(filter printf_float,$(USEMODULE)))
   ifeq (1,$(USE_NANO_SPECS))
     export LINKFLAGS += -u _printf_float
   endif
+endif
+
+ifneq (,$(filter riotboot_%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/riotboot/Makefile.include
 endif
 
 ifneq (,$(filter ssp,$(USEMODULE)))

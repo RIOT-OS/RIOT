@@ -33,7 +33,7 @@ QUIET ?= 1
 # Modules to include:
 
 #USEMODULE += shell
-#USEMODULE += posix
+#USEMODULE += posix_headers
 #USEMODULE += xtimer
 
 # If your application is very simple and doesn't use modules that use

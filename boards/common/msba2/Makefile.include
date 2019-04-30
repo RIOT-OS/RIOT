@@ -1,7 +1,18 @@
+BOARDS_COMMON_MSBA2_DIR := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+
 ## the cpu to build for
 export CPU = lpc2387
 
-FLASHER = lpc2k_pgm
+# Compile `lpc2k_pgm` when required
+# It is still compiling in `boards` as it was the case before introducing the
+# rule to autobuild
+MSBA2_TOOLS = $(BOARDS_COMMON_MSBA2_DIR)/tools
+LPC2K_PGM = $(MSBA2_TOOLS)/bin/lpc2k_pgm
+$(LPC2K_PGM): FORCE
+	env -i PATH=$(PATH) make -C $(MSBA2_TOOLS)
+FLASHDEPS += $(if $(findstring $(LPC2K_PGM),$(FLASHER)),$(LPC2K_PGM))
+
+FLASHER ?= $(LPC2K_PGM)
 
 # configure serial interface
 PORT_LINUX ?= /dev/ttyUSB0
@@ -25,7 +36,8 @@ export LINKFLAGS += -Wl,--gc-sections
 # use the nano-specs of Newlib when available
 USEMODULE += newlib_nano
 
-FFLAGS = $(PORT) $(HEXFILE)
+FLASHFILE ?= $(HEXFILE)
+FFLAGS = $(PORT) $(FLASHFILE)
 
 INCLUDES += -I$(RIOTBOARD)/common/msba2/include
 

@@ -8,8 +8,7 @@
  */
 
 /**
- * @defgroup    sys_riotboot_slot   Helpers to manipulate partitions (slots)
- *                              on internal flash
+ * @defgroup    sys_riotboot_slot   Helpers to manipulate partitions (slots) on internal flash
  * @ingroup     sys
  * @{
  *
@@ -37,6 +36,13 @@ extern "C" {
  * @returns nr of currently active slot
  */
 int riotboot_slot_current(void);
+
+/**
+ * @brief  Get currently not running image slot
+ *
+ * @returns nr of currently inactive slot
+ */
+int riotboot_slot_other(void);
 
 /**
  * @brief  Get jump-to address of image slot

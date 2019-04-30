@@ -3,9 +3,11 @@ include ../Makefile.tests_common
 # The following boards are known to fail or have not been tested.
 BOARD_BLACKLIST :=  arduino-duemilanove \
                     arduino-mega2560 \
+                    arduino-nano \
                     arduino-uno \
                     chronos \
                     f4vi1 \
+                    hifive1 \
                     jiminy-mega256rfr2 \
                     mega-xplained \
                     msb-430 \

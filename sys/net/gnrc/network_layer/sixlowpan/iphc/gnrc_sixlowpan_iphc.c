@@ -673,7 +673,7 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     dispatch = NULL;    /* use dispatch as temporary pointer for prev */
     /* determine maximum dispatch size and write protect all headers until
      * then because they will be removed */
-    while (_compressible(ptr)) {
+    while ((ptr != NULL) && _compressible(ptr)) {
         gnrc_pktsnip_t *tmp = gnrc_pktbuf_start_write(ptr);
 
         if (tmp == NULL) {

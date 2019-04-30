@@ -97,6 +97,35 @@
 typedef struct _thread thread_t;
 
 /**
+ * @name Thread states supported by RIOT
+ * @{
+ */
+typedef enum {
+    STATUS_STOPPED,                 /**< has terminated                       */
+    STATUS_SLEEPING,                /**< sleeping                             */
+    STATUS_MUTEX_BLOCKED,           /**< waiting for a locked mutex           */
+    STATUS_RECEIVE_BLOCKED,         /**< waiting for a message                */
+    STATUS_SEND_BLOCKED,            /**< waiting for message to be delivered  */
+    STATUS_REPLY_BLOCKED,           /**< waiting for a message response       */
+    STATUS_FLAG_BLOCKED_ANY,        /**< waiting for any flag from flag_mask  */
+    STATUS_FLAG_BLOCKED_ALL,        /**< waiting for all flags in flag_mask   */
+    STATUS_MBOX_BLOCKED,            /**< waiting for get/put on mbox          */
+    STATUS_COND_BLOCKED,            /**< waiting for a condition variable     */
+    STATUS_RUNNING,                 /**< currently running                    */
+    STATUS_PENDING,                 /**< waiting to be scheduled to run       */
+    STATUS_NUMOF                    /**< number of supported thread states    */
+} thread_state_t;
+/** @} */
+
+/**
+ * @name Helpers to work with thread states
+ * @{
+ */
+#define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
+                                                 `st >= STATUS_ON_RUNQUEUE`   */
+#define STATUS_NOT_FOUND ((thread_state_t)-1)   /**< Describes an illegal thread status */
+/** @} */
+/**
  * @def SCHED_PRIO_LEVELS
  * @brief The number of thread priority levels
  */
@@ -117,7 +146,7 @@ int sched_run(void);
  *                          targeted process
  * @param[in]   status      The new status of this thread
  */
-void sched_set_status(thread_t *process, unsigned int status);
+void sched_set_status(thread_t *process, thread_state_t status);
 
 /**
  * @brief       Yield if approriate.

@@ -245,7 +245,7 @@ void _simulate_ndp_handshake(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     gnrc_pktbuf_release(msg.content.ptr);
     /* generate neighbor advertisement */
     ipv6_hdr_set_version(ipv6);
-    ipv6->hl = 255U;
+    ipv6->hl = NDP_HOP_LIMIT;
     /* this simulates a reply, so dst and src need to be switched */
     memcpy(&ipv6->src, dst, sizeof(ipv6->src));
     memcpy(&ipv6->dst, src, sizeof(ipv6->dst));
@@ -316,7 +316,7 @@ static void test_handle_pkt__unknown_type(void)
     void *state = NULL;
 
     ipv6_hdr_set_version(ipv6);
-    ipv6->hl = 255U;
+    ipv6->hl = NDP_HOP_LIMIT;
     memcpy(&ipv6->src, &_loc_ll, sizeof(ipv6->src));
     memcpy(&ipv6->dst, &_rem_ll, sizeof(ipv6->dst));
     icmpv6->type = ICMPV6_ECHO_REQ;
@@ -376,8 +376,8 @@ static void test_handle_pkt__nbr_sol__invalid_code(void)
 {
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
-    size_t icmpv6_len = _set_nbr_sol(&_rem_ll, &_loc_sol_nodes, 255U, 201U,
-                                     &_loc_ll, _rem_l2, sizeof(_rem_l2));
+    size_t icmpv6_len = _set_nbr_sol(&_rem_ll, &_loc_sol_nodes, NDP_HOP_LIMIT,
+                                     201U, &_loc_ll, _rem_l2, sizeof(_rem_l2));
 
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
@@ -391,8 +391,8 @@ static void test_handle_pkt__nbr_sol__invalid_icmpv6_len(void)
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
 
-    _set_nbr_sol(&_rem_ll, &_loc_sol_nodes, 255U, 0U, &_loc_ll, _rem_l2,
-                 sizeof(_rem_l2));
+    _set_nbr_sol(&_rem_ll, &_loc_sol_nodes, NDP_HOP_LIMIT, 0U, &_loc_ll,
+                 _rem_l2, sizeof(_rem_l2));
 
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6,
                              sizeof(ndp_nbr_sol_t) - 1);
@@ -406,9 +406,9 @@ static void test_handle_pkt__nbr_sol__invalid_tgt(void)
 {
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
-    size_t icmpv6_len = _set_nbr_sol(&_rem_ll, &_loc_sol_nodes, 255U, 0U,
-                                     &ipv6_addr_all_routers_site_local, _rem_l2,
-                                     sizeof(_rem_l2));
+    size_t icmpv6_len = _set_nbr_sol(&_rem_ll, &_loc_sol_nodes, NDP_HOP_LIMIT,
+                                     0U, &ipv6_addr_all_routers_site_local,
+                                     _rem_l2, sizeof(_rem_l2));
 
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
@@ -421,8 +421,8 @@ static void test_handle_pkt__nbr_sol__invalid_opt_len(void)
 {
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
-    size_t icmpv6_len = _set_nbr_sol(&_rem_ll, &_loc_sol_nodes, 255U, 0U,
-                                     &_loc_ll, _rem_l2, sizeof(_rem_l2));
+    size_t icmpv6_len = _set_nbr_sol(&_rem_ll, &_loc_sol_nodes, NDP_HOP_LIMIT,
+                                     0U, &_loc_ll, _rem_l2, sizeof(_rem_l2));
     ndp_opt_t *opt = (ndp_opt_t *)&_buffer[icmpv6_len];
 
     opt->type = NDP_OPT_SL2A;
@@ -439,8 +439,8 @@ static void test_handle_pkt__nbr_sol__invalid_dst(void)
 {
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
-    size_t icmpv6_len = _set_nbr_sol(&ipv6_addr_unspecified, &_loc_ll, 255U, 0U,
-                                     &_loc_ll, NULL, 0);
+    size_t icmpv6_len = _set_nbr_sol(&ipv6_addr_unspecified, &_loc_ll,
+                                     NDP_HOP_LIMIT, 0U, &_loc_ll, NULL, 0);
 
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
@@ -513,7 +513,7 @@ static void test_handle_pkt__nbr_sol__invalid_sl2ao(void)
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
     size_t icmpv6_len = _set_nbr_sol(&ipv6_addr_unspecified, &_loc_sol_nodes,
-                                     255U, 0U, &_loc_ll, _rem_l2,
+                                     NDP_HOP_LIMIT, 0U, &_loc_ll, _rem_l2,
                                      sizeof(_rem_l2));
 
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
@@ -537,7 +537,7 @@ static void test_handle_pkt__nbr_sol__tgt_not_assigned(void)
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
     size_t icmpv6_len = _set_nbr_sol(&_rem_ll, &_loc_sol_nodes,
-                                     255U, 0U, &_rem_ll, _rem_l2,
+                                     NDP_HOP_LIMIT, 0U, &_rem_ll, _rem_l2,
                                      sizeof(_rem_l2));
 
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
@@ -554,7 +554,7 @@ static void test_handle_pkt__nbr_sol__ll_src(unsigned exp_nud_state,
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
     size_t icmpv6_len = _set_nbr_sol(&_rem_ll, &_loc_sol_nodes,
-                                     255U, 0U, &_loc_ll, _rem_l2,
+                                     NDP_HOP_LIMIT, 0U, &_loc_ll, _rem_l2,
                                      sizeof(_rem_l2));
 
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
@@ -598,7 +598,7 @@ static void test_handle_pkt__nbr_sol__ll_src_no_sl2ao(void)
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
     size_t icmpv6_len = _set_nbr_sol(&_rem_ll, &_loc_sol_nodes,
-                                     255U, 0U, &_loc_ll, NULL, 0);
+                                     NDP_HOP_LIMIT, 0U, &_loc_ll, NULL, 0);
 
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
@@ -663,7 +663,7 @@ static void test_handle_pkt__nbr_adv__invalid_code(void)
 {
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
-    size_t icmpv6_len = _set_nbr_adv(&_rem_ll, &_loc_ll, 255U, 201U,
+    size_t icmpv6_len = _set_nbr_adv(&_rem_ll, &_loc_ll, NDP_HOP_LIMIT, 201U,
                                      NDP_NBR_ADV_FLAGS_S, &_loc_ll, _rem_l2,
                                      sizeof(_rem_l2));
 
@@ -679,7 +679,7 @@ static void test_handle_pkt__nbr_adv__invalid_icmpv6_len(void)
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
 
-    _set_nbr_adv(&_rem_ll, &_loc_ll, 255U, 0U, NDP_NBR_ADV_FLAGS_S,
+    _set_nbr_adv(&_rem_ll, &_loc_ll, NDP_HOP_LIMIT, 0U, NDP_NBR_ADV_FLAGS_S,
                  &_loc_ll, _rem_l2,
                  sizeof(_rem_l2));
 
@@ -695,7 +695,7 @@ static void test_handle_pkt__nbr_adv__invalid_tgt(void)
 {
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
-    size_t icmpv6_len = _set_nbr_adv(&_rem_ll, &_loc_ll, 255U, 0U,
+    size_t icmpv6_len = _set_nbr_adv(&_rem_ll, &_loc_ll, NDP_HOP_LIMIT, 0U,
                                      NDP_NBR_ADV_FLAGS_S,
                                      &ipv6_addr_all_routers_site_local, _rem_l2,
                                      sizeof(_rem_l2));
@@ -712,8 +712,8 @@ static void test_handle_pkt__nbr_adv__invalid_flags(void)
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
     size_t icmpv6_len = _set_nbr_adv(&_rem_ll, &ipv6_addr_all_nodes_link_local,
-                                     255U, 0U, NDP_NBR_ADV_FLAGS_S, &_loc_ll,
-                                     NULL, 0);
+                                     NDP_HOP_LIMIT, 0U, NDP_NBR_ADV_FLAGS_S,
+                                     &_loc_ll, NULL, 0);
 
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
@@ -726,7 +726,7 @@ static void test_handle_pkt__nbr_adv__invalid_opt_len(void)
 {
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
-    size_t icmpv6_len = _set_nbr_adv(&_rem_ll, &_loc_ll, 255U, 0U,
+    size_t icmpv6_len = _set_nbr_adv(&_rem_ll, &_loc_ll, NDP_HOP_LIMIT, 0U,
                                      NDP_NBR_ADV_FLAGS_S, &_loc_ll, _rem_l2,
                                      sizeof(_rem_l2));
     ndp_opt_t *opt = (ndp_opt_t *)&_buffer[icmpv6_len];
@@ -745,8 +745,9 @@ static void test_handle_pkt__nbr_adv__unspecified_src(void)
 {
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
-    size_t icmpv6_len = _set_nbr_adv(&ipv6_addr_unspecified, &_loc_ll, 255U, 0U,
-                                     NDP_NBR_ADV_FLAGS_S, &_loc_ll, _rem_l2,
+    size_t icmpv6_len = _set_nbr_adv(&ipv6_addr_unspecified, &_loc_ll,
+                                     NDP_HOP_LIMIT, 0U, NDP_NBR_ADV_FLAGS_S,
+                                     &_loc_ll, _rem_l2,
                                      sizeof(_rem_l2));
 
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
@@ -760,8 +761,8 @@ static void test_handle_pkt__nbr_adv__unsolicited(void)
 {
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
-    size_t icmpv6_len = _set_nbr_adv(&_rem_ll, &_loc_sol_nodes, 255U, 0U,
-                                     NDP_NBR_ADV_FLAGS_S, &_loc_ll,
+    size_t icmpv6_len = _set_nbr_adv(&_rem_ll, &_loc_sol_nodes, NDP_HOP_LIMIT,
+                                     0U, NDP_NBR_ADV_FLAGS_S, &_loc_ll,
                                      _rem_l2, sizeof(_rem_l2));
 
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
@@ -803,7 +804,8 @@ static void test_handle_pkt__rtr_sol(void)
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
     size_t icmpv6_len = _set_rtr_sol(&_rem_ll, &_loc_ll,
-                                     255U, 0U, _rem_l2, sizeof(_rem_l2));
+                                     NDP_HOP_LIMIT, 0U,
+                                     _rem_l2, sizeof(_rem_l2));
 
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
@@ -919,7 +921,7 @@ static void test_handle_pkt__rtr_adv__invalid_src(void)
     gnrc_ipv6_nib_ft_t route;
     void *state = NULL;
     size_t icmpv6_len = _set_rtr_adv(&_rem_gb,
-                                     255U, 0U, true, 0U,
+                                     NDP_HOP_LIMIT, 0U, true, 0U,
                                      _loc_l2, sizeof(_loc_l2),
                                      32397U, &_loc_gb, _LOC_GB_PFX_LEN,
                                      NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
@@ -965,7 +967,7 @@ static void test_handle_pkt__rtr_adv__invalid_code(void)
     gnrc_ipv6_nib_ft_t route;
     void *state = NULL;
     size_t icmpv6_len = _set_rtr_adv(&_rem_ll,
-                                     255U, 201U, true, 0U,
+                                     NDP_HOP_LIMIT, 201U, true, 0U,
                                      _loc_l2, sizeof(_loc_l2),
                                      32397U, &_loc_gb, _LOC_GB_PFX_LEN,
                                      NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
@@ -990,7 +992,8 @@ static void test_handle_pkt__rtr_adv__invalid_icmpv6_len(void)
     _netif_exp_t exp_netif;
 
     _get_netif_exp(_mock_netif, &exp_netif);
-    _set_rtr_adv(&_rem_ll, 255U, 201U, true, 0U, _loc_l2, sizeof(_loc_l2),
+    _set_rtr_adv(&_rem_ll, NDP_HOP_LIMIT, 201U, true, 0U,
+                 _loc_l2, sizeof(_loc_l2),
                  32397U, &_loc_gb, _LOC_GB_PFX_LEN,
                  NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6,
@@ -1010,7 +1013,7 @@ static void test_handle_pkt__rtr_adv__invalid_opt_len(void)
     gnrc_ipv6_nib_ft_t route;
     void *state = NULL;
     size_t icmpv6_len = _set_rtr_adv(&_rem_ll,
-                                     255U, 201U, true, 0U,
+                                     NDP_HOP_LIMIT, 201U, true, 0U,
                                      _loc_l2, sizeof(_loc_l2),
                                      32397U, &_loc_gb, _LOC_GB_PFX_LEN,
                                      NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
@@ -1041,7 +1044,7 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
     gnrc_ipv6_nib_nc_t nce;
     gnrc_ipv6_nib_ft_t route;
     void *state = NULL;
-    size_t icmpv6_len = _set_rtr_adv(&_rem_ll, 255U, 0U,
+    size_t icmpv6_len = _set_rtr_adv(&_rem_ll, NDP_HOP_LIMIT, 0U,
                                      set_rtr_adv_fields, rtr_adv_flags,
                                      (sl2ao) ? _rem_l2 : NULL, sizeof(_rem_l2),
                                      (mtuo) ? 32397U : 0U,
@@ -1366,7 +1369,7 @@ int _mock_netif_get(gnrc_netapi_opt_t *opt)
             return sizeof(_loc_l2);
         case NETOPT_IS_WIRED:
             return 1;
-        case NETOPT_MAX_PACKET_SIZE: {
+        case NETOPT_MAX_PDU_SIZE: {
                 uint16_t *val = opt->data;
                 if (opt->data_len != sizeof(uint16_t)) {
                     return -EOVERFLOW;

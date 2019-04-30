@@ -104,4 +104,18 @@ work for the time being.
 There are two pins for current measurement on board. Don't connect these pins
 to GND!. The left pin is at 3.3V level and the right pin is connected to V33.
 Divide the measured voltage between this pins by 22 to get the current.
+
+## Flash the board
+
+See the `Flashing` section in @ref boards_common_nrf52.
+
+## Accessing STDIO via UART
+
+The STDIO is directly accessible via the USB port. On a Linux host, it's
+generally mapped to `/dev/ttyACM0`.
+
+Use the `term` target to connect to the board serial port<br/>
+```
+    make BOARD=nrf52dk -C examples/hello-world term
+```
  */

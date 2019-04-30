@@ -49,9 +49,7 @@ export TARGET_ARCH ?= xtensa-lx106-elf
 
 # ESP8266 pseudomodules
 PSEUDOMODULES += esp_gdb
-PSEUDOMODULES += esp_now
 PSEUDOMODULES += esp_sdk
-PSEUDOMODULES += esp_sdk_int_handling
 PSEUDOMODULES += esp_sw_timer
 PSEUDOMODULES += esp_spiffs
 
@@ -71,19 +69,16 @@ endif
 
 INCLUDES += -I$(ESP8266_NEWLIB_DIR)/$(TARGET_ARCH)/include
 INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
+INCLUDES += -I$(RIOTCPU)/esp_common/vendor/
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/espressif
 
-CFLAGS  += -DESP_OPEN_SDK -DSCHED_PRIO_LEVELS=32
+CFLAGS  += -DESP_OPEN_SDK -DSCHED_PRIO_LEVELS=32 -DCONTEXT_SWITCH_BY_INT
 CFLAGS  += -Wno-unused-parameter -Wformat=0
 CFLAGS  += -mlongcalls -mtext-section-literals
 CFLAGS  += -fdata-sections -fzero-initialized-in-bss
 ASFLAGS += --longcalls --text-section-literals
-
-ifeq (, $(filter esp_sdk_int_handling, $(USEMODULE)))
-    CFLAGS += -DCONTEXT_SWITCH_BY_INT
-endif
 
 ifneq (, $(filter esp_sdk, $(USEMODULE)))
     INCLUDES += -I$(ESP8266_SDK_DIR)/include

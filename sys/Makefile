@@ -4,6 +4,12 @@ endif
 ifneq (,$(filter eepreg,$(USEMODULE)))
   DIRS += eepreg
 endif
+ifneq (,$(filter isrpipe_read_timeout,$(USEMODULE)))
+  DIRS += isrpipe/read_timeout
+endif
+ifneq (,$(filter posix_inet,$(USEMODULE)))
+  DIRS += posix/inet
+endif
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   DIRS += posix/semaphore
 endif
@@ -118,11 +124,14 @@ endif
 ifneq (,$(filter l2filter,$(USEMODULE)))
   DIRS += net/link_layer/l2filter
 endif
+ifneq (,$(filter l2util,$(USEMODULE)))
+  DIRS += net/link_layer/l2util
+endif
 ifneq (,$(filter nanocoap,$(USEMODULE)))
   DIRS += net/application_layer/nanocoap
 endif
 ifneq (,$(filter skald,$(USEMODULE)))
-  DIRS += net/skald
+  DIRS += net/ble/skald
 endif
 ifneq (,$(filter cord_common,$(USEMODULE)))
   DIRS += net/application_layer/cord/common

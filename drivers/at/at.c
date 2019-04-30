@@ -12,8 +12,8 @@
 #include "at.h"
 #include "fmt.h"
 #include "isrpipe.h"
+#include "isrpipe/read_timeout.h"
 #include "periph/uart.h"
-#include "xtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -31,10 +31,9 @@ int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t
 {
     dev->uart = uart;
     isrpipe_init(&dev->isrpipe, buf, bufsize);
-    uart_init(uart, baudrate, _isrpipe_write_one_wrapper,
-              &dev->isrpipe);
 
-    return 0;
+    return uart_init(uart, baudrate, _isrpipe_write_one_wrapper,
+                     &dev->isrpipe);
 }
 
 int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)

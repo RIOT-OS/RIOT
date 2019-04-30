@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
+ * Copyright (C) 2017-2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -12,7 +12,7 @@
  *
  * @file
  * @brief       Test application demonstrating the simple registration
- *              process to a CoRE RD using gcoap
+ *              process to a CoRE RD using gcoap and cord_epsim
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -21,11 +21,12 @@
 
 #include <stdio.h>
 
-#include "shell.h"
 #include "net/gcoap.h"
+#include "net/cord/epsim.h"
 #include "net/cord/common.h"
 
 #define BUFSIZE             (64U)
+#define STARTUP_DELAY       (3U)    /* wait 3s before sending first request*/
 
 static char riot_info[BUFSIZE];
 
@@ -34,9 +35,11 @@ static ssize_t text_resp(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                          const char *text, unsigned format)
 {
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    coap_opt_add_format(pdu, format);
+    ssize_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
     size_t slen = strlen(text);
     memcpy(pdu->payload, text, slen);
-    return gcoap_finish(pdu, slen, format);
+    return resp_len + slen;
 }
 
 static ssize_t handler_info(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
@@ -64,25 +67,62 @@ static gcoap_listener_t listener = {
 
 int main(void)
 {
-    puts("CoAP simplified RD registration example!\n");
+    puts("Simplified CoRE RD registration example\n");
 
     /* fill riot info */
     sprintf(riot_info, "{\"ep\":\"%s\",\"lt\":%u}",
             cord_common_get_ep(), CORD_LT);
 
+    /* parse RD address information */
+    sock_udp_ep_t rd_ep = {
+        .family    = AF_INET6,
+        .netif     = SOCK_ADDR_ANY_NETIF,
+        .port      = RD_PORT,
+    };
+
+    /* parse RD server address */
+    if (ipv6_addr_from_str((ipv6_addr_t *)&rd_ep.addr.ipv6, RD_ADDR) == NULL) {
+        puts("error: unable to parse RD address from RD_ADDR variable");
+        return 1;
+    }
+
     /* register resource handlers with gcoap */
     gcoap_register_listener(&listener);
 
     /* print RD client information */
-    puts("RD client information:");
-    printf(" RD addr: %s\n", CORD_SERVER_ADDR);
-    printf(" RD port: %u\n", (unsigned)CORD_SERVER_PORT);
-    printf("      ep: %s\n", cord_common_get_ep());
-    printf("      lt: %is\n", (int)CORD_LT);
+    puts("epsim configuration:");
+    printf("         ep: %s\n", cord_common_get_ep());
+    printf("         lt: %is\n", (int)CORD_LT);
+    printf(" RD address: [%s]:%u\n\n", RD_ADDR, (unsigned)RD_PORT);
 
-    /* run the shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    xtimer_sleep(STARTUP_DELAY);
+
+    while (1) {
+        int res = cord_epsim_state();
+        switch (res) {
+            case CORD_EPSIM_OK:
+                puts("state: registration active");
+                break;
+            case CORD_EPSIM_BUSY:
+                puts("state: registration in progress");
+                break;
+            case CORD_EPSIM_ERROR:
+            default:
+                puts("state: not registered");
+                break;
+        }
+
+        printf("updating registration with RD [%s]:%u\n", RD_ADDR,
+               (unsigned)RD_PORT);
+        res = cord_epsim_register(&rd_ep);
+        if (res == CORD_EPSIM_BUSY) {
+            puts("warning: registration already in progress");
+        }
+        else if (res == CORD_EPSIM_ERROR) {
+            puts("error: unable to trigger simple registration process");
+        }
+        xtimer_sleep(CORD_UPDATE_INTERVAL);
+    }
 
     return 0;
 }

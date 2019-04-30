@@ -75,10 +75,12 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    PM definitions
+ * @{
+ */
+/**
  * @brief   Number of usable low power modes
  */
-#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L0) || defined(DOXYGEN)
 #define PM_NUM_MODES    (2U)
 
 /**
@@ -88,7 +90,14 @@ extern "C" {
 #define STM32_PM_STOP         (1U)
 #define STM32_PM_STANDBY      (0U)
 /** @} */
+
+#ifndef PM_EWUP_CONFIG
+/**
+ * @brief   Wake-up pins configuration (CSR register)
+ */
+#define PM_EWUP_CONFIG          (0U)
 #endif
+/** @} */
 
 /**
  * @brief   Available peripheral buses
@@ -694,6 +703,10 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
                   dma_mode_t mode, uint8_t flags);
 
 #endif /* MODULE_PERIPH_DMA */
+
+#ifdef MODULE_PERIPH_CAN
+#include "candev_stm32.h"
+#endif
 
 #ifdef __cplusplus
 }

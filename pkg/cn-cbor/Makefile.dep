@@ -1,1 +1,1 @@
-USEMODULE += posix
+USEMODULE += posix_headers

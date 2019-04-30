@@ -48,6 +48,7 @@ gnrc_netif_t *gnrc_netif_ieee802154_create(char *stack, int stacksize,
 
 static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
 {
+    gnrc_netif_hdr_t *hdr;
     gnrc_pktsnip_t *snip;
     uint8_t src[IEEE802154_LONG_ADDRESS_LEN], dst[IEEE802154_LONG_ADDRESS_LEN];
     int src_len, dst_len;
@@ -65,10 +66,14 @@ static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
         DEBUG("_make_netif_hdr: no space left in packet buffer\n");
         return NULL;
     }
+    hdr = snip->data;
     /* set broadcast flag for broadcast destination */
     if ((dst_len == 2) && (dst[0] == 0xff) && (dst[1] == 0xff)) {
-        gnrc_netif_hdr_t *hdr = snip->data;
         hdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
+    }
+    /* set flags for pending frames */
+    if (mhr[0] & IEEE802154_FCF_FRAME_PEND) {
+        hdr->flags |= GNRC_NETIF_HDR_FLAGS_MORE_DATA;
     }
     return snip;
 }
@@ -138,7 +143,9 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 #endif
             size_t mhr_len = ieee802154_get_frame_hdr_len(pkt->data);
 
-            if (mhr_len == 0) {
+            /* nread was checked for <= 0 before so we can safely cast it to
+             * unsigned */
+            if ((mhr_len == 0) || ((size_t)nread < mhr_len)) {
                 DEBUG("_recv_ieee802154: illegally formatted frame received\n");
                 gnrc_pktbuf_release(pkt);
                 return NULL;

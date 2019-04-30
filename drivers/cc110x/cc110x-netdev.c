@@ -109,7 +109,7 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
             assert(value_len > 0);
             *((uint8_t *)value) = cc110x->radio_address;
             return sizeof(uint8_t);
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             assert(value_len > 0);
             *((uint16_t *)value) = CC110X_PACKET_LENGTH - CC110X_L2_HDR_SIZE;
             return sizeof(uint16_t);

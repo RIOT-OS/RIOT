@@ -1,7 +1,5 @@
-export CPU_ARCH = cortex-m0
+export CPU_ARCH = cortex-m0plus
 export CPU_FAM  = stm32l0
-
-USEMODULE += pm_layered
 
 include $(RIOTCPU)/stm32_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk

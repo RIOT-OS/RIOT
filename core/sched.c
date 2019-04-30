@@ -158,7 +158,7 @@ void sched_register_cb(void (*callback)(uint32_t, uint32_t))
 }
 #endif
 
-void sched_set_status(thread_t *process, unsigned int status)
+void sched_set_status(thread_t *process, thread_state_t status)
 {
     if (status >= STATUS_ON_RUNQUEUE) {
         if (!(process->status >= STATUS_ON_RUNQUEUE)) {
@@ -170,7 +170,7 @@ void sched_set_status(thread_t *process, unsigned int status)
     }
     else {
         if (process->status >= STATUS_ON_RUNQUEUE) {
-            DEBUG("sched_set_status: removing thread %" PRIkernel_pid " to runqueue %" PRIu8 ".\n",
+            DEBUG("sched_set_status: removing thread %" PRIkernel_pid " from runqueue %" PRIu8 ".\n",
                   process->pid, process->priority);
             clist_lpop(&sched_runqueues[process->priority]);
 

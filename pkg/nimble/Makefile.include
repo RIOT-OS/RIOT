@@ -3,32 +3,79 @@ NIMIBASE = -I$(PKGDIRBASE)/nimble
 # include RIOT glue code headers
 INCLUDES += -I$(RIOTPKG)/nimble/contrib/include
 
-# include tinycrypt headers
-INCLUDES += $(NIMIBASE)/ext/tinycrypt/include
+# include generic nimble headers
+INCLUDES += $(NIMIBASE)/nimble/include
 
 # include the RIOT NPL headers
 INCLUDES += $(NIMIBASE)/porting/npl/riot/include
-
-# include nimble controller headers
-INCLUDES += $(NIMIBASE)/nimble/transport/ram/include
-INCLUDES += $(NIMIBASE)/nimble/controller/include
-INCLUDES += $(NIMIBASE)/nimble/drivers/nrf52/include
-
-# include nimble host headers
-INCLUDES += $(NIMIBASE)/nimble/include
-INCLUDES += $(NIMIBASE)/nimble/host/include
-INCLUDES += $(NIMIBASE)/nimble/host/services/ans/include
-INCLUDES += $(NIMIBASE)/nimble/host/services/bas/include
-INCLUDES += $(NIMIBASE)/nimble/host/services/bleuart/include
-INCLUDES += $(NIMIBASE)/nimble/host/services/gap/include
-INCLUDES += $(NIMIBASE)/nimble/host/services/gatt/include
-INCLUDES += $(NIMIBASE)/nimble/host/services/ias/include
-INCLUDES += $(NIMIBASE)/nimble/host/services/lls/include
-INCLUDES += $(NIMIBASE)/nimble/host/services/tps/include
-INCLUDES += $(NIMIBASE)/nimble/host/store/ram/include
-INCLUDES += $(NIMIBASE)/nimble/host/util/include
 INCLUDES += $(NIMIBASE)/porting/nimble/include
 
-# set environment
-CFLAGS += -DNIMBLE_CFG_CONTROLLER=1
-CFLAGS += -DMYNEWT_VAL_OS_CPUTIME_FREQ=32768
+# include nimble controller headers
+ifneq (,$(filter nimble_controller,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/controller/include
+  # set environment
+  CFLAGS += -DNIMBLE_CFG_CONTROLLER=1
+  CFLAGS += -DMYNEWT_VAL_OS_CPUTIME_FREQ=32768
+
+  ifneq (,$(filter nimble_drivers_nrf52,$(USEMODULE)))
+    INCLUDES += $(NIMIBASE)/nimble/drivers/nrf52/include
+  endif
+endif
+
+# include nimble host headers
+ifneq (,$(filter nimble_host,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/host/include
+endif
+ifneq (,$(filter nimble_host_store_ram,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/host/store/ram/include
+endif
+ifneq (,$(filter nimble_host_util,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/host/util/include
+endif
+
+# include tinycrypt headers
+ifneq (,$(filter nimble_controller,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/ext/tinycrypt/include
+endif
+
+# include transport headers
+ifneq (,$(filter nimble_transport_ram,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/transport/ram/include
+endif
+
+# include services
+ifneq (,$(filter nimble_svc_ans,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/host/services/ans/include
+endif
+ifneq (,$(filter nimble_svc_bas,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/host/services/bas/include
+endif
+ifneq (,$(filter nimble_svc_bleuart,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/host/services/bleuart/include
+endif
+ifneq (,$(filter nimble_svc_gap,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/host/services/gap/include
+endif
+ifneq (,$(filter nimble_svc_gatt,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/host/services/gatt/include
+endif
+ifneq (,$(filter nimble_svc_ias,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/host/services/ias/include
+endif
+ifneq (,$(filter nimble_svc_lls,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/host/services/lls/include
+endif
+ifneq (,$(filter nimble_svc_tps,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/host/services/tps/include
+endif
+
+# include additional headers for RIOT specific NimBLE submodules
+ifneq (,$(filter nimble_addr,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/nimble/addr/include
+endif
+ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/nimble/scanlist/include
+endif
+ifneq (,$(filter nimble_scanner,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/nimble/scanner/include
+endif

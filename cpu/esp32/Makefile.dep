@@ -77,22 +77,9 @@ ifneq (,$(filter ndn-riot,$(USEPKG)))
     USEMODULE += cipher_modes
 endif
 
-ifneq (,$(findstring posix,$(USEMODULE)))
-    USEMODULE += newlib_syscalls_default
-endif
-
 ifneq (,$(filter shell,$(USEMODULE)))
-    USEMODULE += newlib_syscalls_default
     USEMODULE += ps
     USEMODULE += xtimer
-endif
-
-ifneq (,$(filter xtimer,$(USEMODULE)))
-    USEMODULE += newlib_syscalls_default
-endif
-
-ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
-    USEMODULE += stdio_uart
 endif
 
 # if SPI RAM is enabled, ESP-IDF heap and quot flash mode have to be used

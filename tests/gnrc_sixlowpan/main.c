@@ -57,6 +57,15 @@ static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len
     return sizeof(uint16_t);
 }
 
+static int _get_netdev_proto(netdev_t *netdev, void *value, size_t max_len)
+{
+    assert(max_len == sizeof(gnrc_nettype_t));
+    (void)netdev;
+
+    *((gnrc_nettype_t *)value) = GNRC_NETTYPE_SIXLOWPAN;
+    return sizeof(gnrc_nettype_t);
+}
+
 static int _get_netdev_max_packet_size(netdev_t *netdev, void *value,
                                        size_t max_len)
 {
@@ -91,7 +100,9 @@ static void _init_interface(void)
     netdev_test_setup(&_ieee802154_dev, NULL);
     netdev_test_set_get_cb(&_ieee802154_dev, NETOPT_DEVICE_TYPE,
                            _get_netdev_device_type);
-    netdev_test_set_get_cb(&_ieee802154_dev, NETOPT_MAX_PACKET_SIZE,
+    netdev_test_set_get_cb(&_ieee802154_dev, NETOPT_PROTO,
+                           _get_netdev_proto);
+    netdev_test_set_get_cb(&_ieee802154_dev, NETOPT_MAX_PDU_SIZE,
                            _get_netdev_max_packet_size);
     netdev_test_set_get_cb(&_ieee802154_dev, NETOPT_SRC_LEN,
                            _get_netdev_src_len);

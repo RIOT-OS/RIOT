@@ -66,11 +66,14 @@ USEMODULE += esp_idf_driver
 USEMODULE += esp_idf_esp32
 USEMODULE += esp_idf_soc
 USEMODULE += log
+USEMODULE += newlib_syscalls_default
 USEMODULE += periph
 USEMODULE += periph_common
 USEMODULE += random
+USEMODULE += stdio_uart
 USEMODULE += xtensa
 
+INCLUDES += -I$(RIOTCPU)/esp_common/vendor/
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/esp32
@@ -86,7 +89,6 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/include
 INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 
-CFLAGS  += -DRIOT_OS
 CFLAGS  += -DSCHED_PRIO_LEVELS=32
 CFLAGS  += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM
 CFLAGS  += -DLOG_TAG_IN_BRACKETS
@@ -137,7 +139,7 @@ LINKFLAGS += -Wl,--warn-unresolved-symbols
 # configure preflasher to convert .elf to .bin before flashing
 FLASH_MODE ?= dout  # FIX configuration, DO NOT CHANGE
 FLASH_FREQ  = 40m   # FIX configuration, DO NOT CHANGE
-FLASH_SIZE ?= 16m
+FLASH_SIZE ?= 2MB
 export PREFLASHER = $(ESPTOOL)
 export PREFFLAGS  = --chip esp32 elf2image
 export PREFFLAGS += -fm $(FLASH_MODE) -fs $(FLASH_SIZE) -ff $(FLASH_FREQ)

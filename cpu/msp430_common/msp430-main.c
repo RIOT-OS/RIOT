@@ -107,7 +107,7 @@ init_ports(void)
 /*---------------------------------------------------------------------------*/
 /* msp430-ld may align _end incorrectly. Workaround in cpu_init. */
 extern int _end;        /* Not in sys/unistd.h */
-static char *cur_break = (char *) &_end;
+char *cur_break = (char *) &_end;
 
 void msp430_cpu_init(void)
 {
@@ -126,6 +126,8 @@ void msp430_cpu_init(void)
 
 #define STACK_EXTRA 32
 
+extern char __stack;     /* provided by linker script */
+char *__heap_end = NULL; /* top of heap */
 
 /*
  * Allocate memory from the heap. Check that we don't collide with the
@@ -135,12 +137,15 @@ void msp430_cpu_init(void)
  */
 void *sbrk(int incr)
 {
-    char *stack_pointer;
+    char *__heap_top = __heap_end;
 
-    asmv("mov r1, %0" : "=r"(stack_pointer));
-    stack_pointer -= STACK_EXTRA;
+    if (!__heap_top) {
+        /* set __heap_top to stack pointer if we are not in thread mode */
+        asmv("mov r1, %0" : "=r"(__heap_top));
+        __heap_top -= STACK_EXTRA;
+    }
 
-    if (incr > (stack_pointer - cur_break)) {
+    if (incr > (__heap_top - cur_break)) {
         return (void *) - 1;    /* ENOMEM */
     }
 

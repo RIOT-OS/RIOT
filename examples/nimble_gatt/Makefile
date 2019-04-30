@@ -5,13 +5,15 @@ APPLICATION = nimble_gatt
 BOARD ?= nrf52dk
 
 # So far, NimBLE only works on nRF52 based platforms
-BOARD_WHITELIST := nrf52dk nrf52840dk
+BOARD_WHITELIST := nrf52dk nrf52840dk nrf52832-mdk
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
 # Include NimBLE
 USEPKG += nimble
+USEMODULE += nimble_svc_gap
+USEMODULE += nimble_svc_gatt
 
 # We also use the AD part of the BLE helper module
 USEMODULE += bluetil_ad

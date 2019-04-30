@@ -95,6 +95,9 @@ extern "C" {
 #ifdef SX127X_USE_DIO_MULTI
 #define SX127X_IRQ_DIO_MULTI             (1<<6)  /**< DIO MULTI IRQ */
 #endif
+#ifndef SX127X_DIO_PULL_MODE
+#define SX127X_DIO_PULL_MODE             (GPIO_IN_PD) /**< pull down DIOx */
+#endif
 /** @} */
 
 /**
@@ -213,6 +216,10 @@ typedef struct {
     gpio_t dio5_pin;                   /**< Interrupt line DIO5 (not used) */
 #ifdef SX127X_USE_DIO_MULTI
     gpio_t dio_multi_pin;              /**< Interrupt line for multiple IRQs */
+#endif
+#if defined(SX127X_USE_TX_SWITCH) || defined(SX127X_USE_RX_SWITCH)
+    gpio_t rx_switch_pin;              /**< Rx antenna switch */
+    gpio_t tx_switch_pin;              /**< Tx antenna switch */
 #endif
     uint8_t paselect;                  /**< Power amplifier mode (RFO or PABOOST) */
 } sx127x_params_t;

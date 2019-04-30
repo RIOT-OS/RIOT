@@ -91,6 +91,7 @@ int main(void)
     xtimer_init();
 
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
+        netopt_enable_t en = NETOPT_ENABLE;
         const at86rf2xx_params_t *p = &at86rf2xx_params[i];
         netdev_t *dev = (netdev_t *)(&devs[i]);
 
@@ -98,6 +99,7 @@ int main(void)
         at86rf2xx_setup(&devs[i], p);
         dev->event_callback = _event_cb;
         dev->driver->init(dev);
+        dev->driver->set(dev, NETOPT_RX_END_IRQ, &en, sizeof(en));
     }
 
     _recv_pid = thread_create(stack, sizeof(stack), THREAD_PRIORITY_MAIN - 1,

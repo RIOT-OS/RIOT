@@ -131,12 +131,12 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     uint8_t *top_of_stack;
     uint8_t *sp;
 
-    top_of_stack = (uint8_t*)((uint32_t)stack_start + stack_size-1);
+    top_of_stack = (uint8_t*)((uint32_t)stack_start + stack_size - 1);
 
     /* BEGIN - code from FreeRTOS port for Xtensa from Cadence */
 
     /* Create interrupt stack frame aligned to 16 byte boundary */
-    sp = (uint8_t*)(((uint32_t)(top_of_stack+1) - XT_STK_FRMSZ - XT_CP_SIZE) & ~0xf);
+    sp = (uint8_t*)(((uint32_t)(top_of_stack + 1) - XT_STK_FRMSZ - XT_CP_SIZE) & ~0xf);
 
     /* Clear whole stack with a known value to assist debugging */
     #if !defined(DEVELHELP) && !defined(SCHED_TEST_STACK)
@@ -183,7 +183,7 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 
     uint32_t *p;
 
-    p = (uint32_t *)(((uint32_t) top_of_stack+1 - XT_CP_SIZE));
+    p = (uint32_t *)(((uint32_t)(top_of_stack + 1) - XT_CP_SIZE));
     p[0] = 0;
     p[1] = 0;
     p[2] = (((uint32_t) p) + 12 + XCHAL_TOTAL_SA_ALIGN - 1) & -XCHAL_TOTAL_SA_ALIGN;

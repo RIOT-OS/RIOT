@@ -138,6 +138,14 @@
  * offset of 100 years. */
 #define YEAR_OFFSET         (100)
 
+/* Use a magic number to determine the initial RTC source. This will be used
+   to know if a reset of the RTC is required at initialization. */
+#if CLOCK_LSE
+#define MAGIC_CLCK_NUMBER       (0x1970)
+#else
+#define MAGIC_CLCK_NUMBER       (0x1971)
+#endif
+
 static struct {
     rtc_alarm_cb_t cb;          /**< callback called from RTC interrupt */
     void *arg;                  /**< argument passed to the callback */
@@ -186,6 +194,19 @@ static inline void rtc_lock(void)
 
 void rtc_init(void)
 {
+    stmclk_dbp_unlock();
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
+    /* Compare the stored magic number with the current one. If it's different
+       it means the clock source has changed and thus a RTC reset is
+       required. */
+    if (RTC->BKP0R != MAGIC_CLCK_NUMBER) {
+        RCC->CSR |= RCC_CSR_RTCRST;
+        RCC->CSR &= ~RCC_CSR_RTCRST;
+        RTC->BKP0R = MAGIC_CLCK_NUMBER; /* Store the new magic number */
+    }
+#endif
+    stmclk_dbp_lock();
+
     /* enable low frequency clock */
     stmclk_enable_lfclk();
 
@@ -220,7 +241,7 @@ int rtc_set_time(struct tm *time)
 {
     rtc_unlock();
     RTC->DR = (val2bcd((time->tm_year % 100), RTC_DR_YU_Pos, DR_Y_MASK) |
-               val2bcd(time->tm_mon,  RTC_DR_MU_Pos, DR_M_MASK) |
+               val2bcd(time->tm_mon + 1,  RTC_DR_MU_Pos, DR_M_MASK) |
                val2bcd(time->tm_mday, RTC_DR_DU_Pos, DR_D_MASK));
     RTC->TR = (val2bcd(time->tm_hour, RTC_TR_HU_Pos, TR_H_MASK) |
                val2bcd(time->tm_min,  RTC_TR_MNU_Pos, TR_M_MASK) |
@@ -237,7 +258,7 @@ int rtc_get_time(struct tm *time)
     uint32_t tr = RTC->TR;
     uint32_t dr = RTC->DR;
     time->tm_year = bcd2val(dr, RTC_DR_YU_Pos, DR_Y_MASK) + YEAR_OFFSET;
-    time->tm_mon  = bcd2val(dr, RTC_DR_MU_Pos, DR_M_MASK);
+    time->tm_mon  = bcd2val(dr, RTC_DR_MU_Pos, DR_M_MASK) - 1;
     time->tm_mday = bcd2val(dr, RTC_DR_DU_Pos, DR_D_MASK);
     time->tm_hour = bcd2val(tr, RTC_TR_HU_Pos, TR_H_MASK);
     time->tm_min  = bcd2val(tr, RTC_TR_MNU_Pos, TR_M_MASK);
@@ -278,7 +299,7 @@ int rtc_get_alarm(struct tm *time)
     uint32_t alrm = RTC->ALRMAR;
 
     time->tm_year = bcd2val(dr, RTC_DR_YU_Pos, DR_Y_MASK) + YEAR_OFFSET;
-    time->tm_mon  = bcd2val(dr, RTC_DR_MU_Pos, DR_M_MASK);
+    time->tm_mon  = bcd2val(dr, RTC_DR_MU_Pos, DR_M_MASK) - 1;
     time->tm_mday = bcd2val(alrm, RTC_ALRMAR_DU_Pos, ALRM_D_MASK);
     time->tm_hour = bcd2val(alrm, RTC_ALRMAR_HU_Pos, ALRM_H_MASK);
     time->tm_min  = bcd2val(alrm, RTC_ALRMAR_MNU_Pos, ALRM_M_MASK);

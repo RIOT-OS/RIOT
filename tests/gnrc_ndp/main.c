@@ -436,6 +436,9 @@ static void test_nbr_sol_send(const ipv6_addr_t *src)
     gnrc_pktsnip_t *pkt;
     ndp_nbr_sol_t *nbr_sol;
 
+    while (msg_try_receive(&msg) == 1) {
+        /* empty message queue */
+    }
     TEST_ASSERT_NOT_NULL(test_netif);
     gnrc_ndp_nbr_sol_send(&test_tgt, test_netif, src, &test_dst, NULL);
     msg_receive(&msg);
@@ -947,45 +950,6 @@ static gnrc_pktsnip_t *_test_netif_recv(gnrc_netif_t *netif)
     return NULL;
 }
 
-static int _test_netif_get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
-{
-    (void)netif;
-    switch (opt->opt) {
-        case NETOPT_ADDRESS_LONG:
-            if (opt->data_len < sizeof(test_src_l2)) {
-                return -EOVERFLOW;
-            }
-            memcpy(opt->data, test_src_l2, sizeof(test_src_l2));
-            return sizeof(test_src_l2);
-        case NETOPT_SRC_LEN: {
-                uint16_t *val = opt->data;
-                if (opt->data_len != sizeof(uint16_t)) {
-                    return -EOVERFLOW;
-                }
-                *val = sizeof(test_src_l2);
-                return sizeof(uint16_t);
-            }
-        case NETOPT_IPV6_IID:
-            if (opt->data_len < sizeof(uint64_t)) {
-                return -EOVERFLOW;
-            }
-            memcpy(opt->data, &test_src.u64[1], sizeof(uint64_t));
-            return sizeof(uint64_t);
-        case NETOPT_IS_WIRED:
-            return 1;
-        case NETOPT_MAX_PACKET_SIZE: {
-                uint16_t *val = opt->data;
-                if (opt->data_len != sizeof(uint16_t)) {
-                    return -EOVERFLOW;
-                }
-                *val = 100U;
-                return sizeof(uint16_t);
-            }
-        default:
-            return -ENOTSUP;
-    }
-}
-
 static int _test_netif_set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 {
     (void)netif;
@@ -996,11 +960,43 @@ static int _test_netif_set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 static const gnrc_netif_ops_t _test_netif_ops = {
     .send = _test_netif_send,
     .recv = _test_netif_recv,
-    .get = _test_netif_get,
+    .get = gnrc_netif_get_from_netdev,
     .set = _test_netif_set,
 };
 
-int _netdev_test_device_type_get(netdev_t *dev, void *value, size_t max_len)
+static int _netdev_test_address_long(netdev_t *dev, void *value, size_t max_len)
+{
+    (void)dev;
+    assert(max_len >= sizeof(test_src_l2));
+    memcpy(value, test_src_l2, sizeof(test_src_l2));
+    return sizeof(test_src_l2);
+}
+
+static int _netdev_test_proto(netdev_t *dev, void *value, size_t max_len)
+{
+    (void)dev;
+     assert(max_len == sizeof(gnrc_nettype_t));
+     *((gnrc_nettype_t *)value) = GNRC_NETTYPE_UNDEF;
+     return sizeof(gnrc_nettype_t);
+}
+
+static int _netdev_test_src_len(netdev_t *dev, void *value, size_t max_len)
+{
+    (void)dev;
+     assert(max_len == sizeof(uint16_t));
+     *((uint16_t *)value) = sizeof(test_src_l2);
+     return sizeof(uint16_t);
+}
+
+static int _netdev_test_max_pdu_size(netdev_t *dev, void *value, size_t max_len)
+{
+    (void)dev;
+     assert(max_len == sizeof(uint16_t));
+     *((uint16_t *)value) = 100U;
+     return sizeof(uint16_t);
+}
+
+static int _netdev_test_device_type(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
      assert(max_len == sizeof(uint16_t));
@@ -1015,10 +1011,16 @@ static void init_pkt_handler(void)
                                sched_active_pid);
     gnrc_netreg_register(GNRC_NETTYPE_NDP, &netreg_entry);
     netdev_test_setup(&dev, NULL);
-    netdev_test_set_get_cb(&dev, NETOPT_DEVICE_TYPE, _netdev_test_device_type_get);
+    netdev_test_set_get_cb(&dev, NETOPT_ADDRESS_LONG,
+                           _netdev_test_address_long);
+    netdev_test_set_get_cb(&dev, NETOPT_PROTO, _netdev_test_proto);
+    netdev_test_set_get_cb(&dev, NETOPT_SRC_LEN, _netdev_test_src_len);
+    netdev_test_set_get_cb(&dev, NETOPT_MAX_PDU_SIZE,
+                           _netdev_test_max_pdu_size);
+    netdev_test_set_get_cb(&dev, NETOPT_DEVICE_TYPE, _netdev_test_device_type);
     test_netif = gnrc_netif_create(test_netif_stack, sizeof(test_netif_stack),
                                    GNRC_NETIF_PRIO, "test-netif",
-                                   &dev.netdev, &_test_netif_ops);
+                                   &dev.netdev.netdev, &_test_netif_ops);
     TEST_ASSERT_MESSAGE(test_netif != NULL,
                         "Unable to start test interface");
     memcpy(&test_netif->ipv6.addrs[0], &test_src,

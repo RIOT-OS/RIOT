@@ -21,7 +21,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
-#include "f4/cfg_clock_168_8_1.h"
+#include "f4/cfg_clock_168_8_0.h"
 #include "cfg_spi_divtable.h"
 
 #ifdef __cplusplus

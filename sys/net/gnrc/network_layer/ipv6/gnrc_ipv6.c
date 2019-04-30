@@ -229,6 +229,8 @@ static void *_event_loop(void *args)
 
 static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
+    const ipv6_hdr_t *hdr = pkt->next->data;
+
     assert(netif != NULL);
     ((gnrc_netif_hdr_t *)pkt->data)->if_pid = netif->pid;
     if (gnrc_pkt_len(pkt->next) > netif->ipv6.mtu) {
@@ -237,6 +239,11 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         gnrc_pktbuf_release_error(pkt, EMSGSIZE);
         return;
     }
+    DEBUG("ipv6: Sending (src = %s, ",
+          ipv6_addr_to_str(addr_str, &hdr->src, sizeof(addr_str)));
+    DEBUG("dst = %s, next header = %u, length = %u)\n",
+          ipv6_addr_to_str(addr_str, &hdr->dst, sizeof(addr_str)), hdr->nh,
+          byteorder_ntohs(hdr->len));
 #ifdef MODULE_NETSTATS_IPV6
     netif->ipv6.stats.tx_success++;
     netif->ipv6.stats.tx_bytes += gnrc_pkt_len(pkt->next);
@@ -348,7 +355,7 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
     DEBUG("ipv6: write protect up to payload to calculate checksum\n");
     payload = ipv6;
     prev = ipv6;
-    do {
+    while (_is_ipv6_hdr(payload) && (payload->next != NULL)) {
         /* IPv6 header itself was already write-protected in caller function,
          * just write protect extension headers and payload header */
         if ((payload = gnrc_pktbuf_start_write(payload->next)) == NULL) {
@@ -359,7 +366,7 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
         }
         prev->next = payload;
         prev = payload;
-    } while (_is_ipv6_hdr(payload) && (payload->next != NULL));
+    }
     DEBUG("ipv6: calculate checksum for upper header.\n");
     if ((res = gnrc_netreg_calc_csum(payload, ipv6)) < 0) {
         if (res != -ENOENT) {   /* if there is no checksum we are okay */

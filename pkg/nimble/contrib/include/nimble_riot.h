@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     pkg_nimble
+ * @ingroup     ble_nimble
  * @{
  *
  * @file
@@ -18,6 +18,8 @@
 
 #ifndef NIMBLE_RIOT_H
 #define NIMBLE_RIOT_H
+
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,6 +54,11 @@ extern "C" {
 #ifndef NIMBLE_HOST_STACKSIZE
 #define NIMBLE_HOST_STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
 #endif
+
+/**
+ * @brief   Export our own address type for later usage
+ */
+extern uint8_t nimble_riot_own_addr_type;
 
 /**
  * @brief   Setup and run NimBLE's controller and host threads
