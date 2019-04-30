@@ -1,3 +1,5 @@
+.PHONY: info-applications
+
 # fallback so empty RIOTBASE won't lead to "/examples/"
 RIOTBASE ?= .
 
