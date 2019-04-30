@@ -51,6 +51,15 @@ static int _init(netdev_t *netdev)
 {
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
 
+    /* fill transceiver capabilities */
+    netdev_ieee802154_t *ieee802154_dev = (netdev_ieee802154_t*) netdev;
+    ieee802154_dev->caps = NETDEV_IEEE802154_CAPS_TX_CHECKSUM    |
+                           NETDEV_IEEE802154_CAPS_CSMA           |
+                           NETDEV_IEEE802154_CAPS_FRAME_RETRIES  |
+                           NETDEV_IEEE802154_CAPS_ADDRESS_FILTER |
+                           NETDEV_IEEE802154_CAPS_AUTO_ACK       |
+                           NETDEV_IEEE802154_CAPS_PROMISCUOUS;
+
     /* initialize GPIOs */
     spi_init_cs(dev->params.spi, dev->params.cs_pin);
     gpio_init(dev->params.reset_pin, GPIO_OUT);
