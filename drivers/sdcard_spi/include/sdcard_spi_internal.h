@@ -186,7 +186,7 @@ typedef enum {
  * @return                SD_INVALID_R1_RESPONSE if either waiting for the card to enter
  *                        not-busy-state timed out or spi communication failed
  */
-char sdcard_spi_send_cmd(sdcard_spi_t *card, char sd_cmd_idx, uint32_t argument, int32_t max_retry);
+uint8_t sdcard_spi_send_cmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t argument, int32_t max_retry);
 
 /**
  * @brief                 Sends an acmd to the sd card. ACMD<n> consists of sending CMD55 + CMD<n>
@@ -204,7 +204,7 @@ char sdcard_spi_send_cmd(sdcard_spi_t *card, char sd_cmd_idx, uint32_t argument,
  * @return                SD_INVALID_R1_RESPONSE if either waiting for the card to enter
  *                        not-busy-state timed out or spi communication failed
  */
-char sdcard_spi_send_acmd(sdcard_spi_t *card, char sd_cmd_idx, uint32_t argument, int32_t max_retry);
+uint8_t sdcard_spi_send_acmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t argument, int32_t max_retry);
 
 /**
  * @brief                 Gets the sector count of the card.
