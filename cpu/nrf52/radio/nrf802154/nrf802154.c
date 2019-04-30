@@ -194,6 +194,9 @@ static void _timer_cb(void *arg, int chan)
 static int _init(netdev_t *dev)
 {
     (void)dev;
+    /* fill transceiver capabilities */
+    netdev_ieee802154_t *ieee802154_dev = (netdev_ieee802154_t*) dev;
+    ieee802154_dev->caps = NETDEV_IEEE802154_CAPS_TX_CHECKSUM;
 
     int result = timer_init(NRF802154_TIMER, TIMER_FREQ, _timer_cb, NULL);
     assert(result >= 0);
