@@ -38,6 +38,7 @@
 
 #include "esp_common.h"
 #include "adc_arch.h"
+#include "adc_ctrl.h"
 #include "gpio_arch.h"
 #include "irq_arch.h"
 #include "syscalls.h"
