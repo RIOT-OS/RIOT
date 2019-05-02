@@ -79,6 +79,11 @@ static const gpio_t adc_channels[] = ADC_GPIOS;
 #endif
 
 /**
+ * @brief   Static array with declared DAC channels
+ */
+static const gpio_t dac_channels[] = DAC_GPIOS;
+
+/**
  * @brief Number of GPIOs declared as DAC channels
  *
  * The number of GPIOs that are declared as DAC channels is determined from
@@ -86,7 +91,7 @@ static const gpio_t adc_channels[] = ADC_GPIOS;
  *
  * @note DAC_NUMOF definition must not be changed.
  */
-#define DAC_NUMOF   (dac_chn_num)
+#define DAC_NUMOF   (sizeof(dac_channels) / sizeof(dac_channels[0]))
 /** @} */
 
 
