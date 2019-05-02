@@ -47,6 +47,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Static array with declared ADC channels
+ */
+static const gpio_t adc_channels[] = ADC_GPIOS;
+
+/**
  * @brief Number of GPIOs declared as ADC channels
  *
  * The number of GPIOs that are declared as ADC channels is determined from
@@ -54,7 +59,7 @@ extern "C" {
  *
  * @note ADC_NUMOF definition must not be changed.
  */
-#define ADC_NUMOF   (adc_chn_num)
+#define ADC_NUMOF   (sizeof(adc_channels) / sizeof(adc_channels[0]))
 /** @} */
 
 /**
