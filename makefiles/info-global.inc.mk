@@ -16,7 +16,9 @@ define board_missing_features
   FEATURES_OPTIONAL := $(FEATURES_OPTIONAL_GLOBAL)
   FEATURES_MISSING  :=
   FEATURES_PROVIDED :=
-  include $$(RIOTBOARD)/$(1)/Makefile.features
+
+  include $(RIOTBASE)/Makefile.features
+
   ifdef BUILDTEST_MCU_GROUP
     ifneq ($(BUILDTEST_MCU_GROUP), $$(FEATURES_MCU_GROUP))
       BOARDS_FEATURES_MISSING += "$(1) $(BUILDTEST_MCU_GROUP)"
