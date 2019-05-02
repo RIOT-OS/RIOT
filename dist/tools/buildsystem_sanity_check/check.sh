@@ -128,6 +128,22 @@ check_deprecated_vars_patterns() {
         | error_with_message 'Deprecated variables or patterns:'
 }
 
+# Makefile files cpu must not be included by the board anymore
+# They are included by the main Makefile.include/Makefile.features/Makefile.dep
+check_board_do_not_include_cpu_features_dep() {
+    local patterns=()
+    local pathspec=()
+
+    # shellcheck disable=SC2016
+    # Single quotes are used to not expand expressions
+    patterns+=(-e 'include $(RIOTCPU)/.*/Makefile\..*')
+
+    pathspec+=('boards/')
+
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+            | error_with_message 'Makefiles files from cpu must not be included by the board anymore'
+}
+
 # Applications Makefile must not set 'BOARD =' unconditionally
 check_not_setting_board_equal() {
     local patterns=()
@@ -149,6 +165,7 @@ all_checks() {
     check_not_parsing_features
     check_not_exporting_variables
     check_deprecated_vars_patterns
+    check_board_do_not_include_cpu_features_dep
     check_not_setting_board_equal
 }
 
