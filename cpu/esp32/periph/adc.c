@@ -35,12 +35,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/** Map of RIOT ADC to GPIOs */
-static const uint32_t adc_pins[] = ADC_GPIOS;
-
-/** number of ADC channels */
-const unsigned adc_chn_num = (sizeof(adc_pins) / sizeof(adc_pins[0]));
-
 /* declaration of external functions */
 extern void _adc1_ctrl_init(void);
 extern void _adc2_ctrl_init(void);
@@ -55,7 +49,7 @@ extern const gpio_t _gpio_rtcio_map[];
 
 int adc_init(adc_t line)
 {
-    CHECK_PARAM_RET (line < adc_chn_num, -1)
+    CHECK_PARAM_RET (line < ADC_NUMOF, -1)
 
     if (!_adc_module_initialized) {
         /* do some configuration checks */
@@ -66,7 +60,7 @@ int adc_init(adc_t line)
         _adc_module_initialized = true;
     }
 
-    uint8_t rtcio = _gpio_rtcio_map[adc_pins[line]];
+    uint8_t rtcio = _gpio_rtcio_map[adc_channels[line]];
 
     if (_adc_hw[rtcio].adc_ctrl == ADC1_CTRL) {
         _adc1_ctrl_init();
@@ -158,10 +152,10 @@ int adc_init(adc_t line)
 
 int adc_sample(adc_t line, adc_res_t res)
 {
-    CHECK_PARAM_RET (line < adc_chn_num, -1)
+    CHECK_PARAM_RET (line < ADC_NUMOF, -1)
     CHECK_PARAM_RET (res <= ADC_RES_12BIT, -1)
 
-    uint8_t rtcio = _gpio_rtcio_map[adc_pins[line]];
+    uint8_t rtcio = _gpio_rtcio_map[adc_channels[line]];
 
     if (_adc_hw[rtcio].adc_ctrl == ADC1_CTRL) {
         /* set the resolution for the measurement */
@@ -202,9 +196,9 @@ int adc_sample(adc_t line, adc_res_t res)
 
 int adc_set_attenuation(adc_t line, adc_attenuation_t atten)
 {
-    CHECK_PARAM_RET (line < adc_chn_num, -1)
+    CHECK_PARAM_RET (line < ADC_NUMOF, -1)
 
-    uint8_t rtcio = _gpio_rtcio_map[adc_pins[line]];
+    uint8_t rtcio = _gpio_rtcio_map[adc_channels[line]];
 
     if (_adc_hw[rtcio].adc_ctrl == ADC1_CTRL) {
         SENS.sar_atten1 &= ~(0x3 << (_adc_hw[rtcio].adc_channel << 1));
@@ -221,8 +215,8 @@ int adc_vref_to_gpio25 (void)
 {
     /* determine ADC line for GPIO25 */
     adc_t line = ADC_UNDEF;
-    for (unsigned i = 0; i < adc_chn_num; i++) { \
-        if (adc_pins[i] == GPIO25) { \
+    for (unsigned i = 0; i < ADC_NUMOF; i++) { \
+        if (adc_channels[i] == GPIO25) { \
             line = i;
             break;
         }
@@ -235,7 +229,7 @@ int adc_vref_to_gpio25 (void)
 
     if (adc_init(line) == 0)
     {
-        uint8_t rtcio = _gpio_rtcio_map[adc_pins[line]];
+        uint8_t rtcio = _gpio_rtcio_map[adc_channels[line]];
         RTCCNTL.bias_conf.dbg_atten = 0;
         RTCCNTL.test_mux.dtest_rtc = 1;
         RTCCNTL.test_mux.ent_rtc = 1;
@@ -252,10 +246,10 @@ int adc_vref_to_gpio25 (void)
 
 static bool _adc_conf_check(void)
 {
-    for (unsigned i = 0; i < adc_chn_num; i++) {
-        if (_gpio_rtcio_map[adc_pins[i]] == RTCIO_NA) {
+    for (unsigned i = 0; i < ADC_NUMOF; i++) {
+        if (_gpio_rtcio_map[adc_channels[i]] == RTCIO_NA) {
             LOG_TAG_ERROR("adc", "GPIO%d cannot be used as ADC line\n",
-                          adc_pins[i]);
+                          adc_channels[i]);
             return false;
         }
     }
@@ -279,8 +273,8 @@ void adc_print_config(void)
 {
     ets_printf("\tADC\t\tpins=[ ");
 #if defined(ADC_GPIOS)
-    for (unsigned i = 0; i < adc_chn_num; i++) {
-        ets_printf("%d ", adc_pins[i]);
+    for (unsigned i = 0; i < ADC_NUMOF; i++) {
+        ets_printf("%d ", adc_channels[i]);
     }
 #endif /* defined(ADC_GPIOS) */
     ets_printf("]\n");

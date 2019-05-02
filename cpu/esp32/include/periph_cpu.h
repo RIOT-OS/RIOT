@@ -243,9 +243,6 @@ typedef enum {
  */
 #define ADC_NUMOF_MAX   16
 
-/** Number of ADC channels determined from ADC_GPIOS */
-extern const unsigned adc_chn_num;
-
 /** @} */
 
 /**
