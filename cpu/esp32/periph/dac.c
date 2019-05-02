@@ -35,12 +35,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/** Map of RIOT DAC lines to GPIOs */
-static const uint32_t dac_pins[] = DAC_GPIOS;
-
-/** number of DAC channels */
-const unsigned dac_chn_num = (sizeof(dac_pins) / sizeof(dac_pins[0]));
-
 /* declaration of external functions */
 extern void _adc2_ctrl_init(void);
 
@@ -53,7 +47,7 @@ extern const gpio_t _gpio_rtcio_map[];
 
 int8_t dac_init (dac_t line)
 {
-    CHECK_PARAM_RET (line < dac_chn_num, DAC_NOLINE)
+    CHECK_PARAM_RET (line < DAC_NUMOF, DAC_NOLINE)
 
     if (!_dac_module_initialized) {
         /* do some configuration checks */
@@ -65,7 +59,7 @@ int8_t dac_init (dac_t line)
 
     _adc2_ctrl_init();
 
-    uint8_t rtcio = _gpio_rtcio_map[dac_pins[line]];
+    uint8_t rtcio = _gpio_rtcio_map[dac_channels[line]];
     uint8_t idx;
 
     /* try to initialize the pin as DAC ouput */
@@ -112,27 +106,27 @@ int8_t dac_init (dac_t line)
 
 void dac_set (dac_t line, uint16_t value)
 {
-    CHECK_PARAM (line < dac_chn_num);
-    RTCIO.pad_dac[_gpio_rtcio_map[dac_pins[line]] - RTCIO_DAC1].dac = value >> 8;
+    CHECK_PARAM (line < DAC_NUMOF);
+    RTCIO.pad_dac[_gpio_rtcio_map[dac_channels[line]] - RTCIO_DAC1].dac = value >> 8;
 }
 
 void dac_poweroff (dac_t line)
 {
-    CHECK_PARAM (line < dac_chn_num);
+    CHECK_PARAM (line < DAC_NUMOF);
 }
 
 void dac_poweron (dac_t line)
 {
-    CHECK_PARAM (line < dac_chn_num);
+    CHECK_PARAM (line < DAC_NUMOF);
 }
 
 static bool _dac_conf_check(void)
 {
-    for (unsigned i = 0; i < dac_chn_num; i++) {
-        if (_gpio_rtcio_map[dac_pins[i]] != RTCIO_DAC1 &&
-            _gpio_rtcio_map[dac_pins[i]] != RTCIO_DAC2) {
+    for (unsigned i = 0; i < DAC_NUMOF; i++) {
+        if (_gpio_rtcio_map[dac_channels[i]] != RTCIO_DAC1 &&
+            _gpio_rtcio_map[dac_channels[i]] != RTCIO_DAC2) {
             LOG_TAG_ERROR("dac", "GPIO%d cannot be used as DAC line\n",
-                          dac_pins[i]);
+                          dac_channels[i]);
             return false;
         }
     }
@@ -144,8 +138,8 @@ void dac_print_config(void)
 {
     ets_printf("\tDAC\t\tpins=[ ");
 #if defined(DAC_GPIOS)
-    for (unsigned i = 0; i < dac_chn_num; i++) {
-        ets_printf("%d ", dac_pins[i]);
+    for (unsigned i = 0; i < DAC_NUMOF; i++) {
+        ets_printf("%d ", dac_channels[i]);
     }
 #endif /* defined(DAC_GPIOS) */
     ets_printf("]\n");
