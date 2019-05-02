@@ -11,6 +11,11 @@
 
 include $(RIOTBOARD)/$(BOARD)/Makefile.features
 
+# Transitional conditional include until all boards define 'CPU'
+ifneq (,$(CPU))
+  include $(RIOTCPU)/$(CPU)/Makefile.features
+endif
+
 
 # Resolve FEATURES_ variables
 # Their value will only be complete after resolving dependencies
