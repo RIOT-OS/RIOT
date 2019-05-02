@@ -1,6 +1,6 @@
 # the cpu to build for
-export CPU ?= esp32
-export CPU_MODEL ?= esp32
+export CPU = esp32
+export CPU_MODEL = esp32
 
 # configure the serial interface
 PORT_LINUX ?= /dev/ttyUSB0
