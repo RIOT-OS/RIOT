@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016-18 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2018 Inria
  *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
