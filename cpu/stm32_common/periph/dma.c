@@ -62,13 +62,7 @@
 #define MEM_ADDR                CMAR
 #define NDTR_REG                CNDTR
 #define CONTROL_REG             CCR
-#if CPU_FAM_STM32L1
-#define DMA_CCR_TCIE            DMA_CCR1_TCIE
-#define DMA_CCR_TEIE            DMA_CCR1_TEIE
-#define DMA_EN                  DMA_CCR1_EN
-#else /* CPU_FAM_STM32L1 */
 #define DMA_EN                  DMA_CCR_EN
-#endif /* CPU_FAM_STM32L1 */
 #define DMA_STREAM_IT_MASK      (DMA_IFCR_CGIF1 | DMA_IFCR_CTCIF1 | \
                                  DMA_IFCR_CHTIF1 | DMA_IFCR_CTEIF1)
 #ifndef DMA_CCR_MSIZE_Pos

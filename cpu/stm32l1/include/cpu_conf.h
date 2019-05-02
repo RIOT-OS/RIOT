@@ -23,37 +23,17 @@
 
 #include "cpu_conf_common.h"
 
-/**
- * @brief  STM32 L1 cpu type
- *
- * From CMSIS header file, allowed values for L1 cpu types are:
- * * STM32L1XX_MD:
- *   * Ultra Low Power Medium-density devices: STM32L151x6xx, STM32L151x8xx,
- *     STM32L151xBxx, STM32L152x6xx, STM32L152x8xx, STM32L152xBxx,
- *     STM32L151x6xxA, STM32L151x8xxA, STM32L151xBxxA, STM32L152x6xxA,
- *     SM32L152x8xxA and STM32L152xBxxA.
- *   * Ultra Low Power Medium-density Value Line devices: STM32L100x6xx,
- *     STM32L100x8xx and STM32L100xBxx.
- *
- * * STM32L1XX_MDP:
- *   * Ultra Low Power Medium-density Plus devices: STM32L151xCxx,
- *     STM32L152xCxx and STM32L162xCxx
- *   * Ultra Low Power Medium-density Plus Value Line devices: STM32L100xCxx
- *
- * * STM32L1XX_HD: Ultra Low Power High-density devices: STM32L151xDxx,
- *    STM32L152xDxx and STM32L162xDxx
- *
- * * STM32L1XX_XL: Ultra Low Power XL-density devices: STM32L151xExx,
- *   STM32L152xExx and STM32L162xExx
- */
-#if defined(CPU_MODEL_STM32L151RBA) || defined(CPU_MODEL_STM32L151CB)
+#if defined(CPU_MODEL_STM32L151RBA)
 #define STM32L1XX_MD (1U)
+#include "vendor/stm32l151xba.h"
+#elif defined(CPU_MODEL_STM32L151CB)
+#define STM32L1XX_MD (1U)
+#include "vendor/stm32l151xb.h"
 #elif defined(CPU_MODEL_STM32L151RC)
-#define STM32L1XX_MDP (1U)
-#else
-#define STM32L1XX_XL (1U)
+#include "vendor/stm32l151xc.h"
+#elif defined(CPU_MODEL_STM32L152RE)
+#include "vendor/stm32l152xe.h"
 #endif
-#include "vendor/stm32l1xx.h"
 
 #ifdef __cplusplus
 extern "C" {
