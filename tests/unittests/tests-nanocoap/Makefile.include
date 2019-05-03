@@ -1,1 +1,4 @@
 USEMODULE += nanocoap
+USEMODULE += nanocoap_sock
+USEMODULE += gnrc_sock_udp
+USEMODULE += gnrc_ipv6_default

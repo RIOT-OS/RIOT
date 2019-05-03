@@ -19,7 +19,7 @@
 
 #include "embUnit.h"
 
-#include "net/nanocoap.h"
+#include "net/nanocoap_sock.h"
 
 #include "unittests-constants.h"
 #include "tests-nanocoap.h"

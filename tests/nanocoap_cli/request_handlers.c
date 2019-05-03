@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "fmt.h"
-#include "net/nanocoap.h"
+#include "net/nanocoap_sock.h"
 
 #define _MAX_PAYLOAD_LEN  (16)
 
