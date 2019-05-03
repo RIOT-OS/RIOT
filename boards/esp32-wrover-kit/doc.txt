@@ -36,7 +36,7 @@ The Espressif ESP-WROVER-KIT is a development board that uses the ESP32-WROVER m
 
 Furthermore, many GPIOs are broken out for extension. The USB bridge based on FDI FT2232HL provides a JTAG interface for OCD debugging through the USB interface.
 
-\htmlonly<style>div.image img[src="https://docs.espressif.com/projects/esp-idf/en/latest/_images/esp32-wrover-kit-layout-front.jpg"]{width:600px;}</style>\endhtmlonly@image html "https://docs.espressif.com/projects/esp-idf/en/latest/_images/esp32-wrover-kit-layout-front.jpg" "ESP-WROVER-KIT V3"
+\htmlonly<style>div.image img[src="https://dl.espressif.com/dl/schematics/pictures/esp-wrover-kit-v3.jpg"]{width:600px;}</style>\endhtmlonly@image html "https://dl.espressif.com/dl/schematics/pictures/esp-wrover-kit-v3.jpg" "ESP-WROVER-KIT V3"
 
 ## <a name="hardware"> Hardware </a> &nbsp;&nbsp; [[TOC](#toc)]
 
