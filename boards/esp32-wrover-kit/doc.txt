@@ -93,7 +93,7 @@ ESP-WROVER-KIT has the following on-board components
 
 The following table shows the default board configuration sorted according to the defined functionality of GPIOs for different hardware options. This configuration can be overridden by \ref esp32_app_spec_conf "application-specific configurations".
 
-In the following table following abbreviations are used:
+These abbreviations are used in subsequent tables:
 
 <b>SDC</b> = SD-Card interface is used (module **sdcard_spi** is enabled)<br>
 <b>CAM</b> = Camera is plugged in/used
