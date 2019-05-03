@@ -248,7 +248,7 @@ The USB bridge is based on FDI FT2232HL and offers two USB interfaces:
 - the first interface is the JTAG interface for [On-Chip debugging](#debugging)
 - the second interface is the console interface, which is also used for flashing
 
-Therefore, you have to declare the USB interface in the make command. For example, if the ESP32-WROVER-KIT is connected to the host computer through the USB interfaces **/dev/ttyUSB0** and **/dev/ttyUSB1**, the make command would be used as following:
+Therefore, you have to declare the USB interface in the make command. For example, if the ESP32-WROVER-KIT is connected to the host computer through the USB interfaces `/dev/ttyUSB0` and `/dev/ttyUSB1`, the make command would be used as following:
 ```
 make flash BOARD=esp32-wrover-kit PORT=/dev/ttyUSB1 ...
 ```
