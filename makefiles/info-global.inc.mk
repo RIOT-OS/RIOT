@@ -31,9 +31,7 @@ define board_missing_features
   FEATURES_MISSING := $$(sort $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED)))
   ifneq (, $$(FEATURES_MISSING))
     BOARDS_FEATURES_MISSING += "$(1) $$(FEATURES_MISSING)"
-    ifneq (, $$(filter-out $$(FEATURES_OPTIONAL), $$(FEATURES_MISSING)))
-      BOARDS_WITH_MISSING_FEATURES += $(1)
-    endif
+    BOARDS_WITH_MISSING_FEATURES += $(1)
   endif
 endef
 
