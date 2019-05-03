@@ -11,7 +11,7 @@
 #include <string.h>
 
 #include "fmt.h"
-#include "net/nanocoap.h"
+#include "net/nanocoap_sock.h"
 #include "hashes/sha256.h"
 
 /* internal value that can be read/written via CoAP */
