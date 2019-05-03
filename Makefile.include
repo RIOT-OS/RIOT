@@ -622,9 +622,9 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   endif
 
   # Test if all feature requirements were met by the selected board.
-  ifneq (,$(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED)))
+  ifneq (,$(FEATURES_MISSING))
     $(shell $(COLOR_ECHO) "$(COLOR_RED)There are unsatisfied feature requirements:$(COLOR_RESET)"\
-                          "$(sort $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED)))" 1>&2)
+                          "$(FEATURES_MISSING)" 1>&2)
     EXPECT_ERRORS := 1
   endif
 

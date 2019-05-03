@@ -1,3 +1,11 @@
 # Process FEATURES variables
 
 include $(RIOTBOARD)/$(BOARD)/Makefile.features
+
+
+# Resolve FEATURES_ variables
+# Their value will only be complete after resolving dependencies
+
+# Features that are required by the application but not provided by the BSP
+# Having features missing may case the build to fail.
+FEATURES_MISSING = $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_REQUIRED)))

@@ -14,7 +14,6 @@ define board_missing_features
   DISABLE_MODULE    := $(DISABLE_MODULE_GLOBAL)
   FEATURES_REQUIRED := $(FEATURES_REQUIRED_GLOBAL)
   FEATURES_OPTIONAL := $(FEATURES_OPTIONAL_GLOBAL)
-  FEATURES_MISSING  :=
   FEATURES_PROVIDED :=
 
   include $(RIOTBASE)/Makefile.features
@@ -28,8 +27,7 @@ define board_missing_features
 
   include $(RIOTBASE)/Makefile.dep
 
-  FEATURES_MISSING := $$(sort $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED)))
-  ifneq (, $$(FEATURES_MISSING))
+  ifneq (,$$(FEATURES_MISSING))
     BOARDS_FEATURES_MISSING += "$(1) $$(FEATURES_MISSING)"
     BOARDS_WITH_MISSING_FEATURES += $(1)
   endif
