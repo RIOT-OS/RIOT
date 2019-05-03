@@ -865,10 +865,9 @@ FEATURES_OPTIONAL += periph_pm
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
-# add all optional but provided features to the list of used features
-FEATURES_USED := $(sort $(FEATURES_REQUIRED) $(filter $(FEATURES_OPTIONAL),$(FEATURES_PROVIDED)))
 
 # all periph features correspond to a periph submodule
+# FEATURES_USED is defined in Makefile.features
 USEMODULE += $(filter periph_%,$(FEATURES_USED))
 
 # select cpu_check_address pseudomodule if the corresponding feature is used

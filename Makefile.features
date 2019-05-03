@@ -9,3 +9,13 @@ include $(RIOTBOARD)/$(BOARD)/Makefile.features
 # Features that are required by the application but not provided by the BSP
 # Having features missing may case the build to fail.
 FEATURES_MISSING = $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_REQUIRED)))
+
+# Features that are only optional and not required at the same time.
+# The policy is to by default use by features if they are provided by the BSP.
+FEATURES_OPTIONAL_ONLY = $(sort $(filter-out $(FEATURES_REQUIRED),$(FEATURES_OPTIONAL)))
+FEATURES_OPTIONAL_USED = $(sort $(filter $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
+# Optional features that will not be used because they are not provided
+FEATURES_OPTIONAL_MISSING = $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
+
+# Features that are used for an application
+FEATURES_USED = $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
