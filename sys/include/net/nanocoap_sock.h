@@ -11,7 +11,7 @@
 /**
  * @defgroup    net_nanosock Nanocoap Sock
  * @ingroup     net
- * @brief       Synchronous sock based messaging with nanocoap
+ * @brief       Synchronous sock based application messaging with nanocoap
  *
  * nanocoap sock uses the nanocoap CoAP library to provide a synchronous
  * interface to RIOT's sock networking API to read and write CoAP messages.
@@ -27,11 +27,9 @@
  * which it responds. See the declarations of `coap_resources` and
  * `coap_resources_numof`. The array contents must be ordered by the resource
  * path, specifically the ASCII encoding of the path characters (digit and
- * capital precede lower case). Also see _Server path matching_ in the base
- * [nanocoap](group__net__nanocoap.html) documentation.
- *
- * nanocoap itself provides the COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER entry for
- * `/.well-known/core`.
+ * capital precede lower case). Use the COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER
+ * macro for the default `/.well-known/core` entry. Also see _Server path
+ * matching_ in the base [nanocoap](group__net__nanocoap.html) documentation.
  *
  * ### Handler functions ###
  *
@@ -138,6 +136,142 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Global CoAP resource list
+ */
+extern const coap_resource_t coap_resources[];
+
+/**
+ * @brief   Number of entries in global CoAP resource list
+ */
+extern const unsigned coap_resources_numof;
+
+
+/**
+ * @brief   Build reply to CoAP request
+ *
+ * This function can be used to create a reply to any CoAP request packet.  It
+ * will create the reply packet header based on parameters from the request
+ * (e.g., id, token).
+ *
+ * Passing a non-zero @p payload_len will ensure the payload fits into the
+ * buffer along with the header. For this validation, payload_len must include
+ * any options, the payload marker, as well as the payload proper.
+ *
+ * @param[in]   pkt         packet to reply to
+ * @param[in]   code        reply code (e.g., COAP_CODE_204)
+ * @param[out]  rbuf        buffer to write reply to
+ * @param[in]   rlen        size of @p rbuf
+ * @param[in]   payload_len length of payload
+ *
+ * @returns     size of reply packet on success
+ * @returns     <0 on error
+ * @returns     -ENOSPC if @p rbuf too small
+ */
+ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
+                         uint8_t *rbuf, unsigned rlen, unsigned payload_len);
+
+/**
+ * @brief   Build reply to CoAP block2 request
+ *
+ * This function can be used to create a reply to a CoAP block2 request
+ * packet. In addition to @ref coap_build_reply, this function checks the
+ * block2 option and returns an error message to the client if necessary.
+ *
+ * @param[in]   pkt         packet to reply to
+ * @param[in]   code        reply code (e.g., COAP_CODE_204)
+ * @param[out]  rbuf        buffer to write reply to
+ * @param[in]   rlen        size of @p rbuf
+ * @param[in]   payload_len length of payload
+ * @param[in]   slicer      slicer to use
+ *
+ * @returns     size of reply packet on success
+ * @returns     <0 on error
+ */
+ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
+                                uint8_t *rbuf, unsigned rlen, unsigned payload_len,
+                                coap_block_slicer_t *slicer);
+
+/**
+ * @brief   Handle incoming CoAP request
+ *
+ * This function will find the correct handler, call it and write the reply
+ * into @p resp_buf.
+ *
+ * @param[in]   pkt             pointer to (parsed) CoAP packet
+ * @param[out]  resp_buf        buffer for response
+ * @param[in]   resp_buf_len    size of response buffer
+ *
+ * @returns     size of reply packet on success
+ * @returns     <0 on error
+ */
+ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len);
+
+/**
+ * @brief   Pass a coap request to a matching handler
+ *
+ * This function will try to find a matching handler in @p resources and call
+ * the handler.
+ *
+ * @param[in]   pkt             pointer to (parsed) CoAP packet
+ * @param[out]  resp_buf        buffer for response
+ * @param[in]   resp_buf_len    size of response buffer
+ * @param[in]   resources       Array of coap endpoint resources
+ * @param[in]   resources_numof length of the coap endpoint resources
+ *
+ * @returns     size of the reply packet on success
+ * @returns     <0 on error
+ */
+ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
+                          unsigned resp_buf_len,
+                          const coap_resource_t *resources,
+                          size_t resources_numof);
+
+/**
+ * @brief   Create CoAP reply (convenience function)
+ *
+ * This is a simple wrapper that allows for building CoAP replies for simple
+ * use-cases.
+ *
+ * The reply will be written to @p buf. If @p payload and @p payload_len are
+ * non-zero, the payload will be copied into the resulting reply packet.
+ *
+ * @param[in]   pkt         packet to reply to
+ * @param[in]   code        reply code (e.g., COAP_CODE_204)
+ * @param[out]  buf         buffer to write reply to
+ * @param[in]   len         size of @p buf
+ * @param[in]   ct          content type of payload
+ * @param[in]   payload     ptr to payload
+ * @param[in]   payload_len length of payload
+ *
+ * @returns     size of reply packet on success
+ * @returns     <0 on error
+ * @returns     -ENOSPC if @p buf too small
+ */
+ssize_t coap_reply_simple(coap_pkt_t *pkt,
+                          unsigned code,
+                          uint8_t *buf, size_t len,
+                          unsigned ct,
+                          const uint8_t *payload, uint8_t payload_len);
+
+/**
+ * @brief   Reference to the default .well-known/core handler defined by the
+ *          application
+ */
+extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
+                                                    uint8_t *buf, size_t len,
+                                                    void *context);
+
+/**
+ * @brief   Resource definition for the default .well-known/core handler
+ */
+#define COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER \
+    { \
+        .path = "/.well-known/core", \
+        .methods = COAP_GET, \
+        .handler = coap_well_known_core_default_handler \
+    }
 
 /**
  * @brief   Start a nanocoap server instance
