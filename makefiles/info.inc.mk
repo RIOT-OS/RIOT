@@ -62,6 +62,8 @@ info-build:
 	@echo ''
 	@echo 'FEATURES_CONFLICT:     $(FEATURES_CONFLICT)'
 	@echo 'FEATURES_CONFLICT_MSG: $(FEATURES_CONFLICT_MSG)'
+	@echo 'FEATURES_CONFLICTING:'
+	@echo '         $(or $(FEATURES_CONFLICTING), -none-)'
 	@echo ''
 	@echo -e 'INCLUDES:$(patsubst %, \n\t%, $(INCLUDES))'
 	@echo ''
