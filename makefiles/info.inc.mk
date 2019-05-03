@@ -57,7 +57,7 @@ info-build:
 	@echo 'FEATURES_MISSING (incl. optional features):'
 	@echo '         $(or $(sort $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL))), -none-)'
 	@echo 'FEATURES_MISSING (only non optional features):'
-	@echo '         $(or $(sort $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))), -none-)'
+	@echo '         $(or $(FEATURES_MISSING), -none-)'
 	@echo ''
 	@echo 'FEATURES_CONFLICT:     $(FEATURES_CONFLICT)'
 	@echo 'FEATURES_CONFLICT_MSG: $(FEATURES_CONFLICT_MSG)'
@@ -130,7 +130,7 @@ info-features-required:
 	@for i in $(sort $(FEATURES_REQUIRED)); do echo $$i; done
 
 info-features-missing:
-	@for i in $(sort $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))); do echo $$i; done
+	@for i in $(FEATURES_MISSING); do echo $$i; done
 
 info-debug-variable-%:
 	@echo $($*)
