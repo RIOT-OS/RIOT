@@ -51,6 +51,7 @@ export CXXUWFLAGS            # (Patterns of) flags in CFLAGS that should not be 
 export CXXEXFLAGS            # Additional flags that should be passed to CXX.
 export CCASUWFLAGS           # (Patterns of) flags in CFLAGS that should not be passed to CCAS.
 export CCASEXFLAGS           # Additional flags that should be passed to CCAS.
+export LD                    # Linker (not used for linking the executable, see LINKER)
 export AR                    # The command to create the object file archives.
 export ARFLAGS               # Command-line options to pass to AR, default `rcs`.
 export AS                    # The assembler.

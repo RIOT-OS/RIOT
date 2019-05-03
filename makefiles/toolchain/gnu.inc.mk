@@ -8,6 +8,7 @@ else
 export AR         = $(PREFIX)ar
 export RANLIB     = $(PREFIX)ranlib
 endif
+export LD         = $(PREFIX)ld
 export AS         = $(PREFIX)as
 export NM         = $(PREFIX)nm
 export LINK       = $(PREFIX)gcc
