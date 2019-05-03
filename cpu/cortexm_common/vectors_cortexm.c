@@ -26,6 +26,7 @@
 #include <inttypes.h>
 
 #include "cpu.h"
+#include "periph_cpu.h"
 #include "kernel_init.h"
 #include "board.h"
 #include "mpu.h"
@@ -37,6 +38,10 @@
 
 #ifndef SRAM_BASE
 #define SRAM_BASE 0
+#endif
+
+#ifndef CPU_BACKUP_RAM_NOT_RETAINED
+#define CPU_BACKUP_RAM_NOT_RETAINED 0
 #endif
 
 /**
@@ -54,6 +59,15 @@ extern uint32_t _sstack;
 extern uint32_t _estack;
 extern uint8_t _sram;
 extern uint8_t _eram;
+
+/* Support for LPRAM. */
+#ifdef CPU_HAS_BACKUP_RAM
+extern const uint32_t _sbackup_data_load[];
+extern uint32_t _sbackup_data[];
+extern uint32_t _ebackup_data[];
+extern uint32_t _sbackup_bss[];
+extern uint32_t _ebackup_bss[];
+#endif /* CPU_HAS_BACKUP_RAM */
 /** @} */
 
 /**
@@ -101,10 +115,29 @@ void reset_handler_default(void)
     for (dst = &_srelocate; dst < &_erelocate; ) {
         *(dst++) = *(src++);
     }
+
     /* default bss section to zero */
     for (dst = &_szero; dst < &_ezero; ) {
         *(dst++) = 0;
     }
+
+#ifdef CPU_HAS_BACKUP_RAM
+    if (!cpu_woke_from_backup() ||
+        CPU_BACKUP_RAM_NOT_RETAINED) {
+
+        /* load low-power data section. */
+        for (dst = _sbackup_data, src = _sbackup_data_load;
+             dst < _ebackup_data;
+             dst++, src++) {
+            *dst = *src;
+        }
+
+        /* zero-out low-power bss. */
+        for (dst = _sbackup_bss; dst < _ebackup_bss; dst++) {
+            *dst = 0;
+        }
+    }
+#endif /* CPU_HAS_BACKUP_RAM */
 
 #ifdef MODULE_MPU_STACK_GUARD
     if (((uintptr_t)&_sstack) != SRAM_BASE) {

@@ -15,6 +15,12 @@ ifneq (,$(ROM_START_ADDR)$(RAM_START_ADDR)$(ROM_LEN)$(RAM_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_length=$(RAM_LEN)
 endif
 
+ifneq (,$(BACKUP_RAM_LEN))
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_backup_ram_start_addr=$(BACKUP_RAM_ADDR)
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_backup_ram_len=$(BACKUP_RAM_LEN)
+  CFLAGS    += -DCPU_HAS_BACKUP_RAM=1
+endif
+
 TOOLCHAINS_SUPPORTED = gnu llvm
 
 # Only define the linker symbol if the variable is set
