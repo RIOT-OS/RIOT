@@ -377,6 +377,8 @@ USEMODULE_INCLUDES_ = $(strip $(call uniq,$(USEMODULE_INCLUDES)))
 
 INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
+# include blob support
+include $(RIOTMAKE)/blobs.inc.mk
 
 # include bindist target
 include $(RIOTMAKE)/bindist.inc.mk
