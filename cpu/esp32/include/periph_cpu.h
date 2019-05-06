@@ -40,20 +40,83 @@ extern "C" {
 #define CPUID_LEN           (7U)
 
 /**
- * @brief   Available ports on the ESP32
+ * @name   GPIO configuration
  * @{
  */
-#define PORT_GPIO 0       /**< port GPIO */
+
+/**
+ * @brief   Override the default gpio_t type definition
+ *
+ * This is required here to have gpio_t defined in this file.
+ * @{
+ */
+#define HAVE_GPIO_T
+typedef unsigned int gpio_t;
+/** @} */
+
+/**
+ * @brief   Definition of a fitting UNDEF value
+ * @{
+ */
+#define GPIO_UNDEF          (0xffffffff)
+/** @} */
+
+/**
+ * @brief   Define a CPU specific GPIO pin generator macro
+ * @{
+ */
+#define GPIO_PIN(x, y)      ((x & 0) | y)
+/** @} */
+
+/**
+ * @brief   Available GPIO ports on ESP32
+ * @{
+ */
+#define PORT_GPIO           (0)
 /** @} */
 
 /**
  * @brief   Define CPU specific number of GPIO pins
  * @{
  */
-#define GPIO_PIN_NUMOF  40
-#ifndef GPIO_PIN_COUNT
-#define GPIO_PIN_COUNT  GPIO_PIN_NUMOF
-#endif
+#define GPIO_PIN_NUMOF      (40)
+/** @} */
+
+/**
+ * @brief   Override mode flank selection values
+ *
+ * @{
+ */
+#define HAVE_GPIO_FLANK_T
+typedef enum {
+    GPIO_NONE    = 0,
+    GPIO_RISING  = 1,        /**< emit interrupt on rising flank  */
+    GPIO_FALLING = 2,        /**< emit interrupt on falling flank */
+    GPIO_BOTH    = 3,        /**< emit interrupt on both flanks   */
+    GPIO_LOW     = 4,        /**< emit interrupt on low level     */
+    GPIO_HIGH    = 5         /**< emit interrupt on low level     */
+} gpio_flank_t;
+
+/** @} */
+
+/**
+ * @brief   Override GPIO modes
+ *
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN,        /**< input */
+    GPIO_IN_PD,     /**< input with pull-down */
+    GPIO_IN_PU,     /**< input with pull-up */
+    GPIO_OUT,       /**< output */
+    GPIO_OD,        /**< open-drain output */
+    GPIO_OD_PU,     /**< open-drain output with pull-up */
+    GPIO_IN_OUT,    /**< input and output */
+    GPIO_IN_OD,     /**< input and open-drain output */
+    GPIO_IN_OD_PU   /**< input and open-drain output */
+} gpio_mode_t;
+/** @} */
 /** @} */
 
 /**
@@ -98,42 +161,6 @@ extern "C" {
 #define GPIO37      (GPIO_PIN(PORT_GPIO,37))
 #define GPIO38      (GPIO_PIN(PORT_GPIO,38))
 #define GPIO39      (GPIO_PIN(PORT_GPIO,39))
-/** @} */
-
-/**
- * @brief   Override mode flank selection values
- *
- * @{
- */
-#define HAVE_GPIO_FLANK_T
-typedef enum {
-    GPIO_NONE    = 0,
-    GPIO_RISING  = 1,        /**< emit interrupt on rising flank  */
-    GPIO_FALLING = 2,        /**< emit interrupt on falling flank */
-    GPIO_BOTH    = 3,        /**< emit interrupt on both flanks   */
-    GPIO_LOW     = 4,        /**< emit interrupt on low level     */
-    GPIO_HIGH    = 5         /**< emit interrupt on low level     */
-} gpio_flank_t;
-
-/** @} */
-
-/**
- * @brief   Override GPIO modes
- *
- * @{
- */
-#define HAVE_GPIO_MODE_T
-typedef enum {
-    GPIO_IN,        /**< input */
-    GPIO_IN_PD,     /**< input with pull-down */
-    GPIO_IN_PU,     /**< input with pull-up */
-    GPIO_OUT,       /**< output */
-    GPIO_OD,        /**< open-drain output */
-    GPIO_OD_PU,     /**< open-drain output with pull-up */
-    GPIO_IN_OUT,    /**< input and output */
-    GPIO_IN_OD,     /**< input and open-drain output */
-    GPIO_IN_OD_PU   /**< input and open-drain output */
-} gpio_mode_t;
 /** @} */
 
 /**
@@ -215,9 +242,6 @@ typedef enum {
  * is therefore set to 16.
  */
 #define ADC_NUMOF_MAX   16
-
-/** Number of ADC channels determined from ADC_GPIOS */
-extern const unsigned adc_chn_num;
 
 /** @} */
 
