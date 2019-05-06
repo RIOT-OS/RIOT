@@ -54,7 +54,7 @@ int lua_run_script(const uint8_t *buffer, size_t buffer_len)
 int main(void)
 {
     puts("Lua RIOT build");
-    lua_run_script(main_lua, main_lua_len);
+    lua_run_script(_binary_main_lua_start, _binary_main_lua_SIZE);
     puts("Lua interpreter exited");
 
     return 0;
