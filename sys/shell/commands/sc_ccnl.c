@@ -113,24 +113,25 @@ int _ccnl_content(int argc, char **argv)
     arg_len = strlen(buf);
 
     struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL);
-    int offs = CCNL_MAX_PACKET_SIZE;
-    arg_len = ccnl_ndntlv_prependContent(prefix, (unsigned char*) buf, arg_len, NULL, NULL, &offs, _out);
+    size_t offs = CCNL_MAX_PACKET_SIZE;
+    size_t reslen = 0;
+    arg_len = ccnl_ndntlv_prependContent(prefix, (unsigned char*) buf, arg_len, NULL, NULL, &offs, _out, &reslen);
 
     ccnl_prefix_free(prefix);
 
     unsigned char *olddata;
     unsigned char *data = olddata = _out + offs;
 
-    int len;
-    unsigned typ;
+    size_t len;
+    uint64_t typ;
 
-    if (ccnl_ndntlv_dehead(&data, &arg_len, (int*) &typ, &len) ||
+    if (ccnl_ndntlv_dehead(&data, &reslen, &typ, &len) ||
         typ != NDN_TLV_Data) {
         return -1;
     }
 
     struct ccnl_content_s *c = 0;
-    struct ccnl_pkt_s *pk = ccnl_ndntlv_bytes2pkt(typ, olddata, &data, &arg_len);
+    struct ccnl_pkt_s *pk = ccnl_ndntlv_bytes2pkt(typ, olddata, &data, &reslen);
     c = ccnl_content_new(&pk);
     c->flags |= CCNL_CONTENT_FLAGS_STATIC;
     msg_t m = { .type = CCNL_MSG_CS_ADD, .content.ptr = c };
