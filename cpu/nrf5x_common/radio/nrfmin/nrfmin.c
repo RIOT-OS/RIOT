@@ -320,7 +320,10 @@ static int nrfmin_send(netdev_t *dev, const iolist_t *iolist)
 {
     (void)dev;
 
-    assert((iolist) && (state != STATE_OFF));
+    assert(iolist);
+    if (state == STATE_OFF) {
+        return -ENETDOWN;
+    }
 
     /* wait for any ongoing transmission to finish and go into idle state */
     while (state == STATE_TX) {}
@@ -355,7 +358,9 @@ static int nrfmin_recv(netdev_t *dev, void *buf, size_t len, void *info)
     (void)dev;
     (void)info;
 
-    assert(state != STATE_OFF);
+    if (state == STATE_OFF) {
+        return -ENETDOWN;
+    }
 
     unsigned pktlen = rx_buf.pkt.hdr.len;
 
