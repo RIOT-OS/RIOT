@@ -11,6 +11,3 @@ FEATURES_PROVIDED += periph_uart
 FEATURES_MCU_GROUP = cortex_m0_2
 
 include $(RIOTCPU)/kinetis/Makefile.features
-#
-# Remove this line after TRNG driver is implemented
-FEATURES_PROVIDED := $(filter-out periph_hwrng,$(FEATURES_PROVIDED))
