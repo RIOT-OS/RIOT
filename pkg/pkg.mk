@@ -32,7 +32,7 @@ endif
 git-ensure-version: $(PKG_BUILDDIR)/.git-downloaded
 	if [ $(shell git -C $(PKG_BUILDDIR) rev-parse HEAD) != $(PKG_VERSION) ] ; then \
 		git -C $(PKG_BUILDDIR) clean -xdff ; \
-		if git cat-file -e -t '$(PKG_VERSION)^{commit}' ; then \
+		if ! git -C $(PKG_BUILDDIR) cat-file -e '$(PKG_VERSION)^{commit}' ; then \
 			git -C $(PKG_BUILDDIR) fetch "$(PKG_URL)" "$(PKG_VERSION)" ; \
 		fi; \
 		git -C $(PKG_BUILDDIR) checkout -f $(PKG_VERSION) ; \
