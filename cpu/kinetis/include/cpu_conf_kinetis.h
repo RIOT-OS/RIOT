@@ -118,17 +118,21 @@ extern "C"
  */
 #ifdef SIM_SCGC5_LPTMR_SHIFT
 /** Enable LPTMR clock gate */
-#define LPTMR_CLKEN()  (bit_set32(&SIM->SCGC5, SIM_SCGC5_LPTMR_SHIFT))
+#define LPTMR_CLKEN()      (bit_set32(&SIM->SCGC5, SIM_SCGC5_LPTMR_SHIFT))
+#define LPTMR_CLK_IS_EN()  (SIM->SCGC5 & SIM_SCGC5_LPTMR_MASK)
 #endif
 #if defined(SIM_SCGC6_PIT_SHIFT)
 /** Enable PIT clock gate */
-#define PIT_CLKEN()    (bit_set32(&SIM->SCGC6, SIM_SCGC6_PIT_SHIFT))
+#define PIT_CLKEN()        (bit_set32(&SIM->SCGC6, SIM_SCGC6_PIT_SHIFT))
+#define PIT_CLK_IS_EN()    (SIM->SCGC6 & SIM_SCGC6_PIT_MASK)
 #elif defined(SIM_SCGC_PIT_SHIFT)
-#define PIT_CLKEN()    (bit_set32(&SIM->SCGC, SIM_SCGC_PIT_SHIFT))
+#define PIT_CLKEN()        (bit_set32(&SIM->SCGC, SIM_SCGC_PIT_SHIFT))
+#define PIT_CLK_IS_EN()    (SIM->SCGC & SIM_SCGC_PIT_MASK)
+
 #endif
 #ifdef SIM_SCGC6_RTC_SHIFT
 /** Enable RTC clock gate */
-#define RTC_CLKEN()    (bit_set32(&SIM->SCGC6, SIM_SCGC6_RTC_SHIFT))
+#define RTC_CLKEN()        (bit_set32(&SIM->SCGC6, SIM_SCGC6_RTC_SHIFT))
 #endif
 /** @} */
 
