@@ -5,7 +5,6 @@ include $(RIOTBOARD)/common/esp32/Makefile.features
 ifneq (,$(filter olimex_esp32_gateway,$(USEMODULE)))
     FEATURES_PROVIDED += periph_adc
 endif
-FEATURES_PROVIDED += periph_dac
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_spi
