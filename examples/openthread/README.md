@@ -13,6 +13,9 @@ You can either build a FTD or MTD firmware:
        An MTD may or may not be sleepy.
 - FTD: A Full Thread Device has router functionality compiled in.
 
+## Dependencies
+- You need to have `libtool` installed to be able to build this example.
+
 ## Quick usage
 
 With RIOT port, a node is auto-setup and ready to communicate with
