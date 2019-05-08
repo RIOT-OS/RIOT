@@ -13,18 +13,20 @@ RIOTBASE ?= $(CURDIR)/../..
 QUIET ?= 1
 
 USEPKG += openthread
+
+# FTD: A Full Thread Device has router functionality compiled in
+#
+# MTD: A Minimal Thread Device does not have router functionality
+# compiled in. As a result, it is not necessary to configure the
+# routerrole on an MTD. At the same time, an MTD may or may not be sleepy.
+#
+# Use FTD by default
 OPENTHREAD_TYPE ?= ftd
-ifeq ($(OPENTHREAD_TYPE),mtd)
-  # MTD: A Minimal Thread Device does not have router functionality
-  # compiled in. As a result, it is not necessary to configure the
-  # routerrole on an MTD. At the same time, an MTD may or may not be sleepy.
-  USEMODULE += openthread-mtd
-  USEMODULE += openthread-cli-mtd
-else
-  # ftd: A Full Thread Device has router functionality compiled in
-  USEMODULE += openthread-ftd
-  USEMODULE += openthread-cli-ftd
-endif
+
+USEMODULE += openthread-$(OPENTHREAD_TYPE)
+
+# Comment the following line in order to disable the OpenThread CLI
+USEMODULE += openthread-cli
 
 #Define PANID, CHANNEL and UART_BAUDRATE used by default
 OPENTHREAD_PANID ?= 0xbeef
