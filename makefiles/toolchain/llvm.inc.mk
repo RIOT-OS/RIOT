@@ -12,7 +12,7 @@ export CCAS       ?= $(CC)
 export AS          = $(LLVMPREFIX)as
 export AR          = $(LLVMPREFIX)ar
 export NM          = $(LLVMPREFIX)nm
-export LD          = $(LLVMPREFIX)ld
+export LD          = $(PREFIX)ld
 # LLVM does have a linker, however, it is not entirely
 # compatible with GCC. For instance spec files as used in
 # `makefiles/libc/newlib.mk` are not supported. Therefore
