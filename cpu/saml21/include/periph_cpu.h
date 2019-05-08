@@ -27,6 +27,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   The Low Power SRAM is not retained during deep sleep.
+ */
+#define CPU_BACKUP_RAM_NOT_RETAINED (1)
+
+/**
  * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
  */
 #if defined(CPU_MODEL_SAML21E18A) || defined(CPU_MODEL_SAML21E18B) || \
