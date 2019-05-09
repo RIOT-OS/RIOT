@@ -1,5 +1,6 @@
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_hwrng
+FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += puf_sram
 
 -include $(RIOTCPU)/cortexm_common/Makefile.features
