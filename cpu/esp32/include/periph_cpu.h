@@ -300,8 +300,30 @@ typedef enum {
  * @{
  */
 
-/** Number of I2C interfaces determined from I2Cn_* definitions */
-extern const unsigned i2c_bus_num;
+/**
+ * @brief    Override I2C clock speed values
+ *
+ * This is required here to have i2c_speed_t defined in this file.
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW = 0,      /**< 10 kbit/s */
+    I2C_SPEED_NORMAL,       /**< 100 kbit/s */
+    I2C_SPEED_FAST,         /**< 400 kbit/s */
+    I2C_SPEED_FAST_PLUS,    /**< 1 Mbit/s */
+    I2C_SPEED_HIGH,         /**< not supported */
+} i2c_speed_t;
+/** @} */
+
+/**
+ * @brief   I2C configuration structure type
+ */
+typedef struct {
+    i2c_speed_t speed;      /**< I2C bus speed */
+    gpio_t scl;             /**< GPIO used as SCL pin */
+    gpio_t sda;             /**< GPIO used as SDA pin */
+} i2c_conf_t;
 
 #define PERIPH_I2C_NEED_READ_REG    /**< i2c_read_reg required */
 #define PERIPH_I2C_NEED_READ_REGS   /**< i2c_read_regs required */
