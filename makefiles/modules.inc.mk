@@ -9,15 +9,16 @@ CFLAGS += $(EXTDEFINES)
 REALMODULES += $(filter-out $(PSEUDOMODULES), $(_ALLMODULES))
 REALMODULES += $(filter $(NO_PSEUDOMODULES), $(_ALLMODULES))
 
-# For 'shared libraries' every object must be included
-SHARED_LIBS = $(filter-out $(LIBS), $(REALMODULES))
-# For 'static libraries' only required object files are included
-STATIC_LIBS = $(filter $(LIBS), $(REALMODULES))
 
-# Warning: the shared/static libraries handling is not currently handled
-# for all architectures. But correctly defining them allows future proof
-# handling.
+# Modules that can be linked by including all objects
+OBJECTS_REALMODULES = $(filter-out $(LIBS), $(REALMODULES))
+# Modules that must be linked using the default 'archive' linking behaviour
+ARCHIVE_REALMODULES = $(filter $(LIBS), $(REALMODULES))
 
-SHARED_LIBS_FILES = $(SHARED_LIBS:%=$(BINDIR)/%.a)
-STATIC_LIBS_FILES = $(STATIC_LIBS:%=$(BINDIR)/%.a)
-BASELIBS += $(SHARED_LIBS_FILES) $(STATIC_LIBS_FILES)
+OBJECTS_LIBS += $(OBJECTS_REALMODULES:%=$(BINDIR)/%.a)
+ARCHIVE_LIBS += $(ARCHIVE_REALMODULES:%=$(BINDIR)/%.a)
+
+# Warning: the object/archive compilation handling is not currently handled
+# for all architectures.
+
+BASELIBS += $(OBJECTS_LIBS) $(ARCHIVE_LIBS)
