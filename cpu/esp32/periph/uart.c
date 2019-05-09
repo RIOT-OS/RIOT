@@ -50,8 +50,7 @@
 
 struct uart_hw_t {
     uart_dev_t* regs;       /* pointer to register data struct of the UART device */
-    uint8_t  pin_txd;       /* TxD pin */
-    uint8_t  pin_rxd;       /* RxD pin */
+    uint8_t  mod;           /* peripheral hardware module of the UART interface */
     bool     used;          /* indicates whether UART is used */
     uint32_t baudrate;      /* used baudrate */
     uart_data_bits_t data;  /* used data bits */
@@ -67,8 +66,7 @@ struct uart_hw_t {
 static struct uart_hw_t _uarts[] = {
     {
         .regs = &UART0,
-        .pin_txd = GPIO1,
-        .pin_rxd = GPIO3,
+        .mod = PERIPH_UART0_MODULE,
         .used = false,
         .baudrate = STDIO_UART_BAUDRATE,
         .data = UART_DATA_BITS_8,
@@ -78,10 +76,9 @@ static struct uart_hw_t _uarts[] = {
         .signal_rxd = U0RXD_IN_IDX,
         .int_src = ETS_UART0_INTR_SOURCE
     },
-    #if defined(UART1_TXD) && defined(UART1_RXD)
-    {   .regs = &UART1,
-        .pin_txd = UART1_TXD,
-        .pin_rxd = UART1_RXD,
+    {
+        .regs = &UART1,
+        .mod = PERIPH_UART1_MODULE,
         .used = false,
         .baudrate = STDIO_UART_BAUDRATE,
         .data = UART_DATA_BITS_8,
@@ -91,11 +88,9 @@ static struct uart_hw_t _uarts[] = {
         .signal_rxd = U1RXD_IN_IDX,
         .int_src = ETS_UART1_INTR_SOURCE
     },
-    #endif
-    #if defined(UART2_TXD) && defined(UART2_RXD)
-    {   .regs = &UART2,
-        .pin_txd = UART2_TXD,
-        .pin_rxd = UART2_RXD,
+    {
+        .regs = &UART2,
+        .mod = PERIPH_UART2_MODULE,
         .used = false,
         .baudrate = STDIO_UART_BAUDRATE,
         .data = UART_DATA_BITS_8,
@@ -105,7 +100,6 @@ static struct uart_hw_t _uarts[] = {
         .signal_rxd = U2RXD_IN_IDX,
         .int_src = ETS_UART2_INTR_SOURCE
     }
-    #endif
 };
 
 /* declaration of external functions */
@@ -131,30 +125,29 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     if (uart == UART_DEV(1) || uart == UART_DEV(2)) {
 
         /* reset the pins when they were already used as UART pins */
-        if (gpio_get_pin_usage(_uarts[uart].pin_txd) == _UART) {
-            gpio_set_pin_usage(_uarts[uart].pin_txd, _GPIO);
+        if (gpio_get_pin_usage(uart_config[uart].txd) == _UART) {
+            gpio_set_pin_usage(uart_config[uart].txd, _GPIO);
         }
-        if (gpio_get_pin_usage(_uarts[uart].pin_rxd) == _UART) {
-            gpio_set_pin_usage(_uarts[uart].pin_rxd, _GPIO);
+        if (gpio_get_pin_usage(uart_config[uart].rxd) == _UART) {
+            gpio_set_pin_usage(uart_config[uart].rxd, _GPIO);
         }
 
         /* try to initialize the pins as GPIOs first */
-        if (gpio_init (_uarts[uart].pin_rxd, GPIO_IN) ||
-            gpio_init (_uarts[uart].pin_txd, GPIO_OUT)) {
+        if (gpio_init (uart_config[uart].rxd, GPIO_IN) ||
+            gpio_init (uart_config[uart].txd, GPIO_OUT)) {
             return -1;
         }
 
         /* store the usage type in GPIO table */
-        gpio_set_pin_usage(_uarts[uart].pin_txd, _UART);
-        gpio_set_pin_usage(_uarts[uart].pin_rxd, _UART);
+        gpio_set_pin_usage(uart_config[uart].txd, _UART);
+        gpio_set_pin_usage(uart_config[uart].rxd, _UART);
 
         /* connect TxD pin to the TxD output signal through the GPIO matrix */
-        GPIO.func_out_sel_cfg[_uarts[uart].pin_txd].func_sel = _uarts[uart].signal_txd;
-
+        GPIO.func_out_sel_cfg[uart_config[uart].txd].func_sel = _uarts[uart].signal_txd;
         /* connect RxD input signal to the RxD pin through the GPIO matrix */
         GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].sig_in_sel = 1;
         GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].sig_in_inv = 0;
-        GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].func_sel = _uarts[uart].pin_rxd;
+        GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].func_sel = uart_config[uart].rxd;
     }
     _uarts[uart].baudrate = baudrate;
 
@@ -187,40 +180,17 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
 void uart_poweron (uart_t uart)
 {
-    switch (uart) {
-        #if UART_NUMOF
-        case 0:  periph_module_enable(PERIPH_UART0_MODULE);
-                 _uart_config(uart);
-                 break;
-        #endif
-        #if UART_NUMOF > 1
-        case 1:  periph_module_enable(PERIPH_UART1_MODULE);
-                 _uart_config(uart);
-                 break;
-        #endif
-        #if UART_NUMOF > 2
-        case 2:  periph_module_enable(PERIPH_UART2_MODULE);
-                 _uart_config(uart);
-                 break;
-        #endif
-        default: break;
-    }
+    CHECK_PARAM (uart < UART_NUMOF);
+
+    periph_module_enable(_uarts[uart].mod);
+    _uart_config(uart);
 }
 
 void uart_poweroff (uart_t uart)
 {
-    switch (uart) {
-        #if UART_NUMOF
-        case 0: periph_module_disable(PERIPH_UART0_MODULE); break;
-        #endif
-        #if UART_NUMOF > 1
-        case 1: periph_module_disable(PERIPH_UART1_MODULE); break;
-        #endif
-        #if UART_NUMOF > 2
-        case 2: periph_module_disable(PERIPH_UART2_MODULE); break;
-        #endif
-        default: break;
-    }
+    CHECK_PARAM (uart < UART_NUMOF);
+
+    periph_module_disable(_uarts[uart].mod);
 }
 
 /* systemwide UART initializations */
@@ -236,7 +206,7 @@ void uart_print_config(void)
 {
     for (unsigned uart = 0; uart < UART_NUMOF; uart++) {
         ets_printf("\tUART_DEV(%d)\ttxd=%d rxd=%d\n", uart,
-                   _uarts[uart].pin_txd, _uarts[uart].pin_rxd);
+                   uart_config[uart].txd, uart_config[uart].rxd);
     }
 }
 
