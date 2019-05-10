@@ -423,7 +423,8 @@ static int nrfmin_init(netdev_t *dev)
     /* always send from logical address 0 */
     NRF_RADIO->TXADDRESS = 0x00UL;
     /* and listen to logical addresses 0 and 1 */
-    NRF_RADIO->RXADDRESSES = 0x03UL;
+    /* workaround errata nrf52832 3.41 [143] */
+    NRF_RADIO->RXADDRESSES = 0x10003UL;
     /* configure data fields and packet length whitening and endianess */
     NRF_RADIO->PCNF0 = ((CONF_S1 << RADIO_PCNF0_S1LEN_Pos) |
                         (CONF_S0 << RADIO_PCNF0_S0LEN_Pos) |
