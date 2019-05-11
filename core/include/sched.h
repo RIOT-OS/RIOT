@@ -114,7 +114,7 @@ typedef enum {
     STATUS_RUNNING,                 /**< currently running                    */
     STATUS_PENDING,                 /**< waiting to be scheduled to run       */
     STATUS_NUMOF                    /**< number of supported thread states    */
-} thread_state_t;
+} thread_status_t;
 /** @} */
 
 /**
@@ -123,7 +123,7 @@ typedef enum {
  */
 #define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
                                                  `st >= STATUS_ON_RUNQUEUE`   */
-#define STATUS_NOT_FOUND ((thread_state_t)-1)   /**< Describes an illegal thread status */
+#define STATUS_NOT_FOUND ((thread_status_t)-1)  /**< Describes an illegal thread status */
 /** @} */
 /**
  * @def SCHED_PRIO_LEVELS
@@ -146,7 +146,7 @@ int sched_run(void);
  *                          targeted process
  * @param[in]   status      The new status of this thread
  */
-void sched_set_status(thread_t *process, thread_state_t status);
+void sched_set_status(thread_t *process, thread_status_t status);
 
 /**
  * @brief       Yield if approriate.
