@@ -65,6 +65,7 @@ PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_default
 PSEUDOMODULES += saul_gpio
 PSEUDOMODULES += saul_nrf_temperature
+PSEUDOMODULES += scanf_float
 PSEUDOMODULES += schedstatistics
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_ip

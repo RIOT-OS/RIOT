@@ -77,6 +77,12 @@ ifneq (,$(filter printf_float,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter scanf_float,$(USEMODULE)))
+  ifeq (1,$(USE_NANO_SPECS))
+    export LINKFLAGS += -u _scanf_float
+  endif
+endif
+
 ifneq (,$(filter riotboot,$(FEATURES_USED)))
   include $(RIOTBASE)/sys/riotboot/Makefile.include
 endif
