@@ -44,7 +44,15 @@
 /* GCC documentation refers to the types as I1, I2, I4, I8, I16 */
 typedef uint8_t  I1;
 typedef uint16_t I2;
+
+/* the builtins are declared with "unsigned int", but "uint32_t" is typedef'ed
+ * to "long unsigned int" on most platforms where "sizeof(int) == 4. */
+#if __SIZEOF_INT__ == 4
+typedef unsigned int I4;
+#else
 typedef uint32_t I4;
+#endif
+
 typedef uint64_t I8;
 /* typedef __uint128_t I16; */ /* No 128 bit integer support yet */
 
@@ -54,11 +62,11 @@ typedef uint64_t I8;
  * @param[in]  n         width of the data, in bytes
  */
 #define TEMPLATE_ATOMIC_LOAD_N(n) \
-    I##n __atomic_load_##n (I##n *ptr, int memorder) \
+    I##n __atomic_load_##n (const volatile void *ptr, int memorder) \
     { \
         (void) memorder;                   \
         unsigned int mask = irq_disable(); \
-        I##n old = *ptr;                   \
+        I##n old = *(I##n *)ptr;           \
         irq_restore(mask);                 \
         return old;                        \
     }
@@ -69,11 +77,11 @@ typedef uint64_t I8;
  * @param[in]  n         width of the data, in bytes
  */
 #define TEMPLATE_ATOMIC_STORE_N(n) \
-    void __atomic_store_##n (I##n *ptr, I##n val, int memorder) \
+    void __atomic_store_##n (volatile void *ptr, I##n val, int memorder) \
     { \
         (void) memorder;                   \
         unsigned int mask = irq_disable(); \
-        *ptr = val;                        \
+        *(I##n *)ptr = val;                \
         irq_restore(mask);                 \
     }
 
@@ -83,12 +91,12 @@ typedef uint64_t I8;
  * @param[in]  n         width of the data, in bytes
  */
 #define TEMPLATE_ATOMIC_EXCHANGE_N(n) \
-    I##n __atomic_exchange_##n (I##n *ptr, I##n desired, int memorder) \
+    I##n __atomic_exchange_##n (volatile void *ptr, I##n desired, int memorder) \
     { \
         (void) memorder;                   \
         unsigned int mask = irq_disable(); \
-        I##n old = *ptr;                   \
-        *ptr = desired;                    \
+        I##n old = *(I##n *)ptr;           \
+        *(I##n *)ptr = desired;            \
         irq_restore(mask);                 \
         return old;                        \
     }
@@ -99,21 +107,21 @@ typedef uint64_t I8;
  * @param[in]  n         width of the data, in bytes
  */
 #define TEMPLATE_ATOMIC_COMPARE_EXCHANGE_N(n) \
-    bool __atomic_compare_exchange_##n (I##n *ptr, I##n *expected, I##n desired, \
+    bool __atomic_compare_exchange_##n (volatile void *ptr, void *expected, I##n desired, \
         bool weak, int success_memorder, int failure_memorder) \
     { \
         (void) weak;                       \
         (void) success_memorder;           \
         (void) failure_memorder;           \
         unsigned int mask = irq_disable(); \
-        I##n cur = *ptr;                   \
-        if (cur != *expected) {            \
-            *expected = cur;               \
+        I##n cur = *(I##n *)ptr;           \
+        if (cur != *(I##n *)expected) {    \
+            *(I##n *)expected = cur;       \
             irq_restore(mask);             \
             return false;                  \
         }                                  \
                                            \
-        *ptr = desired;                    \
+        *(I##n *)ptr = desired;            \
         irq_restore(mask);                 \
         return true;                       \
     }
@@ -127,12 +135,12 @@ typedef uint64_t I8;
  * @param[in]  prefixop  optional prefix unary operator (use ~ for inverting, NAND, NOR etc)
  */
 #define TEMPLATE_ATOMIC_FETCH_OP_N(opname, op, n, prefixop) \
-    I##n __atomic_fetch_##opname##_##n(I##n *ptr, I##n val, int memmodel) \
+    I##n __atomic_fetch_##opname##_##n(volatile void *ptr, I##n val, int memmodel) \
     { \
         unsigned int mask = irq_disable();    \
         (void)memmodel;                       \
-        I##n tmp = *ptr;                      \
-        *ptr = prefixop(tmp op val);          \
+        I##n tmp = *(I##n *)ptr;              \
+        *(I##n *)ptr = prefixop(tmp op val);  \
         irq_restore(mask);                    \
         return tmp;                           \
     }
@@ -146,12 +154,12 @@ typedef uint64_t I8;
  * @param[in]  prefixop  optional prefix unary operator (use ~ for inverting, NAND, NOR etc)
  */
 #define TEMPLATE_ATOMIC_OP_FETCH_N(opname, op, n, prefixop) \
-    I##n __atomic_##opname##_fetch_##n(I##n *ptr, I##n val, int memmodel) \
+    I##n __atomic_##opname##_fetch_##n(volatile void *ptr, I##n val, int memmodel) \
     { \
         (void)memmodel;                                 \
         unsigned int mask = irq_disable();              \
-        I##n tmp = prefixop((*ptr) op val);             \
-        *ptr = tmp;                                     \
+        I##n tmp = prefixop((*(I##n *)ptr) op val);     \
+        *(I##n *)ptr = tmp;                             \
         irq_restore(mask);                              \
         return tmp;                                     \
     }
