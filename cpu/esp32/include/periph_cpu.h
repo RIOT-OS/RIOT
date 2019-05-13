@@ -358,12 +358,14 @@ typedef struct {
  */
 
 /**
+ * @brief   Maximum number of PWM devices
+ */
+#define PWM_NUMOF_MAX           (2)
+
+/**
  * @brief   Maximum number of channels per PWM device.
  */
 #define PWM_CHANNEL_NUM_DEV_MAX (6)
-
-/** Number of PWM devices determined from PWM0_GPIOS and PWM1_GPIOS. */
-extern const unsigned pwm_dev_num;
 
 /** @} */
 
