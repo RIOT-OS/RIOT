@@ -89,8 +89,8 @@ void i2c_init(i2c_t dev)
      * called */
     bus(dev)->ENABLE = TWIM_ENABLE_ENABLE_Disabled;
     /* configure pins */
-    gpio_init(i2c_config[dev].scl, GPIO_IN_PU);
-    gpio_init(i2c_config[dev].sda, GPIO_IN_PU);
+    gpio_init(i2c_config[dev].scl, GPIO_IN_OD_PU);
+    gpio_init(i2c_config[dev].sda, GPIO_IN_OD_PU);
     bus(dev)->PSEL.SCL = i2c_config[dev].scl;
     bus(dev)->PSEL.SDA = i2c_config[dev].sda;
     /* configure dev clock speed */
