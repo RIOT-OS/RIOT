@@ -113,45 +113,13 @@ def apps_directories(riotdir, apps_dirs=None, apps_dirs_skip=None):
     :param apps_dirs_skip: list of application directories to remove, applied
                            on the RIOT list or `apps_dirs`
     """
-    apps_dirs = apps_dirs or _riot_tracked_applications_dirs(riotdir)
+    apps_dirs = apps_dirs or _riot_applications_dirs(riotdir)
     apps_dirs_skip = apps_dirs_skip or []
 
     # Remove applications to skip
     apps_dirs = set(apps_dirs) - set(apps_dirs_skip)
 
     return sorted(list(apps_dirs))
-
-
-def _is_git_repo(riotdir):
-    """Check if directory is a git repository."""
-    cmd = ['git', 'rev-parse', '--git-dir']
-    ret = subprocess.call(cmd, cwd=riotdir,
-                          stdout=subprocess.DEVNULL,
-                          stderr=subprocess.DEVNULL)
-    return ret == 0
-
-
-def _is_git_tracked(appdir):
-    """Check if directory is a git repository."""
-    cmd = ['git', 'ls-files', '--error-unmatch', 'Makefile']
-    ret = subprocess.call(cmd, cwd=appdir,
-                          stdout=subprocess.DEVNULL,
-                          stderr=subprocess.DEVNULL)
-    return ret == 0
-
-
-def _riot_tracked_applications_dirs(riotdir):
-    """Applications directories in the RIOT repository with relative path.
-
-    Only return 'tracked' applications if riotdir is a git repository.
-    """
-    apps_dirs = _riot_applications_dirs(riotdir)
-
-    # Only keep tracked directories
-    if _is_git_repo(riotdir):
-        apps_dirs = [dir for dir in apps_dirs
-                     if _is_git_tracked(os.path.join(riotdir, dir))]
-    return apps_dirs
 
 
 def _riot_applications_dirs(riotdir):
