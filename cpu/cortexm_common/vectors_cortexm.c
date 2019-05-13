@@ -221,7 +221,7 @@ __attribute__((naked)) void hard_fault_default(void)
         "mov r3, sp                         \n" /* r4_to_r11_stack parameter  */
         "bl hard_fault_handler              \n" /* hard_fault_handler(r0)     */
           :
-          : [sram]   "r" (&_sram + HARDFAULT_HANDLER_REQUIRED_STACK_SPACE),
+          : [sram]   "r" ((uintptr_t)&_sram + HARDFAULT_HANDLER_REQUIRED_STACK_SPACE),
             [eram]   "r" (&_eram),
             [estack] "r" (&_estack)
           : "r0","r4","r5","r6","r8","r9","r10","r11","lr"
