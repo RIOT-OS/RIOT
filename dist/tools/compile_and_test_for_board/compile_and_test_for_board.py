@@ -232,6 +232,10 @@ class RIOTApplication():
         self.resultdir = os.path.join(resultdir, appdir)
         self.logger = logging.getLogger('%s.%s' % (board, appdir))
 
+        # Currently not handling absolute directories or outside of RIOT
+        assert is_in_directory(self.resultdir, resultdir), \
+            "Application result directory is outside main result directory"
+
     # Extract values from make
     def name(self):
         """Get application name."""
