@@ -58,7 +58,7 @@ Vendor      | Espressif | |
 Cores       | 1 or 2 x Tensilica Xtensa LX6 | 1 core
 FPU         | yes (ULP - Ultra low power co-processor) | no
 RAM         | 520 kByte SRAM <br> 16 kByte  RTC SRAM | yes
-ROM         | 520 kByte | yes
+ROM         | 448 kByte | yes
 Flash       | 512 kByte ... 16 MByte |  yes
 Frequency   | 240 MHz, 160 MHz, 80 MHz | yes
 Power Consumption | 68 mA @ 240 MHz <br> 44 mA @ 160 MHz <br> 31 mA @ 80 MHz <br> 5 uA in deep sleep mode | yes <br> yes <br> yes <br> no
