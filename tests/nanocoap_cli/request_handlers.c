@@ -78,15 +78,21 @@ static ssize_t _reqopts_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void 
     ssize_t p = 0;
     char rsp[128];
 
-    for (uint16_t i = 0; i < pkt->options_len; ++i) {
-        uint16_t optnum = pkt->options[i].opt_num;
-        p += snprintf(&rsp[p], sizeof(rsp) - p, "%d: ", optnum);
+    uint8_t *start;
+    size_t length;
+    coap_optpos_t cursor = {0};
+    while (1) {
+        length = coap_opt_get_next(pkt, &cursor, &start);
+        if (start == NULL) {
+            break;
+        }
+
+        p += snprintf(&rsp[p], sizeof(rsp) - p, "%d: ", cursor.opt_num);
         if ((size_t)p >= sizeof(rsp))
             goto error;
-        uint8_t *optcursor;
-        size_t length = coap_opt_by_index(pkt, i, &optcursor);
+
         for (size_t j = 0; j < length; ++j) {
-            p += snprintf(&rsp[p], sizeof(rsp) - p, "%02x", optcursor[j]);
+            p += snprintf(&rsp[p], sizeof(rsp) - p, "%02x", start[j]);
             if ((size_t)p >= sizeof(rsp))
                 goto error;
         }
