@@ -172,6 +172,30 @@ static const gpio_t pwm1_channels[] = PWM1_GPIOS;
  */
 
 /**
+ * @brief   Static array with configuration for declared I2C devices
+ */
+static const spi_conf_t spi_config[] = {
+#ifdef SPI0_CTRL
+    {
+        .ctrl = SPI0_CTRL,
+        .sck = SPI0_SCK,
+        .mosi = SPI0_MOSI,
+        .miso = SPI0_MISO,
+        .cs = SPI0_CS0,
+    },
+#endif
+#ifdef SPI1_CTRL
+    {
+        .ctrl = SPI1_CTRL,
+        .sck = SPI1_SCK,
+        .mosi = SPI1_MOSI,
+        .miso = SPI1_MISO,
+        .cs = SPI1_CS0,
+    },
+#endif
+};
+
+/**
  * @brief Number of SPI interfaces
  *
  * The number of SPI interfaces is determined from board-specific peripheral
@@ -179,7 +203,7 @@ static const gpio_t pwm1_channels[] = PWM1_GPIOS;
  *
  * @note SPI_NUMOF definition must not be changed.
  */
-#define SPI_NUMOF   (spi_bus_num)
+#define SPI_NUMOF   (sizeof(spi_config) / sizeof(spi_config[0]))
 
 /** @} */
 

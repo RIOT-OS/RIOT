@@ -40,12 +40,9 @@
 
 #include "gpio_arch.h"
 
-#define SPI_BLOCK_SIZE  64  /* number of bytes per SPI transfer */
+#if defined(SPI0_CTRL) || defined(SPI1_CTRL)
 
-#define CSPI    (0)         /* controller SPI0 realizes interface CSPI */
-#define FSPI    (1)         /* controller SPI1 realizes interface FSPI */
-#define HSPI    (2)         /* controller SPI2 realizes interface HSPI */
-#define VSPI    (3)         /* controller SPI3 realizes interface VSPI */
+#define SPI_BLOCK_SIZE  64  /* number of bytes per SPI transfer */
 
 /* pins of FSI are fixed */
 #define FSPI_SCK    GPIO6
@@ -55,13 +52,8 @@
 /** stucture which decribes all properties of one SPI bus */
 struct _spi_bus_t {
     spi_dev_t* regs;       /* pointer to register data struct of the SPI device */
-    uint8_t controller;    /* number of the controller used */
     uint8_t mod;           /* peripheral hardware module of the SPI interface */
     uint8_t int_src;       /* peripheral interrupt source used by the SPI device */
-    uint8_t pin_sck;       /* SCK pin */
-    uint8_t pin_mosi;      /* MOSI pin */
-    uint8_t pin_miso;      /* MISO pin */
-    uint8_t pin_cs;        /* CS pin */
     uint8_t signal_sck;    /* SCK signal from the controller */
     uint8_t signal_mosi;   /* MOSI signal from the controller */
     uint8_t signal_miso;   /* MISO signal to the controller */
@@ -73,11 +65,6 @@ struct _spi_bus_t {
 static struct _spi_bus_t _spi[] = {
     #ifdef SPI0_CTRL
     {
-        .controller = SPI0_CTRL,
-        .pin_cs = SPI0_CS0,
-        .pin_sck  = SPI0_SCK,
-        .pin_mosi = SPI0_MOSI,
-        .pin_miso = SPI0_MISO,
         .initialized = false,
         .pins_initialized = false,
         .lock = MUTEX_INIT
@@ -85,11 +72,6 @@ static struct _spi_bus_t _spi[] = {
     #endif
     #ifdef SPI1_CTRL
     {
-        .controller = SPI1_CTRL,
-        .pin_cs = SPI1_CS0,
-        .pin_sck  = SPI1_SCK,
-        .pin_mosi = SPI1_MOSI,
-        .pin_miso = SPI1_MISO,
         .initialized = false,
         .pins_initialized = false,
         .lock = MUTEX_INIT
@@ -97,11 +79,8 @@ static struct _spi_bus_t _spi[] = {
     #endif
 };
 
-/* the number of SPI bus devices used */
-const unsigned spi_bus_num = sizeof(_spi) / sizeof(_spi[0]);
-
 #define CHECK_SPI_DEV(bus) { \
-    CHECK_PARAM(bus < spi_bus_num); \
+    CHECK_PARAM(bus < SPI_NUMOF); \
     if (_spi[bus].regs == NULL) { \
         LOG_TAG_ERROR("spi", "SPI_DEV(%d) is not available\n", bus); \
         return; \
@@ -109,12 +88,13 @@ const unsigned spi_bus_num = sizeof(_spi) / sizeof(_spi[0]);
 }
 
 #define CHECK_SPI_DEV_RET(bus,error) { \
-    CHECK_PARAM_RET(bus < spi_bus_num, error); \
+    CHECK_PARAM_RET(bus < SPI_NUMOF, error); \
     if (_spi[bus].regs == NULL) { \
         LOG_TAG_ERROR("spi", "SPI_DEV(%d) is not available\n", bus); \
         return error; \
     } \
 }
+
 /*
  * GPIOs that were once initialized as SPI interface pins can not be used
  * afterwards for anything else. Therefore, SPI interfaces are not initialized
@@ -127,9 +107,9 @@ const unsigned spi_bus_num = sizeof(_spi) / sizeof(_spi[0]);
 
 void IRAM_ATTR spi_init (spi_t bus)
 {
-    CHECK_PARAM(bus < spi_bus_num);
+    CHECK_PARAM(bus < SPI_NUMOF);
 
-    switch (_spi[bus].controller) {
+    switch (spi_config[bus].ctrl) {
         case HSPI:  _spi[bus].regs = &SPI2;
                     _spi[bus].mod = PERIPH_HSPI_MODULE;
                     _spi[bus].int_src = ETS_SPI2_INTR_SOURCE;
@@ -144,7 +124,9 @@ void IRAM_ATTR spi_init (spi_t bus)
                     _spi[bus].signal_mosi = VSPID_OUT_IDX;
                     _spi[bus].signal_miso = VSPIQ_IN_IDX;
                     break;
-        default:    break;
+        default:    LOG_TAG_ERROR("spi", "invalid SPI interface controller "
+                                         "used for SPI_DEV(%d)\n");
+                    break;
     }
     return;
 }
@@ -166,10 +148,10 @@ static void _spi_init_internal (spi_t bus)
     spi_init_pins(bus);
 
     /* check whether pins could be initialized, otherwise return */
-    if (gpio_get_pin_usage(_spi[bus].pin_sck) != _SPI &&
-        gpio_get_pin_usage(_spi[bus].pin_miso) != _SPI &&
-        gpio_get_pin_usage(_spi[bus].pin_mosi) != _SPI &&
-        gpio_get_pin_usage(_spi[bus].pin_cs) != _SPI) {
+    if (gpio_get_pin_usage(spi_config[bus].sck) != _SPI &&
+        gpio_get_pin_usage(spi_config[bus].miso) != _SPI &&
+        gpio_get_pin_usage(spi_config[bus].mosi) != _SPI &&
+        gpio_get_pin_usage(spi_config[bus].cs) != _SPI) {
         return;
     }
 
@@ -224,31 +206,31 @@ void spi_init_pins(spi_t bus)
        as SPI pins */
     if (bus != SPI_DEV(2)) {
         /* if not already initialized as SPI, try to initialize the pins */
-        if (gpio_init (_spi[bus].pin_sck, GPIO_OUT) ||
-            gpio_init (_spi[bus].pin_mosi, GPIO_OUT) ||
-            gpio_init (_spi[bus].pin_miso, GPIO_IN)) {
+        if (gpio_init (spi_config[bus].sck, GPIO_OUT) ||
+            gpio_init (spi_config[bus].mosi, GPIO_OUT) ||
+            gpio_init (spi_config[bus].miso, GPIO_IN)) {
             LOG_TAG_ERROR("spi",
                           "SPI_DEV(%d) pins could not be initialized\n", bus);
             return;
         }
-        if (spi_init_cs(bus, _spi[bus].pin_cs) != SPI_OK) {
+        if (spi_init_cs(bus, spi_config[bus].cs) != SPI_OK) {
             LOG_TAG_ERROR("spi",
                           "SPI_DEV(%d) CS signal could not be initialized\n",
                           bus);
             return;
         }
         /* store the usage type in GPIO table */
-        gpio_set_pin_usage(_spi[bus].pin_sck, _SPI);
-        gpio_set_pin_usage(_spi[bus].pin_mosi, _SPI);
-        gpio_set_pin_usage(_spi[bus].pin_miso, _SPI);
+        gpio_set_pin_usage(spi_config[bus].sck, _SPI);
+        gpio_set_pin_usage(spi_config[bus].mosi, _SPI);
+        gpio_set_pin_usage(spi_config[bus].miso, _SPI);
 
         /* connect SCK and MOSI pins to the output signal through the GPIO matrix */
-        GPIO.func_out_sel_cfg[_spi[bus].pin_sck].func_sel = _spi[bus].signal_sck;
-        GPIO.func_out_sel_cfg[_spi[bus].pin_mosi].func_sel = _spi[bus].signal_mosi;
+        GPIO.func_out_sel_cfg[spi_config[bus].sck].func_sel = _spi[bus].signal_sck;
+        GPIO.func_out_sel_cfg[spi_config[bus].mosi].func_sel = _spi[bus].signal_mosi;
         /* connect MISO input signal to the MISO pin through the GPIO matrix */
         GPIO.func_in_sel_cfg[_spi[bus].signal_miso].sig_in_sel = 1;
         GPIO.func_in_sel_cfg[_spi[bus].signal_miso].sig_in_inv = 0;
-        GPIO.func_in_sel_cfg[_spi[bus].signal_miso].func_sel = _spi[bus].pin_miso;
+        GPIO.func_in_sel_cfg[_spi[bus].signal_miso].func_sel = spi_config[bus].miso;
     }
     else {
         LOG_TAG_WARNING("spi", "Using SPI_DEV(2) is dangerous\n");
@@ -298,7 +280,7 @@ int IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk
     }
 
     /* if parameter cs is GPIO_UNDEF, the default CS pin is used */
-    cs = (cs == GPIO_UNDEF) ? _spi[bus].pin_cs : cs;
+    cs = (cs == GPIO_UNDEF) ? spi_config[bus].cs : cs;
 
     /* if the CS pin used is not yet initialized, we do it now */
     if (gpio_get_pin_usage(cs) != _SPI && spi_init_cs(bus, cs) != SPI_OK) {
@@ -354,7 +336,7 @@ int IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk
     /* SPI clock is derived from APB clock by dividers */
     _spi[bus].regs->clock.clk_equ_sysclk = 0;
 
-    /* set SPI clock deviders */
+    /* set SPI clock dividers */
     _spi[bus].regs->clock.clkdiv_pre = spi_clkdiv_pre;
     _spi[bus].regs->clock.clkcnt_n = spi_clkcnt_N;
     _spi[bus].regs->clock.clkcnt_h = (spi_clkcnt_N+1)/2-1;
@@ -378,12 +360,12 @@ static const char* _spi_names[] = { "CSPI", "FSPI", "HSPI", "VSPI"  };
 
 void spi_print_config(void)
 {
-    for (unsigned bus = 0; bus < spi_bus_num; bus++) {
-        ets_printf("\tSPI_DEV(%d)\t%s ", bus, _spi_names[_spi[bus].controller]);
-        ets_printf("sck=%d " , _spi[bus].pin_sck);
-        ets_printf("miso=%d ", _spi[bus].pin_miso);
-        ets_printf("mosi=%d ", _spi[bus].pin_mosi);
-        ets_printf("cs=%d\n" , _spi[bus].pin_cs);
+    for (unsigned bus = 0; bus < SPI_NUMOF; bus++) {
+        ets_printf("\tSPI_DEV(%d)\t%s ", bus, _spi_names[spi_config[bus].ctrl]);
+        ets_printf("sck=%d " , spi_config[bus].sck);
+        ets_printf("miso=%d ", spi_config[bus].miso);
+        ets_printf("mosi=%d ", spi_config[bus].mosi);
+        ets_printf("cs=%d\n" , spi_config[bus].cs);
     }
 }
 
@@ -453,7 +435,7 @@ static void IRAM_ATTR _spi_buf_transfer(uint8_t bus, const void *out, void *in, 
 }
 
 void IRAM_ATTR spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
-                             const void *out, void *in, size_t len)
+                                  const void *out, void *in, size_t len)
 {
     CHECK_SPI_DEV(bus);
 
@@ -474,7 +456,7 @@ void IRAM_ATTR spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     }
     #endif
 
-    gpio_clear (cs != SPI_CS_UNDEF ? cs : _spi[bus].pin_cs);
+    gpio_clear (cs != SPI_CS_UNDEF ? cs : spi_config[bus].cs);
 
     size_t blocks = len / SPI_BLOCK_SIZE;
     uint8_t tail = len % SPI_BLOCK_SIZE;
@@ -493,7 +475,7 @@ void IRAM_ATTR spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                           in  ? (uint8_t *)in + blocks * SPI_BLOCK_SIZE : NULL, tail);
     }
     if (!cont) {
-        gpio_set (cs != SPI_CS_UNDEF ? cs : _spi[bus].pin_cs);
+        gpio_set (cs != SPI_CS_UNDEF ? cs : spi_config[bus].cs);
     }
 
     #if ENABLE_DEBUG
@@ -506,3 +488,5 @@ void IRAM_ATTR spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     }
     #endif
 }
+
+#endif /* defined(SPI0_CTRL) || defined(SPI1_CTRL) */
