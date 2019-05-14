@@ -996,7 +996,7 @@ static inline unsigned coap_get_type(coap_pkt_t *pkt)
  *
  * @returns     length of token in the given message (0-8 byte)
  */
-static inline unsigned coap_get_token_len(coap_pkt_t *pkt)
+static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 {
     return (pkt->hdr->ver_t_tkl & 0xf);
 }
