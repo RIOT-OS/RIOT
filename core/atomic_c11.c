@@ -64,11 +64,11 @@ typedef uint64_t I8;
 #define TEMPLATE_ATOMIC_LOAD_N(n) \
     I##n __atomic_load_##n (const volatile void *ptr, int memorder) \
     { \
-        (void) memorder;                   \
-        unsigned int mask = irq_disable(); \
-        I##n old = *(I##n *)ptr;           \
-        irq_restore(mask);                 \
-        return old;                        \
+        (void) memorder;                           \
+        unsigned int mask = irq_disable();         \
+        I##n old = *(const volatile I##n *)ptr;    \
+        irq_restore(mask);                         \
+        return old;                                \
     }
 
 /**
@@ -81,7 +81,7 @@ typedef uint64_t I8;
     { \
         (void) memorder;                   \
         unsigned int mask = irq_disable(); \
-        *(I##n *)ptr = val;                \
+        *(volatile I##n *)ptr = val;       \
         irq_restore(mask);                 \
     }
 
@@ -95,8 +95,8 @@ typedef uint64_t I8;
     { \
         (void) memorder;                   \
         unsigned int mask = irq_disable(); \
-        I##n old = *(I##n *)ptr;           \
-        *(I##n *)ptr = desired;            \
+        I##n old = *(volatile I##n *)ptr;  \
+        *(volatile I##n *)ptr = desired;   \
         irq_restore(mask);                 \
         return old;                        \
     }
@@ -114,14 +114,14 @@ typedef uint64_t I8;
         (void) success_memorder;           \
         (void) failure_memorder;           \
         unsigned int mask = irq_disable(); \
-        I##n cur = *(I##n *)ptr;           \
+        I##n cur = *(volatile I##n *)ptr;  \
         if (cur != *(I##n *)expected) {    \
             *(I##n *)expected = cur;       \
             irq_restore(mask);             \
             return false;                  \
         }                                  \
                                            \
-        *(I##n *)ptr = desired;            \
+        *(volatile I##n *)ptr = desired;   \
         irq_restore(mask);                 \
         return true;                       \
     }
@@ -137,12 +137,12 @@ typedef uint64_t I8;
 #define TEMPLATE_ATOMIC_FETCH_OP_N(opname, op, n, prefixop) \
     I##n __atomic_fetch_##opname##_##n(volatile void *ptr, I##n val, int memmodel) \
     { \
-        unsigned int mask = irq_disable();    \
-        (void)memmodel;                       \
-        I##n tmp = *(I##n *)ptr;              \
-        *(I##n *)ptr = prefixop(tmp op val);  \
-        irq_restore(mask);                    \
-        return tmp;                           \
+        unsigned int mask = irq_disable();             \
+        (void)memmodel;                                \
+        I##n tmp = *(volatile I##n *)ptr;              \
+        *(volatile I##n *)ptr = prefixop(tmp op val);  \
+        irq_restore(mask);                             \
+        return tmp;                                    \
     }
 
 /**
@@ -156,12 +156,12 @@ typedef uint64_t I8;
 #define TEMPLATE_ATOMIC_OP_FETCH_N(opname, op, n, prefixop) \
     I##n __atomic_##opname##_fetch_##n(volatile void *ptr, I##n val, int memmodel) \
     { \
-        (void)memmodel;                                 \
-        unsigned int mask = irq_disable();              \
-        I##n tmp = prefixop((*(I##n *)ptr) op val);     \
-        *(I##n *)ptr = tmp;                             \
-        irq_restore(mask);                              \
-        return tmp;                                     \
+        (void)memmodel;                                        \
+        unsigned int mask = irq_disable();                     \
+        I##n tmp = prefixop((*(volatile I##n *)ptr) op val);   \
+        *(volatile I##n *)ptr = tmp;                           \
+        irq_restore(mask);                                     \
+        return tmp;                                            \
     }
 
 /* Template instantiations below */
