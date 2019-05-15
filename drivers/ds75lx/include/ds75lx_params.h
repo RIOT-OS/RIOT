@@ -47,6 +47,9 @@ extern "C" {
                                        .addr       = DS75LX_PARAM_I2C_ADDR, \
                                        .resolution = DS75LX_PARAM_RESOLUTION }
 #endif
+#ifndef DS75LX_SAUL_INFO
+#define DS75LX_SAUL_INFO             { .name = "ds75lx" }
+#endif
 /**@}*/
 
 /**
@@ -55,6 +58,14 @@ extern "C" {
 static const ds75lx_params_t ds75lx_params[] =
 {
     DS75LX_PARAMS
+};
+
+/**
+ * @brief   Configure SAUL registry entries
+ */
+static const saul_reg_info_t ds75lx_saul_info[] =
+{
+    DS75LX_SAUL_INFO
 };
 
 #ifdef __cplusplus

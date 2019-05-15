@@ -365,6 +365,10 @@ void auto_init(void)
     extern void auto_init_ds18(void);
     auto_init_ds18();
 #endif
+#ifdef MODULE_DS75LX
+    extern void auto_init_ds75lx(void);
+    auto_init_ds75lx();
+#endif
 #ifdef MODULE_FXOS8700
     extern void auto_init_fxos8700(void);
     auto_init_fxos8700();

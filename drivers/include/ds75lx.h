@@ -9,8 +9,10 @@
 /**
  * @defgroup    drivers_ds75lx Maxim DS75LX temperature sensor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver interface for the Maxim DS75LX temperature sensor
  *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
