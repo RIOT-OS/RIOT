@@ -82,7 +82,7 @@ typedef struct {
 static uint8_t _semtech_loramac_send(semtech_loramac_t *mac,
                                      uint8_t *payload, uint8_t len)
 {
-    DEBUG("[semtech-loramac] send frame %s\n", (char *)payload);
+    DEBUG("[semtech-loramac] send frame %s\n", payload ? (char *)payload : "(empty)");
     McpsReq_t mcpsReq;
     LoRaMacTxInfo_t txInfo;
     uint8_t dr = semtech_loramac_get_dr(mac);
