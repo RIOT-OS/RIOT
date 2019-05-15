@@ -3,15 +3,22 @@ PKG_URL=https://github.com/openthread/openthread.git
 PKG_VERSION=thread-reference-20170716
 PKG_BUILDDIR ?= $(PKGDIRBASE)/$(PKG_NAME)
 
-ifneq (,$(filter openthread-cli-ftd,$(USEMODULE)))
+ifneq (,$(filter openthread-ftd,$(USEMODULE)))
+  TD = ftd
   $(info Compile OpenThread for FTD device)
-  OPENTHREAD_ARGS += --enable-cli-app=ftd
-endif
-ifneq (,$(filter openthread-cli-mtd,$(USEMODULE)))
+else ifneq (,$(filter openthread-mtd,$(USEMODULE)))
   $(info Compile OpenThread for MTD device)
-  OPENTHREAD_ARGS += --enable-cli-app=mtd --enable-joiner
+  TD = mtd
+  JOINER_ARG = --enable-joiner
+else
+  $(error "Please use either USEMODULE=openthread-ftd or USEMODULE=openthread-mtd")
 endif
-OPENTHREAD_ARGS += --enable-application-coap
+
+ifneq (,$(filter openthread-cli,$(USEMODULE)))
+  CLI_ARG = --enable-cli-app=$(TD)
+endif
+
+OPENTHREAD_ARGS += $(CLI_ARG) $(JOINER_ARG) --enable-application-coap
 CONFIG_FILE      = OPENTHREAD_PROJECT_CORE_CONFIG_FILE='\"platform_config.h\"'
 $(info $$OPENTHREAD_ARGS is [${OPENTHREAD_ARGS}])
 
@@ -35,13 +42,10 @@ all: git-download
 	cd $(PKG_BUILDDIR) &&  DESTDIR=$(PKG_BUILDDIR)/output PREFIX=/ make -j4 --no-print-directory install
 
 	cp $(PKG_BUILDDIR)/output/lib/libmbedcrypto.a ${BINDIR}/mbedcrypto.a
-ifneq (,$(filter openthread-cli-ftd,$(USEMODULE)))
-	cp $(PKG_BUILDDIR)/output/lib/libopenthread-ftd.a ${BINDIR}/openthread-ftd.a
-	cp $(PKG_BUILDDIR)/output/lib/libopenthread-cli-ftd.a ${BINDIR}/openthread-cli-ftd.a
-endif
-ifneq (,$(filter openthread-cli-mtd,$(USEMODULE)))
-	cp $(PKG_BUILDDIR)/output/lib/libopenthread-mtd.a ${BINDIR}/openthread-mtd.a
-	cp $(PKG_BUILDDIR)/output/lib/libopenthread-cli-mtd.a ${BINDIR}/openthread-cli-mtd.a
+
+	cp $(PKG_BUILDDIR)/output/lib/libopenthread-$(TD).a ${BINDIR}/openthread-$(TD).a
+ifneq (,$(filter openthread-cli,$(USEMODULE)))
+	cp $(PKG_BUILDDIR)/output/lib/libopenthread-cli-$(TD).a ${BINDIR}/openthread-cli.a
 endif
 
 include $(RIOTBASE)/pkg/pkg.mk
