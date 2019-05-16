@@ -6,4 +6,6 @@ export INCLUDES += -I$(RIOTCPU)/atmega_common/include \
 # avr libc needs some RIOT-specific support code
 USEMODULE += avr_libc_extra
 
+export LINKFLAGS += -L$(RIOTCPU)/atmega_common/ldscripts_compat
+
 include $(RIOTMAKE)/arch/atmega.inc.mk
