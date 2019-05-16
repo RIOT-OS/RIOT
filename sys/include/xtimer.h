@@ -213,7 +213,7 @@ static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup, uint32_
  * This function sets a timer that will send a message @p offset ticks
  * from now.
  *
- * The mesage struct specified by msg parameter will not be copied, e.g., it
+ * The message struct specified by msg parameter will not be copied, e.g., it
  * needs to point to valid memory until the message has been delivered.
  *
  * @param[in] timer         timer struct to work with.
@@ -231,7 +231,7 @@ static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, 
  * This function sets a timer that will send a message @p offset microseconds
  * from now.
  *
- * The mesage struct specified by msg parameter will not be copied, e.g., it
+ * The message struct specified by msg parameter will not be copied, e.g., it
  * needs to point to valid memory until the message has been delivered.
  *
  * @param[in] timer         timer struct to work with.
