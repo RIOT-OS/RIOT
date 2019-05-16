@@ -151,16 +151,10 @@ static void mcps_confirm(McpsConfirm_t *confirm)
 
         switch (confirm->McpsRequest) {
             case MCPS_UNCONFIRMED:
-            {
                 /* Check Datarate
                    Check TxPower */
                 DEBUG("[semtech-loramac] MCPS confirm event: UNCONFIRMED\n");
-                msg_t msg;
-                msg.type = MSG_TYPE_LORAMAC_TX_STATUS;
-                msg.content.value = SEMTECH_LORAMAC_TX_DONE;
-                msg_send(&msg, semtech_loramac_pid);
                 break;
-            }
 
             case MCPS_CONFIRMED:
                 /* Check Datarate
@@ -223,19 +217,15 @@ static void mcps_indication(McpsIndication_t *indication)
        Check Port
        Check Datarate
        Check FramePending */
+    msg_t msg;
     if (indication->FramePending == true) {
         /* The server signals that it has pending data to be sent.
            We schedule an uplink as soon as possible to flush the server. */
         DEBUG("[semtech-loramac] MCPS indication: pending data, schedule an "
               "uplink\n");
-        msg_t msg;
         msg.type = MSG_TYPE_LORAMAC_TX_STATUS;
         msg.content.value = SEMTECH_LORAMAC_TX_SCHEDULE;
-        msg_send(&msg, semtech_loramac_pid);
-    }
-
-    msg_t msg;
-    if (indication->RxData) {
+    } else if (indication->RxData) {
         DEBUG("[semtech-loramac] MCPS indication: data received\n");
         msg.type = MSG_TYPE_LORAMAC_RX;
         msg.content.ptr = indication;
@@ -864,6 +854,18 @@ uint8_t semtech_loramac_recv(semtech_loramac_t *mac)
 {
     mac->caller_pid = thread_getpid();
 
+    xtimer_t uncnf_timer;
+    /* Ensure we get a reply from the MAC with unconfirmed messages when no
+    data is received from the network server. */
+    if (semtech_loramac_get_tx_mode(mac) == LORAMAC_TX_UNCNF) {
+        msg_t msg_uncnf;
+        msg_uncnf.type = MSG_TYPE_LORAMAC_TX_STATUS;
+        msg_uncnf.content.value = SEMTECH_LORAMAC_TX_DONE;
+        /* The timer will fire in RX2 window delay + 1s (e.g. 3s) from now */
+        xtimer_set_msg(&uncnf_timer, LORAMAC_DEFAULT_RX2_DELAY * US_PER_MS + 1000U,
+                       &msg_uncnf, semtech_loramac_pid);
+    }
+
     /* Wait until the mac receive some information */
     msg_t msg;
     msg_receive(&msg);
@@ -879,6 +881,9 @@ uint8_t semtech_loramac_recv(semtech_loramac_t *mac)
             ret = SEMTECH_LORAMAC_TX_ERROR;
             break;
     }
+
+    /* Disable any running uncnf timer */
+    xtimer_remove(&uncnf_timer);
 
     DEBUG("[semtech-loramac] MAC reply received: %d\n", ret);
 
