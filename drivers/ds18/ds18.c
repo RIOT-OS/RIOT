@@ -184,7 +184,7 @@ int ds18_read(const ds18_t *dev, int16_t *temperature)
 
     DEBUG("[DS18] Received byte: 0x%02x\n", b2);
 
-    int32_t measurement = ((int32_t)(b2 << 8 | b1) * 625);
+    int32_t measurement = ((int16_t)(b2 << 8 | b1) * 625);
     *temperature = (int16_t)(measurement / 100);
 
     return DS18_OK;
