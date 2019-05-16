@@ -17,7 +17,6 @@
  */
 
 
-#include "openthread/types.h"
 #include "openthread/platform/misc.h"
 #include "periph/pm.h"
 

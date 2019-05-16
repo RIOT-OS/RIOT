@@ -28,7 +28,6 @@
 #include "net/l2util.h"
 #include "net/netdev/ieee802154.h"
 #include "openthread/config.h"
-#include "openthread/openthread.h"
 #include "openthread/platform/diag.h"
 #include "openthread/platform/radio.h"
 #include "ot.h"
@@ -211,13 +210,13 @@ void otPlatRadioSetPanId(otInstance *aInstance, uint16_t panid)
 }
 
 /* OpenThread will call this for setting extended address */
-void otPlatRadioSetExtendedAddress(otInstance *aInstance, uint8_t *aExtendedAddress)
+void otPlatRadioSetExtendedAddress(otInstance *aInstance, const otExtAddress *aExtAddress)
 {
     (void)aInstance;
     DEBUG("openthread: otPlatRadioSetExtendedAddress\n");
     char reversed_addr[IEEE802154_LONG_ADDRESS_LEN];
     for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
-        reversed_addr[i] = (uint8_t) ((uint8_t *)aExtendedAddress)[IEEE802154_LONG_ADDRESS_LEN - 1 - i];
+        reversed_addr[i] = (uint8_t) ((uint8_t *)aExtAddress)[IEEE802154_LONG_ADDRESS_LEN - 1 - i];
     }
     if (ENABLE_DEBUG) {
         for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; ++i) {
@@ -411,7 +410,7 @@ otError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, const uint16_t a
     return OT_ERROR_NONE;
 }
 
-otError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const uint8_t *aExtAddress)
+otError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const otExtAddress *aExtAddress)
 {
     DEBUG("otPlatRadioAddSrcMatchExtEntry\n");
     (void)aInstance;
@@ -427,7 +426,7 @@ otError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, const uint16_t
     return OT_ERROR_NONE;
 }
 
-otError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const uint8_t *aExtAddress)
+otError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const otExtAddress *aExtAddress)
 {
     DEBUG("otPlatRadioClearSrcMatchExtEntry\n");
     (void)aInstance;
