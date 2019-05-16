@@ -670,18 +670,18 @@ void *_semtech_loramac_event_loop(void *arg)
         else {
             switch (msg.type) {
                 case MSG_TYPE_RX_TIMEOUT:
-                    DEBUG("[semtech-loramac] RX timer timeout\n");
+                    DEBUG("[semtech-loramac] event loop: RX timer timeout\n");
                     semtech_loramac_radio_events.RxTimeout();
                     break;
 
                 case MSG_TYPE_TX_TIMEOUT:
-                    DEBUG("[semtech-loramac] TX timer timeout\n");
+                    DEBUG("[semtech-loramac] event loop: TX timer timeout\n");
                     semtech_loramac_radio_events.TxTimeout();
                     break;
 
                 case MSG_TYPE_MAC_TIMEOUT:
                 {
-                    DEBUG("[semtech-loramac] MAC timer timeout\n");
+                    DEBUG("[semtech-loramac] event loop: MAC timer timeout\n");
                     void (*callback)(void) = msg.content.ptr;
                     callback();
                     break;
@@ -689,7 +689,7 @@ void *_semtech_loramac_event_loop(void *arg)
                 case MSG_TYPE_LORAMAC_CMD:
                 {
                     msg_t msg_resp;
-                    DEBUG("[semtech-loramac] loramac cmd msg\n");
+                    DEBUG("[semtech-loramac] event loop: loramac cmd msg\n");
                     semtech_loramac_call_t *call = msg.content.ptr;
                     call->func(mac, call->arg);
                     msg_reply(&msg, &msg_resp);
@@ -697,7 +697,7 @@ void *_semtech_loramac_event_loop(void *arg)
                 }
                 case MSG_TYPE_LORAMAC_JOIN:
                 {
-                    DEBUG("[semtech-loramac] loramac join notification msg\n");
+                    DEBUG("[semtech-loramac] event loop: loramac join notification msg\n");
                     msg_t msg_ret;
                     msg_ret.content.value = msg.content.value;
                     msg_send(&msg_ret, mac->caller_pid);
@@ -709,7 +709,7 @@ void *_semtech_loramac_event_loop(void *arg)
                     mac->link_chk.demod_margin = confirm->DemodMargin;
                     mac->link_chk.nb_gateways = confirm->NbGateways;
                     mac->link_chk.available = true;
-                    DEBUG("[semtech-loramac] link check info received:\n"
+                    DEBUG("[semtech-loramac] event loop: link check info received:\n"
                           "  - Demodulation marging: %d\n"
                           "  - Number of gateways: %d\n",
                           mac->link_chk.demod_margin,
@@ -718,7 +718,7 @@ void *_semtech_loramac_event_loop(void *arg)
                 }
                 case MSG_TYPE_LORAMAC_TX_STATUS:
                 {
-                    DEBUG("[semtech-loramac] received TX status\n");
+                    DEBUG("[semtech-loramac] event loop: received TX status\n");
                     if (msg.content.value == SEMTECH_LORAMAC_TX_SCHEDULE) {
                         DEBUG("[semtech-loramac] schedule immediate TX\n");
                         uint8_t prev_port = mac->port;
@@ -727,7 +727,7 @@ void *_semtech_loramac_event_loop(void *arg)
                         mac->port = prev_port;
                     }
                     else {
-                        DEBUG("[semtech-loramac] forward TX status to caller thread\n");
+                        DEBUG("[semtech-loramac] event loop: forward TX status to caller thread\n");
                         msg_t msg_ret;
                         msg_ret.type = msg.type;
                         msg_ret.content.value = msg.content.value;
@@ -744,7 +744,7 @@ void *_semtech_loramac_event_loop(void *arg)
                            indication->Buffer, indication->BufferSize);
                     mac->rx_data.payload_len = indication->BufferSize;
                     mac->rx_data.port = indication->Port;
-                    DEBUG("[semtech-loramac] loramac RX data:\n"
+                    DEBUG("[semtech-loramac] event loop: loramac RX data:\n"
                           "  - Payload: %s\n"
                           "  - Size: %d\n"
                           "  - Port: %d\n",
@@ -755,7 +755,7 @@ void *_semtech_loramac_event_loop(void *arg)
                     break;
                 }
                 default:
-                    DEBUG("[semtech-loramac] Unexpected msg type '%04x'\n",
+                    DEBUG("[semtech-loramac] event loop: Unexpected msg type '%04x'\n",
                           msg.type);
             }
         }
@@ -852,6 +852,8 @@ uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
     msg_t msg;
     msg_receive(&msg);
     if (msg.type != MSG_TYPE_LORAMAC_TX_STATUS) {
+        DEBUG("[semtech-loramac] error detected when sending data "
+              "(msg type: %04X)\n", msg.type);
         return SEMTECH_LORAMAC_TX_ERROR;
     }
 
