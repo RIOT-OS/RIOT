@@ -282,6 +282,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Channel identifiers defined for L2CAP LE-U link layers
+ * @{
+ */
+#define BLE_L2CAP_CID_IPSP                  (0x0023)
+#define BLE_L2CAP_CID_CB_MIN                (0x0040)
+#define BLE_L2CAP_CID_CB_MAX                (0x007f)
+/** @} */
+
+/**
  * @name    ATT protocol opcodes
  * @{
  */
