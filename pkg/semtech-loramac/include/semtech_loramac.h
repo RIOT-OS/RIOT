@@ -36,15 +36,17 @@ extern "C" {
  * @name    Definitions for messages exchanged between the MAC and call threads
  * @{
  */
-#define MSG_TYPE_ISR                   (0x3456) /**< radio device ISR */
-#define MSG_TYPE_RX_TIMEOUT            (0x3457) /**< radio driver RX timeout */
-#define MSG_TYPE_TX_TIMEOUT            (0x3458) /**< radio driver TX timeout */
-#define MSG_TYPE_MAC_TIMEOUT           (0x3459) /**< MAC timers timeout */
-#define MSG_TYPE_LORAMAC_CMD           (0x3460) /**< Command sent to the MAC */
-#define MSG_TYPE_LORAMAC_JOIN          (0x3461) /**< MAC join event */
-#define MSG_TYPE_LORAMAC_TX_STATUS     (0x3462) /**< MAC TX status */
-#define MSG_TYPE_LORAMAC_RX            (0x3463) /**< Some data received */
-#define MSG_TYPE_LORAMAC_LINK_CHECK    (0x3464) /**< Link check info received */
+#define MSG_TYPE_ISR                        (0x3456) /**< radio device ISR */
+#define MSG_TYPE_RX_TIMEOUT                 (0x3457) /**< radio driver RX timeout */
+#define MSG_TYPE_TX_TIMEOUT                 (0x3458) /**< radio driver TX timeout */
+#define MSG_TYPE_MAC_TIMEOUT                (0x3459) /**< MAC timers timeout */
+#define MSG_TYPE_LORAMAC_CMD                (0x3460) /**< Command sent to the MAC */
+#define MSG_TYPE_LORAMAC_JOIN_STATUS        (0x3461) /**< Join status */
+#define MSG_TYPE_LORAMAC_TX_STATUS          (0x3462) /**< Uplink status */
+#define MSG_TYPE_LORAMAC_MLME_CONFIRM       (0x3463) /**< MAC MLME confirm event */
+#define MSG_TYPE_LORAMAC_MLME_INDICATION    (0x3464) /**< MAC MLME indication event */
+#define MSG_TYPE_LORAMAC_MCPS_CONFIRM       (0x3465) /**< MAC MCPS confirm event */
+#define MSG_TYPE_LORAMAC_MCPS_INDICATION    (0x3466) /**< MAC MCPS indication event */
 /** @} */
 
 /**
@@ -65,7 +67,9 @@ enum {
     SEMTECH_LORAMAC_TX_DONE,                    /**< Transmission completed */
     SEMTECH_LORAMAC_TX_CNF_FAILED,              /**< Confirmable transmission failed */
     SEMTECH_LORAMAC_TX_ERROR,                   /**< Error in TX (invalid param, unknown service) */
-    SEMTECH_LORAMAC_DATA_RECEIVED,              /**< Data received */
+    SEMTECH_LORAMAC_RX_DATA,                    /**< Data received */
+    SEMTECH_LORAMAC_RX_LINK_CHECK,              /**< Link check info received */
+    SEMTECH_LORAMAC_RX_CONFIRMED,               /**< Confirmed ACK received */
     SEMTECH_LORAMAC_BUSY,                       /**< Internal MAC is busy */
     SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED        /**< Restricted access to channels */
 };
@@ -101,7 +105,6 @@ typedef struct {
 typedef struct {
     uint8_t demod_margin;                        /**< Demodulation margin */
     uint8_t nb_gateways;                         /**< number of LoRa gateways found */
-    bool available;                              /**< new link check information avalable */
 } semtech_loramac_link_check_info_t;
 
 /**
@@ -109,7 +112,8 @@ typedef struct {
  */
 typedef struct {
     mutex_t lock;                                /**< loramac access lock */
-    uint8_t caller_pid;                          /**< pid of caller thread */
+    uint8_t tx_pid;                              /**< pid of sender thread */
+    uint8_t rx_pid;                              /**< pid of receiver thread */
     uint8_t port;                                /**< application TX port */
     uint8_t cnf;                                 /**< enable/disable confirmable messages */
     uint8_t deveui[LORAMAC_DEVEUI_LEN];          /**< device EUI */
@@ -184,8 +188,9 @@ uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
  *
  * @param[in] mac          Pointer to the mac
  *
- * @return SEMTECH_LORAMAC_TX_DONE when TX has completed, no data received
- * @return SEMTECH_LORAMAC_DATA_RECEIVED when TX has completed and data is received
+ * @return SEMTECH_LORAMAC_RX_DATA when data is received
+ * @return SEMTECH_LORAMAC_RX_LINK_CHECK when link check information is received
+ * @return SEMTECH_LORAMAC_RX_CONFIRMED when an ACK is received from the network
  */
 uint8_t semtech_loramac_recv(semtech_loramac_t *mac);
 
