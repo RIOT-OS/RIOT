@@ -41,7 +41,7 @@ else
 endif
 
 TERMPROG ?= $(ELFFILE)
-export FLASHER = true
+FLASHER = true
 export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof

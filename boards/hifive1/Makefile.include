@@ -17,4 +17,4 @@ export OPENOCD_CMD_RESET_RUN=-c _reset
 include $(RIOTMAKE)/tools/openocd.inc.mk
 
 # use our own openocd script to flash since HiFive1 has reset problems.
-export FLASHER = $(RIOTBASE)/boards/hifive1/dist/flasher.sh
+FLASHER = $(RIOTBASE)/boards/hifive1/dist/flasher.sh

@@ -1,12 +1,12 @@
 # define the cpu used by the mbed_lpx1768 board
 export CPU = lpc1768
 
-export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
 export DEBUGGER =
 export DEBUGSERVER =
 
 HEXFILE = $(BINFILE)
-export FFLAGS = $(HEXFILE)
+FFLAGS = $(HEXFILE)
 export DEBUGGER_FLAGS =
 
 # define the default port depending on the host OS

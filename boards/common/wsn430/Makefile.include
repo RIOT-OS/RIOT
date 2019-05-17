@@ -13,8 +13,8 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # configure the flash tool
-export FLASHER = mspdebug
-export FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
+FLASHER = mspdebug
+FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
 
 # Use the HEXFILE when using iot-lab.single.inc.mk
 IOTLAB_FLASHFILE = $(HEXFILE)

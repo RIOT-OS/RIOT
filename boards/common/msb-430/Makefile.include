@@ -14,8 +14,8 @@ export MSPDEBUGFLAGS += -j $(PROGRAMMER)
 ifeq ($(strip $(PROGRAMMER)),uif)
   export MSPDEBUGFLAGS += -d $(PORT)
 endif
-export FLASHER ?= mspdebug
-export FFLAGS = $(MSPDEBUGFLAGS) "prog $(HEXFILE)"
+FLASHER ?= mspdebug
+FFLAGS = $(MSPDEBUGFLAGS) "prog $(HEXFILE)"
 
 # setup debugger
 export DEBUGSERVER = $(FLASHER)
