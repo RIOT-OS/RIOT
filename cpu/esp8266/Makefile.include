@@ -131,9 +131,9 @@ LINKFLAGS += -Wl,--warn-unresolved-symbols
 
 # configure preflasher to convert .elf to .bin before flashing
 FLASH_SIZE = -fs 8m
-export PREFLASHER ?= esptool.py
-export PREFFLAGS  ?= elf2image $(FLASH_SIZE) $(ELFFILE)
-export FLASHDEPS  ?= preflash
+PREFLASHER ?= esptool.py
+PREFFLAGS  ?= elf2image $(FLASH_SIZE) $(ELFFILE)
+FLASHDEPS  ?= preflash
 
 # flasher configuration
 ifeq ($(QEMU), 1)
