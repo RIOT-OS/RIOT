@@ -33,7 +33,7 @@ extern "C" {
 #include "net/ethernet.h"
 #include "net/netdev.h"
 #include "thread.h"
-#include "openthread/types.h"
+#include "openthread/instance.h"
 
 /**
  * @name    Openthread message types

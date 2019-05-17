@@ -1,6 +1,6 @@
 PKG_NAME=openthread
 PKG_URL=https://github.com/openthread/openthread.git
-PKG_VERSION=thread-reference-20170716
+PKG_VERSION=thread-reference-20180926
 PKG_BUILDDIR ?= $(PKGDIRBASE)/$(PKG_NAME)
 
 ifneq (,$(filter openthread-ftd,$(USEMODULE)))
@@ -15,7 +15,7 @@ else
 endif
 
 ifneq (,$(filter openthread-cli,$(USEMODULE)))
-  CLI_ARG = --enable-cli-app=$(TD)
+  CLI_ARG = --enable-cli --enable-$(TD)
 endif
 
 OPENTHREAD_ARGS += $(CLI_ARG) $(JOINER_ARG) --enable-application-coap
