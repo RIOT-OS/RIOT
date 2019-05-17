@@ -23,12 +23,12 @@ else ifeq ($(PROGRAMMER),jlink)
   FFLAGS  = $(BINDIR) $(FLASHFILE)
   export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
   export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
-  export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+  RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 endif
 
 FLASHFILE ?= $(BINFILE)
 export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
-export RESET_FLAGS = $(BINDIR)
+RESET_FLAGS = $(BINDIR)
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
 # setup serial terminal

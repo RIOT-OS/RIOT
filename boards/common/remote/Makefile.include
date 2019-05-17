@@ -12,7 +12,7 @@ ifeq ($(PROGRAMMER),cc2538-bsl)
   else ifeq ($(OS),Darwin)
     PORT_BSL ?= $(PORT_DARWIN)
   endif
-  export RESET = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py -p "$(PORT_BSL)"
+  RESET = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py -p "$(PORT_BSL)"
   FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
   FFLAGS  = -p "$(PORT_BSL)" -e -w -v -b 115200 $(FLASHFILE)
 else ifeq ($(PROGRAMMER),jlink)
@@ -20,8 +20,8 @@ else ifeq ($(PROGRAMMER),jlink)
   FFLAGS  = $(BINDIR) $(FLASHFILE)
   export DEBUGGER = $(RIOTBOARD)/common/remote/dist/debug.sh
   export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
-  export RESET = $(RIOTBOARD)/common/remote/dist/reset.sh
-  export RESET_FLAGS = $(BINDIR)
+  RESET = $(RIOTBOARD)/common/remote/dist/reset.sh
+  RESET_FLAGS = $(BINDIR)
 endif
 
 OFLAGS = --gap-fill 0xff

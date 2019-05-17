@@ -82,8 +82,8 @@ export DEBUGGER              # The command to call on "make debug", usually a sc
 export DEBUGGER_FLAGS        # The parameters to supply to DEBUGGER.
 export DEBUGSERVER           # The command to call on "make debug-server", usually a script starting the GDB server.
 export DEBUGSERVER_FLAGS     # The parameters to supply to DEBUGSERVER.
-export RESET                 # The command to call on "make reset", this command resets/reboots the target.
-export RESET_FLAGS           # The parameters to supply to RESET.
+# RESET                      # The command to call on "make reset", this command resets/reboots the target.
+# RESET_FLAGS                # The parameters to supply to RESET.
 
 export CCACHE_BASEDIR        # ccache basedir, allows multiple riot build
                              # directories to share a ccache directory
