@@ -63,7 +63,7 @@ static void _on_data(struct ble_l2cap_event *event)
     printf("# Received: len %5i, seq %5u\n", rx_len, (unsigned)_rxbuf[POS_SEQ]);
 
     res = ble_l2cap_send(_coc, rxd);
-    assert(res == 0);
+    assert((res == 0) || (res == BLE_HS_ESTALLED));
 
     /* allocate new mbuf for receiving new data */
     rxd = os_mbuf_get_pkthdr(&_coc_mbuf_pool, 0);
@@ -117,6 +117,9 @@ static int _on_l2cap_evt(struct ble_l2cap_event *event, void *arg)
         }
         case BLE_L2CAP_EVENT_COC_DATA_RECEIVED:
             _on_data(event);
+            break;
+        case BLE_L2CAP_EVENT_COC_TX_UNSTALLED:
+            /* this event is expected, but we have nothing to do here */
             break;
         default:
             assert(0);
