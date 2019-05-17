@@ -32,7 +32,7 @@ netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif)
 
     switch (netif->device_type) {
 #if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) || \
-    defined(MODULE_NORDIC_SOFTDEVICE_BLE)
+    defined(MODULE_NORDIC_SOFTDEVICE_BLE) || defined(MODULE_NIMBLE_NETIF)
         case NETDEV_TYPE_IEEE802154:
         case NETDEV_TYPE_BLE: {
                 netdev_t *dev = netif->dev;
@@ -128,7 +128,7 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
 #endif
             break;
 #endif
-#ifdef MODULE_NORDIC_SOFTDEVICE_BLE
+#if defined(MODULE_NORDIC_SOFTDEVICE_BLE) || defined(MODULE_NIMBLE_NETIF)
         case NETDEV_TYPE_BLE:
             netif->ipv6.mtu = IPV6_MIN_MTU;
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
