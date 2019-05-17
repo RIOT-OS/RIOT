@@ -11,7 +11,7 @@ export ID ?= 0483:df11
 
 FLASHER = dfu-util
 export DEBUGGER = # dfu-util has no debugger
-export RESET = # dfu-util has no support for resetting the device
+RESET = # dfu-util has no support for resetting the device
 
 HEXFILE = $(BINFILE)
 FFLAGS = -d $(ID) -a 0 -s 0x08000000:leave -D "$(HEXFILE)"

@@ -9,7 +9,7 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 FLASHER = dfu-util
 export DEBUGGER = # spark core has no debugger
-export RESET = # dfu-util has no support for resetting the device
+RESET = # dfu-util has no support for resetting the device
 
 HEXFILE = $(BINFILE)
 FFLAGS = -d 1d50:607f -a 0 -s 0x08005000:leave -D "$(HEXFILE)"

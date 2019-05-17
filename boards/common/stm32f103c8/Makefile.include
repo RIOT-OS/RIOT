@@ -25,7 +25,7 @@ ifeq ($(PROGRAMMER),dfu-util)
   export ROM_OFFSET ?= 0x2000 # Skip the space needed by the embedded bootloader
   FLASHER = dfu-util
   export DEBUGGER = # no debugger
-  export RESET = # dfu-util has no support for resetting the device
+  RESET = # dfu-util has no support for resetting the device
 
   HEXFILE = $(BINFILE)
   FFLAGS = -d 1eaf:0003 -a 2 -D "$(HEXFILE)"
