@@ -2,12 +2,12 @@
 export CPU = lpc1768
 
 FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-export DEBUGGER =
-export DEBUGSERVER =
+DEBUGGER =
+DEBUGSERVER =
 
 HEXFILE = $(BINFILE)
 FFLAGS = $(HEXFILE)
-export DEBUGGER_FLAGS =
+DEBUGGER_FLAGS =
 
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyACM0

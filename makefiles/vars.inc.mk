@@ -78,10 +78,10 @@ export PORT                  # The port to connect the TERMPROG to.
 export ELFFILE               # The unstripped result of the compilation.
 export HEXFILE               # The stripped result of the compilation.
 # FLASHFILE                  # The output file used for flashing (transition phase: only if defined)
-export DEBUGGER              # The command to call on "make debug", usually a script starting the GDB front-end.
-export DEBUGGER_FLAGS        # The parameters to supply to DEBUGGER.
-export DEBUGSERVER           # The command to call on "make debug-server", usually a script starting the GDB server.
-export DEBUGSERVER_FLAGS     # The parameters to supply to DEBUGSERVER.
+# DEBUGGER                   # The command to call on "make debug", usually a script starting the GDB front-end.
+# DEBUGGER_FLAGS             # The parameters to supply to DEBUGGER.
+# DEBUGSERVER                # The command to call on "make debug-server", usually a script starting the GDB server.
+# DEBUGSERVER_FLAGS          # The parameters to supply to DEBUGSERVER.
 # RESET                      # The command to call on "make reset", this command resets/reboots the target.
 # RESET_FLAGS                # The parameters to supply to RESET.
 

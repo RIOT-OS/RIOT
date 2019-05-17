@@ -21,13 +21,13 @@ ifeq ($(PROGRAMMER),cc2538-bsl)
 else ifeq ($(PROGRAMMER),jlink)
   FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
   FFLAGS  = $(BINDIR) $(FLASHFILE)
-  export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
-  export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
+  DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+  DEBUGSERVER = JLinkGDBServer -device CC2538SF53
   RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 endif
 
 FLASHFILE ?= $(BINFILE)
-export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
+DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 RESET_FLAGS = $(BINDIR)
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 

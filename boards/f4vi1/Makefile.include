@@ -14,10 +14,10 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 # st-flash
 FLASHER = st-flash
-export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
-export DEBUGSERVER = st-util
+DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+DEBUGSERVER = st-util
 
 # define st-flash parameters
 HEXFILE = $(BINFILE)
 FFLAGS = write $(HEXFILE) 0x8000000
-export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)
+DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)

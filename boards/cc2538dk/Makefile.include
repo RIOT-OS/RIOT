@@ -15,8 +15,8 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 include $(RIOTMAKE)/tools/renode.inc.mk
 
 # debugger config
-export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
-export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
+DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+DEBUGSERVER = JLinkGDBServer -device CC2538SF53
 RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 
 # Define the flash-tool and default port:
@@ -32,7 +32,7 @@ endif
 
 OFLAGS = --gap-fill 0xff
 FLASHFILE ?= $(BINFILE)
-export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
+DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 RESET_FLAGS = $(BINDIR)
 
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb

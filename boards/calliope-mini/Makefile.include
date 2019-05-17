@@ -11,11 +11,11 @@ PROGRAMMER ?= fscopy
 
 ifeq (fscopy,$(PROGRAMMER))
   FFLAGS = $(HEXFILE)
-  export DEBUGGER_FLAGS =
+  DEBUGGER_FLAGS =
 
   FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-  export DEBUGGER =
-  export DEBUGSERVER =
+  DEBUGGER =
+  DEBUGSERVER =
 else ifeq (openocd,$(PROGRAMMER))
   DEBUG_ADAPTER = dap
 else ifeq (pyocd,$(PROGRAMMER))
