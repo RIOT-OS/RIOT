@@ -10,9 +10,9 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup flash tool
 export PROGRAMMER ?= olimex
-export MSPDEBUGFLAGS += -j $(PROGRAMMER)
+MSPDEBUGFLAGS += -j $(PROGRAMMER)
 ifeq ($(strip $(PROGRAMMER)),uif)
-  export MSPDEBUGFLAGS += -d $(PORT)
+  MSPDEBUGFLAGS += -d $(PORT)
 endif
 FLASHER ?= mspdebug
 FFLAGS = $(MSPDEBUGFLAGS) "prog $(HEXFILE)"
