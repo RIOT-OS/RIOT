@@ -4,8 +4,8 @@ FLASHFILE ?= $(ELFFILE)
 export UNIFLASH_PATH ?= "UNIFLASH_PATH unconfigured"
 # check which uniflash version is available, either 4.x or 3.x
 ifneq ("$(wildcard $(UNIFLASH_PATH)/dslite.sh)","")
-  export FLASHER ?= $(UNIFLASH_PATH)/dslite.sh
-  export FFLAGS  = --config $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml $(FLASHFILE)
+  FLASHER ?= $(UNIFLASH_PATH)/dslite.sh
+  FFLAGS  = --config $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml $(FLASHFILE)
   # configure uniflash for resetting target
   # xds110reset path changed in version UniFlash v4.4.0
   # Try to detect the newest one and fallback to only 'xds110reset'
@@ -15,8 +15,8 @@ ifneq ("$(wildcard $(UNIFLASH_PATH)/dslite.sh)","")
   export RESET = $(XDS110RESET)
   export RESET_FLAGS
 else
-  export FLASHER = $(UNIFLASH_PATH)/uniflash.sh
-  export FFLAGS  = -ccxml $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml -program $(FLASHFILE)
+  FLASHER = $(UNIFLASH_PATH)/uniflash.sh
+  FFLAGS  = -ccxml $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml -program $(FLASHFILE)
   # configure uniflash for resetting target
   export RESET = $(UNIFLASH_PATH)/uniflash.sh
   export RESET_FLAGS = -ccxml $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml -reset

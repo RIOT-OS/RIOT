@@ -13,11 +13,11 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # st-flash
-export FLASHER = st-flash
+FLASHER = st-flash
 export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
 export DEBUGSERVER = st-util
 
 # define st-flash parameters
 HEXFILE = $(BINFILE)
-export FFLAGS = write $(HEXFILE) 0x8000000
+FFLAGS = write $(HEXFILE) 0x8000000
 export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)

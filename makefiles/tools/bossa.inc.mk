@@ -1,5 +1,5 @@
-export FLASHER ?= $(RIOTTOOLS)/bossa/bossac
-export FFLAGS  ?= -p $(PORT) -e -i -w -v -b -R $(HEXFILE)
+FLASHER ?= $(RIOTTOOLS)/bossa/bossac
+FFLAGS  ?= -p $(PORT) -e -i -w -v -b -R $(HEXFILE)
 
 HEXFILE = $(BINFILE)
 

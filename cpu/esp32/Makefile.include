@@ -161,24 +161,24 @@ export FLASHDEPS  = preflash
 
 # flasher configuration
 ifeq ($(QEMU), 1)
-    export FLASHER = dd
-    export FFLAGS += if=/dev/zero bs=1M count=4  | tr "\\000" "\\377" > tmp.bin && cat tmp.bin |
-    export FFLAGS += head -c $$((0x1000)) |
-    export FFLAGS += cat - $(RIOTCPU)/$(CPU)/bin/bootloader.bin tmp.bin |
-    export FFLAGS += head -c $$((0x8000)) |
-    export FFLAGS += cat - $(BINDIR)/partitions.bin tmp.bin |
-    export FFLAGS += head -c $$((0x10000)) |
-    export FFLAGS += cat - $(ELFFILE).bin tmp.bin |
-    export FFLAGS += head -c $$((0x400000)) > $(BINDIR)/esp32flash.bin && rm tmp.bin &&
-    export FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin &&
-    export FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
+    FLASHER = dd
+    FFLAGS += if=/dev/zero bs=1M count=4  | tr "\\000" "\\377" > tmp.bin && cat tmp.bin |
+    FFLAGS += head -c $$((0x1000)) |
+    FFLAGS += cat - $(RIOTCPU)/$(CPU)/bin/bootloader.bin tmp.bin |
+    FFLAGS += head -c $$((0x8000)) |
+    FFLAGS += cat - $(BINDIR)/partitions.bin tmp.bin |
+    FFLAGS += head -c $$((0x10000)) |
+    FFLAGS += cat - $(ELFFILE).bin tmp.bin |
+    FFLAGS += head -c $$((0x400000)) > $(BINDIR)/esp32flash.bin && rm tmp.bin &&
+    FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin &&
+    FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
 else
     export PROGRAMMER_SPEED ?= 460800
-    export FLASHER = $(ESPTOOL)
-    export FFLAGS += --chip esp32 -p $(PORT) -b $(PROGRAMMER_SPEED)
-    export FFLAGS += --before default_reset --after hard_reset write_flash
-    export FFLAGS += -z -fm $(FLASH_MODE) -fs detect -ff $(FLASH_FREQ)
-    export FFLAGS += 0x1000 $(RIOTCPU)/$(CPU)/bin/bootloader.bin
-    export FFLAGS += 0x8000 $(BINDIR)/partitions.bin
-    export FFLAGS += 0x10000 $(ELFFILE).bin
+    FLASHER = $(ESPTOOL)
+    FFLAGS += --chip esp32 -p $(PORT) -b $(PROGRAMMER_SPEED)
+    FFLAGS += --before default_reset --after hard_reset write_flash
+    FFLAGS += -z -fm $(FLASH_MODE) -fs detect -ff $(FLASH_FREQ)
+    FFLAGS += 0x1000 $(RIOTCPU)/$(CPU)/bin/bootloader.bin
+    FFLAGS += 0x8000 $(BINDIR)/partitions.bin
+    FFLAGS += 0x10000 $(ELFFILE).bin
 endif
