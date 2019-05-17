@@ -165,6 +165,15 @@ typedef struct {
     uint8_t miso;       /**< MISO pin */
 } spi_conf_t;
 
+/**
+ * @name    WDT upper and lower bound times in ms
+ * @{
+ */
+#define NWDT_TIME_LOWER_LIMIT          (1)
+/* Set upper limit to the maximum possible value that could go in CRV register */
+#define NWDT_TIME_UPPER_LIMIT          ((UINT32_MAX >> 15) * US_PER_MS + 1)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
