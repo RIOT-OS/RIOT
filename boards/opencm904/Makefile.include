@@ -4,12 +4,12 @@ export CPU_MODEL = stm32f103cb
 
 # custom flasher to use with the bootloader
 FLASHER = $(RIOTBOARD)/$(BOARD)/dist/robotis-loader.py
-export DEBUGGER =
-export DEBUGSERVER =
+DEBUGGER =
+DEBUGSERVER =
 
 HEXFILE = $(BINFILE)
 FFLAGS = $(PORT) $(HEXFILE)
-export DEBUGGER_FLAGS =
+DEBUGGER_FLAGS =
 
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyACM0

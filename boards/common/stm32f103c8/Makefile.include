@@ -24,7 +24,7 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 ifeq ($(PROGRAMMER),dfu-util)
   export ROM_OFFSET ?= 0x2000 # Skip the space needed by the embedded bootloader
   FLASHER = dfu-util
-  export DEBUGGER = # no debugger
+  DEBUGGER = # no debugger
   RESET = # dfu-util has no support for resetting the device
 
   HEXFILE = $(BINFILE)
