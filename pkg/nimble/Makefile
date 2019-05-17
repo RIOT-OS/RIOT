@@ -71,6 +71,9 @@ nimble_drivers_nrf5x:
 nimble_addr:
 	"$(MAKE)" -C $(TDIR)/addr/
 
+nimble_netif:
+	"$(MAKE)" -C $(TDIR)/netif/
+
 nimble_scanlist:
 	"$(MAKE)" -C $(TDIR)/scanlist
 
