@@ -66,7 +66,6 @@
  * 2. set the LoRa keys
  * 3. join the network
  * 4. send some data to the network
- * 5. wait for any potentially received data
  *
  * ```c
  * int main(void)
@@ -94,13 +93,45 @@
  *         return 1;
  *     }
  *
- *     /* 5. wait for any potentially received data */
- *     if (semtech_loramac_recv(&loramac) == SEMTECH_LORAMAC_DATA_RECEIVED) {
+ * }
+ * ```
+ *
+ * To receive downlink messages, use a dedicated receiving thread.
+ * - At the beginning of the application source file, add the necessary
+ * includes and declare the message queue and stack arrays:
+ * ```c
+ * #include "thread.h"
+ *
+ * #define RECV_MSG_QUEUE                   (4U)
+ * static msg_t _recv_queue[RECV_MSG_QUEUE];
+ *
+ * static char _recv_stack[THREAD_STACKSIZE_DEFAULT];
+ * ```
+ * - Implement the thread: it initializes its message queue and then
+ * simply calls the blocking `semtech_loramac_recv` function in a loop:
+ * ```c
+ * static void *_recv(void *arg)
+ * {
+ *     msg_init_queue(_recv_queue, RECV_MSG_QUEUE);
+ *
+ *     (void)arg;
+ *     while (1) {
+ *         /* blocks until some data is received */
+ *         semtech_loramac_recv(&loramac);
  *         loramac.rx_data.payload[loramac.rx_data.payload_len] = 0;
  *         printf("Data received: %s, port: %d\n",
  *                (char *)loramac.rx_data.payload, loramac.rx_data.port);
+ *         }
+ *
  *     }
+ *     return NULL;
  * }
+ * ```
+ * - Finally, this thread can be started after the join procedure
+ * succeeds:
+ * ```c
+ * thread_create(_recv_stack, sizeof(_recv_stack),
+ *               THREAD_PRIORITY_MAIN - 1, 0, _recv, NULL, "recv thread");
  * ```
  *
  * @warning It is not possible to directly call the original LoRaMAC-node API
