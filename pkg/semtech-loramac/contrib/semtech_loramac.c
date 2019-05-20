@@ -190,12 +190,24 @@ static inline void _set_uplink_counter(semtech_loramac_t *mac, uint8_t *counter)
                          (uint32_t)counter[2] << 8 |
                          counter[3]);
 
-    DEBUG("[semtech-loramac] uplink counter: %" PRIu32 " \n", counter4);
+    DEBUG("[semtech-loramac] reading uplink counter: %" PRIu32 " \n", counter4);
 
     mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_UPLINK_COUNTER;
     mibReq.Param.UpLinkCounter = counter4;
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
+}
+
+static inline void _set_join_state(semtech_loramac_t *mac, bool joined)
+{
+    DEBUG("[semtech-loramac] set join state ? %d\n", joined);
+
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_NETWORK_JOINED;
+    mibReq.Param.IsNetworkJoined = joined;
     LoRaMacMibSetRequestConfirm(&mibReq);
     mutex_unlock(&mac->lock);
 }
@@ -214,21 +226,33 @@ static inline void _read_loramac_config(semtech_loramac_t *mac)
         return;
     }
 
+    uint8_t tmp_buf[LORAMAC_APPSKEY_LEN] = { 0 };
+
     /* LoRaWAN EUIs, Keys and device address */
     pos += eeprom_read(pos, mac->deveui, LORAMAC_DEVEUI_LEN);
     pos += eeprom_read(pos, mac->appeui, LORAMAC_APPEUI_LEN);
     pos += eeprom_read(pos, mac->appkey, LORAMAC_APPKEY_LEN);
-    pos += eeprom_read(pos, mac->appskey, LORAMAC_APPSKEY_LEN);
-    pos += eeprom_read(pos, mac->nwkskey, LORAMAC_NWKSKEY_LEN);
-    pos += eeprom_read(pos, mac->devaddr, LORAMAC_DEVADDR_LEN);
+    pos += eeprom_read(pos, tmp_buf, LORAMAC_APPSKEY_LEN);
+    semtech_loramac_set_appskey(mac, tmp_buf);
+    pos += eeprom_read(pos, tmp_buf, LORAMAC_NWKSKEY_LEN);
+    semtech_loramac_set_nwkskey(mac, tmp_buf);
 
-    /* uplink counter, mainly used for ABP activation */
+    /* Read and set device address */
+    uint8_t devaddr[LORAMAC_DEVADDR_LEN];
+    pos += eeprom_read(pos, devaddr, LORAMAC_DEVADDR_LEN);
+
+    semtech_loramac_set_devaddr(mac, devaddr);
+
+    /* uplink counter */
     uint8_t counter[4] = { 0 };
     pos += eeprom_read(pos, counter, 4);
     _set_uplink_counter(mac, counter);
+
+    uint8_t joined = eeprom_read_byte(pos);
+    _set_join_state(mac, (bool)joined);
 }
 
-static inline void _save_uplink_counter(semtech_loramac_t *mac)
+static inline size_t _save_uplink_counter(semtech_loramac_t *mac)
 {
     size_t pos = SEMTECH_LORAMAC_EEPROM_START +
                  SEMTECH_LORAMAC_EEPROM_MAGIC_LEN +
@@ -236,17 +260,19 @@ static inline void _save_uplink_counter(semtech_loramac_t *mac)
                  LORAMAC_APPKEY_LEN + LORAMAC_APPSKEY_LEN +
                  LORAMAC_NWKSKEY_LEN + LORAMAC_DEVADDR_LEN;
 
-    uint8_t counter[4];
+    uint8_t counter[LORAMAC_DEVADDR_LEN];
     mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_UPLINK_COUNTER;
     LoRaMacMibGetRequestConfirm(&mibReq);
+    DEBUG("[semtech-loramac] saving uplink counter: %" PRIu32 " \n",
+          mibReq.Param.UpLinkCounter);
     counter[0] = (uint8_t)(mibReq.Param.UpLinkCounter >> 24);
     counter[1] = (uint8_t)(mibReq.Param.UpLinkCounter >> 16);
     counter[2] = (uint8_t)(mibReq.Param.UpLinkCounter >> 8);
     counter[3] = (uint8_t)(mibReq.Param.UpLinkCounter);
     mutex_unlock(&mac->lock);
-    pos += eeprom_write(pos, counter, 4);
+    return eeprom_write(pos, counter, LORAMAC_DEVADDR_LEN);
 }
 
 void semtech_loramac_save_config(semtech_loramac_t *mac)
@@ -258,15 +284,27 @@ void semtech_loramac_save_config(semtech_loramac_t *mac)
     pos += eeprom_write(pos, magic, SEMTECH_LORAMAC_EEPROM_MAGIC_LEN);
 
     /* Store EUIs, Keys and device address */
+    uint8_t tmp_buf[LORAMAC_APPSKEY_LEN] = { 0 };
+
     pos += eeprom_write(pos, mac->deveui, LORAMAC_DEVEUI_LEN);
     pos += eeprom_write(pos, mac->appeui, LORAMAC_APPEUI_LEN);
     pos += eeprom_write(pos, mac->appkey, LORAMAC_APPKEY_LEN);
-    pos += eeprom_write(pos, mac->appskey, LORAMAC_APPSKEY_LEN);
-    pos += eeprom_write(pos, mac->nwkskey, LORAMAC_NWKSKEY_LEN);
-    pos += eeprom_write(pos, mac->devaddr, LORAMAC_DEVADDR_LEN);
+
+    semtech_loramac_get_appskey(mac, tmp_buf);
+    pos += eeprom_write(pos, tmp_buf, LORAMAC_APPSKEY_LEN);
+    semtech_loramac_get_nwkskey(mac, tmp_buf);
+    pos += eeprom_write(pos, tmp_buf, LORAMAC_NWKSKEY_LEN);
+
+    uint8_t devaddr[LORAMAC_DEVADDR_LEN];
+    semtech_loramac_get_devaddr(mac, devaddr);
+    pos += eeprom_write(pos, devaddr, LORAMAC_DEVADDR_LEN);
 
     /* save uplink counter, mainly used for ABP activation */
-    _save_uplink_counter(mac);
+    pos += _save_uplink_counter(mac);
+
+    /* save join state */
+    uint8_t joined = (uint8_t)semtech_loramac_is_mac_joined(mac);
+    eeprom_write_byte(pos, joined);
 }
 
 void semtech_loramac_erase_config(void)
@@ -283,12 +321,13 @@ void semtech_loramac_erase_config(void)
 
     MibRequestConfirm_t mibReq;
     size_t uplink_counter_len = sizeof(mibReq.Param.UpLinkCounter);
+    size_t joined_state_len = sizeof(mibReq.Param.IsNetworkJoined);
 
     size_t end = (pos + SEMTECH_LORAMAC_EEPROM_MAGIC_LEN +
                   LORAMAC_DEVEUI_LEN + LORAMAC_APPEUI_LEN +
                   LORAMAC_APPKEY_LEN + LORAMAC_APPSKEY_LEN +
                   LORAMAC_NWKSKEY_LEN + LORAMAC_DEVADDR_LEN +
-                  uplink_counter_len);
+                  uplink_counter_len + joined_state_len);
     for (size_t p = pos; p < end; p++) {
         eeprom_write_byte(p, 0);
     }
@@ -392,28 +431,15 @@ static void _join_abp(semtech_loramac_t *mac)
     mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_NETWORK_JOINED;
-    mibReq.Param.IsNetworkJoined = false;
-    LoRaMacMibSetRequestConfirm(&mibReq);
-
-    mibReq.Type = MIB_DEV_ADDR;
-    mibReq.Param.DevAddr = ((uint32_t)mac->devaddr[0] << 24 |
-                            (uint32_t)mac->devaddr[1] << 16 |
-                            (uint32_t)mac->devaddr[2] << 8 |
-                            (uint32_t)mac->devaddr[3]);
-    LoRaMacMibSetRequestConfirm(&mibReq);
-
-    mibReq.Type = MIB_NWK_SKEY;
-    mibReq.Param.NwkSKey = mac->nwkskey;
-    LoRaMacMibSetRequestConfirm(&mibReq);
-
-    mibReq.Type = MIB_APP_SKEY;
-    mibReq.Param.AppSKey = mac->appskey;
-    LoRaMacMibSetRequestConfirm(&mibReq);
-
-    mibReq.Type = MIB_NETWORK_JOINED;
     mibReq.Param.IsNetworkJoined = true;
     LoRaMacMibSetRequestConfirm(&mibReq);
     mutex_unlock(&mac->lock);
+
+    /* ABP join procedure always works */
+    msg_t msg;
+    msg.type = MSG_TYPE_LORAMAC_JOIN_STATUS;
+    msg.content.value = SEMTECH_LORAMAC_JOIN_SUCCEEDED;
+    msg_send(&msg, semtech_loramac_pid);
 }
 
 static void _join(semtech_loramac_t *mac, void *arg)
@@ -793,7 +819,7 @@ int semtech_loramac_init(semtech_loramac_t *mac)
     return 0;
 }
 
-static bool _is_mac_joined(semtech_loramac_t *mac)
+bool semtech_loramac_is_mac_joined(semtech_loramac_t *mac)
 {
     mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
@@ -809,7 +835,7 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type)
 {
     DEBUG("[semtech-loramac] Starting join procedure: %d\n", type);
 
-    if (_is_mac_joined(mac)) {
+    if (semtech_loramac_is_mac_joined(mac)) {
         DEBUG("[semtech-loramac] network is already joined\n");
         return SEMTECH_LORAMAC_ALREADY_JOINED;
     }
@@ -818,15 +844,11 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type)
 
     _semtech_loramac_call(_join, &type);
 
-    if (type == LORAMAC_JOIN_OTAA) {
-        /* Wait until the MAC replies about OTAA join procedure */
-        msg_t msg;
-        msg_receive(&msg);
-        return (uint8_t)msg.content.value;
-    }
+    /* Wait until the MAC replies about join procedure */
+    msg_t msg;
+    msg_receive(&msg);
 
-    /* ABP join procedure always works */
-    return SEMTECH_LORAMAC_JOIN_SUCCEEDED;
+    return (uint8_t)msg.content.value;
 }
 
 #ifdef MODULE_SEMTECH_LORAMAC_RX
@@ -842,7 +864,7 @@ void semtech_loramac_request_link_check(semtech_loramac_t *mac)
 
 uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
 {
-    if (!_is_mac_joined(mac)) {
+    if (!semtech_loramac_is_mac_joined(mac)) {
         DEBUG("[semtech-loramac] network is not joined\n");
         return SEMTECH_LORAMAC_NOT_JOINED;
     }

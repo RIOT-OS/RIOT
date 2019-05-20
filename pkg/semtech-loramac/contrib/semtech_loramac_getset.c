@@ -61,32 +61,69 @@ void semtech_loramac_get_appkey(const semtech_loramac_t *mac, uint8_t *key)
 
 void semtech_loramac_set_appskey(semtech_loramac_t *mac, const uint8_t *skey)
 {
-    memcpy(mac->appskey, skey, LORAMAC_APPSKEY_LEN);
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_APP_SKEY;
+    memcpy(mibReq.Param.AppSKey, skey, LORAMAC_APPSKEY_LEN);
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
 }
 
-void semtech_loramac_get_appskey(const semtech_loramac_t *mac, uint8_t *skey)
+void semtech_loramac_get_appskey(semtech_loramac_t *mac, uint8_t *skey)
 {
-    memcpy(skey, mac->appskey, LORAMAC_APPSKEY_LEN);
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_APP_SKEY;
+    LoRaMacMibGetRequestConfirm(&mibReq);
+    memcpy(skey, mibReq.Param.AppSKey, LORAMAC_APPSKEY_LEN);
+    mutex_unlock(&mac->lock);
 }
 
 void semtech_loramac_set_nwkskey(semtech_loramac_t *mac, const uint8_t *skey)
 {
-    memcpy(mac->nwkskey, skey, LORAMAC_NWKSKEY_LEN);
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_NWK_SKEY;
+    memcpy(mibReq.Param.NwkSKey, skey, LORAMAC_NWKSKEY_LEN);
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
 }
 
-void semtech_loramac_get_nwkskey(const semtech_loramac_t *mac, uint8_t *skey)
+void semtech_loramac_get_nwkskey(semtech_loramac_t *mac, uint8_t *skey)
 {
-    memcpy(skey, mac->nwkskey, LORAMAC_NWKSKEY_LEN);
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_NWK_SKEY;
+    LoRaMacMibGetRequestConfirm(&mibReq);
+    memcpy(skey, mibReq.Param.NwkSKey, LORAMAC_NWKSKEY_LEN);
+    mutex_unlock(&mac->lock);
 }
 
 void semtech_loramac_set_devaddr(semtech_loramac_t *mac, const uint8_t *addr)
 {
-    memcpy(mac->devaddr, addr, LORAMAC_DEVADDR_LEN);
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_DEV_ADDR;
+    mibReq.Param.DevAddr = ((uint32_t)addr[0] << 24 |
+                            (uint32_t)addr[1] << 16 |
+                            (uint32_t)addr[2] << 8 |
+                            (uint32_t)addr[3]);
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
 }
 
-void semtech_loramac_get_devaddr(const semtech_loramac_t *mac, uint8_t *addr)
+void semtech_loramac_get_devaddr(semtech_loramac_t *mac, uint8_t *addr)
 {
-    memcpy(addr, mac->devaddr, LORAMAC_DEVADDR_LEN);
+    mutex_lock(&mac->lock);
+    DEBUG("[semtech-loramac] get device address\n");
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_DEV_ADDR;
+    LoRaMacMibGetRequestConfirm(&mibReq);
+    addr[0] = (uint8_t)(mibReq.Param.DevAddr >> 24);
+    addr[1] = (uint8_t)(mibReq.Param.DevAddr >> 16);
+    addr[2] = (uint8_t)(mibReq.Param.DevAddr >> 8);
+    addr[3] = (uint8_t)(mibReq.Param.DevAddr);
+    mutex_unlock(&mac->lock);
 }
 
 void semtech_loramac_set_class(semtech_loramac_t *mac, loramac_class_t cls)
