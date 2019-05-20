@@ -520,7 +520,7 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 
 #ifndef XTIMER_PERIODIC_SPIN
 /**
- * @brief   xtimer_periodic_wakeup spin cutoff
+ * @brief   xtimer_periodic_wakeup spin cutoff, in microseconds
  *
  * If the difference between target time and now is less than this value, then
  * xtimer_periodic_wakeup will use xtimer_spin instead of setting a timer.

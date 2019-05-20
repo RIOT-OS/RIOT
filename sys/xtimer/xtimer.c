@@ -114,7 +114,7 @@ void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
      */
     uint32_t offset = target - now;
     DEBUG("xps, now: %9" PRIu32 ", tgt: %9" PRIu32 ", off: %9" PRIu32 "\n", now, target, offset);
-    if (offset < XTIMER_PERIODIC_SPIN) {
+    if (offset < xtimer_ticks_from_usec(XTIMER_PERIODIC_SPIN).ticks32) {
         _xtimer_spin(offset);
     }
     else {
