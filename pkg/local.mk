@@ -6,10 +6,7 @@
 #
 # WARNING: any local changes made to $(PKG_BUILDDIR) *will* get lost!
 
-.PHONY: prepare git-download clean
-
-git-download:
-	@true
+.PHONY: prepare clean
 
 prepare: $(PKG_BUILDDIR)/.prepared
 	@true
