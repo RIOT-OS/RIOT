@@ -144,7 +144,7 @@ void _xtimer_set(xtimer_t *timer, uint32_t offset)
 
     xtimer_remove(timer);
 
-    if (offset < XTIMER_BACKOFF) {
+    if (offset < xtimer_ticks_from_usec(XTIMER_BACKOFF).ticks32) {
         _xtimer_spin(offset);
         _shoot(timer);
     }
@@ -198,7 +198,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     DEBUG("timer_set_absolute(): now=%" PRIu32 " target=%" PRIu32 " offset=%" PRIu32 "\n",
           now, target, offset);
 
-    if (offset <= XTIMER_BACKOFF) {
+    if (offset <= xtimer_ticks_from_usec(XTIMER_BACKOFF).ticks32) {
         /* backoff */
         xtimer_spin_until(target);
         _shoot(timer);
