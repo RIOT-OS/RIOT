@@ -123,9 +123,6 @@ typedef struct {
     uint8_t deveui[LORAMAC_DEVEUI_LEN];          /**< device EUI */
     uint8_t appeui[LORAMAC_APPEUI_LEN];          /**< application EUI */
     uint8_t appkey[LORAMAC_APPKEY_LEN];          /**< application key */
-    uint8_t appskey[LORAMAC_APPSKEY_LEN];        /**< application session key */
-    uint8_t nwkskey[LORAMAC_NWKSKEY_LEN];        /**< network session key */
-    uint8_t devaddr[LORAMAC_DEVADDR_LEN];        /**< device address */
 #if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
     semtech_loramac_rx_data_t rx_data;           /**< struct handling the RX data */
     semtech_loramac_link_check_info_t link_chk;  /**< link check information */
@@ -205,6 +202,15 @@ uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
 uint8_t semtech_loramac_recv(semtech_loramac_t *mac);
 #endif
 
+/**
+ * @brief   Check if network is already joined
+ *
+ * @param[in] mac          Pointer to the mac
+ *
+ * @return true when network is joined, false otherwise
+ */
+bool semtech_loramac_is_mac_joined(semtech_loramac_t *mac);
+
 #if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
 /**
  * @brief   Requests a LoRaWAN link check
@@ -279,7 +285,7 @@ void semtech_loramac_set_appskey(semtech_loramac_t *mac, const uint8_t *skey);
  * @param[in] mac          Pointer to the mac
  * @param[in] skey         The application session key
  */
-void semtech_loramac_get_appskey(const semtech_loramac_t *mac, uint8_t *skey);
+void semtech_loramac_get_appskey(semtech_loramac_t *mac, uint8_t *skey);
 
 /**
  * @brief   Sets the network session key
@@ -295,7 +301,7 @@ void semtech_loramac_set_nwkskey(semtech_loramac_t *mac, const uint8_t *skey);
  * @param[in] mac          Pointer to the mac
  * @param[in] skey         The network session key
  */
-void semtech_loramac_get_nwkskey(const semtech_loramac_t *mac, uint8_t *skey);
+void semtech_loramac_get_nwkskey(semtech_loramac_t *mac, uint8_t *skey);
 
 /**
  * @brief   Sets the device address
@@ -311,7 +317,7 @@ void semtech_loramac_set_devaddr(semtech_loramac_t *mac, const uint8_t *addr);
  * @param[in] mac          Pointer to the mac
  * @param[in] addr         The device address
  */
-void semtech_loramac_get_devaddr(const semtech_loramac_t *mac, uint8_t *addr);
+void semtech_loramac_get_devaddr(semtech_loramac_t *mac, uint8_t *addr);
 
 /**
  * @brief   Sets the device class
