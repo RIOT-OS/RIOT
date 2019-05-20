@@ -97,13 +97,6 @@ int _xtimer_msg_receive_timeout64(msg_t *msg, uint64_t ticks);
 void _xtimer_tsleep(uint32_t offset, uint32_t long_offset);
 /** @} */
 
-#ifndef XTIMER_MIN_SPIN
-/**
- * @brief Minimal value xtimer_spin() can spin
- */
-#define XTIMER_MIN_SPIN _xtimer_usec_from_ticks(1)
-#endif
-
 #ifndef DOXYGEN
 /* Doxygen warns that these are undocumented, but the documentation can be found in xtimer.h */
 
