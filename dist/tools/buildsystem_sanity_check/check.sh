@@ -50,6 +50,8 @@ check_not_parsing_features() {
 UNEXPORTED_VARIABLES=()
 UNEXPORTED_VARIABLES+=('FLASHFILE')
 UNEXPORTED_VARIABLES+=('TERMPROG' 'TERMFLAGS')
+
+EXPORTED_VARIABLES_ONLY_IN_VARS=()
 check_not_exporting_variables() {
     local patterns=()
     local pathspec=()
@@ -58,13 +60,22 @@ check_not_exporting_variables() {
         patterns+=(-e "export[[:blank:]]\+${variable}")
     done
 
-    pathspec+=('*')
+    git -C "${RIOTBASE}" grep "${patterns[@]}"
 
-    # Ignore `makefiles/vars.inc.mk` as it currently is the only place that
-    # should export common variables.
+    # Some variables may still be exported in 'makefiles/vars.inc.mk' as the
+    # only place that should export commont variables
+    pathspec+=('*')
     pathspec+=(':!makefiles/vars.inc.mk')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}"
+    patterns=()
+    for variable in "${EXPORTED_VARIABLES_ONLY_IN_VARS[@]}"; do
+        patterns+=(-e "export[[:blank:]]\+${variable}")
+    done
+
+    # Only run if there are patterns, otherwise it matches everything
+    if [ ${#patterns[@]} -ne 0 ]; then
+        git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}"
+    fi
 }
 
 
