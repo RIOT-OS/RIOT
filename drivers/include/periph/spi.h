@@ -225,6 +225,29 @@ void spi_init_pins(spi_t bus);
  */
 int spi_init_cs(spi_t bus, spi_cs_t cs);
 
+#if defined(MODULE_PERIPH_SPI_GPIO_MODE) || DOXYGEN
+
+/**
+ * @brief   SPI gpio mode
+ */
+typedef struct {
+    gpio_mode_t mosi;       /**< GPIO mode used for MOSI pin */
+    gpio_mode_t miso;       /**< GPIO mode used for MISO pin */
+    gpio_mode_t sclk;       /**< GPIO mode used for SCLK pin */
+} spi_gpio_mode_t;
+
+/**
+ * @brief   Initialize MOSI/MISO/SCLK pins with adapted GPIO modes
+ *
+ * @param[in] bus       SPI device that is used with the given CS line
+ * @param[in] mode      a struct containing the 3 modes to use on each pin
+ *
+ * @return              0 on success
+ * @return              <0 on error
+ */
+int spi_init_with_gpio_mode(spi_t bus, spi_gpio_mode_t mode);
+#endif
+
 /**
  * @brief   Start a new SPI transaction
  *
