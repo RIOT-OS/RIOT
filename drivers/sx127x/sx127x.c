@@ -344,6 +344,15 @@ static int _init_spi(sx127x_t *dev)
     /* Setup SPI for SX127X */
     res = spi_init_cs(dev->params.spi, dev->params.nss_pin);
 
+#ifdef MODULE_PERIPH_SPI_GPIO_MODE
+    spi_gpio_mode_t gpio_modes = {
+        .mosi = (GPIO_OUT | SX127X_DIO_PULL_MODE),
+        .miso = (SX127X_DIO_PULL_MODE),
+        .sclk = (GPIO_OUT | SX127X_DIO_PULL_MODE),
+    };
+    res += spi_init_with_gpio_mode(dev->params.spi, gpio_modes);
+#endif
+
     if (res != SPI_OK) {
         DEBUG("[sx127x] error: failed to initialize SPI_%i device (code %i)\n",
               dev->params.spi, res);
