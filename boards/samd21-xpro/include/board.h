@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 /**
- * @name   xtimer configuration
+ * @name    xtimer configuration
  * @{
  */
 #define XTIMER_DEV          TIMER_DEV(1)
