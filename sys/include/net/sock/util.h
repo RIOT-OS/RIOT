@@ -99,13 +99,30 @@ bool sock_udp_ep_equal(const sock_udp_ep_t *a, const sock_udp_ep_t *b);
  * @name helper definitions
  * @{
  */
-#define SOCK_SCHEME_MAXLEN      (16U)   /**< maximum length of the scheme part
-                                             for sock_urlsplit. Ensures a hard
-                                             limit on the string iterator */
-#define SOCK_HOSTPORT_MAXLEN    (64U)   /**< maximum length of host:port part for
-                                             sock_urlsplit() */
-#define SOCK_URLPATH_MAXLEN     (64U)   /**< maximum length path for
-                                             sock_urlsplit() */
+
+/**
+ * @brief maximum length of the scheme part for sock_urlsplit.
+ *
+ * Ensures a hard limit on the string iterator
+ * */
+#ifndef SOCK_SCHEME_MAXLEN
+#define SOCK_SCHEME_MAXLEN      (16U)
+#endif
+
+/**
+ * @brief maximum length of host:port part for sock_urlsplit()
+ */
+#ifndef SOCK_HOSTPORT_MAXLEN
+#define SOCK_HOSTPORT_MAXLEN    (64U)
+#endif
+
+/**
+ * @brief maximum length path for sock_urlsplit()
+ */
+#ifndef SOCK_URLPATH_MAXLEN
+#define SOCK_URLPATH_MAXLEN     (64U)
+#endif
+
 /** @} */
 
 #ifdef __cplusplus
