@@ -113,45 +113,13 @@ def apps_directories(riotdir, apps_dirs=None, apps_dirs_skip=None):
     :param apps_dirs_skip: list of application directories to remove, applied
                            on the RIOT list or `apps_dirs`
     """
-    apps_dirs = apps_dirs or _riot_tracked_applications_dirs(riotdir)
+    apps_dirs = apps_dirs or _riot_applications_dirs(riotdir)
     apps_dirs_skip = apps_dirs_skip or []
 
     # Remove applications to skip
     apps_dirs = set(apps_dirs) - set(apps_dirs_skip)
 
     return sorted(list(apps_dirs))
-
-
-def _is_git_repo(riotdir):
-    """Check if directory is a git repository."""
-    cmd = ['git', 'rev-parse', '--git-dir']
-    ret = subprocess.call(cmd, cwd=riotdir,
-                          stdout=subprocess.DEVNULL,
-                          stderr=subprocess.DEVNULL)
-    return ret == 0
-
-
-def _is_git_tracked(appdir):
-    """Check if directory is a git repository."""
-    cmd = ['git', 'ls-files', '--error-unmatch', 'Makefile']
-    ret = subprocess.call(cmd, cwd=appdir,
-                          stdout=subprocess.DEVNULL,
-                          stderr=subprocess.DEVNULL)
-    return ret == 0
-
-
-def _riot_tracked_applications_dirs(riotdir):
-    """Applications directories in the RIOT repository with relative path.
-
-    Only return 'tracked' applications if riotdir is a git repository.
-    """
-    apps_dirs = _riot_applications_dirs(riotdir)
-
-    # Only keep tracked directories
-    if _is_git_repo(riotdir):
-        apps_dirs = [dir for dir in apps_dirs
-                     if _is_git_tracked(os.path.join(riotdir, dir))]
-    return apps_dirs
 
 
 def _riot_applications_dirs(riotdir):
@@ -190,6 +158,24 @@ def create_directory(directory, clean=False, mode=0o755):
     os.makedirs(directory, mode=mode, exist_ok=True)
 
 
+def is_in_directory(path, directory):
+    """Return if `path` is inside `directory`.
+
+    >>> is_in_directory('RIOT/a/b/c', 'RIOT')
+    True
+    >>> is_in_directory('RIOT/../a', 'RIOT')
+    False
+
+    # Also work if path is absolute but not the directory
+    >>> curdir = os.path.abspath(os.curdir)
+    >>> is_in_directory(os.path.join(curdir, 'RIOT', 'a'), 'RIOT')
+    True
+    """
+    directory = os.path.abspath(directory)
+    path = os.path.abspath(path)
+    return path.startswith(directory)
+
+
 class RIOTApplication():
     """RIOT Application representation.
 
@@ -213,6 +199,10 @@ class RIOTApplication():
         self.appdir = appdir
         self.resultdir = os.path.join(resultdir, appdir)
         self.logger = logging.getLogger('%s.%s' % (board, appdir))
+
+        # Currently not handling absolute directories or outside of RIOT
+        assert is_in_directory(self.resultdir, resultdir), \
+            "Application result directory is outside main result directory"
 
     # Extract values from make
     def name(self):

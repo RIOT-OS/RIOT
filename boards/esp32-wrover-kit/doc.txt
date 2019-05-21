@@ -22,6 +22,7 @@
     4. [Optional Hardware Configurations](#optional_hardware)
 3. [Flashing the Device](#flashing)
 4. [On-Chip Debugging with the device](#debugging)
+5. [Other Documentation Resources](#other-resources)
 
 ## <a name="overview"> Overview </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -35,7 +36,7 @@ The Espressif ESP-WROVER-KIT is a development board that uses the ESP32-WROVER m
 
 Furthermore, many GPIOs are broken out for extension. The USB bridge based on FDI FT2232HL provides a JTAG interface for OCD debugging through the USB interface.
 
-\htmlonly<style>div.image img[src="https://docs.espressif.com/projects/esp-idf/en/latest/_images/esp32-wrover-kit-layout-front.jpg"]{width:600px;}</style>\endhtmlonly@image html "https://docs.espressif.com/projects/esp-idf/en/latest/_images/esp32-wrover-kit-layout-front.jpg" "ESP-WROVER-KIT V3"
+\htmlonly<style>div.image img[src="https://dl.espressif.com/dl/schematics/pictures/esp-wrover-kit-v3.jpg"]{width:600px;}</style>\endhtmlonly@image html "https://dl.espressif.com/dl/schematics/pictures/esp-wrover-kit-v3.jpg" "ESP-WROVER-KIT V3"
 
 ## <a name="hardware"> Hardware </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -57,7 +58,7 @@ Vendor      | Espressif | |
 Cores       | 1 or 2 x Tensilica Xtensa LX6 | 1 core
 FPU         | yes (ULP - Ultra low power co-processor) | no
 RAM         | 520 kByte SRAM <br> 16 kByte  RTC SRAM | yes
-ROM         | 520 kByte | yes
+ROM         | 448 kByte | yes
 Flash       | 512 kByte ... 16 MByte |  yes
 Frequency   | 240 MHz, 160 MHz, 80 MHz | yes
 Power Consumption | 68 mA @ 240 MHz <br> 44 mA @ 160 MHz <br> 31 mA @ 80 MHz <br> 5 uA in deep sleep mode | yes <br> yes <br> yes <br> no
@@ -92,7 +93,7 @@ ESP-WROVER-KIT has the following on-board components
 
 The following table shows the default board configuration sorted according to the defined functionality of GPIOs for different hardware options. This configuration can be overridden by \ref esp32_app_spec_conf "application-specific configurations".
 
-In the following table following abbreviations are used:
+These abbreviations are used in subsequent tables:
 
 <b>SDC</b> = SD-Card interface is used (module **sdcard_spi** is enabled)<br>
 <b>CAM</b> = Camera is plugged in/used
@@ -247,7 +248,7 @@ The USB bridge is based on FDI FT2232HL and offers two USB interfaces:
 - the first interface is the JTAG interface for [On-Chip debugging](#debugging)
 - the second interface is the console interface, which is also used for flashing
 
-Therefore, you have to declare the USB interface in the make command. For example, if the ESP32-WROVER-KIT is connected to the host computer through the USB interfaces **/dev/ttyUSB0** and **/dev/ttyUSB1**, the make command would be used as following:
+Therefore, you have to declare the USB interface in the make command. For example, if the ESP32-WROVER-KIT is connected to the host computer through the USB interfaces `/dev/ttyUSB0` and `/dev/ttyUSB1`, the make command would be used as following:
 ```
 make flash BOARD=esp32-wrover-kit PORT=/dev/ttyUSB1 ...
 ```
@@ -257,4 +258,8 @@ For detailed information about ESP32 as well as configuring and compiling RIOT f
 ## <a name="debugging"> On-Chip Debugging with the Device </a> &nbsp;&nbsp; [[TOC](#toc)]
 
 Since the USB bridge based on FDI FT2232HL provides a JTAG interface for debugging through an USB interface, using ESP-ROVER-KIT is the easiest and most convinient way for On-Chip debugging. Please refer the [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/jtag-debugging/index.html) for details on how to setup and how to use ESP-WROVER-KIT and OpenOCD.
+
+## <a name="other-resources"> Other Documentation Resources </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+There is a comprehensive [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/get-started-wrover-kit-v3.html) for the ESP-WROVER-KIT with a lot information about hardware configuration.
  */

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_frdm-kw41z
+ * @ingroup     boards_common_kw41z
  * @{
  *
  * @file
@@ -21,18 +21,13 @@
 #include "board.h"
 #include "periph/gpio.h"
 
+void led_init(void);
+
 void board_init(void)
 {
     /* initialize the CPU core */
     cpu_init();
 
-    /* initialize and turn off LEDs */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_set(LED0_PIN);
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_set(LED1_PIN);
-    gpio_init(LED2_PIN, GPIO_OUT);
-    gpio_set(LED2_PIN);
-    gpio_init(LED3_PIN, GPIO_OUT);
-    gpio_set(LED3_PIN);
+    /* initialize LEDs */
+    led_init();
 }

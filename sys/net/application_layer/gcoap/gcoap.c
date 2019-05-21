@@ -707,23 +707,9 @@ ssize_t gcoap_finish(coap_pkt_t *pdu, size_t payload_len, unsigned format)
     return pdu->payload_len + (pdu->payload - (uint8_t *)pdu->hdr);
 }
 
-size_t gcoap_req_send(const uint8_t *buf, size_t len, const ipv6_addr_t *addr,
-                      uint16_t port, gcoap_resp_handler_t resp_handler)
-{
-    sock_udp_ep_t remote;
-
-    remote.family = AF_INET6;
-    remote.netif  = SOCK_ADDR_ANY_NETIF;
-    remote.port   = port;
-
-    memcpy(&remote.addr.ipv6[0], &addr->u8[0], sizeof(addr->u8));
-
-    return gcoap_req_send2(buf, len, &remote, resp_handler);
-}
-
-size_t gcoap_req_send2(const uint8_t *buf, size_t len,
-                       const sock_udp_ep_t *remote,
-                       gcoap_resp_handler_t resp_handler)
+size_t gcoap_req_send(const uint8_t *buf, size_t len,
+                      const sock_udp_ep_t *remote,
+                      gcoap_resp_handler_t resp_handler)
 {
     gcoap_request_memo_t *memo = NULL;
     unsigned msg_type  = (*buf & 0x30) >> 4;

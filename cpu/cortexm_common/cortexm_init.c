@@ -73,3 +73,53 @@ void cortexm_init(void)
     cortexm_init_isr_priorities();
     cortexm_init_misc();
 }
+
+bool cpu_check_address(volatile const char *address)
+{
+#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
+    defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
+    static const uint32_t BFARVALID_MASK = (0x80 << SCB_CFSR_BUSFAULTSR_Pos);
+
+    bool is_valid = true;
+
+    /* Clear BFARVALID flag */
+    SCB->CFSR |= BFARVALID_MASK;
+
+    /* Ignore BusFault by enabling BFHFNMIGN and disabling interrupts */
+    uint32_t mask = __get_FAULTMASK();
+    __disable_fault_irq();
+    SCB->CCR |= SCB_CCR_BFHFNMIGN_Msk;
+
+    *address;
+    /* Check BFARVALID flag */
+    if ((SCB->CFSR & BFARVALID_MASK) != 0) {
+        /* Bus Fault occured reading the address */
+        is_valid = false;
+    }
+
+    /* Reenable BusFault by clearing  BFHFNMIGN */
+    SCB->CCR &= ~SCB_CCR_BFHFNMIGN_Msk;
+    __set_FAULTMASK(mask);
+
+    return is_valid;
+#else
+    /* Cortex-M0 doesn't have BusFault so we need to catch HardFault */
+    (void)address;
+
+    bool result;
+
+    __asm__ volatile (
+        "movs r5, #1            \n" /* R5 will be set to 0 by HardFault handler */
+                                    /* to indicate HardFault has occured */
+        "ldr  r1, =0xDEADF00D   \n" /* set magic number     */
+        "ldr  r2, =0xCAFEBABE   \n" /* 2nd magic to be sure */
+        "ldrb r3, %1            \n" /* probe address        */
+        "mov  %0, r5            \n" /* store result */
+        : "=r"(result)
+        : "m"(*address)
+        : "r1", "r2", "r3", "r5", "cc"
+     );
+
+    return result;
+#endif
+}

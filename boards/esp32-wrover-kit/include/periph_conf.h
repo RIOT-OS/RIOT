@@ -122,7 +122,7 @@
  */
 #ifndef PWM0_GPIOS
 #if !MODULE_ESP32_WROVER_KIT_CAMERA || DOXYGEN
-#define PWM0_GPIOS  { LED0_PIN, LED2_PIN } /**< only available when camera is not connected */
+#define PWM0_GPIOS  { GPIO0, GPIO4 } /**< only available when camera is not connected */
 #else
 #define PWM0_GPIOS  { }
 #endif

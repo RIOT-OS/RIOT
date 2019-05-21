@@ -23,9 +23,11 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              feather-m0 \
                              firefly \
                              hamilton \
+                             i-nucleo-lrwan1 \
                              ikea-tradfri \
                              limifrog-v1 maple-mini \
                              lobaro-lorabox \
+                             lsn50 \
                              mbed_lpc1768 \
                              mega-xplained \
                              microbit \
@@ -121,10 +123,12 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        frdm-k22f \
                        frdm-k64f \
                        frdm-kw41z \
+                       i-nucleo-lrwan1 \
                        ikea-tradfri \
                        iotlab-a8-m3 \
                        iotlab-m3 \
                        limifrog-v1 \
+                       lsn50 \
                        maple-mini \
                        mbed_lpc1768 \
                        microbit \

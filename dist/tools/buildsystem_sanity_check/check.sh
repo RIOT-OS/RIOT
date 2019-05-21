@@ -41,11 +41,38 @@ check_not_parsing_features() {
     git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}"
 }
 
+# Some variables do not need to be exported and even cause issues when being
+# exported because they are evaluated even when not needed.
+#
+# Currently this blacklists exported variables instead of whitelisting or
+# providing a mechanism for handling it.
+# It just keep things not exported anymore in the future.
+UNEXPORTED_VARIABLES=()
+UNEXPORTED_VARIABLES+=('FLASHFILE')
+UNEXPORTED_VARIABLES+=('TERMPROG' 'TERMFLAGS')
+check_not_exporting_variables() {
+    local patterns=()
+    local pathspec=()
+
+    for variable in "${UNEXPORTED_VARIABLES[@]}"; do
+        patterns+=(-e "export[[:blank:]]\+${variable}")
+    done
+
+    pathspec+=('*')
+
+    # Ignore `makefiles/vars.inc.mk` as it currently is the only place that
+    # should export common variables.
+    pathspec+=(':!makefiles/vars.inc.mk')
+
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}"
+}
+
 
 main() {
     local errors=''
 
     errors+="$(check_not_parsing_features)"
+    errors+="$(check_not_exporting_variables)"
 
     if [ -n "${errors}" ]
     then

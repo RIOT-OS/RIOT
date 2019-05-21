@@ -40,20 +40,83 @@ extern "C" {
 #define CPUID_LEN           (7U)
 
 /**
- * @brief   Available ports on the ESP32
+ * @name   GPIO configuration
  * @{
  */
-#define PORT_GPIO 0       /**< port GPIO */
+
+/**
+ * @brief   Override the default gpio_t type definition
+ *
+ * This is required here to have gpio_t defined in this file.
+ * @{
+ */
+#define HAVE_GPIO_T
+typedef unsigned int gpio_t;
+/** @} */
+
+/**
+ * @brief   Definition of a fitting UNDEF value
+ * @{
+ */
+#define GPIO_UNDEF          (0xffffffff)
+/** @} */
+
+/**
+ * @brief   Define a CPU specific GPIO pin generator macro
+ * @{
+ */
+#define GPIO_PIN(x, y)      ((x & 0) | y)
+/** @} */
+
+/**
+ * @brief   Available GPIO ports on ESP32
+ * @{
+ */
+#define PORT_GPIO           (0)
 /** @} */
 
 /**
  * @brief   Define CPU specific number of GPIO pins
  * @{
  */
-#define GPIO_PIN_NUMOF  40
-#ifndef GPIO_PIN_COUNT
-#define GPIO_PIN_COUNT  GPIO_PIN_NUMOF
-#endif
+#define GPIO_PIN_NUMOF      (40)
+/** @} */
+
+/**
+ * @brief   Override mode flank selection values
+ *
+ * @{
+ */
+#define HAVE_GPIO_FLANK_T
+typedef enum {
+    GPIO_NONE    = 0,
+    GPIO_RISING  = 1,        /**< emit interrupt on rising flank  */
+    GPIO_FALLING = 2,        /**< emit interrupt on falling flank */
+    GPIO_BOTH    = 3,        /**< emit interrupt on both flanks   */
+    GPIO_LOW     = 4,        /**< emit interrupt on low level     */
+    GPIO_HIGH    = 5         /**< emit interrupt on low level     */
+} gpio_flank_t;
+
+/** @} */
+
+/**
+ * @brief   Override GPIO modes
+ *
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN,        /**< input */
+    GPIO_IN_PD,     /**< input with pull-down */
+    GPIO_IN_PU,     /**< input with pull-up */
+    GPIO_OUT,       /**< output */
+    GPIO_OD,        /**< open-drain output */
+    GPIO_OD_PU,     /**< open-drain output with pull-up */
+    GPIO_IN_OUT,    /**< input and output */
+    GPIO_IN_OD,     /**< input and open-drain output */
+    GPIO_IN_OD_PU   /**< input and open-drain output */
+} gpio_mode_t;
+/** @} */
 /** @} */
 
 /**
@@ -98,42 +161,6 @@ extern "C" {
 #define GPIO37      (GPIO_PIN(PORT_GPIO,37))
 #define GPIO38      (GPIO_PIN(PORT_GPIO,38))
 #define GPIO39      (GPIO_PIN(PORT_GPIO,39))
-/** @} */
-
-/**
- * @brief   Override mode flank selection values
- *
- * @{
- */
-#define HAVE_GPIO_FLANK_T
-typedef enum {
-    GPIO_NONE    = 0,
-    GPIO_RISING  = 1,        /**< emit interrupt on rising flank  */
-    GPIO_FALLING = 2,        /**< emit interrupt on falling flank */
-    GPIO_BOTH    = 3,        /**< emit interrupt on both flanks   */
-    GPIO_LOW     = 4,        /**< emit interrupt on low level     */
-    GPIO_HIGH    = 5         /**< emit interrupt on low level     */
-} gpio_flank_t;
-
-/** @} */
-
-/**
- * @brief   Override GPIO modes
- *
- * @{
- */
-#define HAVE_GPIO_MODE_T
-typedef enum {
-    GPIO_IN,        /**< input */
-    GPIO_IN_PD,     /**< input with pull-down */
-    GPIO_IN_PU,     /**< input with pull-up */
-    GPIO_OUT,       /**< output */
-    GPIO_OD,        /**< open-drain output */
-    GPIO_OD_PU,     /**< open-drain output with pull-up */
-    GPIO_IN_OUT,    /**< input and output */
-    GPIO_IN_OD,     /**< input and open-drain output */
-    GPIO_IN_OD_PU   /**< input and open-drain output */
-} gpio_mode_t;
 /** @} */
 
 /**
@@ -216,9 +243,6 @@ typedef enum {
  */
 #define ADC_NUMOF_MAX   16
 
-/** Number of ADC channels determined from ADC_GPIOS */
-extern const unsigned adc_chn_num;
-
 /** @} */
 
 /**
@@ -250,9 +274,6 @@ extern const unsigned adc_chn_num;
  */
 #define DAC_NUMOF_MAX   2
 
-/** Number of DAC channels determined from DAC_GPIOS */
-extern const unsigned dac_chn_num;
-
 /** @} */
 
 /**
@@ -279,8 +300,30 @@ extern const unsigned dac_chn_num;
  * @{
  */
 
-/** Number of I2C interfaces determined from I2Cn_* definitions */
-extern const unsigned i2c_bus_num;
+/**
+ * @brief    Override I2C clock speed values
+ *
+ * This is required here to have i2c_speed_t defined in this file.
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW = 0,      /**< 10 kbit/s */
+    I2C_SPEED_NORMAL,       /**< 100 kbit/s */
+    I2C_SPEED_FAST,         /**< 400 kbit/s */
+    I2C_SPEED_FAST_PLUS,    /**< 1 Mbit/s */
+    I2C_SPEED_HIGH,         /**< not supported */
+} i2c_speed_t;
+/** @} */
+
+/**
+ * @brief   I2C configuration structure type
+ */
+typedef struct {
+    i2c_speed_t speed;      /**< I2C bus speed */
+    gpio_t scl;             /**< GPIO used as SCL pin */
+    gpio_t sda;             /**< GPIO used as SDA pin */
+} i2c_conf_t;
 
 #define PERIPH_I2C_NEED_READ_REG    /**< i2c_read_reg required */
 #define PERIPH_I2C_NEED_READ_REGS   /**< i2c_read_regs required */
@@ -315,12 +358,14 @@ extern const unsigned i2c_bus_num;
  */
 
 /**
+ * @brief   Maximum number of PWM devices
+ */
+#define PWM_NUMOF_MAX           (2)
+
+/**
  * @brief   Maximum number of channels per PWM device.
  */
 #define PWM_CHANNEL_NUM_DEV_MAX (6)
-
-/** Number of PWM devices determined from PWM0_GPIOS and PWM1_GPIOS. */
-extern const unsigned pwm_dev_num;
 
 /** @} */
 
@@ -329,8 +374,8 @@ extern const unsigned pwm_dev_num;
  *
  * ESP32 has four SPI controllers:
  *
- * - controller SPI0 is reserved for caching the flash memory
- * - controller SPI1 is reserved for external memories like flash and PSRAM
+ * - controller SPI0 is reserved for caching the flash memory (CPSI)
+ * - controller SPI1 is reserved for external memories like flash and PSRAM (FSPI)
  * - controller SPI2 realizes interface HSPI that can be used for peripherals
  * - controller SPI3 realizes interface VSPI that can be used for peripherals
  *
@@ -352,17 +397,31 @@ extern const unsigned pwm_dev_num;
  * - SPIn_CS0, the GPIO used as CS signal when the cs parameter in spi_aquire
  *   is GPIO_UNDEF,
  *
- * where n can be 0 or 1.
- *
- * @note The configuration of the SPI interfaces SPI_DEV(n) should be in
- * continuous ascending order of n.
+ * where n can be 0 or 1. If they are not defined, the according SPI interface
+ * SPI_DEV(n) is not used.
  *
  * SPI_NUMOF is determined automatically from the board-specific peripheral
  * definitions of SPIn_*.
  */
 
-/** Number of SPI interfaces determined from SPI_* definitions */
-extern const unsigned spi_bus_num;
+/**
+ * @brief   SPI controllers that can be used for peripheral interfaces
+ */
+typedef enum {
+    HSPI = 2,         /**< HSPI interface controller */
+    VSPI = 3,         /**< VSPI interface controller */
+} spi_ctrl_t;
+
+/**
+ * @brief   SPI configuration structure type
+ */
+typedef struct {
+    spi_ctrl_t ctrl;        /**< SPI controller used for the interface */
+    gpio_t sck;             /**< GPIO used as SCK pin */
+    gpio_t mosi;            /**< GPIO used as MOSI pin */
+    gpio_t miso;            /**< GPIO used as MISO pin */
+    gpio_t cs;              /**< GPIO used as CS0 pin */
+} spi_conf_t;
 
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE  /**< requires function spi_transfer_byte */
 #define PERIPH_SPI_NEEDS_TRANSFER_REG   /**< requires function spi_transfer_reg */
@@ -399,25 +458,33 @@ extern const unsigned spi_bus_num;
  * configuration and is always available. All ESP32 boards use it as standard
  * configuration for the console.
  *
- * UART_DEV(0).TXD      GPIO1
- * UART_DEV(0).RXD      GPIO3
+ *      UART_DEV(0).TXD      GPIO1
+ *      UART_DEV(0).RXD      GPIO3
  *
  * The pin configuration of UART_DEV(1) and UART_DEV(2) are defined in
  * board specific peripheral configuration by
  *
- * UARTn_TXD, the GPIO used as TxD signal, and
- * UARTn_RXD, the GPIO used as RxD signal,
+ * - UARTn_TXD, the GPIO used as TxD signal, and
+ * - UARTn_RXD, the GPIO used as RxD signal,
  *
- * where n can be 2 or 3. If they are not defined, the UART interface
+ * where n can be 1 or 2. If they are not defined, the according UART interface
  * UART_DEV(n) is not used.
  *
  * UART_NUMOF is determined automatically from the board-specific peripheral
- * definitions of UARTn_TXD and UARTn_RXD.
+ * definitions of UARTn_*.
  *
  * @{
  */
-/** @} */
 
+/**
+ * @brief   UART configuration structure type
+ */
+typedef struct {
+    gpio_t txd;             /**< GPIO used as TxD pin */
+    gpio_t rxd;             /**< GPIO used as RxD pin */
+} uart_conf_t;
+
+/** @} */
 
 #ifdef __cplusplus
 }

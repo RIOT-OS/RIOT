@@ -290,6 +290,25 @@ typedef struct {
 } i2c_conf_t;
 
 /**
+ * @brief   Timer device configuration
+ */
+typedef struct {
+    Tc *dev;                /**< pointer to the used Timer device */
+    IRQn_Type irq;          /**< IRQ# of Timer Interrupt */
+#ifdef MCLK
+    volatile uint32_t *mclk;/**< Pointer to MCLK->APBxMASK.reg */
+    uint32_t mclk_mask;     /**< MCLK_APBxMASK bits to enable Timer */
+    uint16_t gclk_id;       /**< TCn_GCLK_ID */
+#else
+    uint32_t pm_mask;       /**< PM_APBCMASK bits to enable Timer */
+    uint16_t gclk_ctrl;     /**< GCLK_CLKCTRL_ID for the Timer */
+#endif
+    uint16_t gclk_src;      /**< GCLK source which supplys Timer */
+    uint16_t prescaler;     /**< prescaler used by the Timer */
+    uint16_t flags;         /**< flags for CTRA, e.g. TC_CTRLA_MODE_COUNT32 */
+} tc32_conf_t;
+
+/**
  * @brief   Set up alternate function (PMUX setting) for a PORT pin
  *
  * @param[in] pin   Pin to set the multiplexing for

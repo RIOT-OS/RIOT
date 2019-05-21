@@ -143,7 +143,7 @@ typedef void *(*thread_task_func_t)(void *arg);
  */
 struct _thread {
     char *sp;                       /**< thread's stack pointer         */
-    thread_state_t status;          /**< thread's status                */
+    thread_status_t status;         /**< thread's status                */
     uint8_t priority;               /**< thread's priority              */
 
     kernel_pid_t pid;               /**< thread's process id            */

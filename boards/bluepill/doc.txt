@@ -52,8 +52,12 @@ flash][Flashsize].
 ## Flashing
 
 To program and debug the board you need a SWD capable debugger. The
-easiest way is using [OpenOCD][OpenOCD]. If you have OpenOCD installed,
-you can flash the device with:
+easiest way is using [OpenOCD][OpenOCD]. By default RIOT uses the hardware
+reset signal and connects to the chip under reset for flashing. This is
+required to reliably connect to the device even when the MCU is in a low power
+mode. Therefore not only SWDIO and SWCLK, but also the RST pin of your
+debugger need to be connected to the board. Once the device is connected to
+the debugger and OpenOCD is installed, you can flash the device with:
 
     $ make BOARD=bluepill flash
 
@@ -93,11 +97,31 @@ The Micro-USB port is sometimes not soldered properly. Also, it is
 usually equipped with an incorrect resistor. [This can be fixed multiple
 ways][USB].
 
-### Flashing abortion
+### Flashing fails
 
-Some boards have problems to flash on the first try. It may help, to press
-the reset-button, start the flashing and release it while doing so.
+Please check whether the debugger is properly connected, including the hardware
+reset signal pin.
 
+| Pin on Debugger    | Pin on Blue Pill |
+|:------------------ |:---------------- |
+| SWDIO              | DIO              |
+| SWCLK              | DCLK             |
+| NRST               | R                |
+| GND                | GND              |
+| VDD (3.3V) (*)     | 3.3              |
+| Target VCC (**)    | 3.3              |
+
+- (*)  Most debuggers have a 3.3V supply voltage to power the board. You can
+       alternatively power the board using the TTL-Adapter or via Micro-USB.
+- (**) Some debuggers monitor the voltage of the target MCU. Their target VCC
+       pin needs to be connected to one of the 3.3V pins of the boards.
+
+Most very cheap SWD debuggers (especially those imported for about 2€ from far
+east) do not have a Target VCC pin; they will still work just fine. On these
+cheap debuggers the pin to send the reset signal to the board is often either
+not present or defunct. You can work around this by pressing the reset button
+when OpenOCD wants to connect to the Blue Pill. Hit the reset button again after
+flashing in order to boot the newly flashed image.
 
 ## Where to buy
 

@@ -397,8 +397,18 @@ ifneq (,$(filter stdio_rtt,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter stdio_uart,$(USEMODULE)))
+ifneq (,$(filter shell,$(USEMODULE)))
+  ifneq (,$(filter stdio_uart,$(USEMODULE)))
+    USEMODULE += stdio_uart_rx
+  endif
+endif
+
+ifneq (,$(filter stdio_uart_rx,$(USEMODULE)))
   USEMODULE += isrpipe
+  USEMODULE += stdio_uart
+endif
+
+ifneq (,$(filter stdio_uart,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
 endif
 
@@ -582,6 +592,8 @@ endif
 
 ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_REQUIRED += arduino
+  FEATURES_REQUIRED += periph_adc
+  FEATURES_REQUIRED += periph_gpio
   USEMODULE += xtimer
 endif
 
@@ -861,6 +873,9 @@ FEATURES_USED := $(sort $(FEATURES_REQUIRED) $(filter $(FEATURES_OPTIONAL),$(FEA
 
 # all periph features correspond to a periph submodule
 USEMODULE += $(filter periph_%,$(FEATURES_USED))
+
+# select cpu_check_address pseudomodule if the corresponding feature is used
+USEMODULE += $(filter cpu_check_address, $(FEATURES_USED))
 
 # recursively catch transitive dependencies
 USEMODULE := $(sort $(USEMODULE))

@@ -163,7 +163,9 @@ static void goto_target_state(void)
         NRF_RADIO->PACKETPTR = (uint32_t)(&rx_buf);
         NRF_RADIO->BASE0 = (CONF_ADDR_BASE | my_addr);
         /* goto RX mode */
+        NRF_RADIO->EVENTS_READY = 0;
         NRF_RADIO->TASKS_RXEN = 1;
+        while (NRF_RADIO->EVENTS_READY == 0) {}
         state = STATE_RX;
     }
 
@@ -320,7 +322,10 @@ static int nrfmin_send(netdev_t *dev, const iolist_t *iolist)
 {
     (void)dev;
 
-    assert((iolist) && (state != STATE_OFF));
+    assert(iolist);
+    if (state == STATE_OFF) {
+        return -ENETDOWN;
+    }
 
     /* wait for any ongoing transmission to finish and go into idle state */
     while (state == STATE_TX) {}
@@ -344,8 +349,10 @@ static int nrfmin_send(netdev_t *dev, const iolist_t *iolist)
 
     /* trigger the actual transmission */
     DEBUG("[nrfmin] send: putting %i byte into the ether\n", (int)hdr->len);
-    state = STATE_TX;
+    NRF_RADIO->EVENTS_READY = 0;
     NRF_RADIO->TASKS_TXEN = 1;
+    while (NRF_RADIO->EVENTS_READY == 0) {}
+    state = STATE_TX;
 
     return (int)pos;
 }
@@ -355,7 +362,9 @@ static int nrfmin_recv(netdev_t *dev, void *buf, size_t len, void *info)
     (void)dev;
     (void)info;
 
-    assert(state != STATE_OFF);
+    if (state == STATE_OFF) {
+        return -ENETDOWN;
+    }
 
     unsigned pktlen = rx_buf.pkt.hdr.len;
 
@@ -414,7 +423,8 @@ static int nrfmin_init(netdev_t *dev)
     /* always send from logical address 0 */
     NRF_RADIO->TXADDRESS = 0x00UL;
     /* and listen to logical addresses 0 and 1 */
-    NRF_RADIO->RXADDRESSES = 0x03UL;
+    /* workaround errata nrf52832 3.41 [143] */
+    NRF_RADIO->RXADDRESSES = 0x10003UL;
     /* configure data fields and packet length whitening and endianess */
     NRF_RADIO->PCNF0 = ((CONF_S1 << RADIO_PCNF0_S1LEN_Pos) |
                         (CONF_S0 << RADIO_PCNF0_S0LEN_Pos) |

@@ -48,9 +48,16 @@ int main(void)
 
         /* Get temperature in centidegrees celsius */
         if (ds18_get_temperature(&dev, &temperature) == DS18_OK) {
-            printf("Temperature [ºC]: %d.%d"
+            bool negative = (temperature < 0);
+            if (negative) {
+                temperature = -temperature;
+            }
+
+            printf("Temperature [ºC]: %c%d.%02d"
                    "\n+-------------------------------------+\n",
-                   (temperature / 100), (int)(temperature % 100));
+                   negative ? '-': ' ',
+                   temperature / 100,
+                   temperature % 100);
         }
         else {
             puts("[Error] Could not read temperature");

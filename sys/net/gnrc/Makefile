@@ -44,7 +44,7 @@ ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
   DIRS += nettest
 endif
 ifneq (,$(filter gnrc_mac,$(USEMODULE)))
-  DIRS += link_layer/gnrc_mac
+  DIRS += link_layer/mac
 endif
 ifneq (,$(filter gnrc_pkt,$(USEMODULE)))
   DIRS += pkt
