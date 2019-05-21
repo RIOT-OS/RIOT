@@ -111,6 +111,15 @@ extern "C" {
         1   /* -> 12500000Hz */     \
     },
 
+#define CFG_SPIDIV_54               \
+    {       /* for 54000000Hz */    \
+        7,  /* -> 210937Hz */       \
+        6,  /* -> 421875Hz */       \
+        5,  /* -> 843750Hz */       \
+        3,  /* -> 3375000Hz */      \
+        2   /* -> 6750000Hz */      \
+    },
+
 #define CFG_SPIDIV_60               \
     {       /* for 60000000Hz */    \
         7,  /* -> 234375Hz */       \
@@ -173,6 +182,15 @@ extern "C" {
         3,  /* -> 6250000Hz */      \
         2   /* -> 12500000Hz */     \
     },
+
+#define CFG_SPIDIV_108              \
+    {       /* for 108000000Hz */   \
+        7,  /* -> 421875Hz */       \
+        7,  /* -> 421875Hz */       \
+        6,  /* -> 843750Hz */       \
+        4,  /* -> 3375000Hz */      \
+        3   /* -> 6750000Hz */      \
+    },
 /** @} */
 
 
@@ -203,6 +221,8 @@ static const uint8_t spi_divtable[2][5] = {
     CFG_SPIDIV_48
 #elif (CLOCK_APB1 == 50000000)
     CFG_SPIDIV_50
+#elif (CLOCK_APB1 == 54000000)
+    CFG_SPIDIV_54
 #elif (CLOCK_APB1 == 72000000)
     CFG_SPIDIV_72
 #elif (CLOCK_APB1 == 60000000)
@@ -253,6 +273,8 @@ static const uint8_t spi_divtable[2][5] = {
     CFG_SPIDIV_96
 #elif (CLOCK_APB2 == 100000000)
     CFG_SPIDIV_100
+#elif (CLOCK_APB2 == 108000000)
+    CFG_SPIDIV_108
 #else
 #error "CFG_SPI_DIVTABLE: no prescalers for selected APB2 bus clock defined"
 #endif
