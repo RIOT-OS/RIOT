@@ -708,30 +708,38 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
 #include "candev_stm32.h"
 #endif
 
-#ifdef MODULE_STM32_ETH
+/**
+ * @brief STM32 Ethernet configuration mode
+ */
+typedef enum {
+    MII  = 18,                       /**< Configuration for MII */
+    RMII = 9,                       /**< Configuration for RMII */
+    SMI  = 2,                        /**< Configuration for SMI */
+} eth_mode_t;
+
+/**
+ * @brief STM32 Ethernet speed options
+ */
+typedef enum {
+    ETH_SPEED_10T_HD   = 0x0000,
+    ETH_SPEED_10T_FD   = 0x0100,
+    ETH_SPEED_100TX_HD = 0x2000,
+    ETH_SPEED_100TX_FD = 0x2100,
+} eth_speed_t;
 
 /**
  * @brief   Ethernet Peripheral configuration
  */
 typedef struct {
-    enum {
-        MII = 18,                       /**< Configuration for MII */
-        RMII = 9,                       /**< Configuration for RMII */
-        SMI = 2,                        /**< Configuration for SMI */
-    } mode;                             /**< Select configuration mode */
-    enum {
-        ETH_SPEED_10T_HD = 0x0000,
-        ETH_SPEED_10T_FD = 0x0100,
-        ETH_SPEED_100TX_HD = 0x2000,
-        ETH_SPEED_100TX_FD = 0x2100,
-    } speed;                            /**< Speed selection */
-    uint8_t dma;                        /**< Locical CMA Descriptor used for TX */
-    uint8_t dma_chan;                   /**< DMA channel used for TX */
-    char mac[6];                        /**< Et hernet MAC address */
-    char phy_addr;                      /**< PHY address */
-    gpio_t pins[];                      /**< Pins to use. MII requires 18 pins,
-                                             RMII 9 and SMI 9. Not all speeds are
-                                             supported by all modes. */
+    eth_mode_t mode;      /**< Select configuration mode */
+    char mac[6];                /**< Ethernet MAC address */
+    eth_speed_t speed;    /**< Speed selection */
+    uint8_t dma;                /**< Locical CMA Descriptor used for TX */
+    uint8_t dma_chan;           /**< DMA channel used for TX */
+    char phy_addr;              /**< PHY address */
+    gpio_t pins[];              /**< Pins to use. MII requires 18 pins,
+                                        RMII 9 and SMI 9. Not all speeds are
+                                        supported by all modes. */
 } eth_conf_t;
 
 /**
@@ -848,6 +856,7 @@ typedef struct {
 #define ANER_LP_AN_ABLE                    (0x0001)
 /** @} */
 
+#ifdef MODULE_STM32_ETH
 /**
  * @brief Read a PHY register
  *

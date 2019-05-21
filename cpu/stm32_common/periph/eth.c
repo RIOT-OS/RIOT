@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_stm32f4
+ * @ingroup     cpu_stm32_common
  * @{
  *
  * @file
@@ -17,16 +17,20 @@
  *
  * @}
  */
+#include <string.h>
+
 #include "mutex.h"
-#include "periph/gpio.h"
 #include "luid.h"
-#include "net/ethernet.h"
+
 #include "iolist.h"
+#include "net/ethernet.h"
+
+#include "periph/gpio.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#include <string.h>
-#if ETH_NUMOF
+
 /* Set the value of the divider with the clock configured */
 #if !defined(CLOCK_CORECLOCK) || CLOCK_CORECLOCK < (20000000U)
 #error This peripheral requires a CORECLOCK of at least 20MHz
@@ -83,7 +87,7 @@ static unsigned _rw_phy(unsigned addr, unsigned reg, unsigned value)
 {
     unsigned tmp;
 
-    while (ETH->MACMIIAR & ETH_MACMIIAR_MB) ;
+    while (ETH->MACMIIAR & ETH_MACMIIAR_MB) {}
     DEBUG("stm32_eth: rw_phy %x (%x): %x\n", addr, reg, value);
 
     tmp = (ETH->MACMIIAR & ETH_MACMIIAR_CR) | ETH_MACMIIAR_MB;
@@ -92,7 +96,7 @@ static unsigned _rw_phy(unsigned addr, unsigned reg, unsigned value)
 
     ETH->MACMIIDR = (value & 0xffff);
     ETH->MACMIIAR = tmp;
-    while (ETH->MACMIIAR & ETH_MACMIIAR_MB) ;
+    while (ETH->MACMIIAR & ETH_MACMIIAR_MB) {}
 
     DEBUG("stm32_eth: %lx\n", ETH->MACMIIDR);
     return (ETH->MACMIIDR & 0x0000ffff);
@@ -150,10 +154,11 @@ static void _init_buffer(void)
     for (i = 0; i < ETH_TX_BUFFER_COUNT; i++) {
         tx_desc[i].status = TX_DESC_TCH | TX_DESC_CIC;
         tx_desc[i].buffer_addr = &tx_buffer[i][0];
-        if((i+1) < ETH_RX_BUFFER_COUNT) {
+        if ((i + 1) < ETH_RX_BUFFER_COUNT) {
             tx_desc[i].desc_next = &tx_desc[i + 1];
         }
     }
+
     tx_desc[i - 1].desc_next = &tx_desc[0];
 
     rx_curr = &rx_desc[0];
@@ -181,8 +186,8 @@ int stm32_eth_init(void)
     }
 
     /* enable all clocks */
-    RCC->AHB1ENR |= (RCC_AHB1ENR_ETHMACEN | RCC_AHB1ENR_ETHMACTXEN
-                     | RCC_AHB1ENR_ETHMACRXEN | RCC_AHB1ENR_ETHMACPTPEN);
+    RCC->AHB1ENR |= (RCC_AHB1ENR_ETHMACEN | RCC_AHB1ENR_ETHMACTXEN |
+                     RCC_AHB1ENR_ETHMACRXEN | RCC_AHB1ENR_ETHMACPTPEN);
 
     /* reset the peripheral */
     RCC->AHB1RSTR |= RCC_AHB1RSTR_ETHMACRST;
@@ -190,10 +195,10 @@ int stm32_eth_init(void)
 
     /* software reset */
     ETH->DMABMR |= ETH_DMABMR_SR;
-    while (ETH->DMABMR & ETH_DMABMR_SR) ;
+    while (ETH->DMABMR & ETH_DMABMR_SR) {}
 
     /* set the clock divider */
-    while (ETH->MACMIIAR & ETH_MACMIIAR_MB) ;
+    while (ETH->MACMIIAR & ETH_MACMIIAR_MB) {}
     ETH->MACMIIAR = CLOCK_RANGE;
 
     /* configure the PHY (standard for all PHY's) */
@@ -208,18 +213,19 @@ int stm32_eth_init(void)
     /* pass all */
     //ETH->MACFFR |= ETH_MACFFR_RA;
     /* perfect filter on address */
-    ETH->MACFFR |= ETH_MACFFR_PAM | ETH_MACFFR_DAIF;
+    ETH->MACFFR |= (ETH_MACFFR_PAM | ETH_MACFFR_DAIF);
 
     /* store forward */
-    ETH->DMAOMR |= ETH_DMAOMR_RSF | ETH_DMAOMR_TSF | ETH_DMAOMR_OSF;
+    ETH->DMAOMR |= (ETH_DMAOMR_RSF | ETH_DMAOMR_TSF | ETH_DMAOMR_OSF);
 
     /* configure DMA */
-    ETH->DMABMR = ETH_DMABMR_DA | ETH_DMABMR_AAB | ETH_DMABMR_FB |
-                  ETH_DMABMR_RDP_32Beat | ETH_DMABMR_PBL_32Beat | ETH_DMABMR_EDE;
+    ETH->DMABMR = (ETH_DMABMR_DA | ETH_DMABMR_AAB | ETH_DMABMR_FB |
+                   ETH_DMABMR_RDP_32Beat | ETH_DMABMR_PBL_32Beat | ETH_DMABMR_EDE);
 
     if(eth_config.mac[0] != 0) {
       stm32_eth_set_mac(eth_config.mac);
-    }  else {
+    }
+    else {
       luid_get(hwaddr, ETHERNET_ADDR_LEN);
       stm32_eth_set_mac(hwaddr);
     }
@@ -264,8 +270,7 @@ int stm32_eth_send(const struct iolist *iolist)
     tx_curr->status &= 0x0fffffff;
 
     dma_acquire(eth_config.dma);
-    for (; iolist; iolist = iolist->iol_next)
-    {
+    for (; iolist; iolist = iolist->iol_next) {
         ret += dma_transfer(eth_config.dma, eth_config.dma_chan, iolist->iol_base,
                             tx_curr->buffer_addr+ret, iolist->iol_len, DMA_MEM_TO_MEM, DMA_INC_BOTH_ADDR);
     }
@@ -295,14 +300,13 @@ static int _try_receive(char *data, int max_len, int block)
     int copy, len = 0;
     int copied = 0;
     int drop = (data || max_len > 0);
+
     edma_desc_t *p = rx_curr;
     for (int i = 0; i < ETH_RX_BUFFER_COUNT && len == 0; i++) {
         /* try receiving, if the block is set, simply wait for the rest of
          * the packet to complete, otherwise just break */
         while (p->status & DESC_OWN) {
-            if (block) {
-            }
-            else {
+            if (!block) {
                 break;
             }
         }
@@ -354,5 +358,3 @@ void stm32_eth_isr_eth_wkup(void)
 {
     cortexm_isr_end();
 }
-
-#endif
