@@ -23,7 +23,8 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     z1 \
                     #
 
-BOARD_INSUFFICIENT_MEMORY :=    nucleo-f030r8 \
+BOARD_INSUFFICIENT_MEMORY :=    i-nucleo-lrwan1 \
+                                nucleo-f030r8 \
                                 nucleo-f031k6 \
                                 nucleo-f042k6 \
                                 nucleo-l031k6 \

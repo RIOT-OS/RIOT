@@ -3,7 +3,8 @@ include ../Makefile.tests_common
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
                              arduino-nano arduino-uno b-l072z-lrwan1 blackpill \
                              bluepill calliope-mini cc2650-launchpad cc2650stk \
-                             chronos hifive1 lsn50 maple-mini mega-xplained microbit \
+                             chronos hifive1 i-nucleo-lrwan1 lsn50 maple-mini \
+                             mega-xplained microbit \
                              msb-430 msb-430h nrf51dk nrf51dongle nrf6310 \
                              nucleo-f030r8 nucleo-f070rb nucleo-f072rb \
                              nucleo-f103rb nucleo-f302r8 nucleo-f334r8 \

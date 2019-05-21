@@ -7,8 +7,9 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := blackpill bluepill calliope-mini cc2650-launchpad \
-                             cc2650stk lobaro-lorabox maple-mini microbit \
-                             nrf51dk nrf51dongle nucleo-f030r8 nucleo-f031k6 \
+                             cc2650stk i-nucleo-lrwan1 lobaro-lorabox maple-mini \
+                             microbit nrf51dk nrf51dongle \
+                             nucleo-f030r8 nucleo-f031k6 \
                              nucleo-f042k6 nucleo-f070rb nucleo-f072rb \
                              nucleo-f103rb nucleo-f302r8 nucleo-f303k8 \
                              nucleo-f334r8 nucleo-f410rb nucleo-l031k6 \

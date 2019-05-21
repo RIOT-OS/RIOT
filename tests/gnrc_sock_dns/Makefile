@@ -3,8 +3,9 @@ include ../Makefile.tests_common
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-nano \
-                             arduino-uno chronos hifive1 mega-xplained \
-                             msb-430 msb-430h nucleo-f042k6 nucleo-f031k6 \
+                             arduino-uno chronos hifive1 i-nucleo-lrwan1 \
+                             mega-xplained msb-430 msb-430h \
+                             nucleo-f042k6 nucleo-f031k6 \
                              nucleo-f030r8 nucleo-f303k8 nucleo-l053r8 \
                              nucleo-l031k6 stm32f0discovery thingy52 telosb \
                              waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
