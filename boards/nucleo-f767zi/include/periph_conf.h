@@ -142,6 +142,16 @@ static const spi_conf_t spi_config[] = {
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2
     },
+    {
+        .dev      = SPI4,
+        .mosi_pin = GPIO_PIN(PORT_E, 6),
+        .miso_pin = GPIO_PIN(PORT_E, 5),
+        .sclk_pin = GPIO_PIN(PORT_E, 2),
+        .cs_pin   = GPIO_UNDEF,
+        .af       = GPIO_AF5,
+        .rccmask  = RCC_APB2ENR_SPI4EN,
+        .apbbus   = APB2
+    }
 };
 
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
