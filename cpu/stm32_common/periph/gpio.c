@@ -256,12 +256,16 @@ void isr_exti(void)
     cortexm_isr_end();
 }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
+#else
+typedef int dont_be_pedantic;
+#endif
 
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F3) || \
+    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7) || \
+    defined(CPU_FAM_STM32L1)
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || \
-    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L1)
-
+#define APB2ENR_GPIO_MASK      (0x000001FC)
 #define AHBENR_LOWER_MASK      (0x0000FFFF)
 #define AHBENR_UPPER_MASK      (0xFFFF0000)
 #define AHB1ENR_LOWER_MASK     (0x0000FFFF)
@@ -283,6 +287,9 @@ void gpio_pm_init_ain(void)
       defined(CPU_FAM_STM32F7)
     ahb_gpio_clocks = RCC->AHB1ENR & AHBENR_LOWER_MASK;
     periph_clk_en(AHB1, AHB1ENR_LOWER_MASK);
+#elif defined(CPU_FAM_STM32F1)
+    ahb_gpio_clocks = RCC->APB2ENR & APB2ENR_GPIO_MASK;
+    periph_clk_en(APB2, APB2ENR_GPIO_MASK);
 #endif
     /* switch all GPIOs to AIN mode to minimize power consumption */
     for (uint8_t i = 0; i < STM32_CPU_MAX_GPIOS; i++) {
@@ -293,17 +300,37 @@ void gpio_pm_init_ain(void)
             switch (i) {
                 /* preserve JTAG pins on PORTA and PORTB */
                 case 0:
+#if defined(CPU_FAM_STM32F1)
+                    port->CR[0] = GPIO_CRL_CNF;
+                    port->CR[1] = GPIO_CRH_CNF & 0x000FFFFF;
+#else
                     port->MODER = 0xABFFFFFF;
+#endif
                     break;
                 case 1:
+#if defined(CPU_FAM_STM32F1)
+                    port->CR[0] = GPIO_CRL_CNF & 0xFFF00FFF;
+                    port->CR[1] = GPIO_CRH_CNF;
+#else
                     port->MODER = 0xFFFFFEBF;
+#endif
                     break;
                 default:
+#if defined(CPU_FAM_STM32F1)
+                    port->CR[0] = GPIO_CRL_CNF;
+                    port->CR[1] = GPIO_CRH_CNF;
+#else
                     port->MODER = 0xFFFFFFFF;
+#endif
                     break;
             }
 #else
-            port->MODER = 0xFFFFFFFF;
+#if defined(CPU_FAM_STM32F1)
+                    port->CR[0] = GPIO_CRL_CNF;
+                    port->CR[1] = GPIO_CRH_CNF;
+#else
+                    port->MODER = 0xFFFFFFFF;
+#endif
 #endif
         }
         else {
@@ -318,9 +345,8 @@ void gpio_pm_init_ain(void)
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
       defined(CPU_FAM_STM32F7)
     periph_clk_en(AHB1, ((RCC->AHB1ENR & ~((uint32_t)AHB1ENR_LOWER_MASK)) | ahb_gpio_clocks));
+#elif defined(CPU_FAM_STM32F1)
+    periph_clk_en(APB2, ((RCC->APB2ENR & ~((uint32_t)APB2ENR_GPIO_MASK)) | ahb_gpio_clocks));
 #endif
 }
-#endif
-#else
-typedef int dont_be_pedantic;
 #endif
