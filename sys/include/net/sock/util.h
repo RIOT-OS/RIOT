@@ -96,7 +96,9 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str);
 bool sock_udp_ep_equal(const sock_udp_ep_t *a, const sock_udp_ep_t *b);
 
 /**
- * @name helper definitions
+ * @defgroup    net_sock_util_conf SOCK utility functions compile configurations
+ * @ingroup     net_sock_util
+ * @ingroup     config
  * @{
  */
 
