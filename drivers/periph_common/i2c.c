@@ -22,6 +22,7 @@
 #include "board.h"
 #include "cpu.h"
 #include "periph/i2c.h"
+#include "byteorder.h"
 
 #ifdef I2C_NUMOF
 
@@ -37,11 +38,19 @@ int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
 int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                   void *data, size_t len, uint8_t flags)
 {
+    uint16_t reg_end = reg;
+
     if (flags & (I2C_NOSTOP | I2C_NOSTART)) {
         return -EOPNOTSUPP;
     }
+
+    /* Handle endianess of register if 16 bit */
+    if (flags & I2C_REG16) {
+        reg_end = htons(reg); /* Make sure register is in big-endian on I2C bus */
+    }
+
     /* First set ADDR and register with no stop */
-    int ret = i2c_write_bytes(dev, addr, &reg, (flags & I2C_REG16) ? 2 : 1,
+    int ret = i2c_write_bytes(dev, addr, &reg_end, (flags & I2C_REG16) ? 2 : 1,
                               flags | I2C_NOSTOP);
     if (ret < 0) {
         return ret;
@@ -73,11 +82,19 @@ int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                    const void *data, size_t len, uint8_t flags)
 {
+    uint16_t reg_end = reg;
+
     if (flags & (I2C_NOSTOP | I2C_NOSTART)) {
         return -EOPNOTSUPP;
     }
+
+    /* Handle endianess of register if 16 bit */
+    if (flags & I2C_REG16) {
+        reg_end = htons(reg); /* Make sure register is in big-endian on I2C bus */
+    }
+
     /* First set ADDR and register with no stop */
-    int ret = i2c_write_bytes(dev, addr, &reg, (flags & I2C_REG16) ? 2 : 1,
+    int ret = i2c_write_bytes(dev, addr, &reg_end, (flags & I2C_REG16) ? 2 : 1,
                               flags | I2C_NOSTOP);
     if (ret < 0) {
         return ret;
