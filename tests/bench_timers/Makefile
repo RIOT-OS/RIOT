@@ -8,7 +8,6 @@ SINGLE_TIMER_BOARDS = \
   native \
   nucleo-f031k6 \
   nucleo-f042k6 \
-  samd21-xpro \
   saml10-xpro \
   saml11-xpro \
   saml21-xpro \
