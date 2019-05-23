@@ -196,7 +196,6 @@ void thread_stack_print(void)
     printf("stack size: %u bytes\n", size);
 }
 
-void cpu_switch_context_exit(void) __attribute__((naked));
 void cpu_switch_context_exit(void)
 {
     sched_run();
@@ -212,7 +211,6 @@ extern char *__brkval;
 /**
  * @brief Set the MCU into Thread-Mode and load the initial task from the stack and run it
  */
-void NORETURN __enter_thread_mode(void) __attribute__((naked));
 void NORETURN __enter_thread_mode(void)
 {
     irq_enable();
