@@ -24,6 +24,7 @@
 #include "periph_cpu.h"
 #include "f7/cfg_clock_216_8_1.h"
 #include "cfg_i2c1_pb8_pb9.h"
+#include "cfg_rtt_default.h"
 
 #ifdef __cplusplus
 extern "C" {
