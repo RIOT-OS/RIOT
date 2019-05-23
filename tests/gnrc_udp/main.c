@@ -26,10 +26,16 @@
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
-extern int udp_cmd(int argc, char **argv);
+extern int udp_client_send(int argc, char **argv);
+extern int udp_server_start(int argc, char **argv);
+extern int udp_server_stop(int argc, char **argv);
+extern int udp_server_reset(int argc, char **argv);
 
 static const shell_command_t shell_commands[] = {
-    { "udp", "send data over UDP and listen on UDP ports", udp_cmd },
+    { "udp-send", "Send data over UDP", udp_client_send },
+    { "udp-start", "Listen on UDP ports", udp_server_start },
+    { "udp-stop", "Stop udp-server", udp_server_stop },
+    { "udp-reset", "Stop udp-server", udp_server_stop },
     { NULL, NULL, NULL }
 };
 
