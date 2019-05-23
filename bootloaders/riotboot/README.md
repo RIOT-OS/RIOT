@@ -2,7 +2,7 @@
 This folder contains a simple bootloader called "riotboot".
 A header with metadata of length `RIOTBOOT_HDR_LEN` precedes
 the RIOT firmware. The header contains "RIOT" as a magic
-number to recognise a RIOT firmware image, a checksum, and
+number to recognize a RIOT firmware image, a checksum, and
 the version of the RIOT firmware `APP_VER`.
 This bootloader verifies the checksum of the header which is located
 at an offset (`ROM_OFFSET`) with respect to  the `ROM_START_ADDR`
@@ -14,7 +14,7 @@ valid headers and boots the newest image.
 riotboot consists of:
 
   - This application which serves as minimal bootloader,
-  - the module "riotboot_hdr" used to recognise RIOT firmware which riotboot
+  - the module "riotboot_hdr" used to recognize RIOT firmware which riotboot
     can boot,
   - the module "riotboot_slot" used to manage the partitions (slots) with a
     RIOT header attached to them,
@@ -53,7 +53,7 @@ A board capable to use riotboot must meet the following requirements:
   - Use cpu/cortexm_common/ldscripts/cortexm.ld ld script
   - Pass the cortexm_common_ldscript test in tests/
   - Being able to execute startup code at least twice (`board_init()`)
-  - Declare `FEATURES_PROVIDED += riotboot` to pull the rigth dependencies
+  - Declare `FEATURES_PROVIDED += riotboot` to pull the right dependencies
   - Being able to flash binary files, if integration with the build
     system is required for flashing
 
@@ -70,7 +70,7 @@ optionally set (0 by default) in your makefile.
 The image can be flashed using `riotboot/flash` which also flashes
 the bootloader. Below a concrete example:
 
-`BOARD=samr21-xpro FEATURES_REQUIRED+=riotboot APP_VER=$(date +%s) make -C examples/hello-world flash-combined-slot0`
+`BOARD=samr21-xpro FEATURES_REQUIRED+=riotboot APP_VER=$(date +%s) make -C examples/hello-world riotboot/flash-combined-slot0`
 
 The above compiles a hello world binary and a bootloader, then flashes the
 combined binary comprising of: bootloader + slot 0 header + slot 0 image.
