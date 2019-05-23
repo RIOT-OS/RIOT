@@ -77,7 +77,7 @@ ifneq (,$(filter printf_float,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter riotboot_%,$(USEMODULE)))
+ifneq (,$(filter riotboot,$(FEATURES_USED)))
   include $(RIOTBASE)/sys/riotboot/Makefile.include
 endif
 
