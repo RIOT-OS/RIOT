@@ -23,6 +23,7 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/icmpv6/error.h"
 #include "net/gnrc/ipv6.h"
+#include "net/gnrc/ipv6/ext/frag.h"
 #include "net/gnrc/ipv6/ext/rh.h"
 
 #include "net/gnrc/ipv6/ext.h"
@@ -256,10 +257,12 @@ static gnrc_pktsnip_t *_demux(gnrc_pktsnip_t *pkt, unsigned protnum)
 
             break;
 #endif  /* MODULE_GNRC_IPV6_EXT_RH */
-
+        case PROTNUM_IPV6_EXT_FRAG:
+#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+            return gnrc_ipv6_ext_frag_reass(pkt);
+#endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
         case PROTNUM_IPV6_EXT_HOPOPT:
         case PROTNUM_IPV6_EXT_DST:
-        case PROTNUM_IPV6_EXT_FRAG:
         case PROTNUM_IPV6_EXT_AH:
         case PROTNUM_IPV6_EXT_ESP:
         case PROTNUM_IPV6_EXT_MOB:
