@@ -327,6 +327,18 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Bitfield definitions for the GPIO register (0x33)
+ * @{
+ */
+#define MRF24J40_GPIO_0                 (0x01)
+#define MRF24J40_GPIO_1                 (0x02)
+#define MRF24J40_GPIO_2                 (0x04)
+#define MRF24J40_GPIO_3                 (0x08)
+#define MRF24J40_GPIO_4                 (0x10)
+#define MRF24J40_GPIO_5                 (0x20)
+/** @} */
+
+/**
  * @name    Bitfield definitions for the SLPACK register (0x35)
  * @{
  */
@@ -453,6 +465,16 @@ extern "C" {
 #define MRF24J40_SLPCON1_SLPCLKDIV0     (0x01)
 /** @} */
 
+/**
+ * @name    Bitfield definitions for the TESTMODE register (0x22F)
+ * @{
+ */
+#define MRF24J40_TESTMODE_RSSIWAIT1     (0x10)
+#define MRF24J40_TESTMODE_RSSIWAIT0     (0x08)
+#define MRF24J40_TESTMODE_TESTMODE2     (0x04)
+#define MRF24J40_TESTMODE_TESTMODE1     (0x02)
+#define MRF24J40_TESTMODE_TESTMODE0     (0x01)
+/** @} */
 
 #ifdef __cplusplus
 }

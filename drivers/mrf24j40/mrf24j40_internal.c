@@ -36,6 +36,68 @@ static inline void getbus(mrf24j40_t *dev)
     spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params.spi_clk);
 }
 
+#if MRF24J40_USE_EXT_PA_LNA
+static inline void mrf24j40_reg_and_short(mrf24j40_t *dev, const uint8_t addr, uint8_t value)
+{
+    value &= mrf24j40_reg_read_short(dev, addr);
+    mrf24j40_reg_write_short(dev, addr, value);
+}
+
+static inline void mrf24j40_reg_or_short(mrf24j40_t *dev, const uint8_t addr, uint8_t value)
+{
+    value |= mrf24j40_reg_read_short(dev, addr);
+    mrf24j40_reg_write_short(dev, addr, value);
+}
+
+void mrf24j40_enable_auto_pa_lna(mrf24j40_t *dev)
+{
+    /* Configure enable pin of the Voltage Regulator for the PA (GPIO3) on MRF24J40MC */
+    mrf24j40_reg_or_short(dev, MRF24J40_REG_TRISGPIO, MRF24J40_GPIO_3);
+
+    /* Enable the volate regulator to power the Power Amplifier */
+    mrf24j40_reg_or_short(dev, MRF24J40_REG_GPIO, MRF24J40_GPIO_3);
+
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_TESTMODE, (MRF24J40_TESTMODE_RSSIWAIT0 |
+                                                         MRF24J40_TESTMODE_TESTMODE2 |
+                                                         MRF24J40_TESTMODE_TESTMODE1 |
+                                                         MRF24J40_TESTMODE_TESTMODE0));
+}
+
+void mrf24j40_disable_auto_pa_lna(mrf24j40_t *dev)
+{
+    /* Disable automatic switch on PA/LNA */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_TESTMODE, MRF24J40_TESTMODE_RSSIWAIT0);
+
+    /* Configure all GPIOs as Output */
+    mrf24j40_reg_or_short(dev, MRF24J40_REG_TRISGPIO, (MRF24J40_GPIO_0 |
+                                                       MRF24J40_GPIO_1 |
+                                                       MRF24J40_GPIO_2 |
+                                                       MRF24J40_GPIO_3));
+
+    /* Disable all GPIO outputs */
+    mrf24j40_reg_and_short(dev, MRF24J40_REG_GPIO, ~(MRF24J40_GPIO_0 |
+                                                     MRF24J40_GPIO_1 |
+                                                     MRF24J40_GPIO_2 |
+                                                     MRF24J40_GPIO_3));
+}
+
+void mrf24j40_enable_lna(mrf24j40_t *dev)
+{
+    /* Disable automatic switch on PA/LNA */
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_TESTMODE, MRF24J40_TESTMODE_RSSIWAIT0);
+
+    /* Configure all GPIOs as Output */
+    mrf24j40_reg_or_short(dev, MRF24J40_REG_TRISGPIO, (MRF24J40_GPIO_0 |
+                                                       MRF24J40_GPIO_1 |
+                                                       MRF24J40_GPIO_2 |
+                                                       MRF24J40_GPIO_3));
+
+    /* Enable LNA, keep PA voltage regulator on */
+    mrf24j40_reg_and_short(dev, MRF24J40_REG_GPIO, ~(MRF24J40_GPIO_0 | MRF24J40_GPIO_1));
+    mrf24j40_reg_or_short(dev, MRF24J40_REG_GPIO, MRF24J40_GPIO_2 | MRF24J40_GPIO_3);
+}
+#endif /* MRF24J40_USE_EXT_PA_LNA */
+
 void mrf24j40_init(mrf24j40_t *dev)
 {
 
@@ -87,6 +149,8 @@ void mrf24j40_init(mrf24j40_t *dev)
     mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG2, MRF25J40_BBREG2_CCAMODE1 );
     mrf24j40_reg_write_short(dev, MRF24J40_REG_CCAEDTH, 0x60);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG6, MRF24J40_BBREG6_RSSIMODE2 );
+
+    mrf24j40_enable_auto_pa_lna(dev);
 
     /* Enable immediate sleep mode */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE);
