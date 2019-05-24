@@ -92,9 +92,9 @@ extern "C" {
 #endif
 
 #if (__INT8_TYPE__ == 0)
-#define __INT8 "hh"
+#define __INT8 /* "hh" */ /* ets_printf doesn't support "h" */
 #elif (__INT8_TYPE__ == 1 || __INT8_TYPE__ == 3)
-#define __INT8 "h"
+#define __INT8 /* "h" */ /* ets_printf doesn't support "h" */
 #elif (__INT8_TYPE__ == 2)
 #define __INT8
 #elif (__INT8_TYPE__ == 4 || __INT8_TYPE__ == 6)
@@ -103,7 +103,7 @@ extern "C" {
 #define __INT8 "ll"
 #endif
 #if (__INT16_TYPE__ == 1 || __INT16_TYPE__ == 3)
-#define __INT16 "h"
+#define __INT16 /* "h" */ /* ets_printf doesn't support "h" */
 #elif (__INT16_TYPE__ == 2)
 #define __INT16
 #elif (__INT16_TYPE__ == 4 || __INT16_TYPE__ == 6)
@@ -136,9 +136,9 @@ extern "C" {
 #define __INT64 "ll"
 #endif
 #if (__INT_FAST8_TYPE__ == 0)
-#define __FAST8 "hh"
+#define __FAST8 /* "hh" */ /* ets_printf doesn't support "h" */
 #elif (__INT_FAST8_TYPE__ == 1 || __INT_FAST8_TYPE__ == 3)
-#define __FAST8 "h"
+#define __FAST8 /* "h" */ /* ets_printf doesn't support "h" */
 #elif (__INT_FAST8_TYPE__ == 2)
 #define __FAST8
 #elif (__INT_FAST8_TYPE__ == 4 || __INT_FAST8_TYPE__ == 6)
@@ -147,7 +147,7 @@ extern "C" {
 #define __FAST8 "ll"
 #endif
 #if (__INT_FAST16_TYPE__ == 1 || __INT_FAST16_TYPE__ == 3)
-#define __FAST16 "h"
+#define __FAST16 /* "h" */ /* ets_printf doesn't support "h" */
 #elif (__INT_FAST16_TYPE__ == 2)
 #define __FAST16
 #elif (__INT_FAST16_TYPE__ == 4 || __INT_FAST16_TYPE__ == 6)
@@ -171,9 +171,9 @@ extern "C" {
 #endif
 
 #if (__INT_LEAST8_TYPE__ == 0)
-#define __LEAST8 "hh"
+#define __LEAST8 /* "hh" */ /* ets_printf doesn't support "h" */
 #elif (__INT_LEAST8_TYPE__ == 1 || __INT_LEAST8_TYPE__ == 3)
-#define __LEAST8 "h"
+#define __LEAST8 /* "h" */ /* ets_printf doesn't support "h" */
 #elif (__INT_LEAST8_TYPE__ == 2)
 #define __LEAST8
 #elif (__INT_LEAST8_TYPE__ == 4 || __INT_LEAST8_TYPE__ == 6)
@@ -182,7 +182,7 @@ extern "C" {
 #define __LEAST8 "ll"
 #endif
 #if (__INT_LEAST16_TYPE__ == 1 || __INT_LEAST16_TYPE__ == 3)
-#define __LEAST16 "h"
+#define __LEAST16 /* "h" */ /* ets_printf doesn't support "h" */
 #elif (__INT_LEAST16_TYPE__ == 2)
 #define __LEAST16
 #elif (__INT_LEAST16_TYPE__ == 4 || __INT_LEAST16_TYPE__ == 6)

@@ -20,7 +20,6 @@
 #define ENABLE_DEBUG  0
 #include "debug.h"
 
-#include <malloc.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -32,13 +31,9 @@
 #include "esp/common_macros.h"
 #include "esp/xtensa_ops.h"
 #include "sdk/ets.h"
+#include "tools.h"
 #include "xtensa/corebits.h"
 #include "xtensa/xtensa_api.h"
-
-extern void malloc_stats (void);
-extern unsigned int get_free_heap_size (void);
-extern uint8_t _eheap;  /* end of heap (defined in esp8266.riot-os.app.ld) */
-extern uint8_t _sheap;  /* start of heap (defined in esp8266.riot-os.app.ld) */
 
 static const char* exception_names [] =
 {
@@ -96,9 +91,7 @@ void IRAM NORETURN exception_handler (XtExcFrame *frame)
     #if defined(MODULE_PS)
     ps();
     #endif
-    struct mallinfo minfo = mallinfo();
-    ets_printf("heap: %lu (free %lu) byte\n", &_eheap - &_sheap, get_free_heap_size());
-    ets_printf("sysmem: %d (used %d, free %d)\n", minfo.arena, minfo.uordblks, minfo.fordblks);
+    print_meminfo();
     #endif
     /* flushing the buffer */
     ets_printf("                                                          \n");
@@ -125,9 +118,7 @@ void init_exceptions (void)
 void IRAM NORETURN panic_arch(void)
 {
     #if defined(DEVELHELP)
-    struct mallinfo minfo = mallinfo();
-    ets_printf("heap: %lu (free %lu) byte\n", &_eheap - &_sheap, get_free_heap_size());
-    ets_printf("sysmem: %d (used %d, free %d)\n", minfo.arena, minfo.uordblks, minfo.fordblks);
+    print_meminfo();
     ets_printf("                                                          \n");
     ets_printf("                                                          \n");
     #endif
