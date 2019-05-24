@@ -37,7 +37,7 @@ extern "C" {
  * @{
  */
 #define RBUF_SIZE           (GNRC_SIXLOWPAN_FRAG_RBUF_SIZE)
-#define RBUF_TIMEOUT        (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS)
+#define RBUF_TIMEOUT        (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)
 /** @} */
 
 /**
