@@ -98,7 +98,7 @@ enum {
  * @name    Power mode configuration
  * @{
  */
-#ifdef CPU_FAM_SAML11
+#ifdef CPU_SAML1X
 #define PM_NUM_MODES        (2)
 #else
 #define PM_NUM_MODES        (3)
