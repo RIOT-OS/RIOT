@@ -7,7 +7,8 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-nano arduino-uno
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
+                             arduino-uno
 
 # Uncomment these lines if you want to use platform support from external
 # repositories:
@@ -31,7 +32,6 @@ QUIET ?= 1
 
 # Modules to include:
 USEMODULE += shell
-USEMODULE += shell_commands
 USEMODULE += ps
 # include and auto-initialize all available sensors
 USEMODULE += saul_default

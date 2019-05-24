@@ -1,7 +1,8 @@
 export APPLICATION = can_trx
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-nano arduino-uno
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
+                             arduino-uno
 
 USEMODULE += shell
 USEMODULE += shell_commands

@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove
 # newlib for esp8266 and MIPS does not provide _times_r
 BOARD_BLACKLIST := \
                    arduino-duemilanove \
+                   arduino-leonardo \
                    arduino-mega2560 \
                    arduino-nano \
                    arduino-uno \

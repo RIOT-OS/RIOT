@@ -2,13 +2,15 @@ include ../Makefile.tests_common
 
 BOARD ?= native
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-nano arduino-uno
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
+                             arduino-uno
 
 FEATURES_OPTIONAL += periph_rtc
 
 # this list is composed of boards that support spi/gpio + native
-BOARD_WHITELIST := airfy-beacon arduino-due arduino-duemilanove arduino-mega2560 \
-                   arduino-mkr1000 arduino-mkrzero arduino-uno arduino-zero avsextrem \
+BOARD_WHITELIST := airfy-beacon arduino-due arduino-duemilanove \
+                   arduino-leonardo arduino-mega2560 arduino-mkr1000 \
+                   arduino-mkrzero arduino-uno arduino-zero avsextrem \
                    b-l072z-lrwan1 b-l475e-iot01a bluepill cc2538dk ek-lm4f120xl \
                    feather-m0 fox frdm-k22f frdm-k64f i-nucleo-lrwan1 ikea-tradfri \
                    iotlab-a8-m3 iotlab-m3 limifrog-v1 maple-mini msb-430 msb-430h msba2 \

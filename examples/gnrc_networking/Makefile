@@ -7,7 +7,8 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-nano \
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
+                             arduino-mega2560 arduino-nano \
                              arduino-uno blackpill bluepill calliope-mini \
                              chronos hifive1 i-nucleo-lrwan1 mega-xplained \
                              microbit msb-430 msb-430h \

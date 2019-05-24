@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-nano \
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
+                             arduino-mega2560 arduino-nano \
                              arduino-uno i-nucleo-lrwan1 msb-430 msb-430h \
                              nucleo-l053r8 nucleo-f031k6 nucleo-f042k6 \
                              nucleo-l031k6 stm32f0discovery telosb \
