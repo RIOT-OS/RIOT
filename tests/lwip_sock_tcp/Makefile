@@ -2,7 +2,8 @@ include ../Makefile.tests_common
 
 # lwIP's memory management doesn't seem to work on non 32-bit platforms at the
 # moment.
-BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-nano \
+BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
+                   arduino-mega2560 arduino-nano \
                    arduino-uno chronos esp8266-esp-12x esp8266-olimex-mod \
                    esp8266-sparkfun-thing jiminy-mega256rfr2 mega-xplained \
                    msb-430 msb-430h telosb waspmote-pro \
