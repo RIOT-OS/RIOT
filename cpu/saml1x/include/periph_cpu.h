@@ -27,6 +27,12 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Override the default initial PM blocker
+ * @todo   Idle modes are enabled by default, deep sleep mode blocked
+ */
+#define PM_BLOCKER_INITIAL  { .val_u32 = 0x00000001 }
+
+/**
  * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
  */
 static const int8_t exti_config[1][32] = {
