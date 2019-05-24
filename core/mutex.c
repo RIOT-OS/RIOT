@@ -32,7 +32,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-int _mutex_lock(mutex_t *mutex, int blocking)
+int _mutex_lock(mutex_t *mutex, volatile uint8_t *blocking)
 {
     unsigned irqstate = irq_disable();
 
@@ -46,7 +46,7 @@ int _mutex_lock(mutex_t *mutex, int blocking)
         irq_restore(irqstate);
         return 1;
     }
-    else if (blocking) {
+    else if (*blocking) {
         thread_t *me = (thread_t*)sched_active_thread;
         DEBUG("PID[%" PRIkernel_pid "]: Adding node to mutex queue: prio: %"
               PRIu32 "\n", sched_active_pid, (uint32_t)me->priority);
