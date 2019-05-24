@@ -2,7 +2,8 @@ DEVELHELP := 1
 # name of your application
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-nano \
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
+                             arduino-mega2560 arduino-nano \
                              arduino-uno hifive1 i-nucleo-lrwan1 mega-xplained \
                              msb-430 msb-430h nucleo-f030r8 nucleo-f031k6 \
                              nucleo-f042k6 nucleo-f070rb nucleo-f072rb \
