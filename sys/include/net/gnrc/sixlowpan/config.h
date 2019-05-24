@@ -64,8 +64,8 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag](@ref net_gnrc_sixlowpan_frag) module
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS
-#define GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS (3U * US_PER_SEC)
+#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US
+#define GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US (3U * US_PER_SEC)
 #endif
 
 /**
@@ -76,7 +76,7 @@ extern "C" {
  *
  * When set to a non-zero value this will cause the reassembly buffer to
  * override the oldest entry no matter what. When set to zero only the oldest
- * entry that is older than @ref GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS will be
+ * entry that is older than @ref GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be
  * overwritten (they will still timeout normally if reassembly buffer is not
  * full).
  */
