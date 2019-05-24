@@ -7,6 +7,7 @@ BOARD_BLACKLIST := chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
 
 # Incompatible due to non-standard ATmega time.h
 BOARD_BLACKLIST += arduino-duemilanove \
+                   arduino-leonardo \
                    arduino-mega2560 \
                    arduino-nano \
                    arduino-uno \
