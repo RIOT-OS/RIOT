@@ -41,7 +41,7 @@ Please paste or specifically describe the actual output.
 <!--
 Operating system: Mac OSX, Linux, Vagrant VM
 Build environment: GCC, CLang versions (you can run the following command from
-the RIOT base directory: ./dist/tools/ci/print_toolchain_versions.sh).
+the RIOT base directory: make print-versions).
 -->
 
 <!-- Thanks for contributing! -->
