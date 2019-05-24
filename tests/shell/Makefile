@@ -12,6 +12,7 @@ DISABLE_MODULE += auto_init
 BOARD_BLACKLIST += chronos
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove \
+                             arduino-leonardo \
                              arduino-nano \
                              arduino-uno
 

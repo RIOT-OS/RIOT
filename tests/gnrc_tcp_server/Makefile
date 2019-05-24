@@ -12,7 +12,8 @@ TCP_SERVER_PORT ?= 80
 TCP_TEST_CYCLES ?= 3
 
 # Mark Boards with insufficient memory
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove \
+                             arduino-leonardo arduino-mega2560 \
                              arduino-nano arduino-uno calliope-mini chronos \
                              hifive1 i-nucleo-lrwan1 mega-xplained microbit \
                              msb-430 msb-430h \

@@ -2,7 +2,8 @@ include ../Makefile.tests_common
 
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-nano \
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
+                             arduino-mega2560 arduino-nano \
                              arduino-uno chronos hifive1 i-nucleo-lrwan1 \
                              mega-xplained msb-430 msb-430h \
                              nucleo-f042k6 nucleo-f031k6 \

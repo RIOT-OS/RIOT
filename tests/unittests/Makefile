@@ -3,6 +3,7 @@ include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-duemilanove \
+                             arduino-leonardo \
                              arduino-mega2560 \
                              arduino-mkr1000 \
                              arduino-mkrfox1200 \
