@@ -221,6 +221,7 @@ static int _sockaddr_to_ep(const struct sockaddr *address, socklen_t address_len
                 return -1;
             }
             struct sockaddr_in *in_addr = (struct sockaddr_in *)address;
+            memset(out, 0, sizeof(*out));
             out->family = AF_INET;
             out->addr.ipv4_u32 = in_addr->sin_addr.s_addr;
             out->port = ntohs(in_addr->sin_port);
@@ -232,6 +233,7 @@ static int _sockaddr_to_ep(const struct sockaddr *address, socklen_t address_len
                 return -1;
             }
             struct sockaddr_in6 *in6_addr = (struct sockaddr_in6 *)address;
+            memset(out, 0, sizeof(*out));
             out->family = AF_INET6;
             memcpy(&out->addr.ipv6, &in6_addr->sin6_addr, sizeof(out->addr.ipv6));
             out->port = ntohs(in6_addr->sin6_port);
