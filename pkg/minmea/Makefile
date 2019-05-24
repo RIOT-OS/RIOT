@@ -1,6 +1,6 @@
 PKG_NAME=minmea
 PKG_URL=https://github.com/kosma/minmea
-PKG_VERSION=dbf51f03c5058746b4c4b3d6fdcd3d0357c5da36
+PKG_VERSION=ae4dd9442a9041345d5ef108f062e7e4ec6954f2
 PKG_LICENSE=WTFPL
 
 .PHONY: all
