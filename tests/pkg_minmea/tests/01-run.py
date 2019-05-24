@@ -6,6 +6,7 @@ from testrunner import run
 
 def testfunc(child):
     child.expect_exact('START')
+    child.expect('parsed coordinates: lat=52.483631 lon=13.446008')
     child.expect_exact('SUCCESS')
 
 
