@@ -31,8 +31,7 @@
  * to the physical support, the region where the device is used needs to be
  * set at compile time. Example for EU868:
  * ```
- *     CFLAGS += -DREGION_EU868
- *     CFLAGS += -DLORAMAC_ACTIVE_REGION=LORAMAC_REGION_EU868
+ *     LORA_REGION = EU868
  * ```
  *
  * # Using the package API
