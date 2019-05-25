@@ -18,12 +18,12 @@ Simply build and flash the application for a ST B-L072Z-LRWAN1 board:
 
     make flash term
 
-Use the `BOARD`, `DRIVER` and `REGION` make variables to adapt the application
+Use the `BOARD`, `DRIVER` and `LORA_REGION` make variables to adapt the application
 to your hardware setup and region of use:
 
 - `BOARD` can be one of the nucleo-64 boards
 - `DRIVER` can be either `sx1276` or `sx1272`
-- `REGION` can be `EU868`, `US915`, etc (see LoRaWAN regional parameters for
+- `LORA_REGION` can be `EU868`, `US915`, etc (see LoRaWAN regional parameters for
   details).
 
 ST Nucleo-64 can be used with mbed LoRa shields: there's one based on
