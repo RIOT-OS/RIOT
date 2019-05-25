@@ -48,20 +48,12 @@ static inline SercomSpi *dev(spi_t bus)
 
 static inline void poweron(spi_t bus)
 {
-#if defined(CPU_FAM_SAMD21)
-    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#elif defined(CPU_SAML21) || defined(CPU_SAML1X)
-    MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#endif
+    sercom_clk_en(dev(bus));
 }
 
 static inline void poweroff(spi_t bus)
 {
-#if defined(CPU_FAM_SAMD21)
-    PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#elif defined(CPU_SAML21) || defined(CPU_SAML1X)
-    MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#endif
+    sercom_clk_dis(dev(bus));
 }
 
 void spi_init(spi_t bus)
@@ -84,13 +76,10 @@ void spi_init(spi_t bus)
            (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_SWRST));
 
     /* configure base clock: using GLK GEN 0 */
-#if defined(CPU_FAM_SAMD21)
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 |
-                         (SERCOM0_GCLK_ID_CORE + sercom_id(dev(bus))));
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-#elif defined(CPU_SAML21) || defined(CPU_SAML1X)
-    GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + sercom_id(dev(bus))].reg =
-                                (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0);
+#ifdef GCLK_CLKCTRL_GEN_GCLK0
+    sercom_set_gen(dev(bus), GCLK_CLKCTRL_GEN_GCLK0);
+#else
+    sercom_set_gen(dev(bus), GCLK_PCHCTRL_GEN_GCLK0);
 #endif
 
     /* enable receiver and configure character size to 8-bit
