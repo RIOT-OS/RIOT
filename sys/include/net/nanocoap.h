@@ -105,6 +105,7 @@ extern "C" {
 #define COAP_POST               (0x2)
 #define COAP_PUT                (0x4)
 #define COAP_DELETE             (0x8)
+#define COAP_OBSERVABLE         (0x800)  /**< The resource can be observed */
 #define COAP_MATCH_SUBTREE      (0x8000) /**< Path is considered as a prefix
                                               when matching */
 /** @} */
