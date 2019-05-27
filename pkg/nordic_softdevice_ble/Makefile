@@ -21,8 +21,11 @@ prepare: $(PKG_SRCDIR)/.extracted
 $(BINDIR)/ble_6lowpan.a: $(PKG_SRCDIR)/.extracted
 	cp $(PKG_SRCDIR)/$(BLE_6LOWPAN_LIB) $@
 
+# softdevice.hex has the `[0x8bc, 0x3000[` addresses not set.
+# However, it requires that the value at `0x2000` is 0xFFFFFFFF
+# We just put all the undefined memory to 0xff as it is the rom reset value anyway.
 $(BINDIR)/softdevice.hex: $(PKG_SRCDIR)/.extracted
-	cp $(PKG_SRCDIR)/$(SOFTDEVICE) $@
+	$(Q)$(OBJCOPY) $(OFLAGS) -Oihex --gap-fill 0xff $(PKG_SRCDIR)/$(SOFTDEVICE) $@
 
 $(PKG_SRCDIR)/.extracted: $(PKG_BUILDDIR)/$(PKG_FILE)
 	rm -rf $(@D)
