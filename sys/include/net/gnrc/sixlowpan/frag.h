@@ -91,6 +91,7 @@ typedef struct {
 typedef struct {
     gnrc_pktsnip_t *pkt;    /**< Pointer to the IPv6 packet to be fragmented */
     uint16_t datagram_size; /**< Length of just the (uncompressed) IPv6 packet to be fragmented */
+    uint16_t tag;           /**< Tag used for the fragment */
     uint16_t offset;        /**< Offset of the Nth fragment from the beginning of the
                              *   payload datagram */
 } gnrc_sixlowpan_msg_frag_t;
@@ -128,6 +129,13 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
  * @param[in] page      Current 6Lo dispatch parsing page.
  */
 void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
+
+/**
+ * @brief   Generate a new datagram tag for sending
+ *
+ * @return  A new datagram tag.
+ */
+uint16_t gnrc_sixlowpan_frag_next_tag(void);
 
 /**
  * @brief   Garbage collect reassembly buffer.

@@ -131,6 +131,7 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
         }
         fragment_msg->pkt = pkt;
         fragment_msg->datagram_size = orig_datagram_size;
+        fragment_msg->tag = gnrc_sixlowpan_frag_next_tag();
         /* Sending the first fragment has an offset==0 */
         fragment_msg->offset = 0;
 
