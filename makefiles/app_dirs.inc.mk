@@ -1,3 +1,5 @@
+.PHONY: info-applications info-applications-supported-boards
+
 # fallback so empty RIOTBASE won't lead to "/examples/"
 RIOTBASE ?= .
 
@@ -13,3 +15,9 @@ APPLICATION_DIRS := $(sort $(patsubst ./%,%,$(patsubst %/,%,$(dir $(wildcard \
 
 info-applications:
 	@for dir in $(APPLICATION_DIRS); do echo $$dir; done
+
+# All applications / board output of `info-boards-supported`.
+info-applications-supported-boards:
+	@for dir in $(APPLICATION_DIRS); do \
+	  make --no-print-directory -C $${dir} info-boards-supported 2>/dev/null | xargs -n 1 echo $${dir}; \
+	done
