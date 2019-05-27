@@ -37,7 +37,6 @@ define board_missing_features
   endif
 endef
 
-BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name "common" -exec basename {} \;)
 BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
 BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
 
