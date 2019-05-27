@@ -283,81 +283,87 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
             break;
     }
 
-    if (coap_get_observe(pdu) == COAP_OBS_REGISTER) {
-        /* lookup remote+token */
-        int empty_slot = _find_obs_memo(&memo, remote, pdu);
-        /* validate re-registration request */
-        if (resource_memo != NULL) {
-            if (memo != NULL) {
-                if (memo != resource_memo) {
-                    /* reject token already used for a different resource */
-                    memo = NULL;
-                    coap_clear_observe(pdu);
-                    DEBUG("gcoap: can't change resource for token\n");
+    if (resource->methods & COAP_OBSERVABLE) {
+        if (coap_get_observe(pdu) == COAP_OBS_REGISTER) {
+            /* lookup remote+token */
+            int empty_slot = _find_obs_memo(&memo, remote, pdu);
+            /* validate re-registration request */
+            if (resource_memo != NULL) {
+                if (memo != NULL) {
+                    if (memo != resource_memo) {
+                        /* reject token already used for a different resource */
+                        memo = NULL;
+                        coap_clear_observe(pdu);
+                        DEBUG("gcoap: can't change resource for token\n");
+                    }
+                    /* otherwise OK to re-register resource with the same token */
                 }
-                /* otherwise OK to re-register resource with the same token */
+                else if (sock_udp_ep_equal(remote, resource_memo->observer)) {
+                    /* accept new token for resource */
+                    memo = resource_memo;
+                }
             }
-            else if (sock_udp_ep_equal(remote, resource_memo->observer)) {
-                /* accept new token for resource */
-                memo = resource_memo;
-            }
-        }
-        /* initialize new registration request */
-        if ((memo == NULL) && coap_has_observe(pdu)) {
-            /* verify resource not already registerered (for another endpoint) */
-            if ((empty_slot >= 0) && (resource_memo == NULL)) {
-                int obs_slot = _find_observer(&observer, remote);
-                /* cache new observer */
-                if (observer == NULL) {
-                    if (obs_slot >= 0) {
-                        observer = &_coap_state.observers[obs_slot];
-                        memcpy(observer, remote, sizeof(sock_udp_ep_t));
-                    } else {
-                        DEBUG("gcoap: can't register observer\n");
+            /* initialize new registration request */
+            if ((memo == NULL) && coap_has_observe(pdu)) {
+                /* verify resource not already registerered (for another endpoint) */
+                if ((empty_slot >= 0) && (resource_memo == NULL)) {
+                    int obs_slot = _find_observer(&observer, remote);
+                    /* cache new observer */
+                    if (observer == NULL) {
+                        if (obs_slot >= 0) {
+                            observer = &_coap_state.observers[obs_slot];
+                            memcpy(observer, remote, sizeof(sock_udp_ep_t));
+                        } else {
+                            DEBUG("gcoap: can't register observer\n");
+                        }
+                    }
+                    if (observer != NULL) {
+                        memo = &_coap_state.observe_memos[empty_slot];
+                        memo->observer = observer;
                     }
                 }
-                if (observer != NULL) {
-                    memo = &_coap_state.observe_memos[empty_slot];
-                    memo->observer = observer;
+                if (memo == NULL) {
+                    coap_clear_observe(pdu);
+                    DEBUG("gcoap: can't register observe memo\n");
                 }
             }
-            if (memo == NULL) {
-                coap_clear_observe(pdu);
-                DEBUG("gcoap: can't register observe memo\n");
+            /* finish registration */
+            if (memo != NULL) {
+                /* resource may be assigned here if it is not already registered */
+                memo->resource = resource;
+                memo->token_len = coap_get_token_len(pdu);
+                if (memo->token_len) {
+                    memcpy(&memo->token[0], pdu->token, memo->token_len);
+                }
+                DEBUG("gcoap: Registered observer for: %s\n", memo->resource->path);
             }
-        }
-        /* finish registration */
-        if (memo != NULL) {
-            /* resource may be assigned here if it is not already registered */
-            memo->resource = resource;
-            memo->token_len = coap_get_token_len(pdu);
-            if (memo->token_len) {
-                memcpy(&memo->token[0], pdu->token, memo->token_len);
-            }
-            DEBUG("gcoap: Registered observer for: %s\n", memo->resource->path);
-        }
 
-    } else if (coap_get_observe(pdu) == COAP_OBS_DEREGISTER) {
-        _find_obs_memo(&memo, remote, pdu);
-        /* clear memo, and clear observer if no other memos */
-        if (memo != NULL) {
-            DEBUG("gcoap: Deregistering observer for: %s\n", memo->resource->path);
-            memo->observer = NULL;
-            memo           = NULL;
-            _find_obs_memo(&memo, remote, NULL);
-            if (memo == NULL) {
-                _find_observer(&observer, remote);
-                if (observer != NULL) {
-                    observer->family = AF_UNSPEC;
+        } else if (coap_get_observe(pdu) == COAP_OBS_DEREGISTER) {
+            _find_obs_memo(&memo, remote, pdu);
+            /* clear memo, and clear observer if no other memos */
+            if (memo != NULL) {
+                DEBUG("gcoap: Deregistering observer for: %s\n", memo->resource->path);
+                memo->observer = NULL;
+                memo           = NULL;
+                _find_obs_memo(&memo, remote, NULL);
+                if (memo == NULL) {
+                    _find_observer(&observer, remote);
+                    if (observer != NULL) {
+                        observer->family = AF_UNSPEC;
+                    }
                 }
             }
+            coap_clear_observe(pdu);
+
+        } else if (coap_has_observe(pdu)) {
+            /* bogus request; don't respond */
+            DEBUG("gcoap: Observe value unexpected: %" PRIu32 "\n", coap_get_observe(pdu));
+            return -1;
         }
+    }
+    else if (coap_has_observe(pdu)) {
+        /* if resource does not accept observe requests, ignore the option */
         coap_clear_observe(pdu);
-
-    } else if (coap_has_observe(pdu)) {
-        /* bogus request; don't respond */
-        DEBUG("gcoap: Observe value unexpected: %" PRIu32 "\n", coap_get_observe(pdu));
-        return -1;
     }
 
     ssize_t pdu_len = resource->handler(pdu, buf, len, resource->context);
