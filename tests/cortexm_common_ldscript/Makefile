@@ -86,10 +86,15 @@ OFFSETS_TESTS = 0x1000 0x2000
 tests-offsets: $(OFFSETS_TESTS:%=test-offset_%)
 
 .PHONY: test-offset_%
+# Match the 'code' section. It is usually '.text' but is '.vector' on `kinetis`.
+# * [ 1] .text             PROGBITS        08001000 001000 001ef8 ...
+# * [ 1] .vector           PROGBITS        00001000 001000 000400 ...
+# So match with the section [ 1] being `PROGBITS`. Adapt if new cases appear.
+CODE_SECTION = \[ 1\] \.[a-zA-Z_.]* *PROGBITS
 test-offset_%: $(BINDIR)/$(APPLICATION)_offset_%.elf
 	$(Q)echo -n "Test compilation with offset $*: "
 	$(Q)\
-	TEST_START_ADDR=$$($(PREFIX)readelf --section-headers $^ 2>/dev/null | awk '/.text/{printf "0x%s\n", $$5}'); \
+	TEST_START_ADDR=$$($(PREFIX)readelf --section-headers $^ 2>/dev/null | awk '/$(CODE_SECTION)/{printf "0x%s\n", $$5}'); \
 	EXPECT_START_ADDR=$$(printf "0x%08x" $$(( $(ROM_START_ADDR) + $* ))); \
 	if test $${TEST_START_ADDR} != $${EXPECT_START_ADDR}; then \
 	  echo "[ERROR] Linker offset not used $${TEST_START_ADDR} != $${EXPECT_START_ADDR}" >&2; \
