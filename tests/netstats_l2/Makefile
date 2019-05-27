@@ -6,9 +6,7 @@ BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 mulle native nrf51dk nrf51don
     esp32-mh-et-live-minikit esp32-olimex-evb \
     esp32-wemos-lolin-d32-pro esp32-wroom-32 esp32-wrover-kit
 
-BOARDS ?= $(shell find $(RIOTBASE)/boards/* -maxdepth 0 -type d \! -name "common" -exec basename {} \;)
-
-BOARD_BLACKLIST := $(filter-out $(BOARD_PROVIDES_NETIF), $(BOARDS))
+BOARD_WHITELIST += $(BOARD_PROVIDES_NETIF)
 
 USEMODULE += shell
 USEMODULE += shell_commands
