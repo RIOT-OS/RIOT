@@ -32,7 +32,7 @@ endif
 export OPENOCD_CONFIG ?= $(RIOTBOARD)/common/frdm/dist/openocd-$(CPU_FAMILY).cfg
 
 # Check the flash configuration field before flashing
-export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield-elf.sh
+export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
 
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
