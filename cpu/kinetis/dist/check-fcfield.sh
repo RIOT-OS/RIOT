@@ -12,7 +12,7 @@
 # @author       Joakim Nohlgård <joakim.nohlgard@eistec.se>
 # @author       Francisco Molina <francisco.molina@inria.fr>
 
-# Elf or Hex file to flash
+# elf, hex or bin file to flash
 FLASHFILE="$1"
 
 # FCFIELD goes from 0x400-0x40f
@@ -49,12 +49,19 @@ if [ $# -ne 1 ]; then
     exit 2
 fi
 
-if ! filter_fc_field ${FLASHFILE} ${FCFIELD_AWK_REGEX} | grep -q "${EXPECTED_FCFIELD}"; then
+if [ $(printf '%d' "${IMAGE_OFFSET}") -ge $(printf '%d' "${FCFIELD_END}") ]; then
+    echo "Value in fcfield is not checked when flashing at \$IMAGE_OFFSET >= 0x410"
+    exit 0
+elif [ 0 -lt $(printf '%d' "${IMAGE_OFFSET}") ] && [ $(printf '%d' "${IMAGE_OFFSET}") -lt $(printf '%d' "${FCFIELD_END}") ]; then
+    echo "Error: flashing with 0 < \$IMAGE_OFFSET < 0x410 is currently not handled"
+    exit 1
+elif ! filter_fc_field ${FLASHFILE} ${FCFIELD_AWK_REGEX} | grep -q "${EXPECTED_FCFIELD}"; then
     echo "Danger of bricking the device during flash!"
     echo "Flash configuration field of ${FLASHFILE}:"
     get_fc_field ${FLASHFILE}
     echo "Abort flash procedure!"
     exit 1
 fi
+
 echo "${FLASHFILE} is not locked."
 exit 0
