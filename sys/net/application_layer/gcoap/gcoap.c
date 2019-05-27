@@ -923,7 +923,7 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
             size_t path_len = strlen(resource->path);
             if (out) {
                 /* only add new resources if there is space in the buffer */
-                if ((pos + path_len + 3) > maxlen) {
+                if ((pos + path_len + (resource->methods & COAP_OBSERVABLE ? 7 : 3)) > maxlen) {
                     break;
                 }
                 if (pos) {
@@ -933,9 +933,16 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
                 memcpy(&out[pos], resource->path, path_len);
                 pos += path_len;
                 out[pos++] = '>';
+
+                /* if the resource is observable inform it */
+                if (resource->methods & COAP_OBSERVABLE) {
+                    memcpy(&out[pos], ";obs", 4);
+                    pos += 4;
+                }
             }
             else {
                 pos += (pos) ? 3 : 2;
+                pos += (resource->methods & COAP_OBSERVABLE) ? 4 : 0;
                 pos += path_len;
             }
             ++resource;
