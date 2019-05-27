@@ -923,7 +923,7 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
             size_t path_len = strlen(resource->path);
             if (out) {
                 /* only add new resources if there is space in the buffer */
-                if ((pos + path_len + (resource->methods & COAP_OBSERVABLE ? 7 : 3)) > maxlen) {
+                if ((pos + path_len + ((resource->methods & COAP_OBSERVABLE) ? 7 : 3)) > maxlen) {
                     break;
                 }
                 if (pos) {
