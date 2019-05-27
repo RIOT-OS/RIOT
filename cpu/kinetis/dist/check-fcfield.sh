@@ -28,6 +28,8 @@ get_fc_field()
 {
     if [ ${1##*.} = elf ]; then
         arm-none-eabi-objdump -j.fcfield -s "${1}"
+    elif [ ${1##*.} = bin ]; then
+        arm-none-eabi-objdump --start-address=${FCFIELD_START} --stop-address=${FCFIELD_END} -bbinary -marm ${1} -s
     elif [ ${1##*.} = hex ]; then
         arm-none-eabi-objdump --start-address=${FCFIELD_START} --stop-address=${FCFIELD_END} ${1} -s
     else
