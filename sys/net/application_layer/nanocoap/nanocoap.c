@@ -260,16 +260,20 @@ size_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
                             uint8_t **start)
 {
     uint8_t *opt_pos = (uint8_t*)pkt->hdr + (opt->offset == 0 ? sizeof(coap_hdr_t) + coap_get_token_len(pkt) : opt->offset);
-    int opt_len;
+    int opt_len = -1;
     uint16_t delta;
 
     *start = _parse_option(pkt, opt_pos, &delta, &opt_len);
 
-    if (start != NULL) {
+    if (opt_len >= 0) {
         opt->opt_num += delta;
         opt->offset = *start + opt_len - (uint8_t*)pkt->hdr;
         return opt_len;
     } else {
+        // Terminal condition that can either be caused by reaching the end of
+        // the options (if there is no payload marker), or by reaching the
+        // payload marker
+        *start = 0;
         return 0;
     }
 }
