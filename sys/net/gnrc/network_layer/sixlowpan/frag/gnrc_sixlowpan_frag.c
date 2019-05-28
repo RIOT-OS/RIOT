@@ -329,6 +329,19 @@ uint16_t gnrc_sixlowpan_frag_next_tag(void)
     return (++_current_tag);
 }
 
+void gnrc_sixlowpan_frag_rbuf_base_rm(gnrc_sixlowpan_rbuf_base_t *entry)
+{
+    while (entry->ints != NULL) {
+        gnrc_sixlowpan_rbuf_int_t *next = entry->ints->next;
+
+        entry->ints->start = 0;
+        entry->ints->end = 0;
+        entry->ints->next = NULL;
+        entry->ints = next;
+    }
+    entry->datagram_size = 0;
+}
+
 void gnrc_sixlowpan_frag_rbuf_gc(void)
 {
     rbuf_gc();
@@ -337,7 +350,7 @@ void gnrc_sixlowpan_frag_rbuf_gc(void)
 void gnrc_sixlowpan_frag_rbuf_remove(gnrc_sixlowpan_rbuf_t *rbuf)
 {
     assert(rbuf != NULL);
-    rbuf_rm((rbuf_t *)rbuf);
+    rbuf_rm(rbuf);
 }
 
 void gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(gnrc_sixlowpan_rbuf_t *rbuf,
@@ -345,11 +358,11 @@ void gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(gnrc_sixlowpan_rbuf_t *rbuf
 {
     assert(rbuf);
     assert(netif_hdr);
-    if (rbuf->current_size == rbuf->pkt->size) {
-        gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(rbuf->src,
-                                                     rbuf->src_len,
-                                                     rbuf->dst,
-                                                     rbuf->dst_len);
+    if (rbuf->super.current_size == rbuf->pkt->size) {
+        gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(rbuf->super.src,
+                                                     rbuf->super.src_len,
+                                                     rbuf->super.dst,
+                                                     rbuf->super.dst_len);
 
         if (netif == NULL) {
             DEBUG("6lo rbuf: error allocating netif header\n");

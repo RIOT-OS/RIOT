@@ -556,7 +556,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     uint16_t payload_len;
     if (rbuf != NULL) {
         /* for a fragmented datagram we know the overall length already */
-        payload_len = (uint16_t)(rbuf->pkt->size - sizeof(ipv6_hdr_t));
+        payload_len = (uint16_t)(rbuf->super.datagram_size - sizeof(ipv6_hdr_t));
     }
     else {
         /* set IPv6 header payload length field to the length of whatever is left
@@ -577,7 +577,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
            ((uint8_t *)sixlo->data) + payload_offset,
            sixlo->size - payload_offset);
     if (rbuf != NULL) {
-        rbuf->current_size += (uncomp_hdr_len - payload_offset);
+        rbuf->super.current_size += (uncomp_hdr_len - payload_offset);
         gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(rbuf, netif_hdr);
     }
     else {
