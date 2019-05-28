@@ -14,6 +14,7 @@
  * @brief       Default configuration for ADCXX1C devices
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @}
  */
 
 #ifndef ADCXX1C_PARAMS_H
@@ -28,34 +29,56 @@ extern "C" {
 #endif
 
 /**
- * @name    Set default configuration parameters for the ADCXX1C driver
+ * @defgroup drivers_adcxx1c_conf   ADCXX1C driver compile configurations
+ * @ingroup drivers_adcxx1c
+ * @ingroup config
  * @{
  */
+
+/** @brief  I2C device to use */
 #ifndef ADCXX1C_PARAM_I2C
 #define ADCXX1C_PARAM_I2C        (I2C_DEV(0))
 #endif
+
+/** @brief  I2C address */
 #ifndef ADCXX1C_PARAM_ADDR
 #define ADCXX1C_PARAM_ADDR       (ADCXX1C_I2C_ADDRESS)
 #endif
+
+/** @brief  Resolution in bits */
 #ifndef ADCXX1C_PARAM_BITS
 #define ADCXX1C_PARAM_BITS       (ADCXX1C_RES_DEFAULT)
 #endif
+
+/** @brief  Conversion interval */
 #ifndef ADCXX1C_PARAM_CYCLE
 #define ADCXX1C_PARAM_CYCLE      (ADCXX1C_CYCLE_DISABLED)
 #endif
+
+/** @brief  Alert gpio pin */
 #ifndef ADCXX1C_PARAM_ALERT_PIN
 #define ADCXX1C_PARAM_ALERT_PIN  (GPIO_UNDEF)
 #endif
+
+/** @brief  Low limit for the alert */
 #ifndef ADCXX1C_PARAM_LOW_LIMIT
 #define ADCXX1C_PARAM_LOW_LIMIT  (0)
 #endif
+
+/** @brief  High limit for the alert */
 #ifndef ADCXX1C_PARAM_HIGH_LIMIT
 #define ADCXX1C_PARAM_HIGH_LIMIT (0)
 #endif
+
+/** @brief  Hysteresis for the alert */
 #ifndef ADCXX1C_PARAM_HYSTERESIS
 #define ADCXX1C_PARAM_HYSTERESIS (0)
 #endif
+/** @} */
 
+/**
+ * @brief   ADCXX1C driver configuration structures
+ */
 #ifndef ADCXX1C_PARAMS
 #define ADCXX1C_PARAMS          { .i2c        = ADCXX1C_PARAM_I2C,        \
                                   .addr       = ADCXX1C_PARAM_ADDR,       \
@@ -66,10 +89,13 @@ extern "C" {
                                   .high_limit = ADCXX1C_PARAM_HIGH_LIMIT, \
                                   .hysteresis = ADCXX1C_PARAM_HYSTERESIS }
 #endif
+
+/**
+ * @brief   ADCXX1C driver SAUL registry information structures
+ */
 #ifndef ADCXX1C_SAUL_INFO
 #define ADCXX1C_SAUL_INFO       { .name = "adcxx1c" }
 #endif
-/** @} */
 
 /**
  * @brief   ADCXX1C configuration
@@ -93,4 +119,3 @@ static const saul_reg_info_t adcxx1c_saul_info[] =
 #endif
 
 #endif /* ADCXX1C_PARAMS_H */
-/** @} */
