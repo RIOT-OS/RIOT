@@ -19,9 +19,8 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
-#include "tests-spiffs.h"
 
 /* Define MTD_0 in board.h to use the board mtd if any */
 #ifdef MTD_0
@@ -435,7 +434,7 @@ static void tests_spiffs_partition(void)
 #endif
 }
 
-Test *tests_spiffs_tests(void)
+Test *tests_spiffs(void)
 {
 #ifndef MTD_0
     memset(dummy_memory, 0xff, sizeof(dummy_memory));
@@ -457,8 +456,11 @@ Test *tests_spiffs_tests(void)
     return (Test *)&spiffs_tests;
 }
 
-void tests_spiffs(void)
+int main(void)
 {
-    TESTS_RUN(tests_spiffs_tests());
+    TESTS_START();
+    TESTS_RUN(tests_spiffs());
+    TESTS_END();
+    return 0;
 }
 /** @} */
