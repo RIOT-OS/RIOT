@@ -397,18 +397,8 @@ ifneq (,$(filter stdio_rtt,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter shell,$(USEMODULE)))
-  ifneq (,$(filter stdio_uart,$(USEMODULE)))
-    USEMODULE += stdio_uart_rx
-  endif
-endif
-
-ifneq (,$(filter stdio_uart_rx,$(USEMODULE)))
-  USEMODULE += isrpipe
-  USEMODULE += stdio_uart
-endif
-
 ifneq (,$(filter stdio_uart,$(USEMODULE)))
+  USEMODULE += isrpipe
   FEATURES_REQUIRED += periph_uart
 endif
 
