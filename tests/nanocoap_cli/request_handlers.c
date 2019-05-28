@@ -113,7 +113,7 @@ error:
 /* must be sorted by path (ASCII order) */
 const coap_resource_t coap_resources[] = {
     COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER,
-    { "/req-opts", COAP_GET, _reqopts_handler, NULL },
+    { "/req-opts", COAP_GET | COAP_POST, _reqopts_handler, NULL },
     { "/value", COAP_GET | COAP_PUT | COAP_POST, _value_handler, NULL },
 };
 
