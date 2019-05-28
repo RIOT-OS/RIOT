@@ -3,8 +3,8 @@ export CPU = cc430
 export CPU_MODEL = cc430f6137
 
 # flasher configuration
-export FLASHER = mspdebug
-export FFLAGS = rf2500 "prog $(HEXFILE)"
+FLASHER = mspdebug
+FFLAGS = rf2500 "prog $(HEXFILE)"
 
 INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include
 

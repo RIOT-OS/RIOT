@@ -7,12 +7,12 @@ PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-export FLASHER = dfu-util
-export DEBUGGER = # spark core has no debugger
-export RESET = # dfu-util has no support for resetting the device
+FLASHER = dfu-util
+DEBUGGER = # spark core has no debugger
+RESET = # dfu-util has no support for resetting the device
 
 HEXFILE = $(BINFILE)
-export FFLAGS = -d 1d50:607f -a 0 -s 0x08005000:leave -D "$(HEXFILE)"
+FFLAGS = -d 1d50:607f -a 0 -s 0x08005000:leave -D "$(HEXFILE)"
 
 # Skip the space needed by the embedded bootloader
 export ROM_OFFSET ?= 0x5000

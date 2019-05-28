@@ -15,24 +15,24 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 include $(RIOTMAKE)/tools/renode.inc.mk
 
 # debugger config
-export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
-export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
-export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+DEBUGSERVER = JLinkGDBServer -device CC2538SF53
+RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 
 # Define the flash-tool and default port:
 export PROGRAMMER ?= cc2538-bsl
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
-  export FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
-  export FFLAGS  = -p "$(PORT)" -e -w -v $(FLASHFILE)
+  FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
+  FFLAGS  = -p "$(PORT)" -e -w -v $(FLASHFILE)
 else ifeq ($(PROGRAMMER),jlink)
-  export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-  export FFLAGS  = $(BINDIR) $(FLASHFILE)
+  FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+  FFLAGS  = $(BINDIR) $(FLASHFILE)
 endif
 
 OFLAGS = --gap-fill 0xff
 FLASHFILE ?= $(BINFILE)
-export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
-export RESET_FLAGS = $(BINDIR)
+DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
+RESET_FLAGS = $(BINDIR)
 
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb

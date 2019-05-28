@@ -10,18 +10,18 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup flash tool
 export PROGRAMMER ?= olimex
-export MSPDEBUGFLAGS += -j $(PROGRAMMER)
+MSPDEBUGFLAGS += -j $(PROGRAMMER)
 ifeq ($(strip $(PROGRAMMER)),uif)
-  export MSPDEBUGFLAGS += -d $(PORT)
+  MSPDEBUGFLAGS += -d $(PORT)
 endif
-export FLASHER ?= mspdebug
-export FFLAGS = $(MSPDEBUGFLAGS) "prog $(HEXFILE)"
+FLASHER ?= mspdebug
+FFLAGS = $(MSPDEBUGFLAGS) "prog $(HEXFILE)"
 
 # setup debugger
-export DEBUGSERVER = $(FLASHER)
-export DEBUGSERVER_FLAGS = $(MSPDEBUGFLAGS) gdb
-export DEBUGGER = $(PREFIX)gdb
-export DEBUGGER_FLAGS = --tui --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(ELFFILE)
+DEBUGSERVER = $(FLASHER)
+DEBUGSERVER_FLAGS = $(MSPDEBUGFLAGS) gdb
+DEBUGGER = $(PREFIX)gdb
+DEBUGGER_FLAGS = --tui --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(ELFFILE)
 
 # export common msb-430 includes
 export INCLUDES += -I$(RIOTBOARD)/common/msb-430/include

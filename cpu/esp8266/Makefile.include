@@ -131,22 +131,22 @@ LINKFLAGS += -Wl,--warn-unresolved-symbols
 
 # configure preflasher to convert .elf to .bin before flashing
 FLASH_SIZE = -fs 8m
-export PREFLASHER ?= esptool.py
-export PREFFLAGS  ?= elf2image $(FLASH_SIZE) $(ELFFILE)
-export FLASHDEPS  ?= preflash
+PREFLASHER ?= esptool.py
+PREFFLAGS  ?= elf2image $(FLASH_SIZE) $(ELFFILE)
+FLASHDEPS  ?= preflash
 
 # flasher configuration
 ifeq ($(QEMU), 1)
-    export FLASHER = cat
-    export FFLAGS += $(ELFFILE)-0x00000.bin /dev/zero | head -c $$((0x10000)) | cat -
-    export FFLAGS += $(ELFFILE)-0x10000.bin /dev/zero | head -c $$((0xfc000)) | cat -
-    export FFLAGS += $(RIOTCPU)/$(CPU)/bin/esp_init_data_default.bin > $(ELFFILE).bin
+    FLASHER = cat
+    FFLAGS += $(ELFFILE)-0x00000.bin /dev/zero | head -c $$((0x10000)) | cat -
+    FFLAGS += $(ELFFILE)-0x10000.bin /dev/zero | head -c $$((0xfc000)) | cat -
+    FFLAGS += $(RIOTCPU)/$(CPU)/bin/esp_init_data_default.bin > $(ELFFILE).bin
 else
     FLASH_MODE ?= dout
     export PROGRAMMER_SPEED ?= 460800
-    export FLASHER = esptool.py
-    export FFLAGS += -p $(PORT) -b $(PROGRAMMER_SPEED) write_flash
-    export FFLAGS += -fm $(FLASH_MODE)
-    export FFLAGS += 0 $(ELFFILE)-0x00000.bin
-    export FFLAGS += 0x10000 $(ELFFILE)-0x10000.bin; esptool.py -p $(PORT) run
+    FLASHER = esptool.py
+    FFLAGS += -p $(PORT) -b $(PROGRAMMER_SPEED) write_flash
+    FFLAGS += -fm $(FLASH_MODE)
+    FFLAGS += 0 $(ELFFILE)-0x00000.bin
+    FFLAGS += 0x10000 $(ELFFILE)-0x10000.bin; esptool.py -p $(PORT) run
 endif

@@ -16,19 +16,19 @@ ifeq ($(PROGRAMMER),cc2538-bsl)
   else ifeq ($(OS),Darwin)
     PORT_BSL ?= $(PORT_DARWIN)
   endif
-  export FLASHER = $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
-  export FFLAGS  = -p "$(PORT_BSL)" --bootloader-invert-lines -e -w -v -b 460800 $(FLASHFILE)
+  FLASHER = $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
+  FFLAGS  = -p "$(PORT_BSL)" --bootloader-invert-lines -e -w -v -b 460800 $(FLASHFILE)
 else ifeq ($(PROGRAMMER),jlink)
-  export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-  export FFLAGS  = $(BINDIR) $(FLASHFILE)
-  export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
-  export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
-  export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+  FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+  FFLAGS  = $(BINDIR) $(FLASHFILE)
+  DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+  DEBUGSERVER = JLinkGDBServer -device CC2538SF53
+  RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 endif
 
 FLASHFILE ?= $(BINFILE)
-export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
-export RESET_FLAGS = $(BINDIR)
+DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
+RESET_FLAGS = $(BINDIR)
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
 # setup serial terminal

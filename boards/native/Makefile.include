@@ -35,13 +35,13 @@ else
 endif
 
 ifeq ($(shell uname -s),Darwin)
-  export DEBUGGER ?= lldb
+  DEBUGGER ?= lldb
 else
-  export DEBUGGER ?= gdb
+  DEBUGGER ?= gdb
 endif
 
 TERMPROG ?= $(ELFFILE)
-export FLASHER = true
+FLASHER = true
 export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
@@ -104,9 +104,9 @@ TERMFLAGS := $(PORT) $(TERMFLAGS)
 
 export ASFLAGS =
 ifeq ($(shell basename $(DEBUGGER)),lldb)
-  export DEBUGGER_FLAGS = -- $(ELFFILE) $(TERMFLAGS)
+  DEBUGGER_FLAGS = -- $(ELFFILE) $(TERMFLAGS)
 else
-  export DEBUGGER_FLAGS = -q --args $(ELFFILE) $(TERMFLAGS)
+  DEBUGGER_FLAGS = -q --args $(ELFFILE) $(TERMFLAGS)
 endif
 term-valgrind: export VALGRIND_FLAGS ?= \
 	--leak-check=full \

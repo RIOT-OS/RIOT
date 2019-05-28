@@ -69,8 +69,8 @@ export WERROR                # Treat all compiler warnings as errors if set to 1
 
 export GITCACHE              # path to git-cache executable
 export GIT_CACHE_DIR         # path to git-cache cache directory
-export FLASHER               # The command to call on "make flash".
-export FFLAGS                # The parameters to supply to FLASHER.
+# FLASHER                    # The command to call on "make flash".
+# FFLAGS                     # The parameters to supply to FLASHER.
 export FLASH_ADDR            # Define an offset to flash code into ROM memory.
 # TERMPROG                   # The command to call on "make term".
 # TERMFLAGS                  # Additional parameters to supply to TERMPROG.
@@ -78,12 +78,12 @@ export PORT                  # The port to connect the TERMPROG to.
 export ELFFILE               # The unstripped result of the compilation.
 export HEXFILE               # The stripped result of the compilation.
 # FLASHFILE                  # The output file used for flashing (transition phase: only if defined)
-export DEBUGGER              # The command to call on "make debug", usually a script starting the GDB front-end.
-export DEBUGGER_FLAGS        # The parameters to supply to DEBUGGER.
-export DEBUGSERVER           # The command to call on "make debug-server", usually a script starting the GDB server.
-export DEBUGSERVER_FLAGS     # The parameters to supply to DEBUGSERVER.
-export RESET                 # The command to call on "make reset", this command resets/reboots the target.
-export RESET_FLAGS           # The parameters to supply to RESET.
+# DEBUGGER                   # The command to call on "make debug", usually a script starting the GDB front-end.
+# DEBUGGER_FLAGS             # The parameters to supply to DEBUGGER.
+# DEBUGSERVER                # The command to call on "make debug-server", usually a script starting the GDB server.
+# DEBUGSERVER_FLAGS          # The parameters to supply to DEBUGSERVER.
+# RESET                      # The command to call on "make reset", this command resets/reboots the target.
+# RESET_FLAGS                # The parameters to supply to RESET.
 
 export CCACHE_BASEDIR        # ccache basedir, allows multiple riot build
                              # directories to share a ccache directory
