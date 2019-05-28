@@ -60,7 +60,7 @@ NATIVE_FLAGS += $(PORT)  # Flags to the native executable
 
 # checkout the "sigint" flags. Without it ctrl-c just exits socat, which breaks
 # the pipe on the RIOT executable causing SIGPIPE and a dirty exit.
-SOCAT_REMOTE = exec:"$(NATIVE_EXEC) $(NATIVE_FLAGS)",sigint $(PORT)
+SOCAT_REMOTE = exec:"$(NATIVE_EXEC) $(NATIVE_FLAGS)",sigint,pty $(PORT)
 
 include $(RIOTMAKE)/tools/serial.inc.mk
 
