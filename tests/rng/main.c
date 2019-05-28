@@ -260,7 +260,7 @@ static int cmd_speed(int argc, char **argv)
 int main(void)
 {
     puts("Starting shell...");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    static char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
