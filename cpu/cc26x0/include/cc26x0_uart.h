@@ -72,9 +72,8 @@ typedef struct {
 #define UART_FR_RXFF            0x40
 #define UART_FR_TXFE            0x80
 
-#define UART_LCRH_PEN           0x1
-#define UART_LCRH_EPS           0x2
-#define UART_LCRH_RXFE          0x4
+#define UART_LCRH_PEN           0x2
+#define UART_LCRH_EPS           0x4
 #define UART_LCRH_STP2          0x8
 #define UART_LCRH_FEN           0x10
 #define UART_LCRH_WLEN_mask     0x60

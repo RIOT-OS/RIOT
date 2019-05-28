@@ -21,6 +21,7 @@
 
 #include "cpu.h"
 #include "periph/uart.h"
+#include "periph_conf.h"
 
 /**
  * @brief   Bit mask for the fractional part of the baudrate
@@ -90,6 +91,47 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     return UART_OK;
 }
+
+
+#ifdef MODULE_PERIPH_UART_MODECFG
+int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
+              uart_stop_bits_t stop_bits)
+{
+    assert(data_bits == UART_DATA_BITS_5 ||
+           data_bits == UART_DATA_BITS_6 ||
+           data_bits == UART_DATA_BITS_7 ||
+           data_bits == UART_DATA_BITS_8);
+
+    assert(parity == UART_PARITY_NONE ||
+           parity == UART_PARITY_EVEN ||
+           parity == UART_PARITY_ODD ||
+           parity == UART_PARITY_MARK ||
+           parity == UART_PARITY_SPACE);
+
+    assert(stop_bits == UART_STOP_BITS_1 ||
+           stop_bits == UART_STOP_BITS_2);
+
+    /* make sure the uart device is valid */
+    if (uart != 0) {
+        return UART_NODEV;
+    }
+
+    /* cc26x0 does not support mark or space parity */
+    if (parity == UART_PARITY_MARK || parity == UART_PARITY_SPACE) {
+        return UART_NOMODE;
+    }
+
+    /* Disable UART and clear old settings */
+    UART->CTL = 0;
+    UART->LCRH = 0;
+
+    /* Apply setting and enable UART */
+    UART->LCRH = data_bits | parity | stop_bits;
+    UART->CTL = ENABLE_MASK;
+
+    return UART_OK;
+}
+#endif
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
