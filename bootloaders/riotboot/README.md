@@ -46,19 +46,9 @@ Also note that, if no slot is available with a valid checksum,
 no image will be booted and the bootloader will enter `while(1);` endless loop.
 
 # Requirements
-A board capable to use riotboot must meet the following requirements:
-
-  - Embed a Cortex-M0+/3/4/7 processor
-  - Provide the variables `ROM_START_ADDR` and `ROM_LEN`
-  - Use cpu/cortexm_common/ldscripts/cortexm.ld ld script
-  - Pass the cortexm_common_ldscript test in tests/
-  - Being able to execute startup code at least twice (`board_init()`)
-  - Declare `FEATURES_PROVIDED += riotboot` to pull the right dependencies
-  - Being able to flash binary files, if integration with the build
-    system is required for flashing
-
-The above requirements are usually met if the board succeeds to execute
-the riotboot test in tests/.
+Try to compile and run tests/riotboot. If the test succeeds, your board is
+supported. Else you can try to port rioboot to your board (see the below
+porting guide).
 
 # Single Slot
 Just compile your application using the target `riotboot`. The header
@@ -108,3 +98,43 @@ To test building, flashing and booting the first slot:
 For the second slot:
 
 `BOARD=samr21-xpro APP_VER=$(date +%s) make -C tests/riotboot/ riotboot/flash-slot1 test`
+
+# Quick riotboot porting guide
+
+Your board is not supported yet? Try to port riotboot!
+
+## Porting to a board based on am Arm Cortex-M0+/3/4/7 MCU
+
+Extending riotboot to support another board with a Cortex-M0+/3/4/7
+microcontroller is rather straightforward. You need to:
+
+  - Provide the variables `ROM_START_ADDR` and `ROM_LEN` as well as
+`RAM_LEN` and `RAM_START_ADDR`
+  - Adapt the linker scripts for your cpu to pass the test tests/cortexm_common_ldscript.
+To get an idea how to comply with cpu/cortexm_common/ldscrpts/cortexm.ld
+you might want to take a look how is it done for stm32 or sam0 CPU families.
+  - Make the startup code `board_init()` idempotent,
+i.e. whether you execute it once, or twice, it works all the same.
+  - Adapt the flasher script to support .bin flashing with an offset (if `make flash`
+integration is desired, and .bin flashing with offset is not supported yet). To get an idea, you can look at makefiles/tools/edbg.inc.mk
+  - Declare `FEATURES_PROVIDED += riotboot` to pull the right dependencies
+in your board's Makefile.features
+
+## Porting to a board based on other types of MCUs
+
+More work is necessary, but the approach of riotboot is purposedly kept
+"minimal" in order to minimize this work.
+
+- Provide the functions defined in the header sys/include/riotboot/slot.h, in particular `riotboot_slot_jump(unsigned slot)`.
+- Adapt the linker script to link to different start addresses for the bootloader, and for slot(s) for example `SLOT0_LEN`, `SLOT1_LEN`, and linker script config with `ROM_OFFSET` and `FW_ROM_LEN`. To get an idea, take a look at cpu/cortexm_common/Makefile.include
+- Make the startup code idempotent.
+- Adapt the flasher script to support .bin flashing with an offset. To get an idea, you can look at makefiles/tools/edbg.inc.mk
+- Modify flags e.g. add `FEATURES_PROVIDED += riotboot` in your board's Makefile.features
+
+Additional remarks:
+
+- Check the your board's Flash memory alignment specificities!
+- If your are in  Big-Endian, you may need to further adapt some part of the code.
+
+
+
