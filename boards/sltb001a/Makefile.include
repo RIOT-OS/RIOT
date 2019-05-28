@@ -11,6 +11,7 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup JLink for flashing
 export JLINK_DEVICE := EFR32MG1PxxxF256
+export JLINK_PRE_FLASH = r
 include $(RIOTMAKE)/tools/jlink.inc.mk
 
 # add board common drivers
