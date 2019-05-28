@@ -279,4 +279,21 @@ int netdev_ieee802154_dst_filter(netdev_ieee802154_t *dev, const uint8_t *mhr)
     return 1;
 }
 
+int netdev_ieee802154_data_frame_filter(netdev_ieee802154_t *dev,
+                                        const uint8_t *mhr, size_t frame_len)
+{
+    if (frame_len < IEEE802154_FCF_LEN) {
+        return 1;
+    }
+    size_t expected_len = ieee802154_get_frame_hdr_len(mhr);
+    /* Check lenght data type, length and destination filter */
+    if ((expected_len != 0) &&
+        (frame_len > expected_len) &&
+        ((*mhr & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_DATA) &&
+        (netdev_ieee802154_dst_filter(dev, mhr) == 0)) {
+        return 0;
+    }
+    return 1;
+}
+
 /** @} */

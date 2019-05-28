@@ -192,6 +192,21 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
  */
 int netdev_ieee802154_dst_filter(netdev_ieee802154_t *dev, const uint8_t *mhr);
 
+/**
+ * @brief This function validates a data frame for minimal length and
+ * destination fields. It includes @ref netdev_ieee802154_dst_filter for
+ * validating the destination
+ *
+ * @param[in] dev       network device descriptor
+ * @param[in] mhr       mac header
+ * @param[in] frame_len Length of the frame as indicated by the phy
+ *
+ * @return 0            when the frame is not filtered
+ * @return 1            when the frame is filtered
+ */
+int netdev_ieee802154_data_frame_filter(netdev_ieee802154_t *dev,
+                                        const uint8_t *mhr, size_t frame_len);
+
 #ifdef __cplusplus
 }
 #endif
