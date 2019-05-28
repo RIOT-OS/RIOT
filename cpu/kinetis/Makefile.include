@@ -6,10 +6,17 @@ endif
 
 # "The Vector table must be naturally aligned to a power of two whose alignment
 # value is greater than or equal to number of Exceptions supported x 4"
-# CPU_IRQ_NUMOF for KWxD boards is < 81+16 so (81*4 bytes = 388 bytes ~= 0x200)
+# CPU_IRQ_NUMOF for KWxD and KxF boards is < 102+16 so (81*4 bytes = 472 bytes ~= 0x200)
 # RIOTBOOT_HDR_LEN can be set to 0x200
-ifeq (DW, $(KINETIS_CORE)$(KINETIS_SERIES))
+ifneq (,$(filter FK DW,$(KINETIS_CORE)$(KINETIS_SERIES)))
   RIOTBOOT_HDR_LEN ?= 0x200
+endif
+
+# Slot size is determined by "((total_flash_size - RIOTBOOT_LEN) / 2)".
+# If RIOTBOOT_LEN uses an uneven number of flashpages, the remainder of the
+# flash cannot be divided by two slots while staying FLASHPAGE_SIZE aligned.
+ifeq (K, $(KINETIS_SERIES))
+  RIOTBOOT_LEN ?= 0x2000
 endif
 
 # Add search path for linker scripts
