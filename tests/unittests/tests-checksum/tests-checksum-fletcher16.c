@@ -72,6 +72,19 @@ static void test_checksum_fletcher16_wrap_around(void)
                                           sizeof(wrap_around_data) - 1, expect));
 }
 
+static void test_checksum_fletcher16_multipart(void)
+{
+    static const uint16_t expect = 0xf122;
+    static const size_t half_len = sizeof(wrap_around_data)/2;
+    fletcher16_ctx_t ctx;
+
+    fletcher16_init(&ctx);
+    fletcher16_update(&ctx, wrap_around_data, half_len);
+    fletcher16_update(&ctx, wrap_around_data + half_len,
+                      sizeof(wrap_around_data) - half_len - 1);
+    TEST_ASSERT_EQUAL_INT(expect, fletcher16_finish(&ctx));
+}
+
 Test *tests_checksum_fletcher16_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -79,6 +92,7 @@ Test *tests_checksum_fletcher16_tests(void)
         new_TestFixture(test_checksum_fletcher16_0to1_undetected),
         new_TestFixture(test_checksum_fletcher16_atoe),
         new_TestFixture(test_checksum_fletcher16_wrap_around),
+        new_TestFixture(test_checksum_fletcher16_multipart),
     };
 
     EMB_UNIT_TESTCALLER(checksum_fletcher16_tests, NULL, NULL, fixtures);
