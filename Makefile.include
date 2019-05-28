@@ -141,6 +141,14 @@ ifeq ($(DEVELHELP),1)
   CFLAGS += -DDEVELHELP
 endif
 
+# Override LOG_LEVEL if variable is set and if CFLAGS doesn't already contain
+# a LOG_LEVEL config
+ifdef LOG_LEVEL
+  ifneq (,$(filter -DLOG_LEVEL=%,$(CFLAGS)))
+    CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
+  endif
+endif
+
 # Fail on warnings. Can be overridden by `make WERROR=0`.
 WERROR ?= 1
 export WERROR
