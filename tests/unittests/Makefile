@@ -56,7 +56,6 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              nucleo-l433rc \
                              nz32-sc151 \
                              opencm904 \
-                             openmote \
                              openmote-cc2538 \
                              openmote-b \
                              pba-d-01-kw2x \
