@@ -7,6 +7,13 @@ include ../Makefile.tests_common
 BOARD_WHITELIST += iotlab-a8-m3
 BOARD_WHITELIST += iotlab-m3
 BOARD_WHITELIST += samr21-xpro
+# Normally all boards using `kinetis/ldscripts/kinetis.ld` linkerscript
+BOARD_WHITELIST += frdm-kw41z
+BOARD_WHITELIST += frdm-k64f
+BOARD_WHITELIST += frdm-k22f
+BOARD_WHITELIST += mulle
+BOARD_WHITELIST += pba-d-01-kw2x
+BOARD_WHITELIST += teensy31
 # Boards using a bootloader and ROM_OFFSET by default
 BOARD_WHITELIST += arduino-mkr1000
 BOARD_WHITELIST += arduino-mkrfox1200
