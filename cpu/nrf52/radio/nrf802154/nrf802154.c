@@ -139,19 +139,9 @@ static void _enable_tx(void)
  */
 static bool _data_frame_filter(void)
 {
-    size_t psdu_len = rxbuf[0];
-    if (psdu_len < IEEE802154_FCF_LEN) {
-        return false;
-    }
-    size_t expected_len = ieee802154_get_frame_hdr_len(&rxbuf[1]);
-    if (!expected_len) {
-        return false;
-    }
-    /* Check CRC, data type, length and destination filter */
+    /* Check CRC and data frame filter*/
     return ((NRF_RADIO->CRCSTATUS == 1) &&
-            ((rxbuf[1] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_DATA) &&
-            (psdu_len > expected_len) &&
-            (netdev_ieee802154_dst_filter(&nrf802154_dev,  &rxbuf[1]) == 0));
+            netdev_ieee802154_data_frame_filter(&nrf802154_dev, &rxbuf[1], rxbuf[0]));
 }
 
 static void _set_chan(uint16_t chan)
