@@ -45,7 +45,7 @@
 typedef struct {
     mutex_t *mutex;
     thread_t *thread;
-    int timeout;
+    volatile int timeout;
 } mutex_thread_t;
 
 static void _callback_unlock_mutex(void* arg)
