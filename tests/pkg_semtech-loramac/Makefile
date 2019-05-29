@@ -24,6 +24,7 @@ ifeq (,$(filter $(BOARD),$(BOARD_WITHOUT_LORAMAC_RX)))
   USEMODULE += semtech_loramac_rx
 endif
 
+USEMODULE += auto_init_loramac
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += fmt
