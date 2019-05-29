@@ -35,7 +35,6 @@
 #include <stdarg.h>
 #include "thread.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -53,7 +52,7 @@ extern "C" {
 
 /** Maximum number of syslog clients. A client is a thread identified by its PID. If more than SYSLOG_CLIENTS_NUMOF threads issue a call to openlog it wont succeed */
 #ifndef SYSLOG_CLIENTS_NUMOF
-  #define SYSLOG_CLIENTS_NUMOF (1)
+  #define SYSLOG_CLIENTS_NUMOF (5)
 #endif
 
 /** Set the priority mask up to a priority x. LOG_UPTO(LOG_DEBUG) include all priorities */
@@ -62,7 +61,7 @@ extern "C" {
 #endif
 
 /** Macro to set all bits in a log mask (e. g. enable logging of all priorities) */
-#define LOG_MASK_ALL (LOG_UPTO(LOG_DEBUG))
+#define LOG_MASK_ALL (LOG_UPTO(SYSLOG_DEBUG))
 
 /** Macro to set corresponding bit for a priority in a log bitmask */
 #ifndef LOG_MASK
@@ -116,14 +115,14 @@ enum syslog_facility
  */
 enum syslog_priority
 {
-    LOG_EMERG = 0,
-    LOG_ALERT = 1,
-    LOG_CRIT = 2,
-    LOG_ERR = 3,
-    LOG_WARNING = 4,
-    LOG_NOTICE = 5,
-    LOG_INFO = 6,
-    LOG_DEBUG = 7,
+    SYSLOG_EMERG = 0,
+    SYSLOG_ALERT = 1,
+    SYSLOG_CRIT = 2,
+    SYSLOG_ERR = 3,
+    SYSLOG_WARNING = 4,
+    SYSLOG_NOTICE = 5,
+    SYSLOG_INFO = 6,
+    SYSLOG_DEBUG = 7,
 };
 
 /**

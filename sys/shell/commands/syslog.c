@@ -23,7 +23,7 @@ int _syslog_init(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    openlog("test", 0, LOG_USER);
+    openlog("test", LOG_CONS, LOG_USER);
     return 0;
 }
 
@@ -32,6 +32,6 @@ int _syslog(int argc, char **argv)
     if(argc < 2) {
         return -1;
     }
-    syslog(LOG_EMERG, argv[1], LOG_ERR);
+    syslog(SYSLOG_EMERG, argv[1]);
     return 0;
 }

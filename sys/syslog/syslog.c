@@ -45,7 +45,7 @@ static char addr_str[INET6_ADDRSTRLEN];
 #endif /* MODULE_GNRC_NETIF_IPV6 */
 
 static mutex_t syslog_mutex = MUTEX_INIT;
-static int cfree = -1;
+static int cfree = SYSLOG_CLIENTS_NUMOF;
 kernel_pid_t syslog_pid = -1;
 
 syslog_client_t client[SYSLOG_CLIENTS_NUMOF];
@@ -76,7 +76,9 @@ static char *syslog_get_addr(void) {
 static char *syslog_get_hostname(void) {
 #ifdef CPU_NATIVE
   if(gethostname(hostname, sizeof(hostname)) == 0) {
+    return hostname; //TODO: FIX
     struct hostent *host = gethostbyname(hostname);
+
     if(host) {
       return host->h_name;
     }
@@ -124,28 +126,19 @@ void openlog (const char *ident, int option, int facility) {
     return;
   }
 
-  if (cfree == -1) {
-    DEBUG("openlog: Data structs not initzialized yet\n");
-    memset(client, 0, sizeof(client));
-    cfree = 5;
-    c = &client[0];
-  } else {
-    c = get_client(thread_getpid());
-  }
-
   if(!c) {
     for (int i = 0; i < SYSLOG_CLIENTS_NUMOF; i++)
     {
       if(client[i].pid == 0) {
-        DEBUG("openlog: New client %d\n",i);
+        DEBUG("openlog: New client %d\n", i);
         c = &client[i];
         break;
       }
     }
     cfree--;
   }
-
-  if(!c) {
+  if (!c)
+  {
     assert(false);
   }
   c->opt = option;
@@ -173,21 +166,26 @@ void syslog(int facility_priority, const char *format, ...) {
 void vsyslog(int facility_priority, const char *format, va_list ap) {
   int len = 0, i;
 
-  if(cfree < 0) {
-    DEBUG("vsyslog: syslog not initialized\n");
+  kernel_pid_t pid = thread_getpid();
+  syslog_client_t *c = get_client(pid);
+  if (!c)
+  {
+    #ifdef MODULE_LOG_SYSLOG
+    openlog(thread_getname(pid), LOG_CONS, LOG_USER);
+    c = get_client(pid);
+    #else
+    DEBUG("vsyslog: No client found for pid %d\n",(int)pid);
     return;
+    #endif
   }
-  syslog_client_t *c = get_client(thread_getpid());
-  if(!c) {
-    DEBUG("vsyslog: No client found for pid %d\n",(int)thread_getpid());
-    return;
-  }
+
   if(!LOG_MASK_TEST(c->mask,facility_priority)) {
     DEBUG("vsyslog: LOG_MASK %d bit for %d not set\n",c->mask,LOG_MASK(facility_priority));
     return;
   }
   mutex_lock(&syslog_mutex);
   i = snprintf(c->buf, SYSLOG_MAX_LEN, "<%d> %d - %s %s %d %d ", get_pri_numeric(c->facility, facility_priority), SYSLOG_VERSION, syslog_get_hostname(), c->ident, 0, 0);
+
   if(i<0) {
     DEBUG("vsyslog: Encoding error on writing the header\n");
     mutex_unlock(&syslog_mutex);
