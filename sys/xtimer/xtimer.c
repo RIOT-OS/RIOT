@@ -239,6 +239,15 @@ int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout_ticks)
 
 static void _mutex_timeout(void *arg)
 {
+    /* interupts a disabled because xtimer can spin
+     * if xtimer_set spins the callback is executed
+     * in the thread context
+     *
+     * If the xtimer spin is fixed in the future
+     * interups disable/restore can be removed
+     */
+    unsigned irqstate = irq_disable();
+
     mutex_thread_t *mt = (mutex_thread_t *)arg;
 
     mt->timeout = 1;
@@ -249,6 +258,8 @@ static void _mutex_timeout(void *arg)
     }
     sched_set_status(mt->thread, STATUS_PENDING);
     thread_yield_higher();
+
+    irq_restore(irqstate);
 }
 
 int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
