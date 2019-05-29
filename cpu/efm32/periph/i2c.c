@@ -22,6 +22,7 @@
 
 #include "cpu.h"
 #include "mutex.h"
+#include "byteorder.h"
 
 #include "periph_conf.h"
 #include "periph/i2c.h"
@@ -183,8 +184,15 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length, uint8
 int i2c_read_regs(i2c_t dev, uint16_t address, uint16_t reg,
                   void *data, size_t length, uint8_t flags)
 {
+    uint16_t reg_end = reg;
+
     if (flags & (I2C_NOSTART | I2C_NOSTOP)) {
         return -EOPNOTSUPP;
+    }
+
+    /* Handle endianess of register if 16 bit */
+    if (flags & I2C_REG16) {
+        reg_end = htons(reg); /* Make sure register is in big-endian on I2C bus */
     }
 
     /* prepare transfer */
@@ -192,7 +200,7 @@ int i2c_read_regs(i2c_t dev, uint16_t address, uint16_t reg,
 
     transfer.addr = (address << 1);
     transfer.flags = I2C_FLAG_WRITE_READ | ((flags & I2C_ADDR10) ? I2C_FLAG_10BIT_ADDR : 0);
-    transfer.buf[0].data = (uint8_t *) &reg;
+    transfer.buf[0].data = (uint8_t *) &reg_end;
     transfer.buf[0].len = (flags & I2C_REG16) ? 2 : 1;
     transfer.buf[1].data = (uint8_t *) data;
     transfer.buf[1].len = length;
@@ -222,8 +230,15 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data, size_t length
 int i2c_write_regs(i2c_t dev, uint16_t address, uint16_t reg,
                    const void *data, size_t length, uint8_t flags)
 {
+    uint16_t reg_end = reg;
+
     if (flags & (I2C_NOSTART | I2C_NOSTOP)) {
         return -EOPNOTSUPP;
+    }
+
+    /* Handle endianess of register if 16 bit */
+    if (flags & I2C_REG16) {
+        reg_end = htons(reg); /* Make sure register is in big-endian on I2C bus */
     }
 
     /* prepare transfer */
@@ -231,7 +246,7 @@ int i2c_write_regs(i2c_t dev, uint16_t address, uint16_t reg,
 
     transfer.addr = (address << 1);
     transfer.flags = I2C_FLAG_WRITE_WRITE | ((flags & I2C_ADDR10) ? I2C_FLAG_10BIT_ADDR : 0);
-    transfer.buf[0].data = (uint8_t *) &reg;
+    transfer.buf[0].data = (uint8_t *) &reg_end;
     transfer.buf[0].len = (flags & I2C_REG16) ? 2 : 1;
     transfer.buf[1].data = (uint8_t *) data;
     transfer.buf[1].len = length;
