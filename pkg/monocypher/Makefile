@@ -1,6 +1,6 @@
 PKG_NAME=monocypher
 PKG_URL=https://github.com/LoupVaillant/Monocypher
-PKG_VERSION=6c2edbb48a61f43452c48c5f1e3ddabb19af3111
+PKG_VERSION=d9cc2aea29158971ed4b7dc074efdcb35e7183d5
 PKG_LICENSE=CC-0
 
 .PHONY: all
