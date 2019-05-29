@@ -11,30 +11,25 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-nano \
                              arduino-uno \
                              arduino-zero \
-                             avsextrem \
                              b-l072z-lrwan1 \
                              blackpill \
                              bluepill \
                              calliope-mini \
-                             cc2538dk \
                              cc2650-launchpad \
                              cc2650stk \
                              chronos \
                              ek-lm4f120xl \
                              feather-m0 \
-                             firefly \
                              hamilton \
                              i-nucleo-lrwan1 \
                              ikea-tradfri \
                              limifrog-v1 maple-mini \
                              lobaro-lorabox \
                              lsn50 \
-                             mbed_lpc1768 \
                              mega-xplained \
                              microbit \
                              msb-430 \
                              msb-430h \
-                             msba2 \
                              nrf51dk \
                              nrf51dongle \
                              nrf6310 \
@@ -56,20 +51,13 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              nucleo-l433rc \
                              nz32-sc151 \
                              opencm904 \
-                             openmote \
-                             openmote-cc2538 \
-                             openmote-b \
                              pba-d-01-kw2x \
-                             remote-pa \
-                             remote-reva \
-                             remote-revb \
                              saml10-xpro \
                              saml11-xpro \
                              saml21-xpro \
                              samd21-xpro \
                              samr21-xpro \
                              samr30-xpro \
-                             seeeduino_arch-pro \
                              sensebox_samd21 \
                              slstk3401a \
                              sltb001a \
