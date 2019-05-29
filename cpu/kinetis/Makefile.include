@@ -27,12 +27,6 @@ CFLAGS += \
   -DKINETIS_ROMSIZE=$(KINETIS_ROMSIZE) \
   #
 
-LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_start_addr=$(ROM_START_ADDR)
-LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_base_addr=$(RAM_BASE_ADDR)
-LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_start_addr=$(RAM_START_ADDR)
-LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_length=$(ROM_LEN)
-LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_length=$(RAM_LEN)
-
 # add the CPU specific flash configuration field for the linker
 export UNDEF += $(BINDIR)/cpu/fcfield.o
 
