@@ -42,12 +42,17 @@
 
 /* ======================== 'searchers' functions =========================== */
 
+/* A null address for table_len means the weak symbol was not overridden */
+#define _SEARCH_BUILTINS(table, len, sname) \
+    ((&(len) == NULL)? NULL : BINSEARCH_STR_P((table), (len), name, (sname), \
+                                              LUAR_MAX_MODULE_NAME))
+
 static int _ll_searcher_builtin_lua(lua_State *L, const char *name)
 {
     const struct lua_riot_builtin_lua *lmodule =
-        BINSEARCH_STR_P(lua_riot_builtin_lua_table,
-                        lua_riot_builtin_lua_table_len,
-                        name, name, LUAR_MAX_MODULE_NAME);
+        _SEARCH_BUILTINS(lua_riot_builtin_lua_table,
+                         lua_riot_builtin_lua_table_len,
+                         name);
 
     if (lmodule != NULL) {
         int load_result = luaL_loadbuffer(L, (const char *)lmodule->code,
@@ -90,9 +95,9 @@ static int searcher_builtin_lua(lua_State *L)
 static int _ll_searcher_builtin_c(lua_State *L, const char *name)
 {
     const struct lua_riot_builtin_c *cmodule =
-        BINSEARCH_STR_P(lua_riot_builtin_c_table,
-                        lua_riot_builtin_c_table_len,
-                        name, name, LUAR_MAX_MODULE_NAME);
+        _SEARCH_BUILTINS(lua_riot_builtin_c_table,
+                         lua_riot_builtin_c_table_len,
+                         name);
 
     if (cmodule != NULL) {
         lua_pushcfunction(L, cmodule->luaopen);
