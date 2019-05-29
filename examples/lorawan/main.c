@@ -74,9 +74,6 @@ static void _send_message(void)
         printf("Cannot send message '%s', ret code: %d\n", message, ret);
         return;
     }
-    /* The send was successfully scheduled, now wait until the send cycle has
-       completed and a reply is received from the MAC */
-    semtech_loramac_recv(&loramac);
 }
 
 static void *sender(void *arg)
