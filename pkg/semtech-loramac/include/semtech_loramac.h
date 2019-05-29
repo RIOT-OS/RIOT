@@ -99,6 +99,7 @@ typedef struct {
     uint8_t port;                                /**< RX port */
 } semtech_loramac_rx_data_t;
 
+#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
 /**
  * @brief   LoRaMAC link check information
  */
@@ -106,6 +107,7 @@ typedef struct {
     uint8_t demod_margin;                        /**< Demodulation margin */
     uint8_t nb_gateways;                         /**< number of LoRa gateways found */
 } semtech_loramac_link_check_info_t;
+#endif
 
 /**
  * @brief   Semtech LoRaMAC descriptor
@@ -113,7 +115,9 @@ typedef struct {
 typedef struct {
     mutex_t lock;                                /**< loramac access lock */
     uint8_t tx_pid;                              /**< pid of sender thread */
+#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
     uint8_t rx_pid;                              /**< pid of receiver thread */
+#endif
     uint8_t port;                                /**< application TX port */
     uint8_t cnf;                                 /**< enable/disable confirmable messages */
     uint8_t deveui[LORAMAC_DEVEUI_LEN];          /**< device EUI */
@@ -122,8 +126,10 @@ typedef struct {
     uint8_t appskey[LORAMAC_APPSKEY_LEN];        /**< application session key */
     uint8_t nwkskey[LORAMAC_NWKSKEY_LEN];        /**< network session key */
     uint8_t devaddr[LORAMAC_DEVADDR_LEN];        /**< device address */
+#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
     semtech_loramac_rx_data_t rx_data;           /**< struct handling the RX data */
     semtech_loramac_link_check_info_t link_chk;  /**< link check information */
+#endif
 } semtech_loramac_t;
 
 /**
@@ -172,6 +178,7 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type);
  */
 uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len);
 
+#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
 /**
  * @brief   Wait for a message sent by the LoRaWAN network
  *
@@ -184,6 +191,9 @@ uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
  * Be sure to call this function before the end of the RX windows otherwise it
  * may block the calling thread.
  *
+ * By default this feature is not available to the user application, enable it
+ * by adding `USEMODULE += semtech_loramac_rx` to the application Makefile.
+ *
  * @see semtech_loramac_send
  *
  * @param[in] mac          Pointer to the mac
@@ -193,13 +203,19 @@ uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
  * @return SEMTECH_LORAMAC_RX_CONFIRMED when an ACK is received from the network
  */
 uint8_t semtech_loramac_recv(semtech_loramac_t *mac);
+#endif
 
+#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
 /**
  * @brief   Requests a LoRaWAN link check
+ *
+ * By default this feature is not available to the user application, enable it
+ * by adding `USEMODULE += semtech_loramac_rx` to the application Makefile.
  *
  * @param[in] mac          Pointer to the mac
  */
 void semtech_loramac_request_link_check(semtech_loramac_t *mac);
+#endif
 
 /**
  * @brief   Sets the device EUI

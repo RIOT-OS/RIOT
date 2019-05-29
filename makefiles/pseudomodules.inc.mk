@@ -68,6 +68,7 @@ PSEUDOMODULES += saul_gpio
 PSEUDOMODULES += saul_nrf_temperature
 PSEUDOMODULES += scanf_float
 PSEUDOMODULES += schedstatistics
+PSEUDOMODULES += semtech_loramac_rx
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp
