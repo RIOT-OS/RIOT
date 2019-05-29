@@ -23,22 +23,20 @@
 #include "net/gnrc/rpl.h"
 #include "net/gnrc/rpl/structs.h"
 
-static uint16_t calc_rank(gnrc_rpl_parent_t *, uint16_t);
-static gnrc_rpl_parent_t *which_parent(gnrc_rpl_parent_t *, gnrc_rpl_parent_t *);
+static uint16_t calc_rank(gnrc_rpl_dodag_t *, uint16_t);
 static int parent_cmp(gnrc_rpl_parent_t *, gnrc_rpl_parent_t *);
 static gnrc_rpl_dodag_t *which_dodag(gnrc_rpl_dodag_t *, gnrc_rpl_dodag_t *);
 static void reset(gnrc_rpl_dodag_t *);
 
 static gnrc_rpl_of_t gnrc_rpl_of0 = {
-    0x0,
-    calc_rank,
-    which_parent,
-    parent_cmp,
-    which_dodag,
-    reset,
-    NULL,
-    NULL,
-    NULL
+    .ocp          = 0x0,
+    .calc_rank    = calc_rank,
+    .parent_cmp   = parent_cmp,
+    .which_dodag  = which_dodag,
+    .reset        = reset,
+    .parent_state_callback = NULL,
+    .init         = NULL,
+    .process_dio  = NULL
 };
 
 gnrc_rpl_of_t *gnrc_rpl_get_of0(void)
@@ -52,20 +50,20 @@ void reset(gnrc_rpl_dodag_t *dodag)
     (void) dodag;
 }
 
-uint16_t calc_rank(gnrc_rpl_parent_t *parent, uint16_t base_rank)
+uint16_t calc_rank(gnrc_rpl_dodag_t *dodag, uint16_t base_rank)
 {
     if (base_rank == 0) {
-        if (parent == NULL) {
+        if (dodag->parents == NULL) {
             return GNRC_RPL_INFINITE_RANK;
         }
 
-        base_rank = parent->rank;
+        base_rank = dodag->parents->rank;
     }
 
     uint16_t add;
 
-    if (parent != NULL) {
-        add = parent->dodag->instance->min_hop_rank_inc;
+    if (dodag->parents != NULL) {
+        add = dodag->instance->min_hop_rank_inc;
     }
     else {
         add = GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
@@ -76,15 +74,6 @@ uint16_t calc_rank(gnrc_rpl_parent_t *parent, uint16_t base_rank)
     }
 
     return base_rank + add;
-}
-
-/* We simply return the Parent with lower rank */
-gnrc_rpl_parent_t *which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
-{
-    if (parent_cmp(p1, p2) > 0) {
-        return p2;
-    }
-    return p1;
 }
 
 int parent_cmp(gnrc_rpl_parent_t *parent1, gnrc_rpl_parent_t *parent2)
