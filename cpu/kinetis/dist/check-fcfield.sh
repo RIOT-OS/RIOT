@@ -12,6 +12,8 @@
 # @author       Joakim Nohlgård <joakim.nohlgard@eistec.se>
 # @author       Francisco Molina <francisco.molina@inria.fr>
 
+: ${OBJDUMP:=arm-none-eabi-objdump}
+
 # elf, hex or bin file to flash
 FLASHFILE="$1"
 
@@ -27,11 +29,11 @@ EXPECTED_FCFIELD="^fffffffffffffffffffffffffe..ffff$"
 get_fc_field()
 {
     if [ ${1##*.} = elf ]; then
-        arm-none-eabi-objdump -j.fcfield -s "${1}"
+        "${OBJDUMP}" -j.fcfield -s "${1}"
     elif [ ${1##*.} = bin ]; then
-        arm-none-eabi-objdump --start-address=${FCFIELD_START} --stop-address=${FCFIELD_END} -bbinary -marm ${1} -s
+        "${OBJDUMP}" --start-address=${FCFIELD_START} --stop-address=${FCFIELD_END} -bbinary -marm ${1} -s
     elif [ ${1##*.} = hex ]; then
-        arm-none-eabi-objdump --start-address=${FCFIELD_START} --stop-address=${FCFIELD_END} ${1} -s
+        "${OBJDUMP}" --start-address=${FCFIELD_START} --stop-address=${FCFIELD_END} ${1} -s
     else
         echo "Unkown file extension: ${1##*.}"
         exit 1
