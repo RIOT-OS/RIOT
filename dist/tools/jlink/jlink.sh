@@ -254,6 +254,7 @@ do_term() {
             -jtagconf -1,-1 \
             -commandfile '${RIOTTOOLS}/jlink/term.seg' >/dev/null & \
             echo  \$! > $JLINK_PIDFILE" &
+    sleep 1
 
     sh -c "${JLINK_TERMPROG} ${JLINK_TERMFLAGS}"
 }
