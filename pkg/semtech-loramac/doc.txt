@@ -139,6 +139,21 @@
  *               THREAD_PRIORITY_MAIN - 1, 0, _recv, NULL, "recv thread");
  * ```
  *
+ * # Persistence
+ *
+ * If the board CPU provides an internal EEPROM, this package provides a
+ * mecanism for storing EUIs, keys and some MAC parameters (frame counter,
+ * join status).
+ * After a successful join procedure, use `semtech_loramac_save` function to
+ * persist this information and it will be loaded automatically at the next
+ * reboot.
+ * If the device is already joined to a network, to avoid another OTAA join
+ * procedure use `semtech_loramac_is_mac_joined` function to check the join
+ * status of the device.
+ *
+ * This mecanism is especially useful when using deep sleep power modes that
+ * don't preserve RAM.
+ *
  * @warning It is not possible to directly call the original LoRaMAC-node API
  *          using this package. This package should only be considered as a
  *          wrapper around the original LoRaMAC-node API and only the API
