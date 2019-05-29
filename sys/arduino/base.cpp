@@ -72,6 +72,11 @@ unsigned long micros()
     return xtimer_now_usec();
 }
 
+unsigned long millis()
+{
+    return xtimer_now_usec() / US_PER_MS;
+}
+
 int analogRead(int arduino_pin)
 {
     /*
