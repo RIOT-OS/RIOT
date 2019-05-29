@@ -96,7 +96,12 @@
  * }
  * ```
  *
- * To receive downlink messages, use a dedicated receiving thread.
+ * To receive downlink messages, enable the `semtech_loramac_rx` and use a
+ * dedicated receiving thread.
+ * - In the application Makefile, add
+ * ```mk
+ * USEMODULE += semtech_loramac_rx
+ * ```
  * - At the beginning of the application source file, add the necessary
  * includes and declare the message queue and stack arrays:
  * ```c
