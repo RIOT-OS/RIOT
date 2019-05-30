@@ -60,6 +60,7 @@ sx127x_t sx127x;
 RadioEvents_t semtech_loramac_radio_events;
 LoRaMacPrimitives_t semtech_loramac_primitives;
 LoRaMacCallback_t semtech_loramac_callbacks;
+extern LoRaMacParams_t LoRaMacParams;
 
 typedef struct {
     uint8_t *payload;
@@ -183,19 +184,33 @@ static void mlme_indication(MlmeIndication_t *indication)
 }
 
 #ifdef MODULE_PERIPH_EEPROM
-static inline void _set_uplink_counter(semtech_loramac_t *mac, uint8_t *counter)
+static size_t _read_uint32(size_t pos, uint32_t *value)
 {
-    uint32_t counter4 = ((uint32_t)counter[0] << 24 |
-                         (uint32_t)counter[1] << 16 |
-                         (uint32_t)counter[2] << 8 |
-                         counter[3]);
+    uint8_t array[4] = { 0 };
+    size_t ret = eeprom_read(pos, array, sizeof(uint32_t));
+    *value = ((uint32_t)array[0] << 24 | (uint32_t)array[1] << 16 |
+              (uint32_t)array[2] << 8 | array[3]);
+    return ret;
+}
 
-    DEBUG("[semtech-loramac] reading uplink counter: %" PRIu32 " \n", counter4);
+static size_t _write_uint32(size_t pos, uint32_t value)
+{
+    uint8_t array[4] = { 0 };
+    array[0] = (uint8_t)(value >> 24);
+    array[1] = (uint8_t)(value >> 16);
+    array[2] = (uint8_t)(value >> 8);
+    array[3] = (uint8_t)(value);
+    return eeprom_write(pos, array, sizeof(uint32_t));
+}
+
+static inline void _set_uplink_counter(semtech_loramac_t *mac, uint32_t counter)
+{
+    DEBUG("[semtech-loramac] reading uplink counter: %" PRIu32 " \n", counter);
 
     mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_UPLINK_COUNTER;
-    mibReq.Param.UpLinkCounter = counter4;
+    mibReq.Param.UpLinkCounter = counter;
     LoRaMacMibSetRequestConfirm(&mibReq);
     mutex_unlock(&mac->lock);
 }
@@ -240,14 +255,26 @@ static inline void _read_loramac_config(semtech_loramac_t *mac)
     /* Read and set device address */
     uint8_t devaddr[LORAMAC_DEVADDR_LEN];
     pos += eeprom_read(pos, devaddr, LORAMAC_DEVADDR_LEN);
-
     semtech_loramac_set_devaddr(mac, devaddr);
 
-    /* uplink counter */
-    uint8_t counter[4] = { 0 };
-    pos += eeprom_read(pos, counter, 4);
-    _set_uplink_counter(mac, counter);
+    /* Read uplink counter */
+    uint32_t ul_counter;
+    pos += _read_uint32(pos, &ul_counter);
+    _set_uplink_counter(mac, ul_counter);
 
+    /* Read RX2 freq */
+    uint32_t rx2_freq;
+    pos += _read_uint32(pos, &rx2_freq);
+    DEBUG("[semtech-loramac] reading rx2 freq: %" PRIu32 "\n", rx2_freq);
+    semtech_loramac_set_rx2_freq(mac, rx2_freq);
+
+    /* Read RX2 datarate */
+    uint8_t dr;
+    pos += eeprom_read(pos, &dr, 1);
+    DEBUG("[semtech-loramac] reading rx2 dr: %d\n", dr);
+    semtech_loramac_set_rx2_dr(mac, dr);
+
+    /* Read join state */
     uint8_t joined = eeprom_read_byte(pos);
     _set_join_state(mac, (bool)joined);
 }
@@ -260,19 +287,15 @@ static inline size_t _save_uplink_counter(semtech_loramac_t *mac)
                  LORAMAC_APPKEY_LEN + LORAMAC_APPSKEY_LEN +
                  LORAMAC_NWKSKEY_LEN + LORAMAC_DEVADDR_LEN;
 
-    uint8_t counter[LORAMAC_DEVADDR_LEN];
+    uint32_t ul_counter;
     mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_UPLINK_COUNTER;
     LoRaMacMibGetRequestConfirm(&mibReq);
-    DEBUG("[semtech-loramac] saving uplink counter: %" PRIu32 " \n",
-          mibReq.Param.UpLinkCounter);
-    counter[0] = (uint8_t)(mibReq.Param.UpLinkCounter >> 24);
-    counter[1] = (uint8_t)(mibReq.Param.UpLinkCounter >> 16);
-    counter[2] = (uint8_t)(mibReq.Param.UpLinkCounter >> 8);
-    counter[3] = (uint8_t)(mibReq.Param.UpLinkCounter);
+    ul_counter = mibReq.Param.UpLinkCounter;
     mutex_unlock(&mac->lock);
-    return eeprom_write(pos, counter, LORAMAC_DEVADDR_LEN);
+    DEBUG("[semtech-loramac] saving uplink counter: %" PRIu32 " \n", ul_counter);
+    return _write_uint32(pos, ul_counter);
 }
 
 void semtech_loramac_save_config(semtech_loramac_t *mac)
@@ -302,6 +325,16 @@ void semtech_loramac_save_config(semtech_loramac_t *mac)
     /* save uplink counter, mainly used for ABP activation */
     pos += _save_uplink_counter(mac);
 
+    /* save RX2 freq */
+    uint32_t rx2_freq = semtech_loramac_get_rx2_freq(mac);
+    DEBUG("[semtech-loramac] saving rx2 freq: %" PRIu32 "\n", rx2_freq);
+    pos += _write_uint32(pos, rx2_freq);
+
+    /* save RX2 dr */
+    uint8_t dr = semtech_loramac_get_rx2_dr(mac);
+    DEBUG("[semtech-loramac] saving rx2 dr: %d\n", dr);
+    pos += eeprom_write(pos, &dr, 1);
+
     /* save join state */
     uint8_t joined = (uint8_t)semtech_loramac_is_mac_joined(mac);
     eeprom_write_byte(pos, joined);
@@ -319,15 +352,17 @@ void semtech_loramac_erase_config(void)
         return;
     }
 
-    MibRequestConfirm_t mibReq;
-    size_t uplink_counter_len = sizeof(mibReq.Param.UpLinkCounter);
-    size_t joined_state_len = sizeof(mibReq.Param.IsNetworkJoined);
+    size_t uplink_counter_len = sizeof(uint32_t);
+    size_t rx2_freq_len = sizeof(uint32_t);
+    size_t rx2_dr_len = sizeof(uint8_t);
+    size_t joined_state_len = sizeof(uint8_t);
 
     size_t end = (pos + SEMTECH_LORAMAC_EEPROM_MAGIC_LEN +
                   LORAMAC_DEVEUI_LEN + LORAMAC_APPEUI_LEN +
                   LORAMAC_APPKEY_LEN + LORAMAC_APPSKEY_LEN +
                   LORAMAC_NWKSKEY_LEN + LORAMAC_DEVADDR_LEN +
-                  uplink_counter_len + joined_state_len);
+                  uplink_counter_len + rx2_freq_len + rx2_dr_len +
+                  joined_state_len);
     for (size_t p = pos; p < end; p++) {
         eeprom_write_byte(p, 0);
     }
@@ -362,7 +397,6 @@ void _init_loramac(semtech_loramac_t *mac,
 #ifdef MODULE_PERIPH_EEPROM
     _read_loramac_config(mac);
 #endif
-
 }
 
 static void _join_otaa(semtech_loramac_t *mac)
@@ -623,6 +657,8 @@ void *_semtech_loramac_event_loop(void *arg)
                                 /* Status is OK, node has joined the network */
                                 DEBUG("[semtech-loramac] join succeeded\n");
                                 msg_ret.content.value = SEMTECH_LORAMAC_JOIN_SUCCEEDED;
+                                /* Set RX2 DR parameters in the MIB from MAC params */
+                                semtech_loramac_set_rx2_dr(mac, LoRaMacParams.Rx2Channel.Datarate);
                             }
                             else {
                                 DEBUG("[semtech-loramac] join not successful\n");
