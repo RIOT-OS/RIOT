@@ -25,7 +25,7 @@ DEBUG_ADAPTER ?= mulle
 OS := $(shell uname)
 
 # Fall back to PROGRAMMER_SERIAL for backwards compatibility
-export DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
+DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
 
 ifeq ($(PORT),)
   # try to find tty name by serial number, only works on Linux currently.
