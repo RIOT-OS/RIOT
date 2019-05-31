@@ -38,7 +38,7 @@ else ifeq (openocd,$(PROGRAMMER))
     # openocd doesn't work (yet) with softdevice
     $(error Cannot use OpenOCD with nordic_softdevice module)
   endif
-  export DEBUG_ADAPTER ?= jlink
+  DEBUG_ADAPTER ?= jlink
   export OPENOCD_CONFIG := $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
   include $(RIOTMAKE)/tools/openocd.inc.mk
 endif
