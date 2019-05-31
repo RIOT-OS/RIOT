@@ -3,7 +3,7 @@
 # programmer board serial number.
 
 # Fall back to PROGRAMMER_SERIAL for backwards compatibility
-export DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
+DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
 
 ifneq (,$(DEBUG_ADAPTER_ID))
   # Makefile-way of comparing numbers, using lexicographical sorting since we
