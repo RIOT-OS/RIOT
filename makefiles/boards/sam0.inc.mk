@@ -20,7 +20,7 @@ endif
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # Default for these boards is to use a CMSIS-DAP programmer
-export DEBUG_ADAPTER ?= dap
+DEBUG_ADAPTER ?= dap
 
 # EDBG can only be used with a compatible Atmel programmer
 ifeq ($(DEBUG_ADAPTER),dap)
