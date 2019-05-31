@@ -31,6 +31,8 @@
  */
 static int cmd_test_xtimer_mutex_lock_timeout_long_unlocked(int argc,
                                                             char **argv);
+static int cmd_test_xtimer_mutex_lock_timeout_long_locked(int argc,
+                                                          char **argv);
 
 /**
  * @brief   List of command for this application.
@@ -38,6 +40,8 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_unlocked(int argc,
 static const shell_command_t shell_commands[] = {
     { "mutex_timeout_long_unlocked", "unlocked mutex with long timeout",
       cmd_test_xtimer_mutex_lock_timeout_long_unlocked, },
+    { "mutex_timeout_long_locked", "locked mutex with long timeout",
+      cmd_test_xtimer_mutex_lock_timeout_long_locked, },
     { NULL, NULL, NULL }
 };
 
@@ -72,6 +76,43 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_unlocked(int argc,
     }
     else {
         puts("error: mutex timed out");
+    }
+
+    return 0;
+}
+
+/**
+ * @brief   shell command to test xtimer_mutex_lock_timeout
+ *
+ * the mutex is locked before the function call and
+ * the timer long. Meaning the timer will trigger
+ * and remove the thread from the mutex waiting list.
+ *
+ * @param[in] argc  Number of arguments
+ * @param[in] argv  Array of arguments
+ *
+ * @return 0 on success
+ */
+static int cmd_test_xtimer_mutex_lock_timeout_long_locked(int argc,
+                                                          char **argv)
+{
+    (void)argc;
+    (void)argv;
+    puts("starting test: xtimer mutex lock timeout");
+    mutex_t test_mutex = MUTEX_INIT;
+    mutex_lock(&test_mutex);
+
+    if (xtimer_mutex_lock_timeout(&test_mutex, LONG_MUTEX_TIMEOUT) == 0) {
+        puts("Error: mutex taken");
+    }
+    else {
+        /* mutex has to be locked */
+        if (mutex_trylock(&test_mutex) == 0) {
+            puts("OK");
+        }
+        else {
+            puts("error mutex not locked");
+        }
     }
 
     return 0;

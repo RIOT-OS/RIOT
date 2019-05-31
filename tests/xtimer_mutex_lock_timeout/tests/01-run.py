@@ -23,6 +23,10 @@ def testfunc(child):
     child.expect("starting test: xtimer mutex lock timeout")
     child.expect("OK")
     child.expect_exact("> ")
+    child.sendline("mutex_timeout_long_locked")
+    child.expect("starting test: xtimer mutex lock timeout")
+    child.expect("OK")
+    child.expect_exact("> ")
 
 
 if __name__ == "__main__":
