@@ -4,7 +4,4 @@ FEATURES_PROVIDED += periph_rtc
 
 # Various other features (if any)
 
-# The board MPU family (used for grouping by the CI system)
-FEATURES_MCU_GROUP = msp430
-
 include $(RIOTCPU)/cc430/Makefile.features

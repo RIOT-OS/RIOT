@@ -13,7 +13,4 @@ FEATURES_PROVIDED += periph_uart
 # introduced after Jun 8, 2017 - v0.10.0-1-20170607-2132-dev.
 FEATURES_PROVIDED += riotboot
 
-# The board MPU family (used for grouping by the CI system)
-FEATURES_MCU_GROUP = cortex_m0_1
-
 include $(RIOTCPU)/stm32l0/Makefile.features

@@ -11,7 +11,4 @@ FEATURES_PROVIDED += periph_usbdev
 # Various other features (if any)
 FEATURES_PROVIDED += arduino
 
-# The board MPU family (used for grouping by the CI system)
-FEATURES_MCU_GROUP = cortex_m0_2
-
 include $(RIOTCPU)/samd21/Makefile.features

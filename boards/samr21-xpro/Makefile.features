@@ -12,7 +12,4 @@ FEATURES_PROVIDED += periph_usbdev
 # Put other features for this board (in alphabetical order)
 FEATURES_PROVIDED += riotboot
 
-# The board MPU family (used for grouping by the CI system)
-FEATURES_MCU_GROUP = cortex_m0_2
-
 include $(RIOTCPU)/samd21/Makefile.features
