@@ -13,7 +13,6 @@ ifneq ("$(wildcard $(UNIFLASH_PATH)/dslite.sh)","")
   _XDS110RESET ?= $(UNIFLASH_PATH)/simplelink/imagecreator/bin/xds110reset
   XDS110RESET ?= $(firstword $(wildcard $(_XDS110RESET) $(_XDS110RESET_4_0_4_3)) xds110reset)
   RESET = $(XDS110RESET)
-  RESET_FLAGS
 else
   FLASHER = $(UNIFLASH_PATH)/uniflash.sh
   FFLAGS  = -ccxml $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml -program $(FLASHFILE)
