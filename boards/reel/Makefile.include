@@ -1,6 +1,3 @@
-# specific CPU model used
-CPU_MODEL = nrf52840xxaa
-
 # set programming environment
 DEBUG_ADAPTER ?= dap
 PROGRAMMER ?= openocd

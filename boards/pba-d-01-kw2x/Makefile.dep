@@ -11,5 +11,3 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += tcs37727
   USEMODULE += tmp006
 endif
-
-include $(RIOTCPU)/kinetis/Makefile.dep

@@ -1,3 +1,6 @@
+CPU = samd21
+CPU_MODEL = samd21g18a
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm
@@ -10,5 +13,3 @@ FEATURES_PROVIDED += periph_usbdev
 
 # Various other features (if any)
 FEATURES_PROVIDED += arduino
-
-include $(RIOTCPU)/samd21/Makefile.features

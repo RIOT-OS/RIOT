@@ -1,3 +1,6 @@
+CPU = efm32
+CPU_MODEL = efm32pg12b500f1024gl125
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
@@ -9,5 +12,3 @@ FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
 include $(RIOTBOARD)/common/silabs/Makefile.features
-
-include $(RIOTCPU)/efm32/Makefile.features

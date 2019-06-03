@@ -1,7 +1,3 @@
-# define the cpu used by the stm32f769-discovery board
-export CPU = stm32f7
-export CPU_MODEL = stm32f769ni
-
 # we use shared STM32 configuration snippets
 INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 

@@ -1,3 +1,6 @@
+CPU = stm32l4
+CPU_MODEL = stm32l476vg
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_rtt
@@ -6,5 +9,3 @@ FEATURES_PROVIDED += periph_uart
 
 # Put other features for this board (in alphabetical order)
 FEATURES_PROVIDED += riotboot
-
-include $(RIOTCPU)/stm32l4/Makefile.features

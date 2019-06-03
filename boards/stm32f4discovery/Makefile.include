@@ -1,7 +1,3 @@
-# define the cpu used by the stm32f4-discovery board
-export CPU = stm32f4
-export CPU_MODEL = stm32f407vg
-
 # we use shared STM32 configuration snippets
 INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 

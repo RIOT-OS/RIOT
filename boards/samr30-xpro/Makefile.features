@@ -1,3 +1,6 @@
+CPU = saml21
+CPU_MODEL = samr30g18a
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_i2c
@@ -6,6 +9,3 @@ FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
-
-# samr30 is a specific flavor of saml21
-include $(RIOTCPU)/saml21/Makefile.features

@@ -1,5 +1,3 @@
-export CPU       = cc26x0
-export CPU_MODEL = cc26x0f128
 export XDEBUGGER = XDS110
 
 # set default port depending on operating system

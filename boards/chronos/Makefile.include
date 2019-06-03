@@ -1,7 +1,3 @@
-## the cpu to build for
-export CPU = cc430
-export CPU_MODEL = cc430f6137
-
 # flasher configuration
 FLASHFILE ?= $(HEXFILE)
 FLASHER = mspdebug

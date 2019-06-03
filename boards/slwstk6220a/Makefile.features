@@ -1,6 +1,7 @@
+CPU = ezr32wg
+CPU_MODEL = ezr32wg330f256r60
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
-
-include $(RIOTCPU)/ezr32wg/Makefile.features

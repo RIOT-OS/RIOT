@@ -1,7 +1,3 @@
-# define the cpu used by the Teensy3.1 & 3.2 board
-CPU = kinetis
-CPU_MODEL = mk20dx256vlh7
-
 # custom flasher to use with the bootloader
 TEENSY_LOADER = $(RIOTTOOLS)/teensy-loader-cli/teensy_loader
 FLASHER = $(TEENSY_LOADER)

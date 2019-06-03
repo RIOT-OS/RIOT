@@ -1,3 +1,1 @@
 include $(RIOTBOARD)/common/arduino-mkr/Makefile.features
-
-include $(RIOTCPU)/samd21/Makefile.features
