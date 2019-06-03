@@ -13,7 +13,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # all Nucleo boards have an on-board ST-link adapter
-export DEBUG_ADAPTER ?= stlink
+DEBUG_ADAPTER ?= stlink
 
 # nucleo boards use openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk

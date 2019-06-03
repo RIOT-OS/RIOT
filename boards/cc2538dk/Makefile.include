@@ -3,7 +3,7 @@ export CPU        = cc2538
 export CPU_MODEL ?= cc2538nf53
 
 # the SmartRF06 Evaluation Board serial numbers all begin with "06EB":
-export PROGRAMMER_SERIAL ?= 06EB
+PROGRAMMER_SERIAL ?= 06EB
 
 # setup serial terminal
 # the debug UART is always the second tty with the matching serial number:
