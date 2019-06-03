@@ -447,6 +447,28 @@ static bool _safe_fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
 }
 
 /* functions for sending */
+static bool _fragment_pkt_if_needed(gnrc_pktsnip_t *pkt,
+                                    gnrc_netif_t *netif,
+                                    bool from_me)
+{
+#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+    /* TODO: get path MTU when PMTU discovery is implemented */
+    unsigned path_mtu = netif->ipv6.mtu;
+
+    if (from_me && (gnrc_pkt_len(pkt->next) > path_mtu)) {
+        gnrc_netif_hdr_t *hdr = pkt->data;
+        hdr->if_pid = netif->pid;
+        gnrc_ipv6_ext_frag_send_pkt(pkt, path_mtu);
+        return true;
+    }
+#else   /* MODULE_GNRC_IPV6_EXT_FRAG */
+    (void)pkt;
+    (void)netif;
+    (void)from_me;
+#endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
+    return false;
+}
+
 #ifdef MODULE_GNRC_IPV6_EXT_FRAG
 static void _send_by_netif_hdr(gnrc_pktsnip_t *pkt)
 {
@@ -479,6 +501,11 @@ static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
                                      netif_hdr_flags)) == NULL) {
             return;
         }
+        /* prep_hdr => The packet is from me */
+        if (_fragment_pkt_if_needed(pkt, netif, prep_hdr)) {
+            DEBUG("ipv6: packet is fragmented\n");
+            return;
+        }
         DEBUG("ipv6: send unicast over interface %" PRIkernel_pid "\n",
               netif->pid);
         /* and send to interface */
@@ -490,12 +517,18 @@ static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
 }
 
 static inline void _send_multicast_over_iface(gnrc_pktsnip_t *pkt,
+                                              bool prep_hdr,
                                               gnrc_netif_t *netif,
                                               uint8_t netif_hdr_flags)
 {
     if ((pkt = _create_netif_hdr(NULL, 0, pkt,
                                  netif_hdr_flags |
                                  GNRC_NETIF_HDR_FLAGS_MULTICAST)) == NULL) {
+        return;
+    }
+    /* prep_hdr => The packet is from me */
+    if (_fragment_pkt_if_needed(pkt, netif, prep_hdr)) {
+        DEBUG("ipv6: packet is fragmented\n");
         return;
     }
     DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", netif->pid);
@@ -550,12 +583,12 @@ static void _send_multicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
                     return;
                 }
             }
-            _send_multicast_over_iface(pkt, netif, netif_hdr_flags);
+            _send_multicast_over_iface(pkt, prep_hdr, netif, netif_hdr_flags);
         }
     }
     else {
         if (_safe_fill_ipv6_hdr(netif, pkt, prep_hdr)) {
-            _send_multicast_over_iface(pkt, netif, netif_hdr_flags);
+            _send_multicast_over_iface(pkt, prep_hdr, netif, netif_hdr_flags);
         }
     }
 #else   /* GNRC_NETIF_NUMOF */
@@ -569,7 +602,7 @@ static void _send_multicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
         }
     }
     if (_safe_fill_ipv6_hdr(netif, pkt, prep_hdr)) {
-        _send_multicast_over_iface(pkt, netif, netif_hdr_flags);
+        _send_multicast_over_iface(pkt, prep_hdr, netif, netif_hdr_flags);
     }
 #endif  /* GNRC_NETIF_NUMOF */
 }
