@@ -4,7 +4,6 @@ export CPU_MODEL = mkw41z512vht4
 
 # include this module into the build
 INCLUDES += -I$(RIOTBOARD)/common/kw41z/include
-USEMODULE += boards_common_kw41z
 
 # This board comes with OpenSDA configured for JLink compatibility
 DEBUG_ADAPTER ?= jlink
