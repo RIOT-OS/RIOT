@@ -64,13 +64,14 @@ void cpu_init(void)
     OSCCTRL->OSC16MCTRL.bit.ONDEMAND = 0;
     OSCCTRL->OSC16MCTRL.bit.RUNSTDBY = 0;
 
+    PM->PLCFG.reg = PM_PLCFG_PLSEL_PL2;
+    while (!PM->INTFLAG.bit.PLRDY) {}
+
     /* Setup GCLK generators */
     _gclk_setup(0, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
     _gclk_setup(1, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K);
 
 #ifdef MODULE_PERIPH_PM
-    /* enable power managemet module */
-    MCLK->APBAMASK.reg |= MCLK_APBAMASK_PM;
     PM->CTRLA.reg = PM_CTRLA_MASK & (~PM_CTRLA_IORET);
 
     /* disable brownout detection
