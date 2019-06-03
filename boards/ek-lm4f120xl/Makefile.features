@@ -1,8 +1,9 @@
+CPU = lm4f120
+CPU_MODEL = LM4F120H5QR
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
-
-include $(RIOTCPU)/lm4f120/Makefile.features
