@@ -5,21 +5,12 @@ export CPU_MODEL = nrf51x22xxab
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
-# this board supports flashing through plain fscopy, using JLink or using
-# openocd. Default programmer is fscopy
-PROGRAMMER ?= fscopy
+# for this board we support flashing via openocd or pyocd
+PROGRAMMER ?= openocd
 
-ifeq (fscopy,$(PROGRAMMER))
-  FFLAGS = $(HEXFILE)
-  DEBUGGER_FLAGS =
-
-  FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-  DEBUGGER =
-  DEBUGSERVER =
-else ifeq (openocd,$(PROGRAMMER))
-  # this board uses a daplink adapter by default
+ifeq (openocd,$(PROGRAMMER))
   DEBUG_ADAPTER = dap
-else ifeq (pyocd, $(PROGRAMMER))
+else ifeq (pyocd,$(PROGRAMMER))
   include $(RIOTMAKE)/tools/pyocd.inc.mk
 endif
 
