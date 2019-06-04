@@ -5,18 +5,10 @@ export CPU_MODEL = nrf51x22xxab
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
-# this board supports flashing through plain fscopy, using JLink or using
-# openocd
-PROGRAMMER ?= fscopy
+# for this board we support flashing via openocd or pyocd
+PROGRAMMER ?= openocd
 
-ifeq (fscopy,$(PROGRAMMER))
-  FFLAGS = $(HEXFILE)
-  DEBUGGER_FLAGS =
-
-  FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-  DEBUGGER =
-  DEBUGSERVER =
-else ifeq (openocd,$(PROGRAMMER))
+ifeq (openocd,$(PROGRAMMER))
   DEBUG_ADAPTER = dap
 else ifeq (pyocd,$(PROGRAMMER))
   # PyOCD doesn't recognize automatically the board ID, so target type has to
