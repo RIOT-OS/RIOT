@@ -31,6 +31,9 @@
 #ifdef MODULE_NIMBLE_SVC_GATT
 #include "services/gatt/ble_svc_gatt.h"
 #endif
+#ifdef MODULE_NIMBLE_SVC_IPSS
+#include "services/ipss/ble_svc_ipss.h"
+#endif
 
 #ifdef MODULE_NIMBLE_CONTROLLER
 #ifdef CPU_FAM_NRF52
@@ -102,5 +105,8 @@ void nimble_riot_init(void)
 #endif
 #ifdef MODULE_NIMBLE_SVC_GATT
     ble_svc_gatt_init();
+#endif
+#ifdef MODULE_NIMBLE_SVC_IPSS
+    ble_svc_ipss_init();
 #endif
 }
