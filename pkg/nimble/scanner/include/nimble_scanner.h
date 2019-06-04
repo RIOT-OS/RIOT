@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    ble_nimble_scanner NimBLE Scanner Helper
+ * @defgroup    ble_nimble_scanner Scanner Helper
  * @ingroup     ble_nimble
  * @brief       Helper module to simplify the usage of NimBLE in scanning mode
  * @{

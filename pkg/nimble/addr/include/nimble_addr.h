@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    ble_nimble_addr Address helper for NimBLE
+ * @defgroup    ble_nimble_addr Address Helper
  * @ingroup     ble_nimble
  * @brief       NimBLE specific helper functions for handling addresses
  * @{
