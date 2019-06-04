@@ -31,9 +31,22 @@ extern "C" {
 
 /**
  * @name    Xtimer configuration
+ *
+ * Some external packages (e.g. NimBLE) require dedicated access to timer 0.
+ * Setting the BOARD_NRF51_XTIMER_ALT variable allows to change the default
+ * xtimer configuration to use
+ *
  * @{
  */
+#ifndef BOARD_NRF51_XTIMER_ALT
+/* default xtimer mapping */
 #define XTIMER_WIDTH                (24)
+#else
+/* alternative mapping to TIMER_DEV(1) */
+#define XTIMER_DEV                  TIMER_DEV(1)
+#define XTIMER_WIDTH                (16)
+#define XTIMER_CHAN                 (0)
+#endif
 #define XTIMER_BACKOFF              (40)
 /** @} */
 
