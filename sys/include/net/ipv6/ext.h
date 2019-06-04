@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 
+#include "net/ipv6/ext/frag.h"
 #include "net/ipv6/ext/rh.h"
 
 #ifdef __cplusplus
