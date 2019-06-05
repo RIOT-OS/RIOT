@@ -19,13 +19,13 @@
 
 #include "isrpipe.h"
 
-void isrpipe_init(isrpipe_t *isrpipe, char *buf, size_t bufsize)
+void isrpipe_init(isrpipe_t *isrpipe, uint8_t *buf, size_t bufsize)
 {
     mutex_init(&isrpipe->mutex);
-    tsrb_init(&isrpipe->tsrb, (uint8_t *)buf, bufsize);
+    tsrb_init(&isrpipe->tsrb, buf, bufsize);
 }
 
-int isrpipe_write_one(isrpipe_t *isrpipe, char c)
+int isrpipe_write_one(isrpipe_t *isrpipe, uint8_t c)
 {
     int res = tsrb_add_one(&isrpipe->tsrb, c);
 
@@ -37,11 +37,11 @@ int isrpipe_write_one(isrpipe_t *isrpipe, char c)
     return res;
 }
 
-int isrpipe_read(isrpipe_t *isrpipe, char *buffer, size_t count)
+int isrpipe_read(isrpipe_t *isrpipe, uint8_t *buffer, size_t count)
 {
     int res;
 
-    while (!(res = tsrb_get(&isrpipe->tsrb, (uint8_t *)buffer, count))) {
+    while (!(res = tsrb_get(&isrpipe->tsrb, buffer, count))) {
         mutex_lock(&isrpipe->mutex);
     }
     return res;
