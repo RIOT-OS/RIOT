@@ -42,7 +42,8 @@ typedef struct {
 /**
  * @brief   Static initializer for irspipe
  */
-#define ISRPIPE_INIT(tsrb_buf) { .mutex = MUTEX_INIT, .tsrb = TSRB_INIT(tsrb_buf) }
+#define ISRPIPE_INIT(tsrb_buf) { .mutex = MUTEX_INIT, \
+                                 .tsrb = TSRB_INIT(tsrb_buf) }
 
 /**
  * @brief   Initialisation function for isrpipe
