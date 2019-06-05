@@ -32,7 +32,7 @@ static uint8_t _pop(tsrb_t *rb)
 int tsrb_get_one(tsrb_t *rb)
 {
     if (!tsrb_empty(rb)) {
-        return (unsigned char)_pop(rb);
+        return _pop(rb);
     }
     else {
         return -1;
