@@ -9,4 +9,4 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 # reset tool configuration
 RESET ?= esptool.py
-RESET_FLAGS ?= --before default_reset run
+RESET_FLAGS ?= --port $(PORT) --before default_reset run
