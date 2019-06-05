@@ -169,7 +169,7 @@ ifneq (,$(filter esp_cxx,$(USEMODULE)))
     UNDEF += $(BINDIR)/esp_cxx/cxa_guard.o
 endif
 
-ESPTOOL ?= $(RIOTBASE)/dist/tools/esptool/esptool.py
+ESPTOOL ?= esptool.py
 
 # The ELFFILE is the base one used for flashing
 FLASHFILE ?= $(ELFFILE)
