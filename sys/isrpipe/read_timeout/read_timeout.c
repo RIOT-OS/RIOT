@@ -44,7 +44,7 @@ int isrpipe_read_timeout(isrpipe_t *isrpipe, char *buffer, size_t count, uint32_
     xtimer_t timer = { .callback = _cb, .arg = &_timeout };
 
     xtimer_set(&timer, timeout);
-    while (!(res = tsrb_get(&isrpipe->tsrb, buffer, count))) {
+    while (!(res = tsrb_get(&isrpipe->tsrb, (uint8_t *)buffer, count))) {
         mutex_lock(&isrpipe->mutex);
         if (_timeout.flag) {
             res = -ETIMEDOUT;
