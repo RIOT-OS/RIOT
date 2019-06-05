@@ -22,7 +22,7 @@
 void isrpipe_init(isrpipe_t *isrpipe, char *buf, size_t bufsize)
 {
     mutex_init(&isrpipe->mutex);
-    tsrb_init(&isrpipe->tsrb, buf, bufsize);
+    tsrb_init(&isrpipe->tsrb, (uint8_t *)buf, bufsize);
 }
 
 int isrpipe_write_one(isrpipe_t *isrpipe, char c)
@@ -41,7 +41,7 @@ int isrpipe_read(isrpipe_t *isrpipe, char *buffer, size_t count)
 {
     int res;
 
-    while (!(res = tsrb_get(&isrpipe->tsrb, buffer, count))) {
+    while (!(res = tsrb_get(&isrpipe->tsrb, (uint8_t *)buffer, count))) {
         mutex_lock(&isrpipe->mutex);
     }
     return res;
