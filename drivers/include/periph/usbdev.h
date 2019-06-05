@@ -433,7 +433,7 @@ static inline usbdev_ep_t * usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
  * @return              number of bytes written to @p value
  * @return              `< 0` on error 0
  */
-static inline int usbdev_get(usbdev_t *dev, usbopt_ep_t opt,
+static inline int usbdev_get(usbdev_t *dev, usbopt_t opt,
                              void *value, size_t max_len)
 {
     assert(dev);
@@ -455,7 +455,7 @@ static inline int usbdev_get(usbdev_t *dev, usbopt_ep_t opt,
  * @return              number of bytes used from @p value
  * @return              `< 0` on error
  */
-static inline int usbdev_set(usbdev_t *dev, usbopt_ep_t opt,
+static inline int usbdev_set(usbdev_t *dev, usbopt_t opt,
                              const void *value, size_t value_len)
 {
     assert(dev);
