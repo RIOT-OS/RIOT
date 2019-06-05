@@ -48,7 +48,7 @@ extern ethos_t ethos;
 #include "debug.h"
 
 #ifdef MODULE_STDIO_UART_RX
-static char _rx_buf_mem[STDIO_UART_RX_BUFSIZE];
+static uint8_t _rx_buf_mem[STDIO_UART_RX_BUFSIZE];
 isrpipe_t stdio_uart_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
 #endif
 
@@ -81,7 +81,7 @@ void stdio_init(void)
 ssize_t stdio_read(void* buffer, size_t count)
 {
 #ifdef MODULE_STDIO_UART_RX
-    return (ssize_t)isrpipe_read(&stdio_uart_isrpipe, (char *)buffer, count);
+    return (ssize_t)isrpipe_read(&stdio_uart_isrpipe, buffer, count);
 #else
     (void)buffer;
     (void)count;
