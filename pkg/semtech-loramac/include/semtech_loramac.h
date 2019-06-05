@@ -429,7 +429,7 @@ void semtech_loramac_set_tx_port(semtech_loramac_t *mac, uint8_t port);
  * @param[in] mac          Pointer to the mac
  * @param[in] error        The maximum rx timing error
  */
-void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, int error);
+void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, uint32_t error);
 
 /**
  * @brief   Sets the minimum required number of symbols to detect a frame
@@ -437,7 +437,7 @@ void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, int error);
  * @param[in] mac          Pointer to the mac
  * @param[in] min_rx       The minimum rx symbols
  */
-void semtech_loramac_set_min_rx_symbols(semtech_loramac_t *mac, int min_rx);
+void semtech_loramac_set_min_rx_symbols(semtech_loramac_t *mac, uint8_t min_rx);
 
 /**
  * @brief   Gets the TX application port

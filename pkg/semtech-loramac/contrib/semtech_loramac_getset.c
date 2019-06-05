@@ -290,7 +290,7 @@ uint8_t semtech_loramac_get_tx_mode(semtech_loramac_t *mac)
     return mac->cnf;
 }
 
-void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, int error)
+void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, uint32_t error)
 {
     MibRequestConfirm_t mibReq;
     mutex_lock(&mac->lock);
@@ -300,7 +300,7 @@ void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, int error)
     mutex_unlock(&mac->lock);
 }
 
-void semtech_loramac_set_min_rx_symbols(semtech_loramac_t *mac, int min_rx)
+void semtech_loramac_set_min_rx_symbols(semtech_loramac_t *mac, uint8_t min_rx)
 {
     MibRequestConfirm_t mibReq;
     mutex_lock(&mac->lock);
