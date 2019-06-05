@@ -61,7 +61,7 @@ typedef struct {
     netdev_t netdev;                        /**< parent class */
     slipdev_params_t config;                /**< configuration parameters */
     tsrb_t inbuf;                           /**< RX buffer */
-    char rxmem[SLIPDEV_BUFSIZE];            /**< memory used by RX buffer */
+    uint8_t rxmem[SLIPDEV_BUFSIZE];         /**< memory used by RX buffer */
     uint16_t inesc;                         /**< device previously received an escape
                                              *   byte */
 } slipdev_t;
