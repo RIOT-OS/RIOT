@@ -52,7 +52,7 @@ typedef struct {
  * @param[in]   buf         buffer to use as ringbuffer (must be power of two sized!)
  * @param[in]   bufsize     size of @p buf
  */
-void isrpipe_init(isrpipe_t *isrpipe, char *buf, size_t bufsize);
+void isrpipe_init(isrpipe_t *isrpipe, uint8_t *buf, size_t bufsize);
 
 /**
  * @brief   Put one character into the isrpipe's buffer
@@ -63,7 +63,7 @@ void isrpipe_init(isrpipe_t *isrpipe, char *buf, size_t bufsize);
  * @returns     0 if character could be added
  * @returns     -1 if buffer was full
  */
-int isrpipe_write_one(isrpipe_t *isrpipe, char c);
+int isrpipe_write_one(isrpipe_t *isrpipe, uint8_t c);
 
 /**
  * @brief   Read data from isrpipe (blocking)
@@ -74,7 +74,7 @@ int isrpipe_write_one(isrpipe_t *isrpipe, char c);
  *
  * @returns     number of bytes read
  */
-int isrpipe_read(isrpipe_t *isrpipe, char *buf, size_t count);
+int isrpipe_read(isrpipe_t *isrpipe, uint8_t *buf, size_t count);
 
 #ifdef __cplusplus
 }

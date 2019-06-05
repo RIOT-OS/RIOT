@@ -44,7 +44,7 @@ extern "C" {
  * @returns     number of bytes read
  * @returns     -ETIMEDOUT on timeout
  */
-int isrpipe_read_timeout(isrpipe_t *isrpipe, char *buf, size_t count, uint32_t timeout);
+int isrpipe_read_timeout(isrpipe_t *isrpipe, uint8_t *buf, size_t count, uint32_t timeout);
 
 /**
  * @brief   Read data from isrpipe (with timeout, blocking, wait until all read)
@@ -60,7 +60,7 @@ int isrpipe_read_timeout(isrpipe_t *isrpipe, char *buf, size_t count, uint32_t t
  * @returns     number of bytes read
  * @returns     -ETIMEDOUT on timeout
  */
-int isrpipe_read_all_timeout(isrpipe_t *isrpipe, char *buf, size_t count, uint32_t timeout);
+int isrpipe_read_all_timeout(isrpipe_t *isrpipe, uint8_t *buf, size_t count, uint32_t timeout);
 
 #ifdef __cplusplus
 }
