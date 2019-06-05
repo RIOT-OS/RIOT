@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the Cortex-M family
+ * @brief           Rom offset and firmware size calculations
  *
  * @author          Francisco Acosta <francisco.acosta@inria.fr>
  *                  Gaëtan Harter <gaetan.harter@inria.fr>
@@ -20,12 +20,7 @@
  * @}
  */
 
-INCLUDE cortexm_rom_offset.ld
+_rom_offset = DEFINED( _rom_offset ) ? _rom_offset : 0x0;
+_fw_rom_length = DEFINED( _fw_rom_length ) ? _fw_rom_length : _rom_length - _rom_offset;
 
-MEMORY
-{
-    rom (rx)    : ORIGIN = _rom_start_addr + _rom_offset, LENGTH = _fw_rom_length
-    ram (w!rx)  : ORIGIN = _ram_start_addr,               LENGTH = _ram_length
-}
-
-INCLUDE cortexm_base.ld
+ASSERT((_fw_rom_length <= _rom_length - _rom_offset), "Specified firmware size does not fit in ROM");
