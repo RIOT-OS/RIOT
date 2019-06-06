@@ -35,7 +35,7 @@
 #include "periph/uart.h"
 #include "isrpipe.h"
 
-#ifdef USE_ETHOS_FOR_STDIO
+#ifdef MODULE_STDIO_ETHOS
 #include "ethos.h"
 extern ethos_t ethos;
 #endif
@@ -61,18 +61,16 @@ void stdio_init(void)
     cb = (uart_rx_cb_t) isrpipe_write_one;
     arg = &stdio_uart_isrpipe;
 #else
-#ifdef USE_ETHOS_FOR_STDIO
-#error "ethos needs stdio_uart_rx"
-#endif
     cb = NULL;
     arg = NULL;
 #endif
 
-#ifndef USE_ETHOS_FOR_STDIO
-    uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, cb, arg);
-#else
+#ifdef MODULE_STDIO_ETHOS
     uart_init(ETHOS_UART, ETHOS_BAUDRATE, cb, arg);
+#else
+    uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, cb, arg);
 #endif
+
 #if MODULE_VFS
     vfs_bind_stdio();
 #endif
@@ -91,10 +89,10 @@ ssize_t stdio_read(void* buffer, size_t count)
 
 ssize_t stdio_write(const void* buffer, size_t len)
 {
-#ifndef USE_ETHOS_FOR_STDIO
-    uart_write(STDIO_UART_DEV, (const uint8_t *)buffer, len);
-#else
+#ifdef MODULE_STDIO_ETHOS
     ethos_send_frame(&ethos, (const uint8_t *)buffer, len, ETHOS_FRAME_TYPE_TEXT);
+#else
+    uart_write(STDIO_UART_DEV, (const uint8_t *)buffer, len);
 #endif
     return len;
 }
