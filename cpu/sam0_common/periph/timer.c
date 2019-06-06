@@ -56,7 +56,7 @@ static inline void wait_synchronization(tim_t tim)
 {
 #if defined(TC_SYNCBUSY_MASK)
     /* SYNCBUSY is a register */
-    while ((dev(tim)->SYNCBUSY.reg & TC_SYNCBUSY_MASK) != 0) {}
+    while ((dev(tim)->SYNCBUSY.reg) != 0) {}
 #elif defined(TC_STATUS_SYNCBUSY)
     /* SYNCBUSY is a bit */
     while ((dev(tim)->STATUS.reg & TC_STATUS_SYNCBUSY) != 0) {}
@@ -76,15 +76,11 @@ static inline void _irq_enable(tim_t tim)
  */
 int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
+    (void) freq;
     const tc32_conf_t *cfg = &timer_config[tim];
 
     /* make sure given device is valid */
     if (tim >= TIMER_NUMOF) {
-        return -1;
-    }
-
-    /* at the moment, the timer can only run at 1MHz */
-    if (freq != 1000000ul) {
         return -1;
     }
 
@@ -157,12 +153,12 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     case 0:
         dev(tim)->INTFLAG.reg = TC_INTFLAG_MC0;
         _set_cc(tim, 0, value);
-        dev(tim)->INTENSET.bit.MC0 = 1;
+        dev(tim)->INTENSET.reg = TC_INTENSET_MC0;
         break;
     case 1:
         dev(tim)->INTFLAG.reg = TC_INTFLAG_MC1;
         _set_cc(tim, 1, value);
-        dev(tim)->INTENSET.bit.MC1 = 1;
+        dev(tim)->INTENSET.reg = TC_INTENSET_MC1;
         break;
     default:
         return -1;
@@ -176,11 +172,11 @@ int timer_clear(tim_t tim, int channel)
     switch (channel) {
     case 0:
         dev(tim)->INTFLAG.reg = TC_INTFLAG_MC0;
-        dev(tim)->INTENCLR.bit.MC0 = 1;
+        dev(tim)->INTENCLR.reg = TC_INTENCLR_MC0;
         break;
     case 1:
         dev(tim)->INTFLAG.reg = TC_INTFLAG_MC1;
-        dev(tim)->INTENCLR.bit.MC1 = 1;
+        dev(tim)->INTENCLR.reg = TC_INTENCLR_MC1;
         break;
     default:
         return -1;
@@ -198,10 +194,18 @@ unsigned int timer_read(tim_t tim)
 
     /* request syncronisation */
 #ifdef TC_CTRLBSET_CMD_READSYNC_Val
-    dev(tim)->CTRLBSET.bit.CMD = TC_CTRLBSET_CMD_READSYNC_Val;
+    dev(tim)->CTRLBSET.reg = TC_CTRLBSET_CMD_READSYNC;
+     /* work aroud a possible hardware bug where it takes some
+        cycles for the timer peripheral to set the SYNCBUSY/READSYNC bit
+        after writing the READSYNC bit
+
+        The problem was observed on SAME54.
+      */
+    while(dev(tim)->CTRLBSET.bit.CMD == TC_CTRLBSET_CMD_READSYNC_Val) {}
 #else
-    dev(tim)->READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(0x10);
+    dev(tim)->READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(TC_COUNT32_COUNT_OFFSET);
 #endif
+
     wait_synchronization(tim);
 
     return dev(tim)->COUNT.reg;
