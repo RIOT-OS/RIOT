@@ -39,11 +39,11 @@ LOW_MEMORY_BOARDS := nucleo-f334r8
 GNRC_NETIF_NUMOF := 2
 
 # uncomment these to use ethos
-#USEMODULE += ethos gnrc_uhcpc
+#USEMODULE += stdio_ethos gnrc_uhcpc
 #
 ## ethos baudrate can be configured from make command
 #ETHOS_BAUDRATE ?= 115200
-#CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE) -DUSE_ETHOS_FOR_STDIO
+#CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)
 
 ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   $(info Using low-memory configuration for microcoap_server.)
