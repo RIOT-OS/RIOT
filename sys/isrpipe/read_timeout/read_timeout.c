@@ -35,7 +35,7 @@ static void _cb(void *arg)
     mutex_unlock(_timeout->mutex);
 }
 
-int isrpipe_read_timeout(isrpipe_t *isrpipe, char *buffer, size_t count, uint32_t timeout)
+int isrpipe_read_timeout(isrpipe_t *isrpipe, uint8_t *buffer, size_t count, uint32_t timeout)
 {
     int res;
 
@@ -44,7 +44,7 @@ int isrpipe_read_timeout(isrpipe_t *isrpipe, char *buffer, size_t count, uint32_
     xtimer_t timer = { .callback = _cb, .arg = &_timeout };
 
     xtimer_set(&timer, timeout);
-    while (!(res = tsrb_get(&isrpipe->tsrb, (uint8_t *)buffer, count))) {
+    while (!(res = tsrb_get(&isrpipe->tsrb, buffer, count))) {
         mutex_lock(&isrpipe->mutex);
         if (_timeout.flag) {
             res = -ETIMEDOUT;
@@ -57,9 +57,9 @@ int isrpipe_read_timeout(isrpipe_t *isrpipe, char *buffer, size_t count, uint32_
 }
 
 
-int isrpipe_read_all_timeout(isrpipe_t *isrpipe, char *buffer, size_t count, uint32_t timeout)
+int isrpipe_read_all_timeout(isrpipe_t *isrpipe, uint8_t *buffer, size_t count, uint32_t timeout)
 {
-    char *pos = buffer;
+    uint8_t *pos = buffer;
 
     while (count) {
         int res = isrpipe_read_timeout(isrpipe, pos, count, timeout);
