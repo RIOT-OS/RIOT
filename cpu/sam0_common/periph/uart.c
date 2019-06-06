@@ -99,7 +99,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     if ((rx_cb) && (uart_config[uart].rx_pin != GPIO_UNDEF)) {
         uart_ctx[uart].rx_cb = rx_cb;
         uart_ctx[uart].arg = arg;
-#if defined (CPU_SAML1X)
+#if defined (CPU_SAML1X) || defined (CPU_SAMD5X)
         NVIC_EnableIRQ(SERCOM0_2_IRQn + (sercom_id(dev(uart)) * 4));
 #else
         NVIC_EnableIRQ(SERCOM0_IRQn + sercom_id(dev(uart)));

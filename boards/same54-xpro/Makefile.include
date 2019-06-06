@@ -1,0 +1,8 @@
+# define the cpu used by SAME54 Xplained Pro board
+export CPU = samd5x
+export CPU_MODEL = same54p20a
+
+# set edbg device type
+EDBG_DEVICE_TYPE = atmel_cm4v2
+
+include $(RIOTMAKE)/boards/sam0.inc.mk

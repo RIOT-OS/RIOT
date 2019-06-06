@@ -10,6 +10,10 @@ ifneq (,$(filter saml10e16a saml11e16a,$(CPU_MODEL)))
   ROM_LEN ?= 64K
   RAM_LEN ?= 16K
 endif
+ifneq (,$(filter samd51j20a same54p20a,$(CPU_MODEL)))
+  ROM_LEN ?= 1024K
+  RAM_LEN ?= 256K
+endif
 
 ROM_START_ADDR ?= 0x00000000
 RAM_START_ADDR ?= 0x20000000
