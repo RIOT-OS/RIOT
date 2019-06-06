@@ -3,39 +3,24 @@
  *
  * \brief Header file for SAMR30G18A
  *
- * Copyright (c) 2016 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2016 Atmel Corporation,
+ *                    a wholly owned subsidiary of Microchip Technology Inc.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the Licence at
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * \asf_license_stop
  *
@@ -76,11 +61,17 @@ typedef volatile       uint32_t WoReg8;  /**< Write only  8-bit register (volati
 typedef volatile       uint32_t RwReg;   /**< Read-Write 32-bit register (volatile unsigned int) */
 typedef volatile       uint16_t RwReg16; /**< Read-Write 16-bit register (volatile unsigned int) */
 typedef volatile       uint8_t  RwReg8;  /**< Read-Write  8-bit register (volatile unsigned int) */
-#define CAST(type, value) ((type *)(value))
-#define REG_ACCESS(type, address) (*(type*)(address)) /**< C code: Register value */
+#if !defined(_UL)
+#define _U(x)          x ## U            /**< C code: Unsigned integer literal constant value */
+#define _L(x)          x ## L            /**< C code: Long integer literal constant value */
+#define _UL(x)         x ## UL           /**< C code: Unsigned Long integer literal constant value */
+#endif
 #else
-#define CAST(type, value) (value)
-#define REG_ACCESS(type, address) (address) /**< Assembly code: Register address */
+#if !defined(_UL)
+#define _U(x)          x                 /**< Assembler: Unsigned integer literal constant value */
+#define _L(x)          x                 /**< Assembler: Long integer literal constant value */
+#define _UL(x)         x                 /**< Assembler: Unsigned Long integer literal constant value */
+#endif
 #endif
 
 /* ************************************************************************** */
@@ -217,6 +208,7 @@ void PTC_Handler                 ( void );
  * \brief Configuration of the Cortex-M0+ Processor and Core Peripherals
  */
 
+#define LITTLE_ENDIAN          1        
 #define __CM0PLUS_REV          1         /*!< Core revision r0p1 */
 #define __MPU_PRESENT          0         /*!< MPU present or not */
 #define __NVIC_PRIO_BITS       2         /*!< Number of bits used for Priority Levels */
@@ -258,7 +250,6 @@ void PTC_Handler                 ( void );
 #include "component/port.h"
 #include "component/rstc.h"
 #include "component/rtc.h"
-#include "component/rfctrl.h"
 #include "component/sercom.h"
 #include "component/supc.h"
 #include "component/tal.h"
@@ -292,7 +283,6 @@ void PTC_Handler                 ( void );
 #include "instance/port.h"
 #include "instance/rstc.h"
 #include "instance/rtc.h"
-#include "instance/rfctrl.h"
 #include "instance/sercom0.h"
 #include "instance/sercom1.h"
 #include "instance/sercom2.h"
@@ -372,51 +362,51 @@ void PTC_Handler                 ( void );
 /*@{*/
 
 #if defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)
-#define AC                            (0x43001000UL) /**< \brief (AC) APB Base Address */
-#define ADC                           (0x43000C00UL) /**< \brief (ADC) APB Base Address */
-#define CCL                           (0x43001C00UL) /**< \brief (CCL) APB Base Address */
-#define DMAC                          (0x44000400UL) /**< \brief (DMAC) APB Base Address */
-#define DSU                           (0x41002000UL) /**< \brief (DSU) APB Base Address */
-#define EIC                           (0x40002400UL) /**< \brief (EIC) APB Base Address */
-#define EVSYS                         (0x43000000UL) /**< \brief (EVSYS) APB Base Address */
-#define GCLK                          (0x40001800UL) /**< \brief (GCLK) APB Base Address */
-#define MCLK                          (0x40000400UL) /**< \brief (MCLK) APB Base Address */
-#define MTB                           (0x41006000UL) /**< \brief (MTB) APB Base Address */
-#define NVMCTRL                       (0x41004000UL) /**< \brief (NVMCTRL) APB Base Address */
-#define NVMCTRL_CAL                   (0x00800000UL) /**< \brief (NVMCTRL) CAL Base Address */
-#define NVMCTRL_LOCKBIT               (0x00802000UL) /**< \brief (NVMCTRL) LOCKBIT Base Address */
-#define NVMCTRL_OTP1                  (0x00806000UL) /**< \brief (NVMCTRL) OTP1 Base Address */
-#define NVMCTRL_OTP2                  (0x00806008UL) /**< \brief (NVMCTRL) OTP2 Base Address */
-#define NVMCTRL_OTP3                  (0x00806010UL) /**< \brief (NVMCTRL) OTP3 Base Address */
-#define NVMCTRL_OTP4                  (0x00806018UL) /**< \brief (NVMCTRL) OTP4 Base Address */
-#define NVMCTRL_OTP5                  (0x00806020UL) /**< \brief (NVMCTRL) OTP5 Base Address */
-#define NVMCTRL_TEMP_LOG              (0x00806030UL) /**< \brief (NVMCTRL) TEMP_LOG Base Address */
-#define NVMCTRL_USER                  (0x00804000UL) /**< \brief (NVMCTRL) USER Base Address */
-#define OSCCTRL                       (0x40000C00UL) /**< \brief (OSCCTRL) APB Base Address */
-#define OSC32KCTRL                    (0x40001000UL) /**< \brief (OSC32KCTRL) APB Base Address */
-#define PAC                           (0x44000000UL) /**< \brief (PAC) APB Base Address */
-#define PM                            (0x40000000UL) /**< \brief (PM) APB Base Address */
-#define PORT                          (0x40002800UL) /**< \brief (PORT) APB Base Address */
-#define PORT_IOBUS                    (0x60000000UL) /**< \brief (PORT) IOBUS Base Address */
-#define RSTC                          (0x40000800UL) /**< \brief (RSTC) APB Base Address */
-#define RTC                           (0x40002000UL) /**< \brief (RTC) APB Base Address */
-#define RFCTRL                        (0x42003C00UL) /**< \brief (RFCTRL) APB Base Address */
-#define SERCOM0                       (0x42000000UL) /**< \brief (SERCOM0) APB Base Address */
-#define SERCOM1                       (0x42000400UL) /**< \brief (SERCOM1) APB Base Address */
-#define SERCOM2                       (0x42000800UL) /**< \brief (SERCOM2) APB Base Address */
-#define SERCOM3                       (0x42000C00UL) /**< \brief (SERCOM3) APB Base Address */
-#define SERCOM4                       (0x42001000UL) /**< \brief (SERCOM4) APB Base Address */
-#define SERCOM5                       (0x43000400UL) /**< \brief (SERCOM5) APB Base Address */
-#define SUPC                          (0x40001400UL) /**< \brief (SUPC) APB Base Address */
-#define TAL                           (0x40002C00UL) /**< \brief (TAL) APB Base Address */
-#define TC0                           (0x42002000UL) /**< \brief (TC0) APB Base Address */
-#define TC1                           (0x42002400UL) /**< \brief (TC1) APB Base Address */
-#define TC4                           (0x43000800UL) /**< \brief (TC4) APB Base Address */
-#define TCC0                          (0x42001400UL) /**< \brief (TCC0) APB Base Address */
-#define TCC1                          (0x42001800UL) /**< \brief (TCC1) APB Base Address */
-#define TCC2                          (0x42001C00UL) /**< \brief (TCC2) APB Base Address */
-#define USB                           (0x41000000UL) /**< \brief (USB) APB Base Address */
-#define WDT                           (0x40001C00UL) /**< \brief (WDT) APB Base Address */
+#define AC                            (0x43001000) /**< \brief (AC) APB Base Address */
+#define ADC                           (0x43000C00) /**< \brief (ADC) APB Base Address */
+#define CCL                           (0x43001C00) /**< \brief (CCL) APB Base Address */
+#define DMAC                          (0x44000400) /**< \brief (DMAC) APB Base Address */
+#define DSU                           (0x41002000) /**< \brief (DSU) APB Base Address */
+#define EIC                           (0x40002400) /**< \brief (EIC) APB Base Address */
+#define EVSYS                         (0x43000000) /**< \brief (EVSYS) APB Base Address */
+#define GCLK                          (0x40001800) /**< \brief (GCLK) APB Base Address */
+#define MCLK                          (0x40000400) /**< \brief (MCLK) APB Base Address */
+#define MTB                           (0x41006000) /**< \brief (MTB) APB Base Address */
+#define NVMCTRL                       (0x41004000) /**< \brief (NVMCTRL) APB Base Address */
+#define NVMCTRL_CAL                   (0x00800000) /**< \brief (NVMCTRL) CAL Base Address */
+#define NVMCTRL_LOCKBIT               (0x00802000) /**< \brief (NVMCTRL) LOCKBIT Base Address */
+#define NVMCTRL_OTP1                  (0x00806000) /**< \brief (NVMCTRL) OTP1 Base Address */
+#define NVMCTRL_OTP2                  (0x00806008) /**< \brief (NVMCTRL) OTP2 Base Address */
+#define NVMCTRL_OTP3                  (0x00806010) /**< \brief (NVMCTRL) OTP3 Base Address */
+#define NVMCTRL_OTP4                  (0x00806018) /**< \brief (NVMCTRL) OTP4 Base Address */
+#define NVMCTRL_OTP5                  (0x00806020) /**< \brief (NVMCTRL) OTP5 Base Address */
+#define NVMCTRL_TEMP_LOG              (0x00806030) /**< \brief (NVMCTRL) TEMP_LOG Base Address */
+#define NVMCTRL_USER                  (0x00804000) /**< \brief (NVMCTRL) USER Base Address */
+#define OSCCTRL                       (0x40000C00) /**< \brief (OSCCTRL) APB Base Address */
+#define OSC32KCTRL                    (0x40001000) /**< \brief (OSC32KCTRL) APB Base Address */
+#define PAC                           (0x44000000) /**< \brief (PAC) APB Base Address */
+#define PM                            (0x40000000) /**< \brief (PM) APB Base Address */
+#define PORT                          (0x40002800) /**< \brief (PORT) APB Base Address */
+#define PORT_IOBUS                    (0x60000000) /**< \brief (PORT) IOBUS Base Address */
+#define PTC                           (0x43001400) /**< \brief (PTC) APB Base Address */
+#define RSTC                          (0x40000800) /**< \brief (RSTC) APB Base Address */
+#define RTC                           (0x40002000) /**< \brief (RTC) APB Base Address */
+#define SERCOM0                       (0x42000000) /**< \brief (SERCOM0) APB Base Address */
+#define SERCOM1                       (0x42000400) /**< \brief (SERCOM1) APB Base Address */
+#define SERCOM2                       (0x42000800) /**< \brief (SERCOM2) APB Base Address */
+#define SERCOM3                       (0x42000C00) /**< \brief (SERCOM3) APB Base Address */
+#define SERCOM4                       (0x42001000) /**< \brief (SERCOM4) APB Base Address */
+#define SERCOM5                       (0x43000400) /**< \brief (SERCOM5) APB Base Address */
+#define SUPC                          (0x40001400) /**< \brief (SUPC) APB Base Address */
+#define TAL                           (0x40002C00) /**< \brief (TAL) APB Base Address */
+#define TC0                           (0x42002000) /**< \brief (TC0) APB Base Address */
+#define TC1                           (0x42002400) /**< \brief (TC1) APB Base Address */
+#define TC4                           (0x43000800) /**< \brief (TC4) APB Base Address */
+#define TCC0                          (0x42001400) /**< \brief (TCC0) APB Base Address */
+#define TCC1                          (0x42001800) /**< \brief (TCC1) APB Base Address */
+#define TCC2                          (0x42001C00) /**< \brief (TCC2) APB Base Address */
+#define USB                           (0x41000000) /**< \brief (USB) APB Base Address */
+#define WDT                           (0x40001C00) /**< \brief (WDT) APB Base Address */
 #else
 #define AC                ((Ac       *)0x43001000UL) /**< \brief (AC) APB Base Address */
 #define AC_INST_NUM       1                          /**< \brief (AC) Number of instances */
@@ -491,14 +481,13 @@ void PTC_Handler                 ( void );
 #define PORT_IOBUS        ((Port     *)0x60000000UL) /**< \brief (PORT) IOBUS Base Address */
 #define PORT_INST_NUM     1                          /**< \brief (PORT) Number of instances */
 #define PORT_INSTS        { PORT }                   /**< \brief (PORT) Instances List */
+#define PORT_IOBUS_INST_NUM 1                          /**< \brief (PORT) Number of instances */
+#define PORT_IOBUS_INSTS  { PORT_IOBUS }             /**< \brief (PORT) Instances List */
 
+#define PTC               ((void     *)0x43001400UL) /**< \brief (PTC) APB Base Address */
 #define PTC_GCLK_ID       33
 #define PTC_INST_NUM      1                          /**< \brief (PTC) Number of instances */
 #define PTC_INSTS         { PTC }                    /**< \brief (PTC) Instances List */
-
-#define RFCTRL            ((Rfctrl     *)0x42003C00U) /**< \brief (RSTC) APB Base Address */
-#define RFCTRL_INST_NUM     1                          /**< \brief (RSTC) Number of instances */
-#define RFCTRL_INSTS        { RFCTRL }                   /**< \brief (RSTC) Instances List */
 
 #define RSTC              ((Rstc     *)0x40000800UL) /**< \brief (RSTC) APB Base Address */
 #define RSTC_INST_NUM     1                          /**< \brief (RSTC) Number of instances */
@@ -561,27 +550,28 @@ void PTC_Handler                 ( void );
 /**  MEMORY MAPPING DEFINITIONS FOR SAMR30G18A */
 /* ************************************************************************** */
 
-#define FLASH_SIZE            0x40000UL /* 256 kB */
+#define FLASH_SIZE            _UL(0x00040000) /* 256 kB */
 #define FLASH_PAGE_SIZE       64
 #define FLASH_NB_OF_PAGES     4096
 #define FLASH_USER_PAGE_SIZE  64
-#define HSRAM_SIZE            0x8000UL /* 32 kB */
-#define LPRAM_SIZE            0x2000UL /* 8 kB */
+#define HSRAM_SIZE            _UL(0x00008000) /* 32 kB */
+#define LPRAM_SIZE            _UL(0x00002000) /* 8 kB */
 
-#define FLASH_ADDR            (0x00000000u) /**< FLASH base address */
-#define FLASH_USER_PAGE_ADDR  (0x00800000u) /**< FLASH_USER_PAGE base address */
-#define HSRAM_ADDR            (0x20000000u) /**< HSRAM base address */
-#define LPRAM_ADDR            (0x30000000u) /**< LPRAM base address */
-#define HPB0_ADDR             (0x40000000u) /**< HPB0 base address */
-#define HPB1_ADDR             (0x41000000u) /**< HPB1 base address */
-#define HPB2_ADDR             (0x42000000u) /**< HPB2 base address */
-#define HPB3_ADDR             (0x43000000u) /**< HPB3 base address */
-#define HPB4_ADDR             (0x44000000u) /**< HPB4 base address */
-#define PPB_ADDR              (0xE0000000u) /**< PPB base address */
+#define FLASH_ADDR            _UL(0x00000000) /**< FLASH base address */
+#define FLASH_USER_PAGE_ADDR  _UL(0x00800000) /**< FLASH_USER_PAGE base address */
+#define HSRAM_ADDR            _UL(0x20000000) /**< HSRAM base address */
+#define LPRAM_ADDR            _UL(0x30000000) /**< LPRAM base address */
+#define HPB0_ADDR             _UL(0x40000000) /**< HPB0 base address */
+#define HPB1_ADDR             _UL(0x41000000) /**< HPB1 base address */
+#define HPB2_ADDR             _UL(0x42000000) /**< HPB2 base address */
+#define HPB3_ADDR             _UL(0x43000000) /**< HPB3 base address */
+#define HPB4_ADDR             _UL(0x44000000) /**< HPB4 base address */
+#define PPB_ADDR              _UL(0xE0000000) /**< PPB base address */
 
-#define DSU_DID_RESETVALUE    0x1081021EUL
-#define NVMCTRL_RWW_EEPROM_SIZE 0x2000UL /* 8 kB */
+#define DSU_DID_RESETVALUE    _UL(0x1081021E)
+#define NVMCTRL_RWW_EEPROM_SIZE _UL(0x00002000) /* 8 kB */
 #define PORT_GROUPS           3
+#define SIP_CONFIG            RF212
 #define USB_HOST_IMPLEMENTED  1
 
 /* ************************************************************************** */
