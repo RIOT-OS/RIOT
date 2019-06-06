@@ -24,7 +24,20 @@ SAMD21 mcu.
 ### Pinout
 
 <img src="https://cdn-learn.adafruit.com/assets/assets/000/030/921/original/adafruit_products_2772_pinout_v1_0.png"
-     alt="Adafruit Feather M0 proto pinout" style="width:800px;"/>
+     alt="Adafruit Feather M0 proto pinout" style="width:800px;"/><br/>
+
+`AIN7` can be used to [measure the voltage of a connected Lipoly battery][battery].
+It is mapped to ADC_LINE(6) in RIOT.
+
+~~~~~~~~~~~~~~~~ {.c}
+int vbat = adc_sample(ADC_LINE(6), ADC_RES_10BIT);
+vbat *= 2;      /* voltage was divided by 2, so multiply it back */
+vbat *= 33;     /* reference voltage 3.3V * 10 */
+vbat /= 10240;  /* resolution * 10 (because we multiplied 3.3V by 10) */
+printf("Bat: %dV\n", vbat);
+~~~~~~~~~~~~~~~~
+
+[battery]: https://learn.adafruit.com/adafruit-feather-m0-basic-proto/power-management#measuring-battery-4-9
 
 ### Flash the board
 
