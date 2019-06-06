@@ -8,16 +8,18 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 # wolfSSL supports 32-bit architectures only
-BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
-                   jiminy-mega256rfr2 mega-xplained msb-430 msb-430h telosb \
+BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo arduino-mega2560 arduino-nano arduino-uno \
+                   chronos jiminy-mega256rfr2 mega-xplained msb-430 msb-430h telosb \
                    waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini \
-                             cc2650-launchpad cc2650stk hifive1 maple-mini \
-                             microbit nrf51dongle nrf6310 nucleo-f031k6 \
-                             nucleo-f042k6 nucleo-f303k8 nucleo-l031k6 nucleo-f030r8 \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill \
+                             calliope-mini cc2650-launchpad cc2650stk hifive1 i-nucleo-lrwan1 \
+                             maple-mini microbit nrf51dongle nrf6310 nucleo-f031k6 \
+                             nucleo-f042k6 nucleo-f303k8 nucleo-f303k8 nucleo-l031k6 nucleo-f030r8 \
                              nucleo-f070rb nucleo-f072rb nucleo-f103rb nucleo-f302r8 nucleo-f334r8 \
-                             nucleo-l053r8 nucleo-l073rz opencm904 \
+                             nucleo-l031k6 nucleo-l053r8 nucleo-l073rz opencm904 \
+                             saml11-xpro bluepill blackpill saml10-xpro \
+                             stm32l0538-disco \
                              spark-core stm32f0discovery stm32mindev yunjia-nrf51822
 
 # Include packages that pull up and auto-init the link layer.
@@ -35,15 +37,19 @@ USEMODULE += shell_commands
 USEPKG += wolfssl
 USEMODULE += wolfcrypt
 USEMODULE += wolfssl
-USEMODULE += wolfcrypt-test
-USEMODULE += wolfcrypt_ecc
 USEMODULE += wolfssl_dtls
 
+# Select public key algorithm (or PSK) support fot ciphersuite(s):
+#USEMODULE += wolfcrypt_ecc
+#USEMODULE += wolfcrypt_rsa wolfcrypt_dh
+USEMODULE += wolfssl_psk
+
+# Uncomment the following line to add debug symbols
 #CFLAGS+=-g -ggdb3
 
-CFLAGS += -DDTLS_DEFAULT_PORT=$(DTLS_PORT) -DDTLS_WOLFSSL
+CFLAGS += -DDTLS_DEFAULT_PORT=$(DTLS_PORT) -DDTLS_WOLFSSL -Wno-unused-parameter -Wno-unused-variable
 
-# FIXME: This is a temporary patch taken from the TinyDTLS example to ensure proper stack allocation
+# A larger stack size is required if using ECC or RSA
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(3*THREAD_STACKSIZE_DEFAULT\)
 
 # Comment this out to disable code in RIOT that does safety checking
@@ -52,6 +58,6 @@ CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(3*THREAD_STACKSIZE_DEFAULT\)
 CFLAGS += -DDEVELHELP
 
 # Change this to 0 show compiler invocation lines by default:
-QUIET ?= 0
+QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include

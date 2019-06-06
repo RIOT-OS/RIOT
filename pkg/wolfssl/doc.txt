@@ -12,7 +12,7 @@
  * # License
  *
  * wolfSSL’s software is available under two distinct licensing models:
- * open source and standard commercial licensing.
+ * Open Source (GPLv2) or proprietary.
  *
  * Open Source
  *
@@ -24,7 +24,7 @@
  * wolfMQTT
  * wolfSSH
  *
- * These software products are free software downloads and may be modified to
+ * These software products are free software and may be modified to
  * the needs of the user as long as the user adheres to version two of the GPL
  * License. The GPLv2 license can be found on the gnu.org website
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
@@ -68,113 +68,85 @@
  * FEATURES:
  *
  * Because wolfSSL was designed with embedded systems in mind the library is
- * extremely modular. There are very fiew dependancies in wolfSSL Cryptographic
+ * extremely modular. There are very few dependancies in wolfSSL Cryptographic
  * library and we have chosen to setup the pkg makefile to allow for easy
  * modification by developers. We chose to include the core of our library in a
- * singular list and then seperate out the features that a developer may or may
+ * singular list and then separate out the features that a developer may or may
  * not wish to use by default. Please reference the Makefile.wolfssl in
  * "<RIOT-root>/pkg/wolfssl" directory. wolfSSL has chosen to enable a
  * significant portion of our wolfcrypt functionality by default and provided
  * informative comments to explain how a feature might be enabled/disabled.
  *
- * Features should be controlled with the header "user_settings.h" in the root
- * directory of the application. Since RIOT uses the "Empty Translation Unit"
- * warning in combination with the "-Werror" flag you will need to exclude
- * source files from your application by modifying the Makefile.wolfssl in the
- * "<RIOT-root>/pkg/wolfssl" directory when disabling a feature or adding a
- * feature that wolfSSL chose to leave out by default.
+ * Features should be controlled with the header "user_settings.h" included with
+ * the package.
+ * On RIOT-OS, wolfSSL and wolfCrypt libraries can be configured using
+ * PSEUDOMODULES. After selecting the wolfSSL package via:
  *
- * Default ENABLED Features are:
- * aes, arc4, asn, coding, des3, dh, dsa, hmac, md4, md5, pkcs12, pwdbased,
- * rabbit, random, rsa, sha, sha256, signature, tfm (fast math), ecc, and memory
+ * ```makefile
+ * USEPKG+=wolfssl
+ * ```
  *
- * Default DISABLED Features are:
- * integer (normal math), misc (included inline by default), md2, pkcs7,
- * chacha, poly1305, ripemd, sha3 (keccak), sha512, srp, hc128, idea,
- * blake2b (sha3 runner-up IE sha3 alternative to keccak), camellia, compress,
- * curve25519, ed25519, cmac, evp, and asm
+ * Single ciphers, algorithms and features can be selected by including the
+ * associated pseudomodule, e.g.:
+ *
+ * ```makefile
+ * USEMODULE += wolfcrypt
+ * USEMODULE += wolfssl
+ * USEMODULE += wolfcrypt-test
+ * USEMODULE += wolfssl_dtls
+ * ```
+ *
+ * NOTES ON TRANSPORT LAYER:
+ *
+ * wolfSSL package for RIOT-OS supports two types of socket communication:
+ * - GNRC UDP/IP interface (based on sock_udp)
+ * - generic full-POSIX socket support (based on module posix-socket)
+ *
+ * By default, GNRC support is compiled in for UDP/IP communication when the
+ * module `wolfssl_dtls` is selected. Ensure that the module `gnrc_sock_udp`
+ * is also included in the build.
+ *
+ * Alternatively, to enable full-POSIX TLS/DTLS, select the `wolfssl_socket` module by
+ * adding the followint to the application's Makefile:
+ *
+ * ```makefile
+ * USEMODULE += wolfssl_socket
+ * ```
+ *
+ * Refer to the examples in the following section for more details about the API
+ * and the integration with the transport layer.
  *
  * EXAMPLES:
  *
  * wolfSSL has provided a few examples of using this package in the RIOT
  * examples directory. To test these do any of the following:
  *
- * Benchmark Example:
+ * wolfSSL Test/Benchmark:
+ * Useful to verify that the ciphers are working properly
+ * on the target, and comparing performance on different
+ * platforms.
  *
  * ```makefile
- * cd <path-to>/RIOT/examples/wolfssl_crypto_benchmark
+ * cd <path-to>/RIOT/tests/wolfssl-test
  * make
- * ./bin/native/wolfssl_crypto_benchmark.elf
+ * ./bin/native/wolfssl-test.elf # execute native port
  * ```
  *
- * Crypto Test Example:
+ * ED25519 signature verification demo
+ * Very small footprint application to demonstrate
+ * Ed25519 signature verification with a very small footprint
+ * and memory requirements
  *
  * ```makefile
- * cd <path-to>/RIOT/examples/wolfssl_crypto_test
+ * cd <path-to>/RIOT/tests/wolfcrypt-ed25519-verify
  * make
- * ./bin/native/wolfssl_crypto_test.elf
+ * ./bin/native/wolfcrypt-ed25519-verify.elf # execute native port
  * ```
  *
- * Client and Server Example(s):
  *
- * ```makefile
- * cd <path-to>/RIOT/examples/wolfssl_server
- * make
- * ./bin/native/wolf_server.elf
- * ```
- *
- * Now open a second terminal and do...
- *
- * ```makefile
- * cd <path-to>/RIOT/examples/wolfssl_client
- * make
- * ./bin/native/wolf_client.elf
- * ```
- *
- * You should see the following output:
- *
- * SERVER OUTPUT:
- *
- * ```makefile
- * RIOT native interrupts/signals initialized.
- * LED_RED_OFF
- * LED_GREEN_ON
- * RIOT native board initialized.
- * RIOT native hardware initialization complete.
- *
- * main(): This is RIOT!
- * This is the wolfSSL Server!
- * Server is running on 127.0.0.1 and listening on port 11111
- * Waiting for a connection...
- * Client connected successfully
- * Client sent a message!
- * Client said: Hello wolfSSL Server!
- * Sending reply to client, reply reads: I hear ya fa shizzle!
- *
- * Waiting for a connection...
- * ```
- *
- * After the client connection the server cleans up and returns to wait for
- * another client connection. You can kill the server with a Ctrl+C (SIG INT) or
- * by modifying the client to send the string "shutdown" instead of
- * "Hello wolfSSL Server!".
- *
- * CLIENT OUTPUT:
- *
- * ```makefile
- * RIOT native interrupts/signals initialized.
- * LED_RED_OFF
- * LED_GREEN_ON
- * RIOT native board initialized.
- * RIOT native hardware initialization complete.
- *
- * main(): This is RIOT!
- * Message for server: Hello wolfSSL Server!
- * Server sent a reply!
- * Server Response was:  I hear ya fa shizzle!
- * ```
- *
- * At this point the client simply terminates and does nothing interesting.
+ * DTLS Client and Server Example
+ * DTLS example over GNRC UDP/IP stack.
+ * See documentation in `examples/dtls-wolfssl/README.md`
  *
  * QUESTIONS / CONCERNS / FEEDBACK:
  *

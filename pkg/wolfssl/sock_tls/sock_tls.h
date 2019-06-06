@@ -1,3 +1,12 @@
+/*
+ * Copyright (C) 2019 Daniele Lacamera
+ *
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /* @defgroup    module sock_tls
  * @ingroup     pkg_wolfssl
  * @brief       Sock submodule for TLS/DTLS sessions
@@ -225,11 +234,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define MODE_TLS 0
-#define MODE_DTLS 1
 
-#define MODE_TLS 0
-#define MODE_DTLS 1
 /**
  * @brief   Creates a new DTLS sock object.
  *
@@ -277,7 +282,7 @@ extern "C" {
  *          ((local->netif != SOCK_ADDR_ANY_NETIF) ||
  *          (remote->netif != SOCK_ADDR_ANY_NETIF))` if neither is `NULL`).
  * @return  -ENOMEM, if not enough resources can be provided for `sock` to be
- *          created, 0 upon success.
+ *          created.
  */
 int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local, const sock_udp_ep_t *remote, uint16_t flags, WOLFSSL_METHOD *method);
 
@@ -287,7 +292,7 @@ int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local, const sock_ud
  * @pre `(sk != NULL)`
  * @pre `(addr != NULL)`
  *
- * @param[in] sock     The resulting sock object.
+ * @param[in] sk        The resulting sock object.
  * @param[in] addr      Remote end point for the DTLS session.
  *
  */
@@ -298,7 +303,7 @@ void sock_dtls_set_endpoint(sock_tls_t *sk, const sock_udp_ep_t *addr);
  *
  * @pre `(sk != NULL)`
  *
- * @param[in] sock      The sock object previously created using @ref sock_dtls_create
+ * @param[in] sk      The sock object previously created using @ref sock_dtls_create
  *
  * @return  0 on success.
  * @return  -EINVAL, if @sock is null or the SSL context is not initialized yet.
@@ -329,7 +334,7 @@ void sock_dtls_close(sock_tls_t *sk);
 
 
 #ifdef MODULE_SOCK_TCP
-/* TODO */
+#   error Only support for UDP/IP provided via GNRC stack.
 #endif
 
 #ifdef __cplusplus

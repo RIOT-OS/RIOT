@@ -1,36 +1,24 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- * Copyright (C) 2018 Inria
+ * Copyright (C) 2019 Daniele Lacamera
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-/*
- * **** This file incorporates work covered by the following copyright and ****
- * **** permission notice:                                                 ****
+
+/**
+ * @ingroup     examples
+ * @{
  *
- * Copyright (C) 2006-2018 wolfSSL Inc.
+ * @file
+ * @brief       Demonstrating DTLS 1.2 client using wolfSSL
  *
- * This file is part of wolfSSL.
- *
- * wolfSSL is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * wolfSSL is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
- *
+ * @author      Daniele Lacamera <daniele@wolfssl.com>
+ * @}
  */
 
 #include <wolfssl/ssl.h>
+#include <wolfssl/error-ssl.h>
 #include <sock_tls.h>
 #include <net/sock.h>
 
@@ -38,24 +26,81 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SERVER_PORT 11111
+#include "log.h"
 
-extern const unsigned char server_cert[788];
+#define SERVER_PORT 11111
+#define APP_DTLS_BUF_SIZE 64
+
+extern const unsigned char server_cert[];
 extern const unsigned long server_cert_len;
 
 static sock_tls_t skv;
 static sock_tls_t *sk = &skv;
 
+static void usage(const char *cmd_name)
+{
+    LOG(LOG_ERROR, "Usage: %s <server-address>\n", cmd_name);
+}
+
+#ifdef MODULE_WOLFSSL_PSK
+/* identity is OpenSSL testing default for openssl s_client, keep same */
+static const char* kIdentityStr = "Client_identity";
+
+static inline unsigned int my_psk_client_cb(WOLFSSL* ssl, const char* hint,
+        char* identity, unsigned int id_max_len, unsigned char* key,
+        unsigned int key_max_len)
+{
+    (void)ssl;
+    (void)hint;
+    (void)key_max_len;
+
+    /* see internal.h MAX_PSK_ID_LEN for PSK identity limit */
+    strncpy(identity, kIdentityStr, id_max_len);
+
+    if (wolfSSL_GetVersion(ssl) < WOLFSSL_TLSV1_3) {
+        /* test key in hex is 0x1a2b3c4d , in decimal 439,041,101 , we're using
+           unsigned binary */
+        key[0] = 0x1a;
+        key[1] = 0x2b;
+        key[2] = 0x3c;
+        key[3] = 0x4d;
+
+        return 4;   /* length of key in octets or 0 for error */
+    }
+    else {
+        int i;
+        int b = 0x01;
+
+        for (i = 0; i < 32; i++, b += 0x22) {
+            if (b >= 0x100)
+                b = 0x01;
+            key[i] = b;
+        }
+
+        return 32;   /* length of key in octets or 0 for error */
+    }
+}
+#endif
+
 int dtls_client(int argc, char **argv)
 {
     int ret = 0;
-    char buf[64] = "Hello from DTLS client!";
+    char buf[APP_DTLS_BUF_SIZE] = "Hello from DTLS client!";
     int iface;
-    char *addr_str = argv[1];
+    char *addr_str;
+    int connect_timeout = 0;
+    const int max_connect_timeouts = 5;
+
+    if (argc != 2) {
+        usage(argv[0]);
+        return -1;
+    }
+
+    addr_str = argv[1];
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
     sock_udp_ep_t remote = SOCK_IPV6_EP_ANY;
 
-    /* Parsing <address>[:<iface>]:Port */
+    /* Parsing <address> */
     iface = ipv6_addr_split_iface(addr_str);
     if (iface == -1) {
         if (gnrc_netif_numof() == 1) {
@@ -65,25 +110,24 @@ int dtls_client(int argc, char **argv)
     }
     else {
         if (gnrc_netif_get_by_pid(iface) == NULL) {
-            puts("ERROR: interface not valid");
+            LOG(LOG_ERROR, "ERROR: interface not valid");
+            usage(argv[0]);
             return -1;
         }
         remote.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
     }
     if (ipv6_addr_from_str((ipv6_addr_t *)remote.addr.ipv6, addr_str) == NULL) {
-        puts("ERROR: unable to parse destination address");
-        return -1;
-    }
-    if (argc != 2) {
-        printf("Usage: %s <server-address>\n", argv[0]);
+        LOG(LOG_ERROR, "ERROR: unable to parse destination address");
+        usage(argv[0]);
         return -1;
     }
     remote.port = SERVER_PORT;
     if (sock_dtls_create(sk, &local, &remote, 0, wolfDTLSv1_2_client_method()) != 0) {
-        puts("ERROR: Unable to create DTLS sock");
+        LOG(LOG_ERROR, "ERROR: Unable to create DTLS sock");
         return -1;
     }
 
+#ifndef MODULE_WOLFSSL_PSK
     /* Disable certificate validation from the client side */
     wolfSSL_CTX_set_verify(sk->ctx, SSL_VERIFY_NONE, 0);
 
@@ -91,18 +135,37 @@ int dtls_client(int argc, char **argv)
     if (wolfSSL_CTX_use_certificate_buffer(sk->ctx, server_cert,
                 server_cert_len, SSL_FILETYPE_ASN1 ) != SSL_SUCCESS)
     {
-        printf("Error loading cert buffer\n");
+        LOG(LOG_ERROR, "Error loading cert buffer\n");
         return -1;
     }
 
+#else /* !def MODULE_WOLFSSL_PSK */
+    wolfSSL_CTX_set_psk_client_callback(sk->ctx, my_psk_client_cb);
+#endif
+
+    if (sock_dtls_session_create(sk) < 0)
+        return -1;
+    wolfSSL_dtls_set_timeout_init(sk->ssl, 5);
+    LOG(LOG_INFO, "connecting to server...");
     /* attempt to connect until the connection is successful */
     do {
-        printf("connecting to server...\n");
-        if (sock_dtls_session_create(sk) < 0)
-            return -1;
         ret = wolfSSL_connect(sk->ssl);
-        if (ret != SSL_SUCCESS) {
-            sock_dtls_session_destroy(sk);
+        if ((ret != SSL_SUCCESS)) {
+            if(wolfSSL_get_error(sk->ssl, ret) == SOCKET_ERROR_E) {
+                LOG(LOG_WARNING, "Socket error: reconnecting...\n");
+                sock_dtls_session_destroy(sk);
+                connect_timeout = 0;
+                if (sock_dtls_session_create(sk) < 0)
+                    return -1;
+            }
+            if ((wolfSSL_get_error(sk->ssl, ret) == WOLFSSL_ERROR_WANT_READ) &&
+                    (connect_timeout++ >= max_connect_timeouts)) {
+                LOG(LOG_WARNING, "Server not responding: reconnecting...\n");
+                sock_dtls_session_destroy(sk);
+                connect_timeout = 0;
+                if (sock_dtls_session_create(sk) < 0)
+                    return -1;
+            }
         }
     } while(ret != SSL_SUCCESS);
 
@@ -114,14 +177,14 @@ int dtls_client(int argc, char **argv)
 
     /* wait for a reply, indefinitely */
     do {
-        ret = wolfSSL_read(sk->ssl, buf, 63);
-        printf("wolfSSL_read returned %d\r\n", ret);
+        ret = wolfSSL_read(sk->ssl, buf, APP_DTLS_BUF_SIZE - 1);
+        LOG(LOG_INFO, "wolfSSL_read returned %d\r\n", ret);
     } while (ret <= 0);
     buf[ret] = (char)0;
-    printf("Received: '%s'\r\n", buf);
+    LOG(LOG_INFO, "Received: '%s'\r\n", buf);
 
     /* Clean up and exit. */
-    printf("Closing connection.\r\n");
+    LOG(LOG_INFO, "Closing connection.\r\n");
     sock_dtls_session_destroy(sk);
     sock_dtls_close(sk);
     return 0;

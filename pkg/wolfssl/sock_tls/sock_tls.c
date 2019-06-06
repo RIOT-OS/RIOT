@@ -1,41 +1,20 @@
-/* Copyright (C) 2014 Freie Universität Berlin
+/*
+ * Copyright (C) 2019 Daniele Lacamera
+ *
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * **** This file incorporates work covered by the following copyright and ****
- * **** permission notice:                                                 ****
- *
- * Copyright (C) 2006-2017 wolfSSL Inc.
- *
- * This file is part of wolfSSL.
- *
- * wolfSSL is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * wolfSSL is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
- *
  */
 
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #include <net/sock.h>
 #include <wolfssl/ssl.h>
+#include <wolfssl/internal.h>
 
-#define MODE_TLS 0
-#define MODE_DTLS 1
+#include <log.h>
 
 void sock_dtls_close(sock_tls_t *sk)
 {
@@ -44,8 +23,8 @@ void sock_dtls_close(sock_tls_t *sk)
 
 void sock_dtls_set_endpoint(sock_tls_t *sk, const sock_udp_ep_t *addr)
 {
-    printf("wolfSSL: Setting peer address and port\n");
-    memcpy(&sk->peer_addr, addr, sizeof (sock_udp_ep_t));
+    LOG(LOG_INFO, "wolfSSL: Setting peer address and port\n");
+    XMEMCPY(&sk->peer_addr, addr, sizeof (sock_udp_ep_t));
 }
 
 int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local, const sock_udp_ep_t *remote, uint16_t flags, WOLFSSL_METHOD *method)
@@ -66,8 +45,6 @@ int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local, const sock_ud
     if (remote) {
         XMEMCPY(&sock->peer_addr, remote, sizeof(sock_udp_ep_t));
     }
-    wolfSSL_SetIORecv(sock->ctx, GNRC_Receive);
-    wolfSSL_SetIOSend(sock->ctx, GNRC_SendTo);
     return 0;
 }
 
@@ -77,11 +54,12 @@ static int tls_session_create(sock_tls_t *sk)
         return -EINVAL;
     sk->ssl = wolfSSL_new(sk->ctx);
     if (sk->ssl == NULL) {
-        printf("Error allocating ssl session\n");
+        LOG(LOG_ERROR, "Error allocating ssl session\n");
         return -ENOMEM;
     }
     wolfSSL_SetIOReadCtx(sk->ssl, sk);
     wolfSSL_SetIOWriteCtx(sk->ssl, sk);
+    sk->ssl->gnrcCtx = sk;
     return 0;
 }
 
@@ -109,11 +87,19 @@ void sock_dtls_session_destroy(sock_tls_t *sk)
 
 
 
+#ifndef __mips__
 #include <ctype.h>
 int strncasecmp(const char *s1, const char * s2, unsigned int sz)
 {
-    for( ; sz>0; sz--)
-        if(toupper(*s1++) != toupper(*s2++))
-            return 1;
+    unsigned int i;
+    for( i = 0; i < sz; i++) {
+        int res;
+        const unsigned char *us1 = (const unsigned char *)s1;
+        const unsigned char *us2 = (const unsigned char *)s2;
+        res = toupper(us1[i]) - toupper(us2[i]);
+        if (res != 0)
+            return res;
+    }
     return 0;
 }
+#endif
