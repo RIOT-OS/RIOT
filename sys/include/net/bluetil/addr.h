@@ -56,6 +56,19 @@ void bluetil_addr_sprint(char *out, const uint8_t *addr);
 void bluetil_addr_print(const uint8_t *addr);
 
 /**
+ * @brief   Parse a BLE address from the given string
+ *
+ * @param[out] addr     buffer to write the BLE address, *must* be able to hold
+ *                      BLE_ADDR_LEN bytes
+ * @param[in] addr_str  address string, must be at least of length
+ *                      (BLUETIL_ADDR_STRLEN - 1)
+ *
+ * @return  a pointer to the resulting address on success
+ * @return  NULL on parsing error
+ */
+uint8_t *bluetil_addr_from_str(uint8_t *addr, const char *addr_str);
+
+/**
  * @brief   Get a string representation of the given BLE addresses IID-based
  *          link local address
  *
