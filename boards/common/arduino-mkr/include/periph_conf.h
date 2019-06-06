@@ -252,6 +252,20 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
+ * @name USB peripheral configuration
+ * @{
+ */
+static const sam0_common_usb_config_t sam_usbdev_config[] = {
+    {
+        .dm     = GPIO_PIN(PA, 24),
+        .dp     = GPIO_PIN(PA, 25),
+        .d_mux  = GPIO_MUX_G,
+        .device = &USB->DEVICE,
+    }
+};
+/** @} */
+
+/**
  * @name RTC configuration
  * @{
  */
