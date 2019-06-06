@@ -208,10 +208,10 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
                 return -1;
             }
             else if (strncmp(pos, "+CME ERROR:", 11) == 0) {
-                return -1;
+                return -2;
             }
             else if (strncmp(pos, "+CMS ERROR:", 11) == 0) {
-                return -1;
+                return -2;
             }
             else {
                 pos += res;
