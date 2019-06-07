@@ -15,13 +15,18 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+ 
+_rom_offset = DEFINED( _rom_offset ) ? _rom_offset : 0x0;
+_fw_rom_length = DEFINED( _fw_rom_length ) ? _fw_rom_length : _rom_length - _rom_offset;
+
+ASSERT((_fw_rom_length <= _rom_length - _rom_offset), "Specified firmware size does not fit in ROM");
 
 /* Memory Space Definitions: */
 MEMORY
 {
-    rom (rx)    : ORIGIN = 0x00200000, LENGTH = 512K - 44
+    rom (rx)    : ORIGIN = _rom_start_addr + _rom_offset, LENGTH = _fw_rom_length
     cca         : ORIGIN = 0x0027ffd4, LENGTH = 44
-    ram (w!rx)  : ORIGIN = 0x20000000, LENGTH = 32K
+    ram (w!rx)  : ORIGIN = _ram_start_addr,               LENGTH = _ram_length
 }
 
 /* MCU Specific Section Definitions */
