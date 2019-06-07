@@ -2,6 +2,20 @@
 # These functions should help replacing immediate evaluation and global 'export'
 
 
+# Evaluate a deferred variable only once on its first usage
+# Uses after that will be as if it was an immediate evaluation
+# This can replace using `:=` by default
+#
+# The goal is to use it for `shell` commands
+#
+# variable = $(call memoized,<variable>,<value>)
+#
+# Parameters
+#  variable: name of the variable you set
+#  value: value that should be set when evaluated
+memoized = $2$(eval $1:=$2)
+
+
 # Target specific export the variables for that target
 #
 # target-export-variables <target> <variables>
