@@ -12,13 +12,13 @@ ifneq ("$(wildcard $(UNIFLASH_PATH)/dslite.sh)","")
   _XDS110RESET_4_0_4_3 ?= $(UNIFLASH_PATH)/simplelink/gen2/bin/xds110reset
   _XDS110RESET ?= $(UNIFLASH_PATH)/simplelink/imagecreator/bin/xds110reset
   XDS110RESET ?= $(firstword $(wildcard $(_XDS110RESET) $(_XDS110RESET_4_0_4_3)) xds110reset)
-  RESET = $(XDS110RESET)
+  RESET ?= $(XDS110RESET)
 else
   FLASHER = $(UNIFLASH_PATH)/uniflash.sh
   FFLAGS  = -ccxml $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml -program $(FLASHFILE)
   # configure uniflash for resetting target
-  RESET = $(UNIFLASH_PATH)/uniflash.sh
-  RESET_FLAGS = -ccxml $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml -reset
+  RESET ?= $(UNIFLASH_PATH)/uniflash.sh
+  RESET_FLAGS ?= -ccxml $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml -reset
 endif
 # configure the debug server
 DEBUGSERVER = $(UNIFLASH_PATH)/ccs_base/common/uscif/gdb_agent_console
