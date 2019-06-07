@@ -177,7 +177,10 @@ static const spi_conf_t spi_config[] = {
         .miso_pin = GPIO_PIN(PORT_A, 6),
         .sclk_pin = GPIO_PIN(PORT_A, 5),
         .cs_pin   = GPIO_PIN(PORT_B, 6),
-        .af       = GPIO_AF0,
+        .mosi_af  = GPIO_AF0,
+        .miso_af  = GPIO_AF0,
+        .sclk_af  = GPIO_AF0,
+        .cs_af    = GPIO_AF0,
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2,
 #ifdef MODULE_PERIPH_DMA
