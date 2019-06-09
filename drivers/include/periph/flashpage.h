@@ -87,6 +87,15 @@ extern "C" {
 #endif
 
 /**
+ * @def FLASH_ERASE_STATE
+ *
+ * @brief   State of an erased byte in memmory
+ */
+#ifndef FLASH_ERASE_STATE
+#define FLASH_ERASE_STATE               (0xFF)
+#endif
+
+/**
  * @brief   Return values used in this interface
  */
 enum {
