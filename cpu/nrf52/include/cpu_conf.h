@@ -57,6 +57,9 @@ extern "C" {
  */
 #define FLASHPAGE_SIZE                  (4096U)
 
+/* An erase byte in flash is set to 0xFF */
+#define FLASH_ERASE_STATE               (0xFF)
+
 #if defined(CPU_MODEL_NRF52832XXAA)
 #define FLASHPAGE_NUMOF                 (128U)
 #elif defined(CPU_MODEL_NRF52840XXAA)

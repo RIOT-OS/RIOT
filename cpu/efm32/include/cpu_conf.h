@@ -43,6 +43,8 @@ extern "C" {
  * @brief   Flash page configuration
  * @{
  */
+/* An erase byte in flash is set to 0xFF */
+#define FLASH_ERASE_STATE               (0xFF)
 #define FLASHPAGE_SIZE                  (FLASH_PAGE_SIZE)
 #define FLASHPAGE_NUMOF                 (FLASH_SIZE / FLASH_PAGE_SIZE)
 /** @} */

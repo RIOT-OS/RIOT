@@ -74,6 +74,16 @@ extern "C" {
 #ifdef DOXYGEN
 #define FLASHPAGE_RAW_ALIGNMENT
 #endif
+
+/**
+ * @def FLASH_ERASE_STATE
+ *
+ * @brief   State of an erased byte in memory
+ */
+#ifdef DOXYGEN
+#define FLASH_ERASE_STATE
+#endif
+
 /**
  * @def FLASHPAGE_SIZE
  *
@@ -85,6 +95,7 @@ extern "C" {
 #ifndef FLASHPAGE_NUMOF
 #error "periph/flashpage: FLASHPAGE_NUMOF not defined"
 #endif
+
 
 /**
  * @brief   Return values used in this interface

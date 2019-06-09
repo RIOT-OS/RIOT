@@ -28,6 +28,9 @@ extern "C" {
  */
 #define FLASHPAGE_SIZE      (512)
 
+/* An erase byte in flash is set to 0xFF */
+#define FLASH_ERASE_STATE   (0xFF)
+
 #if defined (CPU_MODEL_MSP430F1611)
 #define CPU_FLASH_BASE      (0x4000)
 #define FLASHPAGE_NUMOF     (96)        /* 48K */
