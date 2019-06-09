@@ -168,6 +168,21 @@ static inline uint32_t _get_ep_bitflag(usbdev_ep_t *ep)
                                            : 0x00) + ep->num);
 }
 
+static void _set_ep_event(usbus_t *usbus, usbdev_ep_t *ep)
+{
+    if (irq_is_in()) {
+        usbus->ep_events |= _get_ep_bitflag(ep);
+    }
+    else {
+        unsigned state = irq_disable();
+        usbus->ep_events |= _get_ep_bitflag(ep);
+        irq_restore(state);
+    }
+
+    thread_flags_set((thread_t *)thread_get(usbus->pid),
+                     USBUS_THREAD_FLAG_USBDEV_EP);
+}
+
 static uint32_t _get_and_reset_ep_events(usbus_t *usbus)
 {
     unsigned state = irq_disable();
@@ -316,16 +331,14 @@ static void _event_cb(usbdev_t *usbdev, usbdev_event_t event)
     }
 }
 
+
 /* USB generic endpoint callback */
 static void _event_ep_cb(usbdev_ep_t *ep, usbdev_event_t event)
 {
     usbus_t *usbus = (usbus_t *)ep->dev->context;
 
     if (event == USBDEV_EVENT_ESR) {
-        assert(irq_is_in());
-        usbus->ep_events |= _get_ep_bitflag(ep);
-        thread_flags_set((thread_t *)thread_get(usbus->pid),
-                         USBUS_THREAD_FLAG_USBDEV_EP);
+        _set_ep_event(usbus, ep);
     }
     else {
         usbus_handler_t *handler = _ep_to_handler(usbus, ep);
