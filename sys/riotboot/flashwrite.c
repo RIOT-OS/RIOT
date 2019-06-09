@@ -53,6 +53,8 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
              target_slot);
 
     memset(state, 0, sizeof(riotboot_flashwrite_t));
+    /* set flashpage_buf to erase state values*/
+    memset(state->flashpage_buf, FLASH_ERASE_STATE, offset);
 
     state->offset = offset;
     state->target_slot = target_slot;
@@ -98,10 +100,9 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
 
     int res = -1;
 
+#ifndef MODULE_PERIPH_FLASHPAGE_RAW
     uint8_t *slot_start = (uint8_t *)riotboot_slot_get_hdr(state->target_slot);
-
     uint8_t *firstpage;
-
     if (len < FLASHPAGE_SIZE) {
         firstpage = state->flashpage_buf;
         memcpy(firstpage, bytes, len);
@@ -118,7 +119,25 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
         LOG_WARNING(LOG_PREFIX "re-flashing first block failed!\n");
         goto out;
     }
-
+#else
+    void *slot_start = (void *)riotboot_slot_get_hdr(state->target_slot);
+    if ((len % FLASHPAGE_RAW_BLOCKSIZE) != 0) {
+        void *firstpage;
+        firstpage = state->flashpage_buf;
+        uint8_t aligned_len = ((len / FLASHPAGE_RAW_BLOCKSIZE) + 1) *
+                              FLASHPAGE_RAW_BLOCKSIZE;
+        memcpy(firstpage, slot_start, aligned_len);
+        memcpy(firstpage, bytes, len);
+        flashpage_write_raw(slot_start, firstpage, aligned_len);
+    }
+    else {
+        flashpage_write_raw(slot_start, (void *)bytes, len);
+    }
+    if (memcmp(slot_start, bytes, len) != 0) {
+        LOG_WARNING(LOG_PREFIX "re-flashing first block failed!\n");
+        goto out;
+    }
+#endif
     LOG_INFO(LOG_PREFIX "riotboot flashing completed successfully\n");
     res = 0;
 
