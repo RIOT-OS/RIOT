@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
@@ -116,6 +117,7 @@ static char* _find_pathstart(const char *url)
 
 int sock_urlsplit(const char *url, char *hostport, char *urlpath)
 {
+    assert(url);
     char *hoststart = _find_hoststart(url);
     if (!hoststart) {
         return -EINVAL;
@@ -123,23 +125,25 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
 
     char *pathstart = _find_pathstart(hoststart);
 
-    size_t hostlen = pathstart - hoststart;
-    /* hostlen must be smaller SOCK_HOSTPORT_MAXLEN to have space for the null
-     * terminator */
-    if (hostlen > SOCK_HOSTPORT_MAXLEN - 1) {
-        return -EOVERFLOW;
+    if (hostport) {
+        size_t hostlen = pathstart - hoststart;
+        /* hostlen must be smaller SOCK_HOSTPORT_MAXLEN to have space for the null
+        * terminator */
+        if (hostlen > SOCK_HOSTPORT_MAXLEN - 1) {
+            return -EOVERFLOW;
+        }
+        memcpy(hostport, hoststart, hostlen);
+        hostport[hostlen] = '\0';
     }
-    memcpy(hostport, hoststart, hostlen);
-    *(hostport + hostlen) = '\0';
 
-    size_t pathlen = strlen(pathstart);
-    if (pathlen) {
+    if (urlpath) {
+        size_t pathlen = strlen(pathstart);
         if (pathlen > SOCK_URLPATH_MAXLEN - 1) {
             return -EOVERFLOW;
         }
         memcpy(urlpath, pathstart, pathlen);
+        urlpath[pathlen] = '\0';
     }
-    *(urlpath + pathlen) = '\0';
     return 0;
 }
 

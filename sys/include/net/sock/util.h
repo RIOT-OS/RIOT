@@ -54,12 +54,14 @@ int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *por
  *
  * @note Caller has to make sure hostport and urlpath can hold the results!
  *       Make sure to provide space for @ref SOCK_HOSTPORT_MAXLEN respectively
- *       @ref SOCK_URLPATH_MAXLEN bytes.
+ *       @ref SOCK_URLPATH_MAXLEN bytes, if pointers are not NULL.
  *       Scheme part of the URL is limited to @ref SOCK_SCHEME_MAXLEN length.
  *
- * @param[in]   url         URL to split
- * @param[out]  hostport    where to write host:port
- * @param[out]  urlpath     where to write url path
+ * @pre `url != NULL`
+ *
+ * @param[in]   url         URL to split. Must not be NULL.
+ * @param[out]  hostport    where to write host:port. Can be NULL.
+ * @param[out]  urlpath     where to write url path. Can be NULL.
  *
  * @returns     0 on success
  * @returns     <0 otherwise
