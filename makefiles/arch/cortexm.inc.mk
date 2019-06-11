@@ -1,3 +1,7 @@
+ifeq (,$(CPU_MODEL))
+  $(error CPU_MODEL must have been defined by the board/cpu Makefile.features)
+endif
+
 # Target triple for the build. Use arm-none-eabi if you are unsure.
 export TARGET_ARCH ?= arm-none-eabi
 
@@ -38,9 +42,6 @@ export USEMODULE += cortexm_common_periph
 
 # all cortex MCU's use newlib as libc
 export USEMODULE += newlib
-
-# set default for CPU_MODEL
-export CPU_MODEL ?= $(CPU)
 
 
 # extract version inside the first parentheses
