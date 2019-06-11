@@ -40,6 +40,7 @@ welcome:
 print-versions:
 	@./dist/tools/ci/print_toolchain_versions.sh
 
+include makefiles/boards.inc.mk
 include makefiles/app_dirs.inc.mk
 
 -include makefiles/tests.inc.mk
