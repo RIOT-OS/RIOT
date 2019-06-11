@@ -56,7 +56,8 @@ check_not_parsing_features() {
     # These two files contain sanity checks using FEATURES_ so are allowed
     pathspec+=(':!Makefile.include' ':!makefiles/info-global.inc.mk')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}"
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message 'Modules should not check the content of FEATURES_PROVIDED/_REQUIRED/OPTIONAL'
 }
 
 # Some variables do not need to be exported and even cause issues when being
@@ -87,7 +88,8 @@ check_not_exporting_variables() {
         patterns+=(-e "export[[:blank:]]\+${variable}")
     done
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}"
+    git -C "${RIOTBASE}" grep "${patterns[@]}" \
+        | error_with_message 'Variables must not be exported:'
 
     # Some variables may still be exported in 'makefiles/vars.inc.mk' as the
     # only place that should export commont variables
@@ -101,7 +103,8 @@ check_not_exporting_variables() {
 
     # Only run if there are patterns, otherwise it matches everything
     if [ ${#patterns[@]} -ne 0 ]; then
-        git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}"
+        git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+            | error_with_message 'Variables must only be exported in `makefiles/vars.inc.mk`:'
     fi
 }
 
