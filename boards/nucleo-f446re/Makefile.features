@@ -10,6 +10,7 @@ FEATURES_PROVIDED += periph_qdec
 
 # Various other features (if any)
 FEATURES_PROVIDED += motor_driver
+FEATURES_PROVIDED += riotboot
 
 # load the common Makefile.features for Nucleo boards
 include $(RIOTBOARD)/common/nucleo64/Makefile.features
