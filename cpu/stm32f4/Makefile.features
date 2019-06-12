@@ -1,4 +1,6 @@
 FEATURES_PROVIDED += periph_hwrng
+FEATURES_PROVIDED += periph_flashpage
+FEATURES_PROVIDED += periph_flashpage_raw
 
 # the granularity of provided feature definition for STMs is currently by CPU
 # sub-family (e.g., stm32f[1234]).  Unfortunately, only some of e.g., the
