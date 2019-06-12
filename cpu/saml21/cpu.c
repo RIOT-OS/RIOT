@@ -28,6 +28,41 @@ static void _gclk_setup(int gclk, uint32_t reg)
     while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_GENCTRL(gclk)) {}
 }
 
+static void _osc32k_setup(void)
+{
+#if INTERNAL_OSC32_SOURCE
+    uint32_t * pCalibrationArea;
+    uint32_t osc32kcal;
+
+    /* Read OSC32KCAL, calibration data for OSC32 !!! */
+    pCalibrationArea = (uint32_t*) NVMCTRL_OTP5;
+    osc32kcal = ( (*pCalibrationArea) & 0x1FC0 ) >> 6;
+
+    /* RTC use Low Power Internal Oscillator at 32kHz */
+    OSC32KCTRL->OSC32K.reg = OSC32KCTRL_OSC32K_RUNSTDBY
+                           | OSC32KCTRL_OSC32K_EN32K
+                           | OSC32KCTRL_OSC32K_CALIB(osc32kcal)
+                           | OSC32KCTRL_OSC32K_ENABLE;
+
+    /* Wait OSC32K Ready */
+    while (!OSC32KCTRL->STATUS.bit.OSC32KRDY) {}
+#endif /* INTERNAL_OSC32_SOURCE */
+}
+
+static void _xosc32k_setup(void)
+{
+#if EXTERNAL_OSC32_SOURCE
+    /* RTC uses External 32,768KHz Oscillator */
+    OSC32KCTRL->XOSC32K.reg = OSC32KCTRL_XOSC32K_XTALEN
+                            | OSC32KCTRL_XOSC32K_RUNSTDBY
+                            | OSC32KCTRL_XOSC32K_EN32K
+                            | OSC32KCTRL_XOSC32K_ENABLE;
+
+    /* Wait XOSC32K Ready */
+    while (!OSC32KCTRL->STATUS.bit.XOSC32KRDY) {}
+#endif
+}
+
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks
  */
@@ -67,6 +102,9 @@ void cpu_init(void)
     OSCCTRL->OSC16MCTRL.bit.FSEL = 3;
     OSCCTRL->OSC16MCTRL.bit.ONDEMAND = 0;
     OSCCTRL->OSC16MCTRL.bit.RUNSTDBY = 0;
+
+    _osc32k_setup();
+    _xosc32k_setup();
 
     /* Setup GCLK generators */
     _gclk_setup(0, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
