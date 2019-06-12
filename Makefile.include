@@ -334,6 +334,9 @@ USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 # process dependencies
 include $(RIOTBASE)/Makefile.dep
 
+# Include provided features from drivers after all dependencies are known
+include $(RIOTBASE)/drivers/Makefile.features
+
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
 endif
