@@ -42,7 +42,7 @@
 #else
 #if defined(CPU_FAM_STM32L4)
 #define FLASHPAGE_DIV          (8U)
-#elif defined(CPU_FAM_STM32F4)
+#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
 #define FLASHSECTORS_BANK      (12)
 #define FLASHPAGE_DIV          (4U)
 #else
@@ -157,7 +157,7 @@ static void _erase_sector_page(void *page_addr)
 }
 #endif
 
-#if !(defined(CPU_FAM_STM32F4))
+#if !(defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4))
 static void _erase_page(void *page_addr)
 {
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
@@ -246,7 +246,7 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
            (CPU_FLASH_BASE + (FLASHPAGE_SIZE * FLASHPAGE_NUMOF)) + 1);
 
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
-    defined(CPU_FAM_STM32F4)
+    defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
     uint32_t *dst = target_addr;
     const uint32_t *data_addr = data;
 #elif defined(CPU_FAM_STM32L4)
@@ -270,7 +270,7 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     /* make sure no flash operation is ongoing */
     _wait_for_pending_operations();
 
-#if defined(CPU_FAM_STM32F4)
+#if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
     /* set parallelism to 32bits */
     CNTRL_REG &= FLASH_CR_PSIZE_Msk;
     CNTRL_REG |= (0x2 << FLASH_CR_PSIZE_Pos);
@@ -300,7 +300,8 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     _lock();
 
 #if !(defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
-      defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F4))
+      defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F2) || \
+      defined(CPU_FAM_STM32F4))
     /* restore the HSI state */
     if (!hsi_state) {
         stmclk_disable_hsi();
@@ -322,7 +323,7 @@ void flashpage_write(int page, const void *data)
     uint16_t *page_addr = flashpage_addr(page);
 #endif
 
-#if !(defined(CPU_FAM_STM32F4))
+#if !(defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4))
     /* ERASE sequence */
     _erase_page(page_addr);
 #else
