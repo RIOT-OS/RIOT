@@ -795,7 +795,7 @@ ifneq (,$(filter skald_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter skald,$(USEMODULE)))
-  FEATURES_REQUIRED += radio_ble
+  FEATURES_REQUIRED += radio_nrfble
   USEMODULE += xtimer
   USEMODULE += random
 endif
