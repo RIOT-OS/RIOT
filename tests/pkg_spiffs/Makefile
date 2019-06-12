@@ -21,8 +21,6 @@ BOARD_BLACKLIST := chronos \
                    wsn430-v1_4 \
                    z1 \
 
-TEST_ON_CI_WHITELIST += all
-
 USEMODULE += spiffs
 USEMODULE += embunit
 

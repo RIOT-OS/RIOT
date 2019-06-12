@@ -18,6 +18,4 @@ USEMODULE += od
 
 CFLAGS += -DGNRC_PKTBUF_SIZE=200
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

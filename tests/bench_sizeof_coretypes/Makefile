@@ -15,6 +15,4 @@ ifneq (,$(NO_MSG))
   DISABLE_MODULE += core_msg
 endif
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

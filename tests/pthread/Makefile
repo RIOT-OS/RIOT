@@ -10,6 +10,4 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo arduino-mega2560 \
 USEMODULE += posix_headers
 USEMODULE += pthread
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

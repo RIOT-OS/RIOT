@@ -34,7 +34,6 @@ ifneq ($(BOARD),native)
   TESTS=
 endif
 
-TEST_ON_CI_WHITELIST += all
 # test fails on murdock and on my machine due to the process exiting directly
 TEST_ON_CI_BLACKLIST += all
 

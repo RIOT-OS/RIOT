@@ -19,8 +19,6 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove \
                              arduino-nano \
                              arduino-uno
 
-TEST_ON_CI_WHITELIST += all
-
 APP_SHELL_FMT ?= NONE
 
 include $(RIOTBASE)/Makefile.include

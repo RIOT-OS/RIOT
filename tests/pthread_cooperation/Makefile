@@ -12,6 +12,4 @@ BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6
 USEMODULE += posix_headers
 USEMODULE += pthread
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

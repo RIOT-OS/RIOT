@@ -7,8 +7,6 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
                    jiminy-mega256rfr2 mega-xplained waspmote-pro \
                    chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
 
-TEST_ON_CI_WHITELIST += all
-
 USEPKG += libhydrogen
 USEMODULE += embunit
 

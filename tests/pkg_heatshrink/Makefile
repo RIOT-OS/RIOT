@@ -7,8 +7,6 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove \
                              nucleo-f031k6 \
                              #
 
-TEST_ON_CI_WHITELIST += all
-
 USEPKG += heatshrink
 USEMODULE += embunit
 

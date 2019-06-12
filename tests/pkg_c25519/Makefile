@@ -7,8 +7,6 @@ USEPKG += c25519
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
                              arduino-uno
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include
 
 # c25519 takes up to 1.5K in stack, almost independent of the platform

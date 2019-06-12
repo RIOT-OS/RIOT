@@ -5,8 +5,6 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
 
 USEMODULE += xtimer
 
-TEST_ON_CI_WHITELIST += all
-
 # Port and pin configuration for probing with oscilloscope
 # Define Test pin for hardware timer interrupt, hardware dependent
 # For all ATmega Platforms

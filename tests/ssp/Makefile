@@ -10,6 +10,4 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
 
 USEMODULE += ssp
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

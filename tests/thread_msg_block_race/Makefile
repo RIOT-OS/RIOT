@@ -9,6 +9,4 @@ DISABLE_MODULE += auto_init
 FEATURES_REQUIRED += periph_timer
 USEMODULE += random
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

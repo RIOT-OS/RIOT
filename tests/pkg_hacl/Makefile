@@ -8,8 +8,6 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
 
 BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6 nucleo-f042k6
 
-TEST_ON_CI_WHITELIST += all
-
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(5*THREAD_STACKSIZE_DEFAULT\)
 USEPKG += hacl
 USEMODULE += random
