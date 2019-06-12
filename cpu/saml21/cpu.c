@@ -20,11 +20,12 @@
 
 #include "cpu.h"
 #include "periph/init.h"
+#include "periph_conf.h"
 
 static void _gclk_setup(int gclk, uint32_t reg)
 {
-    while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_GENCTRL(gclk)) {}
     GCLK->GENCTRL[gclk].reg = reg;
+    while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_GENCTRL(gclk)) {}
 }
 
 /**
@@ -59,17 +60,16 @@ void cpu_init(void)
     while (GCLK->CTRLA.reg & GCLK_CTRLA_SWRST) {}
     while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_SWRST) {}
 
+    PM->PLCFG.reg = PM_PLCFG_PLSEL_PL2;
+    while (!PM->INTFLAG.bit.PLRDY) {}
+
     /* set OSC16M to 16MHz */
     OSCCTRL->OSC16MCTRL.bit.FSEL = 3;
     OSCCTRL->OSC16MCTRL.bit.ONDEMAND = 0;
     OSCCTRL->OSC16MCTRL.bit.RUNSTDBY = 0;
 
-    PM->PLCFG.reg = PM_PLCFG_PLSEL_PL2;
-    while (!PM->INTFLAG.bit.PLRDY) {}
-
     /* Setup GCLK generators */
     _gclk_setup(0, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
-    _gclk_setup(1, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K);
 
 #ifdef MODULE_PERIPH_PM
     PM->CTRLA.reg = PM_CTRLA_MASK & (~PM_CTRLA_IORET);
