@@ -65,71 +65,34 @@ static inline void _rtc_set_enabled(bool on)
 #ifdef CPU_SAMD21
 static void _rtc_clock_setup(void)
 {
-    /* RTC uses External 32,768KHz Oscillator (OSC32K isn't accurate enough p1075/1138)*/
-    SYSCTRL->XOSC32K.reg =  SYSCTRL_XOSC32K_ONDEMAND |
-                            SYSCTRL_XOSC32K_EN32K |
-                            SYSCTRL_XOSC32K_XTALEN |
-                            SYSCTRL_XOSC32K_STARTUP(6) |
-                            SYSCTRL_XOSC32K_ENABLE;
-
     /* Setup clock GCLK2 with OSC32K divided by 32 */
-    GCLK->GENDIV.reg = GCLK_GENDIV_ID(2)|GCLK_GENDIV_DIV(4);
-    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_XOSC32K | GCLK_GENCTRL_ID(2) | GCLK_GENCTRL_DIVSEL );
-    GCLK->CLKCTRL.reg = (uint32_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK2 | (RTC_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
+    GCLK->GENDIV.reg = GCLK_GENDIV_ID(2) | GCLK_GENDIV_DIV(4);
+    GCLK->GENCTRL.bit.DIVSEL = 1;
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(2) | GCLK_CLKCTRL_ID_RTC;
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 }
 #else
 static void _rtc_clock_setup(void)
 {
-    MCLK->APBAMASK.reg |= MCLK_APBAMASK_OSC32KCTRL;
-
-#if EXTERNAL_OSC32_SOURCE
-
-    /* RTC uses External 32,768KHz Oscillator */
-    OSC32KCTRL->XOSC32K.reg = OSC32KCTRL_XOSC32K_XTALEN
-                            | OSC32KCTRL_XOSC32K_EN1K
-                            | OSC32KCTRL_XOSC32K_RUNSTDBY
-                            | OSC32KCTRL_XOSC32K_ENABLE;
-
-    /* Wait XOSC32K Ready */
-    while (OSC32KCTRL->STATUS.bit.XOSC32KRDY==0) {}
-
     /* RTC source clock is external oscillator at 1kHz */
+#if EXTERNAL_OSC32_SOURCE
+    OSC32KCTRL->XOSC32K.bit.EN1K = 1;
     OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_XOSC1K;
 
-#endif /* EXTERNAL_OSC32_SOURCE */
-
-#if INTERNAL_OSC32_SOURCE
-    uint32_t * pCalibrationArea;
-    uint32_t osc32kcal;
-
-    /* Read OSC32KCAL, calibration data for OSC32 !!! */
-    pCalibrationArea = (uint32_t*) NVMCTRL_OTP5;
-    osc32kcal = ( (*pCalibrationArea) & 0x1FC0 ) >> 6;
-
-    /* RTC use Low Power Internal Oscillator at 1kHz */
-    OSC32KCTRL->OSC32K.reg = OSC32KCTRL_OSC32K_RUNSTDBY
-                           | OSC32KCTRL_OSC32K_EN1K
-                           | OSC32KCTRL_OSC32K_CALIB(osc32kcal)
-                           | OSC32KCTRL_OSC32K_ENABLE;
-
-    /* Wait OSC32K Ready */
-    while (OSC32KCTRL->STATUS.bit.OSC32KRDY==0) {}
-
     /* RTC uses internal 32,768KHz Oscillator */
+#elif INTERNAL_OSC32_SOURCE
+    OSC32KCTRL->OSC32K.bit.EN1K = 1;
     OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_OSC1K;
 
-
-#endif /* INTERNAL_OSC32_SOURCE */
-
-#if ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE
-
     /* RTC uses Ultra Low Power internal 32,768KHz Oscillator */
+#elif ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE
     OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_ULP1K;
 
-#endif /* ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE */
+#else
+#error "No clock source for RTC selected. "
+#endif
 }
-#endif /* CPU_SAMD21 - Clock Setup */
+#endif /* !CPU_SAMD21 - Clock Setup */
 
 void rtc_init(void)
 {
