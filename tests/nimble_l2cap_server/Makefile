@@ -1,6 +1,5 @@
-# Configure default and allowed boards
+# Configure nrf52dk as default board
 BOARD ?= nrf52dk
-BOARD_WHITELIST := nrf52dk nrf52840dk
 
 # load the default test environment
 include ../Makefile.tests_common
