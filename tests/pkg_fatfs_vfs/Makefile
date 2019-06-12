@@ -51,6 +51,11 @@ BOARD_WHITELIST := airfy-beacon arduino-due arduino-duemilanove \
 
 TEST_DEPS += image
 
+TEST_ON_CI_WHITELIST += all
+# The test requires some manual setup to work
+# So it cannot currently be run
+TEST_ON_CI_BLACKLIST += all
+
 include $(RIOTBASE)/Makefile.include
 
 image:
