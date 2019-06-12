@@ -1,0 +1,39 @@
+_802154_DRIVERS = at86rf2xx     \
+                  cc110x        \
+                  cc2420        \
+                  cc2538_rf     \
+                  kw2xrf        \
+                  mrf24j40      \
+                  xbee          \
+                  #
+
+_ETHERNET_DRIVERS = enc28j60    \
+                    encx24j600  \
+                    ethos       \
+                    w5100       \
+                    #
+
+_LORA_DRIVERS = rn2xx3          \
+                sx127x          \
+                #
+
+_NETIF_DRIVERS = $(_802154_DRIVERS)     \
+                 $(_ETHERNET_DRIVERS)   \
+                 sx127x                 \
+                 #
+
+ifneq (,$(filter $(_NETIF_DRIVERS),$(USEMODULE)))
+  FEATURES_PROVIDED += netif
+endif
+
+ifneq (,$(filter $(_802154_DRIVERS),$(USEMODULE)))
+  FEATURES_PROVIDED += radio_802154
+endif
+
+ifneq (,$(filter $(_ETHERNET_DRIVERS),$(USEMODULE)))
+  FEATURES_PROVIDED += ethernet
+endif
+
+ifneq (,$(filter $(_LORA_DRIVERS),$(USEMODULE)))
+  FEATURES_PROVIDED += radio_lora
+endif
