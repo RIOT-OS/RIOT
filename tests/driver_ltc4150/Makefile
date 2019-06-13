@@ -4,7 +4,7 @@ BOARD_INSUFFICIENT_MEMORY += arduino-duemilanove arduino-leonardo arduino-nano \
                              arduino-uno
 BOARD ?= msba2
 
-USEMODULE += fmt
+USEMODULE += fmt_table
 USEMODULE += ltc4150
 
 include $(RIOTBASE)/Makefile.include
