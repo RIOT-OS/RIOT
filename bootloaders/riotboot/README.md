@@ -63,7 +63,8 @@ the riotboot test in tests/.
 # Single Slot
 Just compile your application with `FEATURES_REQUIRED += riotboot`. The header
 is generated automatically according to your `APP_VER`, which can be optionally
-set (0 by default) in your makefile.
+set (current system time in seconds since 1970 (epoch) by default) in your
+makefile.
 
 
 ## Flashing example
@@ -102,15 +103,6 @@ target `riotboot/flash-extended-slot0` is the way to go (resulting in only
 slot 0 being valid, thus being booted). This is done automatically by `make
 flash` if the `riotboot` feature is used.
 
-## Flashing examples
+## Testing riotboot
 
-The following sequence of commands tests building, flashing and booting slot 0,
-then slot 1. tests/riotboot prints out the current booted slot in the shell.
-
-To test building, flashing and booting the first slot:
-
-`BOARD=samr21-xpro APP_VER=$(date +%s) make -C tests/riotboot/ riotboot/flash-combined-slot0 test`
-
-For the second slot:
-
-`BOARD=samr21-xpro APP_VER=$(date +%s) make -C tests/riotboot/ riotboot/flash-slot1 test`
+See [tests/riotboot/README.md](https://github.com/RIOT-OS/RIOT/blob/master/tests/riotboot/README.md).
