@@ -2,6 +2,9 @@ include ../Makefile.tests_common
 
 USEPKG += lua
 
+# This application uses getchar and thus expects input from stdio
+USEMODULE += stdin
+
 BOARD_WHITELIST += native samr21-xpro
 
 ifneq ($(BOARD),native)
