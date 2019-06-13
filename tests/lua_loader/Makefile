@@ -11,6 +11,3 @@ ifneq ($(BOARD),native)
 endif
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	tests/01-run.py
