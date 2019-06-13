@@ -17,6 +17,24 @@
 
 SCRIPT_PATH=dist/tools/buildsystem_sanity_check/check.sh
 
+
+tab_indent() {
+    # Ident using 'bashism' to to the tab compatible with 'bsd-sed'
+    sed 's/^/\'$'\t/'
+}
+
+prepend() {
+    # 'i' needs 'i\{newline}' and a newline after for 'bsd-sed'
+    sed '1i\
+'"$1"'
+'
+}
+
+error_with_message() {
+    tab_indent | prepend "${1}"
+}
+
+
 # Modules should not check the content of FEATURES_PROVIDED/_REQUIRED/OPTIONAL
 # Handling specific behaviors/dependencies should by checking the content of:
 # * `USEMODULE`
@@ -87,6 +105,10 @@ check_not_exporting_variables() {
     fi
 }
 
+
+error_on_input() {
+    grep '' && return 1
+}
 
 main() {
     local errors=''
