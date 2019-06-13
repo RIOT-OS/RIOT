@@ -3,6 +3,9 @@ USEMODULE += posix_semaphore
 USEMODULE += event_callback
 USEMODULE += xtimer
 
+# Requires nimble feature
+FEATURES_REQUIRED += ble_nimble
+
 # glue code
 USEMODULE += nimble_riot_contrib
 

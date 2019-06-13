@@ -6,7 +6,7 @@ ifeq (,$(filter nordic_softdevice_ble,$(USEPKG)))
 endif
 
 # Various other features (if any)
-FEATURES_PROVIDED += radio_ble
+FEATURES_PROVIDED += ble_nimble
 FEATURES_PROVIDED += radio_nrfble
 
 include $(RIOTCPU)/nrf52/Makefile.features
