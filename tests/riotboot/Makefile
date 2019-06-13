@@ -18,9 +18,5 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-# Target 'all' will generate the combined file directly.
-# It also makes 'flash' and 'flash-only' work without specific command.
-FLASHFILE = $(RIOTBOOT_COMBINED_BIN)
-
 include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include
