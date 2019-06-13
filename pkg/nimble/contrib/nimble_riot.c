@@ -176,6 +176,13 @@ void nimble_riot_init(void)
     nimble_autoconn_enable();
 #endif
 
+#ifdef MODULE_STDIO_NIMBLE
+    extern void stdio_nimble_init(void);
+    /* stdio_nimble_init() needs to be called after nimble stack initialization
+     * and before nimble_autoadv_init() */
+    stdio_nimble_init();
+#endif
+
 #ifdef MODULE_NIMBLE_AUTOADV
     extern void nimble_autoadv_init(void);
     nimble_autoadv_init();

@@ -155,6 +155,7 @@ PSEUDOMODULES += stdin
 PSEUDOMODULES += stdio_available
 PSEUDOMODULES += stdio_cdc_acm
 PSEUDOMODULES += stdio_ethos
+PSEUDOMODULES += stdio_nimble_debug
 PSEUDOMODULES += stdio_uart_rx
 PSEUDOMODULES += stm32_eth
 PSEUDOMODULES += stm32_eth_auto
