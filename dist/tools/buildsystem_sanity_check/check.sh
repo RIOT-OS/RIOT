@@ -110,19 +110,14 @@ error_on_input() {
     grep '' && return 1
 }
 
+all_checks() {
+    check_not_parsing_features
+    check_not_exporting_variables
+}
+
 main() {
-    local errors=''
-
-    errors+="$(check_not_parsing_features)"
-    errors+="$(check_not_exporting_variables)"
-
-    if [ -n "${errors}" ]
-    then
-        printf 'Invalid build system patterns found by %s:\n' "${0}"
-        printf '%s\n' "${errors}"
-        exit 1
-    fi
-    exit 0
+    all_checks | prepend 'Invalid build system patterns found by '"${0}:"  || error_on_input >&2
+    exit $?
 }
 
 
