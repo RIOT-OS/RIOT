@@ -110,7 +110,7 @@ check_not_exporting_variables() {
 
 
 error_on_input() {
-    grep '' && return 1
+    ! grep ''
 }
 
 all_checks() {
