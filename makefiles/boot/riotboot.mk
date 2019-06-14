@@ -13,16 +13,26 @@ BINDIR_APP = $(BINDIR)/$(APPLICATION)
 #
 export SLOT0_OFFSET SLOT0_LEN SLOT1_OFFSET SLOT1_LEN
 
-# Mandatory APP_VER, set to epoch by default
-APP_VER ?= $(shell date +%s)
+# Mandatory APP_VER, set to epoch by default, or "0" for CI build
+ifeq (1, RIOT_CI_BUILD)
+  APP_VER ?= 0
+else
+  APP_VER ?= $(shell date +%s)
+endif
 
 # Final target for slot 0 with riot_hdr
 SLOT0_RIOT_BIN = $(BINDIR_APP)-slot0.riot.bin
 SLOT1_RIOT_BIN = $(BINDIR_APP)-slot1.riot.bin
 SLOT_RIOT_BINS = $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 
+# if RIOTBOOT_SKIP_COMPILE is set to 1, "make riotboot/slot[01](-flash)"
+# will not depend on the base elf files, thus skipping the compilation step.
+# This results in the equivalent to "make flash-only" for
+# "make riotboot/flash-slot[01]".
+ifneq (1, $(RIOTBOOT_SKIP_COMPILE))
 $(BINDIR_APP)-%.elf: $(BASELIBS)
 	$(Q)$(_LINK) -o $@
+endif
 
 # Slot 0 and 1 firmware offset, after header
 SLOT0_IMAGE_OFFSET := $$(($(SLOT0_OFFSET) + $(RIOTBOOT_HDR_LEN)))
@@ -33,6 +43,8 @@ $(BINDIR_APP)-slot0.elf: FW_ROM_LEN=$$((SLOT0_LEN - $(RIOTBOOT_HDR_LEN)))
 $(BINDIR_APP)-slot0.elf: ROM_OFFSET=$(SLOT0_IMAGE_OFFSET)
 $(BINDIR_APP)-slot1.elf: FW_ROM_LEN=$$((SLOT1_LEN - $(RIOTBOOT_HDR_LEN)))
 $(BINDIR_APP)-slot1.elf: ROM_OFFSET=$(SLOT1_IMAGE_OFFSET)
+
+SLOT_RIOT_ELFS = $(BINDIR_APP)-slot0.elf $(BINDIR_APP)-slot1.elf
 
 # Create binary target with RIOT header
 $(SLOT_RIOT_BINS): %.riot.bin: %.hdr %.bin
