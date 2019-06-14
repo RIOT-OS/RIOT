@@ -119,7 +119,7 @@ all_checks() {
 }
 
 main() {
-    all_checks | prepend 'Invalid build system patterns found by '"${0}:"  || error_on_input >&2
+    all_checks | prepend 'Invalid build system patterns found by '"${0}:" | error_on_input >&2
     exit $?
 }
 
