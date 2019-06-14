@@ -1,6 +1,7 @@
 .PHONY: info-objsize info-buildsizes info-build info-boards-supported \
         info-features-missing info-modules info-cpu \
         info-features-provided info-features-required \
+        info-features-used \
         info-debug-variable-% info-toolchains-supported \
         check-toolchain-supported
 
@@ -46,19 +47,23 @@ info-build:
 	@echo 'HEXFILE: $(HEXFILE)'
 	@echo 'FLASHFILE: $(FLASHFILE)'
 	@echo ''
-	@echo 'FEATURES_REQUIRED (excl. optional features):'
-	@echo '         $(or $(sort $(filter-out $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED))), -none-)'
-	@echo 'FEATURES_OPTIONAL (strictly "nice to have"):'
-	@echo '         $(or $(sort $(FEATURES_OPTIONAL)), -none-)'
+	@echo 'FEATURES_USED:'
+	@echo '         $(or $(FEATURES_USED), -none-)'
+	@echo 'FEATURES_REQUIRED:'
+	@echo '         $(or $(sort $(FEATURES_REQUIRED)), -none-)'
+	@echo 'FEATURES_OPTIONAL_ONLY (optional that are not required, strictly "nice to have"):'
+	@echo '         $(or $(FEATURES_OPTIONAL_ONLY), -none-)'
+	@echo 'FEATURES_OPTIONAL_MISSING (missing optional features):'
+	@echo '         $(or $(FEATURES_OPTIONAL_MISSING), -none-)'
 	@echo 'FEATURES_PROVIDED (by the board or USEMODULE'"'"'d drivers):'
 	@echo '         $(or $(sort $(FEATURES_PROVIDED)), -none-)'
-	@echo 'FEATURES_MISSING (incl. optional features):'
-	@echo '         $(or $(sort $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))), -none-)'
-	@echo 'FEATURES_MISSING (only non-optional features):'
-	@echo '         $(or $(sort $(filter-out $(FEATURES_OPTIONAL) $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))), -none-)'
+	@echo 'FEATURES_MISSING (only non optional features):'
+	@echo '         $(or $(FEATURES_MISSING), -none-)'
 	@echo ''
 	@echo 'FEATURES_CONFLICT:     $(FEATURES_CONFLICT)'
 	@echo 'FEATURES_CONFLICT_MSG: $(FEATURES_CONFLICT_MSG)'
+	@echo 'FEATURES_CONFLICTING:'
+	@echo '         $(or $(FEATURES_CONFLICTING), -none-)'
 	@echo ''
 	@echo -e 'INCLUDES:$(patsubst %, \n\t%, $(INCLUDES))'
 	@echo ''
@@ -128,7 +133,10 @@ info-features-required:
 	@for i in $(sort $(FEATURES_REQUIRED)); do echo $$i; done
 
 info-features-missing:
-	@for i in $(sort $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))); do echo $$i; done
+	@for i in $(FEATURES_MISSING); do echo $$i; done
+
+info-features-used:
+	@for i in $(FEATURES_USED); do echo $$i; done
 
 info-debug-variable-%:
 	@echo $($*)
