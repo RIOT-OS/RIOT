@@ -9,11 +9,18 @@
 import sys
 from testrunner import run
 
+slotnum = int(sys.argv[1])
+app_ver = int(sys.argv[2])
+print("expecting slot number %s, app_ver %s" % (slotnum, app_ver))
+
 
 def testfunc(child):
+    global slotnum
+    global app_ver
+
     # Ask for current slot, should be 0 or 1
     child.sendline("curslotnr")
-    child.expect("Current slot=[0-1]")
+    child.expect("Current slot=%s" % (slotnum))
     child.expect('>')
 
     # Ask for current slot header info and checks for basic output integrity
@@ -21,7 +28,7 @@ def testfunc(child):
     # Magic number is "RIOT" (always in little endian)
     child.expect_exact("Image magic_number: 0x544f4952")
     # Other info is hardware/app dependant so we just check basic compliance
-    child.expect("Image Version: 0x[0-9a-fA-F]{8}")
+    child.expect("Image Version: %s" % ("{0:#0{1}x}".format(app_ver, 10)))
     child.expect("Image start address: 0x[0-9a-fA-F]{8}")
     child.expect("Header chksum: 0x[0-9a-fA-F]{8}")
     child.expect('>')

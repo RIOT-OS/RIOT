@@ -17,5 +17,24 @@ This test should foremost give you an overview how to use riotboot:
 In this test two modules `riotboot_hdr` and `riotboot_slot` are used to showcase
 the access to riotboot shared functions.
 
-  - `make test` can be executed to run the automatic Python test that checks
-  basic functionalities of riotboot
+Automatic test
+==============
+
+This application's "test" target can be used to test basic riotboot
+functionality:
+
+    BOARD=<board> make flash test
+
+This will:
+
+1. flash bootloader and slot0 with APP_VER=0, invalidate slot1
+2. verify slot0 has been booted and has APP_VER set to 0
+
+3. flash slot1 with APP_VER set to 1
+4. verify slot1 has booted and shows APP_VER==1
+
+5. flash slot0 with APP_VER set to 2
+6. verify slot0 has booted and shows APP_VER==2
+
+If this test runs correctly, it shows that riotboot's basic functions and are
+working properly on the target board.
