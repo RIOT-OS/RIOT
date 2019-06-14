@@ -128,24 +128,27 @@ LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/eagle.rom.addr.v6.ld
 LINKFLAGS += -nostdlib -lgcc -u ets_run -Wl,-gc-sections # -Wl,--print-gc-sections
 LINKFLAGS += -Wl,--warn-unresolved-symbols
 
+# The ELFFILE is the base one used for flashing
+FLASHFILE ?= $(ELFFILE)
+
 # configure preflasher to convert .elf to .bin before flashing
 FLASH_SIZE = -fs 8m
 PREFLASHER ?= esptool.py
-PREFFLAGS  ?= elf2image $(FLASH_SIZE) $(ELFFILE)
+PREFFLAGS  ?= elf2image $(FLASH_SIZE) $(FLASHFILE)
 FLASHDEPS  ?= preflash
 
 # flasher configuration
 ifeq ($(QEMU), 1)
     FLASHER = cat
-    FFLAGS += $(ELFFILE)-0x00000.bin /dev/zero | head -c $$((0x10000)) | cat -
-    FFLAGS += $(ELFFILE)-0x10000.bin /dev/zero | head -c $$((0xfc000)) | cat -
-    FFLAGS += $(RIOTCPU)/$(CPU)/bin/esp_init_data_default.bin > $(ELFFILE).bin
+    FFLAGS += $(FLASHFILE)-0x00000.bin /dev/zero | head -c $$((0x10000)) | cat -
+    FFLAGS += $(FLASHFILE)-0x10000.bin /dev/zero | head -c $$((0xfc000)) | cat -
+    FFLAGS += $(RIOTCPU)/$(CPU)/bin/esp_init_data_default.bin > $(FLASHFILE).bin
 else
     FLASH_MODE ?= dout
     export PROGRAMMER_SPEED ?= 460800
     FLASHER = esptool.py
     FFLAGS += -p $(PORT) -b $(PROGRAMMER_SPEED) write_flash
     FFLAGS += -fm $(FLASH_MODE)
-    FFLAGS += 0 $(ELFFILE)-0x00000.bin
-    FFLAGS += 0x10000 $(ELFFILE)-0x10000.bin; esptool.py -p $(PORT) run
+    FFLAGS += 0 $(FLASHFILE)-0x00000.bin
+    FFLAGS += 0x10000 $(FLASHFILE)-0x10000.bin; esptool.py -p $(PORT) run
 endif
