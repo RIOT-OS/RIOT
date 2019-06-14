@@ -261,6 +261,11 @@ void auto_init(void)
     auto_init_kw2xrf();
 #endif
 
+#ifdef MODULE_USBUS_CDC_ECM
+    extern void auto_init_netdev_cdcecm(void);
+    auto_init_netdev_cdcecm();
+#endif
+
 #ifdef MODULE_NETDEV_TAP
     extern void auto_init_netdev_tap(void);
     auto_init_netdev_tap();
