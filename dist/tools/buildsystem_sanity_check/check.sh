@@ -46,7 +46,6 @@ check_not_parsing_features() {
     patterns+=(-e 'if.*filter.*FEATURES_PROVIDED')
     patterns+=(-e 'if.*filter.*FEATURES_REQUIRED')
     patterns+=(-e 'if.*filter.*FEATURES_OPTIONAL')
-    patterns+=(-e 'if.*filter.*FEATURES_USED') # Not a real one, it is just to show the error
 
     # Pathspec with exclude should start by an inclusive pathspec in git 2.7.4
     pathspec+=('*')
@@ -79,11 +78,8 @@ UNEXPORTED_VARIABLES+=('DEBUG_ADAPTER' 'DEBUG_ADAPTER_ID')
 UNEXPORTED_VARIABLES+=('PROGRAMMER_SERIAL')
 UNEXPORTED_VARIABLES+=('STLINK_VERSION')
 UNEXPORTED_VARIABLES+=('PORT_LINUX' 'PORT_DARWIN')
-UNEXPORTED_VARIABLES+=('APPDEPS')
-
 
 EXPORTED_VARIABLES_ONLY_IN_VARS=()
-EXPORTED_VARIABLES_ONLY_IN_VARS+=('CC')
 check_not_exporting_variables() {
     local patterns=()
     local pathspec=()
