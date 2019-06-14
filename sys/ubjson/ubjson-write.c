@@ -104,6 +104,7 @@ ssize_t ubjson_write_i64(ubjson_cookie_t *restrict cookie, int64_t value)
     }
 
     ssize_t result = 0;
+    WRITE_MARKER(UBJSON_MARKER_INT64);
     network_uint64_t buf = byteorder_htonll((uint64_t) value);
     WRITE_BUF(&buf, sizeof(buf));
     return result;
