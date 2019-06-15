@@ -53,6 +53,24 @@ int flashpage_write_and_verify(int page, const void *data)
     return flashpage_verify(page, data);
 }
 
+#if defined(MODULE_PERIPH_FLASHPAGE_RAW)
+int flashpage_verify_raw(void *target_addr, const void *data, size_t len)
+{
+    if (memcmp(target_addr, data, len) == 0) {
+        return FLASHPAGE_OK;
+    }
+    else {
+        return FLASHPAGE_NOMATCH;
+    }
+}
+
+int flashpage_write_and_verify_raw(void *target_addr, const void *data, size_t len)
+{
+    flashpage_write_raw(target_addr, data, len);
+    return flashpage_verify_raw(target_addr, data, len);
+}
+
+#endif
 
 #if defined(FLASHPAGE_RWWEE_NUMOF)
 
