@@ -57,20 +57,44 @@ extern "C" {
 #include "riotboot/slot.h"
 #include "periph/flashpage.h"
 
+
+#ifdef MODULE_PERIPH_FLASHPAGE_RAW
+#define FLASHCHUNK_SIZE         64
+#else
+#define FLASHCHUNK_SIZE         FLASHPAGE_SIZE
+#endif
+
+#define FLASHCHUNK_PAGE         (FLASHPAGE_SIZE / FLASHCHUNK_SIZE)
+
 /**
  * @brief   firmware update state structure
  */
 typedef struct {
-    int target_slot;                        /**< update targets this slot     */
-    size_t offset;                          /**< update is at this position   */
-    unsigned flashpage;                     /**< update is at this flashpage  */
-    uint8_t flashpage_buf[FLASHPAGE_SIZE];  /**< flash writing buffer         */
+    int target_slot;                           /**< update targets this slot      */
+    size_t offset;                             /**< update is at this position    */
+    unsigned flashchunck;                      /**< update is at this flashchunck */
+    uint8_t flashchunck_buf[FLASHCHUNK_SIZE];  /**< flash writing buffer          */
 } riotboot_flashwrite_t;
 
 /**
  * @brief Amount of bytes to skip at initial write of first page
  */
 #define RIOTBOOT_FLASHWRITE_SKIPLEN     sizeof(RIOTBOOT_MAGIC)
+
+/**
+ * @brief   Translate the given chunk number into the chunk's starting address
+ *
+ * @note    The given chunk MUST be valid, otherwise the returned address points
+ *          to an undefined memory location!
+ *
+ * @param[in] chunk      chunk number to get the address of
+ *
+ * @return               starting memory address of the given chunk
+ */
+static inline void *flashchunk_addr(int chunk)
+{
+    return (void *)(CPU_FLASH_BASE + (chunk * FLASHCHUNK_SIZE));
+}
 
 /**
  * @brief   Initialize firmware update (raw version)
