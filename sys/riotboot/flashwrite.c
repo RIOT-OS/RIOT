@@ -83,7 +83,6 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
         flashchunck_avail -= to_copy;
 
         state->offset += to_copy;
-        flashchunck_pos += to_copy;
         bytes += to_copy;
         len -= to_copy;
 
