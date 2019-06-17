@@ -70,7 +70,7 @@ ssize_t ubjson_write_bool(ubjson_cookie_t *restrict cookie, bool value)
 {
     static const char marker_false[] = { UBJSON_MARKER_FALSE };
     static const char marker_true[] = { UBJSON_MARKER_TRUE };
-    return cookie->rw.write(cookie, value ? &marker_false : &marker_true, 1);
+    return cookie->rw.write(cookie, value ? &marker_true : &marker_false, 1);
 }
 
 ssize_t ubjson_write_i32(ubjson_cookie_t *restrict cookie, int32_t value)
