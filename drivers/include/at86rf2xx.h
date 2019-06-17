@@ -59,10 +59,12 @@ extern "C" {
 #define AT86RF2XX_DEFAULT_CHANNEL       (IEEE802154_DEFAULT_SUBGHZ_CHANNEL)
 /* Page 2 is O-QPSK 100 kbit/s (channel 0), or 250 kbit/s (channels 1-10) */
 #define AT86RF2XX_DEFAULT_PAGE          (IEEE802154_DEFAULT_SUBGHZ_PAGE)
+#define AT86RF2XX_SUBGHZ                (1)
 #else
 #define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN)
 #define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX)
 #define AT86RF2XX_DEFAULT_CHANNEL       (IEEE802154_DEFAULT_CHANNEL)
+#define AT86RF2XX_SUBGHZ                (0)
 /* Only page 0 is supported in the 2.4 GHz band */
 #endif
 /** @} */
@@ -537,6 +539,35 @@ bool at86rf2xx_cca(at86rf2xx_t *dev);
  */
 void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page);
 
+/**
+ * @brief   Check if a combination of channel and page is supported
+ *
+ * @param[in] dev           device to check
+ * @param[in] chan          channel number
+ * @param[in] page          channel page
+ *
+ * @return                  true if combination is supported
+ * @return                  false otherwise
+ */
+static inline bool at86rf2xx_phy_is_supported(at86rf2xx_t *dev, uint8_t chan,
+        uint8_t page) {
+    /* The following snippet is a workaround. At some point, this logic will
+     * be removed in order to support instances of different class of devices
+     * (e.g sub ghz and 2.4 ghz radio running simultaneosuly) */
+
+    (void) dev;
+    if(AT86RF2XX_SUBGHZ) {
+        if((page != 0 && page != 2) || chan >= 11) {
+            return false;
+        }
+    }
+    else {
+        if(page != 0 || chan < 11 || chan > 26) {
+            return false;
+        }
+    }
+    return true;
+}
 
 #ifdef __cplusplus
 }
