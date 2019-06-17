@@ -288,11 +288,9 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     switch (opt) {
         case NETOPT_CHANNEL_PAGE:
             assert(max_len >= sizeof(uint16_t));
-            ((uint8_t *)val)[1] = 0;
 #ifdef MODULE_AT86RF212B
-            ((uint8_t *)val)[0] = dev->page;
-#else
-            ((uint8_t *)val)[0] = 0;
+            ((uint8_t *)val)[1] = 0;
+            ((uint8_t *)val)[0] = dev->netdev.page;
 #endif
             return sizeof(uint16_t);
 
@@ -466,42 +464,24 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case NETOPT_CHANNEL:
             assert(len == sizeof(uint16_t));
             uint8_t chan = (((const uint16_t *)val)[0]) & UINT8_MAX;
-#if AT86RF2XX_MIN_CHANNEL
-            if (chan < AT86RF2XX_MIN_CHANNEL || chan > AT86RF2XX_MAX_CHANNEL) {
-#else
-            if (chan > AT86RF2XX_MAX_CHANNEL) {
-#endif /* AT86RF2XX_MIN_CHANNEL */
+            if (!at86rf2xx_phy_is_supported(dev, chan, dev->netdev.page)) {
                 res = -EINVAL;
                 break;
             }
-#if MODULE_AT86RF212B
-            at86rf2xx_configure_phy(dev, chan, dev->page);
-#else
-            at86rf2xx_configure_phy(dev, chan, 0);
-#endif
+
+            at86rf2xx_configure_phy(dev, chan, dev->netdev.page);
             /* don't set res to set netdev_ieee802154_t::chan */
             break;
 
         case NETOPT_CHANNEL_PAGE:
             assert(len == sizeof(uint16_t));
             uint8_t page = (((const uint16_t *)val)[0]) & UINT8_MAX;
-#ifdef MODULE_AT86RF212B
-            if ((page != 0) && (page != 2)) {
+            if (!at86rf2xx_phy_is_supported(dev, dev->netdev.chan, page)) {
                 res = -EINVAL;
+                break;
             }
-            else {
-                at86rf2xx_configure_phy(dev, dev->netdev.chan, page);
-                res = sizeof(uint16_t);
-            }
-#else
-            /* rf23x only supports page 0, no need to configure anything in the driver. */
-            if (page != 0) {
-                res = -EINVAL;
-            }
-            else {
-                res = sizeof(uint16_t);
-            }
-#endif
+            at86rf2xx_configure_phy(dev, dev->netdev.chan, page);
+            res = sizeof(uint16_t);
             break;
 
         case NETOPT_TX_POWER:
