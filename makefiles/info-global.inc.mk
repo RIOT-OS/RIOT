@@ -18,13 +18,6 @@ define board_missing_features
 
   include $(RIOTBASE)/Makefile.features
 
-  ifdef BUILDTEST_MCU_GROUP
-    ifneq ($(BUILDTEST_MCU_GROUP), $$(FEATURES_MCU_GROUP))
-      BOARDS_FEATURES_MISSING += "$(1) $(BUILDTEST_MCU_GROUP)"
-    BOARDS_WITH_MISSING_FEATURES += $(1)
-    endif
-  endif
-
   include $(RIOTBASE)/Makefile.dep
 
   ifneq (,$$(FEATURES_MISSING))
