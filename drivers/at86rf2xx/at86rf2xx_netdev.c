@@ -288,10 +288,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     switch (opt) {
         case NETOPT_CHANNEL_PAGE:
             assert(max_len >= sizeof(uint16_t));
-#ifdef MODULE_AT86RF212B
             ((uint8_t *)val)[1] = 0;
-            ((uint8_t *)val)[0] = dev->netdev.page;
-#endif
+            ((uint8_t *)val)[0] = AT86RF2XX_SUBGHZ ? dev->netdev.page : 0;
             return sizeof(uint16_t);
 
         case NETOPT_STATE:
