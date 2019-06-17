@@ -528,6 +528,16 @@ void at86rf2xx_tx_exec(const at86rf2xx_t *dev);
  */
 bool at86rf2xx_cca(at86rf2xx_t *dev);
 
+/**
+ * @brief   Set PHY parameters based on channel and page number
+ *
+ * @param[in] dev           device to configure
+ * @param[in] chan          channel number to set
+ * @param[in] page          channel page to set
+ */
+void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page);
+
+
 #ifdef __cplusplus
 }
 #endif

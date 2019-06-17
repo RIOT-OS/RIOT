@@ -170,49 +170,6 @@ void at86rf2xx_set_addr_long(at86rf2xx_t *dev, uint64_t addr)
     }
 }
 
-uint8_t at86rf2xx_get_chan(const at86rf2xx_t *dev)
-{
-    return dev->netdev.chan;
-}
-
-void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t channel)
-{
-    if ((channel > AT86RF2XX_MAX_CHANNEL)
-#if AT86RF2XX_MIN_CHANNEL /* is zero for sub-GHz */
-       || (channel < AT86RF2XX_MIN_CHANNEL)
-#endif
-        ) {
-        return;
-    }
-
-    dev->netdev.chan = channel;
-
-    at86rf2xx_configure_phy(dev);
-}
-
-uint8_t at86rf2xx_get_page(const at86rf2xx_t *dev)
-{
-#ifdef MODULE_AT86RF212B
-    return dev->page;
-#else
-    (void) dev;
-    return 0;
-#endif
-}
-
-void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page)
-{
-#ifdef MODULE_AT86RF212B
-    if ((page == 0) || (page == 2)) {
-        dev->page = page;
-        at86rf2xx_configure_phy(dev);
-    }
-#else
-    (void) dev;
-    (void) page;
-#endif
-}
-
 uint16_t at86rf2xx_get_pan(const at86rf2xx_t *dev)
 {
     return dev->netdev.pan;

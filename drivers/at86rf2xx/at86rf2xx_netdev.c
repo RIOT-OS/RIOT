@@ -289,7 +289,11 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
         case NETOPT_CHANNEL_PAGE:
             assert(max_len >= sizeof(uint16_t));
             ((uint8_t *)val)[1] = 0;
-            ((uint8_t *)val)[0] = at86rf2xx_get_page(dev);
+#ifdef MODULE_AT86RF212B
+            ((uint8_t *)val)[0] = dev->page;
+#else
+            ((uint8_t *)val)[0] = 0;
+#endif
             return sizeof(uint16_t);
 
         case NETOPT_STATE:
@@ -470,7 +474,11 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = -EINVAL;
                 break;
             }
-            at86rf2xx_set_chan(dev, chan);
+#if MODULE_AT86RF212B
+            at86rf2xx_configure_phy(dev, chan, dev->page);
+#else
+            at86rf2xx_configure_phy(dev, chan, 0);
+#endif
             /* don't set res to set netdev_ieee802154_t::chan */
             break;
 
@@ -482,7 +490,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = -EINVAL;
             }
             else {
-                at86rf2xx_set_page(dev, page);
+                at86rf2xx_configure_phy(dev, dev->netdev.chan, page);
                 res = sizeof(uint16_t);
             }
 #else
