@@ -82,6 +82,8 @@ static int _init(netdev_t *netdev)
     /* reset device to default values and put it into RX state */
     at86rf2xx_reset(dev);
 
+    dev->netdev.txpower = AT86RF2XX_DEFAULT_TXPOWER;
+
     /* test if the SPI is set up correctly and the device is responding */
     if (at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM) != AT86RF2XX_PARTNUM) {
         DEBUG("[at86rf2xx] error: unable to read correct part number\n");
@@ -250,6 +252,7 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
             }
             break;
         case NETOPT_STATE_RESET:
+            dev->netdev.txpower = AT86RF2XX_DEFAULT_TXPOWER;
             at86rf2xx_reset(dev);
             break;
         default:
@@ -371,7 +374,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     switch (opt) {
         case NETOPT_TX_POWER:
             assert(max_len >= sizeof(int16_t));
-            *((uint16_t *)val) = at86rf2xx_get_txpower(dev);
+            *((uint16_t *)val) = dev->netdev.txpower;
             res = sizeof(uint16_t);
             break;
 
@@ -484,6 +487,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_TX_POWER:
             assert(len <= sizeof(int16_t));
+            dev->netdev.txpower = *((const int16_t *)val);
             at86rf2xx_set_txpower(dev, *((const int16_t *)val));
             res = sizeof(uint16_t);
             break;
