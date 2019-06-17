@@ -112,6 +112,7 @@ typedef struct {
     uint8_t long_addr[IEEE802154_LONG_ADDRESS_LEN];
     uint8_t seq;                            /**< sequence number */
     uint8_t chan;                           /**< channel */
+    uint8_t page;                           /**< channel page */
     uint16_t flags;                         /**< flags as defined above */
     /** @} */
 } netdev_ieee802154_t;
