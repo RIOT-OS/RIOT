@@ -25,7 +25,6 @@
  */
 
 
-#include "luid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/gnrc.h"
@@ -53,42 +52,12 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
 
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
-    eui64_t addr_long;
-
     at86rf2xx_hardware_reset(dev);
-
-    netdev_ieee802154_reset(&dev->netdev);
 
     /* Reset state machine to ensure a known state */
     if (dev->state == AT86RF2XX_STATE_P_ON) {
         at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
     }
-
-    /* get an 8-byte unique ID to use as hardware address */
-    luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
-    /* make sure we mark the address as non-multicast and not globally unique */
-    addr_long.uint8[0] &= ~(0x01);
-    addr_long.uint8[0] |=  (0x02);
-    /* set short and long address */
-    at86rf2xx_set_addr_long(dev, ntohll(addr_long.uint64.u64));
-    at86rf2xx_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
-
-    /* set default channel and page */
-#ifdef MODULE_AT86RF212B
-    at86rf2xx_configure_phy(dev, AT86RF2XX_DEFAULT_CHANNEL, AT86RF2XX_DEFAULT_PAGE);
-#else
-    at86rf2xx_configure_phy(dev, AT86RF2XX_DEFAULT_CHANNEL, 0);
-#endif
-
-    /* set default TX power */
-    at86rf2xx_set_txpower(dev, AT86RF2XX_DEFAULT_TXPOWER);
-    /* set default options */
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
-
-    static const netopt_enable_t enable = NETOPT_ENABLE;
-    netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
-                          &enable, sizeof(enable));
 
     /* enable safe mode (protect RX FIFO until reading data starts) */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,

@@ -28,6 +28,7 @@
 #include <errno.h>
 
 #include "iolist.h"
+#include "luid.h"
 
 #include "net/eui64.h"
 #include "net/ieee802154.h"
@@ -67,6 +68,47 @@ static void _irq_handler(void *arg)
     }
 }
 
+static void _reset(netdev_t *netdev)
+{
+    at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
+    eui64_t addr_long;
+    /* reset device to default values and put it into RX state */
+    at86rf2xx_reset(dev);
+
+    netdev_ieee802154_reset(&dev->netdev);
+
+    /* set default channel and page */
+    dev->netdev.chan= AT86RF2XX_DEFAULT_CHANNEL;
+#if AT86RF2XX_SUBGHZ
+    dev->netdev.page = AT86RF2XX_DEFAULT_PAGE;
+#else
+    dev->netdev.page = 0;
+#endif
+    at86rf2xx_configure_phy(dev, dev->netdev.chan, dev->netdev.page);
+
+    dev->netdev.txpower = AT86RF2XX_DEFAULT_TXPOWER;
+    /* set default TX power */
+    at86rf2xx_set_txpower(dev, dev->netdev.txpower);
+
+    /* get an 8-byte unique ID to use as hardware address */
+    luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
+    /* make sure we mark the address as non-multicast and not globally unique */
+    addr_long.uint8[0] &= ~(0x01);
+    addr_long.uint8[0] |=  (0x02);
+    /* set short and long address */
+    at86rf2xx_set_addr_long(dev, ntohll(addr_long.uint64.u64));
+    at86rf2xx_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
+
+    /* set default options */
+    at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
+    at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
+
+
+    static const netopt_enable_t enable = NETOPT_ENABLE;
+    netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
+                          &enable, sizeof(enable));
+}
+
 static int _init(netdev_t *netdev)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
@@ -79,10 +121,7 @@ static int _init(netdev_t *netdev)
     gpio_set(dev->params.reset_pin);
     gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
 
-    /* reset device to default values and put it into RX state */
-    at86rf2xx_reset(dev);
-
-    dev->netdev.txpower = AT86RF2XX_DEFAULT_TXPOWER;
+    _reset(netdev);
 
     /* test if the SPI is set up correctly and the device is responding */
     if (at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM) != AT86RF2XX_PARTNUM) {
@@ -252,8 +291,7 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
             }
             break;
         case NETOPT_STATE_RESET:
-            dev->netdev.txpower = AT86RF2XX_DEFAULT_TXPOWER;
-            at86rf2xx_reset(dev);
+            _reset((netdev_t*) dev);
             break;
         default:
             return -ENOTSUP;
