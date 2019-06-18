@@ -136,17 +136,11 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, const uint8_t *data,
 
 void at86rf2xx_tx_exec(const at86rf2xx_t *dev)
 {
-    netdev_t *netdev = (netdev_t *)dev;
-
     /* write frame length field in FIFO */
     at86rf2xx_sram_write(dev, 0, &(dev->tx_frame_len), 1);
     /* trigger sending of pre-loaded frame */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
                         AT86RF2XX_TRX_STATE__TX_START);
-    if (netdev->event_callback &&
-        (dev->flags & AT86RF2XX_OPT_TELL_TX_START)) {
-        netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
-    }
 }
 
 bool at86rf2xx_cca(at86rf2xx_t *dev)

@@ -278,6 +278,10 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* send data out directly if pre-loading id disabled */
     if (!(dev->flags & AT86RF2XX_OPT_PRELOADING)) {
         at86rf2xx_tx_exec(dev);
+        if (netdev->event_callback &&
+            (dev->flags & AT86RF2XX_OPT_TELL_TX_START)) {
+            netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
+        }
     }
     /* return the number of bytes that were actually loaded into the frame
      * buffer/send out */
@@ -381,6 +385,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
 {
+    netdev_t *netdev = (netdev_t*) netdev;
     switch (state) {
         case NETOPT_STATE_STANDBY:
             at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
@@ -411,6 +416,10 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
                 }
                 at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
                 at86rf2xx_tx_exec(dev);
+                if (netdev->event_callback &&
+                    (dev->flags & AT86RF2XX_OPT_TELL_TX_START)) {
+                    netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
+                }
             }
             break;
         case NETOPT_STATE_RESET:
