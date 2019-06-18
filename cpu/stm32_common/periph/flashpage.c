@@ -38,7 +38,6 @@
 #define CNTRL_REG              (FLASH->PECR)
 #define CNTRL_REG_LOCK         (FLASH_PECR_PELOCK)
 #define FLASH_CR_PER           (FLASH_PECR_ERASE | FLASH_PECR_PROG)
-#define FLASH_CR_PG            (FLASH_PECR_FPRG | FLASH_PECR_PROG)
 #define FLASHPAGE_DIV          (4U) /* write 4 bytes in one go */
 #else
 #if defined(CPU_FAM_STM32L4)
@@ -187,7 +186,10 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     }
 
     /* clear program bit again */
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32L4)
     CNTRL_REG &= ~(FLASH_CR_PG);
+#endif
     DEBUG("[flashpage_raw] write: done writing data\n");
 
     /* lock the flash module again */
