@@ -68,6 +68,18 @@ static void _irq_handler(void *arg)
     }
 }
 
+static void _config_phy(netdev_t *netdev, uint8_t channel, uint8_t page)
+{
+    at86rf2xx_t *dev = (at86rf2xx_t*) netdev;
+    at86rf2xx_configure_phy(dev, channel, page);
+
+    /* Sub GHz radios require to update the tx power when a channel in
+     * a different band is set */
+    if(AT86RF2XX_SUBGHZ) {
+        at86rf2xx_set_txpower(dev, dev->netdev.txpower);
+    }
+}
+
 static void _reset(netdev_t *netdev)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
@@ -84,7 +96,7 @@ static void _reset(netdev_t *netdev)
 #else
     dev->netdev.page = 0;
 #endif
-    at86rf2xx_configure_phy(dev, dev->netdev.chan, dev->netdev.page);
+    _config_phy(netdev, dev->netdev.chan, dev->netdev.page);
 
     dev->netdev.txpower = AT86RF2XX_DEFAULT_TXPOWER;
     /* set default TX power */
@@ -508,7 +520,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 break;
             }
 
-            at86rf2xx_configure_phy(dev, chan, dev->netdev.page);
+            _config_phy(netdev, chan, dev->netdev.page);
             /* don't set res to set netdev_ieee802154_t::chan */
             break;
 
@@ -519,7 +531,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = -EINVAL;
                 break;
             }
-            at86rf2xx_configure_phy(dev, dev->netdev.chan, page);
+            _config_phy(netdev, dev->netdev.chan, page);
             res = sizeof(uint16_t);
             break;
 
