@@ -73,22 +73,34 @@ static void _unlock_flash(void)
 }
 
 #if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
-static inline int flashbank_sector(void *addr) {
-    uint8_t sn = (uint8_t)(((uint32_t)addr - CPU_FLASH_BASE) / FLASHSECTOR_SIZE_MIN);
-    if(sn > 3 && sn < 8) {
+static inline int flashbank_sector(void *addr)
+{
+    /* When flash is in single bank there is a max of 12 sectors. The first 4
+       sectors are equally sized, the 5th amount to the sum of the first 4
+       sectors and the 6th to 12th amount to the sum of the first 5 sectos.
+       e.g.: if FLASHSECTOR_SIZE_MIN is 16k there are 4 sectors of 16kB,
+       1 of 64kB and 7 of 128kB. */
+    /* We use this pattern to find in what sector and address falls */
+    uint8_t sn =
+        (uint8_t)(((uint32_t)addr - CPU_FLASH_BASE) / FLASHSECTOR_SIZE_MIN);
+
+    if (sn > 3 && sn < 8) {
         sn = 4;
     }
-    else if(sn > 8){
+    else if (sn >= 8) {
         sn = (sn / 8) + 4;
     }
     return sn;
 }
 
-static inline int flashsector_sector(void *addr) {
-#if(FLASH_DUAL_BANK == 1)
-    if((uint32_t) addr >= (STM32_FLASHSIZE / 2) + CPU_FLASH_BASE) {
+static inline int flashsector_sector(void *addr)
+{
+    /* When in dual bank there can be up to 24 sectors, where sectors 12-23
+       follow the same layout as sectors 0-11 */
+#if (FLASH_DUAL_BANK == 1)
+    if ((uint32_t)addr >= (STM32_FLASHSIZE / 2) + CPU_FLASH_BASE) {
         DEBUG("[flashsector]: dual bank sector \n");
-        addr = (void *)((uint32_t) addr - (STM32_FLASHSIZE / 2));
+        addr = (void *)((uint32_t)addr - (STM32_FLASHSIZE / 2));
         return FLASHSECTORS_BANK + flashbank_sector(addr);
     }
     else {
@@ -117,7 +129,7 @@ static void _erase_sector(uint8_t sn)
 
     DEBUG("[flashsector] erase: setting the sector erase code\n");
     CNTRL_REG |= ((sn % FLASHSECTORS_BANK) << FLASH_CR_SNB_Pos);
-#if( FLASH_DUAL_BANK == 1)
+#if (FLASH_DUAL_BANK == 1)
     CNTRL_REG |= (sn / FLASHSECTORS_BANK) * FLASH_CR_SNB_4;
 #endif
     DEBUG("[flashsector] erase: setting the erase bit\n");
@@ -143,7 +155,7 @@ static void _erase_sector_page(void *page_addr)
     /* avoid erasing whole sector if "page" is blank*/
     bool blank = true;
     for (unsigned i = 0; i < FLASHPAGE_SIZE; i += sizeof(uint32_t)) {
-        if (*(uint32_t *) (page_addr + i) != 0xffffffff) {
+        if (*(uint32_t *)(page_addr + i) != 0xffffffff) {
             blank = false;
             break;
         }
@@ -157,7 +169,9 @@ static void _erase_sector_page(void *page_addr)
 }
 #endif
 
-#if !(defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4))
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
+    defined(CPU_FAM_STM32L4)
 static void _erase_page(void *page_addr)
 {
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
@@ -288,13 +302,13 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
         /* wait as long as device is busy */
         _wait_for_pending_operations();
     }
+
     /* clear program bit again */
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4)
     CNTRL_REG &= ~(FLASH_CR_PG);
 #endif
     DEBUG("[flashpage_raw] write: done writing data\n");
-
 
     /* lock the flash module again */
     _lock();
@@ -323,11 +337,11 @@ void flashpage_write(int page, const void *data)
     uint16_t *page_addr = flashpage_addr(page);
 #endif
 
-#if !(defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4))
     /* ERASE sequence */
-    _erase_page(page_addr);
-#else
+#if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
     _erase_sector_page(page_addr);
+#else
+    _erase_page(page_addr);
 #endif
     /* WRITE sequence */
     if (data != NULL) {
