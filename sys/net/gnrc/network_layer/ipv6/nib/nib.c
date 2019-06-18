@@ -1031,6 +1031,8 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         int idx = gnrc_netif_ipv6_addr_idx(tgt_netif, &nbr_adv->tgt);
 
         if (gnrc_netif_ipv6_addr_dad_trans(tgt_netif, idx)) {
+            DEBUG("nib: duplicate address detected, removing target address "
+                  "from this interface\n");
             /* cancel validation timer */
             evtimer_del(&_nib_evtimer,
                         &tgt_netif->ipv6.addrs_timers[idx].event);
@@ -1087,6 +1089,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
          * traditional DAD */
         if ((aro_status == _ADDR_REG_STATUS_UNAVAIL) &&
             gnrc_netif_is_6ln(netif)) {
+            DEBUG("nib: No ARO in NA, falling back to classic DAD\n");
             _handle_dad(&ipv6->dst);
         }
 #elif GNRC_IPV6_NIB_CONF_6LN
