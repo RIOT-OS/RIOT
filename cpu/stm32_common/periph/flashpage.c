@@ -77,7 +77,8 @@ static void _erase_page(void *page_addr)
     uint32_t *dst = page_addr;
 #else
     uint16_t *dst = page_addr;
-
+#endif
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1)
     uint32_t hsi_state = (RCC->CR & RCC_CR_HSION);
     /* the internal RC oscillator (HSI) must be enabled */
     stmclk_enable_hsi();
@@ -131,8 +132,7 @@ static void _erase_page(void *page_addr)
     /* lock the flash module again */
     _lock();
 
-#if !(defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
-      defined(CPU_FAM_STM32L4))
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1)
     /* restore the HSI state */
     if (!hsi_state) {
         stmclk_disable_hsi();
@@ -163,7 +163,9 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
 #else
     uint16_t *dst = (uint16_t *)target_addr;
     const uint16_t *data_addr = data;
+#endif
 
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1)
     uint32_t hsi_state = (RCC->CR & RCC_CR_HSION);
     /* the internal RC oscillator (HSI) must be enabled */
     stmclk_enable_hsi();
@@ -191,8 +193,7 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     /* lock the flash module again */
     _lock();
 
-#if !(defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
-      defined(CPU_FAM_STM32L4))
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1)
     /* restore the HSI state */
     if (!hsi_state) {
         stmclk_disable_hsi();
