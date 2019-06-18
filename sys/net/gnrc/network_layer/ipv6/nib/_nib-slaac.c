@@ -193,6 +193,9 @@ void _handle_valid_addr(const ipv6_addr_t *addr)
     gnrc_netif_t *netif = NULL;
     int idx = _get_netif_state(&netif, addr);
 
+    DEBUG("nib: validating address %s (idx: %d, netif: %d)\n",
+          ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)), idx,
+          (netif != NULL) ? netif->pid : 0);
     if (idx >= 0) {
         netif->ipv6.addrs_flags[idx] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
         netif->ipv6.addrs_flags[idx] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
