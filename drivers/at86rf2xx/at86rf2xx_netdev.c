@@ -205,9 +205,15 @@ static void _reset(netdev_t *netdev)
     /* make sure we mark the address as non-multicast and not globally unique */
     addr_long.uint8[0] &= ~(0x01);
     addr_long.uint8[0] |=  (0x02);
+
     /* set short and long address */
-    at86rf2xx_set_addr_long(dev, ntohll(addr_long.uint64.u64));
-    at86rf2xx_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
+    uint64_t long_addr = ntohll(addr_long.uint64.u64);
+    uint16_t short_addr = ntohs(addr_long.uint16[0].u16);
+
+    netdev->driver->set(netdev, NETOPT_ADDRESS_LONG, &long_addr,
+            sizeof(uint64_t));
+    netdev->driver->set(netdev, NETOPT_ADDRESS, &short_addr,
+            sizeof(uint16_t));
 
     /* set default options */
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
@@ -601,17 +607,17 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     switch (opt) {
         case NETOPT_ADDRESS:
             assert(len <= sizeof(uint16_t));
-            at86rf2xx_set_addr_short(dev, *((const uint16_t *)val));
+            at86rf2xx_set_hwfilter_addr_short(dev, *((const uint16_t *)val));
             /* don't set res to set netdev_ieee802154_t::short_addr */
             break;
         case NETOPT_ADDRESS_LONG:
             assert(len <= sizeof(uint64_t));
-            at86rf2xx_set_addr_long(dev, *((const uint64_t *)val));
+            at86rf2xx_set_hwfilter_addr_long(dev, *((const uint64_t *)val));
             /* don't set res to set netdev_ieee802154_t::long_addr */
             break;
         case NETOPT_NID:
             assert(len <= sizeof(uint16_t));
-            at86rf2xx_set_pan(dev, *((const uint16_t *)val));
+            at86rf2xx_set_hwfilter_pan(dev, *((const uint16_t *)val));
             /* don't set res to set netdev_ieee802154_t::pan */
             break;
         case NETOPT_CHANNEL:

@@ -237,38 +237,20 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params);
 void at86rf2xx_reset(at86rf2xx_t *dev);
 
 /**
- * @brief   Get the short address of the given device
- *
- * @param[in] dev           device to read from
- *
- * @return                  the currently set (2-byte) short address
- */
-uint16_t at86rf2xx_get_addr_short(const at86rf2xx_t *dev);
-
-/**
  * @brief   Set the short address of the given device
  *
  * @param[in,out] dev       device to write to
  * @param[in] addr          (2-byte) short address to set
  */
-void at86rf2xx_set_addr_short(at86rf2xx_t *dev, uint16_t addr);
+void at86rf2xx_set_hwfilter_addr_short(at86rf2xx_t *dev, uint16_t addr);
 
 /**
- * @brief   Get the configured long address of the given device
- *
- * @param[in] dev           device to read from
- *
- * @return                  the currently set (8-byte) long address
- */
-uint64_t at86rf2xx_get_addr_long(const at86rf2xx_t *dev);
-
-/**
- * @brief   Set the long address of the given device
+ * @brief   Set the HW filter long address of the given device
  *
  * @param[in,out] dev       device to write to
  * @param[in] addr          (8-byte) long address to set
  */
-void at86rf2xx_set_addr_long(at86rf2xx_t *dev, uint64_t addr);
+void at86rf2xx_set_hwfilter_addr_long(at86rf2xx_t *dev, uint64_t addr);
 
 /**
  * @brief   Get the configured channel number of the given device
@@ -305,21 +287,12 @@ uint8_t at86rf2xx_get_page(const at86rf2xx_t *dev);
 void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page);
 
 /**
- * @brief   Get the configured PAN ID of the given device
- *
- * @param[in] dev           device to read from
- *
- * @return                  the currently set PAN ID
- */
-uint16_t at86rf2xx_get_pan(const at86rf2xx_t *dev);
-
-/**
  * @brief   Set the PAN ID of the given device
  *
  * @param[in,out] dev       device to write to
  * @param[in] pan           PAN ID to set
  */
-void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan);
+void at86rf2xx_set_hwfilter_pan(at86rf2xx_t *dev, uint16_t pan);
 
 /**
  * @brief   Get the configured transmission power of the given device [in dBm]
