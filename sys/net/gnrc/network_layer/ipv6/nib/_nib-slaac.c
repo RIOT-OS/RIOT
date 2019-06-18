@@ -178,7 +178,8 @@ void _handle_dad(const ipv6_addr_t *addr)
     if (idx >= 0) {
         ipv6_addr_set_solicited_nodes(&sol_nodes, addr);
         _snd_ns(addr, netif, &ipv6_addr_unspecified, &sol_nodes);
-        _evtimer_add((void *)addr, GNRC_IPV6_NIB_VALID_ADDR,
+        _evtimer_add((void *)&netif->ipv6.addrs[idx],
+                     GNRC_IPV6_NIB_VALID_ADDR,
                      &netif->ipv6.addrs_timers[idx],
                      netif->ipv6.retrans_time);
     }
