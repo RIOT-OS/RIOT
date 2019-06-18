@@ -215,6 +215,9 @@ static void _reset(netdev_t *netdev)
     netdev->driver->set(netdev, NETOPT_ADDRESS, &short_addr,
             sizeof(uint16_t));
 
+    /* Initialize CSMA seed with hardware address */
+    at86rf2xx_set_csma_seed(dev, dev->netdev.long_addr);
+
     /* set default options */
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
