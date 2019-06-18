@@ -68,6 +68,105 @@ static void _irq_handler(void *arg)
     }
 }
 
+#ifdef MODULE_AT86RF212B
+/* See: Table 9-15. Recommended Mapping of TX Power, Frequency Band, and
+ * PHY_TX_PWR (register 0x05), AT86RF212B data sheet. */
+static const uint8_t dbm_to_tx_pow_868[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x18,
+                                             0x17, 0x15, 0x14, 0x13, 0x12, 0x11,
+                                             0x10, 0x0f, 0x31, 0x30, 0x2f, 0x94,
+                                             0x93, 0x91, 0x90, 0x29, 0x49, 0x48,
+                                             0x47, 0xad, 0xcd, 0xcc, 0xcb, 0xea,
+                                             0xe9, 0xe8, 0xe7, 0xe6, 0xe4, 0x80,
+                                             0xa0 };
+static const uint8_t dbm_to_tx_pow_915[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x17,
+                                             0x16, 0x15, 0x14, 0x13, 0x12, 0x11,
+                                             0x10, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b,
+                                             0x09, 0x91, 0x08, 0x07, 0x05, 0x27,
+                                             0x04, 0x03, 0x02, 0x01, 0x00, 0x86,
+                                             0x40, 0x84, 0x83, 0x82, 0x80, 0xc1,
+                                             0xc0 };
+static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                          0x01, 0x01, 0x01, 0x01, 0x02, 0x02,
+                                          0x02, 0x03, 0x03, 0x03, 0x04, 0x04,
+                                          0x04, 0x05, 0x05, 0x05, 0x06, 0x06,
+                                          0x06, 0x07, 0x07, 0x07, 0x08, 0x08,
+                                          0x08, 0x09, 0x09, 0x09, 0x0a, 0x0a,
+                                          0x0a, 0x0b, 0x0b, 0x0b, 0x0b, 0x0c,
+                                          0x0c, 0x0c, 0x0d, 0x0d, 0x0d, 0x0e,
+                                          0x0e, 0x0e, 0x0f };
+
+#elif MODULE_AT86RF233
+static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
+                                         0x0e, 0x0d, 0x0d, 0x0d, 0x0c, 0x0c,
+                                         0x0b, 0x0b, 0x0a, 0x09, 0x08, 0x07,
+                                         0x06, 0x05, 0x03, 0x00 };
+static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                          0x00, 0x01, 0x01, 0x01, 0x02, 0x02,
+                                          0x02, 0x03, 0x03, 0x03, 0x04, 0x04,
+                                          0x04, 0x05, 0x05, 0x05, 0x06, 0x06,
+                                          0x06, 0x07, 0x07, 0x07, 0x08, 0x08,
+                                          0x08, 0x09, 0x09, 0x09, 0x0a, 0x0a,
+                                          0x0a, 0x0b, 0x0b, 0x0b, 0x0c, 0x0c,
+                                          0x0c, 0x0d, 0x0d, 0x0d, 0x0e, 0x0e,
+                                          0x0e, 0x0f };
+#else
+static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
+                                         0x0e, 0x0d, 0x0d, 0x0c, 0x0c, 0x0b,
+                                         0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06,
+                                         0x05, 0x03, 0x00 };
+static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                          0x00, 0x00, 0x00, 0x00, 0x01, 0x01,
+                                          0x01, 0x02, 0x02, 0x02, 0x03, 0x03,
+                                          0x03, 0x04, 0x04, 0x04, 0x05, 0x05,
+                                          0x05, 0x06, 0x06, 0x06, 0x07, 0x07,
+                                          0x07, 0x08, 0x08, 0x08, 0x09, 0x09,
+                                          0x09, 0x0a, 0x0a, 0x0a, 0x0b, 0x0b,
+                                          0x0b, 0x0c, 0x0c, 0x0c, 0x0d, 0x0d,
+                                          0x0d, 0x0e, 0x0e, 0x0e, 0x0f };
+#endif
+
+static void _set_rxsensitivity(netdev_t *netdev, int16_t rxsens)
+{
+    const at86rf2xx_t *dev = (const at86rf2xx_t*) netdev;
+    rxsens += MIN_RX_SENSITIVITY;
+
+    if (rxsens < 0) {
+        rxsens = 0;
+    }
+    else if (rxsens > MAX_RX_SENSITIVITY) {
+        rxsens = MAX_RX_SENSITIVITY;
+    }
+
+    at86rf2xx_set_rxsensitivity(dev, dbm_to_rx_sens[rxsens]);
+}
+
+void _set_txpower(netdev_t *netdev, int16_t txpower)
+{
+    const at86rf2xx_t *dev = (const at86rf2xx_t*) netdev;
+    netdev_ieee802154_t *phy = (netdev_ieee802154_t*) netdev;
+    txpower += AT86RF2XX_TXPOWER_OFF;
+
+    if (txpower < 0) {
+        txpower = 0;
+    }
+    else if (txpower > AT86RF2XX_TXPOWER_MAX) {
+        txpower = AT86RF2XX_TXPOWER_MAX;
+    }
+
+    phy->txpower = txpower;
+#ifdef MODULE_AT86RF212B
+    if (dev->netdev.chan == 0) {
+        at86rf2xx_set_txpower(dev, dbm_to_tx_pow_868[txpower]);
+    }
+    else if (dev->netdev.chan < 11) {
+        at86rf2xx_set_txpower(dev, dbm_to_tx_pow_915[txpower]);
+    }
+#else
+    at86rf2xx_set_txpower(dev, dbm_to_tx_pow[txpower]);
+#endif
+}
+
 static void _config_phy(netdev_t *netdev, uint8_t channel, uint8_t page)
 {
     at86rf2xx_t *dev = (at86rf2xx_t*) netdev;
@@ -76,7 +175,7 @@ static void _config_phy(netdev_t *netdev, uint8_t channel, uint8_t page)
     /* Sub GHz radios require to update the tx power when a channel in
      * a different band is set */
     if(AT86RF2XX_SUBGHZ) {
-        at86rf2xx_set_txpower(dev, dev->netdev.txpower);
+        _set_txpower(netdev, dev->netdev.txpower);
     }
 }
 
@@ -98,9 +197,8 @@ static void _reset(netdev_t *netdev)
 #endif
     _config_phy(netdev, dev->netdev.chan, dev->netdev.page);
 
-    dev->netdev.txpower = AT86RF2XX_DEFAULT_TXPOWER;
     /* set default TX power */
-    at86rf2xx_set_txpower(dev, dev->netdev.txpower);
+    _set_txpower(netdev, dev->netdev.txpower);
 
     /* get an 8-byte unique ID to use as hardware address */
     luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
@@ -119,6 +217,10 @@ static void _reset(netdev_t *netdev)
     static const netopt_enable_t enable = NETOPT_ENABLE;
     netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
                           &enable, sizeof(enable));
+
+    if(AT86RF2XX_SMART_IDLE_LISTENING) {
+        _set_rxsensitivity(netdev, RSSI_BASE_VAL);
+    }
 }
 
 static int _init(netdev_t *netdev)
@@ -537,8 +639,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_TX_POWER:
             assert(len <= sizeof(int16_t));
-            dev->netdev.txpower = *((const int16_t *)val);
-            at86rf2xx_set_txpower(dev, *((const int16_t *)val));
+            _set_txpower(netdev, *((const int16_t *)val));
             res = sizeof(uint16_t);
             break;
 

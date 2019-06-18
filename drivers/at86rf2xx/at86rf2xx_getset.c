@@ -32,104 +32,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#ifdef MODULE_AT86RF212B
-/* See: Table 9-15. Recommended Mapping of TX Power, Frequency Band, and
- * PHY_TX_PWR (register 0x05), AT86RF212B data sheet. */
-static const uint8_t dbm_to_tx_pow_868[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x18,
-                                             0x17, 0x15, 0x14, 0x13, 0x12, 0x11,
-                                             0x10, 0x0f, 0x31, 0x30, 0x2f, 0x94,
-                                             0x93, 0x91, 0x90, 0x29, 0x49, 0x48,
-                                             0x47, 0xad, 0xcd, 0xcc, 0xcb, 0xea,
-                                             0xe9, 0xe8, 0xe7, 0xe6, 0xe4, 0x80,
-                                             0xa0 };
-static const uint8_t dbm_to_tx_pow_915[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x17,
-                                             0x16, 0x15, 0x14, 0x13, 0x12, 0x11,
-                                             0x10, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b,
-                                             0x09, 0x91, 0x08, 0x07, 0x05, 0x27,
-                                             0x04, 0x03, 0x02, 0x01, 0x00, 0x86,
-                                             0x40, 0x84, 0x83, 0x82, 0x80, 0xc1,
-                                             0xc0 };
-static const int16_t rx_sens_to_dbm[] = { -110, -98, -94, -91, -88, -85, -82,
-                                          -79, -76, -73, -70, -67, -63, -60, -57,
-                                          -54 };
-static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                          0x01, 0x01, 0x01, 0x01, 0x02, 0x02,
-                                          0x02, 0x03, 0x03, 0x03, 0x04, 0x04,
-                                          0x04, 0x05, 0x05, 0x05, 0x06, 0x06,
-                                          0x06, 0x07, 0x07, 0x07, 0x08, 0x08,
-                                          0x08, 0x09, 0x09, 0x09, 0x0a, 0x0a,
-                                          0x0a, 0x0b, 0x0b, 0x0b, 0x0b, 0x0c,
-                                          0x0c, 0x0c, 0x0d, 0x0d, 0x0d, 0x0e,
-                                          0x0e, 0x0e, 0x0f };
-
-static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg)
-{
-    if (page == 0 || page == 2) {
-        const uint8_t *dbm_to_tx_pow;
-        size_t nelem;
-
-        if (channel == 0) {
-            /* Channel 0 is 868.3 MHz */
-            dbm_to_tx_pow = &dbm_to_tx_pow_868[0];
-            nelem = sizeof(dbm_to_tx_pow_868) / sizeof(dbm_to_tx_pow_868[0]);
-        }
-        else {
-            /* Channels 1+ are 915 MHz */
-            dbm_to_tx_pow = &dbm_to_tx_pow_915[0];
-            nelem = sizeof(dbm_to_tx_pow_915) / sizeof(dbm_to_tx_pow_915[0]);
-        }
-
-        for (size_t i = 0; i < nelem; ++i) {
-            if (dbm_to_tx_pow[i] == reg) {
-                return (i - AT86RF2XX_TXPOWER_OFF);
-            }
-        }
-    }
-
-    return 0;
-}
-
-#elif MODULE_AT86RF233
-static const int16_t tx_pow_to_dbm[] = { 4, 4, 3, 3, 2, 2, 1,
-                                         0, -1, -2, -3, -4, -6, -8, -12, -17 };
-static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
-                                         0x0e, 0x0d, 0x0d, 0x0d, 0x0c, 0x0c,
-                                         0x0b, 0x0b, 0x0a, 0x09, 0x08, 0x07,
-                                         0x06, 0x05, 0x03, 0x00 };
-static const int16_t rx_sens_to_dbm[] = { -101, -94, -91, -88, -85, -82, -79,
-                                          -76, -73, -70, -67, -64, -61, -58, -55,
-                                          -52 };
-static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                          0x00, 0x01, 0x01, 0x01, 0x02, 0x02,
-                                          0x02, 0x03, 0x03, 0x03, 0x04, 0x04,
-                                          0x04, 0x05, 0x05, 0x05, 0x06, 0x06,
-                                          0x06, 0x07, 0x07, 0x07, 0x08, 0x08,
-                                          0x08, 0x09, 0x09, 0x09, 0x0a, 0x0a,
-                                          0x0a, 0x0b, 0x0b, 0x0b, 0x0c, 0x0c,
-                                          0x0c, 0x0d, 0x0d, 0x0d, 0x0e, 0x0e,
-                                          0x0e, 0x0f };
-#else
-static const int16_t tx_pow_to_dbm[] = { 3, 3, 2, 2, 1, 1, 0,
-                                         -1, -2, -3, -4, -5, -7, -9, -12, -17 };
-static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
-                                         0x0e, 0x0d, 0x0d, 0x0c, 0x0c, 0x0b,
-                                         0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06,
-                                         0x05, 0x03, 0x00 };
-static const int16_t rx_sens_to_dbm[] = { -101, -91, -88, -85, -82, -79, -76
-                                          -73, -70, -67, -64, -61, -58, -55, -52,
-                                          -49 };
-static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                          0x00, 0x00, 0x00, 0x00, 0x01, 0x01,
-                                          0x01, 0x02, 0x02, 0x02, 0x03, 0x03,
-                                          0x03, 0x04, 0x04, 0x04, 0x05, 0x05,
-                                          0x05, 0x06, 0x06, 0x06, 0x07, 0x07,
-                                          0x07, 0x08, 0x08, 0x08, 0x09, 0x09,
-                                          0x09, 0x0a, 0x0a, 0x0a, 0x0b, 0x0b,
-                                          0x0b, 0x0c, 0x0c, 0x0c, 0x0d, 0x0d,
-                                          0x0d, 0x0e, 0x0e, 0x0e, 0x0f };
-#endif
-
 uint16_t at86rf2xx_get_addr_short(const at86rf2xx_t *dev)
 {
     return (dev->netdev.short_addr[0] << 8) | dev->netdev.short_addr[1];
@@ -184,65 +86,35 @@ void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_1, le_pan.u8[1]);
 }
 
-int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev)
-{
-#ifdef MODULE_AT86RF212B
-    uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR);
-    DEBUG("txpower value: %x\n", txpower);
-    return _tx_pow_to_dbm_212b(dev->netdev.chan, dev->page, txpower);
-#else
-    uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR)
-                      & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
-    return tx_pow_to_dbm[txpower];
-#endif
-}
-
-void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
-{
-    txpower += AT86RF2XX_TXPOWER_OFF;
-
-    if (txpower < 0) {
-        txpower = 0;
-    }
-    else if (txpower > AT86RF2XX_TXPOWER_MAX) {
-        txpower = AT86RF2XX_TXPOWER_MAX;
-    }
-#ifdef MODULE_AT86RF212B
-    if (dev->netdev.chan == 0) {
-        at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                            dbm_to_tx_pow_868[txpower]);
-    }
-    else if (dev->netdev.chan < 11) {
-        at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                            dbm_to_tx_pow_915[txpower]);
-    }
-#else
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                        dbm_to_tx_pow[txpower]);
-#endif
-}
-
 int16_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev)
 {
     uint8_t rxsens = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN)
                      & AT86RF2XX_RX_SYN__RX_PDT_LEVEL;
-    return rx_sens_to_dbm[rxsens];
+    return rxsens;
+}
+
+int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev)
+{
+#ifdef MODULE_AT86RF212B
+    uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR);
+#else
+    uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR)
+                      & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
+#endif
+    return txpower;
+}
+
+void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
+{
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
+                        txpower);
 }
 
 void at86rf2xx_set_rxsensitivity(const at86rf2xx_t *dev, int16_t rxsens)
 {
-    rxsens += MIN_RX_SENSITIVITY;
-
-    if (rxsens < 0) {
-        rxsens = 0;
-    }
-    else if (rxsens > MAX_RX_SENSITIVITY) {
-        rxsens = MAX_RX_SENSITIVITY;
-    }
-
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
     tmp &= ~(AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
-    tmp |= (dbm_to_rx_sens[rxsens] & AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
+    tmp |= (rxsens & AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, tmp);
 }
 
