@@ -99,7 +99,6 @@ static void _erase_page(void *page_addr)
     *dst = (uint32_t)0;
 #elif defined(CPU_FAM_STM32L4)
     DEBUG("[flashpage] erase: setting the page address\n");
-    CNTRL_REG |= FLASH_CR_PER;
     uint8_t pn;
 #if FLASHPAGE_NUMOF <= 256
     pn = (uint8_t)flashpage_page(dst);
