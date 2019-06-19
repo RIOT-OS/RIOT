@@ -205,7 +205,8 @@ static void mtd_spi_cmd_read(const mtd_spi_nor_t *dev, uint8_t opcode, void *des
  * @param[out] src    write buffer
  * @param[in]  count  number of bytes to write after the opcode has been sent
  */
-static void __attribute__((unused)) mtd_spi_cmd_write(const mtd_spi_nor_t *dev, uint8_t opcode, const void *src, uint32_t count)
+static void __attribute__((unused)) mtd_spi_cmd_write(const mtd_spi_nor_t *dev, uint8_t opcode,
+                                                      const void *src, uint32_t count)
 {
     TRACE("mtd_spi_cmd_write: %p, %02x, %p, %" PRIu32 "\n",
           (void *)dev, (unsigned int)opcode, src, count);
@@ -353,6 +354,34 @@ static void delay_us(unsigned us)
 #endif
 }
 
+static inline void wait_for_write_enable_cleared(const mtd_spi_nor_t *dev)
+{
+    do {
+        uint8_t status;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
+
+        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting !WEL\n", (unsigned int)status);
+        if ((status & STATUS_WEL) == 0) {
+            break;
+        }
+        thread_yield();
+    } while (1);
+}
+
+static inline void wait_for_write_enable_set(const mtd_spi_nor_t *dev)
+{
+    do {
+        uint8_t status;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
+
+        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting WEL\n", (unsigned int)status);
+        if (status & STATUS_WEL) {
+            break;
+        }
+        thread_yield();
+    } while (1);
+}
+
 static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us)
 {
     unsigned i = 0, j = 0;
@@ -369,8 +398,8 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
         uint8_t status;
         mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
 
-        TRACE("mtd_spi_nor: wait device status = 0x%02x\n", (unsigned int)status);
-        if ((status & 1) == 0) { /* TODO magic number */
+        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting !WIP\n", (unsigned int)status);
+        if ((status & STATUS_WIP) == 0) {
             break;
         }
         i++;
@@ -487,7 +516,8 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
 
     DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %lx, opcodes: %p\n",
-          (unsigned long)_get_spi(dev), (unsigned long)dev->params->cs, (void *)dev->params->opcode);
+          (unsigned long)_get_spi(dev), (unsigned long)dev->params->cs,
+          (void *)dev->params->opcode);
 
     /* CS, WP, Hold */
     _init_pins(dev);
@@ -506,7 +536,8 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
         return -EIO;
     }
     DEBUG("mtd_spi_nor_init: Found chip with ID: (%d, 0x%02x, 0x%02x, 0x%02x)\n",
-          dev->jedec_id.bank, dev->jedec_id.manuf, dev->jedec_id.device[0], dev->jedec_id.device[1]);
+          dev->jedec_id.bank, dev->jedec_id.manuf,
+          dev->jedec_id.device[0], dev->jedec_id.device[1]);
 
     /* derive density from JEDEC ID  */
     if (mtd->sector_count == 0) {
@@ -614,6 +645,7 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
 
     uint32_t remaining = mtd->page_size - offset;
     size = MIN(remaining, size);
+    int ret = size;
 
     uint32_t addr = page * mtd->page_size + offset;
 
@@ -622,19 +654,36 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
     /* write enable */
     mtd_spi_cmd(dev, dev->params->opcode->wren);
 
+    /* Wait for WEL to be set */
+    wait_for_write_enable_set(dev);
+
     /* Page program */
     mtd_spi_cmd_addr_write(dev, dev->params->opcode->page_program, addr, src, size);
 
     /* waiting for the command to complete before returning */
     wait_for_write_complete(dev, 0);
 
+    /* Wait for WEL to be cleared */
+    wait_for_write_enable_cleared(dev);
+
+    if (IS_ACTIVE(CONFIG_MTD_SPI_NOR_RDSCUR)) {
+        /* Read security register */
+        uint8_t rdscur;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
+        if (rdscur & SECURITY_PFAIL) {
+            DEBUG("mtd_spi_nor_write: ERR: page program failed!\n");
+            ret = -EIO;
+        }
+    }
+
     mtd_spi_release(dev);
 
-    return size;
+    return ret;
 }
 
 static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 {
+    int ret = 0;
     DEBUG("mtd_spi_nor_erase: %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
           (void *)mtd, addr, size);
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
@@ -663,6 +712,9 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 
         /* write enable */
         mtd_spi_cmd(dev, dev->params->opcode->wren);
+
+        /* Wait for WEL to be set */
+        wait_for_write_enable_set(dev);
 
         if (size == total_size) {
             mtd_spi_cmd(dev, dev->params->opcode->chip_erase);
@@ -703,10 +755,23 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 
         /* waiting for the command to complete before continuing */
         wait_for_write_complete(dev, us);
+
+        /* Wait for WEL to be cleared */
+        wait_for_write_enable_cleared(dev);
+
+        if (IS_ACTIVE(CONFIG_MTD_SPI_NOR_RDSCUR)) {
+            /* Read security register */
+            uint8_t rdscur;
+            mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
+            if (rdscur & SECURITY_EFAIL) {
+                DEBUG("mtd_spi_nor_erase: ERR: erase failed!\n");
+                ret = -EIO;
+            }
+        }
     }
     mtd_spi_release(dev);
 
-    return 0;
+    return ret;
 }
 
 const mtd_desc_t mtd_spi_nor_driver = {

@@ -36,6 +36,24 @@ extern "C"
 {
 #endif
 
+#define STATUS_WIP  0x01u
+#define STATUS_WEL  0x02u
+#define STATUS_BP0  0x04u
+#define STATUS_BP1  0x08u
+#define STATUS_BP2  0x10u
+#define STATUS_BP3  0x20u
+#define STATUS_QE   0x40u
+#define STATUS_SRWD 0x80u
+
+#define SECURITY_SOTP 0x01u
+#define SECURITY_LDSO 0x02u
+#define SECURITY_PSB  0x04u
+#define SECURITY_ESB  0x08u
+#define SECURITY_XXXXX 0x10u
+#define SECURITY_PFAIL 0x20u
+#define SECURITY_EFAIL 0x40u
+#define SECURITY_WPSEL 0x80u
+
 /**
  * @brief   SPI NOR flash opcode table
  */
@@ -53,7 +71,7 @@ typedef struct {
     uint8_t chip_erase;      /**< Chip erase */
     uint8_t sleep;           /**< Deep power down */
     uint8_t wake;            /**< Release from deep power down */
-    /* TODO: enter 4 byte address mode for large memories */
+    uint8_t rdscur;          /**< Read security register */
 } mtd_spi_nor_opcode_t;
 
 /**

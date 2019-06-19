@@ -40,6 +40,7 @@ const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default = {
     .chip_erase      = 0xc7,
     .sleep           = 0xb9,
     .wake            = 0xab,
+    .rdscur          = 0x2b,
 };
 
 const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default_4bytes = {
@@ -56,6 +57,7 @@ const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default_4bytes = {
     .chip_erase      = 0xc7,
     .sleep           = 0xb9,
     .wake            = 0xab,
+    .rdscur          = 0x2b,
 };
 
 /** @} */
