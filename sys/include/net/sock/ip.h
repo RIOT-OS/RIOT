@@ -362,7 +362,7 @@ void sock_ip_close(sock_ip_t *sock);
 int sock_ip_get_local(sock_ip_t *sock, sock_ip_ep_t *ep);
 
 /**
- * @brief   Gets the remote end point of a UDP sock object
+ * @brief   Gets the remote end point of a raw IPv4/IPv6 sock object
  *
  * @pre `(sock != NULL) && (ep != NULL)`
  *
@@ -373,7 +373,7 @@ int sock_ip_get_local(sock_ip_t *sock, sock_ip_ep_t *ep);
  * implementation might choose to return the address on this interface the
  * @p sock is bound to in @p ep's sock_ip_ep_t::addr.
  *
- * @param[in] sock  A UDP sock object.
+ * @param[in] sock  A raw IPv4/IPv6 sock object.
  * @param[out] ep   The remote end point.
  *
  * @return  0 on success.
