@@ -23,8 +23,8 @@ RESET ?= $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 export PROGRAMMER ?= cc2538-bsl
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
-  FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py -a $(IMAGE_OFFSET)+$(ROM_START_ADDR)
-  FFLAGS  = -p "$(PORT)" -e -w -v $(FLASHFILE)
+  FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
+  FFLAGS  = -p "$(PORT)" -a $(IMAGE_OFFSET)+$(ROM_START_ADDR) -w -v $(FLASHFILE)
 else ifeq ($(PROGRAMMER),jlink)
   FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
   FFLAGS  = $(BINDIR) $(FLASHFILE)
