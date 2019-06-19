@@ -39,6 +39,7 @@
 
 /* This file was imported into RIOT from newlib 2.3.0 */
 
+#ifdef __MSPGCC__
 #ifndef SYS_CDEFS_H
 #define SYS_CDEFS_H
 
@@ -709,3 +710,6 @@ extern "C" {
 #endif
 
 #endif /* SYS_CDEFS_H */
+#else
+#include_next <sys/cdefs.h>
+#endif
