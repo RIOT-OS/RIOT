@@ -24,8 +24,15 @@ DEBUG_ADAPTER ?= dap
 
 # EDBG can only be used with a compatible Atmel programmer
 ifeq ($(DEBUG_ADAPTER),dap)
-  # set this to either openocd or edbg
+  # set this to either openocd, jlink or edbg
   PROGRAMMER ?= edbg
+else ifeq ($(DEBUG_ADAPTER),jlink)
+  # only use JLinkExe if it's installed
+  ifneq (,$(shell command -v JLinkExe)))
+    PROGRAMMER ?= jlink
+  else
+    PROGRAMMER ?= openocd
+  endif
 else
   PROGRAMMER ?= openocd
 endif
@@ -37,5 +44,12 @@ ifeq ($(PROGRAMMER),edbg)
   endif
 endif
 
+# this board uses J-Link for debug and possibly flashing
+ifeq ($(PROGRAMMER),jlink)
+  include $(RIOTMAKE)/tools/jlink.inc.mk
+endif
+
 # this board uses openocd for debug and possibly flashing
-include $(RIOTMAKE)/tools/openocd.inc.mk
+ifeq ($(PROGRAMMER),openocd)
+  include $(RIOTMAKE)/tools/openocd.inc.mk
+endif
