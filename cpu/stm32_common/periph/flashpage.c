@@ -175,7 +175,8 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     _unlock_flash();
 
     DEBUG("[flashpage_raw] write: now writing the data\n");
-#if !(defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1))
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32L4)
     /* set PG bit and program page to flash */
     CNTRL_REG |= FLASH_CR_PG;
 #endif
