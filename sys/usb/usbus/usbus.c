@@ -107,37 +107,24 @@ uint16_t usbus_add_interface(usbus_t *usbus, usbus_interface_t *iface)
      * usages. Furthermore, the O(1) append is not really necessary as this is
      * only used at init */
     uint16_t idx = 0;
-    usbus_interface_t *last = usbus->iface;
-
-    if (last) {
+    usbus_interface_t **last = &usbus->iface;
+    while (*last) {
+        last = &(*last)->next;
         idx++;
-        while (last->next) {
-            last = last->next;
-            idx++;
-        }
-        last->next = iface;
-    }
-    else {
-        usbus->iface = iface;
     }
     iface->idx = idx;
+    *last = iface;
     return idx;
 }
 
 void usbus_register_event_handler(usbus_t *usbus, usbus_handler_t *handler)
 {
     /* See note above for reasons against clist.h */
-    usbus_handler_t *last = usbus->handlers;
-
-    if (last) {
-        while (last->next) {
-            last = last->next;
-        }
-        last->next = handler;
+    usbus_handler_t **last = &usbus->handlers;
+    while (*last) {
+        last = &(*last)->next;
     }
-    else {
-        usbus->handlers = handler;
-    }
+    *last = handler;
 }
 
 usbus_endpoint_t *usbus_add_endpoint(usbus_t *usbus, usbus_interface_t *iface,
