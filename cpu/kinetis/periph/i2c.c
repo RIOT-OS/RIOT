@@ -471,21 +471,21 @@ static void i2c_irq_mst_tx_handler(I2C_Type *i2c, i2c_state_t *state, uint8_t S)
     assert(len != 0); /* This only happens if this periph driver is broken */
     --len;
     state->tx.bytes_left = len;
-    if (len == 0) {
+    if (S & I2C_S_RXAK_MASK) {
+        /* NACK */
+        /* Abort master transfer */
+        DEBUG("i2c: NACK\n");
+        bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
+        state->active = 0;
+        state->retval = -EIO;
+        i2c_irq_signal_done(i2c, state->pid);
+    }
+    else if (len == 0) {
         /* We are done, NACK on the last byte is OK */
         DEBUG("i2c: TX done\n");
         i2c_irq_signal_done(i2c, state->pid);
     }
     else {
-        if (S & I2C_S_RXAK_MASK) {
-            /* NACK */
-            /* Abort master transfer */
-            DEBUG("i2c: NACK\n");
-            bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
-            state->active = 0;
-            state->retval = -EIO;
-            i2c_irq_signal_done(i2c, state->pid);
-        }
         /* transmit the next byte */
         /* Increment first, datap points to the last byte transmitted */
         ++state->tx.datap;
