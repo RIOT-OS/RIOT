@@ -51,13 +51,14 @@ ssize_t _flashwrite_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *con
 
     if (offset == writer->offset) {
         riotboot_flashwrite_putbytes(writer, payload_start, payload_len, block1.more);
+
+        if (block1.more == 1) {
+            result = COAP_CODE_CONTINUE;
+        }
     }
     else {
         printf("_flashwrite_handler(): skipping invalid offset (data=%u, writer=%u)\n", (unsigned)offset, (unsigned)writer->offset);
-    }
-
-    if (block1.more == 1) {
-        result = COAP_CODE_CONTINUE;
+        result = COAP_CODE_REQUEST_ENTITY_INCOMPLETE;
     }
 
     if (!blockwise || !block1.more) {
