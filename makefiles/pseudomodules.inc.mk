@@ -73,6 +73,7 @@ PSEUDOMODULES += sock
 PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp
 PSEUDOMODULES += sock_udp
+PSEUDOMODULES += stdin
 PSEUDOMODULES += stdio_uart_rx
 
 # print ascii representation in function od_hex_dump()
