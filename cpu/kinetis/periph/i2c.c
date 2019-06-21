@@ -380,8 +380,10 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t fla
         /* Initiate master receive mode by reading the data register once when
          * the C1[TX] bit is cleared and C1[MST] is set */
         volatile uint8_t dummy;
+        /* cppcheck-suppress unreadVariable
+         * (reason: needed to empty D register) */
         dummy = i2c->D;
-        ++dummy;
+        (void)dummy;
         /* Wait until the ISR signals back */
         TRACE("i2c: read C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
         thread_flags_t tflg = thread_flags_wait_any(THREAD_FLAG_KINETIS_I2C | THREAD_FLAG_TIMEOUT);
