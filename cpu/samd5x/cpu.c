@@ -23,14 +23,16 @@
 
 static void xosc32k_init(void)
 {
-    OSC32KCTRL->XOSC32K.reg = OSC32KCTRL_XOSC32K_ENABLE | OSC32KCTRL_XOSC32K_XTALEN
-                | OSC32KCTRL_XOSC32K_EN32K | OSC32KCTRL_XOSC32K_RUNSTDBY
-                | OSC32KCTRL_XOSC32K_STARTUP(7);
+    OSC32KCTRL->XOSC32K.reg = OSC32KCTRL_XOSC32K_ENABLE
+                            | OSC32KCTRL_XOSC32K_EN1K
+                            | OSC32KCTRL_XOSC32K_EN32K
+                            | OSC32KCTRL_XOSC32K_RUNSTDBY
+                            | OSC32KCTRL_XOSC32K_XTALEN
+                            | OSC32KCTRL_XOSC32K_STARTUP(7);
 
     while (!OSC32KCTRL->STATUS.bit.XOSC32KRDY) {}
 }
 
-#ifdef MODULE_PERIPH_USBDEV
 static void dfll_init(void)
 {
     uint32_t reg = OSCCTRL_DFLLCTRLB_QLDIS
@@ -41,30 +43,41 @@ static void dfll_init(void)
 
     OSCCTRL->DFLLCTRLB.reg = reg;
     OSCCTRL->DFLLCTRLA.reg = OSCCTRL_DFLLCTRLA_ENABLE;
+
+    while (!OSCCTRL->STATUS.bit.DFLLRDY) {}
 }
-#endif
 
 static void fdpll0_init(uint32_t f_cpu)
 {
+    /* We source the DPLL from 32kHz GCLK1 */
     const uint32_t LDR = ((f_cpu << 5) / 32768);
 
+    /* disable the DPLL before changing the configuration */
+    OSCCTRL->Dpll[0].DPLLCTRLA.bit.ENABLE = 0;
+    while (OSCCTRL->Dpll[0].DPLLSYNCBUSY.reg) {}
+
+    /* set DPLL clock source */
     GCLK->PCHCTRL[OSCCTRL_GCLK_ID_FDPLL0].reg = GCLK_PCHCTRL_GEN(1) | GCLK_PCHCTRL_CHEN;
+    while (!(GCLK->PCHCTRL[OSCCTRL_GCLK_ID_FDPLL0].reg & GCLK_PCHCTRL_CHEN)) {}
 
     OSCCTRL->Dpll[0].DPLLRATIO.reg = OSCCTRL_DPLLRATIO_LDRFRAC(LDR & 0x1F)
-                       | OSCCTRL_DPLLRATIO_LDR((LDR >> 5) - 1);
+                                   | OSCCTRL_DPLLRATIO_LDR((LDR >> 5) - 1);
 
+    /* Without LBYPASS, startup takes very long, see errata section 2.13. */
     OSCCTRL->Dpll[0].DPLLCTRLB.reg = OSCCTRL_DPLLCTRLB_REFCLK_GCLK
-                       | OSCCTRL_DPLLCTRLB_WUF
-                       | OSCCTRL_DPLLCTRLB_LBYPASS;
+                                   | OSCCTRL_DPLLCTRLB_WUF
+                                   | OSCCTRL_DPLLCTRLB_LBYPASS;
 
     OSCCTRL->Dpll[0].DPLLCTRLA.reg = OSCCTRL_DPLLCTRLA_ENABLE;
 
+    while (OSCCTRL->Dpll[0].DPLLSYNCBUSY.reg) {}
     while (!(OSCCTRL->Dpll[0].DPLLSTATUS.bit.CLKRDY &&
              OSCCTRL->Dpll[0].DPLLSTATUS.bit.LOCK)) {}
 }
 
 static void gclk_connect(uint8_t id, uint8_t src, uint32_t flags) {
     GCLK->GENCTRL[id].reg = GCLK_GENCTRL_SRC(src) | GCLK_GENCTRL_GENEN | flags | GCLK_GENCTRL_IDC;
+    while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_GENCTRL(id)) {}
 }
 
 /**
@@ -77,49 +90,51 @@ void cpu_init(void)
 
     /* turn on only needed APB peripherals */
     MCLK->APBAMASK.reg = MCLK_APBAMASK_MCLK
-                         | MCLK_APBAMASK_OSCCTRL
-                         | MCLK_APBAMASK_OSC32KCTRL
-                         | MCLK_APBAMASK_GCLK
+                       | MCLK_APBAMASK_OSCCTRL
+                       | MCLK_APBAMASK_OSC32KCTRL
+                       | MCLK_APBAMASK_GCLK
+                       | MCLK_APBAMASK_SUPC
+                       | MCLK_APBAMASK_PAC
+#ifdef MODULE_PERIPH_PM
+                       | MCLK_APBAMASK_PM
+#endif
 #ifdef MODULE_PERIPH_GPIO_IRQ
-                         | MCLK_APBAMASK_EIC
+                       | MCLK_APBAMASK_EIC
 #endif
-                         ;
+                       ;
+
+    MCLK->APBBMASK.reg = 0
+#ifdef MODULE_PERIPH_FLASHPAGE
+                       | MCLK_APBBMASK_NVMCTRL
+#endif
 #ifdef MODULE_PERIPH_GPIO
-    MCLK->APBBMASK.reg = MCLK_APBBMASK_PORT;
+                       | MCLK_APBBMASK_PORT
 #endif
+                       ;
+
+    MCLK->APBCMASK.reg = 0;
+    MCLK->APBDMASK.reg = 0;
 
     /* enable the Cortex M Cache Controller */
     CMCC->CTRL.bit.CEN = 1;
 
-    /* Software reset the GCLK module to ensure it is re-initialized correctly */
-    GCLK->CTRLA.reg = GCLK_CTRLA_SWRST;
-    while (GCLK->CTRLA.reg & GCLK_CTRLA_SWRST) {}
-    while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_SWRST) {}
-
     xosc32k_init();
     gclk_connect(1, GCLK_SOURCE_XOSC32K, 0);
 
+    /* make sure main clock is not sourced from DPLL */
+    dfll_init();
+    gclk_connect(0, GCLK_SOURCE_DFLL, 0);
+
     fdpll0_init(CLOCK_CORECLOCK);
 
-    /* main clock */
+    /* source main clock from DPLL */
     gclk_connect(0, GCLK_SOURCE_DPLL0, 0);
 
     /* clock used by xtimer */
     gclk_connect(5, GCLK_SOURCE_DPLL0, GCLK_GENCTRL_DIV(CLOCK_CORECLOCK / 8000000));
 
 #ifdef MODULE_PERIPH_USBDEV
-    dfll_init();
     gclk_connect(6, GCLK_SOURCE_DFLL, 0);
-#endif
-
-    while (GCLK->SYNCBUSY.reg) {}
-
-#ifdef MODULE_PERIPH_PM
-    /* enable power managemet module */
-    MCLK->APBAMASK.reg |= MCLK_APBAMASK_PM;
-#endif
-#ifdef MODULE_PERIPH_FLASHPAGE
-    MCLK->APBBMASK.reg |= MCLK_APBBMASK_NVMCTRL;
 #endif
 
     /* trigger static peripheral initialization */
