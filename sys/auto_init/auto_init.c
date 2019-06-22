@@ -215,6 +215,12 @@ void auto_init(void)
         auto_init_gnrc_rpl();
     }
 
+    if (IS_USED(MODULE_ZBOSS)) {
+        LOG_DEBUG("Auto init ZBOSS.\n");
+        extern void zboss_init(void);
+        zboss_init();
+    }
+
     /* initialize storage devices */
     if (IS_USED(MODULE_AUTO_INIT_STORAGE)) {
         LOG_DEBUG("Auto init STORAGE.\n");
