@@ -40,6 +40,15 @@
 #endif
 
 #ifdef MODULE_PM_LAYERED
+
+/* TODO deduplicate this definition with the one in sys/pm_layered/pm.c */
+typedef union {
+    uint32_t val_u32;
+    uint8_t val_u8[PM_NUM_MODES];
+} pm_blocker_t;
+
+extern volatile pm_blocker_t pm_blocker; /* sys/pm_layered/pm.c */
+
 static int check_mode(int argc, char **argv)
 {
     if (argc < 2) {
@@ -173,6 +182,11 @@ static int cmd_unblock(int argc, char **argv)
         return 1;
     }
 
+    if (pm_blocker.val_u8[mode] == 0) {
+        printf("Mode %d is already unblocked.\n", mode);
+        return 1;
+    }
+
     printf("Unblocking power mode %d.\n", mode);
     fflush(stdout);
 
@@ -192,6 +206,11 @@ static int cmd_unblock_rtc(int argc, char **argv)
     int duration = parse_duration(argv[2]);
 
     if (mode < 0 || duration < 0) {
+        return 1;
+    }
+
+    if (pm_blocker.val_u8[mode] == 0) {
+        printf("Mode %d is already unblocked.\n", mode);
         return 1;
     }
 
