@@ -32,6 +32,7 @@
 #include "periph/rtc.h"
 #endif
 #include "pm_layered.h"
+extern int _pm(int argc, char **argv);
 #endif
 #include "shell.h"
 
@@ -270,6 +271,13 @@ int main(void)
            "save more power, but may require an event/interrupt to wake up\n"
            "the CPU. Reset the CPU if needed.\n",
            PM_NUM_MODES - 1);
+
+    /* In case the system boots into an unresponsive shell, at least display
+     * the state of PM blockers so that the user will know which power mode has
+     * been entered and is presumably responsible for the unresponsive shell.
+     */
+    _pm(2, (char *[]){"pm", "show"});
+
 #else
     puts("This application allows you to test the CPU power management.\n"
          "Layered support is not unavailable for this CPU. Reset the CPU if\n"
