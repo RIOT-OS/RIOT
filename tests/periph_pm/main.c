@@ -163,10 +163,14 @@ static int cmd_set(int argc, char **argv)
         return 1;
     }
 
-    printf("CPU will enter power mode %d.\n", mode);
+    printf("CPU is entering power mode %d.\n", mode);
+    printf("Now waiting for a wakeup event...\n");
     fflush(stdout);
 
     pm_set(mode);
+    /* execution stops here until anything (like shell input) wakes the CPU */
+
+    printf("CPU has returned from power mode %d.\n", mode);
 
     return 0;
 }
