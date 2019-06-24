@@ -44,6 +44,6 @@ endif
 OFLAGS = --gap-fill 0xff
 FLASHFILE ?= $(BINFILE)
 DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
-RESET_FLAGS = $(BINDIR)
+RESET_FLAGS ?= $(BINDIR)
 
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
