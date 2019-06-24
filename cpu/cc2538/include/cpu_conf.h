@@ -42,6 +42,9 @@ extern "C" {
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
+#define FLASHPAGE_SIZE      (2048U)
+#define FLASHPAGE_NUMOF     (256U)    /* 512KB */
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
