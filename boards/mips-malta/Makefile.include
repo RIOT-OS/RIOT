@@ -4,3 +4,7 @@ export USE_DSP = 1
 export USE_UHI_SYSCALLS = 1
 
 HEXFILE = $(BINFILE)
+# Not sure if the file used for flashing is BINFILE (there is no flasher).
+# I chose this one as HEXFILE was overwritten to BINFILE so it keeps the
+# same behavior of generating the '.bin'.
+FLASHFILE ?= $(BINFILE)
