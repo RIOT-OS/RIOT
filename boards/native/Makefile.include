@@ -98,7 +98,7 @@ all-cachegrind: CFLAGS += -g3
 all-gprof: CFLAGS += -pg
 all-gprof: LINKFLAGS += -pg
 all-asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
-all-asan: CFLAGS += -DNATIVE_IN_CALLOC
+all-asan: CFLAGS += -DNATIVE_MEMORY
 all-asan: LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
 
 INCLUDES += $(NATIVEINCLUDES)
