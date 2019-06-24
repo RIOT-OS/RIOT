@@ -233,7 +233,7 @@ static tftp_state _tftp_send_error(tftp_context_t *ctxt, gnrc_pktsnip_t *buf, tf
 static tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len);
 
 /* decode the default TFTP start packet */
-static int _tftp_decode_start(tftp_context_t *ctxt, uint8_t *buf, gnrc_pktsnip_t *outbuf);
+static int _tftp_decode_start(tftp_context_t *ctxt, gnrc_pktsnip_t *inpkt, gnrc_pktsnip_t *outbuf);
 
 /* decode the TFTP option extensions */
 static int _tftp_decode_options(tftp_context_t *ctxt, gnrc_pktsnip_t *buf, uint32_t start);
@@ -629,7 +629,7 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
             ctxt->dst_port = byteorder_ntohs(udp->src_port);
             DEBUG("tftp: client's port is %" PRIu16 "\n", ctxt->dst_port);
 
-            int offset = _tftp_decode_start(ctxt, data, outbuf);
+            int offset = _tftp_decode_start(ctxt, pkt, outbuf);
             DEBUG("tftp: offset after decode start = %i\n", offset);
             if (offset < 0) {
                 DEBUG("tftp: there is no data?\n");
@@ -1022,10 +1022,10 @@ bool _tftp_validate_ack(tftp_context_t *ctxt, uint8_t *buf)
     return ctxt->block_nr == byteorder_ntohs(pkt->block_nr);
 }
 
-int _tftp_decode_start(tftp_context_t *ctxt, uint8_t *buf, gnrc_pktsnip_t *outbuf)
+int _tftp_decode_start(tftp_context_t *ctxt, gnrc_pktsnip_t *inpkt, gnrc_pktsnip_t *outbuf)
 {
     /* decode the packet */
-    tftp_header_t *hdr = (tftp_header_t *)buf;
+    tftp_header_t *hdr = (tftp_header_t *)inpkt->data;
 
     /* get the file name and copy terminating byte */
     size_t fnlen = strlen((char *)hdr->data) + 1;
@@ -1047,6 +1047,10 @@ int _tftp_decode_start(tftp_context_t *ctxt, uint8_t *buf, gnrc_pktsnip_t *outbu
 
     /* decode the TFTP transfer mode */
     for (uint32_t idx = 0; idx < ARRAY_LEN(_tftp_modes); ++idx) {
+        if (_tftp_modes[idx].len > (inpkt->size - sizeof(*hdr) - fnlen)) {
+            continue;
+        }
+
         if (memcmp(_tftp_modes[idx].name, str_mode, _tftp_modes[idx].len) == 0) {
             ctxt->mode = (tftp_mode_t)idx;
             return (str_mode + _tftp_modes[idx].len) - (char *)hdr->data;
