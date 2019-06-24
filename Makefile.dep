@@ -401,6 +401,12 @@ ifneq (,$(filter shell,$(USEMODULE)))
   USEMODULE += stdin
 endif
 
+ifneq (,$(filter stdio_ethos,$(USEMODULE)))
+  USEMODULE += ethos
+  USEMODULE += stdin
+  USEMODULE += stdio_uart
+endif
+
 ifneq (,$(filter stdin,$(USEMODULE)))
   ifneq (,$(filter stdio_uart,$(USEMODULE)))
     USEMODULE += stdio_uart_rx
