@@ -1,8 +1,8 @@
 DFU ?= dfu-util
 FLASHER ?= $(DFU)
-HEXFILE = $(BINFILE)
+FLASHFILE ?= $(BINFILE)
 
-FFLAGS ?= -D $(HEXFILE) --reset $(DFU_ARGS)
+FFLAGS ?= -D $(FLASHFILE) --reset $(DFU_ARGS)
 
 RESET ?= $(DFU)
 RESET_FLAGS ?= $(DFU_ARGS) -t $(DFU_DEVICE_TYPE)

@@ -13,8 +13,8 @@ FLASHER = dfu-util
 DEBUGGER = # dfu-util has no debugger
 RESET ?= # dfu-util has no support for resetting the device
 
-HEXFILE = $(BINFILE)
-FFLAGS = -d $(ID) -a 0 -s 0x08000000:leave -D "$(HEXFILE)"
+FLASHFILE ?= $(BINFILE)
+FFLAGS = -d $(ID) -a 0 -s 0x08000000:leave -D $(FLASHFILE)
 
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
