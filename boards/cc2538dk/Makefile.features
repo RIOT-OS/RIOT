@@ -8,6 +8,7 @@ FEATURES_PROVIDED += periph_adc
 
 # Various other features (if any)
 FEATURES_PROVIDED += emulator_renode
+FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += riotboot
 
 include $(RIOTCPU)/cc2538/Makefile.features
