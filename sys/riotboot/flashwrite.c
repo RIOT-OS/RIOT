@@ -65,7 +65,7 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
                                  const uint8_t *bytes, size_t len, bool more)
 {
     LOG_INFO(LOG_PREFIX "processing bytes %u-%u\n", state->offset, state->offset + len - 1);
-
+	int flash_counter = 0;
     while (len) {
         size_t flashpage_pos = state->offset % FLASHPAGE_SIZE;
         size_t flashpage_avail = FLASHPAGE_SIZE - flashpage_pos;
@@ -80,7 +80,9 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
         bytes += to_copy;
         len -= to_copy;
         if ((!flashpage_avail) || (!more)) {
-            if (flashpage_write_and_verify(state->flashpage, state->flashpage_buf) != FLASHPAGE_OK) {
+            while (flashpage_write_and_verify(state->flashpage, state->flashpage_buf) != FLASHPAGE_OK && (++flash_counter <= 5)) {}
+            if(flash_counter > 5)
+            {
                 LOG_WARNING(LOG_PREFIX "error writing flashpage %u!\n", state->flashpage);
                 return -1;
             }
@@ -97,7 +99,7 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
     assert(len <= FLASHPAGE_SIZE);
 
     int res = -1;
-
+	int flash_counter = 0;
     uint8_t *slot_start = (uint8_t *)riotboot_slot_get_hdr(state->target_slot);
 
     uint8_t *firstpage;
@@ -114,7 +116,9 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
     }
 
     int flashpage = flashpage_page((void *)slot_start);
-    if (flashpage_write_and_verify(flashpage, firstpage) != FLASHPAGE_OK) {
+    while (flashpage_write_and_verify(flashpage, firstpage) != FLASHPAGE_OK && (++flash_counter <= 5)) {}
+    if(flash_counter > 5)
+    {
         LOG_WARNING(LOG_PREFIX "re-flashing first block failed!\n");
         goto out;
     }
