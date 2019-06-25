@@ -18,8 +18,6 @@ BOARD_INSUFFICIENT_MEMORY += chronos i-nucleo-lrwan1 \
                              stm32f0discovery stm32l0538-disco
 
 # HACK Blacklist native as `murdock` fails on utf-8 characters for native tests
-# HACK Blacklist on all as the test implementation can fail due being
-# de-scheduled during printf
-TEST_ON_CI_BLACKLIST += all
+TEST_ON_CI_BLACKLIST += native
 
 include $(RIOTBASE)/Makefile.include
