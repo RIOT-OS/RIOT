@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_hifive
+ * @ingroup     boards_hifive1
  * @{
  *
  * @file
