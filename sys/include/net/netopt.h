@@ -68,6 +68,7 @@ typedef enum {
      * Ethernet      | 6      | device MAC address
      * nrfmin        | 2      | device short address
      * CC110x        | 1      | device address
+     * LoRaWAN       | 4      | device address
      */
     NETOPT_ADDRESS,
 
@@ -79,6 +80,7 @@ typedef enum {
      * IEEE 802.15.4 | 8        | device long address (EUI-64), @ref eui64_t
      * nrfmin        | 8        | device long address (based on short address)
      * BLE           | 8        | device long address (EUI-64), @ref eui64_t
+     * LoRaWAN       | 8        | Device EUI
      */
     NETOPT_ADDRESS_LONG,
     /**
@@ -92,7 +94,8 @@ typedef enum {
     /**
      * @brief   (uint16_t) network ID
      *
-     * Examples for this include the PAN ID in IEEE 802.15.4
+     * Examples for this include the PAN ID in IEEE 802.15.4 and netid in
+     * LoRaWAN (uint32_t in this case)
      */
     NETOPT_NID,
 
@@ -573,6 +576,74 @@ typedef enum {
      * incoming frames until unset.
      */
     NETOPT_PHY_BUSY,
+
+    /**
+     * @brief   (uint8_t*) LoRaWAN application EUI (8 bytes length)
+     */
+    NETOPT_LORAWAN_APPEUI,
+
+    /**
+     * @brief   (uint8_t*) LoRaWAN application key (16 bytes length)
+     */
+    NETOPT_LORAWAN_APPKEY,
+
+    /**
+     * @brief   (uint8_t*) LoRaWAN network session key (16 bytes length)
+     */
+    NETOPT_LORAWAN_NWKSKEY,
+    /**
+     * @brief   (uint8_t*) LoRaWAN application session key (16 bytes length)
+     */
+    NETOPT_LORAWAN_APPSKEY,
+
+     /**
+     * @brief   (uint8_t) LoRaWAN device class (A, B, C)
+     * - LoRaWAN: @ref loramac_class_t
+     */
+    NETOPT_LORAWAN_DEVICE_CLASS,
+
+    /**
+     * @brief   (uint8_t) LoRaWAN datarate
+     * - LoRaWAN: @ref loramac_dr_idx_t
+     */
+    NETOPT_LORAWAN_DR,
+
+    /**
+     * @brief   (@ref netopt_enable_t) LoRaWAN adaptive datarate
+     */
+    NETOPT_LORAWAN_ADR,
+
+    /**
+     * @brief   (@ref netopt_enable_t) LoRaWAN public network
+     */
+    NETOPT_LORAWAN_PUBLIC_NETWORK,
+
+    /**
+     * @brief   (uint8_t) LoRaWAN TX application port
+     * - LoRaWAN: between 1 and 223 (included)
+     */
+    NETOPT_LORAWAN_TX_PORT,
+
+    /**
+     * @brief   (loramac_dr_idx_t) LoRaWAN datarate for second RX window
+     * - LoRaWAN: @ref loramac_dr_idx_t
+     */
+    NETOPT_LORAWAN_RX2_DR,
+
+    /**
+     * @brief   (uint32_t) LoRaWAN frequency used for second RX window
+     */
+    NETOPT_LORAWAN_RX2_FREQ,
+
+    /**
+     * @brief   (uint32_t) LoRaWAN maximum system overall timing error (ms)
+     */
+    NETOPT_LORAWAN_MAX_RX_ERROR,
+
+    /**
+     * @brief   (uint8_t) LoRaWAN maximum system overall timing error (symbols)
+     */
+    NETOPT_LORAWAN_MIN_RX_SYMBOL,
 
     /* add more options if needed */
 
