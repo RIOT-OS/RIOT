@@ -5,4 +5,4 @@ ifeq (,$(filter $(BOARDS_WITHOUT_HWRNG),$(BOARD)))
   FEATURES_PROVIDED += periph_hwrng
 endif
 
--include $(RIOTCPU)/sam0_common/Makefile.features
+include $(RIOTCPU)/sam0_common/Makefile.features
