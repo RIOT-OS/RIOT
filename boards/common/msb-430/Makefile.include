@@ -15,7 +15,8 @@ ifeq ($(strip $(PROGRAMMER)),uif)
   MSPDEBUGFLAGS += -d $(PORT)
 endif
 FLASHER ?= mspdebug
-FFLAGS = $(MSPDEBUGFLAGS) "prog $(HEXFILE)"
+FLASHFILE ?= $(HEXFILE)
+FFLAGS = $(MSPDEBUGFLAGS) "prog $(FLASHFILE)"
 
 # setup debugger
 DEBUGSERVER = $(FLASHER)

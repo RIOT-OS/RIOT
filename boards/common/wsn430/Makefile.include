@@ -14,7 +14,8 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 # configure the flash tool
 FLASHER = mspdebug
-FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
+FLASHFILE ?= $(HEXFILE)
+FFLAGS = -d $(PORT) -j uif "prog $(FLASHFILE)"
 
 # Use the HEXFILE when using iot-lab.single.inc.mk
-IOTLAB_FLASHFILE = $(HEXFILE)
+IOTLAB_FLASHFILE = $(FLASHFILE)
