@@ -40,6 +40,15 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### sys/ubjson [868d37708bb674739ab4983441d6df904dd5a25f]
+Author(s):
+- René Kijewski <rene.kijewski@fu-berlin.de>
+
+Reasons for removal:
+- Unsafe code.
+- Did not comply with RIOT standards.
+- More standard alternatives available (such as CBOR).
+
 ### boards/jiminy-mega256rfr2 [232aed3e18118624b862d36bfec7cd1c21ca2d26]
 Author:
 - Josua Arndt <jarndt@ias.rwth-aachen.de>
