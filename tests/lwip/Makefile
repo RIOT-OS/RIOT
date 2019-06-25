@@ -8,7 +8,7 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
                    esp8266-sparkfun-thing jiminy-mega256rfr2 mega-xplained \
                    msb-430 msb-430h telosb waspmote-pro \
                    wsn430-v1_3b wsn430-v1_4 z1
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon hifive1 i-nucleo-lrwan1 nrf6310 \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon hifive1 hifive1b i-nucleo-lrwan1 nrf6310 \
                              nucleo-f031k6 nucleo-f042k6 \
                              nucleo-l031k6 nucleo-f030r8 nucleo-f303k8 \
                              nucleo-f334r8 nucleo-l053r8 stm32f0discovery \

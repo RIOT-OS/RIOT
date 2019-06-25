@@ -65,10 +65,10 @@
 
 /*
  * By default the SPI FFMT initialized as:
- * 	cmd_en = 1
- * 	addr_len = 3
- * 	cmd_code = 3
- * 	all other fields = 0
+ *  cmd_en = 1
+ *  addr_len = 3
+ *  cmd_code = 3
+ *  all other fields = 0
  */
 
 void board_init_clock(void)
@@ -101,16 +101,16 @@ void board_init_clock(void)
 __attribute__ ((section (".ramfunc")))
 void board_init_flash(void)
 {
-	/* Update the QSPI interface to adjust to the CPU speed
-	 * This function needs to execute from the RAM
-	 * when the QSPI interface is being reconfigured because the flash
-	 * can't be accessed during this time
-	 */
+    /* Update the QSPI interface to adjust to the CPU speed
+     * This function needs to execute from the RAM
+     * when the QSPI interface is being reconfigured because the flash
+     * can't be accessed during this time
+     */
 
-	/* Disable SPI flash mode */
-	SPI0_REG(SPI_REG_FCTRL) &= ~SPI_FCTRL_EN;
+    /* Disable SPI flash mode */
+    SPI0_REG(SPI_REG_FCTRL) &= ~SPI_FCTRL_EN;
 
-	/* Enable QPI mode by sending command to flash */
+    /* Enable QPI mode by sending command to flash */
     SPI0_REG(SPI_REG_TXFIFO) = 0x35;
 
     /* begin{code-style-ignore} */
@@ -125,10 +125,10 @@ void board_init_flash(void)
         SPI_INSN_PAD_CODE(0x00);           /* Dummy cycle sends 0 value bits                */
     /* end{code-style-ignore} */
 
-	/* Re-enable SPI flash mode */
-	SPI0_REG(SPI_REG_FCTRL) |= SPI_FCTRL_EN;
+    /* Re-enable SPI flash mode */
+    SPI0_REG(SPI_REG_FCTRL) |= SPI_FCTRL_EN;
 
-	/* Adjust the SPI clk divider for to boost flash speed */
+    /* Adjust the SPI clk divider for to boost flash speed */
   //  SPI0_REG(SPI_REG_SCKDIV) = SCKDIV;
 }
 

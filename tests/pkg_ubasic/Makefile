@@ -15,6 +15,7 @@ BOARD_BLACKLIST := \
                    esp8266-esp-12x \
                    esp8266-olimex-mod \
                    hifive1 \
+                   hifive1b \
                    jiminy-mega256rfr2 \
                    mega-xplained \
                    msb-430 \

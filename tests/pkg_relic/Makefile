@@ -9,6 +9,7 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     chronos \
                     f4vi1 \
                     hifive1 \
+                    hifive1b \
                     jiminy-mega256rfr2 \
                     mega-xplained \
                     msb-430 \
