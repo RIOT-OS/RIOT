@@ -40,6 +40,15 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### sys/ubjson [868d37708bb674739ab4983441d6df904dd5a25f]
+Author(s):
+- René Kijewski <rene.kijewski@fu-berlin.de>
+
+Reasons for removal:
+- Unsafe code.
+- Did not comply with RIOT standards.
+- More standard alternatives available (such as CBOR).
+
 ### cpu/mips32r2_generic [a2bcd7539ce1931b7aec0077ea71dadd62c96edd]
 Author:
 - Neil Jones <neil.jones@imgtec.com>
