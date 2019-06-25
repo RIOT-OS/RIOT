@@ -187,14 +187,15 @@ typedef enum {
     UBJSON_SIZE_ERROR,        /**< the length of a field exceeded SSIZE_MAX */
 } ubjson_read_callback_result_t;
 
-struct ubjson_cookie;
+struct __attribute__ ((deprecated("The UBJSON module will be removed in release 2020.01"))) ubjson_cookie;
 
 /**
  * @brief         A cookie passed between the read and write functions.
  * @details       You probably want to wrap the cookie in some other data structure,
  *                which you retrieve with container_of() in the callback.
  */
-typedef struct ubjson_cookie ubjson_cookie_t;
+typedef struct ubjson_cookie ubjson_cookie_t
+__attribute__ ((deprecated("The UBJSON module will be removed in release 2020.01")));
 
 /**
  * @brief         Method called by ubjson_read() to get more data.
