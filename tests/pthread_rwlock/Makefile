@@ -17,4 +17,10 @@ BOARD_INSUFFICIENT_MEMORY += chronos i-nucleo-lrwan1 \
                              nucleo-f303k8 nucleo-f334r8 nucleo-l053r8 \
                              stm32f0discovery stm32l0538-disco
 
+TEST_ON_CI_WHITELIST += all
+# HACK Blacklist native as `murdock` fails on utf-8 characters for native tests
+# HACK Blacklist on all as the test implementation can fail due being
+# de-scheduled during printf
+TEST_ON_CI_BLACKLIST += all
+
 include $(RIOTBASE)/Makefile.include
