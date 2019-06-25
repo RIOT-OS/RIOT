@@ -275,7 +275,9 @@ static void _init(usbdev_t *dev)
     usbdev->sstate = NRFUSB_SETUP_READY;
 
     /* Enable a set of interrupts */
-    usbdev->device->INTEN = USBD_INTEN_USBRESET_Msk | USBD_INTEN_EPDATA_Msk;
+    usbdev->device->INTEN = USBD_INTEN_USBRESET_Msk |
+                            USBD_INTEN_EPDATA_Msk |
+                            USBD_INTEN_USBEVENT_Msk;
     NVIC_EnableIRQ(USBD_IRQn);
 }
 
@@ -539,6 +541,19 @@ static void _esr(usbdev_t *dev)
         usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_RESET);
         usbdev->device->INTENSET = USBD_INTENSET_USBRESET_Msk;
     }
+    else if (usbdev->device->EVENTS_USBEVENT) {
+        uint32_t events = usbdev->device->EVENTCAUSE;
+        if (events & USBD_EVENTCAUSE_SUSPEND_Msk) {
+            usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_SUSPEND);
+        }
+        if (events & USBD_EVENTCAUSE_RESUME_Msk) {
+            usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_RESUME);
+        }
+        usbdev->device->EVENTS_USBEVENT = 0;
+        /* Clear eventcause register */
+        usbdev->device->EVENTCAUSE = 0x0f01;
+        usbdev->device->INTENSET = USBD_INTENSET_USBEVENT_Msk;
+    }
 }
 
 static signed _ep0_esr(usbdev_ep_t *ep)
@@ -614,6 +629,11 @@ void isr_usbd(void)
     if (usbdev->device->EVENTS_USBRESET &&
             (usbdev->device->INTEN & USBD_INTEN_USBRESET_Msk)) {
         usbdev->device->INTENCLR = USBD_INTENCLR_USBRESET_Msk;
+        usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_ESR);
+    }
+    else if (usbdev->device->EVENTS_USBEVENT &&
+            (usbdev->device->INTEN & USBD_INTEN_USBEVENT_Msk)) {
+        usbdev->device->INTENCLR = USBD_INTENCLR_USBEVENT_Msk;
         usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_ESR);
     }
     else {
