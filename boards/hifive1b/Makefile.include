@@ -1,0 +1,20 @@
+# define the cpu used by the HiFive1 board
+export CPU = fe310
+export CPU_MODEL = fe310_g002
+
+# Uses UART0 for stdio input/output (comment out to disable)
+USEMODULE += stdio_uart
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB1
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# setup JLink for flashing
+# export JLINK := JLink
+export JLINK_DEVICE := FE310
+export JLINK_IF := JTAG
+export FLASH_ADDR := 0x20010000
+include $(RIOTMAKE)/tools/jlink.inc.mk
