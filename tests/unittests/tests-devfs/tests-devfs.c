@@ -18,8 +18,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <string.h>
 
 #include "fs/devfs.h"
+#include "random.h"
 
 #include "embUnit/embUnit.h"
 
@@ -141,11 +143,39 @@ static void test_devfs_mount_open(void)
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 
+static void test_devfs_urandom(void)
+{
+    const uint8_t zeroes[8] = { 0 };
+    int res;
+    int fd = vfs_open("/dev/urandom", O_RDONLY, 0);
+    TEST_ASSERT(fd >= 0);
+
+    uint8_t buf[8] = { 0 };
+    res = vfs_read(fd, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(sizeof(buf), res);
+    TEST_ASSERT(memcmp(zeroes, buf, sizeof(buf)));
+}
+
+static void test_devfs_hwrng(void)
+{
+    const uint8_t zeroes[8] = { 0 };
+    int res;
+    int fd = vfs_open("/dev/hwrng", O_RDONLY, 0);
+    TEST_ASSERT(fd >= 0);
+
+    uint8_t buf[8] = { 0 };
+    res = vfs_read(fd, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(sizeof(buf), res);
+    TEST_ASSERT(memcmp(zeroes, buf, sizeof(buf)));
+}
+
 Test *tests_devfs_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_devfs_register),
         new_TestFixture(test_devfs_mount_open),
+        new_TestFixture(test_devfs_urandom),
+        new_TestFixture(test_devfs_hwrng),
     };
 
     EMB_UNIT_TESTCALLER(devfs_tests, NULL, NULL, fixtures);
@@ -155,6 +185,11 @@ Test *tests_devfs_tests(void)
 
 void tests_devfs(void)
 {
+    extern void auto_init_devfs(void);
+    auto_init_devfs();
+
+    random_init(1);
+
     TESTS_RUN(tests_devfs_tests());
 }
 /** @} */
