@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_openmote-b OpenMote-B
- * @ingroup     boards
- * @brief       Support for the OpenMote-B board
+ * @ingroup     boards_openmote-b
  * @{
  *
  * @file
