@@ -38,7 +38,11 @@
 
 static mutex_t _mutex = MUTEX_INIT;
 
-#ifdef TEST_SUITES
+#ifdef MODULE_FUZZING
+extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
+#endif
+
+#if defined(TEST_SUITES) || defined(MODULE_FUZZING)
 static unsigned mallocs;
 
 static inline void *_malloc(size_t size)
@@ -50,6 +54,11 @@ static inline void *_malloc(size_t size)
 static inline void _free(void *ptr)
 {
     if (ptr != NULL) {
+#if defined(MODULE_FUZZING) && !defined(MODULE_GNRC_SOCK)
+        if (ptr == gnrc_pktbuf_fuzzptr) {
+           exit(EXIT_SUCCESS);
+        }
+#endif
         mallocs--;
         free(ptr);
     }
