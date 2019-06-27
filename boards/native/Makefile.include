@@ -13,8 +13,11 @@ else
   DEBUGGER ?= gdb
 endif
 
-TERMPROG ?= $(ELFFILE)
 FLASHER = true
+FLASHFILE ?= $(ELFFILE)
+
+TERMPROG ?= $(FLASHFILE)
+
 export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
