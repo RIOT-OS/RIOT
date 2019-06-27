@@ -5,7 +5,7 @@ PKG_LICENSE=BSD-2-Clause
 
 .PHONY: all
 
-all: git-download
+all:
 	cp $(RIOTBASE)/pkg/u8g2/src/Makefile $(PKG_BUILDDIR)/Makefile
 	cp $(RIOTBASE)/pkg/u8g2/src/csrc/Makefile $(PKG_BUILDDIR)/csrc/Makefile
 	cp $(RIOTBASE)/pkg/u8g2/src/csrc/u8g2_riotos.c $(PKG_BUILDDIR)/csrc/u8g2_riotos.c

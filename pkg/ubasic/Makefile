@@ -8,7 +8,7 @@ UBASIC_USEMODULE = $(filter $(UBASIC_MODULES),$(USEMODULE))
 
 .PHONY: all ubasic ubasic%
 
-all: git-download ubasic
+all: ubasic
 
 make_module = "$(MAKE)" -f $(RIOTPKG)/ubasic/$(1).mk -C $(2)
 

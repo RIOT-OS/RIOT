@@ -12,7 +12,7 @@ ifeq ($(TOOLCHAIN)_$(BOARD),llvm_native)
   CFLAGS += -Wno-macro-redefined -Wno-gnu-folding-constant
 endif
 
-all: git-download
+all:
 	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.jerryscript all
 
 include $(RIOTBASE)/pkg/pkg.mk

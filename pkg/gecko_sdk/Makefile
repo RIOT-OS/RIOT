@@ -13,7 +13,7 @@ endif
 
 .PHONY: all
 
-all: git-download
+all:
 	"$(MAKE)" -C $(PKG_BUILDDIR)/dist
 
 include $(RIOTBASE)/pkg/pkg.mk

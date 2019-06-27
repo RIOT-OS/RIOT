@@ -10,7 +10,7 @@ CFLAGS += -Wno-implicit-fallthrough
 
 .PHONY: all
 
-all: git-download
+all:
 	"$(MAKE)" -C $(PKG_BUILDDIR)
 	"$(MAKE)" $(BINDIR)/$(MODULE).a
 

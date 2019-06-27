@@ -5,7 +5,7 @@ PKG_LICENSE=WTFPL
 
 .PHONY: all
 
-all: git-download
+all:
 	@cp Makefile.$(PKG_NAME) $(PKG_BUILDDIR)/Makefile
 	"$(MAKE)" -C $(PKG_BUILDDIR)
 

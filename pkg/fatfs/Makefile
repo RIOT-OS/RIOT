@@ -6,7 +6,7 @@ MODULE_MAKEFILE := $(CURDIR)/Makefile.fatfs
 
 .PHONY: all
 
-all: git-download
+all:
 	@cp $(MODULE_MAKEFILE) $(PKG_BUILDDIR)/Makefile
 	"$(MAKE)" -C $(PKG_BUILDDIR)
 

@@ -22,7 +22,7 @@ SUBMODS := $(filter nimble_%,$(USEMODULE))
 
 .PHONY: all
 
-all: git-download $(SUBMODS)
+all: $(SUBMODS)
 
 # blue code and RIOT port modules
 nimble_riot_contrib:
