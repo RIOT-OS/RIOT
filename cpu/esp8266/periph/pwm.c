@@ -183,23 +183,35 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     CHECK_PARAM (value <= _pwm_dev.res);
 
     uint32_t state = irq_disable();
-    uint32_t phase = _pwm_dev.cycles - _pwm_dev.cycles % _pwm_dev.res + _pwm_dev.res;
+    uint32_t phase = _pwm_dev.cycles - _pwm_dev.cycles % _pwm_dev.res;
+    uint32_t next_on = phase;
+    uint32_t next_off;
 
     switch (_pwm_dev.mode) {
         case PWM_LEFT:
-            _pwm_dev.chn[channel].next_on  = phase;
+            next_on = phase;
             break;
 
         case PWM_RIGHT:
-            _pwm_dev.chn[channel].next_on  = phase + _pwm_dev.res - value;
+            next_on = phase + _pwm_dev.res - value;
             break;
 
         case PWM_CENTER:
-            _pwm_dev.chn[channel].next_on  = phase + (_pwm_dev.res - value) / 2;
+            next_on = phase + (_pwm_dev.res - value) / 2;
             break;
     }
 
-    _pwm_dev.chn[channel].next_off = _pwm_dev.chn[channel].next_on + value;
+    next_off = next_on + value;
+
+    if (_pwm_dev.cycles >= next_on) {
+        next_on += _pwm_dev.res;
+    }
+    if (_pwm_dev.cycles >= next_off) {
+        next_off += _pwm_dev.res;
+    }
+
+    _pwm_dev.chn[channel].next_on = next_on;
+    _pwm_dev.chn[channel].next_off = next_off;
     _pwm_dev.chn[channel].duty = value;
 
     irq_restore(state);
