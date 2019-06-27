@@ -671,6 +671,29 @@ typedef enum {
     /* add more options if needed */
 
     /**
+     * @brief (@ref netopt_enable_t) Enable or disable OTAA activation (LoRaWAN)
+     */
+    NETOPT_OTAA,
+
+     /**
+     * @brief (uint8_t) Get the demodulation margin of the last Link Check request.
+     */
+    NETOPT_DEMOD_MARGIN,
+
+    /**
+     * @brief (uint8_t) Get the number of gateways of the last Link Check request.
+     */
+    NETOPT_NUM_GATEWAYS,
+
+    /**
+     * @brief (@ref netopt_enable_t) Perform a Link Check request (LoRaWAN)
+     *
+     * When set, the next transmission will request a Link Check and will
+     * be received on the next downlink
+     */
+    NETOPT_LINK_CHECK,
+
+    /**
      * @brief   maximum number of options defined here.
      *
      * @note    Interfaces are not meant to respond to this option
