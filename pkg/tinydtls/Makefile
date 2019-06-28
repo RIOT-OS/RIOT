@@ -10,7 +10,7 @@ CFLAGS += -D_XOPEN_SOURCE=600
 
 .PHONY: all
 
-all: git-download
+all:
 	@cp $(PKG_BUILDDIR)/Makefile.riot $(PKG_BUILDDIR)/Makefile
 	@cp $(PKG_BUILDDIR)/aes/Makefile.riot $(PKG_BUILDDIR)/aes/Makefile
 	@cp $(PKG_BUILDDIR)/ecc/Makefile.riot $(PKG_BUILDDIR)/ecc/Makefile

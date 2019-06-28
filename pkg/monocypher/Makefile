@@ -5,7 +5,7 @@ PKG_LICENSE=CC-0
 
 .PHONY: all
 
-all: git-download
+all:
 	$(Q)"$(MAKE)" -C $(PKG_BUILDDIR)/src
 
 include $(RIOTBASE)/pkg/pkg.mk

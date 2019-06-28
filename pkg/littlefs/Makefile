@@ -6,7 +6,7 @@ PKG_LICENSE=Apache-2.0
 
 .PHONY: all
 
-all: git-download
+all:
 	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.littlefs
 
 include $(RIOTBASE)/pkg/pkg.mk

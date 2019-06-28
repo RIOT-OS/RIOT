@@ -5,7 +5,7 @@ PKG_LICENSE=BSD-3-Clause
 
 .PHONY: all
 
-all: git-download
+all:
 	@cp Makefile.loramac $(PKG_BUILDDIR)/Makefile
 	@cp Makefile.loramac_mac $(PKG_BUILDDIR)/src/mac/Makefile
 	@cp Makefile.loramac_region $(PKG_BUILDDIR)/src/mac/region/Makefile

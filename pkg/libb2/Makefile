@@ -5,7 +5,7 @@ PKG_LICENSE = CC0-1.0
 
 .PHONY: all
 
-all: git-download
+all:
 	"$(MAKE)" -C $(PKG_BUILDDIR)/src \
 			  -f $(RIOTPKG)/libb2/Makefile.$(PKG_NAME)
 

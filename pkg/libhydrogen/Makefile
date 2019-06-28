@@ -8,7 +8,7 @@ CFLAGS += -Wno-type-limits
 
 .PHONY: all
 
-all: git-download
+all:
 	"$(MAKE)" -C $(PKG_BUILDDIR) \
 			  -f $(RIOTPKG)/libhydrogen/Makefile.$(PKG_NAME)
 
