@@ -80,6 +80,9 @@ MAKEOVERRIDES += $(foreach v,$(__DIRECTORY_VARIABLES),$(v)=$($(v)))
 # trailing '/' is important when RIOTPROJECT == CURDIR
 BUILDRELPATH ?= $(patsubst $(RIOTPROJECT)/%,%,$(CURDIR)/)
 
+# include makefiles utils tools
+include $(RIOTMAKE)/utils/variables.mk
+
 # get host operating system
 OS := $(shell uname)
 

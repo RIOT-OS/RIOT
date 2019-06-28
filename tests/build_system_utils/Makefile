@@ -16,7 +16,9 @@ endef
 
 MAKEFILES_UTILS = $(RIOTMAKE)/utils
 
-COMPILE_TESTS = test-ensure_value test-ensure_value-negative
+COMPILE_TESTS += test-ensure_value test-ensure_value-negative
+COMPILE_TESTS += test-exported-variables
+COMPILE_TESTS += test-memoized-variables
 
 # Tests will be run both in the host machine and in `docker`
 all: build-system-utils-tests
@@ -31,3 +33,9 @@ test-ensure_value:
 
 test-ensure_value-negative:
 	$(Q)$(call command_should_fail,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-checks.mk test-ensure_value-negative)
+
+test-exported-variables:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-variables.mk test-exported-variables)
+
+test-memoized-variables:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-variables.mk test-memoized-variables)
