@@ -645,6 +645,23 @@ typedef enum {
      */
     NETOPT_LORAWAN_MIN_RX_SYMBOL,
 
+    /**
+     * @brief   (uint8_t*) phy layer syncword
+     */
+    NETOPT_SYNCWORD,
+
+    /**
+     * @brief  (uint32_t) Get a random value from the device
+     *
+     * Nothing happens when set
+     */
+    NETOPT_RANDOM,
+
+    /**
+     * @brief (uint8_t) Get or set the number of PHY symbols before assuming there's no data
+     */
+    NETOPT_RX_SYMBOL_TIMEOUT,
+
     /* add more options if needed */
 
     /**
