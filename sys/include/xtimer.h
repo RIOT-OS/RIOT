@@ -450,8 +450,6 @@ static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b);
 /**
  * @brief lock a mutex but with timeout
  *
- * @note this requires core_thread_flags to be enabled
- *
  * @param[in]    mutex  mutex to lock
  * @param[in]    us     timeout in microseconds relative
  *
