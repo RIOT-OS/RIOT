@@ -31,7 +31,7 @@
 /**
  * @brief   Number of external interrupt lines.
  */
-#define NUMOF_IRQS         (GPIO_PIN_MAX)
+#define NUMOF_IRQS         (GPIO_PIN_MAX + 1)
 
 /**
  * @brief   Hold one interrupt context per interrupt line
