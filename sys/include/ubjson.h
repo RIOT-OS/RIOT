@@ -20,12 +20,16 @@
  * @defgroup sys_ubjson  Universal Binary JSON library
  * @ingroup  sys_serialization
  * @brief    Provides a library to read and write UBJSON serialized data
+ *
+ * @deprecated  This module is deprecated and will be removed in release 2020.01.
  * @{
  *
  * @file
  * @brief       Headers for the UBJSON module
  *
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
+ *
+ * @deprecated  This module is deprecated and will be removed in release 2020.01.
  */
 
 #ifndef UBJSON_H
@@ -187,14 +191,15 @@ typedef enum {
     UBJSON_SIZE_ERROR,        /**< the length of a field exceeded SSIZE_MAX */
 } ubjson_read_callback_result_t;
 
-struct ubjson_cookie;
+struct __attribute__ ((deprecated("The UBJSON module will be removed in release 2020.01"))) ubjson_cookie;
 
 /**
  * @brief         A cookie passed between the read and write functions.
  * @details       You probably want to wrap the cookie in some other data structure,
  *                which you retrieve with container_of() in the callback.
  */
-typedef struct ubjson_cookie ubjson_cookie_t;
+typedef struct ubjson_cookie ubjson_cookie_t
+__attribute__ ((deprecated("The UBJSON module will be removed in release 2020.01")));
 
 /**
  * @brief         Method called by ubjson_read() to get more data.
@@ -288,6 +293,10 @@ ubjson_read_callback_result_t ubjson_read_next(ubjson_cookie_t *__restrict cooki
  *
  *                You probably want to wrap the cookie in some other data structure,
  *                which you retrieve with container_of() in the callback.
+ *
+ * @deprecated    This function and its containing module are deprecated and
+ *                will be removed in release 2020.01.
+ *
  * @param[in]     cookie     The cookie that is passed to the callback function.
  * @param[in]     read       The function that is called to receive more data.
  * @param[in]     callback   The callback function.
@@ -433,6 +442,10 @@ ubjson_read_callback_result_t ubjson_read_object(ubjson_cookie_t *__restrict coo
  *                The programmer needs to ensure that the API is used correctly.
  *                The library won't complain if you write multiple values that are not
  *                inside an array or object. The result will just not be properly serialized.
+ *
+ * @deprecated    This function and its containing module are deprecated and
+ *                will be removed in release 2020.01
+ *
  * @param[out]    cookie     The cookie that will be passed to ubjson_write_null() and friends.
  * @param[in]     write_fun  The function that will be called to write data.
  */
