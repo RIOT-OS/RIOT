@@ -287,9 +287,13 @@ static_tests() {
     BUILDTEST_MCU_GROUP=static-tests ./dist/tools/ci/build_and_test.sh
 }
 
-get_jobs() {
+get_non_compile_jobs() {
     [ "$STATIC_TESTS" = "1" ] && \
         echo "$0 static_tests###{ \"jobdir\" : \"exclusive\" }"
+}
+
+get_jobs() {
+    get_non_compile_jobs
     get_compile_jobs
 }
 
