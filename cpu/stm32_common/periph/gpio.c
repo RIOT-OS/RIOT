@@ -265,32 +265,35 @@ typedef int dont_be_pedantic;
     defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7) || \
     defined(CPU_FAM_STM32L1)
 
-#define APB2ENR_GPIO_MASK      (0x000001FC)
-#define AHBENR_LOWER_MASK      (0x0000FFFF)
-#define AHBENR_UPPER_MASK      (0xFFFF0000)
-#define AHB1ENR_LOWER_MASK     (0x0000FFFF)
-
 #define STM32_CPU_MAX_GPIOS    (12U)
+
+#if defined(CPU_FAM_STM32L1)
+#define GPIO_CLK              (AHB)
+#define GPIO_CLK_ENR          (RCC->AHBENR)
+#define GPIO_CLK_ENR_MASK     (0x0000FFFF)
+#elif defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F0)
+#define GPIO_CLK              (AHB)
+#define GPIO_CLK_ENR          (RCC->AHBENR)
+#define GPIO_CLK_ENR_MASK     (0xFFFF0000)
+#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
+      defined(CPU_FAM_STM32F7)
+#define GPIO_CLK              (AHB1)
+#define GPIO_CLK_ENR          (RCC->AHB1ENR)
+#define GPIO_CLK_ENR_MASK     (0x0000FFFF)
+#elif defined(CPU_FAM_STM32F1)
+#define GPIO_CLK              (APB2)
+#define GPIO_CLK_ENR          (RCC->APB2ENR)
+#define GPIO_CLK_ENR_MASK     (0x000001FC)
+#endif
 
 void gpio_pm_init_ain(void)
 {
     uint32_t ahb_gpio_clocks;
 
     /* enable GPIO clock and save GPIO clock configuration */
-#if defined(CPU_FAM_STM32L1)
-    ahb_gpio_clocks = RCC->AHBENR & AHBENR_LOWER_MASK;
-    periph_clk_en(AHB, AHBENR_LOWER_MASK);
-#elif defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F0)
-    ahb_gpio_clocks = RCC->AHBENR & AHBENR_UPPER_MASK;
-    periph_clk_en(AHB, AHBENR_UPPER_MASK);
-#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
-      defined(CPU_FAM_STM32F7)
-    ahb_gpio_clocks = RCC->AHB1ENR & AHBENR_LOWER_MASK;
-    periph_clk_en(AHB1, AHB1ENR_LOWER_MASK);
-#elif defined(CPU_FAM_STM32F1)
-    ahb_gpio_clocks = RCC->APB2ENR & APB2ENR_GPIO_MASK;
-    periph_clk_en(APB2, APB2ENR_GPIO_MASK);
-#endif
+    ahb_gpio_clocks = GPIO_CLK_ENR & GPIO_CLK_ENR_MASK;
+    periph_clk_en(GPIO_CLK, GPIO_CLK_ENR_MASK);
+
     /* switch all GPIOs to AIN mode to minimize power consumption */
     for (uint8_t i = 0; i < STM32_CPU_MAX_GPIOS; i++) {
         GPIO_TypeDef *port;
@@ -338,15 +341,7 @@ void gpio_pm_init_ain(void)
         }
     }
     /* restore GPIO clock */
-#if defined(CPU_FAM_STM32L1)
-    periph_clk_en(AHB, ((RCC->AHBENR & ~((uint32_t)AHBENR_LOWER_MASK)) | ahb_gpio_clocks));
-#elif defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F0)
-    periph_clk_en(AHB, ((RCC->AHBENR & ~((uint32_t)AHBENR_UPPER_MASK)) | ahb_gpio_clocks));
-#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
-      defined(CPU_FAM_STM32F7)
-    periph_clk_en(AHB1, ((RCC->AHB1ENR & ~((uint32_t)AHB1ENR_LOWER_MASK)) | ahb_gpio_clocks));
-#elif defined(CPU_FAM_STM32F1)
-    periph_clk_en(APB2, ((RCC->APB2ENR & ~((uint32_t)APB2ENR_GPIO_MASK)) | ahb_gpio_clocks));
-#endif
+    periph_clk_en(GPIO_CLK, ((GPIO_CLK_ENR & ~((uint32_t)GPIO_CLK_ENR_MASK)) | ahb_gpio_clocks));
+
 }
 #endif
