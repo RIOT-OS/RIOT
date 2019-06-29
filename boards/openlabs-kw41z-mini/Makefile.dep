@@ -1,0 +1,9 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_adc
+  USEMODULE += saul_gpio
+endif
+
+# TODO uncomment after #12277 (add support for kw41zrf) is merged
+# ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+#   USEMODULE += kw41zrf
+# endif
