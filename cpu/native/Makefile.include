@@ -8,4 +8,4 @@ endif
 USEMODULE += periph
 USEMODULE += periph_uart
 
-TOOLCHAINS_SUPPORTED = gnu llvm
+TOOLCHAINS_SUPPORTED = gnu llvm afl
