@@ -405,11 +405,12 @@ int gnrc_tftp_server(tftp_data_cb_t data_cb, tftp_start_cb_t start_cb, tftp_stop
     }
 
     /* context will be initialized when a connection is established */
-    tftp_context_t ctxt;
-    ctxt.data_cb = data_cb;
-    ctxt.start_cb = start_cb;
-    ctxt.stop_cb = stop_cb;
-    ctxt.enable_options = use_options;
+    tftp_context_t ctxt = {
+        .data_cb = data_cb,
+        .start_cb = start_cb,
+        .stop_cb = stop_cb,
+        .enable_options = use_options,
+    };
 
     /* validate our arguments */
     assert(data_cb);
