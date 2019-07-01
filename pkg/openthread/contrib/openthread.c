@@ -30,15 +30,27 @@
 #include "at86rf2xx_params.h"
 #endif
 
+#ifdef MODULE_NRF802154
+#include "nrf802154.h"
+#endif
+
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #ifdef MODULE_AT86RF2XX     /* is mutual exclusive with above ifdef */
 #define OPENTHREAD_NETIF_NUMOF        (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
 #endif
+#ifdef MODULE_NRF802154
+#define OPENTHREAD_NETIF_NUMOF (1)
+#endif
 
 #ifdef MODULE_AT86RF2XX
 static at86rf2xx_t at86rf2xx_dev;
+#endif
+
+#ifdef MODULE_NRF802154
+extern netdev_ieee802154_t nrf802154_dev;
 #endif
 
 static uint8_t rx_buf[OPENTHREAD_NETDEV_BUFLEN];
@@ -54,6 +66,9 @@ void openthread_bootstrap(void)
 #ifdef MODULE_AT86RF2XX
     at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0]);
     netdev_t *netdev = (netdev_t *) &at86rf2xx_dev;
+#endif
+#ifdef MODULE_NRF802154
+    netdev_t *netdev = (netdev_t *) &nrf802154_dev;
 #endif
 
     openthread_radio_init(netdev, tx_buf, rx_buf);
