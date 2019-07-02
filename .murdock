@@ -62,11 +62,17 @@ is_in_list() {
     echo "$haystack" | grep -q -w "$needle"
 }
 
+# grep that doesn't return error on empty input
+_grep() {
+    grep "$@"
+    true
+}
+
 _greplist() {
     if [ $# -eq 0 ]; then
         echo cat
     else
-        echo -n "grep -E ($1"
+        echo -n "_grep -E ($1"
         shift
         for i in $*; do
             echo -n "|$i"
