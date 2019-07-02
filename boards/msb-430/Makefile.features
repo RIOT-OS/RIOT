@@ -6,4 +6,4 @@ FEATURES_PROVIDED += periph_uart
 
 # Various other features (if any)
 
-include $(RIOTCPU)/msp430fxyz/Makefile.features
+include $(RIOTBOARD)/common/msb-430/Makefile.features

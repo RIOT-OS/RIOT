@@ -7,4 +7,4 @@ FEATURES_PROVIDED += periph_uart
 
 # Various other features (if any)
 
-include $(RIOTCPU)/lpc2387/Makefile.features
+include $(RIOTBOARD)/common/msba2/Makefile.features

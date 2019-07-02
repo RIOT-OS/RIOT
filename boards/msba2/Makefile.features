@@ -6,4 +6,4 @@ FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
-include $(RIOTCPU)/lpc2387/Makefile.features
+include $(RIOTBOARD)/common/msba2/Makefile.features
