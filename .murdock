@@ -145,6 +145,7 @@ get_app_board_toolchain_pairs() {
 get_compile_jobs() {
     get_apps | \
         dwqc ${DWQ_ENV} -s \
+        ${DWQ_JOBID:+--subjob} \
         "$0 get_app_board_toolchain_pairs \${1} $0 compile"
 }
 
