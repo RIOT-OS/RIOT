@@ -73,8 +73,6 @@ static void *_wait_recv(void *arg)
 
 int main(void)
 {
-    semtech_loramac_init(&loramac);
-
 #ifdef MODULE_SEMTECH_LORAMAC_RX
     thread_create(_recv_stack, sizeof(_recv_stack),
                   THREAD_PRIORITY_MAIN - 1, 0, _wait_recv, NULL, "recv thread");
