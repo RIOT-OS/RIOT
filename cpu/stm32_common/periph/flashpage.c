@@ -111,6 +111,7 @@ static void _erase_page(void *page_addr)
     }
     pn = (uint8_t)page;
 #endif
+    CNTRL_REG &= ~FLASH_CR_PNB;
     CNTRL_REG |= (uint32_t)(pn << FLASH_CR_PNB_Pos);
     CNTRL_REG |= FLASH_CR_STRT;
 #else /* CPU_FAM_STM32F0 || CPU_FAM_STM32F1 */
