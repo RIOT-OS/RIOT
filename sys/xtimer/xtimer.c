@@ -261,7 +261,7 @@ static void _mutex_timeout(void *arg)
         }
         sched_set_status(mt->thread, STATUS_PENDING);
         irq_restore(irqstate);
-        thread_yield_higher();
+        sched_switch(mt->thread->priority);
         return;
     }
     irq_restore(irqstate);
