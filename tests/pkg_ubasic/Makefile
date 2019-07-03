@@ -17,7 +17,6 @@ BOARD_BLACKLIST := \
                    hifive1 \
                    jiminy-mega256rfr2 \
                    mega-xplained \
-                   mips-malta \
                    msb-430 \
                    msb-430h \
                    pic32-clicker \
