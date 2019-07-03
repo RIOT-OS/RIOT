@@ -172,7 +172,7 @@ static void _listen(sock_udp_t *sock)
     uint8_t open_reqs = gcoap_op_state();
 
     /* We expect a -EINTR response here when unlimited waiting (SOCK_NO_TIMEOUT)
-     * is interrupted when sending a message in gcoap_req_send2(). While a
+     * is interrupted when sending a message in gcoap_req_send(). While a
      * request is outstanding, sock_udp_recv() is called here with limited
      * waiting so the request's timeout can be handled in a timely manner in
      * _event_loop(). */
@@ -783,7 +783,7 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
 
     /* timeout may be zero for non-confirmable */
     if ((memo != NULL) && (res > 0) && (timeout > 0)) {
-        /* We assume gcoap_req_send2() is called on some thread other than
+        /* We assume gcoap_req_send() is called on some thread other than
          * gcoap's. First, put a message in the mbox for the sock udp object,
          * which will interrupt listening on the gcoap thread. (When there are
          * no outstanding requests, gcoap blocks indefinitely in _listen() at
