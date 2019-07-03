@@ -10,6 +10,10 @@
  * @defgroup    net_gnrc_tftp  TFTP Support Library
  * @ingroup     net_gnrc
  * @brief       Add's support for TFTP protocol parsing
+ *
+ * @deprecated  This module has serious quality defects and is not in a
+ *              maintainable state. It will be removed after the 2020.04 release
+ *              at the latest.
  * @{
  *
  * @file
