@@ -29,6 +29,9 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+extern uint8_t LoRaMacAppSKey[];
+extern uint8_t LoRaMacNwkSKey[];
+
 void semtech_loramac_set_deveui(semtech_loramac_t *mac, const uint8_t *eui)
 {
     memcpy(mac->deveui, eui, LORAMAC_DEVEUI_LEN);
@@ -62,40 +65,28 @@ void semtech_loramac_get_appkey(const semtech_loramac_t *mac, uint8_t *key)
 void semtech_loramac_set_appskey(semtech_loramac_t *mac, const uint8_t *skey)
 {
     mutex_lock(&mac->lock);
-    MibRequestConfirm_t mibReq;
-    mibReq.Type = MIB_APP_SKEY;
-    memcpy(mibReq.Param.AppSKey, skey, LORAMAC_APPSKEY_LEN);
-    LoRaMacMibSetRequestConfirm(&mibReq);
+    memcpy(LoRaMacAppSKey, skey, LORAMAC_APPSKEY_LEN);
     mutex_unlock(&mac->lock);
 }
 
 void semtech_loramac_get_appskey(semtech_loramac_t *mac, uint8_t *skey)
 {
     mutex_lock(&mac->lock);
-    MibRequestConfirm_t mibReq;
-    mibReq.Type = MIB_APP_SKEY;
-    LoRaMacMibGetRequestConfirm(&mibReq);
-    memcpy(skey, mibReq.Param.AppSKey, LORAMAC_APPSKEY_LEN);
+    memcpy(skey, LoRaMacAppSKey, LORAMAC_APPSKEY_LEN);
     mutex_unlock(&mac->lock);
 }
 
 void semtech_loramac_set_nwkskey(semtech_loramac_t *mac, const uint8_t *skey)
 {
     mutex_lock(&mac->lock);
-    MibRequestConfirm_t mibReq;
-    mibReq.Type = MIB_NWK_SKEY;
-    memcpy(mibReq.Param.NwkSKey, skey, LORAMAC_NWKSKEY_LEN);
-    LoRaMacMibSetRequestConfirm(&mibReq);
+    memcpy(LoRaMacNwkSKey, skey, LORAMAC_NWKSKEY_LEN);
     mutex_unlock(&mac->lock);
 }
 
 void semtech_loramac_get_nwkskey(semtech_loramac_t *mac, uint8_t *skey)
 {
     mutex_lock(&mac->lock);
-    MibRequestConfirm_t mibReq;
-    mibReq.Type = MIB_NWK_SKEY;
-    LoRaMacMibGetRequestConfirm(&mibReq);
-    memcpy(skey, mibReq.Param.NwkSKey, LORAMAC_NWKSKEY_LEN);
+    memcpy(skey, LoRaMacNwkSKey, LORAMAC_NWKSKEY_LEN);
     mutex_unlock(&mac->lock);
 }
 
