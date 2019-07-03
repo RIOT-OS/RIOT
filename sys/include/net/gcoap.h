@@ -341,6 +341,20 @@ extern "C" {
 #define GCOAP_RECV_TIMEOUT      (1 * US_PER_SEC)
 #endif
 
+#ifdef DOXYGEN
+/**
+ * @ingroup net_gcoap_conf
+ * @brief   Turns off retransmission backoff when defined (undefined per default)
+ *
+ * In normal operations the timeout between retransmissions doubles. When
+ * GCOAP_NO_RETRANS_BACKOFF is defined this doubling does not happen.
+ *
+ * @see COAP_ACK_TIMEOUT
+ * @see COAP_ACK_VARIANCE
+ */
+#define GCOAP_NO_RETRANS_BACKOFF
+#endif
+
 /**
  * @ingroup net_gcoap_conf
  * @brief   Default time to wait for a non-confirmable response [in usec]
