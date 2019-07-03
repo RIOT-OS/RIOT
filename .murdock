@@ -656,6 +656,12 @@ maybe_filter_changed_apps() {
 # execute static tests
 static_tests() {
     print_worker
+
+    check_skip_commit || {
+        echo "--> \"Skipping build: [ci skip] found in HEAD commit subject.\""
+        exit 1
+    }
+
     build_filter_status
 
     [ "$STATIC_TESTS" = "1" ] && \
@@ -682,8 +688,18 @@ get_non_compile_jobs() {
     echo "$0 static_tests"
 }
 
+# returns "1" if there's the topmost commit contains `[ci skip]`,
+# if it doesn't.
+check_skip_commit() {
+    if git log --pretty=oneline -1 HEAD -- 2>/dev/null | grep -q -s '[ci skip]'; then
+        return 1;
+    fi
+    return 0
+}
+
 get_jobs() {
     get_non_compile_jobs
+    check_skip_commit || return 0
     get_compile_jobs
 }
 
