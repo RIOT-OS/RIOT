@@ -8,8 +8,6 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
                              nucleo-f303k8 nucleo-f334r8 nucleo-l053r8 \
                              stm32f0discovery stm32l0538-disco waspmote-pro
 
-BOARD_BLACKLIST += mips-malta
-
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc
 USEMODULE += gnrc_pktdump

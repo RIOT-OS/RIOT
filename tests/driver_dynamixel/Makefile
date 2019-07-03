@@ -6,9 +6,6 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
 # chronos : USART_1 undeclared
 BOARD_BLACKLIST += chronos
 
-# mips-malta : undefined reference to uart_write
-BOARD_BLACKLIST += mips-malta
-
 USEMODULE += dynamixel
 USEMODULE += shell
 
