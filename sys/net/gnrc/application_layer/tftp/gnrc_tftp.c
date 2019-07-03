@@ -36,6 +36,12 @@
 #include <inttypes.h>
 #endif
 
+#if (GNRC_NETIF_NUMOF > 1)
+/* TODO: change API to make link-local address communitcation with
+ * multiple network interfaces */
+#warning "gnrc_tftp does not work reliably with link-local addresses and >1 network interfaces."
+#endif
+
 static kernel_pid_t _tftp_kernel_pid;
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -993,6 +999,22 @@ tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len)
         }
 
         return TS_FAILED;
+    }
+
+    if (ipv6_addr_is_link_local(&(ctxt->peer))) {
+        gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+        if (netif_hdr == NULL) {
+            DEBUG("tftp: error unable to allocate IPv6 header\n");
+            gnrc_pktbuf_release(ip);
+
+            if (ctxt->stop_cb) {
+                ctxt->stop_cb(TFTP_INTERN_ERROR, "no netif_hdr allocate");
+            }
+
+            return TS_FAILED;
+        }
+        ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = gnrc_netif_iter(NULL)->pid;
+        LL_PREPEND(ip, netif_hdr);
     }
 
     /* send packet */
