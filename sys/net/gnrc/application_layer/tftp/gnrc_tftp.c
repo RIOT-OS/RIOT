@@ -36,6 +36,12 @@
 #include <inttypes.h>
 #endif
 
+#if (GNRC_NETIF_NUMOF > 1)
+/* TODO: change API to make link-local address communitcation with
+ * multiple network interfaces */
+#warning "gnrc_tftp does not work reliably with link-local addresses and >1 network interfaces."
+#endif
+
 static kernel_pid_t _tftp_kernel_pid;
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -405,11 +411,13 @@ int gnrc_tftp_server(tftp_data_cb_t data_cb, tftp_start_cb_t start_cb, tftp_stop
     }
 
     /* context will be initialized when a connection is established */
-    tftp_context_t ctxt;
-    ctxt.data_cb = data_cb;
-    ctxt.start_cb = start_cb;
-    ctxt.stop_cb = stop_cb;
-    ctxt.enable_options = use_options;
+    tftp_context_t ctxt = {
+        .src_port = GNRC_TFTP_DEFAULT_DST_PORT,
+        .data_cb = data_cb,
+        .start_cb = start_cb,
+        .stop_cb = stop_cb,
+        .enable_options = use_options,
+    };
 
     /* validate our arguments */
     assert(data_cb);
@@ -700,6 +708,8 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
 
             if (proc == TS_DUP) {
                 DEBUG("tftp: duplicated data received, acking...\n");
+                ctxt->dst_port = byteorder_ntohs(udp->src_port);
+                DEBUG("tftp: client's port is %" PRIu16 "\n", ctxt->dst_port);
                 _tftp_send_dack(ctxt, outbuf, TO_ACK);
                 return TS_BUSY;
             }
@@ -989,6 +999,22 @@ tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len)
         }
 
         return TS_FAILED;
+    }
+
+    if (ipv6_addr_is_link_local(&(ctxt->peer))) {
+        gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+        if (netif_hdr == NULL) {
+            DEBUG("tftp: error unable to allocate IPv6 header\n");
+            gnrc_pktbuf_release(ip);
+
+            if (ctxt->stop_cb) {
+                ctxt->stop_cb(TFTP_INTERN_ERROR, "no netif_hdr allocate");
+            }
+
+            return TS_FAILED;
+        }
+        ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = gnrc_netif_iter(NULL)->pid;
+        LL_PREPEND(ip, netif_hdr);
     }
 
     /* send packet */
