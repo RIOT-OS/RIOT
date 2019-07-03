@@ -6,7 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
                              arduino-uno nucleo-f031k6 nucleo-f042k6 \
                              nucleo-l031k6
 
-BOARD_BLACKLIST := msb-430 msb-430h pic32-clicker pic32-wifire \
+BOARD_BLACKLIST := msb-430 msb-430h \
                    telosb wsn430-v1_3b wsn430-v1_4 z1
 
 # waspmote-pro doesn't have enough RAM to support another thread dedicated to
