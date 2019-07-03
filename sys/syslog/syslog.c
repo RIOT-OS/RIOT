@@ -20,7 +20,7 @@
 
 #include <string.h>
 #include <unistd.h>
-
+#include "log.h"
 #ifdef CPU_NATIVE
 #include <netdb.h>
 #endif /* CPU_NATIVE */
@@ -35,6 +35,11 @@
 
 #include "syslog/syslog.h"
 #include "mutex.h"
+
+#ifdef MODULE_LOG_MQUEUE
+#include "log_module.h"
+extern log_mqueue_handler_t log_mqueue_handlers[LOG_NFACILITIES];
+#endif
 
 #ifdef CPU_NATIVE
 static char hostname[HOST_NAME_MAX];
@@ -111,9 +116,88 @@ DEBUG("syslog_msg_send: Send ");
 #endif
 }
 
+static void _vsyslog(int facility_priority, const char *format, va_list ap,kernel_pid_t pid) {
+  int len = 0, i;
+  syslog_client_t *c = get_client(pid);
+  if (!c)
+  {
+    openlog(thread_getname(pid), LOG_CONS, LOG_USER);
+    c = get_client(pid);
+  }
+
+  if(!LOG_MASK_TEST(c->mask,GET_LOG_LEVEL(facility_priority))) {
+    DEBUG("vsyslog: facility_priority: %d does not match mask %d\n",GET_LOG_LEVEL(facility_priority),c->mask);
+    return;
+  }
+
+  mutex_lock(&syslog_mutex);
+  i = snprintf(c->buf, SYSLOG_MAX_LEN, "<%d> %d - %s %s %d %d ", get_pri_numeric(c->facility, facility_priority), SYSLOG_VERSION, syslog_get_hostname(), c->ident, 0, 0);
+
+  if(i<0) {
+    DEBUG("vsyslog: Encoding error on writing the header\n");
+    mutex_unlock(&syslog_mutex);
+    return;
+  }
+  len += (i < SYSLOG_MAX_LEN) ? i : SYSLOG_MAX_LEN;
+
+  i = vsnprintf((c->buf) + len, (SYSLOG_MAX_LEN - len), format, ap);
+  if(i<0) {
+    DEBUG("vsyslog: Encoding error on writing the message content\n");
+    mutex_unlock(&syslog_mutex);
+    return;
+  }
+  len += (i < (SYSLOG_MAX_LEN-len)) ? i : (SYSLOG_MAX_LEN-len);
+  assert(len <= SYSLOG_MAX_LEN);
+
+  if (syslog_pid > 0) {
+    msg_t msg;
+    c->msg.len = len;
+    c->msg.ptr = c->buf;
+    msg.content.ptr = &c->msg;
+    DEBUG("vsyslog: Try to send syslog msg with %d bytes content\n", c->msg.len);
+
+    if (syslog_msg_send(&msg, syslog_pid) == 0)
+    {
+      DEBUG("vsyslog: Syslog receiver unable to receive message\n");
+    }
+  } else {
+    if(OPT_MASK_TEST(c->opt,LOG_CONS)) {
+      printf("%s", c->buf);
+    }
+    DEBUG("vsyslog: No receiver registered");
+  }
+  if(OPT_MASK_TEST(c->opt,LOG_PERROR)) {
+    fprintf(stderr,"%s\n", c->buf);
+  }
+  mutex_unlock(&syslog_mutex);
+  return;
+}
+
+static void _syslog(int facility_priority, kernel_pid_t pid, const char *format, ...) {
+  va_list ap;
+  va_start(ap,format);
+  _vsyslog(facility_priority, format, ap,pid);
+  va_end(ap);
+  return;
+}
+
+#ifdef MODULE_LOG_MQUEUE
+    static void syslog_log_mqueue_handler(int priority, int facility, char *msg, int msg_size, kernel_pid_t pid) {
+        (void)msg_size;
+        _syslog((priority|facility),pid,"%s",msg);
+    }
+#endif
+
+void auto_init_syslog(void) {
+    #ifdef MODULE_LOG_MQUEUE
+      for(int i = 1;i<LOG_NFACILITIES;i++) {
+          log_mqueue_handlers[i] = syslog_log_mqueue_handler;
+      }
+    #endif
+}
 
 void openlog (const char *ident, int option, int facility) {
-  syslog_client_t *c = NULL;
+  syslog_client_t *c = get_client(thread_getpid());
 
   if (ident == NULL)
   {
@@ -158,72 +242,13 @@ void openlog (const char *ident, int option, int facility) {
 void syslog(int facility_priority, const char *format, ...) {
   va_list ap;
   va_start(ap,format);
-  vsyslog(facility_priority, format, ap);
+  _syslog(facility_priority,thread_getpid(), format, ap);
   va_end(ap);
   return;
 }
 
 void vsyslog(int facility_priority, const char *format, va_list ap) {
-  int len = 0, i;
-
-  kernel_pid_t pid = thread_getpid();
-  syslog_client_t *c = get_client(pid);
-  if (!c)
-  {
-    #ifdef MODULE_LOG_SYSLOG
-    openlog(thread_getname(pid), LOG_CONS, LOG_USER);
-    c = get_client(pid);
-    #else
-    DEBUG("vsyslog: No client found for pid %d\n",(int)pid);
-    return;
-    #endif
-  }
-
-  if(!LOG_MASK_TEST(c->mask,facility_priority)) {
-    DEBUG("vsyslog: LOG_MASK %d bit for %d not set\n",c->mask,LOG_MASK(facility_priority));
-    return;
-  }
-  mutex_lock(&syslog_mutex);
-  i = snprintf(c->buf, SYSLOG_MAX_LEN, "<%d> %d - %s %s %d %d ", get_pri_numeric(c->facility, facility_priority), SYSLOG_VERSION, syslog_get_hostname(), c->ident, 0, 0);
-
-  if(i<0) {
-    DEBUG("vsyslog: Encoding error on writing the header\n");
-    mutex_unlock(&syslog_mutex);
-    return;
-  }
-  len += (i < SYSLOG_MAX_LEN) ? i : SYSLOG_MAX_LEN;
-
-  i = vsnprintf((c->buf) + len, (SYSLOG_MAX_LEN - len), format, ap);
-  if(i<0) {
-    DEBUG("vsyslog: Encoding error on writing the message content\n");
-    mutex_unlock(&syslog_mutex);
-    return;
-  }
-  len += (i < (SYSLOG_MAX_LEN-len)) ? i : (SYSLOG_MAX_LEN-len);
-  assert(len <= SYSLOG_MAX_LEN);
-
-  if (syslog_pid > 0) {
-    msg_t msg;
-    c->msg.len = len;
-    c->msg.ptr = c->buf;
-    msg.content.ptr = &c->msg;
-    DEBUG("vsyslog: Try to send syslog msg with %d bytes content\n", c->msg.len);
-
-    if (syslog_msg_send(&msg, syslog_pid) == 0)
-    {
-      DEBUG("vsyslog: Syslog receiver unable to receive message\n");
-    }
-  } else {
-    if(OPT_MASK_TEST(c->opt,LOG_CONS)) {
-      printf("%s\n", c->buf);
-    }
-    DEBUG("vsyslog: No receiver registered");
-  }
-  if(OPT_MASK_TEST(c->opt,LOG_PERROR)) {
-    fprintf(stderr,"%s\n", c->buf);
-  }
-  mutex_unlock(&syslog_mutex);
-  return;
+    _vsyslog(facility_priority,format,ap,thread_getpid());
 }
 
 void  closelog (void) {

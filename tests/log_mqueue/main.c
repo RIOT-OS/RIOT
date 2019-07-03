@@ -25,6 +25,7 @@ int main(void)
 int log_test(int argc, char **argv) {
     (void)argc;
     (void)argv;
+
     printf("Testing LOG_*(...) Macros LOG_LEVEL is %d\n",LOG_LEVEL);
     LOG_EMERG("Test LOG_EMERG(...)\n");
     LOG_ALERT("Test LOG_ALERT(...)\n");

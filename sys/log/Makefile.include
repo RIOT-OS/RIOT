@@ -11,3 +11,11 @@ ifneq (,$(filter log_syslog,$(USEMODULE)))
     NATIVEINCLUDES += -I$(RIOTBASE)/sys/log/log_syslog
   endif
 endif
+
+ifneq (,$(filter log_mqueue,$(USEMODULE)))
+  USEMODULE += pipe
+  USEMODULE_INCLUDES += $(RIOTBASE)/sys/log/log_mqueue
+  ifeq ($(BOARD),native)
+    NATIVEINCLUDES += -I$(RIOTBASE)/sys/log/log_mqueue
+  endif
+endif

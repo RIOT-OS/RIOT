@@ -34,6 +34,7 @@
 
 #include <stdarg.h>
 #include "thread.h"
+#include "log.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,35 +81,6 @@ extern "C" {
 
 /** Syslog NILVALUE according to https://tools.ietf.org/html/rfc5424#section-6 */
 #define SYSLOG_NILVALUE "-"
-
-/**
- * @brief Possible syslog facilities as used in the glibc implementation
- */
-enum syslog_facility
-{
-    LOG_KERN = 0,
-    LOG_USER = 1,
-    LOG_MAIL = 2,
-    LOG_DAEMON = 3,
-    LOG_AUTH = 4,
-    LOG_SYSLOG = 5,
-    LOG_LPR = 6,
-    LOG_NEWS = 7,
-    LOG_UUCP = 8,
-    LOG_CRON = 9,
-    LOG_AUTHPRIV = 10,
-    LOG_FTP = 11,
-    LOG_NTP = 12,
-    LOG_AUDIT = 13,
-    LOG_LOCAL0 = 16,
-    LOG_LOCAL1 = 17,
-    LOG_LOCAL2 = 18,
-    LOG_LOCAL3 = 19,
-    LOG_LOCAL4 = 20,
-    LOG_LOCAL5 = 21,
-    LOG_LOCAL6 = 22,
-    LOG_LOCAL7 = 23,
-};
 
 /**
  * @brief Possible syslog priorities as used in the glibc implementation
@@ -165,6 +137,16 @@ typedef struct syslog_client {
     char buf[SYSLOG_MAX_LEN];   /**< Proccess specific buffer for syslog messages */
     syslog_msg_t msg;           /**< Includes the length and a pointer to buf. A pointer to this struct is transferred via IPC to the system logger */
 } syslog_client_t;
+
+
+/**
+ * @brief Auto init function executed on RIOT startup
+ *
+ * This function is executed by RIOT's auto_init() function on startup.
+ * It is used to setup data stuctures and hooks needed by syslog.
+ * If the log_mqueue modules is used for example, this function injects a syslog wrapper into all facility callbacks except facility 0
+ */
+void auto_init_syslog(void);
 
 /**
  * @brief Open a connection to the system logger

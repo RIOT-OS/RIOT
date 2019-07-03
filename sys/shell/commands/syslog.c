@@ -18,6 +18,7 @@
  */
 
 #include "syslog/syslog.h"
+#include "log.h"
 
 int _syslog_init(int argc, char **argv)
 {

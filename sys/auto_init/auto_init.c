@@ -88,6 +88,10 @@
 #include "net/asymcute.h"
 #endif
 
+#ifdef MODULE_SYSLOG
+#include "syslog/syslog.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -186,6 +190,13 @@ void auto_init(void)
 #ifdef MODULE_AUTO_INIT_USBUS
     extern void auto_init_usb(void);
     auto_init_usb();
+#endif
+
+/* initialize LOG_MQUEUE */
+#ifdef MODULE_LOG_MQUEUE
+    DEBUG("Auto init LOG_MQUEUE\n");
+    extern void log_mqueue_init(void);
+    log_mqueue_init();
 #endif
 
 /* initialize network devices */
@@ -519,6 +530,10 @@ void auto_init(void)
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 
+#ifdef MODULE_SYSLOG
+    auto_init_syslog();
+#endif
+
 #ifdef MODULE_AUTO_INIT_GNRC_RPL
 
 #ifdef MODULE_GNRC_RPL
@@ -546,4 +561,5 @@ void auto_init(void)
     auto_init_candev();
 
 #endif /* MODULE_AUTO_INIT_CAN */
+
 }

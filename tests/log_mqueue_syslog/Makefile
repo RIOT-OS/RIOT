@@ -8,21 +8,11 @@ CFLAGS += -DLSYSLOGD_FEATURE_OUTPUT_STDOUT
 CFLAGS += -DLSYSLOGD_FEATURE_OUTPUT_REMOTE
 CFLAGS += -DLSYSLOGD_RIOT_IPC_INPUT_STACKSIZE=4096
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=8096
-
 USEMODULE += syslog
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += gnrc_ipv6_default
-USEMODULE += gnrc_icmpv6_echo
-USEMODULE += gnrc_netdev_default
-USEMODULE += auto_init_gnrc_netif
-USEMODULE += gnrc_udp
-USEMODULE += gnrc_sock_udp
-USEMODULE += posix_sockets
-USEMODULE += sock_util
-USEMODULE += lsyslogd_riot_ipc_input
-USEPKG    += lsyslogd
+USEMODULE += log_mqueue
 
 BOARD_WHITELIST := native
 
