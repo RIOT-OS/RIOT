@@ -1,6 +1,0 @@
-export CPU = mips_pic32mz
-export CPU_MODEL=p32mz2048efg100
-export APPDEPS += $(RIOTCPU)/$(CPU)/$(CPU_MODEL)/$(CPU_MODEL).S
-export USE_UHI_SYSCALLS = 1
-
-FLASHFILE ?= $(HEXFILE)

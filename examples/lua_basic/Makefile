@@ -19,8 +19,8 @@ BOARD_INSUFFICIENT_MEMORY := blackpill bluepill calliope-mini cc2650-launchpad \
 BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
                    arduino-mega2560 arduino-nano \
                    arduino-uno chronos hifive1 hifive1b jiminy-mega256rfr2 \
-                   mega-xplained msb-430 msb-430h pic32-clicker \
-                   pic32-wifire telosb waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
+                   mega-xplained msb-430 msb-430h \
+                   telosb waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
 
 
 # Comment this out to disable code in RIOT that does safety checking

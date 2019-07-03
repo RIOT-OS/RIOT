@@ -20,8 +20,6 @@ BOARD_BLACKLIST := \
                    mega-xplained \
                    msb-430 \
                    msb-430h \
-                   pic32-clicker \
-                   pic32-wifire \
                    telosb \
                    waspmote-pro \
                    wsn430-v1_3b \
