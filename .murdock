@@ -21,8 +21,8 @@ check_label() {
     return $?
 }
 
-[ "$RUN_TESTS" != "1" ] && {
-    check_label "CI: run tests" && RUN_TESTS=1
+[ "$RUN_TESTS" = "1" ] && {
+    check_label "CI: skip tests" && RUN_TESTS=0
 }
 
 [ "$ENABLE_TEST_CACHE" = "1" ] && {
