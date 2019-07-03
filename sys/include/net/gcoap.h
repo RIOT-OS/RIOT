@@ -110,7 +110,7 @@
  * If no payload, call only gcoap_request() to write the full request. If you
  * need to add Options, follow the first four steps in the list above instead.
  *
- * Finally, call gcoap_req_send2() with the sum of the metadata length and
+ * Finally, call gcoap_req_send() with the sum of the metadata length and
  * payload length, the destination endpoint, and a callback function for the
  * host's response.
  *
