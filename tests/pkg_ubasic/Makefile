@@ -4,7 +4,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove
 
 # msp430-libc does not provide `stdout` variable required by ubasic_tests
 # avr-libc does not provide `clock `required by ubasic_tests
-# newlib for esp8266 and MIPS does not provide _times_r
+# newlib for esp8266 and does not provide _times_r
 BOARD_BLACKLIST := \
                    arduino-duemilanove \
                    arduino-leonardo \

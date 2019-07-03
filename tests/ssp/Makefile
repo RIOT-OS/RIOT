@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-# avr8, msp430, esp8266 and mips don't support ssp (yet)
+# avr8, msp430, esp8266 don't support ssp (yet)
 BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
                    arduino-mega2560 arduino-nano \
                    arduino-uno chronos esp8266-esp-12x esp8266-olimex-mod \

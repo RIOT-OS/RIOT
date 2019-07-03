@@ -83,7 +83,7 @@ printf "%s\n" "-----------------------------"
 printf "%23s: %s\n" "native gcc" "$(get_cmd_version gcc)"
 for p in \
          arm-none-eabi \
-         avr mips-mti-elf \
+         avr \
          msp430 \
          riscv-none-embed \
          xtensa-esp32-elf \
@@ -98,7 +98,6 @@ printf "%s\n" "-----------------------"
 # platform specific newlib version
 for p in \
          arm-none-eabi \
-         mips-mti-elf \
          riscv-none-embed \
          xtensa-esp32-elf \
          xtensa-lx106-elf \
