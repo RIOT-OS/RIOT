@@ -1,16 +1,16 @@
-From 21a0864451b15d53a468a359e465084b498cc37b Mon Sep 17 00:00:00 2001
+From b94cb20e4c34dba2c643319c05e27e636cdee61a Mon Sep 17 00:00:00 2001
 From: Alexandre Abadie <alexandre.abadie@inria.fr>
 Date: Sun, 1 Apr 2018 19:52:58 +0200
 Subject: [PATCH] adapt to RIOT
 
 ---
- src/mac/LoRaMac.c       | 28 +++++++++++-----------------
+ src/mac/LoRaMac.c       | 32 +++++++++++++-------------------
  src/mac/LoRaMac.h       |  4 ++--
  src/mac/region/Region.h |  2 +-
- 3 files changed, 14 insertions(+), 20 deletions(-)
+ 3 files changed, 16 insertions(+), 22 deletions(-)
 
 diff --git a/src/mac/LoRaMac.c b/src/mac/LoRaMac.c
-index ca90cd2..ca9c370 100644
+index ca90cd2f..d2a89923 100644
 --- a/src/mac/LoRaMac.c
 +++ b/src/mac/LoRaMac.c
 @@ -32,6 +32,7 @@
@@ -21,6 +21,24 @@ index ca90cd2..ca9c370 100644
  
  /*!
   * Maximum PHY layer payload size
+@@ -86,7 +87,7 @@ static uint8_t *LoRaMacAppKey;
+ /*!
+  * AES encryption/decryption cipher network session key
+  */
+-static uint8_t LoRaMacNwkSKey[] =
++uint8_t LoRaMacNwkSKey[] =
+ {
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+@@ -95,7 +96,7 @@ static uint8_t LoRaMacNwkSKey[] =
+ /*!
+  * AES encryption/decryption cipher application session key
+  */
+-static uint8_t LoRaMacAppSKey[] =
++uint8_t LoRaMacAppSKey[] =
+ {
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 @@ -322,11 +323,6 @@ static LoRaMacPrimitives_t *LoRaMacPrimitives;
   */
  static LoRaMacCallback_t *LoRaMacCallbacks;
@@ -88,7 +106,7 @@ index ca90cd2..ca9c370 100644
      // Random seed initialization
      srand1( Radio.Random( ) );
 diff --git a/src/mac/LoRaMac.h b/src/mac/LoRaMac.h
-index 7899ac2..78ed66c 100644
+index 7899ac21..78ed66cb 100644
 --- a/src/mac/LoRaMac.h
 +++ b/src/mac/LoRaMac.h
 @@ -102,7 +102,7 @@
@@ -110,7 +128,7 @@ index 7899ac2..78ed66c 100644
  /*!
   * \brief   Queries the LoRaMAC if it is possible to send the next frame with
 diff --git a/src/mac/region/Region.h b/src/mac/region/Region.h
-index fa0fd44..810f0ea 100644
+index fa0fd445..810f0ea5 100644
 --- a/src/mac/region/Region.h
 +++ b/src/mac/region/Region.h
 @@ -54,7 +54,7 @@
@@ -123,5 +141,5 @@ index fa0fd44..810f0ea 100644
  /*!
   * Macro to compute bit of a channel index.
 -- 
-2.14.1
+2.20.1
 
