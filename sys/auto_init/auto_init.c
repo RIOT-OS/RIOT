@@ -92,6 +92,10 @@
 #include "net/sock/dtls.h"
 #endif
 
+#ifdef MODULE_SCHEDSTATISTICS
+#include "sched.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -104,6 +108,9 @@ void auto_init(void)
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
+#endif
+#ifdef MODULE_SCHEDSTATISTICS
+    init_schedstatistics();
 #endif
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");
