@@ -121,7 +121,9 @@ extern "C" {
  * @name        SX127X
  *
  * SX127X configuration (on XBEE1 port). This particular board has
- * merged DIO0 and DIO1 interupt pins into one (defined as DIOMULTI).
+ * merged DIO0 and DIO1 interrupt pins into one. The driver will always
+ * check the interrupt type in the ISR handler, so it's enough to set
+ * the DIO0 pin in order to handle both DIO0 and DIO1.
  * @{
  */
 #define SX127X_PARAM_SPI                    (SPI_DEV(0))
@@ -130,15 +132,13 @@ extern "C" {
 
 #define SX127X_PARAM_RESET                  GPIO_UNDEF
 
-#define SX127X_PARAM_DIO0                   GPIO_UNDEF
+#define SX127X_PARAM_DIO0                   XBEE1_INT_PIN       /* D24 */
 
 #define SX127X_PARAM_DIO1                   GPIO_UNDEF
 
 #define SX127X_PARAM_DIO2                   GPIO_UNDEF
 
 #define SX127X_PARAM_DIO3                   GPIO_UNDEF
-
-#define SX127X_PARAM_DIO_MULTI              XBEE1_INT_PIN       /* D24 */
 
 #define SX127X_PARAM_PASELECT               (SX127X_PA_BOOST)
 /** @} */
