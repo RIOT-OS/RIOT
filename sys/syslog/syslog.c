@@ -81,7 +81,6 @@ static char *syslog_get_addr(void) {
 static char *syslog_get_hostname(void) {
 #ifdef CPU_NATIVE
   if(gethostname(hostname, sizeof(hostname)) == 0) {
-    return hostname; //TODO: FIX
     struct hostent *host = gethostbyname(hostname);
 
     if(host) {
