@@ -223,32 +223,27 @@ static int _init(netdev_t *netdev)
 
 static void _isr(netdev_t *netdev)
 {
-    sx127x_t *dev = (sx127x_t *) netdev;
+    sx127x_t *dev = (sx127x_t *)netdev;
 
     uint8_t interruptReg = sx127x_reg_read(dev, SX127X_REG_LR_IRQFLAGS);
 
-    switch (interruptReg) {
-        case SX127X_RF_LORA_IRQFLAGS_TXDONE:
-        case SX127X_RF_LORA_IRQFLAGS_RXDONE:
-            _on_dio0_irq(dev);
-            break;
+    if (interruptReg & (SX127X_RF_LORA_IRQFLAGS_TXDONE |
+                        SX127X_RF_LORA_IRQFLAGS_RXDONE)) {
+        _on_dio0_irq(dev);
+    }
 
-        case SX127X_RF_LORA_IRQFLAGS_RXTIMEOUT:
-            _on_dio1_irq(dev);
-            break;
+    if (interruptReg & SX127X_RF_LORA_IRQFLAGS_RXTIMEOUT) {
+        _on_dio1_irq(dev);
+    }
 
-        case SX127X_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL:
-            _on_dio2_irq(dev);
-            break;
+    if (interruptReg & SX127X_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL) {
+        _on_dio2_irq(dev);
+    }
 
-        case SX127X_RF_LORA_IRQFLAGS_CADDETECTED:
-        case SX127X_RF_LORA_IRQFLAGS_CADDONE:
-        case SX127X_RF_LORA_IRQFLAGS_VALIDHEADER:
-            _on_dio3_irq(dev);
-            break;
-
-        default:
-            break;
+    if (interruptReg & (SX127X_RF_LORA_IRQFLAGS_CADDETECTED |
+                        SX127X_RF_LORA_IRQFLAGS_CADDONE |
+                        SX127X_RF_LORA_IRQFLAGS_VALIDHEADER)) {
+        _on_dio3_irq(dev);
     }
 }
 
