@@ -543,6 +543,10 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
             }
             break;
 
+        case NETDEV_EVENT_RX_STARTED:
+            DEBUG("[semtech-loramac] RX started\n");
+            break;
+
         case NETDEV_EVENT_RX_COMPLETE:
         {
             size_t len;
