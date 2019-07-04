@@ -3,10 +3,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += mma8x5x
 endif
 
-ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
-  ifeq (,$(filter nrfmin,$(USEMODULE)))
-    USEMODULE += nrf802154
-  endif
-endif
+# include common nrf52840 dependencies
+include $(RIOTBOARD)/common/nrf52/nrf52840/Makefile.dep
 
 include $(RIOTBOARD)/common/nrf52/Makefile.dep
