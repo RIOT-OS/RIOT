@@ -36,6 +36,16 @@ extern "C" {
 #endif
 
 /**
+ * @name    The client ID must contain 1-23 characters
+ *
+ * @see MQTT-SN spec v1.2, section 5.3.1
+ * @{
+ */
+#define MQTTSN_CLI_ID_MINLEN    (1U)
+#define MQTTSN_CLI_ID_MAXLEN    (23U)
+/** @} */
+
+/**
  * @brief   MQTT-SN flags
  *
  * All MQTT-SN functions only support a sub-set of the available flags. It is up

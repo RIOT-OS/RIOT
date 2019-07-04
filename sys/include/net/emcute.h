@@ -114,16 +114,6 @@ extern "C" {
 #define EMCUTE_BUFSIZE          (512U)
 #endif
 
-#ifndef EMCUTE_ID_MAXLEN
-/**
- * @brief   Maximum client ID length
- *
- * @note    **Must** be less than (256 - 6) AND less than
- *          (@ref EMCUTE_BUFSIZE - 6).
- */
-#define EMCUTE_ID_MAXLEN        (196U)
-#endif
-
 #ifndef EMCUTE_TOPIC_MAXLEN
 /**
  * @brief   Maximum topic length
