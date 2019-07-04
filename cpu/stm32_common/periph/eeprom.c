@@ -94,7 +94,7 @@ size_t eeprom_read(uint32_t pos, uint8_t *data, size_t len)
     DEBUG("Reading data from EEPROM at pos %" PRIu32 ": ", pos);
     for (size_t i = 0; i < len; i++) {
         _wait_for_pending_operations();
-        *p++ = *(uint8_t *)(EEPROM_START_ADDR + pos++);
+        *p++ = *(__IO uint8_t *)(EEPROM_START_ADDR + pos++);
         DEBUG("0x%02X ", *p);
     }
     DEBUG("\n");
