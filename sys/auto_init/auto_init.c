@@ -191,6 +191,11 @@ void auto_init(void)
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
 
+#ifdef MODULE_STM32_ETH
+    extern void auto_init_stm32_eth(void);
+    auto_init_stm32_eth();
+#endif
+
 #ifdef MODULE_AT86RF2XX
     extern void auto_init_at86rf2xx(void);
     auto_init_at86rf2xx();
