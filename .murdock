@@ -270,7 +270,12 @@ run_test() {
     print_worker
     echo "-- executing tests for $appdir on $board (compiled with $toolchain toolchain):"
     hook run_test_pre
-    BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only test
+
+    # do flashing and building of termdeps simultaneously
+    BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only termdeps -j2
+
+    # now run the actual test
+    BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir test
     RES=$?
 
     if [ $RES -eq 0 -a -n "$TEST_HASH" ]; then
