@@ -176,6 +176,9 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     /* unlock the flash module */
     _unlock_flash();
 
+    /* make sure no flash operation is ongoing */
+    _wait_for_pending_operations();
+
     DEBUG("[flashpage_raw] write: now writing the data\n");
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4)
