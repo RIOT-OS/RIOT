@@ -79,6 +79,7 @@ ifneq (,$(filter uhcpc,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
+  FEATURES_REQUIRED += ble_nordic_softdevice
   USEMODULE += softdevice_handler
   USEMODULE += ble_common
   USEMODULE += ble_6lowpan
