@@ -14,5 +14,12 @@ else ifeq (pyocd,$(PROGRAMMER))
   include $(RIOTMAKE)/tools/pyocd.inc.mk
 endif
 
+# QEMU 4.0 added microbit system emulation.
+EMULATOR = qemu-system-arm
+EMULATOR_FLAGS = -M microbit -device loader,file=$(ELFFILE) \
+                 -serial stdio \
+                 -monitor telnet::45454,server,nowait \
+                 -nographic
+
 # include nrf51 boards common configuration
 include $(RIOTBOARD)/common/nrf51/Makefile.include
