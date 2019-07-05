@@ -826,6 +826,10 @@ ifneq (,$(filter bluetil_addr,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter nimble_%,$(USEMODULE)))
+  USEPKG += nimble
+endif
+
 ifneq (,$(filter cord_epsim,$(USEMODULE)))
   USEMODULE += cord_common
   USEMODULE += gcoap
