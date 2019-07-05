@@ -85,4 +85,8 @@ ifneq (,$(filter semtech-loramac,$(USEPKG)))
   SRC += sc_loramac.c
 endif
 
+ifneq (,$(filter nimble_netif,$(USEMODULE)))
+  SRC += sc_nimble_netif.c
+endif
+
 include $(RIOTBASE)/Makefile.base

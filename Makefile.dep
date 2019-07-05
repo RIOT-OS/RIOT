@@ -443,6 +443,10 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
   ifneq (,$(filter fib,$(USEMODULE)))
     USEMODULE += posix_inet
   endif
+  ifneq (,$(filter nimble_netif,$(USEMODULE)))
+    USEMODULE += nimble_scanner
+    USEMODULE += nimble_scanlist
+  endif
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
