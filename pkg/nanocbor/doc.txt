@@ -7,9 +7,6 @@
  * This package contains the NanoCBOR library for a small CBOR encoder and
  * decoder. Flash footprint for encoding and decoding should be below 1K each.
  *
- * At the moment 8 bit and 16 bit MCU support is broken by upstream, see the
- * [issue](https://github.com/bergzand/NanoCBOR/issues/18).
- *
  * ## Usage
  *
  * Just add it as a package in your application:

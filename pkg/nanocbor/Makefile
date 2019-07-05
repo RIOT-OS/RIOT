@@ -1,6 +1,6 @@
 PKG_NAME    = nanocbor
 PKG_URL     = https://github.com/bergzand/nanocbor
-PKG_VERSION = 44d9b1cfaa6829c5d1063f3c0e4a1733cfa409e3
+PKG_VERSION = 3a672f79b2458a96393447e50a41174f741eadc5
 PKG_LICENSE = LGPL-2.1
 
 .PHONY: all
