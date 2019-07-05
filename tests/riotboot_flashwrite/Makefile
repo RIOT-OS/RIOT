@@ -1,6 +1,8 @@
-DEVELHELP ?= 0
+# If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
-include ../Makefile.tests_common
+
+# DEVELHELP ?= 0 to reduce firmware size
+DEVELHELP ?= 0
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
@@ -19,24 +21,6 @@ USEMODULE += nanocoap_sock
 # include this for printing IP addresses
 USEMODULE += shell_commands
 
-# Comment this out to enable code in RIOT that does safety checking
-# which is not needed in a production environment but helps in the
-# development process:
-#DEVELHELP = 1
-
-# Use different settings when compiling for one of the following (low-memory)
-# boards
-LOW_MEMORY_BOARDS := nucleo-f334r8
-
-GNRC_NETIF_NUMOF := 2
-
-# uncomment these to use ethos
-#USEMODULE += stdio_ethos gnrc_uhcpc
-#
-## ethos baudrate can be configured from make command
-#ETHOS_BAUDRATE ?= 115200
-#CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)
-
 ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   $(info Using low-memory configuration for microcoap_server.)
   ## low-memory tuning values
@@ -52,6 +36,7 @@ FEATURES_REQUIRED += riotboot
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include
 
 # Set a custom channel if needed
