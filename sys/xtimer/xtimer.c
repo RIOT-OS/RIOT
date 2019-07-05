@@ -208,7 +208,10 @@ void xtimer_now_timex(timex_t *out)
     out->microseconds = now - (out->seconds * US_PER_SEC);
 }
 
-static int _mutex_remove_thread_from_waiting_queue(mutex_t *mutex, thread_t *thread)
+/*
+ * The value pointed to by unlocked will be set to 1 if the thread was removed from the waiting queue otherwise 0.
+ */
+static void _mutex_remove_thread_from_waiting_queue(mutex_t *mutex, thread_t *thread, volatile uint8_t *unlocked)
 {
     unsigned irqstate = irq_disable();
     assert(mutex != NULL && thread != NULL);
@@ -220,14 +223,16 @@ static int _mutex_remove_thread_from_waiting_queue(mutex_t *mutex, thread_t *thr
             if (mutex->queue.next == NULL) {
                 mutex->queue.next = MUTEX_LOCKED;
             }
+            *unlocked = 1;
+
             sched_set_status(thread, STATUS_PENDING);
             irq_restore(irqstate);
             sched_switch(thread->priority);
-            return 1;
+            return;
         }
     }
+    *unlocked = 0;
     irq_restore(irqstate);
-    return 0;
 }
 
 static void _mutex_timeout(void *arg)
@@ -243,7 +248,7 @@ static void _mutex_timeout(void *arg)
 
     mutex_thread_t *mt = (mutex_thread_t *)arg;
     mt->blocking = 0;
-    mt->got_unlocked = _mutex_remove_thread_from_waiting_queue(mt->mutex, mt->thread);
+    _mutex_remove_thread_from_waiting_queue(mt->mutex, mt->thread, &mt->dequeued);
     irq_restore(irqstate);
 }
 
