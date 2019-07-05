@@ -580,4 +580,9 @@ void auto_init(void)
     auto_init_candev();
 
 #endif /* MODULE_AUTO_INIT_CAN */
+
+#ifdef MODULE_SUIT
+    extern void suit_init_conditions(void);
+    suit_init_conditions();
+#endif /* MODULE_SUIT */
 }
