@@ -25,6 +25,7 @@
 
 #include "periph_cpu.h"
 #include "cfg_rtt_default.h"
+#include "cfg_timer_tim2.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,25 +73,6 @@ extern "C" {
 #define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
 #define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2
 #define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
-/** @} */
-
-/**
- * @name   Timer configuration
- * @{
- */
-static const timer_conf_t timer_config[] = {
-    {
-        .dev      = TIM2,
-        .max      = 0xffffffff,
-        .rcc_mask = RCC_APB1ENR1_TIM2EN,
-        .bus      = APB1,
-        .irqn     = TIM2_IRQn
-    }
-};
-
-#define TIMER_0_ISR         isr_tim2
-
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**
