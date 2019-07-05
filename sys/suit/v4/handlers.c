@@ -250,6 +250,9 @@ static int _dtv_fetch(suit_v4_manifest_t *manifest, int key, CborValue *_it)
         }
         memcpy(manifest->urlbuf, url, url_len);
         manifest->urlbuf[url_len] = '\0';
+
+        cbor_value_leave_container(&url_it, &url_value_it);
+        cbor_value_leave_container(&it, &url_it);
     }
 
     LOG_DEBUG("_dtv_fetch() fetching \"%s\" (url_len=%u)\n", manifest->urlbuf, (unsigned)url_len);
@@ -411,7 +414,7 @@ static int _component_handler(suit_v4_manifest_t *manifest, int key,
     }
 
     manifest->state |= SUIT_MANIFEST_HAVE_COMPONENTS;
-    cbor_value_enter_container(it, &arr);
+    cbor_value_leave_container(it, &arr);
 
     LOG_DEBUG("storing components done\n)");
     return 0;

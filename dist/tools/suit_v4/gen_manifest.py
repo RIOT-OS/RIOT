@@ -13,8 +13,7 @@ import os
 import hashlib
 import json
 import uuid
-
-import click
+import argparse
 
 from suit_manifest_encoder_04 import compile_to_suit
 
@@ -23,7 +22,7 @@ def str2int(x):
     if x.startswith("0x"):
         return int(x, 16)
     else:
-        return x
+        return int(x)
 
 
 def sha256_from_file(filepath):
@@ -32,37 +31,43 @@ def sha256_from_file(filepath):
     return sha256.digest()
 
 
-@click.command()
-@click.option("--template", "-t", required=True, type=click.File())
-@click.option("--urlroot", "-u", required=True, type=click.STRING)
-@click.option("--offsets", "-O", required=True, type=click.STRING)
-@click.option("--seqnr", "-s", required=True, type=click.INT)
-@click.option("--output", "-o", type=click.File(mode="wb"))
-@click.option("--uuid-vendor", "-V", required=True)
-@click.option("--uuid-class", "-C",  required=True)
-@click.option("--keyfile", "-K",  required=False, type=click.File())
-@click.argument("slotfiles", nargs=2, type=click.Path())
-def main(template, urlroot, offsets, slotfiles, output, seqnr, uuid_vendor,
-         uuid_class, keyfile):
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--template', '-t', help='Manifest template file path')
+    parser.add_argument('--urlroot', '-u', help='')
+    parser.add_argument('--offsets', '-O', help='')
+    parser.add_argument('--seqnr', '-s',
+                        help='Sequence number of the manifest')
+    parser.add_argument('--output', '-o', nargs='?',
+                        help='Manifest output binary file path')
+    parser.add_argument('--uuid-vendor', '-V',
+                        help='Manifest vendor uuid')
+    parser.add_argument('--uuid-class', '-C',
+                        help='Manifest class uuid')
+    parser.add_argument('slotfiles', nargs=2,
+                        help='The list of slot file paths')
+    return parser.parse_args()
 
-    uuid_vendor = uuid.uuid5(uuid.NAMESPACE_DNS, uuid_vendor)
-    uuid_class = uuid.uuid5(uuid_vendor, uuid_class)
-    template = json.load(template)
-    slotfiles = list(slotfiles)
 
-    template["sequence-number"] = seqnr
+def main(args):
+    uuid_vendor = uuid.uuid5(uuid.NAMESPACE_DNS, args.uuid_vendor)
+    uuid_class = uuid.uuid5(uuid_vendor, args.uuid_class)
+    with open(args.template, 'r') as f:
+        template = json.load(f)
+
+    template["sequence-number"] = int(args.seqnr)
     template["conditions"] = [
             {"condition-vendor-id": uuid_vendor.hex},
             {"condition-class-id": uuid_class.hex},
         ]
 
-    offsets = offsets.split(",")
-    offsets = [str2int(x) for x in offsets]
+    offsets = [str2int(offset) for offset in args.offsets.split(",")]
 
-    for slot, slotfile in enumerate(slotfiles):
+    for slot, slotfile in enumerate(args.slotfiles):
         filename = slotfile
         size = os.path.getsize(filename)
-        uri = os.path.join(urlroot, os.path.basename(filename))
+        uri = os.path.join(args.urlroot, os.path.basename(filename))
         offset = offsets[slot]
 
         _image_slot = template["components"][0]["images"][slot]
@@ -77,11 +82,13 @@ def main(template, urlroot, offsets, slotfiles, output, seqnr, uuid_vendor,
         _image_slot["file"] = filename
 
     result = compile_to_suit(template)
-    if output:
-        output.write(result)
+    if args.output is not None:
+        with open(args.output, 'wb') as f:
+            f.write(result)
     else:
         print(result)
 
 
 if __name__ == "__main__":
-    main()
+    _args = parse_arguments()
+    main(_args)

@@ -43,7 +43,7 @@ typedef suit_manifest_handler_t (*suit_manifest_handler_getter_t)(int key);
 int suit_cbor_map_iterate_init(CborValue *map, CborValue *it)
 {
     if (!cbor_value_is_map(map)) {
-        LOG_INFO("suit_v4_parse(): manifest not an map\n)");
+        LOG_INFO("suit_v4_parse(): manifest not a map\n)");
         return SUIT_ERR_INVALID_MANIFEST;
     }
 
@@ -152,7 +152,7 @@ static int _v4_parse(suit_v4_manifest_t *manifest, const uint8_t *buf,
     map = it;
 
     if (suit_cbor_map_iterate_init(&map, &it) != SUIT_OK) {
-        LOG_DEBUG("manifest not map!\n");
+        LOG_DEBUG("manifest not a map!\n");
         return SUIT_ERR_INVALID_MANIFEST;
     }
 
