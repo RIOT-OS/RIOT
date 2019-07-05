@@ -21,7 +21,5 @@ else
   include $(RIOTMAKE)/tools/bossa.inc.mk
 endif
 
-CFLAGS += -DSX127X_USE_DIO_MULTI
-
 # setup the boards dependencies
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
