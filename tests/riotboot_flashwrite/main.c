@@ -36,8 +36,20 @@ int main(void)
     puts("riotboot_flashwrite test application");
 
     int current_slot = riotboot_slot_current();
-    printf("Current slot=%d\n", current_slot);
-    riotboot_slot_print_hdr(current_slot);
+    if (current_slot != -1) {
+        /* Sometimes, udhcp output messes up the following printfs.  That
+         * confuses the test script. As a workaround, just disable interrupts
+         * for a while.
+         */
+        irq_disable();
+        printf("running from slot %d\n", current_slot);
+        printf("slot start addr = %p\n", (void *)riotboot_slot_get_hdr(current_slot));
+        riotboot_slot_print_hdr(current_slot);
+        irq_enable();
+    }
+    else {
+        printf("[FAILED] You're not running riotboot\n");
+    }
 
     /* nanocoap_server uses gnrc sock which uses gnrc which needs a msg queue */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
@@ -52,6 +64,7 @@ int main(void)
     _gnrc_netif_config(0, NULL);
 
     /* initialize nanocoap server instance */
+    puts("Starting nanocoap server instance");
     uint8_t buf[COAP_INBUF_SIZE];
     sock_udp_ep_t local = { .port=COAP_PORT, .family=AF_INET6 };
     nanocoap_server(&local, buf, sizeof(buf));
