@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    core_sched Scheduler
- * @ingroup     core
- * @brief       The RIOT scheduler
+ * @defgroup    core_sched_native Scheduler for native
+ * @ingroup     core_sched
+ * @brief       The RIOT scheduler for the native platform
  * @details
  *
  * @{
