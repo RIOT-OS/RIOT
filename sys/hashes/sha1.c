@@ -11,14 +11,12 @@
  */
 
 /**
- * @defgroup    sys_hashes_sha1 SHA-1
- * @ingroup     sys_hashes
- * @brief       Implementation of the SHA-1 hashing function
+ * @ingroup     sys_hashes_sha1
 
  * @{
  *
  * @file
- * @brief       SHA-1 interface definition
+ * @brief       Implementation of the SHA-1 hashing function
  *
  * @author      Wei Dai and others
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
