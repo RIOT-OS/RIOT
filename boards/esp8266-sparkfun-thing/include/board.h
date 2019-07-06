@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup    boards_esp8266_sparkfun-thing SparkFun ESP8266 Thing
- * @ingroup     boards_esp8266
+ * @ingroup     boards_esp8266_sparkfun-thing
  */
 
 /**
