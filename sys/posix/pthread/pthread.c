@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup pthread POSIX threads
- * POSIX conforming multi-threading features.
- * @ingroup posix
+ * @ingroup pthread
  * @{
  * @file
  * @brief   Thread creation features.
