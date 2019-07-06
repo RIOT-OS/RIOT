@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_arduino-leonardo Arduino Leonardo
- * @ingroup     boards
- * @brief       Support for the Arduino Leonardo board
+ * @ingroup     boards_arduino-leonardo
  * @{
  *
  * @file
