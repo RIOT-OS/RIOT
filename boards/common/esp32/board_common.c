@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_common_esp32 ESP32 Board Commons
- * @ingroup     boards_common
- * @brief       Common definitions for all ESP32 boards
+ * @ingroup     boards_common_esp32
  * @{
  *
  * @file
