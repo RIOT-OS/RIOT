@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    cpu_efm32 Silicon Labs EFM32/EFR32/EZR32
- * @ingroup     cpu
- * @brief       Support for Silicon Labs EFM32/EFR32/EZR32 CPUs
+ * @ingroup     cpu_efm32
  * @{
  *
  * @file
