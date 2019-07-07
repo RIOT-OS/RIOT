@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-l433rc STM32 Nucleo-L433RC
- * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-L433RC
+ * @ingroup     boards_nucleo-l433rc
  * @{
  *
  * @file
