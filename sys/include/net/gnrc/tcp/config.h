@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_tcp TCP
- * @ingroup     net_gnrc
- * @brief       RIOT's TCP implementation for the GNRC network stack.
+ * @ingroup     net_gnrc_tcp
  *
  * @{
  *
