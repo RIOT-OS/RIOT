@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f070rb STM32 Nucleo-F070RB
- * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F070RB
+ * @ingroup     boards_nucleo-f070rb
  * @{
  *
  * @file
