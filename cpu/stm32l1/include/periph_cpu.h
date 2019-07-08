@@ -30,7 +30,8 @@ extern "C" {
 /**
  * @name    Starting address of the CPU ID
  */
-#if defined(CPU_MODEL_STM32L151RBA) || defined(CPU_MODEL_STM32L151CB)
+#if defined(CPU_MODEL_STM32L151RB_A) || defined(CPU_MODEL_STM32L151CB) || \
+    defined(CPU_MODEL_STM32L151CB_A)
 #define CPUID_ADDR          (0x1ff80050)
 #else
 #define CPUID_ADDR          (0x1ff800d0)
@@ -82,7 +83,7 @@ typedef enum {
 #define EEPROM_SIZE                (16384UL)  /* 16kB */
 #elif defined(CPU_MODEL_STM32L151RC)
 #define EEPROM_SIZE                (8192U)    /* 8kB */
-#elif defined(CPU_MODEL_STM32L151CB)
+#elif defined(CPU_MODEL_STM32L151CB) || defined(CPU_MODEL_STM32L151CB_A)
 #define EEPROM_SIZE                (4096U)    /* 4kB */
 #endif
 /** @} */
