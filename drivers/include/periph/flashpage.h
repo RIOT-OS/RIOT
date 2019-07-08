@@ -96,7 +96,6 @@ extern "C" {
 #error "periph/flashpage: FLASHPAGE_NUMOF not defined"
 #endif
 
-
 /**
  * @brief   Return values used in this interface
  */

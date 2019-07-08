@@ -59,12 +59,12 @@ extern "C" {
 
 
 #ifdef MODULE_PERIPH_FLASHPAGE_RAW
-#define FLASHCHUNK_SIZE         64
+#define FLASHCHUNK_SIZE         FLASHPAGE_RAW_BLOCKSIZE
 #else
 #define FLASHCHUNK_SIZE         FLASHPAGE_SIZE
 #endif
 
-#define FLASHCHUNK_PAGE         (FLASHPAGE_SIZE / FLASHCHUNK_SIZE)
+#define FLASHCHUNK_PER_PAGE     (FLASHPAGE_SIZE / FLASHCHUNK_SIZE)
 
 /**
  * @brief   firmware update state structure
@@ -80,21 +80,6 @@ typedef struct {
  * @brief Amount of bytes to skip at initial write of first page
  */
 #define RIOTBOOT_FLASHWRITE_SKIPLEN     sizeof(RIOTBOOT_MAGIC)
-
-/**
- * @brief   Translate the given chunk number into the chunk's starting address
- *
- * @note    The given chunk MUST be valid, otherwise the returned address points
- *          to an undefined memory location!
- *
- * @param[in] chunk      chunk number to get the address of
- *
- * @return               starting memory address of the given chunk
- */
-static inline void *flashchunk_addr(int chunk)
-{
-    return (void *)(CPU_FLASH_BASE + (chunk * FLASHCHUNK_SIZE));
-}
 
 /**
  * @brief   Initialize firmware update (raw version)

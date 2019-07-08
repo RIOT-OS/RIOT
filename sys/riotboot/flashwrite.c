@@ -28,6 +28,13 @@
 #define LOG_PREFIX "riotboot_flashwrite: "
 #include "log.h"
 
+#ifdef MODULE_PERIPH_FLASHPAGE_RAW
+static inline void *flashchunk_addr(int chunk)
+{
+    return (void *)(CPU_FLASH_BASE + (chunk * FLASHCHUNK_SIZE));
+}
+#endif
+
 static inline size_t min(size_t a, size_t b)
 {
     return a <= b ? a : b;
@@ -60,9 +67,10 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
     state->target_slot = target_slot;
     state->flashchunck = flashpage_page((void *)riotboot_slot_get_hdr(target_slot));
 #ifdef MODULE_PERIPH_FLASHPAGE_RAW
-    state->flashchunck = (FLASHCHUNK_PAGE * state->flashchunck);
     /* erase first page */
-    flashpage_write((state->flashchunck / FLASHCHUNK_PAGE), NULL);
+    flashpage_write((state->flashchunck), NULL);
+    /* convert from pages to chunks*/
+    state->flashchunck = (FLASHCHUNK_PER_PAGE * state->flashchunck);
 #endif
     return 0;
 }
@@ -87,10 +95,10 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
         len -= to_copy;
 
 #ifdef MODULE_PERIPH_FLASHPAGE_RAW
-        if (((int)flashchunk_addr(state->flashchunck) % FLASHPAGE_SIZE) == 0) {
+        if ((state->flashchunck % FLASHCHUNK_PER_PAGE) == 0) {
             LOG_DEBUG(LOG_PREFIX "Erasing page %u \n",
-                        (state->flashchunck / FLASHCHUNK_PAGE));
-            flashpage_write((state->flashchunck / FLASHCHUNK_PAGE), NULL);
+                        (state->flashchunck / FLASHCHUNK_PER_PAGE));
+            flashpage_write((state->flashchunck / FLASHCHUNK_PER_PAGE), NULL);
         }
         if ((!flashchunck_avail) || (!more)) {
             if (flashpage_write_and_verify_raw(flashchunk_addr(state->flashchunck),
@@ -104,10 +112,10 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
         }
 #else
         if ((!flashchunck_avail) || (!more)) {
-            LOG_WARNING(LOG_PREFIX "writing flashchunck %u!\n", state->flashchunck);
+            LOG_WARNING(LOG_PREFIX "writing flashpage %u!\n", state->flashchunck);
             if (flashpage_write_and_verify(state->flashchunck,
                                            state->flashchunck_buf) != FLASHPAGE_OK) {
-                LOG_WARNING(LOG_PREFIX "error writing flashchunck %u!\n",
+                LOG_WARNING(LOG_PREFIX "error writing flashpage %u!\n",
                             state->flashchunck);
                 return -1;
             }
@@ -144,7 +152,7 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
 #else
     int flashpage = flashpage_page((void *)slot_start);
     if (flashpage_write_and_verify(flashpage, firstchunck) != FLASHPAGE_OK) {
-        LOG_WARNING(LOG_PREFIX "re-flashing first chunk failed!\n");
+        LOG_WARNING(LOG_PREFIX "re-flashing first page failed!\n");
         goto out;
     }
 #endif
