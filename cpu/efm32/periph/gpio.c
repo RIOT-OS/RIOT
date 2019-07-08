@@ -115,7 +115,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     }
 
     /* just in case, disable the interrupt for this pin */
-    GPIO_IntDisable(_pin_num(pin));
+    GPIO_IntDisable(_pin_mask(pin));
 
     /* store interrupt callback */
     isr_ctx[_pin_num(pin)].cb = cb;
