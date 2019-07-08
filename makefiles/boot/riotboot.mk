@@ -126,6 +126,11 @@ riotboot/slot1: $(SLOT1_RIOT_BIN)
 # Default flashing rule for bootloader + slot 0
 riotboot/flash: riotboot/flash-slot0 riotboot/flash-bootloader
 
+# make applications that use the riotboot feature default to actually using it
+# Target 'all' will generate the combined file directly.
+# It also makes 'flash' and 'flash-only' work without specific command.
+FLASHFILE = $(RIOTBOOT_EXTENDED_BIN)
+
 else
 riotboot:
 	$(Q)echo "error: riotboot feature not selected! (try FEATURES_REQUIRED += riotboot)"

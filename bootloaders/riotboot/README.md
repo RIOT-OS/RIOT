@@ -61,13 +61,19 @@ The above requirements are usually met if the board succeeds to execute
 the riotboot test in tests/.
 
 # Single Slot
-Just compile your application using the target `riotboot`. The header
-is generated automatically according to your `APP_VER`, which can be
-optionally set (0 by default) in your makefile.
+Just compile your application with `FEATURES_REQUIRED += riotboot`. The header
+is generated automatically according to your `APP_VER`, which can be optionally
+set (current system time in seconds since 1970 (epoch) by default) in your
+makefile.
 
 
 ## Flashing example
-The image can be flashed using `riotboot/flash` which also flashes
+If your application is using the riotboot feature, the usual targets (`all`,
+`flash`, `flash-only`) will automatically compile and/or flash both the
+bootloader and slot0, while ensuring that slot 1 is invalidated so slot 0 will
+be booted.
+
+The image can also be flashed using `riotboot/flash` which also flashes
 the bootloader. Below a concrete example:
 
 `BOARD=samr21-xpro FEATURES_REQUIRED+=riotboot APP_VER=$(date +%s) make -C examples/hello-world riotboot/flash-combined-slot0`
@@ -94,17 +100,9 @@ Dedicated make targets are available to build and flash several slots:
 
 In particular, if one wants to be sure to boot a particular image, using the
 target `riotboot/flash-extended-slot0` is the way to go (resulting in only
-slot 0 being valid, thus being booted).
+slot 0 being valid, thus being booted). This is done automatically by `make
+flash` if the `riotboot` feature is used.
 
-## Flashing examples
+## Testing riotboot
 
-The following sequence of commands tests building, flashing and booting slot 0,
-then slot 1. tests/riotboot prints out the current booted slot in the shell.
-
-To test building, flashing and booting the first slot:
-
-`BOARD=samr21-xpro APP_VER=$(date +%s) make -C tests/riotboot/ riotboot/flash-combined-slot0 test`
-
-For the second slot:
-
-`BOARD=samr21-xpro APP_VER=$(date +%s) make -C tests/riotboot/ riotboot/flash-slot1 test`
+See [tests/riotboot/README.md](https://github.com/RIOT-OS/RIOT/blob/master/tests/riotboot/README.md).
