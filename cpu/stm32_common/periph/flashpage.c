@@ -56,6 +56,7 @@ extern void _lock(void);
 extern void _unlock(void);
 extern void _wait_for_pending_operations(void);
 
+
 static void _unlock_flash(void)
 {
     _unlock();
@@ -73,7 +74,23 @@ static void _unlock_flash(void)
 }
 
 #if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
-static inline int flashbank_sector(void *addr)
+static inline void * _flashsector_addr(uint8_t sn)
+{
+#if (FLASH_DUAL_BANK == 1)
+    uint32_t addr = CPU_FLASH_BASE + (STM32_FLASHSIZE / 2);
+#else
+    uint32_t addr = CPU_FLASH_BASE;
+#endif
+    if (sn <= 4) {
+        addr += CPU_FLASH_BASE(FLASHSECTOR_SIZE_MIN * sn);
+    }
+    else {
+        addr += CPU_FLASH_BASE(FLASHSECTOR_SIZE_MIN * (sn - 4));
+    }
+    return (void *) addr;
+}
+
+static inline int _flashbank_sector(void *addr)
 {
     /* When flash is in single bank there is a max of 12 sectors. The first 4
        sectors are equally sized, the 5th amount to the sum of the first 4
@@ -93,7 +110,7 @@ static inline int flashbank_sector(void *addr)
     return sn;
 }
 
-static inline int flashsector_sector(void *addr)
+static inline int _flashsector_sector(void *addr)
 {
     /* When in dual bank there can be up to 24 sectors, where sectors 12-23
        follow the same layout as sectors 0-11 */
@@ -101,14 +118,14 @@ static inline int flashsector_sector(void *addr)
     if ((uint32_t)addr >= (STM32_FLASHSIZE / 2) + CPU_FLASH_BASE) {
         DEBUG("[flashsector]: dual bank sector \n");
         addr = (void *)((uint32_t)addr - (STM32_FLASHSIZE / 2));
-        return FLASHSECTORS_BANK + flashbank_sector(addr);
+        return FLASHSECTORS_BANK + _flashbank_sector(addr);
     }
     else {
         DEBUG("[flashsector]: single bank sector \n");
-        return flashbank_sector(addr);
+        return _flashbank_sector(addr);
     }
 #else
-    return flashbank_sector(addr);
+    return _flashbank_sector(addr);
 #endif
 }
 
@@ -152,7 +169,13 @@ static void _erase_sector(uint8_t sn)
 static void _erase_sector_page(void *page_addr)
 {
     DEBUG("[flashsector] erase: address to erase: %p\n", page_addr);
-    /* avoid erasing whole sector if "page" is blank*/
+    uint8_t sn = _flashsector_sector(page_addr);
+    /* always erase sector when writing to first page */
+    if(_flashsector_addr(sn) == page_addr) {
+        DEBUG("[flashsector] erase: erasing sector: %d\n", sn);
+        _erase_sector(sn);
+    }
+    /* avoid erasing whole sector if "page" is blank */
     bool blank = true;
     for (unsigned i = 0; i < FLASHPAGE_SIZE; i += sizeof(uint32_t)) {
         if (*(uint32_t *)(page_addr + i) != 0xffffffff) {
@@ -162,7 +185,6 @@ static void _erase_sector_page(void *page_addr)
     }
     /* erase the sector if it failed the blank check */
     if (!blank) {
-        uint8_t sn = flashsector_sector(page_addr);
         DEBUG("[flashsector] erase: erasing sector: %d\n", sn);
         _erase_sector(sn);
     }
