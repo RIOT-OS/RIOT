@@ -37,6 +37,8 @@
 #include "vendor/stm32l433xx.h"
 #elif defined(CPU_MODEL_STM32L452RE)
 #include "vendor/stm32l452xx.h"
+#elif defined(CPU_MODEL_STM32L4R5ZI)
+#include "vendor/stm32l4r5xx.h"
 #endif
 
 #ifdef __cplusplus
@@ -52,6 +54,8 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (83U)
 #elif defined(CPU_MODEL_STM32L496ZG)
 #define CPU_IRQ_NUMOF                   (91U)
+#elif defined(CPU_MODEL_STM32L4R5ZI)
+#define CPU_IRQ_NUMOF                   (95U)
 #else
 #define CPU_IRQ_NUMOF                   (82U)
 #endif
