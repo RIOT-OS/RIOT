@@ -27,7 +27,6 @@
 #include "net/ieee802154.h"
 #include "net/l2util.h"
 #include "net/netdev/ieee802154.h"
-#include "openthread/config.h"
 #include "openthread/platform/diag.h"
 #include "openthread/platform/radio.h"
 #include "ot.h"
