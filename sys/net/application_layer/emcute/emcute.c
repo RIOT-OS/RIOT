@@ -345,7 +345,6 @@ int emcute_pub(emcute_topic_t *topic, const void *data, size_t len,
     mutex_lock(&txlock);
 
     size_t pos = set_len(tbuf, (len + 6));
-    len += (pos + 6);
     tbuf[pos++] = PUBLISH;
     tbuf[pos++] = flags;
     byteorder_htobebufs(&tbuf[pos], topic->id);
@@ -356,10 +355,10 @@ int emcute_pub(emcute_topic_t *topic, const void *data, size_t len,
     memcpy(&tbuf[pos], data, len);
 
     if (flags & EMCUTE_QOS_1) {
-        res = syncsend(PUBACK, len, true);
+        res = syncsend(PUBACK, len + pos, true);
     }
     else {
-        sock_udp_send(&sock, tbuf, len, &gateway);
+        sock_udp_send(&sock, tbuf, len + pos, &gateway);
         mutex_unlock(&txlock);
     }
 
