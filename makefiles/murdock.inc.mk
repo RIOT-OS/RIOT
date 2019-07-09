@@ -16,8 +16,8 @@ test-murdock:
 		$(FLASHFILE)
 
 # TEST CHANGE
-# Enable all tests by default
-TEST_ON_CI_WHITELIST ?= all
+# Enable all tests by default, if there are tests
+TEST_ON_CI_WHITELIST ?= $(if $(TESTS),all)
 # TEST CHANGE
 
 # don't whitelist tests if there's no binary
