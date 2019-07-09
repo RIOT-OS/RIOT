@@ -86,10 +86,9 @@
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 /**
- * @brief   Calculate the needed memory (in byte) needed to save 4 bits per MCU
- *          pin
+ * @brief   Calculate the needed memory (in bytes) to store 4 bits per MCU pin
  */
-#define ISR_MAP_SIZE        (GPIO_PORTS_NUMOF * PINS_PER_PORT * 4 / 8)
+#define ISR_MAP_SIZE (GPIO_PORTS_NUMOF * PINS_PER_PORT * 4 / 8 / sizeof(uint32_t))
 
 /**
  * @brief   Define the number of simultaneously configurable interrupt channels
