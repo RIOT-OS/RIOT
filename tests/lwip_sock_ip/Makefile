@@ -10,7 +10,8 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
                    wsn430-v1_3b wsn430-v1_4 z1
 BOARD_INSUFFICIENT_MEMORY = i-nucleo-lrwan1 nucleo-f031k6 nucleo-f042k6 \
                             nucleo-l031k6 nucleo-f030r8 nucleo-f303k8 \
-                            nucleo-f334r8 nucleo-l053r8 stm32f0discovery
+                            nucleo-f334r8 nucleo-l053r8 stm32f0discovery \
+                            stm32l0538-disco
 
 LWIP_IPV4 ?= 0
 

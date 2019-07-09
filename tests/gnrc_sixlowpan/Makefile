@@ -8,7 +8,8 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
                              nucleo-f070rb nucleo-f070rb nucleo-f072rb \
                              nucleo-f303k8 nucleo-f334r8 nucleo-l031k6 \
                              nucleo-l053r8 saml10-xpro saml11-xpro \
-                             stm32f0discovery telosb waspmote-pro wsn430-v1_3b \
+                             stm32f0discovery stm32l0538-disco telosb \
+                             waspmote-pro wsn430-v1_3b \
                              wsn430-v1_4 z1
 
 # use IEEE 802.15.4 as link-layer protocol

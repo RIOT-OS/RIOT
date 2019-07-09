@@ -17,7 +17,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-leonardo \
                              nucleo-f030r8 nucleo-f070rb nucleo-f072rb \
                              nucleo-f103rb nucleo-f302r8 nucleo-f334r8 \
                              nucleo-l053r8 saml10-xpro saml11-xpro spark-core \
-                             stm32f0discovery telosb waspmote-pro wsn430-v1_3b \
+                             stm32f0discovery stm32l0538-disco telosb \
+                             waspmote-pro wsn430-v1_3b \
                              wsn430-v1_4 yunjia-nrf51822 z1
 
 # Include packages that pull up and auto-init the link layer.

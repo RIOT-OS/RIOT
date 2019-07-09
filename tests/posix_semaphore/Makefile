@@ -6,7 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
                              nucleo-f031k6 nucleo-f042k6 nucleo-l031k6 \
                              nucleo-f030r8 nucleo-f303k8 nucleo-f334r8 \
                              nucleo-l053r8 spark-core stm32f0discovery \
-                             yunjia-nrf51822
+                             stm32l0538-disco yunjia-nrf51822
 
 USEMODULE += fmt
 USEMODULE += posix_semaphore
