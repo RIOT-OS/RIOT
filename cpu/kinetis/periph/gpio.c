@@ -94,7 +94,7 @@
 /**
  * @brief   Define the number of simultaneously configurable interrupt channels
  *
- * We have configured 4-bits per pin, so we can go up to 16 simultaneous active
+ * We have configured 4-bits per pin, so we can go up to 15 simultaneous active
  * extern interrupt sources.
  */
 #define CTX_NUMOF           (8U)
@@ -148,10 +148,13 @@ static inline int pin_num(gpio_t pin)
 
 /**
  * @brief   Get context for a specific pin
+ *
+ * @return  index of context for specified pin
+ * @return  -1 if pin has no context
  */
 static inline int get_ctx(int port, int pin)
 {
-    return (isr_map[(port * 4) + (pin >> 3)] >> ((pin & 0x7) * 4)) & 0xf;
+    return ((isr_map[(port * 4) + (pin >> 3)] >> ((pin & 0x7) * 4)) & 0xf) - 1;
 }
 
 /**
@@ -177,13 +180,15 @@ static void write_map(int port, int pin, int ctx)
 }
 
 /**
- * @brief   Clear the context for the given pin
+ * @brief   Free the context for the given pin
  */
-static void ctx_clear(int port, int pin)
+static void ctx_free(int port, int pin)
 {
     int ctx = get_ctx(port, pin);
-
-    write_map(port, pin, ctx);
+    /* clear the context pointer for this pin */
+    write_map(port, pin, 0);
+    /* mark the context entry as free */
+    isr_ctx[ctx].cb = NULL;
 }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
@@ -226,20 +231,17 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
     clk_en(pin);
 
 #ifdef KINETIS_HAVE_PCR
-#ifdef MODULE_PERIPH_GPIO_IRQ
     /* if the given interrupt was previously configured as interrupt source, we
      * need to free its interrupt context. We to this only after we
      * re-configured the pin in case an event is happening just in between... */
-    uint32_t isr_state = port(pin)->PCR[pin_num(pin)];
-#endif /* MODULE_PERIPH_GPIO_IRQ */
 
     /* set new PCR value */
     port(pin)->PCR[pin_num(pin)] = pcr;
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-    /* and clear the interrupt context if needed */
-    if (isr_state & PORT_PCR_IRQC_MASK) {
-        ctx_clear(port_num(pin), pin_num(pin));
+    /* and free the interrupt context if needed */
+    if (get_ctx(port_num(pin), pin_num(pin)) >= 0) {
+        ctx_free(port_num(pin), pin_num(pin));
     }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 #else
@@ -300,7 +302,8 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     isr_ctx[ctx_num].cb = cb;
     isr_ctx[ctx_num].arg = arg;
     isr_ctx[ctx_num].state = flank;
-    write_map(port_num(pin), pin_num(pin), ctx_num);
+    /* context map requires ctx_num + 1, as 0 is the no-context value */
+    write_map(port_num(pin), pin_num(pin), ctx_num + 1);
 
     /* clear interrupt flags */
     port(pin)->ISFR &= ~(1 << pin_num(pin));
