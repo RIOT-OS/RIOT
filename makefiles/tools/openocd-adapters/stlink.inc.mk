@@ -1,10 +1,16 @@
 # ST-Link debug adapter
-# Use st-link v2-1 by default
-STLINK_VERSION ?= 2-1
 
-# Use STLINK_VERSION to select which stlink version is used
+ifeq (,$(STLINK_VERSION))
+    # Use stlink.cfg by default
+    STLINK_CFG = stlink.cfg
+else
+    # Use STLINK_VERSION to select which stlink version is used.
+    # deprecated in OpenOCD since Jan 26, 2017
+    STLINK_CFG = stlink-v$(STLINK_VERSION).cfg
+endif
+
 OPENOCD_ADAPTER_INIT ?= \
-  -c 'source [find interface/stlink-v$(STLINK_VERSION).cfg]' \
+  -c 'source [find interface/$(STLINK_CFG)]' \
   -c 'transport select hla_swd'
 # Add serial matching command, only if DEBUG_ADAPTER_ID was specified
 ifneq (,$(DEBUG_ADAPTER_ID))
