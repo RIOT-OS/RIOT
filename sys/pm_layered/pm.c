@@ -34,14 +34,6 @@
 #endif
 
 /**
- * @brief Power Management mode typedef
- */
-typedef union {
-    uint32_t val_u32;
-    uint8_t val_u8[PM_NUM_MODES];
-} pm_blocker_t;
-
-/**
  * @brief Global variable for keeping track of blocked modes
  */
 volatile pm_blocker_t pm_blocker = { .val_u32 = PM_BLOCKER_INITIAL };
