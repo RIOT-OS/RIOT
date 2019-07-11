@@ -15,20 +15,24 @@ ifeq (llvm,$(TOOLCHAIN))
   RIOT_CFLAGS += -Wno-char-subscripts
 endif
 
-TOOLCHAIN_FILE=$(PKG_BUILDDIR)/xcompile-toolchain.cmake
+TOOLCHAIN_FILE = $(PKG_BUILDDIR)/xcompile-toolchain.cmake
 
-all: $(PKG_BUILDDIR)/src/Makefile
-	$(MAKE) -C $(PKG_BUILDDIR)/src && \
-	cp $(PKG_BUILDDIR)/src/lib/libccnl-riot.a $(BINDIR)/ccn-lite.a
+all: $(BINDIR)/ccn-lite.a
 
-$(PKG_BUILDDIR)/src/Makefile: $(TOOLCHAIN_FILE)
-	cd $(PKG_BUILDDIR)/src && \
-	cmake -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
-		  -DCCNL_RIOT=1 -DRIOT_CFLAGS="$(RIOT_CFLAGS)" -DBUILD_TESTING=OFF .
-$(TOOLCHAIN_FILE): git-download
+$(BINDIR)/ccn-lite.a: $(PKG_BUILDDIR)/bin/lib/libccnl-riot.a
+	cp $< $@
+
+$(PKG_BUILDDIR)/bin/lib/libccnl-riot.a: $(PKG_BUILDDIR)/bin/Makefile
+	$(MAKE) -C $(PKG_BUILDDIR)/bin clean
+	$(MAKE) -C $(PKG_BUILDDIR)/bin
+
+$(PKG_BUILDDIR)/bin/Makefile: $(PKG_PREPARED) $(TOOLCHAIN_FILE) | ..cmake_version_supported
+	cmake -B$(PKG_BUILDDIR)/bin -H$(PKG_BUILDDIR)/src \
+	      -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
+	      -DCCNL_RIOT=1 -DRIOT_CFLAGS="$(RIOT_CFLAGS)" -DBUILD_TESTING=OFF
+
+$(TOOLCHAIN_FILE): FORCE
 	$(RIOTTOOLS)/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
-
-git-download: | ..cmake_version_supported
 
 ..cmake_version_supported:
 	@ # Remove '-rcX' from version as they are not well handled

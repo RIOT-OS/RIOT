@@ -5,17 +5,15 @@ PKG_LICENSE=EDL-1.0,EPL-1.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-all: patch
-	"$(MAKE)" -C $(PKG_BUILDDIR)/riotbuild
+all:
+	"$(MAKE)" -C $(PKG_BUILDDIR)/riotbuild -f $(CURDIR)/Makefile.wakaama
 
-patch: git-download
+$(PKG_PREPARED): $(PKG_BUILDDIR)/riotbuild/copied
+$(PKG_BUILDDIR)/riotbuild/copied: $(PKG_PATCHED) FORCE
 	mkdir -p "$(PKG_BUILDDIR)/riotbuild"
 	cp $(PKG_BUILDDIR)/core/*.c $(PKG_BUILDDIR)/core/*.h $(PKG_BUILDDIR)/riotbuild
 	cp $(PKG_BUILDDIR)/core/er-coap-13/*.c $(PKG_BUILDDIR)/core/er-coap-13/*.h $(PKG_BUILDDIR)/riotbuild
 	cp $(PKG_BUILDDIR)/examples/client/object_server.c $(PKG_BUILDDIR)/riotbuild
 	cp $(PKG_BUILDDIR)/examples/client/object_security.c $(PKG_BUILDDIR)/riotbuild
 	cp $(PKG_BUILDDIR)/examples/client/object_access_control.c $(PKG_BUILDDIR)/riotbuild
-
-	echo 'MODULE:=wakaama' > $(PKG_BUILDDIR)/riotbuild/Makefile
-	echo 'include $$(RIOTBASE)/Makefile.base' >> $(PKG_BUILDDIR)/riotbuild/Makefile
-
+	touch $@

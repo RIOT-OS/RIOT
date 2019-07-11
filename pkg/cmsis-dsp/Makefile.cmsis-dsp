@@ -36,8 +36,5 @@ $(OBJ): | $(CMSIS_BINDIRS)
 $(CMSIS_BINDIRS):
 	@mkdir -p $@
 
-# Reset the default goal.
-.DEFAULT_GOAL :=
-
 # Include RIOT settings and recipes
 include $(RIOTBASE)/Makefile.base
