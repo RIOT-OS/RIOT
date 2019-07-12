@@ -80,6 +80,13 @@ MAKEOVERRIDES += $(foreach v,$(__DIRECTORY_VARIABLES),$(v)=$($(v)))
 # trailing '/' is important when RIOTPROJECT == CURDIR
 BUILDRELPATH ?= $(patsubst $(RIOTPROJECT)/%,%,$(CURDIR)/)
 
+# Set CLEAN to "clean" if that target was requested.
+# Allows recipes to be run after cleaning, without triggering it implicitly:
+#
+# all: | $(CLEAN)
+#
+CLEAN = $(filter clean, $(MAKECMDGOALS))
+
 # include makefiles utils tools
 include $(RIOTMAKE)/utils/variables.mk
 
