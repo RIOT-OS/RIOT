@@ -15,4 +15,9 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += netstats_l2
 
+TEST_ON_CI_WHITELIST += all
+# Cannot run the test on `murdock` in `native`
+#   open(/dev/net/tun): No such file or directory
+TEST_ON_CI_BLACKLIST += native
+
 include $(RIOTBASE)/Makefile.include
