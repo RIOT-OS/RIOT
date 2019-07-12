@@ -2,8 +2,9 @@ include ../Makefile.tests_common
 
 USEMODULE += xtimer
 
+TEST_ON_CI_WHITELIST += all
 # This test randomly fails on `native` so disable it from CI
-TEST_ON_CI_WHITELIST += samr21-xpro
+TEST_ON_CI_BLACKLIST += native
 
 # This application uses getchar and thus expects input from stdio
 USEMODULE += stdin

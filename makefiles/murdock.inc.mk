@@ -15,16 +15,38 @@ test-murdock:
 		"$(BOARD):$(TOOLCHAIN)" \
 		$(FLASHFILE)
 
-# don't whitelist tests if there's no binary
-ifeq (1,$(RIOTNOLINK))
-  TEST_ON_CI_WHITELIST:=
-endif
 
-# create $(BINDIR)/.test file only if BOARD is in $(TEST_ON_CI_WHITELIST)
+# Control running tests on boards during the CI tests.
+#
+# Testing is enabled if all the following conditions are met:
+#
+#  * the board is whitelisted
+#  * the board is not blacklisted (by default none)
+#  * the board has enough memory and the executable is being linked
+#
+# TEST_ON_CI_WHITELIST and TEST_ON_CI_BLACKLIST can be empty, a board list or 'all'
+#
+# Prefer blacklisting boards that fail to whitelisting the ones that work.
+# It will help tracking what is failing.
+#
+# Disabling a test in some case must be justified to keep track of the reason.
+
+TEST_ON_CI_WHITELIST ?=
+TEST_ON_CI_BLACKLIST ?=
+TEST_ON_BOARD_ENABLED ?= $(filter-out $(TEST_ON_CI_BLACKLIST:all=%),$(filter $(TEST_ON_CI_WHITELIST:all=%),$(BOARD)))
+
+TEST_ON_CI_ENABLED ?= $(if $(RIOTNOLINK),,$(TEST_ON_BOARD_ENABLED))
+
+.PHONY: test-on-ci-enabled
+test-on-ci-enabled:
+	$(Q)test -n "$(TEST_ON_CI_ENABLED)"
+
+
+# create $(BINDIR)/.test file only if the test is enabled for this board
 .PHONY: $(BINDIR)/.test
 link: $(BINDIR)/.test
 $(BINDIR)/.test: $(filter clean, $(MAKECMDGOALS))
-ifneq (,$(filter $(BOARD) all, $(TEST_ON_CI_WHITELIST)))
+ifneq (,$(TEST_ON_CI_ENABLED))
 	$(Q)mkdir -p $(BINDIR)
 	$(Q)touch $@
 else
