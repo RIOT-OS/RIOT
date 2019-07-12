@@ -80,6 +80,13 @@ MAKEOVERRIDES += $(foreach v,$(__DIRECTORY_VARIABLES),$(v)=$($(v)))
 # trailing '/' is important when RIOTPROJECT == CURDIR
 BUILDRELPATH ?= $(patsubst $(RIOTPROJECT)/%,%,$(CURDIR)/)
 
+# Set CLEAN to "clean" if that target was requested.
+# Allows recipes to be run after cleaning, without triggering it implicitly:
+#
+# all: | $(CLEAN)
+#
+CLEAN = $(filter clean, $(MAKECMDGOALS))
+
 # include makefiles utils tools
 include $(RIOTMAKE)/utils/variables.mk
 
@@ -511,9 +518,7 @@ endef
 	@$(COLOR_ECHO)
 
 # The `clean` needs to be serialized before everything else.
-ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    all $(BASELIBS) $(BUILDDEPS) ..in-docker-container: clean
-endif
+all $(BASELIBS) $(BUILDDEPS) ..in-docker-container: | $(CLEAN)
 
 .PHONY: pkg-prepare pkg-build pkg-build-%
 pkg-prepare:
