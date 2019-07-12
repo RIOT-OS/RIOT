@@ -1417,6 +1417,9 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                 }
                 break;
 #ifdef MODULE_NETSTATS_L2
+            case NETDEV_EVENT_TX_NOACK:
+                netif->stats.tx_retrans++;
+                break;
             case NETDEV_EVENT_TX_MEDIUM_BUSY:
                 /* we are the only ones supposed to touch this variable,
                  * so no acquire necessary */
