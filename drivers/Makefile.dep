@@ -22,6 +22,9 @@ endif
 
 ifneq (,$(filter at86rf%, $(filter-out at86rf215%, $(USEMODULE))))
   USEMODULE += at86rf2xx
+  ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+    USEMODULE += gnrc_netif_pktq
+  endif
 endif
 
 ifneq (,$(filter bme680_%,$(USEMODULE)))
