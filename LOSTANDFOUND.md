@@ -40,6 +40,15 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### boards/mips-malta [ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7]
+Author:
+- Neil Jones <neil.jones@imgtec.com>
+
+Reasons for removal:
+- UART input not supported.
+- Hardware not available for testing and not available for purchase either.
+- Not actively maintained / broken for some time.
+
 ### boards/pca10000 [9447cb303426d7c6348bb84999f88bf929cd6263]
 Author(s):
 - Christian Kühling <kuehling@zedat.fu-berlin.de>
