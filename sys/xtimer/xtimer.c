@@ -24,6 +24,7 @@
 
 #include "xtimer.h"
 #include "mutex.h"
+#include "rmutex.h"
 #include "thread.h"
 #include "irq.h"
 #include "div.h"
@@ -268,6 +269,20 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
     }
     xtimer_remove(&t);
     return -mt.dequeued;
+}
+
+int xtimer_rmutex_lock_timeout(rmutex_t *rmutex, uint64_t timeout)
+{
+    if (rmutex_trylock(rmutex)) {
+        return 0;
+    }
+    if (xtimer_mutex_lock_timeout(&rmutex->mutex, timeout) == 0) {
+        atomic_store_explicit(&rmutex->owner,
+                              thread_getpid(), memory_order_relaxed);
+        rmutex->refcount++;
+        return 0;
+    }
+    return -1;
 }
 
 #ifdef MODULE_CORE_THREAD_FLAGS
