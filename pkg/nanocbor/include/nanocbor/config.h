@@ -8,6 +8,8 @@
 
 /**
  * @defgroup    nanocbor_config NanoCBOR configuration header
+ * @ingroup     pkg_nanocbor
+ * @ingroup     config
  * @brief       Provides compile-time configuration for nanocbor
  */
 
