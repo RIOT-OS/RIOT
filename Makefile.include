@@ -148,6 +148,9 @@ include $(RIOTMAKE)/scan-build.inc.mk
 
 export RIOTBUILD_CONFIG_HEADER_C = $(BINDIR)/riotbuild/riotbuild.h
 
+# Include Kconfig functionalities
+include $(RIOTMAKE)/kconfig.mk
+
 ifeq ($(OS),Darwin)
   OPEN   := open
 else
