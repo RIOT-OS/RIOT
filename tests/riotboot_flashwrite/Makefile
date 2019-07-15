@@ -21,6 +21,10 @@ USEMODULE += nanocoap_sock
 # include this for printing IP addresses
 USEMODULE += shell_commands
 
+# include riotboot modules
+USEMODULE += riotboot_flashwrite
+FEATURES_REQUIRED += riotboot
+
 ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   $(info Using low-memory configuration for microcoap_server.)
   ## low-memory tuning values
@@ -29,9 +33,13 @@ ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   USEMODULE += prng_minstd
 endif
 
-# include riotboot modules
-USEMODULE += riotboot_flashwrite
-FEATURES_REQUIRED += riotboot
+# riotboot is currently incompatible with the NRF softdevice.
+# That gets automatically selected on boards that support it, unless nrfmin is
+# used.
+# So use that here in order to prevent the softdevice from being used.
+ifeq (nrf52dk,$(BOARD))
+  USEMODULE += nrfmin
+endif
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
