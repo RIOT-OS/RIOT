@@ -15,10 +15,10 @@ remove_tap() {
 }
 
 cleanup() {
-    echo "Cleaning up..."
+    trap "" INT QUIT TERM EXIT
+    echo "Cleaning up network..."
     remove_tap
     ip a d fd00:dead:beef::1/128 dev lo
-    trap "" INT QUIT TERM EXIT
 }
 
 start_uhcpd() {
@@ -44,6 +44,5 @@ if [ -z "$_USER" ]; then
 fi
 
 trap "cleanup" INT QUIT TERM EXIT
-
 
 create_tap && start_uhcpd
