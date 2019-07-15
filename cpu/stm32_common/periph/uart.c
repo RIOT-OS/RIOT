@@ -34,9 +34,9 @@
 #include "periph/gpio.h"
 #include "pm_layered.h"
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) \
-    || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) \
-    || defined(CPU_FAM_STM32F7)
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) || \
+    defined(CPU_FAM_STM32F7)
 #define ISR_REG     ISR
 #define ISR_TXE     USART_ISR_TXE
 #define ISR_TC      USART_ISR_TC
@@ -368,9 +368,9 @@ void uart_poweroff(uart_t uart)
 
 static inline void irq_handler(uart_t uart)
 {
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) \
-    || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) \
-    || defined(CPU_FAM_STM32F7)
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) || \
+    defined(CPU_FAM_STM32F7)
 
     uint32_t status = dev(uart)->ISR;
 
