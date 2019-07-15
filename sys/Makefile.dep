@@ -611,6 +611,10 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
     USEMODULE += netif
     USEMODULE += ipv6_addr
   endif
+
+  ifneq (,$(filter sht1x,$(USEMODULE)))
+    USEMODULE += auto_init_actuators_sensors_sht1x
+  endif
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))

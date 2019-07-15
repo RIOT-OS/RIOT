@@ -26,57 +26,40 @@
 #include <stdint.h>
 #include <periph/gpio.h>
 
+#include "sht1x_types.h"
+#include "sht1x_params.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#ifdef MODULE_AUTO_INIT_ACTUATORS_SENSORS_SHT1X
 /**
- * @brief Possible configuration (=status byte) values of the SHT10/11/15
+ * @brief   Array of all auto-initialized SHT1X device descriptors
  *
- * These values can be or'ed together to get the configuration.
+ * @note    Only available if module @ref sys_auto_init_actuators_sensors_sht1x
+ *          is used
  */
-typedef enum {
-    /** Use 8/12 bit resolution instead of 12/14 bit for temp/hum */
-    SHT1X_CONF_LOW_RESOLUTION   = 0x01,
-    /** Don't upload calibration data to register to safe 10 millisec */
-    SHT1X_CONF_SKIP_CALIBRATION = 0x02,
-    /** Waste 8mA at 5V to increase the sensor temperature up to 10°C */
-    SHT1X_CONF_ENABLE_HEATER    = 0x04,
-    /** Skip the CRC check (and reading the CRC byte) to safe time */
-    SHT1X_CONF_SKIP_CRC         = 0x08,
-} sht1x_conf_t;
+extern sht1x_dev_t sht1x_devs[SHT1X_NUMOF];
 
 /**
- * @brief Possible values for Vdd (measured temperature depends on it)
+ * @brief   If `sht1x` is auto-initialized, device descriptors can be retrieved by number
+ * @param   num     Number of the SHT1X device to retrieve the device descriptor of
+ * @return  The device descriptor of the device with number @p num
+ * @retval  `NULL`  @p num is out of range
+ *
+ * @note    Only available if module @ref sys_auto_init_actuators_sensors_sht1x
+ *          is used
  */
-typedef enum {
-    SHT1X_VDD_5_0V = 0,
-    SHT1X_VDD_4_0V = 1,
-    SHT1X_VDD_3_5V = 2,
-    SHT1X_VDD_3_0V = 3,
-    SHT1X_VDD_2_5V = 4,
-} sht1x_vdd_t;
+static inline sht1x_dev_t * sht1x_get_dev(unsigned num)
+{
+    if (num >= SHT1X_NUMOF) {
+        return NULL;
+    }
 
-/**
- * @brief SHT10/11/15 temperature humidity sensor
- */
-typedef struct {
-    gpio_t  clk;      /**< GPIO connected to the clock pin of the SHT1X */
-    gpio_t  data;     /**< GPIO connected to the data pin of the SHT1X */
-    int16_t temp_off; /**< Offset to add to the measured temperature */
-    int16_t hum_off;  /**< Offset to add to the measured humidity */
-    uint8_t conf;     /**< Status byte (containing configuration) of the SHT1X */
-    uint8_t vdd;      /**< Supply voltage of the SHT1X (as sht1x_vdd_t) */
-} sht1x_dev_t;
-
-/**
- * @brief Parameters required to set up the SHT10/11/15 device driver
- */
-typedef struct {
-    gpio_t      clk;  /**< GPIO connected to the clock pin of the SHT1X */
-    gpio_t      data; /**< GPIO connected to the data pin of the SHT1X */
-    sht1x_vdd_t vdd;  /**< The supply voltage of the SHT1X */
-} sht1x_params_t;
+    return &sht1x_devs[num];
+}
+#endif /* MODULE_AUTO_INIT_ACTUATORS_SENSORS_SHT1X */
 
 /**
  * @brief             Initialize the SHT10/11/15 sensor

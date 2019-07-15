@@ -27,23 +27,19 @@
 #include "sht1x.h"
 #include "sht1x_params.h"
 
-#define SHT1X_NUM     ARRAY_SIZE(sht1x_params)
-
-extern sht1x_dev_t sht1x_devs[SHT1X_NUM];
-
 static sht1x_dev_t *get_dev(int argc, char **argv)
 {
     switch (argc) {
     case 1:
-        return &sht1x_devs[0];
+        return sht1x_get_dev(0);
     case 2:
     {
-        int pos = atoi(argv[1]);
-        if ((pos < 0) || (pos >= (int)SHT1X_NUM)) {
-            printf("No SHT10/SHT11/SHT15 device with number %i\n", pos);
-            return NULL;
+        unsigned num = (unsigned)atoi(argv[1]);
+        sht1x_dev_t *dev = sht1x_get_dev(num);
+        if (!dev) {
+            printf("No SHT10/SHT11/SHT15 device with number %u\n", num);
         }
-        return &sht1x_devs[pos];
+        return dev;
     }
     default:
         break;
@@ -215,7 +211,7 @@ int _sht_config_handler(int argc, char **argv)
                 return -1;
             }
             dev_num = atoi(argv[i]);
-            if ((dev_num < 0) || (dev_num >= (int)SHT1X_NUM)) {
+            if ((dev_num < 0) || (dev_num >= (int)SHT1X_NUMOF)) {
                 printf("No SHT10/11/15 sensor with number %i\n", dev_num);
                 return -1;
             }
