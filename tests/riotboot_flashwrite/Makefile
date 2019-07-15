@@ -25,6 +25,30 @@ USEMODULE += shell_commands
 USEMODULE += riotboot_flashwrite
 FEATURES_REQUIRED += riotboot
 
+# Change this to 0 to not use ethos
+USE_ETHOS ?= 1
+
+ifeq (1,$(USE_ETHOS))
+  GNRC_NETIF_NUMOF := 2
+  USEMODULE += stdio_ethos
+  USEMODULE += gnrc_uhcpc
+  # ethos baudrate can be configured from make command
+  ETHOS_BAUDRATE ?= 115200
+  CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)
+
+ # make sure ethos and uhcpd are built
+  TERMDEPS += host-tools
+
+  # For local testing, run
+  #
+  #     $ cd dist/tools/ethos; sudo ./setup_network.sh riot0 2001:db8::0/64
+  #
+  #... in another shell and keep it running.
+  export TAP ?= riot0
+  TERMPROG = $(RIOTTOOLS)/ethos/ethos
+  TERMFLAGS = $(TAP) $(PORT)
+endif
+
 ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   $(info Using low-memory configuration for microcoap_server.)
   ## low-memory tuning values
@@ -49,3 +73,8 @@ include $(RIOTBASE)/Makefile.include
 
 # Set a custom channel if needed
 include $(RIOTMAKE)/default-radio-settings.inc.mk
+
+.PHONY: host-tools
+
+host-tools:
+	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)
