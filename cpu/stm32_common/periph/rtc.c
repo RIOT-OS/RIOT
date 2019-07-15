@@ -60,6 +60,11 @@
 #define EXTI_FTSR_BIT       (EXTI_FTSR1_FT18)
 #define EXTI_RTSR_BIT       (EXTI_RTSR1_RT18)
 #define EXTI_PR_BIT         (EXTI_PR1_PIF18)
+#elif defined(CPU_FAM_STM32WB)
+#define EXTI_IMR_BIT        (EXTI_IMR1_IM17)
+#define EXTI_FTSR_BIT       (EXTI_FTSR1_FT17)
+#define EXTI_RTSR_BIT       (EXTI_RTSR1_RT17)
+#define EXTI_PR_BIT         (EXTI_PR1_PIF17)
 #else
 #if defined(CPU_FAM_STM32L0)
 #define EXTI_IMR_BIT        (EXTI_IMR_IM17)

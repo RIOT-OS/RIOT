@@ -23,7 +23,8 @@
 #include "stmclk.h"
 #include "periph_conf.h"
 
-#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7)
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7) || \
+    defined(CPU_FAM_STM32WB)
 #define REG_PWR_CR          CR1
 #define BIT_CR_DBP          PWR_CR1_DBP
 #else
@@ -39,6 +40,12 @@
 #define REG_LSE             BDCR
 #define BIT_LSEON           RCC_BDCR_LSEON
 #define BIT_LSERDY          RCC_BDCR_LSERDY
+#endif
+
+#if defined (CPU_FAM_STM32WB)
+#define RCC_CFGR_SWS_HSI        RCC_CFGR_SWS_0
+#define RCC_CSR_LSION           RCC_CSR_LSI1ON
+#define RCC_CSR_LSIRDY          RCC_CSR_LSI1RDY
 #endif
 
 #ifndef CLOCK_HSE

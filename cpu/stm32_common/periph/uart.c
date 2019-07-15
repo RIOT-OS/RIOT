@@ -36,7 +36,7 @@
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32F7)
+    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32F7)
 #define ISR_REG     ISR
 #define ISR_TXE     USART_ISR_TXE
 #define ISR_TC      USART_ISR_TC
@@ -46,7 +46,6 @@
 #define ISR_TXE     USART_SR_TXE
 #define ISR_TC      USART_SR_TC
 #define TDR_REG     DR
-
 #endif
 
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE)
@@ -69,7 +68,8 @@ static inline USART_TypeDef *dev(uart_t uart)
 }
 
 static inline void uart_init_usart(uart_t uart, uint32_t baudrate);
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4)
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
+    defined(CPU_FAM_STM32WB)
 #ifdef MODULE_PERIPH_LPUART
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate);
 #endif
@@ -161,7 +161,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev(uart)->CR2 = 0;
     dev(uart)->CR3 = 0;
 
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4)
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
+    defined(CPU_FAM_STM32WB)
     switch (uart_config[uart].type) {
         case STM32_USART:
             uart_init_usart(uart, baudrate);
@@ -262,7 +263,8 @@ static inline void uart_init_usart(uart_t uart, uint32_t baudrate)
     dev(uart)->BRR = ((mantissa & 0x0fff) << 4) | (fraction & 0x0f);
 }
 
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4)
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
+    defined(CPU_FAM_STM32WB)
 #ifdef MODULE_PERIPH_LPUART
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 {
@@ -295,7 +297,7 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
     dev(uart)->BRR = brr;
 }
 #endif /* MODULE_PERIPH_LPUART */
-#endif /* STM32L0 || STM32L4 */
+#endif /* STM32L0 || STM32L4 || STM32WB */
 
 static inline void send_byte(uart_t uart, uint8_t byte)
 {
@@ -401,7 +403,7 @@ static inline void irq_handler(uart_t uart)
 {
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32F7)
+    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32WB)
 
     uint32_t status = dev(uart)->ISR;
 
