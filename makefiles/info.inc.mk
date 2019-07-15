@@ -45,6 +45,7 @@ info-build:
 	@echo ''
 	@echo 'ELFFILE: $(ELFFILE)'
 	@echo 'HEXFILE: $(HEXFILE)'
+	@echo 'BINFILE: $(BINFILE)'
 	@echo 'FLASHFILE: $(FLASHFILE)'
 	@echo ''
 	@echo 'FEATURES_USED:'
