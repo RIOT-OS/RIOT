@@ -29,4 +29,3 @@ E.g., use as follows:
 Keep that running, then in another shell start ethos:
 
     $ ethos riot0 <serial>
-
