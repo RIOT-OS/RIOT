@@ -142,7 +142,9 @@ void cpu_init(void)
     /* initialize the Cortex-M core */
     cortexm_init();
     /* enable PWR module */
+#ifndef CPU_FAM_STM32WB
     periph_clk_en(APB1, BIT_APB_PWREN);
+#endif
     /* initialize the system clock as configured in the periph_conf.h */
     stmclk_init_sysclk();
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \

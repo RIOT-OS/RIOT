@@ -5,7 +5,7 @@ RAM_START_ADDR ?= 0x20000000
 # The next block takes care of setting the rigth lengths of RAM and ROM
 # for the stm32 family. Most of the CPUs should have been taken into
 # account here, so no need to assign the lengths per model.
-STM32_INFO := $(shell printf '%s' '$(CPU_MODEL)' | tr 'a-z' 'A-Z' | sed -E -e 's/^STM32(F|L)(0|1|2|3|4|7)([A-Z0-9])([0-9])(.)(.)(_A)?/\1 \2 \2\3\4 \3 \4 \5 \6 \7/')
+STM32_INFO := $(shell printf '%s' '$(CPU_MODEL)' | tr 'a-z' 'A-Z' | sed -E -e 's/^STM32(F|L|W)(0|1|2|3|4|7|B)([A-Z0-9])([0-9])(.)(.)(_A)?/\1 \2 \2\3\4 \3 \4 \5 \6 \7/')
 STM32_TYPE     := $(word 1, $(STM32_INFO))
 STM32_FAMILY   := $(word 2, $(STM32_INFO))
 STM32_MODEL    := $(word 3, $(STM32_INFO))
@@ -249,6 +249,16 @@ else ifeq ($(STM32_TYPE), L)
       RAM_LEN = 640K
     endif
   endif
+else ifeq ($(STM32_TYPE), W)
+  ifeq ($(STM32_FAMILY), B)
+    ifeq ($(STM32_MODEL), B55)
+      ifeq ($(STM32_ROMSIZE), C)
+        RAM_LEN = 128K
+      else ifneq (, $(filter $(STM32_ROMSIZE), E G))
+        RAM_LEN = 256K
+      endif
+    endif
+  endif
 endif
 
 ifeq ($(RAM_LEN), )
@@ -306,7 +316,11 @@ else ifeq ($(STM32_PINCOUNT), N)
 else ifeq ($(STM32_PINCOUNT), Q)
   STM32_PINCOUNT = 132
 else ifeq ($(STM32_PINCOUNT), R)
-  STM32_PINCOUNT = 64
+  ifeq ($(STM32_TYPE), W)
+    STM32_PINCOUNT = 68
+  else
+    STM32_PINCOUNT = 64
+  endif
 else ifeq ($(STM32_PINCOUNT), T)
   STM32_PINCOUNT = 36
 else ifeq ($(STM32_PINCOUNT), U)

@@ -19,7 +19,6 @@ export INCLUDES += -I$(RIOTCPU)/stm32_common/include
 include $(RIOTCPU)/stm32_common/stm32_mem_lengths.mk
 KB := 1024
 LEN := $(shell echo $(ROM_LEN) | sed 's/K//')
-FLASHSIZE := $(shell echo $$(( $(LEN) * $(KB) )) )
 
 # Get CPU_LINE_ variable
 -include $(RIOTCPU)/$(CPU)/stm32_line.mk
