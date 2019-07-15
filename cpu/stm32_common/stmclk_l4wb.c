@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     cpu_stm32l4
+ * @ingroup     cpu_stm32_common
  * @{
  *
  * @file
@@ -19,12 +19,15 @@
  * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
+ * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
 
 #include "cpu.h"
 #include "stmclk.h"
 #include "periph_conf.h"
+
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
 
 /* make sure we have all needed information about the clock configuration */
 #ifndef CLOCK_HSE
@@ -35,6 +38,20 @@
 #endif
 #if !defined(CLOCK_PLL_M) || !defined(CLOCK_PLL_N) || !defined(CLOCK_PLL_R)
 #error "Please provide the PLL configuration in your board's periph_conf.h"
+#endif
+
+/* map CMSIS defines not present in stm32wb55xx.h */
+#if defined(CPU_FAM_STM32WB)
+#define RCC_PLLCFGR_PLLSRC_HSE      (RCC_PLLCFGR_PLLSRC_0 | RCC_PLLCFGR_PLLSRC_1)
+#define RCC_PLLCFGR_PLLSRC_MSI      (RCC_PLLCFGR_PLLSRC_0)
+#define RCC_CFGR_SW_MSI             (0x00000000U)
+#define RCC_CFGR_SW_HSI             (RCC_CFGR_SW_0)
+#define RCC_CFGR_SW_HSE             (RCC_CFGR_SW_1)
+#define RCC_CFGR_SW_PLL             (RCC_CFGR_SW_1 + RCC_CFGR_SW_0)
+#define RCC_CFGR_SWS_MSI            (0x00000000U)
+#define RCC_CFGR_SWS_HSI            (RCC_CFGR_SWS_0)
+#define RCC_CFGR_SWS_HSE            (RCC_CFGR_SWS_1)
+#define RCC_CFGR_SWS_PLL            (RCC_CFGR_SWS_1 + RCC_CFGR_SWS_0)
 #endif
 
 /**
@@ -61,6 +78,13 @@
 #endif
 #define PLL_N                       (CLOCK_PLL_N << RCC_PLLCFGR_PLLN_Pos)
 
+#if defined(CPU_FAM_STM32WB)
+#if (CLOCK_PLL_R < 1 || CLOCK_PLL_R > 8)
+#error "PLL configuration: PLL R value is invalid"
+#else
+#define PLL_R                       ((CLOCK_PLL_R - 1)<< RCC_PLLCFGR_PLLR_Pos)
+#endif
+#else
 #if (CLOCK_PLL_R == 2)
 #define PLL_R                       (0)
 #elif (CLOCK_PLL_R == 4)
@@ -72,24 +96,20 @@
 #else
 #error "PLL configuration: PLL R value is invalid"
 #endif
+#endif
 /** @} */
 
 /**
  * @name    Deduct the needed flash wait states from the core clock frequency
  * @{
  */
-#if (CLOCK_CORECLOCK <= 16000000)
-#define FLASH_WAITSTATES            FLASH_ACR_LATENCY_0WS
-#elif (CLOCK_CORECLOCK <= 32000000)
-#define FLASH_WAITSTATES            FLASH_ACR_LATENCY_1WS
-#elif (CLOCK_CORECLOCK <= 48000000)
-#define FLASH_WAITSTATES            FLASH_ACR_LATENCY_2WS
-#elif (CLOCK_CORECLOCK <= 64000000)
-#define FLASH_WAITSTATES            FLASH_ACR_LATENCY_3WS
+#if defined(CPU_FAM_STM32WB)
+#define FLASH_WAITSTATES        ((CLOCK_CORECLOCK - 1) / 18000000U)
 #else
-#define FLASH_WAITSTATES            FLASH_ACR_LATENCY_4WS
+#define FLASH_WAITSTATES        ((CLOCK_CORECLOCK - 1) / 16000000U)
 #endif
 /** @} */
+
 
 void stmclk_init_sysclk(void)
 {
@@ -105,6 +125,10 @@ void stmclk_init_sysclk(void)
      * configure the AHB and APB clock dividers as configure by the board */
     RCC->CFGR = (RCC_CFGR_SW_HSI | CLOCK_AHB_DIV |
                  CLOCK_APB1_DIV | CLOCK_APB2_DIV);
+#if defined(CPU_FAM_STM32WB)
+    /* Use HSE/2 for radios systems */
+    RCC->EXTCFGR = (RCC_EXTCFGR_RFCSS | CLOCK_EXTAHB_DIV);
+#endif
     while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI) {}
 
     /* we enable I+D cashes, pre-fetch, and we set the actual number of
@@ -114,7 +138,7 @@ void stmclk_init_sysclk(void)
 
     /* disable all active clocks except HSI -> resets the clk configuration
      * Note: on STM32L4x5 & STM32L4x6 this disables the following:
-             PLLSAI2, PLLSAI1, Main PLL (via PLLON),
+             PLLSAI1, PLLSAI2, Main PLL (via PLLON),
              Clock security system (via CSSON), MSI clock PLL (via MSIPLLEN),
              HSE crystal oscillator bypass (via HSEBYP), HSE,
              HSI16 automatic start from Stop (via HSIASFS),
@@ -133,7 +157,11 @@ void stmclk_init_sysclk(void)
 
 #if ((CLOCK_HSE == 0) || CLOCK_MSI_ENABLE)
     /* reset clock to MSI with 48MHz, disables all other clocks */
+#if defined(CPU_FAM_STM32WB)
+    RCC->CR |= (RCC_CR_MSIRANGE_11 | RCC_CR_MSION);
+#else
     RCC->CR |= (RCC_CR_MSIRANGE_11 | RCC_CR_MSION | RCC_CR_MSIRGSEL);
+#endif
     while (!(RCC->CR & RCC_CR_MSIRDY)) {}
     /* select the MSI clock for the 48MHz clock tree (USB, RNG) */
     RCC->CCIPR = (RCC_CCIPR_CLK48SEL_0 | RCC_CCIPR_CLK48SEL_1);
@@ -152,9 +180,10 @@ void stmclk_init_sysclk(void)
     while (!(RCC->CR & RCC_CR_PLLRDY)) {}
 
     /* now that the PLL is running, we use it as system clock */
-    RCC->CFGR |= (RCC_CFGR_SW_PLL);
+    RCC->CFGR |= RCC_CFGR_SW_PLL;
     while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
 
     stmclk_disable_hsi();
     irq_restore(is);
 }
+#endif
