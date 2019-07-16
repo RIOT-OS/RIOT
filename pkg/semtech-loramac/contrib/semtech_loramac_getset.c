@@ -64,7 +64,7 @@ void semtech_loramac_set_appskey(semtech_loramac_t *mac, const uint8_t *skey)
     mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_APP_SKEY;
-    memcpy(mibReq.Param.AppSKey, skey, LORAMAC_APPSKEY_LEN);
+    mibReq.Param.AppSKey = (uint8_t *) skey;
     LoRaMacMibSetRequestConfirm(&mibReq);
     mutex_unlock(&mac->lock);
 }
@@ -84,7 +84,7 @@ void semtech_loramac_set_nwkskey(semtech_loramac_t *mac, const uint8_t *skey)
     mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_NWK_SKEY;
-    memcpy(mibReq.Param.NwkSKey, skey, LORAMAC_NWKSKEY_LEN);
+    mibReq.Param.NwkSKey = (uint8_t *) skey;
     LoRaMacMibSetRequestConfirm(&mibReq);
     mutex_unlock(&mac->lock);
 }
