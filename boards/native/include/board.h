@@ -141,7 +141,7 @@ void native_motor_driver_qdec_simulation( \
     int32_t pwm_duty_cycle);
 
 /* C++ standard do not support designated initializers */
-#ifndef __cplusplus
+#if !(defined __cplusplus) && (defined MODULE_PERIPH_QDEC)
 
 /**
  * @name Describe DC motors with PWM channel and GPIOs
