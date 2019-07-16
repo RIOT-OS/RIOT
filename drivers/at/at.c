@@ -23,6 +23,14 @@
 #define AT_PRINT_INCOMING (0)
 #endif
 
+#ifdef MODULE_AT_URC
+static int _check_urc(clist_node_t *node, void *arg);
+#endif
+
+#ifndef MAX_LINE_LENGTH
+#define MAX_LINE_LENGTH     128
+#endif
+
 #if defined(MODULE_AT_URC_ISR_LOW)
 #define AT_EVENT_PRIO EVENT_PRIO_LOW
 #elif defined(MODULE_AT_URC_ISR_MEDIUM)
@@ -188,7 +196,7 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
 
 void at_drain(at_dev_t *dev)
 {
-    uint8_t _tmp[16];
+    uint8_t _tmp[MAX_LINE_LENGTH];
     int res;
 
 #if IS_USED(MODULE_AT_URC_ISR)
@@ -197,7 +205,15 @@ void at_drain(at_dev_t *dev)
 
     do {
         /* consider no character within 10ms "drained" */
+#ifdef MODULE_AT_URC
+        /* Check for URCs while draining isrpipe */
+        res = at_readline(dev, (char *)_tmp, sizeof(_tmp), true, 10000U);
+        if (res > 0 && _tmp[0] == '+') {
+            clist_foreach(&dev->urc_list, _check_urc, _tmp);
+        }
+#else
         res = isrpipe_read_timeout(&dev->isrpipe, _tmp, sizeof(_tmp), 10000U);
+#endif
     } while (res > 0);
 
 #if IS_USED(MODULE_AT_URC_ISR)
