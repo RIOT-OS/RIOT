@@ -37,8 +37,8 @@ extern "C" {
 /**
  * Maximum size of the whitelist.
  */
-#ifndef GNRC_IPV6_WHITELIST_SIZE
-#define GNRC_IPV6_WHITELIST_SIZE    (8)
+#ifndef CONFIG_GNRC_IPV6_WHITELIST_SIZE
+#define CONFIG_GNRC_IPV6_WHITELIST_SIZE    (8)
 #endif
 /** @} */
 
