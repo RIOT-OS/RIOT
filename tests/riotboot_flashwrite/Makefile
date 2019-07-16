@@ -1,8 +1,24 @@
 # If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
 
+include ../Makefile.tests_common
+
 # DEVELHELP ?= 0 to reduce firmware size
 DEVELHELP ?= 0
+
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
+                             arduino-mega2560 arduino-uno \
+                             chronos i-nucleo-lrwan1 \
+                             msb-430 msb-430h nucleo-f031k6 \
+                             nucleo-f042k6 nucleo-l031k6 nucleo-f030r8 \
+                             nucleo-f302r8 nucleo-f303k8 nucleo-f334r8 \
+                             nucleo-l053r8 saml10-xpro saml11-xpro \
+                             stm32f0discovery telosb waspmote-pro \
+                             wsn430-v1_3b wsn430-v1_4 z1
+
+# Use different settings when compiling for one of the following (low-memory)
+# boards
+LOW_MEMORY_BOARDS := nucleo-f334r8
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
@@ -74,7 +90,6 @@ TEST_EXTRA_FILES=$(SLOT_RIOT_ELFS)
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include
 
 # Set a custom channel if needed
