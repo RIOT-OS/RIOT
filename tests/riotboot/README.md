@@ -27,14 +27,14 @@ functionality:
 
 This will:
 
-1. flash bootloader and slot0 with APP_VER=0, invalidate slot1
-2. verify slot0 has been booted and has APP_VER set to 0
+1. flash bootloader and slot0, invalidate slot1
+2. get the running slot and current APP_VER
 
-3. flash slot1 with APP_VER set to 1
-4. verify slot1 has booted and shows APP_VER==1
+3. flash slot1 with APP_VER + 1
+4. verify slot1 has booted and shows version = APP_VER + 1
 
-5. flash slot0 with APP_VER set to 2
-6. verify slot0 has booted and shows APP_VER==2
+5. flash slot0 with APP_VER + 2
+4. verify slot0 has booted and shows version = APP_VER + 2
 
-If this test runs correctly, it shows that riotboot's basic functions and are
+If this test runs correctly, it shows that riotboot's basic functions are
 working properly on the target board.

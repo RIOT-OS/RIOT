@@ -13,13 +13,9 @@ BINDIR_APP = $(BINDIR)/$(APPLICATION)
 #
 export SLOT0_OFFSET SLOT0_LEN SLOT1_OFFSET SLOT1_LEN
 
-# Mandatory APP_VER, set to epoch by default, or "0" for CI build
-ifeq (1, RIOT_CI_BUILD)
-  APP_VER ?= 0
-else
-  EPOCH := $(shell date +%s)
-  APP_VER ?= $(EPOCH)
-endif
+# Mandatory APP_VER, set to epoch by default
+EPOCH := $(shell date +%s)
+APP_VER ?= $(EPOCH)
 
 # Final target for slot 0 with riot_hdr
 SLOT0_RIOT_BIN = $(BINDIR_APP)-slot0.$(APP_VER).riot.bin

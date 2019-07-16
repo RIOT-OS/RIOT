@@ -16,11 +16,6 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-# The test script assumes initially version "0" is flashed,
-# as done by the CI.
-# Thus default to that (instead of epoch set by makefiles/boot/riotboot.inc.mk).
-APP_VER?=0
-
 # Ensure both slot bin files are always generated and linked to avoid compiling
 # during the test. This ensures that "BUILD_IN_DOCKER=1 make test"
 # can rely on them being present without having to trigger re-compilation.
