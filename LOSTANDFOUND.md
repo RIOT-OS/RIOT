@@ -40,6 +40,13 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### cpu/mips32r2_generic [a2bcd7539ce1931b7aec0077ea71dadd62c96edd]
+Author:
+- Neil Jones <neil.jones@imgtec.com>
+
+- No boards use this CPU (the only one was mips-malta).
+- (Same reasons as mips-malta)
+
 ### boards/mips-malta [ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7]
 Author:
 - Neil Jones <neil.jones@imgtec.com>
