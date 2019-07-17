@@ -82,10 +82,10 @@ static inline void * _flashsector_addr(uint8_t sn)
     uint32_t addr = CPU_FLASH_BASE;
 #endif
     if (sn <= 4) {
-        addr += CPU_FLASH_BASE(FLASHSECTOR_SIZE_MIN * sn);
+        addr += (FLASHSECTOR_SIZE_MIN * sn);
     }
     else {
-        addr += CPU_FLASH_BASE(FLASHSECTOR_SIZE_MIN * (sn - 4));
+        addr += (FLASHSECTOR_SIZE_MIN * (sn - 4));
     }
     return (void *) addr;
 }
@@ -174,6 +174,7 @@ static void _erase_sector_page(void *page_addr)
     if(_flashsector_addr(sn) == page_addr) {
         DEBUG("[flashsector] erase: erasing sector: %d\n", sn);
         _erase_sector(sn);
+        return;
     }
     /* avoid erasing whole sector if "page" is blank */
     bool blank = true;
