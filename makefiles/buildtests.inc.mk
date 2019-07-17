@@ -2,9 +2,6 @@
 
 BUILDTEST_MAKE_REDIRECT ?= >/dev/null 2>&1
 
-ifeq ($(BUILD_IN_DOCKER),1)
-buildtest: ..in-docker-container
-else
 buildtest:
 	@ \
 	RESULT=true ; \
@@ -24,7 +21,6 @@ buildtest:
 		fi; \
 	done ; \
 	$${RESULT}
-endif # BUILD_IN_DOCKER
 
 # Define 'buildtest-indocker' completely executed inside the container.
 # It prevents starting one container per compilation wich is slower but it
