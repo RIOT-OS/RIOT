@@ -57,6 +57,7 @@ static kernel_pid_t _tftp_kernel_pid;
 
 #define TFTP_TIMEOUT_MSG            0x4000
 #define TFTP_STOP_SERVER_MSG        0x4001
+#define TFTP_MIN_PACKET_LEN         4
 #define TFTP_DEFAULT_DATA_SIZE      (GNRC_TFTP_MAX_TRANSFER_UNIT    \
                                      + sizeof(tftp_packet_data_t))
 
@@ -607,6 +608,11 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
     }
 
     gnrc_pktsnip_t *pkt = m->content.ptr;
+    if (pkt->size < TFTP_MIN_PACKET_LEN) {
+       DEBUG("tftp: packet is too short\n");
+       gnrc_pktbuf_release(outbuf);
+       return TS_FAILED;
+    }
 
     gnrc_pktsnip_t *tmp;
     tmp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UDP);
