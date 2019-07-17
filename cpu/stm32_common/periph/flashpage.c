@@ -336,9 +336,8 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     /* lock the flash module again */
     _lock();
 
-#if !(defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
-      defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F2) || \
-      defined(CPU_FAM_STM32F4))
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32F3)
     /* restore the HSI state */
     if (!hsi_state) {
         stmclk_disable_hsi();
