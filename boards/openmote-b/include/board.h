@@ -96,6 +96,8 @@
 #define CCA_BACKDOOR_ENABLE       (1)
 #define CCA_BACKDOOR_PORT_A_PIN   (6) /**< BSL_BOOT Pin */
 #define CCA_BACKDOOR_ACTIVE_LEVEL (0) /**< Active low */
+
+#define BOOT_PIN    GPIO_PIN(0, CCA_BACKDOOR_PORT_A_PIN) /**< BSL_BOOT Pin */
 /** @} */
 
 /**

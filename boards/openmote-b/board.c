@@ -29,6 +29,9 @@ void board_init(void)
     gpio_init(LED1_PIN, GPIO_OUT);
     gpio_init(LED2_PIN, GPIO_OUT);
     gpio_init(LED3_PIN, GPIO_OUT);
+    /* The boot pin must be set to input otherwise it may lock the bootloader */
+    gpio_init(BOOT_PIN, GPIO_IN);
+
     gpio_init(USER_BUTTON_PIN, GPIO_IN);
     gpio_init(RF_SWITCH_2_4_GHZ_PIN, GPIO_OUT);
     gpio_init(RF_SWITCH_SUB_GHZ_PIN, GPIO_OUT);
