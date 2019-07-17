@@ -27,6 +27,17 @@ def testfunc(child):
     child.expect("starting test: xtimer mutex lock timeout")
     child.expect("OK")
     child.expect_exact("> ")
+    child.sendline("mutex_timeout_long_locked_low")
+    child.expect("starting test: xtimer mutex lock timeout with thread")
+    child.expect("threads = 2")
+    child.expect("THREAD low prio: start")
+    child.expect("MAIN THREAD: calling xtimer_mutex_lock_timeout")
+    child.expect("OK")
+    child.expect("threads = 3")
+    child.expect("MAIN THREAD: waiting for created thread to end")
+    child.expect("THREAD low prio: exiting low")
+    child.expect("threads = 2")
+    child.expect_exact("> ")
 
 
 if __name__ == "__main__":
