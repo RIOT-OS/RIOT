@@ -23,9 +23,7 @@
 #include "fs/devfs.h"
 #include "random.h"
 
-#include "embUnit/embUnit.h"
-
-#include "tests-devfs.h"
+#include "embUnit.h"
 
 static int _mock_open(vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path);
 static ssize_t _mock_read(vfs_file_t *filp, void *dest, size_t nbytes);
@@ -169,7 +167,7 @@ static void test_devfs_hwrng(void)
     TEST_ASSERT(memcmp(zeroes, buf, sizeof(buf)));
 }
 
-Test *tests_devfs_tests(void)
+Test *tests_devfs(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_devfs_register),
@@ -183,13 +181,16 @@ Test *tests_devfs_tests(void)
     return (Test *)&devfs_tests;
 }
 
-void tests_devfs(void)
+int main(void)
 {
     extern void auto_init_devfs(void);
     auto_init_devfs();
 
     random_init(1);
 
-    TESTS_RUN(tests_devfs_tests());
+    TESTS_START();
+    TESTS_RUN(tests_devfs());
+    TESTS_END();
+    return 0;
 }
 /** @} */
