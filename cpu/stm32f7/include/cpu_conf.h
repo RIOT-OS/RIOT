@@ -43,7 +43,42 @@ extern "C" {
 #elif defined(CPU_LINE_STM32F722xx)
 #define CPU_IRQ_NUMOF                   (104U)
 #endif
+#define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
+
+/**
+ * @brief   Flash sector configuration
+ *
+ * @{
+ */
+#define FLASH_DUAL_BANK           (0)
+#if defined(CPU_LINE_STM32F746xx) || defined(CPU_LINE_STM32F722xx)
+#define FLASHSECTOR_SIZE_MIN      (16*1024U)
+#elif defined(CPU_LINE_STM32F767xx) || defined(CPU_LINE_STM32F769xx)
+#define FLASHSECTOR_SIZE_MIN      (32*1024UL)
+#endif
+
+/**
+ * @brief   Flash page configuration
+ *
+ *          NOTE: STM32F7 flash is organized in sectors, FLASHPAGE_* is
+ *                defined as a wrapper over sectors.
+ *
+ * @{
+ */
+/* To keep the same flashpage functionality an arbitrary 1K < FLASHSECTOR_SIZE_MIN
+ * (size of smaller sector) is defined
+ */
+#define FLASHPAGE_SIZE            (1024U)
+#define FLASHPAGE_NUMOF           (STM32_FLASHSIZE / FLASHPAGE_SIZE)
+/* The minimum block size which can be written is 4B. However, the erase
+ * depends on the specific sector.
+ */
+#define FLASHPAGE_RAW_BLOCKSIZE    (4U)
+/* Writing should be always 4 bytes aligned */
+#define FLASHPAGE_RAW_ALIGNMENT    (4U)
+/** @} */
+
 
 #ifdef __cplusplus
 }
