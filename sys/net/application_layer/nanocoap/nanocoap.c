@@ -176,6 +176,17 @@ uint8_t *coap_find_option(const coap_pkt_t *pkt, unsigned opt_num)
     return NULL;
 }
 
+/*
+ * Parse option attributes
+ *
+ * pkt[in]        coap_pkt_t for buffer
+ * pkt_pos[in]    first byte of option in buffer
+ * delta[out]     option delta from previous option
+ * opt_len[out]   length of option value
+ *
+ * return         next byte after option header, usually the option value
+ * return         NULL if initial pkt_pos is past options
+ */
 static uint8_t *_parse_option(const coap_pkt_t *pkt,
                               uint8_t *pkt_pos, uint16_t *delta, int *opt_len)
 {
@@ -436,6 +447,22 @@ void coap_pkt_init(coap_pkt_t *pkt, uint8_t *buf, size_t len, size_t header_len)
     pkt->payload_len = len - header_len;
 }
 
+/*
+ * Decodes a field value in an Option header, either option delta or length.
+ *
+ * val[in]               Value of a nybble of the first byte of the option
+ *                       header. Upper nybble is coded length of delta; lower
+ *                       nybble is coded length of value.
+ * pkt_pos_ptr[in,out]   in: commonly, first byte of the option's value;
+ *                       otherwise, first byte of extended delta/length header
+ *                       out: next byte after the value or extended header
+ * pkt_end[in]           next byte after all options
+ *
+ * return                field value
+ * return                -ENOSPC if decoded val would extend beyond packet end
+ * return                -EBADMSG if val is 0xF, suggesting the full byte is
+ *                                the 0xFF payload marker
+ */
 static int _decode_value(unsigned val, uint8_t **pkt_pos_ptr, uint8_t *pkt_end)
 {
     uint8_t *pkt_pos = *pkt_pos_ptr;
