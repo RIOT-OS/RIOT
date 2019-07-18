@@ -109,6 +109,16 @@
 #endif
 
 /**
+ * @def ARRAY_SIZE(a)
+ * @brief       Calculate the number of elements in a static array.
+ * @param[in]   a   Array to examine
+ * @returns     The number of elements in the array a.
+ */
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(a) (sizeof((a)) / sizeof((a)[0]))
+#endif
+
+/**
  * @def         ALIGN_OF(T)
  * @brief       Calculate the minimal alignment for type T.
  * @param[in]   T   Type to examine
