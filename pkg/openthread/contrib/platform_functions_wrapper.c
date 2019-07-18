@@ -81,7 +81,7 @@ uint8_t ot_exec_command(otInstance *ot_instance, const char* command, void *arg,
     uint8_t res = 0xFF;
     /* Check running thread */
     if (openthread_get_pid() == thread_getpid()) {
-        for (uint8_t i = 0; i < sizeof(otCommands) / sizeof(otCommands[0]); i++) {
+        for (uint8_t i = 0; i < ARRAY_SIZE(otCommands); i++) {
             if (strcmp(command, otCommands[i].name) == 0) {
                 res = (*otCommands[i].function)(ot_instance, arg, answer);
                 break;

@@ -30,6 +30,7 @@
 #define LUA_LIB
 
 #include "lprefix.h"
+#include "kernel_defines.h"
 
 #include "lua.h"
 #include "lauxlib.h"
@@ -239,7 +240,7 @@ LUAMOD_API int luaopen_package(lua_State *L)
     luaL_newlib(L, pk_funcs); /* create 'package' table */
 
     /* create 'searchers' table */
-    lua_createtable(L, sizeof(searchers) / sizeof(searchers[0]) - 1, 0);
+    lua_createtable(L, ARRAY_SIZE(searchers) - 1, 0);
     /* fill it with predefined searchers */
     for (i = 0; searchers[i] != NULL; i++) {
         lua_pushvalue(L, -2); /* set 'package' as upvalue for all searchers */

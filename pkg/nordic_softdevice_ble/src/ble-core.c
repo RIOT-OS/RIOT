@@ -149,7 +149,7 @@ ble_advertising_init(const char *name)
 
   advdata.name_type = BLE_ADVDATA_FULL_NAME;
   advdata.flags = flags;
-  advdata.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
+  advdata.uuids_complete.uuid_cnt = ARRAY_SIZE(adv_uuids);
   advdata.uuids_complete.p_uuids = adv_uuids;
 
   err_code = ble_advdata_set(&advdata, NULL);

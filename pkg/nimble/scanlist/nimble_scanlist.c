@@ -50,7 +50,7 @@ static nimble_scanlist_entry_t *_find(const ble_addr_t *addr)
 
 void nimble_scanlist_init(void)
 {
-    for (unsigned i = 0; i < (sizeof(_mem) / sizeof(_mem[0])); i++) {
+    for (unsigned i = 0; i < ARRAY_SIZE(_mem); i++) {
         clist_rpush(&_pool, &_mem[i].node);
     }
 }

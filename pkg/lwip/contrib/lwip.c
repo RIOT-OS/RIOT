@@ -48,15 +48,15 @@
 #endif
 
 #ifdef MODULE_AT86RF2XX     /* is mutual exclusive with above ifdef */
-#define LWIP_NETIF_NUMOF        (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
+#define LWIP_NETIF_NUMOF        ARRAY_SIZE(at86rf2xx_params)
 #endif
 
 #ifdef MODULE_MRF24J40     /* is mutual exclusive with above ifdef */
-#define LWIP_NETIF_NUMOF        (sizeof(mrf24j40_params) / sizeof(mrf24j40_params[0]))
+#define LWIP_NETIF_NUMOF        ARRAY_SIZE(mrf24j40_params)
 #endif
 
 #ifdef MODULE_SOCKET_ZEP   /* is mutual exclusive with above ifdef */
-#define LWIP_NETIF_NUMOF        (sizeof(socket_zep_params) / sizeof(socket_zep_params[0]))
+#define LWIP_NETIF_NUMOF        ARRAY_SIZE(socket_zep_params)
 #endif
 
 #ifdef LWIP_NETIF_NUMOF
