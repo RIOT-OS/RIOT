@@ -349,7 +349,7 @@ extern "C" {
 #endif
     };
 
-    #define PWM_NUMOF           (sizeof(pwm_conf) / sizeof(pwm_conf[0]))
+    #define PWM_NUMOF           ARRAY_SIZE(pwm_conf)
 #endif
 #endif /* PWM_NUMOF */
 /** @} */

@@ -28,11 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Internal macro to calculate *_NUMOF based on config.
- */
-#define PERIPH_NUMOF(config)    (sizeof(config) / sizeof(config[0]))
-
-/**
  * @name    Clock configuration
  * @{
  */
@@ -88,7 +83,7 @@ static const spi_dev_t spi_config[] = {
     }
 };
 
-#define SPI_NUMOF           PERIPH_NUMOF(spi_config)
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -111,7 +106,7 @@ static const timer_conf_t timer_config[] = {
     }
 };
 
-#define TIMER_NUMOF         PERIPH_NUMOF(timer_config)
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 #define TIMER_0_ISR         isr_timer1
 /** @} */
 
@@ -134,7 +129,7 @@ static const uart_conf_t uart_config[] = {
     }
 };
 
-#define UART_NUMOF          PERIPH_NUMOF(uart_config)
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 #define UART_0_ISR_RX       isr_usart0_rx
 /** @} */
 

@@ -46,7 +46,7 @@ static const dma_conf_t dma_config[] = {
 #define DMA_SHARED_ISR_1            isr_dma1_channel4_5_6_7
 #define DMA_SHARED_ISR_1_STREAMS    { 2, 3, 4 } /* Indexes 2, 3 and 4 of dma_config share the same isr */
 
-#define DMA_NUMOF           (sizeof(dma_config) / sizeof(dma_config[0]))
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
 #endif
 /** @} */
 
@@ -92,7 +92,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_0_ISR          (isr_usart1)
 #define UART_1_ISR          (isr_usart2)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -138,7 +138,7 @@ static const spi_conf_t spi_config[] = {
     },
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -161,7 +161,7 @@ static const i2c_conf_t i2c_config[] = {
 
 #define I2C_0_ISR           isr_i2c1
 
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 #ifdef __cplusplus

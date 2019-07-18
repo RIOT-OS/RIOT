@@ -64,7 +64,7 @@ static const spi_conf_t spi_config[] = {
         .simmask  = SIM_SCGC6_SPI1_MASK
     }
 };
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -92,7 +92,7 @@ static const adc_conf_t adc_config[] = {
     /* internal: DCDC divided battery level */
     [ 6] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 23, .avg = ADC_AVG_MAX },
 };
-#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /*
  * KW41Z ADC reference settings:
  * 0: VREFH external pin or VREF_OUT 1.2 V signal (if VREF module is enabled)

@@ -116,7 +116,7 @@ static PIC32_GPIO_T base_address[] = {
 
 static inline int check_valid_port(uint8_t port)
 {
-    return port < (sizeof(base_address)/sizeof(base_address[0]))
+    return port < ARRAY_SIZE(base_address)
         && base_address[port].gpio != NULL;
 }
 

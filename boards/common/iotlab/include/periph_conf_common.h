@@ -81,7 +81,7 @@ static const dma_conf_t dma_config[] = {
 #define DMA_0_ISR  isr_dma1_channel4
 #define DMA_1_ISR  isr_dma1_channel6
 
-#define DMA_NUMOF           (sizeof(dma_config) / sizeof(dma_config[0]))
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
 #endif
 /** @} */
 
@@ -109,7 +109,7 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_0_ISR         isr_tim2
 #define TIMER_1_ISR         isr_tim3
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -146,7 +146,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_0_ISR          (isr_usart1)
 #define UART_1_ISR          (isr_usart2)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -183,7 +183,7 @@ static const i2c_conf_t i2c_config[] = {
 
 #define I2C_0_ISR           isr_i2c1_ev
 
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**

@@ -51,7 +51,7 @@ static const tc32_conf_t timer_config[] = {
 /* Timer 0 configuration */
 #define TIMER_0_CHANNELS    2
 #define TIMER_0_ISR         isr_tc0
-#define TIMER_NUMOF         (sizeof(timer_config)/sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -74,7 +74,7 @@ static const uart_conf_t uart_config[] = {
 /* interrupt function name mapping */
 #define UART_0_ISR          isr_sercom2_2
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -96,7 +96,7 @@ static const spi_conf_t spi_config[] = {
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -115,7 +115,7 @@ static const i2c_conf_t i2c_config[] = {
     }
 };
 
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**
