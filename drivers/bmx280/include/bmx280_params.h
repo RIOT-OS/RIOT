@@ -69,7 +69,7 @@ static const bmx280_params_t bmx280_params[] =
 /**
  * @brief   The number of configured sensors
  */
-#define BMX280_NUMOF    (sizeof(bmx280_params) / sizeof(bmx280_params[0]))
+#define BMX280_NUMOF    ARRAY_SIZE(bmx280_params)
 
 /**
  * @brief   Configuration details of SAUL registry entries

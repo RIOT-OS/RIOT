@@ -50,7 +50,7 @@ static void update_ringbuffer(ltc4150_last_minute_data_t *data,
         data->last_rotate_sec += 10;
         data->charged += data->buf_charged[data->ring_pos];
         data->discharged += data->buf_discharged[data->ring_pos];
-        if (++data->ring_pos >= sizeof(data->buf_charged)/sizeof(data->buf_charged[0])) {
+        if (++data->ring_pos >= ARRAY_SIZE(data->buf_charged)) {
             data->ring_pos = 0;
         }
         data->charged -= data->buf_charged[data->ring_pos];

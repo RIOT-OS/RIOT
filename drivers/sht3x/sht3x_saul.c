@@ -22,7 +22,7 @@
 #include "sht3x.h"
 #include "sht3x_params.h"
 
-#define SHT3X_NUM      (sizeof(sht3x_params) / sizeof(sht3x_params[0]))
+#define SHT3X_NUM      ARRAY_SIZE(sht3x_params)
 extern sht3x_dev_t sht3x_devs[SHT3X_NUM];
 
 /**

@@ -39,7 +39,7 @@ static inline bool soft_spi_bus_is_valid(soft_spi_t bus)
 {
     unsigned int soft_spi_num = (unsigned int) bus;
 
-    if (sizeof(soft_spi_config) / sizeof(soft_spi_config[0]) < soft_spi_num) {
+    if (ARRAY_SIZE(soft_spi_config) < soft_spi_num) {
         return false;
     }
     return true;
