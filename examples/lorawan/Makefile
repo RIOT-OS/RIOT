@@ -34,4 +34,16 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# Default IotLab Config to run the test
+ifneq (,$(filter iotlab%,$(MAKECMDGOALS)))
+  IOTLAB_NODES ?= 1
+  IOTLAB_TYPE  ?= st-lrwan1:sx1276
+  IOTLAB_SITE  ?= saclay
+  include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
+endif
+
+ifneq (,$(filter test,$(MAKECMDGOALS)))
+  DEFAULT_MODULE += test_utils_interactive_sync
+endif
+
 include $(RIOTBASE)/Makefile.include
