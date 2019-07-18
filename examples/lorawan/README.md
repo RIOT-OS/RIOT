@@ -36,3 +36,22 @@ Finally, to join a LoRaWAN network using OTAA activation, edit the application
     DEVEUI ?= 0000000000000000
     APPEUI ?= 0000000000000000
     APPKEY ?= 00000000000000000000000000000000
+
+## Automatic test
+
+The automatic test replicates 11-lorawan release specs test:
+
+- [11-lorawan](https://github.com/RIOT-OS/Release-Specs/blob/ba236c4a1d1258ab63d21b0a860d0f5a5935bbd4/11-lorawan/11-lorawan.md)
+  - [Task #01 - LoRaWAN example](https://github.com/RIOT-OS/Release-Specs/blob/ba236c4a1d1258ab63d21b0a860d0f5a5935bbd4/11-lorawan/11-lorawan.md#task-01---lorawan-example)
+
+
+### Assumptions
+
+- The tests assumes that there is a gateway in all DR distance to the device and the
+device was flashed with the correct keys.
+
+### Usage
+
+On a board with a lora radio device run:
+
+    $ make BOARD=b-l072z-lrwan1 -C examples/lorawan test
