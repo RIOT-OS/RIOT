@@ -49,7 +49,7 @@ static const char *_link_params[] = {
 
 static gcoap_listener_t _listener = {
     &_resources[0],
-    sizeof(_resources) / sizeof(_resources[0]),
+    ARRAY_SIZE(_resources),
     _encode_link,
     NULL
 };
@@ -253,7 +253,7 @@ int gcoap_cli_cmd(int argc, char **argv)
 
     /* if not 'info', must be a method code */
     int code_pos = -1;
-    for (size_t i = 0; i < sizeof(method_codes) / sizeof(char*); i++) {
+    for (size_t i = 0; i < ARRAY_SIZE(method_codes); i++) {
         if (strcmp(argv[1], method_codes[i]) == 0) {
             code_pos = i;
         }

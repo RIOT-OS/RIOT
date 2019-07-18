@@ -265,7 +265,7 @@ int main(void)
          "information.");
 
     /* the main thread needs a msg queue to be able to run `ping6`*/
-    msg_init_queue(queue, (sizeof(queue) / sizeof(msg_t)));
+    msg_init_queue(queue, ARRAY_SIZE(queue));
 
     /* initialize our subscription buffers */
     memset(subscriptions, 0, (NUMOFSUBS * sizeof(emcute_sub_t)));

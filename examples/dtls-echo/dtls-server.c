@@ -210,7 +210,7 @@ static int _peer_get_psk_info_handler(struct dtls_context_t *ctx, const session_
 
     if (id) {
         uint8_t i;
-        for (i = 0; i < sizeof(psk) / sizeof(struct keymap_t); i++) {
+        for (i = 0; i < ARRAY_SIZE(psk); i++) {
             if (id_len == psk[i].id_length && memcmp(id, psk[i].id, id_len) == 0) {
                 if (result_length < psk[i].key_length) {
                     dtls_warn("buffer too small for PSK");

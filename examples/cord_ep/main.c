@@ -83,7 +83,7 @@ static const coap_resource_t _resources[] = {
 
 static gcoap_listener_t _listener = {
     .resources     = (coap_resource_t *)&_resources[0],
-    .resources_len = sizeof(_resources) / sizeof(_resources[0]),
+    .resources_len = ARRAY_SIZE(_resources),
     .next          = NULL
 };
 
