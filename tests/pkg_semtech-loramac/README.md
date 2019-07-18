@@ -206,3 +206,33 @@ The node will also print the data received:
 
     > loramac tx test
     Data received: This is RIOT!
+
+## Automatic test
+
+The automatic test replicates 11-lorawan release specs tests:
+
+- [11-lorawan](https://github.com/RIOT-OS/Release-Specs/blob/ba236c4a1d1258ab63d21b0a860d0f5a5935bbd4/11-lorawan/11-lorawan.md)
+  - [Task #02 - OTAA join procedure](https://github.com/RIOT-OS/Release-Specs/blob/ba236c4a1d1258ab63d21b0a860d0f5a5935bbd4/11-lorawan/11-lorawan.md#task-02---otaa-join-procedure)
+  - [Task #03 - ABP join procedure](https://github.com/RIOT-OS/Release-Specs/blob/ba236c4a1d1258ab63d21b0a860d0f5a5935bbd4/11-lorawan/11-lorawan.md#task-03---abp-join-procedure)
+  - [Task #04 - LoRaWAN device parameters persistence](https://github.com/RIOT-OS/Release-Specs/blob/ba236c4a1d1258ab63d21b0a860d0f5a5935bbd4/11-lorawan/11-lorawan.md#task-03---lorawan-device-parameters-persistence)
+
+
+### Assumptions
+
+- The tests assumes that there is a gateway in all DR distance to the device and
+that the correct keys are provided. DEVEUI and APPEUI must be the same for OTAA
+and ABP.
+
+- The DR duty cycling time-offs values are for EU863-870
+
+- The frame counters must be reset on the LoRaWAN backend at the beginning of the
+test since the eeprom is erased at the beginning of the test.
+
+- Requires eeprom support or ABP test will fail because it wont have the right frame
+counter saved.
+
+### Usage
+
+On a board with a lora radio device run:
+
+    $ DEVEUI=<...> APPEUI=<...> APPKEY=<...> DEVADDR=<...> NWKSKEY=<...> APPSKEY=<...> RX2_DR= <...> make BOARD=b-l072z-lrwan1 -C tests/pkg_semtech-loramac test
