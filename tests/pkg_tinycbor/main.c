@@ -71,7 +71,7 @@ const char *tests[] = {
 static void test_parse(void)
 {
     static size_t idx;
-    for (idx = 0; idx < sizeof(tests) / sizeof(char*); idx++) {
+    for (idx = 0; idx < ARRAY_SIZE(tests); idx++) {
         CborParser parser;
         CborValue it;
         unsigned char buf[64] = {0};

@@ -77,4 +77,4 @@ const coap_resource_t coap_resources[] = {
     { "/value", COAP_GET | COAP_PUT | COAP_POST, _value_handler, NULL },
 };
 
-const unsigned coap_resources_numof = sizeof(coap_resources) / sizeof(coap_resources[0]);
+const unsigned coap_resources_numof = ARRAY_SIZE(coap_resources);

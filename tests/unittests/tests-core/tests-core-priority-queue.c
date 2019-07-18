@@ -21,7 +21,7 @@ static priority_queue_node_t qe[Q_LEN];
 static void set_up(void)
 {
     priority_queue_init(&q);
-    for (unsigned i = 0; i < sizeof(qe)/sizeof(priority_queue_node_t); ++i) {
+    for (unsigned i = 0; i < ARRAY_SIZE(qe); ++i) {
         priority_queue_node_init(&(qe[i]));
     }
 }

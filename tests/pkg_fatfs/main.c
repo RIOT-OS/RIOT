@@ -57,14 +57,14 @@ mtd_dev_t *fatfs_mtd_devs[1];
 #elif MODULE_MTD_SDCARD
 #include "mtd_sdcard.h"
 #include "sdcard_spi_params.h"
-#define SDCARD_SPI_NUM (sizeof(sdcard_spi_params) / sizeof(sdcard_spi_params[0]))
+#define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
 /* sdcard devs are provided by sys/auto_init/storage/auto_init_sdcard_spi.c */
 extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
 mtd_sdcard_t mtd_sdcard_devs[SDCARD_SPI_NUM];
 mtd_dev_t *fatfs_mtd_devs[SDCARD_SPI_NUM];
 #endif
 
-#define MTD_NUM (sizeof(fatfs_mtd_devs) / sizeof(fatfs_mtd_devs[0]))
+#define MTD_NUM ARRAY_SIZE(fatfs_mtd_devs)
 
 static int _mount(int argc, char **argv)
 {

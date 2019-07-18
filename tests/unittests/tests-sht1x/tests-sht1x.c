@@ -62,11 +62,11 @@ static void test_sht1x_conversion(void)
     const uint16_t max_raw_hums[] = { 0xff, 0xfff };
     sht1x_dev_t dev = { .conf = 0 };
 
-    for (size_t i_res = 0; i_res < sizeof(confs) / sizeof(confs[0]); i_res++) {
+    for (size_t i_res = 0; i_res < ARRAY_SIZE(confs); i_res++) {
         dev.conf = confs[i_res];
         uint16_t max_raw_temp = max_raw_temps[i_res];
         uint16_t max_raw_hum = max_raw_hums[i_res];
-        for (size_t i_vdd = 0; i_vdd < sizeof(vdds) / sizeof(vdds[0]); i_vdd++) {
+        for (size_t i_vdd = 0; i_vdd < ARRAY_SIZE(vdds); i_vdd++) {
             dev.vdd = vdds[i_vdd];
             for (uint16_t raw_temp = 0; raw_temp <= max_raw_temp; raw_temp++) {
                 int16_t got_temp = sht1x_temperature(&dev, raw_temp);
