@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define LPSXXX_NUM      (sizeof(lpsxxx_params) / sizeof(lpsxxx_params[0]))
+#define LPSXXX_NUM      ARRAY_SIZE(lpsxxx_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -45,7 +45,7 @@ static saul_reg_t saul_entries[LPSXXX_NUM * 2];
 /**
  * @brief   Define the number of saul info
  */
-#define LPSXXX_INFO_NUM    (sizeof(lpsxxx_saul_info) / sizeof(lpsxxx_saul_info[0]))
+#define LPSXXX_INFO_NUM    ARRAY_SIZE(lpsxxx_saul_info)
 
 /**
  * @brief   Reference the driver struct

@@ -25,7 +25,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define CCS811_NUM      (sizeof(ccs811_params) / sizeof(ccs811_params[0]))
+#define CCS811_NUM      ARRAY_SIZE(ccs811_params)
 
 /**
  * @brief   Allocation of memory for device descriptors
@@ -40,7 +40,7 @@ static saul_reg_t saul_entries[CCS811_NUM * 2];
 /**
  * @brief   Define the number of saul info
  */
-#define CCS811_INFO_NUM (sizeof(ccs811_saul_info) / sizeof(ccs811_saul_info[0]))
+#define CCS811_INFO_NUM ARRAY_SIZE(ccs811_saul_info)
 
 /**
  * @name    Reference the driver structs.

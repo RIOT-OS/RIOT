@@ -20,7 +20,7 @@
 #include "can/device.h"
 #include "can_params.h"
 
-#define CANDEV_NUMOF ((sizeof(candev_params) / sizeof(candev_params[0])))
+#define CANDEV_NUMOF (ARRAY_SIZE(candev_params))
 
 #ifndef CANDEV_STACKSIZE
 #define CANDEV_STACKSIZE (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)

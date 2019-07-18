@@ -26,7 +26,7 @@ extern "C" {
 
 #include "arduino.hpp"
 
-#define ANALOG_PIN_NUMOF     (sizeof(arduino_analog_map) / sizeof(arduino_analog_map[0]))
+#define ANALOG_PIN_NUMOF     (ARRAY_SIZE(arduino_analog_map))
 
 void pinMode(int pin, int mode)
 {

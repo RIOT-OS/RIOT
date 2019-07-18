@@ -31,7 +31,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define MMA8X5X_NUM     (sizeof(mma8x5x_params) / sizeof(mma8x5x_params[0]))
+#define MMA8X5X_NUM     ARRAY_SIZE(mma8x5x_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -46,7 +46,7 @@ static saul_reg_t saul_entries[MMA8X5X_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define MMA8X5X_INFO_NUM    (sizeof(mma8x5x_saul_info) / sizeof(mma8x5x_saul_info[0]))
+#define MMA8X5X_INFO_NUM    ARRAY_SIZE(mma8x5x_saul_info)
 
 /**
  * @brief   Reference the driver struct

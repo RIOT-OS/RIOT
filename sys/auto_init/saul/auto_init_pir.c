@@ -28,7 +28,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define PIR_NUM    (sizeof(pir_params)/sizeof(pir_params[0]))
+#define PIR_NUM    ARRAY_SIZE(pir_params)
 
 /**
  * @brief   Allocate memory for the device descriptors

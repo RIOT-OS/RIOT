@@ -31,7 +31,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define TMP006_NUM     (sizeof(tmp006_params) / sizeof(tmp006_params[0]))
+#define TMP006_NUM     ARRAY_SIZE(tmp006_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -46,7 +46,7 @@ static saul_reg_t saul_entries[TMP006_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define TMP006_INFO_NUM    (sizeof(tmp006_saul_info) / sizeof(tmp006_saul_info[0]))
+#define TMP006_INFO_NUM    ARRAY_SIZE(tmp006_saul_info)
 
 /**
  * @brief   Reference the driver struct

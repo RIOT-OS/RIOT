@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define TSL2561_NUMOF    (sizeof(tsl2561_params) / sizeof(tsl2561_params[0]))
+#define TSL2561_NUMOF    ARRAY_SIZE(tsl2561_params)
 
 /**
  * @brief   Allocation of memory for device descriptors
@@ -44,7 +44,7 @@ static saul_reg_t saul_entries[TSL2561_NUMOF];
 /**
  * @brief   Define the number of saul info
  */
-#define TSL2561_INFO_NUMOF    (sizeof(tsl2561_saul_info) / sizeof(tsl2561_saul_info[0]))
+#define TSL2561_INFO_NUMOF    ARRAY_SIZE(tsl2561_saul_info)
 
 /**
  * @brief   Reference the driver structs.

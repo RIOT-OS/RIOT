@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define DS75LX_NUM      (sizeof(ds75lx_params) / sizeof(ds75lx_params[0]))
+#define DS75LX_NUM      ARRAY_SIZE(ds75lx_params)
 
 /**
  * @brief   Allocation of memory for device descriptors
@@ -44,7 +44,7 @@ static saul_reg_t saul_entries[DS75LX_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define DS75LX_INFO_NUM (sizeof(ds75lx_saul_info) / sizeof(ds75lx_saul_info[0]))
+#define DS75LX_INFO_NUM ARRAY_SIZE(ds75lx_saul_info)
 
 /**
  * @name    Reference the driver structs.

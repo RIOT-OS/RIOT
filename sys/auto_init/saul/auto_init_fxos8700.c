@@ -28,7 +28,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define FXOS8700_NUM    (sizeof(fxos8700_params)/sizeof(fxos8700_params[0]))
+#define FXOS8700_NUM    ARRAY_SIZE(fxos8700_params)
 
 /**
  * @brief   Allocate memory for the device descriptors

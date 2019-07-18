@@ -30,7 +30,7 @@
 /**
  * @brief   Calculate the number of configured SX127x devices
  */
-#define SX127X_NUMOF        (sizeof(sx127x_params) / sizeof(sx127x_params_t))
+#define SX127X_NUMOF        ARRAY_SIZE(sx127x_params)
 
 /**
  * @brief   Define stack parameters for the MAC layer thread

@@ -62,7 +62,7 @@ const coap_resource_t _default_resources[] = {
 
 static gcoap_listener_t _default_listener = {
     &_default_resources[0],
-    sizeof(_default_resources) / sizeof(_default_resources[0]),
+    ARRAY_SIZE(_default_resources),
     NULL,
     NULL
 };

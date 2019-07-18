@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define PULSE_COUNTER_NUM    (sizeof(pulse_counter_params) / sizeof(pulse_counter_params[0]))
+#define PULSE_COUNTER_NUM    ARRAY_SIZE(pulse_counter_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -44,7 +44,7 @@ static saul_reg_t saul_entries[PULSE_COUNTER_NUM];
 /**
  * @brief   Define the number of configured sensors
  */
-#define PULSE_COUNTER_INFO_NUM    (sizeof(pulse_counter_saul_info) / sizeof(pulse_counter_saul_info[0]))
+#define PULSE_COUNTER_INFO_NUM    ARRAY_SIZE(pulse_counter_saul_info)
 
 /**
  * @brief   Reference the driver struct

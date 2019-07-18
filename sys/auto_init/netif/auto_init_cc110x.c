@@ -38,7 +38,7 @@
 #define CC110X_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
 
-#define CC110X_NUM (sizeof(cc110x_params)/sizeof(cc110x_params[0]))
+#define CC110X_NUM ARRAY_SIZE(cc110x_params)
 
 static netdev_cc110x_t cc110x_devs[CC110X_NUM];
 static char _stacks[CC110X_NUM][CC110X_MAC_STACKSIZE];

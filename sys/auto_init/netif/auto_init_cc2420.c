@@ -42,7 +42,7 @@
 /**
  * @brief   Get the number of configured CC2420 devices
  */
-#define CC2420_NUMOF        (sizeof(cc2420_params) / sizeof(cc2420_params[0]))
+#define CC2420_NUMOF        ARRAY_SIZE(cc2420_params)
 
 /**
  * @brief   Allocate memory for dev descriptors, stacks, and 802.15.4 adaption

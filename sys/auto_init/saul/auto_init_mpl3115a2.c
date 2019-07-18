@@ -31,7 +31,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define MPL3115A2_NUM     (sizeof(mpl3115a2_params) / sizeof(mpl3115a2_params[0]))
+#define MPL3115A2_NUM     ARRAY_SIZE(mpl3115a2_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -46,7 +46,7 @@ static saul_reg_t saul_entries[MPL3115A2_NUM * 2];
 /**
  * @brief   Define the number of saul info
  */
-#define MPL3115A2_INFO_NUM    (sizeof(mpl3115a2_saul_info) / sizeof(mpl3115a2_saul_info[0]))
+#define MPL3115A2_INFO_NUM    ARRAY_SIZE(mpl3115a2_saul_info)
 
 /**
  * @name    Reference the driver struct

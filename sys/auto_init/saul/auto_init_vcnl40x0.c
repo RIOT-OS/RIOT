@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define VCNL40X0_NUMOF    (sizeof(vcnl40x0_params) / sizeof(vcnl40x0_params[0]))
+#define VCNL40X0_NUMOF    ARRAY_SIZE(vcnl40x0_params)
 
 /**
  * @brief   Allocation of memory for device descriptors
