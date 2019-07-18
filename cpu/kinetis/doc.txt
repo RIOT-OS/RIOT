@@ -22,7 +22,7 @@
         { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  1), .chan = 15 }, // PTC1
         { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  2), .chan =  4 }, // PTC2
     };
-    #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
+    #define ADC_NUMOF           ARRAYSIZE(adc_config)
 
 
 @defgroup    cpu_kinetis_cpuid Kinetis CPUID
@@ -59,7 +59,7 @@ No configuration is necessary.
             .sda_pcr = (PORT_PCR_MUX(2) | PORT_PCR_ODE_MASK),
         },
     };
-    #define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+    #define I2C_NUMOF           ARRAYSIZE(i2c_config)
     #define I2C_0_ISR           (isr_i2c0)
 
 
@@ -195,7 +195,7 @@ because of the additional overhead of calling gpio_set/clear at every transfer.
             .simmask  = SIM_SCGC6_SPI1_MASK
         }
     };
-    #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+    #define SPI_NUMOF           ARRAYSIZE(spi_config)
 
 
 @defgroup    cpu_kinetis_timer Kinetis Timer
@@ -281,6 +281,6 @@ available.
             .mode   = UART_MODE_8N1,
         },
     };
-    #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+    #define UART_NUMOF          ARRAYSIZE(uart_config)
 
 */

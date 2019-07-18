@@ -113,7 +113,7 @@ static const struct station_config station_cfg = {
  */
 static const struct softap_config softap_cfg = {
         .ssid = ESP_WIFI_SSID,
-        .ssid_len = sizeof(ESP_WIFI_SSID) / sizeof(ESP_WIFI_SSID[0]),
+        .ssid_len = ARRAY_SIZE(ESP_WIFI_SSID),
         .ssid_hidden = 1,               /* don't make the AP visible */
         .password = ESP_WIFI_PASS,
         .authmode = AUTH_WPA2_PSK,

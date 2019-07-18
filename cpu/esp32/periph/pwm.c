@@ -100,7 +100,7 @@ static const struct _pwm_hw_t _pwm_hw[] =
         .mod = PERIPH_PWM0_MODULE,
         .int_src = ETS_PWM0_INTR_SOURCE,
         .signal_group = PWM0_OUT0A_IDX,
-        .gpio_num = sizeof(pwm0_channels) / sizeof(pwm0_channels[0]),
+        .gpio_num = ARRAY_SIZE(pwm0_channels),
         .gpios = pwm0_channels,
     },
     #endif
@@ -110,7 +110,7 @@ static const struct _pwm_hw_t _pwm_hw[] =
         .mod = PERIPH_PWM1_MODULE,
         .int_src = ETS_PWM1_INTR_SOURCE,
         .signal_group = PWM1_OUT0A_IDX,
-        .gpio_num = sizeof(pwm1_channels) / sizeof(pwm1_channels[0]),
+        .gpio_num = ARRAY_SIZE(pwm1_channels),
         .gpios = pwm1_channels,
     },
     #endif
