@@ -1,4 +1,4 @@
-USEPKG += cn-cbor
+USEPKG += nanocbor
 
 USEMODULE += libcose_crypt
 
