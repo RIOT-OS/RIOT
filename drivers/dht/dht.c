@@ -93,7 +93,7 @@ int dht_init(dht_t *dev, const dht_params_t *params)
 
     /* check parameters and configuration */
     assert(dev && params &&
-           ((dev->type == DHT11) || (dev->type == DHT22) || (dev->type == DHT21)));
+           ((params->type == DHT11) || (params->type == DHT22) || (params->type == DHT21)));
 
     *dev = *params;
 
