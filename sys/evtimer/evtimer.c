@@ -31,64 +31,63 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/* XXX this function is intentionally non-static, since the optimizer can't
- * handle the pointer hack in this function */
-void evtimer_add_event_to_list(evtimer_t *evtimer, evtimer_event_t *event)
+static void _add_event_to_list(evtimer_t *evtimer, evtimer_event_t *event)
 {
     DEBUG("evtimer: new event offset %" PRIu32 " ms\n", event->offset);
-    /* we want list->next to point to the first list element. thus we take the
-     * *address* of evtimer->events, then cast it from (evtimer_event_t **) to
-     * (evtimer_event_t*). After that, list->next actually equals
-     * evtimer->events. */
-    evtimer_event_t *list = (evtimer_event_t *)&evtimer->events;
+    evtimer_event_t **list = &evtimer->events;
 
-    while (list->next) {
-        evtimer_event_t *list_entry = list->next;
+    while (*list) {
         /* Stop when new event time is nearer then next */
-        if (event->offset < list_entry->offset) {
+        if (event->offset < (*list)->offset) {
             DEBUG("evtimer: next %" PRIu32 " < %" PRIu32 " ms\n",
-                  event->offset, list_entry->offset);
+                  event->offset, (*list)->offset);
             break;
         }
         /* Set event offset relative to previous event */
-        event->offset -= list_entry->offset;
-        list = list->next;
+        event->offset -= (*list)->offset;
+        list = &(*list)->next;
     }
 
     DEBUG("evtimer: new event relativ offset %" PRIu32 " ms\n", event->offset);
 
     /* Set found next bigger event after new event */
-    event->next = list->next;
-    if (list->next) {
+    event->next = *list;
+    if (*list) {
         /* Set offset following event relative to new event */
-        evtimer_event_t *next_entry = list->next;
         DEBUG("evtimer: recalculate offset for %" PRIu32 " ms\n",
-              next_entry->offset);
+              (*list)->offset);
 
-        next_entry->offset -= event->offset;
+        (*list)->offset -= event->offset;
 
         DEBUG("evtimer: resulting new event offset %" PRIu32 " ms\n",
-              next_entry->offset);
+              (*list)->offset);
     }
 
-    list->next = event;
+    *list = event;
 }
 
 static void _del_event_from_list(evtimer_t *evtimer, evtimer_event_t *event)
 {
-    evtimer_event_t *list = (evtimer_event_t *) &evtimer->events;
+    evtimer_event_t **list = &evtimer->events;
 
-    while (list->next) {
-        evtimer_event_t *list_entry = list->next;
-        if (list_entry == event) {
-            list->next = event->next;
-            if (list->next) {
-                list_entry = list->next;
-                list_entry->offset += event->offset;
-            }
+    /* Find the entry to delete from the list */
+    while (*list) {
+        if (*list == event) {
             break;
         }
-        list = list->next;
+        list = &(*list)->next;
+    }
+
+    if (*list) {
+        /* This is the entry we want to remove */
+        *list = (*list)->next;
+        /* If the deleted entry was _not_ the last one
+         * then update 'offset' of the entry that
+         * followed.
+         */
+        if (*list) {
+            (*list)->offset += event->offset;
+        }
     }
 }
 
@@ -145,7 +144,7 @@ void evtimer_add(evtimer_t *evtimer, evtimer_event_t *event)
     DEBUG("evtimer_add(): adding event with offset %" PRIu32 "\n", event->offset);
 
     _update_head_offset(evtimer);
-    evtimer_add_event_to_list(evtimer, event);
+    _add_event_to_list(evtimer, event);
     if (evtimer->events == event) {
         _set_timer(&evtimer->timer, event->offset);
     }
@@ -210,10 +209,11 @@ void evtimer_init(evtimer_t *evtimer, evtimer_callback_t handler)
 void evtimer_print(const evtimer_t *evtimer)
 {
     evtimer_event_t *list = evtimer->events;
+    int nr = 0;
 
-    while (list->next) {
-        evtimer_event_t *list_entry = list->next;
-        printf("ev offset=%u\n", (unsigned)list_entry->offset);
+    while (list) {
+        nr++;
+        printf("ev #%d offset=%u\n", nr, (unsigned)list->offset);
         list = list->next;
     }
 }
