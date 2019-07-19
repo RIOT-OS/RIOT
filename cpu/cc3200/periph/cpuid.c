@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_cc3200
+ * @ingroup     cc3200
  * @{
  *
  * @file

@@ -28,12 +28,12 @@
  */
 void pm_set_lowest(void)
 {
-    /* FIXME: this will hibernate with no way to wake up for now */
+    /* this will hibernate with no way to wake up for now */
 
     /* write to the hibernate register */
     HWREG(HIB3P3_BASE + HIB3P3_O_MEM_HIB_REQ) = 0x1;
 
     /* wait for 200 uSec */
-    USEC_DELAY(PRCM_OP_USEC_DELAY);
+    ROM_UtilsDelay(PRCM_OP_DELAY);
 }
 #endif

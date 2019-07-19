@@ -34,25 +34,25 @@ extern "C" {
  * @brief Timer interrupts
  * @{
  */
-#define TIMER_TIMB_DMA 0x00002000     /**< TimerB DMA Done interrupt */
-#define TIMER_TIMB_MATCH 0x00000800   /**< TimerB match interrupt */
-#define TIMER_CAPB_EVENT 0x00000400   /**< CaptureB event interrupt */
-#define TIMER_CAPB_MATCH 0x00000200   /**< CaptureB match interrupt */
-#define TIMER_TIMB_TIMEOUT 0x00000100 /**< TimerB time out interrupt */
-#define TIMER_TIMA_DMA 0x00000020     /**< TimerA DMA Done interrupt */
-#define TIMER_TIMA_MATCH 0x00000010   /**< TimerA match interrupt */
-#define TIMER_CAPA_EVENT 0x00000004   /**< CaptureA event interrupt */
-#define TIMER_CAPA_MATCH 0x00000002   /**< CaptureA match interrupt */
-#define TIMER_TIMA_TIMEOUT 0x00000001 /**< TimerA time out interrupt */
+#define TIMER_TIMB_DMA 0x00002000       /**< TimerB DMA Done interrupt */
+#define TIMER_TIMB_MATCH 0x00000800     /**< TimerB match interrupt */
+#define TIMER_CAPB_EVENT 0x00000400     /**< CaptureB event interrupt */
+#define TIMER_CAPB_MATCH 0x00000200     /**< CaptureB match interrupt */
+#define TIMER_TIMB_TIMEOUT 0x00000100   /**< TimerB time out interrupt */
+#define TIMER_TIMA_DMA 0x00000020       /**< TimerA DMA Done interrupt */
+#define TIMER_TIMA_MATCH 0x00000010     /**< TimerA match interrupt */
+#define TIMER_CAPA_EVENT 0x00000004     /**< CaptureA event interrupt */
+#define TIMER_CAPA_MATCH 0x00000002     /**< CaptureA match interrupt */
+#define TIMER_TIMA_TIMEOUT 0x00000001   /**< TimerA time out interrupt */
 /** @} */
 
 /**
  * @brief Timer/Subtimer selection
  * @{
  */
-#define TIMER_A 0x000000ff    /**< Timer A */
-#define TIMER_B 0x0000ff00    /**< Timer B */
-#define TIMER_BOTH 0x0000ffff /**< Timer Both */
+#define TIMER_A 0x000000ff      /**< Timer A */
+#define TIMER_B 0x0000ff00      /**< Timer B */
+#define TIMER_BOTH 0x0000ffff   /**< Timer Both */
 /** @} */
 
 /**
@@ -84,33 +84,33 @@ extern "C" {
  * @{
  */
 typedef struct {
-    uint32_t conf;                /**< configuration */
-    uint32_t timer_a_mode;        /**< timer A Mode */
-    uint32_t timer_b_mode;        /**< timer B Mode */
-    uint32_t ctrl;                /**< timer control register */
-    uint8_t sync[8];              /**< sync */
-    uint32_t intr_mask;           /**< interrupt mask */
-    uint32_t intr_raw_stat;       /**< raw interrupt status */
-    uint32_t masked_intr;         /**< masked interrupt */
-    uint32_t intr_clear;          /**< interrupt clear */
-    uint32_t interval_load_a;     /**< interval load a */
-    uint32_t interval_load_b;     /**< interval load b */
-    uint32_t match_a;             /**< timer match a */
-    uint32_t match_b;             /**< timer match b */
-    uint32_t prescale_a;          /**< timer prescale a */
-    uint32_t prescale_b;          /**< timer prescale b */
-    uint32_t prescale_match_a;    /**< timer prescale match a */
-    uint32_t prescale_match_b;    /**< timer prescale match b */
-    uint32_t timer_a;             /**< timer a */
-    uint32_t timer_b;             /**< timer b */
-    uint32_t val_a;               /**< timer value a */
-    uint32_t val_b;               /**< timer value b */
-    uint32_t rtc_predivide;       /**< RTC Predivide */
-    uint32_t prescale_snaphot_a;  /**< timer prescale snapshot a */
-    uint32_t prescale_snapshot_b; /**< timer prescale snapshot b */
-    uint32_t val_snapshot_a;      /**< timer value snapshot a */
-    uint32_t val_snapshot_b;      /**< timer value snapshot b */
-    uint32_t dma_event;           /**< DMA event */
+    uint32_t conf;                  /**< configuration */
+    uint32_t timer_a_mode;          /**< timer A Mode */
+    uint32_t timer_b_mode;          /**< timer B Mode */
+    uint32_t ctrl;                  /**< timer control register */
+    uint8_t sync[8];                /**< sync */
+    uint32_t intr_mask;             /**< interrupt mask */
+    uint32_t intr_raw_stat;         /**< raw interrupt status */
+    uint32_t masked_intr;           /**< masked interrupt */
+    uint32_t intr_clear;            /**< interrupt clear */
+    uint32_t interval_load_a;       /**< interval load a */
+    uint32_t interval_load_b;       /**< interval load b */
+    uint32_t match_a;               /**< timer match a */
+    uint32_t match_b;               /**< timer match b */
+    uint32_t prescale_a;            /**< timer prescale a */
+    uint32_t prescale_b;            /**< timer prescale b */
+    uint32_t prescale_match_a;      /**< timer prescale match a */
+    uint32_t prescale_match_b;      /**< timer prescale match b */
+    uint32_t timer_a;               /**< timer a */
+    uint32_t timer_b;               /**< timer b */
+    uint32_t val_a;                 /**< timer value a */
+    uint32_t val_b;                 /**< timer value b */
+    uint32_t rtc_predivide;         /**< RTC Predivide */
+    uint32_t prescale_snaphot_a;    /**< timer prescale snapshot a */
+    uint32_t prescale_snapshot_b;   /**< timer prescale snapshot b */
+    uint32_t val_snapshot_a;        /**< timer value snapshot a */
+    uint32_t val_snapshot_b;        /**< timer value snapshot b */
+    uint32_t dma_event;             /**< DMA event */
 } cc3200_timer_t;
 /** @} */
 

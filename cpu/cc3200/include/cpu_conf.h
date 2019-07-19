@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup         cpu_cc3200
+ * @defgroup        cpu_cc3200 TI CC3200
  * @ingroup         cpu
  * @brief           CPU specific implementations for CC3200
  * @{
@@ -32,34 +32,16 @@
 extern "C" {
 #endif
 
-/**
- * @brief reset a peripheral clock
- *
- * @param reg arcm register pointer
- * @{
- */
 extern void reset_periph_clk(cc3200_arcm_reg_t *reg);
-/** @} */
-
 /**
  * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
-
-/**
- * @brief Default CPU IRQ priority: The default priority is 1 for every
- * interrupt, 0 is the highest possible priority.
- * @{
- */
-#define CPU_DEFAULT_IRQ_PRIO (1U)
-/** @} */
-
-/**
- * @brief Total number of cpu interrupts
- *
- */
+#define CPU_DEFAULT_IRQ_PRIO                                                  \
+    (1U)                            /**< The default priority is 1 for every interrupt, 0 is the highest \
+                                       possible priority. */
 #define CPU_IRQ_NUMOF IRQN_COUNT
-#define CPU_FLASH_BASE FLASH_BASE /**< number of interrupt sources */
+#define CPU_FLASH_BASE FLASH_BASE   /**< number of interrupt sources */
 /** @} */
 
 /**

@@ -107,7 +107,8 @@ void spi_reset(spi_t bus)
     dev->sys_conf |= MCSPI_SYSCONFIG_SOFTRESET;
 
     /* wait for reset */
-    while (!((dev->sys_status) & MCSPI_SYSSTATUS_RESETDONE)) {}
+    while (!((dev->sys_status) & MCSPI_SYSSTATUS_RESETDONE)) {
+    }
 
     /* enable spi */
     dev->ch0_ctrl &= ~MCSPI_CH0CTRL_EN;
@@ -165,7 +166,8 @@ void spi_init(spi_t bus)
 
     /* ignore pin configuration if MISO and MOSI are zero */
     /* on the CC3200 platform this is used by the CC3200-launchxl board */
-    /* since the NWP SPI pins are configured from the NWP and not the CC3200 itself */
+    /* since the NWP SPI pins are configured from the NWP and not the CC3200
+     * itself */
     if (spi_config[bus].config.pins.miso != 0 &&
         spi_config[bus].config.pins.mosi != 0) {
         /* trigger pin initialization */
@@ -175,8 +177,7 @@ void spi_init(spi_t bus)
     /* enable/configure SPI clock */
     if (spi(bus) == GSPI_BASE) {
         ARCM->MCSPI_A1.clk_gating |= PRCM_RUN_MODE_CLK;
-    }
-    else if (spi(bus) == LSPI_BASE) {
+    } else if (spi(bus) == LSPI_BASE) {
         ARCM->MCSPI_A2.clk_gating |= PRCM_RUN_MODE_CLK | PRCM_SLP_MODE_CLK;
     }
 
@@ -230,8 +231,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont, const void *out,
     spi(bus)->ch0_conf |= MCSPI_CH0CONF_FORCE;
 
     /* perform transfer */
-    if (ROM_SPITransfer((uint32_t)spi(bus), (uint8_t *)out, (uint8_t *)in,
-                        len,
+    if (ROM_SPITransfer((uint32_t)spi(bus), (uint8_t *)out, (uint8_t *)in, len,
                         0) != SPI_OK) {
         DEBUG("SPI: Transfer failed \n");
         /* check that len and word length combination is valid */

@@ -17,7 +17,6 @@
  */
 
 #include "cpu.h"
-#include "periph_conf.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -30,18 +29,6 @@ extern "C" {
 #endif
 
 /**
- * @brief convert x usecs to cpu cycles
- *
- */
-#define USEC_TO_CPU_CYCLES(x) ((CLOCK_CORECLOCK / 1000000) * x)
-/**
- * @brief delay CPU for x uSec. UtilsDelay uses a loop that takes 3 cycles to
- * complete. Therefore the uSec time needs to be divided by 3.
- *
- */
-#define USEC_DELAY(x) ROM_UtilsDelay(USEC_TO_CPU_CYCLES(x) / 3)
-
-/**
  * @brief   Starting offset of CPU_ID
  */
 #define CPUID_ADDR (void *)(0xe000ed00)
@@ -49,14 +36,6 @@ extern "C" {
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN (4U)
-
-/**
- * @brief holds the current hibernation state of the MCU. READONLY and reading
- * requires a delay of PRCM_OP_DELAY
- *
- */
-#define HIBERNATION_WAKE_STATUS_REG \
-    (*((volatile uint32_t *)(HIB3P3_BASE + HIB3P3_O_MEM_HIB_WAKE_STATUS)))
 
 /**
  * @name    Power management configuration
@@ -74,16 +53,8 @@ typedef struct {
     gpio_t gpio_port;   /**< GPIO port */
     spi_pins_t pins;    /**< pin configuration */
     uint32_t config;    /**< SPI config */
-} spi_conf_t;
-/** @} */
 
-/**
- * @brief   Declare needed generic SPI functions.
- * @{
- */
-#define PERIPH_SPI_NEEDS_INIT_CS
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+} spi_conf_t;
 /** @} */
 
 /**

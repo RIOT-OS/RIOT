@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup        cpu_cc3200
+ * @defgroup        cpu_cc3200
  * @{
  *
  * @file
@@ -24,63 +24,60 @@
 #include "vendor/hw_gpio.h"
 #include "vendor/hw_memmap.h"
 #include "vendor/hw_ocp_shared.h"
-#include "vendor/rom.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-
-#define GPIO_PINS_PER_PORT 8        /**< Number of pins per port */
-#define GPIO_DIR_MASK 0x00000001    /**< GPIO direction configuration mask */
-
-/**
- * GPIO Pin type value used to configure pin to GPIO
- */
-#define PIN_MODE_GPIO 0x00000000
-
-#define PAD_MODE_MASK 0x0000000F /**< GPIO mask for setting pin mode */
-/* GPIO mask for setting pin strength */
-#define PAD_STRENGTH_MASK 0x000000E0
-/* GPIO mask for setting pin type e.g. PULL */
-#define PAD_TYPE_MASK 0x00000310
-#define PAD_CONFIG_BASE ((OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_0))
-
-/* Define interrupt signal for GPIOA4 since it is not exported by TIs hw_ints.h
- */
-#define INT_GPIOA4 20
-
-/**
- * @brief get hardware configuration register for a pin
- *
- */
-#define PAD_CONFIG_REG(pin) \
-    (*((volatile uint32_t *)((gpio_pin << 2) + PAD_CONFIG_BASE)))
-
-/**
- * @brief gpio base addresses
- *
- */
-static const uint32_t ports[] = {
-    GPIOA0_BASE, GPIOA1_BASE, GPIOA2_BASE, GPIOA3_BASE, GPIOA4_BASE,
-};
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   static callback memory
  */
-static gpio_isr_ctx_t isr_ctx[ARRAY_SIZE(ports)][GPIO_PINS_PER_PORT];
+static gpio_isr_ctx_t isr_ctx[4][8];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
+
+#define GPIO_DIR_MASK 0x00000001
+#define PIN_MODE_GPIO 0x00000000
+#define GPIO_PORT_MASK (0xfffff000) /**< bit mask for GPIO port addr  */
+#define NOT_A_PORT 0
+#define NOT_A_PIN 0
+#define NOT_A_GPIO 66
+#define PAD_MODE_MASK 0x0000000F
+#define PAD_STRENGTH_MASK 0x000000E0
+#define PAD_TYPE_MASK 0x00000310
+#define PAD_CONFIG_BASE ((OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_0))
+
+/**
+ * @brief gpio base addresses
+ *
+ */
+static unsigned long ports[] = { GPIOA0_BASE, GPIOA1_BASE, GPIOA2_BASE,
+                                 GPIOA3_BASE, GPIOA4_BASE };
 
 /**
  * @brief pin to GPIO pin numbers mappings
  *
  */
-static const uint8_t pin_to_gpio_num[64] = {
+static const unsigned long pin_to_gpio_num[64] = {
     10,  11,  12,  13,  14,  15,  16,  17,  255, 255, 18,  19,  20,
     21,  22,  23,  24,  40,  28,  29,  25,  255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 31,  255, 255, 255, 255, 0,   255, 32,
     30,  255, 1,   255, 2,   3,   4,   5,   6,   7,   8,   9
 };
+
+/**
+ * @brief check if a port base is valid
+ *
+ * @param port
+ * @return true
+ * @return false
+ */
+bool _gpioPortBaseValid(unsigned long port)
+{
+    return ((port == GPIOA0_BASE) || (port == GPIOA1_BASE) ||
+            (port == GPIOA2_BASE) || (port == GPIOA3_BASE) ||
+            (port == GPIOA4_BASE));
+}
 
 /**
  * @brief     Extract the pin number of the given pin
@@ -109,14 +106,14 @@ uint8_t gpio_pin_mask(uint8_t dev)
     return 1 << (pin_to_gpio_num[gpio_pin_num(dev)] % GPIO_PINS_PER_PORT);
 }
 /**
- * @brief gpio_port_by_num returns the port base address for a pin
+ * @brief gpio_pin_to_port returns the port base address for a pin
  *
  * @param dev external pin number
  * @return port base address
  */
-static inline cc3200_gpio_t *gpio_port_by_num(uint8_t port_num)
+unsigned long gpio_pin_to_port(uint8_t port)
 {
-    return (cc3200_gpio_t *)(ports[port_num]);
+    return ports[port];
 }
 
 /**
@@ -126,9 +123,9 @@ static inline cc3200_gpio_t *gpio_port_by_num(uint8_t port_num)
  * @param val value to be masked
  * @return masked value for a given pin with value val
  */
-static inline uint8_t _gpio_pin_value_mask(uint8_t pin, uint8_t val)
+unsigned char _gpio_pin_value_mask(uint8_t pin, unsigned char val)
 {
-    return val << (pin & 0x7);
+    return val << (pin % 8);
 }
 
 /**
@@ -140,37 +137,40 @@ static inline uint8_t _gpio_pin_value_mask(uint8_t pin, uint8_t val)
  */
 static inline cc3200_gpio_t *gpio(gpio_t pin)
 {
-    return (cc3200_gpio_t *)(gpio_port_by_num(gpio_port_num(pin)));
+    return (cc3200_gpio_t *)(gpio_pin_to_port(gpio_port_num(pin)));
 }
 
 void gpio_init_af(gpio_t dev, uint32_t strength, uint32_t type)
 {
     /* does not support analog pin types, but not a problem for GPIO */
-    uint8_t pin = gpio_pin_num(dev);
+    uint8_t pin      = gpio_pin_num(dev);
     uint8_t gpio_pin = pin_to_gpio_num[pin];
 
     /* copied from TIs PinConfigSet. The register is not documented so for */
     /* now only replecate behaviour. */
 
     /* enable input */
-    HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CMN_CONFIG) &=
-        ~((0x80 << gpio_pin) & (0x1E << 8));
+    HWREG(0x4402E144) &= ~((0x80 << gpio_pin) & (0x1E << 8));
 
-    /* write config to hardware register referred by TI as PAD */
-    PAD_CONFIG_REG(gpio_pin) =
-        ((PAD_CONFIG_REG(gpio_pin) & ~(PAD_STRENGTH_MASK | PAD_TYPE_MASK)) |
-         (strength | type));
+    /* compute pin register */
+    unsigned long regAddr = (gpio_pin << 2) + PAD_CONFIG_BASE;
+
+    /* write config */
+    HWREG(regAddr) = ((HWREG(regAddr) & ~(PAD_STRENGTH_MASK | PAD_TYPE_MASK)) |
+                      (strength | type));
 }
 
 void gpio_pin_mode_set(gpio_t dev, uint32_t mode)
 {
     /* does not support analog pin types, but not a problem for GPIO */
-    uint8_t pin = gpio_pin_num(dev);
+    uint8_t pin      = gpio_pin_num(dev);
     uint8_t gpio_pin = pin_to_gpio_num[pin];
 
+    /* compute pin register */
+    unsigned long regAddr = (gpio_pin << 2) + PAD_CONFIG_BASE;
+
     /* set mode */
-    PAD_CONFIG_REG(gpio_pin) =
-        (((PAD_CONFIG_REG(gpio_pin) & ~PAD_MODE_MASK) | mode) & ~(3 << 10));
+    HWREG(regAddr) = (((HWREG(regAddr) & ~PAD_MODE_MASK) | mode) & ~(3 << 10));
 }
 
 int gpio_init(gpio_t dev, gpio_mode_t mode)
@@ -187,8 +187,7 @@ int gpio_init(gpio_t dev, gpio_mode_t mode)
     if (mode & GPIO_DIR_MASK) {
         /* out */
         gpio(dev)->dir |= ipin;
-    }
-    else {
+    } else {
         /* in */
         gpio(dev)->dir &= ipin;
     }
@@ -201,52 +200,44 @@ int gpio_init(gpio_t dev, gpio_mode_t mode)
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 
+void isr_gpio_a0(void)
+{
+    handle_isr((cc3200_gpio_t *)GPIOA0_BASE);
+}
+
+void isr_gpio_a1(void)
+{
+    handle_isr((cc3200_gpio_t *)GPIOA1_BASE);
+}
+
+void isr_gpio_a2(void)
+{
+    handle_isr((cc3200_gpio_t *)GPIOA2_BASE);
+}
+
+void isr_gpio_a3(void)
+{
+    handle_isr((cc3200_gpio_t *)GPIOA3_BASE);
+}
+
 /**
  * @brief isr interrupt handler
  *
  * @param portAddr base address of the GPIO PORT
  */
-void handle_isr(uint8_t port_num)
+void handle_isr(cc3200_gpio_t *u)
 {
-    uint32_t state = gpio_port_by_num(port_num)->mis;
+    uint32_t state = u->mis;
 
     /* clear interrupt */
-    gpio_port_by_num(port_num)->icr = state;
-
-    /* call ISR handlers */
-    state &= (GPIO_PINS_PER_PORT - 1);
-    while (state) {
-        int pin = 8 * sizeof(state) - __builtin_clz(state) - 1;
-        state &= ~(1 << pin);
-        isr_ctx[port_num][pin].cb(isr_ctx[port_num][pin].arg);
+    u->icr = state;
+    for (int i = 0; i < 8; i++) {
+        if (state & (1 << i)) {
+            isr_ctx[port_num][i].cb(isr_ctx[port_num][i].arg);
+        }
     }
 
     cortexm_isr_end();
-}
-
-void isr_gpio_a0(void)
-{
-    handle_isr(0);
-}
-
-void isr_gpio_a1(void)
-{
-    handle_isr(1);
-}
-
-void isr_gpio_a2(void)
-{
-    handle_isr(2);
-}
-
-void isr_gpio_a3(void)
-{
-    handle_isr(3);
-}
-
-void isr_gpio_a4(void)
-{
-    handle_isr(4);
 }
 
 /**
@@ -272,35 +263,33 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
 {
     /* Note: gpio_init() also checks if the gpio is enabled. */
     int res = gpio_init(dev, mode);
-
     if (res != 0) {
         return res;
     }
 
     assert(flank != GPIO_NONE);
 
-    uint8_t portNum = gpio_port_num(dev);
-    uint8_t pinNum = gpio_pin_num(dev);
-    uint8_t bit = gpio_pin_mask(dev);
-    /* convert to number since we use the address for later compare */
-    uint32_t portBase = (uint32_t)gpio_port_by_num(portNum);
+    uint8_t portNum  = gpio_port_num(dev);
+    uint8_t pinNum   = gpio_pin_num(dev);
+    uint8_t bit      = gpio_pin_mask(dev);
+    uint8_t portAddr = gpio_pin_to_port(dev);
 
     /* store callback information; */
-    isr_ctx[portNum][pinNum].cb = cb;
+    isr_ctx[portNum][pinNum].cb  = cb;
     isr_ctx[portNum][pinNum].arg = arg;
 
     ROM_IntMasterDisable();
 
     /* clear interrupt specified pin */
-    gpio(dev)->icr = bit;
+    gpio(dev)->ICR = bit;
 
     /* configure active flanks */
     gpio(dev)->ibe =
-        (flank & GPIO_BOTH) ? gpio(dev)->ibe | bit : gpio(dev)->ibe & ~bit;
+            (flank & GPIO_BOTH) ? gpio(dev)->ibe | bit : gpio(dev)->ibe & ~bit;
     gpio(dev)->is = (flank & GPIO_VALUE_LOW) ? gpio(dev)->is | bit :
-                    gpio(dev)->is & ~bit;
+                                               gpio(dev)->is & ~bit;
     gpio(dev)->iev = (flank & GPIO_RISING) ? gpio(dev)->iev | bit :
-                     gpio(dev)->iev & ~bit;
+                                             gpio(dev)->iev & ~bit;
 
     /* enable gpio interripts */
     gpio(dev)->im |= bit;
@@ -308,26 +297,22 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
     /* register interrupt handlers */
     /* TODO: replace with cortex common */
     switch (portBase) {
-        case GPIOA0_BASE:
-            ROM_GPIOIntRegister(portBase, isr_gpio_a0);
-            ROM_IntEnable(INT_GPIOA0);
-            break;
-        case GPIOA1_BASE:
-            ROM_GPIOIntRegister(portBase, isr_gpio_a1);
-            ROM_IntEnable(INT_GPIOA1);
-            break;
-        case GPIOA2_BASE:
-            ROM_GPIOIntRegister(portBase, isr_gpio_a2);
-            ROM_IntEnable(INT_GPIOA2);
-            break;
-        case GPIOA3_BASE:
-            ROM_GPIOIntRegister(portBase, isr_gpio_a3);
-            ROM_IntEnable(INT_GPIOA3);
-            break;
-        case GPIOA4_BASE:
-            ROM_GPIOIntRegister(portBase, isr_gpio_a4);
-            ROM_IntEnable(INT_GPIOA4);
-            break;
+    case GPIOA0_BASE:
+        ROM_GPIOIntRegister(portBase, isr_gpio_a0);
+        ROM_IntEnable(INT_GPIOA0);
+        break;
+    case GPIOA1_BASE:
+        ROM_GPIOIntRegister(portBase, isr_gpio_a1);
+        ROM_IntEnable(INT_GPIOA1);
+        break;
+    case GPIOA2_BASE:
+        ROM_GPIOIntRegister(portBase, isr_gpio_a2);
+        ROM_IntEnable(INT_GPIOA2);
+        break;
+    case GPIOA3_BASE:
+        ROM_GPIOIntRegister(portBase, isr_gpio_a3);
+        ROM_IntEnable(INT_GPIOA3);
+        break;
     }
 
     ROM_IntMasterEnable();
@@ -344,13 +329,12 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
  */
 void gpio_write(gpio_t dev, int value)
 {
-    uint8_t port = gpio_port_num(dev);
-    uint8_t ipin = gpio_pin_mask(dev);
-    uint32_t portAddr = (uint32_t)gpio_port_by_num(port);
-
+    uint8_t port           = gpio_port_num(dev);
+    unsigned char ipin     = gpio_pin_mask(dev);
+    unsigned long portAddr = gpio_pin_to_port(port);
     /* write to pin at portBase + pinOffset */
-    HWREG(portAddr + (ipin << 2)) =
-        _gpio_pin_value_mask(pin_to_gpio_num[gpio_pin_num(dev)], value);
+    HWREG(portAddr + (0x00000000 + (ipin << 2))) =
+            _gpio_pin_value_mask(pin_to_gpio_num[gpio_pin_num(dev)], value);
 }
 
 /**
@@ -361,13 +345,14 @@ void gpio_write(gpio_t dev, int value)
  */
 int gpio_read(gpio_t dev)
 {
-    uint8_t port = gpio_port_num(dev);
-    uint8_t ipin = gpio_pin_mask(dev);
-    uint32_t portAddr = (uint32_t)gpio_port_by_num(port);
+    uint8_t port           = gpio_port_num(dev);
+    unsigned char ipin     = gpio_pin_mask(dev);
+    unsigned long portAddr = gpio_pin_to_port(port);
 
     /* read from pin at portBase + pinOffset */
     /* cast value to int {0, 1} */
-    return (HWREG(portAddr + (ipin << 2)) ? GPIO_VALUE_HIGH : GPIO_VALUE_LOW);
+    return (HWREG(portAddr + (0x00000000 + (ipin << 2))) ? GPIO_VALUE_HIGH :
+                                                           GPIO_VALUE_LOW);
 }
 
 /**
