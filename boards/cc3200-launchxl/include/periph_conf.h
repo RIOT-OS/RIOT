@@ -80,12 +80,10 @@ static const spi_conf_t spi_config[] = {
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF 1
+#define UART_NUMOF 2
 
 #define UART_0_EN 1
-#define UART_1_EN 0
-#define UART_2_EN 0
-#define UART_3_EN 0
+#define UART_1_EN 1
 
 /**
  * @brief UART device configuration
