@@ -42,7 +42,9 @@ static int check_and_read(const void *dev, phydat_t *res, int16_t *val, uint8_t 
     uint32_t now = xtimer_now_usec();
 
     if ((now - last) > DHT_SAUL_HOLD_TIME) {
-        dht_read((const dht_t *)dev, &temp, &hum);
+        if (dht_read((const dht_t *)dev, &temp, &hum)) {
+            return -ECANCELED;
+        }
         last = now;
     }
 

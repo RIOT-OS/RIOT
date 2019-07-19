@@ -45,7 +45,8 @@ extern "C" {
 enum {
     DHT_OK      =  0,       /**< all good */
     DHT_NOCSUM  = -1,       /**< checksum error */
-    DHT_NODEV   = -2        /**< device type not defined */
+    DHT_TIMEOUT = -2,       /**< communication timed out */
+    DHT_NODEV   = -3        /**< device type not defined */
 };
 
 /**
@@ -101,9 +102,10 @@ int dht_init(dht_t *dev, const dht_params_t *params);
  * @param[out] temp     temperature value [in °C * 10^-1]
  * @param[out] hum      relative humidity value [in percent * 10^-1]
  *
- * @return              0 on success
- * @return              -1 on checksum error
- * @return              -2 on parsing error
+ * @retval `DHT_OK`         Success
+ * @retval `DHT_NOCSUM`     Checksum error
+ * @retval `DHT_TIMEOUT`    Reading data timed out (check wires!)
+ * @retval `DHT_NODEV`      Unsupported device type specified
  */
 int dht_read(const dht_t *dev, int16_t *temp, int16_t *hum);
 
