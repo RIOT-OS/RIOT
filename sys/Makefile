@@ -148,6 +148,9 @@ endif
 ifneq (,$(filter usbus usbus_%,$(USEMODULE)))
     DIRS += usb/usbus
 endif
+ifneq (,$(filter credman,$(USEMODULE)))
+  DIRS += net/credman
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(USEMODULE))))
 
