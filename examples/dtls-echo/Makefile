@@ -15,7 +15,7 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
                    wsn430-v1_4 z1
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 blackpill bluepill calliope-mini \
-                             cc2650-launchpad cc2650stk hifive1 lsn50 i-nucleo-lrwan1 maple-mini \
+                             cc2650-launchpad cc2650stk hifive1 hifive1b lsn50 i-nucleo-lrwan1 maple-mini \
                              microbit nrf51dk nrf51dongle nrf6310 nucleo-f031k6 \
                              nucleo-f042k6 nucleo-f303k8 nucleo-l031k6 nucleo-f030r8 \
                              nucleo-f070rb nucleo-f072rb nucleo-f103rb nucleo-f302r8 nucleo-f334r8 \

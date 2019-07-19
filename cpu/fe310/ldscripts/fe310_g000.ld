@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017   Ken Rabold
+ * Copyright (C) 2017, 2019   Ken Rabold
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the SiFive FE310
+ * @brief           Memory definitions for the SiFive FE310_G000
  *
  * @author          Ken Rabold
  *
@@ -24,8 +24,9 @@ ENTRY( _start )
 
 MEMORY
 {
-  flash (rxai!w) : ORIGIN = 0x20400000, LENGTH = 512M
-  ram (wxa!ri) : ORIGIN = 0x80000000, LENGTH = 16K
+  flash (rxai!w) : ORIGIN = 0x20400000, LENGTH = 0x1fc00000
+  ram   (wxa!ri) : ORIGIN = 0x80000000, LENGTH = 0x00004000
+  itim  (wxa!ri) : ORIGIN = 0x08000000, LENGTH = 0x00002000
 }
 
 PHDRS
@@ -138,6 +139,7 @@ SECTIONS
 
   .data          :
   {
+    *(.ramfunc .ramfunc.*)
     *(.data .data.*)
     *(.gnu.linkonce.d.*)
     . = ALIGN(8);

@@ -2,7 +2,7 @@ include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
                              arduino-mega2560 arduino-nano \
-                             arduino-uno calliope-mini chronos hifive1 \
+                             arduino-uno calliope-mini chronos hifive1 hifive1b \
                              i-nucleo-lrwan1 \
                              mega-xplained microbit msb-430 msb-430h \
                              nucleo-f031k6 nucleo-f042k6 nucleo-f303k8 \

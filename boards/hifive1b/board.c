@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Ken Rabold, JP Bonn
+ * Copyright (C) 2017, 2019 Ken Rabold, JP Bonn
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_hifive1
+ * @ingroup     boards_hifive1b
  * @{
  *
  * @file
- * @brief       Support for the SiFive HiFive1 RISC-V board
+ * @brief       Support for the SiFive HiFive1b RISC-V board
  *
  * @author      Ken Rabold, JP Bonn
  *
@@ -32,20 +32,16 @@
  * Configure the memory mapped flash for faster throughput
  * to minimize interrupt latency on an I-Cache miss and refill
  * from flash.  Alternatively (and faster) the interrupt
- * routine could be put in SRAM.  The linker script supports
- * code in SRAM using the ".hotcode" section.
+ * routine could be put in SRAM.
 
- * The flash chip on the HiFive1 is the ISSI 25LP128
- * http://www.issi.com/WW/pdf/25LP128.pdf
- * The maximum frequency it can run at is 133MHz in
+ * The flash chip on the HiFive1b is the ISSI 25LP03D
+ * http://www.issi.com/WW/pdf/25LP-WP032D.pdf
+ * The maximum frequency it can run at is 115MHz in
  * "Fast Read Dual I/O" mode.
- * Note the updated data sheet:
- * https://static.dev.sifive.com/SiFive-FE310-G000-datasheet-v1.0.4.pdf
- * states "Address and write data using DQ[3] for transmission will not
- * function properly."  This rules out QPI for the XIP memory mapped flash.
- * #define MAX_FLASH_FREQ 133000000
- * On forum SiFive says "safe" operation would be 40MHz.  50MHz seems to work
- * fine.
+ * #define MAX_FLASH_FREQ 115000000
+ *
+ * FYI - Like the FE310-G000, the G002 has problems with reading flash
+ * faster than 50MHz
  */
 #define MAX_FLASH_FREQ 50000000
 
@@ -55,13 +51,12 @@
  * by SCKDIV.  Given we're trying to achieve maximum I-cache refill
  * for the flash we let MAX_FLASH_FREQ dictate the CPU clock.
  */
-#define CPU_DESIRED_FREQ 200000000
+#define CPU_DESIRED_FREQ 320000000
 
 /*
  * The relationship between the input clock and SCK is given
  * by the following formula (Fin is processor/tile-link clock):
  *    Fsck = Fin/(2(div + 1))
- * FYI - For 320MHZ it seems to be tolerating a faster SPI clock (56MHz)
  */
 #define SCKDIV ((CPU_DESIRED_FREQ - 1) / (MAX_FLASH_FREQ * 2))
 
@@ -69,19 +64,11 @@
 #define SCKDIV_SAFE 3
 
 /*
- * By default the SPI initialized as:
- * https://github.com/sifive/sifive-blocks/blob/master/src/main/scala/devices/spi/SPIFlash.scala
- * insn.cmd.en := Bool(true)
- * insn.cmd.code := Bits(0x03)
- * insn.cmd.proto := SPIProtocol.Single
- * insn.addr.len := UInt(3)
- * insn.addr.proto := SPIProtocol.Single
- * insn.pad.cnt := UInt(0)
- * insn.pad.code := Bits(0)
- * insn.data.proto := SPIProtocol.Single
- *
- * 25LP128 appears to left in post-reset default state. Boot code
- * does not modify it. We change the SPI configuration here.
+ * By default the SPI FFMT initialized as:
+ *  cmd_en = 1
+ *  addr_len = 3
+ *  cmd_code = 3
+ *  all other fields = 0
  */
 
 void board_init_clock(void)
@@ -96,19 +83,53 @@ void board_init_clock(void)
      /* Note: The range is limited to ~100MHz and depends on PLL settings */
     PRCI_set_hfrosctrim_for_f_cpu(CPU_DESIRED_FREQ, PRCI_FREQ_UNDERSHOOT);
 
-     /* begin{code-style-ignore} */
-    SPI0_REG(SPI_REG_FFMT) =               /* setup "Fast Read Dual I/O" 1-1-2              */
+    /* begin{code-style-ignore} */
+    SPI0_REG(SPI_REG_FFMT) =               /* setup "Fast Read Dual I/O"                             */
         SPI_INSN_CMD_EN         |          /* Enable memory-mapped flash                    */
-        SPI_INSN_ADDR_LEN(3)    |          /* 25LP128 read commands have 3 address bytes    */
-        SPI_INSN_PAD_CNT(4)     |          /* 25LP128 Table 6.9 Read Dummy Cycles P4,P3=0,0 */
-        SPI_INSN_CMD_PROTO(SPI_PROTO_S) |  /* 25LP128 Table 8.1 "Instruction                */
+        SPI_INSN_ADDR_LEN(3)    |          /* 25LP03D read commands have 3 address bytes    */
+        SPI_INSN_PAD_CNT(4)     |          /* 25LP03D Table 6.11 Read Dummy Cycles = 4      */
+        SPI_INSN_CMD_PROTO(SPI_PROTO_S) |  /* 25LP03D Table 8.1 "Instruction                */
         SPI_INSN_ADDR_PROTO(SPI_PROTO_D) | /*  Set" shows mode for cmd, addr, and           */
         SPI_INSN_DATA_PROTO(SPI_PROTO_D) | /*  data protocol for given instruction          */
-        SPI_INSN_CMD_CODE(0xbb) |          /* Set the instruction to "Fast Read Dual I/O"   */
+        SPI_INSN_CMD_CODE(0xBB) |          /* Set the instruction to "Fast Read Dual I/O"   */
         SPI_INSN_PAD_CODE(0x00);           /* Dummy cycle sends 0 value bits                */
     /* end{code-style-ignore} */
 
     SPI0_REG(SPI_REG_SCKDIV) = SCKDIV;
+}
+
+__attribute__ ((section (".ramfunc")))
+void board_init_flash(void)
+{
+    /* Update the QSPI interface to adjust to the CPU speed
+     * This function needs to execute from the RAM
+     * when the QSPI interface is being reconfigured because the flash
+     * can't be accessed during this time
+     */
+
+    /* Disable SPI flash mode */
+    SPI0_REG(SPI_REG_FCTRL) &= ~SPI_FCTRL_EN;
+
+    /* Enable QPI mode by sending command to flash */
+    SPI0_REG(SPI_REG_TXFIFO) = 0x35;
+
+    /* begin{code-style-ignore} */
+    SPI0_REG(SPI_REG_FFMT) =               /* setup "Fast Read Quad I/O (QPI mode)"         */
+        SPI_INSN_CMD_EN         |          /* Enable memory-mapped flash                    */
+        SPI_INSN_ADDR_LEN(3)    |          /* 25LP03D read commands have 3 address bytes    */
+        SPI_INSN_PAD_CNT(6)     |          /* 25LP03D Table 6.11 Read Dummy Cycles = 6      */
+        SPI_INSN_CMD_PROTO(SPI_PROTO_Q) |  /* 25LP03D Table 8.1 "Instruction                */
+        SPI_INSN_ADDR_PROTO(SPI_PROTO_Q) | /*  Set" shows mode for cmd, addr, and           */
+        SPI_INSN_DATA_PROTO(SPI_PROTO_Q) | /*  data protocol for given instruction          */
+        SPI_INSN_CMD_CODE(0xEB) |          /* Set the instruction to "Fast Read Quad I/O"   */
+        SPI_INSN_PAD_CODE(0x00);           /* Dummy cycle sends 0 value bits                */
+    /* end{code-style-ignore} */
+
+    /* Re-enable SPI flash mode */
+    SPI0_REG(SPI_REG_FCTRL) |= SPI_FCTRL_EN;
+
+    /* Adjust the SPI clk divider for to boost flash speed */
+  //  SPI0_REG(SPI_REG_SCKDIV) = SCKDIV;
 }
 
 void board_init(void)
@@ -116,6 +137,7 @@ void board_init(void)
     /* Initialize CPU and clocks */
     cpu_init();
     board_init_clock();
+  //  board_init_flash();
 
     /* Configure pin muxing for UART0 */
     GPIO_REG(GPIO_OUTPUT_VAL) |= IOF0_UART0_MASK;

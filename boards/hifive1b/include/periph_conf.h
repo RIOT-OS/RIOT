@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Ken Rabold
+ * Copyright (C) 2019 Ken Rabold
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_hifive1
+ * @ingroup     boards_hifive1b
  * @{
  *
  * @file
- * @brief       Peripheral specific definitions for the HiFive1 RISC-V board
+ * @brief       Peripheral specific definitions for the HiFive1b RISC-V board
  *
  * @author      Ken Rabold
  */
