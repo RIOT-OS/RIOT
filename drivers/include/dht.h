@@ -67,19 +67,24 @@ typedef enum {
 } dht_type_t;
 
 /**
- * @brief   Device descriptor for DHT sensor devices
+ * @brief   Configuration parameters for DHT devices
  */
 typedef struct {
     gpio_t pin;             /**< GPIO pin of the device's data pin */
     dht_type_t type;        /**< type of the DHT device */
     gpio_mode_t in_mode;    /**< input pin configuration, with or without pull
                              *   resistor */
-} dht_t;
+
+} dht_params_t;
 
 /**
- * @brief   Configuration parameters for DHT devices
+ * @brief   Device descriptor for DHT sensor devices
  */
-typedef dht_t dht_params_t;
+typedef struct {
+    dht_params_t params;    /**< Device parameters */
+    dht_data_t last_val;    /**< Values of the last measurement */
+    uint32_t last_read_us;  /**< Time of the last measurement */
+} dht_t;
 
 /**
  * @brief   Initialize a new DHT device
@@ -107,7 +112,7 @@ int dht_init(dht_t *dev, const dht_params_t *params);
  * @retval `DHT_TIMEOUT`    Reading data timed out (check wires!)
  * @retval `DHT_NODEV`      Unsupported device type specified
  */
-int dht_read(const dht_t *dev, int16_t *temp, int16_t *hum);
+int dht_read(dht_t *dev, int16_t *temp, int16_t *hum);
 
 #ifdef __cplusplus
 }
