@@ -58,10 +58,8 @@ void board_init(void)
     /* reset board */
     board_reset();
 
-#ifdef HAVE_GPIO_T
     /* initialize the boards LEDs */
     led_init();
-#endif
 }
 
 /**
