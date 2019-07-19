@@ -105,6 +105,14 @@ extern "C"
 /** @} */
 
 /**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_TYPE     ZTIMER_TYPE_PERIPH_TIMER
+#define CONFIG_ZTIMER_USEC_DEV      (TIMER_PIT_DEV(0))
+/** @} */
+
+/**
  * @name Define the interface for the CCS811 gas sensors
  * @{
  */

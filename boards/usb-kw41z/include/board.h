@@ -100,6 +100,16 @@ extern "C"
 #endif
 /** @} */
 
+/**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_TYPE     ZTIMER_TYPE_PERIPH_TIMER
+#define CONFIG_ZTIMER_USEC_DEV      (TIMER_PIT_DEV(0))
+#define CONFIG_ZTIMER_USEC_FREQ     (1000000LU)
+#define CONFIG_ZTIMER_USEC_WIDTH    (32)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
