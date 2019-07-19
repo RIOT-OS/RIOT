@@ -1,0 +1,11 @@
+/**
+ * @defgroup        cpu_cc3200 TI CC3200
+ * @ingroup         cpu
+ * @brief           Texas Instruments CC3200 Cortex-M4 MCU specific code
+ */
+
+/**
+ * @defgroup        cpu_cc3200_regs TI CC3200 CMSIS-style Headers
+ * @ingroup         cpu_cc3200
+ * @brief           CMSIS-style register definitions for the TI CC3200
+ */
