@@ -159,7 +159,7 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type);
  * This function returns after TX status is replied from the MAC. To receive
  * potential messages sent from the network an explicit call to
  * @ref semtech_loramac_recv must be done after this function if it returned
- * @ref SEMTECH_LORAMAC_TX_OK and within the RX windows delays.
+ * @ref SEMTECH_LORAMAC_TX_DONE and within the RX windows delays.
  *
  * @see semtech_loramac_recv
  *
@@ -167,7 +167,7 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type);
  * @param[in] data         The TX data
  * @param[in] len          The length of the TX data
  *
- * @return SEMTECH_LORAMAC_TX_OK when the message can be transmitted
+ * @return SEMTECH_LORAMAC_TX_DONE when the message was transmitted
  * @return SEMTECH_LORAMAC_NOT_JOINED when the network is not joined
  * @return SEMTECH_LORAMAC_BUSY when the mac is already active (join or tx in progress)
  * @return SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED when the send is rejected because of dutycycle restriction
