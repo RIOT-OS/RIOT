@@ -1,0 +1,70 @@
+# Define the cpu used by the CC3200 board:
+export CPU        = cc3200
+export CPU_MODEL ?= cc3200
+
+ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+	USEMODULE += cc110x gnrc_netdev2 gnrc_cc110x
+endif
+
+# setup serial terminal
+# if multiple MCUs are connected the last number will increment
+PORT_LINUX ?=/dev/ttyUSB0
+PORT_DARWIN ?=$(firstword $(sort $(wildcard /dev/tty.usbserial*)))
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# config flasher tool
+ENERGIA_TOOL_LINUX ?= ~/.energia15/packages/energia/tools/1.1.4/cc3200prog
+ENERGIA_TOOL_DARWIN ?= ~/Library/Energia15/packages/energia/tools/1.1.4/cc3200prog
+
+# set energia tool defaults
+OS := $(shell uname -s)
+ifeq ($(OS),Linux)
+  ENERGIA_TOOL ?= $(ENERGIA_TOOL_LINUX)
+else
+  ENERGIA_TOOL ?= $(ENERGIA_TOOL_DARWIN)
+endif
+
+
+PROGRAMMER ?= cc3200prog
+
+# flash using openocd
+ifeq ($(PROGRAMMER),openocd)
+  FLASHER = TBD
+  FFLAGS  = -p "$(PORT)" -e -w -v $(ELFFILE)
+
+# flash using energia cc3200prog tool available as part of the Energia tool
+else ifeq ($(PROGRAMMER),cc3200prog)
+  # abort if PORT is not set
+  ifndef PORT
+    $(error PORT is not set, please connect the MCU or provide a port)
+  endif
+  # also check if port is empty string
+  ifeq ($(PORT), )
+    $(error PORT is not set, please connect the MCU or provide a port)
+  endif
+
+  FLASHFILE = $(ELFFILE:.elf=.bin)
+  FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flasher.sh
+  FFLAGS  = $(ENERGIA_TOOL) $(PORT) $(FLASHFILE)
+endif
+
+# debugger config
+DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debugger.sh
+
+DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/ $(PREFIX) $(ELFFILE)
+
+# reset config
+RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+RESET_FLAGS = $(BINDIR)
+
+# debugger config
+export OFLAGS    = -O binary --gap-fill 0xff
+export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
+
+# include common SPI functions
+USEMODULE += periph_common
+
+# include cortex defaults
+include $(RIOTCPU)/cortexm_common/Makefile.include

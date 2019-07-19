@@ -1,0 +1,102 @@
+/**
+@defgroup    boards_cc3200-launchxl CC3200-launchxl
+@ingroup     boards
+@brief       Support for the SimpleLink™ CC3200 MCU
+
+
+Overview
+
+The [CC3200-launchxl](https://www.ti.com/tool/cc3200-launchxl) is Texas Instruments development kit for the CC3200 wireless microcontroller. This MCU combines an ARM Cortex-M4 microcontroller with the Texas Instrument CC3100 wireless module. The CC3100 inludes an embeded 802.11b/g/n  and IPv4 stack.
+
+Use `BOARD=cc3200-launchxl` for building RIOT for this platform.
+
+## Hardware
+
+![cc3200-launchxl]  (http://www.ti.com/diagrams/cc3200-launchxl_cc3200-launchxl_no_bg_resize.jpg)
+
+| MCU              | CC3200-launchxl                                              |
+| ---------------- | ------------------------------------------------------------ |
+| Family           | ARM Cortex-M4                                                |
+| RAM              | 256Kb                                                        |
+| Flash            | no                                                           |
+| Frequency        | 80MHz                                                        |
+| FPU              | no                                                           |
+| Timers           | 4                                                            |
+| ADCs             | 1x12Bit (4 channels)                                         |
+| UARTs            | 2                                                            |
+| SPIs             | 1 (+1 for embedded CC3100)                                   |
+| I2C              | 1                                                            |
+| SD/MMC           | 1                                                            |
+| GPIO             | 27                                                           |
+| Vcc              | 2.1 - 3.6V                                                   |
+| Datasheet        | [Datasheed PDF](http://www.ti.com/lit/ds/symlink/cc3200.pdf) |
+| NWP Guide        | [NWP Guide PDF](http://www.ti.com/lit/ug/swru368b/swru368b.pdf) |
+| Reference Manual | [Reference Manual PDF](http://www.ti.com/lit/ug/swru367d/swru367d.pdf) |
+| McASP            | 1 Multichannel Audio Serial Port  (2 channel I2S)            |
+
+## Implementation Status
+
+| Module | Status           | Description                                          |
+| ------ | ---------------- | ---------------------------------------------------- |
+| SPI    | Partial Support  | CS currently not properly implemented                |
+| UART   | OK               |                                                      |
+| LEDS   | OK               |                                                      |
+| GPIO   | OK               |                                                      |
+| Timers | Work in Progress | Only 16bit channel 0 is supported (requires testing) |
+| NWP    | Work in Progress |                                                      |
+
+## Toolchain
+
+This MCU works fine with the arm-none-eabi toolchain (tested with version 8.3.0 on Arch Linux).
+
+## Programming and Debugging
+
+The CC3200 MCU can easily be debugged via GDB and OpenOCD and does not require any additional hardware. Make sure the JTAG headers are all bridged with jumpers (as seen here)[http://www.kamleshpanchal.com/wp-content/uploads/2018/05/SimpleLinkWi-FiCC3200LaunchPad5511ec19a66c1.png].
+
+In general any application can be debugged via GDB using the following command (only tested on Linux):
+
+
+
+```
+make debug
+```
+
+### For Linux users
+
+Linux in general has great support for the FTDI used on the CC3200 MCU. Unfortunately for some Linux machines the FTDI module does not detect the device automatically due to TIs custom VID/PID codes. If `/dev/ttyUSB0` and `/dev/ttyUSB1` do not appear after the device is plugged in, the FTDI codes can be set manually:
+
+```
+modprobe ftdi_sio
+echo 0451 c32a > /sys/bus/usb-serial/drivers/ftdi_sio/new_id
+```
+
+This will add TIs VID/PID codes to the FTDI id list.
+The Debugger also requires openocd to be installed (tested with openocd v0.10).
+
+### Flashing MCU
+Before attempting to Flash the board make sure the SOP2 pin is asserted as seen here:
+![cc3200 ready for flash](https://energia.nu/guide/install/jumper.png)
+Unfortunately CC3200 can only be flashed via propriatery TI software. There are two tools available
+
+- Uniflash < 4.0.0 (requires a myTI account)
+- Energias `cc3200prog` binary hidden in a toolchain tarball
+
+*For completenes sake there is an OpenSource Python tool aiming to replicate Uniflash functionality. Unfortunately I was unable to get the tool to work on MacOS or Arch Linux.* (cc3200tool on GitHub)[https://github.com/ALLTERCO/cc3200tool]
+
+To allow flashing on both macOS and Linux as well as skipping the TI registestration process the `cc3200prog ` tool is used. Below you will find direct links to the cc3200prog tool for each platform (same URLs as used by Energia Board Manager).
+
+	- (Linux)[https://s3.amazonaws.com/energiaUS/tools/linux64/cc3200prog-1.1.4-i386-x86_64-pc-linux-gnu.tar.bz2]
+	- (MacOS)[https://s3.amazonaws.com/energiaUS/tools/macosx/cc3200prog-1.1.4-x86_64-apple-darwin.tar.bz2]
+
+The cc3200prog tool can be placed anywhere, the flash script default expects the tool in the Energia Tool folder *(see below)*. The default cc3200prog path can be overwritten using the `ENERGIA_TOOL` environment variable.
+
+- Linux: `~/.energia15/packages/energia/tools/cc3200prog/1.1.4/`
+- macOS: `~/Library/Energia15/packages/energia/tools/cc3200prog/1.1.4/`
+
+Alternatively the tool can be obtained via Energia. Download & Install Energia (download link) [https://energia.nu/download/]. Then download the board tools **Energia CC3200 boards** inside Energia Board Manager (tutorial)[https://energia.nu/guide/boards/]. After a successful download the tool should be located in the tools folder of Energia (see above).
+
+## WiFi Module
+
+Work in progress.
+
+*/
