@@ -52,11 +52,6 @@ static mutex_t locks[SPI_NUMOF];
  */
 void spi_init_pins(spi_t bus)
 {
-    /* check if sck and mosi pins are zero indicating no pin setup */
-    if (spi_config[bus].pins.sck == 0 && spi_config[bus].pins.mosi == 0) {
-        return;
-    }
-
     /* GSPI_CLK */
     ROM_PinTypeSPI(spi_config[bus].pins.sck, PIN_MODE_SPI);
     /* set MISO pin */
@@ -154,8 +149,12 @@ void spi_init(spi_t bus)
 {
     /* assert(bus >= SPI_NUMOF); */
     mutex_init(&locks[bus]);
-    /* trigger pin initialization */
-    spi_init_pins(bus);
+
+    /* CC3100 module does not require pin config */
+    if (bus != CC3100_SPI) {
+        /* trigger pin initialization */
+        spi_init_pins(bus);
+    }
 
     /* enable clock */
     switch (bus) {
@@ -176,16 +175,10 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     if (bus >= SPI_UNDEF) {
         return -1;
     }
-
+    (void)cs;
     /* lock bus */
     mutex_lock(&locks[bus]);
 
-    /* enable cs pin */
-    if (cs == GPIO_UNDEF) {
-        spi(bus)->ch0_conf &= ~MCSPI_CH0CONF_FORCE;
-    } else {
-        spi(bus)->ch0_conf |= MCSPI_CH0CONF_FORCE;
-    }
     /* configure */
     _spi_config(bus, mode, clk);
 
@@ -199,10 +192,11 @@ void spi_release(spi_t bus)
     if (bus >= SPI_NUMOF) {
         return;
     }
-    mutex_unlock(&locks[bus]);
 
     /* disable spi */
     spi(bus)->ch0_ctrl &= ~MCSPI_CH0CTRL_EN;
+
+    mutex_unlock(&locks[bus]);
 }
 
 uint8_t spi_transfer_byte(spi_t bus, spi_cs_t cs, bool cont, uint8_t out)
@@ -214,49 +208,52 @@ uint8_t spi_transfer_byte(spi_t bus, spi_cs_t cs, bool cont, uint8_t out)
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont, const void *out,
                         void *in, size_t len)
 {
-    /* TODO: handle cs and cont for */
-    (void)cont;
-
-    /* disable or enable cs */
-    if (cs == GPIO_UNDEF) {
-        spi(bus)->ch0_conf &= ~MCSPI_CH0CONF_FORCE;
-    } else {
-        spi(bus)->ch0_conf |= MCSPI_CH0CONF_FORCE;
+    if (cs != SPI_CS_UNDEF) {
+        gpio_clear((gpio_t)cs);
     }
-    ROM_SPITransfer((unsigned long)spi(bus), (unsigned char *)out,
-                    (unsigned char *)in, len, 0);
 
-    /* if cs was enabled disable it again */
-    if (cs != GPIO_UNDEF) {
-        spi(bus)->ch0_conf &= ~MCSPI_CH0CONF_FORCE;
+    /* force SPI to stay open between words */
+    spi(bus)->ch0_conf |= MCSPI_CH0CONF_FORCE;
+
+    ROM_SPITransfer((uint32_t)spi(bus), (uint8_t *)out, (uint8_t *)in, len, 0);
+
+    /* stop forcing SPI to stay open */
+    spi(bus)->ch0_conf &= ~MCSPI_CH0CONF_FORCE;
+
+    if ((!cont) && (cs != SPI_CS_UNDEF)) {
+        gpio_set((gpio_t)cs);
     }
 }
 
 uint8_t spi_transfer_reg(spi_t bus, spi_cs_t cs, uint8_t reg, uint8_t out)
 {
-    (void)cs;
-    if (bus >= SPI_NUMOF) {
-        return -1;
+    if (cs != SPI_CS_UNDEF) {
+        gpio_clear((gpio_t)cs);
     }
+
     ROM_SPITransfer(spi_config[bus].base_addr, &reg, 0, 1, 0);
 
-    if (ROM_SPITransfer(spi_config[bus].base_addr, (unsigned char *)&out, 0, 1,
-                        0)) {
+    if (ROM_SPITransfer(spi_config[bus].base_addr, (uint8_t *)&out, 0, 1, 0)) {
         return -1;
     }
-    return 1; /* success transfer */
+
+    if (cs != SPI_CS_UNDEF) {
+        gpio_set((gpio_t)cs);
+    }
+
+    return SPI_OK; /* success transfer */
 }
 
 void spi_transfer_regs(spi_t bus, spi_cs_t cs, uint8_t reg, const void *out,
                        void *in, size_t len)
 {
-    (void)cs;
-    if (bus >= SPI_NUMOF) {
-        return;
+    if (cs != SPI_CS_UNDEF) {
+        gpio_clear((gpio_t)cs);
     }
+
     ROM_SPITransfer(spi_config[bus].base_addr, &reg, 0, 1, 0);
-    if (ROM_SPITransfer(spi_config[bus].base_addr, (unsigned char *)out,
-                        (unsigned char *)in, len, 0)) {
+    if (ROM_SPITransfer(spi_config[bus].base_addr, (uint8_t *)out,
+                        (uint8_t *)in, len, 0)) {
         return;
     }
 }
