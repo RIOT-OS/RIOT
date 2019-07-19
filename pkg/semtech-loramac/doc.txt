@@ -88,7 +88,7 @@
  *     /* 4. send some data */
  *     char *message = "This is RIOT";
  *     if (semtech_loramac_send(&loramac,
- *                              (uint8_t *)message, strlen(message)) != SEMTECH_LORAMAC_TX_OK) {
+ *                              (uint8_t *)message, strlen(message)) != SEMTECH_LORAMAC_TX_DONE) {
            printf("Cannot send message '%s'\n", message);
  *         return 1;
  *     }
