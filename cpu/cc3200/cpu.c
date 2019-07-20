@@ -30,6 +30,8 @@
 #include "vendor/hw_types.h"
 #include "vendor/rom.h"
 
+static void periph_reset(void);
+
 /**
  * @brief configuration for the Digital DC/DC Voltage Trimmer
  *
