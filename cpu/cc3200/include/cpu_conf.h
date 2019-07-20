@@ -32,7 +32,15 @@
 extern "C" {
 #endif
 
+/**
+ * @brief reset a peripheral clock
+ *
+ * @param reg arcm register pointer
+ * @{
+ */
 extern void reset_periph_clk(cc3200_arcm_reg_t *reg);
+/** @} */
+
 /**
  * @brief   ARM Cortex-M specific CPU configuration
  * @{

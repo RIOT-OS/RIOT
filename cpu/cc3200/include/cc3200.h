@@ -108,11 +108,15 @@ typedef enum IRQn {
     0                   /**< Set to 1 if different SysTick Config is used */
 #define __FPU_PRESENT 0 /**< CC3200 has not FPU */
 
-#define PERIPH_BASE 0x40000000U
-
 #define SW_TIMERS_EXAUSTED 111
 
 #define CC3200_VTOR_ALIGN 1024 /**< CC3200 Vector Table alignment */
+
+/** @addtogroup cpu_specific_Peripheral_memory_map
+ * @{
+ */
+#define PERIPH_BASE 0x40000000U
+/** @} */
 
 #ifdef __cplusplus
 } /* end extern "C" */
