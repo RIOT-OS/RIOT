@@ -65,7 +65,7 @@ static uint32_t runqueue_bitcache = 0;
 #endif
 
 FORCE_USED_SECTION
-const uint8_t max_threads = sizeof(sched_threads) / sizeof(thread_t*);
+const uint8_t max_threads = ARRAY_SIZE(sched_threads);
 
 #ifdef DEVELHELP
 /* OpenOCD can't determine struct offsets and additionally this member is only
