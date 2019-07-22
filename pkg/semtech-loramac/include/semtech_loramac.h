@@ -150,6 +150,7 @@ int semtech_loramac_init(semtech_loramac_t *mac);
  * @return SEMTECH_LORAMAC_JOIN_SUCCEEDED on success
  * @return SEMTECH_LORAMAC_JOIN_FAILED on failure
  * @return SEMTECH_LORAMAC_BUSY when the mac is already active (join or tx in progress)
+ * @return SEMTECH_LORAMAC_ALREADY_JOINED if network was already joined
  */
 uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type);
 
@@ -172,6 +173,7 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type);
  * @return SEMTECH_LORAMAC_BUSY when the mac is already active (join or tx in progress)
  * @return SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED when the send is rejected because of dutycycle restriction
  * @return SEMTECH_LORAMAC_TX_ERROR when an invalid parameter is given
+ * @return SEMTECH_LORAMAC_TX_CNF_FAILED when message was transmitted but no ACK was received
  */
 uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len);
 
