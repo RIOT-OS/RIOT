@@ -64,6 +64,7 @@ gnrc_netif_t *gnrc_netif_create(char *stack, int stacksize, char priority,
     assert(netif != NULL);
     rmutex_init(&netif->mutex);
     netif->ops = ops;
+    netif_register((netif_t*) netif);
     assert(netif->dev == NULL);
     netif->dev = netdev;
     res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,

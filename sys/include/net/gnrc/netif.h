@@ -54,6 +54,7 @@
 #include "net/netstats.h"
 #endif
 #include "rmutex.h"
+#include "net/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,6 +69,7 @@ typedef struct gnrc_netif_ops gnrc_netif_ops_t;
  * @brief   Representation of a network interface
  */
 typedef struct {
+    netif_t netif;                          /**< network interface descriptor */
     const gnrc_netif_ops_t *ops;            /**< Operations of the network interface */
     netdev_t *dev;                          /**< Network device of the network interface */
     rmutex_t mutex;                         /**< Mutex of the interface */
