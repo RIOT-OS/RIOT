@@ -350,20 +350,8 @@ include $(RIOTMAKE)/cflags.inc.mk
 # Include VERSION for releases
 -include $(RIOTBASE)/VERSION
 
-# make the RIOT version available to the program
-ifeq ($(origin RIOT_VERSION), undefined)
-  GIT_STRING := $(shell git --git-dir="$(RIOTBASE)/.git" describe --always --abbrev=4 2> /dev/null)
-  ifneq (,$(GIT_STRING))
-    GIT_BRANCH := $(shell git --git-dir="$(RIOTBASE)/.git" rev-parse --abbrev-ref HEAD)
-    ifeq ($(strip $(GIT_BRANCH)),master)
-      RIOT_VERSION := $(GIT_STRING)
-    else
-      RIOT_VERSION := $(GIT_STRING)-$(GIT_BRANCH)
-    endif
-  else
-    RIOT_VERSION := 'UNKNOWN (builddir: $(RIOTBASE))'
-  endif
-endif
+include $(RIOTMAKE)/git_version.inc.mk
+RIOT_VERSION ?= $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
 
 # Set module by prepending APPLICATION name with 'application_'.
 # It prevents conflict with application and modules with the same name.
