@@ -72,13 +72,13 @@ ifneq (,$(filter arduino,$(USEMODULE)))
 endif
 
 ifneq (,$(filter printf_float,$(USEMODULE)))
-  ifeq (1,$(USE_NANO_SPECS))
+  ifneq (,$(filter newlib_nano,$(USEMODULE)))
     export LINKFLAGS += -u _printf_float
   endif
 endif
 
 ifneq (,$(filter scanf_float,$(USEMODULE)))
-  ifeq (1,$(USE_NANO_SPECS))
+  ifneq (,$(filter newlib_nano,$(USEMODULE)))
     export LINKFLAGS += -u _scanf_float
   endif
 endif
