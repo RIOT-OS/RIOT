@@ -13,11 +13,13 @@
  * @brief       Common network interface API
  *
  * This allows access to network interfaces regardless of the network stack
- * implementation. @anchor NETIF_INVALID The network stack must provide
+ * implementation. The network stack must provide
  *
- * - Both a definition for the type `netif_t` and the
- *   value `NETIF_INVALID` of type `netif_t` in a file `netif_types.h` and
- * - implementation of all the functions defined in @ref net/netif.h
+ * - A definition for @p netif_get_name
+ * - A definition for @p netif_get_opt
+ * - A definition for @p netif_set_opt
+ *
+ * The network stack should also register each interface via @p netif_register.
  *
  * @{
  *
@@ -26,13 +28,15 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  José Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
 #ifndef NET_NETIF_H
 #define NET_NETIF_H
 
-#include "net/netopt.h"
+#include <stdint.h>
 
-#include "netif_types.h"
+#include "list.h"
+#include "net/netopt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,19 +50,26 @@ extern "C" {
 #endif
 
 /**
+ * @brief Network interface descriptor.
+ *
+ * @note All network interfaces should inherit from this structure.
+ */
+typedef struct {
+    list_node_t node;  /**< Pointer to the next interface */
+} netif_t;
+
+/**
  * @brief   Iterator for the interfaces
  *
- * Returns interface after @p last. To start use `last == NETIF_INVALID`.
+ * Returns interface after @p last. To start use `last == NULL`.
  *
- * @param[in] last  The previous interface. Usen `NETIF_INVALID` to start
+ * @param[in] last  The previous interface. Use `NULL` to start
  *                  iteration.
  *
- * @note    Supposed to be implemented by the networking module
- *
  * @return next network interface.
- * @return @ref NETIF_INVALID, if there is no interface after @p last
+ * @return NULL, if there is no interface after @p last
  */
-netif_t netif_iter(netif_t last);
+netif_t *netif_iter(netif_t *last);
 
 /**
  * @brief   Gets name of an interface
@@ -74,25 +85,23 @@ netif_t netif_iter(netif_t last);
  *                  hold @ref NETIF_NAMELENMAX bytes.
  *
  * @return  length of @p name on success
- * @return  0, if @p netif was not a valid interface.
  */
-int netif_get_name(netif_t netif, char *name);
+
+int netif_get_name(netif_t *netif, char *name);
 
 /**
  * @brief   Gets interface by name
  *
  * @pre `name != NULL`
  *
- * @note    Supposed to be implemented by the networking module.
-
  *
  * @param[in] name  The name of an interface as a zero-terminated. Must not be
  *                  `NULL`.
  *
  * @return  The identifier of the interface on success.
- * @return  @ref NETIF_INVALID if no interface is named @p name.
+ * @return  NULL if no interface is named @p name.
  */
-netif_t netif_get_by_name(const char *name);
+netif_t *netif_get_by_name(const char *name);
 
 /**
  * @brief   Gets option from an interface
@@ -108,7 +117,7 @@ netif_t netif_get_by_name(const char *name);
  * @return  Number of bytes written to @p value.
  * @return  `< 0` on error, 0 on success.
  */
-int netif_get_opt(netif_t netif, netopt_t opt, uint16_t context,
+int netif_get_opt(netif_t *netif, netopt_t opt, uint16_t context,
                   void *value, size_t max_len);
 
 /**
@@ -125,8 +134,21 @@ int netif_get_opt(netif_t netif, netopt_t opt, uint16_t context,
  * @return Number of bytes used from @p value.
  * @return `< 0` on error, 0 on success.
  */
-int netif_set_opt(netif_t netif, netopt_t opt, uint16_t context,
+int netif_set_opt(netif_t *netif, netopt_t opt, uint16_t context,
                   void *value, size_t value_len);
+
+
+/**
+ * @brief   Registers a network interface in the global interface list.
+ *
+ * @note    This functions should be called when initializing an interface.
+ *
+ * @param[in] netif     Interface to be registered
+ *
+ * @return  0 on success
+ * @return  -EINVAL if @p netif is NULL.
+ */
+int netif_register(netif_t *netif);
 
 #ifdef __cplusplus
 }
