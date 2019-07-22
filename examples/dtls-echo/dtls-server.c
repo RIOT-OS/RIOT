@@ -268,7 +268,7 @@ static int _peer_verify_ecdsa_key_handler(struct dtls_context_t *ctx,
 /* DTLS variables and register are initialized. */
 dtls_context_t *_server_init_dtls(dtls_remote_peer_t *remote_peer)
 {
-    dtls_context_t *new_context = NULL;
+    dtls_context_t *new_context;
 
     static dtls_handler_t cb = {
         .write = _send_to_peer_handler,
