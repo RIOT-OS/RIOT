@@ -40,11 +40,6 @@ RIOT support flashing with USB by default.
 You may have to specify the flashing port with
 `PORT_BSL=<my_openmote_port> make flash`
 
-@note       On some boards the MSP430 chip responsible for controlling
-the bootloading pins may not be functioning.  If you are only able to flash
-when there is no image (either the first time after purchase or after erasing
-with the jtag).  Please contact the manufacturer to provide a fix.
-
 ### Flashing via JTAG
 
 To be able to flash the board via JTAG you need to install Seggers JLinkExe
@@ -56,4 +51,11 @@ from your application folder.
 
 Mac OS users may experiment a command line expecting `connect`. Just type it
 and the process will continue.
+
+### Debugging
+
+The JTAG interface is required for debugging.  On some board revisions the
+debug may not be able to run. To debug use:
+
+`make debug`
  */

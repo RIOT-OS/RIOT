@@ -16,19 +16,20 @@ ifeq ($(PROGRAMMER),cc2538-bsl)
   else ifeq ($(OS),Darwin)
     PORT_BSL ?= $(PORT_DARWIN)
   endif
+  FLASHFILE ?= $(HEXFILE)
   FLASHER = $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
   FFLAGS  = -p "$(PORT_BSL)" --bootloader-invert-lines -e -w -v -b 460800 $(FLASHFILE)
+  RESET ?= $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
+  RESET_FLAGS ?= -p "$(PORT_BSL)" --bootloader-invert-lines
 else ifeq ($(PROGRAMMER),jlink)
-  FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-  FFLAGS  = $(BINDIR) $(FLASHFILE)
-  DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
-  DEBUGSERVER = JLinkGDBServer -device CC2538SF53
-  RESET ?= $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+  # Special flashing and reset scripts are required due to board hardware
+  export FLASH_ADDR = 0x200000
+  export JLINK_DEVICE = CC2538SF53
+  export JLINK_IF = JTAG
+  export JLINK_RESET_FILE = $(RIOTBOARD)/$(BOARD)/dist/hw_reset.seg
+  include $(RIOTMAKE)/tools/jlink.inc.mk
 endif
 
-FLASHFILE ?= $(BINFILE)
-DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
-RESET_FLAGS ?= $(BINDIR)
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
 # setup serial terminal
