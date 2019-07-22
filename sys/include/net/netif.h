@@ -13,11 +13,18 @@
  * @brief       Common network interface API
  *
  * This allows access to network interfaces regardless of the network stack
- * implementation. The network stack must provide
+ * implementation. The network stack must provide definitions for:
  *
- * - A definition for @p netif_get_name
- * - A definition for @p netif_get_opt
- * - A definition for @p netif_set_opt
+ * - @p netif_get_name
+ * - @p netif_get_opt
+ * - @p netif_set_opt
+ * - @p netif_send
+ * - @p netif_receive
+ * - @p netif_rx_done
+ * - @p netif_tx_done
+ * - @p netif_alloc_rx_pkt
+ * - @p netif_link_up
+ * - @p netif_link_down
  *
  * The network stack should also register each interface via @p netif_register.
  *
@@ -150,6 +157,97 @@ int netif_set_opt(netif_t *netif, netopt_t opt, uint16_t context,
  * @return  -EINVAL if @p netif is NULL.
  */
 int netif_register(netif_t *netif);
+
+/**
+ * @brief Sends a packet to a given interface
+ *
+ * @param[in] netif     A network interface
+ * @param[in] msdu       MSDU packet to be sent (full L3 frame)
+ *
+ * @return  0 on success
+ * @return  < 0 on error
+ */
+int netif_send(netif_t *netif, iolist_t *msdu);
+
+/**
+ * @brief   Does link layer processing
+ *
+ *          This functions should be called right after the packet is fetched
+ *          from the network device.
+ *
+ * @note    Supposed to be implemented by the networking module
+ *
+ * @param[in] netif     A network interface
+ * @param[in] psdu      Pointer to the PSDU (full L2 frame)
+ * @param[in] psdu_len  Size of the PSDU
+ * @param[in] rx_data   Data associated to the packet reception (LQI, RSSI, etc).
+ *                      Can be NULL if the network device doesn't report data.
+ */
+void netif_recv(netif_t *netif, uint8_t *msdu, size_t msdu_len, void *rx_data);
+
+/**
+ * @brief   Rx done event
+ *
+ *          This function should be called from the MAC layer when
+ *          the receive procedure is done. It can be used to dispatch packets,
+ *          release buffers and tell upper layers about the reception
+ *          of a packet.
+ *
+ * @note    Supposed to be implemented by the networking module
+ *
+ * @param[in] netif     A network interface
+ * @param[in] msdu      MSDU (full L3 frame) of the processed packet. If NULL,
+ *                      there's no MSDU to dispatch.
+ * @param[in] msdu_len  Length of the MSDU
+ * @param[in] rx_data   Data associated to the packet reception (LQI, RSSI, etc).
+ *                      Can be NULL if not data is passed to the stack.
+ */
+void netif_rx_done(netif_t *netif, uint8_t *msdu, size_t msdu_len, void *rx_data);
+
+/**
+ * @brief   Tx done event
+ *
+ *          This function should be called from the MAC layer when the
+ *          transmission procedure is done. It can be used to release buffers
+ *          and notify the upper layer about the transmission of a packet.
+ *
+ * @note    Supposed to be implemented by the networking module
+ *
+ * @param[in] netif     A network interface
+ * @param[in] msdu      MSDU of the sent packet
+ * @param[in] status    Status of the transmission
+ */
+void netif_tx_done(netif_t *netif, iolist_t *msdu, int status);
+
+/**
+ * @brief   Allocates a buffer for the RX packet.
+ *
+ * @note    Supposed to be implemented by the networking module
+ *
+ * @param[in] netif     A network interface
+ * @param[in] size      Size of the packet to be allocated
+ *
+ * @return  pointer to the allocated buffer
+ * @return  NULL if the stack couldn't allocate the packet
+ */
+void *netif_rx_pkt_alloc(netif_t *netif, size_t size);
+
+/**
+ * @brief   Called by the network interface when the interface is up
+ * @note    Supposed to be implemented by the networking module
+ *
+ * @param[in] netif     A network interface
+ */
+void netif_link_up(netif_t *netif);
+
+/**
+ * @brief   Called by the network interface when the interface is down
+ *
+ * @note    Supposed to be implemented by the networking module
+ *
+ * @param[in] netif     A network interface
+ */
+void netif_link_down(netif_t *netif);
 
 #ifdef __cplusplus
 }
