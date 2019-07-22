@@ -1057,10 +1057,10 @@ static void test_netapi_set__SRC_LEN(void)
 
 static void test_netif_iter(void)
 {
-    netif_t netif = NETIF_INVALID;
+    netif_t *netif = NULL;
     int netif_count = 0;
 
-    while ((netif = netif_iter(netif)) != NETIF_INVALID) {
+    while ((netif = netif_iter(netif)) != NULL) {
         netif_count++;
     }
     TEST_ASSERT_EQUAL_INT(gnrc_netif_numof(), netif_count);
@@ -1071,27 +1071,26 @@ static void test_netif_get_name(void)
     char exp_name[NETIF_NAMELENMAX + 1];
     char name[NETIF_NAMELENMAX];
     int res;
-    netif_t netif = netif_iter(NETIF_INVALID);
+    netif_t *netif = netif_iter(NULL);
     /* there must be at least one interface */
-    TEST_ASSERT(NETIF_INVALID != netif);
+    TEST_ASSERT_NOT_NULL(netif);
 
     res = netif_get_name(netif, name);
-    sprintf(exp_name, "if%d", (int)netif);
+    sprintf(exp_name, "if%d", (int) ((gnrc_netif_t *)netif)->pid);
     TEST_ASSERT_EQUAL_INT(strlen(exp_name), res);
     TEST_ASSERT_EQUAL_STRING(&exp_name[0], &name[0]);
-    TEST_ASSERT_EQUAL_INT(0, netif_get_name(INT16_MAX, name));
 }
 
 static void test_netif_get_by_name(void)
 {
     char name[NETIF_NAMELENMAX] = "6nPRK28";
-    netif_t netif = netif_iter(NETIF_INVALID);
+    netif_t *netif = netif_iter(NULL);
 
-    TEST_ASSERT_EQUAL_INT(NETIF_INVALID, netif_get_by_name(name));
+    TEST_ASSERT(netif_get_by_name(name) == NULL);
     /* there must be at least one interface */
-    TEST_ASSERT(NETIF_INVALID != netif);
+    TEST_ASSERT_NOT_NULL(netif);
     TEST_ASSERT(netif_get_name(netif, name) > 0);
-    TEST_ASSERT_EQUAL_INT(netif, netif_get_by_name(name));
+    TEST_ASSERT(netif == netif_get_by_name(name));
 }
 
 static void test_netif_get_opt(void)
@@ -1101,7 +1100,7 @@ static void test_netif_get_opt(void)
     uint8_t value[GNRC_NETIF_L2ADDR_MAXLEN];
 
     TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
-                          netif_get_opt((netif_t)ethernet_netif->pid,
+                          netif_get_opt((netif_t *)ethernet_netif,
                                         NETOPT_ADDRESS, 0,
                                         &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(exp_ethernet, value, sizeof(exp_ethernet)));
@@ -1114,7 +1113,7 @@ static void test_netif_set_opt(void)
     uint8_t value[] = { LA1 + 1, LA2 + 2, LA3 + 3, LA4 + 4, LA5 + 5, LA6 + 6 };
 
     TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
-                          netif_set_opt((netif_t)ethernet_netif->pid,
+                          netif_set_opt((netif_t *)ethernet_netif,
                                         NETOPT_ADDRESS, 0,
                                         &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(sizeof(value), ethernet_netif->l2addr_len);
@@ -1123,7 +1122,7 @@ static void test_netif_set_opt(void)
     /* return addresses to previous state for further testing */
     memcpy(value, exp_ethernet, sizeof(exp_ethernet));
     TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
-                          netif_set_opt(ethernet_netif->pid,
+                          netif_set_opt((netif_t *)ethernet_netif,
                                         NETOPT_ADDRESS, 0,
                                         &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(sizeof(value), ethernet_netif->l2addr_len);
