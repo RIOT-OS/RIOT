@@ -20,6 +20,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <string.h>
 
 #include "riotboot/flashwrite.h"
