@@ -44,6 +44,11 @@
 #define TIMEOUT                     (1000U)
 /* The DHT sensor cannot measure more than once a second */
 #define DATA_HOLD_TIME              (US_PER_SEC)
+/* The start signal by pulling data low for at least 18ms and then up for
+ * 20-40µs*/
+#define START_LOW_TIME              (20U * US_PER_MS)
+#define START_HIGH_TIME             (40U)
+
 
 static inline void _reset(dht_t *dev)
 {
@@ -131,9 +136,9 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
     if ((now_us - dev->last_read_us) > DATA_HOLD_TIME) {
         /* send init signal to device */
         gpio_clear(dev->params.pin);
-        xtimer_usleep(20 * US_PER_MS);
+        xtimer_usleep(START_LOW_TIME);
         gpio_set(dev->params.pin);
-        xtimer_usleep(40);
+        xtimer_usleep(START_HIGH_TIME);
 
         /* sync on device */
         gpio_init(dev->params.pin, dev->params.in_mode);
@@ -188,6 +193,7 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
                 dev->last_val.temperature = (int16_t)((raw_temp >> 8) * 10);
                 dev->last_val.humidity = (int16_t)((raw_hum >> 8) * 10);
                 break;
+            /* DHT21 == DHT22 (same value in enum), so both are handled here */
             case DHT22:
                 dev->last_val.humidity = (int16_t)raw_hum;
                 /* if the high-bit is set, the value is negative */
