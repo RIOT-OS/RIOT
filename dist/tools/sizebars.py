@@ -1,20 +1,10 @@
-#!/usr/bin/python
-# Enable Python 3 style division in case this script is running via Python 2
-from __future__ import division
+#!/usr/bin/python3
 import argparse
 import re
 import sys
 import subprocess
 import os.path
-
-# Python 2 does not have subprocess.DEVNULL, so a little manual work is required
-# if the script is run via Python 2
-try:
-    from subprocess import DEVNULL
-except ImportError:
-    # Python 2
-    import os
-    DEVNULL = open(os.devnull, "wb")
+from subprocess import DEVNULL
 
 SIZE_REGEX = re.compile(r"^\s*([0-9]+)\s+([0-9]+)\s+([0-9]+)\s+([0-9]+)")
 RAM_WARN_THRESHOLD = 0.9
