@@ -430,6 +430,10 @@ int _loramac_handler(int argc, char **argv)
             case SEMTECH_LORAMAC_TX_ERROR:
                 puts("Cannot send: error");
                 return 1;
+
+            case SEMTECH_LORAMAC_TX_CNF_FAILED:
+                puts("Fail to send: no ACK received");
+                return 1;
         }
 
         puts("Message sent with success");
