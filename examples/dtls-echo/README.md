@@ -12,7 +12,7 @@ Linux version of TinyDTLS. However, this is not tested yet.
 
 Preparing the logical interfaces:
 
-    ./../../dist/tools/tapsetup/tapsetup --create 2
+    sudo ./../../dist/tools/tapsetup/tapsetup --create 2
 
 For the server instance:
 
