@@ -18,6 +18,8 @@
 
 #include <stdio.h>
 #include "arm_cpu.h"
+#include "irq.h"
+#include "sched.h"
 #include "thread.h"
 
 #define STACK_MARKER    (0x77777777)
@@ -25,7 +27,12 @@
 
 void thread_yield_higher(void)
 {
-    __asm__("svc 0\n");
+    if (irq_is_in()) {
+        sched_context_switch_request = 1;
+    }
+    else {
+        __asm__("svc 0\n");
+    }
 }
 
 /*----------------------------------------------------------------------------
