@@ -74,6 +74,24 @@ static inline cc3200_spi_t *spi(spi_t bus)
 }
 
 /**
+ * @brief validate data length is a multiple of SPIs configured word length
+ *
+ * @param bus SPI bus id
+ * @param len length to be tested
+ */
+bool validate_word_len(spi_t bus, size_t len)
+{
+    /* read configured word length */
+    uint32_t spi_wl = spi(bus)->ch0_conf & MCSPI_CH0CONF_WL_M;
+
+    /* convert spi_wl word length constant to word length in byte: (x >> 7) + 1
+     * returns word length in bits, then (bits >> 3) divides it by 8 and results
+     * in word length in bytes. Combined ((x >> 7) + 1) >> 3 == (x >> 10) + 1
+     */
+    return !(len % ((spi_wl >> 10) + 1));
+}
+
+/**
  * @brief reset spi to default state
  *
  * @param bus spi bus id
@@ -215,8 +233,15 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont, const void *out,
     /* force SPI to stay open between words */
     spi(bus)->ch0_conf |= MCSPI_CH0CONF_FORCE;
 
-    ROM_SPITransfer((uint32_t)spi(bus), (uint8_t *)out, (uint8_t *)in, len, 0);
-
+    /* perform transfer */
+    if (ROM_SPITransfer((uint32_t)spi(bus), (uint8_t *)out, (uint8_t *)in, len,
+                        0) != SPI_OK) {
+        DEBUG("SPI: Transfer failed \n");
+        /* check that len and word length combination is valid */
+        if (!validate_word_len(bus, len)) {
+            DEBUG("SPI: word length and transfer length incompatible \n");
+        }
+    }
     /* stop forcing SPI to stay open */
     spi(bus)->ch0_conf &= ~MCSPI_CH0CONF_FORCE;
 
