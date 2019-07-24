@@ -69,8 +69,10 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
 #ifdef MODULE_PERIPH_FLASHPAGE_RAW
     /* erase first page */
     flashpage_write((state->flashchunck), NULL);
-    /* convert from pages to chunks*/
+    /* convert from pages to chunks */
     state->flashchunck = (FLASHCHUNK_PER_PAGE * state->flashchunck);
+    /* offset by chunks in offset */
+    state->flashchunck += offset / FLASHCHUNK_SIZE;
 #endif
     return 0;
 }
@@ -95,9 +97,11 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
         len -= to_copy;
 
 #ifdef MODULE_PERIPH_FLASHPAGE_RAW
+        /* Since flashpage_write_and_verify_raw() doesn't erase, we erase if at
+           start of a page*/
         if ((state->flashchunck % FLASHCHUNK_PER_PAGE) == 0) {
             LOG_DEBUG(LOG_PREFIX "Erasing page %u \n",
-                        (state->flashchunck / FLASHCHUNK_PER_PAGE));
+                      (state->flashchunck / FLASHCHUNK_PER_PAGE));
             flashpage_write((state->flashchunck / FLASHCHUNK_PER_PAGE), NULL);
         }
         if ((!flashchunck_avail) || (!more)) {
@@ -126,32 +130,58 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
     return 0;
 }
 
+#ifdef MODULE_PERIPH_FLASHPAGE_RAW
+static int _finish_flashpage_write_raw(riotboot_flashwrite_t *state,
+                                const uint8_t *bytes, size_t len)
+{
+    uint8_t *slot_start = (uint8_t *)riotboot_slot_get_hdr(state->target_slot);
+    size_t pad_len = (len / FLASHCHUNK_SIZE) * FLASHCHUNK_SIZE;
+    LOG_DEBUG(LOG_PREFIX "Pad length to write %d \n", pad_len);
+    /* write all data that doesn't need padding */
+    if (flashpage_write_and_verify_raw((void *)slot_start, bytes,
+                                       pad_len) != FLASHPAGE_OK) {
+        LOG_WARNING(LOG_PREFIX "re-flashing first chunk failed!\n");
+        return -1;
+    }
+    /* we write the last padded chunk of data if needed */
+    if (pad_len != len) {
+        uint8_t* chunk_buf = state->flashchunck_buf;
+        memcpy(chunk_buf, slot_start + pad_len, FLASHCHUNK_SIZE);
+        memcpy(chunk_buf, bytes + pad_len, len % FLASHCHUNK_SIZE);
+        if (flashpage_write_and_verify_raw((void *)(slot_start + pad_len), chunk_buf,
+                                        FLASHCHUNK_SIZE) != FLASHPAGE_OK) {
+            LOG_WARNING(LOG_PREFIX "re-flashing first chunk failed!\n");
+            return -1;
+        }
+    }
+    return 0;
+}
+#endif
+
 int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
                                    const uint8_t *bytes, size_t len)
 {
-    assert(len <= FLASHCHUNK_SIZE);
+    assert(len <= FLASHPAGE_SIZE);
 
     int res = -1;
-    uint8_t *slot_start = (uint8_t *)riotboot_slot_get_hdr(state->target_slot);
-    uint8_t *firstchunck;
-
-    if (len < FLASHCHUNK_SIZE) {
-        firstchunck = state->flashchunck_buf;
-        memcpy(firstchunck, slot_start, FLASHCHUNK_SIZE);
-        memcpy(firstchunck, bytes, len);
-    }
-    else {
-        firstchunck = (void *)bytes;
-    }
 #ifdef MODULE_PERIPH_FLASHPAGE_RAW
-    if (flashpage_write_and_verify_raw((void *)slot_start, firstchunck,
-                                       FLASHCHUNK_SIZE) != FLASHPAGE_OK) {
-        LOG_WARNING(LOG_PREFIX "re-flashing first chunk failed!\n");
+    if(_finish_flashpage_write_raw(state, bytes, len)) {
         goto out;
     }
 #else
+    uint8_t *slot_start = (uint8_t *)riotboot_slot_get_hdr(state->target_slot);
+    uint8_t *firstpage;
+
+    if (len < FLASHPAGE_SIZE) {
+        firstpage = state->flashchunck_buf;
+        memcpy(firstpage, slot_start, FLASHPAGE_SIZE);
+        memcpy(firstpage, bytes, len);
+    }
+    else {
+        firstpage = (void *)bytes;
+    }
     int flashpage = flashpage_page((void *)slot_start);
-    if (flashpage_write_and_verify(flashpage, firstchunck) != FLASHPAGE_OK) {
+    if (flashpage_write_and_verify(flashpage, firstpage) != FLASHPAGE_OK) {
         LOG_WARNING(LOG_PREFIX "re-flashing first page failed!\n");
         goto out;
     }
