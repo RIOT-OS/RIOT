@@ -45,9 +45,20 @@ extern "C" {
  * @brief SPI Word length config
  * @{
  */
-#define SPI_WL_8 0x00000380
-#define SPI_WL_16 0x00000780
-#define SPI_WL_32 0x00000F80
+
+/**
+ * @brief convert word length in bit to configuration value
+ *
+ */
+#define WORD_LENGTH(x) ((x - 1) << 7)
+
+/**
+ * @brief Supported SPI word lengths
+ *
+ */
+#define SPI_WL_8 WORD_LENGTH(8)
+#define SPI_WL_16 WORD_LENGTH(16)
+#define SPI_WL_32 WORD_LENGTH(32)
 /** @} */
 
 /**
@@ -102,7 +113,8 @@ typedef enum {
     SPI_CLK_5MHZ   = 5000000,  /**< drive the SPI bus with 5MHz */
     SPI_CLK_10MHZ  = 10000000, /**< drive the SPI bus with 10MHz */
     SPI_CLK_13MHZ  = 13000000, /**< drive the SPI bus with 13MHz */
-    SPI_CLK_20MHZ  = 13000000, /**< drive the SPI bus with 20MHz */
+    SPI_CLK_20MHZ  = 20000000, /**< drive the SPI bus with 20MHz */
+    SPI_CLK_30MHZ  = 30000000, /**< drive the SPI bus with 20MHz */
 } spi_clk_t;
 /** @} */
 
@@ -132,49 +144,26 @@ typedef struct {
 /** @} */
 
 /**
- * @brief  SPI hwinfo type
- * @{
- */
-typedef struct cc3200_spi_hwinfo_t {
-    cc3200_reg_t u1;
-    cc3200_reg_t u2;
-    cc3200_reg_t u3;
-    cc3200_reg_t u4;
-} cc3200_spi_hwinfo_t;
-/** @} */
-
-/**
- * @brief  SPI system revision
- * @{
- */
-typedef struct cc3200_spi_sys_rev_t {
-    cc3200_reg_t u0;
-    cc3200_reg_t u1;
-    cc3200_reg_t u2;
-} cc3200_spi_sys_rev_t;
-/** @} */
-
-/**
  * @brief SPI component register
  *
  */
 typedef struct cc3200_spi_t {
-    cc3200_reg_t rev;             /**< hardware revision */
-    cc3200_spi_hwinfo_t hwinfo;   /**< hardware info (HDL generics) */
-    cc3200_reg_t RESERVED1[60];   /**< Sysconfig */
-    cc3200_spi_sys_rev_t sys_rev; /**< System revision number */
-    cc3200_reg_t sys_conf;        /**< System config */
-    cc3200_reg_t sys_status;      /**< Sysstatus */
-    cc3200_reg_t irq_status;      /**< IRQStatus */
-    cc3200_reg_t irq_enable;      /**< IRQEnable */
-    cc3200_reg_t wakeup_enable;   /**< Wakeupenable */
-    cc3200_reg_t sys_test;        /**< system test mode */
-    cc3200_reg_t module_ctrl;     /**< MODULE CTL */
-    cc3200_reg_t ch0_conf;        /**< CH0CONF CTL */
-    cc3200_reg_t ch0_stat;        /**< CH0 Status register */
-    cc3200_reg_t ch0_ctrl;        /**< CH0 Control register */
-    cc3200_reg_t tx0;             /**< single spi transmit word */
-    cc3200_reg_t rx0;             /**< single spi receive word */
+    cc3200_reg_t rev;           /**< hardware revision */
+    uint8_t hwinfo[16];         /**< hardware info (HDL generics) */
+    cc3200_reg_t RESERVED1[60]; /**< Sysconfig */
+    uint8_t sys_rev[12];        /**< System revision number */
+    cc3200_reg_t sys_conf;      /**< System config */
+    cc3200_reg_t sys_status;    /**< Sysstatus */
+    cc3200_reg_t irq_status;    /**< IRQStatus */
+    cc3200_reg_t irq_enable;    /**< IRQEnable */
+    cc3200_reg_t wakeup_enable; /**< Wakeupenable */
+    cc3200_reg_t sys_test;      /**< system test mode */
+    cc3200_reg_t module_ctrl;   /**< MODULE CTL */
+    cc3200_reg_t ch0_conf;      /**< CH0CONF CTL */
+    cc3200_reg_t ch0_stat;      /**< CH0 Status register */
+    cc3200_reg_t ch0_ctrl;      /**< CH0 Control register */
+    cc3200_reg_t tx0;           /**< single spi transmit word */
+    cc3200_reg_t rx0;           /**< single spi receive word */
 } cc3200_spi_t;
 /** @} */
 
