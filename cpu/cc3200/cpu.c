@@ -29,6 +29,13 @@
 #include "vendor/hw_types.h"
 #include "vendor/rom.h"
 
+/**
+ * @brief configuration for the Digital DC/DC Voltage Trimmer
+ *
+ */
+#define DIGI_DCDC_VTRIM_CFG \
+    (*((volatile uint32_t *)(HIB1P2_BASE + HIB1P2_O_DIG_DCDC_VTRIM_CFG)))
+
 static void periph_reset(void);
 
 /**
@@ -147,22 +154,25 @@ static void periph_reset(void)
                  0x2);
     }
 
-    /* DIG DCDC VOUT trim settings based on PROCESS INDICATOR */
+    /* DIG DCDC Voltage Out trim settings based on PROCESS INDICATOR (bits 22-25
+     * of GPRCM_EFUSE_READ_REG0) of FUSE ROM
+     */
     if (((GPRCM->GPRCM_EFUSE_READ_REG0 >> 22) & 0xF) == 0xE) {
-        HWREG(HIB1P2_BASE + HIB1P2_O_DIG_DCDC_VTRIM_CFG) =
-                ((HWREG(HIB1P2_BASE + HIB1P2_O_DIG_DCDC_VTRIM_CFG) &
-                  ~(0x00FC0000)) |
-                 (0x32 << 18));
+        DIGI_DCDC_VTRIM_CFG =
+                (DIGI_DCDC_VTRIM_CFG &
+                 ~HIB1P2_DIG_DCDC_VTRIM_CFG_mem_dcdc_dig_run_vtrim_M) |
+                (0x32 << 18);
     } else {
-        HWREG(HIB1P2_BASE + HIB1P2_O_DIG_DCDC_VTRIM_CFG) =
-                ((HWREG(HIB1P2_BASE + HIB1P2_O_DIG_DCDC_VTRIM_CFG) &
-                  ~(0x00FC0000)) |
-                 (0x29 << 18));
+        DIGI_DCDC_VTRIM_CFG =
+                (DIGI_DCDC_VTRIM_CFG &
+                 ~HIB1P2_DIG_DCDC_VTRIM_CFG_mem_dcdc_dig_run_vtrim_M) |
+                (0x29 << 18);
     }
 
     /* Enable SOFT RESTART in case of DIG DCDC converter collapse */
     HWREG(HIB3P3_BASE + HIB3P3_O_HIBANA_SPARE_LOWV) &= ~(0x10000000);
 
     /* Disable the sleep for ANA DCDC */
-    HWREG(HIB1P2_BASE + HIB1P2_O_ANA_DCDC_PARAMETERS_OVERRIDE) |= 0x00000004;
+    HWREG(HIB1P2_BASE + HIB1P2_O_ANA_DCDC_PARAMETERS_OVERRIDE) |=
+            HIB1P2_ANA_DCDC_PARAMETERS_OVERRIDE_mem_dcdc_ana_en_slp_mode_lowv_fsm_override_ctrl;
 }
