@@ -9,8 +9,8 @@
 /* Memory Space Definitions: */
 MEMORY
 {
-    rom (rx)    : ORIGIN = 0x20004000, LENGTH = 16K
-    ram (w!rx)  : ORIGIN = 0x20008000, LENGTH = 240K - 16K
+    rom (rx)    : ORIGIN = 0x20004000, LENGTH = 32K
+    ram (w!rx)  : ORIGIN = 0x2000C000, LENGTH = 240K - 32K
 }
 
 INCLUDE cortexm_base.ld
