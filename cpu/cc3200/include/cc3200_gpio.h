@@ -90,7 +90,7 @@ typedef enum {
     GPIO_BOTH    = 1, /**< emit interrupt on both flanks   */
     GPIO_LOW     = 2, /**< emit interrupt on low level     */
     GPIO_RISING  = 4, /**< emit interrupt on rising flank  */
-    GPIO_NONE    = 5, /**< emit interrupt on rising flank  */
+    GPIO_NONE    = 5, /**< no interrupt  */
     GPIO_HIGH    = 6  /**< emit interrupt on low level     */
 } gpio_flank_t;
 /** @} */
