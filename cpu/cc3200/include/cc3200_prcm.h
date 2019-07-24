@@ -36,7 +36,17 @@ extern "C" {
  *
  */
 #define USEC_TO_CPU_CYCLES(x) (80 * x) / 3
-#define PRCM_OP_DELAY USEC_TO_CPU_CYCLES(200)
+/**
+ * @brief delay CPU for x uSec
+ *
+ */
+#define USEC_DELAY(x) ROM_UtilsDelay(USEC_TO_CPU_CYCLES(x))
+
+/**
+ * @brief uSec delay for reading some Power Control Module Values
+ *
+ */
+#define PRCM_OP_USEC_DELAY 200
 
 /* Derived/Copied from TIs driverlib/prcm.h */
 
@@ -122,10 +132,18 @@ typedef struct cc3200_arcm_t {
     cc3200_arcm_reg_t CRYPTO;         /**< Crypto Engine ARCM register */
     cc3200_reg_t RESERVED4[2];        /**< RESERVED */
     cc3200_arcm_reg_t MCSPI_S0; /**< Integrated CC3100 SPI ARMC register */
-    cc3200_reg_t MCSPI_S0_CLKDIV_CFG; /**< Integrated CC3100 SPI Configuration
-                                       */
-    cc3200_reg_t RESERVED5[1];        /**< RESERVED */
-    cc3200_arcm_reg_t I2C;            /**< I2C Clock ARCM register */
+    cc3200_reg_t MCSPI_S0_CLKDIV_CFG;   /**< Integrated CC3100 SPI Configuration
+                                         */
+    cc3200_arcm_reg_t I2C;              /**< I2C Clock ARCM register */
+    cc3200_reg_t APPS_LPDS_REQ;         /**< APPS_LPDS_REQ */
+    cc3200_reg_t APPS_TURBO_REQ;        /**< APPS_TURBO_REQ */
+    cc3200_reg_t APPS_DSLP_WAKE_CONFIG; /**< APPS_DSLP_WAKE_CONFIG */
+    cc3200_reg_t APPS_DSLP_WAKE_TIMER_CFG;  /**< APPS_DSLP_WAKE_TIMER_CFG */
+    cc3200_reg_t APPS_RCM_SLP_WAKE_ENABLE;  /**< APPS_RCM_SLP_WAKE_ENABLE */
+    cc3200_reg_t APPS_SLP_WAKETIMER_CFG;    /**< APPS_SLP_WAKETIMER_CFG */
+    cc3200_reg_t APPS_TO_NWP_WAKE_REQUEST;  /**< APPS_TO_NWP_WAKE_REQUEST */
+    cc3200_reg_t APPS_RCM_INTERRUPT_STATUS; /**< APPS_RCM_INTERRUPT_STATUS */
+    cc3200_reg_t APPS_RCM_INTERRUPT_ENABLE; /**< APPS_RCM_INTERRUPT_ENABLE */
 } cc3200_arcm_t;
 
 #define ARCM                                                              \

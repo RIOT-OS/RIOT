@@ -76,13 +76,13 @@ static uint32_t get_sys_reset_cause(void)
 {
     uint32_t reset_cause;
     uint32_t hiber_status;
-    /* reset read reset status */
+    /* read reset status */
     reset_cause = GPRCM->APPS_RESET_CAUSE & 0xFF;
 
     if (reset_cause == PRCM_POWER_ON) {
-        hiber_status = HWREG(HIB3P3_BASE + HIB3P3_O_MEM_HIB_WAKE_STATUS);
+        hiber_status = HIBERNATION_WAKE_STATUS_REG;
         /* FIXME: wait for some reason test if this is needed*/
-        ROM_UtilsDelay(PRCM_OP_DELAY);
+        USEC_DELAY(PRCM_OP_USEC_DELAY);
         if (hiber_status & 0x1) {
             return PRCM_HIB_EXIT;
         }
@@ -91,22 +91,34 @@ static uint32_t get_sys_reset_cause(void)
 }
 
 /**
- * @brief periph_reset resets peripherals
- * based upon PRCMCC3200MCUInit from TIs prcm.c
- *
+ * @brief periph_reset performs essential MCU configuration.
+ * This implementation is a cleaned up version of TIs PRCMCC3200MCUInit
+ * (driverlib/prcm.c) Unfortunately most registers are not documented.
+ * - Setup hardware to allow for Hibernation (ECO) and Low Power Deep Sleep
+ *   (LPDS) modes
+ * - Enable Clock Switching (presumably for the ECO and LPDS modes)
+ * - Reset uDMA & disable it
+ * - enable Real Time Clock if device was awaken from Hibernation (presumably
+ * hibernation awake will trigger an restart interrupt, needs to be tested or
+ * dropped)
+ * - configure JTAG and JTAG FTDI pin connections for Software Development Mode
+ * (SWD)
+ * - Enable and configure various DC/DC converters
  */
 static void periph_reset(void)
 {
-    cc3200_reg_t tmp;
-
-    /* DIG DCDC LPDS ECO Enable */
+    /* This register activates the following MCU features:
+        - Low Power Deep Sleep (LPDS)
+        - Hibernation Mode (referred by TI as ECO)
+        - Analogue DC/DC power converted (probably required by low power modes)
+     */
     HWREG(HIB1P2_BASE + HIB1P2_O_ANA_DCDC_PARAMETERS16) |= 0x800000;
+    USEC_DELAY(PRCM_OP_USEC_DELAY);
 
-    /* enable hibernate ECO */
-    tmp = HWREG(HIB3P3_BASE + HIB3P3_O_MEM_HIB_WAKE_STATUS);
-    ROM_UtilsDelay(PRCM_OP_DELAY);
-    HWREG(HIB3P3_BASE + HIB3P3_O_MEM_HIB_REG0) = tmp | (1 << 4);
-    ROM_UtilsDelay(PRCM_OP_DELAY);
+    /* enable hibernation power save mode on MCU (ECO) */
+    HWREG(HIB3P3_BASE + HIB3P3_O_MEM_HIB_REG0) =
+            HIBERNATION_WAKE_STATUS_REG | (1 << 4);
+    USEC_DELAY(PRCM_OP_USEC_DELAY);
 
     /* enable clock switching */
     HWREG(OCP_SHARED_BASE + OCP_SHARED_O_SPARE_REG_5) |= 0x3C;
@@ -120,10 +132,10 @@ static void periph_reset(void)
     if (get_sys_reset_cause() == PRCM_POWER_ON) {
         /* enable RTC timer after hibernation */
         HWREG(HIB3P3_BASE + HIB3P3_O_MEM_HIB_RTC_TIMER_ENABLE) = 0x1;
-        ROM_UtilsDelay(PRCM_OP_DELAY);
+        USEC_DELAY(PRCM_OP_USEC_DELAY);
     }
 
-    /* SWD mode */
+    /* configure software development mode pins (SWD) */
     if (((HWREG(HIB1P2_BASE + HIB1P2_O_SOP_SENSE_VALUE) & 0xFF) == 0x2)) {
         HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_28) =
                 ((HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_28) &
@@ -133,25 +145,6 @@ static void periph_reset(void)
                 ((HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_29) &
                   ~0xC0F) |
                  0x2);
-    }
-
-    /* Override JTAG mux */
-    HWREG(OCP_SHARED_BASE + OCP_SHARED_O_CC3XX_DEV_PADCONF) |= 0x2;
-
-    /* Change UART pins(55,57) mode to PIN_MODE_0 if they are in PIN_MODE_1
-     */
-    if ((HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_1) & 0xF) ==
-        0x1) {
-        HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_1) =
-                ((HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_1) &
-                  ~0xF));
-    }
-
-    if ((HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_2) & 0xF) ==
-        0x1) {
-        HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_2) =
-                ((HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_2) &
-                  ~0xF));
     }
 
     /* DIG DCDC VOUT trim settings based on PROCESS INDICATOR */
@@ -167,7 +160,7 @@ static void periph_reset(void)
                  (0x29 << 18));
     }
 
-    /* Enable SOFT RESTART in case of DIG DCDC collapse */
+    /* Enable SOFT RESTART in case of DIG DCDC converter collapse */
     HWREG(HIB3P3_BASE + HIB3P3_O_HIBANA_SPARE_LOWV) &= ~(0x10000000);
 
     /* Disable the sleep for ANA DCDC */
