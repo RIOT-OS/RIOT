@@ -38,6 +38,14 @@ extern "C" {
 #define CPUID_LEN (4U)
 
 /**
+ * @brief holds the current hibernation state of the MCU. READONLY and reading
+ * requires a delay of PRCM_OP_DELAY
+ *
+ */
+#define HIBERNATION_WAKE_STATUS_REG \
+    (*((volatile uint32_t *)(HIB3P3_BASE + HIB3P3_O_MEM_HIB_WAKE_STATUS)))
+
+/**
  * @name    Power management configuration
  * @{
  */
@@ -53,7 +61,6 @@ typedef struct {
     gpio_t gpio_port;   /**< GPIO port */
     spi_pins_t pins;    /**< pin configuration */
     uint32_t config;    /**< SPI config */
-
 } spi_conf_t;
 /** @} */
 

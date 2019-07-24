@@ -34,6 +34,6 @@ void pm_set_lowest(void)
     HWREG(HIB3P3_BASE + HIB3P3_O_MEM_HIB_REQ) = 0x1;
 
     /* wait for 200 uSec */
-    ROM_UtilsDelay(PRCM_OP_DELAY);
+    USEC_DELAY(PRCM_OP_USEC_DELAY);
 }
 #endif
