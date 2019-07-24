@@ -30,6 +30,13 @@
 #include "vendor/hw_types.h"
 #include "vendor/rom.h"
 
+/**
+ * @brief configuration for the Digital DC/DC Voltage Trimmer
+ *
+ */
+#define DIGI_DCDC_VTRIM_CFG \
+    (*((volatile uint32_t *)(HIB1P2_BASE + HIB1P2_O_DIG_DCDC_VTRIM_CFG)))
+
 static void periph_reset(void);
 
 /**
