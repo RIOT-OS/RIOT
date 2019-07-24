@@ -58,6 +58,8 @@ extern "C" {
 /* To keep the same flashpage functionality an arbitrary 1K < FLASHSECTOR_SIZE_MIN
  * (size of smaller sector) is defined
  */
+/* An erase byte in flash is set to 0xff */
+#define FLASH_ERASE_STATE         (0xff)
 #define FLASHPAGE_SIZE            (1024U)
 #define FLASHPAGE_NUMOF           (STM32_FLASHSIZE / FLASHPAGE_SIZE)
 /* The minimum block size which can be written is 4B. However, the erase
