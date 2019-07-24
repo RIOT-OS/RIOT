@@ -84,7 +84,7 @@ riotboot/flash-bootloader: riotboot/bootloader/flash
 riotboot/bootloader/%:
 	$(Q)/usr/bin/env -i \
 		QUIET=$(QUIET)\
-		PATH=$(PATH) BOARD=$(BOARD) \
+		PATH=$(PATH) BOARD=$(BOARD) DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID)\
 			$(MAKE) --no-print-directory -C $(RIOTBOOT_DIR) $*
 
 # Generate a binary file from the bootloader which fills all the
