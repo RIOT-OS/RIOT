@@ -47,25 +47,25 @@
 It is 64 bytes and can be mapped (see documentation 1.4.2). */
 .section .vectors
 /* Exception Vectors */
-                ldr     PC, Reset_Addr      /* Reset */
-                ldr     PC, Undef_Addr      /* Undefined Instruction */
-                ldr     PC, SWI_Addr        /* Software Interrupt */
-                ldr     PC, PAbt_Addr       /* Prefetch Abort */
-                ldr     PC, DAbt_Addr       /* Data Abort */
+                ldr     PC, reset_addr      /* Reset */
+                ldr     PC, undef_addr      /* Undefined Instruction */
+                ldr     PC, swi_addr        /* Software Interrupt */
+                ldr     PC, pabt_addr       /* Prefetch Abort */
+                ldr     PC, dabt_addr       /* Data Abort */
                 nop                         /* Reserved Vector (holds Philips ISP checksum) */
                 /* see page 71 of "Insiders Guide to the Philips ARM7-Based Microcontrollers" by Trevor Martin  */
 /*                ldr     PC, [PC,#-0x0120]     /* Interrupt Request Interrupt (load from VIC) */
-                ldr     PC, IRQ_Addr        /* Interrupt Request Interrupt (load from VIC) */
+                ldr     PC, irq_addr        /* Interrupt Request Interrupt (load from VIC) */
                 ldr     r0, =__fiq_handler  /* Fast Interrupt Request Interrupt */
                 ldr     pc, [r0]            /* jump to handler in pointer at __fiq_handler */
 
 /* Exception vector handlers branching table */
-Reset_Addr:     .word   Reset_Handler       /* defined in this module below  */
-Undef_Addr:     .word   UNDEF_Routine       /* defined in main.c  */
-SWI_Addr:       .word   ctx_switch          /* defined in main.c  */
-PAbt_Addr:      .word   PABT_Routine        /* defined in main.c  */
-DAbt_Addr:      .word   DABT_Routine        /* defined in main.c  */
-IRQ_Addr:       .word   arm_irq_handler      /* defined in main.c  */
+reset_addr:     .word   reset_handler       /* defined in this module below  */
+undef_addr:     .word   isr_undef           /* defined in arm7_common/vectors.c */
+swi_addr:       .word   ctx_switch          /* defined in arm7_common/common.s */
+pabt_addr:      .word   isr_pabt            /* defined in arm7_common/vectors.c */
+dabt_addr:      .word   isr_dabt            /* defined in arm7_common/vectors.c */
+irq_addr:       .word   arm_irq_handler     /* defined in arm7_common/common.s */
 
 /* Begin of boot code */
 .text
@@ -76,10 +76,10 @@ IRQ_Addr:       .word   arm_irq_handler      /* defined in main.c  */
 .func   _startup
 
 _startup:
-                ldr    pc, =Reset_Handler
+                ldr    pc, =reset_handler
 
-/*.func Reset_Handler */
-Reset_Handler:
+/*.func reset_handler */
+reset_handler:
 
 .section .init0
                 /* Setup a stack for each mode - note that this only sets up a usable stack
