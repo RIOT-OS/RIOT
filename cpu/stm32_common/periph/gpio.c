@@ -196,11 +196,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     isr_ctx[pin_num].arg = arg;
 
     /* enable clock of the SYSCFG module for EXTI configuration */
-#ifdef CPU_FAN_STM32F0
-    periph_clk_en(APB2, RCC_APB2ENR_SYSCFGCOMPEN);
-#else
     periph_clk_en(APB2, RCC_APB2ENR_SYSCFGEN);
-#endif
 
     /* initialize pin as input */
     gpio_init(pin, mode);
