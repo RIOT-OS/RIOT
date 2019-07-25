@@ -385,3 +385,27 @@ uint8_t semtech_loramac_get_rx2_dr(semtech_loramac_t *mac)
     mutex_unlock(&mac->lock);
     return datarate;
 }
+
+void semtech_loramac_set_uplink_counter(semtech_loramac_t *mac, uint32_t counter)
+{
+    DEBUG("[semtech-loramac] reading uplink counter: %" PRIu32 " \n", counter);
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_UPLINK_COUNTER;
+    mibReq.Param.UpLinkCounter = counter;
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
+}
+
+uint32_t semtech_loramac_get_uplink_counter(semtech_loramac_t *mac)
+{
+    mutex_lock(&mac->lock);
+    uint32_t counter;
+    DEBUG("[semtech-loramac] getting uplink counter\n");
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_UPLINK_COUNTER;
+    LoRaMacMibGetRequestConfirm(&mibReq);
+    counter = mibReq.Param.UpLinkCounter;
+    mutex_unlock(&mac->lock);
+    return counter;
+}

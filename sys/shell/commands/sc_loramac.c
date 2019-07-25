@@ -57,13 +57,13 @@ static void _loramac_tx_usage(void)
 static void _loramac_set_usage(void)
 {
     puts("Usage: loramac set <deveui|appeui|appkey|appskey|nwkskey|devaddr|"
-         "class|dr|adr|public|netid|tx_power|rx2_freq|rx2_dr> <value>");
+         "class|dr|adr|public|netid|tx_power|rx2_freq|rx2_dr|ul_cnt> <value>");
 }
 
 static void _loramac_get_usage(void)
 {
     puts("Usage: loramac get <deveui|appeui|appkey|appskey|nwkskey|devaddr|"
-         "class|dr|adr|public|netid|tx_power|rx2_freq|rx2_dr>");
+         "class|dr|adr|public|netid|tx_power|rx2_freq|rx2_dr|ul_cnt>");
 }
 
 int _loramac_handler(int argc, char **argv)
@@ -161,6 +161,9 @@ int _loramac_handler(int argc, char **argv)
         }
         else if (strcmp("rx2_dr", argv[2]) == 0) {
             printf("RX2 dr: %d\n", semtech_loramac_get_rx2_dr(&loramac));
+        }
+        else if (strcmp("ul_cnt", argv[2]) == 0) {
+            printf("Uplink Counter: %"PRIu32"\n", semtech_loramac_get_uplink_counter(&loramac));
         }
         else {
             _loramac_get_usage();
@@ -334,6 +337,14 @@ int _loramac_handler(int argc, char **argv)
                 return 1;
             }
             semtech_loramac_set_rx2_dr(&loramac, dr);
+        }
+        else if (strcmp("ul_cnt", argv[2]) == 0) {
+            if (argc < 4) {
+                puts("Usage: loramac set ul_cnt <value>");
+                return 1;
+            }
+            uint32_t counter = atoi(argv[3]);
+            semtech_loramac_set_uplink_counter(&loramac, counter);
         }
         else {
             _loramac_set_usage();
