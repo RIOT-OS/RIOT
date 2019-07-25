@@ -72,8 +72,4 @@ void init_clks1(void)
 
     /* Set clock divider to 4 (value+1) */
     CCLKCFG = CL_CPU_DIV - 1;           /* Fcpu = 72 MHz */
-
-#if USE_USB
-    USBCLKCFG = USBCLKDivValue;     /* usbclk = 288 MHz/6 = 48 MHz */
-#endif
 }
