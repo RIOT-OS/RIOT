@@ -42,6 +42,7 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
     int iface;
     uint16_t port;
     ipv6_addr_t addr;
+    printf("Inside send\n");
 
     /* get interface, if available */
     iface = ipv6_addr_split_iface(addr_str);
@@ -63,6 +64,7 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
     for (unsigned int i = 0; i < num; i++) {
         gnrc_pktsnip_t *payload, *udp, *ip;
         unsigned payload_size;
+        printf("Trying to send\n");
         /* allocate payload */
         payload = gnrc_pktbuf_add(NULL, data, strlen(data), GNRC_NETTYPE_UNDEF);
         if (payload == NULL) {
@@ -71,6 +73,11 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
         }
         /* store size for output */
         payload_size = (unsigned)payload->size;
+        printf("Payload size to be sent is %u byte(s) to\n", payload_size);
+        if (payload_size > 85) {
+                puts("Error: unable to allocate NETIF header");
+                return;
+        }
         /* allocate UDP header, set source port := destination port */
         udp = gnrc_udp_hdr_build(payload, port, port);
         if (udp == NULL) {
@@ -87,8 +94,10 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
         }
         /* add netif header, if interface was given */
         if (iface > 0) {
+            
             gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-
+            unsigned long sz = netif->size;
+            printf("NETIF Returned is %lu byte(s)\n", sz);            
             ((gnrc_netif_hdr_t *)netif->data)->if_pid = (kernel_pid_t)iface;
             LL_PREPEND(ip, netif);
         }
@@ -107,8 +116,7 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
 }
 
 static void start_server(char *port_str)
-{
-    uint16_t port;
+{    uint16_t port;
 
     /* check if server is already running */
     if (server.target.pid != KERNEL_PID_UNDEF) {
