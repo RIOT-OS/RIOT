@@ -70,12 +70,12 @@ typedef uint32_t gpio_t;
  */
 #define HAVE_GPIO_MODE_T
 typedef enum {
-    GPIO_IN    = 0x00000000, /**< input, no pull */
-    GPIO_OUT   = 0x00000001, /**< output */
-    GPIO_OD    = 0x00000002, /**< open drain */
-    GPIO_OD_PU = 0x00000106, /**< open drain pull-up */
-    GPIO_IN_PU = 0x00000107, /**< input, pull-up */
-    GPIO_IN_PD = 0x00000208, /**< input, pull-down */
+    GPIO_IN     = 0x00000000,   /**< input, no pull */
+    GPIO_OUT    = 0x00000001,   /**< output */
+    GPIO_OD     = 0x00000002,   /**< open drain */
+    GPIO_OD_PU  = 0x00000106,   /**< open drain pull-up */
+    GPIO_IN_PU  = 0x00000107,   /**< input, pull-up */
+    GPIO_IN_PD  = 0x00000208,   /**< input, pull-down */
 } gpio_mode_t;
 /** @} */
 
@@ -86,12 +86,12 @@ typedef enum {
  */
 #define HAVE_GPIO_FLANK_T
 typedef enum {
-    GPIO_FALLING = 0, /**< emit interrupt on falling flank */
-    GPIO_BOTH    = 1, /**< emit interrupt on both flanks   */
-    GPIO_LOW     = 2, /**< emit interrupt on low level     */
-    GPIO_RISING  = 4, /**< emit interrupt on rising flank  */
-    GPIO_NONE    = 5, /**< no interrupt  */
-    GPIO_HIGH    = 6  /**< emit interrupt on low level     */
+    GPIO_FALLING    = 0,    /**< emit interrupt on falling flank */
+    GPIO_BOTH       = 1,    /**< emit interrupt on both flanks   */
+    GPIO_LOW        = 2,    /**< emit interrupt on low level     */
+    GPIO_RISING     = 4,    /**< emit interrupt on rising flank  */
+    GPIO_NONE       = 5,    /**< no interrupt  */
+    GPIO_HIGH       = 6     /**< emit interrupt on low level     */
 } gpio_flank_t;
 /** @} */
 

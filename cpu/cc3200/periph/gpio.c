@@ -35,16 +35,25 @@
 static gpio_isr_ctx_t isr_ctx[4][8];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
-#define GPIO_DIR_MASK 0x00000001
-#define PIN_MODE_GPIO 0x00000000
-#define GPIO_PORT_MASK (0xfffff000) /**< bit mask for GPIO port addr  */
-#define NOT_A_PORT 0
-#define NOT_A_PIN 0
-#define NOT_A_GPIO 66
-#define PAD_MODE_MASK 0x0000000F
-#define PAD_STRENGTH_MASK 0x000000E0
-#define PAD_TYPE_MASK 0x00000310
+#define GPIO_PINS_PER_PORT 8     /**< Number of pins per port */
+#define GPIO_DIR_MASK 0x00000001 /**< GPIO direction configuration mask */
+#define PIN_MODE_GPIO \
+    0x00000000 /**< GPIO Pin type value used to configure pin to GPIO */
+#define PAD_MODE_MASK 0x0000000F /**< GPIO mask for setting pin mode */
+#define PAD_STRENGTH_MASK                              \
+    0x000000E0 /**< GPIO mask for setting pin strength \
+                */
+#define PAD_TYPE_MASK                                        \
+    0x00000310 /**< GPIO mask for setting pin type e.g. PULL \
+                */
 #define PAD_CONFIG_BASE ((OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_0))
+
+/**
+ * @brief get hardware configuration register for a pin
+ *
+ */
+#define PAD_CONFIG_REG(pin) \
+    (*((volatile unsigned long *)((gpio_pin << 2) + PAD_CONFIG_BASE)))
 
 /**
  * @brief gpio base addresses
@@ -150,14 +159,13 @@ void gpio_init_af(gpio_t dev, uint32_t strength, uint32_t type)
     /* now only replecate behaviour. */
 
     /* enable input */
-    HWREG(0x4402E144) &= ~((0x80 << gpio_pin) & (0x1E << 8));
+    HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CMN_CONFIG) &=
+            ~((0x80 << gpio_pin) & (0x1E << 8));
 
-    /* compute pin register */
-    unsigned long regAddr = (gpio_pin << 2) + PAD_CONFIG_BASE;
-
-    /* write config */
-    HWREG(regAddr) = ((HWREG(regAddr) & ~(PAD_STRENGTH_MASK | PAD_TYPE_MASK)) |
-                      (strength | type));
+    /* write config to hardware register referred by TI as PAD */
+    PAD_CONFIG_REG(gpio_pin) =
+            ((PAD_CONFIG_REG(gpio_pin) & ~(PAD_STRENGTH_MASK | PAD_TYPE_MASK)) |
+             (strength | type));
 }
 
 void gpio_pin_mode_set(gpio_t dev, uint32_t mode)
@@ -166,11 +174,9 @@ void gpio_pin_mode_set(gpio_t dev, uint32_t mode)
     uint8_t pin      = gpio_pin_num(dev);
     uint8_t gpio_pin = pin_to_gpio_num[pin];
 
-    /* compute pin register */
-    unsigned long regAddr = (gpio_pin << 2) + PAD_CONFIG_BASE;
-
     /* set mode */
-    HWREG(regAddr) = (((HWREG(regAddr) & ~PAD_MODE_MASK) | mode) & ~(3 << 10));
+    PAD_CONFIG_REG(gpio_pin) =
+            (((PAD_CONFIG_REG(gpio_pin) & ~PAD_MODE_MASK) | mode) & ~(3 << 10));
 }
 
 int gpio_init(gpio_t dev, gpio_mode_t mode)
@@ -333,7 +339,7 @@ void gpio_write(gpio_t dev, int value)
     unsigned char ipin     = gpio_pin_mask(dev);
     unsigned long portAddr = gpio_pin_to_port(port);
     /* write to pin at portBase + pinOffset */
-    HWREG(portAddr + (0x00000000 + (ipin << 2))) =
+    HWREG(portAddr + (ipin << 2)) =
             _gpio_pin_value_mask(pin_to_gpio_num[gpio_pin_num(dev)], value);
 }
 
@@ -351,8 +357,7 @@ int gpio_read(gpio_t dev)
 
     /* read from pin at portBase + pinOffset */
     /* cast value to int {0, 1} */
-    return (HWREG(portAddr + (0x00000000 + (ipin << 2))) ? GPIO_VALUE_HIGH :
-                                                           GPIO_VALUE_LOW);
+    return (HWREG(portAddr + (ipin << 2)) ? GPIO_VALUE_HIGH : GPIO_VALUE_LOW);
 }
 
 /**
