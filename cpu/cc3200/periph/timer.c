@@ -136,7 +136,7 @@ static inline void *get_irq_handler(tim_t dev)
 int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* check if timer id is valid */
-    if (dev >= MAX_TIMERS) {
+    if (dev >= TIMER_NUMOF) {
         return -1;
     }
     void *timerHandler = get_irq_handler(dev);
@@ -190,7 +190,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 int set_absolute(tim_t dev, int channel, unsigned long long value)
 {
     /* currently only one channel supported */
-    if (dev >= MAX_TIMERS || channel > 0) {
+    if (dev >= TIMER_NUMOF || channel > 0) {
         return -1;
     }
     ROM_TimerMatchSet((uint32_t)timer(dev), TIMER_A, value);
@@ -211,7 +211,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 int timer_clear(tim_t dev, int channel)
 {
     /* currently only one channel supported */
-    if (dev >= MAX_TIMERS || channel > 0) {
+    if (dev >= TIMER_NUMOF || channel > 0) {
         return -1;
     }
     ROM_TimerIntClear((uint32_t)timer(dev), TIMER_TIMA_MATCH);
@@ -222,7 +222,7 @@ int timer_clear(tim_t dev, int channel)
 
 unsigned int timer_read(tim_t dev)
 {
-    if (dev >= MAX_TIMERS) {
+    if (dev >= TIMER_NUMOF) {
         return 0;
     }
     return timer(dev)->val_a;
@@ -230,7 +230,7 @@ unsigned int timer_read(tim_t dev)
 
 void timer_start(tim_t dev)
 {
-    if (dev >= MAX_TIMERS) {
+    if (dev >= TIMER_NUMOF) {
         return;
     }
     ROM_TimerEnable((uint32_t)timer(dev), TIMER_A);
@@ -238,7 +238,7 @@ void timer_start(tim_t dev)
 
 void timer_stop(tim_t dev)
 {
-    if (dev >= MAX_TIMERS) {
+    if (dev >= TIMER_NUMOF) {
         return;
     }
     ROM_TimerDisable((uint32_t)timer(dev), TIMER_A);
@@ -246,7 +246,7 @@ void timer_stop(tim_t dev)
 
 void timer_irq_enable(tim_t dev)
 {
-    if (dev >= MAX_TIMERS) {
+    if (dev >= TIMER_NUMOF) {
         return;
     }
     ROM_TimerIntEnable((uint32_t)timer(dev), TIMER_TIMA_MATCH);
@@ -254,7 +254,7 @@ void timer_irq_enable(tim_t dev)
 
 void timer_irq_disable(tim_t dev)
 {
-    if (dev >= MAX_TIMERS) {
+    if (dev >= TIMER_NUMOF) {
         return;
     }
     ROM_TimerIntDisable((uint32_t)timer(dev), TIMER_TIMA_MATCH);
@@ -262,7 +262,7 @@ void timer_irq_disable(tim_t dev)
 
 void timer_reset(tim_t dev)
 {
-    if (dev >= MAX_TIMERS) {
+    if (dev >= TIMER_NUMOF) {
         return;
     }
 

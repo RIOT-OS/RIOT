@@ -34,6 +34,7 @@ extern "C" {
  * @{
  */
 #define HAVE_GPIO_T
+/** @} */
 
 /**
  * @name Numeric representation of the four GPIO ports
@@ -45,7 +46,6 @@ enum {
     PORT_A2 = 2,
     PORT_A3 = 3,
 };
-
 /** @} */
 
 /**
@@ -97,12 +97,22 @@ typedef enum {
 
 /**
  * @brief   Define a CPU specific GPIO pin generator macro
+ * @{
  */
 #define GPIO_PIN(x, y) ((x << 6) | (y - 1))
-#define GPIO_PINS_PER_PORT 8
+/** @} */
 
+/**
+ * @brief GPIO register
+ * @{
+ */
 typedef unsigned long cc3200_gpio_reg;
+/** @} */
 
+/**
+ * @brief GPIO device register
+ * @{
+ */
 typedef struct cc3200_gpio_t {
     cc3200_gpio_reg data;           /**< GPIO Data register */
     cc3200_gpio_reg RESERVER1[255]; /**< GPIO Reserved addresses */
@@ -114,9 +124,9 @@ typedef struct cc3200_gpio_t {
     cc3200_gpio_reg ris;            /**< GPIO Raw Interrupt Status */
     cc3200_gpio_reg mis;            /**< GPIO Masked Interrupt Status */
     cc3200_gpio_reg icr;            /**< GPIO Interrupt Clear */
-
 } cc3200_gpio_t;
 /** @} */
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
