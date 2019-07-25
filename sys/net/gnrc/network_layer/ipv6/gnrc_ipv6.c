@@ -630,7 +630,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
     netif_hdr = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
 
     if (netif_hdr != NULL) {
-        netif = gnrc_netif_get_by_pid(((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid);
+        netif = gnrc_netif_hdr_get_netif(netif_hdr->data);
 #ifdef MODULE_NETSTATS_IPV6
         assert(netif != NULL);
         netstats_t *stats = &netif->ipv6.stats;
