@@ -81,14 +81,12 @@ void reset_periph_clk(cc3200_arcm_reg_t *reg)
  */
 static uint32_t get_sys_reset_cause(void)
 {
-    uint32_t reset_cause;
-    uint32_t hiber_status;
     /* read reset status */
-    reset_cause = GPRCM->APPS_RESET_CAUSE & 0xFF;
+    uint32_t reset_cause = GPRCM->APPS_RESET_CAUSE & 0xFF;
 
     if (reset_cause == PRCM_POWER_ON) {
-        hiber_status = HIBERNATION_WAKE_STATUS_REG;
-        /* FIXME: wait for some reason test if this is needed*/
+        uint32_t hiber_status = HIBERNATION_WAKE_STATUS_REG;
+        /* reading hibernation status requires a small delay */
         USEC_DELAY(PRCM_OP_USEC_DELAY);
         if (hiber_status & 0x1) {
             return PRCM_HIB_EXIT;
