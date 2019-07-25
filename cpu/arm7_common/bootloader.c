@@ -34,12 +34,6 @@ void FIQ_Routine(void)   __attribute__((interrupt("FIQ")));
 //void SWI_Routine (void)   __attribute__((interrupt("SWI")));
 void UNDEF_Routine(void) __attribute__((interrupt("UNDEF")));
 
-void IRQ_Routine(void)
-{
-    LOG_ERROR("Kernel Panic,\nEarly IRQ call\n");
-
-    while (1) {};
-}
 /*-----------------------------------------------------------------------------------*/
 void FIQ_Routine(void)
 {
@@ -51,13 +45,6 @@ void FIQ_Routine(void)
 void SWI_Routine(void)
 {
     LOG_ERROR("Kernel Panic,\nEarly SWI call\n");
-
-    while (1) {};
-}
-/*-----------------------------------------------------------------------------------*/
-void DEBUG_Routine(void)
-{
-    LOG_ERROR("DEBUG hit.");
 
     while (1) {};
 }
@@ -164,19 +151,14 @@ bl_init_data(void)
 /*-----------------------------------------------------------------------------------*/
 void bootloader(void)
 {
-    extern void bl_uart_init(void);
     extern void bl_init_ports(void);
     extern void bl_init_clks(void);
-    extern void bl_blink(void);
-    extern void bl_config_init(void);
 
     /* board specific setup of clocks */
     bl_init_clks();
 
     /* initialize bss and data */
-#ifndef CPU_MC1322X
     bl_init_data();
-#endif
 
     /* board specific setup of i/o pins */
     bl_init_ports();
