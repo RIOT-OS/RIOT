@@ -61,6 +61,13 @@ typedef uint32_t gpio_t;
 #define CPUID_LEN           (16U)
 
 /**
+ * @name    HWRNG configuration
+ * @{
+ */
+#define HWRNG_HAS_GENERIC_READ (1)
+#define HWRNG_HAS_POWERONOFF   (1)
+
+/**
  * @brief   All SAM3 timers are 32-bit wide
  */
 #define TIMER_MAX_VAL       (0xffffffff)

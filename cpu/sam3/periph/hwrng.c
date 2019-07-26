@@ -28,12 +28,7 @@
  */
 #define KEY             (0x524e4700)
 
-void hwrng_init(void)
-{
-    /* no need for initialization */
-}
-
-static void poweron(void)
+void hwrng_poweron(void)
 {
     /* enable clock signal for TRNG module */
     PMC->PMC_PCER1 |= PMC_PCER1_PID41;
@@ -41,7 +36,7 @@ static void poweron(void)
     TRNG->TRNG_CR |= (KEY | TRNG_CR_ENABLE);
 }
 
-static void poweroff(void)
+void hwrng_poweroff(void)
 {
     /* disable the generation of random numbers */
     TRNG->TRNG_CR &= ~(KEY | TRNG_CR_ENABLE);
@@ -51,33 +46,7 @@ static void poweroff(void)
 
 uint32_t hwrng_uint32(void)
 {
-    poweron();
-
     /* wait until new value is generated -> takes up to 84 cycles */
     while (!(TRNG->TRNG_ISR & TRNG_ISR_DATRDY)) {}
     return TRNG->TRNG_ODATA;
-
-    poweroff();
-}
-
-void hwrng_read(void *buf, unsigned int num)
-{
-    unsigned count = 0;
-    uint8_t *b = (uint8_t *)buf;
-
-    poweron();
-
-    while (count < num) {
-        /* wait until new value is generated -> takes up to 84 cycles */
-        while (!(TRNG->TRNG_ISR & TRNG_ISR_DATRDY)) {}
-        /* read 4 byte of random data */
-        uint32_t tmp = TRNG->TRNG_ODATA;
-        /* extract copy bytes to result */
-        for (int i = 0; i < 4 && count < num; i++) {
-            b[count++] = (uint8_t)tmp;
-            tmp = tmp >> 8;
-        }
-    }
-
-    poweroff();
 }
