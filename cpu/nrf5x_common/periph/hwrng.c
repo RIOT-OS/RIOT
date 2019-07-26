@@ -38,17 +38,33 @@ void hwrng_init(void)
  * enabled, it shall only be accessed through the SoftDevice API
  */
 #ifndef MODULE_NORDIC_SOFTDEVICE_BLE
-void hwrng_read(void *buf, unsigned int num)
-{
-    unsigned int count = 0;
-    uint8_t *b = (uint8_t *)buf;
 
+static inline void poweron(void)
+{
     /* power on RNG */
 #ifdef CPU_FAM_NRF51
     NRF_RNG->POWER = 1;
 #endif
     NRF_RNG->INTENSET = RNG_INTENSET_VALRDY_Msk;
     NRF_RNG->TASKS_START = 1;
+}
+
+static inline void poweroff(void)
+{
+    /* power off RNG */
+    NRF_RNG->INTENCLR = RNG_INTENSET_VALRDY_Msk;
+    NRF_RNG->TASKS_STOP = 1;
+#ifdef CPU_FAM_NRF51
+    NRF_RNG->POWER = 0;
+#endif
+}
+
+void hwrng_read(void *buf, unsigned int num)
+{
+    unsigned int count = 0;
+    uint8_t *b = (uint8_t *)buf;
+
+    poweron();
 
     /* read the actual random data */
     while (count < num) {
@@ -63,12 +79,7 @@ void hwrng_read(void *buf, unsigned int num)
         NVIC_ClearPendingIRQ(RNG_IRQn);
     }
 
-    /* power off RNG */
-    NRF_RNG->INTENCLR = RNG_INTENSET_VALRDY_Msk;
-    NRF_RNG->TASKS_STOP = 1;
-#ifdef CPU_FAM_NRF51
-    NRF_RNG->POWER = 0;
-#endif
+    poweroff();
 }
 
 #else
@@ -91,3 +102,10 @@ void hwrng_read(void *buf, unsigned int num)
     (void)ret;
 }
 #endif /* MODULE_NORDIC_SOFTDEVICE_BLE */
+
+uint32_t hwrng_uint32(void)
+{
+    uint32_t tmp;
+    hwrng_read(&tmp, sizeof(tmp));
+    return tmp;
+}
