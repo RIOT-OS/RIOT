@@ -51,6 +51,13 @@ extern "C" {
 #define CPUID_LEN           (12U)
 
 /**
+ * @name    HWRNG configuration
+ * @{
+ */
+#define HWRNG_HAS_GENERIC_READ (1)
+#define HWRNG_HAS_POWERONOFF   (1)
+
+/**
  * @brief   We provide our own pm_off() function for all STM32-based CPUs
  */
 #define PROVIDES_PM_LAYERED_OFF

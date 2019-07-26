@@ -28,12 +28,7 @@
 /* only build if the CPU actually provides a RNG peripheral */
 #ifdef RNG
 
-void hwrng_init(void)
-{
-    /* no need for initialization */
-}
-
-static void poweron(void)
+void hwrng_poweron(void)
 {
     /* power on and enable the device */
 #if defined(CPU_LINE_STM32F410Rx)
@@ -46,7 +41,7 @@ static void poweron(void)
     RNG->CR = RNG_CR_RNGEN;
 }
 
-static void poweroff(void)
+void hwrng_poweroff(void)
 {
     /* finally disable the device again */
     RNG->CR = 0;
@@ -61,36 +56,9 @@ static void poweroff(void)
 
 uint32_t hwrng_uint32(void)
 {
-    poweron();
-
     /* wait for random data to be ready to read */
     while (!(RNG->SR & RNG_SR_DRDY)) {}
     return RNG->DR;
-
-    poweroff();
-}
-
-void hwrng_read(void *buf, unsigned int num)
-{
-    unsigned int count = 0;
-    uint8_t *b = (uint8_t *)buf;
-
-    poweron();
-
-    /* get random data */
-    while (count < num) {
-        /* wait for random data to be ready to read */
-        while (!(RNG->SR & RNG_SR_DRDY)) {}
-        /* read next 4 bytes */
-        uint32_t tmp = RNG->DR;
-        /* copy data into result vector */
-        for (int i = 0; i < 4 && count < num; i++) {
-            b[count++] = (uint8_t)tmp;
-            tmp = tmp >> 8;
-        }
-    }
-
-    poweroff();
 }
 
 #endif /* RNG */
