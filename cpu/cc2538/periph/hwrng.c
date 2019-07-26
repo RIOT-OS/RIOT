@@ -79,6 +79,24 @@ void hwrng_init(void)
     RFCORE_SFR_RFST = ISRFOFF;
 }
 
+uint32_t hwrng_uint32(void)
+{
+    union {
+        uint16_t half[2];
+        uint32_t val;
+    } rnd;
+
+    /* Clock the RNG LSFR once: */
+    soc_adc->ADCCON1 = soc_adc->ADCCON1 | (1UL << SOC_ADC_ADCCON1_RCTRL_S);
+    rnd.half[0] = soc_adc->RNDL | (soc_adc->RNDH << 8);
+
+    /* Clock the RNG LSFR again: */
+    soc_adc->ADCCON1 = soc_adc->ADCCON1 | (1UL << SOC_ADC_ADCCON1_RCTRL_S);
+    rnd.half[1] = soc_adc->RNDL | (soc_adc->RNDH << 8);
+
+    return rnd.val;
+}
+
 void hwrng_read(void *buf, unsigned int num)
 {
     uint8_t *b = (uint8_t *)buf;
