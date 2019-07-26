@@ -398,6 +398,13 @@ typedef struct {
 } uart_conf_t;
 
 /**
+ * @name    HWRNG configuration
+ * @{
+ */
+#define HWRNG_HAS_GENERIC_READ (1)
+#define HWRNG_HAS_INIT         (1)
+
+/**
  * @brief   CPU provides own pm_off() function
  */
 #define PROVIDES_PM_LAYERED_OFF
