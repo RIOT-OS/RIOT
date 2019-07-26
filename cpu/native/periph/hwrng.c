@@ -94,6 +94,13 @@ void hwrng_read(void *buf, unsigned int num)
     }
 }
 
+uint32_t hwrng_uint32(void)
+{
+    uint32_t tmp;
+    hwrng_read(&tmp, sizeof(tmp));
+    return tmp;
+}
+
 /**********************************************************************
  * internal API implementation
  **********************************************************************/
