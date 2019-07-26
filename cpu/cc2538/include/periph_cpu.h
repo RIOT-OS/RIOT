@@ -326,6 +326,12 @@ typedef gpio_t adc_conf_t;
 #define SOCADC_12_BIT_RSHIFT    (4U) /**< Mask for getting data(12 bits ENOB) */
 /** @} */
 
+/**
+ * @name    HWRNG configuration
+ * @{
+ */
+#define HWRNG_HAS_INIT   (1)
+
 #ifdef __cplusplus
 }
 #endif
