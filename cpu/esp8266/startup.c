@@ -26,6 +26,7 @@
 #include "kernel_init.h"
 #include "log.h"
 #include "periph/init.h"
+#include "periph/hwrng.h"
 
 #include "c_types.h"
 #include "spi_flash.h"
@@ -48,8 +49,6 @@
 
 extern void board_init(void);
 extern void board_print_config(void);
-
-uint32_t hwrand (void);
 
 #ifdef MODULE_NEWLIB_SYSCALLS_DEFAULT
 /* initialization as it should be called from newlibc */
@@ -153,7 +152,7 @@ void system_init(void)
     init_exceptions ();
 
     /* init random number generator */
-    srand(hwrand());
+    srand(hwrng_uint32());
 
     /* init flash drive */
     extern void flash_drive_init (void);
@@ -687,7 +686,7 @@ void __attribute__((noreturn)) IRAM cpu_user_start (void)
     /* PHASE 3: start RIOT-OS kernel */
 
     /* init random number generator */
-    srand(hwrand());
+    srand(hwrng_uint32());
 
     /* init flash drive */
     extern void flash_drive_init (void);
