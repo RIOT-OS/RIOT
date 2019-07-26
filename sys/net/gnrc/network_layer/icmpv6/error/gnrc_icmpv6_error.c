@@ -211,8 +211,7 @@ static void _send(gnrc_pktsnip_t *pkt, const gnrc_pktsnip_t *orig_pkt,
         if (netif) {
             /* copy interface from original netif header to assure packet
              * goes out where it came from */
-            gnrc_netif_hdr_t *netif_hdr = netif->data;
-            kernel_pid_t netif_pid = netif_hdr->if_pid;
+            gnrc_netif_t *iface = gnrc_netif_hdr_get_netif(netif->data);
 
             netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
             if (netif == NULL) {
@@ -220,8 +219,7 @@ static void _send(gnrc_pktsnip_t *pkt, const gnrc_pktsnip_t *orig_pkt,
                 gnrc_pktbuf_release(pkt);
                 return;
             }
-            netif_hdr = netif->data;
-            netif_hdr->if_pid = netif_pid;
+            gnrc_netif_hdr_set_netif(netif->data, iface);
             LL_PREPEND(pkt, netif);
         }
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6,

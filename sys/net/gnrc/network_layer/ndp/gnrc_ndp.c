@@ -609,7 +609,7 @@ static gnrc_pktsnip_t *_build_headers(gnrc_netif_t *netif,
         gnrc_pktbuf_remove_snip(iphdr, iphdr);
         return NULL;
     }
-    ((gnrc_netif_hdr_t *)l2hdr->data)->if_pid = netif->pid;
+    gnrc_netif_hdr_set_netif(l2hdr->data, netif);
     LL_PREPEND(iphdr, l2hdr);
     return l2hdr;
 }
