@@ -41,7 +41,7 @@ static void test_init(char *name)
     if (source == RNG_PRNG) {
         random_init(seed);
     }
-#ifdef MODULE_PERIPH_HWRNG
+#if defined(MODULE_PERIPH_HWRNG) && HWRNG_HAS_INIT
     else if (source == RNG_HWRNG) {
         hwrng_init();
     }

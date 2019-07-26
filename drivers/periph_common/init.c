@@ -20,6 +20,8 @@
  * @}
  */
 
+#include "periph_conf.h"
+
 #ifdef MODULE_PERIPH_I2C
 #include "periph/i2c.h"
 #endif
@@ -66,7 +68,9 @@ void periph_init(void)
 #endif
 
 #ifdef MODULE_PERIPH_HWRNG
+#if HWRNG_HAS_INIT
     hwrng_init();
+#endif
 #endif
 
 #ifdef MODULE_PERIPH_USBDEV

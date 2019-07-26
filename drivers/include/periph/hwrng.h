@@ -39,6 +39,15 @@ extern "C" {
 #endif
 
 /**
+ * @def     HWRNG_HAS_INIT
+ *
+ * @brief   Set to 1 if the platform implements hwrng_init(), 0 otherwise
+ */
+#ifndef HWRNG_HAS_INIT
+#define HWRNG_HAS_INIT            (0)
+#endif
+
+/**
  * @def     HWRNG_HAS_POWERONOFF
  *
  * @brief   Set to 1 if the platform implements hwrng_poweron() / hwrng_poweroff(), 0 otherwise
@@ -64,6 +73,9 @@ extern "C" {
  * if it would impose too much overhead to do this everytime the hwrng_read
  * function is called. The device should however be put into power-off mode
  * after initialization and will be powered on and of when hwrng_read is called.
+ *
+ * @note     Only implemented and called for platforms with HWRNG_HAS_INIT = 1.
+ *
  */
 void hwrng_init(void);
 
