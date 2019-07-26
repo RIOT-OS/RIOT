@@ -43,6 +43,20 @@ void hwrng_init(void)
     RNGCON |= _RNGCON_CONT_MASK;
 }
 
+uint32_t hwrng_uint32(void)
+{
+    uint32_t tmp;
+
+    RNGCON |= _RNGCON_PRNGEN_MASK;
+
+    wait_plen_cycles();
+    tmp = RNGNUMGEN1;
+
+    RNGCON &= ~_RNGCON_PRNGEN_MASK;
+
+    return tmp;
+}
+
 void hwrng_read(void *buf, unsigned int num)
 {
     unsigned int i = 0;
