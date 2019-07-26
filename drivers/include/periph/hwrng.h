@@ -32,9 +32,28 @@
 #define PERIPH_HWRNG_H
 
 #include <stdint.h>
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+ * @def     HWRNG_HAS_POWERONOFF
+ *
+ * @brief   Set to 1 if the platform implements hwrng_poweron() / hwrng_poweroff(), 0 otherwise
+ */
+#ifndef HWRNG_HAS_POWERONOFF
+#define HWRNG_HAS_POWERONOFF      (0)
+#endif
+
+/**
+ * @def     HWRNG_HAS_GENERIC_READ
+ *
+ * @brief   Set to 1 if the platform does not implement a custom hwrng_read() function, 0 otherwise
+ */
+#ifndef HWRNG_HAS_GENERIC_READ
+#define HWRNG_HAS_GENERIC_READ    (0)
 #endif
 
 /**
@@ -49,6 +68,22 @@ extern "C" {
 void hwrng_init(void);
 
 /**
+ * @brief    Power on the HWRNG module
+ *
+ * @note     Only implemented and called for platforms with HWRNG_HAS_POWERONOFF = 1.
+ *
+ */
+void hwrng_poweron(void);
+
+/**
+ * @brief    Power off the HWRNG module
+ *
+ * @note     Only implemented and called for platforms with HWRNG_HAS_POWERONOFF = 1.
+ *
+ */
+void hwrng_poweroff(void);
+
+/**
  * @brief   Read N bytes of random data from the hardware device
  *
  * The read function should power on the HWRNG MCU peripheral, read the given
@@ -61,6 +96,10 @@ void hwrng_read(void *buf, unsigned int num);
 
 /**
  * @brief   Read a single random word.
+ *
+ * The read function does not power on the HWRNG MCU peripheral, the caller
+ * is responsible for calling hwrng_poweron() / hwrng_poweroff() manually if
+ * HWRNG_HAS_POWERONOFF = 1.
  *
  * @return  The random number.
  */
