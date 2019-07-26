@@ -33,11 +33,8 @@ void hwrng_init(void)
     /* no need for initialization */
 }
 
-void hwrng_read(void *buf, unsigned int num)
+static void poweron(void)
 {
-    unsigned int count = 0;
-    uint8_t *b = (uint8_t *)buf;
-
     /* power on and enable the device */
 #if defined(CPU_LINE_STM32F410Rx)
     periph_clk_en(AHB1, RCC_AHB1ENR_RNGEN);
@@ -47,6 +44,38 @@ void hwrng_read(void *buf, unsigned int num)
     periph_clk_en(AHB2, RCC_AHB2ENR_RNGEN);
 #endif
     RNG->CR = RNG_CR_RNGEN;
+}
+
+static void poweroff(void)
+{
+    /* finally disable the device again */
+    RNG->CR = 0;
+#if defined(CPU_LINE_STM32F410Rx)
+    periph_clk_dis(AHB1, RCC_AHB1ENR_RNGEN);
+#elif defined(CPU_FAM_STM32L0)
+    periph_clk_dis(AHB, RCC_AHBENR_RNGEN);
+#else
+    periph_clk_dis(AHB2, RCC_AHB2ENR_RNGEN);
+#endif
+}
+
+uint32_t hwrng_uint32(void)
+{
+    poweron();
+
+    /* wait for random data to be ready to read */
+    while (!(RNG->SR & RNG_SR_DRDY)) {}
+    return RNG->DR;
+
+    poweroff();
+}
+
+void hwrng_read(void *buf, unsigned int num)
+{
+    unsigned int count = 0;
+    uint8_t *b = (uint8_t *)buf;
+
+    poweron();
 
     /* get random data */
     while (count < num) {
@@ -61,15 +90,7 @@ void hwrng_read(void *buf, unsigned int num)
         }
     }
 
-    /* finally disable the device again */
-    RNG->CR = 0;
-#if defined(CPU_LINE_STM32F410Rx)
-    periph_clk_dis(AHB1, RCC_AHB1ENR_RNGEN);
-#elif defined(CPU_FAM_STM32L0)
-    periph_clk_dis(AHB, RCC_AHBENR_RNGEN);
-#else
-    periph_clk_dis(AHB2, RCC_AHB2ENR_RNGEN);
-#endif
+    poweroff();
 }
 
 #endif /* RNG */
