@@ -28,11 +28,6 @@
 #include "assert.h"
 #endif
 
-void hwrng_init(void)
-{
-    /* nothing to do here */
-}
-
 /*
  * The hardware peripheral is used by the SoftDevice. When the SoftDevice is
  * enabled, it shall only be accessed through the SoftDevice API
