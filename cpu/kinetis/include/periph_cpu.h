@@ -51,6 +51,13 @@ extern "C" {
 #endif
 
 /**
+ * @name    HWRNG configuration
+ * @{
+ */
+#define HWRNG_HAS_GENERIC_READ (1)
+#define HWRNG_HAS_POWERONOFF   (1)
+
+/**
  * @name    CPU specific gpio_t type definition
  * @{
  */
