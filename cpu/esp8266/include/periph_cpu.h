@@ -33,6 +33,12 @@ extern "C" {
 #define CPUID_LEN           (4U)
 
 /**
+ * @name    HWRNG configuration
+ * @{
+ */
+#define HWRNG_HAS_GENERIC_READ (1)
+
+/**
  * @name    GPIO configuration of ESP8266
  * @{
  */
