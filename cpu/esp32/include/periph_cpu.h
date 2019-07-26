@@ -35,6 +35,12 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    HWRNG configuration
+ * @{
+ */
+#define HWRNG_HAS_GENERIC_READ (1)
+
+/**
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (7U)
