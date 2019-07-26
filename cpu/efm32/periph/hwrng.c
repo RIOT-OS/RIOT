@@ -45,6 +45,11 @@ void hwrng_init(void)
     while (TRNG0->FIFOLEVEL == 0) {}
 }
 
+uint32_t hwrng_uint32(void)
+{
+    return TRNG0->FIFO;
+}
+
 void hwrng_read(void *buf, unsigned int num)
 {
     uint32_t *out_buf = (uint32_t *) buf;
