@@ -59,6 +59,13 @@ void hwrng_init(void);
  */
 void hwrng_read(void *buf, unsigned int num);
 
+/**
+ * @brief   Read a single random word.
+ *
+ * @return  The random number.
+ */
+uint32_t hwrng_uint32(void);
+
 #ifdef __cplusplus
 }
 #endif
