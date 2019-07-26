@@ -47,9 +47,7 @@ void hwrng_read(void *buf, unsigned int num)
     }
 }
 
-uint32_t hwrand (void)
+uint32_t hwrng_uint32(void)
 {
-    uint32_t _tmp;
-    hwrng_read(&_tmp, sizeof(uint32_t));
-    return _tmp;
+    return WDEV.HWRNG;
 }
