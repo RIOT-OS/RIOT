@@ -180,7 +180,7 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
             }
 #endif
             iface = ipv6_addr_split_iface(data->hostname);
-            if (iface > KERNEL_PID_UNDEF) {
+            if (iface != -1) {
                 data->netif = gnrc_netif_get_by_pid(iface);
             }
 #if GNRC_NETIF_NUMOF == 1
