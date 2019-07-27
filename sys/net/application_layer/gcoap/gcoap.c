@@ -63,6 +63,7 @@ const coap_resource_t _default_resources[] = {
 static gcoap_listener_t _default_listener = {
     &_default_resources[0],
     sizeof(_default_resources) / sizeof(_default_resources[0]),
+    NULL,
     NULL
 };
 
@@ -633,6 +634,9 @@ void gcoap_register_listener(gcoap_listener_t *listener)
     }
 
     listener->next = NULL;
+    if (!listener->link_encoder) {
+        listener->link_encoder = gcoap_encode_link;
+    }
     _last->next = listener;
 }
 
@@ -900,7 +904,6 @@ uint8_t gcoap_op_state(void)
 
 int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
 {
-    (void)cf; /* only used in the assert below. */
     assert(cf == COAP_FORMAT_LINK);
 
     /* skip the first listener, gcoap itself (we skip /.well-known/core) */
@@ -909,36 +912,67 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
     char *out = (char *)buf;
     size_t pos = 0;
 
+    coap_link_encoder_ctx_t ctx;
+    ctx.content_format = cf;
+    /* indicate initial link for the list */
+    ctx.flags = COAP_LINK_FLAG_INIT_RESLIST;
+
     /* write payload */
     while (listener) {
-        const coap_resource_t *resource = listener->resources;
+        if (!listener->link_encoder) {
+            continue;
+        }
+        ctx.link_pos = 0;
 
-        for (unsigned i = 0; i < listener->resources_len; i++) {
-            size_t path_len = strlen(resource->path);
+        for (; ctx.link_pos < listener->resources_len; ctx.link_pos++) {
+            ssize_t res;
             if (out) {
-                /* only add new resources if there is space in the buffer */
-                if ((pos + path_len + 3) > maxlen) {
-                    break;
-                }
-                if (pos) {
-                    out[pos++] = ',';
-                }
-                out[pos++] = '<';
-                memcpy(&out[pos], resource->path, path_len);
-                pos += path_len;
-                out[pos++] = '>';
+                res = listener->link_encoder(&listener->resources[ctx.link_pos],
+                                             &out[pos], maxlen - pos, &ctx);
             }
             else {
-                pos += (pos) ? 3 : 2;
-                pos += path_len;
+                res = listener->link_encoder(&listener->resources[ctx.link_pos],
+                                             NULL, 0, &ctx);
             }
-            ++resource;
+
+            if (res > 0) {
+                pos += res;
+                ctx.flags &= ~COAP_LINK_FLAG_INIT_RESLIST;
+            }
+            else {
+                break;
+            }
         }
 
         listener = listener->next;
     }
 
     return (int)pos;
+}
+
+ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
+                          size_t maxlen, coap_link_encoder_ctx_t *context)
+{
+    size_t path_len = strlen(resource->path);
+     /* count target separators and any link separator */
+    size_t exp_size = path_len + 2
+                        + ((context->flags & COAP_LINK_FLAG_INIT_RESLIST) ? 0 : 1);
+
+    if (buf) {
+        unsigned pos = 0;
+        if (exp_size > maxlen) {
+            return -1;
+        }
+
+        if (!(context->flags & COAP_LINK_FLAG_INIT_RESLIST)) {
+            buf[pos++] = ',';
+        }
+        buf[pos++] = '<';
+        memcpy(&buf[pos], resource->path, path_len);
+        buf[pos+path_len] = '>';
+    }
+
+    return exp_size;
 }
 
 int gcoap_add_qstring(coap_pkt_t *pdu, const char *key, const char *val)
