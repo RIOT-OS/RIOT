@@ -225,14 +225,14 @@ int _sht_config_handler(int argc, char **argv)
                     missing_argument(i - 1, argv);
                     return -1;
                 }
-                temp_off = (int16_t)atoi(argv[i]);
+                temp_off = atoi(argv[i]);
                 break;
             case 'h':
                 if (++i >= argc) {
                     missing_argument(i - 1, argv);
                     return -1;
                 }
-                hum_off = (int16_t)atoi(argv[i]);
+                hum_off = atoi(argv[i]);
                 break;
             case 'r':
                 if (++i >= argc) {
