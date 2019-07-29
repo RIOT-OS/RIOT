@@ -32,18 +32,6 @@ extern "C" {
 #endif
 
 /**
- * @brief convert x usecs to cpu cycles
- *
- */
-#define USEC_TO_CPU_CYCLES(x) ((80000000U / 1000000) * x)
-/**
- * @brief delay CPU for x uSec. UtilsDelay uses a loop that takes 3 cycles to
- * complete. Therefore the uSec time needs to be divided by 3.
- *
- */
-#define USEC_DELAY(x) ROM_UtilsDelay(USEC_TO_CPU_CYCLES(x) / 3)
-
-/**
  * @brief uSec delay for reading some Power Control Module Values
  *
  */
@@ -93,8 +81,10 @@ extern "C" {
  * @{
  */
 typedef struct cc3200_arcm_reg_t {
-    cc3200_reg_t clk_gating;
-    cc3200_reg_t soft_reset;
+    cc3200_reg_t clk_gating; /**< clock gating register. Used to configure clock
+                                mode. */
+    cc3200_reg_t soft_reset; /**< software reset register. Used to enable
+                                ordisable hardware. */
 } cc3200_arcm_reg_t;
 /** @} */
 
@@ -237,12 +227,15 @@ typedef struct cc3200_gprcm_t {
     cc3200_reg_t REF_FSM_DEBUG;              /**< REF_FSM_DEBUG */
     cc3200_reg_t MEM_SYS_OPP_REQ_OVERRIDE;   /**< MEM_SYS_OPP_REQ_OVERRIDE */
     cc3200_reg_t MEM_TESTCTRL_PD_OPP_CONFIG; /**< MEM_TESTCTRL_PD_OPP_CONFIG */
-    /* MEM_WL_FAST_CLK_REQ_OVERRIDES */
-    cc3200_reg_t MEM_WL_FAST_CLK_REQ_OVERRIDES;
-    /* MEM_MCU_PD_MODE_REQ_OVERRIDES */
-    cc3200_reg_t MEM_MCU_PD_MODE_REQ_OVERRIDES;
-    /* MEM_MCSPI_SRAM_OFF_REQ_OVERRIDES */
-    cc3200_reg_t MEM_MCSPI_SRAM_OFF_REQ_OVERRIDES;
+    cc3200_reg_t MEM_WL_FAST_CLK_REQ_OVERRIDES;    /**<
+                                                      MEM_WL_FAST_CLK_REQ_OVERRIDES
+                                                    */
+    cc3200_reg_t MEM_MCU_PD_MODE_REQ_OVERRIDES;    /**<
+                                                      MEM_MCU_PD_MODE_REQ_OVERRIDES
+                                                    */
+    cc3200_reg_t MEM_MCSPI_SRAM_OFF_REQ_OVERRIDES; /**<
+                                                 MEM_MCSPI_SRAM_OFF_REQ_OVERRIDES
+                                               */
     cc3200_reg_t MEM_WLAN_APLLMCS_OVERRIDES;  /**< MEM_WLAN_APLLMCS_OVERRIDES */
     cc3200_reg_t MEM_REF_FSM_CFG2;            /**< MEM_REF_FSM_CFG2 */
     cc3200_reg_t RESERVER7[224];              /**< RESERVER7 */
@@ -319,9 +312,10 @@ typedef struct cc3200_gprcm_t {
     cc3200_reg_t SSDIO_PSCON_OVERRIDES;      /**< SSDIO_PSCON_OVERRIDES */
 } cc3200_gprcm_t;
 
-#define GPRCM                                                          \
-    ((cc3200_gprcm_t *)GPRCM_BASE) /**< One and only instance of the G \
-                      Power Control Module */
+/**
+ * @brief One and only instance of the General Power Control * Module
+ */
+#define GPRCM ((cc3200_gprcm_t *)GPRCM_BASE)
 
 /** @} */
 #ifdef __cplusplus
