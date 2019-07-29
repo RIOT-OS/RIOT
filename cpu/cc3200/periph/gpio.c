@@ -37,15 +37,17 @@ static gpio_isr_ctx_t isr_ctx[4][8];
 
 #define GPIO_PINS_PER_PORT 8     /**< Number of pins per port */
 #define GPIO_DIR_MASK 0x00000001 /**< GPIO direction configuration mask */
-#define PIN_MODE_GPIO \
-    0x00000000 /**< GPIO Pin type value used to configure pin to GPIO */
+
+/**
+ * GPIO Pin type value used to configure pin to GPIO
+ */
+#define PIN_MODE_GPIO 0x00000000
+
 #define PAD_MODE_MASK 0x0000000F /**< GPIO mask for setting pin mode */
-#define PAD_STRENGTH_MASK                              \
-    0x000000E0 /**< GPIO mask for setting pin strength \
-                */
-#define PAD_TYPE_MASK                                        \
-    0x00000310 /**< GPIO mask for setting pin type e.g. PULL \
-                */
+/* GPIO mask for setting pin strength */
+#define PAD_STRENGTH_MASK 0x000000E0
+/* GPIO mask for setting pin type e.g. PULL */
+#define PAD_TYPE_MASK 0x00000310
 #define PAD_CONFIG_BASE ((OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_0))
 
 /**

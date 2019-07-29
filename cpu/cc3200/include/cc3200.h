@@ -32,8 +32,8 @@
 extern "C" {
 #endif
 
-typedef volatile uint32_t cc3200_reg_t; /**< Least-significant 32 bits of the
-                                           IEEE address */
+typedef volatile uint32_t cc3200_reg_t; /**< 32bit CC3200 default register
+                                           address type */
 
 /* ************************************************************************** */
 /*   CMSIS DEFINITIONS FOR CC3200 */
@@ -97,18 +97,19 @@ typedef enum IRQn {
 
 /**
  * @brief Configuration of the Cortex-M4 Processor and Core Peripherals
+ * @{
  */
-#define __CM4_REV                                                          \
-    0x0001 /**< CC2538 core revision number ([15:8] revision number, [7:0] \
-              patch number) */
+#define __CM4_REV 0x0001
 #define __MPU_PRESENT 0 /**< CC3200 does not provides an MPU */
 #define __NVIC_PRIO_BITS \
     3 /**< CC3200 uses 3 Bits for Interrupt Priority Levels */
-#define __Vendor_SysTickConfig \
-    0                   /**< Set to 1 if different SysTick Config is used */
+
+/* Set to 1 if different SysTick Config is used */
+#define __Vendor_SysTickConfig 0
 #define __FPU_PRESENT 0 /**< CC3200 has not FPU */
 
 #define CC3200_VTOR_ALIGN 1024 /**< CC3200 Vector Table alignment */
+/** @} */
 
 #ifdef __cplusplus
 } /* end extern "C" */

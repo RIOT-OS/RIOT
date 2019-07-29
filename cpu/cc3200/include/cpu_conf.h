@@ -45,9 +45,14 @@ extern void reset_periph_clk(cc3200_arcm_reg_t *reg);
  * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
-#define CPU_DEFAULT_IRQ_PRIO                                                  \
-    (1U) /**< The default priority is 1 for every interrupt, 0 is the highest \
-            possible priority. */
+
+/**
+ * @brief Default CPU IRQ priority: The default priority is 1 for every
+ * interrupt, 0 is the highest possible priority.
+ * @{
+ */
+#define CPU_DEFAULT_IRQ_PRIO (1U)
+/** @} */
 #define CPU_IRQ_NUMOF IRQN_COUNT
 #define CPU_FLASH_BASE FLASH_BASE /**< number of interrupt sources */
 /** @} */

@@ -39,7 +39,9 @@
 #define RTMIS (1 << 6)  /**< UART RX time-out */
 #define RXMIS (1 << 4)  /**< UART RX masked interrupt */
 
+/* PIN_MODE value for using a PIN for UART */
 #define PIN_MODE_UART 0x00000003
+
 /* guard file in case no UART device was specified */
 #if UART_NUMOF
 
