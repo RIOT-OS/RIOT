@@ -75,13 +75,15 @@ static void timer_irq_handler(tim_t dev)
     cortexm_isr_end();
 }
 
-#ifdef TIMER_0_EN void isr_timer0(void)
+#ifdef TIMER_0_EN
+void isr_timer0(void)
 {
     timer_irq_handler(0);
 }
 #endif
 
-#ifdef TIMER_1_EN void isr_timer1(void)
+#ifdef TIMER_1_EN
+void isr_timer1(void)
 {
     timer_irq_handler(1);
 }
@@ -110,7 +112,9 @@ void isr_timer3(void)
 static inline void *get_irq_handler(tim_t dev)
 {
     switch (dev) {
-#ifdef TIMER_0_EN case 0 : return isr_timer0;
+#ifdef TIMER_0_EN
+    case 0:
+        return isr_timer0;
 #endif
 #ifdef TIMER_1_EN
     case 1:
