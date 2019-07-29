@@ -121,7 +121,7 @@ extern "C" {
 /**
  * @brief   static initializer for detached event queues
  */
-#define EVENT_QUEUE_INIT_DETACHED   { 0 }
+#define EVENT_QUEUE_INIT_DETACHED   { .waiter = NULL }
 
 /**
  * @brief   event structure forward declaration
