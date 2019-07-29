@@ -66,7 +66,7 @@ static unsigned long ports[] = { GPIOA0_BASE, GPIOA1_BASE, GPIOA2_BASE,
  * @brief pin to GPIO pin numbers mappings
  *
  */
-static const unsigned long pin_to_gpio_num[64] = {
+static const uint8_t pin_to_gpio_num[64] = {
     10,  11,  12,  13,  14,  15,  16,  17,  255, 255, 18,  19,  20,
     21,  22,  23,  24,  40,  28,  29,  25,  255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
