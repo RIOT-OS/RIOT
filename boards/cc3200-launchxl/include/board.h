@@ -16,8 +16,8 @@
  * @author          Wladislaw Meixner <wladislaw.meixner@campus.lmu.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include <stdint.h>
@@ -52,5 +52,5 @@ void board_init(void);
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

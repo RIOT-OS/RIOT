@@ -59,35 +59,24 @@ extern "C" {
  * @brief Timer configurations
  * @{
  */
-#define TIMER_CFG_A_ONE_SHOT 0x00000021 /**< Timer A one-shot timer */
-
-/* Timer A one-shot up-count timer */
-#define TIMER_CFG_A_ONE_SHOT_UP 0x00000031
-#define TIMER_CFG_A_PERIODIC 0x00000022 /**< Timer A periodic timer */
-/* Timer A periodic up-count timer */
-#define TIMER_CFG_A_PERIODIC_UP 0x00000032
-#define TIMER_CFG_A_CAP_COUNT 0x00000003    /**< Timer A event counter */
+#define TIMER_CFG_A_ONE_SHOT     0x00000021 /**< Timer A one-shot timer */
+#define TIMER_CFG_A_ONE_SHOT_UP  0x00000031 /**< Timer A one-shot up-count timer */
+#define TIMER_CFG_A_PERIODIC     0x00000022 /**< Timer A periodic timer */
+#define TIMER_CFG_A_PERIODIC_UP  0x00000032 /**< Timer A periodic up-count timer */
+#define TIMER_CFG_A_CAP_COUNT    0x00000003 /**< Timer A event counter */
 #define TIMER_CFG_A_CAP_COUNT_UP 0x00000013 /**< Timer A event up-counter */
-#define TIMER_CFG_A_CAP_TIME 0x00000007     /**< Timer A event timer */
-
-/* Timer A event up-count timer */
-#define TIMER_CFG_A_CAP_TIME_UP 0x00000017
-#define TIMER_CFG_A_PWM 0x0000000A      /**< Timer A PWM output */
-#define TIMER_CFG_B_ONE_SHOT 0x00002100 /**< Timer B one-shot timer */
-
-/* Timer B one-shot up-count timer */
-#define TIMER_CFG_B_ONE_SHOT_UP 0x00003100
-#define TIMER_CFG_B_PERIODIC 0x00002200 /**< Timer B periodic timer */
-
-/* Timer B periodic up-count timer */
-#define TIMER_CFG_B_PERIODIC_UP 0x00003200
-#define TIMER_CFG_B_CAP_COUNT 0x00000300    /**< Timer B event counter */
+#define TIMER_CFG_A_CAP_TIME     0x00000007 /**< Timer A event timer */
+#define TIMER_CFG_A_CAP_TIME_UP  0x00000017 /**< Timer A event up-count timer */
+#define TIMER_CFG_A_PWM          0x0000000A /**< Timer A PWM output */
+#define TIMER_CFG_B_ONE_SHOT     0x00002100 /**< Timer B one-shot timer */
+#define TIMER_CFG_B_ONE_SHOT_UP  0x00003100 /**< Timer B one-shot up-count timer */
+#define TIMER_CFG_B_PERIODIC     0x00002200 /**< Timer B periodic timer */
+#define TIMER_CFG_B_PERIODIC_UP  0x00003200 /**< Timer B periodic up-count timer */
+#define TIMER_CFG_B_CAP_COUNT    0x00000300 /**< Timer B event counter */
 #define TIMER_CFG_B_CAP_COUNT_UP 0x00001300 /**< Timer B event up-counter */
-#define TIMER_CFG_B_CAP_TIME 0x00000700     /**< Timer B event timer */
-
-/* Timer B event up-count timer */
-#define TIMER_CFG_B_CAP_TIME_UP 0x00001700
-#define TIMER_CFG_B_PWM 0x00000A00 /**< Timer B PWM output */
+#define TIMER_CFG_B_CAP_TIME     0x00000700 /**< Timer B event timer */
+#define TIMER_CFG_B_CAP_TIME_UP  0x00001700 /**< Timer B event up-count timer */
+#define TIMER_CFG_B_PWM          0x00000A00 /**< Timer B PWM output */
 /** @} */
 
 /**

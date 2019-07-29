@@ -31,7 +31,7 @@
 #include "vendor/hw_types.h"
 #include "vendor/rom.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define LOAD_VALUE (0xffff)

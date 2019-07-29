@@ -100,15 +100,21 @@ typedef enum IRQn {
  * @{
  */
 #define __CM4_REV 0x0001
-#define __MPU_PRESENT 0 /**< CC3200 does not provides an MPU */
-#define __NVIC_PRIO_BITS \
-    3 /**< CC3200 uses 3 Bits for Interrupt Priority Levels */
+
+/**< CC3200 does not provides an MPU */
+#define __MPU_PRESENT 0
+
+/**< CC3200 uses 3 Bits for Interrupt Priority Levels */
+#define __NVIC_PRIO_BITS 3
 
 /* Set to 1 if different SysTick Config is used */
 #define __Vendor_SysTickConfig 0
-#define __FPU_PRESENT 0 /**< CC3200 has not FPU */
 
-#define CC3200_VTOR_ALIGN 1024 /**< CC3200 Vector Table alignment */
+/**< CC3200 has not FPU */
+#define __FPU_PRESENT 0
+
+/**< CC3200 Vector Table alignment */
+#define CC3200_VTOR_ALIGN 1024
 /** @} */
 
 #ifdef __cplusplus

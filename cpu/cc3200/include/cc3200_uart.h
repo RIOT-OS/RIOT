@@ -75,12 +75,10 @@ extern "C" {
 typedef struct cc3200_uart_t {
     cc3200_reg_t dr; /**< UART Data Register */
     union {
-        cc3200_reg_t rsr; /**< UART receive status and error clear */
-        cc3200_reg_t ecr; /**< UART receive status and error clear */
-    } cc3200_uart_dr;
-
+        cc3200_reg_t rsr; /**< UART receive status response */
+        cc3200_reg_t ecr; /**< UART error clear */
+    } cc3200_uart_dr; /**< UART receive status response or error clear reg */
     cc3200_reg_t RESERVED1[4];
-
     union {
         cc3200_reg_t raw; /**< RAW flag register */
         struct {
@@ -94,8 +92,8 @@ typedef struct cc3200_uart_t {
             cc3200_reg_t TXFE : 1;       /**< UART transmit FIFO empty */
             cc3200_reg_t RI : 1;         /**< UART ring indicator */
             cc3200_reg_t RESERVED1 : 23; /**< Reserved bits */
-        } bits;
-    } flags;
+        } bits; /**< UART configuration flags as a Bitfield  */
+    } flags;    /**< UART configuration flags */
 
     cc3200_reg_t RESERVED2; /**< Reserved byte */
     cc3200_reg_t ILPR;      /**< UART IrDA Low-Power Register */

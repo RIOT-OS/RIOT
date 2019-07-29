@@ -53,6 +53,11 @@ extern void reset_periph_clk(cc3200_arcm_reg_t *reg);
  */
 #define CPU_DEFAULT_IRQ_PRIO (1U)
 /** @} */
+
+/**
+ * @brief Total number of cpu interrupts
+ *
+ */
 #define CPU_IRQ_NUMOF IRQN_COUNT
 #define CPU_FLASH_BASE FLASH_BASE /**< number of interrupt sources */
 /** @} */

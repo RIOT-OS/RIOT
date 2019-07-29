@@ -16,8 +16,8 @@
  * @author      Wladislaw Meixner <wladislaw.meixner@campus.lmu.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -111,5 +111,5 @@ static const uart_conf_t uart_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */
 /** @} */
