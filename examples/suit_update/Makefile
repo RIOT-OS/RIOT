@@ -49,6 +49,12 @@ USEMODULE += suit suit_coap
 # SUIT draft v4 support:
 USEMODULE += suit_v4
 
+# Optional feature to trigger suit update through gpio callback
+FEATURES_OPTIONAL += periph_gpio_irq
+
+# Default COAP manifest resource location when fetched through gpio trigger
+CFLAGS += -DSUIT_MANIFEST_RESOURCE=\"$(SUIT_COAP_ROOT)/$(SUIT_NOTIFY_MANIFEST)\"
+
 # Change this to 0 to not use ethos
 USE_ETHOS ?= 1
 

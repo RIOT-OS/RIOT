@@ -29,6 +29,10 @@
 #include "suit/coap.h"
 #include "riotboot/slot.h"
 
+#ifdef MODULE_PERIPH_GPIO
+#include "periph/gpio.h"
+#endif
+
 #define COAP_INBUF_SIZE (256U)
 
 /* Extend stacksize of nanocoap server thread */
@@ -54,6 +58,16 @@ static void *_nanocoap_server_thread(void *arg)
     return NULL;
 }
 
+/* assuming that first button is always BTN0 */
+#if defined(MODULE_PERIPH_GPIO_IRQ) && defined(BTN0_PIN)
+static void cb(void *arg)
+{
+    (void) arg;
+    printf("Button pressed! Triggering suit update! \n");
+    suit_coap_trigger((uint8_t *) SUIT_MANIFEST_RESOURCE, sizeof(SUIT_MANIFEST_RESOURCE));
+}
+#endif
+
 int main(void)
 {
     puts("RIOT SUIT update example application");
@@ -73,6 +87,12 @@ int main(void)
     else {
         printf("[FAILED] You're not running riotboot\n");
     }
+
+#if defined(MODULE_PERIPH_GPIO_IRQ) && defined(BTN0_PIN)
+    /* initialize a button to manually trigger an update */
+    gpio_init_int(BTN0_PIN, BTN0_MODE, GPIO_FALLING, cb, NULL);
+#endif
+
 
     /* start suit coap updater thread */
     suit_coap_run();
