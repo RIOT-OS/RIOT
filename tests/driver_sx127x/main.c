@@ -368,6 +368,17 @@ int rx_timeout_cmd(int argc, char **argv)
     return 0;
 }
 
+int reset_cmd(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    netdev_t *netdev = (netdev_t *)&sx127x;
+    puts("resetting sx127x...");
+    netopt_state_t state = NETOPT_STATE_RESET;
+    netdev->driver->set(netdev, NETOPT_STATE, &state, sizeof(netopt_state_t));
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "setup",    "Initialize LoRa modulation settings",     lora_setup_cmd },
     { "random",   "Get random number from sx127x",           random_cmd },
@@ -377,6 +388,7 @@ static const shell_command_t shell_commands[] = {
     { "register", "Get/Set value(s) of registers of sx127x", register_cmd },
     { "send",     "Send raw payload string",                 send_cmd },
     { "listen",   "Start raw payload listener",              listen_cmd },
+    { "reset",    "Reset the sx127x device",                 reset_cmd},
     { NULL, NULL, NULL }
 };
 
