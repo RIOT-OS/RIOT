@@ -83,10 +83,10 @@ extern "C" {
  * @{
  */
 typedef struct cc3200_arcm_reg_t {
-    cc3200_reg_t clk_gating;    /**< clock gating register. Used to configure clock
-                                   mode. */
-    cc3200_reg_t soft_reset;    /**< software reset register. Used to enable
-                                   ordisable hardware. */
+    cc3200_reg_t clk_gating;        /**< clock gating register. Used to configure clock
+                                       mode. */
+    cc3200_reg_t soft_reset;        /**< software reset register. Used to enable
+                                       ordisable hardware. */
 } cc3200_arcm_reg_t;
 /** @} */
 

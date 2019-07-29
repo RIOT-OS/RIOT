@@ -17,6 +17,7 @@
  */
 
 #include "cpu.h"
+#include "periph_conf.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -27,6 +28,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief convert x usecs to cpu cycles
+ *
+ */
+#define USEC_TO_CPU_CYCLES(x) ((CLOCK_CORECLOCK / 1000000) * x)
+/**
+ * @brief delay CPU for x uSec. UtilsDelay uses a loop that takes 3 cycles to
+ * complete. Therefore the uSec time needs to be divided by 3.
+ *
+ */
+#define USEC_DELAY(x) ROM_UtilsDelay(USEC_TO_CPU_CYCLES(x) / 3)
 
 /**
  * @brief   Starting offset of CPU_ID
