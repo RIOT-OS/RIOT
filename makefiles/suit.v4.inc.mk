@@ -11,7 +11,7 @@ SUIT_MANIFEST_SIGNED ?= $(BINDIR_APP)-riot.suitv4_signed.$(APP_VER).bin
 SUIT_MANIFEST_SIGNED_LATEST ?= $(BINDIR_APP)-riot.suitv4_signed.latest.bin
 
 SUIT_NOTIFY_VERSION ?= latest
-SUIT_NOTIFY_MANIFEST ?= $(BINDIR_APP)-riot.suitv4_signed.$(SUIT_NOTIFY_VERSION).bin
+SUIT_NOTIFY_MANIFEST ?= $(APPLICATION)-riot.suitv4_signed.$(SUIT_NOTIFY_VERSION).bin
 
 # Long manifest names require more buffer space when parsing
 export CFLAGS += -DSOCK_URLPATH_MAXLEN=128
@@ -99,5 +99,5 @@ suit/publish: $(SUIT_MANIFESTS) $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 suit/notify: | $(filter suit/publish, $(MAKECMDGOALS))
 	@test -n "$(SUIT_CLIENT)" || { echo "error: SUIT_CLIENT unset!"; false; }
 	aiocoap-client -m POST "coap://$(SUIT_CLIENT)/suit/trigger" \
-		--payload "$(SUIT_COAP_ROOT)/$$(basename $(SUIT_NOTIFY_MANIFEST))" && \
+		--payload "$(SUIT_COAP_ROOT)/$(SUIT_NOTIFY_MANIFEST)" && \
 		echo "Triggered $(SUIT_CLIENT) to update."
