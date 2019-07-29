@@ -43,13 +43,13 @@ static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
 
 /**
  * @brief get timer control register by ID. Each register is 0x1000 apart
- * starting at 0x40030000
+ * starting at TIMERA0_BASE
  *
  *
  */
 static inline cc3200_timer_t *timer(tim_t num)
 {
-    return (cc3200_timer_t *)(0x40030000 + (num << 12));
+    return (cc3200_timer_t *)(TIMERA0_BASE + (num << 12));
 }
 
 /**
