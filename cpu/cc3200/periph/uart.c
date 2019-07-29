@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup        deriver_periph
- * @ingroup         cc3200_uart
+ * @defgroup        cpu_cc3200
  * @{
  *
  * @file
@@ -16,9 +15,7 @@
  *
  * @author          Wladislaw Meixner <wladislaw.meixner@campus.lmu.de>
  *
- * @{
  */
-
 #include <stddef.h>
 
 #include "board.h"
