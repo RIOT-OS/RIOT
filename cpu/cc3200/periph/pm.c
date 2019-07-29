@@ -28,7 +28,7 @@
  */
 void pm_set_lowest(void)
 {
-    /* this will hibernate with no way to wake up for now */
+    /* FIXME: this will hibernate with no way to wake up for now */
 
     /* write to the hibernate register */
     HWREG(HIB3P3_BASE + HIB3P3_O_MEM_HIB_REQ) = 0x1;
