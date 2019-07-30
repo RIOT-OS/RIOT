@@ -93,7 +93,7 @@
 #endif
 
 #ifdef MODULE_SCHEDSTATISTICS
-#include "sched.h"
+#include "schedstatistics.h"
 #endif
 
 #define ENABLE_DEBUG (0)

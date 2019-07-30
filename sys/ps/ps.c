@@ -22,6 +22,10 @@
 #include "thread.h"
 #include "kernel_types.h"
 
+#ifdef MODULE_SCHEDSTATISTICS
+#include "schedstatistics.h"
+#endif
+
 #ifdef MODULE_TLSF_MALLOC
 #include "tlsf.h"
 #include "tlsf-malloc.h"

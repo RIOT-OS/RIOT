@@ -33,10 +33,6 @@
 #include "mpu.h"
 #endif
 
-#ifdef MODULE_SCHEDSTATISTICS
-#include "xtimer.h"
-#endif
-
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -76,9 +72,6 @@ const uint8_t _tcb_name_offset = offsetof(thread_t, name);
 
 #ifdef MODULE_SCHED_CB
 static void (*sched_cb) (kernel_pid_t active_thread, kernel_pid_t next_thread) = NULL;
-#endif
-#ifdef MODULE_SCHEDSTATISTICS
-schedstat_t sched_pidlist[KERNEL_PID_LAST + 1];
 #endif
 
 int __attribute__((used)) sched_run(void)
@@ -210,32 +203,5 @@ NORETURN void sched_task_exit(void)
 void sched_register_cb(void (*callback)(kernel_pid_t, kernel_pid_t))
 {
     sched_cb = callback;
-}
-#endif
-
-#ifdef MODULE_SCHEDSTATISTICS
-void sched_statistics_cb(kernel_pid_t active_thread, kernel_pid_t next_thread)
-{
-    uint32_t now = xtimer_now().ticks32;
-
-    /* Update active thread runtime, there is always an active thread since
-       first sched_run happens when main_trampoline gets scheduled */
-    schedstat_t *active_stat = &sched_pidlist[active_thread];
-    active_stat->runtime_ticks += now - active_stat->laststart;
-
-    /* Update next_thread stats */
-    schedstat_t *next_stat = &sched_pidlist[next_thread];
-    next_stat->laststart = now;
-    next_stat->schedules++;
-}
-
-void init_schedstatistics(void)
-{
-    /* Init laststart for the thread starting schedstatistics since the callback
-       wasn't registered when it was first scheduled */
-    schedstat_t *active_stat = &sched_pidlist[sched_active_pid];
-    active_stat->laststart = xtimer_now().ticks32;
-    active_stat->schedules = 1;
-    sched_register_cb(sched_statistics_cb);
 }
 #endif
