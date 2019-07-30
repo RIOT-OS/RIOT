@@ -1,5 +1,10 @@
 # additional modules dependencies
 
+ifneq (,$(filter cpp,$(FEATURES_USED)))
+    USEMODULE += pthread
+    BASELIBS += -lstdc++
+endif
+
 ifneq (,$(filter esp_eth,$(USEMODULE)))
     USEMODULE += esp_idf_eth
     USEMODULE += esp_idf_eth_phy
