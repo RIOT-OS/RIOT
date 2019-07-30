@@ -228,9 +228,10 @@ void rn2xx3_cmd_start(rn2xx3_t *dev)
 
 void rn2xx3_cmd_append(rn2xx3_t *dev, const uint8_t *payload, uint8_t payload_len)
 {
-    char payload_str[2];
+    char payload_str[3] = { 0 };
     for (unsigned i = 0; i < payload_len; i++) {
         fmt_byte_hex(payload_str, payload[i]);
+        DEBUG("%s", payload_str);
         _uart_write_str(dev, payload_str);
     }
 }
