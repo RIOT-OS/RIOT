@@ -12,7 +12,7 @@
 
 /**
  * @defgroup    net_sock_dtls    DTLS sock API
- * @ingroup     net_sock
+ * @ingroup     net_sock net_dtls
  * @brief       Sock submodule for DTLS
  *
  * DTLS sock acts as a wrapper for the underlying DTLS module to provide

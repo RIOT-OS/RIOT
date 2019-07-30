@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    net_credman (D)TLS Credential Manager
- * @ingroup     net
+ * @ingroup     net net_dtls
  * @brief       Credentials management module for (D)TLS
  *
  * @{
