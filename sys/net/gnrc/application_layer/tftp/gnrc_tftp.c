@@ -1019,7 +1019,7 @@ tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len)
 
             return TS_FAILED;
         }
-        ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = gnrc_netif_iter(NULL)->pid;
+        gnrc_netif_hdr_set_netif(netif_hdr->data, gnrc_netif_iter(NULL));
         LL_PREPEND(ip, netif_hdr);
     }
 
