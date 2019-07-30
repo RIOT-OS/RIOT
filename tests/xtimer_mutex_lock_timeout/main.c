@@ -77,6 +77,9 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_unlocked(int argc,
         puts("error: mutex timed out");
     }
 
+    /* to make the test easier to read */
+    printf("\n");
+
     return 0;
 }
 
@@ -113,6 +116,9 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_locked(int argc,
             puts("error mutex not locked");
         }
     }
+
+    /* to make the test easier to read */
+    printf("\n");
 
     return 0;
 }
