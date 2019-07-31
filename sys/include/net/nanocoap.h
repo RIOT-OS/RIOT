@@ -541,17 +541,63 @@ static inline ssize_t coap_get_uri_query(const coap_pkt_t *pkt, uint8_t *target)
  */
 /**@{*/
 /**
+ * @brief Initialize a block struct from content information
+ *
+ * @param[out]   block      block struct to initialize
+ * @param[in]    blknum     offset from the beginning of content, in terms of
+                            @p blksize byte blocks
+ * @param[in]    blksize    size of each block; must be a power of 2 between 16
+ *                          and 2 raised to #NANOCOAP_BLOCK_SIZE_EXP_MAX
+ * @param[in]    more       more blocks? use 1 if yes; 0 if no or unknown
+ */
+void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
+                            int more);
+
+/**
+ * @brief Finish a block request (block1 or block2)
+ *
+ * This function finalizes the block response header
+ *
+ * Checks whether the `more` bit should be set in the block option and
+ * sets/clears it if required.  Doesn't return the number of bytes, as this
+ * function overwrites bytes in the packet rather than adding new.
+ *
+ * @param[in]     slicer      Preallocated slicer struct to use
+ * @param[in]     option      option number (block1 or block2)
+ */
+void coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
+
+/**
+ * @brief Finish a block1 request
+ *
+ * This function finalizes the block1 response header
+ *
+ * Checks whether the `more` bit should be set in the block1 option and
+ * sets/clears it if required.  Doesn't return the number of bytes, as this
+ * function overwrites bytes in the packet rather than adding new.
+ *
+ * @param[in]     slicer      Preallocated slicer struct to use
+ */
+static inline void coap_block1_finish(coap_block_slicer_t *slicer)
+{
+    coap_block_finish(slicer, COAP_OPT_BLOCK1);
+}
+
+/**
  * @brief Finish a block2 response
  *
  * This function finalizes the block2 response header
  *
  * Checks whether the `more` bit should be set in the block2 option and
- * sets/clears it if required.  Doesn't return the number of bytes as this
- * overwrites bytes in the packet, it doesn't add new bytes to the packet.
+ * sets/clears it if required.  Doesn't return the number of bytes, as this
+ * function overwrites bytes in the packet rather than adding new.
  *
- * @param[inout]  slicer      Preallocated slicer struct to use
+ * @param[in]     slicer      Preallocated slicer struct to use
  */
-void coap_block2_finish(coap_block_slicer_t *slicer);
+static inline void coap_block2_finish(coap_block_slicer_t *slicer)
+{
+    coap_block_finish(slicer, COAP_OPT_BLOCK2);
+}
 
 /**
  * @brief Initialize a block2 slicer struct for writing the payload
@@ -563,6 +609,18 @@ void coap_block2_finish(coap_block_slicer_t *slicer);
  * @param[out]  slicer      Preallocated slicer struct to fill
  */
 void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
+
+/**
+ * @brief Initialize a block slicer struct from content information
+ *
+ * @param[out]   slicer     slicer struct to initialize
+ * @param[in]    blknum     offset from the beginning of content, in terms of
+                            @p blksize byte blocks
+ * @param[in]    blksize    size of each block; must be a power of 2 between 16
+ *                          and 2 raised to #NANOCOAP_BLOCK_SIZE_EXP_MAX
+ */
+void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
+                            size_t blksize);
 
 /**
  * @brief Add a byte array to a block2 reply.
