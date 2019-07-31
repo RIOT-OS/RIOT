@@ -61,7 +61,7 @@
  * not provide an argument that could be used as pointer to the ESP WiFi
  * device which triggers the interrupt.
  */
-static esp_wifi_netdev_t _esp_wifi_dev;
+esp_wifi_netdev_t _esp_wifi_dev;
 static const netdev_driver_t _esp_wifi_driver;
 
 /* device thread stack */
@@ -202,7 +202,7 @@ static wifi_config_t wifi_config_sta = {
     }
 };
 
-static void esp_wifi_setup (esp_wifi_netdev_t* dev)
+void esp_wifi_setup (esp_wifi_netdev_t* dev)
 {
     DEBUG("%s: %p\n", __func__, dev);
 
