@@ -90,7 +90,7 @@ endif
 # if SPI RAM is enabled, ESP-IDF heap and quot flash mode have to be used
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
     # USEMODULE += esp_idf_heap
-    $(error Module esp_spi_ram can't be use with current implementation)    
+    $(error Module esp_spi_ram can't be used with current implementation)    
     export FLASH_MODE = qout
     CFLAGS += -DFLASH_MODE_QOUT=1
 else
