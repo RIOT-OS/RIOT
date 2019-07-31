@@ -73,7 +73,7 @@
  * not provide an argument that could be used as pointer to the ESP WiFi
  * device which triggers the interrupt.
  */
-static esp_wifi_netdev_t _esp_wifi_dev;
+esp_wifi_netdev_t _esp_wifi_dev;
 static const netdev_driver_t _esp_wifi_driver;
 
 /*
