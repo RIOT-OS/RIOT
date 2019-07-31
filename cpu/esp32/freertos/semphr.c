@@ -94,7 +94,7 @@ BaseType_t xSemaphoreTake (SemaphoreHandle_t xSemaphore,
         case queueQUEUE_TYPE_MUTEX:
         {
             if (xTicksToWait == 0) {
-                return (mutex_trylock(mutex) == 0) ? pdTRUE : pdFALSE;
+                return (mutex_trylock(mutex) == 1) ? pdPASS : pdFAIL;
             }
             else {
                 mutex_lock(mutex);
@@ -147,7 +147,7 @@ BaseType_t xSemaphoreTakeRecursive (SemaphoreHandle_t xSemaphore,
     rmutex_t*  rmutex = &((_rmutex_t*)xSemaphore)->rmutex;
 
     if (xTicksToWait == 0) {
-        ret = (rmutex_trylock(rmutex) == 0) ? pdTRUE : pdFALSE;
+        ret = (rmutex_trylock(rmutex) == 1) ? pdPASS : pdFAIL;
     }
     else {
         rmutex_lock(&((_rmutex_t*)xSemaphore)->rmutex);
