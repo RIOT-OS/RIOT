@@ -408,7 +408,7 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
 
     switch (opt) {
         case NETOPT_ADDRESS:
-            assert(max_len == ETHERNET_ADDR_LEN);
+            assert(max_len >= ETHERNET_ADDR_LEN);
             esp_wifi_get_mac(ESP_MAC_WIFI_STA,(uint8_t *)val);
             return ETHERNET_ADDR_LEN;
         case NETOPT_IS_WIRED:
