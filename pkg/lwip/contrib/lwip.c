@@ -38,6 +38,10 @@
 #include "socket_zep_params.h"
 #endif
 
+#if defined(MODULE_ESP_WIFI) && defined(CPU_ESP32)
+#include "esp-wifi/esp_wifi_netdev.h"
+#endif
+
 #include "lwip.h"
 
 #define ENABLE_DEBUG    (0)
@@ -59,6 +63,10 @@
 #define LWIP_NETIF_NUMOF        (sizeof(socket_zep_params) / sizeof(socket_zep_params[0]))
 #endif
 
+#if defined(MODULE_ESP_WIFI) && defined(CPU_ESP32)  /* is mutual exclusive with above ifdef */
+#define LWIP_NETIF_NUMOF        (1)
+#endif
+
 #ifdef LWIP_NETIF_NUMOF
 static struct netif netif[LWIP_NETIF_NUMOF];
 #endif
@@ -77,6 +85,11 @@ static mrf24j40_t mrf24j40_devs[LWIP_NETIF_NUMOF];
 
 #ifdef MODULE_SOCKET_ZEP
 static socket_zep_t socket_zep_devs[LWIP_NETIF_NUMOF];
+#endif
+
+#if defined(MODULE_ESP_WIFI) && defined(CPU_ESP32)
+extern esp_wifi_netdev_t _esp_wifi_dev;
+extern void esp_wifi_setup (esp_wifi_netdev_t* dev);
 #endif
 
 void lwip_bootstrap(void)
@@ -118,6 +131,13 @@ void lwip_bootstrap(void)
             DEBUG("Could not add socket_zep device\n");
             return;
         }
+    }
+#elif defined(MODULE_ESP_WIFI) && defined(CPU_ESP32)
+    esp_wifi_setup(&_esp_wifi_dev);
+    if (netif_add(&netif[0], &_esp_wifi_dev, lwip_netdev_init,
+                  tcpip_input) == NULL) {
+        DEBUG("Could not add esp_wifi device\n");
+        return;
     }
 #endif
     if (netif[0].state != NULL) {
