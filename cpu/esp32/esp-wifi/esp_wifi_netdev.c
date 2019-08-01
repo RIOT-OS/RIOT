@@ -193,6 +193,7 @@ static wifi_config_t wifi_config_sta = {
     .sta = {
         .ssid = ESP_WIFI_SSID,
         .password = ESP_WIFI_PASS,
+        .bssid_set = 0,
         .channel = 0,
         .scan_method = WIFI_ALL_CHANNEL_SCAN,
         .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
@@ -205,53 +206,75 @@ static void esp_wifi_setup (esp_wifi_netdev_t* dev)
 {
     DEBUG("%s: %p\n", __func__, dev);
 
+    /* initialize buffer */
+    dev->rx_len = 0;
+
+    /* set the event handler */
+    esp_system_event_add_handler(_esp_system_event_handler, NULL);
+
     /*
      * Init the WiFi driver. TODO It is not only required before ESP_WIFI is
      * initialized but also before other WiFi functions are used. Once other
      * WiFi functions are realized it has to be moved to a more common place.
      */
+    esp_err_t result;
+
+#ifndef MODULE_ESP_NOW
+    /* if esp_now is used, the following part is already done */
     extern portMUX_TYPE g_intr_lock_mux;
     mutex_init(&g_intr_lock_mux);
 
-    esp_system_event_add_handler (_esp_system_event_handler, NULL);
-
-    esp_err_t result;
-    #if CONFIG_ESP32_WIFI_NVS_ENABLED
+#if CONFIG_ESP32_WIFI_NVS_ENABLED
     result = nvs_flash_init();
     if (result != ESP_OK) {
-       LOG_TAG_ERROR("esp_wifi", "nfs_flash_init failed with return value %d\n", result);
+        LOG_TAG_ERROR("esp_wifi", "nfs_flash_init failed "
+                      "with return value %d\n", result);
         return;
     }
-    #endif
+#endif /* CONFIG_ESP32_WIFI_NVS_ENABLED */
 
+    /* initialize the WiFi driver with default configuration */
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     result = esp_wifi_init(&cfg);
     if (result != ESP_OK) {
-       LOG_TAG_ERROR("esp_wifi", "esp_wifi_init failed with return value %d\n", result);
+        LOG_TAG_ERROR("esp_wifi", "esp_wifi_init failed "
+                      "with return value %d\n", result);
         return;
     }
 
-    #ifdef CONFIG_WIFI_COUNTRY
+    /* set configuration storage type */
+    result = esp_wifi_set_storage(WIFI_STORAGE_RAM);
+    if (result != ESP_OK) {
+        LOG_TAG_ERROR("esp_now", "esp_wifi_set_storage failed "
+                      "with return value %d\n", result);
+        return NULL;
+    }
+
+#ifdef CONFIG_WIFI_COUNTRY
     /* TODO */
-    #endif
+#endif /* CONFIG_WIFI_COUNTRY */
 
     result = esp_wifi_set_mode(WIFI_MODE_STA);
     if (result != ESP_OK) {
-       LOG_TAG_ERROR("esp_wifi", "esp_wifi_set_mode failed with return value %d\n", result);
+        LOG_TAG_ERROR("esp_wifi", "esp_wifi_set_mode failed "
+                      "with return value %d\n", result);
         return;
     }
+#endif /* MODULE_ESP_NOW */
 
-    /* set the Station and SoftAP configuration */
+    /* set the Station configuration */
     result = esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config_sta);
     if (result != ESP_OK) {
-       LOG_TAG_ERROR("esp_wifi", "esp_wifi_set_config station failed with return value %d\n", result);
+        LOG_TAG_ERROR("esp_wifi", "esp_wifi_set_config station failed "
+                      "with return value %d\n", result);
         return;
     }
 
     /* start the WiFi driver */
     result = esp_wifi_start();
     if (result != ESP_OK) {
-       LOG_TAG_ERROR("esp_wifi", "esp_wifi_start failed with return value %d\n", result);
+        LOG_TAG_ERROR("esp_wifi", "esp_wifi_start failed "
+                      "with return value %d\n", result);
         return;
     }
 
@@ -460,8 +483,13 @@ void auto_init_esp_wifi (void)
     esp_wifi_setup(&_esp_wifi_dev);
     _esp_wifi_dev.event = SYSTEM_EVENT_MAX; /* no event */
     _esp_wifi_dev.netif = gnrc_netif_ethernet_create(_esp_wifi_stack,
-                                                    ESP_WIFI_STACKSIZE, ESP_WIFI_PRIO,
-                                                    "netdev-esp-wifi",
+                                                    ESP_WIFI_STACKSIZE,
+#ifdef MODULE_ESP_NOW
+                                                    ESP_WIFI_PRIO - 1,
+#else
+                                                    ESP_WIFI_PRIO,
+#endif
+                                                    "esp-wifi",
                                                     (netdev_t *)&_esp_wifi_dev);
 }
 

@@ -226,11 +226,13 @@ void auto_init(void)
     auto_init_esp_eth();
 #endif
 
+/* don't change the order of auto_init_esp_now and auto_init_esp_wifi */
 #ifdef MODULE_ESP_NOW
     extern void auto_init_esp_now(void);
     auto_init_esp_now();
 #endif
 
+/* don't change the order of auto_init_esp_now and auto_init_esp_wifi */
 #ifdef MODULE_ESP_WIFI
     extern void auto_init_esp_wifi(void);
     auto_init_esp_wifi();
