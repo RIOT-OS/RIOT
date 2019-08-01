@@ -1,1 +1,4 @@
--include $(RIOTCPU)/atmega_common/Makefile.features
+# additional PCINTs for atmega1284p
+FEATURES_PROVIDED += atmega_pcint1 atmega_pcint2 atmega_pcint3
+
+include $(RIOTCPU)/atmega_common/Makefile.features
