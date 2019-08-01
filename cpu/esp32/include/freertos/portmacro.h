@@ -39,9 +39,9 @@ extern "C" {
 #define portEXIT_CRITICAL_ISR(mux)      vTaskExitCritical(mux)
 
 #define taskENTER_CRITICAL(mux)         portENTER_CRITICAL(mux)
-#define taskENTER_CRITICAL_ISR(mux)        portENTER_CRITICAL_ISR(mux)
+#define taskENTER_CRITICAL_ISR(mux)     portENTER_CRITICAL_ISR(mux)
 #define taskEXIT_CRITICAL(mux)          portEXIT_CRITICAL(mux)
-#define taskEXIT_CRITICAL_ISR(mux)        portEXIT_CRITICAL_ISR(mux)
+#define taskEXIT_CRITICAL_ISR(mux)      portEXIT_CRITICAL_ISR(mux)
 
 #define portYIELD_FROM_ISR              thread_yield_higher
 #define portNUM_PROCESSORS              2
