@@ -173,4 +173,9 @@ the clocks for all peripherals are enabled and set to the smallest divider (high
 power consumption. When the device should be put into deep sleep it is recommended to use the internal RC oscillator
 as system clock source.
 
+## Pin Change Interrupts
+
+More pins can be used for hardware interrupts using the Pin Change
+Interrupt feature. See @ref boards_common_atmega for details.
+
  */

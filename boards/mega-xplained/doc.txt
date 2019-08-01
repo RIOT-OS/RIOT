@@ -34,4 +34,10 @@ It will be used automatically with `make term`:
 ```
      make BOARD=mega-xplained -C examples/hello-world term
 ```
+
+### Pin Change Interrupts
+
+More pins can be used for hardware interrupts using the Pin Change
+Interrupt feature. See @ref boards_common_atmega for details.
+
  */
