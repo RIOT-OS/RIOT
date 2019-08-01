@@ -30,8 +30,8 @@ extern "C" {
 #define portMUX_TYPE                    mutex_t
 #define portMUX_INITIALIZER_UNLOCKED    MUTEX_INIT
 
-#define portENTER_CRITICAL(pm)          mutex_lock(pm)
-#define portEXIT_CRITICAL(pm)           mutex_unlock(pm)
+#define portENTER_CRITICAL(mux)         vTaskEnterCritical(mux)
+#define portEXIT_CRITICAL(mux)          vTaskExitCritical(mux)
 #define portENTER_CRITICAL_NESTED       irq_disable
 #define portEXIT_CRITICAL_NESTED        irq_restore
 
@@ -47,6 +47,9 @@ extern "C" {
 #define portNUM_PROCESSORS              2
 
 #define xPortGetCoreID()                PRO_CPU_NUM
+
+extern void vTaskEnterCritical(portMUX_TYPE *mux);
+extern void vTaskExitCritical(portMUX_TYPE *mux);
 
 #ifdef __cplusplus
 }
