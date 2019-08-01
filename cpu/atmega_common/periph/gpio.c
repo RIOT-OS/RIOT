@@ -19,6 +19,9 @@
  * @author      René Herthel <rene-herthel@outlook.de>
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
  * @author      Laurent Navet <laurent.navet@gmail.com>
+ * @author      Robert Hartung <hartung@ibr.cs.tu-bs.de>
+ * @author      Torben Petersen <petersen@ibr.cs.tu-bs.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
  * @}
  */
@@ -28,9 +31,13 @@
 #include <avr/interrupt.h>
 
 #include "cpu.h"
+#include "board.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
+
+#define ENABLE_DEBUG            (0)
+#include "debug.h"
 
 #define GPIO_BASE_PORT_A        (0x20)
 #define GPIO_OFFSET_PORT_H      (0xCB)
@@ -42,6 +49,7 @@
  * @brief     Define GPIO interruptions for an specific atmega CPU, by default
  *            2 (for small atmega CPUs)
  */
+
 #if defined(INT7_vect)
 #define GPIO_EXT_INT_NUMOF      (8U)
 #elif defined(INT6_vect)
@@ -59,7 +67,105 @@
 #endif
 
 static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
-#endif /* MODULE_PERIPH_GPIO_IRQ */
+
+/**
+ * @brief detects ammount of possible PCINTs
+ */
+#if defined(MODULE_ATMEGA_PCINT0) || defined(MODULE_ATMEGA_PCINT1) || \
+    defined(MODULE_ATMEGA_PCINT2) || defined(MODULE_ATMEGA_PCINT3)
+#include "atmega_pcint.h"
+
+/**
+ * @brief check which pcints should be enabled!
+ */
+#ifdef MODULE_ATMEGA_PCINT0
+#ifndef ATMEGA_PCINT_MAP_PCINT0
+#error \
+    Either mapping for pin change interrupt bank 0 is missing or not supported by the MCU
+#else
+#define PCINT0_IDX (0)
+#define _COUNTER0  (1)
+#endif /* ATMEGA_PCINT_MAP_PCINT0 */
+#else
+#define _COUNTER0  (0)
+#endif /* MODULE_ATMEGA_PCINT0 */
+
+#ifdef MODULE_ATMEGA_PCINT1
+#ifndef ATMEGA_PCINT_MAP_PCINT1
+#error \
+    Either mapping for pin change interrupt bank 1 is missing or not supported by the MCU
+#else
+#define PCINT1_IDX _COUNTER0
+#define _COUNTER1 (_COUNTER0 + 1)
+#endif /* ATMEGA_PCINT_MAP_PCINT1 */
+#else
+#define _COUNTER1 _COUNTER0
+#endif /* MODULE_ATMEGA_PCINT1 */
+
+#ifdef MODULE_ATMEGA_PCINT2
+#ifndef ATMEGA_PCINT_MAP_PCINT2
+#error \
+    Either mapping for pin change interrupt bank 2 is missing or not supported by the MCU
+#else
+#define PCINT2_IDX _COUNTER1
+#define _COUNTER2 (_COUNTER1 + 1)
+#endif /* ATMEGA_PCINT_MAP_PCINT2 */
+#else
+#define _COUNTER2 _COUNTER1
+#endif /* MODULE_ATMEGA_PCINT2 */
+
+#ifdef MODULE_ATMEGA_PCINT3
+#ifndef ATMEGA_PCINT_MAP_PCINT3
+#error \
+    Either mapping for pin change interrupt bank 3 is missing or not supported by the MCU
+#else
+#define PCINT3_IDX _COUNTER2
+#define _COUNTER3 (_COUNTER2 + 1)
+#endif /* ATMEGA_PCINT_MAP_PCINT3 */
+#else
+#define _COUNTER3 _COUNTER2
+#endif /* MODULE_ATMEGA_PCINT3 */
+
+#define PCINT_NUM_BANKS (_COUNTER3)
+
+/**
+ * @brief stores the last pcint state of each port
+ */
+static uint8_t pcint_state[PCINT_NUM_BANKS];
+
+/**
+ * @brief stores all cb and args for all defined pcint.
+ */
+typedef struct {
+    gpio_flank_t flank;     /**< type of interrupt the flank should be triggered on */
+    gpio_cb_t cb;           /**< interrupt callback */
+    void *arg;              /**< optional argument */
+} gpio_isr_ctx_pcint_t;
+
+/**
+ * @brief
+ */
+static const gpio_t pcint_mapping[] = {
+#ifdef PCINT0_IDX
+    ATMEGA_PCINT_MAP_PCINT0,
+#endif /* PCINT0_IDX */
+#ifdef PCINT1_IDX
+    ATMEGA_PCINT_MAP_PCINT1,
+#endif /* PCINT1_IDX */
+#ifdef PCINT2_IDX
+    ATMEGA_PCINT_MAP_PCINT2,
+#endif /* PCINT2_IDX */
+#ifdef PCINT3_IDX
+    ATMEGA_PCINT_MAP_PCINT3,
+#endif /* PCINT3_IDX */
+};
+/**
+ * @brief
+ */
+static gpio_isr_ctx_pcint_t pcint_config[8 * PCINT_NUM_BANKS];
+#endif  /* MODULE_ATMEGA_PCINTn */
+
+#endif  /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * @brief     Extract the pin number of the given pin
@@ -115,6 +221,7 @@ static inline uint16_t _pin_addr(gpio_t pin)
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     uint8_t pin_mask = (1 << _pin_num(pin));
+
     switch (mode) {
         case GPIO_OUT:
             _SFR_MEM8(_ddr_addr(pin)) |= pin_mask;
@@ -195,8 +302,82 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         return -1;
     }
 
-    /* not a valid interrupt pin */
+    /* not a valid interrupt pin. Set as pcint instead if pcints are enabled */
     if (int_num < 0) {
+        /* If pin change interrupts are enabled, enable mask and interrupt */
+ #ifdef PCINT_NUM_BANKS
+        int8_t offset = -1;
+        uint8_t pin_num = _pin_num(pin);
+
+        for (unsigned i = 0;
+             i < sizeof(pcint_mapping) / sizeof(pcint_mapping[0]); i++) {
+            if (pin != GPIO_UNDEF && pin == pcint_mapping[i]) {
+                offset = i;
+                break;
+            }
+        }
+
+        /* if pcint was not found: return -1  */
+        if (offset < 0) {
+            return offset;
+        }
+
+        uint8_t bank = offset / 8;
+        uint8_t bank_idx = offset % 8;
+        DEBUG("PCINT enabled for bank %u offset %u\n",
+              (unsigned)bank, (unsigned)offset);
+
+        /* save configuration for pin change interrupt */
+        pcint_config[offset].flank = flank;
+        pcint_config[offset].arg = arg;
+        pcint_config[offset].cb = cb;
+
+        /* init gpio */
+        gpio_init(pin, mode);
+        /* configure pcint */
+        cli();
+        switch (bank) {
+#ifdef PCINT0_IDX
+            case PCINT0_IDX:
+                PCMSK0 |= (1 << bank_idx);
+                PCICR |= (1 << PCIE0);
+                break;
+#endif /* PCINT0_IDX */
+#ifdef PCINT1_IDX
+            case PCINT1_IDX:
+                PCMSK1 |= (1 << bank_idx);
+                PCICR |= (1 << PCIE1);
+                break;
+#endif /* PCINT1_IDX */
+#ifdef PCINT2_IDX
+            case PCINT2_IDX:
+                PCMSK2 |= (1 << bank_idx);
+                PCICR |= (1 << PCIE2);
+                break;
+#endif /* PCINT2_IDX */
+#ifdef PCINT3_IDX
+            case PCINT3_IDX:
+                PCMSK3 |= (1 << pin_num);
+                PCICR |= (1 << PCIE3);
+                break;
+#endif /* PCINT3_IDX */
+            default:
+                return -1;
+                break;
+        }
+        /* As ports are mixed in a bank (e.g. PCINT0), we can only save a single bit here! */
+        uint8_t port_value = (_SFR_MEM8(_pin_addr( pin )));
+        uint8_t pin_mask = (1 << pin_num);
+        uint8_t pin_value = ((port_value & pin_mask) != 0);
+        if (pin_value) {
+            pcint_state[bank] |= pin_mask;
+        }
+        else {
+            pcint_state[bank] &= ~pin_mask;
+        }
+        sei();
+        return 0;
+        #endif /* GPIO_PC_INT_NUMOF */
         return -1;
     }
 
@@ -219,12 +400,12 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         EICRA &= ~(0x3 << (int_num * 2));
         EICRA |= (flank << (int_num * 2));
     }
-#if defined(EICRB)
+    #if defined(EICRB)
     else {
         EICRB &= ~(0x3 << ((int_num % 4) * 2));
         EICRB |= (flank << ((int_num % 4) * 2));
     }
-#endif
+    #endif
 
     /* set callback */
     config[int_num].cb = cb;
@@ -253,6 +434,72 @@ static inline void irq_handler(uint8_t int_num)
     config[int_num].cb(config[int_num].arg);
     __exit_isr();
 }
+
+#ifdef PCINT_NUM_BANKS
+/* inline function that is used by the PCINT ISR */
+static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
+{
+    __enter_isr();
+    /* Find right item */
+    uint8_t idx = 0;
+
+    while (enabled_pcints > 0) {
+        /* check if this pin is enabled & has changed */
+        if (enabled_pcints & 0x1) {
+            /* get pin from mapping (assumes 8 entries per bank!) */
+            gpio_t pin = pcint_mapping[bank * 8 + idx];
+            /* re-construct mask from pin */
+            uint8_t pin_mask = (1 << (_pin_num(pin)));
+            uint8_t idx_mask = (1 << idx);
+            uint8_t port_value = (_SFR_MEM8(_pin_addr( pin )));
+            uint8_t pin_value = ((port_value & pin_mask) != 0);
+            uint8_t old_state = ((pcint_state[bank] & idx_mask) != 0);
+            gpio_isr_ctx_pcint_t *conf = &pcint_config[bank * 8 + idx];
+            if (old_state != pin_value) {
+                pcint_state[bank] ^= idx_mask;
+                if ((conf->flank == GPIO_BOTH ||
+                     (pin_value && conf->flank == GPIO_RISING) ||
+                     (!pin_value && conf->flank == GPIO_FALLING))) {
+                    /* execute callback routine */
+                    conf->cb(conf->arg);
+                }
+            }
+        }
+        enabled_pcints = enabled_pcints >> 1;
+        idx++;
+    }
+
+    __exit_isr();
+}
+#if defined(PCINT0_IDX)
+ISR(PCINT0_vect, ISR_BLOCK)
+{
+    pcint_handler(PCINT0_IDX, PCMSK0);
+}
+#endif /* PCINT0_IDX */
+
+#if defined(PCINT1_IDX)
+ISR(PCINT1_vect, ISR_BLOCK)
+{
+    pcint_handler(PCINT1_IDX, PCMSK1);
+}
+#endif  /* PCINT1_IDX */
+
+#if defined(PCINT2_IDX)
+ISR(PCINT2_vect, ISR_BLOCK)
+{
+    pcint_handler(PCINT2_IDX, PCMSK2);
+}
+#endif  /* PCINT2_IDX */
+
+#if defined(PCINT3_IDX)
+ISR(PCINT3_vect, ISR_BLOCK)
+{
+    pcint_handler(PCINT3_IDX, PCMSK3);
+}
+#endif  /* PCINT3_IDX */
+
+#endif  /* GPIO_PC_INT_NUMOF */
 
 ISR(INT0_vect, ISR_BLOCK)
 {

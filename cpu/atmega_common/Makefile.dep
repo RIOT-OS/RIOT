@@ -1,17 +1,4 @@
-# include module specific includes
-export INCLUDES += -I$(RIOTCPU)/atmega_common/include \
-                   -isystem$(RIOTCPU)/atmega_common/avr_libc_extra/include \
-                   -isystem$(RIOTCPU)/atmega_common/avr_libc_extra/include/vendor
-
-# avr libc needs some RIOT-specific support code
-USEMODULE += avr_libc_extra
-
-PSEUDOMODULES += atmega_pcint
-PSEUDOMODULES += atmega_pcint%
-
 # expand atmega_pcint module
-# atmega16u4 only features atmega_pcint0, therefore additional pseudomodules
-# are activated in each CPU's Makefile.include
 ifneq (,$(filter atmega_pcint,$(USEMODULE)))
   USEMODULE += atmega_pcint0
 endif
@@ -35,5 +22,3 @@ endif
 ifneq (,$(filter atmega_pcint3,$(USEMODULE)))
   FEATURES_REQUIRED += atmega_pcint3
 endif
-
-include $(RIOTMAKE)/arch/atmega.inc.mk
