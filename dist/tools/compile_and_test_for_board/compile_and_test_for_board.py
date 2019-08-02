@@ -220,9 +220,11 @@ class RIOTApplication():
         try:
             self.make(self.TEST_AVAILABLE_TARGETS)
         except subprocess.CalledProcessError:
-            return False
+            has_test = False
         else:
-            return True
+            has_test = True
+        self.logger.info('Application has test: %s', has_test)
+        return has_test
 
     def board_is_supported(self):
         """Return if current board is supported."""
