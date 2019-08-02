@@ -133,7 +133,11 @@ static void *_event_loop(void *arg)
                 /* reduce retries remaining, double timeout and resend */
                 else {
                     memo->send_limit--;
+#ifdef GCOAP_NO_RETRANS_BACKOFF
+                    unsigned i        = 0;
+#else
                     unsigned i        = COAP_MAX_RETRANSMIT - memo->send_limit;
+#endif
                     uint32_t timeout  = ((uint32_t)COAP_ACK_TIMEOUT << i) * US_PER_SEC;
 #if COAP_ACK_VARIANCE > 0
                     uint32_t variance = ((uint32_t)COAP_ACK_VARIANCE << i) * US_PER_SEC;
