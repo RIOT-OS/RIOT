@@ -34,7 +34,7 @@ Usage
 ```
 usage: compile_and_test_for_board.py [-h] [--applications APPLICATIONS]
                                      [--applications-exclude APPLICATIONS_EXCLUDE]
-                                     [--no-test]
+                                     [--no-test] [--with-test-only]
                                      [--loglevel {debug,info,warning,error,fatal,critical}]
                                      [--incremental] [--clean-after]
                                      [--compile-targets COMPILE_TARGETS]
@@ -59,6 +59,8 @@ optional arguments:
                         applications. Also applied after "--applications".
                         (default: None)
   --no-test             Disable executing tests (default: False)
+  --with-test-only      Only compile applications that have a test (default:
+                        False)
   --loglevel {debug,info,warning,error,fatal,critical}
                         Python logger log level (default: info)
   --incremental         Do not rerun successful compilation and tests
@@ -220,9 +222,11 @@ class RIOTApplication():
         try:
             self.make(self.TEST_AVAILABLE_TARGETS)
         except subprocess.CalledProcessError:
-            return False
+            has_test = False
         else:
-            return True
+            has_test = True
+        self.logger.info('Application has test: %s', has_test)
+        return has_test
 
     def board_is_supported(self):
         """Return if current board is supported."""
@@ -273,7 +277,9 @@ class RIOTApplication():
             return (str(err), err.application.appdir, err.errorfile)
 
     def compilation_and_test(self, clean_after=False, runtest=True,
-                             incremental=False, jobs=False):
+                             incremental=False, jobs=False,
+                             with_test_only=False):
+        # pylint:disable=too-many-arguments
         """Compile and execute test if available.
 
         Checks for board supported/enough memory, compiles.
@@ -301,6 +307,13 @@ class RIOTApplication():
             self._write_resultfile('skip', 'not_enough_memory')
             return
 
+        has_test = self.has_test()
+
+        if with_test_only and not has_test:
+            create_directory(self.resultdir, clean=True)
+            self._write_resultfile('skip', 'disabled_has_no_tests')
+            return
+
         # Normal case for supported apps
         create_directory(self.resultdir, clean=not incremental)
 
@@ -317,7 +330,7 @@ class RIOTApplication():
             self.clean_intermediates()
 
         if runtest:
-            if self.has_test():
+            if has_test:
                 setuptasks = collections.OrderedDict(
                     [('flash', ['flash-only'])])
                 self.make_with_outfile('test', self.TEST_TARGETS,
@@ -556,6 +569,8 @@ PARSER.add_argument(
 )
 PARSER.add_argument('--no-test', action='store_true', default=False,
                     help='Disable executing tests')
+PARSER.add_argument('--with-test-only', action='store_true', default=False,
+                    help='Only compile applications that have a test')
 PARSER.add_argument('--loglevel', choices=LOG_LEVELS, default='info',
                     help='Python logger log level')
 PARSER.add_argument('--incremental', action='store_true', default=False,
@@ -617,7 +632,8 @@ def main():
     errors = [app.run_compilation_and_test(clean_after=args.clean_after,
                                            runtest=not args.no_test,
                                            incremental=args.incremental,
-                                           jobs=args.jobs)
+                                           jobs=args.jobs,
+                                           with_test_only=args.with_test_only)
               for app in applications]
     errors = [e for e in errors if e is not None]
     num_errors = len(errors)
