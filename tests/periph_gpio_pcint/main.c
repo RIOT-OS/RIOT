@@ -37,7 +37,7 @@ static const gpio_t analog_map[] = {
     ARDUINO_PIN_A3,
     ARDUINO_PIN_A4,
     ARDUINO_PIN_A5,
-#if !defined(CPU_ATMEGA328P) || !defined(CPU_ATMEGA32U4)
+#if !defined(CPU_ATMEGA328P) && !defined(CPU_ATMEGA32U4)
     ARDUINO_PIN_A6,
     ARDUINO_PIN_A7,
 #endif /* !defined(CPU_ATMEGA328P) || !defined(CPU_ATMEGA32U4) */
