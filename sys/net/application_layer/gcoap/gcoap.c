@@ -135,8 +135,10 @@ static void *_event_loop(void *arg)
                     memo->send_limit--;
                     unsigned i        = COAP_MAX_RETRANSMIT - memo->send_limit;
                     uint32_t timeout  = ((uint32_t)COAP_ACK_TIMEOUT << i) * US_PER_SEC;
+#if COAP_ACK_VARIANCE > 0
                     uint32_t variance = ((uint32_t)COAP_ACK_VARIANCE << i) * US_PER_SEC;
                     timeout = random_uint32_range(timeout, timeout + variance);
+#endif
 
                     ssize_t bytes = sock_udp_send(&_sock, memo->msg.data.pdu_buf,
                                                   memo->msg.data.pdu_len,
@@ -757,8 +759,10 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
             if (memo->msg.data.pdu_buf) {
                 memo->send_limit  = COAP_MAX_RETRANSMIT;
                 timeout           = (uint32_t)COAP_ACK_TIMEOUT * US_PER_SEC;
+#if COAP_ACK_VARIANCE > 0
                 uint32_t variance = (uint32_t)COAP_ACK_VARIANCE * US_PER_SEC;
                 timeout = random_uint32_range(timeout, timeout + variance);
+#endif
             }
             else {
                 memo->state = GCOAP_MEMO_UNUSED;
