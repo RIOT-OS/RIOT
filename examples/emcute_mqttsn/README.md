@@ -95,3 +95,13 @@ pub hello/world "One more beer, please."
 ```
 
 That's it, happy publishing!
+
+
+## FAQ
+
+### I can't connect multiple RIOT nodes to a broker, what can I do?
+Each node that connects to the broker must have a unique node ID string set. Per
+default, this example sets this statically ID to `gertrud`. If you want to
+connect more than one node to the broker, you need to set a custom ID for each
+node during compile time. Simply use the `EMCUTE_ID` environment variable for
+this, e.g. build with `EMCUTE_ID=horst make all`.

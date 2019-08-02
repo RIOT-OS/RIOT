@@ -28,8 +28,10 @@
 #include "net/emcute.h"
 #include "net/ipv6/addr.h"
 
-#define EMCUTE_PORT         (1883U)
+#ifndef EMCUTE_ID
 #define EMCUTE_ID           ("gertrud")
+#endif
+#define EMCUTE_PORT         (1883U)
 #define EMCUTE_PRIO         (THREAD_PRIORITY_MAIN - 1)
 
 #define NUMOFSUBS           (16U)
