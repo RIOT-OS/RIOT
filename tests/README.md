@@ -27,3 +27,12 @@ An automated way of knowing if a test is available is to execute the
 It executes without error if tests run by 'make test' are present.
 
     make test/available
+
+
+Running manual tests
+--------------------
+
+Some tests need active monitoring or manual setup steps but still have some
+automated scripts. The test automation scripts are defined in the
+`<test_application>/tests-manual/` folder.
+For running them, follow the setup or analysis documentation.

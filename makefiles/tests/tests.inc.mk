@@ -28,3 +28,16 @@ else
 test-input-hash:
 	true
 endif
+
+# Tests that may require manual steps
+.PHONY: test-manual test-manual/available
+TESTS_MANUAL ?= $(foreach file,$(wildcard $(APPDIR)/tests-manual/*[^~]),\
+                  $(shell test -f $(file) -a -x $(file) && echo $(file)))
+
+test-manual: $(TEST_DEPS)
+	$(Q) for t in $(TESTS_MANUAL); do \
+		$$t || exit 1; \
+	done
+
+test-manual/available:
+	$(Q)test -n "$(strip $(TESTS_MANUAL))"
