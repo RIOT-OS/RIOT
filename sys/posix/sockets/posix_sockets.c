@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -343,7 +344,7 @@ int socket(int domain, int type, int protocol)
         case AF_INET6:
 #endif
         {
-            int fd = vfs_bind(VFS_ANY_FD, 0, &socket_ops, s);
+            int fd = vfs_bind(VFS_ANY_FD, O_RDWR, &socket_ops, s);
 
             if (fd < 0) {
                 errno = ENFILE;
@@ -443,7 +444,7 @@ int accept(int socket, struct sockaddr *restrict address,
                                                   sa_len);
 
                 }
-                int fd = vfs_bind(VFS_ANY_FD, 0, &socket_ops, new_s);
+                int fd = vfs_bind(VFS_ANY_FD, O_RDWR, &socket_ops, new_s);
                 if (fd < 0) {
                     errno = ENFILE;
                     res = -1;
