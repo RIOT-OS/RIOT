@@ -46,6 +46,11 @@ This should take care of everything!
 We use the open `avrdude` tool to write the new code into the ATmega2560's
 flash
 
+## Pin Change Interrupts
+
+More pins can be used for hardware interrupts using the Pin Change
+Interrupt feature. See @ref boards_common_atmega for details.
+
 ## State
 While there is basic support in RIOT, there are still some parts missing:
 * Timer implementation needs love (ideally simulate a 32bit timer by adding
