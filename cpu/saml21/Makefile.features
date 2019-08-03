@@ -1,1 +1,8 @@
--include $(RIOTCPU)/sam0_common/Makefile.features
+# The SAMR30 line of MCUs does not contain a TRNG
+BOARDS_WITHOUT_HWRNG += samr30-xpro
+
+ifeq (,$(filter $(BOARDS_WITHOUT_HWRNG),$(BOARD)))
+  FEATURES_PROVIDED += periph_hwrng
+endif
+
+include $(RIOTCPU)/sam0_common/Makefile.features
