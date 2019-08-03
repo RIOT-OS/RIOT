@@ -714,8 +714,7 @@ ifneq (,$(filter ws281x_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ws281x,$(USEMODULE)))
-  FEATURES_REQUIRED_ANY += arch_avr8|arch_native
-
+  FEATURES_REQUIRED_ANY += arch_avr8|arch_native|periph_gpio_abc
   ifeq (,$(filter ws281x_%,$(USEMODULE)))
     ifneq (,$(filter arch_avr8,$(FEATURES_USED)))
       USEMODULE += ws281x_atmega
@@ -723,9 +722,15 @@ ifneq (,$(filter ws281x,$(USEMODULE)))
     ifneq (,$(filter arch_native,$(FEATURES_USED)))
       USEMODULE += ws281x_vt100
     endif
+    ifneq (,$(filter periph_gpio_abc,$(FEATURES_USED)))
+      USEMODULE += ws281x_gpio_abc
+    endif
   endif
   ifneq (,$(filter ws281x_atmega,$(USEMODULE)))
     FEATURES_REQUIRED += arch_avr8
+  endif
+  ifneq (,$(filter ws281x_gpio_abc,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_gpio_abc
   endif
   USEMODULE += xtimer
 endif

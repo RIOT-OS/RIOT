@@ -42,6 +42,15 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @name    Properties of the GPIO ABC backend.
+ * @{
+ */
+#ifdef MODULE_WS281X_GPIO_ABC
+#define WS281X_HAVE_INIT                    (1)
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
