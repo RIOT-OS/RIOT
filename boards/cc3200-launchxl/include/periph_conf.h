@@ -54,15 +54,19 @@ extern "C" {
  *
  */
 static const spi_conf_t spi_config[] = {
-    { .base_addr = GSPI_BASE,
-      .gpio_port = 0,
-      .pins      = (spi_pins_t){ .miso = 05, .sck = 04, .mosi = 06, .cs = 07 },
-      .config    = (SPI_HW_CTRL_CS | SPI_4PIN_MODE | SPI_TURBO_OFF |
-                 SPI_CS_ACTIVELOW | SPI_WL_8) },
-    { .base_addr = LSPI_BASE,
-      .gpio_port = 1,
-      .config    = (SPI_SW_CTRL_CS | SPI_4PIN_MODE | SPI_TURBO_OFF |
-                 SPI_CS_ACTIVEHIGH | SPI_WL_32) }
+    {
+            .base_addr = GSPI_BASE,
+            .gpio_port = 0,
+            .pins = (spi_pins_t){ .miso = 05, .sck = 04, .mosi = 06, .cs = 07 },
+            .config = (SPI_HW_CTRL_CS | SPI_4PIN_MODE | SPI_TURBO_OFF |
+                       SPI_CS_ACTIVELOW | SPI_WL_8),
+    },
+    {
+            .base_addr = LSPI_BASE,
+            .gpio_port = 1,
+            .config    = (SPI_SW_CTRL_CS | SPI_4PIN_MODE | SPI_TURBO_OFF |
+                       SPI_CS_ACTIVEHIGH | SPI_WL_32),
+    }
 };
 
 /**
@@ -70,11 +74,6 @@ static const spi_conf_t spi_config[] = {
  */
 #define SPI_NUMOF (sizeof(spi_config) / sizeof(spi_conf_t))
 /** @} */
-
-/**
- * @name UART configuration
- * @{
- */
 
 /**
  * @name UART configuration
