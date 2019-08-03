@@ -33,6 +33,13 @@ extern "C" {
 #define CPUID_LEN           (16U)
 
 /**
+ * @name    HWRNG configuration
+ * @{
+ */
+#define HWRNG_HAS_GENERIC_READ (1)
+#define HWRNG_HAS_INIT         (1)
+
+/**
  * @brief   Use shared SPI functions
  * @{
  */
