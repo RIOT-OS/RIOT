@@ -249,36 +249,3 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont, const void *out,
         gpio_set((gpio_t)cs);
     }
 }
-
-uint8_t spi_transfer_reg(spi_t bus, spi_cs_t cs, uint8_t reg, uint8_t out)
-{
-    if (cs != SPI_CS_UNDEF) {
-        gpio_clear((gpio_t)cs);
-    }
-
-    ROM_SPITransfer(spi_config[bus].base_addr, &reg, 0, 1, 0);
-
-    if (ROM_SPITransfer(spi_config[bus].base_addr, (uint8_t *)&out, 0, 1, 0)) {
-        return -1;
-    }
-
-    if (cs != SPI_CS_UNDEF) {
-        gpio_set((gpio_t)cs);
-    }
-
-    return SPI_OK; /* success transfer */
-}
-
-void spi_transfer_regs(spi_t bus, spi_cs_t cs, uint8_t reg, const void *out,
-                       void *in, size_t len)
-{
-    if (cs != SPI_CS_UNDEF) {
-        gpio_clear((gpio_t)cs);
-    }
-
-    ROM_SPITransfer(spi_config[bus].base_addr, &reg, 0, 1, 0);
-    if (ROM_SPITransfer(spi_config[bus].base_addr, (uint8_t *)out,
-                        (uint8_t *)in, len, 0)) {
-        return;
-    }
-}
