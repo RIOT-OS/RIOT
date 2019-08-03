@@ -171,7 +171,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     if (prescaler > 0) {
         prescaler--;
     }
-    if (prescaler > 255) {
+    prescaler &= 0xFF;
         prescaler = 255;
     }
 
