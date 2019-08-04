@@ -54,7 +54,7 @@
  * @brief gpio base addresses
  *
  */
-static uint32_t ports[GPIO_PORT_NUM] = {
+static uint32_t ports[] = {
     GPIOA0_BASE, GPIOA1_BASE, GPIOA2_BASE, GPIOA3_BASE, GPIOA4_BASE,
 };
 
