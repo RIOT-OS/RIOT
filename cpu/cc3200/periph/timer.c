@@ -172,8 +172,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
         prescaler--;
     }
     prescaler &= 0xFF;
-        prescaler = 255;
-    }
 
     timer(dev)->prescale_a      = prescaler;
     timer(dev)->interval_load_a = LOAD_VALUE;
