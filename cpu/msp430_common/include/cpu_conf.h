@@ -41,6 +41,13 @@ extern "C" {
 #define CPU_FLASH_BASE      (0x8000)
 #define FLASHPAGE_NUMOF     (64U)        /* 32K */
 #endif
+
+/* The minimum block size which can be written is 1B. However, the erase
+ * block is always FLASHPAGE_SIZE.
+ */
+#define FLASHPAGE_RAW_BLOCKSIZE    (1U)
+/* Writing should be always 2 byte aligned */
+#define FLASHPAGE_RAW_ALIGNMENT    (2U)
 /** @} */
 
 /**
