@@ -28,16 +28,16 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
-#endif /* MODULE_PERIPH_GPIO_IRQ */
-
 #define GPIO_PINS_PER_PORT 8     /**< Number of pins per port */
+#define GPIO_PORT_NUM 5          /**< Number of pins per port */
 #define GPIO_DIR_MASK 0x00000001 /**< GPIO direction configuration mask */
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   static callback memory
  */
-static gpio_isr_ctx_t isr_ctx[4][GPIO_PINS_PER_PORT];
+static gpio_isr_ctx_t isr_ctx[GPIO_PORT_NUM][GPIO_PINS_PER_PORT];
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * GPIO Pin type value used to configure pin to GPIO
@@ -56,14 +56,15 @@ static gpio_isr_ctx_t isr_ctx[4][GPIO_PINS_PER_PORT];
  *
  */
 #define PAD_CONFIG_REG(pin) \
-    (*((volatile unsigned long *)((gpio_pin << 2) + PAD_CONFIG_BASE)))
+    (*((volatile uint32_t *)((gpio_pin << 2) + PAD_CONFIG_BASE)))
 
 /**
  * @brief gpio base addresses
  *
  */
-static unsigned long ports[] = { GPIOA0_BASE, GPIOA1_BASE, GPIOA2_BASE,
-                                 GPIOA3_BASE, GPIOA4_BASE };
+static uint32_t ports[GPIO_PORT_NUM] = {
+    GPIOA0_BASE, GPIOA1_BASE, GPIOA2_BASE, GPIOA3_BASE, GPIOA4_BASE,
+};
 
 /**
  * @brief pin to GPIO pin numbers mappings
@@ -84,7 +85,7 @@ static const uint8_t pin_to_gpio_num[64] = {
  * @return true
  * @return false
  */
-bool _gpioPortBaseValid(unsigned long port)
+bool _gpioPortBaseValid(uint32_t port)
 {
     return ((port == GPIOA0_BASE) || (port == GPIOA1_BASE) ||
             (port == GPIOA2_BASE) || (port == GPIOA3_BASE) ||
@@ -229,6 +230,11 @@ void isr_gpio_a3(void)
     handle_isr((cc3200_gpio_t *)GPIOA3_BASE);
 }
 
+void isr_gpio_a4(void)
+{
+    handle_isr((cc3200_gpio_t *)GPIOA3_BASE);
+}
+
 /**
  * @brief isr interrupt handler
  *
@@ -321,6 +327,10 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
     case GPIOA3_BASE:
         ROM_GPIOIntRegister(portBase, isr_gpio_a3);
         ROM_IntEnable(INT_GPIOA3);
+        break;
+    case GPIOA4_BASE:
+        ROM_GPIOIntRegister(portBase, isr_gpio_a4);
+        ROM_IntEnable(INT_GPIOA4);
         break;
     }
 
