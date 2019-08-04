@@ -29,15 +29,7 @@
 #include "debug.h"
 
 #define GPIO_PINS_PER_PORT 8     /**< Number of pins per port */
-#define GPIO_PORT_NUM 5          /**< Number of pins per port */
 #define GPIO_DIR_MASK 0x00000001 /**< GPIO direction configuration mask */
-
-#ifdef MODULE_PERIPH_GPIO_IRQ
-/**
- * @brief   static callback memory
- */
-static gpio_isr_ctx_t isr_ctx[GPIO_PORT_NUM][GPIO_PINS_PER_PORT];
-#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * GPIO Pin type value used to configure pin to GPIO
@@ -65,6 +57,13 @@ static gpio_isr_ctx_t isr_ctx[GPIO_PORT_NUM][GPIO_PINS_PER_PORT];
 static uint32_t ports[GPIO_PORT_NUM] = {
     GPIOA0_BASE, GPIOA1_BASE, GPIOA2_BASE, GPIOA3_BASE, GPIOA4_BASE,
 };
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
+/**
+ * @brief   static callback memory
+ */
+static gpio_isr_ctx_t isr_ctx[ARRAY_SIZE(ports)][GPIO_PINS_PER_PORT];
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * @brief pin to GPIO pin numbers mappings
