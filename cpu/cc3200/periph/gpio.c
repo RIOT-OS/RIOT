@@ -29,14 +29,15 @@
 #include "debug.h"
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-/**
- * @brief   static callback memory
- */
-static gpio_isr_ctx_t isr_ctx[4][8];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
 #define GPIO_PINS_PER_PORT 8     /**< Number of pins per port */
 #define GPIO_DIR_MASK 0x00000001 /**< GPIO direction configuration mask */
+
+/**
+ * @brief   static callback memory
+ */
+static gpio_isr_ctx_t isr_ctx[4][GPIO_PINS_PER_PORT];
 
 /**
  * GPIO Pin type value used to configure pin to GPIO
