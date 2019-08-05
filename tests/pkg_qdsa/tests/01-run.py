@@ -9,9 +9,12 @@
 import sys
 from testrunner import run
 
+# It takes ~11s on nucleo-l152re, so add some margin
+TIMEOUT = 15
+
 
 def testfunc(child):
-    child.expect('OK \(\d+ tests\)')
+    child.expect('OK \(\d+ tests\)', timeout=TIMEOUT)
 
 
 if __name__ == "__main__":
