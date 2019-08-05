@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f413zh STM32 Nucleo-F413ZH
- * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo-F413ZH
+ * @ingroup     boards_nucleo-f413zh
  * @{
  *
  * @file

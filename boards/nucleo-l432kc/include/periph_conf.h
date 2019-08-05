@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-l432kc STM32 Nucleo-L432KC
- * @ingroup     boards_common_nucleo32
- * @brief       Support for the STM32 Nucleo-L432KC
+ * @ingroup     boards_nucleo-l432kc
  * @{
  *
  * @file

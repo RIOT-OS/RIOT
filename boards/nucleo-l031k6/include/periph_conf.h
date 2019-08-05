@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-l031k6 STM32 Nucleo-L031K6
- * @ingroup     boards_common_nucleo32
- * @brief       Support for the STM32 Nucleo-L031K6
+ * @ingroup     boards_nucleo-l031k6
  * @{
  *
  * @file
