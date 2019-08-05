@@ -90,9 +90,14 @@ typedef uint16_t credman_tag_t;
  * @brief Credential types
  */
 typedef enum {
+    /**
+     * @brief Empty type
+     *
+     * Used to detect uninitialized @ref credman_credential_t internally.
+     */
     CREDMAN_TYPE_EMPTY  = 0,
-    CREDMAN_TYPE_PSK    = 1,
-    CREDMAN_TYPE_ECDSA  = 2,
+    CREDMAN_TYPE_PSK    = 1,    /**< PSK credential type */
+    CREDMAN_TYPE_ECDSA  = 2,    /**< ECDSA credential type */
 } credman_type_t;
 
 /**
