@@ -54,7 +54,6 @@
  *
  * int main(void)
  * {
- *
  *     wdt_setup_reboot(0, MAX_TIME);
  *     wdt_start();
  *
