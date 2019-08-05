@@ -10,6 +10,10 @@ CMAKE_MINIMAL_VERSION = 3.6.0
 
 RIOT_CFLAGS = $(INCLUDES)
 
+ifeq (llvm,$(TOOLCHAIN))
+  RIOT_CFLAGS += -Wno-char-subscripts
+endif
+
 TOOLCHAIN_FILE=$(PKG_BUILDDIR)/xcompile-toolchain.cmake
 
 all: $(PKG_BUILDDIR)/src/Makefile
