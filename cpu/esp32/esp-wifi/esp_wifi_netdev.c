@@ -336,6 +336,7 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
 
     /* send the the packet to the peer(s) mac address */
     if (esp_wifi_internal_tx(ESP_IF_WIFI_STA, dev->tx_buf, dev->tx_len) == ESP_OK) {
+        ret = dev->tx_len;
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     }
     else {
