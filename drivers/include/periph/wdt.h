@@ -135,7 +135,7 @@
  *
  * int main(void)
  * {
- *     wdt_setup_callback(0, MAX_TIME, wdt_cb, arg);
+ *     wdt_setup_reboot_with_callback(0, MAX_TIME, wdt_cb, arg);
  *     wdt_start();
  *     while (1) {
  *         xtimer_usleep(time);
