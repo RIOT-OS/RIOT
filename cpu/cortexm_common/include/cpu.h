@@ -171,10 +171,11 @@ static inline void cortexm_sleep(int deep)
     __DSB();
     __WFI();
 #if defined(CPU_MODEL_STM32L152RE)
-    /* STM32L152RE crashes without this __NOP(). See #8518. */
-    __NOP();
-#endif
+    /* STM32L152RE crashes if branching to irq_restore(state). See #11830. */
+    __set_PRIMASK(state);
+#else
     irq_restore(state);
+#endif
 }
 
 /**
