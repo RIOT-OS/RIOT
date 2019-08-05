@@ -26,7 +26,7 @@
 
 void flashpage_write(int page, const void *data)
 {
-    assert(page < FLASHPAGE_NUMOF);
+    assert((unsigned) page < FLASHPAGE_NUMOF);
 
     const uint8_t *src = data;
     uint8_t *dst = (uint8_t *)flashpage_addr(page);

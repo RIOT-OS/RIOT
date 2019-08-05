@@ -26,11 +26,11 @@ extern "C" {
  * @name   Configure the internal flash memory
  * @{
  */
-#define FLASHPAGE_SIZE      (512)
+#define FLASHPAGE_SIZE      (512U)
 
 #if defined (CPU_MODEL_MSP430F1611)
 #define CPU_FLASH_BASE      (0x4000)
-#define FLASHPAGE_NUMOF     (96)        /* 48K */
+#define FLASHPAGE_NUMOF     (96U)        /* 48K */
 #elif defined (CPU_MODEL_MSP430F1612)
 #define CPU_FLASH_BASE      (0x2600)    /* first sector is only 256 byte, skip it*/
 #define FLASHPAGE_NUMOF     (109U)      /* 54.5K */
@@ -39,7 +39,7 @@ extern "C" {
 #define FLASHPAGE_NUMOF     (103U)      /* we can currently only access 51.5K */
 #elif defined (CPU_MODEL_CC430F6137)
 #define CPU_FLASH_BASE      (0x8000)
-#define FLASHPAGE_NUMOF     (64)        /* 32K */
+#define FLASHPAGE_NUMOF     (64U)        /* 32K */
 #endif
 /** @} */
 
