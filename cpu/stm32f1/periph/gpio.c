@@ -23,6 +23,7 @@
 #include "cpu.h"
 #include "board.h"
 #include "periph/gpio.h"
+#include "periph/gpio_abc.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
@@ -241,3 +242,26 @@ void isr_exti(void)
     cortexm_isr_end();
 }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
+
+#ifdef MODULE_PERIPH_GPIO_ABC
+static inline __attribute__((always_inline)) void _delay(int32_t loops)
+{
+    __asm__ volatile(
+        "0:" "SUBS %[iterator], #1;"
+        "BPL 0b;"
+        : [iterator]"+r"(loops)
+    );
+}
+
+void gpio_set_for(gpio_t pin, int delay)
+{
+    _port(pin)->BSRR = (1 << _pin_num(pin));
+    _delay(delay);
+}
+
+void gpio_clear_for(gpio_t pin, int delay)
+{
+    _port(pin)->BRR = (1 << _pin_num(pin));
+    _delay(delay);
+}
+#endif /* MODULE_PERIPH_GPIO_ABC */
