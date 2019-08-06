@@ -7,5 +7,6 @@ FEATURES_PROVIDED += periph_rtc
 
 FEATURES_CONFLICT += periph_rtc:periph_rtt
 FEATURES_CONFLICT_MSG += "On the STM32F1, the RTC and RTT map to the same hardware peripheral."
+FEATURES_PROVIDED += periph_gpio_abc
 
 -include $(RIOTCPU)/stm32_common/Makefile.features
