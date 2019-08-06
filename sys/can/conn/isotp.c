@@ -91,7 +91,7 @@ int conn_can_isotp_create(conn_can_isotp_t *conn, struct isotp_options *options,
     return 0;
 }
 
-int conn_can_isotp_bind(conn_can_isotp_t *conn)
+int conn_can_isotp_bind(conn_can_isotp_t *conn, struct isotp_fc_options *fc_options)
 {
     assert(conn != NULL);
     assert(conn->isotp.opt.tx_id != 0 || conn->isotp.opt.rx_id != 0);
@@ -126,7 +126,7 @@ int conn_can_isotp_bind(conn_can_isotp_t *conn)
         put_msg(conn, &msg);
     }
 
-    ret = isotp_bind(&conn->isotp, &entry, conn);
+    ret = isotp_bind(&conn->isotp, &entry, conn, fc_options);
     if (!ret) {
         conn->bound = 1;
     }
