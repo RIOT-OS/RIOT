@@ -143,6 +143,15 @@ extern "C" {
 
 #define TCPIP_THREAD_STACKSIZE  (THREAD_STACKSIZE_DEFAULT)
 
+#if defined(CPU_ESP32) && !defined(DOXYGEN)
+/**
+ * In ESP32, the thread that is dealing with hardware interrupts of the WiFi
+ * interface has a priority of 1. This thread should have a higher priority
+ * than lwIP's TCP/IP thread.
+ */
+#define TCPIP_THREAD_PRIO       (2)
+#endif
+
 #define MEM_ALIGNMENT           (4)
 #ifndef MEM_SIZE
 /* packet buffer size of GNRC + stack for TCP/IP */
