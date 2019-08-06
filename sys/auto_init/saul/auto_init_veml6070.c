@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define VEML6070_NUM    (sizeof(veml6070_params) / sizeof(veml6070_params[0]))
+#define VEML6070_NUM    ARRAY_SIZE(veml6070_params)
 
 /**
  * @brief   Allocation of memory for device descriptors
@@ -44,7 +44,7 @@ static saul_reg_t saul_entries[VEML6070_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define VEML6070_INFO_NUM    (sizeof(veml6070_saul_info) / sizeof(veml6070_saul_info[0]))
+#define VEML6070_INFO_NUM    ARRAY_SIZE(veml6070_saul_info)
 
 /**
  * @brief   Reference the driver structs.

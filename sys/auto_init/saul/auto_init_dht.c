@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define DHT_NUM     (sizeof(dht_params) / sizeof(dht_params[0]))
+#define DHT_NUM     ARRAY_SIZE(dht_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -45,7 +45,7 @@ static saul_reg_t saul_entries[DHT_NUM * 2];
 /**
  * @brief   Define the number of saul info
  */
-#define DHT_INFO_NUM (sizeof(dht_saul_info) / sizeof(dht_saul_info[0]))
+#define DHT_INFO_NUM ARRAY_SIZE(dht_saul_info)
 
 /**
  * @name    Import SAUL endpoints

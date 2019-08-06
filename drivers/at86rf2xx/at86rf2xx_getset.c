@@ -72,12 +72,12 @@ static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg)
         if (channel == 0) {
             /* Channel 0 is 868.3 MHz */
             dbm_to_tx_pow = &dbm_to_tx_pow_868[0];
-            nelem = sizeof(dbm_to_tx_pow_868) / sizeof(dbm_to_tx_pow_868[0]);
+            nelem = ARRAY_SIZE(dbm_to_tx_pow_868);
         }
         else {
             /* Channels 1+ are 915 MHz */
             dbm_to_tx_pow = &dbm_to_tx_pow_915[0];
-            nelem = sizeof(dbm_to_tx_pow_915) / sizeof(dbm_to_tx_pow_915[0]);
+            nelem = ARRAY_SIZE(dbm_to_tx_pow_915);
         }
 
         for (size_t i = 0; i < nelem; ++i) {

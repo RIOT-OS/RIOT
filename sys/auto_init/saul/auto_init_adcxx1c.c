@@ -31,7 +31,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define ADCXX1C_NUM   (sizeof(adcxx1c_params) / sizeof(adcxx1c_params[0]))
+#define ADCXX1C_NUM   ARRAY_SIZE(adcxx1c_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -46,7 +46,7 @@ static saul_reg_t saul_entries[ADCXX1C_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define ADCXX1C_INFO_NUM (sizeof(adcxx1c_saul_info) / sizeof(adcxx1c_saul_info[0]))
+#define ADCXX1C_INFO_NUM ARRAY_SIZE(adcxx1c_saul_info)
 
 /**
  * @brief   Reference the driver struct

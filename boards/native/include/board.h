@@ -180,7 +180,7 @@ static const motor_driver_config_t motor_driver_config[] = {
     },
 };
 
-#define MOTOR_DRIVER_NUMOF           (sizeof(motor_driver_config) / sizeof(motor_driver_config[0]))
+#define MOTOR_DRIVER_NUMOF           ARRAY_SIZE(motor_driver_config)
 /** @} */
 
 #endif /* __cplusplus */

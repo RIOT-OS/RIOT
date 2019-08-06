@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define SDS011_NUM     (sizeof(sds011_params) / sizeof(sds011_params[0]))
+#define SDS011_NUM     ARRAY_SIZE(sds011_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -45,7 +45,7 @@ static saul_reg_t saul_entries[SDS011_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define SDS011_INFO_NUM (sizeof(sds011_saul_info) / sizeof(sds011_saul_info[0]))
+#define SDS011_INFO_NUM ARRAY_SIZE(sds011_saul_info)
 
 /**
  * @name    Import SAUL endpoint

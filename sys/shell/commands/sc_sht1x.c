@@ -27,7 +27,7 @@
 #include "sht1x.h"
 #include "sht1x_params.h"
 
-#define SHT1X_NUM     (sizeof(sht1x_params) / sizeof(sht1x_params[0]))
+#define SHT1X_NUM     ARRAY_SIZE(sht1x_params)
 
 extern sht1x_dev_t sht1x_devs[SHT1X_NUM];
 
@@ -225,14 +225,14 @@ int _sht_config_handler(int argc, char **argv)
                     missing_argument(i - 1, argv);
                     return -1;
                 }
-                temp_off = (int16_t)atoi(argv[i]);
+                temp_off = atoi(argv[i]);
                 break;
             case 'h':
                 if (++i >= argc) {
                     missing_argument(i - 1, argv);
                     return -1;
                 }
-                hum_off = (int16_t)atoi(argv[i]);
+                hum_off = atoi(argv[i]);
                 break;
             case 'r':
                 if (++i >= argc) {

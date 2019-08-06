@@ -25,6 +25,7 @@
 
 /* include periph_cpu.h to make it visible in any case */
 #include "periph_cpu.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +60,7 @@ static const gpio_t adc_channels[] = ADC_GPIOS;
  *
  * @note ADC_NUMOF definition must not be changed.
  */
-#define ADC_NUMOF   (sizeof(adc_channels) / sizeof(adc_channels[0]))
+#define ADC_NUMOF   ARRAY_SIZE(adc_channels)
 /** @} */
 
 /**
@@ -91,7 +92,7 @@ static const gpio_t dac_channels[] = DAC_GPIOS;
  *
  * @note DAC_NUMOF definition must not be changed.
  */
-#define DAC_NUMOF   (sizeof(dac_channels) / sizeof(dac_channels[0]))
+#define DAC_NUMOF   ARRAY_SIZE(dac_channels)
 /** @} */
 
 /**
@@ -127,7 +128,7 @@ static const i2c_conf_t i2c_config[] = {
  *
  * @note I2C_NUMOF definition must not be changed.
  */
-#define I2C_NUMOF   (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF   ARRAY_SIZE(i2c_config)
 
 /** @} */
 
@@ -203,7 +204,7 @@ static const spi_conf_t spi_config[] = {
  *
  * @note SPI_NUMOF definition must not be changed.
  */
-#define SPI_NUMOF   (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF   ARRAY_SIZE(spi_config)
 
 /** @} */
 

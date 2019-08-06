@@ -132,7 +132,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_0_ISR          (isr_uart0_rx_tx)
 #define UART_1_ISR          (isr_uart1_rx_tx)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -164,7 +164,7 @@ static const pwm_conf_t pwm_config[] = {
     }
 };
 
-#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 #ifdef __cplusplus

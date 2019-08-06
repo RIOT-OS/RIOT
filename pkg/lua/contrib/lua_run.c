@@ -272,7 +272,7 @@ LUALIB_API int lua_riot_do_buffer(const uint8_t *buf, size_t buflen, void *memor
                                      modmask, retval);
 }
 
-#define MAX_ERR_STRING ((sizeof(lua_riot_str_errors) / sizeof(*lua_riot_str_errors)) - 1)
+#define MAX_ERR_STRING (ARRAY_SIZE(lua_riot_str_errors) - 1)
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 LUALIB_API const char *lua_riot_strerror(int errn)

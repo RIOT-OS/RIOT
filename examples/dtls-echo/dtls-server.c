@@ -210,7 +210,7 @@ static int _peer_get_psk_info_handler(struct dtls_context_t *ctx, const session_
 
     if (id) {
         uint8_t i;
-        for (i = 0; i < sizeof(psk) / sizeof(struct keymap_t); i++) {
+        for (i = 0; i < ARRAY_SIZE(psk); i++) {
             if (id_len == psk[i].id_length && memcmp(id, psk[i].id, id_len) == 0) {
                 if (result_length < psk[i].key_length) {
                     dtls_warn("buffer too small for PSK");
@@ -268,7 +268,7 @@ static int _peer_verify_ecdsa_key_handler(struct dtls_context_t *ctx,
 /* DTLS variables and register are initialized. */
 dtls_context_t *_server_init_dtls(dtls_remote_peer_t *remote_peer)
 {
-    dtls_context_t *new_context = NULL;
+    dtls_context_t *new_context;
 
     static dtls_handler_t cb = {
         .write = _send_to_peer_handler,

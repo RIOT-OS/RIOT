@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define SI114X_NUMOF    (sizeof(si114x_params) / sizeof(si114x_params[0]))
+#define SI114X_NUMOF    ARRAY_SIZE(si114x_params)
 
 /**
  * @brief   Allocation of memory for device descriptors
@@ -45,7 +45,7 @@ static saul_reg_t saul_entries[SI114X_NUMOF * 4];
 /**
  * @brief   Define the number of saul info
  */
-#define SI114X_INFO_NUMOF    (sizeof(si114x_saul_reg_info) / sizeof(si114x_saul_reg_info[0]))
+#define SI114X_INFO_NUMOF    ARRAY_SIZE(si114x_saul_reg_info)
 
 /**
  * @name    Reference the driver structs

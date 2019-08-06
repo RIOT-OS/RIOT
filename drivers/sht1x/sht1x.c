@@ -422,7 +422,7 @@ int sht1x_init(sht1x_dev_t *dev, const sht1x_params_t *params)
     if (
         !dev ||
         !params ||
-        (((uint8_t)params->vdd) >= sizeof(sht1x_d1) / sizeof(sht1x_d1[0]))
+        (((uint8_t)params->vdd) >= ARRAY_SIZE(sht1x_d1))
         ) {
         return -EINVAL;
     }
@@ -443,7 +443,7 @@ int sht1x_init(sht1x_dev_t *dev, const sht1x_params_t *params)
 /*---------------------------------------------------------------------------*/
 int16_t sht1x_temperature(const sht1x_dev_t *dev, uint16_t raw)
 {
-    if (!dev || (dev->vdd >= sizeof(sht1x_d1) / sizeof(sht1x_d1[0]))) {
+    if (!dev || (dev->vdd >= ARRAY_SIZE(sht1x_d1))) {
         return INT16_MIN;
     }
 
@@ -520,7 +520,7 @@ int sht1x_read(const sht1x_dev_t *dev, int16_t *temp, int16_t *rel_hum)
 
     if (
         !dev ||
-        (dev->vdd >= sizeof(sht1x_d1) / sizeof(sht1x_d1[0])) ||
+        (dev->vdd >= ARRAY_SIZE(sht1x_d1)) ||
         (!temp && !rel_hum)
         ) {
         return -EINVAL;

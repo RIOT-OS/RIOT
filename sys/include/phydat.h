@@ -36,6 +36,7 @@
 #define PHYDAT_H
 
 #include <stdint.h>
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -60,10 +60,11 @@ static shell_command_handler_t find_handler(const shell_command_t *command_list,
 #endif
     };
 
-    const shell_command_t *entry;
-
     /* iterating over command_lists */
-    for (unsigned int i = 0; i < sizeof(command_lists) / sizeof(entry); i++) {
+    for (unsigned int i = 0; i < ARRAY_SIZE(command_lists); i++) {
+
+        const shell_command_t *entry;
+
         if ((entry = command_lists[i])) {
             /* iterating over commands in command_lists entry */
             while (entry->name != NULL) {
@@ -92,10 +93,11 @@ static void print_help(const shell_command_t *command_list)
 #endif
     };
 
-    const shell_command_t *entry;
-
     /* iterating over command_lists */
-    for (unsigned int i = 0; i < sizeof(command_lists) / sizeof(entry); i++) {
+    for (unsigned int i = 0; i < ARRAY_SIZE(command_lists); i++) {
+
+        const shell_command_t *entry;
+
         if ((entry = command_lists[i])) {
             /* iterating over commands in command_lists entry */
             while (entry->name != NULL) {

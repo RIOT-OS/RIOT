@@ -56,10 +56,10 @@ static char printer_stack[THREAD_STACKSIZE_MAIN];
 #ifdef MODULE_PERIPH_UART_MODECFG
 static uart_data_bits_t data_bits_lut[] = { UART_DATA_BITS_5, UART_DATA_BITS_6,
                                             UART_DATA_BITS_7, UART_DATA_BITS_8 };
-static int data_bits_lut_len = sizeof(data_bits_lut)/sizeof(data_bits_lut[0]);
+static int data_bits_lut_len = ARRAY_SIZE(data_bits_lut);
 
 static uart_stop_bits_t stop_bits_lut[] = { UART_STOP_BITS_1, UART_STOP_BITS_2 };
-static int stop_bits_lut_len = sizeof(stop_bits_lut)/sizeof(stop_bits_lut[0]);
+static int stop_bits_lut_len = ARRAY_SIZE(stop_bits_lut);
 #endif
 
 static int parse_dev(char *arg)

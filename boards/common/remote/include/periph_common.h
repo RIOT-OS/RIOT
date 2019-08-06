@@ -61,7 +61,7 @@ static const timer_conf_t timer_config[] = {
     },
 };
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 
 #define TIMER_IRQ_PRIO      1
 /** @} */
@@ -100,7 +100,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_1_ISR          isr_uart1
 
 /* macros common across all UARTs */
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 
 /** @} */
 

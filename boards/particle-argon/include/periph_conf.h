@@ -53,7 +53,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_0_ISR          (isr_uart0)
 #define UART_1_ISR          (isr_uarte1)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 #ifdef __cplusplus

@@ -26,7 +26,7 @@ extern "C" {
 
 #include "arduino.hpp"
 
-#define ANALOG_PIN_NUMOF     (sizeof(arduino_analog_map) / sizeof(arduino_analog_map[0]))
+#define ANALOG_PIN_NUMOF     (ARRAY_SIZE(arduino_analog_map))
 
 void pinMode(int pin, int mode)
 {
@@ -72,15 +72,14 @@ unsigned long micros()
     return xtimer_now_usec();
 }
 
-/*
- * Bitfield for the state of the ADC-channels.
- * 0: Not initialized
- * 1: Successfully initialized
- */
-static uint16_t adc_line_state = 0;
-
 int analogRead(int arduino_pin)
 {
+    /*
+    * Bitfield for the state of the ADC-channels.
+    * 0: Not initialized
+    * 1: Successfully initialized
+    */
+    static uint16_t adc_line_state;
     int adc_value;
 
     /* Check if the ADC line is valid */
@@ -92,7 +91,7 @@ int analogRead(int arduino_pin)
             return -1;
         }
         /* The ADC channel is initialized */
-        adc_line_state |= 1 << arduino_pin;
+        adc_line_state |= (1 << arduino_pin);
     }
 
     /* Read the ADC channel */

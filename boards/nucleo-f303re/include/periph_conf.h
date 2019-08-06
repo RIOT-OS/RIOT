@@ -98,7 +98,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_1_ISR          (isr_usart1)
 #define UART_2_ISR          (isr_usart3)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -118,7 +118,7 @@ static const pwm_conf_t pwm_config[] = {
     }
 };
 
-#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 /**
@@ -178,7 +178,7 @@ static const spi_conf_t spi_config[] = {
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -215,7 +215,7 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_0_ISR           isr_i2c1_er
 #define I2C_1_ISR           isr_i2c3_er
 
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 #ifdef __cplusplus

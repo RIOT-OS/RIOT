@@ -45,11 +45,6 @@
 #define _LINE_THRESHOLD                 (8U)
 
 /**
- * @brief   Determine length of array in elements
- */
-#define _ARRAY_LEN(x)                   (sizeof(x) / sizeof(x[0]))
-
-/**
  * @brief   Flag command mapping
  *
  * @note    Add options that are changed with netopt_enable_t here
@@ -177,9 +172,9 @@ static void _set_usage(char *cmd_name)
 static void _flag_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> [-]{", cmd_name);
-    for (unsigned i = 0; i < _ARRAY_LEN(flag_cmds); i++) {
+    for (unsigned i = 0; i < ARRAY_SIZE(flag_cmds); i++) {
         printf("%s", flag_cmds[i].name);
-        if (i < (_ARRAY_LEN(flag_cmds) - 1)) {
+        if (i < (ARRAY_SIZE(flag_cmds) - 1)) {
             printf("|");
         }
     }
@@ -1073,7 +1068,7 @@ static int _netif_flag(char *cmd, kernel_pid_t iface, char *flag)
         set = NETOPT_DISABLE;
         flag++;
     }
-    for (unsigned i = 0; i < _ARRAY_LEN(flag_cmds); i++) {
+    for (unsigned i = 0; i < ARRAY_SIZE(flag_cmds); i++) {
         if (strcmp(flag_cmds[i].name, flag) == 0) {
             return _netif_set_flag(iface, flag_cmds[i].opt, set);
         }

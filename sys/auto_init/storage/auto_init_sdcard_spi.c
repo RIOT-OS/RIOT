@@ -29,7 +29,7 @@
  * @brief   number of used sd cards
  * @{
  */
-#define SDCARD_SPI_NUM (sizeof(sdcard_spi_params) / sizeof(sdcard_spi_params[0]))
+#define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
 /** @} */
 
 /**

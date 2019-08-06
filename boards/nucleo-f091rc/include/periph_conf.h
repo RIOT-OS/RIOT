@@ -67,7 +67,7 @@ static const dma_conf_t dma_config[] = {
 #define DMA_SHARED_ISR_0            isr_dma1_ch2_3_dma2_ch1_2
 #define DMA_SHARED_ISR_0_STREAMS    { 0, 1 } /* Indexes 0 and 1 of dma_config share the same isr */
 
-#define DMA_NUMOF           (sizeof(dma_config) / sizeof(dma_config[0]))
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
 #endif
 
 /**
@@ -86,7 +86,7 @@ static const timer_conf_t timer_config[] = {
 
 #define TIMER_0_ISR         isr_tim1_cc
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -142,7 +142,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_1_ISR          (isr_usart1)
 #define UART_2_ISR          (isr_usart3_8)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 
@@ -189,7 +189,7 @@ static const spi_conf_t spi_config[] = {
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -219,7 +219,7 @@ static const pwm_conf_t pwm_config[] = {
     }
 };
 
-#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 /**

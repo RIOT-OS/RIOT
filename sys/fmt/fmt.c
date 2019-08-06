@@ -46,7 +46,7 @@ static const uint32_t _tenmap[] = {
     10000000LU,
 };
 
-#define TENMAP_SIZE  (sizeof(_tenmap) / sizeof(_tenmap[0]))
+#define TENMAP_SIZE  ARRAY_SIZE(_tenmap)
 
 static inline int _is_digit(char c)
 {

@@ -90,7 +90,7 @@ void nhdp_writer_init(void)
 
     /* Register HELLO msg with 16 byte addresses and content provider */
     rfc5444_writer_register_msgcontentprovider(&nhdp_writer,
-            &_nhdp_message_content_provider, _nhdp_addrtlvs, ARRAYSIZE(_nhdp_addrtlvs));
+            &_nhdp_message_content_provider, _nhdp_addrtlvs, ARRAY_SIZE(_nhdp_addrtlvs));
     _hello_msg = rfc5444_writer_register_message(&nhdp_writer, RFC5444_MSGTYPE_HELLO, false, 16);
     _hello_msg->addMessageHeader = _nhdp_add_hello_msg_header_cb;
 

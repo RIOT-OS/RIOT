@@ -297,7 +297,7 @@ void timer_print_config(void)
 {
     for (int i = 0; i < HW_TIMER_NUMOF; i++) {
         LOG_INFO("\tTIMER_DEV(%d): %d channel(s)\n", i,
-                 sizeof(timers[i].channels) / sizeof(struct hw_channel_t));
+                 ARRAY_SIZE(timers[i].channels));
     }
 }
 
@@ -562,7 +562,7 @@ void timer_print_config(void)
 {
     for (int i = 0; i < OS_TIMER_NUMOF; i++) {
         LOG_INFO("\tTIMER_DEV(%d): %d channel(s)\n", i,
-                 sizeof(timers[i].channels) / sizeof(struct phy_channel_t));
+                 ARRAY_SIZE(timers[i].channels));
     }
 }
 

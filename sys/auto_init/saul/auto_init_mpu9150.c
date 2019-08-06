@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define MPU9150_NUM         (sizeof(mpu9150_params) / sizeof(mpu9150_params[0]))
+#define MPU9150_NUM         ARRAY_SIZE(mpu9150_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -45,7 +45,7 @@ static saul_reg_t saul_entries[MPU9150_NUM * 3];
 /**
  * @brief   Define the number of saul info
  */
-#define MPU9150_INFO_NUM    (sizeof(mpu9150_saul_info) / sizeof(mpu9150_saul_info[0]))
+#define MPU9150_INFO_NUM    ARRAY_SIZE(mpu9150_saul_info)
 
 /**
  * @name    Reference the driver structs

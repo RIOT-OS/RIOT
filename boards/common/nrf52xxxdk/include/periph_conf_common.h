@@ -38,7 +38,7 @@ extern "C" {
 static const pwm_conf_t pwm_config[] = {
     { NRF_PWM0, { 28, 29, 30, 31 } }
 };
-#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 #ifdef __cplusplus

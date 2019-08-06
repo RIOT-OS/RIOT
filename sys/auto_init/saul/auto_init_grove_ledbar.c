@@ -31,7 +31,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define GROVE_LEDBAR_NUM     (sizeof(grove_ledbar_params) / sizeof(grove_ledbar_params[0]))
+#define GROVE_LEDBAR_NUM     ARRAY_SIZE(grove_ledbar_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -46,7 +46,7 @@ static saul_reg_t saul_entries[GROVE_LEDBAR_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define GROVE_LEDBAR_INFO_NUM (sizeof(grove_ledbar_saul_info) / sizeof(grove_ledbar_saul_info[0]))
+#define GROVE_LEDBAR_INFO_NUM ARRAY_SIZE(grove_ledbar_saul_info)
 
 /**
  * @brief   Reference the driver struct

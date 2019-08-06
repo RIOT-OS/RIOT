@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define TCS37727_NUM    (sizeof(tcs37727_params) / sizeof(tcs37727_params[0]))
+#define TCS37727_NUM    ARRAY_SIZE(tcs37727_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -45,7 +45,7 @@ static saul_reg_t saul_entries[TCS37727_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define TCS37727_INFO_NUM    (sizeof(tcs37727_saul_info) / sizeof(tcs37727_saul_info[0]))
+#define TCS37727_INFO_NUM    ARRAY_SIZE(tcs37727_saul_info)
 
 /**
  * @brief   Export the sensor's SAUL interface

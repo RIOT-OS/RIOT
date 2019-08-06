@@ -31,7 +31,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define MAG3110_NUM     (sizeof(mag3110_params) / sizeof(mag3110_params[0]))
+#define MAG3110_NUM     ARRAY_SIZE(mag3110_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -46,7 +46,7 @@ static saul_reg_t saul_entries[MAG3110_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define MAG3110_INFO_NUM    (sizeof(mag3110_saul_info) / sizeof(mag3110_saul_info[0]))
+#define MAG3110_INFO_NUM    ARRAY_SIZE(mag3110_saul_info)
 
 /**
  * @brief   Reference the driver struct

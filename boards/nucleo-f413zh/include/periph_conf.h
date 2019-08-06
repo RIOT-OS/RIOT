@@ -49,7 +49,7 @@ static const dma_conf_t dma_config[] = {
 #define DMA_3_ISR  isr_dma2_stream2
 #define DMA_4_ISR  isr_dma2_stream0
 
-#define DMA_NUMOF           (sizeof(dma_config) / sizeof(dma_config[0]))
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
 #endif
 /** @} */
 
@@ -109,7 +109,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_2_ISR          (isr_usart2)
 #define UART_2_DMA_ISR      (isr_dma1_stream4)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -139,7 +139,7 @@ static const pwm_conf_t pwm_config[] = {
     },
 };
 
-#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 /**
@@ -185,7 +185,7 @@ static const spi_conf_t spi_config[] = {
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**

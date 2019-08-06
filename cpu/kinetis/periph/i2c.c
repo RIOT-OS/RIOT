@@ -129,7 +129,7 @@ static uint8_t i2c_find_divider(unsigned freq, unsigned speed)
 {
     unsigned diff = UINT_MAX;
     /* Use maximum divider if nothing matches */
-    uint8_t F = sizeof(i2c_dividers) / sizeof(i2c_dividers[0]) - 1;
+    uint8_t F = ARRAY_SIZE(i2c_dividers) - 1;
     /* We avoid using the MULT field to simplify the driver and avoid having to
      * work around hardware errata on some Kinetis parts
      *
@@ -151,7 +151,7 @@ static uint8_t i2c_find_divider(unsigned freq, unsigned speed)
      *    the I2Cx_F [MULT] field to the original value after the repeated start
      *    has occurred
      */
-    for (unsigned k = 0; k < sizeof(i2c_dividers) / sizeof(i2c_dividers[0]); ++k) {
+    for (unsigned k = 0; k < ARRAY_SIZE(i2c_dividers); ++k) {
         /* Test dividers until we find one that gives a good match */
         unsigned lim = (speed * i2c_dividers[k]);
         if (lim >= freq) {

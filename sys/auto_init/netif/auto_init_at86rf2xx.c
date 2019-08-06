@@ -42,7 +42,7 @@
 #define AT86RF2XX_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
 
-#define AT86RF2XX_NUM (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
+#define AT86RF2XX_NUM ARRAY_SIZE(at86rf2xx_params)
 
 static at86rf2xx_t at86rf2xx_devs[AT86RF2XX_NUM];
 static char _at86rf2xx_stacks[AT86RF2XX_NUM][AT86RF2XX_MAC_STACKSIZE];

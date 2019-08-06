@@ -64,9 +64,9 @@ const struct lua_riot_builtin_lua *const lua_riot_builtin_lua_table = _lua_riot_
 const struct lua_riot_builtin_c *const lua_riot_builtin_c_table = _lua_riot_builtin_c_table;
 
 const size_t lua_riot_builtin_lua_table_len =
-    sizeof(_lua_riot_builtin_lua_table) / sizeof(*_lua_riot_builtin_lua_table);
+    ARRAY_SIZE(_lua_riot_builtin_lua_table);
 const size_t lua_riot_builtin_c_table_len =
-    sizeof(_lua_riot_builtin_c_table) / sizeof(*_lua_riot_builtin_c_table);
+    ARRAY_SIZE(_lua_riot_builtin_c_table);
 
 #define LUA_MEM_SIZE (11000)
 static char lua_mem[LUA_MEM_SIZE] __attribute__ ((aligned(__BIGGEST_ALIGNMENT__)));

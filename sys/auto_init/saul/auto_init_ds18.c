@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define DS18_NUMOF    (sizeof(ds18_params) / sizeof(ds18_params[0]))
+#define DS18_NUMOF    ARRAY_SIZE(ds18_params)
 
 /**
  * @brief   Allocation of memory for device descriptors
