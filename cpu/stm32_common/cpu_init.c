@@ -45,11 +45,16 @@
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F3) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7)
+    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7) || \
+    defined(CPU_FAM_STM32L1)
 
 #define STM32_CPU_MAX_GPIOS    (12U)
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+#if defined(CPU_FAM_STM32L1)
+#define GPIO_CLK              (AHB)
+#define GPIO_CLK_ENR          (RCC->AHBENR)
+#define GPIO_CLK_ENR_MASK     (0x0000FFFF)
+#elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
 #define GPIO_CLK              (AHB)
 #define GPIO_CLK_ENR          (RCC->AHBENR)
 #define GPIO_CLK_ENR_MASK     (0xFFFF0000)
@@ -147,7 +152,8 @@ void cpu_init(void)
     stmclk_init_sysclk();
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F3) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7)
+    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7) || \
+    defined(CPU_FAM_STM32L1)
     _gpio_init_ain();
 #endif
 #ifdef MODULE_PERIPH_DMA
