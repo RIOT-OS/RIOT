@@ -50,6 +50,7 @@ DEFINED_GROUPS=$(echo "${ALL_RAW_DEFGROUP}" | \
                     sort)
 DEFINED_GROUPS_UNIQUE=$(echo "${DEFINED_GROUPS}" | sort -u)
 
+# Check for undefined groups
 UNDEFINED_GROUPS=$( \
     for group in $(echo "${ALL_RAW_INGROUP}" | \
                     grep -oE '[^ ]+$' | sort -u); \
@@ -58,21 +59,17 @@ UNDEFINED_GROUPS=$( \
     done \
     )
 
-UNDEFINED_GROUPS_PRINT=$( \
-    for group in ${UNDEFINED_GROUPS}; \
-    do \
-        echo -e "\n${CWARN}${group}${CRESET} found in:"; \
-        echo "${ALL_RAW_INGROUP}" | grep "\<${group}\>$" | sort -u | \
-                awk -F: '{ print "\t" $1 }'; \
-    done \
-    )
-
 if [ -n "${UNDEFINED_GROUPS}" ]
 then
     COUNT=$(echo "${UNDEFINED_GROUPS}" | wc -l)
     echo -ne "${CERROR}ERROR${CRESET} "
     echo -e "There are ${CWARN}${COUNT}${CRESET} undefined Doxygen groups:"
-    echo "${UNDEFINED_GROUPS_PRINT}"
+    for group in ${UNDEFINED_GROUPS};
+    do
+        echo -e "\n${CWARN}${group}${CRESET} found in:";
+        echo "${ALL_RAW_INGROUP}" | grep "\<${group}\>$" | sort -u |
+                awk -F: '{ print "\t" $1 }';
+    done
     exit 2
 fi
 
