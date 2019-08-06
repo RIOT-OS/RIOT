@@ -33,6 +33,7 @@
 #include "cpu.h"
 #include "board.h"
 #include "periph/gpio.h"
+#include "periph/gpio_abc.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
 #include "atmega_gpio.h"
@@ -498,3 +499,26 @@ ISR(INT7_vect, ISR_BLOCK)
 #endif
 
 #endif /* MODULE_PERIPH_GPIO_IRQ */
+
+#ifdef MODULE_PERIPH_GPIO_ABC
+static inline __attribute__((always_inline)) void _delay(int8_t loops)
+{
+    __asm__ volatile(
+        "0:" "subi %[iterator],1\n\t"
+        "brpl 0b;\n\t"
+        : [iterator]"+r"(loops)
+    );
+}
+
+void gpio_set_for(gpio_t pin, int delay)
+{
+    _SFR_MEM8(atmega_port_addr(pin)) |= (1 << atmega_pin_num(pin));
+    _delay((int8_t)delay);
+}
+
+void gpio_clear_for(gpio_t pin, int delay)
+{
+    _SFR_MEM8(atmega_port_addr(pin)) &= ~(1 << atmega_pin_num(pin));
+    _delay((int8_t)delay);
+}
+#endif /* MODULE_PERIPH_GPIO_ABC */
