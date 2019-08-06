@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f303ze STM32 Nucleo-F303ZE
- * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo-F303ZE
+ * @ingroup     boards_nucleo-f303ze
  * @{
  *
  * @file

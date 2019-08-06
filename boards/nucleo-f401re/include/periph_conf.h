@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f401re STM32 Nucleo-F401RE
- * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F401RE
+ * @ingroup     boards_nucleo-f401re
  * @{
  *
  * @file
