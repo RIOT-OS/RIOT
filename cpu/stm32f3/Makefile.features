@@ -1,4 +1,5 @@
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_raw
+FEATURES_PROVIDED += periph_gpio_abc
 
 -include $(RIOTCPU)/stm32_common/Makefile.features

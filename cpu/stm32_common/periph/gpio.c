@@ -34,6 +34,10 @@
 /* this implementation is not valid for the stm32f1 */
 #ifndef CPU_FAM_STM32F1
 
+#ifdef MODULE_PERIPH_GPIO_ABC
+#include "periph/gpio_abc.h"
+#endif
+
 #ifdef MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   The STM32F0 family has 16 external interrupt lines
@@ -253,6 +257,30 @@ void isr_exti(void)
 }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
-#else
+#ifdef MODULE_PERIPH_GPIO_ABC
+static inline __attribute__((always_inline)) void _delay(int32_t loops)
+{
+    __asm__ volatile(
+        "0:" "SUBS %[iterator], #1;"
+        "BPL 0b;"
+        : [iterator]"+r"(loops)
+    );
+}
+
+void gpio_set_for(gpio_t pin, int delay)
+{
+    _port(pin)->BSRR = (1 << _pin_num(pin));
+    _delay(delay);
+}
+
+void gpio_clear_for(gpio_t pin, int delay)
+{
+    _port(pin)->BSRR = (1 << (_pin_num(pin) + 16));
+    _delay(delay);
+}
+
+#endif /* MODULE_PERIPH_GPIO_ABC */
+
+#else /* !defined(CPU_FAM_STM32F1) */
 typedef int dont_be_pedantic;
-#endif
+#endif /* !defined(CPU_FAM_STM32F1) */
