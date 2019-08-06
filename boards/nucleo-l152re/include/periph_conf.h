@@ -21,6 +21,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "cfg_timer_tim5.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,25 +80,6 @@ static const dma_conf_t dma_config[] = {
 
 #define DMA_NUMOF           (sizeof(dma_config) / sizeof(dma_config[0]))
 #endif
-/** @} */
-
-/**
- * @name   Timer configuration
- * @{
- */
-static const timer_conf_t timer_config[] = {
-    {
-        .dev      = TIM5,
-        .max      = 0xffffffff,
-        .rcc_mask = RCC_APB1ENR_TIM5EN,
-        .bus      = APB1,
-        .irqn     = TIM5_IRQn
-    }
-};
-
-#define TIMER_0_ISR         (isr_tim5)
-
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**
