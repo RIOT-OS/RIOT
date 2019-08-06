@@ -147,6 +147,13 @@ ifneq (,$(filter stdio_uart,$(USEMODULE)))
     LINKFLAGS += -Wl,-wrap,getchar
 endif
 
+ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
+    LINKFLAGS += -Wl,-wrap,_malloc_r
+    LINKFLAGS += -Wl,-wrap,_calloc_r
+    LINKFLAGS += -Wl,-wrap,_realloc_r
+    LINKFLAGS += -Wl,-wrap,_free_r
+endif
+
 # The ELFFILE is the base one used for flashing
 FLASHFILE ?= $(ELFFILE)
 

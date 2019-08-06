@@ -243,22 +243,22 @@ void IRAM _lock_release_recursive(_lock_t *lock)
 extern void *heap_caps_malloc_default( size_t size );
 extern void *heap_caps_realloc_default( void *ptr, size_t size );
 
-void* IRAM_ATTR _malloc_r(struct _reent *r, size_t size)
+void* IRAM_ATTR __wrap__malloc_r(struct _reent *r, size_t size)
 {
     return heap_caps_malloc_default( size );
 }
 
-void IRAM_ATTR _free_r(struct _reent *r, void* ptr)
+void IRAM_ATTR __wrap__free_r(struct _reent *r, void* ptr)
 {
     heap_caps_free( ptr );
 }
 
-void* IRAM_ATTR _realloc_r(struct _reent *r, void* ptr, size_t size)
+void* IRAM_ATTR __wrap__realloc_r(struct _reent *r, void* ptr, size_t size)
 {
     return heap_caps_realloc_default( ptr, size );
 }
 
-void* IRAM_ATTR _calloc_r(struct _reent *r, size_t count, size_t size)
+void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t count, size_t size)
 {
     void* result = heap_caps_malloc_default(count * size);
     if (result) {
