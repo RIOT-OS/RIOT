@@ -61,7 +61,7 @@
  * not provide an argument that could be used as pointer to the ESP WiFi
  * device which triggers the interrupt.
  */
-static esp_wifi_netdev_t _esp_wifi_dev;
+esp_wifi_netdev_t _esp_wifi_dev;
 static const netdev_driver_t _esp_wifi_driver;
 
 /* device thread stack */
@@ -202,7 +202,7 @@ static wifi_config_t wifi_config_sta = {
     }
 };
 
-static void esp_wifi_setup (esp_wifi_netdev_t* dev)
+void esp_wifi_setup (esp_wifi_netdev_t* dev)
 {
     DEBUG("%s: %p\n", __func__, dev);
 
@@ -408,7 +408,7 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
 
     switch (opt) {
         case NETOPT_ADDRESS:
-            assert(max_len == ETHERNET_ADDR_LEN);
+            assert(max_len >= ETHERNET_ADDR_LEN);
             esp_wifi_get_mac(ESP_MAC_WIFI_STA,(uint8_t *)val);
             return ETHERNET_ADDR_LEN;
         case NETOPT_IS_WIRED:
