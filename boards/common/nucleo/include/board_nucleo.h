@@ -38,7 +38,6 @@ extern "C" {
 #endif
 
 #if defined(CPU_MODEL_STM32F334R8)
-#define XTIMER_SHOOT_EARLY          (2)
 #define XTIMER_OVERHEAD             (5)
 #endif
 
