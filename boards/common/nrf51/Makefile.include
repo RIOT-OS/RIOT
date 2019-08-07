@@ -7,6 +7,11 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # include common nrf51 headers
 INCLUDES += -I$(RIOTBOARD)/common/nrf51/include
 
+# use alternative xtimer mapping if applicable
+ifneq (,$(filter nimble,$(USEPKG)))
+  CFLAGS += -DBOARD_NRF51_XTIMER_ALT
+endif
+
 ifeq ($(PROGRAMMER),openocd)
   # use common openocd configuration for nrf51
   export OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf51/dist/openocd.cfg

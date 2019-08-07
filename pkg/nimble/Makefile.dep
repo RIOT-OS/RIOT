@@ -29,8 +29,8 @@ endif
 # nimble controller dependencies
 ifneq (,$(filter nimble_controller,$(USEMODULE)))
   USEMODULE += nimble_transport_ram
-  ifeq (nrf52,$(CPU_FAM))
-    USEMODULE += nimble_drivers_nrf52
+  ifneq (,$(filter nrf5%,$(CPU_FAM)))
+    USEMODULE += nimble_drivers_nrf5x
   endif
 endif
 
