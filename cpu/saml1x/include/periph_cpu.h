@@ -40,6 +40,17 @@ static const int8_t exti_config[1][32] = {
       5,  6,  7,  0, -1, -1,  1,  2,  3, 4, -1,  5, -1, -1, 6, 7},
 };
 
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0xff,                       /**< not supported */
+    ADC_RES_8BIT  = ADC_CTRLC_RESSEL_8BIT,      /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_CTRLC_RESSEL_10BIT,     /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_CTRLC_RESSEL_12BIT,     /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 0xfe,                       /**< not supported */
+    ADC_RES_16BIT = 0xfd                        /**< not supported */
+} adc_res_t;
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
