@@ -1,0 +1,283 @@
+/*
+ * Copyright (C) 2019 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup tests
+ * @{
+ *
+ * @author  Martine Lenders <m.lenders@fu-berlin.de>
+ * @file
+ */
+#include <errno.h>
+#include <stdint.h>
+
+#include "embUnit/embUnit.h"
+
+#include "net/gnrc/sixlowpan/frag/vrb.h"
+#include "xtimer.h"
+
+#include "tests-gnrc_sixlowpan_frag_vrb.h"
+
+#define TEST_TAG_INITIAL    (6U)
+#define TEST_SRC            { 0x68, 0xDF, 0x2A, 0x5B, 0x21, 0x7D, 0xEE, 0xE5 }
+#define TEST_DST            { 0xB1, 0x5B, 0x0F, 0x2F, 0x63, 0x76, 0x28, 0x39 }
+#define TEST_OUT_DST        { 0x13, 0xF8, 0xEB, 0x75, 0x46, 0x60, 0x7C, 0x60 }
+#define TEST_SRC_LEN        (8U)
+#define TEST_DST_LEN        (8U)
+#define TEST_TAG            (26U)
+
+extern uint16_t tag;
+
+/* The interface is not used for anything by the VRB (it just is kept as a
+ * reference for forwarding) so an uninitialized one is enough */
+static gnrc_netif_t _dummy_netif;
+
+static void set_up(void)
+{
+    gnrc_sixlowpan_frag_vrb_reset();
+    tag = 0;
+}
+
+static void test_vrb_add__success(void)
+{
+    static const gnrc_sixlowpan_rbuf_int_t interval = {
+        .next = NULL,
+        .start = 0,
+        .end = 116U,
+    };
+    static const gnrc_sixlowpan_rbuf_base_t base = {
+        .ints = (gnrc_sixlowpan_rbuf_int_t *)&interval,
+        .src = TEST_SRC,
+        .dst = TEST_DST,
+        .src_len = TEST_SRC_LEN,
+        .dst_len = TEST_DST_LEN,
+        .tag = TEST_TAG,
+        .datagram_size = 1156U,
+        .current_size = 116U,
+        .arrival = 1742197326U,
+    };
+    static uint8_t out_dst[] = TEST_OUT_DST;
+    gnrc_sixlowpan_frag_vrb_t *res;
+
+    tag = TEST_TAG_INITIAL;
+    TEST_ASSERT_NOT_NULL((res = gnrc_sixlowpan_frag_vrb_add(&base,
+                                                            &_dummy_netif,
+                                                            out_dst,
+                                                            sizeof(out_dst))));
+    TEST_ASSERT_NOT_NULL(res->super.ints);
+    TEST_ASSERT_NULL(res->super.ints->next);
+    /* make sure base and res->super are distinct*/
+    TEST_ASSERT((&base) != (&res->super));
+    /* but that the values are the same */
+    TEST_ASSERT_EQUAL_INT(interval.start, res->super.ints->start);
+    TEST_ASSERT_EQUAL_INT(interval.end, res->super.ints->end);
+    TEST_ASSERT_EQUAL_INT(base.src_len, res->super.src_len);
+    TEST_ASSERT_MESSAGE(memcmp(base.src, res->super.src, TEST_SRC_LEN) == 0,
+                        "TEST_SRC != res->super.src");
+    TEST_ASSERT_EQUAL_INT(base.dst_len, res->super.src_len);
+    TEST_ASSERT_MESSAGE(memcmp(base.dst, res->super.dst, TEST_DST_LEN) == 0,
+                        "TEST_DST != res->super.dst");
+    TEST_ASSERT_EQUAL_INT(base.tag, res->super.tag);
+    TEST_ASSERT_EQUAL_INT(base.datagram_size, res->super.datagram_size);
+    TEST_ASSERT_EQUAL_INT(base.current_size, res->super.current_size);
+    TEST_ASSERT_EQUAL_INT(base.arrival, res->super.arrival);
+    TEST_ASSERT((&_dummy_netif) == res->out_netif);
+    TEST_ASSERT_EQUAL_INT(sizeof(out_dst), res->out_dst_len);
+    TEST_ASSERT_MESSAGE(memcmp(out_dst, res->out_dst, sizeof(out_dst)) == 0,
+                        "TEST_DST != res->super.dst");
+    TEST_ASSERT_EQUAL_INT(TEST_TAG_INITIAL, res->out_tag);
+    TEST_ASSERT(TEST_TAG_INITIAL != tag);
+}
+
+static void test_vrb_add__duplicate(void)
+{
+    static const gnrc_sixlowpan_rbuf_int_t interval = {
+        .next = NULL,
+        .start = 0,
+        .end = 116U,
+    };
+    static const gnrc_sixlowpan_rbuf_base_t base = {
+        .ints = (gnrc_sixlowpan_rbuf_int_t *)&interval,
+        .src = TEST_SRC,
+        .dst = TEST_DST,
+        .src_len = TEST_SRC_LEN,
+        .dst_len = TEST_DST_LEN,
+        .tag = TEST_TAG,
+        .datagram_size = 1156U,
+        .current_size = 116U,
+        .arrival = 1742197326U,
+    };
+    static uint8_t out_dst[] = TEST_OUT_DST;
+    gnrc_sixlowpan_frag_vrb_t *res1, *res2;
+
+    tag = TEST_TAG_INITIAL;
+    TEST_ASSERT_NOT_NULL((res1 = gnrc_sixlowpan_frag_vrb_add(&base,
+                                                             &_dummy_netif,
+                                                             out_dst,
+                                                             sizeof(out_dst))));
+    TEST_ASSERT_NOT_NULL((res2 = gnrc_sixlowpan_frag_vrb_add(&base,
+                                                             &_dummy_netif,
+                                                             out_dst,
+                                                             sizeof(out_dst))));
+    TEST_ASSERT(res1 == res2);
+}
+
+static void test_vrb_add__full(void)
+{
+    gnrc_sixlowpan_rbuf_base_t base = {
+        .ints = NULL,
+        .src = TEST_SRC,
+        .dst = TEST_DST,
+        .src_len = TEST_SRC_LEN,
+        .dst_len = TEST_DST_LEN,
+        .tag = TEST_TAG,
+        .datagram_size = 1156U,
+        .current_size = 116U,
+        .arrival = 1742197326U,
+    };
+    static uint8_t out_dst[] = TEST_OUT_DST;
+
+    /* fill up VRB */
+    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
+        TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_vrb_add(&base,
+                                                         &_dummy_netif,
+                                                         out_dst,
+                                                         sizeof(out_dst)));
+        base.tag++;
+    }
+    /* another entry will not fit */
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_add(&base, &_dummy_netif,
+                                                 out_dst, sizeof(out_dst)));
+    /* check if it really isn't in the VRB */
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(base.src, base.src_len,
+                                                 base.dst, base.dst_len,
+                                                 base.datagram_size, base.tag));
+}
+
+static void test_vrb_get__empty(void)
+{
+    static const gnrc_sixlowpan_rbuf_base_t base = {
+        .ints = NULL,
+        .src = TEST_SRC,
+        .dst = TEST_DST,
+        .src_len = TEST_SRC_LEN,
+        .dst_len = TEST_DST_LEN,
+        .tag = TEST_TAG,
+        .datagram_size = 1156U,
+        .current_size = 116U,
+        .arrival = 1742197326U,
+    };
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(base.src, base.src_len,
+                                                 base.dst, base.dst_len,
+                                                 base.datagram_size, base.tag));
+}
+
+static void test_vrb_get__after_add(void)
+{
+    static const gnrc_sixlowpan_rbuf_base_t base = {
+        .ints = NULL,
+        .src = TEST_SRC,
+        .dst = TEST_DST,
+        .src_len = TEST_SRC_LEN,
+        .dst_len = TEST_DST_LEN,
+        .tag = TEST_TAG,
+        .datagram_size = 1156U,
+        .current_size = 116U,
+        .arrival = 1742197326U,
+    };
+    static uint8_t out_dst[] = TEST_OUT_DST;
+    gnrc_sixlowpan_frag_vrb_t *res1, *res2;
+
+    TEST_ASSERT_NOT_NULL((res1 = gnrc_sixlowpan_frag_vrb_add(&base,
+                                                             &_dummy_netif,
+                                                             out_dst,
+                                                             sizeof(out_dst))));
+    TEST_ASSERT_NOT_NULL((res2 = gnrc_sixlowpan_frag_vrb_get(base.src,
+                                                             base.src_len,
+                                                             base.dst,
+                                                             base.dst_len,
+                                                             base.datagram_size,
+                                                             base.tag)));
+    TEST_ASSERT(res1 == res2);
+}
+
+static void test_vrb_rm(void)
+{
+    static const gnrc_sixlowpan_rbuf_base_t base = {
+        .ints = NULL,
+        .src = TEST_SRC,
+        .dst = TEST_DST,
+        .src_len = TEST_SRC_LEN,
+        .dst_len = TEST_DST_LEN,
+        .tag = TEST_TAG,
+        .datagram_size = 1156U,
+        .current_size = 116U,
+        .arrival = 1742197326U,
+    };
+    static uint8_t out_dst[] = TEST_OUT_DST;
+    gnrc_sixlowpan_frag_vrb_t *res;
+
+    TEST_ASSERT_NOT_NULL((res = gnrc_sixlowpan_frag_vrb_add(&base,
+                                                            &_dummy_netif,
+                                                            out_dst,
+                                                            sizeof(out_dst))));
+    gnrc_sixlowpan_frag_vrb_rm(res);
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(base.src, base.src_len,
+                                                 base.dst, base.dst_len,
+                                                 base.datagram_size, base.tag));
+}
+
+static void test_vrb_gc(void)
+{
+    gnrc_sixlowpan_rbuf_base_t base = {
+        .ints = NULL,
+        .src = TEST_SRC,
+        .dst = TEST_DST,
+        .src_len = TEST_SRC_LEN,
+        .dst_len = TEST_DST_LEN,
+        .tag = TEST_TAG,
+        .datagram_size = 1156U,
+        .current_size = 116U,
+        .arrival = xtimer_now_usec() - GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US - 1000,
+    };
+    static uint8_t out_dst[] = TEST_OUT_DST;
+    gnrc_sixlowpan_frag_vrb_t *res;
+
+    TEST_ASSERT_NOT_NULL((res = gnrc_sixlowpan_frag_vrb_add(&base,
+                                                            &_dummy_netif,
+                                                            out_dst,
+                                                            sizeof(out_dst))));
+    gnrc_sixlowpan_frag_vrb_gc();
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(base.src, base.src_len,
+                                                 base.dst, base.dst_len,
+                                                 base.datagram_size, base.tag));
+}
+
+static Test *tests_gnrc_sixlowpan_frag_vrb_tests(void)
+{
+    EMB_UNIT_TESTFIXTURES(fixtures) {
+        new_TestFixture(test_vrb_add__success),
+        new_TestFixture(test_vrb_add__duplicate),
+        new_TestFixture(test_vrb_add__full),
+        new_TestFixture(test_vrb_get__empty),
+        new_TestFixture(test_vrb_get__after_add),
+        new_TestFixture(test_vrb_rm),
+        new_TestFixture(test_vrb_gc),
+    };
+
+    EMB_UNIT_TESTCALLER(vrb_tests, set_up, NULL, fixtures);
+
+    return (Test *)&vrb_tests;
+}
+
+void tests_gnrc_sixlowpan_frag_vrb(void)
+{
+    xtimer_init();
+    TESTS_RUN(tests_gnrc_sixlowpan_frag_vrb_tests());
+}
+/** @} */
