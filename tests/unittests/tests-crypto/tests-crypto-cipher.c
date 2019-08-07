@@ -7,6 +7,7 @@
  */
 
 #include <limits.h>
+#include <string.h>
 
 #include "embUnit.h"
 #include "crypto/ciphers.h"
@@ -31,7 +32,7 @@ static void test_crypto_cipher_aes_encrypt(void)
 {
     cipher_t cipher;
     int err, cmp;
-    uint8_t data[16] = {0};
+    uint8_t data[16] = { 0 };
 
     err = cipher_init(&cipher, CIPHER_AES_128, TEST_KEY, 16);
     TEST_ASSERT_EQUAL_INT(1, err);
@@ -40,7 +41,7 @@ static void test_crypto_cipher_aes_encrypt(void)
     TEST_ASSERT_EQUAL_INT(1, err);
 
     cmp = compare(TEST_ENC_AES, data, 16);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
 }
 
 static void test_crypto_cipher_aes_decrypt(void)
@@ -56,17 +57,46 @@ static void test_crypto_cipher_aes_decrypt(void)
     TEST_ASSERT_EQUAL_INT(1, err);
 
     cmp = compare(TEST_INP, data, 16);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong plaintext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong plaintext");
 }
 
-Test* tests_crypto_cipher_tests(void)
+static void test_crypto_cipher_init_aes_key_length(void)
+{
+    cipher_t cipher;
+    int err;
+
+    /* A keylength of 192 bit is not supported by the current implementation */
+    uint8_t unsupported_key_1[24];
+
+    memset(unsupported_key_1, 0, sizeof(unsupported_key_1));
+
+    /* A keylength of 256 bit is not supported by the current implementation */
+    uint8_t unsupported_key_2[32];
+    memset(unsupported_key_2, 0, sizeof(unsupported_key_2));
+
+    /* A keylength of 64 bit is not supported by AES */
+    uint8_t unsupported_key_3[8];
+    memset(unsupported_key_3, 0, sizeof(unsupported_key_3));
+
+    err = cipher_init(&cipher, CIPHER_AES_128, unsupported_key_1, sizeof(unsupported_key_1));
+    TEST_ASSERT_EQUAL_INT(CIPHER_ERR_INVALID_KEY_SIZE, err);
+
+    err = cipher_init(&cipher, CIPHER_AES_128, unsupported_key_2, sizeof(unsupported_key_2));
+    TEST_ASSERT_EQUAL_INT(CIPHER_ERR_INVALID_KEY_SIZE, err);
+
+    err = cipher_init(&cipher, CIPHER_AES_128, unsupported_key_3, sizeof(unsupported_key_3));
+    TEST_ASSERT_EQUAL_INT(CIPHER_ERR_INVALID_KEY_SIZE, err);
+}
+
+Test *tests_crypto_cipher_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_crypto_cipher_aes_encrypt),
-        new_TestFixture(test_crypto_cipher_aes_decrypt)
+        new_TestFixture(test_crypto_cipher_aes_decrypt),
+        new_TestFixture(test_crypto_cipher_init_aes_key_length),
     };
 
     EMB_UNIT_TESTCALLER(crypto_cipher_tests, NULL, NULL, fixtures);
 
-    return (Test*)&crypto_cipher_tests;
+    return (Test *)&crypto_cipher_tests;
 }

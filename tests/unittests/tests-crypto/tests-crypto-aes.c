@@ -46,14 +46,14 @@ static void test_crypto_aes_encrypt(void)
     int err;
     uint8_t data[AES_BLOCK_SIZE];
 
-    err = aes_init(&ctx, TEST_0_KEY, AES_KEY_SIZE);
+    err = aes_init(&ctx, TEST_0_KEY, sizeof(TEST_0_KEY));
     TEST_ASSERT_EQUAL_INT(1, err);
 
     err = aes_encrypt(&ctx, TEST_0_INP, data);
     TEST_ASSERT_EQUAL_INT(1, err);
     TEST_ASSERT_MESSAGE(1 == compare(TEST_0_ENC, data, AES_BLOCK_SIZE), "wrong ciphertext");
 
-    err = aes_init(&ctx, TEST_1_KEY, AES_KEY_SIZE);
+    err = aes_init(&ctx, TEST_1_KEY, sizeof(TEST_1_KEY));
     TEST_ASSERT_EQUAL_INT(1, err);
 
     err = aes_encrypt(&ctx, TEST_1_INP, data);
@@ -63,19 +63,18 @@ static void test_crypto_aes_encrypt(void)
 
 static void test_crypto_aes_decrypt(void)
 {
-
     cipher_context_t ctx;
     int err;
     uint8_t data[AES_BLOCK_SIZE];
 
-    err = aes_init(&ctx, TEST_0_KEY, AES_KEY_SIZE);
+    err = aes_init(&ctx, TEST_0_KEY, sizeof(TEST_0_KEY));
     TEST_ASSERT_EQUAL_INT(1, err);
 
     err = aes_decrypt(&ctx, TEST_0_ENC, data);
     TEST_ASSERT_EQUAL_INT(1, err);
     TEST_ASSERT_MESSAGE(1 == compare(TEST_0_INP, data, AES_BLOCK_SIZE), "wrong plaintext");
 
-    err = aes_init(&ctx, TEST_1_KEY, AES_KEY_SIZE);
+    err = aes_init(&ctx, TEST_1_KEY, sizeof(TEST_1_KEY));
     TEST_ASSERT_EQUAL_INT(1, err);
 
     err = aes_decrypt(&ctx, TEST_1_ENC, data);
@@ -83,14 +82,43 @@ static void test_crypto_aes_decrypt(void)
     TEST_ASSERT_MESSAGE(1 == compare(TEST_1_INP, data, AES_BLOCK_SIZE), "wrong plaintext");
 }
 
-Test* tests_crypto_aes_tests(void)
+static void test_crypto_aes_init_key_length(void)
+{
+    cipher_context_t ctx;
+    int err;
+
+    /* A keylength of 192 bit is not supported by the current implementation */
+    uint8_t unsupported_key_1[24];
+
+    memset(unsupported_key_1, 0, sizeof(unsupported_key_1));
+
+    /* A keylength of 256 bit is not supported by the current implementation */
+    uint8_t unsupported_key_2[32];
+    memset(unsupported_key_2, 0, sizeof(unsupported_key_2));
+
+    /* A keylength of 64 bit is not supported by AES */
+    uint8_t unsupported_key_3[8];
+    memset(unsupported_key_3, 0, sizeof(unsupported_key_3));
+
+    err = aes_init(&ctx, unsupported_key_1, sizeof(unsupported_key_1));
+    TEST_ASSERT_EQUAL_INT(CIPHER_ERR_INVALID_KEY_SIZE, err);
+
+    err = aes_init(&ctx, unsupported_key_2, sizeof(unsupported_key_2));
+    TEST_ASSERT_EQUAL_INT(CIPHER_ERR_INVALID_KEY_SIZE, err);
+
+    err = aes_init(&ctx, unsupported_key_3, sizeof(unsupported_key_3));
+    TEST_ASSERT_EQUAL_INT(CIPHER_ERR_INVALID_KEY_SIZE, err);
+}
+
+Test *tests_crypto_aes_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_crypto_aes_encrypt),
-                        new_TestFixture(test_crypto_aes_decrypt),
+        new_TestFixture(test_crypto_aes_decrypt),
+        new_TestFixture(test_crypto_aes_init_key_length),
     };
 
     EMB_UNIT_TESTCALLER(crypto_aes_tests, NULL, NULL, fixtures);
 
-    return (Test*)&crypto_aes_tests;
+    return (Test *)&crypto_aes_tests;
 }
