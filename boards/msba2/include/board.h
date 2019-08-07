@@ -50,7 +50,6 @@ extern "C" {
  * @{
  */
 #define XTIMER_OVERHEAD     7
-#define XTIMER_SHOOT_EARLY  3
 /** @} */
 
 /**
