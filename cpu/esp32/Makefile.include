@@ -85,6 +85,7 @@ PSEUDOMODULES += esp_idf_newlib
 PSEUDOMODULES += esp_log_colored
 PSEUDOMODULES += esp_log_tagged
 PSEUDOMODULES += esp_log_startup
+PSEUDOMODULES += esp_rtc_timer
 PSEUDOMODULES += esp_spi_ram
 PSEUDOMODULES += esp_spiffs
 PSEUDOMODULES += esp_wifi_any
