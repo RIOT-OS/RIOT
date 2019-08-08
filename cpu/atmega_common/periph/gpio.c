@@ -309,8 +309,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         int8_t offset = -1;
         uint8_t pin_num = _pin_num(pin);
 
-        for (unsigned i = 0;
-             i < sizeof(pcint_mapping) / sizeof(pcint_mapping[0]); i++) {
+        for (unsigned i = 0; i < ARRAY_SIZE(pcint_mapping); i++) {
             if (pin != GPIO_UNDEF && pin == pcint_mapping[i]) {
                 offset = i;
                 break;
