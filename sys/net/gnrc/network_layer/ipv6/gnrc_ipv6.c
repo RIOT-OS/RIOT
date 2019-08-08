@@ -351,6 +351,37 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
             /* Otherwise leave unspecified */
         }
     }
+    else {
+        bool invalid_src;
+        int idx;
+
+        gnrc_netif_acquire(netif);
+        invalid_src = ((idx = gnrc_netif_ipv6_addr_idx(netif, &hdr->src)) == -1) ||
+            (gnrc_netif_ipv6_addr_get_state(netif, idx) != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
+        gnrc_netif_release(netif);
+        if (invalid_src) {
+#if GNRC_IPV6_NIB_CONF_6LN
+            gnrc_pktsnip_t *icmpv6 = gnrc_pktsnip_search_type(ipv6,
+                                                              GNRC_NETTYPE_ICMPV6);
+            icmpv6_hdr_t *icmpv6_hdr;
+
+            if (icmpv6 != NULL) {
+                icmpv6_hdr = icmpv6->data;
+            }
+            if ((icmpv6 == NULL) ||
+                ((icmpv6_hdr->type != ICMPV6_RTR_SOL) &&
+                 (icmpv6_hdr->type != ICMPV6_NBR_SOL))) {
+                DEBUG("ipv6: preset packet source address %s is invalid\n",
+                      ipv6_addr_to_str(addr_str, &hdr->src, sizeof(addr_str)));
+                return -EADDRNOTAVAIL;
+            }
+#else   /* GNRC_IPV6_NIB_CONF_6LN */
+            DEBUG("ipv6: preset packet source address %s is invalid\n",
+                  ipv6_addr_to_str(addr_str, &hdr->src, sizeof(addr_str)));
+            return -EADDRNOTAVAIL;
+#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+        }
+    }
 
     DEBUG("ipv6: write protect up to payload to calculate checksum\n");
     payload = ipv6;
