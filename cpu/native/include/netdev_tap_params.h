@@ -32,7 +32,7 @@ extern "C" {
  *          more similar to actual boards
  */
 #ifndef NETDEV_TAP_MAX
-#define NETDEV_TAP_MAX              (1)
+#define NETDEV_TAP_MAX              (GNRC_NETIF_NUMOF)
 #endif
 
 /**
