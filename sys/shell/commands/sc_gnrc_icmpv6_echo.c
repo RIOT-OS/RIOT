@@ -242,8 +242,9 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
     if (res != 0) {
         _usage(cmdname);
     }
+    data->id ^= (xtimer_now_usec() & UINT16_MAX);
 #ifdef MODULE_LUID
-    luid_custom(&data->id, sizeof(data->id), DEFAULT_ID);
+    luid_custom(&data->id, sizeof(data->id), data->id);
 #endif
     return res;
 }
