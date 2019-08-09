@@ -9,7 +9,11 @@
 /**
  * @defgroup    nhdp NHDP
  * @ingroup     net
+ * @deprecated  Unmaintained for nearly 5 years and uncertain if it still
+ *              works; will be removed after the 2020.04 release.
  * @brief       The MANET Neighborhood Discovery Protocol (RFC 6130)
+ * @deprecated  Unmaintained for 5 years and uncertain if it still works.
+ *              Will be removed after the 2020.04 release.
  * @{
  *
  * @file
@@ -110,7 +114,8 @@ enum nhdp_address_type_t {
  * Sets up NHDP's reader and writer. Call first before starting NHDP's thread
  * and registering interfaces.
  */
-void nhdp_init(void);
+void nhdp_init(void) __attribute__
+        ((deprecated("The nhdp module will be removed after 2020.04")));
 
 /**
  * @brief                   Start NHDP's operational thread
