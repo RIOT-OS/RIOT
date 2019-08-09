@@ -58,9 +58,4 @@ void auto_init_candev(void)
     extern void auto_init_periph_can(void);
     auto_init_periph_can();
 #endif
-
-#ifdef MODULE_ESP_CAN
-    extern void auto_init_esp_can(void);
-    auto_init_esp_can();
-#endif
 }
