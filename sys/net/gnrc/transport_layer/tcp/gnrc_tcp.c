@@ -481,6 +481,14 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         return -ENOTCONN;
     }
 
+    /* If FIN was received (CLOSE_WAIT), no further data can be received. */
+    /* Copy received data into given buffer and return number of bytes. Can be zero. */
+    if (tcb->state == FSM_STATE_CLOSE_WAIT) {
+        ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
+        mutex_unlock(&(tcb->function_lock));
+        return ret;
+    }
+
     /* If this call is non-blocking (timeout_duration_us == 0): Try to read data and return */
     if (timeout_duration_us == 0) {
         ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
@@ -515,6 +523,11 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
 
         /* Try to read available data */
         ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
+
+        /* If FIN was received (CLOSE_WAIT), no further data can be received. Leave event loop */
+        if (tcb->state == FSM_STATE_CLOSE_WAIT) {
+            break;
+        }
 
         /* If there was no data: Wait for next packet or until the timeout fires */
         if (ret <= 0) {

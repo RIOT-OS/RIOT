@@ -228,6 +228,10 @@ int gnrc_tcp_recv_cmd(int argc, char **argv)
         int ret = gnrc_tcp_recv(&tcb, buffer + rcvd, to_receive - rcvd,
                                 timeout);
         switch (ret) {
+            case 0:
+                printf("%s: returns 0\n", argv[0]);
+                return ret;
+
             case -EAGAIN:
                 printf("%s: returns -EAGAIN\n", argv[0]);
                 continue;
