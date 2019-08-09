@@ -31,6 +31,7 @@
 #include "fmt.h"
 #include "log.h"
 #include "sched.h"
+#include "xtimer.h"
 
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/internal.h"
@@ -1314,6 +1315,9 @@ static void *_gnrc_netif_thread(void *args)
 #endif
     /* now let rest of GNRC use the interface */
     gnrc_netif_release(netif);
+#if (GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
+    xtimer_ticks32_t last_wakeup = xtimer_now();
+#endif
 
     while (1) {
         DEBUG("gnrc_netif: waiting for incoming messages\n");
@@ -1335,6 +1339,13 @@ static void *_gnrc_netif_thread(void *args)
                 else {
                     netif->stats.tx_bytes += res;
                 }
+#endif
+#if (GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
+                xtimer_periodic_wakeup(&last_wakeup,
+                                       GNRC_NETIF_MIN_WAIT_AFTER_SEND_US);
+                /* override last_wakeup in case last_wakeup +
+                 * GNRC_NETIF_MIN_WAIT_AFTER_SEND_US was in the past */
+                last_wakeup = xtimer_now();
 #endif
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
