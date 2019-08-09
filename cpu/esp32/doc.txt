@@ -109,7 +109,6 @@ The following table gives a short reference  in alphabetical order of modules th
 
 Module    | Default  | Short description
 ----------|----------|-------------------
-[esp_can](#esp32_can_interfaces) | not used | enable the CAN device
 [esp_eth](#esp32_ethernet_network_interface) | not used | enable the Ethernet MAC (EMAC) network device
 [esp_gdb](#esp32_debugging) | not used | enable the compilation with debug information for debugging
 [esp_hw_counter](#esp32_timers) | not used | use hardware counters for RIOT timers
@@ -392,7 +391,6 @@ Optional features of ESP32 can be enabled by ```USEMODULE``` definitions in the 
 
 Module | Description
 -------|------------
-esp_can | Enable the CAN device, see section [CAN Interfaces](#esp32_can_interfaces).
 esp_eth | Enable the Ethernet MAC (EMAC) interface as `netdev` network device, see section [Ethernet Network Interface](#esp32_ethernet_network_interface).
 esp_gdb | Enable the compilation with debug information for debugging with [QEMU and GDB](#esp32_qemu_mode_and_gdb) (```QEMU=1```) or via [JTAG interface with OpenOCD](#esp32_jtag_debugging).
 esp_i2c_hw | Use the hardware I2C implementation, see section [I2C Interfaces](#esp32_i2c_interfaces).
@@ -797,7 +795,9 @@ Example:
 \anchor esp32_can_interfaces
 ## <a name="esp32_can_interfaces"> CAN Interfaces </a> &nbsp;[[TOC](#esp32_toc)]
 
-The ESP32 intregates a CAN controller which is compatible with the NXP SJA1000 CAN controller. Thus, it is CAN 2.0B specification compliant and supports two message formats:
+The ESP32 intregates a CAN controller which is compatible with the NXP SJA1000
+CAN controller. Thus, it is CAN 2.0B specification compliant and supports two
+message formats:
 
 - Base Frame Format (11-bit ID)
 - Extended Frame Format (29-bit ID)
@@ -806,21 +806,34 @@ The ESP32 intregates a CAN controller which is compatible with the NXP SJA1000 C
 - ESP32 CAN does not support CAN-FD and is not CAN-FD tolerant.
 - ESP32 CAN does not support SJA1000's sleep mode and wake-up functionality.
 
-As with the SJA1000, the ESP32 CAN controller provides only the data link layer and physical layer signaling sublayer. Therefore, depending on the physical layer requirements, an external transceiver module is required which converts the CAN-RX and CAN-TX signals of the ESP32 into CAN_H and CAN_L bus signals, e.g., the MCP2551 or SN65HVD23X transceiver for compatibility with ISO 11898-2.
+As with the SJA1000, the ESP32 CAN controller provides only the data link layer
+and the physical layer signaling sublayer. Therefore, depending on physical
+layer requirements, an external transceiver module is required which converts
+the `CAN-RX` and `CAN-TX` signals of the ESP32 into `CAN_H` and `CAN_L` bus
+signals, e.g., the MCP2551 or SN65HVD23X transceiver for compatibility with
+ISO 11898-2.
 
-The ```esp_can``` module realizes a low-level CAN driver interface for the ESP32 CAN controller and provides a CAN DLL device that can be used with RIOT's CAN protocol stack. It uses the ESP32 CAN controller in SJA1000 PeliCAN mode. Please refer the [SJA1000 Datasheet](https://www.nxp.com/documents/data_sheet/SJA1000.pdf) for detailed information about the CAN controller and its programming.
+If module `periph_can` is used, the low-level CAN driver for the
+ESP32 CAN controller is enabled. It provides a CAN DLL device that can be
+used with RIOT's CAN protocol stack. It uses the ESP32 CAN controller
+in SJA1000 PeliCAN mode. Please refer the
+[SJA1000 Datasheet](https://www.nxp.com/documents/data_sheet/SJA1000.pdf)
+for detailed information about the CAN controller and its programming.
 
-The pin configuration of the CAN interface is usually defined in board specific peripheral configuration by
+The pin configuration of the CAN tranceiver interface is usually defined
+in board specific peripheral configuration by
 
 - <b>```CAN_TX```</b>, the GPIO used as TX tranceiver signal, and
 - <b>```CAN_RX```</b>, the GPIO used as RX tranceiver signal.
 
-If the pin configuration is not defined, the following default configuration is used which can be overridden by the application, see section [Application-Specific Configurations](#esp32_application_specific_configurations).
+If the pin configuration is not defined, the following default configuration
+is used which can be overridden by the application, see section
+[Application-Specific Configurations](#esp32_application_specific_configurations).
 
-Device      |Signal|Pin     |Symbol         |Remarks
-:-----------|:-----|:-------|:--------------|:----------------
-CAN         | TX   | GPIO5  |```CAN_TX```   | optional, can be overridden
-CAN         | RX   | GPIO35 |```CAN_RX```   | optional, can be overridden
+Device  |Signal|Pin     |Symbol         |Remarks
+:-------|:-----|:-------|:--------------|:----------------
+CAN     | TX   | GPIO5  |`CAN_TX`       | optional, can be overridden
+CAN     | RX   | GPIO35 |`CAN_RX`       | optional, can be overridden
 
 Example:
 ```
@@ -828,15 +841,14 @@ Example:
 #define CAN_RX      GPIO9       /* CAN RX tranceiver signal */
 ```
 
-<b>```CAN_DLL_NUMOF```</b> is not defined by the ```esp_can``` module. It uses the default value of 1. If you have further CAN interfaces, make sure to define the correct value of ```CAN_DLL_NUMOF```.
+If the board has an external transceiver module connected to the ESP32 on-board,
+module `periph_can` should be provided as feature in board's `Makefile.features`
+```
+FEATURES_PROVIDED += periph_can     # CAN peripheral interface
+```
 
-If the board has an external transceiver module connected to the ESP32 on board, the ```esp_can``` module should be enabled by default in board's ```Makefile.dep``` when module ```can``` is used.
-```
-ifneq (,$(filter can,$(USEMODULE)))
-    USEMODULE += esp_can
-endif
-```
-Otherwise, the application has to add the ```esp_can``` module in its makefile when needed.
+Otherwise, the application has to add the `periph_can` module in its makefile
+when needed.
 
 ## <a name="esp32_other_peripherals"> Other Peripherals </a> &nbsp;[[TOC](#esp32_toc)]
 
