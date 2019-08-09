@@ -3,8 +3,6 @@ FEATURES_PROVIDED += periph_cpuid
 # HACK Do not define 'hwrng' if the board does not supports it
 # A whitelist on CPU_MODEL would be better but this information/variable is not
 # available yet.
-# HWRNG uses the wrong hwrng register for the frdm-k64f board/cpu_model
-_KINETIS_BOARDS_WITHOUT_HWRNG += frdm-k64f
 # TRNG driver is not implemented for 'CPU_MODEL == mkw41z512vht4'
 _KINETIS_BOARDS_WITHOUT_HWRNG += frdm-kw41z phynode-kw41z usb-kw41z
 # No HWRNG in MK20D7 devices

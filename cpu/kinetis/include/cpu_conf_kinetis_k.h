@@ -119,6 +119,19 @@
     defined(CPU_MODEL_MK64FX512VLQ12) || \
     defined(CPU_MODEL_MK64FX512VMD12)
 #include "vendor/MK64F12.h"
+
+/**
+ * @name Hardware random number generator module configuration
+ *
+ *       For K64F SCG3 or SCG6 can be used depending on if the the
+ *       peripheral is accessed through AIPS-lite0 or AIPS-lite1.
+ *       For K64F RNGA is only mapped to SCG6.
+ * @{
+ */
+#define HWRNG_CLK_REG           (SIM->SCGC6)
+#define HWRNG_CLK_REG_SHIFT     (SIM_SCGC6_RNGA_SHIFT)
+/** @} */
+
 #endif
 #endif /* (KINETIS_SUBFAMILY == y) */
 #endif /* (KINETIS_FAMILY == x) */
