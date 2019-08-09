@@ -43,6 +43,7 @@ extern "C" {
 #elif defined(CPU_LINE_STM32F722xx)
 #define CPU_IRQ_NUMOF                   (104U)
 #endif
+#define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
 #ifdef __cplusplus

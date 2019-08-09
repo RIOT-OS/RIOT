@@ -8,6 +8,9 @@ FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_eth
 
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += riotboot
+
 # load the common Makefile.features for Nucleo boards
 include $(RIOTBOARD)/common/nucleo144/Makefile.features
 
