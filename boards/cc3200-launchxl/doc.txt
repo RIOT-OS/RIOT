@@ -38,7 +38,7 @@ Use `BOARD=cc3200-launchxl` for building RIOT for this platform.
 
 | Module | Status           | Description                                          |
 | ------ | ---------------- | ---------------------------------------------------- |
-| SPI    | Partial Support  | CS currently not properly implemented                |
+| SPI    | OK               |                                                      |
 | UART   | OK               |                                                      |
 | LEDS   | OK               |                                                      |
 | GPIO   | OK               |                                                      |
