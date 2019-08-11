@@ -20,9 +20,9 @@
 
 
 void *
-dh5_init(struct wpabuf **priv, struct wpabuf **publ)
+wpa_dh5_init(struct wpabuf **priv, struct wpabuf **publ)
 {
-    *publ = dh_init(dh_groups_get(5), priv);
+    *publ = wpa_dh_init(wpa_dh_groups_get(5), priv);
     if (*publ == 0)
         return NULL;
     return (void *) 1;
@@ -30,14 +30,14 @@ dh5_init(struct wpabuf **priv, struct wpabuf **publ)
 
 
 struct wpabuf *
-dh5_derive_shared(void *ctx, const struct wpabuf *peer_public,
+wpa_dh5_derive_shared(void *ctx, const struct wpabuf *peer_public,
                   const struct wpabuf *own_private)
 {
-    return dh_derive_shared(peer_public, own_private, dh_groups_get(5));
+    return wpa_dh_derive_shared(peer_public, own_private, wpa_dh_groups_get(5));
 }
 
 
 void
-dh5_free(void *ctx)
+wpa_dh5_free(void *ctx)
 {
 }

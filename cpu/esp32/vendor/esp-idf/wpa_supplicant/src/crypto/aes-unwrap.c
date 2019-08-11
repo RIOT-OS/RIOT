@@ -29,7 +29,7 @@
  * Returns: 0 on success, -1 on failure (e.g., integrity verification failed)
  */
 int
-aes_unwrap(const u8 *kek, int n, const u8 *cipher, u8 *plain)
+wpa_aes_unwrap(const u8 *kek, int n, const u8 *cipher, u8 *plain)
 {
     u8 a[8], *r, b[16];
     int i, j;
@@ -40,7 +40,7 @@ aes_unwrap(const u8 *kek, int n, const u8 *cipher, u8 *plain)
     r = plain;
     os_memcpy(r, cipher + 8, 8 * n);
 
-    ctx = aes_decrypt_init(kek, 16);
+    ctx = wpa_aes_decrypt_init(kek, 16);
     if (ctx == NULL)
         return -1;
 
@@ -58,13 +58,13 @@ aes_unwrap(const u8 *kek, int n, const u8 *cipher, u8 *plain)
             b[7] ^= n * j + i;
 
             os_memcpy(b + 8, r, 8);
-            aes_decrypt(ctx, b, b);
+            wpa_aes_decrypt(ctx, b, b);
             os_memcpy(a, b, 8);
             os_memcpy(r, b + 8, 8);
             r -= 8;
         }
     }
-    aes_decrypt_deinit(ctx);
+    wpa_aes_decrypt_deinit(ctx);
 
     /* 3) Output results.
      *

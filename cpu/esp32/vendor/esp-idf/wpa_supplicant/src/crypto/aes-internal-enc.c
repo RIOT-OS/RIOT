@@ -28,7 +28,7 @@
 
 #include "os.h"
 
-void  rijndaelEncrypt(const u32 rk[], int Nr, const u8 pt[16], u8 ct[16])
+void  wpa_rijndaelEncrypt(const u32 rk[], int Nr, const u8 pt[16], u8 ct[16])
 {
     u32 s0, s1, s2, s3, t0, t1, t2, t3;
 #ifndef FULL_UNROLL
@@ -103,14 +103,14 @@ d##3 = TE0(s##3) ^ TE1(s##0) ^ TE2(s##1) ^ TE3(s##2) ^ rk[4 * i + 3]
 }
 
 
-void *  aes_encrypt_init(const u8 *key, size_t len)
+void *  wpa_aes_encrypt_init(const u8 *key, size_t len)
 {
     u32 *rk;
     int res;
     rk = os_malloc(AES_PRIV_SIZE);
     if (rk == NULL)
         return NULL;
-    res = rijndaelKeySetupEnc(rk, key, len * 8);
+    res = wpa_rijndaelKeySetupEnc(rk, key, len * 8);
     if (res < 0) {
         os_free(rk);
         return NULL;
@@ -120,14 +120,14 @@ void *  aes_encrypt_init(const u8 *key, size_t len)
 }
 
 
-void  aes_encrypt(void *ctx, const u8 *plain, u8 *crypt)
+void  wpa_aes_encrypt(void *ctx, const u8 *plain, u8 *crypt)
 {
     u32 *rk = ctx;
-    rijndaelEncrypt(ctx, rk[AES_PRIV_NR_POS], plain, crypt);
+    wpa_rijndaelEncrypt(ctx, rk[AES_PRIV_NR_POS], plain, crypt);
 }
 
 
-void  aes_encrypt_deinit(void *ctx)
+void  wpa_aes_encrypt_deinit(void *ctx)
 {
     os_memset(ctx, 0, AES_PRIV_SIZE);
     os_free(ctx);

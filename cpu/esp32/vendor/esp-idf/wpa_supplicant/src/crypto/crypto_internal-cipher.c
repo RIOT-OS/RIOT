@@ -73,14 +73,14 @@ struct crypto_cipher *  crypto_cipher_init(enum crypto_cipher_alg alg,
         os_memcpy(ctx->u.rc4.key, key, key_len);
         break;
     case CRYPTO_CIPHER_ALG_AES:
-        ctx->u.aes.ctx_enc = aes_encrypt_init(key, key_len);
+        ctx->u.aes.ctx_enc = wpa_aes_encrypt_init(key, key_len);
         if (ctx->u.aes.ctx_enc == NULL) {
             os_free(ctx);
             return NULL;
         }
-        ctx->u.aes.ctx_dec = aes_decrypt_init(key, key_len);
+        ctx->u.aes.ctx_dec = wpa_aes_decrypt_init(key, key_len);
         if (ctx->u.aes.ctx_dec == NULL) {
-            aes_encrypt_deinit(ctx->u.aes.ctx_enc);
+            wpa_aes_encrypt_deinit(ctx->u.aes.ctx_enc);
             os_free(ctx);
             return NULL;
         }
@@ -92,7 +92,7 @@ struct crypto_cipher *  crypto_cipher_init(enum crypto_cipher_alg alg,
             os_free(ctx);
             return NULL;
         }
-        des3_key_setup(key, &ctx->u.des3.key);
+        wpa_des3_key_setup(key, &ctx->u.des3.key);
         os_memcpy(ctx->u.des3.cbc, iv, 8);
         break;
 #endif
@@ -102,7 +102,7 @@ struct crypto_cipher *  crypto_cipher_init(enum crypto_cipher_alg alg,
             os_free(ctx);
             return NULL;
         }
-        des_key_setup(key, ctx->u.des.ek, ctx->u.des.dk);
+        wpa_des_key_setup(key, ctx->u.des.ek, ctx->u.des.dk);
         os_memcpy(ctx->u.des.cbc, iv, 8);
         break;
 #endif
@@ -124,7 +124,7 @@ int  crypto_cipher_encrypt(struct crypto_cipher *ctx, const u8 *plain,
     case CRYPTO_CIPHER_ALG_RC4:
         if (plain != crypt)
             os_memcpy(crypt, plain, len);
-        rc4_skip(ctx->u.rc4.key, ctx->u.rc4.keylen,
+        wpa_rc4_skip(ctx->u.rc4.key, ctx->u.rc4.keylen,
              ctx->u.rc4.used_bytes, crypt, len);
         ctx->u.rc4.used_bytes += len;
         break;
@@ -135,7 +135,7 @@ int  crypto_cipher_encrypt(struct crypto_cipher *ctx, const u8 *plain,
         for (i = 0; i < blocks; i++) {
             for (j = 0; j < AES_BLOCK_SIZE; j++)
                 ctx->u.aes.cbc[j] ^= plain[j];
-            aes_encrypt(ctx->u.aes.ctx_enc, ctx->u.aes.cbc,
+            wpa_aes_encrypt(ctx->u.aes.ctx_enc, ctx->u.aes.cbc,
                     ctx->u.aes.cbc);
             os_memcpy(crypt, ctx->u.aes.cbc, AES_BLOCK_SIZE);
             plain += AES_BLOCK_SIZE;
@@ -150,7 +150,7 @@ int  crypto_cipher_encrypt(struct crypto_cipher *ctx, const u8 *plain,
         for (i = 0; i < blocks; i++) {
             for (j = 0; j < 8; j++)
                 ctx->u.des3.cbc[j] ^= plain[j];
-            des3_encrypt(ctx->u.des3.cbc, &ctx->u.des3.key,
+            wpa_des3_encrypt(ctx->u.des3.cbc, &ctx->u.des3.key,
                      ctx->u.des3.cbc);
             os_memcpy(crypt, ctx->u.des3.cbc, 8);
             plain += 8;
@@ -166,7 +166,7 @@ int  crypto_cipher_encrypt(struct crypto_cipher *ctx, const u8 *plain,
         for (i = 0; i < blocks; i++) {
             for (j = 0; j < 8; j++)
                 ctx->u.des3.cbc[j] ^= plain[j];
-            des_block_encrypt(ctx->u.des.cbc, ctx->u.des.ek,
+            wpa_des_block_encrypt(ctx->u.des.cbc, ctx->u.des.ek,
                       ctx->u.des.cbc);
             os_memcpy(crypt, ctx->u.des.cbc, 8);
             plain += 8;
@@ -192,7 +192,7 @@ int  crypto_cipher_decrypt(struct crypto_cipher *ctx, const u8 *crypt,
     case CRYPTO_CIPHER_ALG_RC4:
         if (plain != crypt)
             os_memcpy(plain, crypt, len);
-        rc4_skip(ctx->u.rc4.key, ctx->u.rc4.keylen,
+        wpa_rc4_skip(ctx->u.rc4.key, ctx->u.rc4.keylen,
              ctx->u.rc4.used_bytes, plain, len);
         ctx->u.rc4.used_bytes += len;
         break;
@@ -202,7 +202,7 @@ int  crypto_cipher_decrypt(struct crypto_cipher *ctx, const u8 *crypt,
         blocks = len / AES_BLOCK_SIZE;
         for (i = 0; i < blocks; i++) {
             os_memcpy(tmp, crypt, AES_BLOCK_SIZE);
-            aes_decrypt(ctx->u.aes.ctx_dec, crypt, plain);
+            wpa_aes_decrypt(ctx->u.aes.ctx_dec, crypt, plain);
             for (j = 0; j < AES_BLOCK_SIZE; j++)
                 plain[j] ^= ctx->u.aes.cbc[j];
             os_memcpy(ctx->u.aes.cbc, tmp, AES_BLOCK_SIZE);
@@ -217,7 +217,7 @@ int  crypto_cipher_decrypt(struct crypto_cipher *ctx, const u8 *crypt,
         blocks = len / 8;
         for (i = 0; i < blocks; i++) {
             os_memcpy(tmp, crypt, 8);
-            des3_decrypt(crypt, &ctx->u.des3.key, plain);
+            wpa_des3_decrypt(crypt, &ctx->u.des3.key, plain);
             for (j = 0; j < 8; j++)
                 plain[j] ^= ctx->u.des3.cbc[j];
             os_memcpy(ctx->u.des3.cbc, tmp, 8);
@@ -233,7 +233,7 @@ int  crypto_cipher_decrypt(struct crypto_cipher *ctx, const u8 *crypt,
         blocks = len / 8;
         for (i = 0; i < blocks; i++) {
             os_memcpy(tmp, crypt, 8);
-            des_block_decrypt(crypt, ctx->u.des.dk, plain);
+            wpa_des_block_decrypt(crypt, ctx->u.des.dk, plain);
             for (j = 0; j < 8; j++)
                 plain[j] ^= ctx->u.des.cbc[j];
             os_memcpy(ctx->u.des.cbc, tmp, 8);
@@ -254,8 +254,8 @@ void  crypto_cipher_deinit(struct crypto_cipher *ctx)
 {
     switch (ctx->alg) {
     case CRYPTO_CIPHER_ALG_AES:
-        aes_encrypt_deinit(ctx->u.aes.ctx_enc);
-        aes_decrypt_deinit(ctx->u.aes.ctx_dec);
+        wpa_aes_encrypt_deinit(ctx->u.aes.ctx_enc);
+        wpa_aes_decrypt_deinit(ctx->u.aes.ctx_dec);
         break;
 #ifdef CONFIG_DES3
     case CRYPTO_CIPHER_ALG_3DES:

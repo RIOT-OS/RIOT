@@ -49,21 +49,21 @@ struct crypto_hash *  crypto_hash_init(enum crypto_hash_alg alg, const u8 *key,
 
     switch (alg) {
     case CRYPTO_HASH_ALG_MD5:
-        MD5Init(&ctx->u.md5);
+        wpa_MD5Init(&ctx->u.md5);
         break;
     case CRYPTO_HASH_ALG_SHA1:
-        SHA1Init(&ctx->u.sha1);
+        wpa_SHA1Init(&ctx->u.sha1);
         break;
 #ifdef CONFIG_SHA256
     case CRYPTO_HASH_ALG_SHA256:
-        sha256_init(&ctx->u.sha256);
+        wpa_sha256_init(&ctx->u.sha256);
         break;
 #endif /* CONFIG_SHA256 */
     case CRYPTO_HASH_ALG_HMAC_MD5:
         if (key_len > sizeof(k_pad)) {
-            MD5Init(&ctx->u.md5);
-            MD5Update(&ctx->u.md5, key, key_len);
-            MD5Final(tk, &ctx->u.md5);
+            wpa_MD5Init(&ctx->u.md5);
+            wpa_MD5Update(&ctx->u.md5, key, key_len);
+            wpa_MD5Final(tk, &ctx->u.md5);
             key = tk;
             key_len = 16;
         }
@@ -75,14 +75,14 @@ struct crypto_hash *  crypto_hash_init(enum crypto_hash_alg alg, const u8 *key,
             os_memset(k_pad + key_len, 0, sizeof(k_pad) - key_len);
         for (i = 0; i < sizeof(k_pad); i++)
             k_pad[i] ^= 0x36;
-        MD5Init(&ctx->u.md5);
-        MD5Update(&ctx->u.md5, k_pad, sizeof(k_pad));
+        wpa_MD5Init(&ctx->u.md5);
+        wpa_MD5Update(&ctx->u.md5, k_pad, sizeof(k_pad));
         break;
     case CRYPTO_HASH_ALG_HMAC_SHA1:
         if (key_len > sizeof(k_pad)) {
-            SHA1Init(&ctx->u.sha1);
-            SHA1Update(&ctx->u.sha1, key, key_len);
-            SHA1Final(tk, &ctx->u.sha1);
+            wpa_SHA1Init(&ctx->u.sha1);
+            wpa_SHA1Update(&ctx->u.sha1, key, key_len);
+            wpa_SHA1Final(tk, &ctx->u.sha1);
             key = tk;
             key_len = 20;
         }
@@ -94,15 +94,15 @@ struct crypto_hash *  crypto_hash_init(enum crypto_hash_alg alg, const u8 *key,
             os_memset(k_pad + key_len, 0, sizeof(k_pad) - key_len);
         for (i = 0; i < sizeof(k_pad); i++)
             k_pad[i] ^= 0x36;
-        SHA1Init(&ctx->u.sha1);
-        SHA1Update(&ctx->u.sha1, k_pad, sizeof(k_pad));
+        wpa_SHA1Init(&ctx->u.sha1);
+        wpa_SHA1Update(&ctx->u.sha1, k_pad, sizeof(k_pad));
         break;
 #ifdef CONFIG_SHA256
     case CRYPTO_HASH_ALG_HMAC_SHA256:
         if (key_len > sizeof(k_pad)) {
-            sha256_init(&ctx->u.sha256);
-            sha256_process(&ctx->u.sha256, key, key_len);
-            sha256_done(&ctx->u.sha256, tk);
+            wpa_sha256_init(&ctx->u.sha256);
+            wpa_sha256_process(&ctx->u.sha256, key, key_len);
+            wpa_sha256_done(&ctx->u.sha256, tk);
             key = tk;
             key_len = 32;
         }
@@ -114,8 +114,8 @@ struct crypto_hash *  crypto_hash_init(enum crypto_hash_alg alg, const u8 *key,
             os_memset(k_pad + key_len, 0, sizeof(k_pad) - key_len);
         for (i = 0; i < sizeof(k_pad); i++)
             k_pad[i] ^= 0x36;
-        sha256_init(&ctx->u.sha256);
-        sha256_process(&ctx->u.sha256, k_pad, sizeof(k_pad));
+        wpa_sha256_init(&ctx->u.sha256);
+        wpa_sha256_process(&ctx->u.sha256, k_pad, sizeof(k_pad));
         break;
 #endif /* CONFIG_SHA256 */
     default:
@@ -135,16 +135,16 @@ void  crypto_hash_update(struct crypto_hash *ctx, const u8 *data, size_t len)
     switch (ctx->alg) {
     case CRYPTO_HASH_ALG_MD5:
     case CRYPTO_HASH_ALG_HMAC_MD5:
-        MD5Update(&ctx->u.md5, data, len);
+        wpa_MD5Update(&ctx->u.md5, data, len);
         break;
     case CRYPTO_HASH_ALG_SHA1:
     case CRYPTO_HASH_ALG_HMAC_SHA1:
-        SHA1Update(&ctx->u.sha1, data, len);
+        wpa_SHA1Update(&ctx->u.sha1, data, len);
         break;
 #ifdef CONFIG_SHA256
     case CRYPTO_HASH_ALG_SHA256:
     case CRYPTO_HASH_ALG_HMAC_SHA256:
-        sha256_process(&ctx->u.sha256, data, len);
+        wpa_sha256_process(&ctx->u.sha256, data, len);
         break;
 #endif /* CONFIG_SHA256 */
     default:
@@ -174,7 +174,7 @@ int  crypto_hash_finish(struct crypto_hash *ctx, u8 *mac, size_t *len)
             return -1;
         }
         *len = 16;
-        MD5Final(mac, &ctx->u.md5);
+        wpa_MD5Final(mac, &ctx->u.md5);
         break;
     case CRYPTO_HASH_ALG_SHA1:
         if (*len < 20) {
@@ -183,7 +183,7 @@ int  crypto_hash_finish(struct crypto_hash *ctx, u8 *mac, size_t *len)
             return -1;
         }
         *len = 20;
-        SHA1Final(mac, &ctx->u.sha1);
+        wpa_SHA1Final(mac, &ctx->u.sha1);
         break;
 #ifdef CONFIG_SHA256
     case CRYPTO_HASH_ALG_SHA256:
@@ -193,7 +193,7 @@ int  crypto_hash_finish(struct crypto_hash *ctx, u8 *mac, size_t *len)
             return -1;
         }
         *len = 32;
-        sha256_done(&ctx->u.sha256, mac);
+        wpa_sha256_done(&ctx->u.sha256, mac);
         break;
 #endif /* CONFIG_SHA256 */
     case CRYPTO_HASH_ALG_HMAC_MD5:
@@ -204,17 +204,17 @@ int  crypto_hash_finish(struct crypto_hash *ctx, u8 *mac, size_t *len)
         }
         *len = 16;
 
-        MD5Final(mac, &ctx->u.md5);
+        wpa_MD5Final(mac, &ctx->u.md5);
 
         os_memcpy(k_pad, ctx->key, ctx->key_len);
         os_memset(k_pad + ctx->key_len, 0,
               sizeof(k_pad) - ctx->key_len);
         for (i = 0; i < sizeof(k_pad); i++)
             k_pad[i] ^= 0x5c;
-        MD5Init(&ctx->u.md5);
-        MD5Update(&ctx->u.md5, k_pad, sizeof(k_pad));
-        MD5Update(&ctx->u.md5, mac, 16);
-        MD5Final(mac, &ctx->u.md5);
+        wpa_MD5Init(&ctx->u.md5);
+        wpa_MD5Update(&ctx->u.md5, k_pad, sizeof(k_pad));
+        wpa_MD5Update(&ctx->u.md5, mac, 16);
+        wpa_MD5Final(mac, &ctx->u.md5);
         break;
     case CRYPTO_HASH_ALG_HMAC_SHA1:
         if (*len < 20) {
@@ -224,17 +224,17 @@ int  crypto_hash_finish(struct crypto_hash *ctx, u8 *mac, size_t *len)
         }
         *len = 20;
 
-        SHA1Final(mac, &ctx->u.sha1);
+        wpa_SHA1Final(mac, &ctx->u.sha1);
 
         os_memcpy(k_pad, ctx->key, ctx->key_len);
         os_memset(k_pad + ctx->key_len, 0,
               sizeof(k_pad) - ctx->key_len);
         for (i = 0; i < sizeof(k_pad); i++)
             k_pad[i] ^= 0x5c;
-        SHA1Init(&ctx->u.sha1);
-        SHA1Update(&ctx->u.sha1, k_pad, sizeof(k_pad));
-        SHA1Update(&ctx->u.sha1, mac, 20);
-        SHA1Final(mac, &ctx->u.sha1);
+        wpa_SHA1Init(&ctx->u.sha1);
+        wpa_SHA1Update(&ctx->u.sha1, k_pad, sizeof(k_pad));
+        wpa_SHA1Update(&ctx->u.sha1, mac, 20);
+        wpa_SHA1Final(mac, &ctx->u.sha1);
         break;
 #ifdef CONFIG_SHA256
     case CRYPTO_HASH_ALG_HMAC_SHA256:
@@ -245,17 +245,17 @@ int  crypto_hash_finish(struct crypto_hash *ctx, u8 *mac, size_t *len)
         }
         *len = 32;
 
-        sha256_done(&ctx->u.sha256, mac);
+        wpa_sha256_done(&ctx->u.sha256, mac);
 
         os_memcpy(k_pad, ctx->key, ctx->key_len);
         os_memset(k_pad + ctx->key_len, 0,
               sizeof(k_pad) - ctx->key_len);
         for (i = 0; i < sizeof(k_pad); i++)
             k_pad[i] ^= 0x5c;
-        sha256_init(&ctx->u.sha256);
-        sha256_process(&ctx->u.sha256, k_pad, sizeof(k_pad));
-        sha256_process(&ctx->u.sha256, mac, 32);
-        sha256_done(&ctx->u.sha256, mac);
+        wpa_sha256_init(&ctx->u.sha256);
+        wpa_sha256_process(&ctx->u.sha256, k_pad, sizeof(k_pad));
+        wpa_sha256_process(&ctx->u.sha256, mac, 32);
+        wpa_sha256_done(&ctx->u.sha256, mac);
         break;
 #endif /* CONFIG_SHA256 */
     default:

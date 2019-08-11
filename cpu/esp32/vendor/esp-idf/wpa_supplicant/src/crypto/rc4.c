@@ -20,7 +20,7 @@
 #define S_SWAP(a,b) do { u8 t = S[a]; S[a] = S[b]; S[b] = t; } while(0)
 
 int
-rc4_skip(const u8 *key, size_t keylen, size_t skip,
+wpa_rc4_skip(const u8 *key, size_t keylen, size_t skip,
          u8 *data, size_t data_len)
 {
     u32 i, j, k;

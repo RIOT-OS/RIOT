@@ -19,7 +19,7 @@
 #include "crypto/crypto.h"
 
 static int
-pbkdf2_sha1_f(const char *passphrase, const char *ssid,
+wpa_pbkdf2_sha1_f(const char *passphrase, const char *ssid,
              size_t ssid_len, int iterations, unsigned int count,
              u8 *digest)
 {
@@ -45,13 +45,13 @@ pbkdf2_sha1_f(const char *passphrase, const char *ssid,
     count_buf[1] = (count >> 16) & 0xff;
     count_buf[2] = (count >> 8) & 0xff;
     count_buf[3] = count & 0xff;
-    if (hmac_sha1_vector((u8 *) passphrase, passphrase_len, 2, addr, len,
+    if (wpa_hmac_sha1_vector((u8 *) passphrase, passphrase_len, 2, addr, len,
                  tmp))
         return -1;
     os_memcpy(digest, tmp, SHA1_MAC_LEN);
 
     for (i = 1; i < iterations; i++) {
-        if (hmac_sha1((u8 *) passphrase, passphrase_len, tmp,
+        if (wpa_hmac_sha1((u8 *) passphrase, passphrase_len, tmp,
                   SHA1_MAC_LEN, tmp2))
             return -1;
         os_memcpy(tmp, tmp2, SHA1_MAC_LEN);
@@ -78,7 +78,7 @@ pbkdf2_sha1_f(const char *passphrase, const char *ssid,
  * IEEE Std 802.11-2004, Clause H.4. The main construction is from PKCS#5 v2.0.
  */
 int
-pbkdf2_sha1(const char *passphrase, const char *ssid, size_t ssid_len,
+wpa_pbkdf2_sha1(const char *passphrase, const char *ssid, size_t ssid_len,
         int iterations, u8 *buf, size_t buflen)
 {
     unsigned int count = 0;
@@ -88,7 +88,7 @@ pbkdf2_sha1(const char *passphrase, const char *ssid, size_t ssid_len,
 
     while (left > 0) {
         count++;
-        if (pbkdf2_sha1_f(passphrase, ssid, ssid_len, iterations,
+        if (wpa_pbkdf2_sha1_f(passphrase, ssid, ssid_len, iterations,
                   count, digest))
             return -1;
         plen = left > SHA1_MAC_LEN ? SHA1_MAC_LEN : left;

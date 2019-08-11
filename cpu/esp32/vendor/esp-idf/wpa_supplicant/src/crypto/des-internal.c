@@ -396,7 +396,7 @@ static void desfunc(u32 *block, const u32 *keys)
 
 /* wpa_supplicant/hostapd specific wrapper */
 
-void des_encrypt(const u8 *clear, const u8 *key, u8 *cypher)
+void wpa_des_encrypt(const u8 *clear, const u8 *key, u8 *cypher)
 {
     u8 pkey[8], next, tmp;
     int i;
@@ -424,14 +424,14 @@ void des_encrypt(const u8 *clear, const u8 *key, u8 *cypher)
 }
 
 /*
-void des_key_setup(const u8 *key, u32 *ek, u32 *dk)
+void wpa_des_key_setup(const u8 *key, u32 *ek, u32 *dk)
 {
     deskey(key, 0, ek);
     deskey(key, 1, dk);
 }
 
 
-void des_block_encrypt(const u8 *plain, const u32 *ek, u8 *crypt)
+void wpa_des_block_encrypt(const u8 *plain, const u32 *ek, u8 *crypt)
 {
     u32 work[2];
     work[0] = WPA_GET_BE32(plain);
@@ -442,7 +442,7 @@ void des_block_encrypt(const u8 *plain, const u32 *ek, u8 *crypt)
 }
 
 
-void des_block_decrypt(const u8 *crypt, const u32 *dk, u8 *plain)
+void wpa_des_block_decrypt(const u8 *crypt, const u32 *dk, u8 *plain)
 {
     u32 work[2];
     work[0] = WPA_GET_BE32(crypt);
@@ -453,7 +453,7 @@ void des_block_decrypt(const u8 *crypt, const u32 *dk, u8 *plain)
 }
 
 
-void des3_key_setup(const u8 *key, struct des3_key_s *dkey)
+void wpa_des3_key_setup(const u8 *key, struct des3_key_s *dkey)
 {
     deskey(key, 0, dkey->ek[0]);
     deskey(key + 8, 1, dkey->ek[1]);
@@ -465,7 +465,7 @@ void des3_key_setup(const u8 *key, struct des3_key_s *dkey)
 }
 
 
-void des3_encrypt(const u8 *plain, const struct des3_key_s *key, u8 *crypt)
+void wpa_des3_encrypt(const u8 *plain, const struct des3_key_s *key, u8 *crypt)
 {
     u32 work[2];
 
@@ -479,7 +479,7 @@ void des3_encrypt(const u8 *plain, const struct des3_key_s *key, u8 *crypt)
 }
 
 
-void des3_decrypt(const u8 *crypt, const struct des3_key_s *key, u8 *plain)
+void wpa_des3_decrypt(const u8 *crypt, const struct des3_key_s *key, u8 *plain)
 {
     u32 work[2];
 
