@@ -27,7 +27,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-size_t eeprom_read(uint32_t pos, uint8_t *data, size_t len)
+size_t eeprom_read(uint32_t pos, void *data, size_t len)
 {
     assert(pos + len <= EEPROM_SIZE);
 
@@ -50,7 +50,7 @@ size_t eeprom_read(uint32_t pos, uint8_t *data, size_t len)
     return len;
 }
 
-size_t eeprom_write(uint32_t pos, const uint8_t *data, size_t len)
+size_t eeprom_write(uint32_t pos, const void *data, size_t len)
 {
     assert(pos + len <= EEPROM_SIZE);
 
