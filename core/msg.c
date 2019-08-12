@@ -220,16 +220,33 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
 int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
 {
     assert(sched_active_pid != target_pid);
+
     unsigned state = irq_disable();
     thread_t *me = (thread_t*) sched_threads[sched_active_pid];
     sched_set_status(me, STATUS_REPLY_BLOCKED);
     me->wait_data = (void*) reply;
 
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+    thread_t *recv_thread = (thread_t*) sched_threads[target_pid];
+    uint8_t prio_backup = recv_thread->priority;
+    /* When priority inheritance is enabled, we lend the receiver thread our
+     * current priority if lower */
+    if (me->priority < recv_thread->priority) {
+        sched_change_priority(recv_thread, me->priority);
+    }
+#endif
+
     /* we re-use (abuse) reply for sending, because wait_data might be
      * overwritten if the target is not in RECEIVE_BLOCKED */
     *reply = *m;
     /* msg_send blocks until reply received */
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+    int res = _msg_send(reply, target_pid, true, state);
+    sched_change_priority(recv_thread, prio_backup);
+    return res;
+#else
     return _msg_send(reply, target_pid, true, state);
+#endif
 }
 
 int msg_reply(msg_t *m, msg_t *reply)
