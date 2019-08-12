@@ -50,8 +50,10 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define SYSTEM_EVENT_WIFI_RX_DONE    (SYSTEM_EVENT_MAX + 3)
-#define SYSTEM_EVENT_WIFI_TX_DONE    (SYSTEM_EVENT_MAX + 4)
+#define ESP_WIFI_EVENT_RX_DONE          BIT(0)
+#define ESP_WIFI_EVENT_TX_DONE          BIT(1)
+#define ESP_WIFI_EVENT_STA_CONNECTED    BIT(2)
+#define ESP_WIFI_EVENT_STA_DISCONNECTED BIT(3)
 
 /**
  * There is only one ESP WiFi device. We define it as static device variable
@@ -114,6 +116,7 @@ esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
     critical_exit();
     mutex_unlock(&_esp_wifi_dev.dev_lock);
 
+    _esp_wifi_dev.event |= ESP_WIFI_EVENT_RX_DONE;
     return ESP_OK;
 }
 
@@ -145,7 +148,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, _esp_wifi_rx_cb);
 
             _esp_wifi_dev.connected = true;
-            _esp_wifi_dev.event = SYSTEM_EVENT_STA_CONNECTED;
+            _esp_wifi_dev.event |= ESP_WIFI_EVENT_STA_CONNECTED;
             _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
 
             break;
@@ -159,7 +162,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, NULL);
 
             _esp_wifi_dev.connected = false;
-            _esp_wifi_dev.event = SYSTEM_EVENT_STA_DISCONNECTED;
+            _esp_wifi_dev.event |= ESP_WIFI_EVENT_STA_DISCONNECTED;
             _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
 
             /* call disconnect to reset internal state */
@@ -291,6 +294,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 static int _esp_wifi_init(netdev_t *netdev)
 {
     DEBUG("%s: %p\n", __func__, netdev);
+    _esp_wifi_dev.event = 0; /* no event */
 
     return 0;
 }
@@ -446,21 +450,22 @@ static void _esp_wifi_isr(netdev_t *netdev)
 
     esp_wifi_netdev_t *dev = (esp_wifi_netdev_t *) netdev;
 
-    switch (dev->event) {
-        case SYSTEM_EVENT_WIFI_RX_DONE:
-            if (dev->rx_len) {
-                dev->netdev.event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
-            }
-        case SYSTEM_EVENT_STA_CONNECTED:
-            dev->netdev.event_callback(netdev, NETDEV_EVENT_LINK_UP);
-            break;
-        case SYSTEM_EVENT_STA_DISCONNECTED:
-            dev->netdev.event_callback(netdev, NETDEV_EVENT_LINK_DOWN);
-            break;
-        default:
-            break;
+    dev->event &= ~ESP_WIFI_EVENT_RX_DONE;
+    while (rx_buf[rx_buf_read].buffer) {
+        dev->netdev.event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
     }
-    _esp_wifi_dev.event = SYSTEM_EVENT_MAX; /* no event */
+    if (dev->event & ESP_WIFI_EVENT_TX_DONE) {
+        dev->event &= ~ESP_WIFI_EVENT_TX_DONE;
+        dev->netdev.event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+    }
+    if (dev->event & ESP_WIFI_EVENT_STA_CONNECTED) {
+        dev->event &= ~ESP_WIFI_EVENT_STA_CONNECTED;
+        dev->netdev.event_callback(netdev, NETDEV_EVENT_LINK_UP);
+    }
+    if (dev->event & ESP_WIFI_EVENT_STA_DISCONNECTED) {
+        dev->event &= ~ESP_WIFI_EVENT_STA_DISCONNECTED;
+        dev->netdev.event_callback(netdev, NETDEV_EVENT_LINK_DOWN);
+    }
 
     return;
 }
@@ -480,7 +485,6 @@ void auto_init_esp_wifi (void)
     LOG_TAG_DEBUG("esp_wifi", "initializing ESP WiFi device\n");
 
     esp_wifi_setup(&_esp_wifi_dev);
-    _esp_wifi_dev.event = SYSTEM_EVENT_MAX; /* no event */
     _esp_wifi_dev.netif = gnrc_netif_ethernet_create(_esp_wifi_stack,
                                                     ESP_WIFI_STACKSIZE,
 #ifdef MODULE_ESP_NOW
