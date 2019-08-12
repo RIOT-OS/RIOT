@@ -219,6 +219,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
             _pkt_build_reset_from_pkt(&reset, pkt);
             gnrc_netapi_send(gnrc_tcp_pid, reset);
         }
+        gnrc_pktbuf_release(pkt);
         return -ENOTCONN;
     }
     gnrc_pktbuf_release(pkt);
