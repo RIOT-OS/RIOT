@@ -26,11 +26,11 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include "test_utils/interactive_sync.h"
 
 int main(void)
 {
-    puts("Please hit any key and then ENTER to continue");
-    getchar();
+    test_utils_interactive_sync();
     puts("5 x usleep(i++ * 500000)");
     for (unsigned i = 0; i < 5; i++) {
         useconds_t us = i * 500000u;
