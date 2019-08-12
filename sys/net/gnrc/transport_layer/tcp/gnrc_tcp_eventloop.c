@@ -162,6 +162,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
             return -ENOMSG;
         }
         pkt->type = GNRC_NETTYPE_UNDEF;
+        hdr = (tcp_hdr_t *)tcp->data;
     }
 
     /* Validate checksum */
