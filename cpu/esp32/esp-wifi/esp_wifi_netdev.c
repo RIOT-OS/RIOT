@@ -55,7 +55,17 @@
 #define ESP_WIFI_EVENT_STA_CONNECTED    BIT(2)
 #define ESP_WIFI_EVENT_STA_DISCONNECTED BIT(3)
 
-/**
+#define ESP_WIFI_DEBUG(f, ...) \
+        DEBUG("[esp_wifi] %s: " f "\n", __func__, ## __VA_ARGS__)
+
+#define ESP_WIFI_LOG_INFO(f, ...) \
+        LOG_INFO("[esp_wifi] " f "\n", ## __VA_ARGS__)
+
+#define ESP_WIFI_LOG_ERROR(f, ...) \
+        LOG_ERROR("[esp_wifi] " f "\n", ## __VA_ARGS__)
+
+#define MAC_STR                         "%02x:%02x:%02x:%02x:%02x:%02x"
+#define MAC_STR_ARG(m)                  m[0], m[1], m[2], m[3], m[4], m[5]
  * There is only one ESP WiFi device. We define it as static device variable
  * to have accesss to the device inside ESP WiFi interrupt routines which do
  * not provide an argument that could be used as pointer to the ESP WiFi
@@ -79,8 +89,9 @@ esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
      * This callback function is executed in interrupt context but in the
      * context of the wifi thread. That is, mutex_lock or msg_send can block.
      */
+    ESP_WIFI_DEBUG("buf=%p len=%d eb=%p", buffer, len, eb);
 
-    DEBUG("%s: buf=%p len=%d eb=%p\n", __func__, buffer, len, eb);
+    /* check packet buffer for the minimum packet size */
 
     if ((buffer == NULL) || (len >= ETHERNET_MAX_LEN)) {
         if (eb != NULL) {
@@ -132,7 +143,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
 
     switch(event->event_id) {
         case SYSTEM_EVENT_STA_START:
-            DEBUG("%s WiFi started\n", __func__);
+            ESP_WIFI_DEBUG("WiFi started");
             result = esp_wifi_connect();
             if (result != ESP_OK) {
                 LOG_TAG_ERROR("esp_wifi", "esp_wifi_connect failed with return "
@@ -141,11 +152,12 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             break;
 
         case SYSTEM_EVENT_SCAN_DONE:
-            DEBUG("%s WiFi scan done\n", __func__);
+            ESP_WIFI_DEBUG("WiFi scan done");
             break;
 
         case SYSTEM_EVENT_STA_CONNECTED:
-            DEBUG("%s WiFi connected\n", __func__);
+            ESP_WIFI_DEBUG("WiFi connected to ssid %s",
+                           event->event_info.connected.ssid);
 
             /* register RX callback function */
             esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, _esp_wifi_rx_cb);
@@ -157,9 +169,9 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             break;
 
         case SYSTEM_EVENT_STA_DISCONNECTED:
-            DEBUG("%s WiFi disconnected from ssid %s, reason %d\n", __func__,
-                  event->event_info.disconnected.ssid,
-                  event->event_info.disconnected.reason);
+            ESP_WIFI_DEBUG("WiFi disconnected from ssid %s, reason %d",
+                           event->event_info.disconnected.ssid,
+                           event->event_info.disconnected.reason);
 
             /* unregister RX callback function */
             esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, NULL);
@@ -186,7 +198,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             break;
 
         default:
-            DEBUG("%s event %d\n", __func__, event->event_id);
+            ESP_WIFI_DEBUG("event %d", event->event_id);
             break;
     }
     return ESP_OK;
@@ -208,7 +220,7 @@ static wifi_config_t wifi_config_sta = {
 
 void esp_wifi_setup (esp_wifi_netdev_t* dev)
 {
-    DEBUG("%s: %p\n", __func__, dev);
+    ESP_WIFI_DEBUG("%p", dev);
 
     /* initialize buffer */
     dev->rx_len = 0;
@@ -296,7 +308,8 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 
 static int _esp_wifi_init(netdev_t *netdev)
 {
-    DEBUG("%s: %p\n", __func__, netdev);
+    ESP_WIFI_DEBUG("%p", netdev);
+
     _esp_wifi_dev.event = 0; /* no event */
 
     return 0;
@@ -304,7 +317,7 @@ static int _esp_wifi_init(netdev_t *netdev)
 
 static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
 {
-    DEBUG("%s: netdev=%p iolist=%p\n", __func__, netdev, iolist);
+    ESP_WIFI_DEBUG("%p %p", netdev, iolist);
 
     assert(netdev != NULL);
     assert(iolist != NULL);
@@ -312,7 +325,7 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
     esp_wifi_netdev_t* dev = (esp_wifi_netdev_t*)netdev;
 
     if (!_esp_wifi_dev.connected) {
-        DEBUG("%s: WiFi is not connected\n", __func__);
+        ESP_WIFI_DEBUG("WiFi is still not connected to AP, cannot send");
         return -ENODEV;
     }
 
@@ -345,7 +358,7 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     }
     else {
-        DEBUG("%s: sending WiFi packet failed\n", __func__);
+        ESP_WIFI_DEBUG("sending WiFi packet failed");
         ret = -EIO;
     }
 
@@ -356,7 +369,7 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
 
 static int _esp_wifi_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    DEBUG("%s: %p %p %u %p\n", __func__, netdev, buf, len, info);
+    ESP_WIFI_DEBUG("%p %p %u %p", netdev, buf, len, info);
 
 
     assert(netdev != NULL);
@@ -403,7 +416,7 @@ static int _esp_wifi_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
-    DEBUG("%s: %s %p %p %u\n", __func__, netopt2str(opt), netdev, val, max_len);
+    ESP_WIFI_DEBUG("%s %p %p %u", netopt2str(opt), netdev, val, max_len);
 
     assert(netdev != NULL);
     assert(val != NULL);
@@ -429,7 +442,7 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
 
 static int _esp_wifi_set(netdev_t *netdev, netopt_t opt, const void *val, size_t max_len)
 {
-    DEBUG("%s: %s %p %p %u\n", __func__, netopt2str(opt), netdev, val, max_len);
+    ESP_WIFI_DEBUG("%s %p %p %u", netopt2str(opt), netdev, val, max_len);
 
     assert(netdev != NULL);
     assert(val != NULL);
@@ -446,7 +459,7 @@ static int _esp_wifi_set(netdev_t *netdev, netopt_t opt, const void *val, size_t
 
 static void _esp_wifi_isr(netdev_t *netdev)
 {
-    DEBUG("%s: %p\n", __func__, netdev);
+    ESP_WIFI_DEBUG("%p", netdev);
 
     assert(netdev != NULL);
 
