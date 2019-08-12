@@ -6,8 +6,7 @@ TEST_ON_CI_WHITELIST += all
 # This test randomly fails on `native` so disable it from CI
 TEST_ON_CI_BLACKLIST += native
 
-# This application uses getchar and thus expects input from stdio
-USEMODULE += stdin
+USEMODULE += test_utils_interactive_sync
 
 # Port and pin configuration for probing with oscilloscope
 # Port number should be found in port enum e.g in cpu/include/periph_cpu.h

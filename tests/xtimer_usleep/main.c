@@ -27,6 +27,7 @@
 
 #include "xtimer.h"
 #include "timex.h"
+#include "test_utils/interactive_sync.h"
 
 #define RUNS                (5U)
 #define SLEEP_TIMES_NUMOF   ARRAY_SIZE(sleep_times)
@@ -61,8 +62,7 @@ int main(void)
 
     printf("Running test %u times with %u distinct sleep times\n", RUNS,
            (unsigned)SLEEP_TIMES_NUMOF);
-    puts("Please hit any key and then ENTER to continue");
-    getchar();
+    test_utils_interactive_sync();
     start_test = xtimer_now_usec();
     for (unsigned m = 0; m < RUNS; m++) {
         for (unsigned n = 0;
