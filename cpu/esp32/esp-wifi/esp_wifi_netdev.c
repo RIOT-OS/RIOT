@@ -354,49 +354,44 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
     assert(netdev != NULL);
     assert(iolist != NULL);
 
-    esp_wifi_netdev_t* dev = (esp_wifi_netdev_t*)netdev;
-
     if (!_esp_wifi_dev.connected) {
         ESP_WIFI_DEBUG("WiFi is still not connected to AP, cannot send");
-        return -ENODEV;
+        return -EIO;
     }
 
-    mutex_lock(&dev->dev_lock);
-
-    dev->tx_len = 0;
+    uint16_t tx_len = 0;              /**< number of bytes in transmit buffer */
+    uint8_t tx_buf[ETHERNET_MAX_LEN]; /**< transmit buffer */
 
     /* load packet data into TX buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
-        if (dev->tx_len + iol->iol_len > ETHERNET_MAX_LEN) {
-            mutex_unlock(&dev->dev_lock);
+        if (tx_len + iol->iol_len > ETHERNET_MAX_LEN) {
             return -EOVERFLOW;
         }
         if (iol->iol_len) {
-            memcpy (dev->tx_buf + dev->tx_len, iol->iol_base, iol->iol_len);
-            dev->tx_len += iol->iol_len;
+            memcpy (tx_buf + tx_len, iol->iol_base, iol->iol_len);
+            tx_len += iol->iol_len;
         }
     }
 
-    #if ENABLE_DEBUG
-    printf ("%s: send %d byte\n", __func__, dev->tx_len);
-    /* esp_hexdump (dev->tx_buf, dev->tx_len, 'b', 16); */
-    #endif
+#if ENABLE_DEBUG
+    const ethernet_hdr_t* hdr = (const ethernet_hdr_t *)tx_buf;
 
-    int ret = 0;
+    ESP_WIFI_DEBUG("send %u byte to " MAC_STR,
+                   (unsigned)tx_len, MAC_STR_ARG(hdr->dst));
+#if MODULE_OD
+    od_hex_dump(tx_buf, tx_len, OD_WIDTH_DEFAULT);
+#endif /* MODULE_OD */
+#endif /* ENABLE_DEBUG */
 
     /* send the the packet to the peer(s) mac address */
-    if (esp_wifi_internal_tx(ESP_IF_WIFI_STA, dev->tx_buf, dev->tx_len) == ESP_OK) {
-        ret = dev->tx_len;
+    if (esp_wifi_internal_tx(ESP_IF_WIFI_STA, tx_buf, tx_len) == ESP_OK) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+        return tx_len;
     }
     else {
         ESP_WIFI_DEBUG("sending WiFi packet failed");
-        ret = -EIO;
+        return -EIO;
     }
-
-    mutex_unlock(&dev->dev_lock);
-
-    return ret;
 }
 
 static int _esp_wifi_recv(netdev_t *netdev, void *buf, size_t len, void *info)
