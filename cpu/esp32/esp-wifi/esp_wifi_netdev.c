@@ -18,8 +18,6 @@
 
 #ifdef MODULE_ESP_WIFI
 
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 #include "log.h"
 #include "tools.h"
 
@@ -32,7 +30,7 @@
 #include "net/gnrc.h"
 #include "net/ethernet.h"
 #include "net/netdev/eth.h"
-
+#include "od.h"
 #include "xtimer.h"
 
 #include "esp_common.h"
@@ -49,8 +47,8 @@
 #include "esp_wifi_params.h"
 #include "esp_wifi_netdev.h"
 
-#include "net/ipv6/hdr.h"
-#include "net/gnrc/ipv6/nib.h"
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
 #define SYSTEM_EVENT_WIFI_RX_DONE    (SYSTEM_EVENT_MAX + 3)
 #define SYSTEM_EVENT_WIFI_TX_DONE    (SYSTEM_EVENT_MAX + 4)
