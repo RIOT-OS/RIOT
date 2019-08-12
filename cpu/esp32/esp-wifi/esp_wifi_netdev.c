@@ -72,6 +72,9 @@ extern esp_err_t esp_system_event_add_handler (system_event_cb_t handler,
 
 esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
 {
+    assert(buffer);
+    assert(eb);
+
     /*
      * This callback function is executed in interrupt context but in the
      * context of the wifi thread. That is, mutex_lock or msg_send can block.
@@ -303,8 +306,8 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
 {
     DEBUG("%s: netdev=%p iolist=%p\n", __func__, netdev, iolist);
 
-    CHECK_PARAM_RET (netdev != NULL, -ENODEV);
-    CHECK_PARAM_RET (iolist != NULL, -EINVAL);
+    assert(netdev != NULL);
+    assert(iolist != NULL);
 
     esp_wifi_netdev_t* dev = (esp_wifi_netdev_t*)netdev;
 
@@ -355,9 +358,8 @@ static int _esp_wifi_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     DEBUG("%s: %p %p %u %p\n", __func__, netdev, buf, len, info);
 
-    CHECK_PARAM_RET (netdev != NULL, -ENODEV);
 
-    esp_wifi_netdev_t* dev = (esp_wifi_netdev_t*)netdev;
+    assert(netdev != NULL);
 
     mutex_lock(&dev->dev_lock);
 
@@ -403,8 +405,8 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
 {
     DEBUG("%s: %s %p %p %u\n", __func__, netopt2str(opt), netdev, val, max_len);
 
-    CHECK_PARAM_RET (netdev != NULL, -ENODEV);
-    CHECK_PARAM_RET (val != NULL, -EINVAL);
+    assert(netdev != NULL);
+    assert(val != NULL);
 
     esp_wifi_netdev_t* dev = (esp_wifi_netdev_t*)netdev;
 
@@ -429,8 +431,8 @@ static int _esp_wifi_set(netdev_t *netdev, netopt_t opt, const void *val, size_t
 {
     DEBUG("%s: %s %p %p %u\n", __func__, netopt2str(opt), netdev, val, max_len);
 
-    CHECK_PARAM_RET (netdev != NULL, -ENODEV);
-    CHECK_PARAM_RET (val != NULL, -EINVAL);
+    assert(netdev != NULL);
+    assert(val != NULL);
 
     switch (opt) {
         case NETOPT_ADDRESS:
@@ -446,7 +448,7 @@ static void _esp_wifi_isr(netdev_t *netdev)
 {
     DEBUG("%s: %p\n", __func__, netdev);
 
-    CHECK_PARAM (netdev != NULL);
+    assert(netdev != NULL);
 
     esp_wifi_netdev_t *dev = (esp_wifi_netdev_t *) netdev;
 
