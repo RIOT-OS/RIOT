@@ -30,6 +30,7 @@
 
 #include <stdio.h>
 
+#include "kernel_defines.h"
 #include "xtimer.h"
 #include "fix16.h"
 
