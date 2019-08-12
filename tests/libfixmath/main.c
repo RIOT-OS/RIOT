@@ -31,8 +31,8 @@
 #include <stdio.h>
 
 #include "kernel_defines.h"
-#include "xtimer.h"
 #include "fix16.h"
+#include "test_utils/interactive_sync.h"
 
 #ifndef M_PI
 #   define M_PI 3.14159265359
@@ -186,8 +186,9 @@ static void unary_ops(void)
 
 int main(void)
 {
-    /* Delay output to prevent flooding of buffer */
-    xtimer_sleep(1);
+    /* Sync to prevent flooding of buffer */
+    test_utils_interactive_sync();
+
     puts("Unary.");
     unary_ops();
 
