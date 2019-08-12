@@ -21,6 +21,7 @@
 
 #ifdef MODULE_VFS
 #include <fcntl.h>
+#include "irq.h"
 #include "vfs.h"
 #elif defined(MODULE_STDIO_UART)
 #include "stdio_uart.h"
@@ -173,6 +174,47 @@ ssize_t write(int fd, const void *src, size_t count)
     errno = ENODEV;
     return -1;
 #endif
+}
+
+/*
+ * Following functions are wrappers around the according avr-libc system
+ * functions to avoid their preemption by disabling the interrupts for the
+ * time of their execution.
+ */
+extern void *__real_malloc(size_t size);
+extern void __real_free(void *ptr);
+extern void *__real_calloc(size_t nmemb, size_t size);
+extern void *__real_realloc(void *ptr, size_t size);
+
+void *__wrap_malloc(size_t size)
+{
+    unsigned state = irq_disable();
+    void *ptr = __real_malloc(size);
+    irq_restore(state);
+    return ptr;
+}
+
+void __wrap_free(void *ptr)
+{
+    unsigned state = irq_disable();
+    __real_free(ptr);
+    irq_restore(state);
+}
+
+void *__wrap_calloc(size_t nmemb, size_t size)
+{
+    unsigned state = irq_disable();
+    void *ptr = __real_calloc(nmemb, size);
+    irq_restore(state);
+    return ptr;
+}
+
+void *__wrap_realloc(void *ptr, size_t size)
+{
+    unsigned state = irq_disable();
+    void *new = __real_realloc(ptr, size);
+    irq_restore(state);
+    return new;
 }
 
 /** @} */
