@@ -66,12 +66,14 @@
 
 #define MAC_STR                         "%02x:%02x:%02x:%02x:%02x:%02x"
 #define MAC_STR_ARG(m)                  m[0], m[1], m[2], m[3], m[4], m[5]
+
+/*
  * There is only one ESP WiFi device. We define it as static device variable
  * to have accesss to the device inside ESP WiFi interrupt routines which do
  * not provide an argument that could be used as pointer to the ESP WiFi
  * device which triggers the interrupt.
  */
-esp_wifi_netdev_t _esp_wifi_dev;
+static esp_wifi_netdev_t _esp_wifi_dev;
 static const netdev_driver_t _esp_wifi_driver;
 
 /*
@@ -334,8 +336,6 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 
     /* initialize netdev data structure */
     dev->connected = false;
-
-    mutex_init(&dev->dev_lock);
 }
 
 static int _esp_wifi_init(netdev_t *netdev)
