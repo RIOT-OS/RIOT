@@ -74,63 +74,98 @@
 esp_wifi_netdev_t _esp_wifi_dev;
 static const netdev_driver_t _esp_wifi_driver;
 
+/*
+ * Ring buffer for rx_buf elements which hold a pointer to the WiFi frame
+ * buffer, a pointer to the ethernet frame and the frame length for each
+ * received frame. Since we have anly one device, it the ring buffer can be
+ * static and has not to be exposed as part of the network device.
+ */
+#ifndef ESP_WIFI_MAX_RX_BUF
+/** The maximum of pending incoming WiFi frames */
+#define ESP_WIFI_MAX_RX_BUF 20
+#endif
+
+typedef struct {
+    void* buffer;
+    void* eb;
+    uint16_t len;
+} rx_buf_t;
+
+static rx_buf_t rx_buf[ESP_WIFI_MAX_RX_BUF] = { 0 };
+
+static unsigned int rx_buf_write = 0;
+static unsigned int rx_buf_read = 0;
+
 /* device thread stack */
 static char _esp_wifi_stack[ESP_WIFI_STACKSIZE];
 
 extern esp_err_t esp_system_event_add_handler (system_event_cb_t handler,
                                                void *arg);
 
+/**
+ * @brief   Callback when ethernet frame is received. Has to run in IRAM.
+ * @param   buffer  pointer to the begin of the ethernet frame in *eb
+ * @param   eb      allocated buffer in WiFi interface
+ */
 esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
 {
     assert(buffer);
     assert(eb);
 
     /*
-     * This callback function is executed in interrupt context but in the
-     * context of the wifi thread. That is, mutex_lock or msg_send can block.
+     * When interrupts of the WiFi hardware interface occur, the ISRs only
+     * send events to the message queue of the `wifi-event-loop` thread.
+     * The `wifi-event-loop` thread then processes these events sequentially
+     * and invokes callback functions like the function `esp_wifi_recv_cb`
+     * asynchronously.
+     *
+     * This means that the function `_esp_wifi_rx_cb` is never executed in
+     * the interrupt context, but always in the context of the thread
+     * `wifi-event-loop`. Furthermore, function `_esp_wifi_rx_cb` can't
+     * never be reentered.
      */
     ESP_WIFI_DEBUG("buf=%p len=%d eb=%p", buffer, len, eb);
 
     /* check packet buffer for the minimum packet size */
-
-    if ((buffer == NULL) || (len >= ETHERNET_MAX_LEN)) {
-        if (eb != NULL) {
-            esp_wifi_internal_free_rx_buffer(eb);
-        }
-        return ESP_ERR_INVALID_ARG;
+    if (len < sizeof(ethernet_hdr_t)) {
+        ESP_WIFI_DEBUG("frame length is less than the size of an Ethernet"
+                       "header (%u < %u)", len, sizeof(ethernet_hdr_t));
+        esp_wifi_internal_free_rx_buffer(eb);
+        return ESP_ERR_INVALID_SIZE;
     }
 
-    mutex_lock(&_esp_wifi_dev.dev_lock);
+    /* check whether packet buffer fits into receive buffer */
+    if (len > ETHERNET_MAX_LEN) {
+        ESP_WIFI_DEBUG("frame length is greater than the maximum size of an "
+                       "Ethernet frame (%u > %u)", len, ETHERNET_MAX_LEN);
+        esp_wifi_internal_free_rx_buffer(eb);
+        return ESP_ERR_INVALID_SIZE;
+    }
+
+    /* check whether rx buffer is full, that is, rx_buf_write points to an
+       element that is already in use */
+    if (rx_buf[rx_buf_write].buffer) {
+        ESP_WIFI_LOG_ERROR("no space left in receive buffer");
+        esp_wifi_internal_free_rx_buffer(eb);
+        return ESP_ERR_NO_MEM;
+    }
+
     critical_enter();
 
-    /* copy the buffer and free WiFi driver buffer */
-    memcpy(_esp_wifi_dev.rx_buf, buffer, len);
-    if (eb) {
-        esp_wifi_internal_free_rx_buffer(eb);
-    }
+    /* fill the rx_buf element */
+    rx_buf[rx_buf_write].buffer = buffer;
+    rx_buf[rx_buf_write].eb = eb;
+    rx_buf[rx_buf_write].len = len;
 
-    /*
-     * Because this function is not executed in interrupt context but in thread
-     * context, following msg_send could block on heavy network load, if frames
-     * are coming in faster than the ISR events can be handled. To avoid
-     * blocking during msg_send, we pretend we are in an ISR by incrementing
-     * the IRQ nesting counter. If IRQ nesting counter is greater 0, function
-     * irq_is_in returns true and the non-blocking version of msg_send is used.
-     */
-    irq_interrupt_nesting++;
-
-    /* trigger netdev event to read the data */
-    _esp_wifi_dev.rx_len = len;
-    _esp_wifi_dev.event = SYSTEM_EVENT_WIFI_RX_DONE;
-    _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
-
-    /* reset IRQ nesting counter */
-    irq_interrupt_nesting--;
+    /* point to the next element */
+    rx_buf_write = (rx_buf_write + 1) % ESP_WIFI_MAX_RX_BUF;
 
     critical_exit();
-    mutex_unlock(&_esp_wifi_dev.dev_lock);
 
+    /* trigger netdev event to read the data */
     _esp_wifi_dev.event |= ESP_WIFI_EVENT_RX_DONE;
+    _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
+
     return ESP_OK;
 }
 
@@ -221,9 +256,6 @@ static wifi_config_t wifi_config_sta = {
 void esp_wifi_setup (esp_wifi_netdev_t* dev)
 {
     ESP_WIFI_DEBUG("%p", dev);
-
-    /* initialize buffer */
-    dev->rx_len = 0;
 
     /* set the event handler */
     esp_system_event_add_handler(_esp_system_event_handler, NULL);
@@ -371,47 +403,48 @@ static int _esp_wifi_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     ESP_WIFI_DEBUG("%p %p %u %p", netdev, buf, len, info);
 
-
     assert(netdev != NULL);
 
-    mutex_lock(&dev->dev_lock);
+    if (!rx_buf[rx_buf_read].buffer) {
+        /* there is nothing in rx_buf */
+        return 0;
+    }
 
-    uint16_t size = dev->rx_len;
+    uint16_t size = rx_buf[rx_buf_read].len;
 
-    if (!buf && !len) {
-        /* return the size without dropping received data */
-        mutex_unlock(&dev->dev_lock);
+    if (buf == NULL && len == 0) {
+        /* just return the size */
         return size;
     }
 
-    if (!buf && len) {
-        /* return the size and drop received data */
-        mutex_unlock(&dev->dev_lock);
-        dev->rx_len = 0;
-        return size;
+    if (buf && len >= size) {
+        /* copy the buffer */
+        memcpy(buf, rx_buf[rx_buf_read].buffer, size);
+#if ENABLE_DEBUG
+        ethernet_hdr_t *hdr = (ethernet_hdr_t *)buf;
+
+        ESP_WIFI_DEBUG("received %u byte from addr " MAC_STR,
+                       size, MAC_STR_ARG(hdr->src));
+#if MODULE_OD
+        od_hex_dump(buf, size, OD_WIDTH_DEFAULT);
+#endif /* MODULE_OD */
+#endif /* ENABLE_DEBUG */
     }
 
-    if (buf && len && dev->rx_len) {
-        if (dev->rx_len > len) {
-            DEBUG("[esp_wifi] No space in receive buffers\n");
-            mutex_unlock(&dev->dev_lock);
-            return -ENOBUFS;
-        }
+    /*
+     * free the packet buffer and clean the rx_buf element at the read pointer,
+     * it covers the also the cases where the packet is simply dropped when
+     * (buf == NULL && len != 0) or (buf != NULL && len < size)
+     */
+    esp_wifi_internal_free_rx_buffer(rx_buf[rx_buf_read].eb);
 
-        #if ENABLE_DEBUG
-        /* esp_hexdump (dev->rx_buf, dev->rx_len, 'b', 16); */
-        #endif
+    critical_enter();
+    rx_buf[rx_buf_read].buffer = NULL;
+    rx_buf[rx_buf_write].len = len;
+    rx_buf_read = (rx_buf_read + 1) % ESP_WIFI_MAX_RX_BUF;
+    critical_exit();
 
-        /* copy received date and reset the receive length */
-        memcpy(buf, dev->rx_buf, dev->rx_len);
-        dev->rx_len = 0;
-
-        mutex_unlock(&dev->dev_lock);
-        return size;
-    }
-
-    mutex_unlock(&dev->dev_lock);
-    return -EINVAL;
+    return size;
 }
 
 static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
