@@ -113,7 +113,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t s
  * @param[in] size  The size of the new packet snip.
  * @param[in] type  The type of the new packet snip.
  *
- * @note    It's not guaranteeed that `result->data` points to the same address
+ * @note    It's not guaranteed that `result->data` points to the same address
  *          as the original `pkt->data`.
  *
  * @return  The new packet snip in @p pkt on success.
