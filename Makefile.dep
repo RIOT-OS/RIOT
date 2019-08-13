@@ -690,6 +690,12 @@ ifneq (,$(filter evtimer,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter fuzzing,$(USEMODULE)))
+  USEMODULE += netdev_test
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_pktbuf_malloc
+endif
+
 ifneq (,$(filter can_linux,$(USEMODULE)))
   LINKFLAGS += -lsocketcan
 endif
