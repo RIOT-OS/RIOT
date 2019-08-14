@@ -1,0 +1,55 @@
+From c9bc80e4f9607ef7cec74f378c76ed327572da2a Mon Sep 17 00:00:00 2001
+From: Brenton Chetty <brent7984@gmail.com>
+Date: Wed, 14 Aug 2019 15:19:49 +0200
+Subject: [PATCH] Adjust variables for redefinition issue with RIOT
+
+---
+ include/zenoh/collection.h | 2 +-
+ include/zenoh/mvar.h       | 2 +-
+ include/zenoh/types.h      | 3 ++-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/include/zenoh/collection.h b/include/zenoh/collection.h
+index 5c556ad..e7af92b 100644
+--- a/include/zenoh/collection.h
++++ b/include/zenoh/collection.h
+@@ -112,7 +112,7 @@ typedef struct z_list  {
+   struct z_list *tail;
+ } z_list_t;
+ 
+-z_list_t * z_list_empty;
++extern z_list_t * z_list_empty;
+ z_list_t * z_list_of(void *x);
+ z_list_t * z_list_cons(z_list_t *xs, void *x);
+ void * z_list_head(z_list_t *xs);
+diff --git a/include/zenoh/mvar.h b/include/zenoh/mvar.h
+index 270e180..6b9bb73 100644
+--- a/include/zenoh/mvar.h
++++ b/include/zenoh/mvar.h
+@@ -4,7 +4,7 @@
+ 
+ typedef void* z_mvar_t;
+ 
+-z_mvar_t *z_mvar_empty();
++z_mvar_t *z_mvar_empty(void);
+ int z_mvar_is_empty(z_mvar_t *mv);
+ 
+ z_mvar_t *z_mvar_of(void *e);
+diff --git a/include/zenoh/types.h b/include/zenoh/types.h
+index d8b3254..516826d 100644
+--- a/include/zenoh/types.h
++++ b/include/zenoh/types.h
+@@ -8,8 +8,9 @@
+ #include "zenoh/result.h"
+ #include "zenoh/collection.h"
+ #include "zenoh/mvar.h"
++#include "zenoh/unix/types.h"
+ 
+-const int _z_dummy_arg;
++extern const int _z_dummy_arg;
+ 
+ #if (ZENOH_DEBUG == 2)
+ #include <stdio.h>
+-- 
+2.20.1
+

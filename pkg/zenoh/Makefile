@@ -1,6 +1,6 @@
 PKG_NAME=		zenoh
 PKG_URL=		https://github.com/atolab/zenoh-c
-PKG_VERSION=		4467a792bc9dfc0a7e359536fd0c20162fddc4ac
+PKG_VERSION=		b2f6cfb72cb41fd68551840207fc7fa28ef5871d
 
 
 .PHONY: all

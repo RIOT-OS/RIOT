@@ -1,1 +1,3 @@
-INCLUDES += -I$(RIOTBASE)/pkg/zenoh/include
+INCLUDES += -I$(PKGDIRBASE)/zenoh/include
+INCLUDES += -I$(PKGDIRBASE)/zenoh/include/zenoh
+INCLUDES += -I$(PKGDIRBASE)/zenoh/include/zenoh/unix
