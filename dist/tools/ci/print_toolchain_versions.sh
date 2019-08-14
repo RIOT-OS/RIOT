@@ -5,21 +5,17 @@ get_cmd_version() {
         return
     fi
 
-    local cmd="$1"
-    if command -v "$cmd" 2>&1 >/dev/null; then
-        ver=$("$cmd" --version 2> /dev/null | head -n 1)
-        # some tools (eg. openocd) print version info to stderr
-        if [ -z "$ver" ]; then
-            ver=$("$cmd" --version 2>&1 | head -n 1)
-        fi
-        if [ -z "$ver" ]; then
-            ver="error"
-        fi
-    else
-        ver="missing"
+    VERSION_RAW=$( ($@ --version) 2>&1)
+    ERR=$?
+    VERSION=$(echo "$VERSION_RAW" | head -n 1)
+
+    if [ $ERR -eq 127 ] ; then # 127 means command not found
+        VERSION="missing"
+    elif [ $ERR -ne 0 ] ; then
+        VERSION="error: ${VERSION}"
     fi
 
-    printf "%s" "$ver"
+    printf "%s" "$VERSION"
 }
 
 get_define() {
@@ -115,7 +111,6 @@ for c in \
          cmake \
          cppcheck \
          doxygen \
-         flake8 \
          git \
          make \
          openocd \
@@ -123,8 +118,9 @@ for c in \
          python2 \
          python3 \
          ; do
-    printf "%23s: %s\n" "$c" "$(get_cmd_version $c)"
+    printf "%23s: %s\n" "$c" "$(get_cmd_version "${c}")"
 done
+printf "%23s: %s\n" "flake8" "$(get_cmd_version "python3 -Wignore -m flake8")"
 printf "%23s: %s\n" "coccinelle" "$(get_cmd_version spatch)"
 
 exit 0
