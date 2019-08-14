@@ -89,6 +89,13 @@ int cc110x_apply_config(cc110x_t *dev, const cc110x_config_t *conf,
     return cc110x_full_calibration(dev);
 }
 
+static void _set_tx_power(cc110x_t *dev, cc110x_tx_power_t power)
+{
+    uint8_t frend0 = 0x10 | (uint8_t)power;
+    cc110x_write(dev, CC110X_REG_FREND0, frend0);
+    dev->tx_power = power;
+}
+
 int cc110x_set_tx_power(cc110x_t *dev, cc110x_tx_power_t power)
 {
     DEBUG("[cc110x] Applying TX power setting at index %u\n", (unsigned)power);
@@ -114,9 +121,8 @@ int cc110x_set_tx_power(cc110x_t *dev, cc110x_tx_power_t power)
             return -EAGAIN;
     }
 
-    uint8_t frend0 = 0x10 | (uint8_t)power;
-    cc110x_write(dev, CC110X_REG_FREND0, frend0);
-    dev->tx_power = power;
+    _set_tx_power(dev, power);
+
     cc110x_release(dev);
     return 0;
 }
@@ -175,4 +181,48 @@ int cc110x_set_channel(cc110x_t *dev, uint8_t channel)
 
     dev->netdev.event_callback(&dev->netdev, NETDEV_EVENT_FHSS_CHANGE_CHANNEL);
     return 0;
+}
+
+int cc110x_wakeup(cc110x_t *dev)
+{
+    int err = cc110x_power_on_and_acquire(dev);
+
+    if (err) {
+        return err;
+    }
+
+    /* PA_TABLE is lost on SLEEP, see 10.6 in the CC1101 data sheet */
+    cc110x_burst_write(dev, CC110X_MULTIREG_PATABLE,
+                       dev->params.patable->data, CC110X_PATABLE_LEN);
+    _set_tx_power(dev, dev->tx_power);
+
+    cc110x_enter_rx_mode(dev);
+    cc110x_release(dev);
+    return 0;
+}
+
+void cc110x_sleep(cc110x_t *dev)
+{
+    cc110x_acquire(dev);
+    if (dev->state == CC110X_STATE_OFF) {
+        cc110x_release(dev);
+        return;
+    }
+
+    /*
+     * Datasheet page 9 table 4.
+     *
+     * To achieve the lowest power consumption GDO's must
+     * be programmed to 0x2F
+     */
+    cc110x_write(dev, CC110X_REG_IOCFG2, CC110X_GDO_CONSTANT_LOW);
+    cc110x_write(dev, CC110X_REG_IOCFG1, CC110X_GDO_CONSTANT_LOW);
+    cc110x_write(dev, CC110X_REG_IOCFG0, CC110X_GDO_CONSTANT_LOW);
+
+    /* transition to SLEEP only from state IDLE possible */
+    cc110x_cmd(dev, CC110X_STROBE_IDLE);
+    /* go to SLEEP */
+    cc110x_cmd(dev, CC110X_STROBE_OFF);
+    dev->state = CC110X_STATE_OFF;
+    cc110x_release(dev);
 }

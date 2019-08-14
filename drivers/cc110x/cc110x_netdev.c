@@ -248,17 +248,11 @@ static int cc110x_init(netdev_t *netdev)
     /* Make sure the crystal is stable and the chip ready. This is needed as
      * the reset is done via an SPI command, but the SPI interface must not be
      * used unless the chip is ready according to the data sheet. After the
-     * reset, a second call to cc110x_power_on() is needed to finally have
+     * reset, a second call to cc110x_power_on_and_acquire() is needed to finally have
      * the transceiver in a known state and ready for SPI communication.
      */
-    if (cc110x_power_on(dev)) {
+    if (cc110x_power_on_and_acquire(dev)) {
         DEBUG("[cc110x] netdev_driver_t::init(): Failed to pull CS pin low\n");
-        return -EIO;
-    }
-
-    if (cc110x_acquire(dev) != SPI_OK) {
-        DEBUG("[cc110x] netdev_driver_t::init(): Failed to setup/acquire SPI "
-              "interface\n");
         return -EIO;
     }
 
@@ -267,15 +261,9 @@ static int cc110x_init(netdev_t *netdev)
     cc110x_release(dev);
 
     /* Again, make sure the crystal is stable and the chip ready */
-    if (cc110x_power_on(dev)) {
+    if (cc110x_power_on_and_acquire(dev)) {
         DEBUG("[cc110x] netdev_driver_t::init(): Failed to pull CS pin low "
               "after reset\n");
-        return -EIO;
-    }
-
-    if (cc110x_acquire(dev) != SPI_OK) {
-        DEBUG("[cc110x] netdev_driver_t::init(): Failed to setup/acquire SPI "
-              "interface after reset\n");
         return -EIO;
     }
 
@@ -417,20 +405,23 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
     }
 
     switch (dev->state) {
-        case CC110X_STATE_FSTXON:
-            /* falls through */
-        case CC110X_STATE_RX_MODE:
-            break;
-        case CC110X_STATE_RECEIVING:
-            cc110x_release(dev);
-            DEBUG("[cc110x] netdev_driver_t::send(): Refusing to send while "
-                  "receiving a frame\n");
-            return -EBUSY;
-        default:
-            cc110x_release(dev);
-            DEBUG("[cc110x] netdev_driver_t::send(): Driver state %i prevents "
-                  "sending\n", (int)dev->state);
-            return -1;
+    case CC110X_STATE_FSTXON:
+        /* falls through */
+    case CC110X_STATE_RX_MODE:
+        break;
+    case CC110X_STATE_RECEIVING:
+        cc110x_release(dev);
+        DEBUG("[cc110x] netdev_driver_t::send(): Refusing to send while "
+              "receiving a frame\n");
+        return -EBUSY;
+    case CC110X_STATE_OFF:
+        cc110x_release(dev);
+        return -ENOTSUP;
+    default:
+        cc110x_release(dev);
+        DEBUG("[cc110x] netdev_driver_t::send(): Driver state %i prevents "
+              "sending\n", (int)dev->state);
+        return -1;
     }
 
     /* Copy data to send into frame buffer */

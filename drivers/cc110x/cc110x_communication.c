@@ -18,13 +18,16 @@
  */
 
 #include <errno.h>
+
+#include "cc110x.h"
+#include "cc110x_communication.h"
+#include "cc110x_constants.h"
+#include "cc110x_internal.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "xtimer.h"
-#include "cc110x.h"
-#include "cc110x_constants.h"
 
-int cc110x_power_on(cc110x_t *dev)
+int cc110x_power_on_and_acquire(cc110x_t *dev)
 {
     gpio_t cs = dev->params.cs;
 
@@ -32,9 +35,19 @@ int cc110x_power_on(cc110x_t *dev)
         return -EIO;
     }
     gpio_clear(cs);
-    xtimer_usleep(150);
+    xtimer_usleep(CC110X_WAKEUP_TIME_US);
     gpio_set(cs);
     spi_init_cs(dev->params.spi, dev->params.cs);
+
+    if (cc110x_acquire(dev) != SPI_OK) {
+        return -EIO;
+    }
+
+    while (cc110x_state_from_status(cc110x_status(dev)) != CC110X_STATE_IDLE) {
+        cc110x_cmd(dev, CC110X_STROBE_IDLE);
+        xtimer_usleep(CC110X_WAKEUP_TIME_US);
+    }
+
     return 0;
 }
 

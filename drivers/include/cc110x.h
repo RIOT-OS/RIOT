@@ -269,7 +269,7 @@ typedef enum {
      */
     CC110X_STATE_FRAME_READY        = 0x08,
     /**
-     * @brief   Frame received, waiting for upper layer to retrieve it
+     * @brief   Devices is powered down
      *
      * Transceiver is in SLEEP state. There is no matching representation in the
      * status byte, as reading the status byte will power up the transceiver in
@@ -643,6 +643,21 @@ int cc110x_set_channel(cc110x_t *dev, uint8_t channel);
  * @retval  -EIO    Communication with the transceiver failed
  */
 int cc110x_set_tx_power(cc110x_t *dev, cc110x_tx_power_t power);
+
+/**
+ * @brief   Wakes the transceiver from SLEEP mode and enters RX mode
+ *
+ * @retval  0       Success
+ * @retval  -EIO    Communication with the transceiver failed
+ */
+int cc110x_wakeup(cc110x_t *dev);
+
+/**
+ * @brief   Sets the transceiver into SLEEP mode.
+ *
+ * Only @ref cc110x_wakeup can awake the device again.
+ */
+void cc110x_sleep(cc110x_t *dev);
 
 #ifdef __cplusplus
 }
