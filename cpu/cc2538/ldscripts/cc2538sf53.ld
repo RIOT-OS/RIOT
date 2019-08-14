@@ -16,14 +16,12 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-INCLUDE cortexm_rom_offset.ld 
-
 /* Memory Space Definitions: */
 MEMORY
 {
-    rom (rx)    : ORIGIN = _rom_start_addr + _rom_offset, LENGTH = _fw_rom_length
+    rom (rx)    : ORIGIN = 0x00200000, LENGTH = 512K - 44
     cca         : ORIGIN = 0x0027ffd4, LENGTH = 44
-    ram (w!rx)  : ORIGIN = _ram_start_addr,               LENGTH = _ram_length
+    ram (w!rx)  : ORIGIN = 0x20000000, LENGTH = 32K
 }
 
 /* MCU Specific Section Definitions */

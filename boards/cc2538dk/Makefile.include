@@ -17,25 +17,14 @@ include $(RIOTMAKE)/tools/renode.inc.mk
 # debugger config
 DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
 DEBUGSERVER = JLinkGDBServer -device CC2538SF53
-RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
-
-# The entry point `cortex_vector_base` is defined in the cca field.
-# If the cca field is updated when flashing a slot then the entry 
-# point will never be the bootloader but the respective slot. This
-# ensures it never happens .
-ifneq (,$(filter riotboot,$(FEATURES_REQUIRED)))
-ifneq (riotboot,$(filter riotboot,$(APPLICATION)))
-  CFLAGS+=-DUPDATE_CCA=0
-endif
-endif
+RESET ?= $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 
 # Define the flash-tool and default port:
 export PROGRAMMER ?= cc2538-bsl
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
-	FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py 
-    FFLAGS  = $(if $(IMAGE_OFFSET), -a $(shell printf "0x%08x" $$(($(IMAGE_OFFSET) + $(ROM_START_ADDR)))))
-    FFLAGS += -p "$(PORT)" -w -v $(FLASHFILE)
+  FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
+  FFLAGS  = -p "$(PORT)" -e -w -v $(FLASHFILE)
 else ifeq ($(PROGRAMMER),jlink)
   FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
   FFLAGS  = $(BINDIR) $(FLASHFILE)

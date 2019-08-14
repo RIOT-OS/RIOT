@@ -43,7 +43,6 @@
 // The following are defines for the FLASH_CTRL register offsets.
 //
 //*****************************************************************************
-/*
 #define FLASH_CTRL_FCTL         0x400D3008  // Flash control This register 
                                             // provides control and monitoring 
                                             // functions for the flash module. 
@@ -84,7 +83,7 @@
                                             // this, as they are hardwired and 
                                             // are not part of the FLASH 
                                             // information page. 
-*/
+
 
 //*****************************************************************************
 //
