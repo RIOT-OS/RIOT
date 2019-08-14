@@ -218,6 +218,10 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
     I2C_TypeDef *i2c = i2c_config[dev].dev;
     DEBUG("[i2c] read_bytes: Starting\n");
 
+    /* Do not support repeated start reading */
+    if ((i2c->SR2 & I2C_SR2_BUSY) && !(flags & I2C_NOSTART)) {
+        return -EOPNOTSUPP;
+    }
     int ret = _start(i2c, (address << 1) | I2C_FLAG_READ, flags, length);
     if (ret < 0) {
         if (ret == -ETIMEDOUT) {
