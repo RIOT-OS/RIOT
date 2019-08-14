@@ -1,1 +1,3 @@
-INCLUDES += -I$(RIOTBASE)/pkg/zhe/include
+INCLUDES += -I$(PKGDIRBASE)/zhe/src
+INCLUDES += -I$(PKGDIRBASE)/zhe/example/platform
+INCLUDES += -I$(PKGDIRBASE)/zhe/example/configs/p2p
