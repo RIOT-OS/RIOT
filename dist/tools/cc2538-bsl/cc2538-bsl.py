@@ -624,9 +624,6 @@ class CommandInterface(object):
 # Complex commands section
 
     def writeMemory(self, addr, data):
-        mdebug(5, "Erasing %s bytes starting at address 0x%08X"
-            % (len(data), addr))
-        self.cmdEraseMemory(addr, len(data))
         lng = len(data)
         # amount of data bytes transferred per packet (theory: max 252 + 3)
         trsf_size = 248
