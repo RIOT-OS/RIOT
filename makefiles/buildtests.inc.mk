@@ -1,4 +1,4 @@
-.PHONY: buildtest
+.PHONY: buildtest buildtest-indocker
 
 BUILDTEST_MAKE_REDIRECT ?= >/dev/null 2>&1
 
@@ -24,4 +24,18 @@ buildtest:
 		fi; \
 	done ; \
 	$${RESULT}
+endif # BUILD_IN_DOCKER
+
+# Define 'buildtest-indocker' completely executed inside the container.
+# It prevents starting one container per compilation wich is slower but it
+# could hide errors where the host toolchain would be used
+ifeq ($(BUILD_IN_DOCKER),1)
+  buildtest-indocker: ..in-docker-container
+else
+ifeq ($(INSIDE_DOCKER),1)
+  buildtest-indocker: buildtest
+else
+  buildtest-indocker:
+	$(error $@ must be run with `BUILD_IN_DOCKER=1`)
+endif # INSIDE_DOCKER
 endif # BUILD_IN_DOCKER

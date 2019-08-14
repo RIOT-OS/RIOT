@@ -6,6 +6,7 @@ export DOCKER_FLAGS ?= --rm
 export DOCKER_MAKECMDGOALS_POSSIBLE = \
   all \
   buildtest \
+  buildtest-indocker \
   scan-build \
   scan-build-analyze \
   tests-% \
