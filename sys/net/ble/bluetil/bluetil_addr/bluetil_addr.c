@@ -23,7 +23,6 @@
 
 #include "fmt.h"
 #include "assert.h"
-#include "net/eui48.h"
 #include "net/bluetil/addr.h"
 
 static int _is_hex_char(char c)
@@ -48,8 +47,8 @@ void bluetil_addr_sprint(char *out, const uint8_t *addr)
     assert(out);
     assert(addr);
 
-    fmt_byte_hex(out, addr[5]);
-    for (int i = 4; i >= 0; i--) {
+    fmt_byte_hex(out, addr[0]);
+    for (unsigned i = 1; i < BLE_ADDR_LEN; i++) {
         out += 2;
         *out++ = ':';
         fmt_byte_hex(out, addr[i]);
@@ -94,17 +93,18 @@ void bluetil_addr_ipv6_l2ll_sprint(char *out, const uint8_t *addr)
     assert(out);
     assert(addr);
 
-    eui64_t iid;
-    eui48_to_ipv6_iid(&iid, (const eui48_t *)addr);
-    memcpy(out, "[FE80::", 6);
-    out += 6;
-    for (unsigned i = 0; i < 4; i++) {
-        *out++ = ':';
-        fmt_byte_hex(out, iid.uint8[i * 2]);
-        out += 2;
-        fmt_byte_hex(out, iid.uint8[(i * 2) + 1]);
-        out += 2;
-    }
+    memcpy(out, "[FE80::", 7);
+    out += 7;
+    out += fmt_byte_hex(out, addr[0]);
+    out += fmt_byte_hex(out, addr[1]);
+    *out++ = ':';
+    out += fmt_byte_hex(out, addr[2]);
+    memcpy(out, "FF:FE", 5);
+    out += 5;
+    out += fmt_byte_hex(out, addr[3]);
+    *out++ = ':';
+    out += fmt_byte_hex(out, addr[4]);
+    out += fmt_byte_hex(out, addr[5]);
     *out++ = ']';
     *out = '\0';
 }
