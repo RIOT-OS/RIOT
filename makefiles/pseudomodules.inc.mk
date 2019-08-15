@@ -53,6 +53,7 @@ PSEUDOMODULES += netstats_l2
 PSEUDOMODULES += netstats_ipv6
 PSEUDOMODULES += netstats_rpl
 PSEUDOMODULES += nimble
+PSEUDOMODULES += nimble_gatts_init
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
