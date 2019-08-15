@@ -25,6 +25,9 @@ endif
 ifneq (,$(filter shell_commands,$(USEMODULE)))
   DIRS += shell/commands
 endif
+ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
+  DIRS += test_utils/interactive_sync
+endif
 ifneq (,$(filter net_help,$(USEMODULE)))
   DIRS += net/crosslayer/net_help
 endif

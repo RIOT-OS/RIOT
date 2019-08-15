@@ -7,4 +7,6 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
                              nucleo-l031k6 nucleo-l053 nucleo-l053r8 \
                              stm32f0discovery stm32l0538-disco
 
+USEMODULE += test_utils_interactive_sync
+
 include $(RIOTBASE)/Makefile.include
