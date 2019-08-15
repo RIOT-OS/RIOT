@@ -33,6 +33,16 @@ static int _is_hex_char(char c)
             ((c >= 'a') && (c <= 'f')));
 }
 
+void bluetil_addr_swapped_cp(const uint8_t *src, uint8_t *dst)
+{
+    dst[0] = src[5];
+    dst[1] = src[4];
+    dst[2] = src[3];
+    dst[3] = src[2];
+    dst[4] = src[1];
+    dst[5] = src[0];
+}
+
 void bluetil_addr_sprint(char *out, const uint8_t *addr)
 {
     assert(out);

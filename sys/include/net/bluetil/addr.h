@@ -40,6 +40,15 @@ extern "C" {
 #define BLUETIL_IPV6_IID_STRLEN     (28U)
 
 /**
+ * @brief   Copy address and swap the byte order in the target buffer
+ *
+ * @param[in] src       buffer with source address, *must* hold BLE_ADDR_LEN
+ *                      bytes
+ * @param[out] dst      target buffer, *must* be able to hold BLE_ADDR_LEN bytes
+ */
+void bluetil_addr_swapped_cp(const uint8_t *src, uint8_t *dst);
+
+/**
  * @brief   Convert the given BLE address to a human readable string
  *
  * @param[out] out      '\0' terminated address string, *must* be able to hold
