@@ -16,6 +16,12 @@
  */
 
 /**
+ * @defgroup    drivers_multimedia Multimedia Device Drivers
+ * @ingroup     drivers
+ * @brief       Drivers for external multimedia devices.
+ */
+
+/**
  * @defgroup    drivers_netdev Network Device Drivers
  * @ingroup     drivers
  * @brief       Drivers for external network devices.
