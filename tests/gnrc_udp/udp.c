@@ -87,7 +87,6 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
     uint16_t port;
     ipv6_addr_t addr;
     size_t data_len;
-
     /* get interface, if available */
     iface = ipv6_addr_split_iface(addr_str);
     if ((iface < 0) && (gnrc_netif_numof() == 1)) {
@@ -126,7 +125,7 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
             puts("Error: unable to allocate UDP header");
             gnrc_pktbuf_release(payload);
             return;
-        }
+        }      
         /* allocate IPv6 header */
         ip = gnrc_ipv6_hdr_build(udp, NULL, &addr);
         if (ip == NULL) {
@@ -137,7 +136,11 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
         /* add netif header, if interface was given */
         if (iface > 0) {
             gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-
+            if(netif == NULL) {
+                puts("Error: unable to allocate NETIF header");
+                gnrc_pktbuf_release(payload);
+                return;
+            }
             ((gnrc_netif_hdr_t *)netif->data)->if_pid = (kernel_pid_t)iface;
             LL_PREPEND(ip, netif);
         }
@@ -256,3 +259,4 @@ int udp_cmd(int argc, char **argv)
     }
     return 0;
 }
+
