@@ -37,6 +37,7 @@
 
 #include "cpu.h"
 #include "mutex.h"
+#include "byteorder.h"
 
 #include "cpu_conf_stm32_common.h"
 
@@ -168,6 +169,10 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
     /* As a higher level function we know the bus should be free */
     if (i2c->ISR & I2C_ISR_BUSY) {
         return -EAGAIN;
+    }
+    /* Handle endianess of register if 16 bit */
+    if (flags & I2C_REG16) {
+        reg = htons(reg); /* Make sure register is in big-endian on I2C bus */
     }
     /* First set ADDR and register with no stop */
     /* No RELOAD should be set so repeated start is valid */
