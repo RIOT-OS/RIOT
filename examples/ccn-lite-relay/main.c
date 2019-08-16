@@ -31,13 +31,8 @@
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
-/* 10kB buffer for the heap should be enough for everyone */
-#define TLSF_BUFFER     (10240 / sizeof(uint32_t))
-static uint32_t _tlsf_heap[TLSF_BUFFER];
-
 int main(void)
 {
-    tlsf_add_global_pool(_tlsf_heap, sizeof(_tlsf_heap));
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     puts("Basic CCN-Lite example");

@@ -14,12 +14,15 @@ RIOTBASE ?= $(CURDIR)/../..
 # development process:
 DEVELHELP ?= 1
 
+# Configure CCN-lite
 CFLAGS += -DUSE_LINKLAYER
 CFLAGS += -DUSE_RONR
 CFLAGS += -DCCNL_UAPI_H_
 CFLAGS += -DUSE_SUITE_NDNTLV
 CFLAGS += -DNEEDS_PREFIX_MATCHING
 CFLAGS += -DNEEDS_PACKET_CRAFTING
+# 10kB buffer for the heap should be enough for everyone
+CFLAGS += -DTLSF_MALLOC_HEAPSIZE=10240
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
