@@ -20,6 +20,11 @@
 
 #include "auto_init.h"
 
+#ifdef MODULE_TLSF_MALLOC
+#include "tlsf-malloc.h"
+static uint8_t _tlsf_pool[TLSF_MALLOC_HEAPSIZE];
+#endif
+
 #ifdef MODULE_MCI
 #include "diskio.h"
 #endif
@@ -93,6 +98,10 @@
 
 void auto_init(void)
 {
+#ifdef MODULE_TLSF_MALLOC
+    /* NOTE: this should be initialized before any other modules */
+    tlsf_add_global_pool(_tlsf_pool, sizeof(_tlsf_pool));
+#endif
 #ifdef MODULE_PRNG
     void auto_init_random(void);
     auto_init_random();
