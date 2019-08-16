@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
- *               2017 HAW Hamburg
+ *               2017 - 2019 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,12 +8,12 @@
  */
 
 /**
- * @defgroup    drivers_tmp006 TI TMP006 Infrared Thermopile Sensor
+ * @defgroup    drivers_tmp00x TMP006/TMP007 Infrared Thermopile Sensor
  * @ingroup     drivers_sensors
  * @ingroup     drivers_saul
- * @brief       Driver for the Texas Instruments TMP006 sensor.
+ * @brief       Driver for the Texas Instruments TMP00X sensor.
  *
- * The TI TMP006 (Infrared Thermopile Contactless Temperature Sensor) measures
+ * The TI TMP00X (Infrared Thermopile Contactless Temperature Sensor) measures
  * the temperature of an object without need of direct contact with the object.
  * After initialization the sensor can be set active for periodic measurements.
  * <br> The conversion duration depends on oversample ratio. The oversample
@@ -64,20 +64,21 @@
  *          c_{\mathrm{2}} &=& 13.4
  *      \f}
  *
- * The calculation and constants are wrapped from TI TMP006 User's Guide SBOU107.
+ * The calculation and constants are wrapped from TI TMP00X User's Guide SBOU107.
  *
  * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
- * @brief       Interface definition for the TMP006 sensor driver.
+ * @brief       Interface definition for the TMP00X sensor driver.
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
 
-#ifndef TMP006_H
-#define TMP006_H
+#ifndef TMP00X_H
+#define TMP00X_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -88,18 +89,21 @@ extern "C"
 {
 #endif
 
+#define BUS                         (dev->p.i2c) /**< BUS */
+#define ADDR                        (dev->p.addr) /**< ADDR */
+
 /**
- * @brief   TMP006 Default Address
+ * @brief   TMP00X Default Address
  */
-#ifndef TMP006_I2C_ADDRESS
-#define TMP006_I2C_ADDRESS         (0x41)
+#ifndef TMP00X_I2C_ADDRESS
+#define TMP00X_I2C_ADDRESS         (0x40)
 #endif
 
 /**
  * @brief   Default Conversion Time in us
  */
-#ifndef TMP006_CONVERSION_TIME
-#define TMP006_CONVERSION_TIME     (1E6)
+#ifndef TMP00X_CONVERSION_TIME
+#define TMP00X_CONVERSION_TIME     (1E6)
 #endif
 
 /**
@@ -107,11 +111,11 @@ extern "C"
  *
  * If set to 0, the device will be always-on
  * If set to 1, the device will be put in low power mode between measurements.
- * This adds a @c TMP006_CONVERSION_TIME us delay to each measurement call
+ * This adds a @c TMP00X_CONVERSION_TIME us delay to each measurement call
  * for bringing the device out of standby.
  */
-#ifndef TMP006_USE_LOW_POWER
-#define TMP006_USE_LOW_POWER (0)
+#ifndef TMP00X_USE_LOW_POWER
+#define TMP00X_USE_LOW_POWER (0)
 #endif
 
 /**
@@ -120,37 +124,36 @@ extern "C"
  * If set to 0, measurements will be converted to Celsius.
  * If set to 1, raw adc readings will be returned.
  */
-#ifndef TMP006_USE_RAW_VALUES
-#define TMP006_USE_RAW_VALUES (0)
+#ifndef TMP00X_USE_RAW_VALUES
+#define TMP00X_USE_RAW_VALUES (0)
 #endif
 
 /**
  * @name    Conversion rate and AVG sampling configuration
  * @{
  */
-#define TMP006_CONFIG_CR_AS1       (0x00)   /**< Conversion Time 0.25s, AVG Samples: 1 */
-#define TMP006_CONFIG_CR_AS2       (0x01)   /**< Conversion Time 0.5s, AVG Samples: 2 */
-#define TMP006_CONFIG_CR_AS4       (0x02)   /**< Conversion Time 1s, AVG Samples: 4 */
-#define TMP006_CONFIG_CR_AS8       (0x03)   /**< Conversion Time 2s, AVG Samples: 8 */
-#define TMP006_CONFIG_CR_AS16      (0x04)   /**< Conversion Time 4s, AVG Samples: 16 */
-#define TMP006_CONFIG_CR_DEF       TMP006_CONFIG_CR_AS4 /**< Default for Testing */
-/** @} */
+#define TMP00X_CONFIG_CR_AS1       (0x00)   /**< Conversion Time 0.25s, AVG Samples: 1 */
+#define TMP00X_CONFIG_CR_AS2       (0x01)   /**< Conversion Time 0.5s, AVG Samples: 2 */
+#define TMP00X_CONFIG_CR_AS4       (0x02)   /**< Conversion Time 1s, AVG Samples: 4 */
+#define TMP00X_CONFIG_CR_AS8       (0x03)   /**< Conversion Time 2s, AVG Samples: 8 */
+#define TMP00X_CONFIG_CR_AS16      (0x04)   /**< Conversion Time 4s, AVG Samples: 16 */
+#define TMP00X_CONFIG_CR_DEF       TMP00X_CONFIG_CR_AS4 /**< Default for Testing */
 
 /**
- * @name    Constants for TMP006 calibration
+ * @name    Constants for TMP00X calibration
  * @{
  */
-#ifndef TMP006_CCONST_S0
-#define TMP006_CCONST_S0           (6.4E-14)    /**< Calibration Factor */
+#ifndef TMP00X_CCONST_S0
+#define TMP00X_CCONST_S0           (6.4E-14)    /**< Calibration Factor */
 #endif
-#define TMP006_CCONST_A1           (1.75E-3)    /**< Constant \f$a_{\mathrm{1}}\f$ */
-#define TMP006_CCONST_A2           (-1.678E-5)  /**< Constant \f$a_{\mathrm{2}}\f$ */
-#define TMP006_CCONST_TREF         (298.15)     /**< Constant \f$T_{\mathrm{REF}}\f$ */
-#define TMP006_CCONST_B0           (-2.94E-5)   /**< Constant \f$b_{\mathrm{0}}\f$ */
-#define TMP006_CCONST_B1           (-5.7E-7)    /**< Constant \f$b_{\mathrm{1}}\f$ */
-#define TMP006_CCONST_B2           (4.63E-9)    /**< Constant \f$b_{\mathrm{2}}\f$ */
-#define TMP006_CCONST_C2           (13.4)       /**< Constant \f$c_{\mathrm{2}}\f$ */
-#define TMP006_CCONST_LSB_SIZE     (156.25E-9)  /**< Sensor Voltage Register LSB Size */
+#define TMP00X_CCONST_A1           (1.75E-3)    /**< Constant \f$a_{\mathrm{1}}\f$ */
+#define TMP00X_CCONST_A2           (-1.678E-5)  /**< Constant \f$a_{\mathrm{2}}\f$ */
+#define TMP00X_CCONST_TREF         (298.15)     /**< Constant \f$T_{\mathrm{REF}}\f$ */
+#define TMP00X_CCONST_B0           (-2.94E-5)   /**< Constant \f$b_{\mathrm{0}}\f$ */
+#define TMP00X_CCONST_B1           (-5.7E-7)    /**< Constant \f$b_{\mathrm{1}}\f$ */
+#define TMP00X_CCONST_B2           (4.63E-9)    /**< Constant \f$b_{\mathrm{2}}\f$ */
+#define TMP00X_CCONST_C2           (13.4)       /**< Constant \f$c_{\mathrm{2}}\f$ */
+#define TMP00X_CCONST_LSB_SIZE     (156.25E-9)  /**< Sensor Voltage Register LSB Size */
 /** @} */
 
 /**
@@ -160,48 +163,48 @@ typedef struct {
     i2c_t   i2c;        /**< I2C device, the sensor is connected to */
     uint8_t addr;       /**< the sensor's slave address on the I2C bus */
     uint8_t rate;       /**< number of averaged samples */
-} tmp006_params_t;
+} tmp00x_params_t;
 
 /**
- * @brief   Device descriptor for TMP006 sensors.
+ * @brief   Device descriptor for TMP00X sensors.
  */
 typedef struct {
-    tmp006_params_t p;  /**< Configuration parameters */
-} tmp006_t;
+    tmp00x_params_t p;  /**< Configuration parameters */
+} tmp00x_t;
 
 /**
- * @brief   TMP006 specific return values
+ * @brief   TMP00X specific return values
  */
 enum {
-    TMP006_OK,          /**< Success, no error */
-    TMP006_ERROR_BUS,   /**< I2C bus error */
-    TMP006_ERROR_DEV,   /**< internal device error */
-    TMP006_ERROR_CONF,  /**< invalid device configuration */
-    TMP006_ERROR,       /**< general error */
+    TMP00X_OK,          /**< Success, no error */
+    TMP00X_ERROR_BUS,   /**< I2C bus error */
+    TMP00X_ERROR_DEV,   /**< internal device error */
+    TMP00X_ERROR_CONF,  /**< invalid device configuration */
+    TMP00X_ERROR,       /**< general error */
 };
 
 /**
- * @brief   Initialize the TMP006 sensor driver.
+ * @brief   Initialize the TMP00X sensor driver.
  *
  * @param[out] dev          device descriptor of sensor to initialize
  * @param[in]  params       configuration parameters
  *
  * @return                  0 on success
- * @return                  -TMP006_ERROR_BUS on I2C bus error
- * @return                  -TMP006_ERROR_DEV if sensor test failed
- * @return                  -TMP006_ERROR_CONF if sensor configuration failed
+ * @return                  -TMP00X_ERROR_BUS on I2C bus error
+ * @return                  -TMP00X_ERROR_DEV if sensor test failed
+ * @return                  -TMP00X_ERROR_CONF if sensor configuration failed
  */
-int tmp006_init(tmp006_t *dev, const tmp006_params_t *params);
+int tmp00x_init(tmp00x_t *dev, const tmp00x_params_t *params);
 
 /**
- * @brief   Reset the TMP006 sensor, afterwards it should be reinitialized.
+ * @brief   Reset the TMP00X sensor, afterwards it should be reinitialized.
  *
  * @param[out] dev          device descriptor of sensor
  *
  * @return                  0 on success
  * @return                  -1 on error
  */
-int tmp006_reset(const tmp006_t *dev);
+int tmp00x_reset(const tmp00x_t *dev);
 
 /**
  * @brief   Set active mode, this enables periodic measurements.
@@ -211,7 +214,7 @@ int tmp006_reset(const tmp006_t *dev);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int tmp006_set_active(const tmp006_t *dev);
+int tmp00x_set_active(const tmp00x_t *dev);
 
 /**
  * @brief   Set standby mode.
@@ -221,7 +224,7 @@ int tmp006_set_active(const tmp006_t *dev);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int tmp006_set_standby(const tmp006_t *dev);
+int tmp00x_set_standby(const tmp00x_t *dev);
 
 /**
  * @brief   Read sensor's data.
@@ -234,7 +237,7 @@ int tmp006_set_standby(const tmp006_t *dev);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int tmp006_read(const tmp006_t *dev, int16_t *rawv, int16_t *rawt, uint8_t *drdy);
+int tmp00x_read(const tmp00x_t *dev, int16_t *rawv, int16_t *rawt, uint16_t *drdy);
 
 /**
  * @brief   Convert raw sensor values to temperature.
@@ -244,7 +247,7 @@ int tmp006_read(const tmp006_t *dev, int16_t *rawv, int16_t *rawt, uint8_t *drdy
  * @param[out] tamb         converted ambient temperature
  * @param[out] tobj         converted object temperature
  */
-void tmp006_convert(int16_t rawv, int16_t rawt,  float *tamb, float *tobj);
+void tmp00x_convert(int16_t rawv, int16_t rawt,  float *tamb, float *tobj);
 
 /**
  * @brief   Convenience function to get ambient and object temperatures in [°C]
@@ -255,11 +258,11 @@ void tmp006_convert(int16_t rawv, int16_t rawt,  float *tamb, float *tobj);
  * @param[out] ta           converted ambient temperature
  * @param[out] to           converted object temperature
  */
-int tmp006_read_temperature(const tmp006_t *dev, int16_t *ta, int16_t *to);
+int tmp00x_read_temperature(const tmp00x_t *dev, int16_t *ta, int16_t *to);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* TMP006_H */
+#endif /* TMP00X_H */
 /** @} */

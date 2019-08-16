@@ -504,8 +504,8 @@ void auto_init(void)
     auto_init_tcs37727();
 #endif
 #ifdef MODULE_TMP006
-    extern void auto_init_tmp006(void);
-    auto_init_tmp006();
+    extern void auto_init_tmp00x(void);
+    auto_init_tmp00x();
 #endif
 #ifdef MODULE_TSL2561
     extern void auto_init_tsl2561(void);
