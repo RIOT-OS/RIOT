@@ -44,6 +44,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief   The global pool will be initialized with a buffer of this size
+ *          during system initialization (auto-init)
+ */
+#ifndef TLSF_MALLOC_HEAPSIZE
+#define TLSF_MALLOC_HEAPSIZE        (4096U)
+#endif
+
+/**
  * @brief Struct to hold the total sizes of free and used blocks
  * Used for @ref tlsf_size_walker()
  */
