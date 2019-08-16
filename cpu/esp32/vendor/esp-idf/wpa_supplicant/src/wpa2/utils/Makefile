@@ -1,4 +1,4 @@
-MODULE=esp_idf_wpa_supplicant_crypto
+MODULE=esp_idf_wpa_supplicant_wpa2_utils
 
 include $(RIOTBASE)/Makefile.base
 

@@ -7,6 +7,11 @@ FLASH_MODE ?= dout
 # SPECIAL module dependencies
 # cannot be done in Makefile.dep since Makefile.dep is included too late
 
+ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_wifi_enterprise
+  USEMODULE += esp_wifi
+endif
+
 ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
   ifneq (,$(filter lwip,$(USEMODULE)))
     # for lwip, use esp_wifi as default netdev if no other netdev is enabled
