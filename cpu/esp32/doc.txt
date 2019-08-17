@@ -203,52 +203,43 @@ The implementation of RIOT-OS for ESP32 SOCs has the following limitations at th
 Following software components are required for compilation:
 
 - <b>Xtensa GCC</b> compiler suite for ESP32
-- <b>ESP-IDF</b> SDK which includes all ESP32 SOC definitions, the hardware abstraction library <b>```libhal.a```</b>, and the flash programmer tool <b>```esptool.py```</b>
+- <b>ESP-IDF</b> SDK which includes all ESP32 SOC definitions and the hardware
+abstraction library <b>`libhal.a`</b>
+- ESP flash programmer tool <b>`esptool.py`</b>
 
 There are two options to install the Toolchain:
 
-- <b>riotdocker</b> image, see section [RIOT Docker Toolchain (riotdocker)](#esp32_riot_docker_toolchain)
+- using a <b>riotdocker</b> image, see section [RIOT Docker Toolchain (riotdocker)](#esp32_riot_docker_toolchain)
 - <b>manual installation</b>, see section [Manual Toolchain Installation](#esp32_manual_toolchain_installation)
+
+In both cases, the ESP flash programmer tool `esptool.py` has to be installed.
 
 ## <a name="esp32_riot_docker_toolchain"> RIOT Docker Toolchain (riotdocker) </a> &nbsp;[[TOC](#esp32_toc)]
 
-The easiest way to use install the toolchain is the RIOT Docker image ```riotdocker```. The compilation process using Docker consists of two steps
+The easiest way to use install the toolchain is the RIOT Docker image
+`riotdocker`. The compilation process using Docker consists of two steps
 
-1. making the RIOT application in Docker with command ```make BOARD= ...```
-2. flashing the RIOT application on the host computer with command ```make flash-only BOARD=...```
+1. making the RIOT application in Docker with command `make BOARD= ...`
+2. flashing the RIOT application on the host computer with command `make flash-only BOARD=...`
 
-where step 2 requires that the flasher program ```esptool.py``` is installed.
+where step 2 requires that the ESP flash programmer tool `esptool.py` is installed.
 
 ### <a name="esp32_preparing_the_environment"> Preparing the Environment </a> &nbsp;[[TOC](#esp32_toc)]
 
-Using RIOT Docker requires at least the following software:
+Using RIOT Docker requires at least the following software components:
 
-- <b>```Docker```</b> container virtualization software
-- RIOT Docker (<b>```riotdocker```</b>) image
-- flasher tool <b>```esptool.py```</b>
+- <b>`Docker`</b> container virtualization software
+- RIOT Docker (<b>`riotdocker`</b>) image
+- ESP flash programmer tool <b>`esptool.py`</b>
 
-For information about installing Docker on your host, refer to the appropriate manuals for your operating system. For example, the easiest way to install Docker on the Ubuntu/Debian system is:
+For information about installing Docker on your host, refer to the appropriate
+manuals for your operating system. For example, the easiest way to install Docker on the Ubuntu/Debian system is:
 ```
 sudo apt-get install docker.io
 ```
 
-The ESP flasher program <b>```esptool.py```</b> is available at [GitHub](https://github.com/espressif/esptool). Don't use the the ```esptool``` package of your OS. ```esptool.py``` requires either Python 2.7 or Python 3.4 or later. The latest stable version of ```esptool.py``` can be installed with ```pip```:
-```
-pip install esptool
-```
-
-<b>```esptool.py```</b> depends on ```pySerial``` which can be installed either using ```pip```
-
-```
-pip install pyserial
-```
-or the package manager of your OS, for example on Debian/Ubuntu systems:
-```
-apt-get install pyserial
-```
-For more information on ```esptool.py```, please refer the [git repository](https://github.com/espressif/esptool)
-
-Please make sure that ```esptool.py``` is in your ```PATH``` variable.
+For information on how to install `esptool.py`, see section
+[Installation of `esptool.py`](#esp32_installation_of_esptool).
 
 ### <a name="esp32_generating_docker_image"> Generating a riotdocker Image </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -283,6 +274,7 @@ or the [riot/riotbuild](https://hub.docker.com/r/riot/riotbuild/) Docker image (
 cd /path/to/RIOT
 docker run -i -t --privileged -v /dev:/dev -u $UID -v $(pwd):/data/riotbuild riot/riotbuild
 ```
+
 ### <a name="esp32_flashing_using_docker"> Make Process with Docker Image </a> &nbsp;[[TOC](#esp32_toc)]
 
 Using Docker, the make process consists of the following two steps:
@@ -346,6 +338,41 @@ Since we only use a few header files, ESP-IDF does not need to be compiled in an
 export ESP32_SDK_DIR=$HOME/esp/esp-idf
 ```
 
+### <a name="esp32_installation_of_esptool"> Installation of `esptool.py` (ESP flash programmer tool) </a> &nbsp;[[TOC](#esp32_toc)]
+
+The minumum required version of the ESP flash programmer tool
+<b>`esptool.py`</b> is version <b>2.2</b>. If your OS bundles a package with at
+least this version, you can simply use the package manager of your OS to
+install `esptool.py`, for example on Debian/Ubuntu systems:
+
+```
+apt-get install esptool
+```
+
+Otherwise, you have to install the latest stable version of `esptool.py` either
+from [GitHub](https://github.com/espressif/esptool) or using the `pip` command:
+
+```
+pip install esptool
+```
+
+`esptool.py` requires either Python 2.7, Python 3.4 or later. Furthermore,
+it depends on ```pySerial``` which can be installed either using ```pip```
+
+```
+pip install pyserial
+```
+
+or the package manager of your OS, for example on Debian/Ubuntu systems:
+
+```
+apt-get install pyserial
+```
+
+For more information on `esptool.py`, please refer the
+[git repository](https://github.com/espressif/esptool)
+
+Please make sure that `esptool.py` is in your `PATH` variable.
 
 # <a name="esp32_flashing_the_device"> Flashing the Device </a> &nbsp;[[TOC](#esp32_toc)]
 
