@@ -235,16 +235,24 @@ void rtc_unlock(void)
     /* unlock RTC */
     RTC->WPR = WPK1;
     RTC->WPR = WPK2;
+}
+
+static inline void rtc_enter_init_mode(void)
+{
     /* enter RTC init mode */
     RTC_REG_ISR |= RTC_ISR_INIT;
     while (!(RTC_REG_ISR & RTC_ISR_INITF)) {}
 }
 
-void rtc_lock(void)
+static inline void rtc_exit_init_mode(void)
 {
     /* exit RTC init mode */
     RTC_REG_ISR &= ~RTC_ISR_INIT;
     while (RTC_REG_ISR & RTC_ISR_INITF) {}
+}
+
+static inline void rtc_lock(void)
+{
     /* lock RTC device */
     RTC->WPR = 0xff;
     /* disable backup clock domain */
@@ -266,32 +274,35 @@ void rtc_init(void)
 #endif
     stmclk_dbp_lock();
 
-    /* enable low frequency clock */
-    stmclk_enable_lfclk();
+    if (!(RTC_REG_ISR & RTC_ISR_INITS))
+    {
+        /* enable low frequency clock */
+        stmclk_enable_lfclk();
 
-    /* select input clock and enable the RTC */
-    stmclk_dbp_unlock();
+        /* select input clock and enable the RTC */
+        stmclk_dbp_unlock();
 #if defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL)
-    periph_clk_en(APB1, RCC_APB1ENR1_RTCAPBEN);
+        periph_clk_en(APB1, RCC_APB1ENR1_RTCAPBEN);
 #elif defined(CPU_FAM_STM32G0)
-    periph_clk_en(APB1, RCC_APBENR1_RTCAPBEN);
+        periph_clk_en(APB1, RCC_APBENR1_RTCAPBEN);
 #elif defined(CPU_FAM_STM32U5)
-    periph_clk_en(APB3, RCC_APB3ENR_RTCAPBEN);
+        periph_clk_en(APB3, RCC_APB3ENR_RTCAPBEN);
 #endif
-    EN_REG &= ~(CLKSEL_MASK);
+        EN_REG &= ~(CLKSEL_MASK);
 #if IS_ACTIVE(CONFIG_BOARD_HAS_LSE)
-    EN_REG |= (CLKSEL_LSE | EN_BIT);
+        EN_REG |= (CLKSEL_LSE | EN_BIT);
 #else
-    EN_REG |= (CLKSEL_LSI | EN_BIT);
+        EN_REG |= (CLKSEL_LSI | EN_BIT);
 #endif
 
-    rtc_unlock();
-    /* reset configuration */
-    RTC->CR = 0;
-    RTC_REG_ISR = RTC_ISR_INIT;
-    /* configure prescaler (RTC PRER) */
-    RTC->PRER = (PRE_SYNC | (PRE_ASYNC << 16));
-    rtc_lock();
+        rtc_unlock();
+        /* reset configuration */
+        RTC->CR = 0;
+        RTC_REG_ISR = RTC_ISR_INIT;
+        /* configure prescaler (RTC PRER) */
+        RTC->PRER = (PRE_SYNC | (PRE_ASYNC << 16));
+        rtc_lock();
+    }
 
     /* configure the EXTI channel, as RTC interrupts are routed through it.
      * Needs to be configured to trigger on rising edges. */
@@ -311,13 +322,14 @@ int rtc_set_time(struct tm *time)
     rtc_tm_normalize(time);
 
     rtc_unlock();
-
+    rtc_enter_init_mode();
     RTC->DR = (val2bcd((time->tm_year - YEAR_OFFSET), RTC_DR_YU_Pos, DR_Y_MASK) |
                val2bcd(time->tm_mon + 1,  RTC_DR_MU_Pos, DR_M_MASK) |
                val2bcd(time->tm_mday, RTC_DR_DU_Pos, DR_D_MASK));
     RTC->TR = (val2bcd(time->tm_hour, RTC_TR_HU_Pos, TR_H_MASK) |
                val2bcd(time->tm_min,  RTC_TR_MNU_Pos, TR_M_MASK) |
                val2bcd(time->tm_sec,  RTC_TR_SU_Pos, TR_S_MASK));
+    rtc_exit_init_mode();
     rtc_lock();
     while (!(RTC_REG_ISR & RTC_ISR_RSF)) {}
 
