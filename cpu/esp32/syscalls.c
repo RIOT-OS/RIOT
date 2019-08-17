@@ -91,8 +91,12 @@ int IRAM puts(const char *s)
     if (!s) {
         return EOF;
     }
-    ets_printf("%s\n", s);
-    return strlen(s);
+    int len = strlen(s);
+    for (int i = 0; i < len; i++) {
+        __wrap_putchar(s[i]);
+    }
+    __wrap_putchar('\n');
+    return len;
 }
 
 char _printf_buf[PRINTF_BUFSIZ];
@@ -105,7 +109,9 @@ int IRAM printf(const char* format, ...)
     int ret = vsnprintf(_printf_buf, PRINTF_BUFSIZ, format, arglist);
 
     if (ret > 0) {
-        ets_printf (_printf_buf);
+        for (int i = 0; i < ret; i++) {
+            __wrap_putchar(_printf_buf[i]);
+        }
     }
 
     va_end(arglist);
