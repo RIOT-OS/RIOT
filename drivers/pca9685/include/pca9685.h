@@ -10,6 +10,7 @@
  * @defgroup    drivers_pca9685 PCA9685 16-channel, 12-bit PWM Fm+ I²C-bus controller
  * @ingroup     drivers_pca9685
  * @brief       Device driver interface for the PCA9685 16-channel, 12-bit PWM Fm+ I²C-bus controller
+ * Implementation based on https://github.com/adafruit/Adafruit-PWM-Servo-Driver-Library
  * @{
  *
  * @file
