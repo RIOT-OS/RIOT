@@ -25,7 +25,7 @@ export DOCKER_MAKECMDGOALS ?= all
 # List of all exported environment variables that shall be passed on to the
 # Docker container, they will only be passed if they are set from the
 # environment, not if they are only default Makefile values.
-export DOCKER_ENV_VARS = \
+export DOCKER_ENV_VARS += \
   APPDIR \
   AR \
   ARFLAGS \
