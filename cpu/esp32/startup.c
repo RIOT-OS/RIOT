@@ -279,12 +279,6 @@ static NORETURN void IRAM system_init (void)
     /* Disable the hold flag of all RTC GPIO pins */
     RTCCNTL.hold_force.val = 0;
 
-    /* initialize newlib data structure */
-    esp_reent_init(_GLOBAL_REENT);
-    _GLOBAL_REENT->_stdin  = (FILE*) &__sf_fake_stdin;
-    _GLOBAL_REENT->_stdout = (FILE*) &__sf_fake_stdout;
-    _GLOBAL_REENT->_stderr = (FILE*) &__sf_fake_stderr;
-
     /* execute constructors */
     do_global_ctors();
 
@@ -294,16 +288,12 @@ static NORETURN void IRAM system_init (void)
     /* init random number generator */
     srand(hwrand());
 
-    #if defined(MODULE_NEWLIB_SYSCALLS_DEFAULT)
     /*
      * initialization as it should be called from newlibc (includes the
      * execution of stdio_init)
     */
     extern void _init(void);
     _init();
-    #elif defined(MODULE_STDIO_UART)
-    stdio_init();
-    #endif
 
     /* add SPI RAM to heap if enabled */
     #if CONFIG_SPIRAM_SUPPORT && CONFIG_SPIRAM_BOOT_INIT

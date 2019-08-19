@@ -68,7 +68,7 @@ USEMODULE += esp_idf_driver
 USEMODULE += esp_idf_esp32
 USEMODULE += esp_idf_soc
 USEMODULE += log
-USEMODULE += newlib_syscalls_default
+USEMODULE += newlib
 USEMODULE += periph
 USEMODULE += periph_adc_ctrl
 USEMODULE += periph_hwrng
@@ -141,11 +141,6 @@ LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.peripherals.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.nanofmt.ld
 LINKFLAGS += -nostdlib -lgcc -Wl,-gc-sections
-
-ifneq (,$(filter stdio_uart,$(USEMODULE)))
-    LINKFLAGS += -Wl,-wrap,putchar
-    LINKFLAGS += -Wl,-wrap,getchar
-endif
 
 # The ELFFILE is the base one used for flashing
 FLASHFILE ?= $(ELFFILE)

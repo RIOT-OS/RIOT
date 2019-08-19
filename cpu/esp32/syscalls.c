@@ -64,61 +64,6 @@
 
 #define MHZ 1000000UL
 
-#ifdef MODULE_STDIO_UART
-#include "stdio_uart.h"
-
-int IRAM __wrap_putchar(int c)
-{
-    char tmp = c;
-    if (stdio_write(&tmp, 1) > 0) {
-        return c;
-    }
-    return -EOF;
-}
-
-int IRAM __wrap_getchar(void)
-{
-    char tmp;
-    if (stdio_read(&tmp, 1) > 0) {
-        return tmp;
-    }
-    return -EOF;
-}
-#endif /* MODULE_STDIO_UART */
-
-int IRAM puts(const char *s)
-{
-    if (!s) {
-        return EOF;
-    }
-    int len = strlen(s);
-    for (int i = 0; i < len; i++) {
-        __wrap_putchar(s[i]);
-    }
-    __wrap_putchar('\n');
-    return len;
-}
-
-char _printf_buf[PRINTF_BUFSIZ];
-
-int IRAM printf(const char* format, ...)
-{
-    va_list arglist;
-    va_start(arglist, format);
-
-    int ret = vsnprintf(_printf_buf, PRINTF_BUFSIZ, format, arglist);
-
-    if (ret > 0) {
-        for (int i = 0; i < ret; i++) {
-            __wrap_putchar(_printf_buf[i]);
-        }
-    }
-
-    va_end(arglist);
-
-    return ret;
-}
-
 #ifndef MODULE_PTHREAD
 
 #define PTHREAD_CANCEL_DISABLE 1
@@ -273,15 +218,6 @@ void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t count, size_t size)
     return result;
 }
 
-#ifndef MODULE_NEWLIB_SYSCALLS_DEFAULT
-/* this should not happen when MODULE_ESP_IDF_HEAP is activated since heap_caps
-   doesn't use _sbrk_r to allocate memory blocks */
-void* _sbrk_r (struct _reent *r, ptrdiff_t sz)
-{
-    _exit(ENOSYS);
-}
-#endif /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
-
 #else /* MODULE_ESP_IDF_HEAP */
 
 /* for compatibiliy with ESP-IDF heap functions */
@@ -304,48 +240,8 @@ void* IRAM heap_caps_realloc( void *ptr, size_t size )
 
 extern uint8_t  _eheap;     /* end of heap (defined in esp32.common.ld) */
 extern uint8_t  _sheap;     /* start of heap (defined in esp32.common.ld) */
+extern uint8_t *heap_top;   /* current top of heap as defined in newlib_syscalls_default */
 
-#ifdef MODULE_NEWLIB_SYSCALLS_DEFAULT
-
-extern uint8_t *heap_top;
-#define _cheap heap_top
-
-#else /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
-
-static uint8_t* _cheap = 0; /* last allocated chunk of heap */
-
-void* IRAM _sbrk_r (struct _reent *r, ptrdiff_t incr)
-{
-    uint8_t* _cheap_old;
-
-    /* initial _cheap */
-    if (_cheap == NULL) {
-        _cheap = &_sheap;
-    }
-
-    /* save old _cheap */
-    _cheap_old = _cheap;
-
-    /* check whether _cheap + incr overflows the heap */
-    if (_cheap + incr >= &_eheap) {
-        r->_errno = ENOMEM;
-        return (caddr_t)-1;
-    }
-
-    /* set new _cheap */
-    _cheap += incr;
-
-    #if ENABLE_DEBUG
-    uint32_t remaining = &_eheap - _cheap;
-    printf ("%s %i byte allocated in %p .. %p, remaining %u\n",
-             __func__, incr, _cheap_old, _cheap, remaining);
-    #endif
-
-    /* return allocated memory */
-    return (caddr_t) _cheap_old;
-}
-
-#endif /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
 #endif /* MODULE_ESP_IDF_HEAP */
 
 unsigned int IRAM get_free_heap_size (void)
@@ -353,7 +249,7 @@ unsigned int IRAM get_free_heap_size (void)
     #if MODULE_ESP_IDF_HEAP
     return heap_caps_get_free_size( MALLOC_CAP_DEFAULT );
     #else
-    return &_eheap - ((_cheap) ? _cheap : &_sheap);
+    return &_eheap - ((heap_top) ? heap_top : &_sheap);
     #endif
 }
 
@@ -364,39 +260,6 @@ uint32_t esp_get_free_heap_size( void ) __attribute__((alias("get_free_heap_size
 /**
  * @name Other system functions
  */
-
-#ifndef MODULE_NEWLIB_SYSCALLS_DEFAULT
-
-int _getpid_r(struct _reent *r)
-{
-    return sched_active_pid;
-}
-
-int _kill_r(struct _reent *r, int pid, int sig)
-{
-    DEBUG("%s: system function not yet implemented\n", __func__);
-    r->_errno = ESRCH;  /* no such process */
-    return -1;
-}
-
-void _exit(int __status)
-{
-    ets_printf("#! exit %d: powering off\n", __status);
-    pm_off();
-    while(1);
-}
-
-clock_t IRAM_ATTR _times_r(struct _reent *r, struct tms *ptms)
-{
-    ptms->tms_cstime = 0;
-    ptms->tms_cutime = 0;
-    ptms->tms_stime = system_get_time() / (US_PER_SEC / CLK_TCK);
-    ptms->tms_utime = 0;
-
-    return ptms->tms_stime / MHZ;
-}
-
-#endif /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
 
 void _abort(void)
 {
@@ -441,8 +304,8 @@ static struct syscall_stub_table s_stub_table =
     ._kill_r = &_kill_r,
 
     ._times_r = &_times_r,
-    #ifdef MODULE_NEWLIB_SYSCALLS_DEFAULT
     ._gettimeofday_r = _gettimeofday_r,
+
     ._open_r = &_open_r,
     ._close_r = &_close_r,
     ._lseek_r = (int (*)(struct _reent *r, int, int, int))&_lseek_r,
@@ -451,17 +314,6 @@ static struct syscall_stub_table s_stub_table =
     ._write_r = (int (*)(struct _reent *r, int, const void *, int))&_write_r,
     ._read_r = (int (*)(struct _reent *r, int, void *, int))&_read_r,
     ._unlink_r = &_unlink_r,
-    #else /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
-    ._gettimeofday_r = (int (*)(struct _reent *r, struct timeval *, void *))&_no_sys_func,
-    ._open_r = (int (*)(struct _reent *r, const char *, int, int))&_no_sys_func,
-    ._close_r = (int (*)(struct _reent *r, int))&_no_sys_func,
-    ._lseek_r = (int (*)(struct _reent *r, int, int, int))&_no_sys_func,
-    ._fstat_r = (int (*)(struct _reent *r, int, struct stat *))&_no_sys_func,
-    ._stat_r = (int (*)(struct _reent *r, const char*, struct stat *))&_no_sys_func,
-    ._write_r = (int (*)(struct _reent *r, int, const void *, int))&_no_sys_func,
-    ._read_r = (int (*)(struct _reent *r, int, void *, int))&_no_sys_func,
-    ._unlink_r = (int (*)(struct _reent *r, const char*))&_no_sys_func,
-    #endif /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
     ._link_r = (int (*)(struct _reent *r, const char*, const char*))&_no_sys_func,
     ._rename_r = (int (*)(struct _reent *r, const char*, const char*))&_no_sys_func,
 
@@ -475,6 +327,7 @@ static struct syscall_stub_table s_stub_table =
     ._lock_try_acquire_recursive = &_lock_try_acquire_recursive,
     ._lock_release = &_lock_release,
     ._lock_release_recursive = &_lock_release_recursive,
+
     #if CONFIG_NEWLIB_NANO_FORMAT
     ._printf_float = &_printf_float,
     ._scanf_float = &_scanf_float,
