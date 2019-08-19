@@ -28,6 +28,19 @@
 #include "tlsf-malloc.h"
 #include "tlsf-malloc-internal.h"
 
+/*
+ * On native the linker dos not define the Heap area.
+ * It is handled by the C library (it requests memory from the OS ??)
+ * TODO: make this configurable
+ */
+static char _sheap[TLSF_NATIVE_HEAPSIZE];
+
+/* Define the initialization function */
+void init_tlsf_malloc(void)
+{
+    tlsf_add_global_pool(_sheap, ROUND_DOWN4(TLSF_NATIVE_HEAPSIZE));
+}
+
 /* TODO: Add defines for other compilers */
 #if defined(__GNUC__) && !defined(__clang__)    /* Clang supports __GNUC__ but
                                                  * not the alloc_size()

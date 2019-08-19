@@ -4,6 +4,7 @@ include ../Makefile.tests_common
 
 # The bug is not fixed yet, so blacklist this test.
 TEST_ON_CI_BLACKLIST += all
+TEST_ON_CI_WHITELIST += native samr21-xpro
 
 USEMODULE += tlsf-malloc
 
