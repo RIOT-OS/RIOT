@@ -70,18 +70,20 @@ export DOCKER_ENV_VARS += \
 # DOCKER_ENVIRONMENT_CMDLINE must be immediately assigned (:=) or otherwise some
 # of the environment variables will be overwritten by Makefile.include and their
 # origin is changed to "file"
-DOCKER_ENVIRONMENT_CMDLINE := $(foreach varname,$(DOCKER_ENV_VARS), \
+DOCKER_ENVIRONMENT_CMDLINE_AUTO := $(foreach varname,$(DOCKER_ENV_VARS), \
   $(if $(filter environment command,$(origin $(varname))), \
   -e '$(varname)=$(subst ','\'',$($(varname)))', \
   ))
-DOCKER_ENVIRONMENT_CMDLINE := $(strip $(DOCKER_ENVIRONMENT_CMDLINE))
+DOCKER_ENVIRONMENT_CMDLINE += $(strip $(DOCKER_ENVIRONMENT_CMDLINE_AUTO))
+
+
 # The variables set on the command line will also be passed on the command line
 # in Docker
-DOCKER_OVERRIDE_CMDLINE := $(foreach varname,$(DOCKER_ENV_VARS), \
+DOCKER_OVERRIDE_CMDLINE_AUTO := $(foreach varname,$(DOCKER_ENV_VARS), \
     $(if $(filter command,$(origin $(varname))), \
     '$(varname)=$($(varname))', \
     ))
-DOCKER_OVERRIDE_CMDLINE := $(strip $(DOCKER_OVERRIDE_CMDLINE))
+DOCKER_OVERRIDE_CMDLINE += $(strip $(DOCKER_OVERRIDE_CMDLINE_AUTO))
 
 # Overwrite if you want to use `docker` with sudo
 DOCKER ?= docker
