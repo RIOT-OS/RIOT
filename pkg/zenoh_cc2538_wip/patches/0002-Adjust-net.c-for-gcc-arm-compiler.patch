@@ -1,0 +1,58 @@
+From 1a8f70d455b67b6af059183276a991a8ef13735e Mon Sep 17 00:00:00 2001
+From: Brenton Chetty <brent7984@gmail.com>
+Date: Mon, 19 Aug 2019 14:39:05 +0200
+Subject: [PATCH] Adjust net.c for gcc-arm compiler
+
+---
+ src/unix/net.c | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
+
+diff --git a/src/unix/net.c b/src/unix/net.c
+index 17535b5..75d845a 100644
+--- a/src/unix/net.c
++++ b/src/unix/net.c
+@@ -13,6 +13,8 @@
+ 
+ #include "zenoh.h"
+ #include "zenoh/net.h"
++//~ Brenton added the line below, works for native
++#define MSG_NOSIGNAL	0x4000
+ 
+ z_socket_result_t
+ open_tx_session(const char *locator) {
+@@ -106,19 +108,20 @@ int z_compute_remaining(struct iovec* iov, int iovcnt, size_t sent) {
+ 
+ int z_send_iovec(z_socket_t sock, struct iovec* iov, int iovcnt) {
+   int len = 0;
+-  for (int i = 0; i < iovcnt; ++i) 
++  for (int i = 0; i < iovcnt; ++i) {
+     len += iov[i].iov_len;
+-  
+-  int n = writev(sock, iov, iovcnt);
+-  Z_DEBUG_VA("z_send_iovec sent %d of %d bytes \n", n, len);
+-  while (n < len) {
+-    iovcnt = z_compute_remaining(iov, iovcnt, n);
+-    len = z_iovs_len(iov, iovcnt);    
+-    n = writev(sock, iov, iovcnt);
+-    Z_DEBUG_VA("z_send_iovec sent %d of %d bytes \n", n, len);
+-    if (n < 0) 
+-      return -1;    
+-  }
++	write(sock, iov[i].iov_base, iov[i].iov_len);
++  //~ printf("\n\nTest: %d\n\n",iov[i].iov_len);
++}
++  //~ Z_DEBUG_VA("z_send_iovec sent %d of %d bytes \n", n, len);
++  //~ while (n < len) {
++    //~ iovcnt = z_compute_remaining(iov, iovcnt, n);
++    //~ len = z_iovs_len(iov, iovcnt);    
++    //~ n = writev(sock, iov, iovcnt);
++    //~ Z_DEBUG_VA("z_send_iovec sent %d of %d bytes \n", n, len);
++    //~ if (n < 0) 
++      //~ return -1;    
++  //~ }
+   return 0;
+ }
+ int z_send_buf(z_socket_t sock, z_iobuf_t* buf) {
+-- 
+2.20.1
+

@@ -1,0 +1,1 @@
+INCLUDES += -I$(RIOTBASE)/pkg/zenoh_cc2538_wip/include

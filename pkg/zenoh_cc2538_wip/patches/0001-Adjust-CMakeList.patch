@@ -1,0 +1,71 @@
+From c9600f516155d005f1173d345618553822873525 Mon Sep 17 00:00:00 2001
+From: Brenton Chetty <brent7984@gmail.com>
+Date: Mon, 19 Aug 2019 14:22:40 +0200
+Subject: [PATCH] Adjust CMakeList
+
+---
+ CMakeLists.txt | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1853840..13650e9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -43,6 +43,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+   set(INSTALL_NAME_DIR "/usr/local/lib")
+   set(INSTALL_INCLUDE_NAME_DIR "/usr/local/include")
+   set(JNI_PLATFORM_NAME "linux")
++ elseif(CMAKE_SYSTEM_NAME STREQUAL "Generic")
++  message(STATUS "Configuring on/for Linux")
++  set(ZENOH_PLATFORM_OPT "-DZENOH_LINUX=1")  
++  set(INSTALL_RPATH "/usr/local/lib")
++  set(INSTALL_NAME_DIR "/usr/local/lib")
++  set(INSTALL_INCLUDE_NAME_DIR "/usr/local/include")
++  set(JNI_PLATFORM_NAME "linux")
+ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+   message(STATUS "Configuring on/for macOS")
+   set(ZENOH_PLATFORM_OPT "-DZENOH_MACOS=1")
+@@ -69,7 +76,8 @@ if (ZENOH_TRANSPORT_BLE STREQUAL "ON")
+ endif()
+ 
+ set(THREADS_PREFER_PTHREAD_FLAG ON)
+-find_package(Threads REQUIRED)
++#~ Use pthread from RIOT
++find_package(Threads)
+ 
+ 
+ set(CMAKE_C_STANDARD 99)
+@@ -83,6 +91,9 @@ if (NOT SWIG_JAVA)
+   file(GLOB PublicHeaders "include/**.h")
+   include_directories(
+       "${PROJECT_SOURCE_DIR}/include"
++  #~ Headers were copied from arm-linux-gnueabihf   
++      "${PROJECT_SOURCE_DIR}/../../../../../../pkg/zenoh_cc2538_wip/include/include"
++      
+     )
+ else()
+   set(Libname "zenohc_java")
+@@ -126,8 +137,8 @@ if (NOT SWIG_JAVA)
+    install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/zenoh DESTINATION ${INSTALL_INCLUDE_NAME_DIR})
+   endif()
+ 
+-
+-if (EXAMPLES)
++#~ disabled as pthread is not found during cmake build
++if (!EXAMPLES)
+   add_executable(z_pub example/z_pub.c)
+   add_executable(z_wd_pub example/z_wd_pub.c)
+   add_executable(z_sub example/z_sub.c)
+@@ -147,7 +158,8 @@ if (EXAMPLES)
+   target_link_libraries(z_sub_thr ${Libname})
+ endif(EXAMPLES)
+ 
+-if (TESTS)
++#~ disabled as pthread is not found during cmake build
++if (!TESTS)
+   add_executable(z_data_struct test/z_data_struct.c)
+   add_executable(z_mvar_test test/z_mvar_test.c)
+   add_executable(z_rname_test test/z_rname_test.c)
+-- 
+2.20.1
+
