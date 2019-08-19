@@ -73,6 +73,9 @@ void bluetil_addr_print(const uint8_t *addr);
 /**
  * @brief   Parse a BLE address from the given string
  *
+ * @note    The address is expected most significant byte first and is written
+ *          to @p addr in network byte order
+ *
  * @param[out] addr     buffer to write the BLE address, *must* be able to hold
  *                      @ref BLE_ADDR_LEN bytes
  * @param[in] addr_str  address string, must be at least of length

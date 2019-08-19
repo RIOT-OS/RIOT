@@ -78,12 +78,12 @@ uint8_t *bluetil_addr_from_str(uint8_t *addr, const char *addr_str)
         }
     }
 
-    unsigned pos = BLE_ADDR_LEN;
+    unsigned pos = 0;
     for (unsigned i = 0; i < (BLUETIL_ADDR_STRLEN - 1); i += 3) {
         if (!_is_hex_char(addr_str[i]) || !_is_hex_char(addr_str[i + 1])) {
             return NULL;
         }
-        addr[--pos] = fmt_hex_byte(addr_str + i);
+        addr[pos++] = fmt_hex_byte(addr_str + i);
     }
     return addr;
 }
