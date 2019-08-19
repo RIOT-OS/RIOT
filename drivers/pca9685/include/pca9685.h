@@ -92,6 +92,8 @@ int pca9685_init(pca9685_t *dev, const pca9685_params_t *params);
 int pca9685_set_ext_clk(pca9685_t *dev, uint8_t prescale);
 int pca9685_set_pwm_freq(pca9685_t *dev, float freq);
 
+int pca9685_set_output_mode(pca9685_t *dev, bool totempole);
+
 int pca9685_set_pwm(pca9685_t *dev, uint8_t num, uint16_t on, uint16_t off, bool acquire, bool keep_acquired);
 uint16_t pca9685_get_pwm(pca9685_t *dev, uint8_t num);
 

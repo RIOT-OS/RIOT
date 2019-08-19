@@ -130,6 +130,33 @@ int pca9685_set_pwm_freq(pca9685_t *dev, float freq) {
     return PCA9685_OK;
 }
 
+int pca9685_set_output_mode(pca9685_t *dev, bool totempole) {
+    uint8_t oldmode;
+
+    i2c_acquire(DEV_I2C);
+
+    if(i2c_read_reg(DEV_I2C, DEV_ADDR, PCA9685_MODE2, &oldmode, 0) != 0) {
+        i2c_release(DEV_I2C);
+        return -PCA9685_ERR_SETFREQ;
+    }
+
+    uint8_t newmode;
+    if (totempole) {
+        newmode = (oldmode&0x7F) | 0x04;
+    }
+    else {
+        newmode = (oldmode&0x7F) & ~0x04;
+    }
+
+    if(i2c_write_reg(DEV_I2C, DEV_ADDR, PCA9685_MODE2, newmode, 0) != 0) {
+        i2c_release(DEV_I2C);
+        return -PCA9685_ERR_SETFREQ;
+    }
+
+    i2c_release(DEV_I2C);
+    return PCA9685_OK;
+}
+
 int pca9685_set_pwm(pca9685_t *dev, uint8_t num, uint16_t on, uint16_t off, bool acquire, bool keep_acquired) {
     uint8_t onoff[4];
     onoff[0] = (uint8_t)on;
