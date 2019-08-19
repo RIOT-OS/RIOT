@@ -35,9 +35,6 @@ extern "C" {
 /** Necessary initializations of system call functions */
 void syscalls_init (void);
 
-/** System standard printf function */
-int printf(const char* format, ...);
-
 /** Determine free heap size */
 unsigned int get_free_heap_size (void);
 

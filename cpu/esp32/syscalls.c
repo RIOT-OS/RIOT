@@ -64,61 +64,6 @@
 
 #define MHZ 1000000UL
 
-#ifdef MODULE_STDIO_UART
-#include "stdio_uart.h"
-
-int IRAM __wrap_putchar(int c)
-{
-    char tmp = c;
-    if (stdio_write(&tmp, 1) > 0) {
-        return c;
-    }
-    return -EOF;
-}
-
-int IRAM __wrap_getchar(void)
-{
-    char tmp;
-    if (stdio_read(&tmp, 1) > 0) {
-        return tmp;
-    }
-    return -EOF;
-}
-#endif /* MODULE_STDIO_UART */
-
-int IRAM puts(const char *s)
-{
-    if (!s) {
-        return EOF;
-    }
-    int len = strlen(s);
-    for (int i = 0; i < len; i++) {
-        __wrap_putchar(s[i]);
-    }
-    __wrap_putchar('\n');
-    return len;
-}
-
-char _printf_buf[PRINTF_BUFSIZ];
-
-int IRAM printf(const char* format, ...)
-{
-    va_list arglist;
-    va_start(arglist, format);
-
-    int ret = vsnprintf(_printf_buf, PRINTF_BUFSIZ, format, arglist);
-
-    if (ret > 0) {
-        for (int i = 0; i < ret; i++) {
-            __wrap_putchar(_printf_buf[i]);
-        }
-    }
-
-    va_end(arglist);
-
-    return ret;
-}
-
 #ifndef MODULE_PTHREAD
 
 #define PTHREAD_CANCEL_DISABLE 1
