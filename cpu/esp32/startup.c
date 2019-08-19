@@ -279,12 +279,6 @@ static NORETURN void IRAM system_init (void)
     /* Disable the hold flag of all RTC GPIO pins */
     RTCCNTL.hold_force.val = 0;
 
-    /* initialize newlib data structure */
-    esp_reent_init(_GLOBAL_REENT);
-    _GLOBAL_REENT->_stdin  = (FILE*) &__sf_fake_stdin;
-    _GLOBAL_REENT->_stdout = (FILE*) &__sf_fake_stdout;
-    _GLOBAL_REENT->_stderr = (FILE*) &__sf_fake_stderr;
-
     /* execute constructors */
     do_global_ctors();
 

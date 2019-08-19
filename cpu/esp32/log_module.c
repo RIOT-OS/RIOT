@@ -25,7 +25,7 @@
 #include "log.h"
 #include "syscalls.h"
 
-extern char _printf_buf[PRINTF_BUFSIZ];
+char _printf_buf[PRINTF_BUFSIZ];
 bool _new_line = true;
 
 void log_write(unsigned level, const char *format, ...)
