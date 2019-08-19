@@ -339,13 +339,23 @@ esp_err_t IRAM_ATTR spi_flash_erase_range(size_t addr, size_t size)
     /* erase as many sectors as necessary */
     uint32_t sec = addr / _flashchip->sector_size;
     uint32_t cnt = size / _flashchip->sector_size;
+    uint32_t sec_per_block = _flashchip->block_size / _flashchip->sector_size;
 
-    while (cnt-- && result == ESP_ROM_SPIFLASH_RESULT_OK) {
+    while (cnt && result == ESP_ROM_SPIFLASH_RESULT_OK) {
         /* disable interrupts and the cache */
         critical_enter();
         Cache_Read_Disable(PRO_CPU_NUM);
 
-        result = esp_rom_spiflash_erase_sector (sec++);
+        /* erase block-wise (64 kByte) if cnt is at least sec_per_block */
+        if (cnt >= sec_per_block) {
+            result = esp_rom_spiflash_erase_block (sec / sec_per_block);
+            sec += sec_per_block;
+            cnt -= sec_per_block;
+        }
+        else {
+            result = esp_rom_spiflash_erase_sector (sec++);
+            cnt--;
+        }
 
         /* enable interrupts and the cache */
         Cache_Read_Enable(PRO_CPU_NUM);
