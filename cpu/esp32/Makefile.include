@@ -138,6 +138,10 @@ ifeq ($(QEMU), 1)
     CFLAGS += -DQEMU
 endif
 
+ifneq (,$(filter ssp,$(USEMODULE)))
+    CFLAGS  += -fstack-protector-strong
+endif
+
 # LINKFLAGS += -Wl,--verbose
 
 LINKFLAGS += -L$(ESP32_SDK_DIR)/components/esp32
