@@ -88,6 +88,9 @@ DOCKER_OVERRIDE_CMDLINE += $(strip $(DOCKER_OVERRIDE_CMDLINE_AUTO))
 # Overwrite if you want to use `docker` with sudo
 DOCKER ?= docker
 
+# 'make' arguments inside docker
+DOCKER_MAKE_ARGS += $(DOCKER_MAKECMDGOALS) $(DOCKER_OVERRIDE_CMDLINE)
+
 # Resolve symlink of /etc/localtime to its real path
 # This is a workaround for docker on macOS, for more information see:
 # https://github.com/docker/for-mac/issues/2396
@@ -272,4 +275,4 @@ DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),-v $(GIT_WORKTREE_COMMONDIR):
 	    $(DOCKER_VOLUMES_AND_ENV) \
 	    $(DOCKER_ENVIRONMENT_CMDLINE) \
 	    -w '$(DOCKER_APPDIR)' \
-	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKECMDGOALS) $(DOCKER_OVERRIDE_CMDLINE)
+	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKE_ARGS)
