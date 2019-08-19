@@ -7,8 +7,7 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-# USEMODULE += posix_headers
-
+USEMODULE += posix_time
 USEMODULE += pthread
 USEPKG += zenoh
 

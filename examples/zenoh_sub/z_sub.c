@@ -53,6 +53,6 @@ int main(void) {
   sm.kind = Z_PUSH_MODE;
   z_sub_p_result_t r = z_declare_subscriber(z, uri, &sm, listener, NULL);
   ASSERT_P_RESULT(r,"Unable to declare pub\n");
-  //sleep(60000);
+  sleep(60000);
   return 0;
 }

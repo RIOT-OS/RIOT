@@ -42,14 +42,14 @@ int main(void) {
 
   z_start_recv_loop(z);
   printf("Send Query...\n");
-  //while (1) {
+  while (1) {
 
     if (z_query(z, uri, "", reply_handler, NULL) != 0) {
       printf("Unable to query\n");
       return -1;
     }
-   // usleep(100000);
-  //}
+    usleep(100000);
+  }
   
   return 0;
 }

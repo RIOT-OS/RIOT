@@ -98,8 +98,8 @@ int main(void) {
   printf("Declaring Storage: %s\n", uri);
   z_declare_storage(z, uri, listener, query_handler, replies_cleaner, NULL);
 
- // while (1) { 
-   // sleep(1);
- // }
+  while (1) { 
+    sleep(1);
+  }
   return 0;
 }
