@@ -869,8 +869,8 @@ static void _i2c_reset_hw (i2c_t dev)
 void i2c_print_config(void)
 {
     for (unsigned dev = 0; dev < I2C_NUMOF; dev++) {
-        ets_printf("\tI2C_DEV(%d)\tscl=%d sda=%d\n",
-                   dev, i2c_config[dev].scl, i2c_config[dev].sda);
+        printf("\tI2C_DEV(%u)\tscl=%d sda=%d\n",
+               dev, i2c_config[dev].scl, i2c_config[dev].sda);
     }
 }
 

@@ -205,8 +205,8 @@ void uart_system_init (void)
 void uart_print_config(void)
 {
     for (unsigned uart = 0; uart < UART_NUMOF; uart++) {
-        ets_printf("\tUART_DEV(%d)\ttxd=%d rxd=%d\n", uart,
-                   uart_config[uart].txd, uart_config[uart].rxd);
+        printf("\tUART_DEV(%u)\ttxd=%d rxd=%d\n", uart,
+               uart_config[uart].txd, uart_config[uart].rxd);
     }
 }
 

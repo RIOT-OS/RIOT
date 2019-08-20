@@ -32,7 +32,6 @@
 #include "gpio_arch.h"
 
 #include "driver/periph_ctrl.h"
-#include "rom/ets_sys.h"
 #include "soc/gpio_struct.h"
 #include "soc/gpio_sig_map.h"
 #include "soc/mcpwm_reg.h"
@@ -437,11 +436,11 @@ static bool _pwm_configuration(void)
 void pwm_print_config(void)
 {
     for (unsigned pwm = 0; pwm < PWM_NUMOF; pwm++) {
-        ets_printf("\tPWM_DEV(%d)\tchannels=[ ", pwm);
+        printf("\tPWM_DEV(%d)\tchannels=[ ", pwm);
         for (int i = 0; i < _pwm_hw[pwm].gpio_num; i++) {
-            ets_printf("%d ", _pwm_hw[pwm].gpios[i]);
+            printf("%d ", _pwm_hw[pwm].gpios[i]);
         }
-        ets_printf("]\n");
+        printf("]\n");
     }
 }
 

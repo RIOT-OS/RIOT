@@ -125,7 +125,7 @@ void IRAM_ATTR spi_init (spi_t bus)
                     _spi[bus].signal_miso = VSPIQ_IN_IDX;
                     break;
         default:    LOG_TAG_ERROR("spi", "invalid SPI interface controller "
-                                         "used for SPI_DEV(%d)\n");
+                                         "used for SPI_DEV(%d)\n", bus);
                     break;
     }
     return;
@@ -361,11 +361,11 @@ static const char* _spi_names[] = { "CSPI", "FSPI", "HSPI", "VSPI"  };
 void spi_print_config(void)
 {
     for (unsigned bus = 0; bus < SPI_NUMOF; bus++) {
-        ets_printf("\tSPI_DEV(%d)\t%s ", bus, _spi_names[spi_config[bus].ctrl]);
-        ets_printf("sck=%d " , spi_config[bus].sck);
-        ets_printf("miso=%d ", spi_config[bus].miso);
-        ets_printf("mosi=%d ", spi_config[bus].mosi);
-        ets_printf("cs=%d\n" , spi_config[bus].cs);
+        printf("\tSPI_DEV(%u)\t%s ", bus, _spi_names[spi_config[bus].ctrl]);
+        printf("sck=%d " , spi_config[bus].sck);
+        printf("miso=%d ", spi_config[bus].miso);
+        printf("mosi=%d ", spi_config[bus].mosi);
+        printf("cs=%d\n" , spi_config[bus].cs);
     }
 }
 

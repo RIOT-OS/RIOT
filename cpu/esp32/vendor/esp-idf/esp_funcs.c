@@ -165,11 +165,11 @@ void spi_ram_init(void)
         _spi_ram_initialized = true;
     }
     else {
-        ets_printf("Failed to init external SPI RAM\n");
+        ESP_EARLY_LOGE("spi_ram", "Failed to init external SPI RAM\n");
         _spi_ram_initialized = false;
     }
     #else
-    ets_printf("External SPI RAM functions not enabled\n");
+    ESP_EARLY_LOGI("spi_ram", "External SPI RAM functions not enabled\n");
     #endif
 }
 
@@ -189,14 +189,14 @@ void spi_ram_heap_init(void)
     #if CONFIG_SPIRAM_USE_CAPS_ALLOC || CONFIG_SPIRAM_USE_MALLOC
     esp_err_t r=esp_spiram_add_to_heapalloc();
     if (r != ESP_OK) {
-        ets_printf("External SPI RAM could not be added to heap!\n");
+        ESP_EARLY_LOGE("spi_ram", "External SPI RAM could not be added to heap!\n");
         abort();
     }
 
     #if CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL
     r=esp_spiram_reserve_dma_pool(CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL);
     if (r != ESP_OK) {
-        ets_printf("Could not reserve internal/DMA pool!\n");
+        ESP_EARLY_LOGE("spi_ram", "Could not reserve internal/DMA pool!\n");
         abort();
     }
     #endif /* CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL */
@@ -208,7 +208,7 @@ void spi_ram_heap_init(void)
     #endif /* CONFIG_SPIRAM_USE_CAPS_ALLOC || CONFIG_SPIRAM_USE_MALLOC */
 
     #else  /* CONFIG_SPIRAM_SUPPORT */
-    ets_printf("External SPI RAM functions not enabled\n");
+    ESP_EARLY_LOGI("spi_ram", "External SPI RAM functions not enabled\n");
     #endif /* CONFIG_SPIRAM_SUPPORT */
 }
 
