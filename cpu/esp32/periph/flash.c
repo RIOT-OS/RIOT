@@ -457,7 +457,11 @@ static int _flash_write (mtd_dev_t *dev, const void *buff, uint32_t addr, uint32
     /* size must be within the flash address space */
     CHECK_PARAM_RET (_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
 
-    return (spi_flash_write(_flash_beg + addr, buff, size) == ESP_OK) ?(int)size : -EIO;
+    /* addr + size must be within a page */
+    CHECK_PARAM_RET (size <= _flashchip->page_size, -EOVERFLOW);
+    CHECK_PARAM_RET ((addr % _flashchip->page_size) + size <= _flashchip->page_size, -EOVERFLOW);
+
+    return (spi_flash_write(_flash_beg + addr, buff, size) == ESP_OK) ? (int)size : -EIO;
 }
 
 static int _flash_erase (mtd_dev_t *dev, uint32_t addr, uint32_t size)
@@ -470,8 +474,8 @@ static int _flash_erase (mtd_dev_t *dev, uint32_t addr, uint32_t size)
     CHECK_PARAM_RET (_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
 
     /* size must be a multiple of sector_size && at least one sector */
-    CHECK_PARAM_RET (size >= _flashchip->sector_size, -ENOTSUP);
-    CHECK_PARAM_RET (size % _flashchip->sector_size == 0, -ENOTSUP)
+    CHECK_PARAM_RET (size >= _flashchip->sector_size, -EOVERFLOW);
+    CHECK_PARAM_RET (size % _flashchip->sector_size == 0, -EOVERFLOW)
 
     return (spi_flash_erase_range(_flash_beg + addr, size) == ESP_OK) ? 0 : -EIO;
 }
