@@ -25,7 +25,7 @@ export DOCKER_MAKECMDGOALS ?= all
 # List of all exported environment variables that shall be passed on to the
 # Docker container, they will only be passed if they are set from the
 # environment, not if they are only default Makefile values.
-export DOCKER_ENV_VARS = \
+export DOCKER_ENV_VARS += \
   APPDIR \
   AR \
   ARFLAGS \
@@ -70,21 +70,26 @@ export DOCKER_ENV_VARS = \
 # DOCKER_ENVIRONMENT_CMDLINE must be immediately assigned (:=) or otherwise some
 # of the environment variables will be overwritten by Makefile.include and their
 # origin is changed to "file"
-DOCKER_ENVIRONMENT_CMDLINE := $(foreach varname,$(DOCKER_ENV_VARS), \
+DOCKER_ENVIRONMENT_CMDLINE_AUTO := $(foreach varname,$(DOCKER_ENV_VARS), \
   $(if $(filter environment command,$(origin $(varname))), \
   -e '$(varname)=$(subst ','\'',$($(varname)))', \
   ))
-DOCKER_ENVIRONMENT_CMDLINE := $(strip $(DOCKER_ENVIRONMENT_CMDLINE))
+DOCKER_ENVIRONMENT_CMDLINE += $(strip $(DOCKER_ENVIRONMENT_CMDLINE_AUTO))
+
+
 # The variables set on the command line will also be passed on the command line
 # in Docker
-DOCKER_OVERRIDE_CMDLINE := $(foreach varname,$(DOCKER_ENV_VARS), \
+DOCKER_OVERRIDE_CMDLINE_AUTO := $(foreach varname,$(DOCKER_ENV_VARS), \
     $(if $(filter command,$(origin $(varname))), \
     '$(varname)=$($(varname))', \
     ))
-DOCKER_OVERRIDE_CMDLINE := $(strip $(DOCKER_OVERRIDE_CMDLINE))
+DOCKER_OVERRIDE_CMDLINE += $(strip $(DOCKER_OVERRIDE_CMDLINE_AUTO))
 
 # Overwrite if you want to use `docker` with sudo
 DOCKER ?= docker
+
+# 'make' arguments inside docker
+DOCKER_MAKE_ARGS += $(DOCKER_MAKECMDGOALS) $(DOCKER_OVERRIDE_CMDLINE)
 
 # Resolve symlink of /etc/localtime to its real path
 # This is a workaround for docker on macOS, for more information see:
@@ -270,4 +275,4 @@ DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),-v $(GIT_WORKTREE_COMMONDIR):
 	    $(DOCKER_VOLUMES_AND_ENV) \
 	    $(DOCKER_ENVIRONMENT_CMDLINE) \
 	    -w '$(DOCKER_APPDIR)' \
-	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKECMDGOALS) $(DOCKER_OVERRIDE_CMDLINE)
+	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKE_ARGS)
