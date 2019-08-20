@@ -30,11 +30,11 @@ extern "C" {
  * @name    Configure connected CC1101 (radio) device
  * @{
  */
-#define CC110X_PARAM_SPI    SPI_DEV(0)              /**< SPI interface CC1101 is connected to */
-#define CC110X_PARAM_CS     GPIO_PIN(PORT_B, 12)    /**< CS pin of CC1101 */
-#define CC110X_PARAM_GDO0   GPIO_PIN(PORT_C, 4)     /**< GDO0 pin of CC1101 */
-#define CC110X_PARAM_GDO1   GPIO_PIN(PORT_A, 6)     /**< GDO1 pin of CC1101 */
-#define CC110X_PARAM_GDO2   GPIO_PIN(PORT_C, 5)     /**< GDO2 pin of CC1101 */
+#define CC110X_PARAM_SPI        SPI_DEV(0)              /**< SPI interface CC1101 is connected to */
+#define CC110X_PARAM_CS         GPIO_PIN(PORT_B, 12)    /**< CS pin of CC1101 */
+#define CC110X_PARAM_GDO0       GPIO_PIN(PORT_C, 4)     /**< GDO0 pin of CC1101 */
+#define CC110X_PARAM_GDO2       GPIO_PIN(PORT_C, 5)     /**< GDO2 pin of CC1101 */
+#define CC110X_PARAM_SPI_CLOCK  SPI_CLK_1MHZ            /**< SPI clock (reduced to work around hw bug) */
 /** @} */
 
 /**

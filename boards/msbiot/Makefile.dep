@@ -1,7 +1,7 @@
-# add driver for CC1101 sub-gigahertz transceiver as default netdev
 ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
-  USEMODULE += cc110x
+  USEMODULE += cc1101
 endif
+
 # add support for LEDs and buttons as default saul devices
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio

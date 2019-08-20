@@ -81,16 +81,18 @@ ifneq (,$(filter bm%280,$(USEMODULE)))
   USEMODULE += bmx280
 endif
 
-ifneq (,$(filter cc110x,$(USEMODULE)))
-  USEMODULE += ieee802154
+ifneq (,$(filter cc110%,$(USEMODULE)))
+  USEMODULE += cc110x
+  USEMODULE += cc1xxx_common
   USEMODULE += luid
+  USEMODULE += netif
   USEMODULE += xtimer
-  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-    USEMODULE += gnrc_cc110x
-  endif
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
+  ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan
+  endif
 endif
 
 ifneq (,$(filter cc2420,$(USEMODULE)))

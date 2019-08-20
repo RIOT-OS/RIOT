@@ -206,6 +206,11 @@ void auto_init(void)
     auto_init_mrf24j40();
 #endif
 
+#ifdef MODULE_CC110X
+    extern void auto_init_cc110x(void);
+    auto_init_cc110x();
+#endif
+
 #ifdef MODULE_CC2420
     extern void auto_init_cc2420(void);
     auto_init_cc2420();
@@ -246,11 +251,6 @@ void auto_init(void)
 #ifdef MODULE_SLIPDEV
     extern void auto_init_slipdev(void);
     auto_init_slipdev();
-#endif
-
-#ifdef MODULE_CC110X
-    extern void auto_init_cc110x(void);
-    auto_init_cc110x();
 #endif
 
 #ifdef MODULE_CC2538_RF
