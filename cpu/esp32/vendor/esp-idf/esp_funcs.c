@@ -96,7 +96,7 @@ uint32_t IRAM_ATTR esp_log_timestamp(void)
                         printf(LOG_COLOR_ ## letter "[%s] ", tag)
 #endif
 
-#if MODULE_ESP_LOG_COLOR
+#if MODULE_ESP_LOG_COLORED
 #define ESP_LOG_SUFFIX()  printf(LOG_RESET_COLOR)
 #else
 #define ESP_LOG_SUFFIX()

@@ -59,7 +59,7 @@ PSEUDOMODULES += esp_hw_counter
 PSEUDOMODULES += esp_i2c_sw
 PSEUDOMODULES += esp_i2c_hw
 PSEUDOMODULES += esp_idf_newlib
-PSEUDOMODULES += esp_log_color
+PSEUDOMODULES += esp_log_colored
 PSEUDOMODULES += esp_log_tagged
 PSEUDOMODULES += esp_spi_ram
 PSEUDOMODULES += esp_spiffs
@@ -136,7 +136,7 @@ ifeq ($(QEMU), 1)
     CFLAGS += -DQEMU
 endif
 
-ifneq (,$(filter esp_log_color,$(USEMODULE)))
+ifneq (,$(filter esp_log_colored,$(USEMODULE)))
     BOOTLOADER_BIN = bootloader_with_colors.bin
 else
     BOOTLOADER_BIN = bootloader_without_colors.bin

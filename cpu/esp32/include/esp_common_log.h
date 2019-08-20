@@ -33,7 +33,7 @@ extern "C" {
 
 extern uint32_t system_get_time_ms (void);
 
-#if MODULE_ESP_LOG_COLOR
+#if MODULE_ESP_LOG_COLORED
 
 #define LOG_COLOR_RED     "31"
 #define LOG_COLOR_GREEN   "32"
@@ -46,7 +46,7 @@ extern uint32_t system_get_time_ms (void);
 #define LOG_COLOR_D
 #define LOG_COLOR_V
 
-#else /* MODULE_ESP_LOG_COLOR */
+#else /* MODULE_ESP_LOG_COLORED */
 
 #define LOG_COLOR_E
 #define LOG_COLOR_W
@@ -55,7 +55,7 @@ extern uint32_t system_get_time_ms (void);
 #define LOG_COLOR_V
 #define LOG_RESET_COLOR
 
-#endif /* MODULE_ESP_LOG_COLOR */
+#endif /* MODULE_ESP_LOG_COLORED */
 
 #if MODULE_ESP_LOG_TAGGED
 
