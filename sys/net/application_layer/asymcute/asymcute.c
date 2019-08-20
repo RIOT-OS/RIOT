@@ -325,6 +325,7 @@ static void _on_connack(asymcute_con_t *con, const uint8_t *data, size_t len)
     if (data[2] == MQTTSN_ACCEPTED) {
         con->state = CONNECTED;
         /* start keep alive timer */
+        con->keepalive_retry_cnt = ASYMCUTE_N_RETRY;
         event_timeout_set(&con->keepalive_timer, KEEPALIVE_TO);
         ret = ASYMCUTE_CONNECTED;
     }
