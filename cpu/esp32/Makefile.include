@@ -59,6 +59,7 @@ PSEUDOMODULES += esp_hw_counter
 PSEUDOMODULES += esp_i2c_sw
 PSEUDOMODULES += esp_i2c_hw
 PSEUDOMODULES += esp_idf_newlib
+PSEUDOMODULES += esp_log_color
 PSEUDOMODULES += esp_spi_ram
 PSEUDOMODULES += esp_spiffs
 PSEUDOMODULES += esp_wifi_any
