@@ -576,4 +576,9 @@ void auto_init(void)
     auto_init_candev();
 
 #endif /* MODULE_AUTO_INIT_CAN */
+
+#ifdef MODULE_AUTO_INIT_MULTIMEDIA
+    DEBUG("auto_init MULTIMEDIA\n");
+
+#endif /* MODULE_AUTO_INIT_MULTIMEDIA */
 }
