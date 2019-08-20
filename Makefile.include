@@ -426,12 +426,14 @@ include $(RIOTMAKE)/boot/riotboot.mk
 elffile: $(ELFFILE)
 hexfile: $(HEXFILE)
 binfile: $(BINFILE)
-# # # FLASHFILE Being introduced, only supported if bsp define FLASHFILE # # #
-# # # Not all boards use this file for the moment
-#
 # FLASHFILE is the file used by the flasher
-# (can be overwritten to $(HEXFILE), $(BINFILE))
+# Usually set to $(ELFFILE), $(HEXFILE) or $(BINFILE) in the board/flasher
+# or application specific files
 flashfile: $(FLASHFILE)
+
+ifeq (,$(FLASHFILE))
+  $(error FLASHFILE is not defined for this board: $(FLASHFILE))
+endif
 
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)

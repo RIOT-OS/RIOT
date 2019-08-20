@@ -78,7 +78,7 @@ export PORT                  # The port to connect the TERMPROG to.
 export ELFFILE               # The unstripped result of the compilation.
 export HEXFILE               # The 'intel hex' stripped result of the compilation.
 # BINFILE                    # The 'binary' stripped result of the compilation.
-# FLASHFILE                  # The output file used for flashing (transition phase: only if defined)
+# FLASHFILE                  # The output file used for flashing
 # DEBUGGER                   # The command to call on "make debug", usually a script starting the GDB front-end.
 # DEBUGGER_FLAGS             # The parameters to supply to DEBUGGER.
 # DEBUGSERVER                # The command to call on "make debug-server", usually a script starting the GDB server.
