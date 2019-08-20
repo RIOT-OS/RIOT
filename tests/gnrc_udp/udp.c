@@ -87,6 +87,7 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
     uint16_t port;
     ipv6_addr_t addr;
     size_t data_len;
+    
     /* get interface, if available */
     iface = ipv6_addr_split_iface(addr_str);
     if ((iface < 0) && (gnrc_netif_numof() == 1)) {
@@ -136,6 +137,7 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
         /* add netif header, if interface was given */
         if (iface > 0) {
             gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+            
             if(netif == NULL) {
                 puts("Error: unable to allocate NETIF header");
                 gnrc_pktbuf_release(payload);
@@ -259,4 +261,3 @@ int udp_cmd(int argc, char **argv)
     }
     return 0;
 }
-
