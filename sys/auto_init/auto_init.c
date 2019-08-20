@@ -220,7 +220,6 @@ void auto_init(void)
         }
     }
 
-
     if (IS_USED(MODULE_AUTO_INIT_CAN)) {
         LOG_DEBUG("Auto init CAN.\n");
 
@@ -257,5 +256,9 @@ void auto_init(void)
         LOG_DEBUG("Auto init 6LoWPAN border router DHCPv6 client\n");
         extern void gnrc_dhcpv6_client_6lbr_init(void);
         gnrc_dhcpv6_client_6lbr_init();
+    }
+
+    if (IS_USED(MODULE_AUTO_INIT_MULTIMEDIA)) {
+        LOG_DEBUG("auto_init MULTIMEDIA\n");
     }
 }
