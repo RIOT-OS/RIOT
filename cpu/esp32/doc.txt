@@ -114,6 +114,8 @@ Module    | Default  | Short description
 [esp_hw_counter](#esp32_timers) | not used | use hardware counters for RIOT timers
 [esp_i2c_hw](#esp32_i2c_interfaces) | not used  | use the i2C hardware implementation
 [esp_idf_heap](#esp32_esp_idf_heap_implementation) | not used | enable ESP-IDF heap implementation
+[esp_log_colored](#esp32_esp_log_module) | not used | enable colored log output
+[esp_log_tagged](#esp32_esp_log_module) | not used | add additional information to the log output
 [esp_now](#esp32_esp_now_network_interface) | not used  | enable the ESP-NOW network device
 [esp_spi_ram](#esp32_spi_ram) | not used |  enable SPI RAM
 [esp_spiffs](#esp32_spiffs_device) | not used  |  enable SPIFFS for on-board flash memory
@@ -395,6 +397,8 @@ esp_eth | Enable the Ethernet MAC (EMAC) interface as `netdev` network device, s
 esp_gdb | Enable the compilation with debug information for debugging with [QEMU and GDB](#esp32_qemu_mode_and_gdb) (```QEMU=1```) or via [JTAG interface with OpenOCD](#esp32_jtag_debugging).
 esp_i2c_hw | Use the hardware I2C implementation, see section [I2C Interfaces](#esp32_i2c_interfaces).
 esp_idf_heap | Use the ESP-IDF heap implementation, see section [ESP-IDF Heap Implementation](#esp32_esp_idf_heap_implementation).
+esp_log_colored | Enable colored log output, see section [Log output](#esp32_esp_log_module).
+esp_log_tagged | Add additional information to the log output, see section [Log output](#esp32_esp_log_module).
 esp_now | Enable the built-in WiFi module with the ESP-NOW protocol as `netdev` network device, see section [ESP-NOW Network Interface](#esp32_esp_now_network_interface).
 esp_spiffs  | Enable the optional SPIFFS drive in on-board flash memory, see section [SPIFFS Device](#esp32_spiffs_device).
 esp_spi_ram | Enable the optional SPI RAM, see section [SPI RAM Modules](#esp32_spi_ram).
@@ -421,6 +425,41 @@ The flash mode determines whether 2 data lines (```dio``` and ```dout```) or 4 d
 
 For more information about these flash modes, refer the documentation of [esptool.py](https://github.com/espressif/esptool/wiki/SPI-Flash-Modes).
 
+## <a name="esp32_esp_log_module"> Log output </a> &nbsp;[[TOC](#esp32_toc)]
+
+The RIOT port for ESP32 implements a log module with a bunch of macros
+to generate log output according to the interface as defined in
+[system logging header](http://doc.riot-os.org/log_8h.html). These macros
+support colored and tagged log output.
+
+The colored log output is enabled by module `esp_log_colored`. If colored log
+output is enabled, log messages are displayed in color according to their type:
+Error messages are displayed in red, warnings in yellow, information
+messages in green and all other message types in standard color.
+
+When the `esp_log_tagged` module is used, all log messages are tagged with
+additional information: the type of message, the system time in ms, and the
+module or function in which the log message is generated. For example:
+
+```
+I (663) [main_trampoline] main(): This is RIOT! (Version: 2019.10-devel-437-gf506a)
+```
+
+Either the `LOG_*` macros as defined in
+[system logging header](http://doc.riot-os.org/log_8h.html) or the tagged
+version `LOG_TAG_*` of these macros can be used to produce tagged log output.
+If the `LOG_*` macros are used, the function which generates the log message
+is used in the tag while a `tag` parameter is used for the `LOG_TAG_*` macros.
+For example,
+```
+LOG_ERROR("error message");
+```
+generates a log message in which the name of the calling function is used as
+tag. With
+```
+LOG_TAG_ERROR("mod", "error message");
+```
+a log message with string `mod` in the tag is generated.
 
 ## <a name="esp32_esp_idf_heap_implementation"> ESP-IDF Heap Implementation </a> &nbsp;[[TOC](#esp32_toc)]
 
