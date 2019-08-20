@@ -57,6 +57,8 @@ extern uint32_t system_get_time_ms (void);
 
 #endif /* MODULE_ESP_LOG_COLOR */
 
+#if MODULE_ESP_LOG_TAGGED
+
 #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%d) [%s] " format LOG_RESET_COLOR
 
 #define LOG_TAG(level, letter, tag, format, ...) \
@@ -72,6 +74,28 @@ extern uint32_t system_get_time_ms (void);
                         ets_printf(LOG_FORMAT(letter, format), system_get_time_ms(), tag, ##__VA_ARGS__); \
                     } \
                 } while(0)
+
+#else /* MODULE_ESP_LOG_TAGGED */
+
+#define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter format LOG_RESET_COLOR
+
+#define LOG_TAG(level, letter, tag, format, ...) \
+                do { \
+                    (void)tag; \
+                    if ((unsigned)level <= (unsigned)LOG_LEVEL) { \
+                        printf(LOG_FORMAT(letter, format), ##__VA_ARGS__); \
+                    } \
+                } while (0U)
+
+#define LOG_TAG_EARLY(level, letter, tag, format, ...) \
+                do { \
+                    (void)tag; \
+                    if ((unsigned)level <= (unsigned)LOG_LEVEL) { \
+                        ets_printf(LOG_FORMAT(letter, format), ##__VA_ARGS__); \
+                    } \
+                } while (0U)
+
+#endif /* MODULE_ESP_LOG_TAGGED */
 
 /**
  * Override LOG_* definitions with a tagged version. By default the function
