@@ -320,7 +320,7 @@ endif
 
 # set some settings useful for continuous integration builds
 ifeq ($(RIOT_CI_BUILD),1)
-    RIOT_VERSION_OVERRIDE:=buildtest
+    RIOT_VERSION ?= buildtest
     ifneq ($(filter $(BOARD_INSUFFICIENT_MEMORY), $(BOARD)),)
         $(info CI-build: skipping link step)
         RIOTNOLINK:=1
@@ -352,6 +352,12 @@ include $(RIOTMAKE)/cflags.inc.mk
 
 include $(RIOTMAKE)/git_version.inc.mk
 RIOT_VERSION ?= $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
+
+# Deprecate using RIOT_VERSION_OVERRIDE but currently keep the behavior
+ifneq (,$(RIOT_VERSION_OVERRIDE))
+  $(warning 'RIOT_VERSION_OVERRIDE' is deprecated, it can now be set with 'RIOT_VERSION' directly.)
+  RIOT_VERSION = $(RIOT_VERSION_OVERRIDE)
+endif
 
 # Set module by prepending APPLICATION name with 'application_'.
 # It prevents conflict with application and modules with the same name.
@@ -726,12 +732,7 @@ $(RIOTBUILD_CONFIG_HEADER_C): FORCE
 # Immediate evaluation but keep CLAGS_WITH_MACROS deferred
 _CFLAGS := $(CFLAGS)
 CFLAGS_WITH_MACROS = $(_CFLAGS)
-
-ifneq (,$(RIOT_VERSION_OVERRIDE))
-  CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION_OVERRIDE)\"
-else
-  CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
-endif
+CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
 
 CFLAGS := $(patsubst -D%,,$(CFLAGS))
 CFLAGS := $(patsubst -U%,,$(CFLAGS))
