@@ -86,6 +86,22 @@ uint32_t IRAM_ATTR esp_log_timestamp(void)
     return system_get_time() / USEC_PER_MSEC;
 }
 
+
+#if MODULE_ESP_LOG_TAGGED
+#define ESP_LOG_PREFIX(letter, tag)  \
+                        printf(LOG_COLOR_ ## letter #letter " (%d) [%s] ", \
+                               system_get_time_ms(), tag)
+#else
+#define ESP_LOG_PREFIX(letter, tag)  \
+                        printf(LOG_COLOR_ ## letter "[%s] ", tag)
+#endif
+
+#if MODULE_ESP_LOG_COLOR
+#define ESP_LOG_SUFFIX()  printf(LOG_RESET_COLOR)
+#else
+#define ESP_LOG_SUFFIX()
+#endif
+
 /*
  * provided by: /path/to/esp-idf/component/log/log.c
  */
@@ -97,23 +113,16 @@ void IRAM_ATTR esp_log_write(esp_log_level_t level,
     }
 
     char _printf_buf[PRINTF_BUFSIZ];
-
     const char* prefix = (strchr (format, ':') + 2);
 
-    char lc = 'U';
     switch (level) {
         case LOG_NONE   : return;
-        case LOG_ERROR  : lc = 'E'; break;
-        case LOG_WARNING: lc = 'W'; break;
-        case LOG_INFO   : lc = 'I'; break;
-        case LOG_DEBUG  : lc = 'D'; break;
-        case LOG_ALL    : lc = 'V'; break;
+        case LOG_ERROR  : ESP_LOG_PREFIX(E, tag); break;
+        case LOG_WARNING: ESP_LOG_PREFIX(W, tag); break;
+        case LOG_INFO   : ESP_LOG_PREFIX(I, tag); break;
+        case LOG_DEBUG  : ESP_LOG_PREFIX(D, tag); break;
+        case LOG_ALL    : ESP_LOG_PREFIX(V, tag); break;
     }
-    #ifdef LOG_TAG_IN_BRACKETS
-    ets_printf("%c (%u) [%10s]: ", lc, system_get_time_ms(), tag);
-    #else
-    ets_printf("%c (%u) %10s: ", lc, system_get_time_ms(), tag);
-    #endif
 
     va_list arglist;
     va_start(arglist, format);
@@ -124,11 +133,13 @@ void IRAM_ATTR esp_log_write(esp_log_level_t level,
 
     int ret = vsnprintf(_printf_buf, PRINTF_BUFSIZ, prefix, arglist);
 
+    va_end(arglist);
+
     if (ret > 0) {
-        ets_printf (_printf_buf);
+        printf ("%s", _printf_buf);
     }
 
-    va_end(arglist);
+    ESP_LOG_SUFFIX();
 }
 
 /*
