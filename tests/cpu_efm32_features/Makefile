@@ -1,6 +1,5 @@
+BOARD ?= sltb001a
 include ../Makefile.tests_common
-
-BOARD = sltb001a
 
 BOARD_WHITELIST := ikea-tradfri \
                    slstk3401a \
