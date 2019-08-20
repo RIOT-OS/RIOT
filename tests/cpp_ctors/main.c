@@ -7,7 +7,6 @@
  */
 
 #include "embUnit.h"
-#include "embUnit/embUnit.h"
 #include "tests-cpp_ctors.h"
 #include "thread.h" /* For thread_getpid() */
 
@@ -57,7 +56,10 @@ Test *tests_cpp_ctors_tests(void)
     return (Test *)&cpp_tests;
 }
 
-void tests_cpp_ctors(void)
+int main(void)
 {
+    TESTS_START();
     TESTS_RUN(tests_cpp_ctors_tests());
+    TESTS_END();
+    return 0;
 }

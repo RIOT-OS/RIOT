@@ -20,14 +20,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-/**
- * @brief   The entry point of this test suite.
- */
-void tests_cpp(void);
-
-#ifdef __cplusplus
+    /* static test complains if this is not there */
 }
 #endif
 
