@@ -31,9 +31,18 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#if defined (CPU_SAML1X) || defined (CPU_SAMD5X)
+#define UART_HAS_TX_ISR
+#endif
+
 /**
- * @brief   Allocate memory to store the callback functions
+ * @brief   Allocate memory to store the callback functions & buffers
  */
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#include "tsrb.h"
+static tsrb_t uart_tx_rb[UART_NUMOF];
+static uint8_t uart_tx_rb_buf[UART_NUMOF][SAM0_UART_TXBUF_SIZE];
+#endif
 static uart_isr_ctx_t uart_ctx[UART_NUMOF];
 
 /**
@@ -56,6 +65,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* must disable here first to ensure idempotency */
     dev(uart)->CTRLA.reg &= ~(SERCOM_USART_CTRLA_ENABLE);
+
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    /* set up the TX buffer */
+    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], SAM0_UART_TXBUF_SIZE);
+#endif
 
     /* configure pins */
     if (uart_config[uart].rx_pin != GPIO_UNDEF) {
@@ -99,11 +113,13 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     if ((rx_cb) && (uart_config[uart].rx_pin != GPIO_UNDEF)) {
         uart_ctx[uart].rx_cb = rx_cb;
         uart_ctx[uart].arg = arg;
-#if defined (CPU_SAML1X) || defined (CPU_SAMD5X)
+#ifdef UART_HAS_TX_ISR
+        /* enable RXNE ISR */
         NVIC_EnableIRQ(SERCOM0_2_IRQn + (sercom_id(dev(uart)) * 4));
 #else
+        /* enable UART ISR */
         NVIC_EnableIRQ(SERCOM0_IRQn + sercom_id(dev(uart)));
-#endif
+#endif /* UART_HAS_TX_ISR */
         dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_RXEN;
         dev(uart)->INTENSET.reg |= SERCOM_USART_INTENSET_RXC;
         /* set wakeup receive from sleep if enabled */
@@ -111,6 +127,18 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_SFDE;
         }
     }
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#ifndef UART_HAS_TX_ISR
+    else {
+        /* enable UART ISR */
+        NVIC_EnableIRQ(SERCOM0_IRQn + sercom_id(dev(uart)));
+    }
+#else
+    /* enable TXE ISR */
+    NVIC_EnableIRQ(SERCOM0_0_IRQn + (sercom_id(dev(uart)) * 4));
+#endif
+#endif /* MODULE_PERIPH_UART_NONBLOCKING */
+
     while (dev(uart)->SYNCBUSY.bit.CTRLB) {}
 
     /* and finally enable the device */
@@ -121,11 +149,18 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    for (size_t i = 0; i < len; i++) {
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    for (const void* end = data + len; data != end; ++data) {
+        while (tsrb_add_one(&uart_tx_rb[uart], *data) < 0) {}
+        dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
+    }
+#else
+    for (const void* end = data + len; data != end; ++data) {
         while (!dev(uart)->INTFLAG.bit.DRE) {}
-        dev(uart)->DATA.reg = data[i];
+        dev(uart)->DATA.reg = *data;
     }
     while (!dev(uart)->INTFLAG.bit.TXC) {}
+#endif
 }
 
 void uart_poweron(uart_t uart)
@@ -181,14 +216,38 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 }
 #endif
 
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+static inline void irq_handler_tx(unsigned uartnum)
+{
+    /* workaround for saml1x */
+    int c = tsrb_get_one(&uart_tx_rb[uartnum]);
+    if (c >= 0) {
+        dev(uartnum)->DATA.reg = c;
+    }
+
+    /* disable the interrupt if there are no more bytes to send */
+    if (tsrb_empty(&uart_tx_rb[uartnum])) {
+        dev(uartnum)->INTENCLR.reg = SERCOM_USART_INTENSET_DRE;
+    }
+}
+#endif
+
 static inline void irq_handler(unsigned uartnum)
 {
-    if (dev(uartnum)->INTFLAG.bit.RXC) {
+    uint32_t status = dev(uartnum)->INTFLAG.reg;
+
+#if !defined(UART_HAS_TX_ISR) && defined(MODULE_PERIPH_UART_NONBLOCKING)
+    if ((status & SERCOM_USART_INTFLAG_DRE) && dev(uartnum)->INTENSET.bit.DRE) {
+        irq_handler_tx(uartnum);
+    }
+#endif
+
+    if (status & SERCOM_USART_INTFLAG_RXC) {
         /* interrupt flag is cleared by reading the data register */
         uart_ctx[uartnum].rx_cb(uart_ctx[uartnum].arg,
                                 (uint8_t)(dev(uartnum)->DATA.reg));
     }
-    else if (dev(uartnum)->INTFLAG.bit.ERROR) {
+    else if (status & SERCOM_USART_INTFLAG_ERROR) {
         /* clear error flag */
         dev(uartnum)->INTFLAG.reg = SERCOM_USART_INTFLAG_ERROR;
     }
@@ -237,3 +296,48 @@ void UART_5_ISR(void)
     irq_handler(5);
 }
 #endif
+
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+
+#ifdef UART_0_ISR_TX
+void UART_0_ISR_TX(void)
+{
+    irq_handler_tx(0);
+}
+#endif
+
+#ifdef UART_1_ISR_TX
+void UART_1_ISR_TX(void)
+{
+    irq_handler_tx(1);
+}
+#endif
+
+#ifdef UART_2_ISR_TX
+void UART_2_ISR_TX(void)
+{
+    irq_handler_tx(2);
+}
+#endif
+
+#ifdef UART_3_ISR_TX
+void UART_3_ISR_TX(void)
+{
+    irq_handler_tx(3);
+}
+#endif
+
+#ifdef UART_4_ISR_TX
+void UART_4_ISR_TX(void)
+{
+    irq_handler_tx(4);
+}
+#endif
+
+#ifdef UART_5_ISR_TX
+void UART_5_ISR_TX(void)
+{
+    irq_handler_tx(5);
+}
+#endif
+#endif /* MODULE_PERIPH_UART_NONBLOCKING */
