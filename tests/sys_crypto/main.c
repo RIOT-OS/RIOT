@@ -9,8 +9,9 @@
 
 #include "tests-crypto.h"
 
-void tests_crypto(void)
+int main(void)
 {
+    TESTS_START();
     TESTS_RUN(tests_crypto_helper_tests());
     TESTS_RUN(tests_crypto_chacha_tests());
     TESTS_RUN(tests_crypto_poly1305_tests());
@@ -22,4 +23,6 @@ void tests_crypto(void)
     TESTS_RUN(tests_crypto_modes_ecb_tests());
     TESTS_RUN(tests_crypto_modes_cbc_tests());
     TESTS_RUN(tests_crypto_modes_ctr_tests());
+    TESTS_END();
+    return 0;
 }

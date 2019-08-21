@@ -29,11 +29,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   The entry point of this test suite.
- */
-void tests_crypto(void);
-
-/**
  * @brief   Generates tests for helper functions
  *
  * @return  embUnit tests
