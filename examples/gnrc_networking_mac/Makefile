@@ -60,6 +60,5 @@ QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
 
-# Set a custom channel
-DEFAULT_CHANNEL ?= 26
-CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
+# Set a custom channel if needed
+include $(RIOTMAKE)/default-channel.inc.mk
