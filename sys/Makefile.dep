@@ -8,8 +8,6 @@ ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
   SKETCH_MODULE ?= arduino_sketches
   USEMODULE += $(SKETCH_MODULE)
-  USEMODULE += fmt
-  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))
@@ -22,6 +20,14 @@ endif
 
 ifneq (,$(filter congure_test,$(USEMODULE)))
   USEMODULE += fmt
+endif
+
+ifneq (,$(filter auto_init_actuators_sensors_%,$(filter-out auto_init_actuators_sensors_default,$(USEMODULE))))
+  USEMODULE += auto_init_actuators_sensors
+endif
+
+ifneq (,$(filter auto_init_saul,$(USEMODULE)))
+  USEMODULE += auto_init_actuators_sensors_default
 endif
 
 ifneq (,$(filter eepreg,$(USEMODULE)))
