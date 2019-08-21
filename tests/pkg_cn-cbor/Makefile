@@ -29,6 +29,4 @@ CFLAGS += -DCBOR_NO_LL
 # Skips test cases for floating point data types.
 # CFLAGS += -DCBOR_NO_FLOAT
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

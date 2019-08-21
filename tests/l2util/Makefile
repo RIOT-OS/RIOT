@@ -20,6 +20,4 @@ CHECKED_IFDEF_PATHS = cc110x \
 CFLAGS += $(foreach path,$(CHECKED_IFDEF_PATHS),\
             -DMODULE_$(shell echo $(path) | tr a-z A-Z))
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

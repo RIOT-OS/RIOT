@@ -15,6 +15,4 @@ CFLAGS += -DTEST_SUITES -DGNRC_PKTBUF_SIZE=2048
 # to be able to include gnrc_sixlowpan_frag-internal `rbuf.h`
 INCLUDES += -I$(RIOTBASE)/sys/net/gnrc/network_layer/sixlowpan/frag/
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

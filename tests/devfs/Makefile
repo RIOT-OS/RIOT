@@ -7,6 +7,4 @@ USEMODULE += devfs
 USEMODULE += devfs_random
 USEMODULE += devfs_hwrng
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

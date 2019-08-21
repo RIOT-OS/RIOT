@@ -1,8 +1,6 @@
 # If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
 
-TEST_ON_CI_WHITELIST += all
-
 # Select the boards with riotboot feature
 FEATURES_REQUIRED += riotboot
 

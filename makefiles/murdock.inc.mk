@@ -25,9 +25,10 @@ test-murdock:
 #
 # Testing is enabled if all the following conditions are met:
 #
-#  * the board is whitelisted
+#  * the board is whitelisted (by default all are enabled)
 #  * the board is not blacklisted (by default none)
 #  * the board has enough memory and the executable is being linked
+#  * a test is present
 #
 # TEST_ON_CI_WHITELIST and TEST_ON_CI_BLACKLIST can be empty, a board list or 'all'
 #
@@ -36,11 +37,11 @@ test-murdock:
 #
 # Disabling a test in some case must be justified to keep track of the reason.
 
-TEST_ON_CI_WHITELIST ?=
+TEST_ON_CI_WHITELIST ?= all
 TEST_ON_CI_BLACKLIST ?=
 TEST_ON_BOARD_ENABLED ?= $(filter-out $(TEST_ON_CI_BLACKLIST:all=%),$(filter $(TEST_ON_CI_WHITELIST:all=%),$(BOARD)))
 
-TEST_ON_CI_ENABLED ?= $(if $(RIOTNOLINK),,$(TEST_ON_BOARD_ENABLED))
+TEST_ON_CI_ENABLED ?= $(if $(RIOTNOLINK),,$(if $(TESTS),$(TEST_ON_BOARD_ENABLED)))
 
 .PHONY: test-on-ci-enabled
 test-on-ci-enabled:

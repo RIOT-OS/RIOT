@@ -16,6 +16,4 @@ USEMODULE += gnrc_ipv6
 USEMODULE += gnrc_sock_udp
 USEPKG += libcoap
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

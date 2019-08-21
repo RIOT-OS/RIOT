@@ -7,6 +7,4 @@ USEMODULE += event
 USEMODULE += xtimer
 USEMODULE += core_thread_flags
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

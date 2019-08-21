@@ -7,6 +7,4 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-nano arduino-uno \
 
 USEMODULE += pipe
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include

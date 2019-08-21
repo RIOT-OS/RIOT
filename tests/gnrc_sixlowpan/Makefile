@@ -22,6 +22,4 @@ USEMODULE += gnrc_udp
 # Dumps packets
 USEMODULE += gnrc_pktdump
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include
