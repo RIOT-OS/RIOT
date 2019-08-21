@@ -177,6 +177,8 @@ extern "C" {
 #define AT86RF2XX_OPT_AUTOACK        (0x0080)       /**< Auto ACK active */
 #define AT86RF2XX_OPT_ACK_PENDING    (0x0100)       /**< ACK frames with data
                                                      *   pending */
+#define AT86RF2XX_OPT_SLEEP          (0x0200)       /**< Go back to sleep right
+                                                         after any operation */
 
 /** @} */
 

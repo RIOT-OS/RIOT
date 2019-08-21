@@ -222,7 +222,7 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
             at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
             break;
         case NETOPT_STATE_SLEEP:
-            at86rf2xx_set_state(dev, AT86RF2XX_STATE_SLEEP);
+            at86rf2xx_set_option(dev, AT86RF2XX_OPT_SLEEP, true);
             break;
         case NETOPT_STATE_IDLE:
             at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
@@ -260,9 +260,11 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
 
 netopt_state_t _get_state(at86rf2xx_t *dev)
 {
+    if(dev->flags & AT86RF2XX_OPT_SLEEP) {
+        return NETOPT_STATE_SLEEP;
+    }
+
     switch (at86rf2xx_get_status(dev)) {
-        case AT86RF2XX_STATE_SLEEP:
-            return NETOPT_STATE_SLEEP;
         case AT86RF2XX_STATE_TRX_OFF:
             return NETOPT_STATE_STANDBY;
         case AT86RF2XX_STATE_BUSY_RX_AACK:
@@ -360,11 +362,9 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
         return res;
     }
 
-    uint8_t old_state = at86rf2xx_get_status(dev);
-
     /* temporarily wake up if sleeping */
-    if (old_state == AT86RF2XX_STATE_SLEEP) {
-        at86rf2xx_assert_awake(dev);
+    if (dev->flags & AT86RF2XX_OPT_SLEEP) {
+        at86rf2xx_wake_up(dev);
     }
 
     /* these options require the transceiver to be not sleeping*/
@@ -418,8 +418,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     }
 
     /* go back to sleep if were sleeping */
-    if (old_state == AT86RF2XX_STATE_SLEEP) {
-        at86rf2xx_set_state(dev, AT86RF2XX_STATE_SLEEP);
+    if (dev->flags & AT86RF2XX_OPT_SLEEP) {
+        at86rf2xx_sleep(dev);
     }
 
     return res;
@@ -428,7 +428,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
-    uint8_t old_state = at86rf2xx_get_status(dev);
     int res = -ENOTSUP;
 
     if (dev == NULL) {
@@ -439,8 +438,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
      * opt != NETOPT_STATE check prevents redundant wake-up.
      * when opt == NETOPT_STATE, at86rf2xx_set_state() will wake up the
      * radio if needed. */
-    if ((old_state == AT86RF2XX_STATE_SLEEP) && (opt != NETOPT_STATE)) {
-        at86rf2xx_assert_awake(dev);
+    if ((dev->flags & AT86RF2XX_OPT_SLEEP) && (opt != NETOPT_STATE)) {
+        at86rf2xx_wake_up(dev);
     }
 
     switch (opt) {
@@ -591,9 +590,9 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     }
 
     /* go back to sleep if were sleeping and state hasn't been changed */
-    if ((old_state == AT86RF2XX_STATE_SLEEP)
+    if ((dev->flags & AT86RF2XX_OPT_SLEEP)
         && (opt != NETOPT_STATE)) {
-        at86rf2xx_set_state(dev, AT86RF2XX_STATE_SLEEP);
+        at86rf2xx_sleep(dev);
     }
 
     if (res == -ENOTSUP) {
@@ -613,10 +612,11 @@ static void _isr(netdev_t *netdev)
     /* If transceiver is sleeping register access is impossible and frames are
      * lost anyway, so return immediately.
      */
-    state = at86rf2xx_get_status(dev);
-    if (state == AT86RF2XX_STATE_SLEEP) {
+    if (dev->flags & AT86RF2XX_OPT_SLEEP) {
         return;
     }
+
+    state = at86rf2xx_get_status(dev);
 
     /* read (consume) device status */
     irq_mask = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);

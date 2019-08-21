@@ -453,6 +453,13 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                           : (tmp & ~AT86RF2XX_CSMA_SEED_1__AACK_SET_PD);
             at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
             break;
+        case AT86RF2XX_OPT_SLEEP:
+            if(state) {
+                at86rf2xx_sleep(dev);
+            }
+            else {
+                at86rf2xx_wake_up(dev);
+            }
         default:
             /* do nothing */
             break;
@@ -494,6 +501,9 @@ static inline void _set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
 uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
 {
     uint8_t old_state;
+    if(dev->flags & AT86RF2XX_OPT_SLEEP) {
+        at86rf2xx_set_option(dev, AT86RF2XX_OPT_SLEEP, false);
+    }
 
     /* make sure there is no ongoing transmission, or state transition already
      * in progress */
@@ -514,24 +524,8 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
              state == AT86RF2XX_STATE_RX_AACK_ON)) {
             _set_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
         }
-        /* check if we need to wake up from sleep mode */
-        if (state == AT86RF2XX_STATE_SLEEP) {
-            /* First go to TRX_OFF */
-            _set_state(dev, AT86RF2XX_STATE_TRX_OFF,
-                       AT86RF2XX_STATE_FORCE_TRX_OFF);
-            /* Discard all IRQ flags, framebuffer is lost anyway */
-            at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
-            /* Go to SLEEP mode from TRX_OFF */
-            gpio_set(dev->params.sleep_pin);
-            dev->state = state;
-        }
-        else {
-            if (old_state == AT86RF2XX_STATE_SLEEP) {
-                DEBUG("at86rf2xx: waking up from sleep mode\n");
-                at86rf2xx_assert_awake(dev);
-            }
-            _set_state(dev, state, state);
-        }
+
+        _set_state(dev, state, state);
     }
 
     return old_state;

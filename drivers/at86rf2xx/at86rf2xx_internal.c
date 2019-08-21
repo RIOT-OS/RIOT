@@ -103,32 +103,37 @@ void at86rf2xx_fb_stop(const at86rf2xx_t *dev)
 
 uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
 {
-    /* if sleeping immediately return state */
-    if (dev->state == AT86RF2XX_STATE_SLEEP) {
-        return dev->state;
-    }
-
     return (at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
             & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS);
 }
 
-void at86rf2xx_assert_awake(at86rf2xx_t *dev)
+void at86rf2xx_sleep(at86rf2xx_t *dev)
 {
-    if (at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {
-        /* wake up and wait for transition to TRX_OFF */
-        gpio_clear(dev->params.sleep_pin);
-        xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
+    /* First go to TRX_OFF */
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
+            AT86RF2XX_STATE_FORCE_TRX_OFF);
 
-        /* update state: on some platforms, the timer behind xtimer
-         * may be inaccurate or the radio itself may take longer
-         * to wake up due to extra capacitance on the oscillator.
-         * Spin until we are actually awake
-         */
-        do {
-            dev->state = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
-                         & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
-        } while (dev->state != AT86RF2XX_TRX_STATUS__TRX_OFF);
-    }
+    /* Discard all IRQ flags, framebuffer is lost anyway */
+    at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
+
+    /* Go to SLEEP mode from TRX_OFF */
+    gpio_set(dev->params.sleep_pin);
+}
+
+void at86rf2xx_wake_up(at86rf2xx_t *dev)
+{
+    /* wake up and wait for transition to TRX_OFF */
+    gpio_clear(dev->params.sleep_pin);
+    xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
+
+    /* update state: on some platforms, the timer behind xtimer
+     * may be inaccurate or the radio itself may take longer
+     * to wake up due to extra capacitance on the oscillator.
+     * Spin until we are actually awake
+     */
+    while((at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
+                 & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS)
+                != AT86RF2XX_TRX_STATUS__TRX_OFF) {}
 }
 
 void at86rf2xx_hardware_reset(at86rf2xx_t *dev)

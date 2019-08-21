@@ -154,11 +154,11 @@ void at86rf2xx_fb_stop(const at86rf2xx_t *dev);
 uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev);
 
 /**
- * @brief   Make sure that device is not sleeping
+ * @brief   Wake up the device
  *
- * @param[in,out] dev   device to eventually wake up
+ * @param[in,out] dev   device to wake up
  */
-void at86rf2xx_assert_awake(at86rf2xx_t *dev);
+void at86rf2xx_wake_up(at86rf2xx_t *dev);
 
 /**
  * @brief   Trigger a hardware reset
@@ -167,6 +167,12 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev);
  */
 void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
 
+/**
+ * @brief  Put the device to sleep
+ *
+ * @param[in] dev           device to sleep
+ */
+void at86rf2xx_sleep(at86rf2xx_t *dev);
 
 /**
  * @brief   Set PHY parameters based on channel and page number
