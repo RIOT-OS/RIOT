@@ -1,3 +1,6 @@
+CPU = kinetis
+CPU_MODEL = mkw41z512vht4
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_rtc
@@ -7,5 +10,3 @@ FEATURES_PROVIDED += periph_uart
 
 # Put other features for this board (in alphabetical order)
 FEATURES_PROVIDED += riotboot
-
-include $(RIOTCPU)/kinetis/Makefile.features

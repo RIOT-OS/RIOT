@@ -1,7 +1,3 @@
-# the cpu to build for
-export CPU = stm32f1
-export CPU_MODEL = stm32f103cb
-
 # custom flasher to use with the bootloader
 FLASHER = $(RIOTBOARD)/$(BOARD)/dist/robotis-loader.py
 DEBUGGER =

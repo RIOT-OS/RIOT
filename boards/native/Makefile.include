@@ -3,8 +3,6 @@ export NATIVEINCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/
 export NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
 export NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 
-export CPU = native
-
 USEMODULE += native-drivers
 
 ifeq ($(shell uname -s),Darwin)

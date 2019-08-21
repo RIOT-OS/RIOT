@@ -1,3 +1,6 @@
+CPU = saml21
+CPU_MODEL = saml21j18a
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_i2c
@@ -9,5 +12,3 @@ FEATURES_PROVIDED += periph_uart
 
 # Put other features for this board (in alphabetical order)
 FEATURES_PROVIDED += riotboot
-
-include $(RIOTCPU)/saml21/Makefile.features

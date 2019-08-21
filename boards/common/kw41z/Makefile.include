@@ -1,7 +1,3 @@
-# define the cpu used by the board
-export CPU = kinetis
-export CPU_MODEL = mkw41z512vht4
-
 # include this module into the build
 INCLUDES += -I$(RIOTBOARD)/common/kw41z/include
 

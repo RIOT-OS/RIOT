@@ -1,7 +1,3 @@
-# define the cpu used by SAMD21 Xplained Pro board
-export CPU = samd21
-export CPU_MODEL = samd21j18a
-
 # set edbg device type
 EDBG_DEVICE_TYPE = atmel_cm0p
 

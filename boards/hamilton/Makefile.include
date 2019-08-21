@@ -1,7 +1,3 @@
-# define the cpu used by Hamilton
-export CPU = samd21
-export CPU_MODEL = samr21e18a
-
 # debugger config
 export JLINK_DEVICE := atsamr21e18a
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb

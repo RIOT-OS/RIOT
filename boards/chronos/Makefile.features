@@ -1,7 +1,8 @@
+CPU = cc430
+CPU_MODEL = cc430f6137
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_rtc
 
 # Various other features (if any)
-
-include $(RIOTCPU)/cc430/Makefile.features

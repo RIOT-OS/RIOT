@@ -1,3 +1,6 @@
+CPU = stm32l1
+CPU_MODEL = stm32l151rc
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_dac
@@ -7,5 +10,3 @@ FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_spi periph_spi_gpio_mode
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
-
-include $(RIOTCPU)/stm32l1/Makefile.features

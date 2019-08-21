@@ -1,5 +1,7 @@
+CPU = stm32f4
+CPU_MODEL = stm32f415rg
+
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
-
-include $(RIOTCPU)/stm32f4/Makefile.features

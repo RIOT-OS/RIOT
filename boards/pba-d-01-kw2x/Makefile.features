@@ -1,3 +1,9 @@
+CPU = kinetis
+# the pba-d-01-kw2x board can embed either a kw21d256, kw21d512 or kw22d512 cpu.
+# The default set up is kw21d256, the variable is overrideable to use the other
+# cpu if needed.
+CPU_MODEL ?= mkw21d256vha5
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_i2c
@@ -10,5 +16,3 @@ FEATURES_PROVIDED += periph_uart
 
 # Put other features for this board (in alphabetical order)
 FEATURES_PROVIDED += riotboot
-
-include $(RIOTCPU)/kinetis/Makefile.features

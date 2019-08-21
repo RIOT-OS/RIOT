@@ -1,7 +1,3 @@
-# define the cpu used by STK3600
-export CPU = efm32
-export CPU_MODEL = efm32lg990f256
-
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))

@@ -1,3 +1,6 @@
+CPU = stm32f0
+CPU_MODEL = stm32f030r8
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_pwm
@@ -10,5 +13,3 @@ FEATURES_PROVIDED += periph_uart
 
 # load the common Makefile.features for Nucleo boards
 include $(RIOTBOARD)/common/nucleo64/Makefile.features
-
-include $(RIOTCPU)/stm32f0/Makefile.features

@@ -1,3 +1,6 @@
+CPU = samd5x
+CPU_MODEL = same54p20a
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_rtc
@@ -9,5 +12,3 @@ FEATURES_PROVIDED += periph_usbdev
 
 # Put other features for this board (in alphabetical order)
 FEATURES_PROVIDED += riotboot
-
-include $(RIOTCPU)/samd5x/Makefile.features

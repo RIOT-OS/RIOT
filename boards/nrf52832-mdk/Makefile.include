@@ -1,5 +1,3 @@
-export CPU_MODEL = nrf52832xxaa
-
 # This board uses a DAP-Link programmer
 # Flashing support is provided through pyocd (default) and openocd.
 # For openocd, a version built against the development branch and containing

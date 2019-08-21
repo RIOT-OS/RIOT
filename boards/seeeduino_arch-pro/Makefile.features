@@ -1,6 +1,6 @@
+CPU = lpc1768
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
-
-include $(RIOTCPU)/lpc1768/Makefile.features

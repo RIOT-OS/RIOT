@@ -1,5 +1,3 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_adc
 endif
-
-include $(RIOTCPU)/kinetis/Makefile.dep

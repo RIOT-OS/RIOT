@@ -1,7 +1,8 @@
+CPU = stm32f7
+CPU_MODEL = stm32f769ni
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
-
-include $(RIOTCPU)/stm32f7/Makefile.features

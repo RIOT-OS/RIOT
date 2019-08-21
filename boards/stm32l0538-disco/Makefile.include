@@ -1,7 +1,3 @@
-# define the cpu used by the stm32l0538-disco board
-export CPU = stm32l0
-export CPU_MODEL = stm32l053c8
-
 # we use shared STM32 configuration snippets
 INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 

@@ -1,7 +1,3 @@
-## the cpu to build for
-export CPU = stm32l4
-export CPU_MODEL = stm32l496zg
-
 # stdio is not available over st-link but on the Arduino TX/RX pins
 # A serial to USB converter plugged to the host is required
 PORT_LINUX ?= /dev/ttyACM0

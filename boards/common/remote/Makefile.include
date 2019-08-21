@@ -1,7 +1,3 @@
-# define the cpu used by the RE-mote board
-export CPU       =  cc2538
-export CPU_MODEL =  cc2538sf53
-
 # define the default flash-tool
 export PROGRAMMER ?= cc2538-bsl
 

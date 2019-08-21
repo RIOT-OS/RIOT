@@ -1,8 +1,8 @@
+CPU = nrf51
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_timer
 
 # Various other features (if any)
 FEATURES_PROVIDED += ble_nimble
-
--include $(RIOTCPU)/nrf51/Makefile.features

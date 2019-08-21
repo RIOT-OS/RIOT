@@ -1,6 +1,3 @@
-# CPU configuration for the Thingy:52
-CPU_MODEL = nrf52832xxaa
-
 # for this board, we are using Segger's RTT as default terminal interface
 USEMODULE += stdio_rtt
 TERMPROG = $(RIOTTOOLS)/jlink/jlink.sh

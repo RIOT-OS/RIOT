@@ -1,7 +1,3 @@
-# define the cpu used by the arduino due based boards
-export CPU = sam3
-export CPU_MODEL = sam3x8e
-
 # export this module and its includes
 USEMODULE += boards_common_arduino_due
 INCLUDES  += -I$(RIOTBOARD)/common/arduino-due/include
