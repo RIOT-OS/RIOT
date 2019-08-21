@@ -325,7 +325,7 @@ static inline unsigned coap_get_id(coap_pkt_t *pkt)
  *
  * @returns     length of token in the given message (0-8 byte)
  */
-static inline unsigned coap_get_token_len(coap_pkt_t *pkt)
+static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 {
     return (pkt->hdr->ver_t_tkl & 0xf);
 }
@@ -337,7 +337,7 @@ static inline unsigned coap_get_token_len(coap_pkt_t *pkt)
  *
  * @returns     total header length
  */
-static inline unsigned coap_get_total_hdr_len(coap_pkt_t *pkt)
+static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
 {
     return sizeof(coap_hdr_t) + coap_get_token_len(pkt);
 }
