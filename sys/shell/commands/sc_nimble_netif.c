@@ -30,7 +30,7 @@
 #include "net/bluetil/ad.h"
 #include "net/bluetil/addr.h"
 
-#define DEFAULT_NODE_NAME           "RIOT-GNRC"
+#define DEFAULT_NODE_NAME           "bleRIOT"
 #define DEFAULT_SCAN_DURATION       (500U)      /* 500ms */
 #define DEFAULT_CONN_TIMEOUT        (500U)      /* 500ms */
 
