@@ -32,9 +32,19 @@ static can_trx_t tja1042 = {
 };
 #endif
 
+#ifdef MODULE_NCV7356
+#include "ncv7356.h"
+static can_trx_t ncv7356 = {
+    .driver = &ncv7356_driver,
+};
+#endif
+
 static can_trx_t *devs[] = {
 #ifdef MODULE_TJA1042
     &tja1042,
+#endif
+#ifdef MODULE_NCV7356
+    &ncv7356,
 #endif
     NULL,
 };

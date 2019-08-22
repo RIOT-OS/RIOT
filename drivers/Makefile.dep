@@ -357,6 +357,11 @@ ifneq (,$(filter my9221,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter nvc7356,$(USEMODULE)))
+  USEMODULE += can_trx
+  FEATURES_REQUIRED += periph_gpio
+endif
+
 ifneq (,$(filter nrfmin,$(USEMODULE)))
   FEATURES_REQUIRED += radio_nrfmin
   FEATURES_REQUIRED += periph_cpuid
