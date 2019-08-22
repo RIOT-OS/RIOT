@@ -23,6 +23,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <errno.h>
 
@@ -114,15 +115,15 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
+    assert(dev < I2C_NUMOF);
     /* Check that the bus was properly stopped before releasing */
     /* It is a programming error to release the bus after sending a start
      * condition but before sending a stop condition */
     assert(i2c_state[dev].active == 0);
 
     mutex_unlock(&i2c_state[dev].mtx);
-    return 0;
 }
 
 static uint8_t i2c_find_divider(unsigned freq, unsigned speed)
