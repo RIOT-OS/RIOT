@@ -158,6 +158,12 @@ extern "C" {
 #define AT86RF2XX_STATE_IN_PROGRESS    (0x1f)     /**< ongoing state conversion */
 /** @} */
 
+#define AT86RF2XX_PHY_RX               (0x0)      /**< device is in RX mode */
+#define AT86RF2XX_PHY_TX               (0x1)      /**< device is in TX mode */
+#define AT86RF2XX_PHY_TRX_OFF          (0x2)      /**< device transceiver is off */
+#define AT86RF2XX_PHY_FORCE_TRX_OFF    (0x3)      /**< device is forced to turn
+                                                       its transceiver off */
+
 /**
  * @name    Internal device option flags
  * @{
