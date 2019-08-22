@@ -241,14 +241,11 @@ int i2c_acquire(i2c_t dev)
     return -1;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
+    assert(dev < I2C_NUMOF);
     DEBUG("%s\n", __FUNCTION__);
-    if (dev < I2C_NUMOF) {
-        mutex_unlock(&lock);
-        return 0;
-    }
-    return -1;
+    mutex_unlock(&lock);
 }
 
 int i2c_read_bytes(i2c_t dev, uint16_t addr,
