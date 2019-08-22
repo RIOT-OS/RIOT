@@ -126,9 +126,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     uint8_t phr;
     size_t pkt_len;
 
-    /* frame buffer protection will be unlocked as soon as at86rf2xx_fb_stop() is called,
-     * Set receiver to PLL_ON state to be able to free the SPI bus and avoid loosing data. */
-    at86rf2xx_set_state(dev, AT86RF2XX_STATE_PLL_ON);
+    uint8_t rx_syn = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
 
     /* start frame buffer access */
     at86rf2xx_fb_start(dev);
@@ -149,6 +147,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             /* set device back in operation state which was used before last transmission.
              * This state is saved in at86rf2xx.c/at86rf2xx_tx_prepare() e.g RX_AACK_ON */
             at86rf2xx_set_state(dev, dev->idle_state);
+            at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, rx_syn & ~AT86RF2XX_RX_SYN__RX_PDT_DIS);
         }
 
         return pkt_len;
@@ -210,6 +209,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     /* set device back in operation state which was used before last transmission.
      * This state is saved in at86rf2xx.c/at86rf2xx_tx_prepare() e.g RX_AACK_ON */
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, rx_syn & ~AT86RF2XX_RX_SYN__RX_PDT_DIS);
     at86rf2xx_set_state(dev, dev->idle_state);
 
     return pkt_len;
@@ -636,6 +636,11 @@ static void _isr(netdev_t *netdev)
             if (!(dev->flags & AT86RF2XX_OPT_TELL_RX_END)) {
                 return;
             }
+            /* frame buffer protection will be unlocked as soon as at86rf2xx_fb_stop() is called,
+             * Disable the SFD dection to be able to free the SPI bus and avoid loosing data. */
+            at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN,
+                at86rf2xx_reg_read(dev,
+                    AT86RF2XX_REG__RX_SYN) | AT86RF2XX_RX_SYN__RX_PDT_DIS);
             netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
         }
         else if ((state == AT86RF2XX_STATE_TX_ARET_ON)
