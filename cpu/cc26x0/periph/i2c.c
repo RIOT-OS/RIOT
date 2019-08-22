@@ -21,6 +21,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <stdint.h>
 #include <string.h>
@@ -133,11 +134,10 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
     mutex_unlock(&_lock);
-    return 0;
 }
 
 int i2c_read_bytes(i2c_t dev, uint16_t addr,
