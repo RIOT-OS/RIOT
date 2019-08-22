@@ -151,7 +151,7 @@ void at86rf2xx_fb_stop(const at86rf2xx_t *dev);
  *
  * @return              internal status of the given device
  */
-uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev);
+uint8_t at86rf2xx_read_trx_status(const at86rf2xx_t *dev);
 
 /**
  * @brief   Wake up the device

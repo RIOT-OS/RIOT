@@ -211,6 +211,7 @@ typedef struct {
     at86rf2xx_params_t params;              /**< parameters for initialization */
     uint16_t flags;                         /**< Device specific flags */
     uint8_t state;                          /**< current state of the radio */
+    bool busy;                              /**< radio is busy */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */
 #ifdef MODULE_AT86RF212B
     /* Only AT86RF212B supports multiple pages (PHY modes) */
@@ -535,6 +536,18 @@ void at86rf2xx_tx_exec(const at86rf2xx_t *dev);
  * @return                  false if channel is determined busy
  */
 bool at86rf2xx_cca(at86rf2xx_t *dev);
+
+/**
+ * @brief Internal function to change state
+ * @details For all cases but AT86RF2XX_STATE_FORCE_TRX_OFF state and
+ *          cmd parameter are the same.
+ *
+ * @param dev       device to operate on
+ * @param state     target state
+ * @param cmd       command to initiate state transition
+ */
+
+void at86rf2xx_write_trx_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd);
 
 #ifdef __cplusplus
 }

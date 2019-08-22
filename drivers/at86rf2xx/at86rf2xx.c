@@ -45,9 +45,8 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     /* initialize device descriptor */
     dev->params = *params;
     /* State to return after receiving or transmitting */
-    dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
+    dev->idle_state = AT86RF2XX_PHY_TRX_OFF;
     /* radio state is P_ON when first powered-on */
-    dev->state = AT86RF2XX_STATE_P_ON;
     dev->pending_tx = 0;
 }
 
@@ -60,9 +59,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     netdev_ieee802154_reset(&dev->netdev);
 
     /* Reset state machine to ensure a known state */
-    if (dev->state == AT86RF2XX_STATE_P_ON) {
-        at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
-    }
+    at86rf2xx_set_state(dev, AT86RF2XX_PHY_FORCE_TRX_OFF);
 
     /* get an 8-byte unique ID to use as hardware address */
     luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
@@ -115,14 +112,15 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 
     /* enable interrupts */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
-                        AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
+                        AT86RF2XX_IRQ_STATUS_MASK__TRX_END
+                        | AT86RF2XX_IRQ_STATUS_MASK__RX_START);
     /* clear interrupt flags */
     at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
 
     /* State to return after receiving or transmitting */
-    dev->idle_state = AT86RF2XX_STATE_RX_AACK_ON;
+    dev->idle_state = AT86RF2XX_PHY_RX;
     /* go into RX state */
-    at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
+    at86rf2xx_set_state(dev, AT86RF2XX_PHY_RX);
 
     DEBUG("at86rf2xx_reset(): reset complete.\n");
 }
@@ -137,6 +135,7 @@ size_t at86rf2xx_send(at86rf2xx_t *dev, const uint8_t *data, size_t len)
     at86rf2xx_tx_prepare(dev);
     at86rf2xx_tx_load(dev, data, len, 0);
     at86rf2xx_tx_exec(dev);
+    dev->busy = true;
     return len;
 }
 
@@ -145,8 +144,8 @@ void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
     uint8_t state;
 
     dev->pending_tx++;
-    state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
-    if (state != AT86RF2XX_STATE_TX_ARET_ON) {
+    state = at86rf2xx_set_state(dev, AT86RF2XX_PHY_TX);
+    if (state != AT86RF2XX_PHY_TX) {
         dev->idle_state = state;
     }
     dev->tx_frame_len = IEEE802154_FCS_LEN;
@@ -178,14 +177,14 @@ void at86rf2xx_tx_exec(const at86rf2xx_t *dev)
 bool at86rf2xx_cca(at86rf2xx_t *dev)
 {
     uint8_t reg;
-    uint8_t old_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+    uint8_t old_state = at86rf2xx_set_state(dev, AT86RF2XX_PHY_TRX_OFF);
     /* Disable RX path */
     uint8_t rx_syn = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
 
     reg = rx_syn | AT86RF2XX_RX_SYN__RX_PDT_DIS;
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, reg);
     /* Manually triggered CCA is only possible in RX_ON (basic operating mode) */
-    at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_ON);
+    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_RX_ON, AT86RF2XX_STATE_RX_ON);
     /* Perform CCA */
     reg = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
     reg |= AT86RF2XX_PHY_CC_CCA_MASK__CCA_REQUEST;
@@ -199,7 +198,7 @@ bool at86rf2xx_cca(at86rf2xx_t *dev)
     /* re-enable RX */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, rx_syn);
     /* Step back to the old state */
-    at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_TRX_OFF, AT86RF2XX_STATE_TRX_OFF);
     at86rf2xx_set_state(dev, old_state);
     return ret;
 }

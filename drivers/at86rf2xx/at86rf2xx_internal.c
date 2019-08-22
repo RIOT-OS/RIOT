@@ -101,7 +101,7 @@ void at86rf2xx_fb_stop(const at86rf2xx_t *dev)
     spi_release(SPIDEV);
 }
 
-uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
+uint8_t at86rf2xx_read_trx_status(const at86rf2xx_t *dev)
 {
     return (at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
             & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS);
@@ -157,7 +157,7 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
 void at86rf2xx_configure_phy(at86rf2xx_t *dev)
 {
     /* we must be in TRX_OFF before changing the PHY configuration */
-    uint8_t prev_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+    uint8_t prev_state = at86rf2xx_set_state(dev, AT86RF2XX_PHY_TRX_OFF);
 
 #ifdef MODULE_AT86RF212B
     /* The TX power register must be updated after changing the channel if
@@ -225,6 +225,26 @@ void at86rf2xx_get_random(const at86rf2xx_t *dev, uint8_t *data, size_t len)
             rnd |= regVal;
         }
         data[byteCount] = rnd;
+    }
+}
+
+void at86rf2xx_write_trx_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
+{
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, cmd);
+
+    /* To prevent a possible race condition when changing to
+     * RX_AACK_ON state the state doesn't get read back in that
+     * case. See discussion
+     * in https://github.com/RIOT-OS/RIOT/pull/5244
+     */
+    if (state != AT86RF2XX_STATE_RX_AACK_ON) {
+        while (at86rf2xx_read_trx_status(dev) != state) {}
+    }
+    /* Although RX_AACK_ON state doesn't get read back,
+     * at least make sure if state transition is in progress or not
+     */
+    else {
+        while (at86rf2xx_read_trx_status(dev) == AT86RF2XX_STATE_IN_PROGRESS) {}
     }
 }
 #endif

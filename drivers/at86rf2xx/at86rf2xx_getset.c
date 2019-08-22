@@ -466,38 +466,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
     }
 }
 
-/**
- * @brief Internal function to change state
- * @details For all cases but AT86RF2XX_STATE_FORCE_TRX_OFF state and
- *          cmd parameter are the same.
- *
- * @param dev       device to operate on
- * @param state     target state
- * @param cmd       command to initiate state transition
- */
-
-static inline void _set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
-{
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, cmd);
-
-    /* To prevent a possible race condition when changing to
-     * RX_AACK_ON state the state doesn't get read back in that
-     * case. See discussion
-     * in https://github.com/RIOT-OS/RIOT/pull/5244
-     */
-    if (state != AT86RF2XX_STATE_RX_AACK_ON) {
-        while (at86rf2xx_get_status(dev) != state) {}
-    }
-    /* Although RX_AACK_ON state doesn't get read back,
-     * at least make sure if state transition is in progress or not
-     */
-    else {
-        while (at86rf2xx_get_status(dev) == AT86RF2XX_STATE_IN_PROGRESS) {}
-    }
-
-    dev->state = state;
-}
-
 uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
 {
     uint8_t old_state;
@@ -505,28 +473,55 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         at86rf2xx_set_option(dev, AT86RF2XX_OPT_SLEEP, false);
     }
 
-    /* make sure there is no ongoing transmission, or state transition already
-     * in progress */
-    do {
-        old_state = at86rf2xx_get_status(dev);
-    } while (old_state == AT86RF2XX_STATE_BUSY_RX_AACK ||
-             old_state == AT86RF2XX_STATE_BUSY_TX_ARET ||
-             old_state == AT86RF2XX_STATE_IN_PROGRESS);
+    old_state = dev->state;
 
-    if (state == AT86RF2XX_STATE_FORCE_TRX_OFF) {
-        _set_state(dev, AT86RF2XX_STATE_TRX_OFF, state);
+    if (state == AT86RF2XX_PHY_FORCE_TRX_OFF) {
+        at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_TRX_OFF,
+                AT86RF2XX_STATE_FORCE_TRX_OFF);
+        dev->state = AT86RF2XX_PHY_TRX_OFF;
+        return old_state;
     }
-    else if (state != old_state) {
-        /* we need to go via PLL_ON if we are moving between RX_AACK_ON <-> TX_ARET_ON */
-        if ((old_state == AT86RF2XX_STATE_RX_AACK_ON &&
-             state == AT86RF2XX_STATE_TX_ARET_ON) ||
-            (old_state == AT86RF2XX_STATE_TX_ARET_ON &&
-             state == AT86RF2XX_STATE_RX_AACK_ON)) {
-            _set_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
-        }
 
-        _set_state(dev, state, state);
+    switch(state) {
+        case AT86RF2XX_PHY_TRX_OFF:
+            switch(old_state) {
+                case AT86RF2XX_PHY_TRX_OFF:
+                    break;
+                default:
+                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_TRX_OFF, AT86RF2XX_STATE_TRX_OFF);
+            }
+            break;
+        case AT86RF2XX_PHY_RX:
+            switch(old_state) {
+                case AT86RF2XX_PHY_RX:
+                    break;
+                case AT86RF2XX_PHY_TRX_OFF:
+                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_RX_AACK_ON, AT86RF2XX_STATE_RX_AACK_ON);
+                    break;
+                case AT86RF2XX_PHY_TX:
+                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
+                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_RX_AACK_ON, AT86RF2XX_STATE_RX_AACK_ON);
+            }
+            break;
+        case AT86RF2XX_PHY_TX:
+            switch(old_state) {
+                case AT86RF2XX_PHY_RX:
+                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
+                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_TX_ARET_ON, AT86RF2XX_STATE_TX_ARET_ON);
+                    break;
+                case AT86RF2XX_PHY_TRX_OFF:
+                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_TX_ARET_ON, AT86RF2XX_STATE_TX_ARET_ON);
+                    break;
+                case AT86RF2XX_PHY_TX:
+                    break;
+            }
     }
+
+    /* Clear the IRQ mask to avoid race conditions */
+    at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
+
+    dev->state = state;
+    dev->busy = false;
 
     return old_state;
 }
