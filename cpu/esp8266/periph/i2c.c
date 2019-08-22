@@ -31,6 +31,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#include <assert.h>
 #include <stdbool.h>
 #include <errno.h>
 
@@ -201,12 +202,11 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
-    CHECK_PARAM_RET (dev < I2C_NUMOF, -1)
+    assert(dev < I2C_NUMOF);
 
     mutex_unlock(&i2c_bus_lock[dev]);
-    return 0;
 }
 
 int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t flags)
