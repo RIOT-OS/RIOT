@@ -39,6 +39,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <string.h>
@@ -277,15 +278,14 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
     DEBUG ("%s\n", __func__);
 
-    CHECK_PARAM_RET (dev < I2C_NUMOF, -1)
+    assert(dev < I2C_NUMOF);
 
     _i2c_reset_hw (dev);
     mutex_unlock(&_i2c_bus[dev].lock);
-    return 0;
 }
 
 #define _i2c_return_on_error(dev) \
