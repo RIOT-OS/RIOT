@@ -517,9 +517,10 @@ ifneq (,$(filter tja1042,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
 endif
 
-ifneq (,$(filter tmp006,$(USEMODULE)))
+ifneq (,$(filter tmp00%,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
+  USEMODULE += tmp00x
 endif
 
 ifneq (,$(filter tsl2561,$(USEMODULE)))

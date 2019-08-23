@@ -123,6 +123,10 @@ PSEUDOMODULES += si7013
 PSEUDOMODULES += si7020
 PSEUDOMODULES += si7021
 
+#include variants of tmp00x drivers as pseudo modules
+PSEUDOMODULES += tmp006
+PSEUDOMODULES += tmp007
+
 # include variants of RN2XX3 drivers as pseudo modules
 PSEUDOMODULES += rn2483
 PSEUDOMODULES += rn2903
