@@ -63,6 +63,26 @@ static const shell_command_t shell_commands[] = {
 static char t_stack[THREAD_STACKSIZE_DEFAULT];
 
 /**
+ * @brief   send message and suicide thread
+ *
+ * This function will send a message to a thread without yielding
+ * and terminates the calling thread. This can be used to wakeup a
+ * thread and terminating yourself.
+ * This function calls sched_task_exit()
+ *
+ * @param[in] m Pointer to preallocated @ref msg_t structure, must
+ * not be NULL.
+ * @param[in] target_pid PID of target thread
+ *
+ */
+static NORETURN void msg_send_sched_task_exit(msg_t *m, kernel_pid_t target_pid)
+{
+    (void)irq_disable();
+    msg_send_int(m, target_pid);
+    sched_task_exit();
+}
+
+/**
  * @brief   thread function for
  *          cmd_test_xtimer_mutex_lock_timeout_low_prio_thread
  */
@@ -77,11 +97,9 @@ void *thread_low_prio_test(void *arg)
     thread_wakeup(main_thread_pid);
 
     mutex_unlock(test_mutex);
-    (void)irq_disable();
-    puts("THREAD low prio: exiting low");
-    msg_send_int(&msg, main_thread_pid);
 
-    sched_task_exit();
+    puts("THREAD low prio: exiting low");
+    msg_send_sched_task_exit(&msg, main_thread_pid);
 }
 
 /**
