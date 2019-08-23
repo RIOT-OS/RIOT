@@ -112,6 +112,10 @@ PSEUDOMODULES += cc1100
 PSEUDOMODULES += cc1100e
 PSEUDOMODULES += cc1101
 
+# include variants of MPU9X50 drivers as pseudo modules
+PSEUDOMODULES += mpu9150
+PSEUDOMODULES += mpu9250
+
 # include variants of mrf24j40 drivers as pseudo modules
 PSEUDOMODULES += mrf24j40m%
 

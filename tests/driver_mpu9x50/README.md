@@ -1,8 +1,8 @@
 # About
-This is a test application for the MPU-9150 Nine-Axis Driver.
+This is a test application for the MPU-9X50 (MPU9150 and MPU9250) Nine-Axis Driver.
 
 # Usage
-The application will initialize the MPU-9150 motion sensor with the following parameters:
+The application will initialize the MPU-9X50 (MPU9150 and MPU9250) motion sensor with the following parameters:
  - Accelerometer: ON
  - Gyroscope: ON
  - Magnetometer: ON

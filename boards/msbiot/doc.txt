@@ -150,28 +150,28 @@ on the inclusion.
 | IRQ Line                  | PA10                                                              |
 
 
-### MPU-9150 Nine-Axis MotionTracking Device
+### MPU-9X50 Nine-Axis MotionTracking Device
 
-The MSB-IoT is equipped with a MPU-9150 MotionTracking Device from
+The MSB-IoT is equipped with a MPU-9X50 MotionTracking Device from
 Invensense. The device combines a gyroscope, a magnetometer and an accelerometer
 in one module.
 
-Due to licensing issues, the current MPU-9150 driver implementation for RIOT
+Due to licensing issues, the current MPU-9X50 driver implementation for RIOT
 is not based on Invensense's 'Motion Driver' library and offers only a limited
 set of features. Nonetheless, the RIOT driver allows to configure and read
 values from all three sensors of the device. For an overview on the supported
-features, you can check the driver's documentation in @ref drivers_mpu9150.
+features, you can check the driver's documentation in @ref drivers_mpu9x50.
 
-A sample RIOT application for the MPU-9150 that utilizes the driver can be
-found [here](https://github.com/RIOT-OS/RIOT/tree/master/tests/driver_mpu9150).
+A sample RIOT application for the MPU-9X50 that utilizes the driver can be
+found [here](https://github.com/RIOT-OS/RIOT/tree/master/tests/driver_mpu9x50).
 
-| Product               | MPU-9150                                                                                          |
+| Product               | MPU-9X50                                                                                          |
 |:--------------------- |:------------------------------------------------------------------------------------------------- |
 | Type                  | Nine-Axis MotionTracking Device (Gyro, Accel and Compass)                                         |
 | Vendor                | Invensense                                                                                        |
-| Product Specification | [Product Specification](http://www.invensense.com/mems/gyro/documents/PS-MPU-9150A-00v4_3.pdf)    |
-| Register Map          | [Register Map](http://www.invensense.com/mems/gyro/documents/RM-MPU-9150A-00v4_2.pdf)             |
-| Driver                | @ref drivers_mpu9150                                                                              |
+| Product Specification | [Product Specification](http://www.invensense.com/mems/gyro/documents/PS-MPU-9X50A-00v4_3.pdf)    |
+| Register Map          | [Register Map](http://www.invensense.com/mems/gyro/documents/RM-MPU-9X50A-00v4_2.pdf)             |
+| Driver                | @ref drivers_mpu9x50                                                                              |
 | I²C Device            | I2C1 (Mapped to I2C_0 in RIOT)                                                                    |
 | SCL                   | PB6                                                                                               |
 | SDA                   | PB7                                                                                               |
