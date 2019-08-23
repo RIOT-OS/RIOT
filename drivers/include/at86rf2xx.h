@@ -139,6 +139,20 @@ extern "C" {
 #define AT86RF2XX_SMART_IDLE_LISTENING     (0)
 #endif
 
+#define AT86RF2XX_MODE_BASIC               (0)    /**< Basic operation mode */
+#define AT86RF2XX_MODE_EXTENDED            (1)    /**< Extended operation mode */
+
+/**
+ * @brief   Default AT86RF2XX operation mode
+ *
+ * This configuration flag sets the default operation mode to be configured
+ * on radio startup. Note the operation mode is a runtime configuration and
+ * it's possible to change it setting the @ref AT86RF2XX_OPT_EXT_MODE option
+ */
+#ifndef CONFIG_AT86RF2XX_DEFAULT_MODE
+#define CONFIG_AT86RF2XX_DEFAULT_MODE AT86RF2XX_MODE_EXTENDED
+#endif
+
 /**
  * @name    Flags for device internal states (see datasheet)
  * @{
@@ -185,6 +199,8 @@ extern "C" {
                                                      *   pending */
 #define AT86RF2XX_OPT_SLEEP          (0x0200)       /**< Go back to sleep right
                                                          after any operation */
+#define AT86RF2XX_OPT_EXT_MODE       (0x0400)       /**< Enable extended
+                                                         operation */
 
 /** @} */
 

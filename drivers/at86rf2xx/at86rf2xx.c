@@ -77,6 +77,8 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* set default options */
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
+    at86rf2xx_set_option(dev, AT86RF2XX_OPT_EXT_MODE,
+            CONFIG_AT86RF2XX_DEFAULT_MODE);
 
     static const netopt_enable_t enable = NETOPT_ENABLE;
     netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,

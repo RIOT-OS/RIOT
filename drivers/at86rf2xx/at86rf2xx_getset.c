@@ -466,6 +466,7 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
     }
 }
 
+
 uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
 {
     uint8_t old_state;
@@ -482,37 +483,53 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         return old_state;
     }
 
+    bool is_extended = dev->flags & AT86RF2XX_OPT_EXT_MODE;
+
+    uint8_t rx_state = is_extended ?
+        AT86RF2XX_STATE_RX_AACK_ON : AT86RF2XX_STATE_RX_ON;
+
     switch(state) {
         case AT86RF2XX_PHY_TRX_OFF:
             switch(old_state) {
                 case AT86RF2XX_PHY_TRX_OFF:
+                    /* Do nothing */
                     break;
                 default:
+                    /* It's always possible to go to TRX_OFF from any PHY state */
                     at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_TRX_OFF, AT86RF2XX_STATE_TRX_OFF);
             }
             break;
         case AT86RF2XX_PHY_RX:
             switch(old_state) {
                 case AT86RF2XX_PHY_RX:
+                    /* Do nothing */
                     break;
                 case AT86RF2XX_PHY_TRX_OFF:
-                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_RX_AACK_ON, AT86RF2XX_STATE_RX_AACK_ON);
+                    /* From TRX_OFF it's possible to go the RX state directly */
+                    at86rf2xx_write_trx_state(dev, rx_state, rx_state);
                     break;
                 case AT86RF2XX_PHY_TX:
-                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
-                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_RX_AACK_ON, AT86RF2XX_STATE_RX_AACK_ON);
+                    /* TX_ON in Extended Mode needs to go first to PLL_ON before
+                     * moving to the RX state*/
+                    if(is_extended) {
+                        at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
+                    }
+                    at86rf2xx_write_trx_state(dev, rx_state, rx_state);
             }
             break;
         case AT86RF2XX_PHY_TX:
             switch(old_state) {
                 case AT86RF2XX_PHY_RX:
-                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
-                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_TX_ARET_ON, AT86RF2XX_STATE_TX_ARET_ON);
-                    break;
                 case AT86RF2XX_PHY_TRX_OFF:
-                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_TX_ARET_ON, AT86RF2XX_STATE_TX_ARET_ON);
+                    /* In basic mode, PLL_ON is the TX state. In extended, its
+                     * required to move further to TX_ARET */
+                    at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
+                    if(is_extended) {
+                        at86rf2xx_write_trx_state(dev, AT86RF2XX_STATE_TX_ARET_ON, AT86RF2XX_STATE_TX_ARET_ON);
+                    }
                     break;
                 case AT86RF2XX_PHY_TX:
+                    /* Do nothing */
                     break;
             }
     }
