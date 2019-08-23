@@ -27,7 +27,7 @@ extern "C" {
 
 #define _TEST_PROTO         (254) /* https://tools.ietf.org/html/rfc3692#section-2.1 */
 #define _TEST_NETIF         (1)
-#define _TEST_TIMEOUT       (1000000U)
+#define _TEST_TIMEOUT       (1000000UL)
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 # define _TEST_ADDR4_LOCAL  (0x964fa8c0U)   /* 192.168.79.150 */
 # define _TEST_ADDR4_REMOTE (0x6b4fa8c0U)   /* 192.168.79.107 */

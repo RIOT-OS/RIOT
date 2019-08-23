@@ -239,7 +239,7 @@ static void test_sock_udp_recv4__ETIMEDOUT(void)
     assert(-ETIMEDOUT == sock_udp_recv(&_sock, _test_buffer,
                                        sizeof(_test_buffer), _TEST_TIMEOUT,
                                        NULL));
-    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+    printf(" * (timed out with timeout %lu)\n", _TEST_TIMEOUT);
 }
 
 static void test_sock_udp_recv4__socketed(void)
@@ -865,7 +865,7 @@ static void test_sock_udp_recv6__ETIMEDOUT(void)
     assert(-ETIMEDOUT == sock_udp_recv(&_sock, _test_buffer,
                                        sizeof(_test_buffer), _TEST_TIMEOUT,
                                        NULL));
-    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+    printf(" * (timed out with timeout %lu)\n", _TEST_TIMEOUT);
 }
 
 static void test_sock_udp_recv6__socketed(void)

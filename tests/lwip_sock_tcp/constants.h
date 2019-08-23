@@ -28,7 +28,7 @@ extern "C" {
 #define _TEST_PORT_LOCAL    (0x2c94)
 #define _TEST_PORT_REMOTE   (0xa615)
 #define _TEST_NETIF         (1)
-#define _TEST_TIMEOUT       (1000000U)
+#define _TEST_TIMEOUT       (1000000UL)
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 # define _TEST_ADDR4_LOCAL  (0x964fa8c0U)   /* 192.168.79.150 */
 # define _TEST_ADDR4_REMOTE (0x0100007fU)   /* 127.0.0.1 */

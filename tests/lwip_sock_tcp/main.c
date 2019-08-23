@@ -292,7 +292,7 @@ static void test_tcp_accept4__ETIMEDOUT(void)
                                 _QUEUE_SIZE, SOCK_FLAGS_REUSE_EP));
     puts(" * Calling sock_tcp_accept()");
     assert(-ETIMEDOUT == sock_tcp_accept(&_queue, &sock, _TEST_TIMEOUT));
-    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+    printf(" * (timed out with timeout %lu)\n", _TEST_TIMEOUT);
 }
 
 static void test_tcp_accept4__success(void)
@@ -396,7 +396,7 @@ static void test_tcp_read4__ETIMEDOUT(void)
     puts(" * Calling sock_tcp_read()");
     assert(-ETIMEDOUT == sock_tcp_read(&_sock, _test_buffer, sizeof(_test_buffer),
                                        _TEST_TIMEOUT));
-    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+    printf(" * (timed out with timeout %lu)\n", _TEST_TIMEOUT);
 }
 
 static void test_tcp_read4__success(void)
@@ -730,7 +730,7 @@ static void test_tcp_accept6__ETIMEDOUT(void)
                                 _QUEUE_SIZE, 0));
     puts(" * Calling sock_tcp_accept()");
     assert(-ETIMEDOUT == sock_tcp_accept(&_queue, &sock, _TEST_TIMEOUT));
-    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+    printf(" * (timed out with timeout %lu)\n", _TEST_TIMEOUT);
 }
 
 static void test_tcp_accept6__success(void)
@@ -834,7 +834,7 @@ static void test_tcp_read6__ETIMEDOUT(void)
     puts(" * Calling sock_tcp_read()");
     assert(-ETIMEDOUT == sock_tcp_read(&_sock, _test_buffer,
                                        sizeof(_test_buffer), _TEST_TIMEOUT));
-    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+    printf(" * (timed out with timeout %lu)\n", _TEST_TIMEOUT);
 }
 static void test_tcp_read6__success(void)
 {
