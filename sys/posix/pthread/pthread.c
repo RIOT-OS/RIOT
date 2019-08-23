@@ -135,10 +135,9 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     size_t stack_size = attr && attr->ss_size > 0 ? attr->ss_size : PTHREAD_STACKSIZE;
     void *stack = autofree ? malloc(stack_size) : attr->ss_sp;
     pt->stack = autofree ? stack : NULL;
-
-    if (autofree && pthread_reaper_pid != KERNEL_PID_UNDEF) {
+    if (autofree && pthread_reaper_pid == KERNEL_PID_UNDEF) {
         mutex_lock(&pthread_mutex);
-        if (pthread_reaper_pid != KERNEL_PID_UNDEF) {
+        if (pthread_reaper_pid == KERNEL_PID_UNDEF) {
             /* volatile pid to overcome problems with double checking */
             volatile kernel_pid_t pid = thread_create(pthread_reaper_stack,
                                              PTHREAD_REAPER_STACKSIZE,
