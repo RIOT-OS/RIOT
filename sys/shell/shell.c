@@ -57,10 +57,22 @@
 #endif /* SHELL_NO_ECHO */
 
 #ifndef SHELL_NO_PROMPT
-#define PROMPT_ON 1
+#define PROMPT_CHAR '>'
 #else
-#define PROMPT_ON 0
+#define PROMPT_CHAR 0
 #endif /* SHELL_NO_PROMPT */
+
+struct shell_state {
+    char echo_on;
+    char prompt_char;
+    char line[];
+};
+
+static void shell_state_init(struct shell_state *state)
+{
+    state->echo_on = ECHO_ON;
+    state->prompt_char = PROMPT_CHAR;
+}
 
 /**
  * Code indicating that the line buffer size was exceeded.
@@ -122,13 +134,14 @@ static void print_help(const shell_command_t *command_list)
     }
 }
 
-static void handle_input_line(const shell_command_t *command_list, char *line)
+static void handle_input_line(const shell_command_t *command_list,
+                              struct shell_state *state)
 {
     static const char *INCORRECT_QUOTING = "shell: incorrect quoting";
 
     /* first we need to calculate the number of arguments */
     unsigned argc = 0;
-    char *pos = line;
+    char *pos = state->line;
     int contains_esc_seq = 0;
     while (1) {
         if ((unsigned char) *pos > ' ') {
@@ -198,7 +211,7 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
     /* then we fill the argv array */
     char *argv[argc + 1];
     argv[argc] = NULL;
-    pos = line;
+    pos = state->line;
     for (unsigned i = 0; i < argc; ++i) {
         while (!*pos) {
             ++pos;
@@ -231,13 +244,32 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
         handler(argc, argv);
     }
     else {
-        if (strcmp("help", argv[0]) == 0) {
+        if (strcmp("@eon", argv[0]) == 0) {
+            state->echo_on = 1;
+        }
+        else if (strcmp("@eoff", argv[0]) == 0) {
+            state->echo_on = 0;
+        }
+        else if (strcmp("@ps", argv[0]) == 0) {
+            state->prompt_char = (argc > 1)? argv[1][0] : 0;
+        }
+        else if (strcmp("help", argv[0]) == 0) {
             print_help(command_list);
         }
         else {
             printf("shell: command not found: %s\n", argv[0]);
         }
     }
+}
+
+static inline void print_prompt(struct shell_state *state)
+{
+    if (state->prompt_char) {
+        putchar(state->prompt_char);
+        putchar(' ');
+    }
+
+    flush_if_needed();
 }
 
 /**
@@ -249,7 +281,7 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
  * If the input line is too long, the input will still be consumed until the end
  * to prevent the next line from containing garbage.
  *
- * @param   buf     Buffer where the input will be placed.
+ * @param   state   Buffer where the input will be placed.
  * @param   size    Size of the buffer. The maximum line length will be one less
  *                  than size, to accommodate for the null terminator.
  *                  The minimum buffer size is 1.
@@ -257,14 +289,16 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
  * @return  length of the read line, excluding the terminator, if reading was
  *          successful.
  * @return  EOF, if the if the end of the input stream is reached.
- * @return  -READLINE_TOOLONG if the buffer size was exceeded
+ * @return  -READLINE_TOOLONG if the buffer size was exceededsys/shell
  */
-static int readline(char *buf, size_t size)
+static int readline(struct shell_state *state, size_t size)
 {
     int curr_pos = 0;
     bool length_exceeded = false;
 
     assert((size_t)size > 0);
+
+    print_prompt(state);
 
     while (1) {
         /* At the start of the loop, cur_pos should point inside of
@@ -286,8 +320,8 @@ static int readline(char *buf, size_t size)
                 length_exceeded = 0;
             }
 
-            buf[curr_pos] = '\0';
-            if (ECHO_ON) {
+            state->line[curr_pos] = '\0';
+            if (state->echo_on) {
                 putchar('\r');
                 putchar('\n');
             }
@@ -305,10 +339,10 @@ static int readline(char *buf, size_t size)
             /* after we dropped characters do not edit the line, yet keep the
              * visual effects */
             if (!length_exceeded) {
-                buf[--curr_pos] = '\0';
+                state->line[--curr_pos] = '\0';
             }
             /* white-tape the character */
-            if (ECHO_ON) {
+            if (state->echo_on) {
                 putchar('\b');
                 putchar(' ');
                 putchar('\b');
@@ -318,12 +352,12 @@ static int readline(char *buf, size_t size)
         else {
             /* Always consume characters, but do not not always store them */
             if ((size_t)curr_pos < size - 1) {
-                buf[curr_pos++] = c;
+                state->line[curr_pos++] = c;
             }
             else {
                 length_exceeded = true;
             }
-            if (ECHO_ON) {
+            if (state->echo_on) {
                 putchar(c);
             }
         }
@@ -331,24 +365,18 @@ static int readline(char *buf, size_t size)
     }
 }
 
-static inline void print_prompt(void)
-{
-    if (PROMPT_ON) {
-        putchar('>');
-        putchar(' ');
-    }
-
-    flush_if_needed();
-}
-
 #define TOOLONG_MESSAGE "shell: maximum line length exceeded"
 
 void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
 {
-    print_prompt();
+    struct shell_state *state = (void*)line_buf;
+
+    assert(len >= sizeof(struct shell_state));
+
+    shell_state_init(state);
 
     while (1) {
-        int res = readline(line_buf, len);
+        int res = readline(state, len);
 
         switch (res) {
             case EOF:
@@ -359,11 +387,9 @@ void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
             case 0:
                 break;
             default:
-                handle_input_line(shell_commands, line_buf);
+                handle_input_line(shell_commands, state);
                 break;
         }
-
-        print_prompt();
     }
 
 shell_run_exit:
