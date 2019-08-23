@@ -24,7 +24,7 @@
 #include "adxl345_params.h"
 #include "xtimer.h"
 
-#define SLEEP_DELAY 100 * 1000U
+#define SLEEP_DELAY (100 * US_PER_MS)
 
 int main(void)
 {

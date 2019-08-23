@@ -31,7 +31,7 @@
 /**
  * @brief   Switch to the next LED every 10ms
  */
-#define STEP        (10 * 1000U)
+#define STEP        (10 * US_PER_MS)
 
 /**
  * @brief   Allocate the device descriptor

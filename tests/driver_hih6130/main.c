@@ -32,7 +32,7 @@
 #include "xtimer.h"
 #include "hih6130.h"
 
-#define SLEEP    (100 * 1000U)
+#define SLEEP    (100 * US_PER_MS)
 
 int main(void)
 {

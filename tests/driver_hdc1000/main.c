@@ -27,7 +27,7 @@
 #include "hdc1000.h"
 #include "hdc1000_params.h"
 
-#define SLEEP       (1000 * 1000U)
+#define SLEEP       (1000 * US_PER_MS)
 
 int main(void)
 {

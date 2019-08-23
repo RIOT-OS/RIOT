@@ -28,7 +28,7 @@
 #include "isl29125.h"
 #include "isl29125_params.h"
 
-#define SLEEP       (250 * 1000U)
+#define SLEEP       (250 * US_PER_MS)
 
 void cb(void *arg)
 {

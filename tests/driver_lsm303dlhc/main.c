@@ -24,7 +24,7 @@
 #include "lsm303dlhc.h"
 #include "lsm303dlhc_params.h"
 
-#define SLEEP       (100 * 1000U)
+#define SLEEP       (100 * US_PER_MS)
 
 int main(void)
 {

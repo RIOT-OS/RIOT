@@ -38,8 +38,8 @@
 #define SPI_CONF    (SPI_CONF_SECOND_FALLING)
 #define SPI_CLK     (SPI_CLK_10MHZ)
 
-#define SLEEP_CONT  (100 * 1000U)
-#define SLEEP_1SPS  (1000 * 1000U)
+#define SLEEP_CONT  (100 * US_PER_MS)
+#define SLEEP_1SPS  (1000 * US_PER_MS)
 #define READINGS_CONT (200)
 #define READINGS_1SPS (20)
 

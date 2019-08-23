@@ -46,7 +46,7 @@
 
 /* Sleep time between updates, no need to update the servo position more than
  * once per cycle */
-#define WAIT             (10000U)
+#define WAIT             (10 * US_PER_MS)
 
 static servo_t servo;
 

@@ -26,7 +26,7 @@
 #include "mma8x5x.h"
 #include "mma8x5x_params.h"
 
-#define SLEEP       (100 * 1000U)
+#define SLEEP       (100 * US_PER_MS)
 
 static mma8x5x_t dev;
 

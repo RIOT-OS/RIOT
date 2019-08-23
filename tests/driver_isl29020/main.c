@@ -24,7 +24,7 @@
 #include "isl29020.h"
 #include "isl29020_params.h"
 
-#define SLEEP       (250 * 1000U)
+#define SLEEP       (250 * US_PER_MS)
 
 int main(void)
 {

@@ -38,7 +38,7 @@
 #include "srf08.h"
 #include "periph/i2c.h"
 
- #define SLEEP       (1000 * 1000U)
+ #define SLEEP       (1000 * US_PER_MS)
 
  static srf08_t srf08_0;
 
