@@ -24,7 +24,7 @@
 #include "xtimer.h"
 
 #ifndef TEST_DURATION
-#define TEST_DURATION       (1000000U)
+#define TEST_DURATION       (1000 * US_PER_MS)
 #endif
 
 volatile unsigned _flag = 0;
