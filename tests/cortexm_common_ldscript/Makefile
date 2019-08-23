@@ -7,6 +7,7 @@ include ../Makefile.tests_common
 BOARD_WHITELIST += iotlab-a8-m3
 BOARD_WHITELIST += iotlab-m3
 BOARD_WHITELIST += samr21-xpro
+BOARD_WHITELIST += arduino-due
 # Normally all boards using `kinetis/ldscripts/kinetis.ld` linkerscript
 BOARD_WHITELIST += frdm-kw41z
 BOARD_WHITELIST += frdm-k64f
