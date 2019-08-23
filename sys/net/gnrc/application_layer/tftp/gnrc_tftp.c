@@ -1041,7 +1041,7 @@ tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len)
     if (ctxt->block_timeout) {
         ctxt->timer_msg.type = TFTP_TIMEOUT_MSG;
         xtimer_set_msg(&(ctxt->timer), ctxt->block_timeout, &(ctxt->timer_msg), thread_getpid());
-        DEBUG("tftp: set timeout %" PRIu32 " ms\n", ctxt->block_timeout / US_PER_MS);
+        DEBUG("tftp: set timeout %" PRIu32 " ms\n", (uint32_t)(ctxt->block_timeout / US_PER_MS));
     }
 
     return TS_BUSY;
@@ -1129,7 +1129,7 @@ int _tftp_decode_options(tftp_context_t *ctxt, gnrc_pktsnip_t *buf, uint32_t sta
 
                     case TOPT_TIMEOUT:
                         ctxt->timeout = atoi(value) * US_PER_SEC;
-                        DEBUG("tftp: option TOPT_TIMEOUT = %" PRIu32 " ms\n", ctxt->timeout / US_PER_MS);
+                        DEBUG("tftp: option TOPT_TIMEOUT = %" PRIu32 " ms\n", (uint32_t)(ctxt->timeout / US_PER_MS));
                         break;
                 }
 

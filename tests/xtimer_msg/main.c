@@ -61,10 +61,10 @@ void *timer_thread(void *arg)
         struct timer_msg *tmsg = m.content.ptr;
         uint32_t now = xtimer_now_usec();
         printf("now=%" PRIu32 ":%" PRIu32 " -> every %" PRIu32 ".%" PRIu32 "s: %s\n",
-               (now / US_PER_SEC),
-               (now % US_PER_SEC),
-               tmsg->interval / US_PER_SEC,
-               tmsg->interval % US_PER_SEC,
+               (uint32_t)(now / US_PER_SEC),
+               (uint32_t)(now % US_PER_SEC),
+               (uint32_t)(tmsg->interval / US_PER_SEC),
+               (uint32_t)(tmsg->interval % US_PER_SEC),
                tmsg->text);
 
         tmsg->msg.type = 12345;

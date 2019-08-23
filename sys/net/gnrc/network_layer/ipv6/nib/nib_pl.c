@@ -149,10 +149,10 @@ void gnrc_ipv6_nib_pl_print(gnrc_ipv6_nib_pl_t *entry)
            entry->pfx_len);
     printf("dev #%u ", entry->iface);
     if (entry->valid_until < UINT32_MAX) {
-        printf(" expires %" PRIu32 "sec", (entry->valid_until - now) / MS_PER_SEC);
+        printf(" expires %" PRIu32 "sec", (uint32_t)((entry->valid_until - now) / MS_PER_SEC));
     }
     if (entry->pref_until < UINT32_MAX) {
-        printf(" deprecates %" PRIu32 "sec", (entry->pref_until - now) / MS_PER_SEC);
+        printf(" deprecates %" PRIu32 "sec", (uint32_t)((entry->pref_until - now) / MS_PER_SEC));
     }
     puts("");
 }
