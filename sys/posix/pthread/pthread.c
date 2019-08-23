@@ -161,7 +161,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     pt->thread_pid = thread_create(stack,
                                    stack_size,
                                    THREAD_PRIORITY_MAIN,
-                                   THREAD_CREATE_WOUT_YIELD |
+                                   THREAD_CREATE_SLEEPING |
                                    THREAD_CREATE_STACKTEST,
                                    pthread_start_routine,
                                    pt,
@@ -173,7 +173,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
         return -1;
     }
 
-    sched_switch(THREAD_PRIORITY_MAIN);
+    thread_wakeup(pt->thread_pid);
 
     return 0;
 }
