@@ -12,3 +12,4 @@ FEATURES_PROVIDED += periph_uart
 
 # Various other features (if any)
 FEATURES_PROVIDED += arduino
+FEATURES_PROVIDED += riotboot
