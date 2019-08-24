@@ -620,6 +620,31 @@ static void test_nanocoap__options_iterate(void)
     }
 }
 
+/*
+ * Tests use of coap_opt_get_opaque() to find an option as a byte array, and
+ * coap_opt_get_next() to find a second option with the same option number.
+ */
+static void test_nanocoap__options_get_opaque(void)
+{
+    coap_pkt_t pkt;
+    int res = _read_rd_post_req(&pkt, true);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    /* read Uri-Query options */
+    uint8_t *value;
+    ssize_t optlen = coap_opt_get_opaque(&pkt, COAP_OPT_URI_QUERY, &value);
+    TEST_ASSERT_EQUAL_INT(24, optlen);
+
+    coap_optpos_t opt = {0, value + optlen - (uint8_t *)pkt.hdr};
+
+    optlen = coap_opt_get_next(&pkt, &opt, &value, false);
+    TEST_ASSERT_EQUAL_INT(0, opt.opt_num);
+    TEST_ASSERT_EQUAL_INT(5, optlen);
+
+    optlen = coap_opt_get_next(&pkt, &opt, &value, false);
+    TEST_ASSERT_EQUAL_INT(-ENOENT, optlen);
+}
+
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -634,6 +659,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__get_query),
         new_TestFixture(test_nanocoap__get_multi_query),
         new_TestFixture(test_nanocoap__option_add_buffer_max),
+        new_TestFixture(test_nanocoap__options_get_opaque),
         new_TestFixture(test_nanocoap__options_iterate),
         new_TestFixture(test_nanocoap__server_get_req),
         new_TestFixture(test_nanocoap__server_reply_simple),
