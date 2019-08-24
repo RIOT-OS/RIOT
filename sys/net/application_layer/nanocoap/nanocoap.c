@@ -185,14 +185,15 @@ uint8_t *coap_find_option(const coap_pkt_t *pkt, unsigned opt_num)
  * opt_len[out]   length of option value
  *
  * return         next byte after option header, usually the option value
- * return         NULL if initial pkt_pos is past options
+ * return         NULL if initial pkt_pos is payload marker or past options
  */
 static uint8_t *_parse_option(const coap_pkt_t *pkt,
                               uint8_t *pkt_pos, uint16_t *delta, int *opt_len)
 {
     uint8_t *hdr_end = pkt->payload;
 
-    if (pkt_pos == hdr_end) {
+    if ((pkt_pos >= hdr_end)
+            || (((pkt_pos + 1) == hdr_end) && (*pkt_pos == 0xFF))) {
         return NULL;
     }
 
