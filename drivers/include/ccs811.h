@@ -200,7 +200,7 @@ int ccs811_read_ntc (const ccs811_t *dev, uint32_t r_ref, uint32_t *r_ntc);
  * @brief   Data-ready status function
  *
  * The function reads the status register and returns CSS811_OK when new
- * data are available. The function is usefull for polling the sensor.
+ * data are available. The function is useful for polling the sensor.
  *
  * @param[in]   dev     Device descriptor of CCS811 device to read from
  *

@@ -124,7 +124,7 @@ void sha256_final(sha256_context_t *ctx, void *digest);
 
 /**
  * @brief A wrapper function to simplify the generation of a hash, this is
- * usefull for generating sha256 for one buffer
+ * useful for generating sha256 for one buffer
  *
  * @param[in] data   pointer to the buffer to generate hash from
  * @param[in] len    length of the buffer
