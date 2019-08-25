@@ -154,7 +154,7 @@ void sha3_512_final(keccak_state_t *ctx, void *digest);
 
 /**
  * @brief A wrapper function to simplify the generation of a hash, this is
- * usefull for generating SHA-3-256 from one buffer
+ * useful for generating SHA-3-256 from one buffer
  *
  * @param[in] data     pointer to the buffer to generate hash from
  * @param[in] len      length of the buffer
@@ -165,7 +165,7 @@ void sha3_256(void *digest, const void *data, size_t len);
 
 /**
  * @brief A wrapper function to simplify the generation of a hash, this is
- * usefull for generating SHA-3-384 from one buffer
+ * useful for generating SHA-3-384 from one buffer
  *
  * @param[in] data     pointer to the buffer to generate hash from
  * @param[in] len      length of the buffer
@@ -176,7 +176,7 @@ void sha3_384(void *digest, const void *data, size_t len);
 
 /**
  * @brief A wrapper function to simplify the generation of a hash, this is
- * usefull for generating SHA-3-512 from one buffer
+ * useful for generating SHA-3-512 from one buffer
  *
  * @param[in] data     pointer to the buffer to generate hash from
  * @param[in] len      length of the buffer
