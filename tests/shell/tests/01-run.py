@@ -49,6 +49,11 @@ CMDS = (
     ('unknown_command', ('shell: command not found: unknown_command')),
     ('help', EXPECTED_HELP),
     ('echo a string', ('\"echo\"\"a\"\"string\"')),
+    ('echo "t\e st" "\\"" '"'\\'' a\ b", ('"echo""te st"""""\'""a b"')),
+    ('echo a\\', ('shell: incorrect quoting')),
+    ('echo "', ('shell: incorrect quoting')),
+    ("echo '", ('shell: incorrect quoting')),
+    ('echo "\'" \'"\'', ('"echo""\'""""')),
     ('ps', EXPECTED_PS),
     ('garbage1234'+CONTROL_C, ('>')),  # test cancelling a line
     ('help', EXPECTED_HELP),
