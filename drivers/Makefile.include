@@ -58,6 +58,10 @@ ifneq (,$(filter dht,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dht/include
 endif
 
+ifneq (,$(filter eeprom,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/eeprom/include
+endif
+
 ifneq (,$(filter sht1x,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sht1x/include
 endif
