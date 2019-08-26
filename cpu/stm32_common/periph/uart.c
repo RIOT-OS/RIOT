@@ -107,6 +107,42 @@ static inline void uart_init_pins(uart_t uart, uart_rx_cb_t rx_cb)
 #endif
 }
 
+static inline void uart_enable_clock(uart_t uart)
+{
+#ifdef STM32_PM_STOP
+    if (isr_ctx[uart].rx_cb) {
+        pm_block(STM32_PM_STOP);
+    }
+#endif
+#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+    if (uart_config[uart].cts_pin != GPIO_UNDEF) {
+        gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
+#ifdef CPU_FAM_STM32F1
+        gpio_init_af(uart_config[uart].rts_pin, GPIO_AF_OUT_PP);
+#else
+        gpio_init_af(uart_config[uart].rts_pin, uart_config[uart].rts_af);
+#endif
+    }
+#endif
+    periph_clk_en(uart_config[uart].bus, uart_config[uart].rcc_mask);
+}
+
+static inline void uart_disable_clock(uart_t uart)
+{
+    periph_clk_dis(uart_config[uart].bus, uart_config[uart].rcc_mask);
+#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+    if (uart_config[uart].cts_pin != GPIO_UNDEF) {
+        gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
+        gpio_set(uart_config[uart].rts_pin);
+    }
+#endif
+#ifdef STM32_PM_STOP
+    if (isr_ctx[uart].rx_cb) {
+        pm_unblock(STM32_PM_STOP);
+    }
+#endif
+}
+
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     assert(uart < UART_NUMOF);
@@ -118,8 +154,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     uart_init_pins(uart, rx_cb);
 
-    /* enable the clock */
-    uart_poweron(uart);
+    uart_enable_clock(uart);
 
     /* reset UART configuration -> defaults to 8N1 mode */
     dev(uart)->CR1 = 0;
@@ -330,40 +365,19 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 void uart_poweron(uart_t uart)
 {
     assert(uart < UART_NUMOF);
-#ifdef STM32_PM_STOP
-    if (isr_ctx[uart].rx_cb) {
-        pm_block(STM32_PM_STOP);
-    }
-#endif
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
-    if (uart_config[uart].cts_pin != GPIO_UNDEF) {
-        gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
-#ifdef CPU_FAM_STM32F1
-        gpio_init_af(uart_config[uart].rts_pin, GPIO_AF_OUT_PP);
-#else
-        gpio_init_af(uart_config[uart].rts_pin, uart_config[uart].rts_af);
-#endif
-    }
-#endif
-    periph_clk_en(uart_config[uart].bus, uart_config[uart].rcc_mask);
+
+    uart_enable_clock(uart);
+
+    dev(uart)->CR1 |= (USART_CR1_UE);
 }
 
 void uart_poweroff(uart_t uart)
 {
     assert(uart < UART_NUMOF);
 
-    periph_clk_dis(uart_config[uart].bus, uart_config[uart].rcc_mask);
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
-    if (uart_config[uart].cts_pin != GPIO_UNDEF) {
-        gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
-        gpio_set(uart_config[uart].rts_pin);
-    }
-#endif
-#ifdef STM32_PM_STOP
-    if (isr_ctx[uart].rx_cb) {
-        pm_unblock(STM32_PM_STOP);
-    }
-#endif
+    dev(uart)->CR1 &= ~(USART_CR1_UE);
+
+    uart_disable_clock(uart);
 }
 
 static inline void irq_handler(uart_t uart)
