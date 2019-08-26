@@ -193,12 +193,20 @@ int i2c_acquire(i2c_t dev)
 
     periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
 
+    /* enable device */
+    i2c_config[dev].dev->CR1 |= I2C_CR1_PE;
+
     return 0;
 }
 
 void i2c_release(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
+
+    /* disable device */
+    i2c_config[dev].dev->CR1 &= ~(I2C_CR1_PE);
+
+    _wait_for_bus(i2c_config[dev].dev);
 
     periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
 
