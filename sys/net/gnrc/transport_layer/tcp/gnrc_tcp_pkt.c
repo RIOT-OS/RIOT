@@ -175,8 +175,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
     /* Set offset and control bit accordingly */
     tcp_hdr.off_ctl = byteorder_htons(_option_build_offset_control(offset, ctl));
 
-    /* Allocate TCP header: size = offset * 4 bytes */
-    tcp_snp = gnrc_pktbuf_add(pay_snp, &tcp_hdr, offset * 4, GNRC_NETTYPE_TCP);
+    tcp_snp = gnrc_pktbuf_add(pay_snp, &tcp_hdr, sizeof(tcp_hdr), GNRC_NETTYPE_TCP);
     if (tcp_snp == NULL) {
         DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Can't allocate buffer for TCP Header\n.");
         gnrc_pktbuf_release(pay_snp);
@@ -184,6 +183,14 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
         return -ENOMEM;
     }
     else {
+        /* Resize TCP header: size = offset * 4 bytes */
+        if (gnrc_pktbuf_realloc_data(tcp_snp, offset * 4)) {
+            DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Couldn't set size of TCP header\n");
+            gnrc_pktbuf_release(tcp_snp);
+            *(out_pkt) = NULL;
+            return -ENOMEM;
+        }
+
         /* Add options if existing */
         if (TCP_HDR_OFFSET_MIN < offset) {
             uint8_t *opt_ptr = (uint8_t *) tcp_snp->data + sizeof(tcp_hdr);
