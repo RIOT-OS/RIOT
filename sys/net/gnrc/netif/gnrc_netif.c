@@ -1283,7 +1283,9 @@ static void *_gnrc_netif_thread(void *args)
     /* setup the link-layer's message queue */
     msg_init_queue(msg_queue, GNRC_NETIF_MSG_QUEUE_SIZE);
     /* register the event callback with the device driver */
-    dev->event_callback = _event_cb;
+    if(!dev->event_callback) {
+        dev->event_callback = _event_cb;
+    }
     dev->context = netif;
     /* initialize low-level driver */
     res = dev->driver->init(dev);
