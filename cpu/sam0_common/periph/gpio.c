@@ -226,6 +226,26 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
+int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    int exti = _exti(pin);
+
+    /* make sure EIC channel is valid */
+    if (exti == -1) {
+        return -1;
+    }
+
+    if (cb) {
+        gpio_config[exti].cb = cb;
+    }
+
+    if (arg) {
+        gpio_config[exti].arg = arg;
+    }
+
+    return 0;
+}
+
 void gpio_irq_enable(gpio_t pin)
 {
     int exti = _exti(pin);

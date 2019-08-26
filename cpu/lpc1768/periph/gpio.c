@@ -202,6 +202,24 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
+int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    /* only certain pins can be used as interrupt pins */
+    if (_port(pin) != 0 && _port(pin) != 2) {
+        return -1;
+    }
+
+    if (cb) {
+        isr_ctx[_pin(pin)].cb = cb;
+    }
+
+    if (arg) {
+        isr_ctx[_pin(pin)].arg = arg;
+    }
+
+    return 0;
+}
+
 void gpio_irq_enable(gpio_t pin)
 {
     assert(_port(pin) == 0 || _port(pin) == 2);

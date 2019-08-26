@@ -187,6 +187,19 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
+int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    if (cb) {
+        isr_ctx[_ctx(pin)].cb = cb;
+    }
+
+    if (arg) {
+        isr_ctx[_ctx(pin)].arg = arg;
+    }
+
+    return 0;
+}
+
 void gpio_irq_enable(gpio_t pin)
 {
     msp_port_isr_t *port = _isr_port(pin);

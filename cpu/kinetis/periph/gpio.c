@@ -313,6 +313,24 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
+int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    int ctx = get_ctx(port_num(pin), pin_num(pin));
+    if (ctx < 0) {
+        return -1;
+    }
+
+    if (cb) {
+        isr_ctx[ctx].cb = cb;
+    }
+
+    if (arg) {
+        isr_ctx[ctx].arg = arg;
+    }
+
+    return 0;
+}
+
 void gpio_irq_enable(gpio_t pin)
 {
     int ctx = get_ctx(port_num(pin), pin_num(pin));

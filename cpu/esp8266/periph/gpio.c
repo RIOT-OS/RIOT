@@ -214,6 +214,21 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
+int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    CHECK_PARAM_RET(pin < GPIO_PIN_NUMOF, -1);
+
+    if (cb) {
+        gpio_isr_ctx_table[pin].cb = cb;
+    }
+
+    if (arg) {
+        gpio_isr_ctx_table[pin].arg = arg;
+    }
+
+    return 0;
+}
+
 void gpio_irq_enable (gpio_t pin)
 {
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);

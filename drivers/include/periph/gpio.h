@@ -173,6 +173,28 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg);
 
 /**
+ * @brief   Change the callback and/or argument of an external interrupt GPIO
+ *
+ * The registered callback function will be called in interrupt context every
+ * time the defined flank(s) configured in `gpio_init_int()` are detected.
+ *
+ * This assumes `gpio_init_int()` has been called at least once before on `pin`.
+ *
+ * @note    You have to add the module `periph_gpio_irq` to your project to
+ *          enable this function
+ *
+ * @param[in] pin       pin to re-configure
+ * @param[in] cb        callback that is called from interrupt context
+ *                      May be NULL, in which case the previous value is kept.
+ * @param[in] arg       optional argument passed to the callback
+ *                      May be NULL, in which case the previous value is kept.
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg);
+
+/**
  * @brief   Enable pin interrupt if configured as interrupt source
  *
  * @note    You have to add the module `periph_gpio_irq` to your project to

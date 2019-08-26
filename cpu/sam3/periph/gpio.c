@@ -308,6 +308,21 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
+int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    unsigned ctx_num = _ctx(_port_num(pin), _pin_num(pin));
+
+    if (cb) {
+        exti_ctx[ctx_num].cb = cb;
+    }
+
+    if (arg) {
+        exti_ctx[ctx_num].arg = arg;
+    }
+
+    return 0;
+}
+
 static inline void isr_handler(Pio *port, int port_num)
 {
     /* take interrupt flags only from pins which interrupt is enabled */

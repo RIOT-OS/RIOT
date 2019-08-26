@@ -254,6 +254,22 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
+int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    const uint8_t port_num = _port_num(pin);
+    const uint8_t pin_num = _pin_num(pin);
+
+    if (cb) {
+        gpio_config[port_num][pin_num].cb = cb;
+    }
+
+    if (arg) {
+        gpio_config[port_num][pin_num].arg = arg;
+    }
+
+    return 0;
+}
+
 void gpio_irq_enable(gpio_t pin)
 {
     const uint8_t port_num = _port_num(pin);

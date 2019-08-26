@@ -134,6 +134,23 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
+int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    if (pin == GPIO_UNDEF) {
+        return -1;
+    }
+
+    if (cb) {
+        isr_ctx[_pin_num(pin)].cb = cb;
+    }
+
+    if (arg) {
+        isr_ctx[_pin_num(pin)].arg = arg;
+    }
+
+    return 0;
+}
+
 void gpio_irq_enable(gpio_t pin)
 {
     GPIO_IntEnable(_pin_mask(pin));

@@ -239,6 +239,22 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
     return 0;
 }
+
+int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    int pin_num = _pin_num(pin);
+
+    if (cb) {
+        isr_ctx[pin_num].cb = cb;
+    }
+
+    if (arg) {
+        isr_ctx[pin_num].arg = arg;
+    }
+
+    return 0;
+}
+
 void isr_exti(void)
 {
     /* only generate interrupts against lines which have their IMR set */

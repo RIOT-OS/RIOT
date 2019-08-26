@@ -186,6 +186,31 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
+int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    int idx = -1;
+    for (unsigned int i = 0; i < _gpiote_next_index; i++) {
+        if (_exti_pins[i] == pin) {
+            idx = i;
+            break;
+        }
+    }
+
+    if (idx < 0) {
+        return -1;
+    }
+
+    if (cb) {
+        exti_chan[idx].cb = cb;
+    }
+
+    if (arg) {
+        exti_chan[idx].arg = arg;
+    }
+
+    return 0;
+}
+
 void gpio_irq_enable(gpio_t pin)
 {
     for (unsigned int i = 0; i < _gpiote_next_index; i++) {
