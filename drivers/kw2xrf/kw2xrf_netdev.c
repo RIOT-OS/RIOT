@@ -625,6 +625,9 @@ static void _isr_event_seq_t(netdev_t *netdev, uint8_t *dregs)
                 netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
             }
         }
+        else {
+            netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+        }
 
         assert(dev->pending_tx != 0);
         dev->pending_tx--;
@@ -692,13 +695,18 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
                 DEBUG("[kw2xrf] CCA CH busy\n");
                 netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
             }
+            else {
+                netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+            }
+        }
+        else {
+            netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
         }
 
         DEBUG("[kw2xrf] SEQIRQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_SEQIRQ;
         assert(dev->pending_tx != 0);
         dev->pending_tx--;
-        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
         kw2xrf_seq_timeout_off(dev);
         kw2xrf_set_idle_sequence(dev);
     }
