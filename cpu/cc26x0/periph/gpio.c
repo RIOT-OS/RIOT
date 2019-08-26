@@ -137,8 +137,8 @@ void isr_edge(void)
 {
     for (unsigned pin = 0; pin < GPIO_ISR_CHAN_NUMOF; pin++) {
         /* doc claims EVFLAGS will only be set for pins that have edge detection enabled */
-        if (GPIO->EVFLAGS & (1 << pin)) {
-            GPIO->EVFLAGS |= (1 << pin);
+        if (GPIO->EVFLAGS & (1U << pin)) {
+            GPIO->EVFLAGS |= (1U << pin);
             gpio_chan[pin].cb(gpio_chan[pin].arg);
         }
     }
