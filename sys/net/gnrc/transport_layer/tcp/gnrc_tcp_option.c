@@ -64,6 +64,12 @@ int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
                 DEBUG("gnrc_tcp_option.c : _option_parse() : Unknown option found.\
                       KIND=%"PRIu8", LENGTH=%"PRIu8"\n", option->kind, option->length);
         }
+
+        if (option->length > opt_left) {
+            DEBUG("gnrc_tcp_option.c : _option_parse() : invalid option length\n");
+            return 0;
+        }
+
         opt_ptr += option->length;
         opt_left -= option->length;
     }
