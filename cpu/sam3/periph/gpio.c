@@ -329,7 +329,7 @@ static inline void isr_handler(Pio *port, int port_num)
     uint32_t status = (port->PIO_ISR & port->PIO_IMR);
 
     for (int i = 0; i < 32; i++) {
-        if (status & (1 << i)) {
+        if (status & (1U << i)) {
             int ctx = _ctx(port_num, i);
             exti_ctx[ctx].cb(exti_ctx[ctx].arg);
         }
