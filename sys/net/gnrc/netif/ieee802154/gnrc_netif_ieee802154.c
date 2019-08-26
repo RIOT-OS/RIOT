@@ -30,18 +30,79 @@
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
+static void _init(gnrc_netif_t *netif);
 
 static const gnrc_netif_ops_t ieee802154_ops = {
+    .init = _init,
     .send = _send,
     .recv = _recv,
     .get = gnrc_netif_get_from_netdev,
     .set = gnrc_netif_set_from_netdev,
 };
 
+static inline void _release_pending_pkt(netdev_ieee802154_t *netdev)
+{
+    puts("Releasing pkt");
+    gnrc_pktbuf_release((gnrc_pktsnip_t*) netdev->pending_pkt);
+    netdev->pending_pkt = NULL;
+}
+
+static void _event_cb(netdev_t *dev, netdev_event_t event)
+{
+    gnrc_netif_t *netif = (gnrc_netif_t *) dev->context;
+
+    if (event == NETDEV_EVENT_ISR) {
+        msg_t msg = { .type = NETDEV_MSG_TYPE_EVENT,
+                      .content = { .ptr = netif } };
+
+        if (msg_send(&msg, netif->pid) <= 0) {
+            puts("gnrc_netif: possibly lost interrupt.");
+        }
+    }
+    else {
+        DEBUG("gnrc_netif: event triggered -> %i\n", event);
+        gnrc_pktsnip_t *pkt = NULL;
+        switch (event) {
+            case NETDEV_EVENT_RX_COMPLETE:
+                pkt = netif->ops->recv(netif);
+                    /* throw away packet if no one is interested */
+                if (pkt && !gnrc_netapi_dispatch_receive(
+                            pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
+                        DEBUG("gnrc_netif: unable to forward packet of type %i\n",
+                                pkt->type);
+                        gnrc_pktbuf_release(pkt);
+                        return;
+                }
+                break;
+            case NETDEV_EVENT_TX_MEDIUM_BUSY:
+            case NETDEV_EVENT_TX_NOACK:
+                _release_pending_pkt((netdev_ieee802154_t*) netif->dev);
+#ifdef MODULE_NETSTATS_L2
+                /* we are the only ones supposed to touch this variable,
+                 * so no acquire necessary */
+                netif->stats.tx_failed++;
+#endif
+                break;
+            case NETDEV_EVENT_TX_COMPLETE:
+            case NETDEV_EVENT_TX_COMPLETE_DATA_PENDING:
+                _release_pending_pkt((netdev_ieee802154_t*) netif->dev);
+#ifdef MODULE_NETSTATS_L2
+                /* we are the only ones supposed to touch this variable,
+                 * so no acquire necessary */
+                netif->stats.tx_success++;
+#endif
+                break;
+            default:
+                DEBUG("gnrc_netif: warning: unhandled event %u.\n", event);
+        }
+    }
+}
 gnrc_netif_t *gnrc_netif_ieee802154_create(char *stack, int stacksize,
+
                                            char priority, char *name,
                                            netdev_t *dev)
 {
+    dev->event_callback = _event_cb;
     return gnrc_netif_create(stack, stacksize, priority, name, dev,
                              &ieee802154_ops);
 }
@@ -229,6 +290,12 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     uint8_t flags = (uint8_t)(state->flags & NETDEV_IEEE802154_SEND_MASK);
     le_uint16_t dev_pan = byteorder_btols(byteorder_htons(state->pan));
 
+    /* If the MAC layer is busy sending a packet, return busy immediately.
+     * This should be replaced by a queueing mechanism soon... */
+    if(state->pending_pkt) {
+        return -EBUSY;
+    }
+
     flags |= IEEE802154_FCF_TYPE_DATA;
     if (pkt == NULL) {
         DEBUG("_send_ieee802154: pkt was NULL\n");
@@ -296,8 +363,17 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     res = dev->driver->send(dev, &iolist);
 #endif
 
-    /* release old data */
-    gnrc_pktbuf_release(pkt);
+    /* Save the packet for retransmissions */
+    state->pending_pkt = (iolist_t*) pkt;
     return res;
+}
+
+static void _init(gnrc_netif_t *netif)
+{
+    static const netopt_enable_t enable = NETOPT_ENABLE;
+    int res = netif->dev->driver->set(netif->dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
+    if (res < 0) {
+        DEBUG("gnrc_netif: enable NETOPT_TX_END_IRQ failed: %d\n", res);
+    }
 }
 /** @} */
