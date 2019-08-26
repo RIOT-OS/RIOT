@@ -97,6 +97,12 @@ typedef struct {
 #endif
 
     /**
+     * @brief   Pointer to pending pkt.
+     *          This should be used for retransmissions.
+     */
+    iolist_t *pending_pkt;
+
+    /**
      * @brief   PAN ID in network byte order
      */
     uint16_t pan;
