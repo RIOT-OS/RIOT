@@ -142,6 +142,8 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
     enum PARSE_STATE pstate = PARSE_SPACE;
 
     while (*readpos != '\0') {
+        char wordbreak;
+
         switch (pstate) {
             case PARSE_SPACE:
                 if (*readpos != BLANK) {
@@ -159,35 +161,23 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
                 }
                 goto parse_end;
             case PARSE_UNQUOTED:
-                if (*readpos == BLANK) {
-                    pstate = PARSE_SPACE;
-                    *writepos++ = '\0';
-                    goto parse_end;
-                } else if (*readpos == ESCAPECHAR) {
-                    pstate = escape_toggle(pstate);
-                    goto parse_end;
-                }
-                break;
+                wordbreak = BLANK;
+                goto break_word;
             case PARSE_SINGLEQUOTE:
-                if (*readpos == SQUOTE)  {
-                    pstate = PARSE_SPACE;
-                    *writepos++ = '\0';
-                    goto parse_end;
-                } else if (*readpos == ESCAPECHAR) {
-                    pstate = escape_toggle(pstate);
-                    goto parse_end;
-                }
-                break;
+                wordbreak = SQUOTE;
+                goto break_word;
             case PARSE_DOUBLEQUOTE:
-                if (*readpos == DQUOTE) {
+                wordbreak = DQUOTE;
+break_word:
+                if (*readpos == wordbreak) {
                     pstate = PARSE_SPACE;
                     *writepos++ = '\0';
-                    goto parse_end;
                 } else if (*readpos == ESCAPECHAR) {
                     pstate = escape_toggle(pstate);
-                    goto parse_end;
+                } else {
+                    break;
                 }
-                break;
+                goto parse_end;
             default: /* QUOTED state */
                 pstate = escape_toggle(pstate);
                 break;
