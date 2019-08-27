@@ -33,6 +33,10 @@ ifneq (,$(findstring core_thread_flags,$(USEMODULE)))
     USEMODULE += pthread
 endif
 
+ifneq (,$(filter cpp,$(FEATURES_USED)))
+    USEMODULE += esp_cxx
+endif
+
 ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
     USEMODULE += esp_gdb
 endif
@@ -141,6 +145,10 @@ LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.peripherals.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.nanofmt.ld
 LINKFLAGS += -nostdlib -lgcc -Wl,-gc-sections
+
+ifneq (,$(filter esp_cxx,$(USEMODULE)))
+    UNDEF += $(BINDIR)/esp_cxx/cxa_guard.o
+endif
 
 # The ELFFILE is the base one used for flashing
 FLASHFILE ?= $(ELFFILE)
