@@ -1,1 +1,5 @@
 INCLUDES += -I$(RIOTBOARD)/common/atmega/include
+
+DIST_PATH ?= $(RIOTBOARD)/common/atmega/dist
+
+include $(RIOTMAKE)/tools/avrdude.inc.mk
