@@ -81,28 +81,6 @@ typedef struct {
      */
     int (*write)(void *handle, eeprom_off_t pos, const void *data, size_t len);
     /**
-     * @brief   Set all bytes in `[pos; pos + len[` to the value in @p val
-     *
-     * @param[in,out]   handle  Device handle of the EEPROM to write to
-     * @param[in]       pos     Position to start to write to (in bytes)
-     * @param[in]       val     Write this in every byte in `[pos; pos + len[`
-     * @param[in        len     Number of bytes to set to @p val
-     *
-     * @retval  0       Success
-     * @retval  -EIO    I/O error occurred while writen
-     *
-     * If `-EFAULT` has been returned, the content of the EEPROM device is
-     * unchanged. If `0` is returned, all data has been written successfully
-     * to the device. If `-EIO` is returned, the contents in `[pos; pos + len[`
-     * of the device are undefined, but the remaining content of the device
-     * is unchanged.
-     *
-     * This function is optional to implement by the driver. If the function
-     * pointer is `NULL`, a fallback implementation that calls
-     * @ref eeprom_driver_t::write is used instead.
-     */
-    int (*set)(void *handle, eeprom_off_t pos, uint8_t val, size_t len);
-    /**
      * @brief   Erase the whole EEPROM
      *
      * @param[in,out]   handle  Device handle of the EEPROM to erase

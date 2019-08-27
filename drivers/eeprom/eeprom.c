@@ -139,24 +139,20 @@ int eeprom_set(eeprom_t dev, eeprom_off_t pos, uint8_t val, size_t len)
         return -EFAULT;
     }
 
-    if (!eeprom_devs[dev].driver->set) {
-        uint8_t buf[EEPROM_SET_BUF];
-        memset(buf, val, sizeof(buf));
-        while (len > EEPROM_SET_BUF) {
-            int retval = eeprom_devs[dev].driver->write(eeprom_devs[dev].handle,
-                                                       pos, buf, len);
-            if (retval) {
-                /* pass through error code */
-                return retval;
-            }
-            pos += EEPROM_SET_BUF;
-            len -= EEPROM_SET_BUF;
+    uint8_t buf[EEPROM_SET_BUF];
+    memset(buf, val, sizeof(buf));
+    while (len > EEPROM_SET_BUF) {
+        int retval = eeprom_devs[dev].driver->write(eeprom_devs[dev].handle,
+                                                   pos, buf, len);
+        if (retval) {
+            /* pass through error code */
+            return retval;
         }
-        return eeprom_devs[dev].driver->write(eeprom_devs[dev].handle,
-                                             pos, buf, len);
+        pos += EEPROM_SET_BUF;
+        len -= EEPROM_SET_BUF;
     }
-
-    return eeprom_devs[dev].driver->set(eeprom_devs[dev].handle, pos, val, len);
+    return eeprom_devs[dev].driver->write(eeprom_devs[dev].handle,
+                                          pos, buf, len);
 }
 
 int eeprom_erase(eeprom_t dev)
