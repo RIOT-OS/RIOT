@@ -12,7 +12,7 @@ ifeq (1,$(EFM32_TNRG))
 endif
 
 ifeq (1,$(EFM32_UART_MODES))
-  export CFLAGS += -DEFM32_UART_MODES=1
+  CFLAGS += -DEFM32_UART_MODES=1
 endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.features

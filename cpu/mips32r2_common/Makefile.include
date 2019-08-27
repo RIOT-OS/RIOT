@@ -1,4 +1,4 @@
-export INCLUDES += -I$(RIOTCPU)/mips32r2_common/include
+INCLUDES += -I$(RIOTCPU)/mips32r2_common/include
 
 export USEMODULE += mips32r2_common
 export USEMODULE += mips32r2_common_periph

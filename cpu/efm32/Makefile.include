@@ -4,7 +4,7 @@ export CPU_ARCH = $(EFM32_ARCHITECTURE)
 export CPU_FAM = $(EFM32_FAMILY)
 
 # the em_device.h header requires a global define with the cpu model
-export CFLAGS += -D$(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
+CFLAGS += -D$(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
 
 # include Gecko SDK package
 USEPKG += gecko_sdk
