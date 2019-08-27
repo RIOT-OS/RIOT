@@ -47,9 +47,9 @@ static void _putchar(int c) {
 #endif
 
 #ifdef MODULE_SHELL_COMMANDS
-#define _use_builtin_cmds true
+#define _builtin_cmds _shell_command_list
 #else
-#define _use_builtin_cmds false
+#define _builtin_cmds NULL
 #endif
 
 static void flush_if_needed(void)
@@ -78,8 +78,8 @@ static shell_command_handler_t find_handler(const shell_command_t *command_list,
         handler = search_commands(command_list, command);
     }
 
-    if (handler == NULL && _use_builtin_cmds) {
-        handler = search_commands(_shell_command_list, command);
+    if (handler == NULL && _builtin_cmds != NULL) {
+        handler = search_commands(_builtin_cmds, command);
     }
 
     return handler;
@@ -100,8 +100,8 @@ static void print_help(const shell_command_t *command_list)
         print_commands(command_list);
     }
 
-    if (_use_builtin_cmds) {
-        print_commands(_shell_command_list);
+    if (_builtin_cmds != NULL) {
+        print_commands(_builtin_cmds);
     }
 }
 
