@@ -46,6 +46,12 @@ static void _putchar(int c) {
 #endif
 #endif
 
+#ifdef MODULE_SHELL_COMMANDS
+#define _use_builtin_cmds true
+#else
+#define _use_builtin_cmds false
+#endif
+
 static void flush_if_needed(void)
 {
 #ifdef MODULE_NEWLIB
@@ -53,60 +59,49 @@ static void flush_if_needed(void)
 #endif
 }
 
-static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
+static shell_command_handler_t search_commands(const shell_command_t *entry,
+                                               char *command)
 {
-    const shell_command_t *command_lists[] = {
-        command_list,
-#ifdef MODULE_SHELL_COMMANDS
-        _shell_command_list,
-#endif
-    };
-
-    /* iterating over command_lists */
-    for (unsigned int i = 0; i < ARRAY_SIZE(command_lists); i++) {
-
-        const shell_command_t *entry;
-
-        if ((entry = command_lists[i])) {
-            /* iterating over commands in command_lists entry */
-            while (entry->name != NULL) {
-                if (strcmp(entry->name, command) == 0) {
-                    return entry->handler;
-                }
-                else {
-                    entry++;
-                }
-            }
+    for (; entry->name != NULL; entry++) {
+        if (strcmp(entry->name, command) == 0) {
+            return entry->handler;
         }
     }
-
     return NULL;
+}
+
+static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
+{
+    shell_command_handler_t handler = NULL;
+
+    if (command_list != NULL) {
+        handler = search_commands(command_list, command);
+    }
+
+    if (handler == NULL && _use_builtin_cmds) {
+        handler = search_commands(_shell_command_list, command);
+    }
+
+    return handler;
+}
+
+static void print_commands(const shell_command_t *entry)
+{
+    for (; entry->name != NULL; entry++) {
+        printf("%-20s %s\n", entry->name, entry->desc);
+    }
 }
 
 static void print_help(const shell_command_t *command_list)
 {
-    printf("%-20s %s\n", "Command", "Description");
-    puts("---------------------------------------");
+    puts("Command              Description\n---------------------------------------");
 
-    const shell_command_t *command_lists[] = {
-        command_list,
-#ifdef MODULE_SHELL_COMMANDS
-        _shell_command_list,
-#endif
-    };
+    if (command_list != NULL) {
+        print_commands(command_list);
+    }
 
-    /* iterating over command_lists */
-    for (unsigned int i = 0; i < ARRAY_SIZE(command_lists); i++) {
-
-        const shell_command_t *entry;
-
-        if ((entry = command_lists[i])) {
-            /* iterating over commands in command_lists entry */
-            while (entry->name != NULL) {
-                printf("%-20s %s\n", entry->name, entry->desc);
-                entry++;
-            }
-        }
+    if (_use_builtin_cmds) {
+        print_commands(_shell_command_list);
     }
 }
 
