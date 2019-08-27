@@ -20,5 +20,4 @@ endif
 # avoid error if mcu signature doesn't match
 FFLAGS_EXTRA += -F
 
-include $(RIOTMAKE)/tools/avrdude.inc.mk
 include $(RIOTBOARD)/common/atmega/Makefile.include
