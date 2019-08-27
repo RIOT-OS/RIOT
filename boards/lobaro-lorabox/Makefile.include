@@ -17,4 +17,4 @@ FLASHFILE ?= $(BINFILE)
 # -l 0x1ff: amount of sectors to erase
 FFLAGS += -p $(PORT) -e -u -S -l 0x1ff -w $(FLASHFILE)
 
-TERMFLAGS +=  --set-rts 0
+PYTERMFLAGS +=  --set-rts 0
