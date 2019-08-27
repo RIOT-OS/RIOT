@@ -94,6 +94,9 @@ defaultnewline = "LF"
 # default prompt character
 defaultprompt = '>'
 
+# repeat command on empty line instead of sending the line
+defaultrepeat_cmd_empty_line = True
+
 
 class SerCmd(cmd.Cmd):
     """Main class for pyterm based on Python's Cmd class.
@@ -105,7 +108,8 @@ class SerCmd(cmd.Cmd):
     def __init__(self, port=None, baudrate=None, toggle=None, tcp_serial=None,
                  confdir=None, conffile=None, host=None, run_name=None,
                  log_dir_name=None, newline=None, formatter=None,
-                 set_rts=None, set_dtr=None, serprompt=None):
+                 set_rts=None, set_dtr=None, serprompt=None,
+                 repeat_command_on_empty_line=defaultrepeat_cmd_empty_line):
         """Constructor.
 
         Args:
@@ -134,6 +138,7 @@ class SerCmd(cmd.Cmd):
         self.log_dir_name = log_dir_name
         self.newline = newline
         self.serprompt = serprompt
+        self.repeat_command_on_empty_line = repeat_command_on_empty_line
         if formatter is not None:
             self.fmt_str = formatter
 
@@ -271,6 +276,16 @@ class SerCmd(cmd.Cmd):
         if (line.startswith("/")):
                 return "PYTERM_" + line[1:]
         return line
+
+    def emptyline(self):
+        """Either send empty line or repeat previous command.
+
+        Behavior can be configured with `repeat_command_on_empty_line`.
+        """
+        if self.repeat_command_on_empty_line:
+            super().emptyline()
+        else:
+            self.default('')
 
     def default(self, line):
         """In case of no Pyterm specific prefix is detected, split
@@ -796,6 +811,18 @@ if __name__ == "__main__":
                         % defaultprompt,
                         default=defaultprompt)
 
+    # Keep help message in sync if changing the default
+    parser.add_argument("--repeat-command-on-empty-line",
+                        dest='repeat_command_on_empty_line',
+                        action='store_true',
+                        help="Repeat command on empty line (Default)")
+    parser.add_argument("--no-repeat-command-on-empty-line",
+                        dest='repeat_command_on_empty_line',
+                        action="store_false",
+                        help="Do not repeat command on empty line")
+    parser.set_defaults(
+        repeat_command_on_empty_line=defaultrepeat_cmd_empty_line)
+
     args = parser.parse_args()
 
     if args.noprefix:
@@ -803,7 +830,8 @@ if __name__ == "__main__":
     myshell = SerCmd(args.port, args.baudrate, args.toggle, args.tcp_serial,
                      args.directory, args.config, args.host, args.run_name,
                      args.log_dir_name, args.newline, args.format,
-                     args.set_rts, args.set_dtr, args.prompt)
+                     args.set_rts, args.set_dtr, args.prompt,
+                     args.repeat_command_on_empty_line)
     myshell.prompt = ''
 
     try:
