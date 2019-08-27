@@ -110,10 +110,6 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     tmp |= (AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__OFF);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_0, tmp);
 
-    /* enable interrupts */
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
-                        AT86RF2XX_IRQ_STATUS_MASK__TRX_END
-                        | AT86RF2XX_IRQ_STATUS_MASK__RX_START);
     /* clear interrupt flags */
     at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
 

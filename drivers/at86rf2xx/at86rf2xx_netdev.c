@@ -82,6 +82,11 @@ static int _init(netdev_t *netdev)
     /* reset device to default values and put it into RX state */
     at86rf2xx_reset(dev);
 
+    /* enable interrupts */
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
+                        AT86RF2XX_IRQ_STATUS_MASK__TRX_END
+                        | AT86RF2XX_IRQ_STATUS_MASK__RX_START);
+
     /* test if the SPI is set up correctly and the device is responding */
     if (at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM) != AT86RF2XX_PARTNUM) {
         DEBUG("[at86rf2xx] error: unable to read correct part number\n");
@@ -647,7 +652,8 @@ static void _isr(netdev_t *netdev)
     trac_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE)
                   & AT86RF2XX_TRX_STATE_MASK__TRAC;
 
-    if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__RX_START) {
+    if (dev->flags & AT86RF2XX_OPT_TELL_RX_START &&
+            irq_mask & AT86RF2XX_IRQ_STATUS_MASK__RX_START) {
         dev->busy = true;
         if(netdev->event_callback) {
             netdev->event_callback(netdev, NETDEV_EVENT_RX_STARTED);
