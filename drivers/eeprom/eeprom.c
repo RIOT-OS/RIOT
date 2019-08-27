@@ -35,7 +35,7 @@
 #define EEPROM_SET_BUF              (32)
 #endif
 
-static size_t _sizes[EEPROM_NUMOF];
+static eeprom_off_t _sizes[EEPROM_NUMOF];
 
 /**
  * @brief       Check if the given device is valid and initialized
@@ -60,7 +60,7 @@ static inline int _is_dev_valid(eeprom_t dev)
  * @retval      0       The range is not valid
  * @retval      1       The range is valid
  */
-static inline int _is_range_valid(eeprom_t dev, size_t pos, size_t len)
+static inline int _is_range_valid(eeprom_t dev, eeprom_off_t pos, size_t len)
 {
     /* We basically want to check for "pos + len < _sizes[dev]", but we have to
      * be a bit careful to prevent integer overflows */
@@ -86,16 +86,16 @@ void eeprom_init(void)
     }
 }
 
-size_t eeprom_size(eeprom_t dev)
+eeprom_off_t eeprom_size(eeprom_t dev)
 {
     if (_is_dev_valid(dev)) {
-        return (size_t)_sizes[dev];
+        return _sizes[dev];
     }
 
     return 0;
 }
 
-int eeprom_read(eeprom_t dev, size_t pos, void *dest, size_t len)
+int eeprom_read(eeprom_t dev, eeprom_off_t pos, void *dest, size_t len)
 {
     if (!_is_dev_valid(dev)) {
         return -ENODEV;
@@ -112,7 +112,7 @@ int eeprom_read(eeprom_t dev, size_t pos, void *dest, size_t len)
     return eeprom_devs[dev].driver->read(eeprom_devs[dev].handle, pos, dest, len);
 }
 
-int eeprom_write(eeprom_t dev, size_t pos, const void *data, size_t len)
+int eeprom_write(eeprom_t dev, eeprom_off_t pos, const void *data, size_t len)
 {
     if (!_is_dev_valid(dev)) {
         return -ENODEV;
@@ -129,7 +129,7 @@ int eeprom_write(eeprom_t dev, size_t pos, const void *data, size_t len)
     return eeprom_devs[dev].driver->write(eeprom_devs[dev].handle, pos, data, len);
 }
 
-int eeprom_set(eeprom_t dev, size_t pos, uint8_t val, size_t len)
+int eeprom_set(eeprom_t dev, eeprom_off_t pos, uint8_t val, size_t len)
 {
     if (!_is_dev_valid(dev)) {
         return -ENODEV;

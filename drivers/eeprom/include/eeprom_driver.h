@@ -49,7 +49,7 @@ typedef struct {
      * @retval  0       Failed to initialize the device
      * @return          The size of the device in bytes
      */
-    size_t (*init)(void *handle, const void *params);
+    eeprom_off_t (*init)(void *handle, const void *params);
     /**
      * @brief   Read data from the EEPROM device
      *
@@ -61,7 +61,7 @@ typedef struct {
      * @retval  0       Success
      * @retval  -EIO    I/O error occurred while reading
      */
-    int (*read)(void *handle, size_t pos, void *dest, size_t len);
+    int (*read)(void *handle, eeprom_off_t pos, void *dest, size_t len);
     /**
      * @brief   Write data from the EEPROM device
      *
@@ -79,7 +79,7 @@ typedef struct {
      * of the device are undefined, but the remaining content of the device
      * is unchanged.
      */
-    int (*write)(void *handle, size_t pos, const void *data, size_t len);
+    int (*write)(void *handle, eeprom_off_t pos, const void *data, size_t len);
     /**
      * @brief   Set all bytes in `[pos; pos + len[` to the value in @p val
      *
@@ -101,7 +101,7 @@ typedef struct {
      * pointer is `NULL`, a fallback implementation that calls
      * @ref eeprom_driver_t::write is used instead.
      */
-    int (*set)(void *handle, size_t pos, uint8_t val, size_t len);
+    int (*set)(void *handle, eeprom_off_t pos, uint8_t val, size_t len);
     /**
      * @brief   Erase the whole EEPROM
      *

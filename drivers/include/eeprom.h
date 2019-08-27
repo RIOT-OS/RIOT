@@ -40,6 +40,13 @@ extern "C" {
 typedef uint_fast8_t eeprom_t;
 #endif
 
+#ifndef HAVE_EEPROM_OFF_T
+/**
+ * @brief   Offset / size type in EEPROM devices
+ */
+typedef uint32_t eeprom_off_t;
+#endif
+
 /**
  * @brief   Return the size of the EEPROM device
  *
@@ -48,7 +55,7 @@ typedef uint_fast8_t eeprom_t;
  * @return  The size of the EEPROM device in bytes
  * @retval  0               No EEPROM device for parameter @p dev
  */
-size_t eeprom_size(eeprom_t dev);
+eeprom_off_t eeprom_size(eeprom_t dev);
 
 /**
  * @brief   Read @p len bytes from the given position
@@ -67,7 +74,7 @@ size_t eeprom_size(eeprom_t dev);
  * @details If this functions fails with `-EIO`, the contents of @p dest are
  *          undefined. For every other error the content is unchanged.
  */
-int eeprom_read(eeprom_t dev, size_t pos, void *dest, size_t len);
+int eeprom_read(eeprom_t dev, eeprom_off_t pos, void *dest, size_t len);
 
 /**
  * @brief   Write @p len bytes at the given position
@@ -87,7 +94,7 @@ int eeprom_read(eeprom_t dev, size_t pos, void *dest, size_t len);
  *          `[pos; pos + len[` on the device are undefined. For every other
  *          error the EEPROM is not changed.
  */
-int eeprom_write(eeprom_t dev, size_t pos, const void *data, size_t len);
+int eeprom_write(eeprom_t dev, eeprom_off_t pos, const void *data, size_t len);
 
 /**
  * @brief   Set @p len bytes from the given position @p pos with value @p val
@@ -107,7 +114,7 @@ int eeprom_write(eeprom_t dev, size_t pos, const void *data, size_t len);
  *          `[pos; pos + len[` on the device are undefined. For every other
  *          error the EEPROM is not changed.
  */
-int eeprom_set(eeprom_t dev, size_t pos, uint8_t val, size_t len);
+int eeprom_set(eeprom_t dev, eeprom_off_t pos, uint8_t val, size_t len);
 
 /**
  * @brief   Erase the whole EEPROM content
@@ -169,7 +176,7 @@ static inline int eeprom_write_byte(eeprom_t dev, uint32_t pos, uint8_t data)
  *          `[pos; pos + len[` on the device are undefined. For every other
  *          error the EEPROM is not changed.
  */
-static inline int eeprom_clear(eeprom_t dev, size_t pos, size_t len)
+static inline int eeprom_clear(eeprom_t dev, eeprom_off_t pos, size_t len)
 {
     return eeprom_set(dev, pos, 0, len);
 }
