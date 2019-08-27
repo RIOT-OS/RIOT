@@ -6,9 +6,6 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
-# Use a terminal that does not introduce extra characters into the stream.
-RIOT_TERMINAL ?= socat
-
 DISABLE_MODULE += auto_init
 
 # chronos is missing a getchar implementation
