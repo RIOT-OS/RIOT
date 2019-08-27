@@ -276,6 +276,11 @@ static int readline(char *buf, size_t size)
         /* DOS newlines are handled like hitting enter twice, but empty lines are ignored. */
         /* Ctrl-C cancels the current line. */
         if (c == '\r' || c == '\n' || c == ETX) {
+            if (c == ETX) {
+                curr_pos = 0;
+                length_exceeded = 0;
+            }
+
             buf[curr_pos] = '\0';
 #ifndef SHELL_NO_ECHO
             _putchar('\r');
