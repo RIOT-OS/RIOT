@@ -329,8 +329,6 @@ static int readline(struct shell_state *state, size_t size)
 
     assert((size_t)size > 0);
 
-    print_prompt(state);
-
     while (1) {
         int c = getchar();
 
@@ -385,6 +383,7 @@ void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
     len = shell_state_init(state, len);
 
     while (1) {
+        print_prompt(state);
         int res = readline(state, len);
 
         switch (res) {
