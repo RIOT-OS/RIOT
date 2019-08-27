@@ -86,7 +86,8 @@ defaultfile = "pyterm-" + defaulthostname + ".conf"
 defaultrunname = "default-run"
 
 # default logging prefix format string
-default_fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
+# Can use '%(asctime)s # %(message)s' to get the timestamp added
+default_fmt_str = '%(message)s'
 
 # default newline setting
 defaultnewline = "LF"
