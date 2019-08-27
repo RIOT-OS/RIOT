@@ -64,10 +64,29 @@ static int cmd_shellping(int argc, char **argv)
     return 0;
 }
 
+/**
+ * @brief getchar, read one character
+ *
+ * Read one character and print its hex value
+ *
+ * @param[in] argc  Number of arguments
+ * @param[in] argv  Array of arguments
+ *
+ * @return  0
+ *
+ */
+static int cmd_getchar(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    printf("%s 0x%02x\n", argv[0], getchar());
+    return 0;
+}
 
 static const shell_command_t shell_commands[] = {
     { "shellping", "Just print 'shellpong'", cmd_shellping },
     { "true", "do nothing, successfully", cmd_true },
+    { "getchar", "Get one character and print the hex value", cmd_getchar },
     { NULL, NULL, NULL }
 };
 
