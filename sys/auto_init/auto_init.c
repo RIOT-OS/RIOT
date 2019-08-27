@@ -88,6 +88,10 @@
 #include "net/asymcute.h"
 #endif
 
+#ifdef MODULE_SOCK_DTLS
+#include "net/sock/dtls.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -180,6 +184,10 @@ void auto_init(void)
 #ifdef MODULE_AUTO_INIT_LORAMAC
     extern void auto_init_loramac(void);
     auto_init_loramac();
+#endif
+#ifdef MODULE_SOCK_DTLS
+    DEBUG("Auto init sock_dtls\n");
+    sock_dtls_init();
 #endif
 
 /* initialize USB devices */

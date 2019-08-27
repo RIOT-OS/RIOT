@@ -50,6 +50,7 @@
  * * @ref sock_ip_t (net/sock/ip.h): raw IP sock
  * * @ref sock_tcp_t (net/sock/tcp.h): TCP sock
  * * @ref sock_udp_t (net/sock/udp.h): UDP sock
+ * * @ref sock_dtls_t (net/sock/dtls.h): DTLS sock
  *
  * Note that there might be no relation between the different `sock` types.
  * So casting e.g. `sock_ip_t` to `sock_udp_t` might not be as straight forward,

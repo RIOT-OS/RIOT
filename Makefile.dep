@@ -888,6 +888,16 @@ ifneq (,$(filter irq_handler,$(USEMODULE)))
   USEMODULE += event
 endif
 
+ifneq (,$(filter tinydtls_sock_dtls, $(USEMODULE)))
+    USEPKG += tinydtls
+    USEMODULE += sock_dtls
+endif
+
+ifneq (,$(filter sock_dtls, $(USEMODULE)))
+    USEMODULE += credman
+    USEMODULE += sock_udp
+endif
+
 # Enable periph_gpio when periph_gpio_irq is enabled
 ifneq (,$(filter periph_gpio_irq,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
