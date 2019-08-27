@@ -50,7 +50,7 @@ static const eeprom_dev_t eeprom_devs[] = {
         .handle = NULL,
     },
 #endif
-#ifdef MODULE_PERIPH_EEPROM
+#ifdef MODULE_AT24CXXX
     {
         .driver = &eeprom_driver_at24cxxx,
         .params = &at24cxxx_params[0],

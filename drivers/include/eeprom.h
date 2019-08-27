@@ -28,7 +28,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,9 +46,9 @@ typedef uint_fast8_t eeprom_t;
  * @param[in]       dev     Device handle of the EEPROM device to get the size
  *
  * @return  The size of the EEPROM device in bytes
- * @retval  -1              No EEPROM device for parameter @p dev
+ * @retval  0               No EEPROM device for parameter @p dev
  */
-ssize_t eeprom_size(eeprom_t dev);
+size_t eeprom_size(eeprom_t dev);
 
 /**
  * @brief   Read @p len bytes from the given position

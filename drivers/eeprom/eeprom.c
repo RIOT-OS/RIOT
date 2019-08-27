@@ -78,26 +78,21 @@ static inline int _is_range_valid(eeprom_t dev, size_t pos, size_t len)
 void eeprom_init(void)
 {
     for (unsigned i = 0; i < EEPROM_NUMOF; i++) {
-        ssize_t retval = eeprom_devs[i].driver->init(eeprom_devs[i].handle,
-                                                     eeprom_devs[i].params);
-        if (retval == -1) {
+        _sizes[i] = eeprom_devs[i].driver->init(eeprom_devs[i].handle,
+                                                eeprom_devs[i].params);
+        if (!_sizes[i]) {
             LOG_ERROR("[eeprom] Failed to initialize EEPROM device %u\n", i);
-        }
-        else {
-            DEBUG("[eeprom] Initialized device %u (providing %uB of EEPROM)\n",
-                  i, (unsigned)retval);
-            _sizes[i] = (size_t)retval;
         }
     }
 }
 
-ssize_t eeprom_size(eeprom_t dev)
+size_t eeprom_size(eeprom_t dev)
 {
     if (_is_dev_valid(dev)) {
-        return (ssize_t)_sizes[dev];
+        return (size_t)_sizes[dev];
     }
 
-    return -1;
+    return 0;
 }
 
 int eeprom_read(eeprom_t dev, size_t pos, void *dest, size_t len)

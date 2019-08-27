@@ -46,10 +46,10 @@ typedef struct {
      * @param[in,out]   handle  Device handle to initialize
      * @param[in]       params  Initialization parameters of the device
      *
-     * @retval  -1      Failed to initialize the device
+     * @retval  0       Failed to initialize the device
      * @return          The size of the device in bytes
      */
-    ssize_t (*init)(void *handle, const void *params);
+    size_t (*init)(void *handle, const void *params);
     /**
      * @brief   Read data from the EEPROM device
      *
