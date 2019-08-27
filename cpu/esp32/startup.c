@@ -93,7 +93,6 @@ extern void bootloader_clock_configure(void);
 
 /* forward declarations */
 static void system_init(void);
-static void do_global_ctors(void);
 static void intr_matrix_clear(void);
 
 typedef int32_t esp_err_t;
@@ -279,21 +278,18 @@ static NORETURN void IRAM system_init (void)
     /* Disable the hold flag of all RTC GPIO pins */
     RTCCNTL.hold_force.val = 0;
 
-    /* execute constructors */
-    do_global_ctors();
+    /*
+     * initialization of newlib, includes the ctors initialization and
+     * and the execution of stdio_init in _init of newlib_syscalls_default
+     */
+    extern void __libc_init_array(void);
+    __libc_init_array();
 
     /* init watchdogs */
     system_wdt_init();
 
     /* init random number generator */
     srand(hwrand());
-
-    /*
-     * initialization as it should be called from newlibc (includes the
-     * execution of stdio_init)
-    */
-    extern void _init(void);
-    _init();
 
     /* add SPI RAM to heap if enabled */
     #if CONFIG_SPIRAM_SUPPORT && CONFIG_SPIRAM_BOOT_INIT
@@ -343,18 +339,6 @@ static NORETURN void IRAM system_init (void)
     ets_printf("Starting RIOT kernel on PRO cpu\n");
     kernel_init();
     UNREACHABLE();
-}
-
-static void do_global_ctors(void)
-{
-    #if 0 /* TODO when real ctors are used exist */
-    extern uint32_t* __init_array_start;
-    extern uint32_t* __init_array_end;
-    for (uint32_t* up = __init_array_end - 1; up >= __init_array_start; --up) {
-        void (*fp)(void) = (void (*)(void))up;
-        fp();
-    }
-    #endif
 }
 
 static void intr_matrix_clear(void)
