@@ -384,8 +384,6 @@ void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
             case -READLINE_TOOLONG:
                 puts(TOOLONG_MESSAGE);
                 break;
-            case 0:
-                break;
             default:
                 handle_input_line(shell_commands, state);
                 break;
