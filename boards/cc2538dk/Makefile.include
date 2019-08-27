@@ -35,4 +35,4 @@ FLASHFILE ?= $(BINFILE)
 DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 RESET_FLAGS ?= $(BINDIR)
 
-export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
+OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb

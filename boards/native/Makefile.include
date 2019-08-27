@@ -21,30 +21,30 @@ export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
 # basic cflags:
-export CFLAGS += -Wall -Wextra -pedantic
+CFLAGS += -Wall -Wextra -pedantic
 # default std set to gnu99 of not overwritten by user
 ifeq (,$(filter -std=%, $(CFLAGS)))
-  export CFLAGS += -std=gnu99
+  CFLAGS += -std=gnu99
 endif
 
 ifeq ($(shell uname -m),x86_64)
-  export CFLAGS += -m32
+  CFLAGS += -m32
 endif
 ifneq (,$(filter -DDEVELHELP,$(CFLAGS)))
-  export CFLAGS += -fstack-protector-all
+  CFLAGS += -fstack-protector-all
 endif
 ifeq ($(shell uname -s),FreeBSD)
   ifeq ($(shell uname -m),amd64)
-    export CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
+    CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
   endif
 endif
 ifeq ($(shell uname -s),Darwin)
-  export CFLAGS += -Wno-deprecated-declarations
+  CFLAGS += -Wno-deprecated-declarations
 endif
 
 # unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
-export CXXUWFLAGS +=
-export CXXEXFLAGS +=
+CXXUWFLAGS +=
+CXXEXFLAGS +=
 
 ifeq ($(shell uname -m),x86_64)
   export LINKFLAGS += -m32
@@ -59,7 +59,7 @@ else
 endif
 
 # clean up unused functions
-export CFLAGS += -ffunction-sections -fdata-sections
+CFLAGS += -ffunction-sections -fdata-sections
 ifeq ($(shell uname -s),Darwin)
   export LINKFLAGS += -Wl,-dead_strip
 else
@@ -76,7 +76,7 @@ endif
 
 TERMFLAGS := $(PORT) $(TERMFLAGS)
 
-export ASFLAGS =
+ASFLAGS =
 ifeq ($(shell basename $(DEBUGGER)),lldb)
   DEBUGGER_FLAGS = -- $(ELFFILE) $(TERMFLAGS)
 else
@@ -92,23 +92,23 @@ debug-valgrind-server: export VALGRIND_FLAGS ?= --vgdb=yes --vgdb-error=0 -v \
 	--read-var-info=yes
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
 term-gprof: TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELFFILE)
-all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g3
+all-valgrind: CFLAGS += -DHAVE_VALGRIND_H -g3
 all-valgrind: export NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
-all-debug: export CFLAGS += -g3
-all-cachegrind: export CFLAGS += -g3
-all-gprof: export CFLAGS += -pg
+all-debug: CFLAGS += -g3
+all-cachegrind: CFLAGS += -g3
+all-gprof: CFLAGS += -pg
 all-gprof: export LINKFLAGS += -pg
-all-asan: export CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
-all-asan: export CFLAGS += -DNATIVE_IN_CALLOC
+all-asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
+all-asan: CFLAGS += -DNATIVE_IN_CALLOC
 all-asan: export LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
 
-export INCLUDES += $(NATIVEINCLUDES)
+INCLUDES += $(NATIVEINCLUDES)
 
-export CFLAGS += -DDEBUG_ASSERT_VERBOSE
+CFLAGS += -DDEBUG_ASSERT_VERBOSE
 
 # workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52624
 ifneq ($(shell gcc --version | head -1 | grep -E ' (4.6|4.7)'),)
-  export CFLAGS += -DHAVE_NO_BUILTIN_BSWAP16
+  CFLAGS += -DHAVE_NO_BUILTIN_BSWAP16
 endif
 
 # backward compatability with glibc <= 2.17 for native
