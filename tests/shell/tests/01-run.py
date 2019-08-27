@@ -84,9 +84,17 @@ def testfunc(child):
     child.expect(PROMPT)
 
     # check a long line
-    child.sendline("_"*bufsize + "verylong")
-    # this is dirty hack to work around a bug in the uart (#10634)
-    child.sendline()
+    longline = "_"*bufsize + "verylong"
+    if ON_NATIVE:
+        child.sendline(longline)
+    else:
+        # this is dirty hack to work around a bug in the uart (#10634)
+        for c in longline:
+            child.write(c)
+            child.flush()
+        child.sendline()
+        child.sendline()
+
     child.expect('shell: maximum line length exceeded')
 
     # test cancelling a line
