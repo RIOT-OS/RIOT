@@ -5,7 +5,6 @@
 
 export RIOT_CI_BUILD=1
 export STATIC_TESTS=${STATIC_TESTS:-1}
-export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
 
