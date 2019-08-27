@@ -68,10 +68,14 @@ struct shell_state {
     char line[];
 };
 
-static void shell_state_init(struct shell_state *state)
+static int shell_state_init(struct shell_state *state, int len)
 {
+    assert(len >= sizeof(struct shell_state));
+
     state->echo_on = ECHO_ON;
     state->prompt_char = PROMPT_CHAR;
+
+    return len - sizeof(struct shell_state);
 }
 
 /**
@@ -371,9 +375,7 @@ void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
 {
     struct shell_state *state = (void*)line_buf;
 
-    assert(len >= sizeof(struct shell_state));
-
-    shell_state_init(state);
+    len = shell_state_init(state, len);
 
     while (1) {
         int res = readline(state, len);
