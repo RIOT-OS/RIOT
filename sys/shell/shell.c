@@ -276,6 +276,30 @@ static inline void print_prompt(struct shell_state *state)
     flush_if_needed();
 }
 
+static inline void echo_char(struct shell_state *state, char c)
+{
+    if (state->echo_on) {
+        putchar(c);
+    }
+}
+
+static inline void white_tape(struct shell_state *state)
+{
+    if (state->echo_on) {
+        putchar('\b');
+        putchar(' ');
+        putchar('\b');
+    }
+}
+
+static inline void new_line(struct shell_state *state)
+{
+    if (state->echo_on) {
+        putchar('\r');
+        putchar('\n');
+    }
+}
+
 /**
  * Read a single line from standard input into a buffer.
  *
@@ -284,6 +308,10 @@ static inline void print_prompt(struct shell_state *state)
  *
  * If the input line is too long, the input will still be consumed until the end
  * to prevent the next line from containing garbage.
+ *
+ * We allow Unix (\n), DOS (\r\n), and Mac linebreaks (\r).
+ * QEMU transmits only a single '\r' == 13 on hitting enter ("-serial stdio").
+ * DOS newlines are handled like hitting enter twice.
  *
  * @param   state   Buffer where the input will be placed.
  * @param   size    Size of the buffer. The maximum line length will be one less
@@ -298,72 +326,51 @@ static inline void print_prompt(struct shell_state *state)
 static int readline(struct shell_state *state, size_t size)
 {
     int curr_pos = 0;
-    bool length_exceeded = false;
 
     assert((size_t)size > 0);
 
     print_prompt(state);
 
     while (1) {
-        /* At the start of the loop, cur_pos should point inside of
-         * buf. This ensures the terminator can always fit. */
-        assert((size_t)curr_pos < size);
-
         int c = getchar();
-        if (c < 0) {
-            return EOF;
-        }
 
-        /* We allow Unix linebreaks (\n), DOS linebreaks (\r\n), and Mac linebreaks (\r). */
-        /* QEMU transmits only a single '\r' == 13 on hitting enter ("-serial stdio"). */
-        /* DOS newlines are handled like hitting enter twice, but empty lines are ignored. */
-        /* Ctrl-C cancels the current line. */
-        if (c == '\r' || c == '\n' || c == ETX) {
-            if (c == ETX) {
+        switch (c) {
+            case EOF:
+                return EOF;
+            /* Ctrl-C cancels the current line. */
+            case ETX:
                 curr_pos = 0;
-                length_exceeded = 0;
-            }
+            /* fall-thru */
+            case '\r':
+            /* fall-thru */
+            case '\n':
+                new_line(state);
 
-            state->line[curr_pos] = '\0';
-            if (state->echo_on) {
-                putchar('\r');
-                putchar('\n');
-            }
-
-            return (length_exceeded)? -READLINE_TOOLONG : curr_pos;
-        }
-
-        /* QEMU uses 0x7f (DEL) as backspace, while 0x08 (BS) is for most terminals */
-        if (c == BS || c == DEL) {
-            if (curr_pos == 0) {
-                /* The line is empty. */
-                continue;
-            }
-
-            /* after we dropped characters do not edit the line, yet keep the
-             * visual effects */
-            if (!length_exceeded) {
-                state->line[--curr_pos] = '\0';
-            }
-            /* white-tape the character */
-            if (state->echo_on) {
-                putchar('\b');
-                putchar(' ');
-                putchar('\b');
-            }
-
-        }
-        else {
-            /* Always consume characters, but do not not always store them */
-            if ((size_t)curr_pos < size - 1) {
-                state->line[curr_pos++] = c;
-            }
-            else {
-                length_exceeded = true;
-            }
-            if (state->echo_on) {
-                putchar(c);
-            }
+                if ((size_t)curr_pos < size) {
+                    state->line[curr_pos] = '\0';
+                    return curr_pos;
+                } else {
+                    return -READLINE_TOOLONG;
+                }
+            case BS:  /* QEMU uses 0x7f (DEL) as backspace, while 0x08 (BS) is for most terminals */
+            /* fall-thru */
+            case DEL:
+                if (curr_pos > 0) {
+                    --curr_pos;
+                    if ((size_t)curr_pos < size) {
+                        state->line[curr_pos] = '\0';
+                    }
+                    white_tape(state);
+                }
+                break;
+            default:
+                /* Always consume characters, but do not not always store them */
+                if ((size_t)curr_pos < size - 1) {
+                    state->line[curr_pos] = c;
+                }
+                curr_pos++;
+                echo_char(state, c);
+                break;
         }
         flush_if_needed();
     }
