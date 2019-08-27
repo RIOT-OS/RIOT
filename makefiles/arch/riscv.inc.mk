@@ -11,9 +11,7 @@ export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
 export LINKER_SCRIPT ?= $(CPU_MODEL).ld
 export LINKFLAGS += -T$(LINKER_SCRIPT)
 
-# export compiler flags
-export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) $(CFLAGS_LINK)
-# export assmebly flags
-export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
+CFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) $(CFLAGS_LINK)
+ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 # export linker flags
 export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) -Wl,--gc-sections -static -lgcc
