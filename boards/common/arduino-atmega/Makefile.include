@@ -5,6 +5,4 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # Disable auto erase for flash and avoid error if signature doesn't match
 FFLAGS_EXTRA += -F -D
 
-# include avrdude flashing tool
-include $(RIOTMAKE)/tools/avrdude.inc.mk
 include $(RIOTBOARD)/common/atmega/Makefile.include
