@@ -272,6 +272,13 @@ class SerCmd(cmd.Cmd):
                 return "PYTERM_" + line[1:]
         return line
 
+    def emptyline(self):
+        """Disable repeating command on empty line.
+
+        Just send a newline.
+        """
+        self.default('')
+
     def default(self, line):
         """In case of no Pyterm specific prefix is detected, split
         string by colons and send it to the node.
