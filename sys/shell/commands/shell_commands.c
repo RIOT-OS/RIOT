@@ -153,6 +153,10 @@ extern int _i2c_scan(int argc, char **argv);
 extern int _loramac_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_NIMBLE_NETIF
+extern int _nimble_netif_handler(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -251,6 +255,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_SEMTECH_LORAMAC
     {"loramac", "Control Semtech loramac stack", _loramac_handler},
+#endif
+#ifdef MODULE_NIMBLE_NETIF
+    { "ble", "Manage BLE connections for NimBLE", _nimble_netif_handler },
 #endif
     {NULL, NULL, NULL}
 };

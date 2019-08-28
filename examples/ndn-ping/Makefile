@@ -16,6 +16,10 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
                              waspmote-pro weio \
                              wsn430-v1_3b wsn430-v1_4 z1
 
+# Do not build for any board that supports nimble_netif, as NimBLE and ndn-riot
+# use different crypto libraries that have name clashes (tinycrypt vs uECC)
+BOARD_BLACKLIST := acd52832 nrf52832-mdk nrf52dk ruuvitag thingy52
+
 # Include packages that pull up and auto-init the link layer.
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif

@@ -100,6 +100,15 @@ void nimble_riot_init(void)
     assert(res == 0);
     (void)res;
 
+#ifdef MODULE_NIMBLE_NETIF
+    extern void nimble_netif_init(void);
+    nimble_netif_init();
+#ifdef MODULE_SHELL_COMMANDS
+    extern void sc_nimble_netif_init(void);
+    sc_nimble_netif_init();
+#endif
+#endif
+
     /* initialize the configured, build-in services */
 #ifdef MODULE_NIMBLE_SVC_GAP
     ble_svc_gap_init();

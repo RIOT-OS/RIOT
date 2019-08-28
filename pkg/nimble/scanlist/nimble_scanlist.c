@@ -55,6 +55,15 @@ void nimble_scanlist_init(void)
     }
 }
 
+nimble_scanlist_entry_t *nimble_scanlist_get_by_pos(unsigned pos)
+{
+    nimble_scanlist_entry_t *e = nimble_scanlist_get_next(NULL);
+    for (unsigned i = 0; (i < pos) && e; i++) {
+        e = nimble_scanlist_get_next(e);
+    }
+    return e;
+}
+
 void nimble_scanlist_update(const ble_addr_t *addr, int8_t rssi,
                             const uint8_t *ad, size_t len)
 {

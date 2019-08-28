@@ -56,7 +56,7 @@ static void test_eui64_from_addr__success(void)
                                                  test_addr, sizeof(eui64_t),
                                                  &res));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&test_eui64, &res, sizeof(eui64_t)));
-    /* test (nordic softdevice) BLE */
+    /* test BLE */
     res.uint64.u64 = 0;
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t),
                           l2util_eui64_from_addr(NETDEV_TYPE_BLE,
@@ -105,7 +105,7 @@ static void test_eui64_from_addr__EINVAL(void)
                           l2util_eui64_from_addr(NETDEV_TYPE_IEEE802154,
                                                  test_addr, sizeof(eui48_t),
                                                  &res));
-    /* test (nordic softdevice) BLE */
+    /* test BLE */
     TEST_ASSERT_EQUAL_INT(-EINVAL,
                           l2util_eui64_from_addr(NETDEV_TYPE_BLE,
                                                  test_addr, sizeof(uint16_t),
@@ -145,6 +145,7 @@ static void test_iid_from_addr__success(void)
     static const eui64_t test_cc110x = { .uint8 = TEST_CC110X_IID };
     static const eui64_t test_eui48 = { .uint8 = TEST_EUI48_IID };
     static const eui64_t test_eui64 = { .uint8 = TEST_EUI64_IID };
+    static const eui64_t test_ble = { .uint8 = TEST_EUI48_EUI64 };
     eui64_t res;
 
     /* test Ethernet */
@@ -168,13 +169,13 @@ static void test_iid_from_addr__success(void)
                                                     IEEE802154_SHORT_ADDRESS_LEN,
                                                     &res));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&test_802154_s, &res, sizeof(eui64_t)));
-    /* test (nordic softdevice) BLE */
+    /* test BLE */
     res.uint64.u64 = 0;
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t),
                           l2util_ipv6_iid_from_addr(NETDEV_TYPE_BLE,
                                                     test_addr, sizeof(eui48_t),
                                                     &res));
-    TEST_ASSERT_EQUAL_INT(0, memcmp(&test_eui48, &res, sizeof(eui64_t)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(&test_ble, &res, sizeof(eui64_t)));
     /* test cc110x */
     res.uint64.u64 = 0;
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t),
@@ -213,7 +214,7 @@ static void test_iid_from_addr__EINVAL(void)
                           l2util_ipv6_iid_from_addr(NETDEV_TYPE_IEEE802154,
                                                     test_addr, sizeof(eui48_t),
                                                     &res));
-    /* test (nordic softdevice) BLE */
+    /* test BLE */
     TEST_ASSERT_EQUAL_INT(-EINVAL,
                           l2util_ipv6_iid_from_addr(NETDEV_TYPE_BLE,
                                                     test_addr, sizeof(uint16_t),
@@ -253,6 +254,7 @@ static void test_iid_to_addr__success(void)
     static const eui64_t test_cc110x = { .uint8 = TEST_CC110X_IID };
     static const eui64_t test_eui48 = { .uint8 = TEST_EUI48_IID };
     static const eui64_t test_eui64 = { .uint8 = TEST_EUI64_IID };
+    static const eui64_t test_ble = { .uint8 = TEST_EUI48_EUI64 };
     uint8_t res[L2UTIL_ADDR_MAX_LEN];
 
     /* test Ethernet */
@@ -267,11 +269,11 @@ static void test_iid_to_addr__success(void)
                           l2util_ipv6_iid_to_addr(NETDEV_TYPE_IEEE802154,
                                                   &test_eui64, res));
     TEST_ASSERT_EQUAL_INT(0, memcmp(test_addr, res, sizeof(eui64_t)));
-    /* test (nordic softdevice) BLE */
+    /* test BLE */
     memset(res, 0, sizeof(res));
     TEST_ASSERT_EQUAL_INT(sizeof(eui48_t),
                           l2util_ipv6_iid_to_addr(NETDEV_TYPE_BLE,
-                                                  &test_eui48, res));
+                                                  &test_ble, res));
     TEST_ASSERT_EQUAL_INT(0, memcmp(test_addr, res, sizeof(eui48_t)));
     /* test cc110x */
     memset(res, 0, sizeof(res));

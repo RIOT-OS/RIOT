@@ -14,6 +14,9 @@ ifeq (llvm,$(TOOLCHAIN))
 # `nimble/controller/src/ble_ll_adv.c` isn't used in our compilation path, so
 # tell LLVM/clang not to be so pedantic with this.
   CFLAGS += -Wno-unused-function
+# Workaround, until https://github.com/apache/mynewt-nimble/pull/566 is merged
+# upstream and the NimBLE version in RIOT is updated.
+  CFLAGS += -Wno-sometimes-uninitialized
 else
   CFLAGS += -Wno-unused-but-set-variable
 endif
@@ -70,6 +73,9 @@ nimble_drivers_nrf5x:
 # additional, RIOT specific nimble modules
 nimble_addr:
 	"$(MAKE)" -C $(TDIR)/addr/
+
+nimble_netif:
+	"$(MAKE)" -C $(TDIR)/netif/
 
 nimble_scanlist:
 	"$(MAKE)" -C $(TDIR)/scanlist
