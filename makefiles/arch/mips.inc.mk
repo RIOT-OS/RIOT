@@ -69,3 +69,4 @@ export LINKFLAGS += -Wl,--gc-sections
 
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
+OPTIONAL_CFLAGS_BLACKLIST += -gz
