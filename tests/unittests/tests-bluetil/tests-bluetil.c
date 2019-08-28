@@ -27,24 +27,24 @@ static void test_bluetil_addr(void)
     char istr[BLUETIL_IPV6_IID_STRLEN];
 
     bluetil_addr_sprint(astr, addr[0]);
-    TEST_ASSERT_EQUAL_STRING("AF:FE:AF:FE:AF:FE", astr);
+    TEST_ASSERT_EQUAL_STRING("FE:AF:FE:AF:FE:AF", astr);
     bluetil_addr_ipv6_l2ll_sprint(istr, addr[0]);
-    TEST_ASSERT_EQUAL_STRING("[FE80::FCAF:FEFF:FEAF:FEAF]", istr);
+    TEST_ASSERT_EQUAL_STRING("[FE80::FEAF:FEFF:FEAF:FEAF]", istr);
 
     bluetil_addr_sprint(astr, addr[1]);
-    TEST_ASSERT_EQUAL_STRING("AB:CD:EF:01:02:03", astr);
+    TEST_ASSERT_EQUAL_STRING("03:02:01:EF:CD:AB", astr);
     bluetil_addr_ipv6_l2ll_sprint(istr, addr[1]);
-    TEST_ASSERT_EQUAL_STRING("[FE80::0102:01FF:FEEF:CDAB]", istr);
+    TEST_ASSERT_EQUAL_STRING("[FE80::0302:01FF:FEEF:CDAB]", istr);
 
     bluetil_addr_sprint(astr, addr[2]);
     TEST_ASSERT_EQUAL_STRING("FF:FF:FF:FF:FF:FF", astr);
     bluetil_addr_ipv6_l2ll_sprint(istr, addr[2]);
-    TEST_ASSERT_EQUAL_STRING("[FE80::FDFF:FFFF:FEFF:FFFF]", istr);
+    TEST_ASSERT_EQUAL_STRING("[FE80::FFFF:FFFF:FEFF:FFFF]", istr);
 
     bluetil_addr_sprint(astr, addr[3]);
     TEST_ASSERT_EQUAL_STRING("00:00:00:00:00:00", astr);
     bluetil_addr_ipv6_l2ll_sprint(istr, addr[3]);
-    TEST_ASSERT_EQUAL_STRING("[FE80::0200:00FF:FE00:0000]", istr);
+    TEST_ASSERT_EQUAL_STRING("[FE80::0000:00FF:FE00:0000]", istr);
 }
 
 Test *tests_bluetil_tests(void)
