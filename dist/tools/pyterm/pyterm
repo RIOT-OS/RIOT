@@ -805,7 +805,7 @@ if __name__ == "__main__":
                         default=defaultnewline)
     parser.add_argument("--repeat-command-on-empty-line",
                         help="Enable repeating command on empty line",
-                        action="store_true", default=False)
+                        action="store_true")
     parser.add_argument("-pr", "--prompt",
                         help="The expected prompt character, default is %c"
                         % defaultprompt,
