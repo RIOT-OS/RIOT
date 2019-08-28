@@ -19,15 +19,6 @@ endef
 
 MAKEFILES_UTILS = $(RIOTMAKE)/utils
 
-COMPILE_TESTS += test-exported-variables
-COMPILE_TESTS += test-memoized-variables
-
-test-exported-variables:
-	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-variables.mk test-exported-variables,exported-variables)
-
-test-memoized-variables:
-	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-variables.mk test-memoized-variables,memoized-variables)
-
 # Abstract away the most common test procedure:
 # In these rule, the firs prerequisite MUST be the .mk file where the test
 # is defined
@@ -49,6 +40,14 @@ TEST_CHECKS = 	test-ensure_value test-assert test-assert_not \
 COMPILE_TESTS += $(TEST_CHECKS)
 
 $(TEST_CHECKS): $(MAKEFILES_UTILS)/test-checks.mk
+
+# tests for variable helpers
+
+TEST_VARS = test-exported-variables test-memoized-variables
+
+$(TEST_VARS): $(MAKEFILES_UTILS)/test-variables.mk
+
+COMPILE_TESTS += $(TEST_VARS)
 
 # test for string equality. They depend on having a working assert and assert_not
 TEST_STREQ = test-streq
