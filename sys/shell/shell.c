@@ -126,6 +126,36 @@ static enum PARSE_STATE escape_toggle(enum PARSE_STATE s)
 #define ESCAPECHAR '\\'
 #define BLANK ' '
 
+/**
+ * Break input line into words, create argv and call the command handler.
+ *
+ * Words are broken up at spaces. A backslash escaped the character that comes
+ * after (meaning it it taken literally and if it is a space it does not break
+ * the word). Spaces can also be protected by quoting with double or single
+ * quotes.
+ *
+ State diagram for the tokenizer:
+```
+
+
+           ┌───[\]────┐   ┌─────["]────┐   ┌───[']─────┐  ┌───[\]────┐
+           ↓          │   ↓            │   │           ↓  │          ↓
+  ┏━━━━━━━━━━┓      ┏━┷━━━━━┓        ┏━┷━━━┷━┓       ┏━━━━┷━━┓     ┏━━━━━━━━━━┓
+  ┃DQUOTE ESC┃      ┃DQUOTE ┠───["]─>┃SPACE  ┃<─[']──┨SQUOTE ┃     ┃SQUOTE ESC┃
+  ┗━━━━━━━━┯━┛      ┗━━━━━━┯┛        ┗┯━━━━┯━┛       ┗━┯━━━━━┛     ┗━━━┯━━━━━━┛
+           │          ↑    │          │    │           │    ↑(store)   │
+           │   (store)│    │   ┌─[\]──┘    └──[*]────┐ │    │          │
+           └────[*]──▶┴◀[*]┘   │                     │ └[*]▶┴◀──────[*]┘
+                               ↓     ┏━━━━━━━┓       ↓
+                               ├◀─[\]┨NOQUOTE┃◀──────┼◀─┐
+                               │     ┗━━━━━┯━┛(store)↑  │
+                               │           │         │  │
+                               │           └─[*]─────┘  │
+                               │     ┏━━━━━━━━━━━┓      │
+                               └────▶┃NOQUOTE ESC┠──[*]─┘
+                                     ┗━━━━━━━━━━━┛
+```
+*/
 static void handle_input_line(const shell_command_t *command_list, char *line)
 {
     static const char *INCORRECT_QUOTING = "shell: incorrect quoting";
