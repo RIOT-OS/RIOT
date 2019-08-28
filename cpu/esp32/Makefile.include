@@ -105,6 +105,10 @@ CFLAGS  += -DLOG_TAG_IN_BRACKETS
 CFLAGS  += -Wno-unused-parameter -Wformat=0
 CFLAGS  += -mlongcalls -mtext-section-literals -fstrict-volatile-bitfields
 CFLAGS  += -fdata-sections -ffunction-sections -fzero-initialized-in-bss
+
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
+
 ASFLAGS += --longcalls --text-section-literals
 
 ifneq ($(CONFIGS),)
