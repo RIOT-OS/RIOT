@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @brief TCP offset value boundries.
+ * @brief TCP offset value boundaries.
  * @{
  */
 #define TCP_HDR_OFFSET_MIN (0x05)
@@ -41,7 +41,7 @@ extern "C" {
  * @{
  */
 #define TCP_OPTION_KIND_EOL (0x00)  /**< "End of List"-Option */
-#define TCP_OPTION_KIND_NOP (0x01)  /**< "No Operatrion"-Option */
+#define TCP_OPTION_KIND_NOP (0x01)  /**< "No Operation"-Option */
 #define TCP_OPTION_KIND_MSS (0x02)  /**< "Maximum Segment Size"-Option */
 /** @} */
 
@@ -58,7 +58,7 @@ extern "C" {
 typedef struct __attribute__((packed)) {
     network_uint16_t src_port;     /**< Source port, in network byte order */
     network_uint16_t dst_port;     /**< Destination port, in network byte order */
-    network_uint32_t seq_num;      /**< Dequence number, in network byte order */
+    network_uint32_t seq_num;      /**< Sequence number, in network byte order */
     network_uint32_t ack_num;      /**< Acknowledgement number, in network byte order */
     network_uint16_t off_ctl;      /**< Data Offset and control Bits in network byte order */
     network_uint16_t window;       /**< Window, in network byte order */
