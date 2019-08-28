@@ -566,6 +566,12 @@ term: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	$(TERMPROG) $(TERMFLAGS)
 
+# Term without the pyterm added logging
+cleanterm: PYTERMFLAGS += --format "%(message)s"'
+cleanterm: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
+	$(call check_cmd,$(TERMPROG),Terminal program)
+	$(TERMPROG) $(TERMFLAGS)
+
 list-ttys:
 	$(Q)$(RIOTTOOLS)/usb-serial/list-ttys.sh
 
