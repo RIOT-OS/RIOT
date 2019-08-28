@@ -15,7 +15,7 @@ export BAUD ?= 115200
 RIOT_TERMINAL ?= pyterm
 ifeq ($(RIOT_TERMINAL),pyterm)
   TERMPROG  ?= $(RIOTTOOLS)/pyterm/pyterm
-  TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)"
+  TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)" $(PYTERMFLAGS)
 else ifeq ($(RIOT_TERMINAL),socat)
   SOCAT_OUTPUT ?= -
   TERMPROG ?= $(RIOT_TERMINAL)
