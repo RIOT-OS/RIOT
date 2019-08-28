@@ -18,3 +18,4 @@ export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -Wl,--gc-sections 
 OPTIONAL_CFLAGS_BLACKLIST += -fdiagnostics-color
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
+OPTIONAL_CFLAGS_BLACKLIST += -gz

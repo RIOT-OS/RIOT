@@ -38,6 +38,11 @@ endif
 # Forbid common symbols to prevent accidental aliasing.
 CFLAGS += -fno-common
 
+# Compress debug info. This saves approximately 50% of disk usage.
+# It has no effect if debugging information is not emitted, so it can be left
+# on unconditionally.
+OPTIONAL_CFLAGS += -gz
+
 # Enable all default warnings and all extra warnings
 CFLAGS += -Wall -Wextra
 # Enable additional checks for printf/scanf format strings
