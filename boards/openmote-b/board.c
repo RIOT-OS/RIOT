@@ -36,9 +36,15 @@ void board_init(void)
     gpio_init(RF24_SWITCH_CC2538_PIN, GPIO_OUT);
     gpio_init(RF24_SWITCH_AT86RF215_PIN, GPIO_OUT);
 
-    /* start with cc2538 2.4ghz radio*/
+#ifdef MODULE_AT86RF215
+    /* use at86rf215 2.4ghz radio*/
+    RF24_SWITCH_CC2538_OFF;
+    RF24_SWITCH_AT86RF215_ON;
+#else
+    /* use cc2538 2.4ghz radio*/
     RF24_SWITCH_CC2538_ON;
     RF24_SWITCH_AT86RF215_OFF;
+#endif
 
     /* initialize the CPU */
     cpu_init();
