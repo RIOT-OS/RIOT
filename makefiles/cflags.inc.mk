@@ -70,6 +70,9 @@ ifeq (,$(filter -DDEVELHELP,$(CFLAGS)))
   endif
 endif
 
+# Add the optional flags that are not architecture/toolchain blacklisted
+CFLAGS += $(filter-out $(OPTIONAL_CFLAGS_BLACKLIST),$(OPTIONAL_CFLAGS))
+
 # Default ARFLAGS for platforms which do not specify it.
 # Note: make by default provides ARFLAGS=rv which we want to override
 ifeq ($(origin ARFLAGS),default)
