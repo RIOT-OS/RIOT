@@ -90,6 +90,10 @@ endif
 
 ifneq (,$(filter dfplayer,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dfplayer/include
+  ifneq (,$(filter arch_avr8 arch_msp430,$(FEATURES_USED)))
+    # no strerror() on AVR and MSP430
+    CFLAGS += -DDFPLAYER_NO_STRERROR
+  endif
 endif
 
 ifneq (,$(filter dht,$(USEMODULE)))
