@@ -803,13 +803,20 @@ if __name__ == "__main__":
                         "of CR and LF. Examples: -nl=LF, -nl=CRLF. "
                         "(Default is %s)" % defaultnewline,
                         default=defaultnewline)
-    parser.add_argument("--repeat-command-on-empty-line",
-                        help="Enable repeating command on empty line",
-                        action="store_true")
     parser.add_argument("-pr", "--prompt",
                         help="The expected prompt character, default is %c"
                         % defaultprompt,
                         default=defaultprompt)
+
+    parser.add_argument("--repeat-command-on-empty-line",
+                        dest='repeat_command_on_empty_line',
+                        action='store_true',
+                        help="Repeat command on empty line (Default)")
+    parser.add_argument("--no-repeat-command-on-empty-line",
+                        dest='repeat_command_on_empty_line',
+                        action="store_false",
+                        help="Do not repeat command on empty line")
+    parser.set_defaults(repeat_command_on_empty_line=True)
 
     args = parser.parse_args()
 
