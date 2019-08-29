@@ -65,7 +65,8 @@ TEST_CHECKS_ALL = $(TEST_CHECKS) $(TEST_ASSERT_EQ)
 
 # Now that we know string equality assertions work, we can run the rest of
 # the tests
-TEST_STRINGS = test-strnot test-rest test-concat test-intercal
+TEST_STRINGS = test-strnot test-rest test-concat test-intercal \
+	       test-lowercase test-uppercase test-uppercase_and_underscore
 COMPILE_TESTS += $(TEST_STRINGS)
 
 $(TEST_STRINGS): $(MAKEFILES_UTILS)/test-strings.mk $(TEST_CHECKS_ALL)

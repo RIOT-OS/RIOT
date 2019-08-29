@@ -20,3 +20,19 @@ concat ?= $(if $(1),$(firstword $(1))$(call concat,$(call rest,$(1))),)
 
 # Intercalate: concatenate words in a list with a separator between each one.
 intercal = $(firstword $(2))$(call concat,$(addprefix $(1),$(call rest,$(2))))
+
+# Translate all words/characters in the first set to characters in the second set
+# Parameters:
+#    $1: space separated list of words or characters
+#    $2: space separated list of words or characters, same length as $1
+#    $3: string to translate
+xlate ?= $(if $(1),$(call xlate,$(call rest,$(1)),$(call rest,$(2)),$(subst $(firstword $(1)),$(firstword $(2)),$(3))),$(3))
+
+_UPPER_LETTERS = A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+_LOWER_LETTERS = a b c d e f g h i j k l m n o p q r s t u v w x y z
+
+
+lowercase = $(call xlate,$(_UPPER_LETTERS),$(_LOWER_LETTERS),$(1))
+uppercase = $(call xlate,$(_LOWER_LETTERS),$(_UPPER_LETTERS),$(1))
+
+uppercase_and_underscore = $(call uppercase,$(subst -,_,$1))
