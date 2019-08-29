@@ -59,7 +59,7 @@ int digitalRead(int pin)
 
 void delay(unsigned long msec)
 {
-    xtimer_usleep(1000 * msec);
+    xtimer_usleep(msec * US_PER_MS);
 }
 
 void delayMicroseconds(unsigned long usec)
