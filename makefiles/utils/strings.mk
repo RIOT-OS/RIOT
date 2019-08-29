@@ -5,7 +5,10 @@
 streq = $(filter $(1),$(2))
 
 # Get the remaining words in a list (i.e. everything except the first)
-rest = $(wordlist 2,$(words $(1)),$(1))
+# The upper limit is set to an unrealistically high number. The "correct" thing
+# to do would be to count the words, but impacts performance, and nobody will
+# ever have 2**31 words.
+rest = $(wordlist 2,2147483647,$(1))
 
 # Strings as truth values
 # In make, empty strings function as a "false" value and non-empty ones
