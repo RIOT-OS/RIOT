@@ -29,6 +29,10 @@ extern int _reboot_handler(int argc, char **argv);
 extern int _id_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_DFPLAYER
+extern int _sc_dfplayer(int argc, char **argv);
+#endif
+
 #ifdef MODULE_LPC_COMMON
 extern int _heap_handler(int argc, char **argv);
 #endif
@@ -267,6 +271,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_NIMBLE_NETIF
     { "ble", "Manage BLE connections for NimBLE", _nimble_netif_handler },
+#endif
+#ifdef MODULE_DFPLAYER
+    {"dfplayer", "Control a DFPlayer Mini MP3 player", _sc_dfplayer},
 #endif
     {NULL, NULL, NULL}
 };

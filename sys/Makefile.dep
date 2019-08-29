@@ -14,4 +14,11 @@ ifneq (,$(filter prng_fortuna,$(USEMODULE)))
   CFLAGS += -DCRYPTO_AES
 endif
 
+ifneq (,$(filter shell_commands,$(USEMODULE)))
+  ifneq (,$(filter dfplayer,$(USEMODULE)))
+    USEMODULE += auto_init_multimedia
+    USEMODULE += fmt
+  endif
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
