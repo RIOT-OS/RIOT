@@ -2,4 +2,4 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
-include $(RIOTBOARD)/common/nrf52/Makefile.dep
+include $(RIOTBOARD)/common/nrf52/Makefile.nrf52832.dep
