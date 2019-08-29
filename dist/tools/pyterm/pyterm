@@ -94,6 +94,9 @@ defaultnewline = "LF"
 # default prompt character
 defaultprompt = '>'
 
+# repeat command on empty line instead of sending the line
+defaultrepeat_cmd_empty_line = True
+
 
 class SerCmd(cmd.Cmd):
     """Main class for pyterm based on Python's Cmd class.
@@ -106,7 +109,7 @@ class SerCmd(cmd.Cmd):
                  confdir=None, conffile=None, host=None, run_name=None,
                  log_dir_name=None, newline=None, formatter=None,
                  set_rts=None, set_dtr=None, serprompt=None,
-                 repeat_command_on_empty_line=False):
+                 repeat_command_on_empty_line=defaultrepeat_cmd_empty_line):
         """Constructor.
 
         Args:
@@ -808,6 +811,7 @@ if __name__ == "__main__":
                         % defaultprompt,
                         default=defaultprompt)
 
+    # Keep help message in sync if changing the default
     parser.add_argument("--repeat-command-on-empty-line",
                         dest='repeat_command_on_empty_line',
                         action='store_true',
@@ -816,7 +820,8 @@ if __name__ == "__main__":
                         dest='repeat_command_on_empty_line',
                         action="store_false",
                         help="Do not repeat command on empty line")
-    parser.set_defaults(repeat_command_on_empty_line=True)
+    parser.set_defaults(
+        repeat_command_on_empty_line=defaultrepeat_cmd_empty_line)
 
     args = parser.parse_args()
 
