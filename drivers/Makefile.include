@@ -54,6 +54,10 @@ ifneq (,$(filter ccs811,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ccs811/include
 endif
 
+ifneq (,$(filter dfplayer,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dfplayer/include
+endif
+
 ifneq (,$(filter dht,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dht/include
 endif

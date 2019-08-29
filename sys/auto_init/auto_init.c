@@ -580,5 +580,10 @@ void auto_init(void)
 #ifdef MODULE_AUTO_INIT_MULTIMEDIA
     DEBUG("auto_init MULTIMEDIA\n");
 
+#ifdef MODULE_DFPLAYER
+    extern void auto_init_dfplayer(void);
+    auto_init_dfplayer();
+#endif /* MODULE_DFPLAYER */
+
 #endif /* MODULE_AUTO_INIT_MULTIMEDIA */
 }
