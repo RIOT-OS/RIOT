@@ -1,0 +1,8 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-duemilanove \
+    arduino-leonardo \
+    arduino-nano \
+    arduino-uno \
+    atmega328p \
+    stm32f030f4-demo \
+    #
