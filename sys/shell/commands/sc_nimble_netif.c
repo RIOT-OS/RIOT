@@ -30,7 +30,7 @@
 #include "net/bluetil/ad.h"
 #include "net/bluetil/addr.h"
 
-#define DEFAULT_NODE_NAME           "RIOT-GNRC"
+#define DEFAULT_NODE_NAME           "bleRIOT"
 #define DEFAULT_SCAN_DURATION       (500U)      /* 500ms */
 #define DEFAULT_CONN_TIMEOUT        (500U)      /* 500ms */
 
@@ -69,8 +69,11 @@ static int _conn_dump(nimble_netif_conn_t *conn, int handle, void *arg)
 
     printf("[%2i] ", handle);
     bluetil_addr_print(conn->addr);
-    printf(" (%c) -> ", role);
+    printf(" (%c)", role);
+#ifdef MODULE_GNRC_IPV6
+    printf(" -> ");
     bluetil_addr_ipv6_l2ll_print(conn->addr);
+#endif
     puts("");
 
     return 0;
@@ -121,8 +124,10 @@ static void _cmd_info(void)
     bluetil_addr_swapped_cp(tmp_addr, own_addr);
     printf("Own Address: ");
     bluetil_addr_print(own_addr);
+#ifdef MODULE_GNRC_IPV6
     printf(" -> ");
     bluetil_addr_ipv6_l2ll_print(own_addr);
+#endif
     puts("");
 
     printf(" Free slots: %u/%u\n", free, MYNEWT_VAL_BLE_MAX_CONNECTIONS);
