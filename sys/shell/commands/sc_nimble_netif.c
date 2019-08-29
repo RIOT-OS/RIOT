@@ -23,17 +23,21 @@
 
 #include "xtimer.h"
 #include "nimble_riot.h"
-#include "nimble_scanlist.h"
-#include "nimble_scanner.h"
 #include "nimble_netif.h"
 #include "nimble_netif_conn.h"
 #include "net/bluetil/ad.h"
 #include "net/bluetil/addr.h"
 
+#ifndef MODULE_NIMBLE_AUTOCONN
+#include "nimble_scanlist.h"
+#include "nimble_scanner.h"
+#endif
+
 #define DEFAULT_NODE_NAME           "bleRIOT"
 #define DEFAULT_SCAN_DURATION       (500U)      /* 500ms */
 #define DEFAULT_CONN_TIMEOUT        (500U)      /* 500ms */
 
+#ifndef MODULE_NIMBLE_AUTOCONN
 static void _on_ble_evt(int handle, nimble_netif_event_t event)
 {
     switch (event) {
@@ -61,6 +65,7 @@ static void _on_ble_evt(int handle, nimble_netif_event_t event)
             break;
     }
 }
+#endif
 
 static int _conn_dump(nimble_netif_conn_t *conn, int handle, void *arg)
 {
@@ -150,6 +155,7 @@ static void _cmd_info(void)
     puts("");
 }
 
+#ifndef MODULE_NIMBLE_AUTOCONN
 static void _cmd_adv(const char *name)
 {
     int res;
@@ -262,6 +268,7 @@ static void _cmd_connect(unsigned pos)
     }
     _cmd_connect_addr(&sle->addr);
 }
+#endif /* MODULE_NIMBLE_AUTOCONN */
 
 static void _cmd_close(int handle)
 {
@@ -300,23 +307,31 @@ static int _ishelp(char *argv)
 
 void sc_nimble_netif_init(void)
 {
+#ifndef MODULE_NIMBLE_AUTOCONN
     /* setup the scanning environment */
     nimble_scanlist_init();
     nimble_scanner_init(NULL, nimble_scanlist_update);
 
     /* register event callback with the netif wrapper */
     nimble_netif_eventcb(_on_ble_evt);
+#endif
 }
 
 int _nimble_netif_handler(int argc, char **argv)
 {
     if ((argc == 1) || _ishelp(argv[1])) {
+#ifndef MODULE_NIMBLE_AUTOCONN
         printf("usage: %s [help|info|adv|scan|connect|close|update]\n", argv[0]);
+#else
+        printf("usage: %s [help|info|close|update]\n", argv[0]);
+#endif
         return 0;
     }
     if (memcmp(argv[1], "info", 4) == 0) {
         _cmd_info();
     }
+
+#ifndef MODULE_NIMBLE_AUTOCONN
     else if (memcmp(argv[1], "adv", 3) == 0) {
         char *name = NULL;
         if (argc > 2) {
@@ -363,6 +378,7 @@ int _nimble_netif_handler(int argc, char **argv)
         unsigned pos = atoi(argv[2]);
         _cmd_connect(pos);
     }
+#endif
     else if (memcmp(argv[1], "close", 5) == 0) {
         if ((argc < 3) || _ishelp(argv[2])) {
             printf("usage: %s close [help|list|<conn #>]\n", argv[0]);
