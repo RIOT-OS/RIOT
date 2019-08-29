@@ -81,10 +81,8 @@ endif
 endif
 endif
 
-MODEL = $(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
-CFLAGS += -DCPU_MODEL_$(MODEL)
-ARCH = $(shell echo $(CPU_ARCH) | tr 'a-z-' 'A-Z_')
-CFLAGS += -DCPU_ARCH_$(ARCH)
+CFLAGS += -DCPU_MODEL_$(call uppercase_and_underscore,$(CPU_MODEL))
+CFLAGS += -DCPU_ARCH_$(call uppercase_and_underscore,$(CPU_ARCH))
 
 # set the compiler specific CPU and FPU options
 ifneq (,$(filter $(CPU_ARCH),cortex-m4f cortex-m7))
