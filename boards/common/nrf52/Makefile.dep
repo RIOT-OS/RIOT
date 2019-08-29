@@ -1,5 +1,3 @@
-include $(RIOTCPU)/nrf52/Makefile.dep
-
 ifneq (,$(filter skald,$(USEMODULE)))
   USEMODULE += nrfble
 endif
@@ -8,8 +6,4 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_nrf_temperature
 endif
 
-ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-  ifeq (,$(filter nordic_softdevice_ble nrfmin nrf802154,$(USEMODULE) $(USEPKG)))
-    USEMODULE += nimble_netif
-  endif
-endif
+include $(RIOTCPU)/nrf52/Makefile.dep
