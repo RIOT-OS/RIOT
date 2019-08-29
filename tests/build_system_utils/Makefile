@@ -19,6 +19,9 @@ MAKEFILES_UTILS = $(RIOTMAKE)/utils
 COMPILE_TESTS += test-ensure_value test-ensure_value-negative
 COMPILE_TESTS += test-exported-variables
 COMPILE_TESTS += test-memoized-variables
+COMPILE_TESTS += test-lowercase
+COMPILE_TESTS += test-uppercase
+COMPILE_TESTS += test-uppercase_and_underscore
 
 # Tests will be run both in the host machine and in `docker`
 all: build-system-utils-tests
@@ -39,3 +42,10 @@ test-exported-variables:
 
 test-memoized-variables:
 	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-variables.mk test-memoized-variables)
+
+test-lowercase:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-lowercase)
+test-uppercase:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-uppercase)
+test-uppercase_and_underscore:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-uppercase_and_underscore)
