@@ -82,8 +82,14 @@ static void _xosc32k_setup(void)
 
 void sam0_gclk_enable(uint8_t id)
 {
-    (void) id;
-    /* clocks are always running */
+    switch(id) {
+        case SAM0_GCLK_48MHZ:
+            _gclk_setup(SAM0_GCLK_48MHZ, GCLK_GENCTRL_GENEN |
+                        GCLK_GENCTRL_SRC_DFLL48M);
+            break;
+        default:
+            break;
+    }
 }
 
 uint32_t sam0_gclk_freq(uint8_t id)
@@ -95,6 +101,8 @@ uint32_t sam0_gclk_freq(uint8_t id)
         return 8000000;
     case SAM0_GCLK_32KHZ:
         return 32768;
+    case SAM0_GCLK_48MHZ:
+        return 48000000;
     default:
         return 0;
     }
