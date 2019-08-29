@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    pkg_nimble_netif GNRC netif Implementation
- * @ingroup     ble_nimble
+ * @ingroup     pkg_nimble
  * @brief       GNRC netif implementation for NimBLE, enabling the integration
  *              of NimBLE into GNRC
  *

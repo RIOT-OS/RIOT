@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     ble_nimble
+ * @ingroup     pkg_nimble
  * @{
  *
  * @file
