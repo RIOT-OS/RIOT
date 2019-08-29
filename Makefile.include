@@ -89,6 +89,7 @@ CLEAN = $(filter clean, $(MAKECMDGOALS))
 
 # include makefiles utils tools
 include $(RIOTMAKE)/utils/variables.mk
+include $(RIOTMAKE)/utils/strings.mk
 
 # get host operating system
 OS := $(shell uname)
