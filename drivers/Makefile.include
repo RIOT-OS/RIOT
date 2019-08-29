@@ -88,6 +88,10 @@ ifneq (,$(filter dcf77,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dcf77/include
 endif
 
+ifneq (,$(filter dfplayer,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dfplayer/include
+endif
+
 ifneq (,$(filter dht,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dht/include
 endif

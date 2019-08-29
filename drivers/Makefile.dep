@@ -210,6 +210,12 @@ ifneq (,$(filter dcf77,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter dfplayer,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+  FEATURES_REQUIRED += periph_gpio
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter dht,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_gpio
