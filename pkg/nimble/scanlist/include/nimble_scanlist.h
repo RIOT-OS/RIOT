@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    ble_nimble_scanlist Scan Result Helper
- * @ingroup     ble_nimble
+ * @defgroup    pkg_nimble_scanlist Scan Result Helper
+ * @ingroup     pkg_nimble
  * @brief       List for storing and printing BLE scan results
  *
  * @note        This scanlist implementation is not thread safe. So calling

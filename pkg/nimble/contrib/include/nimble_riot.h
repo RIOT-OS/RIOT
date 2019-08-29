@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    ble_nimble_contrib RIOT Integration
- * @ingroup     ble_nimble
+ * @defgroup    pkg_nimble_contrib RIOT Integration
+ * @ingroup     pkg_nimble
  * @brief       Basic RIOT integration of NimBLE, including e.g. stack
  *              configuration and (auto)initialization code
  * @{
