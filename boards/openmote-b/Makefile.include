@@ -26,7 +26,7 @@ else ifeq ($(PROGRAMMER),jlink)
   include $(RIOTMAKE)/tools/jlink.inc.mk
 endif
 
-export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
+OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk

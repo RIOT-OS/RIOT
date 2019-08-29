@@ -45,7 +45,7 @@ index 0000000..afbaf0f
 +# this has to be the absolute path of the RIOT-base dir
 +export RIOTBASE =$(CURDIR)/../../../../../..
 +
-+export CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
++CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
 +
 +## Modules to include.
 +
@@ -59,7 +59,7 @@ index 0000000..afbaf0f
 +	error daemonize is not supported on RIOT
 +endif
 +
-+export INCLUDES += -I$(CURDIR)/../..
++INCLUDES += -I$(CURDIR)/../..
 +
 +QUIET ?= 1
 +
@@ -141,14 +141,14 @@ index 0000000..e472545
 +# this has to be the absolute path of the RIOT-base dir
 +export RIOTBASE =$(CURDIR)/../../../../../..
 +
-+export CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
++CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
 +
 +## Modules to include.
 +USEMODULE += oonf_cunit
 +USEMODULE += oonf_common
 +USEMODULE += oonf_rfc5444
 +
-+export INCLUDES += -I$(CURDIR)/../..
++INCLUDES += -I$(CURDIR)/../..
 +
 +QUIET ?= 1
 +

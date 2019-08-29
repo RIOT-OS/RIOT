@@ -1,7 +1,7 @@
 include $(RIOTBOARD)/slwstk6000b/module-info.mk
 
 # add module specific includes
-export INCLUDES += -I$(RIOTBOARD)/slwstk6000b/modules/$(BOARD_MODULE)/include
+INCLUDES += -I$(RIOTBOARD)/slwstk6000b/modules/$(BOARD_MODULE)/include
 
 # define the cpu used by SLWSTK6000B
 export CPU = efm32

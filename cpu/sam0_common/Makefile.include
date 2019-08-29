@@ -19,9 +19,9 @@ ROM_START_ADDR ?= 0x00000000
 RAM_START_ADDR ?= 0x20000000
 
 # this CPU implementation doesn't use CMSIS initialization
-export CFLAGS += -DDONT_USE_CMSIS_INIT
-export CFLAGS += -DDONT_USE_PREDEFINED_CORE_HANDLERS
-export CFLAGS += -DDONT_USE_PREDEFINED_PERIPHERALS_HANDLERS
+CFLAGS += -DDONT_USE_CMSIS_INIT
+CFLAGS += -DDONT_USE_PREDEFINED_CORE_HANDLERS
+CFLAGS += -DDONT_USE_PREDEFINED_PERIPHERALS_HANDLERS
 
 # For Cortex-M cpu we use the common cortexm.ld linker script
 LINKER_SCRIPT ?= cortexm.ld
@@ -29,5 +29,4 @@ LINKER_SCRIPT ?= cortexm.ld
 # include sam0 common periph drivers
 USEMODULE += sam0_common_periph
 
-# export the common include directory
-export INCLUDES += -I$(RIOTCPU)/sam0_common/include
+INCLUDES += -I$(RIOTCPU)/sam0_common/include
