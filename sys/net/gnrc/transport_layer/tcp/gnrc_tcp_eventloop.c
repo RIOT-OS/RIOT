@@ -136,6 +136,12 @@ static int _receive(gnrc_pktsnip_t *pkt)
         return 0;
     }
 
+    if (tcp->size < sizeof(tcp_hdr_t)) {
+        DEBUG("gnrc_tcp_eventloop.c : _receive() : packet is too short\n");
+        gnrc_pktbuf_release(pkt);
+        return -ERANGE;
+    }
+
     /* Extract control bits, src and dst ports and check if SYN is set (not SYN+ACK) */
     hdr = (tcp_hdr_t *)tcp->data;
     ctl = byteorder_ntohs(hdr->off_ctl);
