@@ -50,3 +50,6 @@ ifeq ($(LTO),1)
   # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59396
   LINKFLAGS += -Wno-error
 endif
+
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation

@@ -71,3 +71,7 @@ ifneq (,$(TARGET_ARCH))
   INCLUDES    += $(GCC_C_INCLUDES)
   CXXINCLUDES += $(GCC_CXX_INCLUDES)
 endif
+
+OPTIONAL_CFLAGS_BLACKLIST += -fno-delete-null-pointer-checks
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation

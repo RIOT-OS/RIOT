@@ -66,3 +66,6 @@ export LINKFLAGS += $(MIPS_HAL_LDFLAGS)
 export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
 export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT)
 export LINKFLAGS += -Wl,--gc-sections
+
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
