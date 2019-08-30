@@ -24,84 +24,85 @@ info-buildsize:
 	@$(SIZE) -d -B $(ELFFILE) || echo ''
 
 info-build:
-	@echo 'APPLICATION: $(APPLICATION)'
-	@echo 'APPDIR:      $(APPDIR)'
-	@echo ''
-	@echo 'supported boards:'
-	@echo $$($(MAKE) info-boards-supported)
-	@echo ''
-	@echo 'BOARD:   $(BOARD)'
-	@echo 'CPU:     $(CPU)'
-	@echo 'MCU:     $(MCU)'
-	@echo ''
-	@echo 'RIOTBASE:  $(RIOTBASE)'
-	@echo 'RIOTBOARD: $(RIOTBOARD)'
-	@echo 'RIOTCPU:   $(RIOTCPU)'
-	@echo 'RIOTPKG:   $(RIOTPKG)'
-	@echo ''
-	@echo 'DEFAULT_MODULE: $(sort $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE)))'
-	@echo 'DISABLE_MODULE: $(sort $(DISABLE_MODULE))'
-	@echo 'USEMODULE:      $(sort $(filter-out $(DEFAULT_MODULE), $(USEMODULE)))'
-	@echo ''
-	@echo 'ELFFILE: $(ELFFILE)'
-	@echo 'HEXFILE: $(HEXFILE)'
-	@echo 'BINFILE: $(BINFILE)'
-	@echo 'FLASHFILE: $(FLASHFILE)'
-	@echo ''
-	@echo 'FEATURES_USED:'
-	@echo '         $(or $(FEATURES_USED), -none-)'
-	@echo 'FEATURES_REQUIRED:'
-	@echo '         $(or $(sort $(FEATURES_REQUIRED)), -none-)'
-	@echo 'FEATURES_OPTIONAL_ONLY (optional that are not required, strictly "nice to have"):'
-	@echo '         $(or $(FEATURES_OPTIONAL_ONLY), -none-)'
-	@echo 'FEATURES_OPTIONAL_MISSING (missing optional features):'
-	@echo '         $(or $(FEATURES_OPTIONAL_MISSING), -none-)'
-	@echo 'FEATURES_PROVIDED (by the board or USEMODULE'"'"'d drivers):'
-	@echo '         $(or $(sort $(FEATURES_PROVIDED)), -none-)'
-	@echo 'FEATURES_MISSING (only non optional features):'
-	@echo '         $(or $(FEATURES_MISSING), -none-)'
-	@echo ''
-	@echo 'FEATURES_CONFLICT:     $(FEATURES_CONFLICT)'
-	@echo 'FEATURES_CONFLICT_MSG: $(FEATURES_CONFLICT_MSG)'
-	@echo 'FEATURES_CONFLICTING:'
-	@echo '         $(or $(FEATURES_CONFLICTING), -none-)'
-	@echo ''
-	@echo 'INCLUDES:$(patsubst %, $(NEWLINE)$(TAB)%, $(INCLUDES))'
-	@echo ''
-	@echo 'CC:      $(CC)'
-	@echo 'CFLAGS:$(patsubst %, $(NEWLINE)$(TAB)%, $(CFLAGS))'
-	@echo ''
-	@echo 'CXX:     $(CXX)'
-	@echo 'CXXUWFLAGS:$(patsubst %, $(NEWLINE)$(TAB)%, $(CXXUWFLAGS))'
-	@echo 'CXXEXFLAGS:$(patsubst %, $(NEWLINE)$(TAB)%, $(CXXEXFLAGS))'
-	@echo ''
-	@echo 'LINK:    $(LINK)'
-	@echo 'LINKFLAGS:$(patsubst %, $(NEWLINE)$(TAB)%, $(LINKFLAGS))'
-	@echo ''
-	@echo 'OBJCOPY: $(OBJCOPY)'
-	@echo 'OFLAGS:  $(OFLAGS)'
-	@echo ''
-	@echo 'FLASHER: $(FLASHER)'
-	@echo 'FFLAGS:  $(FFLAGS)'
-	@echo ''
-	@echo 'TERMPROG:  $(TERMPROG)'
-	@echo 'TERMFLAGS: $(TERMFLAGS)'
-	@echo 'PORT:      $(PORT)'
-	@echo ''
-	@echo 'DEBUGGER:       $(DEBUGGER)'
-	@echo 'DEBUGGER_FLAGS: $(DEBUGGER_FLAGS)'
-	@echo
-	@echo 'DOWNLOAD_TO_FILE:   $(DOWNLOAD_TO_FILE)'
-	@echo 'DOWNLOAD_TO_STDOUT: $(DOWNLOAD_TO_STDOUT)'
-	@echo 'UNZIP_HERE:         $(UNZIP_HERE)'
-	@echo ''
-	@echo 'DEBUGSERVER:       $(DEBUGSERVER)'
-	@echo 'DEBUGSERVER_FLAGS: $(DEBUGSERVER_FLAGS)'
-	@echo ''
-	@echo 'RESET:       $(RESET)'
-	@echo 'RESET_FLAGS: $(RESET_FLAGS)'
-	@echo ''
-	@echo 'MAKEFILE_LIST:$(patsubst %, $(NEWLINE)$(TAB)%, $(abspath $(MAKEFILE_LIST)))'
+	$(info APPLICATION: $(APPLICATION))
+	$(info APPDIR:      $(APPDIR))
+	$(info )
+	$(info supported boards:)
+	$(info $($(MAKE) info-boards-supported))
+	$(info )
+	$(info BOARD:   $(BOARD))
+	$(info CPU:     $(CPU))
+	$(info MCU:     $(MCU))
+	$(info )
+	$(info RIOTBASE:  $(RIOTBASE))
+	$(info RIOTBOARD: $(RIOTBOARD))
+	$(info RIOTCPU:   $(RIOTCPU))
+	$(info RIOTPKG:   $(RIOTPKG))
+	$(info )
+	$(info DEFAULT_MODULE: $(sort $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))))
+	$(info DISABLE_MODULE: $(sort $(DISABLE_MODULE)))
+	$(info USEMODULE:      $(sort $(filter-out $(DEFAULT_MODULE), $(USEMODULE))))
+	$(info )
+	$(info ELFFILE: $(ELFFILE))
+	$(info HEXFILE: $(HEXFILE))
+	$(info BINFILE: $(BINFILE))
+	$(info FLASHFILE: $(FLASHFILE))
+	$(info )
+	$(info FEATURES_USED:)
+	$(info          $(or $(FEATURES_USED), -none-))
+	$(info FEATURES_REQUIRED:)
+	$(info          $(or $(sort $(FEATURES_REQUIRED)), -none-))
+	$(info FEATURES_OPTIONAL_ONLY (optional that are not required, strictly "nice to have"):)
+	$(info          $(or $(FEATURES_OPTIONAL_ONLY), -none-))
+	$(info FEATURES_OPTIONAL_MISSING (missing optional features):)
+	$(info          $(or $(FEATURES_OPTIONAL_MISSING), -none-))
+	$(info FEATURES_PROVIDED (by the board or USEMODULE'd drivers):)
+	$(info          $(or $(sort $(FEATURES_PROVIDED)), -none-))
+	$(info FEATURES_MISSING (only non optional features):)
+	$(info          $(or $(FEATURES_MISSING), -none-))
+	$(info )
+	$(info FEATURES_CONFLICT:     $(FEATURES_CONFLICT))
+	$(info FEATURES_CONFLICT_MSG: $(FEATURES_CONFLICT_MSG))
+	$(info FEATURES_CONFLICTING:)
+	$(info          $(or $(FEATURES_CONFLICTING), -none-))
+	$(info )
+	$(info INCLUDES:$(patsubst %, $(NEWLINE)$(TAB)%, $(INCLUDES)))
+	$(info )
+	$(info CC:      $(CC))
+	$(info CFLAGS:$(patsubst %, $(NEWLINE)$(TAB)%, $(CFLAGS)))
+	$(info )
+	$(info CXX:     $(CXX))
+	$(info CXXUWFLAGS:$(patsubst %, $(NEWLINE)$(TAB)%, $(CXXUWFLAGS)))
+	$(info CXXEXFLAGS:$(patsubst %, $(NEWLINE)$(TAB)%, $(CXXEXFLAGS)))
+	$(info )
+	$(info LINK:    $(LINK))
+	$(info LINKFLAGS:$(patsubst %, $(NEWLINE)$(TAB)%, $(LINKFLAGS)))
+	$(info )
+	$(info OBJCOPY: $(OBJCOPY))
+	$(info OFLAGS:  $(OFLAGS))
+	$(info )
+	$(info FLASHER: $(FLASHER))
+	$(info FFLAGS:  $(FFLAGS))
+	$(info )
+	$(info TERMPROG:  $(TERMPROG))
+	$(info TERMFLAGS: $(TERMFLAGS))
+	$(info PORT:      $(PORT))
+	$(info )
+	$(info DEBUGGER:       $(DEBUGGER))
+	$(info DEBUGGER_FLAGS: $(DEBUGGER_FLAGS))
+	$(info )
+	$(info DOWNLOAD_TO_FILE:   $(DOWNLOAD_TO_FILE))
+	$(info DOWNLOAD_TO_STDOUT: $(DOWNLOAD_TO_STDOUT))
+	$(info UNZIP_HERE:         $(UNZIP_HERE))
+	$(info )
+	$(info DEBUGSERVER:       $(DEBUGSERVER))
+	$(info DEBUGSERVER_FLAGS: $(DEBUGSERVER_FLAGS))
+	$(info )
+	$(info RESET:       $(RESET))
+	$(info RESET_FLAGS: $(RESET_FLAGS))
+	$(info )
+	$(info MAKEFILE_LIST:$(patsubst %, $(NEWLINE)$(TAB)%, $(abspath $(MAKEFILE_LIST))))
+	@true
 
 info-files: QUIET := 0
 info-files:
@@ -140,10 +141,12 @@ info-features-used:
 	@for i in $(FEATURES_USED); do echo $$i; done
 
 info-debug-variable-%:
-	@echo $($*)
+	$(info $($*))
+	@true
 
 info-toolchains-supported:
-	@echo $(filter-out $(TOOLCHAINS_BLACKLIST),$(TOOLCHAINS_SUPPORTED))
+	$(info $(filter-out $(TOOLCHAINS_BLACKLIST),$(TOOLCHAINS_SUPPORTED)))
+	@true
 
 check-toolchain-supported:
 	@exit $(if $(filter $(TOOLCHAIN),$(filter-out $(TOOLCHAINS_BLACKLIST),$(TOOLCHAINS_SUPPORTED))),0,1)

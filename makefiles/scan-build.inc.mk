@@ -82,7 +82,7 @@ endif # BUILD_IN_DOCKER
 
 
 ..scan-build-analyze: clean
-	@echo '$(COLOR_GREEN)Performing Clang static code analysis using toolchain "$(TOOLCHAIN)".$(COLOR_RESET)'
+	$(info $(COLOR_GREEN)Performing Clang static code analysis using toolchain "$(TOOLCHAIN)".$(COLOR_RESET))
 # ccc-analyzer needs to be told the proper -target setting for best results,
 # otherwise false error reports about unknown register names etc will be produced.
 # These kinds of errors can be safely ignored as long as they only come from LLVM
@@ -96,7 +96,7 @@ endif # BUILD_IN_DOCKER
 	      make -C $(CURDIR) all $(strip $(CMDVARS)) FORCE_ASSERTS=1
 
 ..scan-build-view: scan-build-analyze
-	@echo "Showing most recent report in your web browser..."
+	$(info Showing most recent report in your web browser...")
 	@REPORT_FILE="$$(find '$(SCANBUILD_OUTPUTDIR)' -maxdepth 2 -mindepth 2 \
 	            -type f -name 'index.html' 2>/dev/null | sort | tail -n 1)"; \
 	  if [ -n "$${REPORT_FILE}" ]; then \

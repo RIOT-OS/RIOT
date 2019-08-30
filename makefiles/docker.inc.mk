@@ -269,7 +269,7 @@ DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),-v $(GIT_WORKTREE_COMMONDIR):
 # The `flash`, `term`, `debugserver` etc. targets usually require access to
 # hardware which may not be reachable from inside the container.
 ..in-docker-container:
-	@echo '$(COLOR_GREEN)Launching build container using image "$(DOCKER_IMAGE)".$(COLOR_RESET)'
+	$(info $(COLOR_GREEN)Launching build container using image "$(DOCKER_IMAGE)".$(COLOR_RESET))
 	@# HACK: Handle directory creation here until it is provided globally
 	$(Q)mkdir -p $(BUILD_DIR)
 	$(DOCKER) run $(DOCKER_FLAGS) -t -u "$$(id -u)" \

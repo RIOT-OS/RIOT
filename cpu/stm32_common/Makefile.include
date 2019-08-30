@@ -28,11 +28,12 @@ CFLAGS += -D$(CPU_LINE) -DCPU_LINE_$(CPU_LINE)
 CFLAGS += -DSTM32_FLASHSIZE=$(FLASHSIZE)U
 
 info-stm32:
-	@echo "CPU: $(CPU_MODEL)"
-	@echo "$(TAB)Line: $(CPU_LINE)"
-	@echo "$(TAB)Pin count:$(TAB)$(STM32_PINCOUNT)"
-	@echo "$(TAB)ROM size:$(TAB)$(ROM_LEN) ($(FLASHSIZE) Bytes)"
-	@echo "$(TAB)RAM size:$(TAB)$(RAM_LEN)"
+	$(info CPU: $(CPU_MODEL))
+	$(info $(TAB)Line: $(CPU_LINE))
+	$(info $(TAB)Pin count:$(TAB)$(STM32_PINCOUNT))
+	$(info $(TAB)ROM size:$(TAB)$(ROM_LEN) ($(FLASHSIZE) Bytes))
+	$(info $(TAB)RAM size:$(TAB)$(RAM_LEN))
+	@true
 
 ifneq (,$(CCMRAM_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)
