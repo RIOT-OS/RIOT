@@ -14,7 +14,7 @@ info-objsize:
 	  "") SORTROW=4 ;; \
 	  *) echo "Usage: $(MAKE) info-objsize SORTROW=[text|data|bss|dec]" ; return ;; \
 	esac; \
-	printf '   text\t   data\t    bss\t    dec\t    hex\tfilename\n'; \
+	printf '   text$(TAB)   data$(TAB)    bss$(TAB)    dec$(TAB)    hex$(TAB)filename$(NEWLINE)'; \
 	$(SIZE) -d -B $(BASELIBS) | \
 	  tail -n+2 | \
 	  sed -e 's#$(BINDIR)##' | \
@@ -66,17 +66,17 @@ info-build:
 	@echo 'FEATURES_CONFLICTING:'
 	@echo '         $(or $(FEATURES_CONFLICTING), -none-)'
 	@echo ''
-	@echo -e 'INCLUDES:$(patsubst %, \n\t%, $(INCLUDES))'
+	@echo 'INCLUDES:$(patsubst %, $(NEWLINE)$(TAB)%, $(INCLUDES))'
 	@echo ''
 	@echo 'CC:      $(CC)'
-	@echo -e 'CFLAGS:$(patsubst %, \n\t%, $(CFLAGS))'
+	@echo 'CFLAGS:$(patsubst %, $(NEWLINE)$(TAB)%, $(CFLAGS))'
 	@echo ''
 	@echo 'CXX:     $(CXX)'
-	@echo -e 'CXXUWFLAGS:$(patsubst %, \n\t%, $(CXXUWFLAGS))'
-	@echo -e 'CXXEXFLAGS:$(patsubst %, \n\t%, $(CXXEXFLAGS))'
+	@echo 'CXXUWFLAGS:$(patsubst %, $(NEWLINE)$(TAB)%, $(CXXUWFLAGS))'
+	@echo 'CXXEXFLAGS:$(patsubst %, $(NEWLINE)$(TAB)%, $(CXXEXFLAGS))'
 	@echo ''
 	@echo 'LINK:    $(LINK)'
-	@echo -e 'LINKFLAGS:$(patsubst %, \n\t%, $(LINKFLAGS))'
+	@echo 'LINKFLAGS:$(patsubst %, $(NEWLINE)$(TAB)%, $(LINKFLAGS))'
 	@echo ''
 	@echo 'OBJCOPY: $(OBJCOPY)'
 	@echo 'OFLAGS:  $(OFLAGS)'
@@ -101,12 +101,12 @@ info-build:
 	@echo 'RESET:       $(RESET)'
 	@echo 'RESET_FLAGS: $(RESET_FLAGS)'
 	@echo ''
-	@echo -e 'MAKEFILE_LIST:$(patsubst %, \n\t%, $(abspath $(MAKEFILE_LIST)))'
+	@echo 'MAKEFILE_LIST:$(patsubst %, $(NEWLINE)$(TAB)%, $(abspath $(MAKEFILE_LIST)))'
 
 info-files: QUIET := 0
 info-files:
 	@( \
-	  echo "$(abspath $(shell echo "$(MAKEFILE_LIST)"))" | tr ' ' '\n'; \
+	  echo "$(abspath $(shell echo "$(MAKEFILE_LIST)"))" | tr ' ' '$(NEWLINE)'; \
 	  CSRC="$$($(MAKE) USEPKG="" -Bn | grep -o -e "[^ ]\+\.[csS]$$" -e "[^ ]\+\.[csS][ \']" | grep -v -e "^\s*-D")"; \
 	  echo "$$CSRC"; \
 	  echo "$(RIOTBASE)/Makefile.base"; \

@@ -52,14 +52,14 @@ BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES), $(BOARDS))
 
 info-buildsizes: SHELL=bash
 info-buildsizes:
-	@echo -e "   text\t   data\t    bss\t    dec\tboard"; \
+	@echo "   text$(TAB)   data$(TAB)    bss$(TAB)    dec$(TAB)board"; \
 	for board in $(BOARDS); do \
 	    echo "$$(BOARD=$${board} $(MAKE) --no-print-directory info-buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${board}"; \
 	done;
 
 info-buildsizes-diff: SHELL=bash
 info-buildsizes-diff:
-	@echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
+	@echo "text$(TAB)data$(TAB)bss$(TAB)dec$(TAB)BOARD/BINDIRBASE$(NEWLINE)"; \
 	for board in $(BOARDS); do \
 	  for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
 	      BINDIRBASE=$${BINDIRBASE} BOARD=$${board} $(MAKE) info-buildsize --no-print-directory 2>/dev/null | tail -n-1 | cut -f-4; \
@@ -68,16 +68,16 @@ info-buildsizes-diff:
 	    for I in 0 1 2 3; do \
 	      if [[ -n "$${NEW[I]}" && -n "$${OLD[I]}" ]]; then \
 	        DIFF=$$(($${NEW[I]} - $${OLD[I]})); \
-	        if [[ "$${DIFF}" -gt 0 ]]; then $(COLOR_ECHO) -n "$(COLOR_RED)"; fi; \
-	        if [[ "$${DIFF}" -lt 0 ]]; then $(COLOR_ECHO) -n "$(COLOR_GREEN)"; fi; \
+	        if [[ "$${DIFF}" -gt 0 ]]; then printf "$(COLOR_RED)"; fi; \
+	        if [[ "$${DIFF}" -lt 0 ]]; then printf -n "$(COLOR_GREEN)"; fi; \
 	      else \
 	        DIFF="$(COLOR_RED)ERR"; \
 	      fi; \
-	      echo -ne "$${DIFF}\t$(COLOR_RESET)"; \
+	      echo -ne "$${DIFF}$(TAB)$(COLOR_RESET)"; \
 	    done; \
 	    echo "$${board}"; \
-	    for I in 0 1 2 3; do echo -ne "$${OLD[I]-$(COLOR_RED)ERR$(COLOR_RESET)}\t"; done; echo -e "$${OLDBIN}"; \
-	    for I in 0 1 2 3; do echo -ne "$${NEW[I]-$(COLOR_RED)ERR$(COLOR_RESET)}\t"; done; echo -e "$${NEWBIN}\n"; \
+	    for I in 0 1 2 3; do echo -n "$${OLD[I]-$(COLOR_RED)ERR$(COLOR_RESET)}$(TAB)"; done; echo "$${OLDBIN}"; \
+	    for I in 0 1 2 3; do echo -n "$${NEW[I]-$(COLOR_RED)ERR$(COLOR_RESET)}$(TAB)"; done; echo "$${NEWBIN}$(NEWLINE)"; \
 	  done; \
 	done;
 
