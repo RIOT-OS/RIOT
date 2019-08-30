@@ -8,8 +8,6 @@
 #include <stdbool.h>
 
 #define IRQ_MASK 0x00000080
-#define FIQ_MASK 0x00000040
-#define INT_MASK (IRQ_MASK | FIQ_MASK)
 
 static inline unsigned __get_cpsr(void)
 {
@@ -48,46 +46,11 @@ unsigned irq_restore(unsigned oldCPSR)
     return _cpsr;
 }
 
-unsigned IRQenabled(void)
-{
-    unsigned _cpsr;
-
-    _cpsr = __get_cpsr();
-    return (_cpsr & IRQ_MASK);
-}
-
 unsigned irq_enable(void)
 {
     unsigned _cpsr;
 
     _cpsr = __get_cpsr();
     __set_cpsr(_cpsr & ~IRQ_MASK);
-    return _cpsr;
-}
-
-unsigned disableFIQ(void)
-{
-    unsigned _cpsr;
-
-    _cpsr = __get_cpsr();
-    __set_cpsr(_cpsr | FIQ_MASK);
-    return _cpsr;
-}
-
-unsigned restoreFIQ(unsigned oldCPSR)
-{
-    unsigned _cpsr;
-
-    _cpsr = __get_cpsr();
-    __set_cpsr((_cpsr & ~FIQ_MASK) | (oldCPSR & FIQ_MASK));
-    return _cpsr;
-}
-
-unsigned enableFIQ(void)
-{
-    unsigned _cpsr;
-
-    _cpsr = __get_cpsr();
-    __set_cpsr(_cpsr & ~FIQ_MASK);
     return _cpsr;
 }
