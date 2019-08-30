@@ -171,6 +171,7 @@ include $(RIOTMAKE)/utils/checks.mk
 include $(RIOTMAKE)/docker.inc.mk
 
 # include color echo macros
+include $(RIOTMAKE)/utils/ansi.mk
 include $(RIOTMAKE)/color.inc.mk
 
 # include concurrency helpers
