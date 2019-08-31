@@ -52,42 +52,6 @@
 
 #include "sdk/sdk.h"
 
-int IRAM puts(const char * str)
-{
-    char c;
-    while ((c = *str) != 0) {
-        ets_putc(c);
-        ++str;
-    }
-    ets_putc('\n');
-    return true;
-}
-
-int IRAM putchar(int c)
-{
-    /* function is neccessary to avoid unproducable results */
-    ets_putc(c);
-    return true;
-}
-
-char _printf_buf[PRINTF_BUFSIZ];
-
-int /* IRAM */ printf(const char* format, ...)
-{
-    va_list arglist;
-    va_start(arglist, format);
-
-    int ret = vsnprintf(_printf_buf, PRINTF_BUFSIZ, format, arglist);
-
-    if (ret > 0) {
-        ets_printf (_printf_buf);
-    }
-
-    va_end(arglist);
-
-    return ret;
-}
-
 #ifdef MODULE_ESP_SDK
 /**
  * Map memory management functions to SDK memory management functions.
