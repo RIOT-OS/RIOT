@@ -61,10 +61,13 @@ PSEUDOMODULES += esp_spiffs
 
 USEMODULE += esp
 USEMODULE += mtd
+USEMODULE += newlib
+USEMODULE += newlib_syscalls_default
 USEMODULE += periph
 USEMODULE += ps
 USEMODULE += random
 USEMODULE += sdk
+USEMODULE += stdio_uart
 USEMODULE += xtensa
 
 ifneq (, $(filter pthread, $(USEMODULE)))
