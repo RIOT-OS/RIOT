@@ -271,7 +271,10 @@ int _pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_c
     }
 
     /* Pass packet down the network stack */
-    gnrc_netapi_send(gnrc_tcp_pid, out_pkt);
+    if (gnrc_netapi_send(gnrc_tcp_pid, out_pkt) < 1) {
+        DEBUG("gnrc_tcp_pkt.c : _pkt_send() : unable to send packet\n");
+        gnrc_pktbuf_release(out_pkt);
+    }
     return 0;
 }
 
