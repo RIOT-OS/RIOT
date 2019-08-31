@@ -85,7 +85,7 @@ INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/espressif
 CFLAGS  += -DESP_OPEN_SDK -DSCHED_PRIO_LEVELS=32 -DCONTEXT_SWITCH_BY_INT
 CFLAGS  += -Wno-unused-parameter -Wformat=0
 CFLAGS  += -mlongcalls -mtext-section-literals
-CFLAGS  += -fdata-sections -fzero-initialized-in-bss
+CFLAGS  += -ffunction-sections -fdata-sections -fzero-initialized-in-bss
 ASFLAGS += --longcalls --text-section-literals
 
 ifneq (, $(filter esp_sdk, $(USEMODULE)))
@@ -135,7 +135,6 @@ endif
 
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/eagle.rom.addr.v6.ld
 LINKFLAGS += -nostdlib -lgcc -u ets_run -Wl,-gc-sections # -Wl,--print-gc-sections
-LINKFLAGS += -Wl,--warn-unresolved-symbols
 
 # The ELFFILE is the base one used for flashing
 FLASHFILE ?= $(ELFFILE)
