@@ -1,0 +1,26 @@
+From 213f6bb69962154a890925124d44aa8f3361270e Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benpicco@googlemail.com>
+Date: Sun, 1 Sep 2019 17:21:06 +0200
+Subject: [PATCH] rename config.h  to libb2_config.h
+
+This avoids conflics with other config.h files
+---
+ src/blake2-impl.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/blake2-impl.h b/src/blake2-impl.h
+index c99e3de..a8622e7 100644
+--- a/src/blake2-impl.h
++++ b/src/blake2-impl.h
+@@ -17,7 +17,7 @@
+ #include <stddef.h>
+ #include <stdint.h>
+ #include <string.h>
+-#include "config.h"
++#include "libb2_config.h"
+ 
+ #define BLAKE2_IMPL_CAT(x,y) x ## y
+ #define BLAKE2_IMPL_EVAL(x,y)  BLAKE2_IMPL_CAT(x,y)
+-- 
+2.20.1
+
