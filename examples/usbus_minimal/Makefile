@@ -29,8 +29,8 @@ CFLAGS += -DUSB_CONFIG_VID=0x$(USB_VID) -DUSB_CONFIG_PID=0x$(USB_PID)
 include $(RIOTBASE)/Makefile.include
 
 define PID_VID_WARNING
-$(COLOR_RED)Private testing pid.codes USB VID/PID used!, do not use it outside of test environments!$(COLOR_RESET)
-$(COLOR_RED)MUST NOT be used on any device redistributed, sold or manufactured, VID/PID is not unique!$(COLOR_RESET)
+$(call c_red,Private testing pid.codes USB VID/PID used!. Do not use it outside of test environments!)
+$(call c_red,MUST NOT be used on any device redistributed sold or manufactured. VID/PID is not unique!)
 endef
 
 .PHONY: usb_id_check
