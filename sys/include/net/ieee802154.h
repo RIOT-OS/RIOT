@@ -97,6 +97,33 @@ extern "C" {
 #define IEEE802154_FRAME_LEN_MAX        (127U)  /**< maximum frame length */
 
 /**
+ * @brief   802.15.4 PHY modes
+ */
+enum {
+    IEEE802154_PHY_DISABLED,        /**< PHY disabled, no mode selected */
+    IEEE802154_PHY_BPSK,            /**< Binary Phase Shift Keying */
+    IEEE802154_PHY_ASK,             /**< Amplitude-Shift Keying */
+    IEEE802154_PHY_OQPSK,           /**< Offset Quadrature Phase-Shift Keying */
+    IEEE802154_PHY_OFDM,            /**< Orthogonal Frequency-Division Multiplexing */
+    IEEE802154_PHY_FSK              /**< Frequency Shift Keying */
+};
+
+/**
+ * @brief   802.15.4 Flag to indicate that O-QPSK rate mode is a legacy mode.
+ * @note    legacy rate modes != 0 are prorietary and may not be compatible across vendors.
+ */
+#define IEEE802154_OQPSK_FLAG_LEGACY (1 << 7)
+
+/**
+ * @brief   802.15.4 forward error correction schemes
+ */
+enum {
+    IEEE802154_FEC_NONE,            /**< no forward error correction */
+    IEEE802154_FEC_NRNSC,           /**< non-recursive and non-systematic code */
+    IEEE802154_FEC_RSC              /**< recursive and systematic code */
+};
+
+/**
  * @brief   Special address defintions
  * @{
  */
