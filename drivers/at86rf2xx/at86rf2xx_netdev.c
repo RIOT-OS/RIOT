@@ -79,14 +79,23 @@ static int _init(netdev_t *netdev)
     gpio_set(dev->params.reset_pin);
     gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
 
-    /* reset device to default values and put it into RX state */
-    at86rf2xx_reset(dev);
+    /* Intentionally check if bus can be acquired,
+       since getbus() drops the return value */
+    if (spi_acquire(dev->params.spi, dev->params.cs_pin, SPI_MODE_0,
+                                                dev->params.spi_clk) < 0) {
+        DEBUG("[at86rf2xx] error: unable to acquire SPI bus\n");
+        return -EIO;
+    }
+    spi_release(dev->params.spi);
 
-    /* test if the SPI is set up correctly and the device is responding */
+    /* test if the device is responding */
     if (at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM) != AT86RF2XX_PARTNUM) {
         DEBUG("[at86rf2xx] error: unable to read correct part number\n");
-        return -1;
+        return -ENOTSUP;
     }
+
+    /* reset device to default values and put it into RX state */
+    at86rf2xx_reset(dev);
 
     return 0;
 }
