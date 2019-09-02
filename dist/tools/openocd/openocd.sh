@@ -73,6 +73,8 @@
 : ${OPENOCD_EXTRA_INIT:=}
 # Debugger interface initialization commands to pass to OpenOCD
 : ${OPENOCD_ADAPTER_INIT:=}
+# If set to 1 'reset_config' will use 'connect_assert_srst' before 'flash' or 'reset.
+: ${OPENOCD_RESET_USE_CONNECT_ASSERT_SRST:=}
 # The setsid command is needed so that Ctrl+C in GDB doesn't kill OpenOCD
 : ${SETSID:=setsid}
 # GDB command, usually a separate command for each platform (e.g. arm-none-eabi-gdb)
@@ -106,7 +108,6 @@
 #
 # Examples of alternative debugger configurations
 #
-
 # Using the GDB text UI:
 # DBG_EXTRA_FLAGS=-tui make debug
 # or to always use TUI, put in your .profile:
@@ -118,6 +119,11 @@
 # export DBG=ddd
 # export DBG_FLAGS='--debugger "${GDB} ${DBG_DEFAULT_FLAGS}"'
 # The single quotes are important on the line above, or it will not work.
+
+# Handle OPENOCD_RESET_USE_CONNECT_ASSERT_SRST
+if [ "${OPENOCD_RESET_USE_CONNECT_ASSERT_SRST}" -eq 1 ]; then
+  OPENOCD_EXTRA_RESET_INIT+="-c 'reset_config connect_assert_srst'"
+fi
 
 #
 # a couple of tests for certain configuration options
@@ -205,6 +211,7 @@ _flash_list_raw() {
     sh -c "${OPENOCD} \
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_RESET_INIT} \
             -c 'init' \
             -c 'flash probe 0' \
             -c 'flash list' \
@@ -274,6 +281,7 @@ do_flash() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            ${OPENOCD_EXTRA_RESET_INIT} \
             -c 'tcl_port 0' \
             -c 'telnet_port 0' \
             -c 'gdb_port 0' \
@@ -353,6 +361,7 @@ do_reset() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            ${OPENOCD_EXTRA_RESET_INIT} \
             -c 'tcl_port 0' \
             -c 'telnet_port 0' \
             -c 'gdb_port 0' \
