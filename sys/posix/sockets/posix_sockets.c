@@ -461,6 +461,7 @@ int accept(int socket, struct sockaddr *restrict address,
                 new_s->bound = true;
                 new_s->queue_array = NULL;
                 new_s->queue_array_len = 0;
+                new_s->sock = (socket_sock_t *)sock;
                 memset(&s->local, 0, sizeof(sock_tcp_ep_t));
             }
             break;
