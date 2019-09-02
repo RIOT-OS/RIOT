@@ -9,7 +9,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 export OPENOCD_PRE_VERIFY_CMDS += \
   -c 'load_image $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin 0x20000000 bin' \
   -c 'resume 0x20000000'
-export OPENOCD_EXTRA_INIT
 export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
 
 DEBUG_ADAPTER ?= dap
@@ -18,7 +17,8 @@ DEBUG_ADAPTER ?= dap
 # Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
 #   Usage: SERIAL="0200..." BOARD="pba-d-01-kw2x" make flash
 ifneq (,$(SERIAL))
-  export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
+  # Trigger adapter selection on SERIAL in 'openocd-adapters'
+  DEBUG_ADAPTER_ID ?= $(SERIAL)
   SERIAL_TTY = $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh $(SERIAL)))
   ifeq (,$(SERIAL_TTY))
     $(error Did not find a device with serial $(SERIAL))
