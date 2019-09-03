@@ -71,6 +71,10 @@
 #define EXTI_PR_BIT         (EXTI_PR_PR17)
 #endif
 
+#if defined(CPU_MODEL_STM32L412KB)
+    #define RTC_ISR_ALRAF RTC_SR_ALRAF
+#endif
+
 /* write protection values */
 #define WPK1                (0xCA)
 #define WPK2                (0x53)

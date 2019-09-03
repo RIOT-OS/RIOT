@@ -53,7 +53,26 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     dev(pwm)->CR1 = 0;
     dev(pwm)->CR2 = 0;
     for (unsigned i = 0; i < TIMER_CHAN; ++i) {
+#if defined(CPU_MODEL_STM32L412KB)
+        switch(i) {
+            case 0:
+                dev(pwm)->CCR1 = 0;
+                break;
+            case 1:
+                dev(pwm)->CCR2 = 0;
+                break;
+            case 2:
+                dev(pwm)->CCR3 = 0;
+                break;
+            case 3:
+                dev(pwm)->CCR4 = 0;
+                break;
+            default:
+                return 0;
+        }
+#else
         dev(pwm)->CCR[i] = 0;
+#endif
     }
 
     /* configure the used pins */
@@ -120,7 +139,26 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
         value = (uint16_t)dev(pwm)->ARR;
     }
     /* set new value */
+#if defined(CPU_MODEL_STM32L412KB)
+        switch(pwm_config[pwm].chan[channel].cc_chan) {
+            case 0:
+                dev(pwm)->CCR1 = value;
+                break;
+            case 1:
+                dev(pwm)->CCR2 = value;
+                break;
+            case 2:
+                dev(pwm)->CCR3 = value;
+                break;
+            case 3:
+                dev(pwm)->CCR4 = value;
+                break;
+            default:
+                return;
+        }
+#else
     dev(pwm)->CCR[pwm_config[pwm].chan[channel].cc_chan] = value;
+#endif
 }
 
 void pwm_poweron(pwm_t pwm)

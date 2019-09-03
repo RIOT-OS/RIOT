@@ -288,8 +288,6 @@ typedef struct
 
 /**
   * @brief External Interrupt/Event Controller
-  *
-  * Note: IMR1, EMR1, ... were changed to IMR, EMR, ...
   */
 
 typedef struct
@@ -549,7 +547,7 @@ typedef struct
   __IO uint32_t TR;          /*!< RTC time register,                              Address offset: 0x00 */
   __IO uint32_t DR;          /*!< RTC date register,                              Address offset: 0x04 */
   __IO uint32_t SSR;         /*!< RTC sub second register,                        Address offset: 0x08 */
-  __IO uint32_t ICSR;        /*!< RTC initialization control and status register, Address offset: 0x0C */
+  __IO uint32_t ISR;        /*!< RTC initialization control and status register, Address offset: 0x0C */
   __IO uint32_t PRER;        /*!< RTC prescaler register,                         Address offset: 0x10 */
   __IO uint32_t WUTR;        /*!< RTC wakeup timer register,                      Address offset: 0x14 */
   __IO uint32_t CR;          /*!< RTC control register,                           Address offset: 0x18 */
@@ -6403,34 +6401,34 @@ typedef struct
 #define RTC_SSR_SS_Msk               (0xFFFFUL << RTC_SSR_SS_Pos)               /*!< 0x0000FFFF */
 #define RTC_SSR_SS                   RTC_SSR_SS_Msk
 
-/********************  Bits definition for RTC_ICSR register  ******************/
-#define RTC_ICSR_RECALPF_Pos         (16U)
-#define RTC_ICSR_RECALPF_Msk         (0x1UL << RTC_ICSR_RECALPF_Pos)            /*!< 0x00010000 */
-#define RTC_ICSR_RECALPF             RTC_ICSR_RECALPF_Msk
-#define RTC_ICSR_INIT_Pos            (7U)
-#define RTC_ICSR_INIT_Msk            (0x1UL << RTC_ICSR_INIT_Pos)               /*!< 0x00000080 */
-#define RTC_ICSR_INIT                RTC_ICSR_INIT_Msk
-#define RTC_ICSR_INITF_Pos           (6U)
-#define RTC_ICSR_INITF_Msk           (0x1UL << RTC_ICSR_INITF_Pos)              /*!< 0x00000040 */
-#define RTC_ICSR_INITF               RTC_ICSR_INITF_Msk
-#define RTC_ICSR_RSF_Pos             (5U)
-#define RTC_ICSR_RSF_Msk             (0x1UL << RTC_ICSR_RSF_Pos)                /*!< 0x00000020 */
-#define RTC_ICSR_RSF                 RTC_ICSR_RSF_Msk
-#define RTC_ICSR_INITS_Pos           (4U)
-#define RTC_ICSR_INITS_Msk           (0x1UL << RTC_ICSR_INITS_Pos)              /*!< 0x00000010 */
-#define RTC_ICSR_INITS               RTC_ICSR_INITS_Msk
-#define RTC_ICSR_SHPF_Pos            (3U)
-#define RTC_ICSR_SHPF_Msk            (0x1UL << RTC_ICSR_SHPF_Pos)               /*!< 0x00000008 */
-#define RTC_ICSR_SHPF                RTC_ICSR_SHPF_Msk
-#define RTC_ICSR_WUTWF_Pos           (2U)
-#define RTC_ICSR_WUTWF_Msk           (0x1UL << RTC_ICSR_WUTWF_Pos)              /*!< 0x00000004 */
-#define RTC_ICSR_WUTWF               RTC_ICSR_WUTWF_Msk
-#define RTC_ICSR_ALRBWF_Pos          (1U)
-#define RTC_ICSR_ALRBWF_Msk          (0x1UL << RTC_ICSR_ALRBWF_Pos)             /*!< 0x00000002 */
-#define RTC_ICSR_ALRBWF              RTC_ICSR_ALRBWF_Msk
-#define RTC_ICSR_ALRAWF_Pos          (0U)
-#define RTC_ICSR_ALRAWF_Msk          (0x1UL << RTC_ICSR_ALRAWF_Pos)             /*!< 0x00000001 */
-#define RTC_ICSR_ALRAWF              RTC_ICSR_ALRAWF_Msk
+/********************  Bits definition for RTC_ISR register  ******************/
+#define RTC_ISR_RECALPF_Pos         (16U)
+#define RTC_ISR_RECALPF_Msk         (0x1UL << RTC_ISR_RECALPF_Pos)            /*!< 0x00010000 */
+#define RTC_ISR_RECALPF             RTC_ISR_RECALPF_Msk
+#define RTC_ISR_INIT_Pos            (7U)
+#define RTC_ISR_INIT_Msk            (0x1UL << RTC_ISR_INIT_Pos)               /*!< 0x00000080 */
+#define RTC_ISR_INIT                RTC_ISR_INIT_Msk
+#define RTC_ISR_INITF_Pos           (6U)
+#define RTC_ISR_INITF_Msk           (0x1UL << RTC_ISR_INITF_Pos)              /*!< 0x00000040 */
+#define RTC_ISR_INITF               RTC_ISR_INITF_Msk
+#define RTC_ISR_RSF_Pos             (5U)
+#define RTC_ISR_RSF_Msk             (0x1UL << RTC_ISR_RSF_Pos)                /*!< 0x00000020 */
+#define RTC_ISR_RSF                 RTC_ISR_RSF_Msk
+#define RTC_ISR_INITS_Pos           (4U)
+#define RTC_ISR_INITS_Msk           (0x1UL << RTC_ISR_INITS_Pos)              /*!< 0x00000010 */
+#define RTC_ISR_INITS               RTC_ISR_INITS_Msk
+#define RTC_ISR_SHPF_Pos            (3U)
+#define RTC_ISR_SHPF_Msk            (0x1UL << RTC_ISR_SHPF_Pos)               /*!< 0x00000008 */
+#define RTC_ISR_SHPF                RTC_ISR_SHPF_Msk
+#define RTC_ISR_WUTWF_Pos           (2U)
+#define RTC_ISR_WUTWF_Msk           (0x1UL << RTC_ISR_WUTWF_Pos)              /*!< 0x00000004 */
+#define RTC_ISR_WUTWF               RTC_ISR_WUTWF_Msk
+#define RTC_ISR_ALRBWF_Pos          (1U)
+#define RTC_ISR_ALRBWF_Msk          (0x1UL << RTC_ISR_ALRBWF_Pos)             /*!< 0x00000002 */
+#define RTC_ISR_ALRBWF              RTC_ISR_ALRBWF_Msk
+#define RTC_ISR_ALRAWF_Pos          (0U)
+#define RTC_ISR_ALRAWF_Msk          (0x1UL << RTC_ISR_ALRAWF_Pos)             /*!< 0x00000001 */
+#define RTC_ISR_ALRAWF              RTC_ISR_ALRAWF_Msk
 
 /********************  Bits definition for RTC_PRER register  *****************/
 #define RTC_PRER_PREDIV_A_Pos        (16U)
