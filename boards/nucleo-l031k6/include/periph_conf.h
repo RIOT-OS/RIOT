@@ -46,10 +46,23 @@ static const uart_conf_t uart_config[] = {
         .irqn       = USART2_IRQn,
         .type       = STM32_USART,
         .clk_src    = 0, /* Use APB clock */
-    }
+    },
+    {
+        .dev        = LPUART1,
+        .rcc_mask   = RCC_APB1ENR_LPUART1EN,
+        .rx_pin     = GPIO_PIN(PORT_A, 10),
+        .tx_pin     = GPIO_PIN(PORT_A, 9),
+        .rx_af      = GPIO_AF4,
+        .tx_af      = GPIO_AF4,
+        .bus        = APB1,
+        .irqn       = LPUART1_IRQn,
+        .type       = STM32_LPUART,
+        .clk_src    = 0, /* Use APB clock */
+    },
 };
 
 #define UART_0_ISR          (isr_usart2)
+#define UART_1_ISR          (isr_lpuart1)
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
