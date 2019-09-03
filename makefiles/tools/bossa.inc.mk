@@ -1,6 +1,9 @@
 FLASHFILE ?= $(BINFILE)
 FLASHER ?= $(RIOTTOOLS)/bossa/bossac
-FFLAGS  ?= -p $(PORT) -e -i -w -v -b -R $(FLASHFILE)
+BOSSA_ARGS += -p $(PORT)
+BOSSA_ARGS += -i -w -v -b -R
+BOSSA_ARGS += $(if $(IMAGE_OFFSET),--offset $(IMAGE_OFFSET))
+FFLAGS ?= $(BOSSA_ARGS) $(FLASHFILE)
 
 # some arduino boards need to toggle the serial interface a little bit to get
 # them ready for flashing...
