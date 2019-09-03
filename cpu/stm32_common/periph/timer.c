@@ -74,7 +74,27 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
         return -1;
     }
 
+#if defined(CPU_MODEL_STM32L412KB)
+    uint32_t ccr_value = (value & timer_config[tim].max);
+    switch(channel) {
+        case 0:
+            dev(tim)->CCR1 = ccr_value;
+            break;
+        case 1:
+            dev(tim)->CCR2 = ccr_value;
+            break;
+        case 2:
+            dev(tim)->CCR3 = ccr_value;
+            break;
+        case 3:
+            dev(tim)->CCR4 = ccr_value;
+            break;
+        default:
+            return -1;
+    }
+#else
     dev(tim)->CCR[channel] = (value & timer_config[tim].max);
+#endif
     dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
     dev(tim)->DIER |= (TIM_DIER_CC1IE << channel);
 

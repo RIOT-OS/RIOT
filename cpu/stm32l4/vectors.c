@@ -139,10 +139,13 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [DMA1_Channel5_IRQn      ] = isr_dma1_channel5,        /* [15] DMA1 Channel 5 global Interrupt */
     [DMA1_Channel6_IRQn      ] = isr_dma1_channel6,        /* [16] DMA1 Channel 6 global Interrupt */
     [DMA1_Channel7_IRQn      ] = isr_dma1_channel7,        /* [17] DMA1 Channel 7 global Interrupt */
+#if defined(CPU_MODEL_STM32L412KB)
+#else
     [CAN1_TX_IRQn            ] = isr_can1_tx,              /* [19] CAN1 TX Interrupt */
     [CAN1_RX0_IRQn           ] = isr_can1_rx0,             /* [20] CAN1 RX0 Interrupt */
     [CAN1_RX1_IRQn           ] = isr_can1_rx1,             /* [21] CAN1 RX1 Interrupt */
     [CAN1_SCE_IRQn           ] = isr_can1_sce,             /* [22] CAN1 SCE Interrupt */
+#endif
     [EXTI9_5_IRQn            ] = isr_exti,                 /* [23] External Line[9:5] Interrupts */
     [TIM1_BRK_TIM15_IRQn     ] = isr_tim1_brk_tim15,       /* [24] TIM1 Break interrupt and TIM15 global interrupt */
     [TIM1_UP_TIM16_IRQn      ] = isr_tim1_up_tim16,        /* [25] TIM1 Update Interrupt and TIM16 global interrupt */
@@ -155,7 +158,10 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [USART2_IRQn             ] = isr_usart2,               /* [38] USART2 global Interrupt */
     [EXTI15_10_IRQn          ] = isr_exti,                 /* [40] External Line[15:10] Interrupts */
     [RTC_Alarm_IRQn          ] = isr_rtc_alarm,            /* [41] RTC Alarm (A and B) through EXTI Line Interrupt */
+#if defined(CPU_MODEL_STM32L412KB)
+#else
     [SPI3_IRQn               ] = isr_spi3,                 /* [51] SPI3 global Interrupt */
+#endif
     [TIM6_DAC_IRQn           ] = isr_tim6_dac,             /* [54] TIM6 global and DAC1&2 underrun error  interrupts */
     [DMA2_Channel1_IRQn      ] = isr_dma2_channel1,        /* [56] DMA2 Channel 1 global Interrupt */
     [DMA2_Channel2_IRQn      ] = isr_dma2_channel2,        /* [57] DMA2 Channel 2 global Interrupt */
@@ -170,15 +176,21 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [LPUART1_IRQn            ] = isr_lpuart1,              /* [70] LP UART1 interrupt */
     [I2C3_EV_IRQn            ] = isr_i2c3_ev,              /* [72] I2C3 event interrupt */
     [I2C3_ER_IRQn            ] = isr_i2c3_er,              /* [73] I2C3 error interrupt */
+#if defined(CPU_MODEL_STM32L412KB)
+#else
     [SAI1_IRQn               ] = isr_sai1,                 /* [74] Serial Audio Interface 1 global interrupt */
+#endif
     [TSC_IRQn                ] = isr_tsc,                  /* [77] Touch Sense Controller global interrupt */
     [RNG_IRQn                ] = isr_rng,                  /* [80] RNG global interrupt */
     [FPU_IRQn                ] = isr_fpu,                  /* [81] FPU global interrupt */
 
-#if defined(CPU_MODEL_STM32L432KC) || defined(CPU_MODEL_STM32L433RC)
+#if defined(CPU_MODEL_STM32L432KC) || defined(CPU_MODEL_STM32L433RC) || \
+    defined(CPU_MODEL_STM32L412KB)
     [ADC1_IRQn               ] = isr_adc1,                 /* [18] ADC1 global Interrupt */
     [TIM1_TRG_COM_IRQn       ] = isr_tim1_trg_com,         /* [26] TIM1 Trigger and Commutation Interrupt */
     [USB_IRQn                ] = isr_usb,                  /* [67] USB event Interrupt */
+#endif
+#if defined(CPU_MODEL_STM32L432KC) || defined(CPU_MODEL_STM32L433RC)
     [CRS_IRQn                ] = isr_crs,                  /* [82] CRS global interrupt */
 #endif
 #if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L476VG) || \
@@ -219,7 +231,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [QUADSPI_IRQn            ] = isr_quadspi,              /* [71] Quad SPI global interrupt */
     [SWPMI1_IRQn             ] = isr_swpmi1,               /* [76] Serial Wire Interface 1 global interrupt */
 #endif
-#if defined(CPU_MODEL_STM32L452RE)
+#if defined(CPU_MODEL_STM32L452RE) || defined(CPU_MODEL_STM32L412KB)
     [QUADSPI_IRQn            ] = isr_quadspi,              /* [71] Quad SPI global interrupt */
 #endif
 #if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L476VG)
