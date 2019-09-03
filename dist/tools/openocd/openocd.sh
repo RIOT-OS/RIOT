@@ -121,7 +121,7 @@
 # The single quotes are important on the line above, or it will not work.
 
 # Handle OPENOCD_RESET_USE_CONNECT_ASSERT_SRST
-if [ "${OPENOCD_RESET_USE_CONNECT_ASSERT_SRST}" -eq 1 ]; then
+if [ "${OPENOCD_RESET_USE_CONNECT_ASSERT_SRST}" = "1" ]; then
   OPENOCD_EXTRA_RESET_INIT+="-c 'reset_config connect_assert_srst'"
 fi
 
