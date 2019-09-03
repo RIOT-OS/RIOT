@@ -33,3 +33,6 @@ USEMODULE += $(filter cortexm_svc, $(FEATURES_USED))
 ifeq (, $(filter no_idle_thread, $(FEATURES_USED)))
   USEMODULE += core_idle_thread
 endif
+
+# include puf_sram if used
+USEMODULE += $(filter puf_sram, $(FEATURES_USED))
