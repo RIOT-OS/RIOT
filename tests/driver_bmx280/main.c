@@ -19,6 +19,7 @@
  * @}
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <inttypes.h>
 
@@ -83,10 +84,6 @@ int main(void)
 
         /* Get temperature in centi degrees Celsius */
         temperature = bmx280_read_temperature(&dev);
-        bool negative = (temperature < 0);
-        if (negative) {
-            temperature = -temperature;
-        }
 
         /* Get pressure in Pa */
         pressure = bmx280_read_pressure(&dev);
@@ -96,14 +93,13 @@ int main(void)
         humidity = bme280_read_humidity(&dev);
 #endif
 
-        printf("Temperature [°C]:%c%d.%d\n"
+        printf("Temperature [°C]: %d.%d\n"
                "Pressure [Pa]: %lu\n"
 #if defined(MODULE_BME280)
                "Humidity [%%rH]: %u.%02u\n"
 #endif
                "\n+-------------------------------------+\n",
-               (negative) ? '-' : ' ',
-               temperature / 100, (temperature % 100) / 10,
+               temperature / 100, abs(temperature % 100) / 10,
 #if defined(MODULE_BME280)
                (unsigned long)pressure,
                (unsigned int)(humidity / 100), (unsigned int)(humidity % 100)
