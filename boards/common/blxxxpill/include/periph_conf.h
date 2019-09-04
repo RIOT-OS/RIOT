@@ -8,13 +8,11 @@
  */
 
 /**
- * @defgroup    boards_common_stm32f103c8 STM32F103C8 based boards common
- * @ingroup     boards_common
- * @brief       Shared files and configuration for STM32F103C8 based boards
+ * @ingroup     boards_common_blxxxpill
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the bluepill board
+ * @brief       Peripheral MCU configuration for the bluepill/blackpill boards
  *
  * @author      Víctor Ariño <victor.arino@triagnosys.com>
  * @author      Sören Tempel <tempel@uni-bremen.de>

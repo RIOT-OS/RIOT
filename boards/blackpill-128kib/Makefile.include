@@ -1,7 +1,7 @@
 ## the cpu to build for
 export CPU = stm32f1
-export CPU_MODEL = stm32f103c8
-export OPENOCD_CONFIG ?= $(RIOTBOARD)/common/blxxxpill/dist/openocd.cfg
+export CPU_MODEL = stm32f103cb
+export OPENOCD_CONFIG ?= $(RIOTBOARD)/common/blxxxpill/dist/openocd-128kib.cfg
 
 USEMODULE += boards_common_blxxxpill
 

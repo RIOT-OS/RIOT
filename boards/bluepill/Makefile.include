@@ -1,2 +1,8 @@
-USEMODULE += boards_common_stm32f103c8
-include $(RIOTBOARD)/common/stm32f103c8/Makefile.include
+## the cpu to build for
+export CPU = stm32f1
+export CPU_MODEL = stm32f103c8
+export OPENOCD_CONFIG ?= $(RIOTBOARD)/common/blxxxpill/dist/openocd.cfg
+
+USEMODULE += boards_common_blxxxpill
+
+include $(RIOTBOARD)/common/blxxxpill/Makefile.include
