@@ -7,17 +7,17 @@
  */
 
 /**
- * @ingroup   drivers_cc110x
+ * @ingroup     drivers_cc110x
  * @{
  *
  * @file
- * @brief     Default configuration of the transceiver output power for the
- *            different frequency bands
+ * @brief       Default configuration of the transceiver output power for the
+ *              different frequency bands
  *
  * See Section "24 Output Power Programming" on page 59 in the data sheet for
  * details.
  *
- * @author    Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @}
  */
 

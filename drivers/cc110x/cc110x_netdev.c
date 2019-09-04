@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup   drivers_cc110x
+ * @ingroup     drivers_cc110x
  * @{
  *
  * @file
- * @brief     Implementation of RIOT's netdev_driver API for the CC1100/CC1101
- *            transceiver
+ * @brief       Implementation of RIOT's netdev_driver API for the CC1100/CC1101
+ *              transceiver
  *
- * @author    Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @}
  */
 
@@ -45,8 +45,8 @@ static int cc110x_set(netdev_t *netdev, netopt_t opt,
                       const void *val, size_t len);
 
 /**
- * @brief A lookup table to convert from dBm value to the best matching
- *        @ref cc110x_tx_power_t value
+ * @brief   A lookup table to convert from dBm value to the best matching
+ *          @ref cc110x_tx_power_t value
  */
 static const int8_t tx_power_from_dbm[] = {
     [CC110X_TX_POWER_MINUS_30_DBM]  = -25,
@@ -59,7 +59,7 @@ static const int8_t tx_power_from_dbm[] = {
 };
 
 /**
- * @brief A lookup table to convert an @ref cc110x_tx_power_t value to dBm
+ * @brief   A lookup table to convert an @ref cc110x_tx_power_t value to dBm
  */
 static const int8_t dbm_from_tx_power[] = {
     [CC110X_TX_POWER_MINUS_30_DBM]  = -30,
@@ -496,13 +496,13 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
 }
 
 /**
- * @brief Generate an IPv6 interface identifier for a CC110X transceiver
+ * @brief   Generate an IPv6 interface identifier for a CC110X transceiver
  *
- * @param dev   Transceiver to create the IPv6 interface identifier (IID)
- * @param iid   Store the generated IID here
+ * @param   dev     Transceiver to create the IPv6 interface identifier (IID)
+ * @param   iid     Store the generated IID here
  *
- * @return      Returns the size of @ref eui64_t to confirm with the API
- *              in @ref netdev_driver_t::get
+ * @return  Returns the size of @ref eui64_t to confirm with the API
+ *          in @ref netdev_driver_t::get
  */
 static int cc110x_get_iid(cc110x_t *dev, eui64_t *iid)
 {
@@ -562,10 +562,10 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
 }
 
 /**
- * @brief Set the given address as the device's layer 2 address
+ * @brief   Set the given address as the device's layer 2 address
  *
- * @param dev    Device descripter of the transceiver
- * @param addr   Address to set
+ * @param   dev     Device descripter of the transceiver
+ * @param   addr    Address to set
  */
 static int cc110x_set_addr(cc110x_t *dev, uint8_t addr)
 {

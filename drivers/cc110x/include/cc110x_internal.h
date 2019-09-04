@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup   drivers_cc110x
+ * @ingroup     drivers_cc110x
  * @{
  *
  * @file
- * @brief     Internal functions of the CC110x transceiver driver
+ * @brief       Internal functions of the CC110x transceiver driver
  *
- * @author    Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @}
  */
 

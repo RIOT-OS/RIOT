@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup   drivers_cc110x
+ * @ingroup     drivers_cc110x
  * @{
  *
  * @file
- * @brief     Channel maps that translate "virtual" channels to "physical"
- *            channels.
+ * @brief       Channel maps that translate "virtual" channels to "physical"
+ *              channels.
  *
- * @author    Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @}
  */
 

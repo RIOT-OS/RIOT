@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup   drivers_cc110x
+ * @ingroup     drivers_cc110x
  * @{
  *
  * @file
- * @brief     Implementation of the manual calibration facility of the
- *            CC1100/CC1101 driver
+ * @brief       Implementation of the manual calibration facility of the
+ *              CC1100/CC1101 driver
  *
- * @author    Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @}
  */
 
@@ -31,11 +31,11 @@
 #include "debug.h"
 
 /**
- * @brief Read the calibration data from the transceiver and store it
+ * @brief   Read the calibration data from the transceiver and store it
  *
- * @param dev      Device descriptor of the transceiver
+ * @param   dev     Device descriptor of the transceiver
  *
- * @pre @p dev is acquired using @p cc110x_acquire
+ * @pre     @p dev is acquired using @p cc110x_acquire
  */
 static inline void get_calibration_data(cc110x_t *dev)
 {
