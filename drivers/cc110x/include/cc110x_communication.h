@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup   drivers_cc110x
+ * @ingroup     drivers_cc110x
  * @{
  *
  * @file
- * @brief     Functions to communicate with the CC1100/CC1101 transceiver
+ * @brief       Functions to communicate with the CC1100/CC1101 transceiver
  *
- * @author    Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @}
  */
 
@@ -30,14 +30,14 @@ extern "C" {
 #endif
 
 /**
- * @brief Acquire the SPI interface of the transceiver and configure it
+ * @brief   Acquire the SPI interface of the transceiver and configure it
  *
- * @retval SPI_OK       Success
- * @retval SPI_NOMODE   SPI mode 0 not supported by MCU
- * @retval SPI_NOCLK    SPI clock given in @ref cc110x_params_t is not supported
+ * @retval  SPI_OK      Success
+ * @retval  SPI_NOMODE  SPI mode 0 not supported by MCU
+ * @retval  SPI_NOCLK   SPI clock given in @ref cc110x_params_t is not supported
  *
- * @pre @ref cc110x_power_on has be called before calling this function.
- *      (Only needed *once* when the driver initializes.)
+ * @pre     @ref cc110x_power_on has be called before calling this function.
+ *          (Only needed *once* when the driver initializes.)
  */
 static inline int cc110x_acquire(cc110x_t *dev)
 {
@@ -46,7 +46,7 @@ static inline int cc110x_acquire(cc110x_t *dev)
 }
 
 /**
- * @brief Release the SPI interface of the transceiver
+ * @brief   Release the SPI interface of the transceiver
  */
 static inline void cc110x_release(cc110x_t *dev)
 {
@@ -54,133 +54,135 @@ static inline void cc110x_release(cc110x_t *dev)
 }
 
 /**
- * @brief Read a single configuration/status register from the transceiver
+ * @brief   Read a single configuration/status register from the transceiver
  *
- * @param dev   Device descriptor of the transceiver to read the register from
- * @param addr  Address of the register to read
- * @param dest  Where to store the received register content
+ * @param   dev     Device descriptor of the transceiver to read the register
+ *                  from
+ * @param   addr    Address of the register to read
+ * @param   dest    Where to store the received register content
  *
- * @return      The received status byte
+ * @return  The received status byte
  *
- * @pre         @p dest points to one byte of writeable memory
- * @warning     Race condition: SPI access to status registers can occur while
- *              their content is changed, resulting in corrupted data being
- *              retrieved. @ref cc110x_read_reliable provides reliable access
- *              to status registers and should be used to read the TXBYTES,
- *              RXBYTES, MARCSTATE, LQI, RSSI, WORTIME1 and WORTIME0 status
- *              registers. (See Silicon Errata from 2015 at pages 4ff.)
- *              (In IDLE state LQI and RSSI can be read safely using this
- *              function.)
- * @warning     The received status byte is occasionally corrupted. (See
- *              Silicon Errata from 2015 at pages 4ff.) Use @ref cc110x_status
- *              To get the status byte in a reliable way.
+ * @pre     @p dest points to one byte of writeable memory
+ * @warning Race condition: SPI access to status registers can occur while
+ *          their content is changed, resulting in corrupted data being
+ *          retrieved. @ref cc110x_read_reliable provides reliable access
+ *          to status registers and should be used to read the TXBYTES,
+ *          RXBYTES, MARCSTATE, LQI, RSSI, WORTIME1 and WORTIME0 status
+ *          registers. (See Silicon Errata from 2015 at pages 4ff.)
+ *          (In IDLE state LQI and RSSI can be read safely using this
+ *          function.)
+ * @warning The received status byte is occasionally corrupted. (See
+ *          Silicon Errata from 2015 at pages 4ff.) Use @ref cc110x_status
+ *          To get the status byte in a reliable way.
  */
 uint8_t cc110x_read(cc110x_t *dev, uint8_t addr, uint8_t *dest);
 
 /**
- * @brief Read a single status register from the transceiver reliable
+ * @brief   Read a single status register from the transceiver reliable
  *
  * This function has more overhead than @ref cc110x_read, but it is the only
  * reliable way to access frequently updated status registers.
  *
- * @param dev   Device descriptor of the transceiver to read the register from
- * @param addr  Address of the register to read
- * @param dest  Where to store the received register content
+ * @param   dev     Device descriptor of the transceiver to read the register
+ *                  from
+ * @param   addr    Address of the register to read
+ * @param   dest    Where to store the received register content
  *
- * @return      The received status byte
+ * @return  The received status byte
  *
- * @pre         @p dest points to one byte of writeable memory
- * @warning     The received status byte is occasionally corrupted. (See
- *              Silicon Errata from 2015 at pages 4ff.) Use @ref cc110x_status
- *              To get the status byte in a reliable way.
+ * @pre     @p dest points to one byte of writeable memory
+ * @warning The received status byte is occasionally corrupted. (See
+ *          Silicon Errata from 2015 at pages 4ff.) Use @ref cc110x_status
+ *          To get the status byte in a reliable way.
  */
 uint8_t cc110x_read_reliable(cc110x_t *dev, uint8_t addr, uint8_t *dest);
 
 /**
- * @brief Write to a single configuration register on the transceiver
+ * @brief   Write to a single configuration register on the transceiver
  *
- * @param dev   Device descriptor of the transceiver to write byte to
- * @param addr  Address of the register to write to
- * @param data  Data to write
+ * @param   dev     Device descriptor of the transceiver to write byte to
+ * @param   addr    Address of the register to write to
+ * @param   data    Data to write
  *
- * @return      The received status byte
+ * @return  The received status byte
  *
- * @pre         @p addr <= 0x2e (@ref CC110X_REG_TEST0)
- * @warning     Writing to status registers is impossible (==> precondition)
- * @warning     The received status byte is occasionally corrupted. (See
- *              Silicon Errata from 2015 at pages 4ff.) Use @ref cc110x_status
- *              To get the status byte in a reliable way.
+ * @pre     @p addr <= 0x2e (@ref CC110X_REG_TEST0)
+ * @warning Writing to status registers is impossible (==> precondition)
+ * @warning The received status byte is occasionally corrupted. (See
+ *          Silicon Errata from 2015 at pages 4ff.) Use @ref cc110x_status
+ *          To get the status byte in a reliable way.
  */
 uint8_t cc110x_write(cc110x_t *dev, uint8_t addr, uint8_t data);
 
 /**
- * @brief Burst-read a bunch of configuration registers from the transceiver
+ * @brief   Burst-read a bunch of configuration registers from the transceiver
  *
- * @param dev   Device descriptor of the transceiver to read from
- * @param addr  Address to start reading from
- * @param dest  Destination buffer to store the received data to
- * @param len   Number of bytes to read starting from @p addr
+ * @param   dev     Device descriptor of the transceiver to read from
+ * @param   addr    Address to start reading from
+ * @param   dest    Destination buffer to store the received data to
+ * @param   len     Number of bytes to read starting from @p addr
  *
- * @return      The received status byte
+ * @return  The received status byte
  *
- * @pre         @p dest points to a pre-allocated buffer of >= @p len bytes
- * @pre         @p addr + @p len <= 0x2e (@ref CC110X_REG_TEST0)
- * @warning     Burst read access from status registers is impossible
- *              (==> second precondition)
- * @warning     The received status byte is occasionally corrupted. (See
- *              Silicon Errata from 2015 at pages 4ff.) Use @ref cc110x_status
- *              To get the status byte in a reliable way.
+ * @pre     @p dest points to a pre-allocated buffer of >= @p len bytes
+ * @pre     @p addr + @p len <= 0x2e (@ref CC110X_REG_TEST0)
+ * @warning Burst read access from status registers is impossible
+ *          (==> second precondition)
+ * @warning The received status byte is occasionally corrupted. (See
+ *          Silicon Errata from 2015 at pages 4ff.) Use @ref cc110x_status
+ *          To get the status byte in a reliable way.
  */
 uint8_t cc110x_burst_read(cc110x_t *dev, uint8_t addr, void *dest, size_t len);
 
 /**
- * @brief Burst-write to a bunch of configuration registers on the transceiver
+ * @brief   Burst-write to a bunch of configuration registers on the transceiver
  *
- * @param dev   Device descriptor of the transceiver to write
- * @param addr  Address to start writing to
- * @param src   Buffer holding the configuration to write
- * @param len   Number of registers to write to
+ * @param   dev     Device descriptor of the transceiver to write
+ * @param   addr    Address to start writing to
+ * @param   src     Buffer holding the configuration to write
+ * @param   len     Number of registers to write to
  *
- * @return      The received status byte
+ * @return  The received status byte
  *
- * @pre         @p src points to @p len bytes of readable memory
- * @pre         @p addr + @p len <= 0x2e (@ref CC110X_REG_TEST0)
- * @warning     Writes to status registers is impossible
- *              (==> second precondition)
- * @warning     The received status byte is occasionally corrupted. (See
- *              Silicon Errata from 2015 at pages 4ff.) Use @ref cc110x_status
- *              to get the status byte in a reliable way.
+ * @pre     @p src points to @p len bytes of readable memory
+ * @pre     @p addr + @p len <= 0x2e (@ref CC110X_REG_TEST0)
+ * @warning Writes to status registers is impossible
+ *          (==> second precondition)
+ * @warning The received status byte is occasionally corrupted. (See
+ *          Silicon Errata from 2015 at pages 4ff.) Use @ref cc110x_status
+ *          to get the status byte in a reliable way.
  */
 uint8_t cc110x_burst_write(cc110x_t *dev, uint8_t addr,
                            const void *src, size_t len);
 
 /**
- * @brief Send a command to the transceiver
+ * @brief   Send a command to the transceiver
  *
- * @param dev        Device descriptor of the transceiver to send the command to
- * @param cmd_strobe Command to send
+ * @param   dev     Device descriptor of the transceiver to send the command to
+ * @param   cmd     Command to send
  *
- * @return           The received status byte
+ * @return  The received status byte
  *
- * @warning          The received status byte is occasionally corrupted. (See
- *                   Silicon Errata from 2015 at pages 4ff.) Use
- *                   @ref cc110x_status to get the status byte in a reliable
- *                   way.
+ * @warning The received status byte is occasionally corrupted. (See
+ *          Silicon Errata from 2015 at pages 4ff.) Use
+ *          @ref cc110x_status to get the status byte in a reliable
+ *          way.
  */
-uint8_t cc110x_cmd(cc110x_t *dev, uint8_t cmd_strobe);
+uint8_t cc110x_cmd(cc110x_t *dev, uint8_t cmd);
 
 /**
- * @brief Get the transceivers status byte in a reliable way
+ * @brief   Get the transceivers status byte in a reliable way
  *
- * @param dev        Device descriptor of the transceiver to get the status from
+ * @param   dev     Device descriptor of the transceiver to get the status from
  *
- * @return           The received status byte
+ * @return  The received status byte
  */
 uint8_t cc110x_status(cc110x_t *dev);
 
 /**
- * @brief Wakes up the transceiver from "Sleep" or "Crystal oscillator off"
- *        state and waits until the crystal has stabilized
+ * @brief   Wakes up the transceiver from "Sleep" or "Crystal oscillator off"
+ *          state and waits until the crystal has stabilized
  *
  * Thus function clears the CS pin, which triggers a transition from the "Sleep"
  * or "Crystal oscillator off" states (see Figure 13 on page 28 in the data
@@ -199,8 +201,8 @@ uint8_t cc110x_status(cc110x_t *dev);
  * of messing with the SPI interface, this driver simply waits for this upper
  * bound, as suggested in the note below Table 22 on page 30 in the data sheet.
  *
- * @retval 0       Success
- * @retval -EIO    Couldn't pull the CS pin down (@ref cc110x_params_t::cs)
+ * @retval  0       Success
+ * @retval  -EIO    Couldn't pull the CS pin down (@ref cc110x_params_t::cs)
  */
 int cc110x_power_on(cc110x_t *dev);
 

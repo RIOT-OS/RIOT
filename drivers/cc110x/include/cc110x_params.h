@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup   drivers_cc110x
+ * @ingroup     drivers_cc110x
  * @{
  *
  * @file
- * @brief     cc110x board specific configuration
+ * @brief       cc110x board specific configuration
  *
- * @author    Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
 #ifndef CC110X_PARAMS_H

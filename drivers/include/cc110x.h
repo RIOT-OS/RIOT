@@ -209,30 +209,30 @@ extern "C" {
 #endif
 
 /**
- * @brief Length of a layer 2 frame
+ * @brief   Length of a layer 2 frame
  *
  * This does not include the preamble, sync word, CRC field, and length field.
  */
 #define CC110X_MAX_FRAME_SIZE           0xFF
 
 /**
- * @brief Maximum (layer 2) payload size supported by the driver
+ * @brief   Maximum (layer 2) payload size supported by the driver
  */
 #define CC110X_MAX_PAYLOAD_SIZE         (CC110X_MAX_FRAME_SIZE - CC1XXX_HEADER_SIZE)
 
 /**
- * @brief Maximum number of channels supported by the driver
+ * @brief   Maximum number of channels supported by the driver
  */
 #define CC110X_MAX_CHANNELS             8
 
 /**
- * @brief Special value to indicate that layer 2 address should be derived
- *        from the CPU-ID
+ * @brief   Special value to indicate that layer 2 address should be derived
+ *          from the CPU-ID
  */
 #define CC110X_L2ADDR_AUTO              0x00
 
 /**
- * @brief Default protocol for data that is coming in
+ * @brief   Default protocol for data that is coming in
  */
 #ifdef MODULE_GNRC_SIXLOWPAN
 #define CC110X_DEFAULT_PROTOCOL         (GNRC_NETTYPE_SIXLOWPAN)
@@ -241,7 +241,7 @@ extern "C" {
 #endif
 
 /**
- * @brief The state of the CC1100/CC1101 transceiver
+ * @brief   The state of the CC1100/CC1101 transceiver
  *
  * The three least significant bytes match the representation of the matching
  * transceiver state given in the status byte of the hardware. See Table 32 on
@@ -250,13 +250,13 @@ extern "C" {
 typedef enum {
     CC110X_STATE_IDLE               = 0b00000000,   /**< IDLE state */
     /**
-     * @brief Frame received, waiting for upper layer to retrieve it
+     * @brief   Frame received, waiting for upper layer to retrieve it
      *
      * Transceiver is in IDLE state.
      */
     CC110X_STATE_FRAME_READY        = 0b00001000,
     /**
-     * @brief Frame received, waiting for upper layer to retrieve it
+     * @brief   Frame received, waiting for upper layer to retrieve it
      *
      * Transceiver is in SLEEP state. There is no matching representation in the
      * status byte, as reading the status byte will power up the transceiver in
@@ -266,14 +266,14 @@ typedef enum {
     CC110X_STATE_OFF                = 0b00010000,
     CC110X_STATE_RX_MODE            = 0b00000001,   /**< Listening for frames */
     /**
-     * @brief Receiving a frame just now
+     * @brief   Receiving a frame just now
      *
      * Transceiver is in RX state.
      */
     CC110X_STATE_RECEIVING          = 0b00001001,
     CC110X_STATE_TX_MODE            = 0b00000010,   /**< Transmit mode */
     /**
-     * @brief Waiting for transceiver to complete outgoing transmission
+     * @brief   Waiting for transceiver to complete outgoing transmission
      *
      * Transceiver is in TX state
      */
@@ -301,8 +301,8 @@ typedef enum {
 } cc110x_tx_power_t;
 
 /**
- * @brief Structure that holds the PATABLE, which allows to configure the
- *        8 available output power levels using a magic number for each level.
+ * @brief   Structure that holds the PATABLE, which allows to configure the
+ *          8 available output power levels using a magic number for each level.
  *
  * See Section "24 Output Power Programming" on page 59ff in the data sheet.
  * The values suggested in Table 39 on page 60 in the data sheet are already
@@ -319,7 +319,7 @@ typedef struct {
 
 
 /**
- * @brief Configuration of the transceiver to use
+ * @brief   Configuration of the transceiver to use
  *
  * @warning Two transceivers with different configurations will be unable
  *          to communicate.
@@ -344,9 +344,9 @@ typedef struct {
 typedef struct {
     uint8_t base_freq[3]; /**< Base frequency to use */
     /**
-     * @brief FSCTRL1 configuration register value that affects the
-     *        intermediate frequency of the transceiver to use
-     * @note The 4 most significant bits have to be 0.
+     * @brief   FSCTRL1 configuration register value that affects the
+     *          intermediate frequency of the transceiver to use
+     * @note    The 4 most significant bits have to be 0.
      *
      * Assuming a 26 MHz crystal the IF is calculated as follows (in kHz):
      *
@@ -356,8 +356,8 @@ typedef struct {
      */
     uint8_t fsctrl1;
     /**
-     * @brief MDMCFG4 configuration register value that affects channel filter
-     *        bandwidth and the data rate
+     * @brief   MDMCFG4 configuration register value that affects channel filter
+     *          bandwidth and the data rate
      *
      * See page 76 in the data sheet.
      *
@@ -372,9 +372,9 @@ typedef struct {
      */
     uint8_t mdmcfg4;
     /**
-     * @brief MDMCFG3 configuration register value that affects the data rate
+     * @brief   MDMCFG3 configuration register value that affects the data rate
      *
-     * @see   cc110x_config_t::mdmcfg4
+     * @see     cc110x_config_t::mdmcfg4
      *
      * See page 76 in the data sheet.
      *
@@ -388,8 +388,8 @@ typedef struct {
      */
     uint8_t mdmcfg3;
     /**
-     * @brief DEVIANT configuration register that affects the amount by which
-     *        the radio frequency is shifted in FSK/GFSK modulation
+     * @brief   DEVIANT configuration register that affects the amount by which
+     *          the radio frequency is shifted in FSK/GFSK modulation
      *
      * @see cc110x_config_t::mdmcfg4
      *
@@ -413,7 +413,7 @@ typedef struct {
 } cc110x_config_t;
 
 /**
- * @brief Structure to hold mapping between virtual and physical channel numbers
+ * @brief   Structure to hold mapping between virtual and physical channel numbers
  *
  * This driver will provide "virtual" channel numbers 0 to 7, which will be
  * translated to "physical" channel numbers before being send to the
@@ -442,13 +442,13 @@ typedef struct {
 } cc110x_chanmap_t;
 
 /**
- * @brief Structure holding all parameter for driver initialization
+ * @brief   Structure holding all parameter for driver initialization
  */
 typedef struct {
     const cc110x_patable_t *patable;  /**< Pointer to the PATABLE to use */
     /**
-     * @brief Pointer to the configuration of the base frequency, data rate and
-     *        channel bandwidth; or `NULL` to keep the default.
+     * @brief   Pointer to the configuration of the base frequency, data rate
+     *          and channel bandwidth; or `NULL` to keep the default.
      */
     const cc110x_config_t *config;
     const cc110x_chanmap_t *channels;   /**< Pointer to the default channel map */
@@ -465,12 +465,12 @@ typedef struct {
 } cc110x_params_t;
 
 /**
- * @brief Structure holding the calibration data of the frequency synthesizer
+ * @brief   Structure holding the calibration data of the frequency synthesizer
  */
 typedef struct {
     /**
-     * @brief VCO capacitance calibration, which depends on the frequency and,
-     *        thus, has to be stored for each channel
+     * @brief   VCO capacitance calibration, which depends on the frequency and,
+     *          thus, has to be stored for each channel
      */
     char fscal1[CC110X_MAX_CHANNELS];
     char fscal2;    /**< VCO current calibration, independent of channel */
@@ -478,7 +478,7 @@ typedef struct {
 } cc110x_fs_calibration_t;
 
 /**
- * @brief Buffer to temporary store incoming/outgoing packet
+ * @brief   Buffer to temporary store incoming/outgoing packet
  *
  * The CC1100/CC1101 transceiver's FIFO sadly is only 64 bytes in size. To
  * support frames bigger than that, chunks of the frame have to be
@@ -488,23 +488,24 @@ typedef struct {
 typedef struct __attribute__((packed)) {
     uint8_t len;            /**< Length of the frame in bytes */
     /**
-     * @brief The payload data of the frame
+     * @brief   The payload data of the frame
      */
     uint8_t data[CC110X_MAX_FRAME_SIZE];
     /**
-     * @brief Index of the next @ref cc110x_framebuf_t::data element to transfer
+     * @brief   Index of the next @ref cc110x_framebuf_t::data element to
+     *          transfer
      *
-     * In RX mode: Index of the next @ref cc110x_framebuf_t::data element to store
-     * data read from the RX-FIFO into.
+     * In RX mode: Index of the next @ref cc110x_framebuf_t::data element to
+     * store data read from the RX-FIFO into.
      *
-     * In TX mode: Index of the next @ref cc110x_framebuf_t::data element to write
-     * to the TX-FIFO.
+     * In TX mode: Index of the next @ref cc110x_framebuf_t::data element to
+     * write to the TX-FIFO.
      */
     uint8_t pos;
 } cc110x_framebuf_t;
 
 /**
- * @brief Device descriptor for CC1100/CC1101 transceivers
+ * @brief   Device descriptor for CC1100/CC1101 transceivers
  */
 typedef struct {
     netdev_t netdev;                    /**< RIOT's interface to this driver */
@@ -518,11 +519,11 @@ typedef struct {
     cc110x_params_t params;             /**< Configuration of the driver */
     cc110x_framebuf_t buf;              /**< Temporary frame buffer */
     /**
-     * @brief RSSI and LQI of the last received frame
+     * @brief   RSSI and LQI of the last received frame
      */
     cc1xxx_rx_info_t rx_info;
     /**
-     * @brief Frequency synthesizer calibration data
+     * @brief   Frequency synthesizer calibration data
      */
     cc110x_fs_calibration_t fscal;
     /**
@@ -537,16 +538,16 @@ typedef struct {
 } cc110x_t;
 
 /**
- * @brief Setup the CC1100/CC1101 driver, but perform no initialization
+ * @brief   Setup the CC1100/CC1101 driver, but perform no initialization
  *
  * @ref netdev_driver_t::init can be used after this call to initialize the
  * transceiver.
  *
- * @param dev    Device descriptor to use
- * @param params Parameter of the device to setup
+ * @param   dev     Device descriptor to use
+ * @param   params  Parameter of the device to setup
  *
- * @retval 0       Device successfully set up
- * @retval -EINVAL @p dev or @p params is `NULL`, or @p params is invalid
+ * @retval  0       Device successfully set up
+ * @retval  -EINVAL @p dev or @p params is `NULL`, or @p params is invalid
  */
 int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params);
 
@@ -554,16 +555,17 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params);
  * @brief Apply the given configuration and the given channel map and performs
  *        a recalibration
  *
- * @param dev        Device descriptor of the transceiver
- * @param conf       Configuration to apply or `NULL` to only change channel map
- * @param chanmap    Channel map to apply (must be compatible with @p conf)
+ * @param   dev     Device descriptor of the transceiver
+ * @param   conf    Configuration to apply or `NULL` to only change channel map
+ * @param   chanmap Channel map to apply (must be compatible with @p conf)
  *
- * @retval 0         Success
- * @retval -EINVAL   Called with invalid argument
- * @retval -EIO      Communication with the transceiver failed
+ * @retval  0       Success
+ * @retval  -EINVAL Called with invalid argument
+ * @retval  -EIO    Communication with the transceiver failed
  *
- * @pre The application developer checked in the documentation that the channel
- *      map in @p chanmap is compatible with the configuration in @p conf
+ * @pre     The application developer checked in the documentation that the
+ *          channel map in @p chanmap is compatible with the configuration in
+ *          @p conf
  *
  * Because the configuration (potentially) changes the channel bandwidth, the
  * old channel map is rendered invalid. This API therefore asks for both to make
@@ -575,15 +577,15 @@ int cc110x_apply_config(cc110x_t *dev, const cc110x_config_t *conf,
                         const cc110x_chanmap_t *chanmap);
 
 /**
- * @brief Perform a calibration of the frequency generator for each supported
- *        channel
+ * @brief   Perform a calibration of the frequency generator for each supported
+ *          channel
  *
- * @param dev        Device descriptor of the transceiver
+ * @param   dev     Device descriptor of the transceiver
  *
- * @retval 0         Success
- * @retval -EINVAL   Called with invalid argument
- * @retval -EAGAIN   Current state prevents deliberate calibration
- * @retval -EIO      Communication with the transceiver failed
+ * @retval  0       Success
+ * @retval  -EINVAL Called with invalid argument
+ * @retval  -EAGAIN Current state prevents deliberate calibration
+ * @retval  -EIO    Communication with the transceiver failed
  *
  * Tunes in each supported channel and calibrates the transceiver. The
  * calibration data is stored so that @ref cc110x_set_channel can skip the
@@ -594,16 +596,16 @@ int cc110x_full_calibration(cc110x_t *dev);
 /**
  * @brief Hops to the specified channel
  *
- * @param dev        Device descriptor of the transceiver
- * @param channel    Channel to hop to
+ * @param   dev     Device descriptor of the transceiver
+ * @param   channel Channel to hop to
  *
- * @retval 0         Success
- * @retval -EINVAL   Called with `NULL` as @p dev
- * @retval -ERANGE   Channel out of range or not supported by channel map
- * @retval -EAGAIN   Currently in a state that does not allow hopping, e.g.
- *                   sending/receiving a packet, calibrating or handling
- *                   transmission errors
- * @retval -EIO      Communication with the transceiver failed
+ * @retval  0       Success
+ * @retval  -EINVAL Called with `NULL` as @p dev
+ * @retval  -ERANGE Channel out of range or not supported by channel map
+ * @retval  -EAGAIN Currently in a state that does not allow hopping, e.g.
+ *                  sending/receiving a packet, calibrating or handling
+ *                  transmission errors
+ * @retval  -EIO    Communication with the transceiver failed
  *
  * This function implements the fact channel hopping approach outlined in
  * section 28.2 on page 64 in the data sheet, which skips the calibration phase
@@ -612,16 +614,16 @@ int cc110x_full_calibration(cc110x_t *dev);
 int cc110x_set_channel(cc110x_t *dev, uint8_t channel);
 
 /**
- * @brief Set the TX power to the specified value
+ * @brief   Set the TX power to the specified value
  *
- * @param dev        Device descriptor of the transceiver
- * @param power      Output power to apply
+ * @param   dev     Device descriptor of the transceiver
+ * @param   power   Output power to apply
  *
- * @retval 0         Success
- * @retval -EINVAL   Called with `NULL` as @p dev
- * @retval -ERANGE   Called with an invalid value for @p power
- * @retval -EAGAIN   Changing the TX power is in the current state not possible
- * @retval -EIO      Communication with the transceiver failed
+ * @retval  0       Success
+ * @retval  -EINVAL Called with `NULL` as @p dev
+ * @retval  -ERANGE Called with an invalid value for @p power
+ * @retval  -EAGAIN Changing the TX power is in the current state not possible
+ * @retval  -EIO    Communication with the transceiver failed
  */
 int cc110x_set_tx_power(cc110x_t *dev, cc110x_tx_power_t power);
 

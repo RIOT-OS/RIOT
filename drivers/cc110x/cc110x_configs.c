@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup   drivers_cc110x
+ * @ingroup     drivers_cc110x
  * @{
  *
  * @file
- * @brief     Transceiver configuration for different base bands, modulation
- *            rate and channel bandwidth.
+ * @brief       Transceiver configuration for different base bands, modulation
+ *              rate and channel bandwidth.
  *
- * @author    Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @}
  */
 

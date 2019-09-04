@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup   drivers_cc110x
+ * @ingroup     drivers_cc110x
  * @{
  *
  * @file
- * @brief     Implementation for the "public" API of the CC1100/CC1101 driver
+ * @brief       Implementation for the "public" API of the CC1100/CC1101 driver
  *
- * @author    Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @}
  */
 

@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup   drivers_cc110x
+ * @ingroup     drivers_cc110x
  * @{
  *
  * @file
- * @brief     Functions related to the netdev interface of the CC110x driver
+ * @brief       Functions related to the netdev interface of the CC110x driver
  *
- * @author    Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @}
  */
 
@@ -25,14 +25,14 @@ extern "C" {
 #endif
 
 /**
- * @brief RIOT's API to interact with the CC1100/CC1101 driver
+ * @brief   RIOT's API to interact with the CC1100/CC1101 driver
  */
 extern const netdev_driver_t cc110x_driver;
 
 /**
- * @brief Interrupt handler to call on both edges of the GDO0 and GDO2 pins
+ * @brief   Interrupt handler to call on both edges of the GDO0 and GDO2 pins
  *
- * @param dev     The device descriptor of the transceiver
+ * @param   dev     The device descriptor of the transceiver
  *
  * This interrupt handler requests that the cc110x ISR is called in thread
  * context

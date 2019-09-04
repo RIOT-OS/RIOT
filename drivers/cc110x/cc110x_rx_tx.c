@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup   drivers_cc110x
+ * @ingroup     drivers_cc110x
  * @{
  *
  * @file
- * @brief     Functions to manage sending/receiving frames with the CC110x
+ * @brief       Functions to manage sending/receiving frames with the CC110x
  *
- * @author    Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @}
  */
 
@@ -49,9 +49,9 @@ void cc110x_enter_rx_mode(cc110x_t *dev)
 }
 
 /**
- * @brief Function to run when frame is fully received
+ * @brief   Function to run when frame is fully received
  *
- * @param dev     Device descriptor of the transceiver
+ * @param   dev     Device descriptor of the transceiver
  *
  * Intended to be called from @ref cc110x_rx_continue
  */
@@ -87,9 +87,9 @@ static netdev_event_t cc110x_rx_done(cc110x_t *dev)
 }
 
 /**
- * @brief Read a chunk of data from the RX-FIFO
+ * @brief   Read a chunk of data from the RX-FIFO
  *
- * @param dev     Device descriptor of the transceiver
+ * @param   dev     Device descriptor of the transceiver
  *
  * This function should be called from the ISR when data in the RX-FIFO is
  * available or the last byte of the frame was received
@@ -187,9 +187,9 @@ static netdev_event_t cc110x_rx_continue(cc110x_t *dev)
 }
 
 /**
- * @brief Function to run when frame is fully send
+ * @brief   Function to run when frame is fully send
  *
- * @param dev     Device descriptor of the transceiver
+ * @param   dev     Device descriptor of the transceiver
  */
 static netdev_event_t cc110x_tx_done(cc110x_t *dev)
 {
@@ -218,9 +218,9 @@ static netdev_event_t cc110x_tx_done(cc110x_t *dev)
 }
 
 /**
- * @brief Refill the TX-FIFO
+ * @brief   Refill the TX-FIFO
  *
- * @param dev     Device descriptor of the transceiver
+ * @param   dev     Device descriptor of the transceiver
  */
 static netdev_event_t cc110x_tx_continue(cc110x_t *dev)
 {
