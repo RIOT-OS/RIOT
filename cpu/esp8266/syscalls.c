@@ -52,42 +52,6 @@
 
 #include "sdk/sdk.h"
 
-int IRAM puts(const char * str)
-{
-    char c;
-    while ((c = *str) != 0) {
-        ets_putc(c);
-        ++str;
-    }
-    ets_putc('\n');
-    return true;
-}
-
-int IRAM putchar(int c)
-{
-    /* function is neccessary to avoid unproducable results */
-    ets_putc(c);
-    return true;
-}
-
-char _printf_buf[PRINTF_BUFSIZ];
-
-int /* IRAM */ printf(const char* format, ...)
-{
-    va_list arglist;
-    va_start(arglist, format);
-
-    int ret = vsnprintf(_printf_buf, PRINTF_BUFSIZ, format, arglist);
-
-    if (ret > 0) {
-        ets_printf (_printf_buf);
-    }
-
-    va_end(arglist);
-
-    return ret;
-}
-
 #ifdef MODULE_ESP_SDK
 /**
  * Map memory management functions to SDK memory management functions.
@@ -375,53 +339,11 @@ void IRAM _lock_release_recursive(_lock_t *lock)
     rmutex_unlock ((rmutex_t*)*lock);
 }
 
-
-#ifdef MODULE_NEWLIB_SYSCALLS_DEFAULT
-
 #define _cheap heap_top
 
 extern char *heap_top;
 extern char _eheap;     /* end of heap (defined in esp8266.riot-os.app.ld) */
 extern char _sheap;     /* start of heap (defined in esp8266.riot-os.app.ld) */
-
-#else /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
-
-static uint8_t* _cheap = 0; /* last allocated chunk of heap */
-extern uint8_t  _eheap;     /* end of heap (defined in esp8266.riot-os.app.ld) */
-extern uint8_t  _sheap;     /* start of heap (defined in esp8266.riot-os.app.ld) */
-
-void* IRAM _sbrk_r (struct _reent *r, ptrdiff_t incr)
-{
-    uint8_t* _cheap_old;
-
-    /* initial _cheap */
-    if (_cheap == NULL) {
-        _cheap = &_sheap;
-    }
-
-    /* save old _cheap */
-    _cheap_old = _cheap;
-
-    /* check whether _cheap + incr overflows the heap */
-    if (_cheap + incr >= &_eheap) {
-        r->_errno = ENOMEM;
-        return (caddr_t)-1;
-    }
-
-    /* set new _cheap */
-    _cheap += incr;
-
-    #if ENABLE_DEBUG
-    uint32_t remaining = &_eheap - _cheap;
-    printf ("%s %lu byte allocated in %p .. %p, remaining %u\n",
-            __func__, incr, _cheap_old, _cheap, remaining);
-    #endif
-
-    /* return allocated memory */
-    return (void*) _cheap_old;
-}
-
-#endif  /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
 
 unsigned int IRAM get_free_heap_size (void)
 {
@@ -437,70 +359,6 @@ void heap_stats(void)
 }
 
 #endif /* MODULE_ESP_SDK */
-
-#if !defined(MODULE_NEWLIB_SYSCALLS_DEFAULT)
-
-NORETURN void _exit(int status)
-{
-    UNREACHABLE();
-}
-
-static int _no_sys_func (struct _reent *r, const char* f)
-{
-    LOG_ERROR("system function %s does not exist\n", f);
-    r->_errno = ENOSYS;
-    return -1;
-}
-
-int _open_r(struct _reent *r, const char *path, int flag, int m)
-{
-    return _no_sys_func (r, __func__);
-}
-
-int _close_r(struct _reent *r, int fd)
-{
-    return _no_sys_func (r, __func__);
-}
-
-int _fstat_r(struct _reent *r, int fdes, struct stat *stat)
-{
-    return _no_sys_func (r, __func__);
-}
-
-int _stat_r(struct _reent *r, const char *path, struct stat *buff)
-{
-    return _no_sys_func (r, __func__);
-}
-
-int _lseek_r(struct _reent *r, int fdes, int off, int w)
-{
-    return _no_sys_func (r, __func__);
-}
-
-int _write_r(struct _reent *r, int fd, const void *buff, size_t cnt)
-{
-    return _no_sys_func (r, __func__);
-}
-
-int _read_r(struct _reent *r, int fd, void *buff, size_t cnt)
-{
-    return _no_sys_func (r, __func__);
-}
-
-#include <sys/time.h>
-
-int _gettimeofday_r(struct _reent *r, struct timeval *tv, void *tz)
-{
-    (void) tz;
-    if (tv) {
-        uint32_t microseconds = system_get_time();
-        tv->tv_sec = microseconds / 1000000;
-        tv->tv_usec = microseconds % 1000000;
-    }
-    return 0;
-}
-
-#endif /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
 
 int _rename_r (struct _reent *r, const char* old, const char* new)
 {

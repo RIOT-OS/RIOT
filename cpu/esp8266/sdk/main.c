@@ -35,7 +35,7 @@
 #include "sdk/main.h"
 #include "sdk/rom.h"
 
-extern char* _printf_buf;
+static char _printf_buf[PRINTF_BUFSIZ];
 
 int IRAM os_printf_plus (const char* format, ...)
 {

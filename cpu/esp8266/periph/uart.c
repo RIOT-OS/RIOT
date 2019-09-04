@@ -127,7 +127,7 @@ void IRAM __uart_intr_handler (void *arg)
 }
 
 /* RX/TX FIFO capacity is 128 byte */
-#define UART_FIFO_MAX 127
+#define UART_FIFO_MAX 1
 
 /* receive one data byte with wait */
 static uint8_t IRAM __uart_rx_one_char (uart_t uart)

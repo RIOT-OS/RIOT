@@ -25,38 +25,7 @@ ifneq (, $(filter esp_wifi, $(USEMODULE)))
     USEMODULE += netdev_eth
 endif
 
-ifneq (, $(filter lua, $(USEPKG)))
-    USEMODULE += newlib_syscalls_default
-    USEMODULE += xtimer
-endif
-
-ifneq (, $(filter lwip%, $(USEMODULE)))
-    USEMODULE += newlib_syscalls_default
-endif
-
 ifneq (,$(filter ndn-riot,$(USEPKG)))
     USEMODULE += crypto
     USEMODULE += cipher_modes
-endif
-
-ifneq (, $(filter posix%, $(USEMODULE)))
-    USEMODULE += newlib_syscalls_default
-endif
-
-ifneq (, $(filter shell, $(USEMODULE)))
-    USEMODULE += newlib_syscalls_default
-    USEMODULE += xtimer
-endif
-
-ifneq (, $(filter xtimer, $(USEMODULE)))
-    USEMODULE += newlib_syscalls_default
-endif
-
-ifneq (, $(filter vfs, $(USEMODULE)))
-    USEMODULE += newlib_syscalls_default
-    USEMODULE += xtimer
-endif
-
-ifneq (, $(filter newlib_syscalls_default, $(USEMODULE)))
-    USEMODULE += stdio_uart
 endif
