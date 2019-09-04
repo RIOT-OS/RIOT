@@ -1,5 +1,7 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef LIBB2_CONFIG_H
+#define LIBB2_CONFIG_H
+
+#include "cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +15,11 @@ extern "C" {
 #define NATIVE_LITTLE_ENDIAN
 #endif
 
+#ifndef CPU_HAS_UNALIGNED_ACCESS
+#define HAVE_ALIGNED_ACCESS_REQUIRED
+#endif
+
 #ifdef __cplusplus
 }
 #endif
-#endif /* CONFIG_H */
+#endif /* LIBB2_CONFIG_H */
