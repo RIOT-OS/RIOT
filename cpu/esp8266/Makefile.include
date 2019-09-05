@@ -60,6 +60,12 @@ PSEUDOMODULES += esp_sw_timer
 PSEUDOMODULES += esp_spiffs
 
 USEMODULE += esp_freertos
+USEMODULE += esp_idf
+USEMODULE += esp_idf_esp8266
+USEMODULE += esp_idf_nvs_flash
+USEMODULE += esp_idf_spi_flash
+USEMODULE += esp_idf_util
+USEMODULE += esp_idf_wpa_supplicant_crypto
 USEMODULE += mtd
 USEMODULE += newlib
 USEMODULE += newlib_nano

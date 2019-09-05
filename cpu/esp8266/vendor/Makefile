@@ -1,7 +1,7 @@
 # Add a list of subdirectories, that should also be built:
-DIRS += esp
+DIRS += esp-idf
 
-ifeq ($(ENABLE_GDBSTUB), 1)
+ifneq (, $(filter esp_gdbstub, $(USEMODULE)))
     DIRS += esp-gdbstub
 endif
 
