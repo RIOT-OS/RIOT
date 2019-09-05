@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef ARDUINO_H
-#define ARDUINO_H
+#ifndef ARDUINO_HPP
+#define ARDUINO_HPP
 
 extern "C" {
 #include "periph/gpio.h"
@@ -122,5 +122,5 @@ unsigned long millis();
 int analogRead(int pin);
 #endif
 
-#endif /* ARDUINO_H */
+#endif /* ARDUINO_HPP */
 /** @} */
