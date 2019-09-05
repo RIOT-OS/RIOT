@@ -225,7 +225,7 @@ int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, 
                 (res = _i2c_write_byte (bus, addr2)) != 0) {
                 /* abort transfer */
                 _i2c_abort (bus, __func__);
-                return res;
+                return -ENXIO;
             }
         }
         else {
@@ -233,7 +233,7 @@ int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, 
             if ((res = _i2c_write_byte (bus, (addr << 1 | I2C_READ))) != 0) {
                 /* abort transfer */
                 _i2c_abort (bus, __func__);
-                return res;
+                return -ENXIO;
             }
         }
     }
@@ -286,7 +286,7 @@ int /* IRAM */ i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_
                 (res = _i2c_write_byte (bus, addr2)) != 0) {
                 /* abort transfer */
                 _i2c_abort (bus, __func__);
-                return res;
+                return -ENXIO;
             }
         }
         else {
@@ -294,7 +294,7 @@ int /* IRAM */ i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_
             if ((res = _i2c_write_byte (bus, addr << 1)) != 0) {
                 /* abort transfer */
                 _i2c_abort (bus, __func__);
-                return res;
+                return -ENXIO;
             }
         }
     }
