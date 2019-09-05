@@ -236,7 +236,7 @@ void heap_stats(void)
     size_t _alloc = hinfo.total_allocated_bytes;
 
     printf("heap: %u (used %u free %u) [bytes]\n",
-           _free + _alloc, _alloc, _free);
+           (unsigned)(_free + _alloc), (unsigned)_alloc, (unsigned)_free);
 }
 
 #else /* MODULE_ESP_IDF_HEAP */
@@ -271,9 +271,8 @@ unsigned int IRAM get_free_heap_size (void)
 
 void heap_stats(void)
 {
-    printf("heap: %u (used %u free %u)\n",
-           &_eheap - &_sheap, &_eheap - &_sheap - get_free_heap_size(),
-           get_free_heap_size());
+    printf("heap: %u (used %u free %u)\n", (unsigned)(&_eheap - &_sheap),
+           &_eheap - &_sheap - get_free_heap_size(), get_free_heap_size());
 }
 
 #endif /* MODULE_ESP_IDF_HEAP */

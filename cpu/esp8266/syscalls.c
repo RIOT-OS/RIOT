@@ -341,8 +341,6 @@ void heap_stats(void)
                get_free_heap_size());
 }
 
-#endif /* MODULE_ESP_SDK */
-
 int _rename_r (struct _reent *r, const char* old, const char* new)
 {
     DEBUG("%s: system function does not exist\n", __func__);
