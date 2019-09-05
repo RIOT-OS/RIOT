@@ -8,10 +8,6 @@
 
 /**
  * @ingroup     boards_esp8266_sparkfun-thing
- */
-
-/**
- * @ingroup     boards_esp8266_sparkfun-thing
  * @brief       Board specific definitions for
  *              SparkFun ESP8266 Thing boards.
  * @file

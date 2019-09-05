@@ -16,9 +16,12 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#include "board_common.h"
+#include "board.h"
+#include "esp_common.h"
 #include "log.h"
 #include "periph/gpio.h"
+#include "esp_libc.h"
+#include "rom/ets_sys.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,35 +43,69 @@ void board_init(void)
     #endif
 }
 
+extern void adc_print_config(void);
+extern void dac_print_config(void);
 extern void pwm_print_config(void);
 extern void i2c_print_config(void);
 extern void spi_print_config(void);
 extern void uart_print_config(void);
 extern void timer_print_config(void);
+extern void can_print_config(void);
 
 void board_print_config (void)
 {
-    LOG_INFO("\nBoard configuration:\n");
+    ets_printf("\nBoard configuration:\n");
 
+    #if MODULE_PERIPH_ADC
+    adc_print_config();
+    #endif
+    #if MODULE_PERIPH_DAC
+    dac_print_config();
+    #endif
+    #if MODULE_PERIPH_PWM
     pwm_print_config();
+    #endif
+    #if MODULE_PERIPH_I2C
     i2c_print_config();
+    #endif
+    #if MODULE_PERIPH_SPI
     spi_print_config();
+    #endif
+    #if MODULE_PERIPH_UART
     uart_print_config();
+    #endif
+    #if MODULE_PERIPH_TIMER
     timer_print_config();
+    #endif
+    #ifdef MODULE_ESP_CAN
+    can_print_config();
+    #endif
 
-    LOG_INFO("\tLED: pins=[ ");
+    ets_printf("\tLED\t\tpins=[ ");
     #ifdef LED0_PIN
-    LOG_INFO("%d ", LED0_PIN);
+    ets_printf("%d ", LED0_PIN);
     #endif
     #ifdef LED1_PIN
-    LOG_INFO("%d ", LED1_PIN);
+    ets_printf("%d ", LED1_PIN);
     #endif
     #ifdef LED2_PIN
-    LOG_INFO("%d ", LED2_PIN);
+    ets_printf("%d ", LED2_PIN);
     #endif
-    LOG_INFO("]\n");
+    ets_printf("]\n");
 
-    LOG_INFO("\n\n");
+    ets_printf("\tBUTTON\t\tpins=[ ");
+    #ifdef BUTTON0_PIN
+    ets_printf("%d ", BUTTON0_PIN);
+    #endif
+    #ifdef BUTTON2_PIN
+    ets_printf("%d ", BUTTON1_PIN);
+    #endif
+    #ifdef BUTTON3_PIN
+    ets_printf("%d ", BUTTON2_PIN);
+    #endif
+    ets_printf("]\n");
+
+    ets_printf("\n");
 }
 
 #ifdef __cplusplus

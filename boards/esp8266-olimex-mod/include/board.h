@@ -8,10 +8,6 @@
 
 /**
  * @ingroup     boards_esp8266_olimex-mod
- */
-
-/**
- * @ingroup     boards_esp8266_olimex-mod
  * @brief       Board specific definitions for
  *              Olimex MOD-WIFI-ESP8266-DEV boards.
  * @file
