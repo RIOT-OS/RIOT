@@ -59,7 +59,7 @@ PSEUDOMODULES += esp_sdk
 PSEUDOMODULES += esp_sw_timer
 PSEUDOMODULES += esp_spiffs
 
-USEMODULE += esp
+USEMODULE += esp_freertos
 USEMODULE += mtd
 USEMODULE += newlib
 USEMODULE += newlib_nano
