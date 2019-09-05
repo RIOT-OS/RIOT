@@ -57,6 +57,8 @@ port_IntStack:
     .space      configISR_STACK_SIZE
     .global     port_IntStackTop
 port_IntStackTop:
+    .global     _chip_interrupt_tmp
+_chip_interrupt_tmp:
     .word       0
 
 #ifndef RIOT_VERSION
