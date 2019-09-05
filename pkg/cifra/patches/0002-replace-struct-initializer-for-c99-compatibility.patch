@@ -1,0 +1,26 @@
+From 4d3f2070b013036f0d936cda0b9262e8a8445b2e Mon Sep 17 00:00:00 2001
+From: Koen Zandberg <koen@bergzand.net>
+Date: Thu, 5 Sep 2019 09:46:10 +0200
+Subject: [PATCH 2/2] replace struct initializer for c99 compatibility
+
+---
+ src/ocb.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/ocb.c b/src/ocb.c
+index 3d244d4..fb6d822 100644
+--- a/src/ocb.c
++++ b/src/ocb.c
+@@ -163,7 +163,8 @@ static void ocb_hash_block(void *vctx, const uint8_t *block)
+ static void ocb_process_header(ocb *o, const uint8_t *header, size_t nheader,
+                                uint8_t out[BLOCK])
+ {
+-  ocb_hash ctx = { o };
++  ocb_hash ctx = { 0 };
++  ctx.o = o;
+   ocb_hash_init(&ctx);
+ 
+   uint8_t partial[BLOCK];
+-- 
+2.21.0
+
