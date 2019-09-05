@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -26,17 +26,17 @@
 #include "log.h"
 #include "periph/gpio.h"    /* RIOT gpio.h */
 
-#include "c_types.h"
-#include "eagle_soc.h"
-#include "ets_sys.h"
+#include "esp8266/eagle_soc.h"
+#include "esp8266/gpio_register.h"
+#include "rom/ets_sys.h"
 
 #include "sdk/ets.h"
 #include "esp/gpio_regs.h"
 #include "esp/iomux_regs.h"
 #include "esp/rtc_regs.h"
 
-#include "common.h"
-#include "gpio_common.h"
+#include "esp_common.h"
+#include "gpio_arch.h"
 #include "irq_arch.h"
 #include "syscalls.h"
 
@@ -48,7 +48,7 @@
 const uint8_t _gpio_to_iomux[]   = { 12, 5, 13, 4, 14, 15, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3 };
 const uint8_t _iomux_to_gpio[]   = { 12, 13, 14, 15, 3, 1, 6, 7, 8, 9, 10, 11, 0, 2, 4, 5 };
 
-_gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF] =
+gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF] =
 {
    _GPIO,   /* gpio0 */
 
@@ -73,6 +73,12 @@ _gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF] =
    _GPIO,   /* gpio14 */
    _GPIO,   /* gpio15 */
    _GPIO    /* gpio16 */
+};
+
+/* String representation of usage types */
+const char* _gpio_pin_usage_str[] =
+{
+    "GPIO", "I2C", "PWM", "SPI", "SPI Flash", "UART", "N/A"
 };
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
@@ -284,4 +290,21 @@ void gpio_toggle (gpio_t pin)
     }
 
     GPIO.OUT ^= BIT(pin);
+}
+
+int gpio_set_pin_usage(gpio_t pin, gpio_pin_usage_t usage)
+{
+    CHECK_PARAM_RET(pin < GPIO_PIN_NUMOF, -1);
+    _gpio_pin_usage [pin] = usage;
+    return 0;
+}
+
+gpio_pin_usage_t gpio_get_pin_usage (gpio_t pin)
+{
+    return (pin < GPIO_PIN_NUMOF) ? _gpio_pin_usage[pin] : _NOT_EXIST;
+}
+
+const char* gpio_get_pin_usage_str(gpio_t pin)
+{
+    return _gpio_pin_usage_str[_gpio_pin_usage[((pin < GPIO_PIN_NUMOF) ? pin : _NOT_EXIST)]];
 }

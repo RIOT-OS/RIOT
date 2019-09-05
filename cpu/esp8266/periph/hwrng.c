@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,8 +22,13 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph/hwrng.h"
+#include "rom/ets_sys.h"
 
-#include "esp/wdev_regs.h"
+#ifdef MCU_ESP32
+static const uint32_t* RNG_DATA_REG = (uint32_t*)0x3ff75144;
+#else
+static const uint32_t* RNG_DATA_REG = (uint32_t*)0x3ff20e44;
+#endif
 
 void hwrng_init(void)
 {
@@ -37,7 +42,7 @@ void hwrng_read(void *buf, unsigned int num)
 
     while (count < num) {
         /* read next 4 bytes of random data */
-        uint32_t tmp = WDEV.HWRNG;
+        uint32_t tmp = *RNG_DATA_REG;
 
         /* copy data into result vector */
         for (int i = 0; i < 4 && count < num; i++) {

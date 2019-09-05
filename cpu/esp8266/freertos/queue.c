@@ -60,6 +60,10 @@ QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength,
     uint32_t queue_size = uxQueueLength * uxItemSize;
     _queue_t* queue = malloc(sizeof(_queue_t) + queue_size);
 
+    if (!queue) {
+        return NULL;
+    }
+
     queue->type = ucQueueType;
     queue->receiving.next = NULL;
     queue->sending.next = NULL;
