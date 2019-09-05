@@ -332,11 +332,11 @@ ESP-IDF, the official SDK from Espressif, can be downloaded and installed as GIT
 
 ```
 cd $HOME/esp
-git clone --recursive https://github.com/espressif/esp-idf.git
+git clone https://github.com/espressif/esp-idf.git
 cd esp-idf
-git checkout -q f198339ec09e90666150672884535802304d23ec
-cd components/esp32/lib
-git checkout -q 534a9b14101af90231d40a4f94924d67bc848d5f
+git checkout f198339ec09e90666150672884535802304d23ec
+git submodule init
+git submodule update
 ```
 
 @note Please take care to checkout correct branches which were used for the port. Newer versions might also work but were not tested.
