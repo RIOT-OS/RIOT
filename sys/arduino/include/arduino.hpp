@@ -104,6 +104,13 @@ void delayMicroseconds(unsigned long usec);
 unsigned long micros();
 
 /**
+ * @brief   Returns the number of milliseconds since start
+ *
+ * @return value of milliseconds since start
+ */
+unsigned long millis();
+
+/**
  * @brief   Read the current value of the given analog pin
  *
  * @param[in] pin       pin to read
