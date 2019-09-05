@@ -96,7 +96,7 @@ static const i2c_conf_t i2c_config[] = {
  * GPIOs that can be used as PWM channels are defined by #PWM0_GPIOS in board
  * definition.
  *
- * @note   The minumum PWM period that can be realized is 10 us or 100.000 PWM
+ * @note   The minimum PWM period that can be realized is 10 us or 100.000 PWM
  * clock cycles per second. Therefore, the product of frequency and resolution
  * should not be greater than 100.000. Otherwise the frequency is scaled down
  * automatically.
