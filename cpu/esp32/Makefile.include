@@ -79,6 +79,7 @@ USEMODULE += periph_hwrng
 USEMODULE += periph_flash
 USEMODULE += periph_rtc
 USEMODULE += periph_uart
+USEMODULE += riot_freertos
 USEMODULE += random
 USEMODULE += stdio_uart
 USEMODULE += xtensa
