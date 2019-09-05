@@ -205,3 +205,10 @@ void IRAM NORETURN panic_arch(void)
 
     UNREACHABLE();
 }
+
+void _panic_handler(uint32_t addr)
+{
+    ets_printf("#! _xt_panic called from 0x%08x: powering off\n", addr);
+    pm_off();
+    while (1) { };
+}

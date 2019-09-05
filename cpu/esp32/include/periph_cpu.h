@@ -168,7 +168,7 @@ typedef enum {
  *
  * ESP32 integrates two 12-bit ADCs (ADC1 and ADC2) capable of measuring up to
  * 18 analog signals in total. Most of these ADC channels are either connected
- * to a number of intergrated sensors like a Hall sensors, touch sensors and a
+ * to a number of integrated sensors like a Hall sensors, touch sensors and a
  * temperature sensor or can be connected with certain GPIOs. Integrated
  * sensors are disabled in RIOT's implementation and are not accessible. Thus,
  * up to 18 GPIOs, the RTC GPIOs, can be used as ADC inputs:
@@ -207,7 +207,7 @@ typedef enum {
  * determines the mapping between the RIOT's ADC lines and the GPIOs.
  *
  * @note ADC_GPIOS must be defined even if there are no GPIOs that could be
- * used as ADC channels on the board. In this case, an empy list hast to be
+ * used as ADC channels on the board. In this case, an empty list hast to be
  * defined which just contains the curly braces.
  *
  * ADC_NUMOF is determined automatically from the ADC_GPIOS definition.
@@ -235,7 +235,7 @@ typedef enum {
 /** @} */
 
 /**
- * @brief  Number of ADC cahnnels that could be used at maximum
+ * @brief  Number of ADC channels that could be used at maximum
  *
  * @note GPIO37 and GPIO38 are usually not broken out on ESP32 modules and are
  * therefore not usable. The maximum number of ADC channels (ADC_NUMOF_MAX)
@@ -258,7 +258,7 @@ typedef enum {
  * determines the mapping between the RIOT's DAC lines and the GPIOs.
  *
  * @note DAC_GPIOS must be defined even if there are no GPIOs that could be
- * used as DAC channels on the board. In this case, an empy list hast to be
+ * used as DAC channels on the board. In this case, an empty list hast to be
  * defined which just contains the curly braces.
  *
  * DAC_NUMOF is determined automatically from the DAC_GPIOS definition.
@@ -270,7 +270,7 @@ typedef enum {
  */
 
 /**
- * @brief  Number of DAC cahnnels that could be used at maximum.
+ * @brief  Number of DAC channels that could be used at maximum.
  */
 #define DAC_NUMOF_MAX   2
 
@@ -282,7 +282,7 @@ typedef enum {
  * ESP32 has two built-in I2C interfaces.
  *
  * The board-specific configuration of the I2C interface I2C_DEV(n) requires
- * the defintion of
+ * the definition of
  *
  * I2Cn_SPEED, the bus speed,
  * I2Cn_SCL, the GPIO used as SCL signal, and
@@ -325,6 +325,11 @@ typedef struct {
     gpio_t sda;             /**< GPIO used as SDA pin */
 } i2c_conf_t;
 
+/**
+ * @brief   Maximum number of I2C interfaces that can be used by board definitions
+ */
+#define I2C_NUMOF_MAX   (2)
+
 #define PERIPH_I2C_NEED_READ_REG    /**< i2c_read_reg required */
 #define PERIPH_I2C_NEED_READ_REGS   /**< i2c_read_regs required */
 #define PERIPH_I2C_NEED_WRITE_REG   /**< i2c_write_reg required */
@@ -333,7 +338,6 @@ typedef struct {
 
 /**
  * @name   PWM configuration
- * @{
  *
  * PWM implementation uses ESP32's high-speed MCPWM modules. ESP32 has 2 such
  * modules, each with up to 6 channels (PWM_CHANNEL_NUM_DEV_MAX). Thus, the
@@ -355,6 +359,8 @@ typedef struct {
  * @note As long as the GPIOs listed in PWM0_GPIOS and PMW1_GPIOS are not
  * initialized as PWM channels with the *pwm_init* function, they can be used
  * other purposes.
+ *
+ * @{
  */
 
 /**
@@ -388,7 +394,7 @@ typedef struct {
  * device driver doesn't support it.
  *
  * The board-specific configuration of the SPI interface SPI_DEV(n) requires
- * the defintion of
+ * the definition of
  *
  * - SPIn_CTRL, the SPI controller which is used for the interface (VSPI or HSPI),
  * - SPIn_SCK, the GPIO used as clock signal
@@ -402,6 +408,8 @@ typedef struct {
  *
  * SPI_NUMOF is determined automatically from the board-specific peripheral
  * definitions of SPIn_*.
+ *
+ * @{
  */
 
 /**
@@ -422,6 +430,11 @@ typedef struct {
     gpio_t miso;            /**< GPIO used as MISO pin */
     gpio_t cs;              /**< GPIO used as CS0 pin */
 } spi_conf_t;
+
+/**
+ * @brief   Maximum number of SPI interfaces that can be used by board definitions
+ */
+#define SPI_NUMOF_MAX   2
 
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE  /**< requires function spi_transfer_byte */
 #define PERIPH_SPI_NEEDS_TRANSFER_REG   /**< requires function spi_transfer_reg */
