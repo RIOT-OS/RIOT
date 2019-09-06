@@ -14,7 +14,6 @@
  * @brief       Constants for the CC1100/CC1101 driver
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
- * @}
  */
 
 #ifndef CC110X_CONSTANTS_H

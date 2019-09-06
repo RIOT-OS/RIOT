@@ -14,7 +14,6 @@
  * @brief       Calibration related functions of the CC110x transceiver driver
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
- * @}
  */
 
 #ifndef CC110X_CALIBRATION_H

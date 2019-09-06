@@ -14,7 +14,6 @@
  * @brief       Functions to related to RX/TX of the CC110x transceiver driver
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
- * @}
  */
 
 #ifndef CC110X_RX_TX_H

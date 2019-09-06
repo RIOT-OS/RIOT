@@ -14,7 +14,6 @@
  * @brief       Functions to communicate with the CC1100/CC1101 transceiver
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
- * @}
  */
 
 #ifndef CC110X_COMMUNICATION_H
