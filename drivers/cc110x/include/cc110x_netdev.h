@@ -14,7 +14,6 @@
  * @brief       Functions related to the netdev interface of the CC110x driver
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
- * @}
  */
 
 #ifndef CC110X_NETDEV_H
