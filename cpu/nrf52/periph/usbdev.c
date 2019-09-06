@@ -269,6 +269,9 @@ void usbdev_init_lowlevel(void)
 static void _init(usbdev_t *dev)
 {
     DEBUG("nrfusb: initializing\n");
+    /* Engineering revision version A is affected by errata 94, crash *
+     * instead of pretending to have functional USB                   */
+    assert(NRF_FICR->INFO.VARIANT != 0x41414141);
     nrfusb_t *usbdev = (nrfusb_t*)dev;
     poweron(usbdev);
     usbdev->used = 0;
