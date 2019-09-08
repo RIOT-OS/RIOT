@@ -152,6 +152,20 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
+/**
+ * @name USB peripheral configuration
+ * @{
+ */
+static const sam0_common_usb_config_t sam_usbdev_config[] = {
+    {
+        .dm     = GPIO_PIN(PA, 24),
+        .dp     = GPIO_PIN(PA, 25),
+        .d_mux  = GPIO_MUX_G,
+        .device = &USB->DEVICE,
+    }
+};
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

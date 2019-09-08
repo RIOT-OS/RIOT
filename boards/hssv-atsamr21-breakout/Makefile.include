@@ -16,4 +16,7 @@ include $(RIOTMAKE)/tools/bossa.inc.mk
 # enable antenna diversity for this board.
 CFLAGS += -DAT86RF2XX_DEFAULT_ANT_DIV=\(1\)
 
+# Set the USB VID/PID for this board.
+CFLAGS += -DUSB_CONFIG_VID=0x1209 -DUSB_CONFIG_PID=0x053A
+
 include $(RIOTMAKE)/boards/sam0.inc.mk
