@@ -30,12 +30,12 @@ extern "C" {
 #include "serialport.hpp"
 
 /**
- * @brief    Ardunio boolean data type definion
+ * @brief    Arduino boolean data type definion
  */
 typedef bool boolean;
 
 /**
- * @brief    Ardunio byte data type definion
+ * @brief    Arduino byte data type definion
  */
 typedef uint8_t byte;
 
