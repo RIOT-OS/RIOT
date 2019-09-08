@@ -7,41 +7,17 @@ export CPU = native
 
 USEMODULE += native-drivers
 
-# toolchain:
-export PREFIX =
-export CC ?= $(PREFIX)gcc
-export CXX ?= $(PREFIX)g++
-
-ifeq ($(LTO),1)
-  export AR = $(PREFIX)gcc-ar
-else
-  export AR = $(PREFIX)ar
-endif
-
-export AS ?= $(PREFIX)as
-export LINK ?= $(PREFIX)gcc
-export SIZE ?= $(PREFIX)size
-
-ifneq ($(shell uname -s),Darwin)
-  export OBJCOPY ?= $(PREFIX)objcopy
-else
-  ifeq (0,$(shell which gobjcopy 2>&1 > /dev/null ; echo $$?))
-    export OBJCOPY ?= gobjcopy
-  else
-    # If gobjcopy is not available, just do nothing. The hexfile
-    # is not used for native anyways.
-    export OBJCOPY ?= true
-  endif
-endif
-
 ifeq ($(shell uname -s),Darwin)
-  export DEBUGGER ?= lldb
+  DEBUGGER ?= lldb
 else
-  export DEBUGGER ?= gdb
+  DEBUGGER ?= gdb
 endif
 
-TERMPROG ?= $(ELFFILE)
-export FLASHER = true
+FLASHER = true
+FLASHFILE ?= $(ELFFILE)
+
+TERMPROG ?= $(FLASHFILE)
+
 export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
@@ -104,9 +80,9 @@ TERMFLAGS := $(PORT) $(TERMFLAGS)
 
 export ASFLAGS =
 ifeq ($(shell basename $(DEBUGGER)),lldb)
-  export DEBUGGER_FLAGS = -- $(ELFFILE) $(TERMFLAGS)
+  DEBUGGER_FLAGS = -- $(ELFFILE) $(TERMFLAGS)
 else
-  export DEBUGGER_FLAGS = -q --args $(ELFFILE) $(TERMFLAGS)
+  DEBUGGER_FLAGS = -q --args $(ELFFILE) $(TERMFLAGS)
 endif
 term-valgrind: export VALGRIND_FLAGS ?= \
 	--leak-check=full \

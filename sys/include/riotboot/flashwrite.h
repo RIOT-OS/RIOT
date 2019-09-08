@@ -123,7 +123,7 @@ static inline int riotboot_flashwrite_init(riotboot_flashwrite_t *state,
  * @param[in,out]   state   ptr to previously used update state
  * @param[in]       bytes   ptr to data
  * @param[in]       len     len of data
- * @param[in]       more    whether more data is comming
+ * @param[in]       more    whether more data is coming
  *
  * @returns         0 on success, <0 otherwise
  */

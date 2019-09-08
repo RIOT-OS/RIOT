@@ -42,6 +42,17 @@ extern "C" {
 /** @} */
 
 /**
+ * @name   Device specific logic level to indicate POR-cycle is active
+ * @{
+ */
+#if defined(MODULE_SX1272)
+#define SX127X_POR_ACTIVE_LOGIC_LEVEL                      (1)
+#else /* MODULE_SX1276 */
+#define SX127X_POR_ACTIVE_LOGIC_LEVEL                      (0)
+#endif
+/** @} */
+
+/**
  * @brief   Check the transceiver version
  *
  * @param[in] dev                      The sx127x device descriptor

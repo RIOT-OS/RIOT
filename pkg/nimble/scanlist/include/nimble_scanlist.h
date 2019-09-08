@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    ble_nimble_scanlist Scan Result List
+ * @defgroup    ble_nimble_scanlist Scan Result Helper
  * @ingroup     ble_nimble
  * @brief       List for storing and printing BLE scan results
  *

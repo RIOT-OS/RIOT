@@ -116,6 +116,16 @@ extern "C" {
 #define MRF24J40_MAX_FRAME_RETRIES      (3U)        /**< Number of frame retries (fixed) */
 
 /**
+ * @brief Enable external PA/LNA control
+ *
+ * Increase RSSI for MRF24J40MC/MD/ME devices. No effect on MRF24J40MA.
+ * For more information, please refer to section 4.2 of MRF24J40 datasheet.
+ */
+#ifndef MRF24J40_USE_EXT_PA_LNA
+#define MRF24J40_USE_EXT_PA_LNA         (0U)
+#endif
+
+/**
  * @brief   struct holding all params needed for device initialization
  */
 typedef struct mrf24j40_params {
@@ -159,14 +169,15 @@ void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params);
 void mrf24j40_reset(mrf24j40_t *dev);
 
 /**
- * @brief   Trigger a clear channel assessment
+ * @brief   Trigger a clear channel assessment & retrieve RSSI
  *
  * @param[in] dev           device to use
+ * @param[in] rssi          RSSI value from register in dBm
  *
  * @return                  true if channel is clear
  * @return                  false if channel is busy
  */
-bool mrf24j40_cca(mrf24j40_t *dev);
+bool mrf24j40_cca(mrf24j40_t *dev, int8_t *rssi);
 
 /**
  * @brief   Get the short address of the given device

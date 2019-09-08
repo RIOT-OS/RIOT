@@ -407,7 +407,6 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
     }
 }
 
-
 void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
 {
     uint8_t old_state;
@@ -434,6 +433,9 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
 void mrf24j40_sleep(mrf24j40_t *dev)
 {
     DEBUG("[mrf24j40] Putting into sleep mode\n");
+
+    /* disable the PA & LNA */
+    mrf24j40_disable_auto_pa_lna(dev);
     /* Datasheet chapter 3.15.2 IMMEDIATE SLEEP AND WAKE-UP MODE */
     /* First force a Power Management Reset */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_SOFTRST, MRF24J40_SOFTRST_RSTPWR);
@@ -467,6 +469,7 @@ void mrf24j40_assert_awake(mrf24j40_t *dev)
         xtimer_usleep(MRF24J40_WAKEUP_DELAY);
         /* reset interrupts */
         mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
+        mrf24j40_enable_auto_pa_lna(dev);
         dev->state = MRF24J40_PSEUDO_STATE_IDLE;
     }
 }

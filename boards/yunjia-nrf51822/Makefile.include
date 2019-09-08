@@ -9,8 +9,8 @@ PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
 # This board uses an ST-Link v2 debug adapter
-export DEBUG_ADAPTER ?= stlink
-export STLINK_VERSION ?= 2
+DEBUG_ADAPTER ?= stlink
+STLINK_VERSION ?= 2
 
 # use openocd to program this board
 PROGRAMMER = openocd

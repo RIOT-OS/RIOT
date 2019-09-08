@@ -127,17 +127,6 @@ SECTIONS
         _erelocate = .;
     } > ram AT> rom
 
-    /*
-     * collect all uninitialized sections that go into RAM
-     */
-    .noinit (NOLOAD) :
-    {
-        __noinit_start = .;
-        *(.noinit)
-        . = ALIGN(4);
-        __noinit_end = .;
-    }  > ram
-
     /* .bss section which is used for uninitialized data */
     .bss (NOLOAD) :
     {
@@ -150,6 +139,17 @@ SECTIONS
         _ebss = . ;
         _ezero = .;
     } > ram
+
+    /*
+     * collect all uninitialized sections that go into RAM
+     */
+    .noinit (NOLOAD) :
+    {
+        __noinit_start = .;
+        *(.noinit)
+        . = ALIGN(4);
+        __noinit_end = .;
+    }  > ram
 
     /* heap section */
     . = ALIGN(4);

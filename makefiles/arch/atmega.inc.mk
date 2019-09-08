@@ -16,7 +16,6 @@ USEMODULE += atmega_common
 
 # export the peripheral drivers to be linked into the final binary
 USEMODULE += atmega_common_periph
-USEMODULE += periph_common
 
 # Export the peripheral drivers to be linked into the final binary, for now
 # only atmega126rfr2 has periph drivers

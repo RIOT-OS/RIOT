@@ -28,6 +28,7 @@
 
 #include "cpu.h"
 #include "vendor/hw_ssi.h"
+#include "vendor/hw_uart.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -166,6 +167,46 @@ typedef struct {
     gpio_t rts_pin;           /**< RTS pin - set to GPIO_UNDEF when not using */
 } uart_conf_t;
 /** @} */
+
+#ifndef DOXYGEN
+/**
+ * @brief   Override parity values
+ * @{
+ */
+#define HAVE_UART_PARITY_T
+typedef enum {
+   UART_PARITY_NONE = 0,                                                /**< no parity */
+   UART_PARITY_EVEN = (UART_LCRH_PEN | UART_LCRH_EPS),                  /**< even parity */
+   UART_PARITY_ODD = UART_LCRH_PEN,                                     /**< odd parity */
+   UART_PARITY_MARK = (UART_LCRH_PEN | UART_LCRH_SPS),                  /**< mark */
+   UART_PARITY_SPACE = (UART_LCRH_PEN | UART_LCRH_EPS | UART_LCRH_SPS)  /**< space */
+} uart_parity_t;
+/** @} */
+
+ /**
+ * @brief   Override data bits length values
+ * @{
+ */
+#define HAVE_UART_DATA_BITS_T
+typedef enum {
+    UART_DATA_BITS_5 = (0 << UART_LCRH_WLEN_S),     /**< 5 data bits */
+    UART_DATA_BITS_6 = (1 << UART_LCRH_WLEN_S),     /**< 6 data bits */
+    UART_DATA_BITS_7 = (2 << UART_LCRH_WLEN_S),     /**< 7 data bits */
+    UART_DATA_BITS_8 = (3 << UART_LCRH_WLEN_S),     /**< 8 data bits */
+} uart_data_bits_t;
+/** @} */
+
+/**
+ * @brief   Override stop bits length values
+ * @{
+ */
+#define HAVE_UART_STOP_BITS_T
+typedef enum {
+   UART_STOP_BITS_1 = 0,                  /**< 1 stop bit */
+   UART_STOP_BITS_2 = UART_LCRH_STP2,     /**< 2 stop bits */
+} uart_stop_bits_t;
+/** @} */
+#endif /* DOXYGEN */
 
 /**
  * @name   Override SPI mode settings

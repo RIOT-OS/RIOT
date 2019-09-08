@@ -236,15 +236,16 @@ do_term() {
     JLINK_PIDFILE=$(mktemp -t "jilnk_pid.XXXXXXXXXX")
     # will be called by trap
     cleanup() {
-        JLINK_PID="$(cat ${JLINK_PIDFILE})"
-        kill ${JLINK_PID}
-        rm -r "${JLINK_PIDFILE}"
+        if [ -f $JLINK_PIDFILE ]; then
+            JLINK_PID="$(cat ${JLINK_PIDFILE})"
+            kill ${JLINK_PID}
+            rm -r "${JLINK_PIDFILE}"
+        fi
         exit 0
     }
     # cleanup after script terminates
-    trap "cleanup ${JLINK_PIDFILE}" EXIT
-    # don't trapon Ctrl+C, because JLink keeps running
-    trap '' INT
+    trap "cleanup ${JLINK_PIDFILE}" EXIT INT
+
     # start Jlink as RTT server
     sh -c "${JLINK} ${JLINK_SERIAL} \
             -ExitOnError 1 \
@@ -254,6 +255,7 @@ do_term() {
             -jtagconf -1,-1 \
             -commandfile '${RIOTTOOLS}/jlink/term.seg' >/dev/null & \
             echo  \$! > $JLINK_PIDFILE" &
+    sleep 1
 
     sh -c "${JLINK_TERMPROG} ${JLINK_TERMFLAGS}"
 }

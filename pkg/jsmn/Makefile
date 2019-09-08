@@ -5,7 +5,7 @@ PKG_LICENSE=MIT
 
 .PHONY: all
 
-all: git-download
+all:
 	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.jsmn
 
 include $(RIOTBASE)/pkg/pkg.mk

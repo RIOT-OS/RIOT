@@ -7,8 +7,9 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
-                             arduino-nano arduino-uno b-l072z-lrwan1 blackpill \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-leonardo \
+                             arduino-mega2560 arduino-nano arduino-uno \
+                             b-l072z-lrwan1 blackpill \
                              bluepill calliope-mini cc2650-launchpad cc2650stk \
                              hifive1 i-nucleo-lrwan1 lsn50 maple-mini mega-xplained microbit msb-430 \
                              msb-430h nrf51dk nrf51dongle nrf6310 \
@@ -27,11 +28,11 @@ BOARD_BLACKLIST += mips-malta pic32-wifire pic32-clicker ruuvitag thingy52
 # UART, but not on native, as native has a tap interface towards the host.
 ifeq (,$(filter native,$(BOARD)))
   GNRC_NETIF_NUMOF := 2
-  USEMODULE += ethos
+  USEMODULE += stdio_ethos
 
   # ethos baudrate can be configured from make command
   ETHOS_BAUDRATE ?= 115200
-  CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE) -DUSE_ETHOS_FOR_STDIO
+  CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)
 else
   GNRC_NETIF_NUMOF := 2
   TERMFLAGS += -z [::1]:17754

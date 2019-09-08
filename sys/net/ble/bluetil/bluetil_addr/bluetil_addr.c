@@ -26,6 +26,13 @@
 #include "net/eui48.h"
 #include "net/bluetil/addr.h"
 
+static int _is_hex_char(char c)
+{
+    return (((c >= '0') && (c <= '9')) ||
+            ((c >= 'A') && (c <= 'F')) ||
+            ((c >= 'a') && (c <= 'f')));
+}
+
 void bluetil_addr_sprint(char *out, const uint8_t *addr)
 {
     assert(out);
@@ -48,6 +55,28 @@ void bluetil_addr_print(const uint8_t *addr)
     char str[BLUETIL_ADDR_STRLEN];
     bluetil_addr_sprint(str, addr);
     printf("%s", str);
+}
+
+uint8_t *bluetil_addr_from_str(uint8_t *addr, const char *addr_str)
+{
+    assert(addr);
+    assert(addr_str);
+
+    /* check for colons */
+    for (unsigned i = 2; i < (BLUETIL_ADDR_STRLEN - 1); i += 3) {
+        if (addr_str[i] != ':') {
+            return NULL;
+        }
+    }
+
+    unsigned pos = BLE_ADDR_LEN;
+    for (unsigned i = 0; i < (BLUETIL_ADDR_STRLEN - 1); i += 3) {
+        if (!_is_hex_char(addr_str[i]) || !_is_hex_char(addr_str[i + 1])) {
+            return NULL;
+        }
+        addr[--pos] = fmt_hex_byte(addr_str + i);
+    }
+    return addr;
 }
 
 void bluetil_addr_ipv6_l2ll_sprint(char *out, const uint8_t *addr)

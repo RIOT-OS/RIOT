@@ -712,7 +712,7 @@ int asymcute_connect(asymcute_con_t *con, asymcute_req_t *req,
         return ASYMCUTE_NOTSUP;
     }
     /* make sure the client ID will fit into the dedicated buffer */
-    if (id_len > ASYMCUTE_ID_MAXLEN) {
+    if ((id_len < MQTTSN_CLI_ID_MINLEN) || (id_len > MQTTSN_CLI_ID_MAXLEN)) {
         return ASYMCUTE_OVERFLOW;
     }
     /* check if the context is not already connected to any gateway */

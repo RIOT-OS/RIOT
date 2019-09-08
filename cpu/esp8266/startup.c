@@ -165,6 +165,9 @@ void system_init(void)
     /* trigger board initialization */
     board_init();
 
+    /* print memory info */
+    print_meminfo();
+
     /* print the board config */
     board_print_config();
 }
@@ -695,6 +698,9 @@ void __attribute__((noreturn)) IRAM cpu_user_start (void)
 
     /* initialize the board and startup the kernel */
     board_init();
+
+    /* print memory info */
+    print_meminfo();
 
     /* print the board config */
     board_print_config();

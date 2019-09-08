@@ -724,10 +724,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
           ipv6_addr_to_str(addr_str, &(hdr->dst), sizeof(addr_str)),
           first_nh, byteorder_ntohs(hdr->len));
 
-    if ((pkt = gnrc_ipv6_ext_process_hopopt(pkt, &first_nh)) != NULL) {
-        ipv6 = pkt->next->next;
-    }
-    else {
+    if ((pkt = gnrc_ipv6_ext_process_hopopt(pkt, &first_nh)) == NULL) {
         DEBUG("ipv6: packet's extension header was errorneous or packet was "
               "consumed due to it\n");
         return;
@@ -762,16 +759,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
         else if (--(hdr->hl) > 0) {  /* drop packets that *reach* Hop Limit 0 */
             DEBUG("ipv6: forward packet to next hop\n");
 
-            /* pkt might not be writable yet, if header was given above */
-            ipv6 = gnrc_pktbuf_start_write(ipv6);
-            if (ipv6 == NULL) {
-                DEBUG("ipv6: unable to get write access to packet: dropping it\n");
-                gnrc_pktbuf_release(pkt);
-                return;
-            }
-
             /* remove L2 headers around IPV6 */
-            netif_hdr = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
             if (netif_hdr != NULL) {
                 gnrc_pktbuf_remove_snip(pkt, netif_hdr);
             }

@@ -9,7 +9,7 @@ DEBUGGER = $(DIST_PATH)/debug.sh $(DEBUGSERVER_FLAGS) $(DIST_PATH) $(DEBUGSERVER
 PROGRAMMER_FLAGS = -p $(subst atmega,m,$(CPU))
 
 # Set flasher port only for programmers that require it
-ifneq (,$(filter $(PROGRAMMER),arduino buspirate stk500v1 stk500v2 wiring))
+ifneq (,$(filter $(PROGRAMMER),arduino avr109 buspirate stk500v1 stk500v2 wiring))
   # make the flasher port configurable (e.g. with atmelice the port is usb)
   # defaults to terminal's serial port if not configured
   AVRDUDE_PORT     ?= $(PORT)

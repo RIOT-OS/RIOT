@@ -68,7 +68,7 @@ other contributors understand your issue and eventually reproduce it:
 To fill the `Versions` section, you can use the script provided in the RIOT git
 repository:
 ```
-./dist/tools/ci/print_toolchain_versions.sh
+make print-versions
 ```
 
 In summary, try to include as much information as possible, to help maintainers

@@ -204,9 +204,9 @@ static void _set_up(void)
     _set_fragment_offset(_fragment4, TEST_FRAGMENT4_OFFSET);
 }
 
-static const rbuf_t *_first_non_empty_rbuf(void)
+static const gnrc_sixlowpan_rbuf_t *_first_non_empty_rbuf(void)
 {
-    const rbuf_t *rbuf = rbuf_array();
+    const gnrc_sixlowpan_rbuf_t *rbuf = rbuf_array();
 
     for (unsigned i = 0; i < RBUF_SIZE; i++) {
         if (!rbuf_entry_empty(&rbuf[i])) {
@@ -216,12 +216,13 @@ static const rbuf_t *_first_non_empty_rbuf(void)
     return NULL;
 }
 
-static void _test_entry(const rbuf_t *entry, unsigned exp_current_size,
+static void _test_entry(const gnrc_sixlowpan_rbuf_t *entry,
+                        unsigned exp_current_size,
                         unsigned exp_int_start, unsigned exp_int_end)
 {
     TEST_ASSERT_NOT_NULL(entry);
-    TEST_ASSERT_NOT_NULL(entry->super.pkt);
-    TEST_ASSERT_EQUAL_INT(TEST_DATAGRAM_SIZE, entry->super.pkt->size);
+    TEST_ASSERT_NOT_NULL(entry->pkt);
+    TEST_ASSERT_EQUAL_INT(TEST_DATAGRAM_SIZE, entry->pkt->size);
     TEST_ASSERT_EQUAL_INT(sizeof(_test_netif_hdr_src),
                           entry->super.src_len);
     TEST_ASSERT_MESSAGE(memcmp(entry->super.src, _test_netif_hdr_src,
@@ -234,16 +235,16 @@ static void _test_entry(const rbuf_t *entry, unsigned exp_current_size,
                         "entry->super.dst != TEST_NETIF_HDR_DST");
     TEST_ASSERT_EQUAL_INT(TEST_TAG, entry->super.tag);
     TEST_ASSERT_EQUAL_INT(exp_current_size, entry->super.current_size);
-    TEST_ASSERT_NOT_NULL(entry->ints);
-    TEST_ASSERT_NULL(entry->ints->next);
-    TEST_ASSERT_EQUAL_INT(exp_int_start, entry->ints->start);
-    TEST_ASSERT_EQUAL_INT(exp_int_end, entry->ints->end);
+    TEST_ASSERT_NOT_NULL(entry->super.ints);
+    TEST_ASSERT_NULL(entry->super.ints->next);
+    TEST_ASSERT_EQUAL_INT(exp_int_start, entry->super.ints->start);
+    TEST_ASSERT_EQUAL_INT(exp_int_end, entry->super.ints->end);
 }
 
-static void _check_pktbuf(const rbuf_t *entry)
+static void _check_pktbuf(const gnrc_sixlowpan_rbuf_t *entry)
 {
     if (entry != NULL) {
-        gnrc_pktbuf_release(entry->super.pkt);
+        gnrc_pktbuf_release(entry->pkt);
     }
     TEST_ASSERT_MESSAGE(gnrc_pktbuf_is_empty(), "Packet buffer is not empty");
 }
@@ -252,7 +253,7 @@ static void test_rbuf_add__success_first_fragment(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, _fragment1, sizeof(_fragment1),
                                           GNRC_NETTYPE_SIXLOWPAN);
-    const rbuf_t *entry;
+    const gnrc_sixlowpan_rbuf_t *entry;
 
     TEST_ASSERT_NOT_NULL(pkt);
     rbuf_add(&_test_netif_hdr.hdr, pkt, TEST_FRAGMENT1_OFFSET, TEST_PAGE);
@@ -268,7 +269,7 @@ static void test_rbuf_add__success_subsequent_fragment(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, _fragment2, sizeof(_fragment2),
                                           GNRC_NETTYPE_SIXLOWPAN);
-    const rbuf_t *entry;
+    const gnrc_sixlowpan_rbuf_t *entry;
 
     TEST_ASSERT_NOT_NULL(pkt);
     rbuf_add(&_test_netif_hdr.hdr, pkt, TEST_FRAGMENT2_OFFSET, TEST_PAGE);
@@ -286,7 +287,7 @@ static void test_rbuf_add__success_duplicate_fragments(void)
                                            GNRC_NETTYPE_SIXLOWPAN);
     gnrc_pktsnip_t *pkt2 = gnrc_pktbuf_add(NULL, _fragment3, sizeof(_fragment3),
                                            GNRC_NETTYPE_SIXLOWPAN);
-    const rbuf_t *entry;
+    const gnrc_sixlowpan_rbuf_t *entry;
 
     TEST_ASSERT_NOT_NULL(pkt1);
     rbuf_add(&_test_netif_hdr.hdr, pkt1, TEST_FRAGMENT3_OFFSET, TEST_PAGE);
@@ -347,7 +348,7 @@ static void test_rbuf_add__success_complete(void)
 static void test_rbuf_add__full_rbuf(void)
 {
     gnrc_pktsnip_t *pkt;
-    const rbuf_t *rbuf;
+    const gnrc_sixlowpan_rbuf_t *rbuf;
 
     for (unsigned i = 0; i < RBUF_SIZE; i++) {
         pkt = gnrc_pktbuf_add(NULL, _fragment1, sizeof(_fragment1),
@@ -365,20 +366,19 @@ static void test_rbuf_add__full_rbuf(void)
              TEST_PAGE);
     rbuf = rbuf_array();
     for (unsigned i = 0; i < RBUF_SIZE; i++) {
-        const rbuf_t *entry = &rbuf[i];
+        const gnrc_sixlowpan_rbuf_t *entry = &rbuf[i];
 
         TEST_ASSERT_MESSAGE(!rbuf_entry_empty(entry),
                             "Reassembly buffer entry unexpectedly empty");
         TEST_ASSERT((sizeof(_fragment1) - sizeof(sixlowpan_frag_t)) <
-                    entry->super.pkt->size);
+                    entry->pkt->size);
         TEST_ASSERT_MESSAGE(
-                memcmp(entry->super.pkt->data,
-                       &_fragment1[sizeof(sixlowpan_frag_t)],
+                memcmp(entry->pkt->data, &_fragment1[sizeof(sixlowpan_frag_t)],
                        sizeof(_fragment1) - sizeof(sixlowpan_frag_t)) != 0,
                 "Reassembly buffer contains fragment that was not supposed "
                 "to fit");
         /* releasing pkt to check if packet buffer is empty in the end */
-        gnrc_pktbuf_release(entry->super.pkt);
+        gnrc_pktbuf_release(entry->pkt);
     }
     _check_pktbuf(NULL);
 }
@@ -409,7 +409,7 @@ static void test_rbuf_add__overlap_lhs(void)
     gnrc_pktsnip_t *pkt1 = gnrc_pktbuf_add(NULL, _fragment1, sizeof(_fragment1),
                                            GNRC_NETTYPE_SIXLOWPAN);
     gnrc_pktsnip_t *pkt2;
-    const rbuf_t *rbuf;
+    const gnrc_sixlowpan_rbuf_t *rbuf;
     unsigned rbuf_entries = 0;
 
     _set_fragment_offset(_fragment2, pkt2_offset);
@@ -422,7 +422,7 @@ static void test_rbuf_add__overlap_lhs(void)
     rbuf_add(&_test_netif_hdr.hdr, pkt2, pkt2_offset, TEST_PAGE);
     rbuf = rbuf_array();
     for (unsigned i = 0; i < RBUF_SIZE; i++) {
-        const rbuf_t *entry = &rbuf[i];
+        const gnrc_sixlowpan_rbuf_t *entry = &rbuf[i];
         if (!rbuf_entry_empty(entry)) {
             static const size_t pkt3_offset = TEST_FRAGMENT3_OFFSET - 8U - 1;
 
@@ -436,7 +436,7 @@ static void test_rbuf_add__overlap_lhs(void)
                         TEST_FRAGMENT3_OFFSET - TEST_FRAGMENT2_OFFSET,
                         (unsigned)pkt2_offset, (unsigned)pkt3_offset);
             /* releasing pkt to check if packet buffer is empty in the end */
-            gnrc_pktbuf_release(entry->super.pkt);
+            gnrc_pktbuf_release(entry->pkt);
         }
     }
     TEST_ASSERT_EQUAL_INT(1U, rbuf_entries);
@@ -451,7 +451,7 @@ static void test_rbuf_add__overlap_rhs(void)
     gnrc_pktsnip_t *pkt2;
     gnrc_pktsnip_t *pkt3 = gnrc_pktbuf_add(NULL, _fragment3, sizeof(_fragment3),
                                            GNRC_NETTYPE_SIXLOWPAN);
-    const rbuf_t *rbuf;
+    const gnrc_sixlowpan_rbuf_t *rbuf;
     unsigned rbuf_entries = 0;
 
     _set_fragment_offset(_fragment2, pkt2_offset);
@@ -466,7 +466,7 @@ static void test_rbuf_add__overlap_rhs(void)
     rbuf_add(&_test_netif_hdr.hdr, pkt2, pkt2_offset, TEST_PAGE);
     rbuf = rbuf_array();
     for (unsigned i = 0; i < RBUF_SIZE; i++) {
-        const rbuf_t *entry = &rbuf[i];
+        const gnrc_sixlowpan_rbuf_t *entry = &rbuf[i];
         if (!rbuf_entry_empty(entry)) {
             static const size_t pkt3_offset = TEST_FRAGMENT3_OFFSET + 8U - 1U;
 
@@ -480,7 +480,7 @@ static void test_rbuf_add__overlap_rhs(void)
                         TEST_FRAGMENT3_OFFSET - TEST_FRAGMENT2_OFFSET,
                         (unsigned)pkt2_offset, (unsigned)pkt3_offset);
             /* releasing pkt to check if packet buffer is empty in the end */
-            gnrc_pktbuf_release(entry->super.pkt);
+            gnrc_pktbuf_release(entry->pkt);
         }
     }
     TEST_ASSERT_EQUAL_INT(1U, rbuf_entries);
@@ -489,7 +489,7 @@ static void test_rbuf_add__overlap_rhs(void)
 
 static void test_rbuf_rm(void)
 {
-    const rbuf_t *entry;
+    const gnrc_sixlowpan_rbuf_t *entry;
 
     test_rbuf_add__success_first_fragment();
     entry = _first_non_empty_rbuf();
@@ -497,7 +497,7 @@ static void test_rbuf_rm(void)
     TEST_ASSERT_NOT_NULL(entry);
     /* intentionally discarding const qualifier since we enter rbuf's internal
      * context again */
-    rbuf_rm((rbuf_t *)entry);
+    rbuf_rm((gnrc_sixlowpan_rbuf_t *)entry);
     /* reassembly buffer is now empty */
     TEST_ASSERT_NULL(_first_non_empty_rbuf());
     _check_pktbuf(NULL);
@@ -507,15 +507,15 @@ static void test_rbuf_gc__manually(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, _fragment1, sizeof(_fragment1),
                                           GNRC_NETTYPE_SIXLOWPAN);
-    rbuf_t *entry;
+    gnrc_sixlowpan_rbuf_t *entry;
 
     TEST_ASSERT_NOT_NULL(pkt);
     rbuf_add(&_test_netif_hdr.hdr, pkt, TEST_FRAGMENT1_OFFSET, TEST_PAGE);
     /* discarding const qualifier intentionally to override `arrival` */
-    entry = (rbuf_t *)_first_non_empty_rbuf();
+    entry = (gnrc_sixlowpan_rbuf_t *)_first_non_empty_rbuf();
     TEST_ASSERT_NOT_NULL(entry);
     /* set arrival RBUF_TIMEOUT into the past */
-    entry->arrival -= RBUF_TIMEOUT;
+    entry->super.arrival -= RBUF_TIMEOUT;
     rbuf_gc();
     /* reassembly buffer is now empty */
     TEST_ASSERT_NULL(_first_non_empty_rbuf());
@@ -527,12 +527,12 @@ static void test_rbuf_gc__timed(void)
     msg_t msg;
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, _fragment1, sizeof(_fragment1),
                                           GNRC_NETTYPE_SIXLOWPAN);
-    rbuf_t *entry;
+    gnrc_sixlowpan_rbuf_t *entry;
 
     TEST_ASSERT_NOT_NULL(pkt);
     rbuf_add(&_test_netif_hdr.hdr, pkt, TEST_FRAGMENT1_OFFSET, TEST_PAGE);
     /* discarding const qualifier intentionally to override `arrival` */
-    entry = (rbuf_t *)_first_non_empty_rbuf();
+    entry = (gnrc_sixlowpan_rbuf_t *)_first_non_empty_rbuf();
     TEST_ASSERT_NOT_NULL(entry);
     TEST_ASSERT_MESSAGE(
             xtimer_msg_receive_timeout(&msg, TEST_GC_TIMEOUT) >= 0,

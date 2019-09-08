@@ -31,22 +31,6 @@ extern "C" {
 #endif
 
 /**
- * @name    SPI configuration
- * @{
- */
-static const spi_conf_t spi_config[] = {
-    {
-        .dev  = NRF_SPI0,
-        .sclk = 15,
-        .mosi = 13,
-        .miso = 14
-    }
-};
-
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
-/** @} */
-
-/**
  * @name    I2C configuration
  * @{
  */

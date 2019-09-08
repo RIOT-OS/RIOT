@@ -20,12 +20,12 @@ endif
 export CPU_MODEL
 
 # Default debug adapter choice is to use the Mulle programmer board
-export DEBUG_ADAPTER ?= mulle
+DEBUG_ADAPTER ?= mulle
 # Host OS name
 OS := $(shell uname)
 
 # Fall back to PROGRAMMER_SERIAL for backwards compatibility
-export DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
+DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
 
 ifeq ($(PORT),)
   # try to find tty name by serial number, only works on Linux currently.
@@ -56,9 +56,7 @@ endif
 export OPENOCD_PRE_VERIFY_CMDS += \
   -c 'load_image $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin 0x20000000 bin' \
   -c 'resume 0x20000000'
-export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield-elf.sh
-
-FLASHDEPS += $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin
+export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
 
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk

@@ -1,0 +1,6 @@
+MODULE = nanocbor
+
+SRC = decoder.c \
+      encoder.c
+
+include $(RIOTBASE)/Makefile.base

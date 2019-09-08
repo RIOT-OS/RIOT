@@ -61,3 +61,6 @@ scan-build/
 
 # compile_and_test_for_boards default "results" directory
 results/
+
+# mypy artifacts
+.mypy_cache/

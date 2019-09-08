@@ -10,10 +10,17 @@
  * @defgroup    net_gnrc_tftp  TFTP Support Library
  * @ingroup     net_gnrc
  * @brief       Add's support for TFTP protocol parsing
+ *
+ * @deprecated  This module has serious quality defects and is not in a
+ *              maintainable state. It will be removed after the 2020.04 release
+ *              at the latest.
  * @{
  *
  * @file
  * @brief       TFTP support library
+ *
+ * @warning Currently only runs with link-local addresses when there is only
+ *          one interface
  *
  * The TFTP module add's support for the TFTP protocol.
  * It implements the following RFC's:
@@ -162,6 +169,8 @@ int gnrc_tftp_server_stop(void);
 /**
  * @brief Start an TFTP client read action from the given destination
  *
+ * @pre `(GNRC_NETIF_NUMOF == 1) || !ipv6_addr_is_link_local(addr)`
+ *
  * @param [in] addr         the address of the server
  * @param [in] file_name    the filename of the file to get
  * @param [in] mode         the transfer mode
@@ -179,6 +188,8 @@ int gnrc_tftp_client_read(ipv6_addr_t *addr, const char *file_name, tftp_mode_t 
 
 /**
  * @brief Start an TFTP client write action to the given destination
+ *
+ * @pre `(GNRC_NETIF_NUMOF == 1) || !ipv6_addr_is_link_local(addr)`
  *
  * @param [in] addr         the address of the server
  * @param [in] file_name    the filename of the file to write

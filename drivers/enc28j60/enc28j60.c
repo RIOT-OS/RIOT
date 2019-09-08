@@ -26,6 +26,7 @@
 #include "xtimer.h"
 #include "assert.h"
 #include "net/ethernet.h"
+#include "net/eui48.h"
 #include "net/netdev/eth.h"
 
 #include "enc28j60.h"
@@ -427,8 +428,8 @@ static int nd_init(netdev_t *netdev)
     /* set default MAC address */
     uint8_t macbuf[ETHERNET_ADDR_LEN];
     luid_get(macbuf, ETHERNET_ADDR_LEN);
-    macbuf[0] |= 0x02;      /* locally administered address */
-    macbuf[0] &= ~0x01;     /* unicast address */
+    eui48_set_local((eui48_t*)macbuf);      /* locally administered address */
+    eui48_clear_group((eui48_t*)macbuf);    /* unicast address */
     mac_set(dev, macbuf);
 
     /* PHY configuration */

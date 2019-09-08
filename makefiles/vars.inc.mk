@@ -8,8 +8,8 @@ export QUIET                 # The parameter to use whether to show verbose make
 export APPLICATION           # The application, set in the Makefile which is run by the user.
 export APPLICATION_MODULE    # The application module name.
 export BOARD                 # The board to compile the application for.
-export CPU                   # The CPU, set by the board's Makefile.include.
-export CPU_MODEL             # The specific identifier of the used CPU, used for some CPU implementations to differentiate between different memory layouts
+export CPU                   # The CPU, set by the board's Makefile.features.
+export CPU_MODEL             # The specific identifier of the used CPU, used for some CPU implementations to differentiate between different memory layouts. Set by the board's Makefile.features.
 export MCU                   # The MCU, set by the board's Makefile.include, or defaulted to the same value as CPU.
 export INCLUDES              # The extra include paths, set by the various Makefile.include files.
 export CXXINCLUDES           # The extra include paths for c++, set by the various Makefile.include files.
@@ -69,8 +69,8 @@ export WERROR                # Treat all compiler warnings as errors if set to 1
 
 export GITCACHE              # path to git-cache executable
 export GIT_CACHE_DIR         # path to git-cache cache directory
-export FLASHER               # The command to call on "make flash".
-export FFLAGS                # The parameters to supply to FLASHER.
+# FLASHER                    # The command to call on "make flash".
+# FFLAGS                     # The parameters to supply to FLASHER.
 export FLASH_ADDR            # Define an offset to flash code into ROM memory.
 # TERMPROG                   # The command to call on "make term".
 # TERMFLAGS                  # Additional parameters to supply to TERMPROG.
@@ -78,12 +78,12 @@ export PORT                  # The port to connect the TERMPROG to.
 export ELFFILE               # The unstripped result of the compilation.
 export HEXFILE               # The stripped result of the compilation.
 # FLASHFILE                  # The output file used for flashing (transition phase: only if defined)
-export DEBUGGER              # The command to call on "make debug", usually a script starting the GDB front-end.
-export DEBUGGER_FLAGS        # The parameters to supply to DEBUGGER.
-export DEBUGSERVER           # The command to call on "make debug-server", usually a script starting the GDB server.
-export DEBUGSERVER_FLAGS     # The parameters to supply to DEBUGSERVER.
-export RESET                 # The command to call on "make reset", this command resets/reboots the target.
-export RESET_FLAGS           # The parameters to supply to RESET.
+# DEBUGGER                   # The command to call on "make debug", usually a script starting the GDB front-end.
+# DEBUGGER_FLAGS             # The parameters to supply to DEBUGGER.
+# DEBUGSERVER                # The command to call on "make debug-server", usually a script starting the GDB server.
+# DEBUGSERVER_FLAGS          # The parameters to supply to DEBUGSERVER.
+# RESET                      # The command to call on "make reset", this command resets/reboots the target.
+# RESET_FLAGS                # The parameters to supply to RESET.
 
 export CCACHE_BASEDIR        # ccache basedir, allows multiple riot build
                              # directories to share a ccache directory
@@ -95,3 +95,5 @@ export UNZIP_HERE            # Use `cd $(SOME_FOLDER) && $(UNZIP_HERE) $(SOME_FI
 
 export LAZYSPONGE            # Command saving stdin to a file only on content update.
 export LAZYSPONGE_FLAGS      # Parameters supplied to LAZYSPONGE.
+
+# LOG_LEVEL                  # Logging level as integer (NONE: 0, ERROR: 1, WARNING: 2, INFO: 3, DEBUG: 4, default: 3)

@@ -37,42 +37,8 @@ extern "C" {
  * @{
  */
 #define RBUF_SIZE           (GNRC_SIXLOWPAN_FRAG_RBUF_SIZE)
-#define RBUF_TIMEOUT        (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS)
+#define RBUF_TIMEOUT        (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)
 /** @} */
-
-/**
- * @brief   Fragment intervals to identify limits of fragments.
- *
- * @note    Fragments MUST NOT overlap and overlapping fragments are to be
- *          discarded
- *
- * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.3">
- *          RFC 4944, section 5.3
- *      </a>
- *
- * @internal
- */
-typedef struct rbuf_int {
-    struct rbuf_int *next;  /**< next element in interval list */
-    uint16_t start;         /**< start byte of interval */
-    uint16_t end;           /**< end byte of interval */
-} rbuf_int_t;
-
-/**
- * @brief   Internal representation of the 6LoWPAN reassembly buffer.
- *
- * Additional members help with correct reassembly of the buffer.
- *
- * @internal
- *
- * @extends gnrc_sixlowpan_rbuf_t
- */
-typedef struct {
-    gnrc_sixlowpan_rbuf_t super;        /**< exposed part of the reassembly buffer */
-    rbuf_int_t *ints;                   /**< intervals of the fragment */
-    uint32_t arrival;                   /**< time in microseconds of arrival of
-                                         *   last received fragment */
-} rbuf_t;
 
 /**
  * @brief   Adds a new fragment to the reassembly buffer. If the packet is
@@ -106,7 +72,7 @@ void rbuf_gc(void);
  *
  * @internal
  */
-void rbuf_rm(rbuf_t *rbuf);
+void rbuf_rm(gnrc_sixlowpan_rbuf_t *rbuf);
 
 /**
  * @brief   Checks if a reassembly buffer entry is unset
@@ -118,8 +84,8 @@ void rbuf_rm(rbuf_t *rbuf);
  *
  * @internal
  */
-static inline bool rbuf_entry_empty(const rbuf_t *rbuf) {
-    return (rbuf->super.pkt == NULL);
+static inline bool rbuf_entry_empty(const gnrc_sixlowpan_rbuf_t *rbuf) {
+    return (rbuf->pkt == NULL);
 }
 
 #if defined(TEST_SUITES) || defined(DOXYGEN)
@@ -139,7 +105,7 @@ void rbuf_reset(void);
  *          access is immediately spotted at compile time of tests. The `const`
  *          qualifier may however be discarded if required by the tests.
  */
-const rbuf_t *rbuf_array(void);
+const gnrc_sixlowpan_rbuf_t *rbuf_array(void);
 #endif
 
 #ifdef __cplusplus

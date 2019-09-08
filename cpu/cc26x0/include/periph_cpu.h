@@ -65,6 +65,53 @@ typedef enum {
     GPIO_BOTH = IOCFG_EDGEDET_BOTH
 } gpio_flank_t;
 
+/*
+ * @brief   Invalid UART mode mask
+ *
+ * This mask is also used to force data_bits_t to be uint32_t type
+ * since it may be assigned a uint32_t variable in uart_mode
+ */
+#define UART_INVALID_MODE   (0x8000000)
+
+/**
+ * @brief   Override parity values
+ * @{
+ */
+#define HAVE_UART_PARITY_T
+typedef enum {
+   UART_PARITY_NONE = 0,
+   UART_PARITY_EVEN = (UART_LCRH_PEN | UART_LCRH_EPS),
+   UART_PARITY_ODD = UART_LCRH_PEN,
+   UART_PARITY_MARK = UART_INVALID_MODE | 4,
+   UART_PARITY_SPACE = UART_INVALID_MODE | 5
+} uart_parity_t;
+/** @} */
+
+ /**
+ * @brief   Override data bits length values
+ * @{
+ */
+#define HAVE_UART_DATA_BITS_T
+typedef enum {
+    UART_DATA_BITS_5 = UART_LCRH_WLEN_5,
+    UART_DATA_BITS_6 = UART_LCRH_WLEN_6,
+    UART_DATA_BITS_7 = UART_LCRH_WLEN_7,
+    UART_DATA_BITS_8 = UART_LCRH_WLEN_8
+} uart_data_bits_t;
+/** @} */
+
+/**
+ * @brief   Override stop bits length values
+ * @{
+ */
+#define HAVE_UART_STOP_BITS_T
+typedef enum {
+   UART_STOP_BITS_1 = 0,
+   UART_STOP_BITS_2 = UART_LCRH_STP2,
+} uart_stop_bits_t;
+/** @} */
+
+
 /**
  * @brief   Configuration of low-level general purpose timers
  *

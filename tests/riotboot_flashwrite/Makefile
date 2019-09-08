@@ -2,7 +2,8 @@ DEVELHELP ?= 0
 BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
+                             arduino-mega2560 arduino-uno \
                              chronos i-nucleo-lrwan1 \
                              msb-430 msb-430h nucleo-f031k6 \
                              nucleo-f042k6 nucleo-l031k6 nucleo-f030r8 \
@@ -38,11 +39,11 @@ LOW_MEMORY_BOARDS := nucleo-f334r8
 GNRC_NETIF_NUMOF := 2
 
 # uncomment these to use ethos
-#USEMODULE += ethos gnrc_uhcpc
+#USEMODULE += stdio_ethos gnrc_uhcpc
 #
 ## ethos baudrate can be configured from make command
 #ETHOS_BAUDRATE ?= 115200
-#CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE) -DUSE_ETHOS_FOR_STDIO
+#CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)
 
 ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   $(info Using low-memory configuration for microcoap_server.)

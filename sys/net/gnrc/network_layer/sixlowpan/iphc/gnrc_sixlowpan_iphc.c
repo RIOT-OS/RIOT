@@ -454,6 +454,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
             break;
 
         case IPHC_M_DAC_DAM_U_CTX_64:
+            assert(ctx != NULL);
             memcpy(ipv6_hdr->dst.u8 + 8, iphc_hdr + payload_offset, 8);
             ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
                                   ctx->prefix_len);
@@ -464,6 +465,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
             ipv6_hdr->dst.u32[2] = byteorder_htonl(0x000000ff);
             ipv6_hdr->dst.u16[6] = byteorder_htons(0xfe00);
             memcpy(ipv6_hdr->dst.u8 + 14, iphc_hdr + payload_offset, 2);
+            assert(ctx != NULL);
             ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
                                   ctx->prefix_len);
             payload_offset += 2;
@@ -477,6 +479,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
                 _recv_error_release(sixlo, ipv6, rbuf);
                 return;
             }
+            assert(ctx != NULL);
             ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
                                   ctx->prefix_len);
             break;
@@ -509,6 +512,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
 
         case IPHC_M_DAC_DAM_M_UC_PREFIX:
             do {
+                assert(ctx != NULL);
                 uint8_t orig_ctx_len = ctx->prefix_len;
 
                 ipv6_addr_set_unspecified(&ipv6_hdr->dst);
@@ -556,7 +560,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     uint16_t payload_len;
     if (rbuf != NULL) {
         /* for a fragmented datagram we know the overall length already */
-        payload_len = (uint16_t)(rbuf->pkt->size - sizeof(ipv6_hdr_t));
+        payload_len = (uint16_t)(rbuf->super.datagram_size - sizeof(ipv6_hdr_t));
     }
     else {
         /* set IPv6 header payload length field to the length of whatever is left
@@ -577,7 +581,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
            ((uint8_t *)sixlo->data) + payload_offset,
            sixlo->size - payload_offset);
     if (rbuf != NULL) {
-        rbuf->current_size += (uncomp_hdr_len - payload_offset);
+        rbuf->super.current_size += (uncomp_hdr_len - payload_offset);
         gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(rbuf, netif_hdr);
     }
     else {

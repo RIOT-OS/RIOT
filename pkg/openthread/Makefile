@@ -27,7 +27,7 @@ $(info $$OPENTHREAD_ARGS is [${OPENTHREAD_ARGS}])
 OPENTHREAD_COMMON_FLAGS = -fdata-sections -ffunction-sections -Os
 OPENTHREAD_COMMON_FLAGS += -Wno-implicit-fallthrough -Wno-unused-parameter
 
-all: git-download
+all:
 	cd $(PKG_BUILDDIR) && PREFIX="/" ./bootstrap
 	cd $(PKG_BUILDDIR) && CPP="$(CPP)" CC="$(CC)" CXX="$(CXX)"\
 		OBJC="" OBJCXX="" AR="$(AR)" RANLIB="$(RANLIB)" NM="$(NM)" \

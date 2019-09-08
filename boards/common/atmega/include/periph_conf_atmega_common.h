@@ -93,10 +93,35 @@ extern "C" {
  * The timer driver only supports the four 16-bit timers (Timer1, Timer3,
  * Timer4, Timer5), so those are the only onces we can use here.
  *
+ *
+ * ATmega32U4
+ * ==========
+ * The ATmega32U4 has 4 timers. Timer0 and Timer2 are 8 Bit Timers.
+ *
+ * The timer driver only supports the two 16-bit timers (Timer1 and
+ * Timer3), so those are the only ones we can use here.
+ *
  * @{
  */
 #ifndef TIMER_NUMOF
-#if defined(CPU_ATMEGA256RFR2)
+#if defined(CPU_ATMEGA32U4)
+    #define TIMER_NUMOF         (2U)
+    #define TIMER_CHANNELS      (3)
+
+    #define TIMER_0             MEGA_TIMER1
+    #define TIMER_0_MASK        &TIMSK1
+    #define TIMER_0_FLAG        &TIFR1
+    #define TIMER_0_ISRA        TIMER1_COMPA_vect
+    #define TIMER_0_ISRB        TIMER1_COMPB_vect
+    #define TIMER_0_ISRC        TIMER1_COMPC_vect
+
+    #define TIMER_1             MEGA_TIMER3
+    #define TIMER_1_MASK        &TIMSK3
+    #define TIMER_1_FLAG        &TIFR3
+    #define TIMER_1_ISRA        TIMER3_COMPA_vect
+    #define TIMER_1_ISRB        TIMER3_COMPB_vect
+    #define TIMER_1_ISRC        TIMER3_COMPC_vect
+#elif defined(CPU_ATMEGA256RFR2)
     #define TIMER_NUMOF         (3U)
     #define TIMER_CHANNELS      (3)
 
@@ -192,6 +217,11 @@ extern "C" {
 
     #define UART_0              MEGA_UART0
     #define UART_0_ISR          USART_RX_vect
+#elif defined(CPU_ATMEGA32U4)
+    #define UART_NUMOF          (1U)
+
+    #define UART_0              MEGA_UART1
+    #define UART_0_ISR          USART1_RX_vect
 #else
     #define UART_NUMOF          (0U)
 #endif
@@ -205,23 +235,33 @@ extern "C" {
  * All currently supported ATmega MCUs have only one hardware SPI with fixed pin
  * configuration, so all we can do here, is to enable or disable it...
  *
- * The fixed pins ATmega328p are:
- * MOSI - PB3
- * MISO - PB4
- * SCK  - PB5
- * SS   - PB2 -> this pin is configured as output, but not used
+ * The fixed pins ATmega328P are:
  *
- * The fixed pins for the ATmega128rp are:
- * MOSI - PB5
- * MISO - PB6
- * SCK  - PB7
- * SS   - PB4 -> this pin is configured as output, but not used
+ * | Function | Pin |
+ * |:-------- |:--- |
+ * | MOSI     | PB3 |
+ * | MISO     | PB4 |
+ * | SCK      | PB5 |
+ * | SS       | PB2 |
  *
- * The fixed pins for the ATmega1281, ATmega256rfr2, and ATmega2560 are:
- * MOSI - PB2
- * MISO - PB3
- * SCK  - PB1
- * SS   - PB0 -> this pin is configured as output, but not used
+ * The fixed pins for the ATmega1284P are:
+ *
+ * | Function | Pin |
+ * |:-------- |:--- |
+ * | MOSI     | PB5 |
+ * | MISO     | PB6 |
+ * | SCK      | PB7 |
+ * | SS       | PB4 |
+ *
+ * The fixed pins for the ATmega1281, ATmega256RFR2, ATmega2560, and ATmega32U4
+ * are:
+ *
+ * | Function | Pin |
+ * |:-------- |:--- |
+ * | MOSI     | PB2 |
+ * | MISO     | PB3 |
+ * | SCK      | PB1 |
+ * | SS       | PB0 |
  *
  * The SS pin must be configured as output for the SPI device to work as
  * master correctly, though we do not use it for now (as we handle the chip
@@ -255,7 +295,7 @@ extern "C" {
  * @{
  */
 #ifndef ADC_NUMOF
-#if defined(CPU_ATMEGA256RFR2) || defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P)
+#if defined(CPU_ATMEGA256RFR2) || defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P) || defined(CPU_ATMEGA32U4)
     #define ADC_NUMOF           (8U)
 #elif defined (CPU_ATMEGA2560)
     #define ADC_NUMOF           (16U)
@@ -287,22 +327,26 @@ extern "C" {
 #elif defined(CPU_ATMEGA2560)
     #define PWM_PINS_CH0 { GPIO_PIN(PORT_B, 7), GPIO_PIN(PORT_G, 5) }
     #define PWM_PINS_CH1 { GPIO_PIN(PORT_B, 4), GPIO_PIN(PORT_H, 6) }
+#elif defined(CPU_ATMEGA32U4)
+    #define PWM_PINS_CH0 { GPIO_PIN(PORT_B, 7), GPIO_PIN(PORT_D, 0) }
 #else
     #define PWM_NUMOF           (0U)
 #endif
 
-#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA2560)
+#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA32U4)
     static const pwm_conf_t pwm_conf[] = {
         {
             .dev = MINI_TIMER0,
             .pin_ch = PWM_PINS_CH0,
             .div = MINI_TIMER0_DIV,
         },
+#ifndef CPU_ATMEGA32U4
         {
             .dev = MINI_TIMER2,
             .pin_ch = PWM_PINS_CH1,
             .div = MINI_TIMER2_DIV,
         }
+#endif
     };
 
     #define PWM_NUMOF           (sizeof(pwm_conf) / sizeof(pwm_conf[0]))

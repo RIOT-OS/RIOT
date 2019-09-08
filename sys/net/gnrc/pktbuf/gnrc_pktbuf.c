@@ -13,8 +13,6 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
-#include <sys/uio.h>
-
 #include "net/gnrc/pktbuf.h"
 
 gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt,

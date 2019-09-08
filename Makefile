@@ -1,6 +1,6 @@
 .all:
 
-.PHONY: all doc doc-man doc-latex docclean welcome
+.PHONY: all doc doc-man doc-latex docclean print-versions welcome
 
 all: welcome
 	@echo ""
@@ -37,6 +37,10 @@ welcome:
 	@echo "Or ask questions on our mailing list:"
 	@echo "    users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)"
 
+print-versions:
+	@./dist/tools/ci/print_toolchain_versions.sh
+
+include makefiles/boards.inc.mk
 include makefiles/app_dirs.inc.mk
 
 -include makefiles/tests.inc.mk

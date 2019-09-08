@@ -31,8 +31,7 @@
  * to the physical support, the region where the device is used needs to be
  * set at compile time. Example for EU868:
  * ```
- *     CFLAGS += -DREGION_EU868
- *     CFLAGS += -DLORAMAC_ACTIVE_REGION=LORAMAC_REGION_EU868
+ *     LORA_REGION = EU868
  * ```
  *
  * # Using the package API
@@ -67,7 +66,6 @@
  * 2. set the LoRa keys
  * 3. join the network
  * 4. send some data to the network
- * 5. wait for any potentially received data
  *
  * ```c
  * int main(void)
@@ -90,19 +88,71 @@
  *     /* 4. send some data */
  *     char *message = "This is RIOT";
  *     if (semtech_loramac_send(&loramac,
- *                              (uint8_t *)message, strlen(message)) != SEMTECH_LORAMAC_TX_OK) {
+ *                              (uint8_t *)message, strlen(message)) != SEMTECH_LORAMAC_TX_DONE) {
            printf("Cannot send message '%s'\n", message);
  *         return 1;
  *     }
  *
- *     /* 5. wait for any potentially received data */
- *     if (semtech_loramac_recv(&loramac) == SEMTECH_LORAMAC_DATA_RECEIVED) {
+ * }
+ * ```
+ *
+ * To receive downlink messages, enable the `semtech_loramac_rx` and use a
+ * dedicated receiving thread.
+ * - In the application Makefile, add
+ * ```mk
+ * USEMODULE += semtech_loramac_rx
+ * ```
+ * - At the beginning of the application source file, add the necessary
+ * includes and declare the message queue and stack arrays:
+ * ```c
+ * #include "thread.h"
+ *
+ * #define RECV_MSG_QUEUE                   (4U)
+ * static msg_t _recv_queue[RECV_MSG_QUEUE];
+ *
+ * static char _recv_stack[THREAD_STACKSIZE_DEFAULT];
+ * ```
+ * - Implement the thread: it initializes its message queue and then
+ * simply calls the blocking `semtech_loramac_recv` function in a loop:
+ * ```c
+ * static void *_recv(void *arg)
+ * {
+ *     msg_init_queue(_recv_queue, RECV_MSG_QUEUE);
+ *
+ *     (void)arg;
+ *     while (1) {
+ *         /* blocks until some data is received */
+ *         semtech_loramac_recv(&loramac);
  *         loramac.rx_data.payload[loramac.rx_data.payload_len] = 0;
  *         printf("Data received: %s, port: %d\n",
  *                (char *)loramac.rx_data.payload, loramac.rx_data.port);
+ *         }
+ *
  *     }
+ *     return NULL;
  * }
  * ```
+ * - Finally, this thread can be started after the join procedure
+ * succeeds:
+ * ```c
+ * thread_create(_recv_stack, sizeof(_recv_stack),
+ *               THREAD_PRIORITY_MAIN - 1, 0, _recv, NULL, "recv thread");
+ * ```
+ *
+ * # Persistence
+ *
+ * If the board CPU provides an internal EEPROM, this package provides a
+ * mecanism for storing EUIs, keys and some MAC parameters (frame counter,
+ * join status).
+ * After a successful join procedure, use `semtech_loramac_save` function to
+ * persist this information and it will be loaded automatically at the next
+ * reboot.
+ * If the device is already joined to a network, to avoid another OTAA join
+ * procedure use `semtech_loramac_is_mac_joined` function to check the join
+ * status of the device.
+ *
+ * This mecanism is especially useful when using deep sleep power modes that
+ * don't preserve RAM.
  *
  * @warning It is not possible to directly call the original LoRaMAC-node API
  *          using this package. This package should only be considered as a

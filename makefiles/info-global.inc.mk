@@ -14,30 +14,25 @@ define board_missing_features
   DISABLE_MODULE    := $(DISABLE_MODULE_GLOBAL)
   FEATURES_REQUIRED := $(FEATURES_REQUIRED_GLOBAL)
   FEATURES_OPTIONAL := $(FEATURES_OPTIONAL_GLOBAL)
-  FEATURES_MISSING  :=
+
+  # Remove board specific variables set by Makefile.features/Makefile.dep
   FEATURES_PROVIDED :=
+
+  # Undefine variables that must not be defined when starting.
+  # Some are sometime set as `?=`
+  undefine CPU
+  undefine CPU_MODEL
 
   include $(RIOTBASE)/Makefile.features
 
-  ifdef BUILDTEST_MCU_GROUP
-    ifneq ($(BUILDTEST_MCU_GROUP), $$(FEATURES_MCU_GROUP))
-      BOARDS_FEATURES_MISSING += "$(1) $(BUILDTEST_MCU_GROUP)"
-    BOARDS_WITH_MISSING_FEATURES += $(1)
-    endif
-  endif
-
   include $(RIOTBASE)/Makefile.dep
 
-  FEATURES_MISSING := $$(sort $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED)))
-  ifneq (, $$(FEATURES_MISSING))
+  ifneq (,$$(FEATURES_MISSING))
     BOARDS_FEATURES_MISSING += "$(1) $$(FEATURES_MISSING)"
-    ifneq (, $$(filter-out $$(FEATURES_OPTIONAL), $$(FEATURES_MISSING)))
-      BOARDS_WITH_MISSING_FEATURES += $(1)
-    endif
+    BOARDS_WITH_MISSING_FEATURES += $(1)
   endif
 endef
 
-BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name "common" -exec basename {} \;)
 BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
 BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
 

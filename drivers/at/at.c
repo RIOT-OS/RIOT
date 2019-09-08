@@ -24,13 +24,13 @@
 
 static void _isrpipe_write_one_wrapper(void *_isrpipe, uint8_t data)
 {
-    isrpipe_write_one(_isrpipe, (char)data);
+    isrpipe_write_one(_isrpipe, data);
 }
 
 int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize)
 {
     dev->uart = uart;
-    isrpipe_init(&dev->isrpipe, buf, bufsize);
+    isrpipe_init(&dev->isrpipe, (uint8_t *)buf, bufsize);
 
     return uart_init(uart, baudrate, _isrpipe_write_one_wrapper,
                      &dev->isrpipe);
@@ -41,7 +41,7 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
     while (*bytes) {
         char c;
         int res;
-        if ((res = isrpipe_read_timeout(&dev->isrpipe, &c, 1, timeout)) == 1) {
+        if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout)) == 1) {
             if (AT_PRINT_INCOMING) {
                 print(&c, 1);
             }
@@ -68,7 +68,8 @@ ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout)
 
     while (len) {
         int read_res;
-        if ((read_res = isrpipe_read_timeout(&dev->isrpipe, resp_pos, 1, timeout)) == 1) {
+        if ((read_res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)resp_pos,
+                                             1, timeout)) == 1) {
             resp_pos += read_res;
             len -= read_res;
         }
@@ -78,6 +79,34 @@ ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout)
     }
 
     return (resp_pos - bytes);
+}
+
+int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
+                               char *bytes, size_t *bytes_len, uint32_t timeout)
+{
+    size_t len = 0;
+    char *_string = (char *)string;
+
+    while (*_string && len < *bytes_len) {
+        int res;
+        char c;
+        if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout)) == 1) {
+            if (AT_PRINT_INCOMING) {
+                print(&c, 1);
+            }
+            if (c == *_string) {
+                _string++;
+            }
+            bytes[len] = c;
+            len++;
+        }
+        else {
+            *bytes_len = len;
+            return res;
+        }
+    }
+    *bytes_len = len;
+    return 0;
 }
 
 int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
@@ -102,7 +131,7 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
 
 void at_drain(at_dev_t *dev)
 {
-    char _tmp[16];
+    uint8_t _tmp[16];
     int res;
 
     do {
@@ -260,7 +289,8 @@ ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, ui
 
     while (len) {
         int read_res;
-        if ((read_res = isrpipe_read_timeout(&dev->isrpipe, resp_pos, 1, timeout)) == 1) {
+        if ((read_res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)resp_pos,
+                                             1, timeout)) == 1) {
             if (AT_PRINT_INCOMING) {
                 print(resp_pos, read_res);
             }

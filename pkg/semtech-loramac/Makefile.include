@@ -1,3 +1,9 @@
 INCLUDES += -I$(RIOTBASE)/pkg/semtech-loramac/include
 
 DIRS += $(RIOTBASE)/pkg/semtech-loramac/contrib
+
+# Use EU868 as default region
+LORA_REGION ?= EU868
+
+CFLAGS += -DREGION_$(LORA_REGION)
+CFLAGS += -DLORAMAC_ACTIVE_REGION=LORAMAC_REGION_$(LORA_REGION)

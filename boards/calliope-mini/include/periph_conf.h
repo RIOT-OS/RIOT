@@ -22,45 +22,12 @@
 
 #include "periph_cpu.h"
 #include "cfg_clock_16_0.h"
+#include "cfg_timer_012.h"
+#include "cfg_rtt_default.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Timer configuration
- * @{
- */
-static const timer_conf_t timer_config[] = {
-    {
-        .dev      = NRF_TIMER0,
-        .channels =  3,
-        .bitmode  = TIMER_BITMODE_BITMODE_24Bit,
-        .irqn     = TIMER0_IRQn
-    },
-    {
-        .dev      = NRF_TIMER1,
-        .channels = 3,
-        .bitmode  = TIMER_BITMODE_BITMODE_16Bit,
-        .irqn     = TIMER1_IRQn
-    }
-};
-
-#define TIMER_0_ISR         isr_timer0
-#define TIMER_1_ISR         isr_timer1
-
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
-/** @} */
-
-/**
- * @name    Real time counter configuration
- * @{
- */
-#define RTT_NUMOF           (1U)
-#define RTT_DEV             (1)             /* NRF_RTC1 */
-#define RTT_MAX_VALUE       (0x00ffffff)
-#define RTT_FREQUENCY       (1024)
-/** @} */
 
 /**
  * @name    UART configuration

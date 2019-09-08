@@ -1,10 +1,6 @@
 #
 # This file contains helper targets used by the CI.
 #
-
-# (HACK) get actual flash binary from FFLAGS if not defined.
-FLASHFILE ?= $(filter $(HEXFILE) $(ELFFILE:.elf=.bin) $(ELFFILE),$(FFLAGS))
-
 #
 # This target will run "make test" on the CI cluster.
 #

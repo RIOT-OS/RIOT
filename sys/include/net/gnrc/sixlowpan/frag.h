@@ -32,6 +32,9 @@
 #include "msg.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/netif/hdr.h"
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+#include "net/gnrc/sixlowpan/frag/hint.h"
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
 #include "net/gnrc/sixlowpan/internal.h"
 #include "net/ieee802154.h"
 #include "net/sixlowpan.h"
@@ -56,33 +59,65 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   An entry in the 6LoWPAN reassembly buffer.
+ * @brief   Fragment intervals to identify limits of fragments and duplicates.
  *
- * A recipient of a fragment SHALL use
+ * @note    Fragments MUST NOT overlap and overlapping fragments are to be
+ *          discarded
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.3">
+ *          RFC 4944, section 5.3
+ *      </a>
+ */
+typedef struct gnrc_sixlowpan_rbuf_int {
+    /**
+     * @brief   next element in fragment interval list
+     */
+    struct gnrc_sixlowpan_rbuf_int *next;
+    uint16_t start;             /**< start byte of the fragment interval */
+    uint16_t end;               /**< end byte of the fragment interval */
+} gnrc_sixlowpan_rbuf_int_t;
+
+/**
+ * @brief   Base class for both reassembly buffer and virtual reassembly buffer
  *
  * 1. the source address,
  * 2. the destination address,
- * 3. the datagram size (gnrc_pktsnip_t::size of rbuf_t::pkt), and
+ * 3. the datagram size, and
  * 4. the datagram tag
  *
  * to identify all fragments that belong to the given datagram.
  *
  * @see [RFC 4944, section 5.3](https://tools.ietf.org/html/rfc4944#section-5.3)
+ * @see https://tools.ietf.org/html/draft-ietf-lwig-6lowpan-virtual-reassembly-01
  */
 typedef struct {
-    /**
-     * @brief   The reassembled packet in the packet buffer
-     */
-    gnrc_pktsnip_t *pkt;
+    gnrc_sixlowpan_rbuf_int_t *ints;            /**< intervals of already received fragments */
     uint8_t src[IEEE802154_LONG_ADDRESS_LEN];   /**< source address */
     uint8_t dst[IEEE802154_LONG_ADDRESS_LEN];   /**< destination address */
     uint8_t src_len;                            /**< length of gnrc_sixlowpan_rbuf_t::src */
     uint8_t dst_len;                            /**< length of gnrc_sixlowpan_rbuf_t::dst */
     uint16_t tag;                               /**< the datagram's tag */
+    uint16_t datagram_size;                     /**< the datagram's size */
     /**
      * @brief   The number of bytes currently received of the complete datagram
      */
     uint16_t current_size;
+    uint32_t arrival;                           /**< time in microseconds of arrival of
+                                                 *   last received fragment */
+} gnrc_sixlowpan_rbuf_base_t;
+
+/**
+ * @brief   An entry in the 6LoWPAN reassembly buffer.
+ *
+ * A recipient of a fragment SHALL use
+ *
+ */
+typedef struct {
+    gnrc_sixlowpan_rbuf_base_t super;           /**< base class */
+    /**
+     * @brief   The reassembled packet in the packet buffer
+     */
+    gnrc_pktsnip_t *pkt;
 } gnrc_sixlowpan_rbuf_t;
 
 /**
@@ -91,8 +126,16 @@ typedef struct {
 typedef struct {
     gnrc_pktsnip_t *pkt;    /**< Pointer to the IPv6 packet to be fragmented */
     uint16_t datagram_size; /**< Length of just the (uncompressed) IPv6 packet to be fragmented */
+    uint16_t tag;           /**< Tag used for the fragment */
     uint16_t offset;        /**< Offset of the Nth fragment from the beginning of the
                              *   payload datagram */
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+    /**
+     * @brief   Hint for the size (smaller than link-layer PDU) for the next
+     *          fragment to sent
+     */
+    gnrc_sixlowpan_frag_hint_t hint;
+#endif /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
 } gnrc_sixlowpan_msg_frag_t;
 
 /**
@@ -128,6 +171,20 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
  * @param[in] page      Current 6Lo dispatch parsing page.
  */
 void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
+
+/**
+ * @brief   Generate a new datagram tag for sending
+ *
+ * @return  A new datagram tag.
+ */
+uint16_t gnrc_sixlowpan_frag_next_tag(void);
+
+/**
+ * @brief   Remove base entry
+ *
+ * @param[in,out] entry Entry to remove
+ */
+void gnrc_sixlowpan_frag_rbuf_base_rm(gnrc_sixlowpan_rbuf_base_t *entry);
 
 /**
  * @brief   Garbage collect reassembly buffer.

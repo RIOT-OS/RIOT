@@ -360,9 +360,9 @@ static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags)
     uint16_t tick = TICK_TIMEOUT;
     while (tick--) {
         uint32_t sr1 = i2c->SR1;
-        i2c->SR1 &= ~ERROR_FLAG;
         if (sr1 & I2C_SR1_AF) {
             DEBUG("[i2c] is_sr1_mask_set: NACK received\n");
+            i2c->SR1 &= ~ERROR_FLAG;
             if (!(flags & I2C_NOSTOP)) {
                 _stop(i2c);
             }
@@ -370,10 +370,12 @@ static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags)
         }
         if ((sr1 & I2C_SR1_ARLO) || (sr1 & I2C_SR1_BERR)) {
             DEBUG("[i2c] is_sr1_mask_set: arb lost or bus ERROR_FLAG\n");
+            i2c->SR1 &= ~ERROR_FLAG;
             _stop(i2c);
             return -EAGAIN;
         }
         if (sr1 & mask) {
+            i2c->SR1 &= ~ERROR_FLAG;
             return 0;
         }
     }
@@ -381,6 +383,7 @@ static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags)
     * If timeout occurs this means a problem that must be handled on a higher
     * level.  A SWRST is recommended by the datasheet.
     */
+    i2c->SR1 &= ~ERROR_FLAG;
     _stop(i2c);
     return -ETIMEDOUT;
 }

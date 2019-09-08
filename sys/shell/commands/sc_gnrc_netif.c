@@ -348,7 +348,6 @@ static unsigned _netif_list_flag(kernel_pid_t iface, netopt_t opt, char *str,
 static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
 {
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-    unsigned line_thresh = _LINE_THRESHOLD;
 
     printf("inet6 addr: ");
     ipv6_addr_to_str(addr_str, addr, sizeof(addr_str));
@@ -379,19 +378,17 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
                 break;
         }
     }
-    line_thresh = _newline(0U, line_thresh);
+    _newline(0U, _LINE_THRESHOLD);
 }
 
 static void _netif_list_groups(ipv6_addr_t *addr)
 {
-    unsigned line_thresh = _LINE_THRESHOLD;
-
     if ((ipv6_addr_is_multicast(addr))) {
         char addr_str[IPV6_ADDR_MAX_STR_LEN];
         ipv6_addr_to_str(addr_str, addr, sizeof(addr_str));
         printf("inet6 group: %s", addr_str);
     }
-    line_thresh = _newline(0U, line_thresh);
+    _newline(0U, _LINE_THRESHOLD);
 }
 #endif
 
@@ -547,7 +544,7 @@ static void _netif_list(kernel_pid_t iface)
     printf("Link type: %s",
            (gnrc_netapi_get(iface, NETOPT_IS_WIRED, 0, &u16, sizeof(u16)) > 0) ?
             "wired" : "wireless");
-    line_thresh = _newline(0U, ++line_thresh);
+    _newline(0U, ++line_thresh);
     res = gnrc_netapi_get(iface, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
                           sizeof(ipv6_addrs));
     if (res >= 0) {

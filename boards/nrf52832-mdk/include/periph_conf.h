@@ -23,6 +23,7 @@
 #include "periph_cpu.h"
 #include "cfg_clock_32_1.h"
 #include "cfg_rtt_default.h"
+#include "cfg_spi_default.h"
 #include "cfg_timer_default.h"
 
 #ifdef __cplusplus
@@ -36,22 +37,6 @@ extern "C" {
 #define UART_NUMOF          (1U)
 #define UART_PIN_RX         GPIO_PIN(0,19)
 #define UART_PIN_TX         GPIO_PIN(0,20)
-/** @} */
-
-/**
- * @name    SPI configuration
- * @{
- */
-static const spi_conf_t spi_config[] = {
-    {
-        .dev  = NRF_SPI0,
-        .sclk = 15,
-        .mosi = 13,
-        .miso = 14
-    }
-};
-
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 #ifdef __cplusplus

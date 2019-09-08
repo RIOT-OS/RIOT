@@ -1,0 +1,8 @@
+Test modified LUA module loader
+===============================
+
+This test defines a bunch of dummy modules, both in
+pure lua and in C. The way modules are declares is not "nice"
+in the sense that it is not the way it would be done in a big
+application. The goal is to test the module loader code, and not
+the build tooling.

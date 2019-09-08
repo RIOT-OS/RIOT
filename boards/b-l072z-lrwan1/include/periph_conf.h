@@ -20,36 +20,13 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "l0/cfg_clock_32_16_1.h"
 #include "cfg_rtt_default.h"
+#include "cfg_i2c1_pb8_pb9.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Clock system configuration
- * @{
- */
-#define CLOCK_HSI           (16000000U)         /* internal oscillator */
-#define CLOCK_CORECLOCK     (32000000U)         /* desired core clock frequency */
-#define CLOCK_LSE           (1)                 /* enable low speed external oscillator */
-
-/* configuration of PLL prescaler and multiply values */
-/* CORECLOCK := HSI / CLOCK_PLL_DIV * CLOCK_PLL_MUL */
-#define CLOCK_PLL_DIV       RCC_CFGR_PLLDIV2
-#define CLOCK_PLL_MUL       RCC_CFGR_PLLMUL4
-/* configuration of peripheral bus clock prescalers */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* AHB clock -> 32MHz */
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1     /* APB2 clock -> 32MHz */
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV1     /* APB1 clock -> 32MHz */
-/* configuration of flash access cycles */
-#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY
-
-/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
-/** @} */
 
 /**
  * @name    DMA streams configuration
@@ -197,29 +174,6 @@ static const spi_conf_t spi_config[] = {
 };
 
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
-/** @} */
-
-/**
- * @name I2C configuration
- * @{
- */
-static const i2c_conf_t i2c_config[] = {
-    {
-        .dev            = I2C1,
-        .speed          = I2C_SPEED_NORMAL,
-        .scl_pin        = GPIO_PIN(PORT_B, 8),
-        .sda_pin        = GPIO_PIN(PORT_B, 9),
-        .scl_af         = GPIO_AF4,
-        .sda_af         = GPIO_AF4,
-        .bus            = APB1,
-        .rcc_mask       = RCC_APB1ENR_I2C1EN,
-        .irqn           = I2C1_IRQn
-    }
-};
-
-#define I2C_0_ISR           isr_i2c1
-
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 /**

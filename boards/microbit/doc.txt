@@ -77,4 +77,23 @@ With the JLink firmware, you can now also do in-circuit debugging etc.
 **Note: The current version of the JLink firmware
 (JLink_OB_BBC_microbit_16-07-29.hex) does not support any serial port over USB,
 so you can not use the RIOT shell with this firmware.**
+
+
+### QEMU emulation
+
+The microbit can be partly emulated by QEMU.
+
+This requires at least QEMU 4.0 with ARM platform support enabled.
+
+*NOTE*: not all peripherals are emulated. See
+[this](https://wiki.qemu.org/Features/MicroBit) page for an overview.
+E.g., there's no emulation for the radio, thus applications using that will
+fail.
+
+Use it like this:
+
+    $ cd examples/hello-world
+    $ BOARD=microbit make clean all -j4
+    $ BOARD=microbit make emulate
+
  */

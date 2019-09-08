@@ -5,7 +5,7 @@ PKG_LICENSE=PD
 
 .PHONY: all
 
-all: git-download
+all:
 	"$(MAKE)" -C $(PKG_BUILDDIR)/$(QDSA_IMPL)
 
 include $(RIOTBASE)/pkg/pkg.mk

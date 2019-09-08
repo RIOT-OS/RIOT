@@ -275,6 +275,39 @@ void uart_poweroff(uart_t uart)
     dev(uart)->TASKS_STOPRX = 1;
 }
 
+int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
+              uart_stop_bits_t stop_bits)
+{
+
+    if (stop_bits != UART_STOP_BITS_1 && stop_bits != UART_STOP_BITS_2) {
+        return UART_NOMODE;
+    }
+
+    if (data_bits != UART_DATA_BITS_8) {
+        return UART_NOMODE;
+    }
+
+    if (parity != UART_PARITY_NONE && parity != UART_PARITY_EVEN) {
+        return UART_NOMODE;
+    }
+
+    if (stop_bits == UART_STOP_BITS_2) {
+        dev(uart)->CONFIG |= UARTE_CONFIG_STOP_Msk;
+    }
+    else {
+        dev(uart)->CONFIG &= ~UARTE_CONFIG_STOP_Msk;
+    }
+
+    if (parity == UART_PARITY_EVEN) {
+        dev(uart)->CONFIG |= UARTE_CONFIG_PARITY_Msk;
+    }
+    else {
+        dev(uart)->CONFIG &= ~UARTE_CONFIG_PARITY_Msk;
+    }
+
+    return UART_OK;
+}
+
 static inline void irq_handler(uart_t uart)
 {
     if (dev(uart)->EVENTS_ENDRX == 1) {
@@ -331,6 +364,33 @@ void uart_poweroff(uart_t uart)
     (void)uart;
 
     NRF_UART0->TASKS_SUSPEND;
+}
+
+int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
+              uart_stop_bits_t stop_bits)
+{
+    (void)uart;
+
+    if (stop_bits != UART_STOP_BITS_1) {
+        return UART_NOMODE;
+    }
+
+    if (data_bits != UART_DATA_BITS_8) {
+        return UART_NOMODE;
+    }
+
+    if (parity != UART_PARITY_NONE && parity != UART_PARITY_EVEN) {
+        return UART_NOMODE;
+    }
+
+    if (parity == UART_PARITY_EVEN) {
+        NRF_UART0->CONFIG |= UART_CONFIG_PARITY_Msk;
+    }
+    else {
+        NRF_UART0->CONFIG &= ~UART_CONFIG_PARITY_Msk;
+    }
+
+    return UART_OK;
 }
 
 static inline void irq_handler(uart_t uart)

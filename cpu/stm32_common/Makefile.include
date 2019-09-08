@@ -2,9 +2,6 @@
 FAM = $(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
 export CFLAGS += -DCPU_FAM_$(FAM)
 
-# include common periph module
-USEMODULE += periph_common
-
 # All stm32 families provide pm support
 USEMODULE += pm_layered
 

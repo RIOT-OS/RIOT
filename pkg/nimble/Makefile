@@ -22,7 +22,7 @@ SUBMODS := $(filter nimble_%,$(USEMODULE))
 
 .PHONY: all
 
-all: git-download $(SUBMODS)
+all: $(SUBMODS)
 
 # blue code and RIOT port modules
 nimble_riot_contrib:
@@ -53,6 +53,9 @@ nimble_svc_gap:
 
 nimble_svc_gatt:
 	"$(MAKE)" -C $(PDIR)/nimble/host/services/gatt/src/ -f $(TDIR)/svc.gatt.mk
+
+nimble_svc_ipss:
+	"$(MAKE)" -C $(PDIR)/nimble/host/services/ipss/src/ -f $(TDIR)/svc.ipss.mk
 
 # controller specific modules
 nimble_transport_ram:

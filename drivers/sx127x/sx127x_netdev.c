@@ -223,62 +223,27 @@ static int _init(netdev_t *netdev)
 
 static void _isr(netdev_t *netdev)
 {
-    sx127x_t *dev = (sx127x_t *) netdev;
+    sx127x_t *dev = (sx127x_t *)netdev;
 
-    uint8_t irq = dev->irq;
+    uint8_t interruptReg = sx127x_reg_read(dev, SX127X_REG_LR_IRQFLAGS);
 
-#ifdef SX127X_USE_DIO_MULTI
-    /* if the IRQ is from an OR'd pin check the actual IRQ on the registers */
-    if (irq == SX127X_IRQ_DIO_MULTI) {
-        uint8_t interruptReg = sx127x_reg_read(dev, SX127X_REG_LR_IRQFLAGS);
-
-        switch (interruptReg) {
-            case SX127X_RF_LORA_IRQFLAGS_TXDONE:
-            case SX127X_RF_LORA_IRQFLAGS_RXDONE:
-                irq = SX127X_IRQ_DIO0;
-                break;
-
-            case SX127X_RF_LORA_IRQFLAGS_RXTIMEOUT:
-                irq = SX127X_IRQ_DIO1;
-                break;
-
-            case SX127X_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL:
-                irq = SX127X_IRQ_DIO2;
-                break;
-
-            case SX127X_RF_LORA_IRQFLAGS_CADDETECTED:
-            case SX127X_RF_LORA_IRQFLAGS_CADDONE:
-            case SX127X_RF_LORA_IRQFLAGS_VALIDHEADER:
-                irq = SX127X_IRQ_DIO3;
-                break;
-
-            default:
-                break;
-        }
+    if (interruptReg & (SX127X_RF_LORA_IRQFLAGS_TXDONE |
+                        SX127X_RF_LORA_IRQFLAGS_RXDONE)) {
+        _on_dio0_irq(dev);
     }
-#endif
 
-    dev->irq = 0;
+    if (interruptReg & SX127X_RF_LORA_IRQFLAGS_RXTIMEOUT) {
+        _on_dio1_irq(dev);
+    }
 
-    switch (irq) {
-        case SX127X_IRQ_DIO0:
-            _on_dio0_irq(dev);
-            break;
+    if (interruptReg & SX127X_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL) {
+        _on_dio2_irq(dev);
+    }
 
-        case SX127X_IRQ_DIO1:
-            _on_dio1_irq(dev);
-            break;
-
-        case SX127X_IRQ_DIO2:
-            _on_dio2_irq(dev);
-            break;
-
-        case SX127X_IRQ_DIO3:
-            _on_dio3_irq(dev);
-            break;
-
-        default:
-            break;
+    if (interruptReg & (SX127X_RF_LORA_IRQFLAGS_CADDETECTED |
+                        SX127X_RF_LORA_IRQFLAGS_CADDONE |
+                        SX127X_RF_LORA_IRQFLAGS_VALIDHEADER)) {
+        _on_dio3_irq(dev);
     }
 }
 
@@ -350,6 +315,16 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             assert(max_len >= sizeof(int16_t));
             *((int16_t*) val) = (int16_t)sx127x_get_tx_power(dev);
             return sizeof(int16_t);
+
+        case NETOPT_SYNCWORD:
+            assert(max_len >= sizeof(uint8_t));
+            *((uint8_t*) val) = (uint8_t) sx127x_get_syncword(dev);
+            return sizeof(uint8_t);
+
+        case NETOPT_RANDOM:
+            assert(max_len >= sizeof(uint32_t));
+            *((uint32_t*) val) = (uint32_t) sx127x_random(dev);
+            return sizeof(uint32_t);
 
         case NETOPT_IQ_INVERT:
             assert(max_len >= sizeof(uint8_t));
@@ -450,6 +425,11 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             sx127x_set_rx_single(dev, *((const netopt_enable_t*) val) ? true : false);
             return sizeof(netopt_enable_t);
 
+        case NETOPT_RX_SYMBOL_TIMEOUT:
+            assert(len <= sizeof(uint16_t));
+            sx127x_set_symbol_timeout(dev, *((const uint16_t*) val));
+            return sizeof(uint16_t);
+
         case NETOPT_RX_TIMEOUT:
             assert(len <= sizeof(uint32_t));
             sx127x_set_rx_timeout(dev, *((const uint32_t*) val));
@@ -479,6 +459,11 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             assert(len <= sizeof(uint16_t));
             sx127x_set_preamble_length(dev, *((const uint16_t*) val));
             return sizeof(uint16_t);
+
+        case NETOPT_SYNCWORD:
+            assert(len <= sizeof(uint8_t));
+            sx127x_set_syncword(dev, *((uint8_t*) val));
+            return sizeof(uint8_t);
 
         case NETOPT_IQ_INVERT:
             assert(len <= sizeof(netopt_enable_t));

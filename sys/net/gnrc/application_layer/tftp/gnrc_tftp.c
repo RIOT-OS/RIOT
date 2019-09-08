@@ -36,6 +36,12 @@
 #include <inttypes.h>
 #endif
 
+#if (GNRC_NETIF_NUMOF > 1)
+/* TODO: change API to make link-local address communitcation with
+ * multiple network interfaces */
+#warning "gnrc_tftp does not work reliably with link-local addresses and >1 network interfaces."
+#endif
+
 static kernel_pid_t _tftp_kernel_pid;
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -51,6 +57,7 @@ static kernel_pid_t _tftp_kernel_pid;
 
 #define TFTP_TIMEOUT_MSG            0x4000
 #define TFTP_STOP_SERVER_MSG        0x4001
+#define TFTP_MIN_PACKET_LEN         4
 #define TFTP_DEFAULT_DATA_SIZE      (GNRC_TFTP_MAX_TRANSFER_UNIT    \
                                      + sizeof(tftp_packet_data_t))
 
@@ -233,7 +240,7 @@ static tftp_state _tftp_send_error(tftp_context_t *ctxt, gnrc_pktsnip_t *buf, tf
 static tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len);
 
 /* decode the default TFTP start packet */
-static int _tftp_decode_start(tftp_context_t *ctxt, uint8_t *buf, gnrc_pktsnip_t *outbuf);
+static int _tftp_decode_start(tftp_context_t *ctxt, gnrc_pktsnip_t *inpkt, gnrc_pktsnip_t *outbuf);
 
 /* decode the TFTP option extensions */
 static int _tftp_decode_options(tftp_context_t *ctxt, gnrc_pktsnip_t *buf, uint32_t start);
@@ -405,11 +412,14 @@ int gnrc_tftp_server(tftp_data_cb_t data_cb, tftp_start_cb_t start_cb, tftp_stop
     }
 
     /* context will be initialized when a connection is established */
-    tftp_context_t ctxt;
-    ctxt.data_cb = data_cb;
-    ctxt.start_cb = start_cb;
-    ctxt.stop_cb = stop_cb;
-    ctxt.enable_options = use_options;
+    tftp_context_t ctxt = {
+        .dst_port = GNRC_TFTP_DEFAULT_DST_PORT,
+        .src_port = GNRC_TFTP_DEFAULT_DST_PORT,
+        .data_cb = data_cb,
+        .start_cb = start_cb,
+        .stop_cb = stop_cb,
+        .enable_options = use_options,
+    };
 
     /* validate our arguments */
     assert(data_cb);
@@ -598,6 +608,11 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
     }
 
     gnrc_pktsnip_t *pkt = m->content.ptr;
+    if (pkt->size < TFTP_MIN_PACKET_LEN) {
+       DEBUG("tftp: packet is too short\n");
+       gnrc_pktbuf_release(outbuf);
+       return TS_FAILED;
+    }
 
     gnrc_pktsnip_t *tmp;
     tmp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UDP);
@@ -629,7 +644,7 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
             ctxt->dst_port = byteorder_ntohs(udp->src_port);
             DEBUG("tftp: client's port is %" PRIu16 "\n", ctxt->dst_port);
 
-            int offset = _tftp_decode_start(ctxt, data, outbuf);
+            int offset = _tftp_decode_start(ctxt, pkt, outbuf);
             DEBUG("tftp: offset after decode start = %i\n", offset);
             if (offset < 0) {
                 DEBUG("tftp: there is no data?\n");
@@ -700,6 +715,8 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
 
             if (proc == TS_DUP) {
                 DEBUG("tftp: duplicated data received, acking...\n");
+                ctxt->dst_port = byteorder_ntohs(udp->src_port);
+                DEBUG("tftp: client's port is %" PRIu16 "\n", ctxt->dst_port);
                 _tftp_send_dack(ctxt, outbuf, TO_ACK);
                 return TS_BUSY;
             }
@@ -991,6 +1008,22 @@ tftp_state _tftp_send(gnrc_pktsnip_t *buf, tftp_context_t *ctxt, size_t len)
         return TS_FAILED;
     }
 
+    if (ipv6_addr_is_link_local(&(ctxt->peer))) {
+        gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+        if (netif_hdr == NULL) {
+            DEBUG("tftp: error unable to allocate IPv6 header\n");
+            gnrc_pktbuf_release(ip);
+
+            if (ctxt->stop_cb) {
+                ctxt->stop_cb(TFTP_INTERN_ERROR, "no netif_hdr allocate");
+            }
+
+            return TS_FAILED;
+        }
+        ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = gnrc_netif_iter(NULL)->pid;
+        LL_PREPEND(ip, netif_hdr);
+    }
+
     /* send packet */
     if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL,
                                   ip) == 0) {
@@ -1022,10 +1055,10 @@ bool _tftp_validate_ack(tftp_context_t *ctxt, uint8_t *buf)
     return ctxt->block_nr == byteorder_ntohs(pkt->block_nr);
 }
 
-int _tftp_decode_start(tftp_context_t *ctxt, uint8_t *buf, gnrc_pktsnip_t *outbuf)
+int _tftp_decode_start(tftp_context_t *ctxt, gnrc_pktsnip_t *inpkt, gnrc_pktsnip_t *outbuf)
 {
     /* decode the packet */
-    tftp_header_t *hdr = (tftp_header_t *)buf;
+    tftp_header_t *hdr = (tftp_header_t *)inpkt->data;
 
     /* get the file name and copy terminating byte */
     size_t fnlen = strlen((char *)hdr->data) + 1;
@@ -1047,6 +1080,10 @@ int _tftp_decode_start(tftp_context_t *ctxt, uint8_t *buf, gnrc_pktsnip_t *outbu
 
     /* decode the TFTP transfer mode */
     for (uint32_t idx = 0; idx < ARRAY_LEN(_tftp_modes); ++idx) {
+        if (_tftp_modes[idx].len > (inpkt->size - sizeof(*hdr) - fnlen)) {
+            continue;
+        }
+
         if (memcmp(_tftp_modes[idx].name, str_mode, _tftp_modes[idx].len) == 0) {
             ctxt->mode = (tftp_mode_t)idx;
             return (str_mode + _tftp_modes[idx].len) - (char *)hdr->data;

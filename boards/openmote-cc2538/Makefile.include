@@ -17,9 +17,9 @@ ifeq ($(PROGRAMMER),jlink)
   export TUI := 1
   include $(RIOTMAKE)/tools/jlink.inc.mk
 else
-  HEXFILE = $(BINFILE)
-  export FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
-  export FFLAGS  = -p "$(PORT)" -e -w -v -b 460800 $(HEXFILE)
+  FLASHFILE ?= $(BINFILE)
+  FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
+  FFLAGS  = -p "$(PORT)" -e -w -v -b 460800 $(FLASHFILE)
 endif
 
 # setup serial terminal

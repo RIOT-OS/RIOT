@@ -31,6 +31,10 @@ void led_init(void);
 
 void board_init(void)
 {
+#ifdef CPU_ATMEGA32U4
+    /* disable usb interrupt on Atmega32U4 */
+    PRR1 |= 1<<PRUSB;
+#endif
 
     atmega_set_prescaler(CPU_ATMEGA_CLK_SCALE_INIT);
 

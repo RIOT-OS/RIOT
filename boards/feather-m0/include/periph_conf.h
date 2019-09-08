@@ -200,9 +200,10 @@ static const adc_conf_chan_t adc_channels[] = {
     { GPIO_PIN(PA, 4), ADC_INPUTCTRL_MUXPOS_PIN4 },     /* A3 */
     { GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5 },     /* A4 */
     { GPIO_PIN(PB, 2), ADC_INPUTCTRL_MUXPOS_PIN10 },    /* A5 */
+    { GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS_PIN7 },     /* A7 */
 };
 
-#define ADC_0_CHANNELS                     (6U)
+#define ADC_0_CHANNELS                     (7U)
 #define ADC_NUMOF                          ADC_0_CHANNELS
 /** @} */
 
@@ -265,6 +266,20 @@ static const i2c_conf_t i2c_config[] = {
 #define RTT_MAX_VALUE       (0xffffffff)
 #define RTT_FREQUENCY       (32768U)    /* in Hz. For changes see `rtt.c` */
 #define RTT_RUNSTDBY        (1)         /* Keep RTT running in sleep states */
+/** @} */
+
+/**
+ * @name USB peripheral configuration
+ * @{
+ */
+static const sam0_common_usb_config_t sam_usbdev_config[] = {
+    {
+        .dm     = GPIO_PIN(PA, 24),
+        .dp     = GPIO_PIN(PA, 25),
+        .d_mux  = GPIO_MUX_G,
+        .device = &USB->DEVICE,
+    }
+};
 /** @} */
 
 #ifdef __cplusplus

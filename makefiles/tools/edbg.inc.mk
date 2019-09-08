@@ -5,7 +5,7 @@ FLASHFILE ?= $(BINFILE)
 # Use USB serial number to select device when more than one is connected
 # Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
 #   Usage:
-# export DEBUG_ADAPTER_ID="ATML..."
+# DEBUG_ADAPTER_ID="ATML..."
 # BOARD=<board> make flash
 ifneq (,$(DEBUG_ADAPTER_ID))
   EDBG_ARGS += --serial $(DEBUG_ADAPTER_ID)

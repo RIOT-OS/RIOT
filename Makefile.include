@@ -80,6 +80,9 @@ MAKEOVERRIDES += $(foreach v,$(__DIRECTORY_VARIABLES),$(v)=$($(v)))
 # trailing '/' is important when RIOTPROJECT == CURDIR
 BUILDRELPATH ?= $(patsubst $(RIOTPROJECT)/%,%,$(CURDIR)/)
 
+# include makefiles utils tools
+include $(RIOTMAKE)/utils/variables.mk
+
 # get host operating system
 OS := $(shell uname)
 
@@ -96,6 +99,9 @@ include $(RIOTMAKE)/color.inc.mk
 
 # include concurrency helpers
 include $(RIOTMAKE)/info-nproc.inc.mk
+
+# List of boards variables
+include $(RIOTMAKE)/boards.inc.mk
 
 GLOBAL_GOALS += buildtest info-boards-supported info-boards-features-missing info-buildsizes info-buildsizes-diff
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
@@ -139,6 +145,14 @@ QQ=
 DEVELHELP ?= 0
 ifeq ($(DEVELHELP),1)
   CFLAGS += -DDEVELHELP
+endif
+
+# Override LOG_LEVEL if variable is set and if CFLAGS doesn't already contain
+# a LOG_LEVEL config
+ifdef LOG_LEVEL
+  ifneq (,$(filter -DLOG_LEVEL=%,$(CFLAGS)))
+    CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
+  endif
 endif
 
 # Fail on warnings. Can be overridden by `make WERROR=0`.
@@ -261,7 +275,7 @@ include $(RIOTCPU)/$(CPU)/Makefile.include
 # The check is only done after 'include $(RIOTBOARD)/$(BOARD)/Makefile.include'
 # because we need to have the 'CPU' variable defined
 ifeq (,$(filter $(RIOTCPU)/$(CPU)/Makefile.features,$(MAKEFILE_LIST)))
-  $(error $$(RIOTCPU)/$$(CPU)/Makefile.features must have been included by the board / board common Makefile.features)
+  $(error $$(RIOTCPU)/$$(CPU)/Makefile.features must have been included by the board / board common Makefile.features or Makefile.features)
 endif
 
 # Assume GCC/GNU as supported toolchain if CPU's Makefile.include doesn't
@@ -385,7 +399,7 @@ include $(RIOTMAKE)/bindist.inc.mk
 include $(RIOTMAKE)/modules.inc.mk
 
 
-.PHONY: all link clean flash flash-only term doc debug debug-server reset objdump help info-modules
+.PHONY: all link clean flash flash-only termdeps term doc debug debug-server reset objdump help info-modules
 .PHONY: print-size elffile binfile hexfile flashfile
 .PHONY: ..in-docker-container
 
@@ -526,10 +540,12 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
-define flash-recipe
+# Define flash-recipe with a default value
+define default-flash-recipe
   $(call check_cmd,$(FLASHER),Flash program)
   $(FLASHER) $(FFLAGS)
 endef
+flash-recipe ?= $(default-flash-recipe)
 
 # Do not add dependencies to "flash" directly, use FLASHDEPS, as this is shared
 # with flash-only too
@@ -542,6 +558,8 @@ flash-only: $(FLASHDEPS)
 
 preflash: $(BUILD_BEFORE_FLASH)
 	$(PREFLASHER) $(PREFFLAGS)
+
+termdeps: $(TERMDEPS)
 
 term: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
@@ -572,6 +590,16 @@ reset:
 .PHONY: test test/available
 TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*[^~]),\
                         $(shell test -f $(file) -a -x $(file) && echo $(file)))
+
+# "make test" calls "make term" which would implicitly build it's dependencies,
+# but that increases the time "make test" needs to get ready. That can cause
+# problems ("make term" missing some lines) as terminal startup is not properly
+# sychronized, but depends on a static timeout (TESTRUNNER_START_DELAY).
+# Murdock builds the term dependencies before running "make test" to circumvent
+# this. In order to make local builds behave similar, add the term deps here.
+# See #11762.
+TEST_DEPS += $(TERMDEPS)
+
 test: $(TEST_DEPS)
 	$(Q) for t in $(TESTS); do \
 		$$t || exit 1; \
@@ -620,17 +648,16 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   endif
 
   # Test if all feature requirements were met by the selected board.
-  ifneq (, $(filter-out $(FEATURES_PROVIDED) $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED)))
+  ifneq (,$(FEATURES_MISSING))
     $(shell $(COLOR_ECHO) "$(COLOR_RED)There are unsatisfied feature requirements:$(COLOR_RESET)"\
-                          "$(sort $(filter-out $(FEATURES_PROVIDED) $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED)))" 1>&2)
+                          "$(FEATURES_MISSING)" 1>&2)
     EXPECT_ERRORS := 1
   endif
 
   # Test if any used feature conflict with another one.
-  CONFLICT := $(foreach var,$(FEATURES_CONFLICT),$(if $(filter $(words $(subst :, ,$(var))),$(words $(filter $(FEATURES_USED),$(subst :, ,$(var))))),$(subst :, ,$(var))))
-  ifneq (, $(strip $(CONFLICT)))
+  ifneq (,$(FEATURES_CONFLICTING))
     $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)The following features may conflict:$(COLOR_RESET)"\
-                          "$(COLOR_GREEN)$(sort $(filter $(FEATURES_USED), $(CONFLICT)))$(COLOR_RESET)" 1>&2)
+                          "$(FEATURES_CONFLICTING)" 1>&2)
     ifneq (, $(FEATURES_CONFLICT_MSG))
         $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Rationale: $(COLOR_RESET)$(FEATURES_CONFLICT_MSG)" 1>&2)
     endif

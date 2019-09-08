@@ -99,7 +99,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     if ((rx_cb) && (uart_config[uart].rx_pin != GPIO_UNDEF)) {
         uart_ctx[uart].rx_cb = rx_cb;
         uart_ctx[uart].arg = arg;
-#if defined (CPU_SAML1X)
+#if defined (CPU_SAML1X) || defined (CPU_SAMD5X)
         NVIC_EnableIRQ(SERCOM0_2_IRQn + (sercom_id(dev(uart)) * 4));
 #else
         NVIC_EnableIRQ(SERCOM0_IRQn + sercom_id(dev(uart)));
@@ -139,6 +139,47 @@ void uart_poweroff(uart_t uart)
     dev(uart)->CTRLA.reg &= ~(SERCOM_USART_CTRLA_ENABLE);
     sercom_clk_dis(dev(uart));
 }
+
+#ifdef MODULE_PERIPH_UART_MODECFG
+int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
+              uart_stop_bits_t stop_bits)
+{
+    if (uart >= UART_NUMOF) {
+        return UART_NODEV;
+    }
+
+    if (stop_bits != UART_STOP_BITS_1 && stop_bits != UART_STOP_BITS_2) {
+        return UART_NOMODE;
+    }
+
+    if (parity != UART_PARITY_NONE && parity != UART_PARITY_EVEN &&
+            parity != UART_PARITY_ODD) {
+        return UART_NOMODE;
+    }
+
+    /* Disable UART first to remove write protect */
+    dev(uart)->CTRLA.bit.ENABLE = 0;
+    while (dev(uart)->SYNCBUSY.bit.ENABLE) {}
+
+    dev(uart)->CTRLB.bit.CHSIZE = data_bits;
+
+    if (parity == UART_PARITY_NONE) {
+        dev(uart)->CTRLA.bit.FORM = 0x0;
+    }
+    else {
+        dev(uart)->CTRLA.bit.FORM = 0x1;
+        dev(uart)->CTRLB.bit.PMODE = (parity == UART_PARITY_ODD) ? 1 : 0;
+    }
+
+    dev(uart)->CTRLB.bit.SBMODE = (stop_bits == UART_STOP_BITS_1) ? 0 : 1;
+
+    /* Enable UART again */
+    dev(uart)->CTRLA.bit.ENABLE = 1;
+    while (dev(uart)->SYNCBUSY.bit.ENABLE) {}
+
+    return UART_OK;
+}
+#endif
 
 static inline void irq_handler(unsigned uartnum)
 {

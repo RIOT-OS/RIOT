@@ -65,8 +65,11 @@ void _wait_for_pending_operations(void)
         while (FLASH->SR & FLASH_SR_BSY) {}
     }
 
-    /* Clear 'end of operation' bit in status register */
-    if (FLASH->SR & FLASH_SR_EOP) {
-        FLASH->SR &= ~(FLASH_SR_EOP);
-    }
+    /* Clear 'end of operation' bit in status register, for other STM32 boards
+       this bit is set only if EOPIE is set, which is currently not done */
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L1)
+    FLASH->SR |= FLASH_SR_EOP;
+#endif
 }

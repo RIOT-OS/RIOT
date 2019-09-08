@@ -62,11 +62,17 @@ is_in_list() {
     echo "$haystack" | grep -q -w "$needle"
 }
 
+# grep that doesn't return error on empty input
+_grep() {
+    grep "$@"
+    true
+}
+
 _greplist() {
     if [ $# -eq 0 ]; then
         echo cat
     else
-        echo -n "grep -E ($1"
+        echo -n "_grep -E ($1"
         shift
         for i in $*; do
             echo -n "|$i"
@@ -112,9 +118,14 @@ get_supported_toolchains() {
 
 # given an app dir as parameter, print "$appdir $board:$toolchain" for each
 # supported board and toolchain. Only print for boards in $BOARDS.
+# if extra args are given, they will be prepended to each output line.
 get_app_board_toolchain_pairs() {
     local appdir=$1
     local boards="$(get_supported_boards $appdir)"
+
+    # collect extra arguments into prefix variable
+    shift
+    local prefix="$*"
 
     if [ "$boards" = makefile_broken ]; then
         echo "$appdir makefile_broken"
@@ -125,7 +136,7 @@ get_app_board_toolchain_pairs() {
     do
         for toolchain in $(get_supported_toolchains $appdir $board)
         do
-            echo $appdir $board:$toolchain
+            echo $prefix $appdir $board:$toolchain
         done
     done | $(_greplist $BOARDS)
 }
@@ -134,8 +145,8 @@ get_app_board_toolchain_pairs() {
 get_compile_jobs() {
     get_apps | \
         dwqc ${DWQ_ENV} -s \
-        "$0 get_app_board_toolchain_pairs \${1}" \
-        | xargs '-d\n' -n 1 echo $0 compile
+        ${DWQ_JOBID:+--subjob} \
+        "$0 get_app_board_toolchain_pairs \${1} $0 compile"
 }
 
 print_worker() {
@@ -259,7 +270,12 @@ run_test() {
     print_worker
     echo "-- executing tests for $appdir on $board (compiled with $toolchain toolchain):"
     hook run_test_pre
-    BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only test
+
+    # do flashing and building of termdeps simultaneously
+    BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only termdeps -j2
+
+    # now run the actual test
+    BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir test
     RES=$?
 
     if [ $RES -eq 0 -a -n "$TEST_HASH" ]; then
@@ -287,9 +303,13 @@ static_tests() {
     BUILDTEST_MCU_GROUP=static-tests ./dist/tools/ci/build_and_test.sh
 }
 
-get_jobs() {
+get_non_compile_jobs() {
     [ "$STATIC_TESTS" = "1" ] && \
         echo "$0 static_tests###{ \"jobdir\" : \"exclusive\" }"
+}
+
+get_jobs() {
+    get_non_compile_jobs
     get_compile_jobs
 }
 

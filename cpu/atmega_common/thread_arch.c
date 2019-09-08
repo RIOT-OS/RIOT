@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
+ *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -15,6 +16,7 @@
  * @brief       Implementation of the kernel's architecture dependent thread interface
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
+ * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  *
  * @}
@@ -122,7 +124,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
     stk--;
     *stk = (uint8_t)0x00;
 #endif
-#if defined(RAMPZ)
+#if defined(RAMPZ) && !defined(__AVR_ATmega32U4__)
     stk--;
     *stk = (uint8_t)0x00;
 #endif
@@ -196,7 +198,6 @@ void thread_stack_print(void)
     printf("stack size: %u bytes\n", size);
 }
 
-void cpu_switch_context_exit(void) __attribute__((naked));
 void cpu_switch_context_exit(void)
 {
     sched_run();
@@ -212,7 +213,6 @@ extern char *__brkval;
 /**
  * @brief Set the MCU into Thread-Mode and load the initial task from the stack and run it
  */
-void NORETURN __enter_thread_mode(void) __attribute__((naked));
 void NORETURN __enter_thread_mode(void)
 {
     irq_enable();
@@ -264,7 +264,7 @@ __attribute__((always_inline)) static inline void __context_save(void)
         "in   __tmp_reg__, __SREG__          \n\t"
         "cli                                 \n\t"
         "push __tmp_reg__                    \n\t"
-#if defined(RAMPZ)
+#if defined(RAMPZ) && !defined(__AVR_ATmega32U4__)
         "in     __tmp_reg__, __RAMPZ__       \n\t"
         "push   __tmp_reg__                  \n\t"
 #endif
@@ -356,7 +356,8 @@ __attribute__((always_inline)) static inline void __context_restore(void)
         "pop    __tmp_reg__                  \n\t"
         "out    0x3c, __tmp_reg__            \n\t"
 #endif
-#if defined(RAMPZ)
+
+#if defined(RAMPZ) && !defined(__AVR_ATmega32U4__)
         "pop    __tmp_reg__                  \n\t"
         "out    __RAMPZ__, __tmp_reg__       \n\t"
 #endif

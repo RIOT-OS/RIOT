@@ -5,6 +5,13 @@ OLD_USEPKG := $(sort $(USEPKG))
 # include board dependencies
 -include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 
+# Transitional conditional include until all boards define 'CPU' in
+# Makefile.features
+ifneq (,$(CPU))
+  # include cpu dependencies
+  -include $(RIOTCPU)/$(CPU)/Makefile.dep
+endif
+
 # include external modules dependencies
 # processed before RIOT ones to be evaluated before the 'default' rules.
 -include $(EXTERNAL_MODULE_DIRS:%=%/Makefile.dep)
@@ -72,6 +79,7 @@ ifneq (,$(filter uhcpc,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
+  FEATURES_REQUIRED += ble_nordic_softdevice
   USEMODULE += softdevice_handler
   USEMODULE += ble_common
   USEMODULE += ble_6lowpan
@@ -398,6 +406,16 @@ ifneq (,$(filter stdio_rtt,$(USEMODULE)))
 endif
 
 ifneq (,$(filter shell,$(USEMODULE)))
+  USEMODULE += stdin
+endif
+
+ifneq (,$(filter stdio_ethos,$(USEMODULE)))
+  USEMODULE += ethos
+  USEMODULE += stdin
+  USEMODULE += stdio_uart
+endif
+
+ifneq (,$(filter stdin,$(USEMODULE)))
   ifneq (,$(filter stdio_uart,$(USEMODULE)))
     USEMODULE += stdio_uart_rx
   endif
@@ -795,7 +813,7 @@ ifneq (,$(filter skald_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter skald,$(USEMODULE)))
-  FEATURES_REQUIRED += radio_ble
+  FEATURES_REQUIRED += radio_nrfble
   USEMODULE += xtimer
   USEMODULE += random
 endif
@@ -832,6 +850,20 @@ ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
   USEPKG += tlsf
 endif
 
+ifneq (,$(filter usbus,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_usbdev
+  USEMODULE += core_thread_flags
+  USEMODULE += event
+endif
+
+ifneq (,$(filter usbus_cdc_ecm,$(USEMODULE)))
+  USEMODULE += iolist
+  USEMODULE += fmt
+  USEMODULE += usbus
+  USEMODULE += netdev_eth
+  USEMODULE += luid
+endif
+
 ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += random
@@ -856,6 +888,15 @@ endif
 ifneq (,$(filter periph_gpio_irq,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
 endif
+
+ifneq (,$(filter devfs_hwrng,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_hwrng
+endif
+
+ifneq (,$(filter devfs_random,$(USEMODULE)))
+  USEMODULE += random
+endif
+
 # always select gpio (until explicit dependencies are sorted out)
 FEATURES_OPTIONAL += periph_gpio
 
@@ -865,17 +906,18 @@ FEATURES_OPTIONAL += periph_pm
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
-# remove required features from optional features
-FEATURES_OPTIONAL := $(filter-out $(FEATURES_REQUIRED),$(FEATURES_OPTIONAL))
-
-# add all optional but provided features to the list of used features
-FEATURES_USED := $(sort $(FEATURES_REQUIRED) $(filter $(FEATURES_OPTIONAL),$(FEATURES_PROVIDED)))
 
 # all periph features correspond to a periph submodule
+# FEATURES_USED is defined in Makefile.features
 USEMODULE += $(filter periph_%,$(FEATURES_USED))
 
 # select cpu_check_address pseudomodule if the corresponding feature is used
 USEMODULE += $(filter cpu_check_address, $(FEATURES_USED))
+
+# include periph_common if any periph_* driver is used
+ifneq (,$(filter periph_%, $(USEMODULE)))
+  USEMODULE += periph_common
+endif
 
 # recursively catch transitive dependencies
 USEMODULE := $(sort $(USEMODULE))

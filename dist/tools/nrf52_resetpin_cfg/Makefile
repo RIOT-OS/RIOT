@@ -5,6 +5,9 @@ APPLICATION = nrf52_resetpin_cfg
 BOARD ?= nrf52dk
 RIOTBASE ?= $(CURDIR)/../../..
 
+# This application uses getchar and thus expects input from stdio
+USEMODULE += stdin
+
 # the RESET_PIN environment variable allows for manually specifying the reset
 # pin that is programmed. Below this Makefile already contains the specific pins
 # for some known platforms

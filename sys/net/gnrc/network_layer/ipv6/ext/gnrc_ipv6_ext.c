@@ -109,17 +109,19 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
             case PROTNUM_IPV6_EXT_ESP:
             case PROTNUM_IPV6_EXT_MOB: {
                 ipv6_ext_t *ext_hdr;
+                uint8_t nh;
 
                 DEBUG("ipv6: handle extension header (protnum = %u)\n",
                       *protnum);
                 ext_hdr = pkt->data;
+                nh = ext_hdr->nh;
                 if ((pkt = _demux(pkt, *protnum)) == NULL) {
                     DEBUG("ipv6: packet was consumed by extension header "
                           "handling\n");
                     return NULL;
                 }
-                *protnum = ext_hdr->nh;
-                if (_duplicate_hopopt(pkt, *protnum)) {
+                *protnum = nh;
+                if (_duplicate_hopopt(pkt, nh)) {
                     return NULL;
                 }
                 break;
@@ -293,7 +295,7 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_build(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *next,
         }
     }
 
-    snip = gnrc_pktbuf_add(next, NULL, size, GNRC_NETTYPE_IPV6);
+    snip = gnrc_pktbuf_add(next, NULL, size, GNRC_NETTYPE_IPV6_EXT);
 
     if (snip == NULL) {
         return NULL;

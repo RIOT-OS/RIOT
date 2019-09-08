@@ -28,6 +28,7 @@
 #include "thread_flags.h"
 
 #include "net/emcute.h"
+#include "net/mqttsn.h"
 #include "emcute_internal.h"
 
 #define ENABLE_DEBUG        (0)
@@ -490,7 +491,8 @@ int emcute_willupd_msg(const void *data, size_t len)
 
 void emcute_run(uint16_t port, const char *id)
 {
-    assert(strlen(id) < EMCUTE_ID_MAXLEN);
+    assert(strlen(id) >= MQTTSN_CLI_ID_MINLEN &&
+           strlen(id) <= MQTTSN_CLI_ID_MAXLEN);
 
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
     sock_udp_ep_t remote;

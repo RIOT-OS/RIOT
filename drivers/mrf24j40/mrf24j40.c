@@ -74,13 +74,14 @@ void mrf24j40_reset(mrf24j40_t *dev)
     DEBUG("mrf24j40_reset(): reset complete.\n");
 }
 
-bool mrf24j40_cca(mrf24j40_t *dev)
+bool mrf24j40_cca(mrf24j40_t *dev, int8_t *rssi)
 {
     uint8_t tmp_ccaedth;
     uint8_t status;
     uint8_t tmp_rssi;
 
     mrf24j40_assert_awake(dev);
+    mrf24j40_enable_lna(dev);
 
     /* trigger CCA measurment */
     /* take a look onto datasheet chapter 3.6.1 */
@@ -93,6 +94,12 @@ bool mrf24j40_cca(mrf24j40_t *dev)
     /* return according to measurement */
     tmp_ccaedth = mrf24j40_reg_read_short(dev, MRF24J40_REG_CCAEDTH);       /* Energy detection threshold */
     tmp_rssi = mrf24j40_reg_read_long(dev, MRF24J40_REG_RSSI);
+    if (rssi != NULL) {
+        *rssi = mrf24j40_dbm_from_reg(tmp_rssi);
+    }
+
+    mrf24j40_enable_auto_pa_lna(dev);
+
     if (tmp_rssi < tmp_ccaedth) {
         /* channel is clear */
         return true;            /* idle */

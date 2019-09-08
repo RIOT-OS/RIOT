@@ -86,6 +86,39 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Selected GATT service UUIDs (16-bit)
+ *
+ * @see https://www.bluetooth.com/specifications/gatt/services
+ * @{
+ */
+#define BLE_GATT_SVC_GAP                    (0x1800)    /**< GAP service */
+#define BLE_GATT_SVC_GATT                   (0x1801)    /**< GATT service */
+#define BLE_GATT_SVC_DEVINFO                (0x180a)    /**< device info */
+#define BLE_GATT_SVC_HRS                    (0x180d)    /**< heart rate service */
+#define BLE_GATT_SVC_BAS                    (0x180f)    /**< battery service */
+#define BLE_GATT_SVC_IPSS                   (0x1820)    /**< IP protocol support */
+/* add more on demand */
+/** @} */
+
+/**
+ * @name    Selected GATT characteristic UUIDs (16-bit)
+ *
+ * @see https://www.bluetooth.com/specifications/gatt/characteristics/
+ * @{
+ */
+#define BLE_GATT_CHAR_BATTERY_LEVEL         (0x2a19)    /**< battery level */
+#define BLE_GATT_CHAR_SYSTEM_ID             (0x2a23)    /**< system ID */
+#define BLE_GATT_CHAR_MODEL_NUMBER_STR      (0x2a24)    /**< model number */
+#define BLE_GATT_CHAR_SERIAL_NUMBER_STR     (0x2a25)    /**< serial number */
+#define BLE_GATT_CHAR_FW_REV_STR            (0x2a26)    /**< firmware revision */
+#define BLE_GATT_CHAR_HW_REV_STR            (0x2a27)    /**< hardware revision */
+#define BLE_GATT_CHAR_SW_REV_STR            (0x2a28)    /**< software revision */
+#define BLE_GATT_CHAR_MANUFACTURER_NAME     (0x2a29)    /**< manufacturer name */
+#define BLE_GATT_CHAR_HEART_RATE_MEASURE    (0x2a37)    /**< heart rate measurement */
+#define BLE_GATT_CHAR_BODY_SENSE_LOC        (0x2a38)    /**< body sensor location */
+/** @} */
+
+/**
  * @name    Characteristic format types (8-bit)
  *
  * @see https://www.bluetooth.com/specifications/assigned-numbers/format-types

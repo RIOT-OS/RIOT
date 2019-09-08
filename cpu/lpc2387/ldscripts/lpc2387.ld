@@ -155,19 +155,6 @@ SECTIONS
     } >ram
 
     /*
-     * collect all uninitialized sections that go into RAM
-     */
-    .noinit (NOLOAD) :
-    {
-        __noinit_start = .;
-        PROVIDE(__fiq_handler = .);
-        *(.fiq)
-        *(.noinit)
-    }  > ram
-    . = ALIGN(4);
-    __noinit_end = .;
-
-    /*
      * collect all zero initialized sections that go into RAM
      */
     .bss (NOLOAD) :
@@ -213,6 +200,18 @@ SECTIONS
     . = ALIGN(4);                       /* ensure data is aligned so relocation can use 4-byte operations */
     _edata = .;                         /* define a global symbol marking the end of the .data section  */
 
+    /*
+     * collect all uninitialized sections that go into RAM
+     */
+    .noinit (NOLOAD) :
+    {
+        __noinit_start = .;
+        PROVIDE(__fiq_handler = .);
+        *(.fiq)
+        *(.noinit)
+    }  > ram
+    . = ALIGN(4);
+    __noinit_end = .;
 
     /*
      * Exception frames (newer linker versions generate these but they use of

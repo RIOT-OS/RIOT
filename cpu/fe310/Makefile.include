@@ -5,7 +5,6 @@ USEMODULE += newlib_syscalls_fe310
 USEMODULE += sifive_drivers_fe310
 
 USEMODULE += periph
-USEMODULE += periph_common
 USEMODULE += periph_pm
 
 CFLAGS += -Wno-pedantic

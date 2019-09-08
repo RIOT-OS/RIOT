@@ -6,7 +6,8 @@ CPU_MODEL = mk20dx256vlh7
 TEENSY_LOADER = $(RIOTTOOLS)/teensy-loader-cli/teensy_loader
 FLASHER = $(TEENSY_LOADER)
 
-FFLAGS ?= --mcu=mk20dx256 $(HEXFILE)
+FLASHFILE ?= $(HEXFILE)
+FFLAGS ?= --mcu=mk20dx256 $(FLASHFILE)
 
 ifeq ($(TEENSY_LOADER),$(FLASHER))
   FLASHDEPS += $(TEENSY_LOADER)

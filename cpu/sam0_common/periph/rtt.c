@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 #include "periph/rtt.h"
-#include "board.h"
+#include "periph_conf.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -56,48 +56,31 @@ static inline void _rtt_reset(void)
 #ifdef CPU_SAMD21
 static void _rtt_clock_setup(void)
 {
-    /* RTC uses External 32,768KHz Oscillator because OSC32K isn't accurate
-     * enough (p1075/1138). Also keep running in standby. */
-    SYSCTRL->XOSC32K.reg =  SYSCTRL_XOSC32K_ONDEMAND |
-                            SYSCTRL_XOSC32K_EN32K |
-                            SYSCTRL_XOSC32K_XTALEN |
-                            SYSCTRL_XOSC32K_STARTUP(6) |
-#if RTT_RUNSTDBY
-                            SYSCTRL_XOSC32K_RUNSTDBY |
-#endif
-                            SYSCTRL_XOSC32K_ENABLE;
-
-    /* Setup clock GCLK2 with divider 1 */
-    GCLK->GENDIV.reg = GCLK_GENDIV_ID(2) | GCLK_GENDIV_DIV(1);
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
-
-    /* Enable GCLK2 with XOSC32K as source. Use divider without modification
-     * and keep running in standby. */
-    GCLK->GENCTRL.reg = GCLK_GENCTRL_ID(2) |
-                        GCLK_GENCTRL_GENEN |
-#if RTT_RUNSTDBY
-                        GCLK_GENCTRL_RUNSTDBY |
-#endif
-                        GCLK_GENCTRL_SRC_XOSC32K;
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
-
-    /* Connect GCLK2 to RTC */
-    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_GEN_GCLK2 |
-                        GCLK_CLKCTRL_CLKEN |
-                        GCLK_CLKCTRL_ID(RTC_GCLK_ID);
+    /* Setup clock GCLK2 with OSC32K */
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(2) | GCLK_CLKCTRL_ID_RTC;
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 }
-/* !CPU_SAMD21 */
 #else
 static void _rtt_clock_setup(void)
 {
-    /* Turn on power manager for RTC */
-    MCLK->APBAMASK.reg |= MCLK_APBAMASK_OSC32KCTRL;
+    /* RTC source clock is external oscillator at 32kHz */
+#if EXTERNAL_OSC32_SOURCE
+    OSC32KCTRL->XOSC32K.bit.EN32K = 1;
+    OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_XOSC32K;
 
-    /* set clock source */
+    /* RTC uses internal 32,768KHz Oscillator */
+#elif INTERNAL_OSC32_SOURCE
+    OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_OSC32K;
+
+    /* RTC uses Ultra Low Power internal 32,768KHz Oscillator */
+#elif ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE
     OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_ULP32K;
-}
+
+#else
+#error "No clock source for RTT selected. "
 #endif
+}
+#endif /* !CPU_SAMD21 - Clock Setup */
 
 void rtt_init(void)
 {

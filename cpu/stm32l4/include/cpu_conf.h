@@ -37,6 +37,8 @@
 #include "vendor/stm32l433xx.h"
 #elif defined(CPU_MODEL_STM32L452RE)
 #include "vendor/stm32l452xx.h"
+#elif defined(CPU_MODEL_STM32L4R5ZI)
+#include "vendor/stm32l4r5xx.h"
 #endif
 
 #ifdef __cplusplus
@@ -52,9 +54,12 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (83U)
 #elif defined(CPU_MODEL_STM32L496ZG)
 #define CPU_IRQ_NUMOF                   (91U)
+#elif defined(CPU_MODEL_STM32L4R5ZI)
+#define CPU_IRQ_NUMOF                   (95U)
 #else
 #define CPU_IRQ_NUMOF                   (82U)
 #endif
+#define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
 /**
@@ -63,13 +68,8 @@ extern "C" {
  */
 #define FLASHPAGE_SIZE      (2048U)
 
-#if defined(CPU_MODEL_STM32L432KC) || defined(CPU_MODEL_STM32L433RC)
-#define FLASHPAGE_NUMOF            (128U)
-#elif defined(CPU_MODEL_STM32L452RE)
-#define FLASHPAGE_NUMOF            (256U)
-#else
-#define FLASHPAGE_NUMOF            (512U)
-#endif
+#define FLASHPAGE_NUMOF     (STM32_FLASHSIZE / FLASHPAGE_SIZE)
+
 /* The minimum block size which can be written is 8B. However, the erase
  * block is always FLASHPAGE_SIZE.
  */
