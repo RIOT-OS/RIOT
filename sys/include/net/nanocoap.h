@@ -101,10 +101,13 @@ extern "C" {
  * @name    Nanocoap specific CoAP method flags used in coap_handlers array
  * @{
  */
-#define COAP_GET                (0x1)
-#define COAP_POST               (0x2)
-#define COAP_PUT                (0x4)
-#define COAP_DELETE             (0x8)
+#define COAP_GET                (0x01)
+#define COAP_POST               (0x02)
+#define COAP_PUT                (0x04)
+#define COAP_DELETE             (0x08)
+#define COAP_FETCH              (0x10)
+#define COAP_PATCH              (0x20)
+#define COAP_IPATCH             (0x40)
 #define COAP_MATCH_SUBTREE      (0x8000) /**< Path is considered as a prefix
                                               when matching */
 /** @} */

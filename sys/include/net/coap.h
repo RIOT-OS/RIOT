@@ -65,6 +65,9 @@ extern "C" {
 #define COAP_METHOD_POST        (2)
 #define COAP_METHOD_PUT         (3)
 #define COAP_METHOD_DELETE      (4)
+#define COAP_METHOD_FETCH       (5)
+#define COAP_METHOD_PATCH       (6)
+#define COAP_METHOD_IPATCH      (7)
 /** @} */
 
 /**
@@ -104,9 +107,11 @@ extern "C" {
 #define COAP_CODE_METHOD_NOT_ALLOWED         ((4 << 5) | 5)
 #define COAP_CODE_NOT_ACCEPTABLE             ((4 << 5) | 6)
 #define COAP_CODE_REQUEST_ENTITY_INCOMPLETE  ((4 << 5) | 8)
+#define COAP_CODE_CONFLICT                   ((4 << 5) | 9)
 #define COAP_CODE_PRECONDITION_FAILED        ((4 << 5) | 12)
 #define COAP_CODE_REQUEST_ENTITY_TOO_LARGE   ((4 << 5) | 13)
 #define COAP_CODE_UNSUPPORTED_CONTENT_FORMAT ((4 << 5) | 15)
+#define COAP_CODE_UNPROCESSABLE_ENTITY       ((4 << 5) | 22)
 /** @} */
 
 /**
@@ -140,13 +145,23 @@ extern "C" {
  * @anchor  net_coap_format
  * @{
  */
-#define COAP_FORMAT_TEXT         (0)
-#define COAP_FORMAT_LINK        (40)
-#define COAP_FORMAT_XML         (41)
-#define COAP_FORMAT_OCTET       (42)
-#define COAP_FORMAT_EXI         (47)
-#define COAP_FORMAT_JSON        (50)
-#define COAP_FORMAT_CBOR        (60)
+#define COAP_FORMAT_TEXT                      (0)
+#define COAP_FORMAT_LINK                     (40)
+#define COAP_FORMAT_XML                      (41)
+#define COAP_FORMAT_OCTET                    (42)
+#define COAP_FORMAT_EXI                      (47)
+#define COAP_FORMAT_JSON                     (50)
+#define COAP_FORMAT_JSON_PATCH_JSON          (51)
+#define COAP_FORMAT_MERGE_PATCH_JSON         (52)
+#define COAP_FORMAT_CBOR                     (60)
+#define COAP_FORMAT_SENML_JSON              (110)
+#define COAP_FORMAT_SENSML_JSON             (111)
+#define COAP_FORMAT_SENML_CBOR              (112)
+#define COAP_FORMAT_SENSML_CBOR             (113)
+#define COAP_FORMAT_SENML_EXI               (114)
+#define COAP_FORMAT_SENSML_EXI              (115)
+#define COAP_FORMAT_SENML_XML               (310)
+#define COAP_FORMAT_SENSML_XML              (311)
 /** @} */
 
 /**
