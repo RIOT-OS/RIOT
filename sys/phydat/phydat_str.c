@@ -104,6 +104,7 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_COULOMB:  return "C";
         case UNIT_GPM3:     return "g/m^3";
         case UNIT_F:        return "F";
+        case UNIT_PH:       return "pH";
         default:            return "";
     }
 }

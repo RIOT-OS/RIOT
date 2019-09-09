@@ -479,6 +479,10 @@ void auto_init(void)
     extern void auto_init_mpu9150(void);
     auto_init_mpu9150();
 #endif
+#ifdef MODULE_PH_OEM
+    extern void auto_init_ph_oem(void);
+    auto_init_ph_oem();
+#endif
 #ifdef MODULE_PIR
     extern void auto_init_pir(void);
     auto_init_pir();
