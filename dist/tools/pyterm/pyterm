@@ -665,6 +665,14 @@ class SerCmd(cmd.Cmd):
             else:
                 output += c
 
+            # Hack to correctly handle reset ANSI escape code in the stream
+            # When the reset escape sequence is detected, it is written and
+            # flushed immediately to stdout
+            if output == '\033[0m':
+                sys.stdout.write(output)
+                sys.stdout.flush()
+                output = ""
+
             crreceived = c == '\r'
             nlreceived = c == '\n'
 
