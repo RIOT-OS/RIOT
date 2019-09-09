@@ -4,14 +4,14 @@ Date: Tue, 23 Jul 2013 21:08:31 +0200
 Subject: [PATCH 02/10] port tests to riot
 
 ---
- tests/common/.Makefile.template     | 37 +++++++++++++++++++++++++++++++++++++
+ tests/common/.Makefile.template     | 39 +++++++++++++++++++++++++++++++++++++
  tests/common/bin/.gitignore         |  0
- tests/common/generate_makefiles.sh  |  8 ++++++++
+ tests/common/generate_makefiles.sh  |  9 ++++++++
  tests/common/test_common_avl.c      | 10 +++++-----
  tests/cunit/Makefile                |  3 +++
- tests/rfc5444/.Makefile.template    | 30 ++++++++++++++++++++++++++++++
+ tests/rfc5444/.Makefile.template    | 32 ++++++++++++++++++++++++++++++
  tests/rfc5444/bin/.gitignore        |  0
- tests/rfc5444/generate_makefiles.sh |  8 ++++++++
+ tests/rfc5444/generate_makefiles.sh |  9 ++++++++
  8 files changed, 91 insertions(+), 5 deletions(-)
  create mode 100644 tests/common/.Makefile.template
  create mode 100644 tests/common/bin/.gitignore
@@ -26,7 +26,7 @@ new file mode 100644
 index 0000000..afbaf0f
 --- /dev/null
 +++ b/tests/common/.Makefile.template
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,39 @@
 +####
 +#### Sample Makefile for building apps with the RIOT OS
 +####
@@ -43,9 +43,10 @@ index 0000000..afbaf0f
 +export BOARD ?= native
 +
 +# this has to be the absolute path of the RIOT-base dir
-+export RIOTBASE =$(CURDIR)/../../../../../..
++export RIOTBASE =$(CURDIR)/../../../../../../../../..
 +
 +CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
++WERROR = 0
 +
 +## Modules to include.
 +
@@ -54,6 +55,7 @@ index 0000000..afbaf0f
 +	USEMODULE += oonf_regex
 +endif
 +USEMODULE += oonf_common
++USEMODULE += gnrc_sock
 +
 +ifneq (,$(findstring daemonize,$(APPLICATION)))
 +	error daemonize is not supported on RIOT
@@ -72,9 +74,10 @@ new file mode 100755
 index 0000000..8bf9faa
 --- /dev/null
 +++ b/tests/common/generate_makefiles.sh
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,9 @@
 +#!/bin/bash
 +
++cd "$( dirname "${BASH_SOURCE[0]}" )"
 +for file in *.c; do
 +	test=$(basename $file .c)
 +	mkdir -p $test
@@ -122,7 +125,7 @@ new file mode 100644
 index 0000000..e472545
 --- /dev/null
 +++ b/tests/rfc5444/.Makefile.template
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,32 @@
 +####
 +#### Sample Makefile for building apps with the RIOT OS
 +####
@@ -139,14 +142,16 @@ index 0000000..e472545
 +export BOARD ?= native
 +
 +# this has to be the absolute path of the RIOT-base dir
-+export RIOTBASE =$(CURDIR)/../../../../../..
++export RIOTBASE =$(CURDIR)/../../../../../../../../..
 +
 +CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
++WERROR = 0
 +
 +## Modules to include.
 +USEMODULE += oonf_cunit
 +USEMODULE += oonf_common
 +USEMODULE += oonf_rfc5444
++USEMODULE += gnrc_sock
 +
 +INCLUDES += -I$(CURDIR)/../..
 +
@@ -161,9 +166,10 @@ new file mode 100755
 index 0000000..8bf9faa
 --- /dev/null
 +++ b/tests/rfc5444/generate_makefiles.sh
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,9 @@
 +#!/bin/bash
 +
++cd "$( dirname "${BASH_SOURCE[0]}" )"
 +for file in *.c; do
 +	test=$(basename $file .c)
 +	mkdir -p $test
