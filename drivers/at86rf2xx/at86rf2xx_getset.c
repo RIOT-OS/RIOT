@@ -216,14 +216,89 @@ void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page)
 uint8_t at86rf2xx_get_phy_mode(at86rf2xx_t *dev)
 {
 #ifdef MODULE_AT86RF212B
-    switch (dev->page) {
-        case  0: return IEEE802154_PHY_BPSK;
-        case  2: return IEEE802154_PHY_OQPSK;
-        default: return IEEE802154_PHY_DISABLED;
+    uint8_t ctrl2;
+    ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    if (ctrl2 & AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK) {
+        return IEEE802154_PHY_OQPSK;
+    } else {
+        return IEEE802154_PHY_BPSK;
     }
 #else
     (void) dev;
     return IEEE802154_PHY_OQPSK;
+#endif
+}
+
+int at86rf2xx_set_rate(at86rf2xx_t *dev, uint8_t rate)
+{
+    uint8_t ctrl2;
+
+    if (rate > 3) {
+        return -ERANGE;
+    }
+
+    ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    ctrl2 &= AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE;
+    ctrl2 |= rate;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, ctrl2);
+
+    return 0;
+}
+
+uint8_t at86rf2xx_get_rate(at86rf2xx_t *dev)
+{
+    uint8_t rate;
+
+    rate = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    rate &= AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE;
+
+    return rate | IEEE802154_OQPSK_FLAG_LEGACY;
+}
+
+uint16_t at86rf2xx_get_chips(at86rf2xx_t *dev)
+{
+#ifdef MODULE_AT86RF212B
+    uint8_t ctrl2;
+    ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    ctrl2 &= AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE | AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK;
+    switch (ctrl2) {
+    /* O-QPSK, 1000 kChip/s */
+    case (AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE | AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK):
+        return 1000;
+    /* BPSK, 600 kChip/s */
+    case (AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE):
+        return 600;
+    /* O-QPSK, 400 kChip/s */
+    case (AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK):
+        return 400;
+    /* BPSK, 300 kChip/s */
+    default:
+        return 300;
+    }
+#else
+    (void) dev;
+    /* device only supports 2000 kChip/s */
+    return 2000;
+#endif
+}
+
+int at86rf2xx_set_chips(at86rf2xx_t *dev, uint16_t chips)
+{
+#ifdef MODULE_AT86RF212B
+    uint8_t ctrl2;
+    ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    ctrl2 &= ~AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE;
+
+    /* device only supports two chip rates - select the nearest one */
+    if (chips > 500) {
+        ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE;
+    }
+
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, ctrl2);
+
+    return 0;
+#else
+    return -ENOTSUP;
 #endif
 }
 

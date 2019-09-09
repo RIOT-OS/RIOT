@@ -349,11 +349,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
                 !!(dev->flags & AT86RF2XX_OPT_CSMA);
             return sizeof(netopt_enable_t);
 
-        case NETOPT_IEEE802154_PHY:
-            assert(max_len >= sizeof(int8_t));
-            *(uint8_t *)val = at86rf2xx_get_phy_mode(dev);
-            return sizeof(uint8_t);
-
 /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
 #if AT86RF2XX_HAVE_RETRIES
         case NETOPT_TX_RETRIES_NEEDED:
@@ -425,6 +420,21 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             *((netopt_enable_t *)val) = (tmp & AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK) ? false : true;
             res = sizeof(netopt_enable_t);
             break;
+
+        case NETOPT_IEEE802154_PHY:
+            assert(max_len >= sizeof(int8_t));
+            *(uint8_t *)val = at86rf2xx_get_phy_mode(dev);
+            return sizeof(uint8_t);
+
+        case NETOPT_OQPSK_RATE:
+            assert(max_len >= sizeof(int8_t));
+            *(uint8_t *)val = at86rf2xx_get_rate(dev);
+            return sizeof(uint8_t);
+
+        case NETOPT_OQPSK_CHIPS:
+            assert(max_len >= sizeof(int16_t));
+            *(uint16_t *)val = at86rf2xx_get_chips(dev);
+            return sizeof(uint16_t);
 
         default:
             res = -ENOTSUP;
@@ -598,6 +608,24 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             assert(len <= sizeof(int8_t));
             at86rf2xx_set_cca_threshold(dev, *((const int8_t *)val));
             res = sizeof(int8_t);
+            break;
+
+        case NETOPT_OQPSK_CHIPS:
+            assert(len <= sizeof(int16_t));
+            if (at86rf2xx_set_chips(dev, *((const uint16_t *)val)) < 0) {
+                res = -EINVAL;
+            } else {
+                res = sizeof(uint16_t);
+            }
+            break;
+
+        case NETOPT_OQPSK_RATE:
+            assert(len <= sizeof(int8_t));
+            if (at86rf2xx_set_rate(dev, *((const uint8_t *)val)) < 0) {
+                res = -EINVAL;
+            } else {
+                res = sizeof(uint8_t);
+            }
             break;
 
         default:
