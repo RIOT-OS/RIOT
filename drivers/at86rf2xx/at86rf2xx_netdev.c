@@ -451,6 +451,20 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             }
             break;
 
+#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+
+        case NETOPT_IEEE802154_PHY:
+            assert(max_len >= sizeof(int8_t));
+            *(uint8_t *)val = at86rf2xx_get_phy_mode(dev);
+            return sizeof(uint8_t);
+
+        case NETOPT_OQPSK_RATE:
+            assert(max_len >= sizeof(int8_t));
+            *(uint8_t *)val = at86rf2xx_get_rate(dev);
+            return sizeof(uint8_t);
+
+#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
+
         default:
             res = -ENOTSUP;
             break;
@@ -637,6 +651,19 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             at86rf2xx_set_cca_threshold(dev, *((const int8_t *)val));
             res = sizeof(int8_t);
             break;
+
+#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+
+        case NETOPT_OQPSK_RATE:
+            assert(len <= sizeof(int8_t));
+            if (at86rf2xx_set_rate(dev, *((const uint8_t *)val)) < 0) {
+                res = -EINVAL;
+            } else {
+                res = sizeof(uint8_t);
+            }
+            break;
+
+#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
 
         default:
             break;

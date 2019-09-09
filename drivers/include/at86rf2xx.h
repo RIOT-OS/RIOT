@@ -375,6 +375,39 @@ uint8_t at86rf2xx_get_page(const at86rf2xx_t *dev);
 void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page);
 
 /**
+ * @brief   Get the PHY mode of the given device
+ *
+ * @param[in,out] dev       device to read from
+ * @return                  the currently set phy mode
+ */
+uint8_t at86rf2xx_get_phy_mode(at86rf2xx_t *dev);
+
+/**
+ * @brief   Get the current O-QPSK rate mode of the PHY
+ *
+ * @param[in] dev           device to read from
+ *
+ * @return                  the currenty set rate mode
+ */
+uint8_t at86rf2xx_get_rate(at86rf2xx_t *dev);
+
+/**
+ * @brief   Set the current O-QPSK rate mode of the PHY
+ *          rate modes > 0 are proprietary.
+ *
+ *          rate 0:   250 kbit/s (IEEE mode)
+ *          rate 1:   500 kbit/s
+ *          rate 2:  1000 kbit/s (compatible with AT86RF215)
+ *          rate 3:  2000 kbit/s
+ *
+ * @param[in] dev           device to write to
+ * @param[in] rate          the selected data rate mode (0-3)
+ *
+ * @return                  0 on success, otherwise error value
+ */
+int at86rf2xx_set_rate(at86rf2xx_t *dev, uint8_t rate);
+
+/**
  * @brief   Get the configured PAN ID of the given device
  *
  * @param[in] dev           device to read from
