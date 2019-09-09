@@ -26,6 +26,7 @@
 #include "nrf_clock.h"
 #include "periph_conf.h"
 #include "periph/init.h"
+#include "stdio_base.h"
 
 /* FTPAN helper functions */
 static bool ftpan_32(void);
@@ -82,6 +83,9 @@ void cpu_init(void)
 
     /* enable wake up on events for __WFE CPU sleep */
     SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
+
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
 
     /* trigger static peripheral initialization */
     periph_init();

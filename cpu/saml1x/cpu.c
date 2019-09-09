@@ -22,6 +22,7 @@
 #include "periph/init.h"
 #include "periph_conf.h"
 #include "board.h"
+#include "stdio_base.h"
 
 #ifdef CPU_FAM_SAML11
 #define _NVMCTRL NVMCTRL_SEC
@@ -114,6 +115,9 @@ void cpu_init(void)
 
     /* Setup GCLK generators */
     _gclk_setup(0, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
+
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
 
     /* trigger static peripheral initialization */
     periph_init();

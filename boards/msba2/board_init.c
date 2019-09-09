@@ -27,6 +27,7 @@
 #include "board.h"
 #include "cpu.h"
 #include "periph/init.h"
+#include "stdio_base.h"
 
 void bl_init_ports(void)
 {
@@ -42,6 +43,11 @@ void bl_init_ports(void)
 
     LED0_OFF;
     LED0_OFF;
+
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
+
+    /* trigger static peripheral initialization */
     periph_init();
 }
 
