@@ -81,6 +81,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              samd21-xpro \
                              samr21-xpro \
                              samr30-xpro \
+                             samr34-xpro \
                              sensebox_samd21 \
                              slstk3401a \
                              sltb001a \
