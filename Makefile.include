@@ -259,7 +259,7 @@ LAZYSPONGE_FLAGS ?= $(if $(filter 1,$(QUIET)),,--verbose)
 ifeq (, $(APPLICATION))
     $(error An application name must be specified as APPLICATION.)
 endif
-ifneq (0,$(shell test -d $(RIOTBOARD)/$(BOARD); echo $$?))
+ifneq (0,$(shell test -d $(BOARDSDIR)/$(BOARD); echo $$?))
     $(error The specified board $(BOARD) does not exist.)
 endif
 
@@ -317,8 +317,8 @@ include $(RIOTMAKE)/pseudomodules.inc.mk
 include $(RIOTMAKE)/defaultmodules.inc.mk
 
 # Include Board and CPU configuration
-INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/$(BOARD)/include))
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
+INCLUDES += $(addprefix -I,$(wildcard $(BOARDSDIR)/$(BOARD)/include))
+include $(BOARDSDIR)/$(BOARD)/Makefile.include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 

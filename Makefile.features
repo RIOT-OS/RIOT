@@ -5,7 +5,11 @@
 # This makes them available when setting features based on CPU_MODEL in the cpu
 # Makefile.features and also during dependency resolution.
 
-include $(RIOTBOARD)/$(BOARD)/Makefile.features
+# Transition:
+#   Moving 'CPU/CPU_MODEL' to Makefile.features is an ongoing work and may not
+#   reflect the state of all boards for the moment.
+
+include $(BOARDSDIR)/$(BOARD)/Makefile.features
 
 # Sanity check
 ifeq (,$(CPU))

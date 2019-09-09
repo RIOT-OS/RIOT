@@ -1,6 +1,6 @@
 MODULE = $(APPLICATION_MODULE)
 
-DIRS += $(RIOTCPU)/$(CPU) $(RIOTBOARD)/$(BOARD)
+DIRS += $(RIOTCPU)/$(CPU) $(BOARDSDIR)/$(BOARD)
 DIRS += $(RIOTBASE)/core $(RIOTBASE)/drivers $(RIOTBASE)/sys
 
 # For regular modules, adding files to BLOBS to their Makefile is sufficient to
