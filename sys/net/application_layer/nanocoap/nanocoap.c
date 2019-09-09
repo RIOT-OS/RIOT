@@ -361,7 +361,7 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
         return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
     }
 
-    unsigned method_flag = coap_method2flag(coap_get_code_detail(pkt));
+    coap_method_flags_t method_flag = coap_method2flag(coap_get_code_detail(pkt));
 
     uint8_t uri[NANOCOAP_URI_MAX];
     if (coap_get_uri_path(pkt, uri) <= 0) {

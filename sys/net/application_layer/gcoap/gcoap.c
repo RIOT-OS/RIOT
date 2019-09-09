@@ -389,7 +389,7 @@ static int _find_resource(coap_pkt_t *pdu, const coap_resource_t **resource_ptr,
                                             gcoap_listener_t **listener_ptr)
 {
     int ret = GCOAP_RESOURCE_NO_PATH;
-    unsigned method_flag = coap_method2flag(coap_get_code_detail(pdu));
+    coap_method_flags_t method_flag = coap_method2flag(coap_get_code_detail(pdu));
 
     /* Find path for CoAP msg among listener resources and execute callback. */
     gcoap_listener_t *listener = _coap_state.listeners;

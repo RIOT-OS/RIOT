@@ -99,6 +99,7 @@ extern "C" {
 
 /**
  * @name    Nanocoap specific CoAP method flags used in coap_handlers array
+ * @anchor  nanocoap_method_flags
  * @{
  */
 #define COAP_GET                (0x01)
@@ -201,11 +202,18 @@ typedef struct {
 typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context);
 
 /**
+ * @brief   Method flag type
+ *
+ * Must be large enough to contain all @ref nanocoap_method_flags "CoAP method flags"
+ */
+typedef uint16_t coap_method_flags_t;
+
+/**
  * @brief   Type for CoAP resource entry
  */
 typedef struct {
     const char *path;               /**< URI path of resource               */
-    unsigned methods;               /**< OR'ed methods this resource allows */
+    coap_method_flags_t methods;    /**< OR'ed methods this resource allows */
     coap_handler_t handler;         /**< ptr to resource handler            */
     void *context;                  /**< ptr to user defined context data   */
 } coap_resource_t;
@@ -1188,7 +1196,7 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
  *
  * @returns     bit field corresponding to the given request method
  */
-static inline unsigned coap_method2flag(unsigned code)
+static inline coap_method_flags_t coap_method2flag(unsigned code)
 {
     return (1 << (code - 1));
 }
