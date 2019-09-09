@@ -59,6 +59,12 @@ __DIRECTORY_VARIABLES := \
   DLCACHE_DIR \
   #
 
+# In GNU make command line is supposed to override the value set in makefile
+# These variables can be overridden even when set from command line
+__OVERRIDE_DIRECTORY_VARIABLES := $(__DIRECTORY_VARIABLES)
+# Use absolute paths in recursive "make" even if overridden on command line.
+MAKEOVERRIDES += $(foreach v,$(__OVERRIDE_DIRECTORY_VARIABLES),$(v)=$($(v)))
+
 # Make all paths absolute.
 override RIOTBASE       := $(abspath $(RIOTBASE))
 override RIOTCPU        := $(abspath $(RIOTCPU))
@@ -81,9 +87,6 @@ ifneq (, $(filter-out 1, $(foreach v,$(__DIRECTORY_VARIABLES),$(words $($(v)))))
   $(info Related variables = $(__DIRECTORY_VARIABLES))
   $(error Make sure no path override is empty or contains spaces!)
 endif
-
-# Use absolute paths in recusive "make" even if overriden on command line.
-MAKEOVERRIDES += $(foreach v,$(__DIRECTORY_VARIABLES),$(v)=$($(v)))
 
 # Path to the current directory relative to RIOTPROJECT
 # trailing '/' is important when RIOTPROJECT == CURDIR
