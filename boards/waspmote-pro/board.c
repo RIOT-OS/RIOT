@@ -58,10 +58,6 @@ void board_init(void)
 #endif
 #endif
 
-#ifdef MODULE_AVR_LIBC_EXTRA
-    atmega_stdio_init();
-#endif
-
     cpu_init();
     led_init();
     irq_enable();
