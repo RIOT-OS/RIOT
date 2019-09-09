@@ -24,6 +24,7 @@ include $(RIOT_MAKEFILES_GLOBAL_PRE)
 # set undefined variables
 RIOTBASE       ?= $(_riotbase)
 RIOTCPU        ?= $(RIOTBASE)/cpu
+# Deprecated to set RIOTBOARD, use BOARDSDIR
 RIOTBOARD      ?= $(RIOTBASE)/boards
 BOARDSDIR      ?= $(RIOTBOARD)
 RIOTMAKE       ?= $(RIOTBASE)/makefiles
@@ -46,7 +47,6 @@ DLCACHE_DIR    ?= $(RIOTBASE)/.dlcache
 __DIRECTORY_VARIABLES := \
   RIOTBASE \
   RIOTCPU \
-  RIOTBOARD \
   RIOTMAKE \
   RIOTPKG \
   RIOTTOOLS \
@@ -66,10 +66,16 @@ __OVERRIDE_DIRECTORY_VARIABLES := $(__DIRECTORY_VARIABLES)
 # Use absolute paths in recursive "make" even if overridden on command line.
 MAKEOVERRIDES += $(foreach v,$(__OVERRIDE_DIRECTORY_VARIABLES),$(v)=$($(v)))
 
+# Deprecation of configuring 'RIOTBOARD'
+ifneq ($(abspath $(RIOTBASE)/boards),$(abspath $(RIOTBOARD)))
+  $(warning overriding RIOTBOARD for external boards is deprecated, please use an absolute BOARDSDIR)
+  override RIOTBOARD      := $(abspath $(RIOTBOARD))
+  __DIRECTORY_VARIABLES += RIOTBOARD
+endif
+
 # Make all paths absolute.
 override RIOTBASE       := $(abspath $(RIOTBASE))
 override RIOTCPU        := $(abspath $(RIOTCPU))
-override RIOTBOARD      := $(abspath $(RIOTBOARD))
 override RIOTMAKE       := $(abspath $(RIOTMAKE))
 override RIOTPKG        := $(abspath $(RIOTPKG))
 override RIOTTOOLS      := $(abspath $(RIOTTOOLS))

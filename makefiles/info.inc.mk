@@ -35,7 +35,6 @@ info-build:
 	@echo 'MCU:     $(MCU)'
 	@echo ''
 	@echo 'RIOTBASE:  $(RIOTBASE)'
-	@echo 'RIOTBOARD: $(RIOTBOARD)'
 	@echo 'BOARDSDIR: $(BOARDSDIR)'
 	@echo 'RIOTCPU:   $(RIOTCPU)'
 	@echo 'RIOTPKG:   $(RIOTPKG)'
