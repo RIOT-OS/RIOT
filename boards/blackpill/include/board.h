@@ -67,7 +67,7 @@ void board_init(void);
  * @{
  */
 #define XTIMER_WIDTH        (16)
-#define XTIMER_BACKOFF      5
+#define XTIMER_BACKOFF      (19)
 /** @} */
 
 #ifdef __cplusplus
