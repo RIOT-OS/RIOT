@@ -25,6 +25,7 @@ include $(RIOT_MAKEFILES_GLOBAL_PRE)
 RIOTBASE       ?= $(_riotbase)
 RIOTCPU        ?= $(RIOTBASE)/cpu
 RIOTBOARD      ?= $(RIOTBASE)/boards
+BOARDSDIR      ?= $(RIOTBOARD)
 RIOTMAKE       ?= $(RIOTBASE)/makefiles
 RIOTPKG        ?= $(RIOTBASE)/pkg
 RIOTTOOLS      ?= $(RIOTBASE)/dist/tools
@@ -80,6 +81,13 @@ override BINDIRBASE     := $(abspath $(BINDIRBASE))
 override BINDIR         := $(abspath $(BINDIR))
 override PKGDIRBASE     := $(abspath $(PKGDIRBASE))
 override DLCACHE_DIR    := $(abspath $(DLCACHE_DIR))
+
+# Keep standard make behavior for new variables
+__DIRECTORY_VARIABLES += \
+  BOARDSDIR \
+  #
+
+BOARDSDIR               := $(abspath $(BOARDSDIR))
 
 # Ensure that all directories are set and don't contain spaces.
 ifneq (, $(filter-out 1, $(foreach v,$(__DIRECTORY_VARIABLES),$(words $($(v))))))
