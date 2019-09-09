@@ -213,6 +213,20 @@ void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page)
 #endif
 }
 
+uint8_t at86rf2xx_get_phy_mode(at86rf2xx_t *dev)
+{
+#ifdef MODULE_AT86RF212B
+    switch (dev->page) {
+        case  0: return IEEE802154_PHY_BPSK;
+        case  2: return IEEE802154_PHY_OQPSK;
+        default: return IEEE802154_PHY_DISABLED;
+    }
+#else
+    (void) dev;
+    return IEEE802154_PHY_OQPSK;
+#endif
+}
+
 uint16_t at86rf2xx_get_pan(const at86rf2xx_t *dev)
 {
     return dev->netdev.pan;

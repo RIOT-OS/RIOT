@@ -303,6 +303,14 @@ uint8_t at86rf2xx_get_page(const at86rf2xx_t *dev);
 void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page);
 
 /**
+ * @brief   Get the PHY mode of the given device
+ *
+ * @param[in,out] dev       device to read from
+ * @return                  the currently set phy mode
+ */
+uint8_t at86rf2xx_get_phy_mode(at86rf2xx_t *dev);
+
+/**
  * @brief   Get the configured PAN ID of the given device
  *
  * @param[in] dev           device to read from

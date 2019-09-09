@@ -349,6 +349,11 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
                 !!(dev->flags & AT86RF2XX_OPT_CSMA);
             return sizeof(netopt_enable_t);
 
+        case NETOPT_IEEE802154_PHY:
+            assert(max_len >= sizeof(int8_t));
+            *(uint8_t *)val = at86rf2xx_get_phy_mode(dev);
+            return sizeof(uint8_t);
+
 /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
 #if AT86RF2XX_HAVE_RETRIES
         case NETOPT_TX_RETRIES_NEEDED:
