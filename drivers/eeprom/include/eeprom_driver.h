@@ -36,8 +36,7 @@ extern "C" {
  * @brief   Driver interface for EEPROM devices
  *
  * This interface must be implemented by every EEPROM device driver. The
- * function pointers in @ref eeprom_driver_t::set and
- * @ref eeprom_driver_t::erase can be `NULL`.
+ * function pointer in @ref eeprom_driver_t::erase can be `NULL`.
  */
 typedef struct {
     /**
@@ -93,8 +92,9 @@ typedef struct {
      * content of the EEPROM is undefined.
      *
      * This function is optional to implement by the driver. If the function
-     * pointer is `NULL`, a fallback implementation that calls
-     * @ref eeprom_driver_t::set is used instead.
+     * pointer is `NULL`, a fallback implementation that calls @ref eeprom_set
+     * is used instead. This will fill the EEPROM with
+     * @ref eeprom_driver_t::clear_byte.
      */
     int (*erase)(void *handle);
     /**
