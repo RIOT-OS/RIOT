@@ -42,6 +42,15 @@
 #define CONN_CAN_ISOTP_TIMEOUT_TX_CONF (10 * US_PER_SEC)
 #endif
 
+static inline int try_put_msg(conn_can_isotp_t *conn, msg_t *msg)
+{
+#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+    return mbox_try_put(&conn->master->mbox, msg);
+#else
+    return mbox_try_put(&conn->mbox, msg);
+#endif
+}
+
 static inline void put_msg(conn_can_isotp_t *conn, msg_t *msg)
 {
 #ifdef MODULE_CONN_CAN_ISOTP_MULTI
@@ -57,6 +66,15 @@ static inline void get_msg(conn_can_isotp_t *conn, msg_t *msg)
     mbox_get(&conn->master->mbox, msg);
 #else
     mbox_get(&conn->mbox, msg);
+#endif
+}
+
+static inline int try_get_msg(conn_can_isotp_t *conn, msg_t *msg)
+{
+#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+    return mbox_try_get(&conn->master->mbox, msg);
+#else
+    return mbox_try_get(&conn->mbox, msg);
 #endif
 }
 
@@ -141,7 +159,7 @@ static void _tx_conf_timeout(void *arg)
     msg.type = _TIMEOUT_TX_MSG_TYPE;
     msg.content.value = _TIMEOUT_MSG_VALUE;
 
-    put_msg(conn, &msg);
+    try_put_msg(conn, &msg);
 }
 
 int conn_can_isotp_send(conn_can_isotp_t *conn, const void *buf, size_t size, int flags)
@@ -205,7 +223,7 @@ static void _rx_timeout(void *arg)
     msg.type = _TIMEOUT_RX_MSG_TYPE;
     msg.content.value = _TIMEOUT_MSG_VALUE;
 
-    put_msg(conn, &msg);
+    try_put_msg(conn, &msg);
 }
 
 int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t timeout)
@@ -348,7 +366,7 @@ int conn_can_isotp_close(conn_can_isotp_t *conn)
         }
     }
 #else
-    while (mbox_try_get(&conn->mbox, &msg)) {
+    while (try_get_msg(conn, &msg)) {
         if (msg.type == CAN_MSG_RX_INDICATION) {
             DEBUG("conn_can_isotp_close: freeing %p\n", msg.content.ptr);
             isotp_free_rx(msg.content.ptr);
@@ -358,7 +376,7 @@ int conn_can_isotp_close(conn_can_isotp_t *conn)
 
     msg.type = _CLOSE_CONN_MSG_TYPE;
     msg.content.ptr = conn;
-    put_msg(conn, &msg);
+    try_put_msg(conn, &msg);
 
     conn->bound = 0;
 
