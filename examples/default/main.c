@@ -34,6 +34,9 @@
 #include "net/gnrc.h"
 #endif
 
+/* I'm too lazy to write a proper header. */
+extern void secure_login(void);
+
 int main(void)
 {
 #ifdef MODULE_NETIF
@@ -45,7 +48,12 @@ int main(void)
     (void) puts("Welcome to RIOT!");
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+
+    while (1) {
+        secure_login();
+        shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+        puts("\r\nExiting shell");
+    }
 
     return 0;
 }
