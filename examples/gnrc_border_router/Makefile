@@ -116,10 +116,4 @@ host-tools:
 	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)
 
 # Set a custom channel if needed
-ifneq (,$(filter at86rf212b,$(USEMODULE)))    # radio is IEEE 802.15.4 sub-GHz
-  DEFAULT_CHANNEL ?= 5
-  CFLAGS += -DIEEE802154_DEFAULT_SUBGHZ_CHANNEL=$(DEFAULT_CHANNEL)
-else                                          # radio is IEEE 802.15.4 2.4 GHz
-  DEFAULT_CHANNEL ?= 26
-  CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
-endif
+include $(RIOTMAKE)/default-channel.inc.mk

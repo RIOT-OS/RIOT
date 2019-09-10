@@ -44,11 +44,16 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
 }
 
 int cc110x_apply_config(cc110x_t *dev, const cc110x_config_t *conf,
-                        const cc110x_chanmap_t *chanmap)
+                        const cc110x_chanmap_t *chanmap, uint8_t channel)
 {
     DEBUG("[cc110x] Applying new configuration\n");
     if (!dev || !chanmap) {
         return -EINVAL;
+    }
+
+    if ((channel >= CC110X_MAX_CHANNELS) || (chanmap->map[channel] == 0xff)) {
+        /* Channel out of range or not supported in current channel map */
+        return -ERANGE;
     }
 
     if (cc110x_acquire(dev) != SPI_OK) {
@@ -72,11 +77,10 @@ int cc110x_apply_config(cc110x_t *dev, const cc110x_config_t *conf,
         cc110x_write(dev, CC110X_REG_DEVIATN, conf->deviatn);
     }
 
-    /* Set current channel to zero, as the new map might not support the current
-     * virtual channel number. cc110x_full_calibration() will tune in that
-     * channel after calibration.
+    /* We only need to store the channel, cc110x_full_calibration() will tune it
+     * in after calibration.
      */
-    dev->channel = 0;
+    dev->channel = channel;
     dev->channels = chanmap;
     cc110x_release(dev);
 

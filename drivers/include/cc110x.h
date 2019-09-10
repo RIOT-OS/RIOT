@@ -240,6 +240,13 @@ extern "C" {
 #define CC110X_DEFAULT_PROTOCOL         (GNRC_NETTYPE_UNDEF)
 #endif
 
+#ifndef CC110X_DEFAULT_CHANNEL
+/**
+ * @brief The default channel to set up after initializing the device
+ */
+#define CC110X_DEFAULT_CHANNEL      (0U)
+#endif
+
 /**
  * @brief   The state of the CC1100/CC1101 transceiver
  *
@@ -558,10 +565,12 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params);
  * @param   dev     Device descriptor of the transceiver
  * @param   conf    Configuration to apply or `NULL` to only change channel map
  * @param   chanmap Channel map to apply (must be compatible with @p conf)
+ * @param   channel The channel to tune in after applying the config
  *
  * @retval  0       Success
  * @retval  -EINVAL Called with invalid argument
  * @retval  -EIO    Communication with the transceiver failed
+ * @retval  -ERANGE Channel out of range or not supported by channel map
  *
  * @pre     The application developer checked in the documentation that the
  *          channel map in @p chanmap is compatible with the configuration in
@@ -574,7 +583,7 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params);
  * @ref cc110x_full_calibration is called to update it.
  */
 int cc110x_apply_config(cc110x_t *dev, const cc110x_config_t *conf,
-                        const cc110x_chanmap_t *chanmap);
+                        const cc110x_chanmap_t *chanmap, uint8_t channel);
 
 /**
  * @brief   Perform a calibration of the frequency generator for each supported
