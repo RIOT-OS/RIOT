@@ -8,4 +8,5 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # reset tool configuration
-RESET ?= esptool.py --before default_reset run
+RESET ?= esptool.py
+RESET_FLAGS ?= --port $(PORT) --before default_reset run

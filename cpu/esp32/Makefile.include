@@ -175,7 +175,7 @@ PREFFLAGS += ls -l $(FLASHFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partition
 
 PREFFLAGS += python $(RIOTCPU)/$(CPU)/gen_esp32part.py --disable-sha256sum
 PREFFLAGS += --verify $(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
-FLASHDEPS  = preflash
+FLASHDEPS += preflash
 
 # flasher configuration
 ifeq ($(QEMU), 1)

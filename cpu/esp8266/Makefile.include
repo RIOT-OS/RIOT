@@ -141,10 +141,10 @@ LINKFLAGS += -nostdlib -lgcc -u ets_run -Wl,-gc-sections # -Wl,--print-gc-sectio
 FLASHFILE ?= $(ELFFILE)
 
 # configure preflasher to convert .elf to .bin before flashing
-FLASH_SIZE = -fs 8m
+FLASH_SIZE = -fs 1MB
 PREFLASHER ?= esptool.py
 PREFFLAGS  ?= elf2image $(FLASH_SIZE) $(FLASHFILE)
-FLASHDEPS  ?= preflash
+FLASHDEPS  += preflash
 
 # flasher configuration
 ifeq ($(QEMU), 1)
