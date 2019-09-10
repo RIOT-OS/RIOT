@@ -39,9 +39,13 @@ endif
 CFLAGS += -fno-common
 
 # Compress debug info. This saves approximately 50% of disk usage.
-# It has no effect if debugging information is not emitted, so it can be left
-# on unconditionally.
-OPTIONAL_CFLAGS += -gz
+# A bug in ccache <= 3.7.3 makes ccache needlessly include the CWD in a
+# compilation hash when using "-gz" even if no debug symbols are generated,
+# thus disable for CI builds.
+# See https://github.com/ccache/ccache/issues/464 for more info.
+ifneq (1, $(RIOT_CI_BUILD))
+  OPTIONAL_CFLAGS += -gz
+endif
 
 # Enable all default warnings and all extra warnings
 CFLAGS += -Wall -Wextra
