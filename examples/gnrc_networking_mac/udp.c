@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015-17 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +14,7 @@
  * @brief       Demonstrating the sending and receiving of UDP data
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Martine Lenders <m.lenders@fu-berlin.de>
  *
  * @}
  */
@@ -38,6 +39,7 @@ static gnrc_netreg_entry_t server = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX
 static void send(char *addr_str, char *port_str, char *data, unsigned int num,
                  unsigned int delay)
 {
+    gnrc_netif_t *netif;
     int iface;
     uint16_t port;
     ipv6_addr_t addr;
@@ -45,7 +47,10 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
     /* get interface, if available */
     iface = ipv6_addr_split_iface(addr_str);
     if ((iface < 0) && (gnrc_netif_numof() == 1)) {
-        iface = gnrc_netif_iter(NULL)->pid;
+        netif = gnrc_netif_iter(NULL);
+    }
+    else {
+        netif = gnrc_netif_get_by_pid(iface);
     }
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
@@ -53,7 +58,7 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
         return;
     }
     /* parse port */
-    port = (uint16_t)atoi(port_str);
+    port = atoi(port_str);
     if (port == 0) {
         puts("Error: unable to parse destination port");
         return;
@@ -85,11 +90,11 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
             return;
         }
         /* add netif header, if interface was given */
-        if (iface > 0) {
-            gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+        if (netif != NULL) {
+            gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
 
-            ((gnrc_netif_hdr_t *)netif->data)->if_pid = (kernel_pid_t)iface;
-            LL_PREPEND(ip, netif);
+            gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
+            LL_PREPEND(ip, netif_hdr);
         }
         /* send packet */
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {
@@ -116,7 +121,7 @@ static void start_server(char *port_str)
         return;
     }
     /* parse port */
-    port = (uint16_t)atoi(port_str);
+    port = atoi(port_str);
     if (port == 0) {
         puts("Error: invalid port specified");
         return;
@@ -157,10 +162,10 @@ int udp_cmd(int argc, char **argv)
             return 1;
         }
         if (argc > 5) {
-            num = (uint32_t)atoi(argv[5]);
+            num = atoi(argv[5]);
         }
         if (argc > 6) {
-            delay = (uint32_t)atoi(argv[6]);
+            delay = atoi(argv[6]);
         }
         send(argv[2], argv[3], argv[4], num, delay);
     }

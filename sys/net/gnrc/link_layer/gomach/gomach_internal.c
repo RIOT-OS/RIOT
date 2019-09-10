@@ -172,7 +172,7 @@ static int _parse_packet(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
     gnrc_netif_hdr_t *netif_hdr = netif_snip->data;
     netif_hdr->lqi = netif->mac.prot.gomach.rx_pkt_lqi;
     netif_hdr->rssi = netif->mac.prot.gomach.rx_pkt_rssi;
-    netif_hdr->if_pid = netif->pid;
+    gnrc_netif_hdr_set_netif(netif_hdr, netif);
     pkt->type = state->proto;
     gnrc_pktbuf_remove_snip(pkt, pkt->next);
     LL_APPEND(pkt, netif_snip);

@@ -162,7 +162,7 @@ static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netif_t *dev)
     }
     netif->lqi = 0;
     netif->rssi = 0;
-    netif->if_pid = dev->pid;
+    gnrc_netif_hdr_set_netif(netif, dev);
     pkt_snip->type = nrfmin->proto;
 
     /* finally: remove the nrfmin header and append the netif header */

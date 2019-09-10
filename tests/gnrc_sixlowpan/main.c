@@ -141,7 +141,7 @@ static void _send_packet(void)
 
     gnrc_netif_hdr_init(&(netif_hdr.netif_hdr), 8, 8);
 
-    netif_hdr.netif_hdr.if_pid = netif->pid;
+    gnrc_netif_hdr_set_netif(&netif_hdr.netif_hdr, netif);
 
     uint8_t data1[] = {
         /* 6LoWPAN Header */

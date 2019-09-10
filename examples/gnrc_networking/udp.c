@@ -39,6 +39,7 @@ static gnrc_netreg_entry_t server = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX
 static void send(char *addr_str, char *port_str, char *data, unsigned int num,
                  unsigned int delay)
 {
+    gnrc_netif_t *netif;
     int iface;
     uint16_t port;
     ipv6_addr_t addr;
@@ -46,7 +47,10 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
     /* get interface, if available */
     iface = ipv6_addr_split_iface(addr_str);
     if ((iface < 0) && (gnrc_netif_numof() == 1)) {
-        iface = gnrc_netif_iter(NULL)->pid;
+        netif = gnrc_netif_iter(NULL);
+    }
+    else {
+        netif = gnrc_netif_get_by_pid(iface);
     }
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
@@ -86,11 +90,11 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
             return;
         }
         /* add netif header, if interface was given */
-        if (iface > 0) {
-            gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+        if (netif != NULL) {
+            gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
 
-            ((gnrc_netif_hdr_t *)netif->data)->if_pid = (kernel_pid_t)iface;
-            LL_PREPEND(ip, netif);
+            gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
+            LL_PREPEND(ip, netif_hdr);
         }
         /* send packet */
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {

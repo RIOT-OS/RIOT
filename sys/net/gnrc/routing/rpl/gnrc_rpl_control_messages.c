@@ -189,7 +189,6 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ip
             gnrc_pktbuf_release(pkt);
             return;
         }
-        iface = netif->pid;
     }
     else {
         netif = gnrc_netif_get_by_pid(iface);
@@ -225,7 +224,7 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ip
         gnrc_pktbuf_release(pkt);
         return;
     }
-    ((gnrc_netif_hdr_t *)hdr->data)->if_pid = iface;
+    gnrc_netif_hdr_set_netif(hdr->data, netif);
     LL_PREPEND(pkt, hdr);
 
     if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {

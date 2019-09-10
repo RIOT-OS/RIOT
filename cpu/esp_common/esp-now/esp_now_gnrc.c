@@ -173,7 +173,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         goto err;
     }
 
-    ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = netif->pid;
+    gnrc_netif_hdr_set_netif((gnrc_netif_hdr_t *)netif_hdr->data, netif);
 
     uint8_t *mac = mac_hdr->data;
     DEBUG("gnrc_esp_now: received packet from %02x:%02x:%02x:%02x:%02x:%02x of length %u\n",
