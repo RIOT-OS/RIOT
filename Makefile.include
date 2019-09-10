@@ -146,8 +146,10 @@ include $(RIOTMAKE)/boards.inc.mk
 
 # Debug targets for build system migration
 include $(RIOTMAKE)/dependencies_debug.inc.mk
+# save env variable BOARD for global targets
+ENV_BOARD := $(BOARD)
 
-GLOBAL_GOALS += buildtest buildtest-indocker info-boards-supported info-boards-features-missing info-buildsizes info-buildsizes-diff
+GLOBAL_GOALS += buildtest buildtest-indocker info-boards-supported info-boards-features-missing info-buildsizes info-buildsizes-diff is-board-supported
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
   BOARD=none
 endif

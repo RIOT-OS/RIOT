@@ -109,6 +109,11 @@ info-boards-supported:
 info-boards-features-missing:
 	@for f in $(BOARDS_FEATURES_MISSING); do echo $${f}; done | column -t
 
+IS_BOARD_SUPPORTED ?= $(filter $(ENV_BOARD), $(BOARDS))
+.PHONY: is-board-supported
+is-board-supported:
+	$(Q)test -n "$(IS_BOARD_SUPPORTED)"
+
 # Reset BOARDSDIR so unchanged for makefiles included after, for now only
 # needed for buildtests.inc.mk
 BOARDSDIR := $(BOARDSDIR_GLOBAL)
