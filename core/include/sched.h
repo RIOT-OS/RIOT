@@ -224,14 +224,16 @@ extern schedstat_t sched_pidlist[KERNEL_PID_LAST + 1];
  *          caller thread
  */
 void init_schedstatistics(void);
+#endif /* MODULE_SCHEDSTATISTICS */
 
+#ifdef MODULE_SCHED_CB
 /**
  *  @brief  Register a callback that will be called on every scheduler run
  *
  *  @param[in] callback The callback functions the will be called
  */
 void sched_register_cb(void (*callback)(kernel_pid_t, kernel_pid_t));
-#endif /* MODULE_SCHEDSTATISTICS */
+#endif /* MODULE_SCHED_CB */
 
 #ifdef __cplusplus
 }

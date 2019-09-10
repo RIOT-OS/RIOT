@@ -74,8 +74,10 @@ FORCE_USED_SECTION
 const uint8_t _tcb_name_offset = offsetof(thread_t, name);
 #endif
 
-#ifdef MODULE_SCHEDSTATISTICS
+#ifdef MODULE_SCHED_CB
 static void (*sched_cb) (kernel_pid_t active_thread, kernel_pid_t next_thread) = NULL;
+#endif
+#ifdef MODULE_SCHEDSTATISTICS
 schedstat_t sched_pidlist[KERNEL_PID_LAST + 1];
 #endif
 
@@ -112,7 +114,7 @@ int __attribute__((used)) sched_run(void)
 #endif
     }
 
-#ifdef MODULE_SCHEDSTATISTICS
+#ifdef MODULE_SCHED_CB
     if (sched_cb) {
         /* Use `sched_active_pid` instead of `active_thread` since after `sched_task_exit()` is
            called `active_thread` is set to NULL while `sched_active_thread` isn't updated until
@@ -204,12 +206,14 @@ NORETURN void sched_task_exit(void)
     cpu_switch_context_exit();
 }
 
-#ifdef MODULE_SCHEDSTATISTICS
+#ifdef MODULE_SCHED_CB
 void sched_register_cb(void (*callback)(kernel_pid_t, kernel_pid_t))
 {
     sched_cb = callback;
 }
+#endif
 
+#ifdef MODULE_SCHEDSTATISTICS
 void sched_statistics_cb(kernel_pid_t active_thread, kernel_pid_t next_thread)
 {
     uint32_t now = xtimer_now().ticks32;
