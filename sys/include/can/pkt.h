@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 OTA keys S.A.
+ * Copyright (C) 2016-2018 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -26,8 +26,6 @@ extern "C" {
 
 #include <stdatomic.h>
 
-#include "net/gnrc/pktbuf.h"
-
 #include "can/common.h"
 #include "can/can.h"
 #include "msg.h"
@@ -45,7 +43,6 @@ typedef struct {
     atomic_uint ref_count;   /**< Reference counter (for rx frames) */
     int handle;              /**< handle (for tx frames */
     struct can_frame frame;  /**< CAN Frame */
-    gnrc_pktsnip_t *snip;    /**< Pointer to the allocated snip */
 } can_pkt_t;
 
 /**

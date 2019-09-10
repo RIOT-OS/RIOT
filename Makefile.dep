@@ -672,11 +672,12 @@ ifneq (,$(filter can,$(USEMODULE)))
   ifneq (,$(filter can_mbox,$(USEMODULE)))
     USEMODULE += core_mbox
   endif
-  USEMODULE += gnrc_pktbuf_static
+  USEMODULE += memarray
 endif
 
 ifneq (,$(filter can_isotp,$(USEMODULE)))
   USEMODULE += xtimer
+  USEMODULE += gnrc_pktbuf
 endif
 
 ifneq (,$(filter conn_can,$(USEMODULE)))

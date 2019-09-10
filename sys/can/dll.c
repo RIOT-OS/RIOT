@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 OTA keys S.A.
+ * Copyright (C) 2016-2018 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -112,7 +112,7 @@ int raw_can_abort(int ifnum, int handle)
 {
     msg_t msg, reply;
     can_pkt_t *pkt = NULL;
-    can_reg_entry_t *entry;
+    can_reg_entry_t *entry = NULL;
 
     assert(ifnum < candev_nb);
 
@@ -263,6 +263,9 @@ int raw_can_unsubscribe_rx_mbox(int ifnum, struct can_filter *filter, mbox_t *mb
 
 int raw_can_free_frame(can_rx_data_t *frame)
 {
+    if (!frame) {
+        return 0;
+    }
     int ret = can_router_free_frame((struct can_frame *)frame->data.iov_base);
 
     can_pkt_free_rx_data(frame);
@@ -386,6 +389,7 @@ int can_dll_dispatch_bus_off(kernel_pid_t pid)
 int can_dll_init(void)
 {
     can_pkt_init();
+    can_router_init();
 
     return 0;
 }
