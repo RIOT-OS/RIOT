@@ -338,7 +338,10 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
         uint16_t recv_seq;
 
         /* not our ping */
-        if ((byteorder_ntohs(icmpv6_hdr->id) != data->id) ||
+        if (byteorder_ntohs(icmpv6_hdr->id) != data->id) {
+            return;
+        }
+        if (!ipv6_addr_is_multicast(&data->host) &&
             !ipv6_addr_equal(from, &data->host)) {
             return;
         }
