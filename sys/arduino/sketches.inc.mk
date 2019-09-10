@@ -19,7 +19,8 @@ SKETCH_GENERATED_FILES = $(SKETCH_MODULE_DIR)/Makefile $(SKETCH_MODULE_DIR)/$(SK
 # Building the module files
 #   Do not use $^ in receipes as Makefile is also a prerequisite
 $(SKETCH_MODULE_DIR)/Makefile: $(SKETCH_MODULE_DIR)/$(SKETCH_CPP)
-	$(Q)echo 'SRCXX = $(SKETCH_CPP)'               > $@
+	$(Q)echo 'MODULE = $(SKETCH_MODULE)'           > $@
+	$(Q)echo 'SRCXX = $(SKETCH_CPP)'              >> $@
 	$(Q)echo 'include $$(RIOTBASE)/Makefile.base' >> $@
 $(SKETCH_MODULE_DIR)/$(SKETCH_CPP): $(SKETCHES_ALL)
 	@mkdir -p $(@D)
