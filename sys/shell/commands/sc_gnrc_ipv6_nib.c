@@ -273,7 +273,7 @@ static int _nib_route(int argc, char **argv)
             return 1;
         }
         if (argc > 6) {
-            ltime = (uint16_t)atoi(argv[6]);
+            ltime = atoi(argv[6]);
         }
         gnrc_ipv6_nib_ft_add(&pfx, pfx_len, &next_hop, iface, ltime);
     }
