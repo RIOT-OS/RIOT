@@ -184,7 +184,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     }
     dev(tim)->IMR |= chn_isr_cfg[channel].flag;
 
-    return 1;
+    return 0;
 }
 
 int timer_clear(tim_t tim, int channel)
