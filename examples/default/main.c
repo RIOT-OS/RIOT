@@ -35,7 +35,7 @@
 #endif
 
 /* I'm too lazy to write a proper header. */
-extern void secure_login(void);
+extern void secure_login(char *line_buf, size_t buf_size);
 
 int main(void)
 {
@@ -50,7 +50,7 @@ int main(void)
     char line_buf[SHELL_DEFAULT_BUFSIZE];
 
     while (1) {
-        secure_login();
+        secure_login(line_buf, SHELL_DEFAULT_BUFSIZE);
         shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
         puts("\r\nExiting shell");
     }

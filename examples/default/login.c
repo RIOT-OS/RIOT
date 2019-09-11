@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "crypto/helper.h"
 #include "xtimer.h"
 
 const char user[] = "admin";
@@ -36,35 +37,58 @@ static bool is_line_cancel(char c)
     return c == 0x03 || c == 0x04;
 }
 
-static bool input_compare(const char *target, char mask_char)
+enum LINE_TAINT {
+    LINE_OK = 0,
+    LINE_LONG = 1,
+    LINE_OK_DONE = 2,
+    LINE_LONG_DONE = 3,
+    LINE_CANCELLED = 4,
+};
+
+#define MARK_DONE(t) ((t) | LINE_OK_DONE)
+#define IS_DONE(t) ((t) & LINE_OK_DONE)
+
+/**
+ * Get a line of input, while echoing it back.
+ *
+ * The line is read to line_buf. If mask_char is not zero, then tht character
+ * is echoed instead of the one inputted. EOF, ctrl-c, ctrl-d cancel the input
+ * and (-LINE_CANCELLED) is returned.
+ * Otherwise, return the number of characters read or, if the buffer size was
+ * exceeded, (-LINE_LONG).
+ *
+ * At most buf_size-1 chracters will be stored, and the last character will
+ * always be a terminator.
+ *
+ * Even if the buffer size is exceeded, characters will continue to be read
+ * from the input.
+ */
+static int gets_echoing(char *line_buf, size_t buf_size, char mask_char)
 {
-    bool login_ok = true;
-    char cmp_this;
+    size_t length = 0;
+    enum LINE_TAINT state = LINE_OK;
 
     do {
         int c = getchar();
 
         if (c == EOF || is_line_cancel(c)) {
-            cmp_this = '\0';
-            login_ok = false;
+            state = LINE_CANCELLED;
         } else if (is_line_delim(c)) {
-            cmp_this = '\0';
+            state = MARK_DONE(state);
         } else {
-            cmp_this = c;
+            if (length + 1 < buf_size) {
+                line_buf[length++] = c;
+            } else {
+                state = LINE_LONG;
+            }
             putchar(mask_char? mask_char: c);
             fflush(stdout);
         }
+    } while (state != LINE_CANCELLED && !IS_DONE(state));
 
-        if (*target != cmp_this) {
-            login_ok = false;
-        }
+    line_buf[length++] = '\0';
 
-        if (*target != '\0') {
-            target++;
-        }
-    } while (cmp_this != '\0');
-
-    return login_ok;
+    return state == LINE_OK_DONE? (int)length : -state;
 }
 
 enum LOGIN_STATE {
@@ -73,19 +97,38 @@ enum LOGIN_STATE {
     LOGIN_OK_BOTH,
 };
 
-static bool login(void)
+static bool login(char *line_buf, size_t buf_size)
 {
+    int read_len;
     int state = LOGIN_WRONG;
+
+    assert(buf_size >= sizeof(user));
+    assert(buf_size >= sizeof(pass));
 
     fputs("Username: ", stdout);
     fflush(stdout);
 
-    state += !!input_compare(user, 0);
+    read_len = gets_echoing(line_buf, buf_size, 0);
+
+    if (read_len == -LINE_CANCELLED) {
+        goto login_end;
+    } else if (read_len > 0) {
+        state += !!crypto_equals((uint8_t*)line_buf, (uint8_t*)user, sizeof(user));
+    }
 
     fputs("\r\nPassword: ", stdout);
     fflush(stdout);
 
-    state += !!input_compare(pass, '*');
+    read_len = gets_echoing(line_buf, buf_size, '*');
+
+    if (read_len == -LINE_CANCELLED) {
+        goto login_end;
+    } else if (read_len > 0) {
+        state += !!crypto_equals((uint8_t*)line_buf, (uint8_t*)pass, sizeof(pass));
+    }
+
+login_end:
+    crypto_secure_wipe(line_buf, buf_size);
 
     putchar('\r');
     putchar('\n');
@@ -101,17 +144,16 @@ static bool login(void)
  * This function won't return until the correct user-pass pair has been
  * introduced.
  */
-void secure_login(void)
+void secure_login(char *line_buf, size_t buf_size)
 {
     while (1) {
         int attempts = N_ATTEMPTS;
 
         while (attempts--) {
-            if (login()) {
+            if (login(line_buf, buf_size)) {
                 return;
             }
             puts("Wrong user/pass");
-            xtimer_sleep(1);
         }
         xtimer_sleep(7);
     }
