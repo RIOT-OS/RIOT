@@ -24,8 +24,23 @@
 #include "crypto/helper.h"
 #include "xtimer.h"
 
+#include "pbkdf2.h"
+
 const char user[] = "admin";
-const char pass[] = "Passw0rd!";
+
+#define PBKDF2_ITERS 1000
+static const uint8_t salt[] = {0x70, 0x16, 0x2E, 0x1F, 0x2E, 0x38, 0x5, 0x8E,
+                               0xF0, 0x6B, 0xB1, 0x3, 0xCE, 0xE3, 0x6E, 0x73,
+                               0x3D, 0x28, 0x5C, 0xEE, 0xDA, 0x15, 0xB0, 0x5B,
+                               0x3F, 0xF7, 0x67, 0xB6, 0x24, 0xD0, 0xBE, 0x47,
+                               0x57, 0x2E, 0x43, 0xAA, 0x74, 0xC8, 0xF1, 0x7F,
+                               0x55, 0x3B, 0x2F, 0xA4, 0xE2, 0x8F, 0xAD, 0x4D,
+                               0x28, 0x63, 0x27, 0x3, 0x8B, 0xDF, 0x11, 0x23,
+                               0xB3, 0x4B, 0x97, 0x74, 0x1C, 0x4E, 0xB3, 0x62};
+static const uint8_t key[] = {0xD7, 0xEE, 0xF0, 0xCA, 0xD5, 0x29, 0x92, 0xE1,
+                              0xDB, 0x40, 0xE0, 0x2B, 0xD5, 0xFC, 0xD1, 0x84,
+                              0xD5, 0xD2, 0xDB, 0x26, 0xA9, 0xFE, 0x45, 0x64,
+                              0x4B, 0x6C, 0x9, 0x26, 0xB0, 0x56, 0xCD, 0x47};
 
 static bool is_line_delim(char c)
 {
@@ -103,12 +118,15 @@ static bool login(char *line_buf, size_t buf_size)
     int state = LOGIN_WRONG;
 
     assert(buf_size >= sizeof(user));
-    assert(buf_size >= sizeof(pass));
+    assert(PBKDF2_KEY_SIZE >= sizeof(key));
 
     fputs("Username: ", stdout);
     fflush(stdout);
 
     read_len = gets_echoing(line_buf, buf_size, 0);
+
+    putchar('\r');
+    putchar('\n');
 
     if (read_len == -LINE_CANCELLED) {
         goto login_end;
@@ -116,22 +134,29 @@ static bool login(char *line_buf, size_t buf_size)
         state += !!crypto_equals((uint8_t*)line_buf, (uint8_t*)user, sizeof(user));
     }
 
-    fputs("\r\nPassword: ", stdout);
+    fputs("Password: ", stdout);
     fflush(stdout);
 
     read_len = gets_echoing(line_buf, buf_size, '*');
 
+    putchar('\r');
+    putchar('\n');
+
     if (read_len == -LINE_CANCELLED) {
         goto login_end;
     } else if (read_len > 0) {
-        state += !!crypto_equals((uint8_t*)line_buf, (uint8_t*)pass, sizeof(pass));
+        uint8_t this_key[PBKDF2_KEY_SIZE];
+
+        pbkdf2_sha256((uint8_t*)line_buf, read_len-1,
+                      salt, sizeof(salt),
+                      PBKDF2_ITERS,
+                      this_key);
+
+        state += !!crypto_equals(this_key, key, sizeof(key));
     }
 
 login_end:
     crypto_secure_wipe(line_buf, buf_size);
-
-    putchar('\r');
-    putchar('\n');
 
     return state == LOGIN_OK_BOTH;
 }
