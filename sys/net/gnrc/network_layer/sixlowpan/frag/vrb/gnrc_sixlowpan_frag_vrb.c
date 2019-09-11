@@ -73,6 +73,11 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
             break;
         }
     }
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+    if (vrbe == NULL) {
+        gnrc_sixlowpan_frag_stats_get()->vrb_full++;
+    }
+#endif
     return vrbe;
 }
 

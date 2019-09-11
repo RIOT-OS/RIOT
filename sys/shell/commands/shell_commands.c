@@ -117,6 +117,12 @@ extern int _gnrc_6ctx(int argc, char **argv);
 #endif
 #endif
 
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+extern int _gnrc_6lo_frag_stats(int argc, char **argv);
+#endif
+#endif
+
 #ifdef MODULE_CCN_LITE_UTILS
 extern int _ccnl_open(int argc, char **argv);
 extern int _ccnl_content(int argc, char **argv);
@@ -224,6 +230,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_GNRC_IPV6_NIB_6LBR
     {"6ctx", "6LoWPAN context configuration tool", _gnrc_6ctx },
 #endif
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+    {"6lo_frag", "6LoWPAN fragment statistics", _gnrc_6lo_frag_stats },
 #endif
 #ifdef MODULE_SAUL_REG
     {"saul", "interact with sensors and actuators using SAUL", _saul },
