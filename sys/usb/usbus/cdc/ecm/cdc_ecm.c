@@ -34,8 +34,9 @@
 
 static void _event_handler(usbus_t *usbus, usbus_handler_t *handler,
                           usbus_event_usb_t event);
-static int _setup_handler(usbus_t *usbus, usbus_handler_t *handler,
-                          usbus_setuprq_state_t state, usb_setup_t *setup);
+static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
+                            usbus_control_request_state_t state,
+                            usb_setup_t *setup);
 static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
                               usbdev_ep_t *ep, usbus_event_transfer_t event);
 static void _init(usbus_t *usbus, usbus_handler_t *handler);
@@ -147,7 +148,7 @@ static const usbus_handler_driver_t cdcecm_driver = {
     .init = _init,
     .event_handler = _event_handler,
     .transfer_handler = _transfer_handler,
-    .setup_handler = _setup_handler,
+    .control_handler = _control_handler,
 };
 
 static void _fill_ethernet(usbus_cdcecm_device_t *cdcecm)
@@ -237,8 +238,9 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_handler_set_flag(handler, USBUS_HANDLER_FLAG_RESET);
 }
 
-static int _setup_handler(usbus_t *usbus, usbus_handler_t *handler,
-                          usbus_setuprq_state_t state, usb_setup_t *setup)
+static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
+                          usbus_control_request_state_t state,
+                          usb_setup_t *setup)
 {
     (void)usbus;
     (void)state;
