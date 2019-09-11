@@ -18,7 +18,9 @@
  * @}
  */
 
+#include <stdio.h>
 #include <stdbool.h>
+
 #include "xtimer.h"
 
 const char user[] = "admin";
@@ -34,14 +36,9 @@ static bool is_line_cancel(char c)
     return c == 0x03 || c == 0x04;
 }
 
-enum INPUT_STATE {
-    INPUT_OK,
-    INPUT_ERR,
-};
-
 static bool input_compare(const char *target, char mask_char)
 {
-    enum INPUT_STATE status = INPUT_OK;
+    bool login_ok = true;
     char cmp_this;
 
     do {
@@ -49,7 +46,7 @@ static bool input_compare(const char *target, char mask_char)
 
         if (c == EOF || is_line_cancel(c)) {
             cmp_this = '\0';
-            status = INPUT_ERR;
+            login_ok = false;
         } else if (is_line_delim(c)) {
             cmp_this = '\0';
         } else {
@@ -59,7 +56,7 @@ static bool input_compare(const char *target, char mask_char)
         }
 
         if (*target != cmp_this) {
-            status = INPUT_ERR;
+            login_ok = false;
         }
 
         if (*target != '\0') {
@@ -67,7 +64,7 @@ static bool input_compare(const char *target, char mask_char)
         }
     } while (cmp_this != '\0');
 
-    return status == INPUT_OK;
+    return login_ok;
 }
 
 enum LOGIN_STATE {
