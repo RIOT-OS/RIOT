@@ -264,7 +264,7 @@ class SerCmd(cmd.Cmd):
                 except OSError as e:
                     self.logger.error("Cannot connect to serial port {}: {}"
                                       .format(self.port, e.strerror))
-                    sys.exit(1)
+                    sys.exit(e.errno)
                 except Exception as e:
                     self.logger.error("Unexpected exception {}".format(e))
                     sys.exit(1)
