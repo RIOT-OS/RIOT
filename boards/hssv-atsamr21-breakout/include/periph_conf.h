@@ -147,9 +147,88 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_0,
         .mosi_pad = SPI_PAD_MOSI_2_SCK_3
     },
+    {
+      .dev      = &SERCOM1->SPI,
+      .miso_pin = GPIO_PIN(PA, 18),
+      .mosi_pin = GPIO_PIN(PA, 16),
+      .clk_pin  = GPIO_PIN(PA, 19),
+      .miso_mux = GPIO_MUX_C,
+      .mosi_mux = GPIO_MUX_C,
+      .clk_mux  = GPIO_MUX_C,
+      .miso_pad = SPI_PAD_MISO_0,
+      .mosi_pad = SPI_PAD_MOSI_2_SCK_3
+    }
 };
 
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+/** @} */
+
+/**
+ * @name    I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+  {
+    .dev      = &(SERCOM3->I2CM),
+    .speed    = I2C_SPEED_NORMAL,
+    .scl_pin  = GPIO_PIN(PA, 32),
+    .sda_pin  = GPIO_PIN(PA, 31),
+    .mux      = GPIO_MUX_C,
+    .gclk_src = GCLK_CLKCTRL_GEN_GCLK0,
+    .flags    = I2C_FLAG_NONE
+  }
+};
+#define I2C_NUMOF          (sizeof(i2c_config) / sizeof(i2c_config[0]))
+/** @} */
+
+/**
+ * @name    RTC configuration
+ * @{
+ */
+#define RTC_NUMOF           (1U)
+#define RTC_DEV             RTC->MODE2
+/** @} */
+
+/**
+ * @name    RTT configuration
+ * @{
+ */
+#define RTT_NUMOF           (1U)
+#define RTT_DEV             RTC->MODE0
+#define RTT_IRQ             RTC_IRQn
+#define RTT_IRQ_PRIO        10
+#define RTT_ISR             isr_rtc
+#define RTT_MAX_VALUE       (0xffffffff)
+#define RTT_FREQUENCY       (32768U)    /* in Hz. For changes see `rtt.c` */
+#define RTT_RUNSTDBY        (1)         /* Keep RTT running in sleep states */
+/** @} */
+
+/**
+ * @name ADC Configuration
+ * @{
+ */
+#define ADC_0_EN                           1
+#define ADC_MAX_CHANNELS                   14
+/* ADC 0 device configuration */
+#define ADC_0_DEV                          ADC
+#define ADC_0_IRQ                          ADC_IRQn
+
+/* ADC 0 Default values */
+#define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
+#define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV512
+
+#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_GND
+#define ADC_0_GAIN_FACTOR_DEFAULT          ADC_INPUTCTRL_GAIN_1X
+#define ADC_0_REF_DEFAULT                  ADC_REFCTRL_REFSEL_INT1V
+
+static const adc_conf_chan_t adc_channels[] = {
+  /* port, pin, muxpos */
+  {GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5},
+  {GPIO_PIN(PA, 6), ADC_INPUTCTRL_MUXPOS_PIN6},
+};
+
+#define ADC_0_CHANNELS                     (2U)
+#define ADC_NUMOF                          ADC_0_CHANNELS
 /** @} */
 
 /**
