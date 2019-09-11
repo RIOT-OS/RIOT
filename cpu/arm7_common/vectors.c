@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Freie Universitaet Berlin (FUB). All rights reserved.
+ * Copyright (C) 2008-2009, Freie Universität Berlin (FUB). All rights reserved.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,19 +9,13 @@
 /**
  * @ingroup     cpu_arm7_common
  * @{
- */
-
-/**
+ *
  * @file
- * @internal
- * @brief       ARM bootloader
+ * @brief       Default implementations for ARM7 specific interrupt and
+ *              exception handlers
  *
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Michael Baar <michael.baar@fu-berlin.de>
- * @version     $Revision$
- * @since       19.08.2008
- *
- * @note        $Id$
  */
 
 #include <stdio.h>
@@ -30,39 +24,25 @@
 
 #include "log.h"
 
-void FIQ_Routine(void)   __attribute__((interrupt("FIQ")));
-//void SWI_Routine (void)   __attribute__((interrupt("SWI")));
-void UNDEF_Routine(void) __attribute__((interrupt("UNDEF")));
+void isr_fio(void)   __attribute__((interrupt("FIQ")));
+//void isr_swi (void)   __attribute__((interrupt("SWI")));
+void isr_undef(void) __attribute__((interrupt("UNDEF")));
 
-void IRQ_Routine(void)
-{
-    LOG_ERROR("Kernel Panic,\nEarly IRQ call\n");
+volatile int arm_abortflag = 0;
 
-    while (1) {};
-}
-/*-----------------------------------------------------------------------------------*/
-void FIQ_Routine(void)
+void isr_fio(void)
 {
     LOG_ERROR("Kernel Panic,\nEarly FIQ call\n");
 
     while (1) {};
 }
-/*-----------------------------------------------------------------------------------*/
-void SWI_Routine(void)
+
+void isr_swi(void)
 {
     LOG_ERROR("Kernel Panic,\nEarly SWI call\n");
 
     while (1) {};
 }
-/*-----------------------------------------------------------------------------------*/
-void DEBUG_Routine(void)
-{
-    LOG_ERROR("DEBUG hit.");
-
-    while (1) {};
-}
-/*-----------------------------------------------------------------------------------*/
-volatile int arm_abortflag = 0;
 
 void abtorigin(const char *vector, unsigned long *lnk_ptr1)
 {
@@ -83,8 +63,8 @@ void abtorigin(const char *vector, unsigned long *lnk_ptr1)
 
     while (1) {};
 }
-/*-----------------------------------------------------------------------------------*/
-void UNDEF_Routine(void)
+
+void isr_undef(void)
 {
     /* cppcheck-suppress variableScope
      * (reason: used within __asm__ which cppcheck doesn't pick up) */
@@ -98,8 +78,8 @@ void UNDEF_Routine(void)
 
     while (1) {};
 }
-/*-----------------------------------------------------------------------------------*/
-void PABT_Routine(void)
+
+void isr_pabt(void)
 {
     /* cppcheck-suppress variableScope
      * (reason: used within __asm__ which cppcheck doesn't pick up) */
@@ -113,8 +93,8 @@ void PABT_Routine(void)
 
     while (1) {};
 }
-/*-----------------------------------------------------------------------------------*/
-void DABT_Routine(void)
+
+void isr_dabt(void)
 {
     /* cppcheck-suppress variableScope
      * (reason: used within __asm__ which cppcheck doesn't pick up) */
@@ -128,63 +108,3 @@ void DABT_Routine(void)
 
     while (1) {};
 }
-/*-----------------------------------------------------------------------------------*/
-static inline void
-bl_init_data(void)
-{
-    extern unsigned int _etext;
-    extern unsigned int _data;
-    extern unsigned int _edata;
-    extern unsigned int __bss_start;
-    extern unsigned int __bss_end;
-
-    register unsigned int *p1;
-    register unsigned int *p2;
-    register unsigned int *p3;
-
-    // initialize data from flash
-    // (linker script ensures that data is 32-bit aligned)
-    p1 = &_etext;
-    p2 = &_data;
-    p3 = &_edata;
-
-    while (p2 < p3) {
-        *p2++ = *p1++;
-    }
-
-    // clear bss
-    // (linker script ensures that bss is 32-bit aligned)
-    p1 = &__bss_start;
-    p2 = &__bss_end;
-
-    while (p1 < p2) {
-        *p1++ = 0;
-    }
-}
-/*-----------------------------------------------------------------------------------*/
-void bootloader(void)
-{
-    extern void bl_uart_init(void);
-    extern void bl_init_ports(void);
-    extern void bl_init_clks(void);
-    extern void bl_blink(void);
-    extern void bl_config_init(void);
-
-    /* board specific setup of clocks */
-    bl_init_clks();
-
-    /* initialize bss and data */
-#ifndef CPU_MC1322X
-    bl_init_data();
-#endif
-
-    /* board specific setup of i/o pins */
-    bl_init_ports();
-
-#ifdef MODULE_NEWLIB
-    extern void __libc_init_array(void);
-    __libc_init_array();
-#endif
-}
-
-/** @} */
