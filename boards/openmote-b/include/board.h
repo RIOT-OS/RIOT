@@ -38,8 +38,8 @@
 #define LED3_PIN                    GPIO_PIN(2, 5)
 #define LED3_PIN                    GPIO_PIN(2, 5)
 #define USER_BUTTON_PIN             GPIO_PIN(2, 5)
-#define RF_SWITCH_2_4_GHZ_PIN       GPIO_PIN(3, 4)  /**< PD4 -- 2.4ghz */
-#define RF_SWITCH_SUB_GHZ_PIN       GPIO_PIN(3, 3)  /**< PD3 -- subghz */
+#define RF24_SWITCH_CC2538_PIN      GPIO_PIN(3, 4)  /**< PD4 -- CC2538 */
+#define RF24_SWITCH_AT86RF215_PIN   GPIO_PIN(3, 3)  /**< PD3 -- AT86RF215 */
 
 #define LED_PORT                    GPIO_C
 #define LED0_MASK                   (1 << 4)
@@ -48,8 +48,8 @@
 #define LED3_MASK                   (1 << 5)
 
 #define RF_SWITCH_PORT              GPIO_D
-#define RF_SWITCH_2_4_GHZ_MASK      (1 << 4)
-#define RF_SWITCH_SUB_GHZ_MASK      (1 << 3)
+#define RF24_SWITCH_CC2538_MASK     (1 << 4)
+#define RF24_SWITCH_AT86RF215_MASK  (1 << 3)
 
 #define LED0_ON                     (LED_PORT->DATA &= ~LED0_MASK)
 #define LED0_OFF                    (LED_PORT->DATA |=  LED0_MASK)
@@ -67,13 +67,13 @@
 #define LED3_OFF                    (LED_PORT->DATA |=  LED3_MASK)
 #define LED3_TOGGLE                 (LED_PORT->DATA ^=  LED3_MASK)
 
-#define RF_SWITCH_2_4_GHZ_ON        (RF_SWITCH_PORT->DATA &= ~RF_SWITCH_2_4_GHZ_MASK)
-#define RF_SWITCH_2_4_GHZ_OFF       (RF_SWITCH_PORT->DATA |=  RF_SWITCH_2_4_GHZ_MASK)
-#define RF_SWITCH_2_4_GHZ_TOGGLE    (RF_SWITCH_PORT->DATA ^=  RF_SWITCH_2_4_GHZ_MASK)
+#define RF24_SWITCH_CC2538_ON       (RF_SWITCH_PORT->DATA &= ~RF24_SWITCH_CC2538_MASK)
+#define RF24_SWITCH_CC2538_OFF      (RF_SWITCH_PORT->DATA |=  RF24_SWITCH_CC2538_MASK)
+#define RF24_SWITCH_CC2538_TOGGLE   (RF_SWITCH_PORT->DATA ^=  RF24_SWITCH_CC2538_MASK)
 
-#define RF_SWITCH_SUB_GHZ_ON        (RF_SWITCH_PORT->DATA &= ~RF_SWITCH_SUB_GHZ_MASK)
-#define RF_SWITCH_SUB_GHZ_OFF       (RF_SWITCH_PORT->DATA |=  RF_SWITCH_SUB_GHZ_MASK)
-#define RF_SWITCH_SUB_GHZ_TOGGLE    (RF_SWITCH_PORT->DATA ^=  RF_SWITCH_SUB_GHZ_MASK)
+#define RF24_SWITCH_AT86RF215_ON     (RF_SWITCH_PORT->DATA &= ~RF24_SWITCH_AT86RF215_MASK)
+#define RF24_SWITCH_AT86RF215_OFF    (RF_SWITCH_PORT->DATA |=  RF24_SWITCH_AT86RF215_MASK)
+#define RF24_SWITCH_AT86RF215_TOGGLE (RF_SWITCH_PORT->DATA ^=  RF24_SWITCH_AT86RF215_MASK)
 /** @} */
 
 /**
