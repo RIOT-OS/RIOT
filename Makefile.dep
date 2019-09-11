@@ -610,6 +610,7 @@ endif
 
 ifneq (,$(filter schedstatistics,$(USEMODULE)))
   USEMODULE += xtimer
+  USEMODULE += sched_cb
 endif
 
 ifneq (,$(filter arduino,$(USEMODULE)))
