@@ -1,13 +1,25 @@
 include ../Makefile.tests_common
 
-BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo arduino-mega2560 \
-                   arduino-nano arduino-uno hifive1 hifive1b i-nucleo-lrwan1 \
-                   jiminy-mega256rfr2 mega-xplained stm32l0538-disco waspmote-pro
+BOARD_INSUFFICIENT_MEMORY := \
+	arduino-duemilanove \
+	arduino-nano \
+	arduino-uno \
+	nucleo-f031k6 \
+	hifive1 \
+	hifive1b \
+	i-nucleo-lrwan1 \
+	stm32l0538-disco \
+	#
 
-# AVR platform: unknown type name: clockid_t
-# hifive1: not enough memory for thread stacks
-
-BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6
+# The test reboots on 'arduino-mega2560' because it mallocs too much memory.
+# So I disabled all the other avr boards. Re-enable after success test.
+BOARD_INSUFFICIENT_MEMORY += \
+	arduino-leonardo \
+	arduino-mega2560 \
+	jiminy-mega256rfr2 \
+	mega-xplained \
+	waspmote-pro \
+	#
 
 USEMODULE += posix_headers
 USEMODULE += pthread
