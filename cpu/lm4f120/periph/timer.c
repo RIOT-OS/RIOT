@@ -163,7 +163,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     ROM_TimerMatchSet(timer_base, timer_side, (unsigned long) (scaledv & 0xFFFFFFFF));
     ROM_TimerEnable(timer_base, timer_side);
 
-    return 1;
+    return 0;
 }
 
 int timer_clear(tim_t dev, int channel)
@@ -194,7 +194,7 @@ int timer_clear(tim_t dev, int channel)
     }
 
     ROM_TimerIntClear(timer_base, timer_intbit);
-    return 1;
+    return 0;
 }
 
 unsigned int timer_read(tim_t dev)
