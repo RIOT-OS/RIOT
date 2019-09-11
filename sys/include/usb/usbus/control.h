@@ -43,13 +43,36 @@ typedef struct {
  * @brief Endpoint zero event handler
  */
 typedef struct {
-    usbus_handler_t handler;            /**< Inherited generic handler        */
-    usb_setup_t setup;                  /**< Last received setup packet       */
-    usbus_setuprq_state_t setup_state;  /**< Setup request state machine      */
-    usbus_control_slicer_t slicer;      /**< Slicer for multipart control
-                                            messages */
-    usbdev_ep_t *out;                   /**< EP0 out endpoint                 */
-    usbdev_ep_t *in;                    /**< EP0 in endpoint                  */
+
+    /**
+     * @brief inherited generic handler
+     */
+    usbus_handler_t handler;
+
+    /**
+     * @brief Last received setup packet
+     */
+    usb_setup_t setup;
+
+    /**
+     * @brief Control request state machine state
+     */
+    usbus_control_request_state_t control_request_state;
+
+    /**
+     * @brief Slicer state for multipart control request messages
+     */
+    usbus_control_slicer_t slicer;
+
+    /**
+     * @brief EP0 OUT endpoint
+     */
+    usbdev_ep_t *out;
+
+    /**
+     * @brief EP0 IN endpoint
+     */
+    usbdev_ep_t *in;
 } usbus_control_handler_t;
 
 /**

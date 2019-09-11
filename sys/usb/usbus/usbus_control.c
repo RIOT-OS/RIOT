@@ -241,10 +241,11 @@ static int _recv_interface_setup(usbus_t *usbus, usb_setup_t *pkt)
     /* Find interface handler */
     for (usbus_interface_t *iface = usbus->iface; iface; iface = iface->next) {
         if (destination == iface->idx &&
-            iface->handler->driver->setup_handler) {
-            return iface->handler->driver->setup_handler(usbus, iface->handler,
-                                                         ep0_handler->setup_state,
-                                                         pkt);
+            iface->handler->driver->control_handler) {
+            return iface->handler->driver->control_handler(usbus,
+                                                           iface->handler,
+                                                           ep0_handler->control_request_state,
+                                                           pkt);
         }
     }
     return -1;
@@ -257,15 +258,15 @@ static void _recv_setup(usbus_t *usbus, usbus_control_handler_t *handler)
     DEBUG("usbus_control: Received setup %x %x @ %d\n", pkt->type,
           pkt->request, pkt->length);
     if (usb_setup_is_read(pkt)) {
-        handler->setup_state = USBUS_SETUPRQ_INDATA;
+        handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_INDATA;
     }
     else {
         if (pkt->length) {
-            handler->setup_state = USBUS_SETUPRQ_OUTDATA;
+            handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_OUTDATA;
             usbdev_ep_ready(handler->out, 0);
         }
         else {
-            handler->setup_state = USBUS_SETUPRQ_INACK;
+            handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_INACK;
             usbdev_ep_ready(handler->in, 0);
         }
     }
@@ -286,7 +287,7 @@ static void _recv_setup(usbus_t *usbus, usbus_control_handler_t *handler)
         static const usbopt_enable_t enable = USBOPT_ENABLE;
         usbdev_ep_set(handler->in, USBOPT_EP_STALL, &enable,
                       sizeof(usbopt_enable_t));
-        handler->setup_state = USBUS_SETUPRQ_READY;
+        handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_READY;
     }
     else if (res) {
         usbus_control_slicer_ready(usbus);
@@ -311,7 +312,7 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     DEBUG("usbus_control: Initializing EP0\n");
     usbus_control_handler_t *ep0_handler = (usbus_control_handler_t *)handler;
     usbus_handler_set_flag(handler, USBUS_HANDLER_FLAG_RESET);
-    ep0_handler->setup_state = USBUS_SETUPRQ_READY;
+    ep0_handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_READY;
 
     ep0_handler->in = usbus_add_endpoint(usbus, NULL, USB_EP_TYPE_CONTROL,
                                          USB_EP_DIR_IN, USBUS_EP0_SIZE)->ep;
@@ -323,8 +324,8 @@ static int _handle_tr_complete(usbus_t *usbus,
                                usbus_control_handler_t *ep0_handler,
                                usbdev_ep_t *ep)
 {
-    switch (ep0_handler->setup_state) {
-        case USBUS_SETUPRQ_INACK:
+    switch (ep0_handler->control_request_state) {
+        case USBUS_CONTROL_REQUEST_STATE_INACK:
             if (ep->dir == USB_EP_DIR_IN) {
                 if (usbus->addr && usbus->state == USBUS_STATE_RESET) {
                     usbdev_set(usbus->dev, USBOPT_ADDRESS, &usbus->addr,
@@ -332,32 +333,32 @@ static int _handle_tr_complete(usbus_t *usbus,
                     /* Address configured */
                     usbus->state = USBUS_STATE_ADDR;
                 }
-                ep0_handler->setup_state = USBUS_SETUPRQ_READY;
+                ep0_handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_READY;
             }
             break;
-        case USBUS_SETUPRQ_OUTACK:
+        case USBUS_CONTROL_REQUEST_STATE_OUTACK:
             if (ep->dir == USB_EP_DIR_OUT) {
                 memset(&ep0_handler->slicer, 0, sizeof(usbus_control_slicer_t));
-                ep0_handler->setup_state = USBUS_SETUPRQ_READY;
+                ep0_handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_READY;
             }
             break;
-        case USBUS_SETUPRQ_INDATA:
+        case USBUS_CONTROL_REQUEST_STATE_INDATA:
             if (ep->dir == USB_EP_DIR_IN) {
                 if (usbus_control_slicer_nextslice(usbus)) {
                     _recv_setup(usbus, ep0_handler);
-                    ep0_handler->setup_state = USBUS_SETUPRQ_INDATA;
+                    ep0_handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_INDATA;
                 }
                 else {
                     /* Ready out ZLP */
                     usbdev_ep_ready(ep0_handler->out, 0);
-                    ep0_handler->setup_state = USBUS_SETUPRQ_OUTACK;
+                    ep0_handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_OUTACK;
                 }
             }
             break;
-        case USBUS_SETUPRQ_OUTDATA:
+        case USBUS_CONTROL_REQUEST_STATE_OUTDATA:
             if (ep->dir == USB_EP_DIR_OUT) {
                 /* Ready in ZLP */
-                ep0_handler->setup_state = USBUS_SETUPRQ_INACK;
+                ep0_handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_INACK;
                 size_t len = 0;
                 usbdev_ep_get(ep, USBOPT_EP_AVAILABLE, &len, sizeof(size_t));
                 DEBUG("Expected len: %d, received: %d\n",
@@ -373,7 +374,7 @@ static int _handle_tr_complete(usbus_t *usbus,
                 DEBUG("usbus_control: Invalid state OUTDATA with IN request\n");
             }
             break;
-        case USBUS_SETUPRQ_READY:
+        case USBUS_CONTROL_REQUEST_STATE_READY:
             if (ep->dir == USB_EP_DIR_OUT) {
                 memset(&ep0_handler->slicer, 0, sizeof(usbus_control_slicer_t));
                 memcpy(&ep0_handler->setup, ep0_handler->out->buf,
@@ -403,7 +404,7 @@ static void _handler_ep0_event(usbus_t *usbus, usbus_handler_t *handler,
     switch (event) {
         case USBUS_EVENT_USB_RESET:
             DEBUG("usbus_control: Reset event triggered\n");
-            ep0_handler->setup_state = USBUS_SETUPRQ_READY;
+            ep0_handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_READY;
             _usbus_config_ep0(ep0_handler);
             break;
         default:

@@ -28,6 +28,7 @@
 #include "net/ethernet/hdr.h"
 #include "usb/descriptor.h"
 #include "usb/usbus.h"
+#include "usb/usbus/control.h"
 #include "net/netdev.h"
 #include "mutex.h"
 
