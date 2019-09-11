@@ -41,8 +41,24 @@ else ifeq (openocd,$(PROGRAMMER))
   # for nrf52dk and nrf52840dk boards. To use OpenOCD with these a version
   # build from source (master > 2018, August the 13rd) is required.
   ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
-    # openocd doesn't work (yet) with softdevice
-    $(error Cannot use OpenOCD with nordic_softdevice module)
+    LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
+
+    export OPENOCD_PRE_FLASH_CMDS += -c 'flash write_image erase "$(BINDIR)/softdevice.hex"'
+    export OPENOCD_PRE_VERIFY_CMDS += -c 'verify_image "$(BINDIR)/softdevice.hex"'
+
+    # Cannot use the 'ELFFILE' here
+    # The segments are 0x10000 aligned so padding bytes are copied and verified
+    #
+    # Using 'LINKFLAGS += -Wl,--nmagic' prevents it but would require
+    # dedicated testing/review
+    FLASHFILE ?= $(HEXFILE)
+
+    # murdock: softdevice.hex file is used for flashing
+    # It must be taken into account for the test input hash and
+    # be sent to the separated testing boards
+    TEST_EXTRA_FILES += $(BINDIR)/softdevice.hex
+    # Files in TEST_EXTRA_FILES need to have an explicit target
+    $(BINDIR)/softdevice.hex: | $(ELFFILE)
   endif
   DEBUG_ADAPTER ?= jlink
   export OPENOCD_CONFIG := $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
