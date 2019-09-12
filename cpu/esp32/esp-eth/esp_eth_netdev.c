@@ -276,11 +276,18 @@ static int _esp_eth_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_le
     CHECK_PARAM_RET (netdev != NULL, -ENODEV);
     CHECK_PARAM_RET (val != NULL, -EINVAL);
 
+    esp_eth_netdev_t* dev = (esp_eth_netdev_t*)netdev;
+
     switch (opt) {
         case NETOPT_ADDRESS:
             assert(max_len == ETHERNET_ADDR_LEN);
             esp_eth_get_mac((uint8_t *)val);
             return ETHERNET_ADDR_LEN;
+        case NETOPT_LINK_CONNECTED:
+            assert(max_len == 1);
+            *((netopt_enable_t *)val) = (dev->link_up) ? NETOPT_ENABLE
+                                                       : NETOPT_DISABLE;
+            return sizeof(netopt_enable_t);
         default:
             return netdev_eth_get(netdev, opt, val, max_len);
     }
