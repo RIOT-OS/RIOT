@@ -1,8 +1,8 @@
 /**
- * @defgroup pkg_wolfssl  Embedded SSL/TLS library
+ * @defgroup pkg_wolfssl  WolfSSL Embedded SSL/TLS library
  * @ingroup  pkg
- * @ingroup  sys
- * @brief    Provides SSL/TLS solution
+ * @ingroup  net net_dtls
+ * @brief    Provides the WolfSSL SSL/TLS solution
  *
  * # Introduction
  *
