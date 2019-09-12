@@ -19,6 +19,7 @@
  * with the pkg system. Supported DTLS implementations are:
  *
  * - @ref pkg_tinydtls "TinyDTLS"
+ * - @ref pkg_wolfssl "WolfSSL"
  *
  * The other way of using DTLS is through the @ref net_sock_dtls
  * "DTLS sock API".
