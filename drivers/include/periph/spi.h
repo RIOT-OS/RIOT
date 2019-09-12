@@ -288,7 +288,7 @@ void spi_release(spi_t bus);
  * @param[in] cs        chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
  * @param[in] cont      if true, keep device selected after transfer
- * @param[in] out       byte to send out, set NULL if only receiving
+ * @param[in] out       byte to send out
  *
  * @return              the received byte
  */
@@ -318,7 +318,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
  * @param[in]  cs       chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
  * @param[in] reg       register address to transfer data to/from
- * @param[in] out       byte to send, set NULL if only receiving data
+ * @param[in] out       byte to send
  *
  * @return              value that was read from the given register address
  */
