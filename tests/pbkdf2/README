@@ -1,0 +1,11 @@
+Test PBKDF2 implementation
+==========================
+
+This test evaluates the RIOT implementation against a reference. The objective
+is flexibility and clarity, and for this reason there are no hard coded vectors,
+but instead the test is interactive, with the DUT processing vectors given
+through the serial interface.
+
+This means that the test is slower, but more complete and trustworthy.
+
+The test is completely automated.
