@@ -1,0 +1,3 @@
+CFLAGS += -DRTC_NORMALIZE_COMPAT=1
+
+USEMODULE += periph_rtc_common
