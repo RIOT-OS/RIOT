@@ -75,7 +75,7 @@ export GIT_CACHE_DIR         # path to git-cache cache directory
 export FLASH_ADDR            # Define an offset to flash code into ROM memory.
 # TERMPROG                   # The command to call on "make term".
 # TERMFLAGS                  # Additional parameters to supply to TERMPROG.
-export PORT                  # The port to connect the TERMPROG to.
+# PORT                       # The port to connect the TERMPROG to.
 export ELFFILE               # The unstripped result of the compilation.
 export HEXFILE               # The 'intel hex' stripped result of the compilation.
 # BINFILE                    # The 'binary' stripped result of the compilation.

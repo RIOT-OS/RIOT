@@ -41,29 +41,14 @@ solution):
     # Add serial matching command
     ifneq ($(PROGRAMMER_SERIAL),)
       OOCD_BOARD_FLAGS += -c 'ftdi_serial $(PROGRAMMER_SERIAL)'
-
-      ifeq ($(PORT),)
-        # try to find tty name by serial number, only works on Linux currently.
-        ifeq ($(OS),Linux)
-          PORT := $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh "^$(PROGRAMMER_SERIAL)$$"))
-        endif
-      endif
     endif
 
-    # Fallback PORT if no serial was specified or if the specified serial was not found
-    ifeq ($(PORT),)
-        ifeq ($(OS),Linux)
-          PORT := $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh))
-        else ifeq ($(OS),Darwin)
-          PORT := $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
-        endif
-    endif
+    PORT_LINUX_EXACT = $(if $(PROGRAMMER_SERIAL),$(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh "^$(PROGRAMMER_SERIAL)$$")),)
 
-    # TODO: add support for windows as host platform
-    ifeq ($(PORT),)
-      $(info CAUTION: No terminal port for your host system found!)
-    endif
-    export PORT
+    PORT_LINUX = $(if $(PORT_LINUX_EXACT),$(PORT_LINUX_EXACT),$(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh)))
+
+    PORT_DARWIN = $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+
 
 
 Limitations

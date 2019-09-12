@@ -8,7 +8,6 @@ endif
 ifeq ($(PORT),)
   $(info Warning: no PORT set!)
 endif
-export PORT
 
 export BAUD ?= 115200
 
