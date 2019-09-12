@@ -205,6 +205,20 @@ static uint8_t *_parse_option(const coap_pkt_t *pkt,
     return pkt_pos;
 }
 
+ssize_t coap_opt_get_opaque(coap_pkt_t *pkt, unsigned opt_num, uint8_t **value)
+{
+    uint8_t *start = coap_find_option(pkt, opt_num);
+    if (!start) {
+        return -ENOENT;
+    }
+
+    uint16_t delta;
+    int len;
+
+    *value = _parse_option(pkt, start, &delta, &len);
+    return len;
+}
+
 int coap_get_option_uint(coap_pkt_t *pkt, unsigned opt_num, uint32_t *target)
 {
     assert(target);
