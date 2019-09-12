@@ -173,6 +173,7 @@
 #define PERIPH_WDT_H
 
 #include <stdint.h>
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
