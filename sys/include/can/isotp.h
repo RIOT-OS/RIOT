@@ -31,6 +31,26 @@ extern "C" {
 #include "xtimer.h"
 #include "net/gnrc/pktbuf.h"
 
+#ifndef CAN_ISOTP_BS
+/**
+ * @brief   Default Block Size for RX Flow Control frames
+ */
+#define CAN_ISOTP_BS        (10)
+#endif
+
+#ifndef CAN_ISOTP_STMIN
+/**
+ * @brief   Default STmin for RX Flow Control frames
+ */
+#define CAN_ISOTP_STMIN     (5)
+#endif
+
+#ifndef CAN_ISOTP_WFTMAX
+/**
+ * @brief   Default maximum WFT for TX Flow Control
+ */
+#define CAN_ISOTP_WFTMAX    (1)
+#endif
 
 /**
  * @brief The isotp_fc_options struct
@@ -160,11 +180,14 @@ int isotp_send(struct isotp *isotp, const void *buf, int len, int flags);
  * @param isotp           the channel to bind
  * @param entry           entry identifying the CAN ifnum and the upper layer
  *                        either by its pid or its mailbox
+ * @param fc_options      flow control parameters, bs and stmin for rx, wftmax for tx,
+ *                        if NULL, default values will be used
  * @param arg             upper layer private parameter
  *
  * @return 0 on success, < 0 on error
  */
-int isotp_bind(struct isotp *isotp, can_reg_entry_t *entry, void *arg);
+int isotp_bind(struct isotp *isotp, can_reg_entry_t *entry, void *arg,
+               struct isotp_fc_options *fc_options);
 
 /**
  * @brief Release a bound isotp channel
