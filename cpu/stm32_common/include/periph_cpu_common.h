@@ -99,6 +99,23 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    WDT upper and lower bound times in ms
+ * @{
+ */
+/* Actual Lower Limit is ~100us so round up */
+#define NWDT_TIME_LOWER_LIMIT          (1U)
+#define NWDT_TIME_UPPER_LIMIT          (4U * US_PER_MS * 4096U * (1 << 6U) \
+                                        / CLOCK_LSI)
+/* Once enabled wdt can't be stopped */
+#define WDT_HAS_STOP                   (0U)
+#if defined(CPU_FAM_STM32L4)
+#define WDT_HAS_INIT                   (1U)
+#else
+#define WDT_HAS_INIT                   (0U)
+#endif
+/** @} */
+
+/**
  * @brief   Available peripheral buses
  */
 typedef enum {
