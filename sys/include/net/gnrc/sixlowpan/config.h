@@ -146,6 +146,133 @@ extern "C" {
 #define GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US  (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)
 #endif  /* GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US */
 
+/**
+ * @name Selective fragment recovery configuration
+ * @see  [draft-ietf-6lo-fragment-recovery-07, section 7.1]
+ *       (https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-07#section-7.1)
+ * @note Only applicable with gnrc_sixlowpan_frag_sfr module
+ * @{
+ */
+/**
+ * @brief   Default minimum value for fragment size (MinFragmentSize)
+ */
+#ifndef GNRC_SIXLOWPAN_SFR_MIN_FRAG_SIZE
+#define GNRC_SIXLOWPAN_SFR_MIN_FRAG_SIZE    (96U)
+#endif
+
+/**
+ * @brief   Default maximum value for fragment size (MaxFragmentSize)
+ *
+ * It must be lower than the minimum MTU along the path. A large value augments
+ * the chances of buffer bloat and transmission loss. The value must be less
+ * than 512 if the unit is defined for the PHY layer is the octet.
+ */
+#ifndef GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE
+#define GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE    (112U)
+#endif
+
+/**
+ * @brief   Default value for fragment size that the sender should use to start
+ *          with (OptFragmentSize)
+ */
+#ifndef GNRC_SIXLOWPAN_SFR_OPT_FRAG_SIZE
+#define GNRC_SIXLOWPAN_SFR_OPT_FRAG_SIZE    (GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE)
+#endif
+
+/**
+ * @brief   Indicates whether the sender should react to ECN (UseECN)
+ *
+ * When the sender reacts to ECN its window size will vary between @ref
+ * GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE and @ref GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE.
+ */
+#define GNRC_SIXLOWPAN_SFR_USE_ECN          (0U)
+
+/**
+ * @brief   Default minimum value of window size that the sender can use
+ *          (MinWindowSize)
+ */
+#ifndef GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE
+#define GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE     (1U)
+#endif
+
+/**
+ * @brief   Default maximum value of window size that the sender can use
+ *          (MaxWindowSize)
+ *
+ * @warning **Must** be lesser than 32.
+ */
+#ifndef GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE
+#define GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE     (16U)
+#endif
+
+/**
+ * @brief   Default value of window size that the sender should start with
+ *          (OptWindowSize)
+ */
+#ifndef GNRC_SIXLOWPAN_SFR_OPT_WIN_SIZE
+#define GNRC_SIXLOWPAN_SFR_OPT_WIN_SIZE     (16U)
+#endif
+
+/**
+ * @brief   Default minimum amount of time between transmissions in microseconds
+ *          (InterFrameGap)
+ *
+ * All packets to a same destination, and in particular fragments, may be
+ * subject to receive while transmitting and hidden terminal collisions with the
+ * next or the previous transmission as the fragments progress along a same
+ * path. The InterFrameGap protects the propagation of to one transmission
+ * before the next one is triggered and creates a duty cycle that controls the
+ * ratio of air and memory in intermediate nodes that a particular datagram will
+ * use.
+ */
+#ifndef GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US
+#define GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US   (100U)
+#endif
+
+/**
+ * @brief   Default minimum amount of time in milliseconds a node should wait
+ *          for an RFRAG Acknowledgment before it takes a next action
+ *          (MinARQTimeOut)
+ */
+#ifndef GNRC_SIXLOWPAN_SFR_MIN_ARQ_TIMEOUT_MS
+#define GNRC_SIXLOWPAN_SFR_MIN_ARQ_TIMEOUT_MS   (350U)
+#endif
+
+/**
+ * @brief   Default maximum amount of time in milliseconds a node should wait
+ *          for an RFRAG Acknowledgment before it takes a next action
+ *          (MaxARQTimeOut)
+ */
+#ifndef GNRC_SIXLOWPAN_SFR_MAX_ARQ_TIMEOUT_MS
+#define GNRC_SIXLOWPAN_SFR_MAX_ARQ_TIMEOUT_MS   (700U)
+#endif
+
+/**
+ * @brief   Default starting point of the value of the amount of time in
+ *          milliseconds that a sender should wait for an RFRAG Acknowledgment
+ *          before it takes a next action (OptARQTimeOut)
+ */
+#ifndef GNRC_SIXLOWPAN_SFR_OPT_ARQ_TIMEOUT_MS
+#define GNRC_SIXLOWPAN_SFR_OPT_ARQ_TIMEOUT_MS   (GNRC_SIXLOWPAN_SFR_MAX_ARQ_TIMEOUT_MS)
+#endif
+
+/**
+ * @brief   The maximum number of retries for a particular fragment
+ *          (MaxFragRetries)
+ */
+#ifndef GNRC_SIXLOWPAN_SFR_FRAG_RETRIES
+#define GNRC_SIXLOWPAN_SFR_FRAG_RETRIES     (2U)
+#endif
+
+/**
+ * @brief   The maximum number of retries from scratch for a particular
+ *          datagram (MaxDatagramRetries)
+ */
+#ifndef GNRC_SIXLOWPAN_SFR_DG_RETRIES
+#define GNRC_SIXLOWPAN_SFR_DG_RETRIES       (0U)
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
