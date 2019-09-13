@@ -15,4 +15,9 @@ ifneq (,$(filter periph_flashpage periph_eeprom,$(USEMODULE)))
   SRC += flash_common.c
 endif
 
+ifneq (,$(filter periph_wdt,$(USEMODULE)))
+  $(warning Attention! WDT is clocked by CLOCK_LSI, it needs manual measuring\
+    since values can deviate up to 50% from reference)
+endif
+
 include $(RIOTMAKE)/periph.mk

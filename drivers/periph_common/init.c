@@ -38,6 +38,9 @@
 #ifdef MODULE_PERIPH_USBDEV
 #include "periph/usbdev.h"
 #endif
+#ifdef MODULE_PERIPH_WDT
+#include "periph/wdt.h"
+#endif
 
 void periph_init(void)
 {
@@ -71,5 +74,9 @@ void periph_init(void)
 
 #ifdef MODULE_PERIPH_USBDEV
     usbdev_init_lowlevel();
+#endif
+
+#if defined(MODULE_PERIPH_WDT) && WDT_HAS_INIT
+    wdt_init();
 #endif
 }
