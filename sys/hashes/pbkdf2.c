@@ -22,6 +22,7 @@
 
 #include "hashes/sha256.h"
 #include "hashes/pbkdf2.h"
+#include "crypto/helper.h"
 
 static void inplace_xor_scalar(uint8_t *bytes, size_t len, uint8_t c)
 {
@@ -41,6 +42,8 @@ static void inplace_xor_digests(uint8_t *d1, const uint8_t *d2)
         d2++;
     }
 }
+
+#define _WIPE(a) crypto_secure_wipe(&a, sizeof(a))
 
 void pbkdf2_sha256(const uint8_t *password, size_t password_len,
                    const uint8_t *salt, size_t salt_len,
@@ -75,6 +78,8 @@ void pbkdf2_sha256(const uint8_t *password, size_t password_len,
 
         inplace_xor_scalar(processed_pass, sizeof(processed_pass), 0x36 ^ 0x5C);
         sha256_update(&outer, processed_pass, sizeof(processed_pass));
+
+        _WIPE(processed_pass);
     }
 
     memset(output, 0, SHA256_DIGEST_LENGTH);
@@ -96,5 +101,14 @@ void pbkdf2_sha256(const uint8_t *password, size_t password_len,
         sha256_final(&outer_copy, tmp_digest);
 
         inplace_xor_digests(output, tmp_digest);
+
+        if (iterations == 0) {
+            _WIPE(inner_copy);
+            _WIPE(outer_copy);
+        }
     }
+
+    _WIPE(inner);
+    _WIPE(outer);
+    _WIPE(tmp_digest);
 }
