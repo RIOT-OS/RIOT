@@ -644,8 +644,10 @@ static void turn_off(can_t *dev)
 #endif
             }
             _status[chan] = STATUS_SLEEP;
-            periph_clk_dis(APB1, dev->conf->rcc_mask);
-            enable_int(dev, 0);
+            if (dev->conf->en_deep_sleep_wake_up) {
+                periph_clk_dis(APB1, dev->conf->rcc_mask);
+                enable_int(dev, 0);
+            }
         }
     }
     else {
@@ -658,20 +660,26 @@ static void turn_off(can_t *dev)
 #endif
             /* Fall through */
             case STATUS_NOT_USED:
-                periph_clk_dis(APB1, dev->conf->master_rcc_mask);
+                if (dev->conf->en_deep_sleep_wake_up) {
+                    periph_clk_dis(APB1, dev->conf->master_rcc_mask);
+                }
                 break;
         }
-        periph_clk_dis(APB1, dev->conf->rcc_mask);
+        if (dev->conf->en_deep_sleep_wake_up) {
+            periph_clk_dis(APB1, dev->conf->rcc_mask);
+        }
         if (_status[get_channel(dev->conf->can)] != STATUS_SLEEP) {
 #ifdef STM32_PM_STOP
             pm_unblock(STM32_PM_STOP);
 #endif
         }
         _status[get_channel(dev->conf->can)] = STATUS_SLEEP;
-        if (_status[master_chan] == STATUS_SLEEP) {
-            enable_int(dev, 1);
+        if (dev->conf->en_deep_sleep_wake_up) {
+            if (_status[master_chan] == STATUS_SLEEP) {
+                enable_int(dev, 1);
+            }
+            enable_int(dev, 0);
         }
-        enable_int(dev, 0);
     }
 #else
     if (_status[get_channel(dev->conf->can)] != STATUS_SLEEP) {
@@ -680,8 +688,10 @@ static void turn_off(can_t *dev)
 #endif
     }
     _status[get_channel(dev->conf->can)] = STATUS_SLEEP;
-    periph_clk_dis(APB1, dev->conf->rcc_mask);
-    gpio_init_int(dev->rx_pin, GPIO_IN, GPIO_FALLING, _wkup_cb, dev);
+    if (dev->conf->en_deep_sleep_wake_up) {
+        periph_clk_dis(APB1, dev->conf->rcc_mask);
+        gpio_init_int(dev->rx_pin, GPIO_IN, GPIO_FALLING, _wkup_cb, dev);
+    }
 #endif
     irq_restore(irq);
 }
@@ -697,7 +707,9 @@ static void turn_on(can_t *dev)
         switch (_status[master_chan]) {
             case STATUS_SLEEP:
                 _status[master_chan] = STATUS_READY_FOR_SLEEP;
-                disable_int(dev, 1);
+                if (dev->conf->en_deep_sleep_wake_up) {
+                    disable_int(dev, 1);
+                }
 #ifdef STM32_PM_STOP
                 pm_block(STM32_PM_STOP);
 #endif
@@ -712,7 +724,9 @@ static void turn_on(can_t *dev)
 #ifdef STM32_PM_STOP
         pm_block(STM32_PM_STOP);
 #endif
-        disable_int(dev, 0);
+        if (dev->conf->en_deep_sleep_wake_up) {
+            disable_int(dev, 0);
+        }
         periph_clk_en(APB1, dev->conf->rcc_mask);
     }
     _status[get_channel(dev->conf->can)] = STATUS_ON;
