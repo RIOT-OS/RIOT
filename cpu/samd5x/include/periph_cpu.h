@@ -29,6 +29,21 @@ extern "C" {
 #endif
 
 /**
+ * @brief   DFLL runs at at fixed frequency of 48 MHz
+ */
+#define SAM0_DFLL_FREQ_HZ       (48000000U)
+
+/**
+ * @brief   DPLL must run with at least 96 MHz
+ */
+#define SAM0_DPLL_FREQ_MIN_HZ   (96000000U)
+
+/**
+ * @brief   DPLL frequency must not exceed 200 MHz
+ */
+#define SAM0_DPLL_FREQ_MAX_HZ   (200000000U)
+
+/**
  * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
  */
 static const int8_t exti_config[4][32] = {

@@ -22,6 +22,28 @@
 #include "periph/init.h"
 #include "stdio_base.h"
 
+#if CLOCK_CORECLOCK == 0
+#error Please select CLOCK_CORECLOCK
+#endif
+
+/* use DFLL for low frequency operation */
+#if CLOCK_CORECLOCK > SAM0_DFLL_FREQ_HZ
+#define USE_DPLL 1
+#else
+#define USE_DPLL 0
+#if (SAM0_DFLL_FREQ_HZ % CLOCK_CORECLOCK)
+#error For frequencies < 48 MHz, CLOCK_CORECLOCK must be a divider of 48 MHz
+#endif
+#endif
+
+/* If the CPU clock is lower than the minimal DPLL Freq
+   set fDPLL = 2 * CLOCK_CORECLOCK */
+#if USE_DPLL && (CLOCK_CORECLOCK < SAM0_DPLL_FREQ_MIN_HZ)
+#define DPLL_DIV 2
+#else
+#define DPLL_DIV 1
+#endif
+
 static void xosc32k_init(void)
 {
     OSC32KCTRL->XOSC32K.reg = OSC32KCTRL_XOSC32K_ENABLE
@@ -48,6 +70,7 @@ static void dfll_init(void)
     while (!OSCCTRL->STATUS.bit.DFLLRDY) {}
 }
 
+#if USE_DPLL
 static void fdpll0_init(uint32_t f_cpu)
 {
     /* We source the DPLL from 32kHz GCLK1 */
@@ -75,6 +98,7 @@ static void fdpll0_init(uint32_t f_cpu)
     while (!(OSCCTRL->Dpll[0].DPLLSTATUS.bit.CLKRDY &&
              OSCCTRL->Dpll[0].DPLLSTATUS.bit.LOCK)) {}
 }
+#endif
 
 static void gclk_connect(uint8_t id, uint8_t src, uint32_t flags) {
     GCLK->GENCTRL[id].reg = GCLK_GENCTRL_SRC(src) | GCLK_GENCTRL_GENEN | flags | GCLK_GENCTRL_IDC;
@@ -126,13 +150,20 @@ void cpu_init(void)
     dfll_init();
     gclk_connect(0, GCLK_SOURCE_DFLL, 0);
 
-    fdpll0_init(CLOCK_CORECLOCK);
+#if USE_DPLL
+    fdpll0_init(CLOCK_CORECLOCK * DPLL_DIV);
 
     /* source main clock from DPLL */
-    gclk_connect(0, GCLK_SOURCE_DPLL0, 0);
+    gclk_connect(0, GCLK_SOURCE_DPLL0, GCLK_GENCTRL_DIV(DPLL_DIV));
 
     /* clock used by xtimer */
-    gclk_connect(5, GCLK_SOURCE_DPLL0, GCLK_GENCTRL_DIV(CLOCK_CORECLOCK / 8000000));
+    gclk_connect(5, GCLK_SOURCE_DPLL0, GCLK_GENCTRL_DIV(DPLL_DIV * CLOCK_CORECLOCK / 8000000));
+#else
+    gclk_connect(0, GCLK_SOURCE_DFLL, GCLK_GENCTRL_DIV(SAM0_DFLL_FREQ_HZ / CLOCK_CORECLOCK));
+
+    /* clock used by xtimer */
+    gclk_connect(5, GCLK_SOURCE_DFLL, GCLK_GENCTRL_DIV(SAM0_DFLL_FREQ_HZ / 8000000));
+#endif
 
 #ifdef MODULE_PERIPH_USBDEV
     gclk_connect(6, GCLK_SOURCE_DFLL, 0);
