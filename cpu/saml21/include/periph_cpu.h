@@ -27,6 +27,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
  */
 #if defined(CPU_MODEL_SAML21E18A) || defined(CPU_MODEL_SAML21E18B) || \

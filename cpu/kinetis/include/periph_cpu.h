@@ -125,6 +125,11 @@ typedef uint16_t gpio_t;
 /** @} */
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @brief   Prevent shared timer functions from being used
  */
 #define PERIPH_TIMER_PROVIDES_SET

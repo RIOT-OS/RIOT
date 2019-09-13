@@ -69,6 +69,11 @@ typedef enum {
 #define PROVIDES_PM_LAYERED_OFF
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @brief   Power management configuration
  */
 #define PM_NUM_MODES    (2U)

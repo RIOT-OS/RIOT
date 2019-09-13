@@ -29,6 +29,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
  */
 static const int8_t exti_config[4][32] = {

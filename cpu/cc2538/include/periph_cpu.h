@@ -53,6 +53,11 @@ typedef uint32_t gpio_t;
 /** @} */
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @name    Power management configuration
  * @{
  */

@@ -46,6 +46,11 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x, y)      (((uint32_t)PIOA + (x << 9)) | y)
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @brief Declare needed generic SPI functions
  * @{
  */

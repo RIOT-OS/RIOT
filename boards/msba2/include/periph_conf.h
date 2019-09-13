@@ -26,6 +26,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @name    Clock configuration
  * @{
  */

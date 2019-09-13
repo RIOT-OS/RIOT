@@ -35,6 +35,11 @@ extern "C" {
 #define PM_BLOCKER_INITIAL  { .val_u32 = 0x00000001 }
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @name   SAMD21 sleep modes for PM
  * @{
  */

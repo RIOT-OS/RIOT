@@ -36,6 +36,11 @@ extern "C" {
 #define PERIPH_CLOCK        (16000000U)
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @brief   Redefine some peripheral names to unify them between nRF51 and 52
  * @{
  */

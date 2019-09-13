@@ -29,6 +29,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @brief   Overwrite the default gpio_t type definition
  * @{
  */

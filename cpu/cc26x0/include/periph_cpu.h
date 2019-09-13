@@ -35,6 +35,11 @@ extern "C" {
 #define CPUID_LEN           (16U)
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @name    Power management configuration
  * @{
  */

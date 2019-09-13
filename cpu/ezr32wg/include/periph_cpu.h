@@ -39,6 +39,11 @@ typedef uint32_t tim_t;
 /** @} */
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @brief   Starting offset of CPU_ID
  */
 #define CPUID_ADDR          (&DEVINFO->UNIQUEL)

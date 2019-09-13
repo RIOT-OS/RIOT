@@ -398,6 +398,11 @@ typedef struct {
 } uart_conf_t;
 
 /**
+ * @brief   We provide early initialisation of stdio
+ */
+#define PROVIDES_EARLY_STDIO_INIT
+
+/**
  * @brief   CPU provides own pm_off() function
  */
 #define PROVIDES_PM_LAYERED_OFF

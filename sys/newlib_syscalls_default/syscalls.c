@@ -69,7 +69,9 @@ char *heap_top = &_sheap + 4;
  */
 void _init(void)
 {
-    /* nothing to do here */
+#ifndef PROVIDES_EARLY_STDIO_INIT
+    stdio_init();
+#endif
 }
 
 /**
