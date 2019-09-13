@@ -1,0 +1,17 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+ifeq (,$(filter-out stdio_cdc_acm,$(filter stdio_% slipdev_stdio,$(USEMODULE))))
+  # Use stdio_cdc_acm only if no other stdio is requested explicitly.
+  USEMODULE += stdio_cdc_acm
+  # This does not *really* hinge on the choice of stdio, but this ensures
+  # compatibility with the test suite that uses stdio_null and would conflict
+  # with bootloader_nrfutil.
+  # (Having the feature in is generally a good thing because as an indicator
+  # that it the resulting program is meant to be flashed using nrfutil).
+  FEATURES_REQUIRED += bootloader_nrfutil
+endif
+# ... and fall back to the UART-based stdio
+
+include $(RIOTBOARD)/common/nrf52/Makefile.dep
