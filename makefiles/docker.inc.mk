@@ -200,7 +200,7 @@ endef
 
 # docker_volume command line arguments. Allows giving volume mount options.
 # By default 'DOCKER_VOLUME_OPTIONS'. Argument option ignore the default.
-DOCKER_VOLUME_OPTIONS ?=
+DOCKER_VOLUME_OPTIONS ?= delegated
 docker_volume = -v '$1:$2$(addprefix :,$(or $3,$(DOCKER_VOLUME_OPTIONS)))'
 
 docker_volume_and_env = $(strip $(call _docker_volume_and_env,$1,$2,$3))
