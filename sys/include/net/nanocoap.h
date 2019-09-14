@@ -19,13 +19,16 @@
  * provides high and low level interfaces to CoAP options, including Block.
  *
  * nanocoap includes the core structs to store message information. It also
- * also provides support for sending and receiving messages, such as
- * coap_parse() to read an incoming message.
+ * provides helper functions for use before sending and after receiving a
+ * message, such as coap_parse() to read an incoming message.
  *
- * The documentation here mostly categorizes and lists the contents of
- * nanocoap. To use nanocoap in an application, see the APIs that are built
- * with it: [nanocoap sock](group__net__nanosock.html) and
- * [gcoap](group__net__gcoap.html).
+ * ## Application APIs
+ *
+ * This page provides reference documentation for the contents of nanocoap. To
+ * use nanocoap in an application, see the functional APIs that are built with
+ * it. [nanocoap sock](group__net__nanosock.html) is for a targeted client or
+ * server with lesser resource requirements, and [gcoap](group__net__gcoap.html)
+ * provides a more featureful messaging hub.
  *
  * ## Option APIs
  *
