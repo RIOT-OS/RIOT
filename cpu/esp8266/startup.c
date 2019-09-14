@@ -33,6 +33,7 @@
 #include "board.h"
 #include "common.h"
 #include "exceptions.h"
+#include "stdio_base.h"
 #include "syscalls.h"
 #include "tools.h"
 #include "thread_arch.h"
@@ -158,6 +159,9 @@ void system_init(void)
     /* init flash drive */
     extern void flash_drive_init (void);
     flash_drive_init();
+
+    /* initialize stdio*/
+    stdio_init();
 
     /* trigger static peripheral initialization */
     periph_init();
@@ -692,6 +696,9 @@ void __attribute__((noreturn)) IRAM cpu_user_start (void)
     /* init flash drive */
     extern void flash_drive_init (void);
     flash_drive_init();
+
+    /* initialize stdio*/
+    stdio_init();
 
     /* trigger static peripheral initialization */
     periph_init();
