@@ -58,17 +58,13 @@ _init_data(void)
 
 void bootloader(void)
 {
-    extern void bl_init_ports(void);
-    extern void bl_init_clks(void);
-
-    /* board specific setup of clocks */
-    bl_init_clks();
+    extern void cpu_init(void);
 
     /* initialize bss and data */
     _init_data();
 
-    /* board specific setup of i/o pins */
-    bl_init_ports();
+    /* cpu specific setup of clocks, peripherals */
+    cpu_init();
 
 #ifdef MODULE_NEWLIB
     extern void __libc_init_array(void);

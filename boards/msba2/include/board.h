@@ -52,11 +52,6 @@ extern "C" {
 #define XTIMER_OVERHEAD     7
 /** @} */
 
-/**
- * @brief   initialize the board's clock system
- */
-void init_clks1(void);
-
 #ifdef __cplusplus
 }
 #endif
