@@ -191,7 +191,7 @@ int i2c_read_regs(i2c_t dev, uint16_t address, uint16_t reg,
         return -EOPNOTSUPP;
     }
 
-    /* Handle endianess of register if 16 bit */
+    /* Handle endianness of register if 16 bit */
     if (flags & I2C_REG16) {
         reg_end = htons(reg); /* Make sure register is in big-endian on I2C bus */
     }
@@ -237,7 +237,7 @@ int i2c_write_regs(i2c_t dev, uint16_t address, uint16_t reg,
         return -EOPNOTSUPP;
     }
 
-    /* Handle endianess of register if 16 bit */
+    /* Handle endianness of register if 16 bit */
     if (flags & I2C_REG16) {
         reg_end = htons(reg); /* Make sure register is in big-endian on I2C bus */
     }

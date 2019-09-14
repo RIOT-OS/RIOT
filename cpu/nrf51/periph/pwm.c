@@ -124,7 +124,7 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
     assert((dev == 0) && (channel == 0));
 
     /*
-     * make sure duty cycle is set at the beggining of each period
+     * make sure duty cycle is set at the beginning of each period
      * ensure to stop the timer as soon as possible
      */
     PWM_TIMER->TASKS_STOP = 1;

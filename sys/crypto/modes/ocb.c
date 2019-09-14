@@ -306,7 +306,7 @@ int32_t cipher_encrypt_ocb(cipher_t *cipher, uint8_t *auth_data,
                                      OCB_MODE_ENCRYPT);
 
     if (cipher_text_length < 0) {
-        // An error occured. Return the error code
+        // An error occurred. Return the error code
         return cipher_text_length;
     }
     /* C = C_1 || C_2 || ... || C_m || C_* || Tag[1..TAGLEN] */
@@ -331,7 +331,7 @@ int32_t cipher_decrypt_ocb(cipher_t *cipher, uint8_t *auth_data,
                                     OCB_MODE_DECRYPT);
 
     if (plain_text_length < 0) {
-        // An error occured. Retur the error code
+        // An error occurred. Retur the error code
         return plain_text_length;
     }
     /* Check the tag */

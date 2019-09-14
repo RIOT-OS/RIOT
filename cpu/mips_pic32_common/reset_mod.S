@@ -240,5 +240,5 @@ LEAF(__boot_debug_exception)
     ehb
     deret
 1:
-    b 1b			 	#Spin indefinately
+    b 1b			 	#Spin indefinitely
 END(__boot_debug_exception)

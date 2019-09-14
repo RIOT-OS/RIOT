@@ -366,7 +366,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [ENET_1588_Timer_IRQn] = isr_enet_1588_timer, /* Ethernet MAC IEEE 1588 Timer Interrupt */
     [ENET_Transmit_IRQn] = isr_enet_transmit,   /* Ethernet MAC Transmit Interrupt */
     [ENET_Receive_IRQn] = isr_enet_receive,    /* Ethernet MAC Receive Interrupt */
-    [ENET_Error_IRQn ] = isr_enet_error,      /* Ethernet MAC Error and miscelaneous Interrupt */
+    [ENET_Error_IRQn ] = isr_enet_error,      /* Ethernet MAC Error and miscellaneous Interrupt */
 #endif
 #ifdef LPUART0
     [LPUART0_IRQn    ] = isr_lpuart0,         /* LPUART0 status/error interrupt */

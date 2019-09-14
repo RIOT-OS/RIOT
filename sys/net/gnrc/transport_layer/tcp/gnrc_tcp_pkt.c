@@ -313,7 +313,7 @@ int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const ui
         return 0;
     }
 
-    /* Everthing else is not acceptable */
+    /* Everything else is not acceptable */
     return -1;
 }
 
@@ -403,7 +403,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
         }
     }
 
-    /* Perform boundry checks on current RTO before usage */
+    /* Perform boundary checks on current RTO before usage */
     if (tcb->rto < (int32_t) GNRC_TCP_RTO_LOWER_BOUND) {
         tcb->rto = GNRC_TCP_RTO_LOWER_BOUND;
     }

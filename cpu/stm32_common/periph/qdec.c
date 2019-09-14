@@ -156,7 +156,7 @@ static int32_t _qdec_read(qdec_t qdec, uint8_t reset)
     /* Restore IRQ */
     irq_restore(irq_save);
 
-    /* Substract offset before return */
+    /* Subtract offset before return */
     count -= dev(qdec)->ARR / 2;
 
     /* Return count minus offset */

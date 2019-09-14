@@ -62,7 +62,7 @@ void can_pkt_init(void);
  * @param[in] frame  the frame to copy
  * @param[in] tx_pid the pid of the sender's device thread
  *
- * @return an allocated CAN packet, NULL if an error occured
+ * @return an allocated CAN packet, NULL if an error occurred
  */
 can_pkt_t *can_pkt_alloc_tx(int ifnum, const struct can_frame *frame, kernel_pid_t tx_pid);
 
@@ -72,7 +72,7 @@ can_pkt_t *can_pkt_alloc_tx(int ifnum, const struct can_frame *frame, kernel_pid
  * @param[in] ifnum  the interface number
  * @param[in] frame  the received frame
  *
- * @return an allocated CAN packet, NULL if an error occured
+ * @return an allocated CAN packet, NULL if an error occurred
  */
 can_pkt_t *can_pkt_alloc_rx(int ifnum, const struct can_frame *frame);
 
@@ -87,7 +87,7 @@ can_pkt_t *can_pkt_alloc_rx(int ifnum, const struct can_frame *frame);
  * @param[in] frame  the frame to copy
  * @param[in] mbox   the pointer to the sender's mbox
  *
- * @return an allocated CAN packet, NULL if an error occured
+ * @return an allocated CAN packet, NULL if an error occurred
  */
 can_pkt_t *can_pkt_alloc_mbox_tx(int ifnum, const struct can_frame *frame, mbox_t *mbox);
 #endif

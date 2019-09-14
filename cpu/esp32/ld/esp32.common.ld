@@ -85,7 +85,7 @@ SECTIONS
 
   .iram0.text :
   {
-    /* Code marked as runnning out of IRAM */
+    /* Code marked as running out of IRAM */
     _iram_text_start = ABSOLUTE(.);
     *(.iram1 .iram1.*)
 

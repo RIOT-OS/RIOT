@@ -115,7 +115,7 @@ void gpio_isr(int num)
         isr_ctx[pin].cb(isr_ctx[pin].arg);
     }
 
-    /* Clear interupt */
+    /* Clear interrupt */
     switch (isr_flank[pin]) {
         case GPIO_FALLING:
             GPIO_REG(GPIO_FALL_IP) |= (1 << pin);
@@ -169,7 +169,7 @@ void gpio_irq_enable(gpio_t pin)
         return;
     }
 
-    /* Enable interupt for pin */
+    /* Enable interrupt for pin */
     switch (isr_flank[pin]) {
         case GPIO_FALLING:
             GPIO_REG(GPIO_FALL_IE) |= (1 << pin);
@@ -196,7 +196,7 @@ void gpio_irq_disable(gpio_t pin)
         return;
     }
 
-    /* Disable interupt for pin */
+    /* Disable interrupt for pin */
     switch (isr_flank[pin]) {
         case GPIO_FALLING:
             GPIO_REG(GPIO_FALL_IE) &= ~(1 << pin);

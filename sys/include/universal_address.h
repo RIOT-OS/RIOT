@@ -114,7 +114,7 @@ uint8_t* universal_address_get_address(universal_address_container_t *entry,
  * @param[in] entry       pointer to the universal_address_container_t for compare
  * @param[in] addr        pointer to the address for compare
  * @param[in, out] addr_size_in_bits  the number of bits  used for the address entry
- *                                    on sucessfull return this value is overwritten
+ *                                    on successful return this value is overwritten
  *                                    with the number of matching bits till the
  *                                    first of trailing `0`s
  *

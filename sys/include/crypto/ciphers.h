@@ -65,7 +65,7 @@ extern "C" {
 #define CIPHER_ERR_DEC_FAILED         -6
 /** Is returned by the cipher_init functions, if the coresponding alogirithm has not been included in the build */
 #define CIPHER_ERR_BAD_CONTEXT_SIZE    0
-/**  Returned by cipher_init upon succesful initialization of a cipher. */
+/**  Returned by cipher_init upon successful initialization of a cipher. */
 #define CIPHER_INIT_SUCCESS            1
 
 /**

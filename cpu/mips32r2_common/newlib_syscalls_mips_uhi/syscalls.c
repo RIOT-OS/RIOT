@@ -70,7 +70,7 @@ void _exit(int n)
     exit(n);
 
     /* cppcheck-suppress unreachableCode
-     * (reason: pm_off spins indefinately after pulling the plug) */
+     * (reason: pm_off spins indefinitely after pulling the plug) */
     pm_off();
 }
 
@@ -127,7 +127,7 @@ pid_t _getpid_r(struct _reent *ptr)
 * @param sig signal number to pass to process
 *
 * @return -1 on error
-* @return 0 on sucess
+* @return 0 on success
 */
 __attribute__ ((weak))
 int _kill_r(struct _reent *r, pid_t pid, int sig)

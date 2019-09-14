@@ -167,7 +167,7 @@ kernel_pid_t isotp_init(char *stack, int stacksize, char priority, const char *n
  * @param flags           flags for sending
  *
  * @return the number of bytes sent
- * @return < 0 if an error occured  (-EBUSY, -ENOMEM)
+ * @return < 0 if an error occurred  (-EBUSY, -ENOMEM)
  */
 int isotp_send(struct isotp *isotp, const void *buf, int len, int flags);
 

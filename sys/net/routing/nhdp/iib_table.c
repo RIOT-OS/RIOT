@@ -448,7 +448,7 @@ static iib_link_set_entry_t *update_link_set(iib_base_entry_t *base_entry, nib_e
         release_link_tuple_addresses(matching_lt);
     }
     else {
-        /* No single matching link tuple existant, create a new one */
+        /* No single matching link tuple existent, create a new one */
         matching_lt = add_default_link_set_entry(base_entry, now, val_time);
 
         if (!matching_lt) {

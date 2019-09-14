@@ -95,7 +95,7 @@ extern "C" {
 #define RTO_UNINITIALIZED (-1)
 
 /**
- * @brief Overflow tolerant comparision operators for sequence and
+ * @brief Overflow tolerant comparison operators for sequence and
           acknowledgement number comparison.
  * @{
  */

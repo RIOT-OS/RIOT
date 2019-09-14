@@ -208,7 +208,7 @@ static void IRAM system_clk_init (void)
     /* set SLOW_CLK to internal low power clock of 150 kHz */
     rtc_select_slow_clk(RTC_SLOW_FREQ_RTC);
 
-    /* wait until UART is idle to avoid loosing output */
+    /* wait until UART is idle to avoid losing output */
     uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
     ets_printf("Switching system clocks can lead to some unreadable characters\n");
     ets_printf("This message is usually not visible at the console\n");

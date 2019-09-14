@@ -159,7 +159,7 @@ uint32_t sx127x_get_time_on_air(const sx127x_t *dev, uint8_t pkt_len)
                     bw = 500e3;
                     break;
                 default:
-                    DEBUG("Invalid bandwith: %d\n", dev->settings.lora.bandwidth);
+                    DEBUG("Invalid bandwidth: %d\n", dev->settings.lora.bandwidth);
                     break;
             }
 

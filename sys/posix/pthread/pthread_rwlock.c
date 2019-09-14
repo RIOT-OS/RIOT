@@ -261,7 +261,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
     }
 
     if (rwlock->readers != 0 || rwlock->queue.first == NULL) {
-        /* this thread was not the last reader, or no one is waiting to aquire the lock */
+        /* this thread was not the last reader, or no one is waiting to acquire the lock */
         DEBUG("Thread %" PRIkernel_pid ": pthread_rwlock_%s(): no one is waiting\n", thread_getpid(), "unlock");
         mutex_unlock(&rwlock->mutex);
         return 0;

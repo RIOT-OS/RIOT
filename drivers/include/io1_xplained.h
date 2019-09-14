@@ -32,7 +32,7 @@
  * @{
  *
  * @file
- * @brief       Device driver interface for the Atmel IO1 Xplained extention.
+ * @brief       Device driver interface for the Atmel IO1 Xplained extension.
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */

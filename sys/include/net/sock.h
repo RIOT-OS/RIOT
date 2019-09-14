@@ -147,7 +147,7 @@ extern "C" {
 
 /**
  * @brief   Special netif ID for "any interface"
- * @todo    Use an equivalent defintion from PR #5511
+ * @todo    Use an equivalent definition from PR #5511
  */
 #define SOCK_ADDR_ANY_NETIF (0)
 

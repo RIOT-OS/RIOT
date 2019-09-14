@@ -472,7 +472,7 @@ static /* IRAM */ int _i2c_start_cond(_i2c_bus_t* bus)
         /* SDA = passive HIGH (floating and pulled-up) */
         _i2c_sda_high (bus);
 
-        /* t_VD;DAT not neccessary */
+        /* t_VD;DAT not necessary */
         /* _i2c_delay (bus); */
 
         /* SCL = passive HIGH (floating and pulled-up) */

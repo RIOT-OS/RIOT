@@ -71,7 +71,7 @@ enum {
  * @param[in]  params       Initialization parameters
  *
  * @return                  DS75LX_OK on success
- * @return                  -DS75LX_ERR_I2C if an error occured when reading/writing
+ * @return                  -DS75LX_ERR_I2C if an error occurred when reading/writing
  */
 int ds75lx_init(ds75lx_t *dev, const ds75lx_params_t *params);
 
@@ -82,7 +82,7 @@ int ds75lx_init(ds75lx_t *dev, const ds75lx_params_t *params);
  * @param[out] temperature  Temperature in c°C
  *
  * @return                  DS75LX_OK on success
- * @return                  -DS75LX_ERR_I2C if an error occured when reading/writing
+ * @return                  -DS75LX_ERR_I2C if an error occurred when reading/writing
  */
 int ds75lx_read_temperature(const ds75lx_t *dev, int16_t *temperature);
 
@@ -92,7 +92,7 @@ int ds75lx_read_temperature(const ds75lx_t *dev, int16_t *temperature);
  * @param[in] dev           Device descriptor of DS75LX device
  *
  * @return                  DS75LX_OK on success
- * @return                  -DS75LX_ERR_I2C if an error occured when reading/writing
+ * @return                  -DS75LX_ERR_I2C if an error occurred when reading/writing
  */
 int ds75lx_wakeup(const ds75lx_t *dev);
 
@@ -102,7 +102,7 @@ int ds75lx_wakeup(const ds75lx_t *dev);
  * @param[in] dev           Device descriptor of DS75LX device
  *
  * @return                  DS75LX_OK on success
- * @return                  -DS75LX_ERR_I2C if an error occured when reading/writing
+ * @return                  -DS75LX_ERR_I2C if an error occurred when reading/writing
  */
 int ds75lx_shutdown(const ds75lx_t *dev);
 

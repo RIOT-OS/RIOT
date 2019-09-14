@@ -1047,7 +1047,7 @@ class BootStrapLoader(LowLevel):
             sys.stderr.flush()
         #send the password
         self.bslTxRx(self.BSL_TXPWORD,      #Command: Transmit Password
-                       0xffe0,              #Address of interupt vectors
+                       0xffe0,              #Address of interrupt vectors
                        0x0020,              #Number of bytes
                        passwd,              #password
                        wait=wait)           #if wait is 1, try to sync forever
@@ -1098,7 +1098,7 @@ class BootStrapLoader(LowLevel):
                 if DEBUG:
                     sys.stderr.write("Autodetect successful: %04x -> %s\n" % (dev_id, self.cpu))
             else:
-                sys.stderr.write("Autodetect failed! Unkown ID: %04x. Trying to continue anyway.\n" % dev_id)
+                sys.stderr.write("Autodetect failed! Unknown ID: %04x. Trying to continue anyway.\n" % dev_id)
                 self.cpu = F1x                      #assume something and try anyway..
 
         sys.stderr.write("Current bootstrap loader version: %x.%x (Device ID: %04x)\n" % (bslVerHi, bslVerLo, dev_id))
@@ -1200,7 +1200,7 @@ class BootStrapLoader(LowLevel):
         self.txPasswd(self.passwd)
 
         #update version info
-        #verison only valid for the internal ones, but it also makes sure
+        #version only valid for the internal ones, but it also makes sure
         #that the patches are not applied if the user d/ls one
         self.bslVer = 0x0150
 
@@ -1306,7 +1306,7 @@ goodfet.bsl -e -p foo.hex
         sys.stderr.flush()
         self.bslTxRx(self.BSL_CHANGEBAUD,   #Command: change baudrate
                     a, l)                   #args are coded in adr and len
-        time.sleep(0.010)                   #recomended delay
+        time.sleep(0.010)                   #recommended delay
         self.serialport.baudrate = baudrate
 
     def actionReadBSLVersion(self):

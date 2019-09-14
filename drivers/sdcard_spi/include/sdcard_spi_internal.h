@@ -179,10 +179,10 @@ typedef enum {
  *                        (for CMDX this parameter is simply the integer value X).
  * @param[in] argument    The argument for the given cmd. As described by "7.3.1.1 Command Format".
  *                        This argument is transmitted byte wise with most significant byte first.
- * @param[in] max_retry   Specifies how often the command should be retried if an error occures.
+ * @param[in] max_retry   Specifies how often the command should be retried if an error occurs.
  *                        Use 0 to try only once, -1 to try forever, or n to retry n times.
  *
- * @return                R1 response of the command if no (low-level) communication error occured
+ * @return                R1 response of the command if no (low-level) communication error occurred
  * @return                SD_INVALID_R1_RESPONSE if either waiting for the card to enter
  *                        not-busy-state timed out or spi communication failed
  */
@@ -197,10 +197,10 @@ uint8_t sdcard_spi_send_cmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t arg
  *                        (for ACMDX this parameter is simply the integer value X).
  * @param[in] argument    The argument for the given cmd. As described by "7.3.1.1 Command Format".
  *                        This argument is transmitted byte wise with most significant byte first.
- * @param[in] max_retry   Specifies how often the command should be retried if an error occures.
+ * @param[in] max_retry   Specifies how often the command should be retried if an error occurs.
  *                        Use 0 to try only once, -1 to try forever, or n to retry n times.
  *
- * @return                R1 response of the command if no (low-level) communication error occured
+ * @return                R1 response of the command if no (low-level) communication error occurred
  * @return                SD_INVALID_R1_RESPONSE if either waiting for the card to enter
  *                        not-busy-state timed out or spi communication failed
  */

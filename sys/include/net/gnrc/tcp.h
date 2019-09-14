@@ -60,7 +60,7 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
  * @pre @p target_addr must not be NULL.
  * @pre @p target_port must not be 0.
  *
- * @note Blocks until a connection has been established or an error occured.
+ * @note Blocks until a connection has been established or an error occurred.
  *
  * @param[in,out] tcb              TCB holding the connection information.
  * @param[in]     address_family   Address family of @p target_addr.
@@ -85,15 +85,15 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  uint8_t address_family,
                          uint16_t local_port);
 
 /**
- * @brief Opens a connection passively, by waiting for an incomming request.
+ * @brief Opens a connection passively, by waiting for an incoming request.
  *
  * @pre gnrc_tcp_tcb_init() must have been successfully called.
  * @pre @p tcb must not be NULL.
  * @pre if local_addr is not NULL, local_addr must be assigned to a network interface.
  * @pre if local_port is not zero.
  *
- * @note Blocks until a connection has been established (incomming connection request
- *       to @p local_port) or an error occured.
+ * @note Blocks until a connection has been established (incoming connection request
+ *       to @p local_port) or an error occurred.
  *
  * @param[in,out] tcb              TCB holding the connection information.
  * @param[in]     address_family   Address family of @p local_addr.
@@ -121,7 +121,7 @@ int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, uint8_t address_family,
  * @pre @p tcb must not be NULL.
  * @pre @p data must not be NULL.
  *
- * @note Blocks until up to @p len bytes were transmitted or an error occured.
+ * @note Blocks until up to @p len bytes were transmitted or an error occurred.
  *
  * @param[in,out] tcb                        TCB holding the connection information.
  * @param[in]     data                       Pointer to the data that should be transmitted.

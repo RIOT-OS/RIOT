@@ -288,7 +288,7 @@ static int _send_command(sht3x_dev_t* dev, uint16_t cmd)
     DEBUG_DEV("send command 0x%02x%02x", dev, data[0], data[1]);
 
     if (i2c_acquire(dev->i2c_dev) != 0) {
-        DEBUG_DEV ("could not aquire I2C bus", dev);
+        DEBUG_DEV ("could not acquire I2C bus", dev);
         return -SHT3X_ERROR_I2C;
     }
 
@@ -310,7 +310,7 @@ static int _read_data(sht3x_dev_t* dev, uint8_t *data, uint8_t len)
     int res = SHT3X_OK;
 
     if (i2c_acquire(dev->i2c_dev) != 0) {
-        DEBUG_DEV ("could not aquire I2C bus", dev);
+        DEBUG_DEV ("could not acquire I2C bus", dev);
         return -SHT3X_ERROR_I2C;
     }
 

@@ -173,7 +173,7 @@ void IRAM hw_timer_handler(void* arg)
     (void)arg;
 
     /* since all timer interrupt sources are routed to the same cpu interrupt */
-    /* signal, we can't use arg to identify the timer wich caused the it */
+    /* signal, we can't use arg to identify the timer which caused the it */
 
     irq_isr_enter();
 

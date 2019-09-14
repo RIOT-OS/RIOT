@@ -55,7 +55,7 @@ to get CCS811 working.
 ### <a name="supported"> Supported Features </a> &nbsp;&nbsp; [[TOC](#toc)]
 
 @note There are two driver module versions, the `ccs811` module
-wich provides only basic functionality and the `ccs811_full`
+which provides only basic functionality and the `ccs811_full`
 module with additional functionality.
 
 The `ccs811_full` module includes the `ccs811` module

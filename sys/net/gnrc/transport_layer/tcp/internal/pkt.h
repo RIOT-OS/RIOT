@@ -29,13 +29,13 @@ extern "C" {
 #endif
 
 /**
- * @brief Build a reset packet from an incomming packet.
+ * @brief Build a reset packet from an incoming packet.
  *
- * @note This function builds a reset from an incomming packet
+ * @note This function builds a reset from an incoming packet
  *       in cases where the connection has not been established.
  *
  * @param[out] out_pkt    Outgoing reset packet
- * @param[in]  in_pkt     Incomming packet
+ * @param[in]  in_pkt     Incoming packet
  *
  * @returns   Zero on success
  *            -ENOMEM if pktbuf is full.

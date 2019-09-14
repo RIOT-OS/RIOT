@@ -129,7 +129,7 @@ static void _fib_add(const char *dest, const char *next, kernel_pid_t pid, uint3
 
 int _fib_route_handler(int argc, char **argv)
 {
-    /* e.g. fibroute right now dont care about the adress/protocol family */
+    /* e.g. fibroute right now don't care about the address/protocol family */
     if (argc == 1) {
         fib_print_routes(&gnrc_ipv6_fib_table);
         return 0;
