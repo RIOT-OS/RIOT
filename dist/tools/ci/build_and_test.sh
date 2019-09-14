@@ -94,6 +94,7 @@ then
         run ./dist/tools/flake8/check.sh
         run ./dist/tools/headerguards/check.sh
         run ./dist/tools/buildsystem_sanity_check/check.sh
+        run ./dist/tools/codespell/check.sh
         exit $RESULT
     fi
 
