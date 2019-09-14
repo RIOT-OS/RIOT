@@ -30,24 +30,16 @@
  * server with lesser resource requirements, and [gcoap](group__net__gcoap.html)
  * provides a more featureful messaging hub.
  *
- * ## Option APIs
+ * ### Option APIs
  *
  * For both server responses and client requests, CoAP uses an Option mechanism
  * to encode message metadata that is not required for each message. For
  * example, the resource URI path is required only for a request, and is encoded
  * as the Uri-Path option.
  *
- * nanocoap provides two APIs for writing CoAP options:
- *
- * - **Buffer API** requires only a reference to the buffer for the message.
- * However, the caller must provide the last option number written as well as
- * the buffer position. The caller is primarily responsible for tracking and
- * managing the space remaining in the buffer.
- *
- * - **Packet API** uses a coap_pkt_t struct to conveniently track each
- * option as it is written and prepare for any payload. The caller must monitor
- * space remaining in the buffer; however, the API *will not* write past the
- * end of the buffer, and returns -ENOSPC when it is full.
+ * nanocoap sock uses the simpler Buffer API, described in the section
+ * _Options Write Buffer API_. gcoap uses the more convenient Packet API,
+ * described in the section _Options Write Packet API_.
  *
  * ## Server path matching
  *
@@ -779,7 +771,12 @@ static inline unsigned coap_szx2size(unsigned szx)
  * @name    Functions -- Options Write Packet API
  *
  * Use a coap_pkt_t struct to manage writing Options to the PDU.
+ *
+ * The caller must monitor space remaining in the buffer; however, the API
+ * *will not* write past the end of the buffer, and returns -ENOSPC when it is
+ * full.
  */
+/**@{*/
 /**
  * @brief   Encode the given uint option into pkt
  *
@@ -870,6 +867,10 @@ ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
  * @name    Functions -- Options Write Buffer API
  *
  * Write PDU Options directly to the array of bytes for a message.
+ *
+ * The caller must provide the last option number written as well as the buffer
+ * position. The caller is primarily responsible for tracking and managing the
+ * space remaining in the buffer.
  */
 /**@{*/
 /**
