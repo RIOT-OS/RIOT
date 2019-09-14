@@ -17,7 +17,8 @@
  * interface to RIOT's sock networking API to read and write CoAP messages.
  * For a server, nanocoap sock accepts a list of resource paths with callbacks
  * for writing the response. For a client, nanocoap sock provides a function
- * to send a request and waits for the server response.
+ * to send a request and waits for the server response. nanocoap sock uses
+ * nanocoap's Buffer API to write message options.
  *
  * ## Server Operation ##
  *
