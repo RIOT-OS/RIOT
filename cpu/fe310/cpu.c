@@ -17,19 +17,18 @@
  * @}
  */
 
-#include <stdio.h>
 #include <errno.h>
+#include <stdio.h>
 
-#include "thread.h"
+#include "context_frame.h"
+#include "cpu.h"
 #include "irq.h"
+#include "irq.h"
+#include "panic.h"
+#include "periph/init.h"
+#include "periph_cpu.h"
 #include "sched.h"
 #include "thread.h"
-#include "irq.h"
-#include "cpu.h"
-#include "context_frame.h"
-#include "periph_cpu.h"
-#include "periph/init.h"
-#include "panic.h"
 #include "vendor/encoding.h"
 #include "vendor/platform.h"
 #include "vendor/plic_driver.h"
