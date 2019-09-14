@@ -172,7 +172,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
  * @brief thread_stack_print prints the stack to stdout.
  * It depends on getting the correct values for stack_start, stack_size and sp
  * from sched_active_thread.
- * Maybe it would be good to change that to way that is less dependant on
+ * Maybe it would be good to change that to way that is less dependent on
  * getting correct values elsewhere (since it is a debugging tool and in the
  * presence of bugs the data may be corrupted).
  */

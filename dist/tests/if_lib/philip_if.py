@@ -168,11 +168,11 @@ class PhilipIf(LLShell):
         return self.write_bits(33, 3, 1, data)
 
     def get_i2c_status_GENCALL(self):
-        """General call address recieved"""
+        """General call address received"""
         return self.read_bits(33, 4, 1)
 
     def set_i2c_status_GENCALL(self, data=0):
-        """General call address recieved"""
+        """General call address received"""
         return self.write_bits(33, 4, 1, data)
 
     def get_i2c_status_BUSY(self):

@@ -15,7 +15,7 @@
  * of a single usb peripheral. An USBUS instance is started with USB function
  * handlers based on which module is compiled in.
  *
- * If this doesn't suit your use case, a different intialization function can
+ * If this doesn't suit your use case, a different initialization function can
  * to be created based on this initialization sequence.
  *
  * @author  Koen Zandberg <koen@bergzand.net>

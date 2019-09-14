@@ -75,7 +75,7 @@ namespace __cxxabiv1
             assert(0);
         }
 
-        /* mark the initialization in process and aquire */
+        /* mark the initialization in process and acquire */
         _gt->pending = 1;
 
         critical_exit();

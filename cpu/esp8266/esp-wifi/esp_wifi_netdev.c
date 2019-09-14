@@ -211,7 +211,7 @@ void IRAM _esp_wifi_recv_cb(struct pbuf *pb, struct netif *netif)
         return;
     }
 
-    /* we have to store the frame in the buffer and free lwIP pbuf immediatly */
+    /* we have to store the frame in the buffer and free lwIP pbuf immediately */
     _esp_wifi_dev.rx_len = pb->tot_len;
     pbuf_copy_partial(pb, _esp_wifi_dev.rx_buf, _esp_wifi_dev.rx_len, 0);
     pbuf_free(pb);

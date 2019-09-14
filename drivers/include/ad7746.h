@@ -179,7 +179,7 @@ int ad7746_init(ad7746_t *dev, const ad7746_params_t *params);
  *       away. The time until new data is available will depend on the
  *       @ref ad7746_params_t::cap_sample_rate "sample rate" of the channel.
  *
- * @param[in, out] dev  device decriptor
+ * @param[in, out] dev  device descriptor
  * @param[out] value    read value in fF
  *
  * @return AD7746_OK on success
@@ -197,7 +197,7 @@ int ad7746_read_capacitance_1(ad7746_t *dev, int *value);
  *       away. The time until new data is available will depend on the
  *       @ref ad7746_params_t::cap_sample_rate "sample rate" of the channel.
  *
- * @param[in, out] dev device decriptor
+ * @param[in, out] dev device descriptor
  * @param[out] value read value in fF
  *
  * @return AD7746_OK on success

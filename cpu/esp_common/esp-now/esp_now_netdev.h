@@ -61,7 +61,7 @@ extern "C" {
 extern const netdev_driver_t esp_now_driver;
 
 /**
- * @brief   Header with neccesary flags for ESP-NOW packets
+ * @brief   Header with necessary flags for ESP-NOW packets
  */
 typedef struct __attribute__((packed))
 {

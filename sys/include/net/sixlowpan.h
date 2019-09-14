@@ -172,7 +172,7 @@ static inline bool sixlowpan_frag_is(sixlowpan_frag_t *hdr)
 #define SIXLOWPAN_IPHC1_HL          (0x03)
 
 /**
- * @brief   Flag for Context Identifier Extention (part of second byte
+ * @brief   Flag for Context Identifier Extension (part of second byte
  *          of LOWPAN_IPHC).
  * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
  *          RFC 6282, section 3.1.1

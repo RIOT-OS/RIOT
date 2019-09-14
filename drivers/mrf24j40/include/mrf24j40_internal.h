@@ -31,7 +31,7 @@ extern "C" {
 
 
 /**
- * @brief initialization as decribed in datasheet
+ * @brief initialization as described in datasheet
  */
 void mrf24j40_init(mrf24j40_t *dev);
 

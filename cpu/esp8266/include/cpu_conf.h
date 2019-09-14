@@ -66,7 +66,7 @@ extern "C" {
  */
 #define PRINTF_BUFSIZ 256
 
-/* Following include is neccessary to overwrite newlib's PRI*8 and PRI*32. */
+/* Following include is necessary to overwrite newlib's PRI*8 and PRI*32. */
 /* PLEASE NOTE: ets_vprintf does not understand %i %li, or %hi */
 #ifndef DOXYGEN
 #include <inttypes.h>

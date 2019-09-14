@@ -168,7 +168,7 @@ typedef enum {
  *
  * ESP32 integrates two 12-bit ADCs (ADC1 and ADC2) capable of measuring up to
  * 18 analog signals in total. Most of these ADC channels are either connected
- * to a number of intergrated sensors like a Hall sensors, touch sensors and a
+ * to a number of integrated sensors like a Hall sensors, touch sensors and a
  * temperature sensor or can be connected with certain GPIOs. Integrated
  * sensors are disabled in RIOT's implementation and are not accessible. Thus,
  * up to 18 GPIOs, the RTC GPIOs, can be used as ADC inputs:
@@ -282,7 +282,7 @@ typedef enum {
  * ESP32 has two built-in I2C interfaces.
  *
  * The board-specific configuration of the I2C interface I2C_DEV(n) requires
- * the defintion of
+ * the definition of
  *
  * I2Cn_SPEED, the bus speed,
  * I2Cn_SCL, the GPIO used as SCL signal, and
@@ -388,7 +388,7 @@ typedef struct {
  * device driver doesn't support it.
  *
  * The board-specific configuration of the SPI interface SPI_DEV(n) requires
- * the defintion of
+ * the definition of
  *
  * - SPIn_CTRL, the SPI controller which is used for the interface (VSPI or HSPI),
  * - SPIn_SCK, the GPIO used as clock signal

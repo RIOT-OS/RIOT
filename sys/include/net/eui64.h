@@ -9,7 +9,7 @@
 /**
  * @defgroup    net_eui64   IEEE EUI-64 identifier
  * @ingroup     net
- * @brief       Type definiton of the IEEE EUI-64 identifier
+ * @brief       Type definition of the IEEE EUI-64 identifier
  * @see         <a href="http://standards.ieee.org/regauth/oui/tutorials/EUI64.html">
  *                  IEEE, "Guidelines for 64-bit Global Identifier (EUI-64)"
  *              </a>

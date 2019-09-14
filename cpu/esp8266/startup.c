@@ -181,7 +181,7 @@ void system_init(void)
  * @brief   Entry point in user space after a system reset
  *
  * This function is called after system reset by the ESP8266 SDK. In this
- * functions following steps are neccessary:
+ * functions following steps are necessary:
  *
  * 1. Reinit system timer as microsecond timer (precision is 500 us)
  * 2. Set the UART parameters for serial output

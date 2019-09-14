@@ -43,7 +43,7 @@ int adc_init(adc_t line)
 
     /* stop random number generator, and set STSEL = 1 */
     soc_adc->ADCCON1 = (SOC_ADC_ADCCON1_STSEL_M | SOC_ADC_ADCCON1_RCTRL_M);
-    /* disable any DMA, continous ADC settings */
+    /* disable any DMA, continuous ADC settings */
     soc_adc->ADCCON2 = 0x0;
     /* configure ADC GPIO as analog input */
     gpio_init(adc_config[line], GPIO_IN_ANALOG);
@@ -79,7 +79,7 @@ int adc_sample(adc_t line, adc_res_t res)
             return -1;
     }
     /**
-     * @attention CC2538 ADC supports differential comparision of two analog
+     * @attention CC2538 ADC supports differential comparison of two analog
      * GPIO inputs, hence negative values are possible. RIOT currently allows
      * positive ADC output only. Thus, reduce shift by one to compensate and
      * get full value range according to ADC resolution. E.g. 10 Bit resultion

@@ -133,11 +133,11 @@ int ads101x_read_raw(const ads101x_t *dev, int16_t *raw)
     /* Read control register */
     i2c_read_regs(DEV, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
 
-    /* Tell the ADC to aquire a single-shot sample */
+    /* Tell the ADC to acquire a single-shot sample */
     regs[0] |= ADS101X_CONF_OS_CONV;
     i2c_write_regs(DEV, ADDR, ADS101X_CONF_ADDR, &regs, 2, 0x0);
 
-    /* Wait for the sample to be aquired */
+    /* Wait for the sample to be acquired */
     xtimer_usleep(ADS101X_READ_DELAY);
 
     /* Read the sample */

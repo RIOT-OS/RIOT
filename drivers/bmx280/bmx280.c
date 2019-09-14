@@ -205,7 +205,7 @@ uint16_t bme280_read_humidity(const bmx280_t *dev)
  * Read compensation data, 0x88..0x9F, 0xA1, 0xE1..0xE7
  *
  * This function reads all calibration bytes at once. These are
- * the registers DIG_T1_LSB (0x88) upto and including DIG_H6 (0xE7).
+ * the registers DIG_T1_LSB (0x88) up to and including DIG_H6 (0xE7).
  */
 static int read_calibration_data(bmx280_t* dev)
 {

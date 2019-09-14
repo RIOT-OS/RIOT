@@ -196,9 +196,9 @@ uint32_t blank_check_sector(uint32_t tmp_sect1, uint32_t tmp_sect2)
  *              affected sectors are automatically protected again once the copy command is
  *              successfully executed. the boot sector cannot be written by this command.
  *              Command: 51
- *              Param0: (DST) Destination Flash adress where data bytes are to be written.
+ *              Param0: (DST) Destination Flash address where data bytes are to be written.
  *                      This address should be a 512 byte boundary.
- *              Param1: (SRC) Source RAM adress from which data byre are to be read.
+ *              Param1: (SRC) Source RAM address from which data byre are to be read.
  *              Param2: Number of bytes to be written. Should be 512 | 1024 | 4096 | 8192.
  *              Param3: System Clock Frequency (CCLK) in KHz.
  *

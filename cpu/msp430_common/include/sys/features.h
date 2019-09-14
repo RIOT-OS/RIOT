@@ -235,7 +235,7 @@ extern "C" {
  *
  * In all cases above, "enabled by default" means either by defining
  * _DEFAULT_SOURCE, or by not defining any of the public feature test macros.
- * Defining _GNU_SOURCE makes all of the above avaliable.
+ * Defining _GNU_SOURCE makes all of the above available.
  */
 
 #ifdef _ATFILE_SOURCE

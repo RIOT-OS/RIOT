@@ -27,7 +27,7 @@
 #define LONG_MUTEX_TIMEOUT 1000
 
 /**
- * Foward declarations
+ * Forward declarations
  */
 static int cmd_test_xtimer_mutex_lock_timeout_long_unlocked(int argc,
                                                             char **argv);

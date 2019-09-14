@@ -193,7 +193,7 @@ int timer_clear(tim_t tim, int channel)
     if ((tim >= TIMER_NUMOF) || (channel >= timer_config[tim].chn)) {
         return -1;
     }
-    /* clear interupt flags */
+    /* clear interrupt flags */
     dev(tim)->IMR &= ~(chn_isr_cfg[channel].flag);
 
     return 0;

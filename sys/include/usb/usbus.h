@@ -120,7 +120,7 @@ typedef enum {
  * @brief USB endpoint transfer status events
  */
 typedef enum {
-    USBUS_EVENT_TRANSFER_COMPLETE,  /**< Transfer succesfully completed */
+    USBUS_EVENT_TRANSFER_COMPLETE,  /**< Transfer successfully completed */
     USBUS_EVENT_TRANSFER_FAIL,      /**< Transfer nack replied by peripheral */
     USBUS_EVENT_TRANSFER_STALL,     /**< Transfer stall replied by peripheral */
 } usbus_event_transfer_t;

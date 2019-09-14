@@ -215,7 +215,7 @@ void *cli_thread(void *arg)
         /* If there was no error: Check received pattern */
         for (size_t i = 0; i < sizeof(bufs[tid]); ++i) {
             if (bufs[tid][i] != TEST_PATERN_SRV) {
-                printf("TID=%d : Payload verfication failed\n", tid);
+                printf("TID=%d : Payload verification failed\n", tid);
                 failed_payload_verifications += 1;
                 break;
             }

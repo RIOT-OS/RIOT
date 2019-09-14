@@ -106,7 +106,7 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
         return status;
     }
 
-    /* Setup adress width */
+    /* Setup address width */
     status = nrf24l01p_set_address_width(dev, NRF24L01P_AW_5BYTE);
 
     if (status < 0) {
@@ -148,7 +148,7 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
         return status;
     }
 
-    /* Set RX Adress */
+    /* Set RX Address */
     status = nrf24l01p_set_rx_address(dev, NRF24L01P_PIPE0, INITIAL_RX_ADDRESS, INITIAL_ADDRESS_WIDTH);
 
     if (status < 0) {

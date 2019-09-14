@@ -136,7 +136,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     size_t pkt_len;
 
     /* frame buffer protection will be unlocked as soon as at86rf2xx_fb_stop() is called,
-     * Set receiver to PLL_ON state to be able to free the SPI bus and avoid loosing data. */
+     * Set receiver to PLL_ON state to be able to free the SPI bus and avoid losing data. */
     at86rf2xx_set_state(dev, AT86RF2XX_STATE_PLL_ON);
 
     /* start frame buffer access */
@@ -145,7 +145,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     /* get the size of the received packet */
     at86rf2xx_fb_read(dev, &phr, 1);
 
-    /* ignore MSB (refer p.80) and substract length of FCS field */
+    /* ignore MSB (refer p.80) and subtract length of FCS field */
     pkt_len = (phr & 0x7f) - 2;
 
     /* return length when buf == NULL */

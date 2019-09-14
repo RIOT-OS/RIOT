@@ -827,7 +827,7 @@ static void _lwmac_event_cb(netdev_t *dev, netdev_event_t event)
         }
     }
 
-    /* Execute main state machine because something just happend*/
+    /* Execute main state machine because something just happened*/
     while (gnrc_lwmac_get_reschedule(netif)) {
         lwmac_update(netif);
     }
@@ -843,7 +843,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     lwmac_schedule_update(netif);
 
-    /* Execute main state machine because something just happend*/
+    /* Execute main state machine because something just happened*/
     while (gnrc_lwmac_get_reschedule(netif)) {
         lwmac_update(netif);
     }
@@ -891,7 +891,7 @@ static void _lwmac_msg_handler(gnrc_netif_t *netif, msg_t *msg)
         }
     }
 
-    /* Execute main state machine because something just happend*/
+    /* Execute main state machine because something just happened*/
     while (gnrc_lwmac_get_reschedule(netif)) {
         lwmac_update(netif);
     }

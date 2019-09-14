@@ -16,7 +16,7 @@
  * This file defines a number of lwIP functions that are required as symbols by
  * Espressif's SDK libraries. Since RIOT doesn't need lwIP, these functions are
  * only dummies without real functionality. Using these functions instead of
- * the lwIP functions as provided with the SDK saves arround 4 kBytes of RAM.
+ * the lwIP functions as provided with the SDK saves around 4 kBytes of RAM.
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}

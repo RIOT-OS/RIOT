@@ -69,7 +69,7 @@
 static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
 
 /**
- * @brief detects ammount of possible PCINTs
+ * @brief detects amount of possible PCINTs
  */
 #if defined(MODULE_ATMEGA_PCINT0) || defined(MODULE_ATMEGA_PCINT1) || \
     defined(MODULE_ATMEGA_PCINT2) || defined(MODULE_ATMEGA_PCINT3)

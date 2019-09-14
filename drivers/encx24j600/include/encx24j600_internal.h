@@ -31,7 +31,7 @@ typedef struct __attribute__((packed)) encx24j600_frame_hdr {
     uint16_t rx_next_ptr;       /**< ptr to next packet whithin devices memory */
 
     /* Receive Status Vector */
-    uint16_t frame_len;         /**< lenght of ethernet frame including 4 bytes
+    uint16_t frame_len;         /**< length of ethernet frame including 4 bytes
                                      checksum */
     uint32_t flags;             /**< random flag field just mentioned for the
                                      sake of documentation completeness */

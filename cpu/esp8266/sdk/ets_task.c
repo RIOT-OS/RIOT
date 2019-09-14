@@ -33,7 +33,7 @@
  * function, which performs all ETS tasks with pending events exactly once.
  *
  * Thus, when a hardware component used by the SDK triggers an interrupt, e.g.
- * the WiFi interface, the interrupt sevice routine posts an event to the ETS
+ * the WiFi interface, the interrupt service routine posts an event to the ETS
  * task by calling the *ets_post* function. The overwritten version of this
  * function sets the thread flag of the *ets_task_func* thread. The thread
  * then calls function *ets_run* to process pending events.

@@ -119,7 +119,7 @@ void usbus_control_slicer_ready(usbus_t *usbus);
  * @param[in] usbus     USBUS context
  *
  * @return              1 when there is a next slice
- * @return              0 when the data is fully transfered
+ * @return              0 when the data is fully transferred
  */
 int usbus_control_slicer_nextslice(usbus_t *usbus);
 

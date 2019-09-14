@@ -84,13 +84,13 @@ static inline void _set_mac_addr(netdev_t *netdev, const uint8_t *src)
 static inline int _get_promiscous(netdev_t *netdev)
 {
     netdev_tap_t *dev = (netdev_tap_t*)netdev;
-    return dev->promiscous;
+    return dev->promiscuous;
 }
 
 static inline int _set_promiscous(netdev_t *netdev, int value)
 {
     netdev_tap_t *dev = (netdev_tap_t*)netdev;
-    dev->promiscous = value;
+    dev->promiscuous = value;
     return value;
 }
 

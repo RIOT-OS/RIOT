@@ -28,7 +28,7 @@ extern "C" {
 /**
  * @brief Shift in a byte from data_pin, create clock pulses on clock_pin
  *
- * This funtion has the same functionality as the Arduino shiftIn() in Advanced
+ * This function has the same functionality as the Arduino shiftIn() in Advanced
  * I/O.
  *
  * @param[in]   data_pin    Pin to read data from

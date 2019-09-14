@@ -51,7 +51,7 @@ void _prepare_send_checks(void);
  * @param[in] netif     The interface the packet came over
  *
  * @return  true, if packet was successfully injected
- * @return  false, if an error occured during injection
+ * @return  false, if an error occurred during injection
  */
 bool _inject_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                     uint16_t src_port, uint16_t dst_port,

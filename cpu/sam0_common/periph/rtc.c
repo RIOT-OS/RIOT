@@ -15,7 +15,7 @@
  * @brief       Low-level RTC driver implementation
  *
  * @author      Baptiste Clenet <bapclenet@gmail.com>
- * @autor       ported to SAML21 by FWX <FWX@dialine.fr>
+ * @author       ported to SAML21 by FWX <FWX@dialine.fr>
  * @}
  */
 

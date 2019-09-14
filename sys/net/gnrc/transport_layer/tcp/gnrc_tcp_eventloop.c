@@ -86,11 +86,11 @@ static int _send(gnrc_pktsnip_t *pkt)
 /**
  * @brief Receive function, receive packet from network layer.
  *
- * @param[in] pkt   Incomming paket.
+ * @param[in] pkt   Incoming paket.
  *
  * @returns   Zero on success.
  *            Negative value on error.
- *            -EACCES if write access to packet was not aquired.
+ *            -EACCES if write access to packet was not acquired.
  *            -ERANGE if segment offset value is less than 5.
  *            -ENOMSG if paket couldn't be marked.
  *            -EINVAL if checksum was invalid.
@@ -183,7 +183,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
     tcb = _list_tcb_head;
     while (tcb) {
 #ifdef MODULE_GNRC_IPV6
-        /* Check if current TCB is fitting for the incomming packet */
+        /* Check if current TCB is fitting for the incoming packet */
         if (ip->type == GNRC_NETTYPE_IPV6 && tcb->address_family == AF_INET6) {
             /* If SYN is set, a connection is listening on that port ... */
             ipv6_addr_t *tmp_addr = NULL;
@@ -206,7 +206,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
             }
         }
 #else
-        /* Supress compiler warnings if TCP is build without network layer */
+        /* Suppress compiler warnings if TCP is built without network layer */
         (void) syn;
         (void) src;
         (void) dst;

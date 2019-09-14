@@ -35,7 +35,7 @@ get_fc_field()
     elif [ ${1##*.} = hex ]; then
         "${OBJDUMP}" --start-address=${FCFIELD_START} --stop-address=${FCFIELD_END} ${1} -s
     else
-        echo "Unkown file extension: ${1##*.}"
+        echo "Unknown file extension: ${1##*.}"
         exit 1
     fi
 }

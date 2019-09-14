@@ -36,7 +36,7 @@ extern "C" {
 enum {
     SI70XX_OK,                 /**< All OK */
     SI70XX_ERR_NODEV,          /**< No valid device found on I2C bus */
-    SI70XX_ERR_I2C,            /**< An error occured when reading/writing on I2C bus */
+    SI70XX_ERR_I2C,            /**< An error occurred when reading/writing on I2C bus */
 };
 
 /**

@@ -96,7 +96,7 @@ extern const csma_sender_conf_t CSMA_SENDER_CONF_DEFAULT;
  * @return              -ENOMSG if @p pkt is invalid
  * @return              -EOVERFLOW if the payload size of @p pkt exceeds the
  *                      payload size that can be handled by the device
- * @return              -ECANCELED if an internal driver error occured
+ * @return              -ECANCELED if an internal driver error occurred
  * @return              -EBUSY if radio medium never was available
  *                      to send the given data
  */
@@ -127,7 +127,7 @@ int csma_sender_csma_ca_send(netdev_t *dev, iolist_t *iolist,
  * @return              -ENOMSG if @p pkt is invalid
  * @return              -EOVERFLOW if the payload size of @p pkt exceeds the
  *                      payload size that can be handled by the device
- * @return              -ECANCELED if an internal driver error occured
+ * @return              -ECANCELED if an internal driver error occurred
  * @return              -EBUSY if radio medium was not available
  *                      to send the given data
  */

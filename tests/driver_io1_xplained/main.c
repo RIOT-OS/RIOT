@@ -54,7 +54,7 @@ int main(void)
 {
     float temperature;
 
-    puts("IO1 Xplained extention test application\n");
+    puts("IO1 Xplained extension test application\n");
     puts("+-------------Initializing------------+\n");
 
     if (io1_xplained_init(&dev, &io1_xplained_params[0]) != IO1_XPLAINED_OK) {

@@ -138,7 +138,7 @@ int bmx055_init(bmx055_t *dev, const bmx055_params_t *params)
 
     /* Init Gyroscope
      *
-     * The prefered way to bring the module to normal mode is using softreset.
+     * The preferred way to bring the module to normal mode is using softreset.
      * However, a softreset brings the module into an unknown state and
      * deadlocks it. Hence it is not the way to go and normal mode is entered
      * by writing into power mode control register.

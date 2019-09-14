@@ -642,7 +642,7 @@ void dma_init(void);
  * @param[in]  mode    DMA mode
  * @param[in]  flags   DMA configuration
  *
- * @return < 0 on error, the number of transfered bytes otherwise
+ * @return < 0 on error, the number of transferred bytes otherwise
  */
 int dma_transfer(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
                  dma_mode_t mode, uint8_t flags);

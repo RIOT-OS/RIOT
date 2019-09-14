@@ -142,7 +142,7 @@ static inline size_t gnrc_pkt_len(const gnrc_pktsnip_t *pkt)
 }
 
 /**
- * @brief Calculates length of a packet in byte upto (including) a snip with the given type.
+ * @brief Calculates length of a packet in byte up to (including) a snip with the given type.
  *
  * @param[in] pkt  list of packet snips.
  * @param[in] type type of snip to stop calculation.

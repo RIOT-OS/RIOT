@@ -109,7 +109,7 @@ static void clk_init(void)
                             SYSCTRL_XOSC32K_STARTUP(6) |
                             SYSCTRL_XOSC32K_RUNSTDBY;
 
-    /* Enable with Seperate Call */
+    /* Enable with Separate Call */
     SYSCTRL->XOSC32K.bit.ENABLE = 1;
 
     /* reset the GCLK module so it is in a known state */

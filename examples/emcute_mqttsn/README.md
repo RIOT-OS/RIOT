@@ -2,7 +2,7 @@
 This application demonstrates the usage of the emCute (MQTT-SN) module in RIOT.
 
 ## Setup
-For using this example, two prerequisites have to be fullfilled:
+For using this example, two prerequisites have to be fulfilled:
 
 1. You need a running MQTT broker that supports MQTT-SN or a running MQTT-SN
    gateway that is connected to a running MQTT broker

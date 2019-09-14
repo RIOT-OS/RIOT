@@ -219,7 +219,7 @@ void* IRAM pvPortRealloc (void *ptr, size_t size, const char *file, unsigned lin
 
 size_t IRAM xPortWantedSizeAlign(size_t size)
 {
-    /* allign the size to a multiple of 8 */
+    /* align the size to a multiple of 8 */
     return (size & 0x7) ? (size & ~0x7) + 8 : size;
 }
 

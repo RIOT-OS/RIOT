@@ -67,7 +67,7 @@ typedef enum {
  *
  * @param[in,out] tcb     TCB holding the connection information.
  * @param[in]     event   Current event that triggers FSM transition.
- * @param[in]     in_pkt  Incomming packet. Only not NULL in case of event RCVD_PKT.
+ * @param[in]     in_pkt  Incoming packet. Only not NULL in case of event RCVD_PKT.
  * @param[in,out] buf     Buffer for send and receive functions.
  * @param[in]     len     Number of bytes to send or receive.
  *

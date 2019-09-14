@@ -49,7 +49,7 @@
 #define FSPI_MISO   GPIO7
 #define FSPI_MOSI   GPIO8
 
-/** stucture which decribes all properties of one SPI bus */
+/** structure which describes all properties of one SPI bus */
 struct _spi_bus_t {
     spi_dev_t* regs;       /* pointer to register data struct of the SPI device */
     uint8_t mod;           /* peripheral hardware module of the SPI interface */
@@ -180,7 +180,7 @@ static void _spi_init_internal (spi_t bus)
     _spi[bus].regs->ctrl.fastrd_mode = 0;
     _spi[bus].regs->ctrl.wp = 0;
 
-    /* aquire and release to set default parameters */
+    /* acquire and release to set default parameters */
     spi_acquire(bus, GPIO_UNDEF, SPI_MODE_0, SPI_CLK_1MHZ);
     spi_release(bus);
 }

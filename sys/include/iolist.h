@@ -54,7 +54,7 @@ unsigned iolist_count(const iolist_t *iolist);
 /**
  * @brief   Sum up number of bytes in iolist
  *
- * This function returns the summed ip lenght values of all entries in @p
+ * This function returns the summed ip length values of all entries in @p
  * iolist.
  *
  * @param[in]   iolist  iolist to sum up

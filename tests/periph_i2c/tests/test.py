@@ -133,7 +133,7 @@ def setup_test(t, i2c, bpt):
 
 def mutex_test(i2c, bpt):
     cmd_log = []
-    t = Test('mutex test', 'Tests mutex aquire/release functionality', cmd_log)
+    t = Test('mutex test', 'Tests mutex acquire/release functionality', cmd_log)
     t.notes += 'Cannot test since it can still be used without mutex\n'
     t.notes += 'Cannot test expected timeout due to no reset\n'
     t.notes += 'Do we need double release failure check?\n'

@@ -42,7 +42,7 @@
 
 #define PWM_CLK       (160000000UL) /* base clock of PWM devices */
 #define PWM_CPS_MAX   (10000000UL)  /* maximum cycles per second supported */
-#define PWM_CPS_MIN   (2500UL)      /* minumum cycles per second supported */
+#define PWM_CPS_MIN   (2500UL)      /* minimum cycles per second supported */
 
 #define PWM_TIMER_MOD_FREEZE          0  /* timer is disabled */
 #define PWM_TIMER_MOD_UP              1  /* timer counts up */
@@ -55,7 +55,7 @@
 #define PWM_TIMER_STARTS_STOPS_AT_TEZ 3  /* PWM starts and stops at next TEZ */
 #define PWM_TIMER_STARTS_STOPS_AT_TEP 4  /* PWM starts and stops at next TEP */
 
-#define PWM_TIMER_UPDATE_IMMIDIATE    0  /* update period immediatly */
+#define PWM_TIMER_UPDATE_IMMIDIATE    0  /* update period immediately */
 #define PWM_TIMER_UPDATE_AT_TEZ       1  /* update period at TEZ */
 #define PWM_TIMER_UPDATE_AT_SYNC      2  /* update period at sync */
 #define PWM_TIMER_UPDATE_AT_TEZ_SYNC  3  /* update period at TEZ and sync */
@@ -320,7 +320,7 @@ static void _pwm_start(pwm_t pwm)
 
     uint32_t cps = period * freq;
     /* maximum number of timer clock cycles per second (freq*period) must not
-       be greater than PWM_CPS_MAX, reduce the freq if neccessary and keep
+       be greater than PWM_CPS_MAX, reduce the freq if necessary and keep
        the resolution */
     if (cps > PWM_CPS_MAX) {
         freq = PWM_CPS_MAX / period;
@@ -329,7 +329,7 @@ static void _pwm_start(pwm_t pwm)
               __func__, freq);
     }
     /* minimum number of timer clock cycles per second (freq*period) must not
-       be less than PWM_CPS_MIN, increase the freq if neccessary and keep
+       be less than PWM_CPS_MIN, increase the freq if necessary and keep
        the resolution */
     else if (cps < PWM_CPS_MIN) {
         freq = PWM_CPS_MIN / period;

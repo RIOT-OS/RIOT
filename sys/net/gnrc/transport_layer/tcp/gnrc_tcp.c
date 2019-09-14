@@ -132,7 +132,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t targe
         return -EISCONN;
     }
 
-    /* Mark TCB as waiting for incomming messages */
+    /* Mark TCB as waiting for incoming messages */
     tcb->status |= STATUS_WAIT_FOR_MSG;
 
     /* 'Flush' mbox */
@@ -155,7 +155,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t targe
             }
         }
 #else
-        /* Supress Compiler Warnings */
+        /* Suppress Compiler Warnings */
         (void) target_addr;
 #endif
         /* Set port number to listen on */
@@ -180,7 +180,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t targe
             }
         }
  #endif
-        /* Assign port numbers, verfication happens in fsm */
+        /* Assign port numbers, verification happens in fsm */
         tcb->local_port = local_port;
         tcb->peer_port = target_port;
 
@@ -359,7 +359,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
         return -ENOTCONN;
     }
 
-    /* Mark TCB as waiting for incomming messages */
+    /* Mark TCB as waiting for incoming messages */
     tcb->status |= STATUS_WAIT_FOR_MSG;
 
     /* 'Flush' mbox */
@@ -421,7 +421,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
                 _fsm(tcb, FSM_EVENT_SEND_PROBE, NULL, NULL, 0);
                 probe_timeout_duration_us += probe_timeout_duration_us;
 
-                /* Boundry check for time interval between probes */
+                /* Boundary check for time interval between probes */
                 if (probe_timeout_duration_us < GNRC_TCP_PROBE_LOWER_BOUND) {
                     probe_timeout_duration_us = GNRC_TCP_PROBE_LOWER_BOUND;
                 }
@@ -491,7 +491,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         return ret;
     }
 
-    /* Mark TCB as waiting for incomming messages */
+    /* Mark TCB as waiting for incoming messages */
     tcb->status |= STATUS_WAIT_FOR_MSG;
 
     /* 'Flush' mbox */
@@ -567,7 +567,7 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
         return;
     }
 
-    /* Mark TCB as waiting for incomming messages */
+    /* Mark TCB as waiting for incoming messages */
     tcb->status |= STATUS_WAIT_FOR_MSG;
 
     /* 'Flush' mbox */

@@ -28,7 +28,7 @@
 
 #define DELAY       (100UL * US_PER_MS)
 
-/* allocate some memory to hold one formated string for each sensor output, so
+/* allocate some memory to hold one formatted string for each sensor output, so
  * one string for the X, Y, and Z reading, respectively */
 static char str_out[3][8];
 
