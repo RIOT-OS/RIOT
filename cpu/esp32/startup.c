@@ -33,6 +33,7 @@
 #include "kernel_defines.h"
 #include "kernel_init.h"
 #include "log.h"
+#include "stdio_base.h"
 #include "syscalls.h"
 #include "thread_arch.h"
 
@@ -318,6 +319,9 @@ static NORETURN void IRAM system_init (void)
 
     /* initialize the board */
     board_init();
+
+    /* initialize stdio */
+    stdio_init();
 
     /* trigger static peripheral initialization */
     periph_init();
