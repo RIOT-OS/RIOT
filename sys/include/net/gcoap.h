@@ -22,7 +22,8 @@
  * gcoap allocates a RIOT message processing thread, so a single instance can
  * serve multiple applications. This approach also means gcoap uses a single UDP
  * port, which supports RFC 6282 compression. Internally, gcoap depends on the
- * nanocoap package for base level structs and functionality.
+ * nanocoap package for base level structs and functionality. gcoap uses
+ * nanocoap's Packet API to write message options.
  *
  * gcoap also supports the Observe extension (RFC 7641) for a server. gcoap
  * provides functions to generate and send an observe notification that are
