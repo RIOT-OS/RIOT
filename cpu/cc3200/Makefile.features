@@ -3,6 +3,8 @@ include $(RIOTCPU)/cortexm_common/Makefile.features
 
 # Additional MCU features
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += puf_sram
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
