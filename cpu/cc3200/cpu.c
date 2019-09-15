@@ -51,7 +51,7 @@ void cpu_init(void)
     periph_reset();
 
     /* trigger static peripheral initialization */
-    periph_init();
+    stdio_init();
 }
 
 /**
