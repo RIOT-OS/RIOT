@@ -71,7 +71,9 @@
  *
  * -# Call gcoap_resp_init() to initialize the response.
  * -# Use the coap_opt_add_xxx() functions to include any Options, for example
- *    coap_opt_add_format() for Content-Format of the payload.
+ *    coap_opt_add_format() for Content-Format of the payload. Options *must*
+ *    be written in order by option number (see "CoAP option numbers" in
+ *    [CoAP defines](group__net__coap.html)).
  * -# Call coap_opt_finish() to complete the PDU metadata. Retain the returned
  *    metadata length.
  * -# Write the response payload, starting at the updated _payload_ pointer
@@ -112,7 +114,9 @@
  * -# Optionally, mark the request confirmable by calling coap_hdr_set_type()
  *    with COAP_TYPE_CON.
  * -# Use the coap_opt_add_xxx() functions to include any Options beyond
- *    Uri-Path, which was added in the first step.
+ *    Uri-Path, which was added in the first step. Options *must* be written
+ *    in order by option number (see "CoAP option numbers" in
+ *    [CoAP defines](group__net__coap.html)).
  * -# Call coap_opt_finish() to complete the PDU metadata. Retain the returned
  *    metadata length.
  * -# Write the request payload, starting at the updated _payload_ pointer
@@ -162,7 +166,9 @@
  *    Test the return value, which may indicate there is not an observer for
  *    the resource. If so, you are done.
  * -# Use the coap_opt_add_xxx() functions to include any Options, for example
- *    coap_opt_add_format() for Content-Format of the payload.
+ *    coap_opt_add_format() for Content-Format of the payload. Options *must*
+ *    be written in order by option number (see "CoAP option numbers" in
+ *    [CoAP defines](group__net__coap.html)).
  * -# Call coap_opt_finish() to complete the PDU metadata. Retain the returned
  *    metadata length.
  * -# Write the notification payload, starting at the updated _payload_ pointer
