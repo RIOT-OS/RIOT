@@ -223,12 +223,18 @@ static void rx_irq(uart_t dev)
     if (_is_usart(dev)) {
 #endif
         if (USART_IntGet(uart_config[dev].dev) & USART_IF_RXDATAV) {
-            isr_ctx[dev].rx_cb(isr_ctx[dev].arg, USART_RxDataGet(uart_config[dev].dev));
+            uint8_t c = USART_RxDataGet(uart_config[dev].dev);
+            if (isr_ctx[dev].rx_cb) {
+                isr_ctx[dev].rx_cb(isr_ctx[dev].arg, c);
+            }
         }
 #ifdef USE_LEUART
     } else {
         if (LEUART_IntGet(uart_config[dev].dev) & LEUART_IF_RXDATAV) {
-            isr_ctx[dev].rx_cb(isr_ctx[dev].arg, LEUART_RxDataGet(uart_config[dev].dev));
+            uint8_t c = LEUART_RxDataGet(uart_config[dev].dev);
+            if (isr_ctx[dev].rx_cb) {
+                isr_ctx[dev].rx_cb(isr_ctx[dev].arg, c);
+            }
         }
     }
 #endif
