@@ -218,6 +218,80 @@ static void test_bitarithm_bits_set_u32_random(void)
     TEST_ASSERT_EQUAL_INT(21, bitarithm_bits_set_u32(4072524027)); /* Source: https://www.random.org/bytes */
 }
 
+static void test_bitarithm_set_masked_8(void)
+{
+    uint8_t val = 0;
+
+    bitarithm_set_masked(&val, 0x18, 3);
+    TEST_ASSERT_EQUAL_INT(0x18, val);
+
+    bitarithm_set_masked(&val, 0x18, 3);
+    TEST_ASSERT_EQUAL_INT(0x18, val);
+
+    bitarithm_set_masked(&val, 0x18, 2);
+    TEST_ASSERT_EQUAL_INT(0x10, val);
+
+    bitarithm_set_masked(&val, 0x18, 1);
+    TEST_ASSERT_EQUAL_INT(0x8, val);
+
+    bitarithm_set_masked(&val, 0x18, 0);
+    TEST_ASSERT_EQUAL_INT(0x0, val);
+
+    val = 0x81;
+    bitarithm_set_masked(&val, 0x18, 11);
+    TEST_ASSERT_EQUAL_INT(0x99, val);
+
+    bitarithm_set_masked(&val, 0xff, 0);
+    TEST_ASSERT_EQUAL_INT(0x0, val);
+}
+
+static void test_bitarithm_set_masked_16(void)
+{
+    uint16_t val = 0x2300;
+
+    bitarithm_set_masked(&val, 0x18, 3);
+    TEST_ASSERT_EQUAL_INT(0x2318, val);
+
+    bitarithm_set_masked(&val, 0x18, 3);
+    TEST_ASSERT_EQUAL_INT(0x2318, val);
+
+    bitarithm_set_masked(&val, 0x18, 2);
+    TEST_ASSERT_EQUAL_INT(0x2310, val);
+
+    bitarithm_set_masked(&val, 0x18, 1);
+    TEST_ASSERT_EQUAL_INT(0x2308, val);
+
+    bitarithm_set_masked(&val, 0x18, 0);
+    TEST_ASSERT_EQUAL_INT(0x2300, val);
+}
+
+static void test_bitarithm_set_masked_32(void)
+{
+    uint32_t val = 0xfefe2300;
+
+    bitarithm_set_masked(&val, 0x18, 3);
+    TEST_ASSERT_EQUAL_INT(0xfefe2318, val);
+
+    bitarithm_set_masked(&val, 0x18, 3);
+    TEST_ASSERT_EQUAL_INT(0xfefe2318, val);
+
+    bitarithm_set_masked(&val, 0x18, 2);
+    TEST_ASSERT_EQUAL_INT(0xfefe2310, val);
+
+    bitarithm_set_masked(&val, 0x18, 1);
+    TEST_ASSERT_EQUAL_INT(0xfefe2308, val);
+
+    bitarithm_set_masked(&val, 0x18, 0);
+    TEST_ASSERT_EQUAL_INT(0xfefe2300, val);
+}
+
+static void test_bitarithm_get_masked(void)
+{
+    TEST_ASSERT_EQUAL_INT(0x4, bitarithm_get_masked(0xA5, 0x38));
+    TEST_ASSERT_EQUAL_INT(0x3, bitarithm_get_masked(0xA9AA, 0x180));
+    TEST_ASSERT_EQUAL_INT(0x42, bitarithm_get_masked(0x55542AAA, 0xFF000));
+}
+
 Test *tests_core_bitarithm_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -252,6 +326,11 @@ Test *tests_core_bitarithm_tests(void)
         new_TestFixture(test_bitarithm_bits_set_limit),
         new_TestFixture(test_bitarithm_bits_set_random),
         new_TestFixture(test_bitarithm_bits_set_u32_random),
+
+        new_TestFixture(test_bitarithm_set_masked_8),
+        new_TestFixture(test_bitarithm_set_masked_16),
+        new_TestFixture(test_bitarithm_set_masked_32),
+        new_TestFixture(test_bitarithm_get_masked),
     };
 
     EMB_UNIT_TESTCALLER(core_bitarithm_tests, NULL, NULL, fixtures);

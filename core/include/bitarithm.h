@@ -163,6 +163,47 @@ static inline unsigned bitarithm_lsb(unsigned v)
 }
 #endif
 
+/**
+ * @brief           Sets the masked bits in a word to the given value.
+ *
+ * @note            The mask should be compile-time constant so the compiler
+ *                  is able to optimize the entire loop away.
+ *
+ * @param       val The value to modify.
+ * @param[in]  mask The bitmask to apply.
+ * @param[in]  bits The new value of the masked bits.
+ *
+ */
+#define bitarithm_set_masked(val, mask, bits) do {                  \
+        const unsigned _mask = mask;                                \
+        const unsigned _bits = bits;                                \
+        unsigned _shift = 0;                                        \
+        while (!((_mask >> _shift) & 0x01)) {                       \
+            _shift++;                                               \
+        }                                                           \
+        *(val) = ((*(val) & ~_mask) | ((_bits << _shift) & _mask)); \
+        } while (0)
+
+/**
+ * @brief           Gets the masked bits in a word.
+ *
+ * @note            The mask should be compile-time constant so the compiler
+ *                  is able to optimize the entire loop away.
+ *
+ * @param[in]   val The input value.
+ * @param[in]  mask The bitmask to apply.
+ * @return          The set bits in val where mask was applied, shifted down.
+ *
+ */
+static inline unsigned bitarithm_get_masked(unsigned val, unsigned mask)
+{
+    unsigned shift = 0;
+    while (!((mask >> shift) & 0x01)) {
+        shift++;
+    }
+    return (val & mask) >> shift;
+}
+
 #ifdef __cplusplus
 }
 #endif
