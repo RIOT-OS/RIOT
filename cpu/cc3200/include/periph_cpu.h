@@ -78,6 +78,15 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   Declare needed generic SPI functions.
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_INIT_CS
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
+/**
  * @name   UART device configuration
  * @{
  */
