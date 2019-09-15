@@ -143,8 +143,10 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 #endif
 
     /* enable the interrupt */
-    NVIC_ClearPendingIRQ(uart_config[dev].irq);
-    NVIC_EnableIRQ(uart_config[dev].irq);
+    if (rx_cb) {
+        NVIC_ClearPendingIRQ(uart_config[dev].irq);
+        NVIC_EnableIRQ(uart_config[dev].irq);
+    }
 
     uart_poweron(dev);
 
@@ -212,12 +214,30 @@ void uart_poweron(uart_t dev)
     if (_is_usart(dev)) {
 #endif
         USART_TypeDef *usart = uart_config[dev].dev;
-        USART_Enable(usart, usartEnable);
+
+        /* enable tx */
+        USART_Enable_TypeDef enable = usartEnableTx;
+
+        /* enable rx if needed */
+        if (isr_ctx[dev].rx_cb) {
+            enable |= usartEnableRx;
+        }
+
+        USART_Enable(usart, enable);
 #ifdef USE_LEUART
     }
     else {
         LEUART_TypeDef *leuart = uart_config[dev].dev;
-        LEUART_Enable(leuart, leuartEnable);
+
+        /* enable tx */
+        LEUART_Enable_TypeDef enable = leuartEnableTx;
+
+        /* enable rx if needed */
+        if (isr_ctx[dev].rx_cb) {
+            enable |= leuartEnableRx;
+        }
+
+        LEUART_Enable(leuart, enable);
     }
 #endif
 }
@@ -228,11 +248,15 @@ void uart_poweroff(uart_t dev)
     if (_is_usart(dev)) {
 #endif
         USART_TypeDef *usart = uart_config[dev].dev;
+
+        /* disable tx and rx */
         USART_Enable(usart, usartDisable);
 #ifdef USE_LEUART
     }
     else {
         LEUART_TypeDef *leuart = uart_config[dev].dev;
+
+        /* disable tx and rx */
         LEUART_Enable(leuart, leuartDisable);
     }
 #endif
