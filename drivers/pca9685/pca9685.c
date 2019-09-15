@@ -21,6 +21,7 @@
 #include "pca9685_regs.h"
 #include "pca9685.h"
 
+#include "bitarithm.h"
 #include "irq.h"
 #include "log.h"
 #include "xtimer.h"
@@ -83,8 +84,6 @@
 /** Forward declaration of functions for internal use */
 static int _is_available(const pca9685_t *dev);
 static int _init(pca9685_t *dev);
-
-static void _set_reg_bit(uint8_t *byte, uint8_t mask, uint8_t bit);
 
 static int _read(const pca9685_t *dev, uint8_t reg, uint8_t *data, uint32_t len);
 static int _write(const pca9685_t *dev, uint8_t reg, const uint8_t *data, uint32_t len);
@@ -274,21 +273,21 @@ static int _init(pca9685_t *dev)
 
     /* set Auto-Increment flag */
     uint8_t byte = 0;
-    _set_reg_bit(&byte, PCA9685_MODE2_INVERT, dev->params.inv);
-    _set_reg_bit(&byte, PCA9685_MODE2_OUTDRV, dev->params.out_drv);
-    _set_reg_bit(&byte, PCA9685_MODE2_OUTNE, dev->params.out_ne);
+    bitarithm_set_masked(&byte, PCA9685_MODE2_INVERT, dev->params.inv);
+    bitarithm_set_masked(&byte, PCA9685_MODE2_OUTDRV, dev->params.out_drv);
+    bitarithm_set_masked(&byte, PCA9685_MODE2_OUTNE, dev->params.out_ne);
     EXEC_RET(_write(dev, PCA9685_REG_MODE2, &byte, 1));
 
     /* set Sleep mode, Auto-Increment, Restart, All call and External Clock */
     byte = 0;
-    _set_reg_bit(&byte, PCA9685_MODE1_AI, 1);
-    _set_reg_bit(&byte, PCA9685_MODE1_SLEEP, 1);
-    _set_reg_bit(&byte, PCA9685_MODE1_RESTART, 1);
-    _set_reg_bit(&byte, PCA9685_MODE1_ALLCALL, 1);
+    bitarithm_set_masked(&byte, PCA9685_MODE1_AI, 1);
+    bitarithm_set_masked(&byte, PCA9685_MODE1_SLEEP, 1);
+    bitarithm_set_masked(&byte, PCA9685_MODE1_RESTART, 1);
+    bitarithm_set_masked(&byte, PCA9685_MODE1_ALLCALL, 1);
     EXEC_RET(_write(dev, PCA9685_REG_MODE1, &byte, 1));
 
     /* must be done only in sleep mode */
-    _set_reg_bit(&byte, PCA9685_MODE1_EXTCLK, dev->params.ext_freq ? 1 : 0);
+    bitarithm_set_masked(&byte, PCA9685_MODE1_EXTCLK, dev->params.ext_freq ? 1 : 0);
     EXEC_RET(_write(dev, PCA9685_REG_MODE1, &byte, 1));
 
     return PCA9685_OK;
@@ -351,19 +350,10 @@ static int _update(const pca9685_t *dev, uint8_t reg, uint8_t mask, uint8_t data
     EXEC_RET(_read(dev, reg, &byte, 1));
 
     /* set masked bits to the given value  */
-    _set_reg_bit(&byte, mask, data);
+    bitarithm_set_masked(&byte, mask, data);
 
     /* write back new register value */
     EXEC_RET(_write(dev, reg, &byte, 1));
 
     return PCA9685_OK;
-}
-
-static void _set_reg_bit(uint8_t *byte, uint8_t mask, uint8_t bit)
-{
-    uint8_t shift = 0;
-    while (!((mask >> shift) & 0x01)) {
-        shift++;
-    }
-    *byte = ((*byte & ~mask) | ((bit << shift) & mask));
 }
