@@ -23,7 +23,7 @@
 
 #include "periph_cpu.h"
 #include "l0/cfg_clock_32_16_1.h"
-#include "cfg_i2c1_pb8_pb9.h"
+#include "cfg_i2c1_pb6_pb7.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
 
