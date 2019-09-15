@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup        cpu_cc3200_spi CC3200 SPI
- * @ingroup         cpu_cc3200_regs
+ * @ingroup         cpu_cc3200
  * @{
  *
  * @file
