@@ -67,8 +67,7 @@ static uint32_t ports[] = {
 /**
  * @brief   static callback memory
  */
-static gpio_isr_ctx_t isr_ctx[sizeof(ports) / sizeof(uint32_t)]
-                             [GPIO_PINS_PER_PORT];
+static gpio_isr_ctx_t isr_ctx[ARRAY_SIZE(ports)][GPIO_PINS_PER_PORT];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
