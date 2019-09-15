@@ -63,7 +63,7 @@ void cpu_init(void)
     stdio_init();
 
     /* trigger static peripheral initialization */
-    periph_init();
+    stdio_init();
 }
 
 /**
