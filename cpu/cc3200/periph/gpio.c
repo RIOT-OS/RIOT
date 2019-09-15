@@ -24,6 +24,7 @@
 #include "vendor/hw_gpio.h"
 #include "vendor/hw_memmap.h"
 #include "vendor/hw_ocp_shared.h"
+#include "vendor/rom.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -42,6 +43,10 @@
 /* GPIO mask for setting pin type e.g. PULL */
 #define PAD_TYPE_MASK 0x00000310
 #define PAD_CONFIG_BASE ((OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_0))
+
+/* Define interrupt signal for GPIOA4 since it is not exported by TIs hw_ints.h
+ */
+#define INT_GPIOA4 20
 
 /**
  * @brief get hardware configuration register for a pin
@@ -62,7 +67,8 @@ static uint32_t ports[] = {
 /**
  * @brief   static callback memory
  */
-static gpio_isr_ctx_t isr_ctx[ARRAY_SIZE(ports)][GPIO_PINS_PER_PORT];
+static gpio_isr_ctx_t isr_ctx[sizeof(ports) / sizeof(uint32_t)]
+                             [GPIO_PINS_PER_PORT];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
@@ -118,14 +124,14 @@ uint8_t gpio_pin_mask(uint8_t dev)
     return 1 << (pin_to_gpio_num[gpio_pin_num(dev)] % GPIO_PINS_PER_PORT);
 }
 /**
- * @brief gpio_pin_to_port returns the port base address for a pin
+ * @brief gpio_port_by_num returns the port base address for a pin
  *
  * @param dev external pin number
  * @return port base address
  */
-unsigned long gpio_pin_to_port(uint8_t port)
+static inline cc3200_gpio_t *gpio_port_by_num(uint8_t port_num)
 {
-    return ports[port];
+    return (cc3200_gpio_t *)(ports[port_num]);
 }
 
 /**
@@ -149,7 +155,7 @@ unsigned char _gpio_pin_value_mask(uint8_t pin, unsigned char val)
  */
 static inline cc3200_gpio_t *gpio(gpio_t pin)
 {
-    return (cc3200_gpio_t *)(gpio_pin_to_port(gpio_port_num(pin)));
+    return (cc3200_gpio_t *)(gpio_port_by_num(gpio_port_num(pin)));
 }
 
 void gpio_init_af(gpio_t dev, uint32_t strength, uint32_t type)
@@ -209,49 +215,52 @@ int gpio_init(gpio_t dev, gpio_mode_t mode)
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 
-void isr_gpio_a0(void)
-{
-    handle_isr((cc3200_gpio_t *)GPIOA0_BASE);
-}
-
-void isr_gpio_a1(void)
-{
-    handle_isr((cc3200_gpio_t *)GPIOA1_BASE);
-}
-
-void isr_gpio_a2(void)
-{
-    handle_isr((cc3200_gpio_t *)GPIOA2_BASE);
-}
-
-void isr_gpio_a3(void)
-{
-    handle_isr((cc3200_gpio_t *)GPIOA3_BASE);
-}
-
-void isr_gpio_a4(void)
-{
-    handle_isr((cc3200_gpio_t *)GPIOA3_BASE);
-}
-
 /**
  * @brief isr interrupt handler
  *
  * @param portAddr base address of the GPIO PORT
  */
-void handle_isr(cc3200_gpio_t *u)
+void handle_isr(uint8_t port_num)
 {
-    uint32_t state = u->mis;
+    uint32_t state = gpio_port_by_num(port_num)->mis;
 
     /* clear interrupt */
-    u->icr = state;
-    for (int i = 0; i < 8; i++) {
-        if (state & (1 << i)) {
-            isr_ctx[port_num][i].cb(isr_ctx[port_num][i].arg);
-        }
+    gpio_port_by_num(port_num)->icr = state;
+
+    /* call ISR handlers */
+    state &= (GPIO_PINS_PER_PORT - 1);
+    while (state) {
+        int pin = 8 * sizeof(state) - __builtin_clz(state) - 1;
+        state &= ~(1 << pin);
+        isr_ctx[port_num][pin].cb(isr_ctx[port_num][pin].arg);
     }
 
     cortexm_isr_end();
+}
+
+void isr_gpio_a0(void)
+{
+    handle_isr(0);
+}
+
+void isr_gpio_a1(void)
+{
+    handle_isr(1);
+}
+
+void isr_gpio_a2(void)
+{
+    handle_isr(2);
+}
+
+void isr_gpio_a3(void)
+{
+    handle_isr(3);
+}
+
+void isr_gpio_a4(void)
+{
+    handle_isr(4);
 }
 
 /**
@@ -283,10 +292,11 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
 
     assert(flank != GPIO_NONE);
 
-    uint8_t portNum  = gpio_port_num(dev);
-    uint8_t pinNum   = gpio_pin_num(dev);
-    uint8_t bit      = gpio_pin_mask(dev);
-    uint8_t portAddr = gpio_pin_to_port(dev);
+    uint8_t portNum = gpio_port_num(dev);
+    uint8_t pinNum  = gpio_pin_num(dev);
+    uint8_t bit     = gpio_pin_mask(dev);
+    /* convert to number since we use the address for later compare */
+    uint32_t portBase = (uint32_t)gpio_port_by_num(portNum);
 
     /* store callback information; */
     isr_ctx[portNum][pinNum].cb  = cb;
@@ -295,7 +305,7 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
     ROM_IntMasterDisable();
 
     /* clear interrupt specified pin */
-    gpio(dev)->ICR = bit;
+    gpio(dev)->icr = bit;
 
     /* configure active flanks */
     gpio(dev)->ibe =
@@ -349,7 +359,7 @@ void gpio_write(gpio_t dev, int value)
 {
     uint8_t port           = gpio_port_num(dev);
     unsigned char ipin     = gpio_pin_mask(dev);
-    unsigned long portAddr = gpio_pin_to_port(port);
+    unsigned long portAddr = (unsigned long)gpio_port_by_num(port);
     /* write to pin at portBase + pinOffset */
     HWREG(portAddr + (ipin << 2)) =
             _gpio_pin_value_mask(pin_to_gpio_num[gpio_pin_num(dev)], value);
@@ -365,7 +375,7 @@ int gpio_read(gpio_t dev)
 {
     uint8_t port           = gpio_port_num(dev);
     unsigned char ipin     = gpio_pin_mask(dev);
-    unsigned long portAddr = gpio_pin_to_port(port);
+    unsigned long portAddr = (unsigned long)gpio_port_by_num(port);
 
     /* read from pin at portBase + pinOffset */
     /* cast value to int {0, 1} */
