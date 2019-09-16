@@ -116,6 +116,7 @@ check_deprecated_vars_patterns() {
     local pathspec=()
 
     patterns+=(-e 'FEATURES_MCU_GROUP')
+    patterns+=(-e 'TEST_ON_CI_WHITELIST += all')
 
     # Pathspec with exclude should start by an inclusive pathspec in git 2.7.4
     pathspec+=('*')
