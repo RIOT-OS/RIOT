@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 #
 # usage: has_minimal_version.sh <version> <minimal_version> [toolname]
 #   Checks that version >= minimal_version
