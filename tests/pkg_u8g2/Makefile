@@ -59,7 +59,4 @@ CFLAGS += -DTEST_PIN_RESET=$(TEST_PIN_RESET)
 
 CFLAGS += -DTEST_DISPLAY=$(TEST_DISPLAY)
 
-# HACK Blacklist native as `murdock` fails on utf-8 characters for native tests
-TEST_ON_CI_BLACKLIST += native
-
 include $(RIOTBASE)/Makefile.include
