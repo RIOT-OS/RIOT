@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup        cpu_cc3200 TI CC3200
+ * @ingroup         cpu_cc3200
  * @ingroup         cpu
  * @brief           CPU specific implementations for CC3200
  * @{
