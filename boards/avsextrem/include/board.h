@@ -48,11 +48,6 @@ extern "C" {
 #define LED1_TOGGLE         (FIO3PIN ^= LED1_MASK)
 /** @} */
 
-/**
- * @brief   Initialize the board's clock system
- */
-void init_clks1(void);
-
 #ifdef __cplusplus
 }
 #endif

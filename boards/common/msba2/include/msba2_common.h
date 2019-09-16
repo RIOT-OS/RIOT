@@ -28,16 +28,6 @@
 extern "C" {
 #endif
 
-
-/**
- * @brief Feed sequence for PLL register
- */
-static inline void pllfeed(void)
-{
-    PLLFEED = 0xAA;
-    PLLFEED = 0x55;
-}
-
 #ifdef __cplusplus
 }
 #endif

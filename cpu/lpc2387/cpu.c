@@ -16,6 +16,9 @@
 #include "irq.h"
 #include "VIC.h"
 
+#include "stdio_base.h"
+#include "periph/init.h"
+
 void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale)
 {
     uint32_t pclkdiv;
@@ -108,6 +111,29 @@ void arm_reset(void)
     WDFEED = 0x55;
     /* Wait for the watchdog timer to expire, thus performing a reset */
     while(1) {}
+}
+
+/**
+ * @brief Initialize the CPU, set IRQ priorities, clocks
+ */
+void cpu_init(void)
+{
+    extern void board_init(void);
+
+    /* configure CPU clock */
+    cpu_init_clks();
+
+    /* set up GPIOs */
+    gpio_init_ports();
+
+    /* board specific setup of i/o pins */
+    board_init();
+
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
+
+    /* trigger static peripheral initialization */
+    periph_init();
 }
 
 /** @} */
