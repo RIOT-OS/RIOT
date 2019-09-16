@@ -24,7 +24,4 @@ BOARD_INSUFFICIENT_MEMORY = \
 	stm32l0538-disco \
 	#
 
-# HACK Blacklist native as `murdock` fails on utf-8 characters for native tests
-TEST_ON_CI_BLACKLIST += native
-
 include $(RIOTBASE)/Makefile.include
