@@ -334,8 +334,8 @@ void cpu_switch_context_exit(void)
     /* enable interrupts */
     irq_enable();
 
-    /* start the thread */
-    thread_yield();
+    /* start the thread by triggering a context switch */
+    thread_yield_higher();
     UNREACHABLE();
 }
 
