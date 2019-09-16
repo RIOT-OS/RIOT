@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup     cpu_cc3200
- * @ingroup     drivers_periph_uart
+ * @ingroup         cpu_cc3200
+ * @ingroup         drivers_periph_uart
  * @{
  *
  * @file
- * @brief       Sections definitions for the CC3200
+ * @brief           Sections definitions for the CC3200
  *
-* @author          Wladislaw Meixner <wladislaw.meixner@campus.lmu.de>
+* @author           Wladislaw Meixner <wladislaw.meixner@campus.lmu.de>
  * @}
  */
 
