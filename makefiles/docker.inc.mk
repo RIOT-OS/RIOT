@@ -198,6 +198,11 @@ endef
 # Arguments are the same as 'path_in_docker'
 # If the 'directories' variable is empty, it will not be exported to docker
 
+# docker_volume command line arguments. Allows giving volume mount options.
+# By default 'DOCKER_VOLUME_OPTIONS'. Argument option ignore the default.
+DOCKER_VOLUME_OPTIONS ?=
+docker_volume = -v '$1:$2$(addprefix :,$(or $3,$(DOCKER_VOLUME_OPTIONS)))'
+
 docker_volume_and_env = $(strip $(call _docker_volume_and_env,$1,$2,$3))
 define _docker_volume_and_env
   $(call docker_volumes_mapping,$($1),$2,$3)
