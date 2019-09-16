@@ -46,6 +46,9 @@
  * space remaining in the buffer; however, the API *will not* write past the
  * end of the buffer, and returns -ENOSPC when it is full.
  *
+ * For either API, the caller *must* write options in order by option number
+ * (see "CoAP option numbers" in [CoAP defines](group__net__coap.html)).
+ *
  * ## Server path matching
  *
  * By default the URI-path of an incoming request should match exactly one of

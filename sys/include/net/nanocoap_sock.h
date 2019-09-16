@@ -83,7 +83,8 @@
  * Next, use the functions in the _Options Write Buffer API_ section of
  * [nanocoap](group__net__nanocoap.html) to write each option. These functions
  * require the position in the buffer to start writing, and return the number
- * of bytes written.
+ * of bytes written. Options *must* be written in order by option number (see
+ * "CoAP option numbers" in [CoAP defines](group__net__coap.html)).
  *
  * @note You must ensure the buffer has enough space remaining to write each
  * option. The API does not verify the safety of writing an option.
