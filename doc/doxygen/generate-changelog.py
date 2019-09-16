@@ -12,9 +12,9 @@ import sys
 
 
 def generate_changelog(template_filename, changelog_filename, output_filename):
-    with open(template_filename) as template, \
-         open(changelog_filename) as changelog, \
-         open(output_filename, "w") as output:
+    with open(template_filename,    "r", encoding="utf-8") as template, \
+         open(changelog_filename,   "r", encoding="utf-8") as changelog, \
+         open(output_filename,      "w", encoding="utf-8") as output:
         changelog_lines = []
         release_title = re.compile(r"((RIOT-\d{4}\.\d{2} - Release Notes)|(Release 2013\.08))")
         notes_template = re.compile(r"\[Notes\]")
