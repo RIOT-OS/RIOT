@@ -29,6 +29,7 @@
 
 #include "net/gnrc/pkt.h"
 #include "net/ipv6/ext.h"
+#include "timex.h"
 
 #ifdef MODULE_GNRC_IPV6_EXT_RH
 #include "net/gnrc/ipv6/ext/rh.h"
@@ -37,6 +38,45 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @defgroup    net_gnrc_ipv6_ext_conf IPv6 extension header compile configurations
+ * @ingroup     net_gnrc_ipv6_ext
+ * @ingroup     config
+ * @{
+ */
+/**
+ * @brief   IPv6 fragmentation reassembly buffer size
+ *
+ * This limits the total amount of datagrams that can be reassembled at the same time.
+ *
+ * @note    Only applicable with [gnrc_ipv6_ext_frag](@ref net_gnrc_ipv6_ext_frag) module
+ */
+#ifndef GNRC_IPV6_EXT_FRAG_RBUF_SIZE
+#define GNRC_IPV6_EXT_FRAG_RBUF_SIZE        (1U)
+#endif
+
+/**
+ * @brief   The number of total allocatable @ref gnrc_ipv6_ext_frag_limits_t objects
+ *
+ * This is the maximum number of receivable fragments, shared between all
+ * fragmented datagrams
+ *
+ * @note    Only applicable with [gnrc_ipv6_ext_frag](@ref net_gnrc_ipv6_ext_frag) module
+ */
+#ifndef GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE
+#define GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE (GNRC_IPV6_EXT_FRAG_RBUF_SIZE * 2U)
+#endif
+
+/**
+ * @brief   Timeout for IPv6 fragmentation reassembly buffer entries in microseconds
+ *
+ * @note    Only applicable with [gnrc_ipv6_ext_frag](@ref net_gnrc_ipv6_ext_frag) module
+ */
+#ifndef GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US
+#define GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US  (10U * US_PER_SEC)
+#endif
+/** @} **/
 
 /**
  * @brief   Builds an extension header for sending.
