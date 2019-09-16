@@ -34,6 +34,8 @@
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 
+static char addr_str[ETHERNET_ADDR_LEN * 3];
+
 static const gnrc_netif_ops_t ethernet_ops = {
     .send = _send,
     .recv = _recv,
@@ -196,6 +198,12 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_pktbuf_realloc_data(pkt, nread);
         }
 
+        DEBUG("gnrc_netif_ethernet: received packet from %s of length %d\n",
+              gnrc_netif_addr_to_str(pkt->data, ETHERNET_ADDR_LEN, addr_str),
+              nread);
+#if defined(MODULE_OD) && ENABLE_DEBUG
+        od_hex_dump(pkt->data, nread, OD_WIDTH_DEFAULT);
+#endif
         /* mark ethernet header */
         gnrc_pktsnip_t *eth_hdr = gnrc_pktbuf_mark(pkt, sizeof(ethernet_hdr_t), GNRC_NETTYPE_UNDEF);
         if (!eth_hdr) {
@@ -231,14 +239,6 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         gnrc_netif_hdr_set_src_addr(netif_hdr->data, hdr->src, ETHERNET_ADDR_LEN);
         gnrc_netif_hdr_set_dst_addr(netif_hdr->data, hdr->dst, ETHERNET_ADDR_LEN);
         gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
-
-        DEBUG("gnrc_netif_ethernet: received packet from %02x:%02x:%02x:%02x:%02x:%02x "
-              "of length %d\n",
-              hdr->src[0], hdr->src[1], hdr->src[2], hdr->src[3], hdr->src[4],
-              hdr->src[5], nread);
-#if defined(MODULE_OD) && ENABLE_DEBUG
-        od_hex_dump(hdr, nread, OD_WIDTH_DEFAULT);
-#endif
 
         gnrc_pktbuf_remove_snip(pkt, eth_hdr);
         LL_APPEND(pkt, netif_hdr);
