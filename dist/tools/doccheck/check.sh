@@ -10,6 +10,14 @@
 
 RIOTBASE="$(cd $(dirname $0)/../../..; pwd)"
 
+# change 'make' to 'gmake' for FreeBSD
+OS=$(uname -s)
+if [ ${OS} == "FreeBSD" ]; then
+    MAKE=gmake
+fi
+# set default if not provided by env
+MAKE=${MAKE:-make}
+
 if tput colors &> /dev/null && [ $(tput colors) -ge 8 ]; then
     CERROR="\e[1;31m"
     CWARN="\033[1;33m"
@@ -20,11 +28,11 @@ else
     CRESET=
 fi
 
-DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1)
+DOXY_OUTPUT=$(${MAKE} -C "${RIOTBASE}" doc 2>&1)
 DOXY_ERRCODE=$?
 
 if [ "${DOXY_ERRCODE}" -ne 0 ] ; then
-    echo "'make doc' exited with non-zero code (${DOXY_ERRCODE})"
+    echo "'${MAKE} doc' exited with non-zero code (${DOXY_ERRCODE})"
     echo "${DOXY_OUTPUT}"
     exit 2
 else
