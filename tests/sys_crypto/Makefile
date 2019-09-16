@@ -27,6 +27,4 @@ USEMODULE += crypto
 USEMODULE += cipher_modes
 CFLAGS += -DCRYPTO_THREEDES
 
-TEST_ON_CI_WHITELIST += all
-
 include $(RIOTBASE)/Makefile.include
