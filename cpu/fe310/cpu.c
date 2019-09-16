@@ -187,9 +187,20 @@ void handle_trap(unsigned int mcause)
                 break;
         }
     }
+    else {
+        /* Unknown trap */
+        core_panic(PANIC_GENERAL_ERROR, "Unhandled trap");
+    }
 
     /* ISR done - no more changes to thread states */
     __in_isr = 0;
+}
+
+void panic_arch(void)
+{
+#ifdef DEVELHELP
+    while (1) {}
+#endif
 }
 
 /**
@@ -319,22 +330,18 @@ void *thread_isr_stack_start(void)
 }
 
 /**
- * @brief Start or resume threading by loading a threads initial information
- * from the stack.
+ * @brief Call context switching at thread exit
  *
  * This is called is two situations: 1) after the initial main and idle threads
  * have been created and 2) when a thread exits.
  *
- * sched_active_thread is not valid when cpu_switch_context_exit() is
- * called.  sched_run() must be called to determine the next valid thread.
- * This is exploited in the context switch code.
  */
 void cpu_switch_context_exit(void)
 {
     /* enable interrupts */
     irq_enable();
 
-    /* start the thread by triggering a context switch */
+    /* force a context switch to another thread */
     thread_yield_higher();
     UNREACHABLE();
 }
@@ -343,4 +350,7 @@ void thread_yield_higher(void)
 {
     /* Use SW intr to schedule context switch */
     CLINT_REG(CLINT_MSIP) = 1;
+
+    /* Latency of SW intr can be 4-7 cycles; wait for the SW intr */
+    __asm__ volatile ("wfi");
 }
