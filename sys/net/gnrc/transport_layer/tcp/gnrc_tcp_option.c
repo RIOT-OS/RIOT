@@ -63,6 +63,7 @@ int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
             default:
                 DEBUG("gnrc_tcp_option.c : _option_parse() : Unknown option found.\
                       KIND=%"PRIu8", LENGTH=%"PRIu8"\n", option->kind, option->length);
+                return -1;
         }
 
         if (option->length > opt_left) {
