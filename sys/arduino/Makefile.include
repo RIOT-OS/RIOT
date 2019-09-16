@@ -2,7 +2,7 @@
 
 # Define application sketches module, it will be generated into $(BINDIR)
 SKETCH_MODULE     ?= arduino_sketches
-SKETCH_MODULE_DIR ?= $(BINDIR)/$(SKETCH_MODULE)_src
+SKETCH_MODULE_DIR ?= $(BINDIR)/$(SKETCH_MODULE)
 SKETCHES           = $(wildcard $(APPDIR)/*.sketch)
 include $(RIOTBASE)/sys/arduino/sketches.inc.mk
 

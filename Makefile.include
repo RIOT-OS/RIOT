@@ -500,7 +500,8 @@ endif # BUILD_IN_DOCKER
 
 # Rules to check the correctness of thin archives.
 
-relpath = $(shell realpath --relative-to=$(abspath .) $(1))
+# OS independant relpath as 'realpath --relative-to' is not supported on OSx
+relpath = $(shell python3 -c 'import pathlib; print(pathlib.Path("$1").relative_to("$(CURDIR)"))')
 
 # Each ARCHECK file contains all the absolute paths found inside the archive.
 BASELIB_ARCHECKS = $(patsubst %.a,%.a-check,$(filter %.a,$(BASELIBS)))
