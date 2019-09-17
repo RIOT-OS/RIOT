@@ -25,11 +25,7 @@
  * @}
  */
 
-#if defined(MCU_ATMEGA2560) || defined(MCU_ATMEGA1281) || defined(MCU_ATMEGA328P)
 #include <stdlib.h>
-#else
-#include <malloc.h>
-#endif
 
 #include "pipe.h"
 
