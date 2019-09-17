@@ -416,7 +416,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
+int gpio_update_cb(gpio_t pin, gpio_cb_t cb)
 {
     int8_t int_num = _int_num(pin);
 
@@ -424,13 +424,20 @@ int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
         return -1;
     }
 
-    if (cb) {
-        config[int_num].cb = cb;
+    _gpio_update_cb(pin, &config[int_num].cb, cb);
+
+    return 0;
+}
+
+int gpio_update_cb_arg(gpio_t pin, void *arg)
+{
+    int8_t int_num = _int_num(pin);
+
+    if (int_num < 0) {
+        return -1;
     }
 
-    if (arg) {
-        config[int_num].arg = arg;
-    }
+    config[int_num].arg = arg;
 
     return 0;
 }

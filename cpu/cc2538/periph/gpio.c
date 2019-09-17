@@ -196,15 +196,16 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg)
+int gpio_update_cb(gpio_t pin, gpio_cb_t cb)
 {
-    if (cb) {
-        isr_ctx[_port_num(pin)][_pin_num(pin)].cb = cb;
-    }
+    _gpio_update_cb(pin, &isr_ctx[_port_num(pin)][_pin_num(pin)].cb, cb);
 
-    if (arg) {
-        isr_ctx[_port_num(pin)][_pin_num(pin)].arg = arg;
-    }
+    return 0;
+}
+
+int gpio_update_cb_arg(gpio_t pin, void arg)
+{
+    isr_ctx[_port_num(pin)][_pin_num(pin)].arg = arg;
 
     return 0;
 }

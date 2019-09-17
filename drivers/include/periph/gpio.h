@@ -173,7 +173,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg);
 
 /**
- * @brief   Change the callback and/or argument of an external interrupt GPIO
+ * @brief   Change the callback function of an external interrupt GPIO
  *
  * The registered callback function will be called in interrupt context every
  * time the defined flank(s) configured in `gpio_init_int()` are detected.
@@ -185,14 +185,31 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
  *
  * @param[in] pin       pin to re-configure
  * @param[in] cb        callback that is called from interrupt context
- *                      May be NULL, in which case the previous value is kept.
- * @param[in] arg       optional argument passed to the callback
- *                      May be NULL, in which case the previous value is kept.
+ *                      May be NULL, in which case the interrupt is disabled.
  *
  * @return              0 on success
  * @return              -1 on error
  */
-int gpio_set_cb(gpio_t pin, gpio_cb_t cb, void *arg);
+int gpio_update_cb(gpio_t pin, gpio_cb_t cb);
+
+/**
+ * @brief   Change the callback function argument of an external interrupt GPIO
+ *
+ * The registered callback function will be called in interrupt context every
+ * time the defined flank(s) configured in `gpio_init_int()` are detected.
+ *
+ * This assumes `gpio_init_int()` has been called at least once before on `pin`.
+ *
+ * @note    You have to add the module `periph_gpio_irq` to your project to
+ *          enable this function
+ *
+ * @param[in] pin       pin to re-configure
+ * @param[in] arg       argument for the interrupt callback function
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int gpio_update_cb_arg(gpio_t pin, void *arg);
 
 /**
  * @brief   Enable pin interrupt if configured as interrupt source
@@ -254,6 +271,31 @@ void gpio_toggle(gpio_t pin);
  * @param[in] value     value to set the pin to, 0 for LOW, HIGH otherwise
  */
 void gpio_write(gpio_t pin, int value);
+
+/**
+ * @brief   Internal helper function to implement gpio_update_cb()
+ *          DO NOT USE outside of the periph_gpio implementation.
+ *
+ * @param[in] pin       the pin to set
+ * @param     cb_int    where to store the callback
+ * @param[in] cb        the new callback
+ */
+static inline void _gpio_update_cb(gpio_t pin, gpio_cb_t *cb_int, gpio_cb_t cb)
+{
+    bool re_enable = false;
+
+    if (cb == NULL) {
+        gpio_irq_disable(pin);
+    } else if (*cb_int == NULL) {
+        re_enable = true;
+    }
+
+    *cb_int = cb;
+
+    if (re_enable) {
+        gpio_irq_enable(pin);
+    }
+}
 
 #ifdef __cplusplus
 }
