@@ -926,6 +926,11 @@ ifneq (,$(filter usbus_cdc_ecm,$(USEMODULE)))
   USEMODULE += luid
 endif
 
+ifneq (,$(filter usbus_cdc_acm_uart,$(USEMODULE)))
+  USEMODULE += usbus_cdc_acm
+  USEMODULE += isrpipe
+endif
+
 ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += random
