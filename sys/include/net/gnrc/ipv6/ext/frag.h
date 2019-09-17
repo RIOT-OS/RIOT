@@ -20,6 +20,7 @@
 #ifndef NET_GNRC_IPV6_EXT_FRAG_H
 #define NET_GNRC_IPV6_EXT_FRAG_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "clist.h"
@@ -34,7 +35,22 @@ extern "C" {
 /**
  * @brief   Message type to time reassembly buffer garbage collection
  */
-#define GNRC_IPV6_EXT_FRAG_RBUF_GC  (0xfe00U)
+#define GNRC_IPV6_EXT_FRAG_RBUF_GC      (0xfe00U)
+
+/**
+ * @brief   Message type to continue fragmenting a datagram from a given
+ *          fragmentation send buffer
+ *
+ * Expected type: @ref gnrc_ipv6_ext_frag_send_t
+ */
+#define GNRC_IPV6_EXT_FRAG_CONTINUE     (0xfe01U)
+
+/**
+ * @brief   Message type to send a fragment of an IPv6 datagram.
+ *
+ * Expected type: @ref gnrc_pktsnip_t
+ */
+#define GNRC_IPV6_EXT_FRAG_SEND         (0xfe02U)
 
 /**
  * @brief   Data type to describe limits of a single fragment in the reassembly
@@ -46,6 +62,18 @@ typedef struct gnrc_ipv6_ext_frag_limits {
     uint16_t end;                           /**< the exclusive end (= offset + length) of the
                                              *   fragment */
 } gnrc_ipv6_ext_frag_limits_t;
+
+/**
+ * @brief   Fragmentation send buffer type
+ */
+typedef struct {
+    gnrc_pktsnip_t *pkt;            /**< the IPv6 packet to fragment */
+    gnrc_pktsnip_t *per_frag;       /**< per fragment headers */
+    uint32_t id;                    /**< the identification for the fragment header */
+    uint16_t path_mtu;              /**< path MTU to destination of
+                                     *   gnrc_ipv6_ext_frag_send_t::pkt */
+    uint16_t offset;                /**< current fragmentation offset */
+} gnrc_ipv6_ext_frag_send_t;
 
 /**
  * @brief   A reassembly buffer entry
@@ -70,6 +98,26 @@ typedef struct {
  * @internal
  */
 void gnrc_ipv6_ext_frag_init(void);
+
+/**
+ * @brief   Send an IPv6 packet fragmented
+ *
+ * @param[in] pkt       The IPv6 packet. The packet must have an already
+ *                      prepared @ref GNRC_NETTYPE_NETIF snip as its first
+ *                      snip. The packet must contain at least an IPv6 header
+ *                      and any number of IPv6 extension headers after that.
+ * @param[in] path_mtu  Path MTU to destination of IPv6 packet.
+ */
+void gnrc_ipv6_ext_frag_send_pkt(gnrc_pktsnip_t *pkt, unsigned path_mtu);
+
+/**
+ * @brief   (Continue to) fragment packet already in fragmentation send buffer
+ *
+ * @pre `snd_buf != NULL`
+ *
+ * @param[in,out] snd_buf   A fragmentation send buffer entry. May not be NULL.
+ */
+void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf);
 
 /**
  * @brief   Reassemble fragmented IPv6 packet

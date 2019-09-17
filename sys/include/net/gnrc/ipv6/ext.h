@@ -46,6 +46,17 @@ extern "C" {
  * @{
  */
 /**
+ * @brief   IPv6 fragmentation send buffer size
+ *
+ * This limits the total amount of datagrams that can be fragmented at the same time.
+ *
+ * @note    Only applicable with [gnrc_ipv6_ext_frag](@ref net_gnrc_ipv6_ext_frag) module
+ */
+#ifndef GNRC_IPV6_EXT_FRAG_SEND_SIZE
+#define GNRC_IPV6_EXT_FRAG_SEND_SIZE    (1U)
+#endif
+
+/**
  * @brief   IPv6 fragmentation reassembly buffer size
  *
  * This limits the total amount of datagrams that can be reassembled at the same time.
@@ -76,6 +87,7 @@ extern "C" {
 #ifndef GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US
 #define GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US  (10U * US_PER_SEC)
 #endif
+
 /** @} **/
 
 /**
