@@ -17,6 +17,7 @@
 #include "periph/timer.h"
 #include "periph/init.h"
 #include "panic.h"
+#include "stdio_base.h"
 #include "kernel_init.h"
 #include "cpu.h"
 #include "board.h"
@@ -76,6 +77,9 @@ void panic_arch(void)
 
 void cpu_init(void)
 {
+    /* initialize stdio*/
+    stdio_init();
+
     /* trigger static peripheral initialization */
     periph_init();
 }
