@@ -83,7 +83,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
                 return -1;
         }
         TIMER_0_DEV->MCR |= (1 << (channel * 3));
-        return 1;
+        return 0;
     }
     return -1;
 }
@@ -92,7 +92,7 @@ int timer_clear(tim_t dev, int channel)
 {
     if (dev == TIMER_0 && channel >= 0 && channel < TIMER_0_CHANNELS) {
         TIMER_0_DEV->MCR &= ~(1 << (channel * 3));
-        return 1;
+        return 0;
     }
     return -1;
 }

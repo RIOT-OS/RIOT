@@ -463,7 +463,7 @@ static inline int lptmr_set(uint8_t dev, uint16_t timeout)
         lptmr_reload(dev, timeout);
     }
     irq_restore(mask);
-    return 1;
+    return 0;
 }
 
 static inline int lptmr_set_absolute(uint8_t dev, uint16_t target)
@@ -498,7 +498,7 @@ static inline int lptmr_set_absolute(uint8_t dev, uint16_t target)
         lptmr_reload(dev, timeout);
     }
     irq_restore(mask);
-    return 1;
+    return 0;
 }
 
 static inline int lptmr_clear(uint8_t dev)
@@ -510,20 +510,20 @@ static inline int lptmr_clear(uint8_t dev)
     if (!lptmr[dev].running) {
         /* Already clear */
         irq_restore(mask);
-        return 1;
+        return 0;
     }
     lptmr[dev].running = 0;
     if (!(hw->CSR & LPTMR_CSR_TEN_MASK)) {
         /* Timer is stopped */
         irq_restore(mask);
-        return 1;
+        return 0;
     }
     /* Disable interrupt, enable timer */
     hw->CSR = LPTMR_CSR_TEN_MASK | LPTMR_CSR_TFC_MASK;
     /* Clear IRQ if it occurred during this function */
     NVIC_ClearPendingIRQ(lptmr_config[dev].irqn);
     irq_restore(mask);
-    return 1;
+    return 0;
 }
 
 static inline void lptmr_start(uint8_t dev)

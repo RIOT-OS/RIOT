@@ -108,7 +108,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg);
  * @param[in] timeout       timeout in ticks after that the registered callback
  *                          is executed
  *
- * @return                  1 on success
+ * @return                  0 on success
  * @return                  -1 on error
  */
 int timer_set(tim_t dev, int channel, unsigned int timeout);
@@ -121,7 +121,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout);
  * @param[in] value         the absolute compare value when the callback will be
  *                          triggered
  *
- * @return                  1 on success
+ * @return                  0 on success
  * @return                  -1 on error
  */
 int timer_set_absolute(tim_t dev, int channel, unsigned int value);
@@ -132,7 +132,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value);
  * @param[in] dev           the timer device to clear
  * @param[in] channel       the channel on the given device to clear
  *
- * @return                  1 on success
+ * @return                  0 on success
  * @return                  -1 on error
  */
 int timer_clear(tim_t dev, int channel);
