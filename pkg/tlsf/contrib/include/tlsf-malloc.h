@@ -37,6 +37,7 @@
 #define TLSF_MALLOC_H
 
 #include <stddef.h>
+
 #include "tlsf.h"
 
 #ifdef __cplusplus
@@ -86,7 +87,7 @@ int tlsf_add_global_pool(void *mem, size_t bytes);
  *
  * Use for debugging purposes only.
  */
-tlsf_t *_tlsf_get_global_control(void);
+tlsf_t _tlsf_get_global_control(void);
 
 
 #ifdef __cplusplus
