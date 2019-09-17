@@ -51,7 +51,7 @@ int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
                 continue;
 
             case TCP_OPTION_KIND_MSS:
-                if (option->length > opt_left || option->length != TCP_OPTION_LENGTH_MSS) {
+                if (opt_left < TCP_OPTION_LENGTH_MIN || option->length > opt_left || option->length != TCP_OPTION_LENGTH_MSS) {
                     DEBUG("gnrc_tcp_option.c : _option_parse() : invalid MSS Option length.\n");
                     return -1;
                 }
@@ -66,7 +66,7 @@ int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
                 return -1;
         }
 
-        if (option->length > opt_left) {
+        if (opt_left < TCP_OPTION_LENGTH_MIN || option->length > opt_left) {
             DEBUG("gnrc_tcp_option.c : _option_parse() : invalid option length\n");
             return 0;
         }
