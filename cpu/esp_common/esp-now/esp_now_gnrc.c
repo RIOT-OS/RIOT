@@ -147,7 +147,6 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         pkt = mac_hdr;
         goto err;
     }
-    esp_now_pkt_hdr_t *hdr = (esp_now_pkt_hdr_t*)esp_hdr->data;
 
 #ifdef MODULE_L2FILTER
     if (!l2filter_pass(dev->filter, mac_hdr->data, ESP_NOW_ADDR_LEN)) {
@@ -160,6 +159,8 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
     pkt->type = GNRC_NETTYPE_UNDEF;
 
 #ifdef MODULE_GNRC_SIXLOWPAN
+    esp_now_pkt_hdr_t *hdr = (esp_now_pkt_hdr_t*)esp_hdr->data;
+
     if (hdr->flags & ESP_NOW_PKT_HDR_FLAG_SIXLO) {
         pkt->type = GNRC_NETTYPE_SIXLOWPAN;
     }
