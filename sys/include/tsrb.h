@@ -112,6 +112,15 @@ static inline unsigned int tsrb_free(const tsrb_t *rb)
 }
 
 /**
+ * @brief       Peeks a byte from ringbuffer
+ * @param[in]   rb  Ringbuffer to operate on
+ * @param[out]  dst buffer to write to
+ * @return      0 on success
+ * @return      -1  if no byte available
+ */
+int tsrb_peek_one(tsrb_t *rb, uint8_t *dst);
+
+/**
  * @brief       Get a byte from ringbuffer
  * @param[in]   rb  Ringbuffer to operate on
  * @return      >=0 byte that has been read

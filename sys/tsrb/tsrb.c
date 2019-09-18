@@ -29,6 +29,22 @@ static uint8_t _pop(tsrb_t *rb)
     return rb->buf[rb->reads++ & (rb->size - 1)];
 }
 
+static uint8_t _peek(tsrb_t *rb)
+{
+    return rb->buf[rb->reads & (rb->size - 1)];
+}
+
+int tsrb_peek_one(tsrb_t *rb, uint8_t *dst)
+{
+    if (!tsrb_empty(rb)) {
+        *dst = _peek(rb);
+        return 0;
+    }
+    else {
+        return -1;
+    }
+}
+
 int tsrb_get_one(tsrb_t *rb)
 {
     if (!tsrb_empty(rb)) {
