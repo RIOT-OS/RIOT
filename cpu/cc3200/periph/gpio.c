@@ -83,20 +83,6 @@ static const uint8_t pin_to_gpio_num[64] = {
 };
 
 /**
- * @brief check if a port base is valid
- *
- * @param port
- * @return true
- * @return false
- */
-bool _gpioPortBaseValid(uint32_t port)
-{
-    return ((port == GPIOA0_BASE) || (port == GPIOA1_BASE) ||
-            (port == GPIOA2_BASE) || (port == GPIOA3_BASE) ||
-            (port == GPIOA4_BASE));
-}
-
-/**
  * @brief     Extract the pin number of the given pin
  */
 static inline uint8_t gpio_pin_num(gpio_t pin)
