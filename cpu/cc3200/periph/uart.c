@@ -206,7 +206,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     }
 }
 
-int uart_read_blocking(uart_t uart, char *data)
+int uart_read_blocking(uart_t uart, uint8_t *data)
 {
     uint32_t u = (uint32_t)uart_config[uart].dev;
     *data      = ROM_UARTCharGet(u);
@@ -214,7 +214,7 @@ int uart_read_blocking(uart_t uart, char *data)
     return 1;
 }
 
-int uart_write_blocking(uart_t uart, char data)
+int uart_write_blocking(uart_t uart, uint8_t data)
 {
     ROM_UARTCharPut((uint32_t)uart_config[uart].dev, data);
     return 1;

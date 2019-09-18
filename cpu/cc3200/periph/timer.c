@@ -136,9 +136,9 @@ static inline void *get_irq_handler(tim_t dev)
 }
 
 #define ROM_TimerConfigure \
-    ((void (*)(unsigned long ulBase, unsigned long ulConfig))ROM_TIMERTABLE[2])
+    ((void (*)(uint32_t ulBase, uint32_t ulConfig))ROM_TIMERTABLE[2])
 
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
     /* check if timer id is valid */
     if (dev >= TIMER_NUMOF) {
@@ -190,7 +190,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     return 0;
 }
 
-int set_absolute(tim_t dev, int channel, unsigned long long value)
+int set_absolute(tim_t dev, int channel, uint32_t value)
 {
     /* currently only one channel supported */
     if (dev >= TIMER_NUMOF || channel > 0) {

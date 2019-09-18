@@ -64,7 +64,7 @@ void cpu_init(void)
  */
 void reset_periph_clk(cc3200_arcm_reg_t *reg)
 {
-    volatile unsigned long ulDelay;
+    volatile uint32_t ulDelay;
 
     /* enable & reset peripherals */
     reg->soft_reset |= PRCM_SOFT_RESET;

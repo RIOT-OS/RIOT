@@ -106,7 +106,7 @@ typedef enum {
  * @brief GPIO register
  * @{
  */
-typedef unsigned long cc3200_gpio_reg;
+typedef uint32_t cc3200_gpio_reg;
 /** @} */
 
 /**
