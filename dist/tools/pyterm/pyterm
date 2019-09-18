@@ -76,6 +76,9 @@ defaultport = "/dev/ttyUSB0"
 # default baudrate for serial connection
 defaultbaud = 115200
 
+# default timeout for opening the serial connection
+defaultdevicetimeout = 0
+
 # directory to store configuration and log files
 defaultdir = os.environ['HOME'] + os.path.sep + '.pyterm'
 
@@ -109,7 +112,8 @@ class SerCmd(cmd.Cmd):
                  confdir=None, conffile=None, host=None, run_name=None,
                  log_dir_name=None, newline=None, formatter=None,
                  set_rts=None, set_dtr=None, serprompt=None,
-                 repeat_command_on_empty_line=defaultrepeat_cmd_empty_line):
+                 repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
+                 devicetimeout=None):
         """Constructor.
 
         Args:
@@ -120,6 +124,7 @@ class SerCmd(cmd.Cmd):
             conffile (str):     configuration file name
             host (str):         local host name
             run_name (str):     identifier for log files subdirectory
+            devicetimeout (int): seconds to wait for device file autocreation
 
         """
 
@@ -135,6 +140,7 @@ class SerCmd(cmd.Cmd):
         self.configfile = conffile
         self.host = host
         self.run_name = run_name
+        self.devicetimeout = devicetimeout
         self.log_dir_name = log_dir_name
         self.newline = newline
         self.serprompt = serprompt
@@ -626,7 +632,21 @@ class SerCmd(cmd.Cmd):
                 self.process_line(line)
 
     def serial_connect(self):
-        self.ser = serial.Serial(port=self.port, dsrdtr=0, rtscts=0)
+        attempts = self.devicetimeout + 1
+        while attempts:
+            try:
+                self.ser = serial.Serial(port=self.port, dsrdtr=0, rtscts=0)
+            except serial.SerialException as e:
+                attempts -= 1
+                if not attempts:
+                    raise
+                if attempts == self.devicetimeout:
+                    self.logger.warning("Serial port unavailable, waiting "
+                                        "up to %s seconds" % attempts)
+                time.sleep(1)
+            else:
+                break
+
         self.ser.baudrate = self.baudrate
 
         if self.toggle:
@@ -782,6 +802,13 @@ if __name__ == "__main__":
                         action="store",
                         default=None,
                         help="Specifies the value of DTR pin")
+    parser.add_argument("--device-timeout",
+                        dest="devicetimeout",
+                        type=int,
+                        action="store",
+                        default=defaultdevicetimeout,
+                        help="Seconds to wait for device to appear, default "
+                        "is %s" % defaultdevicetimeout)
     parser.add_argument('-d', '--directory',
                         help="Specify the Pyterm directory, default is %s"
                         % defaultdir,
@@ -839,7 +866,7 @@ if __name__ == "__main__":
                      args.directory, args.config, args.host, args.run_name,
                      args.log_dir_name, args.newline, args.format,
                      args.set_rts, args.set_dtr, args.prompt,
-                     args.repeat_command_on_empty_line)
+                     args.repeat_command_on_empty_line, args.devicetimeout)
     myshell.prompt = ''
 
     try:
