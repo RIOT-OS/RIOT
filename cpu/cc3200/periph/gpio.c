@@ -142,7 +142,7 @@ static inline cc3200_gpio_t *gpio_port_by_num(uint8_t port_num)
  */
 unsigned char _gpio_pin_value_mask(uint8_t pin, unsigned char val)
 {
-    return val << (pin % 8);
+    return val << (pin & 0x7);
 }
 
 /**
