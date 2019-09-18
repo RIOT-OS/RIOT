@@ -81,6 +81,17 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
     dev->awaiting_response = true;
 #endif
 
+#ifdef MODULE_AT_URC
+    /* Check for emitted URC */
+    if (bytes) {
+        char c;
+        if (!isrpipe_peek_one(&dev->isrpipe, (uint8_t *)&c)) {
+            if (c != *bytes && c == '+') {
+                return -1;
+            }
+        }
+    }
+#endif
     while (*bytes) {
         char c;
         if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout)) == 1) {
