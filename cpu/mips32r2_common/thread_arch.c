@@ -17,9 +17,8 @@
 #include "cpu.h"
 #include "irq.h"
 #include "cpu_conf.h"
-#include "periph_conf.h" /* for debug uart number */
-#include "periph/uart.h"
 #include "malloc.h"
+#include "stdio_uart.h"
 
 #define STACK_END_PAINT    (0xdeadc0de)
 #define C0_STATUS_EXL      (2)
@@ -216,7 +215,7 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
             syscall_num = (mem_rw((const void *)ctx->epc) >> 6) & 0xFFFF;
 #endif
 
-#ifdef DEBUG_VIA_UART
+#ifdef MODULE_STDIO_UART
 #include <mips/uhi_syscalls.h>
             /*
              * intercept UHI write syscalls (printf) which would normally
@@ -228,7 +227,7 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
                 if (ctx->t2[1] == __MIPS_UHI_WRITE &&
                     (ctx->a[0] == STDOUT_FILENO || ctx->a[0] == STDERR_FILENO)) {
                     uint32_t status = irq_disable();
-                    uart_write(DEBUG_VIA_UART, (uint8_t *)ctx->a[1], ctx->a[2]);
+                    stdio_write((void *)ctx->a[1], ctx->a[2]);
                     ctx->v[0] = ctx->a[2];
                     ctx->epc += 4; /* move PC past the syscall */
                     irq_restore(status);
