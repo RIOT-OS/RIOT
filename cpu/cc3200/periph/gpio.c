@@ -126,7 +126,7 @@ static inline cc3200_gpio_t *gpio_port_by_num(uint8_t port_num)
  * @param val value to be masked
  * @return masked value for a given pin with value val
  */
-unsigned char _gpio_pin_value_mask(uint8_t pin, unsigned char val)
+uint8_t _gpio_pin_value_mask(uint8_t pin, uint8_t val)
 {
     return val << (pin & 0x7);
 }
@@ -342,9 +342,9 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
  */
 void gpio_write(gpio_t dev, int value)
 {
-    uint8_t port           = gpio_port_num(dev);
-    unsigned char ipin     = gpio_pin_mask(dev);
-    unsigned long portAddr = (unsigned long)gpio_port_by_num(port);
+    uint8_t port      = gpio_port_num(dev);
+    uint8_t ipin      = gpio_pin_mask(dev);
+    uint32_t portAddr = (uint32_t)gpio_port_by_num(port);
     /* write to pin at portBase + pinOffset */
     HWREG(portAddr + (ipin << 2)) =
             _gpio_pin_value_mask(pin_to_gpio_num[gpio_pin_num(dev)], value);
@@ -358,9 +358,9 @@ void gpio_write(gpio_t dev, int value)
  */
 int gpio_read(gpio_t dev)
 {
-    uint8_t port           = gpio_port_num(dev);
-    unsigned char ipin     = gpio_pin_mask(dev);
-    unsigned long portAddr = (unsigned long)gpio_port_by_num(port);
+    uint8_t port      = gpio_port_num(dev);
+    uint8_t ipin      = gpio_pin_mask(dev);
+    uint32_t portAddr = (uint32_t)gpio_port_by_num(port);
 
     /* read from pin at portBase + pinOffset */
     /* cast value to int {0, 1} */
