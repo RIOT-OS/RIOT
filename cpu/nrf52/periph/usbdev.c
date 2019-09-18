@@ -498,18 +498,13 @@ static int _ep0_ready(usbdev_ep_t *ep, size_t len)
     }
     else {
         /* USB_EP_DIR_OUT */
-        if (len == 0) {
-            if (usbdev->sstate == NRFUSB_SETUP_READ) {
-                usbdev->device->TASKS_EP0STATUS = 1;
-                usbdev->sstate = NRFUSB_SETUP_ACKOUT;
-                usbdev->usbdev.epcb(_get_ep_out(usbdev, 0), USBDEV_EVENT_ESR);
-            }
-            else if (usbdev->sstate == NRFUSB_SETUP_READY) {
-                return 0;
-            }
+        if (usbdev->sstate == NRFUSB_SETUP_READ) {
+            usbdev->device->TASKS_EP0STATUS = 1;
+            usbdev->sstate = NRFUSB_SETUP_ACKOUT;
+            usbdev->usbdev.epcb(_get_ep_out(usbdev, 0), USBDEV_EVENT_ESR);
         }
-        else {
-            usbdev->device->TASKS_STARTEPOUT[ep->num] = 1;
+        else if (usbdev->sstate == NRFUSB_SETUP_WRITE) {
+            usbdev->device->TASKS_EP0RCVOUT = 1;
         }
     }
     return len;
@@ -576,6 +571,11 @@ static signed _ep0_esr(usbdev_ep_t *ep)
             if ((uint8_t)usbdev->device->BREQUEST == 0x05) {
                 event = 0;
             }
+        }
+        else if (usbdev->device->EVENTS_EP0DATADONE) {
+            usbdev->device->EVENTS_EP0DATADONE = 0;
+            _ep_dma_out(ep);
+            event = USBDEV_EVENT_TR_COMPLETE;
         }
     }
     else {
@@ -649,8 +649,14 @@ void isr_usbd(void)
         }
         if (usbdev->device->EVENTS_EP0DATADONE &&
                 (usbdev->device->INTEN & USBD_INTEN_EP0DATADONE_Msk)) {
-            usbdev->usbdev.epcb(_get_ep_in(usbdev, 0), USBDEV_EVENT_ESR);
-            _ep_disable_irq(_get_ep_in(usbdev, 0));
+            if (usbdev->sstate == NRFUSB_SETUP_READ) {
+                usbdev->usbdev.epcb(_get_ep_in(usbdev, 0), USBDEV_EVENT_ESR);
+                _ep_disable_irq(_get_ep_in(usbdev, 0));
+            }
+            if (usbdev->sstate == NRFUSB_SETUP_WRITE) {
+                usbdev->usbdev.epcb(_get_ep_out(usbdev, 0), USBDEV_EVENT_ESR);
+                _ep_disable_irq(_get_ep_in(usbdev, 0));
+            }
         }
         if (usbdev->device->EVENTS_EPDATA && usbdev->device->EPDATASTATUS) {
             usbdev->device->EVENTS_EPDATA = 0;
