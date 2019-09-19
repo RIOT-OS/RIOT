@@ -65,6 +65,11 @@ typedef struct {
     usbus_control_slicer_t slicer;
 
     /**
+     * @brief Received bytes for set requests
+     */
+    size_t received_len;
+
+    /**
      * @brief EP0 OUT endpoint
      */
     usbdev_ep_t *out;
@@ -122,6 +127,18 @@ void usbus_control_slicer_ready(usbus_t *usbus);
  * @return              0 when the data is fully transfered
  */
 int usbus_control_slicer_nextslice(usbus_t *usbus);
+
+/**
+ * @brief Retrieve the data from the OUT pipe of the control endpoint
+ *
+ * @pre usbus->state == USBUS_CONTROL_REQUEST_STATE_OUTDATA
+ *
+ * @param[in]   usbus       USBUS context
+ * @param[out]  len         Length of the data part
+ *
+ * @return                  pointer to the data buffer
+ */
+uint8_t *usbus_control_get_out_data(usbus_t *usbus, size_t *len);
 
 #ifdef __cplusplus
 }
