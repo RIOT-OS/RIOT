@@ -256,6 +256,7 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     const ipv6_hdr_t *hdr = pkt->next->data;
 
+    (void)hdr;  /* only used for DEBUG messages */
     assert(netif != NULL);
     gnrc_netif_hdr_set_netif(pkt->data, netif);
     if (gnrc_pkt_len(pkt->next) > netif->ipv6.mtu) {

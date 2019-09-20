@@ -439,7 +439,6 @@ static void _handle_rtr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     size_t tmp_len = icmpv6_len - sizeof(ndp_rtr_sol_t);
     _nib_onl_entry_t *nce = NULL;
     ndp_opt_t *opt;
-    uint32_t next_ra_delay = random_uint32_range(0, NDP_MAX_RA_DELAY);
 
     assert(netif != NULL);
     /* check validity, see: https://tools.ietf.org/html/rfc4861#section-6.1.1 */
@@ -498,6 +497,7 @@ static void _handle_rtr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         nce = _nib_onl_get(&ipv6->src, netif->pid);
     }
     if (!gnrc_netif_is_6ln(netif)) {
+        uint32_t next_ra_delay = random_uint32_range(0, NDP_MAX_RA_DELAY);
         uint32_t next_ra_scheduled = _evtimer_lookup(netif,
                                                      GNRC_IPV6_NIB_SND_MC_RA);
         if (next_ra_scheduled < next_ra_delay) {
@@ -529,6 +529,9 @@ static void _handle_rtr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         _snd_rtr_advs(netif, &ipv6->src, false);
     }
 #endif  /* GNRC_IPV6_NIB_CONF_6LR */
+#if GNRC_IPV6_NIB_CONF_6LN
+    (void)nce;  /* NCE is not used */
+#endif
 }
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
 
