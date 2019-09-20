@@ -40,7 +40,7 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (98U)
 #elif defined(CPU_LINE_STM32F767xx) || defined(CPU_LINE_STM32F769xx)
 #define CPU_IRQ_NUMOF                   (110U)
-#elif defined(CPU_LINE_STM32F722xx)
+#elif defined(CPU_LINE_STM32F722xx) || defined(CPU_LINE_STM32F723xx)
 #define CPU_IRQ_NUMOF                   (104U)
 #endif
 #define CPU_FLASH_BASE                  FLASH_BASE
