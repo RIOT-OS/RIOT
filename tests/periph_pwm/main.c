@@ -46,7 +46,7 @@ static uint32_t initiated;
 
 static unsigned _get_dev(const char *dev_str)
 {
-    unsigned dev = (unsigned)atoi(dev_str);
+    unsigned dev = atoi(dev_str);
     if (dev >= PWM_NUMOF) {
         printf("Error: device PWM_DEV(%u) is unknown\n", dev);
         return UINT_MAX;
@@ -123,7 +123,7 @@ static int _set(int argc, char**argv)
         return 1;
     }
 
-    uint8_t chan = (uint8_t)atoi(argv[2]);
+    uint8_t chan = atoi(argv[2]);
     if (chan >= pwm_channels(PWM_DEV(dev))) {
         printf("Error: channel %d is unknown.\n", chan);
         return 1;

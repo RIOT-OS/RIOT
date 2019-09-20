@@ -35,9 +35,6 @@
 
 #include "nimble_l2cap_test_conf.h"
 
-#define ENABLE_DEBUG        (1)
-#include "debug.h"
-
 #define FLAG_UP             (1u << 0)
 #define FLAG_SYNC           (1u << 1)
 #define FLAG_TX_UNSTALLED   (1u << 2)
@@ -224,10 +221,10 @@ static int _cmd_inctest(int argc, char **argv)
 
     /* parse params */
     if (argc >= 2) {
-        step = (size_t)atoi(argv[1]);
+        step = atoi(argv[1]);
     }
     if (argc >= 3) {
-        limit = (size_t)atoi(argv[2]);
+        limit = atoi(argv[2]);
         if ((limit < 8) || (limit > APP_MTU)) {
             puts("err: invalid limit payload length given");
             return 1;
@@ -268,14 +265,14 @@ static int _cmd_floodtest(int argc, char **argv)
     }
 
     if (argc >= 2) {
-        pktsize = (size_t)atoi(argv[1]);
+        pktsize = atoi(argv[1]);
         if ((pktsize < 8) || (pktsize > APP_MTU)) {
             puts("err: invalid packet size given");
             return 1;
         }
     }
     if (argc >= 3) {
-        limit = (unsigned)atoi(argv[2]);
+        limit = atoi(argv[2]);
     }
 
     /* now lets flood */
