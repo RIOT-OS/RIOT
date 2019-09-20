@@ -25,7 +25,7 @@
 
 #include "cpu_conf_common.h"
 
-#if defined(CPU_MODEL_STM32L496ZG)
+#if defined(CPU_MODEL_STM32L496ZG) || defined(CPU_MODEL_STM32L496AG)
 #include "vendor/stm32l496xx.h"
 #elif defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L476VG)
 #include "vendor/stm32l476xx.h"
@@ -52,7 +52,7 @@ extern "C" {
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
 #if defined(CPU_MODEL_STM32L432KC) || defined(CPU_MODEL_STM32L433RC)
 #define CPU_IRQ_NUMOF                   (83U)
-#elif defined(CPU_MODEL_STM32L496ZG)
+#elif defined(CPU_MODEL_STM32L496ZG) || defined(CPU_MODEL_STM32L496AG)
 #define CPU_IRQ_NUMOF                   (91U)
 #elif defined(CPU_MODEL_STM32L4R5ZI)
 #define CPU_IRQ_NUMOF                   (95U)
