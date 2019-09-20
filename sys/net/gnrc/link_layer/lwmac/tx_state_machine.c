@@ -217,9 +217,7 @@ static uint8_t _send_wr(gnrc_netif_t *netif)
     int res = _gnrc_lwmac_transmit(netif, pkt);
     if (res < 0) {
         LOG_ERROR("ERROR: [LWMAC-tx] Send WR failed.");
-        if (pkt != NULL) {
-            gnrc_pktbuf_release(pkt);
-        }
+        gnrc_pktbuf_release(pkt);
         tx_info |= GNRC_LWMAC_TX_FAIL;
         return tx_info;
     }

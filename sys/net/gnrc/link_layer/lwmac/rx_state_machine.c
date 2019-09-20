@@ -183,9 +183,7 @@ static bool _send_wa(gnrc_netif_t *netif)
     /* Send WA */
     if (_gnrc_lwmac_transmit(netif, pkt) < 0) {
         LOG_ERROR("ERROR: [LWMAC-rx] Send WA failed.");
-        if (pkt != NULL) {
-            gnrc_pktbuf_release(pkt);
-        }
+        gnrc_pktbuf_release(pkt);
         gnrc_lwmac_set_quit_rx(netif, true);
         return false;
     }
