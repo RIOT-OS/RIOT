@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 
+#include "log.h"
 #include "isrpipe.h"
 
 #include "usb/usbus.h"
@@ -34,6 +35,44 @@ static usbus_cdcacm_device_t cdcacm;
 static uint8_t _cdc_tx_buf_mem[USBUS_CDC_ACM_STDIO_BUF_SIZE];
 static uint8_t _cdc_rx_buf_mem[USBUS_CDC_ACM_STDIO_BUF_SIZE];
 static isrpipe_t _cdc_stdio_isrpipe = ISRPIPE_INIT(_cdc_rx_buf_mem);
+
+#ifdef MODULE_ARDUINO_BOOTLOADER
+
+#ifndef RESET_IN_BOOTLOADER_TRIGGER_BAUDRATE
+#define RESET_IN_BOOTLOADER_TRIGGER_BAUDRATE    (1200U)
+#endif
+
+#ifndef RESET_IN_APPLICATION_TRIGGER_BAUDRATE
+#define RESET_IN_APPLICATION_TRIGGER_BAUDRATE   (600U)
+#endif
+
+extern void reset_in_bootloader(void);
+extern void reset_in_application(void);
+
+static int _coding_cb(usbus_cdcacm_device_t *cdcacm, uint32_t baud, uint8_t bits,
+                      uint8_t parity, uint8_t stop)
+{
+    (void)cdcacm;
+    (void)bits;
+    (void)parity;
+    (void)stop;
+    switch (baud) {
+        case RESET_IN_BOOTLOADER_TRIGGER_BAUDRATE:
+            LOG_DEBUG("[cdc-acm-stdio] reset in bootloader");
+            reset_in_bootloader();
+            break;
+        case RESET_IN_APPLICATION_TRIGGER_BAUDRATE:
+            LOG_DEBUG("[cdc-acm-stdio] reset in application");
+            reset_in_application();
+            break;
+        default:
+            (void)baud;
+            break;
+    }
+
+    return 0;
+}
+#endif /* MODULE_ARDUINO_BOOTLOADER */
 
 void stdio_init(void)
 {
@@ -71,4 +110,7 @@ void usb_cdc_acm_stdio_init(usbus_t *usbus)
 {
     usbus_cdc_acm_init(usbus, &cdcacm, _cdc_acm_rx_pipe, NULL,
                        _cdc_tx_buf_mem, sizeof(_cdc_tx_buf_mem));
+#ifdef MODULE_ARDUINO_BOOTLOADER
+    usbus_cdc_acm_set_coding_cb(&cdcacm, _coding_cb);
+#endif
 }
