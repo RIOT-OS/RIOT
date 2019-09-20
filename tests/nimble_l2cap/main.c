@@ -35,9 +35,6 @@
 
 #include "nimble_l2cap_test_conf.h"
 
-#define ENABLE_DEBUG        (1)
-#include "debug.h"
-
 #define FLAG_UP             (1u << 0)
 #define FLAG_SYNC           (1u << 1)
 #define FLAG_TX_UNSTALLED   (1u << 2)
