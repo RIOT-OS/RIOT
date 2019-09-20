@@ -57,7 +57,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     isr_ctx[dev].arg = arg;
 
     /* initialize the pins */
-    gpio_init(uart_config[dev].rx_pin, GPIO_IN);
+    gpio_init(uart_config[dev].rx_pin, GPIO_IN_PU);
     gpio_init(uart_config[dev].tx_pin, GPIO_OUT);
 
     /* initialize the UART/USART/LEUART device */
