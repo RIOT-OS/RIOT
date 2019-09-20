@@ -13,7 +13,7 @@ from testrunner import run
 
 # We test only up to 10ms, with smaller times mcu doesn't have time to
 # print system time before resetting
-reset_times_ms = [1e2, 5e2, 1e3, 5e3]
+reset_times_ms = [128, 512, 1024, 8192]
 
 # We don't check for accuracy, only order of magnitude. Some MCU use an
 # an internal un-calibrated clock as reference which can deviate in

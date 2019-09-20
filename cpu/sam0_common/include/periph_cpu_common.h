@@ -496,6 +496,26 @@ typedef struct {
 } sam0_common_usb_config_t;
 #endif /* USB_INST_NUM */
 
+/**
+ * @name    WDT upper and lower bound times in ms
+ * @{
+ */
+/* Limits are in clock cycles according to data sheet.
+   As the WDT is clocked by a 1024 Hz clock, 1 cycle ≈ 1 ms */
+#define NWDT_TIME_LOWER_LIMIT          (8U)
+#define NWDT_TIME_UPPER_LIMIT          (16384U)
+/** @} */
+
+
+/**
+ * @brief Watchdog can be stopped.
+ */
+#define WDT_HAS_STOP                   (1)
+/**
+ * @brief Watchdog has to be initialized.
+ */
+#define WDT_HAS_INIT                   (1)
+
 #ifdef __cplusplus
 }
 #endif
