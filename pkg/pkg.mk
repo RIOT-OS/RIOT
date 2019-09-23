@@ -3,6 +3,7 @@
 #
 PKG_DIR?=$(CURDIR)
 PKG_BUILDDIR?=$(PKGDIRBASE)/$(PKG_NAME)
+PKG_SOURCE_LOCAL ?= $(PKG_SOURCE_LOCAL_$(shell echo $(PKG_NAME) | tr a-z- A-Z_))
 
 # allow overriding package source with local folder (useful during development)
 ifneq (,$(PKG_SOURCE_LOCAL))
