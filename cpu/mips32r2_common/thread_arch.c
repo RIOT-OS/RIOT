@@ -182,11 +182,21 @@ mem_rw(const void *vaddr)
 extern int _dsp_save(struct dspctx *ctx);
 extern int _dsp_load(struct dspctx *ctx);
 #endif
+
 /*
- * The nomips16 attribute should not really be needed, it works around a toolchain
- * issue in 2016.05-03.
+ * The official mips toolchain version 2016.05-03 needs this attribute.
+ * Newer versions (>=2017.10-05) don't. Those started being based on gcc 6,
+ * thus use that to guard the attribute.
+ *
+ * See https://github.com/RIOT-OS/RIOT/pull/11986.
  */
+#if __GNUC__ <= 4
 void __attribute__((nomips16))
+#else
+void
+#endif
+
+/* note return type from above #ifdef */
 _mips_handle_exception(struct gpctx *ctx, int exception)
 {
     unsigned int syscall_num = 0;
