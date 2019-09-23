@@ -281,6 +281,9 @@ static unsigned _on_suback_timeout(asymcute_con_t *con, asymcute_req_t *req)
 
     /* reset the subscription context */
     asymcute_sub_t *sub = (asymcute_sub_t *)req->arg;
+    if (sub == NULL) {
+        return ASYMCUTE_REJECTED;
+    }
     sub->topic = NULL;
     return ASYMCUTE_TIMEOUT;
 }
@@ -389,6 +392,10 @@ static void _on_regack(asymcute_con_t *con, const uint8_t *data, size_t len)
     if (data[6] == MQTTSN_ACCEPTED) {
         /* finish the registration by applying the topic id */
         asymcute_topic_t *topic = (asymcute_topic_t *)req->arg;
+        if (topic == NULL) {
+            return;
+        }
+
         topic->id = byteorder_bebuftohs(&data[2]);
         topic->con = con;
         ret = ASYMCUTE_REGISTERED;
@@ -468,6 +475,10 @@ static void _on_suback(asymcute_con_t *con, const uint8_t *data, size_t len)
     if (data[7] == MQTTSN_ACCEPTED) {
         /* parse and apply assigned topic id */
         asymcute_sub_t *sub = (asymcute_sub_t *)req->arg;
+        if (sub == NULL) {
+            return;
+        }
+
         sub->topic->id = byteorder_bebuftohs(&data[3]);
         sub->topic->con = con;
         /* insert subscription to connection context */
@@ -494,7 +505,9 @@ static void _on_unsuback(asymcute_con_t *con, const uint8_t *data, size_t len)
 
     /* remove subscription from list */
     asymcute_sub_t *sub = (asymcute_sub_t *)req->arg;
-    if (con->subscriptions == sub) {
+    if (sub == NULL) {
+        return;
+    } else if (con->subscriptions == sub) {
         con->subscriptions = sub->next;
     }
     else {
