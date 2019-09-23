@@ -1,3 +1,12 @@
+MATCH_MAKE_VERSION = 4.%
+
+ifeq (,$(filter $(MATCH_MAKE_VERSION),$(MAKE_VERSION)))
+  $(warning GNU Make $(MAKE_VERSION) is DEPRECATED in RIOT. Support for \
+	    versions less than $(MATCH_MAKE_VERSION) will be removed in \
+	    release 2020.01. Please upgrade your system to use GNU Make \
+	    $(MATCH_MAKE_VERSION) or later.)
+endif
+
 # 'Makefile.include' directory, must be evaluated before other 'include'
 _riotbase := $(dir $(lastword $(MAKEFILE_LIST)))
 
