@@ -21,7 +21,6 @@ ifeq (1,$(USE_OLD_OPENOCD))
 export OPENOCD_PRE_VERIFY_CMDS += \
   -c 'load_image $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin 0x20000000 bin' \
   -c 'resume 0x20000000'
-export OPENOCD_EXTRA_INIT
 export OPENOCD_CONFIG ?= $(RIOTBOARD)/common/frdm/dist/old-openocd-$(CPU_FAMILY).cfg
 endif
 
