@@ -185,7 +185,7 @@ endef
 #
 #   docker_volumes_mapping <path_in_docker_args|...>
 #     Command line argument for mapping volumes, if it should be mounted
-#       -v directory:docker_directory
+#       -v 'directory:docker_directory'
 #
 #   docker_environ_mapping <path_in_docker_args|...>
 #     Command line argument for mapping environment variables
@@ -198,13 +198,18 @@ endef
 # Arguments are the same as 'path_in_docker'
 # If the 'directories' variable is empty, it will not be exported to docker
 
+# docker_volume command line arguments. Allows giving volume mount options.
+# By default 'DOCKER_VOLUME_OPTIONS'. Argument option ignore the default.
+DOCKER_VOLUME_OPTIONS ?=
+docker_volume = -v '$1:$2$(addprefix :,$(or $3,$(DOCKER_VOLUME_OPTIONS)))'
+
 docker_volume_and_env = $(strip $(call _docker_volume_and_env,$1,$2,$3))
 define _docker_volume_and_env
   $(call docker_volumes_mapping,$($1),$2,$3)
   $(call docker_environ_mapping,$1,$2,$3)
 endef
 docker_volumes_mapping = $(foreach d,$1,$(call _docker_volume_mapping,$d,$2,$3))
-_docker_volume_mapping = $(if $1,$(if $(call dir_is_outside_riotbase,$1), -v '$(abspath $1):$(call path_in_docker,$1,$2,$3)'))
+_docker_volume_mapping = $(if $1,$(if $(call dir_is_outside_riotbase,$1),$(call docker_volume,$(abspath $1),$(call path_in_docker,$1,$2,$3))))
 docker_environ_mapping = $(addprefix -e ,$(call docker_cmdline_mapping,$1,$2,$3))
 docker_cmdline_mapping = $(if $($1),'$1=$(call path_in_docker,$($1),$2,$3)')
 
@@ -215,8 +220,8 @@ DOCKER_APPDIR = $(DOCKER_RIOTPROJECT)/$(BUILDRELPATH)
 
 
 # Directory mapping in docker and directories environment variable configuration
-DOCKER_VOLUMES_AND_ENV += -v '$(ETC_LOCALTIME):/etc/localtime:ro'
-DOCKER_VOLUMES_AND_ENV += -v '$(RIOTBASE):$(DOCKER_RIOTBASE)'
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(ETC_LOCALTIME),/etc/localtime,ro)
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(RIOTBASE),$(DOCKER_RIOTBASE))
 DOCKER_VOLUMES_AND_ENV += -e 'RIOTBASE=$(DOCKER_RIOTBASE)'
 DOCKER_VOLUMES_AND_ENV += -e 'CCACHE_BASEDIR=$(DOCKER_RIOTBASE)'
 
@@ -228,8 +233,8 @@ DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTBOARD,,riotboard)
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTMAKE,,riotmake)
 
 # Add GIT_CACHE_DIR if the directory exists
-DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-v $(GIT_CACHE_DIR):$(DOCKER_BUILD_ROOT)/gitcache)
-DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-e GIT_CACHE_DIR=$(DOCKER_BUILD_ROOT)/gitcache)
+DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),$(call docker_volume,$(GIT_CACHE_DIR),$(DOCKER_BUILD_ROOT)/gitcache))
+DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-e 'GIT_CACHE_DIR=$(DOCKER_BUILD_ROOT)/gitcache')
 
 # Remap external module directories.
 #
@@ -261,7 +266,7 @@ endif
 # Handle worktree by mounting the git common dir in the same location
 _is_git_worktree = $(shell grep '^gitdir: ' $(RIOTBASE)/.git 2>/dev/null)
 GIT_WORKTREE_COMMONDIR = $(abspath $(shell git rev-parse --git-common-dir))
-DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),-v $(GIT_WORKTREE_COMMONDIR):$(GIT_WORKTREE_COMMONDIR))
+DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),$(call docker_volume,$(GIT_WORKTREE_COMMONDIR),$(GIT_WORKTREE_COMMONDIR)))
 
 # This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
 # We do not push the regular $(MAKECMDGOALS) to the container's make command in
