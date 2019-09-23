@@ -77,7 +77,7 @@ void print_board_config (void)
     uart_print_config();
     #endif
 
-    #ifdef MODULE_ESP_CAN
+    #ifdef MODULE_PERIPH_CAN
     can_print_config();
     #endif
 

@@ -11,9 +11,7 @@ FEATURES_PROVIDED += periph_spi
 
 # unique features of the board
 FEATURES_PROVIDED += periph_eth     # Ethernet MAC (EMAC)
-# FEATURES_PROVIDED += periph_can     # CAN peripheral interface
-FEATURES_PROVIDED += esp_can        # Do not use periph_can but esp_can while common init
-                                    # is not updated
+FEATURES_PROVIDED += periph_can     # CAN peripheral interface
 FEATURES_PROVIDED += periph_ir      # IR peripheral interface
 
 FEATURES_PROVIDED += arduino

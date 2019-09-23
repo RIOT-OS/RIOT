@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,65 +7,43 @@
  */
 
 /**
- * @ingroup     cpu_esp32_esp_can
- * @brief       CAN device driver implementation for ESP32
- *
- * This module realizes the low-level CAN driver interface for the ESP32 CAN
- * controller which is compatible with the NXP SJA1000 CAN controller.
+ * @ingroup     cpu_esp32
+ * @brief       Implementation of the CAN controller driver for ESP32 (esp_can)
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
  * @{
  */
 
-#define ENABLE_DEBUG (0)
-#include "debug.h"
-#include "log.h"
+#include <errno.h>
+#include <string.h>
 
+#include "can_esp.h"
+#include "can_params.h"
 #include "esp_attr.h"
 #include "esp_common.h"
 #include "gpio_arch.h"
 #include "irq_arch.h"
 #include "tools.h"
 
+#include "can/common.h"
 #include "can/device.h"
 #include "driver/periph_ctrl.h"
 #include "freertos/FreeRTOS.h"
+#include "log.h"
 #include "rom/ets_sys.h"
 
+#include "periph/can.h"
 #include "periph/gpio.h"
 #include "soc/can_struct.h"
 #include "soc/gpio_struct.h"
 
 #include "xtensa/xtensa_api.h"
 
-#ifdef MODULE_ESP_CAN
-
-/** Default CAN signal configuration */
-#ifndef CAN_TX
-#define CAN_TX  GPIO5
-#endif
-#ifndef CAN_RX
-#define CAN_RX  GPIO35
-#endif
-
-#ifndef CAN_CLK_OUT_DIV
-#define CAN_CLK_OUT_DIV     1
-#endif
-
-/** Default CAN bitrate setup */
-#ifndef CAN_DEFAULT_BITRATE
-#define CAN_DEFAULT_BITRATE (500000)
-#endif
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
 /** Common ESP CAN definitions */
-#define ESP_CAN_DEV_NUMOF           1       /* there is one CAN device at maximum */
-#define ESP_CAN_DEV_STACKSIZE       (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
-
-#ifndef ESP_CAN_DEV_BASE_PRIORITY
-#define ESP_CAN_DEV_BASE_PRIORITY (THREAD_PRIORITY_MAIN - 1)
-#endif
-
 #define ESP_CAN_INTR_MASK   (0xffU)      /* interrupts handled by ESP CAN */
 #define ESP_CAN_CLOCK       APB_CLK_FREQ /* controller main clock */
 
@@ -93,46 +71,6 @@
 #define ESP_CMD_CLR_DATA_OVRN       0x08    /* Clear Data Overrun */
 #define ESP_CMD_SELF_RX_REQ         0x10    /* Self Reception Request */
 #define ESP_CMD_SELF_RX_SINGLE_SHOT 0x12    /* Single Shot Self Reception */
-
-/* ESP CAN receiver definitions */
-#define ESP_CAN_MAX_RX_FILTERS  16  /**< number of acceptance filters */
-#define ESP_CAN_MAX_RX_FRAMES   8   /**< must be a power of two */
-
-/* shorter typename definitions */
-typedef struct can_frame  can_frame_t;
-typedef struct can_filter can_filter_t;
-
-/**
- * Low level device structure for ESP32 CAN (extension of candev_t)
- */
-typedef struct _esp_can_dev {
-    candev_t          candev;       /**< candev base structure   */
-    canopt_state_t    state;        /**< current state of device */
-
-    can_frame_t* tx_frame;                           /**< frame in transmission  */
-    can_frame_t  rx_frames[ESP_CAN_MAX_RX_FRAMES];   /**< frames received        */
-    can_filter_t rx_filters[ESP_CAN_MAX_RX_FILTERS]; /**< acceptance filter list */
-
-    uint32_t rx_frames_wptr;    /**< pointer to ring buffer for write */
-    uint32_t rx_frames_rptr;    /**< pointer to ring buffer for read  */
-    uint32_t rx_frames_num;     /**< number of frames in ring buffer  */
-    uint32_t rx_filter_num;     /**< number of acceptance filters     */
-
-    bool   powered_up;      /**< device is powered up    */
-
-    gpio_t tx_pin;          /**< TX pin */
-    gpio_t rx_pin;          /**< RX pin */
-    #ifdef CAN_CLK_OUT
-    gpio_t clk_out_pin;     /**< optional CLK_OUT pin    */
-    #endif
-    #ifdef CAN_BUS_ON_OFF
-    gpio_t bus_on_off_pin;  /**< optional BUS_ON_OFF pin */
-    #endif
-
-    uint32_t events;        /**< events triggered by the last interrupt */
-
-
-} _esp_can_dev_t;
 
 /**
  * Frame format definition as it is expected/received in the TX/RX buffer
@@ -177,12 +115,11 @@ static int  _esp_can_set_filter(candev_t *candev, const struct can_filter *filte
 static int  _esp_can_remove_filter(candev_t *candev, const struct can_filter *filter);
 
 /* internal function declarations, we don't need device since we habe only one */
-static void _esp_can_get_bittiming_const (struct can_bittiming_const* esp_const);
-static void _esp_can_set_bittiming (void);
-static void _esp_can_power_up  (void);
-static void _esp_can_power_down(void);
-static void _esp_can_init_pins (void);
-static int  _esp_can_set_mode  (canopt_state_t state);
+static void _esp_can_set_bittiming (can_t *dev);
+static void _esp_can_power_up(can_t *dev);
+static void _esp_can_power_down(can_t *dev);
+static void _esp_can_init_pins(can_t *dev);
+static int  _esp_can_set_mode(can_t *dev, canopt_state_t state);
 static void IRAM_ATTR _esp_can_intr_handler (void *arg);
 
 /** ESP32 CAN low level device driver data */
@@ -197,137 +134,122 @@ static const candev_driver_t _esp_can_driver = {
     .remove_filter = _esp_can_remove_filter,
 };
 
-
-/** ESP32 CAN low level device initialisation, we have only one device */
-static _esp_can_dev_t _esp_can_dev = {
-    .candev.driver = &_esp_can_driver,
-    .candev.state = CAN_STATE_SLEEPING,
-    .candev.bittiming.bitrate = CAN_DEFAULT_BITRATE,
-    .tx_frame = NULL,
-    .rx_frames_wptr = 0,
-    .rx_frames_rptr = 0,
-    .rx_frames_num = 0,
-    .rx_filter_num = 0,
-    .state = CANOPT_STATE_OFF,
-    .powered_up = false,
-    .tx_pin = CAN_TX,
-    .rx_pin = CAN_RX,
-    #ifdef CAN_CLK_OUT
-    .clk_out_pin = CAN_CLK_OUT,
-    #endif
-    #ifdef CAN_BUS_ON_OFF
-    .bus_on_off_pin = CAN_BUS_ON_OFF,
-    #endif
+/** hardware dependent constants used for bit timing calculations */
+static const struct can_bittiming_const bittiming_const = {
+    .tseg1_min = 1,
+    .tseg1_max = 16,
+    .tseg2_min = 1,
+    .tseg2_max = 8,
+    .sjw_max = 4,
+    .brp_min = 2,
+    .brp_max = 128,
+    .brp_inc = 2,
 };
-
-/** ESP CAN thread stack */
-static char _esp_can_stack [ESP_CAN_DEV_STACKSIZE];
-
-/** ESP CAN DLL device */
-static candev_dev_t _esp_can_dll_dev;
 
 static void _esp_can_isr(candev_t *candev)
 {
-    DEBUG("%s\n", __func__);
+    can_t *dev = (can_t *)candev;
 
-    CHECK_PARAM(candev == &_esp_can_dev.candev);
-    CHECK_PARAM(candev->event_callback != NULL);
+    DEBUG("%s candev=%p\n", __func__, candev);
 
-    if (_esp_can_dev.events & ESP_CAN_EVENT_BUS_OFF) {
-        _esp_can_dev.events &= ~ESP_CAN_EVENT_BUS_OFF;
-        _esp_can_dev.candev.event_callback(&_esp_can_dev.candev,
-                                           CANDEV_EVENT_BUS_OFF, NULL);
+    assert(dev);
+    assert(dev->candev.event_callback);
+
+    if (dev->events & ESP_CAN_EVENT_BUS_OFF) {
+        dev->events &= ~ESP_CAN_EVENT_BUS_OFF;
+        dev->candev.event_callback(&dev->candev, CANDEV_EVENT_BUS_OFF, NULL);
     }
 
-    if (_esp_can_dev.events & ESP_CAN_EVENT_ERROR_PASSIVE) {
-        _esp_can_dev.events &= ~ESP_CAN_EVENT_ERROR_PASSIVE;
-        _esp_can_dev.candev.event_callback(&_esp_can_dev.candev,
-                                           CANDEV_EVENT_ERROR_PASSIVE, NULL);
+    if (dev->events & ESP_CAN_EVENT_ERROR_PASSIVE) {
+        dev->events &= ~ESP_CAN_EVENT_ERROR_PASSIVE;
+        dev->candev.event_callback(&dev->candev,
+                                   CANDEV_EVENT_ERROR_PASSIVE, NULL);
     }
 
-    if (_esp_can_dev.events & ESP_CAN_EVENT_ERROR_WARNING) {
-        _esp_can_dev.events &= ~ESP_CAN_EVENT_ERROR_WARNING;
-        _esp_can_dev.candev.event_callback(&_esp_can_dev.candev,
-                                           CANDEV_EVENT_ERROR_WARNING, NULL);
+    if (dev->events & ESP_CAN_EVENT_ERROR_WARNING) {
+        dev->events &= ~ESP_CAN_EVENT_ERROR_WARNING;
+        dev->candev.event_callback(&dev->candev,
+                                   CANDEV_EVENT_ERROR_WARNING, NULL);
     }
 
-    if (_esp_can_dev.events & ESP_CAN_EVENT_TX_ERROR) {
+    if (dev->events & ESP_CAN_EVENT_TX_ERROR) {
         /* a pending TX confirmation has also to be deleted on TX bus error */
-        _esp_can_dev.events &= ~ESP_CAN_EVENT_TX_ERROR;
-        _esp_can_dev.events &= ~ESP_CAN_EVENT_TX_CONFIRMATION;
-        if (_esp_can_dev.tx_frame) {
+        dev->events &= ~ESP_CAN_EVENT_TX_ERROR;
+        dev->events &= ~ESP_CAN_EVENT_TX_CONFIRMATION;
+        if (dev->tx_frame) {
             /* handle the event only if there is still a frame in TX buffer */
-            _esp_can_dev.candev.event_callback(&_esp_can_dev.candev,
-                                               CANDEV_EVENT_TX_ERROR, _esp_can_dev.tx_frame);
-            _esp_can_dev.tx_frame = NULL;
+            dev->candev.event_callback(&dev->candev,
+                                       CANDEV_EVENT_TX_ERROR, dev->tx_frame);
+            dev->tx_frame = NULL;
         }
     }
 
-    if (_esp_can_dev.events & ESP_CAN_EVENT_TX_CONFIRMATION) {
-        _esp_can_dev.events &= ~ESP_CAN_EVENT_TX_CONFIRMATION;
-        if (_esp_can_dev.tx_frame) {
+    if (dev->events & ESP_CAN_EVENT_TX_CONFIRMATION) {
+        dev->events &= ~ESP_CAN_EVENT_TX_CONFIRMATION;
+        if (dev->tx_frame) {
             /* handle the event only if there is still a frame in TX buffer */
-            _esp_can_dev.candev.event_callback(&_esp_can_dev.candev,
-                                               CANDEV_EVENT_TX_CONFIRMATION,
-                                               _esp_can_dev.tx_frame);
-            _esp_can_dev.tx_frame = NULL;
+            dev->candev.event_callback(&dev->candev,
+                                       CANDEV_EVENT_TX_CONFIRMATION,
+                                       dev->tx_frame);
+            dev->tx_frame = NULL;
         }
     }
 
-    if (_esp_can_dev.events & ESP_CAN_EVENT_RX_ERROR) {
-        _esp_can_dev.events &= ~ESP_CAN_EVENT_RX_ERROR;
-        _esp_can_dev.candev.event_callback(&_esp_can_dev.candev,
-                                           CANDEV_EVENT_RX_ERROR, NULL);
+    if (dev->events & ESP_CAN_EVENT_RX_ERROR) {
+        dev->events &= ~ESP_CAN_EVENT_RX_ERROR;
+        dev->candev.event_callback(&dev->candev, CANDEV_EVENT_RX_ERROR, NULL);
     }
 
-    if (_esp_can_dev.events & ESP_CAN_EVENT_RX_INDICATION) {
-        _esp_can_dev.events &= ~ESP_CAN_EVENT_RX_INDICATION;
+    if (dev->events & ESP_CAN_EVENT_RX_INDICATION) {
+        dev->events &= ~ESP_CAN_EVENT_RX_INDICATION;
 
-        while (_esp_can_dev.rx_frames_num) {
-            _esp_can_dev.candev.event_callback(&_esp_can_dev.candev,
-                                               CANDEV_EVENT_RX_INDICATION,
-                                               &_esp_can_dev.rx_frames
-                                                [_esp_can_dev.rx_frames_rptr]);
-            _esp_can_dev.rx_frames_num--;
-            _esp_can_dev.rx_frames_rptr++;
-            _esp_can_dev.rx_frames_rptr &= ESP_CAN_MAX_RX_FRAMES-1;
+        while (dev->rx_frames_num) {
+            dev->candev.event_callback(&dev->candev,
+                                       CANDEV_EVENT_RX_INDICATION,
+                                       &dev->rx_frames[dev->rx_frames_rptr]);
+            dev->rx_frames_num--;
+            dev->rx_frames_rptr++;
+            dev->rx_frames_rptr &= ESP_CAN_MAX_RX_FRAMES-1;
         }
     }
 }
 
 static int _esp_can_init(candev_t *candev)
 {
-    DEBUG("%s\n", __func__);
+    can_t *dev = (can_t *)candev;
 
-    CHECK_PARAM_RET(candev != NULL, -ENODEV);
-    CHECK_PARAM_RET(candev == &_esp_can_dev.candev, -ENODEV);
+    DEBUG("%s candev=%p\n", __func__, candev);
+
+    assert(dev);
 
     /* initialize used GPIOs */
-    _esp_can_init_pins();
+    _esp_can_init_pins(dev);
 
     /* power up and configure the CAN controller */
-    _esp_can_power_up();
+    _esp_can_power_up(dev);
 
     return 0;
 }
 
 static int _esp_can_send(candev_t *candev, const struct can_frame *frame)
 {
-    DEBUG("%s\n", __func__);
+    can_t *dev = (can_t *)candev;
 
-    CHECK_PARAM_RET(candev == &_esp_can_dev.candev, -ENODEV);
-    CHECK_PARAM_RET(frame  != NULL, -EINVAL);
+    DEBUG("%s candev=%p frame=%p\n", __func__, candev, frame);
+
+    assert(dev);
+    assert(frame);
 
     critical_enter();
 
     /* check wthere the device is already transmitting a frame */
-    if (_esp_can_dev.tx_frame != NULL) {
+    if (dev->tx_frame != NULL) {
         critical_exit();
         return -EBUSY;
     }
 
     /* save reference to frame in transmission (marks transmitter as busy) */
-    _esp_can_dev.tx_frame = (struct can_frame*)frame;
+    dev->tx_frame = (struct can_frame*)frame;
 
     /* prepare the frame as exected by ESP32 */
     _esp_can_frame_t esp_frame = {};
@@ -365,11 +287,12 @@ static int _esp_can_send(candev_t *candev, const struct can_frame *frame)
     return 0;
 }
 
-
 static int _esp_can_set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
 {
-    CHECK_PARAM_RET(candev == &_esp_can_dev.candev, -ENODEV);
-    CHECK_PARAM_RET(value != NULL, -EINVAL);
+    can_t *dev = (can_t *)candev;
+
+    assert(dev);
+    assert(value);
 
     int res = 0;
 
@@ -380,15 +303,15 @@ static int _esp_can_set(candev_t *candev, canopt_t opt, void *value, size_t valu
                 DEBUG("%s size error\n", __func__);
                 return -EOVERFLOW;
             }
-            _esp_can_dev.candev.bittiming = *((struct can_bittiming*)value);
-            _esp_can_set_bittiming();
+            dev->candev.bittiming = *((struct can_bittiming*)value);
+            _esp_can_set_bittiming(dev);
 
             res = sizeof(struct can_bittiming);
             break;
 
         case CANOPT_STATE:
             DEBUG("%s CANOPT_STATE\n", __func__);
-            res = _esp_can_set_mode(*((canopt_state_t *)value));
+            res = _esp_can_set_mode(dev, *((canopt_state_t *)value));
             if (res == 0) {
                 res = sizeof(uint16_t);
             }
@@ -419,12 +342,12 @@ static int _esp_can_set(candev_t *candev, canopt_t opt, void *value, size_t valu
 
 static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_len)
 {
+    can_t *dev = (can_t *)candev;
+
     DEBUG("%s\n", __func__);
 
-    CHECK_PARAM_RET(candev == &_esp_can_dev.candev, -ENODEV);
-    CHECK_PARAM_RET(value != NULL, -EINVAL);
-
-    /* _esp_can_dev_t *dev = (_esp_can_dev_t *)candev; */
+    assert(dev);
+    assert(value);
 
     int res = 0;
     switch (opt) {
@@ -435,7 +358,7 @@ static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_
                 break;
             }
 
-            *((struct can_bittiming*)value) = _esp_can_dev.candev.bittiming;
+            *((struct can_bittiming*)value) = dev->candev.bittiming;
 
             res = sizeof(struct can_bittiming);
             break;
@@ -447,7 +370,7 @@ static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_
                 break;
             }
 
-            _esp_can_get_bittiming_const((struct can_bittiming_const*)value);
+            *((struct can_bittiming_const*)value) = bittiming_const;
 
             res = sizeof(struct can_bittiming_const);
             break;
@@ -493,8 +416,8 @@ static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_
             unsigned filter_num = 0;
             unsigned i;
             for (i = 0; i < ESP_CAN_MAX_RX_FILTERS && filter_num < filter_num_max; i++) {
-                if (_esp_can_dev.rx_filters[i].can_id != 0) {
-                    list[i] = _esp_can_dev.rx_filters[i];
+                if (dev->rx_filters[i].can_id != 0) {
+                    list[i] = dev->rx_filters[i];
                     filter_num++;
                 }
 
@@ -512,31 +435,36 @@ static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_
 
 static int _esp_can_abort(candev_t *candev, const struct can_frame *frame)
 {
-    DEBUG("%s\n", __func__);
+    can_t *dev = (can_t *)candev;
 
-    CHECK_PARAM_RET(candev == &_esp_can_dev.candev, -ENODEV);
-    CHECK_PARAM_RET(frame != NULL, -EINVAL);
+    DEBUG("%s candev=%p frame=%p\n", __func__, candev, frame);
+
+    assert(dev);
+    assert(frame);
 
     /* abort transmission command */
     CAN.command_reg.val = ESP_CMD_ABORT_TX;
 
     /* mark the transmitter as free */
-    _esp_can_dev.tx_frame = NULL;
+    dev->tx_frame = NULL;
 
     return -ENOTSUP;
 }
 
 static int _esp_can_set_filter(candev_t *candev, const struct can_filter *filter)
 {
-    DEBUG("%s\n", __func__);
-    CHECK_PARAM_RET(candev == &_esp_can_dev.candev, -ENODEV);
-    CHECK_PARAM_RET(filter != NULL, -EINVAL);
+    can_t *dev = (can_t *)candev;
+
+    DEBUG("%s candev=%p filter=%p\n", __func__, candev, filter);
+
+    assert(dev);
+    assert(filter);
 
     int i;
 
     /* first, check whether filter is already set */
     for (i = 0; i < ESP_CAN_MAX_RX_FILTERS; i++) {
-        if (_esp_can_dev.rx_filters[i].can_id == filter->can_id) {
+        if (dev->rx_filters[i].can_id == filter->can_id) {
             DEBUG("%s filter already set\n", __func__);
             return i;
         }
@@ -544,7 +472,7 @@ static int _esp_can_set_filter(candev_t *candev, const struct can_filter *filter
 
     /* next, search for free filter entry */
     for (i = 0; i < ESP_CAN_MAX_RX_FILTERS; i++) {
-        if (_esp_can_dev.rx_filters[i].can_id == 0) {
+        if (dev->rx_filters[i].can_id == 0) {
             break;
         }
     }
@@ -555,21 +483,26 @@ static int _esp_can_set_filter(candev_t *candev, const struct can_filter *filter
     }
 
     /* set the filter and return the filter index */
-    _esp_can_dev.rx_filters[i] = *filter;
-    _esp_can_dev.rx_filter_num++;
+    dev->rx_filters[i] = *filter;
+    dev->rx_filter_num++;
     return i;
 }
 
 static int _esp_can_remove_filter(candev_t *candev, const struct can_filter *filter)
 {
-    DEBUG("%s\n", __func__);
+    can_t *dev = (can_t *)candev;
+
+    DEBUG("%s candev=%p filter=%p\n", __func__, candev, filter);
+
+    assert(dev);
+    assert(filter);
 
     /* search for the filter */
     for (unsigned i = 0; i < ESP_CAN_MAX_RX_FILTERS; i++) {
-        if (_esp_can_dev.rx_filters[i].can_id == filter->can_id) {
+        if (dev->rx_filters[i].can_id == filter->can_id) {
             /* mark the filter entry as not in use */
-            _esp_can_dev.rx_filters[i].can_id = 0;
-            _esp_can_dev.rx_filter_num--;
+            dev->rx_filters[i].can_id = 0;
+            dev->rx_filter_num--;
             return 0;
         }
     }
@@ -578,13 +511,12 @@ static int _esp_can_remove_filter(candev_t *candev, const struct can_filter *fil
     return -EOVERFLOW;
 }
 
-
 /**
  * Internal functions. All these functions have no dev parameter since
  * they directly access the only one existing CAN controller.
  */
 
-static void _esp_can_set_reset_mode (void)
+static void _esp_can_set_reset_mode(void)
 {
     DEBUG("%s\n", __func__);
 
@@ -593,7 +525,7 @@ static void _esp_can_set_reset_mode (void)
     }
 }
 
-static void _esp_can_set_operating_mode (void)
+static void _esp_can_set_operating_mode(void)
 {
     DEBUG("%s\n", __func__);
 
@@ -602,9 +534,11 @@ static void _esp_can_set_operating_mode (void)
     }
 }
 
-static int _esp_can_config(void)
+static int _esp_can_config(can_t *dev)
 {
-    DEBUG("%s\n", __func__);
+    DEBUG("%s dev=%p\n", __func__, dev);
+
+    assert(dev);
 
     critical_enter();
 
@@ -618,15 +552,15 @@ static int _esp_can_config(void)
     /* Use SJA1000 PeliCAN mode and registers layout */
     CAN.clock_divider_reg.can_mode = 1;
 
-    #ifndef CAN_CLK_OUT
+#ifndef ESP_CAN_CLK_OUT
     CAN.clock_divider_reg.clock_off = 1;
     CAN.clock_divider_reg.clock_divider = 0;
-    #else
-    uint32_t clk_out_div = CAN_CLK_OUT_DIV / 2 - 1;
+#else
+    uint32_t clk_out_div = ESP_CAN_CLK_OUT_DIV / 2 - 1;
     clk_out_div = (clk_out_div < 7) ? clk_out_div : 7;
     CAN.clock_divider_reg.clock_off = 0;
     CAN.clock_divider_reg.clock_divider = clk_out_div;
-    #endif
+#endif
 
     /* set error counter values and warning limits */
     CAN.error_warning_limit_reg.byte = ESP_CAN_ERROR_WARNING_LIMIT;
@@ -646,11 +580,11 @@ static int _esp_can_config(void)
 
     /* route CAN interrupt source to CPU interrupt and enable it */
     intr_matrix_set(PRO_CPU_NUM, ETS_CAN_INTR_SOURCE, CPU_INUM_CAN);
-    xt_set_interrupt_handler(CPU_INUM_CAN, _esp_can_intr_handler, NULL);
+    xt_set_interrupt_handler(CPU_INUM_CAN, _esp_can_intr_handler, (void*)dev);
     xt_ints_on(BIT(CPU_INUM_CAN));
 
     /* set bittiming from parameters as given in device data */
-    _esp_can_set_bittiming();
+    _esp_can_set_bittiming(dev);
 
     /* switch to operating mode */
     _esp_can_set_operating_mode();
@@ -660,85 +594,93 @@ static int _esp_can_config(void)
     return 0;
 }
 
-static void _esp_can_power_up(void)
+static void _esp_can_power_up(can_t *dev)
 {
+    assert(dev);
+
     /* just return when already powered up */
-    if (_esp_can_dev.powered_up) {
+    if (dev->powered_up) {
         return;
     }
 
-    DEBUG("%s\n", __func__);
+    DEBUG("%s dev=%p\n", __func__, dev);
 
     critical_enter();
 
     /* power up and (re)configure the CAN controller */
     periph_module_enable(PERIPH_CAN_MODULE);
-    _esp_can_dev.powered_up = true;
-    _esp_can_config ();
+    dev->powered_up = true;
+    _esp_can_config (dev);
 
     critical_exit();
 }
 
-static void _esp_can_power_down(void)
+static void _esp_can_power_down(can_t *dev)
 {
+    assert(dev);
+
     /* just return when already powered down */
-    if (!_esp_can_dev.powered_up) {
+    if (!dev->powered_up) {
         return;
     }
 
-    DEBUG("%s\n", __func__);
+    DEBUG("%s dev=%p\n", __func__, dev);
 
     /* power down the CAN controller */
     periph_module_disable(PERIPH_CAN_MODULE);
-    _esp_can_dev.powered_up = false;
+    dev->powered_up = false;
 }
 
-static void _esp_can_init_pins(void)
+static void _esp_can_init_pins(can_t *dev)
 {
-    DEBUG("%s\n", __func__);
+    DEBUG("%s dev=%p\n", __func__, dev);
+
+    assert(dev);
 
     /* Init TX pin */
-    gpio_init(_esp_can_dev.tx_pin, GPIO_OUT);
-    gpio_set_pin_usage(_esp_can_dev.tx_pin, _CAN);
-    GPIO.func_out_sel_cfg[_esp_can_dev.tx_pin].func_sel = CAN_TX_IDX;
+    gpio_init(dev->tx_pin, GPIO_OUT);
+    gpio_set_pin_usage(dev->tx_pin, _CAN);
+    GPIO.func_out_sel_cfg[dev->tx_pin].func_sel = CAN_TX_IDX;
 
     /* Init RX pin */
-    gpio_init(_esp_can_dev.rx_pin, GPIO_IN);
-    gpio_set_pin_usage(_esp_can_dev.rx_pin, _CAN);
+    gpio_init(dev->rx_pin, GPIO_IN);
+    gpio_set_pin_usage(dev->rx_pin, _CAN);
     GPIO.func_in_sel_cfg[CAN_RX_IDX].sig_in_sel = 1;
     GPIO.func_in_sel_cfg[CAN_RX_IDX].sig_in_inv = 0;
-    GPIO.func_in_sel_cfg[CAN_RX_IDX].func_sel = _esp_can_dev.rx_pin;
+    GPIO.func_in_sel_cfg[CAN_RX_IDX].func_sel = dev->rx_pin;
 
-    #ifdef CAN_CLK_OUT
+#ifdef ESP_CAN_CLK_OUT
     /* Init CLK_OUT pin (optional) if defined */
-    gpio_init(_esp_can_dev.clk_out_pin, GPIO_OD);
-    gpio_set_pin_usage(_esp_can_dev.clk_out_pin, _CAN);
-    GPIO.func_out_sel_cfg[_esp_can_dev.clk_out_pin].func_sel = CAN_CLKOUT_IDX;
-    #endif
+    gpio_init(dev->clk_out_pin, GPIO_OD);
+    gpio_set_pin_usage(dev->clk_out_pin, _CAN);
+    GPIO.func_out_sel_cfg[dev->clk_out_pin].func_sel = CAN_CLKOUT_IDX;
+#endif
 
     /* Init BUS_ON_OFF pin pin (optional) if defined */
-    #ifdef CAN_BUS_ON_OFF
-    gpio_init(_esp_can_dev.bus_on_of_pin, GPIO_OD);
-    gpio_set_pin_usage(_esp_can_dev.bus_on_of_pin, _CAN);
-    GPIO.func_out_sel_cfg[_esp_can_dev.bus_on_of_pin].func_sel = CAN_BUS_OFF_ON_IDX;
-    #endif
+#ifdef ESP_CAN_BUS_ON_OFF
+    gpio_init(dev->bus_on_of_pin, GPIO_OD);
+    gpio_set_pin_usage(dev->bus_on_of_pin, _CAN);
+    GPIO.func_out_sel_cfg[dev->bus_on_of_pin].func_sel = CAN_BUS_OFF_ON_IDX;
+#endif
 }
 
-static int _esp_can_set_mode(canopt_state_t state)
+static int _esp_can_set_mode(can_t *dev, canopt_state_t state)
 {
-    DEBUG("%s %d\n", __func__, state);
+    DEBUG("%s dev=%p state=%d\n", __func__, dev, state);
+
+    assert(dev);
 
     critical_enter();
 
     switch (state) {
         case CANOPT_STATE_OFF:
             /* just power down the CAN controller */
-            _esp_can_power_down();
+            _esp_can_power_down(dev);
             break;
 
         case CANOPT_STATE_LISTEN_ONLY:
             /* power up and (re)configure the CAN controller if necessary */
-            _esp_can_power_up();
+            _esp_can_power_up(dev);
             /* set the new mode (has to be done in reset mode) */
             _esp_can_set_reset_mode();
             CAN.mode_reg.self_test = 0;
@@ -750,7 +692,7 @@ static int _esp_can_set_mode(canopt_state_t state)
             /* Sleep mode is not supported by ESP32, State On is used instead. */
             #if 0
             /* power up and (re)configure the CAN controller if necessary */
-            _esp_can_power_up();
+            _esp_can_power_up(dev);
             /* set the sleep mode (not necessary to set reset mode before) */
             CAN.mode_reg.sleep_mode = 1;
             break;
@@ -758,7 +700,7 @@ static int _esp_can_set_mode(canopt_state_t state)
 
         case CANOPT_STATE_ON:
             /* power up and (re)configure the CAN controller if necessary */
-            _esp_can_power_up();
+            _esp_can_power_up(dev);
             /* set the new mode (has to be done in reset mode) */
             _esp_can_set_reset_mode();
             CAN.mode_reg.self_test = 0;
@@ -770,15 +712,19 @@ static int _esp_can_set_mode(canopt_state_t state)
             LOG_TAG_ERROR ("esp_can", "state value %d not supported\n", state);
             break;
     }
-    _esp_can_dev.state = state;
+    dev->state = state;
 
     critical_exit();
 
     return 0;
 }
 
-static void IRAM_ATTR _esp_can_intr_handler (void *arg)
+static void IRAM_ATTR _esp_can_intr_handler(void *arg)
 {
+    can_t* dev = (can_t *)arg;
+
+    assert(arg);
+
     critical_enter();
 
     /* read the registers to clear them */
@@ -790,14 +736,14 @@ static void IRAM_ATTR _esp_can_intr_handler (void *arg)
     /* Wake-Up Interrupt (not supported by ESP32) */
     if (int_reg.reserved1) {
         DEBUG("%s wake-up interrupt\n", __func__);
-        _esp_can_dev.events |= ESP_CAN_EVENT_WAKE_UP;
+        dev->events |= ESP_CAN_EVENT_WAKE_UP;
     }
 
     /* Arbitration Lost Interrupt */
     if (int_reg.arb_lost) {
         DEBUG("%s arbitration lost interrupt\n", __func__);
         /* can only happen during transmission, handle it as error in single shot transmission */
-        _esp_can_dev.events |= ESP_CAN_EVENT_TX_ERROR;
+        dev->events |= ESP_CAN_EVENT_TX_ERROR;
     }
 
     /* bus or error status has changed, handle this first */
@@ -807,16 +753,16 @@ static void IRAM_ATTR _esp_can_intr_handler (void *arg)
         if (sta_reg.error && sta_reg.bus) {
             DEBUG("%s bus-off state interrupt\n", __func__);
             /* switch to listen only mode to freeze the RX error counter */
-            _esp_can_set_mode (CANOPT_STATE_LISTEN_ONLY);
+            _esp_can_set_mode (dev, CANOPT_STATE_LISTEN_ONLY);
             /* save the event */
-            _esp_can_dev.events |= ESP_CAN_EVENT_BUS_OFF;
+            dev->events |= ESP_CAN_EVENT_BUS_OFF;
         }
 
         /* ERROR_WARNING state condition, RX/TX error counter are > 96 */
         else if (sta_reg.error && !sta_reg.bus) {
             DEBUG("%s error warning interrupt\n", __func__);
             /* save the event */
-            _esp_can_dev.events |= ESP_CAN_EVENT_ERROR_WARNING;
+            dev->events |= ESP_CAN_EVENT_ERROR_WARNING;
         }
     }
 
@@ -830,7 +776,7 @@ static void IRAM_ATTR _esp_can_intr_handler (void *arg)
                   CAN.tx_error_counter_reg.byte,
                   CAN.rx_error_counter_reg.byte);
             /* save the event */
-            _esp_can_dev.events |= ESP_CAN_EVENT_ERROR_PASSIVE;
+            dev->events |= ESP_CAN_EVENT_ERROR_PASSIVE;
     }
 
     /*
@@ -842,7 +788,7 @@ static void IRAM_ATTR _esp_can_intr_handler (void *arg)
         can_err_code_cap_reg_t ecc = CAN.error_code_capture_reg;
         /* save the event */
         DEBUG("%s bus error interrupt, ecc=%08x\n", __func__, ecc.val);
-        _esp_can_dev.events |= ecc.direction ? ESP_CAN_EVENT_RX_ERROR
+        dev->events |= ecc.direction ? ESP_CAN_EVENT_RX_ERROR
                                              : ESP_CAN_EVENT_TX_ERROR;
     }
 
@@ -850,7 +796,7 @@ static void IRAM_ATTR _esp_can_intr_handler (void *arg)
     if (int_reg.tx) {
         DEBUG("%s transmit interrupt\n", __func__);
         /* save the event */
-        _esp_can_dev.events |= ESP_CAN_EVENT_TX_CONFIRMATION;
+        dev->events |= ESP_CAN_EVENT_TX_CONFIRMATION;
     }
 
     /* RX buffer has one or more frames */
@@ -869,9 +815,9 @@ static void IRAM_ATTR _esp_can_intr_handler (void *arg)
             /* clear RX buffer at read position */
             CAN.command_reg.val = ESP_CMD_RELEASE_RX_BUFF;
 
-            if (_esp_can_dev.rx_frames_num < ESP_CAN_MAX_RX_FRAMES) {
+            if (dev->rx_frames_num < ESP_CAN_MAX_RX_FRAMES) {
                 /* prepare the CAN frame from ESP32 CAN frame */
-                can_frame_t frame = {};
+                struct can_frame frame = {};
 
                 if (esp_frame.eff) {
                     frame.can_id = esp_frame.extended.id[0];
@@ -891,10 +837,10 @@ static void IRAM_ATTR _esp_can_intr_handler (void *arg)
 
                 /* apply acceptance filters only if they are set */
                 unsigned f_id = 0;
-                if (_esp_can_dev.rx_filter_num) {
+                if (dev->rx_filter_num) {
                     for (f_id = 0; f_id < ESP_CAN_MAX_RX_FILTERS; f_id++) {
                         /* compared masked can_id with each filter */
-                        struct can_filter* f = &_esp_can_dev.rx_filters[f_id];
+                        struct can_filter* f = &dev->rx_filters[f_id];
                         if ((f->can_mask & f->can_id) ==
                             (f->can_mask & frame.can_id)) {
                             /* break the loop on first match */
@@ -908,48 +854,49 @@ static void IRAM_ATTR _esp_can_intr_handler (void *arg)
                  * (f_id < ESP_CAN_MAX_RX_FILTERS), otherwise drop it.
                  */
                 if (f_id < ESP_CAN_MAX_RX_FILTERS) {
-                    _esp_can_dev.rx_frames[_esp_can_dev.rx_frames_wptr] = frame;
+                    dev->rx_frames[dev->rx_frames_wptr] = frame;
 
-                    _esp_can_dev.rx_frames_num++;
-                    _esp_can_dev.rx_frames_wptr++;
-                    _esp_can_dev.rx_frames_wptr &= ESP_CAN_MAX_RX_FRAMES-1;
+                    dev->rx_frames_num++;
+                    dev->rx_frames_wptr++;
+                    dev->rx_frames_wptr &= ESP_CAN_MAX_RX_FRAMES-1;
                 }
             }
             else {
                 DEBUG("%s receive buffer overrun\n", __func__);
                 /* we use rx error since there is no separate overrun error */
-                _esp_can_dev.events |= ESP_CAN_EVENT_RX_ERROR;
+                dev->events |= ESP_CAN_EVENT_RX_ERROR;
             }
 
         }
         /* save the event */
-        _esp_can_dev.events |= ESP_CAN_EVENT_RX_INDICATION;
+        dev->events |= ESP_CAN_EVENT_RX_INDICATION;
     }
 
     /* data overrun interrupts are not handled */
     if (int_reg.data_overrun) {
         DEBUG("%s data overrun interrupt\n", __func__);
         /* we use rx error since there is no separate overrun error */
-        _esp_can_dev.events |= ESP_CAN_EVENT_RX_INDICATION;
+        dev->events |= ESP_CAN_EVENT_RX_INDICATION;
     }
 
-    DEBUG("%s events=%08x\n", __func__, _esp_can_dev.events);
+    DEBUG("%s events=%08x\n", __func__, dev->events);
 
     /* inform the upper layer that there are events to be handled */
-    if (_esp_can_dev.events && _esp_can_dev.candev.event_callback) {
-        _esp_can_dev.candev.event_callback(&_esp_can_dev.candev, CANDEV_EVENT_ISR, NULL);
+    if (dev->events && dev->candev.event_callback) {
+        dev->candev.event_callback(&dev->candev, CANDEV_EVENT_ISR, NULL);
     }
 
     critical_exit();
 }
 
-
-static void _esp_can_set_bittiming (void)
+static void _esp_can_set_bittiming(can_t *dev)
 {
-    struct can_bittiming* timing = &_esp_can_dev.candev.bittiming;
+    assert(dev);
 
-    DEBUG("%s bitrate=%d, brp=%d, sample_point=%d, tq=%d, "
-          "prop_seg=%d phase_seg1=%d, phase_seg2=%d, sjw =%d\n", __func__,
+    struct can_bittiming* timing = &dev->candev.bittiming;
+
+    DEBUG("%s %p bitrate=%d, brp=%d, sample_point=%d, tq=%d, "
+          "prop_seg=%d phase_seg1=%d, phase_seg2=%d, sjw =%d\n", __func__, dev,
           timing->bitrate, timing->brp, timing->sample_point, timing->tq,
           timing->prop_seg, timing->phase_seg1, timing->phase_seg2,
           timing->sjw);
@@ -969,57 +916,45 @@ static void _esp_can_set_bittiming (void)
     _esp_can_set_operating_mode();
 }
 
-
-/** returns the hardware dependent constants used for bit timing calculations */
-static void _esp_can_get_bittiming_const (struct can_bittiming_const* timing_const)
+void can_init(can_t *dev, const can_conf_t *conf)
 {
-    CHECK_PARAM(timing_const != NULL);
+    DEBUG("%s dev=%p conf=%p\n", __func__, dev, conf);
 
-    timing_const->tseg1_min = 1;
-    timing_const->tseg1_max = 16;
-    timing_const->tseg2_min = 1;
-    timing_const->tseg2_max = 8;
-    timing_const->sjw_max = 4;
-    timing_const->brp_min = 2;
-    timing_const->brp_max = 128;
-    timing_const->brp_inc = 2;
-}
+    assert(dev);
+    assert(conf);
 
+    dev->candev.driver = &_esp_can_driver;
+    dev->candev.bittiming.bitrate = conf->bitrate;
 
-void auto_init_esp_can(void)
-{
-    struct can_bittiming_const timing_const;
-
-    DEBUG("%s\n", __func__);
+    dev->tx_pin = conf->tx_pin;
+    dev->rx_pin = conf->rx_pin;
+#ifdef ESP_CAN_CLK_OUT
+    dev->clk_out_pin = conf->clk_out_pin;
+#endif
+#ifdef ESP_CAN_BUS_ON_OFF
+    dev->bus_on_off_pin = conf->bus_on_off_pin;
+#endif
 
     /* determine the hardware bittiming constants */
-    _esp_can_get_bittiming_const(&timing_const);
+    struct can_bittiming_const timing_const = bittiming_const;
 
     /* calculate the initial bittimings from the bittiming constants */
-    can_device_calc_bittiming (ESP_CAN_CLOCK, &timing_const, &_esp_can_dev.candev.bittiming);
+    can_device_calc_bittiming (ESP_CAN_CLOCK, &timing_const, &dev->candev.bittiming);
 
-    _esp_can_dll_dev.dev = (candev_t*)&_esp_can_dev;
-    _esp_can_dll_dev.name = "can";
+    /* initialize other members */
+    dev->state = CAN_STATE_SLEEPING;
+    dev->tx_frame = NULL;
+    dev->rx_frames_wptr = 0;
+    dev->rx_frames_rptr = 0;
+    dev->rx_frames_num = 0;
+    dev->rx_filter_num = 0;
+    dev->powered_up = false;
 
-    #ifdef MODULE_CAN_TRX
-    _esp_can_dll_dev.trx = 0;
-    #endif
-    #ifdef MODULE_CAN_PM
-    _esp_can_dll_dev.rx_inactivity_timeout = 0;
-    _esp_can_dll_dev.tx_wakeup_timeout = 0;
-    #endif
-
-    can_device_init(_esp_can_stack, ESP_CAN_DEV_STACKSIZE, ESP_CAN_DEV_BASE_PRIORITY,
-                    "esp_can", &_esp_can_dll_dev);
 }
-
-#endif /* MODULE_ESP_CAN */
 
 void can_print_config(void)
 {
-    #ifdef MODULE_ESP_CAN
     ets_printf("\tCAN_DEV(0)\ttxd=%d rxd=%d\n", CAN_TX, CAN_RX);
-    #endif
 }
 
 /**@}*/
