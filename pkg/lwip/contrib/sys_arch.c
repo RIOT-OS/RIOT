@@ -218,7 +218,7 @@ sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
         abort();
     }
     mutex_lock(&params.sync);
-    sched_switch((char)prio);
+    thread_yield_higher();
     return res;
 }
 
