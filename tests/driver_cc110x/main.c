@@ -31,10 +31,14 @@
 
 static int sc_dump(int argc, char **argv);
 int sc_cc110x(int argc, char **argv);
+int sc_cc110x_sleep(int argc, char **argv);
+int sc_cc110x_wakeup(int argc, char **argv);
 
 static const shell_command_t shell_commands[] = {
     { "dump", "Enable/disable dumping of frames", sc_dump },
     { "cc110x", "Print the low level state of an CC110x device", sc_cc110x },
+    { "sleep", "Set CC110x onto sleep mode", sc_cc110x_sleep },
+    { "wakeup", "Wake-up CC110x device", sc_cc110x_wakeup },
     { NULL, NULL, NULL }
 };
 
@@ -126,7 +130,13 @@ int main(void)
          "- Using \"cc110x\":\n"
          "    - This tool will print low level details for all CC110x devices\n"
          "      attached\n"
-         "    - This will be mostly useful for debugging, not for testing\n");
+         "    - This will be mostly useful for debugging, not for testing\n"
+         "- Using \"sleep\":\n"
+         "    - Puts the given (or all, if no iface is given) transceiver into\n"
+         "      deep sleep mode\n"
+         "- Using \"awake\":\n"
+         "    - Wakes up the given (or all, if no iface is given) transceiver(s)"
+         "      \n");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
