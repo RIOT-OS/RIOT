@@ -155,8 +155,7 @@ static void test_vrb_add__full(void)
                                                  out_dst, sizeof(out_dst)));
     /* check if it really isn't in the VRB */
     TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(base.src, base.src_len,
-                                                 base.dst, base.dst_len,
-                                                 base.datagram_size, base.tag));
+                                                 base.tag));
 }
 
 static void test_vrb_get__empty(void)
@@ -173,8 +172,7 @@ static void test_vrb_get__empty(void)
         .arrival = 1742197326U,
     };
     TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(base.src, base.src_len,
-                                                 base.dst, base.dst_len,
-                                                 base.datagram_size, base.tag));
+                                                 base.tag));
 }
 
 static void test_vrb_get__after_add(void)
@@ -199,9 +197,6 @@ static void test_vrb_get__after_add(void)
                                                              sizeof(out_dst))));
     TEST_ASSERT_NOT_NULL((res2 = gnrc_sixlowpan_frag_vrb_get(base.src,
                                                              base.src_len,
-                                                             base.dst,
-                                                             base.dst_len,
-                                                             base.datagram_size,
                                                              base.tag)));
     TEST_ASSERT(res1 == res2);
 }
@@ -228,8 +223,7 @@ static void test_vrb_rm(void)
                                                             sizeof(out_dst))));
     gnrc_sixlowpan_frag_vrb_rm(res);
     TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(base.src, base.src_len,
-                                                 base.dst, base.dst_len,
-                                                 base.datagram_size, base.tag));
+                                                 base.tag));
 }
 
 static void test_vrb_gc(void)
@@ -254,8 +248,7 @@ static void test_vrb_gc(void)
                                                             sizeof(out_dst))));
     gnrc_sixlowpan_frag_vrb_gc();
     TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(base.src, base.src_len,
-                                                 base.dst, base.dst_len,
-                                                 base.datagram_size, base.tag));
+                                                 base.tag));
 }
 
 static Test *tests_gnrc_sixlowpan_frag_vrb_tests(void)
