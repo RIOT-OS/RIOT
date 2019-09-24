@@ -206,3 +206,74 @@ int sc_cc110x(int argc, char **argv)
 
     return EXIT_SUCCESS;
 }
+
+int sc_cc110x_sleep(int argc, char **argv)
+{
+    switch (argc) {
+        case 1:
+            for (unsigned i = 0; i < CC110X_NUM; i++){
+                printf("Putting to sleep CC110x #%u:\n", i);
+                cc110x_power_off(&_cc110x_devs[i]);
+            }
+            break;
+        case 2:
+            if ((!strcmp(argv[1], "-h")) || (!strcmp(argv[1], "--help"))) {
+                printf("Usage: %s [NUM]\n"
+                        "\n"
+                        "Sets into sleep mode the CC1100/CC1101 transceiver "
+                        "identified by NUM, or of\n"
+                        "all available CC110x transceivers if no argument is "
+                        "given\n", argv[0]);
+            }
+            else {
+                unsigned pos = atoi(argv[1]);
+                if (pos >= CC110X_NUM) {
+                    puts("No such transceiver");
+                    return EXIT_FAILURE;
+                }
+                printf("Putting to sleep CC110x #%u:\n", pos);
+                cc110x_power_off(&_cc110x_devs[pos]);
+            }
+            break;
+        default:
+            printf("Usage: %s [NUM]\n", argv[0]);
+            return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+int sc_cc110x_wakeup(int argc, char **argv)
+{
+    switch (argc) {
+        case 1:
+            for (unsigned i = 0; i < CC110X_NUM; i++){
+                printf("Waking up CC110x #%u:\n", i);
+                cc110x_power_on(&_cc110x_devs[i]);
+            }
+            break;
+        case 2:
+            if ((!strcmp(argv[1], "-h")) || (!strcmp(argv[1], "--help"))) {
+                printf("Usage: %s [NUM]\n"
+                        "\n"
+                        "Wakes up the CC1100/CC1101 transceiver "
+                        "identified by NUM, or of\n"
+                        "all available CC110x transceivers if no argument is "
+                        "given\n", argv[0]);
+            }
+            else {
+                unsigned pos = atoi(argv[1]);
+                if (pos >= CC110X_NUM) {
+                    puts("No such transceiver");
+                    return EXIT_FAILURE;
+                }
+                printf("Waking up CC110x #%u:\n", pos);
+                cc110x_power_on(&_cc110x_devs[pos]);
+            }
+            break;
+        default:
+            printf("Usage: %s [NUM]\n", argv[0]);
+            return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
