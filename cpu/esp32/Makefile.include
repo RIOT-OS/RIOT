@@ -63,7 +63,6 @@ PSEUDOMODULES += esp_spi_ram
 PSEUDOMODULES += esp_spiffs
 PSEUDOMODULES += esp_wifi_any
 
-export CPU ?= esp32
 export TARGET_ARCH ?= xtensa-esp32-elf
 export ESPTOOL ?= $(ESP32_SDK_DIR)/components/esptool_py/esptool/esptool.py
 

@@ -1,3 +1,13 @@
+CPU = kinetis
+
+### CPU part number (must have a specific linker script for each part)
+# Note that MK60DN256ZVLL10 (version 1.x) and MK60DN256VLL10 (version 2.x, no Z)
+# only differ in some register locations etc, not in the actual memory layout,
+# so it is safe to use the same linker script for both version 1.x and version
+# 2.x silicon.
+# The linker script needs to know the flash and RAM sizes of the device.
+CPU_MODEL ?= mk60dn512vll10
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_dac
@@ -8,5 +18,3 @@ FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
-
-include $(RIOTCPU)/kinetis/Makefile.features

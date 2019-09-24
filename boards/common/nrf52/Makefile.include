@@ -1,6 +1,3 @@
-# this module contains shared code for all boards using the nrf52 CPU
-export CPU = nrf52
-
 # include this module into the build
 INCLUDES += -I$(RIOTBOARD)/common/nrf52/include
 

@@ -1,23 +1,7 @@
-# define the cpu used by the Mulle board
-export CPU = kinetis
-
 # MULLE_SERIAL is used to select which specific Mulle board we are compiling for.
 ifdef MULLE_SERIAL
   CFLAGS += -DMULLE_SERIAL=$(MULLE_SERIAL)
 endif
-
-### CPU part number (must have a specific linker script for each part)
-# Note that MK60DN256ZVLL10 (version 1.x) and MK60DN256VLL10 (version 2.x, no Z)
-# only differ in some register locations etc, not in the actual memory layout,
-# so it is safe to use the same linker script for both version 1.x and version
-# 2.x silicon.
-# The linker script needs to know the flash and RAM sizes of the device.
-
-ifeq ($(CPU_MODEL),)
-  CPU_MODEL = mk60dn512vll10
-endif
-
-export CPU_MODEL
 
 # Default debug adapter choice is to use the Mulle programmer board
 DEBUG_ADAPTER ?= mulle
