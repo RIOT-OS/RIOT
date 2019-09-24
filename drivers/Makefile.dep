@@ -48,10 +48,14 @@ ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
-  USEMODULE += gnrc_netif_phy_oqpsk
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
+
+  ifneq (,$(filter gnrc,$(USEMODULE)))
+    # Pull in `ifconfig` support for BPSK/O-QPSK
+    USEMODULE += gnrc_netif_cmd_oqpsk
+  endif
 endif
 
 ifneq (,$(filter ata8520e,$(USEMODULE)))
