@@ -521,6 +521,11 @@ ifneq (,$(filter sx127%,$(USEMODULE)))
   USEMODULE += sx127x
   USEMODULE += netif
   USEMODULE += lora
+
+  ifneq (,$(filter gnrc,$(USEMODULE)))
+    # Pull in `ifconfig` support for LoRA
+    USEMODULE += gnrc_netif_cmd_lora
+  endif
 endif
 
 ifneq (,$(filter tcs37727,$(USEMODULE)))
