@@ -82,24 +82,16 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
 }
 
 gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
-        const uint8_t *src, size_t src_len,
-        const uint8_t *dst, size_t dst_len,
-        size_t datagram_size, unsigned src_tag)
+        const uint8_t *src, size_t src_len, unsigned src_tag)
 {
-    DEBUG("6lo vrb: trying to get entry for (%s, ",
-          gnrc_netif_addr_to_str(src, src_len, l2addr_str));
-    DEBUG("%s, %u, %u)\n",
-          gnrc_netif_addr_to_str(dst, dst_len, l2addr_str),
-          (unsigned)datagram_size, src_tag);
+    DEBUG("6lo vrb: trying to get entry for (%s, %u)\n",
+          gnrc_netif_addr_to_str(src, src_len, l2addr_str), src_tag);
     for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         gnrc_sixlowpan_frag_vrb_t *vrbe = &_vrb[i];
 
-        if ((vrbe->super.datagram_size == datagram_size) &&
-            (vrbe->super.tag == src_tag) &&
+        if ((vrbe->super.tag == src_tag) &&
             (vrbe->super.src_len == src_len) &&
-            (vrbe->super.dst_len == dst_len) &&
-            (memcmp(vrbe->super.src, src, src_len) == 0) &&
-            (memcmp(vrbe->super.dst, dst, dst_len) == 0)) {
+            (memcmp(vrbe->super.src, src, src_len) == 0)) {
             DEBUG("6lo vrb: got VRB to (%s, %u)\n",
                   gnrc_netif_addr_to_str(vrbe->out_dst,
                                          vrbe->out_dst_len,

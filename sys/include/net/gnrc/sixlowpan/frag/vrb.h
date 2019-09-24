@@ -89,10 +89,6 @@ void gnrc_sixlowpan_frag_vrb_gc(void);
  *
  * @param[in] src           Link-layer source address of the original fragment.
  * @param[in] src_len       Length of @p src.
- * @param[in] dst           Link-layer destination address of the original
- *                          fragment.
- * @param[in] dst_len       Length of @p dst.
- * @param[in] datagram_size The original fragment's datagram size.
  * @param[in] src_tag       Tag of the original fragment.
  *
  * @return  The VRB entry identified by the given parameters.
@@ -100,9 +96,7 @@ void gnrc_sixlowpan_frag_vrb_gc(void);
  *          by the given parameters.
  */
 gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
-        const uint8_t *src, size_t src_len,
-        const uint8_t *dst, size_t dst_len,
-        size_t datagram_size, unsigned src_tag);
+        const uint8_t *src, size_t src_len, unsigned src_tag);
 
 /**
  * @brief   Removes an entry from the VRB
@@ -114,8 +108,8 @@ static inline void gnrc_sixlowpan_frag_vrb_rm(gnrc_sixlowpan_frag_vrb_t *vrb)
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
     gnrc_sixlowpan_frag_rb_base_rm(&vrb->super);
 #elif   defined(TEST_SUITES)
-    /* for testing just zero datagram_size */
-    vrb->super.datagram_size = 0;
+    /* for testing just zero src_len */
+    vrb->super.src_len = 0;
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG */
 }
 
@@ -129,7 +123,7 @@ static inline void gnrc_sixlowpan_frag_vrb_rm(gnrc_sixlowpan_frag_vrb_t *vrb)
  */
 static inline bool gnrc_sixlowpan_frag_vrb_entry_empty(gnrc_sixlowpan_frag_vrb_t *vrb)
 {
-    return (vrb->super.datagram_size == 0);
+    return (vrb->super.src_len == 0);
 }
 
 #if defined(TEST_SUITES) || defined(DOXYGEN)
