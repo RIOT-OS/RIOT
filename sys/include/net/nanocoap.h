@@ -781,6 +781,75 @@ static inline unsigned coap_szx2size(unsigned szx)
  * Use a coap_pkt_t struct to manage writing Options to the PDU.
  */
 /**
+ * @brief   Add block option in descriptive use from a slicer object
+ *
+ * When calling this function to initialize a packet with a block option, the
+ * more flag must be set to prevent the creation of an option with a length too
+ * small to contain the size bit.
+
+ * @post pkt.payload advanced to first byte after option
+ * @post pkt.payload_len reduced by option length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     slicer      coap blockwise slicer helper struct
+ * @param[in]     more        more flag (1 or 0)
+ * @param[in]     option      option number (block1 or block2)
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
+ */
+ssize_t coap_opt_add_block(coap_pkt_t *pkt, coap_block_slicer_t *slicer,
+                           bool more, uint16_t option);
+
+/**
+ * @brief   Add block1 option in descriptive use from a slicer object
+ *
+ * When calling this function to initialize a packet with a block option, the
+ * more flag must be set to prevent the creation of an option with a length too
+ * small to contain the size bit.
+
+ * @post pkt.payload advanced to first byte after option
+ * @post pkt.payload_len reduced by option length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     slicer      coap blockwise slicer helper struct
+ * @param[in]     more        more flag (1 or 0)
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
+ */
+static inline ssize_t coap_opt_add_block1(coap_pkt_t *pkt,
+                                          coap_block_slicer_t *slicer, bool more)
+{
+    return coap_opt_add_block(pkt, slicer, more, COAP_OPT_BLOCK1);
+}
+
+/**
+ * @brief   Add block2 option in descriptive use from a slicer object
+ *
+ * When calling this function to initialize a packet with a block option, the
+ * more flag must be set to prevent the creation of an option with a length too
+ * small to contain the size bit.
+
+ * @post pkt.payload advanced to first byte after option
+ * @post pkt.payload_len reduced by option length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     slicer      coap blockwise slicer helper struct
+ * @param[in]     more        more flag (1 or 0)
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
+ */
+static inline ssize_t coap_opt_add_block2(coap_pkt_t *pkt,
+                                          coap_block_slicer_t *slicer, bool more)
+{
+    return coap_opt_add_block(pkt, slicer, more, COAP_OPT_BLOCK2);
+}
+/**
  * @brief   Encode the given uint option into pkt
  *
  * @post pkt.payload advanced to first byte after option
@@ -795,6 +864,43 @@ static inline unsigned coap_szx2size(unsigned szx)
  * @return        -ENOSPC if no available options or insufficient buffer space
  */
 ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value);
+
+/**
+ * @brief   Encode the given block1 option in control use
+ *
+ * @post pkt.payload advanced to first byte after option
+ * @post pkt.payload_len reduced by option length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     block       block to encode
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
+ */
+static inline ssize_t coap_opt_add_block1_control(coap_pkt_t *pkt, coap_block1_t *block) {
+    return coap_opt_add_uint(pkt, COAP_OPT_BLOCK1,
+                             (block->blknum << 4) | block->szx | (block->more ? 0x8 : 0));
+}
+
+/**
+ * @brief   Encode the given block2 option in control use
+ *
+ * @post pkt.payload advanced to first byte after option
+ * @post pkt.payload_len reduced by option length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     block       block to encode
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
+ */
+static inline ssize_t coap_opt_add_block2_control(coap_pkt_t *pkt, coap_block1_t *block) {
+    /* block.more must be zero, so no need to 'or' it in */
+    return coap_opt_add_uint(pkt, COAP_OPT_BLOCK2,
+                             (block->blknum << 4) | block->szx);
+}
 
 /**
  * @brief   Append a Content-Format option to the pkt buffer

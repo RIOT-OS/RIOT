@@ -897,6 +897,18 @@ ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value)
     return _add_opt_pkt(pkt, optnum, (uint8_t *)&tmp, tmp_len);
 }
 
+ssize_t coap_opt_add_block(coap_pkt_t *pkt, coap_block_slicer_t *slicer,
+                           bool more, uint16_t option)
+{
+    uint32_t blkopt = (_slicer_blknum(slicer) << 4);
+    blkopt |= _size2szx(slicer->end - slicer->start);
+    blkopt |= (more ? 0x8 : 0);
+
+    slicer->opt = pkt->payload;
+
+    return coap_opt_add_uint(pkt, option, blkopt);
+}
+
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
 {
     if (flags & COAP_OPT_FINISH_PAYLOAD) {
