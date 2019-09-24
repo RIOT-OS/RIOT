@@ -27,6 +27,7 @@ PSEUDOMODULES += gnrc_neterr
 PSEUDOMODULES += gnrc_netapi_callbacks
 PSEUDOMODULES += gnrc_netapi_mbox
 PSEUDOMODULES += gnrc_pktbuf_cmd
+PSEUDOMODULES += gnrc_netif_cmd_%
 PSEUDOMODULES += gnrc_netif_dedup
 PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
