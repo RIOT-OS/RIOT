@@ -68,8 +68,16 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   include $(RIOTMAKE)/libc/newlib.mk
 endif
 
+ifneq (,$(filter picolibc,$(USEMODULE)))
+  include $(RIOTMAKE)/libc/picolibc.mk
+endif
+
 ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
   include $(RIOTBASE)/sys/newlib_syscalls_default/Makefile.include
+endif
+
+ifneq (,$(filter picolibc_syscalls_default,$(USEMODULE)))
+  include $(RIOTBASE)/sys/picolibc_syscalls_default/Makefile.include
 endif
 
 ifneq (,$(filter arduino,$(USEMODULE)))

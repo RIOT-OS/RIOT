@@ -8,7 +8,7 @@ STDIO_MODULES = \
   stdio_uart \
   #
 
-ifneq (,$(filter newlib,$(USEMODULE)))
+ifneq (,$(filter newlib picolibc,$(USEMODULE)))
   ifeq (,$(filter $(STDIO_MODULES),$(USEMODULE)))
     USEMODULE += stdio_uart
   endif
