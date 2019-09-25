@@ -178,11 +178,12 @@ static const adc_conf_chan_t adc_channels[] = {
     {GPIO_PIN(PA, 9), ADC_INPUTCTRL_MUXPOS_PIN17},    /* A7 */
     {GPIO_PIN(PA,10), ADC_INPUTCTRL_MUXPOS_PIN18},    /* A8 */
     {GPIO_PIN(PA,11), ADC_INPUTCTRL_MUXPOS_PIN19},    /* A9 */
-    {GPIO_PIN(PB, 2), ADC_INPUTCTRL_MUXPOS_PIN10},    /* A10 */
-    {GPIO_PIN(PB, 3), ADC_INPUTCTRL_MUXPOS_PIN11},    /* A11 */
+#if 0
+    /* These pins are also used for RX/TX uart0 */
+    {GPIO_PIN(PB, 2), ADC_INPUTCTRL_MUXPOS_PIN10},    /* A10, TX */
+    {GPIO_PIN(PB, 3), ADC_INPUTCTRL_MUXPOS_PIN11},    /* A11, RX */
+#endif
 
-    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0},     /* DAC/VOUT */
-    {GPIO_PIN(PA, 3), ADC_INPUTCTRL_MUXPOS_PIN1},     /* AREF */
     {GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5},     /* BAT_VOLT */
 };
 
