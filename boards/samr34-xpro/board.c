@@ -41,8 +41,8 @@ void board_init(void)
 
     /* initialize board specific pins for LoRa */
 #ifdef MODULE_SX127X
-    gpio_init(TXCO_PWR_PIN, GPIO_OUT);
-    gpio_set(TXCO_PWR_PIN);
+    gpio_init(TCXO_PWR_PIN, GPIO_OUT);
+    gpio_set(TCXO_PWR_PIN);
     gpio_init(TX_OUTPUT_SEL_PIN, GPIO_OUT);
     gpio_write(TX_OUTPUT_SEL_PIN, !SX127X_PARAM_PASELECT);
 #endif /* USEMODULE_SX127X */

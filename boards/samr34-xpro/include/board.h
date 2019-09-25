@@ -46,7 +46,7 @@ extern "C" {
  * @name Board specific configuration
  *  @{
  */
-#define TXCO_PWR_PIN                        GPIO_PIN(PA, 9)
+#define TCXO_PWR_PIN                        GPIO_PIN(PA, 9)
 #define TX_OUTPUT_SEL_PIN                   GPIO_PIN(PA, 13)
 /** @}*/
 
