@@ -92,7 +92,7 @@ __attribute__((weak)) void post_startup (void)
 void reset_handler_default(void)
 {
     uint32_t *dst;
-    uint32_t *src = &_etext;
+    const uint32_t *src = &_etext;
 
 #ifdef MODULE_PUF_SRAM
     puf_sram_init((uint8_t *)&_srelocate, SEED_RAM_LEN);
