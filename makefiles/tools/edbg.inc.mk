@@ -15,10 +15,17 @@ endif
 EDBG_ARGS += $(if $(IMAGE_OFFSET),--offset $(IMAGE_OFFSET))
 
 FFLAGS ?= $(EDBG_ARGS) --target $(EDBG_DEVICE_TYPE) --verbose \
-                       --verify --program --file $(FLASHFILE)
+                       --file $(FLASHFILE)
 
 ifeq ($(RIOT_EDBG),$(FLASHER))
   FLASHDEPS += $(RIOT_EDBG)
 endif
 RESET ?= $(EDBG)
 RESET_FLAGS ?= $(EDBG_ARGS) --target $(EDBG_DEVICE_TYPE)
+
+define edbg-flash-recipe
+  $(call check_cmd,$(FLASHER),Flash program)
+  $(FLASHER) $(FFLAGS) --verify || $(FLASHER) $(FFLAGS) --verify --program
+endef
+
+flash-recipe = $(edbg-flash-recipe)
