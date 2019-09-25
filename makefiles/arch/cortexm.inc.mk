@@ -29,12 +29,18 @@ ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/cortexm_common/ldscripts
 LINKER_SCRIPT ?= $(CPU_MODEL).ld
 LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
-
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
 LINKFLAGS += -Wl,--gc-sections
 
 # extract version inside the first parentheses
 ARM_GCC_VERSION = $(shell $(TARGET_ARCH)-gcc --version | sed -n '1 s/[^(]*(\([^\)]*\)).*/\1/p')
+
+# all cortex MCU's use newlib as libc
+ifeq (1,$(PICOLIBC))
+  USEMODULE += picolibc
+else
+  USEMODULE += newlib
+endif
 
 # Ubuntu bionic gcc-arm-none-eabi compiler is not supported
 # Both when using gnu and llvm toolchains
@@ -111,6 +117,11 @@ endif
 
 # CPU depends on the cortex-m common module, so include it:
 include $(RIOTCPU)/cortexm_common/Makefile.include
+
+ifneq (1,$(PICOLIBC))
+  # use the nano-specs of Newlib when available
+  USEMODULE += newlib_nano
+endif
 
 # Avoid overriding the default rule:
 all:
