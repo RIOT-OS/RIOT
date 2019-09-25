@@ -53,6 +53,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @name Pthread configuration
+ * @{
+ */
+/* The idle stack of '160' is not enough to do the 'msg_receive'.
+ * It currently used '164' bytes. */
+#define CONFIG_PTHREAD_REAPER_BASE_STACKSIZE (2*THREAD_STACKSIZE_IDLE)
+/** @} */
+
+/**
  * @name Compiler specifics
  * @{
  */
