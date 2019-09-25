@@ -2,7 +2,6 @@ export APPDEPS += $(RIOTCPU)/$(CPU)/$(CPU_MODEL)/$(CPU_MODEL).S
 export USE_UHI_SYSCALLS = 1
 
 PORT_LINUX ?= /dev/ttyUSB0
-BAUD ?= 9600
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # pic32prog
