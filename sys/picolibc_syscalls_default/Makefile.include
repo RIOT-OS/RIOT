@@ -1,0 +1,1 @@
+UNDEF += $(BINDIR)/picolibc_syscalls_default/syscalls.o
