@@ -18,7 +18,7 @@ def chdir_to_riot_root():
 class BoardListVariable:
 	def __init__(self, name):
 		self.name = name
-		self.regex = re.compile('%s\\s*(:=)(.+)' % (self.name))
+		self.regex = re.compile('%s\\s*([\\+:]=)(.+)' % (self.name))
 
 	def match(self, line):
 		return self.regex.match(line)

@@ -101,6 +101,9 @@ def format_boardlist(board_list):
 		return board_list
 
 	operator = board_list.metadata['variable'].match(board_list.content)[1]
+	if operator == '+=':
+		return board_list
+
 	variable, boards = board_list.content.split(operator)
 
 	variable = variable.strip()
