@@ -825,6 +825,7 @@ endif
 
 ifneq (,$(filter skald,$(USEMODULE)))
   FEATURES_REQUIRED += radio_nrfble
+  USEMODULE += nrfble
   USEMODULE += xtimer
   USEMODULE += random
 endif
