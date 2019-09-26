@@ -55,11 +55,6 @@
 #endif
 
 /**
- * @brief   Calculate the number of configured CC1100/CC1101 transceivers
- */
-#define CC110X_NUM                      ARRAY_SIZE(cc110x_params)
-
-/**
  * @brief   Statically allocate memory for device descriptors
  */
 cc110x_t _cc110x_devs[CC110X_NUM];

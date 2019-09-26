@@ -28,11 +28,6 @@
 #include "sx127x_params.h"
 
 /**
- * @brief   Calculate the number of configured SX127x devices
- */
-#define SX127X_NUMOF        ARRAY_SIZE(sx127x_params)
-
-/**
  * @brief   Define stack parameters for the MAC layer thread
  */
 #define SX127X_STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
@@ -43,12 +38,12 @@
 /**
  * @brief   Allocate memory for device descriptors, stacks, and GNRC adaption
  */
-static sx127x_t sx127x_devs[SX127X_NUMOF];
-static char sx127x_stacks[SX127X_NUMOF][SX127X_STACKSIZE];
+static sx127x_t sx127x_devs[SX127X_NUM];
+static char sx127x_stacks[SX127X_NUM][SX127X_STACKSIZE];
 
 void auto_init_sx127x(void)
 {
-    for (unsigned i = 0; i < SX127X_NUMOF; ++i) {
+    for (unsigned i = 0; i < SX127X_NUM; ++i) {
 #if defined(MODULE_SX1272)
         LOG_DEBUG("[auto_init_netif] initializing sx1272 #%u\n", i);
 #else /* MODULE_SX1276 */

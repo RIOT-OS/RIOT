@@ -311,13 +311,6 @@ include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 # For more information, see http://petereisentraut.blogspot.com/2011/09/ccache-and-clang-part-2.html
 export CCACHE_CPP2=yes
 
-# get number of interfaces straight before resolving dependencies
-GNRC_NETIF_NUMOF ?= 1
-
-ifneq ($(GNRC_NETIF_NUMOF),1)
-  CFLAGS += -DGNRC_NETIF_NUMOF=$(GNRC_NETIF_NUMOF)
-endif
-
 # handle removal of default modules
 USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 

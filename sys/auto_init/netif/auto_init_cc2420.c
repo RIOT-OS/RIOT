@@ -40,21 +40,16 @@
 /** @} */
 
 /**
- * @brief   Get the number of configured CC2420 devices
- */
-#define CC2420_NUMOF        ARRAY_SIZE(cc2420_params)
-
-/**
  * @brief   Allocate memory for dev descriptors, stacks, and 802.15.4 adaption
  * @{
  */
-static cc2420_t cc2420_devs[CC2420_NUMOF];
-static char _cc2420_stacks[CC2420_NUMOF][CC2420_MAC_STACKSIZE];
+static cc2420_t cc2420_devs[CC2420_NUM];
+static char _cc2420_stacks[CC2420_NUM][CC2420_MAC_STACKSIZE];
 /** @} */
 
 void auto_init_cc2420(void)
 {
-    for (unsigned i = 0; i < CC2420_NUMOF; i++) {
+    for (unsigned i = 0; i < CC2420_NUM; i++) {
         LOG_DEBUG("[auto_init_netif] initializing cc2420 #%u\n", i);
 
         cc2420_setup(&cc2420_devs[i], &cc2420_params[i]);

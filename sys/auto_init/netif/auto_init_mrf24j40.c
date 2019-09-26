@@ -36,8 +36,6 @@
 #define MRF24J40_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
 
-#define MRF24J40_NUM ARRAY_SIZE(mrf24j40_params)
-
 static mrf24j40_t mrf24j40_devs[MRF24J40_NUM];
 static char _mrf24j40_stacks[MRF24J40_NUM][MRF24J40_MAC_STACKSIZE];
 

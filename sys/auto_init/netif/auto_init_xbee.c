@@ -28,11 +28,6 @@
 #include "xbee_params.h"
 
 /**
- * @brief   Calculate the number of configured XBee devices
- */
-#define XBEE_NUM        ARRAY_SIZE(xbee_params)
-
-/**
  * @brief   Define stack parameters for the MAC layer thread
  */
 #define XBEE_MAC_STACKSIZE           (THREAD_STACKSIZE_DEFAULT)

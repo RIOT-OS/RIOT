@@ -39,8 +39,6 @@
 #define KW2XRF_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
 
-#define KW2XRF_NUM ARRAY_SIZE(kw2xrf_params)
-
 static kw2xrf_t kw2xrf_devs[KW2XRF_NUM];
 static char _kw2xrf_stacks[KW2XRF_NUM][KW2XRF_MAC_STACKSIZE];
 

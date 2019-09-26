@@ -33,11 +33,6 @@
 /*** @} */
 
 /**
- * @brief   Find out how many of these devices we need to care for
- */
-#define W5100_NUM    ARRAY_SIZE(w5100_params)
-
-/**
  * @brief   Allocate memory for the device descriptors
  * @{
  */

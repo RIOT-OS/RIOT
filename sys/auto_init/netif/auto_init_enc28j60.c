@@ -37,11 +37,6 @@
 /*** @} */
 
 /**
- * @brief   Find out how many of these devices we need to care for
- */
-#define ENC28J60_NUM    ARRAY_SIZE(enc28j60_params)
-
-/**
  * @brief   Allocate memory for the device descriptors
  * @{
  */

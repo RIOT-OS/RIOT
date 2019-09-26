@@ -27,8 +27,6 @@
 #include "slipdev.h"
 #include "slipdev_params.h"
 
-#define SLIPDEV_NUM ARRAY_SIZE(slipdev_params)
-
 /**
  * @brief   Define stack parameters for the MAC layer thread
  * @{

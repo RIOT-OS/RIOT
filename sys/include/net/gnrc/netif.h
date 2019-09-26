@@ -30,6 +30,9 @@
 
 #include "kernel_types.h"
 #include "msg.h"
+
+#include "auto_init_netif.h"
+
 #include "net/ipv6/addr.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/pkt.h"
