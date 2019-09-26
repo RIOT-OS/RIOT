@@ -334,7 +334,7 @@ typedef struct __attribute__((packed)) {
 } ndp_opt_mtu_t;
 
 /**
- * @brief   Recursive DNS server option format
+ * @brief   Recursive DNS server option format without payload
  * @extends ndp_opt_t
  *
  * @see     [RFC 8106, section 5.1](https://tools.ietf.org/html/rfc8106#section-5.1)
@@ -345,7 +345,6 @@ typedef struct __attribute__((packed)) {
     uint8_t len;            /**< length in units of 8 octets */
     network_uint16_t resv;  /**< reserved field */
     network_uint32_t ltime; /**< lifetime in seconds */
-    ipv6_addr_t addrs[];    /**< addresses of IPv6 recursive DNS servers */
 } ndp_opt_rdnss_t;
 
 #ifndef __cplusplus
