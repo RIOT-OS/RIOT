@@ -103,14 +103,17 @@ static inline void gnrc_ep_set(sock_ip_ep_t *out, const sock_ip_ep_t *in,
                                size_t in_size)
 {
     memcpy(out, in, in_size);
-#if GNRC_NETIF_NUMOF == 1
+
+    if (GNRC_NETIF_NUMOF > 1) {
+        return;
+    }
+
     /* set interface implicitly */
     gnrc_netif_t *netif = gnrc_netif_iter(NULL);
 
     if (netif != NULL) {
         out->netif = netif->pid;
     }
-#endif
 }
 
 /**

@@ -36,11 +36,9 @@
 #include <inttypes.h>
 #endif
 
-#if (GNRC_NETIF_NUMOF > 1)
 /* TODO: change API to make link-local address communitcation with
  * multiple network interfaces */
-#warning "gnrc_tftp does not work reliably with link-local addresses and >1 network interfaces."
-#endif
+_Static_assert(GNRC_NETIF_NUMOF == 1, "gnrc_tftp does not work reliably with link-local addresses and >1 network interfaces.");
 
 static kernel_pid_t _tftp_kernel_pid;
 

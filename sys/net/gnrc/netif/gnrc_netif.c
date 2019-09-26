@@ -53,7 +53,7 @@ gnrc_netif_t *gnrc_netif_create(char *stack, int stacksize, char priority,
     gnrc_netif_t *netif = NULL;
     int res;
 
-    for (int i = 0; i < GNRC_NETIF_NUMOF; i++) {
+    for (unsigned i = 0; i < GNRC_NETIF_NUMOF; i++) {
         if (_netifs[i].dev == netdev) {
             return &_netifs[i];
         }
@@ -1091,25 +1091,6 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
     return (idx < 0) ? NULL : &netif->ipv6.addrs[idx];
 }
 #endif  /* MODULE_GNRC_IPV6 */
-
-#if (GNRC_NETIF_NUMOF > 1) || !defined(MODULE_GNRC_SIXLOWPAN)
-bool gnrc_netif_is_6ln(const gnrc_netif_t *netif)
-{
-    switch (netif->device_type) {
-#ifdef MODULE_GNRC_SIXLOENC
-        case NETDEV_TYPE_ETHERNET:
-#endif
-        case NETDEV_TYPE_IEEE802154:
-        case NETDEV_TYPE_CC110X:
-        case NETDEV_TYPE_BLE:
-        case NETDEV_TYPE_NRFMIN:
-        case NETDEV_TYPE_ESP_NOW:
-            return true;
-        default:
-            return false;
-    }
-}
-#endif  /* (GNRC_NETIF_NUMOF > 1) || !defined(MODULE_GNRC_SIXLOWPAN) */
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif)
 {

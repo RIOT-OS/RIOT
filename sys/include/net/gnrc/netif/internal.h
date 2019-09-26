@@ -346,13 +346,29 @@ static inline bool gnrc_netif_is_rtr_adv(const gnrc_netif_t *netif)
  * @return  true, if the interface represents a 6LN
  * @return  false, if the interface does not represent a 6LN
  */
-#if (GNRC_NETIF_NUMOF > 1) || !defined(MODULE_GNRC_SIXLOWPAN) || defined(DOXYGEN)
-bool gnrc_netif_is_6ln(const gnrc_netif_t *netif);
-#elif GNRC_IPV6_NIB_CONF_6LN
-#define gnrc_netif_is_6ln(netif)                (true)
-#else
-#define gnrc_netif_is_6ln(netif)                (false)
+static inline bool gnrc_netif_is_6ln(const gnrc_netif_t *netif)
+{
+#ifdef MODULE_GNRC_SIXLOWPAN
+    if (GNRC_NETIF_NUMOF == 1) {
+        (void) netif;
+        return GNRC_IPV6_NIB_CONF_6LN;
+    }
 #endif
+
+    switch (netif->device_type) {
+#ifdef MODULE_GNRC_SIXLOENC
+        case NETDEV_TYPE_ETHERNET:
+#endif
+        case NETDEV_TYPE_IEEE802154:
+        case NETDEV_TYPE_CC110X:
+        case NETDEV_TYPE_BLE:
+        case NETDEV_TYPE_NRFMIN:
+        case NETDEV_TYPE_ESP_NOW:
+            return true;
+        default:
+            return false;
+    }
+}
 
 /**
  * @brief   Checks if the interface represents a 6Lo router (6LR) according to
@@ -368,18 +384,25 @@ bool gnrc_netif_is_6ln(const gnrc_netif_t *netif);
  * @return  true, if the interface represents a 6LR
  * @return  false, if the interface does not represent a 6LR
  */
-#if (GNRC_IPV6_NIB_CONF_6LR && \
-     /* if flag checkers even evaluate, otherwise just assume their result */ \
-     (defined(MODULE_GNRC_IPV6_ROUTER) || \
-      (GNRC_NETIF_NUMOF > 1) || !defined(MODULE_GNRC_SIXLOWPAN))) || \
-    defined(DOXYGEN)
 static inline bool gnrc_netif_is_6lr(const gnrc_netif_t *netif)
 {
+    if (!GNRC_IPV6_NIB_CONF_6LR) {
+        (void) netif;
+        return false;
+    }
+
+    if (GNRC_NETIF_NUMOF == 1) {
+        (void) netif;
+        return false;
+    }
+
+#if defined(MODULE_GNRC_IPV6_ROUTER) || !defined(MODULE_GNRC_SIXLOWPAN)
     return gnrc_netif_is_rtr(netif) && gnrc_netif_is_6ln(netif);
-}
 #else
-#define gnrc_netif_is_6lr(netif)                (false)
+    (void) netif;
+    return false;
 #endif
+}
 
 /**
  * @brief   Checks if the interface represents a 6Lo border router (6LBR)
