@@ -616,7 +616,7 @@ preflash: $(BUILD_BEFORE_FLASH)
 
 termdeps: $(TERMDEPS)
 
-term: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
+term: $(filter flash flash-only, $(MAKECMDGOALS)) $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	$(TERMPROG) $(TERMFLAGS)
 
