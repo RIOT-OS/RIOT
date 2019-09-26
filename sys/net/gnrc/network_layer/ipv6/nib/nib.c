@@ -413,7 +413,7 @@ static void _handle_mtuo(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
                          const ndp_opt_mtu_t *mtuo);
 #if GNRC_IPV6_NIB_CONF_DNS
 static uint32_t _handle_rdnsso(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
-                               const ndp_opt_rdnss_t *rdnsso);
+                               const ndp_opt_rdnss_impl_t *rdnsso);
 #endif
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
 static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
@@ -732,7 +732,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             case NDP_OPT_RDNSS:
                 next_timeout = _min(_handle_rdnsso(netif,
                                                    (icmpv6_hdr_t *)rtr_adv,
-                                                   (ndp_opt_rdnss_t *)opt),
+                                                   (ndp_opt_rdnss_impl_t *)opt),
                                     next_timeout);
                 break;
 #endif
@@ -1352,7 +1352,7 @@ static void _handle_mtuo(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
 
 #if GNRC_IPV6_NIB_CONF_DNS
 static uint32_t _handle_rdnsso(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
-                               const ndp_opt_rdnss_t *rdnsso)
+                               const ndp_opt_rdnss_impl_t *rdnsso)
 {
     uint32_t ltime = UINT32_MAX;
     const ipv6_addr_t *addr;
