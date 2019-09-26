@@ -318,5 +318,6 @@ int strncasecmp(const char *s1, const char * s2, unsigned int sz);
  */
 #define _SAML21_AES_COMPONENT_
 #define _SAME54_AES_COMPONENT_
+#define _SAMR34_AES_COMPONENT_
 
 #endif /* USER_SETTINGS_H */
