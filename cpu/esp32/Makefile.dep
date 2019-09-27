@@ -42,6 +42,9 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
     # crypto and hashes produce symbol conflicts with esp_idf_wpa_supplicant_crypto
     DISABLE_MODULE += crypto
     DISABLE_MODULE += hashes
+
+    # thin archives trigger a reboot loop - see #12258
+    ARFLAGS = rcs
 endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
