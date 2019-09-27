@@ -67,15 +67,15 @@ typedef struct __attribute__((packed)) {
 } uhcp_req_t;
 
 /**
- * @brief struct for push packets
+ * @brief struct for push packets without prefix member
  *
  * @extends uhcp_hdr_t
+ * @see uhcp_push_impl_t
  */
 typedef struct __attribute__((packed)) {
     uhcp_hdr_t hdr;         /**< member holding parent type */
     uint8_t prefix_len;     /**< contains the prefix length of assigned
                                  prefix */
-    uint8_t prefix[];       /**< contains the assigned prefix */
 } uhcp_push_t;
 
 #ifndef __cplusplus
