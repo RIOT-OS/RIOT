@@ -121,7 +121,7 @@ extern "C" {
     #define TIMER_1_ISRA        TIMER3_COMPA_vect
     #define TIMER_1_ISRB        TIMER3_COMPB_vect
     #define TIMER_1_ISRC        TIMER3_COMPC_vect
-#elif defined(CPU_ATMEGA256RFR2)
+#elif defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2)
     #define TIMER_NUMOF         (3U)
     #define TIMER_CHANNELS      (3)
 
@@ -203,7 +203,8 @@ extern "C" {
  */
 
 #ifndef UART_NUMOF
-#if defined(CPU_ATMEGA256RFR2) || defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P) || defined(CPU_ATMEGA2560)
+#if defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2) || \
+    defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P) || defined(CPU_ATMEGA2560)
     #define UART_NUMOF          (2U)
 
     /* UART0 is used for stdio */
@@ -295,7 +296,8 @@ extern "C" {
  * @{
  */
 #ifndef ADC_NUMOF
-#if defined(CPU_ATMEGA256RFR2) || defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P) || defined(CPU_ATMEGA32U4)
+#if defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2) || defined(CPU_ATMEGA328P) ||  \
+    defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P) || defined(CPU_ATMEGA32U4)
     #define ADC_NUMOF           (8U)
 #elif defined (CPU_ATMEGA2560)
     #define ADC_NUMOF           (16U)

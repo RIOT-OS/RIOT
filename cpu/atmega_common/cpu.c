@@ -170,7 +170,7 @@ ISR(BADISR_vect)
                   "STOP Execution.\n"));
 }
 
-#if defined (CPU_ATMEGA256RFR2)
+#if defined(CPU_ATMEGA128RFA1) || defined (CPU_ATMEGA256RFR2)
 ISR(BAT_LOW_vect, ISR_BLOCK)
 {
     __enter_isr();

@@ -62,7 +62,7 @@ void spi_init_pins(spi_t bus)
 #if defined (CPU_ATMEGA1284P)
     DDRB |= ((1 << DDB4) | (1 << DDB5) | (1 << DDB7));
 #endif
-#if defined (CPU_ATMEGA256RFR2)
+#if defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2)
     /* Master: PB3 MISO set to out
      *         PB2 MOSI set to input by hardware
      *         PB1 SCK  set to out
