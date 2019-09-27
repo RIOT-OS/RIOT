@@ -45,9 +45,9 @@ static int cmd_test_xtimer_mutex_lock_timeout_low_prio_thread(int argc,
  * @brief   List of command for this application.
  */
 static const shell_command_t shell_commands[] = {
-    { "mutex_timeout_long_unlocked", "unlocked mutex with long timeout",
+    { "mutex_timeout_long_unlocked", "unlocked mutex (no-spin timeout)",
       cmd_test_xtimer_mutex_lock_timeout_long_unlocked, },
-    { "mutex_timeout_long_locked", "locked mutex with long timeout",
+    { "mutex_timeout_long_locked", "locked mutex (no-spin timeout)",
       cmd_test_xtimer_mutex_lock_timeout_long_locked, },
     { "mutex_timeout_long_locked_low",
       "lock low-prio-locked-mutex from high-prio-thread (no-spin timeout)",
