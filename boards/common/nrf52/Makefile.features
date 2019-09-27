@@ -9,4 +9,3 @@ endif
 
 # Various other features (if any)
 FEATURES_PROVIDED += ble_nimble
-FEATURES_PROVIDED += radio_nrfble
