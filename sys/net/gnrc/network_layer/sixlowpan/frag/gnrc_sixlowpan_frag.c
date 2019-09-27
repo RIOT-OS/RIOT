@@ -21,12 +21,11 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/sixlowpan/frag.h"
+#include "net/gnrc/sixlowpan/frag/rb.h"
 #include "net/gnrc/sixlowpan/internal.h"
 #include "net/gnrc/netif.h"
 #include "net/sixlowpan.h"
 #include "utlist.h"
-
-#include "rbuf.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"

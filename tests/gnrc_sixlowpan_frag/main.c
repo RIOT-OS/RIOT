@@ -23,7 +23,7 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/sixlowpan/frag.h"
-#include "rbuf.h"
+#include "net/gnrc/sixlowpan/frag/rb.h"
 #include "xtimer.h"
 
 #define TEST_NETIF_HDR_SRC      { 0xb3, 0x47, 0x60, 0x49, \
