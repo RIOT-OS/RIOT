@@ -78,6 +78,22 @@ typedef struct __attribute__((packed)) {
     uint8_t prefix[];       /**< contains the assigned prefix */
 } uhcp_push_t;
 
+#ifndef __cplusplus
+/**
+ * @brief struct for push packets with prefix member
+ * @details Auxiliary struct that contains a zero-length array as convenience
+ *          pointer to the prefix. Only for use in C, invalid in ISO-C++.
+ *
+ * @extends uhcp_push_t
+ */
+typedef struct __attribute__((packed)) {
+    uhcp_hdr_t hdr;         /**< member holding parent type */
+    uint8_t prefix_len;     /**< contains the prefix length of assigned
+                                 prefix */
+    uint8_t prefix[];       /**< contains the assigned prefix */
+} uhcp_push_impl_t;
+#endif
+
 /** @brief typedef for interface handle */
 typedef unsigned uhcp_iface_t;
 
