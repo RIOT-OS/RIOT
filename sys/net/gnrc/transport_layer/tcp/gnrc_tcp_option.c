@@ -36,7 +36,7 @@ int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
 
     /* Parse options via tcp_hdr_opt_t */
     while (opt_left > 0) {
-        tcp_hdr_opt_t *option = (tcp_hdr_opt_t *) opt_ptr;
+        tcp_hdr_opt_impl_t *option = (tcp_hdr_opt_impl_t *) opt_ptr;
 
         /* Examine current option */
         switch (option->kind) {
