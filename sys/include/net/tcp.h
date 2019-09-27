@@ -76,6 +76,20 @@ typedef struct __attribute__((packed)) {
     uint8_t value[];  /**< TCP options "Value" field */
 } tcp_hdr_opt_t;
 
+#ifndef __cplusplus
+/**
+ * @brief   TCP option field helper structure with value pointer
+ * @extends tcp_hdr_opt_t
+ * @details Auxiliary struct that contains a zero-length array as convenience
+ *          pointer to the value. Only for use in C, invalid in ISO-C++.
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t kind;     /**< TCP options "Kind" field */
+    uint8_t length;   /**< TCP options "Length" field */
+    uint8_t value[];  /**< TCP options "Value" field */
+} tcp_hdr_opt_impl_t;
+#endif
+
 /**
  * @brief   Print the given TCP header to STDOUT
  *
