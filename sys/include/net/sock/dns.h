@@ -46,6 +46,24 @@ typedef struct {
     uint8_t payload[];  /**< !!             */
 } sock_dns_hdr_t;
 
+#ifndef __cplusplus
+/**
+ * @brief   DNS internal structure with payload
+ * @extends sock_dns_hdr_t
+ * @details Auxiliary struct that contains a zero-length array as convenience
+ *          pointer to the payload. Only for use in C, invalid in ISO-C++.
+ */
+typedef struct {
+    uint16_t id;        /**< read           */
+    uint16_t flags;     /**< DNS            */
+    uint16_t qdcount;   /**< RFC            */
+    uint16_t ancount;   /**< for            */
+    uint16_t nscount;   /**< detailed       */
+    uint16_t arcount;   /**< explanations   */
+    uint8_t  payload[]; /**< !!             */
+} sock_dns_hdr_impl_t;
+#endif
+
 /**
  * @name DNS defines
  * @{
