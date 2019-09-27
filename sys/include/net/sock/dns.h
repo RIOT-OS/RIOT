@@ -34,7 +34,9 @@ extern "C" {
 #endif
 
 /**
- * @brief DNS internal structure
+ * @brief DNS internal structure without payload
+ *
+ * @see   sock_dns_hdr_impl_t
  */
 typedef struct {
     uint16_t id;        /**< read           */
@@ -42,8 +44,7 @@ typedef struct {
     uint16_t qdcount;   /**< RFC            */
     uint16_t ancount;   /**< for            */
     uint16_t nscount;   /**< detailed       */
-    uint16_t arcount;   /**< explanations   */
-    uint8_t payload[];  /**< !!             */
+    uint16_t arcount;   /**< explanations!! */
 } sock_dns_hdr_t;
 
 #ifndef __cplusplus
