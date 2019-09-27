@@ -252,7 +252,7 @@ static size_t _6lo_frag_size(gnrc_pktsnip_t *pkt, size_t offset, uint8_t *data)
 static uint16_t _6lo_sfr_datagram_size(gnrc_pktsnip_t *pkt, size_t offset)
 {
     /* offset doubles as datagram size in RFRAG header when sequence number is 0
-     * see https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-08#section-5.1 */
+     * see https://tools.ietf.org/html/rfc8931#section-5.1 */
     return (offset == 0) ? sixlowpan_sfr_rfrag_get_offset(pkt->data) : 0;
 }
 
@@ -264,8 +264,25 @@ static uint8_t *_6lo_sfr_payload(gnrc_pktsnip_t *pkt)
 static size_t _6lo_sfr_frag_size(gnrc_pktsnip_t *pkt)
 {
     /* TODO: if necessary check MAC layer here,
-     * see https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-08#section-5.1 */
+     * see https://tools.ietf.org/html/rfc8931#section-5.1 */
     return sixlowpan_sfr_rfrag_get_frag_size(pkt->data);
+}
+
+static gnrc_pktsnip_t *_mark_frag_hdr(gnrc_pktsnip_t *pkt)
+{
+    if (IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC)) {
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) &&
+            sixlowpan_sfr_rfrag_is(pkt->data)) {
+            return gnrc_pktbuf_mark(pkt, sizeof(sixlowpan_sfr_rfrag_t),
+                                    GNRC_NETTYPE_SIXLOWPAN);
+        }
+        else if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG) &&
+                 sixlowpan_frag_is(pkt->data)) {
+            return gnrc_pktbuf_mark(pkt, sizeof(sixlowpan_frag_t),
+                                    GNRC_NETTYPE_SIXLOWPAN);
+        }
+    }
+    return NULL;
 }
 
 static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
@@ -294,7 +311,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
     else if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) &&
              sixlowpan_sfr_rfrag_is(pkt->data)) {
-        sixlowpan_sfr_rfrag_t *rfrag = pkt->data;;
+        sixlowpan_sfr_rfrag_t *rfrag = pkt->data;
 
         data = _6lo_sfr_payload(pkt);
         frag_size = _6lo_sfr_frag_size(pkt);
@@ -354,6 +371,9 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         return RBUF_ADD_ERROR;
     }
     entry.rbuf = &rbuf[res];
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+    offset += entry.rbuf->offset_diff;
+#endif  /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
     if ((offset + frag_size) > entry.super->datagram_size) {
         DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
         gnrc_pktbuf_release(entry.rbuf->pkt);
@@ -379,11 +399,11 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         DEBUG("6lo rbuf: add fragment data\n");
         entry.super->current_size += (uint16_t)frag_size;
         if (offset == 0) {
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-            if (sixlowpan_iphc_is(data)) {
+            if (IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC) &&
+                sixlowpan_iphc_is(data)) {
                 DEBUG("6lo rbuf: detected IPHC header.\n");
-                gnrc_pktsnip_t *frag_hdr = gnrc_pktbuf_mark(pkt,
-                        sizeof(sixlowpan_frag_t), GNRC_NETTYPE_SIXLOWPAN);
+                gnrc_pktsnip_t *frag_hdr = _mark_frag_hdr(pkt);
+
                 if (frag_hdr == NULL) {
                     DEBUG("6lo rbuf: unable to mark fragment header. "
                           "aborting reassembly.\n");
@@ -403,9 +423,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                     return res;
                 }
             }
-            else
-#endif
-            if (data[0] == SIXLOWPAN_UNCOMP) {
+            else if (data[0] == SIXLOWPAN_UNCOMP) {
                 DEBUG("6lo rbuf: detected uncompressed datagram\n");
                 data++;
                 if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD) &&
@@ -429,12 +447,17 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                         return _forward_uncomp(pkt, rbuf, vrbe, page);
                     }
                 }
+                else if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) &&
+                         sixlowpan_sfr_rfrag_is(pkt->data)) {
+                    entry.super->datagram_size--;
+                }
             }
         }
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD)) {
-            /* all cases to try forwarding with minfwd above failed so just do
-             * normal reassembly. For the `minfwd` case however, we need to
-             * resize `entry.rbuf->pkt`, since we kept the packet allocation
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD) ||
+            IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)) {
+            /* all cases to try forwarding with minfwd or SFR above failed so
+             * just do normal reassembly. For the `minfwd` case however, we need
+             * to resize `entry.rbuf->pkt`, since we kept the packet allocation
              * with fragment forwarding as minimal as possible in
              * `_rbuf_get()` */
             res = _rbuf_resize_for_reassembly(entry.rbuf);
@@ -575,8 +598,14 @@ static int _rbuf_get(const void *src, size_t src_len,
 
     for (unsigned int i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         /* check first if entry already available */
-        if ((rbuf[i].pkt != NULL) && (rbuf[i].super.datagram_size == size) &&
-            (rbuf[i].super.tag == tag) && (rbuf[i].super.src_len == src_len) &&
+        if ((rbuf[i].pkt != NULL) && (rbuf[i].super.tag == tag) &&
+            ((IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) &&
+              /* not all SFR fragments carry the datagram size, so make 0 a
+               * legal value to not compare datagram size */
+              ((size == 0) || (rbuf[i].super.datagram_size == size))) ||
+             (!IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) &&
+              (rbuf[i].super.datagram_size == size))) &&
+            (rbuf[i].super.src_len == src_len) &&
             (rbuf[i].super.dst_len == dst_len) &&
             (memcmp(rbuf[i].super.src, src, src_len) == 0) &&
             (memcmp(rbuf[i].super.dst, dst, dst_len) == 0)) {
@@ -689,6 +718,10 @@ static int _rbuf_get(const void *src, size_t src_len,
     res->super.dst_len = dst_len;
     res->super.tag = tag;
     res->super.current_size = 0;
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+    res->offset_diff = 0U;
+    memset(res->received, 0U, sizeof(res->received));
+#endif  /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
 
     DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
           gnrc_netif_addr_to_str(res->super.src, res->super.src_len,

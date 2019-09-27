@@ -23,6 +23,9 @@
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/frag.h"
 #include "net/gnrc/sixlowpan/frag/rb.h"
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+#include "net/gnrc/sixlowpan/frag/sfr.h"
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
 #include "net/gnrc/sixlowpan/iphc.h"
 #include "net/gnrc/netif.h"
 #include "net/sixlowpan.h"
@@ -114,11 +117,16 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
         DEBUG("6lo: Dispatch for sending\n");
         gnrc_sixlowpan_dispatch_send(pkt, NULL, page);
     }
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
+#if defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
     else if (orig_datagram_size <= SIXLOWPAN_FRAG_MAX_LEN) {
         DEBUG("6lo: Send fragmented (%u > %u)\n",
               (unsigned int)datagram_size, netif->sixlo.max_frag_size);
         gnrc_sixlowpan_frag_fb_t *fbuf;
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+        bool sfr = gnrc_sixlowpan_frag_sfr_netif(netif);
+#else   /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
+        bool sfr = false;
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
 
         fbuf = gnrc_sixlowpan_frag_fb_get();
         if (fbuf == NULL) {
@@ -136,9 +144,20 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
         fbuf->hint.fragsz = 0;
 #endif
 
-        gnrc_sixlowpan_frag_send(pkt, fbuf, page);
-    }
+        if (!sfr) {
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
+            gnrc_sixlowpan_frag_send(pkt, fbuf, page);
 #endif
+        }
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+        else {
+            fbuf->sfr.cur_seq = 0U;
+            fbuf->sfr.frags_sent = 0U;
+            gnrc_sixlowpan_frag_sfr_send(pkt, fbuf, page);
+        }
+#endif /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
+    }
+#endif /* defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
     else {
         (void)orig_datagram_size;
         DEBUG("6lo: packet too big (%u > %u)\n",
@@ -216,6 +235,13 @@ static void _receive(gnrc_pktsnip_t *pkt)
         return;
     }
 #endif
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+    else if (sixlowpan_sfr_is((sixlowpan_sfr_t *)dispatch)) {
+        DEBUG("6lo: received 6LoWPAN recoverable fragment\n");
+        gnrc_sixlowpan_frag_sfr_recv(pkt, NULL, 0);
+        return;
+    }
+#endif /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
     else if (sixlowpan_iphc_is(dispatch)) {
         DEBUG("6lo: received 6LoWPAN IPHC compressed datagram\n");
@@ -331,6 +357,32 @@ static void _send(gnrc_pktsnip_t *pkt)
     gnrc_sixlowpan_multiplex_by_size(pkt, datagram_size, netif, 0);
 }
 
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_FB
+static void _continue_fragmenting(gnrc_sixlowpan_frag_fb_t *fbuf)
+{
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+    if (fbuf->pkt == NULL) {
+        /* In case the timer fired before the entry was removed */
+        return;
+    }
+
+    gnrc_netif_t *netif = gnrc_netif_hdr_get_netif(fbuf->pkt->data);
+    assert(netif != NULL);
+    if (gnrc_sixlowpan_frag_sfr_netif(netif)) {
+        gnrc_sixlowpan_frag_sfr_send(NULL, fbuf, 0);
+        return;
+    }
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
+    gnrc_sixlowpan_frag_send(NULL, fbuf, 0);
+#else   /* MODULE_GNRC_SIXLOWPAN_FRAG */
+    (void)fbuf;
+    DEBUG("6lo: No fragmentation implementation available to sent\n");
+    assert(false);
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG */
+}
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_FB */
+
 static void *_event_loop(void *args)
 {
     msg_t msg, reply, msg_q[GNRC_SIXLOWPAN_MSG_QUEUE_SIZE];
@@ -345,6 +397,10 @@ static void *_event_loop(void *args)
 
     /* preinitialize ACK */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
+
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+    gnrc_sixlowpan_frag_sfr_init();
+#endif
 
     /* start event loop */
     while (1) {
@@ -371,18 +427,23 @@ static void *_event_loop(void *args)
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_FB
             case GNRC_SIXLOWPAN_FRAG_FB_SND_MSG:
                 DEBUG("6lo: send fragmented event received\n");
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
-                gnrc_sixlowpan_frag_send(NULL, msg.content.ptr, 0);
-#else   /* MODULE_GNRC_SIXLOWPAN_FRAG_FB */
-                DEBUG("6lo: No fragmentation implementation available to sent\n");
-                assert(false);
-#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_FB */
+                _continue_fragmenting(msg.content.ptr);
                 break;
-#endif
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_FB */
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_RB
             case GNRC_SIXLOWPAN_FRAG_RB_GC_MSG:
                 DEBUG("6lo: garbage collect reassembly buffer event received\n");
                 gnrc_sixlowpan_frag_rb_gc();
+                break;
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+            case GNRC_SIXLOWPAN_FRAG_SFR_ARQ_TIMEOUT_MSG:
+                DEBUG("6lo sfr: ARQ timeout received\n");
+                gnrc_sixlowpan_frag_sfr_arq_timeout(msg.content.ptr);
+                break;
+            case GNRC_SIXLOWPAN_FRAG_SFR_INTER_FRAG_GAP_MSG:
+                DEBUG("6lo sfr: sending next scheduled frame\n");
+                gnrc_sixlowpan_frag_sfr_inter_frame_gap();
                 break;
 #endif
 

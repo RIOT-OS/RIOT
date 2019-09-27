@@ -63,7 +63,11 @@ extern "C" {
  *          [gnrc_sixlowpan_frag_fb](@ref net_gnrc_sixlowpan_frag_fb) module
  */
 #ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_FB_SIZE
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_FB_SIZE         (4U)
+#else   /* defined(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
 #define CONFIG_GNRC_SIXLOWPAN_FRAG_FB_SIZE         (1U)
+#endif  /* defined(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
 #endif
 
 /**

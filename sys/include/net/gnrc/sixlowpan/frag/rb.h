@@ -25,6 +25,9 @@
 
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pkt.h"
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+#include "net/sixlowpan/sfr.h"
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
 
 #include "net/gnrc/sixlowpan/config.h"
 
@@ -96,6 +99,17 @@ typedef struct {
      * @brief   The reassembled packet in the packet buffer
      */
     gnrc_pktsnip_t *pkt;
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+    /**
+     * @brief   Bitmap for received fragments
+     *
+     * @note    Only available with module `gnrc_sixlowpan_frag_sfr` compiled
+     *          in.
+     */
+    BITFIELD(received, SIXLOWPAN_SFR_ACK_BITMAP_SIZE);
+    int8_t offset_diff;                         /**< offset change due to
+                                                 *   recompression */
+#endif /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
 } gnrc_sixlowpan_frag_rb_t;
 
 /**
