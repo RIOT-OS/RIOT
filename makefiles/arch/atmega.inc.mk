@@ -17,12 +17,6 @@ USEMODULE += atmega_common
 # export the peripheral drivers to be linked into the final binary
 USEMODULE += atmega_common_periph
 
-# Export the peripheral drivers to be linked into the final binary, for now
-# only atmega126rfr2 has periph drivers
-ifeq ($(CPU), atmega256rfr2)
-  USEMODULE += periph
-endif
-
 # the atmel port uses stdio_uart
 USEMODULE += stdio_uart
 

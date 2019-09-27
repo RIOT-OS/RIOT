@@ -1,9 +1,6 @@
 # tell the build system that the CPU depends on the atmega common files
 USEMODULE += atmega_common
 
-#include periph module
-USEMODULE += periph
-
 RAM_LEN = 16K
 ROM_LEN = 128K
 
