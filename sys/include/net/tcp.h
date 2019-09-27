@@ -68,12 +68,12 @@ typedef struct __attribute__((packed)) {
 } tcp_hdr_t;
 
 /**
- * @brief TCP option field helper structure
+ * @brief TCP option field helper structure without value pointer
+ * @see   tcp_hdr_opt_impl_t
  */
 typedef struct __attribute__((packed)) {
     uint8_t kind;     /**< TCP options "Kind" field */
     uint8_t length;   /**< TCP options "Length" field */
-    uint8_t value[];  /**< TCP options "Value" field */
 } tcp_hdr_opt_t;
 
 #ifndef __cplusplus
