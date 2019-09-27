@@ -42,8 +42,15 @@ enum {
 /**
  * @brief   Callback signature triggered by this module for each discovered
  *          advertising packet
+ *
+ * @param[in] type      type of advertising packet, e.g BLE_HCI_ADV_TYPE_ADV_IND
+ * @param[in] addr      advertising address of the source node
+ * @param[in] rssi      RSSI value for the received packet
+ * @param[in] ad        advertising data
+ * @param[in] ad_len    length of @p ad in bytes
  */
-typedef void(*nimble_scanner_cb)(const ble_addr_t *addr, int8_t rssi,
+typedef void(*nimble_scanner_cb)(uint8_t type,
+                                 const ble_addr_t *addr, int8_t rssi,
                                  const uint8_t *ad, size_t ad_len);
 
 /**

@@ -35,7 +35,7 @@ static int _on_scan_evt(struct ble_gap_event *event, void *arg)
 {
     /* only interested in the DISC event */
     if (event->type == BLE_GAP_EVENT_DISC) {
-        _disc_cb(&event->disc.addr, event->disc.rssi,
+        _disc_cb(event->disc.event_type, &event->disc.addr, event->disc.rssi,
                  event->disc.data, (size_t)event->disc.length_data);
     }
     else {
