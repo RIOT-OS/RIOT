@@ -120,23 +120,6 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *frag,
               size_t offset, unsigned page);
 
 /**
- * @brief   Checks timeouts and removes entries if necessary
- */
-void rbuf_gc(void);
-
-/**
- * @brief   Unsets a reassembly buffer entry (but does not free
- *          rbuf_t::super::pkt)
- *
- * This functions sets rbuf_t::super::pkt to NULL and removes all rbuf::ints.
- *
- * @param[in] rbuf  A reassembly buffer entry
- *
- * @internal
- */
-void rbuf_rm(gnrc_sixlowpan_rbuf_t *rbuf);
-
-/**
  * @brief   Checks if a reassembly buffer entry is unset
  *
  * @param[in] rbuf  A reassembly buffer entry
@@ -184,13 +167,21 @@ void gnrc_sixlowpan_frag_rbuf_gc(void);
 
 #if defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(DOXYGEN)
 /**
- * @brief   Removes an entry from the reassembly buffer
+ * @brief   Unsets a reassembly buffer entry (but does not free
+ *          rbuf_t::super::pkt)
  *
  * @pre `rbuf != NULL`
  *
+ * This functions sets rbuf_t::super::pkt to NULL and removes all rbuf::ints.
+ *
  * @param[in] rbuf  A reassembly buffer entry. Must not be NULL.
  */
-void gnrc_sixlowpan_frag_rbuf_remove(gnrc_sixlowpan_rbuf_t *rbuf);
+static inline void gnrc_sixlowpan_frag_rbuf_remove(gnrc_sixlowpan_rbuf_t *rbuf)
+{
+    assert(rbuf != NULL);
+    gnrc_sixlowpan_frag_rbuf_base_rm(&rbuf->super);
+    rbuf->pkt = NULL;
+}
 
 /**
  * @brief   Checks if a reassembly buffer entry is complete and dispatches it

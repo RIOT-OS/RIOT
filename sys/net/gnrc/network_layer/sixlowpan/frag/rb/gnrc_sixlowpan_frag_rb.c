@@ -140,7 +140,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                 SIXLOWPAN_FRAG_1_DISP)) && (offset == 0)) ||
            ((((frag->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) ==
                 SIXLOWPAN_FRAG_N_DISP)) && (offset == (frag->offset * 8U))));
-    rbuf_gc();
+    gnrc_sixlowpan_frag_rbuf_gc();
     entry = _rbuf_get(gnrc_netif_hdr_get_src_addr(netif_hdr), netif_hdr->src_l2addr_len,
                       gnrc_netif_hdr_get_dst_addr(netif_hdr), netif_hdr->dst_l2addr_len,
                       byteorder_ntohs(frag->disp_size) & SIXLOWPAN_FRAG_SIZE_MASK,
@@ -168,7 +168,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
         gnrc_pktbuf_release(entry->pkt);
         gnrc_pktbuf_release(pkt);
-        rbuf_rm(entry);
+        gnrc_sixlowpan_frag_rbuf_remove(entry);
         return RBUF_ADD_ERROR;
     }
 
@@ -176,7 +176,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         case RBUF_ADD_REPEAT:
             DEBUG("6lo rfrag: overlapping intervals, discarding datagram\n");
             gnrc_pktbuf_release(entry->pkt);
-            rbuf_rm(entry);
+            gnrc_sixlowpan_frag_rbuf_remove(entry);
             return RBUF_ADD_REPEAT;
         case RBUF_ADD_DUPLICATE:
             gnrc_pktbuf_release(pkt);
@@ -196,7 +196,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                 if (frag_hdr == NULL) {
                     gnrc_pktbuf_release(entry->pkt);
                     gnrc_pktbuf_release(pkt);
-                    rbuf_rm(entry);
+                    gnrc_sixlowpan_frag_rbuf_remove(entry);
                     return RBUF_ADD_ERROR;
                 }
                 gnrc_sixlowpan_iphc_recv(pkt, entry, 0);
@@ -235,12 +235,6 @@ static gnrc_sixlowpan_rbuf_int_t *_rbuf_int_get_free(void)
     return NULL;
 }
 
-void rbuf_rm(gnrc_sixlowpan_rbuf_t *entry)
-{
-    gnrc_sixlowpan_frag_rbuf_base_rm(&entry->super);
-    entry->pkt = NULL;
-}
-
 static bool _rbuf_update_ints(gnrc_sixlowpan_rbuf_base_t *entry,
                               uint16_t offset, size_t frag_size)
 {
@@ -271,7 +265,7 @@ static bool _rbuf_update_ints(gnrc_sixlowpan_rbuf_base_t *entry,
     return true;
 }
 
-void rbuf_gc(void)
+void gnrc_sixlowpan_frag_rbuf_gc(void)
 {
     uint32_t now_usec = xtimer_now_usec();
     unsigned int i;
@@ -291,7 +285,7 @@ void rbuf_gc(void)
                   (unsigned)rbuf[i].super.datagram_size, rbuf[i].super.tag);
 
             gnrc_pktbuf_release(rbuf[i].pkt);
-            rbuf_rm(&(rbuf[i]));
+            gnrc_sixlowpan_frag_rbuf_remove(&(rbuf[i]));
         }
     }
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
@@ -357,7 +351,7 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
             GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
             DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
             gnrc_pktbuf_release(oldest->pkt);
-            rbuf_rm(oldest);
+            gnrc_sixlowpan_frag_rbuf_remove(oldest);
             res = oldest;
 #if GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE && \
     defined(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
@@ -446,17 +440,6 @@ void gnrc_sixlowpan_frag_rbuf_base_rm(gnrc_sixlowpan_rbuf_base_t *entry)
         entry->ints = next;
     }
     entry->datagram_size = 0;
-}
-
-void gnrc_sixlowpan_frag_rbuf_gc(void)
-{
-    rbuf_gc();
-}
-
-void gnrc_sixlowpan_frag_rbuf_remove(gnrc_sixlowpan_rbuf_t *rbuf)
-{
-    assert(rbuf != NULL);
-    rbuf_rm(rbuf);
 }
 
 void gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(gnrc_sixlowpan_rbuf_t *rbuf,

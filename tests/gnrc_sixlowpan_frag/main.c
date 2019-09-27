@@ -498,7 +498,7 @@ static void test_rbuf_rm(void)
     TEST_ASSERT_NOT_NULL(entry);
     /* intentionally discarding const qualifier since we enter rbuf's internal
      * context again */
-    rbuf_rm((gnrc_sixlowpan_rbuf_t *)entry);
+    gnrc_sixlowpan_frag_rbuf_remove((gnrc_sixlowpan_rbuf_t *)entry);
     /* reassembly buffer is now empty */
     TEST_ASSERT_NULL(_first_non_empty_rbuf());
     _check_pktbuf(NULL);
@@ -517,7 +517,7 @@ static void test_rbuf_gc__manually(void)
     TEST_ASSERT_NOT_NULL(entry);
     /* set arrival RBUF_TIMEOUT into the past */
     entry->super.arrival -= RBUF_TIMEOUT;
-    rbuf_gc();
+    gnrc_sixlowpan_frag_rbuf_gc();
     /* reassembly buffer is now empty */
     TEST_ASSERT_NULL(_first_non_empty_rbuf());
     _check_pktbuf(NULL);
@@ -540,7 +540,7 @@ static void test_rbuf_gc__timed(void)
             "Waiting for GC timer timed out"
         );
     TEST_ASSERT_EQUAL_INT(GNRC_SIXLOWPAN_MSG_FRAG_GC_RBUF, msg.type);
-    rbuf_gc();
+    gnrc_sixlowpan_frag_rbuf_gc();
     /* reassembly buffer is now empty */
     TEST_ASSERT_NULL(_first_non_empty_rbuf());
     _check_pktbuf(NULL);
