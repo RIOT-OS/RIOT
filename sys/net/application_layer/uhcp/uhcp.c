@@ -79,7 +79,7 @@ void uhcp_handle_req(uhcp_req_t *req, uint8_t *src, uint16_t port, uhcp_iface_t 
     size_t prefix_bytes = (_prefix_len + 7)>>3;
     uint8_t packet[sizeof(uhcp_push_t) + prefix_bytes];
 
-    uhcp_push_t *reply = (uhcp_push_t *)packet;
+    uhcp_push_impl_t *reply = (uhcp_push_impl_t *)packet;
     uhcp_hdr_set(&reply->hdr, UHCP_PUSH);
 
     reply->prefix_len = _prefix_len;
@@ -101,7 +101,7 @@ void uhcp_handle_push(uhcp_push_t *req, uint8_t *src, uint16_t port, uhcp_iface_
     uint8_t prefix[16];
     size_t prefix_bytes = (req->prefix_len + 7)>>3;
     memset(prefix + 16 - prefix_bytes, '\0', 16 - prefix_bytes);
-    memcpy(prefix, req->prefix, prefix_bytes);
+    memcpy(prefix, ((uhcp_push_impl_t *)req)->prefix, prefix_bytes);
 
     inet_ntop(AF_INET6, prefix, prefix_str, INET6_ADDRSTRLEN);
 
