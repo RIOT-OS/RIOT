@@ -24,7 +24,7 @@
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/ctx.h"
-#include "net/gnrc/sixlowpan/frag.h"
+#include "net/gnrc/sixlowpan/frag/rb.h"
 #include "net/gnrc/sixlowpan/internal.h"
 #include "net/sixlowpan.h"
 #include "utlist.h"
