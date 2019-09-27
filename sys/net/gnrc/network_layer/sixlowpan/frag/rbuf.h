@@ -26,7 +26,7 @@
 #include "net/gnrc/pkt.h"
 
 #include "net/gnrc/sixlowpan/config.h"
-#include "net/gnrc/sixlowpan/frag.h"
+#include "net/gnrc/sixlowpan/frag/rb.h"
 #ifdef __cplusplus
 
 extern "C" {

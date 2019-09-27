@@ -35,7 +35,6 @@
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
 #include "net/gnrc/sixlowpan/frag/hint.h"
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
-#include "net/gnrc/sixlowpan/frag/rb.h"
 #include "net/gnrc/sixlowpan/internal.h"
 #include "net/ieee802154.h"
 #include "net/sixlowpan.h"

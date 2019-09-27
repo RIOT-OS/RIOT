@@ -20,6 +20,7 @@
 #include "net/gnrc/ipv6/hdr.h"
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/frag.h"
+#include "net/gnrc/sixlowpan/frag/rb.h"
 #include "net/gnrc/sixlowpan/iphc.h"
 #include "net/gnrc/netif.h"
 #include "net/sixlowpan.h"

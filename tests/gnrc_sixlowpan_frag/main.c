@@ -22,6 +22,7 @@
 #include "embUnit.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netreg.h"
+#include "net/gnrc/sixlowpan/frag.h"
 #include "rbuf.h"
 #include "xtimer.h"
 
