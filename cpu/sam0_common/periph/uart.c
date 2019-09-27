@@ -89,9 +89,9 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     /* calculate and set baudrate */
-    uint32_t baud = ((((uint32_t)CLOCK_CORECLOCK * 10) / baudrate) / 16);
-    dev(uart)->BAUD.FRAC.FP = (baud % 10);
-    dev(uart)->BAUD.FRAC.BAUD = (baud / 10);
+    uint32_t baud = ((((uint32_t)CLOCK_CORECLOCK * 8) / baudrate) / 16);
+    dev(uart)->BAUD.FRAC.FP = (baud % 8);
+    dev(uart)->BAUD.FRAC.BAUD = (baud / 8);
 
     /* enable transmitter, and configure 8N1 mode */
     dev(uart)->CTRLB.reg = SERCOM_USART_CTRLB_TXEN;
