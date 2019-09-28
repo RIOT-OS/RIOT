@@ -35,19 +35,19 @@ extern "C" {
  * @{
  */
 #define HAVE_GPIO_T
-typedef uint8_t gpio_t;
+typedef uint16_t gpio_t;
 /** @} */
 #endif
 
 /**
  * @brief   Definition of a fitting UNDEF value
  */
-#define GPIO_UNDEF          (0xff)
+#define GPIO_UNDEF          (0xffff)
 
 /**
  * @brief   Define a CPU specific GPIO pin generator macro
  */
-#define GPIO_PIN(x, y)          ((x << 4) | y)
+#define GPIO_PIN(x, y)      ((x << 4) | y)
 
 /**
  * @brief   Override the GPIO flanks
