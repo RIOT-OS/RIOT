@@ -67,7 +67,7 @@ void gpio_init_ports(void) {
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 }
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_cpu_init(gpio_t pin, gpio_mode_t mode)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -98,7 +98,7 @@ int gpio_init_mux(unsigned pin, unsigned mux)
     return 0;
 }
 
-int gpio_read(gpio_t pin)
+int gpio_cpu_read(gpio_t pin)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -106,7 +106,7 @@ int gpio_read(gpio_t pin)
     return (_port->PIN & (1 << _pin)) != 0;
 }
 
-void gpio_set(gpio_t pin)
+void gpio_cpu_set(gpio_t pin)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -114,7 +114,7 @@ void gpio_set(gpio_t pin)
     _port->SET = 1 << _pin;
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_cpu_clear(gpio_t pin)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -122,23 +122,23 @@ void gpio_clear(gpio_t pin)
     _port->CLR = 1 << _pin;
 }
 
-void gpio_toggle(gpio_t dev)
+void gpio_cpu_toggle(gpio_t dev)
 {
-    if (gpio_read(dev)) {
-        gpio_clear(dev);
+    if (gpio_cpu_read(dev)) {
+        gpio_cpu_clear(dev);
     }
     else {
-        gpio_set(dev);
+        gpio_cpu_set(dev);
     }
 }
 
-void gpio_write(gpio_t dev, int value)
+void gpio_cpu_write(gpio_t dev, int value)
 {
     if (value) {
-        gpio_set(dev);
+        gpio_cpu_set(dev);
     }
     else {
-        gpio_clear(dev);
+        gpio_cpu_clear(dev);
     }
 }
 
@@ -188,17 +188,17 @@ static void _gpio_configure(gpio_t pin, unsigned rising, unsigned falling)
     irq_restore(state);
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_cpu_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                      gpio_cb_t cb, void *arg)
 {
     (void)mode;
 
-    DEBUG("gpio_init_int(): pin %u\n", pin);
+    DEBUG("gpio_cpu_init_int(): pin %u\n", pin);
     int isr_map_entry;
 
     /* check if interrupt is possible for this pin */
     if ((isr_map_entry = _isr_map_entry(pin)) == -1) {
-        DEBUG("gpio_init_int(): pin %u cannot be used to generate interrupts.\n", pin);
+        DEBUG("gpio_cpu_init_int(): pin %u cannot be used to generate interrupts.\n", pin);
         return -1;
     }
 
@@ -208,7 +208,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     if (_state_index == 0xff) {
         _state_index = bf_get_unset(_gpio_config_bitfield, GPIO_NUM_ISR);
         _gpio_isr_map[isr_map_entry] = _state_index;
-        DEBUG("gpio_init_int(): pin has state_index=%i isr_map_entry=%i\n", _state_index, isr_map_entry);
+        DEBUG("gpio_cpu_init_int(): pin has state_index=%i isr_map_entry=%i\n", _state_index, isr_map_entry);
     }
 
     if (_state_index == 0xff) {
@@ -247,13 +247,13 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_cpu_irq_enable(gpio_t pin)
 {
     int isr_map_entry =_isr_map_entry(pin);
     int _state_index = _gpio_isr_map[isr_map_entry];
 
     if (_state_index == 0xff) {
-        DEBUG("gpio_irq_enable(): trying to enable unconfigured pin.\n");
+        DEBUG("gpio_cpu_irq_enable(): trying to enable unconfigured pin.\n");
         return;
     }
 
@@ -262,7 +262,7 @@ void gpio_irq_enable(gpio_t pin)
             bf_isset(_gpio_falling, _state_index));
 }
 
-void gpio_irq_disable(gpio_t dev)
+void gpio_cpu_irq_disable(gpio_t dev)
 {
     _gpio_configure(dev, 0, 0);
 }

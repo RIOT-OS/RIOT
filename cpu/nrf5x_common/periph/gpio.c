@@ -47,7 +47,7 @@
 /**
  * @brief   Index of next interrupt in GPIOTE channel list.
  *
- * The index is incremented at the end of each call to gpio_init_int.
+ * The index is incremented at the end of each call to gpio_cpu_init_int.
  * The index cannot be greater or equal than GPIOTE_CHAN_NUMOF.
  */
 static uint8_t _gpiote_next_index = 0;
@@ -91,7 +91,7 @@ static inline int pin_num(gpio_t pin)
 #endif
 }
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_cpu_init(gpio_t pin, gpio_mode_t mode)
 {
     switch (mode) {
         case GPIO_IN:
@@ -110,7 +110,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_read(gpio_t pin)
+int gpio_cpu_read(gpio_t pin)
 {
     if (port(pin)->DIR & (1 << pin_num(pin))) {
         return (port(pin)->OUT & (1 << pin_num(pin))) ? 1 : 0;
@@ -120,22 +120,22 @@ int gpio_read(gpio_t pin)
     }
 }
 
-void gpio_set(gpio_t pin)
+void gpio_cpu_set(gpio_t pin)
 {
     port(pin)->OUTSET = (1 << pin_num(pin));
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_cpu_clear(gpio_t pin)
 {
     port(pin)->OUTCLR = (1 << pin_num(pin));
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_cpu_toggle(gpio_t pin)
 {
     port(pin)->OUT ^= (1 << pin_num(pin));
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_cpu_write(gpio_t pin, int value)
 {
     if (value) {
         port(pin)->OUTSET = (1 << pin_num(pin));
@@ -146,8 +146,8 @@ void gpio_write(gpio_t pin, int value)
 }
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_cpu_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                      gpio_cb_t cb, void *arg)
 {
     uint8_t _pin_index = 0xff;
     /* Looking for already known pin in exti table */
@@ -172,7 +172,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     exti_chan[_pin_index].cb = cb;
     exti_chan[_pin_index].arg = arg;
     /* configure pin as input */
-    gpio_init(pin, mode);
+    gpio_cpu_init(pin, mode);
     /* set interrupt priority and enable global GPIOTE interrupt */
     NVIC_EnableIRQ(GPIOTE_IRQn);
     /* configure the GPIOTE channel: set even mode, pin and active flank */
@@ -188,7 +188,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_cpu_irq_enable(gpio_t pin)
 {
     for (unsigned int i = 0; i < _gpiote_next_index; i++) {
         if (_exti_pins[i] == pin) {
@@ -199,7 +199,7 @@ void gpio_irq_enable(gpio_t pin)
     }
 }
 
-void gpio_irq_disable(gpio_t pin)
+void gpio_cpu_irq_disable(gpio_t pin)
 {
     for (unsigned int i = 0; i < _gpiote_next_index; i++) {
         if (_exti_pins[i] == pin) {

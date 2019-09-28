@@ -73,7 +73,7 @@ static inline int _pin_num(gpio_t pin)
     return (pin & 0x0f);
 }
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_cpu_init(gpio_t pin, gpio_mode_t mode)
 {
     GPIO_TypeDef *port = _port(pin);
     int pin_num = _pin_num(pin);
@@ -127,7 +127,7 @@ void gpio_init_af(gpio_t pin, gpio_af_t af)
 void gpio_init_analog(gpio_t pin)
 {
     /* enable clock, needed as this function can be used without calling
-     * gpio_init first */
+     * gpio_cpu_init first */
 #if defined(CPU_FAM_STM32F0) || defined (CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L1)
     periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
 #elif defined (CPU_FAM_STM32L0)
@@ -141,52 +141,52 @@ void gpio_init_analog(gpio_t pin)
     _port(pin)->MODER |= (0x3 << (2 * _pin_num(pin)));
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_cpu_irq_enable(gpio_t pin)
 {
     EXTI->IMR |= (1 << _pin_num(pin));
 }
 
-void gpio_irq_disable(gpio_t pin)
+void gpio_cpu_irq_disable(gpio_t pin)
 {
     EXTI->IMR &= ~(1 << _pin_num(pin));
 }
 
-int gpio_read(gpio_t pin)
+int gpio_cpu_read(gpio_t pin)
 {
     return (_port(pin)->IDR & (1 << _pin_num(pin)));
 }
 
-void gpio_set(gpio_t pin)
+void gpio_cpu_set(gpio_t pin)
 {
     _port(pin)->BSRR = (1 << _pin_num(pin));
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_cpu_clear(gpio_t pin)
 {
     _port(pin)->BSRR = (1 << (_pin_num(pin) + 16));
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_cpu_toggle(gpio_t pin)
 {
-    if (gpio_read(pin)) {
-        gpio_clear(pin);
+    if (gpio_cpu_read(pin)) {
+        gpio_cpu_clear(pin);
     } else {
-        gpio_set(pin);
+        gpio_cpu_set(pin);
     }
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_cpu_write(gpio_t pin, int value)
 {
     if (value) {
-        gpio_set(pin);
+        gpio_cpu_set(pin);
     } else {
-        gpio_clear(pin);
+        gpio_cpu_clear(pin);
     }
 }
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_cpu_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                      gpio_cb_t cb, void *arg)
 {
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
@@ -199,7 +199,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     periph_clk_en(APB2, RCC_APB2ENR_SYSCFGEN);
 
     /* initialize pin as input */
-    gpio_init(pin, mode);
+    gpio_cpu_init(pin, mode);
 
     /* enable global pin interrupt */
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)

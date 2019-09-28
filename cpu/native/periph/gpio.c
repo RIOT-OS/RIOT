@@ -19,7 +19,7 @@
 
 #include "periph/gpio.h"
 
-int gpio_init(gpio_t pin, gpio_mode_t mode) {
+int gpio_cpu_init(gpio_t pin, gpio_mode_t mode) {
   (void) pin;
   (void) mode;
 
@@ -29,25 +29,25 @@ int gpio_init(gpio_t pin, gpio_mode_t mode) {
     return -1;
 }
 
-int gpio_read(gpio_t pin) {
+int gpio_cpu_read(gpio_t pin) {
   (void) pin;
 
   return 0;
 }
 
-void gpio_set(gpio_t pin) {
+void gpio_cpu_set(gpio_t pin) {
   (void) pin;
 }
 
-void gpio_clear(gpio_t pin) {
+void gpio_cpu_clear(gpio_t pin) {
   (void) pin;
 }
 
-void gpio_toggle(gpio_t pin) {
+void gpio_cpu_toggle(gpio_t pin) {
   (void) pin;
 }
 
-void gpio_write(gpio_t pin, int value) {
+void gpio_cpu_write(gpio_t pin, int value) {
   (void) pin;
   (void) value;
 }

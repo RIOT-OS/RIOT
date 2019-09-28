@@ -116,8 +116,8 @@ extern "C" {
 #define SPI0_SCK_GPIO    GPIO14     /**< HSPI / SPI_DEV(0) SCK pin */
 
 #ifndef SPI0_CS0_GPIO
-#define SPI0_CS0_GPIO    GPIO15  /**< HSPI / SPI_DEV(0) CS default pin, only used when cs
-                                      parameter in spi_acquire is GPIO_UNDEF */
+#define SPI0_CS0_GPIO    GPIO15     /**< HSPI / SPI_DEV(0) CS default pin, only used when cs
+                                         parameter in spi_acquire is GPIO_UNDEF */
 #endif
 #endif /* defined(MODULE_PERIPH_SPI) || defined(DOXYGEN) */
 /** @} */

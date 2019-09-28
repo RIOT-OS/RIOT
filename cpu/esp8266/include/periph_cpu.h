@@ -45,16 +45,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Definition of a fitting UNDEF value
- */
-#define GPIO_UNDEF (GPIO_ID_NONE)
-
-/**
- * @brief   Define CPU specific GPIO pin generator macro
- */
-#define GPIO_PIN(x, y)  ((x << 4) | y)
-
-/**
  * @brief   Define CPU specific number of GPIO pins
  */
 #define GPIO_PIN_NUMOF  GPIO_PIN_COUNT+1

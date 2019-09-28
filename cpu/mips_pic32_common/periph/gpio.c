@@ -120,7 +120,7 @@ static inline int check_valid_port(uint8_t port)
         && base_address[port].gpio != NULL;
 }
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_cpu_init(gpio_t pin, gpio_mode_t mode)
 {
     uint8_t port = GPIO_PORT(pin);
     uint32_t pin_no = GPIO_PIN_NO(pin);
@@ -172,38 +172,38 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_read(gpio_t pin)
+int gpio_cpu_read(gpio_t pin)
 {
     assert(check_valid_port(GPIO_PORT(pin)));
 
     return PORTx(GPIO_PORT(pin)) & GPIO_PIN_NO(pin);
 }
 
-void gpio_set(gpio_t pin)
+void gpio_cpu_set(gpio_t pin)
 {
     assert(check_valid_port(GPIO_PORT(pin)));
 
     LATxSET(GPIO_PORT(pin)) = GPIO_PIN_NO(pin);
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_cpu_clear(gpio_t pin)
 {
     assert(check_valid_port(GPIO_PORT(pin)));
 
     LATxCLR(GPIO_PORT(pin)) = GPIO_PIN_NO(pin);
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_cpu_toggle(gpio_t pin)
 {
     assert(check_valid_port(GPIO_PORT(pin)));
 
     LATxINV(GPIO_PORT(pin)) = GPIO_PIN_NO(pin);
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_cpu_write(gpio_t pin, int value)
 {
     if (value)
-        gpio_set(pin);
+        gpio_cpu_set(pin);
     else
-        gpio_clear(pin);
+        gpio_cpu_clear(pin);
 }
