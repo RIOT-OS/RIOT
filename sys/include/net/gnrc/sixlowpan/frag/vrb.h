@@ -36,27 +36,20 @@ extern "C" {
 
 /**
  * @brief   Representation of the virtual reassembly buffer entry
+ *
+ * gnrc_sixlowpan_frag_rb_base_t::dst of gnrc_sixlowpan_frag_vrb_t::super
+ * becomes the next hop destination address.
  */
 typedef struct {
     gnrc_sixlowpan_frag_rb_base_t super;    /**< base type */
-
     /**
-     * @brief   Link-layer destination address to which the fragments are
-     *          supposed to be forwarded to
-     */
-    uint8_t out_dst[IEEE802154_LONG_ADDRESS_LEN];
-    /**
-     * @brief   Outgoing interface to gnrc_sixlowpan_frag_vrb_t::out_dst
+     * @brief   Outgoing interface to gnrc_sixlowpan_frag_rb_base_t::dst
      */
     gnrc_netif_t *out_netif;
     /**
-     * @brief   Outgoing tag to gnrc_sixlowpan_frag_vrb_t::out_dst
+     * @brief   Outgoing tag to gnrc_sixlowpan_frag_rb_base_t::dst
      */
     uint16_t out_tag;
-    /**
-     * @brief   Length of gnrc_sixlowpan_frag_vrb_t::out_dst
-     */
-    uint8_t out_dst_len;
 } gnrc_sixlowpan_frag_vrb_t;
 
 /**

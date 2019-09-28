@@ -80,16 +80,13 @@ static void test_vrb_add__success(void)
     TEST_ASSERT_EQUAL_INT(_base.src_len, res->super.src_len);
     TEST_ASSERT_MESSAGE(memcmp(_base.src, res->super.src, TEST_SRC_LEN) == 0,
                         "TEST_SRC != res->super.src");
-    TEST_ASSERT_EQUAL_INT(_base.dst_len, res->super.src_len);
-    TEST_ASSERT_MESSAGE(memcmp(_base.dst, res->super.dst, TEST_DST_LEN) == 0,
-                        "TEST_DST != res->super.dst");
     TEST_ASSERT_EQUAL_INT(_base.tag, res->super.tag);
     TEST_ASSERT_EQUAL_INT(_base.datagram_size, res->super.datagram_size);
     TEST_ASSERT_EQUAL_INT(_base.current_size, res->super.current_size);
     TEST_ASSERT_EQUAL_INT(_base.arrival, res->super.arrival);
     TEST_ASSERT((&_dummy_netif) == res->out_netif);
-    TEST_ASSERT_EQUAL_INT(sizeof(_out_dst), res->out_dst_len);
-    TEST_ASSERT_MESSAGE(memcmp(_out_dst, res->out_dst, sizeof(_out_dst)) == 0,
+    TEST_ASSERT_EQUAL_INT(sizeof(_out_dst), res->super.dst_len);
+    TEST_ASSERT_MESSAGE(memcmp(_out_dst, res->super.dst, sizeof(_out_dst)) == 0,
                         "TEST_DST != res->super.dst");
     TEST_ASSERT_EQUAL_INT(TEST_TAG_INITIAL, res->out_tag);
     TEST_ASSERT(TEST_TAG_INITIAL != tag);
