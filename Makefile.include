@@ -783,13 +783,11 @@ $(RIOTBUILD_CONFIG_HEADER_C): FORCE
 	$(Q)'$(RIOTTOOLS)/genconfigheader/genconfigheader.sh' $(CFLAGS_WITH_MACROS) \
 		| '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
 
-# Immediate evaluation but keep CLAGS_WITH_MACROS deferred
-_CFLAGS := $(CFLAGS)
-CFLAGS_WITH_MACROS = $(_CFLAGS)
+CFLAGS_WITH_MACROS += $(CFLAGS)
 CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
+# MODULE_NAME defines. Declared in 'makefiles/modules.inc.mk'
+CFLAGS_WITH_MACROS += $(EXTDEFINES)
 
-CFLAGS := $(patsubst -D%,,$(CFLAGS))
-CFLAGS := $(patsubst -U%,,$(CFLAGS))
 CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
 
 # include mcuboot support
