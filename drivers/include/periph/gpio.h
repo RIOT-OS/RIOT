@@ -133,6 +133,29 @@ typedef struct {
 } gpio_isr_ctx_t;
 #endif
 
+#ifndef DOXYGEN
+/**
+ * @name    Low-level versions of the GPIO functions
+ *
+ * These are for CPU implementation in `cpu/.../periph/gpio.c` and should not
+ * be called directly.
+ * @{
+ */
+int  gpio_cpu_init(gpio_t pin, gpio_mode_t mode);
+int  gpio_cpu_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                       gpio_cb_t cb, void *arg);
+void gpio_cpu_irq_enable(gpio_t pin);
+void gpio_cpu_irq_disable(gpio_t pin);
+int  gpio_cpu_read(gpio_t pin);
+void gpio_cpu_set(gpio_t pin);
+void gpio_cpu_clear(gpio_t pin);
+void gpio_cpu_toggle(gpio_t pin);
+void gpio_cpu_write(gpio_t pin, int value);
+/** @} */
+#endif /* DOXYGEN */
+
+#ifndef MODULE_EXTEND_GPIO
+
 /**
  * @brief   Initialize the given pin as general purpose input or output
  *
@@ -140,13 +163,18 @@ typedef struct {
  * The output pin's state **should** be untouched during the initialization.
  * This behavior can however **not be guaranteed** by every platform.
  *
+ * The CPU has to implement the corresponding `gpio_cpu_init` function.
+ *
  * @param[in] pin       pin to initialize
  * @param[in] mode      mode of the pin, see @c gpio_mode_t
  *
  * @return              0 on success
  * @return              -1 on error
  */
-int gpio_init(gpio_t pin, gpio_mode_t mode);
+static inline int gpio_init(gpio_t pin, gpio_mode_t mode)
+{
+    return gpio_cpu_init(pin, mode);
+}
 
 #if defined(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN)
 /**
@@ -156,6 +184,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode);
  * time the defined flank(s) are detected.
  *
  * The interrupt is activated automatically after the initialization.
+ *
+ * The CPU has to implement the corresponding `gpio_cpu_init_int` function.
  *
  * @note    You have to add the module `periph_gpio_irq` to your project to
  *          enable this function
@@ -169,69 +199,118 @@ int gpio_init(gpio_t pin, gpio_mode_t mode);
  * @return              0 on success
  * @return              -1 on error
  */
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg);
+static inline int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                                gpio_cb_t cb, void *arg)
+{
+    return gpio_cpu_init_int(pin, mode, flank, cb, arg);
+}
 
 /**
  * @brief   Enable pin interrupt if configured as interrupt source
+ *
+ * The CPU has to implement the corresponding `gpio_cpu_irq_enable` function.
  *
  * @note    You have to add the module `periph_gpio_irq` to your project to
  *          enable this function
  *
  * @param[in] pin       the pin to enable the interrupt for
  */
-void gpio_irq_enable(gpio_t pin);
+static inline void gpio_irq_enable(gpio_t pin)
+{
+    gpio_cpu_irq_enable(pin);
+}
 
 /**
  * @brief   Disable the pin interrupt if configured as interrupt source
+ *
+ * The CPU has to implement the corresponding `gpio_cpu_irq_disable` function.
  *
  * @note    You have to add the module `periph_gpio_irq` to your project to
  *          enable this function
  *
  * @param[in] pin       the pin to disable the interrupt for
  */
-void gpio_irq_disable(gpio_t pin);
+static inline void gpio_irq_disable(gpio_t pin)
+{
+    gpio_cpu_irq_disable(pin);
+}
 
 #endif /* defined(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN) */
 
 /**
  * @brief   Get the current value of the given pin
  *
+ * The CPU has to implement the corresponding `gpio_cpu_read` function.
+ *
  * @param[in] pin       the pin to read
  *
  * @return              0 when pin is LOW
  * @return              >0 for HIGH
  */
-int gpio_read(gpio_t pin);
+static inline int gpio_read(gpio_t pin)
+{
+    return gpio_cpu_read(pin);
+}
 
 /**
  * @brief   Set the given pin to HIGH
  *
+ * The CPU has to implement the corresponding `gpio_cpu_set` function.
+ *
  * @param[in] pin       the pin to set
  */
-void gpio_set(gpio_t pin);
+static inline void gpio_set(gpio_t pin)
+{
+    gpio_cpu_set(pin);
+}
 
 /**
  * @brief   Set the given pin to LOW
  *
+ * The CPU has to implement the corresponding `gpio_cpu_clear` function.
+ *
  * @param[in] pin       the pin to clear
  */
-void gpio_clear(gpio_t pin);
+static inline void gpio_clear(gpio_t pin)
+{
+    gpio_cpu_clear(pin);
+}
 
 /**
  * @brief   Toggle the value of the given pin
  *
+ * The CPU has to implement the corresponding `gpio_toggle` function.
+ *
  * @param[in] pin       the pin to toggle
  */
-void gpio_toggle(gpio_t pin);
+static inline void gpio_toggle(gpio_t pin)
+{
+    gpio_cpu_toggle(pin);
+}
 
 /**
  * @brief   Set the given pin to the given value
  *
+ * The CPU has to implement the corresponding `gpio_cpu_write` function.
+ *
  * @param[in] pin       the pin to set
  * @param[in] value     value to set the pin to, 0 for LOW, HIGH otherwise
  */
-void gpio_write(gpio_t pin, int value);
+static inline void gpio_write(gpio_t pin, int value)
+{
+    gpio_cpu_write(pin, value);
+}
+
+#else /* !MODULE_EXTEND_GPIO */
+
+/*
+ * If the GPIO extension API is used (module` extend_gpio` is enabled), only
+ * the extend/gpio.h file hase to be included here. The file has to be included
+ * after all the GPIO type and function prototypes definitions for the CPU.
+ */
+#include "extend/gpio.h"
+
+#endif /* !MODULE_EXTEND_GPIO */
 
 #ifdef __cplusplus
 }
