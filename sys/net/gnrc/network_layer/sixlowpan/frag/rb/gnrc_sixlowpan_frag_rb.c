@@ -44,12 +44,13 @@
 #ifndef RBUF_INT_SIZE
 /* same as ((int) ceil((double) N / D)) */
 #define DIV_CEIL(N, D) (((N) + (D) - 1) / (D))
-#define RBUF_INT_SIZE (DIV_CEIL(IPV6_MIN_MTU, GNRC_SIXLOWPAN_FRAG_SIZE) * RBUF_SIZE)
+#define RBUF_INT_SIZE (DIV_CEIL(IPV6_MIN_MTU, GNRC_SIXLOWPAN_FRAG_SIZE) * \
+                       GNRC_SIXLOWPAN_FRAG_RBUF_SIZE)
 #endif
 
 static gnrc_sixlowpan_rbuf_int_t rbuf_int[RBUF_INT_SIZE];
 
-static gnrc_sixlowpan_rbuf_t rbuf[RBUF_SIZE];
+static gnrc_sixlowpan_rbuf_t rbuf[GNRC_SIXLOWPAN_FRAG_RBUF_SIZE];
 
 static char l2addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
 
@@ -271,10 +272,11 @@ void gnrc_sixlowpan_frag_rbuf_gc(void)
     uint32_t now_usec = xtimer_now_usec();
     unsigned int i;
 
-    for (i = 0; i < RBUF_SIZE; i++) {
+    for (i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         /* since pkt occupies pktbuf, aggressivly collect garbage */
         if (!gnrc_sixlowpan_frag_rbuf_entry_empty(&rbuf[i]) &&
-              ((now_usec - rbuf[i].super.arrival) > RBUF_TIMEOUT)) {
+              ((now_usec - rbuf[i].super.arrival) >
+               GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
             DEBUG("6lo rfrag: entry (%s, ",
                   gnrc_netif_addr_to_str(rbuf[i].super.src,
                                          rbuf[i].super.src_len,
@@ -296,7 +298,8 @@ void gnrc_sixlowpan_frag_rbuf_gc(void)
 
 static inline void _set_rbuf_timeout(void)
 {
-    xtimer_set_msg(&_gc_timer, RBUF_TIMEOUT, &_gc_timer_msg, sched_active_pid);
+    xtimer_set_msg(&_gc_timer, GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US,
+                   &_gc_timer_msg, sched_active_pid);
 }
 
 static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
@@ -307,7 +310,7 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
     gnrc_sixlowpan_rbuf_t *res = NULL, *oldest = NULL;
     uint32_t now_usec = xtimer_now_usec();
 
-    for (unsigned int i = 0; i < RBUF_SIZE; i++) {
+    for (unsigned int i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         /* check first if entry already available */
         if ((rbuf[i].pkt != NULL) && (rbuf[i].super.datagram_size == size) &&
             (rbuf[i].super.tag == tag) && (rbuf[i].super.src_len == src_len) &&
@@ -415,7 +418,7 @@ void gnrc_sixlowpan_frag_rbuf_reset(void)
 {
     xtimer_remove(&_gc_timer);
     memset(rbuf_int, 0, sizeof(rbuf_int));
-    for (unsigned int i = 0; i < RBUF_SIZE; i++) {
+    for (unsigned int i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         if ((rbuf[i].pkt != NULL) &&
             (rbuf[i].pkt->users > 0)) {
             gnrc_pktbuf_release(rbuf[i].pkt);

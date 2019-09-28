@@ -33,14 +33,6 @@ extern "C" {
 #endif
 
 /**
- * @name Legacy defines
- * @{
- */
-#define RBUF_SIZE           (GNRC_SIXLOWPAN_FRAG_RBUF_SIZE)
-#define RBUF_TIMEOUT        (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)
-/** @} */
-
-/**
  * @brief   Fragment intervals to identify limits of fragments and duplicates.
  *
  * @note    Fragments MUST NOT overlap and overlapping fragments are to be
