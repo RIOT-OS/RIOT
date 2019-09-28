@@ -27,7 +27,15 @@
 
 #include "em_usart.h"
 #include "em_usart_utils.h"
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+
+/**
+ * @brief   Defines whether LEUART is enabled and supported
+ */
+#if EFM32_LEUART_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#define USE_LEUART
+#endif
+
+#ifdef USE_LEUART
 #include "em_leuart.h"
 #include "em_leuart_utils.h"
 #endif
@@ -37,6 +45,7 @@
  */
 static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 
+#ifdef USE_LEUART
 /**
  * @brief   Check if device is a U(S)ART device.
  */
@@ -44,6 +53,7 @@ static inline bool _is_usart(uart_t dev)
 {
     return ((uint32_t) uart_config[dev].dev) < LEUART0_BASE;
 }
+#endif
 
 int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
@@ -61,7 +71,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     gpio_init(uart_config[dev].tx_pin, GPIO_OUT);
 
     /* initialize the UART/USART/LEUART device */
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#ifdef USE_LEUART
     if (_is_usart(dev)) {
 #endif
         USART_TypeDef *uart = (USART_TypeDef *) uart_config[dev].dev;
@@ -98,7 +108,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
         /* enable peripheral */
         USART_Enable(uart, usartEnable);
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#ifdef USE_LEUART
     } else {
         LEUART_TypeDef *leuart = (LEUART_TypeDef *) uart_config[dev].dev;
 
@@ -146,13 +156,13 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 void uart_write(uart_t dev, const uint8_t *data, size_t len)
 {
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#ifdef USE_LEUART
     if (_is_usart(dev)) {
 #endif
         while (len--) {
             USART_Tx(uart_config[dev].dev, *(data++));
         }
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#ifdef USE_LEUART
     } else {
         while (len--) {
             LEUART_Tx(uart_config[dev].dev, *(data++));
@@ -173,13 +183,13 @@ void uart_poweroff(uart_t dev)
 
 static void rx_irq(uart_t dev)
 {
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#ifdef USE_LEUART
     if (_is_usart(dev)) {
 #endif
         if (USART_IntGet(uart_config[dev].dev) & USART_IF_RXDATAV) {
             isr_ctx[dev].rx_cb(isr_ctx[dev].arg, USART_RxDataGet(uart_config[dev].dev));
         }
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#ifdef USE_LEUART
     } else {
         if (LEUART_IntGet(uart_config[dev].dev) & LEUART_IF_RXDATAV) {
             isr_ctx[dev].rx_cb(isr_ctx[dev].arg, LEUART_RxDataGet(uart_config[dev].dev));
