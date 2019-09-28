@@ -67,7 +67,7 @@
  *
  *  1.  If @ref net_gnrc_sixlowpan_frag is included and @ref sixlowpan_frag_is() is true for the
  *      packet, the fragmentation header will be removed and its remaining data will be added to
- *      the reassembly buffer (using @ref gnrc_sixlowpan_frag_rbuf_add()) in accordance to the
+ *      the reassembly buffer (using @ref gnrc_sixlowpan_frag_rb_add()) in accordance to the
  *      fragmentation header. The packet containing the fragment will be discarded. When the
  *      fragmented datagram is complete, its payload will be marked with @ref GNRC_NETTYPE_IPV6 and
  *      issued via a @ref GNRC_NETAPI_MSG_TYPE_RCV to all subscribers registered to @ref

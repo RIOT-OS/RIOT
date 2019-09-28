@@ -350,7 +350,7 @@ static void *_event_loop(void *args)
                 break;
             case GNRC_SIXLOWPAN_MSG_FRAG_GC_RBUF:
                 DEBUG("6lo: garbage collect reassembly buffer event received\n");
-                gnrc_sixlowpan_frag_rbuf_gc();
+                gnrc_sixlowpan_frag_rb_gc();
                 break;
 #endif
 

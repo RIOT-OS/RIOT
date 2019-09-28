@@ -48,9 +48,9 @@
                        GNRC_SIXLOWPAN_FRAG_RBUF_SIZE)
 #endif
 
-static gnrc_sixlowpan_rbuf_int_t rbuf_int[RBUF_INT_SIZE];
+static gnrc_sixlowpan_frag_rb_int_t rbuf_int[RBUF_INT_SIZE];
 
-static gnrc_sixlowpan_rbuf_t rbuf[GNRC_SIXLOWPAN_FRAG_RBUF_SIZE];
+static gnrc_sixlowpan_frag_rb_t rbuf[GNRC_SIXLOWPAN_FRAG_RBUF_SIZE];
 
 static char l2addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
 
@@ -61,18 +61,18 @@ static msg_t _gc_timer_msg = { .type = GNRC_SIXLOWPAN_MSG_FRAG_GC_RBUF };
  * internal function definitions
  * ------------------------------------*/
 /* checks whether start and end overlaps, but not identical to, given interval i */
-static inline bool _rbuf_int_overlap_partially(gnrc_sixlowpan_rbuf_int_t *i,
+static inline bool _rbuf_int_overlap_partially(gnrc_sixlowpan_frag_rb_int_t *i,
                                                uint16_t start, uint16_t end);
 /* gets a free entry from interval buffer */
-static gnrc_sixlowpan_rbuf_int_t *_rbuf_int_get_free(void);
+static gnrc_sixlowpan_frag_rb_int_t *_rbuf_int_get_free(void);
 /* update interval buffer of entry */
-static bool _rbuf_update_ints(gnrc_sixlowpan_rbuf_base_t *entry,
+static bool _rbuf_update_ints(gnrc_sixlowpan_frag_rb_base_t *entry,
                               uint16_t offset, size_t frag_size);
 /* gets an entry identified by its tupel */
-static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
-                                        const void *dst, size_t dst_len,
-                                        size_t size, uint16_t tag,
-                                        unsigned page);
+static gnrc_sixlowpan_frag_rb_t *_rbuf_get(const void *src, size_t src_len,
+                                           const void *dst, size_t dst_len,
+                                           size_t size, uint16_t tag,
+                                           unsigned page);
 /* internal add to repeat add when fragments overlapped */
 static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                      size_t offset, unsigned page);
@@ -94,10 +94,10 @@ gnrc_sixlowpan_frag_stats_t *gnrc_sixlowpan_frag_stats_get(void)
 }
 #endif
 
-static int _check_fragments(gnrc_sixlowpan_rbuf_base_t *entry,
+static int _check_fragments(gnrc_sixlowpan_frag_rb_base_t *entry,
                             size_t frag_size, size_t offset)
 {
-    gnrc_sixlowpan_rbuf_int_t *ptr = entry->ints;
+    gnrc_sixlowpan_frag_rb_int_t *ptr = entry->ints;
 
     /* If the fragment overlaps another fragment and differs in either the size
      * or the offset of the overlapped fragment, discards the datagram
@@ -120,9 +120,9 @@ static int _check_fragments(gnrc_sixlowpan_rbuf_base_t *entry,
     return RBUF_ADD_SUCCESS;
 }
 
-void gnrc_sixlowpan_frag_rbuf_add(gnrc_netif_hdr_t *netif_hdr,
-                                  gnrc_pktsnip_t *pkt, size_t offset,
-                                  unsigned page)
+void gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr,
+                                gnrc_pktsnip_t *pkt, size_t offset,
+                                unsigned page)
 {
     if (_rbuf_add(netif_hdr, pkt, offset, page) == RBUF_ADD_REPEAT) {
         _rbuf_add(netif_hdr, pkt, offset, page);
@@ -132,7 +132,7 @@ void gnrc_sixlowpan_frag_rbuf_add(gnrc_netif_hdr_t *netif_hdr,
 static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                      size_t offset, unsigned page)
 {
-    gnrc_sixlowpan_rbuf_t *entry;
+    gnrc_sixlowpan_frag_rb_t *entry;
     sixlowpan_frag_n_t *frag = pkt->data;
     uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
     size_t frag_size;
@@ -142,7 +142,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                 SIXLOWPAN_FRAG_1_DISP)) && (offset == 0)) ||
            ((((frag->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) ==
                 SIXLOWPAN_FRAG_N_DISP)) && (offset == (frag->offset * 8U))));
-    gnrc_sixlowpan_frag_rbuf_gc();
+    gnrc_sixlowpan_frag_rb_gc();
     entry = _rbuf_get(gnrc_netif_hdr_get_src_addr(netif_hdr), netif_hdr->src_l2addr_len,
                       gnrc_netif_hdr_get_dst_addr(netif_hdr), netif_hdr->dst_l2addr_len,
                       byteorder_ntohs(frag->disp_size) & SIXLOWPAN_FRAG_SIZE_MASK,
@@ -170,7 +170,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
         gnrc_pktbuf_release(entry->pkt);
         gnrc_pktbuf_release(pkt);
-        gnrc_sixlowpan_frag_rbuf_remove(entry);
+        gnrc_sixlowpan_frag_rb_remove(entry);
         return RBUF_ADD_ERROR;
     }
 
@@ -178,7 +178,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         case RBUF_ADD_REPEAT:
             DEBUG("6lo rfrag: overlapping intervals, discarding datagram\n");
             gnrc_pktbuf_release(entry->pkt);
-            gnrc_sixlowpan_frag_rbuf_remove(entry);
+            gnrc_sixlowpan_frag_rb_remove(entry);
             return RBUF_ADD_REPEAT;
         case RBUF_ADD_DUPLICATE:
             gnrc_pktbuf_release(pkt);
@@ -198,7 +198,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                 if (frag_hdr == NULL) {
                     gnrc_pktbuf_release(entry->pkt);
                     gnrc_pktbuf_release(pkt);
-                    gnrc_sixlowpan_frag_rbuf_remove(entry);
+                    gnrc_sixlowpan_frag_rb_remove(entry);
                     return RBUF_ADD_ERROR;
                 }
                 gnrc_sixlowpan_iphc_recv(pkt, entry, 0);
@@ -213,12 +213,12 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         memcpy(((uint8_t *)entry->pkt->data) + offset, data,
                frag_size);
     }
-    gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(entry, netif_hdr);
+    gnrc_sixlowpan_frag_rb_dispatch_when_complete(entry, netif_hdr);
     gnrc_pktbuf_release(pkt);
     return RBUF_ADD_SUCCESS;
 }
 
-static inline bool _rbuf_int_overlap_partially(gnrc_sixlowpan_rbuf_int_t *i,
+static inline bool _rbuf_int_overlap_partially(gnrc_sixlowpan_frag_rb_int_t *i,
                                                uint16_t start, uint16_t end)
 {
     /* start and ends are both inclusive, so using <= for both */
@@ -226,7 +226,7 @@ static inline bool _rbuf_int_overlap_partially(gnrc_sixlowpan_rbuf_int_t *i,
         ((start != i->start) || (end != i->end)); /* not identical */
 }
 
-static gnrc_sixlowpan_rbuf_int_t *_rbuf_int_get_free(void)
+static gnrc_sixlowpan_frag_rb_int_t *_rbuf_int_get_free(void)
 {
     for (unsigned int i = 0; i < RBUF_INT_SIZE; i++) {
         if (rbuf_int[i].end == 0) { /* start must be smaller than end anyways*/
@@ -237,10 +237,10 @@ static gnrc_sixlowpan_rbuf_int_t *_rbuf_int_get_free(void)
     return NULL;
 }
 
-static bool _rbuf_update_ints(gnrc_sixlowpan_rbuf_base_t *entry,
+static bool _rbuf_update_ints(gnrc_sixlowpan_frag_rb_base_t *entry,
                               uint16_t offset, size_t frag_size)
 {
-    gnrc_sixlowpan_rbuf_int_t *new;
+    gnrc_sixlowpan_frag_rb_int_t *new;
     uint16_t end = (uint16_t)(offset + frag_size - 1);
 
     new = _rbuf_int_get_free();
@@ -267,14 +267,14 @@ static bool _rbuf_update_ints(gnrc_sixlowpan_rbuf_base_t *entry,
     return true;
 }
 
-void gnrc_sixlowpan_frag_rbuf_gc(void)
+void gnrc_sixlowpan_frag_rb_gc(void)
 {
     uint32_t now_usec = xtimer_now_usec();
     unsigned int i;
 
     for (i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         /* since pkt occupies pktbuf, aggressivly collect garbage */
-        if (!gnrc_sixlowpan_frag_rbuf_entry_empty(&rbuf[i]) &&
+        if (!gnrc_sixlowpan_frag_rb_entry_empty(&rbuf[i]) &&
               ((now_usec - rbuf[i].super.arrival) >
                GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
             DEBUG("6lo rfrag: entry (%s, ",
@@ -288,7 +288,7 @@ void gnrc_sixlowpan_frag_rbuf_gc(void)
                   (unsigned)rbuf[i].super.datagram_size, rbuf[i].super.tag);
 
             gnrc_pktbuf_release(rbuf[i].pkt);
-            gnrc_sixlowpan_frag_rbuf_remove(&(rbuf[i]));
+            gnrc_sixlowpan_frag_rb_remove(&(rbuf[i]));
         }
     }
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
@@ -302,12 +302,12 @@ static inline void _set_rbuf_timeout(void)
                    &_gc_timer_msg, sched_active_pid);
 }
 
-static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
-                                        const void *dst, size_t dst_len,
-                                        size_t size, uint16_t tag,
-                                        unsigned page)
+static gnrc_sixlowpan_frag_rb_t *_rbuf_get(const void *src, size_t src_len,
+                                           const void *dst, size_t dst_len,
+                                           size_t size, uint16_t tag,
+                                           unsigned page)
 {
-    gnrc_sixlowpan_rbuf_t *res = NULL, *oldest = NULL;
+    gnrc_sixlowpan_frag_rb_t *res = NULL, *oldest = NULL;
     uint32_t now_usec = xtimer_now_usec();
 
     for (unsigned int i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
@@ -332,7 +332,7 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
         }
 
         /* if there is a free spot: remember it */
-        if ((res == NULL) && gnrc_sixlowpan_frag_rbuf_entry_empty(&rbuf[i])) {
+        if ((res == NULL) && gnrc_sixlowpan_frag_rb_entry_empty(&rbuf[i])) {
             res = &(rbuf[i]);
         }
 
@@ -349,13 +349,13 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
         assert(oldest != NULL);
         /* if oldest is not empty, res must not be NULL (because otherwise
          * oldest could have been picked as res) */
-        assert(!gnrc_sixlowpan_frag_rbuf_entry_empty(oldest));
+        assert(!gnrc_sixlowpan_frag_rb_entry_empty(oldest));
         if (GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE ||
             ((now_usec - oldest->super.arrival) >
             GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
             DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
             gnrc_pktbuf_release(oldest->pkt);
-            gnrc_sixlowpan_frag_rbuf_remove(oldest);
+            gnrc_sixlowpan_frag_rb_remove(oldest);
             res = oldest;
 #if GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE && \
     defined(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
@@ -414,7 +414,7 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
 }
 
 #ifdef TEST_SUITES
-void gnrc_sixlowpan_frag_rbuf_reset(void)
+void gnrc_sixlowpan_frag_rb_reset(void)
 {
     xtimer_remove(&_gc_timer);
     memset(rbuf_int, 0, sizeof(rbuf_int));
@@ -427,16 +427,16 @@ void gnrc_sixlowpan_frag_rbuf_reset(void)
     memset(rbuf, 0, sizeof(rbuf));
 }
 
-const gnrc_sixlowpan_rbuf_t *gnrc_sixlowpan_frag_rbuf_array(void)
+const gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_array(void)
 {
     return &rbuf[0];
 }
 #endif
 
-void gnrc_sixlowpan_frag_rbuf_base_rm(gnrc_sixlowpan_rbuf_base_t *entry)
+void gnrc_sixlowpan_frag_rb_base_rm(gnrc_sixlowpan_frag_rb_base_t *entry)
 {
     while (entry->ints != NULL) {
-        gnrc_sixlowpan_rbuf_int_t *next = entry->ints->next;
+        gnrc_sixlowpan_frag_rb_int_t *next = entry->ints->next;
 
         entry->ints->start = 0;
         entry->ints->end = 0;
@@ -446,8 +446,8 @@ void gnrc_sixlowpan_frag_rbuf_base_rm(gnrc_sixlowpan_rbuf_base_t *entry)
     entry->datagram_size = 0;
 }
 
-void gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(gnrc_sixlowpan_rbuf_t *rbuf,
-                                                     gnrc_netif_hdr_t *netif_hdr)
+void gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
+                                                   gnrc_netif_hdr_t *netif_hdr)
 {
     assert(rbuf);
     assert(netif_hdr);
@@ -460,7 +460,7 @@ void gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(gnrc_sixlowpan_rbuf_t *rbuf
         if (netif == NULL) {
             DEBUG("6lo rbuf: error allocating netif header\n");
             gnrc_pktbuf_release(rbuf->pkt);
-            gnrc_sixlowpan_frag_rbuf_remove(rbuf);
+            gnrc_sixlowpan_frag_rb_remove(rbuf);
             return;
         }
 
@@ -475,7 +475,7 @@ void gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(gnrc_sixlowpan_rbuf_t *rbuf
         new_netif_hdr->rssi = netif_hdr->rssi;
         LL_APPEND(rbuf->pkt, netif);
         gnrc_sixlowpan_dispatch_recv(rbuf->pkt, NULL, 0);
-        gnrc_sixlowpan_frag_rbuf_remove(rbuf);
+        gnrc_sixlowpan_frag_rb_remove(rbuf);
     }
 }
 

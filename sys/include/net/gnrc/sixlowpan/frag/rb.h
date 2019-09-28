@@ -42,14 +42,14 @@ extern "C" {
  *          RFC 4944, section 5.3
  *      </a>
  */
-typedef struct gnrc_sixlowpan_rbuf_int {
+typedef struct gnrc_sixlowpan_frag_rb_int {
     /**
      * @brief   next element in fragment interval list
      */
-    struct gnrc_sixlowpan_rbuf_int *next;
+    struct gnrc_sixlowpan_frag_rb_int *next;
     uint16_t start;             /**< start byte of the fragment interval */
     uint16_t end;               /**< end byte of the fragment interval */
-} gnrc_sixlowpan_rbuf_int_t;
+} gnrc_sixlowpan_frag_rb_int_t;
 
 /**
  * @brief   Base class for both reassembly buffer and virtual reassembly buffer
@@ -65,11 +65,11 @@ typedef struct gnrc_sixlowpan_rbuf_int {
  * @see https://tools.ietf.org/html/draft-ietf-lwig-6lowpan-virtual-reassembly-01
  */
 typedef struct {
-    gnrc_sixlowpan_rbuf_int_t *ints;            /**< intervals of already received fragments */
+    gnrc_sixlowpan_frag_rb_int_t *ints;         /**< intervals of already received fragments */
     uint8_t src[IEEE802154_LONG_ADDRESS_LEN];   /**< source address */
     uint8_t dst[IEEE802154_LONG_ADDRESS_LEN];   /**< destination address */
-    uint8_t src_len;                            /**< length of gnrc_sixlowpan_rbuf_t::src */
-    uint8_t dst_len;                            /**< length of gnrc_sixlowpan_rbuf_t::dst */
+    uint8_t src_len;                            /**< length of gnrc_sixlowpan_frag_rb_t::src */
+    uint8_t dst_len;                            /**< length of gnrc_sixlowpan_frag_rb_t::dst */
     uint16_t tag;                               /**< the datagram's tag */
     uint16_t datagram_size;                     /**< the datagram's size */
     /**
@@ -78,7 +78,7 @@ typedef struct {
     uint16_t current_size;
     uint32_t arrival;                           /**< time in microseconds of arrival of
                                                  *   last received fragment */
-} gnrc_sixlowpan_rbuf_base_t;
+} gnrc_sixlowpan_frag_rb_base_t;
 
 /**
  * @brief   An entry in the 6LoWPAN reassembly buffer.
@@ -87,12 +87,12 @@ typedef struct {
  *
  */
 typedef struct {
-    gnrc_sixlowpan_rbuf_base_t super;           /**< base class */
+    gnrc_sixlowpan_frag_rb_base_t super;        /**< base class */
     /**
      * @brief   The reassembled packet in the packet buffer
      */
     gnrc_pktsnip_t *pkt;
-} gnrc_sixlowpan_rbuf_t;
+} gnrc_sixlowpan_frag_rb_t;
 
 /**
  * @brief   Adds a new fragment to the reassembly buffer. If the packet is
@@ -106,9 +106,9 @@ typedef struct {
  * @param[in] offset        The fragment's offset.
  * @param[in] page          Current 6Lo dispatch parsing page.
  */
-void gnrc_sixlowpan_frag_rbuf_add(gnrc_netif_hdr_t *netif_hdr,
-                                  gnrc_pktsnip_t *frag, size_t offset,
-                                  unsigned page);
+void gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr,
+                                gnrc_pktsnip_t *frag, size_t offset,
+                                unsigned page);
 
 /**
  * @brief   Checks if a reassembly buffer entry is unset
@@ -118,7 +118,8 @@ void gnrc_sixlowpan_frag_rbuf_add(gnrc_netif_hdr_t *netif_hdr,
  * @return  true, if @p rbuf is empty (i.e. rbuf->super.pkt is NULL).
  * @return  false, if @p rbuf is in use.
  */
-static inline bool gnrc_sixlowpan_frag_rbuf_entry_empty(const gnrc_sixlowpan_rbuf_t *rbuf) {
+static inline bool gnrc_sixlowpan_frag_rb_entry_empty(
+        const gnrc_sixlowpan_frag_rb_t *rbuf) {
     return (rbuf->pkt == NULL);
 }
 
@@ -128,7 +129,7 @@ static inline bool gnrc_sixlowpan_frag_rbuf_entry_empty(const gnrc_sixlowpan_rbu
  *
  * @note    Only available when @ref TEST_SUITES is defined
  */
-void gnrc_sixlowpan_frag_rbuf_reset(void);
+void gnrc_sixlowpan_frag_rb_reset(void);
 
 /**
  * @brief   Returns a pointer to the array representing the reassembly buffer.
@@ -139,7 +140,7 @@ void gnrc_sixlowpan_frag_rbuf_reset(void);
  *          access is immediately spotted at compile time of tests. The `const`
  *          qualifier may however be discarded if required by the tests.
  */
-const gnrc_sixlowpan_rbuf_t *gnrc_sixlowpan_frag_rbuf_array(void);
+const gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_array(void);
 #endif
 
 /**
@@ -147,12 +148,12 @@ const gnrc_sixlowpan_rbuf_t *gnrc_sixlowpan_frag_rbuf_array(void);
  *
  * @param[in,out] entry Entry to remove
  */
-void gnrc_sixlowpan_frag_rbuf_base_rm(gnrc_sixlowpan_rbuf_base_t *entry);
+void gnrc_sixlowpan_frag_rb_base_rm(gnrc_sixlowpan_frag_rb_base_t *entry);
 
 /**
  * @brief   Garbage collect reassembly buffer.
  */
-void gnrc_sixlowpan_frag_rbuf_gc(void);
+void gnrc_sixlowpan_frag_rb_gc(void);
 
 #if defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(DOXYGEN)
 /**
@@ -165,10 +166,10 @@ void gnrc_sixlowpan_frag_rbuf_gc(void);
  *
  * @param[in] rbuf  A reassembly buffer entry. Must not be NULL.
  */
-static inline void gnrc_sixlowpan_frag_rbuf_remove(gnrc_sixlowpan_rbuf_t *rbuf)
+static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
 {
     assert(rbuf != NULL);
-    gnrc_sixlowpan_frag_rbuf_base_rm(&rbuf->super);
+    gnrc_sixlowpan_frag_rb_base_rm(&rbuf->super);
     rbuf->pkt = NULL;
 }
 
@@ -184,13 +185,13 @@ static inline void gnrc_sixlowpan_frag_rbuf_remove(gnrc_sixlowpan_rbuf_t *rbuf)
  *                  Used to construct the @ref gnrc_netif_hdr_t of the completed
  *                  datagram. Must not be NULL.
  */
-void gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(gnrc_sixlowpan_rbuf_t *rbuf,
-                                                     gnrc_netif_hdr_t *netif);
+void gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
+                                                   gnrc_netif_hdr_t *netif);
 #else
 /* NOPs to be used with gnrc_sixlowpan_iphc if gnrc_sixlowpan_frag is not
  * compiled in */
-#define gnrc_sixlowpan_frag_rbuf_remove(rbuf)       (void)(rbuf)
-#define gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(rbuf, netif) \
+#define gnrc_sixlowpan_frag_rb_remove(rbuf)     (void)(rbuf)
+#define gnrc_sixlowpan_frag_rb_dispatch_when_complete(rbuf, netif) \
     (void)(rbuf); (void)(netif)
 #endif
 
