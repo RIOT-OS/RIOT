@@ -154,6 +154,42 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return 0;
 }
 
+#ifdef MODULE_PERIPH_UART_MODECFG
+int uart_mode(uart_t dev, uart_data_bits_t data_bits, uart_parity_t parity,
+              uart_stop_bits_t stop_bits)
+{
+    if (parity == UART_PARITY_MARK || parity == UART_PARITY_SPACE) {
+        return UART_NOMODE;
+    }
+
+#ifdef USE_LEUART
+    if (_is_usart(dev)) {
+#endif
+        USART_TypeDef *uart = (USART_TypeDef *) uart_config[dev].dev;
+
+        USART_FrameSet(uart,
+                       USART_DataBits2Def(data_bits),
+                       USART_StopBits2Def(stop_bits),
+                       USART_Parity2Def(parity));
+#ifdef USE_LEUART
+    } else {
+        if (data_bits != UART_DATA_BITS_8) {
+            return UART_NOMODE;
+        }
+
+        LEUART_TypeDef *leuart = (LEUART_TypeDef *) uart_config[dev].dev;
+
+        LEUART_FrameSet(leuart,
+                        LEUART_DataBits2Def(data_bits),
+                        LEUART_StopBits2Def(stop_bits),
+                        LEUART_Parity2Def(parity));
+    }
+#endif
+
+    return UART_OK;
+}
+#endif
+
 void uart_write(uart_t dev, const uint8_t *data, size_t len)
 {
 #ifdef USE_LEUART
