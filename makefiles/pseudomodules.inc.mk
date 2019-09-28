@@ -154,6 +154,9 @@ PSEUDOMODULES += stm32_periph_%
 PSEUDOMODULES += periph_%
 NO_PSEUDOMODULES += periph_common
 
+# periph extention interface pseudomodules
+PSEUDOMODULES += extend_%
+
 # Submodules and auto-init code provided by Skald
 PSEUDOMODULES += auto_init_skald
 PSEUDOMODULES += skald_ibeacon
