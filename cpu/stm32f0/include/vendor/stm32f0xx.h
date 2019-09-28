@@ -129,7 +129,9 @@
   * @{
   */
 
-#if defined(STM32F030x6)
+#if defined(STM32F030x4)
+  #include "stm32f030x4.h"
+#elif defined(STM32F030x6)
   #include "stm32f030x6.h"
 #elif defined(STM32F030x8)
   #include "stm32f030x8.h"
