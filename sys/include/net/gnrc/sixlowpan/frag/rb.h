@@ -155,7 +155,7 @@ void gnrc_sixlowpan_frag_rb_base_rm(gnrc_sixlowpan_frag_rb_base_t *entry);
  */
 void gnrc_sixlowpan_frag_rb_gc(void);
 
-#if defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(DOXYGEN)
+#if defined(MODULE_GNRC_SIXLOWPAN_FRAG_RB) || defined(DOXYGEN)
 /**
  * @brief   Unsets a reassembly buffer entry (but does not free
  *          rbuf_t::super::pkt)
@@ -188,7 +188,7 @@ static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
 void gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
                                                    gnrc_netif_hdr_t *netif);
 #else
-/* NOPs to be used with gnrc_sixlowpan_iphc if gnrc_sixlowpan_frag is not
+/* NOPs to be used with gnrc_sixlowpan_iphc if gnrc_sixlowpan_frag_rb is not
  * compiled in */
 #define gnrc_sixlowpan_frag_rb_remove(rbuf)     (void)(rbuf)
 #define gnrc_sixlowpan_frag_rb_dispatch_when_complete(rbuf, netif) \
