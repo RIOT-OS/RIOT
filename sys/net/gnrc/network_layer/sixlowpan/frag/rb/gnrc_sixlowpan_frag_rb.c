@@ -119,8 +119,9 @@ static int _check_fragments(gnrc_sixlowpan_rbuf_base_t *entry,
     return RBUF_ADD_SUCCESS;
 }
 
-void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
-              size_t offset, unsigned page)
+void gnrc_sixlowpan_frag_rbuf_add(gnrc_netif_hdr_t *netif_hdr,
+                                  gnrc_pktsnip_t *pkt, size_t offset,
+                                  unsigned page)
 {
     if (_rbuf_add(netif_hdr, pkt, offset, page) == RBUF_ADD_REPEAT) {
         _rbuf_add(netif_hdr, pkt, offset, page);
@@ -272,7 +273,7 @@ void gnrc_sixlowpan_frag_rbuf_gc(void)
 
     for (i = 0; i < RBUF_SIZE; i++) {
         /* since pkt occupies pktbuf, aggressivly collect garbage */
-        if (!rbuf_entry_empty(&rbuf[i]) &&
+        if (!gnrc_sixlowpan_frag_rbuf_entry_empty(&rbuf[i]) &&
               ((now_usec - rbuf[i].super.arrival) > RBUF_TIMEOUT)) {
             DEBUG("6lo rfrag: entry (%s, ",
                   gnrc_netif_addr_to_str(rbuf[i].super.src,
@@ -328,7 +329,7 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
         }
 
         /* if there is a free spot: remember it */
-        if ((res == NULL) && rbuf_entry_empty(&rbuf[i])) {
+        if ((res == NULL) && gnrc_sixlowpan_frag_rbuf_entry_empty(&rbuf[i])) {
             res = &(rbuf[i]);
         }
 
@@ -345,7 +346,7 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
         assert(oldest != NULL);
         /* if oldest is not empty, res must not be NULL (because otherwise
          * oldest could have been picked as res) */
-        assert(!rbuf_entry_empty(oldest));
+        assert(!gnrc_sixlowpan_frag_rbuf_entry_empty(oldest));
         if (GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE ||
             ((now_usec - oldest->super.arrival) >
             GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
@@ -410,7 +411,7 @@ static gnrc_sixlowpan_rbuf_t *_rbuf_get(const void *src, size_t src_len,
 }
 
 #ifdef TEST_SUITES
-void rbuf_reset(void)
+void gnrc_sixlowpan_frag_rbuf_reset(void)
 {
     xtimer_remove(&_gc_timer);
     memset(rbuf_int, 0, sizeof(rbuf_int));
@@ -423,7 +424,7 @@ void rbuf_reset(void)
     memset(rbuf, 0, sizeof(rbuf));
 }
 
-const gnrc_sixlowpan_rbuf_t *rbuf_array(void)
+const gnrc_sixlowpan_rbuf_t *gnrc_sixlowpan_frag_rbuf_array(void)
 {
     return &rbuf[0];
 }

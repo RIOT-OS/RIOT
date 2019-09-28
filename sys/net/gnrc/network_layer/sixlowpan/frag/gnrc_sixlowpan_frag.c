@@ -359,7 +359,7 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
             return;
     }
 
-    rbuf_add(hdr, pkt, offset, page);
+    gnrc_sixlowpan_frag_rbuf_add(hdr, pkt, offset, page);
 }
 
 uint16_t gnrc_sixlowpan_frag_next_tag(void)

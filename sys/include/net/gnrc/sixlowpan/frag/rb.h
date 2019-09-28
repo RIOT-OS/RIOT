@@ -113,11 +113,10 @@ typedef struct {
  * @param[in] frag          The fragment to add.
  * @param[in] offset        The fragment's offset.
  * @param[in] page          Current 6Lo dispatch parsing page.
- *
- * @internal
  */
-void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *frag,
-              size_t offset, unsigned page);
+void gnrc_sixlowpan_frag_rbuf_add(gnrc_netif_hdr_t *netif_hdr,
+                                  gnrc_pktsnip_t *frag, size_t offset,
+                                  unsigned page);
 
 /**
  * @brief   Checks if a reassembly buffer entry is unset
@@ -126,10 +125,8 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *frag,
  *
  * @return  true, if @p rbuf is empty (i.e. rbuf->super.pkt is NULL).
  * @return  false, if @p rbuf is in use.
- *
- * @internal
  */
-static inline bool rbuf_entry_empty(const gnrc_sixlowpan_rbuf_t *rbuf) {
+static inline bool gnrc_sixlowpan_frag_rbuf_entry_empty(const gnrc_sixlowpan_rbuf_t *rbuf) {
     return (rbuf->pkt == NULL);
 }
 
@@ -139,7 +136,7 @@ static inline bool rbuf_entry_empty(const gnrc_sixlowpan_rbuf_t *rbuf) {
  *
  * @note    Only available when @ref TEST_SUITES is defined
  */
-void rbuf_reset(void);
+void gnrc_sixlowpan_frag_rbuf_reset(void);
 
 /**
  * @brief   Returns a pointer to the array representing the reassembly buffer.
@@ -150,7 +147,7 @@ void rbuf_reset(void);
  *          access is immediately spotted at compile time of tests. The `const`
  *          qualifier may however be discarded if required by the tests.
  */
-const gnrc_sixlowpan_rbuf_t *rbuf_array(void);
+const gnrc_sixlowpan_rbuf_t *gnrc_sixlowpan_frag_rbuf_array(void);
 #endif
 
 /**
