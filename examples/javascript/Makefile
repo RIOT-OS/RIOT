@@ -7,8 +7,10 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 blackpill bluepill calliope-mini \
-                             cc2650-launchpad cc2650stk hifive1 hifive1b i-nucleo-lrwan1 lobaro-lorabox lsn50 \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 blackpill \
+                             blackpill-128kib bluepill bluepill-128kib \
+                             calliope-mini cc2650-launchpad cc2650stk hifive1 \
+                             hifive1b i-nucleo-lrwan1 lobaro-lorabox lsn50 \
                              maple-mini microbit nrf51dk nrf51dongle nrf6310 \
                              nucleo-f030r8 nucleo-f070rb nucleo-f072rb \
                              nucleo-f103rb nucleo-f302r8 nucleo-f334r8 \
