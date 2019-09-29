@@ -1,1 +1,3 @@
+CPU_MODEL = stm32f103c8
+
 include $(RIOTBOARD)/common/blxxxpill/Makefile.features
