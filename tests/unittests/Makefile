@@ -31,7 +31,9 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-zero \
                              b-l072z-lrwan1 \
                              blackpill \
+                             blackpill-128kib \
                              bluepill \
+                             bluepill-128kib \
                              calliope-mini \
                              cc2650-launchpad \
                              cc2650stk \
