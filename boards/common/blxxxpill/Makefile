@@ -1,3 +1,3 @@
-MODULE = boards_common_stm32f103c8
+MODULE = boards_common_blxxxpill
 
 include $(RIOTBASE)/Makefile.base

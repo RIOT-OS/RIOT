@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     boards_blackpill
+ * @ingroup     boards_blackpill_128kib
  * @brief       Support for the stm32f103c8 based Black pill.
  *
  * @{

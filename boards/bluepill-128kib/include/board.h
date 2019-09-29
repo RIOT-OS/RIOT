@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     boards_bluepill
+ * @ingroup     boards_bluepill_128kib
  *
  * This board can be bought very cheaply on sides like eBay or
  * AliExpress. Although the MCU nominally has 64 KiB ROM, most of them
@@ -34,6 +34,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* Board common contains all required info */
 
 #ifdef __cplusplus
 }

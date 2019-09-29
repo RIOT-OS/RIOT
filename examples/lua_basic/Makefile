@@ -6,7 +6,8 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := blackpill bluepill calliope-mini cc2650-launchpad \
+BOARD_INSUFFICIENT_MEMORY := blackpill blackpill-128kib bluepill \
+                             bluepill-128kib calliope-mini cc2650-launchpad \
                              cc2650stk i-nucleo-lrwan1 lobaro-lorabox maple-mini \
                              microbit nrf51dk nrf51dongle \
                              nucleo-f030r8 nucleo-f031k6 \
