@@ -1,6 +1,6 @@
 # the cpu to build for
-export CPU = stm32l4
-export CPU_MODEL = stm32l496ag
+CPU = stm32l4
+CPU_MODEL = stm32l496ag
 
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_i2c
