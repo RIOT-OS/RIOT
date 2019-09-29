@@ -213,6 +213,9 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan
   USEMODULE += gnrc_sixlowpan_frag_rb
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 

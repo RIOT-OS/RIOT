@@ -45,13 +45,13 @@ static void set_up(void)
 
 static void test_vrb_add__success(void)
 {
-    static const gnrc_sixlowpan_rbuf_int_t interval = {
+    static const gnrc_sixlowpan_frag_rb_int_t interval = {
         .next = NULL,
         .start = 0,
         .end = 116U,
     };
-    static const gnrc_sixlowpan_rbuf_base_t base = {
-        .ints = (gnrc_sixlowpan_rbuf_int_t *)&interval,
+    static const gnrc_sixlowpan_frag_rb_base_t base = {
+        .ints = (gnrc_sixlowpan_frag_rb_int_t *)&interval,
         .src = TEST_SRC,
         .dst = TEST_DST,
         .src_len = TEST_SRC_LEN,
@@ -96,13 +96,13 @@ static void test_vrb_add__success(void)
 
 static void test_vrb_add__duplicate(void)
 {
-    static const gnrc_sixlowpan_rbuf_int_t interval = {
+    static const gnrc_sixlowpan_frag_rb_int_t interval = {
         .next = NULL,
         .start = 0,
         .end = 116U,
     };
-    static const gnrc_sixlowpan_rbuf_base_t base = {
-        .ints = (gnrc_sixlowpan_rbuf_int_t *)&interval,
+    static const gnrc_sixlowpan_frag_rb_base_t base = {
+        .ints = (gnrc_sixlowpan_frag_rb_int_t *)&interval,
         .src = TEST_SRC,
         .dst = TEST_DST,
         .src_len = TEST_SRC_LEN,
@@ -129,7 +129,7 @@ static void test_vrb_add__duplicate(void)
 
 static void test_vrb_add__full(void)
 {
-    gnrc_sixlowpan_rbuf_base_t base = {
+    gnrc_sixlowpan_frag_rb_base_t base = {
         .ints = NULL,
         .src = TEST_SRC,
         .dst = TEST_DST,
@@ -161,7 +161,7 @@ static void test_vrb_add__full(void)
 
 static void test_vrb_get__empty(void)
 {
-    static const gnrc_sixlowpan_rbuf_base_t base = {
+    static const gnrc_sixlowpan_frag_rb_base_t base = {
         .ints = NULL,
         .src = TEST_SRC,
         .dst = TEST_DST,
@@ -179,7 +179,7 @@ static void test_vrb_get__empty(void)
 
 static void test_vrb_get__after_add(void)
 {
-    static const gnrc_sixlowpan_rbuf_base_t base = {
+    static const gnrc_sixlowpan_frag_rb_base_t base = {
         .ints = NULL,
         .src = TEST_SRC,
         .dst = TEST_DST,
@@ -208,7 +208,7 @@ static void test_vrb_get__after_add(void)
 
 static void test_vrb_rm(void)
 {
-    static const gnrc_sixlowpan_rbuf_base_t base = {
+    static const gnrc_sixlowpan_frag_rb_base_t base = {
         .ints = NULL,
         .src = TEST_SRC,
         .dst = TEST_DST,
@@ -234,7 +234,7 @@ static void test_vrb_rm(void)
 
 static void test_vrb_gc(void)
 {
-    gnrc_sixlowpan_rbuf_base_t base = {
+    gnrc_sixlowpan_frag_rb_base_t base = {
         .ints = NULL,
         .src = TEST_SRC,
         .dst = TEST_DST,

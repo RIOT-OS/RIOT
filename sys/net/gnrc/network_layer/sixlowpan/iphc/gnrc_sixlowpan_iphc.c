@@ -218,9 +218,9 @@ static size_t _iphc_nhc_udp_decode(gnrc_pktsnip_t *sixlo, size_t offset,
 
 static inline void _recv_error_release(gnrc_pktsnip_t *sixlo,
                                        gnrc_pktsnip_t *ipv6,
-                                       gnrc_sixlowpan_rbuf_t *rbuf) {
+                                       gnrc_sixlowpan_frag_rb_t *rbuf) {
     if (rbuf != NULL) {
-        gnrc_sixlowpan_frag_rbuf_remove(rbuf);
+        gnrc_sixlowpan_frag_rb_remove(rbuf);
     }
     gnrc_pktbuf_release(ipv6);
     gnrc_pktbuf_release(sixlo);
@@ -238,7 +238,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     size_t payload_offset = SIXLOWPAN_IPHC_HDR_LEN;
     size_t uncomp_hdr_len = sizeof(ipv6_hdr_t);
     gnrc_sixlowpan_ctx_t *ctx = NULL;
-    gnrc_sixlowpan_rbuf_t *rbuf = rbuf_ptr;
+    gnrc_sixlowpan_frag_rb_t *rbuf = rbuf_ptr;
 
     if (rbuf != NULL) {
         ipv6 = rbuf->pkt;
@@ -582,7 +582,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
            sixlo->size - payload_offset);
     if (rbuf != NULL) {
         rbuf->super.current_size += (uncomp_hdr_len - payload_offset);
-        gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(rbuf, netif_hdr);
+        gnrc_sixlowpan_frag_rb_dispatch_when_complete(rbuf, netif_hdr);
     }
     else {
         LL_DELETE(sixlo, netif);

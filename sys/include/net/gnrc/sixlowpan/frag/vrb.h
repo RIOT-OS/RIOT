@@ -38,7 +38,7 @@ extern "C" {
  * @brief   Representation of the virtual reassembly buffer entry
  */
 typedef struct {
-    gnrc_sixlowpan_rbuf_base_t super;   /**< base type */
+    gnrc_sixlowpan_frag_rb_base_t super;    /**< base type */
 
     /**
      * @brief   Link-layer destination address to which the fragments are
@@ -76,7 +76,7 @@ typedef struct {
  * @return  NULL, if VRB is full.
  */
 gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
-        const gnrc_sixlowpan_rbuf_base_t *base,
+        const gnrc_sixlowpan_frag_rb_base_t *base,
         gnrc_netif_t *out_netif, const uint8_t *out_dst, size_t out_dst_len);
 
 /**
@@ -112,7 +112,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
 static inline void gnrc_sixlowpan_frag_vrb_rm(gnrc_sixlowpan_frag_vrb_t *vrb)
 {
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
-    gnrc_sixlowpan_frag_rbuf_base_rm(&vrb->super);
+    gnrc_sixlowpan_frag_rb_base_rm(&vrb->super);
 #elif   defined(TEST_SUITES)
     /* for testing just zero datagram_size */
     vrb->super.datagram_size = 0;

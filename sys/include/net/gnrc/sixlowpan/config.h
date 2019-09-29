@@ -123,7 +123,7 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_vrb](@ref net_gnrc_sixlowpan_frag_vrb) module,
  *          but has also a direct influence on the number of available
- *          gnrc_sixlowpan_rbuf_int_t entries (even when
+ *          gnrc_sixlowpan_frag_rb_int_t entries (even when
  *          `gnrc_sixlowpan_frag_vrb` is not compiled in).
  */
 #ifndef GNRC_SIXLOWPAN_FRAG_VRB_SIZE

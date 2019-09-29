@@ -21,12 +21,11 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/sixlowpan/frag.h"
+#include "net/gnrc/sixlowpan/frag/rb.h"
 #include "net/gnrc/sixlowpan/internal.h"
 #include "net/gnrc/netif.h"
 #include "net/sixlowpan.h"
 #include "utlist.h"
-
-#include "rbuf.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -360,7 +359,7 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
             return;
     }
 
-    rbuf_add(hdr, pkt, offset, page);
+    gnrc_sixlowpan_frag_rb_add(hdr, pkt, offset, page);
 }
 
 uint16_t gnrc_sixlowpan_frag_next_tag(void)

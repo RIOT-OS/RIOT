@@ -67,12 +67,13 @@
  *
  *  1.  If @ref net_gnrc_sixlowpan_frag is included and @ref sixlowpan_frag_is() is true for the
  *      packet, the fragmentation header will be removed and its remaining data will be added to
- *      the reassembly buffer (using @ref rbuf_add()) in accordance to the fragmentation header.
- *      The packet containing the fragment will be discarded. When the fragmented datagram is
- *      complete, its payload will be marked with @ref GNRC_NETTYPE_IPV6 and issued via a
- *      @ref GNRC_NETAPI_MSG_TYPE_RCV to all subscribers registered to @ref GNRC_NETTYPE_IPV6 with
- *      demultiplex context @ref GNRC_NETREG_DEMUX_CTX_ALL in the @ref net_gnrc_netreg. If
- *      reassembly times out or if fragments overlap the datagram will be silently discarded.
+ *      the reassembly buffer (using @ref gnrc_sixlowpan_frag_rb_add()) in accordance to the
+ *      fragmentation header. The packet containing the fragment will be discarded. When the
+ *      fragmented datagram is complete, its payload will be marked with @ref GNRC_NETTYPE_IPV6 and
+ *      issued via a @ref GNRC_NETAPI_MSG_TYPE_RCV to all subscribers registered to @ref
+ *      GNRC_NETTYPE_IPV6 with demultiplex context @ref GNRC_NETREG_DEMUX_CTX_ALL in the @ref
+ *      net_gnrc_netreg. If reassembly times out or if fragments overlap the datagram will be
+ *      silently discarded.
  *  2.  If @ref net_gnrc_sixlowpan_iphc is included the packet will not be send to the subscribers
  *      to @ref GNRC_NETTYPE_IPV6 with demultiplex context @ref GNRC_NETREG_DEMUX_CTX_ALL
  *      immediately, but it will be checked first if @ref sixlowpan_iphc_is() is true for its
