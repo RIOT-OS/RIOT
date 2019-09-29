@@ -37,6 +37,24 @@ extern uint16_t tag;
  * reference for forwarding) so an uninitialized one is enough */
 static gnrc_netif_t _dummy_netif;
 
+static const gnrc_sixlowpan_frag_rb_int_t _interval = {
+    .next = NULL,
+    .start = 0,
+    .end = 116U,
+};
+static const gnrc_sixlowpan_frag_rb_base_t _base = {
+    .ints = (gnrc_sixlowpan_frag_rb_int_t *)&_interval,
+    .src = TEST_SRC,
+    .dst = TEST_DST,
+    .src_len = TEST_SRC_LEN,
+    .dst_len = TEST_DST_LEN,
+    .tag = TEST_TAG,
+    .datagram_size = 1156U,
+    .current_size = 116U,
+    .arrival = 1742197326U,
+};
+static uint8_t _out_dst[] = TEST_OUT_DST;
+
 static void set_up(void)
 {
     gnrc_sixlowpan_frag_vrb_reset();
@@ -45,50 +63,33 @@ static void set_up(void)
 
 static void test_vrb_add__success(void)
 {
-    static const gnrc_sixlowpan_frag_rb_int_t interval = {
-        .next = NULL,
-        .start = 0,
-        .end = 116U,
-    };
-    static const gnrc_sixlowpan_frag_rb_base_t base = {
-        .ints = (gnrc_sixlowpan_frag_rb_int_t *)&interval,
-        .src = TEST_SRC,
-        .dst = TEST_DST,
-        .src_len = TEST_SRC_LEN,
-        .dst_len = TEST_DST_LEN,
-        .tag = TEST_TAG,
-        .datagram_size = 1156U,
-        .current_size = 116U,
-        .arrival = 1742197326U,
-    };
-    static uint8_t out_dst[] = TEST_OUT_DST;
     gnrc_sixlowpan_frag_vrb_t *res;
 
     tag = TEST_TAG_INITIAL;
-    TEST_ASSERT_NOT_NULL((res = gnrc_sixlowpan_frag_vrb_add(&base,
+    TEST_ASSERT_NOT_NULL((res = gnrc_sixlowpan_frag_vrb_add(&_base,
                                                             &_dummy_netif,
-                                                            out_dst,
-                                                            sizeof(out_dst))));
+                                                            _out_dst,
+                                                            sizeof(_out_dst))));
     TEST_ASSERT_NOT_NULL(res->super.ints);
     TEST_ASSERT_NULL(res->super.ints->next);
-    /* make sure base and res->super are distinct*/
-    TEST_ASSERT((&base) != (&res->super));
+    /* make sure _base and res->super are distinct*/
+    TEST_ASSERT((&_base) != (&res->super));
     /* but that the values are the same */
-    TEST_ASSERT_EQUAL_INT(interval.start, res->super.ints->start);
-    TEST_ASSERT_EQUAL_INT(interval.end, res->super.ints->end);
-    TEST_ASSERT_EQUAL_INT(base.src_len, res->super.src_len);
-    TEST_ASSERT_MESSAGE(memcmp(base.src, res->super.src, TEST_SRC_LEN) == 0,
+    TEST_ASSERT_EQUAL_INT(_interval.start, res->super.ints->start);
+    TEST_ASSERT_EQUAL_INT(_interval.end, res->super.ints->end);
+    TEST_ASSERT_EQUAL_INT(_base.src_len, res->super.src_len);
+    TEST_ASSERT_MESSAGE(memcmp(_base.src, res->super.src, TEST_SRC_LEN) == 0,
                         "TEST_SRC != res->super.src");
-    TEST_ASSERT_EQUAL_INT(base.dst_len, res->super.src_len);
-    TEST_ASSERT_MESSAGE(memcmp(base.dst, res->super.dst, TEST_DST_LEN) == 0,
+    TEST_ASSERT_EQUAL_INT(_base.dst_len, res->super.src_len);
+    TEST_ASSERT_MESSAGE(memcmp(_base.dst, res->super.dst, TEST_DST_LEN) == 0,
                         "TEST_DST != res->super.dst");
-    TEST_ASSERT_EQUAL_INT(base.tag, res->super.tag);
-    TEST_ASSERT_EQUAL_INT(base.datagram_size, res->super.datagram_size);
-    TEST_ASSERT_EQUAL_INT(base.current_size, res->super.current_size);
-    TEST_ASSERT_EQUAL_INT(base.arrival, res->super.arrival);
+    TEST_ASSERT_EQUAL_INT(_base.tag, res->super.tag);
+    TEST_ASSERT_EQUAL_INT(_base.datagram_size, res->super.datagram_size);
+    TEST_ASSERT_EQUAL_INT(_base.current_size, res->super.current_size);
+    TEST_ASSERT_EQUAL_INT(_base.arrival, res->super.arrival);
     TEST_ASSERT((&_dummy_netif) == res->out_netif);
-    TEST_ASSERT_EQUAL_INT(sizeof(out_dst), res->out_dst_len);
-    TEST_ASSERT_MESSAGE(memcmp(out_dst, res->out_dst, sizeof(out_dst)) == 0,
+    TEST_ASSERT_EQUAL_INT(sizeof(_out_dst), res->out_dst_len);
+    TEST_ASSERT_MESSAGE(memcmp(_out_dst, res->out_dst, sizeof(_out_dst)) == 0,
                         "TEST_DST != res->super.dst");
     TEST_ASSERT_EQUAL_INT(TEST_TAG_INITIAL, res->out_tag);
     TEST_ASSERT(TEST_TAG_INITIAL != tag);
@@ -96,166 +97,86 @@ static void test_vrb_add__success(void)
 
 static void test_vrb_add__duplicate(void)
 {
-    static const gnrc_sixlowpan_frag_rb_int_t interval = {
-        .next = NULL,
-        .start = 0,
-        .end = 116U,
-    };
-    static const gnrc_sixlowpan_frag_rb_base_t base = {
-        .ints = (gnrc_sixlowpan_frag_rb_int_t *)&interval,
-        .src = TEST_SRC,
-        .dst = TEST_DST,
-        .src_len = TEST_SRC_LEN,
-        .dst_len = TEST_DST_LEN,
-        .tag = TEST_TAG,
-        .datagram_size = 1156U,
-        .current_size = 116U,
-        .arrival = 1742197326U,
-    };
-    static uint8_t out_dst[] = TEST_OUT_DST;
     gnrc_sixlowpan_frag_vrb_t *res1, *res2;
 
     tag = TEST_TAG_INITIAL;
-    TEST_ASSERT_NOT_NULL((res1 = gnrc_sixlowpan_frag_vrb_add(&base,
+    TEST_ASSERT_NOT_NULL((res1 = gnrc_sixlowpan_frag_vrb_add(&_base,
                                                              &_dummy_netif,
-                                                             out_dst,
-                                                             sizeof(out_dst))));
-    TEST_ASSERT_NOT_NULL((res2 = gnrc_sixlowpan_frag_vrb_add(&base,
+                                                             _out_dst,
+                                                             sizeof(_out_dst))));
+    TEST_ASSERT_NOT_NULL((res2 = gnrc_sixlowpan_frag_vrb_add(&_base,
                                                              &_dummy_netif,
-                                                             out_dst,
-                                                             sizeof(out_dst))));
+                                                             _out_dst,
+                                                             sizeof(_out_dst))));
     TEST_ASSERT(res1 == res2);
 }
 
 static void test_vrb_add__full(void)
 {
-    gnrc_sixlowpan_frag_rb_base_t base = {
-        .ints = NULL,
-        .src = TEST_SRC,
-        .dst = TEST_DST,
-        .src_len = TEST_SRC_LEN,
-        .dst_len = TEST_DST_LEN,
-        .tag = TEST_TAG,
-        .datagram_size = 1156U,
-        .current_size = 116U,
-        .arrival = 1742197326U,
-    };
-    static uint8_t out_dst[] = TEST_OUT_DST;
+    gnrc_sixlowpan_frag_rb_base_t base = _base;
 
     /* fill up VRB */
     for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_vrb_add(&base,
                                                          &_dummy_netif,
-                                                         out_dst,
-                                                         sizeof(out_dst)));
+                                                         _out_dst,
+                                                         sizeof(_out_dst)));
         base.tag++;
     }
     /* another entry will not fit */
     TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_add(&base, &_dummy_netif,
-                                                 out_dst, sizeof(out_dst)));
+                                                 _out_dst, sizeof(_out_dst)));
     /* check if it really isn't in the VRB */
     TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(base.src, base.src_len,
-                                                 base.dst, base.dst_len,
-                                                 base.datagram_size, base.tag));
+                                                 base.tag));
 }
 
 static void test_vrb_get__empty(void)
 {
-    static const gnrc_sixlowpan_frag_rb_base_t base = {
-        .ints = NULL,
-        .src = TEST_SRC,
-        .dst = TEST_DST,
-        .src_len = TEST_SRC_LEN,
-        .dst_len = TEST_DST_LEN,
-        .tag = TEST_TAG,
-        .datagram_size = 1156U,
-        .current_size = 116U,
-        .arrival = 1742197326U,
-    };
-    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(base.src, base.src_len,
-                                                 base.dst, base.dst_len,
-                                                 base.datagram_size, base.tag));
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(_base.src, _base.src_len,
+                                                 _base.tag));
 }
 
 static void test_vrb_get__after_add(void)
 {
-    static const gnrc_sixlowpan_frag_rb_base_t base = {
-        .ints = NULL,
-        .src = TEST_SRC,
-        .dst = TEST_DST,
-        .src_len = TEST_SRC_LEN,
-        .dst_len = TEST_DST_LEN,
-        .tag = TEST_TAG,
-        .datagram_size = 1156U,
-        .current_size = 116U,
-        .arrival = 1742197326U,
-    };
-    static uint8_t out_dst[] = TEST_OUT_DST;
     gnrc_sixlowpan_frag_vrb_t *res1, *res2;
 
-    TEST_ASSERT_NOT_NULL((res1 = gnrc_sixlowpan_frag_vrb_add(&base,
+    TEST_ASSERT_NOT_NULL((res1 = gnrc_sixlowpan_frag_vrb_add(&_base,
                                                              &_dummy_netif,
-                                                             out_dst,
-                                                             sizeof(out_dst))));
-    TEST_ASSERT_NOT_NULL((res2 = gnrc_sixlowpan_frag_vrb_get(base.src,
-                                                             base.src_len,
-                                                             base.dst,
-                                                             base.dst_len,
-                                                             base.datagram_size,
-                                                             base.tag)));
+                                                             _out_dst,
+                                                             sizeof(_out_dst))));
+    TEST_ASSERT_NOT_NULL((res2 = gnrc_sixlowpan_frag_vrb_get(_base.src,
+                                                             _base.src_len,
+                                                             _base.tag)));
     TEST_ASSERT(res1 == res2);
 }
 
 static void test_vrb_rm(void)
 {
-    static const gnrc_sixlowpan_frag_rb_base_t base = {
-        .ints = NULL,
-        .src = TEST_SRC,
-        .dst = TEST_DST,
-        .src_len = TEST_SRC_LEN,
-        .dst_len = TEST_DST_LEN,
-        .tag = TEST_TAG,
-        .datagram_size = 1156U,
-        .current_size = 116U,
-        .arrival = 1742197326U,
-    };
-    static uint8_t out_dst[] = TEST_OUT_DST;
     gnrc_sixlowpan_frag_vrb_t *res;
 
-    TEST_ASSERT_NOT_NULL((res = gnrc_sixlowpan_frag_vrb_add(&base,
+    TEST_ASSERT_NOT_NULL((res = gnrc_sixlowpan_frag_vrb_add(&_base,
                                                             &_dummy_netif,
-                                                            out_dst,
-                                                            sizeof(out_dst))));
+                                                            _out_dst,
+                                                            sizeof(_out_dst))));
     gnrc_sixlowpan_frag_vrb_rm(res);
-    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(base.src, base.src_len,
-                                                 base.dst, base.dst_len,
-                                                 base.datagram_size, base.tag));
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(_base.src, _base.src_len,
+                                                 _base.tag));
 }
 
 static void test_vrb_gc(void)
 {
-    gnrc_sixlowpan_frag_rb_base_t base = {
-        .ints = NULL,
-        .src = TEST_SRC,
-        .dst = TEST_DST,
-        .src_len = TEST_SRC_LEN,
-        .dst_len = TEST_DST_LEN,
-        .tag = TEST_TAG,
-        .datagram_size = 1156U,
-        .current_size = 116U,
-        .arrival = xtimer_now_usec() - GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US - 1000,
-    };
-    static uint8_t out_dst[] = TEST_OUT_DST;
+    gnrc_sixlowpan_frag_rb_base_t base = _base;
     gnrc_sixlowpan_frag_vrb_t *res;
 
+    base.arrival = xtimer_now_usec() - GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US - 1000;
     TEST_ASSERT_NOT_NULL((res = gnrc_sixlowpan_frag_vrb_add(&base,
                                                             &_dummy_netif,
-                                                            out_dst,
-                                                            sizeof(out_dst))));
+                                                            _out_dst,
+                                                            sizeof(_out_dst))));
     gnrc_sixlowpan_frag_vrb_gc();
     TEST_ASSERT_NULL(gnrc_sixlowpan_frag_vrb_get(base.src, base.src_len,
-                                                 base.dst, base.dst_len,
-                                                 base.datagram_size, base.tag));
+                                                 base.tag));
 }
 
 static Test *tests_gnrc_sixlowpan_frag_vrb_tests(void)
