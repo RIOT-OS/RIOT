@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "bitarithm.h"
 #include "net/nanocoap.h"
 
 #define ENABLE_DEBUG (0)
@@ -655,16 +656,15 @@ size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, const uin
 
 static unsigned _size2szx(size_t size)
 {
-    unsigned szx = 0;
     assert(size <= 1024);
 
-    while (size) {
-        size = size >> 1;
-        szx++;
-    }
-    /* Size exponent + 1 */
-    assert(szx >= 5);
-    return szx - 5;
+    /* We must wait to subract the szx offset of 4 until after the assert below.
+     * Input should be a power of two, but if not it may have a stray low order
+     * '1' bit that would invalidate the subtraction. */
+    unsigned szx = bitarithm_lsb(size);
+
+    assert(szx >= 4);
+    return szx - 4;
 }
 
 static unsigned _slicer2blkopt(coap_block_slicer_t *slicer, bool more)
