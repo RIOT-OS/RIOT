@@ -368,7 +368,7 @@ typedef enum {
     NETOPT_DEVICE_TYPE,
 
     /**
-     * @brief   (uint8_t) channel page as defined by IEEE 802.15.4
+     * @brief   (uint16_t) channel page as defined by IEEE 802.15.4
      */
     NETOPT_CHANNEL_PAGE,
 
