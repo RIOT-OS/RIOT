@@ -105,10 +105,13 @@ typedef struct {
  * @param[in] frag          The fragment to add.
  * @param[in] offset        The fragment's offset.
  * @param[in] page          Current 6Lo dispatch parsing page.
+ *
+ * @return  The reassembly buffer entry the fragment was added to on success.
+ * @return  NULL on error.
  */
-void gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr,
-                                gnrc_pktsnip_t *frag, size_t offset,
-                                unsigned page);
+gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr,
+                                                     gnrc_pktsnip_t *frag,
+                                                     size_t offset, unsigned page);
 
 /**
  * @brief   Checks if a reassembly buffer entry is unset

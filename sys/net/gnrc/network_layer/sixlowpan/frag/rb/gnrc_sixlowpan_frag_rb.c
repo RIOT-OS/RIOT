@@ -120,13 +120,15 @@ static int _check_fragments(gnrc_sixlowpan_frag_rb_base_t *entry,
     return RBUF_ADD_SUCCESS;
 }
 
-void gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr,
-                                gnrc_pktsnip_t *pkt, size_t offset,
-                                unsigned page)
+gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr,
+                                                     gnrc_pktsnip_t *pkt,
+                                                     size_t offset, unsigned page)
 {
-    if (_rbuf_add(netif_hdr, pkt, offset, page) == RBUF_ADD_REPEAT) {
-        _rbuf_add(netif_hdr, pkt, offset, page);
+    int res;
+    if ((res = _rbuf_add(netif_hdr, pkt, offset, page)) == RBUF_ADD_REPEAT) {
+        res = _rbuf_add(netif_hdr, pkt, offset, page);
     }
+    return (res < 0) ? NULL : &rbuf[res];
 }
 
 #ifndef NDEBUG
@@ -210,7 +212,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             return RBUF_ADD_REPEAT;
         case RBUF_ADD_DUPLICATE:
             gnrc_pktbuf_release(pkt);
-            return RBUF_ADD_SUCCESS;
+            return res;
         default:
             break;
     }
@@ -230,7 +232,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                     return RBUF_ADD_ERROR;
                 }
                 gnrc_sixlowpan_iphc_recv(pkt, entry, 0);
-                return RBUF_ADD_SUCCESS;
+                return res;
             }
             else
 #endif
@@ -243,7 +245,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
     gnrc_sixlowpan_frag_rb_dispatch_when_complete(entry, netif_hdr);
     gnrc_pktbuf_release(pkt);
-    return RBUF_ADD_SUCCESS;
+    return res;
 }
 
 static inline bool _rbuf_int_overlap_partially(gnrc_sixlowpan_frag_rb_int_t *i,
