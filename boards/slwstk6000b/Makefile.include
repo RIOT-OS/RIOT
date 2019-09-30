@@ -1,4 +1,0 @@
-# Define the default board module.
-BOARD_MODULE ?= slwrb4162a
-
-include $(RIOTBOARD)/common/slwstk6000b/Makefile.include

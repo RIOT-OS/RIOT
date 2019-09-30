@@ -88,6 +88,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              sensebox_samd21 \
                              slstk3401a \
                              sltb001a \
+                             slwstk6000b-slwrb4150a \
                              slwstk6220a \
                              sodaq-autonomo \
                              sodaq-explorer \

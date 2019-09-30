@@ -5,7 +5,8 @@ BOARD_WHITELIST := ikea-tradfri \
                    slstk3401a \
                    slstk3402a \
                    sltb001a \
-                   slwstk6000b \
+                   slwstk6000b-slwrb4150a \
+                   slwstk6000b-slwrb4162a \
                    stk3600 \
                    stk3700
 
