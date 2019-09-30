@@ -537,6 +537,10 @@ ifneq (,$(filter sx127%,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter tca6507,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter tcs37727,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif

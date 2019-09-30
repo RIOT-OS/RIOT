@@ -270,6 +270,10 @@ ifneq (,$(filter sx127x,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sx127x/include
 endif
 
+ifneq (,$(filter tca6507,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tca6507/include
+endif
+
 ifneq (,$(filter tcs37727,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tcs37727/include
 endif
