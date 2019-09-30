@@ -62,7 +62,12 @@
  * =======================
  *
  * The EFM32/EFR32/EZR32 MCUs have support for low-power peripherals. Support
- * is enabled by default, but can be disabled by setting LOW_POWER_ENABLED=0.
+ * is enabled by default, but can be disabled if not used.
+ *
+ * - Setting `EFM32_LEUART_ENABLED=0` will disable support for the LEUART
+ *   in the UART driver peripheral and save approximately 400 bytes.
+ *
+ * Refer to `cpu/efm32/efm32-features.mk` for more options.
  */
 
 /**

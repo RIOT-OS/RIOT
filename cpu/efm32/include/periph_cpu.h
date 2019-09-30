@@ -39,15 +39,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Enable support for Low-power peripherals (if supported by CPU).
- * @{
- */
-#ifndef LOW_POWER_ENABLED
-#define LOW_POWER_ENABLED   (1)
-#endif
-/** @} */
-
-/**
  * @brief   Internal macro for combining ADC resolution (x) with number of
  *          shifts (y).
  */
