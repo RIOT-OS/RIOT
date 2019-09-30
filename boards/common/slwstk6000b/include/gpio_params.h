@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_slwstk6000b
+ * @ingroup     boards_common_slwstk6000b
  * @{
  *
  * @file
