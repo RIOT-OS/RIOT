@@ -61,6 +61,27 @@ extern "C" {
 #define BTN0_MODE           GPIO_IN_PU
 /** @} */
 
+/**
+ * @name    Antenna selection configuration
+ * @{
+ */
+
+#ifdef BOARD_PARTICLE_XENON
+#define VCTL1_PIN           GPIO_PIN(0, 24)
+#define VCTL2_PIN           GPIO_PIN(0, 25)
+#endif
+
+#ifdef BOARD_PARTICLE_ARGON
+#define VCTL1_PIN           GPIO_PIN(0, 25)
+#define VCTL2_PIN           GPIO_PIN(0, 2)
+#endif
+
+#ifdef BOARD_PARTICLE_BORON
+#define VCTL1_PIN           GPIO_PIN(0, 7)
+#endif
+
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
