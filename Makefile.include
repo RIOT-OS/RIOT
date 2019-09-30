@@ -451,6 +451,9 @@ ifeq (,$(FLASHFILE))
   $(error FLASHFILE is not defined for this board: $(FLASHFILE))
 endif
 
+# By default always build ELFFILE and FLASHFILE
+BUILD_FILES += $(ELFFILE) $(FLASHFILE)
+
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
 
@@ -479,7 +482,7 @@ ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
 else
 ifeq (,$(RIOTNOLINK))
-link: ..compiler-check ..build-message $(ELFFILE) $(FLASHFILE) print-size
+link: ..compiler-check ..build-message $(BUILD_FILES) print-size
 else
 link: ..compiler-check ..build-message $(BASELIBS)
 endif # RIOTNOLINK
