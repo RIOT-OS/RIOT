@@ -476,12 +476,14 @@ void gnrc_sixlowpan_frag_rb_base_rm(gnrc_sixlowpan_frag_rb_base_t *entry)
     entry->datagram_size = 0;
 }
 
-void gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
+int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
                                                    gnrc_netif_hdr_t *netif_hdr)
 {
     assert(rbuf);
     assert(netif_hdr);
-    if (rbuf->super.current_size == rbuf->super.datagram_size) {
+    int res = (rbuf->super.current_size == rbuf->super.datagram_size);
+
+    if (res) {
         gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(rbuf->super.src,
                                                      rbuf->super.src_len,
                                                      rbuf->super.dst,
@@ -491,7 +493,7 @@ void gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbu
             DEBUG("6lo rbuf: error allocating netif header\n");
             gnrc_pktbuf_release(rbuf->pkt);
             gnrc_sixlowpan_frag_rb_remove(rbuf);
-            return;
+            return -1;
         }
 
         /* copy the transmit information of the latest fragment into the newly
@@ -507,6 +509,7 @@ void gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbu
         gnrc_sixlowpan_dispatch_recv(rbuf->pkt, NULL, 0);
         gnrc_sixlowpan_frag_rb_remove(rbuf);
     }
+    return res;
 }
 
 

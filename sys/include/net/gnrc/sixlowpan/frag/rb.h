@@ -187,9 +187,14 @@ static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
  * @param[in] netif Original @ref gnrc_netif_hdr_t of the last received frame.
  *                  Used to construct the @ref gnrc_netif_hdr_t of the completed
  *                  datagram. Must not be NULL.
+ *
+ * @return  >0, when the datagram in @p rbuf was complete and dispatched.
+ * @return  0, when the datagram in @p rbuf is not complete.
+ * @return  -1, if the the reassembled datagram was not dispatched. @p rbuf is
+ *          destroyed either way.
  */
-void gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
-                                                   gnrc_netif_hdr_t *netif);
+int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
+                                                  gnrc_netif_hdr_t *netif);
 #else
 /* NOPs to be used with gnrc_sixlowpan_iphc if gnrc_sixlowpan_frag_rb is not
  * compiled in */
