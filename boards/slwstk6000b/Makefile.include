@@ -3,8 +3,6 @@ include $(RIOTBOARD)/slwstk6000b/module-info.mk
 # add module specific includes
 INCLUDES += -I$(RIOTBOARD)/slwstk6000b/modules/$(BOARD_MODULE)/include
 
-# define the cpu used by SLWSTK6000B
-export CPU = efm32
 export CPU_MODEL = $(MODULE_CPU)
 
 # set default port depending on operating system
