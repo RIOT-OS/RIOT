@@ -198,9 +198,19 @@ int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf
 #else
 /* NOPs to be used with gnrc_sixlowpan_iphc if gnrc_sixlowpan_frag_rb is not
  * compiled in */
-#define gnrc_sixlowpan_frag_rb_remove(rbuf)     (void)(rbuf)
-#define gnrc_sixlowpan_frag_rb_dispatch_when_complete(rbuf, netif) \
-    (void)(rbuf); (void)(netif)
+static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
+{
+    (void)rbuf;
+    return;
+}
+
+static inline int gnrc_sixlowpan_frag_rb_dispatch_when_complete(
+        gnrc_sixlowpan_frag_rb_t *rbuf, gnrc_netif_hdr_t *netif)
+{
+    (void)rbuf;
+    (void)netif;
+    return -1;
+}
 #endif
 
 #ifdef __cplusplus
