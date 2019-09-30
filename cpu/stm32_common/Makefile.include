@@ -1,5 +1,4 @@
-FAM = $(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
-CFLAGS += -DCPU_FAM_$(FAM)
+CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 
 # All stm32 families provide pm support
 USEMODULE += pm_layered

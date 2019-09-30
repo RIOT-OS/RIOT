@@ -1,5 +1,5 @@
 # Define the CPU family so we can differentiate between them in the code
-CFLAGS += -DCPU_FAM_$(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
+CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 
 # Set ROM and RAM lengths according to CPU model
 ifneq (,$(filter samd21g18a samd21j18a saml21j18b saml21j18a samr21e18a \
