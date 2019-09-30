@@ -102,7 +102,8 @@ typedef struct {
  * @param[in] netif_hdr     The interface header of the fragment, with
  *                          gnrc_netif_hdr_t::if_pid and its source and
  *                          destination address set.
- * @param[in] frag          The fragment to add.
+ * @param[in] frag          The fragment to add. Will be released by the
+ *                          function.
  * @param[in] offset        The fragment's offset.
  * @param[in] page          Current 6Lo dispatch parsing page.
  *
@@ -158,24 +159,6 @@ void gnrc_sixlowpan_frag_rb_base_rm(gnrc_sixlowpan_frag_rb_base_t *entry);
  */
 void gnrc_sixlowpan_frag_rb_gc(void);
 
-#if defined(MODULE_GNRC_SIXLOWPAN_FRAG_RB) || defined(DOXYGEN)
-/**
- * @brief   Unsets a reassembly buffer entry (but does not free
- *          rbuf_t::super::pkt)
- *
- * @pre `rbuf != NULL`
- *
- * This functions sets rbuf_t::super::pkt to NULL and removes all rbuf::ints.
- *
- * @param[in] rbuf  A reassembly buffer entry. Must not be NULL.
- */
-static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
-{
-    assert(rbuf != NULL);
-    gnrc_sixlowpan_frag_rb_base_rm(&rbuf->super);
-    rbuf->pkt = NULL;
-}
-
 /**
  * @brief   Checks if a reassembly buffer entry is complete and dispatches it
  *          to the next layer if that is the case
@@ -195,6 +178,24 @@ static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
  */
 int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
                                                   gnrc_netif_hdr_t *netif);
+
+#if defined(MODULE_GNRC_SIXLOWPAN_FRAG_RB) || defined(DOXYGEN)
+/**
+ * @brief   Unsets a reassembly buffer entry (but does not free
+ *          rbuf_t::super::pkt)
+ *
+ * @pre `rbuf != NULL`
+ *
+ * This functions sets rbuf_t::super::pkt to NULL and removes all rbuf::ints.
+ *
+ * @param[in] rbuf  A reassembly buffer entry. Must not be NULL.
+ */
+static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
+{
+    assert(rbuf != NULL);
+    gnrc_sixlowpan_frag_rb_base_rm(&rbuf->super);
+    rbuf->pkt = NULL;
+}
 #else
 /* NOPs to be used with gnrc_sixlowpan_iphc if gnrc_sixlowpan_frag_rb is not
  * compiled in */
@@ -202,14 +203,6 @@ static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
 {
     (void)rbuf;
     return;
-}
-
-static inline int gnrc_sixlowpan_frag_rb_dispatch_when_complete(
-        gnrc_sixlowpan_frag_rb_t *rbuf, gnrc_netif_hdr_t *netif)
-{
-    (void)rbuf;
-    (void)netif;
-    return -1;
 }
 #endif
 

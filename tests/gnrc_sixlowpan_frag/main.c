@@ -317,6 +317,7 @@ static void test_rbuf_add__success_complete(void)
     gnrc_pktsnip_t *pkt4 = gnrc_pktbuf_add(NULL, _fragment4, sizeof(_fragment4),
                                            GNRC_NETTYPE_SIXLOWPAN);
     gnrc_pktsnip_t *datagram;
+    gnrc_sixlowpan_frag_rb_t *entry1, *entry2;
     msg_t msg = { .type = 0U };
     gnrc_netreg_entry_t reg = GNRC_NETREG_ENTRY_INIT_PID(
             GNRC_NETREG_DEMUX_CTX_ALL,
@@ -326,20 +327,35 @@ static void test_rbuf_add__success_complete(void)
     gnrc_netreg_register(TEST_DATAGRAM_NETTYPE, &reg);
     /* Mixing up things. Order decided by fair dice-rolls ;-) */
     TEST_ASSERT_NOT_NULL(pkt2);
-    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_rb_add(
+    TEST_ASSERT_NOT_NULL((entry1 = gnrc_sixlowpan_frag_rb_add(
             &_test_netif_hdr.hdr, pkt2, TEST_FRAGMENT2_OFFSET, TEST_PAGE
+        )));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_sixlowpan_frag_rb_dispatch_when_complete(
+            entry1, &_test_netif_hdr.hdr
         ));
     TEST_ASSERT_NOT_NULL(pkt4);
-    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_rb_add(
+    TEST_ASSERT_NOT_NULL((entry2 = gnrc_sixlowpan_frag_rb_add(
             &_test_netif_hdr.hdr, pkt4, TEST_FRAGMENT4_OFFSET, TEST_PAGE
+        )));
+    TEST_ASSERT(entry1 == entry2);
+    TEST_ASSERT_EQUAL_INT(0, gnrc_sixlowpan_frag_rb_dispatch_when_complete(
+            entry1, &_test_netif_hdr.hdr
         ));
     TEST_ASSERT_NOT_NULL(pkt1);
-    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_rb_add(
+    TEST_ASSERT_NOT_NULL((entry2 = gnrc_sixlowpan_frag_rb_add(
             &_test_netif_hdr.hdr, pkt1, TEST_FRAGMENT1_OFFSET, TEST_PAGE
+        )));
+    TEST_ASSERT(entry1 == entry2);
+    TEST_ASSERT_EQUAL_INT(0, gnrc_sixlowpan_frag_rb_dispatch_when_complete(
+            entry1, &_test_netif_hdr.hdr
         ));
     TEST_ASSERT_NOT_NULL(pkt3);
-    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_rb_add(
+    TEST_ASSERT_NOT_NULL((entry2 = gnrc_sixlowpan_frag_rb_add(
             &_test_netif_hdr.hdr, pkt3, TEST_FRAGMENT3_OFFSET, TEST_PAGE
+        )));
+    TEST_ASSERT(entry1 == entry2);
+    TEST_ASSERT(0 < gnrc_sixlowpan_frag_rb_dispatch_when_complete(
+            entry1, &_test_netif_hdr.hdr
         ));
     TEST_ASSERT_MESSAGE(
             xtimer_msg_receive_timeout(&msg, TEST_RECEIVE_TIMEOUT) >= 0,

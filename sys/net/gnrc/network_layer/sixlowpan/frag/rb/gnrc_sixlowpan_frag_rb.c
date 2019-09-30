@@ -223,27 +223,39 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         if (offset == 0) {
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
             if (sixlowpan_iphc_is(data)) {
+                DEBUG("6lo rbuf: detected IPHC header.\n");
                 gnrc_pktsnip_t *frag_hdr = gnrc_pktbuf_mark(pkt,
                         sizeof(sixlowpan_frag_t), GNRC_NETTYPE_SIXLOWPAN);
                 if (frag_hdr == NULL) {
+                    DEBUG("6lo rbuf: unable to mark fragment header. "
+                          "aborting reassembly.\n");
                     gnrc_pktbuf_release(entry->pkt);
                     gnrc_pktbuf_release(pkt);
                     gnrc_sixlowpan_frag_rb_remove(entry);
                     return RBUF_ADD_ERROR;
                 }
-                gnrc_sixlowpan_iphc_recv(pkt, entry, 0);
-                return res;
+                else {
+                    DEBUG("6lo rbuf: handing over to IPHC reception.\n");
+                    /* `pkt` released in IPHC */
+                    gnrc_sixlowpan_iphc_recv(pkt, entry, 0);
+                    /* check if entry was deleted in IPHC (error case) */
+                    if (gnrc_sixlowpan_frag_rb_entry_empty(entry)) {
+                        res = RBUF_ADD_ERROR;
+                    }
+                    return res;
+                }
             }
             else
 #endif
             if (data[0] == SIXLOWPAN_UNCOMP) {
+                DEBUG("6lo rbuf: detected uncompressed datagram\n");
                 data++;
             }
         }
         memcpy(((uint8_t *)entry->pkt->data) + offset, data,
                frag_size);
     }
-    gnrc_sixlowpan_frag_rb_dispatch_when_complete(entry, netif_hdr);
+    /* no errors and not consumed => release packet */
     gnrc_pktbuf_release(pkt);
     return res;
 }
