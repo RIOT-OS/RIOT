@@ -56,7 +56,7 @@
 #define MBUF_OVHD               (sizeof(struct os_mbuf) + \
                                  sizeof(struct os_mbuf_pkthdr))
 #define MBUF_SIZE               (MBUF_OVHD + MYNEWT_VAL_BLE_L2CAP_COC_MPS)
-#define MBUF_CNT                (MYNEWT_VAL_BLE_MAX_CONNECTIONS * 2 * \
+#define MBUF_CNT                (NIMBLE_NETIF_MAX_CONN * 2 * \
                                  ((MTU_SIZE + (MBUF_SIZE - 1)) / MBUF_SIZE))
 
 /* thread flag used for signaling transmit readiness */
