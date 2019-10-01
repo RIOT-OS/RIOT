@@ -93,15 +93,15 @@ Besides the SAMD21 the board has the following features:
 
 ## Flashing the device
 
-1. Put the board in bootloader mode by double tapping the reset button.<br/>
-   When the board is in bootloader mode, the user led (green) oscillates
-   smoothly.
-
-2. Use `BOARD=sodaq-autonomo` with the `make` command.<br/>
-   Example with `hello-world` application:
+Use `BOARD=sodaq-autonomo` with the `make` command.<br/>
+Example with `hello-world` application:
 ```
      make BOARD=sodaq-autonomo -C examples/hello-world flash
 ```
+
+## Accessing STDIO via UART
+
+STDIO of RIOT is directly available over the USB port.
 
 ## Supported Toolchains
 
