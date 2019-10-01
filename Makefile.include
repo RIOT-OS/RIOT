@@ -272,6 +272,13 @@ export TOOLCHAIN
 # will most likely not need to touch this.
 export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
 
+# set default PROGRAMMER value if flashing a board on IoT-LAB
+# This must be done before parsing the Makefile.include of the board and cannot
+# be done in makefile.iotlab.single.inc.mk which is included after.
+ifneq (,$(IOTLAB_NODE))
+  PROGRAMMER ?= iotlab
+endif
+
 # Add standard include directories
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 
