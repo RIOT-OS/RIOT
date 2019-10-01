@@ -7,6 +7,7 @@ exemptLabels:
   - "Area: security"
   - "State: demonstrator"
   - "State: don't stale"
+  - "Type: bug"
   - "Type: tracking"
 # Label to use when marking an issue as stale
 staleLabel: "State: stale"
