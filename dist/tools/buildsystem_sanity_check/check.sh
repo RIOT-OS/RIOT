@@ -128,6 +128,40 @@ check_deprecated_vars_patterns() {
         | error_with_message 'Deprecated variables or patterns:'
 }
 
+# Makefile files cpu must not be included by the board anymore
+# They are included by the main Makefile.include/Makefile.features/Makefile.dep
+check_board_do_not_include_cpu_features_dep() {
+    local patterns=()
+    local pathspec=()
+
+    # shellcheck disable=SC2016
+    # Single quotes are used to not expand expressions
+    patterns+=(-e 'include $(RIOTCPU)/.*/Makefile\..*')
+
+    pathspec+=('boards/')
+
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+            | error_with_message 'Makefiles files from cpu must not be included by the board anymore'
+}
+
+# CPU and CPU_MODEL definition have been moved to 'BOARD|CPU/Makefile.features'
+check_cpu_cpu_model_defined_in_makefile_features() {
+    local patterns=()
+    local pathspec=()
+
+    # With our without space and with or without ?=
+    patterns+=(-e '^ *\(export\)\? *CPU \??\?=')
+    patterns+=(-e '^ *\(export\)\? *CPU_MODEL \??\?=')
+    pathspec+=(':!boards/**/Makefile.features')
+    pathspec+=(':!cpu/**/Makefile.features')
+
+    # Currently blacklist this non migrated file for CPU_MODEL
+    pathspec+=(':!boards/slwstk6000b/Makefile.include')
+
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+            | error_with_message 'CPU and CPU_MODEL definition must be done by board/BOARD/Makefile.features, board/common/**/Makefile.features or cpu/CPU/Makefile.features'
+}
+
 # Applications Makefile must not set 'BOARD =' unconditionally
 check_not_setting_board_equal() {
     local patterns=()
@@ -149,6 +183,8 @@ all_checks() {
     check_not_parsing_features
     check_not_exporting_variables
     check_deprecated_vars_patterns
+    check_board_do_not_include_cpu_features_dep
+    check_cpu_cpu_model_defined_in_makefile_features
     check_not_setting_board_equal
 }
 

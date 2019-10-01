@@ -14,6 +14,8 @@ include $(RIOTBOARD)/$(BOARD)/Makefile.features
 # Transitional conditional include until all boards define 'CPU'
 ifneq (,$(CPU))
   include $(RIOTCPU)/$(CPU)/Makefile.features
+else
+  $(warning CPU must be defined by board / board_common Makefile.features)
 endif
 
 
