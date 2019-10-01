@@ -63,7 +63,9 @@ static volatile int result;
 
 static size_t set_len(uint8_t *buf, size_t len)
 {
-    if (len < (0xff - 7)) {
+    /* - `len` field minimum length == 1
+     * - `((len + 1) <= 0xff) == len < 0xff` */
+    if (len < 0xff) {
         buf[0] = len + 1;
         return 1;
     }
