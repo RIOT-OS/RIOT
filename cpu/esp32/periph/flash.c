@@ -20,16 +20,12 @@
 
 #if MODULE_MTD
 
-#define ENABLE_DEBUG (0)
-#include "debug.h"
-
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include "esp_common.h"
 #include "irq_arch.h"
-#include "log.h"
 #include "mtd.h"
 
 #include "rom/cache.h"
@@ -37,6 +33,9 @@
 #include "esp_flash_data_types.h"
 #include "esp_partition.h"
 #include "esp_spi_flash.h"
+
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
 #define ESP_PART_TABLE_ADDR         0x8000 /* TODO configurable as used in Makefile.include */
 #define ESP_PART_TABLE_SIZE         0xC00
@@ -169,9 +168,6 @@ esp_err_t IRAM_ATTR spi_flash_read(size_t addr, void *buff, size_t size)
     /* size must be within the flash address space */
     CHECK_PARAM_RET (addr + size <= _flash_end, -EOVERFLOW);
 
-    /* prepare for write access */
-    critical_enter();
-    Cache_Read_Disable(PRO_CPU_NUM);
     int result = ESP_ROM_SPIFLASH_RESULT_OK;
     uint32_t len = size;
 
@@ -182,8 +178,16 @@ esp_err_t IRAM_ATTR spi_flash_read(size_t addr, void *buff, size_t size)
         uint32_t len_in_word = 4 - pos_in_word;
         len_in_word = (len_in_word < len) ? len_in_word : len;
 
+        /* disable interrupts and the cache */
+        critical_enter();
+        Cache_Read_Disable(PRO_CPU_NUM);
+
         result = esp_rom_spiflash_read (word_addr, (uint32_t*)_flash_buf, 4);
         memcpy(buff, _flash_buf + pos_in_word, len_in_word);
+
+        /* enable interrupts and the cache */
+        Cache_Read_Enable(PRO_CPU_NUM);
+        critical_exit();
 
         buff  = (uint8_t*)buff + len_in_word;
         addr += len_in_word;
@@ -198,8 +202,16 @@ esp_err_t IRAM_ATTR spi_flash_read(size_t addr, void *buff, size_t size)
             len_full_words = ESP_ROM_SPIFLASH_BUFF_BYTE_READ_NUM;
         }
 
+        /* disable interrupts and the cache */
+        critical_enter();
+        Cache_Read_Disable(PRO_CPU_NUM);
+
         result |= esp_rom_spiflash_read (addr, (uint32_t*)_flash_buf, len_full_words);
         memcpy(buff, _flash_buf, len_full_words);
+
+        /* enable interrupts and the cache */
+        Cache_Read_Enable(PRO_CPU_NUM);
+        critical_exit();
 
         buff  = (uint8_t*)buff + len_full_words;
         addr += len_full_words;
@@ -208,13 +220,17 @@ esp_err_t IRAM_ATTR spi_flash_read(size_t addr, void *buff, size_t size)
 
     /* if there is some remaining, we need to prepare last word */
     if (len && result == ESP_ROM_SPIFLASH_RESULT_OK) {
+        /* disable interrupts and the cache */
+        critical_enter();
+        Cache_Read_Disable(PRO_CPU_NUM);
+
         result |= esp_rom_spiflash_read (addr, (uint32_t*)_flash_buf, 4);
         memcpy(buff, _flash_buf, len);
-    }
 
-    /* reset read access */
-    Cache_Read_Enable(PRO_CPU_NUM);
-    critical_exit();
+        /* enable interrupts and the cache */
+        Cache_Read_Enable(PRO_CPU_NUM);
+        critical_exit();
+    }
 
     /* return with the ESP-IDF error code that is mapped from ROM error code */
     RETURN_WITH_ESP_ERR_CODE(result);
@@ -230,8 +246,6 @@ esp_err_t IRAM_ATTR spi_flash_write(size_t addr, const void *buff, size_t size)
     CHECK_PARAM_RET (addr + size <= _flash_end, -EOVERFLOW);
 
     /* prepare for write access */
-    critical_enter();
-    Cache_Read_Disable(PRO_CPU_NUM);
     int result = esp_rom_spiflash_unlock();
     uint32_t len = size;
 
@@ -242,9 +256,17 @@ esp_err_t IRAM_ATTR spi_flash_write(size_t addr, const void *buff, size_t size)
         uint32_t len_in_word = 4 - pos_in_word;
         len_in_word = (len_in_word < len) ? len_in_word : len;
 
+        /* disable interrupts and the cache */
+        critical_enter();
+        Cache_Read_Disable(PRO_CPU_NUM);
+
         result |= esp_rom_spiflash_read (word_addr, (uint32_t*)_flash_buf, 4);
         memcpy(_flash_buf + pos_in_word, buff, len_in_word);
         result |= esp_rom_spiflash_write (word_addr, (uint32_t*)_flash_buf, 4);
+
+        /* enable interrupts and the cache */
+        Cache_Read_Enable(PRO_CPU_NUM);
+        critical_exit();
 
         buff  = (uint8_t*)buff + len_in_word;
         addr += len_in_word;
@@ -259,8 +281,16 @@ esp_err_t IRAM_ATTR spi_flash_write(size_t addr, const void *buff, size_t size)
             len_full_words = ESP_ROM_SPIFLASH_BUFF_BYTE_WRITE_NUM;
         }
 
+        /* disable interrupts and the cache */
+        critical_enter();
+        Cache_Read_Disable(PRO_CPU_NUM);
+
         memcpy(_flash_buf, buff, len_full_words);
         result |= esp_rom_spiflash_write (addr, (uint32_t*)_flash_buf, len_full_words);
+
+        /* enable interrupts and the cache */
+        Cache_Read_Enable(PRO_CPU_NUM);
+        critical_exit();
 
         buff  = (uint8_t*)buff + len_full_words;
         addr += len_full_words;
@@ -269,15 +299,21 @@ esp_err_t IRAM_ATTR spi_flash_write(size_t addr, const void *buff, size_t size)
 
     /* if there is some remaining, we need to prepare last word */
     if (len && result == ESP_ROM_SPIFLASH_RESULT_OK) {
+        /* disable interrupts and the cache */
+        critical_enter();
+        Cache_Read_Disable(PRO_CPU_NUM);
+
         result |= esp_rom_spiflash_read (addr, (uint32_t*)_flash_buf, 4);
         memcpy(_flash_buf, buff, len);
         result |= esp_rom_spiflash_write (addr, (uint32_t*)_flash_buf, 4);
+
+        /* enable interrupts and the cache */
+        Cache_Read_Enable(PRO_CPU_NUM);
+        critical_exit();
     }
 
     /* reset write access */
     esp_rom_spiflash_lock();
-    Cache_Read_Enable(PRO_CPU_NUM);
-    critical_exit();
 
     /* return with the ESP-IDF error code that is mapped from ROM error code */
     RETURN_WITH_ESP_ERR_CODE(result);
@@ -298,21 +334,36 @@ esp_err_t IRAM_ATTR spi_flash_erase_range(size_t addr, size_t size)
     CHECK_PARAM_RET (size % _flashchip->sector_size == 0, -ENOTSUP)
 
     /* prepare for write access */
-    critical_enter();
-    Cache_Read_Disable(PRO_CPU_NUM);
     uint32_t result = esp_rom_spiflash_unlock();
 
     /* erase as many sectors as necessary */
     uint32_t sec = addr / _flashchip->sector_size;
     uint32_t cnt = size / _flashchip->sector_size;
-    while (cnt-- && result == ESP_ROM_SPIFLASH_RESULT_OK) {
-        result = esp_rom_spiflash_erase_sector (sec++);
+    uint32_t sec_per_block = _flashchip->block_size / _flashchip->sector_size;
+
+    while (cnt && result == ESP_ROM_SPIFLASH_RESULT_OK) {
+        /* disable interrupts and the cache */
+        critical_enter();
+        Cache_Read_Disable(PRO_CPU_NUM);
+
+        /* erase block-wise (64 kByte) if cnt is at least sec_per_block */
+        if (cnt >= sec_per_block) {
+            result = esp_rom_spiflash_erase_block (sec / sec_per_block);
+            sec += sec_per_block;
+            cnt -= sec_per_block;
+        }
+        else {
+            result = esp_rom_spiflash_erase_sector (sec++);
+            cnt--;
+        }
+
+        /* enable interrupts and the cache */
+        Cache_Read_Enable(PRO_CPU_NUM);
+        critical_exit();
     }
 
     /* reset write access */
     esp_rom_spiflash_lock();
-    Cache_Read_Enable(PRO_CPU_NUM);
-    critical_exit();
 
     /* return with the ESP-IDF error code that is mapped from ROM error code */
     RETURN_WITH_ESP_ERR_CODE(result);
@@ -406,7 +457,11 @@ static int _flash_write (mtd_dev_t *dev, const void *buff, uint32_t addr, uint32
     /* size must be within the flash address space */
     CHECK_PARAM_RET (_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
 
-    return (spi_flash_write(_flash_beg + addr, buff, size) == ESP_OK) ?(int)size : -EIO;
+    /* addr + size must be within a page */
+    CHECK_PARAM_RET (size <= _flashchip->page_size, -EOVERFLOW);
+    CHECK_PARAM_RET ((addr % _flashchip->page_size) + size <= _flashchip->page_size, -EOVERFLOW);
+
+    return (spi_flash_write(_flash_beg + addr, buff, size) == ESP_OK) ? (int)size : -EIO;
 }
 
 static int _flash_erase (mtd_dev_t *dev, uint32_t addr, uint32_t size)
@@ -419,8 +474,8 @@ static int _flash_erase (mtd_dev_t *dev, uint32_t addr, uint32_t size)
     CHECK_PARAM_RET (_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
 
     /* size must be a multiple of sector_size && at least one sector */
-    CHECK_PARAM_RET (size >= _flashchip->sector_size, -ENOTSUP);
-    CHECK_PARAM_RET (size % _flashchip->sector_size == 0, -ENOTSUP)
+    CHECK_PARAM_RET (size >= _flashchip->sector_size, -EOVERFLOW);
+    CHECK_PARAM_RET (size % _flashchip->sector_size == 0, -EOVERFLOW)
 
     return (spi_flash_erase_range(_flash_beg + addr, size) == ESP_OK) ? 0 : -EIO;
 }
