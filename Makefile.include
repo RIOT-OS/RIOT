@@ -786,9 +786,22 @@ endif
 include $(RIOTTOOLS)/desvirt/Makefile.desvirt
 
 # Build a header file with all common macro definitions and undefinitions
-# make it depend on FORCE to re-run of the script every time even if the file exists
-# The script will only touch the file if anything has changed since last time.
-$(RIOTBUILD_CONFIG_HEADER_C): FORCE
+# Everytime the header is updated, it will trigger a new compilation.
+#
+# The file is created first through a `.in` file that will be modified if
+# any CFLAGS changed. It depends on FORCE to re-run of the script every time
+# even if the file exists but the file will only be updated on modifications.
+#
+# The header is then created by keeping only the macros. Keeping the
+# comments added absolute path in the file that screwed caching.
+#
+# The rebuild behavior could even only be done with an empty file, but currently
+# some macros definitions are passed through this file.
+$(RIOTBUILD_CONFIG_HEADER_C): $(RIOTBUILD_CONFIG_HEADER_C).in
+	$(Q)sed -n -e '1i /* Generated file do not edit */' -e '/^#.*/ p' $< > $@
+
+.SECONDARY: $(RIOTBUILD_CONFIG_HEADER_C).in
+$(RIOTBUILD_CONFIG_HEADER_C).in: FORCE | $(CLEAN)
 	@mkdir -p '$(dir $@)'
 	$(Q)'$(RIOTTOOLS)/genconfigheader/genconfigheader.sh' $(CFLAGS_WITH_MACROS) \
 		| '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
