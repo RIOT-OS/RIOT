@@ -1,4 +1,4 @@
 CPU_MODEL = nrf52832xxaa
 
-include $(RIOTBOARD)/common/nrf52/Makefile.nrf52832.features
+include $(RIOTBOARD)/common/nrf52/nrf52832/Makefile.features
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.features
