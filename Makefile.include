@@ -630,6 +630,13 @@ term: $(filter flash flash-only, $(MAKECMDGOALS)) $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	$(TERMPROG) $(TERMFLAGS)
 
+# Term without the pyterm added logging
+# TERMFLAGS must be exported for `jlink.sh term_rtt`.
+cleanterm: export PYTERMFLAGS += --noprefix --no-repeat-command-on-empty-line
+cleanterm: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
+	$(call check_cmd,$(TERMPROG),Terminal program)
+	$(TERMPROG) $(TERMFLAGS)
+
 list-ttys:
 	$(Q)$(RIOTTOOLS)/usb-serial/list-ttys.sh
 
