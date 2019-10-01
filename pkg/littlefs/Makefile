@@ -1,7 +1,7 @@
 PKG_NAME=littlefs
-PKG_URL=https://github.com/geky/littlefs.git
-# v1.6.2
-PKG_VERSION=0bb1f7af17755bd792f0c4966877fb1886dfc802
+PKG_URL=https://github.com/ARMmbed/littlefs.git
+# v2.1.3
+PKG_VERSION=6b65737715039ef92d348014316b575b52547019
 PKG_LICENSE=Apache-2.0
 
 .PHONY: all

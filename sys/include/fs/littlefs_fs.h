@@ -58,6 +58,18 @@ extern "C" {
  * If set, it must be program size */
 #define LITTLEFS_PROG_BUFFER_SIZE   (0)
 #endif
+
+#ifndef LITTLEFS_CACHE_PAGES
+/** Sets the number of pages used as cache. Has to be at least 1.
+ */
+#define LITTLEFS_CACHE_PAGES        (1)
+#endif
+
+#ifndef LITTLEFS_BLOCK_CYCLES
+/** Sets the maximum number of erase cycles before blocks are evicted as a part
+ * of wear leveling. -1 disables wear-leveling. */
+#define LITTLEFS_BLOCK_CYCLES       (512)
+#endif
 /** @} */
 
 /**
