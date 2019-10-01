@@ -1,4 +1,1 @@
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.dep
-
-# include common nrf52832 dependencies
-include $(RIOTBOARD)/common/nrf52/nrf52832/Makefile.dep

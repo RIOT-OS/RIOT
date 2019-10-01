@@ -1,4 +1,1 @@
-# include common nrf52840 dependencies
-include $(RIOTBOARD)/common/nrf52/nrf52840/Makefile.dep
-
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.dep
