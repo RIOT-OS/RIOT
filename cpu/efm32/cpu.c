@@ -51,6 +51,8 @@
 #define EMU_EM4INIT         EMU_EM4INIT_DEFAULT
 #endif
 
+#ifndef RIOTBOOT
+
 #ifdef _SILICON_LABS_32B_SERIES_1
 /**
  * @brief   Initialize integrated DC-DC regulator
@@ -154,13 +156,19 @@ static void pm_init(void)
 #endif
 }
 
+#endif
+
 void cpu_init(void)
 {
+#ifndef RIOTBOOT
     /* apply errata that may be applicable (see em_chip.h) */
     CHIP_Init();
+#endif
 
     /* initialize the Cortex-M core */
     cortexm_init();
+
+#ifndef RIOTBOOT
 
 #ifdef _SILICON_LABS_32B_SERIES_1
     /* initialize dc-dc */
@@ -178,4 +186,5 @@ void cpu_init(void)
 
     /* trigger static peripheral initialization */
     periph_init();
+#endif
 }
