@@ -50,4 +50,18 @@ The STDIO is not accessible via the USB port.
 To access the STDIO of RIOT, a FTDI to USB converter needs to be plugged to
 the RX/TX pins on the board.
 
+### nRF antenna selection
+
+The Particle Mesh boards all have two antenna choices for their nRF (Bluetooth
+/ 802.15.4) radios, a on-board antenna and a U.FL connector for an external
+antenna.
+
+By default, the on-board antenna is selected at startup. That choice can be
+overridden by setting ``BOARD_NRFANTENNA_DEFAULT = EXTERNAL`` (as opposed to
+the default ``BUILTIN``) in a project's `Makefile`, or at runtime using @ref
+board_nrfantenna_select function.
+
+The external antenna connection should only be enabled if a suitable antenna is
+connected.
+
  */
