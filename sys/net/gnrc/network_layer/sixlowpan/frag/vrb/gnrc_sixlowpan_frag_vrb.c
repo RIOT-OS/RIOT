@@ -34,6 +34,16 @@ uint16_t gnrc_sixlowpan_frag_next_tag(void)
 }
 #endif  /* !defined(MODULE_GNRC_SIXLOWPAN_FRAG) && defined(TEST_SUITES) */
 
+static inline bool _equal_index(const gnrc_sixlowpan_frag_vrb_t *vrbe,
+                                const uint8_t *src, size_t src_len,
+                                unsigned tag)
+{
+    return ((vrbe->super.tag == tag) &&
+            (vrbe->super.src_len == src_len) &&
+            (memcmp(vrbe->super.src, src, src_len) == 0));
+}
+
+
 gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
         const gnrc_sixlowpan_frag_rb_base_t *base,
         gnrc_netif_t *out_netif, const uint8_t *out_dst, size_t out_dst_len)
@@ -48,14 +58,14 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
         gnrc_sixlowpan_frag_vrb_t *ptr = &_vrb[i];
 
         if (gnrc_sixlowpan_frag_vrb_entry_empty(ptr) ||
-            (memcmp(&ptr->super, base, sizeof(ptr->super)) == 0)) {
+            _equal_index(ptr, base->src, base->src_len, base->tag)) {
             vrbe = ptr;
             if (gnrc_sixlowpan_frag_vrb_entry_empty(vrbe)) {
                 vrbe->super = *base;
                 vrbe->out_netif = out_netif;
-                memcpy(vrbe->out_dst, out_dst, out_dst_len);
+                memcpy(vrbe->super.dst, out_dst, out_dst_len);
                 vrbe->out_tag = gnrc_sixlowpan_frag_next_tag();
-                vrbe->out_dst_len = out_dst_len;
+                vrbe->super.dst_len = out_dst_len;
                 DEBUG("6lo vrb: creating entry (%s, ",
                       gnrc_netif_addr_to_str(vrbe->super.src,
                                              vrbe->super.src_len,
@@ -66,8 +76,8 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
                                              l2addr_str),
                       (unsigned)vrbe->super.datagram_size, vrbe->super.tag);
                 DEBUG("(%s, %u)\n",
-                      gnrc_netif_addr_to_str(vrbe->out_dst,
-                                             vrbe->out_dst_len,
+                      gnrc_netif_addr_to_str(vrbe->super.dst,
+                                             vrbe->super.dst_len,
                                              l2addr_str), vrbe->out_tag);
             }
             break;
@@ -89,12 +99,10 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
     for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         gnrc_sixlowpan_frag_vrb_t *vrbe = &_vrb[i];
 
-        if ((vrbe->super.tag == src_tag) &&
-            (vrbe->super.src_len == src_len) &&
-            (memcmp(vrbe->super.src, src, src_len) == 0)) {
+        if (_equal_index(vrbe, src, src_len, src_tag)) {
             DEBUG("6lo vrb: got VRB to (%s, %u)\n",
-                  gnrc_netif_addr_to_str(vrbe->out_dst,
-                                         vrbe->out_dst_len,
+                  gnrc_netif_addr_to_str(vrbe->super.dst,
+                                         vrbe->super.dst_len,
                                          l2addr_str), vrbe->out_tag);
             return vrbe;
         }
