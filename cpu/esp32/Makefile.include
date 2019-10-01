@@ -112,6 +112,9 @@ OPTIONAL_CFLAGS_BLACKLIST += -gz
 
 ASFLAGS += --longcalls --text-section-literals
 
+# thin archives trigger a reboot loop - see #12258, #12035, #12346
+ARFLAGS = rcs
+
 ifneq ($(CONFIGS),)
     CFLAGS += $(CONFIGS)
 endif
