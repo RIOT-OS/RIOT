@@ -146,7 +146,6 @@ int cmd_i2c_acquire(int argc, char **argv)
 
 int cmd_i2c_release(int argc, char **argv)
 {
-    int res;
     int dev;
 
     dev = _check_param(argc, argv, 1, 1, "DEV");
@@ -155,13 +154,10 @@ int cmd_i2c_release(int argc, char **argv)
     }
 
     printf("Command: i2c_release(%i)\n", dev);
-    res = i2c_release(dev);
+    i2c_release(dev);
 
-    if (res == I2C_ACK) {
-        printf("Success: i2c_%i released\n", dev);
-        return 0;
-    }
-    return _print_i2c_error(res);
+    printf("Success: i2c_%i released\n", dev);
+    return 0;
 }
 
 int cmd_i2c_read_reg(int argc, char **argv)

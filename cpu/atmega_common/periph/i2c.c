@@ -226,12 +226,11 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
     mutex_unlock(&locks[dev]);
-    return 0;
 }
 
 static void i2c_poweron(i2c_t dev)
