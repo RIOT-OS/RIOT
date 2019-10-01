@@ -477,6 +477,18 @@ static inline void sercom_set_gen(void *sercom, uint32_t gclk)
 }
 
 /**
+ * @brief   Returns true if the CPU woke deep sleep (backup/standby)
+ */
+static inline bool cpu_woke_from_backup(void)
+{
+#ifdef RSTC_RCAUSE_BACKUP
+    return RSTC->RCAUSE.bit.BACKUP;
+#else
+    return false;
+#endif
+}
+
+/**
  * @brief ADC Channel Configuration
  */
 typedef struct {
