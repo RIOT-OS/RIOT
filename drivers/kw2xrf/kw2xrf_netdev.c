@@ -666,7 +666,10 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
         irqsts1 |= MKW2XDM_IRQSTS1_TXIRQ;
         if (dregs[MKW2XDM_PHY_CTRL1] & MKW2XDM_PHY_CTRL1_RXACKRQD) {
             DEBUG("[kw2xrf] wait for RX ACK\n");
-            kw2xrf_seq_timeout_on(dev, _MACACKWAITDURATION);
+            /* Allow TMR3IRQ to cancel RX operation */
+            kw2xrf_timer3_seq_abort_on(dev);
+            /* Enable interrupt for TMR3 and set timer */
+            kw2xrf_abort_rx_ops_enable(dev, _MACACKWAITDURATION);
         }
     }
 
@@ -694,21 +697,25 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
             }
         }
 
-        DEBUG("[kw2xrf] SEQIRQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_SEQIRQ;
         assert(dev->pending_tx != 0);
         dev->pending_tx--;
-        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-        kw2xrf_seq_timeout_off(dev);
+
+        if (dregs[MKW2XDM_IRQSTS3] & MKW2XDM_IRQSTS3_TMR3IRQ) {
+            /* if the sequence was aborted by timer 3, ACK timed out */
+            DEBUG("[kw2xrf] TC3TMOUT, SEQIRQ, TX failed\n");
+            netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
+        } else {
+            DEBUG("[kw2xrf] SEQIRQ\n");
+            netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+        }
+
+        /* Disallow TMR3IRQ to cancel RX operation */
+        kw2xrf_timer3_seq_abort_off(dev);
+        /* Disable interrupt for TMR3 and reset TMR3IRQ */
+        kw2xrf_abort_rx_ops_disable(dev);
+        /* Go back to idle state */
         kw2xrf_set_idle_sequence(dev);
-    }
-    else if (dregs[MKW2XDM_IRQSTS3] & MKW2XDM_IRQSTS3_TMR4IRQ) {
-        DEBUG("[kw2xrf] TC4TMOUT, no SEQIRQ, TX failed\n");
-        assert(dev->pending_tx != 0);
-        dev->pending_tx--;
-        netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
-        kw2xrf_seq_timeout_off(dev);
-        kw2xrf_set_sequence(dev, dev->idle_state);
     }
 
     kw2xrf_write_dreg(dev, MKW2XDM_IRQSTS1, irqsts1);
