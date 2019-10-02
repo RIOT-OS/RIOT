@@ -26,13 +26,6 @@
 
 extern void board_init(void);
 
-/**
- * Leave some extra space in the stack to allows us to finish the kernel
- * initialization procedure. __heap_end is set the current stack, minus
- * STACK_EXTRA since there is still code to execute.
- */
-#define STACK_EXTRA 32
-
 __attribute__((constructor)) static void startup(void)
 {
     /* use putchar so the linker links it in: */
@@ -41,11 +34,6 @@ __attribute__((constructor)) static void startup(void)
     board_init();
 
     LOG_INFO("RIOT MSP430 hardware initialization complete.\n");
-
-    /* save current stack pointer as top of heap before enter the thread mode */
-    extern char *__heap_end;
-    __asm__ __volatile__("mov r1, %0" : "=r"(__heap_end));
-    __heap_end -= STACK_EXTRA;
 
     kernel_init();
 }
