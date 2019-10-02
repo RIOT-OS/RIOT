@@ -1,2 +1,0 @@
-# Nordic SoftDevice support in RIOT is verified for all nrf52832-based boards
-FEATURES_PROVIDED += ble_nordic_softdevice

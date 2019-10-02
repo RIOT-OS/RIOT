@@ -4,5 +4,4 @@ CPU_MODEL = nrf52832xxaa
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_uart
 
-include $(RIOTBOARD)/common/nrf52/Makefile.nrf52832.features
 include $(RIOTBOARD)/common/nrf52/Makefile.features
