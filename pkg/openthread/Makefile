@@ -2,7 +2,8 @@ PKG_NAME=openthread
 PKG_URL=https://github.com/openthread/openthread.git
 PKG_VERSION=thread-reference-20180926
 PKG_LICENSE=BSD-3-Clause
-PKG_BUILDDIR ?= $(PKGDIRBASE)/$(PKG_NAME)
+
+include $(RIOTBASE)/pkg/pkg.mk
 
 ifneq (,$(filter openthread-ftd,$(USEMODULE)))
   TD = ftd
@@ -22,8 +23,6 @@ endif
 OPENTHREAD_ARGS += $(CLI_ARG) $(JOINER_ARG) --enable-application-coap
 CONFIG_FILE      = OPENTHREAD_PROJECT_CORE_CONFIG_FILE='\"platform_config.h\"'
 $(info $$OPENTHREAD_ARGS is [${OPENTHREAD_ARGS}])
-
-.PHONY: all
 
 OPENTHREAD_COMMON_FLAGS = -fdata-sections -ffunction-sections -Os
 OPENTHREAD_COMMON_FLAGS += -Wno-implicit-fallthrough -Wno-unused-parameter
@@ -48,5 +47,3 @@ all:
 ifneq (,$(filter openthread-cli,$(USEMODULE)))
 	cp $(PKG_BUILDDIR)/output/lib/libopenthread-cli-$(TD).a ${BINDIR}/openthread-cli.a
 endif
-
-include $(RIOTBASE)/pkg/pkg.mk

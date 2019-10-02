@@ -5,7 +5,8 @@ PKG_URL=https://github.com/wolfssl/wolfssl.git
 PKG_VERSION=eaeaaf12c11dd52ab0cd6833252ed559656e9826
 PKG_LICENSE=GPLv2
 
-.PHONY: all
+include $(RIOTBASE)/pkg/pkg.mk
+
 all:  # Nothing to do here when building
 
 prepare:
@@ -14,5 +15,3 @@ prepare:
 	touch $(PKG_BUILDDIR)/wolfssl.a
 	cp Makefile.wolfcrypt-test $(PKG_BUILDDIR)/wolfcrypt/test/Makefile
 	cp Makefile.wolfcrypt-benchmark $(PKG_BUILDDIR)/wolfcrypt/benchmark/Makefile
-
-include $(RIOTBASE)/pkg/pkg.mk

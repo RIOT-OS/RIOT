@@ -2,9 +2,8 @@ PKG_NAME=		# name of the package
 PKG_URL=		# source url of the package's git repository
 PKG_VERSION=	# version of the package to use e.g. a git commit/ref
 
-.PHONY: all
+include $(RIOTBASE)/pkg/pkg.mk
 
 all:
 	$(MAKE) -C $(CURDIR)/$(PKG_NAME)
 
-include $(RIOTBASE)/pkg/pkg.mk

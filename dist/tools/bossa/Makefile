@@ -4,7 +4,7 @@ PKG_VERSION  = 26154375695f345491bba158d57177aa231d6765
 PKG_LICENSE  = BSD-3-Clause
 PKG_BUILDDIR = $(CURDIR)/bin
 
-.PHONY: all
+include $(RIOTBASE)/pkg/pkg.mk
 
 all: git-download
 	@echo "[INFO] compiling bossac from source now"
@@ -13,5 +13,3 @@ all: git-download
 
 distclean::
 	@rm -f $(CURDIR)/bossac
-
-include $(RIOTBASE)/pkg/pkg.mk

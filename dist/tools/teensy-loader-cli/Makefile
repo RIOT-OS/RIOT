@@ -2,6 +2,8 @@ PKG_NAME=teensy-loader-cli
 PKG_LICENSE=GPL-3
 PKG_BUILDDIR=$(CURDIR)/bin
 
+include $(RIOTBASE)/pkg/pkg.mk
+
 # resolv build host in a hacky way
 UNAME=$(shell uname)
 TARGET=WINDOWS
@@ -21,10 +23,6 @@ else
   PKG_VERSION=76921edbdd81ae99b869b104404c16c06b0a266f
 endif
 
-.PHONY: all
-
 all: git-download
 	env -i PATH=$(PATH) TERM=$(TERM) "$(MAKE)" -C $(PKG_BUILDDIR)
 	mv $(PKG_BUILDDIR)/teensy_loader_cli ./teensy_loader
-
-include $(RIOTBASE)/pkg/pkg.mk

@@ -4,9 +4,7 @@ PKG_URL=https://github.com/intel/tinycbor
 PKG_VERSION=d94ca09aa91f5b3c581527aa8bca179a82b79874
 PKG_LICENSE=MIT
 
-.PHONY: all
+include $(RIOTBASE)/pkg/pkg.mk
 
 all:
 	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(CURDIR)/Makefile.tinycbor
-
-include $(RIOTBASE)/pkg/pkg.mk

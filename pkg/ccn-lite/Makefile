@@ -3,10 +3,11 @@ PKG_URL=https://github.com/cn-uofbasel/ccn-lite/
 PKG_VERSION=e37b02c5cb20e9acccea2394be40f7e570a66a4b
 PKG_LICENSE=ISC
 
-.PHONY: all ..cmake_version_supported
+include $(RIOTBASE)/pkg/pkg.mk
+
+.PHONY: ..cmake_version_supported
 
 CMAKE_MINIMAL_VERSION = 3.6.0
-
 
 RIOT_CFLAGS = $(INCLUDES)
 
@@ -35,8 +36,6 @@ git-download: | ..cmake_version_supported
 	CMAKE_VERSION=$$(cmake --version | sed -n '1 {s/cmake version //;s/-rc.*//;p;}'); \
 	$(RIOTTOOLS)/has_minimal_version/has_minimal_version.sh "$${CMAKE_VERSION}" "$(CMAKE_MINIMAL_VERSION)" cmake
 
-
-include $(RIOTBASE)/pkg/pkg.mk
 ifneq (,$(filter -Wformat-nonliteral -Wformat=2, $(CFLAGS)))
   CFLAGS += -Wno-format-nonliteral
 endif
