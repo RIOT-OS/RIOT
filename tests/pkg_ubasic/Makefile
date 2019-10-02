@@ -31,5 +31,6 @@ BOARD_BLACKLIST := \
 
 USEPKG += ubasic
 USEMODULE += ubasic_tests
+USEMODULE += printf_float
 
 include $(RIOTBASE)/Makefile.include
