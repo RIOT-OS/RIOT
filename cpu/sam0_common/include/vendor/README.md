@@ -2,8 +2,7 @@
 
 The include files in this directory tree are copied from Atmel
 sources. Most of the sam0 files are from ASF (Atmel Software Foundation,
-version 3.35.1). The SAMR30 files are from ASF 3.34.2. The SAML10 and
-SAML11 files are from, so called, atpacks.
+version 3.35.1). The SAML10 and SAML11 files are from, so called, atpacks.
 
 ## The sam0 files
 
