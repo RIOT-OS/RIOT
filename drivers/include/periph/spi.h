@@ -43,6 +43,19 @@
  *    configures the bus with specific parameters (clock, mode) for the duration
  *    of that transaction.
  *
+ * # (Low-) Power Implications
+ *
+ * As SPI buses are shared peripherals and the interfaces implements a
+ * transaction based paradigm, we leverage this for the SPI peripherals power
+ * management. After calling spi_init(), the SPI peripheral **should** be
+ * completely powered off (e.g. through peripheral clock gating). It **should**
+ * subsequently only be powered on and enabled in between spi_acquire() and
+ * spi_release() blocks.
+ *
+ * In case the SPI driver implementation puts the active thread to sleep during
+ * data transfer (e.g. when using DMA), the implementation might need to block
+ * certain power states during that time.
+ *
  * @{
  * @file
  * @brief       Low-level SPI peripheral driver interface definition

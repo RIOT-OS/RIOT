@@ -16,6 +16,17 @@
  * conform to the `struct tm` specification.
  * Compare: http://pubs.opengroup.org/onlinepubs/7908799/xsh/time.h.html
  *
+ * # (Low-) Power Implications
+ *
+ * After the RTC has been initialized (i.e. after calling rtc_init()), the RTC
+ * should be powered on and running. The RTC can then be powered off manually
+ * at a later point in time by calling the rtc_poweroff() function. When the RTC
+ * is powered back on using the rtc_poweron() function, it **should**
+ * transparently continue its previously configured operation.
+ *
+ * On many CPUs, certain power states might need to be blocked in rtc_init(), so
+ * that it is ensured that the RTC will function properly while it is enabled.
+ *
  * @{
  * @file
  * @brief       Low-level RTC peripheral driver interface definitions
