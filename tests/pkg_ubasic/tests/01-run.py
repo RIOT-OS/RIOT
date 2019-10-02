@@ -17,7 +17,7 @@ TIMEOUT = 180
 
 def testfunc(child):
     for i in range(1, 6):
-        child.expect(r"Running test #{}... done. Run time: [0-9.]* s".format(i),
+        child.expect(r"Running test #%d... done. Run time: \d+.\d{3} s" % i,
                      timeout=TIMEOUT)
 
 
