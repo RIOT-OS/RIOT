@@ -19,8 +19,13 @@
 #include "mtd.h"
 #include "mtd_flashpage.h"
 
-#define TEST_ADDRESS1       (uint32_t)flashpage_addr(FLASHPAGE_NUMOF - 1)
-#define TEST_ADDRESS2       (uint32_t)flashpage_addr(FLASHPAGE_NUMOF - 2)
+#if (__SIZEOF_POINTER__ == 2)
+    #define TEST_ADDRESS1       (uint16_t)flashpage_addr(FLASHPAGE_NUMOF - 1)
+    #define TEST_ADDRESS2       (uint16_t)flashpage_addr(FLASHPAGE_NUMOF - 2)
+#else
+    #define TEST_ADDRESS1       (uint32_t)flashpage_addr(FLASHPAGE_NUMOF - 1)
+    #define TEST_ADDRESS2       (uint32_t)flashpage_addr(FLASHPAGE_NUMOF - 2)
+#endif
 
 static mtd_dev_t _dev = MTD_FLASHPAGE_INIT_VAL(8);
 static mtd_dev_t *dev = &_dev;
