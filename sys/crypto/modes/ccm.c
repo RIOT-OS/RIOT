@@ -37,7 +37,8 @@ static inline int min(int a, int b)
 static int ccm_compute_cbc_mac(cipher_t *cipher, const uint8_t iv[16],
                         const uint8_t *input, size_t length, uint8_t *mac)
 {
-    uint8_t offset, block_size, mac_enc[16] = { 0 };
+    uint8_t block_size, mac_enc[16] = { 0 };
+    uint32_t offset;
 
     block_size = cipher_get_block_size(cipher);
     memmove(mac, iv, 16);
@@ -244,7 +245,8 @@ int cipher_decrypt_ccm(cipher_t *cipher,
     uint8_t nonce_counter[16] = { 0 }, mac_iv[16] = { 0 }, mac[16] = { 0 },
             mac_recv[16] = { 0 }, stream_block[16] = { 0 },
             zero_block[16] = { 0 },
-            plain_len, block_size;
+            block_size;
+    size_t plain_len;
 
     if (mac_length % 2 != 0  || mac_length < 4 || mac_length > 16) {
         return CCM_ERR_INVALID_MAC_LENGTH;
