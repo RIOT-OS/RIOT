@@ -527,7 +527,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
                     break;
 
                 case MSG_TYPE_USER_SPEC_TIMEOUT:
-                    DEBUG("gnrc_tcp.c : gnrc_tcp_send() : USER_SPEC_TIMEOUT\n");
+                    DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : USER_SPEC_TIMEOUT\n");
                     _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
                     ret = -ETIMEDOUT;
                     break;
@@ -645,7 +645,7 @@ gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16
     /* Allocate header */
     res = gnrc_pktbuf_add(payload, NULL, sizeof(tcp_hdr_t), GNRC_NETTYPE_TCP);
     if (res == NULL) {
-        DEBUG("tcp: No space left in packet buffer\n");
+        DEBUG("gnrc_tcp.c : gnrc_tcp_hdr_build() : No space left in packet buffer\n");
         return NULL;
     }
     hdr = (tcp_hdr_t *) res->data;
