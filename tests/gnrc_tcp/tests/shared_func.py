@@ -105,6 +105,6 @@ def sudo_guard():
     sudo_required = os.environ.get("BOARD", "") != "native"
     if sudo_required and os.geteuid() != 0:
         print("\x1b[1;31mThis test requires root privileges.\n"
-              "It's constructing and sending Ethernet frames.\x1b[0m\n",
+              "It uses `./dist/tools/ethos/start_networking.sh` as term\x1b[0m\n",
               file=sys.stderr)
         sys.exit(1)
