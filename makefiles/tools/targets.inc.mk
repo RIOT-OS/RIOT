@@ -29,3 +29,8 @@ $(RIOTTOOLS)/mosquitto_rsmb/mosquitto_rsmb:
 
 mosquitto_rsmb: $(RIOTTOOLS)/mosquitto_rsmb/mosquitto_rsmb
 	@make -C $(RIOTTOOLS)/mosquitto_rsmb run
+
+$(RIOTTOOLS)/setsid/setsid: $(RIOTTOOLS)/setsid/Makefile
+	@echo "[INFO] setsid binary not found - building it from source now"
+	@make -C $(RIOTTOOLS)/setsid
+	@echo "[INFO] setsid binary successfully build!"

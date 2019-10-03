@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
+
+# The setsid command is needed so that Ctrl+C in GDB doesn't kill avarice
+: ${SETSID:=setsid}
+
 sleep 2
-setsid -w avarice $1 &
+${SETSID} -w avarice $1 &
 #sleep 2 && $2/avr-gdb-wrapper -ex "target remote localhost:$3" $4
 sleep 3 && avr-gdb -ex "target remote localhost:$3" $4
 
