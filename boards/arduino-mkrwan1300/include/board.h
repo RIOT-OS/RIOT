@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Inria
+ * Copyright (C) 2018 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,11 +7,12 @@
  */
 
 /**
- * @ingroup     boards_arduino-mkr1000
+ * @ingroup     boards_arduino-mkrwan1300
+ * @brief       Support for the Arduino MKRWAN1300 board.
  * @{
  *
  * @file
- * @brief       Board specific definitions for the Arduino MKR1000
+ * @brief       Board specific definitions for the Arduino MKRWAN1300
  *              board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
@@ -47,7 +48,7 @@ extern "C" {
 #define LED0_OFF            (LED_PORT.OUTCLR.reg = LED0_MASK)
 #define LED0_TOGGLE         (LED_PORT.OUTTGL.reg = LED0_MASK)
 
-#define LED0_NAME           "LED(Green)"
+#define LED0_NAME           "LED(Amber)"
 /** @} */
 
 #ifdef __cplusplus

@@ -15,7 +15,7 @@ BOARD_INSUFFICIENT_MEMORY := blackpill blackpill-128kib bluepill \
                              nucleo-f302r8 nucleo-f303k8 nucleo-f334r8 \
                              nucleo-f410rb nucleo-l031k6 nucleo-l053r8 \
                              opencm904 spark-core stm32f0discovery \
-                             airfy-beacon  arduino-mkr1000 \
+                             airfy-beacon arduino-mkr1000 arduino-mkrwan1300 \
                              arduino-mkrfox1200 arduino-mkrzero arduino-zero \
                              b-l072z-lrwan1  cc2538dk ek-lm4f120xl  feather-m0 \
                              ikea-tradfri limifrog-v1 lobaro-lorabox \

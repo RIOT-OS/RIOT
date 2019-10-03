@@ -25,6 +25,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-mega2560 \
                              arduino-mkr1000 \
                              arduino-mkrfox1200 \
+                             arduino-mkrwan1300 \
                              arduino-mkrzero \
                              arduino-nano \
                              arduino-uno \

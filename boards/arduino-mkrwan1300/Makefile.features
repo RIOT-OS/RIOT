@@ -1,0 +1,1 @@
+include $(RIOTBOARD)/common/arduino-mkr/Makefile.features
