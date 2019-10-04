@@ -1,6 +1,12 @@
-ifneq (,$(filter periph_spi,$(USEMODULE)))
-  USEMODULE += periph_spidev_linux
+ifeq ($(OS),Linux)
+  ifneq (,$(filter periph_gpio,$(USEMODULE)))
+    USEMODULE += periph_gpio_linux
+  endif
+  ifneq (,$(filter periph_spi,$(USEMODULE)))
+    USEMODULE += periph_spidev_linux
+  endif
 endif
+
 ifeq (,$(filter stdio_%,$(USEMODULE)))
   USEMODULE += stdio_native
 endif
