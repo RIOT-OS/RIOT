@@ -1,6 +1,11 @@
 #
 # Include this file if your Package needs to be checked out by git
 #
+# Packages should include this file just after defining the PKG_* variables
+# This will ensure the variables are defined in the Makefile.
+ifneq (,$(.DEFAULT_GOAL))
+  $(error $(lastword $(MAKEFILE_LIST)) must be included at the beginning of the file after defining the PKG_* variables)
+endif
 
 ifeq (,$(PKG_NAME))
   $(error PKG_NAME not defined)
