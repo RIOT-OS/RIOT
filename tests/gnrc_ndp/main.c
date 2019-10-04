@@ -11,10 +11,9 @@
  * @{
  *
  * @file
- * @brief       Tests extension header handling of gnrc stack.
+ * @brief       Tests NDP message handling of gnrc stack.
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
+ * @author      Martine S. Lenders <m.lenders@fu-berlin.de>
  *
  * @}
  */
