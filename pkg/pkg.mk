@@ -1,6 +1,20 @@
 #
 # Include this file if your Package needs to be checked out by git
 #
+
+ifeq (,$(PKG_NAME))
+  $(error PKG_NAME not defined)
+endif
+ifeq (,$(PKG_URL))
+  $(error PKG_URL not defined)
+endif
+ifeq (,$(PKG_VERSION))
+  $(error PKG_VERSION not defined)
+endif
+ifeq (,$(PKG_LICENSE))
+  $(error PKG_LICENSE not defined)
+endif
+
 PKG_DIR?=$(CURDIR)
 PKG_BUILDDIR?=$(PKGDIRBASE)/$(PKG_NAME)
 PKG_SOURCE_LOCAL ?= $(PKG_SOURCE_LOCAL_$(shell echo $(PKG_NAME) | tr a-z- A-Z_))
