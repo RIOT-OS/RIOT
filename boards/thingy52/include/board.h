@@ -34,6 +34,14 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Power switch pins definitions
+ * @{
+ */
+#define SPK_PWR_CTRL_PIN    GPIO_PIN(0, 29) /**< Speaker power switch */
+#define VDD_PWR_CTRL_PIN    GPIO_PIN(0, 30) /**< VDD power switch */
+/** @} */
+
+/**
  * @name    LIS2DH12 low power accelerometer configuration
  * @{
  */
