@@ -1,6 +1,7 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += lis2dh12
   USEMODULE += hts221
+  USEMODULE += lps22hb
 endif
 
 include $(RIOTBOARD)/common/nrf52/Makefile.dep
