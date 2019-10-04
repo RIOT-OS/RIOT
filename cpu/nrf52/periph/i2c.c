@@ -47,8 +47,7 @@ static mutex_t locks[I2C_NUMOF];
 
 static inline NRF_TWIM_Type *bus(i2c_t dev)
 {
-    (void) dev;
-    return i2c_config[0].dev;
+    return i2c_config[dev].dev;
 }
 
 static int finish(i2c_t dev)
