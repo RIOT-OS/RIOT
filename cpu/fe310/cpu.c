@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <malloc.h>
 
 #include "thread.h"
 #include "irq.h"
@@ -377,4 +378,18 @@ void thread_yield_higher(void)
 
     /* Latency of SW intr can be 4-7 cycles; wait for the SW intr */
     __asm__ volatile ("wfi");
+}
+
+/**
+ * @brief Print heap statistics
+ */
+void heap_stats(void)
+{
+    extern char _heap_start; /* defined in linker script */
+    extern char _heap_end;   /* defined in linker script */
+
+    long int heap_size = &_heap_end - &_heap_start;
+    struct mallinfo minfo = mallinfo();
+    printf("heap: %ld (used %u, free %ld) [bytes]\n",
+           heap_size, minfo.uordblks, heap_size - minfo.uordblks);
 }

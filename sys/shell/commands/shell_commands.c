@@ -29,7 +29,7 @@ extern int _reboot_handler(int argc, char **argv);
 extern int _id_handler(int argc, char **argv);
 #endif
 
-#ifdef MODULE_LPC_COMMON
+#ifdef MODULE_HEAP_CMD
 extern int _heap_handler(int argc, char **argv);
 #endif
 
@@ -168,8 +168,8 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_CONFIG
     {"id", "Gets or sets the node's id.", _id_handler},
 #endif
-#ifdef MODULE_LPC_COMMON
-    {"heap", "Shows the heap state for the LPC2387 on the command shell.", _heap_handler},
+#ifdef MODULE_HEAP_CMD
+    {"heap", "Prints heap statistics.", _heap_handler},
 #endif
 #ifdef MODULE_PS
     {"ps", "Prints information about running threads.", _ps_handler},
