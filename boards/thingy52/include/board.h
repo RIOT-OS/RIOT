@@ -40,6 +40,12 @@ extern "C" {
 #define LIS2DH12_PARAM_I2C  I2C_DEV(1)
 /** @} */
 
+/**
+ * @name    LPS22HB device address
+ * @{
+ */
+#define LPSXXX_PARAM_ADDR   (0x5c)
+/** @} */
 
 /**
  * @brief   Initialize board specific hardware
