@@ -97,3 +97,7 @@ endif
 ifneq (native,$(BOARD))
   INCLUDES += -I$(RIOTBASE)/sys/libc/include
 endif
+
+ifneq (,$(filter clif, $(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/sys/clif/include
+endif
