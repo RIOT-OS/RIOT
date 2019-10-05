@@ -32,11 +32,11 @@ extern "C" {
 #define CPU_FLASH_BASE      (0x4000)
 #define FLASHPAGE_NUMOF     (96)        /* 48K */
 #elif defined (CPU_MODEL_MSP430F1612)
-#define CPU_FLASH_BASE      (0x2600)
-#define FLASHPAGE_NUMOF     (110)       /* 56K */
+#define CPU_FLASH_BASE      (0x2600)    /* first sector is only 256 byte, skip it*/
+#define FLASHPAGE_NUMOF     (109U)      /* 54.5K */
 #elif defined (CPU_MODEL_MSP430F2617)
-#define CPU_FLASH_BASE      (0x3100)
-#define FLASHPAGE_NUMOF     (128)       /* we can currently only access 52K */
+#define CPU_FLASH_BASE      (0x3200)    /* first sector is only 256 byte, skip it*/
+#define FLASHPAGE_NUMOF     (103U)      /* we can currently only access 51.5K */
 #elif defined (CPU_MODEL_CC430F6137)
 #define CPU_FLASH_BASE      (0x8000)
 #define FLASHPAGE_NUMOF     (64)        /* 32K */
