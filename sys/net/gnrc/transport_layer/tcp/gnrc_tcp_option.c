@@ -69,7 +69,8 @@ int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
                 }
         }
 
-        if (opt_left < TCP_OPTION_LENGTH_MIN || option->length > opt_left) {
+        if ((opt_left < TCP_OPTION_LENGTH_MIN) || (option->length > opt_left) ||
+            (option->length < TCP_OPTION_LENGTH_MIN)) {
             DEBUG("gnrc_tcp_option.c : _option_parse() : Invalid option. Drop Packet.\n");
             return -1;
         }
