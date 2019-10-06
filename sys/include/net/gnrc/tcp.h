@@ -70,7 +70,7 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
  *                                 source port is randomly chosen. If local_port is non-zero
  *                                 the local_port is used as source port.
  *
- * @returns   Zero on success.
+ * @returns   0 on success.
  *            -EAFNOSUPPORT if @p address_family is not supported.
  *            -EINVAL if @p address_family is not the same the address_family use by the TCB.
  *                    or @p target_addr is invalid.
@@ -103,7 +103,7 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  uint8_t address_family,
  *                                 addresses is valied.
  * @param[in]     local_port       Port number to listen on.
  *
- * @returns   Zero on success.
+ * @returns   0 on success.
  *            -EAFNOSUPPORT if local_addr != NULL and @p address_family is not supported.
  *            -EINVAL if @p address_family is not the same the address_family used in TCB.
  *                    or @p target_addr is invalid.
@@ -195,7 +195,7 @@ void gnrc_tcp_abort(gnrc_tcp_tcb_t *tcb);
  * @param[in] hdr          Gnrc_pktsnip that contains TCP header.
  * @param[in] pseudo_hdr   Gnrc_pktsnip that contains network layer header.
  *
- * @returns   Zero on succeed.
+ * @returns   0 on succees.
  *            -EFAULT if @p hdr or pseudo_hdr were NULL
  *            -EBADMSG if @p hdr is not of type GNRC_NETTYPE_TCP
  *            -ENOENT if @p pseudo_hdr protocol is unsupported.
