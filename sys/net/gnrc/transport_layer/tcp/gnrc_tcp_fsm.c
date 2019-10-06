@@ -307,9 +307,11 @@ static int _fsm_call_recv(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
     /* Read data into 'buf' up to 'len' bytes from receive buffer */
     size_t rcvd = ringbuffer_get(&(tcb->rcv_buf), buf, len);
 
-    /* If receive buffer can store more than GNRC_TCP_MSS: open window to available buffer size */
-    if (ringbuffer_get_free(&tcb->rcv_buf) >= GNRC_TCP_MSS) {
-        tcb->rcv_wnd = ringbuffer_get_free(&(tcb->rcv_buf));
+    /* Reopen window if recv buffer can hold a MSS sized payload and FIN was not received. */
+    uint16_t buf_free = ringbuffer_get_free(&tcb->rcv_buf);
+
+    if (buf_free >= GNRC_TCP_MSS && tcb->state != FSM_STATE_CLOSE_WAIT) {
+        tcb->rcv_wnd = buf_free;
 
         /* Send ACK to anounce window update */
         gnrc_pktsnip_t *out_pkt = NULL;
