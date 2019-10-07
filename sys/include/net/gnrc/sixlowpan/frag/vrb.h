@@ -27,6 +27,9 @@
 
 #include "net/gnrc/netif.h"
 #include "net/gnrc/sixlowpan/config.h"
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
+#include "net/gnrc/sixlowpan/frag.h"
+#endif /* MODULE_GNRC_SIXLOWPAN_FRAG */
 #include "net/gnrc/sixlowpan/frag/rb.h"
 #include "timex.h"
 
