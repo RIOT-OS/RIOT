@@ -170,8 +170,8 @@ static const uart_conf_t uart_config[] = {
 #define ADC_PRESCALER                       ADC_CTRLB_PRESCALER_DIV512
 
 #define ADC_NEG_INPUT                       ADC_INPUTCTRL_MUXNEG_GND
-#define ADC_GAIN_FACTOR_DEFAULT             ADC_INPUTCTRL_GAIN_1X
-#define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INT1V
+#define ADC_GAIN_FACTOR_DEFAULT             ADC_INPUTCTRL_GAIN_DIV2
+#define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INTVCC1
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
