@@ -22,7 +22,7 @@
 #include "debug.h"
 
 static gnrc_sixlowpan_frag_vrb_t _vrb[GNRC_SIXLOWPAN_FRAG_VRB_SIZE];
-static char l2addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
+static char addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
 
 #if !defined(MODULE_GNRC_SIXLOWPAN_FRAG) && defined(TEST_SUITES)
 /* mock for e.g. testing */
@@ -69,16 +69,16 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
                 DEBUG("6lo vrb: creating entry (%s, ",
                       gnrc_netif_addr_to_str(vrbe->super.src,
                                              vrbe->super.src_len,
-                                             l2addr_str));
+                                             addr_str));
                 DEBUG("%s, %u, %u) => ",
                       gnrc_netif_addr_to_str(vrbe->super.dst,
                                              vrbe->super.dst_len,
-                                             l2addr_str),
+                                             addr_str),
                       (unsigned)vrbe->super.datagram_size, vrbe->super.tag);
                 DEBUG("(%s, %u)\n",
                       gnrc_netif_addr_to_str(vrbe->super.dst,
                                              vrbe->super.dst_len,
-                                             l2addr_str), vrbe->out_tag);
+                                             addr_str), vrbe->out_tag);
             }
             break;
         }
@@ -95,7 +95,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
         const uint8_t *src, size_t src_len, unsigned src_tag)
 {
     DEBUG("6lo vrb: trying to get entry for (%s, %u)\n",
-          gnrc_netif_addr_to_str(src, src_len, l2addr_str), src_tag);
+          gnrc_netif_addr_to_str(src, src_len, addr_str), src_tag);
     for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         gnrc_sixlowpan_frag_vrb_t *vrbe = &_vrb[i];
 
@@ -103,7 +103,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
             DEBUG("6lo vrb: got VRB to (%s, %u)\n",
                   gnrc_netif_addr_to_str(vrbe->super.dst,
                                          vrbe->super.dst_len,
-                                         l2addr_str), vrbe->out_tag);
+                                         addr_str), vrbe->out_tag);
             return vrbe;
         }
     }
@@ -121,11 +121,11 @@ void gnrc_sixlowpan_frag_vrb_gc(void)
             DEBUG("6lo vrb: entry (%s, ",
                   gnrc_netif_addr_to_str(_vrb[i].super.src,
                                          _vrb[i].super.src_len,
-                                         l2addr_str));
+                                         addr_str));
             DEBUG("%s, %u, %u) timed out\n",
                   gnrc_netif_addr_to_str(_vrb[i].super.dst,
                                          _vrb[i].super.dst_len,
-                                         l2addr_str),
+                                         addr_str),
                   (unsigned)_vrb[i].super.datagram_size, _vrb[i].super.tag);
             gnrc_sixlowpan_frag_vrb_rm(&_vrb[i]);
         }
