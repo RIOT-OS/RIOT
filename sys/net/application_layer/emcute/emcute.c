@@ -517,7 +517,7 @@ void emcute_run(uint16_t port, const char *id)
 
         if ((len < 0) && (len != -ETIMEDOUT)) {
             LOG_ERROR("[emcute] error while receiving UDP packet\n");
-            return;
+            continue;
         }
 
         if (len >= 2) {
