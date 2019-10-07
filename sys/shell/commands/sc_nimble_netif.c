@@ -130,7 +130,7 @@ static void _cmd_info(void)
 #endif
     puts("");
 
-    printf(" Free slots: %u/%u\n", free, MYNEWT_VAL_BLE_MAX_CONNECTIONS);
+    printf(" Free slots: %u/%u\n", free, NIMBLE_NETIF_MAX_CONN);
     printf("Advertising: ");
     if (nimble_netif_conn_get_adv() != NIMBLE_NETIF_CONN_INVALID) {
         puts("yes");

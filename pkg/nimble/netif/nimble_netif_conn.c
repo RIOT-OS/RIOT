@@ -23,7 +23,7 @@
 #define ENABLE_DEBUG            (0)
 #include "debug.h"
 
-#define CONN_CNT                (MYNEWT_VAL_BLE_MAX_CONNECTIONS)
+#define CONN_CNT                (NIMBLE_NETIF_MAX_CONN)
 
 static mutex_t _lock = MUTEX_INIT;
 static nimble_netif_conn_t _conn[CONN_CNT];

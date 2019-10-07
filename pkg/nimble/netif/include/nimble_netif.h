@@ -77,6 +77,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief   The maximum number of BLE connections that can be open concurrently
+ *
+ * @note    This value *must* be <= MYNEWT_VAL_BLE_MAX_CONNECTIONS
+ */
+#ifndef NIMBLE_NETIF_MAX_CONN
+#define NIMBLE_NETIF_MAX_CONN       (MYNEWT_VAL_BLE_MAX_CONNECTIONS)
+#endif
+
+/**
  * @brief   Default L2CAP channel ID to use
  */
 #ifndef NIMBLE_NETIF_CID
