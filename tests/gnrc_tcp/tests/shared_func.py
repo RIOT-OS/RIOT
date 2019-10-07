@@ -56,6 +56,12 @@ def get_host_ll_addr(interface):
     return re.search('inet6 (.*)/64', result.read()).group(1).strip()
 
 
+def get_riot_l2_addr(child):
+    child.sendline('ifconfig')
+    child.expect('HWaddr: ([A-F-a-f0-9:]+)')
+    return child.match.group(1)
+
+
 def get_riot_ll_addr(child):
     child.sendline('ifconfig')
     child.expect('(fe80:[0-9a-f:]+)')
@@ -101,10 +107,12 @@ def verify_pktbuf_empty(child):
     child.expect(r'~ unused: {} \(next: (\(nil\)|0), size: {}\) ~'.format(pktbuf_addr, pktbuf_size))
 
 
-def sudo_guard():
-    sudo_required = os.environ.get("BOARD", "") != "native"
+def sudo_guard(uses_scapy=False):
+    sudo_required = uses_scapy or (os.environ.get("BOARD", "") != "native")
     if sudo_required and os.geteuid() != 0:
         print("\x1b[1;31mThis test requires root privileges.\n"
-              "It's constructing and sending Ethernet frames.\x1b[0m\n",
+              "It uses `./dist/tools/ethos/start_networking.sh` as term" +
+              (" and it's constructing and sending Ethernet frames."
+               if uses_scapy else "") + "\x1b[0m\n",
               file=sys.stderr)
         sys.exit(1)

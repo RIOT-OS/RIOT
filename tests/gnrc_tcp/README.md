@@ -18,6 +18,10 @@ in the tests directory.
     This test covers receiving of a byte stream from the host system. The received data is
     causing window opening and closing as well as data transmission over multiple packets.
 
+5) 05-garbage-pkts.py
+    This test mostly is a regression test for issues that were found through fuzzing. It uses
+    `scapy` to interact with the node.
+
 Setup
 ==========
 The test requires a tap-device setup. This can be achieved by running 'dist/tools/tapsetup/tapsetup'
@@ -31,4 +35,4 @@ Usage
     make BOARD=<BOARD_NAME> all flash
     sudo make BOARD=<BOARD_NAME> test
 
-'sudo' is only required if the board is not native, due to ethos usage.
+'sudo' is required due to ethos and raw socket usage.
