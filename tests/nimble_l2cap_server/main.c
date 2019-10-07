@@ -60,7 +60,6 @@ static void _on_data(struct ble_l2cap_event *event)
 
     res = os_mbuf_copydata(rxd, 0, rx_len, _rxbuf);
     assert(res == 0);
-    printf("# Received: len %5i, seq %5u\n", rx_len, (unsigned)_rxbuf[POS_SEQ]);
 
     res = ble_l2cap_send(_coc, rxd);
     assert((res == 0) || (res == BLE_HS_ESTALLED));
@@ -70,6 +69,8 @@ static void _on_data(struct ble_l2cap_event *event)
     assert(rxd != NULL);
     res = ble_l2cap_recv_ready(_coc, rxd);
     assert(res == 0);
+
+    printf("# Received: len %5i, seq %5u\n", rx_len, (unsigned)_rxbuf[POS_SEQ]);
 }
 
 static int _on_gap_evt(struct ble_gap_event *event, void *arg)
