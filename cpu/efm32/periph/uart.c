@@ -68,7 +68,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* initialize the pins */
     gpio_init(uart_config[dev].rx_pin, GPIO_IN_PU);
-    gpio_init(uart_config[dev].tx_pin, GPIO_OUT);
+    gpio_init(uart_config[dev].tx_pin, GPIO_OUT | 1); /* 1 for high */
 
     /* initialize the UART/USART/LEUART device */
 #ifdef USE_LEUART
