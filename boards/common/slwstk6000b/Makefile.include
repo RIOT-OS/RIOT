@@ -1,7 +1,8 @@
-include $(RIOTBOARD)/slwstk6000b/module-info.mk
+include $(RIOTBOARD)/common/slwstk6000b/module-info.mk
 
+INCLUDES += -I$(RIOTBOARD)/common/slwstk6000b/include
 # add module specific includes
-INCLUDES += -I$(RIOTBOARD)/slwstk6000b/modules/$(BOARD_MODULE)/include
+INCLUDES += -I$(RIOTBOARD)/common/slwstk6000b/modules/$(BOARD_MODULE)/include
 
 export CPU_MODEL = $(MODULE_CPU)
 
