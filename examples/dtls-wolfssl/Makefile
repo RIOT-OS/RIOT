@@ -9,7 +9,7 @@ RIOTBASE ?= $(CURDIR)/../..
 
 # wolfSSL supports 32-bit architectures only
 BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo arduino-mega2560 arduino-nano arduino-uno \
-                   chronos jiminy-mega256rfr2 mega-xplained msb-430 msb-430h telosb \
+                   chronos mega-xplained msb-430 msb-430h telosb \
                    waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 blackpill bluepill \

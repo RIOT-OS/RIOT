@@ -16,7 +16,6 @@ BOARD_INSUFFICIENT_MEMORY := \
 BOARD_INSUFFICIENT_MEMORY += \
 	arduino-leonardo \
 	arduino-mega2560 \
-	jiminy-mega256rfr2 \
 	mega-xplained \
 	waspmote-pro \
 	#

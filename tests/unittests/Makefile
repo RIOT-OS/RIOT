@@ -9,7 +9,6 @@ BOARD_BLACKLIST += arduino-mega2560
 BOARD_BLACKLIST += arduino-nano
 BOARD_BLACKLIST += arduino-uno
 BOARD_BLACKLIST += chronos
-BOARD_BLACKLIST += jiminy-mega256rfr2
 BOARD_BLACKLIST += mega-xplained
 BOARD_BLACKLIST += msb-430
 BOARD_BLACKLIST += msb-430h
