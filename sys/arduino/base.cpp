@@ -77,6 +77,7 @@ unsigned long millis()
     return xtimer_now_usec64() / US_PER_MS;
 }
 
+#if MODULE_PERIPH_ADC
 int analogRead(int arduino_pin)
 {
     /*
@@ -104,3 +105,4 @@ int analogRead(int arduino_pin)
 
     return adc_value;
 }
+#endif
