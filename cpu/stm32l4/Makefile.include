@@ -1,5 +1,5 @@
 CPU_ARCH = cortex-m4f
-export CPU_FAM  = stm32l4
+CPU_FAM  = stm32l4
 
 # "The Vector table must be naturally aligned to a power of two whose alignment
 # value is greater than or equal to number of Exceptions supported x 4"

@@ -1,5 +1,5 @@
 CPU_ARCH = cortex-m0plus
-export CPU_FAM  = saml21
+CPU_FAM  = saml21
 
 USEMODULE += pm_layered
 
