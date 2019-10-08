@@ -633,7 +633,7 @@ endif
 
 ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_REQUIRED += arduino
-  FEATURES_REQUIRED += periph_adc
+  FEATURES_OPTIONAL += periph_adc
   FEATURES_REQUIRED += periph_gpio
   USEMODULE += xtimer
 endif
