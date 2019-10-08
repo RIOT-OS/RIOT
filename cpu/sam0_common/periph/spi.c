@@ -104,29 +104,40 @@ void spi_init_pins(spi_t bus)
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void) cs;
-    /* get exclusive access to the device */
-    mutex_lock(&locks[bus]);
-    /* power on the device */
-    poweron(bus);
-
-    /* disable the device */
-    dev(bus)->CTRLA.reg &= ~(SERCOM_SPI_CTRLA_ENABLE);
-    while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
 
     /* configure bus clock, in synchronous mode its calculated from
      * BAUD.reg = (f_ref / (2 * f_bus) - 1)
      * with f_ref := CLOCK_CORECLOCK as defined by the board */
-    dev(bus)->BAUD.reg = (uint8_t)(((uint32_t)CLOCK_CORECLOCK) / (2 * clk) - 1);
+    const uint8_t baud = (((uint32_t)CLOCK_CORECLOCK) / (2 * clk) - 1);
 
     /* configure device to be master and set mode and pads,
      *
      * NOTE: we could configure the pads already during spi_init, but for
      * efficiency reason we do that here, so we can do all in one single write
      * to the CTRLA register */
-    dev(bus)->CTRLA.reg = (SERCOM_SPI_CTRLA_MODE(0x3) |     /* 0x3 -> master */
-                           SERCOM_SPI_CTRLA_DOPO(spi_config[bus].mosi_pad) |
-                           SERCOM_SPI_CTRLA_DIPO(spi_config[bus].miso_pad) |
-                           (mode <<  SERCOM_SPI_CTRLA_CPHA_Pos));
+    const uint32_t ctrla = SERCOM_SPI_CTRLA_MODE(0x3)       /* 0x3 -> master */
+                         | SERCOM_SPI_CTRLA_DOPO(spi_config[bus].mosi_pad)
+                         | SERCOM_SPI_CTRLA_DIPO(spi_config[bus].miso_pad)
+                         | (mode << SERCOM_SPI_CTRLA_CPHA_Pos);
+
+    /* get exclusive access to the device */
+    mutex_lock(&locks[bus]);
+
+    /* power on the device */
+    poweron(bus);
+
+    /* configuration did not change */
+    if (dev(bus)->BAUD.reg == baud && dev(bus)->CTRLA.reg == ctrla) {
+        return SPI_OK;
+    }
+
+    /* disable the device */
+    dev(bus)->CTRLA.reg &= ~(SERCOM_SPI_CTRLA_ENABLE);
+    while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
+
+    dev(bus)->BAUD.reg = baud;
+    dev(bus)->CTRLA.reg = ctrla;
+
     /* also no synchronization needed here, as CTRLA is write-synchronized */
 
     /* finally enable the device */
