@@ -40,6 +40,10 @@ define board_missing_features
     BOARDS_FEATURES_MISSING += "$(1) $$(FEATURES_MISSING)"
     BOARDS_WITH_MISSING_FEATURES += $(1)
   endif
+
+  ifneq (,$$(DEPENDENCY_DEBUG))
+    $$(call file_save_dependencies_variables,dependencies_info-boards-supported)
+  endif
 endef
 
 BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
