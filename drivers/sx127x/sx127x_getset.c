@@ -816,7 +816,7 @@ void sx127x_set_tx_power(sx127x_t *dev, int8_t power)
 #else /* MODULE_SX1276 */
     sx127x_reg_write(dev, SX1276_REG_PADAC, pa_dac);
 #endif
-}
+
 
 uint16_t sx127x_get_preamble_length(const sx127x_t *dev)
 {
