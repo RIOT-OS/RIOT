@@ -199,8 +199,19 @@ static inline void cortexm_isr_end(void)
  */
 static inline void cpu_jump_to_image(uint32_t image_address)
 {
-    /* Disable IRQ */
-    __disable_irq();
+    /* On Cortex-M platforms, the flash begins with:
+     *
+     * 1. 4 byte pointer to stack to be used at startup
+     * 2. 4 byte pointer to the reset vector function
+     *
+     * On powerup, the CPU sets the stack pointer and starts executing the
+     * reset vector.
+     *
+     * We're doing the same here, but we'd like to start at image_address.
+     *
+     * This function must be called while executing from MSP (Master Stack
+     * Pointer).
+     */
 
     /* set MSP */
     __set_MSP(*(uint32_t*)image_address);
