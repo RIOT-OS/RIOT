@@ -10,7 +10,6 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     f4vi1 \
                     hifive1 \
                     hifive1b \
-                    jiminy-mega256rfr2 \
                     mega-xplained \
                     msb-430 \
                     msb-430h \

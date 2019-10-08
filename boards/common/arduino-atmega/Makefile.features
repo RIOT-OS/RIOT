@@ -7,7 +7,5 @@ FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
 # Various other features (if any)
-ifeq (,$(filter jiminy-mega256rfr2,$(BOARD)))
-  FEATURES_PROVIDED += arduino
-  FEATURES_PROVIDED += periph_pwm
-endif
+FEATURES_PROVIDED += arduino
+FEATURES_PROVIDED += periph_pwm
