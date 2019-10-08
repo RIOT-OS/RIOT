@@ -78,6 +78,17 @@ void sx127x_setup(sx127x_t *dev, const sx127x_params_t *params)
 
 int sx127x_reset(const sx127x_t *dev)
 {
+#ifdef SX127X_USE_TX_SWITCH
+    /* tx switch as output, start in rx */
+    gpio_init(dev->params.tx_switch_pin, GPIO_OUT);
+    gpio_clear(dev->params.tx_switch_pin);
+#endif
+#ifdef SX127X_USE_RX_SWITCH
+    /* rx switch as output, start in rx */
+    gpio_init(dev->params.rx_switch_pin, GPIO_OUT);
+    gpio_set(dev->params.rx_switch_pin);
+#endif
+
     /*
      * This reset scheme complies with 7.2 chapter of the SX1272/1276 datasheet
      * See http://www.semtech.com/images/datasheet/sx1276.pdf for SX1276
@@ -93,35 +104,19 @@ int sx127x_reset(const sx127x_t *dev)
      * 2. Set NReset in Hi-Z state
      * 3. Wait at least 5 milliseconds
      */
+    if (dev->params.reset_pin != GPIO_UNDEF) {
+        gpio_init(dev->params.reset_pin, GPIO_OUT);
 
-    /* Check if the reset pin is defined */
-    if (dev->params.reset_pin == GPIO_UNDEF) {
-        DEBUG("[sx127x] error: No reset pin defined.\n");
-        return -SX127X_ERR_GPIOS;
+        /* set reset pin to the state that triggers manual reset */
+        gpio_write(dev->params.reset_pin, SX127X_POR_ACTIVE_LOGIC_LEVEL);
+
+        xtimer_usleep(SX127X_MANUAL_RESET_SIGNAL_LEN_US);
+
+        /* Put reset pin in High-Z */
+        gpio_init(dev->params.reset_pin, GPIO_IN);
+
+        xtimer_usleep(SX127X_MANUAL_RESET_WAIT_FOR_READY_US);
     }
-
-    gpio_init(dev->params.reset_pin, GPIO_OUT);
-
-#ifdef SX127X_USE_TX_SWITCH
-    /* tx switch as output, start in rx */
-    gpio_init(dev->params.tx_switch_pin, GPIO_OUT);
-    gpio_clear(dev->params.tx_switch_pin);
-#endif
-#ifdef SX127X_USE_RX_SWITCH
-    /* rx switch as output, start in rx */
-    gpio_init(dev->params.rx_switch_pin, GPIO_OUT);
-    gpio_set(dev->params.rx_switch_pin);
-#endif
-
-    /* set reset pin to the state that triggers manual reset */
-    gpio_write(dev->params.reset_pin, SX127X_POR_ACTIVE_LOGIC_LEVEL);
-
-    xtimer_usleep(SX127X_MANUAL_RESET_SIGNAL_LEN_US);
-
-    /* Put reset pin in High-Z */
-    gpio_init(dev->params.reset_pin, GPIO_IN);
-
-    xtimer_usleep(SX127X_MANUAL_RESET_WAIT_FOR_READY_US);
 
     return 0;
 }
@@ -140,20 +135,16 @@ int sx127x_init(sx127x_t *dev)
         return -SX127X_ERR_NODEV;
     }
 
-    /* Check if the reset pin is defined */
-    if (dev->params.reset_pin == GPIO_UNDEF) {
-        DEBUG("[sx127x] error: No reset pin defined.\n");
-        return -SX127X_ERR_GPIOS;
-    }
-
     _init_timers(dev);
 
-    /* reset pin should be left floating during POR */
-    gpio_init(dev->params.reset_pin, GPIO_IN);
+    if (dev->params.reset_pin != GPIO_UNDEF) {
+        /* reset pin should be left floating during POR */
+        gpio_init(dev->params.reset_pin, GPIO_IN);
 
-    /* wait till device signals end of POR cycle */
-    while ((gpio_read(dev->params.reset_pin) > 0) ==
-           SX127X_POR_ACTIVE_LOGIC_LEVEL ) {};
+        /* wait till device signals end of POR cycle */
+        while ((gpio_read(dev->params.reset_pin) > 0) ==
+               SX127X_POR_ACTIVE_LOGIC_LEVEL ) {};
+    }
 
     /* wait for the device to become ready */
     xtimer_usleep(SX127X_POR_WAIT_FOR_READY_US);
