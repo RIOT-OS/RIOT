@@ -167,14 +167,14 @@ int16_t bmp180_altitude(const bmp180_t *dev, uint32_t pressure_0)
 {
     uint32_t p = bmp180_read_pressure(dev);
 
-    return (int16_t)(44330.0 * (1.0 - pow((double)p / pressure_0, 0.1903)));;
+    return (int16_t)(44330.0 * (1.0 - pow((float)p / pressure_0, 0.1903)));;
 }
 
 uint32_t bmp180_sealevel_pressure(const bmp180_t *dev, int16_t altitude)
 {
     uint32_t p = bmp180_read_pressure(dev);
 
-    return (uint32_t)((double)p / pow(1.0 - (altitude / 44330.0), 5.255));;
+    return (uint32_t)((float)p / pow(1.0 - (altitude / 44330.0), 5.255));;
 }
 
 /*------------------------------------------------------------------------------------*/
