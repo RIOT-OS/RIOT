@@ -127,7 +127,7 @@ void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
     /* Save current operating mode */
     dev->settings.channel = channel;
 
-    channel = (uint32_t)((double) channel / (double)LORA_FREQUENCY_RESOLUTION_DEFAULT);
+    channel = (uint32_t)((float) channel / (float)LORA_FREQUENCY_RESOLUTION_DEFAULT);
 
     /* Write frequency settings into chip */
     sx127x_reg_write(dev, SX127X_REG_FRFMSB, (uint8_t)((channel >> 16) & 0xFF));
@@ -145,7 +145,7 @@ uint32_t sx127x_get_time_on_air(const sx127x_t *dev, uint8_t pkt_len)
             break;
         case SX127X_MODEM_LORA:
         {
-            double bw = 0.0;
+            float bw = 0.0;
 
             /* Note: When using LoRa modem only bandwidths 125, 250 and 500 kHz are supported. */
             switch (dev->settings.lora.bandwidth) {
@@ -164,27 +164,27 @@ uint32_t sx127x_get_time_on_air(const sx127x_t *dev, uint8_t pkt_len)
             }
 
             /* Symbol rate : time for one symbol [secs] */
-            double rs = bw / (1 << dev->settings.lora.datarate);
-            double ts = 1 / rs;
+            float rs = bw / (1 << dev->settings.lora.datarate);
+            float ts = 1 / rs;
 
             /* time of preamble */
-            double t_preamble = (dev->settings.lora.preamble_len + 4.25) * ts;
+            float t_preamble = (dev->settings.lora.preamble_len + 4.25) * ts;
 
             /* Symbol length of payload and time */
-            double tmp =
+            float tmp =
                 ceil(
                     (8 * pkt_len - 4 * dev->settings.lora.datarate + 28
                      + 16 * (dev->settings.lora.flags & SX127X_ENABLE_CRC_FLAG)
                      - (!(dev->settings.lora.flags & SX127X_ENABLE_FIXED_HEADER_LENGTH_FLAG) ? 20 : 0))
-                    / (double) (4 * dev->settings.lora.datarate
+                    / (float) (4 * dev->settings.lora.datarate
                                 - (((dev->settings.lora.flags & SX127X_LOW_DATARATE_OPTIMIZE_FLAG)
                                     > 0) ? 2 : 0)))
                 * (dev->settings.lora.coderate + 4);
-            double n_payload = 8 + ((tmp > 0) ? tmp : 0);
-            double t_payload = n_payload * ts;
+            float n_payload = 8 + ((tmp > 0) ? tmp : 0);
+            float t_payload = n_payload * ts;
 
             /* Time on air */
-            double t_on_air = t_preamble + t_payload;
+            float t_on_air = t_preamble + t_payload;
 
             /* return milli seconds */
             air_time = floor(t_on_air * 1e3 + 0.999);
