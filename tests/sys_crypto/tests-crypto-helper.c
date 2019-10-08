@@ -34,5 +34,5 @@ Test *tests_crypto_helper_tests(void)
         new_TestFixture(test_crypto_wipe),
     };
     EMB_UNIT_TESTCALLER(crypto_helper_tests, NULL, NULL, fixtures);
-    return (Test *) &crypto_helper_tests;
+    return (Test *)&crypto_helper_tests;
 }

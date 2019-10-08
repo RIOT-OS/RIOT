@@ -51,14 +51,16 @@ static void test_crypto_aes_encrypt(void)
 
     err = aes_encrypt(&ctx, TEST_0_INP, data);
     TEST_ASSERT_EQUAL_INT(1, err);
-    TEST_ASSERT_MESSAGE(1 == compare(TEST_0_ENC, data, AES_BLOCK_SIZE), "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == compare(TEST_0_ENC, data,
+                                     AES_BLOCK_SIZE), "wrong ciphertext");
 
     err = aes_init(&ctx, TEST_1_KEY, sizeof(TEST_1_KEY));
     TEST_ASSERT_EQUAL_INT(1, err);
 
     err = aes_encrypt(&ctx, TEST_1_INP, data);
     TEST_ASSERT_EQUAL_INT(1, err);
-    TEST_ASSERT_MESSAGE(1 == compare(TEST_1_ENC, data, AES_BLOCK_SIZE), "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == compare(TEST_1_ENC, data,
+                                     AES_BLOCK_SIZE), "wrong ciphertext");
 }
 
 static void test_crypto_aes_decrypt(void)
@@ -72,14 +74,16 @@ static void test_crypto_aes_decrypt(void)
 
     err = aes_decrypt(&ctx, TEST_0_ENC, data);
     TEST_ASSERT_EQUAL_INT(1, err);
-    TEST_ASSERT_MESSAGE(1 == compare(TEST_0_INP, data, AES_BLOCK_SIZE), "wrong plaintext");
+    TEST_ASSERT_MESSAGE(1 == compare(TEST_0_INP, data,
+                                     AES_BLOCK_SIZE), "wrong plaintext");
 
     err = aes_init(&ctx, TEST_1_KEY, sizeof(TEST_1_KEY));
     TEST_ASSERT_EQUAL_INT(1, err);
 
     err = aes_decrypt(&ctx, TEST_1_ENC, data);
     TEST_ASSERT_EQUAL_INT(1, err);
-    TEST_ASSERT_MESSAGE(1 == compare(TEST_1_INP, data, AES_BLOCK_SIZE), "wrong plaintext");
+    TEST_ASSERT_MESSAGE(1 == compare(TEST_1_INP, data,
+                                     AES_BLOCK_SIZE), "wrong plaintext");
 }
 
 static void test_crypto_aes_init_key_length(void)

@@ -826,11 +826,11 @@ static const size_t TEST_NIST_3_EXPECTED_LEN = 52;
 /* Share test buffer output */
 static uint8_t data[60];
 
-static void test_encrypt_op(const uint8_t* key, uint8_t key_len,
-                            const uint8_t* adata, size_t adata_len,
-                            const uint8_t* nonce, uint8_t nonce_len,
-                            const uint8_t* plain, size_t plain_len,
-                            const uint8_t* output_expected,
+static void test_encrypt_op(const uint8_t *key, uint8_t key_len,
+                            const uint8_t *adata, size_t adata_len,
+                            const uint8_t *nonce, uint8_t nonce_len,
+                            const uint8_t *plain, size_t plain_len,
+                            const uint8_t *output_expected,
                             size_t output_expected_len,
                             uint8_t mac_length)
 {
@@ -851,15 +851,15 @@ static void test_encrypt_op(const uint8_t* key, uint8_t key_len,
 
     TEST_ASSERT_EQUAL_INT(output_expected_len, len);
     cmp = compare(output_expected, data, len);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
 
 }
 
-static void test_decrypt_op(const uint8_t* key, uint8_t key_len,
-                            const uint8_t* adata, size_t adata_len,
-                            const uint8_t* nonce, uint8_t nonce_len,
-                            const uint8_t* encrypted, size_t encrypted_len,
-                            const uint8_t* output_expected,
+static void test_decrypt_op(const uint8_t *key, uint8_t key_len,
+                            const uint8_t *adata, size_t adata_len,
+                            const uint8_t *nonce, uint8_t nonce_len,
+                            const uint8_t *encrypted, size_t encrypted_len,
+                            const uint8_t *output_expected,
                             size_t output_expected_len,
                             uint8_t mac_length)
 {
@@ -880,23 +880,23 @@ static void test_decrypt_op(const uint8_t* key, uint8_t key_len,
 
     TEST_ASSERT_EQUAL_INT(output_expected_len, len);
     cmp = compare(output_expected, data, len);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
 
 }
 
 #define do_test_encrypt_op(name) do { \
-    test_encrypt_op(TEST_##name##_KEY, TEST_##name##_KEY_LEN, \
-                    TEST_##name##_INPUT, TEST_##name##_ADATA_LEN, \
-                    TEST_##name##_NONCE, TEST_##name##_NONCE_LEN, \
+        test_encrypt_op(TEST_ ## name ## _KEY, TEST_ ## name ## _KEY_LEN, \
+                        TEST_ ## name ## _INPUT, TEST_ ## name ## _ADATA_LEN, \
+                        TEST_ ## name ## _NONCE, TEST_ ## name ## _NONCE_LEN, \
                     \
-                    TEST_##name##_INPUT + TEST_##name##_ADATA_LEN, \
-                    TEST_##name##_INPUT_LEN, \
+                        TEST_ ## name ## _INPUT + TEST_ ## name ## _ADATA_LEN, \
+                        TEST_ ## name ## _INPUT_LEN, \
                     \
-                    TEST_##name##_EXPECTED + TEST_##name##_ADATA_LEN, \
-                    TEST_##name##_EXPECTED_LEN - TEST_##name##_ADATA_LEN, \
+                        TEST_ ## name ## _EXPECTED + TEST_ ## name ## _ADATA_LEN, \
+                        TEST_ ## name ## _EXPECTED_LEN - TEST_ ## name ## _ADATA_LEN, \
                     \
-                    TEST_##name##_MAC_LEN \
-                    ); \
+                        TEST_ ## name ## _MAC_LEN \
+                        ); \
 } while (0)
 
 
@@ -933,18 +933,18 @@ static void test_crypto_modes_ccm_encrypt(void)
 }
 
 #define do_test_decrypt_op(name) do { \
-    test_decrypt_op(TEST_##name##_KEY, TEST_##name##_KEY_LEN, \
-                    TEST_##name##_INPUT, TEST_##name##_ADATA_LEN, \
-                    TEST_##name##_NONCE, TEST_##name##_NONCE_LEN, \
+        test_decrypt_op(TEST_ ## name ## _KEY, TEST_ ## name ## _KEY_LEN, \
+                        TEST_ ## name ## _INPUT, TEST_ ## name ## _ADATA_LEN, \
+                        TEST_ ## name ## _NONCE, TEST_ ## name ## _NONCE_LEN, \
                     \
-                    TEST_##name##_EXPECTED + TEST_##name##_ADATA_LEN, \
-                    TEST_##name##_EXPECTED_LEN - TEST_##name##_ADATA_LEN, \
+                        TEST_ ## name ## _EXPECTED + TEST_ ## name ## _ADATA_LEN, \
+                        TEST_ ## name ## _EXPECTED_LEN - TEST_ ## name ## _ADATA_LEN, \
                     \
-                    TEST_##name##_INPUT + TEST_##name##_ADATA_LEN, \
-                    TEST_##name##_INPUT_LEN, \
+                        TEST_ ## name ## _INPUT + TEST_ ## name ## _ADATA_LEN, \
+                        TEST_ ## name ## _INPUT_LEN, \
                     \
-                    TEST_##name##_MAC_LEN \
-                    ); \
+                        TEST_ ## name ## _MAC_LEN \
+                        ); \
 } while (0)
 
 static void test_crypto_modes_ccm_decrypt(void)
@@ -980,20 +980,22 @@ static void test_crypto_modes_ccm_decrypt(void)
 }
 
 
-typedef int (*func_ccm_t)(cipher_t*, const uint8_t*, uint32_t,
-                          uint8_t, uint8_t, const uint8_t*, size_t,
-                          const uint8_t*, size_t, uint8_t*);
+typedef int (*func_ccm_t)(cipher_t *, const uint8_t *, uint32_t,
+                          uint8_t, uint8_t, const uint8_t *, size_t,
+                          const uint8_t *, size_t, uint8_t *);
 
 static int _test_ccm_len(func_ccm_t func, uint8_t len_encoding,
-                         const uint8_t *input, size_t input_len, size_t adata_len)
+                         const uint8_t *input, size_t input_len,
+                         size_t adata_len)
 {
     int ret;
     cipher_t cipher;
     uint8_t mac_length = 8;
-    uint8_t nonce[15] = {0};
-    uint8_t key[16] = {0};
+    uint8_t nonce[15] = { 0 };
+    uint8_t key[16] = { 0 };
 
     uint8_t nonce_len = nonce_and_len_encoding_size - len_encoding;
+
     cipher_init(&cipher, CIPHER_AES_128, key, 16);
 
     ret = func(&cipher, NULL, adata_len, mac_length, len_encoding,
@@ -1006,6 +1008,7 @@ static int _test_ccm_len(func_ccm_t func, uint8_t len_encoding,
 static void test_crypto_modes_ccm_check_len(void)
 {
     int ret;
+
     /* Just 1 to big to fit */
     ret = _test_ccm_len(cipher_encrypt_ccm, 2, NULL, 1 << 16, 0);
     TEST_ASSERT_EQUAL_INT(CCM_ERR_INVALID_LENGTH_ENCODING, ret);
@@ -1044,7 +1047,7 @@ static void test_crypto_modes_ccm_check_len(void)
 }
 
 
-Test* tests_crypto_modes_ccm_tests(void)
+Test *tests_crypto_modes_ccm_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_crypto_modes_ccm_encrypt),
@@ -1054,5 +1057,5 @@ Test* tests_crypto_modes_ccm_tests(void)
 
     EMB_UNIT_TESTCALLER(crypto_modes_ccm_tests, NULL, NULL, fixtures);
 
-    return (Test*)&crypto_modes_ccm_tests;
+    return (Test *)&crypto_modes_ccm_tests;
 }
