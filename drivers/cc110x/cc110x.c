@@ -175,3 +175,34 @@ int cc110x_set_channel(cc110x_t *dev, uint8_t channel)
     dev->netdev.event_callback(&dev->netdev, NETDEV_EVENT_FHSS_CHANGE_CHANNEL);
     return 0;
 }
+
+int cc110x_wakeup(cc110x_t *dev)
+{
+    if (cc110x_acquire(dev) != SPI_OK) {
+        return -EIO;
+    }
+
+    cc110x_power_on(dev);
+    cc110x_enter_rx_mode(dev);
+    cc110x_release(dev);
+    return 0;
+}
+
+void cc110x_power_off(cc110x_t *dev)
+{
+    /* Ensure device is awake */
+    cc110x_wakeup(dev);
+
+    /*
+     * Datasheet page 9 table 4.
+     *
+     * To achieve the lowest power consumption GDO's must
+     * be programmed to 0x2F
+     */
+    cc110x_write(dev, CC110X_REG_IOCFG2, CC110X_GDO_CONSTANT_LOW);
+    cc110x_write(dev, CC110X_REG_IOCFG1, CC110X_GDO_CONSTANT_LOW);
+    cc110x_write(dev, CC110X_REG_IOCFG0, CC110X_GDO_CONSTANT_LOW);
+
+    /* go to sleep */
+    cc110x_cmd(dev, CC110X_STROBE_OFF);
+}

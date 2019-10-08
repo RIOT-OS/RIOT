@@ -205,21 +205,6 @@ uint8_t cc110x_status(cc110x_t *dev);
  */
 int cc110x_power_on(cc110x_t *dev);
 
-/**
- * @brief   Brings the transceiver into IDLE mode from RX.
- *
- * This is needed to get the state machine into IDLE before going to SLEEP.
- *
- */
-void cc110x_wakeup_from_rx(cc110x_t *dev);
-
-/**
- * @brief   Sets the transceiver into deep sleep mode.
- *          Only cc110x_power_on can awake the device again.
- *
- */
-void cc110x_power_off(cc110x_t *dev);
-
 #ifdef __cplusplus
 }
 #endif
