@@ -68,20 +68,6 @@ ifneq (1,$(BUILD_IN_DOCKER))
   endif # ARM_GCC_UNSUPPORTED
 endif # BUILD_IN_DOCKER
 
-
-# Temporary LLVM/Clang Workaround:
-# report cortex-m0 instead of cortex-m0plus if llvm/clang (<= 3.6.2) is used
-# llvm/clang version 3.6.2 still does not support the cortex-m0plus mcpu type
-ifeq (llvm,$(TOOLCHAIN))
-ifeq (cortex-m0plus,$(CPU_ARCH))
-LLVM_UNSUP = $(shell clang -target arm-none-eabi -mcpu=$(CPU_ARCH) -c -x c /dev/null -o /dev/null \
-                     > /dev/null 2>&1 || echo 1 )
-ifeq (1,$(LLVM_UNSUP))
-CPU_ARCH = cortex-m0
-endif
-endif
-endif
-
 CFLAGS += -DCPU_MODEL_$(call uppercase_and_underscore,$(CPU_MODEL))
 CFLAGS += -DCPU_ARCH_$(call uppercase_and_underscore,$(CPU_ARCH))
 
