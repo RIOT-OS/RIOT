@@ -248,7 +248,7 @@ int sc_cc110x_wakeup(int argc, char **argv)
         case 1:
             for (unsigned i = 0; i < CC110X_NUM; i++){
                 printf("Waking up CC110x #%u:\n", i);
-                cc110x_power_on(&_cc110x_devs[i]);
+                cc110x_wakeup(&_cc110x_devs[i]);
             }
             break;
         case 2:
@@ -267,7 +267,7 @@ int sc_cc110x_wakeup(int argc, char **argv)
                     return EXIT_FAILURE;
                 }
                 printf("Waking up CC110x #%u:\n", pos);
-                cc110x_power_on(&_cc110x_devs[pos]);
+                cc110x_wakeup(&_cc110x_devs[pos]);
             }
             break;
         default:
