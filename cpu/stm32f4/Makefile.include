@@ -1,4 +1,4 @@
-export CPU_ARCH = cortex-m4f
+CPU_ARCH = cortex-m4f
 export CPU_FAM  = stm32f4
 
 # STM32F4 uses sectors instead of pages, where the minimum sector length is 16KB

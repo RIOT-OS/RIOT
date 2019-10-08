@@ -1,6 +1,6 @@
 include $(RIOTCPU)/efm32/efm32-info.mk
 
-export CPU_ARCH = $(EFM32_ARCHITECTURE)
+CPU_ARCH = $(EFM32_ARCHITECTURE)
 export CPU_FAM = $(EFM32_FAMILY)
 
 # the size of riotboot on the EFM32 exceeds the default value

@@ -1,4 +1,4 @@
-export CPU_ARCH = cortex-m3
+CPU_ARCH = cortex-m3
 export CPU_FAM  = stm32f1
 
 include $(RIOTCPU)/stm32_common/Makefile.include

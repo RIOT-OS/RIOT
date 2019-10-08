@@ -1,4 +1,4 @@
-export CPU_ARCH = cortex-m4f
+CPU_ARCH = cortex-m4f
 export CPU_FAM  = nrf52
 
 # Slot size is determined by "((total_flash_size - RIOTBOOT_LEN) / 2)".

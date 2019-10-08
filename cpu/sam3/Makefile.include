@@ -1,4 +1,4 @@
-export CPU_ARCH = cortex-m3
+CPU_ARCH = cortex-m3
 export CPU_FAM  = sam3
 
 include $(RIOTCPU)/sam_common/Makefile.include

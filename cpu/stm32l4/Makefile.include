@@ -1,4 +1,4 @@
-export CPU_ARCH = cortex-m4f
+CPU_ARCH = cortex-m4f
 export CPU_FAM  = stm32l4
 
 # "The Vector table must be naturally aligned to a power of two whose alignment

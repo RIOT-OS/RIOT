@@ -1,4 +1,4 @@
-export CPU_ARCH = cortex-m3
+CPU_ARCH = cortex-m3
 export CPU_FAM  = stm32f2
 
 # STM32F2 uses sectors instead of pages, where the minimum sector length is 16KB
