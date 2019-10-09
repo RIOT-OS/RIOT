@@ -76,10 +76,6 @@ extern "C" {
  * @}
  */
 
-/**
- * @todo check for best value
- */
-#define LWIP_CHKSUM_ALGORITHM   (3)
 
 #ifdef MODULE_LOG
 #  define LWIP_PLATFORM_DIAG(x)   LOG_INFO x

@@ -35,7 +35,6 @@ extern "C" {
 #endif
 
 #define LWIP_COMPAT_MUTEX   (0)
-#define SYS_SEM_NULL        { 0, PRIORITY_QUEUE_INIT }
 #define SYS_MBOX_SIZE       (8)
 
 typedef struct {
