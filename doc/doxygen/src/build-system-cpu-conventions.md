@@ -13,7 +13,7 @@ Not all of them are currently listed but only particular ones.
 `CPU` defining multiple `CPU_MODEL`s         {#cpu-defining-multiple-cpu-models}
 ====================================
 
-Context
+Context                                                               {#context}
 -------
 
 With the increasing number of supported CPU models which have lots of
@@ -36,7 +36,7 @@ either for the description, dependency resolution or compilation
 so may want to define only each piece of information required for each step.
 
 
-Different solutions
+Different solutions                                       {#different-solutions}
 -------------------
 
 This describes different possible solutions and in which case which applies.
@@ -49,7 +49,7 @@ good candidates.
 The main goal is to remove the algorithmic and shell based resolutions for this
 if possible.
 
-### File based handling ###
+### 1. File based handling                                {#file-based-handling}
 
 Somehow, having all `CPU_MODEL` in one directory is just to save common
 parts and keep the cpu directory tidy, all the different ones could still
@@ -75,7 +75,7 @@ and handling that are more than variables configuration for the main `CPU`
 files.
 
 
-### `ifneq` based handling ###
+### 2. `ifneq` based handling                            {#ifneq-based-handling}
 
 To not add any files, the main `CPU` files could add specific definitions if the
 `CPU_MODEL` matches certain values.
@@ -99,7 +99,7 @@ blacklists, it is easy to map it to a per model definition from the other
 methods.
 
 
-### Exhaustive per model definition ###
+### 3. Exhaustive per model definition        {#exhaustive-per-model-definition}
 
 In the case of only declarative values of specific variables, handling different
 `CPU_MODEL` is simply defining one per `CPU_MODEL`.
@@ -130,7 +130,7 @@ similar names. We would still put the `ROM_LEN = ROM_LEN_$(CPU_MODEL)` in the
 main file to separate the "database" from setting the value.
 
 
-### Grouped per model definition ###
+### 4. Grouped per model definition              {#grouped-per-model-definition}
 
 Again in the case only delcarative values of specific variables, it can happen
 that many variables are somehow highly correlated.
