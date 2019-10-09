@@ -1003,10 +1003,46 @@ static int _create_candidate_set(const gnrc_netif_t *netif,
 /* number of "points" assigned to an source address candidate in preferred state */
 #define RULE_3_PTS          (1)
 
+/**
+ * @brief   Caps the match at a source addresses prefix length
+ *
+ * @see https://tools.ietf.org/html/rfc6724#section-2.2
+ *
+ * @param[in] netif The network interface @p src was selected from
+ * @param[in] src   A potential source address
+ * @param[in] match The number of bits matching of @p src with another address
+ *
+ * @return  @p match or a number lesser than @p match, if @p src has a shorter
+ *          prefix.
+ */
+static unsigned _cap_match(const gnrc_netif_t *netif, const ipv6_addr_t *src,
+                           unsigned match)
+{
+    unsigned best_prefix = 0;
+
+    if (ipv6_addr_is_link_local(src)) {
+        best_prefix = 64U;  /* Link-local prefix is always of length 64 */
+    }
+#ifdef MODULE_GNRC_IPV6_NIB
+    else {
+        void *state = NULL;
+        gnrc_ipv6_nib_pl_t ple;
+
+        while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &ple)) {
+            if ((ipv6_addr_match_prefix(&ple.pfx, src) > best_prefix)) {
+                best_prefix = ple.pfx_len;
+            }
+        }
+    }
+#endif /* MODULE_GNRC_IPV6_NIB */
+    return ((best_prefix > 0) && (best_prefix < match)) ? best_prefix : match;
+}
+
 static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
                                         const ipv6_addr_t *dst,
                                         uint8_t *candidate_set)
 {
+    int idx = -1;
     /* create temporary set for assigning "points" to candidates winning in the
      * corresponding rules.
      */
@@ -1081,21 +1117,37 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
          */
 
         if (winner_set[i] > max_pts) {
+            idx = i;
             max_pts = winner_set[i];
         }
     }
-    /* reset candidate set to mark winners */
-    memset(candidate_set, 0, (GNRC_NETIF_IPV6_ADDRS_NUMOF + 7) / 8);
-    /* check if we have a clear winner */
+    /* check if we have a clear winner, otherwise
+     * rule 8: Use longest matching prefix.*/
+    uint8_t best_match = 0;
     /* collect candidates with maximum points */
     for (int i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
         if (winner_set[i] == max_pts) {
-            bf_set(candidate_set, i);
+            const ipv6_addr_t *addr = &netif->ipv6.addrs[i];
+            unsigned match = ipv6_addr_match_prefix(addr, dst);
+
+            match = _cap_match(netif, addr, match);
+            /* if match == 0 for all case, it takes above selected idx */
+            if (match > best_match) {
+                idx = i;
+                best_match = match;
+            }
         }
     }
-    /* otherwise apply rule 8: Use longest matching prefix. */
-    int idx = _match_to_idx(netif, dst, candidate_set);
-    return (idx < 0) ? NULL : &netif->ipv6.addrs[idx];
+    if (idx < 0) {
+        DEBUG("No winner found\n");
+        return NULL;
+    }
+    else {
+        DEBUG("Winner is: %s\n", ipv6_addr_to_str(addr_str,
+                                                  &netif->ipv6.addrs[idx],
+                                                  sizeof(addr_str)));
+        return &netif->ipv6.addrs[idx];
+    }
 }
 #endif  /* MODULE_GNRC_IPV6 */
 
