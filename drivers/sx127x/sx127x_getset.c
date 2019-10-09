@@ -127,7 +127,8 @@ void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
     /* Save current operating mode */
     dev->settings.channel = channel;
 
-    channel = (uint32_t)((float) channel / (float)LORA_FREQUENCY_RESOLUTION_DEFAULT);
+    /* shift to avoid float division */
+    channel = (uint32_t)( channel << 8 / LORA_FREQUENCY_RESOLUTION_DEFAULT << 8 );
 
     /* Write frequency settings into chip */
     sx127x_reg_write(dev, SX127X_REG_FRFMSB, (uint8_t)((channel >> 16) & 0xFF));
