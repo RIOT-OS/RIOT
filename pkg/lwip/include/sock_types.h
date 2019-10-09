@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup pkg_lwip_sock
+ * @addtogroup pkg_lwip_sock
  * @{
  *
  * @file
@@ -27,41 +27,49 @@ extern "C" {
 
 /**
  * @brief   Raw IP sock type
+ * @warning For network stack internal purposes only. Do not access members
+ *          externally.
  * @internal
  */
 struct sock_ip {
-    struct netconn *conn;
+    struct netconn *conn;           /**< lwIP network connection object */
 };
 
 /**
  * @brief   TCP sock type
+ * @warning For network stack internal purposes only. Do not access members
+ *          externally.
  * @internal
  */
 struct sock_tcp {
-    struct netconn *conn;
-    struct sock_tcp_queue *queue;
-    mutex_t mutex;
-    struct pbuf *last_buf;
-    ssize_t last_offset;
+    struct netconn *conn;           /**< lwIP network connection object */
+    struct sock_tcp_queue *queue;   /**< Queue the sock might have been generated from */
+    mutex_t mutex;                  /**< Mutex to protect the sock */
+    struct pbuf *last_buf;          /**< Last received data */
+    ssize_t last_offset;            /**< Offset in struct sock_tcp::last_buf since last read */
 };
 
 /**
  * @brief   TCP queue type
+ * @warning For network stack internal purposes only. Do not access members
+ *          externally.
  */
 struct sock_tcp_queue {
-    struct netconn *conn;
-    struct sock_tcp *array;
-    mutex_t mutex;
-    unsigned short len;
-    unsigned short used;
+    struct netconn *conn;           /**< lwIP network connection object */
+    struct sock_tcp *array;         /**< Allocation array for sock objects to generate */
+    mutex_t mutex;                  /**< Mutex to protect the queue */
+    unsigned short len;             /**< Length of the struct sock_tcp_queue::array */
+    unsigned short used;            /**< Used entries in struct sock_tcp_queue::array */
 };
 
 /**
  * @brief   UDP sock type
+ * @warning For network stack internal purposes only. Do not access members
+ *          externally.
  * @internal
  */
 struct sock_udp {
-    struct netconn *conn;
+    struct netconn *conn;           /**< lwIP network connection object */
 };
 
 #ifdef __cplusplus
