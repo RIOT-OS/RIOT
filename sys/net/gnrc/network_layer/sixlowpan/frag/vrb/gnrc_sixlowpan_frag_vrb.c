@@ -14,6 +14,11 @@
  */
 
 #include "net/ieee802154.h"
+#ifdef MODULE_GNRC_IPV6_NIB
+#include "net/ipv6/addr.h"
+#include "net/gnrc/ipv6/nib.h"
+#endif  /* MODULE_GNRC_IPV6_NIB */
+#include "net/gnrc/netif.h"
 #include "xtimer.h"
 
 #include "net/gnrc/sixlowpan/frag/vrb.h"
@@ -22,7 +27,11 @@
 #include "debug.h"
 
 static gnrc_sixlowpan_frag_vrb_t _vrb[GNRC_SIXLOWPAN_FRAG_VRB_SIZE];
-static char l2addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
+#ifdef MODULE_GNRC_IPV6_NIB
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
+#else   /* MODULE_GNRC_IPV6_NIB */
+static char addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
+#endif  /* MODULE_GNRC_IPV6_NIB */
 
 #if !defined(MODULE_GNRC_SIXLOWPAN_FRAG) && defined(TEST_SUITES)
 /* mock for e.g. testing */
@@ -69,16 +78,16 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
                 DEBUG("6lo vrb: creating entry (%s, ",
                       gnrc_netif_addr_to_str(vrbe->super.src,
                                              vrbe->super.src_len,
-                                             l2addr_str));
+                                             addr_str));
                 DEBUG("%s, %u, %u) => ",
                       gnrc_netif_addr_to_str(vrbe->super.dst,
                                              vrbe->super.dst_len,
-                                             l2addr_str),
+                                             addr_str),
                       (unsigned)vrbe->super.datagram_size, vrbe->super.tag);
                 DEBUG("(%s, %u)\n",
                       gnrc_netif_addr_to_str(vrbe->super.dst,
                                              vrbe->super.dst_len,
-                                             l2addr_str), vrbe->out_tag);
+                                             addr_str), vrbe->out_tag);
             }
             break;
         }
@@ -91,11 +100,55 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
     return vrbe;
 }
 
+gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_from_route(
+            const gnrc_sixlowpan_frag_rb_base_t *base,
+            gnrc_netif_t *netif, const gnrc_pktsnip_t *hdr)
+{
+    gnrc_sixlowpan_frag_vrb_t *res = NULL;
+
+    assert(base != NULL);
+    assert((hdr != NULL) && (hdr->data != NULL) && (hdr->size > 0));
+    switch (hdr->type) {
+#ifdef MODULE_GNRC_IPV6_NIB
+        case GNRC_NETTYPE_IPV6: {
+            assert(hdr->size >= sizeof(ipv6_hdr_t));
+            const ipv6_addr_t *addr = &((const ipv6_hdr_t *)hdr->data)->dst;
+            gnrc_ipv6_nib_nc_t nce;
+
+            if (!ipv6_addr_is_link_local(addr) &&
+                (gnrc_netif_get_by_ipv6_addr(addr) == NULL) &&
+                (gnrc_ipv6_nib_get_next_hop_l2addr(addr, netif, NULL,
+                                                   &nce) == 0)) {
+
+                DEBUG("6lo vrb: FIB entry for IPv6 destination %s found\n",
+                      ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
+                res = gnrc_sixlowpan_frag_vrb_add(
+                        base,
+                        gnrc_netif_get_by_pid(gnrc_ipv6_nib_nc_get_iface(&nce)),
+                        nce.l2addr, nce.l2addr_len
+                    );
+            }
+            else {
+                DEBUG("6lo vrb: no FIB entry for IPv6 destination %s found\n",
+                      ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
+            }
+            break;
+        }
+#endif  /* MODULE_GNRC_IPV6_NIB */
+        default:
+            (void)base;
+            (void)netif;
+            DEBUG("6lo vrb: unknown forwarding header type %d\n", hdr->type);
+            break;
+    }
+    return res;
+}
+
 gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
         const uint8_t *src, size_t src_len, unsigned src_tag)
 {
     DEBUG("6lo vrb: trying to get entry for (%s, %u)\n",
-          gnrc_netif_addr_to_str(src, src_len, l2addr_str), src_tag);
+          gnrc_netif_addr_to_str(src, src_len, addr_str), src_tag);
     for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         gnrc_sixlowpan_frag_vrb_t *vrbe = &_vrb[i];
 
@@ -103,7 +156,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
             DEBUG("6lo vrb: got VRB to (%s, %u)\n",
                   gnrc_netif_addr_to_str(vrbe->super.dst,
                                          vrbe->super.dst_len,
-                                         l2addr_str), vrbe->out_tag);
+                                         addr_str), vrbe->out_tag);
             return vrbe;
         }
     }
@@ -121,11 +174,11 @@ void gnrc_sixlowpan_frag_vrb_gc(void)
             DEBUG("6lo vrb: entry (%s, ",
                   gnrc_netif_addr_to_str(_vrb[i].super.src,
                                          _vrb[i].super.src_len,
-                                         l2addr_str));
+                                         addr_str));
             DEBUG("%s, %u, %u) timed out\n",
                   gnrc_netif_addr_to_str(_vrb[i].super.dst,
                                          _vrb[i].super.dst_len,
-                                         l2addr_str),
+                                         addr_str),
                   (unsigned)_vrb[i].super.datagram_size, _vrb[i].super.tag);
             gnrc_sixlowpan_frag_vrb_rm(&_vrb[i]);
         }

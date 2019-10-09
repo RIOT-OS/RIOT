@@ -27,6 +27,9 @@
 
 #include "net/gnrc/netif.h"
 #include "net/gnrc/sixlowpan/config.h"
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
+#include "net/gnrc/sixlowpan/frag.h"
+#endif /* MODULE_GNRC_SIXLOWPAN_FRAG */
 #include "net/gnrc/sixlowpan/frag/rb.h"
 #include "timex.h"
 
@@ -71,6 +74,28 @@ typedef struct {
 gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
         const gnrc_sixlowpan_frag_rb_base_t *base,
         gnrc_netif_t *out_netif, const uint8_t *out_dst, size_t out_dst_len);
+
+/**
+ * @brief   Generate reassembly buffer from a header's forwarding information.
+ *
+ * @param[in] base  Base data of the datagram. Must not be `NULL`.
+ * @param[in] netif Restict route to this interface. May be `NULL` for any
+ *                  interface.
+ * @param[in] hdr   Header from which to take the forwarding information from
+ *                  (e.g. IPv6 header implies `hdr->type == GNRC_NETTYPE_IPV6`).
+ *
+ * @pre `base != NULL`
+ * @pre `(hdr != NULL) && (hdr->data != NULL) && (hdr->size > 0)`
+ *
+ * @return  The VRB entry pointing to the next hop based on the forwarding
+ *          information provided in @p hdr and present in the respective
+ *          forwarding information base for `hdr->type`.
+ * @return  NULL, if VRB is full or if there is no route to destination in
+ *          @p hdr.
+ */
+gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_from_route(
+            const gnrc_sixlowpan_frag_rb_base_t *base,
+            gnrc_netif_t *netif, const gnrc_pktsnip_t *hdr);
 
 /**
  * @brief   Checks timeouts and removes entries if necessary
