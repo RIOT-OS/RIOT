@@ -41,10 +41,14 @@ Different solutions                                       {#different-solutions}
 
 This describes different possible solutions and in which case which applies.
 
-If only one should be used, then only the first one would currently work
-due to the fact that dependencies are not defined declaratively.
-But due to the overhead, intermediate single file declarative solution are
-good candidates.
+If only one should be used, then it should be solution 1 to go toward
+declarative syntax and support all cases.
+But due to the overhead, intermediate single file declarative solution 2 and 3
+are good candidates too.
+
+As currently dependencies are not declarative, only solutions 1 and 2 would be
+able to declare specific `CPU_MODEL` dependencies. Solutions 3 and 4 are
+declarative only.
 
 The main goal is to remove the algorithmic and shell based resolutions for this
 if possible.
@@ -88,9 +92,6 @@ endif
 
 This allow simple handling when the benefit of having per model definition
 would currently not overcome the overhead of defining it.
-Also, as currently dependencies are not declarative, it is with the previous
-solution one of the only alternative as the following declarative only would
-not work.
 
 An issue with this is that this it not declarative and does not have equivalent
 in a declarative only language that is not Turing complete as `make`.
