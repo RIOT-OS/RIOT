@@ -34,10 +34,10 @@ static inline int min(int a, int b)
     }
 }
 
-int ccm_compute_cbc_mac(cipher_t* cipher, const uint8_t iv[16],
-                        const uint8_t* input, size_t length, uint8_t* mac)
+int ccm_compute_cbc_mac(cipher_t *cipher, const uint8_t iv[16],
+                        const uint8_t *input, size_t length, uint8_t *mac)
 {
-    uint8_t offset, block_size, mac_enc[16] = {0};
+    uint8_t offset, block_size, mac_enc[16] = { 0 };
 
     block_size = cipher_get_block_size(cipher);
     memmove(mac, iv, 16);
@@ -63,8 +63,8 @@ int ccm_compute_cbc_mac(cipher_t* cipher, const uint8_t iv[16],
 }
 
 
-int ccm_create_mac_iv(cipher_t* cipher, uint8_t auth_data_len, uint8_t M,
-                      uint8_t L, const uint8_t* nonce, uint8_t nonce_len,
+int ccm_create_mac_iv(cipher_t *cipher, uint8_t auth_data_len, uint8_t M,
+                      uint8_t L, const uint8_t *nonce, uint8_t nonce_len,
                       size_t plaintext_len, uint8_t X1[16])
 {
     uint8_t M_, L_;
@@ -99,7 +99,7 @@ int ccm_create_mac_iv(cipher_t* cipher, uint8_t auth_data_len, uint8_t M,
     return 0;
 }
 
-int ccm_compute_adata_mac(cipher_t* cipher, const uint8_t* auth_data,
+int ccm_compute_adata_mac(cipher_t *cipher, const uint8_t *auth_data,
                           uint32_t auth_data_len, uint8_t X1[16])
 {
     if (auth_data_len > 0) {
@@ -117,13 +117,15 @@ int ccm_compute_adata_mac(cipher_t* cipher, const uint8_t* auth_data,
 
             auth_data_encoded[1] = auth_data_len & 0xFF;
             auth_data_encoded[0] = (auth_data_len >> 8) & 0xFF;
-        } else {
+        }
+        else {
             DEBUG("UNSUPPORTED Adata length: %" PRIu32 "\n", auth_data_len);
             return -1;
         }
 
         memcpy(auth_data_encoded + len_encoding, auth_data, auth_data_len);
-        len = ccm_compute_cbc_mac(cipher, X1, auth_data_encoded, auth_data_len + len_encoding, X1);
+        len = ccm_compute_cbc_mac(cipher, X1, auth_data_encoded,
+                                  auth_data_len + len_encoding, X1);
         if (len < 0) {
             return -1;
         }
@@ -140,27 +142,28 @@ static inline int _fits_in_nbytes(size_t value, uint8_t num_bytes)
      * So we shift by maximum num bits of size_t -1 and compare to 1
      */
     unsigned shift = (8 * min(sizeof(size_t), num_bytes)) - 1;
+
     return (value >> shift) <= 1;
 }
 
 
-int cipher_encrypt_ccm(cipher_t* cipher,
-                       const uint8_t* auth_data, uint32_t auth_data_len,
+int cipher_encrypt_ccm(cipher_t *cipher,
+                       const uint8_t *auth_data, uint32_t auth_data_len,
                        uint8_t mac_length, uint8_t length_encoding,
-                       const uint8_t* nonce, size_t nonce_len,
-                       const uint8_t* input, size_t input_len,
-                       uint8_t* output)
+                       const uint8_t *nonce, size_t nonce_len,
+                       const uint8_t *input, size_t input_len,
+                       uint8_t *output)
 {
     int len = -1;
-    uint8_t nonce_counter[16] = {0}, mac_iv[16] = {0}, mac[16] = {0},
-                                stream_block[16] = {0}, zero_block[16] = {0}, block_size;
+    uint8_t nonce_counter[16] = { 0 }, mac_iv[16] = { 0 }, mac[16] = { 0 },
+            stream_block[16] = { 0 }, zero_block[16] = { 0 }, block_size;
 
     if (mac_length % 2 != 0  || mac_length < 4 || mac_length > 16) {
         return CCM_ERR_INVALID_MAC_LENGTH;
     }
 
     if (length_encoding < 2 || length_encoding > 8 ||
-            !_fits_in_nbytes(input_len, length_encoding)) {
+        !_fits_in_nbytes(input_len, length_encoding)) {
         return CCM_ERR_INVALID_LENGTH_ENCODING;
     }
 
@@ -184,7 +187,7 @@ int cipher_encrypt_ccm(cipher_t* cipher,
     /* Compute first stream block */
     nonce_counter[0] = length_encoding - 1;
     memcpy(&nonce_counter[1], nonce,
-           min(nonce_len, (size_t) 15 - length_encoding));
+           min(nonce_len, (size_t)15 - length_encoding));
     len = cipher_encrypt_ctr(cipher, nonce_counter, block_size,
                              zero_block, block_size, stream_block);
     if (len < 0) {
@@ -208,31 +211,33 @@ int cipher_encrypt_ccm(cipher_t* cipher,
 }
 
 
-int cipher_decrypt_ccm(cipher_t* cipher,
-                       const uint8_t* auth_data, uint32_t auth_data_len,
+int cipher_decrypt_ccm(cipher_t *cipher,
+                       const uint8_t *auth_data, uint32_t auth_data_len,
                        uint8_t mac_length, uint8_t length_encoding,
-                       const uint8_t* nonce, size_t nonce_len,
-                       const uint8_t* input, size_t input_len,
-                       uint8_t* plain)
+                       const uint8_t *nonce, size_t nonce_len,
+                       const uint8_t *input, size_t input_len,
+                       uint8_t *plain)
 {
     int len = -1;
-    uint8_t nonce_counter[16] = {0}, mac_iv[16] = {0}, mac[16] = {0},
-                                mac_recv[16] = {0}, stream_block[16] = {0}, zero_block[16] = {0},
-                                        plain_len, block_size;
+    uint8_t nonce_counter[16] = { 0 }, mac_iv[16] = { 0 }, mac[16] = { 0 },
+            mac_recv[16] = { 0 }, stream_block[16] = { 0 },
+            zero_block[16] = { 0 },
+            plain_len, block_size;
 
     if (mac_length % 2 != 0  || mac_length < 4 || mac_length > 16) {
         return CCM_ERR_INVALID_MAC_LENGTH;
     }
 
     if (length_encoding < 2 || length_encoding > 8 ||
-            !_fits_in_nbytes(input_len, length_encoding)) {
+        !_fits_in_nbytes(input_len, length_encoding)) {
         return CCM_ERR_INVALID_LENGTH_ENCODING;
     }
 
     /* Compute first stream block */
     nonce_counter[0] = length_encoding - 1;
     block_size = cipher_get_block_size(cipher);
-    memcpy(&nonce_counter[1], nonce, min(nonce_len, (size_t) 15 - length_encoding));
+    memcpy(&nonce_counter[1], nonce, min(nonce_len,
+                                         (size_t)15 - length_encoding));
     len = cipher_encrypt_ctr(cipher, nonce_counter, block_size, zero_block,
                              block_size, stream_block);
     if (len < 0) {

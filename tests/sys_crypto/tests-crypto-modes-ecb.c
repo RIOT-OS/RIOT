@@ -56,8 +56,8 @@ static uint8_t TEST_1_CIPHER[] = {
 };
 static uint8_t TEST_1_CIPHER_LEN = 64;
 
-static void test_encrypt_op(uint8_t* key, uint8_t key_len, uint8_t* input,
-                            uint8_t input_len, uint8_t* output,
+static void test_encrypt_op(uint8_t *key, uint8_t key_len, uint8_t *input,
+                            uint8_t input_len, uint8_t *output,
                             uint8_t output_len)
 {
     cipher_t cipher;
@@ -72,12 +72,12 @@ static void test_encrypt_op(uint8_t* key, uint8_t key_len, uint8_t* input,
 
     TEST_ASSERT_EQUAL_INT(output_len, len);
     cmp = compare(output, data, len);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
 
 }
 
-static void test_decrypt_op(uint8_t* key, uint8_t key_len, uint8_t* input,
-                            uint8_t input_len, uint8_t* output,
+static void test_decrypt_op(uint8_t *key, uint8_t key_len, uint8_t *input,
+                            uint8_t input_len, uint8_t *output,
                             uint8_t output_len)
 {
     cipher_t cipher;
@@ -92,7 +92,7 @@ static void test_decrypt_op(uint8_t* key, uint8_t key_len, uint8_t* input,
 
     TEST_ASSERT_EQUAL_INT(output_len, len);
     cmp = compare(output, data, len);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
 
 }
 
@@ -104,19 +104,20 @@ static void test_crypto_modes_ecb_encrypt(void)
 
 static void test_crypto_modes_ecb_decrypt(void)
 {
-    test_decrypt_op(TEST_1_KEY, TEST_1_KEY_LEN, TEST_1_CIPHER, TEST_1_CIPHER_LEN,
+    test_decrypt_op(TEST_1_KEY, TEST_1_KEY_LEN, TEST_1_CIPHER,
+                    TEST_1_CIPHER_LEN,
                     TEST_1_PLAIN, TEST_1_PLAIN_LEN);
 }
 
 
-Test* tests_crypto_modes_ecb_tests(void)
+Test *tests_crypto_modes_ecb_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_crypto_modes_ecb_encrypt),
-                        new_TestFixture(test_crypto_modes_ecb_decrypt)
+        new_TestFixture(test_crypto_modes_ecb_decrypt)
     };
 
     EMB_UNIT_TESTCALLER(crypto_modes_ecb_tests, NULL, NULL, fixtures);
 
-    return (Test*)&crypto_modes_ecb_tests;
+    return (Test *)&crypto_modes_ecb_tests;
 }

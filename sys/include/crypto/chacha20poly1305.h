@@ -34,21 +34,20 @@
 extern "C" {
 #endif
 
-#define CHACHA20POLY1305_KEY_BYTES      (32U) /**< Key length in bytes */
-#define CHACHA20POLY1305_NONCE_BYTES    (12U) /**< Nonce length in bytes */
-#define CHACHA20POLY1305_TAG_BYTES      (16U) /**< Tag length in bytes */
+#define CHACHA20POLY1305_KEY_BYTES      (32U)   /**< Key length in bytes */
+#define CHACHA20POLY1305_NONCE_BYTES    (12U)   /**< Nonce length in bytes */
+#define CHACHA20POLY1305_TAG_BYTES      (16U)   /**< Tag length in bytes */
 
 /**
  * @brief Chacha20poly1305 state struct
  */
-typedef union
-{
+typedef union {
     /* We need both the state matrix and the poly1305 state, but nearly not at
      * the same time. This works as long as the first 8 members of state
      * overlap fully or completely not with the first and second key parts
      * from the @ref poly1305_ctx_t struct */
-    uint32_t state[16];  /**< The current state of the key stream. */
-    poly1305_ctx_t poly; /**< Poly1305 state for the MAC */
+    uint32_t state[16];     /**< The current state of the key stream. */
+    poly1305_ctx_t poly;    /**< Poly1305 state for the MAC */
 } chacha20poly1305_ctx_t;
 
 /**

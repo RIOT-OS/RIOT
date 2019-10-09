@@ -414,16 +414,20 @@ static void test_crypto_modes_ocb_bad_parameter_values(void)
 
     cipher_init(&cipher, CIPHER_AES_128, key, 16);
     /* tag length must be positive */
-    int rv = cipher_encrypt_ocb(&cipher, auth_data, sizeof(auth_data), 0, nonce, 15, input, sizeof(input), output);
+    int rv = cipher_encrypt_ocb(&cipher, auth_data, sizeof(auth_data), 0, nonce,
+                                15, input, sizeof(input), output);
     TEST_ASSERT_EQUAL_INT(OCB_ERR_INVALID_TAG_LENGTH, rv);
     /* tag length must be <= 16 */
-    rv = cipher_encrypt_ocb(&cipher, auth_data, sizeof(auth_data), 17, nonce, 15, input, sizeof(input), output);
+    rv = cipher_encrypt_ocb(&cipher, auth_data, sizeof(auth_data), 17, nonce,
+                            15, input, sizeof(input), output);
     TEST_ASSERT_EQUAL_INT(OCB_ERR_INVALID_TAG_LENGTH, rv);
     /* nonce must not be empty */
-    rv = cipher_encrypt_ocb(&cipher, auth_data, sizeof(auth_data), 16, nonce, 0, input, sizeof(input), output);
+    rv = cipher_encrypt_ocb(&cipher, auth_data, sizeof(auth_data), 16, nonce, 0,
+                            input, sizeof(input), output);
     TEST_ASSERT_EQUAL_INT(OCB_ERR_INVALID_NONCE_LENGTH, rv);
     /* nonce must be <=15 */
-    rv = cipher_encrypt_ocb(&cipher, auth_data, sizeof(auth_data), 16, nonce, 16, input, sizeof(input), output);
+    rv = cipher_encrypt_ocb(&cipher, auth_data, sizeof(auth_data), 16, nonce,
+                            16, input, sizeof(input), output);
     TEST_ASSERT_EQUAL_INT(OCB_ERR_INVALID_NONCE_LENGTH, rv);
 }
 

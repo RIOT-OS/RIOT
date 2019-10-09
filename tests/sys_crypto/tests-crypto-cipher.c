@@ -78,13 +78,19 @@ static void test_crypto_cipher_init_aes_key_length(void)
     uint8_t unsupported_key_3[8];
     memset(unsupported_key_3, 0, sizeof(unsupported_key_3));
 
-    err = cipher_init(&cipher, CIPHER_AES_128, unsupported_key_1, sizeof(unsupported_key_1));
+    err =
+        cipher_init(&cipher, CIPHER_AES_128, unsupported_key_1,
+                    sizeof(unsupported_key_1));
     TEST_ASSERT_EQUAL_INT(CIPHER_ERR_INVALID_KEY_SIZE, err);
 
-    err = cipher_init(&cipher, CIPHER_AES_128, unsupported_key_2, sizeof(unsupported_key_2));
+    err =
+        cipher_init(&cipher, CIPHER_AES_128, unsupported_key_2,
+                    sizeof(unsupported_key_2));
     TEST_ASSERT_EQUAL_INT(CIPHER_ERR_INVALID_KEY_SIZE, err);
 
-    err = cipher_init(&cipher, CIPHER_AES_128, unsupported_key_3, sizeof(unsupported_key_3));
+    err =
+        cipher_init(&cipher, CIPHER_AES_128, unsupported_key_3,
+                    sizeof(unsupported_key_3));
     TEST_ASSERT_EQUAL_INT(CIPHER_ERR_INVALID_KEY_SIZE, err);
 }
 

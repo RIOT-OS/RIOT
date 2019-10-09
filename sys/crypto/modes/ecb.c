@@ -7,24 +7,24 @@
  */
 
 /**
-* @ingroup     sys_crypto
-* @{
-*
-* @file
-* @brief       Crypto mode - electronic code book
-*
-* @author      Nico von Geyso <nico.geyso@fu-berlin.de>
-*
-* @}
-*/
+ * @ingroup     sys_crypto
+ * @{
+ *
+ * @file
+ * @brief       Crypto mode - electronic code book
+ *
+ * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
+ *
+ * @}
+ */
 
 #include <stddef.h>
 #include <stdint.h>
 
 #include "crypto/modes/ecb.h"
 
-int cipher_encrypt_ecb(cipher_t* cipher, uint8_t* input,
-                       size_t length, uint8_t* output)
+int cipher_encrypt_ecb(cipher_t *cipher, uint8_t *input,
+                       size_t length, uint8_t *output)
 {
     size_t offset;
     uint8_t block_size;
@@ -46,8 +46,8 @@ int cipher_encrypt_ecb(cipher_t* cipher, uint8_t* input,
     return offset;
 }
 
-int cipher_decrypt_ecb(cipher_t* cipher, uint8_t* input,
-                       size_t length, uint8_t* output)
+int cipher_decrypt_ecb(cipher_t *cipher, uint8_t *input,
+                       size_t length, uint8_t *output)
 {
     size_t offset = 0;
     uint8_t block_size;

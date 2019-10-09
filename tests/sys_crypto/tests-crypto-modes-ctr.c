@@ -61,8 +61,8 @@ static uint8_t TEST_1_CIPHER[] = {
 };
 static uint8_t TEST_1_CIPHER_LEN = 64;
 
-static void test_encrypt_op(uint8_t* key, uint8_t key_len, uint8_t ctr[16],
-                            uint8_t* input, uint8_t input_len, uint8_t* output,
+static void test_encrypt_op(uint8_t *key, uint8_t key_len, uint8_t ctr[16],
+                            uint8_t *input, uint8_t input_len, uint8_t *output,
                             uint8_t output_len)
 {
     cipher_t cipher;
@@ -77,12 +77,12 @@ static void test_encrypt_op(uint8_t* key, uint8_t key_len, uint8_t ctr[16],
 
     TEST_ASSERT_EQUAL_INT(output_len, len);
     cmp = compare(output, data, len);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
 
 }
 
-static void test_decrypt_op(uint8_t* key, uint8_t key_len, uint8_t ctr[16],
-                            uint8_t* input, uint8_t input_len, uint8_t* output,
+static void test_decrypt_op(uint8_t *key, uint8_t key_len, uint8_t ctr[16],
+                            uint8_t *input, uint8_t input_len, uint8_t *output,
                             uint8_t output_len)
 {
     cipher_t cipher;
@@ -97,7 +97,7 @@ static void test_decrypt_op(uint8_t* key, uint8_t key_len, uint8_t ctr[16],
 
     TEST_ASSERT_EQUAL_INT(output_len, len);
     cmp = compare(output, data, len);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
 
 }
 
@@ -120,14 +120,14 @@ static void test_crypto_modes_ctr_decrypt(void)
 }
 
 
-Test* tests_crypto_modes_ctr_tests(void)
+Test *tests_crypto_modes_ctr_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_crypto_modes_ctr_encrypt),
-                        new_TestFixture(test_crypto_modes_ctr_decrypt)
+        new_TestFixture(test_crypto_modes_ctr_decrypt)
     };
 
     EMB_UNIT_TESTCALLER(crypto_modes_ctr_tests, NULL, NULL, fixtures);
 
-    return (Test*)&crypto_modes_ctr_tests;
+    return (Test *)&crypto_modes_ctr_tests;
 }
