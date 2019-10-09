@@ -137,7 +137,7 @@ that many variables are somehow highly correlated.
 For example the `ROM`, `RAM` size and address or different classification
 that makes sense for that manufacturer like "family", "series", "core".
 In that case, defining one variable for each may seem tedious and one could
-prefer define one variable for all of these and refer to the array index.
+prefer defining one variable for all of these and refer to the array index.
 
 Defining `Makefile.features` variables:
 
