@@ -954,8 +954,19 @@ static int _create_candidate_set(const gnrc_netif_t *netif,
               ipv6_addr_to_str(addr_str, tmp, sizeof(addr_str)));
         /* "In any case, multicast addresses and the unspecified address MUST NOT
          *  be included in a candidate set."
+         *
+         * flags are set if not unspecfied and multicast addresses are in
+         * `netif->ipv6.groups` so not considered here.
          */
         if ((netif->ipv6.addrs_flags[i] == 0) ||
+            /* https://tools.ietf.org/html/rfc4862#section-2:
+             *  A tentative address is not considered assigned to an interface
+             *  in the usual sense.  An interface discards received packets
+             *  addressed to a tentative address, but accepts Neighbor Discovery
+             *  packets related to Duplicate Address Detection for the tentative
+             *  address.
+             *  (so don't consider tentative addresses for source address
+             *  selection) */
             gnrc_netif_ipv6_addr_dad_trans(netif, i)) {
             continue;
         }
