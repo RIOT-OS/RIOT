@@ -1041,24 +1041,16 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
         if (candidate_scope == dst_scope) {
             DEBUG("winner for rule 2 (same scope) found\n");
             winner_set[i] += RULE_2A_PTS;
-            if (winner_set[i] > max_pts) {
-                max_pts = RULE_2A_PTS;
-            }
         }
         else if (candidate_scope < dst_scope) {
             DEBUG("winner for rule 2 (smaller scope) found\n");
             winner_set[i] += RULE_2B_PTS;
-            if (winner_set[i] > max_pts) {
-                max_pts = winner_set[i];
-            }
         }
+
         /* Rule 3: Avoid deprecated addresses. */
         if (_get_state(netif, i) != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED) {
             DEBUG("winner for rule 3 found\n");
             winner_set[i] += RULE_3_PTS;
-            if (winner_set[i] > max_pts) {
-                max_pts = winner_set[i];
-            }
         }
 
         /* Rule 4: Prefer home addresses.
@@ -1087,6 +1079,10 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
          * Temporary addresses are currently not supported by gnrc.
          * TODO: update as soon as gnrc supports temporary addresses
          */
+
+        if (winner_set[i] > max_pts) {
+            max_pts = winner_set[i];
+        }
     }
     /* reset candidate set to mark winners */
     memset(candidate_set, 0, (GNRC_NETIF_IPV6_ADDRS_NUMOF + 7) / 8);
