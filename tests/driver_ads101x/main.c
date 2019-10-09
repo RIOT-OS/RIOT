@@ -27,7 +27,7 @@
 #include "ads101x_params.h"
 #include "ads101x_regs.h"
 
-#define SLEEP       (100 * US_PER_MS)
+#define SLEEP_USEC  (100 * US_PER_MS)
 
 static ads101x_t dev;
 static ads101x_alert_t alert_dev;
@@ -117,7 +117,7 @@ int main(void)
 
         puts("");
 
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

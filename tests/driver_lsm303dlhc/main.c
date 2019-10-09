@@ -24,7 +24,7 @@
 #include "lsm303dlhc.h"
 #include "lsm303dlhc_params.h"
 
-#define SLEEP       (100 * 1000U)
+#define SLEEP_USEC  (100 * 1000U)
 
 int main(void)
 {
@@ -70,7 +70,7 @@ int main(void)
             puts("\nFailed reading magnetometer values\n");
         }
 
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

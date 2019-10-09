@@ -27,7 +27,7 @@
 #include "mpl3115a2.h"
 #include "mpl3115a2_params.h"
 
-#define SLEEP       (1UL * US_PER_SEC)
+#define SLEEP_USEC  (1UL * US_PER_SEC)
 static mpl3115a2_t dev;
 
 int main(void)
@@ -50,7 +50,7 @@ int main(void)
         uint32_t pressure;
         int16_t temp;
         uint8_t status;
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
         if ((mpl3115a2_read_pressure(&dev, &pressure, &status) |
              mpl3115a2_read_temp(&dev, &temp)) != MPL3115A2_OK) {
             puts("[FAILED] read values!");
