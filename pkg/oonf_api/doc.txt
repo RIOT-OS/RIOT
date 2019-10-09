@@ -1,0 +1,11 @@
+/**
+ * @defgroup    pkg_oonf_api   OLSR.org Network Framework
+ * @ingroup     pkg
+ * @ingroup     net
+ * @brief       The OLSR.org Network Framework (OONF) is a collection of libraries
+ *              that can be used as the building blocks for networking daemons
+ *
+ * @deprecated  The package has not been updated in 6 years, tests were never integrated
+ *              into CI and with NHDP the only user of this package is being deprecated too.
+ *              Will be removed after the 2020.04 release.
+ */
