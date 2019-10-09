@@ -53,6 +53,7 @@ declarative only.
 The main goal is to remove the algorithmic and shell based resolutions for this
 if possible.
 
+
 ### 1. File based handling                                {#file-based-handling}
 
 Somehow, having all `CPU_MODEL` in one directory is just to save common
