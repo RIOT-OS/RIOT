@@ -56,7 +56,7 @@ if possible.
 ### 1. File based handling                                {#file-based-handling}
 
 Somehow, having all `CPU_MODEL` in one directory is just to save common
-parts and keep the cpu directory tidy, all the different ones could still
+parts and keep the `cpu` directory tidy, all the different ones could still
 be defined in there own directory, but nested in the common one.
 
 This could transfer to have for each `CPU_MODEL` for a `CPU` the following files:
