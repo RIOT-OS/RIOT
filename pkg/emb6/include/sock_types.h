@@ -33,6 +33,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Size for struct sock_udp::mbox_queue
+ */
 #ifndef SOCK_MBOX_SIZE
 #define SOCK_MBOX_SIZE  (2)
 #endif
