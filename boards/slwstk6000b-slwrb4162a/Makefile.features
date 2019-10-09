@@ -1,1 +1,3 @@
+# HACK this should be deduced from the daughter board in 'common/slwstk6000b'
+CPU_MODEL = efr32mg12p332f1024gl125
 include $(RIOTBOARD)/common/slwstk6000b/Makefile.features
