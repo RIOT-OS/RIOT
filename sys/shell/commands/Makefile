@@ -95,4 +95,8 @@ ifneq (,$(filter nimble_netif,$(USEMODULE)))
   SRC += sc_nimble_netif.c
 endif
 
+ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
+  SRC += sc_interactive_sync.c
+endif
+
 include $(RIOTBASE)/Makefile.base

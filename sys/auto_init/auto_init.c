@@ -96,6 +96,12 @@
 #include "schedstatistics.h"
 #endif
 
+#ifdef MODULE_TEST_UTILS_INTERACTIVE_SYNC
+#ifndef MODULE_SHELL_COMMANDS
+#include "test_utils/interactive_sync.h"
+#endif
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -597,4 +603,10 @@ void auto_init(void)
     extern void suit_init_conditions(void);
     suit_init_conditions();
 #endif /* MODULE_SUIT */
+
+#ifdef MODULE_TEST_UTILS_INTERACTIVE_SYNC
+#ifndef MODULE_SHELL_COMMANDS
+    test_utils_interactive_sync();
+#endif
+#endif /* MODULE_TEST_UTILS_INTERACTIVE_SYNC */
 }
