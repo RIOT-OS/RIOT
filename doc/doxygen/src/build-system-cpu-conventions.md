@@ -118,7 +118,8 @@ ROM_LEN = ROM_LEN_$(CPU_MODEL)
 
 This represents a direct mapping of the `CPU_MODEL` to the variable value.
 This exact format makes sense when there are not too many variables or for
-variables that have a list as value as the following solution does not apply.
+variables whose value is a list of values (this is a case where solution 4 does
+not apply).
 This is true for example for `FEATURES_PROVIDED`.
 
 It is easy to read and to grep, but can give quite indigests lists if all
