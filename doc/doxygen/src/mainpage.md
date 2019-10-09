@@ -241,6 +241,7 @@ Further information                                      {#further-information}
  - @ref creating-an-application
  - @ref porting-boards
  - @ref creating-modules
+ - @ref build-system-cpu-conventions
  - @ref advanced-build-system-tricks
 
 <!--
