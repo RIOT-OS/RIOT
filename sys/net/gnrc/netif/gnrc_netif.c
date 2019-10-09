@@ -873,8 +873,7 @@ static int _match_to_idx(const gnrc_netif_t *netif,
             continue;
         }
         match = ipv6_addr_match_prefix(&(netif->ipv6.addrs[i]), addr);
-        if (((match > 64U) || !ipv6_addr_is_link_local(&(netif->ipv6.addrs[i]))) &&
-            (match >= best_match)) {
+        if (match > best_match) {
             idx = i;
             best_match = match;
         }
