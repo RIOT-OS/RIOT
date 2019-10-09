@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include "thread.h"
 
+#include "test_utils/interactive_sync.h"
+
 char t2_stack[THREAD_STACKSIZE_MAIN];
 
 void *second_thread(void *arg)
@@ -32,6 +34,8 @@ void *second_thread(void *arg)
 
 int main(void)
 {
+    test_utils_interactive_sync();
+
     (void) thread_create(
             t2_stack, sizeof(t2_stack),
             THREAD_PRIORITY_MAIN - 1,

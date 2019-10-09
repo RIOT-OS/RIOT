@@ -22,6 +22,8 @@
 #include "thread.h"
 #include "mutex.h"
 
+#include "test_utils/interactive_sync.h"
+
 static mutex_t mutex = MUTEX_INIT;
 static volatile int indicator;
 static kernel_pid_t main_pid;
@@ -47,6 +49,8 @@ static void *second_thread(void *arg)
 
 int main(void)
 {
+    test_utils_interactive_sync();
+
     uint32_t count = 0;
     uint32_t kcount = 0;
 

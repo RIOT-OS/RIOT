@@ -32,6 +32,8 @@ USEMODULE += shell_commands
 
 USEMODULE += posix_inet
 
+DISABLE_MODULE += test_utils_interactive_sync
+
 LOW_MEMORY_BOARDS := nucleo-f334r8 msb-430 msb-430h
 
 ifeq ($(BOARD),$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))

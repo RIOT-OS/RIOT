@@ -27,6 +27,8 @@
 #include <thread.h>
 #include <xtimer.h>
 
+#include "test_utils/interactive_sync.h"
+
 #define NB_THREADS  (5U)
 
 static char stacks[NB_THREADS][THREAD_STACKSIZE_DEFAULT];
@@ -54,6 +56,8 @@ static void *_thread_fn(void *arg)
 
 int main(void)
 {
+    test_utils_interactive_sync();
+
     for (unsigned i = 0; i < NB_THREADS; ++i) {
         pids[i] = thread_create(stacks[i], sizeof(stacks[i]),
                                 THREAD_PRIORITY_MAIN - 1,

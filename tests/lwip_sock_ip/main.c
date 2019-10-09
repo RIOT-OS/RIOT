@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "test_utils/interactive_sync.h"
+
 #include "net/sock/ip.h"
 #include "xtimer.h"
 
@@ -1080,6 +1082,8 @@ static void test_sock_ip_send6__no_sock(void)
 int main(void)
 {
     uint8_t code = 0;
+
+    test_utils_interactive_sync();
 
 #ifdef SO_REUSE
     code |= 1;

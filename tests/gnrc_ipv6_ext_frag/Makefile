@@ -44,6 +44,8 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
+DISABLE_MODULE += test_utils_interactive_sync
+
 # The test requires some setup and to be run as root
 # So it cannot currently be run
 TEST_ON_CI_BLACKLIST += all

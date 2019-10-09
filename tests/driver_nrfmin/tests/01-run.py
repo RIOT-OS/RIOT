@@ -5,7 +5,6 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect("All up, running the shell now")
     child.sendline("ifconfig")
     child.expect(r"Iface\s+(\d+)\s+HWaddr:")
 

@@ -22,6 +22,8 @@
 
 #include "thread.h"
 
+#include "test_utils/interactive_sync.h"
+
 char second_thread_stack[THREAD_STACKSIZE_MAIN];
 char third_thread_stack[THREAD_STACKSIZE_MAIN];
 
@@ -78,6 +80,7 @@ void *second_thread(void *arg)
 
 int main(void)
 {
+    test_utils_interactive_sync();
     puts("main: starting");
 
     if ((thread_create(
