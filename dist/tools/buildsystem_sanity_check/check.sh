@@ -155,9 +155,6 @@ check_cpu_cpu_model_defined_in_makefile_features() {
     pathspec+=(':!boards/**/Makefile.features')
     pathspec+=(':!cpu/**/Makefile.features')
 
-    # Currently blacklist this non migrated file for CPU_MODEL
-    pathspec+=(':!boards/common/slwstk6000b/Makefile.include')
-
     git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
             | error_with_message 'CPU and CPU_MODEL definition must be done by board/BOARD/Makefile.features, board/common/**/Makefile.features or cpu/CPU/Makefile.features'
 }

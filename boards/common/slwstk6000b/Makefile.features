@@ -1,5 +1,5 @@
 CPU = efm32
-# TODO move CPU_MODEL here
+# TODO move CPU_MODEL here based on the daughter board
 
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
