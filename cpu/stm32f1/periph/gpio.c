@@ -98,6 +98,16 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     }
 #endif
 
+#ifdef BOARD_BLUEPILL
+    /* disable SWJ to allow using the pin as IO
+       this may also work on other f103 based boards but it was only tested on
+       bluepill */
+    if ((pin_num == 13 || pin_num == 14) && _port_num(pin) == 0) {
+        RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+        AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_DISABLE;
+    }
+#endif
+
     /* set pin mode */
     port->CR[pin_num >> 3] &= ~(0xf << ((pin_num & 0x7) * 4));
     port->CR[pin_num >> 3] |=  ((mode & MODE_MASK) << ((pin_num & 0x7) * 4));
