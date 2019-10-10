@@ -932,6 +932,31 @@ ifneq (,$(filter sock_dtls, $(USEMODULE)))
     USEMODULE += sock_udp
 endif
 
+ifneq (,$(filter suit_v4_%,$(USEMODULE)))
+  USEMODULE += suit_v4
+endif
+
+ifneq (,$(filter suit_v4,$(USEMODULE)))
+  USEPKG += tinycbor
+  USEPKG += libcose
+  USEMODULE += libcose_crypt_hacl
+  USEMODULE += suit_conditions
+
+  # SUIT depends on riotboot support and some extra riotboot modules
+  FEATURES_REQUIRED += riotboot
+  USEMODULE += riotboot_slot
+  USEMODULE += riotboot_flashwrite
+  USEMODULE += riotboot_flashwrite_verify_sha256
+endif
+
+ifneq (,$(filter suit_conditions,$(USEMODULE)))
+  USEMODULE += uuid
+endif
+
+ifneq (,$(filter suit_%,$(USEMODULE)))
+  USEMODULE += suit
+endif
+
 # Enable periph_gpio when periph_gpio_irq is enabled
 ifneq (,$(filter periph_gpio_irq,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
