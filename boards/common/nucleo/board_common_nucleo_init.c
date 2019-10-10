@@ -29,9 +29,10 @@
  */
 
 #include "board.h"
+#include "board_nucleo.h"
 #include "periph/gpio.h"
 
-void board_init(void)
+void board_common_nucleo_init(void)
 {
     /* initialize the CPU */
     cpu_init();
@@ -47,4 +48,14 @@ void board_init(void)
 #ifdef LED2_PIN
     gpio_init(LED2_PIN, GPIO_OUT);
 #endif
+}
+
+/*
+ * Allow overwriting board_init if common implementation doesn't work.
+ * If at link time another implementation of board_init() not marked as weak
+ * ((a.k.a. a strong symbol) is present, it will be linked in instead.
+ */
+void __attribute__((weak)) board_init(void)
+{
+    board_common_nucleo_init();
 }
