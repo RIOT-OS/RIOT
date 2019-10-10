@@ -28,6 +28,10 @@ ifneq (,$(filter ndn-riot,$(USEPKG)))
   USEPKG += micro-ecc
 endif
 
+ifneq (,$(filter core_tasklet,$(USEMODULE)))
+  USEMODULE += core_thread_flags
+endif
+
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += xtimer

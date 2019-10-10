@@ -287,6 +287,14 @@ struct _thread {
 #endif
 
 /**
+ * @def THREAD_PRIORITY_TASKLET
+ * @brief Priority of the tasklet thread (see @ref core_tasklet)
+ */
+#ifndef THREAD_PRIORITY_TASKLET
+#define THREAD_PRIORITY_TASKLET        (0)
+#endif
+
+/**
  * @name Optional flags for controlling a threads initial state
  * @{
  */

@@ -103,6 +103,11 @@ extern "C" {
  * @see xtimer_set_timeout_flag
  */
 #define THREAD_FLAG_TIMEOUT         (1u << 14)
+
+/**
+ * @brief Set by @ref tasklet_schedule
+ */
+#define THREAD_FLAG_TASKLET         (1u << 13)
 /** @} */
 
 /**

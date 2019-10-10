@@ -36,6 +36,10 @@
 #include <auto_init.h>
 #endif
 
+#ifdef MODULE_CORE_TASKLET
+#include "tasklet.h"
+#endif
+
 extern int main(void);
 static void *main_trampoline(void *arg)
 {
@@ -71,6 +75,10 @@ static char idle_stack[THREAD_STACKSIZE_IDLE];
 void kernel_init(void)
 {
     (void) irq_disable();
+
+#ifdef MODULE_CORE_TASKLET
+    tasklet_thread_create();
+#endif
 
     thread_create(idle_stack, sizeof(idle_stack),
             THREAD_PRIORITY_IDLE,
