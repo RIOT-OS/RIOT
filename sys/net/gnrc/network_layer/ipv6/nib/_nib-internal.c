@@ -42,7 +42,7 @@ static _nib_dr_entry_t _def_routers[GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF];
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
 static _nib_abr_entry_t _abrs[GNRC_IPV6_NIB_ABR_NUMOF];
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
-static mutex_t _nib_mutex = MUTEX_INIT;
+static rmutex_t _nib_mutex = RMUTEX_INIT;
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
@@ -70,12 +70,12 @@ void _nib_init(void)
 
 void _nib_acquire(void)
 {
-    mutex_lock(&_nib_mutex);
+    rmutex_lock(&_nib_mutex);
 }
 
 void _nib_release(void)
 {
-    mutex_unlock(&_nib_mutex);
+    rmutex_unlock(&_nib_mutex);
 }
 
 static inline bool _addr_equals(const ipv6_addr_t *addr,
