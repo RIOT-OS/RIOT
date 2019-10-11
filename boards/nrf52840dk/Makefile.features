@@ -6,3 +6,4 @@ include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.features
 FEATURES_PROVIDED += radio_nrf802154
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_usbdev
+FEATURES_PROVIDED += ccn-lite
