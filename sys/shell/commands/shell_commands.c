@@ -168,6 +168,10 @@ extern int _test_start(int argc, char **argv);
 extern int _test_ready(int argc, char **argv);
 #endif
 
+#ifdef MODULE_SUIT_COAP
+extern int _suit_handler(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -276,6 +280,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_TEST_UTILS_INTERACTIVE_SYNC
     { "r", "Test sync, Ready query", _test_ready },
     { "s", "Test sync, Start test trigger", _test_start },
+#endif
+#ifdef MODULE_SUIT_COAP
+    { "suit", "Trigger a SUIT firmware update", _suit_handler },
 #endif
     {NULL, NULL, NULL}
 };

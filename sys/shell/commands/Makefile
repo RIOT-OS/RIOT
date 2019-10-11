@@ -99,4 +99,8 @@ ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
   SRC += sc_interactive_sync.c
 endif
 
+ifneq (,$(filter suit_coap,$(USEMODULE)))
+  SRC += sc_suit.c
+endif
+
 include $(RIOTBASE)/Makefile.base

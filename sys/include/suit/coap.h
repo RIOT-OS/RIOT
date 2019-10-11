@@ -144,17 +144,12 @@ int suit_coap_get_blockwise_url(const char *url,
                                coap_blockwise_cb_t callback, void *arg);
 
 /**
- * @brief   Set the url used to fetch the SUIT manifest
+ * @brief   Trigger a SUIT udate
  *
  * @param[in] url       url pointer containing the full coap url to the manifest
  * @param[in] len       length of the url
  */
-void suit_coap_set_url(const uint8_t *url, size_t len);
-
-/**
- * @brief   Trigger a SUIT udate
- */
-void suit_coap_trigger(void);
+void suit_coap_trigger(const uint8_t *url, size_t len);
 
 #endif /* DOXYGEN */
 
