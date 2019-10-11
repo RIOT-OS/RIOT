@@ -1,0 +1,2 @@
+FEATURES_PROVIDED += netif
+FEATURES_PROVIDED += radio_lora

@@ -1,0 +1,4 @@
+ifneq (,$(filter cc2420,$(USEMODULE)))
+  FEATURES_PROVIDED += netif
+  FEATURES_PROVIDED += radio_802154
+endif
