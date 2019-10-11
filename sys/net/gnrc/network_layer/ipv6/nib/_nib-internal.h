@@ -267,6 +267,22 @@ extern _nib_dr_entry_t *_prime_def_router;
 void _nib_init(void);
 
 /**
+ * @brief   Acquire exclusive access to the NIB
+ */
+static inline void _nib_acquire(void)
+{
+    mutex_lock(&_nib_mutex);
+}
+
+/**
+ * @brief   Release exclusive access to the NIB
+ */
+static inline void _nib_release(void)
+{
+    mutex_unlock(&_nib_mutex);
+}
+
+/**
  * @brief   Gets interface identifier from a NIB entry
  *
  * @param[in] node  A NIB entry.
