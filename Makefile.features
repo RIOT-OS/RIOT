@@ -21,9 +21,16 @@ endif
 
 # Resolve FEATURES_ variables
 # Their value will only be complete after resolving dependencies
+#
+# Features can now declare features that they provide to allow automatic
+# handling of "parents" and "child", like a radio giving a "netif" feature
+# FEATURES_COMPATIBLE_name_of_the_feature += features_also_provided
 
-# All features PROVIDED + compatible features (coming soon)
-FEATURES_COMPATIBLES = $(FEATURES_PROVIDED)
+features_compatible = $1 $(foreach feature,$(FEATURES_COMPATIBLE_$1),$(call features_compatible,$(feature)))
+features_providers_all = $(foreach feature,$(FEATURES_COMPATIBLES),$(if $(findstring $1,$(FEATURES_COMPATIBLE_$(feature))),$(feature) $(call features_providers_all,$(feature))))
+
+# All features PROVIDED + compatible features
+FEATURES_COMPATIBLES = $(sort $(foreach feature,$(FEATURES_PROVIDED),$(call features_compatible,$(feature))))
 # Only features that are got from compatible features
 FEATURES_COMPATIBLES_ONLY = $(filter-out $(FEATURES_PROVIDED),$(FEATURES_COMPATIBLES))
 
@@ -40,7 +47,7 @@ FEATURES_OPTIONAL_MISSING = $(sort $(filter-out $(FEATURES_COMPATIBLES),$(FEATUR
 
 # Features that are used for an application
 FEATURES_USED_EXPLICIT = $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
-FEATURES_USED = $(sort $(FEATURES_USED_EXPLICIT))
+FEATURES_USED = $(sort $(FEATURES_USED_EXPLICIT) $(foreach feature,$(FEATURES_USED_EXPLICIT),$(call features_providers_all,$(feature))))
 
 # Used features that conflict when used together
 FEATURES_CONFLICTING = $(sort $(foreach conflict,$(FEATURES_CONFLICT),$(call _features_conflicting,$(conflict))))
@@ -53,3 +60,10 @@ _features_conflicting = $(if $(call _features_used_conflicting,$(subst :, ,$1)),
 #   $1: list of features that conflict together
 #   Return non empty on error
 _features_used_conflicting = $(filter $(words $1),$(words $(filter $(FEATURES_USED),$1)))
+
+
+# Define FEATURES_PROVIDERS_ and FEATURES_PROVIDERS_ALL_
+# Only define theme currently for debug, not sure if required or not
+features_providers = $(sort $(foreach feature,$(FEATURES_COMPATIBLES),$(if $(findstring $1,$(FEATURES_COMPATIBLE_$(feature))),$(feature))))
+define_providers = $(eval FEATURES_PROVIDERS_$1 = $$(call features_providers,$1))$(eval FEATURES_PROVIDERS_ALL_$1 = $$(call features_providers_all,$1))
+$(foreach feature,$(FEATURES_COMPATIBLES_ONLY),$(eval $(call define_providers,$(feature))))
