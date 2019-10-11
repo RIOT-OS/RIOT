@@ -600,3 +600,8 @@ ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += netif
 endif
+
+
+# The feature must trigger the driver module inclusion
+# Lets do it automatic here for now but may be better explicit?
+USEMODULE += $(patsubst driver_%,%,$(filter driver_%,$(FEATURES_USED)))

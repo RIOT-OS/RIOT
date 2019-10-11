@@ -1,0 +1,8 @@
+FEATURES_COMPATIBLE_driver_at86rf231 += driver_at86rf2xx
+FEATURES_COMPATIBLE_driver_at86rf233 += driver_at86rf2xx
+FEATURES_COMPATIBLE_driver_at86rf21b += driver_at86rf2xx
+
+FEATURES_COMPATIBLE_driver_at86rf2xx += radio_802154
+FEATURES_COMPATIBLE_driver_cc2420 += radio_802154
+FEATURES_COMPATIBLE_driver_kw2xrf += radio_802154
+FEATURES_COMPATIBLE_radio_802154 += netif
