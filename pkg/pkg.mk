@@ -90,7 +90,7 @@ $(PKG_BUILDDIR)/.git:
 	$(GITCACHE) clone $(PKG_URL) $(PKG_VERSION) $(PKG_BUILDDIR)
 
 clean::
-	@-test -d $(PKG_BUILDDIR) && git -C $(PKG_BUILDDIR) clean -xdff
+	@-test -d $(PKG_BUILDDIR) && $(GIT_IN_PKG) clean -xdff
 
 distclean::
 	rm -rf $(PKG_BUILDDIR)
