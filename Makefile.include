@@ -285,6 +285,14 @@ endif
 # Add standard include directories
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 
+# process dependencies
+include $(RIOTBASE)/Makefile.dep
+
+# Include provided features from drivers after all dependencies are known
+DRIVERS = $(filter-out periph_common include netdev_%, $(subst /,, $(subst $(RIOTBASE)/drivers/,,$(sort $(dir $(wildcard $(RIOTBASE)/drivers/*/))))))
+DRIVERS_USED = $(sort $(filter $(DRIVERS),$(USEMODULE)))
+$(foreach _DRIVER, $(DRIVERS_USED), $(eval -include $(RIOTBASE)/drivers/$(_DRIVER)/Makefile.features))
+
 # process provided features
 include $(RIOTBASE)/Makefile.features
 
@@ -333,9 +341,6 @@ USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
 # process dependencies
 include $(RIOTBASE)/Makefile.dep
-
-# Include provided features from drivers after all dependencies are known
-include $(RIOTBASE)/drivers/Makefile.features
 
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
