@@ -78,4 +78,6 @@ clean::
 distclean::
 	rm -rf "$(PKG_BUILDDIR)"
 
+# Reset goal for package
+.DEFAULT_GOAL =
 endif
