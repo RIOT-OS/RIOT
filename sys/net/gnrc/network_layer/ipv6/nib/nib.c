@@ -87,14 +87,14 @@ void gnrc_ipv6_nib_init(void)
 {
     evtimer_event_t *tmp;
 
-    mutex_lock(&_nib_mutex);
+    _nib_acquire();
     for (evtimer_event_t *ptr = _nib_evtimer.events;
          (ptr != NULL) && (tmp = (ptr->next), 1);
          ptr = tmp) {
         evtimer_del((evtimer_t *)(&_nib_evtimer), ptr);
     }
     _nib_init();
-    mutex_unlock(&_nib_mutex);
+    _nib_release();
 }
 
 void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
@@ -180,7 +180,7 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
           ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),
           (netif != NULL) ? (unsigned)netif->pid : 0U);
     gnrc_netif_acquire(netif);
-    mutex_lock(&_nib_mutex);
+    _nib_acquire();
     do {    /* XXX: hidden goto ;-) */
         _nib_onl_entry_t *node = _nib_onl_get(dst,
                                               (netif == NULL) ? 0 : netif->pid);
@@ -266,7 +266,7 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
             }
         }
     } while (0);
-    mutex_unlock(&_nib_mutex);
+    _nib_release();
     gnrc_netif_release(netif);
     return res;
 }
@@ -277,7 +277,7 @@ void gnrc_ipv6_nib_handle_pkt(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     DEBUG("nib: Handle packet (icmpv6->type = %u)\n", icmpv6->type);
     assert(netif != NULL);
     gnrc_netif_acquire(netif);
-    mutex_lock(&_nib_mutex);
+    _nib_acquire();
     switch (icmpv6->type) {
 #if GNRC_IPV6_NIB_CONF_ROUTER
         case ICMPV6_RTR_SOL:
@@ -307,7 +307,7 @@ void gnrc_ipv6_nib_handle_pkt(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             break;
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_DAD */
     }
-    mutex_unlock(&_nib_mutex);
+    _nib_release();
     gnrc_netif_release(netif);
 }
 
@@ -315,7 +315,7 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
 {
     DEBUG("nib: Handle timer event (ctx = %p, type = 0x%04x, now = %ums)\n",
           ctx, type, (unsigned)xtimer_now_usec() / 1000);
-    mutex_lock(&_nib_mutex);
+    _nib_acquire();
     switch (type) {
 #if GNRC_IPV6_NIB_CONF_ARSM
         case GNRC_IPV6_NIB_SND_UC_NS:
@@ -381,7 +381,7 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
         default:
             break;
     }
-    mutex_unlock(&_nib_mutex);
+    _nib_release();
 }
 
 #if GNRC_IPV6_NIB_CONF_ROUTER
