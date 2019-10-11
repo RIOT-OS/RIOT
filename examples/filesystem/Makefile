@@ -6,14 +6,7 @@ BOARD ?= native
 
 
 # Blacklisting msp430-based boards, as file syscalls are not supported
-BOARD_BLACKLIST :=  chronos \
-                    msb-430 \
-                    msb-430h \
-                    telosb \
-                    wsn430-v1_3b \
-                    wsn430-v1_4 \
-                    z1 \
-                    #
+FEATURES_BLACKLIST += arch_msp430
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
                              arduino-uno nucleo-f031k6
