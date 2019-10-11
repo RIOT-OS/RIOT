@@ -11,3 +11,4 @@ FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += esp_spiffs
 FEATURES_PROVIDED += esp_wifi
 FEATURES_PROVIDED += esp_now
+FEATURES_PROVIDED += netif

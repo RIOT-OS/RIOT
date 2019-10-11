@@ -1,3 +1,5 @@
+FEATURES_PROVIDED += netif
+FEATURES_PROVIDED += radio_802154
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_uart_modecfg

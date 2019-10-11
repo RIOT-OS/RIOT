@@ -6,3 +6,4 @@ FEATURES_PROVIDED += periph_timer
 
 # Various other features (if any)
 FEATURES_PROVIDED += ble_nimble
+FEATURES_PROVIDED += netif
