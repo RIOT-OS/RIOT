@@ -18,6 +18,7 @@ else
   $(warning CPU must be defined by board / board_common Makefile.features)
 endif
 
+include $(RIOTBASE)/drivers/Makefile.features
 
 # Resolve FEATURES_ variables
 # Their value will only be complete after resolving dependencies
