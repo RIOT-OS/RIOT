@@ -22,19 +22,25 @@ endif
 # Resolve FEATURES_ variables
 # Their value will only be complete after resolving dependencies
 
+# All features PROVIDED + compatible features (coming soon)
+FEATURES_COMPATIBLES = $(FEATURES_PROVIDED)
+# Only features that are got from compatible features
+FEATURES_COMPATIBLES_ONLY = $(filter-out $(FEATURES_PROVIDED),$(FEATURES_COMPATIBLES))
+
 # Features that are required by the application but not provided by the BSP
 # Having features missing may case the build to fail.
-FEATURES_MISSING = $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_REQUIRED)))
+FEATURES_MISSING = $(sort $(filter-out $(FEATURES_COMPATIBLES),$(FEATURES_REQUIRED)))
 
 # Features that are only optional and not required at the same time.
 # The policy is to by default use by features if they are provided by the BSP.
 FEATURES_OPTIONAL_ONLY = $(sort $(filter-out $(FEATURES_REQUIRED),$(FEATURES_OPTIONAL)))
-FEATURES_OPTIONAL_USED = $(sort $(filter $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
+FEATURES_OPTIONAL_USED = $(sort $(filter $(FEATURES_COMPATIBLES),$(FEATURES_OPTIONAL_ONLY)))
 # Optional features that will not be used because they are not provided
-FEATURES_OPTIONAL_MISSING = $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
+FEATURES_OPTIONAL_MISSING = $(sort $(filter-out $(FEATURES_COMPATIBLES),$(FEATURES_OPTIONAL_ONLY)))
 
 # Features that are used for an application
-FEATURES_USED = $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
+FEATURES_USED_EXPLICIT = $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
+FEATURES_USED = $(sort $(FEATURES_USED_EXPLICIT))
 
 # Used features that conflict when used together
 FEATURES_CONFLICTING = $(sort $(foreach conflict,$(FEATURES_CONFLICT),$(call _features_conflicting,$(conflict))))

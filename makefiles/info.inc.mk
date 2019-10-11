@@ -50,6 +50,8 @@ info-build:
 	@echo ''
 	@echo 'FEATURES_USED:'
 	@echo '         $(or $(FEATURES_USED), -none-)'
+	@echo 'FEATURES_USED_EXPLICIT:' (features that were directly requested, without parent features)
+	@echo '         $(or $(FEATURES_USED_EXPLICIT), -none-)'
 	@echo 'FEATURES_REQUIRED:'
 	@echo '         $(or $(sort $(FEATURES_REQUIRED)), -none-)'
 	@echo 'FEATURES_OPTIONAL_ONLY (optional that are not required, strictly "nice to have"):'
@@ -57,6 +59,10 @@ info-build:
 	@echo 'FEATURES_OPTIONAL_MISSING (missing optional features):'
 	@echo '         $(or $(FEATURES_OPTIONAL_MISSING), -none-)'
 	@echo 'FEATURES_PROVIDED (by the board or USEMODULE'"'"'d drivers):'
+	@echo '         $(or $(sort $(FEATURES_PROVIDED)), -none-)'
+	@echo 'FEATURES_COMPATIBLES (provided directly by the board or by a feature when declared 'COMPATIBLE')
+	@echo '         $(or $(sort $(FEATURES_PROVIDED)), -none-)'
+	@echo 'FEATURES_COMPATIBLES_ONLY (provided by a compatible provided feature)
 	@echo '         $(or $(sort $(FEATURES_PROVIDED)), -none-)'
 	@echo 'FEATURES_MISSING (only non optional features):'
 	@echo '         $(or $(FEATURES_MISSING), -none-)'
