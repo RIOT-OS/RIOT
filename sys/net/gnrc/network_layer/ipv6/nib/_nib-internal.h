@@ -242,11 +242,6 @@ typedef struct {
 } _nib_abr_entry_t;
 
 /**
- * @brief   Mutex for locking the NIB
- */
-extern mutex_t _nib_mutex;
-
-/**
  * @brief   Event timer for the NIB.
  */
 extern evtimer_msg_t _nib_evtimer;
@@ -269,18 +264,12 @@ void _nib_init(void);
 /**
  * @brief   Acquire exclusive access to the NIB
  */
-static inline void _nib_acquire(void)
-{
-    mutex_lock(&_nib_mutex);
-}
+void _nib_acquire(void);
 
 /**
  * @brief   Release exclusive access to the NIB
  */
-static inline void _nib_release(void)
-{
-    mutex_unlock(&_nib_mutex);
-}
+void _nib_release(void);
 
 /**
  * @brief   Gets interface identifier from a NIB entry
