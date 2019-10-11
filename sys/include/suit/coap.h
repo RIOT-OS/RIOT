@@ -19,6 +19,8 @@
  *
  * @brief       SUIT CoAP helper API
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Francisco Molina <francois-xavier.molina@inria.fr>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
 
@@ -140,6 +142,19 @@ typedef enum {
 int suit_coap_get_blockwise_url(const char *url,
                                coap_blksize_t blksize,
                                coap_blockwise_cb_t callback, void *arg);
+
+/**
+ * @brief   Set the url used to fetch the SUIT manifest
+ *
+ * @param[in] url       url pointer containing the full coap url to the manifest
+ * @param[in] len       length of the url
+ */
+void suit_coap_set_url(const uint8_t *url, size_t len);
+
+/**
+ * @brief   Trigger a SUIT udate
+ */
+void suit_coap_trigger(void);
 
 #endif /* DOXYGEN */
 
