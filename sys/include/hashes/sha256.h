@@ -176,7 +176,7 @@ const void *hmac_sha256(const void *key, size_t key_length,
                         const void *data, size_t len, void *digest);
 
 /**
- * @brief function to produce a hash chain statring with a given seed element.
+ * @brief function to produce a hash chain starting with a given seed element.
  *        The chain is computed by taking the sha256 from the seed,
  *        hash the resulting sha256 and continuing taking sha256
  *        from each result consecutively.
@@ -193,7 +193,7 @@ void *sha256_chain(const void *seed, size_t seed_length,
                    size_t elements, void *tail_element);
 
 /**
- * @brief function to produce a hash chain statring with a given seed element.
+ * @brief function to produce a hash chain starting with a given seed element.
  *        The chain is computed the same way as done with sha256_chain().
  *        Additionally intermediate elements are saved while computing the chain.
  *        This slows down computation, but provides the caller with indexed
