@@ -399,6 +399,27 @@ void thread_yield(void);
 void thread_yield_higher(void);
 
 /**
+ * @brief   Puts the current thread into zombie state.
+ *
+ * @details Does nothing when in ISR.
+ *          A thread in zombie state will never be scheduled again,
+ *          but its scheduler entry and stack will be kept.
+ *          A zombie state thread is supposed to be cleaned up
+ *          by @ref thread_kill_zombie().
+ */
+void thread_zombify(void);
+
+/**
+ * @brief Terminates zombie thread.
+ *
+ * @param[in] pid   the PID of the thread to terminate
+ *
+ * @return          `1` on success
+ * @return          `STATUS_NOT_FOUND` if pid is unknown or not a zombie
+ */
+int thread_kill_zombie(kernel_pid_t pid);
+
+/**
  * @brief Wakes up a sleeping thread.
  *
  * @param[in] pid   the PID of the thread to be woken up
