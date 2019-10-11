@@ -28,6 +28,7 @@ USEMODULE += gnrc_sock_udp
 USEMODULE += gnrc_icmpv6_echo
 
 # include this for printing IP addresses
+USEMODULE += shell
 USEMODULE += shell_commands
 
 # Set this to 1 to enable code in RIOT that does safety checking

@@ -19,20 +19,40 @@
 
 #include <stdio.h>
 
+#include "thread.h"
 #include "irq.h"
 #include "net/nanocoap_sock.h"
 #include "xtimer.h"
+
+#include "shell.h"
 
 #include "suit/coap.h"
 #include "riotboot/slot.h"
 
 #define COAP_INBUF_SIZE (256U)
 
+/* Extend stacksize of nanocoap server thread */
+static char _nanocoap_server_stack[THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF];
+#define NANOCOAP_SERVER_QUEUE_SIZE     (8)
+static msg_t _nanocoap_server_msg_queue[NANOCOAP_SERVER_QUEUE_SIZE];
+
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
-/* import "ifconfig" shell command, used for printing addresses */
-extern int _gnrc_netif_config(int argc, char **argv);
+static void *_nanocoap_server_thread(void *arg)
+{
+    (void)arg;
+
+    /* nanocoap_server uses gnrc sock which uses gnrc which needs a msg queue */
+    msg_init_queue(_nanocoap_server_msg_queue, NANOCOAP_SERVER_QUEUE_SIZE);
+
+    /* initialize nanocoap server instance */
+    uint8_t buf[COAP_INBUF_SIZE];
+    sock_udp_ep_t local = { .port=COAP_PORT, .family=AF_INET6 };
+    nanocoap_server(&local, buf, sizeof(buf));
+
+    return NULL;
+}
 
 int main(void)
 {
@@ -54,24 +74,22 @@ int main(void)
         printf("[FAILED] You're not running riotboot\n");
     }
 
-    /* nanocoap_server uses gnrc sock which uses gnrc which needs a msg queue */
-    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
-
-    puts("Waiting for address autoconfiguration...");
-    xtimer_sleep(3);
-
-    /* print network addresses */
-    puts("Configured network interfaces:");
-    _gnrc_netif_config(0, NULL);
-
     /* start suit coap updater thread */
     suit_coap_run();
 
-    /* initialize nanocoap server instance */
-    uint8_t buf[COAP_INBUF_SIZE];
-    sock_udp_ep_t local = { .port=COAP_PORT, .family=AF_INET6 };
-    nanocoap_server(&local, buf, sizeof(buf));
+    /* start nanocoap server thread */
+    thread_create(_nanocoap_server_stack, sizeof(_nanocoap_server_stack),
+                  THREAD_PRIORITY_MAIN - 1,
+                  THREAD_CREATE_STACKTEST,
+                  _nanocoap_server_thread, NULL, "nanocoap server");
 
-    /* should be never reached */
+    /* the shell contains commands that receive packets via GNRC and thus
+       needs a msg queue */
+    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
+
+    puts("Starting the shell");
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+
     return 0;
 }
