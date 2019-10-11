@@ -59,6 +59,9 @@ git-download: $(PKG_PREPARED)
 $(PKG_PREPARED): $(PKG_PATCHED)
 	@touch $@
 
+# Use explicit '--git-dir' and '--work-tree' to prevent issues when the
+# directory is not a git repository for any reason (clean -xdff or others)
+GIT_IN_PKG = git -C $(PKG_BUILDDIR) --git-dir=.git --work-tree=.
 
 # Generate dependency file. Force rebuilding on dependency deletion
 # Warning: It will be evaluated before target execution, so use as first step
@@ -72,13 +75,13 @@ gen_dependency_files = $(file >$1,$@: $2)$(foreach f,$2,$(file >>$1,$(f):))
 # * apply patches if there are any. (If none, it does nothing)
 $(PKG_PATCHED): $(PKG_PATCHES) $(PKG_DOWNLOADED) $(MAKEFILE_LIST)
 	$(call gen_dependency_files,$@.d,$^)
-	git -C $(PKG_BUILDDIR) clean -xdff '**' $(PKG_STATE:$(PKG_BUILDDIR)/%=':!%*')
-	git -C $(PKG_BUILDDIR) checkout -f $(PKG_VERSION)
-	git $(GITFLAGS) -C $(PKG_BUILDDIR) am $(GITAMFLAGS) $(PKG_PATCHES) </dev/null
+	$(GIT_IN_PKG) clean -xdff '**' $(PKG_STATE:$(PKG_BUILDDIR)/%=':!%*')
+	$(GIT_IN_PKG) checkout -f $(PKG_VERSION)
+	$(GIT_IN_PKG) $(GITFLAGS) am $(GITAMFLAGS) $(PKG_PATCHES) </dev/null
 	@touch $@
 
 $(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_BUILDDIR)/.git
-	git -C $(PKG_BUILDDIR) fetch $(PKG_URL) $(PKG_VERSION)
+	$(GIT_IN_PKG) fetch $(PKG_URL) $(PKG_VERSION)
 	echo $(PKG_VERSION) > $@
 
 $(PKG_BUILDDIR)/.git:
