@@ -21,6 +21,12 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#ifdef CPU_MODEL_P32MZ2048EFG100
+#include "vendor/p32mz2048efg100.h"
+#else
+#error "No CPU headers for the defined CPU_MODEL found"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
