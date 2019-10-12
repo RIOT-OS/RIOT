@@ -492,6 +492,17 @@ ifneq (,$(filter stdio_cdc_acm stdio_null stdio_uart slipdev_stdio,$(USEMODULE))
   DISABLE_MODULE += stdio_rtt
 endif
 
+ifneq (,$(filter stdio_rtt stdio_null stdio_uart slipdev_stdio,$(USEMODULE)))
+  # stdio_cdc_acm cannot be used when another STDIO is loaded
+  DISABLE_MODULE += stdio_cdc_acm
+endif
+
+ifeq (,$(filter stdio_cdc_acm,$(USEMODULE)))
+  # The arduino bootloader feature cannot be used if the stdio_cdc_acm module
+  # is not used
+  FEATURES_BLACKLIST += bootloader_arduino
+endif
+
 ifneq (,$(filter isrpipe,$(USEMODULE)))
   USEMODULE += tsrb
 endif
