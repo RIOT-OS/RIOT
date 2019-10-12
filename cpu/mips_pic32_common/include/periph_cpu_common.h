@@ -27,6 +27,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief We run from flash on PIC32
+ */
+#define FLASH_XIP (1)
+
+/**
  * @name    Power management configuration
  * @{
  */
