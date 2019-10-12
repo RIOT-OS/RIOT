@@ -1,6 +1,7 @@
 # Force auto-initialization of usbus to get stdio feature other USB
 USEMODULE += auto_init_usbus
 USEMODULE += stdio_cdc_acm
+FEATURES_REQUIRED += stdio_usb
 
 # This boards requires support for Arduino bootloader.
 USEMODULE += arduino_bootloader
