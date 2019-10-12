@@ -437,6 +437,9 @@ ifneq (,$(filter stdio_ethos,$(USEMODULE)))
   USEMODULE += ethos
   USEMODULE += stdin
   USEMODULE += stdio_uart
+
+  # stdio_ethos doesn't work on boards providing stdio over USB
+  FEATURES_BLACKLIST += stdio_usb
 endif
 
 ifneq (,$(filter stdin,$(USEMODULE)))
@@ -642,6 +645,9 @@ ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_adc
   FEATURES_REQUIRED += periph_gpio
   USEMODULE += xtimer
+
+  # Arduino module doesn't work on boards providing stdio over USB
+  FEATURES_BLACKLIST += stdio_usb
 endif
 
 ifneq (,$(filter xtimer,$(USEMODULE)))
@@ -987,6 +993,11 @@ FEATURES_OPTIONAL += periph_pm
 
 # always select provided architecture features
 FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
+
+ifneq (,$(filter auto_init,$(DISABLE_MODULE)))
+  # boards using stdio over USB require auto_init
+  FEATURES_BLACKLIST += stdio_usb
+endif
 
 # all periph features correspond to a periph submodule
 # FEATURES_USED is defined in Makefile.features
