@@ -1,14 +1,1 @@
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
-# setup the flash tool used
-# we use BOSSA to flash this board since there's an Arduino bootloader
-# preflashed on it. ROM_OFFSET skips the space taken by such bootloader.
-ROM_OFFSET ?= 0x2000
-include $(RIOTMAKE)/tools/bossa.inc.mk
-
-# setup the boards dependencies
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+include $(RIOTBOARD)/common/sodaq/Makefile.include
