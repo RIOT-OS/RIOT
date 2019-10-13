@@ -818,7 +818,8 @@ include $(RIOTTOOLS)/desvirt/Makefile.desvirt
 # The rebuild behavior could even only be done with an empty file, but currently
 # some macros definitions are passed through this file.
 $(RIOTBUILD_CONFIG_HEADER_C): $(RIOTBUILD_CONFIG_HEADER_C).in
-	$(Q)sed -n -e '1i /* Generated file do not edit */' -e '/^#.*/ p' $< > $@
+	$(Q)sed -n -e '1i\
+/* Generated file do not edit */' -e '/^#.*/ p' $< > $@
 
 .SECONDARY: $(RIOTBUILD_CONFIG_HEADER_C).in
 $(RIOTBUILD_CONFIG_HEADER_C).in: FORCE | $(CLEAN)
