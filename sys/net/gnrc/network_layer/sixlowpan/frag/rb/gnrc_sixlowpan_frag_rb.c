@@ -129,41 +129,68 @@ void gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr,
     }
 }
 
-static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
-                     size_t offset, unsigned page)
+#ifndef NDEBUG
+static bool _valid_offset(gnrc_pktsnip_t *pkt, size_t offset)
 {
-    gnrc_sixlowpan_frag_rb_t *entry;
-    sixlowpan_frag_n_t *frag = pkt->data;
-    uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
+    return (sixlowpan_frag_1_is(pkt->data) && (offset == 0)) ||
+           (sixlowpan_frag_n_is(pkt->data) &&
+            (offset == sixlowpan_frag_offset(pkt->data)));
+}
+#endif
+
+static uint8_t *_6lo_frag_payload(gnrc_pktsnip_t *pkt)
+{
+    if (sixlowpan_frag_1_is(pkt->data)) {
+        return ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
+    }
+    else {
+        return ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_n_t);
+    }
+}
+
+static size_t _6lo_frag_size(gnrc_pktsnip_t *pkt, size_t offset, uint8_t *data)
+{
     size_t frag_size;
 
-    /* check if provided offset is the same as in fragment */
-    assert(((((frag->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) ==
-                SIXLOWPAN_FRAG_1_DISP)) && (offset == 0)) ||
-           ((((frag->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) ==
-                SIXLOWPAN_FRAG_N_DISP)) && (offset == (frag->offset * 8U))));
-    gnrc_sixlowpan_frag_rb_gc();
-    entry = _rbuf_get(gnrc_netif_hdr_get_src_addr(netif_hdr), netif_hdr->src_l2addr_len,
-                      gnrc_netif_hdr_get_dst_addr(netif_hdr), netif_hdr->dst_l2addr_len,
-                      byteorder_ntohs(frag->disp_size) & SIXLOWPAN_FRAG_SIZE_MASK,
-                      byteorder_ntohs(frag->tag), page);
-
-    if (entry == NULL) {
-        DEBUG("6lo rbuf: reassembly buffer full.\n");
-        gnrc_pktbuf_release(pkt);
-        return RBUF_ADD_ERROR;
-    }
-
-    /* dispatches in the first fragment are ignored */
     if (offset == 0) {
         frag_size = pkt->size - sizeof(sixlowpan_frag_t);
         if (data[0] == SIXLOWPAN_UNCOMP) {
+            /* subtract SIXLOWPAN_UNCOMP byte from fragment size,
+             * data pointer must be changed by caller (see _rbuf_add()) */
             frag_size--;
         }
     }
     else {
         frag_size = pkt->size - sizeof(sixlowpan_frag_n_t);
-        data++; /* FRAGN header is one byte longer (offset) */
+    }
+    return frag_size;
+}
+
+static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
+                     size_t offset, unsigned page)
+{
+    gnrc_sixlowpan_frag_rb_t *entry;
+    uint8_t *data;
+    size_t frag_size;
+    uint16_t datagram_size;
+    uint16_t datagram_tag;
+
+    /* check if provided offset is the same as in fragment */
+    assert(_valid_offset(pkt, offset));
+    data = _6lo_frag_payload(pkt);
+    frag_size = _6lo_frag_size(pkt, offset, data);
+    datagram_size = sixlowpan_frag_datagram_size(pkt->data);
+    datagram_tag = sixlowpan_frag_datagram_tag(pkt->data);
+
+    gnrc_sixlowpan_frag_rb_gc();
+    entry = _rbuf_get(gnrc_netif_hdr_get_src_addr(netif_hdr), netif_hdr->src_l2addr_len,
+                      gnrc_netif_hdr_get_dst_addr(netif_hdr), netif_hdr->dst_l2addr_len,
+                      datagram_size, datagram_tag, page);
+
+    if (entry == NULL) {
+        DEBUG("6lo rbuf: reassembly buffer full.\n");
+        gnrc_pktbuf_release(pkt);
+        return RBUF_ADD_ERROR;
     }
 
     if ((offset + frag_size) > entry->super.datagram_size) {
