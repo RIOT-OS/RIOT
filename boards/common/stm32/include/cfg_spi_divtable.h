@@ -237,6 +237,8 @@ static const uint8_t spi_divtable[2][5] = {
     CFG_SPIDIV_96
 #elif (CLOCK_APB1 == 100000000)
     CFG_SPIDIV_100
+#elif (CLOCK_APB1 == 108000000)
+    CFG_SPIDIV_108
 #else
 #error "CFG_SPI_DIVTABLE: no prescalers for selected APB1 bus clock defined"
 #endif
@@ -259,6 +261,8 @@ static const uint8_t spi_divtable[2][5] = {
     CFG_SPIDIV_48
 #elif (CLOCK_APB2 == 50000000)
     CFG_SPIDIV_50
+#elif (CLOCK_APB2 == 54000000)
+    CFG_SPIDIV_54
 #elif (CLOCK_APB2 == 72000000)
     CFG_SPIDIV_72
 #elif (CLOCK_APB2 == 60000000)
