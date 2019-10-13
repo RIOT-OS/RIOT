@@ -455,6 +455,7 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
             goto error_exit;
         }
         if (rbuf->pkt == NULL) {
+            /* entry did not exist yet */
             rbuf->pkt = gnrc_pktbuf_add(fh_snip->next, NULL, size_until,
                                         GNRC_NETTYPE_UNDEF);
             if (rbuf->pkt == NULL) {
@@ -464,15 +465,25 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
             }
         }
         else if (rbuf->pkt->size < size_until) {
+            /* entry exists already but doesn't fit full datagram yet */
             if (gnrc_pktbuf_realloc_data(rbuf->pkt, size_until) != 0) {
                 DEBUG("ipv6_ext_frag: unable to allocate space for reassembled "
                       "packet\n");
                 goto error_exit;
             }
         }
+        /* copy payload of fragment into reassembled datagram */
         memcpy(((uint8_t *)rbuf->pkt->data) + offset, pkt->data, pkt->size);
-        /* we don't need the rest anymore */
-        gnrc_pktbuf_release(pkt);
+        /* if entry was newly created above */
+        if (rbuf->pkt->next == fh_snip->next) {
+            /* we don't need the payload anymore, headers are still kept to be
+             * reused when assembled, so just remove the payload. */
+            gnrc_pktbuf_remove_snip(pkt, pkt);
+        }
+        else {
+            /* we don't need the rest anymore */
+            gnrc_pktbuf_release(pkt);
+        }
         return _completed(rbuf);
     }
     else if (!ipv6_ext_frag_more(fh)) {
