@@ -1,3 +1,4 @@
+BOARD ?= samr21-xpro
 DEVELHELP := 1
 # name of your application
 include ../Makefile.tests_common
