@@ -170,8 +170,8 @@ static const uart_conf_t uart_config[] = {
 #define ADC_PRESCALER                       ADC_CTRLB_PRESCALER_DIV512
 
 #define ADC_NEG_INPUT                       ADC_INPUTCTRL_MUXNEG_GND
-#define ADC_GAIN_FACTOR_DEFAULT             ADC_INPUTCTRL_GAIN_1X
-#define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INT1V
+#define ADC_GAIN_FACTOR_DEFAULT             ADC_INPUTCTRL_GAIN_DIV2
+#define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INTVCC1
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
@@ -182,6 +182,9 @@ static const adc_conf_chan_t adc_channels[] = {
     {GPIO_PIN(PA, 8), ADC_INPUTCTRL_MUXPOS_PIN16},    /* A4 */
     {GPIO_PIN(PA, 9), ADC_INPUTCTRL_MUXPOS_PIN17},    /* A5 */
     {GPIO_PIN(PA, 4), ADC_INPUTCTRL_MUXPOS_PIN4},     /* A6 (temperature) */
+    {GPIO_PIN(PA, 10), ADC_INPUTCTRL_MUXPOS_PIN18},   /* A7 */
+    {GPIO_PIN(PA, 11), ADC_INPUTCTRL_MUXPOS_PIN19},   /* A8 */
+    {GPIO_PIN(PB, 5), ADC_INPUTCTRL_MUXPOS_PIN13},    /* BATVOLT */
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)
