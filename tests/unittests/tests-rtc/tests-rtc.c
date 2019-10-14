@@ -54,7 +54,7 @@ static void test_rtc_compat(void)
 static void test_rtc_sec_wrap(void)
 {
     struct tm t1 = {
-        .tm_sec  = 360,
+        .tm_sec  = 120,
         .tm_min  =  58,
         .tm_hour =  23,
         .tm_mday =  30,
@@ -75,7 +75,7 @@ static void test_rtc_sec_wrap(void)
 static void test_rtc_lyear(void)
 {
     struct tm t1 = {
-        .tm_sec  = 360,
+        .tm_sec  = 120,
         .tm_min  =  58,
         .tm_hour =  23,
         .tm_mday =  28,
@@ -96,7 +96,7 @@ static void test_rtc_lyear(void)
 static void test_rtc_nyear(void)
 {
     struct tm t1 = {
-        .tm_sec  = 360,
+        .tm_sec  = 120,
         .tm_min  =  58,
         .tm_hour =  23,
         .tm_mday =  28,
@@ -117,7 +117,7 @@ static void test_rtc_nyear(void)
 static void test_rtc_ywrap(void)
 {
     struct tm t1 = {
-        .tm_sec  = 360,
+        .tm_sec  = 120,
         .tm_min  =  58,
         .tm_hour =  23,
         .tm_mday =  32,
@@ -138,7 +138,7 @@ static void test_rtc_ywrap(void)
 static void test_rtc_year(void)
 {
     struct tm t1 = {
-        .tm_sec  = 360,
+        .tm_sec  = 120,
         .tm_min  =  58,
         .tm_hour =  23,
         .tm_mday =  32,
