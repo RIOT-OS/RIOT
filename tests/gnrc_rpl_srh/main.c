@@ -85,7 +85,7 @@ static void test_rpl_srh_dst_multicast(void)
     static const ipv6_addr_t mcast = IPV6_MCAST_ADDR;
     gnrc_rpl_srh_t *srh;
     uint8_t *vec;
-    void *err_ptr;
+    void *err_ptr = NULL;
     int res;
 
     _init_hdrs(&srh, &vec, &mcast);
@@ -96,7 +96,7 @@ static void test_rpl_srh_dst_multicast(void)
 
     res = gnrc_rpl_srh_process(&hdr, srh, &err_ptr);
     TEST_ASSERT_EQUAL_INT(res, GNRC_IPV6_EXT_RH_ERROR);
-    TEST_ASSERT((&hdr.dst) == err_ptr);
+    TEST_ASSERT_NULL(err_ptr);
 }
 
 static void test_rpl_srh_route_multicast(void)
@@ -106,7 +106,7 @@ static void test_rpl_srh_route_multicast(void)
     static const ipv6_addr_t dst = IPV6_DST;
     gnrc_rpl_srh_t *srh;
     uint8_t *vec;
-    void *err_ptr;
+    void *err_ptr = NULL;
     int res;
 
     _init_hdrs(&srh, &vec, &dst);
@@ -117,7 +117,7 @@ static void test_rpl_srh_route_multicast(void)
 
     res = gnrc_rpl_srh_process(&hdr, srh, &err_ptr);
     TEST_ASSERT_EQUAL_INT(res, GNRC_IPV6_EXT_RH_ERROR);
-    TEST_ASSERT(vec == err_ptr);
+    TEST_ASSERT_NULL(err_ptr);
 }
 
 static void test_rpl_srh_too_many_seg_left(void)
