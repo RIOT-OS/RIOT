@@ -476,14 +476,9 @@ void mrf24j40_assert_awake(mrf24j40_t *dev)
 
 void mrf24j40_reset_state_machine(mrf24j40_t *dev)
 {
-    uint8_t rfstate;
-
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, MRF24J40_RFCTL_RFRST);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x00);
     xtimer_usleep(MRF24J40_STATE_RESET_DELAY);             /* Delay at least 192us */
-    do {
-        rfstate = mrf24j40_reg_read_long(dev, MRF24J40_REG_RFSTATE);
-    } while ((rfstate & MRF24J40_RFSTATE_MASK) != MRF24J40_RFSTATE_RX);
 }
 
 void mrf24j40_software_reset(mrf24j40_t *dev)
