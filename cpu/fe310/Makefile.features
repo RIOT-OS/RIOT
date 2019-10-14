@@ -1,2 +1,4 @@
+FEATURES_PROVIDED += arch_32bit
+FEATURES_PROVIDED += arch_riscv
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_pm
