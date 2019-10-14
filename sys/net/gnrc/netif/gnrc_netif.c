@@ -28,6 +28,7 @@
 #ifdef MODULE_NETSTATS
 #include "net/netstats.h"
 #endif
+#include "irq_handler.h"
 #include "fmt.h"
 #include "log.h"
 #include "sched.h"
@@ -1267,6 +1268,12 @@ static void _test_options(gnrc_netif_t *netif)
 }
 #endif /* DEVELHELP */
 
+static void _isr_process(void *ctx)
+{
+    netdev_t *dev = (netdev_t*) ctx;
+    dev->driver->isr(dev);
+}
+
 static void *_gnrc_netif_thread(void *args)
 {
     gnrc_netapi_opt_t *opt;
@@ -1286,6 +1293,9 @@ static void *_gnrc_netif_thread(void *args)
     /* register the event callback with the device driver */
     dev->event_callback = _event_cb;
     dev->context = netif;
+    netif->irq_ev.isr = _isr_process;
+    netif->irq_ev.ctx = dev;
+
     /* initialize low-level driver */
     res = dev->driver->init(dev);
     if (res < 0) {
@@ -1324,10 +1334,6 @@ static void *_gnrc_netif_thread(void *args)
         msg_receive(&msg);
         /* dispatch netdev, MAC and gnrc_netapi messages */
         switch (msg.type) {
-            case NETDEV_MSG_TYPE_EVENT:
-                DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_EVENT received\n");
-                dev->driver->isr(dev);
-                break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
                 res = netif->ops->send(netif, msg.content.ptr);
@@ -1410,12 +1416,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
     gnrc_netif_t *netif = (gnrc_netif_t *) dev->context;
 
     if (event == NETDEV_EVENT_ISR) {
-        msg_t msg = { .type = NETDEV_MSG_TYPE_EVENT,
-                      .content = { .ptr = netif } };
-
-        if (msg_send(&msg, netif->pid) <= 0) {
-            puts("gnrc_netif: possibly lost interrupt.");
-        }
+        irq_event_add(&netif->irq_ev);
     }
     else {
         DEBUG("gnrc_netif: event triggered -> %i\n", event);

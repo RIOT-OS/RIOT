@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "irq_handler.h"
 #include "kernel_types.h"
 #include "msg.h"
 #include "net/ipv6/addr.h"
@@ -71,6 +72,7 @@ typedef struct {
     const gnrc_netif_ops_t *ops;            /**< Operations of the network interface */
     netdev_t *dev;                          /**< Network device of the network interface */
     rmutex_t mutex;                         /**< Mutex of the interface */
+    irq_event_t irq_ev;                     /**< IRQ event for the network device */
 #ifdef MODULE_NETSTATS_L2
     netstats_t stats;                       /**< transceiver's statistics */
 #endif

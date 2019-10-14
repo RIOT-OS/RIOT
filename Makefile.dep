@@ -156,6 +156,7 @@ ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += l2util
   USEMODULE += fmt
+  USEMODULE += irq_handler
   ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
     USEMODULE += gnrc_netif_ieee802154
   endif
