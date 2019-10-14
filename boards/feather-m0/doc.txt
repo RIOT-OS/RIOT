@@ -17,7 +17,7 @@ Several types of Feather M0 boards exist:
 * [Feather M0 Adalogger](https://learn.adafruit.com/adafruit-feather-m0-adalogger/)
 * [Feather M0 LoRa](https://learn.adafruit.com/adafruit-feather-m0-radio-with-lora-radio-module)
 
-The different modules used to differenciate the boards (ATWINC1500 WiFi,
+The different modules used to differentiate the boards (ATWINC1500 WiFi,
 Bluefruit LE, SD card, LoRa) are connected via SPI (SPI_DEV(0)) to the
 SAMD21 mcu.
 
