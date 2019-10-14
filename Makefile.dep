@@ -979,6 +979,8 @@ FEATURES_OPTIONAL += periph_pm
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
+# always select provided architecture features
+FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
 
 # all periph features correspond to a periph submodule
 # FEATURES_USED is defined in Makefile.features
