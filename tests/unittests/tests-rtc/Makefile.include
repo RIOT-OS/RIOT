@@ -1,3 +1,6 @@
 CFLAGS += -DRTC_NORMALIZE_COMPAT=1
 
 USEMODULE += periph_rtc_common
+
+# MSP-430's libc does not provide `mktime()` used by this test
+FEATURES_BLACKLIST += arch_msp430
