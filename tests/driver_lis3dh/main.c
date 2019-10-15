@@ -27,7 +27,7 @@
 #include "lis3dh_params.h"
 
 
-#define SLEEP       (100 * 1000U)
+#define SLEEP_USEC  (100 * 1000U)
 
 #define WATERMARK_LEVEL 16
 
@@ -145,7 +145,7 @@ int main(void)
             --fifo_level;
         }
 
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

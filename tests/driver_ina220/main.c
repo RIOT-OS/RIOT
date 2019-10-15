@@ -40,7 +40,7 @@
 #define CONFIG   (INA220_MODE_CONTINUOUS_SHUNT_BUS | INA220_RANGE_320MV | \
                   INA220_BRNG_32V_FSR | INA220_SADC_12BIT | INA220_BADC_12BIT)
 #define CALIBRATION (4096)
-#define SLEEP    (100 * 1000U)
+#define SLEEP_USEC    (100 * 1000U)
 
 int main(void)
 {
@@ -95,7 +95,7 @@ int main(void)
         ina220_read_power(&dev, &val);
         printf("\tpower: %6d\n", val);
 
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;
