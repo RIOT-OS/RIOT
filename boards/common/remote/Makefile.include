@@ -30,4 +30,3 @@ OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
 # include common remote includes
 INCLUDES += -I$(RIOTBOARD)/common/remote/include
-

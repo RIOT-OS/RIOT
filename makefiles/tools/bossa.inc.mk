@@ -1,6 +1,6 @@
 FLASHFILE ?= $(BINFILE)
 FLASHER ?= $(RIOTTOOLS)/bossa/bossac
-FFLAGS  ?= -p $(PORT) -e -i -w -v -b -R $(FLASHFILE)
+FFLAGS  ?= -p $(PROG_DEV) -e -i -w -v -b -R $(FLASHFILE)
 
 # some arduino boards need to toggle the serial interface a little bit to get
 # them ready for flashing...
@@ -12,8 +12,9 @@ ifneq (,$(BOSSA_ARDUINO_PREFLASH))
   endif
 
   PREFLASHER ?= stty
-  PREFFLAGS  ?= $(STTY_FLAG) $(PORT) raw ispeed 1200 ospeed 1200 cs8 -cstopb ignpar eol 255 eof 255
+  PREFFLAGS  ?= $(STTY_FLAG) $(PROG_DEV) raw ispeed 1200 ospeed 1200 cs8 -cstopb ignpar eol 255 eof 255
   FLASHDEPS += preflash
+
 endif
 
 # if we go with the default (BOSSA shipped with RIOT), we download and build

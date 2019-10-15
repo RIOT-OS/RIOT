@@ -20,7 +20,7 @@ export PROGRAMMER ?= cc2538-bsl
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
   FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
-  FFLAGS  = -p "$(PORT)" -e -w -v $(FLASHFILE)
+  FFLAGS  = -p "$(PROG_DEV)" -e -w -v $(FLASHFILE)
 else ifeq ($(PROGRAMMER),jlink)
   FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
   FFLAGS  = $(BINDIR) $(FLASHFILE)
