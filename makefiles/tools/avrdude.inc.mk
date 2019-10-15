@@ -12,8 +12,7 @@ PROGRAMMER_FLAGS = -p $(subst atmega,m,$(CPU))
 ifneq (,$(filter $(PROGRAMMER),arduino avr109 buspirate stk500v1 stk500v2 wiring))
   # make the flasher port configurable (e.g. with atmelice the port is usb)
   # defaults to terminal's serial port if not configured
-  AVRDUDE_PORT     ?= $(PORT)
-  PROGRAMMER_FLAGS += -P $(AVRDUDE_PORT)
+  PROGRAMMER_FLAGS += -P $(PROG_DEV)
 endif
 PROGRAMMER_FLAGS += $(FFLAGS_EXTRA)
 
