@@ -38,6 +38,8 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
