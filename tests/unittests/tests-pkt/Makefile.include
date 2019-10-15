@@ -1,5 +1,1 @@
 USEMODULE += gnrc_ipv6
-
-# Test assumes 32-bit width for `size_t` which is only the case on our 32-bit
-# platforms
-FEATURES_REQUIRED += arch_32bit
