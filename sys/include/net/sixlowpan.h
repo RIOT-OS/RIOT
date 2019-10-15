@@ -146,7 +146,33 @@ typedef struct __attribute__((packed)) {
 } sixlowpan_frag_n_t;
 
 /**
- * @brief   Checks if a given fragment is a 6LoWPAN fragment.
+ * @brief   Checks if a given header is a 1st 6LoWPAN fragment header
+ *
+ * @param[in] hdr   A 6LoWPAN fragmentation header.
+ *
+ * @return  true, if given fragment is a 1st 6LoWPAN fragment.
+ * @return  false, if given fragment is not a 1st 6LoWPAN fragment.
+ */
+static inline bool sixlowpan_frag_1_is(sixlowpan_frag_t *hdr)
+{
+    return ((hdr->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) == SIXLOWPAN_FRAG_1_DISP);
+}
+
+/**
+ * @brief   Checks if a given header is a subsequent 6LoWPAN fragment header
+ *
+ * @param[in] hdr   A 6LoWPAN fragmentation header.
+ *
+ * @return  true, if given fragment is a subsequent 6LoWPAN fragment.
+ * @return  false, if given fragment is not a subsequent 6LoWPAN fragment.
+ */
+static inline bool sixlowpan_frag_n_is(sixlowpan_frag_t *hdr)
+{
+    return ((hdr->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) == SIXLOWPAN_FRAG_N_DISP);
+}
+
+/**
+ * @brief   Checks if a given header is a 6LoWPAN fragment header.
  *
  * @param[in] hdr   A 6LoWPAN fragmentation header.
  *
@@ -155,10 +181,48 @@ typedef struct __attribute__((packed)) {
  */
 static inline bool sixlowpan_frag_is(sixlowpan_frag_t *hdr)
 {
-    return ((hdr->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) ==
-            SIXLOWPAN_FRAG_1_DISP) ||
-           ((hdr->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) ==
-            SIXLOWPAN_FRAG_N_DISP);
+    return sixlowpan_frag_1_is(hdr) || sixlowpan_frag_n_is(hdr);
+}
+
+/**
+ * @brief   Get datagram size from general 6LoWPAN fragment header
+ *
+ * @param[in] hdr   A general 6LoWPAN fragment header.
+ *
+ * @return  The datagram size for the 6LoWPAN fragment.
+ */
+static inline uint16_t sixlowpan_frag_datagram_size(sixlowpan_frag_t *hdr)
+{
+    return (byteorder_ntohs(hdr->disp_size) & SIXLOWPAN_FRAG_SIZE_MASK);
+}
+
+/**
+ * @brief   Get datagram tag from general 6LoWPAN fragment header
+ *
+ * @param[in] hdr   A general 6LoWPAN fragment header.
+ *
+ * @return  The datagram tag for the 6LoWPAN fragment.
+ */
+static inline uint16_t sixlowpan_frag_datagram_tag(sixlowpan_frag_t *hdr)
+{
+    return byteorder_ntohs(hdr->tag);
+}
+
+/**
+ * @brief   Get fragment offset from a subsequent 6LoWPAN fragment header
+ *
+ * @param[in] hdr   A subsequent 6LoWPAN fragment header.
+ *
+ * @return  The offset of the 6LoWPAN fragment.
+ */
+static inline uint16_t sixlowpan_frag_offset(sixlowpan_frag_n_t *hdr)
+{
+    /* https://tools.ietf.org/html/rfc4944#section-5.3:
+     * datagram_offset:  This field is present only in the second and
+     *    subsequent link fragments and SHALL specify the offset, in
+     *    increments of 8 octets, of the fragment from the beginning of the
+     *    payload datagram. [...] */
+    return (hdr->offset * 8U);
 }
 /** @} */
 
