@@ -8,9 +8,6 @@ BOARD ?= native
 # Blacklisting msp430-based boards, as file syscalls are not supported
 FEATURES_BLACKLIST += arch_msp430
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
-                             arduino-uno nucleo-f031k6
-
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 

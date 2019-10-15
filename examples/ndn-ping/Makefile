@@ -7,15 +7,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
-                             arduino-mega2560 arduino-nano \
-                             arduino-uno chronos i-nucleo-lrwan1 mega-xplained \
-                             msb-430 msb-430h nucleo-f042k6 nucleo-f031k6 \
-                             nucleo-l031k6 nucleo-f030r8 nucleo-l053r8 \
-                             stm32f0discovery stm32l0538-disco telosb \
-                             waspmote-pro weio \
-                             wsn430-v1_3b wsn430-v1_4 z1
-
 # Do not build for any board that supports nimble_netif, as NimBLE and ndn-riot
 # use different crypto libraries that have name clashes (tinycrypt vs uECC)
 BOARD_BLACKLIST := acd52832 nrf52832-mdk nrf52dk ruuvitag thingy52

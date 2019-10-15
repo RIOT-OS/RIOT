@@ -7,14 +7,6 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-nano \
-                             arduino-uno b-l072z-lrwan1 chronos lsn50 msb-430 \
-                             msb-430h nucleo-f031k6 nucleo-f042k6 nucleo-l031k6 \
-                             nucleo-f030r8 nucleo-f302r8 nucleo-f303k8 \
-                             nucleo-f334r8 nucleo-l053r8 nucleo-l073rz ruuvitag \
-                             saml10-xpro saml11-xpro stm32f0discovery thingy52 \
-                             telosb waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
-
 # lower pktbuf size to something sufficient for this application
 CFLAGS += -DGNRC_PKTBUF_SIZE=2000
 

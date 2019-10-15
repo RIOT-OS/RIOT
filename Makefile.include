@@ -40,6 +40,9 @@ PKGDIRBASE     ?= $(BINDIRBASE)/pkg/$(BOARD)
 DLCACHE        ?= $(RIOTTOOLS)/dlcache/dlcache.sh
 DLCACHE_DIR    ?= $(RIOTBASE)/.dlcache
 
+# include CI info such as BOARD_INSUFFICIENT_MEMORY, if existing
+-include Makefile.ci
+
 __DIRECTORY_VARIABLES := \
   RIOTBASE \
   RIOTCPU \
