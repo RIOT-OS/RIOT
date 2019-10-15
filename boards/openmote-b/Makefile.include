@@ -2,20 +2,24 @@
 PORT_LINUX ?= /dev/ttyUSB1
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
 # Set default flash tool
 export PROGRAMMER ?= cc2538-bsl
 
+# For backward compatibility
+ifneq (,$(PORT_BSL))
+  $(warning Warning! PORT_BSL is deprecated use PROG_DEV)
+  PROG_DEV ?= $(PORT_BSL)
+endif
+
 ifeq ($(PROGRAMMER),cc2538-bsl)
-  ifeq ($(OS),Linux)
-    PORT_BSL ?= $(PORT_LINUX)
-  else ifeq ($(OS),Darwin)
-    PORT_BSL ?= $(PORT_DARWIN)
-  endif
   FLASHFILE ?= $(HEXFILE)
   FLASHER = $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
-  FFLAGS  = -p "$(PORT_BSL)" --bootloader-invert-lines -e -w -v -b 460800 $(FLASHFILE)
+  FFLAGS  = -p "$(PROG_DEV)" --bootloader-invert-lines -e -w -v -b 460800 $(FLASHFILE)
   RESET ?= $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
-  RESET_FLAGS ?= -p "$(PORT_BSL)" --bootloader-invert-lines
+  RESET_FLAGS ?= -p "$(PROG_DEV)" --bootloader-invert-lines
 else ifeq ($(PROGRAMMER),jlink)
   # Special flashing and reset scripts are required due to board hardware
   export FLASH_ADDR = 0x200000
@@ -26,6 +30,3 @@ else ifeq ($(PROGRAMMER),jlink)
 endif
 
 OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
