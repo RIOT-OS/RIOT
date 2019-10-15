@@ -20,7 +20,6 @@
 #define PERIPH_CPU_H
 
 #include "cpu.h"
-#include "cc430_regs.h"
 
 #ifdef __cplusplus
 extern "C" {

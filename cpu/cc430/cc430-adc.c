@@ -47,7 +47,7 @@
  */
 
 
-#include <legacymsp430.h>
+#include <legacy.h>
 #include "irq.h"
 #include "cpu.h"
 #include "cc430-adc.h"
@@ -110,7 +110,7 @@ uint16_t adc12_single_conversion(uint16_t ref, uint16_t sht, uint16_t channel)
  * @param       none
  * @return      none
  *************************************************************************************************/
-interrupt(ADC12_VECTOR) __attribute__((naked)) adc_isr(void)
+ISR(ADC12_VECTOR, adc_isr)
 {
     __enter_isr();
 
