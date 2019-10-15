@@ -21,9 +21,10 @@
  */
 
 #include "mpu9x50.h"
-#include "mpu9x50-regs.h"
+#include "mpu9x50_regs.h"
 #include "periph/i2c.h"
 #include "xtimer.h"
+#include "byteorder.h"
 
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
@@ -361,20 +362,20 @@ int mpu9x50_read_compass(const mpu9x50_t *dev, mpu9x50_results_t *output)
 
 int mpu9x50_read_temperature(const mpu9x50_t *dev, int32_t *output)
 {
-    uint8_t data[2];
-    int16_t temp;
+    uint16_t data;
 
     /* Acquire exclusive access */
     if (i2c_acquire(DEV_I2C)) {
         return -1;
     }
     /* Read raw temperature value */
-    i2c_read_regs(DEV_I2C, DEV_ADDR, MPU9X50_TEMP_START_REG, data, 2, 0);
+    i2c_read_regs(DEV_I2C, DEV_ADDR, MPU9X50_TEMP_START_REG, &data, 2, 0);
     /* Release the bus */
     i2c_release(DEV_I2C);
 
-    temp = ((uint16_t)data[0] << 8) | data[1];
-    *output = (((int32_t)temp * 1000LU) / 340) + (35 * 1000LU);
+    data = htons(data);
+
+    *output = (((int32_t)data * 1000LU) / MPU9X50_TEMP_SENSITIVITY) + (MPU9X50_TEMP_OFFSET * 1000LU);
 
     return 0;
 }
@@ -505,7 +506,7 @@ static int compass_init(mpu9x50_t *dev)
 
     /* Check whether compass answers correctly */
     i2c_read_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_WHOAMI_REG, data, 0);
-    if (data[0] != MPU9150_COMP_WHOAMI_ANSWER) {
+    if (data[0] != MPU9X50_COMP_WHOAMI_ANSWER) {
         DEBUG("[Error] Wrong answer from compass\n");
         return -1;
     }
