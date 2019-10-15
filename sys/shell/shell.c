@@ -290,7 +290,8 @@ static inline void print_prompt(void)
     flush_if_needed();
 }
 
-void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
+void shell_run_once(const shell_command_t *shell_commands,
+                    char *line_buf, int len)
 {
     print_prompt();
 
