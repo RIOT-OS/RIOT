@@ -7,12 +7,14 @@
  */
 
 /**
- * @defgroup    sys_irq_handler Interrupt handler thread
+ * @defgroup    sys_tasklet Tasklets
  * @ingroup     sys
- * @brief       Single thread for handling interrupts that may trigger blocking
- *              functions and therefore may only be called in thread context.
+ * @brief       Support for kernel tasklets
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ *
+ * A tasklet is a function that is scheduled to run in thread context
+ * as soon as possible at a kernel-determined safe time.
  *
  * ## Interrupt Context Problem
  *
@@ -51,61 +53,62 @@
  *
  * ## Solution
  *
- * The solution is to have a single interrupt handler thread which serializes
+ * The solution is to have a single thread which serializes
  * the interrupts of such driver modules and calls the functions of the driver
- * modules to handle the interrupts from its thread context.
+ * modules to handle the interrupts from its thread context. This is what
+ * tasklets are made for.
  *
- * For this purpose, each driver module that wants to use this interrupt
- * handler thread has to define an interrupt event of type #irq_event_t
- * for each of its interrupt sources. The interrupt event contains a
+ * For this purpose, each driver module that wants to use tasklets for handling
+ * IRQ has to define a tasklet of type #tasklet_t
+ * for each of its interrupt sources. The tasklet contains a
  * reference to the function to be called to handle the interrupt.
  *
  * When an interrupt of the corresponding source occurs, the ISR of the
- * driver module registers only the interrupt event associated with the
- * interrupt source with the #irq_event_add function on the handler. The
- * handler places the interrupt event in an pending interrupt queue.
+ * driver module registers only the tasklet associated with the
+ * interrupt source with the #tasklet_schedule function on the handler. The
+ * handler places the tasklet in an pending tasklet queue.
  *
- * Each interrupt event can be registered on the handler only once. That is,
- * if the same interrupt occurs multiple times, only its first occurence is
- * placed to the pending interrupt queue and is handled.
+ * Each tasklet can be registered on the handler only once. That is,
+ * if the same interrupt occurs multiple times, only its first occurrence is
+ * placed to the pending tasklets queue and is handled.
  *
- * When the interrupt handler thread gets the CPU, it processes all pending
- * interrupt events in the order of their occurence before it yields.
+ * When the tasklet thread gets the CPU, it processes all pending
+ * tasklets events in the order they were scheduled before it yields.
  *
  * ## Usage
  *
- * The single-interrupt handler thread can be used not only for driver
- * modules with bus access, but for any interrupt handling that may
- * trigger a blocking function and therefore cannot be called in an
- * interrupt context.
+ * Tasklets can be used not only for driver modules with bus access, but for
+ * any interrupt handling that may trigger a blocking function and therefore
+ * cannot be called in an interrupt context. It can also be used to process
+ * low layer network events (RX process) or MAC events.
  *
- * @note All interrupts handled by the single interrupt handler thread are
+ * @note All tasklets handled by the single tasklets handler thread are
  * serialized.
  *
- * To use the interrupt handler thread, using modules have to define a static
- * interrupt event of type #irq_event_t for each of their interrupt sources.
- * These static interrupt events have to be initialized with the static
- * initializer #IRQ_EVENT_INIT. Furthermore, the interrupt handling function
+ * To use tasklets, the used modules have to define a static
+ * tasklet of type #tasklet_t for each of their events (e.g interrupt sources).
+ * These static tasklets have to be initialized with the static
+ * initializer #TASKLET_INIT. Furthermore, the task function
  * and optionally an argument, the context, have to be set.
  *
- * Once the interrupt events have been initialized, they can be added to the
- * pending interrupts queue of the interrupt handler thread by an ISR using
- * the #irq_event_add function which indicates that an interrupt has occurred
- * and needs to be handled.
+ * Once the tasklets have been initialized, they can be added to the
+ * pending tasklets queue using the #tasklet_schedule function which
+ * indicates that the given tasklets should be handled by the OS as soon as
+ * possible
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  *      #include "foo_device.h"
- *      #include "irq_handler.h"
+ *      #include "tasklet.h"
  *
- *      // interrupt event structure with static initializer
- *      static irq_event_t _int_event = IRQ_EVENT_INIT;
+ *      // tasklet structure with static initializer
+ *      static tasklet_t _int_event = TASKLET_INIT;
  *
  *      ...
  *
  *      // non blocking ISR just adds the event and returns
  *      static void _int_request(void *arg)
  *      {
- *          irq_event_add(&_int_event);
+ *          tasklet_schedule(&_int_event);
  *      }
  *
  *      // example handler for the interrupt including blocking functions
@@ -149,8 +152,8 @@
  * @file
  */
 
-#ifndef IRQ_HANDLER_H
-#define IRQ_HANDLER_H
+#ifndef TASKLET_H
+#define TASKLET_H
 
 #include <stdbool.h>
 
@@ -162,92 +165,92 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default priority of the interrupt handler thread
+ * @brief   Default priority of the tasklets thread
  *
- * The priority of the interrupt handler thread has to be high enough that all
- * pending interrupts are handled before other threads are executed.
+ * The priority of the taskletthread has to be high enough that all
+ * pending tasklets are handled before other threads are executed.
  */
-#ifndef IRQ_HANDLER_PRIO
-#define IRQ_HANDLER_PRIO    0
+#ifndef TASKLET_HANDLER_PRIO
+#define TASKLET_HANDLER_PRIO    0
 #endif
 
 /**
- * @brief   Interrupt handling function prototype
+ * @brief   Tasklet handling function prototype
  *
  * Defines the prototype of the function that is registered together
- * with an interrupt event and to be called when the interrupt is handled.
+ * with a taskletand to be called when the tasklet is handled.
  */
-typedef void (*irq_isr_t)(void *ctx);
+typedef void (*tasklet_task_t)(void *ctx);
 
 /**
- * @brief   Interrupt event structure
+ * @brief   Tasklet structure
  *
- * Using modules have to define a structure of this type for each interrupt
- * source used by the modules. Structures of this type are used to put
- * them in a pending interrupt queue indicating that an interrupt of the
- * corresponding source has occurred and needs to be handled. Each interrupt
- * event can only be pending once.
+ * Used modules have to define a structure of this type for each tasklet
+ * used by the modules. Structures of this type are used to put
+ * them in a pending tasklet queue indicating that a tasklet of the
+ * corresponding source has been scheduled and needs to be handled.
+ * Each tasklet can only be pending once.
  *
- * Interrupt event structures have to be pre-allocated to use them.
+ * Tasklet structures have to be pre-allocated in order to use them.
  */
 typedef struct {
-    event_t event;      /**< Event structure */
-    bool pending;       /**< Indicates whether the same interrupt request event
-                             is already pending */
-    irq_isr_t isr;      /**< Function to be called to handle the interrupt */
-    void *ctx;          /**< Context used by the function */
-} irq_event_t;
+    event_t event;          /**< Event structure */
+    bool pending;           /**< Indicates whether the same tasklet
+                                 is already pending */
+    tasklet_task_t task;    /**< Function to be called to handle the tasklet */
+    void *ctx;              /**< Context used by the function */
+} tasklet_t;
 
 /**
- * @brief Static initializer for #irq_event_t.
+ * @brief Static initializer for #tasklet_t.
  */
-#define IRQ_EVENT_INIT { \
+#define TASKLET_INIT { \
                             .event.handler = NULL, \
                             .event.list_node.next = NULL, \
                             .pending = false, \
-                            .isr = NULL, \
+                            .task = NULL, \
                             .ctx = NULL, \
                        }
 
 /**
- * @brief   Initialize an interrupt event
+ * @brief   Initialize a tasklet.
  *
- * Initializes the given interrupt event structure.
+ * Initializes the given tasklet structure.
  *
- * Only use this function for dynamically allocated interrupt event
- * structures. For the initialization of static interrupt event structures
- * use #IRQ_EVENT_INIT instead.
+ * Only use this function for dynamically allocated tasklet
+ * structures. For the initialization of static tasklet structures
+ * use #TASKLET_INIT instead.
  *
- * @param[out]  irq     Pre-allocated #irq_event_t sturcture, must not be NULL
+ * @param[out]  tasklet Pre-allocated #tasklet_t structure, must not be NULL
  */
 
-static inline void irq_event_init(irq_event_t *irq)
+static inline void tasklet_init(tasklet_t *tasklet)
 {
-    assert(irq != NULL);
-    irq_event_t tmp = IRQ_EVENT_INIT;
-    *irq = tmp;
+    assert(tasklet != NULL);
+    tasklet_t tmp = TASKLET_INIT;
+    *tasklet = tmp;
 }
 
 /**
- * @brief   Add an interrupt event to the pending interrupt queue
+ * @brief   Add a tasklet to the pending tasklet queue
  *
- * The interrupt event given by parameter \p irq will be placed at the end of
- * the pending interrupt queue.
+ * The tasklet given by parameter \p tasklet will be placed at the end of
+ * the pending tasklet queue.
  *
- * Each interrupt event can be added only once to the pending interrupt queue.
- * That is, if the same interrupt occurs multiple times, only its first
- * occurence is placed to the pending interrupt queue and is handled.
+ * Each tasklet can be added only once to the pending tasklet queue.
+ * That is, if the same event that triggers the tasklet occurs multiple times,
+ * only its first occurrence is placed to the pending tasklet queue and is handled.
  *
- * @param[in]   irq     Preallocated interrupt event
+ * @param[in]   tasklet Preallocated tasklet
  *
  * @retval 0            on success
- * @retval -EALREADY    if the given interrupt event is already pending
+ * @retval -EALREADY    if the given tasklet is already pending
  */
-int irq_event_add(irq_event_t *irq);
+int tasklet_schedule(tasklet_t *tasklet);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* IRQ_HANDLER_H */
+#endif /* TASKLET_H */
 /** @} */

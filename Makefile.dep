@@ -918,7 +918,7 @@ ifneq (,$(filter riotboot_hdr, $(USEMODULE)))
   USEMODULE += riotboot
 endif
 
-ifneq (,$(filter irq_handler,$(USEMODULE)))
+ifneq (,$(filter tasklet,$(USEMODULE)))
   USEMODULE += event
 endif
 
