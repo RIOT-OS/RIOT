@@ -25,8 +25,7 @@ endif
 # Features that are required by the application but not provided by the BSP and
 # features that are used but blacklisted (prepended with "!").
 # Having features missing may case the build to fail.
-FEATURES_MISSING = $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_REQUIRED)) \
-                     $(call _features_used_blacklisted))
+FEATURES_MISSING = $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_REQUIRED)))
 
 # Features that are only optional and not required at the same time.
 # The policy is to by default use by features if they are provided by the BSP.
@@ -50,6 +49,6 @@ _features_conflicting = $(if $(call _features_used_conflicting,$(subst :, ,$1)),
 #   Return non empty on error
 _features_used_conflicting = $(filter $(words $1),$(words $(filter $(FEATURES_USED),$1)))
 
-# Return features that are used but blacklisted as
-# "!<feature>" ("not feature")
-_features_used_blacklisted = $(addprefix !,$(sort $(filter $(FEATURES_USED), $(FEATURES_BLACKLIST))))
+# Features that are used by the application but blacklisted by the BSP.
+# Having blacklisted features may cause the build to fail.
+FEATURES_USED_BLACKLISTED = $(sort $(filter $(FEATURES_USED), $(FEATURES_BLACKLIST)))

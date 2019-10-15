@@ -732,13 +732,17 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
     EXPECT_ERRORS := 1
   endif
 
-  # turn provided but blacklisted features into required "!<feature>"
-  FEATURES_REQUIRED += $(addprefix !,$(sort $(filter $(FEATURES_PROVIDED), $(FEATURES_BLACKLIST))))
-
   # Test if all feature requirements were met by the selected board.
   ifneq (,$(FEATURES_MISSING))
     $(shell $(COLOR_ECHO) "$(COLOR_RED)There are unsatisfied feature requirements:$(COLOR_RESET)"\
                           "$(FEATURES_MISSING)" 1>&2)
+    EXPECT_ERRORS := 1
+  endif
+
+  # Test if no feature in the requirements used is blacklisted for the selected board.
+  ifneq (,$(FEATURES_USED_BLACKLISTED))
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)Some feature requirements are blacklisted:$(COLOR_RESET)"\
+                          "$(FEATURES_USED_BLACKLISTED)" 1>&2)
     EXPECT_ERRORS := 1
   endif
 
