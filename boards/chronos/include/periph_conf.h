@@ -50,21 +50,7 @@ extern "C" {
  * @name    UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
-#define UART_0_EN           (1U)
-
-#define UART_DEV            (USART_1)
-#define UART_IE             (SFR->IE2)
-#define UART_IF             (SFR->IFG2)
-#define UART_IE_RX_BIT      (1 << 4)
-#define UART_IE_TX_BIT      (1 << 5)
-#define UART_ME             (SFR->ME2)
-#define UART_ME_BITS        (0x30)
-#define UART_PORT           (PORT_3)
-#define UART_RX_PIN         (1 << 6)
-#define UART_TX_PIN         (1 << 7)
-#define UART_RX_ISR         (USART1RX_VECTOR)
-#define UART_TX_ISR         (USART1TX_VECTOR)
+#define UART_NUMOF          (0U)
 /** @} */
 
 
