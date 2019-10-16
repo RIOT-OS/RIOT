@@ -11,6 +11,7 @@
 #include <mips/m32c0.h>
 #include <mips/regdef.h>
 #include <mips/asm.h>
+#include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include <malloc.h>

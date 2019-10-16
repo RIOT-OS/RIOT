@@ -23,15 +23,13 @@
 #ifndef CPU_H
 #define CPU_H
 
+#include <stdint.h>
+#include "cpu_conf.h"
+#include "irq.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stdio.h>
-#include <inttypes.h>
-#include <assert.h>
-#include "cpu_conf.h"
-#include "irq.h"
 
 /**
  * @brief   Print the last instruction's address
