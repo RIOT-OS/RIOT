@@ -118,6 +118,10 @@ void auto_init(void)
 #ifdef MODULE_SCHEDSTATISTICS
     init_schedstatistics();
 #endif
+#ifdef MODULE_EVENT_THREAD
+    extern void auto_init_event_thread(void);
+    auto_init_event_thread();
+#endif
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");
     mci_initialize();
