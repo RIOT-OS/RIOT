@@ -22,6 +22,12 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#ifdef CPU_MODEL_P32MX470F512H
+#include "vendor/p32mx470f512h.h"
+#else
+#error "No CPU headers for the defined CPU_MODEL found"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
