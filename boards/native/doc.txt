@@ -19,4 +19,5 @@ OS/RIOT/images/Native.jpg)
 - LEDs: One red and one green LED - state changes are printed to the UART
 - PWM: Dummy PWM
 - QDEC: Emulated according to PWM
+- SPI: Runtime configurable - `/dev/spidev*` are supported (Linux host only)
  */

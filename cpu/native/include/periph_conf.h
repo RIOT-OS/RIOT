@@ -17,7 +17,7 @@
 #define PERIPH_CONF_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -50,7 +50,6 @@
 
 /**
  * @brief xtimer configuration
- * @{
  */
 #define XTIMER_OVERHEAD 14
 
@@ -85,6 +84,44 @@
 #ifndef QDEC_NUMOF
 #define QDEC_NUMOF (8U)
 #endif
+
+/**
+ * @name SPI configuration (Linux host only)
+ * @{
+ */
+#if !defined(SPI_NUMOF) || defined(DOXYGEN)
+/**
+ * @brief Amount of SPI devices
+ *
+ * Allows up to SPI_NUMOF SPI devices with each having up to SPI_MAXCS hardware
+ * cable select lines. Assignment to hardware devices can be configured at
+ * runtime using the `--spi` startup parameter.
+ *
+ * Can be overriden during compile time with a `-DSPI_NUMOF=n` flag.
+ */
+#define SPI_NUMOF (1U)
+#endif
+
+#if !defined(SPI_MAXCS) || defined(DOXYGEN)
+/**
+ * @brief Maximum amount of chip select lines per bus
+ *
+ * Allows up to SPI_MAXCS hardware cable select lines per SPI device. The n-th
+ * hardware select line can be used with the SPI_HWCS macro.
+ */
+#define SPI_MAXCS (4U)
+#endif
+
+/**
+ * @brief Hardware chip select access macro.
+ *
+ * The amount of available hardware chip select lines depends on the SPI_MAXCS
+ * parameter. If the line is actually available at runtime depends of whether a
+ * `--spi` startup parameter with the corresponding SPI device and HWCS-line
+ * parameter has been given.
+ */
+#define SPI_HWCS(x)     (x)
+/** @} */
 
 #ifdef __cplusplus
 }

@@ -26,6 +26,11 @@
 #include "async_read.h"
 #include "tty_uart.h"
 
+#ifdef MODULE_PERIPH_SPIDEV_LINUX
+/* Only manage SPI if it is part of the build */
+#include "spidev_linux.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -44,6 +49,9 @@ void pm_set_lowest(void)
 void pm_off(void)
 {
     puts("\nnative: exiting");
+#ifdef MODULE_PERIPH_SPIDEV_LINUX
+    spidev_linux_teardown();
+#endif
     real_exit(EXIT_SUCCESS);
 }
 
@@ -52,6 +60,9 @@ void pm_reboot(void)
     printf("\n\n\t\t!! REBOOT !!\n\n");
 
     native_async_read_cleanup();
+#ifdef MODULE_PERIPH_SPIDEV_LINUX
+    spidev_linux_teardown();
+#endif
 
     if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {
         err(EXIT_FAILURE, "reboot: execve");
