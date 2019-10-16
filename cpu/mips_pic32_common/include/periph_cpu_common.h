@@ -101,6 +101,24 @@ typedef enum {
     GPIO_AF15               /**< use alternate function 15 */
 } gpio_af_t;
 
+/**
+ * @brief   Structure for UART configuration data
+ */
+typedef struct {
+    volatile unsigned int * base;           /**< UART device base register address */
+    uint32_t clock;                         /**< Peripheral clock frequency */
+    gpio_t rx_pin;                          /**< RX pin */
+    gpio_t tx_pin;                          /**< TX pin */
+    volatile unsigned int *rx_mux_reg;      /**< Address of RX mux register*/
+    volatile unsigned int *tx_mux_reg;      /**< Address of TX mux register */
+    gpio_af_t rx_af;                        /**< alternate function for RX pin */
+    gpio_af_t tx_af;                        /**< alternate function for TX pin */
+    uint32_t vector;                        /**< vector number */
+#ifdef CPU_FAM_PIC32MX
+    uint32_t irq;                           /**< interrupt number */
+#endif
+} uart_conf_t;
+
 #ifdef __cplusplus
 }
 #endif
