@@ -11,10 +11,6 @@ ifeq (1,$(EFM32_TNRG))
   FEATURES_PROVIDED += periph_hwrng
 endif
 
-ifeq (1,$(EFM32_UART_MODES))
-  CFLAGS += -DEFM32_UART_MODES=1
-endif
-
 ifeq (1,$(EFM32_LEUART_ENABLED))
   CFLAGS += -DEFM32_LEUART_ENABLED=1
 endif
