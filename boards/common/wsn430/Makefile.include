@@ -1,7 +1,7 @@
 # include this module in the build
 USEMODULE += boards_common_wsn430
 # use common wsn430 includes
-export INCLUDES += -I$(RIOTBOARD)/common/wsn430/include
+INCLUDES += -I$(RIOTBOARD)/common/wsn430/include
 
 # configure the serial interface
 PORT_LINUX ?= /dev/ttyUSB0

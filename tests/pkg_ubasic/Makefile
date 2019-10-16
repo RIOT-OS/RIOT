@@ -16,7 +16,6 @@ BOARD_BLACKLIST := \
                    esp8266-olimex-mod \
                    hifive1 \
                    hifive1b \
-                   jiminy-mega256rfr2 \
                    mega-xplained \
                    msb-430 \
                    msb-430h \
@@ -31,5 +30,6 @@ BOARD_BLACKLIST := \
 
 USEPKG += ubasic
 USEMODULE += ubasic_tests
+USEMODULE += printf_float
 
 include $(RIOTBASE)/Makefile.include

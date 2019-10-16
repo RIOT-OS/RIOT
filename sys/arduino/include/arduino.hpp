@@ -104,6 +104,14 @@ void delayMicroseconds(unsigned long usec);
 unsigned long micros();
 
 /**
+ * @brief   Returns the number of milliseconds since start
+ *
+ * @return value of milliseconds since start
+ */
+unsigned long millis();
+
+#if MODULE_PERIPH_ADC || DOXYGEN
+/**
  * @brief   Read the current value of the given analog pin
  *
  * @param[in] pin       pin to read
@@ -112,6 +120,7 @@ unsigned long micros();
  * to the voltage applied to the pin
  */
 int analogRead(int pin);
+#endif
 
 #endif /* ARDUINO_H */
 /** @} */

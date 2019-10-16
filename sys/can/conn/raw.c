@@ -115,7 +115,7 @@ static void _tx_conf_timeout(void *arg)
     msg.type = _TIMEOUT_TX_MSG_TYPE;
     msg.content.value = _TIMEOUT_MSG_VALUE;
 
-    mbox_put(&conn->mbox, &msg);
+    mbox_try_put(&conn->mbox, &msg);
 }
 
 int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int flags)
@@ -195,7 +195,7 @@ static void _rx_timeout(void *arg)
     msg.type = _TIMEOUT_RX_MSG_TYPE;
     msg.content.value = _TIMEOUT_MSG_VALUE;
 
-    mbox_put(&conn->mbox, &msg);
+    mbox_try_put(&conn->mbox, &msg);
 }
 
 int conn_can_raw_recv(conn_can_raw_t *conn, struct can_frame *frame, uint32_t timeout)

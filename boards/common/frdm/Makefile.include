@@ -21,7 +21,6 @@ ifeq (1,$(USE_OLD_OPENOCD))
 export OPENOCD_PRE_VERIFY_CMDS += \
   -c 'load_image $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin 0x20000000 bin' \
   -c 'resume 0x20000000'
-export OPENOCD_EXTRA_INIT
 export OPENOCD_CONFIG ?= $(RIOTBOARD)/common/frdm/dist/old-openocd-$(CPU_FAMILY).cfg
 endif
 
@@ -33,6 +32,10 @@ export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
 
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
+
+# The board can become un-flashable after some execution,
+# use connect_assert_srst to always be able to flash or reset the board.
+export OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk

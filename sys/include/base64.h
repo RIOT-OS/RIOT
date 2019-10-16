@@ -71,8 +71,7 @@ static inline size_t base64_estimate_encode_size(size_t data_in_size)
             BASE64_ERROR_BUFFER_OUT_SIZE on insufficient size for encoding to `base64_out`,
             BASE64_ERROR_BUFFER_OUT if `base64_out` equals NULL
                                     but the `base64_out_size` is sufficient,
-            BASE64_ERROR_DATA_IN if `data_in` equals NULL,
-            BASE64_ERROR_DATA_IN_SIZE if `data_in_size` is less than 1.
+            BASE64_ERROR_DATA_IN if `data_in` equals NULL.
  */
 int base64_encode(const void *data_in, size_t data_in_size,
                   unsigned char *base64_out, size_t *base64_out_size);
@@ -93,7 +92,7 @@ int base64_encode(const void *data_in, size_t data_in_size,
             BASE64_ERROR_BUFFER_OUT if `data_out` equals NULL
                                     but the size for `data_out_size` is sufficient,
             BASE64_ERROR_DATA_IN if `base64_in` equals NULL,
-            BASE64_ERROR_DATA_IN_SIZE if `base64_in_size` is less than 4.
+            BASE64_ERROR_DATA_IN_SIZE if `base64_in_size` is between 1 and 4.
  */
 int base64_decode(const unsigned char *base64_in, size_t base64_in_size,
                   void *data_out, size_t *data_out_size);

@@ -1,13 +1,17 @@
+ifeq (,$(CPU_MODEL))
+  $(error CPU_MODEL must have been defined by the board/cpu Makefile.features)
+endif
+
 # Target triple for the build. Use arm-none-eabi if you are unsure.
 export TARGET_ARCH ?= arm-none-eabi
 
 # define build specific options
-export CFLAGS_CPU   = -mcpu=$(MCPU) -mlittle-endian -mthumb $(CFLAGS_FPU)
+CFLAGS_CPU   = -mcpu=$(MCPU) -mlittle-endian -mthumb $(CFLAGS_FPU)
 
 ifneq (llvm,$(TOOLCHAIN))
 # Clang (observed with v3.7) does not understand  -mno-thumb-interwork, only add if
 # not building with LLVM
-export CFLAGS      += -mno-thumb-interwork
+CFLAGS      += -mno-thumb-interwork
 
 # work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85606
 ifneq (,$(filter cortex-m0%,$(CPU_ARCH)))
@@ -15,13 +19,13 @@ ifneq (,$(filter cortex-m0%,$(CPU_ARCH)))
 endif
 endif
 
-export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
-export CFLAGS_DBG  ?= -ggdb -g3
-export CFLAGS_OPT  ?= -Os
+CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
+CFLAGS_DBG  ?= -ggdb -g3
+CFLAGS_OPT  ?= -Os
 
-export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
+CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 
-export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
+ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/cortexm_common/ldscripts
 export LINKER_SCRIPT ?= $(CPU_MODEL).ld
 export LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
@@ -38,9 +42,6 @@ export USEMODULE += cortexm_common_periph
 
 # all cortex MCU's use newlib as libc
 export USEMODULE += newlib
-
-# set default for CPU_MODEL
-export CPU_MODEL ?= $(CPU)
 
 
 # extract version inside the first parentheses
@@ -67,38 +68,21 @@ ifneq (1,$(BUILD_IN_DOCKER))
   endif # ARM_GCC_UNSUPPORTED
 endif # BUILD_IN_DOCKER
 
-
-# Temporary LLVM/Clang Workaround:
-# report cortex-m0 instead of cortex-m0plus if llvm/clang (<= 3.6.2) is used
-# llvm/clang version 3.6.2 still does not support the cortex-m0plus mcpu type
-ifeq (llvm,$(TOOLCHAIN))
-ifeq (cortex-m0plus,$(CPU_ARCH))
-LLVM_UNSUP = $(shell clang -target arm-none-eabi -mcpu=$(CPU_ARCH) -c -x c /dev/null -o /dev/null \
-                     > /dev/null 2>&1 || echo 1 )
-ifeq (1,$(LLVM_UNSUP))
-CPU_ARCH = cortex-m0
-endif
-endif
-endif
-
-# export the CPU model and architecture
-MODEL = $(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
-export CFLAGS += -DCPU_MODEL_$(MODEL)
-ARCH = $(shell echo $(CPU_ARCH) | tr 'a-z-' 'A-Z_')
-export CFLAGS += -DCPU_ARCH_$(ARCH)
+CFLAGS += -DCPU_MODEL_$(call uppercase_and_underscore,$(CPU_MODEL))
+CFLAGS += -DCPU_ARCH_$(call uppercase_and_underscore,$(CPU_ARCH))
 
 # set the compiler specific CPU and FPU options
 ifneq (,$(filter $(CPU_ARCH),cortex-m4f cortex-m7))
     ifneq (,$(filter cortexm_fpu,$(DISABLE_MODULE)))
-        export CFLAGS_FPU ?= -mfloat-abi=soft
+        CFLAGS_FPU ?= -mfloat-abi=soft
     else
         USEMODULE += cortexm_fpu
         # clang assumes there is an FPU
         ifneq (llvm,$(TOOLCHAIN))
             ifeq ($(CPU_ARCH),cortex-m7)
-                export CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv5-d16
+                CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv5-d16
             else
-                export CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv4-sp-d16
+                CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv4-sp-d16
             endif
         endif
     endif
@@ -116,19 +100,19 @@ endif
 ifneq (,$(filter cmsis-dsp,$(USEPKG)))
 # definition needed to use cmsis-dsp headers
 ifeq ($(CPU_ARCH),cortex-m0)
-export CFLAGS += -DARM_MATH_CM0
+CFLAGS += -DARM_MATH_CM0
 else ifeq ($(CPU_ARCH),cortex-m0plus)
-export CFLAGS += -DARM_MATH_CM0PLUS
+CFLAGS += -DARM_MATH_CM0PLUS
 else ifeq ($(CPU_ARCH),cortex-m3)
-export CFLAGS += -DARM_MATH_CM3
+CFLAGS += -DARM_MATH_CM3
 else ifeq ($(CPU_ARCH),cortex-m4)
-export CFLAGS += -DARM_MATH_CM4
+CFLAGS += -DARM_MATH_CM4
 else ifeq ($(CPU_ARCH),cortex-m4f)
-export CFLAGS += -DARM_MATH_CM4
+CFLAGS += -DARM_MATH_CM4
 else ifeq ($(CPU_ARCH),cortex-m7)
-export CFLAGS += -DARM_MATH_CM7
+CFLAGS += -DARM_MATH_CM7
 else ifeq ($(CPU_ARCH),cortex-m23)
-export CFLAGS += -DARM_MATH_CM23
+CFLAGS += -DARM_MATH_CM23
 endif
 endif
 

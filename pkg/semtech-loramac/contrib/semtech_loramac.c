@@ -203,17 +203,7 @@ static size_t _write_uint32(size_t pos, uint32_t value)
     return eeprom_write(pos, array, sizeof(uint32_t));
 }
 
-static inline void _set_uplink_counter(semtech_loramac_t *mac, uint32_t counter)
-{
-    DEBUG("[semtech-loramac] reading uplink counter: %" PRIu32 " \n", counter);
 
-    mutex_lock(&mac->lock);
-    MibRequestConfirm_t mibReq;
-    mibReq.Type = MIB_UPLINK_COUNTER;
-    mibReq.Param.UpLinkCounter = counter;
-    LoRaMacMibSetRequestConfirm(&mibReq);
-    mutex_unlock(&mac->lock);
-}
 
 static inline void _set_join_state(semtech_loramac_t *mac, bool joined)
 {
@@ -260,7 +250,7 @@ static inline void _read_loramac_config(semtech_loramac_t *mac)
     /* Read uplink counter */
     uint32_t ul_counter;
     pos += _read_uint32(pos, &ul_counter);
-    _set_uplink_counter(mac, ul_counter);
+    semtech_loramac_set_uplink_counter(mac, ul_counter);
 
     /* Read RX2 freq */
     uint32_t rx2_freq;

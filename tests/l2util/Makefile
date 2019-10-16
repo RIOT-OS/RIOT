@@ -2,7 +2,7 @@ DEVELHELP = 0
 
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := blackpill bluepill
+BOARD_INSUFFICIENT_MEMORY :=
 
 USEMODULE += embunit
 USEMODULE += l2util
@@ -15,7 +15,8 @@ CHECKED_IFDEF_PATHS = cc110x \
                       netdev_ieee802154 \
                       xbee \
                       nordic_softdevice_ble \
-                      nrfmin
+                      nrfmin \
+                      nimble_netif
 
 CFLAGS += $(foreach path,$(CHECKED_IFDEF_PATHS),\
             -DMODULE_$(shell echo $(path) | tr a-z A-Z))

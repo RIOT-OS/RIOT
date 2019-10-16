@@ -104,8 +104,6 @@ static void _on_radio_evt(netdev_t *netdev, netdev_event_t event)
 
 void skald_init(void)
 {
-    assert(dev);
-
     /* setup and a fitting radio driver - potentially move to auto-init at some
      * point */
 #if defined(MODULE_NRFBLE)

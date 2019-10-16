@@ -10,8 +10,20 @@
  * @defgroup    drivers_periph_timer Timer
  * @ingroup     drivers_periph
  * @brief       Low-level timer peripheral driver
- * @{
  *
+ * # (Low-) Power Implications
+ *
+ * After calling timer_init(), the underlying hardware timer **should** be
+ * powered on and running. When a timer is explicitly stopped by calling
+ * timer_stop(), the timer **should** be stopped and powered down (e.g. by
+ * peripheral clock gating). Once the timer is started again (by calling
+ * timer_start()), it should transparently continue its previously configured
+ * operation.
+ *
+ * While the timer is active, the implementation might need to block certain
+ * power modes on specific CPU implementation.
+ *
+ * @{
  * @file
  * @brief       Low-level timer peripheral driver interface definitions
  *
@@ -108,7 +120,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg);
  * @param[in] timeout       timeout in ticks after that the registered callback
  *                          is executed
  *
- * @return                  1 on success
+ * @return                  0 on success
  * @return                  -1 on error
  */
 int timer_set(tim_t dev, int channel, unsigned int timeout);
@@ -121,7 +133,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout);
  * @param[in] value         the absolute compare value when the callback will be
  *                          triggered
  *
- * @return                  1 on success
+ * @return                  0 on success
  * @return                  -1 on error
  */
 int timer_set_absolute(tim_t dev, int channel, unsigned int value);
@@ -132,7 +144,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value);
  * @param[in] dev           the timer device to clear
  * @param[in] channel       the channel on the given device to clear
  *
- * @return                  1 on success
+ * @return                  0 on success
  * @return                  -1 on error
  */
 int timer_clear(tim_t dev, int channel);
@@ -159,6 +171,9 @@ void timer_start(tim_t dev);
  * @brief Stop the given timer
  *
  * This will effect all of the timer's channels.
+ *
+ * When the timer is stopped, the underlying timer peripheral should be
+ * completely powered off.
  *
  * @param[in] dev           the timer to stop
  */

@@ -1,0 +1,9 @@
+/**
+@defgroup    boards_blackpill Blackpill board
+@ingroup     boards
+@brief       Support for the stm32f103c8 based blackpill board.
+
+Refer to the common documentation of the bluepill and blackpill board in
+@ref boards_common_blxxxpill instead.
+
+ */

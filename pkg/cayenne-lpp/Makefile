@@ -1,6 +1,6 @@
 PKG_NAME=cayenne-lpp
 PKG_URL=https://github.com/aabadie/cayenne-lpp
-PKG_VERSION=ad3aa26043e221eda28ac3da2484e1ef84986442
+PKG_VERSION=0.1.1
 PKG_LICENSE=LGPLv2.1
 
 .PHONY: all

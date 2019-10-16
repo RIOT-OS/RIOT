@@ -52,6 +52,8 @@
 : ${PYOCD_CMD:=pyocd}
 : ${PYOCD_FLASH:=${PYOCD_CMD} flash}
 : ${PYOCD_GDBSERVER:=${PYOCD_CMD} gdbserver}
+# Debugger interface initialization commands to pass to PyOCD
+: ${PYOCD_ADAPTER_INIT:=}
 # The setsid command is needed so that Ctrl+C in GDB doesn't kill PyOCD.
 : ${SETSID:=setsid}
 # GDB command, usually a separate command for each platform (e.g.
@@ -124,7 +126,7 @@ do_flash() {
     fi
 
     # flash device
-    sh -c "${PYOCD_FLASH} ${FLASH_TARGET_TYPE} -a ${IMAGE_OFFSET} \"${HEX_FILE}\"" &&
+    sh -c "${PYOCD_FLASH} ${FLASH_TARGET_TYPE} ${PYOCD_ADAPTER_INIT} -a ${IMAGE_OFFSET} \"${HEX_FILE}\"" &&
     echo 'Done flashing'
 }
 
@@ -147,6 +149,7 @@ do_debug() {
     # start PyOCD as GDB server
     ${SETSID} sh -c "${PYOCD_GDBSERVER} \
             ${FLASH_TARGET_TYPE} \
+            ${PYOCD_ADAPTER_INIT} \
             -p ${GDB_PORT} \
             -T ${TELNET_PORT} & \
             echo \$! > $OCD_PIDFILE" &
@@ -164,13 +167,14 @@ do_debugserver() {
     # start PyOCD as GDB server
     sh -c "${PYOCD_GDBSERVER} \
             ${FLASH_TARGET_TYPE} \
+            ${PYOCD_ADAPTER_INIT} \
             -p ${GDB_PORT} \
             -T ${TELNET_PORT}"
 }
 
 do_reset() {
     # start PyOCD and invoke board reset
-    sh -c "${PYOCD_CMD} cmd -c reset ${FLASH_TARGET_TYPE}"
+    sh -c "${PYOCD_CMD} cmd -c reset ${FLASH_TARGET_TYPE} ${PYOCD_ADAPTER_INIT}"
 }
 
 #

@@ -57,25 +57,81 @@ void SerialPort::end(void)
 
 size_t SerialPort::print(int val)
 {
-    return print(val, DEC);
+    return print((long)val, DEC);
 }
 
 size_t SerialPort::print(int val, SerialFormat format)
+{
+    if (format == DEC) {
+        return print((long)val, format);
+    }
+
+    /* Propagation to long of negative number changes binary representation.
+     * This cast should add leading zeros to the binary representation, that
+     * will be skipped by print(unsigned long, SerialFormat)
+     */
+    return print((unsigned long)((unsigned)val), format);
+}
+
+size_t SerialPort::print(unsigned int val)
+{
+    return print((unsigned long)val, DEC);
+}
+
+size_t SerialPort::print(unsigned int val, SerialFormat format)
+{
+    return print((unsigned long)val, format);
+}
+
+size_t SerialPort::print(long val)
+{
+    return print(val, DEC);
+}
+
+size_t SerialPort::print(long val, SerialFormat format)
+{
+    if (format == DEC) {
+        char buf[64];
+        size_t len;
+        len = sprintf(buf, "%li", val);
+        write(buf, len);
+        return len;
+    }
+
+    return print((unsigned long)val, format);
+}
+
+size_t SerialPort::print(unsigned long val)
+{
+    return print(val, DEC);
+}
+
+size_t SerialPort::print(unsigned long val, SerialFormat format)
 {
     char buf[64];
     size_t len;
     switch (format) {
         case BIN:
-            /* TODO */
-            return 0;
+            len = 0;
+            {
+                static const unsigned long mask = 1UL << (8 * sizeof(unsigned long) - 1);
+                unsigned pos = 0;
+                while (!(val & (mask >> pos))) {
+                    pos ++;
+                }
+                for (; pos < 8 * sizeof(unsigned long); pos++) {
+                    buf[len++] = (val & (mask >> pos)) ? '1' : '0';
+                }
+            }
+            break;
         case OCT:
-            len = sprintf(buf, "%o", (unsigned)val);
+            len = sprintf(buf, "%lo", val);
             break;
         case DEC:
-            len = sprintf(buf, "%i", val);
+            len = sprintf(buf, "%lu", val);
             break;
         case HEX:
-            len = sprintf(buf, "%x", (unsigned)val);
+            len = sprintf(buf, "%lx", val);
             break;
         default:
             return 0;
@@ -107,46 +163,87 @@ size_t SerialPort::print(const char *val)
     return (size_t)write(val);
 }
 
-size_t SerialPort::println(int val)
+template<typename T> size_t SerialPort::_println(T val)
 {
     size_t res = print(val);
     write("\r\n");
-    return (res + 2);
+    return res + 2;
+}
+
+template<typename T> size_t SerialPort::_println(T val, SerialFormat format)
+{
+    size_t res = print(val, format);
+    write("\r\n");
+    return res + 2;
+}
+
+size_t SerialPort::println(int val)
+{
+    return _println<int>(val);
 }
 
 size_t SerialPort::println(int val, SerialFormat format)
 {
-    size_t res = print(val, format);
-    write("\r\n");
-    return (res + 2);
+    return _println<int>(val, format);
+}
+
+size_t SerialPort::println(unsigned int val)
+{
+    return _println<unsigned int>(val);
+}
+
+size_t SerialPort::println(unsigned int val, SerialFormat format)
+{
+    return _println<unsigned int>(val, format);
+}
+
+size_t SerialPort::println(long val)
+{
+    return _println<long>(val);
+}
+
+size_t SerialPort::println(long val, SerialFormat format)
+{
+    return _println<long>(val, format);
+}
+
+size_t SerialPort::println(unsigned long val)
+{
+    return _println<unsigned long>(val);
+}
+
+size_t SerialPort::println(unsigned long val, SerialFormat format)
+{
+    return _println<unsigned long>(val, format);
 }
 
 size_t SerialPort::println(float val)
 {
-    size_t res = print(val);
-    write("\r\n");
-    return (res + 2);
+    return _println<float>(val);
 }
 
 size_t SerialPort::println(float val, int format)
 {
+    /* cannot use template here, second parameter differs in type */
     size_t res = print(val, format);
     write("\r\n");
-    return (res + 2);
+    return res + 2;
 }
 
 size_t SerialPort::println(char val)
 {
-    size_t res = print(val);
-    write("\r\n");
-    return (res + 2);
+    return _println<char>(val);
 }
 
 size_t SerialPort::println(const char *val)
 {
-    size_t res = print(val);
+    return _println<const char *>(val);
+}
+
+size_t SerialPort::println(void)
+{
     write("\r\n");
-    return (res + 2);
+    return 2;
 }
 
 int SerialPort::read(void)

@@ -99,7 +99,8 @@ void chacha_encrypt_bytes(chacha_ctx *ctx, const uint8_t *m, uint8_t *c);
 /**
  * @copydoc chacha_encrypt_bytes()
  */
-static inline void chacha_decrypt_bytes(chacha_ctx *ctx, const uint8_t *m, uint8_t *c)
+static inline void chacha_decrypt_bytes(chacha_ctx *ctx, const uint8_t *m,
+                                        uint8_t *c)
 {
     chacha_encrypt_bytes(ctx, m, c);
 }

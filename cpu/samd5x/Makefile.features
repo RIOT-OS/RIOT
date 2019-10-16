@@ -1,3 +1,4 @@
 FEATURES_PROVIDED += periph_hwrng
+FEATURES_PROVIDED += backup_ram
 
 include $(RIOTCPU)/sam0_common/Makefile.features

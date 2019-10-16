@@ -43,6 +43,19 @@
  *    configures the bus with specific parameters (clock, mode) for the duration
  *    of that transaction.
  *
+ * # (Low-) Power Implications
+ *
+ * As SPI buses are shared peripherals and the interfaces implements a
+ * transaction based paradigm, we leverage this for the SPI peripherals power
+ * management. After calling spi_init(), the SPI peripheral **should** be
+ * completely powered off (e.g. through peripheral clock gating). It **should**
+ * subsequently only be powered on and enabled in between spi_acquire() and
+ * spi_release() blocks.
+ *
+ * In case the SPI driver implementation puts the active thread to sleep during
+ * data transfer (e.g. when using DMA), the implementation might need to block
+ * certain power states during that time.
+ *
  * @{
  * @file
  * @brief       Low-level SPI peripheral driver interface definition
@@ -288,7 +301,7 @@ void spi_release(spi_t bus);
  * @param[in] cs        chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
  * @param[in] cont      if true, keep device selected after transfer
- * @param[in] out       byte to send out, set NULL if only receiving
+ * @param[in] out       byte to send out
  *
  * @return              the received byte
  */
@@ -318,7 +331,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
  * @param[in]  cs       chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
  * @param[in] reg       register address to transfer data to/from
- * @param[in] out       byte to send, set NULL if only receiving data
+ * @param[in] out       byte to send
  *
  * @return              value that was read from the given register address
  */

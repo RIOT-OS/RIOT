@@ -1,0 +1,5 @@
+export OPENOCD_CONFIG ?= $(RIOTBOARD)/common/blxxxpill/dist/openocd-128kib.cfg
+
+USEMODULE += boards_common_blxxxpill
+
+include $(RIOTBOARD)/common/blxxxpill/Makefile.include

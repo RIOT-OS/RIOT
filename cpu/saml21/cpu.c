@@ -21,6 +21,7 @@
 #include "cpu.h"
 #include "periph/init.h"
 #include "periph_conf.h"
+#include "stdio_base.h"
 
 static void _gclk_setup(int gclk, uint32_t reg)
 {
@@ -117,6 +118,9 @@ void cpu_init(void)
      */
     SUPC->BOD33.bit.ENABLE=0;
 #endif
+
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
 
     /* trigger static peripheral initialization */
     periph_init();

@@ -41,7 +41,7 @@ QUIET ?= 1
 
 #DISABLE_MODULE += core_msg
 
-#export INCLUDES += -Iapplication_include
+#INCLUDES += -Iapplication_include
 
 # Specify custom dependencies for your application here ...
 # APPDEPS = app_data.h config.h

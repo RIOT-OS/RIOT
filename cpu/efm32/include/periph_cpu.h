@@ -39,15 +39,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Enable support for Low-power peripherals (if supported by CPU).
- * @{
- */
-#ifndef LOW_POWER_ENABLED
-#define LOW_POWER_ENABLED   (1)
-#endif
-/** @} */
-
-/**
  * @brief   Internal macro for combining ADC resolution (x) with number of
  *          shifts (y).
  */
@@ -385,6 +376,46 @@ typedef struct {
 /**
  * @brief   UART device configuration.
  */
+#ifndef DOXYGEN
+/**
+ * @brief   Override parity values
+ * @{
+ */
+#define HAVE_UART_PARITY_T
+typedef enum {
+   UART_PARITY_NONE = 0,
+   UART_PARITY_ODD = 1,
+   UART_PARITY_EVEN = 2,
+   UART_PARITY_MARK = 3,
+   UART_PARITY_SPACE = 4,
+} uart_parity_t;
+/** @} */
+
+/**
+ * @brief   Override data bits length values
+ * @{
+ */
+#define HAVE_UART_DATA_BITS_T
+typedef enum {
+    UART_DATA_BITS_5 = 5,
+    UART_DATA_BITS_6 = 6,
+    UART_DATA_BITS_7 = 7,
+    UART_DATA_BITS_8 = 8,
+} uart_data_bits_t;
+/** @} */
+
+/**
+ * @brief   Override stop bits length values
+ * @{
+ */
+#define HAVE_UART_STOP_BITS_T
+typedef enum {
+   UART_STOP_BITS_1 = 2,
+   UART_STOP_BITS_2 = 4,
+} uart_stop_bits_t;
+/** @} */
+#endif /* ndef DOXYGEN */
+
 typedef struct {
     void *dev;              /**< UART, USART or LEUART device used */
     gpio_t rx_pin;          /**< pin used for RX */

@@ -1,5 +1,5 @@
-# most board features results directly from ESP32 CPU features
-include $(RIOTCPU)/esp32/Makefile.features
+CPU = esp32
+CPU_MODEL = esp32
 
 # additional features provided by all boards are GPIOs and at least one UART
 FEATURES_PROVIDED += periph_gpio

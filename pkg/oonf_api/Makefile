@@ -8,14 +8,34 @@ MODULE:=$(PKG_NAME)
 # GCC 7.x fails on (intentional) fallthrough, thus disable implicit-fallthrough.
 CFLAGS += -Wno-implicit-fallthrough
 
+COMBINED_ARCHIVE = $(BINDIR)/$(MODULE).a
+
 .PHONY: all
 
 all:
 	"$(MAKE)" -C $(PKG_BUILDDIR)
-	"$(MAKE)" $(BINDIR)/$(MODULE).a
+	"$(MAKE)" $(COMBINED_ARCHIVE)
 
-$(BINDIR)/$(MODULE).a: $(BINDIR)/oonf_*.a
-	mkdir -p $(BINDIR)/$(MODULE); cd $(BINDIR)/$(MODULE); for var in $?; do ar -x $$var; done; ar -r -c -s $(BINDIR)/$(MODULE).a *.o
+PARTIAL_ARCHIVES = $(wildcard $(BINDIR)/oonf_*.a)
+
+$(COMBINED_ARCHIVE): $(BINDIR)/$(MODULE).mri $(PARTIAL_ARCHIVES)
+	ar -M < $<
+
+define ADDLIB_TEMPLATE
+addlib $1
+
+endef
+
+define MRI_TEMPLATE
+create $1
+$(foreach a,$2,$(call ADDLIB_TEMPLATE,$a))
+save
+end
+endef
+
+$(BINDIR)/$(MODULE).mri:
+	$(file >$@,$(call MRI_TEMPLATE,$(COMBINED_ARCHIVE),$(PARTIAL_ARCHIVES)))
+	@true
 
 include $(RIOTBASE)/pkg/pkg.mk
 ifneq (,$(filter -Wformat-nonliteral -Wformat=2, $(CFLAGS)))

@@ -131,12 +131,10 @@ static gnrc_pktsnip_t *_build_recvd_pkt(void)
 {
     gnrc_pktsnip_t *netif;
     gnrc_pktsnip_t *pkt;
-    gnrc_netif_hdr_t *netif_hdr;
 
     netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
     assert(netif);
-    netif_hdr = netif->data;
-    netif_hdr->if_pid = _mock_netif->pid;
+    gnrc_netif_hdr_set_netif(netif->data, _mock_netif);
     pkt = gnrc_pktbuf_add(netif, _l2_payload, sizeof(_l2_payload),
                           GNRC_NETTYPE_IPV6);
     assert(pkt);

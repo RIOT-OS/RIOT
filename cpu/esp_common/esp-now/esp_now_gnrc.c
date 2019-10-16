@@ -147,7 +147,6 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         pkt = mac_hdr;
         goto err;
     }
-    esp_now_pkt_hdr_t *hdr = (esp_now_pkt_hdr_t*)esp_hdr->data;
 
 #ifdef MODULE_L2FILTER
     if (!l2filter_pass(dev->filter, mac_hdr->data, ESP_NOW_ADDR_LEN)) {
@@ -160,6 +159,8 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
     pkt->type = GNRC_NETTYPE_UNDEF;
 
 #ifdef MODULE_GNRC_SIXLOWPAN
+    esp_now_pkt_hdr_t *hdr = (esp_now_pkt_hdr_t*)esp_hdr->data;
+
     if (hdr->flags & ESP_NOW_PKT_HDR_FLAG_SIXLO) {
         pkt->type = GNRC_NETTYPE_SIXLOWPAN;
     }
@@ -173,7 +174,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         goto err;
     }
 
-    ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = netif->pid;
+    gnrc_netif_hdr_set_netif((gnrc_netif_hdr_t *)netif_hdr->data, netif);
 
     uint8_t *mac = mac_hdr->data;
     DEBUG("gnrc_esp_now: received packet from %02x:%02x:%02x:%02x:%02x:%02x of length %u\n",

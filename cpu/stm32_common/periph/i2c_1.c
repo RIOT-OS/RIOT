@@ -32,6 +32,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <errno.h>
 
@@ -145,14 +146,13 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
     periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
 
     mutex_unlock(&locks[dev]);
-    return 0;
 }
 
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     ble_nimble
+ * @ingroup     pkg_nimble
  * @{
  *
  * @file
@@ -99,6 +99,15 @@ void nimble_riot_init(void)
     res = ble_hs_id_infer_auto(0, &nimble_riot_own_addr_type);
     assert(res == 0);
     (void)res;
+
+#ifdef MODULE_NIMBLE_NETIF
+    extern void nimble_netif_init(void);
+    nimble_netif_init();
+#ifdef MODULE_SHELL_COMMANDS
+    extern void sc_nimble_netif_init(void);
+    sc_nimble_netif_init();
+#endif
+#endif
 
     /* initialize the configured, build-in services */
 #ifdef MODULE_NIMBLE_SVC_GAP

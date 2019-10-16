@@ -13,7 +13,7 @@ import sys
 import subprocess
 import threading
 
-from scapy.all import Ether, IPv6, \
+from scapy.all import Ether, IPv6, UDP, \
                       IPv6ExtHdrHopByHop, IPv6ExtHdrDestOpt, \
                       IPv6ExtHdrFragment, IPv6ExtHdrRouting, \
                       ICMPv6ParamProblem, ICMPv6TimeExceeded, \
@@ -194,29 +194,37 @@ def test_seg_left_gt_len_addresses(child, iface, hw_dst, ll_dst, ll_src):
 
 def test_multicast_dst(child, iface, hw_dst, ll_dst, ll_src):
     # sniffing for ICMPv6 parameter problem message
-    sniffer.start_sniff(lambda p: p.haslayer(ICMPv6ParamProblem))
+    sniffer.start_sniff(lambda p: p.haslayer(ICMPv6ParamProblem) or
+                        (p.haslayer(UDP) and (p[IPv6].dst != "ff02::1")))
     # send routing header with multicast destination
     sendp(Ether(dst=hw_dst) / IPv6(dst="ff02::1", src=ll_src) /
-          IPv6ExtHdrRouting(type=3, segleft=1, addresses=["abcd::1"]),
-          iface=iface, verbose=0)
+          IPv6ExtHdrRouting(type=3, segleft=1, addresses=["abcd::1"]) /
+          UDP(dport=2606), iface=iface, verbose=0)
     ps = sniffer.wait_for_sniff_results()
-    p = [p for p in ps if ICMPv6ParamProblem in p]
-    assert(len(p) > 0)
-    p = p[0]
-    assert(p[ICMPv6ParamProblem].code == 0)     # erroneous header field encountered
-    assert(p[ICMPv6ParamProblem].ptr == 24)     # IPv6 headers destination field
+    p = [p for p in ps if (ICMPv6ParamProblem in p) or
+                          ((UDP in p) and (p[UDP].dport == 2606) and
+                           (p[IPv6].dst != "ff02::1"))]
+    # packet should be discarded silently:
+    # see https://tools.ietf.org/html/rfc6554#section-4.2
+    assert(len(p) == 0)
     pktbuf_empty(child)
 
 
 def test_multicast_addr(child, iface, hw_dst, ll_dst, ll_src):
+    # sniffing for ICMPv6 parameter problem message
+    sniffer.start_sniff(lambda p: p.haslayer(ICMPv6ParamProblem) or
+                        (p.haslayer(UDP) and (p[IPv6].dst != ll_dst)))
     # Send routing header with multicast address in its destinations
-    p = srp1(Ether(dst=hw_dst) / IPv6(dst=ll_dst, src=ll_src) /
-             IPv6ExtHdrRouting(type=3, segleft=1, addresses=["ff02::1"]),
-             iface=iface, timeout=1, verbose=0)
-    assert(p is not None)
-    assert(ICMPv6ParamProblem in p)
-    assert(p[ICMPv6ParamProblem].code == 0)     # erroneous header field encountered
-    assert(p[ICMPv6ParamProblem].ptr == 48)     # first address in routing header
+    sendp(Ether(dst=hw_dst) / IPv6(dst=ll_dst, src=ll_src) /
+          IPv6ExtHdrRouting(type=3, segleft=1, addresses=["abcd::1"]) /
+          UDP(dport=2606), iface=iface, verbose=0)
+    ps = sniffer.wait_for_sniff_results()
+    p = [p for p in ps if (ICMPv6ParamProblem in p) or
+                          ((UDP in p) and (p[UDP].dport == 2606) and
+                           (p[IPv6].dst != ll_dst))]
+    # packet should be discarded silently:
+    # see https://tools.ietf.org/html/rfc6554#section-4.2
+    assert(len(p) == 0)
     pktbuf_empty(child)
 
 

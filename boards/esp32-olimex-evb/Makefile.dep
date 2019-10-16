@@ -1,5 +1,1 @@
-ifneq (,$(filter can,$(USEMODULE)))
-    USEMODULE += esp_can
-endif
-
 include $(RIOTBOARD)/common/esp32/Makefile.dep

@@ -88,6 +88,14 @@
 #include "net/asymcute.h"
 #endif
 
+#ifdef MODULE_SOCK_DTLS
+#include "net/sock/dtls.h"
+#endif
+
+#ifdef MODULE_SCHEDSTATISTICS
+#include "schedstatistics.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -100,6 +108,9 @@ void auto_init(void)
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
+#endif
+#ifdef MODULE_SCHEDSTATISTICS
+    init_schedstatistics();
 #endif
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");
@@ -180,6 +191,10 @@ void auto_init(void)
 #ifdef MODULE_AUTO_INIT_LORAMAC
     extern void auto_init_loramac(void);
     auto_init_loramac();
+#endif
+#ifdef MODULE_SOCK_DTLS
+    DEBUG("Auto init sock_dtls\n");
+    sock_dtls_init();
 #endif
 
 /* initialize USB devices */
@@ -471,6 +486,18 @@ void auto_init(void)
     extern void auto_init_mpu9150(void);
     auto_init_mpu9150();
 #endif
+#ifdef MODULE_OPT3001
+    extern void auto_init_opt3001(void);
+    auto_init_opt3001();
+#endif
+#ifdef MODULE_PCA9685
+    extern void auto_init_pca9685(void);
+    auto_init_pca9685();
+#endif
+#ifdef MODULE_PH_OEM
+    extern void auto_init_ph_oem(void);
+    auto_init_ph_oem();
+#endif
 #ifdef MODULE_PIR
     extern void auto_init_pir(void);
     auto_init_pir();
@@ -553,4 +580,9 @@ void auto_init(void)
     auto_init_candev();
 
 #endif /* MODULE_AUTO_INIT_CAN */
+
+#ifdef MODULE_SUIT
+    extern void suit_init_conditions(void);
+    suit_init_conditions();
+#endif /* MODULE_SUIT */
 }

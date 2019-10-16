@@ -23,7 +23,6 @@
 
 #include "fmt.h"
 #include "assert.h"
-#include "net/eui48.h"
 #include "net/bluetil/addr.h"
 
 static int _is_hex_char(char c)
@@ -33,13 +32,23 @@ static int _is_hex_char(char c)
             ((c >= 'a') && (c <= 'f')));
 }
 
+void bluetil_addr_swapped_cp(const uint8_t *src, uint8_t *dst)
+{
+    dst[0] = src[5];
+    dst[1] = src[4];
+    dst[2] = src[3];
+    dst[3] = src[2];
+    dst[4] = src[1];
+    dst[5] = src[0];
+}
+
 void bluetil_addr_sprint(char *out, const uint8_t *addr)
 {
     assert(out);
     assert(addr);
 
-    fmt_byte_hex(out, addr[5]);
-    for (int i = 4; i >= 0; i--) {
+    fmt_byte_hex(out, addr[0]);
+    for (unsigned i = 1; i < BLE_ADDR_LEN; i++) {
         out += 2;
         *out++ = ':';
         fmt_byte_hex(out, addr[i]);
@@ -69,12 +78,12 @@ uint8_t *bluetil_addr_from_str(uint8_t *addr, const char *addr_str)
         }
     }
 
-    unsigned pos = BLE_ADDR_LEN;
+    unsigned pos = 0;
     for (unsigned i = 0; i < (BLUETIL_ADDR_STRLEN - 1); i += 3) {
         if (!_is_hex_char(addr_str[i]) || !_is_hex_char(addr_str[i + 1])) {
             return NULL;
         }
-        addr[--pos] = fmt_hex_byte(addr_str + i);
+        addr[pos++] = fmt_hex_byte(addr_str + i);
     }
     return addr;
 }
@@ -84,17 +93,18 @@ void bluetil_addr_ipv6_l2ll_sprint(char *out, const uint8_t *addr)
     assert(out);
     assert(addr);
 
-    eui64_t iid;
-    eui48_to_ipv6_iid(&iid, (const eui48_t *)addr);
-    memcpy(out, "[FE80::", 6);
-    out += 6;
-    for (unsigned i = 0; i < 4; i++) {
-        *out++ = ':';
-        fmt_byte_hex(out, iid.uint8[i * 2]);
-        out += 2;
-        fmt_byte_hex(out, iid.uint8[(i * 2) + 1]);
-        out += 2;
-    }
+    memcpy(out, "[FE80::", 7);
+    out += 7;
+    out += fmt_byte_hex(out, addr[0]);
+    out += fmt_byte_hex(out, addr[1]);
+    *out++ = ':';
+    out += fmt_byte_hex(out, addr[2]);
+    memcpy(out, "FF:FE", 5);
+    out += 5;
+    out += fmt_byte_hex(out, addr[3]);
+    *out++ = ':';
+    out += fmt_byte_hex(out, addr[4]);
+    out += fmt_byte_hex(out, addr[5]);
     *out++ = ']';
     *out = '\0';
 }

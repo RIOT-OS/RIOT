@@ -231,10 +231,8 @@ int i2c_acquire(i2c_t dev);
  * @brief   Release the given I2C device to be used by others
  *
  * @param[in] dev           I2C device to release
- *
- * @return                  0 on success, -1 on error
  */
-int i2c_release(i2c_t dev);
+void i2c_release(i2c_t dev);
 
 /**
  * @brief   Convenience function for reading one byte from a given register

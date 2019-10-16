@@ -32,6 +32,10 @@
 #include "net/gnrc/ipv6/whitelist.h"
 #include "net/gnrc/ipv6/blacklist.h"
 
+#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+#include "net/gnrc/ipv6/ext/frag.h"
+#endif
+
 #include "net/gnrc/ipv6.h"
 
 #define ENABLE_DEBUG    (0)
@@ -69,6 +73,10 @@ static void _receive(gnrc_pktsnip_t *pkt);
  * prep_hdr: prepare header for sending (call to _fill_ipv6_hdr()), otherwise
  * assume it is already prepared */
 static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr);
+
+#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+static void _send_by_netif_hdr(gnrc_pktsnip_t *pkt);
+#endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
 /* Main event loop for IPv6 */
 static void *_event_loop(void *args);
 
@@ -171,6 +179,10 @@ static void *_event_loop(void *args)
     (void)args;
     msg_init_queue(msg_q, GNRC_IPV6_MSG_QUEUE_SIZE);
 
+    /* initialize fragmentation data-structures */
+#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+    gnrc_ipv6_ext_frag_init();
+#endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
     /* register interest in all IPv6 packets */
     gnrc_netreg_register(GNRC_NETTYPE_IPV6, &me_reg);
 
@@ -200,6 +212,19 @@ static void *_event_loop(void *args)
                 msg_reply(&msg, &reply);
                 break;
 
+#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+            case GNRC_IPV6_EXT_FRAG_RBUF_GC:
+                gnrc_ipv6_ext_frag_rbuf_gc();
+                break;
+            case GNRC_IPV6_EXT_FRAG_CONTINUE:
+                DEBUG("ipv6: continue fragmenting packet\n");
+                gnrc_ipv6_ext_frag_send(msg.content.ptr);
+                break;
+            case GNRC_IPV6_EXT_FRAG_SEND:
+                DEBUG("ipv6: send fragment\n");
+                _send_by_netif_hdr(msg.content.ptr);
+                break;
+#endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
             case GNRC_IPV6_NIB_SND_UC_NS:
             case GNRC_IPV6_NIB_SND_MC_NS:
             case GNRC_IPV6_NIB_SND_NA:
@@ -231,6 +256,7 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     const ipv6_hdr_t *hdr = pkt->next->data;
 
+    (void)hdr;  /* only used for DEBUG messages */
     assert(netif != NULL);
     gnrc_netif_hdr_set_netif(pkt->data, netif);
     if (gnrc_pkt_len(pkt->next) > netif->ipv6.mtu) {
@@ -356,7 +382,7 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
         int idx;
 
         gnrc_netif_acquire(netif);
-        invalid_src = ((idx = gnrc_netif_ipv6_addr_idx(netif, &hdr->src)) == -1) ||
+        invalid_src = ((idx = gnrc_netif_ipv6_addr_idx(netif, &hdr->src)) >= 0) &&
             (gnrc_netif_ipv6_addr_get_state(netif, idx) != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
         gnrc_netif_release(netif);
         if (invalid_src) {
@@ -422,6 +448,38 @@ static bool _safe_fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
 }
 
 /* functions for sending */
+static bool _fragment_pkt_if_needed(gnrc_pktsnip_t *pkt,
+                                    gnrc_netif_t *netif,
+                                    bool from_me)
+{
+#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+    /* TODO: get path MTU when PMTU discovery is implemented */
+    unsigned path_mtu = netif->ipv6.mtu;
+
+    if (from_me && (gnrc_pkt_len(pkt->next) > path_mtu)) {
+        gnrc_netif_hdr_t *hdr = pkt->data;
+        hdr->if_pid = netif->pid;
+        gnrc_ipv6_ext_frag_send_pkt(pkt, path_mtu);
+        return true;
+    }
+#else   /* MODULE_GNRC_IPV6_EXT_FRAG */
+    (void)pkt;
+    (void)netif;
+    (void)from_me;
+#endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
+    return false;
+}
+
+#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+static void _send_by_netif_hdr(gnrc_pktsnip_t *pkt)
+{
+    assert(pkt->type == GNRC_NETTYPE_NETIF);
+    gnrc_netif_t *netif = gnrc_netif_hdr_get_netif(pkt->data);
+
+    _send_to_iface(netif, pkt);
+}
+#endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
+
 static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
                           gnrc_netif_t *netif, ipv6_hdr_t *ipv6_hdr,
                           uint8_t netif_hdr_flags)
@@ -444,6 +502,11 @@ static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
                                      netif_hdr_flags)) == NULL) {
             return;
         }
+        /* prep_hdr => The packet is from me */
+        if (_fragment_pkt_if_needed(pkt, netif, prep_hdr)) {
+            DEBUG("ipv6: packet is fragmented\n");
+            return;
+        }
         DEBUG("ipv6: send unicast over interface %" PRIkernel_pid "\n",
               netif->pid);
         /* and send to interface */
@@ -455,12 +518,18 @@ static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
 }
 
 static inline void _send_multicast_over_iface(gnrc_pktsnip_t *pkt,
+                                              bool prep_hdr,
                                               gnrc_netif_t *netif,
                                               uint8_t netif_hdr_flags)
 {
     if ((pkt = _create_netif_hdr(NULL, 0, pkt,
                                  netif_hdr_flags |
                                  GNRC_NETIF_HDR_FLAGS_MULTICAST)) == NULL) {
+        return;
+    }
+    /* prep_hdr => The packet is from me */
+    if (_fragment_pkt_if_needed(pkt, netif, prep_hdr)) {
+        DEBUG("ipv6: packet is fragmented\n");
         return;
     }
     DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", netif->pid);
@@ -515,12 +584,12 @@ static void _send_multicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
                     return;
                 }
             }
-            _send_multicast_over_iface(pkt, netif, netif_hdr_flags);
+            _send_multicast_over_iface(pkt, prep_hdr, netif, netif_hdr_flags);
         }
     }
     else {
         if (_safe_fill_ipv6_hdr(netif, pkt, prep_hdr)) {
-            _send_multicast_over_iface(pkt, netif, netif_hdr_flags);
+            _send_multicast_over_iface(pkt, prep_hdr, netif, netif_hdr_flags);
         }
     }
 #else   /* GNRC_NETIF_NUMOF */
@@ -534,7 +603,7 @@ static void _send_multicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
         }
     }
     if (_safe_fill_ipv6_hdr(netif, pkt, prep_hdr)) {
-        _send_multicast_over_iface(pkt, netif, netif_hdr_flags);
+        _send_multicast_over_iface(pkt, prep_hdr, netif, netif_hdr_flags);
     }
 #endif  /* GNRC_NETIF_NUMOF */
 }

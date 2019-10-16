@@ -59,7 +59,7 @@ int digitalRead(int pin)
 
 void delay(unsigned long msec)
 {
-    xtimer_usleep(1000 * msec);
+    xtimer_usleep(msec * US_PER_MS);
 }
 
 void delayMicroseconds(unsigned long usec)
@@ -72,6 +72,12 @@ unsigned long micros()
     return xtimer_now_usec();
 }
 
+unsigned long millis()
+{
+    return xtimer_now_usec64() / US_PER_MS;
+}
+
+#if MODULE_PERIPH_ADC
 int analogRead(int arduino_pin)
 {
     /*
@@ -99,3 +105,4 @@ int analogRead(int arduino_pin)
 
     return adc_value;
 }
+#endif

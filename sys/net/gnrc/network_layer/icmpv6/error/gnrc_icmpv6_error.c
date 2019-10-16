@@ -243,7 +243,7 @@ static gnrc_pktsnip_t *_check_ipv6_hdr(const gnrc_pktsnip_t *orig_pkt)
     const ipv6_hdr_t *ipv6_hdr = ipv6->data;
 
     if (ipv6_addr_is_unspecified(&ipv6_hdr->src) ||
-        ipv6_addr_is_multicast(&ipv6_hdr->src)) {
+        ipv6_addr_is_multicast(&ipv6_hdr->dst)) {
         ipv6 = NULL;
     }
     return ipv6;

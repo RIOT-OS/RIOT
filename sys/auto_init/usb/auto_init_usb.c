@@ -28,6 +28,9 @@
 #include "usb/usbus/cdc/ecm.h"
 usbus_cdcecm_device_t cdcecm;
 #endif
+#ifdef MODULE_USBUS_CDC_ACM
+#include "usb/usbus/cdc/acm.h"
+#endif
 
 static char _stack[USBUS_STACKSIZE];
 static usbus_t usbus;
@@ -42,6 +45,11 @@ void auto_init_usb(void)
     usbus_init(&usbus, usbdev);
 
     /* USBUS function handlers initialization */
+#ifdef MODULE_STDIO_CDC_ACM
+    void usb_cdc_acm_stdio_init(usbus_t *usbus);
+    usb_cdc_acm_stdio_init(&usbus);
+#endif
+
 #ifdef MODULE_USBUS_CDC_ECM
     usbus_cdcecm_init(&usbus, &cdcecm);
 #endif

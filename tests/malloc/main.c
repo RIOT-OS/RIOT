@@ -23,36 +23,40 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef CHUNK_SIZE
 #define CHUNK_SIZE 1024
+#endif
 
 struct node {
     struct node *next;
     void *ptr;
 };
 
-int total = 0;
+static int total = 0;
 
-void fill_memory(struct node *head)
+static void fill_memory(struct node *head)
 {
     while (head && (head->ptr = malloc(CHUNK_SIZE))) {
-        printf("Allocated %d Bytes at 0x%p, total %d\n", CHUNK_SIZE, head->ptr, total += CHUNK_SIZE);
+        printf("Allocated %d Bytes at 0x%p, total %d\n",
+               CHUNK_SIZE, head->ptr, total += CHUNK_SIZE);
         memset(head->ptr, '@', CHUNK_SIZE);
         head = head->next = malloc(sizeof(struct node));
         if (head) {
-            head->ptr =  0;
+            total += sizeof(struct node);
+            head->ptr  = 0;
             head->next = 0;
         }
-        total += sizeof(struct node);
     }
 }
 
-void free_memory(struct node *head)
+static void free_memory(struct node *head)
 {
     struct node *old_head;
 
     while (head) {
         if (head->ptr) {
-            printf("Free %d Bytes at 0x%p, total %d\n", CHUNK_SIZE, head->ptr, total -= CHUNK_SIZE);
+            printf("Free %d Bytes at 0x%p, total %d\n",
+                   CHUNK_SIZE, head->ptr, total -= CHUNK_SIZE);
             free(head->ptr);
         }
 

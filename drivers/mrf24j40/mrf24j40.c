@@ -40,11 +40,15 @@ void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params)
     dev->params = *params;
 }
 
-void mrf24j40_reset(mrf24j40_t *dev)
+int mrf24j40_reset(mrf24j40_t *dev)
 {
     eui64_t addr_long;
 
-    mrf24j40_init(dev);
+    int res = mrf24j40_init(dev);
+
+    if (res < 0) {
+        return res;
+    }
 
     netdev_ieee802154_reset(&dev->netdev);
 
@@ -72,6 +76,8 @@ void mrf24j40_reset(mrf24j40_t *dev)
     dev->state = 0;
     mrf24j40_set_state(dev, MRF24J40_PSEUDO_STATE_IDLE);
     DEBUG("mrf24j40_reset(): reset complete.\n");
+
+    return 0;
 }
 
 bool mrf24j40_cca(mrf24j40_t *dev, int8_t *rssi)

@@ -1,7 +1,3 @@
-# define the cpu used by the HiFive1 board
-export CPU = fe310
-export CPU_MODEL = fe310_g002
-
 # Uses UART0 for stdio input/output (comment out to disable)
 USEMODULE += stdio_uart
 

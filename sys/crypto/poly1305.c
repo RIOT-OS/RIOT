@@ -27,9 +27,9 @@ static uint32_t u8to32(const uint8_t *p)
 {
     return
         ((uint32_t)p[0] |
-        ((uint32_t)p[1] <<  8) |
-        ((uint32_t)p[2] << 16) |
-        ((uint32_t)p[3] << 24));
+         ((uint32_t)p[1] <<  8) |
+         ((uint32_t)p[2] << 16) |
+         ((uint32_t)p[3] << 24));
 }
 
 static void u32to8(uint8_t *p, uint32_t v)
@@ -42,10 +42,10 @@ static void u32to8(uint8_t *p, uint32_t v)
 
 static void _clear_c(poly1305_ctx_t *ctx)
 {
-    ctx->c[0]  = 0;
-    ctx->c[1]  = 0;
-    ctx->c[2]  = 0;
-    ctx->c[3]  = 0;
+    ctx->c[0] = 0;
+    ctx->c[1] = 0;
+    ctx->c[2] = 0;
+    ctx->c[3] = 0;
     ctx->c_idx = 0;
 }
 
@@ -70,10 +70,10 @@ static void poly1305_block(poly1305_ctx_t *ctx, uint8_t c4)
     const uint32_t s4 = ctx->h[4] + c4;
 
     /* (h + c) * r, without carry propagation */
-    const uint64_t x0 = s0*r0 + s1*rr3 + s2*rr2 + s3*rr1 +s4*rr0;
-    const uint64_t x1 = s0*r1 + s1*r0  + s2*rr3 + s3*rr2 +s4*rr1;
-    const uint64_t x2 = s0*r2 + s1*r1  + s2*r0  + s3*rr3 +s4*rr2;
-    const uint64_t x3 = s0*r3 + s1*r2  + s2*r1  + s3*r0  +s4*rr3;
+    const uint64_t x0 = s0 * r0 + s1 * rr3 + s2 * rr2 + s3 * rr1 + s4 * rr0;
+    const uint64_t x1 = s0 * r1 + s1 * r0  + s2 * rr3 + s3 * rr2 + s4 * rr1;
+    const uint64_t x2 = s0 * r2 + s1 * r1  + s2 * r0  + s3 * rr3 + s4 * rr2;
+    const uint64_t x3 = s0 * r3 + s1 * r2  + s2 * r1  + s3 * r0  + s4 * rr3;
     const uint32_t x4 = s4 * (r0 & 3);
 
     /* partial reduction modulo 2^130 - 5 */
@@ -96,6 +96,7 @@ static void _take_input(poly1305_ctx_t *ctx, uint8_t input)
 {
     size_t word = ctx->c_idx >> 2;
     size_t byte = ctx->c_idx & 3;
+
     ctx->c[word] |= (uint32_t)input << (byte * 8);
     ctx->c_idx++;
 }
@@ -116,10 +117,10 @@ void poly1305_init(poly1305_ctx_t *ctx, const uint8_t *key)
     /* load and clamp key */
     ctx->r[0] = u8to32(key) & 0x0fffffff;
     for (size_t i = 1; i < 4; i++) {
-        ctx->r[i] = u8to32(&key[4*i]) & 0x0ffffffc;
+        ctx->r[i] = u8to32(&key[4 * i]) & 0x0ffffffc;
     }
     for (size_t i = 0; i < 4; i++) {
-        ctx->pad[i] = u8to32(&key[16 + i*4]);
+        ctx->pad[i] = u8to32(&key[16 + i * 4]);
     }
 
     /* Zero the hash */
@@ -140,11 +141,11 @@ void poly1305_finish(poly1305_ctx_t *ctx, uint8_t *mac)
 
     /* check if we should subtract 2^130-5 by performing the
      * corresponding carry propagation. */
-    const uint64_t u0 = (uint64_t)5 + ctx->h[0]; // <= 1_00000004
-    const uint64_t u1 = (u0 >> 32)  + ctx->h[1]; // <= 1_00000000
-    const uint64_t u2 = (u1 >> 32)  + ctx->h[2]; // <= 1_00000000
-    const uint64_t u3 = (u2 >> 32)  + ctx->h[3]; // <= 1_00000000
-    const uint64_t u4 = (u3 >> 32)  + ctx->h[4]; // <=          5
+    const uint64_t u0 = (uint64_t)5 + ctx->h[0];    // <= 1_00000004
+    const uint64_t u1 = (u0 >> 32)  + ctx->h[1];    // <= 1_00000000
+    const uint64_t u2 = (u1 >> 32)  + ctx->h[2];    // <= 1_00000000
+    const uint64_t u3 = (u2 >> 32)  + ctx->h[3];    // <= 1_00000000
+    const uint64_t u4 = (u3 >> 32)  + ctx->h[4];    // <=          5
     /* u4 indicates how many times we should subtract 2^130-5 (0 or 1) */
 
     /* h + pad, minus 2^130-5 if u4 exceeds 3 */
@@ -152,17 +153,18 @@ void poly1305_finish(poly1305_ctx_t *ctx, uint8_t *mac)
     u32to8(mac, uu0);
 
     const uint64_t uu1 = (uu0 >> 32)   + ctx->h[1] + ctx->pad[1];
-    u32to8(mac+4, uu1);
+    u32to8(mac + 4, uu1);
 
     const uint64_t uu2 = (uu1 >> 32)   + ctx->h[2] + ctx->pad[2];
-    u32to8(mac+8, uu2);
+    u32to8(mac + 8, uu2);
 
     const uint64_t uu3 = (uu2 >> 32)   + ctx->h[3] + ctx->pad[3];
-    u32to8(mac+12, uu3);
+    u32to8(mac + 12, uu3);
 
 }
 
-void poly1305_auth(uint8_t *mac, const uint8_t *data, size_t len, const uint8_t *key)
+void poly1305_auth(uint8_t *mac, const uint8_t *data, size_t len,
+                   const uint8_t *key)
 {
     poly1305_ctx_t ctx;
 

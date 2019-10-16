@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 
 #include "hts221.h"
@@ -52,12 +53,8 @@ int main(void)
         if (hts221_read_temperature(&dev, &temp) != HTS221_OK) {
             puts(" -- failed to read temperature!");
         }
-        bool negative = (temp < 0);
-        if (negative) {
-            temp = -temp;
-        }
-        printf("H: %u.%u%%, T:%c%u.%u°C\n", (hum / 10), (hum % 10),
-               (negative ? '-' : ' '), (temp / 10), (temp % 10));
+        printf("H: %d.%d%%, T: %d.%d°C\n", (hum / 10), (hum % 10),
+               (temp / 10), abs(temp % 10));
         xtimer_sleep(SLEEP_S);
     }
     return 0;

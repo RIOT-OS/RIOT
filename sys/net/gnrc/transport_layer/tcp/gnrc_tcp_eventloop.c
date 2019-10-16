@@ -136,6 +136,12 @@ static int _receive(gnrc_pktsnip_t *pkt)
         return 0;
     }
 
+    if (tcp->size < sizeof(tcp_hdr_t)) {
+        DEBUG("gnrc_tcp_eventloop.c : _receive() : packet is too short\n");
+        gnrc_pktbuf_release(pkt);
+        return -ERANGE;
+    }
+
     /* Extract control bits, src and dst ports and check if SYN is set (not SYN+ACK) */
     hdr = (tcp_hdr_t *)tcp->data;
     ctl = byteorder_ntohs(hdr->off_ctl);
@@ -218,7 +224,10 @@ static int _receive(gnrc_pktsnip_t *pkt)
         DEBUG("gnrc_tcp_eventloop.c : _receive() : Can't find fitting tcb\n");
         if ((ctl & MSK_RST) != MSK_RST) {
             _pkt_build_reset_from_pkt(&reset, pkt);
-            gnrc_netapi_send(gnrc_tcp_pid, reset);
+            if (gnrc_netapi_send(gnrc_tcp_pid, reset) < 1) {
+                DEBUG("gnrc_tcp_eventloop.c : _receive() : unable to send reset paket\n");
+                gnrc_pktbuf_release(reset);
+            }
         }
         gnrc_pktbuf_release(pkt);
         return -ENOTCONN;

@@ -177,6 +177,42 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
+ * @name ADC configuration
+ * @{
+ */
+
+/* ADC Default values */
+#define ADC_PRESCALER                      ADC_CTRLB_PRESCALER_DIV512
+
+#define ADC_NEG_INPUT                      ADC_INPUTCTRL_MUXNEG_GND
+#define ADC_GAIN_FACTOR_DEFAULT            ADC_INPUTCTRL_GAIN_DIV2
+#define ADC_REF_DEFAULT                    ADC_REFCTRL_REFSEL_INTVCC1
+
+static const adc_conf_chan_t adc_channels[] = {
+    /* port, muxpos/pin */
+    /* Use the Arduino pin number order */
+    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0},     /* ADC/AIN[0], A0 */
+    {GPIO_PIN(PA, 6), ADC_INPUTCTRL_MUXPOS_PIN6},     /* ADC/AIN[6], A1 */
+    {GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5},     /* ADC/AIN[5], A2 */
+    {GPIO_PIN(PA, 4), ADC_INPUTCTRL_MUXPOS_PIN4},     /* ADC/AIN[4], A3 */
+    {GPIO_PIN(PB, 9), ADC_INPUTCTRL_MUXPOS_PIN3},     /* ADC/AIN[3], A4 */
+    {GPIO_PIN(PB, 8), ADC_INPUTCTRL_MUXPOS_PIN2},     /* ADC/AIN[2], A5 */
+    {GPIO_PIN(PB, 7), ADC_INPUTCTRL_MUXPOS_PIN15},    /* ADC/AIN[15], A6 */
+    {GPIO_PIN(PB, 6), ADC_INPUTCTRL_MUXPOS_PIN14},    /* ADC/AIN[14], A7 */
+    {GPIO_PIN(PB, 5), ADC_INPUTCTRL_MUXPOS_PIN13},    /* ADC/AIN[13], A8 */
+    {GPIO_PIN(PB, 4), ADC_INPUTCTRL_MUXPOS_PIN12},    /* ADC/AIN[12], A9 */
+    {GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS_PIN7},     /* ADC/AIN[7], A10 */
+    {GPIO_PIN(PB, 3), ADC_INPUTCTRL_MUXPOS_PIN11},    /* ADC/AIN[11], A11 */
+    {GPIO_PIN(PB, 2), ADC_INPUTCTRL_MUXPOS_PIN10},    /* ADC/AIN[10], A12 */
+    {GPIO_PIN(PB, 1), ADC_INPUTCTRL_MUXPOS_PIN9},     /* ADC/AIN[9], A13 (pin also used for DTR) */
+
+    {GPIO_PIN(PB, 0), ADC_INPUTCTRL_MUXPOS_PIN8},     /* ADC/AIN[8], BATVOLT */
+};
+
+#define ADC_NUMOF                          ARRAY_SIZE(adc_channels)
+/** @} */
+
+/**
  * @name    PWM configuration
  * @{
  */

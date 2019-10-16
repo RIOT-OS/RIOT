@@ -174,7 +174,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
-            hdr->if_pid = thread_getpid();
+            gnrc_netif_hdr_set_netif(hdr, netif);
             pkt->type = state->proto;
 #if ENABLE_DEBUG
             DEBUG("_recv_ieee802154: received packet from %s of length %u\n",

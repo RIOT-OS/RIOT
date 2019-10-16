@@ -33,11 +33,10 @@ extern "C" {
 #if defined(CPU_FAM_STM32F0) || defined (CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F3)
 #define CLOCK_LSI           (40000U)
-#elif defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
-      defined(CPU_FAM_STM32L1)
+#elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 #define CLOCK_LSI           (37000U)
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
-      defined(CPU_FAM_STM32L4)
+      defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L4)
 #define CLOCK_LSI           (32000U)
 #else
 #error "error: LSI clock speed not defined for your target CPU"
@@ -96,6 +95,23 @@ extern "C" {
  * @brief   Wake-up pins configuration (CSR register)
  */
 #define PM_EWUP_CONFIG          (0U)
+#endif
+/** @} */
+
+/**
+ * @name    WDT upper and lower bound times in ms
+ * @{
+ */
+/* Actual Lower Limit is ~100us so round up */
+#define NWDT_TIME_LOWER_LIMIT          (1U)
+#define NWDT_TIME_UPPER_LIMIT          (4U * US_PER_MS * 4096U * (1 << 6U) \
+                                        / CLOCK_LSI)
+/* Once enabled wdt can't be stopped */
+#define WDT_HAS_STOP                   (0U)
+#if defined(CPU_FAM_STM32L4)
+#define WDT_HAS_INIT                   (1U)
+#else
+#define WDT_HAS_INIT                   (0U)
 #endif
 /** @} */
 

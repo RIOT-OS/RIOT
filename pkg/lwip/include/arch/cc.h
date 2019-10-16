@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    pkg_lwip_arch_cc    Compiler and processor description
- * @ingroup     pkg_lwip
+ * @addtogroup  pkg_lwip_sys
  * @brief       Describes compiler and processor to lwIP
  * @{
  *
  * @file
- * @brief   Compiler and processor definitions
+ * @brief   Compiler/platform abstraction
+ * @see     http://www.nongnu.org/lwip/2_1_x/group__compiler__abstraction.html
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -48,7 +48,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   (sn)printf formatters for the generic lwIP types
+ * @name    (sn)printf formatters for the generic lwIP types
  * @{
  */
 #define X8_F    "02" PRIx8
@@ -60,27 +60,22 @@ extern "C" {
 #define X32_F   PRIx32
 
 #define SZT_F   "lu"
-/**
- * @}
- */
+/** @} */
 
 /**
- * @brief   Compiler hints for packing structures
+ * @name    Compiler hints for packing structures
  * @{
  */
 #define PACK_STRUCT_FIELD(x)    x
 #define PACK_STRUCT_STRUCT      __attribute__((packed))
 #define PACK_STRUCT_BEGIN
 #define PACK_STRUCT_END
-/**
- * @}
- */
+/** @} */
 
 /**
- * @todo check for best value
+ * @name    Platform specific diagnostic output
+ * @{
  */
-#define LWIP_CHKSUM_ALGORITHM   (3)
-
 #ifdef MODULE_LOG
 #  define LWIP_PLATFORM_DIAG(x)   LOG_INFO x
 #  ifdef NDEBUG
@@ -106,10 +101,7 @@ extern "C" {
         } while (0)
 #  endif
 #endif
-
-#define SYS_ARCH_PROTECT(x)         mutex_lock(&x)
-#define SYS_ARCH_UNPROTECT(x)       mutex_unlock(&x)
-#define SYS_ARCH_DECL_PROTECT(x)    mutex_t x = MUTEX_INIT
+/** @} */
 
 #ifdef __cplusplus
 }

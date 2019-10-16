@@ -23,7 +23,7 @@
 
 void pm_set_lowest(void)
 {
-    /* __asm__("wfi"); */
+    __asm__ volatile ("wfi");
 }
 
 void pm_off(void)

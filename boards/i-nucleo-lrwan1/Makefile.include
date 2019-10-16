@@ -11,8 +11,9 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # to flash this board, use an ST-link adapter
 DEBUG_ADAPTER ?= stlink
 
-# call a 'reset halt' command before starting the debugger
-export OPENOCD_DBG_START_CMD = -c 'reset halt'
+# this board can become un-flashable after a hardfault,
+# use connect_assert_srst to always be able to flash or reset the boards.
+export OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk

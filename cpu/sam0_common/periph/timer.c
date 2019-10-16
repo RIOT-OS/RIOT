@@ -164,7 +164,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
         return -1;
      }
 
-    return 1;
+    return 0;
 }
 
 int timer_clear(tim_t tim, int channel)
@@ -182,7 +182,7 @@ int timer_clear(tim_t tim, int channel)
         return -1;
     }
 
-    return 1;
+    return 0;
 }
 
 unsigned int timer_read(tim_t tim)

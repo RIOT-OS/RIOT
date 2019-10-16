@@ -68,3 +68,6 @@ results/
 # Clangd compile flags (language server)
 compile_commands.json
 compile_flags.txt
+
+# suit manifest keys
+keys/

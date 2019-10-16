@@ -157,9 +157,9 @@ void gpio_write(gpio_t pin, int value)
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static int _exti(gpio_t pin)
 {
-    int port_num = ((pin >> 7) & 0x03);
+    unsigned port_num = ((pin >> 7) & 0x03);
 
-    if (port_num > 1) {
+    if (port_num >= ARRAY_SIZE(exti_config)) {
         return -1;
     }
     return exti_config[port_num][_pin_pos(pin)];

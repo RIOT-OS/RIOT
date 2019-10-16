@@ -183,8 +183,9 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * This function sends the supplied @p command, then returns all response
  * lines until the device sends "OK".
  *
- * If a line starts with "ERROR" or "+CME ERROR:", or the buffer is full, the
- * function returns -1.
+ * If a line starts with "ERROR" or the buffer is full, the function returns -1.
+ * If a line starts with "+CME ERROR" or +CMS ERROR", the function returns -2.
+ * In this case resp_buf contains the error string.
  *
  * @param[in]   dev         device to operate on
  * @param[in]   command     command to send
@@ -194,7 +195,8 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * @param[in]   timeout     timeout (in usec)
  *
  * @returns     length of response on success
- * @returns     <0 on error
+ * @returns     -1 on error
+ * @returns     -2 on CMS or CME error
  */
 ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf,
                               size_t len, bool keep_eol, uint32_t timeout);

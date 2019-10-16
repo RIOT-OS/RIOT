@@ -27,7 +27,7 @@
 #include "mpu9150.h"
 #include "mpu9150_params.h"
 
-#define SLEEP   (1000 * 1000u)
+#define SLEEP_USEC   (1000 * 1000u)
 
 int main(void)
 {
@@ -90,7 +90,7 @@ int main(void)
         printf("Temperature [milli deg] : %"PRId32"\n", temperature);
         printf("\n+-------------------------------------+\n");
 
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

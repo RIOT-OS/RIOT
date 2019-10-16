@@ -1,4 +1,4 @@
-#!/bin/bash -eux
+#!/usr/bin/env bash -eux
 
 # inspired by https://github.com/boxcutter/ubuntu
 

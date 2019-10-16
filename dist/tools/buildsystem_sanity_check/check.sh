@@ -78,6 +78,7 @@ UNEXPORTED_VARIABLES+=('DEBUG_ADAPTER' 'DEBUG_ADAPTER_ID')
 UNEXPORTED_VARIABLES+=('PROGRAMMER_SERIAL')
 UNEXPORTED_VARIABLES+=('STLINK_VERSION')
 UNEXPORTED_VARIABLES+=('PORT_LINUX' 'PORT_DARWIN')
+UNEXPORTED_VARIABLES+=('PORT[ ?=:]' 'PORT$')
 
 EXPORTED_VARIABLES_ONLY_IN_VARS=()
 check_not_exporting_variables() {
@@ -115,6 +116,7 @@ check_deprecated_vars_patterns() {
     local pathspec=()
 
     patterns+=(-e 'FEATURES_MCU_GROUP')
+    patterns+=(-e 'TEST_ON_CI_WHITELIST += all')
 
     # Pathspec with exclude should start by an inclusive pathspec in git 2.7.4
     pathspec+=('*')
@@ -124,6 +126,37 @@ check_deprecated_vars_patterns() {
 
     git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Deprecated variables or patterns:'
+}
+
+# Makefile files cpu must not be included by the board anymore
+# They are included by the main Makefile.include/Makefile.features/Makefile.dep
+check_board_do_not_include_cpu_features_dep() {
+    local patterns=()
+    local pathspec=()
+
+    # shellcheck disable=SC2016
+    # Single quotes are used to not expand expressions
+    patterns+=(-e 'include $(RIOTCPU)/.*/Makefile\..*')
+
+    pathspec+=('boards/')
+
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+            | error_with_message 'Makefiles files from cpu must not be included by the board anymore'
+}
+
+# CPU and CPU_MODEL definition have been moved to 'BOARD|CPU/Makefile.features'
+check_cpu_cpu_model_defined_in_makefile_features() {
+    local patterns=()
+    local pathspec=()
+
+    # With our without space and with or without ?=
+    patterns+=(-e '^ *\(export\)\? *CPU \??\?=')
+    patterns+=(-e '^ *\(export\)\? *CPU_MODEL \??\?=')
+    pathspec+=(':!boards/**/Makefile.features')
+    pathspec+=(':!cpu/**/Makefile.features')
+
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+            | error_with_message 'CPU and CPU_MODEL definition must be done by board/BOARD/Makefile.features, board/common/**/Makefile.features or cpu/CPU/Makefile.features'
 }
 
 # Applications Makefile must not set 'BOARD =' unconditionally
@@ -139,6 +172,20 @@ check_not_setting_board_equal() {
         | error_with_message 'Applications Makefile should use "BOARD ?="'
 }
 
+# Examples must not provide BOARD_INSUFFICIENT_MEMORY in Makefile, but in
+# Makefile.ci
+check_board_insufficient_memory_not_in_makefile() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e '^[[:space:]]*BOARD_INSUFFICIENT_MEMORY[[:space:]:]*=')
+
+    pathspec+=('examples*/Makefile')
+
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message 'Move BOARD_INSUFFICIENT_MEMORY to Makefile.ci'
+}
+
 error_on_input() {
     ! grep ''
 }
@@ -147,7 +194,10 @@ all_checks() {
     check_not_parsing_features
     check_not_exporting_variables
     check_deprecated_vars_patterns
+    check_board_do_not_include_cpu_features_dep
+    check_cpu_cpu_model_defined_in_makefile_features
     check_not_setting_board_equal
+    check_board_insufficient_memory_not_in_makefile
 }
 
 main() {

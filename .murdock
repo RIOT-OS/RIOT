@@ -9,6 +9,23 @@ export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
 
+# This is a work around for a bug in CCACHE which interacts very badly with
+# some features of RIOT and of murdock. The result is that ccache is
+# ineffective (i.e. objects are never reused, resulting in extreme cache miss
+# rate) and murdock becomes slow.
+#
+# - CCACHE thinks that -gz by itself enables debugging, which is not true.
+#   see https://github.com/ccache/ccache/issues/464
+#   - When debug info is included, CCACHE hashes the file paths, as these
+#     influence the debug information (the name of compile units and/or their
+#     "comp_dir" attribute)
+# - Riot does not set -fdebug-prefix-map. This is not that easy as it may not
+#   be supported in every toolchain (some are quite old).
+# - Murdock builds PRs in different directories each time.
+#
+# It is only the combination of these three factors which causes this bug.
+export OPTIONAL_CFLAGS_BLACKLIST="-gz"
+
 NIGHTLY=${NIGHTLY:-0}
 RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
 

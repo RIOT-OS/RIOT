@@ -7,17 +7,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-leonardo \
-                             arduino-mega2560 arduino-nano arduino-uno chronos \
-                             i-nucleo-lrwan1 mega-xplained msb-430 msb-430h \
-                             nrf51dk nrf51dongle nrf6310 \
-                             nucleo-f031k6 nucleo-f042k6 nucleo-l031k6 \
-                             nucleo-f030r8 nucleo-f070rb nucleo-f072rb \
-                             nucleo-f334r8 nucleo-f303k8 nucleo-l053r8 \
-                             stm32f0discovery stm32l0538-disco telosb \
-                             wsn430-v1_3b wsn430-v1_4 \
-                             yunjia-nrf51822 waspmote-pro z1
-
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default

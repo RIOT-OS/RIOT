@@ -34,7 +34,8 @@
 #include "byteorder.h"
 
 #if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
-#   error "This code is implementented in a way that it will only work for little-endian systems!"
+#   error \
+    "This code is implementented in a way that it will only work for little-endian systems!"
 #endif
 
 #include <string.h>
@@ -46,9 +47,11 @@ static void _r(uint32_t *d, uint32_t *a, const uint32_t *b, unsigned c)
     *d = (tmp << c) | (tmp >> (32 - c));
 }
 
-static void _doubleround(void *output_, const uint32_t input[16], uint8_t rounds)
+static void _doubleround(void *output_, const uint32_t input[16],
+                         uint8_t rounds)
 {
-    uint32_t *output = (uint32_t *) output_;
+    uint32_t *output = (uint32_t *)output_;
+
     memcpy(output, input, 64);
 
     rounds *= 4;
@@ -115,8 +118,9 @@ void chacha_keystream_bytes(chacha_ctx *ctx, void *x)
 void chacha_encrypt_bytes(chacha_ctx *ctx, const uint8_t *m, uint8_t *c)
 {
     uint8_t x[64];
+
     chacha_keystream_bytes(ctx, x);
-    for (unsigned i = 0 ; i < 64; ++i) {
+    for (unsigned i = 0; i < 64; ++i) {
         c[i] = m[i] ^ x[i];
     }
 }

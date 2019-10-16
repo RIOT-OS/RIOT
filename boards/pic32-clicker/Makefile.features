@@ -1,6 +1,7 @@
+CPU = mips_pic32mx
+CPU_MODEL = p32mx470f512h
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
-
-include $(RIOTCPU)/mips_pic32mx/Makefile.features

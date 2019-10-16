@@ -24,7 +24,7 @@
 #include "l3g4200d.h"
 #include "l3g4200d_params.h"
 
-#define SLEEP       (100 * 1000U)
+#define SLEEP_USEC  (100 * 1000U)
 
 int main(void)
 {
@@ -47,7 +47,7 @@ int main(void)
         printf("Gyro data [dps] - X: %6i   Y: %6i   Z: %6i\n",
                acc_data.acc_x, acc_data.acc_y, acc_data.acc_z);
 
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

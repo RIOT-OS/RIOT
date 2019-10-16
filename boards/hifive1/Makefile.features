@@ -1,3 +1,6 @@
+CPU = fe310
+CPU_MODEL = fe310_g000
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 #FEATURES_PROVIDED += periph_pwm
@@ -6,5 +9,3 @@ FEATURES_PROVIDED += periph_rtt
 #FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
-
-include $(RIOTCPU)/fe310/Makefile.features

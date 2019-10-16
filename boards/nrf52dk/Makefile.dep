@@ -1,7 +1,1 @@
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.dep
-
-ifeq (,$(filter nrfmin,$(USEMODULE)))
-  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-    USEPKG += nordic_softdevice_ble
-  endif
-endif

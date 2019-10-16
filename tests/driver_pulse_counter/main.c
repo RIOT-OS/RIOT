@@ -23,7 +23,7 @@
 #include "xtimer.h"
 #include "pulse_counter_params.h"
 
-#define SLEEP       US_PER_SEC
+#define SLEEP_USEC  US_PER_SEC
 
 int main(void)
 {
@@ -45,7 +45,7 @@ int main(void)
         int16_t count = pulse_counter_read_with_reset(&dev);
         printf("pulse counter: %d\n", count);
 
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

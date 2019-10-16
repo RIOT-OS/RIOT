@@ -105,11 +105,37 @@ void cpu_init(void)
     wdt_reset();   /* should not be nececessary as done in bootloader */
     wdt_disable(); /* but when used without bootloader this is needed */
 
+    /* Initialize stdio before periph_init() to allow use of DEBUG() there */
+#ifdef MODULE_AVR_LIBC_EXTRA
+    atmega_stdio_init();
+#endif
     /* Initialize peripherals for which modules are included in the makefile.*/
     /* spi_init */
     /* rtc_init */
     /* hwrng_init */
     periph_init();
+}
+
+struct __freelist {
+    size_t size;
+    struct __freelist *next;
+};
+
+extern struct __freelist *__flp;
+extern char *__malloc_heap_start;
+extern char *__malloc_heap_end;
+extern char *__brkval;
+
+void heap_stats(void)
+{
+    int heap_size = __malloc_heap_end - __malloc_heap_start;
+    int free = __malloc_heap_end - __brkval;
+    struct __freelist *fp;
+    for (fp = __flp; fp; fp = fp->next) {
+        free += fp->size;
+    }
+    printf("heap: %d (used %d, free %d) [bytes]\n",
+           heap_size, heap_size - free, free);
 }
 
 /* This is a vector which is aliased to __vector_default,

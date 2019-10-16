@@ -38,6 +38,7 @@ usage: compile_and_test_for_board.py [-h] [--applications APPLICATIONS]
                                      [--loglevel {debug,info,warning,error,fatal,critical}]
                                      [--incremental] [--clean-after]
                                      [--compile-targets COMPILE_TARGETS]
+                                     [--flash-targets FLASH_TARGETS]
                                      [--test-targets TEST_TARGETS]
                                      [--test-available-targets TEST_AVAILABLE_TARGETS]
                                      [--jobs JOBS]
@@ -68,6 +69,8 @@ optional arguments:
   --clean-after         Clean after running each test (default: False)
   --compile-targets COMPILE_TARGETS
                         List of make targets to compile (default: clean all)
+  --flash-targets FLASH_TARGETS
+                        List of make targets to flash (default: flash-only)
   --test-targets TEST_TARGETS
                         List of make targets to run test (default: test)
   --test-available-targets TEST_AVAILABLE_TARGETS
@@ -192,6 +195,7 @@ class RIOTApplication():
     MAKEFLAGS = ('RIOT_CI_BUILD=1', 'CC_NOCOLOR=1', '--no-print-directory')
 
     COMPILE_TARGETS = ('clean', 'all',)
+    FLASH_TARGETS = ('flash-only',)
     TEST_TARGETS = ('test',)
     TEST_AVAILABLE_TARGETS = ('test/available',)
 
@@ -332,7 +336,7 @@ class RIOTApplication():
         if runtest:
             if has_test:
                 setuptasks = collections.OrderedDict(
-                    [('flash', ['flash-only'])])
+                    [('flash', self.FLASH_TARGETS)])
                 self.make_with_outfile('test', self.TEST_TARGETS,
                                        save_output=True, setuptasks=setuptasks)
                 if clean_after:
@@ -581,6 +585,9 @@ PARSER.add_argument('--clean-after', action='store_true', default=False,
 PARSER.add_argument('--compile-targets', type=list_from_string,
                     default=' '.join(RIOTApplication.COMPILE_TARGETS),
                     help='List of make targets to compile')
+PARSER.add_argument('--flash-targets', type=list_from_string,
+                    default=' '.join(RIOTApplication.FLASH_TARGETS),
+                    help='List of make targets to flash')
 PARSER.add_argument('--test-targets', type=list_from_string,
                     default=' '.join(RIOTApplication.TEST_TARGETS),
                     help='List of make targets to run test')
@@ -620,6 +627,7 @@ def main():
 
     # Overwrite the compile/test targets from command line arguments
     RIOTApplication.COMPILE_TARGETS = args.compile_targets
+    RIOTApplication.FLASH_TARGETS = args.flash_targets
     RIOTApplication.TEST_TARGETS = args.test_targets
     RIOTApplication.TEST_AVAILABLE_TARGETS = args.test_available_targets
 

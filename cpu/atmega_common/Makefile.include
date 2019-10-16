@@ -1,7 +1,7 @@
 # include module specific includes
-export INCLUDES += -I$(RIOTCPU)/atmega_common/include \
-                   -isystem$(RIOTCPU)/atmega_common/avr_libc_extra/include \
-                   -isystem$(RIOTCPU)/atmega_common/avr_libc_extra/include/vendor
+INCLUDES += -I$(RIOTCPU)/atmega_common/include \
+            -isystem$(RIOTCPU)/atmega_common/avr_libc_extra/include \
+            -isystem$(RIOTCPU)/atmega_common/avr_libc_extra/include/vendor
 
 # avr libc needs some RIOT-specific support code
 USEMODULE += avr_libc_extra

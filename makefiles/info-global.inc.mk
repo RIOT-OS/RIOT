@@ -9,8 +9,9 @@ FEATURES_CONFLICT_GLOBAL := $(FEATURES_CONFLICT)
 FEATURES_CONFLICT_MSG_GLOBAL := $(FEATURES_MSG_CONFLICT)
 DISABLE_MODULE_GLOBAL := $(DISABLE_MODULE)
 DEFAULT_MODULE_GLOBAL := $(DEFAULT_MODULE)
+FEATURES_BLACKLIST_GLOBAL := $(FEATURES_BLACKLIST)
 
-define board_missing_features
+define board_unsatisfied_features
   BOARD             := $(1)
   USEMODULE         := $(USEMODULE_GLOBAL)
   USEPKG            := $(USEPKG_GLOBAL)
@@ -20,6 +21,7 @@ define board_missing_features
   FEATURES_OPTIONAL := $(FEATURES_OPTIONAL_GLOBAL)
   FEATURES_CONFLICT := $(FEATURES_CONFLICT_GLOBAL)
   FEATURES_CONFLICT_MSG := $(FEATURES_CONFLICT_MSG_GLOBAL)
+  FEATURES_BLACKLIST:= $(FEATURES_BLACKLIST_GLOBAL)
 
   # Remove board specific variables set by Makefile.features/Makefile.dep
   FEATURES_PROVIDED :=
@@ -40,6 +42,15 @@ define board_missing_features
     BOARDS_FEATURES_MISSING += "$(1) $$(FEATURES_MISSING)"
     BOARDS_WITH_MISSING_FEATURES += $(1)
   endif
+
+  ifneq (,$$(FEATURES_USED_BLACKLISTED))
+    BOARDS_FEATURES_USED_BLACKLISTED += "$(1) $$(FEATURES_USED_BLACKLISTED)"
+    BOARDS_WITH_BLACKLISTED_FEATURES += $(1)
+  endif
+
+  ifneq (,$$(DEPENDENCY_DEBUG))
+    $$(call file_save_dependencies_variables,dependencies_info-boards-supported)
+  endif
 endef
 
 BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
@@ -47,8 +58,11 @@ BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
 
 BOARDS_WITH_MISSING_FEATURES :=
 BOARDS_FEATURES_MISSING :=
-$(foreach BOARD, $(BOARDS), $(eval $(call board_missing_features,$(BOARD))))
-BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES), $(BOARDS))
+BOARDS_WITH_BLACKLISTED_FEATURES :=
+BOARDS_FEATURES_USED_BLACKLISTED :=
+
+$(foreach BOARD, $(BOARDS), $(eval $(call board_unsatisfied_features,$(BOARD))))
+BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES) $(BOARDS_WITH_BLACKLISTED_FEATURES), $(BOARDS))
 
 info-buildsizes: SHELL=bash
 info-buildsizes:

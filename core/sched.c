@@ -33,10 +33,6 @@
 #include "mpu.h"
 #endif
 
-#ifdef MODULE_SCHEDSTATISTICS
-#include "xtimer.h"
-#endif
-
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -74,9 +70,8 @@ FORCE_USED_SECTION
 const uint8_t _tcb_name_offset = offsetof(thread_t, name);
 #endif
 
-#ifdef MODULE_SCHEDSTATISTICS
-static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
-schedstat_t sched_pidlist[KERNEL_PID_LAST + 1];
+#ifdef MODULE_SCHED_CB
+static void (*sched_cb) (kernel_pid_t active_thread, kernel_pid_t next_thread) = NULL;
 #endif
 
 int __attribute__((used)) sched_run(void)
@@ -100,10 +95,6 @@ int __attribute__((used)) sched_run(void)
         return 0;
     }
 
-#ifdef MODULE_SCHEDSTATISTICS
-    uint32_t now = xtimer_now().ticks32;
-#endif
-
     if (active_thread) {
         if (active_thread->status == STATUS_RUNNING) {
             active_thread->status = STATUS_PENDING;
@@ -114,21 +105,14 @@ int __attribute__((used)) sched_run(void)
             LOG_WARNING("scheduler(): stack overflow detected, pid=%" PRIkernel_pid "\n", active_thread->pid);
         }
 #endif
-
-#ifdef MODULE_SCHEDSTATISTICS
-        schedstat_t *active_stat = &sched_pidlist[active_thread->pid];
-        if (active_stat->laststart) {
-            active_stat->runtime_ticks += now - active_stat->laststart;
-        }
-#endif
     }
 
-#ifdef MODULE_SCHEDSTATISTICS
-    schedstat_t *next_stat = &sched_pidlist[next_thread->pid];
-    next_stat->laststart = now;
-    next_stat->schedules++;
+#ifdef MODULE_SCHED_CB
     if (sched_cb) {
-        sched_cb(now, next_thread->pid);
+        /* Use `sched_active_pid` instead of `active_thread` since after `sched_task_exit()` is
+           called `active_thread` is set to NULL while `sched_active_thread` isn't updated until
+           `next_thread` is scheduled*/
+        sched_cb(sched_active_pid, next_thread->pid);
     }
 #endif
 
@@ -150,13 +134,6 @@ int __attribute__((used)) sched_run(void)
 
     return 1;
 }
-
-#ifdef MODULE_SCHEDSTATISTICS
-void sched_register_cb(void (*callback)(uint32_t, uint32_t))
-{
-    sched_cb = callback;
-}
-#endif
 
 void sched_set_status(thread_t *process, thread_status_t status)
 {
@@ -221,3 +198,10 @@ NORETURN void sched_task_exit(void)
     sched_active_thread = NULL;
     cpu_switch_context_exit();
 }
+
+#ifdef MODULE_SCHED_CB
+void sched_register_cb(void (*callback)(kernel_pid_t, kernel_pid_t))
+{
+    sched_cb = callback;
+}
+#endif

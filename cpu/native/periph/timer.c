@@ -141,7 +141,7 @@ int timer_set(tim_t dev, int channel, unsigned int offset)
 
     do_timer_set(offset);
 
-    return 1;
+    return 0;
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
@@ -157,7 +157,7 @@ int timer_clear(tim_t dev, int channel)
 
     do_timer_set(0);
 
-    return 1;
+    return 0;
 }
 
 void timer_start(tim_t dev)

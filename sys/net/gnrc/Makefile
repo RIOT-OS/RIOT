@@ -13,6 +13,9 @@ endif
 ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
   DIRS += network_layer/ipv6/ext
 endif
+ifneq (,$(filter gnrc_ipv6_ext_frag,$(USEMODULE)))
+  DIRS += network_layer/ipv6/ext/frag
+endif
 ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
   DIRS += network_layer/ipv6/ext/rh
 endif
@@ -87,6 +90,9 @@ ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/frag
+endif
+ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
+  DIRS += network_layer/sixlowpan/frag/rb
 endif
 ifneq (,$(filter gnrc_sixlowpan_frag_vrb,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/frag/vrb

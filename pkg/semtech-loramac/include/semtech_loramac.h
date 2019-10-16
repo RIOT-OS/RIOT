@@ -497,6 +497,22 @@ void semtech_loramac_set_rx2_dr(semtech_loramac_t *mac, uint8_t dr);
  */
 uint8_t semtech_loramac_get_rx2_dr(semtech_loramac_t *mac);
 
+/**
+ * @brief   Sets the Uplink Frame Counter
+ *
+ * @param[in] mac          Pointer to the mac
+ * @param[in] counter      Frame counter to set
+ */
+void semtech_loramac_set_uplink_counter(semtech_loramac_t *mac, uint32_t counter);
+
+/**
+ * @brief   Gets the Uplink Frame Counter
+ *
+ * @param[in] mac          Pointer to the mac
+ * @return                 Uplink frame counter
+ */
+uint32_t semtech_loramac_get_uplink_counter(semtech_loramac_t *mac);
+
 #ifdef MODULE_PERIPH_EEPROM
 /**
  * @brief   The magic number used to identify the LoRaWAN configuration

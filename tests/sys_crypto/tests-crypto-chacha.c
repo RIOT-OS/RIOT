@@ -97,7 +97,8 @@ static const uint8_t TC8_CHACHA20_BLOCK1[64] = {
 static void _test_crypto_chacha(unsigned rounds, unsigned keylen,
                                 const uint8_t key[32], const uint8_t iv[8],
                                 const uint32_t after_init[16],
-                                const uint8_t block0[64], const uint8_t block1[64])
+                                const uint8_t block0[64],
+                                const uint8_t block1[64])
 {
     chacha_ctx ctx;
     uint8_t block[64];
@@ -138,5 +139,5 @@ Test *tests_crypto_chacha_tests(void)
         new_TestFixture(test_crypto_chacha20_tc8),
     };
     EMB_UNIT_TESTCALLER(crypto_chacha_tests, NULL, NULL, fixtures);
-    return (Test *) &crypto_chacha_tests;
+    return (Test *)&crypto_chacha_tests;
 }

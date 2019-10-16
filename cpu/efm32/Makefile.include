@@ -3,8 +3,11 @@ include $(RIOTCPU)/efm32/efm32-info.mk
 export CPU_ARCH = $(EFM32_ARCHITECTURE)
 export CPU_FAM = $(EFM32_FAMILY)
 
+# the size of riotboot on the EFM32 exceeds the default value
+RIOTBOOT_LEN ?= 0x2000
+
 # the em_device.h header requires a global define with the cpu model
-export CFLAGS += -D$(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
+CFLAGS += -D$(call uppercase_and_underscore,$(CPU_MODEL))
 
 # include Gecko SDK package
 USEPKG += gecko_sdk

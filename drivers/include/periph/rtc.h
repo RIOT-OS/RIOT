@@ -16,6 +16,17 @@
  * conform to the `struct tm` specification.
  * Compare: http://pubs.opengroup.org/onlinepubs/7908799/xsh/time.h.html
  *
+ * # (Low-) Power Implications
+ *
+ * After the RTC has been initialized (i.e. after calling rtc_init()), the RTC
+ * should be powered on and running. The RTC can then be powered off manually
+ * at a later point in time by calling the rtc_poweroff() function. When the RTC
+ * is powered back on using the rtc_poweron() function, it **should**
+ * transparently continue its previously configured operation.
+ *
+ * On many CPUs, certain power states might need to be blocked in rtc_init(), so
+ * that it is ensured that the RTC will function properly while it is enabled.
+ *
  * @{
  * @file
  * @brief       Low-level RTC peripheral driver interface definitions
@@ -104,6 +115,21 @@ void rtc_poweron(void);
  * @brief Turns the RTC hardware module off
  */
 void rtc_poweroff(void);
+
+/**
+ * @brief Normalize the time struct
+ *
+ * @note  The function modifies the fields of the tm structure as follows:
+ *        If structure members are outside their valid interval,
+ *        they will be normalized.
+ *        So that, for example, 40 October is changed into 9 November.
+ *
+ *        If RTC_NORMALIZE_COMPAT is 1 `tm_wday` and `tm_yday` are set
+ *        to values determined from the contents of the other fields.
+ *
+ * @param time        Pointer to the struct to normalize.
+ */
+void rtc_tm_normalize(struct tm *time);
 
 #ifdef __cplusplus
 }

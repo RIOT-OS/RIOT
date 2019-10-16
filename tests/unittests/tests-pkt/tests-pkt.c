@@ -185,8 +185,8 @@ static void test_pkt_equals_iolist(void)
     TEST_ASSERT_EQUAL_INT(0, memcmp(&iol, &pkt, sizeof(iol)));
 
     /* check size position */
-    iol.iol_len = 0x12345678;
-    pkt.size = 0x12345678;
+    iol.iol_len = (size_t)0x12345678;
+    pkt.size = (size_t)0x12345678;
 
     TEST_ASSERT_EQUAL_INT(0, memcmp(&iol, &pkt, sizeof(iol)));
 

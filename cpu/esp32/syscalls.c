@@ -60,6 +60,9 @@
 
 #ifdef MODULE_ESP_IDF_HEAP
 #include "heap/esp_heap_caps.h"
+#include "heap/include/multi_heap.h"
+#else
+#include "malloc.h"
 #endif
 
 #define MHZ 1000000UL
@@ -218,6 +221,24 @@ void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t count, size_t size)
     return result;
 }
 
+unsigned int IRAM get_free_heap_size (void)
+{
+    return heap_caps_get_free_size( MALLOC_CAP_DEFAULT );
+}
+
+void heap_stats(void)
+{
+    multi_heap_info_t hinfo;
+
+    heap_caps_get_info(&hinfo,  MALLOC_CAP_DEFAULT);
+
+    size_t _free = hinfo.total_free_bytes;
+    size_t _alloc = hinfo.total_allocated_bytes;
+
+    printf("heap: %u (used %u free %u) [bytes]\n",
+           (unsigned)(_free + _alloc), (unsigned)_alloc, (unsigned)_free);
+}
+
 #else /* MODULE_ESP_IDF_HEAP */
 
 /* for compatibiliy with ESP-IDF heap functions */
@@ -242,20 +263,22 @@ extern uint8_t  _eheap;     /* end of heap (defined in esp32.common.ld) */
 extern uint8_t  _sheap;     /* start of heap (defined in esp32.common.ld) */
 extern uint8_t *heap_top;   /* current top of heap as defined in newlib_syscalls_default */
 
-#endif /* MODULE_ESP_IDF_HEAP */
-
 unsigned int IRAM get_free_heap_size (void)
 {
-    #if MODULE_ESP_IDF_HEAP
-    return heap_caps_get_free_size( MALLOC_CAP_DEFAULT );
-    #else
-    return &_eheap - ((heap_top) ? heap_top : &_sheap);
-    #endif
+    struct mallinfo minfo = mallinfo();
+    return &_eheap - &_sheap - minfo.uordblks;
 }
+
+void heap_stats(void)
+{
+    printf("heap: %u (used %u free %u)\n", (unsigned)(&_eheap - &_sheap),
+           &_eheap - &_sheap - get_free_heap_size(), get_free_heap_size());
+}
+
+#endif /* MODULE_ESP_IDF_HEAP */
 
 /* alias for compatibility with espressif/wifi_libs */
 uint32_t esp_get_free_heap_size( void ) __attribute__((alias("get_free_heap_size")));
-
 
 /**
  * @name Other system functions

@@ -1,5 +1,5 @@
 /**
- * @defgroup ble_nimble NimBLE
+ * @defgroup pkg_nimble NimBLE
  * @ingroup  pkg
  * @ingroup  ble
  * @brief    RIOT port of the NimBLE BLE stack

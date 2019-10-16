@@ -158,19 +158,13 @@ static const uart_conf_t uart_config[] = {
  * @name ADC configuration
  * @{
  */
-#define ADC_0_EN                           1
-#define ADC_MAX_CHANNELS                   17
-/* ADC 0 device configuration */
-#define ADC_0_DEV                          ADC
-#define ADC_0_IRQ                          ADC_IRQn
 
-/* ADC 0 Default values */
-#define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
-#define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV512
+/* ADC Default values */
+#define ADC_PRESCALER                       ADC_CTRLB_PRESCALER_DIV512
 
-#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_GND
-#define ADC_0_GAIN_FACTOR_DEFAULT          ADC_INPUTCTRL_GAIN_1X
-#define ADC_0_REF_DEFAULT                  ADC_REFCTRL_REFSEL_INT1V
+#define ADC_NEG_INPUT                       ADC_INPUTCTRL_MUXNEG_GND
+#define ADC_GAIN_FACTOR_DEFAULT             ADC_INPUTCTRL_GAIN_DIV2
+#define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INTVCC1
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
@@ -184,16 +178,16 @@ static const adc_conf_chan_t adc_channels[] = {
     {GPIO_PIN(PA, 9), ADC_INPUTCTRL_MUXPOS_PIN17},    /* A7 */
     {GPIO_PIN(PA,10), ADC_INPUTCTRL_MUXPOS_PIN18},    /* A8 */
     {GPIO_PIN(PA,11), ADC_INPUTCTRL_MUXPOS_PIN19},    /* A9 */
-    {GPIO_PIN(PB, 2), ADC_INPUTCTRL_MUXPOS_PIN10},    /* A10 */
-    {GPIO_PIN(PB, 3), ADC_INPUTCTRL_MUXPOS_PIN11},    /* A11 */
+#if 0
+    /* These pins are also used for RX/TX uart0 */
+    {GPIO_PIN(PB, 2), ADC_INPUTCTRL_MUXPOS_PIN10},    /* A10, TX */
+    {GPIO_PIN(PB, 3), ADC_INPUTCTRL_MUXPOS_PIN11},    /* A11, RX */
+#endif
 
-    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0},     /* DAC/VOUT */
-    {GPIO_PIN(PA, 3), ADC_INPUTCTRL_MUXPOS_PIN1},     /* AREF */
     {GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5},     /* BAT_VOLT */
 };
 
-#define ADC_0_CHANNELS                     (12)
-#define ADC_NUMOF                          ADC_0_CHANNELS
+#define ADC_NUMOF                           ARRAY_SIZE(adc_channels)
 /** @} */
 
 /**

@@ -5,8 +5,4 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   # USEMODULE += bme280_spi
 endif
 
-ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-  USEMODULE += nrfmin
-endif
-
 include $(RIOTBOARD)/common/nrf52/Makefile.dep

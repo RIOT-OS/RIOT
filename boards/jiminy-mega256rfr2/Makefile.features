@@ -1,8 +1,0 @@
-CPU = atmega256rfr2
-
-# This board is based on an atmega CPU, thus import the features from it
-include $(RIOTBOARD)/common/arduino-atmega/Makefile.features
-
-# Put defined MCU peripherals here (in alphabetical order)
-# Peripherals are defined in common/arduino-atmega/Makefile.features
-# Add only additional Peripherals

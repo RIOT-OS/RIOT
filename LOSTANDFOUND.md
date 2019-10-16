@@ -40,6 +40,18 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### boards/jiminy-mega256rfr2 [232aed3e18118624b862d36bfec7cd1c21ca2d26]
+Author:
+- Josua Arndt <jarndt@ias.rwth-aachen.de>
+- Steffen Robertz <steffen.robertz@rwth-aachen.de>
+
+Reasons for removal:
+- The board is a custom design at the RWTH Aachen, so only two persons have
+  access to the hardware
+- It was unmaintained for several month now
+- Various refactoring PRs affected the ATmega CPU family have not been tested,
+  it is unclear if the board is actually usable with RIOT
+
 ### cpu/mips32r2_generic [a2bcd7539ce1931b7aec0077ea71dadd62c96edd]
 Author:
 - Neil Jones <neil.jones@imgtec.com>

@@ -341,7 +341,7 @@ struct _thread {
 */
 kernel_pid_t thread_create(char *stack,
                   int stacksize,
-                  char priority,
+                  uint8_t priority,
                   int flags,
                   thread_task_func_t task_func,
                   void *arg,

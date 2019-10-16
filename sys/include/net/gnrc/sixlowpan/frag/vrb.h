@@ -27,7 +27,10 @@
 
 #include "net/gnrc/netif.h"
 #include "net/gnrc/sixlowpan/config.h"
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
 #include "net/gnrc/sixlowpan/frag.h"
+#endif /* MODULE_GNRC_SIXLOWPAN_FRAG */
+#include "net/gnrc/sixlowpan/frag/rb.h"
 #include "timex.h"
 
 #ifdef __cplusplus
@@ -36,27 +39,20 @@ extern "C" {
 
 /**
  * @brief   Representation of the virtual reassembly buffer entry
+ *
+ * gnrc_sixlowpan_frag_rb_base_t::dst of gnrc_sixlowpan_frag_vrb_t::super
+ * becomes the next hop destination address.
  */
 typedef struct {
-    gnrc_sixlowpan_rbuf_base_t super;   /**< base type */
-
+    gnrc_sixlowpan_frag_rb_base_t super;    /**< base type */
     /**
-     * @brief   Link-layer destination address to which the fragments are
-     *          supposed to be forwarded to
-     */
-    uint8_t out_dst[IEEE802154_LONG_ADDRESS_LEN];
-    /**
-     * @brief   Outgoing interface to gnrc_sixlowpan_frag_vrb_t::out_dst
+     * @brief   Outgoing interface to gnrc_sixlowpan_frag_rb_base_t::dst
      */
     gnrc_netif_t *out_netif;
     /**
-     * @brief   Outgoing tag to gnrc_sixlowpan_frag_vrb_t::out_dst
+     * @brief   Outgoing tag to gnrc_sixlowpan_frag_rb_base_t::dst
      */
     uint16_t out_tag;
-    /**
-     * @brief   Length of gnrc_sixlowpan_frag_vrb_t::out_dst
-     */
-    uint8_t out_dst_len;
 } gnrc_sixlowpan_frag_vrb_t;
 
 /**
@@ -76,8 +72,30 @@ typedef struct {
  * @return  NULL, if VRB is full.
  */
 gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
-        const gnrc_sixlowpan_rbuf_base_t *base,
+        const gnrc_sixlowpan_frag_rb_base_t *base,
         gnrc_netif_t *out_netif, const uint8_t *out_dst, size_t out_dst_len);
+
+/**
+ * @brief   Generate reassembly buffer from a header's forwarding information.
+ *
+ * @param[in] base  Base data of the datagram. Must not be `NULL`.
+ * @param[in] netif Restict route to this interface. May be `NULL` for any
+ *                  interface.
+ * @param[in] hdr   Header from which to take the forwarding information from
+ *                  (e.g. IPv6 header implies `hdr->type == GNRC_NETTYPE_IPV6`).
+ *
+ * @pre `base != NULL`
+ * @pre `(hdr != NULL) && (hdr->data != NULL) && (hdr->size > 0)`
+ *
+ * @return  The VRB entry pointing to the next hop based on the forwarding
+ *          information provided in @p hdr and present in the respective
+ *          forwarding information base for `hdr->type`.
+ * @return  NULL, if VRB is full or if there is no route to destination in
+ *          @p hdr.
+ */
+gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_from_route(
+            const gnrc_sixlowpan_frag_rb_base_t *base,
+            gnrc_netif_t *netif, const gnrc_pktsnip_t *hdr);
 
 /**
  * @brief   Checks timeouts and removes entries if necessary
@@ -89,10 +107,6 @@ void gnrc_sixlowpan_frag_vrb_gc(void);
  *
  * @param[in] src           Link-layer source address of the original fragment.
  * @param[in] src_len       Length of @p src.
- * @param[in] dst           Link-layer destination address of the original
- *                          fragment.
- * @param[in] dst_len       Length of @p dst.
- * @param[in] datagram_size The original fragment's datagram size.
  * @param[in] src_tag       Tag of the original fragment.
  *
  * @return  The VRB entry identified by the given parameters.
@@ -100,9 +114,7 @@ void gnrc_sixlowpan_frag_vrb_gc(void);
  *          by the given parameters.
  */
 gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
-        const uint8_t *src, size_t src_len,
-        const uint8_t *dst, size_t dst_len,
-        size_t datagram_size, unsigned src_tag);
+        const uint8_t *src, size_t src_len, unsigned src_tag);
 
 /**
  * @brief   Removes an entry from the VRB
@@ -112,10 +124,10 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
 static inline void gnrc_sixlowpan_frag_vrb_rm(gnrc_sixlowpan_frag_vrb_t *vrb)
 {
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
-    gnrc_sixlowpan_frag_rbuf_base_rm(&vrb->super);
+    gnrc_sixlowpan_frag_rb_base_rm(&vrb->super);
 #elif   defined(TEST_SUITES)
-    /* for testing just zero datagram_size */
-    vrb->super.datagram_size = 0;
+    /* for testing just zero src_len */
+    vrb->super.src_len = 0;
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG */
 }
 
@@ -129,7 +141,7 @@ static inline void gnrc_sixlowpan_frag_vrb_rm(gnrc_sixlowpan_frag_vrb_t *vrb)
  */
 static inline bool gnrc_sixlowpan_frag_vrb_entry_empty(gnrc_sixlowpan_frag_vrb_t *vrb)
 {
-    return (vrb->super.datagram_size == 0);
+    return (vrb->super.src_len == 0);
 }
 
 #if defined(TEST_SUITES) || defined(DOXYGEN)

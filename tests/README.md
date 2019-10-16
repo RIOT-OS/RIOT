@@ -27,3 +27,18 @@ An automated way of knowing if a test is available is to execute the
 It executes without error if tests run by 'make test' are present.
 
     make test/available
+
+
+Interaction through the uart
+----------------------------
+
+Tests implemented with `testrunner` use the `cleanterm` target that
+provides an interaction without adding extra text output or input handling.
+It can currently be expected to have unmodified line based interaction with the
+board.
+
+The expected behavior is verified with the test in `tests/test_tools`.
+
+Tests cannot rely on having on all boards and terminal programs:
+* unbuffered input
+* allowing sending special characters like `ctrl+c/ctrl+d`

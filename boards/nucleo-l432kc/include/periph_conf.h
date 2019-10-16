@@ -22,6 +22,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "cfg_i2c1_pb6_pb7.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
 

@@ -32,8 +32,12 @@ extern "C" {
 
 /**
  * @brief initialization as decribed in datasheet
+ *
+ * @param[in] dev device to initialize
+ *
+ * @return 0 on success, error otherwise
  */
-void mrf24j40_init(mrf24j40_t *dev);
+int mrf24j40_init(mrf24j40_t *dev);
 
 /**
  * @brief Read from a register with a  at address `addr` from device `dev`. Register with 8bit address

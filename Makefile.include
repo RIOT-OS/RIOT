@@ -1,3 +1,12 @@
+MATCH_MAKE_VERSION = 4.%
+
+ifeq (,$(filter $(MATCH_MAKE_VERSION),$(MAKE_VERSION)))
+  $(warning GNU Make $(MAKE_VERSION) is DEPRECATED in RIOT. Support for \
+	    versions less than $(MATCH_MAKE_VERSION) will be removed in \
+	    release 2020.01. Please upgrade your system to use GNU Make \
+	    $(MATCH_MAKE_VERSION) or later.)
+endif
+
 # 'Makefile.include' directory, must be evaluated before other 'include'
 _riotbase := $(dir $(lastword $(MAKEFILE_LIST)))
 
@@ -30,6 +39,9 @@ BINDIR         ?= $(BINDIRBASE)/$(BOARD)
 PKGDIRBASE     ?= $(BINDIRBASE)/pkg/$(BOARD)
 DLCACHE        ?= $(RIOTTOOLS)/dlcache/dlcache.sh
 DLCACHE_DIR    ?= $(RIOTBASE)/.dlcache
+
+# include CI info such as BOARD_INSUFFICIENT_MEMORY, if existing
+-include Makefile.ci
 
 __DIRECTORY_VARIABLES := \
   RIOTBASE \
@@ -89,6 +101,7 @@ CLEAN = $(filter clean, $(MAKECMDGOALS))
 
 # include makefiles utils tools
 include $(RIOTMAKE)/utils/variables.mk
+include $(RIOTMAKE)/utils/strings.mk
 
 # get host operating system
 OS := $(shell uname)
@@ -109,6 +122,9 @@ include $(RIOTMAKE)/info-nproc.inc.mk
 
 # List of boards variables
 include $(RIOTMAKE)/boards.inc.mk
+
+# Debug targets for build system migration
+include $(RIOTMAKE)/dependencies_debug.inc.mk
 
 GLOBAL_GOALS += buildtest buildtest-indocker info-boards-supported info-boards-features-missing info-buildsizes info-buildsizes-diff
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
@@ -262,6 +278,13 @@ export TOOLCHAIN
 # will most likely not need to touch this.
 export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
 
+# set default PROGRAMMER value if flashing a board on IoT-LAB
+# This must be done before parsing the Makefile.include of the board and cannot
+# be done in makefile.iotlab.single.inc.mk which is included after.
+ifneq (,$(IOTLAB_NODE))
+  PROGRAMMER ?= iotlab
+endif
+
 # Add standard include directories
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 
@@ -330,9 +353,9 @@ ifeq ($(RIOT_CI_BUILD),1)
 endif
 
 # if you want to publish the board into the sources as an uppercase #define
-BOARDDEF := $(shell echo $(BOARD) | tr 'a-z' 'A-Z' | tr '-' '_')
-CPUDEF := $(shell echo $(CPU) | tr 'a-z' 'A-Z' | tr '-' '_')
-MCUDEF := $(shell echo $(MCU) | tr 'a-z' 'A-Z' | tr '-' '_')
+BOARDDEF = $(call uppercase_and_underscore,$(BOARD))
+CPUDEF = $(call uppercase_and_underscore,$(CPU))
+MCUDEF = $(call uppercase_and_underscore,$(MCU))
 CFLAGS += -DRIOT_APPLICATION=\"$(APPLICATION)\"
 CFLAGS += -DBOARD_$(BOARDDEF)=\"$(BOARD)\" -DRIOT_BOARD=BOARD_$(BOARDDEF)
 CFLAGS += -DCPU_$(CPUDEF)=\"$(CPU)\" -DRIOT_CPU=CPU_$(CPUDEF)
@@ -441,6 +464,9 @@ ifeq (,$(FLASHFILE))
   $(error FLASHFILE is not defined for this board: $(FLASHFILE))
 endif
 
+# By default always build ELFFILE and FLASHFILE
+BUILD_FILES += $(ELFFILE) $(FLASHFILE)
+
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
 
@@ -469,7 +495,7 @@ ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
 else
 ifeq (,$(RIOTNOLINK))
-link: ..compiler-check ..build-message $(ELFFILE) $(FLASHFILE) print-size
+link: ..compiler-check ..build-message $(BUILD_FILES) print-size
 else
 link: ..compiler-check ..build-message $(BASELIBS)
 endif # RIOTNOLINK
@@ -497,6 +523,50 @@ print-size: $(ELFFILE)
 
 endif # BUILD_IN_DOCKER
 
+# Rules to check the correctness of thin archives.
+
+# OS independant relpath as 'realpath --relative-to' is not supported on OSx
+relpath = $(shell python3 -c 'import pathlib; print(pathlib.Path("$1").relative_to("$(CURDIR)"))')
+
+# Each ARCHECK file contains all the absolute paths found inside the archive.
+BASELIB_ARCHECKS = $(patsubst %.a,%.a-check,$(filter %.a,$(BASELIBS)))
+
+# For each a file, print the absolute paths found inside it
+# If "ar t" is called with an absolute path it will print an abs path regardless
+# of how the archive is internally
+# In case of a malformed archive, ar prints to stderr (and sets an error code).
+# Doing `2>&1` is hacky, the correct thing would be to get the exit code.
+# The `| %.a` is necessary to be able to check file produced in docker.
+%.a-check: %.a
+	$(Q)$(AR) t $(call relpath,$<) 2>&1 | grep '^/' | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
+
+# There's no point on keeping files whose content is later copied to another file
+.INTERMEDIATE: $(BASELIB_ARCHECKS)
+
+ARCHIVE_CHECK = $(BINDIR)/$(APPLICATION).archive-check
+
+$(ARCHIVE_CHECK): $(BASELIB_ARCHECKS)
+	$(Q)cat $^ | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
+
+# Rule to check if thin archives are correctly produced, that is, with a correct
+# relative path.
+ifeq ($(BUILD_IN_DOCKER),1)
+archive-check: ..in-docker-container
+else
+archive-check: $(ARCHIVE_CHECK) FORCE
+	@if [ -s '$<' ] ; then \
+		$(COLOR_ECHO) '$(COLOR_RED)Found the following absolute paths in archives' ;\
+		cat '$<';\
+		$(COLOR_ECHO) '$(COLOR_RESET)' ;\
+		exit 1;\
+	elif [ -f '$<' ] ; then \
+		$(COLOR_ECHO) '$(COLOR_GREEN)Archives correctly formed$(COLOR_RESET)' ;\
+	else \
+		$(COLOR_ECHO) '$(COLOR_RED)Unexpected error (file not found)$(COLOR_RESET)' ;\
+		exit 1;\
+	fi
+endif # BUILD_IN_DOCKER
+
 # Check given command is available in the path
 #   check_cmd 'command' 'description'
 define check_cmd
@@ -505,6 +575,16 @@ define check_cmd
 	    '$(COLOR_RED)$2 $1 is required but not found in PATH.  Aborting.$(COLOR_RESET)'; \
 	    exit 1;}
 endef
+
+# Check if setsid command is available on the system for debug target
+# This is not the case on MacOSX, so it must be built on the fly
+ifneq (,$(filter debug, $(MAKECMDGOALS)))
+  ifneq (0,$(shell which setsid 2>&1 > /dev/null ; echo $$?))
+    SETSID = $(RIOTTOOLS)/setsid/setsid
+    $(call target-export-variables,debug,$(SETSID))
+    DEBUGDEPS += $(SETSID)
+  endif
+endif
 
 ..compiler-check:
 	$(call check_cmd,$(CC),Compiler)
@@ -562,7 +642,14 @@ preflash: $(BUILD_BEFORE_FLASH)
 
 termdeps: $(TERMDEPS)
 
-term: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
+term: $(filter flash flash-only, $(MAKECMDGOALS)) $(TERMDEPS)
+	$(call check_cmd,$(TERMPROG),Terminal program)
+	$(TERMPROG) $(TERMFLAGS)
+
+# Term without the pyterm added logging
+# TERMFLAGS must be exported for `jlink.sh term_rtt`.
+cleanterm: export PYTERMFLAGS += --noprefix --no-repeat-command-on-empty-line
+cleanterm: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	$(TERMPROG) $(TERMFLAGS)
 
@@ -572,7 +659,7 @@ list-ttys:
 doc:
 	make -BC $(RIOTBASE) doc
 
-debug:
+debug: $(DEBUGDEPS)
 	$(call check_cmd,$(DEBUGGER),Debug program)
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
@@ -655,6 +742,13 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
     EXPECT_ERRORS := 1
   endif
 
+  # Test if no feature in the requirements used is blacklisted for the selected board.
+  ifneq (,$(FEATURES_USED_BLACKLISTED))
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)Some feature requirements are blacklisted:$(COLOR_RESET)"\
+                          "$(FEATURES_USED_BLACKLISTED)" 1>&2)
+    EXPECT_ERRORS := 1
+  endif
+
   # Test if any used feature conflict with another one.
   ifneq (,$(FEATURES_CONFLICTING))
     $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)The following features may conflict:$(COLOR_RESET)"\
@@ -722,20 +816,31 @@ endif
 include $(RIOTTOOLS)/desvirt/Makefile.desvirt
 
 # Build a header file with all common macro definitions and undefinitions
-# make it depend on FORCE to re-run of the script every time even if the file exists
-# The script will only touch the file if anything has changed since last time.
-$(RIOTBUILD_CONFIG_HEADER_C): FORCE
+# Everytime the header is updated, it will trigger a new compilation.
+#
+# The file is created first through a `.in` file that will be modified if
+# any CFLAGS changed. It depends on FORCE to re-run of the script every time
+# even if the file exists but the file will only be updated on modifications.
+#
+# The header is then created by keeping only the macros. Keeping the
+# comments added absolute path in the file that screwed caching.
+#
+# The rebuild behavior could even only be done with an empty file, but currently
+# some macros definitions are passed through this file.
+$(RIOTBUILD_CONFIG_HEADER_C): $(RIOTBUILD_CONFIG_HEADER_C).in
+	$(Q)sed -n -e '1i /* Generated file do not edit */' -e '/^#.*/ p' $< > $@
+
+.SECONDARY: $(RIOTBUILD_CONFIG_HEADER_C).in
+$(RIOTBUILD_CONFIG_HEADER_C).in: FORCE | $(CLEAN)
 	@mkdir -p '$(dir $@)'
 	$(Q)'$(RIOTTOOLS)/genconfigheader/genconfigheader.sh' $(CFLAGS_WITH_MACROS) \
 		| '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
 
-# Immediate evaluation but keep CLAGS_WITH_MACROS deferred
-_CFLAGS := $(CFLAGS)
-CFLAGS_WITH_MACROS = $(_CFLAGS)
+CFLAGS_WITH_MACROS += $(CFLAGS)
 CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
+# MODULE_NAME defines. Declared in 'makefiles/modules.inc.mk'
+CFLAGS_WITH_MACROS += $(EXTDEFINES)
 
-CFLAGS := $(patsubst -D%,,$(CFLAGS))
-CFLAGS := $(patsubst -U%,,$(CFLAGS))
 CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
 
 # include mcuboot support

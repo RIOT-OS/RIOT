@@ -7,9 +7,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
-                             arduino-uno
-
 # Uncomment these lines if you want to use platform support from external
 # repositories:
 #RIOTCPU ?= $(CURDIR)/../../RIOT/thirdparty_cpu
@@ -38,10 +35,10 @@ USEMODULE += ps
 USEMODULE += saul_default
 
 BOARD_PROVIDES_NETIF := acd52832 airfy-beacon b-l072z-lrwan1 cc2538dk fox \
-        iotlab-m3 iotlab-a8-m3 lobaro-lorabox lsn50 mulle microbit msba2 \
+        hamilton iotlab-m3 iotlab-a8-m3 lobaro-lorabox lsn50 mulle microbit msba2 \
         native nrf51dk nrf51dongle nrf52dk nrf52840dk nrf52840-mdk nrf6310 \
-        nucleo-f767zi openmote-cc2538 pba-d-01-kw2x remote-pa remote-reva \
-        samr21-xpro spark-core telosb yunjia-nrf51822 z1
+        nucleo-f767zi openmote-b openmote-cc2538 pba-d-01-kw2x remote-pa remote-reva \
+        ruuvitag samr21-xpro samr30-xpro spark-core telosb thingy52 yunjia-nrf51822 z1
 
 ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
   # Use modules for networking
@@ -71,10 +68,4 @@ endif
 include $(RIOTBASE)/Makefile.include
 
 # Set a custom channel if needed
-ifneq (,$(filter at86rf212b,$(USEMODULE)))    # radio is IEEE 802.15.4 sub-GHz
-  DEFAULT_CHANNEL ?= 5
-  CFLAGS += -DIEEE802154_DEFAULT_SUBGHZ_CHANNEL=$(DEFAULT_CHANNEL)
-else                                          # radio is IEEE 802.15.4 2.4 GHz
-  DEFAULT_CHANNEL ?= 26
-  CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
-endif
+include $(RIOTMAKE)/default-channel.inc.mk

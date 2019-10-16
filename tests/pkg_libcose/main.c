@@ -40,16 +40,21 @@ static unsigned char pk[COSE_CRYPTO_SIGN_ED25519_PUBLICKEYBYTES];
 static unsigned char sk[COSE_CRYPTO_SIGN_ED25519_SECRETKEYBYTES];
 static unsigned char pk2[COSE_CRYPTO_SIGN_ED25519_PUBLICKEYBYTES];
 static unsigned char sk2[COSE_CRYPTO_SIGN_ED25519_SECRETKEYBYTES];
-static unsigned char symmkey[COSE_CRYPTO_AEAD_CHACHA20POLY1305_KEYBYTES];
-static uint8_t nonce[COSE_CRYPTO_AEAD_CHACHA20POLY1305_NONCEBYTES] = { 0 };
 /* COSE structs */
 static cose_sign_enc_t sign;
 static cose_sign_dec_t verify;
 static cose_signature_t signature1, signature2;
-static cose_key_t signer1, signer2, symm;
+static cose_key_t signer1, signer2;
+
+#if defined(MODULE_LIBCOSE_CRYPT_HACL) || defined(MODULE_LIBCOSE_CRYPT_MONOCYPHER)
+static unsigned char symmkey[COSE_CRYPTO_AEAD_CHACHA20POLY1305_KEYBYTES];
+static uint8_t nonce[COSE_CRYPTO_AEAD_CHACHA20POLY1305_NONCEBYTES] = { 0 };
+static cose_key_t symm;
 static cose_encrypt_t test_encrypt;
 static cose_encrypt_dec_t test_decrypt;
 static cose_recp_dec_t test_derecp;
+#endif
+
 /* COSE sign buffer */
 static uint8_t buf[2048];
 /* Signature Verification buffer */
@@ -179,6 +184,7 @@ static void test_libcose_02(void)
                                            sizeof(vbuf)));
 }
 
+#if defined(MODULE_LIBCOSE_CRYPT_HACL) || defined(MODULE_LIBCOSE_CRYPT_MONOCYPHER)
 /* Untagged 1 encrypt test with chacha20poly1305*/
 static void test_libcose_03(void)
 {
@@ -207,13 +213,16 @@ static void test_libcose_03(void)
                                                vbuf, &plaintext_len));
     TEST_ASSERT_EQUAL_INT( sizeof(payload) - 1, plaintext_len);
 }
+#endif
 
 Test *tests_libcose(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_libcose_01),
         new_TestFixture(test_libcose_02),
+#if defined(MODULE_LIBCOSE_CRYPT_HACL) || defined(MODULE_LIBCOSE_CRYPT_MONOCYPHER)
         new_TestFixture(test_libcose_03),
+#endif
     };
 
     EMB_UNIT_TESTCALLER(libcose_tests, setUp, NULL, fixtures);

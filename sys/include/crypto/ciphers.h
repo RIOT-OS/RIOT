@@ -148,7 +148,8 @@ int cipher_init(cipher_t *cipher, cipher_id_t cipher_id, const uint8_t *key,
  *                   cipher, which is always 1 in case of success
  * @return           A negative value for an error
  */
-int cipher_encrypt(const cipher_t *cipher, const uint8_t *input, uint8_t *output);
+int cipher_encrypt(const cipher_t *cipher, const uint8_t *input,
+                   uint8_t *output);
 
 
 /**
@@ -164,7 +165,8 @@ int cipher_encrypt(const cipher_t *cipher, const uint8_t *input, uint8_t *output
  *                   cipher, which is always 1 in case of success
  * @return           A negative value for an error
  */
-int cipher_decrypt(const cipher_t *cipher, const uint8_t *input, uint8_t *output);
+int cipher_decrypt(const cipher_t *cipher, const uint8_t *input,
+                   uint8_t *output);
 
 
 /**

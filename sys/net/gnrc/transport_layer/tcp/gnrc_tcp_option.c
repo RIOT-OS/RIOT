@@ -51,7 +51,9 @@ int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
                 continue;
 
             case TCP_OPTION_KIND_MSS:
-                if (option->length != TCP_OPTION_LENGTH_MSS) {
+                if (opt_left < TCP_OPTION_LENGTH_MIN || option->length > opt_left ||
+                    option->length != TCP_OPTION_LENGTH_MSS) {
+
                     DEBUG("gnrc_tcp_option.c : _option_parse() : invalid MSS Option length.\n");
                     return -1;
                 }
@@ -61,9 +63,18 @@ int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)
                 break;
 
             default:
-                DEBUG("gnrc_tcp_option.c : _option_parse() : Unknown option found.\
-                      KIND=%"PRIu8", LENGTH=%"PRIu8"\n", option->kind, option->length);
+                if (opt_left >= TCP_OPTION_LENGTH_MIN) {
+                    DEBUG("gnrc_tcp_option.c : _option_parse() : Unsupported option found.\
+                          KIND=%"PRIu8", LENGTH=%"PRIu8"\n", option->kind, option->length);
+                }
         }
+
+        if ((opt_left < TCP_OPTION_LENGTH_MIN) || (option->length > opt_left) ||
+            (option->length < TCP_OPTION_LENGTH_MIN)) {
+            DEBUG("gnrc_tcp_option.c : _option_parse() : Invalid option. Drop Packet.\n");
+            return -1;
+        }
+
         opt_ptr += option->length;
         opt_left -= option->length;
     }

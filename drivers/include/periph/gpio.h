@@ -43,6 +43,23 @@
  * definitions in `RIOT/boards/ * /include/periph_conf.h` will define the selected
  * GPIO pin.
  *
+ * # (Low-) Power Implications
+ *
+ * On almost all platforms, we can only control the peripheral power state of
+ * full ports (i.e. groups of pins), but not for single GPIO pins. Together with
+ * CPU specific alternate function handling for pins used by other peripheral
+ * drivers, this can make it quite complex to keep track of pins that are
+ * currently used at a certain moment. To simplify the implementations (and ease
+ * the memory consumption), we expect ports to be powered on (e.g. through
+ * peripheral clock gating) when first used and never be powered off again.
+ *
+ * GPIO driver implementations **should** power on the corresponding port during
+ * gpio_init() and gpio_init_int().
+ *
+ * For external interrupts to work, some platforms may need to block certain
+ * power modes (although this is not very likely). This should be done during
+ * gpio_init_int().
+ *
  * @{
  * @file
  * @brief       Low-level GPIO peripheral driver interface definitions

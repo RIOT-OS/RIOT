@@ -42,8 +42,7 @@ USEMODULE += gnrc_gomach
 # reduce the size of the packet buffer a bit
 CFLAGS += -DGNRC_PKTBUF_SIZE=1024
 
-# Set a custom channel if needed
-DEFAULT_CHANNEL ?= 26
-CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
-
 include $(RIOTBASE)/Makefile.include
+
+# Set a custom channel if needed
+include $(RIOTMAKE)/default-channel.inc.mk

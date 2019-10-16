@@ -234,7 +234,7 @@ gnrc_pktsnip_t *gnrc_ndp_opt_rdnss_build(uint32_t ltime, ipv6_addr_t *addrs,
     gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_RDNSS, opt_size, next);
 
     if (pkt != NULL) {
-        ndp_opt_rdnss_t *rdnss_opt = pkt->data;
+        ndp_opt_rdnss_impl_t *rdnss_opt = pkt->data;
         rdnss_opt->resv.u16 = 0;
         rdnss_opt->ltime = byteorder_htonl(ltime);
         for (unsigned i = 0; i < addrs_num; i++) {

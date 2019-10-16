@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    net_credman (D)TLS Credential Manager
- * @ingroup     net
+ * @ingroup     net net_dtls
  * @brief       Credentials management module for (D)TLS
  *
  * @{
@@ -45,7 +45,7 @@ extern "C" {
  * @brief Buffer of the credential
  */
 typedef struct {
-    void *s;                /**< Pointer to the buffer */
+    const void *s;          /**< Pointer to the buffer */
     size_t len;             /**< Length of credman_buffer_t::s */
 } credman_buffer_t;
 

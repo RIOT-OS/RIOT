@@ -7,21 +7,6 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-leonardo \
-                             arduino-mega2560 arduino-nano arduino-uno \
-                             b-l072z-lrwan1 blackpill \
-                             bluepill calliope-mini cc2650-launchpad cc2650stk \
-                             hifive1 hifive1b i-nucleo-lrwan1 lsn50 maple-mini mega-xplained microbit msb-430 \
-                             msb-430h nrf51dk nrf51dongle nrf6310 \
-                             nucleo-f031k6 nucleo-f042k6 \
-                             nucleo-f303k8 nucleo-l031k6 nucleo-f030r8 \
-                             nucleo-f070rb nucleo-f072rb nucleo-f103rb \
-                             nucleo-f302r8 nucleo-f334r8 nucleo-l053r8 \
-                             nucleo-l073rz opencm904 saml10-xpro saml11-xpro \
-                             spark-core stm32f0discovery stm32l0538-disco \
-                             telosb waspmote-pro \
-                             weio wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
-
 # The following boards do not have an available UART
 BOARD_BLACKLIST += pic32-wifire pic32-clicker ruuvitag thingy52
 
@@ -116,10 +101,4 @@ host-tools:
 	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)
 
 # Set a custom channel if needed
-ifneq (,$(filter at86rf212b,$(USEMODULE)))    # radio is IEEE 802.15.4 sub-GHz
-  DEFAULT_CHANNEL ?= 5
-  CFLAGS += -DIEEE802154_DEFAULT_SUBGHZ_CHANNEL=$(DEFAULT_CHANNEL)
-else                                          # radio is IEEE 802.15.4 2.4 GHz
-  DEFAULT_CHANNEL ?= 26
-  CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
-endif
+include $(RIOTMAKE)/default-channel.inc.mk

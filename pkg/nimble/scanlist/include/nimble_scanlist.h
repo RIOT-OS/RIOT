@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    ble_nimble_scanlist Scan Result Helper
- * @ingroup     ble_nimble
+ * @defgroup    pkg_nimble_scanlist Scan Result Helper
+ * @ingroup     pkg_nimble
  * @brief       List for storing and printing BLE scan results
  *
  * @note        This scanlist implementation is not thread safe. So calling
@@ -52,6 +52,7 @@ typedef struct {
     uint32_t adv_msg_cnt;           /**< number of adv packets by a node */
     uint32_t first_update;          /**< first packet timestamp */
     uint32_t last_update;           /**< last packet timestamp */
+    uint8_t type;                   /**< advertising packet type */
 } nimble_scanlist_entry_t;
 
 /**
@@ -64,12 +65,13 @@ void nimble_scanlist_init(void);
  *
  * If the list is already full, the scanned node is simply ignored.
  *
+ * @param[in]  type     type of the advertising packet received
  * @param[in]  addr     BLE address of the scanned node
  * @param[in]  rssi     RSSI of the received advertising packet
  * @param[in]  ad       the payload of the advertising packet
  * @param[in]  len      length of @p ad
  */
-void nimble_scanlist_update(const ble_addr_t *addr, int8_t rssi,
+void nimble_scanlist_update(uint8_t type, const ble_addr_t *addr, int8_t rssi,
                             const uint8_t *ad, size_t len);
 
 /**

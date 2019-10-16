@@ -64,6 +64,7 @@ gnrc_netif_t *gnrc_netif_create(char *stack, int stacksize, char priority,
     assert(netif != NULL);
     rmutex_init(&netif->mutex);
     netif->ops = ops;
+    netif_register((netif_t*) netif);
     assert(netif->dev == NULL);
     netif->dev = netdev;
     res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,
@@ -1042,7 +1043,7 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
             }
         }
         /* Rule 3: Avoid deprecated addresses. */
-        if (_get_state(netif, i) == GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED) {
+        if (_get_state(netif, i) != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED) {
             DEBUG("winner for rule 3 found\n");
             winner_set[i] += RULE_3_PTS;
             if (winner_set[i] > max_pts) {

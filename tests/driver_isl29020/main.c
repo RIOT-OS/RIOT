@@ -24,7 +24,7 @@
 #include "isl29020.h"
 #include "isl29020_params.h"
 
-#define SLEEP       (250 * 1000U)
+#define SLEEP_USEC  (250 * 1000U)
 
 int main(void)
 {
@@ -42,7 +42,7 @@ int main(void)
 
     while (1) {
         printf("Light value: %5i LUX\n", isl29020_read(&dev));
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

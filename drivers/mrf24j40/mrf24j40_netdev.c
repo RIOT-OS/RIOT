@@ -58,7 +58,10 @@ static int _init(netdev_t *netdev)
     gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
 
     /* reset device to default values and put it into RX state */
-    mrf24j40_reset(dev);
+    if (mrf24j40_reset(dev)) {
+        return -ENODEV;
+    }
+
     return 0;
 }
 

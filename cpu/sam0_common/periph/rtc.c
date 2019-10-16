@@ -120,6 +120,9 @@ void rtc_init(void)
 
 int rtc_set_time(struct tm *time)
 {
+    /* normalize input */
+    rtc_tm_normalize(time);
+
     if ((time->tm_year < reference_year) || (time->tm_year > reference_year + 63)) {
         return -1;
     }
@@ -157,6 +160,9 @@ int rtc_get_time(struct tm *time)
 
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
+    /* normalize input */
+    rtc_tm_normalize(time);
+
     rtc_clear_alarm();
     if ((time->tm_year < reference_year) || (time->tm_year > (reference_year + 63))) {
         return -2;

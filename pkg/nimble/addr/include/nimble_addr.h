@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    ble_nimble_addr Address Helper
- * @ingroup     ble_nimble
+ * @defgroup    pkg_nimble_addr Address Helper
+ * @ingroup     pkg_nimble
  * @brief       NimBLE specific helper functions for handling addresses
  * @{
  *

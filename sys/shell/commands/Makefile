@@ -11,6 +11,9 @@ endif
 ifneq (,$(filter ps,$(USEMODULE)))
   SRC += sc_ps.c
 endif
+ifneq (,$(filter heap_cmd,$(USEMODULE)))
+  SRC += sc_heap.c
+endif
 ifneq (,$(filter sht1x,$(USEMODULE)))
   SRC += sc_sht1x.c
 endif
@@ -54,6 +57,9 @@ ifneq (,$(filter gnrc_ipv6_nib_6lbr,$(USEMODULE)))
     SRC += sc_gnrc_6ctx.c
 endif
 endif
+ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
+  SRC += sc_gnrc_6lo_frag_stats.c
+endif
 ifneq (,$(filter saul_reg,$(USEMODULE)))
   SRC += sc_saul_reg.c
 endif
@@ -83,6 +89,10 @@ endif
 
 ifneq (,$(filter semtech-loramac,$(USEPKG)))
   SRC += sc_loramac.c
+endif
+
+ifneq (,$(filter nimble_netif,$(USEMODULE)))
+  SRC += sc_nimble_netif.c
 endif
 
 include $(RIOTBASE)/Makefile.base

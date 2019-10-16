@@ -16,9 +16,13 @@ all: $(PKG_BUILDDIR)/Makefile
 	$(MAKE) -C $(PKG_BUILDDIR) && \
 	cp $(PKG_BUILDDIR)/lib/librelic_s.a $(BINDIR)/$(PKG_NAME).a
 
+# Pass 'COMP' with a target specific export to not have issues with the shell
+# escaping evaluation.
+COMP = $(filter-out -Werror -Werror=old-style-definition -Werror=strict-prototypes -std=gnu99,$(CFLAGS))
+$(PKG_BUILDDIR)/Makefile: export COMP ?=
+
 $(PKG_BUILDDIR)/Makefile: $(TOOLCHAIN_FILE)
 	cd $(PKG_BUILDDIR) && \
-	COMP="$(filter-out -Werror -Werror=old-style-definition -Werror=strict-prototypes -std=gnu99, $(CFLAGS) ) " \
 	cmake -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 		  -DCHECK=off -DTESTS=0 -DBENCH=0 -DSHLIB=off -Wno-dev $(RELIC_CONFIG_FLAGS) .
 

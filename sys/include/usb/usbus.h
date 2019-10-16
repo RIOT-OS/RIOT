@@ -137,17 +137,18 @@ typedef enum {
 } usbus_state_t;
 
 /**
- * @brief USBUS setup request state machine
+ * @brief USBUS control request state machine
  */
 typedef enum {
-    USBUS_SETUPRQ_READY,        /**< Ready for new setup request */
-    USBUS_SETUPRQ_INDATA,       /**< Request received with expected DATA IN stage */
-    USBUS_SETUPRQ_OUTACK,       /**< Expecting a zero-length ack out request
-                                     from the host */
-    USBUS_SETUPRQ_OUTDATA,      /**< Data OUT expected */
-    USBUS_SETUPRQ_INACK,        /**< Expecting a zero-length ack in request
-                                     from the host */
-} usbus_setuprq_state_t;
+    USBUS_CONTROL_REQUEST_STATE_READY,    /**< Ready for new control request */
+    USBUS_CONTROL_REQUEST_STATE_INDATA,   /**< Request received with expected
+                                               DATA IN stage */
+    USBUS_CONTROL_REQUEST_STATE_OUTACK,   /**< Expecting a zero-length ack OUT
+                                               request from the host */
+    USBUS_CONTROL_REQUEST_STATE_OUTDATA,  /**< Data OUT expected */
+    USBUS_CONTROL_REQUEST_STATE_INACK,    /**< Expecting a zero-length ack IN
+                                               request from the host */
+} usbus_control_request_state_t;
 
 /**
  * @brief USBUS string type
@@ -314,13 +315,13 @@ typedef struct usbus_handler_driver {
                              usbdev_ep_t *ep, usbus_event_transfer_t event);
 
     /**
-     * @brief setup request handler function
+     * @brief control request handler function
      *
-     * This function receives USB setup requests from the USBUS stack.
+     * This function receives USB control requests from the USBUS stack.
      *
      * @param usbus     USBUS context
      * @param handler   handler context
-     * @param state     setup request state
+     * @param state     control request state
      * @param setup     setup packet
      *
      * @return          Size of the returned data when the request is handled
@@ -328,8 +329,9 @@ typedef struct usbus_handler_driver {
      *                  host
      * @return          zero when the request is not handled by this handler
      */
-    int (*setup_handler)(usbus_t * usbus, struct usbus_handler *handler,
-                         usbus_setuprq_state_t state, usb_setup_t *request);
+    int (*control_handler)(usbus_t * usbus, struct usbus_handler *handler,
+                           usbus_control_request_state_t state,
+                           usb_setup_t *request);
 } usbus_handler_driver_t;
 
 /**

@@ -49,9 +49,7 @@ SLOT_RIOT_ELFS = $(BINDIR_APP)-slot0.elf $(BINDIR_APP)-slot1.elf
 # ensure both slot elf files are always linked
 # this ensures that both "make test" and "make test-murdock" can rely on them
 # being present without having to trigger re-compilation.
-ifneq (1, $(RIOTNOLINK))
-link: $(SLOT_RIOT_ELFS)
-endif
+BUILD_FILES += $(SLOT_RIOT_ELFS)
 
 # Create binary target with RIOT header
 $(SLOT_RIOT_BINS): %.$(APP_VER).riot.bin: %.hdr %.bin
@@ -84,7 +82,7 @@ riotboot/flash-bootloader: riotboot/bootloader/flash
 riotboot/bootloader/%:
 	$(Q)/usr/bin/env -i \
 		QUIET=$(QUIET)\
-		PATH=$(PATH) BOARD=$(BOARD) \
+		PATH=$(PATH) BOARD=$(BOARD) DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID)\
 			$(MAKE) --no-print-directory -C $(RIOTBOOT_DIR) $*
 
 # Generate a binary file from the bootloader which fills all the
@@ -149,6 +147,11 @@ riotboot/flash: riotboot/flash-slot0 riotboot/flash-bootloader
 # Target 'all' will generate the combined file directly.
 # It also makes 'flash' and 'flash-only' work without specific command.
 FLASHFILE = $(RIOTBOOT_EXTENDED_BIN)
+
+# include suit targets
+ifneq (,$(filter suit_v4, $(USEMODULE)))
+  include $(RIOTMAKE)/suit.v4.inc.mk
+endif
 
 else
 riotboot:

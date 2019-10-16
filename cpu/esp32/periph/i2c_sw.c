@@ -33,6 +33,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
 
@@ -186,12 +187,11 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
-    CHECK_PARAM_RET (dev < I2C_NUMOF, -1)
+    assert(dev < I2C_NUMOF);
 
     mutex_unlock(&_i2c_bus[dev].lock);
-    return 0;
 }
 
 int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t flags)
@@ -225,7 +225,7 @@ int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, 
                 (res = _i2c_write_byte (bus, addr2)) != 0) {
                 /* abort transfer */
                 _i2c_abort (bus, __func__);
-                return res;
+                return -ENXIO;
             }
         }
         else {
@@ -233,7 +233,7 @@ int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, 
             if ((res = _i2c_write_byte (bus, (addr << 1 | I2C_READ))) != 0) {
                 /* abort transfer */
                 _i2c_abort (bus, __func__);
-                return res;
+                return -ENXIO;
             }
         }
     }
@@ -286,7 +286,7 @@ int /* IRAM */ i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_
                 (res = _i2c_write_byte (bus, addr2)) != 0) {
                 /* abort transfer */
                 _i2c_abort (bus, __func__);
-                return res;
+                return -ENXIO;
             }
         }
         else {
@@ -294,7 +294,7 @@ int /* IRAM */ i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_
             if ((res = _i2c_write_byte (bus, addr << 1)) != 0) {
                 /* abort transfer */
                 _i2c_abort (bus, __func__);
-                return res;
+                return -ENXIO;
             }
         }
     }
