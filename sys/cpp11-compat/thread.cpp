@@ -42,7 +42,7 @@ void thread::join() {
   }
   if (joinable()) {
     auto status = thread_getstatus(m_handle);
-    if (status != (int)STATUS_NOT_FOUND && status != STATUS_STOPPED) {
+    if (status != STATUS_NOT_FOUND && status != STATUS_STOPPED) {
       m_data->joining_thread = sched_active_pid;
       thread_sleep();
     }

@@ -364,7 +364,7 @@ volatile thread_t *thread_get(kernel_pid_t pid);
  * @return          status of the thread
  * @return          `STATUS_NOT_FOUND` if pid is unknown
  */
-int thread_getstatus(kernel_pid_t pid);
+thread_status_t thread_getstatus(kernel_pid_t pid);
 
 /**
  * @brief Puts the current thread into sleep mode. Has to be woken up externally.
