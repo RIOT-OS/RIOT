@@ -3,8 +3,7 @@ BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
 # MSP-430 doesn't support C11's atomic functionality yet
-BOARD_BLACKLIST := msb-430 msb-430h pic32-clicker pic32-wifire \
-                   telosb wsn430-v1_3b wsn430-v1_4 z1
+FEATURES_BLACKLIST += arch_msp430
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
                              arduino-mega2560 arduino-nano arduino-uno \
