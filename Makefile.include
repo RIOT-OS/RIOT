@@ -103,7 +103,7 @@ CLEAN = $(filter clean, $(MAKECMDGOALS))
 include $(RIOTMAKE)/utils/variables.mk
 include $(RIOTMAKE)/utils/strings.mk
 
-# get host operating system
+# OS is always needed so use simple variable expansion so only evaluated once
 OS := $(shell uname)
 
 # set python path, e.g. for tests

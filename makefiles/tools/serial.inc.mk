@@ -1,5 +1,4 @@
 # set default port depending on operating system
-OS := $(shell uname)
 ifeq ($(OS),Linux)
   PORT ?= $(call ensure_value,$(PORT_LINUX),No port set)
 else ifeq ($(OS),Darwin)

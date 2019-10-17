@@ -5,7 +5,6 @@ FFLAGS  ?= -p $(PORT) -e -i -w -v -b -R $(FLASHFILE)
 # some arduino boards need to toggle the serial interface a little bit to get
 # them ready for flashing...
 ifneq (,$(BOSSA_ARDUINO_PREFLASH))
-  OS := $(shell uname)
   ifeq ($(OS),Linux)
     STTY_FLAG = -F
   else ifeq ($(OS),Darwin)
