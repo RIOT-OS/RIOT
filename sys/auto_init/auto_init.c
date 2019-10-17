@@ -482,9 +482,9 @@ void auto_init(void)
     extern void auto_init_mpl3115a2(void);
     auto_init_mpl3115a2();
 #endif
-#ifdef MODULE_MPU9150
-    extern void auto_init_mpu9150(void);
-    auto_init_mpu9150();
+#ifdef MODULE_MPU9X50
+    extern void auto_init_mpu9x50(void);
+    auto_init_mpu9x50();
 #endif
 #ifdef MODULE_OPT3001
     extern void auto_init_opt3001(void);
