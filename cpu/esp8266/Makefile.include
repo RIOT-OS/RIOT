@@ -21,6 +21,7 @@ endif
 
 ifneq (, $(filter esp_now esp_wifi, $(USEMODULE)))
     $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
+    CFLAGS += -DSCHED_PRIO_LEVELS=32
     USEMODULE += esp_wifi_any
     USEMODULE += netopt
     USEMODULE += xtimer
@@ -94,8 +95,7 @@ INCLUDES += -I$(ESP8266_SDK_DIR)/components/heap/port/esp8266/include
 INCLUDES += -I$(ESP8266_SDK_DIR)/components/nvs_flash/include
 INCLUDES += -I$(ESP8266_SDK_DIR)/components/spi_flash/include
 
-CFLAGS  += -DESP_OPEN_SDK -DSCHED_PRIO_LEVELS=32 -DDEVELHELP
-CFLAGS  += -D__ESP_FILE__=__FILE__
+CFLAGS  += -D__ESP_FILE__=__FILE__ -DDEVELHELP
 CFLAGS  += -Wno-unused-parameter -Wformat=0
 CFLAGS  += -mlongcalls -mtext-section-literals -fstrict-volatile-bitfields
 CFLAGS  += -fdata-sections -ffunction-sections -fzero-initialized-in-bss
