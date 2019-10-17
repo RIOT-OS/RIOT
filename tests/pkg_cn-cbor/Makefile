@@ -7,6 +7,7 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     arduino-uno \
                     chronos \
                     mega-xplained \
+                    microduino-corerf \
                     msb-430 \
                     msb-430h \
                     telosb \

@@ -9,6 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     hifive1b \
     i-nucleo-lrwan1 \
     mega-xplained \
+    microduino-corerf \
     msb-430 \
     msb-430h \
     nucleo-f030r8 \

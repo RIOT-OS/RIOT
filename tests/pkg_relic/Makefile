@@ -11,6 +11,7 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     hifive1 \
                     hifive1b \
                     mega-xplained \
+                    microduino-corerf \
                     msb-430 \
                     msb-430h \
                     msbiot \

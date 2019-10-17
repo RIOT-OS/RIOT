@@ -21,6 +21,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     maple-mini \
     mega-xplained \
     microbit \
+    microduino-corerf \
     msb-430 \
     msb-430h \
     nrf51dk \

@@ -1,5 +1,6 @@
 BOARD_INSUFFICIENT_MEMORY := \
     arduino-mega2560 \
     mega-xplained \
+    microduino-corerf \
     waspmote-pro \
     #

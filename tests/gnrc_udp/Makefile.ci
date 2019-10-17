@@ -12,6 +12,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     i-nucleo-lrwan1 \
     mega-xplained \
     microbit \
+    microduino-corerf \
     msb-430 \
     msb-430h \
     nrf51dongle \
