@@ -918,10 +918,6 @@ ifneq (,$(filter riotboot_hdr, $(USEMODULE)))
   USEMODULE += riotboot
 endif
 
-ifneq (,$(filter irq_handler,$(USEMODULE)))
-  USEMODULE += event
-endif
-
 ifneq (,$(filter tinydtls_sock_dtls, $(USEMODULE)))
     USEPKG += tinydtls
     USEMODULE += sock_dtls
