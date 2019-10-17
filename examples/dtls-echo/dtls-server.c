@@ -77,7 +77,7 @@ char _dtls_server_stack[THREAD_STACKSIZE_MAIN +
  * DTLS records. Also, it determines if said DTLS record is coming from a new
  * peer or a currently established peer.
  */
-static void dtls_handle_read(dtls_context_t *ctx)
+static int dtls_handle_read(dtls_context_t *ctx)
 {
     static session_t session;
     static uint8_t packet_rcvd[DTLS_MAX_BUF];
@@ -87,25 +87,26 @@ static void dtls_handle_read(dtls_context_t *ctx)
 
     if (!ctx) {
         DEBUG("No DTLS context!\n");
-        return;
+        return 0;
     }
 
     if (!dtls_get_app_data(ctx)) {
         DEBUG("No app_data stored!\n");
-        return;
+        return 0;
     }
 
     dtls_remote_peer_t *remote_peer;
     remote_peer = (dtls_remote_peer_t *)dtls_get_app_data(ctx);
 
-    ssize_t res = sock_udp_recv(remote_peer->sock, packet_rcvd, DTLS_MAX_BUF,
-                                1 * US_PER_SEC, remote_peer->remote);
+    ssize_t res = sock_udp_recv(remote_peer->sock, packet_rcvd,
+                                sizeof(packet_rcvd), 1 * US_PER_SEC,
+                                remote_peer->remote);
 
     if (res <= 0) {
         if ((ENABLE_DEBUG) && (res != -EAGAIN) && (res != -ETIMEDOUT)) {
-            DEBUG("sock_udp_recv unexepcted code error: %i\n", (int)res);
+            DEBUG("sock_udp_recv unexpected code error: %i\n", (int)res);
         }
-        return;
+        return 0;
     }
 
     DEBUG("DBG-Server: Record Rcvd\n");
@@ -120,14 +121,8 @@ static void dtls_handle_read(dtls_context_t *ctx)
         session.ifindex = remote_peer->remote->netif;
     }
 
-    if (memcpy(&session.addr, &remote_peer->remote->addr.ipv6, 16) == NULL) {
-        puts("ERROR: memcpy failed!");
-        return;
-    }
-
-    dtls_handle_message(ctx, &session, packet_rcvd, (int)DTLS_MAX_BUF);
-
-    return;
+    memcpy(&session.addr, &remote_peer->remote->addr.ipv6, sizeof(session.addr));
+    return dtls_handle_message(ctx, &session, packet_rcvd, res);
 }
 
 /* Reception of a DTLS Application data record. */
@@ -357,7 +352,9 @@ void *_dtls_server_wrapper(void *arg)
         }
         else {
             /* Listening for any DTLS recodrd */
-            dtls_handle_read(dtls_context);
+            if (dtls_handle_read(dtls_context) < 0) {
+                printf("Received alert from client\n");
+            }
         }
     }
 
