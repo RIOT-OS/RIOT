@@ -8,6 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     chronos \
     i-nucleo-lrwan1 \
     mega-xplained \
+    microduino-corerf \
     msb-430 \
     msb-430h \
     nrf51dk \

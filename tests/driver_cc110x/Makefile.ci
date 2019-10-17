@@ -8,6 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill \
     i-nucleo-lrwan1 \
     mega-xplained \
+    microduino-corerf \
     nucleo-f031k6 \
     nucleo-f042k6 \
     nucleo-f072rb \

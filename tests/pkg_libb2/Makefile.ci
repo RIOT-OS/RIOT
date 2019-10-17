@@ -5,6 +5,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     chronos \
     mega-xplained \
+    microduino-corerf \
     msb-430 \
     msb-430h \
     nucleo-f031k6 \

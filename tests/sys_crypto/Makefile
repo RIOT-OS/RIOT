@@ -8,6 +8,7 @@ BOARD_BLACKLIST += arduino-nano
 BOARD_BLACKLIST += arduino-uno
 BOARD_BLACKLIST += chronos
 BOARD_BLACKLIST += mega-xplained
+BOARD_BLACKLIST += microduino-corerf
 BOARD_BLACKLIST += msb-430
 BOARD_BLACKLIST += msb-430h
 BOARD_BLACKLIST += telosb

@@ -15,6 +15,7 @@ BOARD_BLACKLIST := \
                    hifive1 \
                    hifive1b \
                    mega-xplained \
+                   microduino-corerf \
                    msb-430 \
                    msb-430h \
                    pic32-clicker \

@@ -69,7 +69,7 @@ extern "C" {
 #define CMD_R_RX_PL_WID         0x60
 #define CMD_W_ACK_PAYLOAD       0xa8
 #define CMD_W_TX_PAYLOAD_NOACK  0xb0
-#define CMD_NOP                 0xff
+#define CMD_NOOP                0xff
 
 #define REGISTER_MASK           0x1F
 /** @} */

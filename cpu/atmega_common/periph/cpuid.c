@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_atmega256rfr2
+ * @ingroup     cpu_atmega_common
  * @{
  *
  * @file
@@ -55,7 +55,7 @@ void cpuid_get(void *id)
             signature_0,        /* 0x1E Atmel manufacturer ID */
             signature_1,        /* 0xA8 Part Number high byte */
             signature_2,        /* 0x02 Part Number low byte */
-            MAN_ID_0,            /* 0x1F Atmel JEDEC manufacturer ID */
+            MAN_ID_0,           /* 0x1F Atmel JEDEC manufacturer ID */
             PART_NUM,           /* 0x94 PART_NUM  Identification */
             VERSION_NUM,        /* 0x02 VERSION_NUM  Identification */
 /* last two bytes can be set to flash page 1. for differentiation of different boards */
@@ -63,14 +63,5 @@ void cpuid_get(void *id)
             usr_sign_1,         /* user signature 1 */
     };
 
-#if defined(ENABLE_DEBUG)
-    DEBUG("CPUID: " );
-    for (uint8_t i=0; i<CPUID_LEN; i++)
-    {
-        DEBUG(" %02x ", addr[i] );
-    }
-    DEBUG("\n" );
-#endif
-
-    memcpy( id , addr, CPUID_LEN);
+    memcpy(id, addr, CPUID_LEN);
 }

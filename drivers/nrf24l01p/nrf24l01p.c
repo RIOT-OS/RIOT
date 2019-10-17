@@ -40,7 +40,7 @@ int nrf24l01p_read_reg(const nrf24l01p_t *dev, char reg, char *answer)
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
     *answer = (char)spi_transfer_reg(dev->spi, dev->cs,
                                      (CMD_R_REGISTER | (REGISTER_MASK & reg)),
-                                     CMD_NOP);
+                                     CMD_NOOP);
     /* Release the bus for other threads. */
     spi_release(dev->spi);
 
@@ -581,7 +581,7 @@ int nrf24l01p_get_status(const nrf24l01p_t *dev)
 
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    status = spi_transfer_byte(dev->spi, dev->cs, false, CMD_NOP);
+    status = spi_transfer_byte(dev->spi, dev->cs, false, CMD_NOOP);
     /* Release the bus for other threads. */
     spi_release(dev->spi);
 
