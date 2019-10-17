@@ -1,0 +1,17 @@
+# configure the terminal program
+PORT_LINUX  ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+BAUD        ?= 57600
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# PROGRAMMER defaults to UM232H which is a FT232H breakout board
+# externally connected using wires
+PROGRAMMER_MICRODUINO_CORERF ?= UM232H
+PROGRAMMER ?= $(PROGRAMMER_MICRODUINO_CORERF)
+
+# We don't use a bootloader
+BOOTLOADER_SIZE ?= 0
+ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+
+include $(RIOTMAKE)/tools/avrdude.inc.mk
+include $(RIOTBOARD)/common/atmega/Makefile.include
