@@ -19,6 +19,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     lsn50 \
     maple-mini \
     mega-xplained \
+    microduino-corerf \
     microbit \
     msb-430 \
     msb-430h \
