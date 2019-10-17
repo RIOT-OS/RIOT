@@ -1,8 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
-                             arduino-uno
-
 # These boards only have a single timer in their periph_conf.h, needs special
 # CFLAGS configuration to build properly
 SINGLE_TIMER_BOARDS = \

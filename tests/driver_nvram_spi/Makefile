@@ -1,8 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano\
-                             arduino-uno
-
 USEMODULE += nvram_spi
 USEMODULE += xtimer
 

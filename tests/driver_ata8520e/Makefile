@@ -1,8 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
-                             arduino-uno
-
 USEMODULE += ata8520e
 USEMODULE += shell
 USEMODULE += shell_commands

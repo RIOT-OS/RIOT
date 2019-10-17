@@ -5,13 +5,6 @@ include ../Makefile.tests_common
 # MSP-430 doesn't support C11's atomic functionality yet
 FEATURES_BLACKLIST += arch_msp430
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
-                             arduino-mega2560 arduino-nano arduino-uno \
-                             i-nucleo-lrwan1 msb-430 msb-430h nucleo-l031k6 \
-                             nucleo-f031k6 nucleo-f042k6 nucleo-l053r8 \
-                             stm32f0discovery stm32l0538-disco telosb \
-                             waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
-
 USEPKG += emb6
 
 USEMODULE += emb6_router

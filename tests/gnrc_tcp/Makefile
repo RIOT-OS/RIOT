@@ -8,17 +8,6 @@ TAP ?= tap0
 MSL_US ?= 1000000
 TIMEOUT_US ?= 3000000
 
-# Mark Boards with insufficient memory
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
-                             arduino-mega2560 arduino-nano arduino-uno \
-                             hifive1 hifive1b i-nucleo-lrwan1 mega-xplained \
-                             msb-430 msb-430h nucleo-f030r8 nucleo-f031k6 \
-                             nucleo-f042k6 nucleo-f070rb nucleo-f072rb \
-                             nucleo-f303k8 nucleo-f334r8 nucleo-l031k6 \
-                             nucleo-l053r8 saml10-xpro saml11-xpro \
-                             stm32f0discovery stm32l0538-disco telosb \
-                             waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
-
 # unsupported by ethos: chronos, hamilton, ruuvitag
 BOARD_BLACKLIST := chronos hamilton ruuvitag thingy52
 

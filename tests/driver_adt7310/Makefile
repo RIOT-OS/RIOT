@@ -1,9 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-mega2560 \
-                             mega-xplained \
-                             waspmote-pro
-
 USEMODULE += adt7310
 USEMODULE += xtimer
 
