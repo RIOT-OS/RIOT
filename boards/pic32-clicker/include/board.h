@@ -32,8 +32,6 @@
 extern "C" {
 #endif
 
-#include "vendor/p32mx470f512h.h"
-
 /**
  * @brief   Set how many increments of the count register per uS
  *          needed by the timer code.
