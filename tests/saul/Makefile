@@ -5,8 +5,4 @@ USEMODULE += saul_default
 
 USEMODULE += xtimer
 
-# Too little flash:
-BOARD_INSUFFICIENT_MEMORY += arduino-duemilanove arduino-leonardo arduino-nano \
-                             arduino-uno
-
 include $(RIOTBASE)/Makefile.include

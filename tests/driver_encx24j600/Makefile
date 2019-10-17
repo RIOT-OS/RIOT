@@ -1,13 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
-                             arduino-mega2560 arduino-nano \
-                             arduino-uno i-nucleo-lrwan1 msb-430 msb-430h \
-                             nucleo-l053r8 nucleo-f031k6 nucleo-f042k6 \
-                             nucleo-l031k6 stm32f0discovery \
-                             stm32l0538-disco telosb \
-                             waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
-
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += encx24j600
 USEMODULE += gnrc_ipv6_router_default

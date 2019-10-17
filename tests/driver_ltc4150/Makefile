@@ -1,7 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY += arduino-duemilanove arduino-leonardo arduino-nano \
-                             arduino-uno
 BOARD ?= msba2
 
 USEMODULE += fmt_table

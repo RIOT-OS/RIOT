@@ -2,9 +2,6 @@ BOARD ?= b-l072z-lrwan1
 
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano\
-                             arduino-uno nucleo-f031k6
-
 USEMODULE += od
 USEMODULE += shell
 USEMODULE += shell_commands

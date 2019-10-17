@@ -1,8 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
-                             arduino-uno
-
 # Modules that will have an impact on the size of the TCB (thread_t):
 #
 # disabled by default, enable on demand:

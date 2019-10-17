@@ -1,11 +1,5 @@
 include ../Makefile.tests_common
 
-# copied from shell test
-BOARD_INSUFFICIENT_MEMORY = arduino-duemilanove \
-                             arduino-leonardo \
-                             arduino-nano \
-                             arduino-uno
-
 USEMODULE += xtimer
 USEMODULE += shell
 
