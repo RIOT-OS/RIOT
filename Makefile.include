@@ -105,7 +105,7 @@ include $(RIOTMAKE)/utils/strings.mk
 
 
 # UNAME is always needed so use simple variable expansion so only evaluated once
-UNAME := $(OS -m)
+UNAME := $(shell uname -m -s)
 OS = $(word 1, $(UNAME))
 OS_ARCH = $(word 2, $(UNAME))
 
