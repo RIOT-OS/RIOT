@@ -74,19 +74,14 @@ static size_t _num_endpoints_alt(usbus_interface_alt_t *alt)
     return num;
 }
 
-static inline size_t call_get_header_len(usbus_t *usbus, usbus_hdr_gen_t *hdr)
-{
-    return hdr->funcs->len_type == USBUS_HDR_LEN_FIXED ?
-           hdr->funcs->len.fixed_len :
-           hdr->funcs->len.get_header_len(usbus, hdr->arg);
-}
-
-static size_t _hdr_gen_size(usbus_t *usbus, usbus_hdr_gen_t *hdr)
+static size_t _gen_descriptor_size(usbus_t *usbus, usbus_descr_gen_t *descr)
 {
     size_t len = 0;
 
-    for (; hdr; hdr = hdr->next) {
-        len += call_get_header_len(usbus, hdr);
+    for (; descr; descr = descr->next) {
+        len += (descr->funcs->len_type == USBUS_DESCR_LEN_FIXED)
+            ? descr->funcs->len.fixed_len
+            : descr->funcs->len.get_descriptor_len(usbus, descr->arg);
     }
     return len;
 }
@@ -97,7 +92,7 @@ static size_t _ep_size(usbus_t *usbus, usbus_endpoint_t *ep)
 
     for (; ep; ep = ep->next) {
         len += sizeof(usb_descriptor_endpoint_t);
-        len += _hdr_gen_size(usbus, ep->hdr_gen);
+        len += _gen_descriptor_size(usbus, ep->descr_gen);
     }
     return len;
 }
@@ -108,73 +103,58 @@ static size_t _alt_size(usbus_t *usbus, usbus_interface_alt_t *alt)
 
     for (; alt; alt = alt->next) {
         len += sizeof(usb_descriptor_interface_t);
-        len += _hdr_gen_size(usbus, alt->hdr_gen);
+        len += _gen_descriptor_size(usbus, alt->descr_gen);
         len += _ep_size(usbus, alt->ep);
     }
     return len;
 }
 
-static size_t _hdrs_config_size(usbus_t *usbus)
+static size_t _gen_config_descriptor_size(usbus_t *usbus)
 {
     size_t len = sizeof(usb_descriptor_configuration_t);
 
-    len += _hdr_gen_size(usbus, usbus->hdr_gen);
+    len += _gen_descriptor_size(usbus, usbus->descr_gen);
     for (usbus_interface_t *iface = usbus->iface;
          iface;
          iface = iface->next) {
         len += sizeof(usb_descriptor_interface_t);
-        len += _hdr_gen_size(usbus, iface->hdr_gen);
+        len += _gen_descriptor_size(usbus, iface->descr_gen);
         len += _ep_size(usbus, iface->ep);
         len += _alt_size(usbus, iface->alts);
     }
     return len;
 }
 
-static inline size_t _get_pre_header(usbus_t *usbus, usbus_hdr_gen_t *hdr)
-{
-    return (hdr->funcs->fmt_pre_descriptor != NULL)
-        ? hdr->funcs->fmt_pre_descriptor(usbus, hdr->arg)
-        : 0;
-}
-
-static inline size_t _get_additional_header(usbus_t *usbus, usbus_hdr_gen_t *hdr)
-{
-    return (hdr->funcs->get_header != NULL)
-        ? hdr->funcs->get_header(usbus, hdr->arg)
-        : 0;
-}
-
-static size_t _hdrs_fmt_pre(usbus_t *usbus, usbus_hdr_gen_t *hdr)
+static size_t _fmt_descriptors_pre(usbus_t *usbus, usbus_descr_gen_t *descr)
 {
     size_t len = 0;
 
-    for (; hdr; hdr = hdr->next) {
-        len += _get_pre_header(usbus, hdr);
+    for (; descr; descr = descr->next) {
+        len += (descr->funcs->fmt_pre_descriptor != NULL)
+            ? descr->funcs->fmt_pre_descriptor(usbus, descr->arg)
+            : 0;
     }
     return len;
 }
 
-static size_t _hdrs_fmt_additional(usbus_t *usbus, usbus_hdr_gen_t *hdr)
+static size_t _fmt_descriptors_post(usbus_t *usbus, usbus_descr_gen_t *descr)
 {
     size_t len = 0;
 
-    for (; hdr; hdr = hdr->next) {
-        len += _get_additional_header(usbus, hdr);
+    for (; descr; descr = descr->next) {
+        len += (descr->funcs->fmt_post_descriptor!= NULL)
+            ? descr->funcs->fmt_post_descriptor(usbus, descr->arg)
+            : 0;
     }
     return len;
 }
 
-static size_t _hdrs_fmt_hdrs(usbus_t *usbus)
-{
-    return _hdrs_fmt_additional(usbus, usbus->hdr_gen);
-}
-
-static size_t _hdrs_fmt_endpoints(usbus_t *usbus, usbus_endpoint_t *ep)
+static size_t _fmt_descriptors_endpoints(usbus_t *usbus, usbus_endpoint_t *ep)
 {
     size_t len = 0;
 
     while (ep) {
-        _hdrs_fmt_pre(usbus, ep->hdr_gen);
+        _fmt_descriptors_pre(usbus, ep->descr_gen);
         usb_descriptor_endpoint_t usb_ep;
         memset(&usb_ep, 0, sizeof(usb_descriptor_endpoint_t));
         usb_ep.length = sizeof(usb_descriptor_endpoint_t);
@@ -188,7 +168,7 @@ static size_t _hdrs_fmt_endpoints(usbus_t *usbus, usbus_endpoint_t *ep)
         usb_ep.interval = ep->interval;
         usbus_control_slicer_put_bytes(usbus, (uint8_t *)&usb_ep,
                                        sizeof(usb_descriptor_endpoint_t));
-        _hdrs_fmt_additional(usbus, ep->hdr_gen);
+        _fmt_descriptors_post(usbus, ep->descr_gen);
         len += usb_ep.length;
         /* iterate to next endpoint */
         ep = ep->next;
@@ -196,7 +176,7 @@ static size_t _hdrs_fmt_endpoints(usbus_t *usbus, usbus_endpoint_t *ep)
     return len;
 }
 
-static void _hdrs_fmt_iface(usbus_interface_t *iface,
+static void _fmt_descriptor_iface(usbus_interface_t *iface,
                             usb_descriptor_interface_t *usb_iface)
 {
     memset(usb_iface, 0, sizeof(usb_descriptor_interface_t));
@@ -208,7 +188,8 @@ static void _hdrs_fmt_iface(usbus_interface_t *iface,
     usb_iface->protocol = iface->protocol;
 }
 
-static size_t _hdrs_fmt_iface_alts(usbus_t *usbus, usbus_interface_t *iface)
+static size_t _fmt_descriptors_iface_alts(usbus_t *usbus,
+                                          usbus_interface_t *iface)
 {
     size_t len = 0;
     uint8_t alts = 1;
@@ -217,27 +198,27 @@ static size_t _hdrs_fmt_iface_alts(usbus_t *usbus, usbus_interface_t *iface)
          alt;
          alt = alt->next) {
         usb_descriptor_interface_t usb_iface;
-        _hdrs_fmt_iface(iface, &usb_iface);
+        _fmt_descriptor_iface(iface, &usb_iface);
         usb_iface.alternate_setting = alts++;
         usb_iface.num_endpoints = _num_endpoints_alt(alt);
         usbus_control_slicer_put_bytes(usbus, (uint8_t *)&usb_iface,
                                        sizeof(usb_descriptor_interface_t));
-        len += _hdrs_fmt_additional(usbus, alt->hdr_gen);
-        len += _hdrs_fmt_endpoints(usbus, alt->ep);
+        len += _fmt_descriptors_post(usbus, alt->descr_gen);
+        len += _fmt_descriptors_endpoints(usbus, alt->ep);
     }
     return len;
 }
 
-static size_t _hdrs_fmt_ifaces(usbus_t *usbus)
+static size_t _fmt_descriptors_ifaces(usbus_t *usbus)
 {
     size_t len = 0;
 
     for (usbus_interface_t *iface = usbus->iface;
          iface;
          iface = iface->next) {
-        len += _hdrs_fmt_pre(usbus, iface->hdr_gen);
+        len += _fmt_descriptors_pre(usbus, iface->descr_gen);
         usb_descriptor_interface_t usb_iface;
-        _hdrs_fmt_iface(iface, &usb_iface);
+        _fmt_descriptor_iface(iface, &usb_iface);
         usb_iface.num_endpoints = _num_endpoints(iface);
         if (iface->descr) {
             usb_iface.idx = iface->descr->idx;
@@ -248,14 +229,14 @@ static size_t _hdrs_fmt_ifaces(usbus_t *usbus)
         usbus_control_slicer_put_bytes(usbus, (uint8_t *)&usb_iface,
                                        sizeof(usb_descriptor_interface_t));
         len += sizeof(usb_descriptor_interface_t);
-        len += _hdrs_fmt_additional(usbus, iface->hdr_gen);
-        len += _hdrs_fmt_endpoints(usbus, iface->ep);
-        len += _hdrs_fmt_iface_alts(usbus, iface);
+        len += _fmt_descriptors_post(usbus, iface->descr_gen);
+        len += _fmt_descriptors_endpoints(usbus, iface->ep);
+        len += _fmt_descriptors_iface_alts(usbus, iface);
     }
     return len;
 }
 
-size_t usbus_fmt_hdr_conf(usbus_t *usbus)
+size_t usbus_fmt_descriptor_conf(usbus_t *usbus)
 {
     size_t len = 0;
     usb_descriptor_configuration_t conf;
@@ -274,15 +255,15 @@ size_t usbus_fmt_hdr_conf(usbus_t *usbus)
     conf.max_power = USB_CONFIG_MAX_POWER / 2;
     conf.num_interfaces = _num_ifaces(usbus);
     len += sizeof(usb_descriptor_configuration_t);
-    conf.total_length = _hdrs_config_size(usbus);
+    conf.total_length = _gen_config_descriptor_size(usbus);
     conf.idx = usbus->config.idx;
     usbus_control_slicer_put_bytes(usbus, (uint8_t *)&conf, sizeof(conf));
-    len += _hdrs_fmt_hdrs(usbus);
-    len += _hdrs_fmt_ifaces(usbus);
+    len += _fmt_descriptors_post(usbus, usbus->descr_gen);
+    len += _fmt_descriptors_ifaces(usbus);
     return len;
 }
 
-size_t usbus_fmt_hdr_dev(usbus_t *usbus)
+size_t usbus_fmt_descriptor_dev(usbus_t *usbus)
 {
     usb_descriptor_device_t desc;
 

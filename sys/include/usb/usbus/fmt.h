@@ -36,7 +36,7 @@ extern "C" {
  *
  * @return      the generated descriptor size in bytes
  */
-size_t usbus_fmt_hdr_conf(usbus_t *usbus);
+size_t usbus_fmt_descriptor_conf(usbus_t *usbus);
 
 /**
  * @brief generator for the USB device descriptor
@@ -45,7 +45,7 @@ size_t usbus_fmt_hdr_conf(usbus_t *usbus);
  *
  * @return      the generated descriptor size in bytes
  */
-size_t usbus_fmt_hdr_dev(usbus_t *usbus);
+size_t usbus_fmt_descriptor_dev(usbus_t *usbus);
 
 #ifdef __cplusplus
 }

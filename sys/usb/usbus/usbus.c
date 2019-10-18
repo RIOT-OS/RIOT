@@ -73,10 +73,10 @@ uint16_t usbus_add_string_descriptor(usbus_t *usbus, usbus_string_t *desc,
     return desc->idx;
 }
 
-void usbus_add_conf_descriptor(usbus_t *usbus, usbus_hdr_gen_t *hdr_gen)
+void usbus_add_conf_descriptor(usbus_t *usbus, usbus_descr_gen_t *descr_gen)
 {
-    hdr_gen->next = usbus->hdr_gen;
-    usbus->hdr_gen = hdr_gen;
+    descr_gen->next = usbus->descr_gen;
+    usbus->descr_gen = descr_gen;
 }
 
 static usbus_handler_t *_ep_to_handler(usbus_t *usbus, usbdev_ep_t *ep)
