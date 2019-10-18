@@ -41,7 +41,7 @@ endif
 
 # regular Makefile
 
-export TARGET_ARCH ?= xtensa-lx106-elf
+export TARGET_ARCH ?= xtensa-esp8266-elf
 
 # ESP8266 pseudomodules
 PSEUDOMODULES += esp_gdb
