@@ -102,13 +102,17 @@ typedef struct {
  * @param[in] netif_hdr     The interface header of the fragment, with
  *                          gnrc_netif_hdr_t::if_pid and its source and
  *                          destination address set.
- * @param[in] frag          The fragment to add.
+ * @param[in] frag          The fragment to add. Will be released by the
+ *                          function.
  * @param[in] offset        The fragment's offset.
  * @param[in] page          Current 6Lo dispatch parsing page.
+ *
+ * @return  The reassembly buffer entry the fragment was added to on success.
+ * @return  NULL on error.
  */
-void gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr,
-                                gnrc_pktsnip_t *frag, size_t offset,
-                                unsigned page);
+gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr,
+                                                     gnrc_pktsnip_t *frag,
+                                                     size_t offset, unsigned page);
 
 /**
  * @brief   Checks if a reassembly buffer entry is unset
@@ -155,24 +159,6 @@ void gnrc_sixlowpan_frag_rb_base_rm(gnrc_sixlowpan_frag_rb_base_t *entry);
  */
 void gnrc_sixlowpan_frag_rb_gc(void);
 
-#if defined(MODULE_GNRC_SIXLOWPAN_FRAG_RB) || defined(DOXYGEN)
-/**
- * @brief   Unsets a reassembly buffer entry (but does not free
- *          rbuf_t::super::pkt)
- *
- * @pre `rbuf != NULL`
- *
- * This functions sets rbuf_t::super::pkt to NULL and removes all rbuf::ints.
- *
- * @param[in] rbuf  A reassembly buffer entry. Must not be NULL.
- */
-static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
-{
-    assert(rbuf != NULL);
-    gnrc_sixlowpan_frag_rb_base_rm(&rbuf->super);
-    rbuf->pkt = NULL;
-}
-
 /**
  * @brief   Checks if a reassembly buffer entry is complete and dispatches it
  *          to the next layer if that is the case
@@ -184,15 +170,42 @@ static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
  * @param[in] netif Original @ref gnrc_netif_hdr_t of the last received frame.
  *                  Used to construct the @ref gnrc_netif_hdr_t of the completed
  *                  datagram. Must not be NULL.
+ *
+ * @return  >0, when the datagram in @p rbuf was complete and dispatched.
+ * @return  0, when the datagram in @p rbuf is not complete.
+ * @return  -1, if the the reassembled datagram was not dispatched. @p rbuf is
+ *          destroyed either way.
  */
-void gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
-                                                   gnrc_netif_hdr_t *netif);
+int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
+                                                  gnrc_netif_hdr_t *netif);
+
+#if defined(MODULE_GNRC_SIXLOWPAN_FRAG_RB) || defined(DOXYGEN)
+/**
+ * @brief   Unsets a reassembly buffer entry (but does not free
+ *          rbuf_t::super::pkt)
+ *
+ * @pre `rbuf != NULL`
+ *
+ * This functions sets rbuf_t::super::pkt to NULL and removes all rbuf::ints.
+ *
+ * @note    Does nothing if module `gnrc_sixlowpan_frag_rb` is not included.
+ *
+ * @param[in] rbuf  A reassembly buffer entry. Must not be NULL.
+ */
+static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
+{
+    assert(rbuf != NULL);
+    gnrc_sixlowpan_frag_rb_base_rm(&rbuf->super);
+    rbuf->pkt = NULL;
+}
 #else
 /* NOPs to be used with gnrc_sixlowpan_iphc if gnrc_sixlowpan_frag_rb is not
  * compiled in */
-#define gnrc_sixlowpan_frag_rb_remove(rbuf)     (void)(rbuf)
-#define gnrc_sixlowpan_frag_rb_dispatch_when_complete(rbuf, netif) \
-    (void)(rbuf); (void)(netif)
+static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
+{
+    (void)rbuf;
+    return;
+}
 #endif
 
 #ifdef __cplusplus

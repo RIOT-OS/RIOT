@@ -256,9 +256,9 @@ static void test_rbuf_add__success_first_fragment(void)
     const gnrc_sixlowpan_frag_rb_t *entry;
 
     TEST_ASSERT_NOT_NULL(pkt);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt,
-                               TEST_FRAGMENT1_OFFSET, TEST_PAGE);
-    entry = _first_non_empty_rbuf();
+    TEST_ASSERT_NOT_NULL((entry = gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt, TEST_FRAGMENT1_OFFSET, TEST_PAGE
+        )));
     /* current_size must be the offset of fragment 2, not the size of
      * fragment 1 (fragment dispatch was removed, IPHC was applied etc.). */
     _test_entry(entry, TEST_FRAGMENT2_OFFSET,
@@ -273,9 +273,9 @@ static void test_rbuf_add__success_subsequent_fragment(void)
     const gnrc_sixlowpan_frag_rb_t *entry;
 
     TEST_ASSERT_NOT_NULL(pkt);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt,
-                               TEST_FRAGMENT2_OFFSET, TEST_PAGE);
-    entry = _first_non_empty_rbuf();
+    TEST_ASSERT_NOT_NULL((entry = gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt, TEST_FRAGMENT2_OFFSET, TEST_PAGE
+        )));
     /* current_size must be the offset of fragment 3, not the size of
      * fragment 2 (fragment dispatch was removed, IPHC was applied etc.). */
     _test_entry(entry, TEST_FRAGMENT3_OFFSET - TEST_FRAGMENT2_OFFSET,
@@ -292,12 +292,13 @@ static void test_rbuf_add__success_duplicate_fragments(void)
     const gnrc_sixlowpan_frag_rb_t *entry;
 
     TEST_ASSERT_NOT_NULL(pkt1);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt1,
-                               TEST_FRAGMENT3_OFFSET, TEST_PAGE);
+    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt1, TEST_FRAGMENT3_OFFSET, TEST_PAGE
+        ));
     TEST_ASSERT_NOT_NULL(pkt2);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt2,
-                               TEST_FRAGMENT3_OFFSET, TEST_PAGE);
-    entry = _first_non_empty_rbuf();
+    TEST_ASSERT_NOT_NULL((entry = gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt2, TEST_FRAGMENT3_OFFSET, TEST_PAGE
+        )));
     /* current_size must be the offset of fragment 4, not the size of
      * fragment 3 (fragment dispatch was removed, IPHC was applied etc.). */
     _test_entry(entry, TEST_FRAGMENT4_OFFSET - TEST_FRAGMENT3_OFFSET,
@@ -316,6 +317,7 @@ static void test_rbuf_add__success_complete(void)
     gnrc_pktsnip_t *pkt4 = gnrc_pktbuf_add(NULL, _fragment4, sizeof(_fragment4),
                                            GNRC_NETTYPE_SIXLOWPAN);
     gnrc_pktsnip_t *datagram;
+    gnrc_sixlowpan_frag_rb_t *entry1, *entry2;
     msg_t msg = { .type = 0U };
     gnrc_netreg_entry_t reg = GNRC_NETREG_ENTRY_INIT_PID(
             GNRC_NETREG_DEMUX_CTX_ALL,
@@ -325,17 +327,36 @@ static void test_rbuf_add__success_complete(void)
     gnrc_netreg_register(TEST_DATAGRAM_NETTYPE, &reg);
     /* Mixing up things. Order decided by fair dice-rolls ;-) */
     TEST_ASSERT_NOT_NULL(pkt2);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt2,
-                               TEST_FRAGMENT2_OFFSET, TEST_PAGE);
+    TEST_ASSERT_NOT_NULL((entry1 = gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt2, TEST_FRAGMENT2_OFFSET, TEST_PAGE
+        )));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_sixlowpan_frag_rb_dispatch_when_complete(
+            entry1, &_test_netif_hdr.hdr
+        ));
     TEST_ASSERT_NOT_NULL(pkt4);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt4,
-                               TEST_FRAGMENT4_OFFSET, TEST_PAGE);
+    TEST_ASSERT_NOT_NULL((entry2 = gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt4, TEST_FRAGMENT4_OFFSET, TEST_PAGE
+        )));
+    TEST_ASSERT(entry1 == entry2);
+    TEST_ASSERT_EQUAL_INT(0, gnrc_sixlowpan_frag_rb_dispatch_when_complete(
+            entry1, &_test_netif_hdr.hdr
+        ));
     TEST_ASSERT_NOT_NULL(pkt1);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt1,
-                               TEST_FRAGMENT1_OFFSET, TEST_PAGE);
+    TEST_ASSERT_NOT_NULL((entry2 = gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt1, TEST_FRAGMENT1_OFFSET, TEST_PAGE
+        )));
+    TEST_ASSERT(entry1 == entry2);
+    TEST_ASSERT_EQUAL_INT(0, gnrc_sixlowpan_frag_rb_dispatch_when_complete(
+            entry1, &_test_netif_hdr.hdr
+        ));
     TEST_ASSERT_NOT_NULL(pkt3);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt3,
-                               TEST_FRAGMENT3_OFFSET, TEST_PAGE);
+    TEST_ASSERT_NOT_NULL((entry2 = gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt3, TEST_FRAGMENT3_OFFSET, TEST_PAGE
+        )));
+    TEST_ASSERT(entry1 == entry2);
+    TEST_ASSERT(0 < gnrc_sixlowpan_frag_rb_dispatch_when_complete(
+            entry1, &_test_netif_hdr.hdr
+        ));
     TEST_ASSERT_MESSAGE(
             xtimer_msg_receive_timeout(&msg, TEST_RECEIVE_TIMEOUT) >= 0,
             "Receiving reassembled datagram timed out"
@@ -362,16 +383,18 @@ static void test_rbuf_add__full_rbuf(void)
         pkt = gnrc_pktbuf_add(NULL, _fragment1, sizeof(_fragment1),
                               GNRC_NETTYPE_SIXLOWPAN);
         TEST_ASSERT_NOT_NULL(pkt);
-        gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt,
-                                   TEST_FRAGMENT1_OFFSET, TEST_PAGE);
+        TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt, TEST_FRAGMENT1_OFFSET, TEST_PAGE
+        ));
         _set_fragment_tag(_fragment1, TEST_TAG + i + 1);
         /* pkt is released in gnrc_sixlowpan_frag_rb_add() */
     }
     pkt = gnrc_pktbuf_add(NULL, _fragment1, sizeof(_fragment1),
                           GNRC_NETTYPE_SIXLOWPAN);
     TEST_ASSERT_NOT_NULL(pkt);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt,
-                               TEST_FRAGMENT1_OFFSET, TEST_PAGE);
+    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt, TEST_FRAGMENT1_OFFSET, TEST_PAGE
+        ));
     rbuf = gnrc_sixlowpan_frag_rb_array();
     for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         const gnrc_sixlowpan_frag_rb_t *entry = &rbuf[i];
@@ -404,8 +427,9 @@ static void test_rbuf_add__too_big_fragment(void)
                                           GNRC_NETTYPE_SIXLOWPAN);
 
     TEST_ASSERT_NOT_NULL(pkt);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt,
-                               TEST_FRAGMENT1_OFFSET, TEST_PAGE);
+    TEST_ASSERT_NULL(gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt, TEST_FRAGMENT1_OFFSET, TEST_PAGE
+        ));
     /* packet buffer is empty*/
     TEST_ASSERT_NULL(_first_non_empty_rbuf());
     _check_pktbuf(NULL);
@@ -424,11 +448,13 @@ static void test_rbuf_add__overlap_lhs(void)
     pkt2 = gnrc_pktbuf_add(NULL, _fragment2, sizeof(_fragment2),
                            GNRC_NETTYPE_SIXLOWPAN);
     TEST_ASSERT_NOT_NULL(pkt1);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt1,
-                               TEST_FRAGMENT1_OFFSET, TEST_PAGE);
+    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt1, TEST_FRAGMENT1_OFFSET, TEST_PAGE
+        ));
     TEST_ASSERT_NOT_NULL(pkt2);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt2, pkt2_offset,
-                               TEST_PAGE);
+    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt2, pkt2_offset, TEST_PAGE
+        ));
     rbuf = gnrc_sixlowpan_frag_rb_array();
     for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         const gnrc_sixlowpan_frag_rb_t *entry = &rbuf[i];
@@ -467,14 +493,17 @@ static void test_rbuf_add__overlap_rhs(void)
     pkt2 = gnrc_pktbuf_add(NULL, _fragment2, sizeof(_fragment2),
                            GNRC_NETTYPE_SIXLOWPAN);
     TEST_ASSERT_NOT_NULL(pkt1);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt1,
-                               TEST_FRAGMENT1_OFFSET, TEST_PAGE);
+    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt1, TEST_FRAGMENT1_OFFSET, TEST_PAGE
+        ));
     TEST_ASSERT_NOT_NULL(pkt3);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt3,
-                               TEST_FRAGMENT3_OFFSET, TEST_PAGE);
+    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt3, TEST_FRAGMENT3_OFFSET, TEST_PAGE
+        ));
     TEST_ASSERT_NOT_NULL(pkt2);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt2, pkt2_offset,
-                               TEST_PAGE);
+    TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt2, pkt2_offset, TEST_PAGE
+        ));
     rbuf = gnrc_sixlowpan_frag_rb_array();
     for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         const gnrc_sixlowpan_frag_rb_t *entry = &rbuf[i];
@@ -521,10 +550,9 @@ static void test_rbuf_gc__manually(void)
     gnrc_sixlowpan_frag_rb_t *entry;
 
     TEST_ASSERT_NOT_NULL(pkt);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt,
-                               TEST_FRAGMENT1_OFFSET, TEST_PAGE);
-    /* discarding const qualifier intentionally to override `arrival` */
-    entry = (gnrc_sixlowpan_frag_rb_t *)_first_non_empty_rbuf();
+    TEST_ASSERT_NOT_NULL((entry = gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt, TEST_FRAGMENT1_OFFSET, TEST_PAGE
+        )));
     TEST_ASSERT_NOT_NULL(entry);
     /* set arrival GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US into the past */
     entry->super.arrival -= GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US;
@@ -542,10 +570,9 @@ static void test_rbuf_gc__timed(void)
     gnrc_sixlowpan_frag_rb_t *entry;
 
     TEST_ASSERT_NOT_NULL(pkt);
-    gnrc_sixlowpan_frag_rb_add(&_test_netif_hdr.hdr, pkt,
-                               TEST_FRAGMENT1_OFFSET, TEST_PAGE);
-    /* discarding const qualifier intentionally to override `arrival` */
-    entry = (gnrc_sixlowpan_frag_rb_t *)_first_non_empty_rbuf();
+    TEST_ASSERT_NOT_NULL((entry = gnrc_sixlowpan_frag_rb_add(
+            &_test_netif_hdr.hdr, pkt, TEST_FRAGMENT1_OFFSET, TEST_PAGE
+        )));
     TEST_ASSERT_NOT_NULL(entry);
     TEST_ASSERT_MESSAGE(
             xtimer_msg_receive_timeout(&msg, TEST_GC_TIMEOUT) >= 0,

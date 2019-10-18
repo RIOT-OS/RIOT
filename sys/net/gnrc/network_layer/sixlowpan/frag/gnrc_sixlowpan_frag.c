@@ -339,8 +339,10 @@ error:
 
 void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
 {
-    gnrc_netif_hdr_t *hdr = pkt->next->data;
+    gnrc_pktsnip_t *netif_hdr = pkt->next;
+    gnrc_netif_hdr_t *hdr = netif_hdr->data;
     sixlowpan_frag_t *frag = pkt->data;
+    gnrc_sixlowpan_frag_rb_t *rbe;
     uint16_t offset = 0;
 
     (void)ctx;
@@ -359,7 +361,14 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
             return;
     }
 
-    gnrc_sixlowpan_frag_rb_add(hdr, pkt, offset, page);
+    gnrc_pktbuf_hold(netif_hdr, 1); /* hold netif header to use it with
+                                     * dispatch_when_complete()
+                                     * (rb_add() releases `pkt`) */
+    rbe = gnrc_sixlowpan_frag_rb_add(hdr, pkt, offset, page);
+    if (rbe != NULL) {
+        gnrc_sixlowpan_frag_rb_dispatch_when_complete(rbe, hdr);
+    }
+    gnrc_pktbuf_release(netif_hdr);
 }
 
 uint16_t gnrc_sixlowpan_frag_next_tag(void)
