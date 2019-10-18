@@ -55,7 +55,7 @@ static gnrc_sixlowpan_frag_rb_t rbuf[GNRC_SIXLOWPAN_FRAG_RBUF_SIZE];
 static char l2addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
 
 static xtimer_t _gc_timer;
-static msg_t _gc_timer_msg = { .type = GNRC_SIXLOWPAN_MSG_FRAG_GC_RBUF };
+static msg_t _gc_timer_msg = { .type = GNRC_SIXLOWPAN_FRAG_RB_GC_MSG };
 
 /* ------------------------------------
  * internal function definitions

@@ -348,7 +348,9 @@ static void *_event_loop(void *args)
                 DEBUG("6lo: send fragmented event received\n");
                 gnrc_sixlowpan_frag_send(NULL, msg.content.ptr, 0);
                 break;
-            case GNRC_SIXLOWPAN_MSG_FRAG_GC_RBUF:
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_RB
+            case GNRC_SIXLOWPAN_FRAG_RB_GC_MSG:
                 DEBUG("6lo: garbage collect reassembly buffer event received\n");
                 gnrc_sixlowpan_frag_rb_gc();
                 break;

@@ -51,11 +51,6 @@ extern "C" {
  * @brief   Message type for passing one 6LoWPAN fragment down the network stack
  */
 #define GNRC_SIXLOWPAN_MSG_FRAG_SND         (0x0225)
-
-/**
- * @brief   Message type for triggering garbage collection reassembly buffer
- */
-#define GNRC_SIXLOWPAN_MSG_FRAG_GC_RBUF     (0x0226)
 /** @} */
 
 /**

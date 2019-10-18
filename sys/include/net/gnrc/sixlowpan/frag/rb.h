@@ -31,6 +31,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+/**
+ * @brief   Message type for triggering garbage collection reassembly buffer
+ */
+#define GNRC_SIXLOWPAN_FRAG_RB_GC_MSG       (0x0226)
 
 /**
  * @brief   Fragment intervals to identify limits of fragments and duplicates.
