@@ -188,6 +188,8 @@ int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf
  *
  * This functions sets rbuf_t::super::pkt to NULL and removes all rbuf::ints.
  *
+ * @note    Does nothing if module `gnrc_sixlowpan_frag_rb` is not included.
+ *
  * @param[in] rbuf  A reassembly buffer entry. Must not be NULL.
  */
 static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
