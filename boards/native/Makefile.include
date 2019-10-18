@@ -5,7 +5,7 @@ export NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 
 USEMODULE += native-drivers
 
-ifeq ($(shell uname -s),Darwin)
+ifeq ($(OS),Darwin)
   DEBUGGER ?= lldb
 else
   DEBUGGER ?= gdb
@@ -27,18 +27,18 @@ ifeq (,$(filter -std=%, $(CFLAGS)))
   CFLAGS += -std=gnu99
 endif
 
-ifeq ($(shell uname -m),x86_64)
+ifeq ($(OS_ARCH),x86_64)
   CFLAGS += -m32
 endif
 ifneq (,$(filter -DDEVELHELP,$(CFLAGS)))
   CFLAGS += -fstack-protector-all
 endif
-ifeq ($(shell uname -s),FreeBSD)
-  ifeq ($(shell uname -m),amd64)
+ifeq ($(OS),FreeBSD)
+  ifeq ($(OS_ARCH),amd64)
     CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
   endif
 endif
-ifeq ($(shell uname -s),Darwin)
+ifeq ($(OS),Darwin)
   CFLAGS += -Wno-deprecated-declarations
 endif
 
@@ -46,11 +46,11 @@ endif
 CXXUWFLAGS +=
 CXXEXFLAGS +=
 
-ifeq ($(shell uname -m),x86_64)
+ifeq ($(OS_ARCH),x86_64)
   export LINKFLAGS += -m32
 endif
-ifeq ($(shell uname -s),FreeBSD)
-  ifeq ($(shell uname -m),amd64)
+ifeq ($(OS),FreeBSD)
+  ifeq ($(OS_ARCH),amd64)
     export LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
   endif
   export LINKFLAGS += -L $(BINDIR)
@@ -60,7 +60,7 @@ endif
 
 # clean up unused functions
 CFLAGS += -ffunction-sections -fdata-sections
-ifeq ($(shell uname -s),Darwin)
+ifeq ($(OS),Darwin)
   export LINKFLAGS += -Wl,-dead_strip
 else
   export LINKFLAGS += -Wl,--gc-sections
@@ -113,7 +113,7 @@ endif
 
 # backward compatability with glibc <= 2.17 for native
 ifeq ($(CPU),native)
-  ifeq ($(shell uname -s),Linux)
+  ifeq ($(OS),Linux)
     ifeq ($(shell ldd --version |  awk '/^ldd/{if ($$NF < 2.17) {print "yes"} else {print "no"} }'),yes)
 	  LINKFLAGS += -lrt
     endif
@@ -123,7 +123,7 @@ endif
 # clumsy way to enable building native on osx:
 BUILDOSXNATIVE = 0
 ifeq ($(CPU),native)
-  ifeq ($(shell uname -s),Darwin)
+  ifeq ($(OS),Darwin)
     BUILDOSXNATIVE = 1
   endif
 endif

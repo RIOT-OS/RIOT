@@ -6,7 +6,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 export PROGRAMMER ?= cc2538-bsl
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
-  OS := $(shell uname)
   ifeq ($(OS),Linux)
     PORT_BSL ?= $(PORT_LINUX)
   else ifeq ($(OS),Darwin)

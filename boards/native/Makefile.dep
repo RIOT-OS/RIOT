@@ -7,7 +7,7 @@ ifneq (,$(filter mtd,$(USEMODULE)))
 endif
 
 ifneq (,$(filter can,$(USEMODULE)))
-  ifeq ($(shell uname -s),Linux)
+  ifeq ($(OS),Linux)
     USEMODULE += can_linux
     CFLAGS += -DCAN_DLL_NUMOF=2
   endif

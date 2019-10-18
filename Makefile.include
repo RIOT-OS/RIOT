@@ -103,8 +103,11 @@ CLEAN = $(filter clean, $(MAKECMDGOALS))
 include $(RIOTMAKE)/utils/variables.mk
 include $(RIOTMAKE)/utils/strings.mk
 
-# get host operating system
-OS := $(shell uname)
+
+# UNAME is always needed so use simple variable expansion so only evaluated once
+UNAME := $(shell uname -m -s)
+OS = $(word 1, $(UNAME))
+OS_ARCH = $(word 2, $(UNAME))
 
 # set python path, e.g. for tests
 PYTHONPATH := $(RIOTBASE)/dist/pythonlibs/:$(PYTHONPATH)
