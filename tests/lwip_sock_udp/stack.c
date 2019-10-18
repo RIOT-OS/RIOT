@@ -176,7 +176,7 @@ void _net_init(void)
     ip6_addr_t local6;
     s8_t idx;
 
-    memcpy(&local6.addr, local6_a, sizeof(local6));
+    memcpy(&local6.addr, local6_a, sizeof(local6.addr));
     ip6_addr_clear_zone(&local6);
     netif_add_ip6_address(&netif, &local6, &idx);
     for (int i = 0; i <= idx; i++) {
@@ -213,7 +213,7 @@ void _prepare_send_checks(void)
         struct nd6_neighbor_cache_entry *nc = &neighbor_cache[i];
         if (nc->state == ND6_NO_ENTRY) {
             nc->state = ND6_REACHABLE;
-            memcpy(&nc->next_hop_address, remote6, sizeof(ip6_addr_t));
+            memcpy(&nc->next_hop_address.addr, remote6, sizeof(nc->next_hop_address.addr));
             ip6_addr_assign_zone(&nc->next_hop_address,
                                  IP6_UNICAST, &netif);
             memcpy(&nc->lladdr, mac, 6);
