@@ -1,3 +1,6 @@
+# tell the build system to build the atmega common files
+USEMODULE += atmega_common
+
 # expand atmega_pcint module
 ifneq (,$(filter atmega_pcint,$(USEMODULE)))
   USEMODULE += atmega_pcint0

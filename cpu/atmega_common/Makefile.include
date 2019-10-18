@@ -9,31 +9,4 @@ USEMODULE += avr_libc_extra
 PSEUDOMODULES += atmega_pcint
 PSEUDOMODULES += atmega_pcint%
 
-# expand atmega_pcint module
-# atmega16u4 only features atmega_pcint0, therefore additional pseudomodules
-# are activated in each CPU's Makefile.include
-ifneq (,$(filter atmega_pcint,$(USEMODULE)))
-  USEMODULE += atmega_pcint0
-endif
-
-# feature for atmega_pcint0 module
-ifneq (,$(filter atmega_pcint0,$(USEMODULE)))
-  FEATURES_REQUIRED += atmega_pcint0
-endif
-
-# feature for atmega_pcint1 module
-ifneq (,$(filter atmega_pcint1,$(USEMODULE)))
-  FEATURES_REQUIRED += atmega_pcint1
-endif
-
-# feature for atmega_pcint2 module
-ifneq (,$(filter atmega_pcint2,$(USEMODULE)))
-  FEATURES_REQUIRED += atmega_pcint2
-endif
-
-# feature for atmega_pcint3 module
-ifneq (,$(filter atmega_pcint3,$(USEMODULE)))
-  FEATURES_REQUIRED += atmega_pcint3
-endif
-
 include $(RIOTMAKE)/arch/atmega.inc.mk
