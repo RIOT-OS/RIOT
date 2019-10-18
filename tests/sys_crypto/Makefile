@@ -6,6 +6,7 @@ BOARD_BLACKLIST += arduino-leonardo
 BOARD_BLACKLIST += arduino-mega2560
 BOARD_BLACKLIST += arduino-nano
 BOARD_BLACKLIST += arduino-uno
+BOARD_BLACKLIST += atmega328p
 BOARD_BLACKLIST += chronos
 BOARD_BLACKLIST += mega-xplained
 BOARD_BLACKLIST += microduino-corerf

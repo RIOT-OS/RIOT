@@ -1,8 +1,8 @@
 include ../Makefile.tests_common
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
-                   arduino-mega2560 arduino-nano \
-                   arduino-uno mega-xplained microduino-corerf waspmote-pro
+                   arduino-mega2560 arduino-nano arduino-uno \
+                   atmega328p mega-xplained microduino-corerf waspmote-pro
 # arduino-mega2560: builds locally but breaks travis (possibly because of
 # differences in the toolchain)
 # The MSP boards don't feature round(), exp(), and log(), which are used in the unittests
