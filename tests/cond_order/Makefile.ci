@@ -3,6 +3,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-leonardo \
     arduino-nano \
     arduino-uno \
+    atmega328p \
     i-nucleo-lrwan1 \
     nucleo-f030 \
     nucleo-f030r8 \
