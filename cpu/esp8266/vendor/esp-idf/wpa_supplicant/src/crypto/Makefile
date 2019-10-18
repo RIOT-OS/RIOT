@@ -6,8 +6,8 @@ include $(RIOTBASE)/Makefile.base
 # is found first
 INCLUDES  = -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/wpa_supplicant/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/wpa_supplicant/port/include
-INCLUDES += -I$(ESP8266_SDK_DIR)/components/wpa_supplicant/include
-INCLUDES += -I$(ESP8266_SDK_DIR)/components/wpa_supplicant/port/include
+INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/wpa_supplicant/include
+INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/wpa_supplicant/port/include
 CFLAGS += -D__ets__ -DESPRESSIF_USE -DESP_PLATFORM=1
 CFLAGS += -Wno-strict-aliasing
 

@@ -334,10 +334,10 @@ necessary changes.
 SDK does not need to be compiled in any way.
 
 To use the installed ESP8266 RTOS SDK, set the environment variable
-`ESP8266_SDK_DIR`.
+`ESP8266_RTOS_SDK_DIR`.
 
 ```
-export ESP8266_SDK_DIR=$HOME/esp/ESP8266_RTOS_SDK
+export ESP8266_RTOS_SDK_DIR=$HOME/esp/ESP8266_RTOS_SDK
 ```
 
 
@@ -393,7 +393,7 @@ correctly to
 
 ```
 export PATH=/path/to/esp/esptool-esp8266-rtos-sdk-v3:/path/to/esp/xtensa-lx106-elf/bin:$PATH
-export ESP8266_SDK_DIR=/path/to/esp/ESP8266_RTOS_SDK
+export ESP8266_RTOS_SDK_DIR=/path/to/esp/ESP8266_RTOS_SDK
 ```
 
 ## <a name="esp8266_compile_options"> Compile Options </a> &nbsp;[[TOC](#esp8266_toc)]
