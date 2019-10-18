@@ -65,7 +65,7 @@ extern "C" {
  * @brief   Size of the reassembly buffer
  *
  * @note    Only applicable with
- *          [gnrc_sixlowpan_frag](@ref net_gnrc_sixlowpan_frag) module
+ *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
  */
 #ifndef GNRC_SIXLOWPAN_FRAG_RBUF_SIZE
 #define GNRC_SIXLOWPAN_FRAG_RBUF_SIZE       (4U)
@@ -75,7 +75,7 @@ extern "C" {
  * @brief   Timeout for reassembly buffer entries in microseconds
  *
  * @note    Only applicable with
- *          [gnrc_sixlowpan_frag](@ref net_gnrc_sixlowpan_frag) module
+ *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
  */
 #ifndef GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US
 #define GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US (3U * US_PER_SEC)
@@ -85,7 +85,7 @@ extern "C" {
  * @brief   Aggressively override reassembly buffer when full
  *
  * @note    Only applicable with
- *          [gnrc_sixlowpan_frag](@ref net_gnrc_sixlowpan_frag) module
+ *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
  *
  * When set to a non-zero value this will cause the reassembly buffer to
  * override the oldest entry no matter what. When set to zero only the oldest
