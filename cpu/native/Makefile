@@ -3,7 +3,8 @@ MODULE = cpu
 DIRS += periph
 DIRS += vfs
 
-ifeq ($(shell uname -s),Darwin)
+OS := $(shell uname -s)
+ifeq ($(OS),Darwin)
   CFLAGS += -D_XOPEN_SOURCE=600 -D_DARWIN_C_SOURCE
 endif
 
