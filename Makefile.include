@@ -280,6 +280,10 @@ export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
 # be done in makefile.iotlab.single.inc.mk which is included after.
 ifneq (,$(IOTLAB_NODE))
   PROGRAMMER ?= iotlab
+  # iotlab uses ELFFILE by default for flashing boards, except for WSN430.
+  ifeq (,$(filter wsn430-%,$(BOARD)))
+    FLASHFILE ?= $(ELFFILE)
+  endif
 endif
 
 # Add standard include directories
@@ -438,6 +442,11 @@ include $(RIOTMAKE)/modules.inc.mk
 # https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
 # https://www.gnu.org/software/make/manual/html_node/Force-Targets.html
 .PHONY: FORCE
+
+ifneq (,$(IOTLAB_NODE))
+  # iot-lab serial and flasher
+  include $(RIOTBASE)/dist/testbed-support/makefile.iotlab.single.inc.mk
+endif
 
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
@@ -796,10 +805,6 @@ ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
   ifneq (,$(filter iotlab-%,$(MAKECMDGOALS)))
     include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
   endif
-endif
-ifneq (,$(IOTLAB_NODE))
-  # iot-lab serial and flasher
-  include $(RIOTBASE)/dist/testbed-support/makefile.iotlab.single.inc.mk
 endif
 
 # Include desvirt Makefile
