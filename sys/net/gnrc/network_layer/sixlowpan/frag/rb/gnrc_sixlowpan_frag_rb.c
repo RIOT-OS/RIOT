@@ -126,6 +126,13 @@ gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr
 {
     int res;
     if ((res = _rbuf_add(netif_hdr, pkt, offset, page)) == RBUF_ADD_REPEAT) {
+        /* there was an overlap with existing fragments detected when trying to
+         * add the new fragment.
+         * https://tools.ietf.org/html/rfc4944#section-5.3 states "A fresh
+         * reassembly may be commenced with the most recently received link
+         * fragment.", so let's do that. Since the reassembly buffer entry was
+         * deleted another overlap should not be detected (so _rbuf_add() won't
+         * return RBUF_ADD_REPEAT again) */
         res = _rbuf_add(netif_hdr, pkt, offset, page);
     }
     return (res < 0) ? NULL : &rbuf[res];
