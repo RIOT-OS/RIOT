@@ -512,7 +512,11 @@ ESP32 integrates two 12-bit ADCs (ADC1 and ADC2) capable of measuring up to 18 a
 
 These GPIOs are realized by the RTC unit and are therefore also called RTC GPIOs or RTCIO GPIOs.
 
-@note GPIO37 and GPIO38 are usually not broken out on ESP32 boards and are therefore not usable.
+@note
+- GPIO37 and GPIO38 are usually not broken out on ESP32 boards and can not be
+  used therefore.
+- ADC2 is used by the WiFi module. The GPIOs connected to ADC2 are therefore not
+  available as ADC channels if the modules `esp_wifi` or `esp_now` are used.
 
 The GPIOs that can be used as ADC channels for a given board are defined by the <b>```ADC_GPIOS```</b> macro in the board-specific peripheral configuration. This configuration can be changed by [application-specific configurations](#esp32_application_specific_configurations).
 
