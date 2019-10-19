@@ -39,10 +39,10 @@ static mutex_t _mutex = MUTEX_INIT;
 
 static can_pkt_t _pkt_buf[CAN_PKT_BUF_SIZE];
 static memarray_t _pkt_array;
-static_assert(sizeof(can_pkt_t) >= sizeof(can_rx_data_t), "sizeof(can_rx_data_t) must be at most sizeof(can_pkt_t)");
 
 void can_pkt_init(void)
 {
+    static_assert(sizeof(can_pkt_t) >= sizeof(can_rx_data_t), "sizeof(can_rx_data_t) must be at most sizeof(can_pkt_t)");
     mutex_lock(&_mutex);
     handle = 1;
     memarray_init(&_pkt_array, _pkt_buf, sizeof(can_pkt_t), CAN_PKT_BUF_SIZE);
