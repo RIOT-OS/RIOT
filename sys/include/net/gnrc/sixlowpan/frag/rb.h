@@ -115,6 +115,45 @@ gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr
                                                      size_t offset, unsigned page);
 
 /**
+ * @brief   Checks if a reassembly buffer entry with a given link-layer address
+ *          pair and tag exists
+ *
+ * @pre     `netif_hdr != NULL`
+ *
+ * @param[in] netif_hdr An interface header to provide the (source, destination)
+ *                      link-layer address pair. Must not be NULL.
+ * @param[in] tag       Tag to search for.
+ *
+ * @note    datagram_size is not a search parameter as the primary use case
+ *          for this function is [Selective Fragment Recovery]
+ *          (https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-05)
+ *          where this information only exists in the first fragment.
+ *
+ * @return  true, if an entry with the given tuple exist.
+ * @return  false, if no entry with the given tuple exist.
+ */
+bool gnrc_sixlowpan_frag_rb_exists(const gnrc_netif_hdr_t *netif_hdr,
+                                   uint16_t tag);
+
+/**
+ * @brief   Removes a reassembly buffer entry with a given link-layer address
+ *          pair and tag
+ *
+ * @pre     `netif_hdr != NULL`
+ *
+ * @param[in] netif_hdr An interface header to provide the (source, destination)
+ *                      link-layer address pair. Must not be NULL.
+ * @param[in] tag       Tag to search for.
+ *
+ * @note    datagram_size is not a search parameter as the primary use case
+ *          for this function is [Selective Fragment Recovery]
+ *          (https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-05)
+ *          where this information only exists in the first fragment.
+ */
+void gnrc_sixlowpan_frag_rb_rm_by_datagram(const gnrc_netif_hdr_t *netif_hdr,
+                                           uint16_t tag);
+
+/**
  * @brief   Checks if a reassembly buffer entry is unset
  *
  * @param[in] rbuf  A reassembly buffer entry

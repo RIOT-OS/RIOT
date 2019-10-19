@@ -417,7 +417,7 @@ static void test_rbuf_add__full_rbuf(void)
 static void test_rbuf_add__too_big_fragment(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, _fragment1,
-                                          /* something definetely bigger than
+                                          /* something definitely bigger than
                                            * the datagram size noted in
                                            * _fragment1, can't just be + 1,
                                            * since fragment dispatch and other
@@ -527,6 +527,22 @@ static void test_rbuf_add__overlap_rhs(void)
     _check_pktbuf(NULL);
 }
 
+static void test_rbuf_exists(void)
+{
+    TEST_ASSERT(!gnrc_sixlowpan_frag_rb_exists(&_test_netif_hdr.hdr, TEST_TAG));
+    /* add a fragment */
+    test_rbuf_add__success_first_fragment();
+    TEST_ASSERT(gnrc_sixlowpan_frag_rb_exists(&_test_netif_hdr.hdr, TEST_TAG));
+}
+
+static void test_rbuf_rm_by_dg(void)
+{
+    /* add a fragment */
+    test_rbuf_add__success_first_fragment();
+    gnrc_sixlowpan_frag_rb_rm_by_datagram(&_test_netif_hdr.hdr, TEST_TAG);
+    TEST_ASSERT(!gnrc_sixlowpan_frag_rb_exists(&_test_netif_hdr.hdr, TEST_TAG));
+}
+
 static void test_rbuf_rm(void)
 {
     const gnrc_sixlowpan_frag_rb_t *entry;
@@ -596,6 +612,8 @@ static void run_unittests(void)
         new_TestFixture(test_rbuf_add__too_big_fragment),
         new_TestFixture(test_rbuf_add__overlap_lhs),
         new_TestFixture(test_rbuf_add__overlap_rhs),
+        new_TestFixture(test_rbuf_exists),
+        new_TestFixture(test_rbuf_rm_by_dg),
         new_TestFixture(test_rbuf_rm),
         new_TestFixture(test_rbuf_gc__manually),
         new_TestFixture(test_rbuf_gc__timed),

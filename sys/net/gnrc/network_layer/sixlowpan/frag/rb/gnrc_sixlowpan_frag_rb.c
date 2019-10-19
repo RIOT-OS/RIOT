@@ -68,11 +68,14 @@ static gnrc_sixlowpan_frag_rb_int_t *_rbuf_int_get_free(void);
 /* update interval buffer of entry */
 static bool _rbuf_update_ints(gnrc_sixlowpan_frag_rb_base_t *entry,
                               uint16_t offset, size_t frag_size);
-/* gets an entry identified by its tupel */
+/* gets an entry identified by its tuple */
 static int _rbuf_get(const void *src, size_t src_len,
                      const void *dst, size_t dst_len,
                      size_t size, uint16_t tag,
                      unsigned page);
+/* gets an entry only by link-layer information and tag */
+static gnrc_sixlowpan_frag_rb_t *_rbuf_get_by_tag(const gnrc_netif_hdr_t *netif_hdr,
+                                                  uint16_t tag);
 /* internal add to repeat add when fragments overlapped */
 static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                      size_t offset, unsigned page);
@@ -136,6 +139,47 @@ gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr
         res = _rbuf_add(netif_hdr, pkt, offset, page);
     }
     return (res < 0) ? NULL : &rbuf[res];
+}
+
+
+
+bool gnrc_sixlowpan_frag_rb_exists(const gnrc_netif_hdr_t *netif_hdr,
+                                   uint16_t tag)
+{
+    return (_rbuf_get_by_tag(netif_hdr, tag) != NULL);
+}
+
+void gnrc_sixlowpan_frag_rb_rm_by_datagram(const gnrc_netif_hdr_t *netif_hdr,
+                                           uint16_t tag)
+{
+    gnrc_sixlowpan_frag_rb_t *e = _rbuf_get_by_tag(netif_hdr, tag);
+
+    if (e != NULL) {
+        gnrc_sixlowpan_frag_rb_remove(e);
+    }
+}
+
+static gnrc_sixlowpan_frag_rb_t *_rbuf_get_by_tag(const gnrc_netif_hdr_t *netif_hdr,
+                                                  uint16_t tag)
+{
+    assert(netif_hdr != NULL);
+    const uint8_t *src = gnrc_netif_hdr_get_src_addr(netif_hdr);
+    const uint8_t *dst = gnrc_netif_hdr_get_dst_addr(netif_hdr);
+    const uint8_t src_len = netif_hdr->src_l2addr_len;
+    const uint8_t dst_len = netif_hdr->dst_l2addr_len;
+
+    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+        gnrc_sixlowpan_frag_rb_t *e = &rbuf[i];
+
+        if ((e->pkt != NULL) && (e->super.tag == tag) &&
+            (e->super.src_len == src_len) &&
+            (e->super.dst_len == dst_len) &&
+            (memcmp(e->super.src, src, src_len) == 0) &&
+            (memcmp(e->super.dst, dst, dst_len) == 0)) {
+            return e;
+        }
+    }
+    return NULL;
 }
 
 #ifndef NDEBUG
