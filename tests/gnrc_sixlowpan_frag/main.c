@@ -417,7 +417,7 @@ static void test_rbuf_add__full_rbuf(void)
 static void test_rbuf_add__too_big_fragment(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, _fragment1,
-                                          /* something definetely bigger than
+                                          /* something definitely bigger than
                                            * the datagram size noted in
                                            * _fragment1, can't just be + 1,
                                            * since fragment dispatch and other
