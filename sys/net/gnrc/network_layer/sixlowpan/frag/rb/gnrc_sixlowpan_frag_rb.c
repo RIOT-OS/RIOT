@@ -68,7 +68,7 @@ static gnrc_sixlowpan_frag_rb_int_t *_rbuf_int_get_free(void);
 /* update interval buffer of entry */
 static bool _rbuf_update_ints(gnrc_sixlowpan_frag_rb_base_t *entry,
                               uint16_t offset, size_t frag_size);
-/* gets an entry identified by its tupel */
+/* gets an entry identified by its tuple */
 static int _rbuf_get(const void *src, size_t src_len,
                      const void *dst, size_t dst_len,
                      size_t size, uint16_t tag,
