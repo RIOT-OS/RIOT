@@ -3,7 +3,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     b-l072z-lrwan1 \
     blackpill \
     bluepill \
-    bluepill \
     calliope-mini \
     cc2650-launchpad \
     cc2650stk \
@@ -21,9 +20,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f103rb \
     nucleo-f302r8 \
     nucleo-f303k8 \
-    nucleo-f303k8 \
     nucleo-f334r8 \
-    nucleo-l031k6 \
     nucleo-l031k6 \
     nucleo-l053r8 \
     nucleo-l073rz \
@@ -31,6 +28,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     saml10-xpro \
     saml11-xpro \
     spark-core \
+    stm32f030f4-demo \
     stm32f0discovery \
     stm32l0538-disco \
     stm32mindev \
