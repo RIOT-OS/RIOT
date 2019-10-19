@@ -18,11 +18,12 @@
 
 #include "log.h"
 
+#define format "Logging value '%d' and string '%s'\n"
+
 int main(void)
 {
     const uint8_t value = 42;
     const char *string = "test";
-    const char *format = "Logging value '%d' and string '%s'\n";
 
     LOG_ERROR(format, value, string);
     LOG_WARNING(format, value, string);
