@@ -120,6 +120,10 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
 {
     pthread_thread_t *pt = calloc(1, sizeof(pthread_thread_t));
 
+    if (pt == NULL) {
+        return -ENOMEM;
+    }
+
     kernel_pid_t pthread_pid = insert(pt);
     if (pthread_pid == KERNEL_PID_UNDEF) {
         free(pt);
@@ -134,6 +138,12 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     bool autofree = attr == NULL || attr->ss_sp == NULL || attr->ss_size == 0;
     size_t stack_size = attr && attr->ss_size > 0 ? attr->ss_size : PTHREAD_STACKSIZE;
     void *stack = autofree ? malloc(stack_size) : attr->ss_sp;
+
+    if (stack == NULL) {
+        free(pt);
+        return -ENOMEM;
+    }
+
     pt->stack = autofree ? stack : NULL;
 
     if (autofree && pthread_reaper_pid != KERNEL_PID_UNDEF) {
