@@ -110,7 +110,6 @@ unsigned long micros();
  */
 unsigned long millis();
 
-#if MODULE_PERIPH_ADC || DOXYGEN
 /**
  * @brief   Read the current value of the given analog pin
  *
@@ -120,7 +119,6 @@ unsigned long millis();
  * to the voltage applied to the pin
  */
 int analogRead(int pin);
-#endif
 
 #endif /* ARDUINO_H */
 /** @} */
