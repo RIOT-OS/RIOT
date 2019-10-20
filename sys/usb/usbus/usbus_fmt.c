@@ -130,9 +130,28 @@ static size_t _hdrs_config_size(usbus_t *usbus)
     return len;
 }
 
-static inline size_t call_get_header(usbus_t *usbus, usbus_hdr_gen_t *hdr)
+static inline size_t _get_pre_header(usbus_t *usbus, usbus_hdr_gen_t *hdr)
 {
-    return hdr->funcs->get_header(usbus, hdr->arg);
+    return (hdr->funcs->fmt_pre_descriptor != NULL)
+        ? hdr->funcs->fmt_pre_descriptor(usbus, hdr->arg)
+        : 0;
+}
+
+static inline size_t _get_additional_header(usbus_t *usbus, usbus_hdr_gen_t *hdr)
+{
+    return (hdr->funcs->get_header != NULL)
+        ? hdr->funcs->get_header(usbus, hdr->arg)
+        : 0;
+}
+
+static size_t _hdrs_fmt_pre(usbus_t *usbus, usbus_hdr_gen_t *hdr)
+{
+    size_t len = 0;
+
+    for (; hdr; hdr = hdr->next) {
+        len += _get_pre_header(usbus, hdr);
+    }
+    return len;
 }
 
 static size_t _hdrs_fmt_additional(usbus_t *usbus, usbus_hdr_gen_t *hdr)
@@ -140,7 +159,7 @@ static size_t _hdrs_fmt_additional(usbus_t *usbus, usbus_hdr_gen_t *hdr)
     size_t len = 0;
 
     for (; hdr; hdr = hdr->next) {
-        len += call_get_header(usbus, hdr);
+        len += _get_additional_header(usbus, hdr);
     }
     return len;
 }
@@ -155,6 +174,7 @@ static size_t _hdrs_fmt_endpoints(usbus_t *usbus, usbus_endpoint_t *ep)
     size_t len = 0;
 
     while (ep) {
+        _hdrs_fmt_pre(usbus, ep->hdr_gen);
         usb_descriptor_endpoint_t usb_ep;
         memset(&usb_ep, 0, sizeof(usb_descriptor_endpoint_t));
         usb_ep.length = sizeof(usb_descriptor_endpoint_t);
@@ -215,6 +235,7 @@ static size_t _hdrs_fmt_ifaces(usbus_t *usbus)
     for (usbus_interface_t *iface = usbus->iface;
          iface;
          iface = iface->next) {
+        len += _hdrs_fmt_pre(usbus, iface->hdr_gen);
         usb_descriptor_interface_t usb_iface;
         _hdrs_fmt_iface(iface, &usb_iface);
         usb_iface.num_endpoints = _num_endpoints(iface);
