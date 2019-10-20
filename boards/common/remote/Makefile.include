@@ -24,6 +24,12 @@ FLASHFILE ?= $(BINFILE)
 DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
+# remote use cc2538-bsl attaching to the serial PORT to reset the board. If
+# `make reset` is called when the terminal is open it will set the device in
+# bootloader but fail in the next commands, leaving the device in bootloader
+# mode
+MAKE_RESET_WITH_TERM ?= 0
+
 # include common remote includes
 INCLUDES += -I$(RIOTBOARD)/common/remote/include
 
