@@ -29,8 +29,15 @@ else
     RIOT_MASTER="master"
 fi
 
+keyword_filter() {
+    grep -i \
+        -e "^    [0-9a-f]\+ .\{0,2\}SQUASH" \
+        -e "^    [0-9a-f]\+ .\{0,2\}FIX" \
+        -e "^    [0-9a-f]\+ .\{0,2\}REMOVE *ME"
+}
+
 SQUASH_COMMITS="$(git log $(git merge-base HEAD "${RIOT_MASTER}")...HEAD --pretty=format:"    %h %s" | \
-                  grep -i -e "^    [0-9a-f]\+ .\{0,2\}SQUASH" -e "^    [0-9a-f]\+ .\{0,2\}FIX")"
+                  keyword_filter)"
 
 if [ -n "${SQUASH_COMMITS}" ]; then
     echo -e "${CERROR}Pull request needs squashing:${CRESET}" 1>&2
