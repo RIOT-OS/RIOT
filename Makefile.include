@@ -700,6 +700,12 @@ TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*[^~]),\
 # See #11762.
 TEST_DEPS += $(TERMDEPS)
 
+# Export TESTRUNNER_RESET_AFTER_TERM only for the test target. This allows for
+# it to be accessed through the environment from python test script.
+# This is currently needed only by `examples/%/tests` and should be removed in
+# the future since `make reset` after `term` is not a valid synch method across
+# all platforms.
+$(call target-export-variables,test,TESTRUNNER_RESET_AFTER_TERM)
 test: $(TEST_DEPS)
 	$(Q) for t in $(TESTS); do \
 		$$t || exit 1; \
