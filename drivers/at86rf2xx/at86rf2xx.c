@@ -42,13 +42,49 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     netdev_t *netdev = (netdev_t *)dev;
 
     netdev->driver = &at86rf2xx_driver;
-    /* initialize device descriptor */
-    dev->params = *params;
     /* State to return after receiving or transmitting */
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
     /* radio state is P_ON when first powered-on */
     dev->state = AT86RF2XX_STATE_P_ON;
     dev->pending_tx = 0;
+
+#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+    (void) params;
+    /* set all interrupts off */
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, 0x00);
+#else
+    /* initialize device descriptor */
+    dev->params = *params;
+#endif
+}
+
+static void at86rf2xx_disable_clock_output(at86rf2xx_t *dev)
+{
+#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+    (void) dev;
+#else
+    uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_0);
+    tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_CTRL);
+    tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_SHA_SEL);
+    tmp |= (AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__OFF);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_0, tmp);
+#endif
+}
+
+static void at86rf2xx_enable_smart_idle(at86rf2xx_t *dev)
+{
+#if AT86RF2XX_SMART_IDLE_LISTENING
+    uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_RPC);
+    tmp |= (AT86RF2XX_TRX_RPC_MASK__RX_RPC_EN |
+            AT86RF2XX_TRX_RPC_MASK__PDT_RPC_EN |
+            AT86RF2XX_TRX_RPC_MASK__PLL_RPC_EN |
+            AT86RF2XX_TRX_RPC_MASK__XAH_TX_RPC_EN |
+            AT86RF2XX_TRX_RPC_MASK__IPAN_RPC_EN);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_RPC, tmp);
+    at86rf2xx_set_rxsensitivity(dev, RSSI_BASE_VAL);
+#else
+    (void) dev;
+#endif
 }
 
 void at86rf2xx_reset(at86rf2xx_t *dev)
@@ -92,29 +128,18 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_set_page(dev, AT86RF2XX_DEFAULT_PAGE);
 #endif
 
+#if !defined(MODULE_AT86RFA1) && !defined(MODULE_AT86RFR2)
     /* don't populate masked interrupt flags to IRQ_STATUS register */
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_1);
     tmp &= ~(AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_1, tmp);
-
-    /* configure smart idle listening feature */
-#if AT86RF2XX_SMART_IDLE_LISTENING
-    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_RPC);
-    tmp |= (AT86RF2XX_TRX_RPC_MASK__RX_RPC_EN |
-            AT86RF2XX_TRX_RPC_MASK__PDT_RPC_EN |
-            AT86RF2XX_TRX_RPC_MASK__PLL_RPC_EN |
-            AT86RF2XX_TRX_RPC_MASK__XAH_TX_RPC_EN |
-            AT86RF2XX_TRX_RPC_MASK__IPAN_RPC_EN);
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_RPC, tmp);
-    at86rf2xx_set_rxsensitivity(dev, RSSI_BASE_VAL);
 #endif
 
+    /* configure smart idle listening feature */
+    at86rf2xx_enable_smart_idle(dev);
+
     /* disable clock output to save power */
-    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_0);
-    tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_CTRL);
-    tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_SHA_SEL);
-    tmp |= (AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__OFF);
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_0, tmp);
+    at86rf2xx_disable_clock_output(dev);
 
     /* enable interrupts */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
