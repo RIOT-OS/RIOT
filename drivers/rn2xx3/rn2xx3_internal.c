@@ -178,22 +178,14 @@ int rn2xx3_write_cmd(rn2xx3_t *dev)
 
 int rn2xx3_write_cmd_no_wait(rn2xx3_t *dev)
 {
-    DEBUG("[rn2xx3] CMD: %s\n", dev->cmd_buf);
-
-    if (dev->int_state == RN2XX3_INT_STATE_SLEEP) {
-        DEBUG("[rn2xx3] ABORT: device is in sleep mode\n");
-        return RN2XX3_ERR_SLEEP_MODE;
-    }
+    DEBUG("[rn2xx3] CMD (NO WAIT): %s\n", dev->cmd_buf);
 
     mutex_lock(&(dev->cmd_lock));
     _uart_write_str(dev, dev->cmd_buf);
     _uart_write_str(dev, closing_seq);
-
-    DEBUG("[rn2xx3] RET: %s\n", dev->resp_buf);
-
     mutex_unlock(&(dev->cmd_lock));
 
-    return rn2xx3_process_response(dev);
+    return RN2XX3_OK;
 }
 
 int rn2xx3_wait_response(rn2xx3_t *dev)
