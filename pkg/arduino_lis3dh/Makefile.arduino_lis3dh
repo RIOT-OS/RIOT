@@ -1,0 +1,3 @@
+MODULE = arduino_lis3dh
+
+include $(RIOTBASE)/Makefile.base
