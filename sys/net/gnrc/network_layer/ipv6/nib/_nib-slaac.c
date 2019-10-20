@@ -15,6 +15,7 @@
 
 #include <stdbool.h>
 
+#include "log.h"
 #include "luid.h"
 #include "net/gnrc/netif/internal.h"
 
@@ -34,6 +35,15 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
     int idx;
     uint8_t flags = GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE;
 
+#if !GNRC_IPV6_NIB_CONF_SLAAC
+    if (!gnrc_netif_is_6ln(netif)) {
+        LOG_WARNING("SLAAC not activated; will not auto-configure IPv6 address "
+                         "for interface %u.\n"
+                    "    Use GNRC_IPV6_NIB_CONF_SLAAC=1 to activate.\n",
+                    netif->pid);
+        return;
+    }
+#endif
     if (!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR)) {
         DEBUG("nib: interface %i has no link-layer addresses\n", netif->pid);
         return;
