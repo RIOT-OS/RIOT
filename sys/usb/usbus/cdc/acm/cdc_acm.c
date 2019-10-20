@@ -47,9 +47,11 @@ static const usbus_handler_driver_t cdc_driver = {
 };
 
 static size_t _gen_full_acm_descriptor(usbus_t *usbus, void *arg);
+static size_t _gen_assoc_descriptor(usbus_t *usbus, void *arg);
 
 /* Descriptors */
 static const usbus_hdr_gen_funcs_t _cdcacm_descriptor = {
+    .fmt_pre_descriptor = _gen_assoc_descriptor,
     .get_header = _gen_full_acm_descriptor,
     .len = {
         .fixed_len = sizeof(usb_desc_cdc_t) +
@@ -59,6 +61,22 @@ static const usbus_hdr_gen_funcs_t _cdcacm_descriptor = {
     },
     .len_type = USBUS_HDR_LEN_FIXED,
 };
+
+static size_t _gen_assoc_descriptor(usbus_t *usbus, void *arg)
+{
+    usbus_cdcacm_device_t *cdcacm = arg;
+    usb_descriptor_interface_association_t iad;
+    iad.length = sizeof(usb_descriptor_interface_association_t);
+    iad.type = USB_TYPE_DESCRIPTOR_INTERFACE_ASSOC;
+    iad.first_interface = cdcacm->iface_ctrl.idx;
+    iad.interface_count = 2; /* Management and data interface */
+    iad.class = USB_CLASS_CDC_CONTROL;
+    iad.subclass = USB_CDC_SUBCLASS_ACM;
+    iad.protocol = 0;
+    iad.idx = 0;
+    usbus_control_slicer_put_bytes(usbus, (uint8_t*)&iad, sizeof(iad));
+    return sizeof(iad);
+}
 
 static size_t _gen_mngt_descriptor(usbus_t *usbus, usbus_cdcacm_device_t *cdcacm)
 {
