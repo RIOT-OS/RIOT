@@ -87,7 +87,7 @@
 
 #if (CLOCK_ENABLE_PLL_SAI)
 #ifdef RCC_PLLSAICFGR_PLLSAIN_Pos
-#define PLLSAI_M                 (CLOCK_PLL_SAI_M << RCC_PLLSAICFGR_PLLSAIN_Pos)
+#define PLLSAI_M                 (CLOCK_PLL_SAI_M << RCC_PLLSAICFGR_PLLSAIM_Pos)
 #else
 #define PLLSAI_M                 (0)
 #endif
