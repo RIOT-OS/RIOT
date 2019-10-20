@@ -22,6 +22,7 @@ extern "C" {
 #include "xtimer.h"
 #include "periph/gpio.h"
 #include "periph/adc.h"
+#include "periph/pwm.h"
 }
 
 #include "arduino.hpp"
@@ -106,3 +107,55 @@ int analogRead(int arduino_pin)
     return adc_value;
 }
 #endif
+
+#if MODULE_PERIPH_PWM
+static int _get_pwm_pin_idx(int pin)
+{
+    for (uint8_t i = 0; i < ARRAY_SIZE(arduino_pwm_list); ++i) {
+        if (arduino_pwm_list[i].pin == pin) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+void analogWrite(int pin, int value)
+{
+    /*
+    * Bitfield for the state of the PWM devices.
+    * 0: Not initialized
+    * 1: Successfully initialized
+    */
+    static uint8_t pwm_dev_state;
+
+    /* Clamp given value within bounds */
+    if (value < 0) {
+        value = 0;
+    }
+    if ((unsigned)value >= ARDUINO_PWM_STEPS) {
+        value = ARDUINO_PWM_STEPS - 1;
+    }
+
+    /* Check if the PWM pin is valid */
+    int pin_idx = _get_pwm_pin_idx(pin);
+    if (pin_idx == -1) {
+        /* Set to digital write if not a PWM pin */
+        pinMode(pin, OUTPUT);
+        return;
+    }
+
+    /* Initialization of given PWM pin */
+    if (!(pwm_dev_state & (1 << arduino_pwm_list[pin_idx].dev))) {
+        if (pwm_init(arduino_pwm_list[pin_idx].dev,
+                     ARDUINO_PWM_MODE, ARDUINO_PWM_FREQU, ARDUINO_PWM_STEPS) == 0) {
+            return;
+        }
+        /* The PWM channel is initialized */
+        pwm_dev_state |= (1 << arduino_pwm_list[pin_idx].dev);
+    }
+
+    /* Write analog value */
+    pwm_set(arduino_pwm_list[pin_idx].dev, arduino_pwm_list[pin_idx].chan, value);
+}
+#endif /* MODULE_PERIPH_PWM */
