@@ -6,6 +6,11 @@ ifneq (,$(filter nucleo-f303k8,$(BOARD)))
   CFLAGS += -DTHREAD_STACKSIZE_DEFAULT=512
 endif
 
+# The test compiles, but these boards have too little RAM for
+# dynamic allocation of thread stacks
+BOARD_BLACKLIST := arduino-nano arduino-duemilanove \
+                   arduino-uno nucleo-f031k6 stm32f030f4-demo
+
 USEMODULE += posix_headers
 USEMODULE += pthread
 
