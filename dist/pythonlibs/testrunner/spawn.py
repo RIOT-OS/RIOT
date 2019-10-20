@@ -23,7 +23,6 @@ RIOTBASE = (os.environ.get('RIOTBASE') or
 # default value (3)
 MAKE_TERM_STARTED_DELAY = int(os.environ.get('TESTRUNNER_START_DELAY') or 3)
 
-
 def list_until(l, cond):
     return l[:([i for i, e in enumerate(l) if cond(e)][0])]
 
@@ -35,7 +34,8 @@ def find_exc_origin(exc_info):
     return (pos[3], os.path.relpath(os.path.abspath(pos[0]), RIOTBASE), pos[1])
 
 
-def setup_child(timeout=10, spawnclass=pexpect.spawnu, env=None, logfile=None):
+def setup_child(timeout=10, spawnclass=pexpect.spawnu, env=None, logfile=None,
+                reset=True):
     child = spawnclass("make cleanterm", env=env, timeout=timeout,
                        codec_errors='replace', echo=False)
 
@@ -44,12 +44,13 @@ def setup_child(timeout=10, spawnclass=pexpect.spawnu, env=None, logfile=None):
 
     child.logfile = logfile
 
-    try:
-        subprocess.check_output(('make', 'reset'), env=env,
-                                stderr=subprocess.PIPE)
-    except subprocess.CalledProcessError:
-        # make reset yields error on some boards even if successful
-        pass
+    if reset:
+        try:
+            subprocess.check_output(('make', 'reset'), env=env,
+                                    stderr=subprocess.PIPE)
+        except subprocess.CalledProcessError:
+            # make reset yields error on some boards even if successful
+            pass
     return child
 
 

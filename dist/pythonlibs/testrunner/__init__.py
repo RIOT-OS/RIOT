@@ -21,10 +21,15 @@ from .utils import test_utils_interactive_sync # noqa, F401 expose to users
 # default value (10)
 TIMEOUT = int(os.environ.get('RIOT_TEST_TIMEOUT') or 10)
 
+# Some boards can't be resetted during test since this resets the serial
+# connection. Default to 1 for those boards.
+MAKE_RESET_WITH_TERM = int(os.environ.get('MAKE_RESET_WITH_TERM', 1))
 
-def run(testfunc, timeout=TIMEOUT, echo=True, traceback=False):
+def run(testfunc, timeout=TIMEOUT, echo=True, traceback=False,
+        reset=MAKE_RESET_WITH_TERM):
     child = setup_child(timeout, env=os.environ,
-                        logfile=sys.stdout if echo else None)
+                        logfile=sys.stdout if echo else None,
+                        reset=reset)
     try:
         testfunc(child)
     except pexpect.TIMEOUT:
