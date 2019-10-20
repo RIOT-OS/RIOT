@@ -11,6 +11,7 @@ else
   DEBUGGER ?= gdb
 endif
 
+RESET ?= $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 FLASHER = true
 FLASHFILE ?= $(ELFFILE)
 
