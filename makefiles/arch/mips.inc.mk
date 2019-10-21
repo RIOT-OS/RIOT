@@ -38,6 +38,7 @@ CFLAGS_DBG   = -g3
 CFLAGS_OPT   = -Os
 
 CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_OPT) $(CFLAGS_DBG)
+CFLAGS += -DCPU_MODEL_$(call uppercase_and_underscore,$(CPU_MODEL))
 
 ifeq ($(USE_HARD_FLOAT),1)
     CFLAGS += -mhard-float -DMIPS_HARD_FLOAT
