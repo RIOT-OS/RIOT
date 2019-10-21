@@ -23,6 +23,12 @@ RIOTBASE = (os.environ.get('RIOTBASE') or
 # default value (3)
 MAKE_TERM_STARTED_DELAY = int(os.environ.get('TESTRUNNER_START_DELAY') or 3)
 
+# Resetting the board after the terminal is opened is used by the testrunner
+# to sync the device (application under test), and the test script. This can't
+# be done for some boards so provide a way of disabling the behavior.
+TESTRUNNER_RESET_SYNC = int(os.environ.get('TESTRUNNER_RESET_SYNC', 1))
+
+
 def list_until(l, cond):
     return l[:([i for i, e in enumerate(l) if cond(e)][0])]
 
@@ -34,8 +40,7 @@ def find_exc_origin(exc_info):
     return (pos[3], os.path.relpath(os.path.abspath(pos[0]), RIOTBASE), pos[1])
 
 
-def setup_child(timeout=10, spawnclass=pexpect.spawnu, env=None, logfile=None,
-                reset=True):
+def setup_child(timeout=10, spawnclass=pexpect.spawnu, env=None, logfile=None):
     # Some boards can't be reset after a terminal is open. We currently still
     # need to reset after opening the terminal because most tests use this as a
     # way to sync the device and the test. As long as this is still the behavior
@@ -55,7 +60,7 @@ def setup_child(timeout=10, spawnclass=pexpect.spawnu, env=None, logfile=None,
 
     child.logfile = logfile
 
-    if reset:
+    if TESTRUNNER_RESET_SYNC:
         try:
             subprocess.check_output(('make', 'reset'), env=env,
                                     stderr=subprocess.PIPE)
