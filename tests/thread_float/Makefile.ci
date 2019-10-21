@@ -4,6 +4,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-leonardo \
     arduino-nano \
     arduino-uno \
+    atmega328p \
     cc2650stk \
     chronos \
     maple-mini \

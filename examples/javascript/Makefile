@@ -8,7 +8,7 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo arduino-mega2560 \
-                   arduino-nano arduino-uno chronos \
+                   arduino-nano arduino-uno atmega328p chronos \
                    msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b \
                    wsn430-v1_4 z1 pic32-wifire pic32-clicker \
                    mega-xplained microduino-corerf

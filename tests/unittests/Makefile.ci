@@ -9,6 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mkrzero \
     arduino-nano \
     arduino-uno \
+    atmega328p \
     arduino-zero \
     b-l072z-lrwan1 \
     blackpill \
