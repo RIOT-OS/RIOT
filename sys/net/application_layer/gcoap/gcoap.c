@@ -87,9 +87,14 @@ typedef struct {
                                            the entry is available */
 } gcoap_state_t;
 
+#ifdef MODULE_GCOAP_LAZY_INIT
+static gcoap_state_t _coap_state;
+#else
 static gcoap_state_t _coap_state = {
+    /* No default listeners registered in lazy init mode */
     .listeners   = &_default_listener,
 };
+#endif
 
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static char _msg_stack[GCOAP_STACK_SIZE];
@@ -608,16 +613,29 @@ static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
 }
 
 /*
- * gcoap interface functions
+ * Starts the CoAP server thread
  */
-
-kernel_pid_t gcoap_init(void)
+static kernel_pid_t _start_server(void)
 {
     if (_pid != KERNEL_PID_UNDEF) {
         return -EEXIST;
     }
     _pid = thread_create(_msg_stack, sizeof(_msg_stack), THREAD_PRIORITY_MAIN - 1,
                             THREAD_CREATE_STACKTEST, _event_loop, NULL, "coap");
+    return _pid;
+}
+
+/*
+ * gcoap interface functions.
+ *
+ * Returns `KERNEL_PID_UNDEF` in `gcoap_lazy_init` mode.
+ */
+
+kernel_pid_t gcoap_init(void)
+{
+#ifndef MODULE_GCOAP_LAZY_INIT
+    _pid = _start_server();
+#endif
 
     mutex_init(&_coap_state.lock);
     /* Blank lists so we know if an entry is available. */
@@ -633,6 +651,15 @@ kernel_pid_t gcoap_init(void)
 
 void gcoap_register_listener(gcoap_listener_t *listener)
 {
+#ifdef MODULE_GCOAP_LAZY_INIT
+    /* A CoAP server must be started here and the default listener added
+     * because we are now expecting requests */
+    if (_pid == KERNEL_PID_UNDEF) {
+        _coap_state.listeners = &_default_listener;
+        _pid = _start_server();
+    }
+#endif
+
     /* Add the listener to the end of the linked list. */
     gcoap_listener_t *_last = _coap_state.listeners;
     while (_last->next) {
@@ -650,6 +677,12 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                    unsigned code, const char *path)
 {
     assert((path == NULL) || (path[0] == '/'));
+
+#ifdef MODULE_GCOAP_LAZY_INIT
+    if (_pid == KERNEL_PID_UNDEF) {
+        DEBUG("gcoap: sending request in lazy init mode, responses will be ignored\n");
+    }
+#endif
 
     pdu->hdr = (coap_hdr_t *)buf;
 
@@ -722,8 +755,14 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
                       gcoap_resp_handler_t resp_handler)
 {
     gcoap_request_memo_t *memo = NULL;
-    unsigned msg_type  = (*buf & 0x30) >> 4;
     uint32_t timeout   = 0;
+    unsigned msg_type  = (*buf & 0x30) >> 4;
+#ifdef MODULE_GCOAP_LAZY_INIT
+    if (msg_type == COAP_TYPE_CON && _pid == KERNEL_PID_UNDEF) {
+        DEBUG("gcoap: cannot send CON request in lazy init mode\n");
+        return 0;
+    }
+#endif
 
     assert(remote != NULL);
 
