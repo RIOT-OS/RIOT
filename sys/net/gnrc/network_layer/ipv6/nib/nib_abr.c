@@ -27,9 +27,9 @@ int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr)
     _nib_abr_entry_t *abr;
     _nib_offl_entry_t *offl = NULL;
 
-    mutex_lock(&_nib_mutex);
+    _nib_acquire();
     if ((abr = _nib_abr_add(addr)) == NULL) {
-        mutex_unlock(&_nib_mutex);
+        _nib_release();
         return -ENOMEM;
     }
     abr->valid_until = 0U;
@@ -45,15 +45,15 @@ int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr)
         }
     }
 #endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
-    mutex_unlock(&_nib_mutex);
+    _nib_release();
     return 0;
 }
 
 void gnrc_ipv6_nib_abr_del(const ipv6_addr_t *addr)
 {
-    mutex_lock(&_nib_mutex);
+    _nib_acquire();
     _nib_abr_remove(addr);
-    mutex_unlock(&_nib_mutex);
+    _nib_release();
 }
 #endif  /* GNRC_IPV6_NIB_CONF_6LBR */
 
@@ -61,7 +61,7 @@ bool gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *entry)
 {
     _nib_abr_entry_t *abr = *state;
 
-    mutex_lock(&_nib_mutex);
+    _nib_acquire();
     while ((abr = _nib_abr_iter(abr)) != NULL) {
         if (!ipv6_addr_is_unspecified(&abr->addr)) {
             memcpy(&entry->addr, &abr->addr, sizeof(entry->addr));
@@ -70,7 +70,7 @@ bool gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *entry)
             break;
         }
     }
-    mutex_unlock(&_nib_mutex);
+    _nib_release();
     *state = abr;
     return (*state != NULL);
 }

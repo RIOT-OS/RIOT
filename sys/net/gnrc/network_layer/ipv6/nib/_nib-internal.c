@@ -42,10 +42,10 @@ static _nib_dr_entry_t _def_routers[GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF];
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
 static _nib_abr_entry_t _abrs[GNRC_IPV6_NIB_ABR_NUMOF];
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+static rmutex_t _nib_mutex = RMUTEX_INIT;
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
-mutex_t _nib_mutex = MUTEX_INIT;
 evtimer_msg_t _nib_evtimer;
 
 static void _override_node(const ipv6_addr_t *addr, unsigned iface,
@@ -66,6 +66,16 @@ void _nib_init(void)
 #endif  /* TEST_SUITES */
     evtimer_init_msg(&_nib_evtimer);
     /* TODO: load ABR information from persistent memory */
+}
+
+void _nib_acquire(void)
+{
+    rmutex_lock(&_nib_mutex);
+}
+
+void _nib_release(void)
+{
+    rmutex_unlock(&_nib_mutex);
 }
 
 static inline bool _addr_equals(const ipv6_addr_t *addr,
