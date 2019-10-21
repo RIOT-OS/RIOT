@@ -234,7 +234,6 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_enable_endpoint(cdcecm->ep_out);
     usbus_enable_endpoint(cdcecm->ep_in);
     usbus_enable_endpoint(cdcecm->ep_ctrl);
-    usbdev_ep_ready(cdcecm->ep_out->ep, 0);
     usbus_handler_set_flag(handler, USBUS_HANDLER_FLAG_RESET);
 }
 
@@ -252,6 +251,7 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
                   setup->value);
             cdcecm->active_iface = (uint8_t)setup->value;
             if (cdcecm->active_iface == 1) {
+                usbdev_ep_ready(cdcecm->ep_out->ep, 0);
                 _notify_link_up(cdcecm);
             }
             break;
@@ -296,7 +296,6 @@ static void _handle_tx_xmit(event_t *ev)
 static void _handle_rx_flush(usbus_cdcecm_device_t *cdcecm)
 {
     cdcecm->len = 0;
-    usbdev_ep_ready(cdcecm->ep_out->ep, 0);
 }
 
 static void _handle_rx_flush_ev(event_t *ev)
@@ -304,6 +303,7 @@ static void _handle_rx_flush_ev(event_t *ev)
     usbus_cdcecm_device_t *cdcecm = container_of(ev, usbus_cdcecm_device_t,
                                                  rx_flush);
 
+    usbdev_ep_ready(cdcecm->ep_out->ep, 0);
     _handle_rx_flush(cdcecm);
 }
 
