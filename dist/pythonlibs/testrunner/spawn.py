@@ -36,6 +36,17 @@ def find_exc_origin(exc_info):
 
 def setup_child(timeout=10, spawnclass=pexpect.spawnu, env=None, logfile=None,
                 reset=True):
+    # Some boards can't be reset after a terminal is open. We currently still
+    # need to reset after opening the terminal because most tests use this as a
+    # way to sync the device and the test. As long as this is still the behavior
+    # we keep both resets.
+    try:
+        subprocess.check_output(('make', 'reset'), env=env,
+                                stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError:
+        # make reset yields error on some boards even if successful
+        pass
+
     child = spawnclass("make cleanterm", env=env, timeout=timeout,
                        codec_errors='replace', echo=False)
 
