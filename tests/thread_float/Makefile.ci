@@ -20,6 +20,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     pca10000 \
     pca10005 \
     spark-core \
+    stm32f030f4-demo \
     stm32f0discovery \
     weio \
     yunjia-nrf51822 \
