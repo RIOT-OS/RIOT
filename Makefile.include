@@ -706,7 +706,7 @@ TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*[^~]),\
 # See #11762.
 TEST_DEPS += $(TERMDEPS)
 
-$(call target-export-variables,test,MAKE_RESET_WITH_TERM)
+$(call target-export-variables,test,TESTRUNNER_RESET_SYNC)
 test: $(TEST_DEPS)
 	$(Q) for t in $(TESTS); do \
 		$$t || exit 1; \
