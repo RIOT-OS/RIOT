@@ -371,7 +371,7 @@ def testfunc(child):
         child.expect("HWaddr: (?P<hwaddr>[A-Fa-f:0-9]+)")
         hwaddr_dst = child.match.group("hwaddr").lower()
         res = child.expect([
-            r"(?P<lladdr>fe80::[A-Fa-f:0-9]+)\s+scope:\s+local\s+VAL",
+            r"(?P<lladdr>fe80::[A-Fa-f:0-9]+)\s+scope:\s+link\s+VAL",
             pexpect.TIMEOUT
         ])
         count += 1

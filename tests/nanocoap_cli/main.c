@@ -50,7 +50,7 @@ static void _print_addr(ipv6_addr_t *addr, uint8_t flags)
     ipv6_addr_to_str(addr_str, addr, sizeof(addr_str));
     printf("%s  scope: ", addr_str);
     if ((ipv6_addr_is_link_local(addr))) {
-        printf("local");
+        printf("link");
     }
     else {
         printf("global");
