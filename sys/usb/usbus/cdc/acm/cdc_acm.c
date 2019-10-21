@@ -54,7 +54,8 @@ static const usbus_hdr_gen_funcs_t _cdcacm_descriptor = {
     .fmt_pre_descriptor = _gen_assoc_descriptor,
     .get_header = _gen_full_acm_descriptor,
     .len = {
-        .fixed_len = sizeof(usb_desc_cdc_t) +
+        .fixed_len = sizeof(usb_descriptor_interface_association_t) +
+                     sizeof(usb_desc_cdc_t) +
                      sizeof(usb_desc_acm_t) +
                      sizeof(usb_desc_union_t) +
                      sizeof(usb_desc_call_mngt_t),
