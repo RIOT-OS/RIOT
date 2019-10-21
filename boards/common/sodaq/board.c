@@ -7,12 +7,11 @@
  */
 
 /**
- * @ingroup     boards_sodaq-autonomo
+ * @ingroup     boards_common_sodaq
  * @{
  *
  * @file
- * @brief       Board specific implementations for the SODAQ Autonomo
- *              Pro board
+ * @brief       Board common implementations for the SODAQ boards
  *
  * @author      Kees Bakker <kees@sodaq.com>
  *
