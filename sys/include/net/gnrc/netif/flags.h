@@ -119,6 +119,13 @@ enum {
 #define GNRC_NETIF_FLAGS_6LO_BACKBONE              (0x00000800U)
 
 /**
+ * @brief   This interface represents a 6Lo node (6LN) according to RFC 6775
+ *
+ * @see [RFC 6775, section 2](https://tools.ietf.org/html/rfc6775#section-2)
+ */
+#define GNRC_NETIF_FLAGS_6LN                       (0x00001000U)
+
+/**
  * @brief   Network interface is configured in raw mode
  */
 #define GNRC_NETIF_FLAGS_RAWMODE                   (0x00010000U)

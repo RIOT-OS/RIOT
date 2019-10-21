@@ -109,7 +109,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
         case NETOPT_6LO:
             assert(opt->data_len == sizeof(netopt_enable_t));
             *((netopt_enable_t *)opt->data) =
-                    (netopt_enable_t)gnrc_netif_is_6ln(netif);
+                    (netopt_enable_t)gnrc_netif_is_6lo(netif);
             res = sizeof(netopt_enable_t);
             break;
         case NETOPT_HOP_LIMIT:
@@ -1093,8 +1093,8 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
 }
 #endif  /* MODULE_GNRC_IPV6 */
 
-#if (GNRC_NETIF_NUMOF > 1) || !defined(MODULE_GNRC_SIXLOWPAN)
-bool gnrc_netif_is_6ln(const gnrc_netif_t *netif)
+#if (GNRC_NETIF_NUMOF > 1) && defined(MODULE_GNRC_SIXLOWPAN)
+bool gnrc_netif_is_6lo(const gnrc_netif_t *netif)
 {
     switch (netif->device_type) {
 #ifdef MODULE_GNRC_SIXLOENC
@@ -1110,7 +1110,7 @@ bool gnrc_netif_is_6ln(const gnrc_netif_t *netif)
             return false;
     }
 }
-#endif  /* (GNRC_NETIF_NUMOF > 1) || !defined(MODULE_GNRC_SIXLOWPAN) */
+#endif  /* (GNRC_NETIF_NUMOF > 1) && defined(MODULE_GNRC_SIXLOWPAN) */
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif)
 {
