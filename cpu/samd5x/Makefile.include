@@ -1,5 +1,5 @@
-export CPU_ARCH = cortex-m4f
-export CPU_FAM  = samd5x
+CPU_ARCH = cortex-m4f
+CPU_FAM  = samd5x
 
 # Slot size is determined by "((total_flash_size - RIOTBOOT_LEN) / 2)".
 # If RIOTBOOT_LEN uses an uneven number of flashpages, the remainder of the

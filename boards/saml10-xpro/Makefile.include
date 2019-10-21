@@ -1,4 +1,4 @@
-export CPU_FAM  = saml10
+CPU_FAM = saml10
 CFLAGS += -D__SAML10E16A__
 
 include $(RIOTBOARD)/common/saml1x/Makefile.include

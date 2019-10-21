@@ -1,4 +1,4 @@
-export CPU_ARCH = cortex-m23
+CPU_ARCH = cortex-m23
 
 USEMODULE += pm_layered
 
