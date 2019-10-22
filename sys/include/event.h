@@ -41,7 +41,7 @@
  *    This is not (easily) possible using msg queues, as they might fill up.
  * 4. an event can only be queued in one event queue at the same time.
  *    Notifying many queues using only one event object is not possible with
- *    this imlementation.
+ *    this implementation.
  *
  * At the core, event_wait() uses thread flags to implement waiting for events
  * to be queued. Thus event queues can be used safely and efficiently in combination
