@@ -22,14 +22,57 @@
 
 #if defined(MODULE_PERIPH_HWRNG) && HWRNG_HAS_GENERIC_READ
 
+#define ROUND_UP_PTR(n) (void*)(4 + (~3 & ((intptr_t)(n) - 1)))
+
+static inline void copy_bytewise(void *dest, const void *src, size_t n)
+{
+    uint8_t *d = dest;
+    const uint8_t *s = src;
+
+    switch (n) {
+    case 3:
+        *d++ = *s++;
+        /* fall-through */
+    case 2:
+        *d++ = *s++;
+        /* fall-through */
+    case 1:
+        *d++ = *s++;
+        /* fall-through */
+    }
+}
+
 void hwrng_read(void *buf, unsigned int num)
 {
-    uint32_t *b32 = (uint32_t *)buf;
+    uint32_t tmp;
+    uint32_t *b32;
+    size_t unaligned;
 
 #if HWRNG_HAS_POWERONOFF
     hwrng_poweron();
 #endif
 
+    /* directly jump to fast path if destination buffer
+       is properly aligned */
+    if (!((intptr_t)buf & 0x3)) {
+        b32 = buf;
+        goto fast;
+    }
+
+    b32 = ROUND_UP_PTR(buf);
+    unaligned = (uintptr_t)b32 - (uintptr_t)buf;
+
+    if (unaligned) {
+        tmp = hwrng_uint32();
+        if (num < unaligned) {
+            unaligned = num;
+        }
+
+        copy_bytewise(buf, &tmp, unaligned);
+        num -= unaligned;
+    }
+
+fast:
     while (num >= sizeof(uint32_t)) {
         *b32++ = hwrng_uint32();
         num -= sizeof(uint32_t);
@@ -39,21 +82,8 @@ void hwrng_read(void *buf, unsigned int num)
         goto out;
     }
 
-    uint32_t tmp = hwrng_uint32();
-    uint8_t *b = (uint8_t *)b32;
-    uint8_t *r = (uint8_t *)&tmp;
-
-    switch (num) {
-    case 3:
-        *b++ = *r++;
-        /* fall-through */
-    case 2:
-        *b++ = *r++;
-        /* fall-through */
-    case 1:
-        *b++ = *r++;
-        /* fall-through */
-    }
+    tmp = hwrng_uint32();
+    copy_bytewise(b32, &tmp, num);
 
 out:
 #if HWRNG_HAS_POWERONOFF
