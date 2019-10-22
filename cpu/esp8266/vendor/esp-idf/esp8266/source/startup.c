@@ -77,9 +77,11 @@ static void user_init_entry(void *param)
 
     esp_phy_load_cal_and_init(0);
 
+#ifdef MODULE_ESP_WIFI_ANY
     if (wifi_timer_init() != 0) {
         assert(0);
     }
+#endif
 
     esp_wifi_set_rx_pbuf_mem_type(WIFI_RX_PBUF_DRAM);
 

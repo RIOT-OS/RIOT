@@ -124,3 +124,19 @@ void esp_riot_start(void)
     /* does not return */
     kernel_init();
 }
+
+void __wrap_pp_attach(void)
+{
+#ifdef MODULE_ESP_WIFI_ANY
+    extern void __real_pp_attach(void);
+    __real_pp_attach();
+#endif
+}
+
+void __wrap_pm_attach(void)
+{
+#ifdef MODULE_ESP_WIFI_ANY
+    extern void __real_pm_attach(void);
+    __real_pm_attach();
+#endif
+}

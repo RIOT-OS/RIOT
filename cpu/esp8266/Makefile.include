@@ -156,6 +156,9 @@ LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp8266.rom.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp8266.riot-os.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp8266.peripherals.ld
 
+LINKFLAGS += -Wl,-wrap=pp_attach
+LINKFLAGS += -Wl,-wrap=pm_attach
+
 ifneq (, $(filter esp_idf_heap, $(USEMODULE)))
     LINKFLAGS += -Wl,-wrap=_malloc_r
     LINKFLAGS += -Wl,-wrap=_calloc_r
