@@ -26,6 +26,8 @@ extern "C"
 {
 #endif
 
+/* The default pins corresponds to Arduino pins on the Arduino Zero board. */
+
 #ifndef HD44780_PARAM_COLS
 #define HD44780_PARAM_COLS              (16U)
 #endif
@@ -33,22 +35,22 @@ extern "C"
 #define HD44780_PARAM_ROWS              (2U)
 #endif
 #ifndef HD44780_PARAM_PIN_RS
-#define HD44780_PARAM_PIN_RS            ARDUINO_PIN_2
+#define HD44780_PARAM_PIN_RS            GPIO_PIN(0, 14)         /* Arduino D2 */
 #endif
 #ifndef HD44780_PARAM_PIN_RW
 #define HD44780_PARAM_PIN_RW            GPIO_UNDEF
 #endif
 #ifndef HD44780_PARAM_PIN_ENABLE
-#define HD44780_PARAM_PIN_ENABLE        ARDUINO_PIN_3
+#define HD44780_PARAM_PIN_ENABLE        GPIO_PIN(0, 9)          /* Arduino D3 */
 #endif
 #ifndef HD44780_PARAM_PINS_DATA
-#define HD44780_PARAM_PINS_DATA         {   ARDUINO_PIN_4,  \
-                                            ARDUINO_PIN_5,  \
-                                            ARDUINO_PIN_6,  \
-                                            ARDUINO_PIN_7,  \
-                                            GPIO_UNDEF,     \
-                                            GPIO_UNDEF,     \
-                                            GPIO_UNDEF,     \
+#define HD44780_PARAM_PINS_DATA         {   GPIO_PIN(0, 8),     /* Arduino D4 */  \
+                                            GPIO_PIN(0, 15),    /* Arduino D5 */  \
+                                            GPIO_PIN(0, 20),    /* Arduino D6 */  \
+                                            GPIO_PIN(0, 21),    /* Arduino D7 */  \
+                                            GPIO_UNDEF,                           \
+                                            GPIO_UNDEF,                           \
+                                            GPIO_UNDEF,                           \
                                             GPIO_UNDEF }
 #endif
 
