@@ -59,13 +59,27 @@ static void user_init_entry(void *param)
     syscalls_init ();
 #endif
 
-    assert(nvs_flash_init() == 0);
-    assert(wifi_nvs_init() == 0);
-    assert(esp_rtc_init() == 0);
-    assert(mac_init() == 0);
-    assert(base_gpio_init() == 0);
+    if (nvs_flash_init() != 0) {
+        assert(0);
+    }
+    if (wifi_nvs_init() != 0) {
+        assert(0);
+    }
+    if (esp_rtc_init() != 0) {
+        assert(0);
+    }
+    if (mac_init() != 0) {
+        assert(0);
+    }
+    if (base_gpio_init() != 0) {
+        assert(0);
+    };
+
     esp_phy_load_cal_and_init(0);
-    assert(wifi_timer_init() == 0);
+
+    if (wifi_timer_init() != 0) {
+        assert(0);
+    }
 
     esp_wifi_set_rx_pbuf_mem_type(WIFI_RX_PBUF_DRAM);
 
@@ -78,7 +92,9 @@ static void user_init_entry(void *param)
 #endif
 
 #ifdef CONFIG_ENABLE_PTHREAD
-    assert(esp_pthread_init() == 0);
+    if (esp_pthread_init() != 0) {
+        assert(0);
+    }
 #endif
 
 #ifdef RIOT_VERSION
@@ -144,7 +160,9 @@ void call_user_start(size_t start_addr)
 #else
     wifi_os_init();
 
-    assert(wifi_task_create(user_init_entry, "uiT", CONFIG_MAIN_TASK_STACK_SIZE, NULL, wifi_task_get_max_priority()) != NULL);
+    if (wifi_task_create(user_init_entry, "uiT", CONFIG_MAIN_TASK_STACK_SIZE, NULL, wifi_task_get_max_priority()) == NULL) {
+        assert(0);
+    }
 
     wifi_os_start();
 #endif
