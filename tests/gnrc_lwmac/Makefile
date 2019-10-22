@@ -37,4 +37,4 @@ CFLAGS += -DGNRC_PKTBUF_SIZE=512
 include $(RIOTBASE)/Makefile.include
 
 # Set a custom channel if needed
-include $(RIOTMAKE)/default-channel.inc.mk
+include $(RIOTMAKE)/default-radio-settings.inc.mk
