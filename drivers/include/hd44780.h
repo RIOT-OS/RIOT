@@ -47,11 +47,6 @@ extern "C" {
 #define HD44780_MAX_PINS        (8U)
 
 /**
- * @brief Specific value to turn rw pin off, if unused.
- */
-#define HD44780_RW_OFF          (255U)
-
-/**
  * @brief   Size of RAM for custom chars
  *
  * Generally the driver could support 8 chars of size 5x8 or 4 of size 5x10.
