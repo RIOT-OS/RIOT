@@ -613,6 +613,13 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
               netif->pid);
         return res;
     }
+#else  /* GNRC_IPV6_NIB_CONF_ARSM */
+    if (!gnrc_netif_is_6ln(netif)) {
+        LOG_WARNING("Address-resolution state-machine not activated. Neighbors "
+                    "from interface %u\nwill not be able to resolve address %s\n"
+                    "    Use GNRC_IPV6_NIB_CONF_ARSM=1 to activate.\n",
+                    netif->pid, ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
+    }
 #endif /* GNRC_IPV6_NIB_CONF_ARSM */
     netif->ipv6.addrs_flags[idx] = flags;
     memcpy(&netif->ipv6.addrs[idx], addr, sizeof(netif->ipv6.addrs[idx]));
