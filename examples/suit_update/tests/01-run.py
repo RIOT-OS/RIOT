@@ -84,7 +84,7 @@ def get_ipv6_addr(child):
         child.expect_exact("Link type: wired")
         child.expect(
             r"inet6 addr: (?P<lladdr>[0-9a-fA-F:]+:[A-Fa-f:0-9]+)"
-            "  scope: local  VAL"
+            "  scope: link  VAL"
         )
         addr = "{}%{}".format(child.match.group("lladdr").lower(), TAP)
     return addr
