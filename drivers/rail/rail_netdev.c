@@ -150,9 +150,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
                   (unsigned)len + 2, (unsigned) len + 2 + iol->iol_len);
             return -EOVERFLOW;
         }
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.tx_bytes += len;
-#endif
+
         memcpy(frame + len, iol->iol_base, iol->iol_len);
         len += iol->iol_len;
     }
@@ -284,11 +282,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
           pack_details.syncWordId,
           pack_details.antennaId,
           event_msg.rx_packet_info.packetBytes);
-
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += event_msg.rx_packet_info.packetBytes;
-#endif
 
     /* TODO question: with length info in byte 0 or without? */
     /*  - first try without, skip it (seams to work) */
