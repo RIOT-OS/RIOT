@@ -7,8 +7,5 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # Add board common includes
 INCLUDES += -I$(RIOTBOARD)/common/sodaq/include
 
-# setup the flash tool used
-# we use BOSSA to flash this board since there's an Arduino bootloader
-# preflashed on it. ROM_OFFSET skips the space taken by such bootloader.
-ROM_OFFSET ?= 0x2000
-include $(RIOTMAKE)/tools/bossa.inc.mk
+# Include all definitions for flashing with bossa other USB
+include $(RIOTBOARD)/common/samd21-arduino-bootloader/Makefile.include
