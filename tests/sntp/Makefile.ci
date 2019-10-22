@@ -16,6 +16,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f334r8 \
     nucleo-l031k6 \
     nucleo-l053r8 \
+    microduino-corerf \
     stm32f030f4-demo \
     stm32f0discovery \
     stm32l0538-disco \
