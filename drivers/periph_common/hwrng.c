@@ -17,6 +17,7 @@
  * @}
  */
 
+#include <stddef.h>
 #include "periph_cpu.h"
 #include "periph/hwrng.h"
 
