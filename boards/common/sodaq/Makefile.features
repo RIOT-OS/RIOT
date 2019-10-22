@@ -12,3 +12,4 @@ FEATURES_PROVIDED += periph_usbdev
 
 # Various other features (if any)
 FEATURES_PROVIDED += arduino
+FEATURES_PROVIDED += bootloader_arduino
