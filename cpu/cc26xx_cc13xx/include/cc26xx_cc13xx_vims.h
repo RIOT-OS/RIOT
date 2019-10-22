@@ -41,7 +41,7 @@ typedef struct {
     reg32_t DATALOWER; /**< efuse data - lower */
     reg32_t EFUSECFG; /**< OCP sysconf */
     reg32_t EFUSESTAT; /**< system status */
-    reg32_t ACC; /**< arbitrary instruction cound */
+    reg32_t ACC; /**< arbitrary instruction count */
     reg32_t BOUNDARY; /**< boundary test register to drive I/O */
     reg32_t EFUSEFLAG; /**< efuse key loaded flag */
     reg32_t EFUSEKEY; /**< efuse key */
@@ -105,7 +105,7 @@ typedef struct {
     reg32_t FWPWRITE_ECC; /**< FMC flash wide programming ECC */
     reg32_t FSWSTAT; /**< FMC software interface status */
     reg32_t __reserved12[0x2E]; /**< meh */
-    reg32_t FSM_GLBCTL; /**< FMC FSM global controll */
+    reg32_t FSM_GLBCTL; /**< FMC FSM global control */
     reg32_t FSM_STATE; /**< FMC FSM state status */
     reg32_t FSM_STAT; /**< FMC FSM status */
     reg32_t FSM_CMD; /**< FMC FSM command */

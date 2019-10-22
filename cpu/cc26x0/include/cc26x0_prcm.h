@@ -140,7 +140,7 @@ typedef struct {
 
 #define AUXCLK_SRC_HF               0x1 /* SCLK for AUX */
 #define AUXCLK_SRC_LF               0x4
-#define AUXCLK_SRC_mask             0x7 /* garuanteed to be glitchless */
+#define AUXCLK_SRC_mask             0x7 /* guaranteed to be glitchless */
 #define AUXCLK_SCLK_HF_DIV_pos      8 /* don't set while SCLK_HF active for AUX */
 #define AUXCLK_SCLK_HF_DIV_mask     0x700 /* divisor will be 2^(value+1) */
 #define AUXCLK_PWR_DWN_SRC_pos      11 /* SCLK_LF in powerdown when SCLK_HF is source (no clock elsewise?!)  */

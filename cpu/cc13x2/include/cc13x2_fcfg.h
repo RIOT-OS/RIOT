@@ -82,7 +82,7 @@ typedef struct {
     reg32_t MAC_15_4_1; /**< MAC IEEE 802.15.4 address 1 */
     reg32_t __reserved8[4]; /**< meh */
     reg32_t FLASH_OTP_DATA4; /**< Internal */
-    reg32_t MISC_TRIM; /**< Miscelaneous trim parameters */
+    reg32_t MISC_TRIM; /**< Miscellaneous trim parameters */
     reg32_t RCOSC_HF_TEMPCOMP; /**< Internal */
     reg32_t __reserved9; /**< meh */
     reg32_t ICEPICK_DEVICE_ID; /**< IcePick Device Identification */
