@@ -107,12 +107,12 @@ typedef struct spidev_linux_state {
  * @brief     register `/dev/spidev*` device to be used for SPI
  *
  * @param[in] bus     SPI bus id of the device
- * @param[in] cs      CS line to configure
+ * @param[in] cs_id   ID of CS line to configure
  * @param[in] name    path name for `/dev/spidev*` device
  * @return    SPI_SETUP_OK       On success
  * @return    SPI_SETUP_INVALID  On invalid parameters
  */
-int spidev_linux_setup(spi_t bus, spi_cs_t cs, const char *name);
+int spidev_linux_setup(spi_t bus, unsigned cs_id, const char *name);
 
 /**
  * @brief     Close open SPI file descriptors
