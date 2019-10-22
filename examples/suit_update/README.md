@@ -170,7 +170,7 @@ If the Border Router is already set up when opening the terminal you should get
             RTR_ADV  6LO  IPHC
             Source address length: 8
             Link type: wireless
-            inet6 addr: fe80::7b7e:3255:1313:8d96  scope: local  VAL
+            inet6 addr: fe80::7b7e:3255:1313:8d96  scope: link  VAL
             inet6 addr: 2001:db8::7b7e:3255:1313:8d96  scope: global  VAL
             inet6 group: ff02::2
             inet6 group: ff02::1
