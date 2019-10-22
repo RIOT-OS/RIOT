@@ -77,7 +77,6 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
         flashpage_avail -= to_copy;
 
         state->offset += to_copy;
-        flashpage_pos += to_copy;
         bytes += to_copy;
         len -= to_copy;
         if ((!flashpage_avail) || (!more)) {
