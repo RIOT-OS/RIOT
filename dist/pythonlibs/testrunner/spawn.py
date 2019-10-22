@@ -26,8 +26,7 @@ MAKE_TERM_STARTED_DELAY = int(os.environ.get('TESTRUNNER_START_DELAY') or 3)
 # Resetting the board after the terminal is opened is used by the testrunner
 # to sync the device (application under test), and the test script. This can't
 # be done for some boards so provide a way of disabling the behavior.
-TESTRUNNER_RESET_SYNC = int(os.environ.get('TESTRUNNER_RESET_SYNC', 1))
-
+TESTRUNNER_RESET_SYNC = int(os.getenv('TESTRUNNER_RESET_SYNC') or '1')
 
 def list_until(l, cond):
     return l[:([i for i, e in enumerate(l) if cond(e)][0])]
