@@ -62,15 +62,13 @@ void hwrng_read(void *buf, unsigned int num)
     b32 = ROUND_UP_PTR(buf);
     unaligned = (uintptr_t)b32 - (uintptr_t)buf;
 
-    if (unaligned) {
-        tmp = hwrng_uint32();
-        if (num < unaligned) {
-            unaligned = num;
-        }
-
-        copy_bytewise(buf, &tmp, unaligned);
-        num -= unaligned;
+    tmp = hwrng_uint32();
+    if (num < unaligned) {
+        unaligned = num;
     }
+
+    copy_bytewise(buf, &tmp, unaligned);
+    num -= unaligned;
 
 fast:
     while (num >= sizeof(uint32_t)) {
