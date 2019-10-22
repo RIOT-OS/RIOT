@@ -194,7 +194,25 @@ static const pwm_conf_t pwm_config[] = {
  * @name ADC configuration
  * @{
  */
-#define ADC_NUMOF           (0)
+
+/* ADC Default values */
+#define ADC_PRESCALER                       ADC_CTRLB_PRESCALER_DIV512
+
+#define ADC_NEG_INPUT                       ADC_INPUTCTRL_MUXNEG_GND
+#define ADC_GAIN_FACTOR_DEFAULT             ADC_INPUTCTRL_GAIN_1X
+#define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INT1V
+
+static const adc_conf_chan_t adc_channels[] = {
+    /* port, pin, muxpos */
+    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0},   /* A0 */
+    {GPIO_PIN(PB, 8), ADC_INPUTCTRL_MUXPOS_PIN2},   /* A1 */
+    {GPIO_PIN(PB, 9), ADC_INPUTCTRL_MUXPOS_PIN3},   /* A2 */
+    {GPIO_PIN(PA, 4), ADC_INPUTCTRL_MUXPOS_PIN4},   /* A3 */
+    {GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5},   /* A4 */
+    {GPIO_PIN(PB, 2), ADC_INPUTCTRL_MUXPOS_PIN10},  /* A5 */
+};
+
+#define ADC_NUMOF                           ARRAY_SIZE(adc_channels)
 /** @} */
 
 /**
