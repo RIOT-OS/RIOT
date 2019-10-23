@@ -428,6 +428,24 @@ uint16_t usbus_add_string_descriptor(usbus_t *usbus, usbus_string_t *desc,
 uint16_t usbus_add_interface(usbus_t *usbus, usbus_interface_t *iface);
 
 /**
+ * @brief Find an endpoint from an interface based on the endpoint properties
+ *
+ * This iterates over the endpoints in an interface and will return the first
+ * endpoint from the interface matching the @p type and @p dir. It will return
+ * NULL when no matching endpoint is found.
+ *
+ * @param[in] interface interface to look in
+ * @param[in] type      endpoint type to match
+ * @param[in] dir       endpoint direction to match
+ *
+ * @return              ptr to the first matching endpoint
+ * @return              NULL when no endpoint is found
+ */
+usbus_endpoint_t *usbus_interface_find_endpoint(usbus_interface_t *interface,
+                                                usb_ep_type_t type,
+                                                usb_ep_dir_t dir);
+
+/**
  * @brief Add an endpoint to the specified interface
  *
  * An @ref usbdev_ep_t is requested from the low level peripheral matching the
