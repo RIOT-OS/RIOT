@@ -336,7 +336,7 @@ static void test_nib_pl_set__success(void)
  * Creates MAX_NUMOF prefix list entries with different prefix and interfaces
  * and then tries to delete one with yet another prefix and interface.
  * Expected result: There should be still GNRC_IPV6_NIB_NUMOF entries in the
- * neigbor cache
+ * neighbor cache
  */
 static void test_nib_pl_del__unknown(void)
 {
