@@ -31,7 +31,7 @@ M-K64F_BDTN.jpg)
 | Vcc        | TODO          |
 | Reference Manual | TODO |
 
-The board has an integrated debuger adapter (k20dx128) with the firmware from
+The board has an integrated debugger adapter (k20dx128) with the firmware from
 ARMmbed.
 There are three interfaces available:
 * Drag-n-drop programming over Mass Storage Device
