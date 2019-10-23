@@ -550,7 +550,7 @@ static void _isr(netdev_t *netdev)
         if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
             uint8_t txstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
             dev->tx_retries = (txstat >> MRF24J40_TXSTAT_MAX_FRAME_RETRIES_SHIFT);
-            /* transmision failed */
+            /* transmission failed */
             if (txstat & MRF24J40_TXSTAT_TXNSTAT) {
                 /* TX_NOACK - CCAFAIL */
                 if (txstat & MRF24J40_TXSTAT_CCAFAIL) {

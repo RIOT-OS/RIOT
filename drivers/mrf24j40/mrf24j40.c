@@ -89,7 +89,7 @@ bool mrf24j40_cca(mrf24j40_t *dev, int8_t *rssi)
     mrf24j40_assert_awake(dev);
     mrf24j40_enable_lna(dev);
 
-    /* trigger CCA measurment */
+    /* trigger CCA measurement */
     /* take a look onto datasheet chapter 3.6.1 */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG6, MRF24J40_BBREG6_RSSIMODE1);
     /* wait for result to be ready */
