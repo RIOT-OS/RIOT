@@ -61,7 +61,7 @@ extern uint32_t puf_sram_state;
           calls @p puf_sram_generate
  *
  * @param[in] ram pointer to SRAM memory
- * @param[in] len length of the memroy to consider
+ * @param[in] len length of the memory to consider
  *
  */
 void puf_sram_init(const uint8_t *ram, size_t len);
@@ -71,7 +71,7 @@ void puf_sram_init(const uint8_t *ram, size_t len);
  *        to the global variable @p puf_sram_seed and returns the value
  *
  * @param[in] ram pointer to SRAM memory
- * @param[in] len length of the memroy to consider
+ * @param[in] len length of the memory to consider
  */
 void puf_sram_generate(const uint8_t *ram, size_t len);
 

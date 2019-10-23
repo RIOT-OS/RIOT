@@ -35,7 +35,7 @@ typedef struct {
     size_t start;                   /**< Start offset of the current part */
     size_t cur;                     /**< Current position in the message  */
     size_t len;                     /**< Length of the full message       */
-    size_t transferred;             /**< Number of bytes transferred       */
+    size_t transferred;             /**< Number of bytes transferred      */
     size_t reqlen;                  /**< Maximum length of the request    */
 } usbus_control_slicer_t;
 

@@ -522,7 +522,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
 void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination);
 
 /**
- * @brief   Send a DIS of the @p instace to the @p destination.
+ * @brief   Send a DIS of the @p instance to the @p destination.
  *
  * @param[in] instance          Pointer to the RPL instance, optional.
  * @param[in] destination       IPv6 address of the destination.

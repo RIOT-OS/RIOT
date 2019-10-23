@@ -104,7 +104,7 @@ int csma_sender_csma_ca_send(netdev_t *dev, iolist_t *iolist,
                              const csma_sender_conf_t *conf);
 
 /**
- * @brief   Sends a 802.15.4 frame when medium is avaiable.
+ * @brief   Sends a 802.15.4 frame when medium is available.
  *
  * @pre `dev != NULL`
  *

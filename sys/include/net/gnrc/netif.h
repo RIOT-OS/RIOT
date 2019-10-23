@@ -278,7 +278,7 @@ gnrc_netif_t *gnrc_netif_iter(const gnrc_netif_t *prev);
 gnrc_netif_t *gnrc_netif_get_by_pid(kernel_pid_t pid);
 
 /**
- * @brief   Gets the (unicast on anycast) IPv6 addresss of an interface (if IPv6
+ * @brief   Gets the (unicast on anycast) IPv6 address of an interface (if IPv6
  *          is supported)
  *
  * @pre `netif != NULL`

@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief   6LoWPAN dispatch type and helper function definitons.
+ * @brief   6LoWPAN dispatch type and helper function definitions.
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -316,7 +316,7 @@ static inline uint16_t sixlowpan_frag_offset(sixlowpan_frag_n_t *hdr)
 #define SIXLOWPAN_IPHC_HDR_LEN      (2)
 
 /**
- * @brief   6LoWPAN context idendifier extension header length
+ * @brief   6LoWPAN context identifier extension header length
  */
 #define SIXLOWPAN_IPHC_CID_EXT_LEN  (1)
 

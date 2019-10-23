@@ -195,7 +195,7 @@ int isotp_bind(struct isotp *isotp, can_reg_entry_t *entry, void *arg,
  * Unset the filter on the DLL and remove the channel from the list
  * of bound channels
  *
- * @param isotp           the channel to relase
+ * @param isotp           the channel to release
  *
  * @return 0 on success, < 0 on error
  */

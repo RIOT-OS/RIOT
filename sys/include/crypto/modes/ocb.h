@@ -65,7 +65,7 @@ extern "C" {
  * @param cipher           Already initialized cipher struct
  * @param auth_data        Additional data to authenticate in MAC
  * @param auth_data_len    Length of additional data
- * @param tag_len       Length of the appended tag (at leat 1, at most 16 bytes)
+ * @param tag_len       Length of the appended tag (at least 1, at most 16 bytes)
  *
  * @param nonce            Nonce for the encryption (must be unique)
  * @param nonce_len        Length of the nonce in bytes (at most 15)
@@ -88,7 +88,7 @@ int32_t cipher_encrypt_ocb(cipher_t *cipher, uint8_t *auth_data,
  * @param cipher           Already initialized cipher struct
  * @param auth_data        Additional data to authenticate in MAC
  * @param auth_data_len    Length of additional data
- * @param tag_len       Length of the appended tag (at leat 1, at most 16 bytes)
+ * @param tag_len       Length of the appended tag (at least 1, at most 16 bytes)
  *
  * @param nonce            Nonce for the encryption (must be unique)
  * @param nonce_len        Length of the nonce in bytes (at most 15)

@@ -46,7 +46,7 @@ int32_t adc_util_map(int sample, adc_res_t res, int32_t min, int32_t max);
 
 /**
  * @brief   Map a sampled ADC value to a given range (using floating point
- *          arithmetics)
+ *          arithmetic)
  *
  * @see adc_util_map
  *

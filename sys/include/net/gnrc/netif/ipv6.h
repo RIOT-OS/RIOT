@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief   IPv6 defintions for @ref net_gnrc_netif
+ * @brief   IPv6 definitions for @ref net_gnrc_netif
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */

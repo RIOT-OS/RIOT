@@ -78,7 +78,7 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
  *            -ENOMEM if the receive buffer for the TCB could not be allocated.
  *            -EADDRINUSE if @p local_port is already used by another connection.
  *            -ETIMEDOUT if the connection could not be opened.
- *            -ECONNREFUSED if the connection was resetted by the peer.
+ *            -ECONNREFUSED if the connection was reset by the peer.
  */
 int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  uint8_t address_family,
                          char *target_addr, uint16_t target_port,
@@ -100,7 +100,7 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  uint8_t address_family,
  *                                 If local_addr == NULL, address_family is ignored.
  * @param[in]     local_addr       If not NULL the connection is bound to @p local_addr.
  *                                 If NULL a connection request to all local ip
- *                                 addresses is valied.
+ *                                 addresses is valid.
  * @param[in]     local_port       Port number to listen on.
  *
  * @returns   0 on success.
@@ -132,7 +132,7 @@ int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, uint8_t address_family,
  *
  * @returns   The number of successfully transmitted bytes.
  *            -ENOTCONN if connection is not established.
- *            -ECONNRESET if connection was resetted by the peer.
+ *            -ECONNRESET if connection was reset by the peer.
  *            -ECONNABORTED if the connection was aborted.
  *            -ETIMEDOUT if @p user_timeout_duration_us expired.
  */
@@ -163,7 +163,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
  *            0, if the connection is closing and no further data can be read.
  *            -ENOTCONN if connection is not established.
  *            -EAGAIN if  user_timeout_duration_us is zero and no data is available.
- *            -ECONNRESET if connection was resetted by the peer.
+ *            -ECONNRESET if connection was reset by the peer.
  *            -ECONNABORTED if the connection was aborted.
  *            -ETIMEDOUT if @p user_timeout_duration_us expired.
  */
@@ -196,7 +196,7 @@ void gnrc_tcp_abort(gnrc_tcp_tcb_t *tcb);
  * @param[in] hdr          Gnrc_pktsnip that contains TCP header.
  * @param[in] pseudo_hdr   Gnrc_pktsnip that contains network layer header.
  *
- * @returns   0 on succees.
+ * @returns   0 on success.
  *            -EFAULT if @p hdr or pseudo_hdr were NULL
  *            -EBADMSG if @p hdr is not of type GNRC_NETTYPE_TCP
  *            -ENOENT if @p pseudo_hdr protocol is unsupported.
