@@ -228,7 +228,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
 
         case SD_INIT_SEND_CMD1:
             DEBUG("SD_INIT_SEND_CMD1\n");
-            DEBUG("COULD TRY CMD1 (for MMC-card)-> currently not suported\n");
+            DEBUG("COULD TRY CMD1 (for MMC-card)-> currently not supported\n");
             _unselect_card_spi(card);
             return SD_INIT_CARD_UNKNOWN;
 

@@ -198,7 +198,7 @@ typedef struct {
 /**
  * @brief              Initializes the sd-card with the given parameters in sdcard_spi_t structure.
  *                     The init procedure also takes care of initializing the spi peripheral to master
- *                     mode and performing all neccecary steps to set the sd-card to spi-mode. Reading
+ *                     mode and performing all necessary steps to set the sd-card to spi-mode. Reading
  *                     the CID and CSD registers is also done within this routine and their
  *                     values are copied to the given sdcard_spi_t struct.
  *
