@@ -129,6 +129,8 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     DEBUG("rail_netdev->send called\n");
 
     rail_t *dev = (rail_t *)netdev;
+    uint8_t *pkt_buf = &(frame[1]);
+    size_t len = 0;
 
     /*
        TODO check current state, make it depend what to do
@@ -142,27 +144,30 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
      */
 
     /* prepare frame, cpy header and payload */
-    size_t len = 1; /* start with 1, first byte have to be the length */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         /* current packet data + FCS too long */
-        if ((len + iol->iol_len + 2) > IEEE802154_FRAME_LEN_MAX) {
+        if ((len + iol->iol_len + IEEE802154_FCS_LEN) > IEEE802154_FRAME_LEN_MAX) {
             DEBUG("[rail] error: packet too large (len so far %u byte, combined %u) to be send\n",
-                  (unsigned)len + 2, (unsigned) len + 2 + iol->iol_len);
+                  (unsigned)len + IEEE802154_FCS_LEN,
+                  (unsigned) len + IEEE802154_FCS_LEN + iol->iol_len);
             return -EOVERFLOW;
         }
 
-        memcpy(frame + len, iol->iol_base, iol->iol_len);
+        memcpy(pkt_buf + len, iol->iol_base, iol->iol_len);
         len += iol->iol_len;
     }
 
-    int ret = rail_transmit_frame(dev, frame, len);
+    /* frame length stored in first byte */
+    frame[0] = len + IEEE802154_FCS_LEN;
+
+    int ret = rail_transmit_frame(dev, frame, len + IEEE802154_FCS_LEN);
 
     if (ret != 0) {
         DEBUG("Can not send data\n");
         return ret;
     }
 
-    return (int)len - 1;
+    return (int)len;
 }
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
@@ -326,7 +331,7 @@ static void _isr(netdev_t *netdev)
 
     RAIL_Events_t event = event_msg.event;
 
-    DEBUG("[rail_netdev->isr] Rail event no %lu: 0x%lx\n", event_msg.event_count, (uint32_t) event);
+    DEBUG("[rail_netdev->isr] Rail event count %lu, id: 0x%lx - %s\n", event_msg.event_count, (uint32_t) event, rail_event2str(event));
 
     /* this shouldn't happen, if it does there is a race condition */
     if (event == RAIL_EVENTS_NONE) {

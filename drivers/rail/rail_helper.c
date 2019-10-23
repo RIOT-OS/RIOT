@@ -129,6 +129,48 @@ const char *rail_event2str(RAIL_Events_t event)
     if (event & RAIL_EVENT_TX_PACKET_SENT) {
         return "RAIL_EVENT_TX_PACKET_SENT";
     }
+    if (event & RAIL_EVENT_RX_PACKET_RECEIVED) {
+        return "RAIL_EVENT_RX_PACKET_RECEIVED";
+    }
+    if (event & RAIL_EVENT_TX_PACKET_SENT) {
+        return "RAIL_EVENT_TX_PACKET_SENT";
+    }
+    if (event & RAIL_EVENT_RX_ACK_TIMEOUT) {
+        return "RAIL_EVENT_RX_ACK_TIMEOUT";
+    }
+    if (event & RAIL_EVENT_RX_FRAME_ERROR) {
+        return "RAIL_EVENT_RX_FRAME_ERROR";
+    }
+    if (event & RAIL_EVENT_RX_ADDRESS_FILTERED) {
+        return "RAIL_EVENT_RX_ADDRESS_FILTERED";
+    }
+    if (event & RAIL_EVENT_RX_PACKET_ABORTED) {
+        return "RAIL_EVENT_RX_PACKET_ABORTED";
+    }
+    if (event & RAIL_EVENT_TXACK_PACKET_SENT) {
+        return "RAIL_EVENT_TXACK_PACKET_SENT";
+    }
+    if (event & RAIL_EVENT_TX_CHANNEL_BUSY) {
+        return "RAIL_EVENT_TX_CHANNEL_BUSY";
+    }
+    if (event & RAIL_EVENT_TX_ABORTED) {
+        return "RAIL_EVENT_TX_ABORTED";
+    }
+    if (event & RAIL_EVENT_TXACK_ABORTED) {
+        return "RAIL_EVENT_TXACK_ABORTED";
+    }
+    if (event & RAIL_EVENT_TX_BLOCKED) {
+        return "RAIL_EVENT_TX_BLOCKED";
+    }
+    if (event & RAIL_EVENT_TXACK_BLOCKED) {
+        return "RAIL_EVENT_TXACK_BLOCKED";
+    }
+    if (event & RAIL_EVENT_TX_UNDERFLOW) {
+        return "RAIL_EVENT_TX_UNDERFLOW";
+    }
+    if (event & RAIL_EVENT_TXACK_UNDERFLOW) {
+        return "RAIL_EVENT_TXACK_UNDERFLOW";
+    }
 
     return "RAIL EVENT: TODO";
 #else

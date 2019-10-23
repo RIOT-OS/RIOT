@@ -489,10 +489,7 @@ int rail_init(rail_t *dev)
  */
 int rail_transmit_frame(rail_t *dev, uint8_t *data_ptr, size_t data_length)
 {
-    DEBUG("rail_transmit_frame called\n");
-
-    /* set frame length to first byte (I wonder where this is actually documented?) */
-    data_ptr[0] = (uint8_t)data_length + 1;
+    DEBUG("[rail] rail_transmit_frame called\n");
 
     /* force radio state to idle, aboard running ops, so we can transmitt
        otherwise the transceiver might be receiving/transmitting and the new
@@ -502,7 +499,7 @@ int rail_transmit_frame(rail_t *dev, uint8_t *data_ptr, size_t data_length)
     RAIL_Idle(dev->rhandle, RAIL_IDLE_ABORT, true);
 
     /* write packet payload in the buffer of the rail driver blob*/
-    RAIL_WriteTxFifo(dev->rhandle, data_ptr, data_length + 1, true);
+    RAIL_WriteTxFifo(dev->rhandle, data_ptr, data_length, true);
 
     /* config tx options, here just the defaults*/
     RAIL_TxOptions_t tx_option = RAIL_TX_OPTIONS_DEFAULT;
