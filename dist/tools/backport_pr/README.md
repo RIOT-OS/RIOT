@@ -66,7 +66,7 @@ your home directory at `~/.riotgithubtoken`.
 The setting is located at https://github.com/settings/tokens :
 
     Github->Settings->
-        Developper settings->Personal access tokens->Generate New Token
+        Developer settings->Personal access tokens->Generate New Token
 
 And it should have the following scope:
 
