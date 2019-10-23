@@ -9,7 +9,7 @@ As this can only be done from a Windows computer, that not many Linux users
 have, the following steps explain how to setup a Windows VirtualBox virtual
 machine and flash the PICkit3 from it.
 
-Informations come from this comment
+Information come from this comment
 
 https://github.com/RIOT-OS/RIOT/pull/6092#issuecomment-261987955
 
