@@ -61,7 +61,7 @@
 
 #if TEST_OUTPUT == TEST_OUTPUT_SPI
 /**
- * @brief   RIOT-OS pin maping of Ucglib pin numbers to RIOT-OS GPIO pins.
+ * @brief   RIOT-OS pin mapping of Ucglib pin numbers to RIOT-OS GPIO pins.
  * @note    To minimize the overhead, you can implement an alternative for
  *          ucg_com_riotos_hw_spi.
  */
