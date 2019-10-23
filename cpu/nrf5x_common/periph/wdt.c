@@ -102,7 +102,7 @@ void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
 #ifdef MODULE_PERIPH_WDT_CB
 /* The reset can't be stopped when the callback is triggered: so the MCU will
    reset in any case after 2 cycles of 32.768kHz clock. This is very short so
-   only basic and fast operations can be perfomed in the callback function. */
+   only basic and fast operations can be performed in the callback function. */
 void wdt_setup_reboot_with_callback(uint32_t min_time, uint32_t max_time,
                                     wdt_cb_t cb, void* arg)
 {
