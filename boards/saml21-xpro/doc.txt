@@ -79,7 +79,7 @@ Please note that even the latest official OpenOCD (v0.9 at the time of this
 writing) does not support B-variant SAML21 devices.
 
 If you attempt to flash a board, and OpenOCD throws a `Couldn't find part
-correspoding to DID XXXXXXXX` error, you will need to compile your own OpenOCD
+corresponding to DID XXXXXXXX` error, you will need to compile your own OpenOCD
 from source.
 
 Refer to https://github.com/RIOT-OS/RIOT/wiki/OpenOCD for general
