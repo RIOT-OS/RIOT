@@ -128,7 +128,7 @@ static void compute256(const uint8_t *data, uint8_t *code, uint8_t padding)
 
     /*
      * At this point, we have the line parities, and the column sum. First, We
-     * must caculate the parity group values on the column sum.
+     * must calculate the parity group values on the column sum.
      */
     for (i = 0; i < 8; i++) {
         if (columnSum & 1) {
