@@ -39,7 +39,7 @@
 /*
 * Since atmega MCUs do not feature a software reset, the watchdog timer
 * is being used. It will be set to the shortest time and then force a
-* reset. Therefore the MCUSR register needs to be resetted as fast as
+* reset. Therefore the MCUSR register needs to be reset as fast as
 * possible.
 * Which means in the bootloader or in the following init0 if no bootloader is used.
 * Bootloader resets watchdog and pass MCUSR in r2 (e.g. Optiboot) in order to pass
