@@ -64,7 +64,7 @@ static int _set_interrupt_pin(const ph_oem_t *dev);
  *
  * @return PH_OEM_OK on success
  * @return PH_OEM_READ_ERR if reading from the register failed
- * @return PH_OEM_WRITE_ERR if reseting the register failed
+ * @return PH_OEM_WRITE_ERR if resetting the register failed
  */
 static int _new_reading_available(const ph_oem_t *dev);
 
