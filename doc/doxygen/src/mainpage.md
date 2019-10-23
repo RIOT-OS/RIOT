@@ -230,7 +230,7 @@ output after running `make doc`.
 Lastly, the `dist` directory contains tools to help you with RIOT. These
 include
 the serial terminal application `pyterm`, generic scripts for flashing,
-debugging, reseting (e.g. support for [OpenOCD](http://openocd.org/),
+debugging, resetting (e.g. support for [OpenOCD](http://openocd.org/),
 [Jlink](https://www.segger.com/jlink_base.html)), as well as code enabling easy
 integration to open testbeds such as the [IoT-LAB](https://www.iot-lab.info/).
 Furthermore you can find here scripts to do all kind of code and style checks.
