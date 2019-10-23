@@ -70,7 +70,7 @@ The following wires need to be soldered on:
 As debugger an FT2232HL is used, the cheapest version costs less 10€ (often
 nicknamed CJMCU-2232HL).
 
-Connect as fallows:
+Connect as follows:
 
 | FT2232HL  | MSB-A2    |
 |:----------|:----------|
