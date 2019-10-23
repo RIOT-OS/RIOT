@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 /**
- * @name    ADCxx1C register addesses
+ * @name    ADCxx1C register addresses
  * @{
  */
 #define ADCXX1C_CONV_RES_ADDR      (0)
