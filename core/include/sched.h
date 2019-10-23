@@ -149,7 +149,7 @@ int sched_run(void);
 void sched_set_status(thread_t *process, thread_status_t status);
 
 /**
- * @brief       Yield if approriate.
+ * @brief       Yield if appropriate.
  *
  * @details     Either yield if other_prio is higher than the current priority,
  *              or if the current thread is not on the runqueue.

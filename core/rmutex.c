@@ -100,7 +100,7 @@ static int _lock(rmutex_t *rmutex, int trylock)
     DEBUG("rmutex %" PRIi16" : I am now holding the mutex\n", thread_getpid());
 
     /* I am holding the recursive mutex */
-    DEBUG("rmutex %" PRIi16" : settting the owner\n", thread_getpid());
+    DEBUG("rmutex %" PRIi16" : setting the owner\n", thread_getpid());
 
     /* ensure that owner is written atomically, since others need a consistent value */
     atomic_store_explicit(&rmutex->owner, thread_getpid(), memory_order_relaxed);
