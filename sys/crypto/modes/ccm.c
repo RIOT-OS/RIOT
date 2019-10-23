@@ -174,7 +174,7 @@ int cipher_encrypt_ccm(cipher_t *cipher,
         return CCM_ERR_INVALID_DATA_LENGTH;
     }
 
-    /* MAC calulation (T) with additional data and plaintext */
+    /* MAC calculation (T) with additional data and plaintext */
     len = ccm_compute_adata_mac(cipher, auth_data, auth_data_len, mac_iv);
     if (len < 0) {
         return len;
@@ -259,7 +259,7 @@ int cipher_decrypt_ccm(cipher_t *cipher,
         return CCM_ERR_INVALID_DATA_LENGTH;
     }
 
-    /* MAC calulation (T) with additional data and plaintext */
+    /* MAC calculation (T) with additional data and plaintext */
     len = ccm_compute_adata_mac(cipher, auth_data, auth_data_len, mac_iv);
     if (len < 0) {
         return len;

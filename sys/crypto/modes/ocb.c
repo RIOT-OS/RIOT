@@ -331,7 +331,7 @@ int32_t cipher_decrypt_ocb(cipher_t *cipher, uint8_t *auth_data,
                                     OCB_MODE_DECRYPT);
 
     if (plain_text_length < 0) {
-        // An error occurred. Retur the error code
+        // An error occurred. Return the error code
         return plain_text_length;
     }
     /* Check the tag */
