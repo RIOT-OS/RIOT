@@ -95,7 +95,7 @@ check_not_exporting_variables() {
         | error_with_message 'Variables must not be exported:'
 
     # Some variables may still be exported in 'makefiles/vars.inc.mk' as the
-    # only place that should export commont variables
+    # only place that should export common variables
     pathspec+=('*')
     pathspec+=(':!makefiles/vars.inc.mk')
 
