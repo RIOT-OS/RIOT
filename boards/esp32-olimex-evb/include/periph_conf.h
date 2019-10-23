@@ -73,11 +73,11 @@ extern "C" {
 /**
  * @name    CAN configuration
  *
- * Olimex ESP32-EVB has a CAN interface including a CAN tranceiver on board.
+ * Olimex ESP32-EVB has a CAN interface including a CAN transceiver on board.
  */
 #ifndef MODULE_OLIMEX_ESP32_GATEWAY
-#define CAN_TX      GPIO5          /**< CAN TX tranceiver signal */
-#define CAN_RX      GPIO35         /**< CAN RX tranceiver signal */
+#define CAN_TX      GPIO5          /**< CAN TX transceiver signal */
+#define CAN_RX      GPIO35         /**< CAN RX transceiver signal */
 #endif
 
 /**
@@ -192,7 +192,7 @@ extern "C" {
 /**
  * @name   UART configuration
  *
- * ESP32 provides 3 UART interaces at maximum:
+ * ESP32 provides 3 UART interfaces at maximum:
  *
  * UART_DEV(0) uses fixed standard configuration.<br>
  * UART_DEV(1) is defined here.<br>
