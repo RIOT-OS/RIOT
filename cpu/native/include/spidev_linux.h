@@ -20,10 +20,10 @@
  * listed as `FEATURES_REQUIRED` in the application's Makefile.
  *
  * At runtime, the process has to be connected to a specific bus on the host
- * machine. SPI busses are exposed as `/dev/spidevB.D` character files, where B
+ * machine. SPI buses are exposed as `/dev/spidevB.D` character files, where B
  * is the Bus ID (MISO, MOSI and SCLK lines) and D denotes the connected device
  * or hardware chip select line. Ideally, this structure should be reflected
- * when mapping the device files to RIOT SPI busses.
+ * when mapping the device files to RIOT SPI buses.
  *
  * Example:
  *
@@ -35,7 +35,7 @@
  * The first device can be used with SPI_HWCS(0) as CS parameter, the second one
  * with SPI_HWCS(1) as CS parameter.
  *
- * Multiple SPI busses can be added by increasing SPI_NUMOF in the Makefile:
+ * Multiple SPI buses can be added by increasing SPI_NUMOF in the Makefile:
  * ```
  * CFLAGS += -DSPI_NUMOF=n
  * ```
@@ -43,7 +43,7 @@
  * The sames goes for the SPI_MAXCS parameter that defines the maximum number of
  * SPI_HWCS values per bus.
  *
- * Busses that aren't assigned during startup will return either SPI_NODEV or
+ * Buses that aren't assigned during startup will return either SPI_NODEV or
  * SPI_NOCS when accessed.
  *
  * If the SPI API is called with SPI_CS_UNDEF as CS parameter, the driver will

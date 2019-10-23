@@ -310,7 +310,7 @@ void usage_exit(int status)
 "        specify Linux SPI device to use for CS line d on bus b (in RIOT)\n"
 "        Example: --spi=0:1:/dev/spidev0.0 will assign the file spidev0.0 to\n"
 "                 SPI_DEV(0) and SPI_HWCS(1).\n"
-"        Supports up to %d busses with %d CS lines each.\n", SPI_NUMOF, SPI_MAXCS
+"        Supports up to %d buses with %d CS lines each.\n", SPI_NUMOF, SPI_MAXCS
     );
 #endif
     real_exit(status);
@@ -541,7 +541,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
      * power off command.
      * We need all C++ global constructors and other initializers to run before
      * we enter the normal application code, which may depend on global objects
-     * having been initalized properly. Therefore, we iterate through the
+     * having been initialized properly. Therefore, we iterate through the
      * remainder of the init_array and call any constructors which have been
      * placed after startup in the initialization order.
      */
