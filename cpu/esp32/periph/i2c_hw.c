@@ -685,7 +685,7 @@ void _i2c_transfer_timeout (void *arg)
 {
     i2c_t dev = (i2c_t)arg;
 
-    /* reset the hardware if it I2C got stucked */
+    /* reset the hardware if it I2C got stuck */
     _i2c_reset_hw(dev);
 
     /* set result to timeout */

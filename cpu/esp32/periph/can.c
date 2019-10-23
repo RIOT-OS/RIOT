@@ -251,7 +251,7 @@ static int _esp_can_send(candev_t *candev, const struct can_frame *frame)
     /* save reference to frame in transmission (marks transmitter as busy) */
     dev->tx_frame = (struct can_frame*)frame;
 
-    /* prepare the frame as exected by ESP32 */
+    /* prepare the frame as expected by ESP32 */
     _esp_can_frame_t esp_frame = {};
 
     esp_frame.dlc = frame->can_dlc;

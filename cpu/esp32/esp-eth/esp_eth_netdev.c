@@ -63,7 +63,7 @@
 
 /**
  * There is only one ESP-ETH device. We define it as static device variable
- * to have accesss to the device inside ESP-ETH interrupt routines which do
+ * to have access to the device inside ESP-ETH interrupt routines which do
  * not provide an argument that could be used as pointer to the ESP-ETH
  * device which triggers the interrupt.
  */

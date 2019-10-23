@@ -220,7 +220,7 @@ int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, 
             /* prepare 10 bit address bytes */
             uint8_t addr1 = 0xf0 | (addr & 0x0300) >> 7 | I2C_READ;
             uint8_t addr2 = addr & 0xff;
-            /* send address bytes wit read flag */
+            /* send address bytes with read flag */
             if ((res = _i2c_write_byte (bus, addr1)) != 0 ||
                 (res = _i2c_write_byte (bus, addr2)) != 0) {
                 /* abort transfer */

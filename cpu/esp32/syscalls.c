@@ -241,7 +241,7 @@ void heap_stats(void)
 
 #else /* MODULE_ESP_IDF_HEAP */
 
-/* for compatibiliy with ESP-IDF heap functions */
+/* for compatibility with ESP-IDF heap functions */
 void* IRAM heap_caps_malloc( size_t size, uint32_t caps )
 {
     (void)caps;

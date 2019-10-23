@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-/** Initalize exception handler */
+/** Initialize exception handler */
 extern void init_exceptions(void);
 
 #ifdef __cplusplus

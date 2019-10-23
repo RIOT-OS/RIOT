@@ -110,7 +110,7 @@ static bool _adc2_ctrl_initialized = false;
 
 void _adc1_ctrl_init(void)
 {
-    /* return if already intialized */
+    /* return if already initialized */
     if (_adc1_ctrl_initialized) {
         return;
     }
@@ -149,7 +149,7 @@ void _adc1_ctrl_init(void)
 
 void _adc2_ctrl_init(void)
 {
-    /* return if already intialized */
+    /* return if already initialized */
     if (_adc2_ctrl_initialized) {
         return;
     }
