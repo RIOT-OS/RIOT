@@ -44,7 +44,7 @@ avrdude (the tool used to flash the firmware) to connect to the bootloader.
 3. Hit enter
 
 In case the compilation takes longer than the bootloader waits before starting
-the user program, flashing will fail. See below to work arround
+the user program, flashing will fail. See below to work around
 
 ### On a Slow Host
 
