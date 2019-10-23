@@ -811,7 +811,12 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
     $(shell $(COLOR_ECHO) "\n$(COLOR_YELLOW)EXPECT undesired behaviour!$(COLOR_RESET)" 1>&2)
   endif
 
+  # Fail by default when errors are expected
+  CONTINUE_ON_EXPECTED_ERRORS ?= 0
   ifneq (, $(EXPECT_ERRORS))
+    ifneq (1,$(CONTINUE_ON_EXPECTED_ERRORS))
+      $(error You can let the build continue on expected errors by setting CONTINUE_ON_EXPECTED_ERRORS=1 to the command line)
+    endif
     $(shell $(COLOR_ECHO) "\n\n$(COLOR_RED)EXPECT ERRORS!$(COLOR_RESET)\n\n" 1>&2)
   endif
 
