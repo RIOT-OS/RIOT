@@ -369,7 +369,7 @@ static void download_main(int event)
                         }
 
                         if (strcmp(parsed_response_buf, "OK\r\n") == 0) {
-                            printf("Baud sync sucessful\r\n");
+                            printf("Baud sync successful\r\n");
                             state = CHIP_ID;
                             event = BEGIN;
                             break;
@@ -851,7 +851,7 @@ static void download_main(int event)
                         // would be nice if we could simply jump to the user's code, but
                         // Philips didn't think of that.  The interrupt vector table stays
                         // mapped to the bootloader, so jumping to zero only runs the
-                        // bootloader again.  Intead, we need to download a tiny ARM
+                        // bootloader again.  Instead, we need to download a tiny ARM
                         // program that reconfigures the hardware and then jumps to zero.
                         //snprintf(buf, sizeof(buf), "G %d A\r\n", 0);
                         snprintf(buf, sizeof(buf), "W %u %u\r\n", chip->ram_addr, chip->bootprog[0] * 4);

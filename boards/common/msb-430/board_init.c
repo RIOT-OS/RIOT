@@ -135,7 +135,7 @@ void msp430_init_dco(void)
     unsigned int oldcapture = 0;
     unsigned int i;
 
-    BCSCTL1 = 0xa4; /* ACLK is devided by 4. RSEL=6 no division for MCLK
+    BCSCTL1 = 0xa4; /* ACLK is divided by 4. RSEL=6 no division for MCLK
              and SSMCLK. XT2 is off. */
 
     /* Init FLL to desired frequency using the 32762Hz crystal */
@@ -151,15 +151,15 @@ void msp430_init_dco(void)
     for (i = 0xffff; i > 0; i--);         /* Delay for XTAL to settle */
 
     CCTL2 = CCIS0 + CM0 + CAP;            /* Define CCR2, CAP, ACLK */
-    TACTL = TASSEL1 + TACLR + MC1;        /* SMCLK, continous mode */
+    TACTL = TASSEL1 + TACLR + MC1;        /* SMCLK, continuous mode */
 
 
     while (1) {
         unsigned int compare;
 
-        while ((CCTL2 & CCIFG) != CCIFG);   /* Wait until capture occured! */
+        while ((CCTL2 & CCIFG) != CCIFG);   /* Wait until capture occurred! */
 
-        CCTL2 &= ~CCIFG;                    /* Capture occured, clear flag */
+        CCTL2 &= ~CCIFG;                    /* Capture occurred, clear flag */
         compare = CCR2;                     /* Get current captured SMCLK */
         compare = compare - oldcapture;     /* SMCLK difference */
         oldcapture = CCR2;                  /* Save current captured SMCLK */

@@ -13,5 +13,5 @@ To enable only a specific bank, simply add `USEMODULE += atmega_pcintN` to your
 Makefile. To enable all interrupts you can use `USEMODULE += atmega_pcint`.
 
 In case you want to add a new CPU, simply provide an `atmega_pcint.h` with your
-CPU and adapt your Makefile.dep and Makefile.featues files.
+CPU and adapt your Makefile.dep and Makefile.features files.
  */
