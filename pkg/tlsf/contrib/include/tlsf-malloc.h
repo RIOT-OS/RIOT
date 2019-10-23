@@ -14,7 +14,7 @@
  *
  * This is a malloc/free implementation built on top of the TLSF allocator.
  * It defines a global tlsf_control block and performs allocations on that
- * block. This implemetation replaces the system malloc
+ * block. This implementation replaces the system malloc
  *
  * Additionally, the calls to TLSF are wrapped in irq_disable()/irq_restore(),
  * to make it thread-safe.
