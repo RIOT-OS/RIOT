@@ -830,7 +830,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
           first_nh, byteorder_ntohs(hdr->len));
 
     if ((pkt = gnrc_ipv6_ext_process_hopopt(pkt, &first_nh)) == NULL) {
-        DEBUG("ipv6: packet's extension header was errorneous or packet was "
+        DEBUG("ipv6: packet's extension header was erroneous or packet was "
               "consumed due to it\n");
         return;
     }

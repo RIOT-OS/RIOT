@@ -667,7 +667,7 @@ static unsigned _size2szx(size_t size)
 {
     assert(size <= 1024);
 
-    /* We must wait to subract the szx offset of 4 until after the assert below.
+    /* We must wait to subtract the szx offset of 4 until after the assert below.
      * Input should be a power of two, but if not it may have a stray low order
      * '1' bit that would invalidate the subtraction. */
     unsigned szx = bitarithm_lsb(size);

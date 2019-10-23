@@ -131,7 +131,7 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
             LL_DELETE(_list_tcb_head, tcb);
             mutex_unlock(&_list_tcb_lock);
 
-            /* Free potencially allocated receive buffer */
+            /* Free potentially allocated receive buffer */
             _rcvbuf_release_buffer(tcb);
             tcb->status |= STATUS_NOTIFY_USER;
             break;
@@ -451,7 +451,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             /* Check if SYN request is handled by another connection */
             lst = _list_tcb_head;
             while (lst) {
-                /* Compare port numbers and network layer adresses */
+                /* Compare port numbers and network layer addresses */
                 if (lst->local_port == dst && lst->peer_port == src) {
 #ifdef MODULE_GNRC_IPV6
                     if (snp->type == GNRC_NETTYPE_IPV6 && lst->address_family == AF_INET6) {

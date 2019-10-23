@@ -445,7 +445,7 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
         /* Measure round trip time */
         int32_t rtt = xtimer_now().ticks32 - tcb->rtt_start;
 
-        /* Use time only if ther was no timer overflow and no retransmission (Karns Alogrithm) */
+        /* Use time only if there was no timer overflow and no retransmission (Karns Algorithm) */
         if (tcb->retries == 0 && rtt > 0) {
             /* If this is the first sample taken */
             if (tcb->srtt == RTO_UNINITIALIZED && tcb->rtt_var == RTO_UNINITIALIZED) {

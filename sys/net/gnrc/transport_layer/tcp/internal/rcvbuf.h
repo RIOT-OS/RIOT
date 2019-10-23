@@ -38,7 +38,7 @@ typedef struct rcvbuf_entry {
 } rcvbuf_entry_t;
 
 /**
- * @brief   Stuct holding receive buffers.
+ * @brief   Struct holding receive buffers.
  */
 typedef struct rcvbuf {
     mutex_t lock;                                 /**< Lock for allocation synchronization */
@@ -53,7 +53,7 @@ void _rcvbuf_init(void);
 /**
  * @brief Allocate receive buffer and assign it to TCB.
  *
- * @param[in,out] tcb   TCB that aquires receive buffer.
+ * @param[in,out] tcb   TCB that acquires receive buffer.
  *
  * @returns   Zero  on success.
  *            -ENOMEM if all receive buffers are currently used.

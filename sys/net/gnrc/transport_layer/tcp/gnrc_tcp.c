@@ -113,7 +113,7 @@ static void _setup_timeout(xtimer_t *timer, const uint32_t duration, const xtime
  *            -ENOMEM if the receive buffer for the TCB could not be allocated.
  *            -EADDRINUSE if @p local_port is already in use.
  *            -ETIMEDOUT if the connection opening timed out.
- *            -ECONNREFUSED if the connection was resetted by the peer.
+ *            -ECONNREFUSED if the connection was reset by the peer.
  */
 static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t target_port,
                           const char *local_addr, uint16_t local_port, uint8_t passive)

@@ -56,7 +56,7 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define FIB_ADDR_PRINT_LENS         FIB_ADDR_PRINT_LENS2(FIB_ADDR_PRINT_LEN)
 
 /**
- * @brief convert an offset given in ms to abolute time in time in us
+ * @brief convert an offset given in ms to absolute time in time in us
  * @param[in]  ms       the milliseconds to be converted
  * @param[out] target   the converted point in time
  */
@@ -439,7 +439,7 @@ int fib_update_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
         /* we have ambiguous entries, i.e. count > 1
          * this should never happen
          */
-        DEBUG("[fib_update_entry] ambigious entries detected!!!\n");
+        DEBUG("[fib_update_entry] ambiguous entries detected!!!\n");
     }
 
     mutex_unlock(&(table->mtx_access));
@@ -463,7 +463,7 @@ void fib_remove_entry(fib_table_t *table, uint8_t *dst, size_t dst_size)
         /* we have ambiguous entries, i.e. count > 1
          * this should never happen
          */
-        DEBUG("[fib_update_entry] ambigious entries detected!!!\n");
+        DEBUG("[fib_update_entry] ambiguous entries detected!!!\n");
     }
 
     mutex_unlock(&(table->mtx_access));
@@ -1197,7 +1197,7 @@ fib_sr_t* hit = NULL;
                     /* we create a new sr */
                     if (check_free_entry == -1) {
                         /* we have no room to create a new sr
-                         * so we just retrun and NOT tell the RPs to find a route
+                         * so we just return and NOT tell the RPs to find a route
                          * since we cannot save it
                          */
                         *error = -ENOBUFS;
@@ -1359,7 +1359,7 @@ int fib_sr_get_route(fib_table_t *table, uint8_t *dst, size_t dst_size, kernel_p
              * @note we could handle -EHOSTUNREACH differently here,
              * since it says that we have a partial source route but no RP
              * to manage it.
-             * Thats why I let it pass for now.
+             * That's why I let it pass for now.
              */
             if (hit != NULL) {
                 hit->sr_lifetime = 0;

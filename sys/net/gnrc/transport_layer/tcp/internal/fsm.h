@@ -54,7 +54,7 @@ typedef enum {
     FSM_EVENT_CALL_RECV,          /* User function call: recv */
     FSM_EVENT_CALL_CLOSE,         /* User function call: close */
     FSM_EVENT_CALL_ABORT,         /* User function call: abort */
-    FSM_EVENT_RCVD_PKT,           /* Paket received from peer */
+    FSM_EVENT_RCVD_PKT,           /* Packet received from peer */
     FSM_EVENT_TIMEOUT_TIMEWAIT,   /* Timeout: timewait */
     FSM_EVENT_TIMEOUT_RETRANSMIT, /* Timeout: retransmit */
     FSM_EVENT_TIMEOUT_CONNECTION, /* Timeout: connection */

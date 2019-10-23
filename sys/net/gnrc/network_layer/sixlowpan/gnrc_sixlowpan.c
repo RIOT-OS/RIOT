@@ -221,7 +221,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
     else if (sixlowpan_iphc_is(dispatch)) {
-        DEBUG("6lo: received 6LoWPAN IPHC comressed datagram\n");
+        DEBUG("6lo: received 6LoWPAN IPHC compressed datagram\n");
         gnrc_sixlowpan_iphc_recv(pkt, NULL, 0);
         return;
     }

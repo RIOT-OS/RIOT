@@ -490,7 +490,7 @@ int _tftp_server(tftp_context_t *ctxt)
                 break;
             }
             else {
-                /* continue normal server opration */
+                /* continue normal server operation */
                 DEBUG("tftp: message incoming\n");
                 ret = _tftp_state_processes(ctxt, &msg);
 

@@ -96,7 +96,7 @@ static void _snd_buf_free(gnrc_ipv6_ext_frag_send_t *snd_buf);
 static void _snd_buf_del(gnrc_ipv6_ext_frag_send_t *snd_buf);
 
 /**
- * @brief   Dermines the last Per-Fragment extension header of a datagram.
+ * @brief   Determines the last Per-Fragment extension header of a datagram.
  *
  * @see [RFC 8200, section 4.5](https://tools.ietf.org/html/rfc8200#section-4.5)
  *      for definition of _Per-Fragment extension header_
