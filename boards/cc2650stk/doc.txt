@@ -143,7 +143,7 @@ rfc_ble_param_advertiser_t
 
 | Field                 | Size    | RIOT variable | Description|
 |:----------------------|:--------|:--------------|:------------------------------------------------------------|
-| PDU Type              | 4 bits | `ropCmd.commandNo` | PDU Type is solely dependant on the command type. See below. |
+| PDU Type              | 4 bits | `ropCmd.commandNo` | PDU Type is solely dependent on the command type. See below. |
 | RFU                   | 2 bits | - | Reserved for Future Use (RFU): [You can't touch this.](https://www.youtube.com/watch?v=otCpCn0l4Wo) Assumed to be 0.|
 | TxAdd                 | 1 bit  | `pParams->advConfig.deviceAddrType` | The field value is specific to the PDU type. |
 | RxAdd                 | 1 bit  | - | The field value is specific to the PDU type. According to the TI documentation ([23.6.4.4](http://www.ti.com/lit/ug/swcu117d/swcu117d.pdf)), this field is not available to configure and thus assumed to be 0. |
