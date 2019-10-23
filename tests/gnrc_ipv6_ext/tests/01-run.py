@@ -36,7 +36,7 @@ def pktbuf_empty(child):
     first_byte = child.match.group("first_byte")
     size = child.match.group("size")
     child.expect(
-            r"~ unused: {} \(next: (\(nil\)|0), size: {}\) ~".format(
+            r"~ unused: {} \(next: (\(nil\)|0(x0+)?), size: {}\) ~".format(
                 first_byte, size))
 
 

@@ -104,7 +104,8 @@ def verify_pktbuf_empty(child):
     pktbuf_addr = child.match.group(1)
     pktbuf_size = child.match.group(2)
 
-    child.expect(r'~ unused: {} \(next: (\(nil\)|0), size: {}\) ~'.format(pktbuf_addr, pktbuf_size))
+    child.expect(r'~ unused: {} \(next: (\(nil\)|0(x0+)?), size: {}\) ~'
+                 .format(pktbuf_addr, pktbuf_size))
 
 
 def sudo_guard(uses_scapy=False):
