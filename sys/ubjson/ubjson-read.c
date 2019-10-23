@@ -78,7 +78,7 @@ ssize_t ubjson_get_string(ubjson_cookie_t *restrict cookie, ssize_t length, void
 
 ssize_t ubjson_get_i32(ubjson_cookie_t *restrict cookie, ssize_t content, int32_t *dest)
 {
-    static const int8_t LENGHTS[] = { 1, 1, 2, 4 };
+    static const int8_t LENGTHS[] = { 1, 1, 2, 4 };
 
     union {
         int8_t i8;
@@ -89,7 +89,7 @@ ssize_t ubjson_get_i32(ubjson_cookie_t *restrict cookie, ssize_t content, int32_
 
     int type = content;
 
-    ssize_t result = ubjson_get_string(cookie, LENGHTS[type], &value);
+    ssize_t result = ubjson_get_string(cookie, LENGTHS[type], &value);
     if (result > 0) {
         switch (type) {
             case UBJSON_INT32_INT8:
