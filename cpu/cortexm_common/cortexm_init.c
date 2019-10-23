@@ -97,7 +97,7 @@ bool cpu_check_address(volatile const char *address)
         is_valid = false;
     }
 
-    /* Reenable BusFault by clearing  BFHFNMIGN */
+    /* Re-enable BusFault by clearing  BFHFNMIGN */
     SCB->CCR &= ~SCB_CCR_BFHFNMIGN_Msk;
     __set_FAULTMASK(mask);
 
