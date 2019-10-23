@@ -275,10 +275,23 @@ static inline void _print_chunk(void *chunk, size_t size, int num)
     od_hex_dump(chunk, size, OD_WIDTH_DEFAULT);
 }
 
+static inline void _print_ptr(_unused_t *ptr)
+{
+    if (ptr == NULL) {
+        printf("(nil)");
+    }
+    else {
+        printf("%p", (void *)ptr);
+    }
+}
+
 static inline void _print_unused(_unused_t *ptr)
 {
-    printf("~ unused: %p (next: %p, size: %4u) ~\n", (void *)ptr,
-           (void *)ptr->next, ptr->size);
+    printf("~ unused: ");
+    _print_ptr(ptr);
+    printf(" (next: ");
+    _print_ptr(ptr->next);
+    printf(", size: %4u) ~\n", ptr->size);
 }
 #endif
 
