@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @name   Set default configuration parameters fot the opt3001
+ * @name   Set default configuration parameters for the opt3001
  * @ingroup config
  * @{
  */
