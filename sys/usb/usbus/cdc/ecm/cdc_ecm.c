@@ -176,7 +176,7 @@ void usbus_cdcecm_init(usbus_t *usbus, usbus_cdcecm_device_t *handler)
 
 static void _init(usbus_t *usbus, usbus_handler_t *handler)
 {
-    DEBUG("CDC ECM: intialization\n");
+    DEBUG("CDC ECM: initialization\n");
     usbus_cdcecm_device_t *cdcecm = (usbus_cdcecm_device_t *)handler;
 
     /* Add event handlers */
