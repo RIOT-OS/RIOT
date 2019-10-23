@@ -186,7 +186,7 @@ int ccs811_set_mode(ccs811_t *dev, ccs811_mode_t mode)
         return -CCS811_ERROR_I2C;
     }
 
-    /* check whether setting measurement mode were succesfull */
+    /* check whether setting measurement mode were successful */
     if (_reg_read(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1) != CCS811_OK) {
         DEBUG_DEV("could not read new measurement mode "
                   "from register CCS811_REG_MEAS_MODE", dev);
