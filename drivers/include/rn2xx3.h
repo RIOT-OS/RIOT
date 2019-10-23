@@ -335,7 +335,7 @@ int rn2xx3_mac_tx(rn2xx3_t *dev, uint8_t *payload, uint8_t payload_len);
  * @return                  RN2XX3_ERR_NO_FREE_CH if channels are busy
  * @return                  RN2XX3_ERR_SILENT if device is in Silent state
  * @return                  RN2XX3_ERR_BUSY if MAC layer is in idle state
- * @return                  RN2XX3_ERR_MAC_PAUSED if MAC laid is paused
+ * @return                  RN2XX3_ERR_MAC_PAUSED if MAC layer is paused
  * @return                  RN2XX3_REPLY_JOIN_ACCEPTED when the join procedure succeeded
  * @return                  RN2XX3_REPLY_JOIN_DENIED when the join procedure failed
  */

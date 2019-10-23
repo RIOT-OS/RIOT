@@ -180,7 +180,7 @@ int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
  * @brief   Write data to a MTD device
  *
  * @p addr + @p count must be inside a page boundary. @p addr can be anywhere
- * but the buffer cannot overlap two pages. Though some devices might enforce alignement
+ * but the buffer cannot overlap two pages. Though some devices might enforce alignment
  * on both @p addr and @p buf.
  *
  * @param      mtd   the device to write to

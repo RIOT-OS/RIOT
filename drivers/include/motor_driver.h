@@ -69,7 +69,7 @@
  * - CCW (Counter ClockWise)
  * and a brake capability
  *
- * BRAKE LOW is functionnaly the same than BRAKE HIGH but some H-bridge only
+ * BRAKE LOW is functionally the same than BRAKE HIGH but some H-bridge only
  * brake on BRAKE HIGH due to hardware.
  * In case of single direction GPIO, there is no BRAKE, PWM duty cycle is set
  * to 0.

@@ -254,7 +254,7 @@ int sds011_get_working_period(sds011_t *dev, uint8_t *minutes);
  *
  * @param[in]   dev       device descriptor
  * @param[in]   minutes   0 - 30 new working period of the sensor in minutes
- *                        0 for coninuous reporting mode
+ *                        0 for continuous reporting mode
  *                        1 - 30 for a period of @p minutes
  *
  * @note    For values greater than 0, the active duration (fan, laser enabled)
