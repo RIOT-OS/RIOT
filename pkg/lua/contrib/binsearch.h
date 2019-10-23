@@ -25,7 +25,7 @@
  * the array) given by the struct definition.
  *
  * For example, given the following struct and array definitions and assuming
- * a 32 bit platform with strict aligment:
+ * a 32 bit platform with strict alignment:
  *  struct s1 {
  *      int a;      // Takes up 4 bytes
  *      char *name; // Takes up 4 bytes

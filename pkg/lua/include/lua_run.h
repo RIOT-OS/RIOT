@@ -159,7 +159,7 @@ LUALIB_API lua_State *lua_riot_newstate(void *memory, size_t mem_size,
  * there is an error the load sequence is aborted and the index of the library
  * that failed is reported.
  *
- * If debuging is enabled (compile with the LUA_DEBUG macro), then the test
+ * If debugging is enabled (compile with the LUA_DEBUG macro), then the test
  * library will be unconditionally loaded.
  *
  * @param   L           Lua state
