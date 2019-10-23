@@ -252,7 +252,7 @@ static void start_transmission(unsigned char blks)
 
     XferRp = 0;                             /* Block FIFO read index */
     XferWc = blks;
-    XferStat = 2;                           /* Transfer status: Memroy --> MCI */
+    XferStat = 2;                           /* Transfer status: Memory --> MCI */
 
     MCI_DATA_LEN = 512 * (blks + 1);        /* Set total data length */
     MCI_DATA_TMR = (unsigned long)(MCLK_RW * 0.5);  /* Data timer: 0.5sec */
@@ -383,7 +383,7 @@ static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsign
     assert(buff != NULL);
 
     if (idx & 0x80) {               /* Send a CMD55 prior to the specified command if it is ACMD class */
-        if (!send_cmd(CMD55, (unsigned long)CardRCA << 16, 1, buff) /* When CMD55 is faild, */
+        if (!send_cmd(CMD55, (unsigned long)CardRCA << 16, 1, buff) /* When CMD55 is failed, */
            || !(buff[0] & 0x00000020)) {
             return 0;    /* exit with error */
         }

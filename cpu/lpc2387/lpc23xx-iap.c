@@ -191,7 +191,7 @@ uint32_t blank_check_sector(uint32_t tmp_sect1, uint32_t tmp_sect2)
 /******************************************************************************
  * Function:    copy_ram_to_flash
  *
- * Description: This command is used to programm the flash memory. the affected should be
+ * Description: This command is used to program the flash memory. the affected should be
  *              prepared first by calling "Prepare Sector for Write Operation" command. the
  *              affected sectors are automatically protected again once the copy command is
  *              successfully executed. the boot sector cannot be written by this command.
