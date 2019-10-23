@@ -39,9 +39,9 @@ extern "C" {
 
 #ifndef BYTE_ORDER
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#   define BYTE_ORDER  (LITTLE_ENDIAN)  /**< platform's endianess */
+#   define BYTE_ORDER  (LITTLE_ENDIAN)  /**< platform's endianness */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#   define BYTE_ORDER  (BIG_ENDIAN)     /**< platform's endianess */
+#   define BYTE_ORDER  (BIG_ENDIAN)     /**< platform's endianness */
 #else
 #   error "Byte order is neither little nor big!"
 #endif
