@@ -23,7 +23,7 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @auhtor      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Jan Pohlmann <jan-pohlmann@gmx.de>
  * @author      Aurélien Fillau <aurelien.fillau@we-sens.com>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
