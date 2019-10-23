@@ -28,7 +28,7 @@ Test ROM overflow detection (too_big_for_rom): [OK]
 Test ROM overflow detection (offset_and_romlen): [OK]
 ```
 
-For a bord that have a `ROM_OFFSET` variable configured by default (== a board
+For a board that have a `ROM_OFFSET` variable configured by default (== a board
 with bootloader installed), it produces the following output after the normal
 compilation:
 
