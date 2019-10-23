@@ -140,7 +140,7 @@ typedef enum {
     USBDEV_EVENT_HOST_DISCONNECT,
 
     /**
-     * @brief Line reset occured
+     * @brief Line reset occurred
      *
      * A line reset is a host initiated USB reset to the peripheral
      *
@@ -172,7 +172,7 @@ typedef enum {
      * @brief Transaction completed event.
      *
      * An endpoint must emit this event after a transaction with the host
-     * occured to indicate that the data in the buffer is used or new
+     * occurred to indicate that the data in the buffer is used or new
      * depending on the endpoint direction
      */
     USBDEV_EVENT_TR_COMPLETE,
