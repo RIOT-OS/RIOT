@@ -35,7 +35,7 @@ typedef struct {
     size_t start;                   /**< Start offset of the current part */
     size_t cur;                     /**< Current position in the message  */
     size_t len;                     /**< Length of the full message       */
-    size_t transfered;              /**< Number of bytes transfered       */
+    size_t transferred;             /**< Number of bytes transferred       */
     size_t reqlen;                  /**< Maximum length of the request    */
 } usbus_control_slicer_t;
 
@@ -124,7 +124,7 @@ void usbus_control_slicer_ready(usbus_t *usbus);
  * @param[in] usbus     USBUS context
  *
  * @return              1 when there is a next slice
- * @return              0 when the data is fully transfered
+ * @return              0 when the data is fully transferred
  */
 int usbus_control_slicer_nextslice(usbus_t *usbus);
 

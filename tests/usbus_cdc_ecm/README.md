@@ -6,7 +6,7 @@ board under test and the host computer. Ping to the link local address from and
 to the host computer must work.
 
 On the host computer, using tools such as `ethtool` must show the USB CDC ECM
-interface as link dectected:
+interface as link detected:
 
 ```
 # ethtool enp0s20u9u4

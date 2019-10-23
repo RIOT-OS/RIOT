@@ -31,7 +31,7 @@ int usbus_control_slicer_nextslice(usbus_t *usbus)
     size_t end = bldr->start + ep0->in->len;
 
     if (bldr->cur > end && bldr->start < bldr->reqlen &&
-        bldr->transfered < bldr->reqlen) {
+        bldr->transferred < bldr->reqlen) {
         bldr->start += ep0->in->len;
         bldr->cur = 0;
         bldr->len = 0;
@@ -96,6 +96,6 @@ void usbus_control_slicer_ready(usbus_t *usbus)
     size_t len = bldr->len;
 
     len = len < bldr->reqlen - bldr->start ? len : bldr->reqlen - bldr->start;
-    bldr->transfered += len;
+    bldr->transferred += len;
     usbdev_ep_ready(ep0->in, len);
 }

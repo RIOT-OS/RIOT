@@ -348,7 +348,7 @@ static void _usbdev_init(usbdev_t *dev)
     usbdev->config->device->CTRLA.reg |= USB_CTRLA_ENABLE;
     while (_syncbusy_enable(usbdev)) {}
 
-    /* Callibration values */
+    /* Calibration values */
     usbdev->config->device->PADCAL.reg =
         USB_PADCAL_TRANSP((*(uint32_t *)USB_FUSES_TRANSP_ADDR >>
                            USB_FUSES_TRANSP_Pos)) |

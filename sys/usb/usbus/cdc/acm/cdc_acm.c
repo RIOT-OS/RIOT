@@ -180,7 +180,7 @@ void usbus_cdc_acm_init(usbus_t *usbus, usbus_cdcacm_device_t *cdcacm,
 
 static void _init(usbus_t *usbus, usbus_handler_t *handler)
 {
-    DEBUG("CDC_ACM: intialization\n");
+    DEBUG("CDC_ACM: initialization\n");
     usbus_cdcacm_device_t *cdcacm = (usbus_cdcacm_device_t*)handler;
 
     cdcacm->flush.handler = _handle_flush;
