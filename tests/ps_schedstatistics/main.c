@@ -41,7 +41,7 @@ static void *_thread_fn(void *arg)
     while (1) {
         msg_t m1, m2;
         msg_receive(&m1);
-        /* generate differents loads per thead */
+        /* generate different loads per thead */
         for (int i = 0; i < (10 * (next + 1)); ++i) {
             _xtimer_now64();
         }
