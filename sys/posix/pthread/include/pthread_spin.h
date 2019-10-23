@@ -42,7 +42,7 @@ extern "C" {
 #endif
 
 /**
- * @brief           Intializes a spinlock.
+ * @brief           Initializes a spinlock.
  * @warning         See the warning in pthread_spinlock_t.
  * @details         A zeroed out datum is initialized.
  * @param[in,out]   lock      Datum to initialize.
