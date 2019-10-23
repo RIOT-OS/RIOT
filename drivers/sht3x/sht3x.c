@@ -231,7 +231,7 @@ static int _get_raw_data(sht3x_dev_t* dev, uint8_t* raw_data)
         return -SHT3X_ERROR_I2C;
     }
 
-    /* in single shot mode upate dmeasurement started flag of the driver */
+    /* in single shot mode update dmeasurement started flag of the driver */
     if (dev->mode == SHT3X_SINGLE_SHOT) {
         dev->meas_started = false;
     }
@@ -342,7 +342,7 @@ static int _reset (sht3x_dev_t* dev)
     DEBUG_DEV("", dev);
 
     /*
-     * Sensor can only be soft resetted in idle mode. Therefore, we
+     * Sensor can only be soft reset in idle mode. Therefore, we
      * send a break and wait 1 ms. After that the sensor should be
      * in idle mode. We don't check I2C errors at this moment.
      */
