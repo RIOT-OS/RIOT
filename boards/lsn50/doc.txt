@@ -41,7 +41,7 @@ application.
 ### STDIO
 
 STDIO is connected to pins PA9 (TX) and PA10 (RX) so an USB to UART adapter is
-required. Use the `term` targed to open a terminal:
+required. Use the `term` target to open a terminal:
 
     make BOARD=lsn50 -C examples/hello-world term
 
