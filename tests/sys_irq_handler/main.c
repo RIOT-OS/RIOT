@@ -18,7 +18,7 @@
  * This application demonstrates how to use the interrupt handler thread
  * module `irq_handler`. For that purpose the main thread simulates interrupts
  * from 2 interrupt sources with different priorities with a period
- * of a half second. One interrupt source triggeres a second interrupt before
+ * of a half second. One interrupt source triggers a second interrupt before
  * the interrupts can be handled by the interrupt handler.
  *
  * To be able to simulate the interrupts by the main thread, the interrupt
