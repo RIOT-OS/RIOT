@@ -60,7 +60,7 @@
  * @name   SD card interface configuration
  *
  * SD card interface uses SPI_DEV(0) on this board. This configuration cannot
- * be overriden.
+ * be overridden.
  * @{
  */
 #if MODULE_SDCARD_SPI
