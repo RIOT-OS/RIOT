@@ -26,7 +26,7 @@
 #include <stdint.h>
 
 #include "cose/sign.h"
-#include "cbor.h"
+#include "nanocbor/nanocbor.h"
 #include "uuid.h"
 #include "riotboot/flashwrite.h"
 
@@ -74,11 +74,6 @@ typedef enum {
 } suit_v4_error_t;
 
 /**
- * @brief TinyCBOR validation mode to use
- */
-#define SUIT_TINYCBOR_VALIDATION_MODE       CborValidateStrictMode
-
-/**
  * @brief SUIT payload digest algorithms
  *
  * Unofficial list from
@@ -121,9 +116,9 @@ enum {
  */
 typedef struct {
     uint32_t size;                      /**< Size */
-    CborValue identifier;               /**< Identifier*/
-    CborValue url;                      /**< Url */
-    CborValue digest;                   /**< Digest */
+    nanocbor_value_t identifier;        /**< Identifier*/
+    nanocbor_value_t url;               /**< Url */
+    nanocbor_value_t digest;            /**< Digest */
 } suit_v4_component_t;
 
 /**
@@ -139,7 +134,7 @@ typedef struct {
     /** List of components in the manifest */
     suit_v4_component_t components[SUIT_V4_COMPONENT_MAX];
     unsigned components_len;        /**< Current number of components */
-    int component_current;          /**< Current component index */
+    int32_t component_current;      /**< Current component index */
     riotboot_flashwrite_t *writer;  /**< Pointer to the riotboot flash writer */
     /** Manifest validation buffer */
     uint8_t validation_buf[SUIT_COSE_BUF_SIZE];
@@ -191,7 +186,7 @@ int suit_v4_policy_check(suit_v4_manifest_t *manifest);
  * @return              SUIT_OK when initialization is successful
  * @return              SUIT_ERR_INVALID_MANIFEST if the manifest is not a cbor container
  */
-int suit_cbor_map_iterate_init(CborValue *map, CborValue *it);
+int suit_cbor_map_iterate_init(nanocbor_value_t *map, nanocbor_value_t *it);
 
 /**
  * @brief Iterate over a cbor map container
@@ -203,10 +198,10 @@ int suit_cbor_map_iterate_init(CborValue *map, CborValue *it);
  * @return              0 when the iterator is already at the end of the container
  * @return              the number of returned (key, value) pair, e.g. 1
  */
-int suit_cbor_map_iterate(CborValue *it, CborValue *key, CborValue *value);
+int suit_cbor_map_iterate(nanocbor_value_t *it, nanocbor_value_t *key, nanocbor_value_t *value);
 
 /**
- * @brief Get cbor value as int
+ * @brief Get cbor value as int32_t
  *
  * @param[in]   it      cbor container iterator
  * @param[out]  out     address of the returned integer
@@ -214,7 +209,7 @@ int suit_cbor_map_iterate(CborValue *it, CborValue *key, CborValue *value);
  * @return              SUIT_OK on success
  * @return              SUIT_ERR_INVALID_MANIFEST if value doesn't fit in an int
  */
-int suit_cbor_get_int(const CborValue *it, int *out);
+int suit_cbor_get_int32(nanocbor_value_t *it, int32_t *out);
 
 /**
  * @brief Get cbor value as unsigned
@@ -226,7 +221,7 @@ int suit_cbor_get_int(const CborValue *it, int *out);
  * @return              SUIT_ERR_INVALID_MANIFEST if value doesn't fit or cannot
  *                      be converted to unsigned
  */
-int suit_cbor_get_uint(const CborValue *it, unsigned *out);
+int suit_cbor_get_uint(nanocbor_value_t *it, unsigned *out);
 
 /**
  * @brief Get cbor value as unsigned long
@@ -238,7 +233,7 @@ int suit_cbor_get_uint(const CborValue *it, unsigned *out);
  * @return              SUIT_ERR_INVALID_MANIFEST if value doesn't fit or cannot
  *                      be converted to unsigned long
  */
-int suit_cbor_get_uint32(const CborValue *it, uint32_t *out);
+int suit_cbor_get_uint32(nanocbor_value_t *it, uint32_t *out);
 
 /**
  * @brief Get cbor value as string
@@ -250,20 +245,19 @@ int suit_cbor_get_uint32(const CborValue *it, uint32_t *out);
  * @return              SUIT_OK on success
  * @return              SUIT_ERR_INVALID_MANIFEST if value is not a valid string
  */
-int suit_cbor_get_string(const CborValue *it, const uint8_t **buf, size_t *len);
+int suit_cbor_get_string(nanocbor_value_t *it, const uint8_t **buf, size_t *len);
 
 /**
  * @brief Parser a cbor subsequence
  *
- * @param[in]   parser      ptr to cbor subparser
- * @param[out]  bseq        subsequence value
+ * @param[in]   bseq        subsequence value
  * @param[out]  it          cbor iterator
  *
  * @return                  0 on success
  * @return                  -1 if bseq is not a cbor string
  * @return                  CborError code on other cbor parser errors
  */
-int suit_cbor_subparse(CborParser *parser, CborValue *bseq, CborValue *it);
+int suit_cbor_subparse(nanocbor_value_t *bseq, nanocbor_value_t *it);
 
 /**
  * @brief Helper function for writing bytes on flash a specified offset
