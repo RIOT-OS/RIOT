@@ -28,8 +28,8 @@
 
 #define LINE_LEN            (16)
 
-/* For MSP430 cpu's the last page holds the interrupt vector, allthough the api
-   should not limit erasing that page, we don't want to brake when testing */
+/* For MSP430 cpu's the last page holds the interrupt vector, although the api
+   should not limit erasing that page, we don't want to break when testing */
 #if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
 #define TEST_LAST_AVAILABLE_PAGE    (FLASHPAGE_NUMOF - 2)
 #else
@@ -333,7 +333,7 @@ static int cmd_test_last(int argc, char **argv)
         }
     }
 #if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
-    printf("The last page holds the ISR vector, so test pag %d\n", TEST_LAST_AVAILABLE_PAGE);
+    printf("The last page holds the ISR vector, so test page %d\n", TEST_LAST_AVAILABLE_PAGE);
 #endif
     if (flashpage_write_and_verify(TEST_LAST_AVAILABLE_PAGE, page_mem) != FLASHPAGE_OK) {
         puts("error verifying the content of last page");
@@ -359,17 +359,17 @@ static int cmd_test_last_raw(int argc, char **argv)
 
     /* try to align */
     memcpy(raw_buf, "test12344321tset", 16);
+#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
+    printf("The last page holds the ISR vector, so test page %d\n", TEST_LAST_AVAILABLE_PAGE);
+#endif
 
     /* erase the page first */
-    flashpage_write(((int)FLASHPAGE_NUMOF - 1), NULL);
+    flashpage_write(TEST_LAST_AVAILABLE_PAGE, NULL);
 
-    flashpage_write_raw(flashpage_addr((int)FLASHPAGE_NUMOF - 1), raw_buf, strlen(raw_buf));
+    flashpage_write_raw(flashpage_addr(TEST_LAST_AVAILABLE_PAGE), raw_buf, strlen(raw_buf));
 
-#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
-    printf("The last page holds the ISR vector, so test pag %d\n", TEST_LAST_AVAILABLE_PAGE);
-#endif
     /* verify that previous write_raw effectively wrote the desired data */
-    if (memcmp(flashpage_addr((int)FLASHPAGE_NUMOF - 1), raw_buf, strlen(raw_buf)) != 0) {
+    if (memcmp(flashpage_addr(TEST_LAST_AVAILABLE_PAGE), raw_buf, strlen(raw_buf)) != 0) {
         puts("error verifying the content of last page");
         return 1;
     }
@@ -492,7 +492,7 @@ static int cmd_test_last_rwwee(int argc, char **argv)
         }
     }
 
-    if (flashpage_rwwee_write_and_verify(TEST_LAST_AVAILABLE_PAGE, page_mem) != FLASHPAGE_OK) {
+    if (flashpage_rwwee_write_and_verify((int)FLASHPAGE_RWWEE_NUMOF - 1, page_mem) != FLASHPAGE_OK) {
         puts("error verifying the content of last RWWEE page");
         return 1;
     }
