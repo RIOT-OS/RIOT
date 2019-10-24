@@ -1,3 +1,7 @@
+ifneq (,$(filter arduino,$(USEMODULE)))
+  FEATURES_OPTIONAL += periph_i2c
+endif
+
 ifneq (,$(filter eepreg,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eeprom
 endif
