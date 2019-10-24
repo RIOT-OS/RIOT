@@ -23,6 +23,7 @@
 #include "f4/cfg_clock_168_8_1.h"
 #include "cfg_spi_divtable.h"
 #include "cfg_timer_tim5.h"
+#include "cfg_usb_otg_hs_fs.h"
 
 #ifdef __cplusplus
 extern "C" {
