@@ -24,7 +24,7 @@ export GPROF ?= gprof
 CFLAGS += -Wall -Wextra -pedantic
 # default std set to gnu99 of not overwritten by user
 ifeq (,$(filter -std=%, $(CFLAGS)))
-  CFLAGS += -std=gnu99
+  CFLAGS += -std=gnu11
 endif
 
 ifeq ($(OS_ARCH),x86_64)
