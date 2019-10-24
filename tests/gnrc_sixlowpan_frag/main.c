@@ -594,7 +594,7 @@ static void test_rbuf_gc__timed(void)
             xtimer_msg_receive_timeout(&msg, TEST_GC_TIMEOUT) >= 0,
             "Waiting for GC timer timed out"
         );
-    TEST_ASSERT_EQUAL_INT(GNRC_SIXLOWPAN_MSG_FRAG_GC_RBUF, msg.type);
+    TEST_ASSERT_EQUAL_INT(GNRC_SIXLOWPAN_FRAG_RB_GC_MSG, msg.type);
     gnrc_sixlowpan_frag_rb_gc();
     /* reassembly buffer is now empty */
     TEST_ASSERT_NULL(_first_non_empty_rbuf());
