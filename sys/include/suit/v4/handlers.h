@@ -29,7 +29,7 @@
 
 #include "suit/v4/suit.h"
 #include "uuid.h"
-#include "cbor.h"
+#include "nanocbor/nanocbor.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,12 +39,12 @@ extern "C" {
  * @brief suit handler prototype
  *
  * @param manifest  SUIT v4 manifest context
- * @param it        CborValue iterator to the content the handler must handle
+ * @param it        nanocbor_value_t iterator to the content the handler must handle
  *
  * @return          1 on success
  * @return          negative on error
  */
-typedef int (*suit_manifest_handler_t)(suit_v4_manifest_t *manifest, int key, CborValue *it);
+typedef int (*suit_manifest_handler_t)(suit_v4_manifest_t *manifest, int key, nanocbor_value_t *it);
 
 /**
  * @brief    Get suit manifest handler for given integer key
