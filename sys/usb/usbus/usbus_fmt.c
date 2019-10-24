@@ -260,6 +260,7 @@ size_t usbus_fmt_descriptor_conf(usbus_t *usbus)
     usbus_control_slicer_put_bytes(usbus, (uint8_t *)&conf, sizeof(conf));
     len += _fmt_descriptors_post(usbus, usbus->descr_gen);
     len += _fmt_descriptors_ifaces(usbus);
+    assert(len == conf.total_length);
     return len;
 }
 
