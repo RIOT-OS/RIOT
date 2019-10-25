@@ -60,7 +60,7 @@ static const unsigned _attr_to_size[] = {
 };
 
 /* do not count extension attr type */
-#define ATTRS_NUMOF (sizeof(_attr_to_str) / sizeof(_attr_to_str[0]))
+#define ATTRS_NUMOF ARRAY_SIZE(_attr_to_str)
 
 ssize_t clif_decode_link(clif_t *link, clif_attr_t *attrs, unsigned attrs_len,
                          const char *buf, size_t maxlen)
