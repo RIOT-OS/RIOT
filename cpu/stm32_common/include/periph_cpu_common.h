@@ -489,7 +489,10 @@ typedef struct {
     gpio_t sclk_pin;        /**< SCLK pin */
     gpio_t cs_pin;          /**< HWCS pin, set to GPIO_UNDEF if not mapped */
 #ifndef CPU_FAM_STM32F1
-    gpio_af_t af;           /**< pin alternate function */
+    gpio_af_t mosi_af;      /**< MOSI pin alternate function */
+    gpio_af_t miso_af;      /**< MISO pin alternate function */
+    gpio_af_t sclk_af;      /**< SCLK pin alternate function */
+    gpio_af_t cs_af;        /**< HWCS pin alternate function */
 #endif
     uint32_t rccmask;       /**< bit in the RCC peripheral enable register */
     uint8_t apbbus;         /**< APBx bus the device is connected to */

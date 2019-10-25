@@ -69,7 +69,10 @@ static const spi_conf_t spi_config[] = {
         .miso_pin = GPIO_PIN(PORT_F, 8),
         .sclk_pin = GPIO_PIN(PORT_F, 7),
         .cs_pin   = GPIO_UNDEF,
-        .af       = GPIO_AF5,
+        .mosi_af  = GPIO_AF5,
+        .miso_af  = GPIO_AF5,
+        .sclk_af  = GPIO_AF5,
+        .cs_af    = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI5EN,
         .apbbus   = APB2
     }
