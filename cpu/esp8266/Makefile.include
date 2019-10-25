@@ -175,7 +175,7 @@ FLASH_FREQ = 26m   # FIX configuration, DO NOT CHANGE
 FLASH_SIZE ?= 1MB
 FLASHDEPS  += preflash
 
-PREFLASHER ?= $(ESP8266_RTOS_SDK_DIR)/components/esptool_py/esptool/esptool.py
+PREFLASHER ?= $(RIOTBASE)/dist/tools/esptool/esptool.py
 PREFFLAGS  = --chip esp8266 elf2image
 PREFFLAGS += --flash_mode $(FLASH_MODE) --flash_size $(FLASH_SIZE)
 PREFFLAGS += --flash_freq $(FLASH_FREQ) --version 3
@@ -208,8 +208,8 @@ ifneq (, $(filter esp_qemu, $(USEMODULE)))
     FFLAGS += head -c $$((0x100000)) > $(BINDIR)/esp8266flash.bin && rm tmp.bin
 else
     export PROGRAMMER_SPEED ?= 460800
-    FLASHER = esptool.py
-    FFLAGS += --chip esp8266 --port $(PORT) --baud $(PROGRAMMER_SPEED)
+    FLASHER = $(RIOTBASE)/dist/tools/esptool/esptool.py
+    FFLAGS += --chip esp8266 --port $(PROG_DEV) --baud $(PROGRAMMER_SPEED)
     FFLAGS += --before default_reset --after hard_reset write_flash -z
     FFLAGS += --flash_size detect
     FFLAGS += --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ)

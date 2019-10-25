@@ -148,24 +148,25 @@ described below.
 The following software components are required for compilation:
 
 - <b>Xtensa GCC</b> compiler suite for ESP8266
-- <b>Modified ESP8266 RTOS SDK</b> which includes all SOC definitions,
-  the hardware abstraction library <b>`libhal.a`</b> and some other binary libraries
-- ESP flash programmer tool <b>`esptool.py`</b>
+- Modified <b>ESP8266 RTOS SDK</b> which includes all SOC definitions and
+  some binary libraries
+- Modified version of ESP flash programmer tool <b>`esptool.py`</b>
 
 There are two options to install the toolchain:
 
-- using a <b>riotdocker</b> image, see section [RIOT Docker Toolchain (riotdocker)](#esp8266_riot_docker_toolchain)
+- using RIOT Docker (<b>riotdocker</b>), see section
+  [RIOT Docker Toolchain (riotdocker)](#esp8266_riot_docker_toolchain)
 - <b>manual installation</b>, see section [Manual Toolchain Installation](#esp8266_manual_toolchain_installation)
 
-In both cases, the ESP flash programmer tool `esptool.py` has to be installed,
+In both cases, the ESP flash programmer tool `esptool.py` is required,
 see section [Installation of `esptool.py`](#esp8266_installation_of_esptool).
 
 ## <a name="esp8266_riot_docker_toolchain"> RIOT Docker Toolchain (riotdocker) </a> &nbsp;[[TOC](#esp8266_toc)]
 
-The easiest way to install the toolchain is to use the RIOT Docker image
-`riotdocker`. The compilation process using Docker consists of two steps
+The easiest way to install the toolchain is to use RIOT Docker
+`riotdocker`. The compilation process using RIOT Docker consists of two steps
 
-1. making the RIOT application in Docker with command `make BOARD=...`
+1. making the RIOT application in RIOT Docker with command `make BOARD=...`
 2. flashing the RIOT application on the host computer with command
    `make flash-only BOARD=...`
 
@@ -174,7 +175,7 @@ installed. Both steps can also be performed with a single command on the host
 system using the `BUILD_IN_DOCKER` variable:
 
 ```
-`BUILD_IN_DOCKER=1 make BOARD=... flash
+BUILD_IN_DOCKER=1 make BOARD=... flash
 ```
 
 ### <a name="esp8266_preparing_the_environment"> Preparing the Environment </a> &nbsp;[[TOC](#esp8266_toc)]
@@ -182,7 +183,7 @@ system using the `BUILD_IN_DOCKER` variable:
 Using RIOT Docker requires at least the following software components:
 
 - <b>Docker</b> container virtualization software
-- RIOT Docker (<b>`riotdocker`</b>) image
+- RIOT Docker image (<b>`riotdocker`</b>)
 - ESP flash programmer tool <b>`esptool.py`</b>
 
 For information about installing Docker on your host, refer to the appropriate
@@ -196,45 +197,10 @@ sudo apt-get install docker.io
 For information on how to install `esptool.py`, see section
 [Installation of `esptool.py`](#esp8266_installation_of_esptool).
 
-### <a name="esp8266_generating_docker_image"> Generating a riotdocker Image </a> &nbsp;[[TOC](#esp8266_toc)]
+### <a name="esp8266_using_existing_docker_image"> Using an Existing RIOT Docker Image </a> &nbsp;[[TOC](#esp8266_toc)]
 
-A `riotdocker` fork that only installs the toolchain for ESP8266 RTOS SDK is
-available at [GitHub](https://github.com/gschorcht/riotdocker-Xtensa-ESP.git).
-After cloning this git repository, checkout branch `esp8266_only_rtos_sdk` to
-generate a Docker image with a size of "only" 890 MByte:
-
-```
-cd $HOME/esp
-git clone https://github.com/gschorcht/riotdocker-Xtensa-ESP.git
-cd riotdocker-Xtensa-ESP
-git checkout esp8266_only_rtos_sdk
-docker build -t riotbuild .
-```
-
-A `riotdocker` version that contains toolchains for all platforms supported
-by RIOT can be found at [GitHub](https://github.com/RIOT-OS/riotdocker).
-However, the Docker image generated from the this Docker file has a size of
-about 1.5 GByte.
-
-Once a Docker image has been created, it can be started with the following
-commands while in the RIOT root directory:
-
-```
-cd /path/to/RIOT
-docker run -i -t -u $UID -v $(pwd):/data/riotbuild riotbuild
-```
-
-@note RIOT's root directory `/path/to/RIOT` becomes visible as the home
-directory of the `riotbuild` user in the Docker. That is, the output
-of compilations performed in RIOT Docker are also accessible on the host system.
-
-Please refer the [RIOT wiki](https://github.com/RIOT-OS/RIOT/wiki/Use-Docker-to-build-RIOT)
-on how to use the Docker image to compile RIOT OS.
-
-### <a name="esp8266_using_existing_docker_image"> Using an Existing riotdocker Image </a> &nbsp;[[TOC](#esp8266_toc)]
-
-Alternatively, an existing Docker image from Docker Hub can be used. You can
-either pull and start the
+The easiest way to use RIOT Docker is to use an existing `riotdocker` image.
+You can either pull and start the
 [schorcht/riotbuild_esp8266_rtos](https://hub.docker.com/r/schorcht/riotbuild_esp8266_rtos)
 Docker image which only contains the toolchain for ESP8266 RTOS SDK using
 
@@ -251,27 +217,63 @@ cd /path/to/RIOT
 docker run -i -t -u $UID -v $(pwd):/data/riotbuild riot/riotbuild
 ```
 
-### <a name="esp8266_flashing_using_docker"> Make Process with Docker Image </a> &nbsp;[[TOC](#esp8266_toc)]
+### <a name="esp8266_generating_docker_image"> Generating a riotdocker Image </a> &nbsp;[[TOC](#esp8266_toc)]
 
-Using Docker, the make process consists of the following two steps:
+Alternatively, you can generate the `riotdocker` image by yourself.
+A `riotdocker` fork that only installs the toolchain for ESP8266 RTOS SDK is
+available at [GitHub](https://github.com/gschorcht/riotdocker-Xtensa-ESP.git).
+After cloning this repository, checkout branch `esp8266_only_rtos_sdk` to
+generate a Docker image with a size of "only" 890 MByte:
 
-1. **making** the RIOT binary **within a RIOT Docker image**
+```
+cd $HOME/esp
+git clone https://github.com/gschorcht/riotdocker-Xtensa-ESP.git
+cd riotdocker-Xtensa-ESP
+git checkout esp8266_only_rtos_sdk
+docker build -t riotbuild .
+```
+
+A `riotdocker` version that contains toolchains for all platforms supported
+by RIOT can be found at [GitHub](https://github.com/RIOT-OS/riotdocker).
+However, the Docker image generated from this Docker file has a size of
+about 1.5 GByte.
+
+Once the Docker image has been created, it can be started with the following
+commands while in the RIOT root directory:
+
+```
+cd /path/to/RIOT
+docker run -i -t -u $UID -v $(pwd):/data/riotbuild riotbuild
+```
+
+@note RIOT's root directory `/path/to/RIOT` becomes visible as the home
+directory of the `riotbuild` user in the Docker. That is, the output
+of compilations in RIOT Docker are also accessible on the host system.
+
+Please refer the [RIOT wiki](https://github.com/RIOT-OS/RIOT/wiki/Use-Docker-to-build-RIOT)
+on how to use the Docker image to compile RIOT OS.
+
+### <a name="esp8266_flashing_using_docker"> Make Process with RIOT Docker</a> &nbsp;[[TOC](#esp8266_toc)]
+
+Using RIOT Docker, the make process consists of the following two steps:
+
+1. **making** the RIOT binary **within RIOT Docker**
 2. **flashing** the RIOT binary using a flasher program **on the host system**
 
-Once the RIOT Docker image has been started from RIOT's root directory, a RIOT
-application can be compiled inside the Docker using the make command as usual,
-for example:
+Once the according RIOT Docker image has been started from RIOT's root
+directory, a RIOT application can be compiled inside RIOT Docker using the
+make command as usual, for example:
 
 ```
 make BOARD=esp8266-esp-12x -C tests/shell ...
 ```
 This will generate a RIOT binary in ELF format.
 
-@note You can't use the `flash` target inside the Docker image.
+@note You can't use the `flash` target inside RIOT Docker.
 
-The RIOT binary has to be flash outside docker on the host system. Since the
-Docker image was started while in RIOT's root directory, the output of the
-compilations is also accessible on the host system. On the host system,
+The RIOT binary has to be flash outside RIOT Docker on the host system. Since
+the RIOT Docker image was started while in RIOT's root directory, the output
+of the compilations is also accessible on the host system. On the host system,
 the `flash-only` target can then be used to flash the binary.
 
 ```
@@ -343,34 +345,27 @@ export ESP8266_RTOS_SDK_DIR=$HOME/esp/ESP8266_RTOS_SDK
 
 ### <a name="esp8266_installation_of_esptool"> Installation of `esptool.py` (ESP flash programmer tool) </a> &nbsp;[[TOC](#esp8266_toc)]
 
-The RIOT OS port does not work with the `esptool.py` ESP flasher program
-available on GitHub [GitHub](https://github.com/espressif/esptool).
-Instead, the modified version from the ESP8266 RTOS SDK has to be used.
+The RIOT port does not work with the `esptool.py` ESP flasher program
+available on [GitHub](https://github.com/espressif/esptool) or
+as package for your OS.
+Instead, a modified version from the ESP8266 RTOS SDK is required.
 
-To avoid the installation of the ESP8266 RTOS SDK, for example because
-`riotdocker` is used for compilation, `esptool.py` has been extracted
-from the ESP8266 RTOS SDK and is available as standalone copy from
-[GitHub](https://github.com/gschorcht/esptool-esp8266-rtos-sdk-v3).
+To avoid the installation of the complete ESP8266 RTOS SDK, for example
+because RIOT Docker `riotdocker` is used for compilation, `esptool.py`
+has been extracted from the ESP8266 RTOS SDK and placed in RIOT's
+directory `dist/tools/esptool`.
+For convenience, the build system uses always the version from this directory.
 
-```
-cd $HOME/esp
-git clone https://github.com/gschorcht/esptool-esp8266-rtos-sdk-v3
-chmod +x $HOME/esp/esptool-esp8266-rtos-sdk-v3/esptool.py
-```
-You have to expand your `PATH` variable to use it.
-
-```
-export PATH=$HOME/esp/esptool-esp8266-rtos-sdk-v3:$PATH
-```
-
-`esptool.py` depends on `pySerial` which can be installed either using `pip`
+Therefore, it is **not necessary to install** `esptool.py` explicitly. However
+`esptool.py` depends on `pySerial` which can be installed either
+using `pip`
 
 ```
 sudo pip install pyserial
 ```
 or the package manager of your OS, for example on Debian/Ubuntu systems:
 ```
-apt-get install pyserial
+apt install python-pyserial
 ```
 For more information on `esptool.py`, please refer the
 [git repository](https://github.com/espressif/esptool).
@@ -385,14 +380,13 @@ directories.
 ```
 /path/to/esp/xtensa-esp8266-elf
 /path/to/esp/ESP8266_RTOS_SDK
-/path/to/esp/esptool-esp8266-rtos-sdk-v3
 ```
 
-To use the toolchain, please check that your environment variables are set
+To use the toolchain, please ensure that your environment variables are set
 correctly to
 
 ```
-export PATH=/path/to/esp/esptool-esp8266-rtos-sdk-v3:/path/to/esp/xtensa-esp8266-elf/bin:$PATH
+export PATH=/path/to/esp/xtensa-esp8266-elf/bin:$PATH
 export ESP8266_RTOS_SDK_DIR=/path/to/esp/ESP8266_RTOS_SDK
 ```
 
@@ -404,8 +398,7 @@ The compilation process can be controlled by following make variables:
 
 Option | Values | Default | Description
 -------|--------|---------|------------
-FLASH_MODE | dout, dio, qout, qio | dout | Set the flash mode, please take
-care with your module, see section [Flash Modes](#esp8266_flash_modes)
+FLASH_MODE | dout, dio, qout, qio | dout | Set the flash mode, please take care with your module, see section [Flash Modes](#esp8266_flash_modes)
 PORT | /dev/&lt;port&gt; | /dev/USB0 | Set the USB port for flashing the firmware
 
 </center><br>
