@@ -156,10 +156,10 @@ else
     FLASH_MODE ?= dout
     export PROGRAMMER_SPEED ?= 460800
     FLASHER = esptool.py
-    FFLAGS += -p $(PORT) -b $(PROGRAMMER_SPEED) write_flash
+    FFLAGS += -p $(PROG_DEV) -b $(PROGRAMMER_SPEED) write_flash
     FFLAGS += -fm $(FLASH_MODE)
     FFLAGS += 0 $(FLASHFILE)-0x00000.bin
-    FFLAGS += 0x10000 $(FLASHFILE)-0x10000.bin; esptool.py -p $(PORT) run
+    FFLAGS += 0x10000 $(FLASHFILE)-0x10000.bin; esptool.py -p $(PROG_DEV) run
 endif
 
 OPTIONAL_CFLAGS_BLACKLIST += -fdiagnostics-color

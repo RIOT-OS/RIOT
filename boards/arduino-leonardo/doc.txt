@@ -55,8 +55,8 @@ the user program, flashing will fail. See below to work arround
 
 ## Mac Users
 
-Mac Users have export the environment variable both `PORT` and `AVRDUDE_PORT`
+Mac Users have export the environment variable both `PORT` and `PROG_DEV`
 to point to the device file of the TTL adapter (`PORT`) and the device file of
-the Arduino Leonardo (`AVRDUDE_PORT`).
+the Arduino Leonardo (`PROG_DEV`).
 
  */

@@ -2,6 +2,8 @@
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
 # Set default flash tool
 export PROGRAMMER ?= cc2538-bsl
 
@@ -15,8 +17,5 @@ ifeq ($(PROGRAMMER),jlink)
 else
   FLASHFILE ?= $(BINFILE)
   FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
-  FFLAGS  = -p "$(PORT)" -e -w -v -b 460800 $(FLASHFILE)
+  FFLAGS  = -p "$(PROG_DEV)" -e -w -v -b 460800 $(FLASHFILE)
 endif
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk

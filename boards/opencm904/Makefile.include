@@ -1,18 +1,17 @@
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
 # custom flasher to use with the bootloader
 FLASHER = $(RIOTBOARD)/$(BOARD)/dist/robotis-loader.py
 DEBUGGER =
 DEBUGSERVER =
 
 FLASHFILE ?= $(BINFILE)
-FFLAGS = $(PORT) $(FLASHFILE)
+FFLAGS = $(PROG_DEV) $(FLASHFILE)
 DEBUGGER_FLAGS =
-
-# define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
 # Skip the space needed by the embedded bootloader
 export ROM_OFFSET ?= 0x3000
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk

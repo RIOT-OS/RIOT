@@ -7,4 +7,4 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # setup flash tool
 FLASHER = $(RIOTTOOLS)/goodfet/goodfet.bsl
 FLASHFILE ?= $(HEXFILE)
-FFLAGS = --z1 -I -c $(PORT) -r -e -p $(FLASHFILE)
+FFLAGS = --z1 -I -c $(PROG_DEV) -r -e -p $(FLASHFILE)

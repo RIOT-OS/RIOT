@@ -196,7 +196,7 @@ ifeq ($(QEMU), 1)
 else
     export PROGRAMMER_SPEED ?= 460800
     FLASHER = $(ESPTOOL)
-    FFLAGS += --chip esp32 -p $(PORT) -b $(PROGRAMMER_SPEED)
+    FFLAGS += --chip esp32 -p $(PROG_DEV) -b $(PROGRAMMER_SPEED)
     FFLAGS += --before default_reset --after hard_reset write_flash
     FFLAGS += -z -fm $(FLASH_MODE) -fs detect -ff $(FLASH_FREQ)
     FFLAGS += 0x1000 $(RIOTCPU)/$(CPU)/bin/bootloader.bin

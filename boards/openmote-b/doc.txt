@@ -38,7 +38,7 @@ RIOT support flashing with USB by default.
 `make flash`
 
 You may have to specify the flashing port with
-`PORT_BSL=<my_openmote_port> make flash`
+`PORT_DEV=<my_openmote_port> make flash`
 
 ### Flashing via JTAG
 

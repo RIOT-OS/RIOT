@@ -1,15 +1,19 @@
 # define the default flash-tool
 export PROGRAMMER ?= cc2538-bsl
 
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# For backward compatibility
+ifneq (,$(PORT_BSL))
+  $(warning Warning! PORT_BSL is deprecated use PROG_DEV)
+  PROG_DEV ?= $(PORT_BSL)
+endif
+
 ifeq ($(PROGRAMMER),cc2538-bsl)
-  ifeq ($(OS),Linux)
-    PORT_BSL ?= $(PORT_LINUX)
-  else ifeq ($(OS),Darwin)
-    PORT_BSL ?= $(PORT_DARWIN)
-  endif
-  RESET ?= $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py -p "$(PORT_BSL)"
+  RESET ?= $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py -p "$(PROG_DEV)"
   FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
-  FFLAGS  = -p "$(PORT_BSL)" -e -w -v -b 115200 $(FLASHFILE)
+  FFLAGS  = -p "$(PROG_DEV)" -e -w -v -b 115200 $(FLASHFILE)
 else ifeq ($(PROGRAMMER),jlink)
   FLASHER = $(RIOTBOARD)/common/remote/dist/flash.sh
   FFLAGS  = $(BINDIR) $(FLASHFILE)
@@ -26,6 +30,3 @@ OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
 # include common remote includes
 INCLUDES += -I$(RIOTBOARD)/common/remote/include
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
