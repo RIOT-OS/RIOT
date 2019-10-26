@@ -8,9 +8,6 @@ TAP ?= tap0
 MSL_US ?= 1000000
 TIMEOUT_US ?= 3000000
 
-# unsupported by ethos: chronos, hamilton, ruuvitag
-BOARD_BLACKLIST := chronos hamilton ruuvitag thingy52
-
 # This test depends on tap device setup (only allowed by root)
 # Suppress test execution to avoid CI errors
 TEST_ON_CI_BLACKLIST += all
@@ -46,5 +43,13 @@ export TAPDEV = $(TAP)
 
 ethos:
 	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)/ethos
+
+# unsupported by ethos: chronos, hamilton, ruuvitag
+BOARD_BLACKLIST := \
+  chronos \
+  hamilton \
+  ruuvitag \
+  thingy52 \
+  #
 
 include $(RIOTBASE)/Makefile.include

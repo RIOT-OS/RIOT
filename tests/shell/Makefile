@@ -11,9 +11,11 @@ RIOT_TERMINAL ?= socat
 
 DISABLE_MODULE += auto_init
 
-# chronos is missing a getchar implementation
-BOARD_BLACKLIST += chronos
-
 APP_SHELL_FMT ?= NONE
+
+# chronos is missing a getchar implementation
+BOARD_BLACKLIST += \
+  chronos \
+  #
 
 include $(RIOTBASE)/Makefile.include

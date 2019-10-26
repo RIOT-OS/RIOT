@@ -1,23 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_BLACKLIST :=  arduino-duemilanove \
-                    arduino-leonardo \
-                    arduino-mega2560 \
-                    arduino-nano \
-                    arduino-uno \
-                    atmega328p \
-                    chronos \
-                    mega-xplained \
-                    microduino-corerf \
-                    msb-430 \
-                    msb-430h \
-                    telosb \
-                    waspmote-pro \
-                    wsn430-v1_3b \
-                    wsn430-v1_4 \
-                    z1 \
-                    #
-
 USEPKG += cn-cbor
 USEMODULE += embunit
 USEMODULE += fmt
@@ -29,5 +11,24 @@ CFLAGS += -DCBOR_NO_LL
 
 # Skips test cases for floating point data types.
 # CFLAGS += -DCBOR_NO_FLOAT
+
+BOARD_BLACKLIST := \
+  arduino-duemilanove \
+  arduino-leonardo \
+  arduino-mega2560 \
+  arduino-nano \
+  arduino-uno \
+  atmega328p \
+  chronos \
+  mega-xplained \
+  microduino-corerf \
+  msb-430 \
+  msb-430h \
+  telosb \
+  waspmote-pro \
+  wsn430-v1_3b \
+  wsn430-v1_4 \
+  z1 \
+  #
 
 include $(RIOTBASE)/Makefile.include

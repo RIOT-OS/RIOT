@@ -2,31 +2,6 @@ BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
 
-# Normally all boards using `cortexm_common/ldscripts/cortexm.ld` linkerscript
-# Only tested on these ones for the moment
-BOARD_WHITELIST += iotlab-a8-m3
-BOARD_WHITELIST += iotlab-m3
-BOARD_WHITELIST += samr21-xpro
-# Normally all boards using `kinetis/ldscripts/kinetis.ld` linkerscript
-BOARD_WHITELIST += frdm-kw41z
-BOARD_WHITELIST += frdm-k64f
-BOARD_WHITELIST += frdm-k22f
-BOARD_WHITELIST += mulle
-BOARD_WHITELIST += pba-d-01-kw2x
-BOARD_WHITELIST += teensy31
-# Boards using a bootloader and ROM_OFFSET by default
-BOARD_WHITELIST += arduino-mkr1000
-BOARD_WHITELIST += arduino-mkrfox1200
-BOARD_WHITELIST += arduino-mkrzero
-BOARD_WHITELIST += blackpill
-BOARD_WHITELIST += blackpill-128kib
-BOARD_WHITELIST += bluepill
-BOARD_WHITELIST += bluepill-128kib
-BOARD_WHITELIST += feather-m0
-BOARD_WHITELIST += opencm904
-BOARD_WHITELIST += spark-core
-
-include $(RIOTBASE)/Makefile.include
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -159,3 +134,37 @@ test-assert_overflow_%: $(ELFFILES_DEPS)
 	$(Q)\
 	{ $(_LINK) -o /dev/null 2>&1 | grep -q 'Specified firmware size does not fit in ROM' ; } \
 	  && echo [OK] || { echo [ERROR] Compilation should have failed >&2; exit 1; }
+
+# Normally all boards using `cortexm_common/ldscripts/cortexm.ld` linkerscript
+# Only tested on these ones for the moment
+BOARD_WHITELIST += \
+  iotlab-a8-m3 \
+  iotlab-m3 \
+  samr21-xpro \
+  #
+
+# Normally all boards using `kinetis/ldscripts/kinetis.ld` linkerscript
+BOARD_WHITELIST += \
+  frdm-k22f \
+  frdm-k64f \
+  frdm-kw41z \
+  mulle \
+  pba-d-01-kw2x \
+  teensy31 \
+  #
+
+# Boards using a bootloader and ROM_OFFSET by default
+BOARD_WHITELIST += \
+  arduino-mkr1000 \
+  arduino-mkrfox1200 \
+  arduino-mkrzero \
+  blackpill \
+  blackpill-128kib \
+  bluepill \
+  bluepill-128kib \
+  feather-m0 \
+  opencm904 \
+  spark-core \
+  #
+
+include $(RIOTBASE)/Makefile.include

@@ -7,11 +7,6 @@ RIOTBASE ?= $(CURDIR)/../..
 # If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
 
-# Currently, LWMAC is only tested and evaluated through on samr21-xpro.
-# Once LWMAC has also been tested through on other boards, the whitelist should
-# be then accordingly extended.
-BOARD_WHITELIST := samr21-xpro
-
 # Modules to include:
 USEMODULE += shell
 USEMODULE += shell_commands
@@ -34,7 +29,14 @@ USEMODULE += gnrc_lwmac
 # reduce the size of the packet buffer a bit
 CFLAGS += -DGNRC_PKTBUF_SIZE=512
 
-include $(RIOTBASE)/Makefile.include
-
 # Set a custom channel if needed
 include $(RIOTMAKE)/default-channel.inc.mk
+
+# Currently, LWMAC is only tested and evaluated through on samr21-xpro.
+# Once LWMAC has also been tested through on other boards, the whitelist should
+# be then accordingly extended.
+BOARD_WHITELIST := \
+  samr21-xpro \
+  #
+
+include $(RIOTBASE)/Makefile.include

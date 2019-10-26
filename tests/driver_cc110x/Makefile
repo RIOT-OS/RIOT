@@ -3,9 +3,6 @@ include ../Makefile.tests_common
 
 DEVICE ?= cc1100 # The MSB-A2 uses the CC1100. New boards use CC1101
 
-# stdlib.h for msp430 does not provide EXIT_FAILURE and EXIT_SUCCESS
-BOARD_BLACKLIST += msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
-
 # This test will rely on a human interacting with the shell, so we better add
 # the shell and some commands
 USEMODULE += shell
@@ -30,5 +27,15 @@ USEMODULE += gnrc_icmpv6_echo
 # Some statistics could also be helpful
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
+
+# stdlib.h for msp430 does not provide EXIT_FAILURE and EXIT_SUCCESS
+BOARD_BLACKLIST += \
+  msb-430 \
+  msb-430h \
+  telosb \
+  wsn430-v1_3b \
+  wsn430-v1_4 \
+  z1 \
+  #
 
 include $(RIOTBASE)/Makefile.include

@@ -2,9 +2,6 @@ DEVELHELP := 1
 # name of your application
 include ../Makefile.tests_common
 
-# chronos, hamilton, ruuvitag, and thingy52 boards don't support ethos
-BOARD_BLACKLIST := chronos hamilton ruuvitag thingy52
-
 export TAP ?= tap0
 
 CFLAGS += -DOUTPUT=TEXT
@@ -52,5 +49,13 @@ TEST_ON_CI_BLACKLIST += all
 
 ethos:
 	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)/ethos
+
+# chronos, hamilton, ruuvitag, and thingy52 boards don't support ethos
+BOARD_BLACKLIST := \
+  chronos \
+  hamilton \
+  ruuvitag \
+  thingy52 \
+  #
 
 include $(RIOTBASE)/Makefile.include

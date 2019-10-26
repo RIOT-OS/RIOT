@@ -7,9 +7,6 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-# The following boards do not have an available UART
-BOARD_BLACKLIST += pic32-wifire pic32-clicker ruuvitag thingy52
-
 # use ethos (ethernet over serial) for network communication and stdio over
 # UART, but not on native, as native has a tap interface towards the host.
 ifeq (,$(filter native,$(BOARD)))
@@ -93,8 +90,6 @@ TERMFLAGS ?= $(PORT) $(TAP) $(IPV6_PREFIX)
 TERMDEPS += host-tools
 endif
 
-include $(RIOTBASE)/Makefile.include
-
 .PHONY: host-tools
 
 host-tools:
@@ -102,3 +97,13 @@ host-tools:
 
 # Set a custom channel if needed
 include $(RIOTMAKE)/default-channel.inc.mk
+
+# The following boards do not have an available UART
+BOARD_BLACKLIST += \
+  pic32-clicker \
+  pic32-wifire \
+  ruuvitag \
+  thingy52 \
+  #
+
+include $(RIOTBASE)/Makefile.include

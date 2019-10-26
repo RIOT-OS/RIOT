@@ -13,6 +13,7 @@ BOARD_WHITELIST := \
   mbed_lpc1768 \
   msbiot \
   mulle \
+  nrf6310 \
   nucleo-f091rc \
   nucleo-f103rb \
   nucleo-f103rb \
@@ -31,7 +32,6 @@ BOARD_WHITELIST := \
   stm32f4discovery \
   udoo \
   yunjia-nrf51822 \
-  nrf6310 \
   #
 
 include $(RIOTBASE)/Makefile.include

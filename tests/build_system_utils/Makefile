@@ -1,7 +1,6 @@
 BOARD_WHITELIST = native
 
 include ../Makefile.tests_common
-include $(RIOTBASE)/Makefile.include
 
 
 # Test utils commands
@@ -49,3 +48,5 @@ test-uppercase:
 	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-uppercase)
 test-uppercase_and_underscore:
 	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-uppercase_and_underscore)
+
+include $(RIOTBASE)/Makefile.include

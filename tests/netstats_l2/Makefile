@@ -6,8 +6,6 @@ BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 mulle native nrf51dk nrf51don
     esp32-mh-et-live-minikit esp32-olimex-evb \
     esp32-wemos-lolin-d32-pro esp32-wroom-32 esp32-wrover-kit
 
-BOARD_WHITELIST += $(BOARD_PROVIDES_NETIF)
-
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += gnrc
@@ -18,5 +16,9 @@ USEMODULE += netstats_l2
 # Cannot run the test on `murdock` in `native`
 #   open(/dev/net/tun): No such file or directory
 TEST_ON_CI_BLACKLIST += native
+
+BOARD_WHITELIST += \
+  $(BOARD_PROVIDES_NETIF) \
+  #
 
 include $(RIOTBASE)/Makefile.include

@@ -4,6 +4,8 @@ include ../Makefile.tests_common
 
 USEMODULE += trace
 
-BOARD_WHITELIST := native
+BOARD_WHITELIST := \
+  native \
+  #
 
 include $(RIOTBASE)/Makefile.include
