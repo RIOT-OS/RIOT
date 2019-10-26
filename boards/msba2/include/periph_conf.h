@@ -29,6 +29,8 @@ extern "C" {
  * @name    Clock configuration
  * @{
  */
+#define XTAL_HZ             (16000000U)         /* the board provides a 16 MHz XTAL */
+
 #define CLOCK_CORECLOCK     (72000000U)         /* the msba2 runs with 72MHz */
 
 #define CLOCK_PCLK          (CLOCK_CORECLOCK)
