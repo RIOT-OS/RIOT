@@ -23,6 +23,7 @@
 #include <string.h>
 #include "board.h"
 #include "cpu.h"
+#include "periph_conf.h"
 #include "lpc2387.h"
 
 #define CL_CPU_DIV      4
@@ -68,11 +69,17 @@ static void init_clks1(void)
 
     while (!(SCS & 0x40));              /* Wait until main OSC is usable */
 
-    /* select main OSC, 16MHz, as the PLL clock source */
+#ifdef XTAL_HZ
+    /* select main OSC (XTAL_HZ) as the PLL clock source */
     CLKSRCSEL = 0x0001;
+#else
+    /* use the internal RC OSC as the PLL clock source */
+#define XTAL_HZ F_RC_OSCILLATOR
+#endif
 
     /* Setting Multiplier and Divider values */
-    PLLCFG = 0x0008;                    /* M=9 N=1 Fcco = 288 MHz */
+    /* Fcco = (2 * Fin *  M)/ N = 288 MHz */
+    PLLCFG = PLLCFG_M(F_CCO/(XTAL_HZ)) | PLLCFG_N(2);
     pllfeed();
 
     /* Enabling the PLL */
