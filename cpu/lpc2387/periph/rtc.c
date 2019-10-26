@@ -62,6 +62,8 @@ void rtc_init(void)
         _rtc_set(0);
     }
 
+    rtc_poweron();
+
     DEBUG("%2lu.%2lu.%4lu  %2lu:%2lu:%2lu\n",
             RTC_DOM, RTC_MONTH, RTC_YEAR, RTC_HOUR, RTC_MIN, RTC_SEC);
 }
