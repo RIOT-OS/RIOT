@@ -75,13 +75,28 @@ static const timer_conf_t timer_config[] = {
 * to 1 and defining pins for UART_CTS_PIN and UART_RTS_PIN.
 * @{
 */
-#define UART_NUMOF           (1)
-#define UART0_RX_PIN         (12)
-#define UART0_TX_PIN         (13)
+/**
+ * @name    UART configuration
+ *
+ * We can enable hardware flow control, by setting flow_control
+ * to 1 and defining pins for cts_pin and rts_pin.
+ *
+ * Add a second UART configuration if using external pins.
+ * @{
+ */
 
-/* Not implemented in launchpad, define if using external transceiver */
-#define UART1_RX_PIN          (0)
-#define UART1_TX_PIN          (0)
+static const uart_conf_t uart_config[] = {
+ {
+     .regs = UART0,
+     .tx_pin = 13,
+     .rx_pin = 12,
+     .rts_pin = 0,      /* ignored when flow_control is 0 */
+     .cts_pin = 0,      /* ignored when flow_control is 0 */
+     .flow_control = 0,
+     .intn = UART0_IRQN
+ }
+};
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 #ifdef __cplusplus

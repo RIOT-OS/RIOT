@@ -47,31 +47,15 @@ static uart_isr_ctx_t ctx[UART_NUMOF];
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
-    /* make sure the uart device is valid */
-    if (uart > UART_NUMOF) {
-        return UART_NODEV;
-    }
+    assert(uart < UART_NUMOF);
 
-#if defined(CPU_VARIANT_X2)
-    uart_regs_t *uart_reg = (uart == 1) ? UART1 : UART0;
-    int tx_pin = (uart == 1) ? UART1_TX_PIN : UART0_TX_PIN;
-    int rx_pin = (uart == 1) ? UART1_RX_PIN : UART0_RX_PIN;
-    int irqn = (uart == 1) ? UART1_IRQN : UART0_IRQN;
-#  if UART_HW_FLOW_CONTROL
-    int rts_pin = (uart == 1) ? UART1_RTS_PIN : UART0_RTS_PIN;
-    int cts_pin = (uart == 1) ? UART1_CTS_PIN : UART0_CTS_PIN;
-#  endif // UART_HW_FLOW_CONTROL
-#elif defined(CPU_VARIANT_X0)
-    uart_regs_t *uart_reg = UART0;
-    int tx_pin = UART0_TX_PIN;
-    int rx_pin = UART0_RX_PIN;
-    int irqn = UART0_IRQN;
-#  if UART_HW_FLOW_CONTROL
-    int rts_pin = UART0_RTS_PIN;
-    int cts_pin = UART0_CTS_PIN;
-#  endif // UART_HW_FLOW_CONTROL
-#endif // CPU_VARIANT_X2
-
+    uart_regs_t *uart_reg = uart_config[uart].regs;
+    int tx_pin = uart_config[uart].tx_pin;
+    int rx_pin = uart_config[uart].rx_pin;
+    int intn = uart_config[uart].intn;
+    int flow = uart_config[uart].flow_control;
+    int rts_pin = uart_config[uart].rts_pin;
+    int cts_pin = uart_config[uart].cts_pin;
 
     /* enable clocks: serial power domain and UART */
     PRCM->PDCTL0SERIAL = 1;
@@ -88,10 +72,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* configure pins */
     IOC->CFG[tx_pin] =  IOCFG_PORTID_UART0_TX;
     IOC->CFG[rx_pin] = (IOCFG_PORTID_UART0_RX | IOCFG_INPUT_ENABLE);
-#if UART_HW_FLOW_CONTROL
-    IOC->CFG[rts_pin] =  IOCFG_PORTID_UART0_RTS;
-    IOC->CFG[cts_pin] = (IOCFG_PORTID_UART0_CTS | IOCFG_INPUT_ENABLE);
-#endif
+    if (flow == 1) {
+      IOC->CFG[rts_pin] =  IOCFG_PORTID_UART0_RTS;
+      IOC->CFG[cts_pin] = (IOCFG_PORTID_UART0_CTS | IOCFG_INPUT_ENABLE);
+    }
 
     /* calculate baud-rate */
     uint32_t tmp = (CLOCK_CORECLOCK * 4);
@@ -105,7 +89,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* enable the RX interrupt */
     uart_reg->IMSC = UART_IMSC_RXIM;
-    NVIC_EnableIRQ(irqn);
+    NVIC_EnableIRQ(intn);
 
     /* start the UART */
     uart_reg->CTL = ENABLE_MASK;
@@ -132,14 +116,11 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
     assert(stop_bits == UART_STOP_BITS_1 ||
            stop_bits == UART_STOP_BITS_2);
 
-    /* make sure the uart device is valid */
-    if (uart >= UART_NUMOF) {
-        return UART_NODEV;
-    }
+    assert(uart < UART_NUMOF);
 
-    uart_regs_t *uart_reg = (uart == 1) ? UART1 : UART0;
+    uart_regs_t *uart_reg = uart_config[uart].regs;
 
-    /* cc26x0 does not support mark or space parity */
+    /* cc26xx/cc13xx does not support mark or space parity */
     if (parity == UART_PARITY_MARK || parity == UART_PARITY_SPACE) {
         return UART_NOMODE;
     }
@@ -160,7 +141,9 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    uart_regs_t *uart_reg = (uart == 1) ? UART1 : UART0;
+    assert(uart < UART_NUMOF);
+
+    uart_regs_t *uart_reg = uart_config[uart].regs;
 
     for (size_t i = 0; i < len; i++) {
         while (uart_reg->FR & UART_FR_TXFF) {}
@@ -170,7 +153,9 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
 void uart_poweron(uart_t uart)
 {
-    uart_regs_t *uart_reg = (uart == 1) ? UART1 : UART0;
+    assert(uart < UART_NUMOF);
+
+    uart_regs_t *uart_reg = uart_config[uart].regs;
 
     PRCM->UARTCLKGR |= 0x1;
     PRCM->CLKLOADCTL = CLKLOADCTL_LOAD;
@@ -181,7 +166,9 @@ void uart_poweron(uart_t uart)
 
 void uart_poweroff(uart_t uart)
 {
-    uart_regs_t *uart_reg = (uart == 1) ? UART1 : UART0;
+    assert(uart < UART_NUMOF);
+
+    uart_regs_t *uart_reg = uart_config[uart].regs;
 
     uart_reg->CTL = 0;
 
@@ -193,7 +180,10 @@ void uart_poweroff(uart_t uart)
 
 static void isr_uart(uart_t uart)
 {
-    uart_regs_t *uart_reg = (uart == 1) ? UART1 : UART0;
+    assert(uart < UART_NUMOF);
+
+    uart_regs_t *uart_reg = uart_config[uart].regs;
+
     /* remember pending interrupts */
     uint32_t mis = uart_reg->MIS;
     /* clear them */

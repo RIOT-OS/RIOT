@@ -112,6 +112,21 @@ typedef enum {
 /** @} */
 
 /**
+ * @brief   UART device configuration
+ * @{
+ */
+typedef struct {
+   uart_regs_t *regs;
+   int tx_pin;
+   int rx_pin;
+   int rts_pin;
+   int cts_pin;
+   int flow_control;
+   int intn;
+} uart_conf_t;
+/** @} */
+
+/**
  * @brief   Configuration of low-level general purpose timers
  *
  * General purpose timers (GPT[0-3]) are configured consecutively and in order
