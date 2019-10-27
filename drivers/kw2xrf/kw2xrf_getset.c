@@ -372,7 +372,7 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
 
         /* trigger option specific actions */
         switch (option) {
-            case KW2XRF_OPT_AUTOCCA:
+            case KW2XRF_OPT_CSMA:
                 LOG_DEBUG("[kw2xrf] opt: enabling CCA before TX mode\n");
                 kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL1,
                     MKW2XDM_PHY_CTRL1_CCABFRTX);
@@ -423,7 +423,7 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
         dev->netdev.flags &= ~(option);
         /* trigger option specific actions */
         switch (option) {
-            case KW2XRF_OPT_AUTOCCA:
+            case KW2XRF_OPT_CSMA:
                 kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL1,
                     MKW2XDM_PHY_CTRL1_CCABFRTX);
                 break;

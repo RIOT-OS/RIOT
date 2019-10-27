@@ -315,10 +315,45 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
                 !!(dev->netdev.flags & KW2XRF_OPT_TELL_TX_END);
             return sizeof(netopt_enable_t);
 
-        case NETOPT_AUTOCCA:
+        case NETOPT_CSMA:
             *((netopt_enable_t *)value) =
-                !!(dev->netdev.flags & KW2XRF_OPT_AUTOCCA);
+                !!(dev->netdev.flags & KW2XRF_OPT_CSMA);
             return sizeof(netopt_enable_t);
+
+        case NETOPT_CSMA_RETRIES:
+            if (len != sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint8_t *)value) = dev->max_backoffs;
+            return len;
+
+        case NETOPT_CSMA_MAXBE:
+            if (len != sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint8_t *)value) = dev->csma_max_be;
+            return len;
+
+        case NETOPT_CSMA_MINBE:
+            if (len != sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint8_t *)value) = dev->csma_min_be;
+            return len;
+
+        case NETOPT_RETRANS:
+            if (len != sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint8_t *)value) = dev->max_retrans;
+            return len;
+
+        case NETOPT_TX_RETRIES_NEEDED:
+            if (len != sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint8_t *)value) = dev->num_retrans;
+            return len;
 
         case NETOPT_CHANNEL:
             if (len < sizeof(uint16_t)) {
@@ -503,12 +538,49 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
                                  ((bool *)value)[0]);
             res = sizeof(netopt_enable_t);
             break;
-
-        case NETOPT_AUTOCCA:
-            kw2xrf_set_option(dev, KW2XRF_OPT_AUTOCCA,
+        //////////////////////////////////////////////////////>><
+        case NETOPT_CSMA:
+            kw2xrf_set_option(dev, KW2XRF_OPT_CSMA,
                                  ((bool *)value)[0]);
             res = sizeof(netopt_enable_t);
             break;
+
+        case NETOPT_CSMA_RETRIES:
+            if (len != sizeof(uint8_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            dev->max_backoffs = *((const uint8_t*)value);
+            res = len;
+            break;
+
+        case NETOPT_CSMA_MAXBE:
+            if (len != sizeof(uint8_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            dev->csma_max_be = *((const uint8_t*)value);
+            res = len;
+            break;
+
+        case NETOPT_CSMA_MINBE:
+            if (len != sizeof(uint8_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            dev->csma_min_be = *((const uint8_t*)value);
+            res = len;
+            break;
+
+        case NETOPT_RETRANS:
+            if (len != sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            }
+            dev->max_retrans = *((const uint8_t *)value);
+            res = len;
+            break;
+
+            ///////////////////////////////////////////////////>><
 
         case NETOPT_CCA_THRESHOLD:
             if (len < sizeof(uint8_t)) {

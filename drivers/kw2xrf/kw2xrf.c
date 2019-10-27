@@ -64,6 +64,13 @@ void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
     dev->idle_state = XCVSEQ_RECEIVE;
     dev->state = 0;
     dev->pending_tx = 0;
+
+    /* Set default parameters according to STD IEEE802.15.4-2015 */
+    dev->csma_max_be = 5;
+    dev->csma_min_be = 3;
+    dev->max_retrans = 3;
+    dev->max_backoffs = 4;
+
     kw2xrf_spi_init(dev);
     kw2xrf_set_power_mode(dev, KW2XRF_IDLE);
     DEBUG("[kw2xrf] setup finished\n");
@@ -105,7 +112,7 @@ void kw2xrf_reset_phy(kw2xrf_t *dev)
 
     kw2xrf_set_option(dev, KW2XRF_OPT_AUTOACK, true);
     kw2xrf_set_option(dev, KW2XRF_OPT_ACK_REQ, true);
-    kw2xrf_set_option(dev, KW2XRF_OPT_AUTOCCA, true);
+    kw2xrf_set_option(dev, KW2XRF_OPT_CSMA, true);
 
     kw2xrf_set_power_mode(dev, KW2XRF_AUTODOZE);
     kw2xrf_set_sequence(dev, dev->idle_state);
