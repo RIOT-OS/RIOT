@@ -359,6 +359,11 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsign
     uint16_t delta;
 
     uint8_t *data_start = _parse_option(pkt, optpos, &delta, &option_len);
+    if (!data_start) {
+        DEBUG("nanocoap: invalid start data\n");
+        return -1;
+    }
+
     uint32_t blkopt = _decode_uint(data_start, option_len);
 
     DEBUG("nanocoap: blkopt len: %i\n", option_len);
