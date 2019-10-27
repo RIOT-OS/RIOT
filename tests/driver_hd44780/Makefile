@@ -7,9 +7,6 @@ BOARD_BLACKLIST := stm32f4discovery slstk3401a slstk3402a \
                    stk3600 stk3700 \
                    sodaq-autonomo sodaq-explorer sodaq-one sodaq-sara-aff
 
-# currently the test provides config params for arduinos only
-FEATURES_REQUIRED += arduino
-
 USEMODULE += hd44780
 
 include $(RIOTBASE)/Makefile.include

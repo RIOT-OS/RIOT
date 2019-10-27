@@ -11,10 +11,11 @@
  *
  * @{
  * @file
- * @brief       Pinout config for the HD44780 display
+ * @brief       Default configuration for the HD44780 driver
  *
  * @author      Sebastian Meiling <s@mlng.net>
  */
+
 #ifndef HD44780_PARAMS_H
 #define HD44780_PARAMS_H
 
@@ -28,6 +29,7 @@ extern "C"
 {
 #endif
 
+#ifdef MODULE_ARDUINO
 #define HD44780_PARAMS_ARDUINO {    \
     .cols   = 16,                   \
     .rows   = 2,                    \
@@ -38,12 +40,31 @@ extern "C"
                HD44780_RW_OFF, HD44780_RW_OFF, HD44780_RW_OFF, HD44780_RW_OFF} \
 }
 
+#ifndef HD44780_PARAMS
+#define HD44780_PARAMS HD44780_PARAMS_ARDUINO
+#endif
+#endif
+
+#ifndef HD44780_PARAMS
+#define HD44780_PARAMS {            \
+    .cols   = 16,                   \
+    .rows   = 2,                    \
+    .rs     = GPIO_PIN(0,1),        \
+    .rw     = GPIO_PIN(0,2),        \
+    .enable = GPIO_PIN(0,3),        \
+    .data   = {                     \
+                GPIO_PIN(0,4), GPIO_PIN(0,5), GPIO_PIN(0,6), GPIO_PIN(0,7),      \
+                HD44780_RW_OFF, HD44780_RW_OFF, HD44780_RW_OFF, HD44780_RW_OFF,  \
+              }                     \
+    }
+#endif
+
 /**
  * @brief   LCM1602C configuration
  */
 static const hd44780_params_t hd44780_params[] =
 {
-    HD44780_PARAMS_ARDUINO,
+    HD44780_PARAMS,
 };
 
 #ifdef __cplusplus
