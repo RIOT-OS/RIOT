@@ -902,8 +902,8 @@ void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
 
 void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
 {
-    uint32_t blknum;
-    unsigned szx;
+    uint32_t blknum = 0;
+    unsigned szx = 0;
 
     /* Retrieve the block2 option from the client request */
     if (coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &blknum, &szx) >= 0) {
