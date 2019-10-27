@@ -340,42 +340,53 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
  *
  * @return              numeric id of the given SERCOM device
  */
-static inline int sercom_id(const void *sercom)
+static inline uint8_t sercom_id(const void *sercom)
 {
 #ifdef SERCOM0
-    if (sercom == SERCOM0)
+    if (sercom == SERCOM0) {
         return 0;
+    }
 #endif
 #ifdef SERCOM1
-    if (sercom == SERCOM1)
+    if (sercom == SERCOM1) {
         return 1;
+    }
 #endif
 #ifdef SERCOM2
-    if (sercom == SERCOM2)
+    if (sercom == SERCOM2) {
         return 2;
+    }
 #endif
 #ifdef SERCOM3
-    if (sercom == SERCOM3)
+    if (sercom == SERCOM3) {
         return 3;
+    }
 #endif
 #ifdef SERCOM4
-    if (sercom == SERCOM4)
+    if (sercom == SERCOM4) {
         return 4;
+    }
 #endif
 #ifdef SERCOM5
-    if (sercom == SERCOM5)
+    if (sercom == SERCOM5) {
         return 5;
+    }
 #endif
 #ifdef SERCOM6
-    if (sercom == SERCOM6)
+    if (sercom == SERCOM6) {
         return 6;
+    }
 #endif
 #ifdef SERCOM7
-    if (sercom == SERCOM7)
+    if (sercom == SERCOM7) {
         return 7;
+    }
 #endif
 
-    return -1;
+    /* should not be reached, so fail with assert */
+    assert(false);
+
+    return SERCOM_INST_NUM;
 }
 
 /**
