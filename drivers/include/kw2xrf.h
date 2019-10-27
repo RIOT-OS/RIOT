@@ -88,14 +88,14 @@ extern "C" {
 #define KW2XRF_OPT_RAWDUMP          (NETDEV_IEEE802154_RAW)            /**< legacy define */
 #define KW2XRF_OPT_ACK_REQ          (NETDEV_IEEE802154_ACK_REQ)        /**< legacy define */
 
-#define KW2XRF_OPT_CSMA             (0x0100)    /**< use CSMA/CA algorithm for sending */      //>>< No more AUTOCCA option. Using CSMA instead
+#define KW2XRF_OPT_CSMA             (0x0100)    /**< use CSMA/CA algorithm for sending */
 #define KW2XRF_OPT_PROMISCUOUS      (0x0200)    /**< promiscuous mode active */
 #define KW2XRF_OPT_PRELOADING       (0x0400)    /**< preloading enabled */
 #define KW2XRF_OPT_TELL_TX_START    (0x0800)    /**< notify MAC layer on TX start */
-#define KW2XRF_OPT_TELL_TX_END      (0x1000)    /**< notify MAC layer on TX finished */         //>>< Uncrustify crustified more than it uncrustified here, I guess
+#define KW2XRF_OPT_TELL_TX_END      (0x1000)    /**< notify MAC layer on TX finished */
 #define KW2XRF_OPT_TELL_RX_START    (0x2000)    /**< notify MAC layer on RX start */
 #define KW2XRF_OPT_TELL_RX_END      (0x4000)    /**< notify MAC layer on RX finished */
-#define KW2XRF_OPT_AUTOACK          (0x8000)    /**< enable automatic ACK for incoming packet */   //>>< bloody hell
+#define KW2XRF_OPT_AUTOACK          (0x8000)    /**< enable automatic ACK for incoming packet */
 /** @} */
 
 /**
@@ -137,10 +137,10 @@ typedef struct {
     uint32_t csma_delay;                /**< The actual delay for the CSMA algorithm */
 
                                         /**  -----------------Internal retransmission counters-----------------*/
-    uint8_t max_retrans;                /**< Maximum number of frame retransmissions when no Ack frame is received (macMaxFrameRetries) */  //>>< Retrans for ACK timeout
-    uint8_t num_retrans;                /**< Number of retransmissions due to ACK timeouts*/                                                //>>< Retrans for ACK timeout
-    uint8_t num_backoffs;               /**< Number of CSMA backoffs so far in the current transmission attempt */                          //>>< Backoff for CCA fail
-    uint8_t max_backoffs;               /**< Maximum number of CSMA backoffs when waiting for channel clear (macMaxCsmaBackoffs) */         //>>< Backoff for CCA fail
+    uint8_t max_retrans;                /**< Maximum number of frame retransmissions when no Ack frame is received (macMaxFrameRetries) */
+    uint8_t num_retrans;                /**< Number of retransmissions due to ACK timeouts*/
+    uint8_t num_backoffs;               /**< Number of CSMA backoffs so far in the current transmission attempt */
+    uint8_t max_backoffs;               /**< Maximum number of CSMA backoffs when waiting for channel clear (macMaxCsmaBackoffs) */
     /** @} */
 } kw2xrf_t;
 
