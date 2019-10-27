@@ -424,7 +424,6 @@ void Keccak_update(keccak_state_t *ctx, const unsigned char *input,
 
         if (blockSize == ctx->rateInBytes) {
             KeccakF1600_StatePermute(ctx->state);
-            blockSize = 0;
             ctx->i = 0;
         }
     }
