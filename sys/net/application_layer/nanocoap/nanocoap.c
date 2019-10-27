@@ -784,7 +784,7 @@ static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val
     assert(optnum >= lastonum);
 
     /* calculate option length */
-    uint8_t dummy[3];
+    uint8_t dummy[3] = { 0 };
     size_t optlen = _put_delta_optlen(dummy, 1, 4, optnum - lastonum);
     optlen += _put_delta_optlen(dummy, 0, 0, val_len);
     optlen += val_len;
