@@ -257,6 +257,10 @@ void tmp00x_convert(int16_t rawv, int16_t rawt,  float *tamb, float *tobj);
  * @param[in]  dev          device descriptor of sensor
  * @param[out] ta           converted ambient temperature
  * @param[out] to           converted object temperature
+ *
+ * @return                  TMP00X_OK on success
+ * @return                  -TMP00X_ERROR if data read not ready
+ * @return                  -TMP00X_ERROR_BUS on I2C error
  */
 int tmp00x_read_temperature(const tmp00x_t *dev, int16_t *ta, int16_t *to);
 
