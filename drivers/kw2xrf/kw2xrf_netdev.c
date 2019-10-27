@@ -25,6 +25,7 @@
 #include <errno.h>
 
 #include "log.h"
+#include "random.h"
 #include "thread_flags.h"
 #include "net/eui64.h"
 #include "net/ieee802154.h"
@@ -42,7 +43,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define _MACACKWAITDURATION         (864 / 16) /* 864us * 62500Hz */
+#define KW2XRF_ACK_WAIT_TIME        54	//864 us
+#define KW2XRF_CSMA_UNIT_TIME       20	//320 us
 
 #define KW2XRF_THREAD_FLAG_ISR      (1 << 8)
 
@@ -95,14 +97,48 @@ static size_t kw2xrf_tx_load(uint8_t *pkt_buf, uint8_t *buf, size_t len, size_t 
     return offset + len;
 }
 
+/**
+ * @brief Generate a random number for using as a CSMA delay value
+ */
+static inline uint32_t kw2xrf_csma_random_delay(kw41zrf_t *dev)
+{
+    /* Use topmost csma_be bits of the random number */
+    uint32_t rnd = random_uint32() >> (32 - dev->csma_be);
+    return (rnd * KW41ZRF_CSMA_UNIT_TIME);
+}
+
 static void kw2xrf_tx_exec(kw2xrf_t *dev)
 {
-    if ((dev->netdev.flags & KW2XRF_OPT_ACK_REQ) &&
-        (_send_last_fcf & IEEE802154_FCF_ACK_REQ)) {
+    kw2xrf_set_sequence(dev, XCVSEQ_IDLE);
+
+    bool transmit_with_receive = ((dev->netdev.flags & KW2XRF_OPT_ACK_REQ) &&
+        (_send_last_fcf & IEEE802154_FCF_ACK_REQ));
+    bool csma_requested = (dev->netdev.flags & KW2XRF_OPT_CSMA); //>>< benemorius, what are you doing?? Why not just use dev->netdev.flags?
+
+    //if(csma_requested) //>><Why are we even doing this? Whoever sets the other internal counters should calculate this too!
+    //{
+    //    dev->backoff = kw2xrf_csma_random_delay(dev);
+    //}
+
+    if(csma_requested)
+    {
+        /* Allow TMR2 interrupt to schedule a TX operation */
+        /* For more info check the Reference Manual */
+        /* Chapter 7.7.3 Using T2CMP to Trigger Transceiver Operations*/
+        kw2xrf_timer2_seq_start_on(dev);
+    }
+
+    if (transmit_with_receive) {
         kw2xrf_set_sequence(dev, XCVSEQ_TX_RX);
     }
     else {
         kw2xrf_set_sequence(dev, XCVSEQ_TRANSMIT);
+    }
+
+    if(csma_requested)
+    {
+        /* Enable TMR2 interrupt and set timeout for TMR2 */
+        kw2xrf_trigger_tx_ops_enable(dev, dev->csma_delay);
     }
 }
 
@@ -152,7 +188,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         len = kw2xrf_tx_load(pkt_buf, iol->iol_base, iol->iol_len, len);
     }
 
-    kw2xrf_set_sequence(dev, XCVSEQ_IDLE);
+    //kw2xrf_set_sequence(dev, XCVSEQ_IDLE);  //>>< This has to be done in exec! //>>< Does it tho?
     dev->pending_tx++;
 
     /*
@@ -162,12 +198,17 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     dev->buf[0] = len + IEEE802154_FCS_LEN;
 
     /* Help for decision to use T or TR sequenz */
-    _send_last_fcf = dev->buf[1];
+    _send_last_fcf = dev->buf[1];   //>>< <--There are some inconsistencies with what we are doing here and what benemorius is doing in kw41. MAYBE he's doing it wrong tho
 
     kw2xrf_write_fifo(dev, dev->buf, dev->buf[0]);
 
     /* send data out directly if pre-loading id disabled */
     if (!(dev->netdev.flags & KW2XRF_OPT_PRELOADING)) {
+        /* New transmission! Reset the CSMA counters */
+        dev->csma_be = dev->csma_min_be;
+        dev->num_backoffs = 0;
+        dev->num_retrans = 0;
+        dev->csma_delay = kw2xrf_csma_random_delay(dev);
         kw2xrf_tx_exec(dev);
     }
 
@@ -741,7 +782,7 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
             /* Allow TMR3IRQ to cancel RX operation */
             kw2xrf_timer3_seq_abort_on(dev);
             /* Enable interrupt for TMR3 and set timer */
-            kw2xrf_abort_rx_ops_enable(dev, _MACACKWAITDURATION);
+            kw2xrf_abort_rx_ops_enable(dev, KW2XRF_ACK_WAIT_TIME);
         }
     }
 

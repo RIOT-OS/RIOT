@@ -134,12 +134,13 @@ typedef struct {
     uint8_t csma_min_be;                /**< Minimum backoff exponent (macMinBe) */
     uint8_t csma_max_be;                /**< Maximum backoff exponent (macMaxBe) */
     uint8_t csma_be;                    /**< CSMA backoff exponent in the current transmission attempt */
+    uint32_t csma_delay;                /**< The actual delay for the CSMA algorithm */
 
                                         /**  -----------------Internal retransmission counters-----------------*/
     uint8_t max_retrans;                /**< Maximum number of frame retransmissions when no Ack frame is received (macMaxFrameRetries) */  //>>< Retrans for ACK timeout
     uint8_t num_retrans;                /**< Number of retransmissions due to ACK timeouts*/                                                //>>< Retrans for ACK timeout
     uint8_t num_backoffs;               /**< Number of CSMA backoffs so far in the current transmission attempt */                          //>>< Backoff for CCA fail
-    uint8_t max_backoffs;               /**< Maximum number of CSMA backoffs when waiting for channel clear (macMaxCsmaBackoffs) */
+    uint8_t max_backoffs;               /**< Maximum number of CSMA backoffs when waiting for channel clear (macMaxCsmaBackoffs) */         //>>< Backoff for CCA fail
     /** @} */
 } kw2xrf_t;
 
