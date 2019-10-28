@@ -692,18 +692,15 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
     }
 
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_SEQIRQ) {
+        DEBUG("[kw2xrf] SEQIRQ\n");
+        bool channel_was_busy = false;
         if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_CCAIRQ) {
             irqsts1 |= MKW2XDM_IRQSTS1_CCAIRQ;
             if (dregs[MKW2XDM_IRQSTS2] & MKW2XDM_IRQSTS2_CCA) {
                 DEBUG("[kw2xrf] CCA CH busy\n");
                 netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
+                channel_was_busy = true;
             }
-            else {
-                netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-            }
-        }
-        else {
-            netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
         }
 
         irqsts1 |= MKW2XDM_IRQSTS1_SEQIRQ;
@@ -713,8 +710,8 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
             /* if the sequence was aborted by timer 3, ACK timed out */
             DEBUG("[kw2xrf] TC3TMOUT, SEQIRQ, TX failed\n");
             netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
-        } else {
-            DEBUG("[kw2xrf] SEQIRQ\n");
+        } else if(!channel_was_busy) {
+            DEBUG("[kw2xrf] TX success\n");
             netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
         }
 
