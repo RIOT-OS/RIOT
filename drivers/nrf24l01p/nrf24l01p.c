@@ -618,30 +618,13 @@ int nrf24l01p_set_power(const nrf24l01p_t *dev, int pwr)
     return nrf24l01p_write_reg(dev, REG_RF_SETUP, rf_setup);
 }
 
+static const int8_t _nrf24l01p_power_map[4] = { -18, -12, -6, 0 };
+
 int nrf24l01p_get_power(const nrf24l01p_t *dev)
 {
     char rf_setup;
-    int pwr;
-
     nrf24l01p_read_reg(dev, REG_RF_SETUP, &rf_setup);
-
-    if ((rf_setup & 0x6) == 0) {
-        pwr = -18;
-    }
-
-    if ((rf_setup & 0x6) == 2) {
-        pwr = -12;
-    }
-
-    if ((rf_setup & 0x6) == 4) {
-        pwr = -6;
-    }
-
-    if ((rf_setup & 0x6) == 6) {
-        pwr = 0;
-    }
-
-    return pwr;
+    return _nrf24l01p_power_map[(rf_setup & 0x6) >> 1];
 }
 
 
