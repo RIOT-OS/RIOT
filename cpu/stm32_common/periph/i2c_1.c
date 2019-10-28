@@ -312,7 +312,7 @@ static int _start(I2C_TypeDef *i2c, uint32_t cr2, uint8_t flags)
         cr2 |= I2C_CR2_AUTOEND;
         cr2 &= ~(I2C_CR2_RELOAD);
     }
-    DEBUG("[i2c] start: Setting CR2=0x%08lX\n", cr2);
+    DEBUG("[i2c] start: Setting CR2=0x%08x\n", (unsigned int)cr2);
     i2c->CR2 = cr2;
     if (!(flags & I2C_NOSTART)) {
         uint16_t tick = TICK_TIMEOUT;
@@ -377,7 +377,7 @@ static int _wait_isr_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags)
             return -EAGAIN;
         }
         if (isr & mask) {
-            DEBUG("[i2c] wait_isr_set: ISR 0x%08lX set\n", mask);
+            DEBUG("[i2c] wait_isr_set: ISR 0x%08x set\n", (unsigned int)mask);
             return 0;
         }
     }
