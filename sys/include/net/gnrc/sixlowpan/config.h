@@ -163,8 +163,8 @@ extern "C" {
 
 /**
  * @name Selective fragment recovery configuration
- * @see  [draft-ietf-6lo-fragment-recovery-07, section 7.1]
- *       (https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-07#section-7.1)
+ * @see  [RFC 8931, section 7.1]
+ *       (https://tools.ietf.org/html/rfc8931#section-7.1)
  * @note Only applicable with gnrc_sixlowpan_frag_sfr module
  * @{
  */

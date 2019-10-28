@@ -130,8 +130,8 @@ gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr
  *
  * @note    datagram_size is not a search parameter as the primary use case
  *          for this function is [Selective Fragment Recovery]
- *          (https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-05)
- *          where this information only exists in the first fragment.
+ *          (https://tools.ietf.org/html/rfc8931) where this information only
+ *          exists in the first fragment.
  *
  * @return  true, if an entry with the given tuple exist.
  * @return  false, if no entry with the given tuple exist.
@@ -151,8 +151,8 @@ bool gnrc_sixlowpan_frag_rb_exists(const gnrc_netif_hdr_t *netif_hdr,
  *
  * @note    datagram_size is not a search parameter as the primary use case
  *          for this function is [Selective Fragment Recovery]
- *          (https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-05)
- *          where this information only exists in the first fragment.
+ *          (https://tools.ietf.org/html/rfc8931) where this information only
+ *          exists in the first fragment.
  */
 void gnrc_sixlowpan_frag_rb_rm_by_datagram(const gnrc_netif_hdr_t *netif_hdr,
                                            uint16_t tag);
