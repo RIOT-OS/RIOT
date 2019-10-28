@@ -104,7 +104,7 @@ static size_t kw2xrf_tx_load(uint8_t *pkt_buf, uint8_t *buf, size_t len, size_t 
 /**
  * @brief Generate a random number for using as a CSMA delay value
  */
-static inline uint32_t kw2xrf_csma_random_delay(kw41zrf_t *dev)
+static inline uint32_t kw2xrf_csma_random_delay(kw2xrf_t *dev)
 {
     /* Use topmost csma_be bits of the random number */
     uint32_t rnd = random_uint32() >> (32 - dev->csma_be);
@@ -732,7 +732,7 @@ static void _isr_event_seq_t(netdev_t *netdev, uint8_t *dregs)
             if (dregs[MKW2XDM_IRQSTS2] & MKW2XDM_IRQSTS2_CCA) {
                 DEBUG("[kw2xrf] CCA CH busy\n");
                 /* Channel busy: Try CSMA backoff */
-                /* Info: The fact, that a CCA was performed here, means that NETOPT_CSMA was set before, so we don't have to check that
+                /* Info: The fact, that a CCA was performed here, means that NETOPT_CSMA was set before, so we don't have to check that */
                 /* Limit reached ? */
                 if(dev->num_backoffs < dev->max_backoffs)
                 {
@@ -750,7 +750,7 @@ static void _isr_event_seq_t(netdev_t *netdev, uint8_t *dregs)
                 {
                     /* Limit for retransmissions reached: give up */
                     netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
-                } 
+                }
             }
             else {
                 netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
@@ -842,7 +842,7 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
             if (dregs[MKW2XDM_IRQSTS2] & MKW2XDM_IRQSTS2_CCA) {
                 DEBUG("[kw2xrf] CCA CH busy\n");
                 /* Channel busy: Try CSMA backoff */
-                /* Info: The fact, that a CCA was performed here, means that NETOPT_CSMA was set before, so we don't have to check that
+                /* Info: The fact, that a CCA was performed here, means that NETOPT_CSMA was set before, so we don't have to check that */
                 /* Limit reached ? */
                 if(dev->num_backoffs < dev->max_backoffs)
                 {
@@ -870,12 +870,12 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
             DEBUG("[kw2xrf] TC3TMOUT, TX failed\n");
 
             /* try retransmission? */
-            if((dev->netdev.flags & KW2XRF_OPT_CSMA) && 
+            if((dev->netdev.flags & KW2XRF_OPT_CSMA) &&
                dev->num_retrans < dev->max_retrans)
             {
                 /* CSMA option is enabled AND max_retrans hasn't been reached */
                 /* Try to retransmit */
-                DEBUG("[kw2xrf] TX retry %u\n", (unsigned) dev->num_retrans)
+                DEBUG("[kw2xrf] TX retry %u\n", (unsigned) dev->num_retrans);
                 dev->num_retrans++;
                 /* New transmission means resetting all CSMA values for backoff*/
                 dev->csma_be = dev->csma_min_be;
@@ -885,11 +885,11 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
                 retransmission_issued = true;
             }
             else
-            {      
+            {
                 netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
             }
-        } 
-        else if(!retransmission_issued) 
+        }
+        else if(!retransmission_issued)
         {
             DEBUG("[kw2xrf] NO TC3TMOUT, TX success\n");
             netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
