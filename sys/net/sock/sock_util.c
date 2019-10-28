@@ -151,7 +151,7 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
 {
     unsigned brackets_flag;
     char *hoststart = (char*)str;
-    char *hostend = hoststart;
+    char *hostend;
 
     char hostbuf[SOCK_HOSTPORT_MAXLEN];
 
