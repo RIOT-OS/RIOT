@@ -43,7 +43,7 @@ extern "C"
 #ifndef HD44780_PARAMS
 #define HD44780_PARAMS HD44780_PARAMS_ARDUINO
 #endif
-#endif
+#endif /* MODULE_ARDUINO */
 
 #ifndef HD44780_PARAMS
 #define HD44780_PARAMS {            \
