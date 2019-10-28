@@ -118,6 +118,23 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
         const uint8_t *src, size_t src_len, unsigned src_tag);
 
 /**
+ * @brief   Reverse VRB lookup
+ *
+ * @param[in] netif         Network interface the reverse label-switched packet
+ *                          came over
+ * @param[in] src           Link-layer source address of reverse label-switched
+ *                          packet.
+ * @param[in] src_len       Length of @p src.
+ * @param[in] tag           Tag of the reverse label-switched packet.
+ *
+ * @return  The VRB entry with `vrb->super.dst == src` and `vrb->out_tag == tag`.
+ * @return  NULL, if there is no entry in the VRB that has these values.
+ */
+gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_reverse(
+        const gnrc_netif_t *netif, const uint8_t *src, size_t src_len,
+        unsigned tag);
+
+/**
  * @brief   Removes an entry from the VRB
  *
  * @param[in] vrb   A VRB entry
