@@ -38,6 +38,10 @@ void uhcp_client(uhcp_iface_t iface)
 
     /* create listening socket */
     int res = sock_udp_create(&sock, &local, NULL, 0);
+    if (res < 0) {
+        puts("uhcp_client(): cannot create listening socket");
+        return;
+    }
 
     uint8_t buf[sizeof(uhcp_push_t) + 16];
 
