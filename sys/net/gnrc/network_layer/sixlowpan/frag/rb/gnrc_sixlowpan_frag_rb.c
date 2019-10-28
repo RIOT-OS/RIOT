@@ -116,7 +116,7 @@ static int _check_fragments(gnrc_sixlowpan_frag_rb_base_t *entry,
         }
         /* End was already checked in overlap check */
         if (ptr->start == offset) {
-            DEBUG("6lo rbuf: fragment already in reassembly buffer");
+            DEBUG("6lo rbuf: fragment already in reassembly buffer\n");
             return RBUF_ADD_DUPLICATE;
         }
         ptr = ptr->next;
