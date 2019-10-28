@@ -46,6 +46,16 @@ gnrc_sixlowpan_frag_fb_t *gnrc_sixlowpan_frag_fb_get(void)
     return NULL;
 }
 
+gnrc_sixlowpan_frag_fb_t *gnrc_sixlowpan_frag_fb_get_by_tag(uint16_t tag)
+{
+    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_FB_SIZE; i++) {
+        if ((_fbs[i].pkt != NULL) && (_fbs[i].tag == tag)) {
+            return &_fbs[i];
+        }
+    }
+    return NULL;
+}
+
 uint16_t gnrc_sixlowpan_frag_fb_next_tag(void)
 {
     return (++_current_tag);

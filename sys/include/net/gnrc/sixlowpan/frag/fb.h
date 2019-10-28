@@ -71,6 +71,16 @@ void gnrc_sixlowpan_frag_fb_reset(void);
 gnrc_sixlowpan_frag_fb_t *gnrc_sixlowpan_frag_fb_get(void);
 
 /**
+ * @brief   Get an existing fragmentation buffer entry by a given tag
+ *
+ * @param[in] tag   Tag to search for.
+ *
+ * @return a fragmentation buffer entry if one with @p tag exists.
+ * @return NULL, if no fragmentation buffer entry can be found.
+ */
+gnrc_sixlowpan_frag_fb_t *gnrc_sixlowpan_frag_fb_get_by_tag(uint16_t tag);
+
+/**
  * @brief   Generate a new datagram tag for sending
  *
  * @return  A new datagram tag.
