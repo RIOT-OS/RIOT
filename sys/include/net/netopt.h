@@ -295,14 +295,11 @@ typedef enum {
     NETOPT_AUTOCCA,
 
     /**
-     * @brief (@ref netopt_enable_t) Phy link status.
+     * @brief (@ref netopt_enable_t) network interface link status.
      *
-     * Returns NETOPT_ENABLE when the the link of the interface is up,
-     * NETOPT_DISABLE when the link is down. If the interface is wireless or
-     * doesn't support link status detection this function will return
-     * -ENOTSUP.
+     * This option is used to set or check the link status (up or down).
      *
-     * @note Setting this option will always return -ENOTSUP.
+     * @note On error this option should return a negative number.
      */
     NETOPT_LINK,
 
