@@ -160,6 +160,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
  *                                           @p user_timeout_duration_us microseconds passed.
  *
  * @returns   The number of bytes read into @p data.
+ *            0, if the connection is closing and no further data can be read.
  *            -ENOTCONN if connection is not established.
  *            -EAGAIN if  user_timeout_duration_us is zero and no data is available.
  *            -ECONNRESET if connection was resetted by the peer.
