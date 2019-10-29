@@ -26,7 +26,7 @@
  *  * **Makefile**: A Makefile describing how to get the upstream application,
  *    apply the patch and how to build the package as a RIOT module.
  *    A rough template for several methods of acquiring a package is provided in
- *    `pkg/Makefile.git`, `pkg/Makefile.http`, and `pkg/Makefile.svn`
+ *    `pkg/Makefile.git` and `pkg/Makefile.http`.
  *
  * Patch files can be included in a `patches` directory in the package dir.
  * These are applied to the upstream package to make it build with RIOT.
