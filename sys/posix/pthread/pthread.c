@@ -37,11 +37,15 @@
 
 #define ENABLE_DEBUG (0)
 
+#ifndef CONFIG_PTHREAD_REAPER_BASE_STACKSIZE
+#define CONFIG_PTHREAD_REAPER_BASE_STACKSIZE (THREAD_STACKSIZE_IDLE)
+#endif
+
 #if ENABLE_DEBUG
-#   define PTHREAD_REAPER_STACKSIZE THREAD_STACKSIZE_MAIN
+#   define PTHREAD_REAPER_STACKSIZE ((CONFIG_PTHREAD_REAPER_BASE_STACKSIZE) + THREAD_EXTRA_STACKSIZE_PRINTF)
 #   define PTHREAD_STACKSIZE THREAD_STACKSIZE_MAIN
 #else
-#   define PTHREAD_REAPER_STACKSIZE THREAD_STACKSIZE_DEFAULT
+#   define PTHREAD_REAPER_STACKSIZE (CONFIG_PTHREAD_REAPER_BASE_STACKSIZE)
 #   define PTHREAD_STACKSIZE THREAD_STACKSIZE_DEFAULT
 #endif
 
@@ -145,10 +149,9 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     }
 
     pt->stack = autofree ? stack : NULL;
-
-    if (autofree && pthread_reaper_pid != KERNEL_PID_UNDEF) {
+    if (autofree && pthread_reaper_pid == KERNEL_PID_UNDEF) {
         mutex_lock(&pthread_mutex);
-        if (pthread_reaper_pid != KERNEL_PID_UNDEF) {
+        if (pthread_reaper_pid == KERNEL_PID_UNDEF) {
             /* volatile pid to overcome problems with double checking */
             volatile kernel_pid_t pid = thread_create(pthread_reaper_stack,
                                              PTHREAD_REAPER_STACKSIZE,
@@ -157,6 +160,13 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
                                              pthread_reaper,
                                              NULL,
                                              "pthread-reaper");
+            if (!pid_is_valid(pid)) {
+                free(pt->stack);
+                free(pt);
+                pthread_sched_threads[pthread_pid-1] = NULL;
+                mutex_unlock(&pthread_mutex);
+                return -1;
+            }
             pthread_reaper_pid = pid;
         }
         mutex_unlock(&pthread_mutex);
@@ -165,7 +175,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     pt->thread_pid = thread_create(stack,
                                    stack_size,
                                    THREAD_PRIORITY_MAIN,
-                                   THREAD_CREATE_WOUT_YIELD |
+                                   THREAD_CREATE_SLEEPING |
                                    THREAD_CREATE_STACKTEST,
                                    pthread_start_routine,
                                    pt,
@@ -177,7 +187,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
         return -1;
     }
 
-    sched_switch(THREAD_PRIORITY_MAIN);
+    thread_wakeup(pt->thread_pid);
 
     return 0;
 }
