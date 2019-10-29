@@ -26,6 +26,16 @@ extern "C" {
  */
 #define REG32       volatile uint32_t
 
+/**
+ * @brief   Type for 16-bit registers
+ */
+#define REG16       volatile uint16_t
+
+/**
+ * @brief   Type for 8-bit registers
+ */
+#define REG8        volatile uint8_t
+
 /* Vectored Interrupt Controller (VIC) */
 #define VIC_BASE_ADDR   0xFFFFF000
 #define VICIRQStatus   (*(volatile unsigned long *)(VIC_BASE_ADDR + 0x000))
@@ -655,9 +665,38 @@ typedef struct {
 #define PWM1LER         (*(volatile unsigned long *)(PWM1_BASE_ADDR + 0x50))
 #define PWM1CTCR        (*(volatile unsigned long *)(PWM1_BASE_ADDR + 0x70))
 
+/**
+ * @brief   Generic UART register map
+ */
+typedef struct {
+    union {
+        REG32   RBR;            /**< Receiver Buffer Register  */
+        REG32   THR;            /**< Transmit Holding Register */
+        REG8    DLL;            /**< Divisor Latch LSB         */
+    };
+    union {
+        REG32   IER;            /**< Interrupt Enable Register */
+        REG8    DLM;            /**< Divisor Latch MSB         */
+    };
+    union {
+        REG32   IIR;            /**< Interrupt ID Register     */
+        REG32   FCR;            /**< FIFO Control Register     */
+    };
+    REG32   LCR;                /**< Line Control Register     */
+    REG32   MCR;                /**< Modem Control Register    */
+    REG32   LSR;                /**< Line Status Register      */
+    REG32   MSR;                /**< Modem Status Register     */
+    REG32   SCR;                /**< Scratch Pad Register      */
+    REG32   ACR;                /**< Auto-baud Control Register*/
+    REG32   ICR;                /**< IrDA Control Register     */
+    REG32   FDR;                /**< Fractional Divider        */
+    REG32   reserved;           /**< unused                    */
+    REG8    TER;                /**< Transmit Enable Register  */
+} lpc23xx_uart_t;
 
 /* Universal Asynchronous Receiver Transmitter 0 (UART0) */
 #define UART0_BASE_ADDR     0xE000C000
+#define UART0          ((lpc23xx_uart_t *)UART0_BASE_ADDR)
 #define U0RBR          (*(volatile unsigned long *)(UART0_BASE_ADDR + 0x00))
 #define U0THR          (*(volatile unsigned long *)(UART0_BASE_ADDR + 0x00))
 #define U0DLL          (*(volatile unsigned long *)(UART0_BASE_ADDR + 0x00))
@@ -675,6 +714,7 @@ typedef struct {
 
 /* Universal Asynchronous Receiver Transmitter 1 (UART1) */
 #define UART1_BASE_ADDR     0xE0010000
+#define UART1          ((lpc23xx_uart_t *)UART1_BASE_ADDR)
 #define U1RBR          (*(volatile unsigned long *)(UART1_BASE_ADDR + 0x00))
 #define U1THR          (*(volatile unsigned long *)(UART1_BASE_ADDR + 0x00))
 #define U1DLL          (*(volatile unsigned long *)(UART1_BASE_ADDR + 0x00))
@@ -693,6 +733,7 @@ typedef struct {
 
 /* Universal Asynchronous Receiver Transmitter 2 (UART2) */
 #define UART2_BASE_ADDR     0xE0078000
+#define UART2          ((lpc23xx_uart_t *)UART2_BASE_ADDR)
 #define U2RBR          (*(volatile unsigned long *)(UART2_BASE_ADDR + 0x00))
 #define U2THR          (*(volatile unsigned long *)(UART2_BASE_ADDR + 0x00))
 #define U2DLL          (*(volatile unsigned long *)(UART2_BASE_ADDR + 0x00))
@@ -710,6 +751,7 @@ typedef struct {
 
 /* Universal Asynchronous Receiver Transmitter 3 (UART3) */
 #define UART3_BASE_ADDR     0xE007C000
+#define UART3          ((lpc23xx_uart_t *)UART3_BASE_ADDR)
 #define U3RBR          (*(volatile unsigned long *)(UART3_BASE_ADDR + 0x00))
 #define U3THR          (*(volatile unsigned long *)(UART3_BASE_ADDR + 0x00))
 #define U3DLL          (*(volatile unsigned long *)(UART3_BASE_ADDR + 0x00))
