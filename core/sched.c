@@ -85,9 +85,12 @@ int __attribute__((used)) sched_run(void)
     int nextrq = bitarithm_lsb(runqueue_bitcache);
     thread_t *next_thread = container_of(sched_runqueues[nextrq].next->next, thread_t, rq_entry);
 
-    DEBUG("sched_run: active thread: %" PRIkernel_pid ", next thread: %" PRIkernel_pid "\n",
-          (kernel_pid_t)((active_thread == NULL) ? KERNEL_PID_UNDEF : active_thread->pid),
-          next_thread->pid);
+    DEBUG(
+        "sched_run: active thread: %" PRIkernel_pid ", next thread: %" PRIkernel_pid "\n",
+        (kernel_pid_t)((active_thread == NULL)
+                       ? KERNEL_PID_UNDEF
+                       : active_thread->pid),
+        next_thread->pid);
 
     if (active_thread == next_thread) {
         DEBUG("sched_run: done, sched_active_thread was not changed.\n");

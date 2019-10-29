@@ -31,7 +31,9 @@ extern "C" {
 #endif
 
 /** Static initializer for mbox objects */
-#define MBOX_INIT(queue, queue_size) {{0}, {0}, CIB_INIT(queue_size), queue}
+#define MBOX_INIT(queue, queue_size) { \
+        {0}, {0}, CIB_INIT(queue_size), queue \
+    }
 
 /**
  * @brief Mailbox struct definition

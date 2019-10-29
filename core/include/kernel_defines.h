@@ -27,6 +27,9 @@
  extern "C" {
 #endif
 
+/* uncrustify gets mightily confused by these macros... */
+/* begin{code-style-ignore} */
+
 /**
  * @def         container_of(PTR, TYPE, MEMBER)
  * @brief       Returns the container of a pointer to a member.
@@ -215,6 +218,8 @@
 /**
  * @endcond
  */
+
+/* end{code-style-ignore} */
 
 #ifdef __cplusplus
 }
