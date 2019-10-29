@@ -103,10 +103,8 @@ static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt,
     }
 
     new_netif_hdr = netif->data;
-    new_netif_hdr->if_pid = netif_hdr->if_pid;
-    new_netif_hdr->flags = netif_hdr->flags;
-    new_netif_hdr->rssi = netif_hdr->rssi;
-    new_netif_hdr->lqi = netif_hdr->lqi;
+    /* src_l2addr_len and dst_l2addr_len are already the same, now copy the rest */
+    *new_netif_hdr = *netif_hdr;
 
     frag = gnrc_pktbuf_add(NULL, NULL, fragment_size, GNRC_NETTYPE_SIXLOWPAN);
 
