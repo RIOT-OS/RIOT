@@ -24,6 +24,8 @@
  * @}
  */
 
+#include <string.h>
+
 #include "at86rf2xx.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
@@ -130,43 +132,38 @@ static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                           0x0d, 0x0e, 0x0e, 0x0e, 0x0f };
 #endif
 
-uint16_t at86rf2xx_get_addr_short(const at86rf2xx_t *dev)
+void at86rf2xx_get_addr_short(const at86rf2xx_t *dev, network_uint16_t *addr)
 {
-    return (dev->netdev.short_addr[0] << 8) | dev->netdev.short_addr[1];
+    memcpy(addr, dev->netdev.short_addr, sizeof(*addr));
 }
 
-void at86rf2xx_set_addr_short(at86rf2xx_t *dev, uint16_t addr)
+void at86rf2xx_set_addr_short(at86rf2xx_t *dev, const network_uint16_t *addr)
 {
-    dev->netdev.short_addr[0] = (uint8_t)(addr);
-    dev->netdev.short_addr[1] = (uint8_t)(addr >> 8);
+    memcpy(dev->netdev.short_addr, addr, sizeof(*addr));
 #ifdef MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
     dev->netdev.short_addr[0] &= 0x7F;
 #endif
+    /* device use lsb first, not network byte order */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_0,
                         dev->netdev.short_addr[1]);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_1,
                         dev->netdev.short_addr[0]);
 }
 
-uint64_t at86rf2xx_get_addr_long(const at86rf2xx_t *dev)
+void at86rf2xx_get_addr_long(const at86rf2xx_t *dev, eui64_t *addr)
 {
-    uint64_t addr;
-    uint8_t *ap = (uint8_t *)(&addr);
-
-    for (int i = 0; i < 8; i++) {
-        ap[i] = dev->netdev.long_addr[i];
-    }
-    return addr;
+    memcpy(addr, dev->netdev.long_addr, sizeof(*addr));
 }
 
-void at86rf2xx_set_addr_long(at86rf2xx_t *dev, uint64_t addr)
+void at86rf2xx_set_addr_long(at86rf2xx_t *dev, const eui64_t *addr)
 {
+    memcpy(dev->netdev.long_addr, addr, sizeof(*addr));
     for (int i = 0; i < 8; i++) {
-        dev->netdev.long_addr[i] = (uint8_t)(addr >> (i * 8));
+        /* device use lsb first, not network byte order */
         at86rf2xx_reg_write(dev, (AT86RF2XX_REG__IEEE_ADDR_0 + i),
-                            (addr >> ((7 - i) * 8)));
+                dev->netdev.long_addr[IEEE802154_LONG_ADDRESS_LEN - 1 - i]);
     }
 }
 
