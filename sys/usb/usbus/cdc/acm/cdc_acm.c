@@ -213,12 +213,13 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
                             USBUS_CDC_ACM_BULK_EP_SIZE);
     ep->interval = 0; /* Interval is not used with bulk endpoints */
     usbus_enable_endpoint(ep);
+    /* Store the endpoint reference to activate it
+     * when DTE present is signalled by the host */
     ep = usbus_add_endpoint(usbus, &cdcacm->iface_data,
                             USB_EP_TYPE_BULK, USB_EP_DIR_OUT,
                             USBUS_CDC_ACM_BULK_EP_SIZE);
     ep->interval = 0; /* Interval is not used with bulk endpoints */
     usbus_enable_endpoint(ep);
-    usbdev_ep_ready(ep->ep, 0);
 
     /* Add interfaces to the stack */
     usbus_add_interface(usbus, &cdcacm->iface_ctrl);
@@ -271,6 +272,10 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
             if (setup->value & USB_CDC_ACM_CONTROL_LINE_DTE) {
                 DEBUG("CDC ACM: DTE enabled on interface %u\n", setup->index);
                 cdcacm->state = USBUS_CDC_ACM_LINE_STATE_DTE;
+                usbus_endpoint_t *data_out = usbus_interface_find_endpoint(
+                        &cdcacm->iface_data, USB_EP_TYPE_BULK, USB_EP_DIR_OUT);
+                assert(data_out);
+                usbdev_ep_ready(data_out->ep, 0);
                 usbus_cdc_acm_flush(cdcacm);
             }
             else {

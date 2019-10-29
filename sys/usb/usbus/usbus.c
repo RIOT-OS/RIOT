@@ -127,6 +127,18 @@ void usbus_register_event_handler(usbus_t *usbus, usbus_handler_t *handler)
     *last = handler;
 }
 
+usbus_endpoint_t *usbus_interface_find_endpoint(usbus_interface_t *interface,
+                                                usb_ep_type_t type,
+                                                usb_ep_dir_t dir)
+{
+    for (usbus_endpoint_t *uep = interface->ep; uep; uep = uep->next) {
+        if (uep->ep->type == type && uep->ep->dir == dir) {
+            return uep;
+        }
+    }
+    return NULL;
+}
+
 usbus_endpoint_t *usbus_add_endpoint(usbus_t *usbus, usbus_interface_t *iface,
                                      usb_ep_type_t type, usb_ep_dir_t dir,
                                      size_t len)
