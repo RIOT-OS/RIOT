@@ -43,7 +43,7 @@ This describes different possible solutions and in which case which applies.
 
 If only one should be used, then it should be solution 1 to go toward
 declarative syntax and support all cases.
-But due to the overhead, intermediate single file declarative solution 2 and 3
+But due to the overhead, intermediate single file declarative solution 3 and 4
 are good candidates too.
 
 As currently dependencies are not declarative, only solutions 1 and 2 would be
