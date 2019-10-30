@@ -7,19 +7,19 @@
  */
 
 /**
- * @ingroup         cpu_cc26x0_definitions
+ * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
  *
  * @file
- * @brief           CC26x0 MCU I/O register definitions
+ * @brief           CC26xx/CC13xx MCU I/O register definitions
  *
  * @author          Leon George <leon@georgemail.eu>
  */
 
-#ifndef CC26X0_I2C_H
-#define CC26X0_I2C_H
+#ifndef CC26XX_CC13XX_I2C_H
+#define CC26XX_CC13XX_I2C_H
 
-#include "cc26x0.h"
+#include "cc26xx_cc13xx.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -199,6 +199,6 @@ cycle or continues on to a repeated START condition
 }
 #endif
 
-#endif /* CC26X0_I2C_H */
+#endif /* CC26XX_CC13XX_I2C_H */
 
 /*@}*/

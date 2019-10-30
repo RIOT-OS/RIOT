@@ -7,19 +7,19 @@
  */
 
 /**
- * @ingroup         cpu_cc26x0_definitions
+ * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
  *
  * @file
- * @brief           CC26x0 MCU I/O register definitions
+ * @brief           CC26xx/CC13xx MCU I/O register definitions
  *
  * @author          Leon George <leon@georgemail.eu>
  */
 
-#ifndef CC26X0_IOC_H
-#define CC26X0_IOC_H
+#ifndef CC26XX_CC13XX_IOC_H
+#define CC26XX_CC13XX_IOC_H
 
-#include "cc26x0.h"
+#include "cc26xx_cc13xx.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,10 +48,14 @@ typedef struct {
  * @{
  */
 #define IOCFG_PORTID_GPIO               0x00000000  /**< GPIO */
+
+#ifdef CPU_VARIANT_X0
 #define IOCFG_PORTID_AON_SCS            0x00000001  /**< AON SPI-S SCS */
 #define IOCFG_PORTID_AON_SCK            0x00000002  /**< AON SPI-S SCK */
 #define IOCFG_PORTID_AON_SDI            0x00000003  /**< AON SPI-S SDI */
 #define IOCFG_PORTID_AON_SDO            0x00000004  /**< AON SPI-S SDO */
+#endif //CPU_VARIANT_X0
+
 #define IOCFG_PORTID_AON_CLK32K         0x00000007  /**< AON external 32kHz clock */
 #define IOCFG_PORTID_AUX_IO             0x00000008  /**< AUX IO */
 #define IOCFG_PORTID_SSI0_RX            0x00000009  /**< SSI0 receive */
@@ -64,6 +68,14 @@ typedef struct {
 #define IOCFG_PORTID_UART0_TX           0x00000010  /**< UART0 transmit */
 #define IOCFG_PORTID_UART0_CTS          0x00000011  /**< UART0 clear to send */
 #define IOCFG_PORTID_UART0_RTS          0x00000012  /**< UART0 request to send */
+
+#ifdef CPU_VARIANT_X2
+#define IOCFG_PORTID_UART1_RX           0x00000013  /**< UART1 receive */
+#define IOCFG_PORTID_UART1_TX           0x00000014  /**< UART1 transmit */
+#define IOCFG_PORTID_UART1_CTS          0x00000015  /**< UART1 clear to send */
+#define IOCFG_PORTID_UART1_RTS          0x00000016  /**< UART1 request to send */
+#endif // CPU_VARIANT_X2
+
 #define IOCFG_PORTID_PORT_EVT0          0x00000017  /**< PORT EVENT 0 */
 #define IOCFG_PORTID_PORT_EVT1          0x00000018  /**< PORT EVENT 1 */
 #define IOCFG_PORTID_PORT_EVT2          0x00000019  /**< PORT EVENT 2 */
@@ -159,6 +171,6 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26X0_IOC_H */
+#endif /* CC26XX_CC13XX_IOC_H */
 
 /*@}*/

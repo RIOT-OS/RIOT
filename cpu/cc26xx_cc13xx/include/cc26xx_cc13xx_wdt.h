@@ -7,17 +7,17 @@
  */
 
 /**
- * @ingroup         cpu_cc26x0_definitions
+ * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
  *
  * @file
- * @brief           CC26x0 WDT register definitions
+ * @brief           CC26xx/CC13xx WDT register definitions
  */
 
-#ifndef CC26X0_WDT_H
-#define CC26X0_WDT_H
+#ifndef CC26XX_CC13XX_WDT_H
+#define CC26XX_CC13XX_WDT_H
 
-#include <cc26x0.h>
+#include <cc26xx_cc13xx.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,8 +34,10 @@ typedef struct {
     reg32_t ICR; /**< interrupt clear */
     reg32_t RIS; /**< raw interrupt status */
     reg32_t MIS; /**< masked interrupt status */
+    reg32_t __reserved1[0x100]; /**< meh */
     reg32_t TEST; /**< test mode */
     reg32_t INT_CAUS; /**< interrupt cause test mode */
+    reg32_t __reserved2[0x1f9]; /**< meh */
     reg32_t LOCK; /**< lock */
 } wdt_regs_t;
 
@@ -51,6 +53,6 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26X0_WDT_H */
+#endif /* CC26XX_CC13XX_WDT_H */
 
 /*@}*/

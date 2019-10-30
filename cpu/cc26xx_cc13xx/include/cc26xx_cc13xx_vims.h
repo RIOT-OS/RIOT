@@ -7,15 +7,15 @@
  */
 
 /**
- * @ingroup         cpu_cc26x0_definitions
+ * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
  *
  * @file
- * @brief           CC26x0 VIMS register definitions
+ * @brief           CC26xx/CC13xx VIMS register definitions
  */
 
-#ifndef CC26X0_VIMS_H
-#define CC26X0_VIMS_H
+#ifndef CC26XX_CC13XX_VIMS_H
+#define CC26XX_CC13XX_VIMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,7 +41,7 @@ typedef struct {
     reg32_t DATALOWER; /**< efuse data - lower */
     reg32_t EFUSECFG; /**< OCP sysconf */
     reg32_t EFUSESTAT; /**< system status */
-    reg32_t ACC; /**< arbitrary instruction cound */
+    reg32_t ACC; /**< arbitrary instruction count */
     reg32_t BOUNDARY; /**< boundary test register to drive I/O */
     reg32_t EFUSEFLAG; /**< efuse key loaded flag */
     reg32_t EFUSEKEY; /**< efuse key */
@@ -105,7 +105,7 @@ typedef struct {
     reg32_t FWPWRITE_ECC; /**< FMC flash wide programming ECC */
     reg32_t FSWSTAT; /**< FMC software interface status */
     reg32_t __reserved12[0x2E]; /**< meh */
-    reg32_t FSM_GLBCTL; /**< FMC FSM global controll */
+    reg32_t FSM_GLBCTL; /**< FMC FSM global control */
     reg32_t FSM_STATE; /**< FMC FSM state status */
     reg32_t FSM_STAT; /**< FMC FSM status */
     reg32_t FSM_CMD; /**< FMC FSM command */
@@ -155,7 +155,8 @@ typedef struct {
     reg32_t __reserved19[2]; /**< meh */
     reg32_t FSM_BSLP0; /**< FMC FSM bank sector lock program 0 */
     reg32_t FSM_BSLP1; /**< FMC FSM bank sector lock program 1 */
-    reg32_t __reserved20[0x42]; /**< meh */
+    reg32_t FSM_PGM_128; /**< Enable 128-bit programming. CC26x2_CC13x2 only */
+    reg32_t __reserved20[0x41]; /**< meh */
     reg32_t FCFG_BANK; /**< FMC flash configuration bank */
     reg32_t FCFG_WRAPPER; /**< FMC flash wrapper configuration */
     reg32_t FCFG_BNK_TYPE; /**< FMC flash bank type */
@@ -232,6 +233,6 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26X0_VIMS_H */
+#endif /* CC26XX_CC13XX_VIMS_H */
 
 /*@}*/

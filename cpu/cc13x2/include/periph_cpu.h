@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup         cpu_cc26x0
+ * @ingroup         cpu_cc13x2
  * @{
  *
  * @file
@@ -30,7 +30,6 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* PERIPH_CPU_H */
 /** @} */

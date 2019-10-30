@@ -7,17 +7,18 @@
  */
 
 /**
- * @ingroup         cpu_cc26x0_definitions
+ * @ingroup         cpu_cc13x2_definitions
  * @{
  *
  * @file
- * @brief           CC26x0 MCU interrupt definitions
+ * @brief           CC13x2 MCU interrupt definitions
  *
  * @author          Leon M. George <leon@georgemail.eu>
+ * @author          Anton Gerasimov <tossel@gmail.com>
  */
 
-#ifndef CC26X0_H
-#define CC26X0_H
+#ifndef CC26XX_CC13XX_H
+#define CC26XX_CC13XX_H
 
 #include <stdint.h>
 
@@ -28,29 +29,29 @@ extern "C" {
 typedef volatile uint8_t reg8_t;
 typedef volatile uint32_t reg32_t;
 
-/** @addtogroup CC26x0_cmsis CMSIS Definitions */
+/** @addtogroup CC13x2_cmsis CMSIS Definitions */
 /*@{*/
 
 /** interrupt number definition */
 typedef enum IRQn
 {
-    /******  Cortex-M3 Processor Exceptions Numbers ****************************/
+    /******  Cortex-M4 Processor Exceptions Numbers ****************************/
     ResetHandler_IRQn     = -15, /**<  1 Reset Handler                         */
     NonMaskableInt_IRQn   = -14, /**<  2 Non Maskable Interrupt                */
-    HardFault_IRQn        = -13, /**<  3 Cortex-M3 Hard Fault Interrupt        */
-    MemoryManagement_IRQn = -12, /**<  4 Cortex-M3 Memory Management Interrupt */
-    BusFault_IRQn         = -11, /**<  5 Cortex-M3 Bus Fault Interrupt         */
-    UsageFault_IRQn       = -10, /**<  6 Cortex-M3 Usage Fault Interrupt       */
-    SVCall_IRQn           = - 5, /**< 11 Cortex-M3 SV Call Interrupt           */
-    DebugMonitor_IRQn     = - 4, /**< 12 Cortex-M3 Debug Monitor Interrupt     */
-    PendSV_IRQn           = - 2, /**< 14 Cortex-M3 Pend SV Interrupt           */
-    SysTick_IRQn          = - 1, /**< 15 Cortex-M3 System Tick Interrupt       */
+    HardFault_IRQn        = -13, /**<  3 Cortex-M4 Hard Fault Interrupt        */
+    MemoryManagement_IRQn = -12, /**<  4 Cortex-M4 Memory Management Interrupt */
+    BusFault_IRQn         = -11, /**<  5 Cortex-M4 Bus Fault Interrupt         */
+    UsageFault_IRQn       = -10, /**<  6 Cortex-M4 Usage Fault Interrupt       */
+    SVCall_IRQn           = - 5, /**< 11 Cortex-M4 SV Call Interrupt           */
+    DebugMonitor_IRQn     = - 4, /**< 12 Cortex-M4 Debug Monitor Interrupt     */
+    PendSV_IRQn           = - 2, /**< 14 Cortex-M4 Pend SV Interrupt           */
+    SysTick_IRQn          = - 1, /**< 15 Cortex-M4 System Tick Interrupt       */
 
-    /******  CC26x0 specific Interrupt Numbers *********************************/
+    /******  CC13x2 specific Interrupt Numbers *********************************/
     EDGE_DETECT_IRQN      =   0, /**< 16 AON edge detect                        */
     I2C_IRQN              =   1, /**< 17 I2C                                    */
     RF_CPE1_IRQN          =   2, /**< 18 RF Command and Packet Engine 1         */
-    SPIS_IRQN             =   3, /**< 19 AON SpiSplave Rx, Tx and CS            */
+    PKA_IRQN              =   3, /**< 19 PKA interrupt                          */
     AON_RTC_IRQN          =   4, /**< 20 AON RTC                                */
     UART0_IRQN            =   5, /**< 21 UART0 Rx and Tx                        */
     AON_AUX_SWEV0_IRQN    =   6, /**< 22 Sensor Controller software event 0, through AON domain*/
@@ -81,16 +82,25 @@ typedef enum IRQn
     AUX_COMPA_IRQN        =  31, /**< 47 AUX Comparator A                       */
     AUX_ADC_IRQN          =  32, /**< 48 AUX ADC IRQ                            */
     TRNG_IRQN             =  33, /**< 49 TRNG event                             */
+#ifdef CPU_VARIANT_X2
+    OSC_IRQN              =  34, /**< 50 Combined event from oscillator control */
+    AUX_TIMER2_IRQN       =  35, /**< 51 AUX Timer 2 event 0                    */
+    UART1_IRQN            =  36, /**< 52 UART1 combined interrupt               */
+    BATMON_IRQN           =  37, /**< 53 UART1 combined interrupt               */
 
+    IRQN_COUNT            = (BATMON_IRQN + 1) /**< Number of peripheral IDs */
+#else
     IRQN_COUNT            = (TRNG_IRQN + 1) /**< Number of peripheral IDs */
+#endif
+
 } IRQn_Type;
 
 /**
- * @brief Configuration of the Cortex-M3 processor and core peripherals
+ * @brief Configuration of the Cortex-M4 processor and core peripherals
  */
 
-#define __MPU_PRESENT          1      /**< CC26x0 does provide a MPU */
-#define __NVIC_PRIO_BITS       3      /**< CC26x0 offers priority levels from 0..7 */
+#define __MPU_PRESENT          1      /**< CC13x2 does provide a MPU */
+#define __NVIC_PRIO_BITS       3      /**< CC13x2 offers priority levels from 0..7 */
 #define __Vendor_SysTickConfig 0      /**< Set to 1 if different SysTick config is used */
 
 #define RCOSC48M_FREQ               48000000 /**< 48 MHz */
@@ -99,7 +109,11 @@ typedef enum IRQn
 /**
  * @brief CMSIS includes
  */
+#ifdef CPU_VARIANT_X2
+#include <core_cm4.h>
+#else
 #include <core_cm3.h>
+#endif
 /*@}*/
 
 /** @ingroup cpu_specific_peripheral_memory_map
@@ -113,6 +127,6 @@ typedef enum IRQn
 }
 #endif
 
-#endif /* CC26X0_H */
+#endif /* CC26XX_CC13XX_H */
 
 /*@}*/

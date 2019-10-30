@@ -7,24 +7,25 @@
  */
 
 /**
- * @addtogroup      cpu_cc26x0_definitions
+ * @addtogroup      cpu_cc13x2_definitions
  * @{
  *
  * @file
- * @brief           CC26x0 UART interface
+ * @brief           CC13x2 UART interface
  *
  */
 
-#ifndef CC26X0_UART_H
-#define CC26X0_UART_H
+#ifndef CC26XX_CC13XX_UART_H
+#define CC26XX_CC13XX_UART_H
 
-#include "cc26x0.h"
+#include "cc26xx_cc13xx.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define UART_BASE       (0x40001000) /**< UART base address */
+#define UART0_BASE       (0x40001000) /**< UART0 base address */
+#define UART1_BASE       (0x40008000) /**< UART1 base address */
 
 /**
  * @brief UART component registers
@@ -122,11 +123,12 @@ typedef struct {
 #define UART_IFLS_RXSEL_7_8     0x20
 /** @} */
 
-#define UART ((uart_regs_t *) (UART_BASE)) /**< UART register bank */
+#define UART0 ((uart_regs_t *) (UART0_BASE)) /**< UART0 register bank */
+#define UART1 ((uart_regs_t *) (UART1_BASE)) /**< UART0 register bank */
 
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
 
-#endif /* CC26X0_UART_H */
+#endif /* CC26XX_CC13XX_UART_H */
 /** @} */

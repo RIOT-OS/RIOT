@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup      cpu_cc26x0
+ * @addtogroup      cpu_cc13x2
  * @{
  *
  * @file
@@ -21,17 +21,16 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#define __FPU_PRESENT 1U /**< Presence of FPU */
 #include "cpu_conf_cc26xx_cc13xx.h"
 
-#include "cc26x0_aux.h"
-#include "cc26x0_fcfg.h"
-#include "cc26x0_prcm.h"
+#include "cc13x2_aux.h"
+#include "cc13x2_fcfg.h"
+#include "cc13x2_prcm.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* Empty, but makes linter happy */
 
 #ifdef __cplusplus
 }
