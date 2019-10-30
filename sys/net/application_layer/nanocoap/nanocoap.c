@@ -217,6 +217,10 @@ ssize_t coap_opt_get_opaque(coap_pkt_t *pkt, unsigned opt_num, uint8_t **value)
     int len;
 
     *value = _parse_option(pkt, start, &delta, &len);
+    if (!*value) {
+        return -EINVAL;
+    }
+
     return len;
 }
 
@@ -355,6 +359,11 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsign
     uint16_t delta;
 
     uint8_t *data_start = _parse_option(pkt, optpos, &delta, &option_len);
+    if (!data_start) {
+        DEBUG("nanocoap: invalid start data\n");
+        return -1;
+    }
+
     uint32_t blkopt = _decode_uint(data_start, option_len);
 
     DEBUG("nanocoap: blkopt len: %i\n", option_len);
@@ -775,7 +784,7 @@ static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val
     assert(optnum >= lastonum);
 
     /* calculate option length */
-    uint8_t dummy[3];
+    uint8_t dummy[3] = { 0 };
     size_t optlen = _put_delta_optlen(dummy, 1, 4, optnum - lastonum);
     optlen += _put_delta_optlen(dummy, 0, 0, val_len);
     optlen += val_len;
@@ -893,8 +902,8 @@ void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
 
 void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
 {
-    uint32_t blknum;
-    unsigned szx;
+    uint32_t blknum = 0;
+    unsigned szx = 0;
 
     /* Retrieve the block2 option from the client request */
     if (coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &blknum, &szx) >= 0) {
