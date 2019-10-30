@@ -136,6 +136,11 @@ static int _netif_stats(kernel_pid_t iface, unsigned module, bool reset)
 }
 #endif /* MODULE_NETSTATS */
 
+static void _link_usage(char *cmd_name)
+{
+    printf("usage: %s <if_id> [up|down]\n", cmd_name);
+}
+
 static void _set_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> set <key> <value>\n", cmd_name);
@@ -450,7 +455,7 @@ static void _netif_list(kernel_pid_t iface)
         printf(" CR: %s ", _netopt_coding_rate_str[u8]);
     }
 #endif
-    res = gnrc_netapi_get(iface, NETOPT_LINK_CONNECTED, 0, &u8, sizeof(u8));
+    res = gnrc_netapi_get(iface, NETOPT_LINK, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" Link: %s ", (netopt_enable_t)u8 ? "up" : "down" );
     }
@@ -998,6 +1003,7 @@ static void _l2filter_usage(const char *cmd)
 static void _usage(char *cmd)
 {
     printf("usage: %s\n", cmd);
+    _link_usage(cmd);
     _set_usage(cmd);
     _flag_usage(cmd);
     _add_usage(cmd);
@@ -1106,6 +1112,15 @@ static uint8_t _get_prefix_len(char *addr)
     return prefix_len;
 }
 #endif
+
+static int _netif_link(kernel_pid_t iface, netopt_enable_t en)
+{
+    if(gnrc_netapi_set(iface, NETOPT_LINK, 0, &en, sizeof(en)) < 0) {
+        printf("error: unable to set link %s\n", en == NETOPT_ENABLE ? "up" : "down");
+        return 1;
+    }
+    return 0;
+}
 
 static int _netif_add(char *cmd_name, kernel_pid_t iface, int argc, char **argv)
 {
@@ -1301,6 +1316,12 @@ int _gnrc_netif_config(int argc, char **argv)
                 }
 
                 return _netif_set(argv[0], iface, argv[3], argv[4]);
+            }
+            else if (strcmp(argv[2], "up") == 0) {
+                return _netif_link((kernel_pid_t)iface, NETOPT_ENABLE);
+            }
+            else if (strcmp(argv[2], "down") == 0) {
+                return _netif_link((kernel_pid_t)iface, NETOPT_DISABLE);
             }
             else if (strcmp(argv[2], "add") == 0) {
                 if (argc < 4) {
