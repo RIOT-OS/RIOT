@@ -94,7 +94,7 @@ endif
 This allow simple handling when the benefit of having per model definition
 would currently not overcome the overhead of defining it.
 
-An issue with this is that this it not declarative and does not have equivalent
+An issue with this is that it is not declarative and does not have equivalent
 in a declarative only language that is not Turing complete as `make`.
 But as long as it is used with explicit inclusion lists (no wildcard) and no
 blacklists, it is easy to map it to a per model definition from the other
