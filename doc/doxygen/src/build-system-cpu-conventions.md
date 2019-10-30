@@ -58,7 +58,7 @@ if possible.
 
 Somehow, having all `CPU_MODEL` in one directory is just to save common
 parts and keep the `cpu` directory tidy, all the different ones could still
-be defined in there own directory, but nested in the common one.
+be defined in their own directory, but nested in the common one.
 
 This could transfer to have for each `CPU_MODEL` for a `CPU` the following files:
 
