@@ -2,3 +2,6 @@ ifneq (,$(filter jerryscript,$(USEPKG)))
   USEMODULE += jerryport-minimal
   USEMODULE += jerryscript-ext
 endif
+
+# Jerryscript is only supported by 32-bit architectures
+FEATURES_REQUIRED += arch_32bit
