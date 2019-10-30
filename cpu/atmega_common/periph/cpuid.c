@@ -50,6 +50,7 @@ void cpuid_get(void *id)
 
     uint8_t  usr_sign_0 = boot_signature_byte_get(0x0100);
     uint8_t  usr_sign_1 = boot_signature_byte_get(0x0102);
+    uint8_t  int_rc_cal = boot_signature_byte_get(0x01);
 
     uint8_t addr[CPUID_LEN] = {
             signature_0,        /* 0x1E Atmel manufacturer ID */
@@ -61,6 +62,7 @@ void cpuid_get(void *id)
 /* last two bytes can be set to flash page 1. for differentiation of different boards */
             usr_sign_0,         /* user signature 0 */
             usr_sign_1,         /* user signature 1 */
+            int_rc_cal,         /* internal RC calibration byte */
     };
 
     memcpy(id, addr, CPUID_LEN);
