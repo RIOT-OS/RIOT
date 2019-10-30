@@ -38,6 +38,15 @@ extern "C" {
 #define NETOPT_MAX_PACKET_SIZE NETOPT_MAX_PDU_SIZE
 
 /**
+ * @brief       A deprecated alias for @ref NETOPT_LINK
+ *
+ * @deprecated  Please use @ref NETOPT_LINK instead of
+ *              `NETOPT_LINK_CONNECTED`. It will be removed after the
+ *              2020.07 release at the latest.
+ */
+#define NETOPT_LINK_CONNECTED NETOPT_LINK
+
+/**
  * @brief   Global list of configuration options available throughout the
  *          network stack, e.g. by netdev and netapi
  *
@@ -295,7 +304,7 @@ typedef enum {
      *
      * @note Setting this option will always return -ENOTSUP.
      */
-    NETOPT_LINK_CONNECTED,
+    NETOPT_LINK,
 
     /**
      * @brief   (@ref netopt_enable_t) CSMA/CA support
