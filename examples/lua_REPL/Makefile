@@ -9,8 +9,6 @@ RIOTBASE ?= $(CURDIR)/../..
 BOARD_BLACKLIST +=  \
     hifive1         \
     hifive1b        \
-    pic32-wifire    \
-    pic32-clicker   \
     #
 
 # Comment this out to disable code in RIOT that does safety checking
