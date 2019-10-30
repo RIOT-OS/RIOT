@@ -224,7 +224,7 @@ static inline int _netdev_get(netdev_t *dev, netopt_t opt,
             *((uint16_t *)value) = BLE_ADDR_LEN;
             res = sizeof(uint16_t);
             break;
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             assert(max_len >= sizeof(uint16_t));
             *((uint16_t *)value) = MTU_SIZE;
             res = sizeof(uint16_t);
