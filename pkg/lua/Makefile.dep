@@ -4,3 +4,6 @@ USEMODULE += printf_float
 
 # LUA is only supported by 32-bit architectures
 FEATURES_REQUIRED += arch_32bit
+
+# LUA is not supported on MIPS because of missing stdin over UART
+FEATURES_BLACKLIST += arch_mips32r2
