@@ -39,7 +39,7 @@ so may want to define only each piece of information required for each step.
 Different solutions                                       {#different-solutions}
 -------------------
 
-This describes different possible solutions and in which case which applies.
+This describes different possible solutions, and the cases on which each of them applies.
 
 If only one should be used, then it should be solution 1 to go toward
 declarative syntax and support all cases.
