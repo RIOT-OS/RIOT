@@ -161,7 +161,7 @@ You can find more information about RIOT development procedure on this
 
 [existing-pull-requests]: https://github.com/RIOT-OS/RIOT/pulls
 [archived-pull-requests]: https://github.com/RIOT-OS/RIOT/pulls?q=is:pr+label:"State:+archived"
-[coding-conventions]: https://github.com/RIOT-OS/RIOT/wiki/Coding-conventions
+[coding-conventions]: CODING_CONVENTIONS.md
 [uncrustify]: http://uncrustify.sourceforge.net
 [development-procedures]: https://github.com/RIOT-OS/RIOT/wiki/Development-procedures
 
