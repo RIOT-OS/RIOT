@@ -105,3 +105,18 @@ default, this example sets this statically ID to `gertrud`. If you want to
 connect more than one node to the broker, you need to set a custom ID for each
 node during compile time. Simply use the `EMCUTE_ID` environment variable for
 this, e.g. build with `EMCUTE_ID=horst make all`.
+
+### I see incomming messages in RSMB, but no outgoing message seems to arrive?
+The UDP socket handling for IPv6 based endpoints in the `Mosquitto.rsmb`
+implementation is buggy when it comes to handling link local addresses,
+as the implementation does not remember the interface on which data comes in,
+hindering it from sending out any responses.
+
+Workaround: either use global IPv6 addresses or [ULAs](https://tools.ietf.org/html/rfc4193).
+
+### I have a problem with reusing topics, what could it be?
+It also seems that the `Mosquitto.rsmb` implementation has a bug when it comes
+to subscribing to topics: if a topic name was formerly registered and the same
+topic name is later used for issuing a subscription request, the gateway will
+assign a new topic ID to the same topic name, so publish messages to the
+initially assigned topic ID will not be seen by that subscription.
