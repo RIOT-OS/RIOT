@@ -91,7 +91,7 @@ ifneq (,$(filter abc1 abd0 ade5,$(CPU_MODEL)))
 endif
 ~~~~~~~~~~~~~~~~~~~
 
-This allow simple handling when the benefit of having per model definition
+This allows simple handling when the benefit of having per model definition
 would currently not overcome the overhead of defining it.
 
 An issue with this is that it is not declarative and does not have equivalent
