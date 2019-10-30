@@ -5,3 +5,6 @@ endif
 ifneq (,$(filter atmega_common,$(USEMODULE)))
   USEMODULE += qDSA_asm
 endif
+
+# qDsa is not 16 bit compatible
+FEATURES_BLACKLIST += arch_16bit
