@@ -27,7 +27,7 @@ However, due to the algorithmic resolution one cannot know anymore the value of
 the specific CPU model definitions without executing the build system and the
 shell `sed` magic.
 
-This cause both issue to read the definition and slow execution time for
+This causes both issue to read the definition and slow execution time for
 definitions that are a static mapping from the exact CPU model.
 
 With the way of defining boards and CPU, some informations should be defined
