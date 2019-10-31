@@ -38,7 +38,7 @@ size_t riotboot_flashwrite_slotsize(const riotboot_flashwrite_t *state)
 {
     switch (state->target_slot) {
         case 0: return SLOT0_LEN;
-#if NUMOF_SLOTS==2
+#if NUM_SLOTS==2
         case 1: return SLOT1_LEN;
 #endif
         default: return 0;
