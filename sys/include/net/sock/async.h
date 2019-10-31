@@ -23,27 +23,31 @@
 #ifndef NET_SOCK_ASYNC_H
 #define NET_SOCK_ASYNC_H
 
-#ifdef SOCK_DTLS
-#include "sock/dtls.h"
+#ifdef MODULE_SOCK_DTLS
+#include "net/sock/dtls.h"
 #endif
 
-#ifdef SOCK_IP
-#include "sock/ip.h"
+#ifdef MODULE_SOCK_IP
+#include "net/sock/ip.h"
 #endif
 
-#ifdef SOCK_TCP
-#include "sock/tcp.h"
+#ifdef MODULE_SOCK_TCP
+#include "net/sock/tcp.h"
 #endif
 
-#ifdef SOCK_UDP
-#include "sock/udp"
+#ifdef MODULE_SOCK_UDP
+#include "net/sock/udp.h"
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if SOCK_HAS_ASYNC || defined(DOXYGEN)
+#if defined(SOCK_HAS_ASYNC) || defined(DOXYGEN)
+#ifdef SOCK_HAS_ASYNC_CTX
+#include "sock_async_ctx.h"     /* defines sock_async_ctx_t */
+#endif
+
 /**
  * @brief   Flag types to signify asynchronous sock events
  * @note    Only applicable with @ref SOCK_HAS_ASYNC defined.
@@ -57,11 +61,7 @@ typedef enum {
     SOCK_ASYNC_PATH_PROP = 0x0040,  /**< Path property changed event */
 } sock_async_flags_t;
 
-#if defined(SOCK_HAS_ASYNC) && defined(SOCK_HAS_ASYNC_CTX)
-#include "sock_async_ctx.h"     /* defines sock_async_ctx_t */
-#endif
-
-#if defined(SOCK_DTLS) || defined(DOXYGEN)
+#if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
 /**
  * @brief   Event callback for @ref sock_dtls_t
  *
@@ -95,9 +95,9 @@ typedef void (*sock_dtls_cb_t)(sock_dtls_t *sock, sock_async_flags_t flags);
  * @param[in] cb    An event callback. May be NULL to unset event callback.
  */
 void sock_dtls_set_cb(sock_dtls_t *sock, sock_dtls_cb_t cb);
-#endif  /* defined(SOCK_DTLS) || defined(DOXYGEN) */
+#endif  /* defined(MODULE_SOCK_DTLS) || defined(DOXYGEN) */
 
-#if defined(SOCK_IP) || defined(DOXYGEN)
+#if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
 /**
  * @brief   Event callback for @ref sock_ip_t
  *
@@ -128,9 +128,9 @@ typedef void (*sock_ip_cb_t)(sock_ip_t *sock, sock_async_flags_t flags);
  * @param[in] cb    An event callback. May be NULL to unset event callback.
  */
 void sock_ip_set_cb(sock_ip_t *sock, sock_ip_cb_t cb);
-#endif  /* defined(SOCK_IP) || defined(DOXYGEN) */
+#endif  /* defined(MODULE_SOCK_IP) || defined(DOXYGEN) */
 
-#if defined(SOCK_TCP) || defined(DOXYGEN)
+#if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
 /**
  * @brief   Event callback for @ref sock_tcp_t
  *
@@ -192,9 +192,9 @@ void sock_tcp_set_cb(sock_tcp_t *sock, sock_tcp_cb_t cb);
  * @param[in] cb    An event callback. May be NULL to unset event callback.
  */
 void sock_tcp_queue_set_cb(sock_tcp_queue_t *queue, sock_tcp_queue_cb_t cb);
-#endif  /* defined(SOCK_TCP) || defined(DOXYGEN) */
+#endif  /* defined(MODULE_SOCK_TCP) || defined(DOXYGEN) */
 
-#if defined(SOCK_UDP) || defined(DOXYGEN)
+#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
 /**
  * @brief   Event callback for @ref sock_udp_t
  *
@@ -225,10 +225,10 @@ typedef void (*sock_udp_cb_t)(sock_udp_t *sock, sock_async_flags_t type);
  * @param[in] cb    An event callback. May be NULL to unset event callback.
  */
 void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb);
-#endif  /* defined(SOCK_UDP) || defined(DOXYGEN) */
+#endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
 
-#if SOCK_HAS_ASYNC_CTX || defined(DOXYGEN)
-#if defined(SOCK_DTLS) || defined(DOXYGEN)
+#if defined(SOCK_HAS_ASYNC_CTX) || defined(DOXYGEN)
+#if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
 /**
  * @brief   Gets the asynchronous event context from sock object
  *
@@ -244,9 +244,9 @@ void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb);
  * @return  The asynchronous event context
  */
 sock_async_ctx_t *sock_dtls_get_async_ctx(sock_dtls_t *sock);
-#endif  /* defined(SOCK_DTLS) || defined(DOXYGEN) */
+#endif  /* defined(MODULE_SOCK_DTLS) || defined(DOXYGEN) */
 
-#if defined(SOCK_IP) || defined(DOXYGEN)
+#if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
 /**
  * @brief   Gets the asynchronous event context from sock object
  *
@@ -262,9 +262,9 @@ sock_async_ctx_t *sock_dtls_get_async_ctx(sock_dtls_t *sock);
  * @return  The asynchronous event context
  */
 sock_async_ctx_t *sock_ip_get_async_ctx(sock_ip_t *sock);
-#endif  /* defined(SOCK_IP) || defined(DOXYGEN) */
+#endif  /* defined(MODULE_SOCK_IP) || defined(DOXYGEN) */
 
-#if defined(SOCK_TCP) || defined(DOXYGEN)
+#if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
 /**
  * @brief   Gets the asynchronous event context from sock object
  *
@@ -296,9 +296,9 @@ sock_async_ctx_t *sock_tcp_get_async_ctx(sock_tcp_t *sock);
  * @return  The asynchronous event context
  */
 sock_async_ctx_t *sock_tcp_queue_get_async_ctx(sock_tcp_queue_t *queue);
-#endif  /* defined(SOCK_TCP) || defined(DOXYGEN) */
+#endif  /* defined(MODULE_SOCK_TCP) || defined(DOXYGEN) */
 
-#if defined(SOCK_UDP) || defined(DOXYGEN)
+#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
 /**
  * @brief   Gets the asynchronous event context from sock object
  *
@@ -314,8 +314,9 @@ sock_async_ctx_t *sock_tcp_queue_get_async_ctx(sock_tcp_queue_t *queue);
  * @return  The asynchronous event context
  */
 sock_async_ctx_t *sock_udp_get_async_ctx(sock_udp_t *sock);
-#endif  /* defined(SOCK_UDP) || defined(DOXYGEN) */
-#endif /* SOCK_HAS_ASYNC_CTX */
+#endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
+#endif  /* defined(SOCK_HAS_ASYNC_CTX) || defined(DOXYGEN) */
+#endif  /* defined(SOCK_HAS_ASYNC) || defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }
