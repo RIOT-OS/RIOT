@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += xtimer
+DISABLE_MODULE := core_msg
 
 # Port and pin configuration for probing with oscilloscope
 # Define Test pin for hardware timer interrupt, hardware dependent
