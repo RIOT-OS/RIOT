@@ -30,7 +30,7 @@
 
 static void _ili9341_spi_acquire(ili9341_t *dev)
 {
-    spi_acquire(dev->params->spi, dev->params->cs_pin, SPI_MODE_0,
+    spi_acquire(dev->params->spi, dev->params->cs_pin, dev->params->spi_mode,
                 dev->params->spi_clk);
 }
 

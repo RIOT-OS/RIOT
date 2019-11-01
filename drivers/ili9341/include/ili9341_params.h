@@ -45,13 +45,18 @@ extern "C" {
 #ifndef ILI9341_PARAM_RST
 #define ILI9341_PARAM_RST          GPIO_UNDEF
 #endif
+#ifndef ILI9341_PARAM_SPI_MODE
+#define ILI9341_PARAM_SPI_MODE      SPI_MODE_0
+#endif
 
 #ifndef ILI9341_PARAMS
 #define ILI9341_PARAMS              { .spi = ILI9341_PARAM_SPI, \
                                       .spi_clk = ILI9341_PARAM_SPI_CLK, \
+                                      .spi_mode = ILI9341_PARAM_SPI_MODE, \
                                       .cs_pin = ILI9341_PARAM_CS, \
                                       .dcx_pin = ILI9341_PARAM_DCX, \
-                                      .rst_pin = ILI9341_PARAM_RST }
+                                      .rst_pin = ILI9341_PARAM_RST, \
+                                    }
 #endif
 /**@}*/
 
