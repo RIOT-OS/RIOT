@@ -1,4 +1,3 @@
-APPLICATION = pkg_fatfs_vfs
 include ../Makefile.tests_common
 
 USEMODULE += fatfs_vfs

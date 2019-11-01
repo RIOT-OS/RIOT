@@ -1,7 +1,4 @@
-APPLICATION = external_module_dirs
-BOARD ?= native
-RIOTBASE ?= $(CURDIR)/../..
-
+include ../Makefile.tests_common
 USEMODULE += random
 
 USEMODULE += external_module
