@@ -116,6 +116,10 @@ static inline bool _context_overlaps_iid(gnrc_sixlowpan_ctx_t *ctx,
              (iid->uint8[(ctx->prefix_len / 8) - 8] & byte_mask[ctx->prefix_len % 8])));
 }
 
+static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
+                                    const gnrc_netif_hdr_t *netif_hdr,
+                                    gnrc_netif_t *netif);
+
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
 /**
  * @brief   Decodes UDP NHC
@@ -705,22 +709,19 @@ static inline bool _compressible(gnrc_pktsnip_t *hdr)
     }
 }
 
-void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
+static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
+                                    const gnrc_netif_hdr_t *netif_hdr,
+                                    gnrc_netif_t *iface)
 {
     assert(pkt != NULL);
-    gnrc_netif_hdr_t *netif_hdr = pkt->data;
     ipv6_hdr_t *ipv6_hdr;
-    gnrc_netif_t *iface = gnrc_netif_hdr_get_netif(netif_hdr);
     uint8_t *iphc_hdr;
     gnrc_sixlowpan_ctx_t *src_ctx = NULL, *dst_ctx = NULL;
     gnrc_pktsnip_t *dispatch, *ptr = pkt->next;
     bool addr_comp = false;
     size_t dispatch_size = 0;
-    /* datagram size before compression */
-    size_t orig_datagram_size = gnrc_pkt_len(pkt->next);
     uint16_t inline_pos = SIXLOWPAN_IPHC_HDR_LEN;
 
-    (void)ctx;
     assert(iface != NULL);
     dispatch = NULL;    /* use dispatch as temporary pointer for prev */
     /* determine maximum dispatch size and write protect all headers until
@@ -730,10 +731,7 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
 
         if (tmp == NULL) {
             DEBUG("6lo iphc: unable to write protect compressible header\n");
-            if (addr_comp) {    /* addr_comp was used as release indicator */
-                gnrc_pktbuf_release(pkt);
-            }
-            return;
+            return NULL;
         }
         ptr = tmp;
         if (dispatch == NULL) {
@@ -766,8 +764,7 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
 
     if (dispatch == NULL) {
         DEBUG("6lo iphc: error allocating dispatch space\n");
-        gnrc_pktbuf_release(pkt);
-        return;
+        return NULL;
     }
 
     iphc_hdr = dispatch->data;
@@ -894,8 +891,7 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
             if (gnrc_netif_ipv6_get_iid(iface, &iid) < 0) {
                 DEBUG("6lo iphc: could not get interface's IID\n");
                 gnrc_netif_release(iface);
-                gnrc_pktbuf_release(pkt);
-                return;
+                return NULL;
             }
             gnrc_netif_release(iface);
 
@@ -1013,8 +1009,7 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
 
         if (gnrc_netif_hdr_ipv6_iid_from_dst(iface, netif_hdr, &iid) < 0) {
             DEBUG("6lo iphc: could not get destination's IID\n");
-            gnrc_pktbuf_release(pkt);
-            return;
+            return NULL;
         }
 
         if ((ipv6_hdr->dst.u64[1].u64 == iid.uint64.u64) ||
@@ -1062,7 +1057,7 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
                 if (udp == NULL) {
                     DEBUG("gnrc_sixlowpan_iphc_encode: unable to mark UDP header\n");
                     gnrc_pktbuf_release(dispatch);
-                    return;
+                    return NULL;
                 }
             }
             gnrc_pktbuf_remove_snip(pkt, udp);
@@ -1083,8 +1078,24 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     /* insert dispatch into packet */
     dispatch->next = pkt->next;
     pkt->next = dispatch;
+    return pkt;
+}
 
-    gnrc_sixlowpan_multiplex_by_size(pkt, orig_datagram_size, iface, page);
+void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
+{
+    gnrc_netif_hdr_t *netif_hdr = pkt->data;
+    gnrc_netif_t *netif = gnrc_netif_hdr_get_netif(netif_hdr);
+    gnrc_pktsnip_t *tmp;
+    /* datagram size before compression */
+    size_t orig_datagram_size = gnrc_pkt_len(pkt->next);
+
+    (void)ctx;
+    if ((tmp = _iphc_encode(pkt, pkt->data, netif))) {
+        gnrc_sixlowpan_multiplex_by_size(tmp, orig_datagram_size, netif, page);
+    }
+    else {
+        gnrc_pktbuf_release(pkt);
+    }
 }
 
 /** @} */
