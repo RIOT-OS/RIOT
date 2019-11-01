@@ -673,6 +673,7 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     uint16_t inline_pos = SIXLOWPAN_IPHC_HDR_LEN;
 
     (void)ctx;
+    assert(iface != NULL);
     dispatch = NULL;    /* use dispatch as temporary pointer for prev */
     /* determine maximum dispatch size and write protect all headers until
      * then because they will be removed */
@@ -1035,9 +1036,7 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     dispatch->next = pkt->next;
     pkt->next = dispatch;
 
-    gnrc_netif_t *netif = gnrc_netif_hdr_get_netif(netif_hdr);
-    assert(netif != NULL);
-    gnrc_sixlowpan_multiplex_by_size(pkt, orig_datagram_size, netif, page);
+    gnrc_sixlowpan_multiplex_by_size(pkt, orig_datagram_size, iface, page);
 }
 
 /** @} */
