@@ -152,6 +152,8 @@ typedef enum {
     SPI_CLK_400KHZ = SPI_FREQUENCY_FREQUENCY_K500,  /**< 400KHz */
     SPI_CLK_1MHZ   = SPI_FREQUENCY_FREQUENCY_M1,    /**< 1MHz */
     SPI_CLK_5MHZ   = SPI_FREQUENCY_FREQUENCY_M4,    /**< 5MHz */
+    SPI_CLK_8MHZ   = SPI_FREQUENCY_FREQUENCY_M8,    /**< 8MHz */
+    /* nrf5x doesn't support higher speeds */
     SPI_CLK_10MHZ  = SPI_FREQUENCY_FREQUENCY_M8     /**< 10MHz */
 } spi_clk_t;
 /** @} */
