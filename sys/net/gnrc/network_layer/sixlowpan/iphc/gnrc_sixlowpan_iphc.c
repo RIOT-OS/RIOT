@@ -117,11 +117,11 @@ static inline bool _context_overlaps_iid(gnrc_sixlowpan_ctx_t *ctx,
 /**
  * @brief   Decodes UDP NHC
  *
- * @param[in] pkt                   The IPHC encoded packet
+ * @param[in] sixlo                 The IPHC encoded packet
  * @param[in] offset                The offset of the NHC encoded header
- * @param[in] ipv6_payload_len      Length of the unencoded, reassembled IPv6
- *                                  datagram in @p ipv6 with out the outer-most
- *                                  IPv6 header
+ * @param[in] rbuf                  Reassembly buffer entry if @p ipv6 is a
+ *                                  fragmented datagram. May be NULL, if @p ipv6
+ *                                  is not fragmented
  * @param[out] ipv6                 The packet to write the decoded data to
  * @param[in,out] uncomp_hdr_len    Number of bytes already decoded into @p ipv6
  *                                  by IPHC and other NHC. Adds size of @ref
@@ -132,13 +132,12 @@ static inline bool _context_overlaps_iid(gnrc_sixlowpan_ctx_t *ctx,
  * @return  0 on error.
  */
 static size_t _iphc_nhc_udp_decode(gnrc_pktsnip_t *sixlo, size_t offset,
+                                   const gnrc_sixlowpan_frag_rb_t *rbuf,
                                    gnrc_pktsnip_t *ipv6, size_t *uncomp_hdr_len)
 {
     uint8_t *payload = sixlo->data;
     ipv6_hdr_t *ipv6_hdr;
     udp_hdr_t *udp_hdr;
-    bool frag = true;   /* datagram is fragmented => infer payload length from
-                         * ipv6 snip (== reassembly buffer space) */
     uint16_t payload_len;
     uint8_t udp_nhc = payload[offset++];
     uint8_t tmp;
@@ -150,8 +149,6 @@ static size_t _iphc_nhc_udp_decode(gnrc_pktsnip_t *sixlo, size_t offset,
             DEBUG("6lo: unable to decode UDP NHC (not enough buffer space)\n");
             return 0;
         }
-        frag = false;   /* datagram was not fragmented => infer payload length
-                         * from original 6Lo packet*/
     }
     ipv6_hdr = ipv6->data;
     udp_hdr = (udp_hdr_t *)((uint8_t *)ipv6->data + *uncomp_hdr_len);
@@ -202,8 +199,8 @@ static size_t _iphc_nhc_udp_decode(gnrc_pktsnip_t *sixlo, size_t offset,
         udp_hdr->checksum.u8[1] = payload[offset++];
     }
 
-    if (frag) {
-        payload_len = ipv6->size - *uncomp_hdr_len;
+    if (rbuf != NULL) {
+        payload_len = rbuf->super.datagram_size - *uncomp_hdr_len;
     }
     else {
         payload_len = sixlo->size + sizeof(udp_hdr_t) - offset;
@@ -545,7 +542,8 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
         switch (iphc_hdr[payload_offset] & NHC_ID_MASK) {
             case NHC_UDP_ID: {
                 payload_offset = _iphc_nhc_udp_decode(sixlo, payload_offset,
-                                                      ipv6, &uncomp_hdr_len);
+                                                      rbuf, ipv6,
+                                                      &uncomp_hdr_len);
                 if (payload_offset == 0) {
                     _recv_error_release(sixlo, ipv6, rbuf);
                     return;
