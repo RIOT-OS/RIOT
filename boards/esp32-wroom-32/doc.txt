@@ -26,8 +26,8 @@
 
 This board definition covers not just a single board, but rather a large set of generic boards that use an ESP32-WROOM-32 module and simply break out all GPIOs to external pads without having any special hardware or interfaces on-board. Examples are Espressif's ESP32-DevKitC or NodeMCU-ESP32S and a large number of clones.
 
-\htmlonly<style>div.image img[src="https://docs.espressif.com/projects/esp-idf/en/latest/_images/esp32-devkitc-functional-overview1.jpg"]{width:600px;}</style>\endhtmlonly
-\image html "https://docs.espressif.com/projects/esp-idf/en/latest/_images/esp32-devkitc-functional-overview1.jpg" "Espressif ESP32-DevKitC V4"
+\htmlonly<style>div.image img[src="https://dl.espressif.com/dl/schematics/pictures/esp32-devkitc-v4-front.jpg"]{width:400px;}</style>\endhtmlonly
+\image html "https://dl.espressif.com/dl/schematics/pictures/esp32-devkitc-v4-front.jpg" "Espressif ESP32-DevKitC V4"
 
 ## <a name="hardware"> Hardware </a> &nbsp;&nbsp; [[TOC](#toc)]
 
