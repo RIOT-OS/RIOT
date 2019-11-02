@@ -25,9 +25,15 @@
 
 #include "memarray.h"
 
-#define MAX_NUMBER_BLOCKS    (10)
 #define MESSAGE_SIZE         (8U)
+
+#ifndef MAX_NUMBER_BLOCKS
+#define MAX_NUMBER_BLOCKS    (10)
+#endif
+
+#ifndef NUMBER_OF_TESTS
 #define NUMBER_OF_TESTS      (12)
+#endif
 
 extern int _ps_handler(int argc, char **argv);
 
@@ -94,6 +100,9 @@ void free_memory(struct block_t *head)
 
 int main(void)
 {
+    printf("MAX_NUMBER_BLOCKS: %d\n", MAX_NUMBER_BLOCKS);
+    printf("NUMBER_OF_TESTS: %d\n", NUMBER_OF_TESTS);
+
     memory_block_init();
     int count = 0;
 
