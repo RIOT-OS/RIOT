@@ -34,7 +34,6 @@ extern "C" {
  * @brief   Read Identification
  */
 #define N25Q128_OPCODE_RDID         (0x9E)
-#define N25Q128_OPCODE_RDID_MAX     (20)
 
 /*
  * @brief   Read Data Bytes
@@ -74,7 +73,6 @@ extern "C" {
  * @brief   Read OTP (Read of OTP area)
  */
 #define N25Q128_OPCODE_ROTP         (0x4B)
-#define N25Q128_OPCODE_ROTP_MAX     (65)
 
 /*
  * @brief   Write Enable
@@ -90,42 +88,35 @@ extern "C" {
  * @brief   Page Program
  */
 #define N25Q128_OPCODE_PP           (0x02)
-#define N25Q128_OPCODE_PP_MAX       (256)
 
 /*
  * @brief   Dual Input Fast Program
  * NOTE: Only available in Dual mode, which is not supported yet.
  */
 #define N25Q128_OPCODE_DIFP         (0xA2)
-#define N25Q128_OPCODE_DIFP_MAX     (256)
 
 /*
  * @brief   Dual Input Extended Fast Program
  * NOTE: Only available in Dual mode, which is not supported yet.
  */
 #define N25Q128_OPCODE_DIEFP        (0xD2)
-#define N25Q128_OPCODE_DIEFP_MAX    (256)
 
 /*
  * @brief   Quad Input Fast Program
  * NOTE: Only available in Quad mode, which is not supported yet.
  */
 #define N25Q128_OPCODE_QIFP         (0x32)
-#define N25Q128_OPCODE_QIFP_MIN     (1)
-#define N25Q128_OPCODE_QIFP_MAX     (256)
 
 /*
  * @brief   Quad Input Extended Fast Program
  * NOTE: Only available in Quad mode, which is not supported yet.
  */
 #define N25Q128_OPCODE_QIEFP        (0x12)
-#define N25Q128_OPCODE_QIEFP_MAX    (256)
 
 /*
  * @brief   Program OTP (Program of OTP area)
  */
 #define N25Q128_OPCODE_POTP         (0x42)
-#define N25Q128_OPCODE_POTP_MAX     (65)
 
 /*
  * @brief   SubSector Erase
@@ -161,7 +152,6 @@ extern "C" {
  * @brief   Write Status Register
  */
 #define N25Q128_OPCODE_WRSR         (0x01)
-#define N25Q128_OPCODE_WRSR_MAX     (1)
 
 /*
  * @brief   Read Lock Register
@@ -172,7 +162,6 @@ extern "C" {
  * @brief   Write to Lock Register
  */
 #define N25Q128_OPCODE_WRLR         (0xE5)
-#define N25Q128_OPCODE_WRLR_MAX     (1)
 
 /*
  * @brief   Read Flag Status Register
@@ -188,13 +177,11 @@ extern "C" {
  * @brief   Read NV Configuration Register 1
  */
 #define N25Q128_OPCODE_RDNVCR       (0xB5)
-#define N25Q128_OPCODE_RDNVCR_MAX   (2)
 
 /*
  * @brief   Write NV Configuration Register
  */
 #define N25Q128_OPCODE_WRNVCR       (0xB1)
-#define N25Q128_OPCODE_WRNVCR_MAX   (2)
 
 /*
  * @brief   Read Volatile Configuration Register
@@ -205,7 +192,6 @@ extern "C" {
  * @brief   Write Volatile Configuration Register
  */
 #define N25Q128_OPCODE_WRVCR        (0x81)
-#define N25Q128_OPCODE_WRVCR_MAX    (1)
 
 /*
  * @brief   Read Volatile Enhanced Configuration Register
@@ -216,9 +202,32 @@ extern "C" {
  * @brief   Write Volatile Enhanced Configuration Register
  */
 #define N25Q128_OPCODE_WRVECR       (0x61)
-#define N25Q128_OPCODE_WRVECR_MAX   (1)
 
 /** }@ Extended SPI OPCODE */
+
+/*
+ * @brief   Legacy SPI Status Register of the N25Q128 device.
+ */
+#define N25Q128_STAT_REG_WIP        (0x01)
+#define N25Q128_STAT_REG_WEL        (0x02)
+#define N25Q128_STAT_REG_BP0        (0x04)
+#define N25Q128_STAT_REG_BP1        (0x08)
+#define N25Q128_STAT_REG_BP2        (0x10)
+#define N25Q128_STAT_REG_TB         (0x20)
+#define N25Q128_STAT_REG_BP3        (0x40)
+#define N25Q128_STAT_REG_SRWD       (0x80)
+
+/*
+ * @brief   Flag Status Register of the N25Q128 device.
+ */
+/* First bit is 'RESERVED'. */
+#define N25Q128_FLAG_REG_PROT       (0x02) /*< Protection; Error. */
+#define N25Q128_FLAG_REG_PROG_SUSP  (0x04) /*< Program Suspend; Status. */
+#define N25Q128_FLAG_REG_VPP        (0x08) /*< VPP; Error. */
+#define N25Q128_FLAG_REG_PROG       (0x10) /*< Program; Error. */
+#define N25Q128_FLAG_REG_ERASE      (0x20) /*< Erase; Error. */
+#define N25Q128_FLAG_REG_ERASE_SUSP (0x40) /*< Erase Suspend; Status. */
+#define N25Q128_FLAG_REG_PE_CONTRL  (0x80) /*< P/E Controller (not WIP); Status. */
 
 #ifdef __cplusplus
 }

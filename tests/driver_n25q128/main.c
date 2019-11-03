@@ -130,13 +130,6 @@ static int cmd_read_bytes(int argc, char **argv)
     return 0;
 }
 
-static int cmd_read_bytes_fast(int argc, char **argv)
-{
-    (void)argc;
-    (void)argv;
-    return 0;
-}
-
 static int cmd_page_program(int argc, char **argv)
 {
     (void)argc;
@@ -189,7 +182,6 @@ static const shell_command_t shell_commands[] = {
     { "init", "initialize the device", cmd_init },
     { "id", "Read the id of the device", cmd_read_id },
     { "read", "Read an amount of bytes", cmd_read_bytes },
-    { "fast", "Read an amount of bytes 'fast'", cmd_read_bytes_fast },
     { "pp", "Page program the memory", cmd_page_program },
     { "se", "Sector erase", cmd_sector_erase},
     { "be", "bulk erase (the whole memory)", cmd_bulk_erase },

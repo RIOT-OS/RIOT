@@ -18,8 +18,8 @@
  * @}
  */
 
-#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -27,22 +27,15 @@
 #include "n25q128.h"
 #include "include/n25q128_internal.h"
 
-/* The size of a command without address (1Byte). */
-#define CMD_LEN_1_BYTE  (1)
+/* Some instructions only allowing a specific amount of bytes for sending/receiving. */
+#define CLAMP(x, min, max)    ((x > max) ? max : ((x < min) ? min : x))
 
-/* The size of a command (1Byte) + address (3Byte) in bytes. */
-#define CMD_LEN_4_BYTE  (4)
-
-/* Some instructions don't need an address. */
-#define ADDR_UNDEF      (-1)
-
-/* When the range of data bytes to send is not defined or 'infinite'. */
-#define INFINITE        (-1)
+static void _execute(n25q128_dev_t *dev);
 
 /*
  * @brief   Calls the spi driver for sending bytes.
  */
-static inline void _send(spi_t bus, uint8_t * out, uint8_t len)
+static inline void _send(spi_t bus, uint8_t * out, size_t len)
 {
     spi_transfer_bytes(bus, SPI_CS_UNDEF, false, out, NULL, len);
 }
@@ -50,335 +43,105 @@ static inline void _send(spi_t bus, uint8_t * out, uint8_t len)
 /*
  * @brief   Calls the spi driver for receiving bytes.
  */
-static inline void _receive(spi_t bus,uint8_t * in, uint8_t len)
+static inline void _receive(spi_t bus,uint8_t * in, size_t len)
 {
     spi_transfer_bytes(bus, SPI_CS_UNDEF, false, NULL, in, len);
 }
 
 /*
- * @brief   Sets the Write Enable Latch (WEL) bit.
- *
- * The WEL-bit must be set prior to every Program or Erase instruction.
- *
- * @param[in] *dev      A pointer to the configured device.
- */
-static inline void _write_enable(n25q128_dev_t *dev)
-{
-    (void)*dev;
-    // TODO
-}
-
-/*
- * @brief   Resets the Write Enable Latch (WEL) bit.
- *
- * @param[in] *dev      A pointer to the configured device.
- */
-static inline void _write_disable(n25q128_dev_t *dev)
-{
-    (void)*dev;
-    // TODO
-}
-
-/*
- * @brief   Read the status register.
- *
- * The Read Status Register (RDSR) instruction allows the Status Register to be
- * read. The Status Register may be read at any time, even while a Program,
- * Erase or Write Status Register cycle is in progress. When one of these cycles
- * is in progress, it is recommended to check the Write In Progress (WIP) bit
- * (or the Program/Erase controller bit of the Flag Status Register) before
- * sending a new instruction to the device. It is also possible to read the
- * Status Register continuously.
- *
- * @return  A status code, depending on the state of the device/driver.
- */
-static inline uint8_t _read_status_reg(n25q128_dev_t *dev, uint8_t val)
-{
-    (void)*dev;
-    (void)val;
-    return 0;
-}
-
-/*
- * @brief   Write to the status register.
- *
- * The write status register (WRSR) instruction allows new values to be written
- * to the status register. Before it can be accepted, a write enable (WREN)
- * instruction must previously have been executed. After the write enable (WREN)
- * instruction has been decoded and executed, the device sets the write enable
- * latch (WEL).
- *
- * @return  A status code, depending on the state of the device/driver.
- */
-static inline void _write_status_reg(n25q128_dev_t *dev, uint8_t val)
-{
-    (void)*dev;
-    (void)val;
-    // TODO
-}
-
-/*
- * @brief
- *
- * @return  A status code, depending on the state of the device/driver.
- */
-static inline uint8_t _read_lock_reg(n25q128_dev_t *dev, uint8_t val)
-{
-    (void)*dev;
-    (void)val;
-    return 0; // TODO
-}
-
-/*
- * @brief
- *
- * The Write to Lock Register (WRLR) instruction allows bits to be changed in
- * the Lock Registers. Before it can be accepted, a Write Enable (WREN)
- * instruction must previously have been executed. After the Write Enable (WREN)
- * instruction has been decoded, the device sets the Write Enable Latch (WEL).
- *
- * @return  A status code, depending on the state of the device/driver.
- */
-static inline void _write_lock_reg(n25q128_dev_t *dev, uint8_t val)
-{
-    (void)*dev;
-    (void)val;
-    // TODO
-}
-
-/*
- * @brief TODO
- *
- * The Write Non Volatile Configuration register (WRNVCR) instruction
- * allows new values to be written to the Non Volatile Configuration register.
- * Before it can be accepted, a write enable (WREN) instruction must previously
- * have been executed. After the write enable (WREN) instruction has been
- * decoded and executed, the device sets the write enable latch (WEL).
- *
- * @param[in] *dev      A pointer to the configured device.
- *
- * @return  The value of the non volatile register.
- */
-static inline uint8_t _read_nv_reg(n25q128_dev_t *dev)
-{
-    (void)*dev;
-    return 0;
-}
-
-/*
- * @brief TODO
- *
- * The Write Non Volatile Configuration register (WRNVCR) instruction allows new
- * values to be written to the Non Volatile Configuration register. Before it
- * can be accepted, a write enable (WREN) instruction must previously have been
- * executed. After the write enable (WREN) instruction has been decoded and
- * executed, the device sets the write enable latch (WEL).
- *
- * @param[in] *dev      A pointer to the configured device.
- * @param[in] val       The value to write into the non volatile register.
- */
-static inline void _write_nv_reg(n25q128_dev_t *dev, uint8_t val)
-{
-    (void)*dev;
-    (void)val;
-    // TODO
-}
-
-/*
- * @brief TODO
- *
- * The Read Volatile Configuration Register (RDVCR) instruction allows the
- * Volatile Configuration Register to be read.
- *
- * @param[in] *dev      A pointer to the configured device.
- *
- * @return  The content of the volatile register.
- */
-static inline uint8_t _read_vol_reg(n25q128_dev_t *dev)
-{
-    (void)*dev;
-    return 0;
-}
-
-/*
- * @brief TODO
- *
- * The Write Volatile Configuration register (WRVCR) instruction allows new
- * values to be written to the Volatile Configuration register. Before it can be
- * accepted, a write enable (WREN) instruction must have been executed. After
- * the write enable (WREN) instruction has been decoded and executed, the device
- * sets the write enable latch (WEL).
- *
- * @param[in] *dev  A pointer to the configured device.
- * @param[in] val   The value to write into the volatile register.
- */
-static inline void _write_vol_reg(n25q128_dev_t *dev, uint8_t val)
-{
-    (void)*dev;
-    (void)val;
-    // TODO
-}
-
-/*
- * @brief TODO
- *
- * The Read Volatile Enhanced Configuration Register (RDVECR) instruction allows
- * the Volatile Configuration Register to be read.
- *
- * @param[in] *dev      A pointer to the configured device.
- *
- * @return  The content of the volatile enhanced register.
- */
-static inline uint8_t _read_vol_ehn_reg(n25q128_dev_t *dev)
-{
-    (void)*dev;
-    return 0; // TODO
-}
-
-/*
- * @brief TODO
- *
- * The Write Volatile Enhanced Configuration register (WRVECR) instruction
- * allows new values to be written to the Volatile Enhanced Configuration
- * register. Before it can be accepted, a write enable (WREN) instruction must
- * previously have been executed. After the write enable (WREN) instruction has
- * been decoded and executed, the device sets the write enable latch (WEL).
- *
- * @param[in] *dev  A pointer to the configured device.
- * @param[in] val   The value to write into the volatile enhanced register.
- *
- * @return  A status code, depending on the state of the device/driver.
- */
-static inline void _write_vol_enh_reg(n25q128_dev_t *dev, uint8_t val)
-{
-    (void)*dev;
-    (void)val;
-    // TODO
-}
-
-/*
- * @brief   Reads the content of the "Read Flag Status"-register.
- *
- * The Read Flag Status Register (RFSR) instruction allows the Flag Status
- * Register to be read. The Status Register may be read at any time, even while
- * a Program or Erase is in progress. When one of these cycles is in progress,
- * it is recommended to check the P/E Controller bit (Not WIP) bit before
- * sending a new instruction to the device. It is also possible to read the
- * Flag Register continuously.
- *
- * @param[in] *dev      A pointer to the configured device.
- * @param[out] *buf     Stores the status from the memory device.
- * @param[in] buf_len   The length of the *buf.
- *
- * @return  The content from the flag status register.
- */
-static inline uint8_t _read_flag_status(n25q128_dev_t *dev)
-{
-    (void)*dev;
-    return 0; // TODO
-}
-
-/*
- * @brief
- *
- * The Clear Flag Status Register (CLFSR) instruction reset the error Flag
- * Status Register bits (Erase Error bit, Program Error bit, VPP Error bit,
- * Protection Error bit). It is not necessary to set the WEL bit before the
- * Clear Flag Status Register instruction is executed. The WEL bit will be
- * unchanged after this command is executed.
- *
- * @return  A status code, depending on the state of the device/driver.
- */
-static inline void _clear_flag_status(n25q128_dev_t *dev)
-{
-    (void)*dev;
-    // TODO
-}
-
-/*
  * @brief   Builds and send a packet, with an opcode included.
  */
-static inline void _instruction_set(n25q128_dev_t *dev)
+static inline void _send_instruction(n25q128_dev_t *dev)
 {
     /* The instruction 'set', including operation code and address. */
-    uint8_t set[CMD_LEN_4_BYTE] = {0};
+    uint8_t set[4] = {0};
+    /* Possible length is 4 Byte (with address) or 1 Byte (only instruction). */
+    size_t len = (dev->opt.enabled.addr) ? 4 : 1 ;
 
     set[0] = (dev->cmd.code & 0xFF);
     /* The address is made of 3 Bytes, which needs to be shifted correctly. */
-    set[1] = ((dev->cmd.addr & 0x00FF0000) >> 16); // >> 0x000000FF
-    set[2] = ((dev->cmd.addr & 0x0000FF00) >> 8);  // >> 0x000000FF
-    set[3] = (dev->cmd.addr & 0x000000FF);         // >> 0x000000FF
+    set[1] = ((dev->cmd.addr & 0x00FF0000) >> 16); // = 0x000000FF
+    set[2] = ((dev->cmd.addr & 0x0000FF00) >> 8);  // = 0x000000FF
+    set[3] = (dev->cmd.addr & 0x000000FF);         // = 0x000000FF
 
     /* We need to send it here, to start the corresponding program in the device. */
-    _send(dev->conf.bus, set, dev->cmd.len);
+    _send(dev->conf.bus, set, len);
 }
 
 /*
  * @brief   Execute the configured device with the prepared instruction set.
  */
-static inline int _execute(n25q128_dev_t *dev)
+static inline void _execute(n25q128_dev_t *dev)
 {
     /* Select the configured memory device, via the Chip-Select-GPIO. */
     gpio_clear(dev->conf.cs);
 
-    /* Acquire the configured spi resource. */
-    if (spi_acquire(dev->conf.bus, dev->conf.cs, dev->conf.mode, dev->conf.clk) < 0) {
-        return N25Q128_NOSPI;
+    spi_acquire(dev->conf.bus, dev->conf.cs, dev->conf.mode, dev->conf.clk);
+
+    /* Send the instruction, containing operation code and (optional) an address. */
+    _send_instruction(dev);
+
+    /* Memory is receiving, so transfer from driver to memory. */
+    if (dev->opt.enabled.send) {
+        _send(dev->conf.bus, dev->data.buf, dev->data.len);
     }
 
-    /* Prepare and send the instruction set, to start a program on the device. */
-    _instruction_set(dev);
-
-    /* Switch between operation codes and send or receive, depending on the code. */
-    switch (dev->cmd.code) {
-
-        case N25Q128_OPCODE_RDID:
-            _receive(dev->conf.bus, dev->data.buf, dev->data.len);
-            break;
-
-        case N25Q128_OPCODE_RFSR:
-            _receive(dev->conf.bus, dev->data.buf, dev->data.len);
-            break;
-
-        case N25Q128_OPCODE_READ:
-            _receive(dev->conf.bus, dev->data.buf, dev->data.len);
-            break;
-
-        case N25Q128_OPCODE_PP:
-            _send(dev->conf.bus, dev->data.buf, dev->data.len);
-            break;
-
-        // TODO: Add all other opcodes.
+    /* Memory is sending, so transfer from memory to driver. */
+    if (dev->opt.enabled.recv) {
+        _receive(dev->conf.bus, dev->data.buf, dev->data.len);
     }
 
-    /* Release the configured spi resource. */
     spi_release(dev->conf.bus);
 
     /* Deselect the configured memory device, via the Chip-Select-GPIO. */
     gpio_set(dev->conf.cs);
-
-    return N25Q128_OK;
 }
 
 /*
- * @brief   Process routine for all instruction sets.
+ * @brief   Sets the Write Enable Latch (WEL) bit in the Status Register.
  */
-static inline int _process(n25q128_dev_t *dev, uint8_t code, int32_t addr,
-        uint8_t * buf, uint8_t buf_len, int min_bytes, int max_bytes)
+static inline void _write_enable(n25q128_dev_t *dev)
 {
-    /* Only buffer with a specific size are allowed. */
-    if (!(buf_len >= min_bytes && (buf_len <= max_bytes || max_bytes == INFINITE))) {
-        return N25Q128_OOR;
-    }
+    dev->cmd.code = N25Q128_OPCODE_WREN;
+    dev->cmd.addr = 0;
+    dev->data.buf = NULL;
+    dev->data.len = 0;
+    dev->opt.mask = 0;
 
-    dev->cmd.code = code;
-    dev->cmd.addr = addr;
-    /* Only 1 Byte instruction set instead of 4, when no address is defined. */
-    dev->cmd.len = (addr == ADDR_UNDEF) ? CMD_LEN_1_BYTE : CMD_LEN_4_BYTE;
+    _execute(dev);
+}
+
+/*
+ * @brief   Resets the Write Enable Latch (WEL) bit in the Status Register.
+ */
+static inline void _write_disable(n25q128_dev_t *dev)
+{
+    dev->cmd.code = N25Q128_OPCODE_WRDI;
+    dev->cmd.addr = 0;
+    dev->data.buf = NULL;
+    dev->data.len = 0;
+    dev->opt.mask = 0;
+
+    _execute(dev);
+}
+
+/*
+ * @brief   Read and return the content of the Status Register.
+ */
+static inline uint8_t _read_status_reg(n25q128_dev_t *dev)
+{
+    uint8_t buf[1] = {0};
+
+    dev->cmd.code = N25Q128_OPCODE_RDSR;
+    dev->cmd.addr = 0;
     dev->data.buf = buf;
-    dev->data.len = buf_len;
+    dev->data.len = 1;
+    dev->opt.mask = 0;
+    dev->opt.mask = N25Q128_OPT_RECV_EN;
 
-    return _execute(dev);
+    _execute(dev);
+
+    return buf[0];
 }
 
 int n25q128_init(n25q128_dev_t *dev)
@@ -428,47 +191,104 @@ int n25q128_init(n25q128_dev_t *dev)
     return N25Q128_OK;
 }
 
-int n25q128_read_id(n25q128_dev_t *dev, uint8_t *buf, uint8_t buf_len)
+void n25q128_read_id(n25q128_dev_t *dev, uint8_t *buf, size_t len)
 {
-    return _process(dev, N25Q128_OPCODE_RDID, ADDR_UNDEF, buf, buf_len, 1, 20);
+    dev->cmd.code = N25Q128_OPCODE_RDID;
+    dev->cmd.addr = 0; /*< No address needed for this instruction. */
+    dev->data.buf = buf;
+    dev->data.len = CLAMP(len, 1, 20);
+    dev->opt.mask = 0; /*< Reset the mask, just to be sure. */
+    dev->opt.mask = N25Q128_OPT_RECV_EN;
+
+    /* Execute the prepared device. */
+    _execute(dev);
 }
 
-int n25q128_read_data_bytes(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, uint8_t buf_len)
+void n25q128_read_data_bytes(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, size_t len)
 {
-    return _process(dev, N25Q128_OPCODE_READ, addr, buf, buf_len, 1, INFINITE);
+    dev->cmd.code = N25Q128_OPCODE_READ;
+    dev->cmd.addr = addr;
+    dev->data.buf = buf;
+    dev->data.len = CLAMP(len, 1, len); /* 'infinite' bytes possible. No maximum. */
+    dev->opt.mask = 0;
+    dev->opt.mask = N25Q128_OPT_INF_EN | N25Q128_OPT_RECV_EN | N25Q128_OPT_ADDR_EN;
+
+    _execute(dev);
 }
 
-int n25q128_read_fast_data_bytes(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, uint8_t buf_len)
+void n25q128_page_program(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, size_t len)
 {
-    return _process(dev, N25Q128_OPCODE_FAST_READ, addr, buf, buf_len, 1, INFINITE);
+    /* Wait, if there is a 'Write In Progress'. */
+    while (_read_status_reg(dev) & N25Q128_STAT_REG_WIP);
+
+    _write_enable(dev);
+
+    dev->cmd.code = N25Q128_OPCODE_PP;
+    dev->cmd.addr = addr;
+    dev->data.buf = buf;
+    dev->data.len = CLAMP(len, 1, 256);
+    dev->opt.mask = 0;
+    dev->opt.mask = N25Q128_OPT_SEND_EN | N25Q128_OPT_ADDR_EN;
+
+    _execute(dev);
+
+    _write_disable(dev);
 }
 
-int n25q128_page_program(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, uint8_t buf_len)
+void n25q128_sector_erase(n25q128_dev_t *dev, int32_t addr)
 {
-    return _process(dev, N25Q128_OPCODE_PP, addr, buf, buf_len, 1, 256);
+    /* Wait, if there is a 'Write In Progress'. */
+    while (_read_status_reg(dev) & N25Q128_STAT_REG_WIP);
+
+    _write_enable(dev);
+
+    dev->cmd.code = N25Q128_OPCODE_SE;
+    dev->cmd.addr = addr;
+    dev->data.buf = NULL; /*< No buffer assigned. */
+    dev->data.len = 0;
+    dev->opt.mask = N25Q128_OPT_ADDR_EN;
+
+    _execute(dev);
+
+    _write_disable(dev);
 }
 
-int n25q128_read_otp(n25q128_dev_t *dev, uint8_t *buf, uint8_t buf_len)
+void n25q128_bulk_erase(n25q128_dev_t *dev)
 {
-    return _process(dev, N25Q128_OPCODE_ROTP, ADDR_UNDEF, buf, buf_len, 1, 65);
+    /* Wait, if there is a 'Write In Progress'. */
+    while (_read_status_reg(dev) & N25Q128_STAT_REG_WIP);
+
+    _write_enable(dev);
+
+    dev->cmd.code = N25Q128_OPCODE_BE;
+    dev->cmd.addr = 0;
+    dev->data.buf = NULL;
+    dev->data.len = 0;
+    dev->opt.mask = 0;
+
+    _write_disable(dev);
+
+    _execute(dev);
 }
 
-int n25q128_sector_erase(n25q128_dev_t *dev, int32_t addr)
+void n25q128_program_erase_suspend(n25q128_dev_t *dev)
 {
-    return _process(dev, N25Q128_OPCODE_SE, addr, NULL, 0, 0, 0);
+    dev->cmd.code = N25Q128_OPCODE_PES;
+    dev->cmd.addr = 0;
+    dev->data.buf = NULL;
+    dev->data.len = 0;
+    dev->opt.mask = 0;
+
+    _execute(dev);
 }
 
-int n25q128_bulk_erase(n25q128_dev_t *dev)
+void n25q128_program_erase_resume(n25q128_dev_t *dev)
 {
-    return _process(dev, N25Q128_OPCODE_BE, ADDR_UNDEF, NULL, 0, 0, 0);
-}
+    dev->cmd.code = N25Q128_OPCODE_PER;
+    dev->cmd.addr = 0;
+    dev->data.buf = NULL;
+    dev->data.len = 0;
+    dev->opt.mask = 0;
 
-int n25q128_program_erase_suspend(n25q128_dev_t *dev)
-{
-    return _process(dev, N25Q128_OPCODE_PES, ADDR_UNDEF, NULL, 0, 0, 0);
-}
-
-int n25q128_program_erase_resume(n25q128_dev_t *dev)
-{
-    return _process(dev, N25Q128_OPCODE_PER, ADDR_UNDEF, NULL, 0, 0, 0);
+    _execute(dev);
 }

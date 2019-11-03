@@ -30,35 +30,57 @@ extern "C" {
 #include "periph/spi.h"
 #include "periph/gpio.h"
 
-/**
+/*
  * @brief   Status codes used by the N25Q128 driver interface.
  */
 enum {
     N25Q128_OK      =  0,   /**< Everything went as planned. */
-    N25Q128_OOR     = -1,   /**< Buffer-size: Out-Of-Range. */
-    N25Q128_NOSPI   = -2,   /**< No SPI device available. */
-    N25Q128_NOGPIO  = -3,   /**< NO GPIO available */
+    N25Q128_NOSPI   = -1,   /**< No SPI device available. */
+    N25Q128_NOGPIO  = -2,   /**< NO GPIO available */
 };
 
 /*
- * @brief   Default type definiton of a instruction for a N25Q128.
+ * @brief   Helper for accessing/setting the bits of the 'n25q128_opt_t' type.
+ * @{
+ */
+#define N25Q128_OPT_ADDR_EN     (0x01)
+#define N25Q128_OPT_INF_EN      (0x02)
+#define N25Q128_OPT_SEND_EN     (0x04)
+#define N25Q128_OPT_RECV_EN     (0x08)
+/** }@ */
+
+/*
+ *@brief    Additional options, for specific instructions.
+ */
+typedef union {
+    uint8_t mask;
+    struct {
+        uint8_t addr    : 1;   /*< Set, when an address is available. */
+        uint8_t inf     : 1;   /*< Set, when the memory is able to continously send */
+        uint8_t send    : 1;   /*< Set, when the memory is receiving. */
+        uint8_t recv    : 1;   /*< Set, when the memory is sending. */
+        uint8_t unused  : 4;   /*< Not used bits. */
+    } enabled;
+} n25q128_opt_t;
+
+/*
+ * @brief   Type definiton of a instruction for a N25Q128.
  */
 typedef struct {
     uint8_t code;       /*< The code of the instruction. */
     int32_t addr;       /*< The address to read or write data from. */
-    uint8_t len;        /*< The length of code + addr in Bytes. */
 } n25q128_cmd_t;
 
 /*
- * @brief   Default type definition for the data of a N25Q128.
+ * @brief   Type definition for the data of a N25Q128.
  */
 typedef struct {
     uint8_t *buf;       /*< The buffer for sending or receiving data. */
-    uint8_t len;        /*< The length of the buffer in Bytes. */
+    size_t len;         /*< The length of the buffer in Bytes. */
 } n25q128_data_t;
 
 /*
- * @brief   Default type definition for the configuration of an N25Q128.
+ * @brief   Type definition for the configuration of an N25Q128.
  */
 typedef struct {
     spi_t bus;          /*< The used SPI bus */
@@ -70,16 +92,22 @@ typedef struct {
 } n25q128_conf_t;
 
 /*
- * @brief   Default type definition for a N25Q128 device.
+ * @brief   Type definition for a N25Q128 device.
+ *
  */
 typedef struct {
     n25q128_conf_t conf;    /*< The configuration (SPI/GPIO) of the device. */
     n25q128_cmd_t cmd;      /*< The current instruction set for the device. */
     n25q128_data_t data;    /*< The in/out data for the current instruction. */
+    n25q128_opt_t opt;      /*< bitwise-options, for enabling additional functions. */
 } n25q128_dev_t;
 
 /*
  * @brief   Initialize the N25Q128 with all needed peripherals.
+ *
+ * NOTE:    To initialize a device, it is only required to assign the peripheral
+ *          parameters to the configuration type (n25q128_conf_t). The other
+ *          structures must not be modified.
  *
  * @param[in] *dev  A pointer to the configured device.
  */
@@ -99,9 +127,9 @@ int n25q128_init(n25q128_dev_t *dev);
  * @param[out] *buf     Stores the id from the memory device.
  * @param[in] buf_len   The length of the *buf.
  *
- * @return  A status code, depending on the state of the device/driver.
+ * @return  Status code used by the N25Q128 driver interface
  */
-int n25q128_read_id(n25q128_dev_t *dev, uint8_t *buf, uint8_t buf_len);
+void n25q128_read_id(n25q128_dev_t *dev, uint8_t *buf, size_t len);
 
 /*
  * @brief   Read a specific amount of data bytes from an address.
@@ -111,21 +139,9 @@ int n25q128_read_id(n25q128_dev_t *dev, uint8_t *buf, uint8_t buf_len);
  * @param[out] *buf     Stores the bytes from the address of the device.
  * @param[in] buf_len   The length of the *buf.
  *
- * @return  A status code, depending on the state of the device/driver.
+ * @return  Status code used by the N25Q128 driver interface
  */
-int n25q128_read_data_bytes(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, uint8_t buf_len);
-
-/*
- * @brief   Read data bytes at higher speed.
- *
- * @param[in] *dev      A pointer to the configured device.
- * @param[in] address   The address to read bytes from.
- * @param[out] *buf     Stores the bytes from the address of the device.
- * @param[in] buf_len   The length of the *buf.
- *
- * @return  A status code, depending on the state of the device/driver.
- */
-int n25q128_read_fast_data_bytes(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, uint8_t buf_len);
+void n25q128_read_data_bytes(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, size_t len);
 
 /*
  * @brief   Programs bytes into the memory.
@@ -140,26 +156,9 @@ int n25q128_read_fast_data_bytes(n25q128_dev_t *dev, int32_t addr, uint8_t *buf,
  * @param[out] *buf     Stores the bytes from the address of the device.
  * @param[in] buf_len   The length of the *buf.
  *
- * @return  A status code, depending on the state of the device/driver.
+ * @return  Status code used by the N25Q128 driver interface
  */
-int n25q128_page_program(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, uint8_t buf_len);
-
-/*
- * @brief   TODO: Description.
- *
- * The Program OTP instruction (POTP) is used to program at most 64 bytes to the
- * OTP memory area (by changing bits from 1 to 0, only). Before it can be
- * accepted, a Write Enable (WREN) instruction must previously have been
- * executed. After the Write Enable (WREN) instruction has been decoded, the
- * device sets the Write Enable Latch (WEL) bit.
- *
- * @param[in] *dev      A pointer to the configured device.
- * @param[out] *buf     Stores the bytes from the address of the device.
- * @param[in] buf_len   The length of the *buf.
- *
- * @return  A status code, depending on the state of the device/driver.
- */
-int n25q128_read_otp(n25q128_dev_t *dev, uint8_t *buf, uint8_t buf_len);
+void n25q128_page_program(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, size_t len);
 
 /*
  * @brief   Erases all bits (set to 1 (FFh)) inside the chosen sector.
@@ -168,9 +167,9 @@ int n25q128_read_otp(n25q128_dev_t *dev, uint8_t *buf, uint8_t buf_len);
  * chosen sector. Before itcan be accepted, a Write Enable (WREN) instruction
  * must previously have been executed.
  *
- * @return  A status code, depending on the state of the device/driver.
+ * @return  Status code used by the N25Q128 driver interface
  */
-int n25q128_sector_erase(n25q128_dev_t *dev, int32_t addr);
+void n25q128_sector_erase(n25q128_dev_t *dev, int32_t addr);
 
 /*
  * @brief   Erases the whole device.
@@ -180,9 +179,9 @@ int n25q128_sector_erase(n25q128_dev_t *dev, int32_t addr);
  * executed. After the Write Enable (WREN) instruction has been decoded, the
  * device sets the Write Enable Latch (WEL).
  *
- * @return  A status code, depending on the state of the device/driver.
+ * @return  Status code used by the N25Q128 driver interface
  */
-int n25q128_bulk_erase(n25q128_dev_t *dev);
+void n25q128_bulk_erase(n25q128_dev_t *dev);
 
 /*
  * @brief
@@ -193,9 +192,9 @@ int n25q128_bulk_erase(n25q128_dev_t *dev);
  * program, Quad Input Page Program and Quad Input Extended Page program can be
  * suspended and resumed.
  *
- * @return  A status code, depending on the state of the device/driver.
+ * @return  Status code used by the N25Q128 driver interface
  */
-int n25q128_program_erase_suspend(n25q128_dev_t *dev);
+void n25q128_program_erase_suspend(n25q128_dev_t *dev);
 
 /*
  * @brief
@@ -208,9 +207,9 @@ int n25q128_program_erase_suspend(n25q128_dev_t *dev);
  * to the busy state (1 and 0 respectively) after Program/Erase Resume
  * instruction until the Program or Erase sequence is completed.
  *
- * @return  A status code, depending on the state of the device/driver.
+ * @return  Status code used by the N25Q128 driver interface
  */
-int n25q128_program_erase_resume(n25q128_dev_t *dev);
+void n25q128_program_erase_resume(n25q128_dev_t *dev);
 
 #ifdef __cplusplus
 }
