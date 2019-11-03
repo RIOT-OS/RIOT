@@ -155,12 +155,13 @@
  * take any action to support Observe client registration. However, gcoap
  * limits registration for a given resource to a _single_ observer.
  *
- * It is [suggested] (https://tools.ietf.org/html/rfc7641#section-6) that a
+ * It is [suggested](https://tools.ietf.org/html/rfc7641#section-6) that a
  * server adds the 'obs' attribute to resources that are useful for observation
  * (i.e. will produce notifications) as a hint. Keep in mind that this is not
- * mandatory in order to enable the mechanism in RIOT, nor will prevent a client
- * from observing a resource that does not have this attribute in the link
- * description.
+ * mandatory in order to enable the mechanism in RIOT, nor will it prevent a
+ * client from observing a resource that does not have this attribute in the
+ * link description. See the "Resource list creation" section above for how the
+ * gcoap example app publishes the obs attribute.
  *
  * An Observe notification is considered a response to the original client
  * registration request. So, the Observe server only needs to create and send
