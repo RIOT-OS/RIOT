@@ -6,12 +6,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
-                   arduino-mega2560 arduino-nano arduino-uno atmega328p \
-                   chronos hifive1 hifive1b mega-xplained microduino-corerf \
-                   msb-430 msb-430h pic32-clicker pic32-wifire telosb \
-                   waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:

@@ -7,13 +7,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-# TinyDTLS only has support for 32-bit architectures ATM
-BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
-                   arduino-mega2560 arduino-nano arduino-uno atmega328p \
-                   chronos mega-xplained microduino-corerf \
-                   msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b \
-                   wsn430-v1_4 z1
-
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
