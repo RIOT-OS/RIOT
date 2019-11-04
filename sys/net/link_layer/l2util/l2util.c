@@ -16,6 +16,7 @@
 #include <assert.h>
 
 #include "log.h"
+#include "luid.h"
 #include "net/eui48.h"
 #include "net/ieee802154.h"
 #include "net/ipv6.h"
@@ -238,5 +239,52 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
     return -ENOTSUP;
 }
 
+size_t __attribute__((weak)) board_get_eui_short(netdev_t *netdev, uint16_t *addr)
+{
+    (void) netdev;
+    (void) addr;
+    return 0;
+}
+
+size_t __attribute__((weak)) board_get_eui48(netdev_t *netdev, eui48_t *addr)
+{
+    (void) netdev;
+    (void) addr;
+    return 0;
+}
+
+size_t __attribute__((weak)) board_get_eui64(netdev_t *netdev, eui64_t *addr)
+{
+    (void) netdev;
+    (void) addr;
+    return 0;
+}
+
+void eui_short_get(netdev_t *netdev, uint16_t *addr)
+{
+    if (board_get_eui_short(netdev, addr) == sizeof(*addr)) {
+        return;
+    }
+
+    luid_get_short(addr);
+}
+
+void eui48_get(netdev_t *netdev, eui48_t *addr)
+{
+    if (board_get_eui48(netdev, addr) == sizeof(*addr)) {
+        return;
+    }
+
+    luid_get_eui48(addr);
+}
+
+void eui64_get(netdev_t *netdev, eui64_t *addr)
+{
+    if (board_get_eui64(netdev, addr) == sizeof(*addr)) {
+        return;
+    }
+
+    luid_get_eui64(addr);
+}
 
 /** @} */

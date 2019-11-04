@@ -83,6 +83,66 @@ static inline void eui64_clear_group(eui64_t *addr)
     addr->uint8[0] &= ~EUI64_GROUP_FLAG;
 }
 
+/**
+ * @brief Generates an short address for the netdev interface.
+ *
+ * @note It is possible to supply a board-specific, constant addres
+ *       by implementing @ref board_get_eui_short.
+ *       If no such function is availiable, this will fall back to
+ *       @ref luid_get_short.
+ *
+ * @param[in] netdev    The network device for which the address is
+ *                      generated.
+ *                      Will be passed on to @ref board_get_eui48.
+ * @param[out] addr     The generated short address
+ *
+ */
+void eui_short_get(netdev_t *netdev, uint16_t *addr);
+
+/**
+ * @brief Generates an EUI-64 address for the netdev interface.
+ *
+ * @note It is possible to supply a board-specific, constant addres
+ *       by implementing @ref board_get_eui64.
+ *       If no such function is availiable, this will fall back to
+ *       @ref luid_get_eui64.
+ *
+ * @param[in] netdev    The network device for which the address is
+ *                      generated.
+ *                      Will be passed on to @ref board_get_eui64.
+ * @param[out] addr     The generated EUI-64 address
+ *
+ */
+void eui64_get(netdev_t *netdev, eui64_t *addr);
+
+/**
+ * @brief Board-specific function to supply a short address to a netdev
+ *
+ *        Implement this function in your board code if the board
+ *        provides the means to supply a unique address to a netdev.
+ *
+ * @see eui_short_get
+ *
+ * @param[in] netdev    The network device that requested the address
+ * @param[out] addr     The dedicated address for the netdev
+ *
+ */
+size_t board_get_eui_short(netdev_t *netdev, uint16_t *addr);
+
+/**
+ * @brief Board-specific function to supply an EUI-64 to a netdev
+ *
+ *        Implement this function in your board code if the board
+ *        provides the means to supply a unique address to a netdev.
+ *
+ * @see eui64_get
+ *
+ * @param[in] netdev    The network device that requested the address
+ * @param[out] addr     The dedicated address for the netdev
+ *
+ */
+size_t board_get_eui64(netdev_t *netdev, eui64_t *addr);
+
 #ifdef __cplusplus
 }
 #endif

@@ -131,6 +131,35 @@ static inline void eui48_clear_group(eui48_t *addr)
     addr->uint8[0] &= ~EUI48_GROUP_FLAG;
 }
 
+/**
+ * @brief Generates an EUI-48 address for the netdev interface.
+ *
+ * @note It is possible to supply a board-specific, constant addres
+ *       by implementing @ref board_get_eui48.
+ *       If no such function is availiable, this will fall back to
+ *       @ref luid_get_eui48.
+ *
+ * @param[in] netdev    The network device for which the address is
+ *                      generated.
+ *                      Will be passed on to @ref board_get_eui48.
+ * @param[out] addr     The generated EUI-48 address
+ *
+ */
+void eui48_get(netdev_t *netdev, eui48_t *addr);
+
+/**
+ * @brief Board-specific function to supply an EUI-48 to a netdev
+ *
+ *        Implement this function in your board code if the board
+ *        provides the means to supply a unique address to a netdev.
+ *
+ * @see eui48_get
+ *
+ * @param[in] netdev    The network device that requested the address
+ * @param[out] addr     The dedicated address for the netdev
+ *
+ */
+size_t board_get_eui48(netdev_t *netdev, eui48_t *addr);
 
 #ifdef __cplusplus
 }
