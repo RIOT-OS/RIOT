@@ -63,3 +63,30 @@ void luid_custom(void *buf, size_t len, int gen)
     }
 }
 
+void luid_get_short(network_uint16_t *addr)
+{
+    luid_base(addr, sizeof(*addr));
+    addr->u8[1] ^= lastused++;
+
+    /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
+     * 0 for unicast addresses */
+    addr->u8[0] &= 0x7F;
+}
+
+void luid_get_eui48(eui48_t *addr)
+{
+    luid_base(addr, sizeof(*addr));
+    addr->uint8[5] ^= lastused++;
+
+    eui48_set_local(addr);
+    eui48_clear_group(addr);
+}
+
+void luid_get_eui64(eui64_t *addr)
+{
+    luid_base(addr, sizeof(*addr));
+    addr->uint8[7] ^= lastused++;
+
+    eui64_set_local(addr);
+    eui64_clear_group(addr);
+}
