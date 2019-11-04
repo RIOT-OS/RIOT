@@ -103,10 +103,8 @@ static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt,
     }
 
     new_netif_hdr = netif->data;
-    new_netif_hdr->if_pid = netif_hdr->if_pid;
-    new_netif_hdr->flags = netif_hdr->flags;
-    new_netif_hdr->rssi = netif_hdr->rssi;
-    new_netif_hdr->lqi = netif_hdr->lqi;
+    /* src_l2addr_len and dst_l2addr_len are already the same, now copy the rest */
+    *new_netif_hdr = *netif_hdr;
 
     frag = gnrc_pktbuf_add(NULL, NULL, fragment_size, GNRC_NETTYPE_SIXLOWPAN);
 
@@ -126,6 +124,22 @@ static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt,
     return frag;
 }
 
+static uint16_t _copy_pkt_to_frag(uint8_t *data, const gnrc_pktsnip_t *pkt,
+                                  uint16_t max_frag_size, uint16_t init_offset)
+{
+    uint16_t offset = init_offset;
+
+    while ((pkt != NULL) && (offset < max_frag_size)) {
+        uint16_t len = _min(max_frag_size - offset, pkt->size);
+
+        memcpy(data + offset, pkt->data, len);
+
+        offset += len;
+        pkt = pkt->next;
+    }
+    return offset;
+}
+
 static uint16_t _send_1st_fragment(gnrc_netif_t *iface,
                                    gnrc_sixlowpan_msg_frag_t *fragment_msg,
                                    size_t payload_len)
@@ -136,7 +150,7 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *iface,
     /* payload_len: actual size of the packet vs
      * datagram_size: size of the uncompressed IPv6 packet */
     int payload_diff = _payload_diff(fragment_msg, payload_len);
-    uint16_t local_offset = 0;
+    uint16_t local_offset;
     /* virtually add payload_diff to flooring to account for offset (must be divisable by 8)
      * in uncompressed datagram */
     uint16_t max_frag_size = _floor8(_max_frag_size(iface, fragment_msg) +
@@ -161,19 +175,7 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *iface,
     netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MORE_DATA;
 
     pkt = pkt->next;    /* don't copy netif header */
-
-    while (pkt != NULL) {
-        size_t clen = _min(max_frag_size - local_offset, pkt->size);
-
-        memcpy(data + local_offset, pkt->data, clen);
-        local_offset += clen;
-
-        if (local_offset >= max_frag_size) {
-            break;
-        }
-
-        pkt = pkt->next;
-    }
+    local_offset = _copy_pkt_to_frag(data, pkt, max_frag_size, 0);
 
     DEBUG("6lo frag: send first fragment (datagram size: %u, "
           "datagram tag: %" PRIu16 ", fragment size: %" PRIu16 ")\n",
@@ -212,7 +214,6 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface,
     hdr->offset = (uint8_t)((offset + _payload_diff(fragment_msg,
                                                     payload_len)) >> 3);
     pkt = pkt->next;    /* don't copy netif header */
-
     while ((pkt != NULL) && (offset_count != offset)) {   /* go to offset */
         offset_count += (uint16_t)pkt->size;
 
@@ -223,40 +224,19 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface,
 
             memcpy(data, ((uint8_t *)pkt->data) + pkt_offset, clen);
             local_offset = clen;
-            if (local_offset == max_frag_size) {
-                if ((clen < (pkt->size - pkt_offset)) || (pkt->next != NULL)) {
-                    /* Tell the link layer that we will send more fragments */
-                    gnrc_netif_hdr_t *netif_hdr = frag->data;
-                    netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MORE_DATA;
-                }
-            }
             pkt = pkt->next;
             break;
         }
 
         pkt = pkt->next;
     }
+    /* copy remaining packet snips */
+    local_offset = _copy_pkt_to_frag(data, pkt, max_frag_size, local_offset);
 
-    if (local_offset < max_frag_size) { /* copy other packet snips */
-        while (pkt != NULL) {
-            size_t clen = _min(max_frag_size - local_offset, pkt->size);
-
-            memcpy(data + local_offset, pkt->data, clen);
-            local_offset += clen;
-
-            if (local_offset == max_frag_size) {
-                if ((clen < pkt->size) || (pkt->next != NULL)) {
-                    /* Tell the link layer that we will send more fragments */
-                    gnrc_netif_hdr_t *netif_hdr = frag->data;
-                    netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MORE_DATA;
-                }
-                break;
-            }
-
-            pkt = pkt->next;
-        }
+    if ((offset + local_offset) < payload_len) {
+        gnrc_netif_hdr_t *netif_hdr = frag->data;
+        netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MORE_DATA;
     }
-
     DEBUG("6lo frag: send subsequent fragment (datagram size: %u, "
           "datagram tag: %" PRIu16 ", offset: %" PRIu8 " (%u bytes), "
           "fragment size: %" PRIu16 ")\n",
