@@ -279,7 +279,7 @@ static inline void gpio_clear(gpio_t pin)
 /**
  * @brief   Toggle the value of the given pin
  *
- * The CPU has to implement the corresponding `gpio_toggle` function.
+ * The CPU has to implement the corresponding `gpio_cpu_toggle` function.
  *
  * @param[in] pin       the pin to toggle
  */
