@@ -717,6 +717,8 @@ static int _forward_frag(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *frag_hdr,
     /* remove rewritten netif header (forwarding implementation must do this
      * anyway) */
     pkt = gnrc_pktbuf_remove_snip(pkt, pkt);
+    /* the following is just debug output for testing without any forwarding
+     * scheme */
     DEBUG("6lo iphc: Do not know how to forward fragment from (%s, %u) ",
           gnrc_netif_addr_to_str(vrbe->super.src, vrbe->super.src_len,
                                  addr_str), vrbe->super.tag);
