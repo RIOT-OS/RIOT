@@ -6,6 +6,7 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     arduino-mega2560 \
                     arduino-nano \
                     arduino-uno \
+                    atmega256rfr2-xpro \
                     atmega328p \
                     chronos \
                     f4vi1 \
