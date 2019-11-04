@@ -113,10 +113,12 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     port->CR[pin_num >> 3] |=  ((mode & MODE_MASK) << ((pin_num & 0x7) * 4));
 
     /* set ODR */
-    if (mode == GPIO_IN_PU)
+    if (mode == GPIO_IN_PU) {
         port->ODR |= 1 << pin_num;
-    else
+    }
+    else {
         port->ODR &= ~(1 << pin_num);
+    }
 
     return 0; /* all OK */
 }
@@ -242,6 +244,7 @@ void isr_exti(void)
 {
     /* only generate interrupts against lines which have their IMR set */
     uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
+
     for (unsigned i = 0; i < GPIO_ISR_CHAN_NUMOF; i++) {
         if (pending_isr & (1 << i)) {
             EXTI->PR = (1 << i);        /* clear by writing a 1 */
