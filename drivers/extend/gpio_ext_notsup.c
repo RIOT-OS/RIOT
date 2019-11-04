@@ -95,7 +95,7 @@ void gpio_ext_clear_notsup(void *dev, gpio_t pin)
     DEBUG("[gpio_ext_clear_notsup] call for dev %p\n", dev);
 }
 
-void gpio_toggle_notsup(void *dev, gpio_t pin)
+void gpio_ext_toggle_notsup(void *dev, gpio_t pin)
 {
     (void)dev;
     (void)pin;
@@ -123,7 +123,7 @@ const gpio_ext_driver_t gpio_ext_notsup_driver = {
     .read = gpio_ext_read_notsup,
     .set = gpio_ext_set_notsup,
     .clear = gpio_ext_clear_notsup,
-    .toggle = gpio_toggle_notsup,
+    .toggle = gpio_ext_toggle_notsup,
     .write = gpio_ext_write_notsup,
 };
 

@@ -461,7 +461,7 @@ static inline void gpio_toggle(gpio_t pin)
         return;
     }
 #ifdef MODULE_PERIPH_GPIO
-    gpio_toggle(pin);
+    gpio_cpu_toggle(pin);
 #endif
 }
 
