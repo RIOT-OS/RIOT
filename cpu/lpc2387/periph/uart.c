@@ -100,7 +100,7 @@ static irq_fun_t _uart_isr[UART_NUMOF] = {
  * bits 0…3: DIVADDVAL
  * bits 4…7: MULVAL
  */
-#define DIV_MUL(m, d) ((d << 4) | m)
+#define DIV_MUL(d, m) ((m << 4) | d)
 static const uint8_t div_table[] = {
     DIV_MUL(0,  1),  /* 1       */
     DIV_MUL(0,  1),  /* 1.03125 */
