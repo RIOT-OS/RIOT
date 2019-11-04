@@ -26,7 +26,26 @@
 
 #include "luid.h"
 
-static uint8_t lastused = 1;
+#ifndef MAX
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#endif
+
+void __attribute__((weak)) luid_base(void *buf, size_t len)
+{
+    memset(buf, LUID_BACKUP_SEED, len);
+
+#if CPUID_LEN
+    uint8_t *out = (uint8_t *)buf;
+    uint8_t cid[CPUID_LEN];
+
+    cpuid_get(cid);
+    for (size_t i = 0; i < MAX(len, CPUID_LEN); i++) {
+        out[i % len] ^= cid[i % CPUID_LEN];
+    }
+#endif
+}
+
+static uint8_t lastused;
 
 void luid_get(void *buf, size_t len)
 {
@@ -44,19 +63,3 @@ void luid_custom(void *buf, size_t len, int gen)
     }
 }
 
-void luid_base(void *buf, size_t len)
-{
-    assert(buf && (len > 0));
-
-    memset(buf, LUID_BACKUP_SEED, len);
-
-#if CPUID_LEN
-    uint8_t *out = (uint8_t *)buf;
-    uint8_t cid[CPUID_LEN];
-
-    cpuid_get(cid);
-    for (size_t i = 0; i < CPUID_LEN; i++) {
-        out[i % len] ^= cid[i];
-    }
-#endif
-}
