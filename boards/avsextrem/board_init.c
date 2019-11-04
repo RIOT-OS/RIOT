@@ -26,10 +26,6 @@
 /*---------------------------------------------------------------------------*/
 void board_init(void)
 {
-    /* UART0 */
-    PINSEL0 |= BIT4 + BIT6;   // RxD0 and TxD0
-    PINSEL0 &= ~(BIT5 + BIT7);
-
     //PTTU:
 
     /*Turn Board on*/
