@@ -9,6 +9,8 @@ PROGRAMMER ?= xplainedpro
 
 # This board can be reset via avrdude
 RESET ?= avrdude -c $(PROGRAMMER) -p m256rfr2
+# Use edbg interface for debugging
+DEBUGSERVER_INTERFACE ?= --edbg
 
 include $(RIOTMAKE)/tools/avrdude.inc.mk
 include $(RIOTBOARD)/common/atmega/Makefile.include
