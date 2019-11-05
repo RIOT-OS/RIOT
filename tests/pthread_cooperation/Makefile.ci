@@ -4,6 +4,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mega2560 \
     arduino-nano \
     arduino-uno \
+    atmega256rfr2-xpro \
     atmega328p \
     hifive1 \
     hifive1b \
