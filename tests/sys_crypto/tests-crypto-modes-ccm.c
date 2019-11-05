@@ -1009,6 +1009,9 @@ static void test_crypto_modes_ccm_check_len(void)
 {
     int ret;
 
+/* Using length_encoding above UINT16_MAX doesn't work on 8/16 bit
+   architectures, SIZE_MAX is equal to UINT16_MAX there */
+#if SIZE_MAX > UINT16_MAX
     /* Just 1 to big to fit */
     ret = _test_ccm_len(cipher_encrypt_ccm, 2, NULL, 1 << 16, 0);
     TEST_ASSERT_EQUAL_INT(CCM_ERR_INVALID_LENGTH_ENCODING, ret);
@@ -1019,6 +1022,11 @@ static void test_crypto_modes_ccm_check_len(void)
     ret = _test_ccm_len(cipher_encrypt_ccm, 2, NULL, 1 << 16, 65535);
     TEST_ASSERT_EQUAL_INT(CCM_ERR_INVALID_LENGTH_ENCODING, ret);
     ret = _test_ccm_len(cipher_decrypt_ccm, 2, NULL, 1 << 16, 65535);
+    TEST_ASSERT_EQUAL_INT(CCM_ERR_INVALID_LENGTH_ENCODING, ret);
+#endif
+
+    /* Invalid length when length_encoding < 2 */
+    ret = _test_ccm_len(cipher_encrypt_ccm, 1, NULL, 8, 0);
     TEST_ASSERT_EQUAL_INT(CCM_ERR_INVALID_LENGTH_ENCODING, ret);
 
     /* Valid length that were wrongly checked */
