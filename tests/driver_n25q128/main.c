@@ -22,13 +22,25 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "n25q128.h"
 #include "board.h"
 #include "periph/pm.h"
 #include "shell.h"
+#include "n25q128.h"
 
-/* The device, this test is working on. Multiple devices possible. */
+/*
+ * @brief   The size of the generic buffer.
+ */
+#define BUF_SIZE     (32U)
+
+/*
+ * @brief   The device, used to get access to the n25q128 serial flash memory.
+ */
 static n25q128_dev_t n25q128;
+
+/*
+ * @brief   Generic buffer used for sending and receiving.
+ */
+static uint8_t buf[BUF_SIZE];
 
 static inline void _print_bytes(char * title, uint8_t * data, size_t len)
 {
@@ -86,61 +98,85 @@ static int cmd_read_id(int argc, char **argv)
     (void) argc;
     (void) argv;
 
-    /* The id is 20 bytes in size. See Datasheet -> Page 81. */
-    uint8_t rdid[20] = {0};
+    puts("\nThe first 4 Bytes should look like this:\"0x20 0xba 0x18 0x10\".\n");
+    puts("- Manufacturer identification");
+    puts("  - 1 Byte; 0x20");
+    puts("- Device Information");
+    puts("  - Memory Type; 1 Byte; 0xBA");
+    puts("  - Memory capacity; 1 Byte; 0x18");
+    puts("- UID");
+    puts("  - EDID+CFD length; 1 Byte; 0x10");
+    puts("  - EDID; 2 Bytes; 'no specific values'");
+    puts("  - CFD; 14 Bytes; 'no specific values'\n");
 
-    n25q128_read_id(&n25q128, rdid, 20);
+    memset(buf, 0, sizeof(buf));
 
-    /* First 4 bytes should be: 0x20, 0xBA, 0x18, 0x10.
-     * Datasheet: N25Q_128_3_Volt_with_boot_sector.pdf -> Page 81. */
-    _print_bytes("Read ID", rdid, 20);
+    n25q128_read_id(&n25q128, buf, BUF_SIZE);
+
+    _print_bytes("Read ID", buf, 20);
 
     return 0;
 }
 
 static int cmd_read_bytes(int argc, char **argv)
 {
-    int len = 0;
     int address = 0;
-    uint8_t buf[16] = {0};
 
     if (argc < 2) {
-        printf("usage: %s <number-of-bytes> <address>\n", argv[0]);
+        printf("usage: %s <address>\n", argv[0]);
         return 1;
     }
 
-    /* Parse the number of bytes. */
-    len = atoi(argv[1]);
+    address = atoi(argv[1]);
 
-    // XXX: What is the maximum here?
-    if (len < 0 || len > 16) {
-        puts("error: number of bytes is out of range from buffer\n");
-    }
+    puts("Read bytes from memory.");
 
-    /* Parse the address. */
-    // XXX: Check for correct address range.
-    // NOTE: When the highest address is reached, the address counter rolls over
-    //      to 000000h, allowing the read sequence to be continued indefinitely.
-    address = atoi(argv[2]);
+    memset(buf, 0, sizeof(buf));
 
-    n25q128_read_data_bytes(&n25q128, address, buf, len);
+    n25q128_read_data_bytes(&n25q128, address, buf, BUF_SIZE);
 
-    _print_bytes("Read data bytes", buf, len);
+    _print_bytes("Read data bytes", buf, BUF_SIZE);
 
     return 0;
 }
 
 static int cmd_page_program(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
+    int addr = 0;
+    size_t len = 0;
+
+    if (argc < 2) {
+        printf("usage: %s <address> <value>\n", argv[0]);
+        return 1;
+    }
+
+    addr = atoi(argv[1]);
+    len = strlen(argv[2]);
+
+    puts("Page program the memory.");
+
+    memset(buf, 0, sizeof(buf));
+
+    n25q128_page_program(&n25q128, addr, buf, len);
+
     return 0;
 }
 
 static int cmd_sector_erase(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
+    int addr = 0;
+
+    if (argc < 1) {
+        printf("usage: %s <address>\n", argv[0]);
+        return 1;
+    }
+
+    addr = atoi(argv[1]);
+
+    puts("Sector erase the memory.");
+
+    n25q128_sector_erase(&n25q128, addr);
+
     return 0;
 }
 
@@ -148,20 +184,8 @@ static int cmd_bulk_erase(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    return 0;
-}
-
-static int cmd_suspend(int argc, char **argv)
-{
-    (void)argc;
-    (void)argv;
-    return 0;
-}
-
-static int cmd_resume(int argc, char **argv)
-{
-    (void)argc;
-    (void)argv;
+    puts("Bulk erase the memory. This tooks ~250 seconds.");
+    n25q128_bulk_erase(&n25q128);
     return 0;
 }
 
@@ -185,8 +209,6 @@ static const shell_command_t shell_commands[] = {
     { "pp", "Page program the memory", cmd_page_program },
     { "se", "Sector erase", cmd_sector_erase},
     { "be", "bulk erase (the whole memory)", cmd_bulk_erase },
-    { "suspend", "suspend the program/erase program", cmd_suspend },
-    { "resume", "resume the program/erase program", cmd_resume },
     { NULL, NULL, NULL }
 };
 
