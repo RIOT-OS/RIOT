@@ -1,0 +1,11 @@
+# avr-libc does not provide `clock `required by ubasic_tests
+FEATURES_BLACKLIST += arch_avr8
+
+# msp430-libc does not provide `stdout` variable required by ubasic_tests
+FEATURES_BLACKLIST += arch_msp430
+
+# newlib for MIPS does not provide _times_r
+FEATURES_BLACKLIST += arch_mips32r2
+
+# newlib for RISCV does not provide _times
+FEATURES_BLACKLIST += arch_riscv
