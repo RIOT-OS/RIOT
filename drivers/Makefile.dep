@@ -214,6 +214,16 @@ ifneq (,$(filter ina220,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter ina3221,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter ina3221_alerts,$(USEMODULE)))
+  USEMODULE += ina3221
+  USEMODULE += periph_gpio_irq
+endif
+
 ifneq (,$(filter io1_xplained,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_adc
