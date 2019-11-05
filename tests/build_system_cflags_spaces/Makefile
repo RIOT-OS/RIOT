@@ -1,7 +1,4 @@
-APPLICATION = cflags_with_spaces
-BOARD ?= native
-RIOTBASE ?= $(CURDIR)/../..
-
+include ../Makefile.tests_common
 CFLAGS += -DSUPER_STRING='"I love sentences with spaces"'
 
 include $(RIOTBASE)/Makefile.include

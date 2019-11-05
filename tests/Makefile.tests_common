@@ -1,6 +1,6 @@
 APPLICATION ?= tests_$(notdir $(patsubst %/,%,$(CURDIR)))
 ifneq (,$(filter tests_driver_%,$(APPLICATION)))
-    BOARD ?= samr21-xpro
+  BOARD ?= samr21-xpro
 endif
 BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..

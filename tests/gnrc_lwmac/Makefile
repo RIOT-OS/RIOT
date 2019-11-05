@@ -1,11 +1,6 @@
-# name of your application
-APPLICATION = lwmac
-
-# This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../..
-
-# If no BOARD is found in the environment, use this default:
+# use samr21-xpro as default:
 BOARD ?= samr21-xpro
+include ../Makefile.tests_common
 
 # Currently, LWMAC is only tested and evaluated through on samr21-xpro.
 # Once LWMAC has also been tested through on other boards, the whitelist should

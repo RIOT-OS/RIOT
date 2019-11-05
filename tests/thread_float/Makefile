@@ -1,4 +1,3 @@
-APPLICATION = thread_float
 include ../Makefile.tests_common
 
 USEMODULE += printf_float

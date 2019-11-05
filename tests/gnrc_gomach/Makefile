@@ -1,11 +1,6 @@
-# name of your application
-APPLICATION = gomach
-
-# This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../..
-
-# If no BOARD is found in the environment, use this default:
+# use samr21-xpro as default:
 BOARD ?= samr21-xpro
+include ../Makefile.tests_common
 
 # Currently, GoMacH has only been tested and evaluated through on samr21-xpro and iotlab-m3
 # nodes. Once GoMacH has also been tested through on other devices, the whitelist should
