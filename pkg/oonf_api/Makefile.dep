@@ -1,0 +1,5 @@
+# avr-libc does not provide `strings.h`
+FEATURES_BLACKLIST += arch_avr8
+
+# msp430-libc does not provide `strftime`
+FEATURES_BLACKLIST += arch_msp430
