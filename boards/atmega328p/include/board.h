@@ -24,6 +24,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "periph_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,7 +45,11 @@ extern "C" {
  * @{
  */
 #define XTIMER_WIDTH                (16)
-#define XTIMER_HZ                   (250000UL)
+#if CLOCK_CORECLOCK > 4000000UL
+#define XTIMER_HZ                   (CLOCK_CORECLOCK / 64)
+#else
+#define XTIMER_HZ                   (CLOCK_CORECLOCK / 8)
+#endif
 #define XTIMER_BACKOFF              (40)
 /** @} */
 
