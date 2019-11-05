@@ -94,6 +94,7 @@ enum {
     /* electricity */
     UNIT_A,         /**< Ampere */
     UNIT_V,         /**< Volts */
+    UNIT_W,         /**< Watt */
     UNIT_GS,        /**< gauss */
     UNIT_DBM,       /**< decibel-milliwatts */
     UNIT_COULOMB,   /**< coulomb */
