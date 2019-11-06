@@ -118,6 +118,7 @@ int hd44780_init(hd44780_t *dev, const hd44780_params_t *params)
         }
     }
     /* set mode depending on configured pins */
+    dev->flag = 0;
     if (count_pins < HD44780_MAX_PINS) {
         dev->flag |= HD44780_4BITMODE;
     }
