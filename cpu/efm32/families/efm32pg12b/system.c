@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file
  * @brief CMSIS Cortex-M3/M4 System Layer for EFM32 devices.
- * @version 5.7.0
+ * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
