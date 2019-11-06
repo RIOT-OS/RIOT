@@ -27,6 +27,10 @@
 
 #include "atmega_regs_common.h"
 
+#ifndef FLASHSTART
+#define FLASHSTART                 (0x0000)
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -60,6 +64,13 @@ extern "C" {
  * @brief   Declare the heap_stats function as available
  */
 #define HAVE_HEAP_STATS
+
+/**
+ * @brief   Flash page configuration
+ * @{
+ */
+#define FLASHPAGE_SIZE                  SPM_PAGESIZE
+#define FLASHPAGE_NUMOF                 ((FLASHEND - FLASHSTART) / SPM_PAGESIZE)
 
 #ifdef __cplusplus
 }
