@@ -7,6 +7,7 @@ BOARDS_TIMER_25kHz := \
     arduino-leonardo \
     arduino-mega2560 \
     arduino-uno \
+    atmega256rfr2-xpro \
     atmega328p \
     waspmote-pro \
     #
