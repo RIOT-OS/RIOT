@@ -44,12 +44,10 @@ ifeq ($(PROGRAMMER),edbg)
   endif
 endif
 
-# this board uses J-Link for debug and possibly flashing
 ifeq ($(PROGRAMMER),jlink)
+  # this board uses J-Link for debug and possibly flashing
   include $(RIOTMAKE)/tools/jlink.inc.mk
-endif
-
-# this board uses openocd for debug and possibly flashing
-ifeq ($(PROGRAMMER),openocd)
+else
+  # this board uses openocd for debug and possibly flashing
   include $(RIOTMAKE)/tools/openocd.inc.mk
 endif
