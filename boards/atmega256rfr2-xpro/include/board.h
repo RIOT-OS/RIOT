@@ -27,16 +27,6 @@ extern "C" {
 #endif
 
 /**
- * @name    STDIO configuration
- *
- * As the CPU is too slow to handle 115200 baud, we set the default
- * baudrate to 9600 for this board
- * @{
- */
-#define STDIO_UART_BAUDRATE (9600U)
-/** @} */
-
-/**
  * @brief   Use the UART 1 for STDIO on this board
  */
 #define STDIO_UART_DEV       (UART_DEV(1))
@@ -44,13 +34,11 @@ extern "C" {
 /**
  * @name    xtimer configuration values
  *
- * Xtimer runs at 8MHz / 64 = 125kHz
+ * Xtimer runs at 16MHz / 64 = 250kHz
  * @{
  */
-#define XTIMER_DEV                  (0)
-#define XTIMER_CHAN                 (0)
 #define XTIMER_WIDTH                (16)
-#define XTIMER_HZ                   (125000UL)
+#define XTIMER_HZ                   (250000UL)
 #define XTIMER_BACKOFF              (40)
 /** @} */
 

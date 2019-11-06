@@ -19,24 +19,14 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "periph_conf_atmega_common.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @name    Clock configuration
- * @{
- */
-#ifndef CLOCK_CORECLOCK
-/* Using 8MHz internal oscillator as default clock source */
-#define CLOCK_CORECLOCK     (8000000UL)
-#endif
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
-
-#include "periph_conf_atmega_common.h"
 
 #endif /* PERIPH_CONF_H */
