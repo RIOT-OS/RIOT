@@ -44,13 +44,11 @@ extern "C" {
 /**
  * @name    xtimer configuration values
  *
- * Xtimer runs at 8MHz / 64 = 125kHz
+ * Xtimer runs at 16MHz / 64 = 250kHz
  * @{
  */
-#define XTIMER_DEV                  (0)
-#define XTIMER_CHAN                 (0)
 #define XTIMER_WIDTH                (16)
-#define XTIMER_HZ                   (125000UL)
+#define XTIMER_HZ                   (250000UL)
 #define XTIMER_BACKOFF              (40)
 /** @} */
 
