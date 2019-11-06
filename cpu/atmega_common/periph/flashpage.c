@@ -23,6 +23,7 @@
 
 #include <avr/io.h>
 #include <avr/boot.h>
+#include <avr/pgmspace.h>
 
 #include "cpu.h"
 #include "irq.h"
@@ -60,4 +61,32 @@ void flashpage_write(int page, const void *data)
 
     /* re-enable interrupts (if they were ever enabled) */
     irq_restore(istate);
+}
+
+void flashpage_read(int page, void *data)
+{
+    assert(page < (int)FLASHPAGE_NUMOF);
+
+    uint32_t src = page * FLASHPAGE_SIZE;
+    uint16_t *dst = data;
+
+    for (uint32_t end = src + FLASHPAGE_SIZE; src != end; src += sizeof(*dst)) {
+        *dst++ = pgm_read_word(src);
+    }
+}
+
+int flashpage_verify(int page, const void *data)
+{
+    assert(page < (int)FLASHPAGE_NUMOF);
+
+    uint32_t src = page * FLASHPAGE_SIZE;
+    const uint16_t *dst = data;
+
+    for (uint32_t end = src + FLASHPAGE_SIZE; src != end; src += sizeof(*dst)) {
+        if (*dst++ != pgm_read_word(src)) {
+            return FLASHPAGE_NOMATCH;
+        }
+    }
+
+    return FLASHPAGE_OK;
 }
