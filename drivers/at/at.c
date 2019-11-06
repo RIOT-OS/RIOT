@@ -237,6 +237,7 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command,
 {
     ssize_t res;
 
+    xtimer_usleep(AT_CMD_DELAY);
     at_drain(dev);
 
     res = at_send_cmd(dev, command, timeout);
@@ -264,6 +265,7 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
     size_t bytes_left = len - 1;
     char *pos = resp_buf;
 
+    xtimer_usleep(AT_CMD_DELAY);
     at_drain(dev);
 
     res = at_send_cmd(dev, command, timeout);
@@ -329,6 +331,7 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
 {
     unsigned cmdlen = strlen(command);
 
+    xtimer_usleep(AT_CMD_DELAY);
     at_drain(dev);
 
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);

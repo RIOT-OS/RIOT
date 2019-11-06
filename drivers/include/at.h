@@ -65,6 +65,7 @@
 #include "kernel_defines.h"
 
 #include "event.h"
+#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -184,6 +185,10 @@ typedef struct {
 
 /** Shortcut for getting send end of line length */
 #define AT_SEND_EOL_LEN  (sizeof(CONFIG_AT_SEND_EOL) - 1)
+#ifndef AT_CMD_DELAY
+/** Delay to be introduced before starting a new AT command operation */
+#define AT_CMD_DELAY    (20U * US_PER_MS)
+#endif
 
 /**
  * @brief AT device structure
