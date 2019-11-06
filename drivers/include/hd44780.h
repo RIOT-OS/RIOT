@@ -63,7 +63,7 @@ typedef struct {
     gpio_t rs;                      /**< rs gpio pin */
     gpio_t rw;                      /**< rw gpio pin */
     gpio_t enable;                  /**< enable gpio pin */
-    gpio_t data[8];                 /**< data gpio pins */
+    gpio_t data[HD44780_MAX_PINS];  /**< data gpio pins */
 } hd44780_params_t;
 
 /**
