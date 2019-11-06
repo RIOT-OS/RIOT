@@ -28,14 +28,14 @@
 
 #include "periph/flashpage.h"
 
-void flashpage_read(int page, void *data)
+void __attribute__((weak)) flashpage_read(int page, void *data)
 {
     assert(page < (int)FLASHPAGE_NUMOF);
 
     memcpy(data, flashpage_addr(page), FLASHPAGE_SIZE);
 }
 
-int flashpage_verify(int page, const void *data)
+int __attribute__((weak)) flashpage_verify(int page, const void *data)
 {
     assert(page < (int)FLASHPAGE_NUMOF);
 
