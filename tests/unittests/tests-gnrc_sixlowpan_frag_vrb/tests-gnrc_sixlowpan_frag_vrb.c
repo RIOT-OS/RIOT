@@ -18,6 +18,7 @@
 
 #include "embUnit/embUnit.h"
 
+#include "net/gnrc/sixlowpan/frag/fb.h"
 #include "net/gnrc/sixlowpan/frag/vrb.h"
 #include "xtimer.h"
 
@@ -30,8 +31,6 @@
 #define TEST_SRC_LEN        (8U)
 #define TEST_DST_LEN        (8U)
 #define TEST_TAG            (26U)
-
-extern uint16_t tag;
 
 /* The interface is not used for anything by the VRB (it just is kept as a
  * reference for forwarding) so an uninitialized one is enough */
@@ -58,14 +57,13 @@ static uint8_t _out_dst[] = TEST_OUT_DST;
 static void set_up(void)
 {
     gnrc_sixlowpan_frag_vrb_reset();
-    tag = 0;
+    gnrc_sixlowpan_frag_fb_reset();
 }
 
 static void test_vrb_add__success(void)
 {
     gnrc_sixlowpan_frag_vrb_t *res;
 
-    tag = TEST_TAG_INITIAL;
     TEST_ASSERT_NOT_NULL((res = gnrc_sixlowpan_frag_vrb_add(&_base,
                                                             &_dummy_netif,
                                                             _out_dst,
@@ -88,15 +86,12 @@ static void test_vrb_add__success(void)
     TEST_ASSERT_EQUAL_INT(sizeof(_out_dst), res->super.dst_len);
     TEST_ASSERT_MESSAGE(memcmp(_out_dst, res->super.dst, sizeof(_out_dst)) == 0,
                         "TEST_DST != res->super.dst");
-    TEST_ASSERT_EQUAL_INT(TEST_TAG_INITIAL, res->out_tag);
-    TEST_ASSERT(TEST_TAG_INITIAL != tag);
 }
 
 static void test_vrb_add__duplicate(void)
 {
     gnrc_sixlowpan_frag_vrb_t *res1, *res2;
 
-    tag = TEST_TAG_INITIAL;
     TEST_ASSERT_NOT_NULL((res1 = gnrc_sixlowpan_frag_vrb_add(&_base,
                                                              &_dummy_netif,
                                                              _out_dst,

@@ -212,7 +212,12 @@ endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_frag_fb
   USEMODULE += gnrc_sixlowpan_frag_rb
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_fb,$(USEMODULE)))
+  USEMODULE += core_msg
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
@@ -221,6 +226,7 @@ endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_vrb,$(USEMODULE)))
   USEMODULE += xtimer
+  USEMODULE += gnrc_sixlowpan_frag_fb
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))

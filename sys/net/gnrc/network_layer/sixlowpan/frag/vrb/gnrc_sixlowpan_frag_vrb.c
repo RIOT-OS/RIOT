@@ -21,6 +21,7 @@
 #include "net/gnrc/netif.h"
 #include "xtimer.h"
 
+#include "net/gnrc/sixlowpan/frag/fb.h"
 #include "net/gnrc/sixlowpan/frag/vrb.h"
 
 #define ENABLE_DEBUG    (0)
@@ -32,16 +33,6 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #else   /* MODULE_GNRC_IPV6_NIB */
 static char addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
 #endif  /* MODULE_GNRC_IPV6_NIB */
-
-#if !defined(MODULE_GNRC_SIXLOWPAN_FRAG) && defined(TEST_SUITES)
-/* mock for e.g. testing */
-uint16_t tag = 0;
-
-uint16_t gnrc_sixlowpan_frag_next_tag(void)
-{
-    return tag++;
-}
-#endif  /* !defined(MODULE_GNRC_SIXLOWPAN_FRAG) && defined(TEST_SUITES) */
 
 static inline bool _equal_index(const gnrc_sixlowpan_frag_vrb_t *vrbe,
                                 const uint8_t *src, size_t src_len,
@@ -73,7 +64,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
                 vrbe->super = *base;
                 vrbe->out_netif = out_netif;
                 memcpy(vrbe->super.dst, out_dst, out_dst_len);
-                vrbe->out_tag = gnrc_sixlowpan_frag_next_tag();
+                vrbe->out_tag = gnrc_sixlowpan_frag_fb_next_tag();
                 vrbe->super.dst_len = out_dst_len;
                 DEBUG("6lo vrb: creating entry (%s, ",
                       gnrc_netif_addr_to_str(vrbe->super.src,

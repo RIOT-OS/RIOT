@@ -51,14 +51,14 @@ extern "C" {
 /**
  * @brief   Number of datagrams that can be fragmented simultaneously
  *
- * This determines the number of @ref gnrc_sixlowpan_msg_frag_t instances
+ * This determines the number of @ref gnrc_sixlowpan_frag_fb_t instances
  * available.
  *
  * @note    Only applicable with
- *          [gnrc_sixlowpan_frag](@ref net_gnrc_sixlowpan_frag) module
+ *          [gnrc_sixlowpan_frag_fb](@ref net_gnrc_sixlowpan_frag_fb) module
  */
-#ifndef GNRC_SIXLOWPAN_MSG_FRAG_SIZE
-#define GNRC_SIXLOWPAN_MSG_FRAG_SIZE    (1U)
+#ifndef GNRC_SIXLOWPAN_FRAG_FB_SIZE
+#define GNRC_SIXLOWPAN_FRAG_FB_SIZE         (1U)
 #endif
 
 /**
