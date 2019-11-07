@@ -387,8 +387,10 @@ static void tests_littlefs_statvfs(void)
     int fd = vfs_open("/test-littlefs/test.txt", O_CREAT | O_RDWR, 0);
     TEST_ASSERT(fd >= 0);
 
-    res = vfs_write(fd, buf, sizeof(buf));
-    TEST_ASSERT(res == sizeof(buf));
+    for (int i = 0; i < 128; ++i) {
+        res = vfs_write(fd, buf, sizeof(buf));
+        TEST_ASSERT(res == sizeof(buf));
+    }
 
     res = vfs_close(fd);
     TEST_ASSERT_EQUAL_INT(0, res);
