@@ -78,6 +78,7 @@ static inline int _is_range_valid(eeprom_t dev, eeprom_off_t pos, size_t len)
 void eeprom_init(void)
 {
     for (unsigned i = 0; i < EEPROM_NUMOF; i++) {
+        assert(eeprom_devs[i].driver);
         _sizes[i] = eeprom_devs[i].driver->init(eeprom_devs[i].handle,
                                                 eeprom_devs[i].params);
         if (!_sizes[i]) {
