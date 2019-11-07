@@ -192,6 +192,7 @@ err:
 }
 
 static const gnrc_netif_ops_t _esp_now_ops = {
+    .init = gnrc_netif_default_init,
     .send = _send,
     .recv = _recv,
     .get = gnrc_netif_get_from_netdev,

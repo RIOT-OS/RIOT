@@ -106,6 +106,7 @@ static void _set_up(void)
 static inline void _test_init(gnrc_netif_t *netif)
 {
     (void)netif;
+    gnrc_netif_default_init(netif);
     init_called = true;
 }
 
