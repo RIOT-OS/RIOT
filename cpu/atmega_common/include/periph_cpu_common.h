@@ -151,6 +151,19 @@ typedef struct {
  */
 #define EEPROM_CLEAR_BYTE              (0xff)
 
+/**
+ * @name    WDT upper and lower bound times in ms
+ * @{
+ */
+#define NWDT_TIME_LOWER_LIMIT           (1)
+#define NWDT_TIME_UPPER_LIMIT           (8192U)
+/** @} */
+
+/**
+ * @brief   WDT can be stopped on AVR
+ */
+#define WDT_HAS_STOP                    (1)
+
 #ifdef __cplusplus
 }
 #endif
