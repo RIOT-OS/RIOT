@@ -141,7 +141,7 @@ void n25q128_read_id(n25q128_dev_t *dev, uint8_t *buf, size_t len);
  *
  * @return  Status code used by the N25Q128 driver interface
  */
-void n25q128_read_data_bytes(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, size_t len);
+void n25q128_read_data_bytes(n25q128_dev_t *dev, uint32_t addr, uint8_t *buf, size_t len);
 
 /*
  * @brief   Programs bytes into the memory.
@@ -158,18 +158,21 @@ void n25q128_read_data_bytes(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, siz
  *
  * @return  Status code used by the N25Q128 driver interface
  */
-void n25q128_page_program(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, size_t len);
+void n25q128_page_program(n25q128_dev_t *dev, uint32_t addr, uint8_t *buf, size_t len);
 
 /*
  * @brief   Erases all bits (set to 1 (FFh)) inside the chosen sector.
  *
- * The Sector Erase (SE) instruction sets to '1' (FFh) all bits inside the
- * chosen sector. Before itcan be accepted, a Write Enable (WREN) instruction
- * must previously have been executed.
+ * NOTE: This needs to be done, before programming a sector with new values.
+ *       Because the memory can only set bits back to 1 during erasing. So, once
+ *       a bit is programmed from 1 to 0, it cannot be 'overwritten'.
+ *
+ * @param[in] *dev      A pointer to the configured device.
+ * @param[in] addr      The address of the sector to erase.
  *
  * @return  Status code used by the N25Q128 driver interface
  */
-void n25q128_sector_erase(n25q128_dev_t *dev, int32_t addr);
+void n25q128_sector_erase(n25q128_dev_t *dev, uint32_t addr);
 
 /*
  * @brief   Erases the whole device.
@@ -184,28 +187,13 @@ void n25q128_sector_erase(n25q128_dev_t *dev, int32_t addr);
 void n25q128_bulk_erase(n25q128_dev_t *dev);
 
 /*
- * @brief
+ * @brief   Pause the program/erase program on the memory.
  *
- * The Program/Erase Suspend instruction allows the controller to interrupt a
- * Program or an Erase instruction, in particular: Sector Erase, Subsector
- * Erase, Page Program, Dual Input Page Program, Dual Input Extended Page
- * program, Quad Input Page Program and Quad Input Extended Page program can be
- * suspended and resumed.
- *
- * @return  Status code used by the N25Q128 driver interface
  */
 void n25q128_program_erase_suspend(n25q128_dev_t *dev);
 
 /*
- * @brief
- *
- * After a Program/Erase suspend instruction, a Program/Erase Resume instruction
- * is required to continue performing the suspended Program or Erase sequence.
- * Program/Erase Resume instruction is ignored if the device is not in a
- * Program/Erase Suspended status. The WIP bit of the Status Register and
- * Program/Erase controller bit (NotWIP) of the Flag Status Register both switch
- * to the busy state (1 and 0 respectively) after Program/Erase Resume
- * instruction until the Program or Erase sequence is completed.
+ * @brief   Resume the program/erase program on the memory.
  *
  * @return  Status code used by the N25Q128 driver interface
  */

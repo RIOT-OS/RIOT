@@ -30,7 +30,7 @@
 /*
  * @brief   The size of the generic buffer.
  */
-#define BUF_SIZE     (32U)
+#define BUF_SIZE     (20U)
 
 /*
  * @brief   The device, used to get access to the n25q128 serial flash memory.
@@ -90,6 +90,8 @@ static int cmd_init(int argc, char **argv)
         printf("cmd_init -> Failed!\n");
     }
 
+    memset(buf, 0, BUF_SIZE);
+
     return 0;
 }
 
@@ -142,22 +144,24 @@ static int cmd_read_bytes(int argc, char **argv)
 
 static int cmd_page_program(int argc, char **argv)
 {
-    int addr = 0;
+    uint32_t addr = 0;
     size_t len = 0;
+    uint8_t values[BUF_SIZE];
 
     if (argc < 2) {
         printf("usage: %s <address> <value>\n", argv[0]);
         return 1;
     }
 
-    addr = atoi(argv[1]);
-    len = strlen(argv[2]);
-
     puts("Page program the memory.");
 
     memset(buf, 0, sizeof(buf));
 
-    n25q128_page_program(&n25q128, addr, buf, len);
+    addr = atoi(argv[1]);
+    len = strlen(argv[2]);
+    memcpy(values, argv[2], len);
+
+    n25q128_page_program(&n25q128, addr, values, len);
 
     return 0;
 }
@@ -167,13 +171,13 @@ static int cmd_sector_erase(int argc, char **argv)
     int addr = 0;
 
     if (argc < 1) {
-        printf("usage: %s <address>\n", argv[0]);
+        printf("usage: %s <address of the sector>\n", argv[0]);
         return 1;
     }
 
     addr = atoi(argv[1]);
 
-    puts("Sector erase the memory.");
+    puts("Sector erase the sector of the given address.");
 
     n25q128_sector_erase(&n25q128, addr);
 
@@ -202,13 +206,13 @@ static int cmd_reboot(int argc, char **argv)
  * @brief   List of shell commands for this test.
  */
 static const shell_command_t shell_commands[] = {
-    { "reboot", "reboots your device", cmd_reboot },
+    { "reboot", "reboot the device", cmd_reboot },
     { "init", "initialize the device", cmd_init },
-    { "id", "Read the id of the device", cmd_read_id },
-    { "read", "Read an amount of bytes", cmd_read_bytes },
-    { "pp", "Page program the memory", cmd_page_program },
-    { "se", "Sector erase", cmd_sector_erase},
-    { "be", "bulk erase (the whole memory)", cmd_bulk_erase },
+    { "id", "Read the ID of the device", cmd_read_id },
+    { "read", "Read an amount of bytes from a specific address", cmd_read_bytes },
+    { "pp", "Program byte for byte at a specific address", cmd_page_program },
+    { "se", "Erase a sector of a given address", cmd_sector_erase},
+    { "be", "Erase the whole memory. Tooks ~250 seconds", cmd_bulk_erase },
     { NULL, NULL, NULL }
 };
 

@@ -27,10 +27,10 @@
 #include "n25q128.h"
 #include "include/n25q128_internal.h"
 
-/* Some instructions only allowing a specific amount of bytes for sending/receiving. */
+/*
+ * @brief   Clamps a specifc value between minimum and maximum.
+ */
 #define CLAMP(x, min, max)    ((x > max) ? max : ((x < min) ? min : x))
-
-static void _execute(n25q128_dev_t *dev);
 
 /*
  * @brief   Calls the spi driver for sending bytes.
@@ -55,10 +55,13 @@ static inline void _send_instruction(n25q128_dev_t *dev)
 {
     /* The instruction 'set', including operation code and address. */
     uint8_t set[4] = {0};
-    /* Possible length is 4 Byte (with address) or 1 Byte (only instruction). */
-    size_t len = (dev->opt.enabled.addr) ? 4 : 1 ;
 
+    /* Possible length is 4 Byte (with address) or 1 Byte (only instruction). */
+    size_t len = (dev->opt.enabled.addr) ? 4 : 1;
+
+    /* The first byte will allways be the operation code. */
     set[0] = (dev->cmd.code & 0xFF);
+
     /* The address is made of 3 Bytes, which needs to be shifted correctly. */
     set[1] = ((dev->cmd.addr & 0x00FF0000) >> 16); // = 0x000000FF
     set[2] = ((dev->cmd.addr & 0x0000FF00) >> 8);  // = 0x000000FF
@@ -76,24 +79,25 @@ static inline void _execute(n25q128_dev_t *dev)
     /* Select the configured memory device, via the Chip-Select-GPIO. */
     gpio_clear(dev->conf.cs);
 
-    spi_acquire(dev->conf.bus, dev->conf.cs, dev->conf.mode, dev->conf.clk);
+    /* Try to acquire the required spi resource. */
+    if (spi_acquire(dev->conf.bus, dev->conf.cs, dev->conf.mode, dev->conf.clk) == SPI_OK) {
 
-    /* Send the instruction, containing operation code and (optional) an address. */
-    _send_instruction(dev);
+        /* Send the instruction, containing operation code and (optional) an address. */
+        _send_instruction(dev);
 
+        /* Memory is receiving, so transfer from driver to memory. */
+        if (dev->opt.enabled.send) {
+            _send(dev->conf.bus, dev->data.buf, dev->data.len);
+        }
 
+        /* Memory is sending, so transfer from memory to driver. */
+        if (dev->opt.enabled.recv) {
+            _receive(dev->conf.bus, dev->data.buf, dev->data.len);
+        }
 
-    /* Memory is receiving, so transfer from driver to memory. */
-    if (dev->opt.enabled.send) {
-        _send(dev->conf.bus, dev->data.buf, dev->data.len);
+        /* Release the previous acquired spi resource. */
+        spi_release(dev->conf.bus);
     }
-
-    /* Memory is sending, so transfer from memory to driver. */
-    if (dev->opt.enabled.recv) {
-        _receive(dev->conf.bus, dev->data.buf, dev->data.len);
-    }
-
-    spi_release(dev->conf.bus);
 
     /* Deselect the configured memory device, via the Chip-Select-GPIO. */
     gpio_set(dev->conf.cs);
@@ -104,12 +108,10 @@ static inline void _execute(n25q128_dev_t *dev)
  */
 static inline void _write_enable(n25q128_dev_t *dev)
 {
-    uint8_t buf[1] = {0};
-
     dev->cmd.code = N25Q128_OPCODE_WREN;
     dev->cmd.addr = 0;
-    dev->data.buf = buf;
-    dev->data.len = 1;
+    dev->data.buf = NULL;
+    dev->data.len = 0;
     dev->opt.mask = 0;
 
     _execute(dev);
@@ -120,12 +122,10 @@ static inline void _write_enable(n25q128_dev_t *dev)
  */
 static inline void _write_disable(n25q128_dev_t *dev)
 {
-    uint8_t buf[1] = {0};
-
     dev->cmd.code = N25Q128_OPCODE_WRDI;
     dev->cmd.addr = 0;
-    dev->data.buf = buf;
-    dev->data.len = 1;
+    dev->data.buf = NULL;
+    dev->data.len = 0;
     dev->opt.mask = 0;
 
     _execute(dev);
@@ -200,17 +200,16 @@ int n25q128_init(n25q128_dev_t *dev)
 void n25q128_read_id(n25q128_dev_t *dev, uint8_t *buf, size_t len)
 {
     dev->cmd.code = N25Q128_OPCODE_RDID;
-    dev->cmd.addr = 0; /*< No address needed for this instruction. */
+    dev->cmd.addr = 0;
     dev->data.buf = buf;
     dev->data.len = CLAMP(len, 1, 20);
-    dev->opt.mask = 0; /*< Reset the mask, just to be sure. */
+    dev->opt.mask = 0;
     dev->opt.mask = N25Q128_OPT_RECV_EN;
 
-    /* Execute the prepared device. */
     _execute(dev);
 }
 
-void n25q128_read_data_bytes(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, size_t len)
+void n25q128_read_data_bytes(n25q128_dev_t *dev, uint32_t addr, uint8_t *buf, size_t len)
 {
     dev->cmd.code = N25Q128_OPCODE_READ;
     dev->cmd.addr = addr;
@@ -222,11 +221,8 @@ void n25q128_read_data_bytes(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, siz
     _execute(dev);
 }
 
-void n25q128_page_program(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, size_t len)
+void n25q128_page_program(n25q128_dev_t *dev, uint32_t addr, uint8_t *buf, size_t len)
 {
-    /* Wait, if there is a 'Write In Progress'. */
-    //while (_read_status_reg(dev) & N25Q128_STAT_REG_WIP);
-
     _write_enable(dev);
 
     dev->cmd.code = N25Q128_OPCODE_PP;
@@ -237,56 +233,40 @@ void n25q128_page_program(n25q128_dev_t *dev, int32_t addr, uint8_t *buf, size_t
     dev->opt.mask = N25Q128_OPT_SEND_EN | N25Q128_OPT_ADDR_EN;
 
     _execute(dev);
-
-    //_write_disable(dev);
 }
 
-void n25q128_sector_erase(n25q128_dev_t *dev, int32_t addr)
+void n25q128_sector_erase(n25q128_dev_t *dev, uint32_t addr)
 {
-    uint8_t buf[1] = {0};
-    /* Wait, if there is a 'Write In Progress'. */
-    //while (_read_status_reg(dev) & N25Q128_STAT_REG_WIP);
-
     _write_enable(dev);
 
     dev->cmd.code = N25Q128_OPCODE_SE;
     dev->cmd.addr = addr;
-    dev->data.buf = buf; /*< No buffer assigned. */
-    dev->data.len = 1;
+    dev->data.buf = NULL;
+    dev->data.len = 0;
     dev->opt.mask = N25Q128_OPT_ADDR_EN;
 
     _execute(dev);
-
-    //_write_disable(dev);
 }
 
 void n25q128_bulk_erase(n25q128_dev_t *dev)
 {
-    uint8_t buf[1] = {0};
-    /* Wait, if there is a 'Write In Progress'. */
-    //while (_read_status_reg(dev) & N25Q128_STAT_REG_WIP);
-
     _write_enable(dev);
 
     dev->cmd.code = N25Q128_OPCODE_BE;
     dev->cmd.addr = 0;
-    dev->data.buf = buf;
-    dev->data.len = 1;
+    dev->data.buf = NULL;
+    dev->data.len = 0;
     dev->opt.mask = 0;
-
-    //_write_disable(dev);
 
     _execute(dev);
 }
 
 void n25q128_program_erase_suspend(n25q128_dev_t *dev)
 {
-    uint8_t buf[1] = {0};
-
     dev->cmd.code = N25Q128_OPCODE_PES;
     dev->cmd.addr = 0;
-    dev->data.buf = buf;
-    dev->data.len = 1;
+    dev->data.buf = NULL;
+    dev->data.len = 0;
     dev->opt.mask = 0;
 
     _execute(dev);
@@ -294,12 +274,10 @@ void n25q128_program_erase_suspend(n25q128_dev_t *dev)
 
 void n25q128_program_erase_resume(n25q128_dev_t *dev)
 {
-    uint8_t buf[1] = {0};
-
     dev->cmd.code = N25Q128_OPCODE_PER;
     dev->cmd.addr = 0;
-    dev->data.buf = buf;
-    dev->data.len = 1;
+    dev->data.buf = NULL;
+    dev->data.len = 0;
     dev->opt.mask = 0;
 
     _execute(dev);
