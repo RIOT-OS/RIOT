@@ -1,10 +1,12 @@
-You should check out the [C Conventions](https://github.com/RIOT-OS/RIOT/blob/master/CODING_CONVENTIONS.md) as some section still apply (Documentation, Git, Travis).
+You should check out the [C Conventions](CODING_CONVENTIONS.md) as some section
+still apply (Documentation, Git, Travis).
 
 When contributing source code, please adhere to the following coding style,
-whwich is loosely based on the [Google C++ Style
-Guide](http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml) and the
-coding conventions used by the C++ Standard Library. Based on the [CAF coding style](https://github.com/actor-framework/actor-framework/blob/develop/CONTRIBUTING.md).
+which is loosely based on the [Google C++ Style Guide] and the coding
+ conventions used by the C++ Standard Library. Based on the [CAF coding style].
 
+[Google C++ Style Guide]: (https://google.github.io/styleguide/cppguide.html)
+[CAF coding style]: (https://github.com/actor-framework/actor-framework/blob/master/CONTRIBUTING.md)
 
 ## Example for the Impatient
 
@@ -161,7 +163,7 @@ void my_class::do_something_else() {
   ```cpp
   if (! sunny())
       stay_home();
-  else 
+  else
       go_outside();
   ```
 
@@ -178,7 +180,7 @@ void my_class::do_something_else() {
 
   ```cpp
   // some .hpp file
-  
+
   #include <sys/types.h>
 
   #include <vector>
@@ -196,7 +198,8 @@ void my_class::do_something_else() {
 - When declaring a function, the order of parameters is: outputs, then inputs.
   This follows the parameter order from the STL.
 
-- Protect single-argument constructors with `explicit` to avoid implicit conversions.
+- Protect single-argument constructors with `explicit` to avoid implicit
+  conversions.
 
 ## Naming
 
@@ -209,7 +212,7 @@ void my_class::do_something_else() {
   should be "command" verbs. Classes used to implement metaprogramming
   functions also should use verbs, e.g., `remove_const`.
 
-- Private and protected member variables use the suffix `_` while getter *and* 
+- Private and protected member variables use the suffix `_` while getter *and*
   setter functions use the name without suffix:
 
   ```cpp
@@ -257,7 +260,7 @@ void my_class::do_something_else() {
 - Do not `#include` when a forward declaration suffices.
 
 - Each library component must provide a `fwd.hpp` header providing forward
-  declartations for all types used in the user API.
+  declarations for all types used in the user API.
 
 - Each library component must provide an `all.hpp` header that contains the
   main page for the documentation and includes all headers for the user API.
@@ -306,9 +309,10 @@ void my_class::do_something_else() {
 
 Despite its power, template metaprogramming came to the language pretty
 much by accident. Templates were never meant to be used for compile-time
-algorithms and type transformations. This is why C++ punishes
-metaprogramming with an insane amount of syntax noise. In RIOT, we make excessive use of templates. To keep the code readable despite all the syntax 
-noise, we have some extra rules for formatting metaprogramming code.
+algorithms and type transformations. This is why C++ punishes metaprogramming
+with an insane amount of syntax noise. In RIOT, we make excessive use of
+templates. To keep the code readable despite all the syntax noise, we have some
+extra rules for formatting metaprogramming code.
 
 - Brake `using name = ...` statements always directly after `=` if it
   does not fit in one line.
@@ -364,4 +368,3 @@ noise, we have some extra rules for formatting metaprogramming code.
 
 - Use `//` to define basic comments that should not be
   swallowed by Doxygen.
-
