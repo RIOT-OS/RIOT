@@ -2,7 +2,7 @@
 USEMODULE += stdio_uart
 
 # set default port depending on operating system
-PORT_LINUX ?= /dev/ttyUSB1
+PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
 # setup serial terminal
