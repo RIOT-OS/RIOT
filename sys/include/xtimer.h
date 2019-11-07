@@ -415,7 +415,7 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
  */
 void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 
-#ifdef MODULE_CORE_MSG
+#if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
 /**
  * @brief Set a timer that sends a message
  *
