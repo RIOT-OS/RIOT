@@ -1,3 +1,4 @@
 include $(RIOTCPU)/arm7_common/Makefile.include
 
 USEMODULE += arm7_common periph bitfield newlib
+USEMODULE += pm_layered
