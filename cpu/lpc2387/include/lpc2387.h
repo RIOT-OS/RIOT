@@ -96,7 +96,7 @@ extern "C" {
  * @name UART Constants
  * @{
  */
-#define ULSR_RDR        BIT0
+#define ULSR_RDR    BIT0
 #define ULSR_OE     BIT1
 #define ULSR_PE     BIT2
 #define ULSR_FE     BIT3

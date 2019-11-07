@@ -19,7 +19,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "lpc2387.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,8 +79,42 @@ extern "C" {
  * @name    UART configuration
  * @{
  */
-#define UART_NUMOF          (1)
-#define UART_0_EN           (1)
+static const uart_conf_t uart_config[] = {
+    {
+        .dev = UART0,
+        .irq_prio_rx = 6,
+        .pinsel_rx   = 0,
+        .pinsel_tx   = 0,
+        .pinsel_msk_rx = BIT4,
+        .pinsel_msk_tx = BIT6,
+    },
+    {
+        .dev = UART1,
+        .irq_prio_rx = 6,
+        .pinsel_rx   = 4,
+        .pinsel_tx   = 4,
+        .pinsel_msk_rx = BIT3,
+        .pinsel_msk_tx = BIT1,
+    },
+    {
+        .dev = UART2,
+        .irq_prio_rx = 6,
+        .pinsel_rx   = 0,
+        .pinsel_tx   = 0,
+        .pinsel_msk_rx = BIT22,
+        .pinsel_msk_tx = BIT20,
+    },
+    {
+        .dev = UART3,
+        .irq_prio_rx = 6,
+        .pinsel_rx   = 9,
+        .pinsel_tx   = 9,
+        .pinsel_msk_rx = BIT26 | BIT27,
+        .pinsel_msk_tx = BIT24 | BIT25,
+    },
+};
+
+#define UART_NUMOF          (4)
 /** @} */
 
 /**

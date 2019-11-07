@@ -19,9 +19,6 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
-#include "cpu.h"
-#include "periph/dev_enums.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -74,6 +71,18 @@ typedef enum {
     GPIO_BOTH = 3           /**< emit interrupt on both flanks */
 } gpio_flank_t;
 #endif /* ndef DOXYGEN */
+
+/**
+ * @brief   UART device configuration
+ */
+typedef struct {
+    lpc23xx_uart_t *dev;    /**< pointer to the UART device */
+    uint8_t irq_prio_rx;    /**< priority of the RX IRQ */
+    uint8_t pinsel_rx;      /**< PINSEL# of the RX pin  */
+    uint8_t pinsel_tx;      /**< PINSEL# of the TX pin  */
+    uint32_t pinsel_msk_rx; /**< RX PINSEL Mask         */
+    uint32_t pinsel_msk_tx; /**< TX PINSEL Mask         */
+} uart_conf_t;
 
 /**
  * @brief   Number of available timer channels
