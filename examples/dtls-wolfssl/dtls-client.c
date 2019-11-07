@@ -86,7 +86,7 @@ int dtls_client(int argc, char **argv)
 {
     int ret = 0;
     char buf[APP_DTLS_BUF_SIZE] = "Hello from DTLS client!";
-    int iface;
+    char *iface;
     char *addr_str;
     int connect_timeout = 0;
     const int max_connect_timeouts = 5;
@@ -102,14 +102,14 @@ int dtls_client(int argc, char **argv)
 
     /* Parsing <address> */
     iface = ipv6_addr_split_iface(addr_str);
-    if (iface == -1) {
+    if (!iface) {
         if (gnrc_netif_numof() == 1) {
             /* assign the single interface found in gnrc_netif_numof() */
             remote.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
         }
     }
     else {
-        gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
+        gnrc_netif_t *netif = gnrc_netif_get_by_pid(atoi(iface));
         if (netif == NULL) {
             LOG(LOG_ERROR, "ERROR: interface not valid");
             usage(argv[0]);
