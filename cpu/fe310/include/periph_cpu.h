@@ -138,6 +138,28 @@ typedef struct {
     i2c_speed_t speed;          /**< I2C speed */
 } i2c_conf_t;
 
+/**
+ * @name    WDT upper and lower bound times in ms
+ * @{
+ */
+#define NWDT_TIME_LOWER_LIMIT           (1)
+/* Ensure the internal "count" variable stays within the uint32 bounds.
+  This variable corresponds to max_time * RTC_FREQ / MS_PER_SEC. On fe310,
+  RTC_FREQ is 32768Hz. The 15 right shift is equivalent to a division by RTC_FREQ.
+ */
+#define NWDT_TIME_UPPER_LIMIT           ((UINT32_MAX >> 15)  * MS_PER_SEC + 1)
+/** @} */
+
+/**
+ * @brief   WDT interrupt priority: use highest priority
+ */
+#define WDT_INTR_PRIORITY               (PLIC_NUM_PRIORITIES)
+
+/**
+ * @brief   WDT can be stopped
+ */
+#define WDT_HAS_STOP                    (1)
+
 #ifdef __cplusplus
 }
 #endif
