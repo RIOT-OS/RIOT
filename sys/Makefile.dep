@@ -1,5 +1,6 @@
 ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_i2c
+  FEATURES_OPTIONAL += periph_spi
 endif
 
 ifneq (,$(filter eepreg,$(USEMODULE)))
