@@ -109,12 +109,13 @@ int dtls_client(int argc, char **argv)
         }
     }
     else {
-        if (gnrc_netif_get_by_pid(iface) == NULL) {
+        gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
+        if (netif == NULL) {
             LOG(LOG_ERROR, "ERROR: interface not valid");
             usage(argv[0]);
             return -1;
         }
-        remote.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
+        remote.netif = (uint16_t)netif->pid;
     }
     if (ipv6_addr_from_str((ipv6_addr_t *)remote.addr.ipv6, addr_str) == NULL) {
         LOG(LOG_ERROR, "ERROR: unable to parse destination address");
