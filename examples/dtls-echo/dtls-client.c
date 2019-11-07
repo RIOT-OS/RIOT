@@ -341,12 +341,13 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
         }
     }
     else {
-        if (gnrc_netif_get_by_pid(iface) == NULL) {
+        gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
+        if (netif == NULL) {
             puts("ERROR: interface not valid");
             return new_context;
         }
-        dst->ifindex = (uint16_t)gnrc_netif_iter(NULL)->pid;
-        remote->netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
+        dst->ifindex = (uint16_t)netif->pid;
+        remote->netif = (uint16_t)netif->pid;
     }
 
     if (ipv6_addr_from_str((ipv6_addr_t *)remote->addr.ipv6, addr_str) == NULL) {
