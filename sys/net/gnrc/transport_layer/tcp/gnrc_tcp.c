@@ -168,15 +168,15 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t targe
         if ((target_addr != NULL) && (tcb->address_family == AF_INET6)) {
 
             /* Extract interface (optional) specifier from target address */
-            int ll_iface = ipv6_addr_split_iface(target_addr);
+            char *ll_iface = ipv6_addr_split_iface(target_addr);
             if (ipv6_addr_from_str((ipv6_addr_t *) tcb->peer_addr, target_addr) == NULL) {
                 DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : Invalid peer addr\n");
                 return -EINVAL;
             }
 
             /* In case the given address is link-local: Memorize the interface Id if existing. */
-            if ((ll_iface > 0) && ipv6_addr_is_link_local((ipv6_addr_t *) tcb->peer_addr)) {
-                tcb->ll_iface = ll_iface;
+            if ((ll_iface) && ipv6_addr_is_link_local((ipv6_addr_t *) tcb->peer_addr)) {
+                tcb->ll_iface = atoi(ll_iface);
             }
         }
  #endif
