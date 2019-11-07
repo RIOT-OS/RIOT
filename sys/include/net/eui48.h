@@ -150,7 +150,7 @@ void eui48_get(netdev_t *netdev, eui48_t *addr);
 /**
  * @brief Board-specific function to supply an EUI-48 to a netdev
  *
- *        Implement this function in your board code if the board
+ * @note  Implement this function in your board code if the board
  *        provides the means to supply a unique address to a netdev.
  *
  * @see eui48_get

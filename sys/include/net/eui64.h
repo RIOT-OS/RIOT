@@ -118,7 +118,7 @@ void eui64_get(netdev_t *netdev, eui64_t *addr);
 /**
  * @brief Board-specific function to supply a short address to a netdev
  *
- *        Implement this function in your board code if the board
+ * @note  Implement this function in your board code if the board
  *        provides the means to supply a unique address to a netdev.
  *
  * @see eui_short_get
@@ -132,7 +132,7 @@ size_t board_get_eui_short(netdev_t *netdev, uint16_t *addr);
 /**
  * @brief Board-specific function to supply an EUI-64 to a netdev
  *
- *        Implement this function in your board code if the board
+ * @note  Implement this function in your board code if the board
  *        provides the means to supply a unique address to a netdev.
  *
  * @see eui64_get
