@@ -94,6 +94,8 @@ void luid_get(void *buf, size_t len);
  *
  * @note    The resulting address will repeat after 255 calls.
  *
+ * @warning Don't call this function directly, use @ref eui_short_get() instead.
+ *
  * @param[out] addr     memory location to copy the address into.
  */
 void luid_get_short(network_uint16_t *addr);
@@ -106,6 +108,8 @@ void luid_get_short(network_uint16_t *addr);
  *
  * @note    The resulting address will repeat after 255 calls.
  *
+ * @warning Don't call this function directly, use @ref eui48_get() instead.
+ *
  * @param[out] addr     memory location to copy the address into.
  */
 void luid_get_eui48(eui48_t *addr);
@@ -117,6 +121,8 @@ void luid_get_eui48(eui48_t *addr);
  * isXORed with an 8-bit incrementing counter value into the least significant byte.
  *
  * @note    The resulting address will repeat after 255 calls.
+ *
+ * @warning Don't call this function directly, use @ref eui64_get() instead.
  *
  * @param[out] addr     memory location to copy the address into.
  */
