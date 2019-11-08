@@ -260,31 +260,4 @@ size_t __attribute__((weak)) board_get_eui64(netdev_t *netdev, eui64_t *addr)
     return 0;
 }
 
-void eui_short_get(netdev_t *netdev, uint16_t *addr)
-{
-    if (board_get_eui_short(netdev, addr) == sizeof(*addr)) {
-        return;
-    }
-
-    luid_get_short(addr);
-}
-
-void eui48_get(netdev_t *netdev, eui48_t *addr)
-{
-    if (board_get_eui48(netdev, addr) == sizeof(*addr)) {
-        return;
-    }
-
-    luid_get_eui48(addr);
-}
-
-void eui64_get(netdev_t *netdev, eui64_t *addr)
-{
-    if (board_get_eui64(netdev, addr) == sizeof(*addr)) {
-        return;
-    }
-
-    luid_get_eui64(addr);
-}
-
 /** @} */
