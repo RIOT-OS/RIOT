@@ -27,6 +27,14 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/*
+ * Bit introduced by SAML21xxxB, setting it on SAML21xxxxA too has no ill
+ * effects, but simplifies the code. (This bit is always set on SAML21xxxxA)
+ */
+#ifndef RTC_MODE0_CTRLA_COUNTSYNC
+#define RTC_MODE0_CTRLA_COUNTSYNC   BIT15
+#endif
+
 static rtt_cb_t _overflow_cb;
 static void* _overflow_arg;
 
@@ -91,7 +99,7 @@ void rtt_init(void)
 
     /* set 32bit counting mode & enable the RTC */
 #ifdef REG_RTC_MODE0_CTRLA
-    RTC->MODE0.CTRLA.reg = RTC_MODE0_CTRLA_MODE(0) | RTC_MODE0_CTRLA_ENABLE;
+    RTC->MODE0.CTRLA.reg = RTC_MODE0_CTRLA_MODE(0) | RTC_MODE0_CTRLA_ENABLE | RTC_MODE0_CTRLA_COUNTSYNC;
 #else
     RTC->MODE0.CTRL.reg = RTC_MODE0_CTRL_MODE(0) | RTC_MODE0_CTRL_ENABLE;
 #endif
