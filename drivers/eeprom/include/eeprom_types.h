@@ -8,28 +8,39 @@
  */
 
 /**
- * @defgroup    drivers_eeprom Common EEPROM interface
- * @ingroup     drivers_storage
- *
- * This module provides a common API for accessing EEPROM (both internal and
- * external), as well as common code and convenience interfaces.
+ * @ingroup    drivers_eeprom
  *
  * @{
  *
  * @file
- * @brief       Interface definition of EEPROM drivers
+ * @brief       Types definitions used in the EEPROM API
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-#ifndef EEPROM_DRIVER_H
-#define EEPROM_DRIVER_H
+#ifndef EEPROM_TYPES_H
+#define EEPROM_TYPES_H
 
+#include "board.h"
 #include "eeprom.h"
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#if !defined(HAVE_EEPROM_T) || defined(DOXYGEN)
+/**
+ * @brief   Device handle type for EEPROM devices
+ */
+typedef uint_fast8_t eeprom_t;
+#endif
+
+#if !defined(HAVE_EEPROM_OFF_T) || defined(DOXYGEN)
+/**
+ * @brief   Offset / size type in EEPROM devices
+ */
+typedef uint32_t eeprom_off_t;
 #endif
 
 /**
@@ -108,8 +119,8 @@ typedef struct {
  */
 typedef struct {
     const eeprom_driver_t *driver;  /**< The driver of the EEPROM device */
-    const void *params;             /**< The initialization parameters */
     void *handle;                   /**< The handle to pass to the driver */
+    eeprom_off_t size;              /**< Size of the EEPROM device in bytes */
 } eeprom_dev_t;
 
 /**
@@ -124,5 +135,5 @@ void eeprom_init(void);
 }
 #endif
 
-#endif /* EEPROM_DRIVER_H */
+#endif /* EEPROM_TYPES_H */
 /** @} */
