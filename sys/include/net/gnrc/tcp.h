@@ -47,10 +47,26 @@ int gnrc_tcp_init(void);
 /**
  * @brief Initialize Transmission Control Block (TCB)
  * @pre @p tcb must not be NULL.
+ * @pre @p address_family must not be NULL.
+ * @pre @p local_addr must not be NULL.
+ * @pre @p local_port must not be NULL.
+ * @pre @p local_addr must not be NULL.
+ * @pre @p local_port must not be NULL.
+ * @pre @p ll_iface must not be NULL.
  *
  * @param[in,out] tcb   TCB that should be initialized.
+ * @param[in]     address_family    Pointer to address family storage.
+ * @param[in]     local_addr        Pointer to local address storage.
+ * @param[in]     local_addr_size   size of memory behind @p local_addr.
+ * @param[in]     local_port        Pointer to local port number storage.
+ * @param[in]     peer_addr         Pointer to peer address storage.
+ * @param[in]     peer_addr_size    size of memory behind @p peer_addr.
+ * @param[in]     peer_port         Pointer to peer port number storage.
+ * @param[in]     ll_iface          Pointer to link-layer interface storage.
  */
-void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
+void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb, int *address_family, uint8_t *local_addr,
+                       size_t local_addr_size, uint16_t *local_port, uint8_t *peer_addr,
+                       size_t peer_addr_size, uint16_t *peer_port, int8_t *ll_iface);
 
 /**
  * @brief Opens a connection actively.
@@ -80,7 +96,7 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
  *            -ETIMEDOUT if the connection could not be opened.
  *            -ECONNREFUSED if the connection was resetted by the peer.
  */
-int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  uint8_t address_family,
+int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  int address_family,
                          char *target_addr, uint16_t target_port,
                          uint16_t local_port);
 
@@ -111,7 +127,7 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  uint8_t address_family,
  *            -ENOMEM if the receive buffer for the TCB could not be allocated.
  *            Hint: Increase "GNRC_TCP_RCV_BUFFERS".
  */
-int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, uint8_t address_family,
+int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, int address_family,
                           const char *local_addr, uint16_t local_port);
 
 /**

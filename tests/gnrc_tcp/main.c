@@ -19,6 +19,12 @@
 
 static msg_t main_msg_queue[MAIN_QUEUE_SIZE];
 static gnrc_tcp_tcb_t tcb;
+static int address_family;
+static ipv6_addr_t local_addr;
+static uint16_t local_port;
+static ipv6_addr_t peer_addr;
+static uint16_t peer_port;
+static int8_t ll_iface;
 static char buffer[BUFFER_SIZE];
 
 void dump_args(int argc, char **argv)
@@ -94,7 +100,10 @@ int buffer_read_cmd(int argc, char **argv)
 int gnrc_tcp_tcb_init_cmd(int argc, char **argv)
 {
     dump_args(argc, argv);
-    gnrc_tcp_tcb_init(&tcb);
+
+    gnrc_tcp_tcb_init(&tcb, &address_family, (uint8_t *) &local_addr, sizeof(local_addr),
+                      &local_port, (uint8_t *) &peer_addr, sizeof(peer_addr), &peer_port,
+                      &ll_iface);
     return 0;
 }
 

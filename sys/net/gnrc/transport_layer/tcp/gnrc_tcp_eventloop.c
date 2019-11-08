@@ -184,10 +184,10 @@ static int _receive(gnrc_pktsnip_t *pkt)
     while (tcb) {
 #ifdef MODULE_GNRC_IPV6
         /* Check if current TCB is fitting for the incomming packet */
-        if (ip->type == GNRC_NETTYPE_IPV6 && tcb->address_family == AF_INET6) {
+        if (ip->type == GNRC_NETTYPE_IPV6 && *(tcb->address_family) == AF_INET6) {
             /* If SYN is set, a connection is listening on that port ... */
             ipv6_addr_t *tmp_addr = NULL;
-            if (syn && tcb->local_port == dst && tcb->state == FSM_STATE_LISTEN) {
+            if (syn && *(tcb->local_port) == dst && tcb->state == FSM_STATE_LISTEN) {
                 /* ... and local addr is unspec or pre configured */
                 tmp_addr = &((ipv6_hdr_t *)ip->data)->dst;
                 if (ipv6_addr_equal((ipv6_addr_t *) tcb->local_addr, (ipv6_addr_t *) tmp_addr) ||
@@ -197,7 +197,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
             }
 
             /* If SYN is not set and the ports match ... */
-            if (!syn && tcb->local_port == dst && tcb->peer_port == src) {
+            if (!syn && *(tcb->local_port) == dst && *(tcb->peer_port) == src) {
                 /* .. and the IPv6 addresses match */
                 tmp_addr = &((ipv6_hdr_t * )ip->data)->src;
                 if (ipv6_addr_equal((ipv6_addr_t *) tcb->peer_addr, (ipv6_addr_t *) tmp_addr)) {

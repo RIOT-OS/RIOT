@@ -52,9 +52,15 @@
  */
 static int _is_local_port_in_use(const uint16_t port_number)
 {
-    gnrc_tcp_tcb_t *iter = NULL;
-    LL_SEARCH_SCALAR(_list_tcb_head, iter, local_port, port_number);
-    return (iter != NULL);
+    gnrc_tcp_tcb_t *iter = _list_tcb_head;
+
+    while (iter) {
+        if (*(iter->local_port) == port_number) {
+            return 1;
+        }
+        iter = iter->next;
+    }
+    return 0;
 }
 
 /**
@@ -139,14 +145,14 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
         case FSM_STATE_LISTEN:
             /* Clear address info */
 #ifdef MODULE_GNRC_IPV6
-            if (tcb->address_family == AF_INET6) {
+            if (*(tcb->address_family) == AF_INET6) {
                 if (tcb->status & STATUS_ALLOW_ANY_ADDR) {
                     ipv6_addr_set_unspecified((ipv6_addr_t *) tcb->local_addr);
                 }
                 ipv6_addr_set_unspecified((ipv6_addr_t *) tcb->peer_addr);
             }
 #endif
-            tcb->peer_port = PORT_UNSPEC;
+            *(tcb->peer_port) = PORT_UNSPEC;
 
             /* Allocate receive buffer */
             if (_rcvbuf_get_buffer(tcb) == -ENOMEM) {
@@ -174,9 +180,9 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
             /* If connection is not already active: Check port number, append TCB */
             if (iter == NULL) {
                 /* Check if port number was specified */
-                if (tcb->local_port != PORT_UNSPEC) {
+                if (*(tcb->local_port) != PORT_UNSPEC) {
                     /* Check if given port number is use: return error and release buffer */
-                    if (_is_local_port_in_use(tcb->local_port)) {
+                    if (_is_local_port_in_use(*(tcb->local_port))) {
                         mutex_unlock(&_list_tcb_lock);
                         _rcvbuf_release_buffer(tcb);
                         return -EADDRINUSE;
@@ -184,7 +190,7 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
                 }
                 /* Pick random port */
                 else {
-                    tcb->local_port = _get_random_local_port();
+                    *(tcb->local_port) = _get_random_local_port();
                 }
                 LL_PREPEND(_list_tcb_head, tcb);
             }
@@ -452,9 +458,9 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             lst = _list_tcb_head;
             while (lst) {
                 /* Compare port numbers and network layer adresses */
-                if (lst->local_port == dst && lst->peer_port == src) {
+                if (*(lst->local_port) == dst && *(lst->peer_port) == src) {
 #ifdef MODULE_GNRC_IPV6
-                    if (snp->type == GNRC_NETTYPE_IPV6 && lst->address_family == AF_INET6) {
+                    if (snp->type == GNRC_NETTYPE_IPV6 && *(lst->address_family) == AF_INET6) {
                         ipv6_addr_t *dst_addr = &((ipv6_hdr_t *)ip)->dst;
                         ipv6_addr_t *src_addr = &((ipv6_hdr_t *)ip)->src;
 
@@ -475,7 +481,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
 
             /* SYN request is valid, fill TCB with connection information */
 #ifdef MODULE_GNRC_IPV6
-            if (snp->type == GNRC_NETTYPE_IPV6 && tcb->address_family == AF_INET6) {
+            if (snp->type == GNRC_NETTYPE_IPV6 && *(tcb->address_family) == AF_INET6) {
                 memcpy(tcb->local_addr, &((ipv6_hdr_t *)ip)->dst, sizeof(ipv6_addr_t));
                 memcpy(tcb->peer_addr, &((ipv6_hdr_t *)ip)->src, sizeof(ipv6_addr_t));
 
@@ -490,7 +496,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                                incomming packet had no netif header\n");
                         return 0;
                     }
-                    tcb->ll_iface = ((gnrc_netif_hdr_t *)tmp->data)->if_pid;
+                    *(tcb->ll_iface) = ((gnrc_netif_hdr_t *)tmp->data)->if_pid;
                 }
             }
 #else
@@ -498,8 +504,8 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             return 0;
 #endif
 
-            tcb->local_port = dst;
-            tcb->peer_port = src;
+            *(tcb->local_port) = dst;
+            *(tcb->peer_port) = src;
             tcb->irs = byteorder_ntohl(tcp_hdr->seq_num);
             tcb->rcv_nxt = tcb->irs + 1;
             tcb->iss = random_uint32();
@@ -547,7 +553,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             }
             /* Set local network layer address accordingly */
 #ifdef MODULE_GNRC_IPV6
-            if (snp->type == GNRC_NETTYPE_IPV6 && tcb->address_family == AF_INET6) {
+            if (snp->type == GNRC_NETTYPE_IPV6 && *(tcb->address_family) == AF_INET6) {
                 memcpy(tcb->local_addr, &((ipv6_hdr_t *)ip)->dst, sizeof(ipv6_addr_t));
             }
 #else

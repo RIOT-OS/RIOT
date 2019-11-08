@@ -47,14 +47,12 @@ extern "C" {
  * @brief Transmission control block of GNRC TCP.
  */
 typedef struct _transmission_control_block {
-    uint8_t address_family;                   /**< Address Family of local_addr / peer_addr */
-#ifdef MODULE_GNRC_IPV6
-    uint8_t local_addr[sizeof(ipv6_addr_t)];  /**< Local IP address */
-    uint8_t peer_addr[sizeof(ipv6_addr_t)];   /**< Peer IP address */
-    int8_t  ll_iface;                         /**< Link layer interface id to use. */
-#endif
-    uint16_t local_port;   /**< Local connections port number */
-    uint16_t peer_port;    /**< Peer connections port number */
+    int *address_family;       /**< Address Family in use */
+    uint8_t *local_addr;       /**< Pointer to local address storage */
+    uint16_t *local_port;      /**< Pointer to local port storage */
+    uint8_t *peer_addr;        /**< Pointer to peer address storage */
+    uint16_t *peer_port;       /**< Pointer to peer port storage */
+    int8_t *ll_iface;          /**< Pointer to link-layer interface storage */
     uint8_t state;         /**< Connections state */
     uint8_t status;        /**< A connections status flags */
     uint32_t snd_una;      /**< Send unacknowledged */

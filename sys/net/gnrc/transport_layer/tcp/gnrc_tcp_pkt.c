@@ -159,8 +159,8 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
     }
 
     /* Fill TCP header */
-    tcp_hdr.src_port = byteorder_htons(tcb->local_port);
-    tcp_hdr.dst_port = byteorder_htons(tcb->peer_port);
+    tcp_hdr.src_port = byteorder_htons(*(tcb->local_port));
+    tcp_hdr.dst_port = byteorder_htons(*(tcb->peer_port));
     tcp_hdr.checksum = byteorder_htons(0);
     tcp_hdr.seq_num = byteorder_htonl(seq_num);
     tcp_hdr.ack_num = byteorder_htonl(ack_num);
@@ -227,7 +227,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
     }
 
     /* Prepend network interface header if an interface id was specified */
-    if (tcb->ll_iface > 0) {
+    if (*(tcb->ll_iface) > 0) {
         gnrc_pktsnip_t *net_snp = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
         if (net_snp == NULL) {
             DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Can't allocate buffer for netif header.\n");
@@ -236,7 +236,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
             return -ENOMEM;
         }
         else {
-            ((gnrc_netif_hdr_t *)net_snp->data)->if_pid = (kernel_pid_t)tcb->ll_iface;
+            ((gnrc_netif_hdr_t *) net_snp->data)->if_pid = (kernel_pid_t) *(tcb->ll_iface);
             LL_PREPEND(ip6_snp, net_snp);
             *(out_pkt) = net_snp;
         }
