@@ -83,8 +83,6 @@ static void _send(const hd44780_t *dev, uint8_t value, hd44780_state_t state)
         _write_bits(dev, 4, value>>4);
         _write_bits(dev, 4, value);
     }
-
-    xtimer_usleep(HD44780_PULSE_WAIT_SHORT);
 }
 
 static void _write_bits(const hd44780_t *dev, uint8_t bits, uint8_t value)
