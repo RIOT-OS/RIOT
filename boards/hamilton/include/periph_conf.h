@@ -91,7 +91,6 @@ extern "C" {
  * @name    RTC configuration
  * @{
  */
-#define RTC_NUMOF           (1U)
 #define RTC_DEV             RTC->MODE2
 /** @} */
 
@@ -99,7 +98,6 @@ extern "C" {
  * @name    RTT configuration
  * @{
  */
-#define RTT_NUMOF           (1U)
 #define RTT_DEV             RTC->MODE0
 #define RTT_IRQ             RTC_IRQn
 #define RTT_IRQ_PRIO        10

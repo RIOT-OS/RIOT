@@ -29,7 +29,6 @@ extern "C" {
  * @name    Real time counter configuration
  * @{
  */
-#define RTT_NUMOF           (1U)
 #define RTT_DEV             (1)             /* NRF_RTC1 */
 #define RTT_MAX_VALUE       (0x00ffffff)
 #define RTT_FREQUENCY       (1024)

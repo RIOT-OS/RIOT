@@ -2016,8 +2016,6 @@ PREDEFINED             = DOXYGEN \
                          I2C_NUMOF \
                          PWM_NUMOF \
                          RANDOM_NUMOF \
-                         RTC_NUMOF \
-                         RTT_NUMOF \
                          GPIO_NUMOF \
                          SPI_NUMOF \
                          UART_NUMOF \

@@ -155,18 +155,11 @@ static const pwm_conf_t pwm_config[] = {
 #define PWM_NUMOF           ARRAY_SIZE(pwm_channel_config)
 /** @} */
 
-/**
- * @name    RTC configuration
- * @{
- */
-#define RTC_NUMOF           (1U)
-/** @} */
 
 /**
  * @name    RTT configuration
  * @{
  */
-#define RTT_NUMOF           (1U)
 
 #define RTT_MAX_VALUE       (0xFFFFFF)
 #define RTT_FREQUENCY       (1U)

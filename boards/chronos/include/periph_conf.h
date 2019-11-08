@@ -67,12 +67,6 @@ extern "C" {
 #define UART_TX_ISR         (USART1TX_VECTOR)
 /** @} */
 
-/**
- * @name    Real Time Clock configuration
- * @{
- */
-#define RTC_NUMOF           (1)
-/** @} */
 
 #ifdef __cplusplus
 }

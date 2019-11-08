@@ -243,7 +243,6 @@ static const i2c_conf_t i2c_config[] = {
  * @name    RTC configuration
  * @{
  */
-#define RTC_NUMOF           (1U)
 #define RTC_DEV             RTC->MODE2
 /** @} */
 
@@ -251,7 +250,6 @@ static const i2c_conf_t i2c_config[] = {
  * @name    RTT configuration
  * @{
  */
-#define RTT_NUMOF           (1U)
 #define RTT_DEV             RTC->MODE0
 #define RTT_IRQ             RTC_IRQn
 #define RTT_IRQ_PRIO        10

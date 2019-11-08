@@ -48,18 +48,11 @@ extern "C" {
 #endif
 /** @} */
 
-/**
- * @name    RTC configuration
- * @{
- */
-#define RTC_NUMOF           (1U)
-/** @} */
 
 /**
  * @name    RTT configuration
  * @{
  */
-#define RTT_NUMOF           (1U)
 
 #define RTT_MAX_VALUE       (0xFFFFFFFF)
 #define RTT_FREQUENCY       (1U)
