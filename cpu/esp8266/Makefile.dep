@@ -9,3 +9,7 @@ endif
 ifneq (, $(filter esp_wifi, $(USEMODULE)))
     USEMODULE += netdev_eth
 endif
+
+ifneq (,$(filter log_color,$(USEMODULE)))
+    USEMODULE += esp_log_colored
+endif
