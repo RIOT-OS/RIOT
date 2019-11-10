@@ -92,6 +92,10 @@ ifneq (,$(filter shell,$(USEMODULE)))
     USEMODULE += xtimer
 endif
 
+ifneq (,$(filter log_color,$(USEMODULE)))
+    USEMODULE += esp_log_colored
+endif
+
 # if SPI RAM is enabled, ESP-IDF heap and quot flash mode have to be used
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
     USEMODULE += esp_idf_heap
