@@ -94,7 +94,7 @@ void luid_get(void *buf, size_t len);
  *
  * @note    The resulting address will repeat after 255 calls.
  *
- * @warning Don't call this function directly, use @ref eui_short_get() instead.
+ * @warning Don't call this function directly, use @ref l2util_generate_short_addr() instead.
  *
  * @param[out] addr     memory location to copy the address into.
  */
@@ -108,7 +108,7 @@ void luid_get_short(network_uint16_t *addr);
  *
  * @note    The resulting address will repeat after 255 calls.
  *
- * @warning Don't call this function directly, use @ref eui48_get() instead.
+ * @warning Don't call this function directly, use @ref l2util_generate_eui48() instead.
  *
  * @param[out] addr     memory location to copy the address into.
  */
@@ -122,7 +122,7 @@ void luid_get_eui48(eui48_t *addr);
  *
  * @note    The resulting address will repeat after 255 calls.
  *
- * @warning Don't call this function directly, use @ref eui64_get() instead.
+ * @warning Don't call this function directly, use @ref l2util_generate_eui64() instead.
  *
  * @param[out] addr     memory location to copy the address into.
  */
