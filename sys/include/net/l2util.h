@@ -27,6 +27,7 @@
 
 #include <stdint.h>
 
+#include "luid.h"
 #include "net/eui64.h"
 #include "net/ndp.h"
 
@@ -145,25 +146,25 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
  * @param[out] addr     The dedicated address for the netdev
  *
  */
-size_t short_addr_get_from_board(netdev_t *netdev, uint16_t *addr);
+size_t board_get_short_addr(netdev_t *netdev, network_uint16_t *addr);
 
 /**
  * @brief Generates an short address for the netdev interface.
  *
  * @note It is possible to supply a board-specific, constant addres
- *       by implementing @ref short_addr_get_from_board.
+ *       by implementing @ref board_get_short_addr.
  *       If no such function is availiable, this will fall back to
  *       @ref luid_get_short.
  *
  * @param[in] netdev    The network device for which the address is
  *                      generated.
- *                      Will be passed on to @ref eui48_get_from_board.
+ *                      Will be passed on to @ref board_get_eui48.
  * @param[out] addr     The generated short address
  *
  */
-static inline void l2util_generate_short_addr(netdev_t *netdev, uint16_t *addr)
+static inline void l2util_generate_short_addr(netdev_t *netdev, network_uint16_t *addr)
 {
-    if (short_addr_get_from_board(netdev, addr) == sizeof(*addr)) {
+    if (board_get_short_addr(netdev, addr) == sizeof(*addr)) {
         return;
     }
 
@@ -182,25 +183,25 @@ static inline void l2util_generate_short_addr(netdev_t *netdev, uint16_t *addr)
  * @param[out] addr     The dedicated address for the netdev
  *
  */
-size_t eui48_get_from_board(netdev_t *netdev, eui48_t *addr);
+size_t board_get_eui48(netdev_t *netdev, eui48_t *addr);
 
 /**
  * @brief Generates an EUI-48 address for the netdev interface.
  *
  * @note It is possible to supply a board-specific, constant addres
- *       by implementing @ref eui48_get_from_board.
+ *       by implementing @ref board_get_eui48.
  *       If no such function is availiable, this will fall back to
  *       @ref luid_get_eui48.
  *
  * @param[in] netdev    The network device for which the address is
  *                      generated.
- *                      Will be passed on to @ref eui48_get_from_board.
+ *                      Will be passed on to @ref board_get_eui48.
  * @param[out] addr     The generated EUI-48 address
  *
  */
 static inline void l2util_generate_eui48(netdev_t *netdev, eui48_t *addr)
 {
-    if (eui48_get_from_board(netdev, addr) == sizeof(*addr)) {
+    if (board_get_eui48(netdev, addr) == sizeof(*addr)) {
         return;
     }
 
@@ -219,25 +220,25 @@ static inline void l2util_generate_eui48(netdev_t *netdev, eui48_t *addr)
  * @param[out] addr     The dedicated address for the netdev
  *
  */
-size_t eui64_get_from_board(netdev_t *netdev, eui64_t *addr);
+size_t board_get_eui64(netdev_t *netdev, eui64_t *addr);
 
 /**
  * @brief Generates an EUI-64 address for the netdev interface.
  *
  * @note It is possible to supply a board-specific, constant addres
- *       by implementing @ref eui64_get_from_board.
+ *       by implementing @ref board_get_eui64.
  *       If no such function is availiable, this will fall back to
  *       @ref luid_get_eui64.
  *
  * @param[in] netdev    The network device for which the address is
  *                      generated.
- *                      Will be passed on to @ref eui64_get_from_board.
+ *                      Will be passed on to @ref board_get_eui64.
  * @param[out] addr     The generated EUI-64 address
  *
  */
 static inline void l2util_generate_eui64(netdev_t *netdev, eui64_t *addr)
 {
-    if (eui64_get_from_board(netdev, addr) == sizeof(*addr)) {
+    if (board_get_eui64(netdev, addr) == sizeof(*addr)) {
         return;
     }
 

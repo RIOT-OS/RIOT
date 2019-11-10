@@ -239,21 +239,21 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
     return -ENOTSUP;
 }
 
-size_t __attribute__((weak)) short_addr_get_from_board(netdev_t *netdev, uint16_t *addr)
+size_t __attribute__((weak)) board_get_short_addr(netdev_t *netdev, network_uint16_t *addr)
 {
     (void) netdev;
     (void) addr;
     return 0;
 }
 
-size_t __attribute__((weak)) eui48_get_from_board(netdev_t *netdev, eui48_t *addr)
+size_t __attribute__((weak)) board_get_eui48(netdev_t *netdev, eui48_t *addr)
 {
     (void) netdev;
     (void) addr;
     return 0;
 }
 
-size_t __attribute__((weak)) eui64_get_from_board(netdev_t *netdev, eui64_t *addr)
+size_t __attribute__((weak)) board_get_eui64(netdev_t *netdev, eui64_t *addr)
 {
     (void) netdev;
     (void) addr;
