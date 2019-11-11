@@ -32,7 +32,7 @@ SPISettings::SPISettings(uint32_t clock_hz, uint8_t bitOrder, uint8_t dataMode)
         SPI_CLK_10MHZ, SPI_CLK_5MHZ, SPI_CLK_1MHZ, SPI_CLK_400KHZ
     };
     static const uint32_t steps [] = {
-        1000000, 5000000, 1000000, 400000
+        10000000, 5000000, 1000000, 400000
     };
 
     assert(bitOrder == MSBFIRST);
