@@ -1,0 +1,274 @@
+From 00aa19d5a431e414008e1475421cae8704ad775a Mon Sep 17 00:00:00 2001
+From: Martine Lenders <mail@martine-lenders.eu>
+Date: Thu, 12 May 2016 15:08:39 +0200
+Subject: [PATCH] Adapt unittests for RIOT
+
+---
+ unittests/fix16_exp_unittests.c    | 12 ++++++------
+ unittests/fix16_macros_unittests.c |  6 +++---
+ unittests/fix16_str_unittests.c    | 10 +++++-----
+ unittests/fix16_unittests.c        | 30 +++++++++++++++---------------
+ unittests/libfixmath-unittests.h   | 10 +++++-----
+ 5 files changed, 34 insertions(+), 34 deletions(-)
+
+diff --git a/unittests/fix16_exp_unittests.c b/unittests/fix16_exp_unittests.c
+index afb6706..5b942bb 100644
+--- a/unittests/fix16_exp_unittests.c
++++ b/unittests/fix16_exp_unittests.c
+@@ -2,11 +2,11 @@
+ #include <stdio.h>
+ #include <math.h>
+ #include <stdbool.h>
+-#include "unittests.h"
++#include "libfixmath-unittests.h"
+ 
+ #define delta(a,b) (((a)>=(b)) ? (a)-(b) : (b)-(a))
+ 
+-int main()
++int fix16_exp_unittests(void)
+ {
+     int status = 0;
+     {
+@@ -41,7 +41,7 @@ int main()
+             count++;
+         }
+         
+-        printf("Worst delta %d with input %d\n", max_delta, worst);
++        printf("Worst delta %ld with input %ld\n", (long)max_delta, (long)worst);
+         printf("Average delta %0.2f\n", (float)sum / count);
+         
+         TEST(max_delta < 200);
+@@ -80,7 +80,7 @@ int main()
+             count++;
+         }
+         
+-        printf("Worst delta %0.4f%% with input %d\n", max_delta, worst);
++        printf("Worst delta %0.4f%% with input %ld\n", max_delta, (long)worst);
+         printf("Average delta %0.4f%%\n", sum / count);
+         
+         TEST(max_delta < 1);
+@@ -111,14 +111,14 @@ int main()
+             count++;
+         }
+         
+-        printf("Worst delta %d with input %d\n", max_delta, worst);
++        printf("Worst delta %ld with input %ld\n", (long)max_delta, (long)worst);
+         printf("Average delta %0.2f\n", (float)sum / count);
+         
+         TEST(max_delta < 20);
+     }
+     
+     if (status != 0)
+-    fprintf(stdout, "\n\nSome tests FAILED!\n");
++    printf( "\n\nSome tests FAILED!\n");
+ 
+     return status;
+ }
+diff --git a/unittests/fix16_macros_unittests.c b/unittests/fix16_macros_unittests.c
+index cdfcfaf..6141021 100644
+--- a/unittests/fix16_macros_unittests.c
++++ b/unittests/fix16_macros_unittests.c
+@@ -4,13 +4,13 @@
+ #include <stdio.h>
+ #include <math.h>
+ #include <stdbool.h>
+-#include "unittests.h"
++#include "libfixmath-unittests.h"
+ 
+ #define DO_TEST(i,m) \
+   TEST(F16(i ## . ## m) == F16C(i,m)) \
+   TEST(F16(i ## . ## m) == fix16_from_dbl(i ## . ## m))
+ 
+-int main()
++int fix16_macros_unittests(void)
+ {
+   int status = 0;
+ 
+@@ -103,7 +103,7 @@ int main()
+   DO_TEST(  -0,22957)
+     
+   if (status != 0)
+-    fprintf(stdout, "\n\nSome tests FAILED!\n");
++    printf( "\n\nSome tests FAILED!\n");
+   
+   return status;
+ }
+diff --git a/unittests/fix16_str_unittests.c b/unittests/fix16_str_unittests.c
+index 46da171..678bc3c 100644
+--- a/unittests/fix16_str_unittests.c
++++ b/unittests/fix16_str_unittests.c
+@@ -3,9 +3,9 @@
+ #include <math.h>
+ #include <string.h>
+ #include <stdbool.h>
+-#include "unittests.h"
++#include "libfixmath-unittests.h"
+ 
+-int main()
++int fix16_str_unittests(void)
+ {
+     int status = 0;
+ 
+@@ -93,14 +93,14 @@ int main()
+             
+             if (strcmp(goodbuf, testbuf) != 0)
+             {
+-                printf("Value (fix16_t)%d gave %s, should be %s\n", value, testbuf, goodbuf);
++                printf("Value (fix16_t)%ld gave %s, should be %s\n", (long)value, testbuf, goodbuf);
+                 ok = false;
+             }
+             
+             fix16_t roundtrip = fix16_from_str(testbuf);
+             if (roundtrip != value)
+             {
+-                printf("Roundtrip failed: (fix16_t)%d -> %s -> (fix16_t)%d\n", value, testbuf, roundtrip);
++                printf("Roundtrip failed: (fix16_t)%ld -> %s -> (fix16_t)%ld\n", (long)value, testbuf, (long)roundtrip);
+                 ok = false;
+             }
+         
+@@ -111,7 +111,7 @@ int main()
+     }
+ 
+     if (status != 0)
+-        fprintf(stdout, "\n\nSome tests FAILED!\n");
++        printf( "\n\nSome tests FAILED!\n");
+ 
+     return status;
+ }
+diff --git a/unittests/fix16_unittests.c b/unittests/fix16_unittests.c
+index 9a301a1..b9fbf1a 100644
+--- a/unittests/fix16_unittests.c
++++ b/unittests/fix16_unittests.c
+@@ -2,7 +2,7 @@
+ #include <stdio.h>
+ #include <math.h>
+ #include <stdbool.h>
+-#include "unittests.h"
++#include "libfixmath-unittests.h"
+ 
+ const fix16_t testcases[] = {
+   // Small numbers
+@@ -47,7 +47,7 @@ const fix16_t max_delta = 1;
+ const fix16_t max_delta = 0;
+ #endif
+ 
+-int main()
++int fix16_unittests(void)
+ {
+   int status = 0;
+   
+@@ -101,7 +101,7 @@ int main()
+             #ifndef FIXMATH_NO_OVERFLOW
+             if (result != fix16_overflow)
+             {
+-              printf("\n%d * %d overflow not detected!\n", a, b);
++              printf("\n%ld * %ld overflow not detected!\n", (long)a, (long)b);
+               failures++;
+             }
+             #endif
+@@ -109,8 +109,8 @@ int main()
+             continue;
+           }
+           
+-          printf("\n%d * %d = %d\n", a, b, result);
+-          printf("%f * %f = %d\n", fa, fb, fresult);
++          printf("\n%ld * %ld = %ld\n", (long)a, (long)b, (long)result);
++          printf("%f * %f = %ld\n", fa, fb, (long)fresult);
+           failures++;
+         }
+       }
+@@ -176,7 +176,7 @@ int main()
+             #ifndef FIXMATH_NO_OVERFLOW
+             if (result != fix16_overflow)
+             {
+-              printf("\n%d / %d overflow not detected!\n", a, b);
++              printf("\n%ld / %ld overflow not detected!\n", (long)a, (long)b);
+               failures++;
+             }
+             #endif
+@@ -222,7 +222,7 @@ int main()
+             #ifndef FIXMATH_NO_OVERFLOW
+             if (result != fix16_overflow)
+             {
+-              printf("\n%d + %d overflow not detected!\n", a, b);
++              printf("\n%ld + %ld overflow not detected!\n", (long)a, (long)b);
+               failures++;
+             }
+             #endif
+@@ -230,8 +230,8 @@ int main()
+             continue;
+           }
+           
+-          printf("\n%d + %d = %d\n", a, b, result);
+-          printf("%f + %f = %d\n", fa, fb, fresult);
++          printf("\n%ld + %ld = %ld\n", (long)a, (long)b, (long)result);
++          printf("%f + %f = %ld\n", fa, fb, (long)fresult);
+           failures++;
+         }
+       }
+@@ -268,7 +268,7 @@ int main()
+             #ifndef FIXMATH_NO_OVERFLOW
+             if (result != fix16_overflow)
+             {
+-              printf("\n%d - %d overflow not detected!\n", a, b);
++              printf("\n%ld - %ld overflow not detected!\n", (long)a, (long)b);
+               failures++;
+             }
+             #endif
+@@ -276,8 +276,8 @@ int main()
+             continue;
+           }
+           
+-          printf("\n%d - %d = %d\n", a, b, result);
+-          printf("%f - %f = %d\n", fa, fb, fresult);
++          printf("\n%ld - %ld = %ld\n", (long)a, (long)b, (long)result);
++          printf("%f - %f = %ld\n", fa, fb, (long)fresult);
+           failures++;
+         }
+       }
+@@ -321,8 +321,8 @@ int main()
+       
+       if (delta(fresult, result) > max_delta)
+       {
+-        printf("\nfix16_sqrt(%d) = %d\n", a, result);
+-        printf("sqrt(%f) = %d\n", fa, fresult);
++        printf("\nfix16_sqrt(%ld) = %ld\n", (long)a, (long)result);
++        printf("sqrt(%f) = %ld\n", fa, (long)fresult);
+         failures++;
+       }
+     }
+@@ -331,7 +331,7 @@ int main()
+   }
+   
+   if (status != 0)
+-    fprintf(stdout, "\n\nSome tests FAILED!\n");
++    printf( "\n\nSome tests FAILED!\n");
+   
+   return status;
+ }
+diff --git a/unittests/libfixmath-unittests.h b/unittests/libfixmath-unittests.h
+index 57ad8f8..a3324bf 100644
+--- a/unittests/libfixmath-unittests.h
++++ b/unittests/libfixmath-unittests.h
+@@ -5,13 +5,13 @@
+ #define STR2(x) STR(x)
+ #define TEST(x) \
+     if (!(x)) { \
+-        fflush(stdout); \
+-        fflush(stderr); \
+-        fprintf(stderr, "\033[31;1mFAILED:\033[22;39m " __FILE__ ":" STR2(__LINE__) " " #x "\n"); \
++        printf( "\033[31;1mFAILED:\033[22;39m " __FILE__ ":" STR2(__LINE__) " " #x "\n"); \
+         status = 1; \
+     } else { \
+-        fflush(stdout); \
+-        fflush(stderr); \
+         printf("\033[32;1mOK:\033[22;39m " #x "\n"); \
+     }
+ 
++int fix16_exp_unittests(void);
++int fix16_macros_unittests(void);
++int fix16_str_unittests(void);
++int fix16_unittests(void);
+-- 
+2.20.1
+
