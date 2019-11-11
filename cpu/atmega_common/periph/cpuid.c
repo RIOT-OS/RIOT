@@ -21,6 +21,10 @@
 #include <stdint.h>
 #include "avr/boot.h"
 
+/*
+ * This uses the RC calibration byte as CPU ID, so it may not be very unique.
+ * The first three bytes are constant across different MCUs of the same series.
+ */
 void cpuid_get(void *id)
 {
     uint8_t *out = id;
