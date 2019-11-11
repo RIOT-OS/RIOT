@@ -30,9 +30,15 @@
                               0x1d, 0x4b, 0x7a, 0x57 }
 #else
 #define TEST_01_EXPECTED    { 0x1f, 0x4c, 0x0f, 0x27 }
+#if defined(__AVR__)
+#define TEST_02_EXPECTED    { 0x64, 0xa6, 0xfa, 0xfd, \
+                              0x60, 0x24, 0x04, 0x09, \
+                              0x1d, 0x4b, 0x7a, 0x57 }
+#else
 #define TEST_02_EXPECTED    { 0x64, 0xa6, 0xfa, 0xfd, \
                               0x6a, 0x24, 0x04, 0x09, \
                               0x1d, 0x4b, 0x7a, 0x57 }
+#endif
 #endif
 
 uint8_t test01Expected[] = TEST_01_EXPECTED;
@@ -51,7 +57,7 @@ static void test01(lora_serialization_t *serialization)
     puts("Test 1");
     puts("Temperature and humidity");
     puts("---------------------------------");
-    lora_serialization_reset(serialization); // Always reset
+    lora_serialization_reset(serialization); /* Always reset */
 
     puts("- Writing temperature: 80.12");
     lora_serialization_write_temperature(serialization, 80.12);
@@ -85,7 +91,7 @@ static void test02(lora_serialization_t *serialization)
     puts("Test 2");
     puts("Coordinates and unix time");
     puts("---------------------------------");
-    lora_serialization_reset(serialization); // Always reset
+    lora_serialization_reset(serialization); /* Always reset */
 
     puts("- Writing coordinates: -33.905052, 151.26641");
     lora_serialization_write_coordinates(serialization, -33.905052, 151.26641);
