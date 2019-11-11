@@ -1,6 +1,6 @@
 PKG_NAME=lora-serialization
 PKG_URL=https://github.com/leandrolanzieri/lora-serialization
-PKG_VERSION=90e49e4acd119f20ad2ad7b98751b88b08f564d7
+PKG_VERSION=d88577a18706ea66431b5f037475b65f43fa88ca
 PKG_LICENSE=LGPLv2.1
 
 .PHONY: all
