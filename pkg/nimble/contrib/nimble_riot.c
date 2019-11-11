@@ -119,4 +119,7 @@ void nimble_riot_init(void)
 #ifdef MODULE_NIMBLE_SVC_IPSS
     ble_svc_ipss_init();
 #endif
+#ifdef MODULE_NIMBLE_GATTS_INIT
+    ble_gatts_start();
+#endif
 }

@@ -3,6 +3,8 @@ PKG_URL     = https://github.com/apache/mynewt-nimble.git
 PKG_VERSION = fb7651b773734a075c47ff10210b92e6d55ef55b
 PKG_LICENSE = Apache-2.0
 
+PKG_SOURCE_LOCAL = /home/hauke/dev/ble/mynewt-nimble
+
 TDIR = $(RIOTPKG)/$(PKG_NAME)
 PDIR = $(PKG_BUILDDIR)
 
@@ -21,7 +23,8 @@ else
   CFLAGS += -Wno-unused-but-set-variable
 endif
 
-SUBMODS := $(filter nimble_%,$(USEMODULE))
+PSEUDOMODS := nimble_gatts_init
+SUBMODS := $(filter-out $(PSEUDOMODS),$(filter nimble_%,$(USEMODULE)))
 
 .PHONY: all
 

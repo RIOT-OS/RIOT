@@ -26,6 +26,10 @@ ifneq (,$(filter nimble_host,$(USEMODULE)))
   USEMODULE += nimble_host_store_ram
 endif
 
+ifneq (,$(filter nimble_svc_%,$(USEMODULE)))
+  USEMODULE += nimble_gatts_init
+endif
+
 # nimble controller dependencies
 ifneq (,$(filter nimble_controller,$(USEMODULE)))
   USEMODULE += nimble_transport_ram
