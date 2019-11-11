@@ -57,7 +57,7 @@ static void test01(lora_serialization_t *serialization)
     puts("Test 1");
     puts("Temperature and humidity");
     puts("---------------------------------");
-    lora_serialization_reset(serialization); // Always reset
+    lora_serialization_reset(serialization); /* Always reset */
 
     puts("- Writing temperature: 80.12");
     lora_serialization_write_temperature(serialization, 80.12);
@@ -91,7 +91,7 @@ static void test02(lora_serialization_t *serialization)
     puts("Test 2");
     puts("Coordinates and unix time");
     puts("---------------------------------");
-    lora_serialization_reset(serialization); // Always reset
+    lora_serialization_reset(serialization); /* Always reset */
 
     puts("- Writing coordinates: -33.905052, 151.26641");
     lora_serialization_write_coordinates(serialization, -33.905052, 151.26641);
