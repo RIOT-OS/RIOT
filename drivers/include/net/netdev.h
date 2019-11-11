@@ -283,7 +283,7 @@ typedef void (*netdev_event_cb_t)(netdev_t *dev, netdev_event_t event);
 struct netdev {
     const struct netdev_driver *driver;     /**< ptr to that driver's interface. */
     netdev_event_cb_t event_callback;       /**< callback for device events */
-    void* context;                          /**< ptr to network stack context */
+    void *context;                          /**< ptr to network stack context */
 #ifdef MODULE_NETDEV_LAYER
     netdev_t *lower;                        /**< ptr to the lower netdev layer */
 #endif
