@@ -916,9 +916,22 @@ ifneq (,$(filter nimble_%,$(USEMODULE)))
   USEPKG += nimble
 endif
 
+ifneq (,$(filter cord_common,$(USEMODULE)))
+  USEMODULE += fmt
+  USEMODULE += luid
+  USEMODULE += gcoap
+endif
+
+ifneq (,$(filter cord_lc cord_ep,$(USEMODULE)))
+  USEMODULE += core_thread_flags
+  USEMODULE += cord_common
+  ifneq (,$(filter shell_commands,$(USEMODULE)))
+    USEMODULE += sock_util
+  endif
+endif
+
 ifneq (,$(filter cord_epsim,$(USEMODULE)))
   USEMODULE += cord_common
-  USEMODULE += gcoap
 endif
 
 ifneq (,$(filter cord_ep_standalone,$(USEMODULE)))
@@ -926,18 +939,8 @@ ifneq (,$(filter cord_ep_standalone,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter cord_ep,$(USEMODULE)))
-  USEMODULE += cord_common
-  USEMODULE += core_thread_flags
-  USEMODULE += gcoap
-  ifneq (,$(filter shell_commands,$(USEMODULE)))
-    USEMODULE += sock_util
-  endif
-endif
-
-ifneq (,$(filter cord_common,$(USEMODULE)))
-  USEMODULE += fmt
-  USEMODULE += luid
+ifneq (,$(filter cord_lc,$(USEMODULE)))
+  USEMODULE += clif
 endif
 
 ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
