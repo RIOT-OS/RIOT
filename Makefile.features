@@ -5,18 +5,14 @@
 # This makes them available when setting features based on CPU_MODEL in the cpu
 # Makefile.features and also during dependency resolution.
 
-# Transition:
-#   Moving 'CPU/CPU_MODEL' to Makefile.features is an ongoing work and may not
-#   reflect the state of all boards for the moment.
-
 include $(RIOTBOARD)/$(BOARD)/Makefile.features
 
-# Transitional conditional include until all boards define 'CPU'
-ifneq (,$(CPU))
-  include $(RIOTCPU)/$(CPU)/Makefile.features
-else
-  $(warning CPU must be defined by board / board_common Makefile.features)
+# Sanity check
+ifeq (,$(CPU))
+  $(error CPU must be defined by board / board_common Makefile.features)
 endif
+
+include $(RIOTCPU)/$(CPU)/Makefile.features
 
 
 # Resolve FEATURES_ variables
