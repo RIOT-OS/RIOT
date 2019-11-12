@@ -6,19 +6,17 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os
 import sys
 from testrunner import run
-
-
-CPUID_LEN = int(os.getenv('CPUID_LEN') or 4)
 
 
 def testfunc(child):
     child.expect_exact('Test for the CPUID driver')
     child.expect_exact('This test is reading out the CPUID of the platforms CPU')
-    expected = 'CPUID:' + CPUID_LEN * r' 0x[0-9a-fA-F]{2}'
-    child.expect(expected)
+    child.expect(r'CPUID_LEN: (\d+)')
+    cpuid_len = int(child.match.group(1))
+    child.expect(r'CPUID:( 0x[0-9a-fA-F]{2})+\s*$')
+    assert child.match.group(0).count(' 0x') == cpuid_len
 
 
 if __name__ == "__main__":
