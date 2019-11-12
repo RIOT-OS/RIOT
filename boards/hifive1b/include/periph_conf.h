@@ -54,12 +54,10 @@ extern "C" {
  *
  * @{
  */
-#define RTT_NUMOF                   (1)
 #define RTT_FREQUENCY               (1)             /* in Hz */
 #define RTT_MAX_VALUE               (0xFFFFFFFF)
 #define RTT_INTR_PRIORITY           (2)
 
-#define RTC_NUMOF                   (1)
 /** @} */
 
 /**

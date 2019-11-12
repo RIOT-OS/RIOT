@@ -35,13 +35,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name RealTime Clock configuration
- * @{
- */
-#define RTC_NUMOF (1)
-/** @} */
-
-/**
  * @name Timer peripheral configuration
  * @{
  */

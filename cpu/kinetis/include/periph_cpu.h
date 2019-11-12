@@ -141,8 +141,6 @@ typedef uint16_t gpio_t;
  * @name RTT and RTC configuration
  * @{
  */
-#define RTT_NUMOF                    (1U)
-#define RTC_NUMOF                    (1U)
 #define RTT_FREQUENCY                (1)
 #define RTT_MAX_VALUE                (0xffffffff)
 /** @} */

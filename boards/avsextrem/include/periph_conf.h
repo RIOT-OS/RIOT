@@ -44,12 +44,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Real Time Clock configuration
- */
-#define RTC_NUMOF           (1U)
-/** @} */
-
-/**
  * @name    UART configuration
  * @{
  */

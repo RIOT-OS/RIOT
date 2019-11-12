@@ -158,7 +158,6 @@ static const spi_conf_t spi_config[] = {
  * @name    Real time counter configuration
  * @{
  */
-#define RTT_NUMOF           (1U)
 #define RTT_IRQ_PRIO        1
 
 #define RTT_DEV             RTC

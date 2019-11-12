@@ -216,7 +216,6 @@ static const spi_conf_t spi_config[] = {
  * @name    RTT configuration
  * @{
  */
-#define RTT_NUMOF           (1)
 #define RTT_FREQUENCY       (4096)
 #define RTT_MAX_VALUE       (0xffff)
 /** @} */
