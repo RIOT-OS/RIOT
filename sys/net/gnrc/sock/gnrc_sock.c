@@ -120,6 +120,9 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
     kernel_pid_t iface = KERNEL_PID_UNDEF;
     gnrc_nettype_t type;
     size_t payload_len = gnrc_pkt_len(payload);
+#ifdef MODULE_GNRC_NETERR
+    unsigned status_subs = 0;
+#endif
 
     if (local->family != remote->family) {
         gnrc_pktbuf_release(payload);
@@ -172,7 +175,14 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
         LL_PREPEND(pkt, netif);
     }
 #ifdef MODULE_GNRC_NETERR
-    gnrc_neterr_reg(pkt);   /* no error should occur since pkt was created here */
+    /* cppcheck-suppress uninitvar
+     * (reason: pkt is initialized in AF_INET6 case above, otherwise function
+     * will return early) */
+    for (gnrc_pktsnip_t *ptr = pkt; ptr != NULL; ptr = ptr->next) {
+        /* no error should occur since pkt was created here */
+        gnrc_neterr_reg(ptr);
+        status_subs++;
+    }
 #endif
     if (!gnrc_netapi_dispatch_send(type, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
         /* this should not happen, but just in case */
@@ -180,17 +190,34 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
         return -EBADMSG;
     }
 #ifdef MODULE_GNRC_NETERR
-    msg_t err_report;
-    err_report.type = 0;
+    uint32_t last_status = GNRC_NETERR_SUCCESS;
 
-    while (err_report.type != GNRC_NETERR_MSG_TYPE) {
-        msg_try_receive(&err_report);
-        if (err_report.type != GNRC_NETERR_MSG_TYPE) {
-            msg_try_send(&err_report, sched_active_pid);
+    while (status_subs--) {
+        msg_t err_report;
+        err_report.type = 0;
+
+        while (err_report.type != GNRC_NETERR_MSG_TYPE) {
+            msg_try_receive(&err_report);
+            if (err_report.type != GNRC_NETERR_MSG_TYPE) {
+                msg_try_send(&err_report, sched_active_pid);
+            }
         }
-    }
-    if (err_report.content.value != GNRC_NETERR_SUCCESS) {
-        return (int)(-err_report.content.value);
+        if (err_report.content.value != last_status) {
+            int res = (int)(-err_report.content.value);
+
+            for (unsigned i = 0; i < status_subs; i++) {
+                err_report.type = 0;
+                /* remove remaining status reports from queue */
+                while (err_report.type != GNRC_NETERR_MSG_TYPE) {
+                    msg_try_receive(&err_report);
+                    if (err_report.type != GNRC_NETERR_MSG_TYPE) {
+                        msg_try_send(&err_report, sched_active_pid);
+                    }
+                }
+            }
+            return res;
+        }
+        last_status = err_report.content.value;
     }
 #endif
     return payload_len;
