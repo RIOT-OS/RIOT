@@ -50,9 +50,9 @@ static size_t _gen_full_acm_descriptor(usbus_t *usbus, void *arg);
 static size_t _gen_assoc_descriptor(usbus_t *usbus, void *arg);
 
 /* Descriptors */
-static const usbus_hdr_gen_funcs_t _cdcacm_descriptor = {
+static const usbus_descr_gen_funcs_t _cdcacm_descriptor = {
+    .fmt_post_descriptor = _gen_full_acm_descriptor,
     .fmt_pre_descriptor = _gen_assoc_descriptor,
-    .get_header = _gen_full_acm_descriptor,
     .len = {
         .fixed_len = sizeof(usb_descriptor_interface_association_t) +
                      sizeof(usb_desc_cdc_t) +
@@ -60,7 +60,7 @@ static const usbus_hdr_gen_funcs_t _cdcacm_descriptor = {
                      sizeof(usb_desc_union_t) +
                      sizeof(usb_desc_call_mngt_t),
     },
-    .len_type = USBUS_HDR_LEN_FIXED,
+    .len_type = USBUS_DESCR_LEN_FIXED,
 };
 
 static size_t _gen_assoc_descriptor(usbus_t *usbus, void *arg)
@@ -185,21 +185,21 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
 
     cdcacm->flush.handler = _handle_flush;
 
-    cdcacm->cdcacm_hdr.next = NULL;
-    cdcacm->cdcacm_hdr.funcs = &_cdcacm_descriptor;
-    cdcacm->cdcacm_hdr.arg = cdcacm;
+    cdcacm->cdcacm_descr.next = NULL;
+    cdcacm->cdcacm_descr.funcs = &_cdcacm_descriptor;
+    cdcacm->cdcacm_descr.arg = cdcacm;
 
     /* Configure Interface 0 as control interface */
     cdcacm->iface_ctrl.class = USB_CLASS_CDC_CONTROL ;
     cdcacm->iface_ctrl.subclass = USB_CDC_SUBCLASS_ACM;
     cdcacm->iface_ctrl.protocol = USB_CDC_PROTOCOL_NONE;
-    cdcacm->iface_ctrl.hdr_gen = &cdcacm->cdcacm_hdr;
+    cdcacm->iface_ctrl.descr_gen = &cdcacm->cdcacm_descr;
     cdcacm->iface_ctrl.handler = handler;
     /* Configure second interface to handle data endpoint */
     cdcacm->iface_data.class = USB_CLASS_CDC_DATA ;
     cdcacm->iface_data.subclass = USB_CDC_SUBCLASS_NONE;
     cdcacm->iface_data.protocol = USB_CDC_PROTOCOL_NONE;
-    cdcacm->iface_data.hdr_gen = NULL;
+    cdcacm->iface_data.descr_gen = NULL;
     cdcacm->iface_data.handler = handler;
 
     /* Create required endpoints */

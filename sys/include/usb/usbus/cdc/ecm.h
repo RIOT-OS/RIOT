@@ -98,7 +98,7 @@ typedef struct usbus_cdcecm_device {
     usbus_endpoint_t *ep_in;                /**< Data endpoint in */
     usbus_endpoint_t *ep_out;               /**< Data endpoint out */
     usbus_endpoint_t *ep_ctrl;              /**< Control endpoint */
-    usbus_hdr_gen_t ecm_hdr;                /**< ECM header generator */
+    usbus_descr_gen_t ecm_descr;            /**< ECM descriptor generator */
     event_t rx_flush;                       /**< Receive flush event */
     event_t tx_xmit;                        /**< Transmit ready event */
     netdev_t netdev;                        /**< Netdev context struct */
