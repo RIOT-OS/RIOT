@@ -25,6 +25,9 @@
 
 #include "msg.h"
 #include "net/gnrc/pkt.h"
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+#include "net/gnrc/sixlowpan/frag/hint.h"
+#endif /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
 
 #ifdef __cplusplus
 extern "C" {
