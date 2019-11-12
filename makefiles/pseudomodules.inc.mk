@@ -156,6 +156,9 @@ PSEUDOMODULES += vcnl4010
 PSEUDOMODULES += vcnl4020
 PSEUDOMODULES += vcnl4040
 
+# implementations of ws281x_write as submodules of ws281x:
+PSEUDOMODULES += ws281x_%
+
 # include variants of lpsxxx drivers as pseudo modules
 PSEUDOMODULES += lps331ap
 PSEUDOMODULES += lps22hb
