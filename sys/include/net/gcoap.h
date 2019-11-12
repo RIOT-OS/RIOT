@@ -350,6 +350,10 @@
 #include "net/ipv6/addr.h"
 #include "net/sock/udp.h"
 #include "net/nanocoap.h"
+#ifdef MODULE_SOCK_DTLS
+#include "net/sock/dtls.h"
+#include "net/credman.h"
+#endif
 #include "xtimer.h"
 
 #ifdef __cplusplus
@@ -373,8 +377,12 @@ extern "C" {
  * @brief   Server port; use RFC 7252 default if not defined
  */
 #ifndef GCOAP_PORT
+#ifdef  MODULE_SOCK_DTLS
+#define GCOAP_PORT              (5684)
+#else
 #define GCOAP_PORT              (5683)
-#endif
+#endif  /* MODULE_SOCK_DTLS */
+#endif  /* GCOAP_PORT */
 
 /**
  * @brief   Size of the buffer used to build a CoAP request or response
@@ -590,9 +598,16 @@ extern "C" {
  * @brief Stack size for module thread
  */
 #ifndef GCOAP_STACK_SIZE
+#ifdef  MODULE_SOCK_DTLS
+/* DTLS pkg will need at least (THREAD_STACKSIZE_DEFAULT + 1024) stack size */
+#define GCOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE \
+                          + sizeof(coap_pkt_t) \
+                          + 1024)
+#else
 #define GCOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE \
                           + sizeof(coap_pkt_t))
-#endif
+#endif  /* MODULE_SOCK_DTLS */
+#endif  /* GCOAP_STACK_SIZE */
 
 /**
  * @ingroup net_gcoap_conf
@@ -600,6 +615,13 @@ extern "C" {
  */
 #ifndef GCOAP_RESEND_BUFS_MAX
 #define GCOAP_RESEND_BUFS_MAX      (1)
+#endif
+
+/* define a common name for transport layer object, to accommodate security layer */
+#ifdef MODULE_SOCK_DTLS
+typedef sock_dtls_t coap_tl_sock_t;
+#else
+typedef sock_udp_t coap_tl_sock_t;
 #endif
 
 /**
@@ -943,6 +965,20 @@ ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
  * @return  -1 on error
  */
 int gcoap_add_qstring(coap_pkt_t *pdu, const char *key, const char *val);
+
+#if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
+/**
+ * @brief   Set credential tag to use
+ *
+ * Set the DTLS credential tag. This will tell gcoap which credential
+ * to use for authentication.
+ *
+ * @param[in] tag       The credential tag to use
+ *
+ * @see @ref net_credman
+ */
+void gcoap_set_credential_tag(credman_tag_t tag);
+#endif
 
 #ifdef __cplusplus
 }
