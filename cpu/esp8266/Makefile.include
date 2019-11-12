@@ -175,7 +175,7 @@ FLASH_FREQ = 26m   # FIX configuration, DO NOT CHANGE
 FLASH_SIZE ?= 1MB
 FLASHDEPS  += preflash
 
-PREFLASHER ?= $(RIOTBASE)/dist/tools/esptool/esptool.py
+PREFLASHER ?= $(RIOTTOOLS)/esptool/esptool.py
 PREFFLAGS  = --chip esp8266 elf2image
 PREFFLAGS += --flash_mode $(FLASH_MODE) --flash_size $(FLASH_SIZE)
 PREFFLAGS += --flash_freq $(FLASH_FREQ) --version 3
@@ -210,7 +210,7 @@ else
     export PROGRAMMER_SPEED ?= 460800
     FLASHER = $(RIOTBASE)/dist/tools/esptool/esptool.py
     FFLAGS += --chip esp8266 --port $(PROG_DEV) --baud $(PROGRAMMER_SPEED)
-    FFLAGS += --before default_reset --after hard_reset write_flash -z
+    FFLAGS += --before default_reset write_flash -z
     FFLAGS += --flash_size detect
     FFLAGS += --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ)
     FFLAGS += 0x0000 $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER)
