@@ -28,7 +28,7 @@
 #define TAP_MAC_PRIO                (GNRC_NETIF_PRIO)
 
 static netdev_tap_t netdev_tap[NETDEV_TAP_MAX];
-static char _netdev_eth_stack[NETDEV_TAP_MAX][TAP_MAC_STACKSIZE + DEBUG_EXTRA_STACKSIZE];
+static char _netdev_eth_stack[NETDEV_TAP_MAX][TAP_MAC_STACKSIZE];
 
 void auto_init_netdev_tap(void)
 {
