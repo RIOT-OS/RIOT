@@ -1,8 +1,15 @@
 INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 
 # configure the serial terminal
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+PROGRAMMER ?= openocd
+ifeq (bmp,$(PROGRAMMER))
+  PORT_LINUX ?= /dev/ttyACM1
+  # first item is gdb server, so we take the second
+  PORT_DARWIN ?= $(wordlist 2, 2, $(sort $(wildcard /dev/tty.usbmodem*)))
+else
+  PORT_LINUX ?= /dev/ttyACM0
+  PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+endif
 
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
@@ -11,8 +18,11 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # use connect_assert_srst to always be able to flash or reset the boards.
 export OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
-# all Nucleo boards have an on-board ST-link adapter
-DEBUG_ADAPTER ?= stlink
+ifeq (bmp,$(PROGRAMMER))
+  include $(RIOTMAKE)/tools/bmp.inc.mk
+else
+  DEBUG_ADAPTER ?= stlink
 
-# stlink use openocd
-include $(RIOTMAKE)/tools/openocd.inc.mk
+  # stlink use openocd
+  include $(RIOTMAKE)/tools/openocd.inc.mk
+endif
