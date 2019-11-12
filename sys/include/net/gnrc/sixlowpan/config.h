@@ -98,6 +98,21 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Deletion timer for reassembly buffer entries in microseconds
+ *
+ * @note    Only applicable with
+ *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
+ *
+ * Time to pass between completion of a datagram and the deletion of its
+ * reassembly buffer entry. If this value is 0, the entry is dropped
+ * immediately. Use this value to prevent re-creation of a reassembly buffer
+ * entry on late arriving link-layer duplicates.
+ */
+#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
+#define GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER              (0U)
+#endif
+
+/**
  * @brief   Registration lifetime in minutes for the address registration option
  *
  * This value should be adapted to the devices power-lifecycle so that it is
