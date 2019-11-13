@@ -451,6 +451,17 @@ ifneq (,$(filter pulse_counter,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio_irq
 endif
 
+ifneq (,$(filter qmc5883l_int,$(USEMODULE)))
+  USEMODULE += qmc5883l
+endif
+
+ifneq (,$(filter qmc5883l,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  ifneq (,$(filter qmc5883l_int,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_gpio_irq
+  endif
+endif
+
 ifneq (,$(filter rgbled,$(USEMODULE)))
   USEMODULE += color
 endif

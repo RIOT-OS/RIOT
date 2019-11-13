@@ -510,6 +510,10 @@ void auto_init(void)
     extern void auto_init_pulse_counter(void);
     auto_init_pulse_counter();
 #endif
+#ifdef MODULE_QMC5883L
+    extern void auto_init_qmc5883l(void);
+    auto_init_qmc5883l();
+#endif
 #ifdef MODULE_SHT2X
     extern void auto_init_sht2x(void);
     auto_init_sht2x();
