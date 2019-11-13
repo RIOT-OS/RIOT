@@ -9,6 +9,7 @@ FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_wdt periph_wdt_cb
 
 # Various other features (if any)
+FEATURES_PROVIDED += ble_nimble
 FEATURES_PROVIDED += radio_nrfble
 FEATURES_PROVIDED += radio_nrfmin
 FEATURES_PROVIDED += puf_sram

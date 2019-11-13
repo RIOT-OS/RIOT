@@ -7,9 +7,6 @@ ifeq (,$(filter nordic_softdevice_ble,$(USEPKG)))
   FEATURES_PROVIDED += riotboot
 endif
 
-# Various other features (if any)
-FEATURES_PROVIDED += ble_nimble
-
 ifneq (,$(findstring nrf52832, $(CPU_MODEL)))
   # Nordic SoftDevice support in RIOT is verified for all nrf52832-based boards
   FEATURES_PROVIDED += ble_nordic_softdevice
