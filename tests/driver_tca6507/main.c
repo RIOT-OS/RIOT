@@ -34,6 +34,8 @@ int main(void)
     int rc;
     tca6507_t dev;
 
+    xtimer_usleep(1 * US_PER_SEC);
+
     /* Init TCA6507 context */
     puts("TCA6507 LED Driver: test application");
     rc = tca6507_init(&dev, &tca6507_params[0]);
@@ -44,7 +46,7 @@ int main(void)
     rc = tca6507_clear_all(&dev);
     CHECK(rc);
 
-    /* Configure Brightness */
+    /* Configure Bank Brightness */
     puts("TCA6507 LED Driver: Configure Bank 0 at 20%%");
     rc = tca6507_intensity(&dev, TCA6507_BRIGHTNESS_20_PCENT, TCA6507_BANK0);
     CHECK(rc);
@@ -62,24 +64,46 @@ int main(void)
     rc = tca6507_fade_off_time(&dev, TCA6507_TIME_64_MS, TCA6507_BANK0);
     CHECK(rc);
 
-    puts("TCA6507 LED Driver: Configure fully on time at 128ms");
-    rc = tca6507_fully_on_time(&dev, TCA6507_TIME_128_MS, TCA6507_BANK0);
+    puts("TCA6507 LED Driver: Configure fully on time at 1024ms");
+    rc = tca6507_fully_on_time(&dev, TCA6507_TIME_1024_MS, TCA6507_BANK0);
     CHECK(rc);
 
-    puts("TCA6507 LED Driver: Configure first fully off time at 256ms");
-    rc = tca6507_first_fully_off_time(&dev, TCA6507_TIME_256_MS, TCA6507_BANK0);
+    puts("TCA6507 LED Driver: Configure first fully off time at 512ms");
+    rc = tca6507_first_fully_off_time(&dev, TCA6507_TIME_512_MS, TCA6507_BANK0);
     CHECK(rc);
 
-    puts("TCA6507 LED Driver: Configure second fully off time at 256ms");
-    rc =
-        tca6507_second_fully_off_time(&dev, TCA6507_TIME_1024_MS,
-                                      TCA6507_BANK0);
+    puts("TCA6507 LED Driver: Configure second fully off time at 2048ms");
+    rc = tca6507_second_fully_off_time(&dev, TCA6507_TIME_2048_MS, TCA6507_BANK0);
     CHECK(rc);
 
-    /* Start the heartbeat */
-    puts("TCA6507 LED Driver: Blink on led 1 at 20%% (i.e. Bank 0)");
+    /* Start the heartbeat for 10 seconds (BANK 0) */
+    puts("TCA6507 LED Driver: Blink on led 1 on Bank 0");
     rc = tca6507_blink_led(&dev, 0, TCA6507_BANK0);
     CHECK(rc);
+
+    rc = tca6507_dump_registers(&dev);
+    CHECK(rc);
+
+    xtimer_usleep(10 * US_PER_SEC);
+
+    puts("TCA6507 LED Driver: Clear all leds");
+    rc = tca6507_clear_all(&dev);
+    CHECK(rc);
+
+
+    /* Start the heartbeat for 10 seconds (BANK 1) */
+    puts("TCA6507 LED Driver: Blink on led 1 on Bank 1");
+    rc = tca6507_blink_led(&dev, 0, TCA6507_BANK1);
+    CHECK(rc);
+
+    xtimer_usleep(10 * US_PER_SEC);
+
+    puts("TCA6507 LED Driver: Clear all leds");
+    rc = tca6507_clear_all(&dev);
+    CHECK(rc);
+
+    xtimer_usleep(1 * US_PER_SEC);
+
 
     /* Manual led tests */
     xtimer_usleep(1 * US_PER_SEC);

@@ -27,7 +27,7 @@
  * | 0        | 1        | 0        | LED on with maximum intensity value of PWM0 (ALD value or BRIGHT_F0 value, depending on One Shot / Master Intensity Register setting) |
  * | 0        | 1        | 1        | LED on with maximum intensity value of PWM1 (ALD value or BRIGHT_F1 value, depending on One Shot / Master Intensity Register setting) |
  * | 1        | 0        | 0        | LED fully on (output low). Can be used as general-purpose output                                                                      |
- * | 1        | 0        | 1        | LED on at brightness set by One Shot / Master Intensity registe                                                                       |
+ * | 1        | 0        | 1        | LED on at brightness set by One Shot / Master Intensity register                                                                      |
  * | 1        | 1        | 0        | LED blinking with intensity characteristics of BANK0 (PWM0).                                                                          |
  * | 1        | 1        | 1        | LED blinking with intensity characteristics of BANK1 (PWM1).                                                                          |
 */
@@ -71,6 +71,7 @@ int tca6507_set_led(const tca6507_t *dev, uint8_t led, uint8_t bank)
 {
     int ret = TCA6507_ERR_I2C;
     uint8_t regs[3];
+    uint8_t mask = 1UL << led;
 
     /* setup the i2c bus */
     i2c_acquire(TCA6507_I2C);
@@ -78,25 +79,25 @@ int tca6507_set_led(const tca6507_t *dev, uint8_t led, uint8_t bank)
     if (i2c_read_regs(TCA6507_I2C, TCA6507_ADDR,
                       TCA6507_SELECT0 | TCA6507_COMMAND_AUTOINC, &regs,
                       sizeof(regs), 0) != 0) {
-        DEBUG("[ERROR] Cannot read TCA6507 from I2C.\n");
+        DEBUG("[ERROR] Cannot read TCA6507 (I2C)\n");
         goto finish;
     }
 
-    if (bank == 0) {
-        regs[0] = regs[0] & ~(1UL << led);
-        regs[1] = regs[1] | 1UL << led;
-        regs[2] = regs[2] & ~(1UL << led);
+    if (bank == TCA6507_BANK0) {
+        regs[0] = regs[0] & (uint8_t)(~mask);
+        regs[1] = regs[1] | mask;
+        regs[2] = regs[2] & (uint8_t)(~mask);
     }
     else {
-        regs[0] = regs[0] | 1UL << led;
-        regs[1] = regs[1] | 1UL << led;
-        regs[2] = regs[2] & ~(1UL << led);
+        regs[0] = regs[0] | mask;
+        regs[1] = regs[1] | mask;
+        regs[2] = regs[2] & (uint8_t)(~mask);
     }
 
     if (i2c_write_regs(TCA6507_I2C, TCA6507_ADDR,
                        TCA6507_SELECT0 | TCA6507_COMMAND_AUTOINC, &regs,
                        sizeof(regs), 0) != 0) {
-        DEBUG("[ERROR] Cannot write command 'TCA6507_COMMAND_AUTOINC' to I2C.\n");
+        DEBUG("[ERROR] Cannot write TCA6507 (I2C)\n");
         goto finish;
     }
     ret = TCA6507_OK;
@@ -110,6 +111,7 @@ int tca6507_clear_led(const tca6507_t *dev, uint8_t led)
 {
     int ret = TCA6507_ERR_I2C;
     uint8_t regs[3];
+    uint8_t mask = 1UL << led;
 
     /* setup the i2c bus */
     i2c_acquire(TCA6507_I2C);
@@ -117,18 +119,18 @@ int tca6507_clear_led(const tca6507_t *dev, uint8_t led)
     if (i2c_read_regs(TCA6507_I2C, TCA6507_ADDR,
                       TCA6507_SELECT0 | TCA6507_COMMAND_AUTOINC, &regs,
                       sizeof(regs), 0) != 0) {
-        DEBUG("[ERROR] Cannot read TCA6507 from I2C.\n");
+        DEBUG("[ERROR] Cannot read TCA6507 (I2C)\n");
         goto finish;
     }
 
-    regs[0] = regs[0] & ~(1UL << led);
-    regs[1] = regs[1] & ~(1UL << led);
-    regs[2] = regs[2] & ~(1UL << led);
+    regs[0] = regs[0] & (uint8_t)(~mask);
+    regs[1] = regs[1] & (uint8_t)(~mask);
+    regs[2] = regs[2] & (uint8_t)(~mask);
 
     if (i2c_write_regs(TCA6507_I2C, TCA6507_ADDR,
                        TCA6507_SELECT0 | TCA6507_COMMAND_AUTOINC, &regs,
                        sizeof(regs), 0) != 0) {
-        DEBUG("[ERROR] Cannot write command 'TCA6507_COMMAND_AUTOINC' to I2C.\n");
+        DEBUG("[ERROR] Cannot write TCA6507 (I2C)\n");
         goto finish;
     }
     ret = TCA6507_OK;
@@ -153,7 +155,7 @@ int tca6507_clear_all(const tca6507_t *dev)
     if (i2c_write_regs(TCA6507_I2C, TCA6507_ADDR,
                        TCA6507_SELECT0 | TCA6507_COMMAND_AUTOINC, &regs,
                        sizeof(regs), 0) != 0) {
-        DEBUG("[ERROR] Cannot write command 'TCA6507_COMMAND_AUTOINC' to I2C.\n");
+        DEBUG("[ERROR] Cannot write TCA6507 (I2C)\n");
         goto finish;
     }
     ret = TCA6507_OK;
@@ -162,7 +164,6 @@ finish:
     i2c_release(TCA6507_I2C);
     return ret;
 }
-
 
 int tca6507_toggle_led(const tca6507_t *dev, uint8_t led, uint8_t bank)
 {
@@ -175,26 +176,26 @@ int tca6507_toggle_led(const tca6507_t *dev, uint8_t led, uint8_t bank)
     if (i2c_read_regs(TCA6507_I2C, TCA6507_ADDR,
                       TCA6507_SELECT0 | TCA6507_COMMAND_AUTOINC, &regs,
                       sizeof(regs), 0) != 0) {
-        DEBUG("[ERROR] Cannot read TCA6507 from I2C.\n");
+        DEBUG("[ERROR] Cannot read TCA6507 (I2C)\n");
         goto finish;
     }
 
     /* only work if led was is state 000 or 010/110 before. */
-    if (bank == 0) {
-        regs[0] = regs[0] ^ 0UL << led;
-        regs[1] = regs[1] ^ 1UL << led;
-        regs[2] = regs[2] ^ 0UL << led;
+    if (bank == TCA6507_BANK0) {
+        regs[0] = regs[0] ^ (uint8_t)(0UL << led);
+        regs[1] = regs[1] ^ (uint8_t)(1UL << led);
+        regs[2] = regs[2] ^ (uint8_t)(0UL << led);
     }
     else {
-        regs[0] = regs[0] ^ 1UL << led;
-        regs[1] = regs[1] ^ 1UL << led;
-        regs[2] = regs[2] ^ 0UL << led;
+        regs[0] = regs[0] ^ (uint8_t)(1UL << led);
+        regs[1] = regs[1] ^ (uint8_t)(1UL << led);
+        regs[2] = regs[2] ^ (uint8_t)(0UL << led);
     }
 
     if (i2c_write_regs(TCA6507_I2C, TCA6507_ADDR,
                        TCA6507_SELECT0 | TCA6507_COMMAND_AUTOINC, &regs,
                        sizeof(regs), 0) != 0) {
-        DEBUG("[ERROR] Cannot write command 'TCA6507_COMMAND_AUTOINC' to I2C.\n");
+        DEBUG("[ERROR] Cannot write TCA6507 (I2C)\n");
         goto finish;
     }
     ret = TCA6507_OK;
@@ -216,12 +217,12 @@ int tca6507_blink_led(const tca6507_t *dev, uint8_t led, uint8_t bank)
     if (i2c_read_regs(TCA6507_I2C, TCA6507_ADDR,
                       TCA6507_SELECT0 | TCA6507_COMMAND_AUTOINC, &regs,
                       sizeof(regs), 0) != 0) {
-        DEBUG("[ERROR] Cannot read TCA6507 from I2C.\n");
+        DEBUG("[ERROR] Cannot read TCA6507 (I2C)\n");
         goto finish;
     }
 
-    if (bank == 0) {
-        regs[0] = regs[0] & ~mask;
+    if (bank == TCA6507_BANK0) {
+        regs[0] = regs[0] & (uint8_t)(~mask);
         regs[1] = regs[1] | mask;
         regs[2] = regs[2] | mask;
     }
@@ -231,10 +232,13 @@ int tca6507_blink_led(const tca6507_t *dev, uint8_t led, uint8_t bank)
         regs[2] = regs[2] | mask;
     }
 
+    printf("%x, %x, %x\n", regs[2],regs[1],regs[0]);
+
+
     if (i2c_write_regs(TCA6507_I2C, TCA6507_ADDR,
                        TCA6507_SELECT0 | TCA6507_COMMAND_AUTOINC, &regs,
                        sizeof(regs), 0) != 0) {
-        DEBUG("[ERROR] Cannot write command 'TCA6507_MAX_INTENSITY' to I2C.\n");
+        DEBUG("[ERROR] Cannot write TCA6507 (I2C)\n");
         goto finish;
     }
     ret = TCA6507_OK;
@@ -247,28 +251,29 @@ finish:
 static int tca6507_update_4bits(const tca6507_t *dev, uint8_t function,
                                 uint8_t payload, uint8_t bank)
 {
+    int rc;
     int ret = TCA6507_ERR_I2C;
     uint8_t value;
 
     /* setup the i2c bus */
     i2c_acquire(TCA6507_I2C);
 
-    if (i2c_write_regs(TCA6507_I2C, TCA6507_ADDR, function, &value, 1,
-                       0) != 0) {
-        DEBUG("[ERROR] Cannot read TCA6507 from I2C.\n");
+    rc = i2c_read_regs(TCA6507_I2C, TCA6507_ADDR, function, &value, 1, 0);
+    if (rc != 0) {
+        DEBUG("[ERROR] Cannot read TCA6507 (I2C)\n");
         goto finish;
     }
 
-    if (bank == 0) {
+    if (bank == TCA6507_BANK0) {
         value = (value & 0xF0) | (payload & 0x0F);
     }
     else {
         value = (value & 0x0F) | ((payload & 0x0F) << 4);
     }
 
-    if (i2c_write_regs(TCA6507_I2C, TCA6507_ADDR, function, &value, 1,
-                       0) != 0) {
-        DEBUG("[ERROR] Cannot write command 'TCA6507_MAX_INTENSITY' to I2C.\n");
+    rc = i2c_write_regs(TCA6507_I2C, TCA6507_ADDR, function, &value, 1, 0);
+    if (rc != 0) {
+        DEBUG("[ERROR] Cannot write TCA6507 (I2C)\n");
         goto finish;
     }
 
@@ -282,14 +287,22 @@ finish:
 int tca6507_intensity(const tca6507_t *dev, uint8_t brightness, uint8_t bank)
 {
     if (brightness > TCA6507_BRIGHTNESS_COUNT) {
-        DEBUG(
-            "[WARN] Brightness used a unsupported value, falling back to 100%%\n");
+        DEBUG("[WARN] Brightness used a unsupported value, falling back to 100%%\n");
         brightness = TCA6507_BRIGHTNESS_100_PCENT;
     }
 
     return tca6507_update_4bits(dev, TCA6507_MAX_INTENSITY, brightness, bank);
 }
 
+int tca6507_master_intensity(const tca6507_t *dev, uint8_t brightness)
+{
+    if (brightness > TCA6507_BRIGHTNESS_COUNT) {
+        DEBUG("[WARN] Brightness used a unsupported value, falling back to 100%%\n");
+        brightness = TCA6507_BRIGHTNESS_100_PCENT;
+    }
+
+    return tca6507_update_4bits(dev, TCA6507_ONESHOT_MASTER_INTENSITY, brightness, 0);
+}
 
 int tca6507_fade_on_time(const tca6507_t *dev, uint8_t time, uint8_t bank)
 {
@@ -321,8 +334,7 @@ int tca6507_fully_on_time(const tca6507_t *dev, uint8_t time, uint8_t bank)
     return tca6507_update_4bits(dev, TCA6507_FULLYON_TIME, time, bank);
 }
 
-int tca6507_first_fully_off_time(const tca6507_t *dev, uint8_t time,
-                                 uint8_t bank)
+int tca6507_first_fully_off_time(const tca6507_t *dev, uint8_t time, uint8_t bank)
 {
     if (time > TCA6507_TIME_COUNT) {
         DEBUG("[WARN] Time used a unsupported value, falling back to 256ms\n");
@@ -332,8 +344,7 @@ int tca6507_first_fully_off_time(const tca6507_t *dev, uint8_t time,
     return tca6507_update_4bits(dev, TCA6507_FIRST_FULLYOFF_TIME, time, bank);
 }
 
-int tca6507_second_fully_off_time(const tca6507_t *dev, uint8_t time,
-                                  uint8_t bank)
+int tca6507_second_fully_off_time(const tca6507_t *dev, uint8_t time, uint8_t bank)
 {
     if (time > TCA6507_TIME_COUNT) {
         DEBUG("[WARN] Time used a unsupported value, falling back to 256ms\n");
@@ -341,4 +352,35 @@ int tca6507_second_fully_off_time(const tca6507_t *dev, uint8_t time,
     }
 
     return tca6507_update_4bits(dev, TCA6507_SEC_FULLYOFF_TIME, time, bank);
+}
+
+int tca6507_bank_setup(const tca6507_t *dev, uint8_t mask)
+{
+    return tca6507_update_4bits(dev, TCA6507_ONESHOT_MASTER_INTENSITY, mask >> 4, 1);
+}
+
+int tca6507_dump_registers(const tca6507_t *dev)
+{
+  int ret = TCA6507_ERR_I2C;
+  uint8_t regs[10];
+
+  /* setup the i2c bus */
+  i2c_acquire(TCA6507_I2C);
+
+  if (i2c_read_regs(TCA6507_I2C, TCA6507_ADDR,
+                    TCA6507_SELECT0 | TCA6507_COMMAND_AUTOINC, &regs,
+                    sizeof(regs), 0) != 0) {
+      DEBUG("[ERROR] Cannot read TCA6507 (I2C)\n");
+      goto finish;
+  }
+  ret = TCA6507_OK;
+
+  puts("tca6507 registers :");
+  for (size_t i=0; i<sizeof(regs); i++) {
+    printf("\t%02x: %02x\n", i, regs[i]);
+  }
+
+finish:
+  i2c_release(TCA6507_I2C);
+  return ret;
 }

@@ -52,6 +52,20 @@ enum {
 };
 
 /**
+ * @brief PWM Operating mode
+ * Table 19. One-Shot / Master Intensity Register
+ * The one-shot mode may be bugged by crappy design of the hardware chip, do not use it
+ */
+#define TCA6507_BANK0_MODE_NORMAL              (0 << 6)
+#define TCA6507_BANK0_MODE_ONESHOT             (1 << 6)
+#define TCA6507_BANK0_BRIGHTNESS_MASTER        (1 << 4)
+#define TCA6507_BANK0_BRIGHTNESS_BANK          (0 << 4)
+#define TCA6507_BANK1_MODE_NORMAL              (0 << 7)
+#define TCA6507_BANK1_MODE_ONESHOT             (1 << 7)
+#define TCA6507_BANK1_BRIGHTNESS_MASTER        (1 << 5)
+#define TCA6507_BANK1_BRIGHTNESS_BANK          (0 << 5)
+
+/**
  * @brief Fadding times
  */
 enum {
@@ -64,7 +78,7 @@ enum {
     TCA6507_TIME_512_MS,
     TCA6507_TIME_768_MS,
     TCA6507_TIME_1024_MS,
-    TCA6507_TIME_2536_MS,
+    TCA6507_TIME_1536_MS,
     TCA6507_TIME_2048_MS,
     TCA6507_TIME_3072_MS,
     TCA6507_TIME_4096_MS,
@@ -183,7 +197,7 @@ int tca6507_toggle_led(const tca6507_t *dev, uint8_t led, uint8_t bank);
 int tca6507_blink_led(const tca6507_t *dev, uint8_t led, uint8_t bank);
 
 /**
- * @brief   Confiure the intensity of a bank
+ * @brief   Configure the intensity of a bank
  *
  * @param[in] dev           device descriptor
  * @param[in] intensity     Intensity of the led in percent
@@ -193,6 +207,19 @@ int tca6507_blink_led(const tca6507_t *dev, uint8_t led, uint8_t bank);
  * @return                  TCA6507_ERR_I2C on I2C bus error
  */
 int tca6507_intensity(const tca6507_t *dev, uint8_t intensity, uint8_t bank);
+
+/**
+ * @brief   Configure the master intensity
+ *
+ * @param[in] dev           device descriptor
+ * @param[in] intensity     Intensity of the led in percent
+ * @param[in] bank          The master intensity, this brightness can be configured
+ *                          to overwrite the bank brightness
+ *
+ * @return                  TCA6507_OK on success
+ * @return                  TCA6507_ERR_I2C on I2C bus error
+ */
+int tca6507_master_intensity(const tca6507_t *dev, uint8_t brightness);
 
 /**
  * @brief   Configure the fade on time of a bank
@@ -253,6 +280,29 @@ int tca6507_first_fully_off_time(const tca6507_t *dev, uint8_t time, uint8_t ban
  * @return                  TCA6507_ERR_I2C on I2C bus error
  */
 int tca6507_second_fully_off_time(const tca6507_t *dev, uint8_t time, uint8_t bank);
+
+/**
+ * @brief   Advance configuration for banks
+ *
+ * @param[in] dev           device descriptor
+ * @param[in] mask          Bits mask for register 0x09 (One-Shot / Master Intensity)
+ *                          See TCA6507_BANK0_* and TCA6507_BANK1_* definitions
+ *
+ * @return                  TCA6507_OK on success
+ * @return                  TCA6507_ERR_I2C on I2C bus error
+ */
+int tca6507_bank_setup(const tca6507_t *dev, uint8_t mask);
+
+/**
+ * @brief   Show content of hardware registers (for debug)
+ *
+ * @param[in] dev           device descriptor
+ *
+ * @return                  TCA6507_OK on success
+ * @return                  TCA6507_ERR_I2C on I2C bus error
+ */
+int tca6507_dump_registers(const tca6507_t *dev);
+
 
 #ifdef __cplusplus
 }
