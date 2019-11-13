@@ -55,6 +55,7 @@ ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nimble_netif,$(USEMODULE)))
+  FEATURES_REQUIRED += ble_nimble_netif
   USEMODULE += l2util
   USEMODULE += bluetil_addr
   ifneq (,$(filter gnrc_ipv6_%,$(USEMODULE)))
