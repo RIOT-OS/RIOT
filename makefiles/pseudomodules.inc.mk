@@ -14,6 +14,7 @@ PSEUDOMODULES += ecc_%
 PSEUDOMODULES += emb6_router
 PSEUDOMODULES += event_%
 PSEUDOMODULES += fmt_%
+PSEUDOMODULES += gcoap_lazy_init
 PSEUDOMODULES += gnrc_ipv6_default
 PSEUDOMODULES += gnrc_ipv6_router
 PSEUDOMODULES += gnrc_ipv6_router_default
@@ -84,7 +85,6 @@ PSEUDOMODULES += stdio_ethos
 PSEUDOMODULES += stdio_cdc_acm
 PSEUDOMODULES += stdio_uart_rx
 PSEUDOMODULES += suit_%
-PSEUDOMODULES += gcoap_lazy_init
 
 # handle suit_v4 being a distinct module
 NO_PSEUDOMODULES += suit_v4

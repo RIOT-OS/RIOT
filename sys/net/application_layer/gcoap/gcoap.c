@@ -41,6 +41,7 @@
 /* Internal functions */
 static void *_event_loop(void *arg);
 static void _listen(sock_udp_t *sock);
+static kernel_pid_t _start_server(void);
 static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                                          sock_udp_ep_t *remote);
@@ -633,9 +634,9 @@ static kernel_pid_t _start_server(void)
 
 kernel_pid_t gcoap_init(void)
 {
-#ifndef MODULE_GCOAP_LAZY_INIT
-    _pid = _start_server();
-#endif
+    if (!IS_USED(MODULE_GCOAP_LAZY_INIT)) {
+        _pid = _start_server();
+    }
 
     mutex_init(&_coap_state.lock);
     /* Blank lists so we know if an entry is available. */
@@ -651,14 +652,12 @@ kernel_pid_t gcoap_init(void)
 
 void gcoap_register_listener(gcoap_listener_t *listener)
 {
-#ifdef MODULE_GCOAP_LAZY_INIT
     /* A CoAP server must be started here and the default listener added
-     * because we are now expecting requests */
-    if (_pid == KERNEL_PID_UNDEF) {
+    * because we are now expecting requests */
+    if (IS_USED(MODULE_GCOAP_LAZY_INIT) && _pid == KERNEL_PID_UNDEF) {
         _coap_state.listeners = &_default_listener;
         _pid = _start_server();
     }
-#endif
 
     /* Add the listener to the end of the linked list. */
     gcoap_listener_t *_last = _coap_state.listeners;
@@ -678,11 +677,9 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 {
     assert((path == NULL) || (path[0] == '/'));
 
-#ifdef MODULE_GCOAP_LAZY_INIT
-    if (_pid == KERNEL_PID_UNDEF) {
+    if (IS_USED(MODULE_GCOAP_LAZY_INIT) && _pid == KERNEL_PID_UNDEF) {
         DEBUG("gcoap: sending request in lazy init mode, responses will be ignored\n");
     }
-#endif
 
     pdu->hdr = (coap_hdr_t *)buf;
 
@@ -757,12 +754,12 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
     gcoap_request_memo_t *memo = NULL;
     uint32_t timeout   = 0;
     unsigned msg_type  = (*buf & 0x30) >> 4;
-#ifdef MODULE_GCOAP_LAZY_INIT
-    if (msg_type == COAP_TYPE_CON && _pid == KERNEL_PID_UNDEF) {
-        DEBUG("gcoap: cannot send CON request in lazy init mode\n");
+
+    if (IS_USED(MODULE_GCOAP_LAZY_INIT) && msg_type == COAP_TYPE_CON &&
+        _pid == KERNEL_PID_UNDEF) {
+        DEBUG("gcoap: cannot send CON request, no server is running\n");
         return 0;
     }
-#endif
 
     assert(remote != NULL);
 
