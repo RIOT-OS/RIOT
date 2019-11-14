@@ -101,15 +101,8 @@ typedef struct {
      */
     uint16_t pan;
 
-    /**
-     * @brief   Short address in network byte order
-     */
-    uint8_t short_addr[IEEE802154_SHORT_ADDRESS_LEN];
-
-    /**
-     * @brief   Long address in network byte order
-     */
-    uint8_t long_addr[IEEE802154_LONG_ADDRESS_LEN];
+    network_uint16_t short_addr;            /**< short address */
+    eui64_t long_addr;                      /**< long address */
     uint8_t seq;                            /**< sequence number */
     uint8_t chan;                           /**< channel */
     uint8_t page;                           /**< channel page */
