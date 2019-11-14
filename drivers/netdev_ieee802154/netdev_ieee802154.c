@@ -72,19 +72,19 @@ void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
 }
 
 int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
-                           size_t max_len)
+                          size_t max_len)
 {
     int res = -ENOTSUP;
 
     switch (opt) {
         case NETOPT_ADDRESS:
             assert(max_len >= sizeof(dev->short_addr));
-            memcpy(value, dev->short_addr, sizeof(dev->short_addr));
+            memcpy(value, dev->short_addr.u8, sizeof(dev->short_addr));
             res = sizeof(dev->short_addr);
             break;
         case NETOPT_ADDRESS_LONG:
             assert(max_len >= sizeof(dev->long_addr));
-            memcpy(value, dev->long_addr, sizeof(dev->long_addr));
+            memcpy(value, dev->long_addr.uint8, sizeof(dev->long_addr));
             res = sizeof(dev->long_addr);
             break;
         case NETOPT_ADDR_LEN:
@@ -183,14 +183,14 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
         }
         case NETOPT_ADDRESS:
             assert(len <= sizeof(dev->short_addr));
-            memset(dev->short_addr, 0, sizeof(dev->short_addr));
-            memcpy(dev->short_addr, value, len);
+            memset(dev->short_addr.u8, 0, sizeof(dev->short_addr));
+            memcpy(dev->short_addr.u8, value, len);
             res = sizeof(dev->short_addr);
             break;
         case NETOPT_ADDRESS_LONG:
             assert(len <= sizeof(dev->long_addr));
-            memset(dev->long_addr, 0, sizeof(dev->long_addr));
-            memcpy(dev->long_addr, value, len);
+            memset(dev->long_addr.uint8, 0, sizeof(dev->long_addr));
+            memcpy(dev->long_addr.uint8, value, len);
             res = sizeof(dev->long_addr);
             break;
         case NETOPT_ADDR_LEN:
@@ -269,10 +269,10 @@ int netdev_ieee802154_dst_filter(netdev_ieee802154_t *dev, const uint8_t *mhr)
 
     /* check destination address */
     if (((addr_len == IEEE802154_SHORT_ADDRESS_LEN) &&
-          (memcmp(dev->short_addr, dst_addr, addr_len) == 0 ||
+          (memcmp(dev->short_addr.u8, dst_addr, addr_len) == 0 ||
            memcmp(ieee802154_addr_bcast, dst_addr, addr_len) == 0)) ||
         ((addr_len == IEEE802154_LONG_ADDRESS_LEN) &&
-          (memcmp(dev->long_addr, dst_addr, addr_len) == 0))) {
+          (memcmp(dev->long_addr.uint8, dst_addr, addr_len) == 0))) {
         return 0;
     }
 
