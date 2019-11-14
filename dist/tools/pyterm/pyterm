@@ -274,7 +274,7 @@ class SerCmd(cmd.Cmd):
         """
         self.logger.debug("processing line #%s#" % line)
         if (line.startswith("/")):
-                return "PYTERM_" + line[1:]
+            return "PYTERM_" + line[1:]
         return line
 
     def emptyline(self):

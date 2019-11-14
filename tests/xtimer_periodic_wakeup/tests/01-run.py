@@ -14,11 +14,11 @@ def testfunc(child):
     child.expect_exact("xtimer_periodic_wakeup test application.")
 
     for i in range(256):
-        child.expect(u"Testing interval \d+... \(now=\d+\)")
+        child.expect(r"Testing interval \d+... \(now=\d+\)")
     for i in range(256):
-        child.expect(u" +\d+ diff=\d+")
+        child.expect(r" +\d+ diff=\d+")
 
-    child.expect(u"Min/max error: \d+/\d+")
+    child.expect(r"Min/max error: \d+/\d+")
     child.expect_exact("Test complete.")
 
 
