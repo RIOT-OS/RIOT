@@ -5,25 +5,40 @@ from testrunner import run, test_utils_interactive_sync
 
 
 def expect_unary(child):
-    for _ in range(20):
+    child.expect(r'COUNT: (\d+)')
+    count = int(child.match.group(1))
+    assert count > 0
+    for _ in range(count):
         for op_name in ('abs', 'sq', 'atan', 'exp'):
             child.expect(r'{}\(-?\d+\.\d+\) = -?\d+\.\d+'.format(op_name))
 
-    for _ in range(20):
+    child.expect(r'COUNT: (\d+)')
+    count = int(child.match.group(1))
+    assert count > 0
+    for _ in range(count):
         for op_name in ('sin', 'cos', 'tan'):
             child.expect(r'{}\(-?\d+.\d+\) = -?\d+.\d+'.format(op_name))
 
-    for _ in range(20):
+    child.expect(r'COUNT: (\d+)')
+    count = int(child.match.group(1))
+    assert count > 0
+    for _ in range(count):
         for op_name in ('asin', 'acos'):
             child.expect(r'{}\(-?\d+.\d+\) = -?\d+.\d+'.format(op_name))
 
-    for _ in range(20):
+    child.expect(r'COUNT: (\d+)')
+    count = int(child.match.group(1))
+    assert count > 0
+    for _ in range(count):
         for op_name in ('sqrt', 'log', 'log2', 'slog2'):
             child.expect(r'{}\(-?\d+.\d+\) = -?\d+.\d+'.format(op_name))
 
 
 def expect_binary(child):
-    for _ in range(1500):
+    child.expect(r'COUNT: (\d+)')
+    count = int(child.match.group(1))
+    assert count > 0
+    for _ in range(count):
         for op_name in ('add', 'sub', 'mul', 'div', 'mod', 'sadd', 'ssub',
                         'smul', 'sdiv', 'min', 'max'):
             child.expect(r'{}\(-?\d+.\d+\, -?\d+.\d+\) = -?\d+.\d+'

@@ -29,6 +29,7 @@
  */
 
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "kernel_defines.h"
 #include "fix16.h"
@@ -59,8 +60,20 @@ static void binary_ops(void)
         { "max", fix16_max },
     };
 
-    for (fix16_t a = fix16_from_dbl(-5.0); a < fix16_from_dbl(5.0); a += fix16_from_dbl(0.25)) {
-        for (fix16_t b = fix16_from_dbl(-5.0); b < fix16_from_dbl(5.0); b += fix16_from_dbl(0.25)) {
+#ifdef BOARD_NATIVE
+    fix16_t _min = fix16_from_dbl(-5.0);
+    fix16_t _max = fix16_from_dbl(5.0);
+    fix16_t _step = fix16_from_dbl(0.25);
+#else
+    fix16_t _min = fix16_from_dbl(-2.0);
+    fix16_t _max = fix16_from_dbl(2.0);
+    fix16_t _step = fix16_from_dbl(0.25);
+#endif
+
+    uint16_t _range = (uint16_t)((fix16_to_int(_max) - fix16_to_int(_min)) / fix16_to_dbl(_step));
+    printf("COUNT: %u\n", (unsigned)(_range * (_range - 1)));
+    for (fix16_t a = _min; a < _max; a += _step) {
+        for (fix16_t b = _min; b < _max; b += _step) {
             if (b == 0) {
                 continue;
             }
@@ -95,8 +108,18 @@ static void unary_ops(void)
 
             { "exp", fix16_exp },
         };
-
-        for (fix16_t input = fix16_from_dbl(-10.0); input < fix16_from_dbl(+10.0); input += fix16_from_dbl(0.25)) {
+#ifdef BOARD_NATIVE
+        fix16_t _min = fix16_from_dbl(-10.0);
+        fix16_t _max = fix16_from_dbl(10.0);
+        fix16_t _step = fix16_from_dbl(0.25);
+#else
+        fix16_t _min = fix16_from_dbl(-2.0);
+        fix16_t _max = fix16_from_dbl(2.0);
+        fix16_t _step = fix16_from_dbl(0.25);
+#endif
+        uint8_t _count = (uint8_t)((fix16_to_int(_max) - fix16_to_int(_min)) / fix16_to_dbl(_step));
+        printf("COUNT: %d\n", _count);
+        for (fix16_t input = _min; input < _max; input += _step) {
             for (unsigned o = 0; o < ARRAY_SIZE(ops); ++o) {
                 fix16_t result = ops[o].fun(input);
 
@@ -121,7 +144,16 @@ static void unary_ops(void)
             { "tan", fix16_tan },
         };
 
-        for (fix16_t input = fix16_from_dbl(-M_PI/2); input < fix16_from_dbl(+M_PI/2); input += fix16_from_dbl(0.05)) {
+        fix16_t _min = fix16_from_dbl(-M_PI/2);
+        fix16_t _max = fix16_from_dbl(+M_PI/2);
+#ifdef BOARD_NATIVE
+        fix16_t _step = fix16_from_dbl(0.05);
+#else
+        fix16_t _step = fix16_from_dbl(0.1);
+#endif
+        uint8_t _count = (uint8_t)((fix16_to_dbl(_max) - fix16_to_dbl(_min)) / fix16_to_dbl(_step));
+        printf("COUNT: %d\n", _count);
+        for (fix16_t input = _min; input < _max; input += _step) {
             for (unsigned o = 0; o < ARRAY_SIZE(ops); ++o) {
                 fix16_t result = ops[o].fun(input);
 
@@ -144,7 +176,16 @@ static void unary_ops(void)
             { "acos", fix16_acos },
         };
 
-        for (fix16_t input = fix16_from_dbl(-1.0); input < fix16_from_dbl(+1.0); input += fix16_from_dbl(0.05)) {
+        fix16_t _min = fix16_from_dbl(-1.0);
+        fix16_t _max = fix16_from_dbl(1.0);
+#ifdef BOARD_NATIVE
+        fix16_t _step = fix16_from_dbl(0.05);
+#else
+        fix16_t _step = fix16_from_dbl(0.2);
+#endif
+        uint8_t _count = (uint8_t)((fix16_to_int(_max) - fix16_to_int(_min)) / fix16_to_dbl(_step));
+        printf("COUNT: %d\n", _count);
+        for (fix16_t input = _min; input < _max; input += _step) {
             for (unsigned o = 0; o < ARRAY_SIZE(ops); ++o) {
                 fix16_t result = ops[o].fun(input);
 
@@ -170,7 +211,18 @@ static void unary_ops(void)
             { "slog2", fix16_slog2 },
         };
 
-        for (fix16_t input = fix16_from_dbl(0.05); input < fix16_from_dbl(+10.0); input += fix16_from_dbl(0.25)) {
+#ifdef BOARD_NATIVE
+        fix16_t _min = fix16_from_dbl(0.05);
+        fix16_t _max = fix16_from_dbl(+10.0);
+        fix16_t _step = fix16_from_dbl(0.25);
+#else
+        fix16_t _min = fix16_from_dbl(0.05);
+        fix16_t _max = fix16_from_dbl(+5.0);
+        fix16_t _step = fix16_from_dbl(0.25);
+#endif
+        uint8_t _count = (uint8_t)((fix16_to_int(_max) - fix16_to_int(_min)) / fix16_to_dbl(_step));
+        printf("COUNT: %d\n", _count);
+        for (fix16_t input = _min; input < _max; input += _step) {
             for (unsigned o = 0; o < ARRAY_SIZE(ops); ++o) {
                 fix16_t result = ops[o].fun(input);
 
