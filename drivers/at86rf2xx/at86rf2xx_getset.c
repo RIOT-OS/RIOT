@@ -143,13 +143,13 @@ void at86rf2xx_set_addr_short(at86rf2xx_t *dev, const network_uint16_t *addr)
 #ifdef MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
-    dev->netdev.short_addr[0] &= 0x7F;
+    dev->netdev.short_addr.u8[0] &= 0x7F;
 #endif
     /* device use lsb first, not network byte order */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_0,
-                        dev->netdev.short_addr[1]);
+                        dev->netdev.short_addr.u8[1]);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_1,
-                        dev->netdev.short_addr[0]);
+                        dev->netdev.short_addr.u8[0]);
 }
 
 void at86rf2xx_get_addr_long(const at86rf2xx_t *dev, eui64_t *addr)
@@ -403,7 +403,7 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                 DEBUG("[at86rf2xx] opt: enabling CSMA mode" \
                       "(4 retries, min BE: 3 max BE: 5)\n");
                 /* Initialize CSMA seed with hardware address */
-                at86rf2xx_set_csma_seed(dev, dev->netdev.long_addr);
+                at86rf2xx_set_csma_seed(dev, dev->netdev.long_addr.uint8);
                 at86rf2xx_set_csma_max_retries(dev, 4);
                 at86rf2xx_set_csma_backoff_exp(dev, 3, 5);
             }
