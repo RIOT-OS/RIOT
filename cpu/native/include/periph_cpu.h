@@ -99,9 +99,6 @@ typedef enum {
 #ifndef EEPROM_SIZE
 #define EEPROM_SIZE             (1024U)  /* 1kB */
 #endif
-#ifndef EEPROM_FILE
-#define EEPROM_FILE             "/tmp/riot_native.eeprom"
-#endif
 /** @} */
 
 #ifdef __cplusplus
