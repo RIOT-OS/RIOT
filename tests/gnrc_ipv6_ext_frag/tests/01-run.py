@@ -61,7 +61,7 @@ def stop_udp_server(child):
 def udp_send(child, addr, port, length, num=1, delay=1000000):
     child.sendline("udp send {addr}%6 {port} {length} {num} {delay}"
                    .format(**vars()))
-    child.expect("Success: send {length} byte to \[[0-9a-f:]+\]:{port}"
+    child.expect(r"Success: send {length} byte to \[[0-9a-f:]+\]:{port}"
                  .format(**vars()))
 
 
@@ -125,13 +125,13 @@ def test_reass_successful_udp(child, iface, hw_dst, ll_dst, ll_src):
         s.sendto(bytes(i for i in range(byte_max)) * (payload_len // byte_max),
                  (ll_dst, port))
         child.expect(
-                "~~ SNIP  0 - size: {} byte, type: NETTYPE_UNDEF \(\d+\)"
+                r"~~ SNIP  0 - size: {} byte, type: NETTYPE_UNDEF \(\d+\)"
                 .format(payload_len)
             )
         # 4 snips: payload, UDP header, IPv6 header, netif header
         # (fragmentation header was removed)
         child.expect(
-                "~~ PKT    -  4 snips, total size: (\d+) byte"
+                r"~~ PKT    -  4 snips, total size: (\d+) byte"
             )
         size = int(child.match.group(1))
         # 40 = IPv6 header length; 8 = UDP header length

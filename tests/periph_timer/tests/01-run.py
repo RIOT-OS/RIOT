@@ -11,7 +11,7 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect('Available timers: (\d+)')
+    child.expect(r'Available timers: (\d+)')
     timers_num = int(child.match.group(1))
     for timer in range(timers_num):
         child.expect_exact('Testing TIMER_{}'.format(timer))

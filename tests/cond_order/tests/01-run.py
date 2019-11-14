@@ -26,20 +26,20 @@ def testfunc(child):
     test_utils_interactive_sync(child)
 
     for k in thread_prio.keys():
-        child.expect(u"T%i \(prio %i\): waiting on condition variable now" % (k, thread_prio[k]))
-
+        child.expect_exact("T{} (prio {}): waiting on condition variable now"
+                           .format(k, thread_prio[k]))
     count = 0
     last = -1
-    child.expect(u"First batch was signaled")
+    child.expect_exact("First batch was signaled")
     for _ in range(len(thread_prio)):
-        child.expect(u"T\d+ \(prio (\d+)\): condition variable was signaled now")
+        child.expect(r"T\d+ \(prio (\d+)\): condition variable was signaled now")
         assert(int(child.match.group(1)) > last)
         last = int(child.match.group(1))
         count += 1
         if count == 3:
-            child.expect(u"First batch has woken up")
-            child.expect(u"Second batch was signaled")
-    child.expect(u"Second batch has woken up")
+            child.expect_exact("First batch has woken up")
+            child.expect_exact("Second batch was signaled")
+    child.expect_exact("Second batch has woken up")
 
 
 if __name__ == "__main__":

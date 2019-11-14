@@ -27,7 +27,7 @@ def get_reset_time(child):
         start = time.time()
         timeout = 10  # seconds
         while time.time() < start + timeout:
-            child.expect(u"reset time: (\d+) us", timeout=1)
+            child.expect(r"reset time: (\d+) us", timeout=1)
             reset_time = int(child.match.group(1))
         else:
             # timeout
@@ -38,7 +38,7 @@ def get_reset_time(child):
 
 def testfunc(child):
     child.sendline("range")
-    child.expect(u"lower_bound: (\d+) upper_bound: (\d+) ",
+    child.expect(r"lower_bound: (\d+) upper_bound: (\d+)",
                  timeout=1)
     wdt_lower_bound = int(child.match.group(1))
     wdt_upper_bound = int(child.match.group(2))
@@ -49,7 +49,7 @@ def testfunc(child):
             child.expect_exact("invalid time, see \"range\"", timeout=1)
         else:
             child.sendline("startloop")
-            child.expect(u"start time: (\d+) us", timeout=1)
+            child.expect(r"start time: (\d+) us", timeout=1)
             start_time_us = int(child.match.group(1))
             reset_time_us = get_reset_time(child)
             wdt_reset_time = (reset_time_us - start_time_us) / 1e3
