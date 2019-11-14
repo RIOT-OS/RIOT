@@ -16,6 +16,8 @@ BOARDS_TIMER_32kHz := \
     hifive1 \
     hifive1b \
     %-kw41z \
+    frdm-k64f \
+    frdm-k22f \
     #
 
 ifneq (,$(filter $(BOARDS_TIMER_25kHz),$(BOARD)))
