@@ -51,8 +51,8 @@ netdev_ieee802154_t nrf802154_dev = {
 #endif
 #endif
     .pan = IEEE802154_DEFAULT_PANID,
-    .short_addr = { 0, 0 },
-    .long_addr = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .short_addr = { .u8 = { 0, 0 } },
+    .long_addr = { .uint8 = { 0, 0, 0, 0, 0, 0, 0, 0 } },
     .chan = IEEE802154_DEFAULT_CHANNEL,
     .flags = 0
 };
@@ -236,8 +236,8 @@ static int _init(netdev_t *dev)
     NRF_RADIO->MODECNF0 |= RADIO_MODECNF0_RU_Msk;
 
     /* assign default addresses */
-    luid_get(nrf802154_dev.long_addr, IEEE802154_LONG_ADDRESS_LEN);
-    memcpy(nrf802154_dev.short_addr, &nrf802154_dev.long_addr[6],
+    luid_get_eui64(&nrf802154_dev.long_addr);
+    memcpy(nrf802154_dev.short_addr.u8, &nrf802154_dev.long_addr.uint8[6],
            IEEE802154_SHORT_ADDRESS_LEN);
 
     /* set default channel */
