@@ -19,7 +19,7 @@ HW_TIMEOUT = 300
 def testfunc(child):
     board = os.environ['BOARD']
     # Increase timeout on "real" hardware
-    timeout = HW_TIMEOUT if board is not 'native' else -1
+    timeout = HW_TIMEOUT if board != 'native' else -1
     child.expect(r'OK \(\d+ tests\)', timeout=timeout)
 
 

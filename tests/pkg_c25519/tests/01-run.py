@@ -15,7 +15,7 @@ def testfunc(child):
     board = os.environ['BOARD']
     # Increase timeout on "real" hardware
     # 170 seconds on `arduino-mega2560`
-    timeout = 200 if board is not 'native' else -1
+    timeout = 200 if board != 'native' else -1
     child.expect(r"OK \(2 tests\)", timeout=timeout)
 
 
