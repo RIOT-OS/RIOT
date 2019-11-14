@@ -54,7 +54,7 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, 0x00);
 #else
     /* initialize device descriptor */
-    dev->params = *params;
+    dev->params = params;
 #endif
 }
 

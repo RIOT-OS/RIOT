@@ -29,12 +29,12 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 
-#define SPIDEV          (dev->params.spi)
-#define CSPIN           (dev->params.cs_pin)
+#define SPIDEV          (dev->params->spi)
+#define CSPIN           (dev->params->cs_pin)
 
 static inline void getbus(const at86rf2xx_t *dev)
 {
-    spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params.spi_clk);
+    spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params->spi_clk);
 }
 
 void at86rf2xx_reg_write(const at86rf2xx_t *dev, uint8_t addr, uint8_t value)
@@ -125,7 +125,7 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev)
          * to the TRX_OFF state */
         *AT86RF2XX_REG__TRXPR &= ~(AT86RF2XX_TRXPR_SLPTR);
 #else
-        gpio_clear(dev->params.sleep_pin);
+        gpio_clear(dev->params->sleep_pin);
 #endif
         xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
 
@@ -148,9 +148,9 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
     /* set reset Bit */
     *(AT86RF2XX_REG__TRXPR) |= AT86RF2XX_TRXPR_TRXRST;
 #else
-    gpio_clear(dev->params.reset_pin);
+    gpio_clear(dev->params->reset_pin);
     xtimer_usleep(AT86RF2XX_RESET_PULSE_WIDTH);
-    gpio_set(dev->params.reset_pin);
+    gpio_set(dev->params->reset_pin);
 #endif
     xtimer_usleep(AT86RF2XX_RESET_DELAY);
 

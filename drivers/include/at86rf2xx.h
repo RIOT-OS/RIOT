@@ -244,7 +244,7 @@ typedef struct {
     uint8_t irq_status;                     /**< save irq status */
 #else
     /* device specific fields */
-    at86rf2xx_params_t params;              /**< parameters for initialization */
+    const at86rf2xx_params_t *params;       /**< parameters for initialization */
 #endif
     uint16_t flags;                         /**< Device specific flags */
     uint8_t state;                          /**< current state of the radio */

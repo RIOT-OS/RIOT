@@ -81,21 +81,21 @@ static int _init(netdev_t *netdev)
     at86rfmega_dev = netdev;
 #else
     /* initialize GPIOs */
-    spi_init_cs(dev->params.spi, dev->params.cs_pin);
-    gpio_init(dev->params.sleep_pin, GPIO_OUT);
-    gpio_clear(dev->params.sleep_pin);
-    gpio_init(dev->params.reset_pin, GPIO_OUT);
-    gpio_set(dev->params.reset_pin);
-    gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
+    spi_init_cs(dev->params->spi, dev->params->cs_pin);
+    gpio_init(dev->params->sleep_pin, GPIO_OUT);
+    gpio_clear(dev->params->sleep_pin);
+    gpio_init(dev->params->reset_pin, GPIO_OUT);
+    gpio_set(dev->params->reset_pin);
+    gpio_init_int(dev->params->int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
 
     /* Intentionally check if bus can be acquired,
        since getbus() drops the return value */
-    if (spi_acquire(dev->params.spi, dev->params.cs_pin, SPI_MODE_0,
-                                                dev->params.spi_clk) < 0) {
+    if (spi_acquire(dev->params->spi, dev->params->cs_pin, SPI_MODE_0,
+                                                dev->params->spi_clk) < 0) {
         DEBUG("[at86rf2xx] error: unable to acquire SPI bus\n");
         return -EIO;
     }
-    spi_release(dev->params.spi);
+    spi_release(dev->params->spi);
 #endif
 
     /* test if the device is responding */

@@ -528,7 +528,7 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
             /* Setting SLPTR bit brings radio transceiver to sleep in in TRX_OFF*/
             *AT86RF2XX_REG__TRXPR |= (AT86RF2XX_TRXPR_SLPTR);
 #else
-            gpio_set(dev->params.sleep_pin);
+            gpio_set(dev->params->sleep_pin);
 #endif
             dev->state = state;
         }
