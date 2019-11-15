@@ -29,6 +29,8 @@
  * @}
  */
 
+#include <stdint.h>
+#include <stdatomic.h>
 #include <stdio.h>
 
 #include "bitarithm.h"
@@ -38,22 +40,21 @@
 #define TIMEOUT (TIMEOUT_S * US_PER_SEC)
 #define PER_ITERATION (4)
 
-static void callback(void *done_)
+static atomic_bool done;
+
+static void callback(void *unused)
 {
-    volatile int *done = done_;
-    *done = 1;
+    (void)unused;
+    atomic_store(&done, true);
 }
 
 static void run_test(const char *name, unsigned (*test)(unsigned))
 {
-    volatile int done = 0;
     unsigned i = 0;
     unsigned long count = 0;
+    atomic_store(&done, false);
 
-    xtimer_t xtimer;
-    xtimer.callback = callback;
-    xtimer.arg = (void *) &done;
-
+    xtimer_t xtimer = { .callback = callback };
     xtimer_set(&xtimer, TIMEOUT);
 
     do {
@@ -78,7 +79,7 @@ static void run_test(const char *name, unsigned (*test)(unsigned))
         }
 
         ++count;
-    } while (done == 0);
+    } while (atomic_load(&done) == false);
 
     printf("+ %s: %lu iterations per second\r\n", name, (4*PER_ITERATION) * count / TIMEOUT_S);
 }
