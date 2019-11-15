@@ -1042,6 +1042,20 @@ static void test_ipv6_addr_split_iface__with_iface(void)
     TEST_ASSERT_EQUAL_INT(*(iface - 1), '\0');
 }
 
+static void test_ipv6_addr_split_prefix__no_prefix(void)
+{
+    char a[] = "fd00:dead:beef::1";
+    TEST_ASSERT_EQUAL_INT(ipv6_addr_split_prefix(a), 128);
+}
+
+static void test_ipv6_addr_split_prefix__with_prefix(void)
+{
+    char a[] = "fd00:dead:beef::1/64";
+    TEST_ASSERT_EQUAL_INT(ipv6_addr_split_prefix(a), 64);
+    /* check that the separator has been replaced with '\0' */
+    TEST_ASSERT_EQUAL_INT(strcmp("fd00:dead:beef::1", a), 0);
+}
+
 Test *tests_ipv6_addr_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -1132,6 +1146,8 @@ Test *tests_ipv6_addr_tests(void)
         new_TestFixture(test_ipv6_addr_from_str__success6),
         new_TestFixture(test_ipv6_addr_split_iface__no_iface),
         new_TestFixture(test_ipv6_addr_split_iface__with_iface),
+        new_TestFixture(test_ipv6_addr_split_prefix__no_prefix),
+        new_TestFixture(test_ipv6_addr_split_prefix__with_prefix),
     };
 
     EMB_UNIT_TESTCALLER(ipv6_addr_tests, NULL, NULL, fixtures);
