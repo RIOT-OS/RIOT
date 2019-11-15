@@ -37,6 +37,7 @@
 
 #include "list.h"
 #include "net/netopt.h"
+#include "net/netbuf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,6 +58,21 @@ extern "C" {
 typedef struct {
     list_node_t node;  /**< Pointer to the next interface */
 } netif_t;
+
+typedef struct {
+    iolist_t msdu;
+    netbuf_ctx_t *ctx;
+    uint8_t *src_l2addr;
+    uint8_t *dst_l2addr;
+    int16_t rssi;
+    uint8_t lqi;
+    uint8_t src_l2addr_len;
+    uint8_t dst_l2addr_len;
+    uint8_t flags;
+} netif_pkt_t;
+
+
+int netif_recv(netif_t *netif, netif_pkt_t *pkt);
 
 /**
  * @brief   Iterator for the interfaces

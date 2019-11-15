@@ -21,6 +21,7 @@
 #define NET_NETBUF_H
 
 #include <stdbool.h>
+#include "iolist.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +30,7 @@ extern "C" {
 /**
  * @brief Netbuf descriptor
  */
-typedef void netbuf_t;
+typedef void netbuf_ctx_t;
 
 /**
  * @brief   Allocate a network buffer with a given size.
@@ -41,22 +42,7 @@ typedef void netbuf_t;
  * @return          pointer to the netbuf with the allocated buffer.
  * @return          NULL if there's not enough memory for allocation.
  */
-netbuf_t *netbuf_alloc(size_t size);
-
-/**
- * @brief   Get the @ref iolist_t representation of the network buffer.
- *
- * @pre     @p netbuf not NULL.
- * @pre     @p iol not NULL.
- *
- * @note    Supposed to be implemented by the networking module.
- *
- * @param[in]       netbuf  pointer to the netbuf.
- * @param[out]      iol     iolist representation of the netbuf.
- *
- * @return          @ref iolist_t representation on @p iol.
- */
-void netbuf_get_iolist(netbuf_t *netbuf, iolist_t *iol);
+netbuf_ctx_t *netbuf_alloc(size_t size, void **buf);
 
 /**
  * @brief Free the resources of a network buffer
@@ -65,7 +51,7 @@ void netbuf_get_iolist(netbuf_t *netbuf, iolist_t *iol);
  *
  * @param[in]       netbuf  pointer to the netbuf descriptor.
  */
-void netbuf_free(netbuf_t *netbuf);
+void netbuf_free(netbuf_ctx_t *ctx);
 
 #ifdef __cplusplus
 }

@@ -33,6 +33,7 @@
 #include "sched.h"
 #include "xtimer.h"
 
+#include "net/netbuf.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/internal.h"
 
@@ -45,6 +46,22 @@ static void _update_l2addr_from_dev(gnrc_netif_t *netif);
 static void _configure_netdev(netdev_t *dev);
 static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
+
+netbuf_ctx_t *netbuf_alloc(size_t size, void **buf)
+{
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, size, GNRC_NETTYPE_UNDEF);
+
+    if(pkt) {
+        *buf = pkt->data;
+    }
+
+    return pkt;
+}
+
+void netbuf_free(netbuf_ctx_t *netbuf)
+{
+    gnrc_pktbuf_release(netbuf);
+}
 
 gnrc_netif_t *gnrc_netif_create(char *stack, int stacksize, char priority,
                                 const char *name, netdev_t *netdev,
@@ -1332,6 +1349,7 @@ void gnrc_netif_default_init(gnrc_netif_t *netif)
 #endif
 }
 
+extern int gnrc_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static void *_gnrc_netif_thread(void *args)
 {
     gnrc_netapi_opt_t *opt;
@@ -1388,7 +1406,7 @@ static void *_gnrc_netif_thread(void *args)
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
-                res = netif->ops->send(netif, msg.content.ptr);
+                res = gnrc_netif_send(netif, msg.content.ptr);
                 if (res < 0) {
                     DEBUG("gnrc_netif: error sending packet %p (code: %i)\n",
                           msg.content.ptr, res);

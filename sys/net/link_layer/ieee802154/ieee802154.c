@@ -17,7 +17,12 @@
 #include <errno.h>
 #include <string.h>
 
+#include "net/netbuf.h"
+
 #include "net/ieee802154.h"
+#include "net/netdev/ieee802154.h"
+
+#include "net/gnrc/netif.h"
 
 const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN] = IEEE802154_ADDR_BCAST;
 

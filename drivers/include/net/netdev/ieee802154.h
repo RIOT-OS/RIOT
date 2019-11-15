@@ -194,6 +194,31 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
  */
 int netdev_ieee802154_dst_filter(netdev_ieee802154_t *dev, const uint8_t *mhr);
 
+typedef struct {
+    uint8_t *psdu;
+    size_t psdu_len;
+    uint8_t lqi;
+    int16_t rssi;
+    void *ctx;
+} ieee802154_phy_ind_t;
+
+typedef struct {
+    iolist_t msdu;
+    uint8_t *src;
+    size_t src_len;
+    uint8_t *dst;
+    size_t dst_len;
+    uint8_t frame_pending;
+} ieee802154_mac_ind_t;
+
+void ieee802154_rf_rx_done(netdev_t *netdev);
+void ieee802154_mac_recv(netdev_ieee802154_t *dev, ieee802154_phy_ind_t *ind);
+void ieee802154_mac_ind(netdev_ieee802154_t *netdev, ieee802154_mac_ind_t *ind, ieee802154_phy_ind_t *phy_ind);
+void ieee802154_phy_ind(netdev_t *netdev, ieee802154_phy_ind_t *ind);
+int ieee802154_mac_send(netdev_ieee802154_t *netdev, iolist_t *msdu, int frame_pending,
+        uint8_t *src, size_t src_len, uint8_t *dst, size_t dst_len);
+
+
 #ifdef __cplusplus
 }
 #endif

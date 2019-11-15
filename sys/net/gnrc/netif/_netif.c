@@ -18,10 +18,50 @@
 #include <string.h>
 
 #include "fmt.h"
+#include "net/gnrc.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif/internal.h"
 
 #include "net/netif.h"
+
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
+int netif_recv(netif_t *netif, netif_pkt_t *pkt)
+{
+    gnrc_pktsnip_t *gnrc_pkt = pkt->ctx;
+    gnrc_netif_t *gnrc_netif = (gnrc_netif_t*) netif;
+    netdev_t *dev = gnrc_netif->dev;
+
+    gnrc_pktsnip_t *netif_snip = gnrc_netif_hdr_build(pkt->src_l2addr, pkt->src_l2addr_len, pkt->dst_l2addr, pkt->dst_l2addr_len);
+
+    if (netif_snip == NULL) {
+        DEBUG("_recv_ieee802154: no space left in packet buffer\n");
+        gnrc_pktbuf_release(gnrc_pkt);
+        return 0;
+    }
+
+    gnrc_pktsnip_t *ieee802154_hdr = gnrc_pktbuf_mark(gnrc_pkt, ((uint8_t*) pkt->msdu.iol_base) - ((uint8_t*) gnrc_pkt->data), GNRC_NETTYPE_UNDEF);
+
+    gnrc_pktbuf_remove_snip(gnrc_pkt, ieee802154_hdr);
+    gnrc_pktbuf_realloc_data(gnrc_pkt, pkt->msdu.iol_len);
+    gnrc_netif_hdr_t *hdr = netif_snip->data;
+    hdr->lqi = pkt->lqi;
+    hdr->rssi = pkt->rssi;
+    gnrc_netif_hdr_set_netif(hdr, (gnrc_netif_t*) netif);
+    dev->driver->get(dev, NETOPT_PROTO, &gnrc_pkt->type, sizeof(gnrc_pkt->type));
+
+    hdr->flags |= pkt->flags;
+
+    LL_APPEND(gnrc_pkt, netif_snip);
+
+    if (!gnrc_netapi_dispatch_receive(gnrc_pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pkt))
+    {
+        return 0;
+    }
+
+    return 1;
+}
 
 int netif_get_name(netif_t *iface, char *name)
 {
