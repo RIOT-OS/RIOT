@@ -4,8 +4,8 @@ export TARGET_ARCH ?= riscv-none-embed
 # define build specific options
 CFLAGS_CPU   = -march=rv32imac -mabi=ilp32 -mcmodel=medlow -msmall-data-limit=8
 CFLAGS_LINK  = -nostartfiles -ffunction-sections -fdata-sections
-CFLAGS_DBG  ?= -g3 -Og
-#CFLAGS_OPT  ?= -Os
+CFLAGS_DBG  ?= -g3
+CFLAGS_OPT  ?= -Os
 
 export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
 export LINKER_SCRIPT ?= $(CPU_MODEL).ld
