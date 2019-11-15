@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Fundacion Inria Chile
+ * Copyright (C) 2019 UC Berkeley
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  *
  * @author      Jose Ignacio Alamos <jialamos@uc.cl>
  * @author      Baptiste Clenet <bapclenet@gmail.com>
+ * @author      Hyung-Sin Kim <hs.kim@berkeley.edu>
  * @}
  */
 
@@ -25,6 +27,7 @@
 #include "openthread/instance.h"
 #include "openthread/ip6.h"
 #include "openthread/platform/alarm-milli.h"
+#include "openthread/platform/alarm-micro.h"
 #include "openthread/platform/uart.h"
 #include "openthread/tasklet.h"
 #include "openthread/thread.h"
@@ -39,6 +42,7 @@ static msg_t _queue[OPENTHREAD_QUEUE_LEN];
 
 static kernel_pid_t _pid;
 static otInstance *sInstance;
+static bool otTaskPending = false;
 
 uint8_t ot_call_command(char* command, void *arg, void* answer) {
     ot_job_t job;
@@ -57,6 +61,12 @@ uint8_t ot_call_command(char* command, void *arg, void* answer) {
 /* OpenThread will call this when switching state from empty tasklet to non-empty tasklet. */
 void otTaskletsSignalPending(otInstance *aInstance) {
     (void) aInstance;
+    if (thread_getpid() != _pid && !otTaskPending) {
+        otTaskPending = true;
+        msg_t msg;
+        msg.type = OPENTHREAD_TASK_MSG_TYPE_EVENT;
+        msg_send(&msg, _pid);
+    }
 }
 
 static void *_openthread_event_loop(void *arg) {
@@ -93,33 +103,42 @@ static void *_openthread_event_loop(void *arg) {
 
     ot_job_t *job;
     while (1) {
-        otTaskletsProcess(sInstance);
-        if (otTaskletsArePending(sInstance) == false) {
-            msg_receive(&msg);
-            switch (msg.type) {
-                case OPENTHREAD_XTIMER_MSG_TYPE_EVENT:
-                    /* Tell OpenThread a time event was received */
-                    otPlatAlarmMilliFired(sInstance);
-                    break;
-                case OPENTHREAD_NETDEV_MSG_TYPE_EVENT:
-                    /* Received an event from driver */
-                    dev = msg.content.ptr;
-                    dev->driver->isr(dev);
-                    break;
+        while (otTaskletsArePending(sInstance)) {
+            otTaskletsProcess(sInstance);
+        }
+
+        msg_receive(&msg);
+        switch (msg.type) {
+            case OPENTHREAD_TASK_MSG_TYPE_EVENT:
+                /* Process OpenThread tasks */
+                otTaskPending = false;
+                break;
+            case OPENTHREAD_MILLITIMER_MSG_TYPE_EVENT:
+                /* Tell OpenThread a millisec time event was received */
+                otPlatAlarmMilliFired(sInstance);
+                break;
+            case OPENTHREAD_MICROTIMER_MSG_TYPE_EVENT:
+                /* Tell OpenThread a microsec time event was received */
+                otPlatAlarmMicroFired(sInstance);
+                break;
+            case OPENTHREAD_NETDEV_MSG_TYPE_EVENT:
+                /* Received an event from driver */
+                dev = msg.content.ptr;
+                dev->driver->isr(dev);
+                break;
 #ifdef MODULE_OPENTHREAD_CLI
-                case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
-                    /* Tell OpenThread about the reception of a CLI command */
-                    serialBuffer = (serial_msg_t*)msg.content.ptr;
-                    otPlatUartReceived((uint8_t*) serialBuffer->buf,serialBuffer->length);
-                    serialBuffer->serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
-                    break;
+            case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
+                /* Tell OpenThread about the reception of a CLI command */
+                serialBuffer = (serial_msg_t*)msg.content.ptr;
+                otPlatUartReceived((uint8_t*) serialBuffer->buf,serialBuffer->length);
+                serialBuffer->serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
+                break;
 #endif
-                case OPENTHREAD_JOB_MSG_TYPE_EVENT:
-                    job = msg.content.ptr;
-                    reply.content.value = ot_exec_command(sInstance, job->command, job->arg, job->answer);
-                    msg_reply(&msg, &reply);
-                    break;
-            }
+            case OPENTHREAD_JOB_MSG_TYPE_EVENT:
+                job = msg.content.ptr;
+                reply.content.value = ot_exec_command(sInstance, job->command, job->arg, job->answer);
+                msg_reply(&msg, &reply);
+                break;
         }
     }
 
@@ -147,10 +166,11 @@ static void _event_cb(netdev_t *dev, netdev_event_t event) {
             recv_pkt(sInstance, dev);
             break;
         case NETDEV_EVENT_TX_COMPLETE:
+        case NETDEV_EVENT_TX_COMPLETE_DATA_PENDING:
         case NETDEV_EVENT_TX_NOACK:
         case NETDEV_EVENT_TX_MEDIUM_BUSY:
             DEBUG("openthread_netdev: Transmission of a packet\n");
-            send_pkt(sInstance, dev, event);
+            sent_pkt(sInstance, dev, event);
             break;
         default:
             break;

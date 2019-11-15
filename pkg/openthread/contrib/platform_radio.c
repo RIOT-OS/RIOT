@@ -13,6 +13,7 @@
  * @brief       Implementation of OpenThread radio platform abstraction
  *
  * @author      Jose Ignacio Alamos <jialamos@uc.cl>
+ * @author      Hyung-Sin Kim <hs.kim@berkeley.edu>
  * @}
  */
 
@@ -35,10 +36,16 @@
 #include "debug.h"
 
 #define RADIO_IEEE802154_FCS_LEN    (2U)
+#define IEEE802154_ACK_LENGTH       (5U)
+#define IEEE802154_DSN_OFFSET       (2U)
 
 static otRadioFrame sTransmitFrame;
 static otRadioFrame sReceiveFrame;
+static otRadioFrame sAckFrame;
 static int8_t Rssi;
+
+static uint8_t short_address_list_num = 0;
+static uint8_t ext_address_list_num = 0;
 
 static netdev_t *_dev;
 
@@ -126,12 +133,14 @@ static void _set_idle(void)
 }
 
 /* init framebuffers and initial state */
-void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb)
+void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb, uint8_t *ab)
 {
     sTransmitFrame.mPsdu = tb;
     sTransmitFrame.mLength = 0;
     sReceiveFrame.mPsdu = rb;
     sReceiveFrame.mLength = 0;
+    sAckFrame.mPsdu = ab;
+    sAckFrame.mLength = IEEE802154_ACK_LENGTH;
     _dev = dev;
 }
 
@@ -150,16 +159,17 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev)
         return;
     }
 
+    /* Read received frame */
+    int res = dev->driver->recv(dev, (char *) sReceiveFrame.mPsdu, len, &rx_info);
+    /* Get RSSI from a radio driver. RSSI should be in [dBm] */
+    Rssi = (int8_t)rx_info.rssi;
+
     /* Fill OpenThread receive frame */
     /* Openthread needs a packet length with FCS included,
      * OpenThread do not use the data so we don't need to calculate FCS */
     sReceiveFrame.mLength = len + RADIO_IEEE802154_FCS_LEN;
+    sReceiveFrame.mInfo.mRxInfo.mRssi = Rssi;
 
-    /* Read received frame */
-    int res = dev->driver->recv(dev, (char *) sReceiveFrame.mPsdu, len, &rx_info);
-
-    /* Get RSSI from a radio driver. RSSI should be in [dBm] */
-    Rssi = (int8_t)rx_info.rssi;
     if (ENABLE_DEBUG) {
         DEBUG("Received message: len %d\n", (int) sReceiveFrame.mLength);
         for (int i = 0; i < sReceiveFrame.mLength; ++i) {
@@ -172,8 +182,21 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev)
     otPlatRadioReceiveDone(aInstance, res > 0 ? &sReceiveFrame : NULL, res > 0 ? OT_ERROR_NONE : OT_ERROR_ABORT);
 }
 
+/* create a fake ACK frame: currently does not directly provide a received ACK */
+static inline void _create_fake_ack_frame(bool ackPending)
+{
+    sAckFrame.mPsdu[0] = IEEE802154_FCF_TYPE_ACK;
+    if (ackPending) {
+        sAckFrame.mPsdu[0] |= IEEE802154_FCF_FRAME_PEND;
+    }
+    sAckFrame.mPsdu[1] = 0;
+    sAckFrame.mPsdu[2] = sTransmitFrame.mPsdu[IEEE802154_DSN_OFFSET];
+
+    sAckFrame.mInfo.mRxInfo.mRssi = OT_RADIO_RSSI_INVALID;
+}
+
 /* Called upon TX event */
-void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event)
+void sent_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event)
 {
     (void)dev;
 
@@ -181,11 +204,13 @@ void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event)
     switch (event) {
         case NETDEV_EVENT_TX_COMPLETE:
             DEBUG("openthread: NETDEV_EVENT_TX_COMPLETE\n");
-            otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_NONE);
+            _create_fake_ack_frame(false);
+            otPlatRadioTxDone(aInstance, &sTransmitFrame, &sAckFrame, OT_ERROR_NONE);
             break;
         case NETDEV_EVENT_TX_COMPLETE_DATA_PENDING:
             DEBUG("openthread: NETDEV_EVENT_TX_COMPLETE_DATA_PENDING\n");
-            otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_NONE);
+            _create_fake_ack_frame(true);
+            otPlatRadioTxDone(aInstance, &sTransmitFrame, &sAckFrame, OT_ERROR_NONE);
             break;
         case NETDEV_EVENT_TX_NOACK:
             DEBUG("openthread: NETDEV_EVENT_TX_NOACK\n");
@@ -213,9 +238,9 @@ void otPlatRadioSetExtendedAddress(otInstance *aInstance, const otExtAddress *aE
 {
     (void)aInstance;
     DEBUG("openthread: otPlatRadioSetExtendedAddress\n");
-    char reversed_addr[IEEE802154_LONG_ADDRESS_LEN];
+    uint8_t reversed_addr[IEEE802154_LONG_ADDRESS_LEN];
     for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
-        reversed_addr[i] = (uint8_t) ((uint8_t *)aExtAddress)[IEEE802154_LONG_ADDRESS_LEN - 1 - i];
+        reversed_addr[i] = aExtAddress->m8[IEEE802154_LONG_ADDRESS_LEN - 1 - i];
     }
     if (ENABLE_DEBUG) {
         for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; ++i) {
@@ -223,7 +248,7 @@ void otPlatRadioSetExtendedAddress(otInstance *aInstance, const otExtAddress *aE
         }
         DEBUG("\n");
     }
-    _set_long_addr((uint8_t*) reversed_addr);
+    _set_long_addr(reversed_addr);
 }
 
 /* OpenThread will call this for setting short address */
@@ -406,6 +431,9 @@ otError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, const uint16_t a
     DEBUG("otPlatRadioAddSrcMatchShortEntry\n");
     (void)aInstance;
     (void)aShortAddress;
+    bool pending = true;
+    short_address_list_num++;
+    _dev->driver->set(_dev, NETOPT_ACK_PENDING, &pending, sizeof(bool));
     return OT_ERROR_NONE;
 }
 
@@ -414,6 +442,9 @@ otError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const otExtAddress
     DEBUG("otPlatRadioAddSrcMatchExtEntry\n");
     (void)aInstance;
     (void)aExtAddress;
+    bool pending = true;
+    ext_address_list_num++;
+    _dev->driver->set(_dev, NETOPT_ACK_PENDING, &pending, sizeof(bool));
     return OT_ERROR_NONE;
 }
 
@@ -422,6 +453,11 @@ otError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, const uint16_t
     DEBUG("otPlatRadioClearSrcMatchShortEntry\n");
     (void)aInstance;
     (void)aShortAddress;
+    short_address_list_num--;
+    if (ext_address_list_num == 0 && short_address_list_num == 0) {
+        bool pending = false;
+        _dev->driver->set(_dev, NETOPT_ACK_PENDING, &pending, sizeof(bool));
+    }
     return OT_ERROR_NONE;
 }
 
@@ -430,6 +466,11 @@ otError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const otExtAddre
     DEBUG("otPlatRadioClearSrcMatchExtEntry\n");
     (void)aInstance;
     (void)aExtAddress;
+    ext_address_list_num--;
+    if (ext_address_list_num == 0 && short_address_list_num == 0) {
+        bool pending = false;
+        _dev->driver->set(_dev, NETOPT_ACK_PENDING, &pending, sizeof(bool));
+    }
     return OT_ERROR_NONE;
 }
 
@@ -437,12 +478,22 @@ void otPlatRadioClearSrcMatchShortEntries(otInstance *aInstance)
 {
     DEBUG("otPlatRadioClearSrcMatchShortEntries\n");
     (void)aInstance;
+    short_address_list_num = 0;
+    if (ext_address_list_num == 0) {
+        bool pending = false;
+        _dev->driver->set(_dev, NETOPT_ACK_PENDING, &pending, sizeof(bool));
+    }
 }
 
 void otPlatRadioClearSrcMatchExtEntries(otInstance *aInstance)
 {
     DEBUG("otPlatRadioClearSrcMatchExtEntries\n");
     (void)aInstance;
+    ext_address_list_num = 0;
+    if (short_address_list_num == 0) {
+        bool pending = false;
+        _dev->driver->set(_dev, NETOPT_ACK_PENDING, &pending, sizeof(bool));
+    }
 }
 
 otError otPlatRadioEnergyScan(otInstance *aInstance, uint8_t aScanChannel, uint16_t aScanDuration)

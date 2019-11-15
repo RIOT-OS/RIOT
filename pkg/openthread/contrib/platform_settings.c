@@ -17,7 +17,6 @@
  */
 
 #include "assert.h"
-#include "openthread/error.h"
 #include "openthread/instance.h"
 
 #define ENABLE_DEBUG (0)

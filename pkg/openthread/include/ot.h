@@ -40,15 +40,18 @@ extern "C" {
  * @{
  */
 /** @brief   xtimer message receiver event */
-#define OPENTHREAD_XTIMER_MSG_TYPE_EVENT                    (0x2235)
+#define OPENTHREAD_MILLITIMER_MSG_TYPE_EVENT                    (0x2235)
+#define OPENTHREAD_MICROTIMER_MSG_TYPE_EVENT                    (0x2236)
 /** @brief   message received from driver */
-#define OPENTHREAD_NETDEV_MSG_TYPE_EVENT                    (0x2236)
+#define OPENTHREAD_NETDEV_MSG_TYPE_EVENT                    (0x2237)
 /** @brief   event indicating a serial (UART) message was sent to OpenThread */
-#define OPENTHREAD_SERIAL_MSG_TYPE_EVENT                    (0x2237)
+#define OPENTHREAD_SERIAL_MSG_TYPE_EVENT                    (0x2238)
 /** @brief   event for frame reception */
-#define OPENTHREAD_MSG_TYPE_RECV                            (0x2238)
+#define OPENTHREAD_MSG_TYPE_RECV                            (0x2239)
 /** @brief   event indicating an OT_JOB message */
-#define OPENTHREAD_JOB_MSG_TYPE_EVENT                       (0x2240)
+#define OPENTHREAD_JOB_MSG_TYPE_EVENT                       (0x223A)
+/** @brief   event indicating pending tasks */
+#define OPENTHREAD_TASK_MSG_TYPE_EVENT                       (0x223B)
 /** @} */
 
 /**
@@ -110,7 +113,7 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev);
  * @param[in]  dev                pointer to a netdev interface
  * @param[in]  event              just occurred netdev event
  */
-void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event);
+void sent_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event);
 
 /**
  * @brief   Bootstrap OpenThread
@@ -123,8 +126,9 @@ void openthread_bootstrap(void);
  * @param[in]  dev                pointer to a netdev interface
  * @param[in]  tb                 pointer to the TX buffer designed for OpenThread
  * @param[in]  rb                 pointer to the RX buffer designed for Open_Thread
+ * @param[in]  ab                 pointer to the ACK buffer designed for Open_Thread
  */
-void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb);
+void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb, uint8_t *ab);
 
 
 /**
@@ -152,6 +156,11 @@ kernel_pid_t openthread_get_pid(void);
  * @brief   Init OpenThread random
  */
 void ot_random_init(void);
+
+/**
+ * @brief   Init OpenThread timer
+ */
+void ot_timer_init(void);
 
 /**
  * @brief   Execute OpenThread command. Call this function only in OpenThread thread

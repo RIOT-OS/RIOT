@@ -34,6 +34,12 @@ extern "C" {
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       (10U)
 #endif
 
+/**
+ * @def OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_TIMER
+ *
+ * Whether to support microsec timer feature
+ */
+#define OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_TIMER (1U)
 
 /**
  * @def OPENTHREAD_CONFIG_LOG_LEVEL
