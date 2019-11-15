@@ -71,3 +71,14 @@ compile_flags.txt
 
 # suit manifest keys
 keys/
+
+# archive files
+*.zip
+*.tar.xz
+*.7z
+*.tar.bz2
+*.tar.gz
+*.tar
+# whitelist existing archives in the test
+!/tests/pkg_fatfs/riot_fatfs_disk.tar.gz
+!/tests/pkg_fatfs_vfs/riot_fatfs_disk.tar.gz
