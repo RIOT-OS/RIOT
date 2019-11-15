@@ -504,6 +504,7 @@ typedef struct {
 #endif
 } spi_conf_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Default mapping of I2C bus speed values
  * @{
@@ -523,6 +524,7 @@ typedef enum {
 #endif
 } i2c_speed_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Structure for I2C configuration data

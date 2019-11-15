@@ -106,6 +106,7 @@ void gpio_init_mux(gpio_t pin, uint8_t over, uint8_t sel, uint8_t func);
 #define PERIPH_I2C_NEED_WRITE_REGS
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @name   Override I2C clock speed values
  * @{
@@ -119,6 +120,8 @@ typedef enum {
     I2C_SPEED_HIGH      = 0x03,     /**< not supported */
 } i2c_speed_t;
 /** @} */
+#endif /* ndef DOXYGEN */
+
 /**
  * @brief   I2C configuration options
  */
@@ -138,6 +141,7 @@ typedef struct {
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @name   Override the default GPIO mode settings
  * @{
@@ -153,7 +157,7 @@ typedef enum {
     GPIO_OD_PU      = (0xff)                            /**< not supported */
 } gpio_mode_t;
 /** @} */
-
+#endif /* ndef DOXYGEN */
 
 /**
  * @name   UART device configuration
@@ -206,7 +210,6 @@ typedef enum {
    UART_STOP_BITS_2 = UART_LCRH_STP2,     /**< 2 stop bits */
 } uart_stop_bits_t;
 /** @} */
-#endif /* DOXYGEN */
 
 /**
  * @name   Override SPI mode settings
@@ -234,6 +237,7 @@ typedef enum {
     SPI_CLK_10MHZ  = 4      /**< drive the SPI bus with 10MHz */
 } spi_clk_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Datafields for static SPI clock configuration values
@@ -284,6 +288,7 @@ typedef struct {
     uint_fast8_t cfg;   /**< timer config word */
 } timer_conf_t;
 
+#ifndef DOXYGEN
 /**
  * @name   Override resolution options
  * @{
@@ -300,6 +305,7 @@ typedef enum {
     ADC_RES_16BIT =             (0xd00),    /**< not supported by hardware */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief ADC configuration wrapper

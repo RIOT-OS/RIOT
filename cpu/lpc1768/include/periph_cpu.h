@@ -28,6 +28,7 @@
 extern "C" {
 #endif
 
+#ifndef DOXYGEN
 /**
  * @name   Override the default GPIO type
  * @{
@@ -62,6 +63,7 @@ typedef enum {
     GPIO_OD_PU = (PIN_DIR_OUT | PIN_MODE_OD | PIN_MODE_PU)  /**< open-drain output with pull-up */
 } gpio_mode_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   CPU provides own pm_off() function

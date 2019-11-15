@@ -142,6 +142,7 @@ typedef struct {
 #define PERIPH_SPI_NEEDS_INIT_CS 1
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override SPI clock speed values
  * @{
@@ -169,6 +170,7 @@ typedef enum {
     SPI_MODE_3 = SSI_FRF_MOTO_MODE_0,       /**< CPOL=1, CPHA=1 */
 } spi_mode_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus
 }
