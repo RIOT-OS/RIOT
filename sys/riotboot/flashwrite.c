@@ -65,7 +65,7 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
 int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
                                  const uint8_t *bytes, size_t len, bool more)
 {
-    LOG_INFO(LOG_PREFIX "processing bytes %u-%u\n", state->offset, state->offset + len - 1);
+    LOG_DEBUG(LOG_PREFIX "processing bytes %u-%u\n", state->offset, state->offset + len - 1);
 
     while (len) {
         size_t flashpage_pos = state->offset % FLASHPAGE_SIZE;
