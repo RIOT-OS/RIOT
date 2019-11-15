@@ -221,8 +221,8 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
     remote.family = AF_INET6;
 
     /* parse for interface */
-    int iface = ipv6_addr_split_iface(addr_str);
-    if (iface == -1) {
+    char *iface = ipv6_addr_split_iface(addr_str);
+    if (!iface) {
         if (gnrc_netif_numof() == 1) {
             /* assign the single interface found in gnrc_netif_numof() */
             remote.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
@@ -232,13 +232,13 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
         }
     }
     else {
-        if (gnrc_netif_get_by_pid(iface) == NULL) {
+        int pid = atoi(iface);
+        if (gnrc_netif_get_by_pid(pid) == NULL) {
             puts("gcoap_cli: interface not valid");
             return 0;
         }
-        remote.netif = iface;
+        remote.netif = pid;
     }
-
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
         puts("gcoap_cli: unable to parse destination address");

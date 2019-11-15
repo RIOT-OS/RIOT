@@ -1103,7 +1103,7 @@ static int _netif_flag(char *cmd, kernel_pid_t iface, char *flag)
 #ifdef MODULE_GNRC_IPV6
 static uint8_t _get_prefix_len(char *addr)
 {
-    int prefix_len = ipv6_addr_split(addr, '/', _IPV6_DEFAULT_PREFIX_LEN);
+    int prefix_len = ipv6_addr_split_int(addr, '/', _IPV6_DEFAULT_PREFIX_LEN);
 
     if (prefix_len < 1) {
         prefix_len = _IPV6_DEFAULT_PREFIX_LEN;
