@@ -42,9 +42,9 @@ int ifconfig_list(int idx)
     uint16_t u16_val;
 
     printf("Iface %3d  HWaddr: ", idx);
-    print_addr(dev->short_addr, IEEE802154_SHORT_ADDRESS_LEN);
+    print_addr(dev->short_addr.u8, IEEE802154_SHORT_ADDRESS_LEN);
     printf(", Long HWaddr: ");
-    print_addr(dev->long_addr, IEEE802154_LONG_ADDRESS_LEN);
+    print_addr(dev->long_addr.uint8, IEEE802154_LONG_ADDRESS_LEN);
     printf(", PAN: 0x%04x", dev->pan);
 
     res = get((netdev_t *)dev, NETOPT_ADDR_LEN, &u16_val, sizeof(u16_val));
@@ -267,11 +267,11 @@ static int send(int iface, le_uint16_t dst_pan, uint8_t *dst, size_t dst_len,
     }
     if (dev->flags & NETDEV_IEEE802154_SRC_MODE_LONG) {
         src_len = 8;
-        src = dev->long_addr;
+        src = dev->long_addr.uint8;
     }
     else {
         src_len = 2;
-        src = dev->short_addr;
+        src = dev->short_addr.u8;
     }
     /* fill MAC header, seq should be set by device */
     if ((res = ieee802154_set_frame_hdr(mhr, src, src_len,
