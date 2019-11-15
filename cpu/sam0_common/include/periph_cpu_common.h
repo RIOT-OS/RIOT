@@ -178,6 +178,7 @@ typedef enum {
     UART_FLAG_WAKEUP          = 0x2,    /**< wake from sleep on receive */
 } uart_flag_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Available SERCOM UART data size selections
  *
@@ -193,6 +194,7 @@ typedef enum {
     UART_DATA_BITS_8 = 0x0,   /**< 8 data bits */
 } uart_data_bits_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   UART device configuration
