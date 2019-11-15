@@ -57,7 +57,11 @@ static void run_test(const char *name, unsigned (*test)(unsigned))
     xtimer_set(&xtimer, TIMEOUT);
 
     do {
-        if (i++ == -1u) {
+        if (++i == UINT_MAX) {
+            /* bitarithm_lsb must not be called with 0, but if all bits of i are
+             * ones, that ~i will be zero. Therefore, we jump back to start
+             * when all bits of i are ones
+             */
             i = 1;
         }
 
