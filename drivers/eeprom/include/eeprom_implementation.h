@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-static inline eeprom_off_t eeprom_size(eeprom_t dev)
+static inline eeprom_offset_t eeprom_size(eeprom_t dev)
 {
     if (_eeprom_is_dev_valid(dev)) {
         return _eeprom_devs[dev].size;
@@ -35,7 +35,7 @@ static inline eeprom_off_t eeprom_size(eeprom_t dev)
     return 0;
 }
 
-static inline int eeprom_read(eeprom_t dev, eeprom_off_t pos, void *dest,
+static inline int eeprom_read(eeprom_t dev, eeprom_offset_t pos, void *dest,
                               size_t len)
 {
     if (!_eeprom_is_dev_valid(dev)) {
@@ -53,7 +53,7 @@ static inline int eeprom_read(eeprom_t dev, eeprom_off_t pos, void *dest,
     return _eeprom_driver(dev)->read(_eeprom_handle(dev), pos, dest, len);
 }
 
-static inline int eeprom_write(eeprom_t dev, eeprom_off_t pos, const void *data,
+static inline int eeprom_write(eeprom_t dev, eeprom_offset_t pos, const void *data,
                                size_t len)
 {
     if (!_eeprom_is_dev_valid(dev)) {
@@ -85,19 +85,19 @@ static inline int eeprom_erase(eeprom_t dev)
     return _eeprom_driver(dev)->erase(_eeprom_handle(dev));
 }
 
-static inline int eeprom_read_byte(eeprom_t dev, eeprom_off_t pos,
+static inline int eeprom_read_byte(eeprom_t dev, eeprom_offset_t pos,
                                    uint8_t *dest)
 {
     return eeprom_read(dev, pos, dest, 1);
 }
 
-static inline int eeprom_write_byte(eeprom_t dev, eeprom_off_t pos,
+static inline int eeprom_write_byte(eeprom_t dev, eeprom_offset_t pos,
                                     uint8_t data)
 {
     return eeprom_write(dev, pos, &data, 1);
 }
 
-static inline int eeprom_clear(eeprom_t dev, eeprom_off_t pos, size_t len)
+static inline int eeprom_clear(eeprom_t dev, eeprom_offset_t pos, size_t len)
 {
     return eeprom_set(dev, pos, 0, len);
 }

@@ -44,7 +44,7 @@ extern "C" {
  * @return  The size of the EEPROM device in bytes
  * @retval  0               No EEPROM device for parameter @p dev
  */
-static inline eeprom_off_t eeprom_size(eeprom_t dev);
+static inline eeprom_offset_t eeprom_size(eeprom_t dev);
 
 /**
  * @brief   Read @p len bytes from the given position
@@ -63,7 +63,7 @@ static inline eeprom_off_t eeprom_size(eeprom_t dev);
  * @details If this functions fails with `-EIO`, the contents of @p dest are
  *          undefined. For every other error the content is unchanged.
  */
-static inline int eeprom_read(eeprom_t dev, eeprom_off_t pos, void *dest,
+static inline int eeprom_read(eeprom_t dev, eeprom_offset_t pos, void *dest,
                               size_t len);
 
 /**
@@ -84,7 +84,7 @@ static inline int eeprom_read(eeprom_t dev, eeprom_off_t pos, void *dest,
  *          `[pos; pos + len[` on the device are undefined. For every other
  *          error the EEPROM is not changed.
  */
-static inline int eeprom_write(eeprom_t dev, eeprom_off_t pos, const void *data,
+static inline int eeprom_write(eeprom_t dev, eeprom_offset_t pos, const void *data,
                                size_t len);
 
 /**
@@ -110,7 +110,7 @@ static inline int eeprom_erase(eeprom_t dev);
  * @retval  -EFAULT         Bad address given in @p pos
  * @retval  -EINVAL         Parameter @p dest is `NULL`
  */
-static inline int eeprom_read_byte(eeprom_t dev, eeprom_off_t pos,
+static inline int eeprom_read_byte(eeprom_t dev, eeprom_offset_t pos,
                                    uint8_t *dest);
 
 /**
@@ -125,7 +125,7 @@ static inline int eeprom_read_byte(eeprom_t dev, eeprom_off_t pos,
  * @retval  -EFAULT         Bad address given in @p pos
  * @retval  -EINVAL         Parameter @p dest is `NULL`
  */
-static inline int eeprom_write_byte(eeprom_t dev, eeprom_off_t pos,
+static inline int eeprom_write_byte(eeprom_t dev, eeprom_offset_t pos,
                                     uint8_t data);
 
 /**
@@ -147,7 +147,7 @@ static inline int eeprom_write_byte(eeprom_t dev, eeprom_off_t pos,
  *          `[pos; pos + len[` on the device are undefined. For every other
  *          error the EEPROM is not changed.
  */
-static inline int eeprom_clear(eeprom_t dev, eeprom_off_t pos, size_t len);
+static inline int eeprom_clear(eeprom_t dev, eeprom_offset_t pos, size_t len);
 
 /**
  * @brief   Registers an EEPROM device to the common API
@@ -161,7 +161,7 @@ static inline int eeprom_clear(eeprom_t dev, eeprom_off_t pos, size_t len);
  *          times
  */
 void eeprom_register(const eeprom_driver_t *driver, void *handle,
-                     eeprom_off_t size);
+                     eeprom_offset_t size);
 
 /**
  * @brief   Set @p len bytes from the given position @p pos with value @p val
@@ -181,7 +181,7 @@ void eeprom_register(const eeprom_driver_t *driver, void *handle,
  *          `[pos; pos + len[` on the device are undefined. For every other
  *          error the EEPROM is not changed.
  */
-int eeprom_set(eeprom_t dev, eeprom_off_t pos, uint8_t val, size_t len);
+int eeprom_set(eeprom_t dev, eeprom_offset_t pos, uint8_t val, size_t len);
 
 #ifdef __cplusplus
 }

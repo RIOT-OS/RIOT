@@ -92,7 +92,7 @@ static inline void * _eeprom_handle(eeprom_t dev)
  * @retval      0       The range is not valid
  * @retval      1       The range is valid
  */
-static inline int _eeprom_is_range_valid(eeprom_t dev, eeprom_off_t pos,
+static inline int _eeprom_is_range_valid(eeprom_t dev, eeprom_offset_t pos,
                                          size_t len)
 {
     /* We basically want to check for "pos + len < size", but we have to

@@ -36,11 +36,11 @@ extern "C" {
 typedef uint_fast8_t eeprom_t;
 #endif
 
-#if !defined(HAVE_EEPROM_OFF_T) || defined(DOXYGEN)
+#if !defined(HAVE_EEPROM_OFFSET_T) || defined(DOXYGEN)
 /**
  * @brief   Offset / size type in EEPROM devices
  */
-typedef uint32_t eeprom_off_t;
+typedef uint32_t eeprom_offset_t;
 #endif
 
 /**
@@ -61,7 +61,7 @@ typedef struct {
      * @retval  0       Success
      * @retval  -EIO    I/O error occurred while reading
      */
-    int (*read)(void *handle, eeprom_off_t pos, void *dest, size_t len);
+    int (*read)(void *handle, eeprom_offset_t pos, void *dest, size_t len);
     /**
      * @brief   Write data from the EEPROM device
      *
@@ -79,7 +79,8 @@ typedef struct {
      * of the device are undefined, but the remaining content of the device
      * is unchanged.
      */
-    int (*write)(void *handle, eeprom_off_t pos, const void *data, size_t len);
+    int (*write)(void *handle, eeprom_offset_t pos, const void *data,
+                 size_t len);
     /**
      * @brief   Erase the whole EEPROM
      *
@@ -110,7 +111,7 @@ typedef struct {
 typedef struct {
     const eeprom_driver_t *driver;  /**< The driver of the EEPROM device */
     void *handle;                   /**< The handle to pass to the driver */
-    eeprom_off_t size;              /**< Size of the EEPROM device in bytes */
+    eeprom_offset_t size;              /**< Size of the EEPROM device in bytes */
 } eeprom_dev_t;
 
 #ifdef __cplusplus

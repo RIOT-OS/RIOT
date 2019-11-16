@@ -31,7 +31,7 @@
 
 eeprom_dev_t _eeprom_devices[EEPROM_NUMOF] = { { 0 } };
 
-int eeprom_set(eeprom_t dev, eeprom_off_t pos, uint8_t val, size_t len)
+int eeprom_set(eeprom_t dev, eeprom_offset_t pos, uint8_t val, size_t len)
 {
     if (!_eeprom_is_dev_valid(dev)) {
         return -ENODEV;
@@ -56,7 +56,7 @@ int eeprom_set(eeprom_t dev, eeprom_off_t pos, uint8_t val, size_t len)
 }
 
 void eeprom_register(const eeprom_driver_t *driver, void *handle,
-                     eeprom_off_t size)
+                     eeprom_offset_t size)
 {
     static size_t idx = 0;
     /* Check for overflow of array in _eeprom_devices */
