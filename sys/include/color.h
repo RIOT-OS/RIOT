@@ -151,6 +151,22 @@ static inline void color_rgb_shift(const color_rgb_t *rgb, color_rgb_t *out, int
 }
 
 /**
+ * @brief Change the brightness of a RGB color by multiplying it with a set factor.
+ *
+ * @pre                 ((rgb != NULL) && (out != NULL))
+ *
+ * @param[in] rgb       Input rgb color, that should be multiplied. Must be NOT NULL
+ * @param[out] out      Output rgb color. Must be NOT NULL
+ * @param[in] level     New brightness level. 255 = Full Brightness, 0 = Off.
+ */
+static inline void color_rgb_set_brightness(const color_rgb_t *rgb, color_rgb_t *out, uint8_t level)
+{
+    out->r = ((unsigned)rgb->r * level + 128) >> 8;
+    out->g = ((unsigned)rgb->g * level + 128) >> 8;
+    out->b = ((unsigned)rgb->b * level + 128) >> 8;
+}
+
+/**
  * @brief Calculate the complementary color of a given rgb color.
  *
  * @note                Complementary color calculation according to adobe illustator calculations.
