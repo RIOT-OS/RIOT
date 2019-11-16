@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <stdint.h>
+#include <stdatomic.h>
 #include <stdio.h>
 
 #include "event.h"
@@ -40,13 +42,13 @@ static event_t _evt = { .handler = _on_evt };
 static char _stack[STACKSIZE];
 static thread_t *_thread_main;
 
-static unsigned _wakeup_evt = 0;
-static unsigned _wakeup_timeout = 0;
+static atomic_uint _wakeup_evt = ATOMIC_VAR_INIT(0);
+static atomic_uint _wakeup_timeout = ATOMIC_VAR_INIT(0);
 
 static void _on_evt(event_t *evt)
 {
     (void)evt;
-    ++_wakeup_evt;
+    atomic_fetch_add(&_wakeup_evt, 1);
 }
 
 static void *_cnt_thread(void *arg)
@@ -60,7 +62,7 @@ static void *_cnt_thread(void *arg)
             evt->handler(evt);
         }
         else {
-            ++_wakeup_timeout;
+            atomic_fetch_add(&_wakeup_timeout, 1);
         }
     }
 
@@ -123,8 +125,8 @@ int main(void)
     /* finally, wait 60ms and collect results -> +1 timeout wakeup */
     xtimer_usleep(60U * US_PER_MS);
 
-    unsigned events = _wakeup_evt;
-    unsigned timeouts = _wakeup_timeout;
+    unsigned events = atomic_load(&_wakeup_evt);
+    unsigned timeouts = atomic_load(&_wakeup_timeout);
 
     /* rate results */
     printf("finished: %u/4 events and %u/4 timeouts recorded\n",
