@@ -128,6 +128,29 @@ static inline void color_rgb_invert(const color_rgb_t *rgb, color_rgb_t *inv_rgb
 }
 
 /**
+ * @brief Shifts a given rgb color to change it's brightness
+ *
+ * @pre                 ((rgb != NULL) && (out != NULL))
+ *
+ * @param[in] rgb       Input rgb color, that should be shifted. Must be NOT NULL
+ * @param[out] out      Output rgb color, result of the shift. Must be NOT NULL
+ * @param[in] shift     Amount by which the color components should be shifted.
+ *                      May be positive (shift to left) or negative (shift to right).
+ */
+static inline void color_rgb_shift(const color_rgb_t *rgb, color_rgb_t *out, int8_t shift)
+{
+    if (shift > 0) {
+        out->r = rgb->r << shift;
+        out->g = rgb->g << shift;
+        out->b = rgb->b << shift;
+    } else {
+        out->r = rgb->r >> -shift;
+        out->g = rgb->g >> -shift;
+        out->b = rgb->b >> -shift;
+    }
+}
+
+/**
  * @brief Calculate the complementary color of a given rgb color.
  *
  * @note                Complementary color calculation according to adobe illustator calculations.
