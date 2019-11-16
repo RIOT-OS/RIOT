@@ -51,16 +51,6 @@ typedef uint32_t eeprom_off_t;
  */
 typedef struct {
     /**
-     * @brief   Initialize the data structures for the EEPROM device
-     *
-     * @param[in,out]   handle  Device handle to initialize
-     * @param[in]       params  Initialization parameters of the device
-     *
-     * @retval  0       Failed to initialize the device
-     * @return          The size of the device in bytes
-     */
-    eeprom_off_t (*init)(void *handle, const void *params);
-    /**
      * @brief   Read data from the EEPROM device
      *
      * @param[in,out]   handle  Device handle of the EEPROM to read from
