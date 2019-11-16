@@ -113,14 +113,6 @@ typedef struct {
     eeprom_off_t size;              /**< Size of the EEPROM device in bytes */
 } eeprom_dev_t;
 
-/**
- * @brief   Initialize all EEPROM devices
- *
- * This function is to be called only once and during boot.
- */
-void eeprom_init(void);
-
-
 #ifdef __cplusplus
 }
 #endif
