@@ -41,8 +41,7 @@ int eeprom_set(eeprom_t dev, eeprom_off_t pos, uint8_t val, size_t len)
         return -EFAULT;
     }
 
-    uint8_t buf[EEPROM_SET_BUF];
-    memset(buf, val, sizeof(buf));
+    uint8_t buf[EEPROM_SET_BUF] = { 0 };
     while (len > EEPROM_SET_BUF) {
         int retval;
         retval = _eeprom_driver(dev)->write(_eeprom_handle(dev), pos, buf, len);
