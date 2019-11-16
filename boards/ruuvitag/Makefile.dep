@@ -4,4 +4,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += lis2dh12_spi
 endif
 
+# Use Segger's RTT by default for stdio on this board
+DEFAULT_MODULE += stdio_rtt
+
 include $(RIOTBOARD)/common/nrf52/Makefile.dep
