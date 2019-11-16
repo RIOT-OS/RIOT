@@ -468,6 +468,9 @@ endif
 
 ifneq (,$(filter stdio_uart,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
+
+  # stdio_rtt cannot be used when stdio_uart is loaded
+  DISABLE_MODULE += stdio_rtt
 endif
 
 ifneq (,$(filter isrpipe,$(USEMODULE)))
