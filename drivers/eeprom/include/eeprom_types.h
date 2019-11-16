@@ -111,7 +111,7 @@ typedef struct {
 typedef struct {
     const eeprom_driver_t *driver;  /**< The driver of the EEPROM device */
     void *handle;                   /**< The handle to pass to the driver */
-    eeprom_offset_t size;              /**< Size of the EEPROM device in bytes */
+    eeprom_offset_t size;           /**< Size of the EEPROM device in bytes */
 } eeprom_dev_t;
 
 #ifdef __cplusplus
