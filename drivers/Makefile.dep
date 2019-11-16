@@ -421,6 +421,9 @@ ifneq (,$(filter pca9685,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
+
+  # efm32 CPU doesn't support PWM_RIGHT
+  FEATURES_BLACKLIST += arch_efm32
 endif
 
 ifneq (,$(filter pcd8544,$(USEMODULE)))
