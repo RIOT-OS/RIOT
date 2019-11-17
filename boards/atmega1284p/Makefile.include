@@ -1,0 +1,18 @@
+# configure the terminal program
+PORT_LINUX          ?= /dev/ttyUSB0
+PORT_DARWIN         ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+BAUD                ?= 9600
+ATMEGA328P_CLOCK    ?=
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# Allow overwriting programmer via env variables without affecting other boards
+PROGRAMMER_BOARD_ATMEGA1284P ?= dragon_isp
+# ICSP programmer to use for avrdude
+PROGRAMMER ?= $(PROGRAMMER_BOARD_ATMEGA1284P)
+
+ifneq (,$(ATMEGA1284P_CLOCK))
+  CFLAGS += -DCLOCK_CORECLOCK=$(ATMEGA1284P_CLOCK)
+endif
+
+include $(RIOTMAKE)/tools/avrdude.inc.mk
+include $(RIOTBOARD)/common/atmega/Makefile.include
