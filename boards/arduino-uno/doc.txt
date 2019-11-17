@@ -66,7 +66,7 @@ aWire. So at least can use it for just about every AVR device.
 #### Board Modifications
 On the Arduino Uno the RESET pin of the MCU is connected to a 100 nF capacitor,
 which in turn is connected to the ATmega16U2 (or an CH340 TTL Adapter in case of
-most clones). This allows the device to be automatically reseted when you
+most clones). This allows the device to be automatically reset when you
 connected to the board via a serial. This is particularly useful during
 programming via the bootloader (without external ISP programmer), as avrdude
 can trigger the reset and, thus, start the bootloader without the user having
