@@ -404,7 +404,7 @@ ifneq (,$(filter newlib,$(USEMODULE)))
     USEMODULE += newlib_syscalls_default
   endif
   ifeq (,$(filter stdio_rtt stdio_cdc_acm,$(USEMODULE)))
-    USEMODULE += stdio_uart
+    FEATURES_PROVIDED += stdio_uart
   endif
 endif
 
@@ -432,7 +432,7 @@ endif
 ifneq (,$(filter stdio_ethos,$(USEMODULE)))
   USEMODULE += ethos
   USEMODULE += stdin
-  USEMODULE += stdio_uart
+  FEATURES_REQUIRED += stdio_uart
 endif
 
 ifneq (,$(filter stdin,$(USEMODULE)))
@@ -443,7 +443,7 @@ endif
 
 ifneq (,$(filter stdio_uart_rx,$(USEMODULE)))
   USEMODULE += isrpipe
-  USEMODULE += stdio_uart
+  FEATURES_PROVIDED += stdio_uart
 endif
 
 ifneq (,$(filter stdio_uart,$(USEMODULE)))
