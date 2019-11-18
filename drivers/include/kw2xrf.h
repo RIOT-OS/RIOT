@@ -130,15 +130,13 @@ typedef struct {
                                              return to @ref kw2xrf_t::idle_state */
     int16_t tx_power;                   /**< The current tx-power setting of the device */
 
-                                        /**  -----------------Internal CSMA algorithm counters-----------------*/
+                                        /**  -----------------Internal CSMA algorithm parameters-----------------*/
     uint8_t csma_min_be;                /**< Minimum backoff exponent (macMinBe) */
     uint8_t csma_max_be;                /**< Maximum backoff exponent (macMaxBe) */
     uint8_t csma_be;                    /**< CSMA backoff exponent in the current transmission attempt */
     uint32_t csma_delay;                /**< The actual delay for the CSMA algorithm */
 
-                                        /**  -----------------Internal retransmission counters-----------------*/
-    uint8_t max_retrans;                /**< Maximum number of frame retransmissions when no Ack frame is received (macMaxFrameRetries) */
-    uint8_t num_retrans;                /**< Number of retransmissions due to ACK timeouts*/
+                                        /**  -----------------Internal counters-----------------*/
     uint8_t num_backoffs;               /**< Number of CSMA backoffs so far in the current transmission attempt */
     uint8_t max_backoffs;               /**< Maximum number of CSMA backoffs when waiting for channel clear (macMaxCsmaBackoffs) */
     /** @} */

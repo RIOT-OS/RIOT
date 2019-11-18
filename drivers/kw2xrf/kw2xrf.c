@@ -68,7 +68,6 @@ void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
     /* Set default parameters according to STD IEEE802.15.4-2015 */
     dev->csma_max_be = 5;
     dev->csma_min_be = 3;
-    dev->max_retrans = 3;
     dev->max_backoffs = 4;
 
     kw2xrf_spi_init(dev);

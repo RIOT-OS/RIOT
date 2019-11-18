@@ -47,7 +47,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define KW2XRF_ACK_WAIT_TIME        54	//864 us
+#define _MACACKWAITDURATION         (864 / 16) /* 864us * 62500Hz */
 #define KW2XRF_CSMA_UNIT_TIME       20	//320 us
 
 #define KW2XRF_THREAD_FLAG_ISR      (1 << 8)
@@ -207,7 +207,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         /* New transmission! Reset the CSMA counters */
         dev->csma_be = dev->csma_min_be;
         dev->num_backoffs = 0;
-        dev->num_retrans = 0;
         dev->csma_delay = kw2xrf_csma_random_delay(dev);
         kw2xrf_tx_exec(dev);
     }
@@ -380,20 +379,6 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
                 return -EOVERFLOW;
             }
             *((uint8_t *)value) = dev->csma_min_be;
-            return len;
-
-        case NETOPT_RETRANS:
-            if (len != sizeof(uint8_t)) {
-                return -EOVERFLOW;
-            }
-            *((uint8_t *)value) = dev->max_retrans;
-            return len;
-
-        case NETOPT_TX_RETRIES_NEEDED:
-            if (len != sizeof(uint8_t)) {
-                return -EOVERFLOW;
-            }
-            *((uint8_t *)value) = dev->num_retrans;
             return len;
 
         case NETOPT_CHANNEL:
@@ -612,14 +597,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
             res = len;
             break;
 
-        case NETOPT_RETRANS:
-            if (len != sizeof(uint8_t)) {
-                return -EOVERFLOW;
-            }
-            dev->max_retrans = *((const uint8_t *)value);
-            res = len;
-            break;
-
         case NETOPT_CCA_THRESHOLD:
             if (len < sizeof(uint8_t)) {
                 res = -EOVERFLOW;
@@ -813,7 +790,7 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
             /* Allow TMR3IRQ to cancel RX operation */
             kw2xrf_timer3_seq_abort_on(dev);
             /* Enable interrupt for TMR3 and set timer */
-            kw2xrf_abort_rx_ops_enable(dev, KW2XRF_ACK_WAIT_TIME);
+            kw2xrf_abort_rx_ops_enable(dev, _MACACKWAITDURATION);
         }
     }
 
@@ -835,7 +812,7 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
     if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_SEQIRQ) {
         DEBUG("[kw2xrf] SEQIRQ\n");
         irqsts1 |= MKW2XDM_IRQSTS1_SEQIRQ;
-        bool retransmission_issued = false;
+        bool retry_issued = false;
 
         if (dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_CCAIRQ) {
             irqsts1 |= MKW2XDM_IRQSTS1_CCAIRQ;
@@ -846,7 +823,7 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
                 /* Limit reached ? */
                 if(dev->num_backoffs < dev->max_backoffs)
                 {
-                    /* Limit for retransmissions hasn't been reached yet: try again! */
+                    /* Limit for backoffs hasn't been reached yet: try again! */
                     dev->num_backoffs++;
                     if(dev->csma_be < dev->csma_max_be)
                     {
@@ -854,7 +831,7 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
                     }
                     dev->csma_delay = kw2xrf_csma_random_delay(dev);
                     kw2xrf_tx_exec(dev);
-                    retransmission_issued = true;
+                    retry_issued = true;
                 }
                 else
                 {
@@ -864,34 +841,12 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
             }
         }
 
-        /* Info: TMR3IRQ can't be set if CCAIRQ occured // doesn't make sense */
         if (dregs[MKW2XDM_IRQSTS3] & MKW2XDM_IRQSTS3_TMR3IRQ) {
             /* if the sequence was aborted by timer 3, ACK timed out */
-            DEBUG("[kw2xrf] TC3TMOUT, TX failed\n");
-
-            /* try retransmission? */
-            if((dev->netdev.flags & KW2XRF_OPT_CSMA) &&
-               dev->num_retrans < dev->max_retrans)
-            {
-                /* CSMA option is enabled AND max_retrans hasn't been reached */
-                /* Try to retransmit */
-                DEBUG("[kw2xrf] TX retry %u\n", (unsigned) dev->num_retrans);
-                dev->num_retrans++;
-                /* New transmission means resetting all CSMA values for backoff*/
-                dev->csma_be = dev->csma_min_be;
-                dev->num_backoffs = 0;
-                dev->csma_delay = kw2xrf_csma_random_delay(dev);
-                kw2xrf_tx_exec(dev);
-                retransmission_issued = true;
-            }
-            else
-            {
-                netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
-            }
-        }
-        else if(!retransmission_issued)
-        {
-            DEBUG("[kw2xrf] NO TC3TMOUT, TX success\n");
+            DEBUG("[kw2xrf] TC3TMOUT, SEQIRQ, TX failed\n");
+            netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
+        } else {
+            DEBUG("[kw2xrf] SEQIRQ\n");
             netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
         }
 
@@ -900,9 +855,9 @@ static void _isr_event_seq_tr(netdev_t *netdev, uint8_t *dregs)
         /* Disable interrupt for TMR3 and reset TMR3IRQ */
         kw2xrf_abort_rx_ops_disable(dev);
 
-        if(!retransmission_issued)
+        if(!retry_issued)
         {
-            /* If a retransmission was issued, that means we're not done yet! */
+            /* If a retry was issued, that means we're not done yet! */
             assert(dev->pending_tx != 0);
             dev->pending_tx--;
             kw2xrf_set_idle_sequence(dev);
