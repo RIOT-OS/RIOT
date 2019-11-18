@@ -512,7 +512,8 @@ $(ELFFILE): $(BASELIBS)
 	$(Q)$(_LINK) -o $@
 
 $(BINDIR)/$(APPLICATION_MODULE).a: pkg-build $(BUILDDEPS)
-	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
+	$(Q)DIRS="$(DIRS)" APPLICATION_BLOBS="$(BLOBS)" \
+	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
 $(BINDIR)/$(APPLICATION_MODULE).a: FORCE
 
 # Other modules are built by application.inc.mk and packages building
