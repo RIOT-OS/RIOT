@@ -69,6 +69,7 @@ extern "C" {
  */
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 
+#ifndef DOXYGEN
 /**
  * @brief   Use a custom clock speed type
  */
@@ -88,7 +89,7 @@ typedef enum {
     SPI_CLK_10MHZ  = (10000000U)
 } spi_clk_t;
 /** @} */
-
+#endif /* ndef DOXYGEN */
 #endif /* MODULE_PERIPH_SPI | DOXYGEN */
 
 #ifdef __cplusplus
