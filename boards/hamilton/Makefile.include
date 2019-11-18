@@ -5,7 +5,7 @@ OFLAGS := --gap-fill 0xff
 
 # Configure terminal, hamilton doesn't provide any UART, thus use RTT
 TERMPROG = $(RIOTTOOLS)/jlink/jlink.sh
-TERMFLAGS = term_rtt
+TERMFLAGS = term-rtt
 
 USEMODULE += stdio_rtt
 
