@@ -658,7 +658,7 @@ term: $(TERMDEPS)
 	$(TERMPROG) $(TERMFLAGS)
 
 # Term without the pyterm added logging
-# TERMFLAGS must be exported for `jlink.sh term_rtt`.
+# PYTERMFLAGS must be exported for `jlink.sh term-rtt`.
 cleanterm: export PYTERMFLAGS += --noprefix --no-repeat-command-on-empty-line
 cleanterm: $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
