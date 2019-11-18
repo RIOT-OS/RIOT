@@ -36,8 +36,8 @@
 #define LED1_PIN                    GPIO_PIN(2, 7)
 #define LED2_PIN                    GPIO_PIN(2, 6)
 #define LED3_PIN                    GPIO_PIN(2, 5)
-#define LED3_PIN                    GPIO_PIN(2, 5)
-#define USER_BUTTON_PIN             GPIO_PIN(2, 5)
+#define BTN0_PIN                    GPIO_PIN(3, 5)
+#define BTN0_MODE                   GPIO_IN
 #define RF24_SWITCH_CC2538_PIN      GPIO_PIN(3, 4)  /**< PD4 -- CC2538 */
 #define RF24_SWITCH_AT86RF215_PIN   GPIO_PIN(3, 3)  /**< PD3 -- AT86RF215 */
 
