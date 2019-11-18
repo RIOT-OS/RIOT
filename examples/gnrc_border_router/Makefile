@@ -7,9 +7,6 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-# The following boards do not have an available UART
-BOARD_BLACKLIST += pic32-wifire pic32-clicker ruuvitag thingy52
-
 # use ethos (ethernet over serial) for network communication and stdio over
 # UART, but not on native, as native has a tap interface towards the host.
 ifeq (,$(filter native,$(BOARD)))

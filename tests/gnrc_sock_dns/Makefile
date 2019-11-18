@@ -2,9 +2,6 @@ include ../Makefile.tests_common
 
 RIOTBASE ?= $(CURDIR)/../..
 
-# chronos, hamilton and ruuvitag boards don't support ethos
-BOARD_BLACKLIST := chronos hamilton ruuvitag
-
 export TAP ?= tap0
 
 USEMODULE += sock_dns
