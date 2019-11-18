@@ -1,0 +1,6 @@
+# Put board specific dependencies here
+ifeq (native,$(BOARD))
+  USEMODULE += netdev_tap
+else
+  USEMODULE += stdio_ethos
+endif
