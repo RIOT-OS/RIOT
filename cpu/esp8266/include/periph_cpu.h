@@ -67,6 +67,7 @@ typedef unsigned int gpio_t;
  */
 #define GPIO_PIN_NUMOF  (17)
 
+#ifndef DOXYGEN
 /**
  * @brief   Override flank selection values
  * @{
@@ -81,6 +82,7 @@ typedef enum {
     GPIO_HIGH    = 5         /**< emit interrupt on low level     */
 } gpio_flank_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 /** @} */
 
 /**
