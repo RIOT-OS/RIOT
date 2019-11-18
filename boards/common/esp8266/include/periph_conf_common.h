@@ -19,8 +19,8 @@
 #define PERIPH_CONF_COMMON_H
 
 /* include board.h and periph_cpu.h to make them visible in any case */
-#include "board.h"
 #include "periph_cpu.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,18 +36,67 @@ extern "C" {
  * ESP8266 provides one ADC pin that is broken out on all boards.
  * @{
  */
-#define ADC_NUMOF   1   /**< number of ADC channels */
+#define ADC_NUMOF   (1)     /**< number of ADC channels */
 /** @} */
 
 
 /**
+ * @name    DAC configuration
+ *
+ * ESP8266 provides no DAC.
+ * @{
+ */
+#define DAC_NUMOF   (0)     /**< number of DAC channels */
+/** @} */
+
+
+/**
+ * @name   I2C configuration
+ * @{
+ */
+
+/**
+ * @brief   Static array with configuration for declared I2C devices
+ */
+static const i2c_conf_t i2c_config[] = {
+    #if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
+    {
+        .speed = I2C0_SPEED,
+        .scl = I2C0_SCL,
+        .sda = I2C0_SDA,
+    },
+    #endif
+    #if defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
+    {
+        .speed = I2C1_SPEED,
+        .scl = I2C1_SCL,
+        .sda = I2C1_SDA,
+    },
+    #endif
+};
+
+/**
+ * @brief Number of I2C interfaces
+ *
+ * The number of I2C interfaces is determined automatically from board-specific
+ * peripheral definitions.
+ *
+ * @note I2C_NUMOF definition must not be changed.
+ */
+#define I2C_NUMOF   ARRAY_SIZE(i2c_config)
+
+/** @} */
+
+/**
  * @name    PWM configuration
  *
- * The hardware implementation of ESP8266 PWM supports only frequencies as power of
- * two. Therefore a software implementation of one PWM device PWM_DEV(0) with up to
- * 8 PWM channels (PWM_CHANNEL_NUM_MAX) is used.
+ * The hardware implementation of ESP8266 PWM supports only frequencies as
+ * power of two. Therefore a software implementation of one PWM device
+ * PWM_DEV(0) with up to 8 PWM channels (#PWM_CHANNEL_NUM_MAX) is used. The
+ * GPIOs that can be used as PWM channels are defined by #PWM0_GPIOS in board
+ * definition.
  *
- * @note   The minumum PWM period that can be realized is 10 us or 100.000 PWM
+ * @note   The minimum PWM period that can be realized is 10 us or 100.000 PWM
  * clock cycles per second. Therefore, the product of frequency and resolution
  * should not be greater than 100.000. Otherwise the frequency is scaled down
  * automatically.
@@ -55,71 +104,85 @@ extern "C" {
  * @{
  */
 
+#if defined(PWM0_GPIOS) || defined(DOXYGEN)
+/**
+ * @brief   Static array of GPIOs that can be used as channels of PWM_DEV(0)
+ */
+static const gpio_t pwm0_channels[] = PWM0_GPIOS;
+
+/**
+ * @brief   Number of PWM devices
+ *
+ * The number of PWM devices is determined from the #PWM0_GPIOS definition.
+ *
+ * @note #PWM_NUMOF definition must not be changed.
+ */
 #define PWM_NUMOF           (1)     /**< Number of PWM devices */
 
-/**
- * @brief   Maximum number of channels per PWM device.
- */
-#define PWM_CHANNEL_NUM_MAX (8)
-
-/**
- * @brief   Definition of GPIOs that can be used as PWM channels
- *          of device PWM_DEV(0).
- *
- * The following definition is just an example configuration. Declare up to
- * \ref PWM_CHANNEL_NUM_MAX GPIOs as PWM channels. GPIOs with a duty cycle
- * value of 0 can be used as normal GPIOs for other purposes. GPIOs in the
- * list that are used for other purposes, e.g., I2C or SPI, are then not
- * available as PWM channels.
- */
-#ifndef PWM0_CHANNEL_GPIOS
-#define PWM0_CHANNEL_GPIOS { GPIO2, GPIO4, GPIO5 }
-#endif
-
-/** Alternative device definition */
-#define PWM0_DEV    PWM_DEV(0)
+#endif /* defined(PWM0_GPIOS) || defined(DOXYGEN) */
 /** @} */
 
-
 /**
- * @name    SPI configuration
+ * @name   SPI configuration
  *
- * ESP8266 provides two hardware SPI interfaces:
+ * ESP8266 has two SPI controllers:
  *
- * _FSPI_ for flash memory and usually simply referred to as _SPI_<br>
- * _HSPI_ for peripherals
+ * - _CSPI_ for caching and accessing the flash memory<br>
+ * - _HSPI_ for peripherals
  *
- * Even though _FSPI_ (or simply _SPI_) is a normal SPI interface, it is not
- * possible to use it for peripherals. _HSPI_ is therefore the only usable
- * SPI interface available for peripherals as RIOT's SPI_DEV(0).
+ * Thus, _HSPI_ is the only SPI interface that is available for peripherals.
+ * It is exposed as RIOT's SPI_DEV(0). Furthermore, the pin configuration of
+ * the _HSPI_ interface is fixed as shown in following table.
  *
- * The pin configuration of the _HSPI_ interface SPI_DEV(0) is fixed. The
- * only pin definition that can be overridden by an application-specific
- * board configuration is the CS signal defined by SPI0_CS0_GPIO.
+ * Signal     | Pin
+ * -----------|-------
+ * #SPI0_MISO | GPIO12
+ * #SPI0_MOSI | GPIO13
+ * #SPI0_SCK  | GPIO14
+ * #SPI0_CS0  | GPIOn with n = 0, 2, 4, 5, 15, 16 (additionally 9, 10 in DOUT flash mode)
  *
- * Signal          | Pin
- * ----------------|-------
- * SPI_DEV(0).MISO | GPIO12
- * SPI_DEV(0).MOSI | GPIO13
- * SPI_DEV(0).SCK  | GPIO14
- * SPI_DEV(0).CS   | GPIOn with n = 0, 2, 4, 5, 15, 16 (additionally 9, 10 in DOUT flash mode)
+ * The only pin definition that can be overridden by an application-specific
+ * board configuration is the CS signal defined by #SPI0_CS0.
+ *
  * @{
  */
-#if defined(MODULE_PERIPH_SPI) || defined(DOXYGEN)
 
-#define SPI_NUMOF   1                       /**< Number of SPI interfaces */
-#define SPI_DEV(x)  ((unsigned int)(x+1))   /**< SPI_DEV to SPI hardware mapping */
+#define SPI0_DEV    SPI_DEV(0)  /**< HSPI / SPI_DEV(0) device */
+#define SPI0_CTRL   HSPI        /**< HSPI / SPI_DEV(0) controller */
+#define SPI0_MISO   GPIO12      /**< HSPI / SPI_DEV(0) MISO pin */
+#define SPI0_MOSI   GPIO13      /**< HSPI / SPI_DEV(0) MOSI pin */
+#define SPI0_SCK    GPIO14      /**< HSPI / SPI_DEV(0) SCK pin */
 
-#define SPI0_DEV         SPI_DEV(0) /**< HSPI / SPI_DEV(0) device */
-#define SPI0_MISO_GPIO   GPIO12     /**< HSPI / SPI_DEV(0) MISO pin */
-#define SPI0_MOSI_GPIO   GPIO13     /**< HSPI / SPI_DEV(0) MOSI pin */
-#define SPI0_SCK_GPIO    GPIO14     /**< HSPI / SPI_DEV(0) SCK pin */
-
-#ifndef SPI0_CS0_GPIO
-#define SPI0_CS0_GPIO    GPIO15  /**< HSPI / SPI_DEV(0) CS default pin, only used when cs
-                                      parameter in spi_acquire is GPIO_UNDEF */
+#ifndef SPI0_CS0
+#define SPI0_CS0    GPIO15  /**< HSPI / SPI_DEV(0) CS default pin, only used when cs
+                                 parameter in spi_acquire is #GPIO_UNDEF */
 #endif
-#endif /* defined(MODULE_PERIPH_SPI) || defined(DOXYGEN) */
+
+/**
+ * @brief   Static array with configuration for declared SPI devices
+ */
+static const spi_conf_t spi_config[] = {
+#ifdef SPI0_CTRL
+    {
+        .ctrl = SPI0_CTRL,
+        .sck = SPI0_SCK,
+        .mosi = SPI0_MOSI,
+        .miso = SPI0_MISO,
+        .cs = SPI0_CS0,
+    },
+#endif
+};
+
+/**
+ * @brief Number of SPI interfaces
+ *
+ * The number of SPI interfaces is determined from board-specific peripheral
+ * definitions of SPIn_*.
+ *
+ * @note SPI_NUMOF definition must not be changed.
+ */
+#define SPI_NUMOF   ARRAY_SIZE(spi_config)
+
 /** @} */
 
 /**
@@ -153,9 +216,29 @@ extern "C" {
  *
  * @{
  */
-#define UART_NUMOF  1                   /**< Number of UART devices */
+
 #define UART0_TXD   GPIO1               /**< TxD pin of UART_DEV(0) */
 #define UART0_RXD   GPIO3               /**< RxD pin of UART_DEV(0) */
+
+/**
+ * @brief   Static array with configuration for declared UART devices
+ */
+static const uart_conf_t uart_config[] = {
+    {
+        .txd = UART0_TXD,
+        .rxd = UART0_RXD,
+    },
+};
+
+/**
+ * @brief Number of UART interfaces
+ *
+ * The number of UART interfaces is determined from board-specific peripheral
+ * definitions of UARTn_*.
+ *
+ * @note UART_NUMOF definition must not be changed.
+ */
+#define UART_NUMOF  (sizeof(uart_config)/sizeof(uart_config[0]))
 /** @} */
 
 #ifdef __cplusplus

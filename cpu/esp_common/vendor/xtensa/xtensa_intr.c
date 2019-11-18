@@ -112,13 +112,7 @@ xt_handler xt_set_interrupt_handler(int n, xt_handler f, void * arg)
     if( Xthal_intlevel[n] > XCHAL_EXCM_LEVEL )
         return 0;       /* priority level too high to safely handle in C */
 
-    #ifdef MODULE_ESP_SDK
-    /* for compatibility reasons with SDK, we use _xtos_interrupt_table */
-    /* in reverse order */
-    entry = _xt_interrupt_table + (XCHAL_NUM_INTERRUPTS - n);
-    #else
     entry = _xt_interrupt_table + n;
-    #endif
     old   = entry->handler;
 
     if (f) {

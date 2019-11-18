@@ -24,15 +24,11 @@
 #include "cpu_conf.h"
 #include "net/netdev.h"
 #include "net/gnrc.h"
+#include "esp_common_log.h"
 #include "esp_now_params.h"
 #include "esp_now_netdev.h"
 #include "esp_now_gnrc.h"
 #include "net/gnrc/netif.h"
-
-#ifdef MCU_ESP8266
-#include "log.h"
-#include "common.h"
-#endif
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"

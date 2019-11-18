@@ -6,7 +6,6 @@ extern "C" {
 #endif
 
 void gdbstub_init_debug_entry(void);
-void gdbstub_do_break(void);
 void gdbstub_icount_ena_single_step(void);
 void gdbstub_save_extra_sfrs_for_exception(void);
 void gdbstub_uart_entry(void);

@@ -96,7 +96,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 /* Enable stack backtrace across exception/interrupt - see below */
 #define XT_DEBUG_BACKTRACE    1
 
-
 /*
 --------------------------------------------------------------------------------
   Defines used to access _xtos_interrupt_table.
@@ -225,10 +224,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     find_ms_setbit a3, a4, a3, 0            /* a3 = interrupt number */
 
-#if MODULE_ESP_SDK                          /* _xtos_interrupt_table is in reverse order */
-    movi    a4, XCHAL_NUM_INTERRUPTS        /* intnum = XCHAL_NUM_INTERRUPTS - intnum */
-    sub     a3, a4, a3
-#endif
     movi    a4, _xt_interrupt_table
     addx8   a3, a3, a4                      /* a3 = address of interrupt table entry */
     l32i    a4, a3, XIE_HANDLER             /* a4 = handler address */
@@ -302,6 +297,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
     .text
+    .literal_position
     .global     _xt_panic
     .type       _xt_panic,@function
     .align      4
@@ -315,6 +311,10 @@ _xt_panic:
     movi    a2, SYS_gdb_abort
     simcall
     #else
+    #ifdef RIOT_VERSION
+    addi    a2, a0, -3
+    call0   _panic_handler
+    #endif
     rsil    a2, XCHAL_EXCM_LEVEL            /* disable all low & med ints */
 1:  j       1b                              /* loop infinitely */
     #endif
@@ -388,6 +388,14 @@ Debug Exception.
     .align      4
 
 _DebugExceptionVector:
+    /*
+     * Please note that this code will be overwritten with
+     *      
+     *      xsr a2, excsave2
+     *      jx  a2
+     *
+     * if module esp_gdbstub is used.
+     */
 
     #ifdef XT_SIMULATOR
     /*
@@ -401,15 +409,15 @@ _DebugExceptionVector:
     wsr     a3, EXCSAVE+XCHAL_DEBUGLEVEL
     movi    a3, xthal_debugexc_defhndlr_nw  /* use default debug handler */
     jx      a3
-    #else
+    #else /* XT_SIMULATOR */
     wsr     a0, EXCSAVE+XCHAL_DEBUGLEVEL    /* save original a0 somewhere */
     call0   _xt_panic                       /* does not return */
     rfi     XCHAL_DEBUGLEVEL                /* make a0 point here not later */
-    #endif
+    #endif /* XT_SIMULATOR */
 
-    .end        literal_prefix
+    .end    literal_prefix
 
-#endif
+#endif /* XCHAL_HAVE_DEBUG */
 
 /*
 --------------------------------------------------------------------------------
@@ -503,6 +511,7 @@ _UserExceptionVector:
  * "LoadStoreError Handler END" markers was extracted from esp-open-rtos. It is
  * under the following copyright:
  *
+ * Part of esp-open-rtos
  * Original vector contents Copyright (C) 2014-2015 Espressif Systems
  * Additions Copyright (C) Superhouse Automation Pty Ltd and Angus Gratton
  * BSD Licensed as described in the file LICENSE
@@ -573,13 +582,13 @@ _LoadStoreErrorHandler:
     s32i    a2, sp, 0x08
     s32i    a3, sp, 0x0c
     s32i    a4, sp, 0x10
-    rsr     a0, sar     # Save SAR in a0 to restore later
+    rsr     a0, sar         # Save SAR in a0 to restore later
 
     /* Examine the opcode which generated the exception */
     /* Note: Instructions are in this order to avoid pipeline stalls. */
     rsr     a2, epc1
     movi    a3, ~3
-    ssa8l   a2          # sar is now correct shift for aligned read
+    ssa8l   a2              # sar is now correct shift for aligned read
     and     a2, a2, a3      # a2 now 4-byte aligned address of instruction
     l32i    a4, a2, 0
     l32i    a2, a2, 4
@@ -600,8 +609,8 @@ _LoadStoreErrorHandler:
     and     a4, a3, a4      # a4 now word aligned read address
 
     l32i    a4, a4, 0       # perform the actual read
-    ssa8l   a3          # sar is now shift to extract a3's byte
-    srl     a3, a4      # shift right correct distance
+    ssa8l   a3              # sar is now shift to extract a3's byte
+    srl     a3, a4          # shift right correct distance
     extui   a4, a3, 0, 8    # mask off bits we need for an l8
 
 .LSE_post_fetch:
@@ -678,8 +687,8 @@ _LoadStoreErrorHandler:
     and     a4, a3, a4      # a4 now word aligned read address
 
     l32i    a4, a4, 0       # perform the actual read
-    ssa8l   a3          # sar is now shift to extract a3's bytes
-    srl     a3, a4      # shift right correct distance
+    ssa8l   a3              # sar is now shift to extract a3's bytes
+    srl     a3, a4          # shift right correct distance
     extui   a4, a3, 0, 16   # mask off bits we need for an l16
 
     bbci    a2, 15, .LSE_post_fetch  # Not a signed op
@@ -1951,14 +1960,32 @@ _xt_highint6:
 
 #if XCHAL_HAVE_NMI
 
+#define NMI_STACK_CANARY 0xABBABABA
+
+/* Stack space for NMI handler
+
+   NMI handler stack high water mark measured at 0x134 bytes. Any use
+   of the NMI timer callback will add stack overhead as well.
+
+   The NMI handler does a basic check for stack overflow
+*/
+
+    .section .bss
+    .balign 16
+
+NMIHandlerStack:
+    .skip 0x200
+.NMIHandlerStackTop:
+
     .begin      literal_prefix .NMIExceptionVector
     .section    .NMIExceptionVector.text, "ax"
     .global     _NMIExceptionVector
     .type       _NMIExceptionVector,@function
     .literal_position
-
     .align      4
+
 _NMIExceptionVector:
+
     wsr     a0, EXCSAVE + XCHAL_NMILEVEL  _ /* preserve a0 */
     call0   _xt_nmi                         /* load interrupt handler */
     /* never returns here - call0 is used as a jump (see note at top) */
@@ -1983,6 +2010,113 @@ _xt_nmi:
     /* USER_EDIT:
     ADD HIGH PRIORITY NON-MASKABLE INTERRUPT (NMI) HANDLER CODE HERE.
     */
+    #if defined(RIOT_VERSION) && defined(MCU_ESP8266)
+
+    rsr     a0, EXCSAVE + XCHAL_NMILEVEL /* restore a0 as saved in _NMIExceptionHandler */
+
+    /*************************** NMI Handler BEGIN **************************/
+    /*
+     * PLEASE NOTE: The code between "NMI Handler BEGIN" and
+     * "NMI Handler END" markers was extracted from esp-open-rtos.
+     * It is under the following copyright:
+     *
+     * Part of esp-open-rtos
+     * Original vector contents Copyright (C) 2014-2015 Espressif Systems
+     * Additions Copyright (C) Superhouse Automation Pty Ltd and Angus Gratton
+     * BSD Licensed as described in the file LICENSE.
+     */
+    wsr     sp, excsave3    # excsave3 holds user stack
+    movi    sp, .NMIHandlerStackTop - 0x40
+    s32i    a0, sp, 0x00
+    s32i    a2, sp, 0x04
+    s32i    a3, sp, 0x08
+    s32i    a4, sp, 0x0c
+    s32i    a5, sp, 0x10
+    s32i    a6, sp, 0x14
+    s32i    a7, sp, 0x18
+    s32i    a8, sp, 0x1c
+    s32i    a9, sp, 0x20
+    s32i    a10, sp, 0x24
+    s32i    a11, sp, 0x28
+    rsr     a0, epc1
+    s32i    a0, sp, 0x2c
+    rsr     a0, exccause
+    s32i    a0, sp, 0x30
+    rsr     a0, excsave1
+    s32i    a0, sp, 0x34
+    rsr     a0, excvaddr
+    s32i    a0, sp, 0x38
+    rsr     a0, sar
+    s32i    a0, sp, 0x3c
+    movi    a0, 0x23        # Override PS for NMI handler
+    wsr     a0, ps
+    rsync
+
+    /* mark the stack overflow point before we call the actual NMI handler */
+    movi    a0, NMIHandlerStack
+    movi    a2, NMI_STACK_CANARY
+    s32i    a2, a0, 0x00
+
+    call0   wDev_ProcessFiq
+
+    /* verify we didn't overflow */
+    movi    a0, NMIHandlerStack
+    l32i    a3, a0, 0
+    movi    a2, NMI_STACK_CANARY
+    bne     a3, a2, _xt_panic /* .NMIFatalStackOverflow */
+
+    l32i    a0, sp, 0x3c
+    wsr     a0, sar
+    l32i    a0, sp, 0x38
+    wsr     a0, excvaddr
+    l32i    a0, sp, 0x34
+    wsr     a0, excsave1
+    l32i    a0, sp, 0x30
+    wsr     a0, exccause
+    l32i    a0, sp, 0x2c
+    wsr     a0, epc1
+    l32i    a11, sp, 0x28
+    l32i    a10, sp, 0x24
+    l32i    a9, sp, 0x20
+    l32i    a8, sp, 0x1c
+    l32i    a7, sp, 0x18
+    l32i    a6, sp, 0x14
+    l32i    a5, sp, 0x10
+    l32i    a4, sp, 0x0c
+    l32i    a3, sp, 0x08
+    movi    a0, 0x33      # Reset PS
+    wsr     a0, ps
+    rsync
+    /* set dport nmi status to 1 (wDev_ProcessFiq clears bit 0 and verifies it
+     * stays cleared, see
+     * http://esp8266-re.foogod.com/wiki/WDev_ProcessFiq_%28IoT_RTOS_SDK_0.9.9%29)
+     */
+    movi    a0, 0x3ff00000
+    movi    a2, 0x1
+    s32i    a2, a0, 0
+    l32i    a2, sp, 0x04
+    l32i    a0, sp, 0x00
+    movi    a1, 0x0
+    xsr     a1, excsave3       # Load stack back from excsave3, clear excsave3
+    rfi     XCHAL_NMILEVEL
+
+    .section .rodata
+.NMIStackOverflowErrorMsg:
+    .string "\nFATAL: NMI Stack Overflow\n"
+
+    .section .NMIExceptionhandler.text, "ax"
+    .literal_position
+
+.NMIFatalStackOverflow:
+    movi a2, .NMIStackOverflowErrorMsg
+    call0 printf
+
+.NMIInfiniteLoop:
+    j .NMIInfiniteLoop /* TODO: replace with call to abort() */
+
+    /*************************** NMI Handler END ****************************/
+
+    #endif  /* defined(RIOT_VERSION) && defined(MCU_ESP8266) */
 
     .align  4
 .L_xt_nmi_exit:

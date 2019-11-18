@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,7 +18,7 @@
  * @}
  */
 
-#define ENABLE_DEBUG    0
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #include <stdint.h>
@@ -27,10 +27,9 @@
 #include "irq.h"
 #include "cpu.h"
 
-#include "common.h"
+#include "esp_common.h"
 #include "esp/common_macros.h"
 #include "esp/xtensa_ops.h"
-#include "sdk/ets.h"
 #include "xtensa/xtensa_context.h"
 
 /**
@@ -46,9 +45,9 @@ unsigned int IRAM irq_disable(void)
     uint32_t _saved_interrupt_level;
 
     /* read and set interrupt level (RSIL) */
-    __asm__ volatile ("rsil %0, " XTSTR(XCHAL_NUM_INTLEVELS+1) : "=a" (_saved_interrupt_level));
+    __asm__ volatile ("rsil %0, " XTSTR(XCHAL_EXCM_LEVEL) : "=a" (_saved_interrupt_level));
     DEBUG ("%s %02x(%02x)\n", __func__,
-           (_saved_interrupt_level & 0xfffffff0) | (XCHAL_NUM_INTLEVELS+1),
+           (_saved_interrupt_level & 0xfffffff0) | (XCHAL_EXCM_LEVEL),
            _saved_interrupt_level);
     return _saved_interrupt_level;
 }
@@ -62,7 +61,7 @@ unsigned int IRAM irq_enable(void)
 
     /* read and set interrupt level (RSIL) */
     __asm__ volatile ("rsil %0, 0" : "=a" (_saved_interrupt_level));
-    DEBUG ("%s %02x(%02x)\n", __func__,
+    DEBUG ("%s %02x (%02x)\n", __func__,
            _saved_interrupt_level & 0xfffffff0, _saved_interrupt_level);
     return _saved_interrupt_level;
 }

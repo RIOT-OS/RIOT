@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-/** Initalize exception handler */
+/** Initialize exception handler */
 extern void init_exceptions(void);
 
 #ifdef __cplusplus

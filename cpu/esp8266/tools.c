@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,11 +19,16 @@
  */
 
 #include <stdio.h>
-#include <inttypes.h>
 #include <malloc.h>
 
+#ifdef MCU_ESP8266
+#include <inttypes.h>
+#include "sdk/sdk.h"
+#else
+#include "rom/ets_sys.h"
+#endif
+
 #include "esp/common_macros.h"
-#include "sdk/ets.h"
 #include "tools.h"
 
 extern void malloc_stats (void);
@@ -58,19 +63,18 @@ void esp_hexdump (const void* addr, uint32_t num, char width, uint8_t per_line)
 
     while (count < num) {
         if (count % per_line == 0) {
-            printf ("%08x: ", (uint32_t)((uint8_t*)addr+count*size));
+            ets_printf ("%08" PRIx32 ": ", (uint32_t)((uint8_t*)addr+count*size));
         }
         switch (width) {
-            case 'b': printf("%02" PRIx8 " ", addr8[count++]); break;
-            case 'h': printf("%04" PRIx16 " ", addr16[count++]); break;
-            case 'w': printf("%08" PRIx32 " ", addr32[count++]); break;
-            case 'g': printf("%016" PRIx64 " ", addr64[count++]); break;
-
-            default : printf("."); count++; break;
+            case 'b': ets_printf("%02" PRIx8 " ", addr8[count++]); break;
+            case 'h': ets_printf("%04" PRIx16 " ", addr16[count++]); break;
+            case 'w': ets_printf("%08" PRIx32 " ", addr32[count++]); break;
+            case 'g': ets_printf("%016" PRIx64 " ", addr64[count++]); break;
+            default : ets_printf("."); count++; break;
         }
         if (count % per_line == 0) {
-            printf ("\n");
+            ets_printf ("\n");
         }
     }
-    printf ("\n");
+    ets_printf ("\n");
 }

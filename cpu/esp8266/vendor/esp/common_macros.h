@@ -33,7 +33,7 @@ extern "C" {
 
 #define UNUSED __attributed((unused))
 
-#ifndef BIT
+#if defined(MCU_ESP8266) && !defined(BIT)
 #define BIT(X) (1<<(X))
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -25,28 +25,9 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#include "c_types.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#ifndef MODULE_ESP_SDK
-/*
- * The following functions are mappings or dummies for source code
- * compatibility of SDK and NON-SDK version
- */
-
-#include "esp/dport_regs.h"
-
-extern void     phy_afterwake_set_rfoption(int op);
-extern int      phy_check_data_table(void * gdctbl, int x, int flg);
-extern int      register_chipv6_phy(uint8_t * esp_init_data);
-extern void     sleep_reset_analog_rtcreg_8266(void);
-extern uint32_t test_tout(bool);
-extern void     write_data_to_rtc(uint8_t *);
-
-#endif /* MODULE_ESP_SDK */
 
 extern uint32_t phy_get_mactime(void);
 

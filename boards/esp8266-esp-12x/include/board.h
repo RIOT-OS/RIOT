@@ -8,10 +8,6 @@
 
 /**
  * @ingroup     boards_esp8266_esp-12x
- */
-
-/**
- * @ingroup     boards_esp8266_esp-12x
  * @brief       Board specific definitions for ESP-12x based boards.
  * @file
  * @author      Gunar Schorcht <gunar@schorcht.net>

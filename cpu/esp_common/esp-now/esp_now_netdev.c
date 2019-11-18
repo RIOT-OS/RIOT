@@ -27,24 +27,16 @@
 #include "net/gnrc.h"
 #include "xtimer.h"
 
-#ifdef MCU_ESP32
 #include "esp_common.h"
 #include "esp_attr.h"
 #include "esp_event_loop.h"
 #include "esp_now.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
-#include "nvs_flash/include/nvs_flash.h"
-#else
-#include "common.h"
-#include "espressif/c_types.h"
-#include "espnow.h"
-#include "esp/common_macros.h"
-#include "sdk/sdk.h"
-#endif /* MCU_ESP32 */
-
 #include "irq_arch.h"
 #include "od.h"
+
+#include "nvs_flash/include/nvs_flash.h"
 
 #include "esp_now_params.h"
 #include "esp_now_netdev.h"
@@ -61,50 +53,25 @@
 #define ESP_NOW_AP_PREFIX        "RIOT_ESP_"
 #define ESP_NOW_AP_PREFIX_LEN    (strlen(ESP_NOW_AP_PREFIX))
 
-#ifdef MCU_ESP32
-
-#define esp_now_set_self_role(r)
-
-#else
-
-#define ESP_NOW_ROLE_IDLE        (0)
-#define ESP_NOW_ROLE_CONTROLLER  (1)
-#define ESP_NOW_ROLE_SLAVE       (2)
-#define ESP_NOW_ROLE_COMBO       (3)
-#define ESP_NOW_KEY_LEN          (16)
-
-#define ESP_OK                   (0)
-
-#ifndef IRAM_ATTR
-#define IRAM_ATTR                IRAM
-#endif
-
-#endif /* MCU_ESP8266 */
-
 #if MODULE_ESP_WIFI && !ESP_NOW_UNICAST
 #error If module esp_wifi is used, module esp_now has to be used in unicast mode
 #endif
 
 /**
  * There is only one ESP-NOW device. We define it as static device variable
- * to have accesss to the device inside ESP-NOW interrupt routines which do
+ * to have access to the device inside ESP-NOW interrupt routines which do
  * not provide an argument that could be used as pointer to the ESP-NOW
  * device which triggers the interrupt.
  */
-static esp_now_netdev_t _esp_now_dev;
+static esp_now_netdev_t _esp_now_dev = { 0 };
 static const netdev_driver_t _esp_now_driver;
 
-#ifdef MCU_ESP32
 static bool _esp_now_add_peer(const uint8_t* bssid, uint8_t channel, uint8_t* key)
-#else
-static bool _esp_now_add_peer(uint8_t* bssid, uint8_t channel, uint8_t* key)
-#endif
 {
     if (esp_now_is_peer_exist(bssid)) {
         return false;
     }
 
-#ifdef MCU_ESP32
     esp_now_peer_info_t peer = {};
 
     memcpy(peer.peer_addr, bssid, ESP_NOW_ETH_ALEN);
@@ -117,11 +84,6 @@ static bool _esp_now_add_peer(uint8_t* bssid, uint8_t channel, uint8_t* key)
     }
 
     esp_err_t ret = esp_now_add_peer(&peer);
-#else
-    int ret = esp_now_add_peer(bssid, ESP_NOW_ROLE_COMBO, channel,
-                               esp_now_params.key,
-                               esp_now_params.key ? ESP_NOW_KEY_LEN : 0);
-#endif
     DEBUG("esp_now_add_peer node %02x:%02x:%02x:%02x:%02x:%02x "
           "added with return value %d\n",
           bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5], ret);
@@ -132,8 +94,6 @@ static bool _esp_now_add_peer(uint8_t* bssid, uint8_t channel, uint8_t* key)
 
 static xtimer_t _esp_now_scan_peers_timer;
 static bool _esp_now_scan_peers_done = false;
-
-#ifdef MCU_ESP32
 
 #define ESP_NOW_APS_BLOCK_SIZE 8 /* has to be power of two */
 
@@ -207,64 +167,14 @@ static void IRAM_ATTR esp_now_scan_peers_done(void)
     mutex_unlock(&_esp_now_dev.dev_lock);
 }
 
-#else /* MCU_ESP32 */
-
-static const struct scan_config scan_cfg = {
-        .ssid = 0,
-        .bssid = 0,
-        .channel = ESP_NOW_CHANNEL,
-        .show_hidden = true
-};
-
-static void IRAM esp_now_scan_peers_done(void *arg, STATUS status)
-{
-    /* This function is executed in interrupt context */
-
-    DEBUG("%s: %p %d\n", __func__, arg, status);
-
-    CHECK_PARAM (status == OK);
-    CHECK_PARAM (arg != NULL);
-
-    critical_enter();
-
-    struct bss_info *bss_link = (struct bss_info*)arg;
-
-    /* iterate over APs records */
-    while (bss_link) {
-        /* check whether the AP is an ESP_NOW node */
-        if (strncmp((char*)bss_link->ssid, ESP_NOW_AP_PREFIX, ESP_NOW_AP_PREFIX_LEN) == 0) {
-            /* add the AP as peer */
-            _esp_now_add_peer(bss_link->bssid, bss_link->channel, esp_now_params.key);
-        }
-        bss_link = STAILQ_NEXT(bss_link, next);
-    }
-
-#if ENABLE_DEBUG
-    uint8_t peers_all;
-    uint8_t peers_enc;
-    esp_now_get_cnt_info (&peers_all, &peers_enc);
-    DEBUG("associated peers total=%d, encrypted=%d\n", peers_all, peers_enc);
-#endif /* ENABLE_DEBUG */
-
-    _esp_now_scan_peers_done = true;
-
-    critical_exit();
-}
-
-#endif /* MCU_ESP32 */
-
 static void esp_now_scan_peers_start(void)
 {
     DEBUG("%s\n", __func__);
 
+    /* start the scan */
+    esp_wifi_scan_start(&scan_cfg, false);
     /* set the time for next scan */
     xtimer_set(&_esp_now_scan_peers_timer, esp_now_params.scan_period);
-    /* start the scan */
-#ifdef MCU_ESP32
-    esp_wifi_scan_start(&scan_cfg, false);
-#else
-    wifi_station_scan((struct scan_config*)&scan_cfg, esp_now_scan_peers_done);
-#endif
 }
 
 static void IRAM_ATTR esp_now_scan_peers_timer_cb(void* arg)
@@ -287,11 +197,7 @@ static const uint8_t _esp_now_mac[6] = { 0x82, 0x73, 0x79, 0x84, 0x79, 0x83 }; /
 
 static bool _in_recv_cb = false;
 
-#ifdef MCU_ESP32
 static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, int len)
-#else
-static IRAM_ATTR void esp_now_recv_cb(uint8_t *mac, uint8_t *data, uint8_t len)
-#endif
 {
 #if ESP_NOW_UNICAST
     if (!_esp_now_scan_peers_done) {
@@ -349,11 +255,7 @@ static IRAM_ATTR void esp_now_recv_cb(uint8_t *mac, uint8_t *data, uint8_t len)
 
 static volatile int _esp_now_sending = 0;
 
-#ifdef MCU_ESP32
 static void IRAM_ATTR esp_now_send_cb(const uint8_t *mac, esp_now_send_status_t status)
-#else
-static void IRAM_ATTR esp_now_send_cb(uint8_t *mac, uint8_t status)
-#endif
 {
     DEBUG("%s: sent to %02x:%02x:%02x:%02x:%02x:%02x with status %d\n",
           __func__,
@@ -364,7 +266,6 @@ static void IRAM_ATTR esp_now_send_cb(uint8_t *mac, uint8_t status)
     }
 }
 
-#ifdef MCU_ESP32
 /*
  * Event handler for esp system events.
  */
@@ -389,12 +290,6 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
 extern esp_err_t esp_system_event_add_handler(system_event_cb_t handler,
                                               void *arg);
 
-#else /* MCU_ESP32 */
-
-#define ESP_IF_WIFI_STA             (STATION_IF)
-
-#endif /* MCU_ESP32 */
-
 esp_now_netdev_t *netdev_esp_now_setup(void)
 {
     esp_now_netdev_t* dev = &_esp_now_dev;
@@ -406,17 +301,17 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
         return dev;
     }
 
-#ifdef MCU_ESP32
-
     /* initialize buffer */
     dev->rx_len = 0;
 
     /* set the event handler */
     esp_system_event_add_handler(_esp_system_event_handler, NULL);
 
+#ifdef MCU_ESP32
     /* init the WiFi driver */
     extern portMUX_TYPE g_intr_lock_mux;
     mutex_init(&g_intr_lock_mux);
+#endif /* MCU_ESP32 */
 
     esp_err_t result;
 
@@ -462,7 +357,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
         }
     };
 
-    /* get SoftAP interface mac address and store it as device addresss */
+    /* get SoftAP interface mac address and store it as device address */
     esp_read_mac(dev->addr, ESP_MAC_WIFI_SOFTAP);
 
     /* prepare the ESP_NOW configuration for SoftAP */
@@ -513,47 +408,13 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
                       "esp_wifi_start failed with return value %d\n", result);
         return NULL;
     }
+
 #if !ESP_NOW_UNICAST
     /* all ESP-NOW nodes get the shared mac address on their station interface */
     esp_wifi_set_mac(ESP_IF_WIFI_STA, (uint8_t*)_esp_now_mac);
 #endif
 
 #endif /* MODULE_ESP_WIFI */
-
-#else /* MCU_ESP32 */
-
-    int result;
-
-    /* set the WiFi interface to Station + SoftAP mode without DHCP */
-    wifi_set_opmode_current(ESP_NOW_WIFI_STA_SOFTAP);
-    wifi_softap_dhcps_stop();
-
-    /* get SoftAP mac address and store it in device address */
-    wifi_get_macaddr(SOFTAP_IF, dev->addr);
-
-    /* set the SoftAP configuration */
-    struct softap_config ap_conf;
-
-    strcpy((char*)ap_conf.password, esp_now_params.softap_pass);
-    sprintf((char*)ap_conf.ssid, "%s%02x%02x%02x%02x%02x%02x", ESP_NOW_AP_PREFIX,
-            dev->addr[0], dev->addr[1], dev->addr[2],
-            dev->addr[3], dev->addr[4], dev->addr[5]);
-
-    ap_conf.ssid_len = strlen((char*)ap_conf.ssid);
-    ap_conf.channel = esp_now_params.channel; /* support 1 ~ 13 */
-    ap_conf.authmode = AUTH_WPA2_PSK;         /* don't support AUTH_WEP in softAP mode. */
-    ap_conf.ssid_hidden = 0;                  /* default 0 */
-    ap_conf.max_connection = 4;               /* default 4, max 4 */
-    ap_conf.beacon_interval = 100;            /* support 100 ~ 60000 ms, default 100 */
-
-    wifi_softap_set_config_current(&ap_conf);
-
-#if !ESP_NOW_UNICAST
-    /* all ESP-NOW nodes get the shared mac address on their station interface */
-    wifi_set_macaddr(ESP_IF_WIFI_STA, (uint8_t*)_esp_now_mac);
-#endif
-
-#endif /* MCU_ESP32 */
 
     /* set the netdev driver */
     dev->netdev.driver = &_esp_now_driver;
@@ -572,7 +433,6 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     }
     esp_now_register_send_cb(esp_now_send_cb);
     esp_now_register_recv_cb(esp_now_recv_cb);
-    esp_now_set_self_role(ESP_NOW_ROLE_COMBO);
 
 #if ESP_NOW_UNICAST
     /* timer for peer scan initialization */

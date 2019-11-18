@@ -1,4 +1,3 @@
-file ../ld/esp8266.riot-os.sdk.app.ld
 #set remotedebug 1
 set remotelogfile gdb_rsp_logfile.txt
 set serial baud 115200
