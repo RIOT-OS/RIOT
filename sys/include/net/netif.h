@@ -90,6 +90,16 @@ netif_t *netif_iter(netif_t *last);
 int netif_get_name(netif_t *netif, char *name);
 
 /**
+ * @brief   Gets the numeric identifier of an interface
+ *
+ * @param[in] netif A network interface.
+ *
+ * @return  The numeric identifier of an interface
+ * @return  -1 if @p netif is not registered
+ */
+int16_t netif_get_id(const netif_t *netif);
+
+/**
  * @brief   Gets interface by name
  *
  * @pre `name != NULL`
@@ -102,6 +112,16 @@ int netif_get_name(netif_t *netif, char *name);
  * @return  NULL if no interface is named @p name.
  */
 netif_t *netif_get_by_name(const char *name);
+
+/**
+ * @brief   Gets interface by a numeric identifier.
+ *
+ * @param[in] id  A numeric identifier.
+ *
+ * @return  The interface on success.
+ * @return  NULL if no interface with identifier @p id.
+ */
+netif_t *netif_get_by_id(int16_t id);
 
 /**
  * @brief   Gets option from an interface
