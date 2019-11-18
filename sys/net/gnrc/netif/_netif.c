@@ -27,6 +27,26 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+/* GNRC implementation of netif_recv.
+ *
+ * This function converts the `netif_pkt` representation
+ * into a `gnrc_pkt` representation. Note that the
+ * netbuf implementation of GNRC uses the gnrc_pktsnip_t
+ * pointer as netbuf context, so we can get fetch the packet
+ * from there.
+ *
+ * Also, we need to create the gnrc_netif_hdr to pass the
+ * L2 metadata to the upper layers. And also remove the
+ * L2 header.
+ *
+ * Note that if a PHY layer didn't call the netbuf allocation
+ * function (e.g the PHY layer had a static framebuffer like
+ * the ESP-WIFI implementation), it's possible to set the
+ * allocation context (netif_pkt->ctx) to NULL.
+ * So, it's possible to only allocate the MSDU
+ * and not the full packet!! This would reduce the number
+ * of memcpy in those cases.
+ */
 int netif_recv(netif_t *netif, netif_pkt_t *pkt)
 {
     gnrc_pktsnip_t *gnrc_pkt = pkt->ctx;
@@ -41,6 +61,13 @@ int netif_recv(netif_t *netif, netif_pkt_t *pkt)
         return 0;
     }
 
+    /* We can avoid the following logic if we know the PHY layer
+     * didn't allocate the packet (see the description of this function).
+     *
+     * In that case, we would need to call
+     * `gnrc_pktbuf_add(pkt->msdu.iol_base, pkt->msdu.iol_len, GNRC_NETTYPE_UNDEF)`
+     * instead of removing the snip and reallocating data.
+     */
     gnrc_pktsnip_t *ieee802154_hdr = gnrc_pktbuf_mark(gnrc_pkt, ((uint8_t*) pkt->msdu.iol_base) - ((uint8_t*) gnrc_pkt->data), GNRC_NETTYPE_UNDEF);
 
     gnrc_pktbuf_remove_snip(gnrc_pkt, ieee802154_hdr);

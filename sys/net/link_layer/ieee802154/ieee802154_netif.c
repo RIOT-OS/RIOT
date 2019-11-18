@@ -7,6 +7,10 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+/* Implementation of the MAC indication.
+ * This function generates the `netif_pkt` from the MAC layer output,
+ * and calls the `netif_recv` function.
+ */
 void ieee802154_mac_ind(netdev_ieee802154_t *netdev, ieee802154_mac_ind_t *ind, ieee802154_phy_ind_t *phy_ind)
 {
     netif_pkt_t pkt = {0};
@@ -42,6 +46,10 @@ void ieee802154_mac_ind(netdev_ieee802154_t *netdev, ieee802154_mac_ind_t *ind, 
 #endif
 
     netif_t *netif = ((netdev_t*) netdev)->context;
+
+    /* We call the `netif_recv` function to pass the packet
+     * to the stack. If the stack doesn't want the packet,
+     * we release it via the netbuf API. */
     if(!netif_recv(netif, &pkt)) {
         netbuf_free(phy_ind->ctx);
     }

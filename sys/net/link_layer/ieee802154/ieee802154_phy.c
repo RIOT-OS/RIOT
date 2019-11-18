@@ -6,7 +6,18 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/* This function is the same for all IEEE802154 devices! */
+/* The transceiver HAL will call this function when there's a packet
+ * in the framebuffer of the transceiver. The role of the PHY layer
+ * is to use the transceiver HAL and the netbuf API to:
+ * - Allocate a buffer from the network stack
+ * - Read L1 data (LQI, RSSI, etc).
+ * - Generate a PHY indication with the packet + L1 data.
+ *
+ * Here we use some components of `netdev` as our transceiver
+ * HAL.
+ * Note this function is the same for all IEEE802154 devices,
+ * as seen, we reuse the PHY layer for those :)
+ */
 void ieee802154_rf_rx_done(netdev_t *dev)
 {
     netdev_ieee802154_rx_info_t rx_info;
@@ -30,13 +41,19 @@ void ieee802154_rf_rx_done(netdev_t *dev)
     }
 
     ieee802154_phy_ind_t ind;
+
+    /* Here we populate the indication with the Physical Service
+     * Data Unit (PSDU, full L2 frame), allocation context and
+     * L1 info
+     */
     ind.lqi = rx_info.lqi;
     ind.rssi = rx_info.rssi;
     ind.psdu = psdu;
     ind.psdu_len = nread;
     ind.ctx = ctx;
 
-    /* Interface here? */
+    /* We have to decide if we need an interface here
+     * E.g ieee802154_phy->ind(dev, &ind); */
     ieee802154_phy_ind(dev, &ind);
 }
 

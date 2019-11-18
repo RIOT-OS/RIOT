@@ -6,9 +6,17 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/* Note all IEEE802.15.4 MAC layers will have this signature.
- * There's probably no need for an interface here, unless there are co-existent
- * IEEE802.15.4 MAC layers. */
+/* Receive function of the IEEE802.15.4 MAC.
+ * This function parses the packet and does handles MAC duties
+ * (packet filtering, handle ACK, security, etc).
+ *
+ * This function interacts with the IEEE802.15.4 PHY (represented by
+ * the `netdev_ieee802154_t` structure).
+ *
+ * It will generate a MAC indication with the MSDU (MAC Service Data Unit,
+ * L2 payload) and L2 information (source and destination addresses,
+ * frame pending, etc).
+ */
 void ieee802154_mac_recv(netdev_ieee802154_t *dev, ieee802154_phy_ind_t *ind)
 {
     ieee802154_mac_ind_t mac_ind;
@@ -81,10 +89,23 @@ void ieee802154_mac_recv(netdev_ieee802154_t *dev, ieee802154_phy_ind_t *ind)
     netif->last_pkt.src_len = src_len;
     netif->last_pkt.seq = ieee802154_get_seq(mhr);
 #endif /* MODULE_GNRC_NETIF_DEDUP */
+
+    /* IEEE802.15.4 indication with L1 + L2 data */
+    /* We could think of having an interface here
+     * E.g ieee802154_mac->ind(dev, &mac_ind, ind)
+     */
     ieee802154_mac_ind(dev, &mac_ind, ind);
 }
 
-/* Interface here? */
+/* Implementation of the PHY indication.
+ * This PHY indication implementation checks if the packet has to be processed
+ * by the IEEE802.15.4 MAC layer. If so, it calls the receive function
+ * of the IEEE802.15.4 MAC. Otherwise, it calls `netif_recv` directly
+ * with the `netif_pkt`.
+ *
+ * Note the PHY indication contains all the data required by the MAC layer
+ * (PSDU, RSSI, LQI, etc).
+ */
 void ieee802154_phy_ind(netdev_t *netdev, ieee802154_phy_ind_t *ind)
 {
 #ifdef MODULE_NETSTATS_L2
@@ -110,6 +131,12 @@ void ieee802154_phy_ind(netdev_t *netdev, ieee802154_phy_ind_t *ind)
     }
 }
 
+/* IEEE802.15.4 send function.
+ * Note this functions is GNRC independent!
+ *
+ * This function interacts with the PHY layer (represented by
+ * `netdev_ieee802154_t`) in order to send a IEEE802.15.4 packet
+ */
 int ieee802154_mac_send(netdev_ieee802154_t *netdev, iolist_t *msdu, int frame_pending,
         uint8_t *src, size_t src_len, uint8_t *dst, size_t dst_len)
 {
@@ -150,6 +177,7 @@ int ieee802154_mac_send(netdev_ieee802154_t *netdev, iolist_t *msdu, int frame_p
         res = dev->driver->send(dev, &iolist);
     }
 #else
+    /* We call our PHY layer send function */
     res = dev->driver->send(dev, &iolist);
 #endif
 

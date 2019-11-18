@@ -56,7 +56,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
 /* Implementation of netif_ieee802144 send function.
  * This function sits on top of the IEEE802154 MAC layer.
- * Nothe this functions is (mostly) GNRC agnostic! */
+ * Note this functions is intended to be GNRC agnostic! */
 void netif_ieee802154_send(netif_t *netif, netif_pkt_t *pkt)
 {
     //const uint8_t *src, *dst = NULL;
@@ -94,19 +94,34 @@ void netif_ieee802154_send(netif_t *netif, netif_pkt_t *pkt)
 
     
     gnrc_netif_t *gnrc_netif = (gnrc_netif_t*) netif;
+    /* We don't need any MAC interface here since we know gnrc_netif_ieee802154
+     * talks to a IEEE802.15.4 MAC layer... */
     ieee802154_mac_send((netdev_ieee802154_t*) gnrc_netif->dev, &pkt->msdu, pkt->flags & GNRC_NETIF_HDR_FLAGS_MORE_DATA,
             src, src_len, dst, dst_len);
 
-    /* release old data */
+    /* This is usually handled by the MAC layer.
+     * But anyway, we release the old data */
     netbuf_free(pkt->ctx);
 }
 
+/* Send a `netif_pkt` via the given interface-
+ *
+ * Note this function is GNRC independent!
+ */
 void netif_send(netif_t *netif, netif_pkt_t *pkt)
 {
-    /* netif->ops->send(netif, pkt); */
+    /* Of course, this will be:
+     * netif->ops->send(netif, pkt); */
     netif_ieee802154_send(netif, pkt); /* We use this one, since there's no netif->ops yet :( */
 }
 
+/* Function to be called when GNRC needs to send a
+ * pkt snip that contains the netif hdr.
+ *
+ * This function should build the `netif_pkt` and
+ * call the `netif_send` function. From there, all
+ * functions are GNRC independent.
+ */
 int gnrc_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     /* ========== BEGIN GNRC_NETIF_GLUE_CODE ========== */
@@ -132,6 +147,7 @@ int gnrc_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     memcpy(&netif_pkt.msdu, pkt->next, sizeof(iolist_t));
     netif_pkt.ctx = pkt;
 
+    /* We call this function to send the packet via the interface */
     netif_send((netif_t*) netif, &netif_pkt);
     /* ========== END GNRC_NETIF_GLUE_CODE ========== */
     return 0;
