@@ -98,7 +98,7 @@ int netif_get_name(netif_t *netif, char *name);
  * @param[in] name  The name of an interface as a zero-terminated. Must not be
  *                  `NULL`.
  *
- * @return  The identifier of the interface on success.
+ * @return  The interface on success.
  * @return  NULL if no interface is named @p name.
  */
 netif_t *netif_get_by_name(const char *name);
