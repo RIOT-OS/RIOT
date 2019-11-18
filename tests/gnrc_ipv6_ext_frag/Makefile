@@ -12,11 +12,8 @@ CFLAGS += -DTEST_SUITES="gnrc_ipv6_ext_frag"
 CFLAGS += -DGNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE=3
 
 ifeq (native,$(BOARD))
-  USEMODULE += netdev_tap
   TERMFLAGS ?= $(TAP)
 else
-  USEMODULE += stdio_ethos
-
   ETHOS_BAUDRATE ?= 115200
   CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)
   TERMDEPS += ethos
