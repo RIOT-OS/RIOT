@@ -61,13 +61,32 @@ typedef struct {
     __IO uint32_t CLR;
 } FIO_PORT_t;
 
+/**
+ * @brief   Pointer to the Fast GPIO register
+ */
 #define FIO_PORTS   ((FIO_PORT_t*)FIO_BASE_ADDR)
+
+/**
+ * @brief   Pointer to the PINSEL register
+ */
 #define PINSEL      ((__IO uint32_t *)(PINSEL_BASE_ADDR))
+
+/**
+ * @brief   Pointer to the PINMODE register
+ */
 #define PINMODE     ((__IO uint32_t *)(PINSEL_BASE_ADDR + 0x40))
 
+/**
+ * @brief   Set up alternate function (PMUX setting) for a PORT pin
+ *
+ * @param[in] pin   Pin to set the multiplexing for
+ * @param[in] mux   Mux value
+ */
 int gpio_init_mux(unsigned pin, unsigned mux);
-void gpio_init_states(void);
 
+/**
+ * @brief   Macro for accessing GPIO pins
+ */
 #define GPIO_PIN(port, pin) (port<<5 | pin)
 
 #ifndef DOXYGEN
