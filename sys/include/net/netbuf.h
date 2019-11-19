@@ -36,13 +36,18 @@ typedef void netbuf_ctx_t;
  * @brief   Allocate a network buffer with a given size.
  *
  * @note    Supposed to be implemented by the networking module.
+ * @note    @p ctx must be NOT NULL if the function returns a valid pointer.
+ *          If this function returns NULL, the value of @p ctx
+ *          is undefined.
  *
  * @param[in]       size    size of the buffer to be allocated.
+ * @param[out]      ctx     allocation context.
  *
- * @return          pointer to the netbuf with the allocated buffer.
+ * @return          pointer to the buffer.
+ * @return          packet context in @p ctx.
  * @return          NULL if there's not enough memory for allocation.
  */
-netbuf_ctx_t *netbuf_alloc(size_t size, void **buf);
+void *netbuf_alloc(size_t size, netbuf_ctx_t **ctx);
 
 /**
  * @brief Free the resources of a network buffer

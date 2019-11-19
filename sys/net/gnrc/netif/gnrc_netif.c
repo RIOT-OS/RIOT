@@ -48,15 +48,16 @@ static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 
 /* GNRC implementation of the netbuf_allocate function */
-netbuf_ctx_t *netbuf_alloc(size_t size, void **buf)
+void *netbuf_alloc(size_t size, netbuf_ctx_t **ctx)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, size, GNRC_NETTYPE_UNDEF);
 
     if(pkt) {
-        *buf = pkt->data;
+        *ctx = pkt;
+        return pkt->data;
     }
 
-    return pkt;
+    return NULL;
 }
 
 /* GNRC implementation of the netbuf_free function */

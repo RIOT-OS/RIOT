@@ -22,10 +22,11 @@ void ieee802154_rf_rx_done(netdev_t *dev)
 {
     netdev_ieee802154_rx_info_t rx_info;
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
-    void *psdu;
-    netbuf_ctx_t *ctx = netbuf_alloc(bytes_expected, &psdu);
+    ieee802154_phy_ind_t ind = {0};
 
-    if (ctx == NULL) {
+    void *psdu = netbuf_alloc(bytes_expected, &ind.ctx);
+
+    if (ind.ctx == NULL) {
         DEBUG("_recv_ieee802154: cannot allocate netbuf.\n");
 
         /* Discard packet on netdev device */
@@ -36,11 +37,9 @@ void ieee802154_rf_rx_done(netdev_t *dev)
     int nread = dev->driver->recv(dev, psdu, bytes_expected, &rx_info);
 
     if (nread <= 0) {
-        netbuf_free(ctx);
+        netbuf_free(ind.ctx);
         return;
     }
-
-    ieee802154_phy_ind_t ind;
 
     /* Here we populate the indication with the Physical Service
      * Data Unit (PSDU, full L2 frame), allocation context and
@@ -50,7 +49,6 @@ void ieee802154_rf_rx_done(netdev_t *dev)
     ind.rssi = rx_info.rssi;
     ind.psdu = psdu;
     ind.psdu_len = nread;
-    ind.ctx = ctx;
 
     /* We have to decide if we need an interface here
      * E.g ieee802154_phy->ind(dev, &ind); */
