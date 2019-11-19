@@ -23,6 +23,26 @@
 
 #include "periph/gpio.h"
 
+void board_nrfantenna_select(enum board_nrfantenna_selection choice)
+{
+    switch (choice) {
+        case BOARD_NRFANTENNA_BUILTIN:
+            /* Suppress output to the UFL connector */
+            gpio_set(VCTL1_PIN);
+#ifdef VCTL2_PIN
+            /* Enable output to the built-in antenna */
+            gpio_clear(VCTL2_PIN);
+#endif
+            break;
+        case BOARD_NRFANTENNA_EXTERNAL:
+            gpio_clear(VCTL1_PIN);
+#ifdef VCTL2_PIN
+            gpio_set(VCTL2_PIN);
+#endif
+            break;
+    }
+}
+
 void board_init(void)
 {
     /* initialize the boards LEDs */
@@ -32,6 +52,14 @@ void board_init(void)
     gpio_set(LED1_PIN);
     gpio_init(LED2_PIN, GPIO_OUT);
     gpio_set(LED2_PIN);
+
+    gpio_init(VCTL1_PIN, GPIO_OUT);
+#ifdef VCTL2_PIN
+    /* On boards without VCLT2_PIN (Boron), the VCTL2 net is driven by NOT(VCTL1) */
+    gpio_init(VCTL2_PIN, GPIO_OUT);
+#endif
+
+    board_nrfantenna_select(BOARD_NRFANTENNA_DEFAULT);
 
     /* initialize the CPU */
     cpu_init();
