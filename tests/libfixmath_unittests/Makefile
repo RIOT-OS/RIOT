@@ -2,7 +2,7 @@ include ../Makefile.tests_common
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
                    arduino-mega2560 arduino-nano arduino-uno \
-                   atmega328p atmega256rfr2-xpro mega-xplained \
+                   atmega328p atmega256rfr2-xpro atmega1284p mega-xplained \
                    microduino-corerf waspmote-pro
 # arduino-mega2560: builds locally but breaks travis (possibly because of
 # differences in the toolchain)
