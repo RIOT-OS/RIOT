@@ -21,4 +21,9 @@ else ifeq ($(RIOT_TERMINAL),socat)
 else ifeq ($(RIOT_TERMINAL),picocom)
   TERMPROG  ?= picocom
   TERMFLAGS ?= --nolock --imap lfcrlf --baud "$(BAUD)" "$(PORT)"
+else ifeq ($(RIOT_TERMINAL),miniterm)
+  TERMPROG  ?= miniterm.py
+  # The RIOT shell will still transmit back a CRLF, but at least with --eol LF
+  # we avoid sending two lines on every "enter".
+  TERMFLAGS ?= --eol LF "$(PORT)" "$(BAUD)"
 endif
