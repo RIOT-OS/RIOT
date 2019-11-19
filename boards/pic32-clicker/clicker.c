@@ -27,7 +27,7 @@ void board_init(void)
     RPF4R =    0x1;          /*connect pin RPF4 to UART3 TX*/
 
     /* intialise UART used for debug (printf) */
-#ifdef DEBUG_VIA_UART
+#if MODULE_PERIPH_UART && defined(DEBUG_VIA_UART)
     uart_init(DEBUG_VIA_UART, DEBUG_UART_BAUD, NULL, 0);
 #endif
 
