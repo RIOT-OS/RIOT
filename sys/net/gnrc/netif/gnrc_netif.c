@@ -47,8 +47,8 @@ static void _configure_netdev(netdev_t *dev);
 static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 
-/* GNRC implementation of the netbuf_allocate function */
-void *netbuf_alloc(size_t size, void **ctx)
+/* GNRC implementation of the netbuf_get function */
+void *netbuf_get(size_t size, void **ctx)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, size, GNRC_NETTYPE_UNDEF);
 

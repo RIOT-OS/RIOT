@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Allocate a network buffer with a given size.
+ * @brief   Get a network buffer with a given size.
  *
  * @note    Supposed to be implemented by the networking module.
  * @note    @p ctx must be NOT NULL if the function returns a valid pointer.
@@ -40,9 +40,9 @@ extern "C" {
  *
  * @return          pointer to the buffer.
  * @return          packet context in @p ctx.
- * @return          NULL if there's not enough memory for allocation.
+ * @return          NULL on failure (e.g there's not enough memory for allocation)
  */
-void *netbuf_alloc(size_t size, void **ctx);
+void *netbuf_get(size_t size, void **ctx);
 
 /**
  * @brief Free the resources of a network buffer

@@ -24,7 +24,7 @@ void ieee802154_rf_rx_done(netdev_t *dev)
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
     ieee802154_phy_ind_t ind = {0};
 
-    void *psdu = netbuf_alloc(bytes_expected, &ind.ctx);
+    void *psdu = netbuf_get(bytes_expected, &ind.ctx);
 
     if (psdu == NULL) {
         DEBUG("_recv_ieee802154: cannot allocate netbuf.\n");
