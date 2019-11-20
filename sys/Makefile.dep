@@ -3,6 +3,10 @@ ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_spi
 endif
 
+ifneq (,$(filter crypto,$(USEMODULE)))
+  FEATURES_REQUIRED += arch_32bit
+endif
+
 ifneq (,$(filter eepreg,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eeprom
 endif
