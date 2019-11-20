@@ -214,18 +214,30 @@ int tmp00x_read_temperature(const tmp00x_t *dev, int16_t *ta, int16_t *to)
     xtimer_usleep(TMP00X_CONVERSION_TIME);
 #endif
 
+int ret;
 #if TMP00X_USE_RAW_VALUES
-    tmp00x_read(dev, to, ta, &drdy);
+    if ((ret = tmp00x_read(dev, to, ta, &drdy)) < 0) {
+        return ret;
+    }
 
     if (!drdy) {
-        return TMP00X_ERROR;
+#if TMP00X_USE_LOW_POWER
+        tmp00x_set_standby(dev);
+#endif
+        return -TMP00X_ERROR;
     }
 #else
-    tmp00x_read(dev, &rawvolt, &rawtemp, &drdy);
+    if ((ret = tmp00x_read(dev, &rawvolt, &rawtemp, &drdy)) < 0) {
+        return ret;
+    }
 
     if (!drdy) {
-        return TMP00X_ERROR;
+#if TMP00X_USE_LOW_POWER
+        tmp00x_set_standby(dev);
+#endif
+        return -TMP00X_ERROR;
     }
+
     tmp00x_convert(rawvolt, rawtemp,  &tamb, &tobj);
     *ta = (int16_t)(tamb*100);
     *to = (int16_t)(tobj*100);
@@ -233,7 +245,7 @@ int tmp00x_read_temperature(const tmp00x_t *dev, int16_t *ta, int16_t *to)
 
 #if TMP00X_USE_LOW_POWER
     if (tmp00x_set_standby(dev)) {
-        return TMP00X_ERROR;
+        return -TMP00X_ERROR;
     }
 #endif
 
