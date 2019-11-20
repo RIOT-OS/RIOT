@@ -32,18 +32,15 @@ extern "C" {
 #include "log.h"
 
 extern uint32_t system_get_time_ms (void);
+extern int ets_printf(const char *fmt, ...);
 
 #if MODULE_ESP_LOG_COLORED
 
-#define LOG_COLOR_RED     "31"
-#define LOG_COLOR_GREEN   "32"
-#define LOG_COLOR_BROWN   "33"
-#define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
 #define LOG_RESET_COLOR   "\033[0m"
-#define LOG_COLOR_E       LOG_COLOR(LOG_COLOR_RED)
-#define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
-#define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_GREEN)
-#define LOG_COLOR_D
+#define LOG_COLOR_E       "\033[1;31m"
+#define LOG_COLOR_W       "\033[1;33m"
+#define LOG_COLOR_I       "\033[1m"
+#define LOG_COLOR_D       "\033[0;32m"
 #define LOG_COLOR_V
 
 #else /* MODULE_ESP_LOG_COLORED */
@@ -65,6 +62,7 @@ extern uint32_t system_get_time_ms (void);
                  do { \
                     if ((unsigned)level <= (unsigned)LOG_LEVEL) { \
                         printf(LOG_FORMAT(letter, format), system_get_time_ms(), tag, ##__VA_ARGS__); \
+                        fflush(stdout); \
                     } \
                 } while(0)
 
@@ -84,6 +82,7 @@ extern uint32_t system_get_time_ms (void);
                     (void)tag; \
                     if ((unsigned)level <= (unsigned)LOG_LEVEL) { \
                         printf(LOG_FORMAT(letter, format), ##__VA_ARGS__); \
+                        fflush(stdout); \
                     } \
                 } while (0U)
 
