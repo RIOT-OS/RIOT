@@ -7,6 +7,7 @@ BOARD_BLACKLIST += arduino-mega2560
 BOARD_BLACKLIST += arduino-nano
 BOARD_BLACKLIST += arduino-uno
 BOARD_BLACKLIST += atmega256rfr2-xpro
+BOARD_BLACKLIST += avr-rss2
 BOARD_BLACKLIST += atmega328p
 BOARD_BLACKLIST += atmega1284p
 BOARD_BLACKLIST += chronos
