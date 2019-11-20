@@ -1,7 +1,5 @@
-ifneq (,$(filter ccn-lite,$(USEPKG)))
-  USEMODULE += ccn-lite-utils
-  USEMODULE += evtimer
-  USEMODULE += random
-  USEMODULE += timex
-  USEMODULE += posix_headers
-endif
+USEMODULE += ccn-lite-utils
+USEMODULE += evtimer
+USEMODULE += random
+USEMODULE += timex
+USEMODULE += posix_headers

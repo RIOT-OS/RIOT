@@ -1,8 +1,6 @@
-ifneq (,$(filter libcoap,$(USEPKG)))
-  USEMODULE += posix_sockets
-  USEMODULE += posix_headers
-  USEMODULE += gnrc_sock_udp
-endif
+USEMODULE += posix_sockets
+USEMODULE += posix_headers
+USEMODULE += gnrc_sock_udp
 
 # libcoap is only supported by 32 bit architectures
 FEATURES_REQUIRED += arch_32bit
