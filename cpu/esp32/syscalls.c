@@ -271,7 +271,7 @@ unsigned int IRAM get_free_heap_size (void)
 
 void heap_stats(void)
 {
-    printf("heap: %u (used %u free %u)\n", (unsigned)(&_eheap - &_sheap),
+    printf("heap: %u (used %u, free %u) [bytes]\n", (unsigned)(&_eheap - &_sheap),
            &_eheap - &_sheap - get_free_heap_size(), get_free_heap_size());
 }
 
