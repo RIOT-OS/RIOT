@@ -28,11 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Netbuf descriptor
- */
-typedef void netbuf_ctx_t;
-
-/**
  * @brief   Allocate a network buffer with a given size.
  *
  * @note    Supposed to be implemented by the networking module.
@@ -47,16 +42,16 @@ typedef void netbuf_ctx_t;
  * @return          packet context in @p ctx.
  * @return          NULL if there's not enough memory for allocation.
  */
-void *netbuf_alloc(size_t size, netbuf_ctx_t **ctx);
+void *netbuf_alloc(size_t size, void **ctx);
 
 /**
  * @brief Free the resources of a network buffer
  *
  * @note    Supposed to be implemented by the networking module.
  *
- * @param[in]       netbuf  pointer to the netbuf descriptor.
+ * @param[in]       ctx  pointer to the allocation context.
  */
-void netbuf_free(netbuf_ctx_t *ctx);
+void netbuf_free(void *ctx);
 
 #ifdef __cplusplus
 }

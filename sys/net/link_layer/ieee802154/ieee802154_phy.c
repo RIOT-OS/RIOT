@@ -26,7 +26,7 @@ void ieee802154_rf_rx_done(netdev_t *dev)
 
     void *psdu = netbuf_alloc(bytes_expected, &ind.ctx);
 
-    if (ind.ctx == NULL) {
+    if (psdu == NULL) {
         DEBUG("_recv_ieee802154: cannot allocate netbuf.\n");
 
         /* Discard packet on netdev device */

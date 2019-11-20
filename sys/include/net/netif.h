@@ -61,7 +61,7 @@ typedef struct {
 
 typedef struct {
     iolist_t msdu;
-    netbuf_ctx_t *ctx;
+    void *ctx;
     uint8_t *src_l2addr;
     uint8_t *dst_l2addr;
     int16_t rssi;
