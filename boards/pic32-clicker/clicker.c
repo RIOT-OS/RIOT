@@ -7,13 +7,9 @@
  * directory for more details.
  *
  */
-#include <stdio.h>
-#include <stdint.h>
-#include "periph/gpio.h"
-#include "periph/uart.h"
-#include "bitarithm.h"
+
 #include "board.h"
-#include "cpu.h"
+#include "periph/gpio.h"
 
 extern void dummy(void);
 
