@@ -51,6 +51,14 @@ ifneq (,$(filter esp_wifi,$(USEMODULE)))
     USEMODULE += esp_wifi_any
 endif
 
+ifneq (,$(filter spiffs,$(USEMODULE)))
+  export RIOT_TEST_TIMEOUT = 300
+endif
+
+ifneq (,$(filter littlefs,$(USEMODULE)))
+  export RIOT_TEST_TIMEOUT = 300
+endif
+
 # ESP32 pseudomodules
 PSEUDOMODULES += esp_eth_hw
 PSEUDOMODULES += esp_gdb
