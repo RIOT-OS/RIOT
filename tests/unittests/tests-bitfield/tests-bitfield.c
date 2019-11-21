@@ -53,15 +53,15 @@ static void test_bf_get_unset_firstbyte(void)
     res = bf_get_unset(field, 40);
     TEST_ASSERT_EQUAL_INT(0, res);
 
-    field[0] = 0x01;
+    field[0] = 0x80;
     res = bf_get_unset(field, 40);
     TEST_ASSERT_EQUAL_INT(1, res);
 
-    field[0] = 0x0f;
+    field[0] = 0xf0;
     res = bf_get_unset(field, 40);
     TEST_ASSERT_EQUAL_INT(4, res);
 
-    field[0] = 0x7f;
+    field[0] = 0xfe;
     res = bf_get_unset(field, 40);
     TEST_ASSERT_EQUAL_INT(7, res);
 
@@ -80,15 +80,15 @@ static void test_bf_get_unset_middle(void)
     res = bf_get_unset(field, 40);
     TEST_ASSERT_EQUAL_INT(16, res);
 
-    field[2] = 0x01;
+    field[2] = 0x80;
     res = bf_get_unset(field, 40);
     TEST_ASSERT_EQUAL_INT(17, res);
 
-    field[2] = 0x0f;
+    field[2] = 0xf0;
     res = bf_get_unset(field, 40);
     TEST_ASSERT_EQUAL_INT(20, res);
 
-    field[2] = 0x7f;
+    field[2] = 0xfe;
     res = bf_get_unset(field, 40);
     TEST_ASSERT_EQUAL_INT(23, res);
 }
@@ -103,15 +103,15 @@ static void test_bf_get_unset_lastbyte(void)
     res = bf_get_unset(field, 40);
     TEST_ASSERT_EQUAL_INT(32, res);
 
-    field[4] = 0x01;
+    field[4] = 0x80;
     res = bf_get_unset(field, 40);
     TEST_ASSERT_EQUAL_INT(33, res);
 
-    field[4] = 0x0f;
+    field[4] = 0xf0;
     res = bf_get_unset(field, 40);
     TEST_ASSERT_EQUAL_INT(36, res);
 
-    field[4] = 0x7f;
+    field[4] = 0xfe;
     res = bf_get_unset(field, 40);
     TEST_ASSERT_EQUAL_INT(39, res);
 }
