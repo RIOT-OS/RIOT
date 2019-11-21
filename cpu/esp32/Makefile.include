@@ -64,7 +64,6 @@ PSEUDOMODULES += esp_spiffs
 PSEUDOMODULES += esp_wifi_any
 
 export TARGET_ARCH ?= xtensa-esp32-elf
-export ESPTOOL ?= $(ESP32_SDK_DIR)/components/esptool_py/esptool/esptool.py
 
 USEMODULE += esp_idf
 USEMODULE += esp_idf_driver
@@ -162,6 +161,8 @@ ifneq (,$(filter esp_cxx,$(USEMODULE)))
     UNDEF += $(BINDIR)/esp_cxx/cxa_guard.o
 endif
 
+ESPTOOL ?= $(RIOTBASE)/dist/tools/esptool/esptool.py
+
 # The ELFFILE is the base one used for flashing
 FLASHFILE ?= $(ELFFILE)
 
@@ -169,6 +170,7 @@ FLASHFILE ?= $(ELFFILE)
 FLASH_MODE ?= dout  # FIX configuration, DO NOT CHANGE
 FLASH_FREQ  = 40m   # FIX configuration, DO NOT CHANGE
 FLASH_SIZE ?= 2MB
+
 PREFLASHER = $(ESPTOOL)
 PREFFLAGS  = --chip esp32 elf2image
 PREFFLAGS += -fm $(FLASH_MODE) -fs $(FLASH_SIZE) -ff $(FLASH_FREQ)
@@ -178,7 +180,6 @@ PREFFLAGS += printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $(BINDIR)/partitions.c
 PREFFLAGS += printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $(BINDIR)/partitions.csv;
 PREFFLAGS += printf "factory, app, factory, 0x10000, " >> $(BINDIR)/partitions.csv;
 PREFFLAGS += ls -l $(FLASHFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partitions.csv;
-
 
 PREFFLAGS += python $(RIOTCPU)/$(CPU)/gen_esp32part.py --disable-sha256sum
 PREFFLAGS += --verify $(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
