@@ -105,7 +105,7 @@ cb_mux_cbid_t cb_mux_find_free_id(cb_mux_t *head)
 
     /* Find which ID in block was free */
     for (num = 0; num < 32; num++) {
-        if (~free & (1 << num)) {
+        if (~free & ((uint32_t)1 << num)) {
             return block | num;
         }
     }
