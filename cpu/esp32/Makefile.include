@@ -99,7 +99,11 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/include
 INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 
-CFLAGS  += -DSCHED_PRIO_LEVELS=32
+# if any WiFi interface is used, the number of priority levels has to be 32
+ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
+  CFLAGS += -DSCHED_PRIO_LEVELS=32
+endif
+
 CFLAGS  += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM
 CFLAGS  += -DLOG_TAG_IN_BRACKETS
 CFLAGS  += -Wno-unused-parameter -Wformat=0
