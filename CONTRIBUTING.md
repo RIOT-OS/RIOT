@@ -92,7 +92,8 @@ into the source repository.
 * Before opening a new Pull Request, have a look at
   [existing ones][existing-pull-requests]. Maybe someone has already opened one
   about the same thing. If it's the case, you might be able to help with the
-  contribution. Just comment on the PR and ask.
+  contribution. Just comment on the PR and ask. Include closed PR's in your
+  search, as previous work might have been closed for lack of interest.
   Old and stalled [PRs are sometimes archived][archived-pull-requests] with the
   "State: archived" label, maybe one of them is also about the same topic.
 
