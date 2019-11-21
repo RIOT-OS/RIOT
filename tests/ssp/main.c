@@ -24,6 +24,14 @@
 #include <stdio.h>
 #include <string.h>
 
+__attribute__((weak)) void
+_prevent_memset_lto(void *const  s, int c, const size_t n)
+{
+    (void) s;
+    (void) c;
+    (void) n;
+}
+
 void test_func(void)
 {
     char buf[16];
@@ -35,6 +43,9 @@ void test_func(void)
     /* cppcheck-suppress bufferAccessOutOfBounds
      * (reason: deliberately overflowing stack) */
     memset(buffer_to_confuse_compiler, 0, 32);
+
+    /* prevent that memset call is optimized out by LTO */
+    _prevent_memset_lto(buf, 0, 32);
 }
 
 int main(void)
