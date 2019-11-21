@@ -229,7 +229,7 @@ int irq_is_in(void)
 int _native_popsig(void)
 {
     int nread, nleft, i;
-    int sig;
+    int sig = 0;
 
     nleft = sizeof(int);
     i = 0;
