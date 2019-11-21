@@ -21,6 +21,7 @@
 
 #include "periph/gpio.h"
 #include "periph/adc.h"
+#include "periph/pwm.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -143,6 +144,22 @@ static const adc_t arduino_analog_map[] = {
     ADC_LINE(12),
     ADC_LINE(13),
     ADC_LINE(14),
+};
+
+/**
+ * @brief   PWM frequency
+ */
+#define ARDUINO_PWM_FREQU       (732U)
+
+/**
+ * @brief   List of PWM GPIO mappings
+ */
+static const arduino_pwm_t arduino_pwm_list[] = {
+    { .pin = 20, .dev = PWM_DEV(0), .chan = 0 },
+    { .pin = 29, .dev = PWM_DEV(0), .chan = 1 },
+    { .pin = 11, .dev = PWM_DEV(1), .chan = 0 },
+    { .pin = 13, .dev = PWM_DEV(1), .chan = 1 },
+    { .pin = 14, .dev = PWM_DEV(1), .chan = 2 },
 };
 
 #ifdef __cplusplus
