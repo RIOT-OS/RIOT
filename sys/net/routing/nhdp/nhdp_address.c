@@ -35,7 +35,7 @@ static nhdp_addr_t *nhdp_addr_db_head = NULL;
 
 nhdp_addr_t *nhdp_addr_db_get_address(uint8_t *addr, size_t addr_size, uint8_t addr_type)
 {
-    nhdp_addr_t *addr_elt;
+    nhdp_addr_t *addr_elt = NULL;
 
     mutex_lock(&mtx_addr_access);
 
@@ -101,7 +101,7 @@ void nhdp_decrement_addr_usage(nhdp_addr_t *addr)
 
 void nhdp_free_addr_list(nhdp_addr_entry_t *list_head)
 {
-    nhdp_addr_entry_t *list_elt, *list_tmp;
+    nhdp_addr_entry_t *list_elt = NULL, *list_tmp = NULL;
 
     LL_FOREACH_SAFE(list_head, list_elt, list_tmp) {
         nhdp_free_addr_entry(list_elt);
@@ -117,7 +117,7 @@ void nhdp_free_addr_entry(nhdp_addr_entry_t *addr_entry)
 nhdp_addr_entry_t *nhdp_generate_addr_list_from_tmp(uint8_t tmp_type)
 {
     nhdp_addr_entry_t *new_list_head;
-    nhdp_addr_t *addr_elt;
+    nhdp_addr_t *addr_elt = NULL;
 
     new_list_head = NULL;
     LL_FOREACH(nhdp_addr_db_head, addr_elt) {
@@ -142,7 +142,7 @@ nhdp_addr_entry_t *nhdp_generate_addr_list_from_tmp(uint8_t tmp_type)
 
 void nhdp_reset_addresses_tmp_usg(uint8_t decr_usg)
 {
-    nhdp_addr_t *addr_elt, *addr_tmp;
+    nhdp_addr_t *addr_elt = NULL, *addr_tmp = NULL;
 
     LL_FOREACH_SAFE(nhdp_addr_db_head, addr_elt, addr_tmp) {
         addr_elt->tmp_metric_val = NHDP_METRIC_UNKNOWN;
