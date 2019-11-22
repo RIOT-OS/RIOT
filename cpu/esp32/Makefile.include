@@ -67,6 +67,8 @@ PSEUDOMODULES += esp_hw_counter
 PSEUDOMODULES += esp_i2c_sw
 PSEUDOMODULES += esp_i2c_hw
 PSEUDOMODULES += esp_idf_newlib
+PSEUDOMODULES += esp_log_colored
+PSEUDOMODULES += esp_log_tagged
 PSEUDOMODULES += esp_spi_ram
 PSEUDOMODULES += esp_spiffs
 PSEUDOMODULES += esp_wifi_any
@@ -145,6 +147,12 @@ ifeq ($(QEMU), 1)
     CFLAGS += -DQEMU
 endif
 
+ifneq (,$(filter esp_log_colored,$(USEMODULE)))
+    BOOTLOADER_BIN = bootloader_with_colors.bin
+else
+    BOOTLOADER_BIN = bootloader_without_colors.bin
+endif
+
 # LINKFLAGS += -Wl,--verbose
 
 LINKFLAGS += -L$(ESP32_SDK_DIR)/components/esp32
@@ -198,7 +206,7 @@ ifeq ($(QEMU), 1)
     FLASHER = dd
     FFLAGS += if=/dev/zero bs=1M count=4  | tr "\\000" "\\377" > tmp.bin && cat tmp.bin |
     FFLAGS += head -c $$((0x1000)) |
-    FFLAGS += cat - $(RIOTCPU)/$(CPU)/bin/bootloader.bin tmp.bin |
+    FFLAGS += cat - $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN) tmp.bin |
     FFLAGS += head -c $$((0x8000)) |
     FFLAGS += cat - $(BINDIR)/partitions.bin tmp.bin |
     FFLAGS += head -c $$((0x10000)) |
@@ -212,7 +220,7 @@ else
     FFLAGS += --chip esp32 -p $(PROG_DEV) -b $(PROGRAMMER_SPEED)
     FFLAGS += --before default_reset --after hard_reset write_flash
     FFLAGS += -z -fm $(FLASH_MODE) -fs detect -ff $(FLASH_FREQ)
-    FFLAGS += 0x1000 $(RIOTCPU)/$(CPU)/bin/bootloader.bin
+    FFLAGS += 0x1000 $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN)
     FFLAGS += 0x8000 $(BINDIR)/partitions.bin
     FFLAGS += 0x10000 $(FLASHFILE).bin
 endif

@@ -26,7 +26,6 @@
 #include "adc_ctrl.h"
 #include "esp_common.h"
 #include "gpio_arch.h"
-#include "rom/ets_sys.h"
 #include "soc/rtc_io_struct.h"
 #include "soc/rtc_cntl_struct.h"
 #include "soc/sens_reg.h"
@@ -136,11 +135,11 @@ static bool _dac_conf_check(void)
 
 void dac_print_config(void)
 {
-    ets_printf("\tDAC\t\tpins=[ ");
+    printf("\tDAC\t\tpins=[ ");
 #if defined(DAC_GPIOS)
     for (unsigned i = 0; i < DAC_NUMOF; i++) {
-        ets_printf("%d ", dac_channels[i]);
+        printf("%d ", dac_channels[i]);
     }
 #endif /* defined(DAC_GPIOS) */
-    ets_printf("]\n");
+    printf("]\n");
 }
