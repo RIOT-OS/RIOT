@@ -109,7 +109,7 @@ INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 
 # if any WiFi interface is used, the number of priority levels has to be 32
-ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
+ifneq (,$(filter esp_wifi_any esp_eth,$(USEMODULE)))
   CFLAGS += -DSCHED_PRIO_LEVELS=32
 endif
 
