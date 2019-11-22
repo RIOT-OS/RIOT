@@ -631,6 +631,23 @@ ifneq (,$(filter w5100,$(USEMODULE)))
   USEMODULE += luid
 endif
 
+ifneq (,$(filter ws281x_%,$(USEMODULE)))
+  USEMODULE += ws281x
+endif
+
+ifneq (,$(filter ws281x,$(USEMODULE)))
+  FEATURES_OPTIONAL += arch_avr8
+  ifeq (,$(filter ws281x_%,$(USEMODULE)))
+    ifneq (,$(filter arch_avr8,$(FEATURES_USED)))
+      USEMODULE += ws281x_atmega
+    endif
+  endif
+  ifneq (,$(filter ws281x_atmega,$(USEMODULE)))
+    FEATURES_REQUIRED += arch_avr8
+  endif
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter xbee,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
   FEATURES_REQUIRED += periph_gpio
