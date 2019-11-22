@@ -19,6 +19,9 @@
  * @author     Philipp-Alexander Blum <philipp-blum@jakiku.de>
  */
 
+#ifndef PERIPH_GPIO_UTIL_H
+#define PERIPH_GPIO_UTIL_H
+
 #include "gpio.h"
 
 #ifdef __cplusplus
@@ -40,4 +43,5 @@ uint8_t gpio_util_shiftin(gpio_t data_pin, gpio_t clock_pin);
 #ifdef __cplusplus
 }
 #endif
+#endif /* PERIPH_GPIO_UTIL_H */
 /** @} */
