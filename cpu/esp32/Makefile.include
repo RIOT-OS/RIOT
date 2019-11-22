@@ -51,6 +51,10 @@ ifneq (,$(filter esp_wifi,$(USEMODULE)))
     USEMODULE += esp_wifi_any
 endif
 
+ifneq (,$(filter esp_eth,$(USEMODULE)))
+  $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
+endif
+
 ifneq (,$(filter spiffs,$(USEMODULE)))
   export RIOT_TEST_TIMEOUT = 300
 endif
