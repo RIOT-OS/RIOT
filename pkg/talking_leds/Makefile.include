@@ -1,0 +1,3 @@
+INCLUDES += -I$(PKGDIRBASE)/talking_leds/src
+
+CXXEXFLAGS += -std=c++11

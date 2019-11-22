@@ -22,11 +22,22 @@
 #define ARDUINO_HPP
 
 extern "C" {
+#include <stdint.h>
 #include "periph/gpio.h"
 #include "arduino_board.h"
 }
 
 #include "serialport.hpp"
+
+/**
+ * @brief    Arduino boolean data type definion
+ */
+typedef bool boolean;
+
+/**
+ * @brief    Arduino byte data type definion
+ */
+typedef uint8_t byte;
 
 /**
  * @brief   Possible pin configurations
