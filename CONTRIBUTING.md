@@ -354,6 +354,20 @@ makes it difficult for the reviewer to follow them. It might also happen that
 you introduce regression and won't be able to recover them from previous
 commits.
 
+If you encounter a merge conflict you could either resolve it by hand with an
+editor and use
+
+    $ git add -p
+
+To add your changes or use a merge tool like [meld](https://meldmerge.org/) to
+resolve your merge conflict.
+
+    $ git mergetool
+
+After the merge conflict is resolved you can continue to rebase by using
+
+    $ git rebase --continue
+
 Once squashing is done, you will have to force push your branch to update the
 PR:
 
