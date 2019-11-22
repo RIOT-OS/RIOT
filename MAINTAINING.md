@@ -5,8 +5,6 @@ and non-technical. The list is not exhaustive, and represents a baseline on
 things that should be ensured for contributions.
 
 Notes:
--   Any of the items in this list might be skipped, if clearly and logically
-    articulated reasons are presented.
 -   The order of the steps is meant to maximize efficiency and minimize
     overhead, with the philosophy that failing in step n makes steps n+x
     obsolete. However, this efficiency can depend on the quality of the
@@ -28,8 +26,8 @@ areas of RIOT they each maintain.
 This guideline and other guidelines like the [Coding Conventions] should be
 applied consistently and rigorously, but not blindly. A static set of guidelines
 cannot reasonably address the complexity of the real world. Thus, exceptions
-from the guideline or the coding convention are explicitly allowed, if a solid
-argument for doing so can be provided.
+from this guideline or the coding convention are explicitly allowed, if clearly
+and logically articulated reasons can be presented.
 
 
 ## Technical guidelines
