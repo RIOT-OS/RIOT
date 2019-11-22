@@ -123,20 +123,12 @@ static int _read_burst(const bmx280_t *dev, uint8_t reg, void *buf, size_t len)
 
 static uint16_t _to_u16_le(const uint8_t *buffer, size_t offset)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    return (((uint16_t)buffer[offset + 1]) << 8) + buffer[offset];
-#else
-    return (((uint16_t)buffer[offset]) << 8) + buffer[offset + 1];
-#endif
+    return (((uint16_t)buffer[offset + 1]) << 8) | buffer[offset];
 }
 
 static int16_t _to_i16_le(const uint8_t *buffer, size_t offset)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    return (((int16_t)buffer[offset + 1]) << 8) + buffer[offset];
-#else
-    return (((int16_t)buffer[offset]) << 8) + buffer[offset + 1];
-#endif
+    return (((int16_t)buffer[offset + 1]) << 8) | buffer[offset];
 }
 
 /**
