@@ -73,7 +73,7 @@ void spi_init(spi_t bus)
     /* reset all device configuration */
     dev(bus)->CTRLA.reg |= SERCOM_SPI_CTRLA_SWRST;
     while ((dev(bus)->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST) ||
-           (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_SWRST));
+           (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_SWRST)) {}
 
     /* configure base clock: using GLK GEN 0 */
 #ifdef GCLK_CLKCTRL_GEN_GCLK0
@@ -103,7 +103,7 @@ void spi_init_pins(spi_t bus)
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void) cs;
+    (void)cs;
 
     /* configure bus clock, in synchronous mode its calculated from
      * BAUD.reg = (f_ref / (2 * f_bus) - 1)
@@ -116,9 +116,9 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
      * efficiency reason we do that here, so we can do all in one single write
      * to the CTRLA register */
     const uint32_t ctrla = SERCOM_SPI_CTRLA_MODE(0x3)       /* 0x3 -> master */
-                         | SERCOM_SPI_CTRLA_DOPO(spi_config[bus].mosi_pad)
-                         | SERCOM_SPI_CTRLA_DIPO(spi_config[bus].miso_pad)
-                         | (mode << SERCOM_SPI_CTRLA_CPHA_Pos);
+                           | SERCOM_SPI_CTRLA_DOPO(spi_config[bus].mosi_pad)
+                           | SERCOM_SPI_CTRLA_DIPO(spi_config[bus].miso_pad)
+                           | (mode << SERCOM_SPI_CTRLA_CPHA_Pos);
 
     /* get exclusive access to the device */
     mutex_lock(&locks[bus]);
