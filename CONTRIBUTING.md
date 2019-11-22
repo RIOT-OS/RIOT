@@ -6,6 +6,7 @@ of this document using the following links:
 
 * [Getting Started][getting-started]
 * [Help wanted][help-wanted]
+* [General Tips][general-tips]
 * [Feature Requests][feature-requests]
 * [Bug Reports][bug-reports]
 * [Pull Requests][pull-requests]
@@ -29,6 +30,27 @@ If you are just beginning to work with RIOT you might first want to read our
 - [Creating an application](https://doc.riot-os.org/creating-an-application.html)
 
 [documentation]: https://doc.riot-os.org
+
+## General Tips
+[general-tips]: #general-tips
+From experience, the following recommendations help to get a software
+contribution into RIOT master faster:
+
+- **Ask around for help!** Either offline or through one of our communication
+  channels (see above). The earlier you check your feature design with other
+  people, the less likely it is that it is denied during the review process.
+- **Verify your concept early!** If you work on your own until the code
+  *looks* good enough to show publicly, you might miss some design flaws others
+  might have spotted earlier.
+- **Keep it simple!** Try to use what is already there and don't change existing
+  APIs if not absolutely necessary.
+- **Keep it small!** A PR with >1000 lines of changes will very likely make
+  even the most active reviewer put your review on their long to-do list.
+- **Keep it modular!** Make extensions to a feature or new features for a
+  platform optionally to use.
+- **Provide tests!** They should be comprehensible and easy to be executed.
+  Alternatively comprehensive testing procedures should be provided with your
+  pull request.
 
 ## Help Wanted
 [help-wanted]: #help-wanted
