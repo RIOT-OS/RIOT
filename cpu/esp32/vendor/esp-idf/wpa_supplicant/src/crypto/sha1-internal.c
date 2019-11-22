@@ -22,7 +22,7 @@
 
 typedef struct SHA1Context SHA1_CTX;
 
-void SHA1Transform(u32 state[5], const unsigned char buffer[64]);
+void wpa_SHA1Transform(u32 state[5], const unsigned char buffer[64]);
 
 
 /**
@@ -34,15 +34,15 @@ void SHA1Transform(u32 state[5], const unsigned char buffer[64]);
  * Returns: 0 on success, -1 of failure
  */
 int
-sha1_vector(size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac)
+wpa_sha1_vector(size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac)
 {
     SHA1_CTX ctx;
     size_t i;
 
-    SHA1Init(&ctx);
+    wpa_SHA1Init(&ctx);
     for (i = 0; i < num_elem; i++)
-        SHA1Update(&ctx, addr[i], len[i]);
-    SHA1Final(mac, &ctx);
+        wpa_SHA1Update(&ctx, addr[i], len[i]);
+    wpa_SHA1Final(mac, &ctx);
     return 0;
 }
 
@@ -160,7 +160,7 @@ A million repetitions of "a"
 
 
 #ifdef VERBOSE  /* SAK */
-void SHAPrintContext(SHA1_CTX *context, char *msg)
+void wpa_SHAPrintContext(SHA1_CTX *context, char *msg)
 {
     printf("%s (%d,%d) %x %x %x %x %x\n",
            msg,
@@ -176,7 +176,7 @@ void SHAPrintContext(SHA1_CTX *context, char *msg)
 /* Hash a single 512-bit block. This is the core of the algorithm. */
 
 void
-SHA1Transform(u32 state[5], const unsigned char buffer[64])
+wpa_SHA1Transform(u32 state[5], const unsigned char buffer[64])
 {
     u32 a, b, c, d, e;
     typedef union {
@@ -235,7 +235,7 @@ SHA1Transform(u32 state[5], const unsigned char buffer[64])
 /* SHA1Init - Initialize new context */
 
 void
-SHA1Init(SHA1_CTX* context)
+wpa_SHA1Init(SHA1_CTX* context)
 {
     /* SHA1 initialization constants */
     context->state[0] = 0x67452301;
@@ -250,13 +250,13 @@ SHA1Init(SHA1_CTX* context)
 /* Run your data through this. */
 
 void
-SHA1Update(SHA1_CTX* context, const void *_data, u32 len)
+wpa_SHA1Update(SHA1_CTX* context, const void *_data, u32 len)
 {
     u32 i, j;
     const unsigned char *data = _data;
 
 #ifdef VERBOSE
-    SHAPrintContext(context, "before");
+    wpa_SHAPrintContext(context, "before");
 #endif
     j = (context->count[0] >> 3) & 63;
     if ((context->count[0] += len << 3) < (len << 3))
@@ -264,16 +264,16 @@ SHA1Update(SHA1_CTX* context, const void *_data, u32 len)
     context->count[1] += (len >> 29);
     if ((j + len) > 63) {
         os_memcpy(&context->buffer[j], data, (i = 64-j));
-        SHA1Transform(context->state, context->buffer);
+        wpa_SHA1Transform(context->state, context->buffer);
         for ( ; i + 63 < len; i += 64) {
-            SHA1Transform(context->state, &data[i]);
+            wpa_SHA1Transform(context->state, &data[i]);
         }
         j = 0;
     }
     else i = 0;
     os_memcpy(&context->buffer[j], &data[i], len - i);
 #ifdef VERBOSE
-    SHAPrintContext(context, "after ");
+    wpa_SHAPrintContext(context, "after ");
 #endif
 }
 
@@ -281,7 +281,7 @@ SHA1Update(SHA1_CTX* context, const void *_data, u32 len)
 /* Add padding and return the message digest. */
 
 void
-SHA1Final(unsigned char digest[20], SHA1_CTX* context)
+wpa_SHA1Final(unsigned char digest[20], SHA1_CTX* context)
 {
     u32 i;
     unsigned char finalcount[8];
@@ -291,11 +291,11 @@ SHA1Final(unsigned char digest[20], SHA1_CTX* context)
             ((context->count[(i >= 4 ? 0 : 1)] >>
               ((3-(i & 3)) * 8) ) & 255);  /* Endian independent */
     }
-    SHA1Update(context, (unsigned char *) "\200", 1);
+    wpa_SHA1Update(context, (unsigned char *) "\200", 1);
     while ((context->count[0] & 504) != 448) {
-        SHA1Update(context, (unsigned char *) "\0", 1);
+        wpa_SHA1Update(context, (unsigned char *) "\0", 1);
     }
-    SHA1Update(context, finalcount, 8);  /* Should cause a SHA1Transform()
+    wpa_SHA1Update(context, finalcount, 8);  /* Should cause a SHA1Transform()
                           */
     for (i = 0; i < 20; i++) {
         digest[i] = (unsigned char)

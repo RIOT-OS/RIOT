@@ -30,7 +30,7 @@
  * Returns: 0 on success, -1 on failure
  */
 int
-hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
+wpa_hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
              const u8 *addr[], const size_t *len, u8 *mac)
 {
     unsigned char k_pad[64]; /* padding - key XORd with ipad/opad */
@@ -48,7 +48,7 @@ hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
 
         /* if key is longer than 64 bytes reset it to key = SHA1(key) */
         if (key_len > 64) {
-        if (sha1_vector(1, &key, &key_len, tk))
+        if (wpa_sha1_vector(1, &key, &key_len, tk))
             return -1;
         key = tk;
         key_len = 20;
@@ -77,7 +77,7 @@ hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
         _addr[i + 1] = addr[i];
         _len[i + 1] = len[i];
     }
-    if (sha1_vector(1 + num_elem, _addr, _len, mac))
+    if (wpa_sha1_vector(1 + num_elem, _addr, _len, mac))
         return -1;
 
     os_memset(k_pad, 0, sizeof(k_pad));
@@ -91,7 +91,7 @@ hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
     _len[0] = 64;
     _addr[1] = mac;
     _len[1] = SHA1_MAC_LEN;
-    return sha1_vector(2, _addr, _len, mac);
+    return wpa_sha1_vector(2, _addr, _len, mac);
 }
 
 
@@ -105,10 +105,10 @@ hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
  * Returns: 0 on success, -1 of failure
  */
 int
-hmac_sha1(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
+wpa_hmac_sha1(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
            u8 *mac)
 {
-    return hmac_sha1_vector(key, key_len, 1, &data, &data_len, mac);
+    return wpa_hmac_sha1_vector(key, key_len, 1, &data, &data_len, mac);
 }
 
 /**
@@ -126,7 +126,7 @@ hmac_sha1(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
  * given key (e.g., PMK in IEEE 802.11i).
  */
 int
-sha1_prf(const u8 *key, size_t key_len, const char *label,
+wpa_sha1_prf(const u8 *key, size_t key_len, const char *label,
          const u8 *data, size_t data_len, u8 *buf, size_t buf_len)
 {
     u8 counter = 0;
@@ -147,12 +147,12 @@ sha1_prf(const u8 *key, size_t key_len, const char *label,
     while (pos < buf_len) {
         plen = buf_len - pos;
         if (plen >= SHA1_MAC_LEN) {
-            if (hmac_sha1_vector(key, key_len, 3, addr, len,
+            if (wpa_hmac_sha1_vector(key, key_len, 3, addr, len,
                          &buf[pos]))
                 return -1;
             pos += SHA1_MAC_LEN;
         } else {
-            if (hmac_sha1_vector(key, key_len, 3, addr, len,
+            if (wpa_hmac_sha1_vector(key, key_len, 3, addr, len,
                          hash))
                 return -1;
             os_memcpy(&buf[pos], hash, plen);

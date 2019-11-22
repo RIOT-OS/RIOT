@@ -40,10 +40,6 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
     USEMODULE += esp_idf_nvs_flash
     USEMODULE += riot_freertos
     USEMODULE += xtimer
-
-    # crypto and hashes produce symbol conflicts with esp_idf_wpa_supplicant_crypto
-    DISABLE_MODULE += crypto
-    DISABLE_MODULE += hashes
 endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))

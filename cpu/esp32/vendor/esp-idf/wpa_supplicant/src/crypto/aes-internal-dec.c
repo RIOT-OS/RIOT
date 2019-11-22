@@ -36,13 +36,13 @@
  *
  * @return    the number of rounds for the given cipher key size.
  */
-static int  rijndaelKeySetupDec(u32 rk[], const u8 cipherKey[], int keyBits)
+static int  wpa_rijndaelKeySetupDec(u32 rk[], const u8 cipherKey[], int keyBits)
 {
     int Nr, i, j;
     u32 temp;
 
     /* expand the cipher key: */
-    Nr = rijndaelKeySetupEnc(rk, cipherKey, keyBits);
+    Nr = wpa_rijndaelKeySetupEnc(rk, cipherKey, keyBits);
     if (Nr < 0)
         return Nr;
     /* invert the order of the round keys: */
@@ -67,14 +67,14 @@ static int  rijndaelKeySetupDec(u32 rk[], const u8 cipherKey[], int keyBits)
     return Nr;
 }
 
-void *  aes_decrypt_init(const u8 *key, size_t len)
+void *  wpa_aes_decrypt_init(const u8 *key, size_t len)
 {
     u32 *rk;
     int res;
     rk = os_malloc(AES_PRIV_SIZE);
     if (rk == NULL)
         return NULL;
-    res = rijndaelKeySetupDec(rk, key, len * 8);
+    res = wpa_rijndaelKeySetupDec(rk, key, len * 8);
     if (res < 0) {
         os_free(rk);
         return NULL;
@@ -83,7 +83,7 @@ void *  aes_decrypt_init(const u8 *key, size_t len)
     return rk;
 }
 
-static void  rijndaelDecrypt(const u32 rk[/*44*/], int Nr, const u8 ct[16],
+static void  wpa_rijndaelDecrypt(const u32 rk[/*44*/], int Nr, const u8 ct[16],
                 u8 pt[16])
 {
     u32 s0, s1, s2, s3, t0, t1, t2, t3;
@@ -158,14 +158,14 @@ d##3 = TD0(s##3) ^ TD1(s##2) ^ TD2(s##1) ^ TD3(s##0) ^ rk[4 * i + 3]
     PUTU32(pt + 12, s3);
 }
 
-void  aes_decrypt(void *ctx, const u8 *crypt, u8 *plain)
+void  wpa_aes_decrypt(void *ctx, const u8 *crypt, u8 *plain)
 {
     u32 *rk = ctx;
-    rijndaelDecrypt(ctx, rk[AES_PRIV_NR_POS], crypt, plain);
+    wpa_rijndaelDecrypt(ctx, rk[AES_PRIV_NR_POS], crypt, plain);
 }
 
 
-void  aes_decrypt_deinit(void *ctx)
+void  wpa_aes_decrypt_deinit(void *ctx)
 {
     os_memset(ctx, 0, AES_PRIV_SIZE);
     os_free(ctx);

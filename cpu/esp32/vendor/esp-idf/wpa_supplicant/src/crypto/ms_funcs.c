@@ -93,7 +93,7 @@ static int challenge_hash(const u8 *peer_challenge, const u8 *auth_challenge,
     addr[2] = username;
     len[2] = username_len;
 
-    if (sha1_vector(3, addr, len, hash))
+    if (wpa_sha1_vector(3, addr, len, hash))
         return -1;
     os_memcpy(challenge, hash, 8);
     return 0;
@@ -119,7 +119,7 @@ int nt_password_hash(const u8 *password, size_t password_len,
 
     len *= 2;
     pos = buf;
-    return md4_vector(1, (const u8 **) &pos, &len, password_hash);
+    return wpa_md4_vector(1, (const u8 **) &pos, &len, password_hash);
 }
 
 
@@ -132,7 +132,7 @@ int nt_password_hash(const u8 *password, size_t password_len,
 int hash_nt_password_hash(const u8 *password_hash, u8 *password_hash_hash)
 {
     size_t len = 16;
-    return md4_vector(1, &password_hash, &len, password_hash_hash);
+    return wpa_md4_vector(1, &password_hash, &len, password_hash_hash);
 }
 
 
@@ -146,12 +146,12 @@ void challenge_response(const u8 *challenge, const u8 *password_hash,
            u8 *response)
 {
     u8 zpwd[7];
-    des_encrypt(challenge, password_hash, response);
-    des_encrypt(challenge, password_hash + 7, response + 8);
+    wpa_des_encrypt(challenge, password_hash, response);
+    wpa_des_encrypt(challenge, password_hash + 7, response + 8);
     zpwd[0] = password_hash[14];
     zpwd[1] = password_hash[15];
     os_memset(zpwd + 2, 0, 5);
-    des_encrypt(challenge, zpwd, response + 16);
+    wpa_des_encrypt(challenge, zpwd, response + 16);
 }
 
 
@@ -259,13 +259,13 @@ int generate_authenticator_response_pwhash(
 
     if (hash_nt_password_hash(password_hash, password_hash_hash))
         return -1;
-    if (sha1_vector(3, addr1, len1, response))
+    if (wpa_sha1_vector(3, addr1, len1, response))
         return -1;
 
     if (challenge_hash(peer_challenge, auth_challenge, username,
                username_len, challenge))
         return -1;
-    return sha1_vector(3, addr2, len2, response);
+    return wpa_sha1_vector(3, addr2, len2, response);
 }
 
 
@@ -339,7 +339,7 @@ int get_master_key(const u8 *password_hash_hash, const u8 *nt_response,
     addr[1] = nt_response;
     addr[2] = magic1;
 
-    if (sha1_vector(3, addr, len, hash))
+    if (wpa_sha1_vector(3, addr, len, hash))
         return -1;
     os_memcpy(master_key, hash, 16);
     return 0;
@@ -407,7 +407,7 @@ int get_asymetric_start_key(const u8 *master_key, u8 *session_key,
     }
     addr[3] = shs_pad2;
 
-    if (sha1_vector(4, addr, len, digest))
+    if (wpa_sha1_vector(4, addr, len, digest))
         return -1;
 
     if (session_key_len > SHA1_MAC_LEN)
@@ -454,7 +454,7 @@ int encrypt_pw_block_with_password_hash(
      */
     pos = &pw_block[2 * 256];
     WPA_PUT_LE16(pos, password_len * 2);
-    rc4_skip(password_hash, 16, 0, pw_block, PWBLOCK_LEN);
+    wpa_rc4_skip(password_hash, 16, 0, pw_block, PWBLOCK_LEN);
     return 0;
 }
 
@@ -494,8 +494,8 @@ int new_password_encrypted_with_old_nt_password_hash(
 void nt_password_hash_encrypted_with_block(const u8 *password_hash,
                       const u8 *block, u8 *cypher)
 {
-    des_encrypt(password_hash, block, cypher);
-    des_encrypt(password_hash + 8, block + 7, cypher + 8);
+    wpa_des_encrypt(password_hash, block, cypher);
+    wpa_des_encrypt(password_hash + 8, block + 7, cypher + 8);
 }
 
 

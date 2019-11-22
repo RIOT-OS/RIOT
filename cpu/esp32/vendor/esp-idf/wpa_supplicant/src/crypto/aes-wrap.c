@@ -22,7 +22,7 @@
  * @cipher: Wrapped key, (n + 1) * 64 bits
  * Returns: 0 on success, -1 on failure
  */
-int  aes_wrap(const u8 *kek, int n, const u8 *plain, u8 *cipher)
+int  wpa_aes_wrap(const u8 *kek, int n, const u8 *plain, u8 *cipher)
 {
     u8 *a, *r, b[16];
     int i, j;
@@ -35,7 +35,7 @@ int  aes_wrap(const u8 *kek, int n, const u8 *plain, u8 *cipher)
     os_memset(a, 0xa6, 8);
     os_memcpy(r, plain, 8 * n);
 
-    ctx = aes_encrypt_init(kek, 16);
+    ctx = wpa_aes_encrypt_init(kek, 16);
     if (ctx == NULL)
         return -1;
 
@@ -51,14 +51,14 @@ int  aes_wrap(const u8 *kek, int n, const u8 *plain, u8 *cipher)
         for (i = 1; i <= n; i++) {
             os_memcpy(b, a, 8);
             os_memcpy(b + 8, r, 8);
-            aes_encrypt(ctx, b, b);
+            wpa_aes_encrypt(ctx, b, b);
             os_memcpy(a, b, 8);
             a[7] ^= n * j + i;
             os_memcpy(r, b + 8, 8);
             r += 8;
         }
     }
-    aes_encrypt_deinit(ctx);
+    wpa_aes_encrypt_deinit(ctx);
 
     /* 3) Output the results.
      *

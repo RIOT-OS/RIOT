@@ -29,7 +29,7 @@
  * @mac: Buffer for the hash (32 bytes)
  */
 void
-hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
+wpa_hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
             const u8 *addr[], const size_t *len, u8 *mac)
 {
     unsigned char k_pad[64]; /* padding - key XORd with ipad/opad */
@@ -47,7 +47,7 @@ hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
 
         /* if key is longer than 64 bytes reset it to key = SHA256(key) */
         if (key_len > 64) {
-        sha256_vector(1, &key, &key_len, tk);
+        wpa_sha256_vector(1, &key, &key_len, tk);
         key = tk;
         key_len = 32;
         }
@@ -75,7 +75,7 @@ hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
         _addr[i + 1] = addr[i];
         _len[i + 1] = len[i];
     }
-    sha256_vector(1 + num_elem, _addr, _len, mac);
+    wpa_sha256_vector(1 + num_elem, _addr, _len, mac);
 
     os_memset(k_pad, 0, sizeof(k_pad));
     os_memcpy(k_pad, key, key_len);
@@ -88,7 +88,7 @@ hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
     _len[0] = 64;
     _addr[1] = mac;
     _len[1] = SHA256_MAC_LEN;
-    sha256_vector(2, _addr, _len, mac);
+    wpa_sha256_vector(2, _addr, _len, mac);
 }
 
 
@@ -101,10 +101,10 @@ hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
  * @mac: Buffer for the hash (20 bytes)
  */
 void
-hmac_sha256(const u8 *key, size_t key_len, const u8 *data,
+wpa_hmac_sha256(const u8 *key, size_t key_len, const u8 *data,
          size_t data_len, u8 *mac)
 {
-    hmac_sha256_vector(key, key_len, 1, &data, &data_len, mac);
+    wpa_hmac_sha256_vector(key, key_len, 1, &data, &data_len, mac);
 }
 
 
@@ -122,7 +122,7 @@ hmac_sha256(const u8 *key, size_t key_len, const u8 *data,
  * given key.
  */
 void
-sha256_prf(const u8 *key, size_t key_len, const char *label,
+wpa_sha256_prf(const u8 *key, size_t key_len, const char *label,
         const u8 *data, size_t data_len, u8 *buf, size_t buf_len)
 {
     u16 counter = 1;
@@ -147,11 +147,11 @@ sha256_prf(const u8 *key, size_t key_len, const char *label,
         plen = buf_len - pos;
         WPA_PUT_LE16(counter_le, counter);
         if (plen >= SHA256_MAC_LEN) {
-            hmac_sha256_vector(key, key_len, 4, addr, len,
+            wpa_hmac_sha256_vector(key, key_len, 4, addr, len,
                        &buf[pos]);
             pos += SHA256_MAC_LEN;
         } else {
-            hmac_sha256_vector(key, key_len, 4, addr, len, hash);
+            wpa_hmac_sha256_vector(key, key_len, 4, addr, len, hash);
             os_memcpy(&buf[pos], hash, plen);
             break;
         }

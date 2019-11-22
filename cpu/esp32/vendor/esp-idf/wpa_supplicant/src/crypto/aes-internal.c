@@ -785,7 +785,7 @@ const u8 rcons[] /* ICACHE_RODATA_ATTR */ = {
  *
  * @return    the number of rounds for the given cipher key size.
  */
-int rijndaelKeySetupEnc(u32 rk[], const u8 cipherKey[], int keyBits)
+int wpa_rijndaelKeySetupEnc(u32 rk[], const u8 cipherKey[], int keyBits)
 {
     int i;
     u32 temp;

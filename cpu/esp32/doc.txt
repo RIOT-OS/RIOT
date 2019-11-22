@@ -192,7 +192,6 @@ The RIOT-OS for ESP32 SoCs supports the following features at the moment:
 The implementation of RIOT-OS for ESP32 SOCs has the following limitations at the moment:
 
 - Only <b>one core</b> (the PRO CPU) is used because RIOT does not support running multiple threads  simultaneously.
-- RIOT modules <b>crypto</b> and <b>hashes</b> cannot be used together with modules <b>esp_now</b> and <b>esp_wifi</b>
 - <b>Bluetooth</b> cannot be used at the moment.
 - <b>Flash encryption</b> is not yet supported.
 
@@ -946,12 +945,9 @@ The board has to have one of the supported PHY modules to be able to use the Eth
 The RIOT port for ESP32 implements in module `esp_wifi` a `netdev` driver for
 the built-in WiFi interface.
 
-@note Due to symbol conflicts with the `crypto` and `hash` modules of RIOT
-in module `esp_idf_wpa_supplicant_crypto`, which is required by module
-`esp_wifi`, `esp_wifi` cannot be used for applications that use these modules.
-Therefore, module `esp_wifi` is not automatically enabled when module
-`netdev_default` is used. Instead, if necessary, the application has to add
-the module `esp_wifi` in the Makefile.
+@note Module `esp_wifi` is not enabled automatically when the `netdev_default`
+module is used. Instead, if necessary, the application has to add the
+`esp_wifi` module in the Makefile.
 
 ```
 USEMODULE += esp_wifi
@@ -991,7 +987,9 @@ With ESP-NOW, the ESP32 provides a connectionless communication technology, feat
 
 The RIOT port for ESP32 implements in module ```esp_now``` a ```netdev``` driver which uses ESP-NOW to provide a link layer interface to a meshed network of ESP32 nodes. In this network, each node can send short packets with up to 250 data bytes to all other nodes that are visible in its range.
 
-@note Due to symbol conflicts in the ```esp_idf_wpa_supplicant_crypto``` module used by the ```esp_now``` with RIOT's ```crypto``` and ```hashes``` modules, ESP-NOW cannot be used for application that use these modules. Therefore, the module ```esp_now``` is not enabled automatically if the ```netdev_default``` module is used. Instead, the application has to add the ```esp_now``` module in its makefile when needed.<br>
+@note Module `esp_now`module is not enabled automatically if the
+`netdev_default` module is used. Instead, the application has to add the
+`esp_now` module in its makefile when needed.<br>
 ```
 USEMODULE += esp_now
 ```
