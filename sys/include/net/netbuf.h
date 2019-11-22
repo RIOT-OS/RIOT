@@ -31,9 +31,6 @@ extern "C" {
  * @brief   Get a network buffer with a given size.
  *
  * @note    Supposed to be implemented by the networking module.
- * @note    @p ctx must be NOT NULL if the function returns a valid pointer.
- *          If this function returns NULL, the value of @p ctx
- *          is undefined.
  *
  * @param[in]       size    size of the buffer to be allocated.
  * @param[out]      ctx     allocation context.
