@@ -26,7 +26,7 @@ areas of RIOT they each maintain.
 This guideline and other guidelines like the [Coding Conventions] should be
 applied consistently and rigorously, but not blindly. A static set of guidelines
 cannot reasonably address the complexity of the real world. Thus, exceptions
-from this guideline or the coding convention are explicitly allowed, if clearly
+from our guidelines or the coding convention are explicitly allowed, if clearly
 and logically articulated reasons can be presented.
 
 
