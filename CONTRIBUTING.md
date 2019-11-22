@@ -4,6 +4,7 @@ Thank you for your interest in contributing to RIOT! There are many ways to
 contribute, and we appreciate all of them. You can jump to the major sections
 of this document using the following links:
 
+* [Getting Started][getting-started]
 * [Help wanted][help-wanted]
 * [Feature Requests][feature-requests]
 * [Bug Reports][bug-reports]
@@ -17,6 +18,17 @@ As a reminder, all contributors are expected to follow our
 [Code of Conduct](CODE_OF_CONDUCT.md).
 
 [riot-chat]: http://webchat.freenode.net?channels=riot-os
+
+## Getting Started
+[getting-started]: #getting-started
+If you are just beginning to work with RIOT you might first want to read our
+[documentation]. Especially the following sections might be of interest to you
+
+- [Getting Started](https://doc.riot-os.org/getting-started.html)
+- [Creating modules](https://doc.riot-os.org/creating-modules.html)
+- [Creating an application](https://doc.riot-os.org/creating-an-application.html)
+
+[documentation]: https://doc.riot-os.org
 
 ## Help Wanted
 [help-wanted]: #help-wanted
