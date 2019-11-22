@@ -382,7 +382,7 @@ void auto_init(void)
     extern void auto_init_bmp180(void);
     auto_init_bmp180();
 #endif
-#if defined(MODULE_BME280) || defined(MODULE_BMP280)
+#ifdef MODULE_BMX280
     extern void auto_init_bmx280(void);
     auto_init_bmx280();
 #endif

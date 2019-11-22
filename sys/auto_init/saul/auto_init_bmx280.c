@@ -20,7 +20,7 @@
  * @}
  */
 
-#if defined(MODULE_BME280) || defined(MODULE_BMP280)
+#ifdef MODULE_BMX280
 
 #include "log.h"
 #include "saul_reg.h"
@@ -34,20 +34,9 @@
 static bmx280_t bmx280_devs[BMX280_NUMOF];
 
 /**
- * @brief   Reference the driver structs.
- * @{
- */
-extern const saul_driver_t bmx280_temperature_saul_driver;
-extern const saul_driver_t bmx280_pressure_saul_driver;
-#if defined(MODULE_BME280)
-extern const saul_driver_t bme280_relative_humidity_saul_driver;
-#endif
-/** @} */
-
-/**
  * @brief   Memory for the SAUL registry entries
  */
-#if defined(MODULE_BME280)
+#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
 #define SENSORS_NUMOF 3
 #else
 #define SENSORS_NUMOF 2
@@ -79,7 +68,7 @@ void auto_init_bmx280(void)
         saul_reg_add(&saul_entries[se_ix]);
         se_ix++;
 
-#if defined(MODULE_BME280)
+#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
         /* relative humidity */
         saul_entries[se_ix].dev = &bmx280_devs[i];
         saul_entries[se_ix].name = bmx280_saul_reg_info[i].name;

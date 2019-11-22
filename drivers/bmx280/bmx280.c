@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2016 Kees Bakker, SODAQ
  *               2017 Inria
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -12,9 +13,10 @@
  * @{
  *
  * @file
- * @brief       Device driver implementation for sensors BMX280 (BME280 and BMP280).
+ * @brief       Device driver implementation for BME280 and BMP280 sensors
  *
  * @author      Kees Bakker <kees@sodaq.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -23,93 +25,322 @@
 #include <math.h>
 
 #include "log.h"
+#include "assert.h"
 #include "bmx280.h"
 #include "bmx280_internals.h"
-#include "bmx280_params.h"
-#include "periph/i2c.h"
 #include "xtimer.h"
 
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-static int read_calibration_data(bmx280_t* dev);
-static int do_measurement(const bmx280_t* dev);
-static uint8_t get_ctrl_meas(const bmx280_t* dev);
-static uint8_t get_status(const bmx280_t* dev);
-static uint8_t read_u8_reg(const bmx280_t* dev, uint8_t reg);
-static void write_u8_reg(const bmx280_t* dev, uint8_t reg, uint8_t b);
-static uint16_t get_uint16_le(const uint8_t *buffer, size_t offset);
-static int16_t get_int16_le(const uint8_t *buffer, size_t offset);
-
-#if ENABLE_DEBUG
-static void dump_buffer(const char *txt, uint8_t *buffer, size_t size);
-#define DUMP_BUFFER(txt, buffer, size)  dump_buffer(txt, buffer, size)
+#ifdef BMX280_USE_SPI
+#define BUS                 (dev->params.spi)
+#define CS                  (dev->params.cs)
+#define CLK                 (dev->params.clk)
+#define MODE                SPI_MODE_0
+#define WRITE_MASK          (0x7F)
 #else
-#define DUMP_BUFFER(txt, buffer, size)
+#define BUS                 (dev->params.i2c_dev)
+#define ADDR                (dev->params.i2c_addr)
 #endif
 
-/**
- * @brief   Fine resolution temperature value, also needed for pressure and humidity.
- */
-static int32_t t_fine;
+/* shortcut for accessing byte x of the latest sensor reading */
+#define RAW_DATA            (dev->last_reading)
 
-/**
- * @brief   The measurement registers, including temperature, pressure and humidity
- *
- * A temporary buffer for the memory map 0xF7..0xFE
- * These are read all at once and then used to compute the three sensor values.
- */
-static uint8_t measurement_regs[8];
-
-/*---------------------------------------------------------------------------*
- *                          BMX280 Core API                                  *
- *---------------------------------------------------------------------------*/
-
-int bmx280_init(bmx280_t* dev, const bmx280_params_t* params)
+/* implementation for the driver's configured bus interface (I2C vs SPI) */
+#ifdef BMX280_USE_SPI /* using SPI mode */
+static inline int _acquire(const bmx280_t *dev)
 {
-    uint8_t chip_id;
+    if (spi_acquire(BUS, CS, MODE, CLK) != SPI_OK) {
+        return BMX280_ERR_BUS;
+    }
+    return BMX280_OK;
+}
 
-    dev->params = *params;
+static inline void _release(const bmx280_t *dev)
+{
+    spi_release(BUS);
+}
 
-    /* Read chip ID */
-    chip_id = read_u8_reg(dev, BMX280_CHIP_ID_REG);
-    if ((chip_id != BME280_CHIP_ID) && (chip_id != BMP280_CHIP_ID)) {
-        DEBUG("[Error] Did not detect a BMX280 at address %02x (%02x != %02x or %02x)\n",
-              dev->params.i2c_addr, chip_id, BME280_CHIP_ID, BMP280_CHIP_ID);
-        return BMX280_ERR_NODEV;
+static int _read_reg(const bmx280_t *dev, uint8_t reg, uint8_t *data)
+{
+    *data = spi_transfer_reg(BUS, CS, reg, 0);
+    return BMX280_OK;
+}
+
+static int _write_reg(const bmx280_t *dev, uint8_t reg, uint8_t data)
+{
+    (void)spi_transfer_reg(BUS, CS, (reg & WRITE_MASK), data);
+    return BMX280_OK;
+}
+
+static int _read_burst(const bmx280_t *dev, uint8_t reg, void *buf, size_t len)
+{
+    spi_transfer_regs(BUS, CS, reg, NULL, buf, len);
+    return BMX280_OK;
+}
+
+#else /* using I2C mode */
+
+static inline int _acquire(const bmx280_t *dev)
+{
+    if (i2c_acquire(BUS) != 0) {
+        return BMX280_ERR_BUS;
+    }
+    return BMX280_OK;
+}
+
+static inline void _release(const bmx280_t *dev)
+{
+    i2c_release(BUS);
+}
+
+static int _read_reg(const bmx280_t *dev, uint8_t reg, uint8_t *data)
+{
+    if (i2c_read_reg(BUS, ADDR, reg, data, 0) != 0) {
+        return BMX280_ERR_BUS;
+    }
+    return BMX280_OK;
+}
+
+static int _write_reg(const bmx280_t *dev, uint8_t reg, uint8_t data)
+{
+    if (i2c_write_reg(BUS, ADDR, reg, data, 0) != 0) {
+        return BMX280_ERR_BUS;
+    }
+    return BMX280_OK;
+}
+
+static int _read_burst(const bmx280_t *dev, uint8_t reg, void *buf, size_t len)
+{
+    if (i2c_read_regs(BUS, ADDR, reg, buf, len, 0) != 0) {
+        return BMX280_ERR_BUS;
+    }
+    return BMX280_OK;
+}
+
+#endif /* bus mode selection */
+
+static uint16_t _to_u16_le(const uint8_t *buffer, size_t offset)
+{
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    return (((uint16_t)buffer[offset + 1]) << 8) + buffer[offset];
+#else
+    return (((uint16_t)buffer[offset]) << 8) + buffer[offset + 1];
+#endif
+}
+
+static int16_t _to_i16_le(const uint8_t *buffer, size_t offset)
+{
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    return (((int16_t)buffer[offset + 1]) << 8) + buffer[offset];
+#else
+    return (((int16_t)buffer[offset]) << 8) + buffer[offset + 1];
+#endif
+}
+
+/**
+ * @brief   Read the calibration data from sensor ROM, it is in registers
+ *          0x88..0x9F, 0xA1, and 0xE1..0xE7
+ */
+static int _read_calibration_data(bmx280_t *dev)
+{
+    /* no need to acquire a bus here, as this is done in the init function */
+
+    /* allocate some memory to store the largest block of calibration data */
+    uint8_t buf[CALIB_T_P_LEN];
+
+    /* read humidity and temperature calibration data */
+    if (_read_burst(dev, CALIB_T_P_BASE, buf, CALIB_T_P_LEN) != BMX280_OK) {
+        return BMX280_ERR_BUS;
     }
 
-    /* Read compensation data, 0x88..0x9F, 0xA1, 0xE1..0xE7 */
-    if (read_calibration_data(dev)) {
-        DEBUG("[Error] Could not read calibration data\n");
-        return BMX280_ERR_NOCAL;
+    /* convert calibration values to little endian format and save them */
+    dev->calibration.dig_T1 = _to_u16_le(buf, OFFSET_T_P(BMX280_DIG_T1_LSB_REG));
+    dev->calibration.dig_T2 = _to_i16_le(buf, OFFSET_T_P(BMX280_DIG_T2_LSB_REG));
+    dev->calibration.dig_T3 = _to_i16_le(buf, OFFSET_T_P(BMX280_DIG_T3_LSB_REG));
+
+    dev->calibration.dig_P1 = _to_u16_le(buf, OFFSET_T_P(BMX280_DIG_P1_LSB_REG));
+    dev->calibration.dig_P2 = _to_i16_le(buf, OFFSET_T_P(BMX280_DIG_P2_LSB_REG));
+    dev->calibration.dig_P3 = _to_i16_le(buf, OFFSET_T_P(BMX280_DIG_P3_LSB_REG));
+    dev->calibration.dig_P4 = _to_i16_le(buf, OFFSET_T_P(BMX280_DIG_P4_LSB_REG));
+    dev->calibration.dig_P5 = _to_i16_le(buf, OFFSET_T_P(BMX280_DIG_P5_LSB_REG));
+    dev->calibration.dig_P6 = _to_i16_le(buf, OFFSET_T_P(BMX280_DIG_P6_LSB_REG));
+    dev->calibration.dig_P7 = _to_i16_le(buf, OFFSET_T_P(BMX280_DIG_P7_LSB_REG));
+    dev->calibration.dig_P8 = _to_i16_le(buf, OFFSET_T_P(BMX280_DIG_P8_LSB_REG));
+    dev->calibration.dig_P9 = _to_i16_le(buf, OFFSET_T_P(BMX280_DIG_P9_LSB_REG));
+
+#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+    /* read dig_H1 in a single read, as this value is not in the block with the
+     * rest of the humidity calibration values */
+    if (_read_reg(dev, BME280_DIG_H1_REG, &dev->calibration.dig_H1) != BMX280_OK) {
+        return BMX280_ERR_BUS;
     }
+
+    /* read the block with the rest of the values */
+    if (_read_burst(dev, CALIB_H_BASE, buf, CALIB_H_LEN) != BMX280_OK) {
+        return BMX280_ERR_BUS;
+    }
+
+    /* parse the humidity compensation and store in device descriptor */
+    dev->calibration.dig_H2 = _to_i16_le(buf, OFFSET_H(BME280_DIG_H2_LSB_REG));
+    dev->calibration.dig_H3 = buf[OFFSET_H(BME280_DIG_H3_REG)];
+    dev->calibration.dig_H4 = ((((int16_t)buf[OFFSET_H(BME280_DIG_H4_MSB_REG)]) << 4) +
+                               (buf[OFFSET_H(BME280_DIG_H4_H5_REG)] & 0x0F));
+    dev->calibration.dig_H5 = ((((int16_t)buf[OFFSET_H(BME280_DIG_H5_MSB_REG)]) << 4) +
+                               ((buf[OFFSET_H(BME280_DIG_H4_H5_REG)] & 0xF0) >> 4));
+    dev->calibration.dig_H6 = buf[OFFSET_H(BME280_DIG_H6_REG)];
+#endif
 
     return BMX280_OK;
 }
 
-/*
- * Returns temperature in DegC, resolution is 0.01 DegC.
- * t_fine carries fine temperature as global value
+/**
+ * @brief   Trigger a new measurement (if applicable) and read raw data
  */
-int16_t bmx280_read_temperature(const bmx280_t* dev)
+static int _do_measurement(bmx280_t *dev)
 {
-    if (do_measurement(dev) < 0) {
+    uint8_t reg;
+
+    /* get access to the bus */
+    if (_acquire(dev) != BMX280_OK) {
+        goto err;
+    }
+
+    /* if in FORCED mode, we need to manually trigger a measurement */
+    if (dev->params.run_mode != BMX280_MODE_NORMAL) {
+        reg = ((dev->params.temp_oversample << MEAS_OSRS_T_POS) |
+               (dev->params.press_oversample << MEAS_OSRS_P_POS) |
+               BMX280_MODE_FORCED);
+        if (_write_reg(dev, BMX280_CTRL_MEAS_REG, reg) != BMX280_OK) {
+            goto err;
+        }
+        do {
+            if (_read_reg(dev, BMX280_STAT_REG, &reg) != BMX280_OK) {
+                goto err;
+            }
+        } while (reg & STAT_MEASURING);
+        /* results are ready now */
+        DEBUG("[bmx280] _do_measurement: measurement data ready\n");
+    }
+
+    /* read all raw data registers into data buffer */
+    if (_read_burst(dev, DATA_BASE, RAW_DATA, BMX280_RAW_LEN) != BMX280_OK) {
+        goto err;
+    }
+
+    /* we are done reading from the device, so release the bus again */
+    _release(dev);
+    return BMX280_OK;
+
+err:
+    _release(dev);
+    return BMX280_ERR_BUS;
+}
+
+int bmx280_init(bmx280_t *dev, const bmx280_params_t *params)
+{
+    assert(dev && params);
+
+    dev->params = *params;
+    uint8_t reg;
+
+
+#ifdef BMX280_USE_SPI
+    /* configure the chip-select pin */
+    if (spi_init_cs(BUS, CS) != SPI_OK) {
+        DEBUG("[bmx280] error: unable to configure chip the select pin\n");
+        return BMX280_ERR_BUS;
+    }
+#endif
+
+    /* acquire bus bus, this also tests the bus parameters in SPI mode */
+    if (_acquire(dev) != BMX280_OK) {
+        DEBUG("[bmx280] error: unable to acquire bus\n");
+        return BMX280_ERR_BUS;
+    }
+
+    /* test the connection to the device by reading and verifying its chip ID */
+    if (_read_reg(dev, BMX280_CHIP_ID_REG, &reg) != BMX280_OK) {
+        DEBUG("[bmx280] error: unable to read chip ID from device\n");
+        return BMX280_ERR_NODEV;
+    }
+    if (reg != BMX280_CHIP_ID_VAL) {
+        DEBUG("[bmx280] error: invalid chip ID (0x%02x)\n", (int)reg);
+        _release(dev);
+        return BMX280_ERR_NODEV;
+    }
+
+    /* trigger a power-on reset sequence to reset all registers */
+    if (_write_reg(dev, BMEX80_RST_REG, RESET_WORD) != BMX280_OK) {
+        goto err;
+    }
+    /* wait for reset sequence to finish */
+    do {
+        if (_read_reg(dev, BMX280_STAT_REG, &reg) != BMX280_OK) {
+            goto err;
+        }
+    } while (reg != 0);
+
+    /* read the compensation data from the sensor's ROM */
+    if (_read_calibration_data(dev) != BMX280_OK) {
+        DEBUG("[bmx280] error: could not read calibration data\n");
+        goto err;
+    }
+
+    /* write basic device configuration: t_sb and filter values */
+    reg = (dev->params.t_sb | dev->params.filter);
+    if (_write_reg(dev, BMX280_CONFIG_REG, reg) != BMX280_OK) {
+        goto err;
+    }
+
+#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+    /* ctrl_hum must be written before ctrl_meas for changes to become
+     * effective */
+    reg = dev->params.humid_oversample;
+    if (_write_reg(dev, BME280_CTRL_HUM_REG, reg) != BMX280_OK) {
+        goto err;
+    }
+#endif
+
+    /* finally apply the temperature and pressure oversampling configuration and
+     * configure the run mode */
+    reg = ((dev->params.temp_oversample << MEAS_OSRS_T_POS) |
+           (dev->params.press_oversample << MEAS_OSRS_P_POS) |
+           (dev->params.run_mode));
+    if (_write_reg(dev, BMX280_CTRL_MEAS_REG, reg) != BMX280_OK) {
+        goto err;
+    }
+
+    _release(dev);
+    return BMX280_OK;
+
+err:
+    _release(dev);
+    DEBUG("[bmx280] init: bus error while initializing device\n");
+    return BMX280_ERR_BUS;
+}
+
+int16_t bmx280_read_temperature(bmx280_t *dev)
+{
+    assert(dev);
+
+    if (_do_measurement(dev) < 0) {
         return INT16_MIN;
     }
 
     const bmx280_calibration_t *cal = &dev->calibration; /* helper variable */
 
     /* Read the uncompensated temperature */
-    int32_t adc_T = (((uint32_t)measurement_regs[3 + 0]) << 12) |
-        (((uint32_t)measurement_regs[3 + 1]) << 4) |
-        ((((uint32_t)measurement_regs[3 + 2]) >> 4) & 0x0F);
+    int32_t adc_T = (((uint32_t)RAW_DATA[3 + 0]) << 12) |
+        (((uint32_t)RAW_DATA[3 + 1]) << 4) |
+        ((((uint32_t)RAW_DATA[3 + 2]) >> 4) & 0x0F);
 
     /*
      * Compensate the temperature value.
-     * The following is code from Bosch's BME280_driver bme280_compensate_temperature_int32()
-     * The variable names and the many defines have been modified to make the code
-     * more readable.
+     * The following is code from Bosch's BME280_driver
+     * bme280_compensate_temperature_int32(). The variable names and the many
+     * defines have been modified to make the code more readable.
      */
     int32_t var1;
     int32_t var2;
@@ -119,22 +350,21 @@ int16_t bmx280_read_temperature(const bmx280_t* dev)
             ((int32_t)cal->dig_T3)) >> 14;
 
     /* calculate t_fine (used for pressure and humidity too) */
-    t_fine = var1 + var2;
+    dev->t_fine = var1 + var2;
 
-    return (t_fine * 5 + 128) >> 8;
+    return (dev->t_fine * 5 + 128) >> 8;
 }
 
-/*
- * Returns pressure in Pa
- */
 uint32_t bmx280_read_pressure(const bmx280_t *dev)
 {
+    assert(dev);
+
     const bmx280_calibration_t *cal = &dev->calibration; /* helper variable */
 
     /* Read the uncompensated pressure */
-    int32_t adc_P = (((uint32_t)measurement_regs[0 + 0]) << 12) |
-        (((uint32_t)measurement_regs[0 + 1]) << 4) |
-        ((((uint32_t)measurement_regs[0 + 2]) >> 4) & 0x0F);
+    int32_t adc_P = (((uint32_t)RAW_DATA[0 + 0]) << 12) |
+        (((uint32_t)RAW_DATA[0 + 1]) << 4) |
+        ((((uint32_t)RAW_DATA[0 + 2]) >> 4) & 0x0F);
 
     int64_t var1;
     int64_t var2;
@@ -142,11 +372,11 @@ uint32_t bmx280_read_pressure(const bmx280_t *dev)
 
     /*
      * Compensate the pressure value.
-     * The following is code from Bosch's BME280_driver bme280_compensate_pressure_int64()
-     * The variable names and the many defines have been modified to make the code
-     * more readable.
+     * The following is code from Bosch's BME280_driver
+     * bme280_compensate_pressure_int64(). The variable names and the many
+     * defines have been modified to make the code more readable.
      */
-    var1 = ((int64_t)t_fine) - 128000;
+    var1 = ((int64_t)dev->t_fine) - 128000;
     var2 = var1 * var1 * (int64_t)cal->dig_P6;
     var2 = var2 + ((var1 * (int64_t)cal->dig_P5) << 17);
     var2 = var2 + (((int64_t)cal->dig_P4) << 35);
@@ -166,27 +396,29 @@ uint32_t bmx280_read_pressure(const bmx280_t *dev)
     return p_acc >> 8;
 }
 
-#if defined(MODULE_BME280)
+#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
 uint16_t bme280_read_humidity(const bmx280_t *dev)
 {
+    assert(dev);
+
     const bmx280_calibration_t *cal = &dev->calibration; /* helper variable */
 
     /* Read the uncompensated pressure */
-    int32_t adc_H = (((uint32_t)measurement_regs[6 + 0]) << 8) |
-        (((uint32_t)measurement_regs[6 + 1]));
+    int32_t adc_H = (((uint32_t)RAW_DATA[6 + 0]) << 8) |
+        (((uint32_t)RAW_DATA[6 + 1]));
 
     /*
      * Compensate the humidity value.
-     * The following is code from Bosch's BME280_driver bme280_compensate_humidity_int32()
-     * The variable names and the many defines have been modified to make the code
-     * more readable.
+     * The following is code from Bosch's BME280_driver
+     * bme280_compensate_humidity_int32(). The variable names and the many
+     * defines have been modified to make the code more readable.
      * The value is first computed as a value in %rH as unsigned 32bit integer
      * in Q22.10 format(22 integer 10 fractional bits).
      */
     int32_t var1;
 
     /* calculate x1*/
-    var1 = (t_fine - ((int32_t)76800));
+    var1 = (dev->t_fine - ((int32_t)76800));
     /* calculate x1*/
     var1 = (((((adc_H << 14) - (((int32_t)cal->dig_H4) << 20) - (((int32_t)cal->dig_H5) * var1)) +
               ((int32_t)16384)) >> 15) *
@@ -194,190 +426,9 @@ uint16_t bme280_read_humidity(const bmx280_t *dev)
                  (((var1 * ((int32_t)cal->dig_H3)) >> 11) + ((int32_t)32768))) >> 10) +
                ((int32_t)2097152)) * ((int32_t)cal->dig_H2) + 8192) >> 14));
     var1 = (var1 - (((((var1 >> 15) * (var1 >> 15)) >> 7) * ((int32_t)cal->dig_H1)) >> 4));
-    var1 = (var1 < 0 ? 0 : var1);
-    var1 = (var1 > 419430400 ? 419430400 : var1);
+    var1 = (var1 < 0) ? 0 : var1;
+    var1 = (var1 > 419430400) ? 419430400 : var1;
     /* First multiply to avoid losing the accuracy after the shift by ten */
     return (100 * ((uint32_t)var1 >> 12)) >> 10;
-}
-#endif
-
-/**
- * Read compensation data, 0x88..0x9F, 0xA1, 0xE1..0xE7
- *
- * This function reads all calibration bytes at once. These are
- * the registers DIG_T1_LSB (0x88) upto and including DIG_H6 (0xE7).
- */
-static int read_calibration_data(bmx280_t* dev)
-{
-    uint8_t buffer[128];        /* 128 should be enough to read all calibration bytes */
-    int result;
-#ifdef MODULE_BME280
-    int nr_bytes_to_read = (BME280_DIG_H6_REG - BMX280_DIG_T1_LSB_REG) + 1;
-#else
-    int nr_bytes_to_read = (BMX280_DIG_P9_MSB_REG - BMX280_DIG_T1_LSB_REG) + 1;
-#endif
-    uint8_t offset = 0x88;
-
-    memset(buffer, 0, sizeof(buffer));
-    i2c_acquire(dev->params.i2c_dev);
-    result = i2c_read_regs(dev->params.i2c_dev, dev->params.i2c_addr, offset,
-                           buffer, nr_bytes_to_read, 0);
-    i2c_release(dev->params.i2c_dev);
-    if (result != 0) {
-        LOG_ERROR("Unable to read calibration data\n");
-        return -1;
-    }
-    DUMP_BUFFER("Raw Calibration Data", buffer, nr_bytes_to_read);
-
-    /* All little endian */
-    dev->calibration.dig_T1 = get_uint16_le(buffer, BMX280_DIG_T1_LSB_REG - offset);
-    dev->calibration.dig_T2 = get_int16_le(buffer, BMX280_DIG_T2_LSB_REG - offset);
-    dev->calibration.dig_T3 = get_int16_le(buffer, BMX280_DIG_T3_LSB_REG - offset);
-
-    dev->calibration.dig_P1 = get_uint16_le(buffer, BMX280_DIG_P1_LSB_REG - offset);
-    dev->calibration.dig_P2 = get_int16_le(buffer, BMX280_DIG_P2_LSB_REG - offset);
-    dev->calibration.dig_P3 = get_int16_le(buffer, BMX280_DIG_P3_LSB_REG - offset);
-    dev->calibration.dig_P4 = get_int16_le(buffer, BMX280_DIG_P4_LSB_REG - offset);
-    dev->calibration.dig_P5 = get_int16_le(buffer, BMX280_DIG_P5_LSB_REG - offset);
-    dev->calibration.dig_P6 = get_int16_le(buffer, BMX280_DIG_P6_LSB_REG - offset);
-    dev->calibration.dig_P7 = get_int16_le(buffer, BMX280_DIG_P7_LSB_REG - offset);
-    dev->calibration.dig_P8 = get_int16_le(buffer, BMX280_DIG_P8_LSB_REG - offset);
-    dev->calibration.dig_P9 = get_int16_le(buffer, BMX280_DIG_P9_LSB_REG - offset);
-
-#if defined(MODULE_BME280)
-    dev->calibration.dig_H1 = buffer[BME280_DIG_H1_REG - offset];
-    dev->calibration.dig_H2 = get_int16_le(buffer, BME280_DIG_H2_LSB_REG - offset);
-    dev->calibration.dig_H3 = buffer[BME280_DIG_H3_REG - offset];
-    dev->calibration.dig_H4 = (((int16_t)buffer[BME280_DIG_H4_MSB_REG - offset]) << 4) +
-        (buffer[BME280_DIG_H4_H5_REG - offset] & 0x0F);
-    dev->calibration.dig_H5 = (((int16_t)buffer[BME280_DIG_H5_MSB_REG - offset]) << 4) +
-        ((buffer[BME280_DIG_H4_H5_REG - offset] & 0xF0) >> 4);
-    dev->calibration.dig_H6 = buffer[BME280_DIG_H6_REG - offset];
-#endif
-
-    DEBUG("[INFO] Chip ID = 0x%02X\n", buffer[BMX280_CHIP_ID_REG - offset]);
-
-    /* Config is only writable in sleep mode */
-    i2c_acquire(dev->params.i2c_dev);
-    (void)i2c_write_reg(dev->params.i2c_dev, dev->params.i2c_addr,
-                        BMX280_CTRL_MEAS_REG, 0, 0);
-    i2c_release(dev->params.i2c_dev);
-
-    uint8_t b;
-
-    /* Config Register */
-    /* spi3w_en unused */
-    b = ((dev->params.t_sb & 7) << 5) | ((dev->params.filter & 7) << 2);
-    write_u8_reg(dev, BMX280_CONFIG_REG, b);
-
-#if defined(MODULE_BME280)
-    /*
-     * Note from the datasheet about ctrl_hum: "Changes to this register only become effective
-     * after a write operation to "ctrl_meas".
-     * So, set ctrl_hum first.
-     */
-    b = dev->params.humid_oversample & 7;
-    write_u8_reg(dev, BME280_CTRL_HUMIDITY_REG, b);
-#endif
-
-    b = ((dev->params.temp_oversample & 7) << 5) |
-        ((dev->params.press_oversample & 7) << 2) |
-        (dev->params.run_mode & 3);
-    write_u8_reg(dev, BMX280_CTRL_MEAS_REG, b);
-
-    return 0;
-}
-
-/**
- * @brief Start a measurement and read the registers
- */
-static int do_measurement(const bmx280_t* dev)
-{
-    /*
-     * If settings has FORCED mode, then the device go to sleep after
-     * it finished the measurement. To read again we have to set the
-     * run_mode back to FORCED.
-     */
-    uint8_t ctrl_meas = get_ctrl_meas(dev);
-    uint8_t run_mode = ctrl_meas & 3;
-    if (run_mode != dev->params.run_mode) {
-        /* Set the run_mode back to what we want. */
-        ctrl_meas &= ~3;
-        ctrl_meas |= dev->params.run_mode;
-        write_u8_reg(dev, BMX280_CTRL_MEAS_REG, ctrl_meas);
-
-        /* Wait for measurement ready? */
-        size_t count = 0;
-        while (count < 10 && (get_status(dev) & 0x08) != 0) {
-            ++count;
-        }
-        /* What to do when measuring is still on? */
-    }
-    int result;
-    int nr_bytes_to_read = sizeof(measurement_regs);
-    uint8_t offset = BMX280_PRESSURE_MSB_REG;
-
-    i2c_acquire(dev->params.i2c_dev);
-    result = i2c_read_regs(dev->params.i2c_dev, dev->params.i2c_addr,
-                           offset, measurement_regs, nr_bytes_to_read, 0);
-    i2c_release(dev->params.i2c_dev);
-    if (result != 0) {
-        LOG_ERROR("Unable to read temperature data\n");
-        return -1;
-    }
-    DUMP_BUFFER("Raw Sensor Data", measurement_regs, nr_bytes_to_read);
-
-    return 0;
-}
-
-static uint8_t get_ctrl_meas(const bmx280_t* dev)
-{
-    return read_u8_reg(dev, BMX280_CTRL_MEAS_REG);
-}
-
-static uint8_t get_status(const bmx280_t* dev)
-{
-    return read_u8_reg(dev, BMX280_STAT_REG);
-}
-
-static uint8_t read_u8_reg(const bmx280_t* dev, uint8_t reg)
-{
-    uint8_t b;
-    /* Assuming device is correct, it should return 1 (nr bytes) */
-    i2c_acquire(dev->params.i2c_dev);
-    (void)i2c_read_reg(dev->params.i2c_dev, dev->params.i2c_addr, reg, &b, 0);
-    i2c_release(dev->params.i2c_dev);
-    return b;
-}
-
-static void write_u8_reg(const bmx280_t* dev, uint8_t reg, uint8_t b)
-{
-    /* Assuming device is correct, it should return 1 (nr bytes) */
-    i2c_acquire(dev->params.i2c_dev);
-    (void)i2c_write_reg(dev->params.i2c_dev, dev->params.i2c_addr, reg, b, 0);
-    i2c_release(dev->params.i2c_dev);
-}
-
-static uint16_t get_uint16_le(const uint8_t *buffer, size_t offset)
-{
-    return (((uint16_t)buffer[offset + 1]) << 8) + buffer[offset];
-}
-
-static int16_t get_int16_le(const uint8_t *buffer, size_t offset)
-{
-    return (((int16_t)buffer[offset + 1]) << 8) + buffer[offset];
-}
-
-#if ENABLE_DEBUG
-static void dump_buffer(const char *txt, uint8_t *buffer, size_t size)
-{
-    size_t ix;
-    DEBUG("%s\n", txt);
-    for (ix = 0; ix < size; ix++) {
-        DEBUG("%02X", buffer[ix]);
-        if ((ix + 1) == size || (((ix + 1) % 16) == 0)) {
-            DEBUG("\n");
-        }
-    }
 }
 #endif
