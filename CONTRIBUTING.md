@@ -4,6 +4,7 @@ Thank you for your interest in contributing to RIOT! There are many ways to
 contribute, and we appreciate all of them. You can jump to the major sections
 of this document using the following links:
 
+* [Help wanted][help-wanted]
 * [Feature Requests][feature-requests]
 * [Bug Reports][bug-reports]
 * [Pull Requests][pull-requests]
@@ -17,39 +18,70 @@ As a reminder, all contributors are expected to follow our
 
 [riot-chat]: http://webchat.freenode.net?channels=riot-os
 
-## Help wanted
+## Help Wanted
+[help-wanted]: #help-wanted
 In case you're not really sure where to start, we've created a list of suggestions.
 
 ### Documentation
-If you've found yourself struggling to understand a particular aspect, chances are you're not the first and won't be the last. Writing down what you've learned is a great way to recap your new knowledge and share it with others. You can also start to learn about RIOT by combing through existing documentation and fixing errors and typos. Any help with improving the documentation is greatly appreciated and makes a big difference to the RIOT project.
-After you've finished writing, please publish your documentation in one of the following ways, depending on its type.
+If you've found yourself struggling to understand a particular aspect, chances
+are you're not the first and won't be the last. Writing down what you've learned
+is a great way to recap your new knowledge and share it with others. You can
+also start to learn about RIOT by combing through existing documentation and
+fixing errors and typos. Any help with improving the documentation is greatly
+appreciated and makes a big difference to the RIOT project.
+After you've finished writing, please publish your documentation in one of the
+following ways, depending on its type.
 
 #### General knowledge, HOWTOs
-Articles that focus on design aspects or how to use a particular module should be contributed to the [RIOT wiki](https://github.com/RIOT-OS/RIOT/wiki). After you've added your entry, please share it on the riot-dev mailing list so everyone is aware of its existence (and thank you).
-If you'd like to document a solution to minor annoyances or common pitfalls, please do not hesitate to extend the [Troubleshooting wiki page](https://github.com/RIOT-OS/RIOT/wiki/Troubleshooting). Again, please share your additions with the riot-dev mailing list.
+Articles that focus on design aspects or how to use a particular module should
+be contributed to the [RIOT wiki](https://github.com/RIOT-OS/RIOT/wiki). After
+you've added your entry, please share it on the riot-dev mailing list so
+everyone is aware of its existence (and thank you).
+If you'd like to document a solution to minor annoyances or common pitfalls,
+please do not hesitate to extend the [Troubleshooting wiki
+page](https://github.com/RIOT-OS/RIOT/wiki/Troubleshooting). Again, please share
+your additions with the riot-dev mailing list.
 
 #### Code comments, HOWTOs for particular projects
-Documentation that relates directly to the code at hand like the HOWTO files that can be found in some of the directories in ``RIOT/examples/`` or comments in the code itself should be submitted through a [pull request](https://help.github.com/articles/using-pull-requests).
+Documentation that relates directly to the code at hand like the HOWTO files
+that can be found in some of the directories in ``RIOT/examples/`` or comments
+in the code itself should be submitted through a [pull request][pull-requests].
 
-If you're not sure about the correct way to submit your writing, please ask on the mailing list or open an issue saying which documentation is missing. The other RIOTers will help you find the right format.
+If you're not sure about the correct way to submit your writing, please ask on
+the mailing list or open an issue saying which documentation is missing. The
+other RIOTers will help you find the right format.
 
 ### Issues
-If RIOT behaves oddly, please do not hesitate to [open an issue](https://github.com/RIOT-OS/RIOT/issues?state=open). Other RIOT developers will be happy to help figure out what the problem is and fix possible bugs. Please notice that we use a bunch of tags to label the issues. Their meanings are explained [[here|Labels]].
+If RIOT behaves oddly, please do not hesitate to [open an issue][open-an-issue].
+Other RIOT developers will be happy to help figure out what the problem is and
+fix possible bugs. Please notice that we use a bunch of tags to label the
+issues. If you have permission to use them, do it. Their meanings are explained
+[here][labels].
 
 ### Contribute code
-If you think your work should be integrated in the main RIOT repository, take the following steps: (short version, a more detailed version is available [here](https://github.com/RIOT-OS/RIOT/wiki/Development-procedures))
+If you think your work should be integrated in the main RIOT repository, take
+the following steps: (short version, the more detailed version can be found
+[below][pull-requests])
 
   0. Fork the RIOT git repository (if you haven't done this already)
   1. Create a branch
   2. Make commits
-  3. Make sure your code is in compliance with RIOTs [coding conventions](https://github.com/RIOT-OS/RIOT/blob/master/CODING_CONVENTIONS.md)
+  3. Make sure your code is in compliance with RIOTs
+     [coding conventions][coding-conventions]
   1. Push this branch to your fork on GitHub
-  1. Do a [pull request](https://help.github.com/articles/using-pull-requests) (Use the [[labels|Labels]])
-  1. Other RIOT members will provide feedback
+  1. Do a [pull request][open-a-pull-request] (use the [labels] if you have
+     permission to use them)
+  1. RIOT maintainers will provide feedback
   1. Address this feedback
   1. Your code is merged in RIOT master branch
 
-If you do not receive feedback after a reasonable time, feel free to address maintainers directly. This is especially true if you addressed previous feedback and got no response.
+If you do not receive feedback after a reasonable time, feel free to address
+maintainers directly. This is especially true if you addressed previous feedback
+and got no response.
+
+[open-an-issue]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+bug"
+[labels]: https://github.com/RIOT-OS/RIOT/wiki/RIOT%27s-labeling-system
+[open-a-pull-request]: https://help.github.com/articles/using-pull-requests
 
 ## Feature Requests
 [feature-requests]: #feature-requests
