@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_saml21
+ * @ingroup     cpu_saml1x
  * @ingroup     drivers_periph_pm
  * @{
  *
