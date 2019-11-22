@@ -23,6 +23,15 @@ The [list of maintainers] gives information on the current maintainers and the
 areas of RIOT they each maintain.
 
 
+## Applying the guidelines and rules
+
+This guideline and other guidelines like the [Coding Conventions] should be
+applied consistently and rigorously, but not blindly. A static set of guidelines
+cannot reasonably address the complexity of the real world. Thus, exceptions
+from the guideline or the coding convention are explicitly allowed, if a solid
+argument for doing so can be provided.
+
+
 ## Technical guidelines
 
 ### 1. - Review the fundamentals
