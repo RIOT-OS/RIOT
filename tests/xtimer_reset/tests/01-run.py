@@ -14,9 +14,9 @@ def testfunc(child):
     child.expect_exact("This test tests re-setting of an already active timer.")
     child.expect_exact("It should print three times \"now=<value>\", with "
                        "values approximately 100ms (100000us) apart.")
-    child.expect(u"now=\d+")
-    child.expect(u"now=\d+")
-    child.expect(u"now=\d+")
+    child.expect(r"now=\d+")
+    child.expect(r"now=\d+")
+    child.expect(r"now=\d+")
     child.expect_exact("Test completed!")
 
 

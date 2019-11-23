@@ -12,7 +12,7 @@ from testrunner import run
 
 def testfunc(child):
     child.expect_exact("[START]")
-    child.expect(u"\[RESULTS\] min=\d+, avg=\d+, max=\d+")
+    child.expect(r"\[RESULTS\] min=\d+, avg=\d+, max=\d+")
     child.expect_exact("[SUCCESS]")
 
 

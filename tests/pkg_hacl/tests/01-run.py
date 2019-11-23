@@ -16,7 +16,7 @@ TIMEOUT = 30
 
 
 def testfunc(child):
-    child.expect('OK \(\d+ tests\)', timeout=TIMEOUT)
+    child.expect(r'OK \(\d+ tests\)', timeout=TIMEOUT)
 
 
 if __name__ == "__main__":

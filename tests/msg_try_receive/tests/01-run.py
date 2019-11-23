@@ -5,8 +5,8 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect('main starting')
-    child.expect('msg available: 1 \(should be 1\!\)')
+    child.expect_exact('main starting')
+    child.expect_exact('msg available: 1 (should be 1!)')
 
 
 if __name__ == "__main__":
