@@ -29,11 +29,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "kernel_defines.h"  /* for ARRAY_SIZE macro */
 #include "jsmn.h"
-
-#ifndef ARRAY_SIZE
-#define ARRAY_SIZE(a) (sizeof(a)/sizeof(*a))
-#endif
 
 /*
  * A small example of jsmn parsing when JSON structure is known and number of
