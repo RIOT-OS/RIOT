@@ -41,6 +41,13 @@ ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
     USEMODULE += esp_gdb
 endif
 
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+  # use esp_now as default netdev if no other netdev module is enabled
+  ifeq (,$(filter esp_wifi esp_eth,$(USEMODULE)))
+    USEMODULE += esp_now
+  endif
+endif
+
 ifneq (,$(filter esp_now,$(USEMODULE)))
     $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
     USEMODULE += esp_wifi_any
@@ -49,6 +56,10 @@ endif
 ifneq (,$(filter esp_wifi,$(USEMODULE)))
     $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
     USEMODULE += esp_wifi_any
+endif
+
+ifneq (,$(filter esp_eth,$(USEMODULE)))
+  $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
 endif
 
 ifneq (,$(filter spiffs,$(USEMODULE)))
@@ -109,7 +120,7 @@ INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 
 # if any WiFi interface is used, the number of priority levels has to be 32
-ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
+ifneq (,$(filter esp_wifi_any esp_eth,$(USEMODULE)))
   CFLAGS += -DSCHED_PRIO_LEVELS=32
 endif
 
