@@ -186,11 +186,11 @@ void uart_poweroff(uart_t uart)
 
 static inline void isr_handler(int num)
 {
-    __enter_isr();
+    atmega_enter_isr();
 
     isr_ctx[num].rx_cb(isr_ctx[num].arg, dev[num]->DR);
 
-    __exit_isr();
+    atmega_exit_isr();
 }
 
 #ifdef UART_0_ISR
