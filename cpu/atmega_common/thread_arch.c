@@ -245,8 +245,9 @@ void thread_yield_higher(void)
     }
 }
 
-void atmega_thread_yield_isr(void)
+void atmega_exit_isr(void)
 {
+    atmega_in_isr = 0;
     atmega_context_save();
     sched_run();
     atmega_context_restore();

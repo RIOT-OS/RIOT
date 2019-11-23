@@ -72,24 +72,9 @@ static inline void atmega_enter_isr(void)
 }
 
 /**
- * @brief   Exit ISR mode and yield with a return from interrupt. Use at the
- * end of ISRs in place of thread_yield_higher. If thread_yield is needed, use
- * thread_yield followed by thread_yield_isr instead of thread_yield alone.
- */
-void atmega_thread_yield_isr(void)
-
-/**
  * @brief Run this code on exiting interrupt routines
  */
-static inline void atmega_exit_isr(void)
-{
-    if (sched_context_switch_request) {
-        thread_yield();
-        atmega_in_isr = 0;
-        atmega_thread_yield_isr()
-    }
-    atmega_in_isr = 0;
-}
+void atmega_exit_isr(void);
 
 /**
  * @brief Initialization of the CPU
