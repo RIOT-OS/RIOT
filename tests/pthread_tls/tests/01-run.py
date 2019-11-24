@@ -14,7 +14,7 @@ def _check_test_output(child):
 
 def testfunc(child):
     child.expect('START')
-    child.expect('-= TEST 1 - create 20 tls with sequencial values 0...19 =-')
+    child.expect('-= TEST 1 - create 20 tls with sequential values 0...19 =-')
     _check_test_output(child)
     child.expect('-= TEST 2 - '
                  r'delete deliberate key \(key\[5\]:-?\d+\) =-')

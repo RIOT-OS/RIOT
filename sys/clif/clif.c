@@ -27,7 +27,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/* returns the correspondant attribute string */
+/* returns the correspondent attribute string */
 static const char *_attr_to_str[] = {
     [CLIF_ATTR_ANCHOR]    = LF_ATTR_ANCHOR,
     [CLIF_ATTR_REL]       = LF_ATTR_REL_TYPE,
@@ -43,7 +43,7 @@ static const char *_attr_to_str[] = {
     [CLIF_ATTR_OBS]       = LF_ATTR_OBS
 };
 
-/* returns the correspondant attribute string size */
+/* returns the correspondent attribute string size */
 static const unsigned _attr_to_size[] = {
     [CLIF_ATTR_ANCHOR]    = LF_ATTR_ANCHOR_S,
     [CLIF_ATTR_REL]       = LF_ATTR_REL_TYPE_S,
@@ -60,7 +60,7 @@ static const unsigned _attr_to_size[] = {
 };
 
 /* do not count extension attr type */
-#define ATTRS_NUMOF (sizeof(_attr_to_str) / sizeof(_attr_to_str[0]))
+#define ATTRS_NUMOF ARRAY_SIZE(_attr_to_str)
 
 ssize_t clif_decode_link(clif_t *link, clif_attr_t *attrs, unsigned attrs_len,
                          const char *buf, size_t maxlen)

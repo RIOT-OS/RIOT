@@ -199,7 +199,7 @@ void nrf24l01p_transmit(const nrf24l01p_t *dev);
 * @param[in] answer Buffer to receive bytes to.
 * @param[in] size   Number of bytes to transfer. For nrf24l01+ in general 32.
 *
-* @return           Number of bytes that were transfered.
+* @return           Number of bytes that were transferred.
 * @return           -1 on error.
 */
 int nrf24l01p_read_payload(const nrf24l01p_t *dev, char *answer, unsigned int size);
@@ -277,7 +277,7 @@ void nrf24l01p_stop(const nrf24l01p_t *dev);
 * @param[in] data   Buffer to preload.
 * @param[in] size   Number of bytes in buffer. For nrf24l01+ e.g. 32
 *
-* @return           Number of bytes that were transfered.
+* @return           Number of bytes that were transferred.
 * @return           -1 on error.
 */
 int nrf24l01p_preload(const nrf24l01p_t *dev, char *data, unsigned int size);
@@ -317,7 +317,7 @@ int nrf24l01p_set_address_width(const nrf24l01p_t *dev, nrf24l01p_aw_t aw);
 *
 * @param[in] dev    Transceiver device to use.
 * @param[in] pipe   RX pipe to set the payload width.
-* @param[in] width  Numer of bytes per packet in RX payload.
+* @param[in] width  Number of bytes per packet in RX payload.
 *
 * @return           0 on success.
 * @return           -1 on error.

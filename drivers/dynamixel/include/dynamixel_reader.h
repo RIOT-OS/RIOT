@@ -123,7 +123,7 @@ static inline uint16_t dynamixel_reader_get_crc(const dynamixel_reader_t *reader
  *
  * @param[in] reader      the packet reader
  *
- * @return the addess of the begining of the payload
+ * @return the address of the beginning of the payload
  */
 static inline const uint8_t *dynamixel_reader_status_get_payload(const dynamixel_reader_t *reader)
 {

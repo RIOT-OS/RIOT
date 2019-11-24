@@ -35,7 +35,7 @@ extern "C" {
 
 
 /* number of clocks that should be applied to the card on init
-   before taking furter actions (see sd spec. 6.4.1.1 Power Up Time of Card) */
+   before taking further actions (see sd spec. 6.4.1.1 Power Up Time of Card) */
 #define SD_POWERSEQUENCE_CLOCK_COUNT 74
 
 #define SD_CARD_PREINIT_CLOCK_PERIOD_US 10 /* used to generate 100 kHz clock in init phase*/
@@ -100,7 +100,7 @@ extern "C" {
 #define SD_CMD_24 24 /* Writes a block of the size selected by the SET_BLOCKLEN command */
 #define SD_CMD_25 25 /* Continuously writes blocks of data until 'Stop Tran'token is sent */
 #define SD_CMD_41 41 /* Reserved (used for ACMD41) */
-#define SD_CMD_55 55 /* Defines to the card that the next commmand is an application specific
+#define SD_CMD_55 55 /* Defines to the card that the next command is an application specific
                         command rather than a standard command */
 #define SD_CMD_58 58 /* Reads the OCR register of a card */
 #define SD_CMD_59 59 /* Turns the CRC option on or off. Argument: 1:on; 0:off */
@@ -179,10 +179,10 @@ typedef enum {
  *                        (for CMDX this parameter is simply the integer value X).
  * @param[in] argument    The argument for the given cmd. As described by "7.3.1.1 Command Format".
  *                        This argument is transmitted byte wise with most significant byte first.
- * @param[in] max_retry   Specifies how often the command should be retried if an error occures.
+ * @param[in] max_retry   Specifies how often the command should be retried if an error occurs.
  *                        Use 0 to try only once, -1 to try forever, or n to retry n times.
  *
- * @return                R1 response of the command if no (low-level) communication error occured
+ * @return                R1 response of the command if no (low-level) communication error occurred
  * @return                SD_INVALID_R1_RESPONSE if either waiting for the card to enter
  *                        not-busy-state timed out or spi communication failed
  */
@@ -197,10 +197,10 @@ uint8_t sdcard_spi_send_cmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t arg
  *                        (for ACMDX this parameter is simply the integer value X).
  * @param[in] argument    The argument for the given cmd. As described by "7.3.1.1 Command Format".
  *                        This argument is transmitted byte wise with most significant byte first.
- * @param[in] max_retry   Specifies how often the command should be retried if an error occures.
+ * @param[in] max_retry   Specifies how often the command should be retried if an error occurs.
  *                        Use 0 to try only once, -1 to try forever, or n to retry n times.
  *
- * @return                R1 response of the command if no (low-level) communication error occured
+ * @return                R1 response of the command if no (low-level) communication error occurred
  * @return                SD_INVALID_R1_RESPONSE if either waiting for the card to enter
  *                        not-busy-state timed out or spi communication failed
  */

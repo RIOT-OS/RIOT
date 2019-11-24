@@ -157,7 +157,7 @@ static inline uint8_t feetech_reader_get_instr(const feetech_reader_t *reader)
  *
  * @param[in] reader      the packet reader
  *
- * @return the addess of the begining of the payload
+ * @return the address of the beginning of the payload
  */
 static inline const uint8_t *feetech_reader_response_get_payload(const feetech_reader_t *reader)
 {
@@ -181,7 +181,7 @@ static inline size_t feetech_reader_response_get_payload_size(const feetech_read
  *
  * @param[in] reader      the packet reader
  *
- * @return the begining addess of the payload
+ * @return the beginning address of the payload
  */
 static inline const uint8_t *feetech_reader_write_get_payload(const feetech_reader_t *reader)
 {
@@ -285,7 +285,7 @@ uint8_t feetech_reader_sync_write_item_get_id(const feetech_reader_t *reader, ui
  * @param[in] reader      the packet reader
  * @param[in] index       the item index
  *
- * @return the begining addess of the payload
+ * @return the beginning address of the payload
  */
 const uint8_t *feetech_reader_sync_write_item_get_payload(const feetech_reader_t *reader, uint8_t index);
 

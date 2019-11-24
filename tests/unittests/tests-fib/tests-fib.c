@@ -464,7 +464,7 @@ static void test_fib_12_get_next_hop_fail(void)
 }
 
 /*
-* @brief get next hop for known destination but unsufficient size for the output
+* @brief get next hop for known destination but insufficient size for the output
 * It is expected to get no next hop and receive -ENOBUFS
 */
 static void test_fib_13_get_next_hop_fail_on_buffer_size(void)

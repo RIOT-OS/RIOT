@@ -56,7 +56,7 @@ static inline void leds_init(void)
 /**
  * @brief Initialize the Radio interface SW-controlled Switch
  *
- * The RE-Mote features an on-board RF switch to programatically select to
+ * The RE-Mote features an on-board RF switch to programmatically select to
  * enable either the 2.4GHz or Sub-1GHz RF interface to the RP-SMA connector
  * to use an external antenna.  As default we prefer to use the 2.4GHz RF.
  *

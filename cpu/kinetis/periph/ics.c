@@ -50,7 +50,7 @@
 **     - rev. 1.0 (2013-07-30)
 **         Initial version.
 **     - rev. 1.1 (2013-10-29)
-**         Definition of BITBAND macros updated to support peripherals with 32-bit acces disabled.
+**         Definition of BITBAND macros updated to support peripherals with 32-bit access disabled.
 **     - rev. 1.2 (2014-01-10)
 **         CAN - Corrected address of TSIDR1 register.
 **         CAN - Corrected name of MSCAN_TDLR bit DLC to TDLC.

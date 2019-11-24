@@ -45,7 +45,7 @@ extern "C" {
 }
 #endif
 
-/* Beware: This include must come *after* LED0 paramters have been defined */
+/* Beware: This include must come *after* LED0 parameters have been defined */
 #include "board_common.h"
 
 #endif /* BOARD_H */

@@ -114,7 +114,7 @@ enum {
  * @brief   Read a value (a set of values) from a device
  *
  * Simple sensors, as e.g. a temperature sensor, will return exactly one value
- * together with the values scale and unit. Some sensors might return a touple
+ * together with the values scale and unit. Some sensors might return a tuple
  * or triple of data (e.g. a 3-axis accelerometer).
  *
  * Actuators can chose to either just return -ENOTSUP or to return their current

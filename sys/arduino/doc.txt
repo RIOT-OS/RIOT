@@ -40,7 +40,7 @@
  * -# build, flash, and run your application the usual RIOT-way: simply call
  *    `make all`, `make flash`, `make term`, etc.
  *
- * Thats all. As bonus you can of course use any existing RIOT code inside your
+ * That's all. As bonus you can of course use any existing RIOT code inside your
  * Arduino sketches - you simply have to add the includes to your sketch and
  * the corresponding modules to your `Makefile`.
  *

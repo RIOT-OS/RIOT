@@ -315,9 +315,9 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
 
                 /*
                  * The toolchain Exception restore code just wholesale copies the
-                 * status register from the context back to the register loosing
-                 * any changes that may have occured, 'status' is really global state
-                 * You dont enable interrupts on one thread and not another...
+                 * status register from the context back to the register losing
+                 * any changes that may have occurred, 'status' is really global state
+                 * You don't enable interrupts on one thread and not another...
                  * So we just copy the current status value into the saved value
                  * so nothing changes on the restore
                  */

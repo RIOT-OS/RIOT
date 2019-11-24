@@ -156,7 +156,7 @@ void uuid_to_string(const uuid_t *uuid, char *str);
  * @param[out]  uuid    out UUID
  * @param[in]   str     null-terminated input UUID string, must be UUID_STR_LEN bytes
  *
- * @return 0 on succes, < 0 if @p str is not valid
+ * @return 0 on success, < 0 if @p str is not valid
  */
 int uuid_from_string(uuid_t *uuid, const char *str);
 

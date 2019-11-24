@@ -80,7 +80,7 @@ inline auto apply_args(F& f, detail::int_list<Is...>, Tuple&& tup)
 }
 
 /**
- * @brief Prefix the argument tuple with additonal arguments.
+ * @brief Prefix the argument tuple with additional arguments.
  *        In this case the tuple is empty.
  */
 template <class F, class Tuple, class... Ts>
@@ -90,7 +90,7 @@ inline auto apply_args_prefixed(F& f, detail::int_list<>, Tuple&, Ts&&... args)
 }
 
 /**
- * @brief Prefix the argument tuple with additonal arguments.
+ * @brief Prefix the argument tuple with additional arguments.
  *        In this case the tuple is contains arguments.
  */
 template <class F, long... Is, class Tuple, class... Ts>
@@ -101,7 +101,7 @@ inline auto apply_args_prefixed(F& f, detail::int_list<Is...>, Tuple& tup,
 }
 
 /**
- * @brief Suffix the tuple with additonal arguments.
+ * @brief Suffix the tuple with additional arguments.
  */
 template <class F, long... Is, class Tuple, class... Ts>
 inline auto apply_args_suffxied(F& f, detail::int_list<Is...>, Tuple& tup,

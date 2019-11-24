@@ -183,7 +183,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     timer->next = NULL;
 
     /* Ensure that offset is bigger than 'XTIMER_BACKOFF',
-     * 'target - now' will allways be the offset no matter if target < or > now.
+     * 'target - now' will always be the offset no matter if target < or > now.
      *
      * This expects that target was not set too close to now and overrun now, so
      * from setting target up until the call of '_xtimer_now()' above now has not

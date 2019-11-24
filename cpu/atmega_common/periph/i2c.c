@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Low-level I2C driver implementation fot atmega common
+ * @brief       Low-level I2C driver implementation for atmega common
  *
  * @note        This implementation only implements the 7-bit addressing mode.
  *

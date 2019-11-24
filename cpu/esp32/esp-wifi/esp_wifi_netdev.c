@@ -69,7 +69,7 @@
 
 /*
  * There is only one ESP WiFi device. We define it as static device variable
- * to have accesss to the device inside ESP WiFi interrupt routines which do
+ * to have access to the device inside ESP WiFi interrupt routines which do
  * not provide an argument that could be used as pointer to the ESP WiFi
  * device which triggers the interrupt.
  */
@@ -79,7 +79,7 @@ static const netdev_driver_t _esp_wifi_driver;
 /*
  * Ring buffer for rx_buf elements which hold a pointer to the WiFi frame
  * buffer, a pointer to the ethernet frame and the frame length for each
- * received frame. Since we have anly one device, it the ring buffer can be
+ * received frame. Since we have only one device, it the ring buffer can be
  * static and has not to be exposed as part of the network device.
  */
 #ifndef ESP_WIFI_MAX_RX_BUF

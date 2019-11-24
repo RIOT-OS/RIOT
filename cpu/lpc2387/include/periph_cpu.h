@@ -45,7 +45,7 @@ extern "C" {
 typedef struct {
     /** @brief Direction: Output if corresponding bit is set, otherwise input */
     __IO uint32_t DIR;
-    /** @brief 12 bytes of reseved memory we don't need to access */
+    /** @brief 12 bytes of reserved memory we don't need to access */
     uint32_t _reserved[3];
     /** @brief Set bits to ignore corresponding bits when accessing `PIN`, `SET`
      *         or `CLR` register of this port

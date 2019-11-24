@@ -202,7 +202,7 @@ typedef union {
  *      </a>
  */
 /**
- * @brief   The address is transient, i.e. not well-known, permanantly
+ * @brief   The address is transient, i.e. not well-known, permanently
  *          assigned address by IANA.
  */
 #define IPV6_ADDR_MCAST_FLAG_TRANSIENT      (0x01)
@@ -746,16 +746,16 @@ char *ipv6_addr_split_str(char *addr_str, char separator);
 /**
  * @brief split IPv6 address string representation
  *
- * @note Will change @p seperator position in @p addr_str to '\0'
+ * @note Will change @p separator position in @p addr_str to '\0'
  *
  * @param[in,out]   addr_str    Address to split
- * @param[in]       seperator   Seperator char to use
+ * @param[in]       separator   Separator char to use
  * @param[in]       _default    Default value
  *
  * @return      atoi(string after split)
- * @return      @p _default if no string after @p seperator
+ * @return      @p _default if no string after @p separator
  */
-int ipv6_addr_split_int(char *addr_str, char seperator, int _default);
+int ipv6_addr_split_int(char *addr_str, char separator, int _default);
 
 /**
  * @brief split IPv6 prefix string representation

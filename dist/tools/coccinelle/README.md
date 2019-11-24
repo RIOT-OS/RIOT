@@ -46,7 +46,7 @@ piping coccinelle's output into patch:
 
 Specifying BRANCH, FILES and/or a specific patch file works here, too.
 
-Beware that some of our semantic patch files might just *find* occurences of
+Beware that some of our semantic patch files might just *find* occurrences of
 bad code or style! Not all semantic patches output useful diffs.
 
 ## My PR has coccinelle warnings/errors!

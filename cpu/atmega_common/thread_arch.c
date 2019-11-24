@@ -66,7 +66,7 @@ static void __enter_thread_mode(void);
  *
  * After the invocation of __context_restore() the pointer to task_func is
  * on top of the stack and can be returned to. This way we can actually place
- * it inside of the programm counter of the MCU.
+ * it inside of the program counter of the MCU.
  * if task_func returns sched_task_exit gets popped into the PC
  */
 char *thread_stack_init(thread_task_func_t task_func, void *arg,
@@ -172,7 +172,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
  * @brief thread_stack_print prints the stack to stdout.
  * It depends on getting the correct values for stack_start, stack_size and sp
  * from sched_active_thread.
- * Maybe it would be good to change that to way that is less dependant on
+ * Maybe it would be good to change that to way that is less dependent on
  * getting correct values elsewhere (since it is a debugging tool and in the
  * presence of bugs the data may be corrupted).
  */

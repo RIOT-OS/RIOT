@@ -88,7 +88,7 @@ static const bmx055_params_t bmx055_params[] = {
 };
 
 /**
- * @brief   SAUL registry entires
+ * @brief   SAUL registry entries
  */
 static const saul_reg_info_t bmx055_saul_info[][3] = {
     BMX055_SAULINFO

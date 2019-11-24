@@ -49,7 +49,7 @@ extern "C" {
  * @brief TCP option "length"-field values.
  * @{
  */
-#define TCP_OPTION_LENGTH_MIN (2U)    /**< Mimimum amount of bytes needed for an option with a length field */
+#define TCP_OPTION_LENGTH_MIN (2U)    /**< Minimum amount of bytes needed for an option with a length field */
 #define TCP_OPTION_LENGTH_MSS (0x04)  /**< MSS Option Size always 4 */
 /** @} */
 

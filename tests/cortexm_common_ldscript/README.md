@@ -20,7 +20,7 @@ after the normal compilation:
 make all BOARD=iotlab-m3
 ...
 Test rom offset 1 byte overflow detection: [OK]
-Test rom offset substracted from rom length in elffile: [SKIP](Reason: board does not have a ROM_OFFSET configured)
+Test rom offset subtracted from rom length in elffile: [SKIP](Reason: board does not have a ROM_OFFSET configured)
 Test compilation with offset 0x1000: [OK]
 Test compilation with offset 0x2000: [OK]
 Test compilation with half ROM length: [OK]
@@ -28,7 +28,7 @@ Test ROM overflow detection (too_big_for_rom): [OK]
 Test ROM overflow detection (offset_and_romlen): [OK]
 ```
 
-For a bord that have a `ROM_OFFSET` variable configured by default (== a board
+For a board that have a `ROM_OFFSET` variable configured by default (== a board
 with bootloader installed), it produces the following output after the normal
 compilation:
 
@@ -36,7 +36,7 @@ compilation:
 make BOARD=bluepill  PROGRAMMER=dfu-util
 ...
 Test rom offset 1 byte overflow detection: [OK]
-Test rom offset substracted from rom length in elffile: [OK]
+Test rom offset subtracted from rom length in elffile: [OK]
 Test compilation with offset 0x1000: [OK]
 Test compilation with offset 0x2000: [OK]
 Test compilation with half ROM length: [OK]

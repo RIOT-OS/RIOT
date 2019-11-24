@@ -58,7 +58,7 @@ wget -qO - https://github.com/iot-lab/cli-tools/archive/2.1.0.tar.gz | tar xz
 cd cli-tools-* && python setup.py install && cd .. && rm -rf cli-tools-*
 
 # Remove some packages to get a minimal install
-echo "==> Removing all linux kernels except the currrent one"
+echo "==> Removing all linux kernels except the current one"
 dpkg --list | awk '{ print $2 }' | grep 'linux-image-*-generic' | grep -v $(uname -r) | xargs apt-get -y purge
 echo "==> Removing linux source"
 dpkg --list | awk '{ print $2 }' | grep linux-source | xargs apt-get -y purge

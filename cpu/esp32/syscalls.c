@@ -241,7 +241,7 @@ void heap_stats(void)
 
 #else /* MODULE_ESP_IDF_HEAP */
 
-/* for compatibiliy with ESP-IDF heap functions */
+/* for compatibility with ESP-IDF heap functions */
 void* IRAM heap_caps_malloc( size_t size, uint32_t caps )
 {
     (void)caps;
@@ -433,8 +433,8 @@ void system_wdt_init (void)
     TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;  /* disable write protection */
     TIMERG0.wdt_config0.stg0 = TIMG_WDT_STG_SEL_INT;          /* stage0 timeout: interrupt */
     TIMERG0.wdt_config0.stg1 = TIMG_WDT_STG_SEL_RESET_SYSTEM; /* stage1 timeout: sys reset */
-    TIMERG0.wdt_config0.sys_reset_length = 7;  /* sys reset signal lenght: 3.2 us */
-    TIMERG0.wdt_config0.cpu_reset_length = 7;  /* sys reset signal lenght: 3.2 us */
+    TIMERG0.wdt_config0.sys_reset_length = 7;  /* sys reset signal length: 3.2 us */
+    TIMERG0.wdt_config0.cpu_reset_length = 7;  /* sys reset signal length: 3.2 us */
     TIMERG0.wdt_config0.edge_int_en = 0;
     TIMERG0.wdt_config0.level_int_en = 1;
 

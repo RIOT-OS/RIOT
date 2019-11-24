@@ -186,7 +186,7 @@ int ccs811_set_mode(ccs811_t *dev, ccs811_mode_t mode)
         return -CCS811_ERROR_I2C;
     }
 
-    /* check whether setting measurement mode were succesfull */
+    /* check whether setting measurement mode were successful */
     if (_reg_read(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1) != CCS811_OK) {
         DEBUG_DEV("could not read new measurement mode "
                   "from register CCS811_REG_MEAS_MODE", dev);
@@ -485,7 +485,7 @@ static int _reg_read(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t l
     int res = CCS811_OK;
 
     if (i2c_acquire(dev->params.i2c_dev) != CCS811_OK) {
-        DEBUG_DEV("could not aquire I2C bus", dev);
+        DEBUG_DEV("could not acquire I2C bus", dev);
         return -CCS811_ERROR_I2C;
     }
 
@@ -546,7 +546,7 @@ static int _reg_write(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t 
     }
 
     if (i2c_acquire(dev->params.i2c_dev)) {
-        DEBUG_DEV("could not aquire I2C bus", dev);
+        DEBUG_DEV("could not acquire I2C bus", dev);
         return -CCS811_ERROR_I2C;
     }
 

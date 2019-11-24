@@ -67,7 +67,7 @@ eabi-gdb`), which provided by most toolchains. Most Linux distributions provide
 also a package for OpenOCD. The required configuration files are provided by
 RIOT.
 When starting the debugger with `make debug BOARD=iotlab-m3` GDB connects to
-openocd, loads the elf-file and puts the MCU into halt state. Befor setting
+openocd, loads the elf-file and puts the MCU into halt state. Before setting
 breakpoints it is sometimes needed to use the following workflow
 ```
 bash
@@ -148,7 +148,7 @@ In some cases it
 seems necessary to prepend a `monitor reset run` before executing continue.
 In general you can
 use openocd commands prepended by `monitor`.
-In the case the node crashes it can be reseted with the following sequence
+In the case the node crashes it can be reset with the following sequence
 ```
 Bash
 (gdb) monitor reset halt

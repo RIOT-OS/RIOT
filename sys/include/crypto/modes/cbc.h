@@ -40,7 +40,7 @@ extern "C" {
  *
  * @return            <0 on error
  * @return            CIPHER_ERR_INVALID_LENGTH when input_len % BLOCK_SIZE != 0
- * @return            CIPHER_ERR_ENC_FAILED on internal encrption error
+ * @return            CIPHER_ERR_ENC_FAILED on internal encryption error
  * @return            otherwise number of input bytes that aren't consumed
  */
 int cipher_encrypt_cbc(cipher_t *cipher, uint8_t iv[16], const uint8_t *input,

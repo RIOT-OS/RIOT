@@ -127,7 +127,7 @@ int rtc_set_alarm(struct tm *localt, rtc_alarm_cb_t cb, void *arg)
         RTC_ALDOY = localt->tm_yday;
         RTC_ALMON = localt->tm_mon + 1;
         RTC_ALYEAR = localt->tm_year;
-        RTC_AMR = 0;                                            /* set wich alarm fields to check */
+        RTC_AMR = 0;                                            /* set which alarm fields to check */
         DEBUG("alarm set %2lu.%2lu.%4lu  %2lu:%2lu:%2lu\n",
               RTC_ALDOM, RTC_ALMON, RTC_ALYEAR, RTC_ALHOUR, RTC_ALMIN, RTC_ALSEC);
 

@@ -37,7 +37,7 @@ extern "C" {
  * module to be loaded and does not register the module.
  * Only the builtin tables are searched.
  *
- * Upon sucessful execution, the compiled chunk will be at the top of the lua
+ * Upon successful execution, the compiled chunk will be at the top of the lua
  * stack.
  *
  * @param   L       Initialized Lua interpreter state.

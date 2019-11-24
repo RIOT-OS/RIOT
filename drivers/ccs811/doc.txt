@@ -9,7 +9,7 @@
 
 The driver is for the usage with [RIOT-OS](https://github.com/RIOT-OS/RIOT).
 
-## <a name="toc"> Table of contets </a>
+## <a name="toc"> Table of contents </a>
 
 1. [Overview](#overview)
   1. [About the sensor](#about)
@@ -46,7 +46,7 @@ The sensor allows to
 - correct baseline automatically or manually
 - connect a NTC thermistor to provide means of calculating the local
   ambient temperature,
-- power-save using a sleep mode and wakup feature.
+- power-save using a sleep mode and wakeup feature.
 
 @note The sensor is connected to I2C interface and uses clock stretching.
 The I2C implementation of the MCU has to support clock stretching
@@ -55,7 +55,7 @@ to get CCS811 working.
 ### <a name="supported"> Supported Features </a> &nbsp;&nbsp; [[TOC](#toc)]
 
 @note There are two driver module versions, the `ccs811` module
-wich provides only basic functionality and the `ccs811_full`
+which provides only basic functionality and the `ccs811_full`
 module with additional functionality.
 
 The `ccs811_full` module includes the `ccs811` module
@@ -71,7 +71,7 @@ read raw and converted gas sensor data (eCO2, TVOC) | `ccs811`
 poling for new sensor gas data | `ccs811`
 power saving using sleep mode with wakeup | `ccs811`
 data ready and threshold interrupt handling | `ccs811_full`
-ambient temperatur calculation with NTC | `ccs811_full`
+ambient temperature calculation with NTC | `ccs811_full`
 compensate gas readings using an external sensor | `ccs811_full`
 manual baseline handling | `ccs811_full`
 
@@ -448,7 +448,7 @@ defining according macros before including **ccs811_params.h**, for example:
 ```
 
 Alternatively, the complete set of default configuration parameters could
-also be overriden by a single definition, for example:
+also be overridden by a single definition, for example:
 ```
 #define CCS811_PARAMS    { .i2c_dev   = I2C, \
                            .i2c_addr  = CCS811_I2C_ADDRESS_2, \

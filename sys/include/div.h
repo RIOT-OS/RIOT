@@ -79,8 +79,8 @@ static inline uint64_t div_u64_by_15625(uint64_t val)
  * @brief Integer divide val by 125
  *
  * This function can be used to convert uint64_t microsecond times (or
- * intervals) to miliseconds and store them in uint32_t variables, with up to
- * ~50 days worth of miliseconds ((2**32*1000) -1).
+ * intervals) to milliseconds and store them in uint32_t variables, with up to
+ * ~50 days worth of milliseconds ((2**32*1000) -1).
  * Use e.g.,  ms = div_u64_by_125(microseconds >> 3)
  *
  * @pre val <= 536870911999 ((2**32 * 125) -1)

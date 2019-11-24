@@ -126,7 +126,7 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf);
  *                  the fragment header in the first snip.
  *
  * @return  The reassembled packet when @p pkt completed the reassembly
- * @return  NULL, when there are still fragments missing or an error occured
+ * @return  NULL, when there are still fragments missing or an error occurred
  *          during reassembly
  */
 gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt);

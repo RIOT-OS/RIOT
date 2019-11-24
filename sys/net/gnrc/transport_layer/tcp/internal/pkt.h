@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       TCP paket handling declarations.
+ * @brief       TCP packet handling declarations.
  *
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
@@ -29,13 +29,13 @@ extern "C" {
 #endif
 
 /**
- * @brief Build a reset packet from an incomming packet.
+ * @brief Build a reset packet from an incoming packet.
  *
- * @note This function builds a reset from an incomming packet
+ * @note This function builds a reset from an incoming packet
  *       in cases where the connection has not been established.
  *
  * @param[out] out_pkt    Outgoing reset packet
- * @param[in]  in_pkt     Incomming packet
+ * @param[in]  in_pkt     Incoming packet
  *
  * @returns   Zero on success
  *            -ENOMEM if pktbuf is full.
@@ -43,10 +43,10 @@ extern "C" {
 int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt);
 
 /**
- * @brief Build and allocate a TCB paket, TCB stores pointer to new paket.
+ * @brief Build and allocate a TCB packet, TCB stores pointer to new packet.
  *
  * @param[in,out] tcb           TCB holding the connection information.
- * @param[out]    out_pkt       Pointer to paket to build.
+ * @param[out]    out_pkt       Pointer to packet to build.
  * @param[out]    seq_con       Sequence number consumption of built packet.
  * @param[in]     ctl           Control bits to set in @p out_pkt.
  * @param[in]     seq_num       Sequence number of the new packet.
@@ -65,7 +65,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
  * @brief Sends packet to peer.
  *
  * @param[in,out] tcb          TCB holding the connection information.
- * @param[in]     out_pkt      Pointer to paket to send.
+ * @param[in]     out_pkt      Pointer to packet to send.
  * @param[in]     seq_con      Sequence number consumption of the packet to send.
  * @param[in]     retransmit   Flag so mark that packet this is a retransmission.
  *

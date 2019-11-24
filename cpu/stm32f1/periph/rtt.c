@@ -91,7 +91,7 @@ void rtt_clear_overflow_cb(void)
 
 uint32_t rtt_get_counter(void)
 {
-    /* wait for syncronization */
+    /* wait for synchronization */
     while (!(RTT_DEV->CRL & RTT_FLAG_RSF)) {}
 
     return (((uint32_t)RTT_DEV->CNTH << 16 ) | (uint32_t)(RTT_DEV->CNTL));
@@ -111,7 +111,7 @@ void rtt_set_counter(uint32_t counter)
 
 uint32_t rtt_get_alarm(void)
 {
-    /* wait for syncronization */
+    /* wait for synchronization */
     while (!(RTT_DEV->CRL & RTT_FLAG_RSF)) {}
 
     return (((uint32_t)RTT_DEV->ALRH << 16 ) | (uint32_t)(RTT_DEV->ALRL));

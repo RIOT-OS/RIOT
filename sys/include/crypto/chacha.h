@@ -60,7 +60,7 @@ typedef struct {
  * @param[in]  nonce   IV / nonce to use.
  *
  * @return     `== 0` on success.
- * @return     `< 0` if an illegal value for @p rounds or @p keylen was suppplied.
+ * @return     `< 0` if an illegal value for @p rounds or @p keylen was supplied.
  */
 int chacha_init(chacha_ctx *ctx,
                 unsigned rounds,

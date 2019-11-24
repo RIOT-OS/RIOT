@@ -336,7 +336,7 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
             radio_info->lqi = (uint8_t)(hwlqi > UINT8_MAX/ED_RSSISCALE
                                        ? UINT8_MAX
                                        : hwlqi * ED_RSSISCALE);
-            /* Calculate RSSI by substracting the offset from the datasheet.
+            /* Calculate RSSI by subtracting the offset from the datasheet.
              * Intentionally using a different calculation than the one from
              * figure 122 of the v1.1 product specification. This appears to
              * match real world performance better */

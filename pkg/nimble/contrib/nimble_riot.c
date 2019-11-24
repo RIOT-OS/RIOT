@@ -116,7 +116,7 @@ void nimble_riot_init(void)
 #endif
 #endif
 
-    /* initialize the configured, build-in services */
+    /* initialize the configured, built-in services */
 #ifdef MODULE_NIMBLE_SVC_GAP
     ble_svc_gap_init();
 #endif

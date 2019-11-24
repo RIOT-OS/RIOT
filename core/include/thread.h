@@ -348,10 +348,10 @@ kernel_pid_t thread_create(char *stack,
                   const char *name);
 
 /**
- * @brief       Retreive a thread control block by PID.
+ * @brief       Retrieve a thread control block by PID.
  * @details     This is a bound-checked variant of accessing `sched_threads[pid]` directly.
  *              If you know that the PID is valid, then don't use this function.
- * @param[in]   pid   Thread to retreive.
+ * @param[in]   pid   Thread to retrieve.
  * @return      `NULL` if the PID is invalid or there is no such thread.
  */
 volatile thread_t *thread_get(kernel_pid_t pid);

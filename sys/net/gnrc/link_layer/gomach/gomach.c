@@ -305,7 +305,7 @@ static void gomach_wait_bcast_tx_finish(gnrc_netif_t *netif)
     }
 
     /* This is to handle no-TX-complete issue. In case there is no no-TX-complete event,
-     * we will quit broadcasting, i.e., not getting stucked here. */
+     * we will quit broadcasting, i.e., not getting stuck here. */
     if (gnrc_gomach_timeout_is_expired(netif, GNRC_GOMACH_TIMEOUT_BCAST_FINISH)) {
         gnrc_gomach_clear_timeout(netif, GNRC_GOMACH_TIMEOUT_BCAST_INTERVAL);
         netif->mac.tx.bcast_state = GNRC_GOMACH_BCAST_END;
@@ -1104,7 +1104,7 @@ static void gomach_t2u_wait_preamble_tx(gnrc_netif_t *netif)
 
     /* This is mainly to handle no-TX-complete error. Once the max preamble interval
      * timeout expired here (i.e., no-TX-complete error), we will quit waiting here
-     * and go to send the next preamble, thus the MAC will not get stucked here. */
+     * and go to send the next preamble, thus the MAC will not get stuck here. */
     if (gnrc_gomach_timeout_is_expired(netif, GNRC_GOMACH_TIMEOUT_MAX_PREAM_INTERVAL)) {
         gnrc_priority_pktqueue_flush(&netif->mac.rx.queue);
         netif->mac.tx.t2u_state = GNRC_GOMACH_T2U_PREAMBLE_PREPARE;

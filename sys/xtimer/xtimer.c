@@ -241,7 +241,7 @@ void xtimer_now_timex(timex_t *out)
 
 static void _mutex_timeout(void *arg)
 {
-    /* interupts a disabled because xtimer can spin
+    /* interrupts a disabled because xtimer can spin
      * if xtimer_set spins the callback is executed
      * in the thread context
      *

@@ -140,7 +140,7 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 
     /* Clear whole stack with a known value to assist debugging */
     #if !defined(DEVELHELP) && !defined(SCHED_TEST_STACK)
-        /* Unfortunatly, this affects thread_measure_stack_free function */
+        /* Unfortunately, this affects thread_measure_stack_free function */
         memset(stack_start, 0, stack_size);
     #else
         memset(sp, 0, XT_STK_FRMSZ + XT_CP_SIZE);

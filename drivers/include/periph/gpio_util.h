@@ -19,6 +19,9 @@
  * @author     Philipp-Alexander Blum <philipp-blum@jakiku.de>
  */
 
+#ifndef PERIPH_GPIO_UTIL_H
+#define PERIPH_GPIO_UTIL_H
+
 #include "gpio.h"
 
 #ifdef __cplusplus
@@ -28,7 +31,7 @@ extern "C" {
 /**
  * @brief Shift in a byte from data_pin, create clock pulses on clock_pin
  *
- * This funtion has the same functionality as the Arduino shiftIn() in Advanced
+ * This function has the same functionality as the Arduino shiftIn() in Advanced
  * I/O.
  *
  * @param[in]   data_pin    Pin to read data from
@@ -40,4 +43,5 @@ uint8_t gpio_util_shiftin(gpio_t data_pin, gpio_t clock_pin);
 #ifdef __cplusplus
 }
 #endif
+#endif /* PERIPH_GPIO_UTIL_H */
 /** @} */

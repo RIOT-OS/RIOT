@@ -37,7 +37,7 @@
 /* on stm32-l476rg all ADC clocks are are enabled by this bit
    further clock config is possible over CKMODE[1:0] bits in ADC_CCR reg */
 #define ADC_CLK_EN_MASK   (RCC_AHB2ENR_ADCEN)
-/* refering to Datasheet Section 6.3.18 (ADC characteristics) the minimum
+/* referring to Datasheet Section 6.3.18 (ADC characteristics) the minimum
    achievable sampling rate is 4.21 Msps (12 Bit resolution on slow channel)
    we use that worst case for configuring the sampling time to be sure it
    works on all channels.

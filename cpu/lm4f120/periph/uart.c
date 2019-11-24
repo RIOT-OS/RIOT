@@ -137,7 +137,7 @@ void isr_uart0(void)
     ulStatus = ROM_UARTIntStatus(UART0_BASE, true);
     ROM_UARTIntClear(UART0_BASE, ulStatus);
 
-    /* Are we interrupted due to a recieved character */
+    /* Are we interrupted due to a received character */
     if(ulStatus & (UART_INT_RX | UART_INT_RT))
     {
         while(ROM_UARTCharsAvail(UART0_BASE))

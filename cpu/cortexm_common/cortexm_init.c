@@ -93,11 +93,11 @@ bool cpu_check_address(volatile const char *address)
     *address;
     /* Check BFARVALID flag */
     if ((SCB->CFSR & BFARVALID_MASK) != 0) {
-        /* Bus Fault occured reading the address */
+        /* Bus Fault occurred reading the address */
         is_valid = false;
     }
 
-    /* Reenable BusFault by clearing  BFHFNMIGN */
+    /* Re-enable BusFault by clearing  BFHFNMIGN */
     SCB->CCR &= ~SCB_CCR_BFHFNMIGN_Msk;
     __set_FAULTMASK(mask);
 
@@ -110,7 +110,7 @@ bool cpu_check_address(volatile const char *address)
 
     __asm__ volatile (
         "movs r5, #1            \n" /* R5 will be set to 0 by HardFault handler */
-                                    /* to indicate HardFault has occured */
+                                    /* to indicate HardFault has occurred */
         "ldr  r1, =0xDEADF00D   \n" /* set magic number     */
         "ldr  r2, =0xCAFEBABE   \n" /* 2nd magic to be sure */
         "ldrb r3, %1            \n" /* probe address        */

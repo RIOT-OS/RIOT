@@ -79,7 +79,7 @@ struct hw_timer_regs_t {
         uint32_t unused      : 10;
         uint32_t ALARM_EN    : 1;  /* alarms are enabled */
         uint32_t LEVEL_INT_EN: 1;  /* alarms will generate level type interrupt */
-        uint32_t EDGE_INT_EN : 1;  /* alarms will generate egde type interrupt */
+        uint32_t EDGE_INT_EN : 1;  /* alarms will generate edge type interrupt */
         uint32_t DIVIDER     : 16; /* timer clock prescale value (basis is ABP) */
         uint32_t AUTORELOAD  : 1;  /* auto-reload on alarms */
         uint32_t INCREASE    : 1;  /* count up */
@@ -173,7 +173,7 @@ void IRAM hw_timer_handler(void* arg)
     (void)arg;
 
     /* since all timer interrupt sources are routed to the same cpu interrupt */
-    /* signal, we can't use arg to identify the timer wich caused the it */
+    /* signal, we can't use arg to identify the timer which caused the it */
 
     irq_isr_enter();
 

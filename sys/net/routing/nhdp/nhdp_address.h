@@ -122,7 +122,7 @@ nhdp_addr_entry_t *nhdp_generate_addr_list_from_tmp(uint8_t tmp_type);
  * @note
  * Must not be called from outside the NHDP writer's or reader's message creation process.
  *
- * @param[in] decr_usg      Flag whether the usage counter of a resetted addr has to be decremented
+ * @param[in] decr_usg      Flag whether the usage counter of a reset addr has to be decremented
  */
 void nhdp_reset_addresses_tmp_usg(uint8_t decr_usg);
 

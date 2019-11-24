@@ -451,7 +451,7 @@ static void native_shutdown(int sig, siginfo_t *info, void *context)
 
 /**
  * register internal signal handler,
- * initalize local variables
+ * initialize local variables
  *
  * TODO: see register_interrupt
  */

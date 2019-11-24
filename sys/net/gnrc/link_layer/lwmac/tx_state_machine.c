@@ -118,7 +118,7 @@ static uint8_t _send_bcast(gnrc_netif_t *netif)
                 gnrc_pktbuf_release(netif->mac.tx.packet);
                 LOG_WARNING("WARNING: [LWMAC-tx] TX queue full, drop packet\n");
             }
-            /* drop pointer so it wont be free'd */
+            /* drop pointer so it won't be free'd */
             netif->mac.tx.packet = NULL;
             tx_info |= GNRC_LWMAC_TX_FAIL;
             return tx_info;
@@ -158,7 +158,7 @@ static uint8_t _send_wr(gnrc_netif_t *netif)
             gnrc_pktbuf_release(netif->mac.tx.packet);
             LOG_WARNING("WARNING: [LWMAC-tx] TX queue full, drop packet\n");
         }
-        /* drop pointer so it wont be free'd */
+        /* drop pointer so it won't be free'd */
         netif->mac.tx.packet = NULL;
         tx_info |= GNRC_LWMAC_TX_FAIL;
         return tx_info;
@@ -271,7 +271,7 @@ static uint8_t _packet_process_in_wait_for_wa(gnrc_netif_t *netif)
                 gnrc_pktbuf_release(netif->mac.tx.packet);
                 LOG_WARNING("WARNING: [LWMAC-tx] TX queue full, drop packet\n");
             }
-            /* drop pointer so it wont be free'd */
+            /* drop pointer so it won't be free'd */
             netif->mac.tx.packet = NULL;
             postponed = true;
             gnrc_pktbuf_release(pkt);
@@ -285,7 +285,7 @@ static uint8_t _packet_process_in_wait_for_wa(gnrc_netif_t *netif)
                 gnrc_pktbuf_release(netif->mac.tx.packet);
                 LOG_WARNING("WARNING: [LWMAC-tx] TX queue full, drop packet\n");
             }
-            /* drop pointer so it wont be free'd */
+            /* drop pointer so it won't be free'd */
             netif->mac.tx.packet = NULL;
             postponed = true;
             gnrc_pktbuf_release(pkt);
@@ -441,7 +441,7 @@ static bool _send_data(gnrc_netif_t *netif)
             gnrc_pktbuf_release(netif->mac.tx.packet);
             LOG_WARNING("WARNING: [LWMAC-tx] TX queue full, drop packet\n");
         }
-        /* drop pointer so it wont be free'd */
+        /* drop pointer so it won't be free'd */
         netif->mac.tx.packet = NULL;
         return false;
     }
@@ -545,7 +545,7 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
                     gnrc_pktbuf_release(netif->mac.tx.packet);
                     LOG_WARNING("WARNING: [LWMAC-tx] TX queue full, drop packet\n");
                 }
-                /* drop pointer so it wont be free'd */
+                /* drop pointer so it won't be free'd */
                 netif->mac.tx.packet = NULL;
                 netif->mac.tx.state = GNRC_LWMAC_TX_STATE_FAILED;
                 reschedule = true;
@@ -699,7 +699,7 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
                         gnrc_pktbuf_release(netif->mac.tx.packet);
                         LOG_WARNING("WARNING: [LWMAC-tx] TX queue full, drop packet\n");
                     }
-                    /* drop pointer so it wont be free'd */
+                    /* drop pointer so it won't be free'd */
                     netif->mac.tx.packet = NULL;
 
                     netif->mac.tx.state = GNRC_LWMAC_TX_STATE_FAILED;

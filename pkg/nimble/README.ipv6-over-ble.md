@@ -50,7 +50,7 @@ and start advertising itself:
 
     ble adv
 
-Thats it, the node can now be seen and connected to from Linux.
+That's it, the node can now be seen and connected to from Linux.
 
 
 ## Establishing a connection from Linux
@@ -104,7 +104,7 @@ command:
     #       used by `nimble_netif`
     echo "connect UU:VV:WW:XX:YY:ZZ 2" > /sys/kernel/debug/bluetooth/6lowpan_control
 
-Thats it, you now have a IPv6 connection to your RIOT node. You can verify this
+That's it, you now have a IPv6 connection to your RIOT node. You can verify this
 using `ifconfig`, where something like the following should be visible:
 
     bt0       Link encap:UNSPEC  HWaddr 00-19-86-00-16-CA-00-00-00-00-00-00-00-00-00-00
@@ -126,7 +126,7 @@ Now everything should be fine :-)
 
 ## [optional] Distributing a routeable Prefix
 
-You can use the Router Advertisement Deamon (`radvd`) in Linux to automatically
+You can use the Router Advertisement Daemon (`radvd`) in Linux to automatically
 distribute prefixes in your BLE network. For the following, you need to make
 sure that `radvd` is installed on your Linux host.
 
@@ -162,7 +162,7 @@ with the one of the BLE device on your Linux host.
 router advertisements, as it is in 6LN configuration
 (see https://tools.ietf.org/html/rfc6775#section-4.3).
 
-With this, simply (re-)start the deamon:
+With this, simply (re-)start the daemon:
 
     sudo service radvd restart
 
@@ -170,7 +170,7 @@ or
 
     sudo systemctl restart radvd
 
-Again, thats it. Your RIOT node should now have an address using the above
+Again, that's it. Your RIOT node should now have an address using the above
 prefix assigned. Simply verify with `ifconfig` on the RIOT node.
 
 Also you should be able to ping the RIOT node from Linux:

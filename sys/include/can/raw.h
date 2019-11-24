@@ -72,7 +72,7 @@ int raw_can_send(int ifnum, const struct can_frame *frame, kernel_pid_t pid);
  * @param[in] ifnum  the interface number used to send the frame
  * @param[in] handle the handle of the frame to abort,
  *                   it must be the value returned by raw_can_send
- * @return 0 on succes
+ * @return 0 on success
  * @return < 0 on error (-ENODEV)
  */
 int raw_can_abort(int ifnum, int handle);

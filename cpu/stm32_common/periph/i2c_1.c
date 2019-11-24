@@ -23,7 +23,7 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @auhtor      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Jan Pohlmann <jan-pohlmann@gmx.de>
  * @author      Aurélien Fillau <aurelien.fillau@we-sens.com>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
@@ -170,7 +170,7 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
     if (i2c->ISR & I2C_ISR_BUSY) {
         return -EAGAIN;
     }
-    /* Handle endianess of register if 16 bit */
+    /* Handle endianness of register if 16 bit */
     if (flags & I2C_REG16) {
         reg = htons(reg); /* Make sure register is in big-endian on I2C bus */
     }
@@ -405,7 +405,7 @@ static inline void irq_handler(i2c_t dev)
     I2C_TypeDef *i2c = i2c_config[dev].dev;
 
     unsigned state = i2c->ISR;
-    DEBUG("\n\n### I2C ERROR OCCURED ###\n");
+    DEBUG("\n\n### I2C ERROR OCCURRED ###\n");
     DEBUG("status: %08x\n", state);
     if (state & I2C_ISR_OVR) {
         DEBUG("OVR\n");

@@ -26,7 +26,7 @@ make BOARD=nucleo-l4r5zi flash -C examples/hello-world
 
 STDIO is available via the ST-Link programmer.
 
-Use the `term` targed to open a terminal:
+Use the `term` target to open a terminal:
 
     make BOARD=nucleo-l4r5zi -C examples/hello-world term
 

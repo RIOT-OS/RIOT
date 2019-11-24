@@ -85,7 +85,7 @@ void gnrc_icmpv6_error_time_exc_send(uint8_t code,
  *          multicast
  *
  * @param[in] code      The [code for the message](@ref net_icmpv6_error_param_prob_codes).
- * @param[in] ptr       Pointer to the errorneous octet in @p orig_pkt.
+ * @param[in] ptr       Pointer to the erroneous octet in @p orig_pkt.
  * @param[in] orig_pkt  The invoking packet.
  */
 void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,

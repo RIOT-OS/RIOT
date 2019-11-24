@@ -123,11 +123,11 @@ void ipv6_addr_init_iid(ipv6_addr_t *out, const uint8_t *iid, uint8_t bits)
     memcpy(&(out->u8[pos]), iid, bytes);
 }
 
-char *ipv6_addr_split_str(char *addr_str, char seperator)
+char *ipv6_addr_split_str(char *addr_str, char separator)
 {
     char *sep = addr_str;
     while (*(++sep)) {
-        if (*sep == seperator) {
+        if (*sep == separator) {
             *sep++ = '\0';
             break;
         }

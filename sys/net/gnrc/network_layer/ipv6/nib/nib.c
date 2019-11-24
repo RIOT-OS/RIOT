@@ -1284,7 +1284,7 @@ static void _handle_rtr_timeout(_nib_dr_entry_t *router)
                 route->mode = _EMPTY;
                 route->next_hop->mode &= ~_DST;
                 _nib_offl_clear(route);
-                /* XXX routing protocol get's informed in case NUD
+                /* XXX routing protocol gets informed in case NUD
                  * determines ipv6->src (still in neighbor cache) to be
                  * unreachable */
             }

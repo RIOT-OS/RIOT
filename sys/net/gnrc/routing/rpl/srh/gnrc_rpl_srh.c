@@ -102,7 +102,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh, void **err_ptr)
         return GNRC_IPV6_EXT_RH_ERROR;
     }
     if (ipv6_addr_is_multicast(&addr)) {
-        DEBUG("RPL SRH: found a multicast addres in next address - discard\n");
+        DEBUG("RPL SRH: found a multicast address in next address - discard\n");
         return GNRC_IPV6_EXT_RH_ERROR;
     }
 

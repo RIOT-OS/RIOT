@@ -51,7 +51,7 @@ static int _lock(rmutex_t *rmutex, int trylock)
          *     mutex_lock(). However the read access to owner is not
          *     locked, and owner can be changed by a thread that is
          *     holding the lock (e.g.: holder unlocks the mutex, new
-         *     holder aquired the lock). The atomic access strategy
+         *     holder acquired the lock). The atomic access strategy
          *     'relaxed' ensures, that the value of rmutex->owner is read
          *     consistent.
          *
@@ -72,7 +72,7 @@ static int _lock(rmutex_t *rmutex, int trylock)
          * Note for Case 2:
          *
          *     Because the mutex rmutex->owner is only written be the
-         *     owner (me), rmutex->owner stays constant througout the
+         *     owner (me), rmutex->owner stays constant throughout the
          *     complete call and rmutex->refcount is protected
          *     (read/write) by the mutex.
          */
@@ -100,7 +100,7 @@ static int _lock(rmutex_t *rmutex, int trylock)
     DEBUG("rmutex %" PRIi16" : I am now holding the mutex\n", thread_getpid());
 
     /* I am holding the recursive mutex */
-    DEBUG("rmutex %" PRIi16" : settting the owner\n", thread_getpid());
+    DEBUG("rmutex %" PRIi16" : setting the owner\n", thread_getpid());
 
     /* ensure that owner is written atomically, since others need a consistent value */
     atomic_store_explicit(&rmutex->owner, thread_getpid(), memory_order_relaxed);

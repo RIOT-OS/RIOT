@@ -46,7 +46,7 @@ void board_init(void)
 /**
  * @brief Initialize the 2.4GHz Radio Frequency SW-controlled Switch
  *
- * The Re-Mote features an on-board RF switch to programatically select to
+ * The Re-Mote features an on-board RF switch to programmatically select to
  * enable either the internal ceramic antenna, or an external antenna over an
  * uFL connector.  As default we prefer to use the internal one.
  *

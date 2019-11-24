@@ -208,13 +208,13 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                     void *payload = &dev->rcv_buf[sizeof(zep_v2_data_hdr_t)];
 
                     if (zep->type != ZEP_V2_TYPE_DATA) {
-                        DEBUG("socket_zep::recv: unexpect ZEP type\n");
+                        DEBUG("socket_zep::recv: unexpected ZEP type\n");
                         /* don't support ACK frames for now*/
                         return -1;
                     }
                     if (((sizeof(zep_v2_data_hdr_t) + zep->length) != (unsigned)size) ||
                         (zep->length > len) || (zep->chan != dev->netdev.chan) ||
-                        /* TODO promiscous mode */
+                        /* TODO promiscuous mode */
                         _dst_not_me(dev, payload)) {
                         /* TODO: check checksum */
                         return -1;

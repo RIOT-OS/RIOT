@@ -375,7 +375,7 @@ void gnrc_ndp_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
                 pkt = hdr;
             }
         }
-        /* TODO: also check if the node provides proxy servies for tgt */
+        /* TODO: also check if the node provides proxy services for tgt */
         if ((pkt != NULL) &&
             (netif->ipv6.addrs_flags[tgt_idx] &
              GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST)) {

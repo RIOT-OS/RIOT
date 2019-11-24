@@ -61,7 +61,7 @@ static void test_hashes_hmac_sha256_hash_sequence(void)
 }
 
 /*
-        The followig testcases are taken from:
+        The following testcases are taken from:
         https://tools.ietf.org/html/rfc4868#section-2.7.1
 */
 
@@ -186,7 +186,7 @@ static void test_hashes_hmac_sha256_ite_hash_sequence(void)
 }
 
 /*
-        The followig testcases are taken from:
+        The following testcases are taken from:
         https://tools.ietf.org/html/rfc4868#section-2.7.1
 */
 

@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Common CPU definitions fpr MSP430
+ * @brief       Common CPU definitions for MSP430
  *
  */
 

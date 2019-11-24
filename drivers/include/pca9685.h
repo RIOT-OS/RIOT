@@ -113,10 +113,10 @@ extern "C"
  * @{
  */
 #define PCA9685_I2C_BASE_ADDR   (0x40)  /**< I2C slave base address */
-#define PCA9685_I2C_ALLCALLADDR (0x70)  /**< Default All Call adress */
-#define PCA9685_I2C_SUBADR1     (0x71)  /**< Default Sub Call adress 1 */
-#define PCA9685_I2C_SUBADR2     (0x72)  /**< Default Sub Call adress 2 */
-#define PCA9685_I2C_SUBADR3     (0x73)  /**< Default Sub Call adress 3 */
+#define PCA9685_I2C_ALLCALLADDR (0x70)  /**< Default All Call address */
+#define PCA9685_I2C_SUBADR1     (0x71)  /**< Default Sub Call address 1 */
+#define PCA9685_I2C_SUBADR2     (0x72)  /**< Default Sub Call address 2 */
+#define PCA9685_I2C_SUBADR3     (0x73)  /**< Default Sub Call address 3 */
 /** @} */
 
 /**
@@ -153,7 +153,7 @@ typedef enum {
  * The output driver mode defines how the outputs are configured.
  */
 typedef enum {
-    PCA9685_OPEN_DRAIN = 0,     /**< Open-drain structure ouptut */
+    PCA9685_OPEN_DRAIN = 0,     /**< Open-drain structure output */
     PCA9685_TOTEM_POLE = 1,     /**< Totem pole structure output */
 } pca9685_out_drv_t;
 
@@ -237,14 +237,14 @@ int pca9685_init(pca9685_t *dev, const pca9685_params_t *params);
  * @brief   Initialize the PCA9685 PWM device
  *
  * The function initializes the PWM device with the given parameters that are
- * used for all channels. After calling this funcion, the PWM device is
+ * used for all channels. After calling this function, the PWM device is
  * operational (powered on). That is, all outputs are active with the given
  * parameters and the same duty cycle value as before the call.
  *
  * @note
  * - PCA9685 works with internally with a resolution of 12 bit = 4096.
  *   Using a resolution that is not a power of two, will cause inaccuracy due
- *   to aligment errors when scaling down the internal resolution to the
+ *   to alignment errors when scaling down the internal resolution to the
  *   configured resolution.
  * - Frequencies from 24 Hz to 1526 Hz can be used with PCF9865.
  *

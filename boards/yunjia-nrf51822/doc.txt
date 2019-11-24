@@ -67,7 +67,7 @@ Second you need to enable the stand-alone ST-Link mode of the discovery board
 by removing the two `CN2` jumpers, found somewhere in the upper right part of
 the board. This disconnects the ST-Link programmer from the micro-controller
 part of the port and enables direct access through the pin-header `CN3`, also
-labled `SWD`.
+labeled `SWD`.
 
 The Yunjia NRF51822 module supports the Serial Wire Debug (SWD) interface. To
 access the device the following four lines need to be connected with the

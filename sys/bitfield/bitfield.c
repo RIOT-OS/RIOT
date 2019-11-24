@@ -10,7 +10,7 @@
  * @{
  *
  * @file
- * @brief       Bitfield auxillary functions
+ * @brief       Bitfield auxiliary functions
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *

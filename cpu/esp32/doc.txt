@@ -73,8 +73,8 @@ The following table gives a short reference of all board configuration parameter
 Parameter | Short Description                      | Type*
 ----------|----------------------------------------|------
 [ADC_GPIOS](#esp32_adc_channels)        | GPIOs that can be used as ADC channels | m
-[CAN_TX](#esp32_can_interfaces) | GPIO used as CAN tranceiver TX signal | o
-[CAN_RX](#esp32_can_interfaces) | GPIO used as CAN tranceiver RX signal | o
+[CAN_TX](#esp32_can_interfaces) | GPIO used as CAN transceiver TX signal | o
+[CAN_RX](#esp32_can_interfaces) | GPIO used as CAN transceiver RX signal | o
 [DAC_GPIOS](#esp32_adc_channels)        | GPIOs that can be used as DAC channels | m
 [I2C0_SPEED](#esp32_i2c_interfaces)| Bus speed of I2C_DEV(0)         | o
 [I2C0_SCL](#esp32_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(0) | o
@@ -877,11 +877,11 @@ in SJA1000 PeliCAN mode. Please refer the
 [SJA1000 Datasheet](https://www.nxp.com/documents/data_sheet/SJA1000.pdf)
 for detailed information about the CAN controller and its programming.
 
-The pin configuration of the CAN tranceiver interface is usually defined
+The pin configuration of the CAN transceiver interface is usually defined
 in board specific peripheral configuration by
 
-- <b>```CAN_TX```</b>, the GPIO used as TX tranceiver signal, and
-- <b>```CAN_RX```</b>, the GPIO used as RX tranceiver signal.
+- <b>```CAN_TX```</b>, the GPIO used as TX transceiver signal, and
+- <b>```CAN_RX```</b>, the GPIO used as RX transceiver signal.
 
 If the pin configuration is not defined, the following default configuration
 is used which can be overridden by the application, see section
@@ -894,8 +894,8 @@ CAN     | RX   | GPIO35 |`CAN_RX`       | optional, can be overridden
 
 Example:
 ```
-#define CAN_TX      GPIO10      /* CAN TX tranceiver signal */
-#define CAN_RX      GPIO9       /* CAN RX tranceiver signal */
+#define CAN_TX      GPIO10      /* CAN TX transceiver signal */
+#define CAN_RX      GPIO9       /* CAN RX transceiver signal */
 ```
 
 If the board has an external transceiver module connected to the ESP32 on-board,
@@ -1035,7 +1035,7 @@ USEMODULE += esp_now
 
 For ESP-NOW, ESP32 nodes are used in WiFi SoftAP + Station mode to advertise their SSID and become visible to other ESP32 nodes. The SSID of an ESP32 node is the concatenation of the prefix ```RIOT_ESP_``` with the MAC address of its SoftAP WiFi interface. The driver periodically scans all visible ESP32 nodes.
 
-The following parameters are defined for ESP-NOW nodes. These parameters can be overriden by [application-specific board configurations](#esp32_application_specific_board_configuration).
+The following parameters are defined for ESP-NOW nodes. These parameters can be overridden by [application-specific board configurations](#esp32_application_specific_board_configuration).
 
 <center>
 
@@ -1173,7 +1173,7 @@ It is important to ensure that the application-specific driver parameter file ``
 INCLUDES += -I$(APPDIR)
 ```
 
-**Pleae note:** To make such application-specific board configurations dependent on the ESP32 MCU or a particular ESP32 board, you should always enclose these definitions in the following constructs:
+**Please note:** To make such application-specific board configurations dependent on the ESP32 MCU or a particular ESP32 board, you should always enclose these definitions in the following constructs:
 ```
 #ifdef CPU_ESP32
 ...

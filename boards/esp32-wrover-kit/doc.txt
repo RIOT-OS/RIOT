@@ -257,7 +257,7 @@ For detailed information about ESP32 as well as configuring and compiling RIOT f
 
 ## <a name="debugging"> On-Chip Debugging with the Device </a> &nbsp;&nbsp; [[TOC](#toc)]
 
-Since the USB bridge based on FDI FT2232HL provides a JTAG interface for debugging through an USB interface, using ESP-ROVER-KIT is the easiest and most convinient way for On-Chip debugging. Please refer the [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/jtag-debugging/index.html) for details on how to setup and how to use ESP-WROVER-KIT and OpenOCD.
+Since the USB bridge based on FDI FT2232HL provides a JTAG interface for debugging through an USB interface, using ESP-ROVER-KIT is the easiest and most convenient way for On-Chip debugging. Please refer the [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/jtag-debugging/index.html) for details on how to setup and how to use ESP-WROVER-KIT and OpenOCD.
 
 ## <a name="other-resources"> Other Documentation Resources </a> &nbsp;&nbsp; [[TOC](#toc)]
 

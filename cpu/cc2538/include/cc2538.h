@@ -609,38 +609,38 @@ typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IE
 #define IOC_PD5_SEL                 ( *(cc2538_reg_t*)0x400d4074 ) /**< Peripheral select control for PD5 */
 #define IOC_PD6_SEL                 ( *(cc2538_reg_t*)0x400d4078 ) /**< Peripheral select control for PD6 */
 #define IOC_PD7_SEL                 ( *(cc2538_reg_t*)0x400d407c ) /**< Peripheral select control for PD7 */
-#define IOC_PA0_OVER                ( *(cc2538_reg_t*)0x400d4080 ) /**< Overide configuration register for PA0. */
-#define IOC_PA1_OVER                ( *(cc2538_reg_t*)0x400d4084 ) /**< Overide configuration register for PA1. */
-#define IOC_PA2_OVER                ( *(cc2538_reg_t*)0x400d4088 ) /**< Overide configuration register for PA2. */
-#define IOC_PA3_OVER                ( *(cc2538_reg_t*)0x400d408c ) /**< Overide configuration register for PA3. */
-#define IOC_PA4_OVER                ( *(cc2538_reg_t*)0x400d4090 ) /**< Overide configuration register for PA4. */
-#define IOC_PA5_OVER                ( *(cc2538_reg_t*)0x400d4094 ) /**< Overide configuration register for PA5. */
-#define IOC_PA6_OVER                ( *(cc2538_reg_t*)0x400d4098 ) /**< Overide configuration register for PA6. */
-#define IOC_PA7_OVER                ( *(cc2538_reg_t*)0x400d409c ) /**< Overide configuration register for PA7. */
-#define IOC_PB0_OVER                ( *(cc2538_reg_t*)0x400d40a0 ) /**< Overide configuration register for PB0. */
-#define IOC_PB1_OVER                ( *(cc2538_reg_t*)0x400d40a4 ) /**< Overide configuration register for PB1. */
-#define IOC_PB2_OVER                ( *(cc2538_reg_t*)0x400d40a8 ) /**< Overide configuration register for PB2. */
-#define IOC_PB3_OVER                ( *(cc2538_reg_t*)0x400d40ac ) /**< Overide configuration register for PB3. */
-#define IOC_PB4_OVER                ( *(cc2538_reg_t*)0x400d40b0 ) /**< Overide configuration register for PB4. */
-#define IOC_PB5_OVER                ( *(cc2538_reg_t*)0x400d40b4 ) /**< Overide configuration register for PB5. */
-#define IOC_PB6_OVER                ( *(cc2538_reg_t*)0x400d40b8 ) /**< Overide configuration register for PB6. */
-#define IOC_PB7_OVER                ( *(cc2538_reg_t*)0x400d40bc ) /**< Overide configuration register for PB7. */
-#define IOC_PC0_OVER                ( *(cc2538_reg_t*)0x400d40c0 ) /**< Overide configuration register for PC0. PC0 has high drive capability. */
-#define IOC_PC1_OVER                ( *(cc2538_reg_t*)0x400d40c4 ) /**< Overide configuration register for PC1. PC1 has high drive capability. */
-#define IOC_PC2_OVER                ( *(cc2538_reg_t*)0x400d40c8 ) /**< Overide configuration register for PC2. PC2 has high drive capability. */
-#define IOC_PC3_OVER                ( *(cc2538_reg_t*)0x400d40cc ) /**< Overide configuration register for PC3. PC3 has high drive capability. */
-#define IOC_PC4_OVER                ( *(cc2538_reg_t*)0x400d40d0 ) /**< Overide configuration register for PC4. */
-#define IOC_PC5_OVER                ( *(cc2538_reg_t*)0x400d40d4 ) /**< Overide configuration register for PC5. */
-#define IOC_PC6_OVER                ( *(cc2538_reg_t*)0x400d40d8 ) /**< Overide configuration register for PC6. */
-#define IOC_PC7_OVER                ( *(cc2538_reg_t*)0x400d40dc ) /**< Overide configuration register for PC7. */
-#define IOC_PD0_OVER                ( *(cc2538_reg_t*)0x400d40e0 ) /**< Overide configuration register for PD0. */
-#define IOC_PD1_OVER                ( *(cc2538_reg_t*)0x400d40e4 ) /**< Overide configuration register for PD1. */
-#define IOC_PD2_OVER                ( *(cc2538_reg_t*)0x400d40e8 ) /**< Overide configuration register for PD2. */
-#define IOC_PD3_OVER                ( *(cc2538_reg_t*)0x400d40ec ) /**< Overide configuration register for PD3. */
-#define IOC_PD4_OVER                ( *(cc2538_reg_t*)0x400d40f0 ) /**< Overide configuration register for PD4. */
-#define IOC_PD5_OVER                ( *(cc2538_reg_t*)0x400d40f4 ) /**< Overide configuration register for PD5. */
-#define IOC_PD6_OVER                ( *(cc2538_reg_t*)0x400d40f8 ) /**< Overide configuration register for PD6. */
-#define IOC_PD7_OVER                ( *(cc2538_reg_t*)0x400d40fc ) /**< Overide configuration register for PD7. */
+#define IOC_PA0_OVER                ( *(cc2538_reg_t*)0x400d4080 ) /**< Override configuration register for PA0. */
+#define IOC_PA1_OVER                ( *(cc2538_reg_t*)0x400d4084 ) /**< Override configuration register for PA1. */
+#define IOC_PA2_OVER                ( *(cc2538_reg_t*)0x400d4088 ) /**< Override configuration register for PA2. */
+#define IOC_PA3_OVER                ( *(cc2538_reg_t*)0x400d408c ) /**< Override configuration register for PA3. */
+#define IOC_PA4_OVER                ( *(cc2538_reg_t*)0x400d4090 ) /**< Override configuration register for PA4. */
+#define IOC_PA5_OVER                ( *(cc2538_reg_t*)0x400d4094 ) /**< Override configuration register for PA5. */
+#define IOC_PA6_OVER                ( *(cc2538_reg_t*)0x400d4098 ) /**< Override configuration register for PA6. */
+#define IOC_PA7_OVER                ( *(cc2538_reg_t*)0x400d409c ) /**< Override configuration register for PA7. */
+#define IOC_PB0_OVER                ( *(cc2538_reg_t*)0x400d40a0 ) /**< Override configuration register for PB0. */
+#define IOC_PB1_OVER                ( *(cc2538_reg_t*)0x400d40a4 ) /**< Override configuration register for PB1. */
+#define IOC_PB2_OVER                ( *(cc2538_reg_t*)0x400d40a8 ) /**< Override configuration register for PB2. */
+#define IOC_PB3_OVER                ( *(cc2538_reg_t*)0x400d40ac ) /**< Override configuration register for PB3. */
+#define IOC_PB4_OVER                ( *(cc2538_reg_t*)0x400d40b0 ) /**< Override configuration register for PB4. */
+#define IOC_PB5_OVER                ( *(cc2538_reg_t*)0x400d40b4 ) /**< Override configuration register for PB5. */
+#define IOC_PB6_OVER                ( *(cc2538_reg_t*)0x400d40b8 ) /**< Override configuration register for PB6. */
+#define IOC_PB7_OVER                ( *(cc2538_reg_t*)0x400d40bc ) /**< Override configuration register for PB7. */
+#define IOC_PC0_OVER                ( *(cc2538_reg_t*)0x400d40c0 ) /**< Override configuration register for PC0. PC0 has high drive capability. */
+#define IOC_PC1_OVER                ( *(cc2538_reg_t*)0x400d40c4 ) /**< Override configuration register for PC1. PC1 has high drive capability. */
+#define IOC_PC2_OVER                ( *(cc2538_reg_t*)0x400d40c8 ) /**< Override configuration register for PC2. PC2 has high drive capability. */
+#define IOC_PC3_OVER                ( *(cc2538_reg_t*)0x400d40cc ) /**< Override configuration register for PC3. PC3 has high drive capability. */
+#define IOC_PC4_OVER                ( *(cc2538_reg_t*)0x400d40d0 ) /**< Override configuration register for PC4. */
+#define IOC_PC5_OVER                ( *(cc2538_reg_t*)0x400d40d4 ) /**< Override configuration register for PC5. */
+#define IOC_PC6_OVER                ( *(cc2538_reg_t*)0x400d40d8 ) /**< Override configuration register for PC6. */
+#define IOC_PC7_OVER                ( *(cc2538_reg_t*)0x400d40dc ) /**< Override configuration register for PC7. */
+#define IOC_PD0_OVER                ( *(cc2538_reg_t*)0x400d40e0 ) /**< Override configuration register for PD0. */
+#define IOC_PD1_OVER                ( *(cc2538_reg_t*)0x400d40e4 ) /**< Override configuration register for PD1. */
+#define IOC_PD2_OVER                ( *(cc2538_reg_t*)0x400d40e8 ) /**< Override configuration register for PD2. */
+#define IOC_PD3_OVER                ( *(cc2538_reg_t*)0x400d40ec ) /**< Override configuration register for PD3. */
+#define IOC_PD4_OVER                ( *(cc2538_reg_t*)0x400d40f0 ) /**< Override configuration register for PD4. */
+#define IOC_PD5_OVER                ( *(cc2538_reg_t*)0x400d40f4 ) /**< Override configuration register for PD5. */
+#define IOC_PD6_OVER                ( *(cc2538_reg_t*)0x400d40f8 ) /**< Override configuration register for PD6. */
+#define IOC_PD7_OVER                ( *(cc2538_reg_t*)0x400d40fc ) /**< Override configuration register for PD7. */
 #define IOC_UARTRXD_UART0           ( *(cc2538_reg_t*)0x400d4100 ) /**< Pin selection for UART0 RX. */
 #define IOC_UARTCTS_UART1           ( *(cc2538_reg_t*)0x400d4104 ) /**< Pin selection for UART1 CTS. */
 #define IOC_UARTRXD_UART1           ( *(cc2538_reg_t*)0x400d4108 ) /**< Pin selection for UART1 RX. */

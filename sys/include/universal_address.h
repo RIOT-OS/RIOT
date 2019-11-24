@@ -101,7 +101,7 @@ void universal_address_rem(universal_address_container_t *entry);
  *                           this value is overwritten with the actual size required
  *
  * @return addr if the address is copied to the addr destination
- * @return NULL if the size is unsufficient for copy
+ * @return NULL if the size is insufficient for copy
  */
 uint8_t* universal_address_get_address(universal_address_container_t *entry,
                                        uint8_t *addr, size_t *addr_size);
@@ -114,7 +114,7 @@ uint8_t* universal_address_get_address(universal_address_container_t *entry,
  * @param[in] entry       pointer to the universal_address_container_t for compare
  * @param[in] addr        pointer to the address for compare
  * @param[in, out] addr_size_in_bits  the number of bits  used for the address entry
- *                                    on sucessfull return this value is overwritten
+ *                                    on successful return this value is overwritten
  *                                    with the number of matching bits till the
  *                                    first of trailing `0`s
  *
@@ -123,7 +123,7 @@ uint8_t* universal_address_get_address(universal_address_container_t *entry,
  *                                           (trailing '0's in @p entry)
  * @return UNIVERSAL_ADDRESS_IS_ALL_ZERO_ADDRESS if the entry address is all `0`s
  *                                               and considered as default route
- * @return -ENOENT if the given adresses do not match
+ * @return -ENOENT if the given addresses do not match
  */
 int universal_address_compare(universal_address_container_t *entry,
                               uint8_t *addr, size_t *addr_size_in_bits);
@@ -145,7 +145,7 @@ int universal_address_compare(universal_address_container_t *entry,
 * @return UNIVERSAL_ADDRESS_EQUAL if the entries are equal
 * @return UNIVERSAL_ADDRESS_MATCHING_PREFIX if the entry matches to a certain prefix
 *                                           (trailing '0's in @p prefix)
-* @return -ENOENT if the given adresses do not match
+* @return -ENOENT if the given addresses do not match
 */
 int universal_address_compare_prefix(universal_address_container_t *entry,
                             uint8_t *prefix, size_t prefix_size_in_bits);

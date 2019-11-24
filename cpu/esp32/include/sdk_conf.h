@@ -13,7 +13,7 @@
  * @file
  * @brief       SDK configuration compatible to the ESP-IDF
  *
- * The SDK configuration can be partially overriden by application-specific
+ * The SDK configuration can be partially overridden by application-specific
  * board configuration.
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
@@ -31,7 +31,7 @@ extern "C" {
 #include "board.h"
 
 /**
- * @brief   Defines the CPU frequency [vallues = 2, 40, 80, 160 and 240]
+ * @brief   Defines the CPU frequency [values = 2, 40, 80, 160 and 240]
  */
 #ifndef CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ
 #define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   80
@@ -41,7 +41,7 @@ extern "C" {
  * Default console configuration
  *
  * STDIO_UART_BAUDRATE is used as CONFIG_CONSOLE_UART_BAUDRATE and
- * can be overriden by an application specific configuration.
+ * can be overridden by an application specific configuration.
  */
 #define CONFIG_CONSOLE_UART_NUM 0
 
@@ -59,7 +59,7 @@ extern "C" {
 /**
  * ESP32 specific configuration
  *
- * CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ can be overriden by an application
+ * CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ can be overridden by an application
  * specific SDK configuration file.
  */
 #ifndef CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ

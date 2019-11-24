@@ -300,7 +300,7 @@ int rn2xx3_wait_response(rn2xx3_t *dev);
  * @return                  RN2XX3_REPLY_TX_MAC_ERR when MAC transmission failed
  * @return                  RN2XX3_REPLY_TX_MAC_RX when received downlink data from server
  * @return                  RN2XX3_REPLY_TX_INVALID_DATA_LEN when Application payload is too large
- * @return                  RN2XX3_REPLY_JOIN_ACCEPTED when the join procedure succeded
+ * @return                  RN2XX3_REPLY_JOIN_ACCEPTED when the join procedure succeeded
  * @return                  RN2XX3_REPLY_JOIN_DENIED when the join procedure failed
  * @return                  RN2XX3_REPLY_OTHER when an unknown reply is received
  */
@@ -317,7 +317,7 @@ int rn2xx3_wait_reply(rn2xx3_t *dev, uint8_t timeout);
  * @return                  RN2XX3_ERR_NO_FREE_CH if channels are busy
  * @return                  RN2XX3_ERR_SILENT if device is in Silent state
  * @return                  RN2XX3_ERR_BUSY if MAC layer is in idle state
- * @return                  RN2XX3_ERR_MAC_PAUSED if MAC layed is paused
+ * @return                  RN2XX3_ERR_MAC_PAUSED if MAC laid is paused
  * @return                  RN2XX3_REPLY_TX_INVALID_DATA_LEN if payload is too large
  * @return                  RN2XX3_REPLY_TX_MAC_ERR when MAC transmission failed
  * @return                  RN2XX3_REPLY_TX_MAC_RX when received downlink data from server
@@ -335,8 +335,8 @@ int rn2xx3_mac_tx(rn2xx3_t *dev, uint8_t *payload, uint8_t payload_len);
  * @return                  RN2XX3_ERR_NO_FREE_CH if channels are busy
  * @return                  RN2XX3_ERR_SILENT if device is in Silent state
  * @return                  RN2XX3_ERR_BUSY if MAC layer is in idle state
- * @return                  RN2XX3_ERR_MAC_PAUSED if MAC layed is paused
- * @return                  RN2XX3_REPLY_JOIN_ACCEPTED when the join procedure succeded
+ * @return                  RN2XX3_ERR_MAC_PAUSED if MAC layer is paused
+ * @return                  RN2XX3_REPLY_JOIN_ACCEPTED when the join procedure succeeded
  * @return                  RN2XX3_REPLY_JOIN_DENIED when the join procedure failed
  */
 int rn2xx3_mac_join_network(rn2xx3_t *dev, loramac_join_mode_t mode);

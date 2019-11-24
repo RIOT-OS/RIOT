@@ -84,13 +84,13 @@ static inline void _set_mac_addr(netdev_t *netdev, const uint8_t *src)
 static inline int _get_promiscous(netdev_t *netdev)
 {
     netdev_tap_t *dev = (netdev_tap_t*)netdev;
-    return dev->promiscous;
+    return dev->promiscuous;
 }
 
 static inline int _set_promiscous(netdev_t *netdev, int value)
 {
     netdev_tap_t *dev = (netdev_tap_t*)netdev;
-    dev->promiscous = value;
+    dev->promiscuous = value;
     return value;
 }
 
@@ -239,7 +239,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     if (nread > 0) {
         ethernet_hdr_t *hdr = (ethernet_hdr_t *)buf;
-        if (!(dev->promiscous) && !_is_addr_multicast(hdr->dst) &&
+        if (!(dev->promiscuous) && !_is_addr_multicast(hdr->dst) &&
             !_is_addr_broadcast(hdr->dst) &&
             (memcmp(hdr->dst, dev->addr, ETHERNET_ADDR_LEN) != 0)) {
             DEBUG("netdev_tap: received for %02x:%02x:%02x:%02x:%02x:%02x\n"
@@ -332,7 +332,7 @@ static int _init(netdev_t *netdev)
     const char *clonedev = "/dev/net/tun";
 #endif
     /* initialize device descriptor */
-    dev->promiscous = 0;
+    dev->promiscuous = 0;
     /* implicitly create the tap interface */
     if ((dev->tap_fd = real_open(clonedev, O_RDWR | O_NONBLOCK)) == -1) {
         err(EXIT_FAILURE, "open(%s)", clonedev);

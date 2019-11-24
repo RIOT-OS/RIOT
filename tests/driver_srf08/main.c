@@ -74,7 +74,7 @@ int main(void)
             }
 
             else {
-                puts("An error occured");
+                puts("An error occurred");
             }
             xtimer_usleep(SLEEP_USEC);
         }

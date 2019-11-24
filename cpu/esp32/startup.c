@@ -208,7 +208,7 @@ static void IRAM system_clk_init (void)
     /* set SLOW_CLK to internal low power clock of 150 kHz */
     rtc_select_slow_clk(RTC_SLOW_FREQ_RTC);
 
-    /* wait until UART is idle to avoid loosing output */
+    /* wait until UART is idle to avoid losing output */
     uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
     ets_printf("Switching system clocks can lead to some unreadable characters\n");
     ets_printf("This message is usually not visible at the console\n");
@@ -216,7 +216,7 @@ static void IRAM system_clk_init (void)
     /* determine configured CPU clock frequency from sdk_conf.h */
     rtc_cpu_freq_t freq;
     switch (CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ) {
-        case 40:  freq = RTC_CPU_FREQ_XTAL; /* derived from external cristal */
+        case 40:  freq = RTC_CPU_FREQ_XTAL; /* derived from external crystal */
                   break;                    /* normally 40 MHz */
         case 80:  freq = RTC_CPU_FREQ_80M;  /* derived from PLL */
                   break;
@@ -266,7 +266,7 @@ static NORETURN void IRAM system_init (void)
     /* initialize the RTC module (restore timer values from RTC RAM) */
     rtc_init();
 
-    /* install execption handlers */
+    /* install exception handlers */
     init_exceptions();
 
     /* clear interrupt matrix */

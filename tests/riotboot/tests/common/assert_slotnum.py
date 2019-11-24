@@ -27,7 +27,7 @@ def testfunc(child):
     child.sendline("curslothdr")
     # Magic number is "RIOT" (always in little endian)
     child.expect_exact("Image magic_number: 0x544f4952")
-    # Other info is hardware/app dependant so we just check basic compliance
+    # Other info is hardware/app dependent so we just check basic compliance
     child.expect("Image Version: %s" % ("{0:#0{1}x}".format(app_ver, 10)))
     child.expect("Image start address: 0x[0-9a-fA-F]{8}")
     child.expect("Header chksum: 0x[0-9a-fA-F]{8}")

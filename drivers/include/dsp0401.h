@@ -68,10 +68,10 @@ typedef struct {
  * @param[in]  params       Device parameters to use
  *
  * @return                  DSP0401_OK if everything is good
- * @return                  -DSP0401_ERR_CLK_GPIO if an error occured during CLK GPIO initialization
- * @return                  -DSP0401_ERR_SDI_GPIO if an error occured during SDI GPIO initialization
- * @return                  -DSP0401_ERR_LAT_GPIO if an error occured during LAT GPIO initialization
- * @return                  -DSP0401_ERR_PWM if an error occured during PWM initialization
+ * @return                  -DSP0401_ERR_CLK_GPIO if an error occurred during CLK GPIO initialization
+ * @return                  -DSP0401_ERR_SDI_GPIO if an error occurred during SDI GPIO initialization
+ * @return                  -DSP0401_ERR_LAT_GPIO if an error occurred during LAT GPIO initialization
+ * @return                  -DSP0401_ERR_PWM if an error occurred during PWM initialization
  */
 int dsp0401_init(dsp0401_t *dev, const dsp0401_params_t *params);
 

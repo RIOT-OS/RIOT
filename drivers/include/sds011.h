@@ -141,7 +141,7 @@ void sds011_power_off(const sds011_t *dev);
  * @return  SDS011_OK on success
  * @return  SDS011_INVALID_RESPONSE when response doesn't match the request
  * @return  SDS011_INVALID_CHKSUM when response checksum is invalid
- * @return  SDS011_ERROR when other error occured
+ * @return  SDS011_ERROR when other error occurred
  *
  * @pre     @p dev != NULL
  * @pre     @p data != NULL
@@ -161,7 +161,7 @@ int sds011_read(sds011_t *dev, sds011_data_t *data);
  * @param[in]  ctx       context pointer that will be handed to the callback
  *
  * @return  SDS011_OK on success
- * @return  SDS011_ERROR when error occured
+ * @return  SDS011_ERROR when error occurred
  *
  * @pre     @p dev != NULL
  */
@@ -177,7 +177,7 @@ int sds011_register_callback(sds011_t *dev, sds011_callback_t cb, void *ctx);
  * @return  SDS011_OK on success
  * @return  SDS011_INVALID_RESPONSE when response doesn't match the request
  * @return  SDS011_INVALID_CHKSUM when response checksum is invalid
- * @return  SDS011_ERROR when other error occured
+ * @return  SDS011_ERROR when other error occurred
  *
  * @pre     @p dev != NULL
  */
@@ -196,7 +196,7 @@ int sds011_get_reporting_mode(sds011_t *dev, sds011_reporting_mode_t *mode);
  * @return  SDS011_OK on success
  * @return  SDS011_INVALID_RESPONSE when response doesn't match the request
  * @return  SDS011_INVALID_CHKSUM when response checksum is invalid
- * @return  SDS011_ERROR when other error occured
+ * @return  SDS011_ERROR when other error occurred
  *
  * @pre     @p dev != NULL
  */
@@ -212,7 +212,7 @@ int sds011_set_reporting_mode(sds011_t *dev, sds011_reporting_mode_t mode);
  * @return  SDS011_OK on success
  * @return  SDS011_INVALID_RESPONSE when response doesn't match the request
  * @return  SDS011_INVALID_CHKSUM when response checksum is invalid
- * @return  SDS011_ERROR when other error occured
+ * @return  SDS011_ERROR when other error occurred
  *
  * @pre     @p dev != NULL
  */
@@ -228,7 +228,7 @@ int sds011_get_working_mode(sds011_t *dev, sds011_working_mode_t *mode);
  * @return  SDS011_OK on success
  * @return  SDS011_INVALID_RESPONSE when response doesn't match the request
  * @return  SDS011_INVALID_CHKSUM when response checksum is invalid
- * @return  SDS011_ERROR when other error occured
+ * @return  SDS011_ERROR when other error occurred
  *
  * @pre     @p dev != NULL
  */
@@ -243,7 +243,7 @@ int sds011_set_working_mode(sds011_t *dev, sds011_working_mode_t mode);
  * @return  SDS011_OK on success
  * @return  SDS011_INVALID_RESPONSE when response doesn't match the request
  * @return  SDS011_INVALID_CHKSUM when response checksum is invalid
- * @return  SDS011_ERROR when other error occured
+ * @return  SDS011_ERROR when other error occurred
  *
  * @pre     @p dev != NULL
  */
@@ -254,7 +254,7 @@ int sds011_get_working_period(sds011_t *dev, uint8_t *minutes);
  *
  * @param[in]   dev       device descriptor
  * @param[in]   minutes   0 - 30 new working period of the sensor in minutes
- *                        0 for coninuous reporting mode
+ *                        0 for continuous reporting mode
  *                        1 - 30 for a period of @p minutes
  *
  * @note    For values greater than 0, the active duration (fan, laser enabled)
@@ -264,7 +264,7 @@ int sds011_get_working_period(sds011_t *dev, uint8_t *minutes);
  * @return  SDS011_OK on success
  * @return  SDS011_INVALID_RESPONSE when response doesn't match the request
  * @return  SDS011_INVALID_CHKSUM when response checksum is invalid
- * @return  SDS011_ERROR when other error occured
+ * @return  SDS011_ERROR when other error occurred
  *
  * @pre     @p dev != NULL
  */
@@ -281,7 +281,7 @@ int sds011_set_working_period(sds011_t *dev, uint8_t minutes);
  * @return  SDS011_OK on success
  * @return  SDS011_INVALID_RESPONSE when response doesn't match the request
  * @return  SDS011_INVALID_CHKSUM when response checksum is invalid
- * @return  SDS011_ERROR when other error occured
+ * @return  SDS011_ERROR when other error occurred
  *
  * @pre     @p dev != NULL
  * @pre     @p year != NULL
@@ -303,7 +303,7 @@ int sds011_get_fw_version(sds011_t *dev, uint8_t *year, uint8_t *mon, uint8_t *d
  * @return  SDS011_OK on success
  * @return  SDS011_INVALID_RESPONSE when response doesn't match the request
  * @return  SDS011_INVALID_CHKSUM when response checksum is invalid
- * @return  SDS011_ERROR when other error occured
+ * @return  SDS011_ERROR when other error occurred
  *
  * @pre     @p dev != NULL
  */

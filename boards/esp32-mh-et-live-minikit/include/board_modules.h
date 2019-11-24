@@ -46,16 +46,16 @@ extern "C" {
 #define MRF24J40_PARAM_SPI      SPI_DEV(0)      /**< SPI_DEV(0) is used (fixed) */
 
 #ifndef MRF24J40_PARAM_SPI_CLK
-#define MRF24J40_PARAM_SPI_CLK  SPI_CLK_1MHZ    /**< SPI bus speed used (can be overriden) */
+#define MRF24J40_PARAM_SPI_CLK  SPI_CLK_1MHZ    /**< SPI bus speed used (can be overridden) */
 #endif
 #ifndef MRF24J40_PARAM_CS
-#define MRF24J40_PARAM_CS       GPIO26           /**< MRF24J40 CS signal (can be overriden) */
+#define MRF24J40_PARAM_CS       GPIO26           /**< MRF24J40 CS signal (can be overridden) */
 #endif
 #ifndef MRF24J40_PARAM_INT
-#define MRF24J40_PARAM_INT      GPIO17           /**< MRF24J40 INT signal (can be overriden) */
+#define MRF24J40_PARAM_INT      GPIO17           /**< MRF24J40 INT signal (can be overridden) */
 #endif
 #ifndef MRF24J40_PARAM_RESET
-#define MRF24J40_PARAM_RESET    GPIO16          /**< MRF24J40 RESET signal (can be overriden) */
+#define MRF24J40_PARAM_RESET    GPIO16          /**< MRF24J40 RESET signal (can be overridden) */
 #endif
 /** @} */
 #endif /* MODULE_MRF24J40 || DOXYGEN */

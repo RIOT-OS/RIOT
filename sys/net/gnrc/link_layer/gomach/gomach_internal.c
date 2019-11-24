@@ -747,7 +747,7 @@ void gnrc_gomach_cp_packet_process(gnrc_netif_t *netif)
     gnrc_gomach_packet_info_t receive_packet_info;
 
     while ((pkt = gnrc_priority_pktqueue_pop(&netif->mac.rx.queue)) != NULL) {
-        /* Parse the received packet, fetch key MAC informations. */
+        /* Parse the received packet, fetch key MAC information. */
         int res = _parse_packet(netif, pkt, &receive_packet_info);
         if (res != 0) {
             LOG_DEBUG("[GOMACH] CP: Packet could not be parsed: %i\n", res);

@@ -101,7 +101,7 @@ extern "C" {
 #endif
 
 /**
-  * @brief  funcion name mappings for source code compatibility with ESP8266 port
+  * @brief  function name mappings for source code compatibility with ESP8266 port
   * @{
   */
 #define system_get_cpu_freq     ets_get_cpu_frequency

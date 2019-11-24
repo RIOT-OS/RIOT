@@ -61,7 +61,7 @@ int8_t dac_init (dac_t line)
     uint8_t rtcio = _gpio_rtcio_map[dac_channels[line]];
     uint8_t idx;
 
-    /* try to initialize the pin as DAC ouput */
+    /* try to initialize the pin as DAC output */
     if (gpio_get_pin_usage(_adc_hw[rtcio].gpio) != _GPIO) {
         LOG_TAG_ERROR("dac", "GPIO%d is used for %s and cannot be used as "
                       "DAC output\n", _adc_hw[rtcio].gpio,

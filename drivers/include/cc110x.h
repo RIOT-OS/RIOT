@@ -386,7 +386,7 @@ typedef struct {
      * See page 76 in the data sheet.
      *
      * Assuming a 26 MHz crystal the symbol rate of the transceiver is calculated
-     * as fallows (in kBaud):
+     * as follows (in kBaud):
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * uint8_t exponent = mdmcfg4 & 0x0f;
      * int32_t mantissa = mdmcfg3;

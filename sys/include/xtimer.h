@@ -500,7 +500,7 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
  * (in callback:)
  * overhead=xtimer_now()-start-X;
  *
- * xtimer automatically substracts XTIMER_OVERHEAD from a timer's target time,
+ * xtimer automatically subtracts XTIMER_OVERHEAD from a timer's target time,
  * but when the timer triggers, xtimer will spin-lock until a timer's target
  * time is reached, so timers will never trigger early.
  *

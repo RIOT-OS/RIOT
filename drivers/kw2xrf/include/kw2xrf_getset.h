@@ -122,10 +122,10 @@ uint16_t kw2xrf_get_addr_short(kw2xrf_t *dev);
 uint64_t kw2xrf_get_addr_long(kw2xrf_t *dev);
 
 /**
- * @brief   Get CCA threshhold of a given device
+ * @brief   Get CCA threshold of a given device
  *
  * @param[in] dev       kw2xrf device descriptor
- * @return              current CCA threshhold
+ * @return              current CCA threshold
  */
 int8_t kw2xrf_get_cca_threshold(kw2xrf_t *dev);
 
@@ -171,7 +171,7 @@ int16_t kw2xrf_get_rssi(uint32_t value);
 netopt_state_t kw2xrf_get_status(kw2xrf_t *dev);
 
 /**
- * @brief               Enable continous CCA
+ * @brief               Enable continuous CCA
  *
  * @param[in] dev       kw2xrf device descriptor
  *

@@ -117,7 +117,7 @@ int bmx055_init(bmx055_t *dev, const bmx055_params_t *params)
      * softreset to bring module to normal mode
      */
     if (i2c_write_reg(BUS, ADDR_ACC, 0x14, 0xB6, 0x0) < 0) {
-        DEBUG("[bmx055] erro: setting accelerometer opmode\n");
+        DEBUG("[bmx055] error: setting accelerometer opmode\n");
         i2c_release(BUS);
         return BMX055_NOWRITE;
     }
@@ -138,7 +138,7 @@ int bmx055_init(bmx055_t *dev, const bmx055_params_t *params)
 
     /* Init Gyroscope
      *
-     * The prefered way to bring the module to normal mode is using softreset.
+     * The preferred way to bring the module to normal mode is using softreset.
      * However, a softreset brings the module into an unknown state and
      * deadlocks it. Hence it is not the way to go and normal mode is entered
      * by writing into power mode control register.

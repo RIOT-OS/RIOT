@@ -40,7 +40,7 @@
 
    The drawbacks of this implementation are:
     - There is no message queue. The whole message must be ready in a buffer.
-    - It is not optimized for peformance.
+    - It is not optimized for performance.
 
    The implementation is even simpler on a little endian platform. Just define the
    LITTLE_ENDIAN symbol in that case.

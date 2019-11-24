@@ -45,13 +45,13 @@ connected to the ports is reset before use.
 #### SX127X radio
 The pin configuration for the SX127X radio on the
 *boards/sensebox_samd21/include/board.h** file assumes that it will be connected to
-the XBEE1 port. If a different configuraion is needed please modify this
+the XBEE1 port. If a different configuration is needed please modify this
 file.
 
 #### SD card
 The pin configuration for the mSD-Bee module radio on the
 *boards/sensebox_samd21/include/sdcard_spi_params.h** file assumes that it will be
-connected to the XBEE2 port. If a different configuraion is needed please
+connected to the XBEE2 port. If a different configuration is needed please
 modify this file.
 
 #### Limitations

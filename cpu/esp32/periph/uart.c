@@ -62,7 +62,7 @@ struct uart_hw_t {
     uint8_t  int_src;       /* peripheral interrupt source used by the UART device */
 };
 
-/* hardware ressources */
+/* hardware resources */
 static struct uart_hw_t _uarts[] = {
     {
         .regs = &UART0,
@@ -259,7 +259,7 @@ static uint8_t IRAM _uart_rx_one_char (uart_t uart)
 /* send one data byte with wait */
 static void _uart_tx_one_char(uart_t uart, uint8_t data)
 {
-    /* wait until at least one byte is avaiable in the TX FIFO */
+    /* wait until at least one byte is available in the TX FIFO */
     while (_uarts[uart].regs->status.txfifo_cnt >= UART_FIFO_MAX) {}
 
     /* send the byte by placing it in the TX FIFO using MPU */

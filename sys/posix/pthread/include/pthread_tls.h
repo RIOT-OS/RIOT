@@ -57,7 +57,7 @@ int pthread_setspecific(pthread_key_t key, const void *value);
 /**
  * @brief Creates a new key to be used to identify a specific tls
  * @param[out] key the created key is scribed to the given pointer
- * @param[in] destructor function pointer called when non NULL just befor the pthread exits
+ * @param[in] destructor function pointer called when non NULL just before the pthread exits
  * @return returns 0 on success, an errorcode otherwise
  */
 int pthread_key_create(pthread_key_t *key, void (*destructor)(void *));

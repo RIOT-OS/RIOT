@@ -381,7 +381,7 @@ uint32_t scn_u32_dec(const char *str, size_t n);
  *
  * Will convert up to @p n char. Stop at any non-hexadecimal or '\0' character
  *
- * @param[in]   str Pointer to tring to read from
+ * @param[in]   str Pointer to string to read from
  * @param[in]   n   Maximum number of characters to consider
  *
  * @return  converted uint32_t value

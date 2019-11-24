@@ -121,7 +121,7 @@ In some cases it
 seems necessary to prepend a `monitor reset run` before executing continue.
 In general you can
 use openocd commands prepended by `monitor`.
-In the case the node crashes it can be reseted with the following sequence
+In the case the node crashes it can be reset with the following sequence
 ```
 Bash
 (gdb) monitor reset halt

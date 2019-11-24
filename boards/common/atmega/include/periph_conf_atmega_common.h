@@ -91,7 +91,7 @@ extern "C" {
  * ATmega2560
  * ==========
  * The timer driver only supports the four 16-bit timers (Timer1, Timer3,
- * Timer4, Timer5), so those are the only onces we can use here.
+ * Timer4, Timer5), so those are the only ones we can use here.
  *
  *
  * ATmega32U4

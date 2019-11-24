@@ -60,7 +60,7 @@ typedef uint32_t gpio_t;
 /** @} */
 
 /**
- * @brief Define custom value to speficy undefined or unused GPIOs
+ * @brief Define custom value to specify undefined or unused GPIOs
  */
 #define GPIO_UNDEF          (0xffffffff)
 

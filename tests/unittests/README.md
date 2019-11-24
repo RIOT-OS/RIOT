@@ -97,7 +97,7 @@ make term
 ```
 
 ## Writing unit tests
-### File struture
+### File structure
 RIOT uses [*embUnit*](http://embunit.sourceforge.net/) for unit testing.
 All unit tests are organized in ``tests/unittests`` and can be built module-wise, if needed.
 For each module there exists a ``tests-<modulename>/tests-<modulename>.h`` file, at least one C file in ``tests-<modulename>/`` and a ``tests-<modulename>/Makefile``.
