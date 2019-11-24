@@ -61,35 +61,20 @@ extern "C"
 /**
  * @brief global in-ISR state variable
  */
-extern volatile uint8_t __in_isr;
+extern volatile uint8_t atmega_in_isr;
 
 /**
  * @brief Run this code on entering interrupt routines
  */
-static inline void __enter_isr(void)
+static inline void atmega_enter_isr(void)
 {
-    __in_isr = 1;
+    atmega_in_isr = 1;
 }
-
-/**
- * @brief   Exit ISR mode and yield with a return from interrupt. Use at the
- * end of ISRs in place of thread_yield_higher. If thread_yield is needed, use
- * thread_yield followed by thread_yield_isr instead of thread_yield alone.
- */
-void thread_yield_isr(void);
 
 /**
  * @brief Run this code on exiting interrupt routines
  */
-static inline void __exit_isr(void)
-{
-    if (sched_context_switch_request) {
-        thread_yield();
-        __in_isr = 0;
-        thread_yield_isr();
-    }
-    __in_isr = 0;
-}
+void atmega_exit_isr(void);
 
 /**
  * @brief Initialization of the CPU

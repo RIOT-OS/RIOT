@@ -176,7 +176,7 @@ static inline void _isr(tim_t tim, int chan)
     DEBUG_TIMER_PORT |= (1 << DEBUG_TIMER_PIN);
 #endif
 
-    __enter_isr();
+    atmega_enter_isr();
 
     *ctx[tim].mask &= ~(1 << (chan + OCIE1A));
     ctx[tim].cb(ctx[tim].arg, chan);
@@ -185,7 +185,7 @@ static inline void _isr(tim_t tim, int chan)
     DEBUG_TIMER_PORT &= ~(1 << DEBUG_TIMER_PIN);
 #endif
 
-    __exit_isr();
+    atmega_exit_isr();
 }
 #endif
 

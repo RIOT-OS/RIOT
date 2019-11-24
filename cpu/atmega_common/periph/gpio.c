@@ -374,16 +374,16 @@ void gpio_irq_disable(gpio_t pin)
 
 static inline void irq_handler(uint8_t int_num)
 {
-    __enter_isr();
+    atmega_enter_isr();
     config[int_num].cb(config[int_num].arg);
-    __exit_isr();
+    atmega_exit_isr();
 }
 
 #ifdef PCINT_NUM_BANKS
 /* inline function that is used by the PCINT ISR */
 static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
 {
-    __enter_isr();
+    atmega_enter_isr();
     /* Find right item */
     uint8_t idx = 0;
 
@@ -413,7 +413,7 @@ static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
         idx++;
     }
 
-    __exit_isr();
+    atmega_exit_isr();
 }
 #if defined(PCINT0_IDX)
 ISR(PCINT0_vect, ISR_BLOCK)

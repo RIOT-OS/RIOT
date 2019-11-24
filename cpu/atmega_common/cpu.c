@@ -173,8 +173,8 @@ ISR(BADISR_vect)
 #if defined(CPU_ATMEGA128RFA1) || defined (CPU_ATMEGA256RFR2)
 ISR(BAT_LOW_vect, ISR_BLOCK)
 {
-    __enter_isr();
+    atmega_enter_isr();
     DEBUG("BAT_LOW\n");
-    __exit_isr();
+    atmega_exit_isr();
 }
 #endif

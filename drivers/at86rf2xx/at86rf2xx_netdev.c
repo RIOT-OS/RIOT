@@ -732,7 +732,7 @@ static void _isr(netdev_t *netdev)
  */
 ISR(TRX24_RX_END_vect, ISR_BLOCK)
 {
-    __enter_isr();
+    atmega_enter_isr();
 
     uint8_t status = *AT86RF2XX_REG__TRX_STATE & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
     DEBUG("TRX24_RX_END 0x%x\n", status);
@@ -741,7 +741,7 @@ ISR(TRX24_RX_END_vect, ISR_BLOCK)
     /* Call upper layer to process received data */
     at86rfmega_dev->event_callback(at86rfmega_dev, NETDEV_EVENT_ISR);
 
-    __exit_isr();
+    atmega_exit_isr();
 }
 
 /**
@@ -754,12 +754,12 @@ ISR(TRX24_RX_END_vect, ISR_BLOCK)
  */
 ISR(TRX24_XAH_AMI_vect, ISR_BLOCK)
 {
-    __enter_isr();
+    atmega_enter_isr();
 
     DEBUG("TRX24_XAH_AMI\n");
     ((at86rf2xx_t *)at86rfmega_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__AMI;
 
-    __exit_isr();
+    atmega_exit_isr();
 }
 
 /**
@@ -771,7 +771,7 @@ ISR(TRX24_XAH_AMI_vect, ISR_BLOCK)
  */
 ISR(TRX24_TX_END_vect, ISR_BLOCK)
 {
-    __enter_isr();
+    atmega_enter_isr();
 
     at86rf2xx_t *dev = (at86rf2xx_t *) at86rfmega_dev;
     uint8_t status = *AT86RF2XX_REG__TRX_STATE & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
@@ -786,7 +786,7 @@ ISR(TRX24_TX_END_vect, ISR_BLOCK)
         at86rfmega_dev->event_callback(at86rfmega_dev, NETDEV_EVENT_ISR);
     }
 
-    __exit_isr();
+    atmega_exit_isr();
 }
 
 #endif /* MODULE_AT86RFA1 || MODULE_AT86RFR2 */
