@@ -42,7 +42,7 @@ thread_status_t thread_getstatus(kernel_pid_t pid)
 
 const char *thread_getname(kernel_pid_t pid)
 {
-#ifdef DEVELHELP
+#ifdef CONFIG_THREAD_NAMES
     thread_t *thread = thread_get(pid);
     return thread ? thread->name : NULL;
 #else
@@ -194,8 +194,9 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
 
 #ifdef DEVELHELP
     int total_stacksize = stacksize;
-#else
-    (void)name;
+#endif
+#ifndef CONFIG_THREAD_NAMES
+    (void) name;
 #endif
 
     /* align the stack on a 16/32bit boundary */
@@ -271,6 +272,8 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
 
 #ifdef DEVELHELP
     thread->stack_size = total_stacksize;
+#endif
+#ifdef CONFIG_THREAD_NAMES
     thread->name = name;
 #endif
 
