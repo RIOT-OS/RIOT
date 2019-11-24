@@ -153,8 +153,10 @@ void auto_init(void)
     openthread_bootstrap();
 #endif
 #ifdef MODULE_GCOAP
-    DEBUG("Auto init gcoap module.\n");
-    gcoap_init();
+    if (!IS_ACTIVE(GCOAP_NO_AUTO_INIT)) {
+        DEBUG("Auto init gcoap module.\n");
+        gcoap_init();
+    }
 #endif
 #ifdef MODULE_DEVFS
     DEBUG("Mounting /dev\n");
