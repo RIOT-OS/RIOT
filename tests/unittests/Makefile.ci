@@ -22,6 +22,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     cc2650-launchpad \
     cc2650stk \
     chronos \
+    derfmega128 \
+    derfmega256 \
     ek-lm4f120xl \
     esp8266-esp-12x \
     esp8266-olimex-mod \

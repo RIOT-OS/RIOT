@@ -6,7 +6,9 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     chronos \
+    derfmega128 \
     i-nucleo-lrwan1 \
+    microduino-corerf \
     msb-430 \
     msb-430h \
     nucleo-f030r8 \
@@ -16,7 +18,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f334r8 \
     nucleo-l031k6 \
     nucleo-l053r8 \
-    microduino-corerf \
     stm32f030f4-demo \
     stm32f0discovery \
     stm32l0538-disco \
