@@ -469,13 +469,13 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
     switch (opt) {
         case NETOPT_ADDRESS:
-            assert(len <= sizeof(uint16_t));
-            at86rf2xx_set_addr_short(dev, *((const uint16_t *)val));
+            assert(len >= sizeof(network_uint16_t));
+            at86rf2xx_set_addr_short(dev, val);
             /* don't set res to set netdev_ieee802154_t::short_addr */
             break;
         case NETOPT_ADDRESS_LONG:
-            assert(len <= sizeof(uint64_t));
-            at86rf2xx_set_addr_long(dev, *((const uint64_t *)val));
+            assert(len >= sizeof(eui64_t));
+            at86rf2xx_set_addr_long(dev, val);
             /* don't set res to set netdev_ieee802154_t::long_addr */
             break;
         case NETOPT_NID:
