@@ -73,24 +73,18 @@ int main(void)
         puts("Animation: Fading rainbow...");
         last_wakeup = xtimer_now();
         for (unsigned i = 0; i < RAINBOW_LEN; i++) {
-            for (unsigned j = 0; j < 100; j++) {
-                color_rgb_t col = {
-                    .r = (uint8_t)(((unsigned)rainbow[i].r * j + 50) / 100),
-                    .g = (uint8_t)(((unsigned)rainbow[i].g * j + 50) / 100),
-                    .b = (uint8_t)(((unsigned)rainbow[i].b * j + 50) / 100),
-                };
+            for (unsigned j = 0; j < 255; j++) {
+                color_rgb_t col;
+                color_rgb_set_brightness(&rainbow[i], &col, j);
                 for (uint16_t k = 0; k < dev.params.numof; k++) {
                     ws281x_set(&dev, k, col);
                 }
                 ws281x_write(&dev);
                 xtimer_periodic_wakeup(&last_wakeup, 10 * US_PER_MS);
             }
-            for (unsigned j = 100; j > 0; j--) {
-                color_rgb_t col = {
-                    .r = (uint8_t)(((unsigned)rainbow[i].r * j + 50) / 100),
-                    .g = (uint8_t)(((unsigned)rainbow[i].g * j + 50) / 100),
-                    .b = (uint8_t)(((unsigned)rainbow[i].b * j + 50) / 100),
-                };
+            for (unsigned j = 255; j > 0; j--) {
+                color_rgb_t col;
+                color_rgb_set_brightness(&rainbow[i], &col, j);
                 for (uint16_t k = 0; k < dev.params.numof; k++) {
                     ws281x_set(&dev, k, col);
                 }
