@@ -19,8 +19,22 @@
 #include "mtd.h"
 #include "mtd_flashpage.h"
 
-#define TEST_ADDRESS1       (uint32_t)flashpage_addr(FLASHPAGE_NUMOF - 1)
-#define TEST_ADDRESS2       (uint32_t)flashpage_addr(FLASHPAGE_NUMOF - 2)
+/* For MSP430 cpu's the last page holds the interrupt vector, although the api
+   should not limit erasing that page, we don't want to break when testing */
+#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
+#define LAST_AVAILABLE_PAGE    (FLASHPAGE_NUMOF - 2)
+#else
+#define LAST_AVAILABLE_PAGE    (FLASHPAGE_NUMOF - 1)
+#endif
+
+#if (__SIZEOF_POINTER__ == 2)
+#define TEST_ADDRESS1       (uint16_t)flashpage_addr(LAST_AVAILABLE_PAGE)
+#define TEST_ADDRESS2       (uint16_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1)
+#else
+#define TEST_ADDRESS1       (uint32_t)flashpage_addr(LAST_AVAILABLE_PAGE)
+#define TEST_ADDRESS2       (uint32_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1)
+#endif
+#define TEST_ADDRESS0       (FLASHPAGE_NUMOF - 1)
 
 static mtd_dev_t _dev = MTD_FLASHPAGE_INIT_VAL(8);
 static mtd_dev_t *dev = &_dev;
@@ -59,13 +73,13 @@ static void test_mtd_erase(void)
     ret = mtd_erase(dev, TEST_ADDRESS1 + dev->page_size, dev->page_size);
     TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
 
-    /* Erase 2 last sectors */
+    /* Erase 2 last available pages */
     ret = mtd_erase(dev, TEST_ADDRESS2,
                     FLASHPAGE_SIZE * 2);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
     /* Erase out of memory area */
-    ret = mtd_erase(dev, TEST_ADDRESS1,
+    ret = mtd_erase(dev, TEST_ADDRESS0,
                     FLASHPAGE_SIZE * 2);
     TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
 }
