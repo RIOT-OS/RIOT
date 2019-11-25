@@ -311,12 +311,6 @@ static NORETURN void IRAM system_init (void)
                _sys_time.tm_year + 1900, _sys_time.tm_mon + 1, _sys_time.tm_mday,
                _sys_time.tm_hour, _sys_time.tm_min, _sys_time.tm_sec);
 
-    #if MODULE_MTD
-    /* init flash drive */
-    extern void spi_flash_drive_init (void);
-    spi_flash_drive_init();
-    #endif
-
     /* initialize the board */
     board_init();
 
@@ -328,6 +322,12 @@ static NORETURN void IRAM system_init (void)
 
     /* print the board config */
     print_board_config();
+
+    #if MODULE_MTD
+    /* init flash drive */
+    extern void spi_flash_drive_init (void);
+    spi_flash_drive_init();
+    #endif
 
     /* route a software interrupt source to CPU as trigger for thread yields */
     intr_matrix_set(PRO_CPU_NUM, ETS_FROM_CPU_INTR0_SOURCE, CPU_INUM_SOFTWARE);
