@@ -35,7 +35,7 @@ static int read_temperature(const void *dev, phydat_t *res)
 
 static int read_pressure(const void *dev, phydat_t *res)
 {
-    res->val[0] = bmx280_read_pressure((const bmx280_t *)dev) / 100;
+    res->val[0] = bmx280_read_pressure((bmx280_t *)dev) / 100;
     res->unit = UNIT_PA;
     res->scale = 2;
 
@@ -45,7 +45,7 @@ static int read_pressure(const void *dev, phydat_t *res)
 #if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
 static int read_relative_humidity(const void *dev, phydat_t *res)
 {
-    res->val[0] = bme280_read_humidity((const bmx280_t *)dev);
+    res->val[0] = bme280_read_humidity((bmx280_t *)dev);
     res->unit = UNIT_PERCENT;
     res->scale = -2;
 

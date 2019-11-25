@@ -283,7 +283,7 @@ int16_t bmx280_read_temperature(bmx280_t* dev);
  *
  * @return  air pressure in PA
  */
-uint32_t bmx280_read_pressure(const bmx280_t *dev);
+uint32_t bmx280_read_pressure(bmx280_t *dev);
 
 #if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C) || defined(DOXYGEN)
 /**
@@ -302,7 +302,7 @@ uint32_t bmx280_read_pressure(const bmx280_t *dev);
  *
  * @return  humidity in centi %RH (i.e. the percentage times 100)
  */
-uint16_t bme280_read_humidity(const bmx280_t *dev);
+uint16_t bme280_read_humidity(bmx280_t *dev);
 #endif
 
 #ifdef __cplusplus
