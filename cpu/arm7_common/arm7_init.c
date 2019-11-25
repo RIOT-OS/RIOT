@@ -20,6 +20,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "thread.h"
+#ifdef MODULE_PUF_SRAM
+#include "puf_sram.h"
+#endif
 
 #include "log.h"
 
@@ -62,6 +65,12 @@ void bootloader(void)
 
     /* initialize bss and data */
     _init_data();
+
+#ifdef MODULE_PUF_SRAM
+    /* uninitialized heap starts after bss section */
+    extern unsigned int __bss_end;
+    puf_sram_init((uint8_t *) __bss_end, SEED_RAM_LEN);
+#endif
 
     /* cpu specific setup of clocks, peripherals */
     cpu_init();
