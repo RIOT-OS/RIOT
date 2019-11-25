@@ -26,6 +26,11 @@
       [completely different](https://www.kernel.org/doc/html/latest/process/coding-style.html#typedefs)
       (see below) (BTW: Do we have any reason to do so?)
     * Comments should be C-style comments (see below)
+* In order to follow Linux's recommendation on
+  [conditional compilation](https://www.kernel.org/doc/html/latest/process/coding-style.html#conditional-compilation)
+  make use of `IS_ACTIVE` and `IS_USED` macros from `kernel_defines.h` with C
+  conditionals. If a symbol is not going to be defined under a certain
+  condition, the usage of preprocessor `#if defined()` is fine.
 * You can use [uncrustify](http://uncrustify.sourceforge.net/) with the provided
   option files: https://github.com/RIOT-OS/RIOT/blob/master/uncrustify-riot.cfg
 
