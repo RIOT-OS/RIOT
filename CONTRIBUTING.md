@@ -46,7 +46,7 @@ public channels, to allow us adequate time to release the fix.
 Before reporting a bug, have a look at [open bugs][existing-bugs-link]. Maybe
 someone has already reported your error.
 
-Once you have verified that they haven't, opening an issue is as easy as
+Once you have verified that the bug you have found hasn't been reported, opening an issue is as easy as
 clicking on [this link][bug-report-link] and filling out the fields.
 
 [existing-bugs-link]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+bug"
@@ -71,8 +71,8 @@ repository:
 make print-versions
 ```
 
-In summary, try to include as much information as possible, to help maintainers
-or other developers to fix the bug quickly.
+In summary, try to include as much information as possible to help maintainers
+or other developers fix the bug quickly.
 
 ## Pull Requests
 [pull-requests]: #pull-requests
@@ -97,8 +97,8 @@ into the source repository.
   Old and stalled [PRs are sometimes archived][archived-pull-requests] with the
   "State: archived" label, maybe one of them is also about the same topic.
 
-* Each Pull Request form uses a template with 3 sections that are here to help
-  maintainers understand your contribution and help them testing it:
+* Each Pull Request form uses a template with 3 sections that are there to help
+  maintainers understand your contribution and help them in testing it:
 
       #### Contribution description
 
@@ -151,7 +151,7 @@ into the source repository.
 
 * Maintainers try their best to review every PR as fast as possible, but they
   are also only human and it can happen that they miss a few PRs or might be
-  preoccupied with other PRs. If it happens that your PR receive no review for
+  preoccupied with other PRs. If it happens that your PR receives no review for
   a long time, don't hesitate to gently solicit a review by commenting or
   by explicitly mentioning a maintainer that you know is knowledgeable in the
   area of the PR. You can also advertise the PR on devel@riot-os.org mailing
