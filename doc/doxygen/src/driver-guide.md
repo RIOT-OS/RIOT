@@ -1,4 +1,6 @@
-# Guide for writing a device driver in RIOT
+Writing a Device Driver in RIOT                                 {#driver-guide}
+===============================
+
 This document describes the requirement, design objectives, and some
 non-function details when writing device drivers in/for RIOT. The term device
 driver in this context includes all 'CPU-external' devices connected to the CPU
@@ -7,8 +9,10 @@ peripherals itself are in RIOT not considered to be device drivers, but
 peripheral or low-level drivers. Typical devices are network devices like
 radios, Ethernet adapters, sensors, and actuators.
 
+[TOC]
 
-## General Design Objectives
+# General Design Objectives                   {#driver-guide-design-objectives}
+
 Device drivers should be as easy to use as possible. This implies an
 'initialize->ready' paradigm, meaning, that device drivers should be ready to use
 and in operation right after they have been initialized. On top, devices should
@@ -46,17 +50,18 @@ Sixth, device drivers SHOULD be implemented independent of any CPU/board code.
 To achieve this, the driver implementations should strictly be based on
 platform independent interfaces as the peripheral drivers, xtimer, etc.
 
+# General                                               {#driver-guide-general}
 
-## General
+## Documentation                                            {#driver-guide-doc}
 
-### Documentation
 Document what your driver does! Most devices come with a very large number of
 features, while the corresponding device driver only supports a sub-set of them.
 This should be clearly stated in the device driver's documentation, so that
 anyone wanting to use the driver can find out the supported features without
 having to scan through the code.
 
-### Device descriptor and parameter configuration
+## Device descriptor and parameter configuration          {#driver-guide-types}
+
 Each device MUST supply a data structure, holding the devices state and
 configuration, using the naming scheme of `DEVNAME_t` (e.g. `dht_t`, or
 `at86rf2xx_t`). In the context of RIOT, we call this data structure the device
@@ -79,7 +84,8 @@ should only contain static information, that is needed for the device
 initialization as it is preferably allocated in ROM.
 
 A simple I2C temperature sensors's device descriptor could look like this:
-```c
+
+@code{.c}
 typedef struct {
     tmpabc_params_t p;  /**< device configuration parameter like I2C bus and bus addr */
     int scale;          /**< some custom scaling factor for converting the results */
@@ -90,7 +96,7 @@ typedef struct {
     i2c_t bus;          /**< I2C bus the device is connected to */
     uint8_t addr;       /**< the device's address on the bus */
 } tmpabc_params_t;
-```
+@endcode
 
 **NOTE:** In many cases it makes sense, to copy the `xxx_params` data into the
 device descriptor during initialization. In some cases, it is however better to
@@ -99,7 +105,8 @@ configuration data that is only used once can be read directly from ROM, while
 often used fields (e.g. used peripherals) are stored directly in the device
 descriptor and one saves hereby one de-referencing step when accessing them.
 
-### Default device configuration
+## Default device configuration                          {#driver-guide-config}
+
 Each device driver in RIOT MUST supply a default configuration file, named
 `DEVNAME_params.h`. This file should be located in the `RIOT/drivers/...`. The
 idea is, that this file can be overridden by an application or a board, by
@@ -109,13 +116,14 @@ instead of the default params file.
 
 A default parameter header file for the example temperature sensor above would
 look like this (`tmpabc_params.h`):
-```c
-...
+
+@code{.c}
+/* ... */
 
 #include "board.h"  /* THIS INCLUDE IS MANDATORY */
 #include "tmpabc.h"
 
-...
+/* ... */
 
 /**
  * @brief   Default configuration parameters for TMPABC sensors
@@ -140,18 +148,22 @@ look like this (`tmpabc_params.h`):
 static const tmpabc_params_t tmpabc_params[] = {
     TMPABC_PARAMS
 }
-...
-```
+/* ... */
+@endcode
 
 Now to influence the default configuration parameters, we have these options:
 
-1. We can override one or more of the parameter from the makesystem, e.g.
-```bash
+First, we can override one or more of the parameter from the makesystem, e.g.
+
+@code{.sh}
 CFLAGS="-DTMPABC_PARAM_ADDR=0x23" make all
-```
-2. We can override selected parameters from the board configuration (`board.h`):
-```c
-...
+@endcode
+
+Second, we can override selected parameters from the board configuration
+(`board.h`):
+
+@code.{c}
+/* ... */
 /**
  * @brief   TMPABC sensor configuration
  * @{
@@ -159,12 +171,14 @@ CFLAGS="-DTMPABC_PARAM_ADDR=0x23" make all
 #define TMPABC_PARAM_I2C        (I2C_DEV(1))
 #define TMPABC_PARAM_ADDR       (0x17)
 /** @} */
-...
-```
-3. We can define more than a single device in the board configuration
-    (`board.h`):
-```c
-...
+/* ... */
+@endcode
+
+Third, we can define more than a single device in the board configuration
+(`board.h`):
+
+@code{.c}
+/* ... */
 /**
  * @brief   Configure the on-board temperature sensors
  * @{
@@ -178,13 +192,16 @@ CFLAGS="-DTMPABC_PARAM_ADDR=0x23" make all
                                     .addr = 0x21 \
                                 }
 /** @} */
-...
-```
-4. And finally, we can simply override the `tmpabc_params.h` file as described
-   above.
+/* ... */
+@endcode
 
-### Initialization
+And finally, we can simply override the `tmpabc_params.h` file as described
+above.
+
+## Initialization                                {#driver-guide-initialization}
+
 In general, the initialization functions should to the following:
+
 - initialize the device descriptor
 - initialize non-shared peripherals they use, e.g. GPIO pins
 - test for device connectivity, e.g. does a SPI/I2C slave react
@@ -201,59 +218,65 @@ For more detailed information on how the signature of the init functions should
 look like, please refer below to the specific requirements for network devices
 and sensors.
 
+## Return values                                  {#driver-guide-return-values}
 
-### Return values
 As stated above, we check communication of a device during initialization, and
 handle error return values from the lower layers, where they exist. To prevent
 subsequent missuse by passing NULL pointers and similar to the subsequent
 functions, the recommended way is to check parameter using `assert`, e.g.:
-```c
+
+@code{.c}
 int16_t tmpabc_read(const tmpabc_t *dev)
 {
     assert(dev);
-    ....
+    /* ... */
     return value;
 }
-```
+@endcode
+
 Whenever status/error return values are implemented by you in your driver, they
 should be named, meaning that the driver MUST define an enum assigning names to
 the actual used value, e.g.
-```c
+
+@code{.c}
 enum {
     TMPABC_OK    = 0,       /**< all went as expected */
     TMPABC_NOI2C = -1,      /**< error using the I2C bus */
     TMPABC_NODEV = -2       /**< no device with the configured address found on the bus */
 };
-```
+@endcode
 
-### General Device Driver Checklist
-- [ ] MUST: the supported feature set and any custom behavior is clearly
-      documented
-- [ ] MUST: device descriptor is defined: `devab_t`
-- [ ] MUST: device parameter `struct` is defined: `devab_params_t`
-- [ ] MUST: a default parameter configuration file is present, e.g.
-      `RIOT/drivers/devab/include/devab_params.h`
-- [ ] MUST: all error and status return codes are named, e.g.
-      `DEVAB_OK, DEVAB_NOSPI, DEVAB_OVERFLOW, ...`
-- [ ] MUST: use `const devab_t *dev` when the device descriptor can be access
-      read-only
+## General Device Driver Checklist            {#driver-guide-general-checklist}
 
+- *MUST*: the supported feature set and any custom behavior is clearly
+  documented
+- *MUST*: device descriptor is defined: `devab_t`
+- *MUST*: device parameter `struct` is defined: `devab_params_t`
+- *MUST*: a default parameter configuration file is present, e.g.
+  `RIOT/drivers/devab/include/devab_params.h`
+- *MUST*: all error and status return codes are named, e.g.
+  `DEVAB_OK, DEVAB_NOSPI, DEVAB_OVERFLOW, ...`
+- *MUST*: use `const devab_t *dev` when the device descriptor can be access
+  read-only
 
-## Sensors
+# Sensors                                               {#driver-guide-sensors}
 
-### SAUL
+## SAUL                                                    {#driver-guide-saul}
+
 All sensor drivers SHOULD implement the SAUL interface. It is however
 recommended, that the drivers are written in a way, that the drivers do not
 solely export the SAUL interface, but map the SAUL interface upon a driver
 specific one.
 
 For example, a temperature driver provides the following function (`tmpabc.c`):
-```c
+
+@code{.c}
 int16_t tmpabc_read(tmpabc_t *dev);
-```
+@endcode
 
 which then can easily be mapped to SAUL (`tmpabc_saul.c`):
-```c
+
+@code{.c}
 int saul_read(saul_t *dev, phydat_t *data)
 {
     memset(data, 0, sizeof(phydat_t));
@@ -262,28 +285,33 @@ int saul_read(saul_t *dev, phydat_t *data)
     data->scale = -2;
     return 1;
 }
-```
+@endcode
+
 This ensures the versatility of the device driver, having in mind that one might
 want to use the driver without SAUL or maybe in a context without RIOT.
 
+## Initialization                         {#driver-guide-sensor-initialization}
 
-### Initialization
 Sensor device drivers are expected to implement a single initialization
 function, `DEVNAME_init`, taking the device descriptor and the device's
 parameter struct as argument:
-```c
+
+@code{.c}
 int tmpabc_init(tmpabc_t *dev, const tmpabc_params_t *params);
-```
+@endcode
 
 After this function is called, the device MUST be running and usable.
 
-### Value handling
-#### Value semantics
+## Value handling                         {#driver-guide-sensor-value-handling}
+
+### Value semantics                      {#driver-guide-sensor-value-semantics}
+
 All sensors in RIOT MUST return their reading results as real physical values.
 When working with sensor data, these are the values of interest, and the
 overhead of the conversion is normally neglectable.
 
-#### Typing
+### Typing                                         {#driver-guide-sensor-types}
+
 All values SHOULD be returned using integer types, with `int16_t` being the
 preferred type where applicable.
 
@@ -293,7 +321,8 @@ directly while using their fraction. The recommended way to solve this is by
 scaling the result value using decimal fixed point arithmetic, in other words
 just return centi-degree instead of degree (e.g. 2372c°C instead of 23.72°C).
 
-### Additional Sensor Driver Checklist
+## Additional Sensor Driver Checklist          {#driver-guide-sensor-checklist}
+
 - *MUST*: mandatory device parameters are configurable through this file, e.g.
   sampling rate, resolution, sensitivity
 - *MUST*: an init function in the style of
@@ -310,9 +339,10 @@ just return centi-degree instead of degree (e.g. 2372c°C instead of 23.72°C).
 - *SHOULD*: the driver exports functions for putting it to sleep and waking up
   the device
 
-## Network devices
+# Network devices                                        {#driver-guide-netdev}
 
-### Initialization
+## Initialization                                   {#driver-guide-netdev-init}
+
 The initialization process MUST be split into 2 steps: first initialize the
 device descriptor and if applicable the used peripherals, and secondly do the
 actual device initialization. The reason for this is, that before a device is
@@ -322,27 +352,29 @@ the actual initialization, we can hand the control over when this is done to the
 actual network stacks.
 
 The initialization functions SHOULD follow this naming scheme:
-```
+
+@code{.c}
 void netabc_setup(netabc_t *dev, const netabc_params_t *params);
 int netabs_init(netabc_t *dev);
-```
+@endcode
 
-### netdev
+## netdev                                      {#driver-guide-netdev-interface}
+
 Device driver for network device SHOULD implement the `netdev` interface. It is
 up to the implementer, if the device driver also offers a device specific
 interface which is then mapped to the `netdev` interface, or if the device
 driver can be purely interfaced using `netdev`. While the second option is
 recommended for efficiency reasons, this is not mandatory.
 
-### Additional Network Device Driver Checklist
-- [ ] MUST: a setup function in the style of
-      `int devab_setup(devab_t *dev, const devab_params_t *params);` exists
-- [ ] MUST: an init function in the style of `int devnet_init(devnet_t *dev)`
-      exists
-- [ ] SHOULD: the driver implements 'netdev' [if applicable]
+## Additional Network Device Driver Checklist  {#driver-guide-netdev-checklist}
 
+- *MUST*: a setup function in the style of
+  `int devab_setup(devab_t *dev, const devab_params_t *params);` exists
+- *MUST*: an init function in the style of `int devnet_init(devnet_t *dev)`
+  exists
+- *SHOULD*: the driver implements 'netdev' [if applicable]
 
-## TODO
+# TODO                                                     {#driver-guide-todo}
 
 Add some information about how to handle multiple threads, when to use mutexes,
 and how to deal with interrupts?  And especially patterns for being nice from
