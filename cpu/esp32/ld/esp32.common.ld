@@ -107,6 +107,7 @@ SECTIONS
     /* part of RIOT ports that should run in IRAM */
     *cpu.a:*(.literal .text .literal.* .text.*)
     *periph.a:*(.literal .text .literal.* .text.*)
+    *mtd.a:**(.literal .text .literal.* .text.*)
 
     INCLUDE esp32.spiram.rom-functions-iram.ld
     _iram_text_end = ABSOLUTE(.);
