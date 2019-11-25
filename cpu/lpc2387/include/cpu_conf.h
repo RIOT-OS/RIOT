@@ -71,6 +71,11 @@ extern "C" {
 #define CC_CONF_WARN_UNUSED_RESULT      __attribute__((warn_unused_result))
 /** @} */
 
+/**
+ * @brief   Attribute for memory sections required by SRAM PUF
+ */
+#define PUF_SRAM_ATTRIBUTES __attribute__((used, section(".noinit")))
+
 #ifdef __cplusplus
 }
 #endif
