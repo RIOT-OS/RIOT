@@ -158,7 +158,7 @@ extern "C" {
  * manual recommends to disable this feature for RSSI measurements or random number
  * generation (Section 8.4 and Section 11.2).
  */
-#ifdef MODULE_AT86RF233
+#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RFR2)
 #ifndef AT86RF2XX_SMART_IDLE_LISTENING
 #define AT86RF2XX_SMART_IDLE_LISTENING     (1)
 #endif

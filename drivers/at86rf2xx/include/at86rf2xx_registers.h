@@ -84,6 +84,7 @@ extern "C" {
 #define AT86RF2XX_REG__RX_CTRL                                  (&RX_CTRL)
 #define AT86RF2XX_REG__SFD_VALUE                                (&SFD_VALUE)
 #define AT86RF2XX_REG__TRX_CTRL_2                               (&TRX_CTRL_2)
+#define AT86RF2XX_REG__TRX_RPC                                  (&TRX_RPC)
 #define AT86RF2XX_REG__ANT_DIV                                  (&ANT_DIV)
 #define AT86RF2XX_REG__IRQ_MASK                                 (&IRQ_MASK)
 #define AT86RF2XX_REG__IRQ_STATUS                               (&IRQ_STATUS)
@@ -522,14 +523,12 @@ extern "C" {
  * @name    Bitfield definitions for the TRX_RPC register
  * @{
  */
-#ifdef MODULE_AT86RF233
 #define AT86RF2XX_TRX_RPC_MASK__RX_RPC_CTRL_MAXPWR              (0xC0)
 #define AT86RF2XX_TRX_RPC_MASK__RX_RPC_EN                       (0x20)
 #define AT86RF2XX_TRX_RPC_MASK__PDT_RPC_EN                      (0x10)
 #define AT86RF2XX_TRX_RPC_MASK__PLL_RPC_EN                      (0x08)
 #define AT86RF2XX_TRX_RPC_MASK__XAH_TX_RPC_EN                   (0x04)
 #define AT86RF2XX_TRX_RPC_MASK__IPAN_RPC_EN                     (0x02)
-#endif
 
 #ifdef __cplusplus
 }
