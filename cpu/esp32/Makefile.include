@@ -80,6 +80,7 @@ PSEUDOMODULES += esp_i2c_hw
 PSEUDOMODULES += esp_idf_newlib
 PSEUDOMODULES += esp_log_colored
 PSEUDOMODULES += esp_log_tagged
+PSEUDOMODULES += esp_log_startup
 PSEUDOMODULES += esp_spi_ram
 PSEUDOMODULES += esp_spiffs
 PSEUDOMODULES += esp_wifi_any
@@ -159,10 +160,14 @@ ifeq ($(QEMU), 1)
 endif
 
 ifneq (,$(filter esp_log_colored,$(USEMODULE)))
-    BOOTLOADER_BIN = bootloader_with_colors.bin
-else
-    BOOTLOADER_BIN = bootloader_without_colors.bin
+  BOOTLOADER_COLOR = _colors
 endif
+
+ifneq (,$(filter esp_log_startup,$(USEMODULE)))
+  BOOTLOADER_INFO = _info
+endif
+
+BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
 
 # LINKFLAGS += -Wl,--verbose
 
