@@ -108,6 +108,7 @@ printf "\n"
 printf "%s\n" "Installed development tools"
 printf "%s\n" "---------------------------"
 for c in \
+         ccache \
          cmake \
          cppcheck \
          doxygen \
