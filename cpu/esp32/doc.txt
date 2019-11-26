@@ -115,6 +115,7 @@ Module    | Default  | Short description
 [esp_i2c_hw](#esp32_i2c_interfaces) | not used  | use the i2C hardware implementation
 [esp_idf_heap](#esp32_esp_idf_heap_implementation) | not used | enable ESP-IDF heap implementation
 [esp_log_colored](#esp32_esp_log_module) | not used | enable colored log output
+[esp_log_startup](#esp32_esp_log_module) | not used | enable additional startup information
 [esp_log_tagged](#esp32_esp_log_module) | not used | add additional information to the log output
 [esp_now](#esp32_esp_now_network_interface) | not used  | enable the ESP-NOW network device
 [esp_spi_ram](#esp32_spi_ram) | not used |  enable SPI RAM
@@ -412,6 +413,7 @@ esp_gdb | Enable the compilation with debug information for debugging with [QEMU
 esp_i2c_hw | Use the hardware I2C implementation, see section [I2C Interfaces](#esp32_i2c_interfaces).
 esp_idf_heap | Use the ESP-IDF heap implementation, see section [ESP-IDF Heap Implementation](#esp32_esp_idf_heap_implementation).
 esp_log_colored | Enable colored log output, see section [Log output](#esp32_esp_log_module).
+esp_log_startup | Enable additional startup information, see section [Log output](#esp32_esp_log_module).
 esp_log_tagged | Add additional information to the log output, see section [Log output](#esp32_esp_log_module).
 esp_now | Enable the built-in WiFi module with the ESP-NOW protocol as `netdev` network device, see section [ESP-NOW Network Interface](#esp32_esp_now_network_interface).
 esp_spiffs  | Enable the optional SPIFFS drive in on-board flash memory, see section [SPIFFS Device](#esp32_spiffs_device).
@@ -474,6 +476,12 @@ tag. With
 LOG_TAG_ERROR("mod", "error message");
 ```
 a log message with string `mod` in the tag is generated.
+
+The `esp_log_startup` module can be used to enable additional information
+about the boot process, the board configuration, the system configuration,
+the CPU used by the system, and the available heap. These information may
+help to detect problems during the startup. If the application does not
+start as expected, this module should be used.
 
 ## <a name="esp32_esp_idf_heap_implementation"> ESP-IDF Heap Implementation </a> &nbsp;[[TOC](#esp32_toc)]
 

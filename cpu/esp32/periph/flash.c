@@ -110,11 +110,11 @@ void spi_flash_drive_init (void)
      */
     #if SPI_FLASH_DRIVE_START
     if (part_top > SPI_FLASH_DRIVE_START) {
-        LOG_TAG_ERROR("spi_flash", "configured MTD start address in SPI Flash is to less\n");
+        LOG_ERROR("configured MTD start address in SPI Flash is to less\n");
     }
     else if (SPI_FLASH_DRIVE_START % _flashchip->sector_size) {
-        LOG_TAG_ERROR("spi_flash", "configured start address has to be a "
-                      "multiple of %d byte\n", _flashchip->sector_size);
+        LOG_ERROR("configured start address has to be a "
+                  "multiple of %d byte\n", _flashchip->sector_size);
         part_top = ((SPI_FLASH_DRIVE_START +
                      _flashchip->sector_size)) & ~(_flashchip->sector_size-1);
     }
@@ -123,8 +123,7 @@ void spi_flash_drive_init (void)
     }
     #endif
 
-    LOG_TAG_INFO("spi_flash",
-                 "MTD in SPI flash starts at address 0x%08x\n", part_top);
+    LOG_DEBUG("MTD in SPI flash starts at address 0x%08x\n", part_top);
 
     /* second, change flash parameters according to partition table */
     _flash_beg  = part_top;

@@ -954,7 +954,7 @@ void can_init(can_t *dev, const can_conf_t *conf)
 
 void can_print_config(void)
 {
-    ets_printf("\tCAN_DEV(0)\ttxd=%d rxd=%d\n", CAN_TX, CAN_RX);
+    printf("\tCAN_DEV(0)\ttxd=%d rxd=%d\n", CAN_TX, CAN_RX);
 }
 
 /**@}*/

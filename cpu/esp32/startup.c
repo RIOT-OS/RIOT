@@ -70,6 +70,12 @@
 #define STRINGIFY(s) STRINGIFY2(s)
 #define STRINGIFY2(s) #s
 
+#if MODULE_ESP_LOG_STARTUP
+#define LOG_STARTUP(format, ...) LOG_TAG_EARLY(LOG_DEBUG, D, __func__, format, ##__VA_ARGS__)
+#else
+#define LOG_STARTUP(format, ...)
+#endif
+
 /* following variables are defined in linker script */
 extern uint8_t _bss_start;
 extern uint8_t _bss_end;
@@ -137,12 +143,16 @@ NORETURN void IRAM call_start_cpu0 (void)
     uint8_t cpu_id[CPUID_LEN];
     cpuid_get ((void*)cpu_id);
 
-    ets_printf("\nStarting ESP32 with ID: ");
+#ifdef MODULE_ESP_LOG_STARTUP
+    ets_printf("\n");
+    LOG_STARTUP("Starting ESP32 with ID: ");
     for (unsigned i = 0; i < CPUID_LEN; i++) {
         ets_printf("%02x", cpu_id[i]);
     }
+    ets_printf("\n");
+#endif
 
-    ets_printf("\n\nCurrent clocks in Hz: CPU=%d APB=%d XTAL=%d SLOW=%d\n",
+    LOG_STARTUP("Current clocks in Hz: CPU=%d APB=%d XTAL=%d SLOW=%d\n",
                 rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()),
                 rtc_clk_apb_freq_get(), rtc_clk_xtal_freq_get()*MHZ,
                 rtc_clk_slow_freq_get_hz());
@@ -159,10 +169,9 @@ NORETURN void IRAM call_start_cpu0 (void)
     #endif /* MODULE_ESP_IDF_HEAP */
     #endif /* ENABLE_DEBUG */
 
-    ets_printf("PRO cpu is up ");
+    LOG_STARTUP("PRO cpu is up (single core mode, only PRO cpu is used)\n");
 
     /* disable APP cpu */
-    ets_printf("(single core mode, only PRO cpu is used)\n");
     DPORT_CLEAR_PERI_REG_MASK(DPORT_APPCPU_CTRL_B_REG, DPORT_APPCPU_CLKGATE_EN);
 
     #ifdef MODULE_ESP_IDF_HEAP
@@ -178,7 +187,7 @@ NORETURN void IRAM call_start_cpu0 (void)
     spi_ram_init();
     #endif
 
-    ets_printf("PRO cpu starts user code\n");
+    LOG_STARTUP("PRO cpu starts user code\n");
     system_init();
 
     UNREACHABLE();
@@ -208,7 +217,7 @@ static void IRAM system_clk_init (void)
     /* set SLOW_CLK to internal low power clock of 150 kHz */
     rtc_select_slow_clk(RTC_SLOW_FREQ_RTC);
 
-    ets_printf("Switching system clocks can lead to some unreadable characters\n");
+    LOG_STARTUP("Switching system clocks can lead to some unreadable characters\n");
 
     /* wait until UART is idle to avoid losing output */
     uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
@@ -300,18 +309,19 @@ static NORETURN void IRAM system_init (void)
     #endif
 
     /* print some infos */
-    ets_printf("Used clocks in Hz: CPU=%d APB=%d XTAL=%d FAST=%d SLOW=%d\n",
-               rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()),
-               rtc_clk_apb_freq_get(), rtc_clk_xtal_freq_get()*MHZ,
-               RTC_FAST_FREQ_8M_MHZ, rtc_clk_slow_freq_get_hz());
-    ets_printf("XTAL calibration value: %d\n", esp_clk_slowclk_cal_get());
-    ets_printf("Heap free: %u bytes\n", get_free_heap_size());
+    LOG_STARTUP("Used clocks in Hz: CPU=%d APB=%d XTAL=%d FAST=%d SLOW=%d\n",
+                rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()),
+                rtc_clk_apb_freq_get(), rtc_clk_xtal_freq_get()*MHZ,
+                RTC_FAST_FREQ_8M_MHZ, rtc_clk_slow_freq_get_hz());
+    LOG_STARTUP("XTAL calibration value: %d\n", esp_clk_slowclk_cal_get());
+    LOG_STARTUP("Heap free: %u bytes\n", get_free_heap_size());
 
     struct tm _sys_time;
     rtc_get_time(&_sys_time);
-    ets_printf("System time: %04d-%02d-%02d %02d:%02d:%02d\n",
-               _sys_time.tm_year + 1900, _sys_time.tm_mon + 1, _sys_time.tm_mday,
-               _sys_time.tm_hour, _sys_time.tm_min, _sys_time.tm_sec);
+    LOG_STARTUP("System time: %04d-%02d-%02d %02d:%02d:%02d\n",
+                _sys_time.tm_year + 1900, _sys_time.tm_mon + 1, _sys_time.tm_mday,
+                _sys_time.tm_hour, _sys_time.tm_min, _sys_time.tm_sec);
+    uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
 
     /* initialize the board */
     board_init();
@@ -323,7 +333,9 @@ static NORETURN void IRAM system_init (void)
     periph_init();
 
     /* print the board config */
+#ifdef MODULE_ESP_LOG_STARTUP
     print_board_config();
+#endif
 
     #if MODULE_MTD
     /* init flash drive */
@@ -342,7 +354,12 @@ static NORETURN void IRAM system_init (void)
     esp_event_handler_init();
 
     /* starting RIOT */
-    printf("Starting RIOT kernel on PRO cpu\n");
+#ifdef MODULE_ESP_LOG_STARTUP
+    LOG_STARTUP("Starting RIOT kernel on PRO cpu\n");
+    uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
+#else
+    puts("");
+#endif
     kernel_init();
     UNREACHABLE();
 }
