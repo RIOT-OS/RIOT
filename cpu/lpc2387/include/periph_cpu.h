@@ -141,6 +141,18 @@ typedef enum {
 /** @} */
 #endif /* ndef DOXYGEN */
 
+/**
+ * @brief   DAC configuration, valid for all boards using this CPU
+ *
+ * lpc23xx has a fixed mapping of DAC pins and a fixed number of DAC channels,
+ * so this DAC configuration is valid for all boards using this CPU. No need for
+ * any board specific configuration.
+ *
+ * The DAC of the lpc23xx is mapped to the following fixed pin:
+ * - line 0 (ch0): P0.26
+ */
+#define DAC_NUMOF           (1U)
+
 /* @} */
 #ifdef __cplusplus
 }
