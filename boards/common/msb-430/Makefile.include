@@ -5,7 +5,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup flash tool
-export PROGRAMMER ?= olimex
+PROGRAMMER ?= olimex
 MSPDEBUGFLAGS += -j $(PROGRAMMER)
 ifeq ($(strip $(PROGRAMMER)),uif)
   MSPDEBUGFLAGS += -d $(PROG_DEV)

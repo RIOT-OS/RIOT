@@ -16,7 +16,7 @@ DEBUGSERVER = JLinkGDBServer -device CC2538SF53
 RESET ?= $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 
 # Define the flash-tool and default port:
-export PROGRAMMER ?= cc2538-bsl
+PROGRAMMER ?= cc2538-bsl
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
   FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
