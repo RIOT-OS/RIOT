@@ -1,0 +1,12 @@
+MODULE = tensorflow-lite-kernels-internal
+
+CXXEXFLAGS += -Wno-missing-field-initializers
+CXXEXFLAGS += -Wno-unused-function
+CXXEXFLAGS += -Wno-unused-parameter
+
+SRCXXEXT = cc
+
+NO_AUTO_SRC = 1
+SRCXX = quantization_util.cc
+
+include $(RIOTBASE)/Makefile.base
