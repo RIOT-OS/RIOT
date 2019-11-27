@@ -1,0 +1,20 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-duemilanove \
+    arduino-leonardo \
+    arduino-mega2560 \
+    arduino-nano \
+    arduino-uno \
+    atmega328p \
+    nucleo-f031k6 \
+    nucleo-f042k6 \
+    nucleo-l031k6 \
+    stm32f030f4-demo \
+    stm32f0discovery \
+    msb-430 \
+    msb-430h \
+    telosb \
+    waspmote-pro \
+    wsn430-v1_3b \
+    wsn430-v1_4 \
+    z1 \
+#

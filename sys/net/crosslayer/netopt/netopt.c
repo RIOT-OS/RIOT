@@ -109,6 +109,10 @@ static const char *_netopt_strmap[] = {
     [NETOPT_SYNCWORD]              = "NETOPT_SYNCWORD",
     [NETOPT_RANDOM]                = "NETOPT_RANDOM",
     [NETOPT_RX_SYMBOL_TIMEOUT]     = "NETOPT_RX_SYMBOL_TIMEOUT",
+    [NETOPT_OTAA]                  = "NETOPT_OTAA",
+    [NETOPT_DEMOD_MARGIN]          = "NETOPT_DEMOD_MARGIN",
+    [NETOPT_NUM_GATEWAYS]          = "NETOPT_NUM_GATEWAYS",
+    [NETOPT_LINK_CHECK]            = "NETOPT_LINK_CHECK",
     [NETOPT_NUMOF]                 = "NETOPT_NUMOF",
 };
 
