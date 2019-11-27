@@ -11,22 +11,22 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect(r'CHUNK_SIZE: (\d+)')
+    child.expect(r'CHUNK_SIZE: (\d+)\r\n')
     chunk_size = int(child.match.group(1))
-    child.expect(r'NUMBER_OF_TESTS: (\d+)')
+    child.expect(r'NUMBER_OF_TESTS: (\d+)\r\n')
     number_of_tests = int(child.match.group(1))
     initial_allocations = 0
     for _ in range(number_of_tests):
-        child.expect(r"Allocated {} Bytes at 0x[a-z0-9]+, total [a-z0-9]+"
+        child.expect(r"Allocated {} Bytes at 0x[a-z0-9]+, total [a-z0-9]+\r\n"
                      .format(chunk_size))
-        child.expect(r'Allocations count: (\d+)')
+        child.expect(r'Allocations count: (\d+)\r\n')
         allocations = int(child.match.group(1))
         assert allocations > 0
         if initial_allocations == 0:
             initial_allocations = allocations
         assert initial_allocations == allocations
         for _ in range(allocations):
-            child.expect(r"Free {} Bytes at 0x[a-z0-9]+, total [a-z0-9]+"
+            child.expect(r"Free {} Bytes at 0x[a-z0-9]+, total [a-z0-9]+\r\n"
                          .format(chunk_size))
     child.expect_exact("[SUCCESS]")
 
