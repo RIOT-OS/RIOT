@@ -87,7 +87,6 @@ static int _adc_configure(adc_res_t res)
     _adc_poweroff();
     if (ADC->CTRLA.reg & ADC_CTRLA_SWRST ||
         ADC->CTRLA.reg & ADC_CTRLA_ENABLE ) {
-        _done();
         DEBUG("adc: not ready\n");
         return -1;
     }
