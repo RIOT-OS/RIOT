@@ -29,6 +29,42 @@ It executes without error if tests run by 'make test' are present.
     make test/available
 
 
+Automated Tests Guidelines
+--------------------------
+
+
+When using `pexpect` `$` is useless for matching the end of a line, instead use
+`\r\n`([pexpect end-of-line](https://pexpect.readthedocs.io/en/stable/overview.html#find-the-end-of-line-cr-lf-conventions)).
+
+Beware of `+` and `*` at the end of patterns. These patterns will always get
+a minimal match (non-greedy).([pexpect end-of-patterns](https://pexpect.readthedocs.io/en/stable/overview.html#beware-of-and-at-the-end-of-patterns))
+This can be an issue when matching groups and using the matched groups to verify
+some kind of behavior since `*` could return an empty match and `+` only a subset.
+
+This is especially prevalent since `printf()` is buffered so the output might not
+arrive in a single read to `pexpect`.
+
+To avoid this make sure to match a non-ambiguous character at the end of the
+pattern like `\r\n`, `\s`, `\)`, etc..
+
+**don't**:
+
+~~~~
+    child.expect(r'some string: (\d+)')
+~~~~
+
+**do**:
+
+~~~
+    child.expect(r'some string: (\d+)\r\n')
+~~~
+~~~
+    child.expect(r'some string: (\d+)\s')
+~~~
+~~~
+    child.expect(r'some string: (\d+) ,')
+~~~
+
 Interaction through the uart
 ----------------------------
 
