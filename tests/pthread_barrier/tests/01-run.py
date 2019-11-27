@@ -5,7 +5,7 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect(r'NUM_CHILDREN: (\d+), NUM_ITERATIONS: (\d+)')
+    child.expect(r'NUM_CHILDREN: (\d+), NUM_ITERATIONS: (\d+)\r\n')
     children = int(child.match.group(1))
     iterations = int(child.match.group(2))
     for i in range(children):

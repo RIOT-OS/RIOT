@@ -5,28 +5,28 @@ from testrunner import run, test_utils_interactive_sync
 
 
 def expect_unary(child):
-    child.expect(r'COUNT: (\d+)')
+    child.expect(r'COUNT: (\d+)\r\n')
     count = int(child.match.group(1))
     assert count > 0
     for _ in range(count):
         for op_name in ('abs', 'sq', 'atan', 'exp'):
             child.expect(r'{}\(-?\d+\.\d+\) = -?\d+\.\d+'.format(op_name))
 
-    child.expect(r'COUNT: (\d+)')
+    child.expect(r'COUNT: (\d+)\r\n')
     count = int(child.match.group(1))
     assert count > 0
     for _ in range(count):
         for op_name in ('sin', 'cos', 'tan'):
             child.expect(r'{}\(-?\d+.\d+\) = -?\d+.\d+'.format(op_name))
 
-    child.expect(r'COUNT: (\d+)')
+    child.expect(r'COUNT: (\d+)\r\n')
     count = int(child.match.group(1))
     assert count > 0
     for _ in range(count):
         for op_name in ('asin', 'acos'):
             child.expect(r'{}\(-?\d+.\d+\) = -?\d+.\d+'.format(op_name))
 
-    child.expect(r'COUNT: (\d+)')
+    child.expect(r'COUNT: (\d+)\r\n')
     count = int(child.match.group(1))
     assert count > 0
     for _ in range(count):
@@ -35,7 +35,7 @@ def expect_unary(child):
 
 
 def expect_binary(child):
-    child.expect(r'COUNT: (\d+)')
+    child.expect(r'COUNT: (\d+)\r\n')
     count = int(child.match.group(1))
     assert count > 0
     for _ in range(count):

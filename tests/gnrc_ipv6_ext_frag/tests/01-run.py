@@ -260,7 +260,7 @@ def _fwd_setup(child, ll_dst, g_src, g_dst):
     child.expect(r"fe80::1 dev #7 lladdr\s+-")
     # get TAP MAC address
     child.sendline("ifconfig 6")
-    child.expect("HWaddr: ([0-9A-F:]+)")
+    child.expect(r"HWaddr: ([0-9A-F:]+)\s")
     hwaddr = child.match.group(1)
     # consume MTU for later calls of `ifconfig 7`
     child.expect(r"MTU:(\d+)")
@@ -337,7 +337,7 @@ def testfunc(child):
                 print("FAILED")
                 raise e
 
-    child.expect(r"Sending UDP test packets to port (\d+)")
+    child.expect(r"Sending UDP test packets to port (\d+)\r\n")
 
     port = int(child.match.group(1))
     with socket.socket(socket.AF_INET6, socket.SOCK_DGRAM) as s:
@@ -368,7 +368,7 @@ def testfunc(child):
         # link-local address becomes valid
         time.sleep(1)
         child.sendline("ifconfig")
-        child.expect("HWaddr: (?P<hwaddr>[A-Fa-f:0-9]+)")
+        child.expect(r"HWaddr: (?P<hwaddr>[A-Fa-f:0-9]+)\s")
         hwaddr_dst = child.match.group("hwaddr").lower()
         res = child.expect([
             r"(?P<lladdr>fe80::[A-Fa-f:0-9]+)\s+scope:\s+link\s+VAL",

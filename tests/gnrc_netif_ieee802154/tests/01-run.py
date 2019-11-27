@@ -19,7 +19,7 @@ ZEP_V2_TYPE_DATA = 1
 def testfunc(child):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.bind(("", 17754))
-        child.expect("l2_addr: ([0-9A-F:]+)")
+        child.expect(r"l2_addr: ([0-9A-F:]+)\r\n")
         dst = int(child.match.group(1).replace(':', ''), base=16)
 
         # first send valid packet to check if communication is set up correctly

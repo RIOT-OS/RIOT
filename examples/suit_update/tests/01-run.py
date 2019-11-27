@@ -119,7 +119,7 @@ def testfunc(child):
 
     # get version of currently running image
     # "Image Version: 0x00000000"
-    child.expect(r"Image Version: (?P<app_ver>0x[0-9a-fA-F:]+)")
+    child.expect(r"Image Version: (?P<app_ver>0x[0-9a-fA-F:]+)\r\n")
     current_app_ver = int(child.match.group("app_ver"), 16)
 
     for version in [current_app_ver + 1, current_app_ver + 2]:
@@ -139,7 +139,7 @@ def testfunc(child):
         child.expect_exact("suit_coap: trigger received")
         child.expect_exact("suit: verifying manifest signature...")
         child.expect(
-            r"riotboot_flashwrite: initializing update to target slot (\d+)",
+            r"riotboot_flashwrite: initializing update to target slot (\d+)\r\n",
             timeout=MANIFEST_TIMEOUT,
         )
         target_slot = int(child.match.group(1))
@@ -148,7 +148,7 @@ def testfunc(child):
             pass
 
         # Verify running slot
-        child.expect(r"running from slot (\d+)")
+        child.expect(r"running from slot (\d+)\r\n")
         assert target_slot == int(child.match.group(1)), "BOOTED FROM SAME SLOT"
 
     print("TEST PASSED")

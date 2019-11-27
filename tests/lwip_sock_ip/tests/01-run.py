@@ -19,7 +19,7 @@ def _ipv4_tests(code):
 
 
 def testfunc(child):
-    child.expect(u"code (0x[0-9a-f]{2})")
+    child.expect(r"code (0x[0-9a-f]{2}\s)")
     code = int(child.match.group(1), base=16)
     if _ipv4_tests(code):
         child.expect_exact(u"Calling test_sock_ip_create4__EAFNOSUPPORT()")

@@ -38,7 +38,7 @@ def get_reset_time(child):
 
 def testfunc(child):
     child.sendline("range")
-    child.expect(r"lower_bound: (\d+) upper_bound: (\d+)",
+    child.expect(r"lower_bound: (\d+) upper_bound: (\d+)\s*\r\n",
                  timeout=1)
     wdt_lower_bound = int(child.match.group(1))
     wdt_upper_bound = int(child.match.group(2))
