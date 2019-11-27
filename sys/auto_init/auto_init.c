@@ -97,7 +97,7 @@
 #endif
 
 #ifdef MODULE_TEST_UTILS_INTERACTIVE_SYNC
-#ifndef MODULE_SHELL_COMMANDS
+#if !defined(MODULE_SHELL_COMMANDS) || !defined(MODULE_SHELL)
 #include "test_utils/interactive_sync.h"
 #endif
 #endif
@@ -605,7 +605,7 @@ void auto_init(void)
 #endif /* MODULE_SUIT */
 
 #ifdef MODULE_TEST_UTILS_INTERACTIVE_SYNC
-#ifndef MODULE_SHELL_COMMANDS
+#if !defined(MODULE_SHELL_COMMANDS) || !defined(MODULE_SHELL)
     test_utils_interactive_sync();
 #endif
 #endif /* MODULE_TEST_UTILS_INTERACTIVE_SYNC */
