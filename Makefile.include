@@ -179,7 +179,7 @@ endif
 # Override LOG_LEVEL if variable is set and if CFLAGS doesn't already contain
 # a LOG_LEVEL config
 ifdef LOG_LEVEL
-  ifneq (,$(filter -DLOG_LEVEL=%,$(CFLAGS)))
+  ifeq (,$(filter -DLOG_LEVEL=%,$(CFLAGS)))
     CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
   endif
 endif
