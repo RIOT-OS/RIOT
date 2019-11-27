@@ -20,6 +20,8 @@ ifneq ($(BOARD),native)
   TESTS=
 endif
 
+DISABLE_MODULE += test_utils_interactive_sync
+
 # test fails on murdock and on my machine due to the process exiting directly
 TEST_ON_CI_BLACKLIST += all
 

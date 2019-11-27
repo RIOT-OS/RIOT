@@ -24,6 +24,8 @@
 #include "thread.h"
 #include "msg.h"
 
+#include "test_utils/interactive_sync.h"
+
 char t1_stack[THREAD_STACKSIZE_MAIN];
 char t2_stack[THREAD_STACKSIZE_MAIN];
 char t3_stack[THREAD_STACKSIZE_MAIN];
@@ -85,6 +87,8 @@ void *thread3(void *arg)
 
 int main(void)
 {
+    test_utils_interactive_sync();
+
     p_main = sched_active_pid;
     p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN - 1,
                        THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,

@@ -13,6 +13,7 @@ import signal
 import subprocess
 import time
 from traceback import extract_tb
+from . import utils
 
 PEXPECT_PATH = os.path.dirname(pexpect.__file__)
 RIOTBASE = (os.environ.get('RIOTBASE') or
@@ -50,6 +51,10 @@ def setup_child(timeout=10, spawnclass=pexpect.spawnu, env=None, logfile=None):
     except subprocess.CalledProcessError:
         # make reset yields error on some boards even if successful
         pass
+
+    # Handle synchronization if requested by the build system
+    sync_child(child)
+
     return child
 
 
@@ -60,3 +65,22 @@ def teardown_child(child):
         print("Process already stopped")
 
     child.close()
+
+
+def modules_list():
+    modules = set(os.environ.get('USEMODULE', '').split(' '))
+    modules.discard('')
+    return modules
+
+
+def sync_child(child):
+    # Do a child synchronization if used by a module
+    modules = modules_list()
+    _test_utils_interactive_sync(child, modules)
+
+
+def _test_utils_interactive_sync(child, modules, retries=5, delay=1):
+    if 'test_utils_interactive_sync' not in modules:
+        return
+
+    utils.test_utils_interactive_sync(child, retries=retries, delay=delay)

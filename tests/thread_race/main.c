@@ -26,6 +26,8 @@
 #include "sched.h"
 #include "thread.h"
 
+#include "test_utils/interactive_sync.h"
+
 char iqr_check_stack[THREAD_STACKSIZE_DEFAULT];
 
 static volatile uint8_t irq_occurred;
@@ -65,6 +67,8 @@ static void _spin(void)
 
 int main(void)
 {
+    test_utils_interactive_sync();
+
     puts("Context swap race condition test application");
 
     kernel_pid_t pid;

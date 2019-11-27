@@ -7,6 +7,26 @@ allow basic functionality to be verified as well as provide an example of
 usage.
 
 
+Implementing automated tests
+----------------------------
+
+The goal is to be able to run all tests in a sequential way for as many targets
+as possible.
+
+As some board can't be reset without a manual trigger tests should be implemented
+with some kind of `synchronization`. This can be done in two ways:
+
+- use `test_utils_interactive_sync` when uart input/output does not need to be
+  disabled for the test. This is enabled by default.
+- set up the test in a loop so the test script will be able so sync with some kind
+  of start condition in the test.
+
+The module for the first option is `test_utils_interactive_sync` and is set as a
+default module in `Makefile.tests_common`. It can be disabled by setting in the
+application makefile `DISABLE_MODULE += test_utils_interactive_sync`. The python
+test script will adapt to it automatically.
+
+
 Running automated tests
 -----------------------
 

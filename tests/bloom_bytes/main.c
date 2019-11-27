@@ -22,6 +22,8 @@
 #include <string.h>
 #include <inttypes.h>
 
+#include "test_utils/interactive_sync.h"
+
 #include "xtimer.h"
 #include "fmt.h"
 
@@ -62,6 +64,8 @@ int main(void)
     xtimer_init();
 
     bloom_init(&bloom, BLOOM_BITS, bf, hashes, BLOOM_HASHF);
+
+    test_utils_interactive_sync();
 
     printf("Testing Bloom filter.\n\n");
     printf("m: %" PRIu32 " k: %" PRIu32 "\n\n", (uint32_t) bloom.m,

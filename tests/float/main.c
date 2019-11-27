@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "test_utils/interactive_sync.h"
+
 #include "board.h"
 
 /* as default we run the test 100k times */
@@ -34,6 +36,8 @@
 
 int main(void)
 {
+    test_utils_interactive_sync();
+
     double x = 1234567.0 / 1024.0;
 
     puts("Testing floating point arithmetic...\n");

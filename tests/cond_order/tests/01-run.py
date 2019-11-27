@@ -10,8 +10,6 @@
 import os
 import sys
 
-from testrunner import test_utils_interactive_sync
-
 thread_prio = {
         3:  6,
         4:  4,
@@ -23,7 +21,6 @@ first_group_size = 3
 
 
 def testfunc(child):
-    test_utils_interactive_sync(child)
 
     for k in thread_prio.keys():
         child.expect_exact("T{} (prio {}): waiting on condition variable now"

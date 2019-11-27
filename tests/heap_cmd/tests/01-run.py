@@ -12,7 +12,6 @@ from testrunner import run
 
 def testfunc(child):
     # check startup message
-    child.expect('Shell-based test application for heap functions.')
     child.sendline('heap')
     ret = child.expect([r'heap: \d+ \(used \d+, free \d+\) \[bytes\]', 'heap statistics are not supported'])
     if ret == 1:
