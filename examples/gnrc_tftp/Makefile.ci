@@ -12,6 +12,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill \
     calliope-mini \
     chronos \
+    derfmega128 \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \

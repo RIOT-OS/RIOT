@@ -6,6 +6,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega256rfr2-xpro \
     atmega328p \
+    derfmega128 \
+    derfmega256 \
     mega-xplained \
     microduino-corerf \
     nucleo-f031k6 \

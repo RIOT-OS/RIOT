@@ -9,6 +9,8 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     atmega256rfr2-xpro \
                     atmega328p \
                     chronos \
+                    derfmega128 \
+                    derfmega256 \
                     f4vi1 \
                     hifive1 \
                     hifive1b \

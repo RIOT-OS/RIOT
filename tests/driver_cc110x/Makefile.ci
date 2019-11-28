@@ -8,6 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p \
     blackpill \
     bluepill \
+    derfmega128 \
     i-nucleo-lrwan1 \
     mega-xplained \
     microduino-corerf \
