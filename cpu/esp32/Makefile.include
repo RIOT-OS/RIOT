@@ -70,6 +70,10 @@ ifneq (,$(filter littlefs,$(USEMODULE)))
   export RIOT_TEST_TIMEOUT = 300
 endif
 
+ifneq (,$(filter 4 5,$(LOG_LEVEL)))
+  USEMODULE += esp_log_startup
+endif
+
 # ESP32 pseudomodules
 PSEUDOMODULES += esp_eth_hw
 PSEUDOMODULES += esp_gdb
