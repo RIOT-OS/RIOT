@@ -7,10 +7,19 @@
  */
 
 /**
- * @defgroup    drivers_ncv7356 NCV7356
- * @ingroup     drivers_can
- * @ingroup     drivers_can_trx
- * @brief       ncv7356 Single Wire CAN transceiver driver
+* @defgroup    drivers_ncv7356 NCV7356 Single Wire CAN Transceiver
+* @ingroup     drivers_can
+* @ingroup     drivers_can_trx
+* @brief       Device driver for the NCV7356 Single Wire CAN Transceiver
+*
+* The NCV7356 is a physical layer device for a single wire data connection
+* such as Bosch's Controller Area Network (CAN) protocol.
+* The device is capable of transmissions of up to 100 kbps and operates in a
+* voltage range of 5 to 27 V. All logic inputs are compatible with 3.3 V and
+* 5 V supply systems. The pins MODE0 and MODE1 indicate the mode of the
+* transceiver, with the transceiver being initially in sleep mode.
+* An example application circuitry for the 8 pin package can be found at page
+* 15 of https://www.onsemi.com/pub/Collateral/NCV7356-D.PDF.
  *
  * @{
  *
