@@ -226,7 +226,7 @@ and sensors.
 
 As stated above, we check communication of a device during initialization, and
 handle error return values from the lower layers, where they exist. To prevent
-subsequent missuse by passing NULL pointers and similar to the subsequent
+subsequent misuse by passing NULL pointers and similar to the subsequent
 functions, the recommended way is to check parameter using `assert`, e.g.:
 
 @code{.c}
