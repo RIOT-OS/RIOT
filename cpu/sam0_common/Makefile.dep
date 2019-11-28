@@ -1,0 +1,3 @@
+ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
+  USEMODULE += tsrb
+endif
