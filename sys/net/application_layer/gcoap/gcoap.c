@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015-2017 Ken Bannister. All rights reserved.
+ *               2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  * Runs a thread (_pid) to manage request/response messaging.
  *
  * @author      Ken Bannister <kb2ma@runbox.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #include <errno.h>
@@ -240,7 +242,7 @@ static void _listen(sock_udp_t *sock)
                 xtimer_remove(&memo->response_timer);
                 memo->state = GCOAP_MEMO_RESP;
                 if (memo->resp_handler) {
-                    memo->resp_handler(memo->state, &pdu, &remote);
+                    memo->resp_handler(memo, &pdu, &remote);
                 }
 
                 if (memo->send_limit >= 0) {        /* if confirmable */
@@ -488,7 +490,7 @@ static void _expire_request(gcoap_request_memo_t *memo)
             else {
                 req.hdr = (coap_hdr_t *)memo->msg.data.pdu_buf;
             }
-            memo->resp_handler(memo->state, &req, NULL);
+            memo->resp_handler(memo, &req, NULL);
         }
         if (memo->send_limit != GCOAP_SEND_LIMIT_NON) {
             *memo->msg.data.pdu_buf = 0;    /* clear resend buffer */
@@ -721,7 +723,7 @@ ssize_t gcoap_finish(coap_pkt_t *pdu, size_t payload_len, unsigned format)
 
 size_t gcoap_req_send(const uint8_t *buf, size_t len,
                       const sock_udp_ep_t *remote,
-                      gcoap_resp_handler_t resp_handler)
+                      gcoap_resp_handler_t resp_handler, void *context)
 {
     gcoap_request_memo_t *memo = NULL;
     unsigned msg_type  = (*buf & 0x30) >> 4;
@@ -748,6 +750,7 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
         }
 
         memo->resp_handler = resp_handler;
+        memo->context = context;
         memcpy(&memo->remote_ep, remote, sizeof(sock_udp_ep_t));
 
         switch (msg_type) {
