@@ -21,6 +21,10 @@ already converted values in some physical unit instead of RAW data, so that
 users can work directly with data from different devices directly without having
 to care about device specific conversion.
 
+However, please avoid the use of `float` or `double`. Instead, multiply to the
+next SI (or appropriate) unit. E.g. if an ADC would return values like `1.23 V`,
+chose to return `1230 mV` instead.
+
 Additionally towards ease of use, all device drivers in RIOT should provide a
 similar 'look and feel'. They should behave similar concerning things like their
 state after initialization, like their used data representation and so on.
