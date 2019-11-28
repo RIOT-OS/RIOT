@@ -47,7 +47,7 @@ static void *_thread_fn(void *arg)
         for (int i = 0; i < (10 * (next + 1)); ++i) {
             _xtimer_now64();
         }
-        xtimer_usleep(XTIMER_BACKOFF * 3);
+        xtimer_usleep(XTIMER_BACKOFF * 10);
         msg_send(&m2, pids[next]);
     }
 
