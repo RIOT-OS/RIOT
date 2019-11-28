@@ -447,6 +447,16 @@ extern "C" {
 #define GCOAP_PAYLOAD_MARKER    (0xFF)
 
 /**
+ * @ingroup net_gcoap_conf
+ * @brief   Disables gcoap startup during system auto init
+ *
+ * If disabled, gcoap_init() must be called by some other means.
+ */
+#ifndef GCOAP_NO_AUTO_INIT
+#define GCOAP_NO_AUTO_INIT      0
+#endif
+
+/**
  * @name    States for the memo used to track waiting for a response
  * @{
  */
