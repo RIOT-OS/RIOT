@@ -24,39 +24,71 @@
 #include "puf_sram.h"
 #endif
 
+#include "cpu.h"
 #include "log.h"
 
-static inline void
-_init_data(void)
+static inline void _init_data(void)
 {
+    /* (linker script ensures that data is 32-bit aligned) */
     extern unsigned int _etext;
     extern unsigned int _data;
     extern unsigned int _edata;
     extern unsigned int __bss_start;
     extern unsigned int __bss_end;
 
-    register unsigned int *p1;
-    register unsigned int *p2;
-    register unsigned int *p3;
+/* Support for Battery Backup RAM */
+#ifdef CPU_HAS_BACKUP_RAM
+    extern unsigned int _sbackup_data_load[];
+    extern unsigned int _sbackup_data[];
+    extern unsigned int _ebackup_data[];
+    extern unsigned int _sbackup_bss[];
+    extern unsigned int _ebackup_bss[];
+#endif
 
-    // initialize data from flash
-    // (linker script ensures that data is 32-bit aligned)
-    p1 = &_etext;
-    p2 = &_data;
-    p3 = &_edata;
+    register unsigned int *src;
+    register unsigned int *dst;
+    register unsigned int *end;
 
-    while (p2 < p3) {
-        *p2++ = *p1++;
+    /* initialize data from flash */
+    src = &_etext;
+    dst = &_data;
+    end = &_edata;
+
+    while (dst < end) {
+        *dst++ = *src++;
     }
 
-    // clear bss
-    // (linker script ensures that bss is 32-bit aligned)
-    p1 = &__bss_start;
-    p2 = &__bss_end;
+    /* clear bss */
+    dst = &__bss_start;
+    end = &__bss_end;
 
-    while (p1 < p2) {
-        *p1++ = 0;
+    while (dst < end) {
+        *dst++ = 0;
     }
+
+#ifdef CPU_HAS_BACKUP_RAM
+    /* only initialize battery backup on cold boot */
+    if (cpu_woke_from_backup()) {
+        return;
+    }
+
+    /* load low-power data section. */
+    src = _sbackup_data_load;
+    dst = _sbackup_data;
+    end = _ebackup_data;
+
+    while (dst < end) {
+        *dst++ = *src++;
+    }
+
+    /* zero-out low-power bss. */
+    dst = _sbackup_bss;
+    end = _ebackup_bss;
+
+    while (dst < end) {
+        *dst++ = 0;
+    }
+#endif /* CPU_HAS_BACKUP_RAM */
 }
 
 void bootloader(void)

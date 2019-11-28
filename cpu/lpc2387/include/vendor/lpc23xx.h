@@ -424,6 +424,10 @@ Reset, and Code Security/Debugging */
 
 /* Reset, reset source identification */
 #define RSIR           (*(volatile unsigned long *)(SCB_BASE_ADDR + 0x180))
+#define RSIR_POR       (BIT0)
+#define RSIR_EXTR      (BIT1)
+#define RSIR_WDTR      (BIT2)
+#define RSIR_BODR      (BIT3)
 
 /* RSID, code security protection */
 #define CSPR           (*(volatile unsigned long *)(SCB_BASE_ADDR + 0x184))
