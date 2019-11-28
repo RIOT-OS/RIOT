@@ -281,6 +281,8 @@ static void _uart_config (uart_t uart)
 
     /* setup the baudrate */
     if (uart == UART_DEV(0) || uart == UART_DEV(1)) {
+        /* wait until TX FIFO is empty */
+        while (_uarts[uart].regs->status.txfifo_cnt) { }
         /* for UART0 and UART1, we can us the ROM function */
         uart_div_modify(uart, (UART_CLK_FREQ << 4) / _uarts[uart].baudrate);
     }
