@@ -17,7 +17,6 @@
 
 import sys
 import re
-import time
 import logging
 import argparse
 import serial
@@ -59,6 +58,7 @@ class SpectrumEmitter(object):
                         continue
                 yield ed
 
+
 class RSSIPlot(object):
 
     def __init__(self, ax, *args, tlen=120, dt=0.5, nchannels=27):
@@ -68,7 +68,8 @@ class RSSIPlot(object):
         self.tlen = tlen
         # Generate mesh for plotting, this creates a grid of nchannel rows and
         # (tlen / dt) columns
-        self.Y, self.X = np.mgrid[slice(0 - .5, nchannels + 0.5, 1), slice(-self.tlen - self.dt / 2, 0 + 1 - self.dt / 2, self.dt)]
+        self.Y, self.X = np.mgrid[slice(0 - .5, nchannels + 0.5, 1),
+                                  slice(-self.tlen - self.dt / 2, 0 + 1 - self.dt / 2, self.dt)]
         Z = np.zeros_like(self.X)
         # X and Y are the bounds, so Z should be the value *inside* those bounds.
         # Therefore, remove the last row and column from the Z array.
@@ -130,7 +131,7 @@ def main(argv):
         fig, ax = plt.subplots()
         graph = RSSIPlot(ax)
         emitter = SpectrumEmitter(port)
-        ani = animation.FuncAnimation(fig, graph.update, emitter.data_gen, interval=10, blit=True)
+        animation.FuncAnimation(fig, graph.update, emitter.data_gen, interval=10, blit=True)
         plt.show()
     except KeyboardInterrupt:
         port.close()
