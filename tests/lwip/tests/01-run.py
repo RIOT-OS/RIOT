@@ -185,7 +185,7 @@ class TestStrategy(ApplicationStrategy):
 
 def get_ipv6_address(spawn):
     spawn.sendline(u"ifconfig")
-    spawn.expect(u"[A-Za-z0-9]{2}_[0-9]+:  inet6 (fe80::[0-9a-f:]+)")
+    spawn.expect(r"[A-Za-z0-9]{2}_[0-9]+:  inet6 (fe80::[0-9a-f:]+)\s")
     return spawn.match.group(1)
 
 

@@ -595,9 +595,9 @@ def testfunc(child):
 
     lladdr_src = get_host_lladdr(tap)
     child.sendline("ifconfig")
-    child.expect("HWaddr: (?P<hwaddr>[A-Fa-f:0-9]+)")
+    child.expect(r"HWaddr: (?P<hwaddr>[A-Fa-f:0-9]+)\s")
     hwaddr_dst = child.match.group("hwaddr").lower()
-    child.expect("(?P<lladdr>fe80::[A-Fa-f:0-9]+)")
+    child.expect(r"(?P<lladdr>fe80::[A-Fa-f:0-9]+)\s")
     lladdr_dst = child.match.group("lladdr").lower()
 
     def run(func):

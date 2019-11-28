@@ -58,26 +58,26 @@ def get_host_ll_addr(interface):
 
 def get_riot_l2_addr(child):
     child.sendline('ifconfig')
-    child.expect('HWaddr: ([A-F-a-f0-9:]+)')
+    child.expect(r'HWaddr: ([A-F-a-f0-9:]+)\s')
     return child.match.group(1)
 
 
 def get_riot_ll_addr(child):
     child.sendline('ifconfig')
-    child.expect('(fe80:[0-9a-f:]+)')
+    child.expect(r'(fe80:[0-9a-f:]+)\s')
     return child.match.group(1).strip()
 
 
 def get_riot_if_id(child):
     child.sendline('ifconfig')
-    child.expect(r'Iface\s+(\d+)')
+    child.expect(r'Iface\s+(\d+)\s')
     return child.match.group(1).strip()
 
 
 def setup_internal_buffer(child):
     child.sendline('buffer_init')
     child.sendline('buffer_get_max_size')
-    child.expect(r'returns (\d+)')
+    child.expect(r'returns (\d+)\s')
     return int(child.match.group(1).strip())
 
 

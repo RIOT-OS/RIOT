@@ -35,7 +35,7 @@ def testfunc(func):
         child.sendline('gnrc_tcp_open_passive AF_INET6 {}'.format(port))
         child.expect(r'gnrc_tcp_open_passive: argc=3, '
                      r'argv\[0\] = gnrc_tcp_open_passive, '
-                     r'argv\[1\] = AF_INET6, argv\[2\] = (\d+)')
+                     r'argv\[1\] = AF_INET6, argv\[2\] = (\d+)\r\n')
         assert int(child.match.group(1)) == port
 
         try:

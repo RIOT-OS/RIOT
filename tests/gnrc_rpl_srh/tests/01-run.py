@@ -143,7 +143,7 @@ def unregister(child):
 
 def get_first_interface(child):
     child.sendline("ifconfig")
-    child.expect(r"Iface\s+(\d+)")
+    child.expect(r"Iface\s+(\d+)\s")
     return int(child.match.group(1))
 
 
@@ -342,9 +342,9 @@ def testfunc(child):
     print("." * int(child.match.group(1)), end="", flush=True)
     lladdr_src = get_host_lladdr(tap)
     child.sendline("ifconfig")
-    child.expect("HWaddr: (?P<hwaddr>[A-Fa-f:0-9]+)")
+    child.expect(r"HWaddr: (?P<hwaddr>[A-Fa-f:0-9]+)\s")
     hwaddr_dst = child.match.group("hwaddr").lower()
-    child.expect("(?P<lladdr>fe80::[A-Fa-f:0-9]+)")
+    child.expect(r"(?P<lladdr>fe80::[A-Fa-f:0-9]+)\s")
     lladdr_dst = child.match.group("lladdr").lower()
     sniffer = Sniffer(tap)
     sniffer.start()
