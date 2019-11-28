@@ -739,6 +739,9 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * Assumes the PDU has been initialized with a gcoap_xxx_init() function, like
  * gcoap_req_init().
  *
+ * @deprecated  Will not be available after the 2020.07 release. Use
+ * coap_opt_finish() instead.
+ *
  * @warning To use this function, you only may have added an Option with
  * option number less than COAP_OPT_CONTENT_FORMAT. Otherwise, use the
  * struct-based API described with @link net_nanocoap nanocoap. @endlink With
