@@ -11,8 +11,6 @@ DISABLE_MODULE += auto_init
 USEMODULE += od
 USEMODULE += socket_zep
 
-CFLAGS += -DDEVELHELP
-
 TERMFLAGS ?= -z [::1]:17754
 
 include $(RIOTBASE)/Makefile.include
