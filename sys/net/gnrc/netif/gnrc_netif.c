@@ -1497,6 +1497,9 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                 netif->stats.tx_success++;
                 break;
 #endif
+            case NETDEV_EVENT_PDU_CHANGED:
+                gnrc_netif_ipv6_init_mtu(netif);
+                break;
             default:
                 DEBUG("gnrc_netif: warning: unhandled event %u.\n", event);
         }

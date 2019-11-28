@@ -252,6 +252,7 @@ typedef enum {
     NETDEV_EVENT_MCPS_INDICATION,           /**< MAC MCPS indication event */
     NETDEV_EVENT_MLME_GET_BUFFER,           /**< MAC layer requests MLME buffer */
     NETDEV_EVENT_MCPS_GET_BUFFER,           /**< MAC layer requests MCPS buffer */
+    NETDEV_EVENT_PDU_CHANGED,               /**< MAC layer PDU changed */
     /* expand this list if needed */
 } netdev_event_t;
 
