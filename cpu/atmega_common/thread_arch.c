@@ -248,11 +248,12 @@ void thread_yield_higher(void)
 void atmega_exit_isr(void)
 {
     atmega_in_isr = 0;
-    atmega_context_save();
-    sched_run();
-    atmega_context_restore();
-
-    __asm__ volatile ("reti");
+    if (sched_context_switch_request) {
+        atmega_context_save();
+        sched_run();
+        atmega_context_restore();
+        __asm__ volatile ("reti");
+    }
 }
 
 __attribute__((always_inline)) static inline void atmega_context_save(void)
