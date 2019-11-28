@@ -23,7 +23,6 @@ include $(RIOT_MAKEFILES_GLOBAL_PRE)
 
 # set undefined variables
 RIOTBASE       ?= $(_riotbase)
-CCACHE_BASEDIR ?= $(RIOTBASE)
 RIOTCPU        ?= $(RIOTBASE)/cpu
 RIOTBOARD      ?= $(RIOTBASE)/boards
 RIOTMAKE       ?= $(RIOTBASE)/makefiles
@@ -55,7 +54,6 @@ __DIRECTORY_VARIABLES := \
   BUILD_DIR \
   BINDIRBASE \
   BINDIR \
-  CCACHE_BASEDIR \
   GITCACHE \
   PKGDIRBASE \
   DLCACHE_DIR \
@@ -63,7 +61,6 @@ __DIRECTORY_VARIABLES := \
 
 # Make all paths absolute.
 override RIOTBASE       := $(abspath $(RIOTBASE))
-override CCACHE_BASEDIR := $(abspath $(CCACHE_BASEDIR))
 override RIOTCPU        := $(abspath $(RIOTCPU))
 override RIOTBOARD      := $(abspath $(RIOTBOARD))
 override RIOTMAKE       := $(abspath $(RIOTMAKE))
