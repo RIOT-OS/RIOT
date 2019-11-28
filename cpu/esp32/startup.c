@@ -197,8 +197,8 @@ static void IRAM system_clk_init (void)
     rtc_init_module(rtc_cfg);
 
     /* configure main crystal frequency if necessary */
-    if (CONFIG_ESP32_XTAL_FREQ != RTC_XTAL_FREQ_AUTO
-            && CONFIG_ESP32_XTAL_FREQ != rtc_clk_xtal_freq_get()) {
+    if (CONFIG_ESP32_XTAL_FREQ != RTC_XTAL_FREQ_AUTO &&
+        CONFIG_ESP32_XTAL_FREQ != rtc_clk_xtal_freq_get()) {
         bootloader_clock_configure();
     }
 
@@ -208,10 +208,10 @@ static void IRAM system_clk_init (void)
     /* set SLOW_CLK to internal low power clock of 150 kHz */
     rtc_select_slow_clk(RTC_SLOW_FREQ_RTC);
 
+    ets_printf("Switching system clocks can lead to some unreadable characters\n");
+
     /* wait until UART is idle to avoid losing output */
     uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
-    ets_printf("Switching system clocks can lead to some unreadable characters\n");
-    ets_printf("This message is usually not visible at the console\n");
 
     /* determine configured CPU clock frequency from sdk_conf.h */
     rtc_cpu_freq_t freq;
@@ -230,12 +230,14 @@ static void IRAM system_clk_init (void)
 
     uint32_t freq_before = rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()) / MHZ ;
 
-    /* set configured CPU frequency */
-    rtc_clk_cpu_freq_set(freq);
+    if (freq_before != CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ) {
+        /* set configured CPU frequency */
+        rtc_clk_cpu_freq_set(freq);
 
-    /* Recalculate the ccount to make time calculation correct. */
-    uint32_t freq_after = CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ;
-    XTHAL_SET_CCOUNT( XTHAL_GET_CCOUNT() * freq_after / freq_before );
+        /* Recalculate the ccount to make time calculation correct. */
+        uint32_t freq_after = CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ;
+        XTHAL_SET_CCOUNT( XTHAL_GET_CCOUNT() * freq_after / freq_before );
+    }
 }
 
 extern void IRAM_ATTR thread_yield_isr(void* arg);
@@ -340,7 +342,7 @@ static NORETURN void IRAM system_init (void)
     esp_event_handler_init();
 
     /* starting RIOT */
-    ets_printf("Starting RIOT kernel on PRO cpu\n");
+    printf("Starting RIOT kernel on PRO cpu\n");
     kernel_init();
     UNREACHABLE();
 }
