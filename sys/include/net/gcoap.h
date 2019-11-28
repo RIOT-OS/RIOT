@@ -388,6 +388,9 @@ extern "C" {
  *
  * Accommodates writing Content-Format option in gcoap_finish(). May set to
  * zero if function not used.
+ *
+ * @deprecated  Will not be available after the 2020.07 release. Used only by
+ * gcoap_finish(), which also is deprecated.
  */
 #ifndef GCOAP_REQ_OPTIONS_BUF
 #define GCOAP_REQ_OPTIONS_BUF   (4)
@@ -398,6 +401,9 @@ extern "C" {
  *
  * Accommodates writing Content-Format option in gcoap_finish(). May set to
  * zero if function not used.
+ *
+ * @deprecated  Will not be available after the 2020.07 release. Used only by
+ * gcoap_finish(), which also is deprecated.
  */
 #ifndef GCOAP_RESP_OPTIONS_BUF
 #define GCOAP_RESP_OPTIONS_BUF  (4)
@@ -408,6 +414,9 @@ extern "C" {
  *
  * Accommodates writing Content-Format option in gcoap_finish(). May set to
  * zero if function not used.
+ *
+ * @deprecated  Will not be available after the 2020.07 release. Used only by
+ * gcoap_finish(), which also is deprecated.
  */
 #ifndef GCOAP_OBS_OPTIONS_BUF
 #define GCOAP_OBS_OPTIONS_BUF   (4)
