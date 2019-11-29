@@ -732,6 +732,11 @@ endif
 
 ifneq (,$(filter random,$(USEMODULE)))
   USEMODULE += prng
+
+  ifneq (,$(filter puf_sram,$(FEATURES_PROVIDED)))
+    USEMODULE += puf_sram
+  endif
+
   # select default prng
   ifeq (,$(filter prng_%,$(USEMODULE)))
     USEMODULE += prng_tinymt32
