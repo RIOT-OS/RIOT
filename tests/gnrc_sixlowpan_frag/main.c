@@ -251,7 +251,7 @@ static void _check_pktbuf(const gnrc_sixlowpan_frag_rb_t *entry)
     TEST_ASSERT_MESSAGE(gnrc_pktbuf_is_empty(), "Packet buffer is not empty");
 }
 
-static void test_rbuf_add__success_first_fragment(void)
+static void _rbuf_create_first_fragment(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, _fragment1, sizeof(_fragment1),
                                           GNRC_NETTYPE_SIXLOWPAN);
@@ -265,6 +265,15 @@ static void test_rbuf_add__success_first_fragment(void)
      * fragment 1 (fragment dispatch was removed, IPHC was applied etc.). */
     _test_entry(entry, TEST_FRAGMENT2_OFFSET,
                 TEST_FRAGMENT1_OFFSET, TEST_FRAGMENT2_OFFSET - 1);
+}
+
+static void test_rbuf_add__success_first_fragment(void)
+{
+    const gnrc_sixlowpan_frag_rb_t *entry;
+
+    _rbuf_create_first_fragment();
+    /* get entry to release entry->pkt it in `_check_pktbuf()` */
+    TEST_ASSERT_NOT_NULL((entry = _first_non_empty_rbuf()));
     _check_pktbuf(entry);
 }
 
@@ -531,28 +540,38 @@ static void test_rbuf_add__overlap_rhs(void)
 
 static void test_rbuf_exists(void)
 {
+    const gnrc_sixlowpan_frag_rb_t *entry;
+
     TEST_ASSERT(!gnrc_sixlowpan_frag_rb_exists(&_test_netif_hdr.hdr, TEST_TAG));
     /* add a fragment */
-    test_rbuf_add__success_first_fragment();
+    _rbuf_create_first_fragment();
     TEST_ASSERT(gnrc_sixlowpan_frag_rb_exists(&_test_netif_hdr.hdr, TEST_TAG));
+    /* get entry to release entry->pkt it in `_check_pktbuf()` */
+    entry = _first_non_empty_rbuf();
+    /* entry is however not properly removed yet */
+    TEST_ASSERT_NOT_NULL(entry);
+    _check_pktbuf(entry);
 }
 
 static void test_rbuf_rm_by_dg(void)
 {
     /* add a fragment */
-    test_rbuf_add__success_first_fragment();
+    _rbuf_create_first_fragment();
     gnrc_sixlowpan_frag_rb_rm_by_datagram(&_test_netif_hdr.hdr, TEST_TAG);
     TEST_ASSERT(!gnrc_sixlowpan_frag_rb_exists(&_test_netif_hdr.hdr, TEST_TAG));
+    _check_pktbuf(NULL);
 }
 
 static void test_rbuf_rm(void)
 {
     const gnrc_sixlowpan_frag_rb_t *entry;
 
-    test_rbuf_add__success_first_fragment();
+    _rbuf_create_first_fragment();
     entry = _first_non_empty_rbuf();
     /* entry is however not properly removed yet */
     TEST_ASSERT_NOT_NULL(entry);
+    /* release packet as `gnrc_sixlowpan_frag_rb_remove()` does not do this */
+    gnrc_pktbuf_release(entry->pkt);
     /* intentionally discarding const qualifier since we enter rbuf's internal
      * context again */
     gnrc_sixlowpan_frag_rb_remove((gnrc_sixlowpan_frag_rb_t *)entry);
