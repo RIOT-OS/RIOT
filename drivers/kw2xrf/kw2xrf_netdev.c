@@ -108,6 +108,12 @@ static inline uint32_t kw2xrf_csma_random_delay(kw2xrf_t *dev)
 {
     /* Use topmost csma_be bits of the random number */
     uint32_t rnd = random_uint32() >> (32 - dev->csma_be);
+
+    if(rnd == 0)
+    {
+        rnd = 1; //Wait at least ONE unit time, so timer target doesn't pass
+    }
+
     return (rnd * KW2XRF_CSMA_UNIT_TIME);
 }
 
