@@ -17,6 +17,8 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Francisco Molina <francois-xavier.molina@inria.fr>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @}
  */
 
@@ -480,13 +482,9 @@ static ssize_t _trigger_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
             code = COAP_CODE_REQUEST_ENTITY_TOO_LARGE;
         }
         else {
-            memcpy(_url, pkt->payload, payload_len);
-            _url[payload_len] = '\0';
-
             code = COAP_CODE_CREATED;
-            LOG_INFO("suit: received URL: \"%s\"\n", _url);
-            msg_t m = { .content.value = SUIT_MSG_TRIGGER };
-            msg_send(&m, _suit_coap_pid);
+            LOG_INFO("suit: received URL: \"%s\"\n", (char*)pkt->payload);
+            suit_coap_trigger(pkt->payload, payload_len);
         }
     }
     else {
@@ -495,6 +493,14 @@ static ssize_t _trigger_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 
     return coap_reply_simple(pkt, code, buf, len,
                              COAP_FORMAT_NONE, NULL, 0);
+}
+
+void suit_coap_trigger(const uint8_t *url, size_t len)
+{
+    memcpy(_url, url, len);
+    _url[len] = '\0';
+    msg_t m = { .content.value = SUIT_MSG_TRIGGER };
+    msg_send(&m, _suit_coap_pid);
 }
 
 static const coap_resource_t _subtree[] = {
