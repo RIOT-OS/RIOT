@@ -1,0 +1,24 @@
+From 2cd3bcccd3d60b90847e498d402c81ceb7e41328 Mon Sep 17 00:00:00 2001
+From: Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
+Date: Fri, 29 Nov 2019 20:18:12 +0100
+Subject: [PATCH 1/1] Fix warnings in discover.c
+
+---
+ core/discover.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/core/discover.c b/core/discover.c
+index a4947c7..c877769 100644
+--- a/core/discover.c
++++ b/core/discover.c
+@@ -439,4 +439,5 @@ int discover_serialize(lwm2m_context_t * contextP,
+ 
+     return (int)head;
+ }
+-#endif
+\ No newline at end of file
++#endif
++
+-- 
+2.20.1
+
