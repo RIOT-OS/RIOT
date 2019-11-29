@@ -28,7 +28,6 @@ int netif_get_name(netif_t *iface, char *name)
     gnrc_netif_t *netif = (gnrc_netif_t*) iface;
 
     int res = 0;
-    res += fmt_str(name, "if");
     res += fmt_u16_dec(&name[res], netif->pid);
     name[res] = '\0';
     return res;
