@@ -19,4 +19,10 @@ ifneq (,$(filter prng_fortuna,$(USEMODULE)))
   CFLAGS += -DCRYPTO_AES
 endif
 
+ifneq (,$(filter gcoap,$(USEMODULE)))
+  ifneq (,$(filter sock_dtls,$(USEMODULE)))
+    CFLAGS += -DGCOAP_NO_AUTO_INIT
+  endif
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
