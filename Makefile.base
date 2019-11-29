@@ -55,7 +55,7 @@ ifeq ($(strip $(SRC))$(NO_AUTO_SRC),)
   SRC := $(filter-out $(SRC_NOLTO), $(wildcard *.c))
 endif
 ifeq ($(strip $(SRCXX))$(NO_AUTO_SRC),)
-  SRCXX := $(wildcard *.$(SRCXXEXT))
+  SRCXX := $(filter-out $(SRCXXEXCLUDE),$(wildcard *.$(SRCXXEXT)))
 endif
 ifeq ($(strip $(ASMSRC))$(NO_AUTO_SRC),)
   ASMSRC := $(wildcard *.s)
