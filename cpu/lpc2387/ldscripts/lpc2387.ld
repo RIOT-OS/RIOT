@@ -9,7 +9,7 @@
 /* specify the LPC2387 memory areas (see LPC2387 datasheet page 15)  */
 MEMORY
 {
-    flash (rx)          : ORIGIN = 0,          LENGTH = 504K    /* FLASH ROM 512kByte without ISP bootloader*/
+    rom (rx)            : ORIGIN = 0,          LENGTH = 504K    /* FLASH ROM 512kByte without ISP bootloader*/
     infomem             : ORIGIN = 0x0007D000, LENGTH = 4K      /* Last sector in FLASH ROM for config data */
     ram_battery         : ORIGIN = 0xE0084000, LENGTH = 2K      /* Battery RAM                              */
     ram (w!rx)          : ORIGIN = 0x40000000, LENGTH = 64K     /* LOCAL ON-CHIP STATIC RAM                 */
@@ -34,125 +34,77 @@ SECTIONS
         . = ALIGN(64);
         KEEP(*(.init))
         KEEP(*(.init0))                 /* Start here after reset.  */
-        KEEP(*(.init1))
-        KEEP(*(.init2))                 /* Copy data loop  */
-        KEEP(*(.init3))
-        KEEP(*(.init4))                 /* Clear bss  */
-        KEEP(*(.init5))
-        KEEP(*(.init6))                 /* C++ constructors.  */
-        KEEP(*(.init7))
-        KEEP(*(.init8))
-        KEEP(*(.init9))                 /* Call main().  */
-        *(.text)                        /* all .text sections (code)  */
-        *(.text.*)
-        *(.gnu.linkonce.t.*)
+        *(.text .text.* .gnu.linkonce.t.*)
+        *(.glue_7t) *(.glue_7)
+        *(.rodata .rodata* .gnu.linkonce.r.*)
+        *(.ARM.extab* .gnu.linkonce.armextab.*)
+
+        /* Support C constructors, and C destructors in both user code
+           and the C library. This also provides support for C++ code. */
+        . = ALIGN(4);
+        KEEP(*(.init))
+        . = ALIGN(4);
+        __preinit_array_start = .;
+        KEEP (*(.preinit_array))
+        __preinit_array_end = .;
 
         . = ALIGN(4);
-        __commands_start = .;
-        KEEP(*(.commands))              /* command table */
-        __commands_end = .;
+        __init_array_start = .;
+        KEEP (*(SORT(.init_array.*)))
+        KEEP (*(.init_array))
+        __init_array_end = .;
+
+        . = ALIGN(0x4);
+        KEEP (*crtbegin.o(.ctors))
+        KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
+        KEEP (*(SORT(.ctors.*)))
+        KEEP (*crtend.o(.ctors))
+
         . = ALIGN(4);
-        __cfgspec_start = .;
-        KEEP(*(.cfgspec))               /* configuration spec table */
-        __cfgspec_end = .;
-        . = ALIGN(4);
-
-        __ctors_start = .;
-            PROVIDE(_os_ctor_start = .);
-            KEEP(*(.ctors));
-            KEEP(*(.init_array))
-            PROVIDE(_os_ctor_end = .);
-        __ctors_end = .;
-            KEEP(*(.dtors));
-            LONG (0);
-
-
-        *(.rodata .rodata.*)            /* all .rodata sections (constants, strings, etc.)  */
-        *(.gnu.linkonce.r.*)
-        *(.glue_7)                      /* all .glue_7 sections, see https://gcc.gnu.org/ml/gcc-help/2009-03/msg00306.html */
-        *(.glue_7t)                     /* all .glue_7t sections */
-
-        KEEP(*(.fini9))
-        KEEP(*(.fini8))
-        KEEP(*(.fini7))
-        KEEP(*(.fini6))                     /* C++ destructors.  */
-        KEEP(*(.fini5))
-        KEEP(*(.fini4))
-        KEEP(*(.fini3))
-        KEEP(*(.fini2))
-        KEEP(*(.fini1))
-        KEEP(*(.fini0))                     /* Infinite loop after program termination.  */
         KEEP(*(.fini))
 
-        *(.gcc_except_table)
+        . = ALIGN(4);
+        __fini_array_start = .;
+        KEEP (*(.fini_array))
+        KEEP (*(SORT(.fini_array.*)))
+        __fini_array_end = .;
 
-    } >flash                            /* put all the above into FLASH */
-    . = ALIGN(4);
+        KEEP (*crtbegin.o(.dtors))
+        KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
+        KEEP (*(SORT(.dtors.*)))
+        KEEP (*crtend.o(.dtors))
 
-    /* The .extab, .exidx sections are used for C++ exception handling */
-    .ARM.extab :
-    {
-        *(.ARM.extab* .gnu.linkonce.armextab.*)
-    } > flash
+        . = ALIGN(4);
+        _efixed = .;            /* End of text section */
+    } > rom
 
+    /* .ARM.exidx is sorted, so has to go in its own output section.  */
     PROVIDE_HIDDEN (__exidx_start = .);
     .ARM.exidx :
     {
-        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-    } > flash
+      *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+    } > rom
     PROVIDE_HIDDEN (__exidx_end = .);
 
-    .eh_frame_hdr :
-    {
-        *(.eh_frame_hdr)
-    } > flash
-
-    .eh_frame : ONLY_IF_RO
+    /* exception handling */
+    . = ALIGN(4);
+    .eh_frame :
     {
         KEEP (*(.eh_frame))
-    } > flash
+    } > rom
 
-    .gcc_except_table : ONLY_IF_RO
-    {
-        *(.gcc_except_table .gcc_except_table.*)
-    } > flash
-
-/*
-    .eh_frame       : ONLY_IF_RW { KEEP (*(.eh_frame)) } > sram_u AT > flash
-    .gcc_except_table   : ONLY_IF_RW { *(.gcc_except_table .gcc_except_table.*) } > sram_u AT > flash
-*/
-
-    _etext = . ;                        /* define a global symbol _etext just after the last code byte */
+    . = ALIGN(4);
+    _etext = .;
 
     .config :
     {
         *(.configmem)
         . = ALIGN(256);
     } >infomem
-    . = ALIGN(4);
 
     /**************************************************************************
      * RAM
      **************************************************************************/
-
-
-    .ctors (NOLOAD) :
-    {
-        . = ALIGN(4096);
-        start_ctors = .;
-        *(.init_array);
-        *(.ctors);
-        end_ctors = .;
-    } >ram
-
-    .dtors (NOLOAD) :
-    {
-        . = ALIGN(4096);
-        start_dtors = .;
-        *(.fini_array);
-        *(.dtors);
-        end_dtors = .;
-    } >ram
 
     /*
      * collect all zero initialized sections that go into RAM
@@ -196,7 +148,7 @@ SECTIONS
         KEEP(*(SORT(.fini_array.*)))
             KEEP(*(.fini_array))
             PROVIDE_HIDDEN (__fini_array_end = .);
-    } >ram AT > flash                   /* put all the above into RAM (but load the LMA copy into FLASH) */
+    } >ram AT > rom                     /* put all the above into RAM (but load the LMA copy into FLASH) */
     . = ALIGN(4);                       /* ensure data is aligned so relocation can use 4-byte operations */
     _edata = .;                         /* define a global symbol marking the end of the .data section  */
 
@@ -212,24 +164,6 @@ SECTIONS
     }  > ram
     . = ALIGN(4);
     __noinit_end = .;
-
-    /*
-     * Exception frames (newer linker versions generate these but they use of
-     * most of the RAM.
-     */
-    /DISCARD/ :                         /* discard exception frames */
-    {
-        *(.eh_*)
-    }
-
-    /* to enable exception frames */
-    /*
-    .eh_frame :
-    {
-         KEEP (*(.eh_frame))
-    } > ram
-    . = ALIGN(4);
-    */
 
     _end = .;                           /* define a global symbol marking the end of application RAM */
 
@@ -302,5 +236,5 @@ SECTIONS
         _ebackup_data = .;
         /* Round size so that we can use 4 byte copy in init */
         . = ALIGN(4);
-    } > ram_battery AT> flash
+    } > ram_battery AT> rom
 }

@@ -98,32 +98,6 @@ reset_handler:
                 msr   CPSR_c, #MODE_SYS|I_BIT|F_BIT     /* User Mode */
                 ldr   sp, =__stack_usr_start
 
-.section .init2                         /* copy .data section (Copy from ROM to RAM) */
-.extern _etext
-.extern _data
-.extern _edata
-/*
-                ldr     R1, =_etext
-                ldr     R2, =_data
-                ldr     R3, =_edata
-LoopRel:        cmp     R2, R3
-                ldrlo   R0, [R1], #4
-                strlo   R0, [R2], #4
-                blo     LoopRel
-*/
-.section .init4                         /* Clear .bss section (Zero init)  */
-.extern __bss_start
-.extern __bss_end
-/*
-                mov     R0, #0
-                ldr     R1, =__bss_start
-                ldr     R2, =__bss_end
-LoopZI:         cmp     R1, R2
-                strlo   R0, [R1], #4
-                blo     LoopZI
-*/
-                /* Enter the C code  */
-.section .init9
                 bl  bootloader
                 b   kernel_init
 
