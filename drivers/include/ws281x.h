@@ -21,7 +21,7 @@
  *
  * The protocol to communicate with the WS281x is custom, so no hardware
  * implementations can be used. Hence, the protocol needs to be bit banged in
- * software. As the timing requirements are to strict to do this using
+ * software. As the timing requirements are too strict to do this using
  * the platform independent APIs for accessing @ref drivers_periph_gpio and
  * @ref sys_xtimer, platform specific implementations of @ref ws281x_write are
  * needed.
@@ -30,7 +30,7 @@
  *
  * A bit banging implementation for ATmegas clocked at 8MHz and at 16MHz is
  * provided. Boards clocked at any other core frequency are not supported.
- * (But keep in mind that most (all?) ATmega MCUs do have an internal 8 MHz
+ * (But keep in mind that most (all?) ATmega MCUs do have an internal 8MHz
  * oscillator, that could be enabled by changing the fuse settings.)
  *
  * @warning On 8MHz ATmegas, only pins at GPIO ports B, C, and D are supported.
