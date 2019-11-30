@@ -59,6 +59,7 @@
 
 #include "color.h"
 #include "periph/gpio.h"
+#include "ws281x_backend.h"
 #include "ws281x_constants.h"
 #include "xtimer.h"
 
@@ -92,6 +93,7 @@ typedef struct {
     ws281x_params_t params;   /**< Parameters of the LED chain */
 } ws281x_t;
 
+#if defined(WS281X_HAVE_INIT) || defined(DOXYGEN)
 /**
  * @brief   Initialize an WS281x RGB LED chain
  *
@@ -103,6 +105,12 @@ typedef struct {
  * @retval  -EIO    Failed to initialize the data GPIO pin
  */
 int ws281x_init(ws281x_t *dev, const ws281x_params_t *params);
+#else
+static inline int ws281x_init(ws281x_t *dev, const ws281x_params_t *params) {
+    dev->params = *params;
+    return 0;
+}
+#endif
 
 /**
  * @brief   Writes the color data of the user supplied buffer

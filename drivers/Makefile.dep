@@ -693,11 +693,6 @@ ifneq (,$(filter ws281x,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter ws281x_vt100,$(USEMODULE)))
-  CFLAGS += -DWS281X_HAVE_PREPARE_TRANSMISSION
-  CFLAGS += -DWS281X_HAVE_END_TRANSMISSION
-endif
-
 ifneq (,$(filter xbee,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
   FEATURES_REQUIRED += periph_gpio
