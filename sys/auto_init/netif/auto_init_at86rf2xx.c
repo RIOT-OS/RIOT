@@ -31,7 +31,7 @@
 #include "net/gnrc.h"
 
 #include "at86rf2xx.h"
-#include "at86rf2xx_params.h"
+#include "at86rf2xx_devs.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
@@ -42,33 +42,35 @@
 #define AT86RF2XX_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
 
-#define AT86RF2XX_NUM ARRAY_SIZE(at86rf2xx_params)
+at86rf2xx_devs_t at86rf2xx_devs;
 
-static at86rf2xx_t at86rf2xx_devs[AT86RF2XX_NUM];
 static char _at86rf2xx_stacks[AT86RF2XX_NUM][AT86RF2XX_MAC_STACKSIZE];
 
 void auto_init_at86rf2xx(void)
 {
+    at86rf2xx_setup_devs(&at86rf2xx_devs);
+    uint8_t *dev = at86rf2xx_devs.mem_devs;
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
         LOG_DEBUG("[auto_init_netif] initializing at86rf2xx #%u\n", i);
-
-        at86rf2xx_setup(&at86rf2xx_devs[i], &at86rf2xx_params[i]);
+        at86rf2xx_t *at86rf2xx_dev = (at86rf2xx_t *)dev;
 #if defined(MODULE_GNRC_GOMACH)
         gnrc_netif_gomach_create(_at86rf2xx_stacks[i],
                                  AT86RF2XX_MAC_STACKSIZE,
                                  AT86RF2XX_MAC_PRIO, "at86rf2xx-gomach",
-                                 (netdev_t *)&at86rf2xx_devs[i]);
+                                 (netdev_t *)(&(at86rf2xx_dev->base.netdev)));
 #elif defined(MODULE_GNRC_LWMAC)
         gnrc_netif_lwmac_create(_at86rf2xx_stacks[i],
                                 AT86RF2XX_MAC_STACKSIZE,
                                 AT86RF2XX_MAC_PRIO, "at86rf2xx-lwmac",
-                                (netdev_t *)&at86rf2xx_devs[i]);
+                                (netdev_t *)(&(at86rf2xx_dev->base.netdev)));
 #else
         gnrc_netif_ieee802154_create(_at86rf2xx_stacks[i],
                                      AT86RF2XX_MAC_STACKSIZE,
                                      AT86RF2XX_MAC_PRIO, "at86rf2xx",
-                                     (netdev_t *)&at86rf2xx_devs[i]);
+                                     (netdev_t *)(&(at86rf2xx_dev->base.netdev)));
+
 #endif
+        dev += at86rf2xx_get_size((at86rf2xx_t *)dev);
     }
 }
 #else

@@ -24,6 +24,30 @@ ifneq (,$(filter at24mac,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at24mac/include
 endif
 
+ifneq (,$(filter at86rf212b,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at86rf2xx/at86rf212b/include
+endif
+
+ifneq (,$(filter at86rf231,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at86rf2xx/at86rf231/include
+endif
+
+ifneq (,$(filter at86rf232,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at86rf2xx/at86rf232/include
+endif
+
+ifneq (,$(filter at86rf233,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at86rf2xx/at86rf233/include
+endif
+
+ifneq (,$(filter at86rfa1,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at86rf2xx/at86rfa1/include
+endif
+
+ifneq (,$(filter at86rfr2,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at86rf2xx/at86rfr2/include
+endif
+
 ifneq (,$(filter at86rf2xx,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at86rf2xx/include
 endif

@@ -101,6 +101,8 @@ NO_PSEUDOMODULES += suit_v4
 PSEUDOMODULES += od_string
 
 # include variants of the AT86RF2xx drivers as pseudo modules
+PSEUDOMODULES += at86rf2xx_spi
+PSEUDOMODULES += at86rf2xx_periph
 PSEUDOMODULES += at86rf23%
 PSEUDOMODULES += at86rf21%
 PSEUDOMODULES += at86rfa1

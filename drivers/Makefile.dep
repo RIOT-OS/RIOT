@@ -54,11 +54,15 @@ ifneq (,$(filter at86rf%,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
 
-  # only needed for SPI based variants
-  ifeq (,$(filter at86rfa1 at86rfr2,$(USEMODULE)))
+# only needed for SPI based variants
+  ifneq (,$(filter at86rf212b at86rf231 at86rf232 at86rf233,$(USEMODULE)))
     FEATURES_REQUIRED += periph_gpio
     FEATURES_REQUIRED += periph_gpio_irq
     FEATURES_REQUIRED += periph_spi
+    USEMODULE += at86rf2xx_spi
+  endif
+  ifneq (,$(filter at86rfa1 at86rfr2,$(USEMODULE)))
+    USEMODULE += at86rf2xx_periph
   endif
 endif
 
