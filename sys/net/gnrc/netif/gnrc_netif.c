@@ -83,6 +83,7 @@ bool gnrc_netif_dev_is_6lo(const gnrc_netif_t *netif)
 #endif
         case NETDEV_TYPE_IEEE802154:
         case NETDEV_TYPE_CC110X:
+        case NETDEV_TYPE_NRF24L01P:
         case NETDEV_TYPE_BLE:
         case NETDEV_TYPE_NRFMIN:
         case NETDEV_TYPE_ESP_NOW:
@@ -196,8 +197,8 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 
                 res = 0;
                 for (unsigned i = 0;
-                     (res < (int)opt->data_len) && (i < GNRC_NETIF_IPV6_GROUPS_NUMOF);
-                     i++) {
+                    (res < (int)opt->data_len) && (i < GNRC_NETIF_IPV6_GROUPS_NUMOF);
+                    i++) {
                     if (!ipv6_addr_is_unspecified(&netif->ipv6.groups[i])) {
                         memcpy(tgt, &netif->ipv6.groups[i], sizeof(ipv6_addr_t));
                         res += sizeof(ipv6_addr_t);
@@ -268,11 +269,11 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                 assert(opt->data_len == sizeof(ipv6_addr_t));
                 /* always assume manually added */
                 uint8_t flags = ((((uint8_t)opt->context & 0xff) &
-                                  ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK) |
-                                 GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
+                                ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK) |
+                                GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
                 uint8_t pfx_len = (uint8_t)(opt->context >> 8U);
                 /* acquire locks a recursive mutex so we are safe calling this
-                 * public function */
+                * public function */
                 res = gnrc_netif_ipv6_addr_add_internal(netif, opt->data,
                                                         pfx_len, flags);
                 if (res >= 0) {
@@ -1302,6 +1303,13 @@ static void _test_options(gnrc_netif_t *netif)
         case NETDEV_TYPE_CC110X:
             assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
             assert(1U == netif->l2addr_len);
+#ifdef MODULE_GNRC_IPV6
+            assert(netif->ipv6.mtu < UINT16_MAX);
+#endif  /* MODULE_GNRC_IPV6 */
+            break;
+        case NETDEV_TYPE_NRF24L01P:
+            assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
+            assert(netif->l2addr_len <= 5U);
 #ifdef MODULE_GNRC_IPV6
             assert(netif->ipv6.mtu < UINT16_MAX);
 #endif  /* MODULE_GNRC_IPV6 */

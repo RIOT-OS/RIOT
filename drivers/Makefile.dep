@@ -520,10 +520,19 @@ ifneq (,$(filter nrfmin,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nrf24l01p,$(USEMODULE)))
+  USEMODULE += luid
+  USEMODULE += netif
+  USEMODULE += xtimer
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
-  USEMODULE += xtimer
+  ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan
+  endif
+endif
+
+ifneq (,$(filter nrf24l01p_advanced,$(USEMODULE)))
+  USEMODULE += nrf24l01p
 endif
 
 ifneq (,$(filter nvram_spi,$(USEMODULE)))

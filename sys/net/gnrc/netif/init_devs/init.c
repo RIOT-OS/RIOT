@@ -139,6 +139,11 @@ void gnrc_netif_init_devs(void)
         gnrc_nordic_ble_6lowpan_init();
     }
 
+    if (IS_USED(MODULE_NRF24L01P)) {
+        extern void auto_init_nrf24l01p(void);
+        auto_init_nrf24l01p();
+    }
+
     if (IS_USED(MODULE_NRFMIN)) {
         extern void gnrc_nrfmin_init(void);
         gnrc_nrfmin_init();

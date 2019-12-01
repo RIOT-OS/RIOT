@@ -36,6 +36,25 @@ static void _create_eui64_from_short(const uint8_t *addr, size_t addr_len,
 }
 #endif /* defined(MODULE_CC110X) || defined(MODULE_NRFMIN) */
 
+#if defined(MODULE_NRF24L01P)
+/* create EUI64 from l2-addr with 1 Byte to 5 Byte length*/
+static void _create_eui64_from_flexible(const uint8_t *addr, size_t addr_len,
+                                        eui64_t *eui64)
+{
+    memset(eui64->uint8, 0, sizeof(eui64->uint8));
+    eui64->uint8[3] = 0xff;
+    eui64->uint8[4] = 0xfe;
+    eui64->uint8[0] = ((uint8_t)addr_len) << 5; /* encode length */
+    if (addr_len > 3) {
+        memcpy(&eui64->uint8[1 + (5 - addr_len)],
+               addr, addr_len - 3);
+        addr += (addr_len - 3);
+        addr_len -= (addr_len - 3);
+    }
+    memcpy(&eui64->uint8[5 + (3 - addr_len)], addr, addr_len);
+}
+#endif /* defined(MODULE_NRF24L01P) */
+
 int l2util_eui64_from_addr(int dev_type, const uint8_t *addr, size_t addr_len,
                            eui64_t *eui64)
 {
@@ -76,6 +95,14 @@ int l2util_eui64_from_addr(int dev_type, const uint8_t *addr, size_t addr_len,
                 return -EINVAL;
             }
 #endif  /* defined(MODULE_CC110X) || defined(MODULE_NRFMIN) */
+#if defined(MODULE_NRF24L01P)
+        case NETDEV_TYPE_NRF24L01P:
+            if (addr_len >= 3 && addr_len <= 5) {
+                _create_eui64_from_flexible(addr, addr_len, eui64);
+                return sizeof(eui64_t);
+            }
+            return -EINVAL;
+#endif /* defined(MODULE_NRF24L01P) */
         default:
             (void)addr;
             (void)addr_len;
@@ -104,6 +131,14 @@ int l2util_ipv6_iid_from_addr(int dev_type,
                 return -EINVAL;
             }
 #endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
+#if defined(MODULE_NRF24L01P)
+        case NETDEV_TYPE_NRF24L01P:
+            if (addr_len >= 3 && addr_len <= 5) {
+                _create_eui64_from_flexible(addr, addr_len, iid);
+                return sizeof(eui64_t);
+            }
+            return -EINVAL;
+#endif /* #if defined(MODULE_NRF24L01P) */
 #if defined(MODULE_CC110X) || defined(MODULE_NRFMIN)
         case NETDEV_TYPE_CC110X:
         case NETDEV_TYPE_NRFMIN:
@@ -162,6 +197,16 @@ int l2util_ipv6_iid_to_addr(int dev_type, const eui64_t *iid, uint8_t *addr)
             addr[0] ^= 0x02;
             return sizeof(eui64_t);
 #endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
+#if defined (MODULE_NRF24L01P)
+        case NETDEV_TYPE_NRF24L01P:
+            memset(addr, 0, sizeof(eui64_t));
+            uint8_t addr_len = iid->uint8[0] >> 5;
+            if (addr_len > 3) {
+                memcpy(addr, &iid->uint8[1 + (5 - addr_len)], addr_len - 3);
+            }
+            memcpy(&addr[addr_len - 3], &iid->uint8[5], 3);
+            return addr_len;
+#endif /* defined (MODULE_NRF24L01P) */
 #ifdef MODULE_NRFMIN
         case NETDEV_TYPE_NRFMIN:
             addr[0] = iid->uint8[6];
@@ -195,6 +240,11 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
             (void)opt;
             return sizeof(uint8_t);
 #endif  /* MODULE_CC110X */
+#ifdef MODULE_NRF24L01P
+        case NETDEV_TYPE_NRF24L01P:
+            (void)opt;
+            return 5; /* maximum length */
+#endif /* MODULE_NRF24L01P */
 #if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) || \
     defined(MODULE_NORDIC_SOFTDEVICE_BLE) || defined(MODULE_NIMBLE_NETIF)
         case NETDEV_TYPE_ETHERNET:

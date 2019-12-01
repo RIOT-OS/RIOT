@@ -1,943 +1,522 @@
 /*
- * Copyright (C) 2014 Hamburg University of Applied Sciences
+ * Copyright (C) 2019 Otto-von-Guericke-Universität Magdeburg
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
 /**
- * @ingroup     drivers_nrf24l01p
+ * @ingroup drivers_nrf24l01p
  * @{
- * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
- * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
- * @author      Marc Poulhiès <dkm@kataplop.net>
+ *
+ * @file
+ * @brief   Implementation of the public NRF24L01P device interface
+ *
+ * @author Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author Fabian Hüßler <fabian.huessler@ovgu.de>
  * @}
  */
-#include "nrf24l01p.h"
-#include "nrf24l01p_settings.h"
-#include "mutex.h"
-#include "periph/gpio.h"
-#include "periph/spi.h"
-#include "xtimer.h"
-#include "thread.h"
-#include "msg.h"
 
+#include <errno.h>
+#include <string.h>
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define DELAY_CS_TOGGLE_TICKS       (xtimer_ticks_from_usec(DELAY_CS_TOGGLE_US))
-#define DELAY_AFTER_FUNC_TICKS      (xtimer_ticks_from_usec(DELAY_AFTER_FUNC_US))
-#define DELAY_CHANGE_TXRX_TICKS     (xtimer_ticks_from_usec(DELAY_CHANGE_TXRX_US))
+#include "nrf24l01p_netdev.h"
+#include "nrf24l01p_constants.h"
+#include "nrf24l01p_channels.h"
+#include "nrf24l01p_communication.h"
+#include "nrf24l01p_registers.h"
+#include "nrf24l01p_states.h"
+#include "nrf24l01p_internal.h"
+#include "nrf24l01p_custom_header.h"
+#include "nrf24l01p_diagnostics.h"
 
-#define SPI_MODE            SPI_MODE_0
-#define SPI_CLK             SPI_CLK_400KHZ
+/**
+ * @brief   Struct that holds certain register addresses for any pipe
+ */
+typedef struct {
+    uint8_t reg_pipe_addr;  /**< Register that holds the rx address */
+    uint8_t reg_pipe_plw;   /**< Register that holds the expected payload width */
+} nrf24l01p_pipe_regs_t;
 
-int nrf24l01p_read_reg(const nrf24l01p_t *dev, char reg, char *answer)
+/**
+ * @brief   Table that maps data pipe indices to corresponding pipe
+ *          register addresses
+ */
+static const nrf24l01p_pipe_regs_t reg_pipe_info[NRF24L01P_PX_NUM_OF] = {
+    {
+        .reg_pipe_addr = NRF24L01P_REG_RX_ADDR_P0,
+        .reg_pipe_plw = NRF24L01P_REG_RX_PW_P0
+    },
+    {
+        .reg_pipe_addr = NRF24L01P_REG_RX_ADDR_P1,
+        .reg_pipe_plw = NRF24L01P_REG_RX_PW_P1
+    },
+    {
+        .reg_pipe_addr = NRF24L01P_REG_RX_ADDR_P2,
+        .reg_pipe_plw = NRF24L01P_REG_RX_PW_P2
+    },
+    {
+        .reg_pipe_addr = NRF24L01P_REG_RX_ADDR_P3,
+        .reg_pipe_plw = NRF24L01P_REG_RX_PW_P3
+    },
+    {
+        .reg_pipe_addr = NRF24L01P_REG_RX_ADDR_P4,
+        .reg_pipe_plw = NRF24L01P_REG_RX_PW_P4
+    },
+    {
+        .reg_pipe_addr = NRF24L01P_REG_RX_ADDR_P5,
+        .reg_pipe_plw = NRF24L01P_REG_RX_PW_P5
+    }
+};
+
+static int nrf24l01p_set_payload_width(nrf24l01p_t *dev, uint8_t width,
+                                       nrf24l01p_pipe_t pipe)
 {
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    *answer = (char)spi_transfer_reg(dev->spi, dev->cs,
-                                     (CMD_R_REGISTER | (REGISTER_MASK & reg)),
-                                     CMD_NOOP);
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-    return 0;
-}
-
-int nrf24l01p_write_reg(const nrf24l01p_t *dev, char reg, char write)
-{
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    spi_transfer_reg(dev->spi, dev->cs,
-                     (CMD_W_REGISTER | (REGISTER_MASK & reg)), (uint8_t)write);
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-    return 0;
-}
-
-
-int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq)
-{
-    int status;
-    static const char INITIAL_TX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
-    static const char INITIAL_RX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
-
-    dev->spi = spi;
-    dev->ce = ce;
-    dev->cs = cs;
-    dev->irq = irq;
-    dev->listener = KERNEL_PID_UNDEF;
-
-    /* Init CE pin */
-    gpio_init(dev->ce, GPIO_OUT);
-
-    /* Init CS pin */
-    spi_init_cs(dev->spi, dev->cs);
-
-    /* Init IRQ pin */
-    gpio_init_int(dev->irq, GPIO_IN_PU, GPIO_FALLING, nrf24l01p_rx_cb, dev);
-
-    /* Test the SPI connection */
-    if (spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK) != SPI_OK) {
-        DEBUG("error: unable to acquire SPI bus with given params\n");
-        return -1;
-    }
-    spi_release(dev->spi);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-
-    /* Flush TX FIFIO */
-    status = nrf24l01p_flush_tx_fifo(dev);
-
-    if (status < 0) {
-        return status;
-    }
-
-    /* Flush RX FIFIO */
-    status = nrf24l01p_flush_rx_fifo(dev);
-
-    if (status < 0) {
-        return status;
-    }
-
-    /* Setup address width */
-    status = nrf24l01p_set_address_width(dev, NRF24L01P_AW_5BYTE);
-
-    if (status < 0) {
-        return status;
-    }
-
-    /* Setup payload width */
-    status = nrf24l01p_set_payload_width(dev, NRF24L01P_PIPE0, NRF24L01P_MAX_DATA_LENGTH);
-
-    if (status < 0) {
-        return status;
-    }
-
-    /* Set RF channel */
-    status = nrf24l01p_set_channel(dev, INITIAL_RF_CHANNEL);
-
-    if (status < 0) {
-        return status;
-    }
-
-    /* Set RF power */
-    status = nrf24l01p_set_power(dev, INITIAL_RX_POWER_0dB);
-
-    if (status < 0) {
-        return status;
-    }
-
-    /* Set RF datarate */
-    status = nrf24l01p_set_datarate(dev, NRF24L01P_DR_250KBS);
-
-    if (status < 0) {
-        return status;
-    }
-
-    /* Set TX Address */
-    status = nrf24l01p_set_tx_address(dev, INITIAL_TX_ADDRESS, INITIAL_ADDRESS_WIDTH);
-
-    if (status < 0) {
-        return status;
-    }
-
-    /* Set RX Address */
-    status = nrf24l01p_set_rx_address(dev, NRF24L01P_PIPE0, INITIAL_RX_ADDRESS, INITIAL_ADDRESS_WIDTH);
-
-    if (status < 0) {
-        return status;
-    }
-
-    /* Reset auto ack for all pipes */
-    status = nrf24l01p_disable_all_auto_ack(dev);
-
-    if (status < 0) {
-        return status;
-    }
-
-    /* Setup Auto ACK and retransmission */
-    status = nrf24l01p_setup_auto_ack(dev, NRF24L01P_PIPE0, NRF24L01P_RETR_750US, 15);
-
-    if (status < 0) {
-        return status;
-    }
-
-    /* Setup CRC */
-    status = nrf24l01p_enable_crc(dev, NRF24L01P_CRC_2BYTE);
-
-    if (status < 0) {
-        return status;
-    }
-
-    /* Reset all interrupt flags */
-    status = nrf24l01p_reset_all_interrupts(dev);
-
-    if (status < 0) {
-        return status;
-    }
-
-    return nrf24l01p_on(dev);
-}
-
-int nrf24l01p_on(const nrf24l01p_t *dev)
-{
-    char read;
-    int status;
-
-    nrf24l01p_read_reg(dev, REG_CONFIG, &read);
-    status = nrf24l01p_write_reg(dev, REG_CONFIG, (read | PWR_UP));
-
-    xtimer_usleep(DELAY_CHANGE_PWR_MODE_US);
-
-    return status;
-}
-
-int nrf24l01p_off(const nrf24l01p_t *dev)
-{
-    char read;
-    int status;
-
-    nrf24l01p_read_reg(dev, REG_CONFIG, &read);
-    status = nrf24l01p_write_reg(dev, REG_CONFIG, (read & ~PWR_UP));
-
-    xtimer_usleep(DELAY_CHANGE_PWR_MODE_US);
-
-    return status;
-}
-
-void nrf24l01p_transmit(const nrf24l01p_t *dev)
-{
-    gpio_set(dev->ce);
-    xtimer_usleep(DELAY_CE_HIGH_US); /* at least 10 us high */
-    gpio_clear(dev->ce);
-
-    xtimer_spin(DELAY_CHANGE_TXRX_TICKS);
-}
-
-int nrf24l01p_read_payload(const nrf24l01p_t *dev, char *answer, unsigned int size)
-{
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    spi_transfer_regs(dev->spi, dev->cs, CMD_R_RX_PAYLOAD, NULL, answer, size);
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
-
-    return 0;
-}
-
-void nrf24l01p_register(nrf24l01p_t *dev, unsigned int *pid)
-{
-    dev->listener = *pid;
-}
-
-int nrf24l01p_unregister(nrf24l01p_t *dev, unsigned int pid)
-{
-    if (dev != NULL && dev->listener == pid) {
-        dev->listener = 0;
+    assert(dev);
+    if (dev->params.config.cfg_protocol == NRF24L01P_PROTOCOL_ESB) {
         return 0;
     }
+    if (pipe >= NRF24L01P_PX_NUM_OF) {
+        return -ERANGE;
+    }
+    if (!width || width > NRF24L01P_MAX_PAYLOAD_WIDTH) {
+        return -EINVAL;
+    }
+    switch (dev->state) {
+        case NRF24L01P_STATE_POWER_DOWN:
+        case NRF24L01P_STATE_STANDBY_1:
+        case NRF24L01P_STATE_RX_MODE:
+            break;
+        default:
+            return -EAGAIN;
+    }
+    nrf24l01p_reg8_rx_pw_px_t rx_pw_px = NRF24L01P_FLG_RX_PW_PX(width);
+    nrf24l01p_acquire(dev);
+    nrf24l01p_write_reg(dev, reg_pipe_info[pipe].reg_pipe_plw, &rx_pw_px, 1);
+    nrf24l01p_release(dev);
+    if (pipe == NRF24L01P_P0) {
+        dev->params.config.cfg_plw_padd_p0 = NRF24L01P_MAX_PAYLOAD_WIDTH -
+                                             width;
+    }
+    else if (pipe == NRF24L01P_P1) {
+        dev->params.config.cfg_plw_padd_p1 = NRF24L01P_MAX_PAYLOAD_WIDTH -
+                                             width;
+    }
+    else if (pipe == NRF24L01P_P2) {
+        dev->params.config.cfg_plw_padd_p2 = NRF24L01P_MAX_PAYLOAD_WIDTH -
+                                             width;
+    }
+    else if (pipe == NRF24L01P_P3) {
+        dev->params.config.cfg_plw_padd_p3 = NRF24L01P_MAX_PAYLOAD_WIDTH -
+                                             width;
+    }
+    else if (pipe == NRF24L01P_P4) {
+        dev->params.config.cfg_plw_padd_p4 = NRF24L01P_MAX_PAYLOAD_WIDTH -
+                                             width;
+    }
+    else if (pipe == NRF24L01P_P5) {
+        dev->params.config.cfg_plw_padd_p5 = NRF24L01P_MAX_PAYLOAD_WIDTH -
+                                             width;
+    }
+    return 0;
+}
+
+static int nrf24l01p_get_payload_width(const nrf24l01p_t *dev,
+                                       nrf24l01p_pipe_t pipe)
+{
+    assert(dev);
+    if (dev->params.config.cfg_protocol == NRF24L01P_PROTOCOL_ESB) {
+        return NRF24L01P_MAX_PAYLOAD_WIDTH;
+    }
+    else if (pipe == NRF24L01P_P0) {
+        return NRF24L01P_MAX_PAYLOAD_WIDTH - dev->params.config.cfg_plw_padd_p0;
+    }
+    else if (pipe == NRF24L01P_P1) {
+        return NRF24L01P_MAX_PAYLOAD_WIDTH - dev->params.config.cfg_plw_padd_p1;
+    }
+    else if (pipe == NRF24L01P_P2) {
+        return NRF24L01P_MAX_PAYLOAD_WIDTH - dev->params.config.cfg_plw_padd_p2;
+    }
+    else if (pipe == NRF24L01P_P3) {
+        return NRF24L01P_MAX_PAYLOAD_WIDTH - dev->params.config.cfg_plw_padd_p3;
+    }
+    else if (pipe == NRF24L01P_P4) {
+        return NRF24L01P_MAX_PAYLOAD_WIDTH - dev->params.config.cfg_plw_padd_p4;
+    }
+    else if (pipe == NRF24L01P_P5) {
+        return NRF24L01P_MAX_PAYLOAD_WIDTH - dev->params.config.cfg_plw_padd_p5;
+    }
+    return -ERANGE;
+}
+
+int nrf24l01p_setup(nrf24l01p_t *dev, const nrf24l01p_params_t *params)
+{
+    assert(dev);
+    assert(params);
+    if (params->config.cfg_protocol == NRF24L01P_PROTOCOL_SB) {
+        if (params->config.cfg_max_retr != 0) {
+            return -ENOTSUP;
+        }
+    }
+    /* Zero out everything but RIOT's driver interface, which should be
+     * managed by RIOT
+     */
+    memset((char *)dev + sizeof(netdev_t), 0x00,
+           sizeof(nrf24l01p_t) - sizeof(netdev_t));
+    dev->state = NRF24L01P_STATE_UNDEFINED;
+    dev->idle_state = NRF24L01P_STATE_RX_MODE;
+#ifndef NDEBUG
+    dev->transitions = NRF24L01P_TRANSITIONS_FROM_UNDEFINED;
+#endif
+    dev->params = *params;
+    dev->netdev.driver = &nrf24l01p_driver;
+    nrf24l01p_power_on(dev);
+    return 0;
+}
+
+int nrf24l01p_set_air_data_rate(nrf24l01p_t *dev, nrf24l01p_rfdr_t data_rate)
+{
+    assert(dev);
+    if (data_rate >= NRF24L01P_RF_DR_NUM_OF) {
+        return -EINVAL;
+    }
+    switch (dev->state) {
+        case NRF24L01P_STATE_POWER_DOWN:
+        case NRF24L01P_STATE_STANDBY_1:
+        case NRF24L01P_STATE_RX_MODE:
+            break;
+        default:
+            return -EAGAIN;
+    }
+    nrf24l01p_reg8_rf_setup_t rf_setup = NRF24L01P_FLG_RF_DR(data_rate);
+    nrf24l01p_acquire(dev);
+    nrf24l01p_reg8_mod(dev, NRF24L01P_REG_RF_SETUP, NRF24L01P_MSK_RF_DR,
+                       &rf_setup);
+    nrf24l01p_release(dev);
+    dev->params.config.cfg_data_rate = data_rate;
+    return 0;
+}
+
+uint16_t nrf24l01p_get_air_data_rate(const nrf24l01p_t *dev,
+                                     nrf24l01p_rfdr_t *data_rate)
+{
+    assert(dev);
+    if (data_rate) {
+        *data_rate = dev->params.config.cfg_data_rate;
+    }
+    return nrf24l01p_etoval_rfdr(dev->params.config.cfg_data_rate);
+}
+
+int nrf24l01p_set_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc)
+{
+    assert(dev);
+    if (crc >= NRF24L01P_CRC_NUM_OF) {
+        return -EINVAL;
+    }
+    if (dev->params.config.cfg_protocol == NRF24L01P_PROTOCOL_ESB) {
+        if (crc == NRF24L01P_CRC_0BYTE) {
+            return -ENOTSUP;
+        }
+    }
+    switch (dev->state) {
+        case NRF24L01P_STATE_POWER_DOWN:
+        case NRF24L01P_STATE_STANDBY_1:
+        case NRF24L01P_STATE_RX_MODE:
+            break;
+        default:
+            return -EAGAIN;
+    }
+    nrf24l01p_reg8_config_t config =
+        (((crc & 2) ? NRF24L01P_FLG_EN_CRC : 0) |
+         ((crc & 1) ? NRF24L01P_FLG_CRCO_2_BYTE : NRF24L01P_FLG_CRCO_1_BYTE));
+    nrf24l01p_acquire(dev);
+    nrf24l01p_reg8_mod(dev, NRF24L01P_REG_CONFIG, NRF24L01P_MSK_CRC,
+                       &config);
+    nrf24l01p_release(dev);
+    dev->params.config.cfg_crc = crc;
+    return 0;
+}
+
+uint8_t nrf24l01p_get_crc(const nrf24l01p_t *dev, nrf24l01p_crc_t *crc)
+{
+    assert(dev);
+    if (crc) {
+        *crc = dev->params.config.cfg_crc;
+    }
+    return nrf24l01p_etoval_crc(dev->params.config.cfg_crc);
+}
+
+int nrf24l01p_set_tx_power(nrf24l01p_t *dev, nrf24l01p_tx_power_t power)
+{
+    assert(dev);
+    if (power >= NRF24L01P_TX_POWER_NUM_OF) {
+        return -EINVAL;
+    }
+    switch (dev->state) {
+        case NRF24L01P_STATE_POWER_DOWN:
+        case NRF24L01P_STATE_STANDBY_1:
+        case NRF24L01P_STATE_RX_MODE:
+            break;
+        default:
+            return -EAGAIN;
+    }
+    nrf24l01p_reg8_rf_setup_t rf_setup = NRF24L01P_FLG_RF_PWR(power);
+    nrf24l01p_acquire(dev);
+    nrf24l01p_reg8_mod(dev, NRF24L01P_REG_RF_SETUP, NRF24L01P_MSK_RF_PWR,
+                       &rf_setup);
+    nrf24l01p_release(dev);
+    dev->params.config.cfg_tx_power = power;
+    return 0;
+}
+
+int8_t nrf24l01p_get_tx_power(const nrf24l01p_t *dev, nrf24l01p_tx_power_t *power)
+{
+    assert(dev);
+    if (power) {
+        *power = dev->params.config.cfg_tx_power;
+    }
+    return nrf24l01p_etoval_tx_power(dev->params.config.cfg_tx_power);
+}
+
+int nrf24l01p_set_channel(nrf24l01p_t *dev, uint8_t channel)
+{
+    assert(dev);
+    if (channel >= NRF24L01P_NUM_CHANNELS) {
+        return -EINVAL;
+    }
+    switch (dev->state) {
+        case NRF24L01P_STATE_POWER_DOWN:
+        case NRF24L01P_STATE_STANDBY_1:
+        case NRF24L01P_STATE_RX_MODE:
+            break;
+        default:
+            return -EAGAIN;
+    }
+    nrf24l01p_reg8_rf_ch_t rf_ch = NRF24L01P_FLG_RF_CH(vchanmap[channel]);
+    nrf24l01p_acquire(dev);
+    nrf24l01p_reg8_mod(dev, NRF24L01P_REG_RF_CH, NRF24L01P_MSK_RF_CH,
+                       &rf_ch);
+    nrf24l01p_release(dev);
+    dev->params.config.cfg_channel = channel;
+    return 0;
+}
+
+uint8_t nrf24l01p_get_channel(const nrf24l01p_t *dev)
+{
+    assert(dev);
+    return dev->params.config.cfg_channel;
+}
+
+int nrf24l01p_set_mtu(nrf24l01p_t *dev, uint8_t mtu, nrf24l01p_pipe_t pipe)
+{
+# if NRF24L01P_CUSTOM_HEADER
+    return nrf24l01p_set_payload_width(dev,
+                                       mtu + NRF24L01P_MAX_ADDR_WIDTH + 1,
+                                       pipe);
+#else
+    return nrf24l01p_set_payload_width(dev, mtu, pipe);
+#endif
+}
+
+int nrf24l01p_get_mtu(const nrf24l01p_t *dev, nrf24l01p_pipe_t pipe)
+{
+# if NRF24L01P_CUSTOM_HEADER
+    return nrf24l01p_get_payload_width(dev, pipe)
+                                        - (NRF24L01P_MAX_ADDR_WIDTH + 1);
+#else
+    return nrf24l01p_get_payload_width(dev, pipe);
+#endif
+}
+
+int nrf24l01p_set_rx_address(nrf24l01p_t *dev, const uint8_t *addr,
+                             size_t addr_len, nrf24l01p_pipe_t pipe)
+{
+    assert(dev);
+    assert(addr);
+    if (pipe >= NRF24L01P_PX_NUM_OF) {
+        return -ERANGE;
+    }
+    switch (dev->state) {
+        case NRF24L01P_STATE_POWER_DOWN:
+        case NRF24L01P_STATE_STANDBY_1:
+        case NRF24L01P_STATE_RX_MODE:
+            break;
+        default:
+            return -EAGAIN;
+    }
+    if (pipe == NRF24L01P_P0 || pipe == NRF24L01P_P1) {
+        if (addr_len !=
+            nrf24l01p_etoval_aw(dev->params.config.cfg_addr_width)) {
+            return -EINVAL;
+        }
+        nrf24l01p_acquire(dev);
+        nrf24l01p_write_reg(dev, reg_pipe_info[pipe].reg_pipe_addr, addr,
+                            addr_len);
+        nrf24l01p_release(dev);
+        memcpy(dev->params.urxaddr.arxaddr.rx_addr_long[pipe], addr, addr_len);
+    }
     else {
-        return -1;
+        if (addr_len > 1) {
+            return -EINVAL;
+        }
+        nrf24l01p_acquire(dev);
+        nrf24l01p_write_reg(dev, reg_pipe_info[pipe].reg_pipe_addr, addr,
+                            addr_len);
+        nrf24l01p_release(dev);
+        dev->params.urxaddr.arxaddr.rx_addr_short[pipe - 2] = *addr;
     }
-}
-
-void nrf24l01p_get_id(const nrf24l01p_t *dev, unsigned int *pid)
-{
-    *((int *)pid) = dev->listener;
-}
-
-void nrf24l01p_start(const nrf24l01p_t *dev)
-{
-    gpio_set(dev->ce);
-    xtimer_usleep(DELAY_CE_START_US);
-}
-
-void nrf24l01p_stop(const nrf24l01p_t *dev)
-{
-    xtimer_spin(DELAY_CS_TOGGLE_TICKS);
-    gpio_clear(dev->ce);
-}
-
-int nrf24l01p_preload(const nrf24l01p_t *dev, char *data, unsigned int size)
-{
-    size = (size <= 32) ? size : 32;
-
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    spi_transfer_regs(dev->spi, dev->cs, CMD_W_TX_PAYLOAD, data, NULL, size);
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
     return 0;
 }
 
-
-int nrf24l01p_set_channel(const nrf24l01p_t *dev, uint8_t chan)
+int nrf24l01p_get_rx_address(const nrf24l01p_t *dev, uint8_t *addr,
+                             nrf24l01p_pipe_t pipe)
 {
-    if (chan > 125) {
-        chan = 125;
+    assert(dev);
+    assert(addr);
+    if (pipe >= NRF24L01P_PX_NUM_OF) {
+        return -ERANGE;
     }
-
-    return nrf24l01p_write_reg(dev, REG_RF_CH, chan);
+    uint8_t aw = nrf24l01p_etoval_aw(dev->params.config.cfg_addr_width);
+    if (pipe == NRF24L01P_P0 || pipe == NRF24L01P_P1) {
+        memcpy(addr, dev->params.urxaddr.arxaddr.rx_addr_long[pipe], aw);
+    }
+    else {
+        memcpy(addr, dev->params.urxaddr.arxaddr.rx_addr_long[NRF24L01P_P1], aw);
+        addr[aw - 1] = dev->params.urxaddr.arxaddr.rx_addr_short[pipe - 2];
+    }
+    return aw;
 }
 
-int nrf24l01p_set_address_width(const nrf24l01p_t *dev, nrf24l01p_aw_t aw)
+int nrf24l01p_set_max_retransm(nrf24l01p_t *dev, uint8_t max_rt)
 {
-    char aw_setup;
-    nrf24l01p_read_reg(dev, REG_SETUP_AW, &aw_setup);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-
-    switch (aw) {
-        case NRF24L01P_AW_3BYTE:
-            aw_setup &= ~(3);
-            aw_setup |= 1;
+    assert(dev);
+    if (max_rt > NRF24L01P_MAX_RETRANSMISSIONS) {
+        return -EINVAL;
+    }
+    if (dev->params.config.cfg_protocol == NRF24L01P_PROTOCOL_SB) {
+        return -ENOTSUP;
+    }
+    switch (dev->state) {
+        case NRF24L01P_STATE_POWER_DOWN:
+        case NRF24L01P_STATE_STANDBY_1:
+        case NRF24L01P_STATE_RX_MODE:
             break;
-
-        case NRF24L01P_AW_4BYTE:
-            aw_setup &= ~(3);
-            aw_setup |= 2;
-            break;
-
-        case NRF24L01P_AW_5BYTE:
-            aw_setup &= ~(3);
-            aw_setup |= 3;
-            break;
-
         default:
-            return -1;
+            return -EAGAIN;
     }
-
-    return nrf24l01p_write_reg(dev, REG_SETUP_AW, aw_setup);
+    nrf24l01p_reg8_setup_retr_t setup_retr = NRF24L01P_FLG_ARC(max_rt);
+    nrf24l01p_acquire(dev);
+    nrf24l01p_reg8_mod(dev, NRF24L01P_REG_SETUP_RETR, NRF24L01P_MSK_ARC,
+                       &setup_retr);
+    nrf24l01p_release(dev);
+    dev->params.config.cfg_max_retr = max_rt;
+    return 0;
 }
 
-int nrf24l01p_set_payload_width(const nrf24l01p_t *dev,
-                                nrf24l01p_rx_pipe_t pipe, uint8_t width)
+uint8_t nrf24l01p_get_max_retransm(const nrf24l01p_t *dev)
 {
-    char pipe_pw_address;
+    assert(dev);
+    if (dev->params.config.cfg_protocol == NRF24L01P_PROTOCOL_SB) {
+        return 0;
+    }
+    return dev->params.config.cfg_max_retr;
+}
 
-    switch (pipe) {
-        case NRF24L01P_PIPE0:
-            pipe_pw_address = REG_RX_PW_P0;
+int nrf24l01p_set_retransm_delay(nrf24l01p_t *dev, nrf24l01p_ard_t rt_delay)
+{
+    assert(dev);
+    if (rt_delay >= NRF24L01P_ARD_NUM_OF) {
+        return -EINVAL;
+    }
+    if (dev->params.config.cfg_protocol == NRF24L01P_PROTOCOL_SB) {
+        return -ENOTSUP;
+    }
+    switch (dev->state) {
+        case NRF24L01P_STATE_POWER_DOWN:
+        case NRF24L01P_STATE_STANDBY_1:
+        case NRF24L01P_STATE_RX_MODE:
             break;
-
-        case NRF24L01P_PIPE1:
-            pipe_pw_address = REG_RX_PW_P1;
-            break;
-
-        case NRF24L01P_PIPE2:
-            pipe_pw_address = REG_RX_PW_P2;
-            break;
-
-        case NRF24L01P_PIPE3:
-            pipe_pw_address = REG_RX_PW_P3;
-            break;
-
-        case NRF24L01P_PIPE4:
-            pipe_pw_address = REG_RX_PW_P4;
-            break;
-
-        case NRF24L01P_PIPE5:
-            pipe_pw_address = REG_RX_PW_P5;
-            break;
-
         default:
-            return -1;
+            return -EAGAIN;
     }
-
-    if (width > 32) {
-        width = 32;
-    }
-
-    return nrf24l01p_write_reg(dev, pipe_pw_address, width);
+    nrf24l01p_reg8_setup_retr_t setup_retr = NRF24L01P_FLG_ARD(rt_delay);
+    nrf24l01p_acquire(dev);
+    nrf24l01p_reg8_mod(dev, NRF24L01P_REG_SETUP_RETR, NRF24L01P_MSK_ARD,
+                       &setup_retr);
+    nrf24l01p_release(dev);
+    dev->params.config.cfg_retr_delay = rt_delay;
+    return 0;
 }
 
-
-
-int nrf24l01p_set_tx_address(const nrf24l01p_t *dev, const char *saddr, unsigned int length)
+uint16_t nrf24l01p_get_retransm_delay(const nrf24l01p_t *dev,
+                                      nrf24l01p_ard_t *rt_delay)
 {
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    spi_transfer_regs(dev->spi, dev->cs,
-                      (CMD_W_REGISTER | (REGISTER_MASK & REG_TX_ADDR)),
-                      saddr, NULL, length);
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-
-    return (int)length;
+    assert(dev);
+    if (dev->params.config.cfg_protocol == NRF24L01P_PROTOCOL_SB) {
+        return 0;
+    }
+    if (rt_delay) {
+        *rt_delay = dev->params.config.cfg_retr_delay;
+    }
+    return nrf24l01p_etoval_ard(dev->params.config.cfg_retr_delay);
 }
 
-int nrf24l01p_set_tx_address_long(const nrf24l01p_t *dev, uint64_t saddr, unsigned int length)
+int nrf24l01p_set_state(nrf24l01p_t *dev, nrf24l01p_state_t state)
 {
-    char buf[length];
-
-    if (length <= INITIAL_ADDRESS_WIDTH) {
-        for (unsigned int i = 0; i < length; i++) {
-
-            buf[i] = (uint8_t)(saddr >> (((length - 1) - i) * sizeof(uint64_t)));
+    switch (dev->state) {
+        case NRF24L01P_STATE_POWER_DOWN:
+        case NRF24L01P_STATE_STANDBY_1:
+        case NRF24L01P_STATE_RX_MODE:
+            break;
+        default:
+            return -EAGAIN;
+    }
+    nrf24l01p_state_t old = dev->state;
+    nrf24l01p_acquire(dev);
+    if (state == NRF24L01P_STATE_POWER_DOWN) {
+        if (dev->state != NRF24L01P_STATE_POWER_DOWN) {
+            nrf24l01p_transition_to_power_down(dev);
+        }
+    }
+    else if (state == NRF24L01P_STATE_STANDBY_1) {
+        if (dev->state != NRF24L01P_STATE_STANDBY_1) {
+            nrf24l01p_transition_to_standby_1(dev);
+        }
+    }
+    else if (state == NRF24L01P_STATE_RX_MODE) {
+        if (dev->state != NRF24L01P_STATE_RX_MODE) {
+            if (state != NRF24L01P_STATE_STANDBY_1) {
+                nrf24l01p_transition_to_standby_1(dev);
+            }
+            nrf24l01p_transition_to_rx_mode(dev);
         }
     }
     else {
-        return -1;
+        nrf24l01p_release(dev);
+        return -ENOTSUP;
     }
-
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    spi_transfer_regs(dev->spi, dev->cs,
-                      (CMD_W_REGISTER | (REGISTER_MASK & REG_TX_ADDR)),
-                      buf, NULL, length);
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-    return (int)length;
+    nrf24l01p_release(dev);
+    return (int)old;
 }
 
-uint64_t nrf24l01p_get_tx_address_long(const nrf24l01p_t *dev)
+nrf24l01p_state_t nrf24l01p_get_state(const nrf24l01p_t *dev)
 {
-    uint64_t saddr_64 = 0;
-    char addr_array[INITIAL_ADDRESS_WIDTH];
-
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    spi_transfer_regs(dev->spi, dev->cs,
-                      (CMD_R_REGISTER | (REGISTER_MASK & REG_TX_ADDR)),
-                      NULL, addr_array, INITIAL_ADDRESS_WIDTH);
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-
-    for (int i = 0; i < INITIAL_ADDRESS_WIDTH; i++) {
-        saddr_64 |= (((uint64_t) addr_array[i]) << (8 * (INITIAL_ADDRESS_WIDTH - i - 1)));
-    }
-
-    return saddr_64;
+    assert(dev);
+    return dev->state;
 }
 
-
-int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, const char *saddr, unsigned int length)
+void nrf24l01p_print_all_regs(nrf24l01p_t *dev)
 {
-    char pipe_addr;
-
-    switch (pipe) {
-        case NRF24L01P_PIPE0:
-            pipe_addr = REG_RX_ADDR_P0;
-            break;
-
-        case NRF24L01P_PIPE1:
-            pipe_addr = REG_RX_ADDR_P1;
-            break;
-
-        case NRF24L01P_PIPE2:
-            pipe_addr = REG_RX_ADDR_P2;
-            break;
-
-        case NRF24L01P_PIPE3:
-            pipe_addr = REG_RX_ADDR_P3;
-            break;
-
-        case NRF24L01P_PIPE4:
-            pipe_addr = REG_RX_ADDR_P4;
-            break;
-
-        case NRF24L01P_PIPE5:
-            pipe_addr = REG_RX_ADDR_P5;
-            break;
-
-        default:
-            return -1;
-    }
-
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    spi_transfer_regs(dev->spi, dev->cs,
-                      (CMD_W_REGISTER | (REGISTER_MASK & pipe_addr)),
-                      saddr, NULL, length);
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-
-    /* Enable this pipe */
-    nrf24l01p_enable_pipe(dev, pipe);
-    return (int)length;
+    nrf24l01p_acquire(dev);
+    nrf24l01p_diagnostics_print_all_regs(dev);
+    nrf24l01p_release(dev);
 }
 
-int nrf24l01p_set_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint64_t saddr, unsigned int length)
+void nrf24l01p_print_dev_info(const nrf24l01p_t *dev)
 {
-    char buf[length];
-
-    if (length <= INITIAL_ADDRESS_WIDTH) {
-        for (unsigned int i = 0; i < length; i++) {
-
-            buf[i] = (uint8_t)(saddr >> (((length - 1) - i) * 8));
-        }
-    }
-    else {
-        return -1;
-    }
-
-    return nrf24l01p_set_rx_address(dev, pipe, buf, length);
-}
-
-
-uint64_t nrf24l01p_get_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
-{
-    char pipe_addr;
-    uint64_t saddr_64 = 0;
-
-    char addr_array[INITIAL_ADDRESS_WIDTH];
-
-    switch (pipe) {
-        case NRF24L01P_PIPE0:
-            pipe_addr = REG_RX_ADDR_P0;
-            break;
-
-        case NRF24L01P_PIPE1:
-            pipe_addr = REG_RX_ADDR_P1;
-            break;
-
-        case NRF24L01P_PIPE2:
-            pipe_addr = REG_RX_ADDR_P2;
-            break;
-
-        case NRF24L01P_PIPE3:
-            pipe_addr = REG_RX_ADDR_P3;
-            break;
-
-        case NRF24L01P_PIPE4:
-            pipe_addr = REG_RX_ADDR_P4;
-            break;
-
-        case NRF24L01P_PIPE5:
-            pipe_addr = REG_RX_ADDR_P5;
-            break;
-
-        default:
-            return -1;
-    }
-
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    spi_transfer_regs(dev->spi, dev->cs,
-                      (CMD_R_REGISTER | (REGISTER_MASK & pipe_addr)),
-                      NULL, addr_array, INITIAL_ADDRESS_WIDTH);
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-
-    for (int i = 0; i < INITIAL_ADDRESS_WIDTH; i++) {
-        saddr_64 |= (((uint64_t) addr_array[i]) << (8 * (INITIAL_ADDRESS_WIDTH - i - 1)));
-    }
-
-    return saddr_64;
-}
-
-
-int nrf24l01p_set_datarate(const nrf24l01p_t *dev, nrf24l01p_dr_t dr)
-{
-    char rf_setup;
-
-    nrf24l01p_read_reg(dev, REG_RF_SETUP, &rf_setup);
-
-    switch (dr) {
-        case NRF24L01P_DR_250KBS:
-            rf_setup |= RF_SETUP_RF_DR_LOW;
-            rf_setup &= ~(RF_SETUP_RF_DR_HIGH);
-            break;
-
-        case NRF24L01P_DR_1MBS:
-            rf_setup &= ~(RF_SETUP_RF_DR_LOW | RF_SETUP_RF_DR_HIGH);
-            break;
-
-        case NRF24L01P_DR_2MBS:
-            rf_setup &= ~RF_SETUP_RF_DR_LOW;
-            rf_setup |= RF_SETUP_RF_DR_HIGH;
-            break;
-
-        default:
-            return -1;
-    }
-
-    return nrf24l01p_write_reg(dev, REG_RF_SETUP, rf_setup);
-}
-
-int nrf24l01p_get_status(const nrf24l01p_t *dev)
-{
-    uint8_t status;
-
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    status = spi_transfer_byte(dev->spi, dev->cs, false, CMD_NOOP);
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-
-    return (int)status;
-}
-
-int nrf24l01p_set_power(const nrf24l01p_t *dev, int pwr)
-{
-    char rf_setup;
-
-    nrf24l01p_read_reg(dev, REG_RF_SETUP, &rf_setup);
-
-    if (pwr >= -3) {
-        rf_setup &= ~(3 << 1);
-        rf_setup |= (NRF24L01P_PWR_0DBM << 1);
-    }
-
-    if (pwr < -3) {
-        rf_setup &= ~(3 << 1);
-        rf_setup |= (NRF24L01P_PWR_N6DBM << 1);
-    }
-
-    if (pwr < -9) {
-        rf_setup &= ~(3 << 1);
-        rf_setup |= (NRF24L01P_PWR_N12DBM << 1);
-    }
-
-    if (pwr < -15) {
-        rf_setup &= ~(3 << 1);
-    }
-
-    return nrf24l01p_write_reg(dev, REG_RF_SETUP, rf_setup);
-}
-
-static const int8_t _nrf24l01p_power_map[4] = { -18, -12, -6, 0 };
-
-int nrf24l01p_get_power(const nrf24l01p_t *dev)
-{
-    char rf_setup;
-    nrf24l01p_read_reg(dev, REG_RF_SETUP, &rf_setup);
-    return _nrf24l01p_power_map[(rf_setup & 0x6) >> 1];
-}
-
-
-int nrf24l01p_set_txmode(const nrf24l01p_t *dev)
-{
-    char conf;
-    int status;
-
-    nrf24l01p_stop(dev);
-
-    nrf24l01p_mask_interrupt(dev, (MASK_RX_DR | MASK_TX_DS | MASK_MAX_RT));
-
-    nrf24l01p_flush_tx_fifo(dev);
-
-    nrf24l01p_read_reg(dev, REG_CONFIG, &conf);
-    conf &= ~(PRIM_RX);
-    status = nrf24l01p_write_reg(dev, REG_CONFIG, conf);
-
-    xtimer_usleep(DELAY_CHANGE_TXRX_US);
-
-    return status;
-}
-
-int nrf24l01p_set_rxmode(const nrf24l01p_t *dev)
-{
-    char conf;
-    int status;
-
-    nrf24l01p_unmask_interrupt(dev, MASK_RX_DR);
-    nrf24l01p_mask_interrupt(dev, (MASK_TX_DS | MASK_MAX_RT));
-
-    nrf24l01p_flush_rx_fifo(dev);
-
-    nrf24l01p_read_reg(dev, REG_CONFIG, &conf);
-    conf |= PRIM_RX;
-    status = nrf24l01p_write_reg(dev, REG_CONFIG, conf);
-
-    nrf24l01p_start(dev);
-
-    xtimer_usleep(DELAY_CHANGE_TXRX_US);
-
-    return status;
-}
-
-
-int nrf24l01p_reset_interrupts(const nrf24l01p_t *dev, char intrs)
-{
-    return nrf24l01p_write_reg(dev, REG_STATUS, intrs);
-}
-
-int nrf24l01p_reset_all_interrupts(const nrf24l01p_t *dev)
-{
-    return nrf24l01p_write_reg(dev, REG_STATUS, ALL_INT_MASK);
-}
-
-int nrf24l01p_mask_interrupt(const nrf24l01p_t *dev, char intr)
-{
-    char conf;
-
-    nrf24l01p_read_reg(dev, REG_CONFIG, &conf);
-    conf |= intr;
-
-    return nrf24l01p_write_reg(dev, REG_CONFIG, conf);
-}
-
-int nrf24l01p_unmask_interrupt(const nrf24l01p_t *dev, char intr)
-{
-    char conf;
-
-    nrf24l01p_read_reg(dev, REG_CONFIG, &conf);
-    conf &= ~intr;
-
-    return nrf24l01p_write_reg(dev, REG_CONFIG, conf);
-}
-
-int nrf24l01p_enable_dynamic_payload(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
-{
-    char feature_val;
-    char en_aa_val;
-    char dynpd_val;
-    int pipe_mask = 0;
-    int dpl_mask = 0;
-
-    if (nrf24l01p_read_reg(dev, REG_FEATURE, &feature_val) < 0) {
-        DEBUG("Can't read REG_FEATURE\n");
-        return -1;
-    }
-    if (!(feature_val & FEATURE_EN_DPL)){
-        feature_val |= FEATURE_EN_DPL;
-        if (nrf24l01p_write_reg(dev, REG_FEATURE, feature_val) < 0){
-            DEBUG("Can't write REG_FEATURE\n");
-            return -1;
-        }
-    }
-
-    if (nrf24l01p_read_reg(dev, REG_EN_AA, &en_aa_val) < 0){
-        DEBUG("Can't read REG_EN_AA\n");
-        return -1;
-    }
-    switch (pipe){
-    case NRF24L01P_PIPE0:
-        pipe_mask = ENAA_P0;
-        dpl_mask = DYNPD_DPL_P0;
-        break;
-    case NRF24L01P_PIPE1:
-        pipe_mask = ENAA_P1;
-        dpl_mask = DYNPD_DPL_P1;
-        break;
-    case NRF24L01P_PIPE2:
-        pipe_mask = ENAA_P2;
-        dpl_mask = DYNPD_DPL_P2;
-        break;
-    case NRF24L01P_PIPE3:
-        pipe_mask = ENAA_P3;
-        dpl_mask = DYNPD_DPL_P3;
-        break;
-    case NRF24L01P_PIPE4:
-        pipe_mask = ENAA_P4;
-        dpl_mask = DYNPD_DPL_P4;
-        break;
-    case NRF24L01P_PIPE5:
-        pipe_mask = ENAA_P5;
-        dpl_mask = DYNPD_DPL_P5;
-        break;
-    }
-
-    if (!(en_aa_val & pipe_mask)){
-        en_aa_val |= pipe_mask;
-        if (nrf24l01p_write_reg(dev, REG_EN_AA, en_aa_val) < 0){
-            DEBUG("Can't write REG_EN_AA\n");
-            return -1;
-        }
-    }
-
-    if (nrf24l01p_read_reg(dev, REG_DYNPD, &dynpd_val) < 0){
-        DEBUG("Can't read REG_DYNPD\n");
-        return -1;
-    }
-
-    if (!(dynpd_val & dpl_mask)){
-        dynpd_val |= dpl_mask;
-        if (nrf24l01p_write_reg(dev, REG_DYNPD, dynpd_val) < 0){
-            DEBUG("Can't write REG_DYNPD\n");
-            return -1;
-        }
-    }
-
-    return 0;
-}
-
-int nrf24l01p_enable_pipe(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
-{
-    char pipe_conf;
-
-    nrf24l01p_read_reg(dev, REG_EN_RXADDR, &pipe_conf);
-    pipe_conf |= (1 << pipe);
-
-    return nrf24l01p_write_reg(dev, REG_EN_RXADDR, pipe_conf);
-}
-
-int nrf24l01p_disable_pipe(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
-{
-    char pipe_conf;
-
-    nrf24l01p_read_reg(dev, REG_EN_RXADDR, &pipe_conf);
-    pipe_conf &= ~(1 << pipe);
-
-    return nrf24l01p_write_reg(dev, REG_EN_RXADDR, pipe_conf);
-}
-
-int nrf24l01p_disable_crc(const nrf24l01p_t *dev)
-{
-    char conf;
-
-    nrf24l01p_read_reg(dev, REG_CONFIG, &conf);
-    return nrf24l01p_write_reg(dev, REG_CONFIG, (conf & ~(EN_CRC)));
-}
-
-int nrf24l01p_enable_crc(const nrf24l01p_t *dev, nrf24l01p_crc_t crc)
-{
-    char conf;
-
-    nrf24l01p_read_reg(dev, REG_CONFIG, &conf);
-
-    switch (crc) {
-        case NRF24L01P_CRC_1BYTE:
-            conf &= ~(CRCO);
-            break;
-
-        case NRF24L01P_CRC_2BYTE:
-            conf |= CRCO;
-            break;
-
-        default:
-            return -1;
-    }
-
-    return nrf24l01p_write_reg(dev, REG_CONFIG, (conf | EN_CRC));
-}
-
-int nrf24l01p_setup_auto_ack(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l01p_retransmit_delay_t delay_retrans, char count_retrans)
-{
-    char en_aa;
-    int status;
-    nrf24l01p_read_reg(dev, REG_EN_AA, &en_aa);
-
-    switch (pipe) {
-        case NRF24L01P_PIPE0:
-            en_aa |= (1 << 0);
-            break;
-
-        case NRF24L01P_PIPE1:
-            en_aa |= (1 << 1);
-            break;
-
-        case NRF24L01P_PIPE2:
-            en_aa |= (1 << 2);
-            break;
-
-        case NRF24L01P_PIPE3:
-            en_aa |= (1 << 3);
-            break;
-
-        case NRF24L01P_PIPE4:
-            en_aa |= (1 << 4);
-            break;
-
-        case NRF24L01P_PIPE5:
-            en_aa |= (1 << 5);
-            break;
-
-        default:
-            return -1;
-    }
-
-    /* Enable Auto Ack */
-    status = nrf24l01p_write_reg(dev, REG_EN_AA, en_aa);
-
-    if (status < 0) {
-        return status;
-    }
-
-    count_retrans = (count_retrans < 16) ? count_retrans : 15;
-
-    /* setup auto retransmit delay and count */
-    return nrf24l01p_write_reg(dev, REG_SETUP_RETR, ((delay_retrans << 4) | count_retrans));
-}
-
-int nrf24l01p_enable_dynamic_ack(const nrf24l01p_t *dev)
-{
-    char feature;
-
-    if (nrf24l01p_read_reg(dev, REG_FEATURE, &feature) < 0){
-        DEBUG("Can't read FEATURE reg\n");
-       return -1;
-    }
-    if (!(feature & FEATURE_EN_DYN_ACK)){
-        feature |= FEATURE_EN_DYN_ACK;
-        if (nrf24l01p_write_reg(dev, REG_FEATURE, feature) < 0){
-            DEBUG("Can't write FEATURE reg\n");
-            return -1;
-        }
-    }
-    return 0;
-}
-
-int nrf24l01p_disable_all_auto_ack(const nrf24l01p_t *dev)
-{
-    return nrf24l01p_write_reg(dev, REG_EN_AA, 0x00);
-}
-
-
-int nrf24l01p_flush_tx_fifo(const nrf24l01p_t *dev)
-{
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    spi_transfer_byte(dev->spi, dev->cs, false, CMD_FLUSH_TX);
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-
-    return 0;
-}
-
-int nrf24l01p_flush_rx_fifo(const nrf24l01p_t *dev)
-{
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    spi_transfer_byte(dev->spi, dev->cs, false, CMD_FLUSH_RX);
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
-
-    xtimer_spin(DELAY_AFTER_FUNC_TICKS);
-
-    return 0;
-}
-
-void nrf24l01p_rx_cb(void *arg)
-{
-    DEBUG("In HW cb\n");
-
-    nrf24l01p_t *dev = (nrf24l01p_t *)arg;
-
-    /* clear interrupt */
-    nrf24l01p_reset_all_interrupts(dev);
-
-    /* informs thread about available rx data*/
-    if (dev->listener != KERNEL_PID_UNDEF) {
-        msg_t m;
-        m.type = RCV_PKT_NRF24L01P;
-        m.content.ptr = dev;
-        /* transmit more things here ? */
-        msg_send_int(&m, dev->listener);
-    }
+    nrf24l01p_diagnostics_print_dev_info(dev);
 }
