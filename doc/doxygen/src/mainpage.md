@@ -8,9 +8,9 @@ RIOT in a nutshell                                        {#riot-in-a-nutshell}
 RIOT is an open-source  microkernel-based operating system, designed to match
 the requirements of Internet of Things (IoT) devices and other embedded
 devices. These requirements include a very low memory footprint (on the order
-of a few kilobytes), high energy efficiency, real-time capabilities,
-communication stacks for both wireless and wired networks, and support for a
-wide range of low-power hardware.
+of a few kilobytes), high energy efficiency, real-time capabilities, support
+for a wide range of low-power hardware, communication stacks for wireless and
+communication stacks for wired networks.
 
 RIOT provides a microkernel, multiple network stacks, and utilities which
 include cryptographic libraries, data structures (bloom filters, hash tables,
@@ -109,9 +109,9 @@ top-level directories:
 
 core
 ----
-This directory contains the actual kernel. The kernel consists of the
-scheduler, inter-process-communication (messaging), threading, thread
-synchronization, and supporting data-structures and type definitions.
+This directory contains the actual kernel. The kernel consists of the scheduler,
+inter-process-communication (messaging), threading, and thread
+synchronization, as well as supporting data-structures and type definitions.
 
 See @ref core for further information and API documentations.
 
