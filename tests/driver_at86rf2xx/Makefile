@@ -21,7 +21,8 @@ endif
 # use the at86rf231 as fallback device
 DRIVER ?= at86rf231
 
-# include the selected driver
-USEMODULE += $(DRIVER)
+# include the selected drivers
+
+USEMODULE += $(foreach module,$(DRIVER),$(module))
 
 include $(RIOTBASE)/Makefile.include

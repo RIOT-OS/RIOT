@@ -34,7 +34,7 @@
 static char stack[_STACKSIZE];
 static kernel_pid_t _recv_pid;
 
-at86rf2xx_t devs[AT86RF2XX_NUM];
+at86rf2xx_devs_t at86rf2xx_devs;
 
 static const shell_command_t shell_commands[] = {
     { "ifconfig", "Configure netdev", ifconfig },
@@ -89,20 +89,23 @@ int main(void)
 {
     puts("AT86RF2xx device driver test");
 
+    at86rf2xx_setup_devs(&at86rf2xx_devs);
+
     unsigned dev_success = 0;
+    uint8_t *dev = at86rf2xx_devs.mem_devs;
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
         netopt_enable_t en = NETOPT_ENABLE;
-        const at86rf2xx_params_t *p = &at86rf2xx_params[i];
-        netdev_t *dev = (netdev_t *)(&devs[i]);
-
-        printf("Initializing AT86RF2xx radio at SPI_%d\n", p->spi);
-        at86rf2xx_setup(&devs[i], p);
-        dev->event_callback = _event_cb;
-        if (dev->driver->init(dev) < 0) {
+        netdev_t *netdev = (netdev_t *)(&(((at86rf2xx_t *)dev)->base.netdev));
+        dev += at86rf2xx_get_size((at86rf2xx_t *)dev);
+        printf("Initializing AT86RF2xx radio #%u\n", i);
+        netdev->event_callback = _event_cb;
+        if (netdev->driver->init(netdev) < 0) {
+            printf("radio #%u: initialization failed\n", i);
             continue;
         }
-        dev->driver->set(dev, NETOPT_RX_END_IRQ, &en, sizeof(en));
+        printf("radio #%u: initialization successful\n", i);
         dev_success++;
+        netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &en, sizeof(en));
     }
 
     if (!dev_success) {
