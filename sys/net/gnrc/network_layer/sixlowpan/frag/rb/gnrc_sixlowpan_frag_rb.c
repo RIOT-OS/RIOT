@@ -423,6 +423,18 @@ static gnrc_sixlowpan_frag_rb_int_t *_rbuf_int_get_free(void)
     return NULL;
 }
 
+#ifdef TEST_SUITES
+bool gnrc_sixlowpan_frag_rb_ints_empty(void)
+{
+    for (unsigned int i = 0; i < RBUF_INT_SIZE; i++) {
+        if (rbuf_int[i].end > 0) {
+            return false;
+        }
+    }
+    return true;
+}
+#endif  /* TEST_SUITES */
+
 static bool _rbuf_update_ints(gnrc_sixlowpan_frag_rb_base_t *entry,
                               uint16_t offset, size_t frag_size)
 {
