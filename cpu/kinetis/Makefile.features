@@ -1,22 +1,22 @@
 FEATURES_PROVIDED += periph_cpuid
 
-# HACK Do not define 'hwrng' if the board does not supports it
-# A whitelist on CPU_MODEL would be better but this information/variable is not
-# available yet.
-# TRNG driver is not implemented for 'CPU_MODEL == mkw41z512vht4'
-_KINETIS_BOARDS_WITHOUT_HWRNG += frdm-kw41z phynode-kw41z usb-kw41z
-# No HWRNG in MK20D7 devices
-_KINETIS_BOARDS_WITHOUT_HWRNG += teensy31
-ifneq (,$(filter-out $(_KINETIS_BOARDS_WITHOUT_HWRNG),$(BOARD)))
+# TRNG driver is not implemented for mkw41z512vht4 model
+_KINETIS_CPU_MODELS_WITHOUT_HWRNG += mkw41z512vht4
+# No HWRNG in mk20d7 devices
+_KINETIS_CPU_MODELS_WITHOUT_HWRNG += mk20dx256vlh7
+
+ifneq (,$(filter-out $(_KINETIS_CPU_MODELS_WITHOUT_HWRNG),$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_hwrng
 endif
 
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_gpio_irq
-ifeq (EA,$(KINETIS_SERIES))
-FEATURES_PROVIDED += periph_ics
+
+# This applies to all Kinetis EA series, for now this is only s9keaz128aclh48
+ifeq (s9keaz128aclh48,$(CPU_MODEL))
+  FEATURES_PROVIDED += periph_ics
 else
-FEATURES_PROVIDED += periph_mcg
+  FEATURES_PROVIDED += periph_mcg
 endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.features
