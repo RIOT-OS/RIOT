@@ -32,6 +32,7 @@
 # include "xtimer.h"
 # define TEST_TIMER_DEV      XTIMER_DEV
 # define TEST_TIMER_FREQ     XTIMER_HZ
+# define TEST_TIMER_WIDTH    XTIMER_WIDTH
 #else
 # ifndef TEST_TIMER_FREQ
 #  define TEST_TIMER_FREQ     (1000000LU)
@@ -40,6 +41,12 @@
 
 #ifndef TEST_MAX_DIFF
 #define TEST_MAX_DIFF   (1000LU)
+#endif
+
+#if TEST_TIMER_WIDTH == 32
+# define TEST_TIMER_MAX      (0xFFFFFFFFLU)
+#else
+# define TEST_TIMER_MAX      ((1UL << TEST_TIMER_WIDTH) - 1)
 #endif
 
 static void cb(void *arg, int chan)
@@ -65,7 +72,8 @@ int main(void)
         uint32_t before = timer_read(TEST_TIMER_DEV);
         timer_set(TEST_TIMER_DEV, 0, interval);
         while(!thread_flags_clear(1)) {
-            uint32_t diff = timer_read(TEST_TIMER_DEV) - before;
+            uint32_t diff = (timer_read(TEST_TIMER_DEV) - before)
+                            & TEST_TIMER_MAX;
             if (diff > TEST_MAX_DIFF) {
                 printf("ERROR: too long delay, aborted after %" PRIu32
                         " (TEST_MAX_DIFF=%lu)\n"
