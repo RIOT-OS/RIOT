@@ -7,6 +7,8 @@ FEATURES_REQUIRED += riotboot
 # Include modules to test the bootloader
 USEMODULE += riotboot_slot
 USEMODULE += shell
+# Add shell_commands to use the shell version of `test_utils_interactive_sync`
+USEMODULE += shell_commands
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
@@ -15,11 +17,6 @@ DEVELHELP ?= 1
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
-
-# The test script assumes initially version "0" is flashed,
-# as done by the CI.
-# Thus default to that (instead of epoch set by makefiles/boot/riotboot.inc.mk).
-APP_VER?=0
 
 # Ensure both slot bin files are always generated and linked to avoid compiling
 # during the test. This ensures that "BUILD_IN_DOCKER=1 make test"
