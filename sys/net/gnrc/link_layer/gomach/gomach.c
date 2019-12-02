@@ -162,7 +162,8 @@ static void _gomach_rtt_cb(void *arg)
 {
     msg_t msg;
 
-    msg.content.value = ((uint32_t) arg) & 0xffff;
+    (void)arg;
+    msg.content.value = GNRC_GOMACH_EVENT_RTT_NEW_CYCLE;
     msg.type = GNRC_GOMACH_EVENT_RTT_TYPE;
     msg_send(&msg, gomach_pid);
 
@@ -194,7 +195,7 @@ static void _gomach_rtt_handler(uint32_t event, gnrc_netif_t *netif)
             /* Set next cycle's starting time. */
             uint32_t alarm = netif->mac.prot.gomach.last_wakeup +
                              RTT_US_TO_TICKS(GNRC_GOMACH_SUPERFRAME_DURATION_US);
-            rtt_set_alarm(alarm, _gomach_rtt_cb, (void *) GNRC_GOMACH_EVENT_RTT_NEW_CYCLE);
+            rtt_set_alarm(alarm, _gomach_rtt_cb, NULL);
 
             /* Update neighbors' public channel phases. */
             gnrc_gomach_update_neighbor_pubchan(netif);
@@ -1451,7 +1452,7 @@ static void _gomach_phase_backoff(gnrc_netif_t *netif)
     uint32_t alarm = netif->mac.prot.gomach.last_wakeup +
                      RTT_US_TO_TICKS(GNRC_GOMACH_SUPERFRAME_DURATION_US);
 
-    rtt_set_alarm(alarm, _gomach_rtt_cb, (void *) GNRC_GOMACH_EVENT_RTT_NEW_CYCLE);
+    rtt_set_alarm(alarm, _gomach_rtt_cb, NULL);
 
     gnrc_gomach_update_neighbor_phase(netif);
 
