@@ -57,6 +57,28 @@ extern "C" {
 #define GNRC_SIXLOWPAN_FRAG_SFR_INTER_FRAG_GAP_MSG  (0x0228)
 
 /**
+ * @brief   Stats on selective fragment recovery
+ */
+typedef struct {
+    uint32_t datagram_resends;  /**< datagrams resent */
+    struct {
+        uint32_t usual;         /**< non-abort fragments sent */
+        uint32_t aborts;        /**< abort pseudo-fragments sent */
+        uint32_t forwarded;     /**< forwarded fragments */
+    } fragments_sent;           /**< RFRAG packets sent */
+    struct {
+        uint32_t by_nack;       /**< fragments resent due to a 0 in ACK's bitmap */
+        uint32_t by_timeout;    /**< fragments resent due to an ARQ timeout */
+    } fragment_resends;         /**< fragments resent */
+    struct {
+        uint32_t full;          /**< full RFRAGs ACKs sent */
+        uint32_t partly;        /**< partly ACKing RFRAGs sent */
+        uint32_t aborts;        /**< abort RFRAG ACKs sent */
+        uint32_t forwarded;     /**< forwarded ACKs */
+    } acks;                     /**< ACKs stats */
+} gnrc_sixlowpan_frag_sfr_stats_t;
+
+/**
  * @brief   Initialize selective fragment recovery
  */
 void gnrc_sixlowpan_frag_sfr_init(void);
@@ -162,6 +184,15 @@ void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf);
  * @brief   Handles inter frame gap
  */
 void gnrc_sixlowpan_frag_sfr_inter_frame_gap(void);
+
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)
+/**
+ * @brief   Fetch current stats for selective fragment recovery
+ *
+ * @param[out] stats    The current stats. Must not be NULL.
+ */
+void gnrc_sixlowpan_frag_sfr_stats_get(gnrc_sixlowpan_frag_sfr_stats_t *stats);
+#endif /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) */
 
 #ifdef __cplusplus
 }

@@ -96,6 +96,8 @@ static clist_node_t _frame_queue;
 static const gnrc_sixlowpan_frag_sfr_bitmap_t _full_bitmap = { .u32 = UINT32_MAX };
 static const gnrc_sixlowpan_frag_sfr_bitmap_t _null_bitmap = { .u32 = 0U };
 
+static gnrc_sixlowpan_frag_sfr_stats_t _stats;
+
 /**
  * @brief   Converts a @ref sys_bitmap based bitmap to a
  *          gnrc_sixlowpan_frag_sfr_bitmap_t
@@ -495,6 +497,11 @@ void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
                         error_no = ENOMEM;
                         goto error;
                     }
+                    else if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+                        /* fragment was resent successfully, note this done in
+                         * the statistics */
+                        _stats.fragment_resends.by_timeout++;
+                    }
                     /* fragment was resent successfully, schedule next ACK
                      * timeout */
                     reschedule_arq_timeout = true;
@@ -556,6 +563,13 @@ void gnrc_sixlowpan_frag_sfr_inter_frame_gap(void)
         if (clist_lpeek(&_frame_queue) != NULL) {
             _sched_next_frame();
         }
+    }
+}
+
+void gnrc_sixlowpan_frag_sfr_stats_get(gnrc_sixlowpan_frag_sfr_stats_t *stats)
+{
+    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+        *stats = _stats;
     }
 }
 
@@ -770,6 +784,9 @@ static bool _send_fragment(gnrc_pktsnip_t *frag, gnrc_sixlowpan_frag_fb_t *fbuf,
     frag_desc->retries = 0;
     clist_rpush(&fbuf->sfr.window, &frag_desc->super);
     if ((res = _send_frame(frag, NULL, page))) {
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+            _stats.fragments_sent.usual++;
+        }
         frag_desc->last_sent = _last_frame_sent;
         fbuf->sfr.cur_seq++;
         fbuf->sfr.frags_sent++;
@@ -866,6 +883,9 @@ static void _try_reassembly(gnrc_netif_hdr_t *netif_hdr,
               "fragment\n");
         /* send abort */
         bitmap = &_null_bitmap;
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+            _stats.acks.aborts++;
+        }
     }
     else if (vrbe != NULL) {
         DEBUG("6lo sfr: packet was forwarded\n");
@@ -886,11 +906,17 @@ static void _try_reassembly(gnrc_netif_hdr_t *netif_hdr,
             _clean_up_rb_entry(entry);
             /* send abort */
             bitmap = &_null_bitmap;
+            if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+                _stats.acks.aborts++;
+            }
         }
         else {
             if (res) {
                 DEBUG("6lo sfr: dispatched datagram to upper layer\n");
                 bitmap = &_full_bitmap;
+                if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+                    _stats.acks.full++;
+                }
             }
             else if (ack_req) {
                 DEBUG("6lo sfr: ACKing received fragments %02X%02X%02X%02X "
@@ -902,6 +928,9 @@ static void _try_reassembly(gnrc_netif_hdr_t *netif_hdr,
                       entry->entry.base->current_size,
                       entry->entry.base->datagram_size);
                 bitmap = _to_bitmap(entry->entry.rb->received);
+                if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+                    _stats.acks.partly++;
+                }
             }
             else {
                 /* no ACK was requested and no error was causing an abort ACK*/
@@ -1087,6 +1116,17 @@ static void _handle_nth_rfrag(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
 }
 
+static int _resend_failed_frag(clist_node_t *node, void *fbuf_ptr)
+{
+    int res;
+
+    if (((res = _resend_frag(node, fbuf_ptr)) == 0) &&
+        IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+        _stats.fragment_resends.by_nack++;
+    }
+    return res;
+}
+
 static void _check_failed_frags(sixlowpan_sfr_ack_t *ack,
                                 gnrc_sixlowpan_frag_fb_t *fbuf)
 {
@@ -1140,10 +1180,10 @@ static void _check_failed_frags(sixlowpan_sfr_ack_t *ack,
     else {
         fbuf->sfr.window = not_received;
         assert(fbuf->sfr.frags_sent == clist_count(&fbuf->sfr.window));
-        /* use _resend_frag here instead of loop above, so _resend_frag
-         * can know if the fragment is the last in the window by using
-         * clist_rpeek() on fbuf->sfr.window */
-        if (clist_foreach(&fbuf->sfr.window, _resend_frag, fbuf) != NULL) {
+        /* use _resend_failed_frag here instead of loop above, so
+         * _resend_frag can know if the fragment is the last in the window by
+         * using clist_rpeek() on fbuf->sfr.window */
+        if (clist_foreach(&fbuf->sfr.window, _resend_failed_frag, fbuf) != NULL) {
             /* XXX: it is unlikely that allocating an abort RFRAG will be
              * successful since the resources missing to cause the abort are
              * still in use, but we should at least try */
@@ -1310,6 +1350,9 @@ static bool _send_abort_frag(gnrc_pktsnip_t *pkt, uint8_t tag, bool req_ack,
     if (frag != NULL) {
         sixlowpan_sfr_rfrag_set_offset(frag->next->data, 0);
         _send_frame(frag, NULL, page);
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+            _stats.fragments_sent.aborts++;
+        }
         return true;
     }
     return false;
@@ -1378,6 +1421,9 @@ static void _retry_datagram(gnrc_sixlowpan_frag_fb_t *fbuf)
     }
     else {
         DEBUG("6lo sfr: Retrying to send datagram %u completely\n", fbuf->tag);
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+            _stats.datagram_resends++;
+        }
         fbuf->sfr.retrans--;
         /* return fragmentation buffer to its original state to resend the whole
          * datagram again */
@@ -1396,6 +1442,9 @@ static void _abort_rb(gnrc_pktsnip_t *pkt, _generic_rb_entry_t *entry,
                                  netif_hdr->src_l2addr_len, addr_str),
           hdr->base.tag);
     if (send_ack) {
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+            _stats.acks.aborts++;
+        }
         _send_ack(gnrc_netif_hdr_get_netif(netif_hdr),
                   gnrc_netif_hdr_get_src_addr(netif_hdr),
                   netif_hdr->src_l2addr_len,
@@ -1513,6 +1562,9 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                                      addr_str), vrbe->super.tag);
         _send_ack(vrbe->in_netif, vrbe->super.src, vrbe->super.src_len,
                   &mock_base, hdr->bitmap);
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+            _stats.acks.forwarded++;
+        }
         if ((unaligned_get_u32(hdr->bitmap) == _full_bitmap.u32) ||
             (unaligned_get_u32(hdr->bitmap) == _null_bitmap.u32)) {
             if (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0) {
@@ -1598,6 +1650,9 @@ static int _forward_rfrag(gnrc_pktsnip_t *pkt, _generic_rb_entry_t *entry,
     gnrc_netif_hdr_set_netif(new->data, entry->entry.vrb->out_netif);
     new->next = pkt;
     _send_frame(new, NULL, page);
+    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+        _stats.fragments_sent.forwarded++;
+    }
     return 0;
 }
 

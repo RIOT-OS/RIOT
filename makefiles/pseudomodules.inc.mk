@@ -56,6 +56,7 @@ PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
 PSEUDOMODULES += gnrc_sixlowpan_default
 PSEUDOMODULES += gnrc_sixlowpan_frag_hint
+PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_stats
 PSEUDOMODULES += gnrc_sixlowpan_iphc_nhc
 PSEUDOMODULES += gnrc_sixlowpan_nd_border_router
 PSEUDOMODULES += gnrc_sixlowpan_router_default

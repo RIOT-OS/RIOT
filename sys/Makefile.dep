@@ -333,6 +333,10 @@ ifneq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_stats,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_sfr
+endif
+
 ifneq (,$(filter gnrc_sixlowpan_frag_vrb,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += gnrc_sixlowpan_frag_fb
