@@ -193,6 +193,10 @@ static void _mlme_set(gnrc_lorawan_t *mac, const mlme_request_t *mlme_request,
             mlme_confirm->status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
             memcpy(&mac->dev_addr, mlme_request->mib.dev_addr, sizeof(uint32_t));
             break;
+        case MIB_RX2_DR:
+            mlme_confirm->status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
+            gnrc_lorawan_set_rx2_dr(mac, mlme_request->mib.rx2_dr);
+            break;
         default:
             break;
     }

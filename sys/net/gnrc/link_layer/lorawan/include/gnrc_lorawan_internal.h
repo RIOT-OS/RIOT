@@ -446,6 +446,14 @@ static inline void gnrc_lorawan_mac_release(gnrc_lorawan_t *mac)
     mac->busy = false;
 }
 
+/**
+ * @brief Set the datarate of the second reception window
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] rx2_dr datarate of RX2
+ */
+void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr);
+
 #ifdef __cplusplus
 }
 #endif

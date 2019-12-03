@@ -361,6 +361,13 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
         case NETOPT_LINK_CHECK:
             netif->lorawan.flags |= GNRC_NETIF_LORAWAN_FLAGS_LINK_CHECK;
             break;
+        case NETOPT_LORAWAN_RX2_DR:
+            assert(opt->data_len == sizeof(uint8_t));
+            mlme_request.type = MLME_SET;
+            mlme_request.mib.type = MIB_RX2_DR;
+            mlme_request.mib.rx2_dr = *((uint8_t*) opt->data);
+            gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request, &mlme_confirm);
+            break;
         default:
             res = netif->lorawan.mac.netdev.driver->set(&netif->lorawan.mac.netdev, opt->opt, opt->data, opt->data_len);
             break;
