@@ -24,7 +24,7 @@ static uint8_t dr_bw[GNRC_LORAWAN_DATARATES_NUMOF] =
 
 int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate)
 {
-    netdev_t *dev = mac->netdev.lower;
+    netdev_t *dev = gnrc_lorawan_get_netdev(mac);
 
     if (!gnrc_lorawan_validate_dr(datarate)) {
         return -EINVAL;
@@ -84,7 +84,7 @@ void gnrc_lorawan_channels_init(gnrc_lorawan_t *mac)
 
 uint32_t gnrc_lorawan_pick_channel(gnrc_lorawan_t *mac)
 {
-    netdev_t *netdev = mac->netdev.lower;
+    netdev_t *netdev = gnrc_lorawan_get_netdev(mac);
     uint32_t random_number;
 
     netdev->driver->get(netdev, NETOPT_RANDOM, &random_number,

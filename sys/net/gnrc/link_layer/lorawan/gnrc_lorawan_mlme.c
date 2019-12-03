@@ -59,7 +59,7 @@ static gnrc_pktsnip_t *_build_join_req_pkt(uint8_t *appeui, uint8_t *deveui, uin
 static int gnrc_lorawan_send_join_request(gnrc_lorawan_t *mac, uint8_t *deveui,
                                           uint8_t *appeui, uint8_t *appkey, uint8_t dr)
 {
-    netdev_t *dev = mac->netdev.lower;
+    netdev_t *dev = gnrc_lorawan_get_netdev(mac);
 
     /* Dev Nonce */
     uint32_t random_number;
@@ -100,7 +100,7 @@ void gnrc_lorawan_mlme_process_join(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt)
         goto out;
     }
 
-    /* Substract 1 from join accept max size, since the MHDR was already read */
+    /* Subtract 1 from join accept max size, since the MHDR was already read */
     uint8_t out[GNRC_LORAWAN_JOIN_ACCEPT_MAX_SIZE - 1];
     uint8_t has_cflist = (pkt->size - 1) >= CFLIST_SIZE;
     gnrc_lorawan_decrypt_join_accept(mac->appskey, ((uint8_t *) pkt->data) + 1,

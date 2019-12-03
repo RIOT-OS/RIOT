@@ -107,16 +107,10 @@ void gnrc_lorawan_mcps_confirm(gnrc_lorawan_t *mac, mcps_confirm_t *confirm)
     mac->mcps.outgoing_pkt = NULL;
 }
 
-static void _mac_cb(netdev_t *dev, netdev_event_t event)
-{
-    assert(false);
-    netdev_event_cb_pass(dev, event);
-}
-
 static void _driver_cb(netdev_t *dev, netdev_event_t event)
 {
-    gnrc_lorawan_t *mac = (gnrc_lorawan_t *) dev->context;
-    gnrc_netif_t *netif = (gnrc_netif_t *) mac->netdev.context;
+    gnrc_netif_t *netif = dev->context;
+    gnrc_lorawan_t *mac = &netif->lorawan.mac;
 
     if (event == NETDEV_EVENT_ISR) {
         msg_t msg = { .type = NETDEV_MSG_TYPE_EVENT,
@@ -163,12 +157,16 @@ static void _memcpy_reversed(uint8_t *dst, uint8_t *src, size_t size)
     }
 }
 
+netdev_t *gnrc_lorawan_get_netdev(gnrc_lorawan_t *mac)
+{
+    gnrc_netif_t *netif = container_of(mac, gnrc_netif_t, lorawan.mac);
+    return netif->dev;
+}
+
 static void _init(gnrc_netif_t *netif)
 {
     gnrc_netif_default_init(netif);
     netif->dev->event_callback = _driver_cb;
-    netif->lorawan.mac.netdev.event_callback = _mac_cb;
-    netif->lorawan.mac.netdev.context = netif;
     _reset(netif);
 
     /* Initialize default keys, address and EUIs */
@@ -178,7 +176,6 @@ static void _init(gnrc_netif_t *netif)
     memcpy(netif->lorawan.appkey, _appkey, sizeof(_appkey));
     _memcpy_reversed(netif->lorawan.appeui, _appeui, sizeof(_appeui));
 
-    gnrc_lorawan_setup(&netif->lorawan.mac, netif->dev);
     _set_be_addr(&netif->lorawan.mac, _devaddr);
     gnrc_lorawan_init(&netif->lorawan.mac, netif->lorawan.nwkskey, netif->lorawan.appskey);
 }
@@ -275,7 +272,7 @@ static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             res = sizeof(uint32_t);
             break;
         default:
-            res = netif->lorawan.mac.netdev.driver->get(&netif->lorawan.mac.netdev, opt->opt, opt->data, opt->data_len);
+            res = netif->dev->driver->get(netif->dev, opt->opt, opt->data, opt->data_len);
             break;
     }
     return res;
@@ -369,7 +366,7 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
             gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request, &mlme_confirm);
             break;
         default:
-            res = netif->lorawan.mac.netdev.driver->set(&netif->lorawan.mac.netdev, opt->opt, opt->data, opt->data_len);
+            res = netif->dev->driver->set(netif->dev, opt->opt, opt->data, opt->data_len);
             break;
     }
     gnrc_netif_release(netif);
