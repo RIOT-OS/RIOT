@@ -337,7 +337,7 @@ def test_time_exc(child, iface, hw_dst, ll_dst, ll_src):
 def testfunc(child):
     global sniffer
     tap = get_bridge(os.environ["TAP"])
-
+    child.sendline("unittests")
     child.expect(r"OK \((\d+) tests\)")     # wait for and check result of unittests
     print("." * int(child.match.group(1)), end="", flush=True)
     lladdr_src = get_host_lladdr(tap)
