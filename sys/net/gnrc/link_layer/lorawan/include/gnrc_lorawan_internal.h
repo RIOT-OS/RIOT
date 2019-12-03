@@ -446,33 +446,6 @@ static inline void gnrc_lorawan_mac_release(gnrc_lorawan_t *mac)
     mac->busy = false;
 }
 
-/**
- * @brief Allocate memory to hold a GNRC LoRaWAN MCPS request
- *
- * @param[in] mac pointer to the MAC descriptor
- *
- * @return pointer the allocated buffer
- */
-static inline void *gnrc_lorawan_mcps_allocate(gnrc_lorawan_t *mac)
-{
-    mac->netdev.event_callback((netdev_t *) mac, NETDEV_EVENT_MCPS_GET_BUFFER);
-    return mac->mcps_buf;
-}
-
-/**
- * @brief Allocate memory to hold a GNRC LoRaWAN MLME request
- *
- * @param[in] mac pointer to the MAC descriptor
- *
- * @return pointer the allocated buffer
- */
-static inline void *gnrc_lorawan_mlme_allocate(gnrc_lorawan_t *mac)
-{
-    mac->netdev.event_callback((netdev_t *) mac, NETDEV_EVENT_MLME_GET_BUFFER);
-    return mac->mlme_buf;
-}
-
-
 #ifdef __cplusplus
 }
 #endif

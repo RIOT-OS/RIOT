@@ -49,13 +49,9 @@ static const gnrc_netif_ops_t lorawan_ops = {
     .msg_handler = _msg_handler
 };
 
-static uint8_t _mcps_buffer[sizeof(mcps_confirm_t) > sizeof(mcps_indication_t) ?
-                            sizeof(mcps_confirm_t) : sizeof(mcps_indication_t)];
-static uint8_t _mlme_buffer[sizeof(mlme_confirm_t) > sizeof(mlme_indication_t) ?
-                            sizeof(mlme_confirm_t) : sizeof(mlme_indication_t)];
-
-static void _mlme_confirm(gnrc_netif_t *netif, mlme_confirm_t *confirm)
+void gnrc_lorawan_mlme_confirm(gnrc_lorawan_t *mac, mlme_confirm_t *confirm)
 {
+    gnrc_netif_lorawan_t *lw_netif = container_of(mac, gnrc_netif_lorawan_t, mac);
     if (confirm->type == MLME_JOIN) {
         if (confirm->status == 0) {
             DEBUG("gnrc_lorawan: join succeeded\n");
@@ -65,52 +61,42 @@ static void _mlme_confirm(gnrc_netif_t *netif, mlme_confirm_t *confirm)
         }
     }
     else if (confirm->type == MLME_LINK_CHECK) {
-        netif->lorawan.flags &= ~GNRC_NETIF_LORAWAN_FLAGS_LINK_CHECK;
-        netif->lorawan.demod_margin = confirm->link_req.margin;
-        netif->lorawan.num_gateways = confirm->link_req.num_gateways;
+        lw_netif->flags &= ~GNRC_NETIF_LORAWAN_FLAGS_LINK_CHECK;
+        lw_netif->demod_margin = confirm->link_req.margin;
+        lw_netif->num_gateways = confirm->link_req.num_gateways;
     }
+}
+
+void gnrc_lorawan_mcps_indication(gnrc_lorawan_t *mac, mcps_indication_t *ind)
+{
+    (void) mac;
+    if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_LORAWAN, ind->data.port,
+                ind->data.pkt)) {
+        gnrc_pktbuf_release(ind->data.pkt);
+    }
+}
+
+void gnrc_lorawan_mlme_indication(gnrc_lorawan_t *mac, mlme_indication_t *ind)
+{
+    (void) mac;
+    (void) ind;
+}
+
+void gnrc_lorawan_mcps_confirm(gnrc_lorawan_t *mac, mcps_confirm_t *confirm)
+{
+    if (confirm->status == 0) {
+        gnrc_pktbuf_release(mac->mcps.outgoing_pkt);
+    }
+    else {
+        gnrc_pktbuf_release_error(mac->mcps.outgoing_pkt, 1);
+    }
+    mac->mcps.outgoing_pkt = NULL;
 }
 
 static void _mac_cb(netdev_t *dev, netdev_event_t event)
 {
-    gnrc_lorawan_t *mac = (gnrc_lorawan_t *) dev;
-
-    mcps_confirm_t *mcps_confirm;
-    mcps_indication_t *mcps_indication;
-
-    switch (event) {
-        case NETDEV_EVENT_MLME_INDICATION:
-            /* ignore */
-            break;
-        case NETDEV_EVENT_MCPS_INDICATION:
-            mcps_indication = mac->mcps_buf;
-            if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_LORAWAN, mcps_indication->data.port, mcps_indication->data.pkt)) {
-                gnrc_pktbuf_release(mcps_indication->data.pkt);
-            }
-            break;
-        case NETDEV_EVENT_MLME_CONFIRM:
-            _mlme_confirm((gnrc_netif_t *) mac->netdev.context, mac->mlme_buf);
-            break;
-        case NETDEV_EVENT_MCPS_CONFIRM:
-            mcps_confirm = mac->mcps_buf;
-            if (mcps_confirm->status == 0) {
-                gnrc_pktbuf_release(mac->mcps.outgoing_pkt);
-            }
-            else {
-                gnrc_pktbuf_release_error(mac->mcps.outgoing_pkt, 1);
-            }
-            mac->mcps.outgoing_pkt = NULL;
-            break;
-        case NETDEV_EVENT_MLME_GET_BUFFER:
-            mac->mlme_buf = _mlme_buffer;
-            break;
-        case NETDEV_EVENT_MCPS_GET_BUFFER:
-            mac->mcps_buf = _mcps_buffer;
-            break;
-        default:
-            netdev_event_cb_pass(dev, event);
-            break;
-    }
+    assert(false);
+    netdev_event_cb_pass(dev, event);
 }
 
 static void _driver_cb(netdev_t *dev, netdev_event_t event)

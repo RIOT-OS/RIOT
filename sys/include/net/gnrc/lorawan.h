@@ -230,6 +230,10 @@ void gnrc_lorawan_recv(gnrc_lorawan_t *mac);
  * @param lower pointer to the lower netdev device (radio)
  */
 void gnrc_lorawan_setup(gnrc_lorawan_t *mac, netdev_t *lower);
+void gnrc_lorawan_mcps_indication(gnrc_lorawan_t *mac, mcps_indication_t *ind);
+void gnrc_lorawan_mlme_indication(gnrc_lorawan_t *mac, mlme_indication_t *ind);
+void gnrc_lorawan_mcps_confirm(gnrc_lorawan_t *mac, mcps_confirm_t *confirm);
+void gnrc_lorawan_mlme_confirm(gnrc_lorawan_t *mac, mlme_confirm_t *confirm);
 
 #ifdef __cplusplus
 }
