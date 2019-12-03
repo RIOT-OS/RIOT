@@ -84,11 +84,6 @@ static gnrc_netif_t *eth_netif, *mock_netif;
 static ipv6_addr_t *local_addr;
 static char mock_netif_stack[THREAD_STACKSIZE_DEFAULT];
 static char line_buf[SHELL_DEFAULT_BUFSIZE];
-static const shell_command_t shell_commands[] = {
-    { "udp", "send data over UDP and listen on UDP ports", udp_cmd },
-    { "test", "sends data according to a specified numeric test", shell_test_cmd },
-    { NULL, NULL, NULL }
-};
 
 static const ipv6_addr_t _src = { .u8 = TEST_SRC };
 static const ipv6_addr_t _dst = { .u8 = TEST_DST };
@@ -617,6 +612,29 @@ static int shell_test_cmd(int argc, char **argv)
     return 0;
 }
 
+static int send_test_pkt(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    printf("Sending UDP test packets to port %u\n", TEST_PORT);
+    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+        if (ipv6_addr_is_link_local(&eth_netif->ipv6.addrs[i])) {
+            local_addr = &eth_netif->ipv6.addrs[i];
+        }
+    }
+    return 0;
+}
+
+static int unittests(int argc, char** argv)
+{
+    (void) argc;
+    (void) argv;
+
+    run_unittests();
+    return 0;
+}
+
 /* TODO: test if forwarded packet is not fragmented */
 
 static int mock_get_device_type(netdev_t *dev, void *value, size_t max_len)
@@ -649,6 +667,14 @@ static int mock_send(netdev_t *dev, const iolist_t *iolist)
     return res;
 }
 
+static const shell_command_t shell_commands[] = {
+    { "udp", "send data over UDP and listen on UDP ports", udp_cmd },
+    { "unittests", "Runs unitest", unittests},
+    { "test", "sends data according to a specified numeric test", shell_test_cmd },
+    { "send-test-pkt", "start sendig UDP test packets to TEST_PORT", send_test_pkt },
+    { NULL, NULL, NULL }
+};
+
 int main(void)
 {
     eth_netif = gnrc_netif_iter(NULL);
@@ -663,13 +689,6 @@ int main(void)
                                        sizeof(mock_netif_stack),
                                        GNRC_NETIF_PRIO, "mock_netif",
                                        (netdev_t *)&mock_netdev);
-    run_unittests();
-    printf("Sending UDP test packets to port %u\n", TEST_PORT);
-    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
-        if (ipv6_addr_is_link_local(&eth_netif->ipv6.addrs[i])) {
-            local_addr = &eth_netif->ipv6.addrs[i];
-        }
-    }
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }

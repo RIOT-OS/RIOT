@@ -318,6 +318,7 @@ def test_ipv6_ext_frag_fwd_too_big(child, s, iface, ll_dst):
 def testfunc(child):
     tap = get_bridge(os.environ["TAP"])
 
+    child.sendline("unittests")
     child.expect(r"OK \((\d+) tests\)")     # wait for and check result of unittests
     print("." * int(child.match.group(1)), end="", flush=True)
 
@@ -337,6 +338,7 @@ def testfunc(child):
                 print("FAILED")
                 raise e
 
+    child.sendline("send-test-pkt")
     child.expect(r"Sending UDP test packets to port (\d+)\r\n")
 
     port = int(child.match.group(1))
