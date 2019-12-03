@@ -189,6 +189,10 @@ static void _mlme_set(gnrc_lorawan_t *mac, const mlme_request_t *mlme_request,
                 mac->mlme.activation = mlme_request->mib.activation;
             }
             break;
+        case MIB_DEV_ADDR:
+            mlme_confirm->status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
+            memcpy(&mac->dev_addr, mlme_request->mib.dev_addr, sizeof(uint32_t));
+            break;
         default:
             break;
     }
@@ -201,6 +205,10 @@ static void _mlme_get(gnrc_lorawan_t *mac, const mlme_request_t *mlme_request,
         case MIB_ACTIVATION_METHOD:
             mlme_confirm->status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
             mlme_confirm->mib.activation = mac->mlme.activation;
+            break;
+        case MIB_DEV_ADDR:
+            mlme_confirm->status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
+            mlme_confirm->mib.dev_addr = &mac->dev_addr;
             break;
         default:
             mlme_confirm->status = -EINVAL;

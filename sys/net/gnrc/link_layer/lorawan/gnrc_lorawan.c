@@ -269,39 +269,18 @@ void gnrc_lorawan_process_pkt(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt)
 
 int gnrc_lorawan_netdev_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 {
-    int res = 0;
-    gnrc_lorawan_t *mac = (gnrc_lorawan_t *) dev;
-    uint32_t tmp;
-
-    switch (opt) {
-        case NETOPT_ADDRESS:
-            assert(max_len >= sizeof(mac->dev_addr));
-            tmp = byteorder_swapl(mac->dev_addr.u32);
-            memcpy(value, &tmp, sizeof(mac->dev_addr));
-            res = sizeof(mac->dev_addr);
-            break;
-        default:
-            res = netdev_get_pass(dev, opt, value, max_len);
-            break;
-    }
-    return res;
+    return netdev_get_pass(dev, opt, value, max_len);
 }
 
 int gnrc_lorawan_netdev_set(netdev_t *dev, netopt_t opt, const void *value, size_t len)
 {
     gnrc_lorawan_t *mac = (gnrc_lorawan_t *) dev;
-    uint32_t tmp;
 
     if (mac->busy) {
         return -EBUSY;
     }
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            assert(len == sizeof(uint32_t));
-            tmp = byteorder_swapl(*((uint32_t *) value));
-            memcpy(&mac->dev_addr, &tmp, sizeof(uint32_t));
-            break;
         case NETOPT_LORAWAN_RX2_DR:
             assert(len == sizeof(uint8_t));
             _set_rx2_dr(mac, *((uint8_t *) value));

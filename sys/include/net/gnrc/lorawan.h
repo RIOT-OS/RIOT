@@ -73,7 +73,8 @@ typedef enum {
  * @brief MAC Information Base attributes
  */
 typedef enum {
-    MIB_ACTIVATION_METHOD      /**< type is activation method */
+    MIB_ACTIVATION_METHOD,     /**< type is activation method */
+    MIB_DEV_ADDR               /**< type is dev addr */
 } mlme_mib_type_t;
 
 /**
@@ -103,6 +104,7 @@ typedef struct {
     mlme_mib_type_t type; /**< MIB attribute identifier */
     union {
         mlme_activation_t activation;   /**< holds activation mechanism */
+        void *dev_addr;                 /**< pointer to the dev_addr */
     };
 } mlme_mib_t;
 
