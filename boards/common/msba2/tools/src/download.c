@@ -245,7 +245,7 @@ hardware you may be using.  Thanks :-)\r\n"
 
 static void download_main(int event)
 {
-    char buf[4096];
+    char buf[4096 + 32];
     unsigned char bytes[256];
     double xtal;
     int n;
