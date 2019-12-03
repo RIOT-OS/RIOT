@@ -6,4 +6,6 @@ CFLAGS += -DNDEBUG -DLOG_LEVEL=LOG_NONE
 DISABLE_MODULE += auto_init
 DISABLE_MODULE += test_utils_interactive_sync
 
+USEMODULE += stdio_null
+
 include $(RIOTBASE)/Makefile.include

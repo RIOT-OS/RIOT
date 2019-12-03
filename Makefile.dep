@@ -415,7 +415,7 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   ifeq (,$(filter newlib_syscalls_%,$(USEMODULE)))
     USEMODULE += newlib_syscalls_default
   endif
-  ifeq (,$(filter stdio_rtt stdio_cdc_acm,$(USEMODULE)))
+  ifeq (,$(filter stdio_cdc_acm stdio_null stdio_rtt,$(USEMODULE)))
     USEMODULE += stdio_uart
   endif
 endif
