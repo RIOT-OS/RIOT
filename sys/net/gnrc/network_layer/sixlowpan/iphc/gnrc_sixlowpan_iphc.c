@@ -742,130 +742,17 @@ static int _forward_frag(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *frag_hdr,
 }
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
 
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
-static inline size_t iphc_nhc_udp_encode(uint8_t *nhc_data,
-                                         const gnrc_pktsnip_t *udp)
+static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
+                                const gnrc_netif_hdr_t *netif_hdr,
+                                gnrc_netif_t *iface,
+                                uint8_t *iphc_hdr)
 {
-    const udp_hdr_t *udp_hdr = udp->data;
-    uint16_t src_port = byteorder_ntohs(udp_hdr->src_port);
-    uint16_t dst_port = byteorder_ntohs(udp_hdr->dst_port);
-    size_t nhc_len = 1; /* skip over NHC header */
-
-    /* Set UDP NHC header type
-     * (see https://tools.ietf.org/html/rfc6282#section-4.3). */
-    nhc_data[0] = NHC_UDP_ID;
-    /* Compressing UDP ports, follow the same sequence as the linux kernel (nhc_udp module). */
-    if (((src_port & NHC_UDP_4BIT_MASK) == NHC_UDP_4BIT_PORT) &&
-        ((dst_port & NHC_UDP_4BIT_MASK) == NHC_UDP_4BIT_PORT)) {
-        DEBUG("6lo iphc nhc: elide src and dst\n");
-        nhc_data[0] |= NHC_UDP_SD_ELIDED;
-        nhc_data[nhc_len++] = dst_port - NHC_UDP_4BIT_PORT +
-                              ((src_port - NHC_UDP_4BIT_PORT) << 4);
-    }
-    else if ((dst_port & NHC_UDP_8BIT_MASK) == NHC_UDP_8BIT_PORT) {
-        DEBUG("6lo iphc nhc: elide dst\n");
-        nhc_data[0] |= NHC_UDP_S_INLINE;
-        nhc_data[nhc_len++] = udp_hdr->src_port.u8[0];
-        nhc_data[nhc_len++] = udp_hdr->src_port.u8[1];
-        nhc_data[nhc_len++] = dst_port - NHC_UDP_8BIT_PORT;
-    }
-    else if ((src_port & NHC_UDP_8BIT_MASK) == NHC_UDP_8BIT_PORT) {
-        DEBUG("6lo iphc nhc: elide src\n");
-        nhc_data[0] |= NHC_UDP_D_INLINE;
-        nhc_data[nhc_len++] = src_port - NHC_UDP_8BIT_PORT;
-        nhc_data[nhc_len++] = udp_hdr->dst_port.u8[0];
-        nhc_data[nhc_len++] = udp_hdr->dst_port.u8[1];
-    }
-    else {
-        DEBUG("6lo iphc nhc: src and dst inline\n");
-        nhc_data[0] |= NHC_UDP_SD_INLINE;
-        nhc_data[nhc_len++] = udp_hdr->src_port.u8[0];
-        nhc_data[nhc_len++] = udp_hdr->src_port.u8[1];
-        nhc_data[nhc_len++] = udp_hdr->dst_port.u8[0];
-        nhc_data[nhc_len++] = udp_hdr->dst_port.u8[1];
-    }
-
-    /* TODO: Add support for elided checksum. */
-    nhc_data[nhc_len++] = udp_hdr->checksum.u8[0];
-    nhc_data[nhc_len++] = udp_hdr->checksum.u8[1];
-
-    return nhc_len;
-}
-#endif
-
-static inline bool _compressible(gnrc_pktsnip_t *hdr)
-{
-    switch (hdr->type) {
-        case GNRC_NETTYPE_UNDEF:    /* when forwarded */
-        case GNRC_NETTYPE_IPV6:
-#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && defined(MODULE_GNRC_UDP)
-        case GNRC_NETTYPE_UDP:
-#endif
-            return true;
-        default:
-            return false;
-    }
-}
-
-static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
-                                    const gnrc_netif_hdr_t *netif_hdr,
-                                    gnrc_netif_t *iface)
-{
-    assert(pkt != NULL);
-    ipv6_hdr_t *ipv6_hdr;
-    uint8_t *iphc_hdr;
     gnrc_sixlowpan_ctx_t *src_ctx = NULL, *dst_ctx = NULL;
-    gnrc_pktsnip_t *dispatch, *ptr = pkt->next;
+    ipv6_hdr_t *ipv6_hdr = pkt->next->data;
     bool addr_comp = false;
-    size_t dispatch_size = 0;
     uint16_t inline_pos = SIXLOWPAN_IPHC_HDR_LEN;
 
     assert(iface != NULL);
-    dispatch = NULL;    /* use dispatch as temporary pointer for prev */
-    /* determine maximum dispatch size and write protect all headers until
-     * then because they will be removed */
-    while ((ptr != NULL) && _compressible(ptr)) {
-        gnrc_pktsnip_t *tmp = gnrc_pktbuf_start_write(ptr);
-
-        if (tmp == NULL) {
-            DEBUG("6lo iphc: unable to write protect compressible header\n");
-            return NULL;
-        }
-        ptr = tmp;
-        if (dispatch == NULL) {
-            /* pkt was already write protected in gnrc_sixlowpan.c:_send so
-             * we shouldn't do it again */
-            pkt->next = ptr;    /* reset original packet */
-        }
-        else {
-            dispatch->next = ptr;
-        }
-        if (ptr->type == GNRC_NETTYPE_UNDEF) {
-            /* most likely UDP for now so use that (XXX: extend if extension
-             * headers make problems) */
-            dispatch_size += sizeof(udp_hdr_t);
-            break;  /* nothing special after UDP so quit even if more UNDEF
-                     * come */
-        }
-        else {
-            dispatch_size += ptr->size;
-        }
-        dispatch = ptr; /* use dispatch as temporary point for prev */
-        ptr = ptr->next;
-    }
-    /* there should be at least one compressible header in `pkt`, otherwise this
-     * function should not be called */
-    assert(dispatch_size > 0);
-    ipv6_hdr = pkt->next->data;
-    dispatch = gnrc_pktbuf_add(NULL, NULL, dispatch_size,
-                               GNRC_NETTYPE_SIXLOWPAN);
-
-    if (dispatch == NULL) {
-        DEBUG("6lo iphc: error allocating dispatch space\n");
-        return NULL;
-    }
-
-    iphc_hdr = dispatch->data;
 
     /* set initial dispatch value*/
     iphc_hdr[IPHC1_IDX] = SIXLOWPAN_IPHC1_DISP;
@@ -989,7 +876,7 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
             if (gnrc_netif_ipv6_get_iid(iface, &iid) < 0) {
                 DEBUG("6lo iphc: could not get interface's IID\n");
                 gnrc_netif_release(iface);
-                return NULL;
+                return 0;
             }
             gnrc_netif_release(iface);
 
@@ -1107,7 +994,7 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
 
         if (gnrc_netif_hdr_ipv6_iid_from_dst(iface, netif_hdr, &iid) < 0) {
             DEBUG("6lo iphc: could not get destination's IID\n");
-            return NULL;
+            return 0;
         }
 
         if ((ipv6_hdr->dst.u64[1].u64 == iid.uint64.u64) ||
@@ -1140,8 +1027,139 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
         inline_pos += 16;
     }
 
+    return inline_pos;
+}
+
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
-    switch (ipv6_hdr->nh) {
+static inline size_t iphc_nhc_udp_encode(uint8_t *nhc_data,
+                                         const gnrc_pktsnip_t *udp)
+{
+    const udp_hdr_t *udp_hdr = udp->data;
+    uint16_t src_port = byteorder_ntohs(udp_hdr->src_port);
+    uint16_t dst_port = byteorder_ntohs(udp_hdr->dst_port);
+    size_t nhc_len = 1; /* skip over NHC header */
+
+    /* Set UDP NHC header type
+     * (see https://tools.ietf.org/html/rfc6282#section-4.3). */
+    nhc_data[0] = NHC_UDP_ID;
+    /* Compressing UDP ports, follow the same sequence as the linux kernel (nhc_udp module). */
+    if (((src_port & NHC_UDP_4BIT_MASK) == NHC_UDP_4BIT_PORT) &&
+        ((dst_port & NHC_UDP_4BIT_MASK) == NHC_UDP_4BIT_PORT)) {
+        DEBUG("6lo iphc nhc: elide src and dst\n");
+        nhc_data[0] |= NHC_UDP_SD_ELIDED;
+        nhc_data[nhc_len++] = dst_port - NHC_UDP_4BIT_PORT +
+                              ((src_port - NHC_UDP_4BIT_PORT) << 4);
+    }
+    else if ((dst_port & NHC_UDP_8BIT_MASK) == NHC_UDP_8BIT_PORT) {
+        DEBUG("6lo iphc nhc: elide dst\n");
+        nhc_data[0] |= NHC_UDP_S_INLINE;
+        nhc_data[nhc_len++] = udp_hdr->src_port.u8[0];
+        nhc_data[nhc_len++] = udp_hdr->src_port.u8[1];
+        nhc_data[nhc_len++] = dst_port - NHC_UDP_8BIT_PORT;
+    }
+    else if ((src_port & NHC_UDP_8BIT_MASK) == NHC_UDP_8BIT_PORT) {
+        DEBUG("6lo iphc nhc: elide src\n");
+        nhc_data[0] |= NHC_UDP_D_INLINE;
+        nhc_data[nhc_len++] = src_port - NHC_UDP_8BIT_PORT;
+        nhc_data[nhc_len++] = udp_hdr->dst_port.u8[0];
+        nhc_data[nhc_len++] = udp_hdr->dst_port.u8[1];
+    }
+    else {
+        DEBUG("6lo iphc nhc: src and dst inline\n");
+        nhc_data[0] |= NHC_UDP_SD_INLINE;
+        nhc_data[nhc_len++] = udp_hdr->src_port.u8[0];
+        nhc_data[nhc_len++] = udp_hdr->src_port.u8[1];
+        nhc_data[nhc_len++] = udp_hdr->dst_port.u8[0];
+        nhc_data[nhc_len++] = udp_hdr->dst_port.u8[1];
+    }
+
+    /* TODO: Add support for elided checksum. */
+    nhc_data[nhc_len++] = udp_hdr->checksum.u8[0];
+    nhc_data[nhc_len++] = udp_hdr->checksum.u8[1];
+
+    return nhc_len;
+}
+#endif
+
+static inline bool _compressible(gnrc_pktsnip_t *hdr)
+{
+    switch (hdr->type) {
+        case GNRC_NETTYPE_UNDEF:    /* when forwarded */
+        case GNRC_NETTYPE_IPV6:
+#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && defined(MODULE_GNRC_UDP)
+        case GNRC_NETTYPE_UDP:
+#endif
+            return true;
+        default:
+            return false;
+    }
+}
+
+static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
+                                    const gnrc_netif_hdr_t *netif_hdr,
+                                    gnrc_netif_t *iface)
+{
+    assert(pkt != NULL);
+    uint8_t *iphc_hdr;
+    gnrc_pktsnip_t *dispatch, *ptr = pkt->next;
+    size_t dispatch_size = 0;
+    uint16_t inline_pos = 0;
+    uint8_t nh;
+
+    dispatch = NULL;    /* use dispatch as temporary pointer for prev */
+    /* determine maximum dispatch size and write protect all headers until
+     * then because they will be removed */
+    while ((ptr != NULL) && _compressible(ptr)) {
+        gnrc_pktsnip_t *tmp = gnrc_pktbuf_start_write(ptr);
+
+        if (tmp == NULL) {
+            DEBUG("6lo iphc: unable to write protect compressible header\n");
+            return NULL;
+        }
+        ptr = tmp;
+        if (dispatch == NULL) {
+            /* pkt was already write protected in gnrc_sixlowpan.c:_send so
+             * we shouldn't do it again */
+            pkt->next = ptr;    /* reset original packet */
+        }
+        else {
+            dispatch->next = ptr;
+        }
+        if (ptr->type == GNRC_NETTYPE_UNDEF) {
+            /* most likely UDP for now so use that (XXX: extend if extension
+             * headers make problems) */
+            dispatch_size += sizeof(udp_hdr_t);
+            break;  /* nothing special after UDP so quit even if more UNDEF
+                     * come */
+        }
+        else {
+            dispatch_size += ptr->size;
+        }
+        dispatch = ptr; /* use dispatch as temporary point for prev */
+        ptr = ptr->next;
+    }
+    /* there should be at least one compressible header in `pkt`, otherwise this
+     * function should not be called */
+    assert(dispatch_size > 0);
+    dispatch = gnrc_pktbuf_add(NULL, NULL, dispatch_size,
+                               GNRC_NETTYPE_SIXLOWPAN);
+
+    if (dispatch == NULL) {
+        DEBUG("6lo iphc: error allocating dispatch space\n");
+        return NULL;
+    }
+
+    iphc_hdr = dispatch->data;
+    inline_pos = _iphc_ipv6_encode(pkt, netif_hdr, iface, iphc_hdr);
+
+    if (inline_pos == 0) {
+        DEBUG("6lo iphc: error encoding IPv6 header\n");
+        return NULL;
+    }
+
+    nh = ((ipv6_hdr_t *)pkt->next->data)->nh;
+#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
+    switch (nh) {
         case PROTNUM_UDP: {
             gnrc_pktsnip_t *udp = pkt->next->next;
 
