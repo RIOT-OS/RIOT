@@ -40,9 +40,6 @@ static rtc_alarm_cb_t _cb;
 /* Argument to alarm callback */
 static void *_cb_arg;
 
-/* internal function to set time based on time_t */
-static void _rtc_set(time_t time);
-
 void RTC_IRQHandler(void) __attribute__((interrupt("IRQ")));
 
 void rtc_init(void)
@@ -56,10 +53,10 @@ void rtc_init(void)
 
     RTC_CCR = CCR_CLKSRC;                   /* Clock from external 32 kHz Osc. */
 
-    /* initialize clock with valid unix compatible values
-     * If RTC_YEAR contains an value larger unix time_t we must reset. */
+    /* initialize clock with valid unix compatible values */
     if (RTC_YEAR > 2037) {
-        _rtc_set(0);
+        struct tm localt = { .tm_year = 70 };
+        rtc_set_time(&localt);
     }
 
     rtc_poweron();
@@ -200,11 +197,4 @@ void RTC_IRQHandler(void)
     }
 
     VICVectAddr = 0;                        /* Acknowledge Interrupt */
-}
-
-static void _rtc_set(time_t time)
-{
-    struct tm *localt;
-    localt = localtime(&time);                      /* convert seconds to broken-down time */
-    rtc_set_time(localt);
 }
