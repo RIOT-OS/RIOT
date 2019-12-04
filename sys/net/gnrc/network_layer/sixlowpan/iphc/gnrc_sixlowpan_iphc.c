@@ -20,6 +20,7 @@
 
 #include "byteorder.h"
 #include "net/ipv6/hdr.h"
+#include "net/ipv6/ext.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/sixlowpan.h"
@@ -95,6 +96,16 @@
 #define NHC_UDP_4BIT_MASK           (0xFFF0)
 #define NHC_UDP_8BIT_PORT           (0xF000)
 #define NHC_UDP_8BIT_MASK           (0xFF00)
+
+#define NHC_IPV6_EXT_ID             (0xE0)
+#define NHC_IPV6_EXT_NH             (0x01)
+
+#define NHC_IPV6_EXT_EID_HOPOPT     (0x00 << 1)
+#define NHC_IPV6_EXT_EID_RH         (0x01 << 1)
+#define NHC_IPV6_EXT_EID_FRAG       (0x02 << 1)
+#define NHC_IPV6_EXT_EID_DST        (0x03 << 1)
+#define NHC_IPV6_EXT_EID_MOB        (0x04 << 1)
+#define NHC_IPV6_EXT_EID_IPV6       (0x07 << 1)
 
 /* currently only used with forwarding output, remove guard if more debug info
  * is added */
@@ -742,6 +753,24 @@ static int _forward_frag(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *frag_hdr,
 }
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
 
+static inline bool _compressible_nh(uint8_t nh)
+{
+    switch (nh) {
+#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
+        case PROTNUM_IPV6_EXT_HOPOPT:
+        case PROTNUM_UDP:
+        case PROTNUM_IPV6:
+        case PROTNUM_IPV6_EXT_RH:
+        case PROTNUM_IPV6_EXT_FRAG:
+        case PROTNUM_IPV6_EXT_DST:
+        case PROTNUM_IPV6_EXT_MOB:
+            return true;
+#endif
+        default:
+            return false;
+    }
+}
+
 static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
                                 const gnrc_netif_hdr_t *netif_hdr,
                                 gnrc_netif_t *iface,
@@ -823,16 +852,11 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
     }
 
     /* check for compressible next header */
-    switch (ipv6_hdr->nh) {
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
-        case PROTNUM_UDP:
-            iphc_hdr[IPHC1_IDX] |= SIXLOWPAN_IPHC1_NH;
-            break;
-#endif
-
-        default:
-            iphc_hdr[inline_pos++] = ipv6_hdr->nh;
-            break;
+    if (_compressible_nh(ipv6_hdr->nh)) {
+        iphc_hdr[IPHC1_IDX] |= SIXLOWPAN_IPHC1_NH;
+    }
+    else {
+        iphc_hdr[inline_pos++] = ipv6_hdr->nh;
     }
 
     /* compress hop limit */
@@ -1031,6 +1055,85 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
 }
 
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
+static ssize_t _iphc_nhc_ipv6_ext_encode(uint8_t *nhc_data,
+                                        const gnrc_pktsnip_t *ext,
+                                        uint16_t ext_len,
+                                        uint8_t *protnum)
+{
+    const ipv6_ext_t *ext_hdr = ext->data;
+    size_t nhc_len = 1; /* skip over NHC header */
+    uint8_t nh = ext_hdr->nh;
+
+    /* From https://tools.ietf.org/html/rfc6282#section-4.1:
+     * > The Length field contained in a compressed IPv6 Extension Header
+     * > indicates the number of octets that pertain to the (compressed)
+     * > extension header following the Length field.
+     *
+     * ipv6_ext_t is nh + length field so subtract it
+     */
+    ext_len -= sizeof(ipv6_ext_t);
+    if (ext_len > UINT8_MAX) {
+        /* From https://tools.ietf.org/html/rfc6282#section-4.1:
+         * > Note that specifying units in octets means that LOWPAN_NHC MUST NOT
+         * > be used to encode IPv6 Extension Headers that have more than 255
+         * > octets following the Length field after compression. */
+        return 0;
+    }
+    /* Set IPv6 extension compression header type
+     * (see https://tools.ietf.org/html/rfc6282#section-4.2). */
+    nhc_data[0] = NHC_IPV6_EXT_ID;
+    switch (*protnum) {
+        case PROTNUM_IPV6_EXT_HOPOPT:
+            nhc_data[0] |= NHC_IPV6_EXT_EID_HOPOPT;
+            /* TODO: decrement ext_len by length of trailing Pad1/PadN option:
+             * > IPv6 Hop-by-Hop and Destination Options Headers may use a trailing
+             * > Pad1 or PadN to achieve 8-octet alignment.  When there is a single
+             * > trailing Pad1 or PadN option of 7 octets or less and the containing
+             * > header is a multiple of 8 octets, the trailing Pad1 or PadN option
+             * > MAY be elided by the compressor. */
+            break;
+        case PROTNUM_IPV6_EXT_RH:
+            nhc_data[0] |= NHC_IPV6_EXT_EID_RH;
+            break;
+        case PROTNUM_IPV6_EXT_FRAG:
+            nhc_data[0] |= NHC_IPV6_EXT_EID_FRAG;
+            break;
+        case PROTNUM_IPV6_EXT_DST:
+            nhc_data[0] |= NHC_IPV6_EXT_EID_DST;
+            /* TODO: decrement ext_len by length of trailing Pad1/PadN option:
+             * > IPv6 Hop-by-Hop and Destination Options Headers may use a trailing
+             * > Pad1 or PadN to achieve 8-octet alignment.  When there is a single
+             * > trailing Pad1 or PadN option of 7 octets or less and the containing
+             * > header is a multiple of 8 octets, the trailing Pad1 or PadN option
+             * > MAY be elided by the compressor. */
+            break;
+        case PROTNUM_IPV6_EXT_MOB:
+            nhc_data[0] |= NHC_IPV6_EXT_EID_MOB;
+            break;
+        default:
+            return -1;
+    }
+    if (_compressible_nh(nh) &&
+        /* carry next header inline when fragment header and offset is equal to
+         * 0 (which means the next header indicates the next header after the
+         * fragment header in the *first fragment*) */
+        ((*protnum != PROTNUM_IPV6_EXT_FRAG) ||
+         (ipv6_ext_frag_get_offset((ipv6_ext_frag_t *)ext_hdr) == 0))) {
+        nhc_data[0] |= NHC_IPV6_EXT_NH;
+    }
+    else {
+        nhc_data[nhc_len++] = ext_hdr->nh;
+        /* prevent next header from being encoded regardless (e.g. if not
+         * first IPv6 fragment) */
+        nh = PROTNUM_RESERVED;
+    }
+    /* integer overflow prevented by `ext_len > UINT8_MAX` check above */
+    nhc_data[nhc_len++] = (uint8_t)ext_len;
+    memcpy(&nhc_data[nhc_len], ext_hdr + 1, ext_len);
+    *protnum = nh;
+    return nhc_len + ext_len;
+}
+
 static inline size_t iphc_nhc_udp_encode(uint8_t *nhc_data,
                                          const gnrc_pktsnip_t *udp)
 {
@@ -1079,6 +1182,99 @@ static inline size_t iphc_nhc_udp_encode(uint8_t *nhc_data,
 
     return nhc_len;
 }
+
+static bool _remove_header(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *hdr,
+                           size_t exp_hdr_size)
+{
+    if (hdr->size > exp_hdr_size) {
+        hdr = gnrc_pktbuf_mark(hdr, exp_hdr_size,
+                               GNRC_NETTYPE_UNDEF);
+
+        if (hdr == NULL) {
+            DEBUG("6lo iphc: unable to remove compressed header\n");
+            return false;
+        }
+    }
+    gnrc_pktbuf_remove_snip(pkt, hdr);
+    return true;
+}
+
+static ssize_t _nhc_ipv6_encode_snip(gnrc_pktsnip_t *pkt,
+                                     const gnrc_netif_hdr_t *netif_hdr,
+                                     gnrc_netif_t *iface,
+                                     uint8_t *nhc_data,
+                                     uint8_t *nh)
+{
+    gnrc_pktsnip_t *hdr = pkt->next->next;
+    ssize_t nhc_len = 1;    /* skip over NHC header */
+    size_t tmp;
+    uint8_t new_nh = ((ipv6_hdr_t *)hdr->data)->nh;
+
+    assert(hdr->size >= sizeof(ipv6_hdr_t));
+    /* Set IPv6 extension compression header type
+     * (see https://tools.ietf.org/html/rfc6282#section-4.2). */
+    nhc_data[0] = NHC_IPV6_EXT_ID;
+    if (_compressible_nh(new_nh)) {
+        nhc_data[0] |= NHC_IPV6_EXT_NH;
+    }
+    else {
+        nhc_data[nhc_len++] = new_nh;
+    }
+    /* save to cast as result is max 40 */
+    tmp = (ssize_t)_iphc_ipv6_encode(hdr, netif_hdr, iface, &nhc_data[nhc_len]);
+    if (tmp == 0) {
+        DEBUG("6lo iphc: error encoding IPv6 header\n");
+        return -1;
+    }
+    nhc_len += tmp;
+    /* remove encapsulated IPv6 header */
+    if (!_remove_header(pkt, hdr, sizeof(ipv6_hdr_t))) {
+        return -1;
+    }
+    *nh = new_nh;
+    return nhc_len;
+}
+
+static ssize_t _nhc_ipv6_ext_encode_snip(gnrc_pktsnip_t *pkt, uint8_t *nhc_data,
+                                         uint8_t *nh)
+{
+    gnrc_pktsnip_t *hdr = pkt->next->next;
+    ipv6_ext_t *ext = hdr->data;
+    ssize_t nhc_len;
+    uint16_t ext_len = ((ext->len * IPV6_EXT_LEN_UNIT) + IPV6_EXT_LEN_UNIT);
+    uint8_t new_nh = *nh;
+
+    assert((hdr->size >= sizeof(ipv6_ext_t)) && (hdr->size >= ext_len));
+    /* _iphc_nhc_ipv6_ext_encode() manipulates nh, so use `new_nh` as temporary
+     * carrier in case of later errors */
+    nhc_len = _iphc_nhc_ipv6_ext_encode(nhc_data, hdr, ext_len, &new_nh);
+    if (nhc_len == 0) {
+        /* extension header is not compressible, so don't compress it and
+         * just copy it after the preceding compression headers */
+        return nhc_len;
+    }
+    /* remove IPv6 extension header */
+    if (!_remove_header(pkt, hdr, ext_len)) {
+        return -1;
+    }
+    *nh = new_nh;
+    return nhc_len;
+}
+
+static ssize_t _nhc_udp_encode_snip(gnrc_pktsnip_t *pkt, uint8_t *nhc_data)
+{
+    gnrc_pktsnip_t *hdr = pkt->next->next;
+    ssize_t nhc_len;
+
+    assert(hdr->size >= sizeof(udp_hdr_t));
+    /* save to cast, as result is max 8 */
+    nhc_len = (ssize_t)iphc_nhc_udp_encode(nhc_data, hdr);
+    /* remove UDP header */
+    if (!_remove_header(pkt, hdr, sizeof(udp_hdr_t))) {
+        return -1;
+    }
+    return nhc_len;
+}
 #endif
 
 static inline bool _compressible(gnrc_pktsnip_t *hdr)
@@ -1086,8 +1282,13 @@ static inline bool _compressible(gnrc_pktsnip_t *hdr)
     switch (hdr->type) {
         case GNRC_NETTYPE_UNDEF:    /* when forwarded */
         case GNRC_NETTYPE_IPV6:
-#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && defined(MODULE_GNRC_UDP)
+#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC)
+# if defined(MODULE_GNRC_IPV6_EXT)
+        case GNRC_NETTYPE_IPV6_EXT:
+# endif /* defined(MODULE_GNRC_IPV6_EXT) */
+# if defined(MODULE_GNRC_UDP)
         case GNRC_NETTYPE_UDP:
+# endif /* defined(MODULE_GNRC_UDP) */
 #endif
             return true;
         default:
@@ -1141,7 +1342,7 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
     /* there should be at least one compressible header in `pkt`, otherwise this
      * function should not be called */
     assert(dispatch_size > 0);
-    dispatch = gnrc_pktbuf_add(NULL, NULL, dispatch_size,
+    dispatch = gnrc_pktbuf_add(NULL, NULL, dispatch_size + 1,
                                GNRC_NETTYPE_SIXLOWPAN);
 
     if (dispatch == NULL) {
@@ -1154,33 +1355,50 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
 
     if (inline_pos == 0) {
         DEBUG("6lo iphc: error encoding IPv6 header\n");
+        gnrc_pktbuf_release(dispatch);
         return NULL;
     }
 
     nh = ((ipv6_hdr_t *)pkt->next->data)->nh;
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
-    switch (nh) {
-        case PROTNUM_UDP: {
-            gnrc_pktsnip_t *udp = pkt->next->next;
-
-            assert(udp->size >= sizeof(udp_hdr_t));
-            inline_pos += iphc_nhc_udp_encode(&iphc_hdr[inline_pos], udp);
-            /* remove UDP header */
-            if (udp->size > sizeof(udp_hdr_t)) {
-                udp = gnrc_pktbuf_mark(udp, sizeof(udp_hdr_t),
-                                       GNRC_NETTYPE_UNDEF);
-
-                if (udp == NULL) {
-                    DEBUG("gnrc_sixlowpan_iphc_encode: unable to mark UDP header\n");
-                    gnrc_pktbuf_release(dispatch);
-                    return NULL;
-                }
+    while (_compressible_nh(nh)) {
+        ssize_t local_pos = 0;
+        switch (nh) {
+            case PROTNUM_UDP:
+                local_pos = _nhc_udp_encode_snip(pkt, &iphc_hdr[inline_pos]);
+                /* abort loop on next iteration */
+                nh = PROTNUM_RESERVED;
+                break;
+            case PROTNUM_IPV6: {    /* encapsulated IPv6 header */
+                local_pos = _nhc_ipv6_encode_snip(pkt, netif_hdr, iface,
+                                                  &iphc_hdr[inline_pos], &nh);
+                break;
             }
-            gnrc_pktbuf_remove_snip(pkt, udp);
-            break;
+            case PROTNUM_IPV6_EXT_HOPOPT:
+            case PROTNUM_IPV6_EXT_RH:
+            case PROTNUM_IPV6_EXT_FRAG:
+            case PROTNUM_IPV6_EXT_DST:
+            case PROTNUM_IPV6_EXT_MOB:
+                local_pos = _nhc_ipv6_ext_encode_snip(pkt,
+                                                      &iphc_hdr[inline_pos],
+                                                      &nh);
+                if (local_pos == 0) {
+                    /* abort loop, extension header is not compressible as
+                     * length field is too large value */
+                    nh = PROTNUM_RESERVED;
+                }
+                break;
+            default:
+                /* abort loop on next iteration */
+                nh = PROTNUM_RESERVED;
+                break;
         }
-        default:
-            break;
+        if (local_pos < 0) {
+            DEBUG("6lo iphc: error on compressing next header\n");
+            gnrc_pktbuf_release(dispatch);
+            return NULL;
+        }
+        inline_pos += local_pos;
     }
 #endif
 
