@@ -252,19 +252,22 @@ static void _mutex_timeout(void *arg)
 
     mutex_thread_t *mt = (mutex_thread_t *)arg;
 
-    mt->timeout = 1;
-    list_node_t *node = list_remove(&mt->mutex->queue,
-                                    (list_node_t *)&mt->thread->rq_entry);
+    if (mt->mutex->queue.next != MUTEX_LOCKED &&
+        mt->mutex->queue.next != NULL) {
+        mt->timeout = 1;
+        list_node_t *node = list_remove(&mt->mutex->queue,
+                                        (list_node_t *)&mt->thread->rq_entry);
 
-    /* if thread was removed from the list */
-    if (node != NULL) {
-        if (mt->mutex->queue.next == NULL) {
-            mt->mutex->queue.next = MUTEX_LOCKED;
+        /* if thread was removed from the list */
+        if (node != NULL) {
+            if (mt->mutex->queue.next == NULL) {
+                mt->mutex->queue.next = MUTEX_LOCKED;
+            }
+            sched_set_status(mt->thread, STATUS_PENDING);
+            irq_restore(irqstate);
+            sched_switch(mt->thread->priority);
+            return;
         }
-        sched_set_status(mt->thread, STATUS_PENDING);
-        irq_restore(irqstate);
-        sched_switch(mt->thread->priority);
-        return;
     }
     irq_restore(irqstate);
 }
