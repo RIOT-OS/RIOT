@@ -19,21 +19,22 @@ again.
 ![Arduino Mega2560](https://store-cdn.arduino.cc/uni/catalog/product/cache/1/image/500x375/f8876a31b63532bbba4e781c30024a0a/a/0/a000067_front_1_.jpg)
 
 ### MCU
-| MCU        | ATmega2560        |
-|:------------- |:--------------------- |
-| Family | AVR/ATmega    |
-| Vendor | Atmel |
-| RAM        | 8Kb   |
-| Flash      | 256Kb         |
-| Frequency  | 16MHz |
-| Timers | 6 (2x 8bit, 4x 16bit) |
-| ADCs       | 14 analog input pins (10bit resolution|
-| UARTs      | 4                 |
-| SPIs       | 1 |
-| I2Cs       | 1 (called TWI)    |
-| Vcc        | 5.0V          |
-| Datasheet / Reference Manual   | [Datasheet and Reference Manual](http://www.atmel.com/images/atmel-2549-8-bit-avr-microcontroller-atmega640-1280-1281-2560-2561_datasheet.pdf) |
-| Board Manual   | [Board Manual](http://arduino.cc/en/Main/arduinoBoardMega2560)|
+
+| MCU                           | ATmega2560                                |
+|:----------------------------- |:----------------------------------------- |
+| Family                        | AVR/ATmega                                |
+| Vendor                        | Atmel                                     |
+| RAM                           | 8 KiB                                     |
+| Flash                         | 256 KiB                                   |
+| Frequency                     | 16 MHz                                    |
+| Timers                        | 6 (2x 8bit, 4x 16bit)                     |
+| ADCs                          | 14 analog input pins (10bit resolution)   |
+| UARTs                         | 4                                         |
+| SPIs                          | 1                                         |
+| I2Cs                          | 1 (called TWI)                            |
+| Vcc                           | 5.0 V                                     |
+| Datasheet / Reference Manual  | [Datasheet and Reference Manual](http://www.atmel.com/images/atmel-2549-8-bit-avr-microcontroller-atmega640-1280-1281-2560-2561_datasheet.pdf) |
+| Board Manual                  | [Board Manual](http://arduino.cc/en/Main/arduinoBoardMega2560) |
 
 Flashing RIOT on the Arduino Mega2560 is quite straight forward, just connect
 your Arduino Mega2560 using the programming port to your host computer and type:
@@ -50,23 +51,17 @@ flash
 More pins can be used for hardware interrupts using the Pin Change
 Interrupt feature. See @ref boards_common_atmega for details.
 
-## State
-While there is basic support in RIOT, there are still some parts missing:
-* Timer implementation needs love (ideally simulate a 32bit timer by adding
-an overflow counter to the implementation)
-* LPM driver missing
-* ~~SPI driver missing~~ (See https://github.com/RIOT-OS/RIOT/pull/4045)
-* I2C/TWI driver missing
-* ADC driver missing
-* PWM driver missing
-
 ## Debugging (WIP)
 The ATmega2560 MCU supports JTAG debugging. To use the JTAG debugging on the
 Arduino Mega 2560 an external JTAG debugger is required. There are several
 options for this MCU/board:
+ * [Atmel-ICE](https://www.microchip.com/DevelopmentTools/ProductDetails/atatmel-ice)
+   (Note: A version of the Atmel-ICE without case (just the naked but fully
+   assembled PCB) is currently the most affordable option.
+ * [AVR Dragon](http://www.atmel.com/tools/avrdragon.aspx)
+   (Note: This debugger is out of production.)
  * [AVR JTAGICE mkII](http://www.atmel.com/tools/avrjtagicemkii.aspx)
  * [JTAGICE3](http://www.atmel.com/tools/jtagice3.aspx)
- * [AVR Dragon](http://www.atmel.com/tools/avrdragon.aspx)
 
 There may be other options as well, but I can't comment on how well they
 work. I tested debugging RIOT on the Arduino Mega 2560 using an AVR Dragon.
@@ -142,8 +137,6 @@ calculator](http://www.engbedded.com/fusecalc/), which also works with other AVR
 MCUs.
 
 ### Debugging RIOT on the Arduino Mega 2560
-With PR [#1696](https://github.com/RIOT-OS/RIOT/pull/1696) merged the
-following commands should work for debugging:
 
 `make BOARD=arduino-mega2560 debug-server`: starts an
 [avarice](http://avarice.sourceforge.net/) (avarice needs to be installed)
@@ -157,6 +150,13 @@ server that `avr-gdb` can connect to.
 For a full rebuild and debug cycle use the following command:
 
 `make BOARD=arduino-mega2560 PROGRAMMER=dragon_isp clean all flash debug`
+
+@note       If you are using a different debugger than the Atmel-ICE, you have
+            to export the `AVR_DEBUGDEVICE` environment variable to the required
+            flag to pass to AVaRICE, e.g. when using the AVR Dragon you have to
+            export `AVR_DEBUGDEVICE=--dragon`. If the debug device is not
+            connected via USB, you also need to export `AVR_DEBUGINTERFACE` to
+            the correct value.
 
 # Mac OSX El Capitan users
 Mac users can flash this Arduino board by installing `avr-gcc` and `avrdude`
