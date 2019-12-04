@@ -25,6 +25,11 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup usb_conf USB peripheral compile time configurations
+ * @ingroup config
+ * @{
+ */
+/**
  * @brief USB peripheral device vendor ID
  *
  * @note You must provide your own VID/PID combination when manufacturing a
@@ -110,6 +115,7 @@ extern "C" {
 #ifndef USB_CONFIG_DEFAULT_LANGID
 #define USB_CONFIG_DEFAULT_LANGID   0x0409 /* EN-US */
 #endif
+/** @} */
 
 /**
  * @brief USB version definitions
