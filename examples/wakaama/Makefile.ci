@@ -1,8 +1,3 @@
-BOARD_BLACKLIST := \
-    pic32-clicker \
-    pic32-wifire \
-    #
-
 BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
     b-l072z-lrwan1 \
