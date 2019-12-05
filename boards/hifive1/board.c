@@ -117,12 +117,6 @@ void board_init(void)
     cpu_init();
     board_init_clock();
 
-    /* Configure pin muxing for UART0 */
-    GPIO_REG(GPIO_OUTPUT_VAL) |= IOF0_UART0_MASK;
-    GPIO_REG(GPIO_OUTPUT_EN) |= IOF0_UART0_MASK;
-    GPIO_REG(GPIO_IOF_SEL) &= ~IOF0_UART0_MASK;
-    GPIO_REG(GPIO_IOF_EN) |= IOF0_UART0_MASK;
-
     /* Configure GPIOs for LEDs */
     gpio_init(LED0_PIN, GPIO_OUT);
     gpio_init(LED1_PIN, GPIO_OUT);

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Ken Rabold
+ *               2019 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,10 +15,13 @@
  * @brief       Peripheral specific definitions for the HiFive1b RISC-V board
  *
  * @author      Ken Rabold
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
+
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,6 +54,28 @@ extern "C" {
 /** @} */
 
 /**
+ * @name   UART configuration
+ * @{
+ */
+static const uart_conf_t uart_config[] = {
+    {
+        .addr       = UART0_CTRL_ADDR,
+        .rx         = GPIO_PIN(0, 16),
+        .tx         = GPIO_PIN(0, 17),
+        .isr_num    = INT_UART0_BASE,
+    },
+    {
+        .addr       = UART1_CTRL_ADDR,
+        .rx         = GPIO_PIN(0, 18),
+        .tx         = GPIO_PIN(0, 23),
+        .isr_num    = INT_UART1_BASE,
+    },
+};
+
+#define UART_NUMOF                  ARRAY_SIZE(uart_config)
+/** @} */
+
+/**
  * @name    RTT/RTC configuration
  *
  * @{
@@ -74,16 +100,6 @@ extern "C" {
  * @{
  */
 #define PWM_NUMOF                   (3)
-/** @} */
-
-/**
- * @name    UART configuration
- *
- * @{
- */
-#define UART_NUMOF                  (2)
-#define UART0_RX_INTR_PRIORITY      (2)
-#define UART1_RX_INTR_PRIORITY      (2)
 /** @} */
 
 #ifdef __cplusplus
