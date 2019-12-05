@@ -138,6 +138,7 @@ struct chip_info_struct chip_info[] = {
     {"LPC2378 (500k)", "117702437",  0x40000200, 0x1000, 27, lpc2138_layout, boot_23xx},
     {"LPC2387 (500k)", "402716981",  0x40000200, 0x1000, 27, lpc2138_layout, boot_23xx},
     {"LPC2387 (500k)", "385941301",  0x40000200, 0x1000, 27, lpc2138_layout, boot_23xx},
+    {"LPC2388 (500k)", "402718517",  0x40000200, 0x1000, 27, lpc2138_layout, boot_23xx},
     {"LPC2468 (500k)", "100925237",  0x40000200, 0x1000, 27, lpc2138_layout, boot_23xx},
     {NULL, NULL, 0, 0, 0, NULL}
 };
