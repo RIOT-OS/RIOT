@@ -50,8 +50,25 @@ enum {
     PORT_H = 7,             /**< port H */
     PORT_I = 8,             /**< port I */
     PORT_J = 9,             /**< port J */
-    PORT_K = 10             /**< port K */
+    PORT_K = 10,            /**< port K */
+    GPIO_EXT_PORT = 11      /**< first GPIO extender port */
 };
+
+/**
+ * @brief   Available ports on the STM32F7 family as GPIO register definitions
+ */
+#define GPIO_CPU_PORTS \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_A)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_B)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_C)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_D)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_E)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_F)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_G)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_H)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_I)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_J)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_K)),
 
 #ifdef __cplusplus
 }

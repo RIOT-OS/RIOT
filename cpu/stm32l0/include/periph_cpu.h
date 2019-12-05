@@ -43,7 +43,21 @@ enum {
     PORT_D = 3,             /**< port D */
     PORT_E = 4,             /**< port E */
     PORT_H = 7,             /**< port H */
+    GPIO_EXT_PORT = 8       /**< first GPIO extender port */
 };
+
+/**
+ * @brief   Available ports on the STM32L0 family as GPIO register definitions
+ */
+#define GPIO_CPU_PORTS \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_A)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_B)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_C)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_D)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_E)), \
+    GPIO_CPU_PORT(0), \
+    GPIO_CPU_PORT(0), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_H)),
 
 #ifndef DOXYGEN
 /**

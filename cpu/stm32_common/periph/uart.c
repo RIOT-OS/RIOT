@@ -78,7 +78,7 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate);
 #ifdef MODULE_STM32_PERIPH_UART_HW_FC
 static inline void uart_init_rts_pin(uart_t uart)
 {
-    if (uart_config[uart].rts_pin != GPIO_UNDEF) {
+    if (!gpio_is_undef(uart_config[uart].rts_pin)) {
         gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
 #ifdef CPU_FAM_STM32F1
         gpio_init_af(uart_config[uart].rts_pin, GPIO_AF_OUT_PP);
@@ -90,7 +90,7 @@ static inline void uart_init_rts_pin(uart_t uart)
 
 static inline void uart_init_cts_pin(uart_t uart)
 {
-    if (uart_config[uart].cts_pin != GPIO_UNDEF) {
+    if (!gpio_is_undef(uart_config[uart].cts_pin)) {
         gpio_init(uart_config[uart].cts_pin, GPIO_IN);
 #ifndef CPU_FAM_STM32F1
         gpio_init_af(uart_config[uart].cts_pin, uart_config[uart].cts_af);
@@ -188,10 +188,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
 #ifdef MODULE_STM32_PERIPH_UART_HW_FC
-    if (uart_config[uart].cts_pin != GPIO_UNDEF) {
+    if (!gpio_is_undef(uart_config[uart].cts_pin)) {
         dev(uart)->CR3 |= USART_CR3_CTSE;
     }
-    if (uart_config[uart].rts_pin != GPIO_UNDEF) {
+    if (!gpio_is_undef(uart_config[uart].rts_pin)) {
         dev(uart)->CR3 |= USART_CR3_RTSE;
     }
 #endif
@@ -386,7 +386,7 @@ void uart_poweroff(uart_t uart)
 #ifdef MODULE_STM32_PERIPH_UART_HW_FC
     /* the uart peripheral does not put RTS high from hardware when
      * UE flag is cleared, so we need to do this manually */
-    if (uart_config[uart].rts_pin != GPIO_UNDEF) {
+    if (!gpio_is_undef(uart_config[uart].rts_pin)) {
         gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
         gpio_set(uart_config[uart].rts_pin);
     }

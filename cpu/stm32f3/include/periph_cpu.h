@@ -42,7 +42,21 @@ enum {
     PORT_F = 5,             /**< port F */
     PORT_G = 6,             /**< port G */
     PORT_H = 7,             /**< port H */
+    GPIO_EXT_PORT = 8       /**< first GPIO extender port */
 };
+
+/**
+ * @brief   Available ports on the STM32F3 family as GPIO register definitions
+ */
+#define GPIO_CPU_PORTS \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_A)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_B)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_C)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_D)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_E)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_F)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_G)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_H)),
 
 #ifdef __cplusplus
 }

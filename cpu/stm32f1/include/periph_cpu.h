@@ -122,7 +122,20 @@ enum {
     PORT_E = 4,             /**< port E */
     PORT_F = 5,             /**< port F */
     PORT_G = 6,             /**< port G */
+    GPIO_EXT_PORT = 7       /**< first GPIO extender port */
 };
+
+/**
+ * @brief   Available ports on the STM32F1 familiy as GPIO register definitions
+ */
+#define GPIO_CPU_PORTS \
+    { .port.reg = (gpio_reg_t)GPIO_CPU_PORT_ADDR(PORT_A) }, \
+    { .port.reg = (gpio_reg_t)GPIO_CPU_PORT_ADDR(PORT_B) }, \
+    { .port.reg = (gpio_reg_t)GPIO_CPU_PORT_ADDR(PORT_C) }, \
+    { .port.reg = (gpio_reg_t)GPIO_CPU_PORT_ADDR(PORT_D) }, \
+    { .port.reg = (gpio_reg_t)GPIO_CPU_PORT_ADDR(PORT_E) }, \
+    { .port.reg = (gpio_reg_t)GPIO_CPU_PORT_ADDR(PORT_F) }, \
+    { .port.reg = (gpio_reg_t)GPIO_CPU_PORT_ADDR(PORT_G) },
 
 /**
  * @brief   ADC channel configuration data

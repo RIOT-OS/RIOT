@@ -1,5 +1,5 @@
 FEATURES_PROVIDED += periph_cpuid
-FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += periph_gpio periph_gpio_irq periph_gpio_ext
 FEATURES_PROVIDED += puf_sram
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_wdt

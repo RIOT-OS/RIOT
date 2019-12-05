@@ -58,7 +58,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* configure the used pins */
     unsigned i = 0;
-    while ((i < TIMER_CHAN) && (pwm_config[pwm].chan[i].pin != GPIO_UNDEF)) {
+    while ((i < TIMER_CHAN) && !gpio_is_undef(pwm_config[pwm].chan[i].pin)) {
         gpio_init(pwm_config[pwm].chan[i].pin, GPIO_OUT);
         gpio_init_af(pwm_config[pwm].chan[i].pin, pwm_config[pwm].af);
         i++;
@@ -103,7 +103,7 @@ uint8_t pwm_channels(pwm_t pwm)
     assert(pwm < PWM_NUMOF);
 
     unsigned i = 0;
-    while ((i < TIMER_CHAN) && (pwm_config[pwm].chan[i].pin != GPIO_UNDEF)) {
+    while ((i < TIMER_CHAN) && !gpio_is_undef(pwm_config[pwm].chan[i].pin)) {
         i++;
     }
     return (uint8_t)i;
@@ -113,7 +113,7 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
 {
     assert((pwm < PWM_NUMOF) &&
            (channel < TIMER_CHAN) &&
-           (pwm_config[pwm].chan[channel].pin != GPIO_UNDEF));
+           !gpio_is_undef(pwm_config[pwm].chan[channel].pin));
 
     /* norm value to maximum possible value */
     if (value > dev(pwm)->ARR) {

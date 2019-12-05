@@ -92,13 +92,13 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     if (bus >= SPI_NUMOF) {
         return SPI_NODEV;
     }
-    if (cs == SPI_CS_UNDEF ||
-        (((cs & SPI_HWCS_MASK) == SPI_HWCS_MASK) && (cs & ~(SPI_HWCS_MASK)))) {
+    if (gpio_is_equal(cs, SPI_CS_UNDEF) ||
+        (SPI_HWCS_IS(cs) && !gpio_is_equal(cs, SPI_HWCS(0)))) {
         return SPI_NOCS;
     }
 
-    if (cs == SPI_HWCS_MASK) {
-        if (spi_config[bus].cs_pin == GPIO_UNDEF) {
+    if (gpio_is_equal(cs, SPI_HWCS(0))) {
+        if (gpio_is_undef(spi_config[bus].cs_pin)) {
             return SPI_NOCS;
         }
 #ifdef CPU_FAM_STM32F1
@@ -109,8 +109,8 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
 #endif
     }
     else {
-        gpio_init((gpio_t)cs, GPIO_OUT);
-        gpio_set((gpio_t)cs);
+        gpio_init(cs, GPIO_OUT);
+        gpio_set(cs);
     }
 
     return SPI_OK;
@@ -151,7 +151,7 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /* enable device */
     uint8_t br = spi_divtable[spi_config[bus].apbbus][clk];
     dev(bus)->CR1 = ((br << BR_SHIFT) | mode | SPI_CR1_MSTR);
-    if (cs != SPI_HWCS_MASK) {
+    if (!SPI_HWCS_IS(cs)) {
         dev(bus)->CR1 |= (SPI_CR1_SSM | SPI_CR1_SSI);
     }
     else {
@@ -274,8 +274,8 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
 
     /* active the given chip select line */
     dev(bus)->CR1 |= (SPI_CR1_SPE);     /* this pulls the HW CS line low */
-    if ((cs != SPI_HWCS_MASK) && (cs != SPI_CS_UNDEF)) {
-        gpio_clear((gpio_t)cs);
+    if (!SPI_HWCS_IS(cs) && !gpio_is_equal(cs, SPI_CS_UNDEF)) {
+        gpio_clear(cs);
     }
 
 #ifdef MODULE_PERIPH_DMA
@@ -291,10 +291,10 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
 #endif
 
     /* release the chip select if not specified differently */
-    if ((!cont) && (cs != SPI_CS_UNDEF)) {
+    if ((!cont) && (!gpio_is_equal(cs, SPI_CS_UNDEF))) {
         dev(bus)->CR1 &= ~(SPI_CR1_SPE);    /* pull HW CS line high */
-        if (cs != SPI_HWCS_MASK) {
-            gpio_set((gpio_t)cs);
+        if (!SPI_HWCS_IS(cs)) {
+            gpio_set(cs);
         }
     }
 }

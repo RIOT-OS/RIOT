@@ -49,7 +49,21 @@ enum {
     PORT_F = 6,             /**< port F */
     PORT_G = 7,             /**< port G */
     PORT_H = 5,             /**< port H */
+    GPIO_EXT_PORT = 8       /**< first GPIO extender port */
 };
+
+/**
+ * @brief   Available ports on the STM32L1 family as GPIO device definitions
+ */
+#define GPIO_CPU_PORTS \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_A)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_B)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_C)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_D)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_E)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_H)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_F)), \
+    GPIO_CPU_PORT(GPIO_CPU_PORT_ADDR(PORT_G)),
 
 /**
  * @brief   ADC channel configuration data

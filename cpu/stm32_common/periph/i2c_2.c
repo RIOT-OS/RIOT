@@ -114,8 +114,8 @@ static void _init_pins(i2c_t dev)
     gpio_init(i2c_config[dev].sda_pin, GPIO_OD_PU);
 #ifdef CPU_FAM_STM32F1
     /* This is needed in case the remapped pins are used */
-    if (i2c_config[dev].scl_pin == GPIO_PIN(PORT_B, 8) ||
-        i2c_config[dev].sda_pin == GPIO_PIN(PORT_B, 9)) {
+    if (gpio_is_equal(i2c_config[dev].scl_pin, GPIO_PIN(PORT_B, 8)) ||
+        gpio_is_equal(i2c_config[dev].sda_pin, GPIO_PIN(PORT_B, 9))) {
         /* The remapping periph clock must first be enabled */
         RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
         /* Then the remap can occur */
