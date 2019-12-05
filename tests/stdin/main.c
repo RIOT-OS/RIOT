@@ -18,7 +18,10 @@
 
 int main(void)
 {
-    int value = getchar();
-    printf("You entered '%c'\n", (char)value);
+    while (1) {
+        int value = getchar();
+        printf("You entered '%c'\n", (char)value);
+    }
+
     return 0;
 }
