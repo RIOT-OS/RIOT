@@ -90,7 +90,7 @@ suit/manifest: $(SUIT_MANIFESTS)
 
 suit/publish: $(SUIT_MANIFESTS) $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 	@mkdir -p $(SUIT_COAP_FSROOT)/$(SUIT_COAP_BASEPATH)
-	@cp -t $(SUIT_COAP_FSROOT)/$(SUIT_COAP_BASEPATH) $^
+	@cp $^ $(SUIT_COAP_FSROOT)/$(SUIT_COAP_BASEPATH)
 	@for file in $^; do \
 		echo "published \"$$file\""; \
 		echo "       as \"$(SUIT_COAP_ROOT)/$$(basename $$file)\""; \
