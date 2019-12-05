@@ -38,6 +38,11 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup usbus_cdc_acm_conf USBUS CDC ACM compile time configurations
+ * @ingroup usb_conf
+ * @{
+ */
+/**
  * @brief Buffer size for STDIN and STDOUT data to and from USB when using
  *        the USBUS_CDC_ACM_STDIO module
  */
@@ -51,6 +56,7 @@ extern "C" {
 #ifndef USBUS_CDC_ACM_BULK_EP_SIZE
 #define USBUS_CDC_ACM_BULK_EP_SIZE    (64)
 #endif
+/** @} */
 
 /**
  * @brief USBUS CDC ACM interrupt endpoint size.

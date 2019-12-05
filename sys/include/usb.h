@@ -25,20 +25,36 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup usb_conf USB peripheral compile time configurations
+ * @ingroup config
+ * @{
+ */
+/**
  * @brief USB peripheral device vendor ID
+ *
+ * @note You must provide your own VID/PID combination when manufacturing a
+ * device with USB.
  */
 #ifndef USB_CONFIG_VID
+#ifdef DOXYGEN
+#define USB_CONFIG_VID
+#else
 #error  Please supply your vendor ID by setting USB_CONFIG_VID
+#endif
 #endif
 
 /**
  * @brief USB peripheral device product ID
  *
- * You must provide your own VID/PID combination when manufacturing a device
- * with USB
+ * @note You must provide your own VID/PID combination when manufacturing a
+ * device with USB.
  */
 #ifndef USB_CONFIG_PID
+#ifdef DOXYGEN
+#define USB_CONFIG_PID
+#else
 #error  Please supply your vendor ID by setting USB_CONFIG_PID
+#endif
 #endif
 
 /**
@@ -99,6 +115,7 @@ extern "C" {
 #ifndef USB_CONFIG_DEFAULT_LANGID
 #define USB_CONFIG_DEFAULT_LANGID   0x0409 /* EN-US */
 #endif
+/** @} */
 
 /**
  * @brief USB version definitions

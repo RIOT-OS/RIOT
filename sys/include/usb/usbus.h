@@ -41,6 +41,11 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup usb_usbus_conf    USBUS compile time configurations
+ * @ingroup usb_conf
+ * @{
+ */
+/**
  * @brief USBUS thread stack size
  */
 #ifndef USBUS_STACKSIZE
@@ -53,11 +58,6 @@ extern "C" {
 #ifndef USBUS_PRIO
 #define USBUS_PRIO                  (THREAD_PRIORITY_MAIN - 6)
 #endif
-
-/**
- * @brief USBUS thread name
- */
-#define USBUS_TNAME                 "usbus"
 
 /**
  * @brief USBUS auto attach setting
@@ -80,6 +80,12 @@ extern "C" {
 #ifndef USBUS_EP0_SIZE
 #define USBUS_EP0_SIZE              64
 #endif
+/** @} */
+
+/**
+ * @brief USBUS thread name
+ */
+#define USBUS_TNAME                 "usbus"
 
 /**
  * @name USBUS thread flags
