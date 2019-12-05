@@ -19,6 +19,10 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
+#include <inttypes.h>
+
+#include "cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,6 +31,39 @@ extern "C" {
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (12U)
+
+#ifndef DOXYGEN
+/**
+ * @brief   Overwrite the default gpio_t type definition
+ */
+#define HAVE_GPIO_T
+typedef uint8_t gpio_t;
+#endif
+
+/**
+ * @brief   Definition of a fitting UNDEF value
+ */
+#define GPIO_UNDEF          (0xff)
+
+/**
+ * @brief   Define a CPU specific GPIO pin generator macro
+ */
+#define GPIO_PIN(x, y)      (x | y)
+
+/**
+ * @brief   Structure for UART configuration data
+ */
+typedef struct {
+    uint32_t addr;          /**< UART control register address */
+    gpio_t rx;              /**< RX pin */
+    gpio_t tx;              /**< TX pin */
+    plic_source isr_num;    /**< ISR source number */
+} uart_conf_t;
+
+/**
+ * @brief   UART interrupt priority
+ */
+#define UART_ISR_PRIO       (2)
 
 /**
  * @brief   Prevent shared timer functions from being used
