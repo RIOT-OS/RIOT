@@ -33,8 +33,6 @@ static int read(const void *dev, phydat_t *res)
 
     res->val[0] = (gpio_read(p->pin)) ? !inverted : inverted;
 
-    res->val[1] = 0;
-    res->val[2] = 0;
     res->unit = UNIT_BOOL;
     res->scale = 0;
     return 1;
