@@ -53,6 +53,20 @@ static inline char _to_lower(char c)
     return 'a' + (c - 'A');
 }
 
+int fmt_is_number(const char *str)
+{
+    if (!str || !*str) {
+        return 0;
+    }
+    for (; *str; str++) {
+        if (!fmt_is_digit(*str)) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 size_t fmt_byte_hex(char *out, uint8_t byte)
 {
     if (out) {

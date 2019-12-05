@@ -70,6 +70,15 @@ static inline int fmt_is_upper(char c)
 }
 
 /**
+ * @brief   Test if the given string is a number (regex `[0-9]+`)
+ *
+ * @param[in] str   String to test, **must be `\0` terminated**
+ *
+ * @return  true if @p str solely contains digits, false otherwise
+ */
+int fmt_is_number(const char *str);
+
+/**
  * @brief Format a byte value as hex
  *
  * E.g., converts byte value 0 to the string 00, 255 to the string FF.
