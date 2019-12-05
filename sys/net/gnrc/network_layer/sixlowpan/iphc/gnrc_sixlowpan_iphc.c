@@ -145,6 +145,289 @@ static int _forward_frag(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *frag_hdr,
                          gnrc_sixlowpan_frag_vrb_t *vrbe, unsigned page);
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
 
+static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
+                                const gnrc_netif_hdr_t *netif_hdr,
+                                gnrc_netif_t *iface, ipv6_hdr_t *ipv6_hdr)
+{
+    gnrc_sixlowpan_ctx_t *ctx = NULL;
+    size_t payload_offset = SIXLOWPAN_IPHC_HDR_LEN;
+
+    if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_CID_EXT) {
+        payload_offset++;
+    }
+
+    ipv6_hdr_set_version(ipv6_hdr);
+
+    switch (iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_TF) {
+        case IPHC_TF_ECN_DSCP_FL:
+            ipv6_hdr_set_tc(ipv6_hdr, iphc_hdr[payload_offset++]);
+            ipv6_hdr->v_tc_fl.u8[1] |= iphc_hdr[payload_offset++] & 0x0f;
+            ipv6_hdr->v_tc_fl.u8[2] |= iphc_hdr[payload_offset++];
+            ipv6_hdr->v_tc_fl.u8[3] |= iphc_hdr[payload_offset++];
+            break;
+
+        case IPHC_TF_ECN_FL:
+            ipv6_hdr_set_tc_ecn(ipv6_hdr, iphc_hdr[payload_offset] >> 6);
+            ipv6_hdr_set_tc_dscp(ipv6_hdr, 0);
+            ipv6_hdr->v_tc_fl.u8[1] |= iphc_hdr[payload_offset++] & 0x0f;
+            ipv6_hdr->v_tc_fl.u8[2] |= iphc_hdr[payload_offset++];
+            ipv6_hdr->v_tc_fl.u8[3] |= iphc_hdr[payload_offset++];
+            break;
+
+        case IPHC_TF_ECN_DSCP:
+            ipv6_hdr_set_tc(ipv6_hdr, iphc_hdr[payload_offset++]);
+            ipv6_hdr_set_fl(ipv6_hdr, 0);
+            break;
+
+        case IPHC_TF_ECN_ELIDE:
+            ipv6_hdr_set_tc(ipv6_hdr, 0);
+            ipv6_hdr_set_fl(ipv6_hdr, 0);
+            break;
+    }
+
+    if (!(iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_NH)) {
+        ipv6_hdr->nh = iphc_hdr[payload_offset++];
+    }
+
+    switch (iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_HL) {
+        case IPHC_HL_INLINE:
+            ipv6_hdr->hl = iphc_hdr[payload_offset++];
+            break;
+
+        case IPHC_HL_1:
+            ipv6_hdr->hl = 1;
+            break;
+
+        case IPHC_HL_64:
+            ipv6_hdr->hl = 64;
+            break;
+
+        case IPHC_HL_255:
+            ipv6_hdr->hl = 255;
+            break;
+    }
+
+    if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_SAC) {
+        uint8_t sci = 0;
+
+        if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_CID_EXT) {
+            sci = iphc_hdr[CID_EXT_IDX] >> 4;
+        }
+
+        if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_SAM) {
+            ctx = gnrc_sixlowpan_ctx_lookup_id(sci);
+
+            if (ctx == NULL) {
+                DEBUG("6lo iphc: could not find source context\n");
+                return 0;
+            }
+        }
+    }
+
+    iface = gnrc_netif_hdr_get_netif(netif_hdr);
+    switch (iphc_hdr[IPHC2_IDX] & (SIXLOWPAN_IPHC2_SAC | SIXLOWPAN_IPHC2_SAM)) {
+
+        case IPHC_SAC_SAM_FULL:
+            /* take full 128 from inline */
+            memcpy(&(ipv6_hdr->src), iphc_hdr + payload_offset, 16);
+            payload_offset += 16;
+            break;
+
+        case IPHC_SAC_SAM_64:
+            ipv6_addr_set_link_local_prefix(&ipv6_hdr->src);
+            memcpy(ipv6_hdr->src.u8 + 8, iphc_hdr + payload_offset, 8);
+            payload_offset += 8;
+            break;
+
+        case IPHC_SAC_SAM_16:
+            ipv6_addr_set_link_local_prefix(&ipv6_hdr->src);
+            ipv6_hdr->src.u32[2] = byteorder_htonl(0x000000ff);
+            ipv6_hdr->src.u16[6] = byteorder_htons(0xfe00);
+            memcpy(ipv6_hdr->src.u8 + 14, iphc_hdr + payload_offset, 2);
+            payload_offset += 2;
+            break;
+
+        case IPHC_SAC_SAM_L2:
+            if (gnrc_netif_hdr_ipv6_iid_from_src(
+                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->src.u64[1])
+                    ) < 0) {
+                DEBUG("6lo iphc: could not get source's IID\n");
+                return 0;
+            }
+            ipv6_addr_set_link_local_prefix(&ipv6_hdr->src);
+            break;
+
+        case IPHC_SAC_SAM_UNSPEC:
+            ipv6_addr_set_unspecified(&ipv6_hdr->src);
+            break;
+
+        case IPHC_SAC_SAM_CTX_64:
+            assert(ctx != NULL);
+            memcpy(ipv6_hdr->src.u8 + 8, iphc_hdr + payload_offset, 8);
+            ipv6_addr_init_prefix(&ipv6_hdr->src, &ctx->prefix,
+                                  ctx->prefix_len);
+            payload_offset += 8;
+            break;
+
+        case IPHC_SAC_SAM_CTX_16:
+            assert(ctx != NULL);
+            ipv6_hdr->src.u32[2] = byteorder_htonl(0x000000ff);
+            ipv6_hdr->src.u16[6] = byteorder_htons(0xfe00);
+            memcpy(ipv6_hdr->src.u8 + 14, iphc_hdr + payload_offset, 2);
+            ipv6_addr_init_prefix(&ipv6_hdr->src, &ctx->prefix,
+                                  ctx->prefix_len);
+            payload_offset += 2;
+            break;
+
+        case IPHC_SAC_SAM_CTX_L2:
+            assert(ctx != NULL);
+            if (gnrc_netif_hdr_ipv6_iid_from_src(
+                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->src.u64[1])
+                    ) < 0) {
+                DEBUG("6lo iphc: could not get source's IID\n");
+                return 0;
+            }
+            ipv6_addr_init_prefix(&ipv6_hdr->src, &ctx->prefix,
+                                  ctx->prefix_len);
+            break;
+    }
+
+    if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_DAC) {
+        uint8_t dci = 0;
+
+        if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_CID_EXT) {
+            dci = iphc_hdr[CID_EXT_IDX] & 0x0f;
+        }
+
+        if (iphc_hdr[IPHC2_IDX] & (SIXLOWPAN_IPHC2_M | SIXLOWPAN_IPHC2_DAM)) {
+            ctx = gnrc_sixlowpan_ctx_lookup_id(dci);
+
+            if (ctx == NULL) {
+                DEBUG("6lo iphc: could not find destination context\n");
+                return 0;
+            }
+        }
+    }
+
+    switch (iphc_hdr[IPHC2_IDX] & (SIXLOWPAN_IPHC2_M | SIXLOWPAN_IPHC2_DAC |
+                                   SIXLOWPAN_IPHC2_DAM)) {
+        case IPHC_M_DAC_DAM_U_FULL:
+        case IPHC_M_DAC_DAM_M_FULL:
+            memcpy(&(ipv6_hdr->dst.u8), iphc_hdr + payload_offset, 16);
+            payload_offset += 16;
+            break;
+
+        case IPHC_M_DAC_DAM_U_64:
+            ipv6_addr_set_link_local_prefix(&ipv6_hdr->dst);
+            memcpy(ipv6_hdr->dst.u8 + 8, iphc_hdr + payload_offset, 8);
+            payload_offset += 8;
+            break;
+
+        case IPHC_M_DAC_DAM_U_16:
+            ipv6_addr_set_link_local_prefix(&ipv6_hdr->dst);
+            ipv6_hdr->dst.u32[2] = byteorder_htonl(0x000000ff);
+            ipv6_hdr->dst.u16[6] = byteorder_htons(0xfe00);
+            memcpy(ipv6_hdr->dst.u8 + 14, iphc_hdr + payload_offset, 2);
+            payload_offset += 2;
+            break;
+
+        case IPHC_M_DAC_DAM_U_L2:
+            if (gnrc_netif_hdr_ipv6_iid_from_dst(
+                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->dst.u64[1])
+                    ) < 0) {
+                DEBUG("6lo iphc: could not get destination's IID\n");
+                return 0;
+            }
+            ipv6_addr_set_link_local_prefix(&ipv6_hdr->dst);
+            break;
+
+        case IPHC_M_DAC_DAM_U_CTX_64:
+            assert(ctx != NULL);
+            memcpy(ipv6_hdr->dst.u8 + 8, iphc_hdr + payload_offset, 8);
+            ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
+                                  ctx->prefix_len);
+            payload_offset += 8;
+            break;
+
+        case IPHC_M_DAC_DAM_U_CTX_16:
+            ipv6_hdr->dst.u32[2] = byteorder_htonl(0x000000ff);
+            ipv6_hdr->dst.u16[6] = byteorder_htons(0xfe00);
+            memcpy(ipv6_hdr->dst.u8 + 14, iphc_hdr + payload_offset, 2);
+            assert(ctx != NULL);
+            ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
+                                  ctx->prefix_len);
+            payload_offset += 2;
+            break;
+
+        case IPHC_M_DAC_DAM_U_CTX_L2:
+            if (gnrc_netif_hdr_ipv6_iid_from_dst(
+                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->dst.u64[1])
+                    ) < 0) {
+                DEBUG("6lo iphc: could not get destination's IID\n");
+                return 0;
+            }
+            assert(ctx != NULL);
+            ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
+                                  ctx->prefix_len);
+            break;
+
+        case IPHC_M_DAC_DAM_M_48:
+            /* ffXX::00XX:XXXX:XXXX */
+            ipv6_addr_set_unspecified(&ipv6_hdr->dst);
+            ipv6_hdr->dst.u8[0] = 0xff;
+            ipv6_hdr->dst.u8[1] = iphc_hdr[payload_offset++];
+            memcpy(ipv6_hdr->dst.u8 + 11, iphc_hdr + payload_offset, 5);
+            payload_offset += 5;
+            break;
+
+        case IPHC_M_DAC_DAM_M_32:
+            /* ffXX::00XX:XXXX */
+            ipv6_addr_set_unspecified(&ipv6_hdr->dst);
+            ipv6_hdr->dst.u8[0] = 0xff;
+            ipv6_hdr->dst.u8[1] = iphc_hdr[payload_offset++];
+            memcpy(ipv6_hdr->dst.u8 + 13, iphc_hdr + payload_offset, 3);
+            payload_offset += 3;
+            break;
+
+        case IPHC_M_DAC_DAM_M_8:
+            /* ff02::XX: */
+            ipv6_addr_set_unspecified(&ipv6_hdr->dst);
+            ipv6_hdr->dst.u8[0] = 0xff;
+            ipv6_hdr->dst.u8[1] = 0x02;
+            ipv6_hdr->dst.u8[15] = iphc_hdr[payload_offset++];
+            break;
+
+        case IPHC_M_DAC_DAM_M_UC_PREFIX:
+            do {
+                assert(ctx != NULL);
+                uint8_t orig_ctx_len = ctx->prefix_len;
+
+                ipv6_addr_set_unspecified(&ipv6_hdr->dst);
+
+                if (ctx->prefix_len > 64) {
+                    ctx->prefix_len = 64;
+                }
+
+                ipv6_hdr->dst.u8[0] = 0xff;
+                ipv6_hdr->dst.u8[1] = iphc_hdr[payload_offset++];
+                ipv6_hdr->dst.u8[2] = iphc_hdr[payload_offset++];
+                ipv6_hdr->dst.u8[3] = ctx->prefix_len;
+                ipv6_addr_init_prefix((ipv6_addr_t *)ipv6_hdr->dst.u8 + 4,
+                                      &ctx->prefix, ctx->prefix_len);
+                memcpy(ipv6_hdr->dst.u8 + 12, iphc_hdr + payload_offset + 2, 4);
+
+                payload_offset += 4;
+                ctx->prefix_len = orig_ctx_len;
+            } while (0);    /* ANSI-C compatible block creation for orig_ctx_len allocation */
+            break;
+
+        default:
+            DEBUG("6lo iphc: unspecified or reserved M, DAC, DAM combination\n");
+            break;
+    }
+    return payload_offset;
+}
+
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
 /**
  * @brief   Decodes UDP NHC
@@ -231,6 +514,8 @@ static size_t _iphc_nhc_udp_decode(gnrc_pktsnip_t *sixlo, size_t offset,
         udp_hdr->checksum.u8[1] = payload[offset++];
     }
 
+    /* might be needed to be overwritten by IPv6 reassembly after the IPv6
+     * packet was reassembled to get complete length */
     if (rbuf != NULL) {
         payload_len = rbuf->super.datagram_size - *uncomp_hdr_len;
     }
@@ -260,13 +545,11 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
 {
     assert(sixlo != NULL);
     gnrc_pktsnip_t *ipv6, *netif;
-    gnrc_netif_hdr_t *netif_hdr;
     gnrc_netif_t *iface;
     ipv6_hdr_t *ipv6_hdr;
     uint8_t *iphc_hdr = sixlo->data;
-    size_t payload_offset = SIXLOWPAN_IPHC_HDR_LEN;
+    size_t payload_offset;
     size_t uncomp_hdr_len = sizeof(ipv6_hdr_t);
-    gnrc_sixlowpan_ctx_t *ctx = NULL;
     gnrc_sixlowpan_frag_rb_t *rbuf = rbuf_ptr;
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
     gnrc_sixlowpan_frag_vrb_t *vrbe = NULL;
@@ -286,292 +569,17 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     }
 
     assert(ipv6->size >= sizeof(ipv6_hdr_t));
-    ipv6_hdr = ipv6->data;
-
-    if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_CID_EXT) {
-        payload_offset++;
-    }
-
-    ipv6_hdr_set_version(ipv6_hdr);
-
-    switch (iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_TF) {
-        case IPHC_TF_ECN_DSCP_FL:
-            ipv6_hdr_set_tc(ipv6_hdr, iphc_hdr[payload_offset++]);
-            ipv6_hdr->v_tc_fl.u8[1] |= iphc_hdr[payload_offset++] & 0x0f;
-            ipv6_hdr->v_tc_fl.u8[2] |= iphc_hdr[payload_offset++];
-            ipv6_hdr->v_tc_fl.u8[3] |= iphc_hdr[payload_offset++];
-            break;
-
-        case IPHC_TF_ECN_FL:
-            ipv6_hdr_set_tc_ecn(ipv6_hdr, iphc_hdr[payload_offset] >> 6);
-            ipv6_hdr_set_tc_dscp(ipv6_hdr, 0);
-            ipv6_hdr->v_tc_fl.u8[1] |= iphc_hdr[payload_offset++] & 0x0f;
-            ipv6_hdr->v_tc_fl.u8[2] |= iphc_hdr[payload_offset++];
-            ipv6_hdr->v_tc_fl.u8[3] |= iphc_hdr[payload_offset++];
-            break;
-
-        case IPHC_TF_ECN_DSCP:
-            ipv6_hdr_set_tc(ipv6_hdr, iphc_hdr[payload_offset++]);
-            ipv6_hdr_set_fl(ipv6_hdr, 0);
-            break;
-
-        case IPHC_TF_ECN_ELIDE:
-            ipv6_hdr_set_tc(ipv6_hdr, 0);
-            ipv6_hdr_set_fl(ipv6_hdr, 0);
-            break;
-    }
-
-    if (!(iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_NH)) {
-        ipv6_hdr->nh = iphc_hdr[payload_offset++];
-    }
-
-    switch (iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_HL) {
-        case IPHC_HL_INLINE:
-            ipv6_hdr->hl = iphc_hdr[payload_offset++];
-            break;
-
-        case IPHC_HL_1:
-            ipv6_hdr->hl = 1;
-            break;
-
-        case IPHC_HL_64:
-            ipv6_hdr->hl = 64;
-            break;
-
-        case IPHC_HL_255:
-            ipv6_hdr->hl = 255;
-            break;
-    }
-
-    if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_SAC) {
-        uint8_t sci = 0;
-
-        if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_CID_EXT) {
-            sci = iphc_hdr[CID_EXT_IDX] >> 4;
-        }
-
-        if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_SAM) {
-            ctx = gnrc_sixlowpan_ctx_lookup_id(sci);
-
-            if (ctx == NULL) {
-                DEBUG("6lo iphc: could not find source context\n");
-                _recv_error_release(sixlo, ipv6, rbuf);
-                return;
-            }
-        }
-    }
 
     netif = gnrc_pktsnip_search_type(sixlo, GNRC_NETTYPE_NETIF);
     assert(netif != NULL);
-    netif_hdr = netif->data;
-    iface = gnrc_netif_hdr_get_netif(netif_hdr);
-    switch (iphc_hdr[IPHC2_IDX] & (SIXLOWPAN_IPHC2_SAC | SIXLOWPAN_IPHC2_SAM)) {
-
-        case IPHC_SAC_SAM_FULL:
-            /* take full 128 from inline */
-            memcpy(&(ipv6_hdr->src), iphc_hdr + payload_offset, 16);
-            payload_offset += 16;
-            break;
-
-        case IPHC_SAC_SAM_64:
-            ipv6_addr_set_link_local_prefix(&ipv6_hdr->src);
-            memcpy(ipv6_hdr->src.u8 + 8, iphc_hdr + payload_offset, 8);
-            payload_offset += 8;
-            break;
-
-        case IPHC_SAC_SAM_16:
-            ipv6_addr_set_link_local_prefix(&ipv6_hdr->src);
-            ipv6_hdr->src.u32[2] = byteorder_htonl(0x000000ff);
-            ipv6_hdr->src.u16[6] = byteorder_htons(0xfe00);
-            memcpy(ipv6_hdr->src.u8 + 14, iphc_hdr + payload_offset, 2);
-            payload_offset += 2;
-            break;
-
-        case IPHC_SAC_SAM_L2:
-            if (gnrc_netif_hdr_ipv6_iid_from_src(
-                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->src.u64[1])
-                    ) < 0) {
-                DEBUG("6lo iphc: could not get source's IID\n");
-                _recv_error_release(sixlo, ipv6, rbuf);
-                return;
-            }
-            ipv6_addr_set_link_local_prefix(&ipv6_hdr->src);
-            break;
-
-        case IPHC_SAC_SAM_UNSPEC:
-            ipv6_addr_set_unspecified(&ipv6_hdr->src);
-            break;
-
-        case IPHC_SAC_SAM_CTX_64:
-            assert(ctx != NULL);
-            memcpy(ipv6_hdr->src.u8 + 8, iphc_hdr + payload_offset, 8);
-            ipv6_addr_init_prefix(&ipv6_hdr->src, &ctx->prefix,
-                                  ctx->prefix_len);
-            payload_offset += 8;
-            break;
-
-        case IPHC_SAC_SAM_CTX_16:
-            assert(ctx != NULL);
-            ipv6_hdr->src.u32[2] = byteorder_htonl(0x000000ff);
-            ipv6_hdr->src.u16[6] = byteorder_htons(0xfe00);
-            memcpy(ipv6_hdr->src.u8 + 14, iphc_hdr + payload_offset, 2);
-            ipv6_addr_init_prefix(&ipv6_hdr->src, &ctx->prefix,
-                                  ctx->prefix_len);
-            payload_offset += 2;
-            break;
-
-        case IPHC_SAC_SAM_CTX_L2:
-            assert(ctx != NULL);
-            if (gnrc_netif_hdr_ipv6_iid_from_src(
-                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->src.u64[1])
-                    ) < 0) {
-                DEBUG("6lo iphc: could not get source's IID\n");
-                _recv_error_release(sixlo, ipv6, rbuf);
-                return;
-            }
-            ipv6_addr_init_prefix(&ipv6_hdr->src, &ctx->prefix,
-                                  ctx->prefix_len);
-            break;
+    iface = gnrc_netif_hdr_get_netif(netif->data);
+    payload_offset = _iphc_ipv6_decode(iphc_hdr, netif->data, iface,
+                                       ipv6->data);
+    if (payload_offset == 0) {
+        /* unable to parse IPHC header */
+        _recv_error_release(sixlo, ipv6, rbuf);
+        return;
     }
-
-    if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_DAC) {
-        uint8_t dci = 0;
-
-        if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_CID_EXT) {
-            dci = iphc_hdr[CID_EXT_IDX] & 0x0f;
-        }
-
-        if (iphc_hdr[IPHC2_IDX] & (SIXLOWPAN_IPHC2_M | SIXLOWPAN_IPHC2_DAM)) {
-            ctx = gnrc_sixlowpan_ctx_lookup_id(dci);
-
-            if (ctx == NULL) {
-                DEBUG("6lo iphc: could not find destination context\n");
-                _recv_error_release(sixlo, ipv6, rbuf);
-                return;
-            }
-        }
-    }
-
-    switch (iphc_hdr[IPHC2_IDX] & (SIXLOWPAN_IPHC2_M | SIXLOWPAN_IPHC2_DAC |
-                                   SIXLOWPAN_IPHC2_DAM)) {
-        case IPHC_M_DAC_DAM_U_FULL:
-        case IPHC_M_DAC_DAM_M_FULL:
-            memcpy(&(ipv6_hdr->dst.u8), iphc_hdr + payload_offset, 16);
-            payload_offset += 16;
-            break;
-
-        case IPHC_M_DAC_DAM_U_64:
-            ipv6_addr_set_link_local_prefix(&ipv6_hdr->dst);
-            memcpy(ipv6_hdr->dst.u8 + 8, iphc_hdr + payload_offset, 8);
-            payload_offset += 8;
-            break;
-
-        case IPHC_M_DAC_DAM_U_16:
-            ipv6_addr_set_link_local_prefix(&ipv6_hdr->dst);
-            ipv6_hdr->dst.u32[2] = byteorder_htonl(0x000000ff);
-            ipv6_hdr->dst.u16[6] = byteorder_htons(0xfe00);
-            memcpy(ipv6_hdr->dst.u8 + 14, iphc_hdr + payload_offset, 2);
-            payload_offset += 2;
-            break;
-
-        case IPHC_M_DAC_DAM_U_L2:
-            if (gnrc_netif_hdr_ipv6_iid_from_dst(
-                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->dst.u64[1])
-                    ) < 0) {
-                DEBUG("6lo iphc: could not get destination's IID\n");
-                _recv_error_release(sixlo, ipv6, rbuf);
-                return;
-            }
-            ipv6_addr_set_link_local_prefix(&ipv6_hdr->dst);
-            break;
-
-        case IPHC_M_DAC_DAM_U_CTX_64:
-            assert(ctx != NULL);
-            memcpy(ipv6_hdr->dst.u8 + 8, iphc_hdr + payload_offset, 8);
-            ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
-                                  ctx->prefix_len);
-            payload_offset += 8;
-            break;
-
-        case IPHC_M_DAC_DAM_U_CTX_16:
-            ipv6_hdr->dst.u32[2] = byteorder_htonl(0x000000ff);
-            ipv6_hdr->dst.u16[6] = byteorder_htons(0xfe00);
-            memcpy(ipv6_hdr->dst.u8 + 14, iphc_hdr + payload_offset, 2);
-            assert(ctx != NULL);
-            ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
-                                  ctx->prefix_len);
-            payload_offset += 2;
-            break;
-
-        case IPHC_M_DAC_DAM_U_CTX_L2:
-            if (gnrc_netif_hdr_ipv6_iid_from_dst(
-                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->dst.u64[1])
-                    ) < 0) {
-                DEBUG("6lo iphc: could not get destination's IID\n");
-                _recv_error_release(sixlo, ipv6, rbuf);
-                return;
-            }
-            assert(ctx != NULL);
-            ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
-                                  ctx->prefix_len);
-            break;
-
-        case IPHC_M_DAC_DAM_M_48:
-            /* ffXX::00XX:XXXX:XXXX */
-            ipv6_addr_set_unspecified(&ipv6_hdr->dst);
-            ipv6_hdr->dst.u8[0] = 0xff;
-            ipv6_hdr->dst.u8[1] = iphc_hdr[payload_offset++];
-            memcpy(ipv6_hdr->dst.u8 + 11, iphc_hdr + payload_offset, 5);
-            payload_offset += 5;
-            break;
-
-        case IPHC_M_DAC_DAM_M_32:
-            /* ffXX::00XX:XXXX */
-            ipv6_addr_set_unspecified(&ipv6_hdr->dst);
-            ipv6_hdr->dst.u8[0] = 0xff;
-            ipv6_hdr->dst.u8[1] = iphc_hdr[payload_offset++];
-            memcpy(ipv6_hdr->dst.u8 + 13, iphc_hdr + payload_offset, 3);
-            payload_offset += 3;
-            break;
-
-        case IPHC_M_DAC_DAM_M_8:
-            /* ff02::XX: */
-            ipv6_addr_set_unspecified(&ipv6_hdr->dst);
-            ipv6_hdr->dst.u8[0] = 0xff;
-            ipv6_hdr->dst.u8[1] = 0x02;
-            ipv6_hdr->dst.u8[15] = iphc_hdr[payload_offset++];
-            break;
-
-        case IPHC_M_DAC_DAM_M_UC_PREFIX:
-            do {
-                assert(ctx != NULL);
-                uint8_t orig_ctx_len = ctx->prefix_len;
-
-                ipv6_addr_set_unspecified(&ipv6_hdr->dst);
-
-                if (ctx->prefix_len > 64) {
-                    ctx->prefix_len = 64;
-                }
-
-                ipv6_hdr->dst.u8[0] = 0xff;
-                ipv6_hdr->dst.u8[1] = iphc_hdr[payload_offset++];
-                ipv6_hdr->dst.u8[2] = iphc_hdr[payload_offset++];
-                ipv6_hdr->dst.u8[3] = ctx->prefix_len;
-                ipv6_addr_init_prefix((ipv6_addr_t *)ipv6_hdr->dst.u8 + 4,
-                                      &ctx->prefix, ctx->prefix_len);
-                memcpy(ipv6_hdr->dst.u8 + 12, iphc_hdr + payload_offset + 2, 4);
-
-                payload_offset += 4;
-                ctx->prefix_len = orig_ctx_len;
-            } while (0);    /* ANSI-C compatible block creation for orig_ctx_len allocation */
-            break;
-
-        default:
-            DEBUG("6lo iphc: unspecified or reserved M, DAC, DAM combination\n");
-            break;
-    }
-
-
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
     if (iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_NH) {
         switch (iphc_hdr[payload_offset] & NHC_ID_MASK) {
@@ -641,7 +649,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
         _recv_error_release(sixlo, ipv6, rbuf);
         return;
     }
-    /* re-assign IPv6 header in case realloc changed the address */
+    /* assign IPv6 header only here in case realloc changed the address */
     ipv6_hdr = ipv6->data;
     ipv6_hdr->len = byteorder_htons(payload_len);
     memcpy(((uint8_t *)ipv6->data) + uncomp_hdr_len,
