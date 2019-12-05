@@ -98,6 +98,8 @@
 #define NHC_UDP_8BIT_MASK           (0xFF00)
 
 #define NHC_IPV6_EXT_ID             (0xE0)
+#define NHC_IPV6_EXT_ID_ALT         (0xE8)  /* first bit of EID 1 */
+#define NHC_IPV6_EXT_EID_MASK       (0x0E)
 #define NHC_IPV6_EXT_NH             (0x01)
 
 #define NHC_IPV6_EXT_EID_HOPOPT     (0x00 << 1)
@@ -429,6 +431,151 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
 }
 
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
+static size_t _iphc_nhc_ipv6_ext_decode(gnrc_pktsnip_t *sixlo, size_t offset,
+                                        size_t *prev_nh_offset,
+                                        gnrc_pktsnip_t *ipv6,
+                                        size_t *uncomp_hdr_len)
+{
+    uint8_t *payload = sixlo->data;
+    ipv6_ext_t *ext_hdr;
+    uint8_t ipv6_ext_nhc = payload[offset++];
+    uint8_t protnum;
+    uint8_t ext_len = (ipv6_ext_nhc & NHC_IPV6_EXT_NH)
+                    ? payload[offset]
+                    : payload[offset + 1];
+
+    /* realloc size for uncompressed snip, if too small */
+    if (ipv6->size < (*uncomp_hdr_len + sizeof(ipv6_ext_t) + ext_len)) {
+        if (gnrc_pktbuf_realloc_data(ipv6,
+                                     *uncomp_hdr_len + sizeof(ipv6_ext_t) +
+                                     ext_len)) {
+            DEBUG("6lo iphc: unable to decode IPv6 Extension header NHC "
+                  "(not enough buffer space)\n");
+            return 0;
+        }
+    }
+    ext_hdr = (ipv6_ext_t *)((uint8_t *)ipv6->data + *uncomp_hdr_len);
+    switch (ipv6_ext_nhc & NHC_IPV6_EXT_EID_MASK) {
+        case NHC_IPV6_EXT_EID_HOPOPT:
+            protnum = PROTNUM_IPV6_EXT_HOPOPT;
+            break;
+        case NHC_IPV6_EXT_EID_RH:
+            protnum = PROTNUM_IPV6_EXT_RH;
+            break;
+        case NHC_IPV6_EXT_EID_FRAG:
+            protnum = PROTNUM_IPV6_EXT_FRAG;
+            break;
+        case NHC_IPV6_EXT_EID_DST:
+            protnum = PROTNUM_IPV6_EXT_DST;
+            break;
+        case NHC_IPV6_EXT_EID_MOB:
+            protnum = PROTNUM_IPV6_EXT_MOB;
+            break;
+        default:
+            DEBUG("6lo iphc: unexpected extension header EID %u\n",
+                  (ipv6_ext_nhc & NHC_IPV6_EXT_EID_MASK) >> 1U);
+            return 0;
+    }
+    ((uint8_t *)ipv6->data)[*prev_nh_offset] = protnum;
+    if (!(ipv6_ext_nhc & NHC_IPV6_EXT_NH)) {
+        ext_hdr->nh = payload[offset++];
+        /* signal end of next header compression to caller */
+        *prev_nh_offset = 0;
+    }
+    else {
+        *prev_nh_offset = (&ext_hdr->nh) - ((uint8_t *)ipv6->data);
+    }
+    /* skip already fetched length field */
+    offset++;
+    ext_hdr->len = ((sizeof(ipv6_ext_t) + ext_len) - IPV6_EXT_LEN_UNIT) /
+                   IPV6_EXT_LEN_UNIT;
+    memcpy(ext_hdr + 1, &payload[offset], ext_len);
+    offset += ext_len;
+    *uncomp_hdr_len += sizeof(ipv6_ext_t) + ext_len;
+    return offset;
+}
+
+static size_t _iphc_nhc_ipv6_decode(gnrc_pktsnip_t *sixlo, size_t offset,
+                                    const gnrc_sixlowpan_frag_rb_t *rbuf,
+                                    size_t *prev_nh_offset,
+                                    gnrc_pktsnip_t *ipv6,
+                                    size_t *uncomp_hdr_len)
+{
+    uint8_t *payload = sixlo->data;
+    uint8_t ipv6_nhc = payload[offset];
+
+    switch (ipv6_nhc & NHC_IPV6_EXT_EID_MASK) {
+        case NHC_IPV6_EXT_EID_HOPOPT:
+        case NHC_IPV6_EXT_EID_RH:
+        case NHC_IPV6_EXT_EID_FRAG:
+        case NHC_IPV6_EXT_EID_DST:
+        case NHC_IPV6_EXT_EID_MOB: {
+            size_t tmp;
+            tmp = _iphc_nhc_ipv6_ext_decode(sixlo, offset, prev_nh_offset,
+                                            ipv6, uncomp_hdr_len);
+            if (tmp == 0) {
+                /* unable to parse IPHC header */
+                return 0;
+            }
+            offset = tmp;
+            break;
+        }
+        case NHC_IPV6_EXT_EID_IPV6: {
+            gnrc_pktsnip_t *netif = gnrc_pktsnip_search_type(sixlo,
+                                                             GNRC_NETTYPE_NETIF);
+            ipv6_hdr_t *ipv6_hdr;
+            uint16_t payload_len;
+            size_t tmp;
+
+            offset++;   /* move over NHC header */
+            /* realloc size for uncompressed snip, if too small */
+            if (ipv6->size < (*uncomp_hdr_len + sizeof(ipv6_hdr_t))) {
+                if (gnrc_pktbuf_realloc_data(ipv6,
+                                             *uncomp_hdr_len +
+                                             sizeof(ipv6_hdr_t))) {
+                    DEBUG("6lo iphc: unable to decode IPv6 encapsulated header "
+                          "NHC (not enough buffer space)\n");
+                    return 0;
+                }
+            }
+            ipv6_hdr = (ipv6_hdr_t *)(((uint8_t *)ipv6->data) + *uncomp_hdr_len);
+            tmp = _iphc_ipv6_decode(&payload[offset], netif->data,
+                                    gnrc_netif_hdr_get_netif(netif->data),
+                                    ipv6_hdr);
+            if (tmp == 0) {
+                /* unable to parse IPHC header */
+                return 0;
+            }
+            ((uint8_t *)ipv6->data)[*prev_nh_offset] = PROTNUM_IPV6;
+            if (payload[offset + IPHC1_IDX] & SIXLOWPAN_IPHC1_NH) {
+                *prev_nh_offset = (&ipv6_hdr->nh) - ((uint8_t *)ipv6->data);
+            }
+            else {
+                /* signal end of next header compression to caller */
+                *prev_nh_offset = 0;
+            }
+            offset += tmp;
+            /* might be needed to be overwritten by IPv6 reassembly after the IPv6
+             * packet was reassembled to get complete length */
+            if (rbuf != NULL) {
+                payload_len = rbuf->super.datagram_size - *uncomp_hdr_len-
+                              sizeof(ipv6_hdr_t);
+            }
+            else {
+                payload_len = (sixlo->size + *uncomp_hdr_len) -
+                              sizeof(ipv6_hdr_t) - offset;
+            }
+            ipv6_hdr->len = byteorder_htons(payload_len);
+            *uncomp_hdr_len += sizeof(ipv6_hdr_t);
+            break;
+        }
+        default:
+            DEBUG("6lo iphc: unknown IPv6 extension header EID\n");
+            break;
+    }
+    return offset;
+}
+
 /**
  * @brief   Decodes UDP NHC
  *
@@ -437,6 +584,8 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
  * @param[in] rbuf                  Reassembly buffer entry if @p ipv6 is a
  *                                  fragmented datagram. May be NULL, if @p ipv6
  *                                  is not fragmented
+ * @param[out] prev_nh_offset       Offset to previous nh field in
+ *                                  gnrc_pktsnip_t::data of @p ipv6
  * @param[out] ipv6                 The packet to write the decoded data to
  * @param[in,out] uncomp_hdr_len    Number of bytes already decoded into @p ipv6
  *                                  by IPHC and other NHC. Adds size of @ref
@@ -448,10 +597,10 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
  */
 static size_t _iphc_nhc_udp_decode(gnrc_pktsnip_t *sixlo, size_t offset,
                                    const gnrc_sixlowpan_frag_rb_t *rbuf,
-                                   gnrc_pktsnip_t *ipv6, size_t *uncomp_hdr_len)
+                                   size_t prev_nh_offset, gnrc_pktsnip_t *ipv6,
+                                   size_t *uncomp_hdr_len)
 {
     uint8_t *payload = sixlo->data;
-    ipv6_hdr_t *ipv6_hdr;
     udp_hdr_t *udp_hdr;
     uint16_t payload_len;
     uint8_t udp_nhc = payload[offset++];
@@ -465,7 +614,6 @@ static size_t _iphc_nhc_udp_decode(gnrc_pktsnip_t *sixlo, size_t offset,
             return 0;
         }
     }
-    ipv6_hdr = ipv6->data;
     udp_hdr = (udp_hdr_t *)((uint8_t *)ipv6->data + *uncomp_hdr_len);
     network_uint16_t *src_port = &(udp_hdr->src_port);
     network_uint16_t *dst_port = &(udp_hdr->dst_port);
@@ -524,7 +672,7 @@ static size_t _iphc_nhc_udp_decode(gnrc_pktsnip_t *sixlo, size_t offset,
     }
     udp_hdr->length = byteorder_htons(payload_len);
     *uncomp_hdr_len += sizeof(udp_hdr_t);
-    ipv6_hdr->nh = PROTNUM_UDP;
+    ((uint8_t *)ipv6->data)[prev_nh_offset] = PROTNUM_UDP;
 
     return offset;
 }
@@ -582,19 +730,47 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     }
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
     if (iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_NH) {
-        switch (iphc_hdr[payload_offset] & NHC_ID_MASK) {
-            case NHC_UDP_ID: {
-                payload_offset = _iphc_nhc_udp_decode(sixlo, payload_offset,
-                                                      rbuf, ipv6,
-                                                      &uncomp_hdr_len);
-                if (payload_offset == 0) {
-                    _recv_error_release(sixlo, ipv6, rbuf);
-                    return;
+        bool nhc_header = true;
+        ipv6_hdr = ipv6->data;
+        size_t prev_nh_offset = (&ipv6_hdr->nh) - ((uint8_t *)ipv6->data);
+
+        while (nhc_header) {
+            switch (iphc_hdr[payload_offset] & NHC_ID_MASK) {
+                case NHC_IPV6_EXT_ID:
+                case NHC_IPV6_EXT_ID_ALT:
+                    payload_offset = _iphc_nhc_ipv6_decode(sixlo,
+                                                           payload_offset,
+                                                           rbuf,
+                                                           &prev_nh_offset,
+                                                           ipv6,
+                                                           &uncomp_hdr_len);
+                    if (payload_offset == 0) {
+                        _recv_error_release(sixlo, ipv6, rbuf);
+                        return;
+                    }
+                    /* prev_nh_offset is set to 0 if next header is not
+                     * compressed (== NH flag in compression header not set) */
+                    nhc_header = (prev_nh_offset > 0);
+                    break;
+                case NHC_UDP_ID: {
+                    payload_offset = _iphc_nhc_udp_decode(sixlo,
+                                                          payload_offset,
+                                                          rbuf,
+                                                          prev_nh_offset,
+                                                          ipv6,
+                                                          &uncomp_hdr_len);
+                    if (payload_offset == 0) {
+                        _recv_error_release(sixlo, ipv6, rbuf);
+                        return;
+                    }
+                    /* no NHC after UDP header */
+                    nhc_header = false;
+                    break;
                 }
-                break;
+                default:
+                    nhc_header = false;
+                    break;
             }
-            default:
-                break;
         }
     }
 #endif
@@ -649,7 +825,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
         _recv_error_release(sixlo, ipv6, rbuf);
         return;
     }
-    /* assign IPv6 header only here in case realloc changed the address */
+    /* re-assign IPv6 header in case realloc changed the address */
     ipv6_hdr = ipv6->data;
     ipv6_hdr->len = byteorder_htons(payload_len);
     memcpy(((uint8_t *)ipv6->data) + uncomp_hdr_len,
