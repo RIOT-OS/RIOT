@@ -166,6 +166,11 @@ bool cpu_woke_from_backup(void)
         return false;
     }
 
+    /* When we wake from Deep Sleep only POR is set, just like in the real
+     * POR case. Clear the bit to create a new, distinct state.
+     */
+    RSIR |= RSIR_POR;
+
     return true;
 }
 
