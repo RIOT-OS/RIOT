@@ -76,6 +76,14 @@ extern "C" {
  */
 #define PUF_SRAM_ATTRIBUTES __attribute__((used, section(".noinit")))
 
+/**
+ * @brief   Stack size used for the exception (ISR) stack
+ * @{
+ */
+extern unsigned __stack_irq_size;
+#define ISR_STACKSIZE                   ((unsigned) &__stack_irq_size)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

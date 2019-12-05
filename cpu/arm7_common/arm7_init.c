@@ -49,6 +49,26 @@ static inline void _init_data(void)
     register unsigned int *dst;
     register unsigned int *end;
 
+#ifdef DEVELHELP
+    /* Fill user stack with canary values up until the current stack pointer */
+    /* Read current stack pointer from CPU register */
+    __asm__ volatile ("mov %[end], sp" : [end] "=r" (end) : : );
+    dst = &__stack_start;
+    while (dst < end) {
+        *(dst++) = STACK_CANARY_WORD;
+    }
+
+    /* fill the interrupt stacks with canary values */
+    extern unsigned int __stack_usr_start;
+    extern unsigned int __stack_end;
+
+    dst = &__stack_usr_start;
+    end = &__stack_end;
+    while (dst < end) {
+        *(dst++) = STACK_CANARY_WORD;
+    }
+#endif
+
     /* initialize data from flash */
     src = &_etext;
     dst = &_srelocate;

@@ -25,6 +25,16 @@ void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale);
 
 void arm_reset(void);
 
+/**
+ * @brief Interrupt stack canary value
+ *
+ * @note 0xeafffffe is the ARM machine code equivalent of asm("b #0") or
+ * 'while (1);', i.e. an infinite loop.
+ * @internal
+ */
+#define STACK_CANARY_WORD   (0xEAFFFFFEu)
+
+
 #ifdef __cplusplus
 }
 #endif
