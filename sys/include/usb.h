@@ -92,7 +92,13 @@ extern "C" {
  * @brief USB specification version
  */
 #ifndef CONFIG_USB_SPEC_BCDVERSION
+#if defined(CONFIG_USB_SPEC_BCDVERSION_1_1)
+#define CONFIG_USB_SPEC_BCDVERSION      0x0110
+#elif defined(CONFIG_USB_SPEC_BCDVERSION_2_0)
 #define CONFIG_USB_SPEC_BCDVERSION      0x0200
+#else
+#define CONFIG_USB_SPEC_BCDVERSION      0x0200
+#endif
 #endif
 
 /**

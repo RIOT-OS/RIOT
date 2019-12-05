@@ -7,5 +7,6 @@
 menu "System"
 
 rsource "net/Kconfig"
+rsource "usb/Kconfig"
 
 endmenu # System
