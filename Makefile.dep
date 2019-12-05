@@ -1011,6 +1011,11 @@ ifneq (,$(filter periph_gpio_irq,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
 endif
 
+# Enable optionally periph_gpio_ext when the MCU supports it as feature
+ifneq (,$(filter periph_gpio,$(USEMODULE)))
+  FEATURES_OPTIONAL += periph_gpio_ext
+endif
+
 ifneq (,$(filter devfs_hwrng,$(USEMODULE)))
   FEATURES_REQUIRED += periph_hwrng
 endif

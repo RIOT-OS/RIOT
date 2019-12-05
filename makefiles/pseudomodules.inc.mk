@@ -42,6 +42,9 @@ PSEUDOMODULES += gnrc_sixlowpan_router_default
 PSEUDOMODULES += gnrc_sock_async
 PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd
+PSEUDOMODULES += gpio_mask_32bit
+PSEUDOMODULES += gpio_mask_16bit
+PSEUDOMODULES += gpio_mask_8bit
 PSEUDOMODULES += heap_cmd
 PSEUDOMODULES += i2c_scan
 PSEUDOMODULES += ina3221_alerts
@@ -135,6 +138,9 @@ PSEUDOMODULES += mpu9250
 # include variants of INA2xx drivers as pseudo modules
 PSEUDOMODULES += ina219
 PSEUDOMODULES += ina220
+
+# periph extention interface pseudomodules
+PSEUDOMODULES += extend_%
 
 # include variants of mrf24j40 drivers as pseudo modules
 PSEUDOMODULES += mrf24j40m%
