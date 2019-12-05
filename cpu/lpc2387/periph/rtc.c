@@ -53,8 +53,10 @@ void rtc_init(void)
 
     RTC_CCR = CCR_CLKSRC;                   /* Clock from external 32 kHz Osc. */
 
-    /* initialize clock with valid unix compatible values */
-    if (RTC_YEAR > 2037) {
+    /* Initialize clock to a a sane and predictable default
+     * after cold boot or external reset.
+     */
+    if ((RSIR == RSIR_POR) || (RSIR == (RSIR_POR | RSIR_EXTR))) {
         struct tm localt = { .tm_year = 70 };
         rtc_set_time(&localt);
     }
