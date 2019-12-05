@@ -24,7 +24,7 @@ USB_PID ?= $(DEFAULT_PID)
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-CFLAGS += -DUSB_CONFIG_VID=0x$(USB_VID) -DUSB_CONFIG_PID=0x$(USB_PID)
+CFLAGS += -DCONFIG_USB_VID=0x$(USB_VID) -DCONFIG_USB_PID=0x$(USB_PID)
 
 include $(RIOTBASE)/Makefile.include
 

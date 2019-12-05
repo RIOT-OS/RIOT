@@ -123,7 +123,7 @@ static int _req_str(usbus_t *usbus, uint16_t idx)
             desc.length = sizeof(uint16_t) + sizeof(usb_descriptor_string_t);
             usbus_control_slicer_put_bytes(usbus, (uint8_t *)&desc, sizeof(desc));
             /* Only one language ID supported */
-            uint16_t us = USB_CONFIG_DEFAULT_LANGID;
+            uint16_t us = CONFIG_USB_DEFAULT_LANGID;
             usbus_control_slicer_put_bytes(usbus, (uint8_t *)&us, sizeof(uint16_t));
             res = 1;
         }
