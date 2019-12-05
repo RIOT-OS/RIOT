@@ -46,6 +46,39 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Test if the given character is a numerical digit (regex `[0-9]`)
+ *
+ * @param[in] c     Character to test
+ *
+ * @return  true if @p c is a digit, false otherwise
+ */
+static inline int fmt_is_digit(char c)
+{
+    return (c >= '0' && c <= '9');
+}
+
+/**
+ * @brief   Test if the given character is an uppercase letter (regex `[A-Z]`)
+ *
+ * @param[in] c     Character to test
+ *
+ * @return  true if @p c is an uppercase letter, false otherwise
+ */
+static inline int fmt_is_upper(char c)
+{
+    return (c >= 'A' && c <= 'Z');
+}
+
+/**
+ * @brief   Test if the given string is a number (regex `[0-9]+`)
+ *
+ * @param[in] str   String to test, **must be `\0` terminated**
+ *
+ * @return  true if @p str solely contains digits, false otherwise
+ */
+int fmt_is_number(const char *str);
+
+/**
  * @brief Format a byte value as hex
  *
  * E.g., converts byte value 0 to the string 00, 255 to the string FF.

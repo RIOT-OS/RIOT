@@ -20,6 +20,28 @@
 #include "fmt.h"
 #include "tests-fmt.h"
 
+static void test_fmt_is_x(void)
+{
+    const char *num = "123";
+    const char *hex = "0xabc";
+    const char *str = "muh";
+    char digit = '8';
+    char lower = 'a';
+    char upper = 'A';
+
+    TEST_ASSERT_EQUAL_INT(1, fmt_is_digit(digit));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_digit(lower));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_digit(upper));
+
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_upper(digit));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_upper(lower));
+    TEST_ASSERT_EQUAL_INT(1, fmt_is_upper(upper));
+
+    TEST_ASSERT_EQUAL_INT(1, fmt_is_number(num));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_number(hex));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_number(str));
+}
+
 static void test_fmt_byte_hex(void)
 {
     char out[8] = "zzzzzzz";
@@ -825,6 +847,7 @@ static void test_fmt_lpad(void)
 Test *tests_fmt_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
+        new_TestFixture(test_fmt_is_x),
         new_TestFixture(test_fmt_byte_hex),
         new_TestFixture(test_fmt_bytes_hex),
         new_TestFixture(test_fmt_bytes_hex_reverse),

@@ -78,17 +78,6 @@ static const struct {
 };
 
 /* utility functions */
-static bool _is_number(char *str)
-{
-    for (; *str; str++) {
-        if (*str < '0' || *str > '9') {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 static void _print_iface_name(netif_t *iface)
 {
     char name[NETIF_NAMELENMAX];
@@ -684,7 +673,7 @@ static int _netif_set_u32(netif_t *iface, netopt_t opt, uint32_t context,
     unsigned long int res;
     bool hex = false;
 
-    if (_is_number(u32_str)) {
+    if (fmt_is_number(u32_str)) {
         if ((res = strtoul(u32_str, NULL, 10)) == ULONG_MAX) {
             puts("error: unable to parse value.\n"
                  "Must be a 32-bit unsigned integer (dec or hex)\n");
@@ -796,7 +785,7 @@ static int _netif_set_u16(netif_t *iface, netopt_t opt, uint16_t context,
     unsigned long int res;
     bool hex = false;
 
-    if (_is_number(u16_str)) {
+    if (fmt_is_number(u16_str)) {
         if ((res = strtoul(u16_str, NULL, 10)) == ULONG_MAX) {
             puts("error: unable to parse value.\n"
                  "Must be a 16-bit unsigned integer (dec or hex)\n");
