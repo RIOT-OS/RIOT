@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Implementation of `ws281x_write()` for ATmega MCUs
+ * @brief       Implementation of `ws281x_write_buffer()` for ATmega MCUs
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
