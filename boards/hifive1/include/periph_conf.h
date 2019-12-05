@@ -35,16 +35,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Xtimer configuration
- * @{
- */
-#define XTIMER_DEV                  (0)
-#define XTIMER_CHAN                 (0)
-#define XTIMER_WIDTH                (32)
-#define XTIMER_HZ                   (32768ul)
-/** @} */
-
-/**
  * @name    Timer configuration
  *
  * @{
