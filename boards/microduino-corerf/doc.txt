@@ -44,6 +44,22 @@ Atmel AT86RF23x line of transceivers with the only difference being that it is
 not being accessed over an SPI bus, but instead the radio registers are directly
 mapped into memory.
 
+
+## Peripheral interfaces SPI and I2C
+According to the wiki, SPI and I2C pins are the following:
+
+| SPI  | Original Pin Name | Map Pin Name |
+|:---- |:------------------|:-------------|
+| SS   | PB4               | D10          |
+| MOSI | PB2               | D11          |
+| MISO | PB3               | D12          |
+| SCK  | PB1               | D13          |
+
+| I2C  | Original Pin Name | Map Pin Name |
+|:---- |:------------------|:-------------|
+| SDA  | PD1               | D18          |
+| SCL  | PD0               | D19          |
+
 # Flashing RIOT
 Flashing RIOT on the CoreRF is done using the SPI method.
 Using a cheap FT232H breakout board, connect the board as follows:
