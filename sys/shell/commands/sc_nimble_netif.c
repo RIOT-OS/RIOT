@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "fmt.h"
 #include "xtimer.h"
 #include "nimble_riot.h"
 #include "nimble_netif.h"
@@ -38,6 +39,25 @@
 #define DEFAULT_CONN_TIMEOUT        (500U)      /* 500ms */
 
 #ifndef MODULE_NIMBLE_AUTOCONN
+static const char *_name_to_connect = NULL;
+
+static void _scan_for_name(uint8_t type, const ble_addr_t *addr, int8_t rssi,
+                           const uint8_t *ad, size_t ad_len)
+{
+    (void)type;
+    (void)rssi;
+    int res;
+    bluetil_ad_t adstruct;
+
+    bluetil_ad_init(&adstruct, (uint8_t *)ad, ad_len, ad_len);
+    res = bluetil_ad_find_and_cmp(&adstruct, BLE_GAP_AD_NAME,
+                                  _name_to_connect, strlen(_name_to_connect));
+    if (res) {
+        nimble_scanner_stop();
+        nimble_netif_connect(addr, NULL, DEFAULT_CONN_TIMEOUT);
+    }
+}
+
 static void _on_ble_evt(int handle, nimble_netif_event_t event)
 {
     switch (event) {
@@ -45,6 +65,10 @@ static void _on_ble_evt(int handle, nimble_netif_event_t event)
             printf("event: handle %i -> CONNECTED as MASTER (", handle);
             bluetil_addr_print(nimble_netif_conn_get(handle)->addr);
             puts(")");
+            if (_name_to_connect != NULL) {
+                printf("connection to '%s' established\n", _name_to_connect);
+                _name_to_connect = NULL;
+            }
             break;
         }
         case NIMBLE_NETIF_CONNECTED_SLAVE:
@@ -212,16 +236,27 @@ static void _cmd_adv_stop(void)
     }
 }
 
-static void _cmd_scan(unsigned duration)
+static void _do_scan(nimble_scanner_cb cb, unsigned duration)
 {
     if (duration == 0) {
+        printf("err: duration must be > 0\n");
         return;
     }
-    printf("scanning (for %ums) ... ", (duration / 1000));
+    if (nimble_scanner_status() == NIMBLE_SCANNER_SCANNING) {
+        printf("err: scanner already active\n");
+        return;
+    }
+    nimble_scanner_init(NULL, cb);
     nimble_scanlist_clear();
     nimble_scanner_start();
     xtimer_usleep(duration);
     nimble_scanner_stop();
+}
+
+static void _cmd_scan(unsigned duration)
+{
+    printf("scanning (for %ums) ...\n", (duration / 1000));
+    _do_scan(nimble_scanlist_update, duration);
     puts("done");
     nimble_scanlist_print();
 }
@@ -243,23 +278,32 @@ static void _cmd_connect_addr(ble_addr_t *addr)
 
 }
 
-static void _cmd_connect_addstr(const char *addr_str)
+static void _cmd_connect_addr_raw(const uint8_t *addr_in)
 {
-    uint8_t tmp[BLE_ADDR_LEN];
     /* RANDOM is the most common type, has no noticeable effect when connecting
        anyhow... */
     ble_addr_t addr = { .type = BLE_ADDR_RANDOM };
-
-    if (bluetil_addr_from_str(tmp, addr_str) == NULL) {
-        puts("err: unable to parse address");
-        return;
-    }
     /* NimBLE expects address in little endian, so swap */
-    bluetil_addr_swapped_cp(tmp, addr.val);
+    bluetil_addr_swapped_cp(addr_in, addr.val);
     _cmd_connect_addr(&addr);
 }
 
-static void _cmd_connect(unsigned pos)
+static void _cmd_connect_name(const char *name, unsigned duration)
+{
+    if (_name_to_connect != NULL) {
+        printf("err: already trying to connect to '%s'\n", _name_to_connect);
+        return;
+    }
+    _name_to_connect = name;
+    printf("trying to find and connect to a node with name '%s'\n", name);
+    _do_scan(_scan_for_name, duration);
+    if (_name_to_connect != NULL) {
+        printf("fail: unable to connect to '%s'\n", _name_to_connect);
+        _name_to_connect = NULL;
+    }
+}
+
+static void _cmd_connect_scanlist(unsigned pos)
 {
     nimble_scanlist_entry_t *sle = nimble_scanlist_get_by_pos(pos);
     if (sle == NULL) {
@@ -310,7 +354,6 @@ void sc_nimble_netif_init(void)
 #ifndef MODULE_NIMBLE_AUTOCONN
     /* setup the scanning environment */
     nimble_scanlist_init();
-    nimble_scanner_init(NULL, nimble_scanlist_update);
 
     /* register event callback with the netif wrapper */
     nimble_netif_eventcb(_on_ble_evt);
@@ -364,19 +407,32 @@ int _nimble_netif_handler(int argc, char **argv)
     }
     else if (memcmp(argv[1], "connect", 7) == 0) {
         if ((argc < 3) || _ishelp(argv[2])) {
-            printf("usage: %s connect [help|list|<scanlist entry #>|<BLE addr>]\n",
+            printf("usage: %s connect [help|list|<scanlist entry #>|<BLE addr>|<name>]\n",
                    argv[0]);
+            return 0;
         }
         if (memcmp(argv[2], "list", 4) == 0) {
             _conn_list();
             return 0;
         }
-        if (strlen(argv[2]) == (BLUETIL_ADDR_STRLEN - 1)) {
-            _cmd_connect_addstr(argv[2]);
+        /* try if param is an BLE address */
+        uint8_t addr[BLE_ADDR_LEN];
+        if (bluetil_addr_from_str(addr, argv[2]) != NULL) {
+            _cmd_connect_addr_raw(addr);
             return 0;
         }
+        /* try if param is a name (contains non-number chars) */
+        if (!fmt_is_number(argv[2])) {
+            unsigned duration = DEFAULT_SCAN_DURATION;
+            if (argc > 3) {
+                duration = (unsigned)atoi(argv[3]);
+            }
+            _cmd_connect_name(argv[2], duration * 1000);
+            return 0;
+        }
+
         unsigned pos = atoi(argv[2]);
-        _cmd_connect(pos);
+        _cmd_connect_scanlist(pos);
     }
 #endif
     else if (memcmp(argv[1], "close", 5) == 0) {
