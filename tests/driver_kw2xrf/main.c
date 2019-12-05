@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 
+#include "fmt.h"
 #include "shell.h"
 #include "kw2xrf.h"
 #include "shell_commands.h"
@@ -32,21 +33,10 @@
 #include "kw2xrf_tm.h"
 
 /* utility functions */
-static bool _is_number(char *str)
-{
-    for (; *str; str++) {
-        if (*str < '0' || *str > '9') {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 static void _set_test_mode(int argc, char **argv, uint8_t mode)
 {
     (void) argc;
-    if (_is_number(argv[1])) {
+    if (fmt_is_number(argv[1])) {
         kernel_pid_t dev = atoi(argv[1]);
 
         if (gnrc_netif_get_by_pid(dev)) {
