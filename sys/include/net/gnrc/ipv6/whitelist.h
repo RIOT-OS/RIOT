@@ -31,7 +31,7 @@ extern "C" {
 /**
  * @defgroup    net_gnrc_ipv6_whitelist_conf GNRC IPv6 address whitelisting compile configurations
  * @ingroup     net_gnrc_ipv6_whitelist
- * @ingroup     config
+ * @ingroup     net_gnrc_conf
  * @{
  */
 /**
