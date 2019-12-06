@@ -4,8 +4,6 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menu "System"
+menu "Networking"
 
-rsource "net/Kconfig"
-
-endmenu # System
+endmenu # Networking
