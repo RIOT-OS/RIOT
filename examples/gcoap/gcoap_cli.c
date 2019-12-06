@@ -43,7 +43,7 @@ extern const unsigned char ecdsa_pub_key_y[];
 #endif /* DTLS_ECC */
 #endif /* MODULE_SOCK_DTLS */
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
@@ -411,7 +411,7 @@ void gcoap_cli_init(void)
             },
         },
     };
-#else /* DTLS_PSK */
+#else
     ecdsa_public_key_t other_pubkeys[] = {
         { .x = ecdsa_pub_key_x, .y = ecdsa_pub_key_y },
     };
@@ -437,10 +437,10 @@ void gcoap_cli_init(void)
         return;
     }
 
-    /* start gcoap server */
-    gcoap_init();
     /* tell gcoap with tag to use */
     gcoap_set_credential_tag(SOCK_DTLS_GCOAP_TAG);
+    /* start gcoap server */
+    gcoap_init();
 #endif
 
     gcoap_register_listener(&_listener);
