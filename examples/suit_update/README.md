@@ -275,14 +275,12 @@ in regards to the running slot to see witch firmware image to fetch.
 
 Once the manifest validation is complete, the application fetches the image
 and starts flashing.
-This step takes some time to fetch and write to flash, a series of messages like
-the following are printed to the terminal:
+This step takes some time to fetch and write to flash. A progress bar is
+displayed during this step:
 
     ....
-    riotboot_flashwrite: processing bytes 1344-1407
-    riotboot_flashwrite: processing bytes 1408-1471
-    riotboot_flashwrite: processing bytes 1472-1535
-    ...
+    Fetching firmware |█████████████            |  50%
+    ....
 
 Once the new image is written, a final validation is performed and, in case of
 success, the application reboots on the new slot:
