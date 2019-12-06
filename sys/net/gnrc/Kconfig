@@ -4,8 +4,7 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menu "Networking"
+menu "GNRC Network stack"
+    depends on MODULE_GNRC
 
-rsource "gnrc/Kconfig"
-
-endmenu # Networking
+endmenu # GNRC Network Stack
