@@ -183,8 +183,8 @@ void spi_flash_drive_init (void)
     _flash_end  = _flashchip->chip_size - 5 * _flashchip->sector_size;
     _flash_size = _flash_end - _flash_beg; /* MUST be at least 3 sectors (0x3000) */
 
-    LOG_TAG_INFO("spi_flash", "MTD in SPI flash starts at address 0x%08x "
-                 "with a size of %d kbytes\n", _flash_beg, _flash_size >> 10);
+    LOG_TAG_DEBUG("spi_flash", "MTD in SPI flash starts at address 0x%08x "
+                  "with a size of %d kbytes\n", _flash_beg, _flash_size >> 10);
 
     _flash_dev.driver = &_flash_driver;
     _flash_dev.sector_count = _flash_size / _flashchip->sector_size;
