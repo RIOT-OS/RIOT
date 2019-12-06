@@ -63,11 +63,11 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
 endif
 
 ifneq (,$(filter spiffs,$(USEMODULE)))
-  export RIOT_TEST_TIMEOUT = 300
+  export RIOT_TEST_TIMEOUT = 120
 endif
 
 ifneq (,$(filter littlefs,$(USEMODULE)))
-  export RIOT_TEST_TIMEOUT = 300
+  export RIOT_TEST_TIMEOUT = 120
 endif
 
 ifneq (,$(filter 4 5,$(LOG_LEVEL)))

@@ -47,11 +47,11 @@ ifneq (, $(filter esp_gdbstub, $(USEMODULE)))
 endif
 
 ifneq (, $(filter spiffs, $(USEMODULE)))
-    export RIOT_TEST_TIMEOUT = 300
+    export RIOT_TEST_TIMEOUT = 200
 endif
 
 ifneq (, $(filter littlefs, $(USEMODULE)))
-    export RIOT_TEST_TIMEOUT = 300
+    export RIOT_TEST_TIMEOUT = 200
 endif
 
 # regular Makefile
