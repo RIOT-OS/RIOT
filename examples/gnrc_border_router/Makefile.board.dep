@@ -1,0 +1,6 @@
+# Put board specific dependencies here
+ifeq (,$(filter native,$(BOARD)))
+  USEMODULE += stdio_ethos
+else
+  USEMODULE += socket_zep
+endif
