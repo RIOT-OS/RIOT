@@ -832,9 +832,6 @@ ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += nanocoap
   USEMODULE += gnrc_sock_udp
   USEMODULE += sock_util
-  ifneq (,$(filter sock_dtls,$(USEMODULE)))
-    USEMODULE += gcoap_lazy_init
-  endif
 endif
 
 ifneq (,$(filter luid,$(USEMODULE)))

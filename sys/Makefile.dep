@@ -22,6 +22,9 @@ endif
 ifneq (,$(filter gcoap,$(USEMODULE)))
   ifneq (,$(filter sock_dtls,$(USEMODULE)))
     CFLAGS += -DGCOAP_NO_AUTO_INIT
+    # Payload size might be bigger when using DTLS with ECC, causing errors not present
+    # when using plain CoAP
+    CFLAGS += -DGCOAP_PDU_BUF_SIZE=256
   endif
 endif
 
