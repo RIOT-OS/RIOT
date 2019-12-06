@@ -36,6 +36,18 @@ KCONFIG_USER_CONFIG = $(APPDIR)/user.config
 # one that is used to generate the 'riotconf.h' header
 KCONFIG_MERGED_CONFIG = $(GENERATED_DIR)/merged.config
 
+# Include configuration symbols if available, only when not cleaning. This
+# allows to check for Kconfig symbols in makefiles.
+# Make tries to 'remake' all included files
+# (see https://www.gnu.org/software/make/manual/html_node/Remaking-Makefiles.html).
+# So if this file was included even when 'clean' is called, make would enter a
+# loop, as it always is out-of-date.
+# This has the side effect of requiring a Kconfig user to run 'clean' on a
+# separate call (e.g. 'make clean && make all'), to get the symbols correctly.
+ifneq ($(CLEAN),clean)
+  -include $(KCONFIG_MERGED_CONFIG)
+endif
+
 # Flag that indicates that the configuration has been edited
 KCONFIG_EDITED_CONFIG = $(GENERATED_DIR)/.editedconfig
 
