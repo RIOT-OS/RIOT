@@ -119,6 +119,10 @@ ifneq (,$(filter sock_async_event,$(USEMODULE)))
   include $(RIOTBASE)/sys/net/sock/async/event/Makefile.include
 endif
 
+ifneq (,$(filter sock_async_msg,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/sock/async/msg/Makefile.include
+endif
+
 ifneq (,$(filter ssp,$(USEMODULE)))
   include $(RIOTBASE)/sys/ssp/Makefile.include
 endif
