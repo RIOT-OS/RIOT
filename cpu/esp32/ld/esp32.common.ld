@@ -101,8 +101,9 @@ SECTIONS
     *esp_idf_spi_flash.a:*(.literal .text .literal.* .text.*)
     /* parts of RIOT that should to run in IRAM */
     *core.a:*(.literal .text .literal.* .text.*)
-    /* *spiffs_fs.a:*(.literal .text .literal.* .text.*) */
-    /* *spiffs.a:*(.literal .text .literal.* .text.*) */
+    *spiffs_fs.a:*(.literal .text .literal.* .text.*)
+    *spiffs.a:*(.literal .text .literal.* .text.*)
+    *vfs.a:*(.literal .text .literal.* .text.*)
 
     /* part of RIOT ports that should run in IRAM */
     *cpu.a:*(.literal .text .literal.* .text.*)
