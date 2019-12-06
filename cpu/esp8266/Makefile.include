@@ -58,6 +58,10 @@ ifneq (,$(filter log_color,$(USEMODULE)))
     USEMODULE += esp_log_colored
 endif
 
+ifneq (,$(filter 4 5,$(LOG_LEVEL)))
+  USEMODULE += esp_log_startup
+endif
+
 # regular Makefile
 
 export TARGET_ARCH ?= xtensa-esp8266-elf
