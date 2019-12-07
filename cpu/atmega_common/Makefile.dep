@@ -1,3 +1,6 @@
+# avr libc needs some RIOT-specific support code
+USEMODULE += avr_libc_extra
+
 # tell the build system to build the atmega common files
 USEMODULE += atmega_common
 
