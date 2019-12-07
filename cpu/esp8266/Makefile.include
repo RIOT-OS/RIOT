@@ -54,6 +54,14 @@ ifneq (, $(filter littlefs, $(USEMODULE)))
     export RIOT_TEST_TIMEOUT = 200
 endif
 
+ifneq (,$(filter log_color,$(USEMODULE)))
+    USEMODULE += esp_log_colored
+endif
+
+ifneq (,$(filter 4 5,$(LOG_LEVEL)))
+  USEMODULE += esp_log_startup
+endif
+
 # regular Makefile
 
 export TARGET_ARCH ?= xtensa-esp8266-elf
@@ -62,6 +70,7 @@ export TARGET_ARCH ?= xtensa-esp8266-elf
 PSEUDOMODULES += esp_gdb
 PSEUDOMODULES += esp_log_colored
 PSEUDOMODULES += esp_log_tagged
+PSEUDOMODULES += esp_log_startup
 PSEUDOMODULES += esp_qemu
 PSEUDOMODULES += esp_sw_timer
 PSEUDOMODULES += esp_spiffs
@@ -204,16 +213,20 @@ PREFFLAGS += ls -l $(FLASHFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partition
 PREFFLAGS += python $(RIOTCPU)/$(CPU)/vendor/esp-idf/partition_table/gen_esp32part.py
 PREFFLAGS += --verify $(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
 
-ifneq (, $(filter esp_log_colored, $(USEMODULE)))
-    BOOTLOADER ?= bootloader_dout_115200_color.bin
-else
-    BOOTLOADER ?= bootloader_dout_115200_no_color.bin
+ifneq (,$(filter esp_log_colored,$(USEMODULE)))
+  BOOTLOADER_COLOR = _colors
 endif
+
+ifneq (,$(filter esp_log_startup,$(USEMODULE)))
+  BOOTLOADER_INFO = _info
+endif
+
+BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
 
 ifneq (, $(filter esp_qemu, $(USEMODULE)))
     FLASHER = dd
     FFLAGS += if=/dev/zero bs=1M count=1 | tr "\\000" "\\377" > tmp.bin &&
-    FFLAGS += cat $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER) tmp.bin |
+    FFLAGS += cat $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN) tmp.bin |
     FFLAGS += head -c $$((0x8000)) |
     FFLAGS += cat - $(BINDIR)/partitions.bin tmp.bin |
     FFLAGS += head -c $$((0x10000)) |
@@ -228,7 +241,7 @@ else
     FFLAGS += --before default_reset write_flash -z
     FFLAGS += --flash_size detect
     FFLAGS += --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ)
-    FFLAGS += 0x0000 $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER)
+    FFLAGS += 0x0000 $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN)
     FFLAGS += 0x8000 $(BINDIR)/partitions.bin
     FFLAGS += 0x10000 $(FLASHFILE).bin
 endif

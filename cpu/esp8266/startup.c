@@ -67,12 +67,14 @@ void esp_riot_init(void)
     }
 
     ets_printf("\n");
+#ifdef MODULE_ESP_LOG_STARTUP
     ets_printf("Starting ESP8266 CPU with ID: %08x\n", system_get_chip_id());
     ets_printf("ESP8266-RTOS-SDK Version %s\n\n", system_get_sdk_version());
     ets_printf("CPU clock frequency: %d MHz\n", system_get_cpu_freq());
     extern void heap_stats(void);
     heap_stats();
     ets_printf("\n");
+#endif
 
     /* set exception handlers */
     init_exceptions ();
@@ -102,8 +104,10 @@ void esp_riot_init(void)
     /* trigger board initialization */
     board_init();
 
+#ifdef MODULE_ESP_LOG_STARTUP
     /* print the board config */
     board_print_config();
+#endif
 
     /* initialize ESP system event loop */
     extern void esp_event_handler_init(void);
