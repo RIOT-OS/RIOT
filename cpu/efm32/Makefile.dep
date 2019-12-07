@@ -5,3 +5,9 @@ endif
 ifneq (,$(filter periph_rtt,$(USEMODULE)))
   USEMODULE += periph_rtt_series$(EFM32_SERIES)
 endif
+
+# include Gecko SDK package
+USEPKG += gecko_sdk
+
+# include layered power management
+USEMODULE += pm_layered

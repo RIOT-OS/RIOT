@@ -9,9 +9,6 @@ RIOTBOOT_LEN ?= 0x2000
 # the em_device.h header requires a global define with the cpu model
 CFLAGS += -D$(call uppercase_and_underscore,$(CPU_MODEL))
 
-# include Gecko SDK package
-USEPKG += gecko_sdk
-
 # CMSIS-DSP is needed for arm_math.h on Cortex-M0+ architectures
 ifeq ($(CPU_ARCH),cortex-m0plus)
   USEPKG += cmsis-dsp
@@ -22,9 +19,6 @@ USEMODULE += cpu_$(EFM32_FAMILY)
 
 # vectors.o is provided by 'cpu_$(EFM32_FAMILY)' and not by 'cpu'
 VECTORS_O := $(BINDIR)/cpu_$(EFM32_FAMILY)/vectors.o
-
-# include layered power management
-USEMODULE += pm_layered
 
 # include vendor device headers
 INCLUDES += -I$(RIOTCPU)/efm32/families/$(EFM32_FAMILY)/include/vendor
