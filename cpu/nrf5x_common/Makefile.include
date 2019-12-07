@@ -1,9 +1,3 @@
 CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 
-# include nrf5x common periph drivers
-USEMODULE += nrf5x_common_periph
-
-# link common cpu code
-USEMODULE += cpu_common
-
 INCLUDES += -I$(RIOTCPU)/nrf5x_common/include
