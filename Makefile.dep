@@ -19,6 +19,9 @@ OLD_USEPKG := $(sort $(USEPKG))
 include $(RIOTBASE)/sys/Makefile.dep
 include $(RIOTBASE)/drivers/Makefile.dep
 
+# pull dependencies from packages
+-include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
+
 ifneq (,$(filter ssp,$(USEMODULE)))
   FEATURES_REQUIRED += ssp
 endif
@@ -1047,9 +1050,6 @@ FEATURES_OPTIONAL += periph_gpio
 
 # always select power management if available
 FEATURES_OPTIONAL += periph_pm
-
-# include package dependencies
--include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
 # always select provided architecture features
 FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
