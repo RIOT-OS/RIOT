@@ -6,8 +6,6 @@ CPU_FAM  = samd5x
 # flash cannot be divided by two slots while staying FLASHPAGE_SIZE aligned.
 RIOTBOOT_LEN ?= 0x4000
 
-USEMODULE += pm_layered
-
 BACKUP_RAM_ADDR = 0x47000000
 BACKUP_RAM_LEN  = 0x2000
 

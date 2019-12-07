@@ -1,6 +1,4 @@
 CPU_ARCH = cortex-m23
 
-USEMODULE += pm_layered
-
 include $(RIOTCPU)/sam0_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk
