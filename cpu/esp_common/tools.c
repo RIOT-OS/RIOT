@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_esp32
+ * @ingroup     cpu_esp_common
  * @{
  *
  * @file
- * @brief       Implementation of some tools
+ * @brief       Implementation of some tools for ESP SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
@@ -20,7 +20,6 @@
 
 #include <stdio.h>
 #include "esp/common_macros.h"
-#include "rom/ets_sys.h"
 #include "tools.h"
 
 void esp_hexdump (const void* addr, uint32_t num, char width, uint8_t per_line)

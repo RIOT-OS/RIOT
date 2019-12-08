@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_esp32
+ * @ingroup     cpu_esp_common
  * @{
  *
  * @file
@@ -63,10 +63,17 @@
 #include "syscalls.h"
 #include "tools.h"
 
+#include "esp_attr.h"
 #include "esp/xtensa_ops.h"
 #include "rom/ets_sys.h"
-#include "soc/dport_reg.h"
 #include "xtensa/xtensa_context.h"
+
+#ifdef MCU_ESP32
+#include "soc/dport_reg.h"
+#else /* MCU_ESP32 */
+#include "esp8266/rom_functions.h"
+#include "sdk/sdk.h"
+#endif /* MCU_ESP32 */
 
 /* User exception dispatcher when exiting */
 extern void _xt_user_exit(void);
@@ -81,8 +88,12 @@ extern void _frxt_setup_switch(void);
 extern void vPortYield(void);
 extern void vPortYieldFromInt(void);
 
+#ifdef __XTENSA_CALL0_ABI__
+#define task_exit sched_task_exit
+#else /* __XTENSA_CALL0_ABI__ */
 /* forward declarations */
 NORETURN void task_exit(void);
+#endif /* __XTENSA_CALL0_ABI__ */
 
 char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size)
 {
@@ -162,10 +173,9 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     #ifdef __XTENSA_CALL0_ABI__
     /* for CALL0 ABI set in parameter a2 to task argument */
     exc_frame->ps = PS_UM | PS_EXCM;
-    exc_frame->a2 = (uint32_t)arg;               /* parameters for task_func */
+    exc_frame->a2 = (uint32_t)arg;                 /* parameters for task_func */
     #else
-    /* for Windowed Register ABI set PS.CALLINC=01 to handle task entry as
-       call4 return address in a4 and parameter in a6 and */
+    /* for windowed ABI also set WOE and CALLINC (pretend task was 'call4'd). */
     exc_frame->ps = PS_UM | PS_EXCM | PS_WOE | PS_CALLINC(1);
     exc_frame->a4 = (uint32_t)task_exit;         /* task exit point*/
     exc_frame->a6 = (uint32_t)arg;               /* parameters for task_func */
@@ -177,10 +187,11 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     #endif
 
     #if XCHAL_CP_NUM > 0
-    /* Init the coprocessor save area (see xtensa_context.h) */
-    /* No access to TCB here, so derive indirectly. Stack growth is top to bottom. */
-    /* p = (uint32_t *) xMPUSettings->coproc_area; */
-
+    /*
+     * Init the coprocessor save area (see xtensa_context.h)
+     * No access to TCB here, so derive indirectly. Stack growth is top to bottom.
+     * p = (uint32_t *) xMPUSettings->coproc_area;
+     */
     uint32_t *p;
 
     p = (uint32_t *)(((uint32_t)(top_of_stack + 1) - XT_CP_SIZE));
@@ -190,10 +201,17 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     #endif
 
     /* END - code from FreeRTOS port for Xtensa from Cadence */
+
     DEBUG("%s start=%p size=%d top=%p sp=%p free=%u\n",
           __func__, stack_start, stack_size, top_of_stack, sp, sp-(uint8_t*)stack_start);
+
     return (char*)sp;
 }
+
+#ifdef MCU_ESP8266
+extern int MacIsrSigPostDefHdl(void);
+unsigned int ets_soft_int_type = ETS_SOFT_INT_NONE;
+#endif
 
 /**
  * Context switches are realized using software interrupts since interrupt
@@ -202,11 +220,32 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
  */
 void IRAM_ATTR thread_yield_isr(void* arg)
 {
+#ifdef MCU_ESP8266
+    ETS_NMI_LOCK();
+
+    if (ets_soft_int_type == ETS_SOFT_INT_HDL_MAC) {
+        ets_soft_int_type = MacIsrSigPostDefHdl() ? ETS_SOFT_INT_YIELD
+                                                  : ETS_SOFT_INT_NONE;
+    }
+
+    if (ets_soft_int_type == ETS_SOFT_INT_YIELD) {
+        /*
+         * set the context switch flag (indicates that context has to be
+         * switched on exit from interrupt in _frxt_int_exit
+         */
+        ets_soft_int_type = ETS_SOFT_INT_NONE;
+        _frxt_setup_switch();
+    }
+
+    ETS_NMI_UNLOCK();
+#else
     /* clear the interrupt first */
     DPORT_WRITE_PERI_REG(DPORT_CPU_INTR_FROM_CPU_0_REG, 0);
     /* set the context switch flag (indicates that context has to be switched
        is switch on exit from interrupt in _frxt_int_exit */
+
     _frxt_setup_switch();
+#endif
 }
 
 /**
@@ -216,7 +255,7 @@ void IRAM_ATTR thread_yield_isr(void* arg)
  * will generate a software interrupt to force the context switch when
  * terminating the software interrupt (see thread_yield_isr).
  */
-void  thread_yield_higher(void)
+void IRAM_ATTR thread_yield_higher(void)
 {
     /* reset hardware watchdog */
     system_wdt_feed();
@@ -229,10 +268,16 @@ void  thread_yield_higher(void)
                sched_active_thread->sp - sched_active_thread-> stack_start);
     }
     #endif
-
     if (!irq_is_in()) {
+#ifdef MCU_ESP32
         /* generate the software interrupt to switch the context */
         DPORT_WRITE_PERI_REG(DPORT_CPU_INTR_FROM_CPU_0_REG, DPORT_CPU_INTR_FROM_CPU_0);
+#else /* MCU_ESP32 */
+        critical_enter();
+        ets_soft_int_type = ETS_SOFT_INT_YIELD;
+        WSR(BIT(ETS_SOFT_INUM), interrupt);
+        critical_exit();
+#endif /* MCU_ESP32 */
     }
     else {
         /* set the context switch flag */
@@ -257,7 +302,7 @@ void  thread_yield_higher(void)
     return;
 }
 
-void  thread_stack_print(void)
+void thread_stack_print(void)
 {
     /* Print the current stack to stdout. */
 
@@ -275,10 +320,10 @@ void  thread_stack_print(void)
     #endif
 }
 
-void  thread_print_stack(void)
+void thread_print_stack(void)
 {
     /* Prints human readable, ps-like thread information for debugging purposes. */
-    /* because of Xtensa stack structure and call ABI, it is not possible to implement */
+    /* because of Xtensa stack structure and call0 ABI, it is not possible to implement */
     NOT_YET_IMPLEMENTED();
     return;
 }
@@ -291,9 +336,14 @@ extern uint8_t port_IntStackTop;
 void thread_isr_stack_init(void)
 {
     /* code from thread.c, please see the copyright notice there */
+#ifdef MCU_ESP32
+    #define sp (&port_IntStackTop)
+#else /* MCU_ESP32 */
+    register uint32_t *sp __asm__ ("a1");
+#endif /* MCU_ESP32 */
 
     /* assign each int of the stack the value of it's address */
-    uintptr_t *stackmax = (uintptr_t *)&port_IntStackTop;
+    uintptr_t *stackmax = (uintptr_t *)sp;
     uintptr_t *stackp = (uintptr_t *)&port_IntStack;
 
     while (stackp < stackmax) {
@@ -332,8 +382,30 @@ void thread_isr_stack_init(void) {}
 
 #endif /* DEVELHELP */
 
+#ifndef __XTENSA_CALL0_ABI__
 static bool _initial_exit = true;
+#endif /* __XTENSA_CALL0_ABI__ */
 
+NORETURN void cpu_switch_context_exit(void)
+{
+    DEBUG("%s\n", __func__);
+
+    /* Switch context to the highest priority ready task without context save */
+#ifdef __XTENSA_CALL0_ABI__
+    _frxt_dispatch();
+#else /* __XTENSA_CALL0_ABI__ */
+    if (_initial_exit) {
+        _initial_exit = false;
+        __asm__ volatile ("call0 _frxt_dispatch");
+    }
+    else {
+        task_exit();
+    }
+#endif /* __XTENSA_CALL0_ABI__ */
+    UNREACHABLE();
+}
+
+#ifndef __XTENSA_CALL0_ABI__
 /**
  * The function is used on task exit to switch to the context to the next
  * running task. It realizes only the second half of a complete context by
@@ -377,18 +449,4 @@ NORETURN void task_exit(void)
     /* should not be executed */
     UNREACHABLE();
 }
-
-NORETURN void cpu_switch_context_exit(void)
-{
-    DEBUG("%s\n", __func__);
-
-    /* Switch context to the highest priority ready task without context save */
-    if (_initial_exit) {
-        _initial_exit = false;
-        __asm__ volatile ("call0 _frxt_dispatch");
-    }
-    else {
-        task_exit();
-    }
-    UNREACHABLE();
-}
+#endif /* __XTENSA_CALL0_ABI__ */
