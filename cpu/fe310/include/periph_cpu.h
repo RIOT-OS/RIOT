@@ -75,6 +75,43 @@ typedef struct {
  */
 #define PERIPH_TIMER_PROVIDES_SET
 
+/**
+ * @name    Use the shared I2C functions
+ * @{
+ */
+/** Use read reg function from periph common */
+#define PERIPH_I2C_NEED_READ_REG
+/** Use write reg function from periph common */
+#define PERIPH_I2C_NEED_WRITE_REG
+/** Use read regs function from periph common */
+#define PERIPH_I2C_NEED_READ_REGS
+/** Use write regs function from periph common */
+#define PERIPH_I2C_NEED_WRITE_REGS
+/** @} */
+
+#ifndef DOXYGEN
+/**
+ * @brief   Default mapping of I2C bus speed values
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_NORMAL,       /**< normal mode:  ~100kbit/s */
+    I2C_SPEED_FAST,         /**< fast mode:    ~400kbit/s */
+} i2c_speed_t;
+/** @} */
+#endif /* ndef DOXYGEN */
+
+/**
+ * @brief   I2C configuration options
+ */
+typedef struct {
+    uint32_t addr;              /**< device base address */
+    gpio_t scl;                 /**< SCL pin */
+    gpio_t sda;                 /**< SDA pin */
+    i2c_speed_t speed;          /**< I2C speed */
+} i2c_conf_t;
+
 #ifdef __cplusplus
 }
 #endif
