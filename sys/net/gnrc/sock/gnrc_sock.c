@@ -15,6 +15,7 @@
 
 #include <errno.h>
 
+#include "log.h"
 #include "net/af.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/ipv6.h"
@@ -44,10 +45,36 @@ static void _callback_put(void *arg)
 }
 #endif
 
+#ifdef SOCK_HAS_ASYNC
+static void _netapi_cb(uint16_t cmd, gnrc_pktsnip_t *pkt, void *ctx)
+{
+    if (cmd == GNRC_NETAPI_MSG_TYPE_RCV) {
+        msg_t msg = { .type = GNRC_NETAPI_MSG_TYPE_RCV,
+                      .content = { .ptr = pkt } };
+        gnrc_sock_reg_t *reg = ctx;
+
+        if (mbox_try_put(&reg->mbox, &msg) < 1) {
+            LOG_WARNING("gnrc_sock: dropped message to %p (was full)\n",
+                        (void *)&reg->mbox);
+        }
+        if (reg->async_cb.generic) {
+            reg->async_cb.generic(reg, SOCK_ASYNC_MSG_RECV);
+        }
+    }
+}
+#endif /* SOCK_HAS_ASYNC */
+
 void gnrc_sock_create(gnrc_sock_reg_t *reg, gnrc_nettype_t type, uint32_t demux_ctx)
 {
     mbox_init(&reg->mbox, reg->mbox_queue, SOCK_MBOX_SIZE);
+#ifdef SOCK_HAS_ASYNC
+    reg->async_cb.generic = NULL;
+    reg->netreg_cb.cb = _netapi_cb;
+    reg->netreg_cb.ctx = reg;
+    gnrc_netreg_entry_init_cb(&reg->entry, demux_ctx, &reg->netreg_cb);
+#else   /* SOCK_HAS_ASYNC */
     gnrc_netreg_entry_init_mbox(&reg->entry, demux_ctx, &reg->mbox);
+#endif  /* SOCK_HAS_ASYNC */
     gnrc_netreg_register(type, &reg->entry);
 }
 
