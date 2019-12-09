@@ -143,11 +143,6 @@ ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += iolist
 endif
 
-ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
-  USEMODULE += gnrc_udp
-  USEMODULE += xtimer
-endif
-
 ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
   USEMODULE += gnrc_rpl
 endif
