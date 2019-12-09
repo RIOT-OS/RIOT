@@ -24,7 +24,7 @@
 #include <stdio.h>
 
 #include "at86rf2xx.h"
-#include "at86rf2xx_params.h"
+#include "at86rf2xx_devs.h"
 #include "common.h"
 #include "emb6.h"
 #include "emb6/netdev.h"
@@ -38,7 +38,7 @@
 #define EMB6_PRIO       (THREAD_PRIORITY_MAIN - 3)
 #define EMB6_DELAY      (500)
 
-static at86rf2xx_t at86rf2xx;
+static at86rf2xx_devs_t at86rf2xx_devs;
 static s_ns_t emb6 = {
     .hc = &sicslowpan_driver,
     .llsec = &nullsec_driver,
@@ -91,14 +91,20 @@ static char line_buf[SHELL_DEFAULT_BUFSIZE];
 
 int main(void)
 {
-    netdev_t *netdev = (netdev_t *)&at86rf2xx;
 
     puts("RIOT emb6 test application");
 
-    at86rf2xx_setup(&at86rf2xx, at86rf2xx_params);
-    netdev->driver->init((netdev_t *)&at86rf2xx);
-    emb6_netdev_setup(netdev);
-    emb6_init(&emb6);
+    at86rf2xx_setup_devs(&at86rf2xx_devs);
+
+    uint8_t *dev = at86rf2xx_devs.mem_devs;
+    for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
+        netdev_t *netdev = (netdev_t *)(&(((at86rf2xx_t *)dev)->base.netdev));
+        dev += at86rf2xx_get_size((at86rf2xx_t *)dev);
+        netdev->driver->init(netdev);
+        emb6_netdev_setup(netdev);
+        emb6_init(&emb6);
+    }
+
     thread_create(emb6_stack, sizeof(emb6_stack), EMB6_PRIO,
                   THREAD_CREATE_STACKTEST, _emb6_thread, NULL, "emb6");
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
