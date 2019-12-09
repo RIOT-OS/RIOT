@@ -121,6 +121,32 @@ static const uart_conf_t uart_config[] = {
 #define SPI_NUMOF           (1)
 /** @} */
 
+/**
+ * @name ADC configuration
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    {   /* P0.23 */
+        .chan       = 0,
+        .pinsel     = 1,
+        .pinsel_msk = BIT14,
+    },
+    {   /* P0.24 */
+        .chan       = 1,
+        .pinsel     = 1,
+        .pinsel_msk = BIT16,
+    },
+    {   /* P0.25 */
+        .chan       = 2,
+        .pinsel     = 1,
+        .pinsel_msk = BIT18,
+    },
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+/** @} */
+
+
 #ifdef __cplusplus
 }
 #endif
