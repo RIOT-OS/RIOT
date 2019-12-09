@@ -9,12 +9,8 @@ export TAP ?= tap0
 
 # use Ethernet as link-layer protocol
 ifeq (native,$(BOARD))
-  USEMODULE += netdev_tap
-
   TERMFLAGS ?= $(TAP)
 else
-  USEMODULE += stdio_ethos
-
   ETHOS_BAUDRATE ?= 115200
   CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)
   TERMDEPS += ethos
