@@ -22,6 +22,9 @@
 #include "dtls.h"
 #include "net/sock/udp.h"
 #include "net/credman.h"
+#ifdef SOCK_HAS_ASYNC
+#include "net/sock/async/types.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,6 +40,27 @@ extern "C" {
 struct sock_dtls {
     dtls_context_t *dtls_ctx;               /**< TinyDTLS context for sock */
     sock_udp_t *udp_sock;                   /**< Underlying UDP sock to use */
+#if defined(SOCK_HAS_ASYNC) || defined(DOXYGEN)
+    /**
+     * @brief   Network stack internal buffer context.
+     */
+    void *buf_ctx;
+    /**
+     * @brief   Asynchronous event callback
+     *
+     * @note    Only available if @ref SOCK_HAS_ASYNC is defined
+     */
+    sock_dtls_cb_t async_cb;
+    void *async_cb_arg;                     /**< asynchronous callback arg */
+#if defined(SOCK_HAS_ASYNC_CTX) || defined(DOXYGEN)
+    /**
+     * @brief   Asynchronous event context
+     *
+     * @note    Only available if @ref SOCK_HAS_ASYNC_CTX is defined
+     */
+    sock_async_ctx_t async_ctx;
+#endif
+#endif
     mbox_t mbox;                            /**< Mailbox for internal event
                                                 handling */
     msg_t mbox_queue[SOCK_DTLS_MBOX_SIZE];  /**< Queue for struct
