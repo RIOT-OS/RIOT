@@ -33,7 +33,7 @@ extern "C" {
 /**
  * @defgroup    net_gnrc_ipv6_blacklist_conf GNRC IPv6 address blacklisting compile configurations
  * @ingroup     net_gnrc_ipv6_blacklist
- * @ingroup     config
+ * @ingroup     net_gnrc_conf
  * @{
  */
 /**
