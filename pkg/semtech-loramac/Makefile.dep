@@ -6,6 +6,9 @@ USEMODULE += semtech_loramac_mac_region
 USEMODULE += semtech_loramac_crypto
 USEMODULE += semtech_loramac_arch
 
+#Enable SX127x watchdog
+USEMODULE += sx127x_wdog
+
 # The build fails on MSP430 because the toolchain doesn't provide
 # EXIT_SUCCESS/EXIT_FAILURE macros
 FEATURES_BLACKLIST += arch_msp430
