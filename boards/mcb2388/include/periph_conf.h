@@ -79,6 +79,21 @@ static const uart_conf_t uart_config[] = {
 #define SPI_NUMOF           (1)
 /** @} */
 
+/**
+ * @name ADC configuration
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    {
+        .chan       = 0,
+        .pinsel     = 1,
+        .pinsel_msk = BIT14,
+    },
+};
+
+#define ADC_NUMOF           (1)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
