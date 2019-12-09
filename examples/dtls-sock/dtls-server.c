@@ -108,8 +108,7 @@ void *dtls_server_wrapper(void *arg)
     }
 
     while (active) {
-        msg_try_receive(&msg);
-        if (msg.type == DTLS_STOP_SERVER_MSG) {
+        if ((msg_try_receive(&msg) == 1) && (msg.type == DTLS_STOP_SERVER_MSG)) {
             active = false;
         }
         else {
