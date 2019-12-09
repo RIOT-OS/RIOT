@@ -199,9 +199,11 @@ void sx127x_set_sleep(sx127x_t *dev)
 {
     DEBUG("[sx127x] Set sleep\n");
 
+#if IS_USED(MODULE_SX127X_WDOG)
     /* Disable running timers */
     xtimer_remove(&dev->_internal.tx_timeout_timer);
     xtimer_remove(&dev->_internal.rx_timeout_timer);
+#endif
 
     /* Put chip into sleep */
     sx127x_set_op_mode(dev, SX127X_RF_OPMODE_SLEEP);
@@ -212,9 +214,11 @@ void sx127x_set_standby(sx127x_t *dev)
 {
     DEBUG("[sx127x] Set standby\n");
 
+#if IS_USED(MODULE_SX127X_WDOG)
     /* Disable running timers */
     xtimer_remove(&dev->_internal.tx_timeout_timer);
     xtimer_remove(&dev->_internal.rx_timeout_timer);
+#endif
 
     sx127x_set_op_mode(dev, SX127X_RF_OPMODE_STANDBY);
     sx127x_set_state(dev,  SX127X_RF_IDLE);
@@ -319,9 +323,6 @@ void sx127x_set_rx(sx127x_t *dev)
     }
 
     sx127x_set_state(dev, SX127X_RF_RX_RUNNING);
-    if (dev->settings.lora.rx_timeout != 0) {
-        xtimer_set(&(dev->_internal.rx_timeout_timer), dev->settings.lora.rx_timeout);
-    }
 
 
     if (dev->settings.lora.flags & SX127X_RX_CONTINUOUS_FLAG) {
@@ -329,6 +330,9 @@ void sx127x_set_rx(sx127x_t *dev)
     }
     else {
         sx127x_set_op_mode(dev, SX127X_RF_LORA_OPMODE_RECEIVER_SINGLE);
+#if IS_USED(MODULE_SX127X_WDOG)
+        xtimer_set(&(dev->_internal.rx_timeout_timer), SX127X_RX_SINGLE_WDOG_MS_TIMEOUT * US_PER_MS);
+#endif
     }
 }
 
@@ -391,10 +395,10 @@ void sx127x_set_tx(sx127x_t *dev)
 
     sx127x_set_state(dev, SX127X_RF_TX_RUNNING);
 
+#if IS_USED(MODULE_SX127X_WDOG)
     /* Start TX timeout timer */
-    if (dev->settings.lora.tx_timeout != 0) {
-        xtimer_set(&(dev->_internal.tx_timeout_timer), dev->settings.lora.tx_timeout);
-    }
+        xtimer_set(&(dev->_internal.tx_timeout_timer), SX127X_TX_WDOG_MS_TIMEOUT * US_PER_MS);
+#endif
 
     /* Put chip into transfer mode */
     sx127x_set_op_mode(dev, SX127X_RF_OPMODE_TRANSMITTER );
@@ -833,20 +837,6 @@ void sx127x_set_preamble_length(sx127x_t *dev, uint16_t preamble)
                      (preamble >> 8) & 0xFF);
     sx127x_reg_write(dev, SX127X_REG_LR_PREAMBLELSB,
                      preamble & 0xFF);
-}
-
-void sx127x_set_rx_timeout(sx127x_t *dev, uint32_t timeout)
-{
-    DEBUG("[sx127x] Set RX timeout: %" PRIu32 "\n", timeout);
-
-    dev->settings.lora.rx_timeout = timeout;
-}
-
-void sx127x_set_tx_timeout(sx127x_t *dev, uint32_t timeout)
-{
-    DEBUG("[sx127x] Set TX timeout: %" PRIu32 "\n", timeout);
-
-    dev->settings.lora.tx_timeout = timeout;
 }
 
 void sx127x_set_symbol_timeout(sx127x_t *dev, uint16_t timeout)

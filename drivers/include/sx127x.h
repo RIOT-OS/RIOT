@@ -73,6 +73,21 @@ extern "C" {
  * @name    SX127X device default configuration
  * @{
  */
+
+/**
+ * @brief Watchdog timeout for RX single procedure
+ */
+#ifndef SX127X_RX_SINGLE_WDOG_MS_TIMEOUT
+#define SX127X_RX_SINGLE_WDOG_MS_TIMEOUT    (3000U)
+#endif
+
+/**
+ * @brief Watchdog timeout for TX procedure
+ */
+#ifndef SX127X_TX_WDOG_MS_TIMEOUT
+#define SX127X_TX_WDOG_MS_TIMEOUT           (3000U)
+#endif
+
 #define SX127X_MODEM_DEFAULT             (SX127X_MODEM_LORA)    /**< Use LoRa as default modem */
 #define SX127X_CHANNEL_DEFAULT           (868300000UL)          /**< Default channel frequency, 868.3MHz (Europe) */
 #define SX127X_HF_CHANNEL_DEFAULT        (868000000UL)          /**< Use to calibrate RX chain for LF and HF bands */
@@ -173,8 +188,6 @@ typedef struct {
     uint8_t coderate;                  /**< Error coding rate */
     uint8_t freq_hop_period;           /**< Frequency hop period */
     uint8_t flags;                     /**< Boolean flags */
-    uint32_t rx_timeout;               /**< RX timeout in microseconds */
-    uint32_t tx_timeout;               /**< TX timeout in microseconds */
 } sx127x_lora_settings_t;
 
 /**
@@ -192,8 +205,12 @@ typedef struct {
  */
 typedef struct {
     /* Data that will be passed to events handler in application */
+#if IS_USED(MODULE_SX127X_WDOG)
     xtimer_t tx_timeout_timer;         /**< TX operation timeout timer */
+#endif
+#if IS_USED(MODULE_SX127X_WDOG)
     xtimer_t rx_timeout_timer;         /**< RX operation timeout timer */
+#endif
     uint32_t last_channel;             /**< Last channel in frequency hopping sequence */
     bool is_last_cad_success;          /**< Sign of success of last CAD operation (activity detected) */
 } sx127x_internal_t;
@@ -625,22 +642,6 @@ void sx127x_set_preamble_length(sx127x_t *dev, uint16_t preamble);
  * @param[in] timeout                  The LoRa symbol timeout
  */
 void sx127x_set_symbol_timeout(sx127x_t *dev, uint16_t timeout);
-
-/**
- * @brief   Sets the SX127X RX timeout
- *
- * @param[in] dev                      The sx127x device descriptor
- * @param[in] timeout                  The RX timeout
- */
-void sx127x_set_rx_timeout(sx127x_t *dev, uint32_t timeout);
-
-/**
- * @brief   Sets the SX127X TX timeout
- *
- * @param[in] dev                      The sx127x device descriptor
- * @param[in] timeout                  The TX timeout
- */
-void sx127x_set_tx_timeout(sx127x_t *dev, uint32_t timeout);
 
 /**
  * @brief   Checks if the SX127X LoRa inverted IQ mode is enabled/disabled

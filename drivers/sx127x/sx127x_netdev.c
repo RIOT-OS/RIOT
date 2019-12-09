@@ -122,7 +122,9 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                     sx127x_set_state(dev, SX127X_RF_IDLE);
                 }
 
+#if IS_USED(MODULE_SX127X_WDOG)
                 xtimer_remove(&dev->_internal.rx_timeout_timer);
+#endif
                 netdev->event_callback(netdev, NETDEV_EVENT_CRC_ERROR);
                 return -EBADMSG;
             }
@@ -180,7 +182,9 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                 sx127x_set_state(dev, SX127X_RF_IDLE);
             }
 
+#if IS_USED(MODULE_SX127X_WDOG)
             xtimer_remove(&dev->_internal.rx_timeout_timer);
+#endif
             /* Read the last packet from FIFO */
             uint8_t last_rx_addr = sx127x_reg_read(dev, SX127X_REG_LR_FIFORXCURRENTADDR);
             sx127x_reg_write(dev, SX127X_REG_LR_FIFOADDRPTR, last_rx_addr);
@@ -430,16 +434,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             sx127x_set_symbol_timeout(dev, *((const uint16_t*) val));
             return sizeof(uint16_t);
 
-        case NETOPT_RX_TIMEOUT:
-            assert(len <= sizeof(uint32_t));
-            sx127x_set_rx_timeout(dev, *((const uint32_t*) val));
-            return sizeof(uint32_t);
-
-        case NETOPT_TX_TIMEOUT:
-            assert(len <= sizeof(uint32_t));
-            sx127x_set_tx_timeout(dev, *((const uint32_t*) val));
-            return sizeof(uint32_t);
-
         case NETOPT_TX_POWER:
             assert(len <= sizeof(int16_t));
             int16_t power = *((const int16_t *)val);
@@ -490,7 +484,6 @@ static int _set_state(sx127x_t *dev, netopt_state_t state)
 
         case NETOPT_STATE_IDLE:
             /* set permanent listening */
-            sx127x_set_rx_timeout(dev, 0);
             sx127x_set_rx(dev);
             break;
 
@@ -560,7 +553,9 @@ void _on_dio0_irq(void *arg)
             netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
             break;
         case SX127X_RF_TX_RUNNING:
+#if IS_USED(MODULE_SX127X_WDOG)
             xtimer_remove(&dev->_internal.tx_timeout_timer);
+#endif
             switch (dev->settings.modem) {
                 case SX127X_MODEM_LORA:
                     /* Clear IRQ */
@@ -597,7 +592,9 @@ void _on_dio1_irq(void *arg)
                     /* todo */
                     break;
                 case SX127X_MODEM_LORA:
+#if IS_USED(MODULE_SX127X_WDOG)
                     xtimer_remove(&dev->_internal.rx_timeout_timer);
+#endif
                     /*  Clear Irq */
                     sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS, SX127X_RF_LORA_IRQFLAGS_RXTIMEOUT);
                     sx127x_set_state(dev, SX127X_RF_IDLE);

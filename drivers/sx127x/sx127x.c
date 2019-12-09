@@ -59,9 +59,6 @@
 /* Internal functions */
 static int _init_spi(sx127x_t *dev);
 static int _init_gpios(sx127x_t *dev);
-static void _init_timers(sx127x_t *dev);
-static void _on_tx_timeout(void *arg);
-static void _on_rx_timeout(void *arg);
 
 /* SX127X DIO interrupt handlers initialization */
 static void sx127x_on_dio0_isr(void *arg);
@@ -75,6 +72,31 @@ void sx127x_setup(sx127x_t *dev, const sx127x_params_t *params)
     netdev->driver = &sx127x_driver;
     dev->params = *params;
 }
+
+#if IS_USED(MODULE_SX127X_WDOG)
+static void _on_tx_timeout(void *arg)
+{
+    netdev_t *dev = (netdev_t *) arg;
+
+    dev->event_callback(dev, NETDEV_EVENT_TX_TIMEOUT);
+}
+
+static void _on_rx_timeout(void *arg)
+{
+    netdev_t *dev = (netdev_t *) arg;
+
+    dev->event_callback(dev, NETDEV_EVENT_RX_TIMEOUT);
+}
+
+static void _init_timers(sx127x_t *dev)
+{
+    dev->_internal.tx_timeout_timer.arg = dev;
+    dev->_internal.tx_timeout_timer.callback = _on_tx_timeout;
+
+    dev->_internal.rx_timeout_timer.arg = dev;
+    dev->_internal.rx_timeout_timer.callback = _on_rx_timeout;
+}
+#endif
 
 int sx127x_reset(const sx127x_t *dev)
 {
@@ -135,7 +157,9 @@ int sx127x_init(sx127x_t *dev)
         return -SX127X_ERR_NODEV;
     }
 
+#if IS_USED(MODULE_SX127X_WDOG)
     _init_timers(dev);
+#endif
 
     if (dev->params.reset_pin != GPIO_UNDEF) {
         /* reset pin should be left floating during POR */
@@ -182,7 +206,6 @@ void sx127x_init_radio_settings(sx127x_t *dev)
     sx127x_set_preamble_length(dev, LORA_PREAMBLE_LENGTH_DEFAULT);
     sx127x_set_symbol_timeout(dev, LORA_SYMBOL_TIMEOUT_DEFAULT);
     sx127x_set_rx_single(dev, SX127X_RX_SINGLE);
-    sx127x_set_tx_timeout(dev, SX127X_TX_TIMEOUT_DEFAULT);
 }
 
 uint32_t sx127x_random(sx127x_t *dev)
@@ -303,29 +326,6 @@ static int _init_gpios(sx127x_t *dev)
     }
 
     return res;
-}
-
-static void _on_tx_timeout(void *arg)
-{
-    netdev_t *dev = (netdev_t *) arg;
-
-    dev->event_callback(dev, NETDEV_EVENT_TX_TIMEOUT);
-}
-
-static void _on_rx_timeout(void *arg)
-{
-    netdev_t *dev = (netdev_t *) arg;
-
-    dev->event_callback(dev, NETDEV_EVENT_RX_TIMEOUT);
-}
-
-static void _init_timers(sx127x_t *dev)
-{
-    dev->_internal.tx_timeout_timer.arg = dev;
-    dev->_internal.tx_timeout_timer.callback = _on_tx_timeout;
-
-    dev->_internal.rx_timeout_timer.arg = dev;
-    dev->_internal.rx_timeout_timer.callback = _on_rx_timeout;
 }
 
 static int _init_spi(sx127x_t *dev)
