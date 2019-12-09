@@ -88,7 +88,7 @@ static inline void _init_data(void)
 
 #ifdef CPU_HAS_BACKUP_RAM
     /* only initialize battery backup on cold boot */
-    if (cpu_woke_from_backup()) {
+    if (cpu_backup_ram_is_initialized()) {
         return;
     }
 
