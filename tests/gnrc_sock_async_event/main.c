@@ -18,9 +18,9 @@
  */
 
 #include <stdio.h>
+#include "event.h"
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
-#include "net/sock/async.h"
 #include "net/sock/ip.h"
 #include "net/sock/udp.h"
 #include "net/gnrc.h"
@@ -30,6 +30,8 @@
 #include "net/protnum.h"
 #include "od.h"
 #include "thread.h"
+
+#include "net/sock/async/event.h"
 
 #define RECV_BUFFER_SIZE        (128)
 
@@ -47,6 +49,7 @@ static const uint8_t _test_payload[] = TEST_PAYLOAD;
 static gnrc_netreg_entry_t _pktdump;
 
 static char _addr_str[IPV6_ADDR_MAX_STR_LEN];
+static event_queue_t _ev_queue;
 static uint8_t _buffer[128];
 static sock_ip_t _ip_sock;
 static sock_udp_t _udp_sock;
@@ -113,6 +116,7 @@ int main(void)
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
     sock_udp_ep_t remote = SOCK_IPV6_EP_ANY;
 
+    event_queue_init(&_ev_queue);
     /* register for IPv6 to have a target */
     gnrc_netreg_entry_init_pid(&_pktdump, GNRC_NETREG_DEMUX_CTX_ALL,
                                gnrc_pktdump_pid);
@@ -122,11 +126,8 @@ int main(void)
     sock_udp_create(&_udp_sock, &local, NULL, 0);
     sock_ip_create(&_ip_sock, (sock_ip_ep_t *)&local, NULL, PROTNUM_UDP, 0);
 
-
-    /* XXX don't do it like this in production and use a proper `sock_async`
-     * frontend! This is just for testing. */
-    sock_udp_set_cb(&_udp_sock, _recv_udp);
-    sock_ip_set_cb(&_ip_sock, _recv_ip);
+    sock_udp_event_init(&_udp_sock, &_ev_queue, _recv_udp);
+    sock_ip_event_init(&_ip_sock, &_ev_queue, _recv_ip);
     memcpy(remote.addr.ipv6, _test_remote, sizeof(_test_remote));
     remote.port = TEST_PORT - 1;
 
@@ -155,6 +156,7 @@ int main(void)
     gnrc_netapi_dispatch_receive(GNRC_NETTYPE_UDP, TEST_PORT, pkt);
     /* trigger receive on IP sock */
     gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, PROTNUM_UDP, pkt);
+    event_loop(&_ev_queue);
     return 0;
 }
 

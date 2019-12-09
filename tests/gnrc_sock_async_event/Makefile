@@ -6,6 +6,7 @@ USEMODULE += gnrc_pktdump
 USEMODULE += gnrc_sock_async
 USEMODULE += gnrc_sock_ip
 USEMODULE += gnrc_sock_udp
+USEMODULE += sock_async_event
 USEMODULE += od
 USEMODULE += xtimer
 
