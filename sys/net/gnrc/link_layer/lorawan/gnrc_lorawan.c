@@ -94,10 +94,6 @@ void gnrc_lorawan_reset(gnrc_lorawan_t *mac)
                                                       : LORA_SYNCWORD_PRIVATE;
     netdev_set_pass(&mac->netdev, NETOPT_SYNCWORD, &syncword, sizeof(syncword));
 
-    /* Continuous reception */
-    uint32_t rx_timeout = 0;
-    netdev_set_pass(&mac->netdev, NETOPT_RX_TIMEOUT, &rx_timeout, sizeof(rx_timeout));
-
     _set_rx2_dr(mac, LORAMAC_DEFAULT_RX2_DR);
 
     mac->toa = 0;
