@@ -262,8 +262,6 @@ int listen_cmd(int argc, char **argv)
     /* Switch to continuous listen mode */
     const netopt_enable_t single = false;
     netdev->driver->set(netdev, NETOPT_SINGLE_RECEIVE, &single, sizeof(single));
-    const uint32_t timeout = 0;
-    netdev->driver->set(netdev, NETOPT_RX_TIMEOUT, &timeout, sizeof(timeout));
 
     /* Switch to RX state */
     uint8_t state = NETOPT_STATE_RX;
@@ -428,10 +426,6 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                 break;
 
             case NETDEV_EVENT_CAD_DONE:
-                break;
-
-            case NETDEV_EVENT_TX_TIMEOUT:
-                sx127x_set_sleep(&sx127x);
                 break;
 
             default:
