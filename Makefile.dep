@@ -478,6 +478,7 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
   ifneq (,$(filter nimble_netif,$(USEMODULE)))
     USEMODULE += nimble_scanner
     USEMODULE += nimble_scanlist
+    USEMODULE += fmt
   endif
 endif
 
