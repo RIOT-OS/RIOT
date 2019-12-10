@@ -86,6 +86,31 @@ extern "C" {
 #endif
 
 /**
+ * @brief  Default number of onboard PWM devices
+ */
+#ifndef PWM_NUMOF
+#define PWM_NUMOF           (0U)
+#endif
+
+/**
+ * @brief   Default number of PWM extension devices
+ */
+#ifndef PWM_EXT_NUMOF
+#if MODULE_EXTEND_PWM
+#define PWM_EXT_NUMOF       (sizeof(pwm_ext_list) / sizeof(pwm_ext_list[0]))
+#else
+#define PWM_EXT_NUMOF       (0U)
+#endif /* MODULE_EXTEND_PWM */
+#endif /* PWM_EXT_NUMOF */
+
+/**
+ * @brief   Default overall number of PWM devices
+ */
+#ifndef PWM_DEV_NUMOF
+#define PWM_DEV_NUMOF       (PWM_NUMOF + PWM_EXT_NUMOF)
+#endif
+
+/**
  * @brief   Default PWM type definition
  */
 #ifndef HAVE_PWM_T
@@ -115,6 +140,34 @@ typedef struct {
 #endif
 
 /**
+ * @brief   Low-level versions of the PWM functions provided by the CPU
+ *
+ * These are for cpu pwm.c implementation and should not be called directly.
+ * @{
+ */
+uint32_t pwm_init_cpu(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res);
+uint8_t pwm_channels_cpu(pwm_t dev);
+void pwm_set_cpu(pwm_t dev, uint8_t channel, uint16_t value);
+void pwm_poweron_cpu(pwm_t dev);
+void pwm_poweroff_cpu(pwm_t dev);
+/** @} */
+
+#if MODULE_EXTEND_PWM || DOXYGEN
+/**
+ * @brief   Redirecting versions of the PWM functions
+ *
+ * These are for the extension interface and should not be called directly.
+ * @{
+ */
+uint32_t pwm_init_redir(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res);
+uint8_t pwm_channels_redir(pwm_t dev);
+void pwm_set_redir(pwm_t dev, uint8_t channel, uint16_t value);
+void pwm_poweron_redir(pwm_t dev);
+void pwm_poweroff_redir(pwm_t dev);
+/** @} */
+#endif /* MODULE_EXTEND_PWM || DOXYGEN */
+
+/**
  * @brief   Initialize a PWM device
  *
  * The PWM module is based on virtual PWM devices, which can have one or more
@@ -135,7 +188,27 @@ typedef struct {
  * @return                  actual PWM frequency on success
  * @return                  0 on error
  */
-uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res);
+static inline uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
+{
+    (void)dev;
+    (void)mode;
+    (void)freq;
+    (void)res;
+#if MODULE_EXTEND_PWM
+#if MODULE_PERIPH_PWM
+    if (dev >= PWM_NUMOF) {
+        return pwm_init_redir(dev, mode, freq, res);
+    }
+#else
+    return pwm_init_redir(dev, mode, freq, res);
+#endif /* MODULE_PERIPH_PWM */
+#endif /* MODULE_EXTEND_PWM */
+#if MODULE_PERIPH_PWM
+    return pwm_init_cpu(dev, mode, freq, res);
+#else
+    return 0;
+#endif
+}
 
 /**
  * @brief   Get the number of available channels
@@ -144,7 +217,24 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res);
  *
  * @return                  Number of channels available for the given device
  */
-uint8_t pwm_channels(pwm_t dev);
+static inline uint8_t pwm_channels(pwm_t dev)
+{
+    (void)dev;
+#if MODULE_EXTEND_PWM
+#if MODULE_PERIPH_PWM
+    if (dev >= PWM_NUMOF) {
+        return pwm_channels_redir(dev);
+    }
+#else
+        return pwm_channels_redir(dev);
+#endif /* MODULE_PERIPH_PWM */
+#endif /* MODULE_EXTEND_PWM */
+#if MODULE_PERIPH_PWM
+    return pwm_channels_cpu(dev);
+#else
+    return 0;
+#endif
+}
 
 /**
  * @brief   Set the duty-cycle for a given channel of the given PWM device
@@ -156,8 +246,26 @@ uint8_t pwm_channels(pwm_t dev);
  * @param[in] channel       the channel of the given device to set
  * @param[in] value         the desired duty-cycle to set
  */
-void pwm_set(pwm_t dev, uint8_t channel, uint16_t value);
-
+static inline void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
+{
+    (void)dev;
+    (void)channel;
+    (void)value;
+#if MODULE_EXTEND_PWM
+#if MODULE_PERIPH_PWM
+    if (dev >= PWM_NUMOF) {
+        pwm_set_redir(dev, channel, value);
+        return;
+    }
+#else
+    pwm_set_redir(dev, channel, value);
+    return;
+#endif /* MODULE_PERIPH_PWM */
+#endif /* MODULE_EXTEND_PWM */
+#if MODULE_PERIPH_PWM
+    pwm_set_cpu(dev, channel, value);
+#endif
+}
 /**
  * @brief   Resume PWM generation on the given device
  *
@@ -169,7 +277,24 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value);
  *
  * @param[in] dev           device to start
  */
-void pwm_poweron(pwm_t dev);
+static inline void pwm_poweron(pwm_t dev)
+{
+    (void)dev;
+#if MODULE_EXTEND_PWM
+#if MODULE_PERIPH_PWM
+    if (dev >= PWM_NUMOF) {
+        pwm_poweron_redir(dev);
+        return;
+    }
+#else
+    pwm_poweron_redir(dev);
+    return;
+#endif /* MODULE_PERIPH_PWM */
+#endif /* MODULE_EXTEND_PWM */
+#if MODULE_PERIPH_PWM
+    pwm_poweron_cpu(dev);
+#endif
+}
 
 /**
  * @brief   Stop PWM generation on the given device
@@ -179,7 +304,24 @@ void pwm_poweron(pwm_t dev);
  *
  * @param[in] dev           device to stop
  */
-void pwm_poweroff(pwm_t dev);
+static inline void pwm_poweroff(pwm_t dev)
+{
+    (void)dev;
+#if MODULE_EXTEND_PWM
+#if MODULE_PERIPH_PWM
+    if (dev >= PWM_NUMOF) {
+        pwm_poweroff_redir(dev);
+        return;
+    }
+#else
+    pwm_poweroff_redir(dev);
+    return;
+#endif /* MODULE_PERIPH_PWM */
+#endif /* MODULE_EXTEND_PWM */
+#if MODULE_PERIPH_PWM
+    pwm_poweroff_cpu(dev);
+#endif
+}
 
 #ifdef __cplusplus
 }

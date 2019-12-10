@@ -137,7 +137,7 @@ static struct _pwm_dev_t _pwm_dev[PWM_NUMOF_MAX] = {};
 static bool _pwm_init_first_time = true;
 
 /* Initialize PWM device */
-uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
+uint32_t pwm_init_cpu(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     DEBUG ("%s pwm=%u mode=%u freq=%u, res=%u\n", __func__, pwm, mode, freq, res);
 
@@ -196,14 +196,14 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     return freq;
 }
 
-uint8_t pwm_channels(pwm_t pwm)
+uint8_t pwm_channels_cpu(pwm_t pwm)
 {
     CHECK_PARAM_RET (pwm < PWM_NUMOF, 0);
 
     return _pwm_hw[pwm].gpio_num;
 }
 
-void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
+void pwm_set_cpu(pwm_t pwm, uint8_t channel, uint16_t value)
 {
     DEBUG("%s pwm=%u channel=%u value=%u\n", __func__, pwm, channel, value);
 
@@ -280,14 +280,14 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     irq_restore(state);
 }
 
-void pwm_poweron(pwm_t pwm)
+void pwm_poweron_cpu(pwm_t pwm)
 {
     CHECK_PARAM (pwm < PWM_NUMOF);
     periph_module_enable(_pwm_hw[pwm].mod);
     _pwm_start(pwm);
 }
 
-void pwm_poweroff(pwm_t pwm)
+void pwm_poweroff_cpu(pwm_t pwm)
 {
     CHECK_PARAM (pwm < PWM_NUMOF);
     _pwm_stop (pwm);
