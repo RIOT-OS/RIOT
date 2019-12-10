@@ -131,6 +131,22 @@ typedef struct {
     i2c_speed_t speed;          /**< I2C speed */
 } i2c_conf_t;
 
+/**
+ * @brief   PWM channel configuration data structure
+ */
+typedef struct {
+    gpio_t pin;                 /**< GPIO pin */
+    uint8_t cmp;                /**< PWM comparator to use */
+} pwm_conf_chan_t;
+
+/**
+ * @brief   PWM device configuration data structure
+ */
+typedef struct {
+    uint32_t addr;              /**< PWM address to use */
+    pwm_conf_chan_t chan[4];    /**< channel configuration */
+} pwm_conf_t;
+
 #ifdef __cplusplus
 }
 #endif
