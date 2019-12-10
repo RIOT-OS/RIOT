@@ -143,7 +143,24 @@ static const spi_conf_t spi_config[] = {
  *
  * @{
  */
-#define PWM_NUMOF                   (3)
+static const pwm_conf_t pwm_config[] = {
+    {   .addr  = PWM1_CTRL_ADDR,
+        .chan = {  /* GPIO pin, channel comparator index */
+                    { .pin = GPIO_PIN(0, 19), .cmp = 0 }, /* D3, on-board green LED */
+                    { .pin = GPIO_PIN(0, 20), .cmp = 1 }, /* D4 */
+                    { .pin = GPIO_PIN(0, 21), .cmp = 2 }, /* D5, On-board blue LED */
+                    { .pin = GPIO_PIN(0, 22), .cmp = 3 }} /* D6, On-board red LED */
+    },
+    {   .addr  = PWM2_CTRL_ADDR,
+        .chan = {  /* GPIO pin, channel comparator index */
+                    { .pin = GPIO_PIN(0, 10), .cmp = 0 }, /* D16 */
+                    { .pin = GPIO_PIN(0, 11), .cmp = 1 }, /* D17 */
+                    { .pin = GPIO_UNDEF, .cmp = 2 },
+                    { .pin = GPIO_UNDEF, .cmp = 3 }}
+    },
+};
+
+#define PWM_NUMOF                   ARRAY_SIZE(pwm_config)
 /** @} */
 
 /**
