@@ -676,9 +676,18 @@ ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))
 endif
 
 ifneq (,$(filter xtimer,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_xtimer
-  FEATURES_REQUIRED += periph_timer
+  ifeq (,$(filter ztimer,$(USEMODULE)))
+    DEFAULT_MODULE += auto_init_xtimer
+    FEATURES_REQUIRED += periph_timer
+    USEMODULE += div
+  else
+    USEMODULE += ztimer_xtimer_compat
+  endif
+endif
+
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   USEMODULE += div
+  PSEUDOMODULES += xtimer
 endif
 
 ifneq (,$(filter saul,$(USEMODULE)))
@@ -1013,13 +1022,20 @@ ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
 endif
 
-ifneq (,$(filter xtimer_on_ztimer%,$(USEMODULE)))
+#
+# ztimer dependencies
+#
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter ztimer_%,$(USEMODULE)))
-  USEMODULE += ztimer
+  USEMODULE += ztimer_core
   USEMODULE += ztimer_extend
+endif
+
+ifneq (,$(filter ztimer_convert_%,$(USEMODULE)))
+  USEMODULE += ztimer_convert
 endif
 
 ifneq (,$(filter ztimer_periph,$(USEMODULE)))
@@ -1035,6 +1051,7 @@ ifneq (,$(filter ztimer_convert_frac,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ztimer,$(USEMODULE)))
+  # this is the default module for ztimer
   USEMODULE += ztimer_auto_init
   USEMODULE += ztimer_core
   USEMODULE += ztimer_convert_frac
