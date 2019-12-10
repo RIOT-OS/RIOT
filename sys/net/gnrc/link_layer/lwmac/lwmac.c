@@ -302,7 +302,7 @@ void lwmac_set_state(gnrc_netif_t *netif, gnrc_lwmac_state_t newstate)
                 netif->mac.prot.lwmac.last_wakeup = netif->mac.prot.lwmac.last_wakeup + alarm;
                 alarm = _next_inphase_event(netif->mac.prot.lwmac.last_wakeup,
                                             RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US));
-                rtt_set_alarm(alarm, rtt_cb, (void *) GNRC_LWMAC_EVENT_RTT_WAKEUP_PENDING);
+                rtt_set_alarm(alarm, rtt_cb, NULL);
             }
 
             /* Return immediately, so no rescheduling */
@@ -674,9 +674,11 @@ static bool lwmac_update(gnrc_netif_t *netif)
 
 static void rtt_cb(void *arg)
 {
+    (void) arg;
+
     msg_t msg;
 
-    msg.content.value = ((uint32_t) arg) & 0xffff;
+    msg.content.value = GNRC_LWMAC_EVENT_RTT_WAKEUP_PENDING;
     msg.type = GNRC_LWMAC_EVENT_RTT_TYPE;
     msg_send(&msg, lwmac_pid);
 
@@ -732,7 +734,7 @@ void rtt_handler(uint32_t event, gnrc_netif_t *netif)
             rtt_clear_alarm();
             alarm = _next_inphase_event(netif->mac.prot.lwmac.last_wakeup,
                                         RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US));
-            rtt_set_alarm(alarm, rtt_cb, (void *) GNRC_LWMAC_EVENT_RTT_WAKEUP_PENDING);
+            rtt_set_alarm(alarm, rtt_cb, NULL);
             gnrc_lwmac_set_dutycycle_active(netif, true);
             break;
         }
