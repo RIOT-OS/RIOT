@@ -43,7 +43,7 @@ extern const unsigned char ecdsa_pub_key_y[];
 #endif /* DTLS_ECC */
 #endif /* MODULE_SOCK_DTLS */
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
