@@ -529,6 +529,7 @@ endif
 
 ifneq (,$(filter sht3x,$(USEMODULE)))
   USEMODULE += xtimer
+  USEMODULE += checksum
   FEATURES_REQUIRED += periph_i2c
 endif
 
