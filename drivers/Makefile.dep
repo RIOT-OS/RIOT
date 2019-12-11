@@ -130,6 +130,12 @@ ifneq (,$(filter ccs811,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter dcf77,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter dht,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_gpio
@@ -137,6 +143,11 @@ endif
 
 ifneq (,$(filter ds1307,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter ds18,$(USEMODULE)))
+    USEMODULE += xtimer
+    FEATURES_REQUIRED += periph_gpio
 endif
 
 ifneq (,$(filter ds3234,$(USEMODULE)))
@@ -156,11 +167,6 @@ endif
 
 ifneq (,$(filter dynamixel,$(USEMODULE)))
   USEMODULE += uart_half_duplex
-endif
-
-ifneq (,$(filter ds18,$(USEMODULE)))
-    USEMODULE += xtimer
-    FEATURES_REQUIRED += periph_gpio
 endif
 
 ifneq (,$(filter enc28j60,$(USEMODULE)))
@@ -658,10 +664,4 @@ ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += xtimer
   USEMODULE += netif
-endif
-
-ifneq (,$(filter dcf77,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_gpio
-  FEATURES_REQUIRED += periph_gpio_irq
-  USEMODULE += xtimer
 endif
