@@ -60,12 +60,16 @@ static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
 #ifdef MODULE_SOCK_DTLS
 #include "net/credman.h"
 static credman_tag_t credential_tag;
-
 static ssize_t _tl_send(sock_dtls_t *sock, const void *data, size_t len,
-                     const sock_udp_ep_t *remote);
+                        const sock_udp_ep_t *remote);
 static ssize_t _tl_recv(sock_dtls_t *sock, void *data, size_t max_len,
-                     uint32_t timeout, sock_udp_ep_t *remote);
+                        uint32_t timeout, sock_udp_ep_t *remote);
+/* define a common name for transport layer object, to accommodate security layer */
+typedef sock_dtls_t coap_tl_sock_t;
+#else
+typedef sock_udp_t coap_tl_sock_t;
 #endif
+
 
 /* Internal variables */
 const coap_resource_t _default_resources[] = {

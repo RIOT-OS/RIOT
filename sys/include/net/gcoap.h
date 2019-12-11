@@ -37,6 +37,7 @@
  * - Client Operation
  * - Observe Server Operation
  * - Block Operation
+ * - Secure CoAP with DTLS
  * - Implementation Notes
  * - Implementation Status
  *
@@ -304,6 +305,26 @@
  *   in the slicer.
  * - Finally, use coap_block1_finish() to finalize the block option with the
  *   proper value for the _more_ parameter.
+ *
+ * ## Secure CoAP with DTLS
+ *
+ * gcoap supports securing CoAP packets with [DTLS](@ref net_sock_dtls).
+ * To enable this feature, add the following line in the Makefile:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {Makefile}
+ * USEMODULE += tinydtls_sock_dtls
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * After that, add credential to use using @ref credman_add(), tell
+ * gcoap which credential tag to use with gcoap_set_credential_tag(). **After**
+ * setting up the credentials, we need to start the gcoap server manually by
+ * calling gcoap_init().
+ *
+ * Sending and receiving CoAP packets with DTLS is the same as using plain CoAP.
+ * gcoap will automatically encrypt/decrypt CoAP packets with DTLS before
+ * sending/receiving them over the network.
+ *
+ * To read more on DTLS support in RIOT, refer @ref net_dtls and @ref net_sock_dtls.
  *
  * ## Implementation Notes ##
  *
@@ -619,13 +640,6 @@ extern "C" {
  */
 #ifndef GCOAP_RESEND_BUFS_MAX
 #define GCOAP_RESEND_BUFS_MAX      (1)
-#endif
-
-/* define a common name for transport layer object, to accommodate security layer */
-#ifdef MODULE_SOCK_DTLS
-typedef sock_dtls_t coap_tl_sock_t;
-#else
-typedef sock_udp_t coap_tl_sock_t;
 #endif
 
 /**
