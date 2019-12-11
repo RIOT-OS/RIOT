@@ -30,7 +30,7 @@
 #include "net/gnrc.h"
 #include "net/gnrc/netreg.h"
 #ifdef SOCK_HAS_ASYNC
-#include "net/sock/async.h"
+#include "net/sock/async/types.h"
 #endif
 #include "net/sock/ip.h"
 #include "net/sock/udp.h"
