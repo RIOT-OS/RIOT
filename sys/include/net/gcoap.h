@@ -388,8 +388,12 @@ extern "C" {
  * @brief   Size of the buffer used to build a CoAP request or response
  */
 #ifndef GCOAP_PDU_BUF_SIZE
+#ifdef MODULE_SOCK_DTLS
+#define GCOAP_PDU_BUF_SIZE      (256)
+#else
 #define GCOAP_PDU_BUF_SIZE      (128)
-#endif
+#endif /* MODULE_SOCK_DTLS */
+#endif /* GCOAP_PDU_BUF_SIZE */
 
 /**
  * @brief   Reduce payload length by this value for a request
