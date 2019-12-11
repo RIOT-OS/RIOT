@@ -20,33 +20,85 @@
 #include "cpu.h"
 #include "periph_conf.h"
 
-#include "vendor/encoding.h"
-#include "vendor/platform.h"
 #include "vendor/prci_driver.h"
+
+#if !(USE_CLOCK_HFXOSC || USE_CLOCK_HFXOSC_PLL)
+static uint32_t _cpu_frequency = 0;
+#endif
 
 void clock_init(void)
 {
-    /* In case we are executing from QSPI, (which is quite likely) we need to
-     * set the QSPI clock divider appropriately before boosting the clock
-     * frequency. PRCI_set_hfrosctrim_for_f_cpu() tries multiple clocks
-     * so choose a safe value that should work for all frequencies.
-     */
-    SPI0_REG(SPI_REG_SCKDIV) = SCKDIV_SAFE;
+    /* Ensure that we aren't running off the PLL before we mess with it. */
+    if (PRCI_REG(PRCI_PLLCFG) & PLL_SEL(1)) {
+        /* Make sure the HFROSC is running at its default setting */
+        /* It is OK to change this even if we are running off of it.*/
+        PRCI_REG(PRCI_HFROSCCFG) = (ROSC_DIV(4) | ROSC_TRIM(16) | ROSC_EN(1));
 
-    /* Note: The range is limited to ~100MHz and depends on PLL settings */
-    PRCI_set_hfrosctrim_for_f_cpu(CPU_DESIRED_FREQ, PRCI_FREQ_UNDERSHOOT);
+        /* Wait for HFROSC to be ready */
+        while ((PRCI_REG(PRCI_HFROSCCFG) & ROSC_RDY(1)) == 0);
 
-    /* begin{code-style-ignore} */
-    SPI0_REG(SPI_REG_FFMT) =               /* setup "Fast Read Dual I/O"                             */
-        SPI_INSN_CMD_EN         |          /* Enable memory-mapped flash                    */
-        SPI_INSN_ADDR_LEN(3)    |          /* 25LP03D read commands have 3 address bytes    */
-        SPI_INSN_PAD_CNT(4)     |          /* 25LP03D Table 6.11 Read Dummy Cycles = 4      */
-        SPI_INSN_CMD_PROTO(SPI_PROTO_S) |  /* 25LP03D Table 8.1 "Instruction                */
-        SPI_INSN_ADDR_PROTO(SPI_PROTO_D) | /*  Set" shows mode for cmd, addr, and           */
-        SPI_INSN_DATA_PROTO(SPI_PROTO_D) | /*  data protocol for given instruction          */
-        SPI_INSN_CMD_CODE(0xBB) |          /* Set the instruction to "Fast Read Dual I/O"   */
-        SPI_INSN_PAD_CODE(0x00);           /* Dummy cycle sends 0 value bits                */
-    /* end{code-style-ignore} */
+        /* Don't use PLL clock source */
+        PRCI_REG(PRCI_PLLCFG) &= ~PLL_SEL(PLL_SEL_PLL);
+    }
 
-    SPI0_REG(SPI_REG_SCKDIV) = SCKDIV;
+#if USE_CLOCK_HFXOSC || USE_CLOCK_HFXOSC_PLL
+    /* Ensure HFXOSC is enabled */
+    PRCI_REG(PRCI_HFXOSCCFG) = XOSC_EN(1);
+
+    /* Wait for HFXOSC to become ready */
+    while ((PRCI_REG(PRCI_HFXOSCCFG) & XOSC_RDY(1)) == 0);
+
+    /* Select HFXOSC as reference frequency and bypass PLL */
+    PRCI_REG(PRCI_PLLCFG) = PLL_REFSEL(PLL_REFSEL_HFXOSC) | PLL_BYPASS(1);
+
+#if USE_CLOCK_HFXOSC_PLL
+    /* Divide final output frequency by 1 */
+    PRCI_REG(PRCI_PLLDIV) = (PLL_FINAL_DIV_BY_1(1) | PLL_FINAL_DIV(0));
+
+    /* Configure PLL */
+    PRCI_REG(PRCI_PLLCFG) |= PLL_R(CLOCK_PLL_R) | PLL_F(CLOCK_PLL_F) | PLL_Q(CLOCK_PLL_Q);
+
+    /* Disable PLL Bypass */
+    PRCI_REG(PRCI_PLLCFG) &= ~PLL_BYPASS(1);
+
+    /* Now it is safe to check for PLL Lock */
+    while ((PRCI_REG(PRCI_PLLCFG) & PLL_LOCK(1)) == 0);
+#endif
+
+    /* Switch over to PLL Clock source */
+    PRCI_REG(PRCI_PLLCFG) |= PLL_SEL(PLL_SEL_PLL);
+
+    /* Turn off the HFROSC */
+    PRCI_REG(PRCI_HFROSCCFG) &= ~ROSC_EN(1);
+#elif USE_CLOCK_HFROSC_PLL
+    PRCI_set_hfrosctrim_for_f_cpu(CLOCK_DESIRED_FREQUENCY, PRCI_FREQ_UNDERSHOOT);
+#else /* Clock HFROSC */
+    /* Disable Bypass */
+    PRCI_REG(PRCI_PLLCFG) &= ~PLL_BYPASS(1);
+
+    /* Configure trim and divider values of HFROSC */
+    PRCI_REG(PRCI_HFROSCCFG) = (ROSC_DIV(CLOCK_HFROSC_DIV) | ROSC_TRIM(CLOCK_HFROSC_TRIM) | ROSC_EN(1));
+
+    /* Wait for HFROSC to be ready */
+    while ((PRCI_REG(PRCI_HFROSCCFG) & ROSC_RDY(1)) == 0);
+
+    /* Don't use PLL clock source */
+    PRCI_REG(PRCI_PLLCFG) &= ~PLL_SEL(PLL_SEL_PLL);
+#endif
+}
+
+uint32_t cpu_freq(void)
+{
+#if USE_CLOCK_HFXOSC || USE_CLOCK_HFXOSC_PLL
+    return CLOCK_CORECLOCK;
+#else /* Clock frequency with HFROSC cannot be determined precisely from
+         settings */
+    /* If not done already, estimate the CPU frequency */
+    if (_cpu_frequency == 0) {
+        /* Ignore the first run (for icache reasons) */
+        _cpu_frequency = PRCI_measure_mcycle_freq(3000, RTC_FREQ);
+        _cpu_frequency = PRCI_measure_mcycle_freq(3000, RTC_FREQ);
+    }
+    return _cpu_frequency;
+#endif
 }

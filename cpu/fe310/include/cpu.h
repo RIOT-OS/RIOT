@@ -45,6 +45,13 @@ void cpu_init(void);
 void clock_init(void);
 
 /**
+ * @brief   Get and eventually compute the current CPU core clock frequency
+ *
+ * @return  the cpu core clock frequency in Hz
+ */
+uint32_t cpu_freq(void);
+
+/**
  * @brief   Initialization of interrupts
  */
 void irq_init(void);
