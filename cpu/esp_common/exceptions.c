@@ -7,18 +7,15 @@
  */
 
 /**
- * @ingroup     cpu_esp8266
+ * @ingroup     cpu_esp_common
  * @{
  *
  * @file
- * @brief       ESP8266 exception handling
+ * @brief       ESP SoCs exception handling
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
  */
-
-#define ENABLE_DEBUG  (0)
-#include "debug.h"
 
 #include <malloc.h>
 #include <string.h>
@@ -31,9 +28,11 @@
 #include "esp_common.h"
 #include "esp/common_macros.h"
 #include "esp/xtensa_ops.h"
-#include "sdk/ets.h"
 #include "xtensa/corebits.h"
 #include "xtensa/xtensa_api.h"
+
+#define ENABLE_DEBUG  (0)
+#include "debug.h"
 
 extern void heap_stats(void);
 
@@ -85,16 +84,31 @@ void IRAM NORETURN exception_handler (XtExcFrame *frame)
 {
     uint32_t excsave1;
     uint32_t epc1;
-    uint32_t epc2;
-    uint32_t epc3;
     RSR(excsave1, excsave1);
     RSR(epc1, epc1);
+#if XCHAL_NMILEVEL >= 2
+    uint32_t epc2;
     RSR(epc2, epc2);
+#endif
+#if XCHAL_NMILEVEL >= 3
+    uint32_t epc3;
     RSR(epc3, epc3);
-
-#ifdef MCU_ESP32
+#endif
+#if XCHAL_NMILEVEL >= 4
     uint32_t epc4;
     RSR(epc4, epc4);
+#endif
+#if XCHAL_NMILEVEL >= 5
+    uint32_t epc5;
+    RSR(epc5, epc5);
+#endif
+#if XCHAL_NMILEVEL >= 6
+    uint32_t epc6;
+    RSR(epc6, epc6);
+#endif
+#if XCHAL_NMILEVEL >= 7
+    uint32_t epc7;
+    RSR(epc7, epc7);
 #endif
 
     ets_printf("EXCEPTION!! exccause=%d (%s) @%08x excvaddr=%08x\n",
@@ -117,13 +131,25 @@ void IRAM NORETURN exception_handler (XtExcFrame *frame)
     ets_printf("exccause: %08x\t", frame->exccause);
     ets_printf("excvaddr: %08x\n", frame->excvaddr);
     ets_printf("epc1    : %08x\t", epc1);
+#if XCHAL_NMILEVEL >= 2
     ets_printf("epc2    : %08x\t", epc2);
+#endif
+#if XCHAL_NMILEVEL >= 3
     ets_printf("epc3    : %08x\t", epc3);
-#ifdef MCU_ESP32
+#endif
+#if XCHAL_NMILEVEL >= 4
     ets_printf("epc4    : %08x\n", epc4);
-#else /* MCU_ESP32 */
-    ets_printf("epc3    : %08x\n", epc3);
-#endif /* MCU_ESP32 */
+#endif
+#if XCHAL_NMILEVEL >= 5
+    ets_printf("epc5    : %08x\t", epc5);
+#endif
+#if XCHAL_NMILEVEL >= 6
+    ets_printf("epc6    : %08x\t", epc6);
+#endif
+#if XCHAL_NMILEVEL >= 7
+    ets_printf("epc7    : %08x\t", epc7);
+#endif
+    ets_printf("\n");
     ets_printf("a0      : %08x\t", frame->a0);
     ets_printf("a1      : %08x\t", frame->a1);
     ets_printf("a2      : %08x\t", frame->a2);
@@ -154,9 +180,7 @@ void IRAM NORETURN exception_handler (XtExcFrame *frame)
        One option is to break the execution and wait for the WDT reset. Maybe
        there is better way. If debugger is active, 'break 0,0' stops the
        execution in debugger. */
-    /* __asm__ volatile ("break 0,0"); */
-    /* hard reset */
-    __asm__ volatile (" call0 0x40000080 ");
+    __asm__ volatile ("break 0,0");
 
     UNREACHABLE();
 }
@@ -174,12 +198,14 @@ void init_exceptions (void)
 
 void IRAM NORETURN panic_arch(void)
 {
-    #if defined(DEVELHELP)
+#if defined(DEVELHELP)
     heap_stats();
-    #endif
-
-    /* hard reset */
-    __asm__ volatile (" call0 0x40000080 ");
+    /* break in debugger or reboot after WDT */
+    __asm__ volatile ("break 0,0");
+#else /* DEVELHELP */
+    /* restart */
+    pm_reboot();
+#endif /* DEVELHELP */
 
     UNREACHABLE();
 }
