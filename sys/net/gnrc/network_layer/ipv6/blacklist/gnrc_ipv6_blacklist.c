@@ -22,14 +22,14 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-ipv6_addr_t gnrc_ipv6_blacklist[GNRC_IPV6_BLACKLIST_SIZE];
-BITFIELD(gnrc_ipv6_blacklist_set, GNRC_IPV6_BLACKLIST_SIZE);
+ipv6_addr_t gnrc_ipv6_blacklist[CONFIG_GNRC_IPV6_BLACKLIST_SIZE];
+BITFIELD(gnrc_ipv6_blacklist_set, CONFIG_GNRC_IPV6_BLACKLIST_SIZE);
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 int gnrc_ipv6_blacklist_add(const ipv6_addr_t *addr)
 {
-    for (int i = 0; i < GNRC_IPV6_BLACKLIST_SIZE; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_BLACKLIST_SIZE; i++) {
         if (!bf_isset(gnrc_ipv6_blacklist_set, i)) {
             bf_set(gnrc_ipv6_blacklist_set, i);
             memcpy(&gnrc_ipv6_blacklist[i], addr, sizeof(*addr));
@@ -43,7 +43,7 @@ int gnrc_ipv6_blacklist_add(const ipv6_addr_t *addr)
 
 void gnrc_ipv6_blacklist_del(const ipv6_addr_t *addr)
 {
-    for (int i = 0; i < GNRC_IPV6_BLACKLIST_SIZE; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_BLACKLIST_SIZE; i++) {
         if (ipv6_addr_equal(addr, &gnrc_ipv6_blacklist[i])) {
             bf_unset(gnrc_ipv6_blacklist_set, i);
             DEBUG("IPv6 blacklist: unblacklisted %s\n",
@@ -54,7 +54,7 @@ void gnrc_ipv6_blacklist_del(const ipv6_addr_t *addr)
 
 bool gnrc_ipv6_blacklisted(const ipv6_addr_t *addr)
 {
-    for (int i = 0; i < GNRC_IPV6_BLACKLIST_SIZE; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_BLACKLIST_SIZE; i++) {
         if (bf_isset(gnrc_ipv6_blacklist_set, i) &&
             ipv6_addr_equal(addr, &gnrc_ipv6_blacklist[i])) {
             return true;
