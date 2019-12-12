@@ -63,9 +63,6 @@ def check_cmd(child, cmd, expected):
 
 
 def testfunc(child):
-    # check startup message
-    child.expect('test_shell.')
-
     # loop other defined commands and expected output
     for cmd, expected in CMDS:
         check_cmd(child, cmd, expected)

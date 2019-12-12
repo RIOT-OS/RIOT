@@ -37,8 +37,6 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += od
 
-DISABLE_MODULE += test_utils_interactive_sync
-
 # Export used tap device to environment
 export TAPDEV = $(TAP)
 
