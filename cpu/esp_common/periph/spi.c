@@ -7,12 +7,12 @@
  */
 
 /**
- * @ingroup     cpu_esp8266
+ * @ingroup     cpu_esp_common
  * @ingroup     drivers_periph_spi
  * @{
  *
  * @file
- * @brief       Low-level SPI driver implementation
+ * @brief       Low-level SPI driver implementation for ESP SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
@@ -496,7 +496,9 @@ void IRAM_ATTR spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     }
     #endif
 
-    gpio_clear(cs != SPI_CS_UNDEF ? cs : spi_config[bus].cs);
+    if (cs != SPI_CS_UNDEF) {
+        gpio_clear(cs);
+    }
 
     size_t blocks = len / SPI_BLOCK_SIZE;
     uint8_t tail = len % SPI_BLOCK_SIZE;
@@ -516,8 +518,8 @@ void IRAM_ATTR spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                           in  ? (uint8_t *)in + blocks * SPI_BLOCK_SIZE : NULL, tail);
     }
 
-    if (!cont) {
-        gpio_set(cs != SPI_CS_UNDEF ? cs : spi_config[bus].cs);
+    if (!cont && (cs != SPI_CS_UNDEF)) {
+        gpio_set (cs);
     }
 
     #if ENABLE_DEBUG
