@@ -143,7 +143,7 @@ class PartitionDefinition(object):
         "data" : DATA_TYPE,
     }
 
-    # Keep this map in sync with esp_partition_subtype_t enum in esp_partition.h 
+    # Keep this map in sync with esp_partition_subtype_t enum in esp_partition.h
     SUBTYPES = {
         APP_TYPE : {
             "factory" : 0x00,

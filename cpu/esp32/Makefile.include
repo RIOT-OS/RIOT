@@ -232,7 +232,7 @@ PREFFLAGS += printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $(BINDIR)/partiti
 PREFFLAGS += printf "factory, app, factory, 0x10000, " >> $(BINDIR)/partitions.csv;
 PREFFLAGS += ls -l $(FLASHFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partitions.csv;
 
-PREFFLAGS += python $(RIOTCPU)/$(CPU)/gen_esp32part.py --disable-sha256sum
+PREFFLAGS += python $(RIOTTOOLS)/esptool/gen_esp32part.py
 PREFFLAGS += --verify $(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
 FLASHDEPS += preflash
 
