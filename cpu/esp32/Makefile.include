@@ -39,7 +39,6 @@ TARGET_ARCH ?= xtensa-esp32-elf
 PSEUDOMODULES += esp_eth_hw
 PSEUDOMODULES += esp_gdbstub
 PSEUDOMODULES += esp_hw_counter
-PSEUDOMODULES += esp_i2c_sw
 PSEUDOMODULES += esp_i2c_hw
 PSEUDOMODULES += esp_idf_newlib
 PSEUDOMODULES += esp_rtc_timer

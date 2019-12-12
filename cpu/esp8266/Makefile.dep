@@ -1,3 +1,8 @@
 # additional modules dependencies
 
 include $(RIOTCPU)/esp_common/Makefile.dep
+
+ifneq (,$(filter periph_i2c,$(USEMODULE)))
+  USEMODULE += esp_i2c_sw
+  USEMODULE += periph_i2c_sw
+endif

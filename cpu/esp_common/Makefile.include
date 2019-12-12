@@ -29,6 +29,7 @@ endif
 # ESP* pseudomodules
 
 PSEUDOMODULES += esp_gdb
+PSEUDOMODULES += esp_i2c_sw
 PSEUDOMODULES += esp_log_colored
 PSEUDOMODULES += esp_log_tagged
 PSEUDOMODULES += esp_log_startup
