@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_esp8266
+ * @ingroup     cpu_esp_common
  * @{
  *
  * @file
- * @brief       Low-level MTD flash drive implementation
+ * @brief       Low-level MTD flash drive implementation for ESP SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
