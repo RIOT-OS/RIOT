@@ -18,7 +18,7 @@ ifneq (, $(filter esp_wifi, $(USEMODULE)))
     DIRS += esp-wifi
 endif
 
-ifneq (, $(filter riot_freertos, $(USEMODULE)))
+ifneq (, $(filter esp_freertos, $(USEMODULE)))
     DIRS += freertos
 endif
 

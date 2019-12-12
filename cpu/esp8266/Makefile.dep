@@ -1,15 +1,3 @@
 # additional modules dependencies
 
-ifneq (, $(filter esp_spiffs, $(USEMODULE)))
-    export SPIFFS_STD_OPTION = -std=c99
-    USEMODULE += spiffs
-    USEMODULE += vfs
-endif
-
-ifneq (, $(filter esp_wifi, $(USEMODULE)))
-    USEMODULE += netdev_eth
-endif
-
-ifneq (,$(filter log_color,$(USEMODULE)))
-    USEMODULE += esp_log_colored
-endif
+include $(RIOTCPU)/esp_common/Makefile.dep

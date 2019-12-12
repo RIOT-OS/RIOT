@@ -1154,19 +1154,18 @@ Therefore, it is often necessary to change some of these default configurations 
 
 There are two ways to give the application the ability to change some of these default configurations:
 
-- make variable ```CONFIGS```
+- make variable `CFLAGS`
 - application-specific board or driver configuration file
 
 
-## <a name="esp32_config_make_variable"> Make Variable ```CONFIGS``` </a> &nbsp;[[TOC](#esp32_toc)]
+## <a name="esp32_config_make_variable"> Make Variable `CFLAGS` </a> &nbsp;[[TOC](#esp32_toc)]
 
-
-Using the ```CONFIGS``` make variable at the command line, board or driver parameter definitions can be overridden.
+Using the `CFLAGS` make variable at the command line, board or driver parameter definitions can be overridden.
 
 Example:
-```
-CONFIGS='-DESP_LCD_PLUGGED_IN=1 -DLIS3DH_PARAM_INT2=GPIO4'
-```
+`
+CFLAGS='-DESP_LCD_PLUGGED_IN=1 -DLIS3DH_PARAM_INT2=GPIO4'
+`
 
 When a larger number of board definitions needs be overridden, this approach becomes impractical. In that case, an application-specific board configuration file located in application directory can be used, see sections below.
 
