@@ -366,7 +366,7 @@ ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len)
     mutex_unlock(&sock->mutex); /* we won't change anything to sock here
                                    (lwip_sock_send neither, since it remote is
                                    NULL) so we can leave the mutex */
-    res = lwip_sock_send(&conn, data, len, 0, NULL, NETCONN_TCP);
+    res = lwip_sock_send(conn, data, len, 0, NULL, NETCONN_TCP);
     return res;
 }
 

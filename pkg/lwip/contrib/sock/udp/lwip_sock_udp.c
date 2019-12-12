@@ -128,7 +128,7 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     if ((remote != NULL) && (remote->port == 0)) {
         return -EINVAL;
     }
-    return lwip_sock_send((sock) ? &sock->conn : NULL, data, len, 0,
+    return lwip_sock_send((sock) ? sock->conn : NULL, data, len, 0,
                           (struct _sock_tl_ep *)remote, NETCONN_UDP);
 }
 
