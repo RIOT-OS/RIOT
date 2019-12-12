@@ -71,6 +71,36 @@ void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
     dev->netdev.driver->set(&dev->netdev, NETOPT_NID, &dev->pan, sizeof(dev->pan));
 }
 
+static inline uint16_t _get_ieee802154_pdu(netdev_ieee802154_t *dev)
+{
+#if defined(MODULE_NETDEV_IEEE802154_MR_OQPSK) || \
+    defined(MODULE_NETDEV_IEEE802154_MR_OFDM)  || \
+    defined(MODULE_NETDEV_IEEE802154_MR_FSK)
+    uint8_t type = IEEE802154_PHY_DISABLED;
+    dev->netdev.driver->get(&dev->netdev, NETOPT_IEEE802154_PHY, &type, sizeof(type));
+#else
+    (void) dev;
+#endif
+
+#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+    if (type == IEEE802154_PHY_MR_OQPSK) {
+        return IEEE802154G_FRAME_LEN_MAX;
+    }
+#endif
+#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+    if (type == IEEE802154_PHY_MR_OFDM) {
+        return IEEE802154G_FRAME_LEN_MAX;
+    }
+#endif
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+    if (type == IEEE802154_PHY_MR_FSK) {
+        return IEEE802154G_FRAME_LEN_MAX;
+    }
+#endif
+
+    return IEEE802154_FRAME_LEN_MAX;
+}
+
 int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
                            size_t max_len)
 {
@@ -152,9 +182,10 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
 #endif
         case NETOPT_MAX_PDU_SIZE:
             assert(max_len >= sizeof(int16_t));
-            *((uint16_t *)value) = (IEEE802154_FRAME_LEN_MAX -
-                                  IEEE802154_MAX_HDR_LEN) -
-                                  IEEE802154_FCS_LEN;
+
+            *((uint16_t *)value) = (_get_ieee802154_pdu(dev)
+                                    - IEEE802154_MAX_HDR_LEN)
+                                    - IEEE802154_FCS_LEN;
             res = sizeof(uint16_t);
             break;
         default:
