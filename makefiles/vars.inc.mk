@@ -5,6 +5,8 @@ export Q                     # Used in front of Makefile lines to suppress the p
 export QQ                    # as Q, but be more quiet
 export QUIET                 # The parameter to use whether to show verbose makefile commands or not.
 
+export OS                    # The operating system of the build host
+
 export APPLICATION           # The application, set in the Makefile which is run by the user.
 export APPLICATION_MODULE    # The application module name.
 export BOARD                 # The board to compile the application for.
