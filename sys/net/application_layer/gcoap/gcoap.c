@@ -40,6 +40,16 @@
 #define GCOAP_RESOURCE_WRONG_METHOD -1
 #define GCOAP_RESOURCE_NO_PATH -2
 
+/* define a common name for transport layer object, to accommodate security layer */
+#ifdef MODULE_SOCK_DTLS
+#include "net/credman.h"
+static credman_tag_t credential_tag;
+
+typedef sock_dtls_t coap_tl_sock_t;
+#else
+typedef sock_udp_t coap_tl_sock_t;
+#endif
+
 /* Internal functions */
 static void *_event_loop(void *arg);
 static void _listen(coap_tl_sock_t *sock);
@@ -56,20 +66,6 @@ static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
                                                        coap_pkt_t *pdu);
 static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
                                    const coap_resource_t *resource);
-
-#ifdef MODULE_SOCK_DTLS
-#include "net/credman.h"
-static credman_tag_t credential_tag;
-static ssize_t _tl_send(sock_dtls_t *sock, const void *data, size_t len,
-                        const sock_udp_ep_t *remote);
-static ssize_t _tl_recv(sock_dtls_t *sock, void *data, size_t max_len,
-                        uint32_t timeout, sock_udp_ep_t *remote);
-/* define a common name for transport layer object, to accommodate security layer */
-typedef sock_dtls_t coap_tl_sock_t;
-#else
-typedef sock_udp_t coap_tl_sock_t;
-#endif
-
 
 /* Internal variables */
 const coap_resource_t _default_resources[] = {
@@ -120,7 +116,7 @@ static sock_udp_t _udp_sock;
 static sock_dtls_t _tl_sock;
 
 static ssize_t _tl_send(sock_dtls_t *sock, const void *data, size_t len,
-                     const sock_udp_ep_t *remote)
+                        const sock_udp_ep_t *remote)
 {
     sock_dtls_session_t session;
     /* convert sock_udp_ep_t to sock_dtls_session_t */
@@ -135,11 +131,11 @@ static ssize_t _tl_send(sock_dtls_t *sock, const void *data, size_t len,
     return res;
 }
 
-static ssize_t _tl_recv(sock_dtls_t *sock, void *data, size_t max_len,
-                     uint32_t timeout, sock_udp_ep_t *remote)
+static ssize_t _tl_recv(sock_dtls_t *sock, void *data, size_t len,
+                        uint32_t timeout, sock_udp_ep_t *remote)
 {
     sock_dtls_session_t session;
-    ssize_t res = sock_dtls_recv(sock, &session, data, max_len, timeout);
+    ssize_t res = sock_dtls_recv(sock, &session, data, len, timeout);
     if (res < 0) {
         return res;
     }
