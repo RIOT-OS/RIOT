@@ -73,10 +73,7 @@ CFLAGS += -DCPU_ARCH_$(call uppercase_and_underscore,$(CPU_ARCH))
 
 # set the compiler specific CPU and FPU options
 ifneq (,$(filter $(CPU_ARCH),cortex-m4f cortex-m7))
-  ifneq (,$(filter cortexm_fpu,$(DISABLE_MODULE)))
-    CFLAGS_FPU ?= -mfloat-abi=soft
-  else
-    USEMODULE += cortexm_fpu
+  ifneq (,$(filter cortexm_fpu,$(USEMODULE)))
     # clang assumes there is an FPU
     ifneq (llvm,$(TOOLCHAIN))
       ifeq ($(CPU_ARCH),cortex-m7)
@@ -85,6 +82,8 @@ ifneq (,$(filter $(CPU_ARCH),cortex-m4f cortex-m7))
         CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv4-sp-d16
       endif
     endif
+  else
+    CFLAGS_FPU ?= -mfloat-abi=soft
   endif
 else
   CFLAGS_FPU ?= -mfloat-abi=soft
