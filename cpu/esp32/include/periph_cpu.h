@@ -383,6 +383,17 @@ typedef struct {
 /** @} */
 
 /**
+ * @name    RNG configuration
+ * @{
+ */
+
+/**
+ * @brief   The address of the register for accessing the hardware RNG.
+ */
+#define RNG_DATA_REG_ADDR   (0x3ff75144)
+/** @} */
+
+/**
  * @name   SPI configuration
  *
  * ESP32 has four SPI controllers:
