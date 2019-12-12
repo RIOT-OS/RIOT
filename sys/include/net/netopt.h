@@ -652,6 +652,11 @@ typedef enum {
     NETOPT_LORAWAN_MIN_RX_SYMBOL,
 
     /**
+     * @brief   (uint8_t) 802.15.4 PHY mode
+     */
+    NETOPT_IEEE802154_PHY,
+
+    /**
      * @brief   (uint8_t*) phy layer syncword
      */
     NETOPT_SYNCWORD,
