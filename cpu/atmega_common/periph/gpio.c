@@ -301,7 +301,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 #endif /* PCINT2_IDX */
 #ifdef PCINT3_IDX
             case PCINT3_IDX:
-                PCMSK3 |= (1 << pin_num);
+                PCMSK3 |= (1 << bank_idx);
                 PCICR |= (1 << PCIE3);
                 break;
 #endif /* PCINT3_IDX */
