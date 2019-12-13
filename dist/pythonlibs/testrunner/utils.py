@@ -9,7 +9,7 @@
 import pexpect
 
 
-def test_utils_interactive_sync(child, retries=5, delay=1):
+def test_utils_interactive_sync(child, retries, delay):
     """Synchronisation for 'test_utils_interactive_sync' function.
 
     Interacts through input to wait for node being ready.

@@ -24,6 +24,10 @@ RIOTBASE = (os.environ.get('RIOTBASE') or
 # default value (3)
 MAKE_TERM_STARTED_DELAY = int(os.environ.get('TESTRUNNER_START_DELAY') or 3)
 
+# Allow customizing test interactive settings with environment variables
+TEST_INTERACTIVE_RETRIES = int(os.environ.get('TEST_INTERACTIVE_RETRIES') or 5)
+TEST_INTERACTIVE_DELAY = int(os.environ.get('TEST_INTERACTIVE_DELAY') or 1)
+
 
 def list_until(l, cond):
     return l[:([i for i, e in enumerate(l) if cond(e)][0])]
@@ -79,8 +83,10 @@ def sync_child(child):
     _test_utils_interactive_sync(child, modules)
 
 
-def _test_utils_interactive_sync(child, modules, retries=5, delay=1):
+def _test_utils_interactive_sync(child, modules):
     if 'test_utils_interactive_sync' not in modules:
         return
 
-    utils.test_utils_interactive_sync(child, retries=retries, delay=delay)
+    utils.test_utils_interactive_sync(child,
+                                      TEST_INTERACTIVE_RETRIES,
+                                      TEST_INTERACTIVE_DELAY)
