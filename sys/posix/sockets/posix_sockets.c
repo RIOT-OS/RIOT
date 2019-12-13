@@ -41,6 +41,12 @@
 #if IS_USED(MODULE_SOCK_ASYNC)
 #include "net/sock/async.h"
 #endif
+#if IS_USED(MODULE_POSIX_SELECT)
+#include <sys/select.h>
+
+#include "thread.h"
+#include "thread_flags.h"
+#endif
 
 /* enough to create sockets both with socket() and accept() */
 #define _ACTUAL_SOCKET_POOL_SIZE   (SOCKET_POOL_SIZE + \
@@ -87,6 +93,9 @@ typedef struct {
 #if IS_USED(MODULE_SOCK_ASYNC)
     atomic_uint available;
 #endif
+#if IS_USED(MODULE_POSIX_SELECT)
+    thread_t *selecting_thread;
+#endif
     sock_tcp_ep_t local;        /* to store bind before connect/listen */
 } socket_t;
 
@@ -115,6 +124,9 @@ static socket_t *_get_free_socket(void)
         if (_socket_pool[i].domain == AF_UNSPEC) {
 #if IS_USED(MODULE_SOCK_ASYNC)
             atomic_init(&_socket_pool[i].available, 0U);
+#endif
+#if IS_USED(MODULE_POSIX_SELECT)
+            _socket_pool[i].selecting_thread = NULL;
 #endif
             return &_socket_pool[i];
         }
@@ -359,8 +371,10 @@ static void _async_cb(void *sock, sock_async_flags_t type,
     if (type & SOCK_ASYNC_MSG_RECV) {
         atomic_fetch_add(&socket->available, 1);
 #if IS_USED(MODULE_POSIX_SELECT)
-        thread_flags_set(sock->socket->selecting_thread,
-                         POSIX_SELECT_THREAD_FLAG);
+        if (socket->selecting_thread) {
+            thread_flags_set(socket->selecting_thread,
+                             POSIX_SELECT_THREAD_FLAG);
+        }
 #endif
     }
 }
@@ -1167,6 +1181,30 @@ unsigned posix_socket_avail(int fd)
     (void)fd;
     return 0U;
 #endif
+}
+
+int posix_socket_select(int fd)
+{
+#if IS_USED(MODULE_POSIX_SELECT)
+    socket_t *socket = _get_socket(fd);
+
+    if (socket != NULL) {
+        if (socket->sock == NULL) {  /* socket is not connected */
+            int res;
+
+            /* bind implicitly */
+            if ((res = _bind_connect(socket, NULL, 0)) < 0) {
+                return res;
+            }
+        }
+        socket->selecting_thread = (thread_t *)sched_active_thread;
+        return 0;
+    }
+#else
+    (void)fd;
+#endif
+    errno = ENOTSUP;
+    return -1;
 }
 
 /**

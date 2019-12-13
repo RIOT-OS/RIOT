@@ -470,6 +470,15 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter posix_select,$(USEMODULE)))
+  ifneq (,$(filter posix_sockets,$(USEMODULE)))
+    USEMODULE += sock_async
+  endif
+  USEMODULE += core_thread_flags
+  USEMODULE += posix_headers
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += bitfield
   USEMODULE += random
