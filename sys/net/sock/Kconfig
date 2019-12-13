@@ -1,0 +1,31 @@
+# Copyright (c) 2019 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_MODULE_SOCK_UTIL
+    bool "Configure SOCK utility functions"
+    depends on MODULE_SOCK_UTIL
+
+if KCONFIG_MODULE_SOCK_UTIL
+
+config SOCK_SCHEME_MAXLEN
+    int "Maximum length of the scheme part"
+    default 16
+    help
+        This value is used in sock_urlsplit().
+
+config SOCK_HOSTPORT_MAXLEN
+    int "Maximum length of host:port part"
+    default 64
+    help
+        This value is used in sock_urlsplit().
+
+config SOCK_URLPATH_MAXLEN
+    int "Maximum path length"
+    default 64
+    help
+        This value is used in sock_urlsplit().
+
+endif # KCONFIG_MODULE_SOCK_UTIL

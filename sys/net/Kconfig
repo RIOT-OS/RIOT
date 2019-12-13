@@ -7,5 +7,6 @@
 menu "Networking"
 
 rsource "gnrc/Kconfig"
+rsource "sock/Kconfig"
 
 endmenu # Networking
