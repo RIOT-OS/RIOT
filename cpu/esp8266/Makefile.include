@@ -41,7 +41,6 @@ USEMODULE += ps
 
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include/freertos
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/bootloader_support/include

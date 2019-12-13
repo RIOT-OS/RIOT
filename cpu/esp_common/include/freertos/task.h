@@ -14,6 +14,7 @@
 #ifndef DOXYGEN
 
 #include "thread.h"
+#include "freertos/FreeRTOS.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +24,7 @@ extern "C" {
 #define tskNO_AFFINITY  INT_MAX
 
 #define taskDISABLE_INTERRUPTS      portDISABLE_INTERRUPTS
-#define taskENABLE_INTERRUPTS		portENABLE_INTERRUPTS
+#define taskENABLE_INTERRUPTS       portENABLE_INTERRUPTS
 
 #define taskENTER_CRITICAL          portENTER_CRITICAL
 #define taskEXIT_CRITICAL           portEXIT_CRITICAL
@@ -55,7 +56,7 @@ TaskHandle_t xTaskGetCurrentTaskHandle(void);
 void vTaskEnterCritical(portMUX_TYPE *mux);
 void vTaskExitCritical(portMUX_TYPE *mux);
 
-TickType_t xTaskGetTickCount (void);
+TickType_t xTaskGetTickCount(void);
 
 #ifdef __cplusplus
 }

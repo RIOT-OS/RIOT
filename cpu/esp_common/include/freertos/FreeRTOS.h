@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,21 +22,24 @@ extern "C" {
 #define configMAX_PRIORITIES    SCHED_PRIO_LEVELS
 
 #ifndef configASSERT
-#define configASSERT    assert
+#define configASSERT            assert
 #endif
 
 #define portTICK_PERIOD_MS      10
 #define portTickType            TickType_t
 
-typedef int32_t  BaseType_t;
-typedef uint32_t UBaseType_t;
+#define portTICK_RATE_MS        portTICK_PERIOD_MS
+
+#define BaseType_t              portBASE_TYPE
+#define UBaseType_t             unsigned portBASE_TYPE
+
 typedef uint32_t TickType_t;
 
 uint32_t xPortGetTickRateHz(void);
 BaseType_t xPortInIsrContext(void);
 
 /*
- * PLESE NOTE: Following definitions were copied directly from the FreeRTOS
+ * PLEASE NOTE: Following definitions were copied directly from the FreeRTOS
  * distribution and are under the following copyright:
  *
  * FreeRTOS V8.2.0 - Copyright (C) 2015 Real Time Engineers Ltd.

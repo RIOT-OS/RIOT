@@ -58,6 +58,7 @@ USEMODULE += xtensa
 INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
 INCLUDES += -I$(RIOTCPU)/esp_common
 INCLUDES += -I$(RIOTCPU)/esp_common/include
+INCLUDES += -I$(RIOTCPU)/esp_common/include/freertos
 INCLUDES += -I$(RIOTCPU)/esp_common/vendor/
 INCLUDES += -I$(RIOTCPU)/esp_common/vendor/esp
 

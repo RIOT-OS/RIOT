@@ -32,28 +32,27 @@ extern "C" {
 
 #define portYIELD_FROM_ISR              thread_yield_higher
 
+#define portENTER_CRITICAL              vTaskEnterCritical
+#define portEXIT_CRITICAL               vTaskExitCritical
+#define portENTER_CRITICAL_ISR          vTaskEnterCritical
+#define portEXIT_CRITICAL_ISR           vTaskExitCritical
+#define portENTER_CRITICAL_NESTED       irq_disable
+#define portEXIT_CRITICAL_NESTED        irq_restore
+
 #ifdef MCU_ESP32
 
 #define portNUM_PROCESSORS              2
 #define xPortGetCoreID()                PRO_CPU_NUM
-
-#define portENTER_CRITICAL(pm)          mutex_lock(pm)
-#define portEXIT_CRITICAL(pm)           mutex_unlock(pm)
-#define portENTER_CRITICAL_NESTED       irq_disable
-#define portEXIT_CRITICAL_NESTED        irq_restore
-
-#define portENTER_CRITICAL_ISR          vTaskEnterCritical
-#define portEXIT_CRITICAL_ISR           vTaskExitCritical
 
 #else /* MCU_ESP32 */
 
 #define portNUM_PROCESSORS              1
 #define xPortGetCoreID()                PRO_CPU_NUM
 
-#define portENTER_CRITICAL              vTaskEnterCritical
-#define portEXIT_CRITICAL               vTaskExitCritical
-
 #endif /* MCU_ESP32 */
+
+extern void vTaskEnterCritical(portMUX_TYPE *mux);
+extern void vTaskExitCritical(portMUX_TYPE *mux);
 
 #ifdef __cplusplus
 }
