@@ -27,6 +27,9 @@
 extern "C" {
 #endif
 
+/* Apply configurations only if not using Kconfig for this module */
+#if !IS_ACTIVE(CONFIG_KCONFIG_MODULE_GNRC_IPV6_NIB) || defined(DOXYGEN)
+
 /* some pseudo-module based configuration, doc: see below */
 #ifdef MODULE_GNRC_IPV6_NIB_6LBR
 #ifndef CONFIG_GNRC_IPV6_NIB_6LBR
@@ -276,6 +279,8 @@ extern "C" {
 #define CONFIG_GNRC_IPV6_NIB_ABR_NUMOF             (1)
 #endif
 #endif
+
+#endif /* !CONFIG_KCONFIG_MODULE_GNRC_IPV6_NIB || DOXYGEN */
 
 #ifdef __cplusplus
 }
