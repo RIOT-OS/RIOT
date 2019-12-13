@@ -25,6 +25,8 @@
 #ifndef CPU_H
 #define CPU_H
 
+#include "thread.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
