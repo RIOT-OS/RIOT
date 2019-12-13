@@ -111,6 +111,15 @@ enum {
 };
 
 /**
+ * @brief   802.15.4 forward error correction schemes
+ */
+enum {
+    IEEE802154_FEC_NONE,            /**< no forward error correction */
+    IEEE802154_FEC_NRNSC,           /**< non-recursive and non-systematic code */
+    IEEE802154_FEC_RSC              /**< recursive and systematic code */
+};
+
+/**
  * @brief   Special address definitions
  * @{
  */
