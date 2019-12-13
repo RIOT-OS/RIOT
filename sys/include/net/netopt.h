@@ -657,6 +657,26 @@ typedef enum {
     NETOPT_IEEE802154_PHY,
 
     /**
+     * @brief   (uint8_t) legacy O-QPSK Rate Mode
+     */
+    NETOPT_OQPSK_RATE,
+
+    /**
+     * @brief   (uint8_t) MR-O-QPSK Chip Rate (kchip/s)
+     */
+    NETOPT_MR_OQPSK_CHIPS,
+
+    /**
+     * @brief   (uint8_t) MR-O-QPSK Rate Mode
+     */
+    NETOPT_MR_OQPSK_RATE,
+
+    /**
+     * @brief   (uint8_t) PHY Channel Spacing (kHz)
+     */
+    NETOPT_CHANNEL_SPACING,
+
+    /**
      * @brief   (uint8_t*) phy layer syncword
      */
     NETOPT_SYNCWORD,
