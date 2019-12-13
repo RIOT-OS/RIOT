@@ -864,6 +864,16 @@ const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur)
     return container_of(node, vfs_mount_t, list_entry);
 }
 
+const vfs_file_t *vfs_file_get(int fd)
+{
+    if (_fd_is_valid(fd) == 0) {
+        return &_vfs_open_files[fd];
+    }
+    else {
+        return NULL;
+    }
+}
+
 static inline int _allocate_fd(int fd)
 {
     if (fd < 0) {
