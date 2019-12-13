@@ -34,9 +34,9 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-static gnrc_ipv6_ext_frag_send_t _snd_bufs[GNRC_IPV6_EXT_FRAG_SEND_SIZE];
-static gnrc_ipv6_ext_frag_rbuf_t _rbuf[GNRC_IPV6_EXT_FRAG_RBUF_SIZE];
-static gnrc_ipv6_ext_frag_limits_t _limits_pool[GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE];
+static gnrc_ipv6_ext_frag_send_t _snd_bufs[CONFIG_GNRC_IPV6_EXT_FRAG_SEND_SIZE];
+static gnrc_ipv6_ext_frag_rbuf_t _rbuf[CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE];
+static gnrc_ipv6_ext_frag_limits_t _limits_pool[CONFIG_GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE];
 static clist_node_t _free_limits;
 static xtimer_t _gc_xtimer;
 static msg_t _gc_msg = { .type = GNRC_IPV6_EXT_FRAG_RBUF_GC };
@@ -61,7 +61,7 @@ void gnrc_ipv6_ext_frag_init(void)
     memset(_rbuf, 0, sizeof(_rbuf));
 #endif
     _last_id = random_uint32();
-    for (unsigned i = 0; i < GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE; i++) {
         clist_rpush(&_free_limits, (clist_node_t *)&_limits_pool[i]);
     }
 }
@@ -272,7 +272,7 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
 
 static gnrc_ipv6_ext_frag_send_t *_snd_buf_alloc(void)
 {
-    for (unsigned i = 0; i < GNRC_IPV6_EXT_FRAG_SEND_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_EXT_FRAG_SEND_SIZE; i++) {
         gnrc_ipv6_ext_frag_send_t *snd_buf = &_snd_bufs[i];
         if (snd_buf->pkt == NULL) {
             return snd_buf;
@@ -420,7 +420,7 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
         goto error_release;
     }
     rbuf->arrival = xtimer_now_usec();
-    xtimer_set_msg(&_gc_xtimer, GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US, &_gc_msg,
+    xtimer_set_msg(&_gc_xtimer, CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US, &_gc_msg,
                    sched_active_pid);
     nh = fh->nh;
     offset = ipv6_ext_frag_get_offset(fh);
@@ -538,7 +538,7 @@ gnrc_ipv6_ext_frag_rbuf_t *gnrc_ipv6_ext_frag_rbuf_get(ipv6_hdr_t *ipv6,
                                                        uint32_t id)
 {
     gnrc_ipv6_ext_frag_rbuf_t *res = NULL, *oldest = NULL;
-    for (unsigned i = 0; i < GNRC_IPV6_EXT_FRAG_RBUF_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE; i++) {
         gnrc_ipv6_ext_frag_rbuf_t *tmp = &_rbuf[i];
         if (tmp->ipv6 != NULL) {
             if ((tmp->id == id) &&
@@ -580,9 +580,9 @@ void gnrc_ipv6_ext_frag_rbuf_free(gnrc_ipv6_ext_frag_rbuf_t *rbuf)
 void gnrc_ipv6_ext_frag_rbuf_gc(void)
 {
     uint32_t now = xtimer_now_usec();
-    for (unsigned i = 0; i < GNRC_IPV6_EXT_FRAG_RBUF_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE; i++) {
         gnrc_ipv6_ext_frag_rbuf_t *rbuf = &_rbuf[i];
-        if ((now - rbuf->arrival) > GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US) {
+        if ((now - rbuf->arrival) > CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US) {
             gnrc_ipv6_ext_frag_rbuf_del(rbuf);
         }
     }
