@@ -20,6 +20,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include "checksum/crc8.h"
 #include "sht3x.h"
 #include "xtimer.h"
 
@@ -99,8 +100,10 @@ static int _status (sht3x_dev_t* dev, uint16_t* status);
 static int _send_command(sht3x_dev_t* dev, uint16_t cmd);
 static int _read_data(sht3x_dev_t* dev, uint8_t *data, uint8_t len);
 
-/* helper functions */
-static uint8_t _crc8 (uint8_t data[], int len);
+static inline uint8_t _crc8(const void* buf, size_t len)
+{
+    return crc8(buf, len, 0x31, 0xff);
+}
 
 /* ------------------------------------------------ */
 
@@ -415,28 +418,4 @@ static int _status (sht3x_dev_t* dev, uint16_t* status)
     *status = (data[0] << 8 | data[1]) & SHT3X_STATUS_REG_MASK;
     DEBUG_DEV("status=%02x", dev, *status);
     return SHT3X_OK;
-}
-
-
-static const uint8_t g_polynom = 0x31;
-
-static uint8_t _crc8 (uint8_t data[], int len)
-{
-    /* initialization value */
-    uint8_t crc = 0xff;
-
-    /* iterate over all bytes */
-    for (int i=0; i < len; i++)
-    {
-        crc ^= data[i];
-
-        for (int i = 0; i < 8; i++)
-        {
-            bool xor = crc & 0x80;
-            crc = crc << 1;
-            crc = xor ? crc ^ g_polynom : crc;
-        }
-    }
-
-    return crc;
 }
