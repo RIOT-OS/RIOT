@@ -37,6 +37,7 @@ static const char *state_names[] = {
     [STATUS_PENDING] = "pending",
     [STATUS_STOPPED] = "stopped",
     [STATUS_SLEEPING] = "sleeping",
+    [STATUS_ZOMBIE] = "zombie",
     [STATUS_MUTEX_BLOCKED] = "bl mutex",
     [STATUS_RECEIVE_BLOCKED] = "bl rx",
     [STATUS_SEND_BLOCKED] = "bl send",

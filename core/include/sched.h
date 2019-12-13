@@ -101,19 +101,20 @@ typedef struct _thread thread_t;
  * @{
  */
 typedef enum {
-    STATUS_STOPPED,                 /**< has terminated                       */
-    STATUS_SLEEPING,                /**< sleeping                             */
-    STATUS_MUTEX_BLOCKED,           /**< waiting for a locked mutex           */
-    STATUS_RECEIVE_BLOCKED,         /**< waiting for a message                */
-    STATUS_SEND_BLOCKED,            /**< waiting for message to be delivered  */
-    STATUS_REPLY_BLOCKED,           /**< waiting for a message response       */
-    STATUS_FLAG_BLOCKED_ANY,        /**< waiting for any flag from flag_mask  */
-    STATUS_FLAG_BLOCKED_ALL,        /**< waiting for all flags in flag_mask   */
-    STATUS_MBOX_BLOCKED,            /**< waiting for get/put on mbox          */
-    STATUS_COND_BLOCKED,            /**< waiting for a condition variable     */
-    STATUS_RUNNING,                 /**< currently running                    */
-    STATUS_PENDING,                 /**< waiting to be scheduled to run       */
-    STATUS_NUMOF                    /**< number of supported thread states    */
+    STATUS_STOPPED,                 /**< has terminated                           */
+    STATUS_ZOMBIE,                  /**< has terminated & keeps thread's thread_t */
+    STATUS_SLEEPING,                /**< sleeping                                 */
+    STATUS_MUTEX_BLOCKED,           /**< waiting for a locked mutex               */
+    STATUS_RECEIVE_BLOCKED,         /**< waiting for a message                    */
+    STATUS_SEND_BLOCKED,            /**< waiting for message to be delivered      */
+    STATUS_REPLY_BLOCKED,           /**< waiting for a message response           */
+    STATUS_FLAG_BLOCKED_ANY,        /**< waiting for any flag from flag_mask      */
+    STATUS_FLAG_BLOCKED_ALL,        /**< waiting for all flags in flag_mask       */
+    STATUS_MBOX_BLOCKED,            /**< waiting for get/put on mbox              */
+    STATUS_COND_BLOCKED,            /**< waiting for a condition variable         */
+    STATUS_RUNNING,                 /**< currently running                        */
+    STATUS_PENDING,                 /**< waiting to be scheduled to run           */
+    STATUS_NUMOF                    /**< number of supported thread states        */
 } thread_status_t;
 /** @} */
 
