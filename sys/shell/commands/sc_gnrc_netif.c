@@ -533,7 +533,7 @@ static void _netif_list(netif_t *iface)
     }
     res = netif_get_opt(iface, NETOPT_NID, 0, &u16, sizeof(u16));
     if (res >= 0) {
-        printf(" NID: 0x%" PRIx16, u16);
+        printf(" NID: 0x%" PRIx16 " ", u16);
     }
 #ifdef MODULE_GNRC_NETIF_CMD_LORA
     res = netif_get_opt(iface, NETOPT_BANDWIDTH, 0, &u8, sizeof(u8));
