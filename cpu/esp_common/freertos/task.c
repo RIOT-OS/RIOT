@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,12 +22,20 @@
 #include "thread.h"
 #include "xtimer.h"
 
+#ifdef MCU_ESP32
 #include "soc/soc.h"
+#endif
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
 #define MHZ 1000000
+
+#ifdef MCU_ESP8266
+#include "rom/ets_sys.h"
+
+#define PRO_CPU_NUM (0)
+#endif
 
 /**
  * @brief   Architecture specific data of thread control blocks
@@ -56,6 +64,9 @@ BaseType_t xTaskCreatePinnedToCore (TaskFunction_t pvTaskCode,
     char* stack = malloc(usStackDepth + sizeof(thread_t));
 
     if (!stack) {
+        LOG_TAG_ERROR("freertos", "not enough memory to create task %s with "
+                      "stack size of %d bytes\n", pcName, usStackDepth);
+        abort();
         return pdFALSE;
     }
     kernel_pid_t pid = thread_create(stack,
@@ -94,7 +105,7 @@ void vTaskDelete (TaskHandle_t xTaskToDelete)
 {
     DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToDelete);
 
-    CHECK_PARAM(xTaskToDelete != NULL);
+    assert(xTaskToDelete != NULL);
 
     uint32_t pid = (uint32_t)xTaskToDelete;
 
@@ -119,8 +130,11 @@ TaskHandle_t xTaskGetCurrentTaskHandle(void)
 
 void vTaskDelay( const TickType_t xTicksToDelay )
 {
+    DEBUG("%s xTicksToDelay=%d\n", __func__, xTicksToDelay);
+#if defined(MCU_ESP8266) && defined(MODULE_ESP_WIFI_ANY)
     uint64_t us = xTicksToDelay * MHZ / xPortGetTickRateHz();
     xtimer_usleep(us);
+#endif
 }
 
 TickType_t xTaskGetTickCount (void)
@@ -130,23 +144,33 @@ TickType_t xTaskGetTickCount (void)
 
 void vTaskEnterCritical( portMUX_TYPE *mux )
 {
+#ifdef MCU_ESP8266
+    /* we have to return on NMI */
+    if (NMIIrqIsOn) {
+        return;
+    }
+#endif /* MCU_ESP8266 */
+
+    /* disable interrupts */
+    uint32_t state = irq_disable();
+
     /* determine calling thread pid (can't fail) */
     kernel_pid_t my_pid = thread_getpid();
 
     DEBUG("%s pid=%d prio=%d mux=%p\n", __func__,
           my_pid, sched_threads[my_pid]->priority, mux);
 
-    /* disable interrupts */
-    uint32_t state = irq_disable();
-
-    /* Locking the given mutex does not work here, as this function can also
-       be called in the interrupt context. Therefore, the given mutex is not
-       used. Instead, the basic default FreeRTOS mechanism for critical
-       sections is used by simply disabling interrupts. Since context
-       switches for the ESP32 are also based on interrupts, there is no
-       possibility that another thread will enter the critical section
-       once the interrupts are disabled. */
-    /* mutex_lock(mux); */ /* TODO should be only a spin lock */
+    /* acquire the mutex with interrupts disabled */
+    if (mux) {
+        /* Locking the given mutex does not work here, as this function can also
+           be called in the interrupt context. Therefore, the given mutex is not
+           used. Instead, the basic default FreeRTOS mechanism for critical
+           sections is used by simply disabling interrupts. Since context
+           switches for the ESPs are also based on interrupts, there is no
+           possibility that another thread will enter the critical section
+           once the interrupts are disabled. */
+        /* mutex_lock(mux); */ /* TODO should be only a spin lock */
+    }
 
     /* increment nesting counter and save old interrupt level */
     threads_arch_exts[my_pid].critical_nesting++;
@@ -157,15 +181,23 @@ void vTaskEnterCritical( portMUX_TYPE *mux )
 
 void vTaskExitCritical( portMUX_TYPE *mux )
 {
+#ifdef MCU_ESP8266
+    /* we have to return on NMI */
+    if (NMIIrqIsOn) {
+        return;
+    }
+#endif /* MCU_ESP8266 */
+
     /* determine calling thread pid (can't fail) */
     kernel_pid_t my_pid = thread_getpid();
 
     DEBUG("%s pid=%d prio=%d mux=%p\n", __func__,
           my_pid, sched_threads[my_pid]->priority, mux);
 
-    /* The given mutex is not used (see vTaskEnterCritical) and has not to
-       be unlocked here. */
-    /* mutex_unlock(mux); */ /* TODO should be only a spin lock */
+    /* release the mutex with interrupts disabled */
+    if (mux) {
+        /* mutex_unlock(mux); */ /* TODO should be only a spin lock */
+    }
 
     /* decrement nesting counter and restore old interrupt level */
     if (threads_arch_exts[my_pid].critical_nesting) {
@@ -176,5 +208,26 @@ void vTaskExitCritical( portMUX_TYPE *mux )
     }
 }
 
+void vTaskStepTick(const TickType_t xTicksToJump)
+{
+    DEBUG("%s xTicksToJump=%d\n", __func__, xTicksToJump);
+    /*
+     * TODO:
+     * At the moment, only the calling task is set to sleep state. Usually, the
+     * complete system should sleep but not only the task.
+     */
+    vTaskDelay(xTicksToJump);
+}
+
+TickType_t prvGetExpectedIdleTime(void)
+{
+    DEBUG("%s\n", __func__);
+    /*
+     * TODO:
+     * Since we are not able to estimate the time the system will be idle,
+     * we simply return 0.
+     */
+    return 0;
+}
 
 #endif /* DOXYGEN */
