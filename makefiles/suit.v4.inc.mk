@@ -14,7 +14,7 @@ SUIT_NOTIFY_VERSION ?= latest
 SUIT_NOTIFY_MANIFEST ?= $(APPLICATION)-riot.suitv4_signed.$(SUIT_NOTIFY_VERSION).bin
 
 # Long manifest names require more buffer space when parsing
-export CFLAGS += -DSOCK_URLPATH_MAXLEN=128
+export CFLAGS += -DCONFIG_SOCK_URLPATH_MAXLEN=128
 
 SUIT_VENDOR ?= "riot-os.org"
 SUIT_SEQNR ?= $(APP_VER)
