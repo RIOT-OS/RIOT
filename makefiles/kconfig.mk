@@ -48,13 +48,17 @@ MERGE_SOURCES += $(wildcard $(KCONFIG_USER_CONFIG))
 $(GENERATED_DIR): $(CLEAN)
 	$(Q)mkdir -p $@
 
-# Build a Kconfig file defining all used modules. This is done by defining
-# symbols like 'MODULE_<MODULE_NAME>' which default to 'y'. Then, every module
-# Kconfig menu will depend on that symbol being set to show its options.
+USEMODULE_W_PREFIX = $(addprefix MODULE_,$(USEMODULE))
+USEPKG_W_PREFIX = $(addprefix PKG_,$(USEPKG))
+
+# Build a Kconfig file defining all used modules and packages. This is done by
+# defining symbols like 'MODULE_<MODULE_NAME>' or PKG_<PACKAGE_NAME> which
+# default to 'y'. Then, every module and package Kconfig menu will depend on
+# that symbol being set to show its options.
 $(KCONFIG_GENERATED_DEPENDENCIES): FORCE | $(GENERATED_DIR)
-	$(Q)printf "%s " $(USEMODULE) \
+	$(Q)printf "%s " $(USEMODULE_W_PREFIX) $(USEPKG_W_PREFIX) \
 	  | awk 'BEGIN {RS=" "}{ gsub("-", "_", $$0); \
-	      printf "config MODULE_%s\n\tbool\n\tdefault y\n", toupper($$0)}' \
+	      printf "config %s\n\tbool\n\tdefault y\n", toupper($$0)}' \
 	  | $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@
 
 .PHONY: menuconfig
