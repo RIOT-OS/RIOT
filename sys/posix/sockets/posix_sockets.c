@@ -1066,6 +1066,11 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
 #endif
 }
 
+bool posix_socket_is(int fd)
+{
+    return IS_USED(MODULE_SOCK_ASYNC) && (_get_socket(fd) != NULL);
+}
+
 /**
  * @}
  */
