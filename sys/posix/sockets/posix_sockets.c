@@ -122,12 +122,19 @@ static socket_sock_t *_get_free_sock(void)
 
 static socket_t *_get_socket(int fd)
 {
-    for (int i = 0; i < _ACTUAL_SOCKET_POOL_SIZE; i++) {
-        if (_socket_pool[i].fd == fd) {
-            return &_socket_pool[i];
-        }
+    const vfs_file_t *file = vfs_file_get(fd);
+    /* we know what to do with `socket`, so it's okay to discard the const */
+    socket_t *socket = (file == NULL)
+                     ? NULL
+                     : file->private_data.ptr;
+    if ((socket >= &_socket_pool[0]) &&
+        (socket <= &_socket_pool[_ACTUAL_SOCKET_POOL_SIZE - 1])) {
+        assert(socket->fd == fd);
+        return socket;
     }
-    return NULL;
+    else {
+        return NULL;
+    }
 }
 
 static int _get_sock_idx(socket_sock_t *sock)
