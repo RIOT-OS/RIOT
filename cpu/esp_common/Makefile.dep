@@ -1,20 +1,24 @@
 # additional modules dependencies
 
 # each device has SPI flash memory, but it has to be enabled explicitly
-ifneq (,$(filter esp_spiffs, $(USEMODULE)))
+ifneq (,$(filter esp_spiffs,$(USEMODULE)))
   USEMODULE += spiffs
 endif
 
-ifneq (, $(filter esp_now, $(USEMODULE)))
+ifneq (,$(filter esp_freertos,$(USEMODULE)))
+  USEMODULE += esp_freertos_common
+endif
+
+ifneq (,$(filter esp_now,$(USEMODULE)))
   USEMODULE += esp_wifi_any
 endif
 
-ifneq (, $(filter esp_wifi, $(USEMODULE)))
+ifneq (,$(filter esp_wifi,$(USEMODULE)))
   USEMODULE += esp_wifi_any
   USEMODULE += netdev_eth
 endif
 
-ifneq (, $(filter esp_wifi_any, $(USEMODULE)))
+ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += netopt
   USEMODULE += xtimer
 endif
