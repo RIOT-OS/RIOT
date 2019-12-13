@@ -82,7 +82,7 @@ typedef struct {
 #define EEPROM_SIZE                (2048U)  /* 2kB */
 #elif defined(CPU_LINE_STM32L031xx)
 #define EEPROM_SIZE                (1024U)  /* 1kB */
-#elif defined(CPU_LINE_STM32L010xB) || defined(CPU_LINE_STM32L011x3) || defined(CPU_LINE_STM32L011x4) || defined(CPU_LINE_STM32L011x4)
+#elif defined(CPU_LINE_STM32L010xB) || defined(CPU_LINE_STM32L011x3) || defined(CPU_LINE_STM32L011x4) || defined(CPU_LINE_STM32L021x4)
 #define EEPROM_SIZE                (512U)   /* 512B */
 #elif defined(CPU_LINE_STM32L010x6) || defined(CPU_LINE_STM32L010x8)
 #define EEPROM_SIZE                (256U)   /* 256B */
