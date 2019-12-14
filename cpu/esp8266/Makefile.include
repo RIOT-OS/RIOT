@@ -54,6 +54,12 @@ ifneq (, $(filter littlefs, $(USEMODULE)))
     export RIOT_TEST_TIMEOUT = 200
 endif
 
+ifneq (,$(filter lwip,$(USEMODULE)))
+  # The threads for handling the ESP hardware have the priorities from 2 to 4.
+  # The priority of lwIP TCPIP thread should be lower than these priorities.
+  CFLAGS += -DTCPIP_THREAD_PRIO=5
+endif
+
 ifneq (,$(filter log_color,$(USEMODULE)))
     USEMODULE += esp_log_colored
 endif
