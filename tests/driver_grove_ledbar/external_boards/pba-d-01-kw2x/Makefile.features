@@ -1,0 +1,3 @@
+FEATURES_PROVIDED += driver_grove_ledbar
+
+include $(RIOTBOARD)/pba-d-01-kw2x/Makefile.features

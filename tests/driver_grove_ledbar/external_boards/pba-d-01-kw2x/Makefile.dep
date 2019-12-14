@@ -1,0 +1,4 @@
+# This must be a different name than 'board' as it is implemented by 'pba-d-01-kw2x'
+USEMODULE += board_external_pba-d-01-kw2x
+
+include $(RIOTBOARD)/pba-d-01-kw2x/Makefile.dep

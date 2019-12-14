@@ -18,4 +18,7 @@ CFLAGS += -DGROVE_LEDBAR_CLK=$(TEST_GROVE_LEDBAR_CLK)
 CFLAGS += -DGROVE_LEDBAR_DAT=$(TEST_GROVE_LEDBAR_DAT)
 CFLAGS += -DGROVE_LEDBAR_DIR=$(TEST_GROVE_LEDBAR_DIR)
 
+# Set without '?=' to also verify the docker integration when set with =
+BOARDSDIR = $(CURDIR)/external_boards
+
 include $(RIOTBASE)/Makefile.include

@@ -1,0 +1,7 @@
+CFLAGS += -DTHIS_BOARD_IS='"external_pba-d-01-kw2x"'
+
+# We must duplicate the include done by $(RIOTBASE)/Makefile.include
+# to also include the main board header
+INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/pba-d-01-kw2x/include))
+
+include $(RIOTBOARD)/pba-d-01-kw2x/Makefile.include
