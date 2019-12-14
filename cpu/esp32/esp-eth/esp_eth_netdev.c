@@ -67,7 +67,7 @@
  * not provide an argument that could be used as pointer to the ESP-ETH
  * device which triggers the interrupt.
  */
-static esp_eth_netdev_t _esp_eth_dev;
+esp_eth_netdev_t _esp_eth_dev;
 
 /* device thread stack */
 static char _esp_eth_stack[ESP_ETH_STACKSIZE];
