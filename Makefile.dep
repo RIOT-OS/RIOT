@@ -1019,6 +1019,10 @@ FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
 # FEATURES_USED is defined in Makefile.features
 USEMODULE += $(filter periph_%,$(FEATURES_USED))
 
+# all driver_% features correspond to a module
+# FEATURES_USED is defined in Makefile.features
+USEMODULE += $(patsubst driver_%,%,$(filter driver_%,$(FEATURES_USED)))
+
 # select cpu_check_address pseudomodule if the corresponding feature is used
 USEMODULE += $(filter cpu_check_address, $(FEATURES_USED))
 
