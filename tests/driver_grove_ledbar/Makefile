@@ -1,3 +1,6 @@
+# Default configuration for this driver is for pba-d-01-kw2x
+BOARD ?= pba-d-01-kw2x
+
 include ../Makefile.tests_common
 
 USEMODULE += grove_ledbar
@@ -7,6 +10,8 @@ USEMODULE += grove_ledbar
 TEST_GROVE_LEDBAR_CLK ?= 	GPIO_PIN\(0,1\)
 TEST_GROVE_LEDBAR_DAT ?= 	GPIO_PIN\(0,2\)
 TEST_GROVE_LEDBAR_DIR ?=	GROVE_LEDBAR_G2R
+
+FEATURES_REQUIRED_DRIVERS += driver_grove_ledbar
 
 # export parameters
 CFLAGS += -DGROVE_LEDBAR_CLK=$(TEST_GROVE_LEDBAR_CLK)
