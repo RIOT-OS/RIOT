@@ -183,9 +183,6 @@ static void *_event_loop(void *arg)
     }
 
 #ifdef MODULE_SOCK_DTLS
-    sock_dtls_session_t rcv_session;
-    (void)rcv_session;
-
     res = sock_dtls_create(&_tl_sock, &_udp_sock, credential_tag,
                            SOCK_DTLS_1_2, SOCK_DTLS_SERVER);
     if (res < 0) {
