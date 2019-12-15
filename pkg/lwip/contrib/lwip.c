@@ -160,11 +160,19 @@ void lwip_bootstrap(void)
     }
 #elif defined(MODULE_ESP_ETH)
     esp_eth_setup(&_esp_eth_dev);
-    if (netif_add(&netif[0], &_esp_eth_dev, lwip_netdev_init,
-                  tcpip_input) == NULL) {
-        DEBUG("Could not add esp_wifi device\n");
+#ifdef MODULE_LWIP_IPV4
+    if (netif_add(&netif[0], IP4_ADDR_ANY, IP4_ADDR_ANY, IP4_ADDR_ANY,
+                  &_esp_eth_dev, lwip_netdev_init, tcpip_input) == NULL) {
+        DEBUG("Could not add esp_eth device\n");
         return;
     }
+#else /* MODULE_LWIP_IPV4 */
+    if (netif_add(&netif[0], &_esp_eth_dev, lwip_netdev_init,
+                  tcpip_input) == NULL) {
+        DEBUG("Could not add esp_eth device\n");
+        return;
+    }
+#endif /* MODULE_LWIP_IPV4 */
 #elif defined(MODULE_ESP_WIFI)
     esp_wifi_setup(&_esp_wifi_dev);
     if (netif_add(&netif[0], &_esp_wifi_dev, lwip_netdev_init,
