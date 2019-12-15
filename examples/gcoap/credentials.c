@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Inria
+ *               2019 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,12 +12,10 @@
  * @{
  *
  * @file
- * @brief       tlsman test application (PSK and ECC keys)
- *
- * Small test for TLSMAN. Many definitions defined here are also available at
- * sock_secure (and are intended to be used in standard applications)
+ * @brief       gcoap DTLS test credentials (PSK and ECC keys)
  *
  * @author      Raul Fuentes <raul.fuentes-samaniego@inria.fr>
+ * @author      Aiman Ismail <muhammadaimanbin.ismail@haw-hamburg.de>
  *
  * @}
  */

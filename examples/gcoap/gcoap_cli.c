@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015-2017 Ken Bannister. All rights reserved.
+ *               2019 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  *
  * @author      Ken Bannister <kb2ma@runbox.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Aiman Ismail <muhammadaimanbin.ismail@haw-hamburg.de>
  *
  * @}
  */
