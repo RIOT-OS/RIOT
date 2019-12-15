@@ -40,6 +40,7 @@ export PKGDIRBASE            # The base folder for building packages
 export PYTHONPATH            # Python default search path for module filesi, with RIOT specific packages
 
 export FEATURES_REQUIRED     # List of required features by the application
+# FEATURES_REQUIRED_DRIVERS  # List of required driver features by the application, prefixed with driver_%. Used for dependency resolution if INCLUDE_FEATURES_REQUIRED_DRIVERS is set.
 export FEATURES_PROVIDED     # List of provided features by the board
 export FEATURES_OPTIONAL     # List of nice to have features
 # TOOLCHAINS_SUPPORTED       # List of supported toolchains by an MCU (gnu/llvm/...).

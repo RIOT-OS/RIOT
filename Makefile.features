@@ -22,6 +22,10 @@ include $(RIOTCPU)/$(CPU)/Makefile.features
 # Resolve FEATURES_ variables
 # Their value will only be complete after resolving dependencies
 
+ifneq (,$(INCLUDE_FEATURES_REQUIRED_DRIVERS))
+  FEATURES_REQUIRED += $(FEATURES_REQUIRED_DRIVERS)
+endif
+
 # Features that are required by the application but not provided by the BSP and
 # features that are used but blacklisted (prepended with "!").
 # Having features missing may case the build to fail.
