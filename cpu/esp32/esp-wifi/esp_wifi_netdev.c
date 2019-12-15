@@ -348,7 +348,7 @@ static int _esp_wifi_init(netdev_t *netdev)
 }
 
 /* transmit buffer should bot be on stack */
-static uint8_t _tx_buf[ETHERNET_MAX_LEN];
+static uint8_t tx_buf[ETHERNET_MAX_LEN];
 
 static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
 {
@@ -370,7 +370,7 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
             return -EOVERFLOW;
         }
         if (iol->iol_len) {
-            memcpy (_tx_buf + tx_len, iol->iol_base, iol->iol_len);
+            memcpy (tx_buf + tx_len, iol->iol_base, iol->iol_len);
             tx_len += iol->iol_len;
         }
     }
