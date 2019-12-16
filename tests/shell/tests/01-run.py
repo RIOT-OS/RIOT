@@ -40,6 +40,7 @@ CONTROL_C = DLE+'\x03'
 CONTROL_D = DLE+'\x04'
 
 CMDS = (
+    (CONTROL_C, ('>')),
     ('start_test', ('[TEST_START]')),
     ('end_test', ('[TEST_END]')),
     ('\n', ('>')),
