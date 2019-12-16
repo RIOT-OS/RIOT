@@ -69,9 +69,6 @@
  */
 esp_eth_netdev_t _esp_eth_dev;
 
-/* device thread stack */
-static char _esp_eth_stack[ESP_ETH_STACKSIZE];
-
 static void _eth_gpio_config_rmii(void)
 {
     DEBUG("%s\n", __func__);
@@ -405,16 +402,6 @@ void esp_eth_setup(esp_eth_netdev_t* dev)
     _esp_eth_dev.link_up = false;
     _esp_eth_dev.rx_len = 0;
     _esp_eth_dev.tx_len = 0;
-}
-
-void auto_init_esp_eth(void)
-{
-    esp_eth_setup(&_esp_eth_dev);
-    _esp_eth_dev.netif = gnrc_netif_ethernet_create(_esp_eth_stack,
-                                                    ESP_ETH_STACKSIZE,
-                                                    ESP_ETH_PRIO,
-                                                    "esp_eth",
-                                                    (netdev_t *)&_esp_eth_dev);
 }
 
 #endif /* MODULE_ESP_ETH */
