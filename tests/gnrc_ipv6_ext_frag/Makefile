@@ -6,7 +6,6 @@ export TAP ?= tap0
 
 CFLAGS += -DOUTPUT=TEXT
 CFLAGS += -DTEST_SUITES="gnrc_ipv6_ext_frag"
-CFLAGS += -DCONFIG_GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE=3
 
 ifeq (native,$(BOARD))
   TERMFLAGS ?= $(TAP)
@@ -48,3 +47,8 @@ ethos:
 	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)/ethos
 
 include $(RIOTBASE)/Makefile.include
+
+# Set the pool size for limit objects if not being set by Kconfig
+ifndef CONFIG_GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE
+  CFLAGS += -DCONFIG_GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE=3
+endif
