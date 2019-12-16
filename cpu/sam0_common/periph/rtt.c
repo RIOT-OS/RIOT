@@ -65,7 +65,7 @@ static inline void _rtt_reset(void)
 static void _rtt_clock_setup(void)
 {
     /* Setup clock GCLK2 with OSC32K */
-    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(2) | GCLK_CLKCTRL_ID_RTC;
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(SAM0_GCLK_32KHZ) | GCLK_CLKCTRL_ID_RTC;
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 }
 #else

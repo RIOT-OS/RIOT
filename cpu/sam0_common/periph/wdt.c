@@ -83,9 +83,9 @@ static uint32_t ms_to_per(uint32_t ms)
 #ifdef CPU_SAMD21
 static void _wdt_clock_setup(void)
 {
-    /* Connect to GCLK4 (~1.024 kHz) */
+    /* Connect to GCLK3 (~1.024 kHz) */
     GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID_WDT
-                      | GCLK_CLKCTRL_GEN_GCLK4
+                      | GCLK_CLKCTRL_GEN(SAM0_GCLK_1KHZ)
                       | GCLK_CLKCTRL_CLKEN;
 }
 #else

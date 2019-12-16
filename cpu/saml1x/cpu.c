@@ -80,9 +80,9 @@ void sam0_gclk_enable(uint8_t id)
 uint32_t sam0_gclk_freq(uint8_t id)
 {
     switch (id) {
-    case 0:
+    case SAM0_GCLK_MAIN:
         return CLOCK_CORECLOCK;
-    case 1:
+    case SAM0_GCLK_32KHZ:
         return 32768;
     default:
         return 0;
@@ -132,11 +132,11 @@ void cpu_init(void)
     _xosc32k_setup();
 
     /* Setup GCLK generators */
-    _gclk_setup(0, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
+    _gclk_setup(SAM0_GCLK_MAIN, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
 #if EXTERNAL_OSC32_SOURCE
-    _gclk_setup(1, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_XOSC32K);
+    _gclk_setup(SAM0_GCLK_32KHZ, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_XOSC32K);
 #else
-    _gclk_setup(1, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K);
+    _gclk_setup(SAM0_GCLK_32KHZ, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K);
 #endif
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
