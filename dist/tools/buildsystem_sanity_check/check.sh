@@ -196,6 +196,7 @@ checks_tests_application_not_defined_in_makefile() {
     patterns+=(-e '^[[:space:]]*APPLICATION[[:space:]:+]=')
 
     pathspec+=('tests/**/Makefile')
+    pathspec+=(':!tests/external_board_native/Makefile')
 
     git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message "Don't define APPLICATION in test Makefile"
