@@ -19,6 +19,10 @@
 #ifndef ESP_WIFI_NETDEV_H
 #define ESP_WIFI_NETDEV_H
 
+#include <stdbool.h>
+
+#include "mutex.h"
+#include "net/ethernet.h"
 #include "net/netdev.h"
 #include "ringbuffer.h"
 
@@ -56,8 +60,6 @@ typedef struct
     uint8_t event_disc;                /**< number of pending disc events */
 
     bool connected;                    /**< indicates whether connected to AP */
-
-    gnrc_netif_t* netif;               /**< reference to the corresponding netif */
 
     mutex_t dev_lock;                  /**< device is already in use */
 
