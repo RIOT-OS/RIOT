@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_esp8266
+ * @ingroup     cpu_esp_common
  * @{
  *
  * @file
@@ -42,14 +42,16 @@ volatile uint32_t irq_interrupt_nesting = 0;
  */
 unsigned int IRAM irq_disable(void)
 {
-    uint32_t _saved_interrupt_level;
+    uint32_t state;
 
     /* read and set interrupt level (RSIL) */
-    __asm__ volatile ("rsil %0, " XTSTR(XCHAL_EXCM_LEVEL) : "=a" (_saved_interrupt_level));
-    DEBUG ("%s %02x(%02x)\n", __func__,
-           (_saved_interrupt_level & 0xfffffff0) | (XCHAL_EXCM_LEVEL),
-           _saved_interrupt_level);
-    return _saved_interrupt_level;
+    __asm__ volatile ("rsil %0, " XTSTR(XCHAL_EXCM_LEVEL) : "=a" (state) :: "memory");
+    /* mask out everything else of the PS register that do not belong to
+       interrupt level (bits 3..0) */
+    state &= 0xf;
+
+    DEBUG("%s %02x(%02x)\n", __func__, XCHAL_EXCM_LEVEL, state);
+    return state;
 }
 
 /**
@@ -57,13 +59,16 @@ unsigned int IRAM irq_disable(void)
  */
 unsigned int IRAM irq_enable(void)
 {
-    uint32_t _saved_interrupt_level;
+    uint32_t state;
 
     /* read and set interrupt level (RSIL) */
-    __asm__ volatile ("rsil %0, 0" : "=a" (_saved_interrupt_level));
-    DEBUG ("%s %02x (%02x)\n", __func__,
-           _saved_interrupt_level & 0xfffffff0, _saved_interrupt_level);
-    return _saved_interrupt_level;
+    __asm__ volatile ("rsil %0, 0" : "=a" (state) :: "memory");
+    /* mask out everything else of the PS register that do not belong to
+       interrupt level (bits 3..0) */
+    state &= 0xf;
+
+    DEBUG("%s %02x(%02x)\n", __func__, 0, state);
+    return state;
 }
 
 /**
@@ -71,9 +76,19 @@ unsigned int IRAM irq_enable(void)
  */
 void IRAM irq_restore(unsigned int state)
 {
+    uint32_t old = 0;
+
     /* write interrupt level and sync */
-    DEBUG ("%s %02x\n", __func__, state);
-    __asm__ volatile ("wsr %0, ps; rsync" :: "a" (state));
+    __asm__ volatile ("extui  %1, %1, 0, 4  \n" /* mask intlevel bits in param */
+                      "rsr.ps %0            \n" /* read current PS value */
+                      "movi.n a4, -16       \n"
+                      "and    a4, a4, %0    \n" /* mask out intlevel bits in PS */
+                      "or     a4, a4, %1    \n" /* or intlevel with PS */
+                      "wsr.ps a4            \n" /* write back PS */
+                      "rsync                \n"
+                     : "+a" (old) : "a" (state) : "memory");
+
+    DEBUG("%s %02x(%02x)\n", __func__, state, old & 0xf);
 }
 
 /**
