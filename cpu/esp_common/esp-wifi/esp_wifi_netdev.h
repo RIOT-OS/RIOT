@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_esp8266_esp_wifi
+ * @ingroup     cpu_esp_common_esp_wifi
  * @{
  *
  * @file
- * @brief       Network device driver for the ESP32 WiFi interface
+ * @brief       Network device driver for the ESP SoCs WiFi interface
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */

@@ -7,20 +7,22 @@
  */
 
 /**
- * @ingroup     cpu_esp8266_esp_wifi
+ * @ingroup     cpu_esp_common_esp_wifi
  * @{
  *
  * @file
- * @brief       GNRC network interface part for ESP8266 WiFi interface
+ * @brief       GNRC network interface part for ESP WiFi interface
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
 #if defined(MODULE_ESP_WIFI) && defined(MODULE_GNRC_NETIF_ETHERNET)
 
+#include "net/ethernet.h"
+#include "net/gnrc/netif/ethernet.h"
+
 #include "esp_wifi_params.h"
 #include "esp_wifi_netdev.h"
-#include "net/gnrc/netif/ethernet.h"
 
 /** the only ESP WiFi device */
 extern esp_wifi_netdev_t _esp_wifi_dev;

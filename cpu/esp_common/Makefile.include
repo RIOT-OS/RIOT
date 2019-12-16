@@ -97,7 +97,12 @@ ifneq (,$(filter esp_wifi esp_now esp_eth,$(USEMODULE)))
   CFLAGS += -DSCHED_PRIO_LEVELS=32
 endif
 
-# lwIP thread priority has to be lower than that of ESP hardware driver threads
+ifneq (,$(filter esp_wifi esp_now esp_eth,$(USEMODULE)))
+  INCLUDES += -I$(RIOTCPU)/esp_common/esp-wifi
+endif
+
+# The threads for handling the ESP hardware have the priorities from 2 to 4.
+# The priority of lwIP TCPIP thread should be lower than these priorities.
 ifneq (,$(filter lwip,$(USEMODULE)))
   CFLAGS += -DTCPIP_THREAD_PRIO=5
 endif

@@ -7,14 +7,16 @@
  */
 
 /**
- * @defgroup    cpu_esp8266_esp_wifi ESP8266 WiFi netdev interface
+ * @defgroup    cpu_esp_common_esp_wifi ESP-WiFi netdev interface
+ * @ingroup     cpu_esp_common
+ * @ingroup     cpu_esp32
  * @ingroup     cpu_esp8266
- * @brief       Network device driver for the ESP8266 WiFi interface
+ * @brief       Network device driver for the ESP SoC WiFi interface
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
 
-This module realizes a `netdev` interface for the built-in WiFi interface
-of ESP8266. To enable the WiFi interface, module `esp_wifi` has to be used.
+This module realizes a `netdev` interface for the built-in WiFi interface of
+ESP SoCs. To enable the WiFi interface, module `esp_wifi` has to be used.
 Furthermore, the following configuration parameters have to be defined:
 
 Configuration Parameter | Description
@@ -34,7 +36,7 @@ make -C examples/gnrc_networking BOARD=...
 ```
 
 @note The Wifi network interface (module `esp_wifi`) and the
-\ref esp8266_esp_now_network_interface "ESP-NOW network interface" (module `esp_now`)
+ESP-NOW network interface (module `esp_now`)
 can be used simultaneously, for example, to realize a border router for
 a mesh network which uses ESP-NOW.
  */

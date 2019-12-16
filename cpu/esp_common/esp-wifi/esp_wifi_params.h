@@ -7,12 +7,12 @@
  */
 
 /**
- * @ingroup     cpu_esp8266_esp_wifi
- * @ingroup     cpu_esp8266_conf
+ * @ingroup     cpu_esp_common_esp_wifi
+ * @ingroup     cpu_esp_common_conf
  * @{
  *
  * @file
- * @brief       Parameters for the ESP32 WiFi netdev interface
+ * @brief       Parameters for the ESP SoCs WiFi netdev interface
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
