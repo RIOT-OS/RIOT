@@ -409,6 +409,9 @@ extern "C" {
 
 /**
  * @brief   Size of the buffer used to build a CoAP request or response
+ *
+ * gcoap with DTLS will need bigger payload size for the handshake especially
+ * when using ECC credentials.
  */
 #ifndef GCOAP_PDU_BUF_SIZE
 #ifdef MODULE_SOCK_DTLS
