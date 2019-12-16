@@ -141,15 +141,8 @@ extern "C" {
 #define MEMP_MEM_MALLOC         (1)
 #define NETIF_MAX_HWADDR_LEN    (GNRC_NETIF_HDR_L2ADDR_MAX_LEN)
 
+#ifndef TCPIP_THREAD_STACKSIZE
 #define TCPIP_THREAD_STACKSIZE  (THREAD_STACKSIZE_DEFAULT)
-
-#if defined(CPU_ESP32) && !defined(DOXYGEN)
-/**
- * In ESP32, the thread that is dealing with hardware interrupts of the WiFi
- * interface has a priority of 1. This thread should have a higher priority
- * than lwIP's TCP/IP thread.
- */
-#define TCPIP_THREAD_PRIO       (2)
 #endif
 
 #define MEM_ALIGNMENT           (4)

@@ -129,6 +129,12 @@ ifneq (,$(filter esp_wifi_any esp_eth,$(USEMODULE)))
   CFLAGS += -DSCHED_PRIO_LEVELS=32
 endif
 
+ifneq (,$(filter lwip,$(USEMODULE)))
+  # The thread for handling the WiFi hardware has the priority. The priority
+  # of the lwIP TCP/IP thread should be lower than this priority.
+  CFLAGS += -DTCPIP_THREAD_PRIO=2
+endif
+
 CFLAGS  += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM
 CFLAGS  += -DLOG_TAG_IN_BRACKETS
 CFLAGS  += -Wno-unused-parameter -Wformat=0
