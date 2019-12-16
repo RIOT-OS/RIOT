@@ -293,13 +293,6 @@ static NORETURN void IRAM system_init (void)
     /* Disable the hold flag of all RTC GPIO pins */
     RTCCNTL.hold_force.val = 0;
 
-    /*
-     * initialization of newlib, includes the ctors initialization and
-     * and the execution of stdio_init in _init of newlib_syscalls_default
-     */
-    extern void __libc_init_array(void);
-    __libc_init_array();
-
     /* set log levels for SDK library outputs */
     extern void esp_log_level_set(const char* tag, esp_log_level_t level);
     esp_log_level_set("wifi", LOG_DEBUG);
