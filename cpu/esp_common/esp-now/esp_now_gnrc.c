@@ -214,7 +214,7 @@ void auto_init_esp_now(void)
     } else {
         gnrc_netif_esp_now_create(_esp_now_stack, sizeof(_esp_now_stack),
                                   ESP_NOW_PRIO,
-                                  "esp-now",
+                                  "netif-esp-now",
                                   &esp_now_dev->netdev);
     }
 }
