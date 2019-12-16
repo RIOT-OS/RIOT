@@ -121,25 +121,13 @@ extern int ets_printf(const char *fmt, ...);
 #define ESP_EARLY_LOGE(tag, format, ...) LOG_TAG_EARLY(LOG_ERROR  , E, tag, format "\n", ##__VA_ARGS__)
 #define ESP_EARLY_LOGW(tag, format, ...) LOG_TAG_EARLY(LOG_WARNING, W, tag, format "\n", ##__VA_ARGS__)
 #define ESP_EARLY_LOGI(tag, format, ...) LOG_TAG_EARLY(LOG_INFO   , I, tag, format "\n", ##__VA_ARGS__)
+#define ESP_EARLY_LOGD(tag, format, ...) LOG_TAG_EARLY(LOG_DEBUG, D, tag, format "\n", ##__VA_ARGS__)
+#define ESP_EARLY_LOGV(tag, format, ...) LOG_TAG_EARLY(LOG_ALL  , V, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGE(tag, format, ...) LOG_TAG(LOG_ERROR  , E, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGW(tag, format, ...) LOG_TAG(LOG_WARNING, W, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGI(tag, format, ...) LOG_TAG(LOG_INFO   , I, tag, format "\n", ##__VA_ARGS__)
-
-#if ENABLE_DEBUG
-
-#define ESP_EARLY_LOGD(tag, format, ...) LOG_TAG_EARLY(LOG_DEBUG, D, tag, format "\n", ##__VA_ARGS__)
-#define ESP_EARLY_LOGV(tag, format, ...) LOG_TAG_EARLY(LOG_ALL  , V, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGD(tag, format, ...) LOG_TAG(LOG_DEBUG, D, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGV(tag, format, ...) LOG_TAG(LOG_ALL  , V, tag, format "\n", ##__VA_ARGS__)
-
-#else /* ENABLE_DEBUG */
-
-#define ESP_EARLY_LOGD( tag, format, ... ) (void)tag
-#define ESP_EARLY_LOGV( tag, format, ... ) (void)tag
-#define ESP_LOGD( tag, format, ... ) (void)tag
-#define ESP_LOGV( tag, format, ... ) (void)tag
-
-#endif /* ENABLE_DEBUG */
 
 #ifdef __cplusplus
 }
