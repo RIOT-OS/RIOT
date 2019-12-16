@@ -509,6 +509,10 @@ typedef struct {
     gpio_t rxd;             /**< GPIO used as RxD pin */
 } uart_conf_t;
 
+/**
+ * @brief   Maximum number of UART interfaces
+ */
+#define UART_NUMOF_MAX  (3)
 /** @} */
 
 #ifdef __cplusplus
