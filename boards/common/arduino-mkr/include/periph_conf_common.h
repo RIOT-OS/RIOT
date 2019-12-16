@@ -90,10 +90,10 @@ static const tc32_conf_t timer_config[] = {
         .pm_mask        = PM_APBCMASK_TC3,
         .gclk_ctrl      = GCLK_CLKCTRL_ID_TCC2_TC3,
 #if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
-        .gclk_src       = GCLK_CLKCTRL_GEN(1),
+        .gclk_src       = 1,
         .prescaler      = TC_CTRLA_PRESCALER_DIV1,
 #else
-        .gclk_src       = GCLK_CLKCTRL_GEN(0),
+        .gclk_src       = 0,
         .prescaler      = TC_CTRLA_PRESCALER_DIV8,
 #endif
         .flags          = TC_CTRLA_MODE_COUNT16,
@@ -104,10 +104,10 @@ static const tc32_conf_t timer_config[] = {
         .pm_mask        = PM_APBCMASK_TC4 | PM_APBCMASK_TC5,
         .gclk_ctrl      = GCLK_CLKCTRL_ID_TC4_TC5,
 #if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
-        .gclk_src       = GCLK_CLKCTRL_GEN(1),
+        .gclk_src       = 1,
         .prescaler      = TC_CTRLA_PRESCALER_DIV1,
 #else
-        .gclk_src       = GCLK_CLKCTRL_GEN(0),
+        .gclk_src       = 0,
         .prescaler      = TC_CTRLA_PRESCALER_DIV8,
 #endif
         .flags          = TC_CTRLA_MODE_COUNT32,
@@ -184,7 +184,7 @@ static const i2c_conf_t i2c_config[] = {
         .scl_pin  = GPIO_PIN(PA, 9),
         .sda_pin  = GPIO_PIN(PA, 8),
         .mux      = GPIO_MUX_C,
-        .gclk_src = GCLK_CLKCTRL_GEN_GCLK0,
+        .gclk_src = 0,
         .flags    = I2C_FLAG_NONE
      }
 };

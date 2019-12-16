@@ -92,7 +92,7 @@ void i2c_init(i2c_t dev)
     sercom_clk_en(bus(dev));
 
     /* I2C using CLK GEN 0 */
-    sercom_set_gen(bus(dev),i2c_config[dev].gclk_src);
+    sercom_set_gen(bus(dev), i2c_config[dev].gclk_src);
 
     /* Check if module is enabled. */
     if (bus(dev)->CTRLA.reg & SERCOM_I2CM_CTRLA_ENABLE) {
