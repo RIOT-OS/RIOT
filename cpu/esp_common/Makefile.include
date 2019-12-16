@@ -39,6 +39,7 @@ PSEUDOMODULES += esp_wifi_any
 # Modules used by ESP*
 
 USEMODULE += esp_common
+USEMODULE += esp_common_periph
 USEMODULE += esp_freertos
 USEMODULE += esp_idf
 USEMODULE += log
