@@ -143,7 +143,10 @@ static void _filter_and_connect(struct ble_gap_disc_desc *disc)
     int res;
     bluetil_ad_t ad;
 
-    bluetil_ad_init(&ad, disc->data,
+
+    /* we use the bluetil module read-only here, so its save to cast the AD
+     * buffer to non-const */
+    bluetil_ad_init(&ad, (uint8_t *)disc->data,
                     (size_t)disc->length_data, (size_t)disc->length_data);
     res = bluetil_ad_find_and_cmp(&ad, BLE_GAP_AD_NAME,
                                   APP_NODENAME, (sizeof(APP_NODENAME) - 1));
