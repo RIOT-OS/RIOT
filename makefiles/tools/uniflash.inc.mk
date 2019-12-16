@@ -1,9 +1,9 @@
 # http://www.ti.com/tool/uniflash
 FLASHFILE ?= $(ELFFILE)
 
-UNIFLASH_CONFIG_CCXML ?= $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml
-UNIFLASH_CONFIG_DAT ?= $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).dat
-UNIFLASH_CONFIG_GDB ?= $(RIOTBOARD)/$(BOARD)/dist/$(CPU_MODEL)_gdb.conf
+UNIFLASH_CONFIG_CCXML ?= $(BOARDSDIR)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml
+UNIFLASH_CONFIG_DAT ?= $(BOARDSDIR)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).dat
+UNIFLASH_CONFIG_GDB ?= $(BOARDSDIR)/$(BOARD)/dist/$(CPU_MODEL)_gdb.conf
 
 export UNIFLASH_PATH ?= "UNIFLASH_PATH unconfigured"
 # check which uniflash version is available, either 4.x or 3.x

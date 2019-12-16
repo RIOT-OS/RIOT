@@ -24,7 +24,9 @@ include $(RIOT_MAKEFILES_GLOBAL_PRE)
 # set undefined variables
 RIOTBASE       ?= $(_riotbase)
 RIOTCPU        ?= $(RIOTBASE)/cpu
+# Deprecated to set RIOTBOARD, use BOARDSDIR
 RIOTBOARD      ?= $(RIOTBASE)/boards
+BOARDSDIR      ?= $(RIOTBOARD)
 RIOTMAKE       ?= $(RIOTBASE)/makefiles
 RIOTPKG        ?= $(RIOTBASE)/pkg
 RIOTTOOLS      ?= $(RIOTBASE)/dist/tools
@@ -45,7 +47,6 @@ DLCACHE_DIR    ?= $(RIOTBASE)/.dlcache
 __DIRECTORY_VARIABLES := \
   RIOTBASE \
   RIOTCPU \
-  RIOTBOARD \
   RIOTMAKE \
   RIOTPKG \
   RIOTTOOLS \
@@ -59,10 +60,22 @@ __DIRECTORY_VARIABLES := \
   DLCACHE_DIR \
   #
 
+# In GNU make command line is supposed to override the value set in makefile
+# These variables can be overridden even when set from command line
+__OVERRIDE_DIRECTORY_VARIABLES := $(__DIRECTORY_VARIABLES)
+# Use absolute paths in recursive "make" even if overridden on command line.
+MAKEOVERRIDES += $(foreach v,$(__OVERRIDE_DIRECTORY_VARIABLES),$(v)=$($(v)))
+
+# Deprecation of configuring 'RIOTBOARD'
+ifneq ($(abspath $(RIOTBASE)/boards),$(abspath $(RIOTBOARD)))
+  $(warning overriding RIOTBOARD for external boards is deprecated, please use an absolute BOARDSDIR)
+  override RIOTBOARD      := $(abspath $(RIOTBOARD))
+  __DIRECTORY_VARIABLES += RIOTBOARD
+endif
+
 # Make all paths absolute.
 override RIOTBASE       := $(abspath $(RIOTBASE))
 override RIOTCPU        := $(abspath $(RIOTCPU))
-override RIOTBOARD      := $(abspath $(RIOTBOARD))
 override RIOTMAKE       := $(abspath $(RIOTMAKE))
 override RIOTPKG        := $(abspath $(RIOTPKG))
 override RIOTTOOLS      := $(abspath $(RIOTTOOLS))
@@ -75,15 +88,19 @@ override BINDIR         := $(abspath $(BINDIR))
 override PKGDIRBASE     := $(abspath $(PKGDIRBASE))
 override DLCACHE_DIR    := $(abspath $(DLCACHE_DIR))
 
+# Keep standard make behavior for new variables
+__DIRECTORY_VARIABLES += \
+  BOARDSDIR \
+  #
+
+BOARDSDIR               := $(abspath $(BOARDSDIR))
+
 # Ensure that all directories are set and don't contain spaces.
 ifneq (, $(filter-out 1, $(foreach v,$(__DIRECTORY_VARIABLES),$(words $($(v))))))
   $(info Aborting compilation for your safety.)
   $(info Related variables = $(__DIRECTORY_VARIABLES))
   $(error Make sure no path override is empty or contains spaces!)
 endif
-
-# Use absolute paths in recusive "make" even if overriden on command line.
-MAKEOVERRIDES += $(foreach v,$(__DIRECTORY_VARIABLES),$(v)=$($(v)))
 
 # Path to the current directory relative to RIOTPROJECT
 # trailing '/' is important when RIOTPROJECT == CURDIR
@@ -248,7 +265,7 @@ LAZYSPONGE_FLAGS ?= $(if $(filter 1,$(QUIET)),,--verbose)
 ifeq (, $(APPLICATION))
     $(error An application name must be specified as APPLICATION.)
 endif
-ifneq (0,$(shell test -d $(RIOTBOARD)/$(BOARD); echo $$?))
+ifneq (0,$(shell test -d $(BOARDSDIR)/$(BOARD); echo $$?))
     $(error The specified board $(BOARD) does not exist.)
 endif
 
@@ -306,8 +323,8 @@ include $(RIOTMAKE)/pseudomodules.inc.mk
 include $(RIOTMAKE)/defaultmodules.inc.mk
 
 # Include Board and CPU configuration
-INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/$(BOARD)/include))
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
+INCLUDES += $(addprefix -I,$(wildcard $(BOARDSDIR)/$(BOARD)/include))
+include $(BOARDSDIR)/$(BOARD)/Makefile.include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
