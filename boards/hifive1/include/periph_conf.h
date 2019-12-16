@@ -110,6 +110,23 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
+ * @name    SPI device configuration
+ *
+ * @{
+ */
+static const spi_conf_t spi_config[] = {
+    {
+        .addr       = SPI1_CTRL_ADDR,
+        .mosi       = GPIO_PIN(0, 3), /* D11 */
+        .miso       = GPIO_PIN(0, 4), /* D12 */
+        .sclk       = GPIO_PIN(0, 5), /* D13 */
+    },
+};
+
+#define SPI_NUMOF                  ARRAY_SIZE(spi_config)
+/** @} */
+
+/**
  * @name    RTT/RTC configuration
  *
  * @{
