@@ -137,7 +137,7 @@ void i2c_init(i2c_t dev)
             return;
     }
     /* Get the baudrate */
-    tmp_baud = (int32_t)(((CLOCK_CORECLOCK +
+    tmp_baud = (int32_t)(((sam0_gclk_freq(i2c_config[dev].gclk_src) +
                (2 * (i2c_config[dev].speed)) - 1) /
                (2 * (i2c_config[dev].speed))) -
                (i2c_config[dev].speed == I2C_SPEED_HIGH ? 1 : 5));

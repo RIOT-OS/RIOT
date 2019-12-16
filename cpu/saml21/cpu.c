@@ -64,6 +64,24 @@ static void _xosc32k_setup(void)
 #endif
 }
 
+void sam0_gclk_enable(uint8_t id)
+{
+    (void) id;
+    /* clocks are always running */
+}
+
+uint32_t sam0_gclk_freq(uint8_t id)
+{
+    switch (id) {
+    case 0:
+        return CLOCK_CORECLOCK;
+    case 1:
+        return 32768;
+    default:
+        return 0;
+    }
+}
+
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks
  */
@@ -109,6 +127,11 @@ void cpu_init(void)
 
     /* Setup GCLK generators */
     _gclk_setup(0, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
+#if EXTERNAL_OSC32_SOURCE
+    _gclk_setup(1, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_XOSC32K);
+#else
+    _gclk_setup(1, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K);
+#endif
 
 #ifdef MODULE_PERIPH_PM
     PM->CTRLA.reg = PM_CTRLA_MASK & (~PM_CTRLA_IORET);

@@ -49,6 +49,30 @@
 #define WAITSTATES          ((CLOCK_CORECLOCK - 1) / 14000000)
 #endif
 
+void sam0_gclk_enable(uint8_t id)
+{
+    (void) id;
+    /* clocks are always running */
+}
+
+uint32_t sam0_gclk_freq(uint8_t id)
+{
+    switch (id) {
+    case 0:
+        return CLOCK_CORECLOCK;
+    case 1:
+        return 1000000;
+    case 2:
+        return 32768;
+    case 3:
+        return 32768;
+    case 4:
+        return 1024;
+    default:
+        return 0;
+    }
+}
+
 /**
  * @brief   Configure clock sources and the cpu frequency
  */

@@ -353,6 +353,22 @@ typedef struct {
 void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
 
 /**
+ * @brief   Returns the frequency of a GCLK provider.
+ *
+ * @param[in] id    The ID of the GCLK
+ *
+ * @return          The frequency of the GCLK with the given ID.
+ */
+uint32_t sam0_gclk_freq(uint8_t id);
+
+/**
+ * @brief   Enables an on-demand GCLK that has been configured in cpu.c
+ *
+ * @param[in] id    The ID of the GCLK
+ */
+void sam0_gclk_enable(uint8_t id);
+
+/**
  * @brief   Return the numeric id of a SERCOM device derived from its address
  *
  * @param[in] sercom    SERCOM device
@@ -488,6 +504,7 @@ static inline uint8_t _sercom_gclk_id_core(uint8_t sercom_id) {
 static inline void sercom_set_gen(void *sercom, uint8_t gclk)
 {
     const uint8_t id = sercom_id(sercom);
+    sam0_gclk_enable(gclk);
 #if defined(CPU_FAM_SAMD21)
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(gclk) |
                          (SERCOM0_GCLK_ID_CORE + id));
@@ -535,6 +552,7 @@ typedef struct {
     gpio_t dp;              /**< D+ line gpio                           */
     gpio_mux_t d_mux;       /**< alternate function (mux) for data pins */
     UsbDevice *device;      /**< ptr to the device registers            */
+    uint8_t gclk_src;       /**< GCLK source which supplys 48 MHz       */
 } sam0_common_usb_config_t;
 #endif /* USB_INST_NUM */
 

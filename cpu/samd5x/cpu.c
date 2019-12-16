@@ -105,6 +105,41 @@ static void gclk_connect(uint8_t id, uint8_t src, uint32_t flags) {
     while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_GENCTRL(id)) {}
 }
 
+void sam0_gclk_enable(uint8_t id)
+{
+    /* clocks 0 & 1 are always running */
+
+    switch (id) {
+    case 5:
+        /* 8 MHz clock used by xtimer */
+#if USE_DPLL
+        gclk_connect(5, GCLK_SOURCE_DPLL0, GCLK_GENCTRL_DIV(DPLL_DIV * CLOCK_CORECLOCK / 8000000));
+#else
+        gclk_connect(5, GCLK_SOURCE_DFLL, GCLK_GENCTRL_DIV(SAM0_DFLL_FREQ_HZ / 8000000));
+#endif
+        break;
+    case 6:
+        gclk_connect(6, GCLK_SOURCE_DFLL, 0);
+        break;
+    }
+}
+
+uint32_t sam0_gclk_freq(uint8_t id)
+{
+    switch (id) {
+    case 0:
+        return CLOCK_CORECLOCK;
+    case 1:
+        return 32768;
+    case 5:
+        return 8000000;
+    case 6:
+        return SAM0_DFLL_FREQ_HZ;
+    default:
+        return 0;
+    }
+}
+
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks
  */
@@ -155,18 +190,8 @@ void cpu_init(void)
 
     /* source main clock from DPLL */
     gclk_connect(0, GCLK_SOURCE_DPLL0, GCLK_GENCTRL_DIV(DPLL_DIV));
-
-    /* clock used by xtimer */
-    gclk_connect(5, GCLK_SOURCE_DPLL0, GCLK_GENCTRL_DIV(DPLL_DIV * CLOCK_CORECLOCK / 8000000));
 #else
     gclk_connect(0, GCLK_SOURCE_DFLL, GCLK_GENCTRL_DIV(SAM0_DFLL_FREQ_HZ / CLOCK_CORECLOCK));
-
-    /* clock used by xtimer */
-    gclk_connect(5, GCLK_SOURCE_DFLL, GCLK_GENCTRL_DIV(SAM0_DFLL_FREQ_HZ / 8000000));
-#endif
-
-#ifdef MODULE_PERIPH_USBDEV
-    gclk_connect(6, GCLK_SOURCE_DFLL, 0);
 #endif
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
