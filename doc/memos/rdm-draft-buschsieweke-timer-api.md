@@ -158,8 +158,9 @@ future changes.
 - The implementation must only disable IRQs for short periods of time. More
   specifically: With *n* software timers used in parallel, the longest period of
   time with interrupts disabled be at most *O(n)*
-- The implementation must cause as little IRQs as possible and its ISRs must
-  be as short as possible
+- The implementation must aim for a minimized number of IRQs caused
+- The implementation must aim for keeping its ISRs short; with *n* software
+  timers used in parallel, the ISR should run for at most *O(n)*
 - The implementation should provide means to execute callbacks in thread
   context
 
