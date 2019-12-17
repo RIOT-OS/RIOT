@@ -2,3 +2,13 @@ DIRS += $(RIOTBASE)/pkg/wakaama/contrib
 
 INCLUDES += -I$(RIOTBASE)/pkg/wakaama/include
 INCLUDES += -I$(PKGDIRBASE)/wakaama
+
+# Translate 'CONFIG_' options to package specific flags. This checks if the
+# option is set via CFLAGS
+ifneq (,$(filter -DCONFIG_LWM2M_BOOTSTRAP=1,$(CFLAGS)))
+    CFLAGS += -DLWM2M_BOOTSTRAP=1
+endif
+
+ifdef (,$(filter -DCONFIG_LWM2M_WITH_LOGS=1,$(CFLAGS)))
+    CFLAGS += -DLWM2M_WITH_LOGS=1
+endif
