@@ -25,9 +25,9 @@ extern "C" {
 #endif
 
 /**
- * @brief   The on-board LED is connected to pin 2 on this board
+ * @brief   The on-board LED is connected to GPIO5 (Arduino pin 6) on this board
  */
-#define ARDUINO_LED         (GPIO5)
+#define ARDUINO_LED     (6)
 
 /**
  * @brief   Look-up table for the Arduino's digital pins
