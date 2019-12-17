@@ -178,7 +178,7 @@ future changes.
 
 - Efficient use of RAM/ROM
 - Optimized for power management
-    - The timer API should only cause the system to wake up when strictly needed
+    - The timer implementation should minimize system wake ups
 - Efficient use of CPU cycles
 
 # 3. Design Decisions
