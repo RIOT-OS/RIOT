@@ -168,7 +168,7 @@ future changes.
 - Timer callbacks should never fire prematurely (+- 1 tick of the underlying
   timer)
 - The accuracy of execution delay should be measured with single digit micro
-  seconds for short delays
+  seconds for short delays in absence of other load on the system
     - It is acceptable if platform specific tweaking is needed to achieve this
     - It is acceptable if minimum hardware requirements are needed to achieve
       this
