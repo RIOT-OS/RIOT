@@ -64,6 +64,10 @@ extern "C" {
 #ifndef ESP_NOW_STACKSIZE
 #define ESP_NOW_STACKSIZE             (2560)
 #endif
+
+#ifndef TCPIP_THREAD_STACKSIZE
+#define TCPIP_THREAD_STACKSIZE        (3072)
+#endif
 /** @} */
 
 /**

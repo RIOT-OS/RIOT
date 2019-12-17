@@ -74,6 +74,23 @@
 #define CONFIG_TCP_OVERSIZE_MSS 1
 #define LL_ALIGN(s)             (((uint32_t)s + 3) & 0xfffffffcU)
 
+/**
+ * The SDK interface of the WiFi module uses the lwIP `pbuf` structure for
+ * packets sent to and received from the WiFi interface. For compatibility
+ * reasons with the binary SDK libraries we need to incclude the SDK lwIP
+ * `pbuf` header here.
+ *
+ * To avoid compilation errors, we need to undefine all our pkg/lwIP settings
+ * that are also defined by SDK lwIP header files. These definitions do not
+ * affect the implementation of this module.
+ */
+#undef ETHARP_SUPPORT_STATIC_ENTRIES
+#undef LWIP_HAVE_LOOPIF
+#undef LWIP_NETIF_LOOPBACK
+#undef SO_REUSE
+#undef TCPIP_THREAD_PRIO
+#undef TCPIP_THREAD_STACKSIZE
+
 #include "lwip/pbuf.h"
 
 #endif /* MCU_ESP8266 */

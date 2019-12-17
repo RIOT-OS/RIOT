@@ -134,6 +134,12 @@ ASFLAGS += --longcalls --text-section-literals
 # thin archives trigger a reboot loop - see #12258, #12035, #12346
 ARFLAGS = rcs
 
+ifneq (,$(filter lwip,$(USEMODULE)))
+  # The threads for handling the ESP hardware have the priorities from 2 to 4.
+  # The priority of lwIP TCPIP thread should be lower than these priorities.
+  CFLAGS += -DTCPIP_THREAD_PRIO=5
+endif
+
 ifneq (, $(filter esp_gdbstub, $(USEMODULE)))
     GDBSTUB_DIR ?= $(RIOTCPU)/$(CPU)/vendor/esp-gdbstub
     CFLAGS      += -DGDBSTUB_BREAK_ON_INIT=1
