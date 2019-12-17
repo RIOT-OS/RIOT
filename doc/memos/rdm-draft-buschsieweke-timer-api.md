@@ -169,6 +169,9 @@ future changes.
   timer)
 - The accuracy of execution delay should be measured with single digit micro
   seconds for short delays
+    - It is acceptable if platform specific tweaking is needed to achieve this
+    - It is acceptable if minimum hardware requirements are needed to achieve
+      this
 - Timer callbacks should fire as early as possible after the timer expired
 
 ## Performance Requirements
