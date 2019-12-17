@@ -19,24 +19,33 @@
 
 #include "cpu.h"
 #include "periph/init.h"
+#include "periph_conf.h"
 
-/**
- * @brief Initialize the CPU, set IRQ priorities, clocks, peripheral
+#include "vendor/encoding.h"
+#include "vendor/plic_driver.h"
+
+/*
+ * Configure the memory mapped flash for faster throughput
+ * to minimize interrupt latency on an I-Cache miss and refill
+ * from flash.  Alternatively (and faster) the interrupt
+ * routine could be put in SRAM.  The linker script supports
+ * code in SRAM using the ".hotcode" section.
+ * The flash chip on the HiFive1 is the ISSI 25LP128
+ * http://www.issi.com/WW/pdf/IS25LP128.pdf
+ * The maximum frequency it can run at is 133MHz in
+ * "Fast Read Dual I/O" mode.
+ * Note the updated data sheet:
+ * https://static.dev.sifive.com/SiFive-FE310-G000-datasheet-v1.0.4.pdf
+ * states "Address and write data using DQ[3] for transmission will not
+ * function properly."  This rules out QPI for the XIP memory mapped flash.
+ * #define MAX_FLASH_FREQ 133000000
+ * On forum SiFive says "safe" operation would be 40MHz.  50MHz seems to work
+ * fine.
  */
-void cpu_init(void)
-{
-    /* Initialize IRQs */
-    irq_init();
+#define MAX_FLASH_FREQ 50000000
 
-    /* Initialize clock */
-    clock_init();
-
-    /* Initialize newlib-nano library stubs */
-    nanostubs_init();
-
-    /* Initialize static peripheral */
-    periph_init();
-}
+/* This should work for any reasonable cpu clock value. */
+#define SCKDIV_SAFE 3
 
 /*
  * By default the SPI FFMT initialized as:
@@ -45,37 +54,65 @@ void cpu_init(void)
  *  cmd_code = 3
  *  all other fields = 0
  */
-
-__attribute__ ((section (".ramfunc")))
-void init_flash(void)
+void flash_init(void)
 {
-    /* Update the QSPI interface to adjust to the CPU speed
-     * This function needs to execute from the RAM
-     * when the QSPI interface is being reconfigured because the flash
-     * can't be accessed during this time
+    /* In case we are executing from QSPI, (which is quite likely) we need to
+     * set the QSPI clock divider appropriately before boosting the clock
+     * frequency.
      */
-
-    /* Disable SPI flash mode */
-    SPI0_REG(SPI_REG_FCTRL) &= ~SPI_FCTRL_EN;
-
-    /* Enable QPI mode by sending command to flash */
-    SPI0_REG(SPI_REG_TXFIFO) = 0x35;
+    SPI0_REG(SPI_REG_SCKDIV) = SCKDIV_SAFE;
 
     /* begin{code-style-ignore} */
-    SPI0_REG(SPI_REG_FFMT) =               /* setup "Fast Read Quad I/O (QPI mode)"         */
+    SPI0_REG(SPI_REG_FFMT) =               /* setup "Fast Read Dual I/O" 1-1-2              */
         SPI_INSN_CMD_EN         |          /* Enable memory-mapped flash                    */
-        SPI_INSN_ADDR_LEN(3)    |          /* 25LP03D read commands have 3 address bytes    */
-        SPI_INSN_PAD_CNT(6)     |          /* 25LP03D Table 6.11 Read Dummy Cycles = 6      */
-        SPI_INSN_CMD_PROTO(SPI_PROTO_Q) |  /* 25LP03D Table 8.1 "Instruction                */
-        SPI_INSN_ADDR_PROTO(SPI_PROTO_Q) | /*  Set" shows mode for cmd, addr, and           */
-        SPI_INSN_DATA_PROTO(SPI_PROTO_Q) | /*  data protocol for given instruction          */
-        SPI_INSN_CMD_CODE(0xEB) |          /* Set the instruction to "Fast Read Quad I/O"   */
+        SPI_INSN_ADDR_LEN(3)    |          /* 25LP128 read commands have 3 address bytes    */
+        SPI_INSN_PAD_CNT(4)     |          /* 25LP128 Table 6.9 Read Dummy Cycles P4,P3=0,0 */
+        SPI_INSN_CMD_PROTO(SPI_PROTO_S) |  /* 25LP128 Table 8.1 "Instruction                */
+        SPI_INSN_ADDR_PROTO(SPI_PROTO_D) | /*  Set" shows mode for cmd, addr, and           */
+        SPI_INSN_DATA_PROTO(SPI_PROTO_D) | /*  data protocol for given instruction          */
+        SPI_INSN_CMD_CODE(0xbb) |          /* Set the instruction to "Fast Read Dual I/O"   */
         SPI_INSN_PAD_CODE(0x00);           /* Dummy cycle sends 0 value bits                */
     /* end{code-style-ignore} */
 
-    /* Re-enable SPI flash mode */
-    SPI0_REG(SPI_REG_FCTRL) |= SPI_FCTRL_EN;
+    /*
+     * The relationship between the input clock and SCK is given
+     * by the following formula (Fin is processor/tile-link clock):
+     *    Fsck = Fin/(2(div + 1))
+     */
+    uint32_t freq = cpu_freq();
+    uint32_t sckdiv = (freq - 1) / (MAX_FLASH_FREQ * 2);
+    if (sckdiv > SCKDIV_SAFE) {
+        SPI0_REG(SPI_REG_SCKDIV) = sckdiv;
+    }
+}
 
-    /* Adjust the SPI clk divider for to boost flash speed */
-  //  SPI0_REG(SPI_REG_SCKDIV) = SCKDIV;
+/**
+ * @brief Initialize the CPU, set IRQ priorities, clocks, peripheral
+ */
+void cpu_init(void)
+{
+    /* Initialize clock */
+    clock_init();
+
+#if USE_CLOCK_HFROSC_PLL
+    /* Initialize flash memory, only when using the PLL: in this
+       case the CPU core clock can be configured to be so fast that the SPI
+       flash frequency needs to be adjusted accordingly. */
+    flash_init();
+#endif
+
+    /* Enable FPU if present */
+    if (read_csr(misa) & (1 << ('F' - 'A'))) {
+        write_csr(mstatus, MSTATUS_FS); /* allow FPU instructions without trapping */
+        write_csr(fcsr, 0);             /* initialize rounding mode, undefined at reset */
+    }
+
+    /* Initialize IRQs */
+    irq_init();
+
+    /* Initialize newlib-nano library stubs */
+    nanostubs_init();
+
+    /* Initialize static peripheral */
+    periph_init();
 }

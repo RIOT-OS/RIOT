@@ -56,12 +56,6 @@ void irq_init(void)
     /* Setup trap handler function */
     write_csr(mtvec, &trap_entry);
 
-    /* Enable FPU if present */
-    if (read_csr(misa) & (1 << ('F' - 'A'))) {
-        write_csr(mstatus, MSTATUS_FS); /* allow FPU instructions without trapping */
-        write_csr(fcsr, 0);             /* initialize rounding mode, undefined at reset */
-    }
-
     /* Clear all interrupt enables */
     write_csr(mie, 0);
 
