@@ -52,7 +52,7 @@ Actual timer hardware however is difficult to use. One main reason is that
 timer hardware can differ significantly starting with the clock frequency,
 the timer width (8 bit, 16 bit, 24 bit, and 32 bit are all common), and their
 time representation. Another reason is that hardware timers only allow setting
-a single alarm.
+a fixed number of alarms - possible only one.
 
 A high level timer API is needed to provide convenient and portable access to
 the hardware features and is essential when multiple virtual timers need to
@@ -65,7 +65,7 @@ constraint devices of class C2 according to RFC 7228 terminology has been
 studied:
 
 - FreeRTOS:
-    - [Software Timer Feature description](https://www.freertos.org/RTOS-software-timer.html),
+    - [Software Timer Feature description](https://www.freertos.org/RTOS-software-timer.html)
     - [Software Timer API reference](https://www.freertos.org/FreeRTOS-Software-Timer-API-Functions.html)
     - [Task Control API reference](https://www.freertos.org/a00112.html)
     - [`xTaskGetTickCount()` API reference](https://www.freertos.org/a00021.html#xTaskGetTickCount)
