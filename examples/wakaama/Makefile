@@ -31,10 +31,6 @@ DEVELHELP ?= 1
 # Specific the server URI  address (NOTE: Domain names not supported yet)
 SERVER_URI ?= '"coap://[fd00:dead:beef::1]"'
 
-ifneq (,$(SERVER_URI))
-  CFLAGS += -DCONFIG_LWM2M_SERVER_URI=$(SERVER_URI)
-endif
-
 # NOTE: Add the package for wakaama
 USEPKG += wakaama
 # Uncomment to enable Wakaama debug log
@@ -47,3 +43,8 @@ USEPKG += wakaama
 CFLAGS += -DLWM2M_CLIENT_MODE
 
 include $(RIOTBASE)/Makefile.include
+
+# Configure server via CFLAGS only if not done via Kconfig
+ifndef CONFIG_LWM2M_SERVER_URI
+  CFLAGS += -DCONFIG_LWM2M_SERVER_URI=$(SERVER_URI)
+endif
