@@ -52,7 +52,7 @@ Actual timer hardware however is difficult to use. One main reason is that
 timer hardware can differ significantly starting with the clock frequency,
 the timer width (8 bit, 16 bit, 24 bit, and 32 bit are all common), and their
 time representation. Another reason is that hardware timers only allow setting
-a fixed number of alarms - possible only one.
+a (very) small number of alarm callbacks.
 
 A high level timer API is needed to provide convenient and portable access to
 the hardware features and is essential when multiple virtual timers need to
