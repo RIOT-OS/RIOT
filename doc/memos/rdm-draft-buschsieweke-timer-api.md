@@ -83,6 +83,8 @@ studied:
     - [TOSThreads Tutorial](http://tinyos.stanford.edu/tinyos-wiki/index.php/TOSThreads_Tutorial)
 - Mynewt:
     - [OS Time API reference](https://mynewt.apache.org/latest/os/core_os/time/os_time.html)
+- Xtimer, RIOT's (at the time of writing) current timer API
+    - [xtimer API documentation](http://api.riot-os.org/group__sys__xtimer.html)
 
 The following common feature sets provided by competing operating systems have
 been identified:
@@ -98,13 +100,13 @@ been identified:
     - Quantify time spans between to events
 - APIs used to delay the execution flow
 
-| Feature                   | FreeRTOS  | Zephyr    | Mbed OS   | Contiki   | TinyOS    | Mynewt    |
-|:------------------------- |:--------- |:--------- |:--------- |:--------- |:--------- |:--------- |
-| Software Timers           | ✓         | ✓         | ✓         | ✓         | ✓         | ✗         |
-| Periodic Software Timers  | ✓         | ✓         | ✓         | ● (2)     | ✓         | ✗         |
-| Context of Timer Callback | Thread    | ?         | ?         | Both? (3) | ?         | n.a.      |
-| System Time               | ✓         | ✓         | ✓         | ✓         | ✓         | ✓         |
-| Delays                    | ✓         | ● (1)     | ✓         | ● (4)     | ✓ (5)     | ✓         |
+| Feature                   | FreeRTOS  | Zephyr    | Mbed OS   | Contiki   | TinyOS    | Mynewt    | xtimer    |
+|:------------------------- |:--------- |:--------- |:--------- |:--------- |:--------- |:--------- |:--------- |
+| Software Timers           | ✓         | ✓         | ✓         | ✓         | ✓         | ✗         | ✓         |
+| Periodic Software Timers  | ✓         | ✓         | ✓         | ● (2)     | ✓         | ✗         | ✗ (6)     |
+| Context of Timer Callback | Thread    | ?         | ?         | Both? (3) | ?         | n.a.      | Thread    |
+| System Time               | ✓         | ✓         | ✓         | ✓         | ✓         | ✓         | ✓         |
+| Delays                    | ✓         | ● (1)     | ✓         | ● (4)     | ✓ (5)     | ✓         | ✓         |
 
 ✓ = 1st level API support, ● = supported by combining APIs, ✗ = no support
 
@@ -119,6 +121,10 @@ been identified:
    until a specific event has been posted. Combined, this can be used to
    delay execution
 5. Only available when using TOSTThreads
+6. Periodic software timers can be implemented by the use with a few lines of
+   code by resetting the timer from the callback. However, this requires the
+   user to manually compensate for the time delta between the timer has
+   expired and the callback is actually executed
 
 # 2. Requirements
 
