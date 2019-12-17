@@ -122,14 +122,6 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name    GPIO configuration
- *
- * @{
- */
-#define GPIO_INTR_PRIORITY          (3)
-/** @} */
-
-/**
  * @name    PWM configuration
  *
  * @{
