@@ -166,14 +166,17 @@ future changes.
 
 ## Precision Requirements
 
-- Timer callbacks should never fire prematurely (+- 1 tick of the underlying
+- Timer callbacks should never fire prematurely (±1 tick of the underlying
   timer)
 - The accuracy of execution delay should be measured with single digit micro
   seconds for short delays in absence of other load on the system
     - It is acceptable if platform specific tweaking is needed to achieve this
     - It is acceptable if minimum hardware requirements are needed to achieve
       this
-- Timer callbacks should fire as early as possible after the timer expired
+- Timer callbacks should fire closely after the timer expired
+    - In absence of other load on the system, accuracy in the order of single
+      digit micro seconds should be achievable when given hardware requirements
+      are fulfilled and platform specific tweaking is done
 
 ## Performance Requirements
 
