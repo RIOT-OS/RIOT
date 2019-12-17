@@ -155,7 +155,9 @@ future changes.
 
 ## Real-Time Requirements
 
-- The implementation must only disable IRQs for short periods of time
+- The implementation must only disable IRQs for short periods of time. More
+  specifically: With *n* software timers used in parallel, the longest period of
+  time with interrupts disabled be at most *O(n)*
 - The implementation must cause as little IRQs as possible and its ISRs must
   be as short as possible
 - The implementation should provide means to execute callbacks in thread
