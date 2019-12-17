@@ -39,9 +39,6 @@ USEPKG += wakaama
 # Uncomment to indicate that the server is a LwM2M bootstrap server
 # CFLAGS += -DCONFIG_LWM2M_BOOTSTRAP=1
 
-# NOTE: Use wakaama in client mode
-CFLAGS += -DLWM2M_CLIENT_MODE
-
 include $(RIOTBASE)/Makefile.include
 
 # Configure server via CFLAGS only if not done via Kconfig
