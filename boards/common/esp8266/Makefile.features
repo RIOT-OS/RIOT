@@ -1,7 +1,6 @@
 CPU = esp8266
 
 # MCU defined peripheral features provided by all boards in alphabetical order
-
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_gpio_irq
