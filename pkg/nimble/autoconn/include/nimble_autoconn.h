@@ -111,6 +111,8 @@
 
 #include <stdint.h>
 
+#include "nimble_netif.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -167,6 +169,16 @@ typedef struct {
  */
 int nimble_autoconn_init(const nimble_autoconn_params_t *params,
                          const uint8_t *ad, size_t adlen);
+
+/**
+ * @brief   Register a callback that is called on netif events
+ *
+ * The registered callback function is a simple pass-through of nimble_netif
+ * events. The callback is executed in the context of NimBLE's host thread.
+ *
+ * @param[in] cb            event callback to register, may be NULL
+ */
+void nimble_autoconn_eventcb(nimble_netif_eventcb_t cb);
 
 /**
  * @brief   Update the used parameters (timing and node ID)
