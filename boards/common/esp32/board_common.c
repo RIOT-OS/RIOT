@@ -30,7 +30,7 @@
  extern "C" {
 #endif
 
-void board_init(void)
+void board_init_common(void)
 {
     #ifdef LED0_PIN
     gpio_init (LED0_PIN, GPIO_OUT);
@@ -54,7 +54,7 @@ extern void spi_print_config(void);
 extern void uart_print_config(void);
 extern void can_print_config(void);
 
-void print_board_config (void)
+void print_board_config(void)
 {
     ets_printf("\nBoard configuration:\n");
 

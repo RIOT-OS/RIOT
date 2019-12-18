@@ -79,5 +79,10 @@
 /* include common board definitions as last step */
 #include "board_common.h"
 
+/**
+ * @brief Initialize the board specific hardware
+ */
+void board_init(void);
+
 #endif /* BOARD_H */
 /** @} */
