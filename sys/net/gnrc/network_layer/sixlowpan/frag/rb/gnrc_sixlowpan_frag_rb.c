@@ -22,6 +22,9 @@
 #include "net/gnrc.h"
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/config.h"
+#ifdef  MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+#include "net/gnrc/sixlowpan/frag/stats.h"
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_STATS */
 #ifdef  MODULE_GNRC_SIXLOWPAN_FRAG_VRB
 #include "net/gnrc/sixlowpan/frag/vrb.h"
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
@@ -88,15 +91,6 @@ enum {
     RBUF_ADD_REPEAT = -2,
     RBUF_ADD_DUPLICATE = -3,
 };
-
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
-static gnrc_sixlowpan_frag_stats_t _stats;
-
-gnrc_sixlowpan_frag_stats_t *gnrc_sixlowpan_frag_stats_get(void)
-{
-    return &_stats;
-}
-#endif
 
 static int _check_fragments(gnrc_sixlowpan_frag_rb_base_t *entry,
                             size_t frag_size, size_t offset)
@@ -474,12 +468,12 @@ static int _rbuf_get(const void *src, size_t src_len,
             res = oldest;
 #if GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE && \
     defined(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
-            _stats.rbuf_full++;
+            gnrc_sixlowpan_frag_stats_get()->rbuf_full++;
 #endif
         }
         else {
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
-            _stats.rbuf_full++;
+            gnrc_sixlowpan_frag_stats_get()->rbuf_full++;
 #endif
             return -1;
         }
