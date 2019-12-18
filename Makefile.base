@@ -99,19 +99,25 @@ CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)
 
 $(OBJC_LTO): CFLAGS+=$(LTOFLAGS)
 
-$(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(RIOTBUILD_CONFIG_HEADER_C) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
+# Define dependencies for object files
+OBJ_DEPS += $(RIOTBUILD_CONFIG_HEADER_C)
+ifneq (,$(SHOULD_RUN_KCONFIG))
+  OBJ_DEPS += $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
+endif
+
+$(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(OBJ_DEPS)
 	$(Q)$(CCACHE) $(CC) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
 
-$(GENOBJC): %.o: %.c $(RIOTBUILD_CONFIG_HEADER_C) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
+$(GENOBJC): %.o: %.c $(OBJ_DEPS)
 	$(Q) $(CCACHE) $(CC) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$<)\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $<
 
-$(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.$(SRCXXEXT) $(RIOTBUILD_CONFIG_HEADER_C) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
+$(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.$(SRCXXEXT) $(OBJ_DEPS)
 	$(Q)$(CCACHE) $(CXX) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
@@ -120,7 +126,7 @@ $(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.$(SRCXXEXT) $(RIOTBUILD_CONFIG_HEADER_C) $
 $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
 	$(Q)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
-$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(RIOTBUILD_CONFIG_HEADER_C) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
+$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(OBJ_DEPS)
 	$(Q)$(CCAS) $(CCASFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
 
 # pull in dependency info for *existing* .o files
