@@ -1,3 +1,12 @@
+ifneq (,$(filter gnrc_icmpv4,$(USEMODULE)))
+  DIRS += network_layer/icmpv4
+endif
+ifneq (,$(filter gnrc_icmpv4_echo,$(USEMODULE)))
+  DIRS += network_layer/icmpv4/echo
+endif
+ifneq (,$(filter gnrc_icmpv4_error,$(USEMODULE)))
+  DIRS += network_layer/icmpv4/error
+endif
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   DIRS += network_layer/icmpv6
 endif
