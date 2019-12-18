@@ -39,7 +39,7 @@ char _dtls_server_stack[THREAD_STACKSIZE_MAIN +
 
 static kernel_pid_t _dtls_server_pid = KERNEL_PID_UNDEF;
 
-#ifdef DTLS_ECC
+#ifdef CONFIG_DTLS_ECC
 static const ecdsa_public_key_t other_pubkeys[] = {
     { .x = ecdsa_pub_key_x, .y = ecdsa_pub_key_y },
 };
@@ -59,7 +59,7 @@ static const credman_credential_t credential = {
         },
     },
 };
-#else /* #ifdef DTLS_PSK */
+#else /* #ifdef CONFIG_DTLS_PSK */
 static const uint8_t psk_key_0[] = PSK_DEFAULT_KEY;
 
 static const credman_credential_t credential = {

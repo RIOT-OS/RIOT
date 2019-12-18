@@ -31,7 +31,7 @@
 
 #define SOCK_DTLS_CLIENT_TAG (2)
 
-#ifdef DTLS_ECC
+#ifdef CONFIG_DTLS_ECC
 static const ecdsa_public_key_t other_pubkeys[] = {
     { .x = ecdsa_pub_key_x, .y = ecdsa_pub_key_y },
 };
@@ -52,7 +52,7 @@ static const credman_credential_t credential = {
     },
 };
 
-#else /* ifdef DTLS_PSK */
+#else /* ifdef CONFIG_DTLS_PSK */
 static const uint8_t psk_id_0[] = PSK_DEFAULT_IDENTITY;
 static const uint8_t psk_key_0[] = PSK_DEFAULT_KEY;
 
