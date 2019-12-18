@@ -44,6 +44,9 @@ get_os_info() {
     elif [ "$os" = "Darwin" ]; then
         osname="$(sw_vers -productName)"
         osvers="$(sw_vers -productVersion)"
+    elif [ "$os" = "FreeBSD" ]; then
+        osname="$os"
+        osvers="$(freebsd-version)"
     fi
     printf "%s %s" "$osname" "$osvers"
 }
