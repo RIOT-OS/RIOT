@@ -21,6 +21,7 @@
 #define NET_IPV4_HDR_H
 
 #include "byteorder.h"
+#include "net/inet_csum.h"
 #include "net/ipv4/addr.h"
 #ifdef __cplusplus
 extern "C" {
@@ -77,6 +78,7 @@ typedef struct __attribute__((packed)) {
      *
      * This module provides helper functions to set, get, and check these
      * fields accordingly:
+     * * ipv4_hdr_is()
      * * ipv4_hdr_set_flags()
      * * ipv4_hdr_get_flags()
      * * ipv4_hdr_set_fo()
@@ -92,7 +94,7 @@ typedef struct __attribute__((packed)) {
 
 
 /**
- * @brief   Sets the version field of @p hdr to 6
+ * @brief   Sets the version field of @p hdr to 4
  *
  * @param[out] hdr  Pointer to an IPv4 header.
  */
@@ -109,16 +111,29 @@ static inline void ipv4_hdr_set_version(ipv4_hdr_t *hdr)
  *
  * @return  Value of the version field of @p hdr.
  */
-static inline uint8_t ipv4_hdr_get_version(ipv4_hdr_t *hdr)
+static inline uint8_t ipv4_hdr_get_version(const ipv4_hdr_t *hdr)
 {
     return ((hdr->v_ih) >> 4);
+}
+
+/**
+ * @brief   Checks if the version field is set to 4
+ *
+ * @param[in] hdr   Pointer to an IPv4 header.
+ *
+ * @return  true, if version field is 4
+ * @return  false, otherwise
+ */
+static inline bool ipv4_hdr_is(const ipv4_hdr_t *hdr)
+{
+    return ipv4_hdr_get_version(hdr) == 0x04;
 }
 
 /**
  * @brief   Sets the Internet Header Length field of @p hdr
  *
  * @param[out] hdr  Pointer to an IPv4 header.
- * @param[in] ihl  Size in bytes of the Internet Header Length (including padding)
+ * @param[in] ihl  Size in bits of the Internet Header Length (including padding)
  */
 static inline void ipv4_hdr_set_ihl(ipv4_hdr_t *hdr, uint16_t ihl)
 {
@@ -131,7 +146,7 @@ static inline void ipv4_hdr_set_ihl(ipv4_hdr_t *hdr, uint16_t ihl)
  *
  * @param[in] hdr   Pointer to an IPv4 header.
  *
- * @return Size in bytes of the Internet Header Length field of @p hdr
+ * @return Size in bites of the Internet Header Length field of @p hdr
  */
 static inline uint16_t ipv4_hdr_get_ihl(ipv4_hdr_t *hdr)
 {
@@ -186,6 +201,41 @@ static inline uint16_t ipv4_hdr_get_fo(ipv4_hdr_t *hdr)
 {
     return (((hdr->fl_fo.u8[0] & 0x1f) << 8) + hdr->fl_fo.u8[1]);
 }
+
+/**
+ * @brief   Calculates the Internet Checksum for the IPv4 Pseudo Header.
+ *
+ * @param[in] hdr       An IPv4 header
+ */
+static inline void ipv4_hdr_inet_csum(ipv4_hdr_t *hdr)
+{
+    uint16_t csum;
+
+    // Ensure the checksum is 0, to be able to count it ;p
+    hdr->csum = byteorder_htons(0);
+
+    csum = inet_csum(0, (uint8_t *) hdr, sizeof(ipv4_hdr_t));
+    hdr->csum = byteorder_htons(~csum);
+}
+
+static inline uint16_t ipv4_hdr_inet_csum_prot(uint16_t sum, ipv4_hdr_t *hdr,
+                                          uint8_t prot_num, uint16_t len)
+{
+    if (((uint32_t)sum + len + prot_num) > 0xffff) {
+        /* increment by one for overflow to keep it as 1's complement sum */
+        sum++;
+    }
+
+    return inet_csum(sum + len + prot_num, hdr->src.u8,
+                     (2 * sizeof(ipv4_addr_t)));
+}
+
+/**
+ * @brief   Outputs an IPv4 header to stdout.
+ *
+ * @param[in] hdr   An IPv4 header.
+ */
+void ipv4_hdr_print(ipv4_hdr_t *hdr);
 
 #ifdef __cplusplus
 }
