@@ -142,6 +142,19 @@ static void _on_scan_evt(uint8_t type, const ble_addr_t *addr, int8_t rssi,
     }
 }
 
+static void _evt_dbg(const char *msg, int handle, const uint8_t *addr)
+{
+#if ENABLE_DEBUG
+    printf("%s (%i|", msg, handle);
+    bluetil_addr_print(addr);
+    puts(")");
+#else
+    (void)msg;
+    (void)handle;
+    (void)addr;
+#endif
+}
+
 static void _on_netif_evt(int handle, nimble_netif_event_t event,
                           const uint8_t *addr)
 {
@@ -149,26 +162,26 @@ static void _on_netif_evt(int handle, nimble_netif_event_t event,
 
     switch (event) {
         case NIMBLE_NETIF_CONNECTED_MASTER:
-            DEBUG("[autoconn] CONNECTED as master %i\n", handle);
+            _evt_dbg("[autoconn] CONNECTED master", handle, addr);
             assert(_state == STATE_CONN);
             _state = STATE_IDLE;
             break;
         case NIMBLE_NETIF_CONNECTED_SLAVE:
-            DEBUG("[autoconn] CONNECTED as slave %i\n", handle);
+            _evt_dbg("[autoconn] CONNECTED slave", handle, addr);
             break;
         case NIMBLE_NETIF_CLOSED_MASTER:
-            DEBUG("[autoconn] CLOSED master connection\n");
+            _evt_dbg("[autoconn] CLOSED master", handle, addr);
             break;
         case NIMBLE_NETIF_CLOSED_SLAVE:
-            DEBUG("[autoconn] CLOSED slave connection\n");
+            _evt_dbg("[autoconn] CLOSED slave", handle, addr);
             break;
         case NIMBLE_NETIF_CONNECT_ABORT:
-            DEBUG("[autoconn] CONNECT ABORT\n");
+            _evt_dbg("[autoconn] ABORTED", handle, addr);
             assert(_state == STATE_CONN);
             _state = STATE_IDLE;
             break;
         case NIMBLE_NETIF_CONN_UPDATED:
-            DEBUG("[autoconn] CONNECTION UPDATED %i\n", handle);
+            _evt_dbg("[autoconn] UPDATED", handle, addr);
             en = 0;
             break;
         default:
@@ -297,8 +310,8 @@ int nimble_autoconn_update(const nimble_autoconn_params_t *params,
 
 void nimble_autoconn_enable(void)
 {
-    DEBUG("[autoconn] ACTIVE\n");
     if (nimble_netif_conn_count(NIMBLE_NETIF_UNUSED) > 0) {
+        DEBUG("[autoconn] ACTIVE\n");
         /* insert a random delay */
         ble_npl_time_t delay = (ble_npl_time_t)random_uint32_range(0,
                                                     (uint32_t)_period_jitter);
@@ -309,8 +322,8 @@ void nimble_autoconn_enable(void)
 
 void nimble_autoconn_disable(void)
 {
-    DEBUG("[autoconn] DISABLED\n");
     if ((_state == STATE_ADV) || (_state == STATE_SCAN)) {
+        DEBUG("[autoconn] DISABLED\n");
         _state = STATE_IDLE;
         ble_npl_callout_stop(&_state_evt);
         nimble_scanner_stop();
