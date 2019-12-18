@@ -65,6 +65,8 @@ static ble_npl_time_t _timeout_adv_period;
 static ble_npl_time_t _timeout_scan_period;
 static ble_npl_time_t _period_jitter;
 
+static nimble_netif_eventcb_t _eventcb = NULL;
+
 /* this is run inside the NimBLE host thread */
 static void _on_state_change(struct ble_npl_event *ev)
 {
@@ -143,38 +145,45 @@ static void _on_scan_evt(uint8_t type, const ble_addr_t *addr, int8_t rssi,
 static void _on_netif_evt(int handle, nimble_netif_event_t event,
                           const uint8_t *addr)
 {
+    int en = 1;
+
     switch (event) {
         case NIMBLE_NETIF_CONNECTED_MASTER:
             DEBUG("[autoconn] CONNECTED as master %i\n", handle);
             assert(_state == STATE_CONN);
             _state = STATE_IDLE;
-            nimble_autoconn_enable();
             break;
         case NIMBLE_NETIF_CONNECTED_SLAVE:
             DEBUG("[autoconn] CONNECTED as slave %i\n", handle);
-            nimble_autoconn_enable();
             break;
         case NIMBLE_NETIF_CLOSED_MASTER:
             DEBUG("[autoconn] CLOSED master connection\n");
-            nimble_autoconn_enable();
             break;
         case NIMBLE_NETIF_CLOSED_SLAVE:
             DEBUG("[autoconn] CLOSED slave connection\n");
-            nimble_autoconn_enable();
             break;
         case NIMBLE_NETIF_CONNECT_ABORT:
             DEBUG("[autoconn] CONNECT ABORT\n");
             assert(_state == STATE_CONN);
             _state = STATE_IDLE;
-            nimble_autoconn_enable();
             break;
         case NIMBLE_NETIF_CONN_UPDATED:
             DEBUG("[autoconn] CONNECTION UPDATED %i\n", handle);
-            /* nothing to do here */
+            en = 0;
             break;
         default:
             /* this should never happen */
             assert(0);
+    }
+
+    /* pass events to high-level user if someone registered for them */
+    if (_eventcb) {
+        _eventcb(handle, event, addr);
+    }
+
+    /* search for the next connection possibility */
+    if (en) {
+        nimble_autoconn_enable();
     }
 }
 
@@ -195,6 +204,11 @@ int nimble_autoconn_init(const nimble_autoconn_params_t *params,
                          _on_state_change, NULL);
     /* at last, set the given parameters */
     return nimble_autoconn_update(params, ad, adlen);
+}
+
+void nimble_autoconn_eventcb(nimble_netif_eventcb_t cb)
+{
+    _eventcb = cb;
 }
 
 int nimble_autoconn_update(const nimble_autoconn_params_t *params,
