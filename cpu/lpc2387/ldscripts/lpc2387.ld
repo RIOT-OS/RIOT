@@ -100,80 +100,11 @@ SECTIONS
     {
         *(.configmem)
         . = ALIGN(256);
-    } >infomem
+    } > infomem
 
-    /**************************************************************************
-     * RAM
-     **************************************************************************/
-
-    /*
-     * collect all zero initialized sections that go into RAM
-     */
-    .bss (NOLOAD) :
-    {
-        . = ALIGN(4);                   /* ensure data is aligned so relocation can use 4-byte operations */
-        __bss_start = .;                /* define a global symbol marking the start of the .bss section */
-        *(.bss*)                        /* all .bss sections  */
-        *(COMMON)
-    } > ram                             /* put all the above in RAM (it will be cleared in the startup code */
-    . = ALIGN(4);                       /* ensure data is aligned so relocation can use 4-byte operations */
-    __bss_end = . ;                     /* define a global symbol marking the end of the .bss section */
-
-    /*
-     * collect all initialized .data sections that go into RAM
-     * initial values get placed at the end of .text in flash
-     */
-    .data :
-    {
-        . = ALIGN(4);                   /* ensure data is aligned so relocation can use 4-byte operations */
-        _data = .;                      /* create a global symbol marking the start of the .data section  */
-        *(.data .data.*)                /* all .data sections  */
-        *(.gnu.linkonce.d*)
-        . = ALIGN(4);
-        /* preinit data */
-        PROVIDE_HIDDEN (__preinit_array_start = .);
-        KEEP(*(.preinit_array))
-            PROVIDE_HIDDEN (__preinit_array_end = .);
-
-        . = ALIGN(4);
-        /* init data */
-        PROVIDE_HIDDEN (__init_array_start = .);
-        KEEP(*(SORT(.init_array.*)))
-            KEEP(*(.init_array))
-            PROVIDE_HIDDEN (__init_array_end = .);
-
-        . = ALIGN(4);
-        /* finit data */
-        PROVIDE_HIDDEN (__fini_array_start = .);
-        KEEP(*(SORT(.fini_array.*)))
-            KEEP(*(.fini_array))
-            PROVIDE_HIDDEN (__fini_array_end = .);
-    } >ram AT > rom                     /* put all the above into RAM (but load the LMA copy into FLASH) */
-    . = ALIGN(4);                       /* ensure data is aligned so relocation can use 4-byte operations */
-    _edata = .;                         /* define a global symbol marking the end of the .data section  */
-
-    /*
-     * collect all uninitialized sections that go into RAM
-     */
-    .noinit (NOLOAD) :
-    {
-        __noinit_start = .;
-        PROVIDE(__fiq_handler = .);
-        *(.fiq)
-        *(.noinit)
-    }  > ram
-    . = ALIGN(4);
-    __noinit_end = .;
-
-    _end = .;                           /* define a global symbol marking the end of application RAM */
-
-    __heap1_size = ORIGIN(ram) + LENGTH(ram) - . - __stack_size;
-    .heap1 (NOLOAD) :
-    {
-        PROVIDE(_sheap = .);
-        . = . + __heap1_size;
-        PROVIDE(_eheap = .);
-    } > ram
+/**************************************************************************
+ * RAM
+ **************************************************************************/
 
     /*
      * Stacks
@@ -198,12 +129,56 @@ SECTIONS
         PROVIDE(__stack_end = .);
     } > ram
 
+    .relocate :
+    {
+        . = ALIGN(4);
+        _srelocate = .;
+        *(.ramfunc .ramfunc.*);
+        *(.data .data.*);
+        KEEP (*(.openocd .openocd.*))
+        . = ALIGN(4);
+        _erelocate = .;
+    } > ram AT> rom
+
+    /* .bss section which is used for uninitialized data */
+    .bss (NOLOAD) :
+    {
+        . = ALIGN(4);
+        _sbss = . ;
+        _szero = .;
+        *(.bss .bss.*)
+        *(COMMON)
+        . = ALIGN(4);
+        _ebss = . ;
+        _ezero = .;
+    } > ram
+
+    /*
+     * collect all uninitialized sections that go into RAM
+     */
+    .noinit (NOLOAD) :
+    {
+        __noinit_start = .;
+        PROVIDE(__fiq_handler = .);
+        *(.fiq)
+        *(.noinit)
+        . = ALIGN(4);
+        __noinit_end = .;
+    }  > ram
+
+    /* heap section */
+    . = ALIGN(4);
+    _sheap = . ;
+    _eheap = ORIGIN(ram) + LENGTH(ram);
+
+    /* Populate information about ram size */
+    _sram = ORIGIN(ram);
+    _eram = ORIGIN(ram) + LENGTH(ram);
+
     __heap2_size = LENGTH(ram_ethernet);
     .heap2 (NOLOAD) :
     {
         PROVIDE(__heap2_start = . );
-        . = . + __heap2_size;
-        PROVIDE(__heap2_max = .);       /* _heap shall always be < _heap_max */
     } > ram_ethernet
 
     . = ORIGIN(ram_usb);
@@ -216,10 +191,17 @@ SECTIONS
     {
         __heap3_size = ORIGIN(ram_usb) + LENGTH(ram_usb) - ABSOLUTE(.);
         PROVIDE(__heap3_start = . );
-        . += __heap3_size;
-        PROVIDE(__heap3_max = .);
     } > ram_usb
     __heap_size = SIZEOF(.heap3);
+
+    _sbackup_data_load = LOADADDR(.backup.data);
+    .backup.data :  ALIGN(4) {
+        _sbackup_data = .;
+        *(.backup.data)
+        _ebackup_data = .;
+        /* Round size so that we can use 4 byte copy in init */
+        . = ALIGN(4);
+    } > ram_battery AT> rom
 
     .backup.bss (NOLOAD) : ALIGN(4) {
         _sbackup_bss = .;
@@ -228,13 +210,4 @@ SECTIONS
         /* Round size so that we can use 4 byte copy in init */
         . = ALIGN(4);
     } > ram_battery
-
-    _sbackup_data_load = LOADADDR(.backup.data);
-    .backup.data : ALIGN(4) {
-        _sbackup_data = .;
-        *(.backup.data)
-        _ebackup_data = .;
-        /* Round size so that we can use 4 byte copy in init */
-        . = ALIGN(4);
-    } > ram_battery AT> rom
 }

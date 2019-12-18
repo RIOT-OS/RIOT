@@ -31,10 +31,10 @@ static inline void _init_data(void)
 {
     /* (linker script ensures that data is 32-bit aligned) */
     extern unsigned int _etext;
-    extern unsigned int _data;
-    extern unsigned int _edata;
-    extern unsigned int __bss_start;
-    extern unsigned int __bss_end;
+    extern unsigned int _srelocate; /* .data section */
+    extern unsigned int _erelocate;
+    extern unsigned int _szero;     /* .bss section */
+    extern unsigned int _ezero;
 
 /* Support for Battery Backup RAM */
 #ifdef CPU_HAS_BACKUP_RAM
@@ -49,18 +49,38 @@ static inline void _init_data(void)
     register unsigned int *dst;
     register unsigned int *end;
 
+#ifdef DEVELHELP
+    /* Fill user stack with canary values up until the current stack pointer */
+    /* Read current stack pointer from CPU register */
+    __asm__ volatile ("mov %[end], sp" : [end] "=r" (end) : : );
+    dst = &__stack_start;
+    while (dst < end) {
+        *(dst++) = STACK_CANARY_WORD;
+    }
+
+    /* fill the interrupt stacks with canary values */
+    extern unsigned int __stack_usr_start;
+    extern unsigned int __stack_end;
+
+    dst = &__stack_usr_start;
+    end = &__stack_end;
+    while (dst < end) {
+        *(dst++) = STACK_CANARY_WORD;
+    }
+#endif
+
     /* initialize data from flash */
     src = &_etext;
-    dst = &_data;
-    end = &_edata;
+    dst = &_srelocate;
+    end = &_erelocate;
 
     while (dst < end) {
         *dst++ = *src++;
     }
 
     /* clear bss */
-    dst = &__bss_start;
-    end = &__bss_end;
+    dst = &_szero;
+    end = &_ezero;
 
     while (dst < end) {
         *dst++ = 0;
@@ -99,9 +119,9 @@ void bootloader(void)
     _init_data();
 
 #ifdef MODULE_PUF_SRAM
-    /* uninitialized heap starts after bss section */
-    extern unsigned int __bss_end;
-    puf_sram_init((uint8_t *) __bss_end, SEED_RAM_LEN);
+    /* use uninitialized heap */
+    extern unsigned _sheap;
+    puf_sram_init((uint8_t *) &_sheap, SEED_RAM_LEN);
 #endif
 
     /* cpu specific setup of clocks, peripherals */
