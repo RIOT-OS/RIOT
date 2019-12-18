@@ -24,11 +24,17 @@
 #include "msg.h"
 #include "thread.h"
 #include "utlist.h"
-#include "net/ipv6/hdr.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc.h"
-#include "net/gnrc/icmpv6/error.h"
 #include "net/inet_csum.h"
+#ifdef MODULE_GNRC_IPV6
+    #include "net/ipv6/hdr.h"
+    #include "net/gnrc/icmpv6/error.h"
+#endif
+#ifdef MODULE_GNRC_IPV4
+    #include "net/ipv4/hdr.h"
+    #include "net/gnrc/icmpv4/error.h"
+#endif
 
 
 #define ENABLE_DEBUG    (0)
@@ -77,6 +83,11 @@ static uint16_t _calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr,
     csum = inet_csum(csum, (uint8_t *)hdr->data, sizeof(udp_hdr_t));
 
     switch (pseudo_hdr->type) {
+#ifdef MODULE_GNRC_IPV4
+        case GNRC_NETTYPE_IPV4:
+            csum = ipv4_hdr_inet_csum_prot(csum, pseudo_hdr->data, PROTNUM_UDP, len);
+            break;
+#endif
 #ifdef MODULE_GNRC_IPV6
         case GNRC_NETTYPE_IPV6:
             csum = ipv6_hdr_inet_csum(csum, pseudo_hdr->data, PROTNUM_UDP, len);
@@ -101,7 +112,7 @@ static uint16_t _calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr,
 
 static void _receive(gnrc_pktsnip_t *pkt)
 {
-    gnrc_pktsnip_t *udp, *ipv6;
+    gnrc_pktsnip_t *udp, *ip;
     udp_hdr_t *hdr;
     uint32_t port;
 
@@ -113,10 +124,13 @@ static void _receive(gnrc_pktsnip_t *pkt)
         return;
     }
     pkt = udp;
-
-    ipv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
-
-    assert(ipv6 != NULL);
+    #ifdef MODULE_GNRC_IPV6
+        ip = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
+    #endif
+    #ifdef MODULE_GNRC_IPV4
+        ip = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV4);
+    #endif
+    assert(ip != NULL);
 
     if ((pkt->next != NULL) && (pkt->next->type == GNRC_NETTYPE_UDP) &&
         (pkt->next->size == sizeof(udp_hdr_t))) {
@@ -146,8 +160,9 @@ static void _receive(gnrc_pktsnip_t *pkt)
         gnrc_pktbuf_release(pkt);
         return;
     }
-    if (_calc_csum(udp, ipv6, pkt) != 0xFFFF) {
-        DEBUG("udp: received packet with invalid checksum, dropping it\n");
+    
+    if (_calc_csum(udp, ip, pkt) != 0xFFFF) {
+        DEBUG("udp: received packet with invalid checksum (%x), dropping it\n", byteorder_ntohs(hdr->checksum));
         gnrc_pktbuf_release(pkt);
         return;
     }
@@ -159,7 +174,16 @@ static void _receive(gnrc_pktsnip_t *pkt)
     if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_UDP, port, pkt)) {
         DEBUG("udp: unable to forward packet as no one is interested in it\n");
         /* TODO determine if IPv6 packet, when IPv4 is implemented */
-        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PORT, pkt);
+#ifdef MODULE_GNRC_IPV6
+        if(ip->type == GNRC_NETTYPE_IPV6) {
+            gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PORT, pkt);
+        }
+#endif
+#ifdef MODULE_GNRC_IPV4
+        if(ip->type == GNRC_NETTYPE_IPV4) {
+            gnrc_icmpv4_error_dst_unr_send(ICMPV4_ERROR_DST_UNR_PORT, pkt);
+        }
+#endif
         gnrc_pktbuf_release(pkt);
     }
 }
@@ -207,7 +231,7 @@ static void _send(gnrc_pktsnip_t *pkt)
     /* fill in size field */
     hdr->length = byteorder_htons(gnrc_pkt_len(udp_snip));
 
-    /* set to IPv6, if first header is netif header */
+    /* set to IPv6 or IPv4, if first header is netif header */
     if (target_type == GNRC_NETTYPE_NETIF) {
         target_type = pkt->next->type;
     }
