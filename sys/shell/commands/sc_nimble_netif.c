@@ -58,13 +58,19 @@ static void _scan_for_name(uint8_t type, const ble_addr_t *addr, int8_t rssi,
     }
 }
 
-static void _on_ble_evt(int handle, nimble_netif_event_t event)
+static void _print_evt(const char *msg, int handle, const uint8_t *addr)
+{
+    printf("event: handle %i -> %s (", handle, msg);
+    bluetil_addr_print(addr);
+    puts(")");
+}
+
+static void _on_ble_evt(int handle, nimble_netif_event_t event,
+                        const uint8_t *addr)
 {
     switch (event) {
         case NIMBLE_NETIF_CONNECTED_MASTER: {
-            printf("event: handle %i -> CONNECTED as MASTER (", handle);
-            bluetil_addr_print(nimble_netif_conn_get(handle)->addr);
-            puts(")");
+            _print_evt("CONNECTED as MASTER", handle, addr);
             if (_name_to_connect != NULL) {
                 printf("connection to '%s' established\n", _name_to_connect);
                 _name_to_connect = NULL;
@@ -72,16 +78,14 @@ static void _on_ble_evt(int handle, nimble_netif_event_t event)
             break;
         }
         case NIMBLE_NETIF_CONNECTED_SLAVE:
-            printf("event: handle %i -> CONNECTED as SLAVE (", handle);
-            bluetil_addr_print(nimble_netif_conn_get(handle)->addr);
-            puts(")");
+            _print_evt("CONNECTED as SLAVE", handle, addr);
             break;
         case NIMBLE_NETIF_CLOSED_MASTER:
         case NIMBLE_NETIF_CLOSED_SLAVE:
-            printf("event: handle %i -> CONNECTION CLOSED\n", handle);
+            _print_evt("CONNECTION CLOSED", handle, addr);
             break;
         case NIMBLE_NETIF_CONNECT_ABORT:
-            printf("event: handle %i -> CONNECTION ABORT\n", handle);
+            _print_evt("CONNECTION ABORT", handle, addr);
             break;
         case NIMBLE_NETIF_CONN_UPDATED:
         default:
