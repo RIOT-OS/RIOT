@@ -568,6 +568,10 @@ ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter lwip_dhcp_auto,$(USEMODULE)))
+  USEMODULE += lwip_dhcp
+endif
+
 ifneq (,$(filter sema,$(USEMODULE)))
   USEMODULE += xtimer
 endif
