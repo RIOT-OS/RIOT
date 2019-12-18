@@ -41,6 +41,7 @@
 
 #include "board_internal.h"
 #include "native_internal.h"
+#include "stdio_base.h"
 #include "tty_uart.h"
 
 #include "periph/init.h"
@@ -399,6 +400,8 @@ static void _reset_handler(void)
 __attribute__((constructor)) static void startup(int argc, char **argv, char **envp)
 {
     _native_init_syscalls();
+    /* initialize stdio as early as possible */
+    stdio_init();
 
     _native_argv = argv;
     _progname = argv[0];
