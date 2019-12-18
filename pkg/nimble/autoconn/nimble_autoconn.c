@@ -284,8 +284,11 @@ void nimble_autoconn_enable(void)
 {
     DEBUG("[autoconn] ACTIVE\n");
     if (nimble_netif_conn_count(NIMBLE_NETIF_UNUSED) > 0) {
+        /* insert a random delay */
+        ble_npl_time_t delay = (ble_npl_time_t)random_uint32_range(0,
+                                                    (uint32_t)_period_jitter);
         _state = STATE_ADV;
-        _on_state_change(NULL);
+        ble_npl_callout_reset(&_state_evt, delay);
     }
 }
 
