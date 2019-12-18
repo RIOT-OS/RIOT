@@ -140,7 +140,8 @@ static void _on_scan_evt(uint8_t type, const ble_addr_t *addr, int8_t rssi,
     }
 }
 
-static void _on_netif_evt(int handle, nimble_netif_event_t event)
+static void _on_netif_evt(int handle, nimble_netif_event_t event,
+                          const uint8_t *addr)
 {
     switch (event) {
         case NIMBLE_NETIF_CONNECTED_MASTER:

@@ -156,12 +156,15 @@ int nimble_netif_conn_start_adv(void)
     return handle;
 }
 
-void nimble_netif_conn_free(int handle)
+void nimble_netif_conn_free(int handle, uint8_t *addr)
 {
     assert((handle >= 0) && (handle < CONN_CNT));
 
     DEBUG("nimble_netif_conn_free, handle %i\n", handle);
     mutex_lock(&_lock);
+    if (addr) {
+        memcpy(addr, _conn[handle].addr, BLE_ADDR_LEN);
+    }
     memset(&_conn[handle], 0, sizeof(nimble_netif_conn_t));
     _conn[handle].state = NIMBLE_NETIF_UNUSED;
     mutex_unlock(&_lock);
