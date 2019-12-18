@@ -114,6 +114,36 @@ typedef enum {
     NETOPT_HOP_LIMIT,
 
     /**
+     * @brief   (@ref ipv4_addr_t[]) get IPv4 addresses of an interface as array
+     *          of @ref ipv4_addr_t or add an IPv4 address as @ref ipv6_addr_t
+     *          to an interface
+     *
+     * When adding an IPv4 address to a GNRC interface using
+     * @ref GNRC_NETAPI_MSG_TYPE_SET, the gnrc_netapi_opt_t::context field can
+     * be used to pass the prefix length (8 MSB) and some flags (8 LSB)
+     * according to @ref net_gnrc_netif_ipv4_addrs_flags. The address is however
+     * always considered to be manually added.
+     * When getting the option you can pass an array of @ref ipv4_addr_t of any
+     * length greater than 0 to the getter. The array will be filled up to to
+     * its maximum and the remaining addresses on the interface will be ignored
+     */
+    NETOPT_IPV4_ADDR,
+    NETOPT_IPV4_MASK,
+    /**
+     * @brief   (@ref ipv4_addr_t) Removes an IPv6 address from an interface
+     */
+    NETOPT_IPV4_ADDR_REMOVE,
+    /**
+     * @brief   (array of uint8_t) get the flags to the addresses returned by
+     *          @ref NETOPT_IPV4_ADDR as array
+     *
+     * The information contained in the array is very specific to the
+     * interface's API. For GNRC e.g. the values are according to
+     * @ref net_gnrc_netif_ipv4_addrs_flags.
+     */
+    NETOPT_IPV4_ADDR_FLAGS,
+
+    /**
      * @brief   (@ref eui64_t) get the IPv6 interface identifier of a network interface
      *
      * @see <a href="https://tools.ietf.org/html/rfc4291#section-2.5.1">

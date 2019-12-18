@@ -56,6 +56,58 @@ void gnrc_netif_acquire(gnrc_netif_t *netif);
  */
 void gnrc_netif_release(gnrc_netif_t *netif);
 
+#if defined(MODULE_GNRC_IPV4) || DOXYGEN
+int gnrc_netif_ipv4_addr_add_internal(gnrc_netif_t *netif,
+                                      const ipv4_addr_t *addr,
+                                      unsigned pfx_len, uint8_t flags);
+
+/**
+ * @brief   Removes an IPv4 address from the interface
+ *
+ * @pre `(netif != NULL) && (addr != NULL)`
+ *
+ * @param[in,out] netif the network interface
+ * @param[in] addr      the address to remove
+ *
+ * @note    Only available with @ref net_gnrc_ipv4 "gnrc_ipv4".
+ */
+void gnrc_netif_ipv4_addr_remove_internal(gnrc_netif_t *netif,
+                                          const ipv4_addr_t *addr);
+
+ipv4_addr_t *gnrc_netif_ipv4_addr_best_src(gnrc_netif_t *netif,
+                                           const ipv4_addr_t *dst,
+                                           bool ll_only);
+
+/**
+ * @brief   Gets an interface by an address (incl. multicast groups) assigned
+ *          to it.
+ *
+ * @pre `addr != NULL`
+ *
+ * @param[in] addr  an IPv4 address
+ *
+ * @return  The network interface that has @p addr assigned
+ * @return  NULL, if no interface has @p addr assigned
+ */
+gnrc_netif_t *gnrc_netif_get_by_ipv4_addr(const ipv4_addr_t *addr);
+
+/**
+ * @brief   Gets number of duplicate address detection transmissions already
+ *          performed for an address
+ *
+ * @param[in] netif the network interface
+ * @param[in] idx   index of the address (and its flags)
+ *
+ * @return  the number of duplicate address detection transmissions already
+ *          performed
+ */
+static inline uint8_t gnrc_netif_ipv4_addr_dad_trans(const gnrc_netif_t *netif,
+                                                     int idx)
+{
+    return netif->ipv4.addrs_flags[idx] & GNRC_NETIF_IPV4_ADDRS_FLAGS_STATE_TENTATIVE;
+}
+#endif  /* MODULE_GNRC_IPV4 */
+
 #if defined(MODULE_GNRC_IPV6) || DOXYGEN
 /**
  * @brief   Adds an IPv6 address to the interface

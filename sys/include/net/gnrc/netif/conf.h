@@ -94,6 +94,19 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Maximum number of unicast and anycast addresses per interface
+ *
+ * @note    If you change this, please make sure that
+ *          @ref GNRC_NETIF_IPV4_GROUPS_NUMOF is also large enough to fit the
+ *          addresses' solicited nodes multicast addresses.
+ *
+ * Default: 2 (1 link-local + 1 global address)
+ */
+#ifndef GNRC_NETIF_IPV4_ADDRS_NUMOF
+#define GNRC_NETIF_IPV4_ADDRS_NUMOF    (2)
+#endif
+
+/**
  * @brief   Maximum number of multicast groups per interface
  *
  * Default: 3 (all-nodes + solicited-nodes of link-local and global unicast

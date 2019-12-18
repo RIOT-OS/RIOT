@@ -83,6 +83,11 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_pktbuf_realloc_data(pkt, nread);
         }
         switch (_get_version(pkt->data)) {
+#ifdef MODULE_GNRC_IPV4
+            case IP_VERSION4:
+                pkt->type = GNRC_NETTYPE_IPV4;
+                break;
+#endif
 #ifdef MODULE_GNRC_IPV6
             case IP_VERSION6:
                 pkt->type = GNRC_NETTYPE_IPV6;

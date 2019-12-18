@@ -20,6 +20,9 @@
 #include "net/ethernet/hdr.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netif/ethernet.h"
+#ifdef MODULE_GNRC_IPV4
+#include "net/ipv4/hdr.h"
+#endif
 #ifdef MODULE_GNRC_IPV6
 #include "net/ipv6/hdr.h"
 #endif
@@ -59,7 +62,17 @@ static inline void _addr_set_broadcast(uint8_t *dst)
 
 static inline void _addr_set_multicast(uint8_t *dst, gnrc_pktsnip_t *payload)
 {
+#ifdef MODULE_GNRC_IPV4
+ipv4_hdr_t *ipv4;
+#endif
+
     switch (payload->type) {
+#ifdef MODULE_GNRC_IPV4
+        case GNRC_NETTYPE_IPV4:
+            ipv4 = payload->data;
+            memcpy(dst, ipv4->dst.u8, 4);
+            break;
+#endif
 #ifdef MODULE_GNRC_IPV6
         case GNRC_NETTYPE_IPV6:
             /* https://tools.ietf.org/html/rfc2464#section-7 */
