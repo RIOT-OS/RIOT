@@ -22,6 +22,9 @@ endif
 ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
   DIRS += network_layer/ipv6/ext/rh
 endif
+ifneq (,$(filter gnrc_ipv4_hdr,$(USEMODULE)))
+  DIRS += network_layer/ipv4/hdr
+endif
 ifneq (,$(filter gnrc_ipv6_hdr,$(USEMODULE)))
   DIRS += network_layer/ipv6/hdr
 endif
