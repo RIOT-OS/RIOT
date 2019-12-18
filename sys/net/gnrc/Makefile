@@ -100,6 +100,9 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/frag/rb
 endif
+ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
+  DIRS += network_layer/sixlowpan/frag/stats
+endif
 ifneq (,$(filter gnrc_sixlowpan_frag_vrb,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/frag/vrb
 endif

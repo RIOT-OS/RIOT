@@ -22,6 +22,9 @@
 #include "xtimer.h"
 
 #include "net/gnrc/sixlowpan/frag/fb.h"
+#ifdef  MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+#include "net/gnrc/sixlowpan/frag/stats.h"
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_STATS */
 #include "net/gnrc/sixlowpan/frag/vrb.h"
 
 #define ENABLE_DEBUG    (0)
