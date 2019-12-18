@@ -314,9 +314,6 @@ static NORETURN void IRAM system_init (void)
     LOG_STARTUP("Heap free: %u bytes\n", get_free_heap_size());
     uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
 
-    /* initialize the board */
-    board_init();
-
     /* initialize stdio */
     stdio_init();
 
@@ -340,6 +337,9 @@ static NORETURN void IRAM system_init (void)
     extern void spi_flash_drive_init (void);
     spi_flash_drive_init();
     #endif
+
+    /* initialize the board */
+    board_init();
 
     /* route a software interrupt source to CPU as trigger for thread yields */
     intr_matrix_set(PRO_CPU_NUM, ETS_FROM_CPU_INTR0_SOURCE, CPU_INUM_SOFTWARE);
