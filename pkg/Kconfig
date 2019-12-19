@@ -6,6 +6,6 @@
 #
 menu "Packages"
 
+rsource "tinydtls/Kconfig"
 
 endmenu # Packages
-
