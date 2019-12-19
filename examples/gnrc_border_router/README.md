@@ -152,7 +152,6 @@ has the following:
 
 ```make
 ifeq (,$(filter native,$(BOARD)))
-GNRC_NETIF_NUMOF := 2
 USEMODULE += stdio_ethos
 CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=115200
 FEATURES_REQUIRED += periph_uart

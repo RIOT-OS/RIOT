@@ -2,7 +2,6 @@ DEVELHELP := 1
 include $(CURDIR)/../Makefile.tests_common
 
 export TAP ?= tap0
-GNRC_NETIF_NUMOF := 2
 
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_dhcpv6_client_6lbr

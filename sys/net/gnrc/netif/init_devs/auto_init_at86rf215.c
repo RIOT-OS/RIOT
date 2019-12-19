@@ -35,13 +35,6 @@
 #include "at86rf215.h"
 #include "at86rf215_params.h"
 
-/* If we don't have enough NETIFs configured, disable the sub-GHz band */
-#if (GNRC_NETIF_NUMOF == 1) && IS_USED(MODULE_AT86RF215_SUBGHZ) && IS_USED(MODULE_AT86RF215_24GHZ)
-#undef MODULE_AT86RF215_SUBGHZ
-#undef USED_BANDS
-#define USED_BANDS 1
-#endif
-
 /**
  * @brief   Define stack parameters for the MAC layer thread
  * @{

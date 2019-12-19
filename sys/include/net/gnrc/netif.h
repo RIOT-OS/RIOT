@@ -284,7 +284,7 @@ unsigned gnrc_netif_numof(void);
  */
 static inline bool gnrc_netif_highlander(void)
 {
-    return (GNRC_NETIF_NUMOF == 1);
+    return IS_ACTIVE(GNRC_NETIF_SINGLE);
 }
 
 /**

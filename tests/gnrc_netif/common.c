@@ -25,7 +25,7 @@
 #include "od.h"
 #include "test_utils/expect.h"
 
-static netdev_test_t _devs[GNRC_NETIF_NUMOF];
+static netdev_test_t _devs[NETIF_NUMOF];
 
 netdev_t *ethernet_dev = (netdev_t *)&_devs[0];
 netdev_t *ieee802154_dev = (netdev_t *)&_devs[1];
@@ -179,7 +179,7 @@ void _tests_init(void)
                            _get_netdev_proto);
     netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev,
                            NETOPT_MAX_PDU_SIZE, _get_netdev_max_packet_size);
-    for (intptr_t i = SPECIAL_DEVS; i < GNRC_NETIF_NUMOF; i++) {
+    for (intptr_t i = SPECIAL_DEVS; i < NETIF_NUMOF; i++) {
         devs[i - SPECIAL_DEVS] = (netdev_t *)&_devs[i];
         netdev_test_setup(&_devs[i], (void *)i);
         netdev_test_set_get_cb(&_devs[i], NETOPT_DEVICE_TYPE,

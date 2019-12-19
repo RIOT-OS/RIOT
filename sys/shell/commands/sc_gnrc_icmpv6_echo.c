@@ -371,7 +371,7 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
             data->num_recv++;
             dupmsg += 7;
         }
-        if ((GNRC_NETIF_NUMOF == 1) || (if_pid == KERNEL_PID_UNDEF) ||
+        if (gnrc_netif_highlander() || (if_pid == KERNEL_PID_UNDEF) ||
             !ipv6_addr_is_link_local(from)) {
             printf("%u bytes from %s: icmp_seq=%u ttl=%u",
                    (unsigned)icmpv6->size,

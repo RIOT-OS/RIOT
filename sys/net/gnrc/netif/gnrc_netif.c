@@ -39,29 +39,21 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-static gnrc_netif_t _netifs[GNRC_NETIF_NUMOF];
-
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);
 static void _configure_netdev(netdev_t *dev);
 static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 
 int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize, char priority,
-                                const char *name, netdev_t *netdev,
-                                const gnrc_netif_ops_t *ops)
+                      const char *name, netdev_t *netdev, const gnrc_netif_ops_t *ops)
 {
-    gnrc_netif_t *netif = NULL;
     int res;
 
-    for (int i = 0; i < GNRC_NETIF_NUMOF; i++) {
-        if (_netifs[i].dev == netdev) {
-            return &_netifs[i];
-        }
-        if ((netif == NULL) && (_netifs[i].ops == NULL)) {
-            netif = &_netifs[i];
-        }
+    if (IS_ACTIVE(DEVELHELP) && IS_ACTIVE(GNRC_NETIF_SINGLE) && netif_iter(NULL)) {
+        LOG_WARNING("gnrc_netif: GNRC_NETIF_SINGLE set but more than one "
+                    "interface is being registered.");
+        assert(netif_iter(NULL) == NULL);
     }
-    assert(netif != NULL);
     rmutex_init(&netif->mutex);
     netif->ops = ops;
     netif_register((netif_t*) netif);

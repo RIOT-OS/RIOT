@@ -51,9 +51,6 @@ else
   USEMODULE += gnrc_uhcpc
 endif
 
-# Use two network interfaces
-GNRC_NETIF_NUMOF := 2
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:

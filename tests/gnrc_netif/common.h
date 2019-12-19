@@ -26,8 +26,9 @@
 extern "C" {
 #endif
 
+#define NETIF_NUMOF         (4)
 #define SPECIAL_DEVS        (2)
-#define DEFAULT_DEVS_NUMOF  (GNRC_NETIF_NUMOF - SPECIAL_DEVS)
+#define DEFAULT_DEVS_NUMOF  (NETIF_NUMOF - SPECIAL_DEVS)
 
 #define GP1 (0x20U)
 #define GP2 (0x01U)

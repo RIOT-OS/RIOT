@@ -30,16 +30,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Maximum number of network interfaces
- *
- * @note    Intentionally not calling it `GNRC_NETIF_NUMOF` to not require
- *          rewrites throughout the stack.
- */
-#ifndef GNRC_NETIF_NUMOF
-#define GNRC_NETIF_NUMOF            (1)
-#endif
-
-/**
  * @brief   Default priority for network interface threads
  */
 #ifndef GNRC_NETIF_PRIO
