@@ -49,6 +49,13 @@ extern "C" {
 /** in 802.15.4 oqpsk each symble is 4 bits, not about the others */
 #define AT86RF215_BACKOFF_PERIOD_IN_BITS    (AT86RF215_BACKOFF_PERIOD_IN_SYMBOLS * 4)
 
+/** For the SUN PHYs, the value is 1 ms expressed in symbol periods, rounded up to the next
+    integer number of symbol periods using the ceiling() function */
+#define AT86RF215_TURNAROUND_TIME_US        (1000)
+
+/** An ACK consists of 5 payload bytes */
+#define AT86RF215_ACK_PSDU_BYTES            (5)
+
 /**
  * This is used to calculate the ACK timeout based on the bitrate.
  * AT86RF233 uses an ACK timeout of 54 symbol periods, or 864 µs @ 250 kbit/s

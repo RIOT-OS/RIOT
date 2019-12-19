@@ -23,7 +23,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define KBIT 1000
+/* symbol time is always 120 µs for MR-OFDM */
+#define OFDM_SYMBOL_TIME_US 120
 
 /* IEEE Std 802.15.4g™-2012 Amendment 3
  * Table 68d—Total number of channels and first channel center frequencies for SUN PHYs */
@@ -161,22 +162,6 @@ static uint32_t _RXBWC_IFS(uint8_t option, bool superGHz)
     return 0;
 }
 
-/* Table 6-88. MR-OFDM PHY Options and Modulation Schemes */
-static uint32_t _get_bitrate(uint8_t option, uint8_t scheme)
-{
-    switch (scheme) {
-    case BB_MCS_BPSK_REP4:  return  100 * KBIT / option;
-    case BB_MCS_BPSK_REP2:  return  200 * KBIT / option;
-    case BB_MCS_QPSK_REP2:  return  400 * KBIT / option;
-    case BB_MCS_QPSK_1BY2:  return  800 * KBIT / option;
-    case BB_MCS_QPSK_3BY4:  return 1200 * KBIT / option;
-    case BB_MCS_16QAM_1BY2: return 1600 * KBIT / option;
-    case BB_MCS_16QAM_3BY4: return 2400 * KBIT / option;
-    }
-
-    return 0;
-}
-
 static void _set_option(at86rf215_t *dev, uint8_t option)
 {
     const bool superGHz = !is_subGHz(dev);
@@ -212,16 +197,24 @@ static void _set_option(at86rf215_t *dev, uint8_t option)
     at86rf215_reg_write16(dev, dev->RF->RG_CNL, dev->netdev.chan);
 }
 
-static void _set_ack_timeout(at86rf215_t *dev, uint8_t option, uint8_t scheme)
+static unsigned _get_frame_duration(uint8_t option, uint8_t scheme, uint8_t bytes)
 {
-    dev->ack_timeout_usec = 10 * AT86RF215_ACK_PERIOD_IN_BITS * 1000000UL / _get_bitrate(option, scheme);
-    DEBUG("[%s] ACK timeout: %"PRIu32" µs\n", "OFDM", dev->ack_timeout_usec);
+    /* Table 150 - phySymbolsPerOctet values for MR-OFDM PHY, IEEE 802.15.4g-2012 */
+    static const uint8_t quot[] = { 3, 3, 6, 12, 18, 24, 36 };
+    --option;
+    /* phyMaxFrameDuration = phySHRDuration + phyPHRDuration + ceiling [(aMaxPHYPacketSize + 1) x phySymbolsPerOctet] */
+    const unsigned phySHRDuration = OFDM_SYMBOL_TIME_US * 6;
+    const unsigned phyPHRDuration = OFDM_SYMBOL_TIME_US * (option ? 6 : 3);
+    const unsigned phyPDUDuration = (OFDM_SYMBOL_TIME_US * ((bytes + 1) * (1 << option) + quot[scheme] - 1)) / quot[scheme];
+
+    return phySHRDuration + phyPHRDuration + phyPDUDuration;
 }
 
-static void _set_csma_backoff_period(at86rf215_t *dev, uint8_t option, uint8_t scheme)
+static void _set_ack_timeout(at86rf215_t *dev, uint8_t option, uint8_t scheme)
 {
-    dev->csma_backoff_period = 10 * AT86RF215_BACKOFF_PERIOD_IN_BITS * 1000000UL / _get_bitrate(option, scheme);
-    DEBUG("[%s] CSMA BACKOFF: %"PRIu32" µs\n", "OFDM", dev->csma_backoff_period);
+    dev->ack_timeout_usec = dev->csma_backoff_period + AT86RF215_TURNAROUND_TIME_US
+                          + _get_frame_duration(option, scheme, AT86RF215_ACK_PSDU_BYTES);
+    DEBUG("[%s] ACK timeout: %"PRIu32" µs\n", "OFDM", dev->ack_timeout_usec);
 }
 
 static bool _option_mcs_valid(uint8_t option, uint8_t mcs)
@@ -266,8 +259,10 @@ int at86rf215_configure_OFDM(at86rf215_t *dev, uint8_t option, uint8_t scheme)
 
     at86rf215_reg_write(dev, dev->BBC->RG_OFDMPHRTX, scheme);
 
+    dev->csma_backoff_period = AT86RF215_BACKOFF_PERIOD_IN_SYMBOLS * OFDM_SYMBOL_TIME_US;
+    DEBUG("[%s] CSMA BACKOFF: %"PRIu32" µs\n", "OFDM", dev->csma_backoff_period);
+
     _set_ack_timeout(dev, option, scheme);
-    _set_csma_backoff_period(dev, option, scheme);
 
     at86rf215_enable_radio(dev, BB_MROFDM);
 
@@ -289,7 +284,6 @@ int at86rf215_OFDM_set_scheme(at86rf215_t *dev, uint8_t scheme)
 
     at86rf215_reg_write(dev, dev->BBC->RG_OFDMPHRTX, scheme);
     _set_ack_timeout(dev, at86rf215_OFDM_get_option(dev), scheme);
-    _set_csma_backoff_period(dev, at86rf215_OFDM_get_option(dev), scheme);
 
     return 0;
 }
@@ -312,7 +306,6 @@ int at86rf215_OFDM_set_option(at86rf215_t *dev, uint8_t option)
 
     _set_option(dev, option);
     _set_ack_timeout(dev, option, mcs);
-    _set_csma_backoff_period(dev, option, mcs);
 
     return 0;
 }
