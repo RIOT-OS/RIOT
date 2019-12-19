@@ -85,6 +85,9 @@ endif
 # don't compile themselves and re-create signed images, thus add the required
 # files here so they will be submitted along with the test jobs.
 TEST_EXTRA_FILES += $(SLOT_RIOT_ELFS) $(SUIT_SEC) $(SUIT_PUB)
+# For now `examples/%/tests" still rely on the test applicaton being reset after
+# a terminal is opened to synchronize.
+TESTRUNNER_RESET_AFTER_TERM ?= 1
 
 include $(RIOTBASE)/Makefile.include
 

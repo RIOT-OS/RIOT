@@ -28,6 +28,20 @@ MAKE_TERM_STARTED_DELAY = int(os.environ.get('TESTRUNNER_START_DELAY') or 3)
 TEST_INTERACTIVE_RETRIES = int(os.environ.get('TEST_INTERACTIVE_RETRIES') or 5)
 TEST_INTERACTIVE_DELAY = int(os.environ.get('TEST_INTERACTIVE_DELAY') or 1)
 
+# By default never reset after the terminal is open unless explicitly requested
+# through an environment variable.
+TESTRUNNER_RESET_AFTER_TERM = int(os.environ.get('TESTRUNNER_RESET_AFTER_TERM')
+                                  or '0')
+
+
+def _reset_board(env):
+    try:
+        subprocess.check_output(('make', 'reset'), env=env,
+                                stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError:
+        # make reset yields error on some boards even if successful
+        pass
+
 
 def list_until(l, cond):
     return l[:([i for i, e in enumerate(l) if cond(e)][0])]
@@ -41,6 +55,10 @@ def find_exc_origin(exc_info):
 
 
 def setup_child(timeout=10, spawnclass=pexpect.spawnu, env=None, logfile=None):
+    # Some boards can't be reset after a terminal is open. Therefore reset
+    # before `cleanterm`.
+    _reset_board(env)
+
     child = spawnclass("make cleanterm", env=env, timeout=timeout,
                        codec_errors='replace', echo=False)
 
@@ -49,15 +67,8 @@ def setup_child(timeout=10, spawnclass=pexpect.spawnu, env=None, logfile=None):
 
     child.logfile = logfile
 
-    try:
-        subprocess.check_output(('make', 'reset'), env=env,
-                                stderr=subprocess.PIPE)
-    except subprocess.CalledProcessError:
-        # make reset yields error on some boards even if successful
-        pass
-
     # Handle synchronization if requested by the build system
-    sync_child(child)
+    sync_child(child, env)
 
     return child
 
@@ -77,16 +88,15 @@ def modules_list():
     return modules
 
 
-def sync_child(child):
+def sync_child(child, env):
     # Do a child synchronization if used by a module
     modules = modules_list()
-    _test_utils_interactive_sync(child, modules)
-
-
-def _test_utils_interactive_sync(child, modules):
-    if 'test_utils_interactive_sync' not in modules:
-        return
-
-    utils.test_utils_interactive_sync(child,
-                                      TEST_INTERACTIVE_RETRIES,
-                                      TEST_INTERACTIVE_DELAY)
+    if 'test_utils_interactive_sync' in modules:
+        utils.test_utils_interactive_sync(child,
+                                          TEST_INTERACTIVE_RETRIES,
+                                          TEST_INTERACTIVE_DELAY)
+    # If requested also reset after opening the terminal, this should not be used
+    # by any application since it breaks the tests for boards that do not support
+    # this feature.
+    elif TESTRUNNER_RESET_AFTER_TERM:
+        _reset_board(env)
