@@ -195,14 +195,15 @@ static const gnrc_netif_ops_t _esp_now_ops = {
     .set = gnrc_netif_set_from_netdev,
 };
 
-gnrc_netif_t *gnrc_netif_esp_now_create(char *stack, int stacksize, char priority,
-                                        char *name, netdev_t *dev)
+int gnrc_netif_esp_now_create(gnrc_netif_t *netif, char *stack, int stacksize, char priority,
+                              char *name, netdev_t *dev)
 {
-    return gnrc_netif_create(stack, stacksize, priority, name, dev, &_esp_now_ops);
+    return gnrc_netif_create(netif, stack, stacksize, priority, name, dev, &_esp_now_ops);
 }
 
 /* device thread stack */
 static char _esp_now_stack[ESP_NOW_STACKSIZE];
+static gnrc_netif_t _netif;
 
 void auto_init_esp_now(void)
 {
@@ -212,7 +213,7 @@ void auto_init_esp_now(void)
     if (!esp_now_dev) {
         LOG_ERROR("[auto_init_netif] error initializing esp_now\n");
     } else {
-        gnrc_netif_esp_now_create(_esp_now_stack, sizeof(_esp_now_stack),
+        gnrc_netif_esp_now_create(&_netif, _esp_now_stack, sizeof(_esp_now_stack),
                                   ESP_NOW_PRIO,
                                   "netif-esp-now",
                                   &esp_now_dev->netdev);

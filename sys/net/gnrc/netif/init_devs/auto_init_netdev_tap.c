@@ -30,6 +30,8 @@
 static netdev_tap_t netdev_tap[NETDEV_TAP_MAX];
 static char _netdev_eth_stack[NETDEV_TAP_MAX][TAP_MAC_STACKSIZE];
 
+static gnrc_netif_t _netif[NETDEV_TAP_MAX];
+
 void auto_init_netdev_tap(void)
 {
     for (unsigned i = 0; i < NETDEV_TAP_MAX; i++) {
@@ -39,7 +41,7 @@ void auto_init_netdev_tap(void)
                   i, *(p->tap_name));
 
         netdev_tap_setup(&netdev_tap[i], p);
-        gnrc_netif_ethernet_create(_netdev_eth_stack[i], TAP_MAC_STACKSIZE,
+        gnrc_netif_ethernet_create(&_netif[i], _netdev_eth_stack[i], TAP_MAC_STACKSIZE,
                                    TAP_MAC_PRIO, "gnrc_netdev_tap",
                                    &netdev_tap[i].netdev);
     }

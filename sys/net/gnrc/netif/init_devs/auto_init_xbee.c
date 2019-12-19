@@ -46,13 +46,15 @@
 static xbee_t xbee_devs[XBEE_NUM];
 static char stacks[XBEE_NUM][XBEE_MAC_STACKSIZE];
 
+static gnrc_netif_t _netif[XBEE_NUM];
+
 void auto_init_xbee(void)
 {
     for (unsigned i = 0; i < XBEE_NUM; i++) {
         LOG_DEBUG("[auto_init_netif] initializing xbee #%u\n", i);
 
         xbee_setup(&xbee_devs[i], &xbee_params[i]);
-        gnrc_netif_xbee_create(stacks[i], XBEE_MAC_STACKSIZE, XBEE_MAC_PRIO,
+        gnrc_netif_xbee_create(&_netif[i], stacks[i], XBEE_MAC_STACKSIZE, XBEE_MAC_PRIO,
                                "xbee", (netdev_t *)&xbee_devs[i]);
     }
 }

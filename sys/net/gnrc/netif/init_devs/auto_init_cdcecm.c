@@ -43,6 +43,7 @@ extern usbus_cdcecm_device_t cdcecm;
  * @brief   Stacks for the MAC layer threads
  */
 static char _netdev_eth_stack[CDCECM_MAC_STACKSIZE];
+static gnrc_netif_t _netif;
 extern void cdcecm_netdev_setup(usbus_cdcecm_device_t *cdcecm);
 
 void auto_init_netdev_cdcecm(void)
@@ -51,7 +52,7 @@ void auto_init_netdev_cdcecm(void)
 
     cdcecm_netdev_setup(&cdcecm);
     /* initialize netdev<->gnrc adapter state */
-    gnrc_netif_ethernet_create(_netdev_eth_stack, CDCECM_MAC_STACKSIZE,
+    gnrc_netif_ethernet_create(&_netif, _netdev_eth_stack, CDCECM_MAC_STACKSIZE,
                                CDCECM_MAC_PRIO, "cdcecm", &cdcecm.netdev);
 }
 

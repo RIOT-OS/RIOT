@@ -22,6 +22,8 @@
 #include "esp_eth_netdev.h"
 #include "net/gnrc/netif/ethernet.h"
 
+static gnrc_netif_t _netif;
+
 /** the only ESP32 Ethernet MAC (EMAC) device */
 extern esp_eth_netdev_t _esp_eth_dev;
 
@@ -34,7 +36,7 @@ extern void esp_eth_setup(esp_eth_netdev_t* dev);
 void auto_init_esp_eth(void)
 {
     esp_eth_setup(&_esp_eth_dev);
-    gnrc_netif_ethernet_create(_esp_eth_stack, ESP_ETH_STACKSIZE, ESP_ETH_PRIO,
+    gnrc_netif_ethernet_create(&_netif, _esp_eth_stack, ESP_ETH_STACKSIZE, ESP_ETH_PRIO,
                                "netif-esp-eth", (netdev_t *)&_esp_eth_dev);
 }
 

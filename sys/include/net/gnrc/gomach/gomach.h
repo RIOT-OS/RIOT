@@ -354,6 +354,7 @@ extern "C" {
 /**
  * @brief   Creates an IEEE 802.15.4 GoMacH network interface
  *
+ * @param[in] netif     The interface. May not be `NULL`.
  * @param[in] stack     The stack for the GoMacH network interface's thread.
  * @param[in] stacksize Size of @p stack.
  * @param[in] priority  Priority for the GoMacH network interface's thread.
@@ -362,12 +363,11 @@ extern "C" {
  *
  * @see @ref gnrc_netif_create()
  *
- * @return  The network interface on success.
- * @return  NULL, on error.
+ * @return  0 on success
+ * @return  negative number on error
  */
-gnrc_netif_t *gnrc_netif_gomach_create(char *stack, int stacksize,
-                                       char priority, char *name,
-                                       netdev_t *dev);
+int gnrc_netif_gomach_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                             char priority, char *name, netdev_t *dev);
 
 #ifdef __cplusplus
 }

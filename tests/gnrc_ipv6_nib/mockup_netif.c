@@ -28,6 +28,7 @@
 #define _MSG_QUEUE_SIZE  (2)
 
 gnrc_netif_t *_mock_netif = NULL;
+static gnrc_netif_t _netif;
 
 static netdev_test_t _mock_netdev;
 static char _mock_netif_stack[THREAD_STACKSIZE_DEFAULT];
@@ -79,11 +80,12 @@ void _tests_init(void)
                            _get_max_packet_size);
     netdev_test_set_get_cb(&_mock_netdev, NETOPT_ADDRESS,
                            _get_address);
-    _mock_netif = gnrc_netif_ethernet_create(
+    int res = gnrc_netif_ethernet_create(&_netif,
            _mock_netif_stack, THREAD_STACKSIZE_DEFAULT, GNRC_NETIF_PRIO,
             "mockup_eth", &_mock_netdev.netdev
         );
-    expect(_mock_netif != NULL);
+    _mock_netif = &_netif;
+    expect(res == 0);
     /* we do not want to test for SLAAC here so just assure the configured
      * address is valid */
     expect(!ipv6_addr_is_unspecified(&_mock_netif->ipv6.addrs[0]));

@@ -52,6 +52,7 @@
 
 static kw41zrf_t kw41zrf_devs[KW41ZRF_NUMOF];
 static char _kw41zrf_stacks[KW41ZRF_NUMOF][KW41ZRF_NETIF_STACKSIZE];
+static gnrc_netif_t _netif[KW41ZRF_NUMOF];
 
 void auto_init_kw41zrf(void)
 {
@@ -60,15 +61,15 @@ void auto_init_kw41zrf(void)
         kw41zrf_setup(&kw41zrf_devs[i]);
 
 #if defined(MODULE_GNRC_GOMACH)
-        gnrc_netif_gomach_create(_kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
-                                     KW41ZRF_NETIF_PRIO, "kw41zrf-gomach",
-                                     (netdev_t *)&kw41zrf_devs[i]);
+        gnrc_netif_gomach_create(&_netif[i], _kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
+                                 KW41ZRF_NETIF_PRIO, "kw41zrf-gomach",
+                                 (netdev_t *)&kw41zrf_devs[i]);
 #elif defined(MODULE_GNRC_LWMAC)
-        gnrc_netif_lwmac_create(_kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
-                                     KW41ZRF_NETIF_PRIO, "kw41zrf-lwmac",
-                                     (netdev_t *)&kw41zrf_devs[i]);
+        gnrc_netif_lwmac_create(&_netif[i], _kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
+                                KW41ZRF_NETIF_PRIO, "kw41zrf-lwmac",
+                                (netdev_t *)&kw41zrf_devs[i]);
 #else
-        gnrc_netif_ieee802154_create(_kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
+        gnrc_netif_ieee802154_create(&_netif[i], _kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
                                      KW41ZRF_NETIF_PRIO, "kw41zrf",
                                      (netdev_t *)&kw41zrf_devs[i]);
 #endif

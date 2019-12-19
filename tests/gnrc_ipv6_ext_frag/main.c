@@ -82,6 +82,7 @@ static int shell_test_cmd(int argc, char **argv);
 
 static netdev_test_t mock_netdev;
 static gnrc_netif_t *eth_netif, *mock_netif;
+static gnrc_netif_t _netif;
 static ipv6_addr_t *local_addr;
 static char mock_netif_stack[THREAD_STACKSIZE_DEFAULT];
 static char line_buf[SHELL_DEFAULT_BUFSIZE];
@@ -686,10 +687,12 @@ int main(void)
     netdev_test_set_get_cb(&mock_netdev, NETOPT_MAX_PDU_SIZE,
                            mock_get_max_packet_size);
     netdev_test_set_send_cb(&mock_netdev, mock_send);
-    mock_netif = gnrc_netif_raw_create(mock_netif_stack,
-                                       sizeof(mock_netif_stack),
-                                       GNRC_NETIF_PRIO, "mock_netif",
-                                       (netdev_t *)&mock_netdev);
+    int res = gnrc_netif_raw_create(&_netif, mock_netif_stack,
+                                    sizeof(mock_netif_stack),
+                                    GNRC_NETIF_PRIO, "mock_netif",
+                                    (netdev_t *)&mock_netdev);
+    mock_netif = &_netif;
+    assert(res == 0);
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }

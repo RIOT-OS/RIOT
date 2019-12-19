@@ -44,6 +44,8 @@
 static w5100_t dev[W5100_NUM];
 /** @} */
 
+static gnrc_netif_t _netif[W5100_NUM];
+
 /**
  * @brief   Stacks for the MAC layer threads
  */
@@ -58,7 +60,7 @@ void auto_init_w5100(void)
         /* setup netdev device */
         w5100_setup(&dev[i], &w5100_params[i]);
         /* initialize netdev <-> gnrc adapter state */
-        gnrc_netif_ethernet_create(stack[i], MAC_STACKSIZE, MAC_PRIO, "w5100",
+        gnrc_netif_ethernet_create(&_netif[i], stack[i], MAC_STACKSIZE, MAC_PRIO, "w5100",
                                    (netdev_t *)&dev[i]);
     }
 }

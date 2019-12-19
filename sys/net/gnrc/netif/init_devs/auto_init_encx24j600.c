@@ -25,6 +25,7 @@
 #include "net/gnrc/netif/ethernet.h"
 
 static encx24j600_t encx24j600;
+static gnrc_netif_t _netif;
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
@@ -52,7 +53,7 @@ void auto_init_encx24j600(void)
     encx24j600_setup(&encx24j600, &p);
 
     /* initialize netdev<->gnrc adapter state */
-    gnrc_netif_ethernet_create(_netdev_eth_stack, ENCX24J600_MAC_STACKSIZE,
+    gnrc_netif_ethernet_create(&_netif, _netdev_eth_stack, ENCX24J600_MAC_STACKSIZE,
                                ENCX24J600_MAC_PRIO, "encx24j600",
                                (netdev_t *)&encx24j600);
 }

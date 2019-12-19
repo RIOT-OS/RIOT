@@ -46,7 +46,7 @@ static void _configure_netdev(netdev_t *dev);
 static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 
-gnrc_netif_t *gnrc_netif_create(char *stack, int stacksize, char priority,
+int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize, char priority,
                                 const char *name, netdev_t *netdev,
                                 const gnrc_netif_ops_t *ops)
 {
@@ -71,7 +71,7 @@ gnrc_netif_t *gnrc_netif_create(char *stack, int stacksize, char priority,
                         _gnrc_netif_thread, (void *)netif, name);
     (void)res;
     assert(res > 0);
-    return netif;
+    return 0;
 }
 
 bool gnrc_netif_dev_is_6lo(const gnrc_netif_t *netif)
@@ -107,15 +107,7 @@ unsigned gnrc_netif_numof(void)
 
 gnrc_netif_t *gnrc_netif_iter(const gnrc_netif_t *prev)
 {
-    assert((prev == NULL) || (prev >= _netifs));
-    for (const gnrc_netif_t *netif = (prev == NULL) ? _netifs : (prev + 1);
-         netif < (_netifs + GNRC_NETIF_NUMOF); netif++) {
-        if (netif->ops != NULL) {
-            /* we don't care about external modification */
-            return (gnrc_netif_t *)netif;
-        }
-    }
-    return NULL;
+    return (gnrc_netif_t*) netif_iter((netif_t*) prev);
 }
 
 int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)

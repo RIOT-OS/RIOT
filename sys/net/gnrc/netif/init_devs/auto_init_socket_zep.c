@@ -40,6 +40,7 @@
  */
 static char _socket_zep_stacks[SOCKET_ZEP_MAX][SOCKET_ZEP_MAC_STACKSIZE];
 static socket_zep_t _socket_zeps[SOCKET_ZEP_MAX];
+static gnrc_netif_t _netif[SOCKET_ZEP_MAX];
 
 void auto_init_socket_zep(void)
 {
@@ -47,7 +48,7 @@ void auto_init_socket_zep(void)
         LOG_DEBUG("[auto_init_netif: initializing socket ZEP device #%u\n", i);
         /* setup netdev device */
         socket_zep_setup(&_socket_zeps[i], &socket_zep_params[i]);
-        gnrc_netif_ieee802154_create(_socket_zep_stacks[i],
+        gnrc_netif_ieee802154_create(&_netif[i], _socket_zep_stacks[i],
                                      SOCKET_ZEP_MAC_STACKSIZE,
                                      SOCKET_ZEP_MAC_PRIO, "socket_zep",
                                      (netdev_t *)&_socket_zeps[i]);

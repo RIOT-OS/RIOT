@@ -35,13 +35,14 @@
 
 static cc2538_rf_t cc2538_rf_dev;
 static char _cc2538_rf_stack[CC2538_MAC_STACKSIZE];
+static gnrc_netif_t _netif;
 
 void auto_init_cc2538_rf(void)
 {
     LOG_DEBUG("[auto_init_netif] initializing cc2538 radio\n");
 
     cc2538_setup(&cc2538_rf_dev);
-    gnrc_netif_ieee802154_create(_cc2538_rf_stack,
+    gnrc_netif_ieee802154_create(&_netif, _cc2538_rf_stack,
                                  CC2538_MAC_STACKSIZE,
                                  CC2538_MAC_PRIO, "cc2538_rf",
                                  (netdev_t *)&cc2538_rf_dev);

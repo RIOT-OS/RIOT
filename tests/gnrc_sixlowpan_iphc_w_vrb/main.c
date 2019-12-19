@@ -101,6 +101,7 @@ const ipv6_addr_t _test_tgt_ipv6 = { .u8 = TEST_TGT_IPV6 };
 
 static char _mock_netif_stack[THREAD_STACKSIZE_DEFAULT];
 static netdev_test_t _mock_dev;
+static gnrc_netif_t _netif;
 static gnrc_netif_t *_mock_netif;
 
 void _set_up(void)
@@ -308,9 +309,10 @@ static void _init_mock_netif(void)
                            _get_netdev_src_len);
     netdev_test_set_get_cb(&_mock_dev, NETOPT_ADDRESS_LONG,
                            _get_netdev_addr_long);
-    _mock_netif = gnrc_netif_ieee802154_create(
-            _mock_netif_stack, THREAD_STACKSIZE_DEFAULT, GNRC_NETIF_PRIO,
-            "mock_netif", (netdev_t *)&_mock_dev);
+    gnrc_netif_ieee802154_create(&_netif, _mock_netif_stack,
+                                 THREAD_STACKSIZE_DEFAULT, GNRC_NETIF_PRIO,
+                                 "mock_netif", (netdev_t *)&_mock_dev);
+    _mock_netif = &_netif;
     thread_yield_higher();
 }
 
