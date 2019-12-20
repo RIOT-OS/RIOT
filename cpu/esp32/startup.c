@@ -177,7 +177,7 @@ NORETURN void IRAM call_start_cpu0 (void)
     #ifdef MODULE_ESP_IDF_HEAP
     /* init heap */
     heap_caps_init();
-    #ifdef ENABLE_DEBUG
+    #if ENABLE_DEBUG
     ets_printf("Heap free: %u byte\n", get_free_heap_size());
     #endif /* ENABLE_DEBUG */
     #endif /* MODULE_ESP_IDF_HEAP */

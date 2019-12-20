@@ -70,27 +70,31 @@ static system_event_handler_t default_event_handlers[SYSTEM_EVENT_MAX] = { 0 };
 
 static esp_err_t system_event_sta_got_ip_default(system_event_t *event)
 {
-    #ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_VERSION /* TODO implement */
     ESP_LOGI(TAG, "sta ip: " IPSTR ", mask: " IPSTR ", gw: " IPSTR,
            IP2STR(&event->event_info.got_ip.ip_info.ip),
            IP2STR(&event->event_info.got_ip.ip_info.netmask),
            IP2STR(&event->event_info.got_ip.ip_info.gw));
-    #else
-    ESP_LOGI(TAG, "%s", __func__);
-    #endif
+#else
+    ESP_LOGD(TAG, "%s", __func__);
+#endif
 
     return ESP_OK;
 }
 
 static esp_err_t system_event_sta_lost_ip_default(system_event_t *event)
 {
+#ifndef RIOT_VERSION
     ESP_LOGI(TAG, "station ip lost");
+#else
+    ESP_LOGD(TAG, "%s", __func__);
+#endif
     return ESP_OK;
 }
 
 esp_err_t system_event_ap_start_handle_default(system_event_t *event)
 {
-    #ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_VERSION /* TODO implement */
     tcpip_adapter_ip_info_t ap_ip;
     uint8_t ap_mac[6];
 
@@ -98,54 +102,54 @@ esp_err_t system_event_ap_start_handle_default(system_event_t *event)
 
     tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ap_ip);
     tcpip_adapter_start(TCPIP_ADAPTER_IF_AP, ap_mac,  &ap_ip);
-    #else
-    ESP_LOGI(TAG, "%s", __func__);
-    #endif
+#else
+    ESP_LOGD(TAG, "%s", __func__);
+#endif
 
     return ESP_OK;
 }
 
 esp_err_t system_event_ap_stop_handle_default(system_event_t *event)
 {
-    #ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_VERSION /* TODO implement */
     tcpip_adapter_stop(TCPIP_ADAPTER_IF_AP);
-    #else
-    ESP_LOGI(TAG, "%s", __func__);
-    #endif
+#else
+    ESP_LOGD(TAG, "%s", __func__);
+#endif
 
     return ESP_OK;
 }
 
 esp_err_t system_event_sta_start_handle_default(system_event_t *event)
 {
-    #ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_VERSION /* TODO implement */
     tcpip_adapter_ip_info_t sta_ip;
     uint8_t sta_mac[6];
 
     WIFI_API_CALL_CHECK("esp_wifi_mac_get",  esp_wifi_get_mac(ESP_IF_WIFI_STA, sta_mac), ESP_OK);
     tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &sta_ip);
     tcpip_adapter_start(TCPIP_ADAPTER_IF_STA, sta_mac, &sta_ip);
-    #else
-    ESP_LOGI(TAG, "%s", __func__);
-    #endif
+#else
+    ESP_LOGD(TAG, "%s", __func__);
+#endif
 
     return ESP_OK;
 }
 
 esp_err_t system_event_sta_stop_handle_default(system_event_t *event)
 {
-    #ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_VERSION /* TODO implement */
     tcpip_adapter_stop(TCPIP_ADAPTER_IF_STA);
-    #else
-    ESP_LOGI(TAG, "%s", __func__);
-    #endif
+#else
+    ESP_LOGD(TAG, "%s", __func__);
+#endif
 
     return ESP_OK;
 }
 
 esp_err_t system_event_sta_connected_handle_default(system_event_t *event)
 {
-    #ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_VERSION /* TODO implement */
     tcpip_adapter_dhcp_status_t status;
 
     tcpip_adapter_up(TCPIP_ADAPTER_IF_STA);
@@ -179,20 +183,20 @@ esp_err_t system_event_sta_connected_handle_default(system_event_t *event)
             ESP_LOGE(TAG, "invalid static ip");
         }
     }
-    #else
-    ESP_LOGI(TAG, "%s", __func__);
-    #endif
+#else
+    ESP_LOGD(TAG, "%s", __func__);
+#endif
 
     return ESP_OK;
 }
 
 esp_err_t system_event_sta_disconnected_handle_default(system_event_t *event)
 {
-    #ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_VERSION /* TODO implement */
     tcpip_adapter_down(TCPIP_ADAPTER_IF_STA);
-    #else
-    ESP_LOGI(TAG, "%s", __func__);
-    #endif
+#else
+    ESP_LOGD(TAG, "%s", __func__);
+#endif
     return ESP_OK;
 }
 
@@ -244,16 +248,16 @@ static esp_err_t esp_system_event_debug(system_event_t *event)
         break;
     }
     case SYSTEM_EVENT_STA_GOT_IP: {
-        #ifndef RIOT_VERSION /* TODO implement */
+    #ifndef RIOT_VERSION /* TODO implement */
         system_event_sta_got_ip_t *got_ip = &event->event_info.got_ip;
         (void)got_ip; /* to avoid compile error: unused variable */
         ESP_LOGD(TAG, "SYSTEM_EVENT_STA_GOT_IP, ip:" IPSTR ", mask:" IPSTR ", gw:" IPSTR,
             IP2STR(&got_ip->ip_info.ip),
             IP2STR(&got_ip->ip_info.netmask),
             IP2STR(&got_ip->ip_info.gw));
-        #else
+    #else
         ESP_LOGD(TAG, "SYSTEM_EVENT_STA_GOT_IP");
-        #endif
+    #endif
         break;
     }
     case SYSTEM_EVENT_STA_LOST_IP: {
@@ -312,7 +316,7 @@ static esp_err_t esp_system_event_debug(system_event_t *event)
     }
 #if ESP_EVENT_IPV6
     case SYSTEM_EVENT_GOT_IP6: {
-        #ifndef RIOT_VERSION /* TODO implement */
+    #ifndef RIOT_VERSION /* TODO implement */
         ip6_addr_t *addr = &event->event_info.got_ip6.ip6_info.ip;
         ESP_LOGD(TAG, "SYSTEM_EVENT_AP_STA_GOT_IP6 address %04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
                  IP6_ADDR_BLOCK1(addr),
@@ -323,9 +327,9 @@ static esp_err_t esp_system_event_debug(system_event_t *event)
                  IP6_ADDR_BLOCK6(addr),
                  IP6_ADDR_BLOCK7(addr),
                  IP6_ADDR_BLOCK8(addr));
-        #else
+    #else
         ESP_LOGD(TAG, "SYSTEM_EVENT_AP_STA_GOT_IP6 address ");
-        #endif
+    #endif
         break;
     }
 #endif
