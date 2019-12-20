@@ -302,13 +302,14 @@ end:
     if (retval != CORD_EP_OK) {
         _rd_loc[0] = '\0';
     }
+    mutex_unlock(&_mutex);
+
 #ifdef MODULE_CORD_EP_STANDALONE
-    else {
+    if (retval == CORD_EP_OK) {
         cord_ep_standalone_signal(true);
     }
 #endif
 
-    mutex_unlock(&_mutex);
     return retval;
 }
 
@@ -318,12 +319,16 @@ int cord_ep_update(void)
     int res = _update_remove(COAP_METHOD_POST, _on_update);
     if (res != CORD_EP_OK) {
         /* in case we are not able to reach the RD, we drop the association */
-#ifdef MODULE_CORD_EP_STANDALONE
-        cord_ep_standalone_signal(false);
-#endif
         _rd_loc[0] = '\0';
     }
     mutex_unlock(&_mutex);
+
+#ifdef MODULE_CORD_EP_STANDALONE
+    if (res != CORD_EP_OK) {
+        cord_ep_standalone_signal(false);
+    }
+#endif
+
     return res;
 }
 
@@ -334,14 +339,16 @@ int cord_ep_remove(void)
         mutex_unlock(&_mutex);
         return CORD_EP_NORD;
     }
-#ifdef MODULE_CORD_EP_STANDALONE
-    cord_ep_standalone_signal(false);
-#endif
     _update_remove(COAP_METHOD_DELETE, _on_remove);
     /* we actually do not care about the result, we drop the RD local RD entry
      * in any case */
     _rd_loc[0] = '\0';
     mutex_unlock(&_mutex);
+
+#ifdef MODULE_CORD_EP_STANDALONE
+    cord_ep_standalone_signal(false);
+#endif
+
     return CORD_EP_OK;
 }
 
