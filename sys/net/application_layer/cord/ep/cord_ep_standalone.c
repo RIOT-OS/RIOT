@@ -76,9 +76,6 @@ static void *_reg_runner(void *arg)
                 _set_timer();
                 _notify(CORD_EP_UPDATED);
             }
-            else {
-                _notify(CORD_EP_DEREGISTERED);
-            }
         }
     }
 
