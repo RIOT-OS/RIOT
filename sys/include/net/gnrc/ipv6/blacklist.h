@@ -39,8 +39,8 @@ extern "C" {
 /**
  * Maximum size of the blacklist.
  */
-#ifndef GNRC_IPV6_BLACKLIST_SIZE
-#define GNRC_IPV6_BLACKLIST_SIZE    (8)
+#ifndef CONFIG_GNRC_IPV6_BLACKLIST_SIZE
+#define CONFIG_GNRC_IPV6_BLACKLIST_SIZE    (8)
 #endif
 /** @} */
 
