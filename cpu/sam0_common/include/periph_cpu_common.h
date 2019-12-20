@@ -211,6 +211,10 @@ typedef struct {
     SercomUsart *dev;       /**< pointer to the used UART device */
     gpio_t rx_pin;          /**< pin used for RX */
     gpio_t tx_pin;          /**< pin used for TX */
+#ifdef MODULE_SAM0_PERIPH_UART_HW_FC
+    gpio_t rts_pin;          /**< pin used for RTS */
+    gpio_t cts_pin;          /**< pin used for CTS */
+#endif
     gpio_mux_t mux;         /**< alternative function for pins */
     uart_rxpad_t rx_pad;    /**< pad selection for RX line */
     uart_txpad_t tx_pad;    /**< pad selection for TX line */
