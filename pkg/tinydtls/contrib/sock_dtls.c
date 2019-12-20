@@ -386,17 +386,9 @@ ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
 ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
                        void *data, size_t max_len, uint32_t timeout)
 {
-    xtimer_t timeout_timer;
-
     assert(sock);
     assert(data);
     assert(remote);
-
-    if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
-        timeout_timer.callback = _timeout_callback;
-        timeout_timer.arg = sock;
-        xtimer_set(&timeout_timer, timeout);
-    }
 
     /* save location to result buffer */
     sock->buf = data;
@@ -409,7 +401,6 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
                                     &remote->ep);
         if (res <= 0) {
             DEBUG("sock_dtls: error receiving UDP packet: %zd\n", res);
-            xtimer_remove(&timeout_timer);
             return res;
         }
 
@@ -427,7 +418,6 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
         if (mbox_try_get(&sock->mbox, &msg)) {
             switch(msg.type) {
                 case DTLS_EVENT_READ:
-                    xtimer_remove(&timeout_timer);
                     return msg.content.value;
                 case DTLS_EVENT_TIMEOUT:
                     DEBUG("sock_dtls: timed out while decrypting message\n");
