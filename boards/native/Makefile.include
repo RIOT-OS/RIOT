@@ -1,5 +1,5 @@
 export NATIVEINCLUDES += -DNATIVE_INCLUDES
-export NATIVEINCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/
+export NATIVEINCLUDES += -I$(RIOTBOARD)/native/include/
 export NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
 export NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 
@@ -11,7 +11,7 @@ else
   DEBUGGER ?= gdb
 endif
 
-RESET ?= $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+RESET ?= $(RIOTBOARD)/native/dist/reset.sh
 FLASHER = true
 FLASHFILE ?= $(ELFFILE)
 
