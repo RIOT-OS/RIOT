@@ -46,6 +46,10 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM5->USART,
         .rx_pin   = GPIO_PIN(PB, 30),  /* D0, RX Pin */
         .tx_pin   = GPIO_PIN(PB, 31),  /* D1, TX Pin */
+#ifdef MODULE_SAM0_PERIPH_UART_HW_FC
+        .rts_pin  = GPIO_UNDEF,
+        .cts_pin  = GPIO_UNDEF,
+#endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
@@ -56,6 +60,10 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM0->USART,
         .rx_pin   = GPIO_PIN(PA,5),
         .tx_pin   = GPIO_PIN(PA,6),
+#ifdef MODULE_SAM0_PERIPH_UART_HW_FC
+        .rts_pin  = GPIO_UNDEF,
+        .cts_pin  = GPIO_UNDEF,
+#endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_2,
