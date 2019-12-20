@@ -44,6 +44,7 @@
 #include "driver/periph_ctrl.h"
 #include "esp/common_macros.h"
 #include "heap/esp_heap_caps_init.h"
+#include "log/esp_log.h"
 #include "rom/cache.h"
 #include "rom/ets_sys.h"
 #include "rom/rtc.h"
@@ -296,6 +297,10 @@ static NORETURN void IRAM system_init (void)
      */
     extern void __libc_init_array(void);
     __libc_init_array();
+
+    /* set log levels for SDK library outputs */
+    extern void esp_log_level_set(const char* tag, esp_log_level_t level);
+    esp_log_level_set("wifi", LOG_DEBUG);
 
     /* init watchdogs */
     system_wdt_init();
