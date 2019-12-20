@@ -116,6 +116,7 @@ extern int ets_printf(const char *fmt, ...);
 #define LOG_TAG_WARNING(tag, format, ...) LOG_TAG(LOG_WARNING, W, tag, format, ##__VA_ARGS__)
 #define LOG_TAG_INFO(tag, format, ...)    LOG_TAG(LOG_INFO   , I, tag, format, ##__VA_ARGS__)
 #define LOG_TAG_DEBUG(tag, format, ...)   LOG_TAG(LOG_DEBUG  , D, tag, format, ##__VA_ARGS__)
+#define LOG_TAG_ALL(tag, format, ...)     LOG_TAG(LOG_ALL    , V, tag, format, ##__VA_ARGS__)
 
 /** definitions for source code compatibility with ESP-IDF */
 #define ESP_EARLY_LOGE(tag, format, ...) LOG_TAG_EARLY(LOG_ERROR  , E, tag, format "\n", ##__VA_ARGS__)
