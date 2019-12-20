@@ -30,7 +30,7 @@
 /* This factor is used for converting "real" seconds into microcontroller
  * microseconds. This is done in order to correct timer drift.
  */
-#define _DRIFT_FACTOR (int) (US_PER_SEC * 100 / (100 + CONFIG_GNRC_LORAWAN_TIMER_DRIFT))
+#define _DRIFT_FACTOR (int) (US_PER_SEC * 100 / (100 + (CONFIG_GNRC_LORAWAN_TIMER_DRIFT / 10.0)))
 
 #define GNRC_LORAWAN_DL_RX2_DR_MASK       (0x0F)  /**< DL Settings DR Offset mask */
 #define GNRC_LORAWAN_DL_RX2_DR_POS        (0)     /**< DL Settings DR Offset pos */

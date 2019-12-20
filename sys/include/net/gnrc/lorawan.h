@@ -35,15 +35,15 @@ extern "C" {
  * @{
  */
 /**
- * @brief maximum timer drift in percentage
+ * @brief maximum timer drift in per mille
  *
  * @note this is only a workaround to compensate inaccurate timers.
  *
- * E.g a value of 0.1 means there's a positive drift of 0.1% (set timeout to
+ * E.g a value of 1 means there's a positive drift of 0.1% (set timeout to
  * 1000 ms => triggers after 1001 ms)
  */
 #ifndef CONFIG_GNRC_LORAWAN_TIMER_DRIFT
-#define CONFIG_GNRC_LORAWAN_TIMER_DRIFT 1
+#define CONFIG_GNRC_LORAWAN_TIMER_DRIFT 10
 #endif
 
 /**
