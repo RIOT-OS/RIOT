@@ -25,7 +25,11 @@
 #include "common.h"
 #include "lwip.h"
 #include "lwip/netif.h"
+#if LWIP_IPV4
 #include "net/ipv6/addr.h"
+#else
+#include "net/ipv4/addr.h"
+#endif
 #include "shell.h"
 
 static int ifconfig(int argc, char **argv)
@@ -42,6 +46,11 @@ static int ifconfig(int argc, char **argv)
                                                        sizeof(addrstr)));
             }
         }
+#endif
+#ifdef MODULE_LWIP_IPV4
+        char addrstr[IPV4_ADDR_MAX_STR_LEN];
+        printf(" inet %s\n", ipv4_addr_to_str(addrstr, (ipv4_addr_t *)&iface->ip_addr,
+                                              sizeof(addrstr)));
 #endif
         puts("");
     }
@@ -61,6 +70,7 @@ static const shell_command_t shell_commands[] = {
     { "ifconfig", "Shows assigned IPv6 addresses", ifconfig },
     { NULL, NULL, NULL }
 };
+
 static char line_buf[SHELL_DEFAULT_BUFSIZE];
 
 int main(void)
