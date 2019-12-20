@@ -91,6 +91,7 @@ PSEUDOMODULES += esp_wifi_any
 
 export TARGET_ARCH ?= xtensa-esp32-elf
 
+USEMODULE += esp_common
 USEMODULE += esp_idf
 USEMODULE += esp_idf_driver
 USEMODULE += esp_idf_esp32

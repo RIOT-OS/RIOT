@@ -53,7 +53,7 @@ can also be used to connect external IEEE802.15.4 modules to integrate
 ESP8266 boards into a GNRC network.
 
 The RIOT-OS port for ESP8266 supports ESP8266 as well as ESP8285 MCUs and requires
-the [ESP8266 RTOS SDK v3.x](https://github.com/espressif/ESP8266_RTOS_SDK).
+the [ESP8266 RTOS SDK v3.x](https://github.com/gschorcht/RIOT-Xtensa-ESP8266-RTOS-SDK.git).
 To build a RIOT application, simply use the `make` command and specify an
 existing ESP8266 board, for example:
 
@@ -326,7 +326,7 @@ required. This modified version can also be downloaded as
 cd $HOME/esp
 git clone https://github.com/gschorcht/RIOT-Xtensa-ESP8266-RTOS-SDK.git ESP8266_RTOS_SDK
 cd ESP8266_RTOS_SDK/
-git checkout release/v3.1-for-riot-os
+git checkout release/v3.1-for-riot-os-v2
 ```
 @note
 - Please be sure to checkout the correct branch that was used for the

@@ -76,6 +76,7 @@ PSEUDOMODULES += esp_sw_timer
 PSEUDOMODULES += esp_spiffs
 PSEUDOMODULES += esp_wifi_any
 
+USEMODULE += esp_common
 USEMODULE += esp_freertos
 USEMODULE += esp_idf
 USEMODULE += esp_idf_esp8266
