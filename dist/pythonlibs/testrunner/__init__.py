@@ -14,9 +14,15 @@ import pexpect
 
 from .spawn import find_exc_origin, setup_child, teardown_child
 from .unittest import PexpectTestCase   # noqa, F401 expose to users
+from .utils import test_utils_interactive_sync # noqa, F401 expose to users
+
+# Timeout for tests can be changed by setting RIOT_TEST_TIMEOUT to the desired
+# value in the environment variables
+# default value (10)
+TIMEOUT = int(os.environ.get('RIOT_TEST_TIMEOUT') or 10)
 
 
-def run(testfunc, timeout=10, echo=True, traceback=False):
+def run(testfunc, timeout=TIMEOUT, echo=True, traceback=False):
     child = setup_child(timeout, env=os.environ,
                         logfile=sys.stdout if echo else None)
     try:

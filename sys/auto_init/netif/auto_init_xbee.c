@@ -30,7 +30,7 @@
 /**
  * @brief   Calculate the number of configured XBee devices
  */
-#define XBEE_NUM        (sizeof(xbee_params) / sizeof(xbee_params_t))
+#define XBEE_NUM        ARRAY_SIZE(xbee_params)
 
 /**
  * @brief   Define stack parameters for the MAC layer thread

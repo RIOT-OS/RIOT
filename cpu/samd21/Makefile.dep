@@ -1,0 +1,1 @@
+include $(RIOTCPU)/sam0_common/Makefile.dep

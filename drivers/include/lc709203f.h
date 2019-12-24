@@ -115,7 +115,7 @@ typedef struct {
 
 /**
  * @brief Register Addresses
- * @details For more information on the registers and its funtions see the datasheet
+ * @details For more information on the registers and its functions see the datasheet
  * @{
  */
 #define LC709203F_REG_CELL_VOLTAGE      0x09        /**< Register Cell Voltage */

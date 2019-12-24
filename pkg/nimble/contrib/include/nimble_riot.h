@@ -7,7 +7,10 @@
  */
 
 /**
+ * @defgroup    pkg_nimble_contrib RIOT Integration
  * @ingroup     pkg_nimble
+ * @brief       Basic RIOT integration of NimBLE, including e.g. stack
+ *              configuration and (auto)initialization code
  * @{
  *
  * @file
@@ -18,6 +21,8 @@
 
 #ifndef NIMBLE_RIOT_H
 #define NIMBLE_RIOT_H
+
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

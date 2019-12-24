@@ -5,7 +5,8 @@ PKG_LICENSE  := MIT
 
 .PHONY: all
 
-all: git-download
-	$(Q)"$(MAKE)" -C $(PKG_BUILDDIR)
+all:
+	$(Q)cp $(CURDIR)/Makefile.$(PKG_NAME) $(PKG_BUILDDIR)/$(PKG_NAME)/Makefile
+	$(Q)cp $(CURDIR)/Makefile.$(PKG_NAME)-unittests $(PKG_BUILDDIR)/unittests/Makefile
 
 include $(RIOTBASE)/pkg/pkg.mk

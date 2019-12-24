@@ -227,7 +227,7 @@ static int _bind_isotp(int argc, char **argv)
 #endif
     ret = conn_can_isotp_create(&conn_isotp[thread_nb], &isotp_opt, ifnum);
     if (ret == 0) {
-        ret = conn_can_isotp_bind(&conn_isotp[thread_nb]);
+        ret = conn_can_isotp_bind(&conn_isotp[thread_nb], NULL);
     }
     if (ret < 0) {
         puts("Error when binding connection");

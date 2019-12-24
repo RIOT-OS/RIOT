@@ -30,7 +30,7 @@
  * Returns: 0 on success, -1 on failure
  */
 int
-hmac_md5_vector(const u8 *key, size_t key_len, size_t num_elem,
+wpa_hmac_md5_vector(const u8 *key, size_t key_len, size_t num_elem,
             const u8 *addr[], const size_t *len, u8 *mac)
 {
     u8 k_pad[64]; /* padding - key XORd with ipad/opad */
@@ -48,7 +48,7 @@ hmac_md5_vector(const u8 *key, size_t key_len, size_t num_elem,
 
         /* if key is longer than 64 bytes reset it to key = MD5(key) */
         if (key_len > 64) {
-        if (md5_vector(1, &key, &key_len, tk))
+        if (wpa_md5_vector(1, &key, &key_len, tk))
             return -1;
         key = tk;
         key_len = 16;
@@ -78,7 +78,7 @@ hmac_md5_vector(const u8 *key, size_t key_len, size_t num_elem,
         _addr[i + 1] = addr[i];
         _len[i + 1] = len[i];
     }
-    if (md5_vector(1 + num_elem, _addr, _len, mac))
+    if (wpa_md5_vector(1 + num_elem, _addr, _len, mac))
         return -1;
 
     os_memset(k_pad, 0, sizeof(k_pad));
@@ -92,7 +92,7 @@ hmac_md5_vector(const u8 *key, size_t key_len, size_t num_elem,
     _len[0] = 64;
     _addr[1] = mac;
     _len[1] = MD5_MAC_LEN;
-    return md5_vector(2, _addr, _len, mac);
+    return wpa_md5_vector(2, _addr, _len, mac);
 }
 
 
@@ -106,8 +106,8 @@ hmac_md5_vector(const u8 *key, size_t key_len, size_t num_elem,
  * Returns: 0 on success, -1 on failure
  */
 int
-hmac_md5(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
+wpa_hmac_md5(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
           u8 *mac)
 {
-    return hmac_md5_vector(key, key_len, 1, &data, &data_len, mac);
+    return wpa_hmac_md5_vector(key, key_len, 1, &data, &data_len, mac);
 }

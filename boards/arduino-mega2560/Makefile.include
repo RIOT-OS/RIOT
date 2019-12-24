@@ -1,6 +1,3 @@
-# define the cpu used by the arduino mega2560 board
-export CPU = atmega2560
-
 USEMODULE += boards_common_arduino-atmega
 
 # configure the terminal program

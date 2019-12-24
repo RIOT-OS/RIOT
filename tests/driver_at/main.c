@@ -47,9 +47,19 @@ static int init(int argc, char **argv)
     uint8_t uart = atoi(argv[1]);
     uint32_t baudrate = atoi(argv[2]);
 
-    at_dev_init(&at_dev, UART_DEV(uart), baudrate, buf, sizeof(buf));
+    int res = at_dev_init(&at_dev, UART_DEV(uart), baudrate, buf, sizeof(buf));
 
-    return 0;
+    /* check the UART initialization return value and respond as needed */
+    if (res == UART_NODEV) {
+        puts("Invalid UART device given!");
+        return 1;
+    }
+    else if (res == UART_NOBAUD) {
+        puts("Baudrate is not applicable!");
+        return 1;
+    }
+
+    return res;
 }
 
 static int send(int argc, char **argv)
@@ -121,6 +131,34 @@ static int send_recv_bytes(int argc, char **argv)
 
     printf("Response (len=%d): %s\n", (int)len, buffer);
 
+    return 0;
+}
+
+static int send_recv_bytes_until_string(int argc, char **argv)
+{
+    char buffer[128];
+    size_t len = sizeof(buffer);
+
+    memset(buffer, 0, sizeof(buffer));
+
+    if (argc < 3) {
+        printf("Usage: %s <command> <string to expect>\n", argv[0]);
+        return 1;
+    }
+
+    sprintf(buffer, "%s%s", argv[1], AT_SEND_EOL);
+    at_send_bytes(&at_dev, buffer, strlen(buffer));
+    memset(buffer, 0, sizeof(buffer));
+
+    int res = at_recv_bytes_until_string(&at_dev, argv[2], buffer, &len,
+                                         10 * US_PER_SEC);
+
+    if (res) {
+        puts("Error");
+        return 1;
+    }
+
+    printf("Response (len=%d): %s\n", (int)len, buffer);
     return 0;
 }
 
@@ -248,6 +286,8 @@ static const shell_command_t shell_commands[] = {
     { "send_ok", "Send a command and wait OK", send_ok },
     { "send_lines", "Send a command and wait lines", send_lines },
     { "send_recv_bytes", "Send a command and wait response as raw bytes", send_recv_bytes },
+    { "send_recv_until_string", "Send a command and receive response until "
+      "the expected pattern arrives", send_recv_bytes_until_string },
     { "drain", "Drain AT device", drain },
     { "power_on", "Power on AT device", power_on },
     { "power_off", "Power off AT device", power_off },

@@ -21,7 +21,7 @@
 
 /*
  * If RTC_TIMER_USED is 0, the microsecond system timer is used to emulate an
- * RTC, otherwise the RTC timer is used. Advantage of using RTC over sytem
+ * RTC, otherwise the RTC timer is used. Advantage of using RTC over system
  * timer is that it also continues in deep sleep and after software reset.
  */
 #define RTC_TIMER_USED 1
@@ -175,7 +175,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     /*
      * RTC doesn't provide alarm functionality in active mode. At least
      * the RTC main timer seems not to work. Therefore we always use the
-     * system timer for alarms. The Advantage of using RTC over sytem timer
+     * system timer for alarms. The Advantage of using RTC over system timer
      * is that it also continues in deep sleep and after software reset.
      */
     #if 0 /* TODO should be RTC_TIMER_USED */

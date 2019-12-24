@@ -28,6 +28,7 @@
 #include "thread_flags.h"
 
 #include "net/emcute.h"
+#include "net/mqttsn.h"
 #include "emcute_internal.h"
 
 #define ENABLE_DEBUG        (0)
@@ -62,7 +63,9 @@ static volatile int result;
 
 static size_t set_len(uint8_t *buf, size_t len)
 {
-    if (len < (0xff - 7)) {
+    /* - `len` field minimum length == 1
+     * - `((len + 1) <= 0xff) == len < 0xff` */
+    if (len < 0xff) {
         buf[0] = len + 1;
         return 1;
     }
@@ -344,7 +347,6 @@ int emcute_pub(emcute_topic_t *topic, const void *data, size_t len,
     mutex_lock(&txlock);
 
     size_t pos = set_len(tbuf, (len + 6));
-    len += (pos + 6);
     tbuf[pos++] = PUBLISH;
     tbuf[pos++] = flags;
     byteorder_htobebufs(&tbuf[pos], topic->id);
@@ -355,10 +357,10 @@ int emcute_pub(emcute_topic_t *topic, const void *data, size_t len,
     memcpy(&tbuf[pos], data, len);
 
     if (flags & EMCUTE_QOS_1) {
-        res = syncsend(PUBACK, len, true);
+        res = syncsend(PUBACK, len + pos, true);
     }
     else {
-        sock_udp_send(&sock, tbuf, len, &gateway);
+        sock_udp_send(&sock, tbuf, len + pos, &gateway);
         mutex_unlock(&txlock);
     }
 
@@ -490,7 +492,8 @@ int emcute_willupd_msg(const void *data, size_t len)
 
 void emcute_run(uint16_t port, const char *id)
 {
-    assert(strlen(id) < EMCUTE_ID_MAXLEN);
+    assert(strlen(id) >= MQTTSN_CLI_ID_MINLEN &&
+           strlen(id) <= MQTTSN_CLI_ID_MAXLEN);
 
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
     sock_udp_ep_t remote;
@@ -513,7 +516,7 @@ void emcute_run(uint16_t port, const char *id)
 
         if ((len < 0) && (len != -ETIMEDOUT)) {
             LOG_ERROR("[emcute] error while receiving UDP packet\n");
-            return;
+            continue;
         }
 
         if (len >= 2) {

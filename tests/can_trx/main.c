@@ -32,9 +32,19 @@ static can_trx_t tja1042 = {
 };
 #endif
 
+#ifdef MODULE_NCV7356
+#include "ncv7356.h"
+static can_trx_t ncv7356 = {
+    .driver = &ncv7356_driver,
+};
+#endif
+
 static can_trx_t *devs[] = {
 #ifdef MODULE_TJA1042
     &tja1042,
+#endif
+#ifdef MODULE_NCV7356
+    &ncv7356,
 #endif
     NULL,
 };
@@ -47,7 +57,7 @@ static int help(int argc, char **argv)
     puts("Help:");
     puts("\tinit [trx_id] - initialize a trx");
     puts("\tset_mode [trx_id] [mode] - set a mode on the trx");
-    printf("trx_id: 0..%u\n", (unsigned)(sizeof(devs) / sizeof(devs[0])));
+    printf("trx_id: 0..%u\n", (unsigned)ARRAY_SIZE(devs));
     puts("modes:");
     puts("\t0: normal mode");
     puts("\t1: silent mode");
@@ -67,7 +77,7 @@ static int init(int argc, char **argv) {
     }
 
     unsigned trx = atoi(argv[1]);
-    if (trx < (sizeof(devs) / sizeof(devs[0]))) {
+    if (trx < ARRAY_SIZE(devs)) {
         int res = can_trx_init(devs[trx]);
         if (res >= 0) {
             puts("Trx successfully initialized");
@@ -93,7 +103,7 @@ static int set_mode(int argc, char **argv) {
     }
     unsigned trx = atoi(argv[1]);
     unsigned mode = atoi(argv[2]);
-    if ((trx < (sizeof(devs) / sizeof(devs[0]))) &&
+    if ((trx < ARRAY_SIZE(devs)) &&
             (mode <= TRX_HIGH_VOLTAGE_WAKE_UP_MODE)) {
         int res = can_trx_set_mode(devs[trx], mode);
         if (res >= 0) {

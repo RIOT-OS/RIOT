@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -221,6 +222,7 @@ static int _sockaddr_to_ep(const struct sockaddr *address, socklen_t address_len
                 return -1;
             }
             struct sockaddr_in *in_addr = (struct sockaddr_in *)address;
+            memset(out, 0, sizeof(*out));
             out->family = AF_INET;
             out->addr.ipv4_u32 = in_addr->sin_addr.s_addr;
             out->port = ntohs(in_addr->sin_port);
@@ -232,6 +234,7 @@ static int _sockaddr_to_ep(const struct sockaddr *address, socklen_t address_len
                 return -1;
             }
             struct sockaddr_in6 *in6_addr = (struct sockaddr_in6 *)address;
+            memset(out, 0, sizeof(*out));
             out->family = AF_INET6;
             memcpy(&out->addr.ipv6, &in6_addr->sin6_addr, sizeof(out->addr.ipv6));
             out->port = ntohs(in6_addr->sin6_port);
@@ -343,7 +346,7 @@ int socket(int domain, int type, int protocol)
         case AF_INET6:
 #endif
         {
-            int fd = vfs_bind(VFS_ANY_FD, 0, &socket_ops, s);
+            int fd = vfs_bind(VFS_ANY_FD, O_RDWR, &socket_ops, s);
 
             if (fd < 0) {
                 errno = ENFILE;
@@ -443,7 +446,7 @@ int accept(int socket, struct sockaddr *restrict address,
                                                   sa_len);
 
                 }
-                int fd = vfs_bind(VFS_ANY_FD, 0, &socket_ops, new_s);
+                int fd = vfs_bind(VFS_ANY_FD, O_RDWR, &socket_ops, new_s);
                 if (fd < 0) {
                     errno = ENFILE;
                     res = -1;
@@ -458,6 +461,7 @@ int accept(int socket, struct sockaddr *restrict address,
                 new_s->bound = true;
                 new_s->queue_array = NULL;
                 new_s->queue_array_len = 0;
+                new_s->sock = (socket_sock_t *)sock;
                 memset(&s->local, 0, sizeof(sock_tcp_ep_t));
             }
             break;
@@ -928,7 +932,7 @@ static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
             return res;
         }
     }
-#if defined(MODULE_SOCK_IP) || defined(MODULE_SOCK_UDP)
+#if defined(MODULE_SOCK_IP)
     if ((res = _sockaddr_to_ep(address, address_len, &ep)) < 0)
         return res;
 #endif
@@ -959,7 +963,13 @@ static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
 #endif
 #ifdef MODULE_SOCK_UDP
         case SOCK_DGRAM:
-            if ((res = sock_udp_send(&s->sock->udp, buffer, length, &ep)) < 0) {
+            if (address == NULL) {
+                res = sock_udp_get_remote(&s->sock->udp, &ep);
+            } else {
+                res = _sockaddr_to_ep(address, address_len, &ep);
+            }
+            if ((res < 0) ||
+                (res = sock_udp_send(&s->sock->udp, buffer, length, &ep)) < 0) {
                 errno = -res;
                 res = -1;
             }

@@ -29,7 +29,7 @@
 #define MCLK_RW     18000000UL  /* MCICLK for data transfer (PCLK divided by even number) */
 
 /* This MCI driver assumes that MCLK_RW is CCLK/4 or slower. If block buffer underrun/overrun
-/  occured due to any interrupt by higher priority process or slow external memory, increasing
+/  occurred due to any interrupt by higher priority process or slow external memory, increasing
 /  N_BUF or decreasing MCLK_RW will solve it. */
 
 
@@ -130,7 +130,7 @@ void Isr_MCI(void)
             }
         }
     }
-    else {                  /* An MCI error occured (not DataBlockEnd) */
+    else {                  /* An MCI error occurred (not DataBlockEnd) */
         xs |= 8;
     }
 
@@ -252,7 +252,7 @@ static void start_transmission(unsigned char blks)
 
     XferRp = 0;                             /* Block FIFO read index */
     XferWc = blks;
-    XferStat = 2;                           /* Transfer status: Memroy --> MCI */
+    XferStat = 2;                           /* Transfer status: Memory --> MCI */
 
     MCI_DATA_LEN = 512 * (blks + 1);        /* Set total data length */
     MCI_DATA_TMR = (unsigned long)(MCLK_RW * 0.5);  /* Data timer: 0.5sec */
@@ -383,7 +383,7 @@ static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsign
     assert(buff != NULL);
 
     if (idx & 0x80) {               /* Send a CMD55 prior to the specified command if it is ACMD class */
-        if (!send_cmd(CMD55, (unsigned long)CardRCA << 16, 1, buff) /* When CMD55 is faild, */
+        if (!send_cmd(CMD55, (unsigned long)CardRCA << 16, 1, buff) /* When CMD55 is failed, */
            || !(buff[0] & 0x00000020)) {
             return 0;    /* exit with error */
         }
@@ -729,7 +729,7 @@ diskio_result_t mci_read(unsigned char *buff, unsigned long sector, unsigned cha
             }
 
             if (XferStat & 0xC) {
-                break; /* Abort if any error has occured */
+                break; /* Abort if any error has occurred */
             }
 
             copy_al2un(buff, DmaBuff[rp], 512); /* Pop an block */
@@ -737,7 +737,7 @@ diskio_result_t mci_read(unsigned char *buff, unsigned long sector, unsigned cha
             XferRp = rp = (rp + 1) % N_BUF; /* Next DMA buffer */
 
             if (XferStat & 0xC) {
-                break; /* Abort if overrun has occured */
+                break; /* Abort if overrun has occurred */
             }
 
             buff += 512; /* Next user buffer address */
@@ -830,14 +830,14 @@ diskio_result_t mci_write(const unsigned char *buff, unsigned long sector, unsig
         }
 
         if (XferStat & 0xC) {
-            break;    /* Abort if block underrun or any MCI error has occured */
+            break;    /* Abort if block underrun or any MCI error has occurred */
         }
 
         copy_un2al(DmaBuff[wp], (unsigned char *)(unsigned int)buff, 512);  /* Push a block */
         XferWp = wp = (wp + 1) % N_BUF;             /* Next DMA buffer */
 
         if (XferStat & 0xC) {
-            break;    /* Abort if block underrun has occured */
+            break;    /* Abort if block underrun has occurred */
         }
 
         count--;
@@ -847,7 +847,7 @@ diskio_result_t mci_write(const unsigned char *buff, unsigned long sector, unsig
     while (!(XferStat & 0xC)) {} /* Wait for all blocks sent (block underrun) */
 
     if (XferStat & 0x8) {
-        count = 1;    /* Abort if any MCI error has occured */
+        count = 1;    /* Abort if any MCI error has occurred */
     }
 
     stop_transfer();                            /* Close data path */

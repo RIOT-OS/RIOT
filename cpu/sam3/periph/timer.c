@@ -141,7 +141,7 @@ int timer_clear(tim_t tim, int channel)
 
     dev(tim)->TC_CHANNEL[0].TC_IDR = (TC_IDR_CPAS << channel);
 
-    return 1;
+    return 0;
 }
 
 unsigned int timer_read(tim_t tim)

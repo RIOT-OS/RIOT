@@ -33,7 +33,6 @@
   .extern  sched_active_thread
   .extern  sched_context_switch_request
   .extern  sched_run
-  .extern  DEBUG_Routine
 
 /* Public functions declared in this file */
   .global  arm_irq_handler

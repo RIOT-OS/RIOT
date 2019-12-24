@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 /* if using ethos + stdio, use STDIO_UART values unless overridden */
-#ifdef USE_ETHOS_FOR_STDIO
+#ifdef MODULE_STDIO_ETHOS
 #include "stdio_uart.h"
 #ifndef ETHOS_UART
 #define ETHOS_UART     STDIO_UART_DEV

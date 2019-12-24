@@ -80,7 +80,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     unsigned int timer_base;
     unsigned int timer_side = TIMER_A;
     unsigned int timer_cfg = TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PERIODIC_UP | TIMER_TAMR_TAMIE;
-    unsigned int timer_max_val;
+    unsigned int timer_max_val = 0;
     unsigned int timer_intbit = TIMER_TIMA_TIMEOUT | TIMER_TIMA_MATCH;
 
     switch(dev){
@@ -163,7 +163,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     ROM_TimerMatchSet(timer_base, timer_side, (unsigned long) (scaledv & 0xFFFFFFFF));
     ROM_TimerEnable(timer_base, timer_side);
 
-    return 1;
+    return 0;
 }
 
 int timer_clear(tim_t dev, int channel)
@@ -194,7 +194,7 @@ int timer_clear(tim_t dev, int channel)
     }
 
     ROM_TimerIntClear(timer_base, timer_intbit);
-    return 1;
+    return 0;
 }
 
 unsigned int timer_read(tim_t dev)

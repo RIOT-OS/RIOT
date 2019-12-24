@@ -32,7 +32,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define TSL4531X_NUMOF    (sizeof(tsl4531x_params) / sizeof(tsl4531x_params[0]))
+#define TSL4531X_NUMOF    ARRAY_SIZE(tsl4531x_params)
 
 /**
  * @brief   Allocation of memory for device descriptors
@@ -48,7 +48,7 @@ static saul_reg_t saul_entries[TSL4531X_NUMOF];
 /**
  * @brief   Define the number of saul info
  */
-#define TSL4531X_INFO_NUMOF    (sizeof(tsl4531x_saul_info) / sizeof(tsl4531x_saul_info[0]))
+#define TSL4531X_INFO_NUMOF    ARRAY_SIZE(tsl4531x_saul_info)
 
 /**
  * @brief   Reference the driver structs.

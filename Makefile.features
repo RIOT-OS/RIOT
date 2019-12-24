@@ -1,0 +1,54 @@
+# Process FEATURES variables
+#
+# The board/board common are responsible for defining the CPU and CPU_MODEL
+# variables in their Makefile.features.
+# This makes them available when setting features based on CPU_MODEL in the cpu
+# Makefile.features and also during dependency resolution.
+
+# Transition:
+#   Moving 'CPU/CPU_MODEL' to Makefile.features is an ongoing work and may not
+#   reflect the state of all boards for the moment.
+
+include $(BOARDSDIR)/$(BOARD)/Makefile.features
+
+# Sanity check
+ifeq (,$(CPU))
+  $(error CPU must be defined by board / board_common Makefile.features)
+endif
+
+include $(RIOTCPU)/$(CPU)/Makefile.features
+
+
+# Resolve FEATURES_ variables
+# Their value will only be complete after resolving dependencies
+
+# Features that are required by the application but not provided by the BSP and
+# features that are used but blacklisted (prepended with "!").
+# Having features missing may case the build to fail.
+FEATURES_MISSING = $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_REQUIRED)))
+
+# Features that are only optional and not required at the same time.
+# The policy is to by default use by features if they are provided by the BSP.
+FEATURES_OPTIONAL_ONLY = $(sort $(filter-out $(FEATURES_REQUIRED),$(FEATURES_OPTIONAL)))
+FEATURES_OPTIONAL_USED = $(sort $(filter $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
+# Optional features that will not be used because they are not provided
+FEATURES_OPTIONAL_MISSING = $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
+
+# Features that are used for an application
+FEATURES_USED = $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
+
+# Used features that conflict when used together
+FEATURES_CONFLICTING = $(sort $(foreach conflict,$(FEATURES_CONFLICT),$(call _features_conflicting,$(conflict))))
+
+# Return conflicting features from the conflict string feature1:feature2
+#   $1: feature1:feature2
+#   Return the list of conflicting features
+_features_conflicting = $(if $(call _features_used_conflicting,$(subst :, ,$1)),$(subst :, ,$1))
+# Check if all features from the list are used
+#   $1: list of features that conflict together
+#   Return non empty on error
+_features_used_conflicting = $(filter $(words $1),$(words $(filter $(FEATURES_USED),$1)))
+
+# Features that are used by the application but blacklisted by the BSP.
+# Having blacklisted features may cause the build to fail.
+FEATURES_USED_BLACKLISTED = $(sort $(filter $(FEATURES_USED), $(FEATURES_BLACKLIST)))

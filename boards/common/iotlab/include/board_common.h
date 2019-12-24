@@ -51,7 +51,6 @@ extern "C" {
  */
 #define XTIMER_WIDTH        (16U)
 #define XTIMER_OVERHEAD     (6U)
-#define XTIMER_SHOOT_EARLY  (3U)
 /** @} */
 
 /**

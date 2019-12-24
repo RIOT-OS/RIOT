@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -34,7 +34,12 @@ extern "C" {
  * @param[in]  width     format of the items
  * @param[in]  per_line  number of items per line
  */
-extern void esp_hexdump (const void* addr, uint32_t num, char width, uint8_t per_line);
+void esp_hexdump (const void* addr, uint32_t num, char width, uint8_t per_line);
+
+/**
+ * @brief  Print heap and system memory information
+ */
+void print_meminfo (void);
 
 #ifdef __cplusplus
 }

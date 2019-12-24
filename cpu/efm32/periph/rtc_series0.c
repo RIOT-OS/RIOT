@@ -74,7 +74,7 @@ void rtc_init(void)
     /* initialize the state */
     rtc_state.overflows = 0;
 
-    /* reset and initialze the peripheral */
+    /* reset and initialize the peripheral */
     RTC_Init_TypeDef init = RTC_INIT_DEFAULT;
 
     init.enable = false;

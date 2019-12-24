@@ -62,10 +62,17 @@ extern "C" {
 /**
  * @brief   AT86RF231 configuration
  */
+#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+static const uint8_t at86rf2xx_params[] =
+{
+    0 /* dummy value */
+};
+#else
 static const at86rf2xx_params_t at86rf2xx_params[] =
 {
     AT86RF2XX_PARAMS
 };
+#endif
 
 #ifdef __cplusplus
 }

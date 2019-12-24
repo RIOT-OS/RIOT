@@ -45,7 +45,7 @@ static const i2c_conf_t i2c_config[] = {
     },
 };
 
-#define I2C_NUMOF               (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF               ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**
@@ -68,7 +68,7 @@ static const spi_conf_t spi_config[] = {
         .cs_pin   = GPIO_PIN(0, 7)
     }
 };
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -84,7 +84,7 @@ static const adc_conf_t adc_config[] = {
     GPIO_PIN(0, 2), /**< GPIO_PA2 = ADC3_PIN */
 };
 
-#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

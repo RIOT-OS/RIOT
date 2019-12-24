@@ -10,7 +10,7 @@
 
 #ifndef DOXYGEN
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #include <string.h>
@@ -139,8 +139,14 @@ void vTaskEnterCritical( portMUX_TYPE *mux )
     /* disable interrupts */
     uint32_t state = irq_disable();
 
-    /* aquire the mutex with interrupts disabled */
-    mutex_lock(mux); /* TODO should be only a spin lock */
+    /* Locking the given mutex does not work here, as this function can also
+       be called in the interrupt context. Therefore, the given mutex is not
+       used. Instead, the basic default FreeRTOS mechanism for critical
+       sections is used by simply disabling interrupts. Since context
+       switches for the ESP32 are also based on interrupts, there is no
+       possibility that another thread will enter the critical section
+       once the interrupts are disabled. */
+    /* mutex_lock(mux); */ /* TODO should be only a spin lock */
 
     /* increment nesting counter and save old interrupt level */
     threads_arch_exts[my_pid].critical_nesting++;
@@ -157,8 +163,9 @@ void vTaskExitCritical( portMUX_TYPE *mux )
     DEBUG("%s pid=%d prio=%d mux=%p\n", __func__,
           my_pid, sched_threads[my_pid]->priority, mux);
 
-    /* release the mutex with interrupts disabled */
-    mutex_unlock(mux); /* TODO should be only a spin lock */
+    /* The given mutex is not used (see vTaskEnterCritical) and has not to
+       be unlocked here. */
+    /* mutex_unlock(mux); */ /* TODO should be only a spin lock */
 
     /* decrement nesting counter and restore old interrupt level */
     if (threads_arch_exts[my_pid].critical_nesting) {

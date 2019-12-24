@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define LTC4150_NUM     (sizeof(ltc4150_params) / sizeof(ltc4150_params[0]))
+#define LTC4150_NUM     ARRAY_SIZE(ltc4150_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -45,7 +45,7 @@ static saul_reg_t saul_entries[LTC4150_NUM * 2];
 /**
  * @brief   Define the number of saul info
  */
-#define LTC4150_INFO_NUM (sizeof(ltc4150_saul_info) / sizeof(ltc4150_saul_info[0]))
+#define LTC4150_INFO_NUM ARRAY_SIZE(ltc4150_saul_info)
 
 /**
  * @name    Import SAUL endpoints

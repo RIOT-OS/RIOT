@@ -617,10 +617,10 @@ static void estimate_cpu_overhead(void)
 int main(void)
 {
     print_str("\nStatistical benchmark for timers\n");
-    for (unsigned int k = 0; k < (sizeof(ref_states) / sizeof(ref_states[0])); ++k) {
+    for (unsigned int k = 0; k < ARRAY_SIZE(ref_states); ++k) {
         matstat_clear(&ref_states[k]);
     }
-    for (unsigned int k = 0; k < (sizeof(int_states) / sizeof(int_states[0])); ++k) {
+    for (unsigned int k = 0; k < ARRAY_SIZE(int_states); ++k) {
         matstat_clear(&int_states[k]);
     }
     /* print test overview */
@@ -661,7 +661,7 @@ int main(void)
     print_u32_dec(log2test);
     print("\n", 1);
     print_str("state vector elements per variant = ");
-    print_u32_dec(sizeof(ref_states) / sizeof(ref_states[0]) / TEST_VARIANT_NUMOF);
+    print_u32_dec(ARRAY_SIZE(ref_states) / TEST_VARIANT_NUMOF);
     print("\n", 1);
     print_str("number of variants = ");
     print_u32_dec(TEST_VARIANT_NUMOF);
@@ -714,7 +714,7 @@ int main(void)
     if (res < 0) {
         print_str("Error ");
         print_s32_dec(res);
-        print_str(" intializing reference timer\n");
+        print_str(" initializing reference timer\n");
         return res;
     }
     random_init(seed);
@@ -724,7 +724,7 @@ int main(void)
     if (res < 0) {
         print_str("Error ");
         print_s32_dec(res);
-        print_str(" intializing timer under test\n");
+        print_str(" initializing timer under test\n");
         return res;
     }
 #endif

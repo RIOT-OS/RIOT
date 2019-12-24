@@ -37,18 +37,10 @@ typedef struct
 {
     netdev_t netdev;                   /**< netdev parent struct */
 
-    uint16_t rx_len;                   /**< number of bytes received */
-    uint8_t rx_buf[ETHERNET_MAX_LEN];  /**< receive buffer */
-
-    uint16_t tx_len;                   /**< number of bytes in transmit buffer */
-    uint8_t tx_buf[ETHERNET_MAX_LEN];  /**< transmit buffer */
-
     uint32_t event;                    /**< received event */
     bool connected;                    /**< indicates whether connected to AP */
 
     gnrc_netif_t* netif;               /**< reference to the corresponding netif */
-
-    mutex_t dev_lock;                  /**< device is already in use */
 
 } esp_wifi_netdev_t;
 

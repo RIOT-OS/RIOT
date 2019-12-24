@@ -54,9 +54,6 @@ IOTLAB_USER ?= $(shell cut -f1 -d: $(IOTLAB_AUTH))
 # Optional Experiment id. Required when having multiple experiments
 IOTLAB_EXP_ID ?=
 
-# File to use for flashing
-IOTLAB_FLASHFILE ?= $(ELFFILE)
-
 # Specify experiment-id option if provided
 _IOTLAB_EXP_ID := $(if $(IOTLAB_EXP_ID),--id $(IOTLAB_EXP_ID))
 
@@ -75,7 +72,9 @@ IOTLAB_ARCHI_iotlab-m3      = m3:at86rf231
 IOTLAB_ARCHI_microbit       = microbit:ble
 IOTLAB_ARCHI_nrf51dk        = nrf51dk:ble
 IOTLAB_ARCHI_nrf52dk        = nrf52dk:ble
+IOTLAB_ARCHI_nrf52832-mdk   = nrf52832mdk:ble
 IOTLAB_ARCHI_nrf52840dk     = nrf52840dk:multi
+IOTLAB_ARCHI_nrf52840-mdk   = nrf52840mdk:multi
 IOTLAB_ARCHI_pba-d-01-kw2x  = phynode:kw2xrf
 IOTLAB_ARCHI_samr21-xpro    = samr21:at86rf233
 IOTLAB_ARCHI_samr30-xpro    = samr30:at86rf212b
@@ -161,7 +160,7 @@ ifneq (iotlab-a8-m3,$(BOARD))
   FLASHER     = iotlab-node
   RESET       = iotlab-node
   _NODE_FMT   = --jmespath='keys(@)[0]' --format='int'
-  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) --update $(IOTLAB_FLASHFILE) | $(_STDIN_EQ_0)
+  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) --update $(FLASHFILE) | $(_STDIN_EQ_0)
   RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) --reset | $(_STDIN_EQ_0)
 
   ifeq (,$(_IOTLAB_ON_FRONTEND))
@@ -178,7 +177,7 @@ else
   FLASHER     = iotlab-ssh
   RESET       = iotlab-ssh
   _NODE_FMT   = --jmespath='keys(values(@)[0])[0]' --fmt='int'
-  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) flash-m3 $(_IOTLAB_NODELIST) $(IOTLAB_FLASHFILE) | $(_STDIN_EQ_0)
+  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) flash-m3 $(_IOTLAB_NODELIST) $(FLASHFILE) | $(_STDIN_EQ_0)
   RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) reset-m3 $(_IOTLAB_NODELIST) | $(_STDIN_EQ_0)
 
   TERMPROG  = ssh

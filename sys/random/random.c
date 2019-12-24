@@ -20,9 +20,12 @@
  */
 
 #include <stdint.h>
+#include <assert.h>
 
 #include "log.h"
 #include "random.h"
+#include "bitarithm.h"
+
 #ifdef MODULE_PUF_SRAM
 #include "puf_sram.h"
 #endif

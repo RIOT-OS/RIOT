@@ -38,13 +38,12 @@ extern "C" {
 #endif
 
 #if defined(CPU_MODEL_STM32F334R8)
-#define XTIMER_SHOOT_EARLY          (2)
 #define XTIMER_OVERHEAD             (5)
 #endif
 
 #if defined(CPU_FAM_STM32F1)
 #define XTIMER_WIDTH                (16)
-#define XTIMER_BACKOFF              (5)
+#define XTIMER_BACKOFF              (19)
 #endif
 
 #if defined(CPU_FAM_STM32L1)

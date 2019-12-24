@@ -1,4 +1,12 @@
+FEATURES_PROVIDED += arch_32bit
+FEATURES_PROVIDED += arch_native
 FEATURES_PROVIDED += cpp
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_pm
+FEATURES_PROVIDED += periph_pwm
+
+# Access to hardware SPI bus is only supported on Linux hosts
+ifeq ($(OS),Linux)
+  FEATURES_PROVIDED += periph_spi
+endif

@@ -17,7 +17,7 @@ MAX_HELLOS = 5
 
 def testfunc(child):
     child.expect(r'This test will display \'Hello\' every (\d+) seconds')
-    period = int(child.match[1])
+    period = int(child.match.group(1))
     child.expect_exact('Initializing the RTT driver')
     child.expect(r'RTT now: \d+')
     child.expect(r'Setting initial alarm to now \+ {} s \(\d+\)'

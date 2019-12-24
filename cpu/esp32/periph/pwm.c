@@ -32,7 +32,6 @@
 #include "gpio_arch.h"
 
 #include "driver/periph_ctrl.h"
-#include "rom/ets_sys.h"
 #include "soc/gpio_struct.h"
 #include "soc/gpio_sig_map.h"
 #include "soc/mcpwm_reg.h"
@@ -40,10 +39,9 @@
 
 #if defined(PWM0_GPIOS) || defined(PWM1_GPIOS)
 
-#define PWM_NUMOF_MAX (2)           /* maximum number of PWM devices */
 #define PWM_CLK       (160000000UL) /* base clock of PWM devices */
 #define PWM_CPS_MAX   (10000000UL)  /* maximum cycles per second supported */
-#define PWM_CPS_MIN   (2500UL)      /* minumum cycles per second supported */
+#define PWM_CPS_MIN   (2500UL)      /* minimum cycles per second supported */
 
 #define PWM_TIMER_MOD_FREEZE          0  /* timer is disabled */
 #define PWM_TIMER_MOD_UP              1  /* timer counts up */
@@ -56,7 +54,7 @@
 #define PWM_TIMER_STARTS_STOPS_AT_TEZ 3  /* PWM starts and stops at next TEZ */
 #define PWM_TIMER_STARTS_STOPS_AT_TEP 4  /* PWM starts and stops at next TEP */
 
-#define PWM_TIMER_UPDATE_IMMIDIATE    0  /* update period immediatly */
+#define PWM_TIMER_UPDATE_IMMIDIATE    0  /* update period immediately */
 #define PWM_TIMER_UPDATE_AT_TEZ       1  /* update period at TEZ */
 #define PWM_TIMER_UPDATE_AT_SYNC      2  /* update period at sync */
 #define PWM_TIMER_UPDATE_AT_TEZ_SYNC  3  /* update period at TEZ and sync */
@@ -101,8 +99,8 @@ static const struct _pwm_hw_t _pwm_hw[] =
         .mod = PERIPH_PWM0_MODULE,
         .int_src = ETS_PWM0_INTR_SOURCE,
         .signal_group = PWM0_OUT0A_IDX,
-        .gpio_num = sizeof(_pwm_channel_gpios_0) >> 2,
-        .gpios = _pwm_channel_gpios_0,
+        .gpio_num = ARRAY_SIZE(pwm0_channels),
+        .gpios = pwm0_channels,
     },
     #endif
     #ifdef PWM1_GPIOS
@@ -111,14 +109,11 @@ static const struct _pwm_hw_t _pwm_hw[] =
         .mod = PERIPH_PWM1_MODULE,
         .int_src = ETS_PWM1_INTR_SOURCE,
         .signal_group = PWM1_OUT0A_IDX,
-        .gpio_num = sizeof(_pwm_channel_gpios_1) >> 2,
-        .gpios = _pwm_channel_gpios_1,
+        .gpio_num = ARRAY_SIZE(pwm1_channels),
+        .gpios = pwm1_channels,
     },
     #endif
 };
-
-/* the number of PWM devices used */
-const unsigned pwm_dev_num = sizeof(_pwm_hw) / sizeof(_pwm_hw[0]);
 
 /* data structure dynamic channel configuration */
 typedef struct {
@@ -146,7 +141,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     DEBUG ("%s pwm=%u mode=%u freq=%u, res=%u\n", __func__, pwm, mode, freq, res);
 
-    CHECK_PARAM_RET (pwm < pwm_dev_num, 0);
+    CHECK_PARAM_RET (pwm < PWM_NUMOF, 0);
     CHECK_PARAM_RET (freq > 0, 0);
 
     if (_pwm_init_first_time) {
@@ -203,7 +198,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
 uint8_t pwm_channels(pwm_t pwm)
 {
-    CHECK_PARAM_RET (pwm < pwm_dev_num, 0);
+    CHECK_PARAM_RET (pwm < PWM_NUMOF, 0);
 
     return _pwm_hw[pwm].gpio_num;
 }
@@ -212,7 +207,7 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
 {
     DEBUG("%s pwm=%u channel=%u value=%u\n", __func__, pwm, channel, value);
 
-    CHECK_PARAM (pwm < pwm_dev_num);
+    CHECK_PARAM (pwm < PWM_NUMOF);
     CHECK_PARAM (channel < _pwm_dev[pwm].chn_num);
     CHECK_PARAM (value <= _pwm_dev[pwm].res);
 
@@ -287,14 +282,14 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
 
 void pwm_poweron(pwm_t pwm)
 {
-    CHECK_PARAM (pwm < pwm_dev_num);
+    CHECK_PARAM (pwm < PWM_NUMOF);
     periph_module_enable(_pwm_hw[pwm].mod);
     _pwm_start(pwm);
 }
 
 void pwm_poweroff(pwm_t pwm)
 {
-    CHECK_PARAM (pwm < pwm_dev_num);
+    CHECK_PARAM (pwm < PWM_NUMOF);
     _pwm_stop (pwm);
     periph_module_disable(_pwm_hw[pwm].mod);
 }
@@ -324,7 +319,7 @@ static void _pwm_start(pwm_t pwm)
 
     uint32_t cps = period * freq;
     /* maximum number of timer clock cycles per second (freq*period) must not
-       be greater than PWM_CPS_MAX, reduce the freq if neccessary and keep
+       be greater than PWM_CPS_MAX, reduce the freq if necessary and keep
        the resolution */
     if (cps > PWM_CPS_MAX) {
         freq = PWM_CPS_MAX / period;
@@ -333,7 +328,7 @@ static void _pwm_start(pwm_t pwm)
               __func__, freq);
     }
     /* minimum number of timer clock cycles per second (freq*period) must not
-       be less than PWM_CPS_MIN, increase the freq if neccessary and keep
+       be less than PWM_CPS_MIN, increase the freq if necessary and keep
        the resolution */
     else if (cps < PWM_CPS_MIN) {
         freq = PWM_CPS_MIN / period;
@@ -385,7 +380,7 @@ static void _pwm_start(pwm_t pwm)
     }
 
     /* sync all timers */
-    for (unsigned i = 0; i < pwm_dev_num; i++) {
+    for (unsigned i = 0; i < PWM_NUMOF; i++) {
         _pwm_hw[i].regs->timer[0].sync.sync_sw = ~_pwm_hw[i].regs->timer[0].sync.sync_sw;
     }
 }
@@ -399,13 +394,13 @@ static void _pwm_stop(pwm_t pwm)
 /* do some static initialization and configuration checks */
 static bool _pwm_configuration(void)
 {
-    if (pwm_dev_num > PWM_NUMOF_MAX) {
+    if (PWM_NUMOF > PWM_NUMOF_MAX) {
         LOG_TAG_ERROR("pwm", "%d PWM devices were defined, only %d PWM are "
-                      "supported\n", pwm_dev_num, PWM_NUMOF_MAX);
+                      "supported\n", PWM_NUMOF, PWM_NUMOF_MAX);
         return false;
     }
 
-    for (unsigned i = 0; i < pwm_dev_num; i++) {
+    for (unsigned i = 0; i < PWM_NUMOF; i++) {
         if (_pwm_hw[i].gpio_num > PWM_CHANNEL_NUM_DEV_MAX) {
             LOG_TAG_ERROR("pwm", "Number of PWM channels of device %d is %d, "
                           "at maximum only %d channels per PWM device are "
@@ -415,8 +410,8 @@ static bool _pwm_configuration(void)
         }
     }
     bool multiple_used = false;
-    for (unsigned i = 0; i < pwm_dev_num; i++) {
-        for (unsigned j = 0; j < pwm_dev_num; j++) {
+    for (unsigned i = 0; i < PWM_NUMOF; i++) {
+        for (unsigned j = 0; j < PWM_NUMOF; j++) {
             if (i != j) {
                 for (unsigned k = 0; k < _pwm_hw[i].gpio_num >> 2; k++) {
                     for (unsigned l = 0; l < _pwm_hw[j].gpio_num >> 2; l++) {
@@ -440,12 +435,12 @@ static bool _pwm_configuration(void)
 
 void pwm_print_config(void)
 {
-    for (unsigned pwm = 0; pwm < pwm_dev_num; pwm++) {
-        ets_printf("\tPWM_DEV(%d)\tchannels=[ ", pwm);
+    for (unsigned pwm = 0; pwm < PWM_NUMOF; pwm++) {
+        printf("\tPWM_DEV(%d)\tchannels=[ ", pwm);
         for (int i = 0; i < _pwm_hw[pwm].gpio_num; i++) {
-            ets_printf("%d ", _pwm_hw[pwm].gpios[i]);
+            printf("%d ", _pwm_hw[pwm].gpios[i]);
         }
-        ets_printf("]\n");
+        printf("]\n");
     }
 }
 

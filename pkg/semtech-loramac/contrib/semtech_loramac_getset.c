@@ -61,32 +61,69 @@ void semtech_loramac_get_appkey(const semtech_loramac_t *mac, uint8_t *key)
 
 void semtech_loramac_set_appskey(semtech_loramac_t *mac, const uint8_t *skey)
 {
-    memcpy(mac->appskey, skey, LORAMAC_APPSKEY_LEN);
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_APP_SKEY;
+    mibReq.Param.AppSKey = (uint8_t *) skey;
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
 }
 
-void semtech_loramac_get_appskey(const semtech_loramac_t *mac, uint8_t *skey)
+void semtech_loramac_get_appskey(semtech_loramac_t *mac, uint8_t *skey)
 {
-    memcpy(skey, mac->appskey, LORAMAC_APPSKEY_LEN);
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_APP_SKEY;
+    LoRaMacMibGetRequestConfirm(&mibReq);
+    memcpy(skey, mibReq.Param.AppSKey, LORAMAC_APPSKEY_LEN);
+    mutex_unlock(&mac->lock);
 }
 
 void semtech_loramac_set_nwkskey(semtech_loramac_t *mac, const uint8_t *skey)
 {
-    memcpy(mac->nwkskey, skey, LORAMAC_NWKSKEY_LEN);
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_NWK_SKEY;
+    mibReq.Param.NwkSKey = (uint8_t *) skey;
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
 }
 
-void semtech_loramac_get_nwkskey(const semtech_loramac_t *mac, uint8_t *skey)
+void semtech_loramac_get_nwkskey(semtech_loramac_t *mac, uint8_t *skey)
 {
-    memcpy(skey, mac->nwkskey, LORAMAC_NWKSKEY_LEN);
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_NWK_SKEY;
+    LoRaMacMibGetRequestConfirm(&mibReq);
+    memcpy(skey, mibReq.Param.NwkSKey, LORAMAC_NWKSKEY_LEN);
+    mutex_unlock(&mac->lock);
 }
 
 void semtech_loramac_set_devaddr(semtech_loramac_t *mac, const uint8_t *addr)
 {
-    memcpy(mac->devaddr, addr, LORAMAC_DEVADDR_LEN);
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_DEV_ADDR;
+    mibReq.Param.DevAddr = ((uint32_t)addr[0] << 24 |
+                            (uint32_t)addr[1] << 16 |
+                            (uint32_t)addr[2] << 8 |
+                            (uint32_t)addr[3]);
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
 }
 
-void semtech_loramac_get_devaddr(const semtech_loramac_t *mac, uint8_t *addr)
+void semtech_loramac_get_devaddr(semtech_loramac_t *mac, uint8_t *addr)
 {
-    memcpy(addr, mac->devaddr, LORAMAC_DEVADDR_LEN);
+    mutex_lock(&mac->lock);
+    DEBUG("[semtech-loramac] get device address\n");
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_DEV_ADDR;
+    LoRaMacMibGetRequestConfirm(&mibReq);
+    addr[0] = (uint8_t)(mibReq.Param.DevAddr >> 24);
+    addr[1] = (uint8_t)(mibReq.Param.DevAddr >> 16);
+    addr[2] = (uint8_t)(mibReq.Param.DevAddr >> 8);
+    addr[3] = (uint8_t)(mibReq.Param.DevAddr);
+    mutex_unlock(&mac->lock);
 }
 
 void semtech_loramac_set_class(semtech_loramac_t *mac, loramac_class_t cls)
@@ -253,7 +290,7 @@ uint8_t semtech_loramac_get_tx_mode(semtech_loramac_t *mac)
     return mac->cnf;
 }
 
-void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, int error)
+void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, uint32_t error)
 {
     MibRequestConfirm_t mibReq;
     mutex_lock(&mac->lock);
@@ -263,7 +300,7 @@ void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, int error)
     mutex_unlock(&mac->lock);
 }
 
-void semtech_loramac_set_min_rx_symbols(semtech_loramac_t *mac, int min_rx)
+void semtech_loramac_set_min_rx_symbols(semtech_loramac_t *mac, uint8_t min_rx)
 {
     MibRequestConfirm_t mibReq;
     mutex_lock(&mac->lock);
@@ -347,4 +384,28 @@ uint8_t semtech_loramac_get_rx2_dr(semtech_loramac_t *mac)
     datarate = mibReq.Param.Rx2DefaultChannel.Datarate;
     mutex_unlock(&mac->lock);
     return datarate;
+}
+
+void semtech_loramac_set_uplink_counter(semtech_loramac_t *mac, uint32_t counter)
+{
+    DEBUG("[semtech-loramac] reading uplink counter: %" PRIu32 " \n", counter);
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_UPLINK_COUNTER;
+    mibReq.Param.UpLinkCounter = counter;
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
+}
+
+uint32_t semtech_loramac_get_uplink_counter(semtech_loramac_t *mac)
+{
+    mutex_lock(&mac->lock);
+    uint32_t counter;
+    DEBUG("[semtech-loramac] getting uplink counter\n");
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_UPLINK_COUNTER;
+    LoRaMacMibGetRequestConfirm(&mibReq);
+    counter = mibReq.Param.UpLinkCounter;
+    mutex_unlock(&mac->lock);
+    return counter;
 }

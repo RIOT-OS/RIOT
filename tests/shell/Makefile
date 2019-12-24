@@ -6,15 +6,14 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
+# Use a terminal that does not introduce extra characters into the stream.
+RIOT_TERMINAL ?= socat
+
 DISABLE_MODULE += auto_init
+DISABLE_MODULE += test_utils_interactive_sync
 
 # chronos is missing a getchar implementation
 BOARD_BLACKLIST += chronos
-
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove \
-                             arduino-uno
-
-TEST_ON_CI_WHITELIST += all
 
 APP_SHELL_FMT ?= NONE
 

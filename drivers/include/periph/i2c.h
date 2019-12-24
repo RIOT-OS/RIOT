@@ -195,7 +195,7 @@ typedef enum {
 #ifndef HAVE_I2C_FLAGS_T
 typedef enum {
     I2C_ADDR10  = 0x01,     /**< use 10-bit device addressing */
-    I2C_REG16   = 0x02,     /**< use 16-bit register addressing */
+    I2C_REG16   = 0x02,     /**< use 16-bit register addressing, big-endian */
     I2C_NOSTOP  = 0x04,     /**< do not issue a STOP condition after transfer */
     I2C_NOSTART = 0x08,     /**< skip START sequence, ignores address field */
 } i2c_flags_t;
@@ -231,10 +231,8 @@ int i2c_acquire(i2c_t dev);
  * @brief   Release the given I2C device to be used by others
  *
  * @param[in] dev           I2C device to release
- *
- * @return                  0 on success, -1 on error
  */
-int i2c_release(i2c_t dev);
+void i2c_release(i2c_t dev);
 
 /**
  * @brief   Convenience function for reading one byte from a given register

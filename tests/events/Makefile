@@ -1,11 +1,13 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
-
 FORCE_ASSERTS = 1
 USEMODULE += event_callback
 USEMODULE += event_timeout
 
-TEST_ON_CI_WHITELIST += all
+# stm32f030f4-demo doesn't have enough RAM to run the test
+# so we reduce the stack size for every thread
+ifneq (,$(filter stm32f030f4-demo,$(BOARD)))
+  CFLAGS += -DTHREAD_STACKSIZE_DEFAULT=640
+endif
 
 include $(RIOTBASE)/Makefile.include

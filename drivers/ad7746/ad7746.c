@@ -30,7 +30,7 @@
 
 #include "xtimer.h"
 
-#define I2C (dev->params.i2c)
+#define DEV (dev->params.i2c)
 #define ADDR (dev->params.addr)
 
 #define CONF_TEST_VALUE (1 << AD7746_CONFIGURATION_VTF1_BIT)
@@ -51,7 +51,7 @@ static const unsigned char _vt_sr_times[] = {
  *
  * @return AD7746_OK on success
  * @return AD7746_NODATA if no data is available
- * @return AD7746_I2C on error getting a reponse
+ * @return AD7746_I2C on error getting a response
  */
 static int _read_capacitance(ad7746_t *dev, int *value,
                              ad7746_cap_input_t input);
@@ -67,7 +67,7 @@ static int _read_capacitance(ad7746_t *dev, int *value,
  *
  * @return AD7746_OK on success
  * @return AD7746_NODATA if no data is available
- * @return AD7746_I2C on error getting a reponse
+ * @return AD7746_I2C on error getting a response
  */
 static int _read_voltage_temp(ad7746_t *dev, int *value, ad7746_vt_mode_t mode);
 
@@ -83,7 +83,7 @@ static int _read_voltage_temp(ad7746_t *dev, int *value, ad7746_vt_mode_t mode);
  *
  * @return AD7746_OK on success
  * @return AD7746_NODATA if no data is available
- * @return AD7746_I2C on error getting a reponse
+ * @return AD7746_I2C on error getting a response
  */
 static int _read_raw_ch(const ad7746_t *dev, uint8_t ch, uint32_t *raw);
 
@@ -122,13 +122,13 @@ int ad7746_init(ad7746_t *dev, const ad7746_params_t *params)
     assert(dev && params);
     dev->params = *params;
 
-    i2c_acquire(I2C);
+    i2c_acquire(DEV);
     uint8_t reg = 0;
 
     /* Test communication write and read configuration register */
-    status = i2c_write_reg(I2C, ADDR, AD7746_REG_CONFIGURATION, CONF_TEST_VALUE,
+    status = i2c_write_reg(DEV, ADDR, AD7746_REG_CONFIGURATION, CONF_TEST_VALUE,
                            0);
-    status += i2c_read_reg(I2C, ADDR, AD7746_REG_CONFIGURATION, &reg, 0);
+    status += i2c_read_reg(DEV, ADDR, AD7746_REG_CONFIGURATION, &reg, 0);
 
     if (status < 0 || reg != CONF_TEST_VALUE) {
         DEBUG("[ad7746] init - error: unable to communicate with the device "
@@ -140,7 +140,7 @@ int ad7746_init(ad7746_t *dev, const ad7746_params_t *params)
     /* Enable capacitive channel and select input */
     reg = (1 << AD7746_CAP_SETUP_CAPEN_BIT) |
           (dev->params.cap_input << AD7746_CAP_SETUP_CIN2_BIT);
-    if (i2c_write_reg(I2C, ADDR, AD7746_REG_CAP_SETUP, reg, 0)) {
+    if (i2c_write_reg(DEV, ADDR, AD7746_REG_CAP_SETUP, reg, 0)) {
         DEBUG("[ad7746] init - error: unable to enable capacitive channel\n");
         goto release;
     }
@@ -150,7 +150,7 @@ int ad7746_init(ad7746_t *dev, const ad7746_params_t *params)
         reg = (1 << AD7746_VT_SETUP_VTEN_BIT) |
               (dev->params.vt_mode << AD7746_VT_SETUP_VTMD0_BIT) |
               (1 << AD7746_VT_SETUP_VTCHOP_BIT);
-        if (i2c_write_reg(I2C, ADDR, AD7746_REG_VT_SETUP, reg, 0)) {
+        if (i2c_write_reg(DEV, ADDR, AD7746_REG_VT_SETUP, reg, 0)) {
             DEBUG("[ad7746] init - error: unable to enable the v/t channel\n");
             goto release;
         }
@@ -158,7 +158,7 @@ int ad7746_init(ad7746_t *dev, const ad7746_params_t *params)
 
     /* Set EXC sources */
     reg = (dev->params.exc_config << AD7746_EXC_SETUP_INV_EXCA_BIT);
-    if (i2c_write_reg(I2C, ADDR, AD7746_REG_EXC_SETUP, reg, 0)) {
+    if (i2c_write_reg(DEV, ADDR, AD7746_REG_EXC_SETUP, reg, 0)) {
         DEBUG("[ad7746] init - error: unable to set EXC outputs\n");
         goto release;
     }
@@ -167,7 +167,7 @@ int ad7746_init(ad7746_t *dev, const ad7746_params_t *params)
     if (dev->params.dac_a_cap) {
         assert(dev->params.dac_a_cap <= AD7746_DAC_MAX);
         reg = (1 << AD7746_DACAEN_BIT) | dev->params.dac_a_cap;
-        if (i2c_write_reg(I2C, ADDR, AD7746_REG_CAP_DAC_A, reg, 0)) {
+        if (i2c_write_reg(DEV, ADDR, AD7746_REG_CAP_DAC_A, reg, 0)) {
             DEBUG("[ad7746] init - error: unable to set DAC A\n");
             goto release;
         }
@@ -177,7 +177,7 @@ int ad7746_init(ad7746_t *dev, const ad7746_params_t *params)
     if (dev->params.dac_b_cap) {
         assert(dev->params.dac_b_cap <= AD7746_DAC_MAX);
         reg = (1 << AD7746_DACBEN_BIT) | dev->params.dac_b_cap;
-        if (i2c_write_reg(I2C, ADDR, AD7746_REG_CAP_DAC_B, reg, 0)) {
+        if (i2c_write_reg(DEV, ADDR, AD7746_REG_CAP_DAC_B, reg, 0)) {
             DEBUG("[ad7746] init - error: unable to set DAC B\n");
             goto release;
         }
@@ -187,7 +187,7 @@ int ad7746_init(ad7746_t *dev, const ad7746_params_t *params)
     reg = (1 << AD7746_CONFIGURATION_MD0_BIT) |
           (dev->params.cap_sample_rate << AD7746_CONFIGURATION_CAPF0_BIT) |
           (dev->params.vt_sample_rate << AD7746_CONFIGURATION_VTF0_BIT);
-    if (i2c_write_reg(I2C, ADDR, AD7746_REG_CONFIGURATION, reg, 0)) {
+    if (i2c_write_reg(DEV, ADDR, AD7746_REG_CONFIGURATION, reg, 0)) {
         DEBUG("[ad7746] init - error: unable to set mode and SR\n");
         goto release;
     }
@@ -195,7 +195,7 @@ int ad7746_init(ad7746_t *dev, const ad7746_params_t *params)
     res = AD7746_OK;
 
 release:
-    i2c_release(I2C);
+    i2c_release(DEV);
     return res;
 }
 
@@ -205,8 +205,8 @@ int ad7746_set_vt_ch_mode(ad7746_t *dev, ad7746_vt_mode_t mode)
     int res = AD7746_NOI2C;
 
     assert(dev);
-    i2c_acquire(I2C);
-    if (i2c_read_reg(I2C, ADDR, AD7746_REG_VT_SETUP, &reg, 0)) {
+    i2c_acquire(DEV);
+    if (i2c_read_reg(DEV, ADDR, AD7746_REG_VT_SETUP, &reg, 0)) {
         goto release;
     }
 
@@ -221,7 +221,7 @@ int ad7746_set_vt_ch_mode(ad7746_t *dev, ad7746_vt_mode_t mode)
                (mode << AD7746_VT_SETUP_VTMD0_BIT);
     }
 
-    if (i2c_write_reg(I2C, ADDR, AD7746_REG_VT_SETUP, reg, 0)) {
+    if (i2c_write_reg(DEV, ADDR, AD7746_REG_VT_SETUP, reg, 0)) {
         DEBUG("[ad7746] set_vt_ch - error: unable to set v/t channel mode\n");
         goto release;
     }
@@ -230,7 +230,7 @@ int ad7746_set_vt_ch_mode(ad7746_t *dev, ad7746_vt_mode_t mode)
     dev->params.vt_mode = mode;
 
 release:
-    i2c_release(I2C);
+    i2c_release(DEV);
     return res;
 }
 
@@ -270,9 +270,9 @@ int ad7746_set_cap_ch_input(const ad7746_t *dev, ad7746_cap_input_t input)
     int res = AD7746_NOI2C;
 
     assert(dev);
-    i2c_acquire(I2C);
+    i2c_acquire(DEV);
 
-    if (i2c_read_reg(I2C, ADDR, AD7746_REG_CAP_SETUP, &reg, 0)) {
+    if (i2c_read_reg(DEV, ADDR, AD7746_REG_CAP_SETUP, &reg, 0)) {
         goto release;
     }
 
@@ -283,14 +283,14 @@ int ad7746_set_cap_ch_input(const ad7746_t *dev, ad7746_cap_input_t input)
         reg &= ~(1 << AD7746_CAP_SETUP_CIN2_BIT);
     }
 
-    if (i2c_write_reg(I2C, ADDR, AD7746_REG_CAP_SETUP, reg, 0)) {
+    if (i2c_write_reg(DEV, ADDR, AD7746_REG_CAP_SETUP, reg, 0)) {
         goto release;
     }
 
     res = AD7746_OK;
 
 release:
-    i2c_release(I2C);
+    i2c_release(DEV);
     return res;
 }
 
@@ -300,23 +300,23 @@ int ad7746_set_cap_sr(const ad7746_t *dev, ad7746_cap_sample_rate_t sr)
     int res = AD7746_NOI2C;
 
     assert(dev);
-    i2c_acquire(I2C);
+    i2c_acquire(DEV);
 
-    if (i2c_read_reg(I2C, ADDR, AD7746_REG_CONFIGURATION, &reg, 0)) {
+    if (i2c_read_reg(DEV, ADDR, AD7746_REG_CONFIGURATION, &reg, 0)) {
         goto release;
     }
 
     reg &= ~(7 << AD7746_CONFIGURATION_CAPF0_BIT);
     reg |= (sr << AD7746_CONFIGURATION_CAPF0_BIT);
 
-    if (i2c_write_reg(I2C, ADDR, AD7746_REG_CONFIGURATION, reg, 0)) {
+    if (i2c_write_reg(DEV, ADDR, AD7746_REG_CONFIGURATION, reg, 0)) {
         goto release;
     }
 
     res = AD7746_OK;
 
 release:
-    i2c_release(I2C);
+    i2c_release(DEV);
     return res;
 }
 
@@ -326,23 +326,23 @@ int ad7746_set_vt_sr(const ad7746_t *dev, ad7746_vt_sample_rate_t sr)
     int res = AD7746_NOI2C;
 
     assert(dev);
-    i2c_acquire(I2C);
+    i2c_acquire(DEV);
 
-    if (i2c_read_reg(I2C, ADDR, AD7746_REG_CONFIGURATION, &reg, 0)) {
+    if (i2c_read_reg(DEV, ADDR, AD7746_REG_CONFIGURATION, &reg, 0)) {
         goto release;
     }
 
     reg &= ~(3 << AD7746_CONFIGURATION_VTF0_BIT);
     reg |= (sr << AD7746_CONFIGURATION_VTF0_BIT);
 
-    if (i2c_write_reg(I2C, ADDR, AD7746_REG_CONFIGURATION, reg, 0)) {
+    if (i2c_write_reg(DEV, ADDR, AD7746_REG_CONFIGURATION, reg, 0)) {
         goto release;
     }
 
     res = AD7746_OK;
 
 release:
-    i2c_release(I2C);
+    i2c_release(DEV);
     return res;
 }
 
@@ -406,9 +406,9 @@ static int _read_raw_ch(const ad7746_t *dev, uint8_t ch, uint32_t *raw)
 
     assert(dev);
     assert((ch == AD7746_READ_CAP_CH) || (ch == AD7746_READ_VT_CH));
-    i2c_acquire(I2C);
+    i2c_acquire(DEV);
 
-    if (i2c_read_reg(I2C, ADDR, AD7746_REG_STATUS, buf, 0)) {
+    if (i2c_read_reg(DEV, ADDR, AD7746_REG_STATUS, buf, 0)) {
         goto release;
     }
 
@@ -418,7 +418,7 @@ static int _read_raw_ch(const ad7746_t *dev, uint8_t ch, uint32_t *raw)
         goto release;
     }
 
-    if (i2c_read_regs(I2C, ADDR, reg, buf, 3, 0)) {
+    if (i2c_read_regs(DEV, ADDR, reg, buf, 3, 0)) {
         goto release;
     }
 
@@ -427,7 +427,7 @@ static int _read_raw_ch(const ad7746_t *dev, uint8_t ch, uint32_t *raw)
     res = AD7746_OK;
 
 release:
-    i2c_release(I2C);
+    i2c_release(DEV);
     return res;
 }
 

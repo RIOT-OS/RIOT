@@ -5,7 +5,7 @@ PKG_LICENSE=BSD-3-Clause
 
 .PHONY: all
 
-all: git-download
+all:
 	"$(MAKE)" -C $(PKG_BUILDDIR)/lib/source/ \
 			  -f $(RIOTPKG)/tinycrypt/Makefile.$(PKG_NAME)
 

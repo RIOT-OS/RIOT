@@ -42,14 +42,22 @@ extern "C" {
  * @name Kernel configuration
  * @{
  */
-#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT  (4096)
-#define THREAD_EXTRA_STACKSIZE_PRINTF        (2048)
+#define THREAD_EXTRA_STACKSIZE_PRINTF        (512)
 
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT   (512)
+#define THREAD_STACKSIZE_DEFAULT   (1024)
 #endif
 
 #define THREAD_STACKSIZE_IDLE      (160)
+/** @} */
+
+/**
+ * @name Pthread configuration
+ * @{
+ */
+/* The idle stack of '160' is not enough to do the 'msg_receive'.
+ * It currently used '164' bytes. */
+#define CONFIG_PTHREAD_REAPER_BASE_STACKSIZE (2*THREAD_STACKSIZE_IDLE)
 /** @} */
 
 /**
@@ -60,6 +68,19 @@ extern "C" {
 #define CC_CONF_USED                    __attribute__((used))
 #define CC_CONF_NONNULL(...)            __attribute__((nonnull(__VA_ARGS__)))
 #define CC_CONF_WARN_UNUSED_RESULT      __attribute__((warn_unused_result))
+/** @} */
+
+/**
+ * @brief   Attribute for memory sections required by SRAM PUF
+ */
+#define PUF_SRAM_ATTRIBUTES __attribute__((used, section(".noinit")))
+
+/**
+ * @brief   Stack size used for the exception (ISR) stack
+ * @{
+ */
+extern unsigned __stack_irq_size;
+#define ISR_STACKSIZE                   ((unsigned) &__stack_irq_size)
 /** @} */
 
 #ifdef __cplusplus

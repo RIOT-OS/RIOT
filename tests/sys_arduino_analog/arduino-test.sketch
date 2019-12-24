@@ -1,0 +1,15 @@
+// Example sketch given in analogWrite documentation
+// https://www.arduino.cc/reference/en/language/functions/analog-io/analogwrite/
+
+int ledPin = LED_PIN;         // LED connected to digital pin 3 by default
+int analogPin = 1;            // potentiometer connected to analog pin 1
+int val = 0;                  // variable to store the read value
+
+void setup() {
+  pinMode(ledPin, OUTPUT);    // sets the pin as output
+}
+
+void loop() {
+  val = analogRead(analogPin);  // read the input pin
+  analogWrite(ledPin, val / 4); // analogRead values go from 0 to 1023, analogWrite values from 0 to 255
+}

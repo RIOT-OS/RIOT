@@ -40,29 +40,22 @@ exclude_filter() {
     grep -v -e vendor -e examples -e tests -e "\<dist/tools\>"
 }
 
-# Check all groups are defined
-DEFINED_GROUPS=$(git grep @defgroup -- '*.h' '*.c' '*.txt' | \
-                    exclude_filter | \
+# Check groups are correctly defined (e.g. no undefined groups and no group
+# defined multiple times)
+ALL_RAW_DEFGROUP=$(git grep @defgroup -- '*.h' '*.c' '*.txt' | exclude_filter)
+ALL_RAW_INGROUP=$(git grep '@ingroup' -- '*.h' '*.c' '*.txt' | exclude_filter)
+DEFINED_GROUPS=$(echo "${ALL_RAW_DEFGROUP}" | \
                     grep -oE '@defgroup[ ]+[^ ]+' | \
-                    grep -oE '[^ ]+$' | sort -u)
+                    grep -oE '[^ ]+$' | \
+                    sort)
+DEFINED_GROUPS_UNIQUE=$(echo "${DEFINED_GROUPS}" | sort -u)
 
+# Check for undefined groups
 UNDEFINED_GROUPS=$( \
-    for group in $(git grep '@ingroup' -- '*.h' '*.c' '*.txt' | \
-                    exclude_filter | \
+    for group in $(echo "${ALL_RAW_INGROUP}" | \
                     grep -oE '[^ ]+$' | sort -u); \
     do \
-        echo "${DEFINED_GROUPS}" | grep -xq "${group}" || echo "${group}"; \
-    done \
-    )
-
-ALL_RAW_INGROUP=$(git grep '@ingroup' -- '*.h' '*.c' '*.txt' | exclude_filter)
-
-UNDEFINED_GROUPS_PRINT=$( \
-    for group in ${UNDEFINED_GROUPS}; \
-    do \
-        echo -e "\n${CWARN}${group}${CRESET} found in:"; \
-        echo "${ALL_RAW_INGROUP}" | grep "\<${group}\>$" | sort -u | \
-                awk -F: '{ print "\t" $1 }'; \
+        echo "${DEFINED_GROUPS_UNIQUE}" | grep -xq "${group}" || echo "${group}"; \
     done \
     )
 
@@ -71,6 +64,30 @@ then
     COUNT=$(echo "${UNDEFINED_GROUPS}" | wc -l)
     echo -ne "${CERROR}ERROR${CRESET} "
     echo -e "There are ${CWARN}${COUNT}${CRESET} undefined Doxygen groups:"
-    echo "${UNDEFINED_GROUPS_PRINT}"
+    for group in ${UNDEFINED_GROUPS};
+    do
+        echo -e "\n${CWARN}${group}${CRESET} found in:";
+        echo "${ALL_RAW_INGROUP}" | grep "\<${group}\>$" | sort -u |
+                awk -F: '{ print "\t" $1 }';
+    done
+    exit 2
+fi
+
+# Check for groups defined multiple times:
+MULTIPLE_DEFINED_GROUPS=$(echo "${DEFINED_GROUPS}" | uniq -d)
+
+if [ -n "${MULTIPLE_DEFINED_GROUPS}" ]
+then
+    COUNT=$(echo "${MULTIPLE_DEFINED_GROUPS}" | wc -l)
+    echo -ne "${CERROR}ERROR${CRESET} "
+    echo -e "There are ${CWARN}${COUNT}${CRESET} Doxygen groups defined multiple times:"
+    for group in ${MULTIPLE_DEFINED_GROUPS};
+    do
+        echo -e "\n${CWARN}${group}${CRESET} defined in:";
+        echo "${ALL_RAW_DEFGROUP}" | \
+            awk -F@ '{ split($2, end, " "); printf("%s%s\n",$1,end[2]) }' |
+            grep "\<${group}\>$" | sort -u |
+            awk -F: '{ print "\t" $1 }';
+    done
     exit 2
 fi

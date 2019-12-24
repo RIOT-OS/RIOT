@@ -20,6 +20,7 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph/init.h"
+#include "stdio_base.h"
 
 /**
  * @brief   Configure clock sources and the CPU frequency
@@ -60,6 +61,8 @@ void cpu_init(void)
     cortexm_init();
     /* Initialise clock sources and generic clocks */
     clk_init();
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
     /* trigger static peripheral initialization */
     periph_init();
 }

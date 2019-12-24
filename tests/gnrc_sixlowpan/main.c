@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015-2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +15,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
+ * @author      Martine S. Lenders <m.lenders@fu-berlin.de>
  *
  * @}
  */
@@ -141,7 +142,7 @@ static void _send_packet(void)
 
     gnrc_netif_hdr_init(&(netif_hdr.netif_hdr), 8, 8);
 
-    netif_hdr.netif_hdr.if_pid = netif->pid;
+    gnrc_netif_hdr_set_netif(&netif_hdr.netif_hdr, netif);
 
     uint8_t data1[] = {
         /* 6LoWPAN Header */

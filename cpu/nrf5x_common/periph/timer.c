@@ -103,7 +103,7 @@ int timer_set_absolute(tim_t tim, int chan, unsigned int value)
     dev(tim)->CC[chan] = value;
     dev(tim)->INTENSET = (TIMER_INTENSET_COMPARE0_Msk << chan);
 
-    return 1;
+    return 0;
 }
 
 int timer_clear(tim_t tim, int chan)
@@ -116,7 +116,7 @@ int timer_clear(tim_t tim, int chan)
     dev(tim)->INTENCLR = (TIMER_INTENSET_COMPARE0_Msk << chan);
     ctx[tim].flags &= ~(1 << chan);
 
-    return 1;
+    return 0;
 }
 
 unsigned int timer_read(tim_t tim)

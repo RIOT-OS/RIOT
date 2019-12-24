@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
- * Copyright (C) 2013 INRIA
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2018 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,261 +9,169 @@
 /**
  * @ingroup     drivers_cc110x
  * @{
- * @file
- * @brief       Basic functionality of cc110x driver
  *
- * @author      Oliver Hahm <oliver.hahm@inria.fr>
- * @author      Fabian Nack <nack@inf.fu-berlin.de>
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @file
+ * @brief       Implementation for the "public" API of the CC1100/CC1101 driver
+ *
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @}
  */
 
-#include "luid.h"
-#include "board.h"
-#include "periph/gpio.h"
-#include "periph/spi.h"
-#include "xtimer.h"
-#include "cpu.h"
-#include "log.h"
+#include <errno.h>
+#include <string.h>
 
 #include "cc110x.h"
-#include "cc110x-defaultsettings.h"
-#include "cc110x-defines.h"
-#include "cc110x-interface.h"
-#include "cc110x-internal.h"
-#include "cc110x-spi.h"
+#include "cc110x_internal.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/* Internal function prototypes */
-#ifndef CC110X_DONT_RESET
-static void _reset(cc110x_t *dev);
-static void _power_up_reset(cc110x_t *dev);
-#endif
-
 int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
 {
-    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-
-#ifdef MODULE_CC110X_HOOKS
-    cc110x_hooks_init();
-#endif
-
-    dev->params = *params;
-
-    /* Configure chip-select */
-    spi_init_cs(dev->params.spi, dev->params.cs);
-
-    /* Configure GDO1 */
-    gpio_init(dev->params.gdo1, GPIO_IN);
-
-#ifndef CC110X_DONT_RESET
-    /* reset device*/
-    _power_up_reset(dev);
-#endif
-
-    /* set default state */
-    dev->radio_state = RADIO_IDLE;
-
-    /* Write configuration to configuration registers */
-    cc110x_writeburst_reg(dev, 0x00, cc110x_default_conf, cc110x_default_conf_size);
-
-    /* Write PATABLE (power settings) */
-    cc110x_writeburst_reg(dev, CC110X_PATABLE, CC110X_DEFAULT_PATABLE, 8);
-
-    /* set base frequency */
-    cc110x_set_base_freq_raw(dev, CC110X_DEFAULT_FREQ);
-
-    /* Set default channel number */
-    cc110x_set_channel(dev, CC110X_DEFAULT_CHANNEL);
-
-    /* set default node id */
-    uint8_t addr;
-    luid_get(&addr, 1);
-    cc110x_set_address(dev, addr);
-
-    LOG_INFO("cc110x: initialized with address=%u and channel=%i\n",
-            (unsigned)dev->radio_address,
-            dev->radio_channel);
-
-    return 0;
-}
-
-uint8_t cc110x_set_address(cc110x_t *dev, uint8_t address)
-{
-    DEBUG("%s:%s:%u setting address %u\n", RIOT_FILE_RELATIVE, __func__,
-            __LINE__, (unsigned)address);
-    if (!(address < MIN_UID)) {
-        if (dev->radio_state != RADIO_UNKNOWN) {
-            cc110x_write_register(dev, CC110X_ADDR, address);
-            dev->radio_address = address;
-            return address;
-        }
+    if (!dev || !params) {
+        return -EINVAL;
     }
 
+    /* Zero out everything but RIOT's driver interface, which should be
+     * managed by RIOT
+     */
+    memset((char *)dev + sizeof(netdev_t), 0x00,
+           sizeof(cc110x_t) - sizeof(netdev_t));
+    dev->params = *params;
+    dev->netdev.driver = &cc110x_driver;
+    dev->state = CC110X_STATE_OFF;
     return 0;
 }
 
-void cc110x_set_base_freq_raw(cc110x_t *dev, const char* freq_array)
+int cc110x_apply_config(cc110x_t *dev, const cc110x_config_t *conf,
+                        const cc110x_chanmap_t *chanmap, uint8_t channel)
 {
-#if ENABLE_DEBUG == 1
-    uint8_t _tmp[] = { freq_array[2], freq_array[1], freq_array[0], 0x00};
-    uint32_t *FREQ = (uint32_t*) _tmp;
+    DEBUG("[cc110x] Applying new configuration\n");
+    if (!dev || !chanmap) {
+        return -EINVAL;
+    }
 
-    DEBUG("cc110x_set_base_freq_raw(): setting base frequency to %uHz\n",
-            (26000000>>16) * (unsigned)(*FREQ));
-#endif
-    cc110x_writeburst_reg(dev, CC110X_FREQ2, freq_array, 3);
-}
+    if ((channel >= CC110X_MAX_CHANNELS) || (chanmap->map[channel] == 0xff)) {
+        /* Channel out of range or not supported in current channel map */
+        return -ERANGE;
+    }
 
-void cc110x_set_monitor(cc110x_t *dev, uint8_t mode)
-{
-    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
+    if (cc110x_acquire(dev) != SPI_OK) {
+        return -EIO;
+    }
 
-    cc110x_write_register(dev, CC110X_PKTCTRL1, mode ? 0x04 : 0x06);
-}
-
-void cc110x_setup_rx_mode(cc110x_t *dev)
-{
-    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-
-    /* Stay in RX mode until end of packet */
-    cc110x_write_reg(dev, CC110X_MCSM2, 0x07);
-    cc110x_switch_to_rx(dev);
-}
-
-void cc110x_switch_to_rx(cc110x_t *dev)
-{
-    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-
-#ifdef MODULE_CC110X_HOOKS
-    cc110x_hook_rx();
-#endif
-
+    gpio_irq_disable(dev->params.gdo0);
     gpio_irq_disable(dev->params.gdo2);
 
-    /* flush RX fifo */
-    cc110x_strobe(dev, CC110X_SIDLE);
-    cc110x_strobe(dev, CC110X_SFRX);
+    /* Go to IDLE state to allow reconfiguration */
+    cc110x_cmd(dev, CC110X_STROBE_IDLE);
+    dev->state = CC110X_STATE_IDLE;
 
-    dev->radio_state = RADIO_RX;
+    if (conf != NULL) {
+        /* Write all three base frequency configuration bytes in one burst */
+        cc110x_burst_write(dev, CC110X_REG_FREQ2, &conf->base_freq, 3);
 
-    cc110x_write_reg(dev, CC110X_IOCFG2, CC110X_GDO_HIGH_ON_SYNC_WORD);
-    cc110x_strobe(dev, CC110X_SRX);
-
-    gpio_irq_enable(dev->params.gdo2);
-}
-
-void cc110x_wakeup_from_rx(cc110x_t *dev)
-{
-    if (dev->radio_state != RADIO_RX) {
-        return;
+        cc110x_write(dev, CC110X_REG_FSCTRL1, conf->fsctrl1);
+        cc110x_write(dev, CC110X_REG_MDMCFG4, conf->mdmcfg4);
+        cc110x_write(dev, CC110X_REG_MDMCFG3, conf->mdmcfg3);
+        cc110x_write(dev, CC110X_REG_DEVIATN, conf->deviatn);
     }
 
-    LOG_DEBUG("cc110x: switching to idle mode\n");
+    /* We only need to store the channel, cc110x_full_calibration() will tune it
+     * in after calibration.
+     */
+    dev->channel = channel;
+    dev->channels = chanmap;
+    cc110x_release(dev);
 
-    cc110x_strobe(dev, CC110X_SIDLE);
-    dev->radio_state = RADIO_IDLE;
+    /* prepare hopping will call cc110x_enter_rx_mode(), which restores the IRQs */
+    return cc110x_full_calibration(dev);
 }
 
-void cc110x_switch_to_pwd(cc110x_t *dev)
+int cc110x_set_tx_power(cc110x_t *dev, cc110x_tx_power_t power)
 {
-    LOG_DEBUG("cc110x: switching to powerdown mode\n");
-    cc110x_wakeup_from_rx(dev);
-    cc110x_strobe(dev, CC110X_SPWD);
-    dev->radio_state = RADIO_PWD;
-
-#ifdef MODULE_CC110X_HOOKS
-     cc110x_hook_off();
-#endif
-}
-
-#ifndef MODULE_CC110X_HOOKS
-int16_t cc110x_set_channel(cc110x_t *dev, uint8_t channr)
-{
-    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-
-    if (channr > MAX_CHANNR) {
-        return -1;
+    DEBUG("[cc110x] Applying TX power setting at index %u\n", (unsigned)power);
+    if (!dev) {
+        return -EINVAL;
     }
 
-    cc110x_write_register(dev, CC110X_CHANNR, channr * 10);
-    dev->radio_channel = channr;
-
-    return channr;
-}
-#endif
-
-#ifndef CC110X_DONT_RESET
-static void _reset(cc110x_t *dev)
-{
-    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-    cc110x_wakeup_from_rx(dev);
-    cc110x_cs(dev);
-    cc110x_strobe(dev, CC110X_SRES);
-    xtimer_usleep(100);
-}
-
-static void _power_up_reset(cc110x_t *dev)
-{
-    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-    gpio_set(dev->params.cs);
-    gpio_clear(dev->params.cs);
-    gpio_set(dev->params.cs);
-    xtimer_usleep(RESET_WAIT_TIME);
-    _reset(dev);
-}
-#endif
-
-void cc110x_write_register(cc110x_t *dev, uint8_t r, uint8_t value)
-{
-    /* Save old radio state */
-    uint8_t old_state = dev->radio_state;
-
-    /* Wake up from RX (no effect if in other mode) */
-    cc110x_wakeup_from_rx(dev);
-    cc110x_write_reg(dev, r, value);
-
-    /* Have to put radio back to RX if old radio state
-     * was RX, otherwise no action is necessary */
-    if (old_state == RADIO_RX) {
-        cc110x_switch_to_rx(dev);
-    }
-}
-
-int cc110x_rd_set_mode(cc110x_t *dev, int mode)
-{
-    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-
-    int result;
-
-    /* Get current radio mode */
-    if ((dev->radio_state == RADIO_UNKNOWN) || (dev->radio_state == RADIO_PWD)) {
-        result = RADIO_MODE_OFF;
-    }
-    else {
-        result = RADIO_MODE_ON;
+    if ((unsigned)power >= CC110X_TX_POWER_NUMOF) {
+        return -ERANGE;
     }
 
-    switch(mode) {
-        case RADIO_MODE_ON:
-            LOG_DEBUG("cc110x: switching to RX mode\n");
-            cc110x_setup_rx_mode(dev);          /* Set chip to desired mode */
+    if (cc110x_acquire(dev) != SPI_OK) {
+        return -EIO;
+    }
+
+    switch (dev->state) {
+        case CC110X_STATE_IDLE:
+        /* falls through */
+        case CC110X_STATE_RX_MODE:
             break;
-
-        case RADIO_MODE_OFF:
-            gpio_irq_disable(dev->params.gdo2); /* Disable interrupts */
-            cc110x_switch_to_pwd(dev);          /* Set chip to power down mode */
-            break;
-
-        case RADIO_MODE_GET:
-            /* do nothing, just return current mode */
         default:
-            /* do nothing */
-            break;
+            cc110x_release(dev);
+            return -EAGAIN;
     }
 
-    /* Return previous mode */
-    return result;
+    uint8_t frend0 = 0x10 | (uint8_t)power;
+    cc110x_write(dev, CC110X_REG_FREND0, frend0);
+    dev->tx_power = power;
+    cc110x_release(dev);
+    return 0;
+}
+
+int cc110x_set_channel(cc110x_t *dev, uint8_t channel)
+{
+    DEBUG("[cc110x] Hopping to channel %i\n", (int)channel);
+    if (!dev) {
+        return -EINVAL;
+    }
+
+    if (cc110x_acquire(dev) != SPI_OK) {
+        return -EIO;
+    }
+
+    if ((channel >= CC110X_MAX_CHANNELS) || (dev->channels->map[channel] == 0xff)) {
+        /* Channel out of range or not supported in current channel map */
+        cc110x_release(dev);
+        return -ERANGE;
+    }
+
+    switch (dev->state) {
+        case CC110X_STATE_IDLE:
+        /* falls through */
+        case CC110X_STATE_RX_MODE:
+        /* falls through */
+        case CC110X_STATE_FSTXON:
+            /* Above states are fine for hopping */
+            break;
+        default:
+            /* All other states do not allow hopping right now */
+            cc110x_release(dev);
+            return -EAGAIN;
+    }
+
+    /* Disable IRQs, as e.g. PLL indicator will go LOW in IDLE state */
+    gpio_irq_disable(dev->params.gdo0);
+    gpio_irq_disable(dev->params.gdo2);
+
+    /* Go to IDLE state to disable frequency synchronizer */
+    cc110x_cmd(dev, CC110X_STROBE_IDLE);
+
+    /* Upload new channel and corresponding calibration data */
+    cc110x_write(dev, CC110X_REG_CHANNR, dev->channels->map[channel]);
+
+    uint8_t caldata[] = {
+        dev->fscal.fscal3, dev->fscal.fscal2, dev->fscal.fscal1[channel]
+    };
+    cc110x_burst_write(dev, CC110X_REG_FSCAL3, caldata, sizeof(caldata));
+
+    /* Start listening on the new channel (restores IRQs) */
+    cc110x_enter_rx_mode(dev);
+
+    dev->channel = channel;
+    cc110x_release(dev);
+
+    dev->netdev.event_callback(&dev->netdev, NETDEV_EVENT_FHSS_CHANGE_CHANNEL);
+    return 0;
 }

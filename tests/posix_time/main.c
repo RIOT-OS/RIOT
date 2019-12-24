@@ -29,8 +29,6 @@
 
 int main(void)
 {
-    puts("Please hit any key and then ENTER to continue");
-    getchar();
     puts("5 x usleep(i++ * 500000)");
     for (unsigned i = 0; i < 5; i++) {
         useconds_t us = i * 500000u;

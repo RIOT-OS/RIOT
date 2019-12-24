@@ -40,7 +40,7 @@ void puf_sram_generate(const uint8_t *ram, size_t len)
     puf_sram_seed = dek_hash(ram, len);
     /* write marker to a defined section for subsequent reset detection */
     puf_sram_marker = PUF_SRAM_MARKER;
-    /* seting state to 0 means seed was generated from SRAM pattern */
+    /* setting state to 0 means seed was generated from SRAM pattern */
     puf_sram_state = 0;
 }
 

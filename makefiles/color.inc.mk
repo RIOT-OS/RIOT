@@ -8,12 +8,8 @@ COLOR_RESET  :=
 COLOR_ECHO   := /bin/echo
 
 ifeq ($(CC_NOCOLOR),)
-  available_colors:=$(shell tput colors 2> /dev/null)
-  ifeq ($(available_colors),)
-    CC_NOCOLOR = 1
-  else ifeq ($(available_colors),-1)
-    CC_NOCOLOR = 1
-  else ifeq ($(available_colors),0)
+  IS_TERMINAL = $(if $(MAKE_TERMOUT),$(MAKE_TERMERR),)
+  ifeq ($(IS_TERMINAL),)
     CC_NOCOLOR = 1
   else
     CC_NOCOLOR = 0

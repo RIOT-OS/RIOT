@@ -1,0 +1,5 @@
+VARIANT = $(shell echo $(CPU_VARIANT) | tr 'a-z-' 'A-Z_')
+CFLAGS += -DCPU_VARIANT_$(VARIANT)
+
+USEMODULE += periph_common cc26xx_cc13xx_periph
+INCLUDES += -I${RIOTCPU}/cc26xx_cc13xx/include

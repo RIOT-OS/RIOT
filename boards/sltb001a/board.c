@@ -32,6 +32,7 @@ void board_init(void)
     /* initialize the CPU */
     cpu_init();
 
+#ifndef RIOTBOOT
     /* perform common board initialization */
     board_common_init();
 
@@ -59,6 +60,7 @@ void board_init(void)
               (RGB_LED2_ENABLED << RGB_LED2_EN_BIT) |
               (RGB_LED3_ENABLED << RGB_LED3_EN_BIT) |
               (RGB_LED4_ENABLED << RGB_LED4_EN_BIT));
+#endif
 #endif
 #endif
 }

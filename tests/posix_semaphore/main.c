@@ -32,6 +32,8 @@
 #include "thread.h"
 #include "xtimer.h"
 
+#include "test_utils/interactive_sync.h"
+
 #define SEMAPHORE_MSG_QUEUE_SIZE        (8)
 #define SEMAPHORE_TEST_THREADS          (5)
 static char test1_thread_stack[THREAD_STACKSIZE_MAIN];
@@ -236,16 +238,16 @@ void test3(void)
     sem_post(&s1);
 }
 
-#ifdef BOARD_NATIVE
-/* native can sometime take more time to respond as it is not real time */
-#define TEST4_TIMEOUT_EXCEEDED_MARGIN (300)
-#elif CPU_FAM_NRF51
-/* nrf51 based boards needs a slightly higher margin value. Using 105us makes
- test4 result more reliable. */
-#define TEST4_TIMEOUT_EXCEEDED_MARGIN (105)
-#else
-#define TEST4_TIMEOUT_EXCEEDED_MARGIN (100)
-#endif /* BOARD_NATIVE */
+/*
+ * Allowed margin for waiting too long.
+ *
+ * Waiting too short is forbidden by POSIX, but is checked elsewhere.
+ *
+ * This allows waiting a little (0.1%) longer than exactly 1000000us.
+ * The value should be large enough to not trip over timer inaccuracies, but
+ * small enough to catch any fundamental problems.
+ */
+#define TEST4_TIMEOUT_EXCEEDED_MARGIN (1000)
 
 void test4(void)
 {
@@ -279,7 +281,7 @@ void test4(void)
     }
 
     uint64_str[fmt_u64_dec(uint64_str, elapsed)] = '\0';
-    if (elapsed < (exp - 100)) {
+    if (elapsed < exp) {
         printf("first: waited only %s usec => FAILED\n", uint64_str);
     }
     else if (elapsed > (exp + TEST4_TIMEOUT_EXCEEDED_MARGIN)) {
@@ -292,6 +294,8 @@ void test4(void)
 
 int main(void)
 {
+    test_utils_interactive_sync();
+
     msg_init_queue(main_msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
     xtimer_init();
     puts("######################### TEST1:");

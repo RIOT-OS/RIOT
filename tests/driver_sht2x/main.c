@@ -19,6 +19,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
 
@@ -88,7 +89,7 @@ int main(void)
             printf("Temperature [°C]: %d.%d\n"
                    "Humidity [%%RH]: %u.%02u\n"
                    "\n+-------------------------------------+\n",
-                   temperature / 100, (temperature % 100) / 10,
+                   temperature / 100, abs(temperature % 100) / 10,
                    (unsigned int)(humidity / 100), (unsigned int)(humidity % 100)
                    );
         }

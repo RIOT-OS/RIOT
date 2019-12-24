@@ -9,9 +9,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-l476rg STM32 Nucleo-L476RG
- * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-L476RG
+ * @ingroup     boards_nucleo-l476rg
  * @{
  *
  * @file
@@ -27,6 +25,7 @@
 
 #include "periph_cpu.h"
 #include "cfg_i2c1_pb8_pb9.h"
+#include "cfg_rtt_default.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,6 +89,28 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    DMA streams configuration
+ * @{
+ */
+#ifdef MODULE_PERIPH_DMA
+static const dma_conf_t dma_config[] = {
+    { .stream = 1 },    /* DMA1 Channel 2 - SPI1_RX | USART3_TX */
+    { .stream = 2 },    /* DMA1 Channel 3 - SPI1_TX */
+    { .stream = 3 },    /* DMA1 Channel 4 - USART1_TX */
+    { .stream = 6 },    /* DMA1 Channel 7 - USART2_TX */
+};
+
+#define DMA_0_ISR  isr_dma1_channel2
+#define DMA_1_ISR  isr_dma1_channel3
+#define DMA_2_ISR  isr_dma1_channel4
+#define DMA_3_ISR  isr_dma1_channel7
+
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
+#endif /* MODULE_PERIPH_DMA */
+/** @} */
+
+
+/**
  * @name    Timer configuration
  * @{
  */
@@ -105,7 +126,7 @@ static const timer_conf_t timer_config[] = {
 
 #define TIMER_0_ISR         isr_tim5
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -124,9 +145,9 @@ static const uart_conf_t uart_config[] = {
         .irqn       = USART2_IRQn,
         .type       = STM32_USART,
         .clk_src    = 0, /* Use APB clock */
-#ifdef UART_USE_DMA
-        .dma_stream = 6,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 3,
+        .dma_chan   = 2
 #endif
     },
     {
@@ -140,9 +161,9 @@ static const uart_conf_t uart_config[] = {
         .irqn       = USART3_IRQn,
         .type       = STM32_USART,
         .clk_src    = 0, /* Use APB clock */
-#ifdef UART_USE_DMA
-        .dma_stream = 5,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 0,
+        .dma_chan   = 2
 #endif
     },
     {
@@ -156,9 +177,9 @@ static const uart_conf_t uart_config[] = {
         .irqn       = USART1_IRQn,
         .type       = STM32_USART,
         .clk_src    = 0, /* Use APB clock */
-#ifdef UART_USE_DMA
-        .dma_stream = 4,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 2,
+        .dma_chan   = 2
 #endif
     }
 };
@@ -167,7 +188,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_1_ISR          (isr_usart3)
 #define UART_2_ISR          (isr_usart1)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -207,7 +228,7 @@ static const pwm_conf_t pwm_config[] = {
     }
 };
 
-#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 /**
@@ -241,13 +262,22 @@ static const spi_conf_t spi_config[] = {
         .miso_pin = GPIO_PIN(PORT_A, 6),
         .sclk_pin = GPIO_PIN(PORT_A, 5),
         .cs_pin   = GPIO_UNDEF,
-        .af       = GPIO_AF5,
+        .mosi_af  = GPIO_AF5,
+        .miso_af  = GPIO_AF5,
+        .sclk_af  = GPIO_AF5,
+        .cs_af    = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2
+        .apbbus   = APB2,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma   = 1,
+        .tx_dma_chan = 1,
+        .rx_dma   = 0,
+        .rx_dma_chan = 1,
+#endif
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -266,24 +296,6 @@ static const spi_conf_t spi_config[] = {
     {GPIO_PIN(PORT_C, 1), 2, 2},  /*< ADC123_IN_2 */ \
     {GPIO_PIN(PORT_C, 0), 2, 1},  /*< ADC123_IN_1 */ \
 }
-/** @} */
-
-/**
- * @name    RTT configuration
- *
- * On the STM32Lx platforms, we always utilize the LPTIM1.
- * @{
- */
-#define RTT_NUMOF           (1)
-#define RTT_FREQUENCY       (1024U)             /* 32768 / 2^n */
-#define RTT_MAX_VALUE       (0x0000ffff)        /* 16-bit timer */
-/** @} */
-
-/**
- * @name   RTC configuration
- * @{
- */
-#define RTC_NUMOF           (1)
 /** @} */
 
 #ifdef __cplusplus

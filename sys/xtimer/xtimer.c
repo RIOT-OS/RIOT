@@ -38,10 +38,14 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/*
+ * @brief: struct for mutex lock with timeout
+ * xtimer_mutex_lock_timeout() uses it to give information to the timer callback function
+ */
 typedef struct {
     mutex_t *mutex;
     thread_t *thread;
-    int timeout;
+    volatile int timeout;
 } mutex_thread_t;
 
 static void _callback_unlock_mutex(void* arg)
@@ -135,6 +139,7 @@ out:
     *last_wakeup = target;
 }
 
+#ifdef MODULE_CORE_MSG
 static void _callback_msg(void* arg)
 {
     msg_t *msg = (msg_t*)arg;
@@ -160,35 +165,6 @@ void _xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_
 {
     _setup_msg(timer, msg, target_pid);
     _xtimer_set64(timer, offset, offset >> 32);
-}
-
-static void _callback_wakeup(void* arg)
-{
-    thread_wakeup((kernel_pid_t)((intptr_t)arg));
-}
-
-void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
-{
-    timer->callback = _callback_wakeup;
-    timer->arg = (void*) ((intptr_t)pid);
-
-    _xtimer_set(timer, offset);
-}
-
-void _xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
-{
-    timer->callback = _callback_wakeup;
-    timer->arg = (void*) ((intptr_t)pid);
-
-    _xtimer_set64(timer, offset, offset >> 32);
-}
-
-void xtimer_now_timex(timex_t *out)
-{
-    uint64_t now = xtimer_usec_from_ticks64(xtimer_now64());
-
-    out->seconds = div_u64_by_1000000(now);
-    out->microseconds = now - (out->seconds * US_PER_SEC);
 }
 
 /* Prepares the message to trigger the timeout.
@@ -232,19 +208,68 @@ int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout_ticks)
     _xtimer_set_msg(&t, timeout_ticks, &tmsg, sched_active_pid);
     return _msg_wait(msg, &tmsg, &t);
 }
+#endif /* MODULE_CORE_MSG */
+
+static void _callback_wakeup(void* arg)
+{
+    thread_wakeup((kernel_pid_t)((intptr_t)arg));
+}
+
+void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
+{
+    timer->callback = _callback_wakeup;
+    timer->arg = (void*) ((intptr_t)pid);
+
+    _xtimer_set(timer, offset);
+}
+
+void _xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
+{
+    timer->callback = _callback_wakeup;
+    timer->arg = (void*) ((intptr_t)pid);
+
+    _xtimer_set64(timer, offset, offset >> 32);
+}
+
+void xtimer_now_timex(timex_t *out)
+{
+    uint64_t now = xtimer_usec_from_ticks64(xtimer_now64());
+
+    out->seconds = div_u64_by_1000000(now);
+    out->microseconds = now - (out->seconds * US_PER_SEC);
+}
 
 static void _mutex_timeout(void *arg)
 {
+    /* interrupts a disabled because xtimer can spin
+     * if xtimer_set spins the callback is executed
+     * in the thread context
+     *
+     * If the xtimer spin is fixed in the future
+     * interups disable/restore can be removed
+     */
+    unsigned irqstate = irq_disable();
+
     mutex_thread_t *mt = (mutex_thread_t *)arg;
 
-    mt->timeout = 1;
-    list_node_t *node = list_remove(&mt->mutex->queue,
-                                    (list_node_t *)&mt->thread->rq_entry);
-    if ((node != NULL) && (mt->mutex->queue.next == NULL)) {
-        mt->mutex->queue.next = MUTEX_LOCKED;
+    if (mt->mutex->queue.next != MUTEX_LOCKED &&
+        mt->mutex->queue.next != NULL) {
+        mt->timeout = 1;
+        list_node_t *node = list_remove(&mt->mutex->queue,
+                                        (list_node_t *)&mt->thread->rq_entry);
+
+        /* if thread was removed from the list */
+        if (node != NULL) {
+            if (mt->mutex->queue.next == NULL) {
+                mt->mutex->queue.next = MUTEX_LOCKED;
+            }
+            sched_set_status(mt->thread, STATUS_PENDING);
+            irq_restore(irqstate);
+            sched_switch(mt->thread->priority);
+            return;
+        }
     }
-    sched_set_status(mt->thread, STATUS_PENDING);
-    thread_yield_higher();
+    irq_restore(irqstate);
 }
 
 int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
@@ -255,7 +280,7 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
     if (timeout != 0) {
         t.callback = _mutex_timeout;
         t.arg = (void *)((mutex_thread_t *)&mt);
-        _xtimer_set64(&t, timeout, timeout >> 32);
+        xtimer_set64(&t, timeout);
     }
 
     mutex_lock(mutex);

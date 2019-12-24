@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define MMA7660_NUM       (sizeof(mma7660_params) / sizeof(mma7660_params[0]))
+#define MMA7660_NUM       ARRAY_SIZE(mma7660_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -45,7 +45,7 @@ static saul_reg_t saul_entries[MMA7660_NUM];
 /**
  * @brief   Define the number of configured sensors
  */
-#define MMA7660_INFO_NUM  (sizeof(mma7660_saul_info) / sizeof(mma7660_saul_info[0]))
+#define MMA7660_INFO_NUM  ARRAY_SIZE(mma7660_saul_info)
 
 /**
  * @brief   Reference the driver struct

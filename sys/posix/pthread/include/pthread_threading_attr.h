@@ -23,7 +23,7 @@ extern "C" {
 
 /**
  * @brief     An attribute set to supply to pthread_create()
- * @details   A zeroed out datum is default initiliazed.
+ * @details   A zeroed out datum is default initialized.
  * @see       pthread_create() for further information
  */
 typedef struct

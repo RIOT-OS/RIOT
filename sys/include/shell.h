@@ -64,13 +64,41 @@ typedef struct shell_command_t {
 } shell_command_t;
 
 /**
- * @brief           Start a shell.
+ * @brief           Start a shell and exit once EOF is reached.
  *
  * @param[in]       commands    ptr to array of command structs
  * @param[in]       line_buf    Buffer that will be used for reading a line
  * @param[in]       len         nr of bytes that fit in line_buf
  */
-void shell_run(const shell_command_t *commands, char *line_buf, int len);
+void shell_run_once(const shell_command_t *commands, char *line_buf, int len);
+
+/**
+ * @brief           Start a shell and restart it if it exits
+ *
+ * @param[in]       commands    ptr to array of command structs
+ * @param[in]       line_buf    Buffer that will be used for reading a line
+ * @param[in]       len         nr of bytes that fit in line_buf
+ */
+static inline void shell_run_forever(const shell_command_t *commands,
+                                     char *line_buf, int len)
+{
+    while (1) {
+        shell_run_once(commands, line_buf, len);
+    }
+}
+
+/**
+ * @brief           Back-porting alias for @ref shell_run_forever
+ *
+ * @param[in]       commands    ptr to array of command structs
+ * @param[in]       line_buf    Buffer that will be used for reading a line
+ * @param[in]       len         nr of bytes that fit in line_buf
+ */
+static inline void shell_run(const shell_command_t *commands,
+                             char *line_buf, int len)
+{
+    shell_run_forever(commands, line_buf, len);
+}
 
 #ifdef __cplusplus
 }

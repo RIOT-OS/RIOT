@@ -249,7 +249,7 @@ void gnrc_pktbuf_release_error(gnrc_pktsnip_t *pkt, uint32_t err)
 gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt)
 {
     mutex_lock(&_mutex);
-    if ((pkt == NULL) || (pkt->size == 0)) {
+    if (pkt == NULL) {
         mutex_unlock(&_mutex);
         return NULL;
     }
@@ -275,10 +275,23 @@ static inline void _print_chunk(void *chunk, size_t size, int num)
     od_hex_dump(chunk, size, OD_WIDTH_DEFAULT);
 }
 
+static inline void _print_ptr(_unused_t *ptr)
+{
+    if (ptr == NULL) {
+        printf("(nil)");
+    }
+    else {
+        printf("%p", (void *)ptr);
+    }
+}
+
 static inline void _print_unused(_unused_t *ptr)
 {
-    printf("~ unused: %p (next: %p, size: %4u) ~\n", (void *)ptr,
-           (void *)ptr->next, ptr->size);
+    printf("~ unused: ");
+    _print_ptr(ptr);
+    printf(" (next: ");
+    _print_ptr(ptr->next);
+    printf(", size: %4u) ~\n", ptr->size);
 }
 #endif
 
@@ -483,57 +496,6 @@ static void _pktbuf_free(void *data, size_t size)
     if ((new->next != NULL) && (_too_small_hole(new, new->next))) {
         _merge(new, new->next);
     }
-}
-
-
-gnrc_pktsnip_t *gnrc_pktbuf_duplicate_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type)
-{
-    mutex_lock(&_mutex);
-
-    bool is_shared = pkt->users > 1;
-    size_t size = gnrc_pkt_len_upto(pkt, type);
-
-    DEBUG("ipv6_ext: duplicating %d octets\n", (int) size);
-
-    gnrc_pktsnip_t *tmp;
-    gnrc_pktsnip_t *target = gnrc_pktsnip_search_type(pkt, type);
-    gnrc_pktsnip_t *next = (target == NULL) ? NULL : target->next;
-    gnrc_pktsnip_t *new = _create_snip(next, NULL, size, type);
-
-    if (new == NULL) {
-        mutex_unlock(&_mutex);
-
-        return NULL;
-    }
-
-    /* copy payloads */
-    for (tmp = pkt; tmp != NULL; tmp = tmp->next) {
-        uint8_t *dest = ((uint8_t *)new->data) + (size - tmp->size);
-
-        memcpy(dest, tmp->data, tmp->size);
-
-        size -= tmp->size;
-
-        if (tmp->type == type) {
-            break;
-        }
-    }
-
-    /* decrements reference counters */
-
-    if (target != NULL) {
-        target->next = NULL;
-    }
-
-    _release_error_locked(pkt, GNRC_NETERR_SUCCESS);
-
-    if (is_shared && (target != NULL)) {
-        target->next = next;
-    }
-
-    mutex_unlock(&_mutex);
-
-    return new;
 }
 
 /** @} */

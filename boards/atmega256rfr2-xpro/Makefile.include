@@ -1,0 +1,16 @@
+# configure the terminal program
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+BAUD ?= 115200
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# Use EDBG (xplainedpro) programmer with avrdude
+PROGRAMMER ?= xplainedpro
+
+# This board can be reset via avrdude
+RESET ?= avrdude -c $(PROGRAMMER) -p m256rfr2
+# Use edbg interface for debugging
+DEBUGSERVER_INTERFACE ?= --edbg
+
+include $(RIOTMAKE)/tools/avrdude.inc.mk
+include $(RIOTBOARD)/common/atmega/Makefile.include

@@ -41,6 +41,7 @@ extern "C" {
 #else
 #define CPU_IRQ_NUMOF                   (32U)
 #endif
+#define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
 /**

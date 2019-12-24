@@ -5,10 +5,11 @@ export DOCKER_FLAGS ?= --rm
 # List of Docker-enabled make goals
 export DOCKER_MAKECMDGOALS_POSSIBLE = \
   all \
-  buildtest \
+  buildtest-indocker \
   scan-build \
   scan-build-analyze \
   tests-% \
+  archive-check \
   #
 export DOCKER_MAKECMDGOALS = $(filter $(DOCKER_MAKECMDGOALS_POSSIBLE),$(MAKECMDGOALS))
 
@@ -25,7 +26,7 @@ export DOCKER_MAKECMDGOALS ?= all
 # List of all exported environment variables that shall be passed on to the
 # Docker container, they will only be passed if they are set from the
 # environment, not if they are only default Makefile values.
-export DOCKER_ENV_VARS = \
+export DOCKER_ENV_VARS += \
   APPDIR \
   AR \
   ARFLAGS \
@@ -34,10 +35,12 @@ export DOCKER_ENV_VARS = \
   BINDIR \
   BINDIRBASE \
   BOARD \
+  BOARDS \
   BUILDRELPATH \
   BUILDTEST_MCU_GROUP \
   BUILDTEST_VERBOSE \
   CC \
+  CC_NOCOLOR \
   CFLAGS \
   CPPMIX \
   CXX \
@@ -55,6 +58,7 @@ export DOCKER_ENV_VARS = \
   PREFIX \
   QUIET \
   WERROR \
+  PROGRAMMER \
   RIOT_CI_BUILD \
   RIOT_VERSION \
   SCANBUILD_ARGS \
@@ -69,21 +73,26 @@ export DOCKER_ENV_VARS = \
 # DOCKER_ENVIRONMENT_CMDLINE must be immediately assigned (:=) or otherwise some
 # of the environment variables will be overwritten by Makefile.include and their
 # origin is changed to "file"
-DOCKER_ENVIRONMENT_CMDLINE := $(foreach varname,$(DOCKER_ENV_VARS), \
+DOCKER_ENVIRONMENT_CMDLINE_AUTO := $(foreach varname,$(DOCKER_ENV_VARS), \
   $(if $(filter environment command,$(origin $(varname))), \
   -e '$(varname)=$(subst ','\'',$($(varname)))', \
   ))
-DOCKER_ENVIRONMENT_CMDLINE := $(strip $(DOCKER_ENVIRONMENT_CMDLINE))
+DOCKER_ENVIRONMENT_CMDLINE += $(strip $(DOCKER_ENVIRONMENT_CMDLINE_AUTO))
+
+
 # The variables set on the command line will also be passed on the command line
 # in Docker
-DOCKER_OVERRIDE_CMDLINE := $(foreach varname,$(DOCKER_ENV_VARS), \
+DOCKER_OVERRIDE_CMDLINE_AUTO := $(foreach varname,$(DOCKER_ENV_VARS), \
     $(if $(filter command,$(origin $(varname))), \
     '$(varname)=$($(varname))', \
     ))
-DOCKER_OVERRIDE_CMDLINE := $(strip $(DOCKER_OVERRIDE_CMDLINE))
+DOCKER_OVERRIDE_CMDLINE += $(strip $(DOCKER_OVERRIDE_CMDLINE_AUTO))
 
 # Overwrite if you want to use `docker` with sudo
 DOCKER ?= docker
+
+# 'make' arguments inside docker
+DOCKER_MAKE_ARGS += $(DOCKER_MAKECMDGOALS) $(DOCKER_OVERRIDE_CMDLINE)
 
 # Resolve symlink of /etc/localtime to its real path
 # This is a workaround for docker on macOS, for more information see:
@@ -176,7 +185,7 @@ endef
 #
 #   docker_volumes_mapping <path_in_docker_args|...>
 #     Command line argument for mapping volumes, if it should be mounted
-#       -v directory:docker_directory
+#       -v 'directory:docker_directory'
 #
 #   docker_environ_mapping <path_in_docker_args|...>
 #     Command line argument for mapping environment variables
@@ -189,13 +198,18 @@ endef
 # Arguments are the same as 'path_in_docker'
 # If the 'directories' variable is empty, it will not be exported to docker
 
+# docker_volume command line arguments. Allows giving volume mount options.
+# By default 'DOCKER_VOLUME_OPTIONS'. Argument option ignore the default.
+DOCKER_VOLUME_OPTIONS ?= delegated
+docker_volume = -v '$1:$2$(addprefix :,$(or $3,$(DOCKER_VOLUME_OPTIONS)))'
+
 docker_volume_and_env = $(strip $(call _docker_volume_and_env,$1,$2,$3))
 define _docker_volume_and_env
   $(call docker_volumes_mapping,$($1),$2,$3)
   $(call docker_environ_mapping,$1,$2,$3)
 endef
 docker_volumes_mapping = $(foreach d,$1,$(call _docker_volume_mapping,$d,$2,$3))
-_docker_volume_mapping = $(if $1,$(if $(call dir_is_outside_riotbase,$1), -v '$(abspath $1):$(call path_in_docker,$1,$2,$3)'))
+_docker_volume_mapping = $(if $1,$(if $(call dir_is_outside_riotbase,$1),$(call docker_volume,$(abspath $1),$(call path_in_docker,$1,$2,$3))))
 docker_environ_mapping = $(addprefix -e ,$(call docker_cmdline_mapping,$1,$2,$3))
 docker_cmdline_mapping = $(if $($1),'$1=$(call path_in_docker,$($1),$2,$3)')
 
@@ -206,8 +220,8 @@ DOCKER_APPDIR = $(DOCKER_RIOTPROJECT)/$(BUILDRELPATH)
 
 
 # Directory mapping in docker and directories environment variable configuration
-DOCKER_VOLUMES_AND_ENV += -v '$(ETC_LOCALTIME):/etc/localtime:ro'
-DOCKER_VOLUMES_AND_ENV += -v '$(RIOTBASE):$(DOCKER_RIOTBASE)'
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(ETC_LOCALTIME),/etc/localtime,ro)
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(RIOTBASE),$(DOCKER_RIOTBASE))
 DOCKER_VOLUMES_AND_ENV += -e 'RIOTBASE=$(DOCKER_RIOTBASE)'
 DOCKER_VOLUMES_AND_ENV += -e 'CCACHE_BASEDIR=$(DOCKER_RIOTBASE)'
 
@@ -219,8 +233,8 @@ DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTBOARD,,riotboard)
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTMAKE,,riotmake)
 
 # Add GIT_CACHE_DIR if the directory exists
-DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-v $(GIT_CACHE_DIR):$(DOCKER_BUILD_ROOT)/gitcache)
-DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-e GIT_CACHE_DIR=$(DOCKER_BUILD_ROOT)/gitcache)
+DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),$(call docker_volume,$(GIT_CACHE_DIR),$(DOCKER_BUILD_ROOT)/gitcache))
+DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-e 'GIT_CACHE_DIR=$(DOCKER_BUILD_ROOT)/gitcache')
 
 # Remap external module directories.
 #
@@ -237,6 +251,12 @@ DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-e GIT_CACHE_DIR=$(D
 DOCKER_VOLUMES_AND_ENV += $(call docker_volumes_mapping,$(EXTERNAL_MODULE_DIRS),$(DOCKER_BUILD_ROOT)/external,)
 DOCKER_OVERRIDE_CMDLINE += $(call docker_cmdline_mapping,EXTERNAL_MODULE_DIRS,$(DOCKER_BUILD_ROOT)/external,)
 
+# Remap 'BOARDSDIR' if it is external
+DOCKER_VOLUMES_AND_ENV += $(call docker_volumes_mapping,$(BOARDSDIR),,boards)
+# Value is overridden from command line if it is not the default value
+# This allows handling even if the value is set in the 'Makefile'.
+DOCKER_OVERRIDE_CMDLINE += $(if $(findstring $(RIOTBOARD),$(BOARDSDIR)),,$(call docker_cmdline_mapping,BOARDSDIR,,boards))
+
 # External module directories sanity check:
 #
 # Detect if there are remapped directories with the same name as it is not handled.
@@ -252,7 +272,7 @@ endif
 # Handle worktree by mounting the git common dir in the same location
 _is_git_worktree = $(shell grep '^gitdir: ' $(RIOTBASE)/.git 2>/dev/null)
 GIT_WORKTREE_COMMONDIR = $(abspath $(shell git rev-parse --git-common-dir))
-DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),-v $(GIT_WORKTREE_COMMONDIR):$(GIT_WORKTREE_COMMONDIR))
+DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),$(call docker_volume,$(GIT_WORKTREE_COMMONDIR),$(GIT_WORKTREE_COMMONDIR)))
 
 # This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
 # We do not push the regular $(MAKECMDGOALS) to the container's make command in
@@ -269,4 +289,4 @@ DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),-v $(GIT_WORKTREE_COMMONDIR):
 	    $(DOCKER_VOLUMES_AND_ENV) \
 	    $(DOCKER_ENVIRONMENT_CMDLINE) \
 	    -w '$(DOCKER_APPDIR)' \
-	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKECMDGOALS) $(DOCKER_OVERRIDE_CMDLINE)
+	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKE_ARGS)

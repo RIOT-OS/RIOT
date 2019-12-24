@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Network device driver for the ESP8266 WiFi interface
+ * @brief       Network device driver for the ESP32 WiFi interface
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
@@ -20,35 +20,46 @@
 #define ESP_WIFI_NETDEV_H
 
 #include "net/netdev.h"
+#include "ringbuffer.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   State of the WiFi interface
+ * @brief   Buffer size used for RX buffering
  */
-typedef enum {
-    ESP_WIFI_NOT_WORKING,   /**< interface is not working correctly */
-    ESP_WIFI_DISCONNECTED,  /**< interface is not associated to the AP */
-    ESP_WIFI_CONNECTING,    /**< interface is trying an association to the AP */
-    ESP_WIFI_CONNECTED      /**< interface is not associated to the AP */
-} esp_wifi_state_t;
+#ifndef ESP_WIFI_BUFSIZE
+#define ESP_WIFI_BUFSIZE (ETHERNET_MAX_LEN << 1)
+#endif
 
 /**
- * @brief   Device descriptor for ESP infrastructure mode WIFI device
+ * @brief   Reference to the netdev device driver struct
+ */
+extern const netdev_driver_t esp_wifi_driver;
+
+/**
+ * @brief   Device descriptor for ESP WiFi devices
  */
 typedef struct
 {
-    netdev_t netdev;                  /**< netdev parent struct */
+    netdev_t netdev;                   /**< netdev parent struct */
 
-    uint8_t mac[ETHERNET_ADDR_LEN];   /**< MAC address of the device */
+    uint8_t rx_mem[ESP_WIFI_BUFSIZE];  /**< memory holding incoming packages */
+    ringbuffer_t rx_buf;               /**< ringbuffer for incoming packages */
 
-    uint8_t rx_buf[ETHERNET_MAX_LEN]; /**< receive buffer */
-    uint16_t rx_len;                  /**< number of bytes received from lwIP */
+    uint16_t tx_len;                   /**< number of bytes in transmit buffer */
+    uint8_t tx_buf[ETHERNET_MAX_LEN];  /**< transmit buffer */
 
-    esp_wifi_state_t state;           /**< indicates the interface state */
-    uint32_t event;                   /**< received event */
+    uint8_t event_recv;                /**< number of frame received events */
+    uint8_t event_conn;                /**< number of pending connect events */
+    uint8_t event_disc;                /**< number of pending disc events */
+
+    bool connected;                    /**< indicates whether connected to AP */
+
+    gnrc_netif_t* netif;               /**< reference to the corresponding netif */
+
+    mutex_t dev_lock;                  /**< device is already in use */
 
 } esp_wifi_netdev_t;
 

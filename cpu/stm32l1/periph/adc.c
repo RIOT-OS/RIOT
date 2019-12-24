@@ -93,7 +93,7 @@ static void adc_set_sample_time(uint8_t time)
         reg32 |= (time << (i * 3));
     }
 
-#if !defined STM32L1XX_MD
+#if defined(CPU_MODEL_STM32L152RE)
     ADC1->SMPR0 = reg32;
 #endif
     ADC1->SMPR1 = reg32;

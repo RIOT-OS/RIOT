@@ -52,7 +52,7 @@ int main(void)
         for (unsigned i = 0; i < ADC_NUMOF; i++) {
             sample = adc_sample(ADC_LINE(i), RES);
             if (sample < 0) {
-                printf("ADC_LINE(%u): 10-bit resolution not applicable\n", i);
+                printf("ADC_LINE(%u): selected resolution not applicable\n", i);
             } else {
                 printf("ADC_LINE(%u): %i\n", i, sample);
             }

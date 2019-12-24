@@ -61,6 +61,7 @@ typedef struct {
     uint8_t chan;           /**< CPU ADC channel connected to the pin */
 } adc_conf_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Override the ADC resolution configuration
  * @{
@@ -75,6 +76,7 @@ typedef enum {
     ADC_RES_16BIT = 2            /**< ADC resolution: 16 bit (not supported)*/
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus
 }

@@ -106,6 +106,7 @@ static void _set_up(void)
 static inline void _test_init(gnrc_netif_t *netif)
 {
     (void)netif;
+    gnrc_netif_default_init(netif);
     init_called = true;
 }
 
@@ -470,6 +471,60 @@ static void test_ipv6_addr_best_src__ula_src_dst(void)
                                                               &ula_dst,
                                                               false)));
     TEST_ASSERT(ipv6_addr_equal(&ula_src, out));
+}
+
+static void test_ipv6_addr_best_src__global_src_ula_dst(void)
+{
+    static const ipv6_addr_t src = { .u8 = NETIF0_IPV6_G };
+    static const ipv6_addr_t ula_dst = { .u8 = { ULA1, ULA2, ULA3, ULA4,
+                                                 ULA5, ULA6, ULA7, ULA8,
+                                                 0, 0, 0, 0, 0, 0, 0, 1 } };
+    ipv6_addr_t *out = NULL;
+    int idx;
+
+    test_ipv6_addr_add__success();  /* adds link-local address */
+    TEST_ASSERT(0 <= (idx = gnrc_netif_ipv6_addr_add_internal(netifs[0], &src, 64U,
+                                                     GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID)));
+    TEST_ASSERT_EQUAL_INT(GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID,
+                          netifs[0]->ipv6.addrs_flags[idx]);
+    TEST_ASSERT(ipv6_addr_equal(&src, &netifs[0]->ipv6.addrs[idx]));
+
+    TEST_ASSERT_NOT_NULL((out = gnrc_netif_ipv6_addr_best_src(netifs[0],
+                                                              &ula_dst,
+                                                              false)));
+    TEST_ASSERT(ipv6_addr_equal(&src, out));
+}
+
+static void test_ipv6_addr_best_src__deprecated_addr(void)
+{
+    static const ipv6_addr_t src = { .u8 = { LP1, LP2, LP3, LP4,
+                                             LP5, LP6, LP7, LP8,
+                                             0, 0, 0, 0, 0, 0, 0, 2 } };
+    static const ipv6_addr_t dst = { .u8 = { LP1, LP2, LP3, LP4,
+                                             LP5, LP6, LP7, LP8,
+                                             0, 0, 0, 0, 0, 0, 0, 1 } };
+    ipv6_addr_t *out = NULL;
+    int idx;
+    const unsigned exp_match = ipv6_addr_match_prefix(&src, &dst);
+
+    test_ipv6_addr_add__success();  /* adds EUI-64 based link-local address */
+    /* ensure that current addresses have smaller matches */
+    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+        ipv6_addr_t *addr = &netifs[0]->ipv6.addrs[i];
+        TEST_ASSERT(exp_match > ipv6_addr_match_prefix(addr, &dst));
+    }
+    /* add another link-local address but deprecated  */
+    TEST_ASSERT(0 <= (idx = gnrc_netif_ipv6_addr_add_internal(netifs[0], &src, 64U,
+                                                    GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED)));
+    TEST_ASSERT_EQUAL_INT(GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED,
+                          netifs[0]->ipv6.addrs_flags[idx]);
+    TEST_ASSERT(ipv6_addr_equal(&src, &netifs[0]->ipv6.addrs[idx]));
+
+    TEST_ASSERT_NOT_NULL((out = gnrc_netif_ipv6_addr_best_src(netifs[0],
+                                                              &dst,
+                                                              false)));
+    /* should be not `src` as it is deprecated */
+    TEST_ASSERT(!ipv6_addr_equal(&src, out));
 }
 
 static void test_get_by_ipv6_addr__empty(void)
@@ -1057,10 +1112,10 @@ static void test_netapi_set__SRC_LEN(void)
 
 static void test_netif_iter(void)
 {
-    netif_t netif = NETIF_INVALID;
+    netif_t *netif = NULL;
     int netif_count = 0;
 
-    while ((netif = netif_iter(netif)) != NETIF_INVALID) {
+    while ((netif = netif_iter(netif)) != NULL) {
         netif_count++;
     }
     TEST_ASSERT_EQUAL_INT(gnrc_netif_numof(), netif_count);
@@ -1071,27 +1126,26 @@ static void test_netif_get_name(void)
     char exp_name[NETIF_NAMELENMAX + 1];
     char name[NETIF_NAMELENMAX];
     int res;
-    netif_t netif = netif_iter(NETIF_INVALID);
+    netif_t *netif = netif_iter(NULL);
     /* there must be at least one interface */
-    TEST_ASSERT(NETIF_INVALID != netif);
+    TEST_ASSERT_NOT_NULL(netif);
 
     res = netif_get_name(netif, name);
-    sprintf(exp_name, "if%d", (int)netif);
+    sprintf(exp_name, "%d", (int) ((gnrc_netif_t *)netif)->pid);
     TEST_ASSERT_EQUAL_INT(strlen(exp_name), res);
     TEST_ASSERT_EQUAL_STRING(&exp_name[0], &name[0]);
-    TEST_ASSERT_EQUAL_INT(0, netif_get_name(INT16_MAX, name));
 }
 
 static void test_netif_get_by_name(void)
 {
     char name[NETIF_NAMELENMAX] = "6nPRK28";
-    netif_t netif = netif_iter(NETIF_INVALID);
+    netif_t *netif = netif_iter(NULL);
 
-    TEST_ASSERT_EQUAL_INT(NETIF_INVALID, netif_get_by_name(name));
+    TEST_ASSERT(netif_get_by_name(name) == NULL);
     /* there must be at least one interface */
-    TEST_ASSERT(NETIF_INVALID != netif);
+    TEST_ASSERT_NOT_NULL(netif);
     TEST_ASSERT(netif_get_name(netif, name) > 0);
-    TEST_ASSERT_EQUAL_INT(netif, netif_get_by_name(name));
+    TEST_ASSERT(netif == netif_get_by_name(name));
 }
 
 static void test_netif_get_opt(void)
@@ -1101,7 +1155,7 @@ static void test_netif_get_opt(void)
     uint8_t value[GNRC_NETIF_L2ADDR_MAXLEN];
 
     TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
-                          netif_get_opt((netif_t)ethernet_netif->pid,
+                          netif_get_opt((netif_t *)ethernet_netif,
                                         NETOPT_ADDRESS, 0,
                                         &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(exp_ethernet, value, sizeof(exp_ethernet)));
@@ -1114,7 +1168,7 @@ static void test_netif_set_opt(void)
     uint8_t value[] = { LA1 + 1, LA2 + 2, LA3 + 3, LA4 + 4, LA5 + 5, LA6 + 6 };
 
     TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
-                          netif_set_opt((netif_t)ethernet_netif->pid,
+                          netif_set_opt((netif_t *)ethernet_netif,
                                         NETOPT_ADDRESS, 0,
                                         &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(sizeof(value), ethernet_netif->l2addr_len);
@@ -1123,7 +1177,7 @@ static void test_netif_set_opt(void)
     /* return addresses to previous state for further testing */
     memcpy(value, exp_ethernet, sizeof(exp_ethernet));
     TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
-                          netif_set_opt(ethernet_netif->pid,
+                          netif_set_opt((netif_t *)ethernet_netif,
                                         NETOPT_ADDRESS, 0,
                                         &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(sizeof(value), ethernet_netif->l2addr_len);
@@ -1495,6 +1549,8 @@ static Test *embunit_tests_gnrc_netif(void)
         new_TestFixture(test_ipv6_addr_best_src__unspecified_addr),
         new_TestFixture(test_ipv6_addr_best_src__other_subnet),
         new_TestFixture(test_ipv6_addr_best_src__ula_src_dst),
+        new_TestFixture(test_ipv6_addr_best_src__global_src_ula_dst),
+        new_TestFixture(test_ipv6_addr_best_src__deprecated_addr),
         new_TestFixture(test_get_by_ipv6_addr__empty),
         new_TestFixture(test_get_by_ipv6_addr__unspecified_addr),
         new_TestFixture(test_get_by_ipv6_addr__success),

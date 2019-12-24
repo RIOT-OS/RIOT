@@ -23,6 +23,7 @@
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
 #include "net/netdev.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +34,7 @@ extern "C" {
  * @internal
  * @{
  */
-#define AT86RF2XX_NUM   (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
+#define AT86RF2XX_NUM   ARRAY_SIZE(at86rf2xx_params)
 
 extern at86rf2xx_t devs[AT86RF2XX_NUM];
 

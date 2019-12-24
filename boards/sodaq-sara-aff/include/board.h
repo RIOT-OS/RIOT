@@ -20,7 +20,7 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "periph_conf.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -154,11 +154,6 @@ extern "C" {
 #define NB_IOT_TOGGLE_ON        (NB_IOT_TOGGLE_PORT.OUTSET.reg = NB_IOT_TOGGLE_MASK)
 #define NB_IOT_TOGGLE_OFF       (NB_IOT_TOGGLE_PORT.OUTCLR.reg = NB_IOT_TOGGLE_MASK)
 /** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

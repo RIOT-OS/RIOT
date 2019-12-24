@@ -61,11 +61,12 @@ extern "C" {
  * @brief   Generate GPIO mode bitfields
  *
  * We use 4 bit to encode the pin mode:
- * - bit   0: output enable
- * - bit   1: input connect
- * - bit 2+3: pull resistor configuration
+ * - bit      0: output enable
+ * - bit      1: input connect
+ * - bit    2+3: pull resistor configuration
+ * - bit 8+9+10: drive configuration
  */
-#define GPIO_MODE(oe, ic, pr)   (oe | (ic << 1) | (pr << 2))
+#define GPIO_MODE(oe, ic, pr, dr)   (oe | (ic << 1) | (pr << 2) | (dr << 8))
 
 /**
  * @brief   No support for HW chip select...
@@ -94,12 +95,13 @@ extern "C" {
  */
 #define HAVE_GPIO_MODE_T
 typedef enum {
-    GPIO_IN    = GPIO_MODE(0, 0, 0),    /**< IN */
-    GPIO_IN_PD = GPIO_MODE(0, 0, 1),    /**< IN with pull-down */
-    GPIO_IN_PU = GPIO_MODE(0, 0, 3),    /**< IN with pull-up */
-    GPIO_OUT   = GPIO_MODE(1, 1, 0),    /**< OUT (push-pull) */
-    GPIO_OD    = (0xff),                /**< not supported by HW */
-    GPIO_OD_PU = (0xfe)                 /**< not supported by HW */
+    GPIO_IN       = GPIO_MODE(0, 0, 0, 0), /**< IN */
+    GPIO_IN_PD    = GPIO_MODE(0, 0, 1, 0), /**< IN with pull-down */
+    GPIO_IN_PU    = GPIO_MODE(0, 0, 3, 0), /**< IN with pull-up */
+    GPIO_IN_OD_PU = GPIO_MODE(0, 0, 3, 6), /**< IN with pull-up and open drain output */
+    GPIO_OUT      = GPIO_MODE(1, 1, 0, 0), /**< OUT (push-pull) */
+    GPIO_OD       = (0xff),                /**< not supported by HW */
+    GPIO_OD_PU    = (0xfe)                 /**< not supported by HW */
 } gpio_mode_t;
 /** @} */
 
@@ -126,6 +128,7 @@ typedef struct {
     uint8_t irqn;           /**< IRQ number of the timer device */
 } timer_conf_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Override SPI mode values
  * @{
@@ -152,6 +155,7 @@ typedef enum {
     SPI_CLK_10MHZ  = SPI_FREQUENCY_FREQUENCY_M8     /**< 10MHz */
 } spi_clk_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief  SPI configuration values
@@ -162,6 +166,15 @@ typedef struct {
     uint8_t mosi;       /**< MOSI pin */
     uint8_t miso;       /**< MISO pin */
 } spi_conf_t;
+
+/**
+ * @name    WDT upper and lower bound times in ms
+ * @{
+ */
+#define NWDT_TIME_LOWER_LIMIT          (1)
+/* Set upper limit to the maximum possible value that could go in CRV register */
+#define NWDT_TIME_UPPER_LIMIT          ((UINT32_MAX >> 15) * US_PER_MS + 1)
+/** @} */
 
 #ifdef __cplusplus
 }

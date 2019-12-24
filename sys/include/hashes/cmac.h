@@ -40,7 +40,7 @@ extern "C" {
 typedef struct {
     /** AES128 context */
     cipher_t aes_ctx;
-    /** auxiliar array for CMAC calculations **/
+    /** auxiliary array for CMAC calculations **/
     uint8_t X[CMAC_BLOCK_SIZE];
     /** current last block **/
     uint8_t M_last[CMAC_BLOCK_SIZE];

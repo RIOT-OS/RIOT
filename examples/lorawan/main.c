@@ -70,13 +70,10 @@ static void _send_message(void)
     /* Try to send the message */
     uint8_t ret = semtech_loramac_send(&loramac,
                                        (uint8_t *)message, strlen(message));
-    if (ret != SEMTECH_LORAMAC_TX_OK) {
+    if (ret != SEMTECH_LORAMAC_TX_DONE)  {
         printf("Cannot send message '%s', ret code: %d\n", message, ret);
         return;
     }
-    /* The send was successfully scheduled, now wait until the send cycle has
-       completed and a reply is received from the MAC */
-    semtech_loramac_recv(&loramac);
 }
 
 static void *sender(void *arg)

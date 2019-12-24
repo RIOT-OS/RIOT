@@ -16,13 +16,6 @@ USEMODULE += atmega_common
 
 # export the peripheral drivers to be linked into the final binary
 USEMODULE += atmega_common_periph
-USEMODULE += periph_common
-
-# Export the peripheral drivers to be linked into the final binary, for now
-# only atmega126rfr2 has periph drivers
-ifeq ($(CPU), atmega256rfr2)
-  USEMODULE += periph
-endif
 
 # the atmel port uses stdio_uart
 USEMODULE += stdio_uart
@@ -42,9 +35,16 @@ LDSCRIPT_COMPAT = $(if $(shell $(TARGET_ARCH)-ld --verbose | grep __TEXT_REGION_
                     -T$(RIOTCPU)/$(CPU)/ldscripts_compat/avr_2.26.ld)
 LINKFLAGS += $(LDSCRIPT_COMPAT)
 
+# use the wrapper functions for following avr-libc functions
+LINKFLAGS += -Wl,-wrap=malloc -Wl,-wrap=calloc -Wl,-wrap=realloc -Wl,-wrap=free
+
 ifeq ($(LTO),1)
   # avr-gcc <4.8.3 has a bug when using LTO which causes a warning to be printed always:
   # '_vector_25' appears to be a misspelled signal handler [enabled by default]
   # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59396
   LINKFLAGS += -Wno-error
 endif
+
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
+OPTIONAL_CFLAGS_BLACKLIST += -gz

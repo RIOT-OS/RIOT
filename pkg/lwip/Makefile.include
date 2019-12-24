@@ -4,6 +4,7 @@ INCLUDES += -I$(RIOTBASE)/pkg/lwip/include \
 PSEUDOMODULES += lwip_arp
 PSEUDOMODULES += lwip_autoip
 PSEUDOMODULES += lwip_dhcp
+PSEUDOMODULES += lwip_dhcp_auto
 PSEUDOMODULES += lwip_ethernet
 PSEUDOMODULES += lwip_igmp
 PSEUDOMODULES += lwip_ipv6_autoconfig

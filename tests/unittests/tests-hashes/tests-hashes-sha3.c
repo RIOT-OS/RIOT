@@ -28,7 +28,7 @@
 /**
  * @brief expected SHA3-256 hash for test 01
  *
- * All test values taken from the Keccak code pacakge:
+ * All test values taken from the Keccak code package:
  * https://github.com/gvanas/KeccakCodePackage
  * Files: TestVectors/ShortMsgKAT_SHA3-256.txt, TestVectors/ShortMsgKAT_SHA3-384.txt,
  *        TestVectors/ShortMsgKAT_SHA3-512.txt

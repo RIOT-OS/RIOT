@@ -30,38 +30,25 @@
 
 #include "saul.h"
 #include "dht.h"
-#include "xtimer.h"
 
-#define DHT_SAUL_HOLD_TIME      (1000 * 1000U)  /* 1s */
-
-static int16_t temp, hum;
-static uint32_t last = 0;
-
-static int check_and_read(const void *dev, phydat_t *res, int16_t *val, uint8_t unit)
+static int read_temp(const void *dev, phydat_t *res)
 {
-    uint32_t now = xtimer_now_usec();
-
-    if ((now - last) > DHT_SAUL_HOLD_TIME) {
-        dht_read((const dht_t *)dev, &temp, &hum);
-        last = now;
+    if (dht_read((dht_t *)dev, &res->val[0], NULL)) {
+        return -ECANCELED;
     }
-
-    res->val[0] = *val;
-    res->val[1] = 0;
-    res->val[2] = 0;
-    res->unit = unit;
+    res->unit = UNIT_TEMP_C;
     res->scale = -1;
     return 1;
 }
 
-static int read_temp(const void *dev, phydat_t *res)
-{
-    return check_and_read(dev, res, &temp, UNIT_TEMP_C);
-}
-
 static int read_hum(const void *dev, phydat_t *res)
 {
-    return check_and_read(dev, res, &hum, UNIT_PERCENT);
+    if (dht_read((dht_t *)dev, NULL, &res->val[0])) {
+        return -ECANCELED;
+    }
+    res->unit = UNIT_PERCENT;
+    res->scale = -1;
+    return 1;
 }
 
 const saul_driver_t dht_temp_saul_driver = {

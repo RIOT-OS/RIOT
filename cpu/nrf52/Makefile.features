@@ -1,4 +1,8 @@
 # The ADC does not depend on any board configuration, so always available
 FEATURES_PROVIDED += periph_adc
 
+# So far, NimBLE netif does not support nrf51 platforms, so we use a dedicated
+# feature to mark this
+FEATURES_PROVIDED += ble_nimble_netif
+
 -include $(RIOTCPU)/nrf5x_common/Makefile.features

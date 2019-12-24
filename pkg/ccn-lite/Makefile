@@ -1,6 +1,6 @@
 PKG_NAME=ccn-lite
 PKG_URL=https://github.com/cn-uofbasel/ccn-lite/
-PKG_VERSION=f85a2a055db92b5978f2d4f92b830b5b6b9acb42
+PKG_VERSION=e37b02c5cb20e9acccea2394be40f7e570a66a4b
 PKG_LICENSE=ISC
 
 .PHONY: all ..cmake_version_supported
@@ -9,6 +9,10 @@ CMAKE_MINIMAL_VERSION = 3.6.0
 
 
 RIOT_CFLAGS = $(INCLUDES)
+
+ifeq (llvm,$(TOOLCHAIN))
+  RIOT_CFLAGS += -Wno-char-subscripts
+endif
 
 TOOLCHAIN_FILE=$(PKG_BUILDDIR)/xcompile-toolchain.cmake
 

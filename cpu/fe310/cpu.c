@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Ken Rabold, JP Bonn
+ * Copyright (C) 2017, 2019 Ken Rabold, JP Bonn
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,7 +18,9 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
+#include <malloc.h>
 
 #include "thread.h"
 #include "irq.h"
@@ -39,8 +41,8 @@
 
 volatile int __in_isr = 0;
 
+/* ISR trap vector */
 void trap_entry(void);
-void thread_start(void);
 
 /* PLIC external ISR function list */
 static external_isr_ptr_t _ext_isrs[PLIC_NUM_INTERRUPTS];
@@ -160,8 +162,12 @@ void external_isr(void)
 /**
  * @brief Global trap and interrupt handler
  */
-void handle_trap(unsigned int mcause)
+void handle_trap(unsigned int mcause, unsigned int mepc, unsigned int mtval)
 {
+#ifndef DEVELHELP
+    (void) mepc;
+    (void) mtval;
+#endif
     /*  Tell RIOT to set sched_context_switch_request instead of
      *  calling thread_yield(). */
     __in_isr = 1;
@@ -170,6 +176,12 @@ void handle_trap(unsigned int mcause)
     if ((mcause & MCAUSE_INT) == MCAUSE_INT) {
         /* Cause is an interrupt - determine type */
         switch (mcause & MCAUSE_CAUSE) {
+            case IRQ_M_SOFT:
+                /* Handle software interrupt - flag for context switch */
+                sched_context_switch_request = 1;
+                CLINT_REG(0) = 0;
+                break;
+
 #ifdef MODULE_PERIPH_TIMER
             case IRQ_M_TIMER:
                 /* Handle timer interrupt */
@@ -187,9 +199,31 @@ void handle_trap(unsigned int mcause)
                 break;
         }
     }
+    else {
+#ifdef DEVELHELP
+        printf("Unhandled trap:\n");
+        printf("  mcause: 0x%08x\n", mcause);
+        printf("  mepc:   0x%08x\n", mepc);
+        printf("  mtval:  0x%08x\n", mtval);
+#endif
+        /* Unknown trap */
+        core_panic(PANIC_GENERAL_ERROR, "Unhandled trap");
+    }
+
+    /* Check if context change was requested */
+    if (sched_context_switch_request) {
+        sched_run();
+    }
 
     /* ISR done - no more changes to thread states */
     __in_isr = 0;
+}
+
+void panic_arch(void)
+{
+#ifdef DEVELHELP
+    while (1) {}
+#endif
 }
 
 /**
@@ -242,7 +276,6 @@ char *thread_stack_init(thread_task_func_t task_func,
                              int stack_size)
 {
     struct context_switch_frame *sf;
-    uint32_t *reg;
     uint32_t *stk_top;
 
     /* calculate the top of the stack */
@@ -264,11 +297,10 @@ char *thread_stack_init(thread_task_func_t task_func,
     /* populate the stack frame with default values for starting the thread. */
     sf = (struct context_switch_frame *) stk_top;
 
-    /* a7 is register with highest memory address in frame */
-    reg = &sf->a7;
-    while (reg != &sf->pc) {
-        *reg-- = 0;
-    }
+    /* Clear stack frame */
+    memset(sf, 0, sizeof(*sf));
+
+    /* set initial reg values */
     sf->pc = (uint32_t) task_func;
     sf->a0 = (uint32_t) arg;
 
@@ -281,7 +313,11 @@ char *thread_stack_init(thread_task_func_t task_func,
 void thread_print_stack(void)
 {
     int count = 0;
-    uint32_t *sp = (uint32_t *) sched_active_thread->sp;
+    uint32_t *sp = (uint32_t *) ((sched_active_thread) ? sched_active_thread->sp : NULL);
+
+    if (sp == NULL) {
+        return;
+    }
 
     printf("printing the current stack of thread %" PRIkernel_pid "\n",
            thread_getpid());
@@ -319,23 +355,19 @@ void *thread_isr_stack_start(void)
 }
 
 /**
- * @brief Start or resume threading by loading a threads initial information
- * from the stack.
+ * @brief Call context switching at thread exit
  *
  * This is called is two situations: 1) after the initial main and idle threads
  * have been created and 2) when a thread exits.
  *
- * sched_active_thread is not valid when cpu_switch_context_exit() is
- * called.  sched_run() must be called to determine the next valid thread.
- * This is exploited in the context switch code.
  */
 void cpu_switch_context_exit(void)
 {
     /* enable interrupts */
     irq_enable();
 
-    /* start the thread */
-    thread_yield();
+    /* force a context switch to another thread */
+    thread_yield_higher();
     UNREACHABLE();
 }
 
@@ -343,4 +375,21 @@ void thread_yield_higher(void)
 {
     /* Use SW intr to schedule context switch */
     CLINT_REG(CLINT_MSIP) = 1;
+
+    /* Latency of SW intr can be 4-7 cycles; wait for the SW intr */
+    __asm__ volatile ("wfi");
+}
+
+/**
+ * @brief Print heap statistics
+ */
+void heap_stats(void)
+{
+    extern char _heap_start; /* defined in linker script */
+    extern char _heap_end;   /* defined in linker script */
+
+    long int heap_size = &_heap_end - &_heap_start;
+    struct mallinfo minfo = mallinfo();
+    printf("heap: %ld (used %u, free %ld) [bytes]\n",
+           heap_size, minfo.uordblks, heap_size - minfo.uordblks);
 }

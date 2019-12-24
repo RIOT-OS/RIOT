@@ -112,10 +112,10 @@ static inline void conn_can_isotp_init_slave(conn_can_isotp_t *master, conn_can_
  * @brief   ISOTP connection
  */
 typedef struct conn_can_isotp {
-    struct isotp isotp;  /**< ISO-TP connection */
-    int ifnum;           /**< interface number */
-    int bound;           /**< 1 if connection is bound */
-    mbox_t mbox;         /**< mbox */
+    struct isotp isotp; /**< ISO-TP connection */
+    int ifnum;          /**< interface number */
+    int bound;          /**< 1 if connection is bound */
+    mbox_t mbox;        /**< mbox */
     /** message queue */
     msg_t mbox_queue[CONN_CAN_ISOTP_MBOX_SIZE];
 } conn_can_isotp_t;
@@ -137,11 +137,12 @@ int conn_can_isotp_create(conn_can_isotp_t *conn, struct isotp_options *options,
  * @brief Bind a can isotp connection
  *
  * @param[inout] conn       ISO-TP connection
+ * @param[in] fc_options    ISO-TP flow control options, can be NULL for default parameters
  *
  * @return 0 on success
  * @return any other negative number in case of an error
  */
-int conn_can_isotp_bind(conn_can_isotp_t *conn);
+int conn_can_isotp_bind(conn_can_isotp_t *conn, struct isotp_fc_options *fc_options);
 
 /**
  * @brief  Close can isotp connection socket

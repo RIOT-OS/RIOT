@@ -22,6 +22,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <string.h>
 #include <errno.h>
 
@@ -46,8 +47,7 @@ static mutex_t locks[I2C_NUMOF];
 
 static inline NRF_TWIM_Type *bus(i2c_t dev)
 {
-    (void) dev;
-    return i2c_config[0].dev;
+    return i2c_config[dev].dev;
 }
 
 static int finish(i2c_t dev)
@@ -89,8 +89,8 @@ void i2c_init(i2c_t dev)
      * called */
     bus(dev)->ENABLE = TWIM_ENABLE_ENABLE_Disabled;
     /* configure pins */
-    gpio_init(i2c_config[dev].scl, GPIO_IN_PU);
-    gpio_init(i2c_config[dev].sda, GPIO_IN_PU);
+    gpio_init(i2c_config[dev].scl, GPIO_IN_OD_PU);
+    gpio_init(i2c_config[dev].sda, GPIO_IN_OD_PU);
     bus(dev)->PSEL.SCL = i2c_config[dev].scl;
     bus(dev)->PSEL.SDA = i2c_config[dev].sda;
     /* configure dev clock speed */
@@ -113,7 +113,7 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
@@ -121,7 +121,6 @@ int i2c_release(i2c_t dev)
     mutex_unlock(&locks[dev]);
 
     DEBUG("[i2c] released dev %i\n", (int)dev);
-    return 0;
 }
 
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
@@ -134,7 +133,7 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
     }
     /* the nrf52's TWI device does not support to do two consecutive transfers
      * without a repeated start condition in between. So we have to put all data
-     * to be transfered into a temporary buffer
+     * to be transferred into a temporary buffer
      *
      * CAUTION: this might become critical when transferring large blocks of
      *          data as the temporary buffer is allocated on the stack... */

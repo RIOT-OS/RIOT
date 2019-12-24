@@ -131,7 +131,7 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
             LL_DELETE(_list_tcb_head, tcb);
             mutex_unlock(&_list_tcb_lock);
 
-            /* Free potencially allocated receive buffer */
+            /* Free potentially allocated receive buffer */
             _rcvbuf_release_buffer(tcb);
             tcb->status |= STATUS_NOTIFY_USER;
             break;
@@ -384,10 +384,10 @@ static int _fsm_call_abort(gnrc_tcp_tcb_t *tcb)
 }
 
 /**
- * @brief FSM handling function for processing of an incomming TCP packet.
+ * @brief FSM handling function for processing of an incoming TCP packet.
  *
  * @param[in,out] tcb      TCB holding the connection information.
- * @param[in]     in_pkt   Incomming packet.
+ * @param[in]     in_pkt   Incoming packet.
  *
  * @returns   Zero on success.
  *            -ENOMEM if receive buffer could not be allocated.
@@ -398,12 +398,12 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
     uint16_t seq_con = 0;            /* Sequence number consumption of outgoing packet */
     gnrc_pktsnip_t *snp = NULL;      /* Temporary packet snip */
     gnrc_tcp_tcb_t *lst = NULL;      /* Temporary pointer to TCB */
-    uint16_t ctl = 0;                /* Control bits of the incomming packet */
-    uint32_t seg_seq = 0;            /* Sequence number of the incomming packet*/
-    uint32_t seg_ack = 0;            /* Acknowledgment number of the incomming packet */
-    uint32_t seg_wnd = 0;            /* Receive window of the incomming packet */
-    uint32_t seg_len = 0;            /* Segment length of the incomming packet */
-    uint32_t pay_len = 0;            /* Payload length of the incomming packet */
+    uint16_t ctl = 0;                /* Control bits of the incoming packet */
+    uint32_t seg_seq = 0;            /* Sequence number of the incoming packet*/
+    uint32_t seg_ack = 0;            /* Acknowledgment number of the incoming packet */
+    uint32_t seg_wnd = 0;            /* Receive window of the incoming packet */
+    uint32_t seg_len = 0;            /* Segment length of the incoming packet */
+    uint32_t pay_len = 0;            /* Payload length of the incoming packet */
 
     DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt()\n");
     /* Search for TCP header. */
@@ -425,7 +425,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
 #ifdef MODULE_GNRC_IPV6
     LL_SEARCH_SCALAR(in_pkt, snp, type, GNRC_NETTYPE_IPV6);
     if (snp == NULL) {
-        DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() : incomming packet had no IPv6 header\n");
+        DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() : incoming packet had no IPv6 header\n");
         return 0;
     }
     void *ip = snp->data;
@@ -443,7 +443,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             _pkt_send(tcb, out_pkt, 0, false);
             return 0;
         }
-        /* 3) Check SYN: if SYN is set prepare for incomming connection */
+        /* 3) Check SYN: if SYN is set prepare for incoming connection */
         if (ctl & MSK_SYN) {
             uint16_t src = byteorder_ntohs(tcp_hdr->src_port);
             uint16_t dst = byteorder_ntohs(tcp_hdr->dst_port);
@@ -451,7 +451,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             /* Check if SYN request is handled by another connection */
             lst = _list_tcb_head;
             while (lst) {
-                /* Compare port numbers and network layer adresses */
+                /* Compare port numbers and network layer addresses */
                 if (lst->local_port == dst && lst->peer_port == src) {
 #ifdef MODULE_GNRC_IPV6
                     if (snp->type == GNRC_NETTYPE_IPV6 && lst->address_family == AF_INET6) {
@@ -487,7 +487,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                      * (reason: tmp *can* be != NULL after LL_SEARCH_SCALAR) */
                     if (tmp == NULL) {
                         DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() :\
-                               incomming packet had no netif header\n");
+                               incoming packet had no netif header\n");
                         return 0;
                     }
                     tcb->ll_iface = ((gnrc_netif_hdr_t *)tmp->data)->if_pid;
@@ -655,7 +655,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                     }
                 }
                 /* Additional processing */
-                /* Check additionaly if previously sent FIN was acknowledged */
+                /* Check additionally if previously sent FIN was acknowledged */
                 if (tcb->state == FSM_STATE_FIN_WAIT_1) {
                     if (tcb->pkt_retransmit == NULL) {
                         _transition_to(tcb, FSM_STATE_FIN_WAIT_2);
@@ -896,7 +896,7 @@ int _fsm(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *b
     tcb->status &= ~STATUS_NOTIFY_USER;
     int32_t result = _fsm_unprotected(tcb, event, in_pkt, buf, len);
 
-    /* Notify blocked thread if something interesting happend */
+    /* Notify blocked thread if something interesting happened */
     if ((tcb->status & STATUS_NOTIFY_USER) && (tcb->status & STATUS_WAIT_FOR_MSG)) {
         msg_t msg;
         msg.type = MSG_TYPE_NOTIFY_USER;

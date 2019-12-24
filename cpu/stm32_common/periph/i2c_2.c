@@ -34,6 +34,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <errno.h>
 
@@ -59,12 +60,14 @@
 #define ERROR_FLAG          (I2C_SR1_AF | I2C_SR1_ARLO | I2C_SR1_BERR)
 
 /* static function definitions */
+static void _init(i2c_t dev);
 static void _i2c_init(I2C_TypeDef *i2c, uint32_t clk, uint32_t ccr);
 static int _start(I2C_TypeDef *dev, uint8_t address_byte, uint8_t flags,
                   size_t length);
 static int _stop(I2C_TypeDef *dev);
 static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags);
 static inline int _wait_for_bus(I2C_TypeDef *i2c);
+static void _init_pins(i2c_t dev);
 
 /**
  * @brief Array holding one pre-initialized mutex for each I2C device
@@ -77,35 +80,35 @@ void i2c_init(i2c_t dev)
 
     mutex_init(&locks[dev]);
 
-    I2C_TypeDef *i2c = i2c_config[dev].dev;
-
-    assert(i2c != NULL);
-
-    uint32_t ccr;
-    /* read speed configuration */
-    switch (i2c_config[dev].speed) {
-        case I2C_SPEED_LOW:
-            /* 10Kbit/s */
-            ccr = i2c_config[dev].clk / 20000;
-            break;
-
-        case I2C_SPEED_NORMAL:
-            /* 100Kbit/s */
-            ccr = i2c_config[dev].clk / 200000;
-            break;
-
-        case I2C_SPEED_FAST:
-            ccr = i2c_config[dev].clk / 800000;
-            break;
-
-        default:
-            return;
-    }
+    assert(i2c_config[dev].dev != NULL);
 
     periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
     NVIC_SetPriority(i2c_config[dev].irqn, I2C_IRQ_PRIO);
     NVIC_EnableIRQ(i2c_config[dev].irqn);
 
+    _init(dev);
+
+#if defined(CPU_FAM_STM32F4)
+    /* make sure the analog filters don't hang -> see errata sheet 2.14.7 */
+    if (i2c_config[dev].dev->SR2 & I2C_SR2_BUSY) {
+        /* disable peripheral */
+        i2c_config[dev].dev->CR1 &= ~I2C_CR1_PE;
+        /* toggle both pins to reset analog filter */
+        gpio_init(i2c_config[dev].scl_pin, GPIO_OD);
+        gpio_init(i2c_config[dev].sda_pin, GPIO_OD);
+        gpio_set(i2c_config[dev].sda_pin);
+        gpio_set(i2c_config[dev].scl_pin);
+        gpio_clear(i2c_config[dev].sda_pin);
+        gpio_clear(i2c_config[dev].scl_pin);
+        gpio_set(i2c_config[dev].sda_pin);
+        gpio_set(i2c_config[dev].scl_pin);
+        _init(dev);
+    }
+#endif
+}
+
+static void _init_pins(i2c_t dev)
+{
     /* configure pins */
     gpio_init(i2c_config[dev].scl_pin, GPIO_OD_PU);
     gpio_init(i2c_config[dev].sda_pin, GPIO_OD_PU);
@@ -123,36 +126,6 @@ void i2c_init(i2c_t dev)
 #else
     gpio_init_af(i2c_config[dev].scl_pin, i2c_config[dev].scl_af);
     gpio_init_af(i2c_config[dev].sda_pin, i2c_config[dev].sda_af);
-#endif
-
-    /* configure device */
-    _i2c_init(i2c, i2c_config[dev].clk, ccr);
-
-#if defined(CPU_FAM_STM32F4)
-    /* make sure the analog filters don't hang -> see errata sheet 2.14.7 */
-    if (i2c->SR2 & I2C_SR2_BUSY) {
-        /* disable peripheral */
-        i2c->CR1 &= ~I2C_CR1_PE;
-        /* toggle both pins to reset analog filter */
-        gpio_init(i2c_config[dev].scl_pin, GPIO_OD);
-        gpio_init(i2c_config[dev].sda_pin, GPIO_OD);
-        gpio_set(i2c_config[dev].sda_pin);
-        gpio_set(i2c_config[dev].scl_pin);
-        gpio_clear(i2c_config[dev].sda_pin);
-        gpio_clear(i2c_config[dev].scl_pin);
-        gpio_set(i2c_config[dev].sda_pin);
-        gpio_set(i2c_config[dev].scl_pin);
-        /* reset pins for alternate function */
-        gpio_init(i2c_config[dev].scl_pin, GPIO_OD_PU);
-        gpio_init(i2c_config[dev].sda_pin, GPIO_OD_PU);
-        gpio_init_af(i2c_config[dev].scl_pin, i2c_config[dev].scl_af);
-        gpio_init_af(i2c_config[dev].sda_pin, i2c_config[dev].sda_af);
-        /* make peripheral soft reset */
-        i2c->CR1 |= I2C_CR1_SWRST;
-        i2c->CR1 &= ~I2C_CR1_SWRST;
-        /* enable device */
-        _i2c_init(i2c, i2c_config[dev].clk, ccr);
-    }
 #endif
 }
 
@@ -174,6 +147,39 @@ static void _i2c_init(I2C_TypeDef *i2c, uint32_t clk, uint32_t ccr)
     i2c->CR1 |= I2C_CR1_PE;
 }
 
+static void _init(i2c_t dev)
+{
+    I2C_TypeDef *i2c = i2c_config[dev].dev;
+
+    uint32_t ccr = 0;
+    /* read speed configuration */
+    switch (i2c_config[dev].speed) {
+        case I2C_SPEED_LOW:
+            /* 10Kbit/s */
+            ccr = i2c_config[dev].clk / 20000;
+            break;
+
+        case I2C_SPEED_NORMAL:
+            /* 100Kbit/s */
+            ccr = i2c_config[dev].clk / 200000;
+            break;
+
+        case I2C_SPEED_FAST:
+            ccr = i2c_config[dev].clk / 800000;
+            break;
+    }
+
+    /* make peripheral soft reset */
+    i2c->CR1 |= I2C_CR1_SWRST;
+
+    _init_pins(dev);
+
+    i2c->CR1 &= ~I2C_CR1_SWRST;
+
+    /* configure device */
+    _i2c_init(i2c, i2c_config[dev].clk, ccr);
+}
+
 int i2c_acquire(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
@@ -190,7 +196,7 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
@@ -202,7 +208,6 @@ int i2c_release(i2c_t dev)
 #endif
 
     mutex_unlock(&locks[dev]);
-    return 0;
 }
 
 int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
@@ -213,8 +218,20 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
     I2C_TypeDef *i2c = i2c_config[dev].dev;
     DEBUG("[i2c] read_bytes: Starting\n");
 
+    /* Do not support repeated start reading
+     * The repeated start read requires the bus to be busy (I2C_SR2_BUSY == 1)
+     * the previous R/W state to be a read (I2C_SR2_TRA == 0)
+     * and for the command not to be split frame (I2C_NOSTART == 0)
+    */
+    if (((i2c->SR2 & (I2C_SR2_BUSY | I2C_SR2_TRA)) == I2C_SR2_BUSY) &&
+        !(flags & I2C_NOSTART)) {
+        return -EOPNOTSUPP;
+    }
     int ret = _start(i2c, (address << 1) | I2C_FLAG_READ, flags, length);
     if (ret < 0) {
+        if (ret == -ETIMEDOUT) {
+            _init(dev);
+        }
         return ret;
     }
 
@@ -260,6 +277,9 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
     /* Length is 0 in start since we don't need to preset the stop bit */
     ret = _start(i2c, (address << 1) | I2C_FLAG_WRITE, flags, 0);
     if (ret < 0) {
+        if (ret == -ETIMEDOUT) {
+            _init(dev);
+        }
         return ret;
     }
 
@@ -329,7 +349,7 @@ static int _start(I2C_TypeDef *i2c, uint8_t address_byte, uint8_t flags,
         ret = _is_sr1_mask_set(i2c, I2C_SR1_ADDR, flags & ~I2C_NOSTOP);
         if (ret == -EIO){
             /* Since NACK happened during start it means no device connected */
-            ret = -ENXIO;
+            return -ENXIO;
         }
         /* Needed to clear address bit */
         i2c->SR2;
@@ -349,9 +369,9 @@ static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags)
     uint16_t tick = TICK_TIMEOUT;
     while (tick--) {
         uint32_t sr1 = i2c->SR1;
-        i2c->SR1 &= ~ERROR_FLAG;
         if (sr1 & I2C_SR1_AF) {
             DEBUG("[i2c] is_sr1_mask_set: NACK received\n");
+            i2c->SR1 &= ~ERROR_FLAG;
             if (!(flags & I2C_NOSTOP)) {
                 _stop(i2c);
             }
@@ -359,10 +379,12 @@ static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags)
         }
         if ((sr1 & I2C_SR1_ARLO) || (sr1 & I2C_SR1_BERR)) {
             DEBUG("[i2c] is_sr1_mask_set: arb lost or bus ERROR_FLAG\n");
+            i2c->SR1 &= ~ERROR_FLAG;
             _stop(i2c);
             return -EAGAIN;
         }
         if (sr1 & mask) {
+            i2c->SR1 &= ~ERROR_FLAG;
             return 0;
         }
     }
@@ -370,6 +392,7 @@ static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags)
     * If timeout occurs this means a problem that must be handled on a higher
     * level.  A SWRST is recommended by the datasheet.
     */
+    i2c->SR1 &= ~ERROR_FLAG;
     _stop(i2c);
     return -ETIMEDOUT;
 }
@@ -413,7 +436,7 @@ static inline void irq_handler(i2c_t dev)
     assert(i2c != NULL);
 
     unsigned state = i2c->SR1;
-    DEBUG("\n\n### I2C ERROR OCCURED ###\n");
+    DEBUG("\n\n### I2C ERROR OCCURRED ###\n");
     DEBUG("status: %08x\n", state);
     if (state & I2C_SR1_OVR) {
         DEBUG("OVR\n");

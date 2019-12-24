@@ -57,6 +57,24 @@ static inline void eui48_to_eui64(eui64_t *eui64, const eui48_t *addr)
 }
 
 /**
+ * @name EUI-48 bit flags contained in the first octet
+ *
+ * @see IEEE 802-2001 section 9.2
+ * @{
+ */
+
+/**
+ * @brief Locally administered address.
+ */
+#define EUI48_LOCAL_FLAG  0x02
+
+/**
+ * @brief Group type address.
+ */
+#define EUI48_GROUP_FLAG        0x01
+/** @} */
+
+/**
  * @brief   Generates an IPv6 interface identifier from a 48-bit device address
  *
  * @note    The IPv6 IID is derived from the EUI-64 by flipping the U/L bit.
@@ -87,6 +105,32 @@ static inline void eui48_from_ipv6_iid(eui48_t *addr, const eui64_t *iid)
     addr->uint8[4] = iid->uint8[6];
     addr->uint8[5] = iid->uint8[7];
 }
+
+/**
+ * @brief Set the locally administrated bit in the EUI-48 address.
+ *
+ * @see IEEE 802-2001 section 9.2
+ *
+ * @param   addr    ethernet address
+ */
+static inline void eui48_set_local(eui48_t *addr)
+{
+    addr->uint8[0] |= EUI48_LOCAL_FLAG;
+}
+
+/**
+ * @brief Clear the group address bit to signal the address as individual
+ * address
+ *
+ * @see IEEE 802-2001 section 9.2
+ *
+ * @param   addr    ethernet address
+ */
+static inline void eui48_clear_group(eui48_t *addr)
+{
+    addr->uint8[0] &= ~EUI48_GROUP_FLAG;
+}
+
 
 #ifdef __cplusplus
 }

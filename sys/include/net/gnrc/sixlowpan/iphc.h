@@ -38,7 +38,7 @@ extern "C" {
  *                          be expected to start with the IPHC dispatch.
  * @param[in,out] ctx       Context for the packet. May be NULL. If not NULL it
  *                          is expected to be of type
- *                          @ref gnrc_sixlowpan_rbuf_t. This function might
+ *                          @ref gnrc_sixlowpan_frag_rb_t. This function might
  *                          change the content of that.
  * @param[in] page          Current 6Lo dispatch parsing page.
  */

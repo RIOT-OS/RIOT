@@ -1,0 +1,2 @@
+USEMODULE += board_common_slwstk6000b
+include $(RIOTBOARD)/common/slwstk6000b/Makefile.dep

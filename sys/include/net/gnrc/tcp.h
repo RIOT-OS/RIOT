@@ -60,7 +60,7 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
  * @pre @p target_addr must not be NULL.
  * @pre @p target_port must not be 0.
  *
- * @note Blocks until a connection has been established or an error occured.
+ * @note Blocks until a connection has been established or an error occurred.
  *
  * @param[in,out] tcb              TCB holding the connection information.
  * @param[in]     address_family   Address family of @p target_addr.
@@ -70,7 +70,7 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
  *                                 source port is randomly chosen. If local_port is non-zero
  *                                 the local_port is used as source port.
  *
- * @returns   Zero on success.
+ * @returns   0 on success.
  *            -EAFNOSUPPORT if @p address_family is not supported.
  *            -EINVAL if @p address_family is not the same the address_family use by the TCB.
  *                    or @p target_addr is invalid.
@@ -78,32 +78,32 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
  *            -ENOMEM if the receive buffer for the TCB could not be allocated.
  *            -EADDRINUSE if @p local_port is already used by another connection.
  *            -ETIMEDOUT if the connection could not be opened.
- *            -ECONNREFUSED if the connection was resetted by the peer.
+ *            -ECONNREFUSED if the connection was reset by the peer.
  */
 int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  uint8_t address_family,
                          char *target_addr, uint16_t target_port,
                          uint16_t local_port);
 
 /**
- * @brief Opens a connection passively, by waiting for an incomming request.
+ * @brief Opens a connection passively, by waiting for an incoming request.
  *
  * @pre gnrc_tcp_tcb_init() must have been successfully called.
  * @pre @p tcb must not be NULL.
  * @pre if local_addr is not NULL, local_addr must be assigned to a network interface.
  * @pre if local_port is not zero.
  *
- * @note Blocks until a connection has been established (incomming connection request
- *       to @p local_port) or an error occured.
+ * @note Blocks until a connection has been established (incoming connection request
+ *       to @p local_port) or an error occurred.
  *
  * @param[in,out] tcb              TCB holding the connection information.
  * @param[in]     address_family   Address family of @p local_addr.
  *                                 If local_addr == NULL, address_family is ignored.
  * @param[in]     local_addr       If not NULL the connection is bound to @p local_addr.
  *                                 If NULL a connection request to all local ip
- *                                 addresses is valied.
+ *                                 addresses is valid.
  * @param[in]     local_port       Port number to listen on.
  *
- * @returns   Zero on success.
+ * @returns   0 on success.
  *            -EAFNOSUPPORT if local_addr != NULL and @p address_family is not supported.
  *            -EINVAL if @p address_family is not the same the address_family used in TCB.
  *                    or @p target_addr is invalid.
@@ -121,7 +121,7 @@ int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, uint8_t address_family,
  * @pre @p tcb must not be NULL.
  * @pre @p data must not be NULL.
  *
- * @note Blocks until up to @p len bytes were transmitted or an error occured.
+ * @note Blocks until up to @p len bytes were transmitted or an error occurred.
  *
  * @param[in,out] tcb                        TCB holding the connection information.
  * @param[in]     data                       Pointer to the data that should be transmitted.
@@ -132,7 +132,7 @@ int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, uint8_t address_family,
  *
  * @returns   The number of successfully transmitted bytes.
  *            -ENOTCONN if connection is not established.
- *            -ECONNRESET if connection was resetted by the peer.
+ *            -ECONNRESET if connection was reset by the peer.
  *            -ECONNABORTED if the connection was aborted.
  *            -ETIMEDOUT if @p user_timeout_duration_us expired.
  */
@@ -160,9 +160,10 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
  *                                           @p user_timeout_duration_us microseconds passed.
  *
  * @returns   The number of bytes read into @p data.
+ *            0, if the connection is closing and no further data can be read.
  *            -ENOTCONN if connection is not established.
  *            -EAGAIN if  user_timeout_duration_us is zero and no data is available.
- *            -ECONNRESET if connection was resetted by the peer.
+ *            -ECONNRESET if connection was reset by the peer.
  *            -ECONNABORTED if the connection was aborted.
  *            -ETIMEDOUT if @p user_timeout_duration_us expired.
  */
@@ -195,7 +196,7 @@ void gnrc_tcp_abort(gnrc_tcp_tcb_t *tcb);
  * @param[in] hdr          Gnrc_pktsnip that contains TCP header.
  * @param[in] pseudo_hdr   Gnrc_pktsnip that contains network layer header.
  *
- * @returns   Zero on succeed.
+ * @returns   0 on success.
  *            -EFAULT if @p hdr or pseudo_hdr were NULL
  *            -EBADMSG if @p hdr is not of type GNRC_NETTYPE_TCP
  *            -ENOENT if @p pseudo_hdr protocol is unsupported.

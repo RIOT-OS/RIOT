@@ -97,7 +97,7 @@ extern "C" {
 #define IEEE802154_FRAME_LEN_MAX        (127U)  /**< maximum frame length */
 
 /**
- * @brief   Special address defintions
+ * @brief   Special address definitions
  * @{
  */
 /**
@@ -194,7 +194,7 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
  *                      Otherwise, it will be ignored, when
  *                      @ref IEEE802154_FCF_PAN_COMP is set.
  * @param[in] dst_pan   Destination PAN ID in little-endian.
- * @param[in] flags     Flags for the frame. These are interchangable with the
+ * @param[in] flags     Flags for the frame. These are interchangeable with the
  *                      first byte of the IEEE 802.15.4 FCF. This means that
  *                      it encompasses the type values,
  *                      @ref IEEE802154_FCF_SECURITY_EN,

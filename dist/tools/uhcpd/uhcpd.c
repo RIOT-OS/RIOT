@@ -23,11 +23,11 @@ unsigned _prefix_len;
 static const char *BIND_OPTION = "--bind-to-device";
 static void bind_to_device(int sock, const char *interface);
 
-int ipv6_addr_split(char *addr_str, char seperator, int _default)
+int ipv6_addr_split(char *addr_str, char separator, int _default)
 {
     char *sep = addr_str;
     while(*++sep) {
-        if (*sep == seperator) {
+        if (*sep == separator) {
             *sep++ = '\0';
             if (*sep) {
                 _default = atoi(sep);
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
     if (argc == 4) {
         if (strcmp(BIND_OPTION, argv[3])) {
-            fprintf(stderr, "error: unkwown option\n");
+            fprintf(stderr, "error: unknown option\n");
             exit(1);
         }
         _bind_to_device = 1;

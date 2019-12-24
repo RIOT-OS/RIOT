@@ -30,9 +30,9 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define HTS221_NUM      (sizeof(hts221_params)/sizeof(hts221_params[0]))
+#define HTS221_NUM      ARRAY_SIZE(hts221_params)
 
-#define HTS221_SAUL_NUM (sizeof(hts221_saul_info)/sizeof(hts221_saul_info[0]))
+#define HTS221_SAUL_NUM ARRAY_SIZE(hts221_saul_info)
 /**
  * @brief   Allocate memory for the device descriptors
  */

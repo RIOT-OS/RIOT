@@ -7,15 +7,12 @@
  */
 
 /**
- * @defgroup    net_gnrc_sock   GNRC-specific implementation of the sock API
- * @ingroup     net_gnrc
- * @brief       Provides an implementation of the @ref net_sock by the
- *              @ref net_gnrc
+ * @ingroup     net_gnrc_sock
  *
  * @{
  *
  * @file
- * @brief   GNRC-specific types and function definitions
+ * @brief   Internal GNRC-specific types and function definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */

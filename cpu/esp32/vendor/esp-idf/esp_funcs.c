@@ -50,34 +50,6 @@
 
 #include "syscalls.h"
 
-/* This function is not part on newlib API, it is defined in libc/stdio/local.h
- * There is no nice way to get __cleanup member populated while avoiding __sinit,
- * so extern declaration is used here.
- */
-extern void _cleanup_r(struct _reent* r);
-
-/**
- * This is the replacement for newlib's _REENT_INIT_PTR and __sinit.
- * The problem with __sinit is that it allocates three FILE structures
- * (stdin, stdout, stderr). Having individual standard streams for each task
- * is a bit too much on a small embedded system. So we point streams
- * to the streams of the global struct _reent, which are initialized in
- * startup code.
- */
-void IRAM_ATTR esp_reent_init(struct _reent* r)
-{
-    memset(r, 0, sizeof(*r));
-    r->_stdout = _GLOBAL_REENT->_stdout;
-    r->_stderr = _GLOBAL_REENT->_stderr;
-    r->_stdin  = _GLOBAL_REENT->_stdin;
-    r->__cleanup = &_cleanup_r;
-    r->__sdidinit = 1;
-    r->__sglue._next = NULL;
-    r->__sglue._niobs = 0;
-    r->__sglue._iobs = NULL;
-    r->_current_locale = "C";
-}
-
 /* source: /path/to/esp-idf/components/esp32/panic.c */
 void IRAM_ATTR esp_panic_wdt_stop (void)
 {
@@ -114,6 +86,22 @@ uint32_t IRAM_ATTR esp_log_timestamp(void)
     return system_get_time() / USEC_PER_MSEC;
 }
 
+
+#if MODULE_ESP_LOG_TAGGED
+#define ESP_LOG_PREFIX(letter, tag)  \
+                        printf(LOG_COLOR_ ## letter #letter " (%d) [%s] ", \
+                               system_get_time_ms(), tag)
+#else
+#define ESP_LOG_PREFIX(letter, tag)  \
+                        printf(LOG_COLOR_ ## letter "[%s] ", tag)
+#endif
+
+#if MODULE_ESP_LOG_COLORED
+#define ESP_LOG_SUFFIX()  printf(LOG_RESET_COLOR)
+#else
+#define ESP_LOG_SUFFIX()
+#endif
+
 /*
  * provided by: /path/to/esp-idf/component/log/log.c
  */
@@ -125,23 +113,16 @@ void IRAM_ATTR esp_log_write(esp_log_level_t level,
     }
 
     char _printf_buf[PRINTF_BUFSIZ];
-
     const char* prefix = (strchr (format, ':') + 2);
 
-    char lc = 'U';
     switch (level) {
         case LOG_NONE   : return;
-        case LOG_ERROR  : lc = 'E'; break;
-        case LOG_WARNING: lc = 'W'; break;
-        case LOG_INFO   : lc = 'I'; break;
-        case LOG_DEBUG  : lc = 'D'; break;
-        case LOG_ALL    : lc = 'V'; break;
+        case LOG_ERROR  : ESP_LOG_PREFIX(E, tag); break;
+        case LOG_WARNING: ESP_LOG_PREFIX(W, tag); break;
+        case LOG_INFO   : ESP_LOG_PREFIX(I, tag); break;
+        case LOG_DEBUG  : ESP_LOG_PREFIX(D, tag); break;
+        case LOG_ALL    : ESP_LOG_PREFIX(V, tag); break;
     }
-    #ifdef LOG_TAG_IN_BRACKETS
-    ets_printf("%c (%u) [%10s]: ", lc, system_get_time_ms(), tag);
-    #else
-    ets_printf("%c (%u) %10s: ", lc, system_get_time_ms(), tag);
-    #endif
 
     va_list arglist;
     va_start(arglist, format);
@@ -152,11 +133,13 @@ void IRAM_ATTR esp_log_write(esp_log_level_t level,
 
     int ret = vsnprintf(_printf_buf, PRINTF_BUFSIZ, prefix, arglist);
 
+    va_end(arglist);
+
     if (ret > 0) {
-        ets_printf (_printf_buf);
+        printf ("%s", _printf_buf);
     }
 
-    va_end(arglist);
+    ESP_LOG_SUFFIX();
 }
 
 /*
@@ -182,11 +165,11 @@ void spi_ram_init(void)
         _spi_ram_initialized = true;
     }
     else {
-        ets_printf("Failed to init external SPI RAM\n");
+        ESP_EARLY_LOGE("spi_ram", "Failed to init external SPI RAM\n");
         _spi_ram_initialized = false;
     }
     #else
-    ets_printf("External SPI RAM functions not enabled\n");
+    ESP_EARLY_LOGI("spi_ram", "External SPI RAM functions not enabled\n");
     #endif
 }
 
@@ -206,14 +189,14 @@ void spi_ram_heap_init(void)
     #if CONFIG_SPIRAM_USE_CAPS_ALLOC || CONFIG_SPIRAM_USE_MALLOC
     esp_err_t r=esp_spiram_add_to_heapalloc();
     if (r != ESP_OK) {
-        ets_printf("External SPI RAM could not be added to heap!\n");
+        ESP_EARLY_LOGE("spi_ram", "External SPI RAM could not be added to heap!\n");
         abort();
     }
 
     #if CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL
     r=esp_spiram_reserve_dma_pool(CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL);
     if (r != ESP_OK) {
-        ets_printf("Could not reserve internal/DMA pool!\n");
+        ESP_EARLY_LOGE("spi_ram", "Could not reserve internal/DMA pool!\n");
         abort();
     }
     #endif /* CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL */
@@ -225,7 +208,7 @@ void spi_ram_heap_init(void)
     #endif /* CONFIG_SPIRAM_USE_CAPS_ALLOC || CONFIG_SPIRAM_USE_MALLOC */
 
     #else  /* CONFIG_SPIRAM_SUPPORT */
-    ets_printf("External SPI RAM functions not enabled\n");
+    ESP_EARLY_LOGI("spi_ram", "External SPI RAM functions not enabled\n");
     #endif /* CONFIG_SPIRAM_SUPPORT */
 }
 

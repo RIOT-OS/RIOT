@@ -48,20 +48,12 @@ static inline SercomSpi *dev(spi_t bus)
 
 static inline void poweron(spi_t bus)
 {
-#if defined(CPU_FAM_SAMD21)
-    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#elif defined(CPU_SAML21) || defined(CPU_SAML1X)
-    MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#endif
+    sercom_clk_en(dev(bus));
 }
 
 static inline void poweroff(spi_t bus)
 {
-#if defined(CPU_FAM_SAMD21)
-    PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#elif defined(CPU_SAML21) || defined(CPU_SAML1X)
-    MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#endif
+    sercom_clk_dis(dev(bus));
 }
 
 void spi_init(spi_t bus)
@@ -81,16 +73,13 @@ void spi_init(spi_t bus)
     /* reset all device configuration */
     dev(bus)->CTRLA.reg |= SERCOM_SPI_CTRLA_SWRST;
     while ((dev(bus)->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST) ||
-           (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_SWRST));
+           (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_SWRST)) {}
 
     /* configure base clock: using GLK GEN 0 */
-#if defined(CPU_FAM_SAMD21)
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 |
-                         (SERCOM0_GCLK_ID_CORE + sercom_id(dev(bus))));
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-#elif defined(CPU_SAML21) || defined(CPU_SAML1X)
-    GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + sercom_id(dev(bus))].reg =
-                                (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0);
+#ifdef GCLK_CLKCTRL_GEN_GCLK0
+    sercom_set_gen(dev(bus), GCLK_CLKCTRL_GEN_GCLK0);
+#else
+    sercom_set_gen(dev(bus), GCLK_PCHCTRL_GEN_GCLK0);
 #endif
 
     /* enable receiver and configure character size to 8-bit
@@ -114,31 +103,40 @@ void spi_init_pins(spi_t bus)
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void) cs;
-    /* get exclusive access to the device */
-    mutex_lock(&locks[bus]);
-    /* power on the device */
-    poweron(bus);
-
-    /* disable the device */
-    dev(bus)->CTRLA.reg &= ~(SERCOM_SPI_CTRLA_ENABLE);
-    while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
+    (void)cs;
 
     /* configure bus clock, in synchronous mode its calculated from
      * BAUD.reg = (f_ref / (2 * f_bus) - 1)
      * with f_ref := CLOCK_CORECLOCK as defined by the board */
-    dev(bus)->BAUD.reg = (uint8_t)(((uint32_t)CLOCK_CORECLOCK) / (2 * clk) - 1);
+    const uint8_t baud = (((uint32_t)CLOCK_CORECLOCK) / (2 * clk) - 1);
 
     /* configure device to be master and set mode and pads,
      *
      * NOTE: we could configure the pads already during spi_init, but for
      * efficiency reason we do that here, so we can do all in one single write
      * to the CTRLA register */
-    dev(bus)->CTRLA.reg = (SERCOM_SPI_CTRLA_MODE(0x3) |     /* 0x3 -> master */
-                           SERCOM_SPI_CTRLA_DOPO(spi_config[bus].mosi_pad) |
-                           SERCOM_SPI_CTRLA_DIPO(spi_config[bus].miso_pad) |
-                           (mode <<  SERCOM_SPI_CTRLA_CPHA_Pos));
-    /* also no synchronization needed here, as CTRLA is write-synchronized */
+    const uint32_t ctrla = SERCOM_SPI_CTRLA_MODE(0x3)       /* 0x3 -> master */
+                           | SERCOM_SPI_CTRLA_DOPO(spi_config[bus].mosi_pad)
+                           | SERCOM_SPI_CTRLA_DIPO(spi_config[bus].miso_pad)
+                           | (mode << SERCOM_SPI_CTRLA_CPHA_Pos);
+
+    /* get exclusive access to the device */
+    mutex_lock(&locks[bus]);
+
+    /* power on the device */
+    poweron(bus);
+
+    /* first configuration or reconfiguration after altered device usage */
+    if (dev(bus)->BAUD.reg != baud || dev(bus)->CTRLA.reg != ctrla) {
+        /* disable the device */
+        dev(bus)->CTRLA.reg &= ~(SERCOM_SPI_CTRLA_ENABLE);
+        while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
+
+        dev(bus)->BAUD.reg = baud;
+        dev(bus)->CTRLA.reg = ctrla;
+        /* no synchronization needed here, the enable synchronization below
+         * acts as a write-synchronization for both registers */
+    }
 
     /* finally enable the device */
     dev(bus)->CTRLA.reg |= SERCOM_SPI_CTRLA_ENABLE;
@@ -149,6 +147,13 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
 void spi_release(spi_t bus)
 {
+    /* disable the device */
+    dev(bus)->CTRLA.reg &= ~(SERCOM_SPI_CTRLA_ENABLE);
+    while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
+
+    /* power off the device */
+    poweroff(bus);
+
     /* release access to the device */
     mutex_unlock(&locks[bus]);
 }

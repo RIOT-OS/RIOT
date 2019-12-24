@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015-2017 Ken Bannister. All rights reserved.
+ *               2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  * Runs a thread (_pid) to manage request/response messaging.
  *
  * @author      Ken Bannister <kb2ma@runbox.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #include <errno.h>
@@ -62,7 +64,8 @@ const coap_resource_t _default_resources[] = {
 
 static gcoap_listener_t _default_listener = {
     &_default_resources[0],
-    sizeof(_default_resources) / sizeof(_default_resources[0]),
+    ARRAY_SIZE(_default_resources),
+    NULL,
     NULL
 };
 
@@ -93,6 +96,7 @@ static gcoap_state_t _coap_state = {
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static char _msg_stack[GCOAP_STACK_SIZE];
 static msg_t _msg_queue[GCOAP_MSG_QUEUE_SIZE];
+static uint8_t _listen_buf[GCOAP_PDU_BUF_SIZE];
 static sock_udp_t _sock;
 
 
@@ -132,10 +136,16 @@ static void *_event_loop(void *arg)
                 /* reduce retries remaining, double timeout and resend */
                 else {
                     memo->send_limit--;
+#ifdef GCOAP_NO_RETRANS_BACKOFF
+                    unsigned i        = 0;
+#else
                     unsigned i        = COAP_MAX_RETRANSMIT - memo->send_limit;
+#endif
                     uint32_t timeout  = ((uint32_t)COAP_ACK_TIMEOUT << i) * US_PER_SEC;
+#if COAP_ACK_VARIANCE > 0
                     uint32_t variance = ((uint32_t)COAP_ACK_VARIANCE << i) * US_PER_SEC;
                     timeout = random_uint32_range(timeout, timeout + variance);
+#endif
 
                     ssize_t bytes = sock_udp_send(&_sock, memo->msg.data.pdu_buf,
                                                   memo->msg.data.pdu_len,
@@ -166,17 +176,16 @@ static void *_event_loop(void *arg)
 static void _listen(sock_udp_t *sock)
 {
     coap_pkt_t pdu;
-    uint8_t buf[GCOAP_PDU_BUF_SIZE];
     sock_udp_ep_t remote;
     gcoap_request_memo_t *memo = NULL;
     uint8_t open_reqs = gcoap_op_state();
 
     /* We expect a -EINTR response here when unlimited waiting (SOCK_NO_TIMEOUT)
-     * is interrupted when sending a message in gcoap_req_send2(). While a
+     * is interrupted when sending a message in gcoap_req_send(). While a
      * request is outstanding, sock_udp_recv() is called here with limited
      * waiting so the request's timeout can be handled in a timely manner in
      * _event_loop(). */
-    ssize_t res = sock_udp_recv(sock, buf, sizeof(buf),
+    ssize_t res = sock_udp_recv(sock, _listen_buf, sizeof(_listen_buf),
                                 open_reqs > 0 ? GCOAP_RECV_TIMEOUT : SOCK_NO_TIMEOUT,
                                 &remote);
     if (res <= 0) {
@@ -188,7 +197,7 @@ static void _listen(sock_udp_t *sock)
         return;
     }
 
-    res = coap_parse(&pdu, buf, res);
+    res = coap_parse(&pdu, _listen_buf, res);
     if (res < 0) {
         DEBUG("gcoap: parse failure: %d\n", (int)res);
         /* If a response, can't clear memo, but it will timeout later. */
@@ -206,9 +215,11 @@ static void _listen(sock_udp_t *sock)
     case COAP_CLASS_REQ:
         if (coap_get_type(&pdu) == COAP_TYPE_NON
                 || coap_get_type(&pdu) == COAP_TYPE_CON) {
-            size_t pdu_len = _handle_req(&pdu, buf, sizeof(buf), &remote);
+            size_t pdu_len = _handle_req(&pdu, _listen_buf, sizeof(_listen_buf),
+                                         &remote);
             if (pdu_len > 0) {
-                ssize_t bytes = sock_udp_send(sock, buf, pdu_len, &remote);
+                ssize_t bytes = sock_udp_send(sock, _listen_buf, pdu_len,
+                                              &remote);
                 if (bytes <= 0) {
                     DEBUG("gcoap: send response failed: %d\n", (int)bytes);
                 }
@@ -231,7 +242,7 @@ static void _listen(sock_udp_t *sock)
                 xtimer_remove(&memo->response_timer);
                 memo->state = GCOAP_MEMO_RESP;
                 if (memo->resp_handler) {
-                    memo->resp_handler(memo->state, &pdu, &remote);
+                    memo->resp_handler(memo, &pdu, &remote);
                 }
 
                 if (memo->send_limit >= 0) {        /* if confirmable */
@@ -304,7 +315,7 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         }
         /* initialize new registration request */
         if ((memo == NULL) && coap_has_observe(pdu)) {
-            /* verify resource not already registerered (for another endpoint) */
+            /* verify resource not already registered (for another endpoint) */
             if ((empty_slot >= 0) && (resource_memo == NULL)) {
                 int obs_slot = _find_observer(&observer, remote);
                 /* cache new observer */
@@ -382,7 +393,7 @@ static int _find_resource(coap_pkt_t *pdu, const coap_resource_t **resource_ptr,
                                             gcoap_listener_t **listener_ptr)
 {
     int ret = GCOAP_RESOURCE_NO_PATH;
-    unsigned method_flag = coap_method2flag(coap_get_code_detail(pdu));
+    coap_method_flags_t method_flag = coap_method2flag(coap_get_code_detail(pdu));
 
     /* Find path for CoAP msg among listener resources and execute callback. */
     gcoap_listener_t *listener = _coap_state.listeners;
@@ -399,7 +410,7 @@ static int _find_resource(coap_pkt_t *pdu, const coap_resource_t **resource_ptr,
                 resource++;
             }
 
-            int res = strcmp((char *)&uri[0], resource->path);
+            int res = coap_match_path(resource, uri);
             if (res > 0) {
                 continue;
             }
@@ -479,7 +490,7 @@ static void _expire_request(gcoap_request_memo_t *memo)
             else {
                 req.hdr = (coap_hdr_t *)memo->msg.data.pdu_buf;
             }
-            memo->resp_handler(memo->state, &req, NULL);
+            memo->resp_handler(memo, &req, NULL);
         }
         if (memo->send_limit != GCOAP_SEND_LIMIT_NON) {
             *memo->msg.data.pdu_buf = 0;    /* clear resend buffer */
@@ -496,15 +507,18 @@ static void _expire_request(gcoap_request_memo_t *memo)
  * Handler for /.well-known/core. Lists registered handlers, except for
  * /.well-known/core itself.
  */
-static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+                                        void *ctx)
 {
     (void)ctx;
-   /* write header */
+
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
-    int plen = gcoap_get_resource_list(pdu->payload, (size_t)pdu->payload_len,
-                                      COAP_FORMAT_LINK);
-    /* response content */
-    return gcoap_finish(pdu, (size_t)plen, COAP_FORMAT_LINK);
+    coap_opt_add_format(pdu, COAP_FORMAT_LINK);
+    ssize_t plen = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
+
+    plen += gcoap_get_resource_list(pdu->payload, (size_t)pdu->payload_len,
+                                    COAP_FORMAT_LINK);
+    return plen;
 }
 
 /*
@@ -630,6 +644,9 @@ void gcoap_register_listener(gcoap_listener_t *listener)
     }
 
     listener->next = NULL;
+    if (!listener->link_encoder) {
+        listener->link_encoder = gcoap_encode_link;
+    }
     _last->next = listener;
 }
 
@@ -650,25 +667,19 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                (GCOAP_TOKENLEN - i >= 4) ? 4 : GCOAP_TOKENLEN - i);
     }
     uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
-    ssize_t hdrlen = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &token[0], GCOAP_TOKENLEN,
-                                    code, msgid);
+    ssize_t res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &token[0], GCOAP_TOKENLEN,
+                                 code, msgid);
 #else
     uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
-    ssize_t hdrlen = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, NULL, GCOAP_TOKENLEN,
-                                    code, msgid);
+    ssize_t res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, NULL, GCOAP_TOKENLEN,
+                                 code, msgid);
 #endif
 
-    if (hdrlen > 0) {
-        coap_pkt_init(pdu, buf, len - GCOAP_REQ_OPTIONS_BUF, hdrlen);
-        if (path != NULL) {
-            coap_opt_add_string(pdu, COAP_OPT_URI_PATH, path, '/');
-        }
-        return 0;
+    coap_pkt_init(pdu, buf, len - GCOAP_REQ_OPTIONS_BUF, res);
+    if (path != NULL) {
+        res = coap_opt_add_string(pdu, COAP_OPT_URI_PATH, path, '/');
     }
-    else {
-        /* reason for negative hdrlen is not defined, so we also are vague */
-        return -1;
-    }
+    return (res > 0) ? 0 : res;
 }
 
 /*
@@ -710,23 +721,9 @@ ssize_t gcoap_finish(coap_pkt_t *pdu, size_t payload_len, unsigned format)
     return pdu->payload_len + (pdu->payload - (uint8_t *)pdu->hdr);
 }
 
-size_t gcoap_req_send(const uint8_t *buf, size_t len, const ipv6_addr_t *addr,
-                      uint16_t port, gcoap_resp_handler_t resp_handler)
-{
-    sock_udp_ep_t remote;
-
-    remote.family = AF_INET6;
-    remote.netif  = SOCK_ADDR_ANY_NETIF;
-    remote.port   = port;
-
-    memcpy(&remote.addr.ipv6[0], &addr->u8[0], sizeof(addr->u8));
-
-    return gcoap_req_send2(buf, len, &remote, resp_handler);
-}
-
-size_t gcoap_req_send2(const uint8_t *buf, size_t len,
-                       const sock_udp_ep_t *remote,
-                       gcoap_resp_handler_t resp_handler)
+size_t gcoap_req_send(const uint8_t *buf, size_t len,
+                      const sock_udp_ep_t *remote,
+                      gcoap_resp_handler_t resp_handler, void *context)
 {
     gcoap_request_memo_t *memo = NULL;
     unsigned msg_type  = (*buf & 0x30) >> 4;
@@ -753,6 +750,7 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
         }
 
         memo->resp_handler = resp_handler;
+        memo->context = context;
         memcpy(&memo->remote_ep, remote, sizeof(sock_udp_ep_t));
 
         switch (msg_type) {
@@ -770,8 +768,10 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
             if (memo->msg.data.pdu_buf) {
                 memo->send_limit  = COAP_MAX_RETRANSMIT;
                 timeout           = (uint32_t)COAP_ACK_TIMEOUT * US_PER_SEC;
+#if COAP_ACK_VARIANCE > 0
                 uint32_t variance = (uint32_t)COAP_ACK_VARIANCE * US_PER_SEC;
                 timeout = random_uint32_range(timeout, timeout + variance);
+#endif
             }
             else {
                 memo->state = GCOAP_MEMO_UNUSED;
@@ -800,7 +800,7 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
 
     /* timeout may be zero for non-confirmable */
     if ((memo != NULL) && (res > 0) && (timeout > 0)) {
-        /* We assume gcoap_req_send2() is called on some thread other than
+        /* We assume gcoap_req_send() is called on some thread other than
          * gcoap's. First, put a message in the mbox for the sock udp object,
          * which will interrupt listening on the gcoap thread. (When there are
          * no outstanding requests, gcoap blocks indefinitely in _listen() at
@@ -917,7 +917,6 @@ uint8_t gcoap_op_state(void)
 
 int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
 {
-    (void)cf; /* only used in the assert below. */
     assert(cf == COAP_FORMAT_LINK);
 
     /* skip the first listener, gcoap itself (we skip /.well-known/core) */
@@ -926,36 +925,67 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
     char *out = (char *)buf;
     size_t pos = 0;
 
+    coap_link_encoder_ctx_t ctx;
+    ctx.content_format = cf;
+    /* indicate initial link for the list */
+    ctx.flags = COAP_LINK_FLAG_INIT_RESLIST;
+
     /* write payload */
     while (listener) {
-        const coap_resource_t *resource = listener->resources;
+        if (!listener->link_encoder) {
+            continue;
+        }
+        ctx.link_pos = 0;
 
-        for (unsigned i = 0; i < listener->resources_len; i++) {
-            size_t path_len = strlen(resource->path);
+        for (; ctx.link_pos < listener->resources_len; ctx.link_pos++) {
+            ssize_t res;
             if (out) {
-                /* only add new resources if there is space in the buffer */
-                if ((pos + path_len + 3) > maxlen) {
-                    break;
-                }
-                if (pos) {
-                    out[pos++] = ',';
-                }
-                out[pos++] = '<';
-                memcpy(&out[pos], resource->path, path_len);
-                pos += path_len;
-                out[pos++] = '>';
+                res = listener->link_encoder(&listener->resources[ctx.link_pos],
+                                             &out[pos], maxlen - pos, &ctx);
             }
             else {
-                pos += (pos) ? 3 : 2;
-                pos += path_len;
+                res = listener->link_encoder(&listener->resources[ctx.link_pos],
+                                             NULL, 0, &ctx);
             }
-            ++resource;
+
+            if (res > 0) {
+                pos += res;
+                ctx.flags &= ~COAP_LINK_FLAG_INIT_RESLIST;
+            }
+            else {
+                break;
+            }
         }
 
         listener = listener->next;
     }
 
     return (int)pos;
+}
+
+ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
+                          size_t maxlen, coap_link_encoder_ctx_t *context)
+{
+    size_t path_len = strlen(resource->path);
+     /* count target separators and any link separator */
+    size_t exp_size = path_len + 2
+                        + ((context->flags & COAP_LINK_FLAG_INIT_RESLIST) ? 0 : 1);
+
+    if (buf) {
+        unsigned pos = 0;
+        if (exp_size > maxlen) {
+            return -1;
+        }
+
+        if (!(context->flags & COAP_LINK_FLAG_INIT_RESLIST)) {
+            buf[pos++] = ',';
+        }
+        buf[pos++] = '<';
+        memcpy(&buf[pos], resource->path, path_len);
+        buf[pos+path_len] = '>';
+    }
+
+    return exp_size;
 }
 
 int gcoap_add_qstring(coap_pkt_t *pdu, const char *key, const char *val)

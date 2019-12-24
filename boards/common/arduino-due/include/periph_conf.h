@@ -59,7 +59,7 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_0_ISR         isr_tc0
 #define TIMER_1_ISR         isr_tc3
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -107,7 +107,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_2_ISR          isr_usart1
 #define UART_3_ISR          isr_usart3
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -125,7 +125,7 @@ static const spi_conf_t spi_config[] = {
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -140,7 +140,7 @@ static const pwm_chan_conf_t pwm_chan[] = {
 };
 
 #define PWM_NUMOF           (1U)
-#define PWM_CHAN_NUMOF      (sizeof(pwm_chan) / sizeof(pwm_chan[0]))
+#define PWM_CHAN_NUMOF      ARRAY_SIZE(pwm_chan)
 /** @} */
 
 #ifdef __cplusplus

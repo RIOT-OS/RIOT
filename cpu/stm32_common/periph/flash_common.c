@@ -14,6 +14,7 @@
  * @brief       Low-level flash lock/unlock implementation
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Oleg Artamonov <oleg@unwds.com>
  *
  * @}
  */
@@ -55,4 +56,20 @@ void _lock(void)
         DEBUG("[flash-common] locking the flash module\n");
         CNTRL_REG |= CNTRL_REG_LOCK;
     }
+}
+
+void _wait_for_pending_operations(void)
+{
+    if (FLASH->SR & FLASH_SR_BSY) {
+        DEBUG("[flash-common] waiting for any pending operation to finish\n");
+        while (FLASH->SR & FLASH_SR_BSY) {}
+    }
+
+    /* Clear 'end of operation' bit in status register, for other STM32 boards
+       this bit is set only if EOPIE is set, which is currently not done */
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L1)
+    FLASH->SR |= FLASH_SR_EOP;
+#endif
 }

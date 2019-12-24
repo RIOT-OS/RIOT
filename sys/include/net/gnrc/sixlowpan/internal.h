@@ -28,6 +28,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Returns the PID of the 6Lo thread
+ *
+ * @return  The PID of the 6Lo thread on success
+ * @return  KERNEL_PID_UNDEF, when 6Lo thread was not started.
+ */
+kernel_pid_t gnrc_sixlowpan_get_pid(void);
+
+/**
  * @brief   Delegates a packet to the network layer
  *
  * @param[in] pkt       A packet

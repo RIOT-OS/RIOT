@@ -36,6 +36,7 @@
 #define PHYDAT_H
 
 #include <stdint.h>
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -93,10 +94,13 @@ enum {
     /* electricity */
     UNIT_A,         /**< Ampere */
     UNIT_V,         /**< Volts */
+    UNIT_W,         /**< Watt */
     UNIT_GS,        /**< gauss */
     UNIT_DBM,       /**< decibel-milliwatts */
     UNIT_COULOMB,   /**< coulomb */
     UNIT_F,         /**< Farad */
+    /* electrochemical */
+    UNIT_PH,        /**< pH  */
     /* pressure */
     UNIT_BAR,       /**< Beer? */
     UNIT_PA,        /**< Pascal */
@@ -120,7 +124,7 @@ enum {
 /**
  * @brief   Generic data structure for expressing physical values
  *
- * Physical data is expressed in a 3-dimensional touple of values. In addition
+ * Physical data is expressed in a 3-dimensional tuple of values. In addition
  * to the data fields, this struct contains further the (physical) unit and the
  * scale factor of the data. The unit is expressed as constant. The scale factor
  * is expressed as power of 10 (10^factor).

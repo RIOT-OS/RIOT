@@ -210,6 +210,11 @@ static void _status(const ata8520e_t *dev)
         _print_sigfox_status(sigfox);
         _print_sigfox_status(sigfox2);
     }
+    else {
+        (void)atmel;
+        (void)sigfox;
+        (void)sigfox2;
+    }
 }
 
 static void _reset(const ata8520e_t *dev)

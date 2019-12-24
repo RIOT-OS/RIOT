@@ -7,16 +7,20 @@
  * directory for more details.
  */
 
+#include <mips/hal.h>
 #include <mips/m32c0.h>
 #include <mips/regdef.h>
 #include <mips/asm.h>
+#include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <malloc.h>
 
 #include "periph/uart.h"
 #include "periph/timer.h"
 #include "periph/init.h"
 #include "panic.h"
+#include "stdio_base.h"
 #include "kernel_init.h"
 #include "cpu.h"
 #include "board.h"
@@ -76,6 +80,41 @@ void panic_arch(void)
 
 void cpu_init(void)
 {
+    /* initialize stdio*/
+    stdio_init();
+
     /* trigger static peripheral initialization */
     periph_init();
 }
+
+#ifdef MODULE_NEWLIB_SYSCALLS_DEFAULT
+
+void heap_stats(void)
+{
+    puts("heap statistics are not supported for newlib_syscalls_default");
+}
+
+#else
+
+extern char _end[]; /* defined in linker script */
+
+void heap_stats(void)
+{
+    void *ram_base;
+    void *ram_extent;
+    unsigned long heap_size;
+
+    _get_ram_range (&ram_base, &ram_extent);
+    /* If the _end symbol is within the RAM then use _end.  */
+    if ((void*)_end > ram_base && (void*)_end < ram_extent) {
+        heap_size = ram_extent - (void*)_end;
+    }
+    else {
+        heap_size = ram_extent - ram_base;
+    }
+    struct mallinfo minfo = mallinfo();
+    printf("heap: %lu (used %lu, free %lu) [bytes]\n",
+           heap_size, minfo.uordblks, heap_size - minfo.uordblks);
+}
+
+#endif

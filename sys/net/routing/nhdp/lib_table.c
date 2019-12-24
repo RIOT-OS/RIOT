@@ -44,8 +44,8 @@ static int add_address_to_if(lib_entry_t *if_entry, nhdp_addr_t *addr);
 
 int lib_add_if_addr(kernel_pid_t if_pid, nhdp_addr_t *addr)
 {
-    lib_entry_t *lib_elt;
-    nhdp_addr_entry_t *addr_elt;
+    lib_entry_t *lib_elt = NULL;
+    nhdp_addr_entry_t *addr_elt = NULL;
     int result = -1;
 
     mutex_lock(&mtx_lib_access);
@@ -81,7 +81,7 @@ int lib_add_if_addr(kernel_pid_t if_pid, nhdp_addr_t *addr)
 
 void lib_rem_if(kernel_pid_t if_pid)
 {
-    lib_entry_t *lib_elt, *lib_tmp;
+    lib_entry_t *lib_elt = NULL, *lib_tmp = NULL;
 
     mutex_lock(&mtx_lib_access);
 
@@ -99,8 +99,8 @@ void lib_rem_if(kernel_pid_t if_pid)
 
 void lib_fill_wr_addresses(kernel_pid_t if_pid, struct rfc5444_writer *wr)
 {
-    lib_entry_t *lib_elt;
-    nhdp_addr_entry_t *add_tmp;
+    lib_entry_t *lib_elt = NULL;
+    nhdp_addr_entry_t *add_tmp = NULL;
 
     mutex_lock(&mtx_lib_access);
 
@@ -138,8 +138,8 @@ void lib_fill_wr_addresses(kernel_pid_t if_pid, struct rfc5444_writer *wr)
 
 uint8_t lib_is_reg_addr(kernel_pid_t if_pid, nhdp_addr_t *addr)
 {
-    lib_entry_t *lib_elt;
-    nhdp_addr_entry_t *addr_elt;
+    lib_entry_t *lib_elt = NULL;
+    nhdp_addr_entry_t *addr_elt = NULL;
 
     LL_FOREACH(lib_entry_head, lib_elt) {
         LL_FOREACH(lib_elt->if_addr_list_head, addr_elt) {

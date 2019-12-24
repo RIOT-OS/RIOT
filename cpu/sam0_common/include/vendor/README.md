@@ -2,8 +2,7 @@
 
 The include files in this directory tree are copied from Atmel
 sources. Most of the sam0 files are from ASF (Atmel Software Foundation,
-version 3.35.1). The SAMR30 files are from ASF 3.34.2. The SAML10 and
-SAML11 files are from, so called, atpacks.
+version 3.35.1). The SAML10 and SAML11 files are from, so called, atpacks.
 
 ## The sam0 files
 
@@ -50,6 +49,13 @@ Since 2019 the necessary variant files are available in atpacks at
 
 saml10: `Atmel.SAML10_DFP.1.0.142.atpack`
 saml11: `Atmel.SAML11_DFP.1.0.91.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
+## SAMR34 files
+
+samr34: `Atmel.SAMR34_DFP.1.0.11.atpacks`
 
 Each atpack has an include subdirectory with the files we copy into
 RIOT. The files are copied unmodified.

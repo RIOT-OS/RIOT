@@ -1,5 +1,10 @@
 # additional modules dependencies
 
+ifneq (,$(filter cpp,$(FEATURES_USED)))
+    USEMODULE += pthread
+    BASELIBS += -lstdc++
+endif
+
 ifneq (,$(filter esp_eth,$(USEMODULE)))
     USEMODULE += esp_idf_eth
     USEMODULE += esp_idf_eth_phy
@@ -7,6 +12,7 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
     USEMODULE += netdev_eth
     USEMODULE += netopt
     USEMODULE += riot_freertos
+    USEMODULE += xtimer
     INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/ethernet
     INCLUDES += -I$(ESP32_SDK_DIR)/components/ethernet/include
 endif
@@ -33,10 +39,7 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
     USEMODULE += esp_idf_wpa_supplicant_port
     USEMODULE += esp_idf_nvs_flash
     USEMODULE += riot_freertos
-
-    # crypto and hashes produce symbol conflicts with esp_idf_wpa_supplicant_crypto
-    DISABLE_MODULE += crypto
-    DISABLE_MODULE += hashes
+    USEMODULE += xtimer
 endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
@@ -45,18 +48,18 @@ ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
     USEMODULE += pthread
 endif
 
-ifneq (,$(filter riot_freertos,$(USEMODULE)))
-    # add additional modules required by riot_freertos
-    USEMODULE += xtimer
-endif
-
-ifneq (,$(filter esp_i2c_hw,$(USEMODULE)))
-    USEMODULE += xtimer
-else
-    # PLEASE NOTE: because of the very poor and faulty hardware implementation
-    # we use software implementation by default for the moment (if module
-    # esp_i2c_hw is not explicitly used)
-    USEMODULE += esp_i2c_sw
+ifneq (,$(filter periph_i2c,$(USEMODULE)))
+    ifneq (,$(filter esp_i2c_hw,$(USEMODULE)))
+        USEMODULE += core_thread_flags
+        USEMODULE += xtimer
+        USEMODULE += periph_i2c_hw
+    else
+        # PLEASE NOTE: because of the very poor and faulty hardware implementation
+        # we use software implementation by default for the moment (if module
+        # esp_i2c_hw is not explicitly used)
+        USEMODULE += esp_i2c_sw
+        USEMODULE += periph_i2c_sw
+    endif
 endif
 
 ifneq (, $(filter esp_spi_ram, $(DISABLE_MODULE)))
@@ -77,22 +80,12 @@ ifneq (,$(filter ndn-riot,$(USEPKG)))
     USEMODULE += cipher_modes
 endif
 
-ifneq (,$(findstring posix,$(USEMODULE)))
-    USEMODULE += newlib_syscalls_default
-endif
-
 ifneq (,$(filter shell,$(USEMODULE)))
-    USEMODULE += newlib_syscalls_default
     USEMODULE += ps
-    USEMODULE += xtimer
 endif
 
-ifneq (,$(filter xtimer,$(USEMODULE)))
-    USEMODULE += newlib_syscalls_default
-endif
-
-ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
-    USEMODULE += stdio_uart
+ifneq (,$(filter log_color,$(USEMODULE)))
+    USEMODULE += esp_log_colored
 endif
 
 # if SPI RAM is enabled, ESP-IDF heap and quot flash mode have to be used
@@ -113,4 +106,11 @@ else
     ifeq ($(FLASH_MODE), dout)
         CFLAGS += -DFLASH_MODE_DOUT=1
     endif
+endif
+
+ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
+    LINKFLAGS += -Wl,-wrap,_malloc_r
+    LINKFLAGS += -Wl,-wrap,_calloc_r
+    LINKFLAGS += -Wl,-wrap,_realloc_r
+    LINKFLAGS += -Wl,-wrap,_free_r
 endif

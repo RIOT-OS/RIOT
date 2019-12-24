@@ -20,7 +20,7 @@
 #include "crypto/crypto.h"
 
 
-static void MD5Transform(u32 buf[4], u32 const in[16]);
+static void wpa_MD5Transform(u32 buf[4], u32 const in[16]);
 
 
 typedef struct MD5Context MD5_CTX;
@@ -35,15 +35,15 @@ typedef struct MD5Context MD5_CTX;
  * Returns: 0 on success, -1 of failure
  */
 int
-md5_vector(size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac)
+wpa_md5_vector(size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac)
 {
     MD5_CTX ctx;
     size_t i;
 
-    MD5Init(&ctx);
+    wpa_MD5Init(&ctx);
     for (i = 0; i < num_elem; i++)
-        MD5Update(&ctx, addr[i], len[i]);
-    MD5Final(mac, &ctx);
+        wpa_MD5Update(&ctx, addr[i], len[i]);
+    wpa_MD5Final(mac, &ctx);
     return 0;
 }
 
@@ -89,7 +89,7 @@ static void byteReverse(unsigned char *buf, unsigned longs)
  * initialization constants.
  */
 void
-MD5Init(struct MD5Context *ctx)
+wpa_MD5Init(struct MD5Context *ctx)
 {
     ctx->buf[0] = 0x67452301;
     ctx->buf[1] = 0xefcdab89;
@@ -105,7 +105,7 @@ MD5Init(struct MD5Context *ctx)
  * of bytes.
  */
 void
-MD5Update(struct MD5Context *ctx, unsigned char const *buf, unsigned len)
+wpa_MD5Update(struct MD5Context *ctx, unsigned char const *buf, unsigned len)
 {
     u32 t;
 
@@ -130,7 +130,7 @@ MD5Update(struct MD5Context *ctx, unsigned char const *buf, unsigned len)
     }
     os_memcpy(p, buf, t);
     byteReverse(ctx->in, 16);
-    MD5Transform(ctx->buf, (u32 *) ctx->in);
+    wpa_MD5Transform(ctx->buf, (u32 *) ctx->in);
     buf += t;
     len -= t;
     }
@@ -139,7 +139,7 @@ MD5Update(struct MD5Context *ctx, unsigned char const *buf, unsigned len)
     while (len >= 64) {
     os_memcpy(ctx->in, buf, 64);
     byteReverse(ctx->in, 16);
-    MD5Transform(ctx->buf, (u32 *) ctx->in);
+    wpa_MD5Transform(ctx->buf, (u32 *) ctx->in);
     buf += 64;
     len -= 64;
     }
@@ -154,7 +154,7 @@ MD5Update(struct MD5Context *ctx, unsigned char const *buf, unsigned len)
  * 1 0* (64-bit count of bits processed, MSB-first)
  */
 void
-MD5Final(unsigned char digest[16], struct MD5Context *ctx)
+wpa_MD5Final(unsigned char digest[16], struct MD5Context *ctx)
 {
     unsigned count;
     unsigned char *p;
@@ -175,7 +175,7 @@ MD5Final(unsigned char digest[16], struct MD5Context *ctx)
     /* Two lots of padding:  Pad the first block to 64 bytes */
     os_memset(p, 0, count);
     byteReverse(ctx->in, 16);
-    MD5Transform(ctx->buf, (u32 *) ctx->in);
+    wpa_MD5Transform(ctx->buf, (u32 *) ctx->in);
 
     /* Now fill the next block with 56 bytes */
     os_memset(ctx->in, 0, 56);
@@ -189,7 +189,7 @@ MD5Final(unsigned char digest[16], struct MD5Context *ctx)
     ((u32 *) ctx->in)[14] = ctx->bits[0];
     ((u32 *) ctx->in)[15] = ctx->bits[1];
 
-    MD5Transform(ctx->buf, (u32 *) ctx->in);
+    wpa_MD5Transform(ctx->buf, (u32 *) ctx->in);
     byteReverse((unsigned char *) ctx->buf, 4);
     os_memcpy(digest, ctx->buf, 16);
     os_memset(ctx, 0, sizeof(struct MD5Context));    /* In case it's sensitive */
@@ -213,7 +213,7 @@ MD5Final(unsigned char digest[16], struct MD5Context *ctx)
  * the data and converts bytes into longwords for this routine.
  */
 static void
-MD5Transform(u32 buf[4], u32 const in[16])
+wpa_MD5Transform(u32 buf[4], u32 const in[16])
 {
     register u32 a, b, c, d;
 

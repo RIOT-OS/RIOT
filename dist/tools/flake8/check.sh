@@ -23,7 +23,13 @@ cd $RIOTBASE
 : "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
 . "${RIOTTOOLS}"/ci/changed_files.sh
 
-EXCLUDE='^(.+/vendor/|dist/tools/cc2538-bsl|dist/tools/mcuboot|dist/tools/uhcpd|dist/tools/stm32loader)'
+EXCLUDE="^(.+/vendor/\
+|dist/tools/cc2538-bsl\
+|dist/tools/mcuboot\
+|dist/tools/uhcpd\
+|dist/tools/stm32loader\
+|dist/tools/suit_v4/suit_manifest_encoder_04)\
+|dist/tools/esptool"
 FILEREGEX='(\.py$|pyterm$)'
 FILES=$(FILEREGEX=${FILEREGEX} EXCLUDE=${EXCLUDE} changed_files)
 

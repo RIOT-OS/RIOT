@@ -89,21 +89,44 @@ extern "C" {
  * @name    Timer peripheral configuration
  * @{
  */
-#define TIMER_NUMOF         (2U)
-#define TIMER_0_EN          1
-#define TIMER_1_EN          1
+static const tc32_conf_t timer_config[] = {
+    {   /* Timer 0 - System Clock */
+        .dev            = TC3,
+        .irq            = TC3_IRQn,
+        .pm_mask        = PM_APBCMASK_TC3,
+        .gclk_ctrl      = GCLK_CLKCTRL_ID_TCC2_TC3,
+#if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
+        .gclk_src       = GCLK_CLKCTRL_GEN(1),
+        .prescaler      = TC_CTRLA_PRESCALER_DIV1,
+#else
+        .gclk_src       = GCLK_CLKCTRL_GEN(0),
+        .prescaler      = TC_CTRLA_PRESCALER_DIV8,
+#endif
+        .flags          = TC_CTRLA_MODE_COUNT16,
+    },
+    {   /* Timer 1 */
+        .dev            = TC4,
+        .irq            = TC4_IRQn,
+        .pm_mask        = PM_APBCMASK_TC4 | PM_APBCMASK_TC5,
+        .gclk_ctrl      = GCLK_CLKCTRL_ID_TC4_TC5,
+#if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
+        .gclk_src       = GCLK_CLKCTRL_GEN(1),
+        .prescaler      = TC_CTRLA_PRESCALER_DIV1,
+#else
+        .gclk_src       = GCLK_CLKCTRL_GEN(0),
+        .prescaler      = TC_CTRLA_PRESCALER_DIV8,
+#endif
+        .flags          = TC_CTRLA_MODE_COUNT32,
+    }
+};
 
-/* Timer 0 configuration */
-#define TIMER_0_DEV         TC3->COUNT16
-#define TIMER_0_CHANNELS    2
-#define TIMER_0_MAX_VALUE   (0xffff)
+#define TIMER_0_MAX_VALUE   0xffff
+
+/* interrupt function name mapping */
 #define TIMER_0_ISR         isr_tc3
-
-/* Timer 1 configuration */
-#define TIMER_1_DEV         TC4->COUNT32
-#define TIMER_1_CHANNELS    2
-#define TIMER_1_MAX_VALUE   (0xffffffff)
 #define TIMER_1_ISR         isr_tc4
+
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -137,7 +160,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_0_ISR          isr_sercom0
 #define UART_1_ISR          isr_sercom5
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -204,7 +227,7 @@ static const spi_conf_t spi_config[] = {
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -222,14 +245,13 @@ static const i2c_conf_t i2c_config[] = {
         .flags    = I2C_FLAG_NONE
      }
 };
-#define I2C_NUMOF          (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF          ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**
  * @name    RTC configuration
  * @{
  */
-#define RTC_NUMOF           (1U)
 #define RTC_DEV             RTC->MODE2
 /** @} */
 
@@ -237,7 +259,6 @@ static const i2c_conf_t i2c_config[] = {
  * @name    RTT configuration
  * @{
  */
-#define RTT_NUMOF           (1U)
 #define RTT_DEV             RTC->MODE0
 #define RTT_IRQ             RTC_IRQn
 #define RTT_IRQ_PRIO        10
@@ -251,19 +272,13 @@ static const i2c_conf_t i2c_config[] = {
  * @name ADC Configuration
  * @{
  */
-#define ADC_0_EN                           1
-#define ADC_MAX_CHANNELS                   14
-/* ADC 0 device configuration */
-#define ADC_0_DEV                          ADC
-#define ADC_0_IRQ                          ADC_IRQn
 
-/* ADC 0 Default values */
-#define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
-#define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV512
+/* ADC Default values */
+#define ADC_PRESCALER                       ADC_CTRLB_PRESCALER_DIV512
 
-#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_GND
-#define ADC_0_GAIN_FACTOR_DEFAULT          ADC_INPUTCTRL_GAIN_1X
-#define ADC_0_REF_DEFAULT                  ADC_REFCTRL_REFSEL_INT1V
+#define ADC_NEG_INPUT                       ADC_INPUTCTRL_MUXNEG_GND
+#define ADC_GAIN_FACTOR_DEFAULT             ADC_INPUTCTRL_GAIN_1X
+#define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INT1V
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
@@ -271,8 +286,21 @@ static const adc_conf_chan_t adc_channels[] = {
     {GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS_PIN7},      /* EXT1, pin 4 */
 };
 
-#define ADC_0_CHANNELS                     (2U)
-#define ADC_NUMOF                          ADC_0_CHANNELS
+#define ADC_NUMOF                           ARRAY_SIZE(adc_channels)
+/** @} */
+
+/**
+ * @name USB peripheral configuration
+ * @{
+ */
+static const sam0_common_usb_config_t sam_usbdev_config[] = {
+    {
+        .dm     = GPIO_PIN(PA, 24),
+        .dp     = GPIO_PIN(PA, 25),
+        .d_mux  = GPIO_MUX_G,
+        .device = &USB->DEVICE,
+    }
+};
 /** @} */
 #ifdef __cplusplus
 }

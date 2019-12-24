@@ -5,5 +5,3 @@ endif
 
 # include board common dependencies
 include $(RIOTBOARD)/common/silabs/Makefile.dep
-
-include $(RIOTCPU)/efm32/Makefile.dep

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2018 Kaspar Schleiser <kaspar@schleiser.de>
- *                    Inria
+ *               2018 Inria
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,8 +9,7 @@
  */
 
 /**
- * @defgroup    sys_riotboot_slot   Helpers to manipulate partitions (slots)
- *                              on internal flash
+ * @defgroup    sys_riotboot_slot   Helpers to manipulate partitions (slots) on internal flash
  * @ingroup     sys
  * @{
  *
@@ -37,6 +37,13 @@ extern "C" {
  * @returns nr of currently active slot
  */
 int riotboot_slot_current(void);
+
+/**
+ * @brief  Get currently not running image slot
+ *
+ * @returns nr of currently inactive slot
+ */
+int riotboot_slot_other(void);
 
 /**
  * @brief  Get jump-to address of image slot

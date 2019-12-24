@@ -60,7 +60,7 @@ DSTATUS disk_status(BYTE pdrv)
  * @param[in] pdrv  drive number to identify the drive
  *
  * @return          STA_NODISK if no disk exists with the given id
- * @return          0 if disk was initialized sucessfully
+ * @return          0 if disk was initialized successfully
  * @return          STA_NOINIT if disk id exists, but couldn't be initialized
  */
 DSTATUS disk_initialize(BYTE pdrv)

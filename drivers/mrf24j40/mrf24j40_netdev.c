@@ -58,7 +58,10 @@ static int _init(netdev_t *netdev)
     gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
 
     /* reset device to default values and put it into RX state */
-    mrf24j40_reset(dev);
+    if (mrf24j40_reset(dev)) {
+        return -ENODEV;
+    }
+
     return 0;
 }
 
@@ -71,13 +74,17 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
     /* load packet data into FIFO */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
-        /* current packet data + FCS too long */
-        if ((len + iol->iol_len + 2) > IEEE802154_FRAME_LEN_MAX) {
-            DEBUG("[mrf24j40] error: packet too large (%u byte) to be send\n",
-                  (unsigned)len + 2);
-            return -EOVERFLOW;
+        /* Check if there is data to copy, prevents assertion failure in the
+         * SPI peripheral if there is no data to copy */
+        if (iol->iol_len) {
+            /* current packet data + FCS too long */
+            if ((len + iol->iol_len + 2) > IEEE802154_FRAME_LEN_MAX) {
+                DEBUG("[mrf24j40] error: packet too large (%u byte) to be send\n",
+                      (unsigned)len + 2);
+                return -EOVERFLOW;
+            }
+            len = mrf24j40_tx_load(dev, iol->iol_base, iol->iol_len, len);
         }
-        len = mrf24j40_tx_load(dev, iol->iol_base, iol->iol_len, len);
         /* only on first iteration: */
         if (iol == iolist) {
             dev->header_len = len;
@@ -275,13 +282,23 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         case NETOPT_IS_CHANNEL_CLR:
-            if (mrf24j40_cca(dev)) {
+            if (mrf24j40_cca(dev, NULL)) {
                 *((netopt_enable_t *)val) = NETOPT_ENABLE;
             }
             else {
                 *((netopt_enable_t *)val) = NETOPT_DISABLE;
             }
             res = sizeof(netopt_enable_t);
+            break;
+
+        case NETOPT_LAST_ED_LEVEL:
+            if (max_len < sizeof(int8_t)) {
+                res = -EOVERFLOW;
+            }
+            else {
+                mrf24j40_cca(dev, (int8_t *)val);
+                res = sizeof(int8_t);
+            }
             break;
 
         case NETOPT_CSMA_RETRIES:
@@ -303,6 +320,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
                 res = sizeof(int8_t);
             }
             break;
+
         case NETOPT_TX_RETRIES_NEEDED:
             if (max_len < sizeof(uint8_t)) {
                 res = -EOVERFLOW;
@@ -524,7 +542,7 @@ static void _isr(netdev_t *netdev)
     /* update pending bits */
     mrf24j40_update_tasks(dev);
     DEBUG("[mrf24j40] INTERRUPT (pending: %x),\n", dev->pending);
-    /* Transmit interrupt occured */
+    /* Transmit interrupt occurred */
     if (dev->pending & MRF24J40_TASK_TX_READY) {
         dev->pending &= ~(MRF24J40_TASK_TX_READY);
         DEBUG("[mrf24j40] EVT - TX_END\n");
@@ -532,7 +550,7 @@ static void _isr(netdev_t *netdev)
         if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
             uint8_t txstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
             dev->tx_retries = (txstat >> MRF24J40_TXSTAT_MAX_FRAME_RETRIES_SHIFT);
-            /* transmision failed */
+            /* transmission failed */
             if (txstat & MRF24J40_TXSTAT_TXNSTAT) {
                 /* TX_NOACK - CCAFAIL */
                 if (txstat & MRF24J40_TXSTAT_CCAFAIL) {
@@ -551,7 +569,7 @@ static void _isr(netdev_t *netdev)
         }
 #endif
     }
-    /* Receive interrupt occured */
+    /* Receive interrupt occurred */
     if (dev->pending & MRF24J40_TASK_RX_READY) {
         DEBUG("[mrf24j40] EVT - RX_END\n");
         if ((dev->netdev.flags & MRF24J40_OPT_TELL_RX_END)) {

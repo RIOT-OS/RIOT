@@ -10,7 +10,7 @@
  * @ingroup     tests
  * @{
  * @file
- * @brief       test aplication for the LC709203F Battery fuel gauge by on semiconductors
+ * @brief       test application for the LC709203F Battery fuel gauge by on semiconductors
  *
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>

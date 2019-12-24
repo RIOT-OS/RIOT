@@ -456,7 +456,7 @@ extern "C" {
  *
  *  * These are meant to be used in places that are run `a lot'.
  *    It is wasteful to make predictions in code that is run
- *    seldomly (e.g. at subsystem initialization time) as the
+ *    seldom (e.g. at subsystem initialization time) as the
  *    basic block reordering that this affects can often generate
  *    larger code.
  */

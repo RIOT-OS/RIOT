@@ -66,6 +66,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    LPS22HB pressure/temperature sensor configuration
+ * @{
+ */
+#define LPSXXX_PARAM_I2C    I2C_DEV(1)
+/** @} */
+
+/**
  * @name    LSM6DSL accelerometer sensor configuration
  * @{
  */

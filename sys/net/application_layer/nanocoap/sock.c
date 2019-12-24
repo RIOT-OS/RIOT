@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016-17 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2016-18 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2018 Inria
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -142,7 +144,7 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
                 continue;
             }
             if ((res = coap_handle_req(&pkt, buf, bufsize)) > 0) {
-                res = sock_udp_send(&sock, buf, res, &remote);
+                sock_udp_send(&sock, buf, res, &remote);
             }
             else {
                 DEBUG("error handling request %d\n", (int)res);

@@ -4,3 +4,12 @@ ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/tlsf/contrib/include
   DIRS += $(RIOTPKG)/tlsf/contrib
 endif
+
+PSEUDOMODULES += tlsf-malloc_newlib
+PSEUDOMODULES += tlsf-malloc_native
+
+ifneq (,$(filter tlsf-malloc_newlib,$(USEMODULE)))
+  UNDEF += $(BINDIR)/tlsf-malloc/newlib.o
+else ifneq (,$(filter tlsf-malloc_native,$(BOARD)))
+  UNDEF += $(BINDIR)/tlsf-malloc/native.o
+endif

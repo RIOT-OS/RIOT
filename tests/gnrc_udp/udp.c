@@ -17,6 +17,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <inttypes.h>
 
 #include "msg.h"
@@ -59,7 +60,7 @@ static void *_eventloop(void *arg)
 
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
-                printf("Packets received: %d\n", ++rcv_count);
+                printf("Packets received: %u\n", ++rcv_count);
                 gnrc_pktbuf_release(msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_GET:
@@ -81,15 +82,20 @@ static void *_eventloop(void *arg)
 static void send(char *addr_str, char *port_str, char *data_len_str, unsigned int num,
                  unsigned int delay)
 {
-    int iface;
+    gnrc_netif_t *netif = NULL;
+    char *iface;
+    char *conversion_end;
     uint16_t port;
     ipv6_addr_t addr;
     size_t data_len;
 
     /* get interface, if available */
     iface = ipv6_addr_split_iface(addr_str);
-    if ((iface < 0) && (gnrc_netif_numof() == 1)) {
-        iface = gnrc_netif_iter(NULL)->pid;
+    if ((!iface) && (gnrc_netif_numof() == 1)) {
+        netif = gnrc_netif_iter(NULL);
+    }
+    else if (iface) {
+        netif = gnrc_netif_get_by_pid(atoi(iface));
     }
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
@@ -103,8 +109,8 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
         return;
     }
 
-    data_len = atoi(data_len_str);
-    if (data_len == 0) {
+    data_len = strtoul(data_len_str, &conversion_end, 0);
+    if (*conversion_end != '\0') {
         puts("Error: unable to parse data_len");
         return;
     }
@@ -133,11 +139,16 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
             return;
         }
         /* add netif header, if interface was given */
-        if (iface > 0) {
-            gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+        if (netif != NULL) {
+            gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
 
-            ((gnrc_netif_hdr_t *)netif->data)->if_pid = (kernel_pid_t)iface;
-            LL_PREPEND(ip, netif);
+            if(netif == NULL) {
+                puts("Error: unable to allocate NETIF header");
+                gnrc_pktbuf_release(ip);
+                return;
+            }
+            gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
+            LL_PREPEND(ip, netif_hdr);
         }
         /* send packet */
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {

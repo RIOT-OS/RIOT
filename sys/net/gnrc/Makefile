@@ -13,6 +13,9 @@ endif
 ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
   DIRS += network_layer/ipv6/ext
 endif
+ifneq (,$(filter gnrc_ipv6_ext_frag,$(USEMODULE)))
+  DIRS += network_layer/ipv6/ext/frag
+endif
 ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
   DIRS += network_layer/ipv6/ext/rh
 endif
@@ -44,7 +47,7 @@ ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
   DIRS += nettest
 endif
 ifneq (,$(filter gnrc_mac,$(USEMODULE)))
-  DIRS += link_layer/gnrc_mac
+  DIRS += link_layer/mac
 endif
 ifneq (,$(filter gnrc_pkt,$(USEMODULE)))
   DIRS += pkt
@@ -54,6 +57,9 @@ ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_pktbuf_malloc,$(USEMODULE)))
     DIRS += pktbuf_malloc
+endif
+ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
+    DIRS += link_layer/lorawan
 endif
 ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
     DIRS += link_layer/gomach
@@ -87,6 +93,18 @@ ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/frag
+endif
+ifneq (,$(filter gnrc_sixlowpan_frag_fb,$(USEMODULE)))
+  DIRS += network_layer/sixlowpan/frag/fb
+endif
+ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
+  DIRS += network_layer/sixlowpan/frag/rb
+endif
+ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
+  DIRS += network_layer/sixlowpan/frag/stats
+endif
+ifneq (,$(filter gnrc_sixlowpan_frag_vrb,$(USEMODULE)))
+  DIRS += network_layer/sixlowpan/frag/vrb
 endif
 ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/iphc

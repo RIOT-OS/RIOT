@@ -162,7 +162,7 @@ static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netif_t *dev)
     }
     netif->lqi = 0;
     netif->rssi = 0;
-    netif->if_pid = dev->pid;
+    gnrc_netif_hdr_set_netif(netif, dev);
     pkt_snip->type = nrfmin->proto;
 
     /* finally: remove the nrfmin header and append the netif header */
@@ -173,6 +173,7 @@ static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netif_t *dev)
 }
 
 static const gnrc_netif_ops_t gnrc_nrfmin_ops = {
+    .init = gnrc_netif_default_init,
     .send = gnrc_nrfmin_send,
     .recv = gnrc_nrfmin_recv,
     .get = gnrc_netif_get_from_netdev,

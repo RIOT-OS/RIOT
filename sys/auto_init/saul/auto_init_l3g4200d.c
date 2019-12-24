@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define L3G4200D_NUM    (sizeof(l3g4200d_params) / sizeof(l3g4200d_params[0]))
+#define L3G4200D_NUM    ARRAY_SIZE(l3g4200d_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -45,7 +45,7 @@ static saul_reg_t saul_entries[L3G4200D_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define L3G4200D_INFO_NUM    (sizeof(l3g4200d_saul_info) / sizeof(l3g4200d_saul_info[0]))
+#define L3G4200D_INFO_NUM    ARRAY_SIZE(l3g4200d_saul_info)
 
 /**
  * @brief   Reference the driver struct

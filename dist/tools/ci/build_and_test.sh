@@ -39,7 +39,7 @@ function run {
     print_result $NEW_RESULT
     set_result $NEW_RESULT
 
-    # Indent command output so that its easily discernable from the rest
+    # Indent command output so that its easily discernible from the rest
     if [ -n "$OUT" ]; then
         echo "Command output:"
         echo ""
@@ -80,7 +80,7 @@ then
             exit $RESULT
         fi
 
-        run ./dist/tools/ci/print_toolchain_versions.sh
+        run make print-versions
 
         run ./dist/tools/commit-msg/check.sh ${CI_BASE_BRANCH}
         run ./dist/tools/whitespacecheck/check.sh ${CI_BASE_BRANCH}
@@ -94,6 +94,7 @@ then
         run ./dist/tools/flake8/check.sh
         run ./dist/tools/headerguards/check.sh
         run ./dist/tools/buildsystem_sanity_check/check.sh
+        run ./dist/tools/codespell/check.sh
         exit $RESULT
     fi
 

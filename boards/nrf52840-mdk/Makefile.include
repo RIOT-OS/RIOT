@@ -1,5 +1,3 @@
-export CPU_MODEL = nrf52840xxaa
-
 # This board uses a DAP-Link programmer
 # Flashing support is provided through pyocd (default) and openocd.
 # For openocd, a version built against the development branch and containing
@@ -8,7 +6,7 @@ PROGRAMMER ?= pyocd
 ifeq (pyocd,$(PROGRAMMER))
   # The board is not recognized automatically by pyocd, so the CPU target
   # option is passed explicitly
-  export FLASH_TARGET_TYPE ?= -t $(CPU)
+  export FLASH_TARGET_TYPE ?= -t nrf52840
   include $(RIOTMAKE)/tools/pyocd.inc.mk
 else ifeq (openocd,$(PROGRAMMER))
   DEBUG_ADAPTER = dap

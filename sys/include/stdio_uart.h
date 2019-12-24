@@ -13,6 +13,12 @@
  *
  * @brief       Standard input/output backend using UART
  *
+ * @warning Standard input is disabled by default on UART. To enable it, load
+ *          the `stdin` module in your application:
+ * ```
+ * USEMODULE += stdin
+ * ```
+ *
  * @{
  * @file
  *

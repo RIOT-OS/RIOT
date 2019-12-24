@@ -82,7 +82,7 @@ D1 mini Pro  | ESP8266EX | 16 MByte | ceramic | |
 
 Following image shows the pinout of all WEMOS LOLIN D1 mini boards. It is compatible with the WEMOS LOLIN D32 Pro ESP32 board.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Wemos_D1_mini_pinout.png?inline=false" "WEMOS LOLIN D1 min pinout"<br>
+@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Wemos_D1_mini_pinout.png?inline=false" "WEMOS LOLIN D1 mini pinout"<br>
 
 ## <a name="nodemcu_devkit_esp8266"> NodeMCU DEVKIT </a>
 

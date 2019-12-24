@@ -1,7 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
-
 DRIVER ?= sht11
 BOARD ?= msba2
 

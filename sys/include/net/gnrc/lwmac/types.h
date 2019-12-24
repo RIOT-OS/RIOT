@@ -167,7 +167,7 @@ typedef enum {
  * @brief   LWMAC timeout types
  */
 typedef enum {
-    GNRC_LWMAC_TIMEOUT_DISABLED,                /**< Timeout is diabled */
+    GNRC_LWMAC_TIMEOUT_DISABLED,                /**< Timeout is disabled */
     GNRC_LWMAC_TIMEOUT_WR,                      /**< WR timeout, waiting WA */
     GNRC_LWMAC_TIMEOUT_NO_RESPONSE,             /**< Maximum WR duration timeout awaiting WA */
     GNRC_LWMAC_TIMEOUT_DATA,                    /**< Timeout awaiting data packet from receiver */
@@ -193,7 +193,7 @@ typedef struct {
 typedef struct lwmac {
     gnrc_lwmac_state_t state;                                   /**< Internal state of MAC layer */
     uint32_t last_wakeup;                                       /**< Used to calculate wakeup times */
-    uint8_t lwmac_info;                                         /**< LWMAC's internal informations (flags) */
+    uint8_t lwmac_info;                                         /**< LWMAC's internal information (flags) */
     gnrc_lwmac_timeout_t timeouts[GNRC_LWMAC_TIMEOUT_COUNT];    /**< Store timeouts used for protocol */
 
 #if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)

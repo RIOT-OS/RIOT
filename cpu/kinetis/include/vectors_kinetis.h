@@ -92,7 +92,7 @@ void isr_dma14_dma30(void);  /**< DMA channel 14, 30 transfer complete interrupt
 void isr_dma15_dma31(void);  /**< DMA channel 15, 31 transfer complete interrupt handler */
 void isr_dma_error(void);    /**< DMA Error interrupt handler */
 void isr_enet_1588_timer(void); /**< Ethernet MAC IEEE 1588 timer interrupt handler */
-void isr_enet_error(void);   /**< Ethernet MAC error and miscelaneous interrupt handler */
+void isr_enet_error(void);   /**< Ethernet MAC error and miscellaneous interrupt handler */
 void isr_enet_receive(void); /**< Ethernet MAC receive interrupt handler */
 void isr_enet_transmit(void); /**< Ethernet MAC transmit interrupt handler */
 void isr_ftfa(void);         /**< FTFA Command complete interrupt handler */

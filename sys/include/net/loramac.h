@@ -320,6 +320,17 @@ extern "C" {
  * @brief   Maximmu port value
  */
 #define LORAMAC_PORT_MAX               (223U)
+
+/**
+ * @brief Application Nonce length in bytes
+ */
+#define LORAMAC_APP_NONCE_LEN          (3U)
+
+/**
+ * @brief Network ID length in bytes
+ */
+#define LORAMAC_NETWORK_ID_LEN         (3U)
+
 /** @} */
 
 /**

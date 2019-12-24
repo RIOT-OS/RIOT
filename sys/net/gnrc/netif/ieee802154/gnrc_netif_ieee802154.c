@@ -32,6 +32,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 
 static const gnrc_netif_ops_t ieee802154_ops = {
+    .init = gnrc_netif_default_init,
     .send = _send,
     .recv = _recv,
     .get = gnrc_netif_get_from_netdev,
@@ -48,6 +49,7 @@ gnrc_netif_t *gnrc_netif_ieee802154_create(char *stack, int stacksize,
 
 static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
 {
+    gnrc_netif_hdr_t *hdr;
     gnrc_pktsnip_t *snip;
     uint8_t src[IEEE802154_LONG_ADDRESS_LEN], dst[IEEE802154_LONG_ADDRESS_LEN];
     int src_len, dst_len;
@@ -65,10 +67,14 @@ static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
         DEBUG("_make_netif_hdr: no space left in packet buffer\n");
         return NULL;
     }
+    hdr = snip->data;
     /* set broadcast flag for broadcast destination */
     if ((dst_len == 2) && (dst[0] == 0xff) && (dst[1] == 0xff)) {
-        gnrc_netif_hdr_t *hdr = snip->data;
         hdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
+    }
+    /* set flags for pending frames */
+    if (mhr[0] & IEEE802154_FCF_FRAME_PEND) {
+        hdr->flags |= GNRC_NETIF_HDR_FLAGS_MORE_DATA;
     }
     return snip;
 }
@@ -126,7 +132,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_netif_hdr_t *hdr = netif_snip->data;
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
-            hdr->if_pid = netif->pid;
+            gnrc_netif_hdr_set_netif(hdr, netif);
             LL_APPEND(pkt, netif_snip);
         }
         else {
@@ -138,7 +144,9 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 #endif
             size_t mhr_len = ieee802154_get_frame_hdr_len(pkt->data);
 
-            if (mhr_len == 0) {
+            /* nread was checked for <= 0 before so we can safely cast it to
+             * unsigned */
+            if ((mhr_len == 0) || ((size_t)nread < mhr_len)) {
                 DEBUG("_recv_ieee802154: illegally formatted frame received\n");
                 gnrc_pktbuf_release(pkt);
                 return NULL;
@@ -184,7 +192,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
-            hdr->if_pid = thread_getpid();
+            gnrc_netif_hdr_set_netif(hdr, netif);
             dev->driver->get(dev, NETOPT_PROTO, &pkt->type, sizeof(pkt->type));
 #if ENABLE_DEBUG
             DEBUG("_recv_ieee802154: received packet from %s of length %u\n",

@@ -6,6 +6,8 @@ EXT_CFLAGS :=-D__TARGET_RIOT
 
 ifeq ($(TOOLCHAIN)_$(BOARD),llvm_native)
   EXT_CFLAGS :=-D__TARGET_RIOT -Wno-conversion
+else ifeq ($(OS)_$(BOARD),FreeBSD_native)
+  EXT_CFLAGS += -Wno-conversion
 else ifeq (esp32,$(CPU))
   # The esp32 C newlib version 2.2.0 has errors when compiling with warnings
   # that are enabled by jerryscript build system so disable them for this cpu:

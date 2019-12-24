@@ -10,7 +10,7 @@
 /**
  * @ingroup     boards_telosb
  *
- * <h2>Compontents</h2>
+ * <h2>Components</h2>
  * \li MSP430
  * \li CC2420
  *

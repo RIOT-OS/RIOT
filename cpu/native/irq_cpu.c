@@ -229,7 +229,7 @@ int irq_is_in(void)
 int _native_popsig(void)
 {
     int nread, nleft, i;
-    int sig;
+    int sig = 0;
 
     nleft = sizeof(int);
     i = 0;
@@ -451,7 +451,7 @@ static void native_shutdown(int sig, siginfo_t *info, void *context)
 
 /**
  * register internal signal handler,
- * initalize local variables
+ * initialize local variables
  *
  * TODO: see register_interrupt
  */

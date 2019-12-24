@@ -4,7 +4,7 @@ PKG_VERSION=	# version of the package to use e.g. a git commit/ref
 
 .PHONY: all
 
-all: git-download
+all:
 	$(MAKE) -C $(CURDIR)/$(PKG_NAME)
 
 include $(RIOTBASE)/pkg/pkg.mk

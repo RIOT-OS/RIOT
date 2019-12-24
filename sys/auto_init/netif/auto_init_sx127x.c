@@ -21,7 +21,11 @@
 
 #include "log.h"
 #include "board.h"
+#ifdef MODULE_GNRC_LORAWAN
+#include "net/gnrc/netif/lorawan_base.h"
+#else
 #include "net/gnrc/netif/raw.h"
+#endif
 #include "net/gnrc.h"
 
 #include "sx127x.h"
@@ -30,7 +34,7 @@
 /**
  * @brief   Calculate the number of configured SX127x devices
  */
-#define SX127X_NUMOF        (sizeof(sx127x_params) / sizeof(sx127x_params_t))
+#define SX127X_NUMOF        ARRAY_SIZE(sx127x_params)
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
@@ -56,8 +60,16 @@ void auto_init_sx127x(void)
 #endif
 
         sx127x_setup(&sx127x_devs[i], &sx127x_params[i]);
+#ifdef MODULE_GNRC_LORAWAN
+        /* Currently only one lora device is supported */
+        assert(SX127X_NUMOF == 1);
+
+        gnrc_netif_lorawan_create(sx127x_stacks[i], SX127X_STACKSIZE, SX127X_PRIO,
+                                  "sx127x", (netdev_t *)&sx127x_devs[i]);
+#else
         gnrc_netif_raw_create(sx127x_stacks[i], SX127X_STACKSIZE, SX127X_PRIO,
                               "sx127x", (netdev_t *)&sx127x_devs[i]);
+#endif
     }
 }
 

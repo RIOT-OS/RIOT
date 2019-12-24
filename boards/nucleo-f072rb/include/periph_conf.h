@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f072rb STM32 Nucleo-F072RB
- * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F072RB
+ * @ingroup     boards_nucleo-f072rb
  * @{
  *
  * @file
@@ -73,7 +71,7 @@ static const timer_conf_t timer_config[] = {
 
 #define TIMER_0_ISR         isr_tim1_cc
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -117,7 +115,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_1_ISR          (isr_usart1)
 #define UART_2_ISR          (isr_usart3_8)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -157,7 +155,7 @@ static const pwm_conf_t pwm_config[] = {
     }
 };
 
-#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 /**
@@ -191,7 +189,10 @@ static const spi_conf_t spi_config[] = {
         .miso_pin = GPIO_PIN(PORT_A, 6),
         .sclk_pin = GPIO_PIN(PORT_A, 5),
         .cs_pin   = GPIO_PIN(PORT_A, 4),
-        .af       = GPIO_AF0,
+        .mosi_af  = GPIO_AF0,
+        .miso_af  = GPIO_AF0,
+        .sclk_af  = GPIO_AF0,
+        .cs_af    = GPIO_AF0,
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2
     },
@@ -201,13 +202,16 @@ static const spi_conf_t spi_config[] = {
         .miso_pin = GPIO_PIN(PORT_B, 14),
         .sclk_pin = GPIO_PIN(PORT_B, 13),
         .cs_pin   = GPIO_PIN(PORT_B, 12),
-        .af       = GPIO_AF0,
+        .mosi_af  = GPIO_AF0,
+        .miso_af  = GPIO_AF0,
+        .sclk_af  = GPIO_AF0,
+        .cs_af    = GPIO_AF0,
         .rccmask  = RCC_APB1ENR_SPI2EN,
         .apbbus   = APB1
     },
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -224,18 +228,6 @@ static const spi_conf_t spi_config[] = {
 }
 
 #define ADC_NUMOF           (6)
-/** @} */
-
-/**
- * @name RTC configuration
- * @{
- */
-/**
- * Nucleos with MB1136 C-02 or MB1136 C-03 -sticker on it have the required LSE
- * oscillator provided on the X2 slot.
- * See Nucleo User Manual UM1724 section 5.6.2.
- */
-#define RTC_NUMOF           (1U)
 /** @} */
 
 #ifdef __cplusplus

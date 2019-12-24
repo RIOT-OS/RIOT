@@ -6,6 +6,9 @@ ifeq ($(TOOLCHAIN), llvm)
   CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function
 endif
 
+INCLUDES += -I$(RIOTBASE)/pkg/tinydtls/include
+DIRS += $(RIOTBASE)/pkg/tinydtls/contrib
+
 ifneq (,$(filter tinydtls,$(USEMODULE)))
   INCLUDES += -I$(PKG_BUILDDIR)
   # Mandatory for tinyDTLS
@@ -14,7 +17,7 @@ ifneq (,$(filter tinydtls,$(USEMODULE)))
   # Dependencies partially under control of the App's requirements
 
   # The configuration for socket overrides Sock
-  ifeq (,$(filter WITH_RIOT_SOCKETS,$(CFLAGS)))
+  ifeq (,$(filter posix_sockets,$(USEMODULE)))
     CFLAGS += -DWITH_RIOT_GNRC
   endif
 
@@ -24,6 +27,13 @@ ifneq (,$(filter tinydtls,$(USEMODULE)))
   ifeq (,$(filter -DDTLS_PSK,$(CFLAGS)))
     ifeq (,$(filter -DDTLS_ECC,$(CFLAGS)))
       CFLAGS += -DDTLS_PSK
+    endif
+  endif
+
+  # Enable debug when using tinydtls_sock_dtls
+  ifneq (,$(filter -DDTLS_DEBUG,$(CFLAGS)))
+    ifeq (,$(TINYDTLS_LOG))
+      CFLAGS += -DTINYDTLS_DEBUG
     endif
   endif
 

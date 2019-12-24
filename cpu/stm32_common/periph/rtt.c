@@ -49,21 +49,21 @@
 #endif
 
 
-#if !defined(CPU_FAM_STM32F4)
-#define CLOCK_SRC_REG       RCC->CCIPR
-#define CLOCK_SRC_MASK      RCC_CCIPR_LPTIM1SEL
-#if CLOCK_LSE
-#define CLOCK_SRC_CFG       (RCC_CCIPR_LPTIM1SEL_1 | RCC_CCIPR_LPTIM1SEL_0)
-#else
-#define CLOCK_SRC_CFG       (RCC_CCIPR_LPTIM1SEL_0)
-#endif
-#else
+#if defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7)
 #define CLOCK_SRC_REG       RCC->DCKCFGR2
 #define CLOCK_SRC_MASK      RCC_DCKCFGR2_LPTIM1SEL
 #if CLOCK_LSE
 #define CLOCK_SRC_CFG       (RCC_DCKCFGR2_LPTIM1SEL_1 | RCC_DCKCFGR2_LPTIM1SEL_0)
 #else
 #define CLOCK_SRC_CFG       (RCC_DCKCFGR2_LPTIM1SEL_0)
+#endif
+#else
+#define CLOCK_SRC_REG       RCC->CCIPR
+#define CLOCK_SRC_MASK      RCC_CCIPR_LPTIM1SEL
+#if CLOCK_LSE
+#define CLOCK_SRC_CFG       (RCC_CCIPR_LPTIM1SEL_1 | RCC_CCIPR_LPTIM1SEL_0)
+#else
+#define CLOCK_SRC_CFG       (RCC_CCIPR_LPTIM1SEL_0)
 #endif
 #endif
 
@@ -95,14 +95,20 @@ void rtt_init(void)
     /* enable timer */
     LPTIM1->CR = LPTIM_CR_ENABLE;
     /* set auto-reload value (timer needs to be enabled for this) */
+    LPTIM1->ICR = LPTIM_ICR_ARROKCF;
     LPTIM1->ARR = RTT_MAX_VALUE;
+    while (!(LPTIM1->ISR & LPTIM_ISR_ARROK)) {}
     /* start the timer */
     LPTIM1->CR |= LPTIM_CR_CNTSTRT;
 }
 
 uint32_t rtt_get_counter(void)
 {
-    return (uint32_t)LPTIM1->CNT;
+    uint32_t cnt;
+    do {
+        cnt = LPTIM1->CNT;
+    } while (cnt != LPTIM1->CNT);
+    return cnt;
 }
 
 void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
@@ -125,9 +131,11 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     assert(cb && !(alarm & ~RTT_MAX_VALUE));
 
     unsigned is = irq_disable();
+    LPTIM1->ICR = LPTIM_ICR_CMPOKCF;
     to_cb  = cb;
     to_arg = arg;
     LPTIM1->CMP = (uint16_t)alarm;
+    while (!(LPTIM1->ISR & LPTIM_ISR_CMPOK)) {}
     irq_restore(is);
 }
 

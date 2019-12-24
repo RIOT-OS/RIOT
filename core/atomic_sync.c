@@ -29,7 +29,17 @@
 #include <string.h>
 #include "irq.h"
 
-#if !defined(__llvm__) && !defined(__clang__)
+/* use gcc/clang implementation if available */
+#if defined(__GNUC__) \
+    && (__GNUC__ > 4 || \
+       (__GNUC__ == 4 && (__GNUC_MINOR__ > 7 || \
+       (__GNUC_MINOR__ == 7 && __GNUC_PATCHLEVEL__ > 0)))) \
+    || defined(__llvm__) || defined(__clang__)
+#define HAVE_C11_SYNC
+#endif
+
+#if !defined(HAVE_C11_SYNC)
+
 /* GCC documentation refers to the types as I1, I2, I4, I8, I16 */
 typedef uint8_t  I1;
 typedef uint16_t I2;

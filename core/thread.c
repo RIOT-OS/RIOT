@@ -38,21 +38,64 @@ volatile thread_t *thread_get(kernel_pid_t pid)
     return NULL;
 }
 
-int thread_getstatus(kernel_pid_t pid)
+thread_status_t thread_getstatus(kernel_pid_t pid)
 {
-    volatile thread_t *t = thread_get(pid);
-    return t ? (int)t->status : (int)STATUS_NOT_FOUND;
+    volatile thread_t *thread = thread_get(pid);
+    return thread ? thread->status : STATUS_NOT_FOUND;
 }
 
 const char *thread_getname(kernel_pid_t pid)
 {
 #ifdef DEVELHELP
-    volatile thread_t *t = thread_get(pid);
-    return t ? t->name : NULL;
+    volatile thread_t *thread = thread_get(pid);
+    return thread ? thread->name : NULL;
 #else
     (void)pid;
     return NULL;
 #endif
+}
+
+void thread_zombify(void)
+{
+    if (irq_is_in()) {
+        return;
+    }
+
+    unsigned state = irq_disable();
+    sched_set_status((thread_t *)sched_active_thread, STATUS_ZOMBIE);
+    irq_restore(state);
+    thread_yield_higher();
+
+    /* this line should never be reached */
+    UNREACHABLE();
+}
+
+int thread_kill_zombie(kernel_pid_t pid)
+{
+    DEBUG("thread_kill: Trying to kill PID %" PRIkernel_pid "...\n", pid);
+    unsigned state = irq_disable();
+
+    int result = (int)STATUS_NOT_FOUND;
+
+    thread_t *thread = (thread_t *) thread_get(pid);
+
+    if (!thread) {
+        DEBUG("thread_kill: Thread does not exist!\n");
+    }
+    else if (thread->status == STATUS_ZOMBIE) {
+        DEBUG("thread_kill: Thread is a zombie.\n");
+
+        sched_threads[pid] = NULL;
+        sched_num_threads--;
+        sched_set_status(thread, STATUS_STOPPED);
+
+        result =  1;
+    }
+    else {
+        DEBUG("thread_kill: Thread is not a zombie!\n");
+    }
+    irq_restore(state);
+    return result;
 }
 
 void thread_sleep(void)
@@ -73,18 +116,18 @@ int thread_wakeup(kernel_pid_t pid)
 
     unsigned old_state = irq_disable();
 
-    thread_t *other_thread = (thread_t *) thread_get(pid);
+    thread_t *thread = (thread_t *) thread_get(pid);
 
-    if (!other_thread) {
+    if (!thread) {
         DEBUG("thread_wakeup: Thread does not exist!\n");
     }
-    else if (other_thread->status == STATUS_SLEEPING) {
+    else if (thread->status == STATUS_SLEEPING) {
         DEBUG("thread_wakeup: Thread is sleeping.\n");
 
-        sched_set_status(other_thread, STATUS_RUNNING);
+        sched_set_status(thread, STATUS_RUNNING);
 
         irq_restore(old_state);
-        sched_switch(other_thread->priority);
+        sched_switch(thread->priority);
 
         return 1;
     }
@@ -143,7 +186,7 @@ uintptr_t thread_measure_stack_free(char *stack)
 }
 #endif
 
-kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags, thread_task_func_t function, void *arg, const char *name)
+kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority, int flags, thread_task_func_t function, void *arg, const char *name)
 {
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;
@@ -173,7 +216,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         DEBUG("thread_create: stacksize is too small!\n");
     }
     /* allocate our thread control block at the top of our stackspace */
-    thread_t *cb = (thread_t *) (stack + stacksize);
+    thread_t *thread = (thread_t *) (stack + stacksize);
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
     if (flags & THREAD_CREATE_STACKTEST) {
@@ -209,41 +252,41 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         return -EOVERFLOW;
     }
 
-    sched_threads[pid] = cb;
+    sched_threads[pid] = thread;
 
-    cb->pid = pid;
-    cb->sp = thread_stack_init(function, arg, stack, stacksize);
+    thread->pid = pid;
+    thread->sp = thread_stack_init(function, arg, stack, stacksize);
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
-    cb->stack_start = stack;
+    thread->stack_start = stack;
 #endif
 
 #ifdef DEVELHELP
-    cb->stack_size = total_stacksize;
-    cb->name = name;
+    thread->stack_size = total_stacksize;
+    thread->name = name;
 #endif
 
-    cb->priority = priority;
-    cb->status = STATUS_STOPPED;
+    thread->priority = priority;
+    thread->status = STATUS_STOPPED;
 
-    cb->rq_entry.next = NULL;
+    thread->rq_entry.next = NULL;
 
 #ifdef MODULE_CORE_MSG
-    cb->wait_data = NULL;
-    cb->msg_waiters.next = NULL;
-    cib_init(&(cb->msg_queue), 0);
-    cb->msg_array = NULL;
+    thread->wait_data = NULL;
+    thread->msg_waiters.next = NULL;
+    cib_init(&(thread->msg_queue), 0);
+    thread->msg_array = NULL;
 #endif
 
     sched_num_threads++;
 
-    DEBUG("Created thread %s. PID: %" PRIkernel_pid ". Priority: %u.\n", name, cb->pid, priority);
+    DEBUG("Created thread %s. PID: %" PRIkernel_pid ". Priority: %u.\n", name, thread->pid, priority);
 
     if (flags & THREAD_CREATE_SLEEPING) {
-        sched_set_status(cb, STATUS_SLEEPING);
+        sched_set_status(thread, STATUS_SLEEPING);
     }
     else {
-        sched_set_status(cb, STATUS_PENDING);
+        sched_set_status(thread, STATUS_PENDING);
 
         if (!(flags & THREAD_CREATE_WOUT_YIELD)) {
             irq_restore(state);

@@ -33,6 +33,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
 
@@ -77,28 +78,7 @@ typedef struct
 
 } _i2c_bus_t;
 
-static _i2c_bus_t _i2c_bus[] =
-{
-  #if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
-  {
-    .speed = I2C0_SPEED,
-    .sda   = I2C0_SDA,
-    .scl   = I2C0_SCL,
-    .lock  = MUTEX_INIT
-  },
-  #endif
-  #if defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
-  {
-    .speed = I2C1_SPEED,
-    .sda   = I2C1_SDA,
-    .scl   = I2C1_SCL,
-    .lock  = MUTEX_INIT
-  },
-  #endif
-};
-
-/* the number of I2C bus devices used */
-const unsigned i2c_bus_num = sizeof(_i2c_bus) / sizeof(_i2c_bus[0]);
+static _i2c_bus_t _i2c_bus[I2C_NUMOF] = {};
 
 /* to ensure that I2C is always optimized with -O2 to use the defined delays */
 #pragma GCC optimize ("O2")
@@ -140,12 +120,18 @@ static void _i2c_clear (_i2c_bus_t* bus);
 
 void i2c_init(i2c_t dev)
 {
-    CHECK_PARAM (dev < i2c_bus_num)
+    CHECK_PARAM (dev < I2C_NUMOF)
 
-    if (_i2c_bus[dev].speed == I2C_SPEED_HIGH) {
+    if (i2c_config[dev].speed == I2C_SPEED_HIGH) {
         LOG_TAG_INFO("i2c", "I2C_SPEED_HIGH is not supported\n");
         return;
     }
+
+    mutex_init(&_i2c_bus[dev].lock);
+
+    _i2c_bus[dev].scl   = i2c_config[dev].scl;
+    _i2c_bus[dev].sda   = i2c_config[dev].sda;
+    _i2c_bus[dev].speed = i2c_config[dev].speed;
 
     _i2c_bus[dev].dev     = dev;
     _i2c_bus[dev].scl_bit = BIT(_i2c_bus[dev].scl); /* store bit mask for faster access */
@@ -195,18 +181,17 @@ void i2c_init(i2c_t dev)
 
 int i2c_acquire(i2c_t dev)
 {
-    CHECK_PARAM_RET (dev < i2c_bus_num, -1)
+    CHECK_PARAM_RET (dev < I2C_NUMOF, -1)
 
     mutex_lock(&_i2c_bus[dev].lock);
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
-    CHECK_PARAM_RET (dev < i2c_bus_num, -1)
+    assert(dev < I2C_NUMOF);
 
     mutex_unlock(&_i2c_bus[dev].lock);
-    return 0;
 }
 
 int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t flags)
@@ -214,7 +199,7 @@ int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, 
     DEBUG ("%s: dev=%u addr=%02x data=%p len=%d flags=%01x\n",
            __func__, dev, addr, data, len, flags);
 
-    CHECK_PARAM_RET (dev < i2c_bus_num, -EINVAL);
+    CHECK_PARAM_RET (dev < I2C_NUMOF, -EINVAL);
     CHECK_PARAM_RET (len > 0, -EINVAL);
     CHECK_PARAM_RET (data != NULL, -EINVAL);
 
@@ -235,12 +220,12 @@ int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, 
             /* prepare 10 bit address bytes */
             uint8_t addr1 = 0xf0 | (addr & 0x0300) >> 7 | I2C_READ;
             uint8_t addr2 = addr & 0xff;
-            /* send address bytes wit read flag */
+            /* send address bytes with read flag */
             if ((res = _i2c_write_byte (bus, addr1)) != 0 ||
                 (res = _i2c_write_byte (bus, addr2)) != 0) {
                 /* abort transfer */
                 _i2c_abort (bus, __func__);
-                return res;
+                return -ENXIO;
             }
         }
         else {
@@ -248,7 +233,7 @@ int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, 
             if ((res = _i2c_write_byte (bus, (addr << 1 | I2C_READ))) != 0) {
                 /* abort transfer */
                 _i2c_abort (bus, __func__);
-                return res;
+                return -ENXIO;
             }
         }
     }
@@ -275,7 +260,7 @@ int /* IRAM */ i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_
     DEBUG ("%s: dev=%u addr=%02x data=%p len=%d flags=%01x\n",
            __func__, dev, addr, data, len, flags);
 
-    CHECK_PARAM_RET (dev < i2c_bus_num, -EINVAL);
+    CHECK_PARAM_RET (dev < I2C_NUMOF, -EINVAL);
     CHECK_PARAM_RET (len > 0, -EINVAL);
     CHECK_PARAM_RET (data != NULL, -EINVAL);
 
@@ -301,7 +286,7 @@ int /* IRAM */ i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_
                 (res = _i2c_write_byte (bus, addr2)) != 0) {
                 /* abort transfer */
                 _i2c_abort (bus, __func__);
-                return res;
+                return -ENXIO;
             }
         }
         else {
@@ -309,7 +294,7 @@ int /* IRAM */ i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_
             if ((res = _i2c_write_byte (bus, addr << 1)) != 0) {
                 /* abort transfer */
                 _i2c_abort (bus, __func__);
-                return res;
+                return -ENXIO;
             }
         }
     }
@@ -487,7 +472,7 @@ static /* IRAM */ int _i2c_start_cond(_i2c_bus_t* bus)
         /* SDA = passive HIGH (floating and pulled-up) */
         _i2c_sda_high (bus);
 
-        /* t_VD;DAT not neccessary */
+        /* t_VD;DAT not necessary */
         /* _i2c_delay (bus); */
 
         /* SCL = passive HIGH (floating and pulled-up) */
@@ -703,7 +688,7 @@ static /* IRAM */ int _i2c_read_byte(_i2c_bus_t* bus, uint8_t *byte, bool ack)
         if (res != 0) {
             return res;
         }
-        *byte = (*byte << 1) | bit;
+        *byte = (*byte << 1) | (bit ? 1 : 0);
     }
 
     /* write acknowledgement flag */
@@ -714,9 +699,9 @@ static /* IRAM */ int _i2c_read_byte(_i2c_bus_t* bus, uint8_t *byte, bool ack)
 
 void i2c_print_config(void)
 {
-    for (unsigned bus = 0; bus < i2c_bus_num; bus++) {
-        ets_printf("\tI2C_DEV(%d)\tscl=%d sda=%d\n",
-                   bus, _i2c_bus[bus].scl, _i2c_bus[bus].sda);
+    for (unsigned dev = 0; dev < I2C_NUMOF; dev++) {
+        printf("\tI2C_DEV(%u)\tscl=%d sda=%d\n",
+               dev, i2c_config[dev].scl, i2c_config[dev].sda);
     }
 }
 

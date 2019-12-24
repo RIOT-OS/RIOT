@@ -63,9 +63,9 @@ extern "C" {
 #define CIPHER_ERR_INVALID_LENGTH     -4
 #define CIPHER_ERR_ENC_FAILED         -5
 #define CIPHER_ERR_DEC_FAILED         -6
-/** Is returned by the cipher_init functions, if the coresponding alogirithm has not been included in the build */
+/** Is returned by the cipher_init functions, if the corresponding alogirithm has not been included in the build */
 #define CIPHER_ERR_BAD_CONTEXT_SIZE    0
-/**  Returned by cipher_init upon succesful initialization of a cipher. */
+/**  Returned by cipher_init upon successful initialization of a cipher. */
 #define CIPHER_INIT_SUCCESS            1
 
 /**
@@ -148,7 +148,8 @@ int cipher_init(cipher_t *cipher, cipher_id_t cipher_id, const uint8_t *key,
  *                   cipher, which is always 1 in case of success
  * @return           A negative value for an error
  */
-int cipher_encrypt(const cipher_t *cipher, const uint8_t *input, uint8_t *output);
+int cipher_encrypt(const cipher_t *cipher, const uint8_t *input,
+                   uint8_t *output);
 
 
 /**
@@ -164,7 +165,8 @@ int cipher_encrypt(const cipher_t *cipher, const uint8_t *input, uint8_t *output
  *                   cipher, which is always 1 in case of success
  * @return           A negative value for an error
  */
-int cipher_decrypt(const cipher_t *cipher, const uint8_t *input, uint8_t *output);
+int cipher_decrypt(const cipher_t *cipher, const uint8_t *input,
+                   uint8_t *output);
 
 
 /**

@@ -26,6 +26,7 @@
 #include "saul/periph.h"
 #include "gpio_params.h"
 #include "periph/gpio.h"
+#include "kernel_defines.h"
 
 /**
  * @brief   Define the number of configured sensors
@@ -37,7 +38,7 @@ void auto_init_gpio(void)
     LOG_DEBUG("[auto_init_saul] no SAUL GPIO configured!\n");
 }
 #else
-#define SAUL_GPIO_NUMOF (sizeof(saul_gpio_params)/sizeof(saul_gpio_params[0]))
+#define SAUL_GPIO_NUMOF ARRAY_SIZE(saul_gpio_params)
 
 
 /**

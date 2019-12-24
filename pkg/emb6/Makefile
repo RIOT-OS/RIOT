@@ -18,11 +18,11 @@ EMB6_SUBMODULES:=$(filter-out emb6_contrib \
 
 .PHONY: all
 
-all: git-download $(EMB6_SUBMODULES)
+all: $(EMB6_SUBMODULES)
 	"$(MAKE)" -C $(PKG_BUILDDIR)
 
 # Rule for all submodules
-emb6_%: git-download
+emb6_%:
 	"$(MAKE)" -C $(dir $(shell grep -lR "MODULE.*=.*\<$@\>" $(PKG_BUILDDIR)))
 
 include $(RIOTBASE)/pkg/pkg.mk

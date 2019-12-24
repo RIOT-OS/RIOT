@@ -37,9 +37,9 @@
 static msg_t _eventloop_msg_queue[TCP_EVENTLOOP_MSG_QUEUE_SIZE];
 
 /**
- * @brief Send function, pass paket down the network stack.
+ * @brief Send function, pass packet down the network stack.
  *
- * @param[in] pkt   Paket to send.
+ * @param[in] pkt   Packet to send.
  *
  * @returns   Zero on success.
  *            Negative value on error.
@@ -86,13 +86,13 @@ static int _send(gnrc_pktsnip_t *pkt)
 /**
  * @brief Receive function, receive packet from network layer.
  *
- * @param[in] pkt   Incomming paket.
+ * @param[in] pkt   Incoming packet.
  *
  * @returns   Zero on success.
  *            Negative value on error.
- *            -EACCES if write access to packet was not aquired.
+ *            -EACCES if write access to packet was not acquired.
  *            -ERANGE if segment offset value is less than 5.
- *            -ENOMSG if paket couldn't be marked.
+ *            -ENOMSG if packet couldn't be marked.
  *            -EINVAL if checksum was invalid.
  *            -ENOTCONN if no TCB is interested in @p pkt.
  */
@@ -136,6 +136,12 @@ static int _receive(gnrc_pktsnip_t *pkt)
         return 0;
     }
 
+    if (tcp->size < sizeof(tcp_hdr_t)) {
+        DEBUG("gnrc_tcp_eventloop.c : _receive() : packet is too short\n");
+        gnrc_pktbuf_release(pkt);
+        return -ERANGE;
+    }
+
     /* Extract control bits, src and dst ports and check if SYN is set (not SYN+ACK) */
     hdr = (tcp_hdr_t *)tcp->data;
     ctl = byteorder_ntohs(hdr->off_ctl);
@@ -162,6 +168,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
             return -ENOMSG;
         }
         pkt->type = GNRC_NETTYPE_UNDEF;
+        hdr = (tcp_hdr_t *)tcp->data;
     }
 
     /* Validate checksum */
@@ -176,7 +183,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
     tcb = _list_tcb_head;
     while (tcb) {
 #ifdef MODULE_GNRC_IPV6
-        /* Check if current TCB is fitting for the incomming packet */
+        /* Check if current TCB is fitting for the incoming packet */
         if (ip->type == GNRC_NETTYPE_IPV6 && tcb->address_family == AF_INET6) {
             /* If SYN is set, a connection is listening on that port ... */
             ipv6_addr_t *tmp_addr = NULL;
@@ -199,7 +206,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
             }
         }
 #else
-        /* Supress compiler warnings if TCP is build without network layer */
+        /* Suppress compiler warnings if TCP is built without network layer */
         (void) syn;
         (void) src;
         (void) dst;
@@ -217,8 +224,12 @@ static int _receive(gnrc_pktsnip_t *pkt)
         DEBUG("gnrc_tcp_eventloop.c : _receive() : Can't find fitting tcb\n");
         if ((ctl & MSK_RST) != MSK_RST) {
             _pkt_build_reset_from_pkt(&reset, pkt);
-            gnrc_netapi_send(gnrc_tcp_pid, reset);
+            if (gnrc_netapi_send(gnrc_tcp_pid, reset) < 1) {
+                DEBUG("gnrc_tcp_eventloop.c : _receive() : unable to send reset packet\n");
+                gnrc_pktbuf_release(reset);
+            }
         }
+        gnrc_pktbuf_release(pkt);
         return -ENOTCONN;
     }
     gnrc_pktbuf_release(pkt);

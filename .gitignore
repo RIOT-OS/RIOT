@@ -61,3 +61,16 @@ scan-build/
 
 # compile_and_test_for_boards default "results" directory
 results/
+
+# mypy artifacts
+.mypy_cache/
+
+# Clangd compile flags (language server)
+compile_commands.json
+compile_flags.txt
+
+# suit manifest keys
+keys/
+
+# clangd language server
+.clangd/

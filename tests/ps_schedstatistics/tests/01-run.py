@@ -10,25 +10,25 @@ import sys
 from testrunner import run
 
 PS_EXPECTED = (
-    ('\tpid | name                 | state    Q | pri | stack  ( used) | '
-     'base addr  | current     | runtime  | switches'),
-    ('\t  - | isr_stack            | -        - |   - | \d+  ( -?\d+) | '
-     '0x\d+ | 0x\d+'),
-    ('\t  1 | idle                 | pending  Q |  15 | \d+  ( -?\d+) | '
-     '0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
-    ('\t  2 | main                 | running  Q |   7 | \d+  ( -?\d+) | '
-     '0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
-    ('\t  3 | thread               | bl rx    _ |   6 | \d+  ( -?\d+) | '
-     '0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
-    ('\t  4 | thread               | bl rx    _ |   6 | \d+  ( -?\d+) | '
-     '0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
-    ('\t  5 | thread               | bl rx    _ |   6 | \d+  ( -?\d+) | '
-     '0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
-    ('\t  6 | thread               | bl mutex _ |   6 | \d+  ( -?\d+) | '
-     '0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
-    ('\t  7 | thread               | bl rx    _ |   6 | \d+  ( -?\d+) | '
-     '0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
-    ('\t    | SUM                  |            |     | \d+  (\d+)')
+    (r'\tpid | name                 | state    Q | pri | stack  \( used\) | '
+     r'base addr  | current     | runtime  | switches'),
+    (r'\t  - | isr_stack            | -        - |   - | \d+  \( -?\d+\) | '
+     r'0x\d+ | 0x\d+'),
+    (r'\t  1 | idle                 | pending  Q |  15 | \d+  \( -?\d+\) | '
+     r'0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
+    (r'\t  2 | main                 | running  Q |   7 | \d+  \( -?\d+\) | '
+     r'0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
+    (r'\t  3 | thread               | bl rx    _ |   6 | \d+  \( -?\d+\) | '
+     r'0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
+    (r'\t  4 | thread               | bl rx    _ |   6 | \d+  \( -?\d+\) | '
+     r'0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
+    (r'\t  5 | thread               | bl rx    _ |   6 | \d+  \( -?\d+\) | '
+     r'0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
+    (r'\t  6 | thread               | bl mutex _ |   6 | \d+  \( -?\d+\) | '
+     r'0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
+    (r'\t  7 | thread               | bl rx    _ |   6 | \d+  \( -?\d+\) | '
+     r'0x\d+ | 0x\d+  | \d+\.\d+% |      \d+'),
+    (r'\t    | SUM                  |            |     | \d+  \(\d+\)')
 )
 
 
@@ -40,7 +40,7 @@ def _check_startup(child):
 
 def _check_help(child):
     child.sendline('')
-    child.expect('>')
+    child.expect_exact('>')
     child.sendline('help')
     child.expect_exact('Command              Description')
     child.expect_exact('---------------------------------------')
@@ -53,6 +53,8 @@ def _check_ps(child):
     child.sendline('ps')
     for line in PS_EXPECTED:
         child.expect(line)
+    # Wait for all lines of the ps output to be displayed
+    child.expect_exact('>')
 
 
 def testfunc(child):

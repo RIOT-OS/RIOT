@@ -53,7 +53,8 @@ but not limited to:
 * a preemptive, tickless scheduler with priorities
 * flexible memory management
 * high resolution, long-term timers
-* support 100+ boards based on AVR, MSP430, ESP8266, MIPS, ARM7 and ARM Cortex-M
+* support 100+ boards based on AVR, MSP430, ESP8266, ESP32, MIPS, RISC-V,
+  ARM7 and ARM Cortex-M
 * the native port allows to run RIOT as-is on Linux, BSD, and MacOS. Multiple
   instances of RIOT running on a single machine can also be interconnected via
   a simple virtual Ethernet bridge

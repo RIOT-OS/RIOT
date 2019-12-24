@@ -64,7 +64,7 @@ extern const uint32_t _gpio_to_iomux_reg[];
  * @brief   Set the usage type of the pin
  * @param   pin     GPIO pin
  * @param   usage   GPIO pin usage type
- * @return  0 on succes
+ * @return  0 on success
  *         -1 on error
  */
 int gpio_set_pin_usage(gpio_t pin, gpio_pin_usage_t usage);
@@ -72,7 +72,7 @@ int gpio_set_pin_usage(gpio_t pin, gpio_pin_usage_t usage);
 /**
  * @brief   Get the usage type of the pin
  * @param   pin     GPIO pin
- * @return  GPIO pin usage type on succes
+ * @return  GPIO pin usage type on success
  *          _NOT_EXIST on error
  */
 gpio_pin_usage_t gpio_get_pin_usage(gpio_t pin);
@@ -80,7 +80,7 @@ gpio_pin_usage_t gpio_get_pin_usage(gpio_t pin);
 /**
  * @brief   Get the usage type of the pin as string
  * @param   pin     GPIO pin
- * @return  GPIO pin usage type string on succes
+ * @return  GPIO pin usage type string on success
  *          _NOT_EXIST on error
  */
 const char* gpio_get_pin_usage_str(gpio_t pin);

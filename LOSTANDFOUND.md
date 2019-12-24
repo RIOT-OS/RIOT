@@ -40,6 +40,43 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### sys/ubjson [868d37708bb674739ab4983441d6df904dd5a25f]
+Author(s):
+- René Kijewski <rene.kijewski@fu-berlin.de>
+
+Reasons for removal:
+- Unsafe code.
+- Did not comply with RIOT standards.
+- More standard alternatives available (such as CBOR).
+
+### boards/jiminy-mega256rfr2 [232aed3e18118624b862d36bfec7cd1c21ca2d26]
+Author:
+- Josua Arndt <jarndt@ias.rwth-aachen.de>
+- Steffen Robertz <steffen.robertz@rwth-aachen.de>
+
+Reasons for removal:
+- The board is a custom design at the RWTH Aachen, so only two persons have
+  access to the hardware
+- It was unmaintained for several month now
+- Various refactoring PRs affected the ATmega CPU family have not been tested,
+  it is unclear if the board is actually usable with RIOT
+
+### cpu/mips32r2_generic [a2bcd7539ce1931b7aec0077ea71dadd62c96edd]
+Author:
+- Neil Jones <neil.jones@imgtec.com>
+
+- No boards use this CPU (the only one was mips-malta).
+- (Same reasons as mips-malta)
+
+### boards/mips-malta [ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7]
+Author:
+- Neil Jones <neil.jones@imgtec.com>
+
+Reasons for removal:
+- UART input not supported.
+- Hardware not available for testing and not available for purchase either.
+- Not actively maintained / broken for some time.
+
 ### boards/pca10000 [9447cb303426d7c6348bb84999f88bf929cd6263]
 Author(s):
 - Christian Kühling <kuehling@zedat.fu-berlin.de>
@@ -100,3 +137,14 @@ Author(s):
 Reason for removal:
 - code broken and excluded from all tests for a long time
 - no maintainer available
+
+### gnrc_pktbuf_duplicate_upto() [b83430aa625a1d42f11f9badf5e5cfbb8efacd99]
+Author(s):
+- Takuo Yonezawa <yonezawa.t2@gmail.com>
+- Martine S. Lenders <m.lenders@fu-berlin.de>
+
+Reason for removal:
+- broke the abstraction of `gnrc_pktbuf`
+- its only user within the RIOT code base `gnrc_ipv6_ext` was reworked in
+  f671a87fe2c539c3aecd595ae03fa4f6f209d042 so it is not needed anymore.
+- the function was deprecated in f2760c033c5f332be076b25aa212aca4007c3d65

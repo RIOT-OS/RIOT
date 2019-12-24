@@ -247,7 +247,7 @@ static int _nrfble_init(netdev_t *dev)
     NRF_RADIO->RXADDRESSES = 0x01UL;
     /* load driver specific configuration */
     NRF_RADIO->MODE = CONF_MODE;
-    /* configure data fields and packet length whitening and endianess */
+    /* configure data fields and packet length whitening and endianness */
     NRF_RADIO->PCNF0 = ((CONF_S1 << RADIO_PCNF0_S1LEN_Pos) |
                         (CONF_S0 << RADIO_PCNF0_S0LEN_Pos) |
                         (CONF_LEN << RADIO_PCNF0_LFLEN_Pos));

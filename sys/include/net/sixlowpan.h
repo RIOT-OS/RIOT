@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief   6LoWPAN dispatch type and helper function definitons.
+ * @brief   6LoWPAN dispatch type and helper function definitions.
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -60,6 +60,27 @@ extern "C" {
  *          </a>
  */
 #define SIXLOWPAN_IPHC1_DISP        (0x60)
+
+/**
+ * @brief   Dispatch mask for 6LoWPAN selective fragment recovery
+ * @see [draft-ietf-6lo-fragment-recovery-05,
+ *      section 5](https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-05#section-5)
+ */
+#define SIXLOWPAN_SFR_DISP_MASK         (0xfe)
+
+/**
+ * @brief   Dispatch for 6LoWPAN recoverable fragment
+ * @see [draft-ietf-6lo-fragment-recovery-05, section
+ *      5.1](https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-05#section-5.1)
+ */
+#define SIXLOWPAN_SFR_RFRAG_DISP        (0xe8)
+
+/**
+ * @brief   Dispatch for 6LoWPAN recoverable fragment acknowledgment
+ * @see [draft-ietf-6lo-fragment-recovery-05, section
+ *      5.2](https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-05#section-5.2)
+ */
+#define SIXLOWPAN_SFR_ACK_DISP          (0xea)
 
 /**
  * @brief   Checks if dispatch indicates that frame is not a 6LoWPAN (NALP) frame.
@@ -125,7 +146,33 @@ typedef struct __attribute__((packed)) {
 } sixlowpan_frag_n_t;
 
 /**
- * @brief   Checks if a given fragment is a 6LoWPAN fragment.
+ * @brief   Checks if a given header is a 1st 6LoWPAN fragment header
+ *
+ * @param[in] hdr   A 6LoWPAN fragmentation header.
+ *
+ * @return  true, if given fragment is a 1st 6LoWPAN fragment.
+ * @return  false, if given fragment is not a 1st 6LoWPAN fragment.
+ */
+static inline bool sixlowpan_frag_1_is(sixlowpan_frag_t *hdr)
+{
+    return ((hdr->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) == SIXLOWPAN_FRAG_1_DISP);
+}
+
+/**
+ * @brief   Checks if a given header is a subsequent 6LoWPAN fragment header
+ *
+ * @param[in] hdr   A 6LoWPAN fragmentation header.
+ *
+ * @return  true, if given fragment is a subsequent 6LoWPAN fragment.
+ * @return  false, if given fragment is not a subsequent 6LoWPAN fragment.
+ */
+static inline bool sixlowpan_frag_n_is(sixlowpan_frag_t *hdr)
+{
+    return ((hdr->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) == SIXLOWPAN_FRAG_N_DISP);
+}
+
+/**
+ * @brief   Checks if a given header is a 6LoWPAN fragment header.
  *
  * @param[in] hdr   A 6LoWPAN fragmentation header.
  *
@@ -134,10 +181,48 @@ typedef struct __attribute__((packed)) {
  */
 static inline bool sixlowpan_frag_is(sixlowpan_frag_t *hdr)
 {
-    return ((hdr->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) ==
-            SIXLOWPAN_FRAG_1_DISP) ||
-           ((hdr->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) ==
-            SIXLOWPAN_FRAG_N_DISP);
+    return sixlowpan_frag_1_is(hdr) || sixlowpan_frag_n_is(hdr);
+}
+
+/**
+ * @brief   Get datagram size from general 6LoWPAN fragment header
+ *
+ * @param[in] hdr   A general 6LoWPAN fragment header.
+ *
+ * @return  The datagram size for the 6LoWPAN fragment.
+ */
+static inline uint16_t sixlowpan_frag_datagram_size(sixlowpan_frag_t *hdr)
+{
+    return (byteorder_ntohs(hdr->disp_size) & SIXLOWPAN_FRAG_SIZE_MASK);
+}
+
+/**
+ * @brief   Get datagram tag from general 6LoWPAN fragment header
+ *
+ * @param[in] hdr   A general 6LoWPAN fragment header.
+ *
+ * @return  The datagram tag for the 6LoWPAN fragment.
+ */
+static inline uint16_t sixlowpan_frag_datagram_tag(sixlowpan_frag_t *hdr)
+{
+    return byteorder_ntohs(hdr->tag);
+}
+
+/**
+ * @brief   Get fragment offset from a subsequent 6LoWPAN fragment header
+ *
+ * @param[in] hdr   A subsequent 6LoWPAN fragment header.
+ *
+ * @return  The offset of the 6LoWPAN fragment.
+ */
+static inline uint16_t sixlowpan_frag_offset(sixlowpan_frag_n_t *hdr)
+{
+    /* https://tools.ietf.org/html/rfc4944#section-5.3:
+     * datagram_offset:  This field is present only in the second and
+     *    subsequent link fragments and SHALL specify the offset, in
+     *    increments of 8 octets, of the fragment from the beginning of the
+     *    payload datagram. [...] */
+    return (hdr->offset * 8U);
 }
 /** @} */
 
@@ -172,7 +257,7 @@ static inline bool sixlowpan_frag_is(sixlowpan_frag_t *hdr)
 #define SIXLOWPAN_IPHC1_HL          (0x03)
 
 /**
- * @brief   Flag for Context Identifier Extention (part of second byte
+ * @brief   Flag for Context Identifier Extension (part of second byte
  *          of LOWPAN_IPHC).
  * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
  *          RFC 6282, section 3.1.1
@@ -231,7 +316,7 @@ static inline bool sixlowpan_frag_is(sixlowpan_frag_t *hdr)
 #define SIXLOWPAN_IPHC_HDR_LEN      (2)
 
 /**
- * @brief   6LoWPAN context idendifier extension header length
+ * @brief   6LoWPAN context identifier extension header length
  */
 #define SIXLOWPAN_IPHC_CID_EXT_LEN  (1)
 

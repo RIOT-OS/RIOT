@@ -1,0 +1,8 @@
+/**
+ * @defgroup pkg_nanopb small Protocol Buffers library
+ * @ingroup  pkg
+ * @ingroup  sys
+ * @brief    Provides a protocol buffers library to RIOT
+ *
+ * @see      https://github.com/nanopb/nanopb
+ */

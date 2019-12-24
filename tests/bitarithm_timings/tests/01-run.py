@@ -12,9 +12,9 @@ from testrunner import run
 
 def testfunc(child):
     child.expect_exact("Start.")
-    child.expect('\+ bitarithm_msb: \d+ iterations per second')
-    child.expect('\+ bitarithm_lsb: \d+ iterations per second')
-    child.expect('\+ bitarithm_bits_set: \d+ iterations per second')
+    child.expect(r'\+ bitarithm_msb: \d+ iterations per second')
+    child.expect(r'\+ bitarithm_lsb: \d+ iterations per second')
+    child.expect(r'\+ bitarithm_bits_set: \d+ iterations per second')
     child.expect_exact("Done.")
 
 

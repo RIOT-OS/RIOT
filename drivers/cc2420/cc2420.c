@@ -131,9 +131,11 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const iolist_t *iolist)
     cc2420_strobe(dev, CC2420_STROBE_FLUSHTX);
     /* push packet length to TX FIFO */
     cc2420_fifo_write(dev, (uint8_t *)&pkt_len, 1);
-    /* push packet to TX FIFO */
+    /* push packet to TX FIFO, only if iol->iol_len > 0 */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
-        cc2420_fifo_write(dev, iol->iol_base, iol->iol_len);
+        if (iol->iol_len > 0) {
+            cc2420_fifo_write(dev, iol->iol_base, iol->iol_len);
+        }
     }
     DEBUG("cc2420: tx_prep: loaded %i byte into the TX FIFO\n", (int)pkt_len);
 

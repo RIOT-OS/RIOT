@@ -24,7 +24,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define SHT3X_NUM      (sizeof(sht3x_params) / sizeof(sht3x_params[0]))
+#define SHT3X_NUM      ARRAY_SIZE(sht3x_params)
 
 /**
  * @brief   Allocation of memory for device descriptors
@@ -39,7 +39,7 @@ static saul_reg_t saul_entries[SHT3X_NUM * 2];
 /**
  * @brief   Define the number of saul info
  */
-#define SHT3X_INFO_NUM (sizeof(sht3x_saul_info) / sizeof(sht3x_saul_info[0]))
+#define SHT3X_INFO_NUM ARRAY_SIZE(sht3x_saul_info)
 
 /**
  * @name    Reference the driver structs.

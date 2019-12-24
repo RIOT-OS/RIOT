@@ -27,6 +27,8 @@ void board_init(void)
     /* initialize the CPU */
     cpu_init();
 
+#ifndef RIOTBOOT
     /* perform common board initialization */
     board_common_init();
+#endif
 }

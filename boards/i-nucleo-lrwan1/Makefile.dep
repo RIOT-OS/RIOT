@@ -1,0 +1,5 @@
+FEATURES_REQUIRED += periph_lpuart
+
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += sx1272
+endif

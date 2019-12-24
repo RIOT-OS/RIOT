@@ -128,7 +128,7 @@ int main(void)
     puts("[START] event test application.\n");
 
     /* test creation of delayed claiming of a detached event queue */
-    event_queue_t dq;
+    event_queue_t dq = EVENT_QUEUE_INIT_DETACHED;
     printf("initializing detached event queue %p\n", (void *)&dq);
     event_queue_init_detached(&dq);
 

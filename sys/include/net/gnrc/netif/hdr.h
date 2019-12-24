@@ -295,6 +295,19 @@ static inline gnrc_netif_t *gnrc_netif_hdr_get_netif(const gnrc_netif_hdr_t *hdr
 }
 
 /**
+ * @brief   Convenience function to set the interface of an interface header,
+ *          given the network interface
+ *
+ * @param[out] hdr  Header to set the interface for.
+ * @param[in] netif Network interface to set for @p hdr.
+ */
+static inline void gnrc_netif_hdr_set_netif(gnrc_netif_hdr_t *hdr,
+                                            const gnrc_netif_t *netif)
+{
+    hdr->if_pid = (netif != NULL) ? netif->pid : KERNEL_PID_UNDEF;
+}
+
+/**
  * @brief   Outputs a generic interface header to stdout.
  *
  * @param[in] hdr   A generic interface header.

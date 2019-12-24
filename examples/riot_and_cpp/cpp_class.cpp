@@ -24,7 +24,7 @@
 
 cpp_class::cpp_class()
 {
-    printf("Instanciating Object [constructor called]\n");
+    printf("Instantiating Object [constructor called]\n");
     greet();
 }
 

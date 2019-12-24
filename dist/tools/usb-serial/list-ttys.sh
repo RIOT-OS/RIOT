@@ -28,5 +28,5 @@ for basedev in $(find /sys/bus/usb/devices/ -regex "/sys/bus/usb/devices/[0-9]+[
     serial=$(cat "${parent}/serial" 2>/dev/null)
     manuf=$(cat "${parent}/manufacturer" 2>/dev/null)
     product=$(cat "${parent}/product" 2>/dev/null)
-    echo "${parent}: ${manuf} ${product} serial: '${serial}', tty(s): ${ttys}"
+    echo "${parent}: ${manuf} ${product}, serial: '${serial}', tty(s): ${ttys}"
 done

@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define ADXL345_NUM    (sizeof(adxl345_params) / sizeof(adxl345_params[0]))
+#define ADXL345_NUM    ARRAY_SIZE(adxl345_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -45,7 +45,7 @@ static saul_reg_t saul_entries[ADXL345_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define ADXL345_INFO_NUM (sizeof(adxl345_saul_info) / sizeof(adxl345_saul_info[0]))
+#define ADXL345_INFO_NUM ARRAY_SIZE(adxl345_saul_info)
 
 /**
  * @brief   Reference the driver structs

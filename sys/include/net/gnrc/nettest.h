@@ -11,6 +11,10 @@
  * @ingroup     net_gnrc_netapi
  * @brief       This provides a framework to test the @ref net_gnrc_netapi IPC
  *              calls.
+ *
+ * @deprecated  This module was intended to be a test framework for GNRC but
+ *              it never got used. It has not been maintained for 3 years.
+ *              It will be removed after the 2020.07 release at the latest.
  * @{
  *
  * @file

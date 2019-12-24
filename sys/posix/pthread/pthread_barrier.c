@@ -76,7 +76,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
 
         while (1) {
             /* The mutex is reacquired before checking if we should continue,
-             * so that the waiting thread don't accidentially run before the
+             * so that the waiting thread don't accidentally run before the
              * wake up loop has ended. Otherwise the thread could run into the
              * the barrier again before `barrier->count` was reset. */
             mutex_lock(&barrier->mutex);

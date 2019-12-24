@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -36,45 +36,46 @@ extern "C" {
  */
 extern uint32_t irq_interrupt_nesting;
 
-#if defined(MODULE_ESP_SDK_INT_HANDLING) || defined(DOXYGEN)
 /**
- * @brief   Macros that have to be used on entry into and exit from an ISR
+ * @name   Macros to enter and exit an ISR
  *
- * NOTE: since they use a local variable they can be used only in same function
+ * Since all the stuff is done in `_frxt_int_enter` and `_frxt_int_exit`, these
+ * macros are doing nothing and are kept only for source code compatibility.
+ *
  * @{
  */
-/** Macro that has to be used at the entry point of an ISR */
-#define irq_isr_enter()    int _irq_state = irq_disable (); \
-                           irq_interrupt_nesting++;
-
-/** Macro that has to be used at the exit point of an ISR */
-#define irq_isr_exit()     if (irq_interrupt_nesting) \
-                               irq_interrupt_nesting--; \
-                           irq_restore (_irq_state); \
-                           if (sched_context_switch_request) \
-                               thread_yield();
-
-#else /* MODULE_ESP_SDK_INT_HANDLING */
-
-/* in non SDK task handling all the stuff is done in _frxt_int_enter and _frxt_int_exit */
-#define irq_isr_enter() /* int _irq_state = irq_disable (); \
-                           irq_interrupt_nesting++; */
-
-#define irq_isr_exit()  /* if (irq_interrupt_nesting) \
-                               irq_interrupt_nesting--; \
-                           irq_restore (_irq_state); */
-
-#endif /* MODULE_ESP_SDK_INT_HANDLING */
+#define irq_isr_enter()
+#define irq_isr_exit()
+/** @} */
 
 /**
- * @brief   Macros to enter and exit from critical region
+ * @name   Macros to enter and exit a critical region
  *
- * NOTE: since they use a local variable they can be used only in same function
+ * @note since they use a local variable they can be used only in same function
+ *
  * @{
  */
-#define critical_enter()   int _irq_state = irq_disable ()
+#define critical_enter()   int _irq_state = irq_disable()
 #define critical_exit()    irq_restore(_irq_state)
 /** @} */
+
+/**
+ * @name   Macros to enter and exit a critical region with state variable
+ * @{
+ */
+#define critical_enter_var(m)   m = irq_disable()
+#define critical_exit_var(m)    irq_restore(m)
+/** @} */
+
+/**
+ * @name    Software interrupt types
+ *
+ * These definitions are used to distinguish different types of software
+ * interrupts in software interrupt handler.
+ */
+#define ETS_SOFT_INT_NONE       0
+#define ETS_SOFT_INT_YIELD      1
+#define ETS_SOFT_INT_HDL_MAC    2
 
 #ifdef __cplusplus
 }

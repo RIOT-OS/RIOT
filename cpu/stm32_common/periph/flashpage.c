@@ -38,7 +38,6 @@
 #define CNTRL_REG              (FLASH->PECR)
 #define CNTRL_REG_LOCK         (FLASH_PECR_PELOCK)
 #define FLASH_CR_PER           (FLASH_PECR_ERASE | FLASH_PECR_PROG)
-#define FLASH_CR_PG            (FLASH_PECR_FPRG | FLASH_PECR_PROG)
 #define FLASHPAGE_DIV          (4U) /* write 4 bytes in one go */
 #else
 #if defined(CPU_FAM_STM32L4)
@@ -52,6 +51,7 @@
 
 extern void _lock(void);
 extern void _unlock(void);
+extern void _wait_for_pending_operations(void);
 
 static void _unlock_flash(void)
 {
@@ -69,17 +69,6 @@ static void _unlock_flash(void)
 #endif
 }
 
-static void _wait_for_pending_operations(void)
-{
-    DEBUG("[flashpage] waiting for any pending operation to finish\n");
-    while (FLASH->SR & FLASH_SR_BSY) {}
-
-    /* Clear 'end of operation' bit in status register */
-    if (FLASH->SR & FLASH_SR_EOP) {
-        FLASH->SR &= ~(FLASH_SR_EOP);
-    }
-}
-
 static void _erase_page(void *page_addr)
 {
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
@@ -87,7 +76,9 @@ static void _erase_page(void *page_addr)
     uint32_t *dst = page_addr;
 #else
     uint16_t *dst = page_addr;
-
+#endif
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32F3)
     uint32_t hsi_state = (RCC->CR & RCC_CR_HSION);
     /* the internal RC oscillator (HSI) must be enabled */
     stmclk_enable_hsi();
@@ -108,7 +99,6 @@ static void _erase_page(void *page_addr)
     *dst = (uint32_t)0;
 #elif defined(CPU_FAM_STM32L4)
     DEBUG("[flashpage] erase: setting the page address\n");
-    CNTRL_REG |= FLASH_CR_PER;
     uint8_t pn;
 #if FLASHPAGE_NUMOF <= 256
     pn = (uint8_t)flashpage_page(dst);
@@ -122,9 +112,10 @@ static void _erase_page(void *page_addr)
     }
     pn = (uint8_t)page;
 #endif
+    CNTRL_REG &= ~FLASH_CR_PNB;
     CNTRL_REG |= (uint32_t)(pn << FLASH_CR_PNB_Pos);
     CNTRL_REG |= FLASH_CR_STRT;
-#else /* CPU_FAM_STM32F0 || CPU_FAM_STM32F1 */
+#else /* CPU_FAM_STM32F0 || CPU_FAM_STM32F1 || CPU_FAM_STM32F3 */
     DEBUG("[flashpage] erase: setting the page address\n");
     FLASH->AR = (uint32_t)dst;
     /* trigger the page erase and wait for it to be finished */
@@ -141,8 +132,8 @@ static void _erase_page(void *page_addr)
     /* lock the flash module again */
     _lock();
 
-#if !(defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
-      defined(CPU_FAM_STM32L4))
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32F3)
     /* restore the HSI state */
     if (!hsi_state) {
         stmclk_disable_hsi();
@@ -173,7 +164,10 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
 #else
     uint16_t *dst = (uint16_t *)target_addr;
     const uint16_t *data_addr = data;
+#endif
 
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32F3)
     uint32_t hsi_state = (RCC->CR & RCC_CR_HSION);
     /* the internal RC oscillator (HSI) must be enabled */
     stmclk_enable_hsi();
@@ -182,8 +176,12 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     /* unlock the flash module */
     _unlock_flash();
 
+    /* make sure no flash operation is ongoing */
+    _wait_for_pending_operations();
+
     DEBUG("[flashpage_raw] write: now writing the data\n");
-#if !(defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1))
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4)
     /* set PG bit and program page to flash */
     CNTRL_REG |= FLASH_CR_PG;
 #endif
@@ -195,14 +193,17 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     }
 
     /* clear program bit again */
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4)
     CNTRL_REG &= ~(FLASH_CR_PG);
+#endif
     DEBUG("[flashpage_raw] write: done writing data\n");
 
     /* lock the flash module again */
     _lock();
 
-#if !(defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
-      defined(CPU_FAM_STM32L4))
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32F3)
     /* restore the HSI state */
     if (!hsi_state) {
         stmclk_disable_hsi();

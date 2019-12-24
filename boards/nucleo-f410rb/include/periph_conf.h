@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f410rb STM32 Nucleo-F410RB
- * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F410RB
+ * @ingroup     boards_nucleo-f410rb
  * @{
  *
  * @file
@@ -24,29 +22,11 @@
 #include "periph_cpu.h"
 #include "f4/cfg_clock_96_8_1.h"
 #include "cfg_i2c1_pb8_pb9.h"
+#include "cfg_timer_tim5.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name Timer configuration
- * @{
- */
-static const timer_conf_t timer_config[] = {
-    {
-        .dev      = TIM5,
-        .max      = 0xffffffff,
-        .rcc_mask = RCC_APB1ENR_TIM5EN,
-        .bus      = APB1,
-        .irqn     = TIM5_IRQn
-    }
-};
-
-#define TIMER_0_ISR         isr_tim5
-
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
-/** @} */
 
 /**
  * @name   UART configuration
@@ -106,7 +86,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_2_DMA_ISR      (isr_dma2_stream7)
 
 /* deduct number of defined UART interfaces */
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -140,13 +120,16 @@ static const spi_conf_t spi_config[] = {
         .miso_pin = GPIO_PIN(PORT_A, 6),
         .sclk_pin = GPIO_PIN(PORT_A, 5),
         .cs_pin   = GPIO_PIN(PORT_A, 4),
-        .af       = GPIO_AF5,
+        .mosi_af  = GPIO_AF5,
+        .miso_af  = GPIO_AF5,
+        .sclk_af  = GPIO_AF5,
+        .cs_af    = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**

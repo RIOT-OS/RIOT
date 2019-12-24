@@ -7,12 +7,21 @@ include ../Makefile.tests_common
 BOARD_WHITELIST += iotlab-a8-m3
 BOARD_WHITELIST += iotlab-m3
 BOARD_WHITELIST += samr21-xpro
+# Normally all boards using `kinetis/ldscripts/kinetis.ld` linkerscript
+BOARD_WHITELIST += frdm-kw41z
+BOARD_WHITELIST += frdm-k64f
+BOARD_WHITELIST += frdm-k22f
+BOARD_WHITELIST += mulle
+BOARD_WHITELIST += pba-d-01-kw2x
+BOARD_WHITELIST += teensy31
 # Boards using a bootloader and ROM_OFFSET by default
 BOARD_WHITELIST += arduino-mkr1000
 BOARD_WHITELIST += arduino-mkrfox1200
 BOARD_WHITELIST += arduino-mkrzero
 BOARD_WHITELIST += blackpill
+BOARD_WHITELIST += blackpill-128kib
 BOARD_WHITELIST += bluepill
+BOARD_WHITELIST += bluepill-128kib
 BOARD_WHITELIST += feather-m0
 BOARD_WHITELIST += opencm904
 BOARD_WHITELIST += spark-core
@@ -56,7 +65,7 @@ _test-elffile-overflow-runtest: $(BINFILE)
 
 # Test `ROM_OFFSET` is removed from firmware rom length if the board defines it
 test-elffile-fw_rom_length: $(ELFFILE)
-	$(Q)echo -n "Test rom offset substracted from rom length in elffile: "
+	$(Q)echo -n "Test rom offset subtracted from rom length in elffile: "
 	$(Q)\
 	if test -n "$(ROM_OFFSET)"; then \
 	  TEST_FW_LEN=$$($(PREFIX)readelf --symbols $^ 2>/dev/null | awk '/_fw_rom_length/{printf "0x%s\n", $$2}'); \
@@ -86,10 +95,15 @@ OFFSETS_TESTS = 0x1000 0x2000
 tests-offsets: $(OFFSETS_TESTS:%=test-offset_%)
 
 .PHONY: test-offset_%
+# Match the 'code' section. It is usually '.text' but is '.vector' on `kinetis`.
+# * [ 1] .text             PROGBITS        08001000 001000 001ef8 ...
+# * [ 1] .vector           PROGBITS        00001000 001000 000400 ...
+# So match with the section [ 1] being `PROGBITS`. Adapt if new cases appear.
+CODE_SECTION = \[ 1\] \.[a-zA-Z_.]* *PROGBITS
 test-offset_%: $(BINDIR)/$(APPLICATION)_offset_%.elf
 	$(Q)echo -n "Test compilation with offset $*: "
 	$(Q)\
-	TEST_START_ADDR=$$($(PREFIX)readelf --section-headers $^ 2>/dev/null | awk '/.text/{printf "0x%s\n", $$5}'); \
+	TEST_START_ADDR=$$($(PREFIX)readelf --section-headers $^ 2>/dev/null | awk '/$(CODE_SECTION)/{printf "0x%s\n", $$5}'); \
 	EXPECT_START_ADDR=$$(printf "0x%08x" $$(( $(ROM_START_ADDR) + $* ))); \
 	if test $${TEST_START_ADDR} != $${EXPECT_START_ADDR}; then \
 	  echo "[ERROR] Linker offset not used $${TEST_START_ADDR} != $${EXPECT_START_ADDR}" >&2; \

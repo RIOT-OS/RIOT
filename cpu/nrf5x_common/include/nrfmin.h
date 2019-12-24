@@ -21,7 +21,7 @@
  *    -> we define host byte order := network byte order
  *
  * The driver is using a Nordic proprietary physical layer, configured to a
- * bitrate of 2Mbit. The maximum payload length can be freely configured, but
+ * bitrate of 1 Mbit/s. The maximum payload length can be freely configured, but
  * the maximal supported value is 250 byte (default is 200 byte).
  *
  * We define the nrfmin link layer to use 16-bit addresses. On the physical

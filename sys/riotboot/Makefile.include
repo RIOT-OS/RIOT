@@ -1,0 +1,18 @@
+# Indicate the reserved space for a header, 256B by default.
+# The value must respect the cpu alignment requirements for the specific
+# cpu, it can be re-defined in the cpu Makefile.include accordingly.
+# e.g: `cortex-m` vector-table comes after `riotboot_hdr` and must be naturally
+# aligned according to CPU_IRQ_NUMOF (ref: cpu/cortexm_common/Makefile.include)
+RIOTBOOT_HDR_LEN ?= 0x100
+
+# By default, slot 0 is found just after RIOTBOOT_LEN. Slot 1 after
+# slot 0. The values might be overridden to add more or less offset
+# if needed.
+SLOT0_OFFSET ?= $(RIOTBOOT_LEN)
+SLOT1_OFFSET ?= $(shell echo $$(($(SLOT0_OFFSET) + $(SLOT0_LEN))))
+
+CFLAGS += -DSLOT0_LEN=$(SLOT0_LEN)
+CFLAGS += -DSLOT0_OFFSET=$(SLOT0_OFFSET)
+CFLAGS += -DSLOT1_LEN=$(SLOT1_LEN)
+CFLAGS += -DSLOT1_OFFSET=$(SLOT1_OFFSET)
+CFLAGS += -DNUM_SLOTS=$(NUM_SLOTS)

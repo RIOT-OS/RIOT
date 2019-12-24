@@ -60,12 +60,15 @@ netdev_ieee802154_t nrf802154_dev = {
 static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 
+#define ED_RSSISCALE        (4U)
+#define ED_RSSIOFFS         (92U)
+
 #define RX_COMPLETE         (0x1)
 #define TX_COMPLETE         (0x2)
 #define LIFS                (40U)
 #define SIFS                (12U)
 #define SIFS_MAXPKTSIZE     (18U)
-#define TIMER_FREQ          (250000UL)
+#define TIMER_FREQ          (62500UL)
 static volatile uint8_t _state;
 static mutex_t _txlock;
 
@@ -186,7 +189,6 @@ static void _timer_cb(void *arg, int chan)
     (void)chan;
     mutex_unlock(&_txlock);
     timer_stop(NRF802154_TIMER);
-    timer_clear(NRF802154_TIMER, 0);
 }
 
 static int _init(netdev_t *dev)
@@ -196,6 +198,7 @@ static int _init(netdev_t *dev)
     int result = timer_init(NRF802154_TIMER, TIMER_FREQ, _timer_cb, NULL);
     assert(result >= 0);
     (void)result;
+    timer_stop(NRF802154_TIMER);
 
     /* initialize local variables */
     mutex_init(&_txlock);
@@ -228,6 +231,9 @@ static int _init(netdev_t *dev)
                          (RADIO_CRCCNF_SKIPADDR_Ieee802154 << RADIO_CRCCNF_SKIPADDR_Pos));
     NRF_RADIO->CRCPOLY = 0x011021;
     NRF_RADIO->CRCINIT = 0;
+
+    /* Disable the hardware IFS handling  */
+    NRF_RADIO->MODECNF0 |= RADIO_MODECNF0_RU_Msk;
 
     /* assign default addresses */
     luid_get(nrf802154_dev.long_addr, IEEE802154_LONG_ADDRESS_LEN);
@@ -268,8 +274,12 @@ static int _send(netdev_t *dev,  const iolist_t *iolist)
             mutex_unlock(&_txlock);
             return -EOVERFLOW;
         }
-        memcpy(&txbuf[len + 1], iolist->iol_base, iolist->iol_len);
-        len += iolist->iol_len;
+        /* Check if there is data to copy, prevents undefined behaviour with
+         * memcpy when iolist->iol_base == NULL */
+        if (iolist->iol_len) {
+            memcpy(&txbuf[len + 1], iolist->iol_base, iolist->iol_len);
+            len += iolist->iol_len;
+        }
     }
 
     /* specify the length of the package. */
@@ -280,8 +290,9 @@ static int _send(netdev_t *dev,  const iolist_t *iolist)
     DEBUG("[nrf802154] send: putting %i byte into the ether\n", len);
 
     /* set interframe spacing based on packet size */
-    unsigned int ifs = (len > SIFS_MAXPKTSIZE) ? LIFS : SIFS;
-    timer_set_absolute(NRF802154_TIMER, 0, ifs);
+    unsigned int ifs = (len + IEEE802154_FCS_LEN > SIFS_MAXPKTSIZE) ? LIFS
+                                                                    : SIFS;
+    timer_set(NRF802154_TIMER, 0, ifs);
 
     return len;
 }
@@ -317,6 +328,20 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
     else {
         DEBUG("[nrf802154] recv: reading packet of length %i\n", pktlen);
         memcpy(buf, &rxbuf[1], pktlen);
+        if (info != NULL) {
+            netdev_ieee802154_rx_info_t *radio_info = info;
+            /* Hardware link quality indicator */
+            uint8_t hwlqi = rxbuf[pktlen + 1];
+            /* Convert to 802.15.4 LQI (page 319 of product spec v1.1) */
+            radio_info->lqi = (uint8_t)(hwlqi > UINT8_MAX/ED_RSSISCALE
+                                       ? UINT8_MAX
+                                       : hwlqi * ED_RSSISCALE);
+            /* Calculate RSSI by subtracting the offset from the datasheet.
+             * Intentionally using a different calculation than the one from
+             * figure 122 of the v1.1 product specification. This appears to
+             * match real world performance better */
+            radio_info->rssi = (int16_t)hwlqi - ED_RSSIOFFS;
+        }
     }
 
     _reset_rx();

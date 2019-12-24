@@ -259,8 +259,17 @@ struct gnrc_rpl_parent {
  */
 typedef struct {
     uint16_t ocp;   /**< objective code point */
-    uint16_t (*calc_rank)(gnrc_rpl_parent_t *parent, uint16_t base_rank); /**< calculate the rank */
-    gnrc_rpl_parent_t *(*which_parent)(gnrc_rpl_parent_t *, gnrc_rpl_parent_t *); /**< retrieve the better parent */
+
+    /**
+     * @brief Calculate the rank of this node.
+     *
+     * @param[in]   dodag       RPL DODAG to calculate rank from.
+     * @param[in]   base_rank   BASE_RANK parameter as in rfc6550
+     *
+     * @return      RPL Rank of this node.
+     * @return      GNRC_RPL_INFINITE_RANK, if no rank calculation is possible.
+     */
+    uint16_t (*calc_rank)(gnrc_rpl_dodag_t *dodag, uint16_t base_rank);
 
     /**
      * @brief   Compare two @ref gnrc_rpl_parent_t.
@@ -279,9 +288,21 @@ typedef struct {
      */
     int (*parent_cmp)(gnrc_rpl_parent_t *parent1, gnrc_rpl_parent_t *parent2);
     gnrc_rpl_dodag_t *(*which_dodag)(gnrc_rpl_dodag_t *, gnrc_rpl_dodag_t *); /**< compare for dodags */
-    void (*reset)(gnrc_rpl_dodag_t *);    /**< resets the OF */
+
+    /**
+     * @brief Reset the state of the objective function.
+     *
+     * @param[in]   dodag   RPL dodag object.
+     */
+    void (*reset)(gnrc_rpl_dodag_t *dodag);
     void (*parent_state_callback)(gnrc_rpl_parent_t *, int, int); /**< retrieves the state of a parent*/
-    void (*init)(void);  /**< OF specific init function */
+
+    /**
+     * @brief Initialize the objective function.
+     *
+     * @param[in]   dodag   RPL dodag object.
+     */
+    void (*init)(gnrc_rpl_dodag_t *dodag);
     void (*process_dio)(void);  /**< DIO processing callback (acc. to OF0 spec, chpt 5) */
 } gnrc_rpl_of_t;
 

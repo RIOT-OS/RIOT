@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file
  * @brief EFM32LG_DMACTRL register and bit field definitions
- * @version 5.7.0
+ * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib

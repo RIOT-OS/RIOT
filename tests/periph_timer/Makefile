@@ -1,14 +1,28 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
-
 FEATURES_REQUIRED = periph_timer
 
-TEST_ON_CI_WHITELIST += all
+BOARDS_TIMER_25kHz := \
+    arduino-duemilanove \
+    arduino-leonardo \
+    arduino-mega2560 \
+    arduino-uno \
+    atmega256rfr2-xpro \
+    atmega328p \
+    waspmote-pro \
+    #
 
-ifneq (,$(filter arduino-duemilanove arduino-mega2560 arduino-uno waspmote-pro,$(BOARD)))
+BOARDS_TIMER_32kHz := \
+    hifive1 \
+    hifive1b \
+    %-kw41z \
+    frdm-k64f \
+    frdm-k22f \
+    #
+
+ifneq (,$(filter $(BOARDS_TIMER_25kHz),$(BOARD)))
   TIMER_SPEED ?= 250000
-else ifneq (,$(filter hifive1,$(BOARD)))
+else ifneq (,$(filter $(BOARDS_TIMER_32kHz),$(BOARD)))
   TIMER_SPEED ?= 32768
 endif
 

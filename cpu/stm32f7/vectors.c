@@ -272,5 +272,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [107] = isr_can3_sce,             /* [107] CAN3 SCE Interrupt */
     [108] = isr_jpeg,                 /* [108] JPEG global Interrupt */
     [109] = isr_mdios,                /* [109] MDIO Slave global Interrupt */
+#elif defined(CPU_LINE_STM32F723xx)
+    [103] = isr_sdmmc2,               /* [103] SDMMC2 global Interrupt */
 #endif
 };

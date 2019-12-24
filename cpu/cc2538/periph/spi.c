@@ -145,14 +145,13 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
             dev(bus)->DR;
         }
     }
-    else if (!out_buf) { /*TODO this case is currently untested */
+    else if (!out_buf) {
         size_t in_cnt = 0;
         for (size_t i = 0; i < len; i++) {
             while (!(dev(bus)->SR & SSI_SR_TNF)) {}
             dev(bus)->DR = 0;
-            if (dev(bus)->SR & SSI_SR_RNE) {
-                in_buf[in_cnt++] = dev(bus)->DR;
-            }
+            while (!(dev(bus)->SR & SSI_SR_RNE)) {}
+            in_buf[in_cnt++] = dev(bus)->DR;
         }
         /* get remaining bytes */
         while (dev(bus)->SR & SSI_SR_RNE) {
@@ -163,7 +162,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         for (size_t i = 0; i < len; i++) {
             while (!(dev(bus)->SR & SSI_SR_TNF)) {}
             dev(bus)->DR = out_buf[i];
-            while (!(dev(bus)->SR & SSI_SR_RNE)){}
+            while (!(dev(bus)->SR & SSI_SR_RNE)) {}
             in_buf[i] = dev(bus)->DR;
         }
         /* wait until no more busy */

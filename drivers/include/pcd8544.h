@@ -118,9 +118,9 @@ void pcd8544_set_bias(const pcd8544_t *dev, uint8_t bias);
  * datasheet.
  *
  * @param[in] dev           device descriptor of display to use
- * @param[in] img           char array with image data (must be of size := 504)
+ * @param[in] img           uint8_t array with image data (must be of size := 504)
  */
-void pcd8544_write_img(const pcd8544_t *dev, const char img[]);
+void pcd8544_write_img(const pcd8544_t *dev, const uint8_t img[]);
 
 /**
  * @brief   Write a single ASCII character to the display

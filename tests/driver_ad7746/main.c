@@ -25,7 +25,7 @@
 #include "ad7746.h"
 #include "ad7746_params.h"
 
-#define SLEEP       (1000 * US_PER_MS)
+#define SLEEP_USEC  (1000 * US_PER_MS)
 
 static ad7746_t dev;
 
@@ -84,7 +84,7 @@ int main(void)
             printf("Error reading internal temperature\n");
         }
         puts("");
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

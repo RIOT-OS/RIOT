@@ -52,6 +52,8 @@
 : ${PYOCD_CMD:=pyocd}
 : ${PYOCD_FLASH:=${PYOCD_CMD} flash}
 : ${PYOCD_GDBSERVER:=${PYOCD_CMD} gdbserver}
+# Debugger interface initialization commands to pass to PyOCD
+: ${PYOCD_ADAPTER_INIT:=}
 # The setsid command is needed so that Ctrl+C in GDB doesn't kill PyOCD.
 : ${SETSID:=setsid}
 # GDB command, usually a separate command for each platform (e.g.
@@ -70,6 +72,12 @@
 # CPU Target type.
 # Use `-t` followed by value. Example: -t nrf51
 : ${FLASH_TARGET_TYPE:=}
+# This is an optional offset to the base address that can be used to flash an
+# image in a different location than it is linked at. This feature can be useful
+# when flashing images for firmware swapping/remapping boot loaders.
+# Default offset is 0, meaning the image will be flashed at the address that it
+# was linked at.
+: ${IMAGE_OFFSET:=0}
 
 #
 # Examples of alternative debugger configurations
@@ -112,8 +120,13 @@ test_hexfile() {
 do_flash() {
     HEX_FILE=$1
     test_hexfile
+
+    if [ "${IMAGE_OFFSET}" != "0" ]; then
+        echo "Flashing with IMAGE_OFFSET: ${IMAGE_OFFSET}"
+    fi
+
     # flash device
-    sh -c "${PYOCD_FLASH} ${FLASH_TARGET_TYPE} \"${HEX_FILE}\"" &&
+    sh -c "${PYOCD_FLASH} ${FLASH_TARGET_TYPE} ${PYOCD_ADAPTER_INIT} -a ${IMAGE_OFFSET} \"${HEX_FILE}\"" &&
     echo 'Done flashing'
 }
 
@@ -136,6 +149,7 @@ do_debug() {
     # start PyOCD as GDB server
     ${SETSID} sh -c "${PYOCD_GDBSERVER} \
             ${FLASH_TARGET_TYPE} \
+            ${PYOCD_ADAPTER_INIT} \
             -p ${GDB_PORT} \
             -T ${TELNET_PORT} & \
             echo \$! > $OCD_PIDFILE" &
@@ -153,13 +167,14 @@ do_debugserver() {
     # start PyOCD as GDB server
     sh -c "${PYOCD_GDBSERVER} \
             ${FLASH_TARGET_TYPE} \
+            ${PYOCD_ADAPTER_INIT} \
             -p ${GDB_PORT} \
             -T ${TELNET_PORT}"
 }
 
 do_reset() {
     # start PyOCD and invoke board reset
-    sh -c "${PYOCD_CMD} cmd -c reset ${FLASH_TARGET_TYPE}"
+    sh -c "${PYOCD_CMD} cmd -c reset ${FLASH_TARGET_TYPE} ${PYOCD_ADAPTER_INIT}"
 }
 
 #

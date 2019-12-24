@@ -172,7 +172,7 @@ static int _parse_packet(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
     gnrc_netif_hdr_t *netif_hdr = netif_snip->data;
     netif_hdr->lqi = netif->mac.prot.gomach.rx_pkt_lqi;
     netif_hdr->rssi = netif->mac.prot.gomach.rx_pkt_rssi;
-    netif_hdr->if_pid = netif->pid;
+    gnrc_netif_hdr_set_netif(netif_hdr, netif);
     pkt->type = state->proto;
     gnrc_pktbuf_remove_snip(pkt, pkt->next);
     LL_APPEND(pkt, netif_snip);
@@ -747,7 +747,7 @@ void gnrc_gomach_cp_packet_process(gnrc_netif_t *netif)
     gnrc_gomach_packet_info_t receive_packet_info;
 
     while ((pkt = gnrc_priority_pktqueue_pop(&netif->mac.rx.queue)) != NULL) {
-        /* Parse the received packet, fetch key MAC informations. */
+        /* Parse the received packet, fetch key MAC information. */
         int res = _parse_packet(netif, pkt, &receive_packet_info);
         if (res != 0) {
             LOG_DEBUG("[GOMACH] CP: Packet could not be parsed: %i\n", res);

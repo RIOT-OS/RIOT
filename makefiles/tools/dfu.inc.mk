@@ -1,0 +1,8 @@
+DFU ?= dfu-util
+FLASHER ?= $(DFU)
+FLASHFILE ?= $(BINFILE)
+
+FFLAGS ?= -D $(FLASHFILE) --reset $(DFU_ARGS)
+
+RESET ?= $(DFU)
+RESET_FLAGS ?= $(DFU_ARGS) -t $(DFU_DEVICE_TYPE)

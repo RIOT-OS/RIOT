@@ -133,7 +133,7 @@ void stmclk_init_sysclk(void)
 
 #if ((CLOCK_HSE == 0) || CLOCK_MSI_ENABLE)
     /* reset clock to MSI with 48MHz, disables all other clocks */
-    RCC->CR = (RCC_CR_MSIRANGE_11 | RCC_CR_MSION | RCC_CR_MSIRGSEL);
+    RCC->CR |= (RCC_CR_MSIRANGE_11 | RCC_CR_MSION | RCC_CR_MSIRGSEL);
     while (!(RCC->CR & RCC_CR_MSIRDY)) {}
     /* select the MSI clock for the 48MHz clock tree (USB, RNG) */
     RCC->CCIPR = (RCC_CCIPR_CLK48SEL_0 | RCC_CCIPR_CLK48SEL_1);

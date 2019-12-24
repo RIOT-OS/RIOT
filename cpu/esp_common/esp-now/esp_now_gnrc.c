@@ -24,15 +24,11 @@
 #include "cpu_conf.h"
 #include "net/netdev.h"
 #include "net/gnrc.h"
+#include "esp_common_log.h"
 #include "esp_now_params.h"
 #include "esp_now_netdev.h"
 #include "esp_now_gnrc.h"
 #include "net/gnrc/netif.h"
-
-#ifdef MCU_ESP8266
-#include "log.h"
-#include "common.h"
-#endif
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -147,7 +143,6 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         pkt = mac_hdr;
         goto err;
     }
-    esp_now_pkt_hdr_t *hdr = (esp_now_pkt_hdr_t*)esp_hdr->data;
 
 #ifdef MODULE_L2FILTER
     if (!l2filter_pass(dev->filter, mac_hdr->data, ESP_NOW_ADDR_LEN)) {
@@ -160,6 +155,8 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
     pkt->type = GNRC_NETTYPE_UNDEF;
 
 #ifdef MODULE_GNRC_SIXLOWPAN
+    esp_now_pkt_hdr_t *hdr = (esp_now_pkt_hdr_t*)esp_hdr->data;
+
     if (hdr->flags & ESP_NOW_PKT_HDR_FLAG_SIXLO) {
         pkt->type = GNRC_NETTYPE_SIXLOWPAN;
     }
@@ -173,7 +170,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         goto err;
     }
 
-    ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = netif->pid;
+    gnrc_netif_hdr_set_netif((gnrc_netif_hdr_t *)netif_hdr->data, netif);
 
     uint8_t *mac = mac_hdr->data;
     DEBUG("gnrc_esp_now: received packet from %02x:%02x:%02x:%02x:%02x:%02x of length %u\n",
@@ -191,6 +188,7 @@ err:
 }
 
 static const gnrc_netif_ops_t _esp_now_ops = {
+    .init = gnrc_netif_default_init,
     .send = _send,
     .recv = _recv,
     .get = gnrc_netif_get_from_netdev,
@@ -216,7 +214,7 @@ void auto_init_esp_now(void)
     } else {
         gnrc_netif_esp_now_create(_esp_now_stack, sizeof(_esp_now_stack),
                                   ESP_NOW_PRIO,
-                                  "net-esp-now",
+                                  "esp-now",
                                   &esp_now_dev->netdev);
     }
 }

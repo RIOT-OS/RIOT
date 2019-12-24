@@ -122,7 +122,7 @@
  */
 #ifndef PWM0_GPIOS
 #if !MODULE_ESP32_WROVER_KIT_CAMERA || DOXYGEN
-#define PWM0_GPIOS  { LED0_PIN, LED2_PIN } /**< only available when camera is not connected */
+#define PWM0_GPIOS  { GPIO0, GPIO4 } /**< only available when camera is not connected */
 #else
 #define PWM0_GPIOS  { }
 #endif
@@ -196,7 +196,7 @@
 /**
  * @name   UART configuration
  *
- * ESP32 provides 3 UART interaces at maximum:
+ * ESP32 provides 3 UART interfaces at maximum:
  *
  * UART_DEV(0) uses fixed standard configuration.<br>
  * UART_DEV(1) is not available.<br>

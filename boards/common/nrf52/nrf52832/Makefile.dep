@@ -1,0 +1,5 @@
+ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+  ifeq (,$(filter nordic_softdevice_ble nrfmin,$(USEMODULE) $(USEPKG)))
+    USEMODULE += nimble_netif
+  endif
+endif

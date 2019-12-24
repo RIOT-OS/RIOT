@@ -49,9 +49,6 @@ static void print_time(const char *label, const struct tm *time)
 static void inc_secs(struct tm *time, unsigned val)
 {
     time->tm_sec += val;
-    if (time->tm_sec >= 60) {
-        time->tm_sec -= 60;
-    }
 }
 
 static void cb(void *arg)
@@ -76,7 +73,7 @@ int main(void)
         .tm_mday = 13,
         .tm_hour = 14,
         .tm_min  = 15,
-        .tm_sec  = 15
+        .tm_sec  = 57
     };
 
     puts("\nRIOT RTC low-level driver test");

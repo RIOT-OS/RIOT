@@ -141,7 +141,9 @@ extern "C" {
 #define MEMP_MEM_MALLOC         (1)
 #define NETIF_MAX_HWADDR_LEN    (GNRC_NETIF_HDR_L2ADDR_MAX_LEN)
 
+#ifndef TCPIP_THREAD_STACKSIZE
 #define TCPIP_THREAD_STACKSIZE  (THREAD_STACKSIZE_DEFAULT)
+#endif
 
 #define MEM_ALIGNMENT           (4)
 #ifndef MEM_SIZE

@@ -86,7 +86,7 @@ static gnrc_pktsnip_t *xbee_adpt_recv(gnrc_netif_t *netif)
         return NULL;
     }
     netif_hdr = (gnrc_netif_hdr_t *)netif_snip->data;
-    netif_hdr->if_pid = netif->pid;
+    gnrc_netif_hdr_set_netif(netif_hdr, netif);
     netif_hdr->rssi = l2hdr.rssi;
     if (l2hdr.bcast) {
         netif_hdr->flags = GNRC_NETIF_HDR_FLAGS_BROADCAST;
@@ -160,6 +160,7 @@ static int xbee_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 }
 
 static const gnrc_netif_ops_t _xbee_ops = {
+    .init = gnrc_netif_default_init,
     .send = xbee_adpt_send,
     .recv = xbee_adpt_recv,
     .get = gnrc_netif_get_from_netdev,

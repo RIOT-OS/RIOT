@@ -24,10 +24,17 @@
 #include "od.h"
 #include "net/af.h"
 #include "net/sock/tcp.h"
-#include "net/ipv6.h"
 #include "shell.h"
 #include "thread.h"
 #include "xtimer.h"
+
+#ifdef MODULE_LWIP_IPV6
+#include "net/ipv6.h"
+#define SOCK_IP_EP_ANY  SOCK_IPV6_EP_ANY
+#else
+#include "net/ipv4.h"
+#define SOCK_IP_EP_ANY  SOCK_IPV4_EP_ANY
+#endif
 
 #ifdef MODULE_SOCK_TCP
 static char sock_inbuf[SOCK_INBUF_SIZE];
@@ -39,7 +46,7 @@ static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
 
 static void *_server_thread(void *args)
 {
-    sock_tcp_ep_t server_addr = SOCK_IPV6_EP_ANY;
+    sock_tcp_ep_t server_addr = SOCK_IP_EP_ANY;
     int res;
 
     msg_init_queue(server_msg_queue, SERVER_MSG_QUEUE_SIZE);
@@ -68,8 +75,13 @@ static void *_server_thread(void *args)
             sock_tcp_ep_t client;
 
             sock_tcp_get_remote(sock, &client);
+#ifdef MODULE_LWIP_IPV6
             ipv6_addr_to_str(client_addr, (ipv6_addr_t *)&client.addr.ipv6,
                              sizeof(client_addr));
+#else
+            ipv4_addr_to_str(client_addr, (ipv4_addr_t *)&client.addr.ipv4,
+                             sizeof(client_addr));
+#endif
             client_port = client.port;
             printf("TCP client [%s]:%u connected\n",
                    client_addr, client_port);
@@ -96,7 +108,7 @@ static void *_server_thread(void *args)
 
 static int tcp_connect(char *addr_str, char *port_str, char *local_port_str)
 {
-    sock_tcp_ep_t dst = SOCK_IPV6_EP_ANY;
+    sock_tcp_ep_t dst = SOCK_IP_EP_ANY;
     uint16_t local_port = 0;
 
     if (client_running) {
@@ -104,7 +116,11 @@ static int tcp_connect(char *addr_str, char *port_str, char *local_port_str)
     }
 
     /* parse destination address */
+#ifdef MODULE_LWIP_IPV6
     if (ipv6_addr_from_str((ipv6_addr_t *)&dst.addr.ipv6, addr_str) == NULL) {
+#else
+    if (ipv4_addr_from_str((ipv4_addr_t *)&dst.addr.ipv4, addr_str) == NULL) {
+#endif
         puts("Error: unable to parse destination address");
         return 1;
     }

@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    net_gnrc_neterr Error reporting
- * @ingroup     net
+ * @ingroup     net_gnrc
  * @brief       Allows for asynchronous error reporting in the network stack.
  * @{
  *
@@ -38,7 +38,7 @@ extern "C" {
 #define GNRC_NETERR_MSG_TYPE        (0x0206)
 
 /**
- * @brief   Error code to signalise success (no error occured) to an gnrc_neterr subscriber.
+ * @brief   Error code to signalise success (no error occurred) to an gnrc_neterr subscriber.
  */
 #define GNRC_NETERR_SUCCESS         (0)
 

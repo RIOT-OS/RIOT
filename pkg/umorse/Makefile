@@ -7,7 +7,7 @@ CFLAGS += -D_XOPEN_SOURCE=600
 
 .PHONY: all
 
-all: git-download
+all:
 	@cp Makefile.umorse $(PKG_BUILDDIR)/Makefile
 	"$(MAKE)" -C $(PKG_BUILDDIR)
 

@@ -9,7 +9,7 @@
 /**
  * @defgroup    net_gnrc_netif_conf GNRC network interface configurations
  * @ingroup     net_gnrc_netif
- * @ingroup     config
+ * @ingroup     net_gnrc_conf
  * @{
  *
  * @file
@@ -54,7 +54,7 @@ extern "C" {
  *              changed.
  */
 #ifndef GNRC_NETIF_MSG_QUEUE_SIZE
-#define GNRC_NETIF_MSG_QUEUE_SIZE  (8U)
+#define GNRC_NETIF_MSG_QUEUE_SIZE  (16U)
 #endif
 
 /**
@@ -135,6 +135,17 @@ extern "C" {
 
 #ifndef GNRC_NETIF_DEFAULT_HL
 #define GNRC_NETIF_DEFAULT_HL      (64U)   /**< default hop limit */
+#endif
+
+/**
+ * @brief   Minimum wait time in microseconds after a send operation
+ *
+ * @experimental
+ *
+ * This is purely meant as a debugging feature to slow down a radios sending.
+ */
+#ifndef GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
+#define GNRC_NETIF_MIN_WAIT_AFTER_SEND_US   (0U)
 #endif
 
 #ifdef __cplusplus

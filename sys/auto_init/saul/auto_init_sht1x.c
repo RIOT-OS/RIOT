@@ -36,7 +36,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define SHT1X_NUM     (sizeof(sht1x_params) / sizeof(sht1x_params[0]))
+#define SHT1X_NUM     ARRAY_SIZE(sht1x_params)
 
 /**
  * @brief   Allocate memory for the device descriptors

@@ -11,10 +11,11 @@
  * @ingroup     pkg_lwip
  * @brief       Provides an implementation of the @ref net_sock for the
  *              @ref pkg_lwip
+ * @internal
  * @{
  *
  * @file
- * @brief       lwIP-specific function @ref  definitions
+ * @brief       lwIP-specific function @ref net_sock definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */

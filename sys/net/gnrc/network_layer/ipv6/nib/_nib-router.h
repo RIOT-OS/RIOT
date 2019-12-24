@@ -57,6 +57,8 @@ static inline void _init_iface_router(gnrc_netif_t *netif)
  *          [route info callback](@ref gnrc_netif_ipv6_t::route_info_cb) of an
  *          interface
  *
+ * @pre `netif != NULL`.
+ *
  * @param[in] netif     An interface.
  * @param[in] type      [Type](@ref net_gnrc_ipv6_nib_route_info_type) of the
  *                      route info.
@@ -67,6 +69,7 @@ static inline void _call_route_info_cb(gnrc_netif_t *netif, unsigned type,
                                        const ipv6_addr_t *ctx_addr,
                                        const void *ctx)
 {
+    assert(netif != NULL);
     if (netif->ipv6.route_info_cb != NULL) {
         netif->ipv6.route_info_cb(type, ctx_addr, ctx);
     }

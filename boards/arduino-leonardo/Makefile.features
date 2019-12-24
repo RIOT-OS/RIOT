@@ -1,0 +1,3 @@
+CPU = atmega32u4
+
+include $(RIOTBOARD)/common/arduino-atmega/Makefile.features

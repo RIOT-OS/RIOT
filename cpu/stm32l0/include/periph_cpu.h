@@ -71,22 +71,23 @@ typedef struct {
 } adc_conf_t;
 
 /**
- * @brief   Override the default initial PM blocker
- * @todo   we block all modes per default, until PM is cleanly implemented
- */
-#define PM_BLOCKER_INITIAL  { .val_u32 = 0x01010101 }
-
-/**
  * @name    EEPROM configuration
+ * https://www.st.com/en/microcontrollers-microprocessors/stm32l0-series.html#products
  * @{
  */
 #define EEPROM_START_ADDR          (0x08080000)
 #if defined(CPU_LINE_STM32L073xx) || defined(CPU_LINE_STM32L072xx)
 #define EEPROM_SIZE                (6144U)  /* 6kB */
-#elif defined(CPU_LINE_STM32L053xx)
+#elif defined(CPU_LINE_STM32L053xx) || defined(CPU_LINE_STM32L052xx)
 #define EEPROM_SIZE                (2048U)  /* 2kB */
 #elif defined(CPU_LINE_STM32L031xx)
 #define EEPROM_SIZE                (1024U)  /* 1kB */
+#elif defined(CPU_LINE_STM32L010xB) || defined(CPU_LINE_STM32L011x3) || defined(CPU_LINE_STM32L011x4) || defined(CPU_LINE_STM32L021x4)
+#define EEPROM_SIZE                (512U)   /* 512B */
+#elif defined(CPU_LINE_STM32L010x6) || defined(CPU_LINE_STM32L010x8)
+#define EEPROM_SIZE                (256U)   /* 256B */
+#elif defined(CPU_LINE_STM32L010x4)
+#define EEPROM_SIZE                (128U)   /* 128B */
 #endif
 /** @} */
 

@@ -7,6 +7,9 @@ BOARD ?= samr21-xpro
 # Select the boards with riotboot feature
 FEATURES_REQUIRED += riotboot
 
+# Provide a define to detect if building the bootloader
+CFLAGS += -DRIOTBOOT
+
 # Disable unused modules
 CFLAGS += -DNDEBUG -DLOG_LEVEL=LOG_NONE
 DISABLE_MODULE += auto_init

@@ -160,7 +160,7 @@ static const spi_conf_t spi_confs[] = {
     },
 };
 
-#define SPI_NUMOF (sizeof(spi_confs) / sizeof(spi_confs[0]))
+#define SPI_NUMOF ARRAY_SIZE(spi_confs)
 /** @} */
 
 #ifdef __cplusplus

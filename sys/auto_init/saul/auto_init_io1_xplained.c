@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define IO1_XPLAINED_NUM    (sizeof(io1_xplained_params) / sizeof(io1_xplained_params[0]))
+#define IO1_XPLAINED_NUM    ARRAY_SIZE(io1_xplained_params)
 
 /**
  * @brief   Allocation of memory for device descriptors
@@ -44,7 +44,7 @@ static saul_reg_t saul_entries[IO1_XPLAINED_NUM * 4];
 /**
  * @brief   Define the number of saul info
  */
-#define IO1_XPLAINED_INFO_NUM    (sizeof(io1_xplained_saul_info) / sizeof(io1_xplained_saul_info[0]))
+#define IO1_XPLAINED_INFO_NUM    ARRAY_SIZE(io1_xplained_saul_info)
 
 /**
  * @name    Reference the driver structs.
@@ -74,7 +74,7 @@ void auto_init_io1_xplained(void)
 
         /* GPIOs */
         for (unsigned j = 0;
-             j < sizeof(io1_xplained_saul_gpios) / sizeof(io1_xplained_saul_gpios[0]);
+             j < ARRAY_SIZE(io1_xplained_saul_gpios);
              j++) {
             saul_reg_t *entry = &saul_entries[i * 4 + j + 1];
             entry->dev = &(io1_xplained_saul_gpios[j]);

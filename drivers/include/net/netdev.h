@@ -204,6 +204,13 @@ extern "C" {
 #include "net/l2filter.h"
 #endif
 
+/**
+ * @name        Network device types
+ * @anchor      net_netdev_type
+ * @attention   When implementing a new type that is able to carry IPv6, have
+ *              a look if you need to update @ref net_l2util as well.
+ * @{
+ */
 enum {
     NETDEV_TYPE_UNKNOWN,
     NETDEV_TYPE_TEST,
@@ -217,6 +224,7 @@ enum {
     NETDEV_TYPE_SLIP,
     NETDEV_TYPE_ESP_NOW,
 };
+/** @} */
 
 /**
  * @brief   Possible event types that are send from the device driver to the
@@ -238,6 +246,12 @@ typedef enum {
     NETDEV_EVENT_CRC_ERROR,                 /**< wrong CRC */
     NETDEV_EVENT_FHSS_CHANGE_CHANNEL,       /**< channel changed */
     NETDEV_EVENT_CAD_DONE,                  /**< channel activity detection done */
+    NETDEV_EVENT_MLME_CONFIRM,              /**< MAC MLME confirm event */
+    NETDEV_EVENT_MLME_INDICATION,           /**< MAC MLME indication event */
+    NETDEV_EVENT_MCPS_CONFIRM,              /**< MAC MCPS confirm event */
+    NETDEV_EVENT_MCPS_INDICATION,           /**< MAC MCPS indication event */
+    NETDEV_EVENT_MLME_GET_BUFFER,           /**< MAC layer requests MLME buffer */
+    NETDEV_EVENT_MCPS_GET_BUFFER,           /**< MAC layer requests MCPS buffer */
     /* expand this list if needed */
 } netdev_event_t;
 
@@ -275,7 +289,7 @@ typedef void (*netdev_event_cb_t)(netdev_t *dev, netdev_event_t event);
 struct netdev {
     const struct netdev_driver *driver;     /**< ptr to that driver's interface. */
     netdev_event_cb_t event_callback;       /**< callback for device events */
-    void* context;                          /**< ptr to network stack context */
+    void *context;                          /**< ptr to network stack context */
 #ifdef MODULE_NETDEV_LAYER
     netdev_t *lower;                        /**< ptr to the lower netdev layer */
 #endif
@@ -297,7 +311,11 @@ typedef struct netdev_driver {
      * @pre `(dev != NULL) && (iolist != NULL`
      *
      * @param[in] dev       Network device descriptor. Must not be NULL.
-     * @param[in] iolist    io vector list to send
+     * @param[in] iolist    IO vector list to send. Elements of this list may
+     *                      have iolist_t::iol_data == NULL or
+     *                      iolist_t::iol_size == 0. However, unless otherwise
+     *                      specified by the device, the *first* element
+     *                      must contain data.
      *
      * @return negative errno on error
      * @return number of bytes sent

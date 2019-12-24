@@ -154,7 +154,7 @@ static void test_nib_nc_set__success_duplicate(void)
  * Creates GNRC_IPV6_NIB_NUMOF neighbor cache entries with different addresses
  * and interfaces and then tries to delete one with yet another address.
  * Expected result: There should be still GNRC_IPV6_NIB_NUMOF entries in the
- * neigbor cache
+ * neighbor cache
  */
 static void test_nib_nc_del__unknown(void)
 {

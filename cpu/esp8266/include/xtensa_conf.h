@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -27,11 +27,7 @@ extern "C" {
  * @brief   Xtensa ASM code specific default stack sizes
  * @{
  */
-#if defined(MODULE_ESP_SDK_INT_HANDLING)
-#define ISR_STACKSIZE                 (8)
-#else
 #define ISR_STACKSIZE                 (2048)
-#endif
 /** @} */
 
 #ifdef __cplusplus

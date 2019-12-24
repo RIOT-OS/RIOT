@@ -26,6 +26,9 @@ extern "C" {
 
 #define VIC_SIZE                32
 
+#define PLLCFG_N(n)             ((n - 1) << 16)
+#define PLLCFG_M(m)             (m - 1)
+
 #define GPIO_INT 17
 #define IRQP_GPIO 4
 
@@ -93,7 +96,7 @@ extern "C" {
  * @name UART Constants
  * @{
  */
-#define ULSR_RDR        BIT0
+#define ULSR_RDR    BIT0
 #define ULSR_OE     BIT1
 #define ULSR_PE     BIT2
 #define ULSR_FE     BIT3

@@ -124,8 +124,8 @@ typedef struct {
  * @param[in]   buf         input buffer
  * @param[in]   bufsize     size of @p buf
  *
- * @returns     0 on success
- * @returns     <0 otherwise
+ * @returns     success code UART_OK on success
+ * @returns     error code UART_NODEV or UART_NOBAUD otherwise
  */
 int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize);
 
@@ -183,8 +183,9 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * This function sends the supplied @p command, then returns all response
  * lines until the device sends "OK".
  *
- * If a line starts with "ERROR" or "+CME ERROR:", or the buffer is full, the
- * function returns -1.
+ * If a line starts with "ERROR" or the buffer is full, the function returns -1.
+ * If a line starts with "+CME ERROR" or +CMS ERROR", the function returns -2.
+ * In this case resp_buf contains the error string.
  *
  * @param[in]   dev         device to operate on
  * @param[in]   command     command to send
@@ -194,7 +195,8 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * @param[in]   timeout     timeout (in usec)
  *
  * @returns     length of response on success
- * @returns     <0 on error
+ * @returns     -1 on error
+ * @returns     -2 on CMS or CME error
  */
 ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf,
                               size_t len, bool keep_eol, uint32_t timeout);
@@ -210,6 +212,25 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
  * @returns     <0 otherwise
  */
 int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
+
+/**
+ * @brief   Receives bytes into @p bytes buffer until the string pattern
+ * @p string is received or the buffer is full.
+ *
+ * @param[in] dev               device to operate on
+ * @param[in] string            string pattern to expect
+ * @param[out] bytes            buffer to store received bytes
+ * @param[in, out] bytes_len    pointer to the maximum number of bytes to
+ *                              receive. On return stores the amount of received
+ *                              bytes.
+ * @param[in] timeout           timeout (in usec) of inactivity to finish read
+ *
+ * @returns                     0 on success
+ * @returns                     <0 on error
+ */
+int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
+                               char *bytes, size_t *bytes_len,
+                               uint32_t timeout);
 
 /**
  * @brief   Send raw bytes to a device

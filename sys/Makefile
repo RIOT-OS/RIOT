@@ -4,6 +4,12 @@ endif
 ifneq (,$(filter eepreg,$(USEMODULE)))
   DIRS += eepreg
 endif
+ifneq (,$(filter isrpipe_read_timeout,$(USEMODULE)))
+  DIRS += isrpipe/read_timeout
+endif
+ifneq (,$(filter posix_inet,$(USEMODULE)))
+  DIRS += posix/inet
+endif
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   DIRS += posix/semaphore
 endif
@@ -18,6 +24,9 @@ ifneq (,$(filter pthread,$(USEMODULE)))
 endif
 ifneq (,$(filter shell_commands,$(USEMODULE)))
   DIRS += shell/commands
+endif
+ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
+  DIRS += test_utils/interactive_sync
 endif
 ifneq (,$(filter net_help,$(USEMODULE)))
   DIRS += net/crosslayer/net_help
@@ -118,11 +127,14 @@ endif
 ifneq (,$(filter l2filter,$(USEMODULE)))
   DIRS += net/link_layer/l2filter
 endif
+ifneq (,$(filter l2util,$(USEMODULE)))
+  DIRS += net/link_layer/l2util
+endif
 ifneq (,$(filter nanocoap,$(USEMODULE)))
   DIRS += net/application_layer/nanocoap
 endif
 ifneq (,$(filter skald,$(USEMODULE)))
-  DIRS += net/skald
+  DIRS += net/ble/skald
 endif
 ifneq (,$(filter cord_common,$(USEMODULE)))
   DIRS += net/application_layer/cord/common
@@ -135,6 +147,18 @@ ifneq (,$(filter cord_ep,$(USEMODULE)))
 endif
 ifneq (,$(filter bluetil_%,$(USEMODULE)))
   DIRS += net/ble/bluetil
+endif
+ifneq (,$(filter usbus usbus_%,$(USEMODULE)))
+    DIRS += usb/usbus
+endif
+ifneq (,$(filter credman,$(USEMODULE)))
+  DIRS += net/credman
+endif
+ifneq (,$(filter suit%,$(USEMODULE)))
+  DIRS += suit
+endif
+ifneq (,$(filter netif,$(USEMODULE)))
+    DIRS += net/netif
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(USEMODULE))))

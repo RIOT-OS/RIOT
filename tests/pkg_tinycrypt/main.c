@@ -42,7 +42,7 @@ int main(void)
     struct tc_aes_key_sched_struct s;
 
     /* 128-bit key to use */
-    const char *key = "Thats my Kung Fu";
+    const char *key = "That's my Kung Fu";
     /* one block (TC_AES_BLOCK_SIZE := 16 byte) of plain text */
     const char *plain = "Two One Nine Two";
     /* some memory to store the encrypted data (add '\0` termination)*/

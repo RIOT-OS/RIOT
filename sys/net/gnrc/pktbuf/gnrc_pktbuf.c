@@ -13,43 +13,7 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
-#include <sys/uio.h>
-
 #include "net/gnrc/pktbuf.h"
-
-gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len)
-{
-    size_t length;
-    gnrc_pktsnip_t *head;
-    struct iovec *vec;
-
-    assert(len != NULL);
-    if (pkt == NULL) {
-        *len = 0;
-        return NULL;
-    }
-
-    /* count the number of snips in the packet and allocate the IOVEC */
-    length = gnrc_pkt_count(pkt);
-    head = gnrc_pktbuf_add(pkt, NULL, (length * sizeof(struct iovec)),
-                           GNRC_NETTYPE_IOVEC);
-    if (head == NULL) {
-        *len = 0;
-        return NULL;
-    }
-
-    assert(head->data != NULL);
-    vec = (struct iovec *)(head->data);
-    /* fill the IOVEC */
-    while (pkt != NULL) {
-        vec->iov_base = pkt->data;
-        vec->iov_len = pkt->size;
-        ++vec;
-        pkt = pkt->next;
-    }
-    *len = length;
-    return head;
-}
 
 gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt,
                                         gnrc_pktsnip_t *snip)

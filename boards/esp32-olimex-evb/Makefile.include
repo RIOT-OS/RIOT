@@ -2,14 +2,10 @@ PSEUDOMODULES += olimex_esp32_gateway
 
 USEMODULE += boards_common_esp32
 
-# enables esp_eth as network device
+# enables esp_eth as default network device
+# cannot be done in Makefile.dep since Makefile.dep is included too late
 ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
-    # avoid multiple definitions when package depenedencies are resolved recursively
-    ifndef MODULE_ESP_ETH_ADDED
-        MODULE_ESP_ETH_ADDED = 1
-        USEMODULE += esp_eth
-        $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
-    endif
+  USEMODULE += esp_eth
 endif
 
 include $(RIOTBOARD)/common/esp32/Makefile.include

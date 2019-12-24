@@ -37,8 +37,8 @@ static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str
     remote.family = AF_INET6;
 
     /* parse for interface */
-    int iface = ipv6_addr_split_iface(addr_str);
-    if (iface == -1) {
+    char *iface = ipv6_addr_split_iface(addr_str);
+    if (!iface) {
         if (gnrc_netif_numof() == 1) {
             /* assign the single interface found in gnrc_netif_numof() */
             remote.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
@@ -48,11 +48,12 @@ static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str
         }
     }
     else {
-        if (gnrc_netif_get_by_pid(iface) == NULL) {
+        int pid = atoi(iface);
+        if (gnrc_netif_get_by_pid(pid) == NULL) {
             puts("nanocli: interface not valid");
             return 0;
         }
-        remote.netif = iface;
+        remote.netif = pid;
     }
 
     /* parse destination address */
@@ -92,7 +93,7 @@ int nanotest_client_cmd(int argc, char **argv)
     }
 
     int code_pos = -1;
-    for (size_t i = 0; i < sizeof(method_codes) / sizeof(char*); i++) {
+    for (size_t i = 0; i < ARRAY_SIZE(method_codes); i++) {
         if (strcmp(argv[1], method_codes[i]) == 0) {
             code_pos = i;
         }

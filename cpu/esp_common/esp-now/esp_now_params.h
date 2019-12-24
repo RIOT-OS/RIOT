@@ -25,34 +25,52 @@
  * @name    Set default configuration parameters for the ESP-NOW netdev driver
  * @{
  */
+
+/**
+ * @brief   The size of the stack used for the ESP-NOW netdev driver thread.
+ * @ingroup cpu_esp_common_conf
+ */
 #ifndef ESP_NOW_STACKSIZE
-/** The size of the stack used for the ESP-NOW netdev driver thread */
 #define ESP_NOW_STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
 #endif
 
+/**
+ * @brief   The priority of the ESP-NOW netdev driver thread. Should not be
+ *          changed.
+ * @ingroup cpu_esp_common_conf
+ */
 #ifndef ESP_NOW_PRIO
-/** The priority of the ESP-NOW netdev driver thread */
 #define ESP_NOW_PRIO            (GNRC_NETIF_PRIO)
 #endif
 
+/**
+ * @brief   Period in microseconds at which an ESP-NOW node scans for other
+ *          ESP-NOW nodes in its range.
+ * @ingroup cpu_esp_common_conf
+ */
 #ifndef ESP_NOW_SCAN_PERIOD
-/** Period in us at which the node scans for other nodes in its range */
 #define ESP_NOW_SCAN_PERIOD     (10000000UL)
 #endif
 
+/**
+ * @brief   Passphrase used for the SoftAP interface of for all ESP-NOW nodes.
+ * @ingroup cpu_esp_common_conf
+ */
 #ifndef ESP_NOW_SOFT_AP_PASS
-/** Passphrase (max. 64 chars) used for the SoftAP interface of the nodes */
 #define ESP_NOW_SOFT_AP_PASS    "ThisistheRIOTporttoESP"
 #endif
 
+/**
+ * @brief   Channel used as broadcast medium by all ESP-NOW nodes together
+ * @ingroup cpu_esp_common_conf
+ */
 #ifndef ESP_NOW_CHANNEL
-/** Channel used as broadcast medium by all ESP-NOW nodes together */
 #define ESP_NOW_CHANNEL         (6)
 #endif
 
-#ifndef ESP_NOW_KEY
 /**
  * @brief   Key used for the communication between ESP-NOW nodes
+ * @ingroup cpu_esp_common_conf
  *
  * The key has to be defined to enable encrypted communication between ESP-NOW
  * nodes. The key has to be of type *uint8_t [16]* and has to be exactly
@@ -63,9 +81,15 @@
  * communicate with each other, while in unencrypted mode, up to 20 nodes can
  * communicate.
  */
+#ifndef ESP_NOW_KEY
 #define ESP_NOW_KEY             (NULL)
 #endif
 
+/** @} */
+
+/**
+ * @brief   Initializer for default configuration parameters.
+ */
 #ifndef ESP_NOW_PARAMS
 #define ESP_NOW_PARAMS   { .key = ESP_NOW_KEY, \
                            .scan_period = ESP_NOW_SCAN_PERIOD, \
@@ -75,7 +99,7 @@
 #endif
 
 /**
- * @brief   struct holding all params needed for device initialization
+ * @brief   Struct holding all parameters needed for device initialization.
  */
 typedef struct
 {
@@ -90,6 +114,9 @@ typedef struct
 extern "C" {
 #endif
 
+/**
+ * @brief   Static configuration structure
+ */
 static const esp_now_params_t esp_now_params = ESP_NOW_PARAMS;
 
 #ifdef __cplusplus

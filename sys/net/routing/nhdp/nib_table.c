@@ -51,7 +51,7 @@ static void rem_ln_entry(nib_lost_address_entry_t *ln_entry);
 nib_entry_t *nib_process_hello(void)
 {
     nib_entry_t *nb_match = NULL;
-    nib_entry_t *nib_elt, *nib_tmp;
+    nib_entry_t *nib_elt = NULL, *nib_tmp = NULL;
     timex_t now;
     uint8_t matches = 0;
 
@@ -60,7 +60,7 @@ nib_entry_t *nib_process_hello(void)
     xtimer_now_timex(&now);
 
     LL_FOREACH_SAFE(nib_entry_head, nib_elt, nib_tmp) {
-        nhdp_addr_entry_t *list_elt;
+        nhdp_addr_entry_t *list_elt = NULL;
         LL_FOREACH(nib_elt->address_list_head, list_elt) {
             if (NHDP_ADDR_TMP_IN_NB_LIST(list_elt->address)) {
                 /* Matching neighbor tuple */
@@ -106,9 +106,9 @@ nib_entry_t *nib_process_hello(void)
 
 void nib_fill_wr_addresses(struct rfc5444_writer *wr)
 {
-    nib_entry_t *nib_elt;
-    nhdp_addr_entry_t *addr_elt;
-    nib_lost_address_entry_t *lost_elt, *lost_tmp;
+    nib_entry_t *nib_elt = NULL;
+    nhdp_addr_entry_t *addr_elt = NULL;
+    nib_lost_address_entry_t *lost_elt = NULL, *lost_tmp = NULL;
     timex_t now;
 
     mutex_lock(&mtx_nib_access);
@@ -160,8 +160,8 @@ void nib_rem_nb_entry(nib_entry_t *nib_entry)
 
 void nib_set_nb_entry_sym(nib_entry_t *nib_entry)
 {
-    nib_lost_address_entry_t *ln_elt, *ln_tmp;
-    nhdp_addr_entry_t *nb_elt;
+    nib_lost_address_entry_t *ln_elt = NULL, *ln_tmp = NULL;
+    nhdp_addr_entry_t *nb_elt = NULL;
 
     nib_entry->symmetric = 1;
     LL_FOREACH(nib_entry->address_list_head, nb_elt) {
@@ -177,7 +177,7 @@ void nib_set_nb_entry_sym(nib_entry_t *nib_entry)
 
 void nib_reset_nb_entry_sym(nib_entry_t *nib_entry, timex_t *now)
 {
-    nhdp_addr_entry_t *nb_elt;
+    nhdp_addr_entry_t *nb_elt = NULL;
 
     nib_entry->symmetric = 0;
     LL_FOREACH(nib_entry->address_list_head, nb_elt) {
@@ -241,7 +241,7 @@ static void rem_nib_entry(nib_entry_t *nib_entry, timex_t *now)
  */
 static void clear_nb_addresses(nib_entry_t *nib_entry, timex_t *now)
 {
-    nhdp_addr_entry_t *nib_elt, *nib_tmp;
+    nhdp_addr_entry_t *nib_elt = NULL, *nib_tmp = NULL;;
 
     LL_FOREACH_SAFE(nib_entry->address_list_head, nib_elt, nib_tmp) {
         /* Check whether address is still present in the new neighbor address list */
@@ -269,7 +269,7 @@ static void clear_nb_addresses(nib_entry_t *nib_entry, timex_t *now)
  */
 static int add_lost_neighbor_address(nhdp_addr_t *lost_addr, timex_t *now)
 {
-    nib_lost_address_entry_t *elt;
+    nib_lost_address_entry_t *elt = NULL;
     timex_t n_hold = timex_from_uint64(((uint64_t)NHDP_N_HOLD_TIME_MS) * US_PER_MS);
 
     LL_FOREACH(nib_lost_address_entry_head, elt) {

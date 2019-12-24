@@ -1,0 +1,6 @@
+include $(RIOTCPU)/atmega_common/Makefile.features
+# common feature are defined in atmega_common/Makefile.features
+# Only add Additional features
+
+# additional PCINT for atmega128rfa1
+FEATURES_PROVIDED += atmega_pcint1

@@ -51,14 +51,14 @@ memory.
 | Low-level driver | GPIO    | yes       | |
 |        | PWM       | no            | |
 |        | UART      | yes           | |
-|        | I2C       | no        | |
-|        | SPI       | no        | |
+|        | I2C       | yes        | |
+|        | SPI       | yes        | |
 |        | USB       | no        | |
-|        | RTT       | no        | |
-|        | RTC       | no       |  |
-|        | RNG       | no        |  |
+|        | RTT       | yes        | |
+|        | RTC       | yes      |  |
+|        | RNG       | yes        |  |
 |        | Timer     | yes           | |
-|        | ADC       | no          | |
+|        | ADC       | yes         | |
 
 ## Flashing the device
 

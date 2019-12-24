@@ -31,7 +31,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define AD7746_NUM   (sizeof(ad7746_params) / sizeof(ad7746_params[0]))
+#define AD7746_NUM   ARRAY_SIZE(ad7746_params)
 
 /**
  * @brief   Allocate memory for the device descriptors.
@@ -47,7 +47,7 @@ static saul_reg_t saul_entries[AD7746_NUM * 3];
 /**
  * @brief   Define the number of saul info
  */
-#define AD7746_INFO_NUM (sizeof(ad7746_saul_info) / sizeof(ad7746_saul_info[0]))
+#define AD7746_INFO_NUM ARRAY_SIZE(ad7746_saul_info)
 
 /**
  * @brief   Reference the driver structs

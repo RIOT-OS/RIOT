@@ -69,7 +69,7 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
     }
 
     /* Count on A (TI1) signal edges, B (TI2) signal edges or both,
-     * default to EINVAL (Invalide argument).
+     * default to EINVAL (Invalid argument).
      */
     switch (mode) {
         /* X2 mode */
@@ -156,7 +156,7 @@ static int32_t _qdec_read(qdec_t qdec, uint8_t reset)
     /* Restore IRQ */
     irq_restore(irq_save);
 
-    /* Substract offset before return */
+    /* Subtract offset before return */
     count -= dev(qdec)->ARR / 2;
 
     /* Return count minus offset */

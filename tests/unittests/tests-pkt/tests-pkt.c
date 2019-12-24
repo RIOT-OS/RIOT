@@ -147,7 +147,7 @@ static void test_pktsnip_search_type(void)
     gnrc_pktsnip_t snip1 = _INIT_ELEM_STATIC_TYPE(GNRC_NETTYPE_UNDEF, NULL);
     gnrc_pktsnip_t snip2 = _INIT_ELEM_STATIC_TYPE(GNRC_NETTYPE_TEST, &snip1);
     gnrc_pktsnip_t snip3 = _INIT_ELEM_STATIC_TYPE(GNRC_NETTYPE_IPV6, &snip2);
-    /* successfull searches */
+    /* successful searches */
     gnrc_pktsnip_t *res;
     TEST_ASSERT_NOT_NULL((res = gnrc_pktsnip_search_type(&snip3, GNRC_NETTYPE_UNDEF)));
     TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_UNDEF, res->type);
@@ -185,8 +185,8 @@ static void test_pkt_equals_iolist(void)
     TEST_ASSERT_EQUAL_INT(0, memcmp(&iol, &pkt, sizeof(iol)));
 
     /* check size position */
-    iol.iol_len = 0x12345678;
-    pkt.size = 0x12345678;
+    iol.iol_len = (size_t)0x12345678;
+    pkt.size = (size_t)0x12345678;
 
     TEST_ASSERT_EQUAL_INT(0, memcmp(&iol, &pkt, sizeof(iol)));
 

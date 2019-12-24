@@ -73,7 +73,8 @@ static void *_openthread_event_loop(void *arg) {
     netdev_t *dev;
     msg_t msg, reply;
 
-#if defined(MODULE_OPENTHREAD_CLI_FTD) || defined(MODULE_OPENTHREAD_CLI_MTD)
+#if defined(MODULE_OPENTHREAD_CLI)
+    serial_msg_t* serialBuffer;
     otCliUartInit(sInstance);
     /* Init default parameters */
     otPanId panid = OPENTHREAD_PANID;
@@ -91,7 +92,6 @@ static void *_openthread_event_loop(void *arg) {
 #endif
 
     ot_job_t *job;
-    serial_msg_t* serialBuffer;
     while (1) {
         otTaskletsProcess(sInstance);
         if (otTaskletsArePending(sInstance) == false) {
@@ -106,12 +106,14 @@ static void *_openthread_event_loop(void *arg) {
                     dev = msg.content.ptr;
                     dev->driver->isr(dev);
                     break;
+#ifdef MODULE_OPENTHREAD_CLI
                 case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
                     /* Tell OpenThread about the reception of a CLI command */
                     serialBuffer = (serial_msg_t*)msg.content.ptr;
                     otPlatUartReceived((uint8_t*) serialBuffer->buf,serialBuffer->length);
                     serialBuffer->serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
                     break;
+#endif
                 case OPENTHREAD_JOB_MSG_TYPE_EVENT:
                     job = msg.content.ptr;
                     reply.content.value = ot_exec_command(sInstance, job->command, job->arg, job->answer);

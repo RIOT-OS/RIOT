@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-l031k6 STM32 Nucleo-L031K6
- * @ingroup     boards_common_nucleo32
- * @brief       Support for the STM32 Nucleo-L031K6
+ * @ingroup     boards_nucleo-l031k6
  * @{
  *
  * @file
@@ -24,53 +22,14 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "l0/cfg_clock_32_16_1.h"
+#include "cfg_i2c1_pb6_pb7.h"
+#include "cfg_rtt_default.h"
+#include "cfg_timer_tim2.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Clock system configuration
- * @{
- */
-#define CLOCK_HSI           (16000000U)         /* internal oscillator */
-#define CLOCK_CORECLOCK     (32000000U)         /* desired core clock frequency */
-
-/* configuration of PLL prescaler and multiply values */
-/* CORECLOCK := HSI / CLOCK_PLL_DIV * CLOCK_PLL_MUL */
-#define CLOCK_PLL_DIV       RCC_CFGR_PLLDIV2
-#define CLOCK_PLL_MUL       RCC_CFGR_PLLMUL4
-/* configuration of peripheral bus clock prescalers */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* AHB clock -> 32MHz */
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1     /* APB2 clock -> 32MHz */
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV1     /* APB1 clock -> 32MHz */
-/* configuration of flash access cycles */
-#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY
-
-/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
-/** @} */
-
-/**
- * @name    Timer configuration
- * @{
- */
-static const timer_conf_t timer_config[] = {
-    {
-        .dev      = TIM2,
-        .max      = 0x0000ffff,
-        .rcc_mask = RCC_APB1ENR_TIM2EN,
-        .bus      = APB1,
-        .irqn     = TIM2_IRQn
-    }
-};
-
-#define TIMER_0_ISR         isr_tim2
-
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
-/** @} */
 
 /**
  * @name    UART configuration
@@ -93,7 +52,7 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_0_ISR          (isr_usart2)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -113,7 +72,7 @@ static const pwm_conf_t pwm_config[] = {
     }
 };
 
-#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 /**
@@ -144,13 +103,16 @@ static const spi_conf_t spi_config[] = {
         .miso_pin = GPIO_PIN(PORT_B, 4),
         .sclk_pin = GPIO_PIN(PORT_B, 3),
         .cs_pin   = GPIO_UNDEF,
-        .af       = GPIO_AF0,
+        .mosi_af  = GPIO_AF0,
+        .miso_af  = GPIO_AF0,
+        .sclk_af  = GPIO_AF0,
+        .cs_af    = GPIO_AF0,
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -167,13 +129,6 @@ static const spi_conf_t spi_config[] = {
     { GPIO_PIN(PORT_A, 7), 7 },  /* Pin A6 */  \
 }
 #define ADC_NUMOF           (7U)
-/** @} */
-
-/**
- * @name    RTC configuration
- * @{
- */
-#define RTC_NUMOF           (1U)
 /** @} */
 
 #ifdef __cplusplus

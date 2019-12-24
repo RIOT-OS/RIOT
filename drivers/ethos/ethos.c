@@ -34,6 +34,10 @@
 #include "net/ethernet.h"
 
 #ifdef USE_ETHOS_FOR_STDIO
+#error USE_ETHOS_FOR_STDIO is deprecated, use USEMODULE+=stdio_ethos instead
+#endif
+
+#ifdef MODULE_STDIO_ETHOS
 #include "stdio_uart.h"
 #include "isrpipe.h"
 extern isrpipe_t stdio_uart_isrpipe;
@@ -60,7 +64,7 @@ void ethos_setup(ethos_t *dev, const ethos_params_t *params)
     dev->last_framesize = 0;
     dev->accept_new = true;
 
-    tsrb_init(&dev->inbuf, (char*)params->buf, params->bufsize);
+    tsrb_init(&dev->inbuf, params->buf, params->bufsize);
     mutex_init(&dev->out_mutex);
 
     uint32_t a = random_uint32();
@@ -104,7 +108,7 @@ static void _handle_char(ethos_t *dev, char c)
                 _reset_state(dev);
             }
             break;
-#ifdef USE_ETHOS_FOR_STDIO
+#ifdef MODULE_STDIO_ETHOS
         case ETHOS_FRAME_TYPE_TEXT:
             dev->framesize++;
             isrpipe_write_one(&stdio_uart_isrpipe, c);
@@ -127,7 +131,7 @@ static void _end_of_frame(ethos_t *dev)
             /* fall through */
         case ETHOS_FRAME_TYPE_HELLO_REPLY:
             if (dev->framesize == 6) {
-                tsrb_get(&dev->inbuf, (char*)dev->remote_mac_addr, 6);
+                tsrb_get(&dev->inbuf, dev->remote_mac_addr, 6);
             }
             break;
     }

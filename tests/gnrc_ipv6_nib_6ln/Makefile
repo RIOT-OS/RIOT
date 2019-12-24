@@ -1,10 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             chronos nucleo-f030r8 nucleo-l053r8 nucleo-f031k6 \
-                             nucleo-l031k6 nucleo-f042k6 stm32f0discovery \
-                             telosb waspmote-pro wsn430-v1_3b wsn430-v1_4
-
 USEMODULE += gnrc_ipv6
 USEMODULE += gnrc_sixlowpan
 USEMODULE += gnrc_sixlowpan_ctx
@@ -14,10 +9,10 @@ USEMODULE += embunit
 USEMODULE += netdev_ieee802154
 USEMODULE += netdev_test
 
+# lower log-level to save memory of LOG_WARNING() in gnrc_netif
+CFLAGS += -DLOG_LEVEL=LOG_ERROR
 CFLAGS += -DGNRC_NETTYPE_NDP=GNRC_NETTYPE_TEST
 CFLAGS += -DGNRC_PKTBUF_SIZE=512
 CFLAGS += -DTEST_SUITES
-
-TEST_ON_CI_WHITELIST += all
 
 include $(RIOTBASE)/Makefile.include

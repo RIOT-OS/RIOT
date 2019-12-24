@@ -15,7 +15,7 @@ CFLAGS += -Wno-address
 
 make_module = "$(MAKE)" -f $(LWIP_MODULE_MAKEFILE) MODULE=$(1) -C $(2)
 
-all: git-download lwip
+all: lwip
 
 lwip: $(LWIP_USEMODULE)
 	$(call make_module,$@,$(PKG_BUILDDIR))

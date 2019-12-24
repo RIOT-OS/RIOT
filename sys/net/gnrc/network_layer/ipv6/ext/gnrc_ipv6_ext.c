@@ -23,6 +23,7 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/icmpv6/error.h"
 #include "net/gnrc/ipv6.h"
+#include "net/gnrc/ipv6/ext/frag.h"
 #include "net/gnrc/ipv6/ext/rh.h"
 
 #include "net/gnrc/ipv6/ext.h"
@@ -109,17 +110,19 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
             case PROTNUM_IPV6_EXT_ESP:
             case PROTNUM_IPV6_EXT_MOB: {
                 ipv6_ext_t *ext_hdr;
+                uint8_t nh;
 
                 DEBUG("ipv6: handle extension header (protnum = %u)\n",
                       *protnum);
                 ext_hdr = pkt->data;
+                nh = ext_hdr->nh;
                 if ((pkt = _demux(pkt, *protnum)) == NULL) {
                     DEBUG("ipv6: packet was consumed by extension header "
                           "handling\n");
                     return NULL;
                 }
-                *protnum = ext_hdr->nh;
-                if (_duplicate_hopopt(pkt, *protnum)) {
+                *protnum = nh;
+                if (_duplicate_hopopt(pkt, nh)) {
                     return NULL;
                 }
                 break;
@@ -254,10 +257,12 @@ static gnrc_pktsnip_t *_demux(gnrc_pktsnip_t *pkt, unsigned protnum)
 
             break;
 #endif  /* MODULE_GNRC_IPV6_EXT_RH */
-
+        case PROTNUM_IPV6_EXT_FRAG:
+#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+            return gnrc_ipv6_ext_frag_reass(pkt);
+#endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
         case PROTNUM_IPV6_EXT_HOPOPT:
         case PROTNUM_IPV6_EXT_DST:
-        case PROTNUM_IPV6_EXT_FRAG:
         case PROTNUM_IPV6_EXT_AH:
         case PROTNUM_IPV6_EXT_ESP:
         case PROTNUM_IPV6_EXT_MOB:
@@ -293,7 +298,7 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_build(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *next,
         }
     }
 
-    snip = gnrc_pktbuf_add(next, NULL, size, GNRC_NETTYPE_IPV6);
+    snip = gnrc_pktbuf_add(next, NULL, size, GNRC_NETTYPE_IPV6_EXT);
 
     if (snip == NULL) {
         return NULL;

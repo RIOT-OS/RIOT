@@ -16,6 +16,9 @@
 #include "irq.h"
 #include "VIC.h"
 
+#include "stdio_base.h"
+#include "periph/init.h"
+
 void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale)
 {
     uint32_t pclkdiv;
@@ -108,6 +111,62 @@ void arm_reset(void)
     WDFEED = 0x55;
     /* Wait for the watchdog timer to expire, thus performing a reset */
     while(1) {}
+}
+
+/**
+ * @brief Initialize the CPU, set IRQ priorities, clocks
+ */
+void cpu_init(void)
+{
+    extern void board_init(void);
+
+    /* configure CPU clock */
+    cpu_init_clks();
+
+    /* set up GPIOs */
+    gpio_init_ports();
+
+    /* board specific setup of i/o pins */
+    board_init();
+
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
+
+    /* trigger static peripheral initialization */
+    periph_init();
+}
+
+/* RSIR will only have POR bit set even when waking up from Deep Power Down
+ * Use signature in battery RAM to discriminate between Deep Power Down and POR
+ */
+bool cpu_woke_from_backup(void)
+{
+    static char signature[] __attribute__((section(".backup.data"))) = {
+        'R', 'I', 'O', 'T'
+    };
+
+    /* external reset */
+    if (RSIR & RSIR_EXTR) {
+        return false;
+    }
+
+    if (signature[0] != 'R') {
+        return false;
+    }
+
+    if (signature[1] != 'I') {
+        return false;
+    }
+
+    if (signature[2] != 'O') {
+        return false;
+    }
+
+    if (signature[3] != 'T') {
+        return false;
+    }
+
+    return true;
 }
 
 /** @} */

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -28,10 +28,10 @@
 #include "periph_conf.h"
 #include "board.h"
 
-#include "common.h"
+#include "esp_common.h"
 #include "sdk/sdk.h"
 
-#if defined(ADC_NUMOF) && ADC_NUMOF > 0
+extern uint16_t test_tout(void);
 
 int adc_init(adc_t line)
 {
@@ -47,11 +47,10 @@ int adc_sample(adc_t line, adc_res_t res)
     CHECK_PARAM_RET (line < ADC_NUMOF, -1)
     CHECK_PARAM_RET (res == ADC_RES_10BIT, -1)
 
-    #ifdef MODULE_ESP_SDK
-    return system_adc_read ();
-    #else
-    return test_tout(false);
-    #endif
+    return test_tout();
 }
 
-#endif
+void adc_print_config(void)
+{
+    printf("\tADC\t\tpins=[ A0 ]\n");
+}

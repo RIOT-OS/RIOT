@@ -56,7 +56,7 @@ extern "C" {
             printf(__VA_ARGS__); \
         } \
         else { \
-            puts("Cannot debug, stack too small"); \
+            puts("Cannot debug, stack too small. Consider using DEBUG_PUTS()."); \
         } \
     } while (0)
 #else
@@ -95,6 +95,14 @@ extern "C" {
  * @note Another name for ::DEBUG_PRINT
  */
 #define DEBUG(...) if (ENABLE_DEBUG) DEBUG_PRINT(__VA_ARGS__)
+
+/**
+ * @def DEBUG_PUTS
+ *
+ * @brief Print debug information to stdout using puts(), so no stack size
+ *        restrictions do apply.
+ */
+#define DEBUG_PUTS(str) if (ENABLE_DEBUG) puts(str)
 /** @} */
 
 /**

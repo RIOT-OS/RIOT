@@ -66,7 +66,7 @@
  * in ascending order by this key.
  *
  * The definitions for the table types are in `lua_builtin.h`. The loader module
- * containes empty tables, defined as weak symbols so they can be ovewritten
+ * contains empty tables, defined as weak symbols so they can be ovewritten
  * by the application. The variables that must be defined are:
  *
  * ```

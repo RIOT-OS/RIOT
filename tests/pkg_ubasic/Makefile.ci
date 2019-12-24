@@ -1,0 +1,4 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-duemilanove \
+    stm32f030f4-demo \
+    #

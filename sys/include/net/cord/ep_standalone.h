@@ -74,7 +74,7 @@ void cord_ep_standalone_reg_cb(cord_ep_standalone_cb_t cb);
  * @brief   Signal the cord_ep thread about connection status change
  *
  * @note    This function should not be called by a user, but it is called from
- *          withing the cord_ep implementation
+ *          within the cord_ep implementation
  *
  * @param[in] connected     set to true if we are connected to a RD
  */

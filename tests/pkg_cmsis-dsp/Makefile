@@ -1,7 +1,6 @@
 BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
-TEST_ON_CI_WHITELIST += all
 USEPKG += cmsis-dsp
 
 BOARD_WHITELIST := \

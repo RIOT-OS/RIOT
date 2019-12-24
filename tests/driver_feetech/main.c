@@ -14,8 +14,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define ARRAY_LEN(array) (sizeof(array)/sizeof(array[0]))
-
 typedef struct {
     const char *name;
     int addr;
@@ -97,7 +95,7 @@ static int32_t parse_baud(char *arg)
 {
     int32_t baud = atoi(arg);
 
-    for (size_t i = 0 ; i < ARRAY_LEN(baudrates) ; i++) {
+    for (size_t i = 0 ; i < ARRAY_SIZE(baudrates); i++) {
         if (baud == baudrates[i]) {
             return baud;
         }
@@ -122,14 +120,14 @@ static void parse_reg(char *arg, int *reg8, int *reg16)
     *reg8 = -1;
     *reg16 = -1;
 
-    for (size_t i = 0 ; i < ARRAY_LEN(regs8) ; i++) {
+    for (size_t i = 0 ; i < ARRAY_SIZE(regs8); i++) {
         if (strcmp(arg, regs8[i].name) == 0) {
             *reg8 = regs8[i].addr;
             return;
         }
     }
 
-    for (size_t i = 0 ; i < ARRAY_LEN(regs16) ; i++) {
+    for (size_t i = 0 ; i < ARRAY_SIZE(regs16); i++) {
         if (strcmp(arg, regs16[i].name) == 0) {
             *reg16 = regs16[i].addr;
             return;
@@ -141,12 +139,12 @@ static void parse_reg(char *arg, int *reg8, int *reg16)
 
 void print_registers(void) {
     puts("available 8bits registers :");
-    for (size_t i = 0 ; i < ARRAY_LEN(regs8) ; i++) {
+    for (size_t i = 0 ; i < ARRAY_SIZE(regs8); i++) {
         printf("\t%s\n", regs8[i].name);
     }
 
     puts("available 16bits registers :");
-    for (size_t i = 0 ; i < ARRAY_LEN(regs16) ; i++) {
+    for (size_t i = 0 ; i < ARRAY_SIZE(regs16); i++) {
         printf("\t%s\n", regs16[i].name);
     }
 }
@@ -159,7 +157,7 @@ static int cmd_init(int argc, char **argv) {
     if (argc != 3 && argc != 4) {
         printf("usage; %s <uart> <baudrate> [<timeout_us>]\n", argv[0]);
         puts("available baudrates :");
-        for (size_t i = 0 ; i < ARRAY_LEN(baudrates) ; i++) {
+        for (size_t i = 0 ; i < ARRAY_SIZE(baudrates); i++) {
             printf("\t%ld\n", (long int)baudrates[i]);
         }
         return 1;
@@ -190,7 +188,7 @@ static int cmd_init(int argc, char **argv) {
         .dir = UART_HALF_DUPLEX_DIR_NONE,
     };
 
-    int ret = uart_half_duplex_init(&stream, feetech_buffer, ARRAY_LEN(feetech_buffer), &params);
+    int ret = uart_half_duplex_init(&stream, feetech_buffer, ARRAY_SIZE(feetech_buffer), &params);
 
     if (argc == 4) {
         stream.timeout_us = timeout;

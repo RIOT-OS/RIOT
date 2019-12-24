@@ -26,7 +26,7 @@
 #include "tcs37727.h"
 #include "tcs37727_params.h"
 
-#define SLEEP       (1 * US_PER_SEC)
+#define SLEEP_USEC  (1 * US_PER_SEC)
 
 int main(void)
 {
@@ -51,7 +51,7 @@ int main(void)
         printf("CT : %5"PRIu32" Lux: %6"PRIu32" AGAIN: %2d ATIME %"PRIu32"\n",
                data.ct, data.lux, dev.again, dev.p.atime);
 
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

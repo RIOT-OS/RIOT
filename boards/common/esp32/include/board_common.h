@@ -108,7 +108,7 @@
 /**
  * @brief   MTD drive start address in SPI flash memory
  *
- * Defines the start adress of the MTD system device in the SPI
+ * Defines the start address of the MTD system device in the SPI
  * flash memory. It can be overridden by \ref esp32_app_spec_conf
  * "application-specific board configuration"
  *

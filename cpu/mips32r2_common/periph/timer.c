@@ -135,7 +135,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
     compares[channel] = counter + timeout;
     irq_restore(status);
 
-    return 1;
+    return 0;
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
@@ -152,7 +152,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     compares[channel] = value;
     irq_restore(status);
 
-    return 1;
+    return 0;
 }
 
 int timer_clear(tim_t dev, int channel)
@@ -166,7 +166,7 @@ int timer_clear(tim_t dev, int channel)
     compares[channel] = 0;
     irq_restore(status);
 
-    return 1;
+    return 0;
 }
 
 unsigned int timer_read(tim_t dev)
@@ -225,7 +225,7 @@ void timer_irq_disable(tim_t dev)
  *
  * When toolchain support is available we could move to full vector mode but
  * this does take up significant space (MCU-ASE provides 256 vectors at 32B
- * spacing (the default) thats 8KB of vector space!), So a single entry point
+ * spacing (the default) that's 8KB of vector space!), So a single entry point
  * may be better anyway.
  *
  */

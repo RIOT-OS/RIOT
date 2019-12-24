@@ -28,7 +28,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define BMX055_NUM          (sizeof(bmx055_params) / sizeof(bmx055_params[0]))
+#define BMX055_NUM          ARRAY_SIZE(bmx055_params)
 
 /**
  * @brief   Each sensor contains 3 individual i2c modules

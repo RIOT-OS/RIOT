@@ -1,0 +1,16 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-duemilanove \
+    arduino-leonardo \
+    arduino-nano \
+    arduino-uno \
+    atmega328p \
+    chronos \
+    msb-430 \
+    msb-430h \
+    nucleo-f031k6 \
+    stm32f030f4-demo \
+    telosb \
+    wsn430-v1_3b \
+    wsn430-v1_4 \
+    z1 \
+    #

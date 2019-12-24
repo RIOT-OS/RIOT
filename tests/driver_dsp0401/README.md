@@ -1,7 +1,7 @@
 ## About
 
 This is a test application for the [DSP0401](https://www.embeddedadventures.com/datasheets/DSP-0401B_hw_v4.pdf),
-a 4 digits with 16 segments alpha-numeric display.
+a 4 digits with 16 segments alphanumeric display.
 
 ## Connecting the device
 

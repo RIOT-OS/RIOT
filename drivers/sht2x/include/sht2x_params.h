@@ -77,7 +77,7 @@ static const sht2x_params_t sht2x_params[] =
 /**
  * @brief   Get the number of configured SHT2X devices
  */
-#define SHT2X_NUMOF       (sizeof(sht2x_params) / sizeof(sht2x_params[0]))
+#define SHT2X_NUMOF       ARRAY_SIZE(sht2x_params)
 
 /**
  * @brief   Configuration details of SAUL registry entries

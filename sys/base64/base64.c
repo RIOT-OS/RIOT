@@ -66,8 +66,9 @@ int base64_encode(const void *data_in, size_t data_in_size,
         return BASE64_ERROR_DATA_IN;
     }
 
-    if (data_in_size < 1) {
-        return BASE64_ERROR_DATA_IN_SIZE;
+    if (data_in_size == 0) {
+        *base64_out_size = 0;
+        return BASE64_SUCCESS;
     }
 
     if (*base64_out_size < required_size) {
@@ -168,6 +169,11 @@ int base64_decode(const unsigned char *base64_in, size_t base64_in_size,
 
     if (base64_in == NULL) {
         return BASE64_ERROR_DATA_IN;
+    }
+
+    if (base64_in_size == 0) {
+        *data_out_size = 0;
+        return BASE64_SUCCESS;
     }
 
     if (base64_in_size < 4) {

@@ -1,1 +1,0 @@
-include $(RIOTCPU)/fe310/Makefile.dep

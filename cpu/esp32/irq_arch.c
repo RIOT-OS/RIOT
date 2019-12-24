@@ -129,7 +129,7 @@ static const struct _irq_alloc_table_t _irq_alloc_table[] = {
 
 typedef void (*intr_handler_t)(void *arg);
 
-#define IRQ_ALLOC_TABLE_SIZE (sizeof(_irq_alloc_table)/sizeof(struct _irq_alloc_table_t))
+#define IRQ_ALLOC_TABLE_SIZE ARRAY_SIZE(_irq_alloc_table)
 #define ESP_INTR_FLAG_INTRDISABLED    (1<<11)
 
 /**

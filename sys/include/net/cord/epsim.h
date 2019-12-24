@@ -11,6 +11,12 @@
  * @ingroup     net_cord
  * @brief       CoRE Resource Directory endpoint using the simple registration
  *              procedure
+ *
+ * This module is designed to provide nodes with the possibility to register
+ * with resource directories without having to allocate a lot of resources. All
+ * the user has to do, is to call the cord_epsim_register() function in periodic
+ * intervals, depending on the value of the `CORD_LT` variable.
+ *
  * @{
  *
  * @file
@@ -22,6 +28,8 @@
 #ifndef NET_CORD_EPSIM_H
 #define NET_CORD_EPSIM_H
 
+#include "net/sock/udp.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,34 +39,33 @@ extern "C" {
  */
 enum {
     CORD_EPSIM_OK     =  0,     /**< all good */
-    CORD_EPSIM_NOADDR = -1,     /**< on address conversion errors */
-    CORD_EPSIM_ERROR  = -2,     /**< on other errors */
+    CORD_EPSIM_ERROR  = -1,     /**< on failing to send POST request */
+    CORD_EPSIM_BUSY   = -2,     /**< endpoint registration is in progress */
 };
 
 /**
  * @brief   Initiate the node registration by sending an empty CoAP POST message
  *          to the RD server's /.well-known/core resource
  *
+ * @pre     remote != NULL
+ *
+ * @param[in] remote    address and port of the target resource directory
+ *
  * @return  CORD_EPSIM_OK on success
- * @return  CORD_EPSIM_NOADDR if conversion of RD address fails
+ * @return  CORD_EPSIM_BUSY if registration is already in progress
  * @return  CORD_EPSIM_ERROR if something goes wrong preparing or sending the
- *          initial request
+ *          registration request
  */
-int cord_epsim_register(void);
+int cord_epsim_register(const sock_udp_ep_t *remote);
 
-#if defined(MODULE_CORD_EPSIM_STANDALONE) || defined(DOXYGEN)
 /**
- * @brief   Spawn a new thread that registers the node and updates the
- *          registration with all responding RDs using the simple registration
- *          process
+ * @brief   Get the status of the latest registration procedure
  *
- * @note    Only available with the `cord_epsim_standalone` module compiled in
- *
- * @warning This function must only be called once (typically during system
- *          initialization)
+ * @return  CORD_EPSIM_OK if last registration was triggered successfully
+ * @return  CORD_EPSIM_BUSY if a registration is currently in progress
+ * @return  CORD_EPSIM_ERROR if latest registration attempt failed
  */
-void cord_epsim_run(void);
-#endif
+int cord_epsim_state(void);
 
 #ifdef __cplusplus
 }

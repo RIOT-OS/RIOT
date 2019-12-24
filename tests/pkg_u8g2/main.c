@@ -103,7 +103,7 @@ static const uint8_t logo[] = {
 
 #if (TEST_OUTPUT == TEST_OUTPUT_I2C) || (TEST_OUTPUT == TEST_OUTPUT_SPI)
 /**
- * @brief   RIOT-OS pin maping of U8g2 pin numbers to RIOT-OS GPIO pins.
+ * @brief   RIOT-OS pin mapping of U8g2 pin numbers to RIOT-OS GPIO pins.
  * @note    To minimize the overhead, you can implement an alternative for
  *          u8x8_gpio_and_delay_riotos.
  */

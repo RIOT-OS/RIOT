@@ -75,6 +75,8 @@ typedef struct {
  * @param       context   the cipher_context_t-struct to save the
  *                        initialization of the cipher in
  * @param       keySize   the size of the key
+ *                        Must be 16, since this implementation does not
+ *                        support key lengths of 24 or 32 bytes
  * @param       key       a pointer to the key
  *
  * @return  CIPHER_INIT_SUCCESS if the initialization was successful.

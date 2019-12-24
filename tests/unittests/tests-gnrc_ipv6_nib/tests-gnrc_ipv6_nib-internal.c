@@ -476,7 +476,7 @@ static void test_nib_nc_add__success(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_NUMOF neighbor cache entries with differnt IP address.
+ * Creates GNRC_IPV6_NIB_NUMOF neighbor cache entries with different IP address.
  * Expected result: new entries should still be able to be created and further
  * should be different than the previous created ones
  */

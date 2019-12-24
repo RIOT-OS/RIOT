@@ -1,0 +1,2 @@
+CPU = cc2538
+CPU_MODEL = cc2538sf53

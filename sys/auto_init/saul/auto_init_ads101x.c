@@ -33,7 +33,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define ADS101X_NUM   (sizeof(ads101x_params) / sizeof(ads101x_params[0]))
+#define ADS101X_NUM   ARRAY_SIZE(ads101x_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -48,7 +48,7 @@ static saul_reg_t saul_entries[ADS101X_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define ADS101X_INFO_NUM (sizeof(ads101x_saul_info) / sizeof(ads101x_saul_info[0]))
+#define ADS101X_INFO_NUM ARRAY_SIZE(ads101x_saul_info)
 
 /**
  * @brief   Reference the driver struct

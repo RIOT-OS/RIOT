@@ -112,7 +112,7 @@ static int _tftp_server_data_cb(uint32_t offset, void *data, size_t data_len)
 static void _tftp_server_stop_cb(tftp_event_t event, const char *msg)
 {
     /* decode the stop event received */
-    const char *cause = "UNKOWN";
+    const char *cause = "UNKNOWN";
 
     if (event == TFTP_SUCCESS) {
         cause = "SUCCESS";

@@ -27,7 +27,7 @@ extern "C" {
 /**
  * @brief   Number of allocated parameters at @ref socket_zep_params
  *
- * @note    This was desided to only be confiruable on compile-time to be
+ * @note    This was decided to only be confiruable on compile-time to be
  *          more similar to actual boards
  */
 #ifndef SOCKET_ZEP_MAX

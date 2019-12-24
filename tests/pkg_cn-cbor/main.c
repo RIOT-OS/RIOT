@@ -134,7 +134,7 @@ static void test_parse(void)
         "bf61610161629f0203ffff",   // {_ "a": 1, "b": [_ 2, 3]}
     };
 
-    for (test = 0; test < sizeof(tests) / sizeof(char*); test++) {
+    for (test = 0; test < ARRAY_SIZE(tests); test++) {
         unsigned char buf[64] = {0};
         TEST_ASSERT((strlen(tests[test])/2) <= sizeof(buf));
 
@@ -172,7 +172,7 @@ static void test_errors(void)
     TEST_ASSERT_EQUAL_INT(-1, cn_cbor_encoder_write(ebuf, 0, sizeof(ebuf),
             &inv));
 
-    for (offs = 0; offs < sizeof(tests) / sizeof(cbor_failure); offs++) {
+    for (offs = 0; offs < ARRAY_SIZE(tests); offs++) {
         unsigned char buf[32] = {0};
         TEST_ASSERT((strlen(tests[offs].hex)/2) <= sizeof(buf));
 

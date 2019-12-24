@@ -108,7 +108,7 @@ static void _handle_raw_sixlowpan(ble_mac_inbuf_t *inbuf)
     gnrc_netif_hdr_init(netif_hdr->data, BLE_L2_ADDR_LEN, BLE_L2_ADDR_LEN);
     gnrc_netif_hdr_set_src_addr(netif_hdr->data, inbuf->src, BLE_L2_ADDR_LEN);
     gnrc_netif_hdr_set_dst_addr(netif_hdr->data, _ble_netif->l2addr, BLE_L2_ADDR_LEN);
-    ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = _ble_netif->pid;
+    gnrc_netif_hdr_set_netif(netif_hdr->data, _ble_netif);
 
     DEBUG("_handle_raw_sixlowpan(): received packet from %02x:%02x:%02x:%02x:%02x:%02x "
             "of length %d\n",
@@ -258,7 +258,7 @@ static void _netif_msg_handler(gnrc_netif_t *netif, msg_t *msg)
 }
 
 static const gnrc_netif_ops_t _ble_ops = {
-    .init = NULL,
+    .init = gnrc_netif_default_init,
     .send = _netif_send,
     .recv = _netif_recv,
     .get = gnrc_netif_get_from_netdev,

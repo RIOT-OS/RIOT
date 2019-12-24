@@ -24,7 +24,7 @@
 
 void pm_set_lowest(void)
 {
-    /* Dont wait if interrupts are not enabled - we would never return!*/
+    /* Don't wait if interrupts are not enabled - we would never return!*/
     if (mips32_get_c0(C0_STATUS) & SR_IE) {
         __asm volatile ("wait");
     }

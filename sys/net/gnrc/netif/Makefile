@@ -9,5 +9,8 @@ endif
 ifneq (,$(filter gnrc_netif_hdr,$(USEMODULE)))
   DIRS += hdr
 endif
+ifneq (,$(filter gnrc_netif_lorawan,$(USEMODULE)))
+  DIRS += lorawan
+endif
 
 include $(RIOTBASE)/Makefile.base

@@ -56,6 +56,11 @@ extern "C" {
  */
 #define PUF_SRAM_ATTRIBUTES __attribute__((used, section(".noinit")))
 
+/**
+ * @brief   Declare the heap_stats function as available
+ */
+#define HAVE_HEAP_STATS
+
 #ifdef __cplusplus
 }
 #endif

@@ -113,7 +113,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t s
  * @param[in] size  The size of the new packet snip.
  * @param[in] type  The type of the new packet snip.
  *
- * @note    It's not guaranteeed that `result->data` points to the same address
+ * @note    It's not guaranteed that `result->data` points to the same address
  *          as the original `pkt->data`.
  *
  * @return  The new packet snip in @p pkt on success.
@@ -191,23 +191,6 @@ static inline void gnrc_pktbuf_release(gnrc_pktsnip_t *pkt)
 gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt);
 
 /**
- * @brief   Create a IOVEC representation of the packet pointed to by *pkt*
- *
- * @pre `(len != NULL)`
- *
- * @details This function will create a new packet snip in the packet buffer,
- *          which points to the given *pkt* and contains a IOVEC representation
- *          of the referenced packet in its data section.
- *
- * @param[in]  pkt  Packet to export as IOVEC
- * @param[out] len  Number of elements in the IOVEC
- *
- * @return  Pointer to the 'IOVEC packet snip'
- * @return  NULL, if packet is empty of the packet buffer is full
- */
-gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len);
-
-/**
  * @brief   Deletes a snip from a packet and the packet buffer.
  *
  * @param[in] pkt   A packet.
@@ -245,61 +228,6 @@ gnrc_pktsnip_t *gnrc_pktbuf_replace_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *ol
  *          case.
  */
 gnrc_pktsnip_t *gnrc_pktbuf_reverse_snips(gnrc_pktsnip_t *pkt);
-
-/**
- * @brief Duplicates pktsnip chain upto (including) a snip with the given type
- *        as a continuous snip.
- *
- *          Example:
- *              Input:
- *                                                                  buffer
- *              +---------------------------+                      +------+
- *              | size = 8                  | data       +-------->|      |
- *              | type = NETTYPE_IPV6_EXT   |------------+         +------+
- *              +---------------------------+                      .      .
- *                    | next                                       .      .
- *                    v                                            .      .
- *              +---------------------------+                      +------+
- *              | size = 40                 | data    +----------->|      |
- *              | type = NETTYPE_IPV6       |---------+            +------+
- *              +---------------------------+                      .      .
- *                    | next                                       .      .
- *                    v
- *              +---------------------------+                      +------+
- *              | size = 14                 | data +-------------->|      |
- *              | type = NETTYPE_NETIF      |------+               +------+
- *              +---------------------------+                      .      .
- *
- *
- *              Output:
- *                                                                  buffer
- *              +---------------------------+                      +------+
- *              | size = 48                 | data       +-------->|      |
- *              | type = NETTYPE_IPV6       |------------+         |      |
- *              +---------------------------+                      |      |
- *                    |                                            +------+
- *                    |                                            .      .
- *                    | next                                       .      .
- *                    v
- *              +---------------------------+                      +------+
- *              | size = 14                 | data +-------------->|      |
- *              | type = NETTYPE_NETIF      |------+               +------+
- *              +---------------------------+                      .      .
- *
- *        The original snip is keeped as is except `users` decremented.
- *
- * @deprecated  This function breaks the abstraction of `gnrc_pktbuf` and its
- *              only user within the RIOT code base `gnrc_ipv6_ext` was reworked
- *              so it isn't needed anymore.
- *              It will be removed after the 2019.04 release.
- *
- * @param[in,out] pkt   The snip to duplicate.
- * @param[in]     type  The type of snip to stop duplication.
- *
- * @return The duplicated snip, if succeeded.
- * @return NULL, if no space is left in the packet buffer.
- */
-gnrc_pktsnip_t *gnrc_pktbuf_duplicate_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type);
 
 /**
  * @brief   Merge pktsnip chain to single pktsnip.

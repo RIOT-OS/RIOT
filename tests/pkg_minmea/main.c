@@ -18,26 +18,26 @@
  * @}
  */
 
-#include <stdio.h>
-
+#include "fmt.h"
 #include "minmea.h"
 
 static const char *_gll = "$GNGLL,5229.0178,N,01326.7605,E,114350.000,A,A*45";
 
 int main(void)
 {
-    puts("START");
+    print_str("START\n");
     struct minmea_sentence_gll frame;
 
     int res = minmea_parse_gll(&frame, _gll);
     if (!res) {
-        puts("FAILURE: error parsing GPS sentence");
+        print_str("FAILURE: error parsing GPS sentence\n");
     }
     else {
-        printf("parsed coordinates: lat=%f lon=%f\n",
-                minmea_tocoord(&frame.latitude),
-                minmea_tocoord(&frame.longitude));
-        puts("SUCCESS");
+        print_str("parsed coordinates: lat=");
+        print_float(minmea_tocoord(&frame.latitude), 6);
+        print_str(" lon=");
+        print_float(minmea_tocoord(&frame.longitude), 6);
+        print_str("\nSUCCESS\n");
     }
 
     return 0;

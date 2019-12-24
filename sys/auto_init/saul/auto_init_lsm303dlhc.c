@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define LSM303DLHC_NUM    (sizeof(lsm303dlhc_params) / sizeof(lsm303dlhc_params[0]))
+#define LSM303DLHC_NUM    ARRAY_SIZE(lsm303dlhc_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -45,7 +45,7 @@ static saul_reg_t saul_entries[LSM303DLHC_NUM * 2];
 /**
  * @brief   Define the number of saul info
  */
-#define LSM303DLHC_INFO_NUM    (sizeof(lsm303dlhc_saul_info) / sizeof(lsm303dlhc_saul_info[0]))
+#define LSM303DLHC_INFO_NUM    ARRAY_SIZE(lsm303dlhc_saul_info)
 
 /**
  * @name    Reference the driver structs

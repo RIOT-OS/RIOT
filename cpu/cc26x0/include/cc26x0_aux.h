@@ -18,7 +18,7 @@
 
 #include <stdbool.h>
 
-#include "cc26x0.h"
+#include "cc26xx_cc13xx.h"
 
 #ifdef __cplusplus
 extern "C" {

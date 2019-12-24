@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "openthread/config.h"
 #include "openthread/platform/logging.h"
 
 /* adapted from OpenThread posix example:

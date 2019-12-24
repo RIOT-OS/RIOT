@@ -26,16 +26,26 @@ WORKTREE_SUBDIR = "backport_temp"
 RELEASE_PREFIX = ""
 RELEASE_SUFFIX = "-branch"
 
-LABELS_REMOVE = ['Process: needs backport']
+LABELS_REMOVE = ['Process: needs backport', 'Reviewed: ']
 LABELS_ADD = ['Process: release backport']
 
 BACKPORT_BRANCH = 'backport/{release}/{origbranch}'
 
 
 def _get_labels(pr):
-    labels = {label['name'] for label in pr['labels']}
-    for remove in LABELS_REMOVE:
-        labels.discard(remove)
+    """
+    >>> _get_labels({'labels': [{'name': 'test'}, {'name': 'abcd'}]})
+    ['Process: release backport', 'abcd', 'test']
+    >>> _get_labels({'labels': [{'name': 'Reviewed: what'}, {'name': 'Reviewed: 3-testing'}]})
+    ['Process: release backport']
+    >>> _get_labels({'labels': [{'name': 'Process: release backport'}]})
+    ['Process: release backport']
+    >>> _get_labels({'labels': [{'name': 'Process: needs backport'}]})
+    ['Process: release backport']
+    """
+    labels = set(label['name'] for label in pr['labels']
+                 if all(not label['name'].startswith(remove)
+                        for remove in LABELS_REMOVE))
     labels.update(LABELS_ADD)
     return sorted(list(labels))
 
@@ -74,11 +84,17 @@ def _get_latest_release(branches):
     return (release_short, release_fullname)
 
 
-def _get_upstream(repo):
+def _find_remote(repo, user, repo_name):
     for remote in repo.remotes:
-        if (remote.url.endswith("{}/{}.git".format(ORG, REPO)) or
-                remote.url.endswith("{}/{}".format(ORG, REPO))):
+        if (remote.url.endswith("{}/{}.git".format(user, repo_name)) or
+                remote.url.endswith("{}/{}".format(user, repo_name))):
             return remote
+    raise ValueError("Could not find remote with URL ending in {}/{}.git"
+                     .format(user, repo_name))
+
+
+def _get_upstream(repo):
+    return _find_remote(repo, ORG, REPO)
 
 
 def _delete_worktree(repo, workdir):
@@ -168,22 +184,39 @@ def main():
     # Build topic branch in temp dir
     new_branch = args.backport_branch_fmt.format(release=release_shortname,
                                                  origbranch=orig_branch)
+    if new_branch in repo.branches:
+        print("ERROR: Branch {} already exists".format(new_branch))
+        sys.exit(1)
     worktree_dir = os.path.join(args.gitdir, WORKTREE_SUBDIR)
     repo.git.worktree("add", "-b",
                       new_branch,
                       WORKTREE_SUBDIR,
                       "{}/{}".format(upstream_remote, release_fullname))
-    bp_repo = git.Repo(worktree_dir)
-    # Apply commits
-    for commit in commits:
-        bp_repo.git.cherry_pick('-x', commit['sha'])
-    # Push to github
-    print("Pushing branch {} to origin".format(new_branch))
-    if not args.noop:
-        repo.git.push('origin', '{0}:{0}'.format(new_branch))
-    # Delete worktree
-    print("Pruning temporary workdir at {}".format(worktree_dir))
-    _delete_worktree(repo, worktree_dir)
+    # transform branch name into Head object for later configuring
+    new_branch = repo.branches[new_branch]
+    try:
+        bp_repo = git.Repo(worktree_dir)
+        # Apply commits
+        for commit in commits:
+            bp_repo.git.cherry_pick('-x', commit['sha'])
+        # Push to github
+        origin = _find_remote(repo, username, REPO)
+        print("Pushing branch {} to {}".format(new_branch, origin))
+        if not args.noop:
+            push_info = origin.push('{0}:{0}'.format(new_branch))
+            new_branch.set_tracking_branch(push_info[0].remote_ref)
+    except Exception as exc:
+        # Delete worktree
+        print("Pruning temporary workdir at {}".format(worktree_dir))
+        _delete_worktree(repo, worktree_dir)
+        # also delete branch created by worktree; this is only possible after
+        # the worktree was deleted
+        repo.delete_head(new_branch)
+        raise exc
+    else:
+        # Delete worktree
+        print("Pruning temporary workdir at {}".format(worktree_dir))
+        _delete_worktree(repo, worktree_dir)
 
     labels = _get_labels(pulldata)
     merger = pulldata['merged_by']['login']

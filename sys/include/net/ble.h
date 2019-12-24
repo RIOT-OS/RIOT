@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_ble BLE defines
- * @ingroup     net
+ * @defgroup    ble_defs Generic BLE defines
+ * @ingroup     ble
  * @brief       General values defined by the BT standard
  * @{
  *
@@ -83,6 +83,41 @@ extern "C" {
 #define BLE_DESC_TIME_TRIGGER_SETTING       (0x290e)
 #define BLE_DESC_VALID_RANGE                (0x2906)
 #define BLE_DESC_VALUE_TRIGGER_SETTING      (0x290a)
+/** @} */
+
+/**
+ * @name    Selected GATT service UUIDs (16-bit)
+ *
+ * @see https://www.bluetooth.com/specifications/gatt/services
+ * @{
+ */
+#define BLE_GATT_SVC_GAP                    (0x1800)    /**< GAP service */
+#define BLE_GATT_SVC_GATT                   (0x1801)    /**< GATT service */
+#define BLE_GATT_SVC_DEVINFO                (0x180a)    /**< device info */
+#define BLE_GATT_SVC_HRS                    (0x180d)    /**< heart rate service */
+#define BLE_GATT_SVC_BAS                    (0x180f)    /**< battery service */
+#define BLE_GATT_SVC_IPSS                   (0x1820)    /**< IP protocol support */
+/* XXX: custom services not defined by the BT SIG (random values) */
+#define BLE_GATT_SVC_NDNSS                  (0x7e5e)    /**< NDN support service */
+/* add more on demand */
+/** @} */
+
+/**
+ * @name    Selected GATT characteristic UUIDs (16-bit)
+ *
+ * @see https://www.bluetooth.com/specifications/gatt/characteristics/
+ * @{
+ */
+#define BLE_GATT_CHAR_BATTERY_LEVEL         (0x2a19)    /**< battery level */
+#define BLE_GATT_CHAR_SYSTEM_ID             (0x2a23)    /**< system ID */
+#define BLE_GATT_CHAR_MODEL_NUMBER_STR      (0x2a24)    /**< model number */
+#define BLE_GATT_CHAR_SERIAL_NUMBER_STR     (0x2a25)    /**< serial number */
+#define BLE_GATT_CHAR_FW_REV_STR            (0x2a26)    /**< firmware revision */
+#define BLE_GATT_CHAR_HW_REV_STR            (0x2a27)    /**< hardware revision */
+#define BLE_GATT_CHAR_SW_REV_STR            (0x2a28)    /**< software revision */
+#define BLE_GATT_CHAR_MANUFACTURER_NAME     (0x2a29)    /**< manufacturer name */
+#define BLE_GATT_CHAR_HEART_RATE_MEASURE    (0x2a37)    /**< heart rate measurement */
+#define BLE_GATT_CHAR_BODY_SENSE_LOC        (0x2a38)    /**< body sensor location */
 /** @} */
 
 /**
@@ -246,6 +281,15 @@ extern "C" {
 #define BLE_UNIT_LUX_HOUR                   (0x27c0)    /**< luminous_exposure [lux_hour] */
 #define BLE_UNIT_GRAM_PER_SECOND            (0x27c1)    /**< mass_flow [gram_per_second] */
 #define BLE_UNIT_LITRE_PER_SECOND           (0x27c2)    /**< volume_flow [litre_per_second] */
+/** @} */
+
+/**
+ * @brief   Channel identifiers defined for L2CAP LE-U link layers
+ * @{
+ */
+#define BLE_L2CAP_CID_IPSP                  (0x0023)
+#define BLE_L2CAP_CID_CB_MIN                (0x0040)
+#define BLE_L2CAP_CID_CB_MAX                (0x007f)
 /** @} */
 
 /**

@@ -26,6 +26,7 @@
 #include <inttypes.h>
 
 #include "cpu.h"
+#include "periph_cpu.h"
 #include "kernel_init.h"
 #include "board.h"
 #include "mpu.h"
@@ -37,6 +38,10 @@
 
 #ifndef SRAM_BASE
 #define SRAM_BASE 0
+#endif
+
+#ifndef CPU_BACKUP_RAM_NOT_RETAINED
+#define CPU_BACKUP_RAM_NOT_RETAINED 0
 #endif
 
 /**
@@ -54,6 +59,15 @@ extern uint32_t _sstack;
 extern uint32_t _estack;
 extern uint8_t _sram;
 extern uint8_t _eram;
+
+/* Support for LPRAM. */
+#ifdef CPU_HAS_BACKUP_RAM
+extern const uint32_t _sbackup_data_load[];
+extern uint32_t _sbackup_data[];
+extern uint32_t _ebackup_data[];
+extern uint32_t _sbackup_bss[];
+extern uint32_t _ebackup_bss[];
+#endif /* CPU_HAS_BACKUP_RAM */
 /** @} */
 
 /**
@@ -78,7 +92,7 @@ __attribute__((weak)) void post_startup (void)
 void reset_handler_default(void)
 {
     uint32_t *dst;
-    uint32_t *src = &_etext;
+    const uint32_t *src = &_etext;
 
 #ifdef MODULE_PUF_SRAM
     puf_sram_init((uint8_t *)&_srelocate, SEED_RAM_LEN);
@@ -101,10 +115,29 @@ void reset_handler_default(void)
     for (dst = &_srelocate; dst < &_erelocate; ) {
         *(dst++) = *(src++);
     }
+
     /* default bss section to zero */
     for (dst = &_szero; dst < &_ezero; ) {
         *(dst++) = 0;
     }
+
+#ifdef CPU_HAS_BACKUP_RAM
+    if (!cpu_woke_from_backup() ||
+        CPU_BACKUP_RAM_NOT_RETAINED) {
+
+        /* load low-power data section. */
+        for (dst = _sbackup_data, src = _sbackup_data_load;
+             dst < _ebackup_data;
+             dst++, src++) {
+            *dst = *src;
+        }
+
+        /* zero-out low-power bss. */
+        for (dst = _sbackup_bss; dst < _ebackup_bss; dst++) {
+            *dst = 0;
+        }
+    }
+#endif /* CPU_HAS_BACKUP_RAM */
 
 #ifdef MODULE_MPU_STACK_GUARD
     if (((uintptr_t)&_sstack) != SRAM_BASE) {
@@ -165,6 +198,7 @@ __attribute__((naked)) void hard_fault_default(void)
     /* Get stack pointer where exception stack frame lies */
     __asm__ volatile
     (
+        ".syntax unified                    \n"
         /* Check that msp is valid first because we want to stack all the
          * r4-r11 registers so that we can use r0, r1, r2, r3 for other things. */
         "mov r0, sp                         \n" /* r0 = msp                   */
@@ -188,6 +222,24 @@ __attribute__((naked)) void hard_fault_default(void)
         " use_psp:                          \n" /* else {                     */
         "mrs r0, psp                        \n" /*   r0 = psp                 */
         " out:                              \n" /* }                          */
+#if (defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS)) \
+    && defined(MODULE_CPU_CHECK_ADDRESS)
+        /* catch intended HardFaults on Cortex-M0 to probe memory addresses */
+        "ldr     r1, [r0, #0x04]            \n" /* read R1 from the stack        */
+        "ldr     r2, =0xDEADF00D            \n" /* magic number to be found      */
+        "cmp     r1, r2                     \n" /* compare with the magic number */
+        "bne     regular_handler            \n" /* no magic -> handle as usual   */
+        "ldr     r1, [r0, #0x08]            \n" /* read R2 from the stack        */
+        "ldr     r2, =0xCAFEBABE            \n" /* 2nd magic number to be found  */
+        "cmp     r1, r2                     \n" /* compare with 2nd magic number */
+        "bne     regular_handler            \n" /* no magic -> handle as usual   */
+        "ldr     r1, [r0, #0x18]            \n" /* read PC from the stack        */
+        "adds    r1, r1, #2                 \n" /* move to the next instruction  */
+        "str     r1, [r0, #0x18]            \n" /* modify PC in the stack        */
+        "ldr     r5, =0                     \n" /* set R5 to indicate HardFault  */
+        "bx      lr                         \n" /* exit the exception handler    */
+        " regular_handler:                  \n"
+#endif
 #if defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS) \
     || defined(CPU_ARCH_CORTEX_M23)
         "push {r4-r7}                       \n" /* save r4..r7 to the stack   */
@@ -202,7 +254,7 @@ __attribute__((naked)) void hard_fault_default(void)
         "mov r3, sp                         \n" /* r4_to_r11_stack parameter  */
         "bl hard_fault_handler              \n" /* hard_fault_handler(r0)     */
           :
-          : [sram]   "r" (&_sram + HARDFAULT_HANDLER_REQUIRED_STACK_SPACE),
+          : [sram]   "r" ((uintptr_t)&_sram + HARDFAULT_HANDLER_REQUIRED_STACK_SPACE),
             [eram]   "r" (&_eram),
             [estack] "r" (&_estack)
           : "r0","r4","r5","r6","r8","r9","r10","r11","lr"

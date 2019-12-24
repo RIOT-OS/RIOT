@@ -88,6 +88,20 @@
 #include "net/asymcute.h"
 #endif
 
+#ifdef MODULE_SOCK_DTLS
+#include "net/sock/dtls.h"
+#endif
+
+#ifdef MODULE_SCHEDSTATISTICS
+#include "schedstatistics.h"
+#endif
+
+#ifdef MODULE_TEST_UTILS_INTERACTIVE_SYNC
+#if !defined(MODULE_SHELL_COMMANDS) || !defined(MODULE_SHELL)
+#include "test_utils/interactive_sync.h"
+#endif
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -100,6 +114,9 @@ void auto_init(void)
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
+#endif
+#ifdef MODULE_SCHEDSTATISTICS
+    init_schedstatistics();
 #endif
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");
@@ -142,8 +159,10 @@ void auto_init(void)
     openthread_bootstrap();
 #endif
 #ifdef MODULE_GCOAP
-    DEBUG("Auto init gcoap module.\n");
-    gcoap_init();
+    if (!IS_ACTIVE(GCOAP_NO_AUTO_INIT)) {
+        DEBUG("Auto init gcoap module.\n");
+        gcoap_init();
+    }
 #endif
 #ifdef MODULE_DEVFS
     DEBUG("Mounting /dev\n");
@@ -168,11 +187,6 @@ void auto_init(void)
     extern void cord_ep_standalone_run(void);
     cord_ep_standalone_run();
 #endif
-#ifdef MODULE_CORD_EPSIM_STANDALONE
-    DEBUG("Auto init cord_epsim module\n");
-    extern void cord_epsim_run(void);
-    cord_epsim_run();
-#endif
 #ifdef MODULE_ASYMCUTE
     DEBUG("Auto init Asymcute\n");
     asymcute_handler_run();
@@ -182,9 +196,28 @@ void auto_init(void)
     extern void nimble_riot_init(void);
     nimble_riot_init();
 #endif
+#ifdef MODULE_AUTO_INIT_LORAMAC
+    extern void auto_init_loramac(void);
+    auto_init_loramac();
+#endif
+#ifdef MODULE_SOCK_DTLS
+    DEBUG("Auto init sock_dtls\n");
+    sock_dtls_init();
+#endif
+
+/* initialize USB devices */
+#ifdef MODULE_AUTO_INIT_USBUS
+    extern void auto_init_usb(void);
+    auto_init_usb();
+#endif
 
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
+
+#ifdef MODULE_STM32_ETH
+    extern void auto_init_stm32_eth(void);
+    auto_init_stm32_eth();
+#endif
 
 #ifdef MODULE_AT86RF2XX
     extern void auto_init_at86rf2xx(void);
@@ -194,6 +227,11 @@ void auto_init(void)
 #ifdef MODULE_MRF24J40
     extern void auto_init_mrf24j40(void);
     auto_init_mrf24j40();
+#endif
+
+#ifdef MODULE_CC110X
+    extern void auto_init_cc110x(void);
+    auto_init_cc110x();
 #endif
 
 #ifdef MODULE_CC2420
@@ -216,11 +254,13 @@ void auto_init(void)
     auto_init_esp_eth();
 #endif
 
+/* don't change the order of auto_init_esp_now and auto_init_esp_wifi */
 #ifdef MODULE_ESP_NOW
     extern void auto_init_esp_now(void);
     auto_init_esp_now();
 #endif
 
+/* don't change the order of auto_init_esp_now and auto_init_esp_wifi */
 #ifdef MODULE_ESP_WIFI
     extern void auto_init_esp_wifi(void);
     auto_init_esp_wifi();
@@ -231,14 +271,14 @@ void auto_init(void)
     auto_init_ethos();
 #endif
 
+#ifdef MODULE_DOSE
+    extern void auto_init_dose(void);
+    auto_init_dose();
+#endif
+
 #ifdef MODULE_SLIPDEV
     extern void auto_init_slipdev(void);
     auto_init_slipdev();
-#endif
-
-#ifdef MODULE_CC110X
-    extern void auto_init_cc110x(void);
-    auto_init_cc110x();
 #endif
 
 #ifdef MODULE_CC2538_RF
@@ -254,6 +294,11 @@ void auto_init(void)
 #ifdef MODULE_KW2XRF
     extern void auto_init_kw2xrf(void);
     auto_init_kw2xrf();
+#endif
+
+#ifdef MODULE_USBUS_CDC_ECM
+    extern void auto_init_netdev_cdcecm(void);
+    auto_init_netdev_cdcecm();
 #endif
 
 #ifdef MODULE_NETDEV_TAP
@@ -281,7 +326,7 @@ void auto_init(void)
     auto_init_w5100();
 #endif
 
-#ifdef MODULE_SX127X
+#if defined(MODULE_SX127X) && !defined(MODULE_SEMTECH_LORAMAC)
     extern void auto_init_sx127x(void);
     auto_init_sx127x();
 #endif
@@ -350,7 +395,7 @@ void auto_init(void)
     extern void auto_init_bmp180(void);
     auto_init_bmp180();
 #endif
-#if defined(MODULE_BME280) || defined(MODULE_BMP280)
+#ifdef MODULE_BMX280
     extern void auto_init_bmx280(void);
     auto_init_bmx280();
 #endif
@@ -370,6 +415,10 @@ void auto_init(void)
     extern void auto_init_ds18(void);
     auto_init_ds18();
 #endif
+#ifdef MODULE_DS75LX
+    extern void auto_init_ds75lx(void);
+    auto_init_ds75lx();
+#endif
 #ifdef MODULE_FXOS8700
     extern void auto_init_fxos8700(void);
     auto_init_fxos8700();
@@ -385,6 +434,14 @@ void auto_init(void)
 #ifdef MODULE_HTS221
     extern void auto_init_hts221(void);
     auto_init_hts221();
+#endif
+#ifdef MODULE_INA2XX
+    extern void auto_init_ina2xx(void);
+    auto_init_ina2xx();
+#endif
+#ifdef MODULE_INA3221
+    extern void auto_init_ina3221(void);
+    auto_init_ina3221();
 #endif
 #ifdef MODULE_IO1_XPLAINED
     extern void auto_init_io1_xplained(void);
@@ -414,9 +471,9 @@ void auto_init(void)
     extern void auto_init_lis3mdl(void);
     auto_init_lis3mdl();
 #endif
-#ifdef MODULE_LPS331AP
-    extern void auto_init_lps331ap(void);
-    auto_init_lps331ap();
+#ifdef MODULE_LPSXXX
+    extern void auto_init_lpsxxx(void);
+    auto_init_lpsxxx();
 #endif
 #ifdef MODULE_LSM303DLHC
     extern void auto_init_lsm303dlhc(void);
@@ -446,9 +503,21 @@ void auto_init(void)
     extern void auto_init_mpl3115a2(void);
     auto_init_mpl3115a2();
 #endif
-#ifdef MODULE_MPU9150
-    extern void auto_init_mpu9150(void);
-    auto_init_mpu9150();
+#ifdef MODULE_MPU9X50
+    extern void auto_init_mpu9x50(void);
+    auto_init_mpu9x50();
+#endif
+#ifdef MODULE_OPT3001
+    extern void auto_init_opt3001(void);
+    auto_init_opt3001();
+#endif
+#ifdef MODULE_PCA9685
+    extern void auto_init_pca9685(void);
+    auto_init_pca9685();
+#endif
+#ifdef MODULE_PH_OEM
+    extern void auto_init_ph_oem(void);
+    auto_init_ph_oem();
 #endif
 #ifdef MODULE_PIR
     extern void auto_init_pir(void);
@@ -458,6 +527,10 @@ void auto_init(void)
     extern void auto_init_pulse_counter(void);
     auto_init_pulse_counter();
 #endif
+#ifdef MODULE_QMC5883L
+    extern void auto_init_qmc5883l(void);
+    auto_init_qmc5883l();
+#endif
 #ifdef MODULE_SHT2X
     extern void auto_init_sht2x(void);
     auto_init_sht2x();
@@ -465,6 +538,10 @@ void auto_init(void)
 #ifdef MODULE_SHT3X
     extern void auto_init_sht3x(void);
     auto_init_sht3x();
+#endif
+#ifdef MODULE_SHTC1
+    extern void auto_init_shtc1(void);
+    auto_init_shtc1();
 #endif
 #ifdef MODULE_SDS011
     extern void auto_init_sds011(void);
@@ -483,8 +560,8 @@ void auto_init(void)
     auto_init_tcs37727();
 #endif
 #ifdef MODULE_TMP006
-    extern void auto_init_tmp006(void);
-    auto_init_tmp006();
+    extern void auto_init_tmp00x(void);
+    auto_init_tmp00x();
 #endif
 #ifdef MODULE_TSL2561
     extern void auto_init_tsl2561(void);
@@ -532,4 +609,15 @@ void auto_init(void)
     auto_init_candev();
 
 #endif /* MODULE_AUTO_INIT_CAN */
+
+#ifdef MODULE_SUIT
+    extern void suit_init_conditions(void);
+    suit_init_conditions();
+#endif /* MODULE_SUIT */
+
+#ifdef MODULE_TEST_UTILS_INTERACTIVE_SYNC
+#if !defined(MODULE_SHELL_COMMANDS) || !defined(MODULE_SHELL)
+    test_utils_interactive_sync();
+#endif
+#endif /* MODULE_TEST_UTILS_INTERACTIVE_SYNC */
 }

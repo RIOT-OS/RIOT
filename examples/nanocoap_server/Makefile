@@ -7,12 +7,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             chronos msb-430 msb-430h nucleo-f031k6 \
-                             nucleo-f042k6 nucleo-l031k6 nucleo-f030r8 \
-                             nucleo-f303k8 nucleo-l053r8 stm32f0discovery \
-                             telosb waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
-
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
@@ -58,15 +52,4 @@ QUIET ?= 1
 include $(RIOTBASE)/Makefile.include
 
 # Set a custom channel if needed
-ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz
-  DEFAULT_CHANNEL ?= 0
-  CFLAGS += -DCC110X_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
-else
-  ifneq (,$(filter at86rf212b,$(USEMODULE)))    # radio is IEEE 802.15.4 sub-GHz
-    DEFAULT_CHANNEL ?= 5
-    CFLAGS += -DIEEE802154_DEFAULT_SUBGHZ_CHANNEL=$(DEFAULT_CHANNEL)
-  else                                          # radio is IEEE 802.15.4 2.4 GHz
-    DEFAULT_CHANNEL ?= 26
-    CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
-  endif
-endif
+include $(RIOTMAKE)/default-radio-settings.inc.mk

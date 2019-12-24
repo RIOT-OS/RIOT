@@ -120,7 +120,7 @@ extern "C" {
 /**
  * @defgroup    net_gnrc_ipv6_conf  GNRC IPv6 compile configurations
  * @ingroup     net_gnrc_ipv6
- * @ingroup     config
+ * @ingroup     net_gnrc_conf
  * @{
  */
 /**

@@ -38,3 +38,38 @@ You can configure your own files that will be parsed by the build system main
 * Specify a hard written `PORT` / `DEBUG_ADAPTER_ID` for some BOARD values
 * Define your custom targets
 * Override default targets
+
+
+Analyze dependency resolution                   {#analyze-depedency-resolution}
+=============================
+
+When refactoring dependency handling or modifying variables used for dependency
+resolution, one may want to evaluate the impact on the existing applications.
+This describe some debug targets to dump variables used during dependency
+resolution.
+
+To analyze one board and application run the following commands in an
+application directory.
+
+Generate the variables dump with the normal dependency resolution to a
+`dependencies_info_board_name` file:
+
+~~~~~~~~~~~~~~~~~~~
+BOARD=board_name make dependency-debug
+~~~~~~~~~~~~~~~~~~~
+
+Or with the "quick" version used by murdock to know supported boards
+(this is an incomplete resolution, details in `makefiles/dependencies_debug.inc.mk`)
+to a `dependencies_info-boards-supported_board_name` file:
+
+~~~~~~~~~~~~~~~~~~~
+BOARDS=board_name DEPENDENCY_DEBUG=1 make info-boards-supported
+~~~~~~~~~~~~~~~~~~~
+
+For more configuration and usage details, see in the file defining the targets
+`makefiles/dependencies_debug.inc.mk`
+
+To do a repository wide analysis, you can use the script
+`dist/tools/buildsystem_sanity_check/save_all_dependencies_resolution_variables.sh`
+that will generate the output for all boards and applications.
+It currently take around 2 hours on an 8 cores machine with ssd.

@@ -1,7 +1,22 @@
+ifneq (,$(filter arduino,$(USEMODULE)))
+  FEATURES_OPTIONAL += periph_i2c
+  FEATURES_OPTIONAL += periph_spi
+endif
+
 ifneq (,$(filter eepreg,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eeprom
+endif
+
+ifneq (,$(filter fmt_table,$(USEMODULE)))
+  USEMODULE += fmt
+endif
+
+ifneq (,$(filter i2c_scan,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
 endif
 
 ifneq (,$(filter prng_fortuna,$(USEMODULE)))
   CFLAGS += -DCRYPTO_AES
 endif
+
+include $(RIOTBASE)/sys/test_utils/Makefile.dep

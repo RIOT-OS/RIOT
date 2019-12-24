@@ -35,9 +35,6 @@ extern "C" {
 /** Necessary initializations of system call functions */
 void syscalls_init (void);
 
-/** System standard printf function */
-int printf(const char* format, ...);
-
 /** Determine free heap size */
 unsigned int get_free_heap_size (void);
 
@@ -50,7 +47,7 @@ uint64_t system_get_time_64 (void);
 /** Time since boot in ms (32bit version) */
 uint32_t system_get_time_ms (void);
 
-/** initialize system watchdog timer ans start it */
+/** initialize system watchdog timer and start it */
 void system_wdt_init (void);
 
 /** start the initialized system watchdog timer */

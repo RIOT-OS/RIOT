@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 JP Bonn
+ * Copyright (C) 2017, 2019 JP Bonn, Ken Rabold
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -40,8 +40,6 @@ static void check_context_switch_frame_alignment(void)
                    "Stack pointer should be 16 byte aligned");
     _Static_assert(sizeof(struct context_switch_frame) == CONTEXT_FRAME_SIZE,
                    "context_switch_frame size mismatch");
-    CHECK_OFFSET(pad);
-    CHECK_OFFSET(pc);
     CHECK_OFFSET(s0);
     CHECK_OFFSET(s1);
     CHECK_OFFSET(s2);
@@ -55,7 +53,6 @@ static void check_context_switch_frame_alignment(void)
     CHECK_OFFSET(s10);
     CHECK_OFFSET(s11);
     CHECK_OFFSET(ra);
-    CHECK_OFFSET(tp);
     CHECK_OFFSET(t0);
     CHECK_OFFSET(t1);
     CHECK_OFFSET(t2);
@@ -71,6 +68,8 @@ static void check_context_switch_frame_alignment(void)
     CHECK_OFFSET(a5);
     CHECK_OFFSET(a6);
     CHECK_OFFSET(a7);
+    CHECK_OFFSET(pc);
+    CHECK_OFFSET(pad);
 
     /*
      * also check the SP offset in the _frame structure

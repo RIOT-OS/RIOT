@@ -39,15 +39,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Enable support for Low-power peripherals (if supported by CPU).
- * @{
- */
-#ifndef LOW_POWER_ENABLED
-#define LOW_POWER_ENABLED   (1)
-#endif
-/** @} */
-
-/**
  * @brief   Internal macro for combining ADC resolution (x) with number of
  *          shifts (y).
  */
@@ -369,30 +360,53 @@ typedef struct {
 /** @} */
 
 /**
- * @brief   Internal macro for combining UART modes data bits (x), stop bits
- *          (y, in half bits) and parity (z).
+ * @brief   UART device configuration.
  */
-#define UART_MODE(x, y, z)      ((z << 8) | ((y * 2) << 4) | x)
-
+#ifndef DOXYGEN
 /**
- * @brief   Internal, pre-defined UART modes.
+ * @brief   Override parity values
  * @{
  */
-#define UART_MODE_8N1           UART_MODE(8, 1, 0)
-#define UART_MODE_8E1           UART_MODE(8, 1, 2)
+#define HAVE_UART_PARITY_T
+typedef enum {
+   UART_PARITY_NONE = 0,
+   UART_PARITY_ODD = 1,
+   UART_PARITY_EVEN = 2,
+   UART_PARITY_MARK = 3,
+   UART_PARITY_SPACE = 4,
+} uart_parity_t;
 /** @} */
 
 /**
- * @brief   UART device configuration.
+ * @brief   Override data bits length values
+ * @{
  */
+#define HAVE_UART_DATA_BITS_T
+typedef enum {
+    UART_DATA_BITS_5 = 5,
+    UART_DATA_BITS_6 = 6,
+    UART_DATA_BITS_7 = 7,
+    UART_DATA_BITS_8 = 8,
+} uart_data_bits_t;
+/** @} */
+
+/**
+ * @brief   Override stop bits length values
+ * @{
+ */
+#define HAVE_UART_STOP_BITS_T
+typedef enum {
+   UART_STOP_BITS_1 = 2,
+   UART_STOP_BITS_2 = 4,
+} uart_stop_bits_t;
+/** @} */
+#endif /* ndef DOXYGEN */
+
 typedef struct {
     void *dev;              /**< UART, USART or LEUART device used */
     gpio_t rx_pin;          /**< pin used for RX */
     gpio_t tx_pin;          /**< pin used for TX */
     uint32_t loc;           /**< location of UART pins */
-#if EFM32_UART_MODES
-    uint32_t mode;          /**< UART mode of operation */
-#endif
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
     IRQn_Type irq;          /**< the devices base IRQ channel */
 } uart_conf_t;

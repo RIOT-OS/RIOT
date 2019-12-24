@@ -127,7 +127,7 @@ typedef struct {
 int sht3x_init (sht3x_dev_t *dev, const sht3x_params_t *params);
 
 /**
- * @brief   Read SHT3x measurment results (temperature and humidity)
+ * @brief   Read SHT3x measurement results (temperature and humidity)
  *
  * The function returns the results of one measurement once they are available.
  *

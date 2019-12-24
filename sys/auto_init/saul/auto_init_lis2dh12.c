@@ -30,7 +30,7 @@
 /**
  * @brief   Number of configured sensors
  */
-#define LIS2DH12_NUM    (sizeof(lis2dh12_params) / sizeof(lis2dh12_params[0]))
+#define LIS2DH12_NUM    ARRAY_SIZE(lis2dh12_params)
 
 
 /**

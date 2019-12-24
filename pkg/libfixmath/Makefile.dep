@@ -1,0 +1,8 @@
+ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
+  # libfixmath unittests use shift operand incompatible with 8bit
+  # architecture int type.
+  FEATURES_BLACKLIST += arch_8bit
+
+  # The round function is not provided by the msp430 toolchain
+  FEATURES_BLACKLIST += arch_msp430
+endif

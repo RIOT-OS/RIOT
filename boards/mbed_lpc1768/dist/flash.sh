@@ -58,7 +58,7 @@ fi
 rm -f ${MOUNT}/*.bin
 # copy new binary to device
 cp ${BINFILE} ${MOUNT}
-# make sure hexfile was written
+# make sure binary was written
 sync
 
 # unmount the device if we have manually mounted it before
@@ -68,5 +68,5 @@ then
 fi
 
 echo ""
-echo "UPLOAD SUCCESFUL"
+echo "UPLOAD SUCCESSFUL"
 echo ""

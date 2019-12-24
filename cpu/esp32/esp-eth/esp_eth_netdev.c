@@ -63,11 +63,11 @@
 
 /**
  * There is only one ESP-ETH device. We define it as static device variable
- * to have accesss to the device inside ESP-ETH interrupt routines which do
+ * to have access to the device inside ESP-ETH interrupt routines which do
  * not provide an argument that could be used as pointer to the ESP-ETH
  * device which triggers the interrupt.
  */
-static esp_eth_netdev_t _esp_eth_dev;
+esp_eth_netdev_t _esp_eth_dev;
 
 /* device thread stack */
 static char _esp_eth_stack[ESP_ETH_STACKSIZE];
@@ -200,8 +200,10 @@ static int _esp_eth_send(netdev_t *netdev, const iolist_t *iolist)
             mutex_unlock(&dev->dev_lock);
             return -EOVERFLOW;
         }
-        memcpy (dev->tx_buf + dev->tx_len, iol->iol_base, iol->iol_len);
-        dev->tx_len += iol->iol_len;
+        if (iol->iol_len) {
+            memcpy (dev->tx_buf + dev->tx_len, iol->iol_base, iol->iol_len);
+            dev->tx_len += iol->iol_len;
+        }
     }
 
     #if ENABLE_DEBUG
@@ -274,11 +276,18 @@ static int _esp_eth_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_le
     CHECK_PARAM_RET (netdev != NULL, -ENODEV);
     CHECK_PARAM_RET (val != NULL, -EINVAL);
 
+    esp_eth_netdev_t* dev = (esp_eth_netdev_t*)netdev;
+
     switch (opt) {
         case NETOPT_ADDRESS:
-            assert(max_len == ETHERNET_ADDR_LEN);
+            assert(max_len >= ETHERNET_ADDR_LEN);
             esp_eth_get_mac((uint8_t *)val);
             return ETHERNET_ADDR_LEN;
+        case NETOPT_LINK_CONNECTED:
+            assert(max_len == 1);
+            *((netopt_enable_t *)val) = (dev->link_up) ? NETOPT_ENABLE
+                                                       : NETOPT_DISABLE;
+            return sizeof(netopt_enable_t);
         default:
             return netdev_eth_get(netdev, opt, val, max_len);
     }
@@ -376,8 +385,10 @@ static const netdev_driver_t _esp_eth_driver =
 extern esp_err_t esp_system_event_add_handler (system_event_cb_t handler,
                                                void *arg);
 
-void auto_init_esp_eth (void)
+void esp_eth_setup(esp_eth_netdev_t* dev)
 {
+    (void)dev;
+
     LOG_TAG_INFO("esp_eth", "initializing ESP32 Ethernet MAC (EMAC) device\n");
 
     /* initialize locking */
@@ -394,11 +405,16 @@ void auto_init_esp_eth (void)
     _esp_eth_dev.link_up = false;
     _esp_eth_dev.rx_len = 0;
     _esp_eth_dev.tx_len = 0;
+}
+
+void auto_init_esp_eth(void)
+{
+    esp_eth_setup(&_esp_eth_dev);
     _esp_eth_dev.netif = gnrc_netif_ethernet_create(_esp_eth_stack,
-                                                   ESP_ETH_STACKSIZE,
-                                                   ESP_ETH_PRIO,
-                                                   "netdev-esp-eth",
-                                                   (netdev_t *)&_esp_eth_dev);
+                                                    ESP_ETH_STACKSIZE,
+                                                    ESP_ETH_PRIO,
+                                                    "esp_eth",
+                                                    (netdev_t *)&_esp_eth_dev);
 }
 
 #endif /* MODULE_ESP_ETH */

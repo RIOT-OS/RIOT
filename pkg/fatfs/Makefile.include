@@ -16,6 +16,6 @@ else
   CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=1
 endif
 
-ifeq ($(shell uname -s),Darwin)
+ifeq ($(OS),Darwin)
   CFLAGS += -Wno-empty-body
 endif

@@ -36,15 +36,17 @@ extern "C" {
  * @name    Definitions for messages exchanged between the MAC and call threads
  * @{
  */
-#define MSG_TYPE_ISR                   (0x3456) /**< radio device ISR */
-#define MSG_TYPE_RX_TIMEOUT            (0x3457) /**< radio driver RX timeout */
-#define MSG_TYPE_TX_TIMEOUT            (0x3458) /**< radio driver TX timeout */
-#define MSG_TYPE_MAC_TIMEOUT           (0x3459) /**< MAC timers timeout */
-#define MSG_TYPE_LORAMAC_CMD           (0x3460) /**< Command sent to the MAC */
-#define MSG_TYPE_LORAMAC_JOIN          (0x3461) /**< MAC join event */
-#define MSG_TYPE_LORAMAC_TX_STATUS     (0x3462) /**< MAC TX status */
-#define MSG_TYPE_LORAMAC_RX            (0x3463) /**< Some data received */
-#define MSG_TYPE_LORAMAC_LINK_CHECK    (0x3464) /**< Link check info received */
+#define MSG_TYPE_ISR                        (0x3456) /**< radio device ISR */
+#define MSG_TYPE_RX_TIMEOUT                 (0x3457) /**< radio driver RX timeout */
+#define MSG_TYPE_TX_TIMEOUT                 (0x3458) /**< radio driver TX timeout */
+#define MSG_TYPE_MAC_TIMEOUT                (0x3459) /**< MAC timers timeout */
+#define MSG_TYPE_LORAMAC_CMD                (0x3460) /**< Command sent to the MAC */
+#define MSG_TYPE_LORAMAC_JOIN_STATUS        (0x3461) /**< Join status */
+#define MSG_TYPE_LORAMAC_TX_STATUS          (0x3462) /**< Uplink status */
+#define MSG_TYPE_LORAMAC_MLME_CONFIRM       (0x3463) /**< MAC MLME confirm event */
+#define MSG_TYPE_LORAMAC_MLME_INDICATION    (0x3464) /**< MAC MLME indication event */
+#define MSG_TYPE_LORAMAC_MCPS_CONFIRM       (0x3465) /**< MAC MCPS confirm event */
+#define MSG_TYPE_LORAMAC_MCPS_INDICATION    (0x3466) /**< MAC MCPS indication event */
 /** @} */
 
 /**
@@ -65,7 +67,9 @@ enum {
     SEMTECH_LORAMAC_TX_DONE,                    /**< Transmission completed */
     SEMTECH_LORAMAC_TX_CNF_FAILED,              /**< Confirmable transmission failed */
     SEMTECH_LORAMAC_TX_ERROR,                   /**< Error in TX (invalid param, unknown service) */
-    SEMTECH_LORAMAC_DATA_RECEIVED,              /**< Data received */
+    SEMTECH_LORAMAC_RX_DATA,                    /**< Data received */
+    SEMTECH_LORAMAC_RX_LINK_CHECK,              /**< Link check info received */
+    SEMTECH_LORAMAC_RX_CONFIRMED,               /**< Confirmed ACK received */
     SEMTECH_LORAMAC_BUSY,                       /**< Internal MAC is busy */
     SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED        /**< Restricted access to channels */
 };
@@ -95,31 +99,34 @@ typedef struct {
     uint8_t port;                                /**< RX port */
 } semtech_loramac_rx_data_t;
 
+#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
 /**
  * @brief   LoRaMAC link check information
  */
 typedef struct {
     uint8_t demod_margin;                        /**< Demodulation margin */
     uint8_t nb_gateways;                         /**< number of LoRa gateways found */
-    bool available;                              /**< new link check information avalable */
 } semtech_loramac_link_check_info_t;
+#endif
 
 /**
  * @brief   Semtech LoRaMAC descriptor
  */
 typedef struct {
     mutex_t lock;                                /**< loramac access lock */
-    uint8_t caller_pid;                          /**< pid of caller thread */
+    uint8_t tx_pid;                              /**< pid of sender thread */
+#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
+    uint8_t rx_pid;                              /**< pid of receiver thread */
+#endif
     uint8_t port;                                /**< application TX port */
     uint8_t cnf;                                 /**< enable/disable confirmable messages */
     uint8_t deveui[LORAMAC_DEVEUI_LEN];          /**< device EUI */
     uint8_t appeui[LORAMAC_APPEUI_LEN];          /**< application EUI */
     uint8_t appkey[LORAMAC_APPKEY_LEN];          /**< application key */
-    uint8_t appskey[LORAMAC_APPSKEY_LEN];        /**< application session key */
-    uint8_t nwkskey[LORAMAC_NWKSKEY_LEN];        /**< network session key */
-    uint8_t devaddr[LORAMAC_DEVADDR_LEN];        /**< device address */
+#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
     semtech_loramac_rx_data_t rx_data;           /**< struct handling the RX data */
     semtech_loramac_link_check_info_t link_chk;  /**< link check information */
+#endif
 } semtech_loramac_t;
 
 /**
@@ -143,6 +150,7 @@ int semtech_loramac_init(semtech_loramac_t *mac);
  * @return SEMTECH_LORAMAC_JOIN_SUCCEEDED on success
  * @return SEMTECH_LORAMAC_JOIN_FAILED on failure
  * @return SEMTECH_LORAMAC_BUSY when the mac is already active (join or tx in progress)
+ * @return SEMTECH_LORAMAC_ALREADY_JOINED if network was already joined
  */
 uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type);
 
@@ -152,7 +160,7 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type);
  * This function returns after TX status is replied from the MAC. To receive
  * potential messages sent from the network an explicit call to
  * @ref semtech_loramac_recv must be done after this function if it returned
- * @ref SEMTECH_LORAMAC_TX_OK and within the RX windows delays.
+ * @ref SEMTECH_LORAMAC_TX_DONE and within the RX windows delays.
  *
  * @see semtech_loramac_recv
  *
@@ -160,14 +168,16 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type);
  * @param[in] data         The TX data
  * @param[in] len          The length of the TX data
  *
- * @return SEMTECH_LORAMAC_TX_OK when the message can be transmitted
+ * @return SEMTECH_LORAMAC_TX_DONE when the message was transmitted
  * @return SEMTECH_LORAMAC_NOT_JOINED when the network is not joined
  * @return SEMTECH_LORAMAC_BUSY when the mac is already active (join or tx in progress)
  * @return SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED when the send is rejected because of dutycycle restriction
  * @return SEMTECH_LORAMAC_TX_ERROR when an invalid parameter is given
+ * @return SEMTECH_LORAMAC_TX_CNF_FAILED when message was transmitted but no ACK was received
  */
 uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len);
 
+#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
 /**
  * @brief   Wait for a message sent by the LoRaWAN network
  *
@@ -180,21 +190,40 @@ uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
  * Be sure to call this function before the end of the RX windows otherwise it
  * may block the calling thread.
  *
+ * By default this feature is not available to the user application, enable it
+ * by adding `USEMODULE += semtech_loramac_rx` to the application Makefile.
+ *
  * @see semtech_loramac_send
  *
  * @param[in] mac          Pointer to the mac
  *
- * @return SEMTECH_LORAMAC_TX_DONE when TX has completed, no data received
- * @return SEMTECH_LORAMAC_DATA_RECEIVED when TX has completed and data is received
+ * @return SEMTECH_LORAMAC_RX_DATA when data is received
+ * @return SEMTECH_LORAMAC_RX_LINK_CHECK when link check information is received
+ * @return SEMTECH_LORAMAC_RX_CONFIRMED when an ACK is received from the network
  */
 uint8_t semtech_loramac_recv(semtech_loramac_t *mac);
+#endif
 
 /**
+ * @brief   Check if network is already joined
+ *
+ * @param[in] mac          Pointer to the mac
+ *
+ * @return true when network is joined, false otherwise
+ */
+bool semtech_loramac_is_mac_joined(semtech_loramac_t *mac);
+
+#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
+/**
  * @brief   Requests a LoRaWAN link check
+ *
+ * By default this feature is not available to the user application, enable it
+ * by adding `USEMODULE += semtech_loramac_rx` to the application Makefile.
  *
  * @param[in] mac          Pointer to the mac
  */
 void semtech_loramac_request_link_check(semtech_loramac_t *mac);
+#endif
 
 /**
  * @brief   Sets the device EUI
@@ -258,7 +287,7 @@ void semtech_loramac_set_appskey(semtech_loramac_t *mac, const uint8_t *skey);
  * @param[in] mac          Pointer to the mac
  * @param[in] skey         The application session key
  */
-void semtech_loramac_get_appskey(const semtech_loramac_t *mac, uint8_t *skey);
+void semtech_loramac_get_appskey(semtech_loramac_t *mac, uint8_t *skey);
 
 /**
  * @brief   Sets the network session key
@@ -274,7 +303,7 @@ void semtech_loramac_set_nwkskey(semtech_loramac_t *mac, const uint8_t *skey);
  * @param[in] mac          Pointer to the mac
  * @param[in] skey         The network session key
  */
-void semtech_loramac_get_nwkskey(const semtech_loramac_t *mac, uint8_t *skey);
+void semtech_loramac_get_nwkskey(semtech_loramac_t *mac, uint8_t *skey);
 
 /**
  * @brief   Sets the device address
@@ -290,7 +319,7 @@ void semtech_loramac_set_devaddr(semtech_loramac_t *mac, const uint8_t *addr);
  * @param[in] mac          Pointer to the mac
  * @param[in] addr         The device address
  */
-void semtech_loramac_get_devaddr(const semtech_loramac_t *mac, uint8_t *addr);
+void semtech_loramac_get_devaddr(semtech_loramac_t *mac, uint8_t *addr);
 
 /**
  * @brief   Sets the device class
@@ -402,7 +431,7 @@ void semtech_loramac_set_tx_port(semtech_loramac_t *mac, uint8_t port);
  * @param[in] mac          Pointer to the mac
  * @param[in] error        The maximum rx timing error
  */
-void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, int error);
+void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, uint32_t error);
 
 /**
  * @brief   Sets the minimum required number of symbols to detect a frame
@@ -410,7 +439,7 @@ void semtech_loramac_set_system_max_rx_error(semtech_loramac_t *mac, int error);
  * @param[in] mac          Pointer to the mac
  * @param[in] min_rx       The minimum rx symbols
  */
-void semtech_loramac_set_min_rx_symbols(semtech_loramac_t *mac, int min_rx);
+void semtech_loramac_set_min_rx_symbols(semtech_loramac_t *mac, uint8_t min_rx);
 
 /**
  * @brief   Gets the TX application port
@@ -467,6 +496,22 @@ void semtech_loramac_set_rx2_dr(semtech_loramac_t *mac, uint8_t dr);
  * @return                 The RX2 datarate
  */
 uint8_t semtech_loramac_get_rx2_dr(semtech_loramac_t *mac);
+
+/**
+ * @brief   Sets the Uplink Frame Counter
+ *
+ * @param[in] mac          Pointer to the mac
+ * @param[in] counter      Frame counter to set
+ */
+void semtech_loramac_set_uplink_counter(semtech_loramac_t *mac, uint32_t counter);
+
+/**
+ * @brief   Gets the Uplink Frame Counter
+ *
+ * @param[in] mac          Pointer to the mac
+ * @return                 Uplink frame counter
+ */
+uint32_t semtech_loramac_get_uplink_counter(semtech_loramac_t *mac);
 
 #ifdef MODULE_PERIPH_EEPROM
 /**

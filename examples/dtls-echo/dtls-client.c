@@ -79,8 +79,10 @@ static int _events_handler(struct dtls_context_t *ctx,
  * DTLS records. Also, it determines if said DTLS record is coming from a new
  * peer or a currently established peer.
  *
+ * Return value < 0 if dtls_handle_message() returns error and 0 on other
+ * errors.
  */
-static void dtls_handle_read(dtls_context_t *ctx)
+static int dtls_handle_read(dtls_context_t *ctx)
 {
     static session_t session;
     static sock_udp_ep_t remote = SOCK_IPV6_EP_ANY;
@@ -88,12 +90,12 @@ static void dtls_handle_read(dtls_context_t *ctx)
 
     if (!ctx) {
         DEBUG("%s: No DTLS context\n", __func__);
-        return;
+        return 0;
     }
 
     if (!dtls_get_app_data(ctx)) {
         DEBUG("%s: No app_data stored!\n", __func__);
-        return;
+        return 0;
     }
 
     sock_udp_t *sock;
@@ -102,18 +104,17 @@ static void dtls_handle_read(dtls_context_t *ctx)
 
     if (sock_udp_get_remote(sock, &remote) == -ENOTCONN) {
         DEBUG("%s: Unable to retrieve remote!\n", __func__);
-        return;
+        return 0;
     }
 
-    ssize_t res = sock_udp_recv(sock, packet_rcvd, DTLS_MAX_BUF,
-                                1 * US_PER_SEC + DEFAULT_US_DELAY,
-                                &remote);
+    ssize_t res = sock_udp_recv(sock, packet_rcvd, sizeof(packet_rcvd),
+                                1 * US_PER_SEC + DEFAULT_US_DELAY, &remote);
 
     if (res <= 0) {
         if ((ENABLE_DEBUG) && (res != -EAGAIN) && (res != -ETIMEDOUT)) {
-            DEBUG("sock_udp_recv unexepcted code error: %i\n", (int)res);
+            DEBUG("sock_udp_recv unexpected code error: %i\n", (int)res);
         }
-        return;
+        return 0;
     }
 
     /* session requires the remote socket (IPv6:UDP) address and netif  */
@@ -126,10 +127,7 @@ static void dtls_handle_read(dtls_context_t *ctx)
         session.ifindex = remote.netif;
     }
 
-    if (memcpy(&session.addr, &remote.addr.ipv6, 16) == NULL) {
-        puts("ERROR: memcpy failed!");
-        return;
-    }
+    memcpy(&session.addr, &remote.addr.ipv6, sizeof(session.addr));
 
     if (ENABLE_DEBUG) {
         DEBUG("DBG-Client: Msg received from \n\t Addr Src: [");
@@ -137,9 +135,7 @@ static void dtls_handle_read(dtls_context_t *ctx)
         DEBUG("]:%u\n", remote.port);
     }
 
-    dtls_handle_message(ctx, &session, packet_rcvd, (int)DTLS_MAX_BUF);
-
-    return;
+    return dtls_handle_message(ctx, &session, packet_rcvd, res);
 }
 
 #ifdef DTLS_PSK
@@ -165,7 +161,7 @@ static int _peer_get_psk_info_handler(struct dtls_context_t *ctx,
     switch (type) {
         case DTLS_PSK_IDENTITY:
             if (id_len) {
-                dtls_debug("got psk_identity_hint: '%.*s'\n", id_len, id);
+                dtls_debug("got psk_identity_hint: '%.*s'\n", (int)id_len, id);
             }
 
             if (result_length < psk_id_length) {
@@ -267,7 +263,7 @@ ssize_t try_send(struct dtls_context_t *ctx, session_t *dst, uint8 *buf, size_t 
         len -= res;
         return len;
     }
-    else if (res < 0) {
+    else {
         dtls_crit("Client: dtls_write returned error!\n");
         return -1;
     }
@@ -291,12 +287,7 @@ static int _send_to_peer_handler(struct dtls_context_t *ctx,
     sock_udp_t *sock;
     sock = (sock_udp_t *)dtls_get_app_data(ctx);
 
-    ssize_t res = sock_udp_send(sock, buf, len, NULL);
-    if (res <= 0) {
-        puts("ERROR: Unable to send DTLS record");
-    }
-
-    return res;
+    return sock_udp_send(sock, buf, len, NULL);
 }
 
 /* DTLS variables are initialized. */
@@ -337,8 +328,8 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
     remote->port = (unsigned short) DTLS_DEFAULT_PORT;
 
     /* Parsing <address>[:<iface>]:Port */
-    int iface = ipv6_addr_split_iface(addr_str);
-    if (iface == -1) {
+    char *iface = ipv6_addr_split_iface(addr_str);
+    if (!iface) {
         if (gnrc_netif_numof() == 1) {
             /* assign the single interface found in gnrc_netif_numof() */
             dst->ifindex = (uint16_t)gnrc_netif_iter(NULL)->pid;
@@ -350,12 +341,13 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
         }
     }
     else {
-        if (gnrc_netif_get_by_pid(iface) == NULL) {
+        gnrc_netif_t *netif = gnrc_netif_get_by_pid(atoi(iface));
+        if (netif == NULL) {
             puts("ERROR: interface not valid");
             return new_context;
         }
-        dst->ifindex = (uint16_t)gnrc_netif_iter(NULL)->pid;
-        remote->netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
+        dst->ifindex = (uint16_t)netif->pid;
+        remote->netif = (uint16_t)netif->pid;
     }
 
     if (ipv6_addr_from_str((ipv6_addr_t *)remote->addr.ipv6, addr_str) == NULL) {
@@ -384,7 +376,6 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
 static void client_send(char *addr_str, char *data)
 {
     static session_t dst;
-    dtls_context_t *dtls_context = NULL;
 
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
     sock_udp_ep_t remote = SOCK_IPV6_EP_ANY;
@@ -395,7 +386,8 @@ static void client_send(char *addr_str, char *data)
 
     /* NOTE: dtls_init() must be called previous to this (see main.c) */
 
-    dtls_context = _init_dtls(&sock, &local, &remote, &dst, addr_str);
+    dtls_context_t *dtls_context = _init_dtls(&sock, &local, &remote, &dst,
+                                              addr_str);
     if (!dtls_context) {
         puts("ERROR: Client unable to load context!");
         return;
@@ -455,8 +447,11 @@ static void client_send(char *addr_str, char *data)
         }
 
         /* Check if a DTLS record was received */
-        /* NOTE: We expect an answer after try_send() */
-        dtls_handle_read(dtls_context);
+        /* NOTE: We expect an answer or alert after try_send() */
+        if (dtls_handle_read(dtls_context) < 0) {
+            printf("Received error during message handling\n");
+            break;
+        }
         watch--;
     } /* END while */
 

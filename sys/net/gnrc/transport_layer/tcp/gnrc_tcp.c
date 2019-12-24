@@ -113,7 +113,7 @@ static void _setup_timeout(xtimer_t *timer, const uint32_t duration, const xtime
  *            -ENOMEM if the receive buffer for the TCB could not be allocated.
  *            -EADDRINUSE if @p local_port is already in use.
  *            -ETIMEDOUT if the connection opening timed out.
- *            -ECONNREFUSED if the connection was resetted by the peer.
+ *            -ECONNREFUSED if the connection was reset by the peer.
  */
 static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t target_port,
                           const char *local_addr, uint16_t local_port, uint8_t passive)
@@ -132,7 +132,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t targe
         return -EISCONN;
     }
 
-    /* Mark TCB as waiting for incomming messages */
+    /* Mark TCB as waiting for incoming messages */
     tcb->status |= STATUS_WAIT_FOR_MSG;
 
     /* 'Flush' mbox */
@@ -155,7 +155,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t targe
             }
         }
 #else
-        /* Supress Compiler Warnings */
+        /* Suppress Compiler Warnings */
         (void) target_addr;
 #endif
         /* Set port number to listen on */
@@ -168,19 +168,19 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t targe
         if ((target_addr != NULL) && (tcb->address_family == AF_INET6)) {
 
             /* Extract interface (optional) specifier from target address */
-            int ll_iface = ipv6_addr_split_iface(target_addr);
+            char *ll_iface = ipv6_addr_split_iface(target_addr);
             if (ipv6_addr_from_str((ipv6_addr_t *) tcb->peer_addr, target_addr) == NULL) {
                 DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : Invalid peer addr\n");
                 return -EINVAL;
             }
 
             /* In case the given address is link-local: Memorize the interface Id if existing. */
-            if ((ll_iface > 0) && ipv6_addr_is_link_local((ipv6_addr_t *) tcb->peer_addr)) {
-                tcb->ll_iface = ll_iface;
+            if ((ll_iface) && ipv6_addr_is_link_local((ipv6_addr_t *) tcb->peer_addr)) {
+                tcb->ll_iface = atoi(ll_iface);
             }
         }
  #endif
-        /* Assign port numbers, verfication happens in fsm */
+        /* Assign port numbers, verification happens in fsm */
         tcb->local_port = local_port;
         tcb->peer_port = target_port;
 
@@ -359,7 +359,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
         return -ENOTCONN;
     }
 
-    /* Mark TCB as waiting for incomming messages */
+    /* Mark TCB as waiting for incoming messages */
     tcb->status |= STATUS_WAIT_FOR_MSG;
 
     /* 'Flush' mbox */
@@ -391,7 +391,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
                 probe_timeout_duration_us = tcb->rto;
             }
             /* Setup probe timeout */
-            _setup_timeout(&probe_timeout, timeout_duration_us, _cb_mbox_put_msg,
+            _setup_timeout(&probe_timeout, probe_timeout_duration_us, _cb_mbox_put_msg,
                            &probe_timeout_arg);
         }
 
@@ -421,7 +421,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
                 _fsm(tcb, FSM_EVENT_SEND_PROBE, NULL, NULL, 0);
                 probe_timeout_duration_us += probe_timeout_duration_us;
 
-                /* Boundry check for time interval between probes */
+                /* Boundary check for time interval between probes */
                 if (probe_timeout_duration_us < GNRC_TCP_PROBE_LOWER_BOUND) {
                     probe_timeout_duration_us = GNRC_TCP_PROBE_LOWER_BOUND;
                 }
@@ -481,6 +481,14 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         return -ENOTCONN;
     }
 
+    /* If FIN was received (CLOSE_WAIT), no further data can be received. */
+    /* Copy received data into given buffer and return number of bytes. Can be zero. */
+    if (tcb->state == FSM_STATE_CLOSE_WAIT) {
+        ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
+        mutex_unlock(&(tcb->function_lock));
+        return ret;
+    }
+
     /* If this call is non-blocking (timeout_duration_us == 0): Try to read data and return */
     if (timeout_duration_us == 0) {
         ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
@@ -491,7 +499,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         return ret;
     }
 
-    /* Mark TCB as waiting for incomming messages */
+    /* Mark TCB as waiting for incoming messages */
     tcb->status |= STATUS_WAIT_FOR_MSG;
 
     /* 'Flush' mbox */
@@ -516,6 +524,11 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         /* Try to read available data */
         ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
 
+        /* If FIN was received (CLOSE_WAIT), no further data can be received. Leave event loop */
+        if (tcb->state == FSM_STATE_CLOSE_WAIT) {
+            break;
+        }
+
         /* If there was no data: Wait for next packet or until the timeout fires */
         if (ret <= 0) {
             mbox_get(&(tcb->mbox), &msg);
@@ -527,7 +540,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
                     break;
 
                 case MSG_TYPE_USER_SPEC_TIMEOUT:
-                    DEBUG("gnrc_tcp.c : gnrc_tcp_send() : USER_SPEC_TIMEOUT\n");
+                    DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : USER_SPEC_TIMEOUT\n");
                     _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
                     ret = -ETIMEDOUT;
                     break;
@@ -567,7 +580,7 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
         return;
     }
 
-    /* Mark TCB as waiting for incomming messages */
+    /* Mark TCB as waiting for incoming messages */
     tcb->status |= STATUS_WAIT_FOR_MSG;
 
     /* 'Flush' mbox */
@@ -645,7 +658,7 @@ gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16
     /* Allocate header */
     res = gnrc_pktbuf_add(payload, NULL, sizeof(tcp_hdr_t), GNRC_NETTYPE_TCP);
     if (res == NULL) {
-        DEBUG("tcp: No space left in packet buffer\n");
+        DEBUG("gnrc_tcp.c : gnrc_tcp_hdr_build() : No space left in packet buffer\n");
         return NULL;
     }
     hdr = (tcp_hdr_t *) res->data;

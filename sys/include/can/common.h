@@ -38,7 +38,6 @@ extern "C" {
 #ifdef MODULE_CAN_MBOX
 #include "mbox.h"
 #endif
-#include "net/gnrc/pktbuf.h"
 
 /**
  * @brief CAN options
@@ -123,9 +122,7 @@ enum can_msg {
 typedef struct can_rx_data {
     struct iovec data;    /**< iovec containing received data */
     void *arg;            /**< upper layer private param */
-    gnrc_pktsnip_t *snip; /**< pointer to the allocated snip */
 } can_rx_data_t;
-
 
 /**
  * @brief registry entry types

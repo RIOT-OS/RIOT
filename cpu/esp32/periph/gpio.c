@@ -38,6 +38,7 @@
 
 #include "esp_common.h"
 #include "adc_arch.h"
+#include "adc_ctrl.h"
 #include "gpio_arch.h"
 #include "irq_arch.h"
 #include "syscalls.h"
@@ -188,7 +189,7 @@ gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF] = {
     _SPIF,        /* gpio7 not configurable, used as SPI MISO */
     _SPIF,        /* gpio8 not configurable, used as SPI MOSI */
     #if defined(FLASH_MODE_QIO) || defined(FLASH_MODE_QOUT)
-    /* in qio and qout mode thes pins are used for quad SPI */
+    /* in qio and qout mode these pins are used for quad SPI */
     _SPIF,        /* gpio9 not configurable, used as SPI HD */
     _SPIF,        /* gpio10 not configurable, used as SPI WP */
     #else
@@ -238,6 +239,7 @@ const char* _gpio_pin_usage_str[] =
 
 #define GPIO_PIN_SET(b) if (b < 32) GPIO.out_w1ts = BIT(b); else GPIO.out1_w1ts.val = BIT(b-32)
 #define GPIO_PIN_CLR(b) if (b < 32) GPIO.out_w1tc = BIT(b); else GPIO.out1_w1tc.val = BIT(b-32)
+#define GPIO_PIN_GET(b) (b < 32) ? (GPIO.out >> b) & 1 : (GPIO.out1.val >> (b-32)) & 1
 
 #define GPIO_REG_BIT_GET(l,h,b) ((b < 32) ? GPIO.l & BIT(b) : GPIO.h.val & BIT(b-32))
 #define GPIO_REG_BIT_SET(l,h,b) if (b < 32) GPIO.l |=  BIT(b); else GPIO.h.val |=  BIT(b-32)
@@ -272,7 +274,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
             case GPIO_IN_PD:
             case GPIO_IN_PU:
-                /* GPIOs 34 ... 39 have no software controlable pullups/pulldowns */
+                /* GPIOs 34 ... 39 have no software controllable pullups/pulldowns */
                 LOG_TAG_ERROR("gpio",
                               "GPIO%d has no pullups/pulldowns\n", pin);
                 return -1;
@@ -446,7 +448,18 @@ void gpio_irq_disable (gpio_t pin)
 int gpio_read (gpio_t pin)
 {
     CHECK_PARAM_RET(pin < GPIO_PIN_NUMOF, -1);
-    return GPIO_REG_BIT_GET(in, in1, pin) ? 1 : 0;
+    int value;
+
+    if (REG_GET_BIT(_gpio_to_iomux_reg[pin], FUN_IE)) {
+        /* in case the pin is any kind of input, read from input register */
+        value = GPIO_REG_BIT_GET(in, in1, pin) ? 1 : 0;
+    }
+    else {
+        /* otherwise read the last value written to the output register */
+        value = GPIO_PIN_GET(pin);
+    }
+    DEBUG("%s gpio=%u val=%d\n", __func__, pin, value);
+    return value;
 }
 
 void gpio_write (gpio_t pin, int value)

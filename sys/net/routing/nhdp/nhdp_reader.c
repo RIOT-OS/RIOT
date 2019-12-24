@@ -108,9 +108,9 @@ void nhdp_reader_init(void)
 
     /* Register HELLO message consumer */
     rfc5444_reader_add_message_consumer(&reader, &_nhdp_msg_consumer,
-                                        _nhdp_msg_tlvs, ARRAYSIZE(_nhdp_msg_tlvs));
+                                        _nhdp_msg_tlvs, ARRAY_SIZE(_nhdp_msg_tlvs));
     rfc5444_reader_add_message_consumer(&reader, &_nhdp_address_consumer,
-                                        _nhdp_addr_tlvs, ARRAYSIZE(_nhdp_addr_tlvs));
+                                        _nhdp_addr_tlvs, ARRAY_SIZE(_nhdp_addr_tlvs));
 }
 
 int nhdp_reader_handle_packet(kernel_pid_t rcvg_if_pid, void *buffer, size_t length)

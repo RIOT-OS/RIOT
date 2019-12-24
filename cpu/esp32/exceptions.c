@@ -193,15 +193,29 @@ void init_exceptions (void)
 void IRAM NORETURN panic_arch(void)
 {
     #if defined(DEVELHELP)
+
     #ifdef MODULE_ESP_IDF_HEAP
     heap_caps_print_heap_info(MALLOC_CAP_DEFAULT);
     #else
     ets_printf("\nheap: %u (free %u) byte\n", &_eheap - &_sheap, get_free_heap_size());
     #endif /* MODULE_ESP_IDF_HEAP */
-    #endif /* DEVELHELP */
+
+    /* break in debugger or reboot after WDT */
+    __asm__ volatile ("break 0,0");
+
+    #else /* DEVELHELP */
 
     /* restart */
     software_reset();
 
+    #endif /* DEVELHELP */
+
     UNREACHABLE();
+}
+
+void _panic_handler(uint32_t addr)
+{
+    ets_printf("#! _xt_panic called from 0x%08x: powering off\n", addr);
+    pm_off();
+    while (1) { };
 }

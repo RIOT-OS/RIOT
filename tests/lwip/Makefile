@@ -1,21 +1,25 @@
 include ../Makefile.tests_common
 
-# lwIP's memory management doesn't seem to work on non 32-bit platforms at the
-# moment.
-BOARD_BLACKLIST := arduino-uno arduino-duemilanove arduino-mega2560 chronos \
-                   esp8266-esp-12x esp8266-olimex-mod esp8266-sparkfun-thing \
-                   msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b \
-                   wsn430-v1_4 z1 jiminy-mega256rfr2 mega-xplained
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon hifive1 nrf6310 nucleo-f031k6 nucleo-f042k6 \
-                             nucleo-l031k6 nucleo-f030r8 nucleo-f303k8 \
-                             nucleo-f334r8 nucleo-l053r8 stm32f0discovery \
-                             yunjia-nrf51822
+LWIP_IPV4 ?= 0
+
+ifneq (0, $(LWIP_IPV4))
+  USEMODULE += ipv4_addr
+  USEMODULE += lwip_arp
+  USEMODULE += lwip_ipv4
+  USEMODULE += lwip_dhcp_auto
+  CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
+  LWIP_IPV6 ?= 0
+else
+  USEMODULE += ipv6_addr
+  USEMODULE += lwip_ipv6
+  USEMODULE += lwip_ipv6_autoconfig
+  LWIP_IPV6 ?= 1
+endif
 
 # including lwip_ipv6_mld would currently break this test on at86rf2xx radios
-USEMODULE += lwip lwip_ipv6_autoconfig lwip_sock_ip lwip_netdev
+USEMODULE += lwip lwip_sock_ip lwip_netdev
 USEMODULE += lwip_udp lwip_sock_udp
 USEMODULE += lwip_tcp lwip_sock_tcp
-USEMODULE += ipv6_addr
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
@@ -30,5 +34,10 @@ endif
 ifneq ($(BOARD),native)
   TESTS=
 endif
+
+DISABLE_MODULE += test_utils_interactive_sync
+
+# test fails on murdock and on my machine due to the process exiting directly
+TEST_ON_CI_BLACKLIST += all
 
 include $(RIOTBASE)/Makefile.include

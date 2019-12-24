@@ -15,6 +15,7 @@
 
 #include <stdbool.h>
 
+#include "log.h"
 #include "luid.h"
 #include "net/gnrc/netif/internal.h"
 
@@ -34,6 +35,19 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
     int idx;
     uint8_t flags = GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE;
 
+#if !GNRC_IPV6_NIB_CONF_SLAAC
+    if (!gnrc_netif_is_6ln(netif)) {
+        LOG_WARNING("SLAAC not activated; will not auto-configure IPv6 address "
+                         "for interface %u.\n"
+                    "    Use GNRC_IPV6_NIB_CONF_SLAAC=1 to activate.\n",
+                    netif->pid);
+        return;
+    }
+#endif
+    if (!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR)) {
+        DEBUG("nib: interface %i has no link-layer addresses\n", netif->pid);
+        return;
+    }
     DEBUG("nib: add address based on %s/%u automatically to interface %u\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
           pfx_len, netif->pid);
@@ -174,7 +188,8 @@ void _handle_dad(const ipv6_addr_t *addr)
     if (idx >= 0) {
         ipv6_addr_set_solicited_nodes(&sol_nodes, addr);
         _snd_ns(addr, netif, &ipv6_addr_unspecified, &sol_nodes);
-        _evtimer_add((void *)addr, GNRC_IPV6_NIB_VALID_ADDR,
+        _evtimer_add((void *)&netif->ipv6.addrs[idx],
+                     GNRC_IPV6_NIB_VALID_ADDR,
                      &netif->ipv6.addrs_timers[idx],
                      netif->ipv6.retrans_time);
     }
@@ -189,6 +204,9 @@ void _handle_valid_addr(const ipv6_addr_t *addr)
     gnrc_netif_t *netif = NULL;
     int idx = _get_netif_state(&netif, addr);
 
+    DEBUG("nib: validating address %s (idx: %d, netif: %d)\n",
+          ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)), idx,
+          (netif != NULL) ? netif->pid : 0);
     if (idx >= 0) {
         netif->ipv6.addrs_flags[idx] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
         netif->ipv6.addrs_flags[idx] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;

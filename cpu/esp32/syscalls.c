@@ -60,58 +60,12 @@
 
 #ifdef MODULE_ESP_IDF_HEAP
 #include "heap/esp_heap_caps.h"
+#include "heap/include/multi_heap.h"
+#else
+#include "malloc.h"
 #endif
 
 #define MHZ 1000000UL
-
-#ifdef MODULE_STDIO_UART
-#include "stdio_uart.h"
-
-int IRAM putchar(int c)
-{
-    char tmp = c;
-    if (stdio_write(&tmp, 1) > 0) {
-        return c;
-    }
-    return -EOF;
-}
-
-int IRAM getchar(void)
-{
-    char tmp;
-    if (stdio_read(&tmp, 1) > 0) {
-        return tmp;
-    }
-    return -EOF;
-}
-#endif /* MODULE_STDIO_UART */
-
-int IRAM puts(const char *s)
-{
-    if (!s) {
-        return EOF;
-    }
-    ets_printf("%s\n", s);
-    return strlen(s);
-}
-
-char _printf_buf[PRINTF_BUFSIZ];
-
-int IRAM printf(const char* format, ...)
-{
-    va_list arglist;
-    va_start(arglist, format);
-
-    int ret = vsnprintf(_printf_buf, PRINTF_BUFSIZ, format, arglist);
-
-    if (ret > 0) {
-        ets_printf (_printf_buf);
-    }
-
-    va_end(arglist);
-
-    return ret;
-}
 
 #ifndef MODULE_PTHREAD
 
@@ -243,22 +197,22 @@ void IRAM _lock_release_recursive(_lock_t *lock)
 extern void *heap_caps_malloc_default( size_t size );
 extern void *heap_caps_realloc_default( void *ptr, size_t size );
 
-void* IRAM_ATTR _malloc_r(struct _reent *r, size_t size)
+void* IRAM_ATTR __wrap__malloc_r(struct _reent *r, size_t size)
 {
     return heap_caps_malloc_default( size );
 }
 
-void IRAM_ATTR _free_r(struct _reent *r, void* ptr)
+void IRAM_ATTR __wrap__free_r(struct _reent *r, void* ptr)
 {
     heap_caps_free( ptr );
 }
 
-void* IRAM_ATTR _realloc_r(struct _reent *r, void* ptr, size_t size)
+void* IRAM_ATTR __wrap__realloc_r(struct _reent *r, void* ptr, size_t size)
 {
     return heap_caps_realloc_default( ptr, size );
 }
 
-void* IRAM_ATTR _calloc_r(struct _reent *r, size_t count, size_t size)
+void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t count, size_t size)
 {
     void* result = heap_caps_malloc_default(count * size);
     if (result) {
@@ -267,18 +221,27 @@ void* IRAM_ATTR _calloc_r(struct _reent *r, size_t count, size_t size)
     return result;
 }
 
-#ifndef MODULE_NEWLIB_SYSCALLS_DEFAULT
-/* this should not happen when MODULE_ESP_IDF_HEAP is activated since heap_caps
-   doesn't use _sbrk_r to allocate memory blocks */
-void* _sbrk_r (struct _reent *r, ptrdiff_t sz)
+unsigned int IRAM get_free_heap_size (void)
 {
-    _exit(ENOSYS);
+    return heap_caps_get_free_size( MALLOC_CAP_DEFAULT );
 }
-#endif /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
+
+void heap_stats(void)
+{
+    multi_heap_info_t hinfo;
+
+    heap_caps_get_info(&hinfo,  MALLOC_CAP_DEFAULT);
+
+    size_t _free = hinfo.total_free_bytes;
+    size_t _alloc = hinfo.total_allocated_bytes;
+
+    printf("heap: %u (used %u free %u) [bytes]\n",
+           (unsigned)(_free + _alloc), (unsigned)_alloc, (unsigned)_free);
+}
 
 #else /* MODULE_ESP_IDF_HEAP */
 
-/* for compatibiliy with ESP-IDF heap functions */
+/* for compatibility with ESP-IDF heap functions */
 void* IRAM heap_caps_malloc( size_t size, uint32_t caps )
 {
     (void)caps;
@@ -298,99 +261,28 @@ void* IRAM heap_caps_realloc( void *ptr, size_t size )
 
 extern uint8_t  _eheap;     /* end of heap (defined in esp32.common.ld) */
 extern uint8_t  _sheap;     /* start of heap (defined in esp32.common.ld) */
-
-#ifdef MODULE_NEWLIB_SYSCALLS_DEFAULT
-
-extern uint8_t *heap_top;
-#define _cheap heap_top
-
-#else /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
-
-static uint8_t* _cheap = 0; /* last allocated chunk of heap */
-
-void* IRAM _sbrk_r (struct _reent *r, ptrdiff_t incr)
-{
-    uint8_t* _cheap_old;
-
-    /* initial _cheap */
-    if (_cheap == NULL) {
-        _cheap = &_sheap;
-    }
-
-    /* save old _cheap */
-    _cheap_old = _cheap;
-
-    /* check whether _cheap + incr overflows the heap */
-    if (_cheap + incr >= &_eheap) {
-        r->_errno = ENOMEM;
-        return (caddr_t)-1;
-    }
-
-    /* set new _cheap */
-    _cheap += incr;
-
-    #if ENABLE_DEBUG
-    uint32_t remaining = &_eheap - _cheap;
-    printf ("%s %i byte allocated in %p .. %p, remaining %u\n",
-             __func__, incr, _cheap_old, _cheap, remaining);
-    #endif
-
-    /* return allocated memory */
-    return (caddr_t) _cheap_old;
-}
-
-#endif /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
-#endif /* MODULE_ESP_IDF_HEAP */
+extern uint8_t *heap_top;   /* current top of heap as defined in newlib_syscalls_default */
 
 unsigned int IRAM get_free_heap_size (void)
 {
-    #if MODULE_ESP_IDF_HEAP
-    return heap_caps_get_free_size( MALLOC_CAP_DEFAULT );
-    #else
-    return &_eheap - ((_cheap) ? _cheap : &_sheap);
-    #endif
+    struct mallinfo minfo = mallinfo();
+    return &_eheap - &_sheap - minfo.uordblks;
 }
+
+void heap_stats(void)
+{
+    printf("heap: %u (used %u, free %u) [bytes]\n", (unsigned)(&_eheap - &_sheap),
+           &_eheap - &_sheap - get_free_heap_size(), get_free_heap_size());
+}
+
+#endif /* MODULE_ESP_IDF_HEAP */
 
 /* alias for compatibility with espressif/wifi_libs */
 uint32_t esp_get_free_heap_size( void ) __attribute__((alias("get_free_heap_size")));
 
-
 /**
  * @name Other system functions
  */
-
-#ifndef MODULE_NEWLIB_SYSCALLS_DEFAULT
-
-int _getpid_r(struct _reent *r)
-{
-    return sched_active_pid;
-}
-
-int _kill_r(struct _reent *r, int pid, int sig)
-{
-    DEBUG("%s: system function not yet implemented\n", __func__);
-    r->_errno = ESRCH;  /* no such process */
-    return -1;
-}
-
-void _exit(int __status)
-{
-    ets_printf("#! exit %d: powering off\n", __status);
-    pm_off();
-    while(1);
-}
-
-clock_t IRAM_ATTR _times_r(struct _reent *r, struct tms *ptms)
-{
-    ptms->tms_cstime = 0;
-    ptms->tms_cutime = 0;
-    ptms->tms_stime = system_get_time() / (US_PER_SEC / CLK_TCK);
-    ptms->tms_utime = 0;
-
-    return ptms->tms_stime / MHZ;
-}
-
-#endif /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
 
 void _abort(void)
 {
@@ -435,8 +327,8 @@ static struct syscall_stub_table s_stub_table =
     ._kill_r = &_kill_r,
 
     ._times_r = &_times_r,
-    #ifdef MODULE_NEWLIB_SYSCALLS_DEFAULT
     ._gettimeofday_r = _gettimeofday_r,
+
     ._open_r = &_open_r,
     ._close_r = &_close_r,
     ._lseek_r = (int (*)(struct _reent *r, int, int, int))&_lseek_r,
@@ -445,17 +337,6 @@ static struct syscall_stub_table s_stub_table =
     ._write_r = (int (*)(struct _reent *r, int, const void *, int))&_write_r,
     ._read_r = (int (*)(struct _reent *r, int, void *, int))&_read_r,
     ._unlink_r = &_unlink_r,
-    #else /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
-    ._gettimeofday_r = (int (*)(struct _reent *r, struct timeval *, void *))&_no_sys_func,
-    ._open_r = (int (*)(struct _reent *r, const char *, int, int))&_no_sys_func,
-    ._close_r = (int (*)(struct _reent *r, int))&_no_sys_func,
-    ._lseek_r = (int (*)(struct _reent *r, int, int, int))&_no_sys_func,
-    ._fstat_r = (int (*)(struct _reent *r, int, struct stat *))&_no_sys_func,
-    ._stat_r = (int (*)(struct _reent *r, const char*, struct stat *))&_no_sys_func,
-    ._write_r = (int (*)(struct _reent *r, int, const void *, int))&_no_sys_func,
-    ._read_r = (int (*)(struct _reent *r, int, void *, int))&_no_sys_func,
-    ._unlink_r = (int (*)(struct _reent *r, const char*))&_no_sys_func,
-    #endif /* MODULE_NEWLIB_SYSCALLS_DEFAULT */
     ._link_r = (int (*)(struct _reent *r, const char*, const char*))&_no_sys_func,
     ._rename_r = (int (*)(struct _reent *r, const char*, const char*))&_no_sys_func,
 
@@ -469,6 +350,7 @@ static struct syscall_stub_table s_stub_table =
     ._lock_try_acquire_recursive = &_lock_try_acquire_recursive,
     ._lock_release = &_lock_release,
     ._lock_release_recursive = &_lock_release_recursive,
+
     #if CONFIG_NEWLIB_NANO_FORMAT
     ._printf_float = &_printf_float,
     ._scanf_float = &_scanf_float,
@@ -551,8 +433,8 @@ void system_wdt_init (void)
     TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;  /* disable write protection */
     TIMERG0.wdt_config0.stg0 = TIMG_WDT_STG_SEL_INT;          /* stage0 timeout: interrupt */
     TIMERG0.wdt_config0.stg1 = TIMG_WDT_STG_SEL_RESET_SYSTEM; /* stage1 timeout: sys reset */
-    TIMERG0.wdt_config0.sys_reset_length = 7;  /* sys reset signal lenght: 3.2 us */
-    TIMERG0.wdt_config0.cpu_reset_length = 7;  /* sys reset signal lenght: 3.2 us */
+    TIMERG0.wdt_config0.sys_reset_length = 7;  /* sys reset signal length: 3.2 us */
+    TIMERG0.wdt_config0.cpu_reset_length = 7;  /* sys reset signal length: 3.2 us */
     TIMERG0.wdt_config0.edge_int_en = 0;
     TIMERG0.wdt_config0.level_int_en = 1;
 

@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define BMP180_NUM      (sizeof(bmp180_params) / sizeof(bmp180_params[0]))
+#define BMP180_NUM      ARRAY_SIZE(bmp180_params)
 
 /**
  * @brief   Allocation of memory for device descriptors
@@ -44,7 +44,7 @@ static saul_reg_t saul_entries[BMP180_NUM * 2];
 /**
  * @brief   Define the number of saul info
  */
-#define BMP180_INFO_NUM (sizeof(bmp180_saul_info) / sizeof(bmp180_saul_info[0]))
+#define BMP180_INFO_NUM ARRAY_SIZE(bmp180_saul_info)
 
 /**
  * @name    Reference the driver structs.

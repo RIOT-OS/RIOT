@@ -24,7 +24,7 @@
 #include "mma7660.h"
 #include "mma7660_params.h"
 
-#define SLEEP       (100 * US_PER_MS)
+#define SLEEP_USEC  (100 * US_PER_MS)
 
 static mma7660_t dev;
 
@@ -47,7 +47,7 @@ int main(void)
         mma7660_read(&dev, &data);
         printf("Acceleration [in mg]: X: %d Y: %d Z: %d\n",
                data.x, data.y, data.z);
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

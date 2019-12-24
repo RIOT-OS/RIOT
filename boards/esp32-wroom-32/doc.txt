@@ -26,8 +26,8 @@
 
 This board definition covers not just a single board, but rather a large set of generic boards that use an ESP32-WROOM-32 module and simply break out all GPIOs to external pads without having any special hardware or interfaces on-board. Examples are Espressif's ESP32-DevKitC or NodeMCU-ESP32S and a large number of clones.
 
-\htmlonly<style>div.image img[src="https://docs.espressif.com/projects/esp-idf/en/latest/_images/esp32-devkitc-functional-overview1.jpg"]{width:600px;}</style>\endhtmlonly
-\image html "https://docs.espressif.com/projects/esp-idf/en/latest/_images/esp32-devkitc-functional-overview1.jpg" "Espressif ESP32-DevKitC V4"
+\htmlonly<style>div.image img[src="https://dl.espressif.com/dl/schematics/pictures/esp32-devkitc-v4-front.jpg"]{width:400px;}</style>\endhtmlonly
+\image html "https://dl.espressif.com/dl/schematics/pictures/esp32-devkitc-v4-front.jpg" "Espressif ESP32-DevKitC V4"
 
 ## <a name="hardware"> Hardware </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -49,7 +49,7 @@ Vendor      | Espressif | |
 Cores       | 1 or 2 x Tensilica Xtensa LX6 | 1 core
 FPU         | yes (ULP - Ultra low power co-processor) | no
 RAM         | 520 kByte SRAM <br> 16 kByte  RTC SRAM | yes
-ROM         | 520 kByte | yes
+ROM         | 448 kByte | yes
 Flash       | 512 kByte ... 16 MByte |  yes
 Frequency   | 240 MHz, 160 MHz, 80 MHz | yes
 Power Consumption | 68 mA @ 240 MHz <br> 44 mA @ 160 MHz <br> 31 mA @ 80 MHz <br> 5 uA in deep sleep mode | yes <br> yes <br> yes <br> no
@@ -63,7 +63,7 @@ UARTs       | 3 | yes
 WiFi        | IEEE 802.11 b/g/n built in | yes
 Bluetooth   | v4.2 BR/EDR and BLE | no
 Ethernet    | MAC interface with dedicated DMA and IEEE 1588 support | yes
-CAN         | version 2.0 | no
+CAN         | version 2.0 | yes
 IR          | up to 8 channels TX/RX | no
 Motor PWM   | 2 devices x 6 channels | yes
 LED PWM     | 16 channels | no
@@ -145,7 +145,7 @@ MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network i
 #define ENC28J80_PARAM_CS       GPIO32      /* ENC28J80 CS signal    */
 #define ENC28J80_PARAM_RESET    GPIO33      /* ENC28J80 RESET signal */
 #define ENC28J80_PARAM_INT      GPIO35      /* ENC28J80 INT signal   */
-endif
+#endif
 
 #endif
 ```

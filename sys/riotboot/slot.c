@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
- *                    Inria
+ *               2017 Inria
+ *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -39,7 +40,7 @@ const riotboot_hdr_t * const riotboot_slots[] = {
 };
 
 /* Calculate the number of slots */
-const unsigned riotboot_slot_numof = sizeof(riotboot_slots) / sizeof(riotboot_hdr_t*);
+const unsigned riotboot_slot_numof = ARRAY_SIZE(riotboot_slots);
 
 static void _riotboot_slot_jump_to_image(const riotboot_hdr_t *hdr)
 {
@@ -58,6 +59,11 @@ int riotboot_slot_current(void)
     }
 
     return -1;
+}
+
+int riotboot_slot_other(void)
+{
+    return riotboot_slot_current() ? 0 : 1;
 }
 
 void riotboot_slot_jump(unsigned slot)

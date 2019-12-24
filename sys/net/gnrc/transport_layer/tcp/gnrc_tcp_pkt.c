@@ -175,8 +175,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
     /* Set offset and control bit accordingly */
     tcp_hdr.off_ctl = byteorder_htons(_option_build_offset_control(offset, ctl));
 
-    /* Allocate TCP header: size = offset * 4 bytes */
-    tcp_snp = gnrc_pktbuf_add(pay_snp, &tcp_hdr, offset * 4, GNRC_NETTYPE_TCP);
+    tcp_snp = gnrc_pktbuf_add(pay_snp, &tcp_hdr, sizeof(tcp_hdr), GNRC_NETTYPE_TCP);
     if (tcp_snp == NULL) {
         DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Can't allocate buffer for TCP Header\n.");
         gnrc_pktbuf_release(pay_snp);
@@ -184,6 +183,14 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
         return -ENOMEM;
     }
     else {
+        /* Resize TCP header: size = offset * 4 bytes */
+        if (gnrc_pktbuf_realloc_data(tcp_snp, offset * 4)) {
+            DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Couldn't set size of TCP header\n");
+            gnrc_pktbuf_release(tcp_snp);
+            *(out_pkt) = NULL;
+            return -ENOMEM;
+        }
+
         /* Add options if existing */
         if (TCP_HDR_OFFSET_MIN < offset) {
             uint8_t *opt_ptr = (uint8_t *) tcp_snp->data + sizeof(tcp_hdr);
@@ -271,7 +278,10 @@ int _pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_c
     }
 
     /* Pass packet down the network stack */
-    gnrc_netapi_send(gnrc_tcp_pid, out_pkt);
+    if (gnrc_netapi_send(gnrc_tcp_pid, out_pkt) < 1) {
+        DEBUG("gnrc_tcp_pkt.c : _pkt_send() : unable to send packet\n");
+        gnrc_pktbuf_release(out_pkt);
+    }
     return 0;
 }
 
@@ -303,7 +313,7 @@ int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const ui
         return 0;
     }
 
-    /* Everthing else is not acceptable */
+    /* Everything else is not acceptable */
     return -1;
 }
 
@@ -393,7 +403,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
         }
     }
 
-    /* Perform boundry checks on current RTO before usage */
+    /* Perform boundary checks on current RTO before usage */
     if (tcb->rto < (int32_t) GNRC_TCP_RTO_LOWER_BOUND) {
         tcb->rto = GNRC_TCP_RTO_LOWER_BOUND;
     }
@@ -435,7 +445,7 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
         /* Measure round trip time */
         int32_t rtt = xtimer_now().ticks32 - tcb->rtt_start;
 
-        /* Use time only if ther was no timer overflow and no retransmission (Karns Alogrithm) */
+        /* Use time only if there was no timer overflow and no retransmission (Karns Algorithm) */
         if (tcb->retries == 0 && rtt > 0) {
             /* If this is the first sample taken */
             if (tcb->srtt == RTO_UNINITIALIZED && tcb->rtt_var == RTO_UNINITIALIZED) {

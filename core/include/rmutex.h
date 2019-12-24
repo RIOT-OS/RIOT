@@ -24,7 +24,11 @@
 #define RMUTEX_H
 
 #include <stdint.h>
+#ifdef __cplusplus
+#include "c11_atomics_compat.hpp"
+#else
 #include <stdatomic.h>
+#endif
 
 #include "mutex.h"
 #include "kernel_types.h"

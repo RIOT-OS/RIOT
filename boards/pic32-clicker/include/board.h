@@ -26,6 +26,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include "cpu.h"
 #include "periph_conf.h"
 
 #ifdef __cplusplus
@@ -39,6 +40,13 @@ extern "C" {
  *          needed by the timer code.
  */
 #define TICKS_PER_US (48)
+
+/**
+ * @brief   Use the 3rd UART for STDIO on this board
+ *
+ * This is the UART connected to the MikroBus.
+ */
+#define STDIO_UART_DEV      UART_DEV(3)
 
 /**
  * @brief   We are using an External Interrupt Controller (all pic32 devices use this mode)

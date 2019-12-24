@@ -23,6 +23,9 @@ static void _usage(char **argv);
 static int _nib_neigh(int argc, char **argv);
 static int _nib_prefix(int argc, char **argv);
 static int _nib_route(int argc, char **argv);
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+static int _nib_abr(int argc, char **argv);
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
 
 int _gnrc_ipv6_nib(int argc, char **argv)
 {
@@ -41,6 +44,11 @@ int _gnrc_ipv6_nib(int argc, char **argv)
     else if (strcmp(argv[1], "route") == 0) {
         res = _nib_route(argc, argv);
     }
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+    else if (strcmp(argv[1], "abr") == 0) {
+        res = _nib_abr(argc, argv);
+    }
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
     else {
         _usage(argv);
     }
@@ -49,7 +57,11 @@ int _gnrc_ipv6_nib(int argc, char **argv)
 
 static void _usage(char **argv)
 {
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+    printf("usage: %s {neigh|prefix|route|abr|help} ...\n", argv[0]);
+#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
     printf("usage: %s {neigh|prefix|route|help} ...\n", argv[0]);
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
 }
 
 static void _usage_nib_neigh(char **argv)
@@ -261,7 +273,7 @@ static int _nib_route(int argc, char **argv)
             return 1;
         }
         if (argc > 6) {
-            ltime = (uint16_t)atoi(argv[6]);
+            ltime = atoi(argv[6]);
         }
         gnrc_ipv6_nib_ft_add(&pfx, pfx_len, &next_hop, iface, ltime);
     }
@@ -281,5 +293,75 @@ static int _nib_route(int argc, char **argv)
     }
     return 0;
 }
+
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+static void _usage_nib_abr(char **argv)
+{
+#if GNRC_IPV6_NIB_CONF_6LBR
+    printf("usage: %s %s [show|add|del|help]\n", argv[0], argv[1]);
+    printf("       %s %s add <ipv6 global addr>\n",
+           argv[0], argv[1]);
+    printf("       %s %s del <ipv6 global addr>\n", argv[0], argv[1]);
+#else   /* GNRC_IPV6_NIB_CONF_6LBR */
+    printf("usage: %s %s [show|help]\n", argv[0], argv[1]);
+#endif  /* GNRC_IPV6_NIB_CONF_6LBR */
+    printf("       %s %s show\n", argv[0], argv[1]);
+}
+
+static int _nib_abr(int argc, char **argv)
+{
+    if ((argc == 2) || (strcmp(argv[2], "show") == 0)) {
+        gnrc_ipv6_nib_abr_t entry;
+        void *state = NULL;
+
+        while (gnrc_ipv6_nib_abr_iter(&state, &entry)) {
+            gnrc_ipv6_nib_abr_print(&entry);
+        }
+    }
+    else if ((argc > 2) && (strcmp(argv[2], "help") == 0)) {
+        _usage_nib_abr(argv);
+    }
+#if GNRC_IPV6_NIB_CONF_6LBR
+    else if ((argc > 3) && (strcmp(argv[2], "del") == 0)) {
+        ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
+
+        if (ipv6_addr_from_str(&addr, argv[3]) == NULL) {
+            _usage_nib_abr(argv);
+            return 1;
+        }
+        gnrc_ipv6_nib_abr_del(&addr);
+    }
+    else if ((argc > 3) && (strcmp(argv[2], "add") == 0)) {
+        gnrc_netif_t *netif;
+        ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
+
+        if (ipv6_addr_from_str(&addr, argv[3]) == NULL) {
+            _usage_nib_abr(argv);
+            return 1;
+        }
+        /* check addr */
+        if (ipv6_addr_is_link_local(&addr)) {
+            printf("address %s must be global\n", argv[3]);
+            return 1;
+        }
+        if (!(((netif = gnrc_netif_get_by_ipv6_addr(&addr)) != NULL) &&
+              gnrc_netif_is_6lbr(netif))) {
+            printf("address %s is not assigned to a 6LBR interface\n",
+                   argv[3]);
+            return 1;
+        }
+        if (gnrc_ipv6_nib_abr_add(&addr) < 0) {
+            printf("unable to add border router %s\n", argv[3]);
+            return 1;
+        }
+    }
+#endif  /* GNRC_IPV6_NIB_CONF_6LBR */
+    else {
+        _usage_nib_abr(argv);
+        return 1;
+    }
+    return 0;
+}
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
 
 /** @} */

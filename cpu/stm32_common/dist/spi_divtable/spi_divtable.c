@@ -72,7 +72,7 @@ static int real_clk(int bus, int br)
 
 int main(int argc, char **argv)
 {
-    int tnum = sizeof(targets) / sizeof(targets[0]);
+    int tnum = ARRAY_SIZE(targets);
     int apb[2];
 
     if (argc != 3) {
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 
     printf("static const uint8_t spi_divtable[2][%i] = {\n", tnum);
 
-    for (int bus = 0; bus < (sizeof(apb) / sizeof(apb[0])); bus ++) {
+    for (int bus = 0; bus < ARRAY_SIZE(apb); bus ++) {
         printf("    {       /* for APB%i @ %iHz */\n", (bus + 1), apb[bus]);
         for (int t = 0; t < tnum; t++) {
             int br = find_best(apb[bus], targets[t]);

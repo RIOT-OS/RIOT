@@ -103,7 +103,7 @@ iib_link_set_entry_t *iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt
                                         uint64_t validity_time, uint8_t is_sym_nb,
                                         uint8_t is_lost)
 {
-    iib_base_entry_t *base_elt;
+    iib_base_entry_t *base_elt = NULL;
     iib_link_set_entry_t *ls_entry = NULL;
     timex_t now;
 
@@ -138,9 +138,9 @@ iib_link_set_entry_t *iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt
 
 void iib_fill_wr_addresses(kernel_pid_t if_pid, struct rfc5444_writer *wr)
 {
-    iib_base_entry_t *base_elt;
-    iib_link_set_entry_t *ls_elt;
-    nhdp_addr_entry_t *addr_elt;
+    iib_base_entry_t *base_elt  = NULL;
+    iib_link_set_entry_t *ls_elt  = NULL;
+    nhdp_addr_entry_t *addr_elt = NULL;
     timex_t now;
 
     mutex_lock(&mtx_iib_access);
@@ -214,8 +214,8 @@ void iib_fill_wr_addresses(kernel_pid_t if_pid, struct rfc5444_writer *wr)
 
 void iib_update_lt_status(timex_t *now)
 {
-    iib_base_entry_t *base_elt;
-    iib_link_set_entry_t *ls_elt, *ls_tmp;
+    iib_base_entry_t *base_elt = NULL;
+    iib_link_set_entry_t *ls_elt = NULL, *ls_tmp = NULL;
 
     LL_FOREACH(iib_base_entry_head, base_elt) {
         LL_FOREACH_SAFE(base_elt->link_set_head, ls_elt, ls_tmp) {
@@ -226,8 +226,8 @@ void iib_update_lt_status(timex_t *now)
 
 void iib_propagate_nb_entry_change(nib_entry_t *old_entry, nib_entry_t *new_entry)
 {
-    iib_base_entry_t *base_elt;
-    iib_link_set_entry_t *ls_elt;
+    iib_base_entry_t *base_elt = NULL;
+    iib_link_set_entry_t *ls_elt = NULL;
     LL_FOREACH(iib_base_entry_head, base_elt) {
         LL_FOREACH(base_elt->link_set_head, ls_elt) {
             if (ls_elt->nb_elt == old_entry) {
@@ -314,7 +314,7 @@ void iib_process_metric_pckt(iib_link_set_entry_t *ls_entry, uint32_t metric_out
         }
         else if (ls_entry->metric_out == ls_entry->nb_elt->metric_out){
             /* The corresponding neighbor tuples metric needs to be updated */
-            iib_base_entry_t *base_elt;
+            iib_base_entry_t *base_elt = NULL;
             iib_link_set_entry_t *ls_elt;
             ls_entry->nb_elt->metric_out = metric_out;
             LL_FOREACH(iib_base_entry_head, base_elt) {
@@ -364,15 +364,15 @@ void iib_process_metric_refresh(void)
  */
 static void cleanup_link_sets(void)
 {
-    iib_base_entry_t *base_elt;
+    iib_base_entry_t *base_elt = NULL;
 
     /* Loop through all link sets */
     LL_FOREACH(iib_base_entry_head, base_elt) {
         /* Loop through all link tuples of the link set */
-        iib_link_set_entry_t *ls_elt, *ls_tmp;
+        iib_link_set_entry_t *ls_elt = NULL, *ls_tmp = NULL;
         LL_FOREACH_SAFE(base_elt->link_set_head, ls_elt, ls_tmp) {
             /* Loop through all addresses of the link tuples */
-            nhdp_addr_entry_t *lt_elt, *lt_tmp;
+            nhdp_addr_entry_t *lt_elt = NULL, *lt_tmp = NULL;
             LL_FOREACH_SAFE(ls_elt->address_list_head, lt_elt, lt_tmp) {
                 if (NHDP_ADDR_TMP_IN_REM_LIST(lt_elt->address)) {
                     /* Remove link tuple address if included in the Removed Addr List */
@@ -385,7 +385,7 @@ static void cleanup_link_sets(void)
             if (!ls_elt->address_list_head) {
                 if (ls_elt->last_status == IIB_LT_STATUS_SYM) {
                     /* Remove all two hop entries for the corresponding link tuple */
-                    iib_two_hop_set_entry_t *th_elt, *th_tmp;
+                    iib_two_hop_set_entry_t *th_elt = NULL, *th_tmp = NULL;
                     LL_FOREACH_SAFE(base_elt->two_hop_set_head, th_elt, th_tmp) {
                         if (th_elt->ls_elt == ls_elt) {
                             rem_two_hop_entry(base_elt, th_elt);
@@ -406,9 +406,9 @@ static iib_link_set_entry_t *update_link_set(iib_base_entry_t *base_entry, nib_e
                                              timex_t *now, uint64_t val_time,
                                              uint8_t sym, uint8_t lost)
 {
-    iib_link_set_entry_t *ls_elt, *ls_tmp;
+    iib_link_set_entry_t *ls_elt = NULL, *ls_tmp = NULL;
     iib_link_set_entry_t *matching_lt = NULL;
-    nhdp_addr_entry_t *lt_elt;
+    nhdp_addr_entry_t *lt_elt = NULL;
     timex_t v_time, l_hold;
     uint8_t matches = 0;
 
@@ -448,7 +448,7 @@ static iib_link_set_entry_t *update_link_set(iib_base_entry_t *base_entry, nib_e
         release_link_tuple_addresses(matching_lt);
     }
     else {
-        /* No single matching link tuple existant, create a new one */
+        /* No single matching link tuple existent, create a new one */
         matching_lt = add_default_link_set_entry(base_entry, now, val_time);
 
         if (!matching_lt) {
@@ -643,8 +643,8 @@ static int update_two_hop_set(iib_base_entry_t *base_entry, iib_link_set_entry_t
 
     /* If the link to the neighbor is still symmetric */
     if (get_tuple_status(ls_entry, now) == IIB_LT_STATUS_SYM) {
-        iib_two_hop_set_entry_t *ths_elt, *ths_tmp;
-        nhdp_addr_t *addr_elt;
+        iib_two_hop_set_entry_t *ths_elt = NULL, *ths_tmp = NULL;
+        nhdp_addr_t *addr_elt = NULL;
 
         /* Loop through all the two hop tuples of the two hop set */
         LL_FOREACH_SAFE(base_entry->two_hop_set_head, ths_elt, ths_tmp) {
@@ -728,7 +728,7 @@ static void rem_two_hop_entry(iib_base_entry_t *base_entry, iib_two_hop_set_entr
 static void update_nb_tuple_symmetry(iib_base_entry_t *base_entry,
                                      iib_link_set_entry_t *ls_entry, timex_t *now)
 {
-    iib_two_hop_set_entry_t *th_elt, *th_tmp;
+    iib_two_hop_set_entry_t *th_elt = NULL, *th_tmp = NULL;
 
     /* First remove all two hop entries for the corresponding link tuple */
     LL_FOREACH_SAFE(base_entry->two_hop_set_head, th_elt, th_tmp) {
@@ -739,9 +739,9 @@ static void update_nb_tuple_symmetry(iib_base_entry_t *base_entry,
 
     /* Afterwards check the neighbor tuple containing the link tuple's addresses */
     if ((ls_entry->nb_elt != NULL) && (ls_entry->nb_elt->symmetric == 1)) {
-        iib_base_entry_t *base_tmp;
+        iib_base_entry_t *base_tmp = NULL;
         LL_FOREACH(iib_base_entry_head, base_tmp) {
-            iib_link_set_entry_t *ls_tmp;
+            iib_link_set_entry_t *ls_tmp = NULL;
             LL_FOREACH(base_tmp->link_set_head, ls_tmp) {
                 if ((ls_entry->nb_elt == ls_tmp->nb_elt) && (ls_entry != ls_tmp)) {
                     if (timex_cmp(ls_tmp->sym_time, *now) == 1) {
@@ -764,9 +764,9 @@ static void rem_not_heard_nb_tuple(iib_link_set_entry_t *ls_entry, timex_t *now)
 {
     /* Check whether the corresponding neighbor tuple still exists */
     if (ls_entry->nb_elt) {
-        iib_base_entry_t *base_tmp;
+        iib_base_entry_t *base_tmp = NULL;
         LL_FOREACH(iib_base_entry_head, base_tmp) {
-            iib_link_set_entry_t *ls_tmp;
+            iib_link_set_entry_t *ls_tmp = NULL;
             LL_FOREACH(base_tmp->link_set_head, ls_tmp) {
                 if ((ls_entry->nb_elt == ls_tmp->nb_elt) && (ls_entry != ls_tmp)) {
                     if (timex_cmp(ls_tmp->heard_time, *now) == 1) {
@@ -855,7 +855,7 @@ static void queue_rem(uint8_t *queue)
  */
 static void dat_metric_refresh(void)
 {
-    iib_base_entry_t *base_elt;
+    iib_base_entry_t *base_elt = NULL;
     iib_link_set_entry_t *ls_elt;
     uint32_t metric_temp;
     double sum_total, sum_rcvd, loss;

@@ -25,6 +25,7 @@
 
 /* include periph_cpu.h to make it visible in any case */
 #include "periph_cpu.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,6 +48,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Static array with declared ADC channels
+ */
+static const gpio_t adc_channels[] = ADC_GPIOS;
+
+/**
  * @brief Number of GPIOs declared as ADC channels
  *
  * The number of GPIOs that are declared as ADC channels is determined from
@@ -54,7 +60,7 @@ extern "C" {
  *
  * @note ADC_NUMOF definition must not be changed.
  */
-#define ADC_NUMOF   (adc_chn_num)
+#define ADC_NUMOF   ARRAY_SIZE(adc_channels)
 /** @} */
 
 /**
@@ -74,6 +80,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Static array with declared DAC channels
+ */
+static const gpio_t dac_channels[] = DAC_GPIOS;
+
+/**
  * @brief Number of GPIOs declared as DAC channels
  *
  * The number of GPIOs that are declared as DAC channels is determined from
@@ -81,14 +92,33 @@ extern "C" {
  *
  * @note DAC_NUMOF definition must not be changed.
  */
-#define DAC_NUMOF   (dac_chn_num)
+#define DAC_NUMOF   ARRAY_SIZE(dac_channels)
 /** @} */
-
 
 /**
  * @name   I2C configuration
  * @{
  */
+
+/**
+ * @brief   Static array with configuration for declared I2C devices
+ */
+static const i2c_conf_t i2c_config[] = {
+    #if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
+    {
+        .speed = I2C0_SPEED,
+        .scl = I2C0_SCL,
+        .sda = I2C0_SDA,
+    },
+    #endif
+    #if defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
+    {
+        .speed = I2C1_SPEED,
+        .scl = I2C1_SCL,
+        .sda = I2C1_SDA,
+    },
+    #endif
+};
 
 /**
  * @brief Number of I2C interfaces
@@ -98,7 +128,7 @@ extern "C" {
  *
  * @note I2C_NUMOF definition must not be changed.
  */
-#define I2C_NUMOF   (i2c_bus_num)
+#define I2C_NUMOF   ARRAY_SIZE(i2c_config)
 
 /** @} */
 
@@ -108,6 +138,19 @@ extern "C" {
  */
 
 /**
+ * @brief   Static array of GPIOs that can be used as channels of PWM0
+ */
+#ifdef PWM0_GPIOS
+static const gpio_t pwm0_channels[] = PWM0_GPIOS;
+#endif
+/**
+ * @brief   Static array of GPIOs that can be used as channels of PWM0
+ */
+#ifdef PWM1_GPIOS
+static const gpio_t pwm1_channels[] = PWM1_GPIOS;
+#endif
+
+/**
  * @brief   Number of PWM devices
  *
  * The number of PWM devices is determined from the PWM0_GPIOS and PWM1_GPIOS
@@ -115,13 +158,43 @@ extern "C" {
  *
  * @note PWM_NUMOF definition must not be changed.
  */
-#define PWM_NUMOF   (pwm_dev_num)
+#if defined(PWM0_GPIOS) && defined(PWM1_GPIOS)
+#define PWM_NUMOF  (2)
+#elif defined(PWM0_GPIOS) || defined(PWM1_GPIOS)
+#define PWM_NUMOF  (1)
+#else
+#define PWM_NUMOF  (0)
+#endif
 
 /** @} */
 
 /**
  * @name   SPI configuration
  */
+
+/**
+ * @brief   Static array with configuration for declared SPI devices
+ */
+static const spi_conf_t spi_config[] = {
+#ifdef SPI0_CTRL
+    {
+        .ctrl = SPI0_CTRL,
+        .sck = SPI0_SCK,
+        .mosi = SPI0_MOSI,
+        .miso = SPI0_MISO,
+        .cs = SPI0_CS0,
+    },
+#endif
+#ifdef SPI1_CTRL
+    {
+        .ctrl = SPI1_CTRL,
+        .sck = SPI1_SCK,
+        .mosi = SPI1_MOSI,
+        .miso = SPI1_MISO,
+        .cs = SPI1_CS0,
+    },
+#endif
+};
 
 /**
  * @brief Number of SPI interfaces
@@ -131,13 +204,42 @@ extern "C" {
  *
  * @note SPI_NUMOF definition must not be changed.
  */
-#define SPI_NUMOF   (spi_bus_num)
+#define SPI_NUMOF   ARRAY_SIZE(spi_config)
 
 /** @} */
 
 /**
  * @name   UART configuration
  */
+
+#ifndef UART0_TXD
+#define UART0_TXD   (GPIO1)  /**< TxD of UART_DEV(0) used on all ESP32 boards */
+#endif
+#ifndef UART0_RXD
+#define UART0_RXD   (GPIO3)  /**< RxD of UART_DEV(0) used on all ESP32 boards */
+#endif
+
+/**
+ * @brief   Static array with configuration for declared UART devices
+ */
+static const uart_conf_t uart_config[] = {
+    {
+        .txd = UART0_TXD,
+        .rxd = UART0_RXD,
+    },
+    #if defined(UART1_TXD) && defined(UART1_RXD)
+    {
+        .txd = UART1_TXD,
+        .rxd = UART1_RXD,
+    },
+    #endif
+    #if defined(UART2_TXD) && defined(UART2_RXD)
+    {
+        .txd = UART2_TXD,
+        .rxd = UART2_RXD,
+    },
+    #endif
+};
 
 /**
  * @brief Number of UART interfaces
@@ -147,13 +249,7 @@ extern "C" {
  *
  * @note UART_NUMOF definition must not be changed.
  */
-#if defined(UART1_TXD) && defined(UART1_RXD) && defined(UART2_TXD) && defined(UART2_RXD)
-#define UART_NUMOF  3
-#elif (defined(UART1_TXD) && defined(UART1_RXD)) || (defined(UART2_TXD) && defined(UART2_RXD))
-#define UART_NUMOF  2
-#else
-#define UART_NUMOF  1
-#endif
+#define UART_NUMOF  ARRAY_SIZE(uart_config)
 /** @} */
 
 #ifdef __cplusplus

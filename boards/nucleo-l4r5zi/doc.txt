@@ -1,0 +1,33 @@
+/**
+ * @defgroup    boards_nucleo144-l4r5 STM32 Nucleo-L4R5ZI
+ * @ingroup     boards_common_nucleo144
+ * @brief       Support for the STM32 Nucleo-L4R5ZI
+
+## Overview
+
+The Nucleo-L4R5ZI is a board from ST's Nucleo family supporting a ARM Cortex-M4
+STM32L4R5ZI microcontroller with 640Kb of RAM and 2Mb of ROM Flash.
+
+## Flashing the device
+
+The ST Nucleo-L4R5ZI board includes an on-board ST-LINK programmer and can be
+flashed using OpenOCD.
+@note The latest release of OpenOCD doesn't contain support for this board,
+so a recent development version (including  http://openocd.zylin.com/#/c/4777)
+must be built from source to be able to flash this board.
+
+To flash this board, just use the following command:
+
+```
+make BOARD=nucleo-l4r5zi flash -C examples/hello-world
+```
+
+### STDIO
+
+STDIO is available via the ST-Link programmer.
+
+Use the `term` target to open a terminal:
+
+    make BOARD=nucleo-l4r5zi -C examples/hello-world term
+
+ */

@@ -80,7 +80,19 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [22] = isr_tim17,                /* [22] TIM17 global Interrupt */
     [25] = isr_spi1,                 /* [25] SPI1 global Interrupt */
 
-#if defined(CPU_LINE_STM32F030x8)
+#if defined(CPU_LINE_STM32F030x4)
+    [ 4] = isr_rcc,                  /* [ 4] RCC global Interrupt */
+    [ 5] = isr_exti,                 /* [ 5] EXTI Line 0 and 1 Interrupt */
+    [ 6] = isr_exti,                 /* [ 6] EXTI Line 2 and 3 Interrupt */
+    [ 7] = isr_exti,                 /* [ 7] EXTI Line 4 to 15 Interrupt */
+    [ 9] = isr_dma1_channel1,        /* [ 9] DMA1 Channel 1 Interrupt */
+    [10] = isr_dma1_channel2_3,      /* [10] DMA1 Channel 2 and Channel 3 Interrupt */
+    [11] = isr_dma1_channel4_5,      /* [11] DMA1 Channel 4 and Channel 5 Interrupt */
+    [12] = isr_adc1,                 /* [12] ADC1 Interrupt */
+    [13] = isr_tim1_brk_up_trg_com,  /* [13] TIM1 Break, Update, Trigger and Commutation Interrupt */
+    [23] = isr_i2c1,                 /* [23] I2C1 Event Interrupt */
+    [27] = isr_usart1,               /* [27] USART1 global Interrupt */
+#elif defined(CPU_LINE_STM32F030x8)
     [ 4] = isr_rcc,                  /* [ 4] RCC global Interrupt */
     [ 5] = isr_exti,                 /* [ 5] EXTI Line 0 and 1 Interrupt */
     [ 6] = isr_exti,                 /* [ 6] EXTI Line 2 and 3 Interrupt */

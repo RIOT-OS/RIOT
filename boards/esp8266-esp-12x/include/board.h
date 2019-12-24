@@ -7,11 +7,6 @@
  */
 
 /**
- * @defgroup    boards_esp8266_esp-12x  ESP-12x based boards
- * @ingroup     boards_esp8266
- */
-
-/**
  * @ingroup     boards_esp8266_esp-12x
  * @brief       Board specific definitions for ESP-12x based boards.
  * @file
