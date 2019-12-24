@@ -19,5 +19,4 @@ interface number for the following commands. Then you can check with
 `ifconfig <iface> promisc` if promiscuous mode is supported and with
 `ifconfig <iface> raw` if raw mode is supported by the driver/network device.
 
-For further information on setting up the host part, see
-`RIOTBASE/dist/tools/sniffer/README.md`.
+For further information on setting up the host part, see `./tools/README.md`.
