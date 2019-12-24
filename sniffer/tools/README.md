@@ -40,7 +40,7 @@ General usage:
 ```
 $ git clone https://github.com/RIOT-OS/applications/
 $ cd applications/sniffer
-$ RIOTBASE=<path/to/RIOT> BOARD=<name> make clean all flash
+$ BOARD=<name> make clean all flash
 ```
 
 2.  Run the `sniffer.py` script (change to subfolder `tools/`) as follows :
