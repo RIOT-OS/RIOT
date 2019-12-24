@@ -14,9 +14,10 @@ Usage
 
 Compile and flash this application to the board of your choice. You can check
 if everything on the RIOT side works by connecting to the board via UART and by
-checking with `ifconfig` if a network device is available. Further you can
-check with `ifconfig 4 promisc` if promiscuous mode is supported and with
-`ifconfig 4 raw` if raw mode is supported by the driver/network device.
+checking with `ifconfig` if a network device is available. Also note the
+interface number for the following commands. Then you can check with
+`ifconfig <iface> promisc` if promiscuous mode is supported and with
+`ifconfig <iface> raw` if raw mode is supported by the driver/network device.
 
 For further information on setting up the host part, see
 `RIOTBASE/dist/tools/sniffer/README.md`.
