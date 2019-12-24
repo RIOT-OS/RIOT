@@ -53,6 +53,14 @@ For network socket:
 $ ./sniffer.py <host>:<port> <channel> [outfile]
 ```
 
+You should see output like below:
+```
+ifconfig 3 set chan 26
+ifconfig 3 raw
+ifconfig 3 promisc
+RX: 0
+```
+
 For detailed information on the parameters use the scripts on-line help:
 
 ```
