@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "irq.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
 #include "periph/timer.h"
@@ -167,6 +168,37 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     dev->MR[channel] = value;
     /* Match Interrupt */
     dev->MCR |= (1 << (channel * 3));
+
+    return 0;
+}
+
+int timer_set(tim_t tim, int channel, unsigned int timeout)
+{
+    if (((unsigned) tim >= TIMER_NUMOF) || ((unsigned) channel >= TIMER_CHANNEL_NUMOF)) {
+        return -1;
+    }
+
+    /* Interrupt will only be generated on increment,
+       so a 0 timeout is not possible */
+    if (timeout == 0) {
+        timeout = 1;
+    }
+
+    lpc23xx_timer_t *dev = get_dev(tim);
+
+    unsigned state = irq_disable();
+    dev->TCR = 0;
+
+    unsigned absolute = timeout + dev->TC;
+    unsigned mask = 1 << (channel * 3);
+
+    dev->MR[channel] = absolute;
+    dev->MCR |= mask;
+    set_oneshot(tim, channel);
+
+    dev->TCR = 1;
+    irq_restore(state);
+
     return 0;
 }
 
