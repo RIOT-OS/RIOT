@@ -386,11 +386,7 @@ uint32_t system_get_time (void)
 
 uint32_t system_get_time_ms (void)
 {
-    /* latch 64 bit timer value before read */
-    TIMER_SYSTEM.update = 0;
-    /* wait until instructions have been finished */
-    __asm__ volatile ("isync");
-    return TIMER_SYSTEM.cnt_low / USEC_PER_MSEC;
+    return system_get_time_64() / USEC_PER_MSEC;
 }
 
 uint64_t system_get_time_64 (void)

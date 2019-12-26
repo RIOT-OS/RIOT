@@ -71,7 +71,7 @@
 #define STRINGIFY2(s) #s
 
 #if MODULE_ESP_LOG_STARTUP
-#define LOG_STARTUP(format, ...) LOG_TAG_EARLY(LOG_DEBUG, D, __func__, format, ##__VA_ARGS__)
+#define LOG_STARTUP(format, ...) LOG_TAG_EARLY(LOG_INFO, D, __func__, format, ##__VA_ARGS__)
 #else
 #define LOG_STARTUP(format, ...)
 #endif
@@ -274,9 +274,6 @@ static NORETURN void IRAM system_init (void)
     /* initialize system call tables of ESP32 rom and newlib */
     syscalls_init();
 
-    /* initialize the RTC module (restore timer values from RTC RAM) */
-    rtc_init();
-
     /* install exception handlers */
     init_exceptions();
 
@@ -315,12 +312,6 @@ static NORETURN void IRAM system_init (void)
                 RTC_FAST_FREQ_8M_MHZ, rtc_clk_slow_freq_get_hz());
     LOG_STARTUP("XTAL calibration value: %d\n", esp_clk_slowclk_cal_get());
     LOG_STARTUP("Heap free: %u bytes\n", get_free_heap_size());
-
-    struct tm _sys_time;
-    rtc_get_time(&_sys_time);
-    LOG_STARTUP("System time: %04d-%02d-%02d %02d:%02d:%02d\n",
-                _sys_time.tm_year + 1900, _sys_time.tm_mon + 1, _sys_time.tm_mday,
-                _sys_time.tm_hour, _sys_time.tm_min, _sys_time.tm_sec);
     uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
 
     /* initialize the board */
@@ -331,6 +322,13 @@ static NORETURN void IRAM system_init (void)
 
     /* trigger static peripheral initialization */
     periph_init();
+
+    /* print system time */
+    struct tm _sys_time;
+    rtc_get_time(&_sys_time);
+    LOG_STARTUP("System time: %04d-%02d-%02d %02d:%02d:%02d\n",
+                _sys_time.tm_year + 1900, _sys_time.tm_mon + 1, _sys_time.tm_mday,
+                _sys_time.tm_hour, _sys_time.tm_min, _sys_time.tm_sec);
 
     /* print the board config */
 #ifdef MODULE_ESP_LOG_STARTUP
