@@ -61,8 +61,12 @@ static const tc32_conf_t timer_config[] = {
 static const uart_conf_t uart_config[] = {
     {    /* Virtual COM Port */
         .dev      = &SERCOM2->USART,
-        .rx_pin   = GPIO_PIN(PA,25),
-        .tx_pin   = GPIO_PIN(PA,24),
+        .rx_pin   = GPIO_PIN(PA, 25),
+        .tx_pin   = GPIO_PIN(PA, 24),
+#ifdef MODULE_SAM0_PERIPH_UART_HW_FC
+        .rts_pin  = GPIO_UNDEF,
+        .cts_pin  = GPIO_UNDEF,
+#endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_3,
         .tx_pad   = UART_PAD_TX_2,

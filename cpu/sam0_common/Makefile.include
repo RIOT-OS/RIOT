@@ -28,6 +28,9 @@ CFLAGS += -DDONT_USE_PREDEFINED_PERIPHERALS_HANDLERS
 # For Cortex-M cpu we use the common cortexm.ld linker script
 LINKER_SCRIPT ?= cortexm.ld
 
+# define sam0 specific pseudomodules
+PSEUDOMODULES += sam0_periph_uart_hw_fc
+
 # include sam0 common periph drivers
 USEMODULE += sam0_common_periph
 

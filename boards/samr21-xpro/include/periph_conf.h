@@ -135,23 +135,31 @@ static const tc32_conf_t timer_config[] = {
  */
 static const uart_conf_t uart_config[] = {
     {
-        .dev    = &SERCOM0->USART,
-        .rx_pin = GPIO_PIN(PA,5),
-        .tx_pin = GPIO_PIN(PA,4),
-        .mux    = GPIO_MUX_D,
-        .rx_pad = UART_PAD_RX_1,
-        .tx_pad = UART_PAD_TX_0,
-        .flags  = UART_FLAG_NONE,
+        .dev      = &SERCOM0->USART,
+        .rx_pin   = GPIO_PIN(PA,5),
+        .tx_pin   = GPIO_PIN(PA,4),
+#ifdef MODULE_SAM0_PERIPH_UART_HW_FC
+        .rts_pin  = GPIO_UNDEF,
+        .cts_pin  = GPIO_UNDEF,
+#endif
+        .mux      = GPIO_MUX_D,
+        .rx_pad   = UART_PAD_RX_1,
+        .tx_pad   = UART_PAD_TX_0,
+        .flags    = UART_FLAG_NONE,
         .gclk_src = GCLK_CLKCTRL_GEN_GCLK0
     },
     {
-        .dev    = &SERCOM5->USART,
-        .rx_pin = GPIO_PIN(PA,23),
-        .tx_pin = GPIO_PIN(PA,22),
-        .mux    = GPIO_MUX_D,
-        .rx_pad = UART_PAD_RX_1,
-        .tx_pad = UART_PAD_TX_0,
-        .flags  = UART_FLAG_NONE,
+        .dev      = &SERCOM5->USART,
+        .rx_pin   = GPIO_PIN(PA,23),
+        .tx_pin   = GPIO_PIN(PA,22),
+#ifdef MODULE_SAM0_PERIPH_UART_HW_FC
+        .rts_pin  = GPIO_UNDEF,
+        .cts_pin  = GPIO_UNDEF,
+#endif
+        .mux      = GPIO_MUX_D,
+        .rx_pad   = UART_PAD_RX_1,
+        .tx_pad   = UART_PAD_TX_0,
+        .flags    = UART_FLAG_NONE,
         .gclk_src = GCLK_CLKCTRL_GEN_GCLK0
     }
 };
