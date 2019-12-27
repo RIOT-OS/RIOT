@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-typedef size_t socklen_t;           /**< socket address length */
+typedef __socklen_t socklen_t;           /**< socket address length */
 
 #ifdef __cplusplus
 }

@@ -59,7 +59,7 @@ extern netdev_tap_t netdev_tap;
 
 #include "native_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 ucontext_t end_context;
@@ -70,21 +70,11 @@ char __end_stack[SIGSTKSZ];
  */
 static void _native_mod_ctx_leave_sigh(ucontext_t *ctx)
 {
-#ifdef __MACH__
-    _native_saved_eip = ((ucontext_t *)ctx)->uc_mcontext->__ss.__eip;
-    ((ucontext_t *)ctx)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_handler;
-#elif defined(__FreeBSD__)
-    _native_saved_eip = ((struct sigcontext *)ctx)->sc_eip;
-    ((struct sigcontext *)ctx)->sc_eip = (unsigned int)&_native_sig_leave_handler;
-#else /* Linux */
-#if defined(__arm__)
-    _native_saved_eip = ((ucontext_t *)ctx)->uc_mcontext.arm_pc;
-    ((ucontext_t *)ctx)->uc_mcontext.arm_pc = (unsigned int)&_native_sig_leave_handler;
-#else /* Linux/x86 */
-    _native_saved_eip = ctx->uc_mcontext.gregs[REG_EIP];
-    ctx->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_handler;
-#endif
-#endif
+    DEBUG("XXX %s\n", __func__);
+    (void)ctx;
+    _native_saved_program_counter = ctx->uc_mcontext.gregs[REG_RIP];
+    DEBUG("%s: _native_saved_program_counter is now 0x%llx\n", __func__, _native_saved_program_counter);
+    ctx->uc_mcontext.gregs[REG_RIP] = (greg_t)&_native_sig_leave_handler;
 }
 
 /**
@@ -92,19 +82,21 @@ static void _native_mod_ctx_leave_sigh(ucontext_t *ctx)
  */
 void thread_print_stack(void)
 {
-    DEBUG("thread_print_stack\n");
+    DEBUG("%s\n", __func__);
     return;
 }
 
 /* This function calculates the ISR_usage */
 int thread_isr_stack_usage(void)
 {
+    DEBUG("%s\n", __func__);
     /* TODO */
     return -1;
 }
 
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stacksize)
 {
+    DEBUG("%s\n", __func__);
     char *stk;
     ucontext_t *p;
 
@@ -132,16 +124,18 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
         err(EXIT_FAILURE, "thread_stack_init: sigemptyset");
     }
 
+    
     makecontext(p, (void (*)(void)) task_func, 1, arg);
+    DEBUG("new thread context RIP: 0x%llx\n", p->uc_mcontext.gregs[REG_RIP]);
 
     return (char *) p;
 }
 
 void isr_cpu_switch_context_exit(void)
 {
+    DEBUG("%s\n", __func__);
     ucontext_t *ctx;
 
-    DEBUG("isr_cpu_switch_context_exit\n");
     if ((sched_context_switch_request == 1) || (sched_active_thread == NULL)) {
         sched_run();
     }
@@ -152,6 +146,7 @@ void isr_cpu_switch_context_exit(void)
     native_interrupts_enabled = 1;
     _native_mod_ctx_leave_sigh(ctx);
 
+    DEBUG("isr_cpu_switch_context_exit: about to setcontext\n");
     if (setcontext(ctx) == -1) {
         err(EXIT_FAILURE, "isr_cpu_switch_context_exit: setcontext");
     }
@@ -160,6 +155,7 @@ void isr_cpu_switch_context_exit(void)
 
 void cpu_switch_context_exit(void)
 {
+    DEBUG("%s\n", __func__);
 #ifdef NATIVE_AUTO_EXIT
     if (sched_num_threads <= 1) {
         DEBUG("cpu_switch_context_exit: last task has ended. exiting.\n");
@@ -168,6 +164,7 @@ void cpu_switch_context_exit(void)
 #endif
 
     if (_native_in_isr == 0) {
+        DEBUG("cpu_switch_context_exit: switching to ISR context\n");
         irq_disable();
         _native_in_isr = 1;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
@@ -187,7 +184,7 @@ void cpu_switch_context_exit(void)
 
 void isr_thread_yield(void)
 {
-    DEBUG("isr_thread_yield\n");
+    DEBUG("%s\n", __func__);
 
     if (_native_sigpend > 0) {
         DEBUG("isr_thread_yield(): handling signals\n\n");
@@ -208,6 +205,7 @@ void isr_thread_yield(void)
 
 void thread_yield_higher(void)
 {
+    DEBUG("%s\n", __func__);
     sched_context_switch_request = 1;
 
     if (_native_in_isr == 0) {
@@ -230,6 +228,7 @@ void thread_yield_higher(void)
 
 void native_cpu_init(void)
 {
+    DEBUG("%s\n", __func__);
     if (getcontext(&end_context) == -1) {
         err(EXIT_FAILURE, "native_cpu_init: getcontext");
     }

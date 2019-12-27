@@ -25,15 +25,15 @@
  * check here for more:
  * http://sourceforge.net/p/predef/wiki/OperatingSystems/
  */
-#if (defined(__FreeBSD__) || defined(__MACH__))
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE
-#include <ucontext.h>
-#undef _XOPEN_SOURCE
-#else
-#include <ucontext.h>
-#endif
-#elif defined(__linux__)
+// #if (defined(__FreeBSD__) || defined(__MACH__))
+// #ifndef _XOPEN_SOURCE
+// #define _XOPEN_SOURCE
+// #include <ucontext.h>
+// #undef _XOPEN_SOURCE
+// #else
+// #include <ucontext.h>
+// #endif
+// #elif defined(__linux__)
 #ifndef _GNU_SOURCE
 #define GNU_SOURCE
 #include <ucontext.h>
@@ -41,7 +41,8 @@
 #else
 #include <ucontext.h>
 #endif
-#endif /* BSD/Linux */
+// #endif /* BSD/Linux */
+
 #include <netdb.h>
 #include <ifaddrs.h>
 #include <time.h>
@@ -143,7 +144,8 @@ extern int (*real_clock_gettime)(clockid_t clk_id, struct timespec *tp);
  * data structures
  */
 extern volatile int native_interrupts_enabled;
-extern volatile unsigned int _native_saved_eip;
+extern volatile greg_t _native_saved_program_counter;
+
 extern int _sig_pipefd[2];
 extern volatile int _native_sigpend;
 extern volatile int _native_in_isr;

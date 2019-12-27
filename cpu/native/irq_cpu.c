@@ -40,7 +40,7 @@
 
 #include "native_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 volatile int native_interrupts_enabled = 0;
@@ -53,7 +53,8 @@ char __isr_stack[SIGSTKSZ];
 ucontext_t native_isr_context;
 ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 
-volatile unsigned int _native_saved_eip;
+volatile greg_t _native_saved_program_counter;
+
 volatile int _native_sigpend;
 int _sig_pipefd[2];
 
@@ -72,6 +73,7 @@ void *thread_isr_stack_start(void)
 
 void print_thread_sigmask(ucontext_t *cp)
 {
+    DEBUG("%s\n", __func__);
     sigset_t *p = &cp->uc_sigmask;
 
     if (sigemptyset(p) == -1) {
@@ -95,6 +97,7 @@ void print_thread_sigmask(ucontext_t *cp)
 #ifdef DEVELHELP
 void print_sigmasks(void)
 {
+    DEBUG("%s\n", __func__);
     for (int i = 0; i < MAXTHREADS; i++) {
         if (sched_threads[i] != NULL) {
             ucontext_t *p;
@@ -110,6 +113,7 @@ void print_sigmasks(void)
 
 void native_print_signals(void)
 {
+    DEBUG("%s\n", __func__);
     sigset_t p, q;
     puts("native signals:\n");
 
@@ -148,6 +152,7 @@ void native_print_signals(void)
  */
 unsigned irq_disable(void)
 {
+    DEBUG("%s\n", __func__);
     unsigned int prev_state;
 
     _native_syscall_enter();
@@ -175,6 +180,7 @@ unsigned irq_disable(void)
  */
 unsigned irq_enable(void)
 {
+    DEBUG("%s\n", __func__);
     unsigned int prev_state;
 
     if (_native_in_isr == 1) {
@@ -208,6 +214,7 @@ unsigned irq_enable(void)
 
 void irq_restore(unsigned state)
 {
+    DEBUG("%s\n", __func__);
     DEBUG("irq_restore()\n");
 
     if (state == 1) {
@@ -222,12 +229,14 @@ void irq_restore(unsigned state)
 
 int irq_is_in(void)
 {
+    DEBUG("%s\n", __func__);
     DEBUG("irq_is_in: %i\n", _native_in_isr);
     return _native_in_isr;
 }
 
 int _native_popsig(void)
 {
+    DEBUG("%s\n", __func__);
     int nread, nleft, i;
     int sig;
 
@@ -252,7 +261,7 @@ int _native_popsig(void)
  */
 void native_irq_handler(void)
 {
-    DEBUG("\n\n\t\tnative_irq_handler\n\n");
+    DEBUG("%s\n", __func__);
 
     while (_native_sigpend > 0) {
         int sig = _native_popsig();
@@ -276,6 +285,7 @@ void native_irq_handler(void)
 
 void isr_set_sigmask(ucontext_t *ctx)
 {
+    DEBUG("%s\n", __func__);
     ctx->uc_sigmask = _native_sig_set_dint;
     native_interrupts_enabled = 0;
 }
@@ -285,6 +295,7 @@ void isr_set_sigmask(ucontext_t *ctx)
  */
 void native_isr_entry(int sig, siginfo_t *info, void *context)
 {
+    DEBUG("%s\n", __func__);
     (void) info; /* unused at the moment */
     //printf("\n\033[33m\n\t\tnative_isr_entry(%i)\n\n\033[0m", sig);
 
@@ -331,27 +342,10 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     /* disable interrupts in context */
     isr_set_sigmask((ucontext_t *)context);
     _native_in_isr = 1;
-    /*
-     * For register access on new platforms see:
-     * http://google-glog.googlecode.com/svn/trunk/m4/pc_from_ucontext.m4
-     * (URL added on Fri Aug 29 17:17:45 CEST 2014)
-     */
-#ifdef __MACH__
-    _native_saved_eip = ((ucontext_t *)context)->uc_mcontext->__ss.__eip;
-    ((ucontext_t *)context)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_tramp;
-#elif defined(__FreeBSD__)
-    _native_saved_eip = ((struct sigcontext *)context)->sc_eip;
-    ((struct sigcontext *)context)->sc_eip = (unsigned int)&_native_sig_leave_tramp;
-#else /* Linux */
-#if defined(__arm__)
-    _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.arm_pc;
-    ((ucontext_t *)context)->uc_mcontext.arm_pc = (unsigned int)&_native_sig_leave_tramp;
-#else /* Linux/x86 */
-    //printf("\n\033[31mEIP:\t%p\ngo switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP]);
-    _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
-    ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
-#endif
-#endif
+
+    DEBUG("\n\033[31mRIP:\t%p\ngo switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_RIP]);
+    _native_saved_program_counter = ((ucontext_t *)context)->uc_mcontext.gregs[REG_RIP];
+    ((ucontext_t *)context)->uc_mcontext.gregs[REG_RIP] = (greg_t)&_native_sig_leave_tramp;
 }
 
 /**
@@ -362,6 +356,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
  */
 void set_signal_handler(int sig, bool add)
 {
+    DEBUG("%s\n", __func__);
     struct sigaction sa;
     int ret;
 
@@ -411,7 +406,7 @@ void set_signal_handler(int sig, bool add)
  */
 int register_interrupt(int sig, _native_callback_t handler)
 {
-    DEBUG("register_interrupt\n");
+    DEBUG("%s\n", __func__);
 
     unsigned state = irq_disable();
 
@@ -428,7 +423,7 @@ int register_interrupt(int sig, _native_callback_t handler)
  */
 int unregister_interrupt(int sig)
 {
-    DEBUG("unregister_interrupt\n");
+    DEBUG("%s\n", __func__);
 
     unsigned state = irq_disable();
 
@@ -442,6 +437,7 @@ int unregister_interrupt(int sig)
 
 static void native_shutdown(int sig, siginfo_t *info, void *context)
 {
+    DEBUG("%s\n", __func__);
     (void)sig;
     (void)info;
     (void)context;
@@ -458,7 +454,7 @@ static void native_shutdown(int sig, siginfo_t *info, void *context)
 void native_interrupt_init(void)
 {
     struct sigaction sa;
-    DEBUG("native_interrupt_init\n");
+    DEBUG("%s\n", __func__);
 
     VALGRIND_STACK_REGISTER(__isr_stack, __isr_stack + sizeof(__isr_stack));
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",

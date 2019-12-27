@@ -10,4 +10,11 @@ FEATURES_PROVIDED += periph_qdec
 FEATURES_PROVIDED += ethernet
 FEATURES_PROVIDED += motor_driver
 
-include $(RIOTCPU)/native/Makefile.features
+LBITS := $(shell getconf LONG_BIT)
+ifeq ($(LBITS),64)
+  export CPU ?= native64
+else
+  export CPU ?= native32
+endif
+
+include $(RIOTCPU)/$(CPU)/Makefile.features

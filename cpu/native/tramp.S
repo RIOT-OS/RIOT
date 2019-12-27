@@ -9,113 +9,72 @@
 
 .text
 
-#ifdef __MACH__
-.globl __native_sig_leave_tramp
-__native_sig_leave_tramp:
-    pushl __native_saved_eip
-    pushfl
-    pushal
-
-    pushl __native_isr_ctx
-    pushl __native_cur_ctx
-    call _swapcontext
-    addl $8, %esp
-
-    call _irq_enable
-
-    movl $0x0, __native_in_isr
-    popal
-    popfl
-
-    ret
-
-.globl __native_sig_leave_handler
-__native_sig_leave_handler:
-    pushl __native_saved_eip
-    movl $0x0, __native_in_isr
-    ret
-
-#elif __arm__
-
 .globl _native_sig_leave_tramp
 _native_sig_leave_tramp:
-    /* save _native_saved_eip and registers */
-    stmdb   sp!, {r0}
-    ldr     r0, =_native_saved_eip
-    ldr     r0, [r0]
-    stmdb   sp!, {r0-r12}
-    stmdb   sp!, {lr}
+    pushf
 
-    /* exchange r0 and _native_saved_eip */
-    ldr     r0, [sp,#56]
-    ldr     r1, [sp,#4 ]
-    str     r0, [sp,#4 ]
-    str     r1, [sp,#56]
+    push %rax
+    push %rbx
+    push %rcx
+    push %rdx
+    push %rsi
+    push %rdi
+    push %rbp
+    push %rsp
+    push %r8
+    push %r9
+    push %r10
+    push %r11
+    push %r12
+    push %r13
+    push %r14
+    push %r15
 
-    /* call swapcontext ( _native_cur_ctx, _native_isr_ctx ) */
-    ldr     r2, =_native_cur_ctx
-    ldr     r0, [r2]
-    ldr     r2, =_native_isr_ctx
-    ldr     r1, [r2]
-    bl      swapcontext
+    movabs $_native_saved_program_counter, %rax
+    push %rax
 
-    /* reeanble interrupts */
-    bl      irq_enable
+    movabs $_native_isr_ctx, %rax
+    push %rax
 
-    /* _native_in_isr = 0 */
-    eor     r0, r0, r0
-    ldr     r2, =_native_in_isr
-    str     r0, [r2]
+    movabs $_native_cur_ctx, %rax
+    push %rax
 
-    /* restore registers, jump to (saved) _native_saved_eip */
-    ldmia   sp!, {lr}
-    ldmia   sp!, {r0-r12}
-    ldmia   sp!, {pc}
-
-.globl _native_sig_leave_handler
-_native_sig_leave_handler:
-    stmdb sp!, {r0}
-    ldr r0, =_native_saved_eip
-    ldr r0, [r0]
-    stmdb sp!, {r0-r12}
-    stmdb sp!, {lr}
-    /* exchange r0 and _native_saved_eip */
-    ldr     r0, [sp,#56]
-    ldr     r1, [sp,#4 ]
-    str     r0, [sp,#4 ]
-    str     r1, [sp,#56]
-    /* _native_in_isr = 0 */
-    eor     r0, r0, r0
-    ldr     r1, =_native_in_isr
-    str     r0, [r1]
-    ldmia sp!, {lr}
-    ldmia sp!, {r0-r12}
-    ldmia sp!, {pc}
-
-#else
-.globl _native_sig_leave_tramp
-
-_native_sig_leave_tramp:
-    pushl _native_saved_eip
-    pushfl
-    pushal
-
-    pushl _native_isr_ctx
-    pushl _native_cur_ctx
     call swapcontext
-    addl $8, %esp
+
+    add $16, %rsp
 
     call irq_enable
 
-    movl $0x0, _native_in_isr
-    popal
-    popfl
+    movabs $_native_in_isr, %rax
+    movq $0x0, (%rax)
+    
+    pop %r15
+    pop %r14
+    pop %r13
+    pop %r12
+    pop %r11
+    pop %r10
+    pop %r9
+    pop %r8
+    pop %rsp
+    pop %rbp
+    pop %rdi
+    pop %rsi
+    pop %rdx
+    pop %rcx
+    pop %rbx
+    pop %rax
+
+    popf
 
     ret
 
 .globl _native_sig_leave_handler
 _native_sig_leave_handler:
-    pushl _native_saved_eip
-    movl $0x0, _native_in_isr
-    ret
-#endif
+    movabs $_native_in_isr, %rax
+    movq $0x0, (%rax)
+
+    movabs $_native_saved_program_counter, %rax
+    movq (%rax), %rax
+
+    jmp %rax

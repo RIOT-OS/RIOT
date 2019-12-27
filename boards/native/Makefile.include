@@ -3,8 +3,6 @@ export NATIVEINCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/
 export NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
 export NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 
-export CPU = native
-
 USEMODULE += native-drivers
 
 ifeq ($(shell uname -s),Darwin)
@@ -29,17 +27,32 @@ ifeq (,$(filter -std=%, $(CFLAGS)))
   export CFLAGS += -std=gnu99
 endif
 
-ifeq ($(shell uname -m),x86_64)
-  export CFLAGS += -m32
+
+########################
+# Begin: 64-bit handling
+########################
+
+ifeq ($(shell uname -s),FreeBSD)
+  ifeq ($(CPU),native32)
+    export CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
+    export LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
+  endif
+else
+  ifeq ($(CPU),native32)
+    export CFLAGS += -m32
+    export LINKFLAGS += -m32
+  endif
 endif
+
+########################
+# End: 64-bit handling
+########################
+
+
 ifneq (,$(filter -DDEVELHELP,$(CFLAGS)))
   export CFLAGS += -fstack-protector-all
 endif
-ifeq ($(shell uname -s),FreeBSD)
-  ifeq ($(shell uname -m),amd64)
-    export CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
-  endif
-endif
+
 ifeq ($(shell uname -s),Darwin)
   export CFLAGS += -Wno-deprecated-declarations
 endif
@@ -48,13 +61,7 @@ endif
 export CXXUWFLAGS +=
 export CXXEXFLAGS +=
 
-ifeq ($(shell uname -m),x86_64)
-  export LINKFLAGS += -m32
-endif
 ifeq ($(shell uname -s),FreeBSD)
-  ifeq ($(shell uname -m),amd64)
-    export LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
-  endif
   export LINKFLAGS += -L $(BINDIR)
 else
   export LINKFLAGS += -ldl
@@ -114,7 +121,7 @@ ifneq ($(shell gcc --version | head -1 | grep -E ' (4.6|4.7)'),)
 endif
 
 # backward compatability with glibc <= 2.17 for native
-ifeq ($(CPU),native)
+ifeq ($(CPU),native32)
   ifeq ($(shell uname -s),Linux)
     ifeq ($(shell ldd --version |  awk '/^ldd/{if ($$NF < 2.17) {print "yes"} else {print "no"} }'),yes)
 	  LINKFLAGS += -lrt
@@ -124,7 +131,7 @@ endif
 
 # clumsy way to enable building native on osx:
 BUILDOSXNATIVE = 0
-ifeq ($(CPU),native)
+ifeq ($(CPU),native32)
   ifeq ($(shell uname -s),Darwin)
     BUILDOSXNATIVE = 1
   endif
