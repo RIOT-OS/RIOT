@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_esp8266
+ * @ingroup     cpu_esp_common
  * @{
  *
  * @file
- * @brief       Log module to realize consistent log messages
+ * @brief       Log module to realize consistent log messages for ESP SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
@@ -49,7 +49,7 @@ static inline void log_write(unsigned level, const char *format, ...) {
                     else if (level == LOG_DEBUG) { \
                         LOG_TAG(LOG_DEBUG, E, __func__, ##__VA_ARGS__); \
                     } \
-                } while (0)
+                } while (0U)
 
 #endif /* MODULE_LOG_PRINTFNOFORMAT */
 

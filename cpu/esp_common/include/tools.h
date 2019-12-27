@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_esp8266
+ * @ingroup     cpu_esp_common
  * @{
  *
  * @file
- * @brief       Implementation of some tools
+ * @brief       Implementation of some tools for ESP SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
@@ -22,6 +22,7 @@
 #define TOOLS_H
 
 #include <stdint.h>
+#include <inttypes.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,11 +36,6 @@ extern "C" {
  * @param[in]  per_line  number of items per line
  */
 void esp_hexdump (const void* addr, uint32_t num, char width, uint8_t per_line);
-
-/**
- * @brief  Print heap and system memory information
- */
-void print_meminfo (void);
 
 #ifdef __cplusplus
 }

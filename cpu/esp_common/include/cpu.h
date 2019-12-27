@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_esp8266
+ * @ingroup     cpu_esp_common
  * @{
  *
  * @file
- * @brief       CPU common functions
+ * @brief       CPU common functions for ESP SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */

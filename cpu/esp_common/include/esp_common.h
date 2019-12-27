@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_esp32
+ * @ingroup     cpu_esp_common
  * @{
  *
  * @file
- * @brief       Common helper macros
+ * @brief       Common helper macros for ESP SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
@@ -104,8 +104,10 @@ extern "C" {
   * @brief  function name mappings for source code compatibility with ESP8266 port
   * @{
   */
+#ifdef MCU_ESP32
 #define system_get_cpu_freq     ets_get_cpu_frequency
 #define system_update_cpu_freq  ets_update_cpu_frequency
+#endif /* MCU_ESP32 */
 /** @} */
 
 /** @} */

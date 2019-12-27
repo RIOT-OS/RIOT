@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_esp32
+ * @ingroup     cpu_esp_common
  * @{
  *
  * @file
- * @brief       Common log macros
+ * @brief       Common log macros for ESP SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
@@ -45,12 +45,12 @@ extern int ets_printf(const char *fmt, ...);
 
 #else /* MODULE_ESP_LOG_COLORED */
 
+#define LOG_RESET_COLOR
 #define LOG_COLOR_E
 #define LOG_COLOR_W
 #define LOG_COLOR_I
 #define LOG_COLOR_D
 #define LOG_COLOR_V
-#define LOG_RESET_COLOR
 
 #endif /* MODULE_ESP_LOG_COLORED */
 
@@ -122,25 +122,13 @@ extern int ets_printf(const char *fmt, ...);
 #define ESP_EARLY_LOGE(tag, format, ...) LOG_TAG_EARLY(LOG_ERROR  , E, tag, format "\n", ##__VA_ARGS__)
 #define ESP_EARLY_LOGW(tag, format, ...) LOG_TAG_EARLY(LOG_WARNING, W, tag, format "\n", ##__VA_ARGS__)
 #define ESP_EARLY_LOGI(tag, format, ...) LOG_TAG_EARLY(LOG_INFO   , I, tag, format "\n", ##__VA_ARGS__)
+#define ESP_EARLY_LOGD(tag, format, ...) LOG_TAG_EARLY(LOG_DEBUG, D, tag, format "\n", ##__VA_ARGS__)
+#define ESP_EARLY_LOGV(tag, format, ...) LOG_TAG_EARLY(LOG_ALL  , V, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGE(tag, format, ...) LOG_TAG(LOG_ERROR  , E, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGW(tag, format, ...) LOG_TAG(LOG_WARNING, W, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGI(tag, format, ...) LOG_TAG(LOG_INFO   , I, tag, format "\n", ##__VA_ARGS__)
-
-#if ENABLE_DEBUG
-
-#define ESP_EARLY_LOGD(tag, format, ...) LOG_TAG_EARLY(LOG_DEBUG, D, tag, format "\n", ##__VA_ARGS__)
-#define ESP_EARLY_LOGV(tag, format, ...) LOG_TAG_EARLY(LOG_ALL  , V, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGD(tag, format, ...) LOG_TAG(LOG_DEBUG, D, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGV(tag, format, ...) LOG_TAG(LOG_ALL  , V, tag, format "\n", ##__VA_ARGS__)
-
-#else /* ENABLE_DEBUG */
-
-#define ESP_EARLY_LOGD( tag, format, ... ) (void)tag
-#define ESP_EARLY_LOGV( tag, format, ... ) (void)tag
-#define ESP_LOGD( tag, format, ... ) (void)tag
-#define ESP_LOGV( tag, format, ... ) (void)tag
-
-#endif /* ENABLE_DEBUG */
 
 #ifdef __cplusplus
 }

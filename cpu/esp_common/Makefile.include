@@ -38,6 +38,7 @@ PSEUDOMODULES += esp_wifi_any
 
 # Modules used by ESP*
 
+USEMODULE += esp_common
 USEMODULE += esp_freertos
 USEMODULE += esp_idf
 USEMODULE += log
@@ -54,6 +55,7 @@ USEMODULE += xtensa
 
 INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
 INCLUDES += -I$(RIOTCPU)/esp_common
+INCLUDES += -I$(RIOTCPU)/esp_common/include
 INCLUDES += -I$(RIOTCPU)/esp_common/vendor/
 
 # Flags

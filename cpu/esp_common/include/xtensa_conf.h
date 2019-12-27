@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_esp8266
+ * @ingroup     cpu_esp_common
  * @{
  *
  * @file
- * @brief       Xtensa ASM code specific configuration options
+ * @brief       Xtensa ASM code specific configuration options for ESP SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
