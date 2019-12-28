@@ -140,8 +140,8 @@ Try [eBay][eBay] or [AliExpress][AliExpress].
 
 ## Further reading
 
-* http://wiki.stm32duino.com/index.php?title=Blue_Pill
-* http://wiki.stm32duino.com/index.php?title=Maple_Mini#Clones
+* https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?title=Blue_Pill
+* https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?title=Maple_Mini#Clones
 * http://www.st.com/content/st_com/en/products/microcontrollers/stm32-32-bit-
 arm-cortex-mcus/stm32-mainstream-mcus/stm32f1-series/stm32f103/stm32f103c8.html
 
@@ -149,13 +149,13 @@ arm-cortex-mcus/stm32-mainstream-mcus/stm32f1-series/stm32f103/stm32f103c8.html
 eet/33/d4/6f/1d/df/0b/4c/6d/CD00161566.pdf/files/CD00161566.pdf/jcr:content/tran
 slations/en.CD00161566.pdf
 [Flashsize]:
-http://wiki.stm32duino.com/index.php?title=Blue_Pill#128_KB_flash_on_C8_version
+https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?title=Blue_Pill#128_KB_flash_on_C8_version
 [eBay]: https://www.ebay.com/sch/i.html?_nkw=stm32f103c8
 [AliExpress]: https://www.aliexpress.com/wholesale?SearchText=STM32F103C8T6
 [OpenOCD]: https://github.com/RIOT-OS/RIOT/wiki/OpenOCD
 [USB]:
-http://wiki.stm32duino.com/index.php?title=Blue_Pill#Hardware_installation
+https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?title=Blue_Pill#Hardware_installation
 [imgTop]:
-http://wiki.stm32duino.com/images/thumb/1/19/STM32_Blue_Pill_top.jpg/800px-
+https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/images/thumb/1/19/STM32_Blue_Pill_top.jpg/800px-
 STM32_Blue_Pill_top.jpg
  */
