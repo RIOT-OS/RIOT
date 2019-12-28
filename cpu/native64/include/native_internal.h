@@ -25,23 +25,23 @@
  * check here for more:
  * http://sourceforge.net/p/predef/wiki/OperatingSystems/
  */
-#if (defined(__FreeBSD__) || defined(__MACH__))
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE
-#include <ucontext.h>
-#undef _XOPEN_SOURCE
-#else
-#include <ucontext.h>
-#endif
-#elif defined(__linux__)
-#ifndef _GNU_SOURCE
-#define GNU_SOURCE
-#include <ucontext.h>
-#undef GNU_SOURCE
-#else
-#include <ucontext.h>
-#endif
-#endif /* BSD/Linux */
+// #if (defined(__FreeBSD__) || defined(__MACH__))
+// #ifndef _XOPEN_SOURCE
+// #define _XOPEN_SOURCE
+// #include <ucontext.h>
+// #undef _XOPEN_SOURCE
+// #else
+// #include <ucontext.h>
+// #endif
+// #elif defined(__linux__)
+// #ifndef _GNU_SOURCE
+// #define GNU_SOURCE
+// #include <ucontext.h>
+// #undef GNU_SOURCE
+// #else
+// #include <ucontext.h>
+// #endif
+// #endif /* BSD/Linux */
 
 #include <netdb.h>
 #include <ifaddrs.h>

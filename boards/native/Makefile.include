@@ -27,28 +27,6 @@ ifeq (,$(filter -std=%, $(CFLAGS)))
   export CFLAGS += -std=gnu99
 endif
 
-
-########################
-# Begin: 64-bit handling
-########################
-
-ifeq ($(shell uname -s),FreeBSD)
-  ifeq ($(CPU),native32)
-    export CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
-    export LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
-  endif
-else
-  ifeq ($(CPU),native32)
-    export CFLAGS += -m32
-    export LINKFLAGS += -m32
-  endif
-endif
-
-########################
-# End: 64-bit handling
-########################
-
-
 ifneq (,$(filter -DDEVELHELP,$(CFLAGS)))
   export CFLAGS += -fstack-protector-all
 endif
