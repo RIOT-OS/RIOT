@@ -30,23 +30,13 @@
 
 static xtimer_t ot_millitimer;
 static xtimer_t ot_microtimer;
-static void _millitimer_cb(void* arg);
-static void _microtimer_cb(void* arg);
+static msg_t ot_millitimer_msg;
+static msg_t ot_microtimer_msg;
 
 void ot_timer_init(void)
 {
-    ot_millitimer.callback = _millitimer_cb;
-    ot_microtimer.callback = _microtimer_cb;
-}
-
-/* Interupt handler for OpenThread milli-timer event */
-static void _millitimer_cb(void* arg) {
-    (void)arg;
-    msg_t millitimer_msg;
-    millitimer_msg.type = OPENTHREAD_MILLITIMER_MSG_TYPE_EVENT;
-    if (msg_send(&millitimer_msg, openthread_get_pid()) <= 0) {
-        DEBUG("openthread: possibly lost timer interrupt.\n");
-    }
+    ot_millitimer_msg.type = OPENTHREAD_MILLITIMER_MSG_TYPE_EVENT;
+    ot_microtimer_msg.type = OPENTHREAD_MICROTIMER_MSG_TYPE_EVENT;
 }
 
 /**
@@ -63,7 +53,7 @@ void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
     DEBUG("openthread: otPlatAlarmMilliStartAt: aT0: %" PRIu32 ", aDT: %" PRIu32 "\n", aT0, aDt);
 
     uint32_t dt = aDt * US_PER_MS;
-    xtimer_set(&ot_millitimer, dt);
+    xtimer_set_msg(&ot_millitimer, dt, &ot_millitimer_msg, openthread_get_pid());
 }
 
 /* OpenThread will call this to stop alarms */
@@ -82,16 +72,6 @@ uint32_t otPlatAlarmMilliGetNow(void)
     return now;
 }
 
-/* Interupt handler for OpenThread micro-timer event */
-static void _microtimer_cb(void* arg) {
-    (void)arg;
-    msg_t microtimer_msg;
-    microtimer_msg.type = OPENTHREAD_MICROTIMER_MSG_TYPE_EVENT;
-    if (msg_send(&microtimer_msg, openthread_get_pid()) <= 0) {
-        DEBUG("openthread: possibly lost timer interrupt.\n");
-    }
-}
-
 /**
  * Set the alarm to fire at @p aDt microseconds after @p aT0.
  *
@@ -102,8 +82,10 @@ static void _microtimer_cb(void* arg) {
 void otPlatAlarmMicroStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
 {
     (void)aInstance;
+    (void)aT0;
     DEBUG("openthread: otPlatAlarmMicroStartAt: aT0: %" PRIu32 ", aDT: %" PRIu32 "\n", aT0, aDt);
-    xtimer_set(&ot_microtimer, aDt);
+
+    xtimer_set_msg(&ot_microtimer, aDt, &ot_microtimer_msg, openthread_get_pid());
 }
 
 /* OpenThread will call this to stop alarms */
