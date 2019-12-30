@@ -1,27 +1,70 @@
-TensorFlow Lite sample application
-==================================
+## TensorFlow Lite sample application
 
-This application is taken as-is from the hello-world sample
-application of TensorFlow Lite for microcontrollers.
-
-The original code is
-[available on GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/experimental/micro/examples/hello_world).
-
-This application simply replicates a `sine` function from a trained model.
+This application contains several examples of usage of TensorFlow Lite for
+microcontrollers:
+- The default example, `mnist` contains a complete example to perform
+  hand-written digit recognition: it shows how to train a very simple
+  MLP (Multi-Layer Perceptron) model and how to reuse it in a RIOT application.
+  The code of this example is provided as an external module in the
+  [mnist](mnist) directory.
+- The other example, [Hello World](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/experimental/micro/examples/hello_world),
+  taken as-is from TensorFlow Lite code, simply replicates a `sine` function
+  from a trained model.
 
 To get started with TensorFlow Lite on microcontrollers, please refer to
 [this page](https://www.tensorflow.org/lite/microcontrollers).
 
-Usage
------
+### Usage
 
 Simply run the application on the board of your choice using:
 
     make BOARD=<board of your choice> -C tests/pkg_tensorflow-lite flash term
 
+Set `EXAMPLE=hello_world` from the command line to try the upstream hello_world
+example.
+
 Then type 's' to start the application.
 
-Expected result
+### Examples details
+
+#### mnist
+
+expected output
+---------------
+
+```
+Digit prediction: 7
+```
+
+scripts usage
+-------------
+
+First, install tensorflow:
+
+```
+pip3 install --user tensorflow
+```
+
+The scripts require TensorFlow >= 2, so a fairly recent version of pip is
+required.
+
+The `mnist_mlp` example comes with 2 Python scripts:
+- `mnist_mlp.py` is used to train and store the model. To minimize the size of
+  the generated model, the script uses
+  [post-training quantization](https://www.tensorflow.org/lite/performance/post_training_quantization).
+  The quantized model is stored in the `model.tflite` file in the FlatBuffers
+  format and is embedded in the application using the BLOB mechanism.
+- `generate_digit.py` is used to generate the `digit` from the MNIST dataset
+  test data. The default digit generated corresponds to a 7.
+  Use the `-i` option to choose another digit. The script displays the
+  generated digit so you can compare with the prediction made by the RIOT
+  application.
+  Note that after a new digit is generated the firmware has to be rebuilt so
+  that it embeds the array containing the pixel values.
+
+#### hello_world
+
+expected output
 ---------------
 
 The application prints the values of the `sine` function:
