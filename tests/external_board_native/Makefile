@@ -9,6 +9,10 @@ RIOTBASE ?= $(CURDIR)/../../
 # In practice it should be something else
 BOARD ?= native
 
+# Require arch_native feature so this is not compiled for other boards in
+# $(RIOTBOARD)/
+FEATURES_REQUIRED += arch_native
+
 # Set without '?=' to also verify the docker integration when set with =
 BOARDSDIR = $(CURDIR)/external_boards
 

@@ -1,6 +1,7 @@
 .PHONY: info-buildsizes info-buildsizes-diff info-features-missing \
         info-boards-features-missing
 
+BOARDSDIR_GLOBAL := $(BOARDSDIR)
 USEMODULE_GLOBAL := $(USEMODULE)
 USEPKG_GLOBAL := $(USEPKG)
 FEATURES_REQUIRED_GLOBAL := $(FEATURES_REQUIRED)
@@ -13,6 +14,7 @@ FEATURES_BLACKLIST_GLOBAL := $(FEATURES_BLACKLIST)
 
 define board_unsatisfied_features
   BOARD             := $(1)
+  BOARDSDIR         := $(BOARDSDIR_GLOBAL)
   USEMODULE         := $(USEMODULE_GLOBAL)
   USEPKG            := $(USEPKG_GLOBAL)
   DISABLE_MODULE    := $(DISABLE_MODULE_GLOBAL)
@@ -30,6 +32,12 @@ define board_unsatisfied_features
   # Some are sometime set as `?=`
   undefine CPU
   undefine CPU_MODEL
+
+  # Replicate Makefile.include handling that sets BOARDSDIR to RIOTBOARD
+  # when BOARD is not found in BOARDSDIR
+  ifeq (,$(wildcard $(BOARDSDIR_GLOBAL)/$(BOARD)/.))
+    BOARDSDIR = $(RIOTBOARD)
+  endif
 
   include $(RIOTBASE)/Makefile.features
 

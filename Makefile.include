@@ -158,6 +158,20 @@ else
 
 all: link
 
+# Include Board and CPU configuration, if BOARD is not found in BOARDSDIR
+# e.g. when set by the environment fallback to searching in RIOTBOARD
+ifeq (,$(wildcard $(BOARDSDIR)/$(BOARD)/.))
+  ifneq ($(RIOTBOARD),$(BOARDSDIR))
+    # The specified board $(BOARD) was not found in $(BOARDSDIR) fallback to RIOTBOARD
+    BOARDSDIR = $(RIOTBOARD)
+  endif
+  ifeq ($(RIOTBOARD),$(BOARDSDIR))
+    ifeq (,$(wildcard $(BOARDSDIR)/$(BOARD)/.))
+      $(error The specified board $(BOARD) does not exist.)
+    endif
+  endif
+endif
+
 include $(RIOTMAKE)/info.inc.mk
 
 # Static code analysis tools provided by LLVM
@@ -262,9 +276,6 @@ LAZYSPONGE_FLAGS ?= $(if $(filter 1,$(QUIET)),,--verbose)
 
 ifeq (, $(APPLICATION))
     $(error An application name must be specified as APPLICATION.)
-endif
-ifneq (0,$(shell test -d $(BOARDSDIR)/$(BOARD); echo $$?))
-    $(error The specified board $(BOARD) does not exist.)
 endif
 
 # Use TOOLCHAIN environment variable to select the toolchain to use.
