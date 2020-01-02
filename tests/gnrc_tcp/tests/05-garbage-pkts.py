@@ -32,10 +32,10 @@ def testfunc(func):
         # Setup RIOT Node wait for incoming connections from host system
         child.sendline('gnrc_tcp_tcb_init')
         child.expect_exact('gnrc_tcp_tcb_init: argc=1, argv[0] = gnrc_tcp_tcb_init')
-        child.sendline('gnrc_tcp_open_passive AF_INET6 {}'.format(port))
-        child.expect(r'gnrc_tcp_open_passive: argc=3, '
+        child.sendline('gnrc_tcp_open_passive [::]:{}'.format(port))
+        child.expect(r'gnrc_tcp_open_passive: argc=2, '
                      r'argv\[0\] = gnrc_tcp_open_passive, '
-                     r'argv\[1\] = AF_INET6, argv\[2\] = (\d+)\r\n')
+                     r'argv\[1\] = \[::\]:(\d+)\r\n')
         assert int(child.match.group(1)) == port
 
         try:

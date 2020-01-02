@@ -37,7 +37,7 @@ def testfunc(child):
 
     # Setup RIOT Node wait for incoming connections from host system
     child.sendline('gnrc_tcp_tcb_init')
-    child.sendline('gnrc_tcp_open_passive AF_INET6 ' + str(port))
+    child.sendline('gnrc_tcp_open_passive [::]:{}'.format(str(port)))
 
     client_handle.start()
     child.expect_exact('gnrc_tcp_open_passive: returns 0')
