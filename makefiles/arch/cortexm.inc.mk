@@ -80,7 +80,7 @@ ifneq (,$(filter $(CPU_ARCH),cortex-m4f cortex-m7))
         # clang assumes there is an FPU
         ifneq (llvm,$(TOOLCHAIN))
             ifeq ($(CPU_ARCH),cortex-m7)
-                CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv5-d16
+                CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv5-sp-d16
             else
                 CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv4-sp-d16
             endif
