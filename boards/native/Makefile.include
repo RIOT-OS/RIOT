@@ -48,25 +48,25 @@ CXXUWFLAGS +=
 CXXEXFLAGS +=
 
 ifeq ($(OS_ARCH),x86_64)
-  export LINKFLAGS += -m32
+  LINKFLAGS += -m32
 endif
 ifeq ($(OS),FreeBSD)
   ifeq ($(OS_ARCH),amd64)
-    export LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
+    LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
   endif
-  export LINKFLAGS += -L $(BINDIR)
+  LINKFLAGS += -L $(BINDIR)
 else
-  export LINKFLAGS += -ldl
+  LINKFLAGS += -ldl
 endif
 
 # clean up unused functions
 CFLAGS += -ffunction-sections -fdata-sections
 ifeq ($(OS),Darwin)
-  export LINKFLAGS += -Wl,-dead_strip
+  LINKFLAGS += -Wl,-dead_strip
 else
-  export LINKFLAGS += -Wl,--gc-sections
+  LINKFLAGS += -Wl,--gc-sections
 endif
-export LINKFLAGS += -ffunction-sections
+LINKFLAGS += -ffunction-sections
 
 # set the tap interface for term/valgrind
 ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
@@ -96,10 +96,10 @@ all-valgrind: export NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
 all-debug: CFLAGS += -g3
 all-cachegrind: CFLAGS += -g3
 all-gprof: CFLAGS += -pg
-all-gprof: export LINKFLAGS += -pg
+all-gprof: LINKFLAGS += -pg
 all-asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
 all-asan: CFLAGS += -DNATIVE_IN_CALLOC
-all-asan: export LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
+all-asan: LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
 
 INCLUDES += $(NATIVEINCLUDES)
 
