@@ -19,4 +19,11 @@ else
   FEATURES_PROVIDED += periph_mcg
 endif
 
+# Since KINETIS_SERIES isn't available in Makefile.features filter according to
+# CPU_MODEL
+ifneq (,$(filter mkw% mk%,$(CPU_MODEL)))
+  FEATURES_PROVIDED += periph_flashpage
+  FEATURES_PROVIDED += periph_flashpage_raw
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.features
