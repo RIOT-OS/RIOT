@@ -83,10 +83,10 @@ int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *por
 
 static char* _find_hoststart(const char *url)
 {
-    /* Increment SOCK_SCHEME_MAXLEN due to comparison with the colon after the
+    /* Increment CONFIG_SOCK_SCHEME_MAXLEN due to comparison with the colon after the
      * scheme part
      */
-    size_t remaining = SOCK_SCHEME_MAXLEN + 1;
+    size_t remaining = CONFIG_SOCK_SCHEME_MAXLEN + 1;
     char *urlpos = (char*)url;
     while(*urlpos && remaining) {
         remaining--;
@@ -103,7 +103,7 @@ static char* _find_hoststart(const char *url)
 
 static char* _find_pathstart(const char *url)
 {
-    size_t remaining = SOCK_HOSTPORT_MAXLEN;
+    size_t remaining = CONFIG_SOCK_HOSTPORT_MAXLEN;
     char *urlpos = (char*)url;
     while(*urlpos && remaining) {
         remaining--;
@@ -127,9 +127,9 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
 
     if (hostport) {
         size_t hostlen = pathstart - hoststart;
-        /* hostlen must be smaller SOCK_HOSTPORT_MAXLEN to have space for the null
+        /* hostlen must be smaller CONFIG_SOCK_HOSTPORT_MAXLEN to have space for the null
         * terminator */
-        if (hostlen > SOCK_HOSTPORT_MAXLEN - 1) {
+        if (hostlen > CONFIG_SOCK_HOSTPORT_MAXLEN - 1) {
             return -EOVERFLOW;
         }
         memcpy(hostport, hoststart, hostlen);
@@ -138,7 +138,7 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
 
     if (urlpath) {
         size_t pathlen = strlen(pathstart);
-        if (pathlen > SOCK_URLPATH_MAXLEN - 1) {
+        if (pathlen > CONFIG_SOCK_URLPATH_MAXLEN - 1) {
             return -EOVERFLOW;
         }
         memcpy(urlpath, pathstart, pathlen);
@@ -153,7 +153,7 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
     char *hoststart = (char*)str;
     char *hostend;
 
-    char hostbuf[SOCK_HOSTPORT_MAXLEN];
+    char hostbuf[CONFIG_SOCK_HOSTPORT_MAXLEN];
 
     memset(ep_out, 0, sizeof(sock_udp_ep_t));
 

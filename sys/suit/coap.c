@@ -268,8 +268,8 @@ int suit_coap_get_blockwise_url(const char *url,
                                coap_blksize_t blksize,
                                coap_blockwise_cb_t callback, void *arg)
 {
-    char hostport[SOCK_HOSTPORT_MAXLEN];
-    char urlpath[SOCK_URLPATH_MAXLEN];
+    char hostport[CONFIG_SOCK_HOSTPORT_MAXLEN];
+    char urlpath[CONFIG_SOCK_URLPATH_MAXLEN];
     sock_udp_ep_t remote;
 
     if (strncmp(url, "coap://", 7)) {
