@@ -115,10 +115,10 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
     if (signal == DOSE_SIGNAL_UART) {
         /* We received a new octet */
         int esc = (ctx->flags & DOSE_FLAG_ESC_RECEIVED);
-        if (!esc && ctx->uart_octet == DOSE_OCTECT_ESC) {
+        if (!esc && ctx->uart_octet == DOSE_OCTET_ESC) {
             SETBIT(ctx->flags, DOSE_FLAG_ESC_RECEIVED);
         }
-        else if (!esc && ctx->uart_octet == DOSE_OCTECT_END) {
+        else if (!esc && ctx->uart_octet == DOSE_OCTET_END) {
             SETBIT(ctx->flags, DOSE_FLAG_END_RECEIVED);
             rc = DOSE_SIGNAL_END;
         }
@@ -374,8 +374,8 @@ static int send_data_octet(dose_t *ctx, uint8_t c)
     int rc;
 
     /* Escape special octets */
-    if (c == DOSE_OCTECT_ESC || c == DOSE_OCTECT_END) {
-        rc = send_octet(ctx, DOSE_OCTECT_ESC);
+    if (c == DOSE_OCTET_ESC || c == DOSE_OCTET_END) {
+        rc = send_octet(ctx, DOSE_OCTET_ESC);
         if (rc) {
             return rc;
         }
@@ -432,7 +432,7 @@ send:
     }
 
     /* Send END octet */
-    if (send_octet(ctx, DOSE_OCTECT_END)) {
+    if (send_octet(ctx, DOSE_OCTET_END)) {
         goto collision;
     }
 

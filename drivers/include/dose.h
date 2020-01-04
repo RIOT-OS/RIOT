@@ -71,8 +71,8 @@ extern "C" {
  * @name    Escape octet definitions
  * @{
  */
-#define DOSE_OCTECT_END          (0xFF)     /**< Magic octet indicating the end of frame */
-#define DOSE_OCTECT_ESC          (0xFE)     /**< Magic octet escaping 0xFF in byte stream */
+#define DOSE_OCTET_END  (0xFF)     /**< Magic octet indicating the end of frame */
+#define DOSE_OCTET_ESC  (0xFE)     /**< Magic octet escaping 0xFF in byte stream */
 /** @} */
 
 /**
