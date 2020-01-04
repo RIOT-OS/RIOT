@@ -73,24 +73,24 @@ printf "\n"
 # print operating system information
 printf "%s\n" "Operating System Environment"
 printf "%s\n" "-----------------------------"
-printf "%23s: %s\n" "Operating System" "$(get_os_info)"
-printf "%23s: %s\n" "Kernel" "$(get_kernel_info)"
+printf "%25s: %s\n" "Operating System" "$(get_os_info)"
+printf "%25s: %s\n" "Kernel" "$(get_kernel_info)"
 printf "\n"
 
 printf "%s\n" "Installed compiler toolchains"
 printf "%s\n" "-----------------------------"
-printf "%23s: %s\n" "native gcc" "$(get_cmd_version gcc)"
+printf "%25s: %s\n" "native gcc" "$(get_cmd_version gcc)"
 for p in \
          arm-none-eabi \
          avr mips-mti-elf \
          msp430 \
          riscv-none-embed \
          xtensa-esp32-elf \
-         xtensa-lx106-elf \
+         xtensa-esp8266-elf \
          ; do
-    printf "%23s: %s\n" "$p-gcc" "$(get_cmd_version ${p}-gcc)"
+    printf "%25s: %s\n" "$p-gcc" "$(get_cmd_version ${p}-gcc)"
 done
-printf "%23s: %s\n" "clang" "$(get_cmd_version clang)"
+printf "%25s: %s\n" "clang" "$(get_cmd_version clang)"
 printf "\n"
 printf "%s\n" "Installed compiler libs"
 printf "%s\n" "-----------------------"
@@ -100,12 +100,12 @@ for p in \
          mips-mti-elf \
          riscv-none-embed \
          xtensa-esp32-elf \
-         xtensa-lx106-elf \
+         xtensa-esp8266-elf \
          ; do
-    printf "%23s: %s\n" "$p-newlib" "$(newlib_version ${p}-gcc)"
+    printf "%25s: %s\n" "$p-newlib" "$(newlib_version ${p}-gcc)"
 done
 # avr libc version
-printf "%23s: %s\n" "avr-libc" "$(avr_libc_version avr-gcc)"
+printf "%25s: %s\n" "avr-libc" "$(avr_libc_version avr-gcc)"
 # tools
 printf "\n"
 printf "%s\n" "Installed development tools"
@@ -122,9 +122,9 @@ for c in \
          python2 \
          python3 \
          ; do
-    printf "%23s: %s\n" "$c" "$(get_cmd_version "${c}")"
+    printf "%25s: %s\n" "$c" "$(get_cmd_version "${c}")"
 done
-printf "%23s: %s\n" "flake8" "$(get_cmd_version "python3 -Wignore -m flake8")"
-printf "%23s: %s\n" "coccinelle" "$(get_cmd_version spatch)"
+printf "%25s: %s\n" "flake8" "$(get_cmd_version "python3 -Wignore -m flake8")"
+printf "%25s: %s\n" "coccinelle" "$(get_cmd_version spatch)"
 
 exit 0
