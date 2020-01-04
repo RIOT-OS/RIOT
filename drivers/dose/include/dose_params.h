@@ -36,7 +36,7 @@ extern "C" {
 #define DOSE_PARAM_BAUDRATE     (115200)
 #endif
 #ifndef DOSE_PARAM_SENSE_PIN
-#define DOSE_PARAM_SENSE_PIN    (GPIO_PIN(0, 0))
+#define DOSE_PARAM_SENSE_PIN    (GPIO_UNDEF)
 #endif
 
 #ifndef DOSE_PARAMS
