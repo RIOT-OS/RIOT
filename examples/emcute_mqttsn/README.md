@@ -58,7 +58,7 @@ single RIOT native instance, we can do the following:
 
 1. Setup `tap` and `tapbr` devices using RIOT's `tapsetup` script:
 ```
-./RIOTDIR/dist/tools/tapsetup/tapsetup
+sudo ./RIOTDIR/dist/tools/tapsetup/tapsetup
 ```
 
 2. Assign a site-global prefix to the `tapbr0` interface (the name could be

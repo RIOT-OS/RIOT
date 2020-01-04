@@ -39,7 +39,7 @@ RIOT provides three shell to interact with the CCN-Lite stack:
 
 An example usage of this application could be setup like this:
 1. Open a terminal window, navigate to the RIOT directory, and enter
-   `dist/tools/tapsetup/tapsetup -c`.
+   `sudo dist/tools/tapsetup/tapsetup -c`.
 2. Open a second terminal window and navigate to this directory in both of
    windows.
 3. Call `make -B clean all term` in the first terminal and `PORT=tap1 make
