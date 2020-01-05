@@ -487,6 +487,12 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t len)
     dose_t *ctx = (dose_t *) dev;
 
     switch (opt) {
+        case NETOPT_ADDRESS:
+            if (len < ETHERNET_ADDR_LEN) {
+                return -EINVAL;
+            }
+            memcpy(ctx->mac_addr.uint8, value, ETHERNET_ADDR_LEN);
+            return ETHERNET_ADDR_LEN;
         case NETOPT_PROMISCUOUSMODE:
             if (len < sizeof(netopt_enable_t)) {
                 return -EINVAL;
