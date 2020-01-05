@@ -6,7 +6,7 @@ PKG_BUILDDIR=$(CURDIR)/bin
 
 .PHONY: all
 
-all: git-download
+all:
 	cp $(PKG_BUILDDIR)/kconfiglib.py $(PKG_BUILDDIR)/menuconfig.py \
 	   $(PKG_BUILDDIR)/genconfig.py $(PKG_BUILDDIR)/examples/merge_config.py \
 	   .
