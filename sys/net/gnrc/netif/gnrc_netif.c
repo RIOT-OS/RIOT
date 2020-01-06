@@ -1142,12 +1142,14 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
 }
 #endif  /* MODULE_GNRC_IPV6 */
 
-#if (GNRC_NETIF_NUMOF > 1) && defined(MODULE_GNRC_SIXLOWPAN)
+#if ((GNRC_NETIF_NUMOF > 1) && defined(MODULE_GNRC_SIXLOWPAN)) || \
+    defined(MODULE_GNRC_SIXLOENC)
 bool gnrc_netif_is_6lo(const gnrc_netif_t *netif)
 {
     switch (netif->device_type) {
 #ifdef MODULE_GNRC_SIXLOENC
         case NETDEV_TYPE_ETHERNET:
+            return (netif->flags & GNRC_NETIF_FLAGS_6LO);
 #endif
         case NETDEV_TYPE_IEEE802154:
         case NETDEV_TYPE_CC110X:
@@ -1159,7 +1161,8 @@ bool gnrc_netif_is_6lo(const gnrc_netif_t *netif)
             return false;
     }
 }
-#endif  /* (GNRC_NETIF_NUMOF > 1) && defined(MODULE_GNRC_SIXLOWPAN) */
+#endif  /* ((GNRC_NETIF_NUMOF > 1) && defined(MODULE_GNRC_SIXLOWPAN)) || \
+         * defined(MODULE_GNRC_SIXLOENC)*/
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif)
 {

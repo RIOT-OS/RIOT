@@ -152,8 +152,11 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
 #ifdef MODULE_GNRC_IPV6
             netif->ipv6.mtu = ETHERNET_DATA_LEN;
 #endif
-#if defined(MODULE_GNRC_SIXLOWPAN_IPHC) && defined(MODULE_GNRC_SIXLOENC)
+#ifdef MODULE_GNRC_SIXLOENC
+            netif->flags |= GNRC_NETIF_FLAGS_6LO;
+#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
             netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
+#endif
 #endif
             break;
 #endif

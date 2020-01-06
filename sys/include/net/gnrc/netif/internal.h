@@ -337,13 +337,17 @@ static inline bool gnrc_netif_is_rtr_adv(const gnrc_netif_t *netif)
  *              @ref net_gnrc_sixlowpan module is included. When the
  *              @ref net_gnrc_sixlowpan module is not included, it is assumed
  *              to be false.
+ *              Since `gnrc_sixloenc` makes the interface's 6Lo capabilities
+ *              configurable for an Ethernet interface, this does not apply,
+ *              when that module is compiled in.
  *
  * @param[in] netif the network interface
  *
  * @return  true, if the interface represents a 6LN
  * @return  false, if the interface does not represent a 6LN
  */
-#if ((GNRC_NETIF_NUMOF > 1) && defined(MODULE_GNRC_SIXLOWPAN)) || defined(DOXYGEN)
+#if ((GNRC_NETIF_NUMOF > 1) && defined(MODULE_GNRC_SIXLOWPAN)) || \
+    defined(MODULE_GNRC_SIXLOENC) || defined(DOXYGEN)
 bool gnrc_netif_is_6lo(const gnrc_netif_t *netif);
 #elif (GNRC_NETIF_NUMOF == 1) && defined(MODULE_GNRC_SIXLOWPAN)
 #define gnrc_netif_is_6lo(netif)                (true)
