@@ -53,9 +53,7 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     SRC += sc_gnrc_rpl.c
 endif
 ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
-ifneq (,$(filter gnrc_ipv6_nib_6lbr,$(USEMODULE)))
     SRC += sc_gnrc_6ctx.c
-endif
 endif
 ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
   SRC += sc_gnrc_6lo_frag_stats.c

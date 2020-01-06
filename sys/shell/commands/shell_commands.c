@@ -112,9 +112,7 @@ extern int _gnrc_rpl(int argc, char **argv);
 #endif
 
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
-#ifdef MODULE_GNRC_IPV6_NIB_6LBR
 extern int _gnrc_6ctx(int argc, char **argv);
-#endif
 #endif
 
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
@@ -236,9 +234,7 @@ const shell_command_t _shell_command_list[] = {
     {"rpl", "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl },
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
-#ifdef MODULE_GNRC_IPV6_NIB_6LBR
     {"6ctx", "6LoWPAN context configuration tool", _gnrc_6ctx },
-#endif
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
     {"6lo_frag", "6LoWPAN fragment statistics", _gnrc_6lo_frag_stats },
