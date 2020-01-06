@@ -15,6 +15,12 @@
 extern "C" {
 #endif
 
+/* This header needs to re-typedef the sock types to prevent cyclic includes */
+#if defined (__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wtypedef-redefinition"
+#endif
+
 #if defined(SOCK_HAS_ASYNC) || defined(DOXYGEN)
 /**
  * @brief   Flag types to signify asynchronous sock events
@@ -133,10 +139,15 @@ typedef void (*sock_udp_cb_t)(sock_udp_t *sock, sock_async_flags_t type);
 #ifdef MODULE_SOCK_DTLS
 #include "sock_dtls_types.h"
 #endif  /* MODULE_SOCK_DTLS */
+
 #ifdef SOCK_HAS_ASYNC_CTX
 #include "sock_async_ctx.h"
 #endif
 #endif  /* defined(SOCK_HAS_ASYNC) || defined(DOXYGEN) */
+
+#if defined (__clang__)
+# pragma clang diagnostic pop
+#endif
 
 #ifdef __cplusplus
 }

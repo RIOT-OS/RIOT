@@ -273,6 +273,13 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
+/* net/sock/async/types.h included by net/sock.h needs to re-typedef the
+ * `sock_ip_t` to prevent cyclic includes */
+#if defined (__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wtypedef-redefinition"
+#endif
+
 #include "net/sock.h"
 
 #ifdef __cplusplus
@@ -286,6 +293,10 @@ extern "C" {
  *       implementation-specific `sock_types.h`.
  */
 typedef struct sock_ip sock_ip_t;
+
+#if defined (__clang__)
+# pragma clang diagnostic pop
+#endif
 
 /**
  * @brief   Creates a new raw IPv4/IPv6 sock object
