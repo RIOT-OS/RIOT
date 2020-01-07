@@ -38,6 +38,12 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief Block size required for the cipher. CCM is only defined for 128 bit ciphers.
+ */
+#define CCM_BLOCK_SIZE                      16
+
+
+/**
  * @brief Encrypt and authenticate data of arbitrary length in ccm mode.
  *
  * @param cipher           Already initialized cipher struct

@@ -169,6 +169,7 @@ int cipher_encrypt_ccm(cipher_t *cipher,
 
     /* Create B0, encrypt it (X1) and use it as mac_iv */
     block_size = cipher_get_block_size(cipher);
+    assert(block_size == CCM_BLOCK_SIZE);
     if (ccm_create_mac_iv(cipher, auth_data_len, mac_length, length_encoding,
                           nonce, nonce_len, input_len, mac_iv) < 0) {
         return CCM_ERR_INVALID_DATA_LENGTH;
@@ -236,6 +237,7 @@ int cipher_decrypt_ccm(cipher_t *cipher,
     /* Compute first stream block */
     nonce_counter[0] = length_encoding - 1;
     block_size = cipher_get_block_size(cipher);
+    assert(block_size == CCM_BLOCK_SIZE);
     memcpy(&nonce_counter[1], nonce, min(nonce_len,
                                          (size_t)15 - length_encoding));
     len = cipher_encrypt_ctr(cipher, nonce_counter, block_size, zero_block,
