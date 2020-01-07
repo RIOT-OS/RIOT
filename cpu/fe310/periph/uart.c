@@ -41,7 +41,9 @@ static inline void _uart_isr(uart_t dev)
 
     /* Intr cleared automatically when data is read */
     while ((data & UART_RXFIFO_EMPTY) != (uint32_t)UART_RXFIFO_EMPTY) {
-        isr_ctx[dev].rx_cb(isr_ctx[dev].arg, (uint8_t)(data & 0xff));
+        if (isr_ctx[dev].rx_cb) {
+            isr_ctx[dev].rx_cb(isr_ctx[dev].arg, (uint8_t)(data & 0xff));
+        }
         data = _REG32(uart_config[dev].addr, UART_REG_RXFIFO);
     }
 }
