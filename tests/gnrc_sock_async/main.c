@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
+#include "net/sock/async.h"
 #include "net/sock/ip.h"
 #include "net/sock/udp.h"
 #include "net/gnrc.h"
