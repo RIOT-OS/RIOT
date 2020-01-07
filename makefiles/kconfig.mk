@@ -18,7 +18,7 @@ CFLAGS += -include '$(KCONFIG_GENERATED_AUTOCONF_HEADER_C)'
 
 # Header for the generated header file
 define KCONFIG_AUTOHEADER_HEADER
-/* RIOT Configuration File */
+$(if $(filter MINGW% CYGWIN% MSYS%,$(OS)),/)/* RIOT Configuration File */
 
 endef
 export KCONFIG_AUTOHEADER_HEADER
