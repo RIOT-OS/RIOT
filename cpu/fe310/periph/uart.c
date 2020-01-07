@@ -62,6 +62,16 @@ void uart_isr(int num)
     }
 }
 
+static void _drain(uart_t dev)
+{
+    uint32_t data = _REG32(uart_config[dev].addr, UART_REG_RXFIFO);
+
+    /* Intr cleared automatically when data is read */
+    while ((data & UART_RXFIFO_EMPTY) != (uint32_t)UART_RXFIFO_EMPTY) {
+        data = _REG32(uart_config[dev].addr, UART_REG_RXFIFO);
+    }
+}
+
 int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     uint32_t uartDiv;
@@ -109,6 +119,11 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         set_external_isr_cb(uart_config[dev].isr_num, uart_isr);
         PLIC_enable_interrupt(uart_config[dev].isr_num);
         PLIC_set_priority(uart_config[dev].isr_num, UART_ISR_PRIO);
+
+        /* avoid trap by emptying RX FIFO */
+        _drain(dev);
+
+        /* enable RX interrupt */
         _REG32(uart_config[dev].addr, UART_REG_IE) = UART_IP_RXWM;
 
         /* Enable RX */
