@@ -627,10 +627,8 @@ PARSER.add_argument(
     help="Parallel building (0 means not limit, like '--jobs')")
 
 
-def main():
+def main(args):
     """For one board, compile all examples and tests and run test on board."""
-    args = PARSER.parse_args()
-
     logger = logging.getLogger(args.board)
     if args.loglevel:
         loglevel = logging.getLevelName(args.loglevel.upper())
@@ -690,4 +688,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(PARSER.parse_args())
