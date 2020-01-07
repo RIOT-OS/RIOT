@@ -29,4 +29,9 @@ ifneq (,$(filter cpu_ezr32wg,$(USEMODULE)))
   DIRS += families/ezr32wg
 endif
 
+# add EFM32 specific drivers, if enabled
+ifneq (,$(filter efm32_coretemp,$(USEMODULE)))
+  DIRS += drivers/coretemp
+endif
+
 include $(RIOTBASE)/Makefile.base
