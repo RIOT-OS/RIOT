@@ -1,0 +1,4 @@
+FEATURES_REQUIRED += cpp
+
+USEMODULE += utensor-ops
+USEMODULE += utensor-util
