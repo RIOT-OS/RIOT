@@ -105,8 +105,8 @@ static int ccm_compute_adata_mac(cipher_t *cipher, const uint8_t *auth_data,
     if (auth_data_len > 0) {
         int len;
 
-        /* 16 octet block size + max. 10 len encoding  */
-        uint8_t auth_data_encoded[26], len_encoding = 0;
+        /* Create a block with the encoded length. Block length is always 16 */
+        uint8_t auth_data_encoded[CCM_BLOCK_SIZE], len_encoding = 0;
 
         /* If 0 < l(a) < (2^16 - 2^8), then the length field is encoded as two
          * octets. (RFC3610 page 2)
@@ -123,11 +123,31 @@ static int ccm_compute_adata_mac(cipher_t *cipher, const uint8_t *auth_data,
             return -1;
         }
 
-        memcpy(auth_data_encoded + len_encoding, auth_data, auth_data_len);
+        uint8_t auth_data_len_in_encoded =
+            (auth_data_len >=
+             (uint32_t)CCM_BLOCK_SIZE -
+             len_encoding) ? ((uint32_t)CCM_BLOCK_SIZE -
+                              len_encoding) :
+            auth_data_len;
+        memcpy(auth_data_encoded + len_encoding, auth_data,
+               auth_data_len_in_encoded);
+        /* Calculate the MAC over the first block of AAD + heading length encoding */
         len = ccm_compute_cbc_mac(cipher, X1, auth_data_encoded,
-                                  auth_data_len + len_encoding, X1);
+                                  auth_data_len_in_encoded + len_encoding, X1);
+
         if (len < 0) {
             return -1;
+        }
+
+        /* Calculate the MAC for the remainder of the AAD (if there is one) */
+        if (auth_data_len_in_encoded < auth_data_len) {
+            len = ccm_compute_cbc_mac(cipher, X1,
+                                      auth_data + auth_data_len_in_encoded,
+                                      auth_data_len - auth_data_len_in_encoded,
+                                      X1);
+            if (len < 0) {
+                return -1;
+            }
         }
     }
 
@@ -180,6 +200,7 @@ int cipher_encrypt_ccm(cipher_t *cipher,
     if (len < 0) {
         return len;
     }
+
     len = ccm_compute_cbc_mac(cipher, mac_iv, input, input_len, mac);
     if (len < 0) {
         return len;
