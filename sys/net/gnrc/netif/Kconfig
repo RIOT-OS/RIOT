@@ -1,0 +1,39 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_MODULE_GNRC_NETIF
+    bool "Configure GNRC network interface"
+    depends on MODULE_GNRC_NETIF
+    help
+        Configure GNRC network interface using Kconfig.
+
+if KCONFIG_MODULE_GNRC_NETIF
+
+config GNRC_NETIF_MSG_QUEUE_SIZE
+    int "Message queue size for network interface threads"
+    default 16
+
+config GNRC_NETIF_IPV6_ADDRS_NUMOF
+    int "Maximum number of unicast and anycast addresses per interface"
+    default 2
+    help
+        If you change this, please make sure that
+        @ref CONFIG_GNRC_NETIF_IPV6_GROUPS_NUMOF is also large enough to fit the
+        addresses' solicited nodes multicast addresses.
+        Default: 2 (1 link-local + 1 global address).
+
+config GNRC_NETIF_DEFAULT_HL
+    int "Default hop limit"
+    default 64
+
+config GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
+    int "Minimum wait time after a send operation"
+    default 0
+    help
+        This value is expressed in microseconds. It is purely meant as a debugging
+        feature to slow down a radios sending.
+
+endif # KCONFIG_MODULE_GNRC_NETIF
