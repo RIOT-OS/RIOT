@@ -332,6 +332,24 @@ typedef gpio_t adc_conf_t;
 #define SOCADC_12_BIT_RSHIFT    (4U) /**< Mask for getting data(12 bits ENOB) */
 /** @} */
 
+/**
+ * @name RTT configuration
+ * @{
+ */
+#define RTT_DEV             SMWDTHROSC
+#define RTT_IRQ             SM_TIMER_ALT_IRQn
+#define RTT_IRQ_PRIO        1
+#define RTT_ISR             isr_sleepmode
+#define RTT_MAX_VALUE       (0xffffffff)
+#if SYS_CTRL_OSC32K_USE_XTAL
+/* Frequency of XOSC off by default */
+#define RTT_FREQUENCY       (32768U)    /* in Hz. For changes see `rtt.c` */
+#else
+/* Frequency of RCOSC on by default */
+#define RTT_FREQUENCY       (32753U)    /* in Hz. For changes see `rtt.c` */
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
