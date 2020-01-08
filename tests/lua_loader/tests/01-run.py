@@ -9,8 +9,8 @@
 # Tell the lua interpreter running in riot to load some modules and print
 # the value of a variable inside that module.
 
-import os
 import sys
+from testrunner import run
 
 MODULE_QUERIES = [
     ("m1", "a", "Quando uma lua"),
@@ -31,6 +31,4 @@ def test(child):
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTTOOLS'], 'testrunner'))
-    from testrunner import run
     sys.exit(run(test))
