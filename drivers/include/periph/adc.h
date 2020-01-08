@@ -87,6 +87,10 @@ typedef unsigned int adc_t;
 
 /**
  * @brief   Possible ADC resolution settings
+ *
+ * @details This type has to be provided by the underlying implementation if
+ *          the set of supported resolutions is different. Only resolutions
+ *          actually supported by the board must be defined.
  */
 #ifndef HAVE_ADC_RES_T
 typedef enum {
@@ -104,10 +108,11 @@ typedef enum {
  *
  * The ADC line is initialized in synchronous, blocking mode.
  *
- * @param[in] line          line to initialize
+ * @param[in]   line        line to initialize
  *
- * @return                  0 on success
- * @return                  -1 on invalid ADC line
+ * @retval      0           success
+ * @retval      -1          on invalid ADC line
+ * @retval      <-1         on internal errors
  */
 int adc_init(adc_t line);
 
@@ -119,11 +124,21 @@ int adc_init(adc_t line);
  * at the same time (e.g. from different threads), the one called secondly waits
  * for the first to finish before its conversion starts.
  *
- * @param[in] line          line to sample
- * @param[in] res           resolution to use for conversion
+ * @pre     The line given by @p line must be valid. An @ref assert will blow
+ *          up, if not.
+ * @pre     @ref adc_init has been called for the ADC line given by @p line
+ *          prior to this call.
+ * @pre     The resolution given by @p res is supported. An @ref assert will
+ *          blow up if the resolution is not valid.
+ *
+ * @note    All constants provided by the `enum` in @ref adc_res_t are valid
+ *          resolutions, except for `ADC_RES_NUMOF`, if it is provided.
+ *
+ * @param[in]   line        line to sample
+ * @param[in]   res         resolution to use for conversion
  *
  * @return                  the sampled value on success
- * @return                  -1 if resolution is not applicable
+ * @retval      <0          on internal errors
  */
 int adc_sample(adc_t line, adc_res_t res);
 
