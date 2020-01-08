@@ -296,7 +296,7 @@ gnrc_netif_t *gnrc_netif_get_by_pid(kernel_pid_t pid);
  *                      addresses assigned to @p netif. May not be `NULL`
  * @param[in] max_len   Number of *bytes* available in @p addrs. Must be at
  *                      least `sizeof(ipv6_addr_t)`. It is recommended to use
- *                      @p GNRC_NETIF_IPV6_ADDRS_NUMOF `* sizeof(ipv6_addr_t)
+ *                      @p CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF `* sizeof(ipv6_addr_t)
  *                      here (and have @p addrs of the according length).
  *
  * @return  Number of addresses in @p addrs times `sizeof(ipv6_addr_t)` on

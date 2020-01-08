@@ -239,7 +239,7 @@ static void test_ipv6_addr_add__ENOMEM(void)
 {
     ipv6_addr_t addr = { .u8 = NETIF0_IPV6_G };
 
-    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF;
+    for (unsigned i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF;
          i++, addr.u16[3].u16++) {
         TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_add_internal(netifs[0], &addr, 64U,
                                                   GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID));
@@ -509,7 +509,7 @@ static void test_ipv6_addr_best_src__deprecated_addr(void)
 
     test_ipv6_addr_add__success();  /* adds EUI-64 based link-local address */
     /* ensure that current addresses have smaller matches */
-    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
         ipv6_addr_t *addr = &netifs[0]->ipv6.addrs[i];
         TEST_ASSERT(exp_match > ipv6_addr_match_prefix(addr, &dst));
     }
@@ -747,7 +747,7 @@ static void test_netapi_get__HOP_LIMIT(void)
 static void test_netapi_get__IPV6_ADDR(void)
 {
     static const ipv6_addr_t exp = { NETIF0_IPV6_LL };
-    ipv6_addr_t value[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+    ipv6_addr_t value[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
     test_ipv6_addr_add__success();
     TEST_ASSERT_EQUAL_INT(sizeof(ipv6_addr_t), gnrc_netapi_get(netifs[0]->pid,
@@ -759,7 +759,7 @@ static void test_netapi_get__IPV6_ADDR(void)
 
 static void test_netapi_get__IPV6_ADDR_FLAGS(void)
 {
-    uint8_t value[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+    uint8_t value[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
     test_ipv6_addr_add__success();
     TEST_ASSERT_EQUAL_INT(sizeof(uint8_t), gnrc_netapi_get(netifs[0]->pid,

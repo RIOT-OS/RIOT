@@ -618,7 +618,7 @@ static int send_test_pkt(int argc, char **argv)
     (void) argv;
 
     printf("Sending UDP test packets to port %u\n", TEST_PORT);
-    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
         if (ipv6_addr_is_link_local(&eth_netif->ipv6.addrs[i])) {
             local_addr = &eth_netif->ipv6.addrs[i];
         }

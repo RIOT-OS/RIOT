@@ -89,8 +89,8 @@ extern "C" {
  *
  * Default: 2 (1 link-local + 1 global address)
  */
-#ifndef GNRC_NETIF_IPV6_ADDRS_NUMOF
-#define GNRC_NETIF_IPV6_ADDRS_NUMOF    (2)
+#ifndef CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF
+#define CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF    (2)
 #endif
 
 /**
@@ -100,7 +100,7 @@ extern "C" {
  * address) + @ref GNRC_NETIF_RPL_ADDR + @ref GNRC_NETIF_IPV6_RTR_ADDR
  */
 #ifndef GNRC_NETIF_IPV6_GROUPS_NUMOF
-#define GNRC_NETIF_IPV6_GROUPS_NUMOF   (GNRC_NETIF_IPV6_ADDRS_NUMOF + \
+#define GNRC_NETIF_IPV6_GROUPS_NUMOF   (CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF + \
                                         GNRC_NETIF_RPL_ADDR + \
                                         GNRC_NETIF_IPV6_RTR_ADDR + 1)
 #endif

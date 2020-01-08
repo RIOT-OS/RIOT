@@ -797,7 +797,7 @@ static uint8_t _netif_addr_count(const gnrc_netif_t *netif)
 {
     unsigned count = 0U;
 
-    for (int i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
         if (netif->ipv6.addrs_flags[i] != 0) {
             count++;
         }
