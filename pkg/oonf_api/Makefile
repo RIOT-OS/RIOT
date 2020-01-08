@@ -3,14 +3,14 @@ PKG_URL=https://github.com/OLSR/OONF.git
 PKG_VERSION=v0.3.0
 PKG_LICENSE=BSD-3-Clause
 
+include $(RIOTBASE)/pkg/pkg.mk
+
 MODULE:=$(PKG_NAME)
 
 # GCC 7.x fails on (intentional) fallthrough, thus disable implicit-fallthrough.
 CFLAGS += -Wno-implicit-fallthrough
 
 COMBINED_ARCHIVE = $(BINDIR)/$(MODULE).a
-
-.PHONY: all
 
 all:
 	"$(MAKE)" -C $(PKG_BUILDDIR)
@@ -37,7 +37,6 @@ $(BINDIR)/$(MODULE).mri:
 	$(file >$@,$(call MRI_TEMPLATE,$(COMBINED_ARCHIVE),$(PARTIAL_ARCHIVES)))
 	@true
 
-include $(RIOTBASE)/pkg/pkg.mk
 ifneq (,$(filter -Wformat-nonliteral -Wformat=2, $(CFLAGS)))
   CFLAGS += -Wno-format-nonliteral
 endif

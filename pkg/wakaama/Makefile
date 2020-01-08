@@ -3,12 +3,13 @@ PKG_URL=https://github.com/eclipse/wakaama.git
 PKG_VERSION=da74b3c91570b9716fbb424e90935806b2b29814
 PKG_LICENSE=EDL-1.0,EPL-1.0
 
-.PHONY: all
+include $(RIOTBASE)/pkg/pkg.mk
 
-all: patch
+all:
 	"$(MAKE)" -C $(PKG_BUILDDIR)
 
-patch: git-download
+$(PKG_PREPARED): $(PKG_BUILDDIR)/copied
+$(PKG_BUILDDIR)/copied: $(PKG_PATCHED) FORCE
 	mkdir -p "$(PKG_BUILDDIR)"
 	# copy the Wakaama core files
 	cp $(PKG_BUILDDIR)/core/*.c $(PKG_BUILDDIR)/core/*.h $(PKG_BUILDDIR)
@@ -21,5 +22,3 @@ patch: git-download
 
 	echo 'MODULE:=wakaama' > $(PKG_BUILDDIR)/Makefile
 	echo 'include $$(RIOTBASE)/Makefile.base' >> $(PKG_BUILDDIR)/Makefile
-
-include $(RIOTBASE)/pkg/pkg.mk
