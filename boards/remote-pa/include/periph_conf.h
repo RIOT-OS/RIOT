@@ -22,7 +22,10 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "periph_common.h"
+#include "periph_cpu.h"
+#include "cfg_clk_default.h"
+#include "cfg_timer_default.h"
+#include "cfg_uart_default.h"
 
 #ifdef __cplusplus
  extern "C" {
