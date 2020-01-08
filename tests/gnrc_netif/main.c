@@ -126,7 +126,7 @@ static void test_creation(void)
     TEST_ASSERT_NOT_NULL(ethernet_netif->ops);
     TEST_ASSERT_NOT_NULL(ethernet_netif->dev);
     TEST_ASSERT_EQUAL_INT(ETHERNET_DATA_LEN, ethernet_netif->ipv6.mtu);
-    TEST_ASSERT_EQUAL_INT(GNRC_NETIF_DEFAULT_HL, ethernet_netif->cur_hl);
+    TEST_ASSERT_EQUAL_INT(CONFIG_GNRC_NETIF_DEFAULT_HL, ethernet_netif->cur_hl);
     TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_ETHERNET, ethernet_netif->device_type);
     TEST_ASSERT(ethernet_netif->pid > KERNEL_PID_UNDEF);
 #ifdef DEVELHELP
@@ -147,7 +147,7 @@ static void test_creation(void)
     TEST_ASSERT_EQUAL_INT(IPV6_MIN_MTU, ieee802154_netif->ipv6.mtu);
     TEST_ASSERT_EQUAL_INT(TEST_IEEE802154_MAX_FRAG_SIZE,
                           ieee802154_netif->sixlo.max_frag_size);
-    TEST_ASSERT_EQUAL_INT(GNRC_NETIF_DEFAULT_HL, ieee802154_netif->cur_hl);
+    TEST_ASSERT_EQUAL_INT(CONFIG_GNRC_NETIF_DEFAULT_HL, ieee802154_netif->cur_hl);
     TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_IEEE802154,
                           ieee802154_netif->device_type);
     TEST_ASSERT(ieee802154_netif->pid > KERNEL_PID_UNDEF);
@@ -163,7 +163,7 @@ static void test_creation(void)
             )));
         TEST_ASSERT_NOT_NULL(netifs[i]->ops);
         TEST_ASSERT_NOT_NULL(netifs[i]->dev);
-        TEST_ASSERT_EQUAL_INT(GNRC_NETIF_DEFAULT_HL, netifs[i]->cur_hl);
+        TEST_ASSERT_EQUAL_INT(CONFIG_GNRC_NETIF_DEFAULT_HL, netifs[i]->cur_hl);
         TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_TEST, netifs[i]->device_type);
         TEST_ASSERT(netifs[i]->pid > KERNEL_PID_UNDEF);
         TEST_ASSERT(thread_has_msg_queue(sched_threads[netifs[i]->pid]));

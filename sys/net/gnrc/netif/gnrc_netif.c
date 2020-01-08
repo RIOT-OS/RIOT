@@ -1329,7 +1329,7 @@ void gnrc_netif_default_init(gnrc_netif_t *netif)
 #ifdef DEVELHELP
     _test_options(netif);
 #endif
-    netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
+    netif->cur_hl = CONFIG_GNRC_NETIF_DEFAULT_HL;
 #ifdef MODULE_GNRC_IPV6_NIB
     gnrc_ipv6_nib_init_iface(netif);
 #endif

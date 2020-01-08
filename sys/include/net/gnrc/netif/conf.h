@@ -133,8 +133,8 @@ extern "C" {
 #endif
 #endif
 
-#ifndef GNRC_NETIF_DEFAULT_HL
-#define GNRC_NETIF_DEFAULT_HL      (64U)   /**< default hop limit */
+#ifndef CONFIG_GNRC_NETIF_DEFAULT_HL
+#define CONFIG_GNRC_NETIF_DEFAULT_HL      (64U)   /**< default hop limit */
 #endif
 
 /**

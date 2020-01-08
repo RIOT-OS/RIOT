@@ -78,7 +78,7 @@ static void _set_up(void)
     gnrc_netif_acquire(_mock_netif);
     /* reset some fields not set by the nib interface initializer */
     _mock_netif->ipv6.mtu = ETHERNET_DATA_LEN;
-    _mock_netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
+    _mock_netif->cur_hl = CONFIG_GNRC_NETIF_DEFAULT_HL;
     gnrc_netif_ipv6_addr_remove_internal(_mock_netif, &_loc_gb);
     gnrc_netif_release(_mock_netif);
     memset(_buffer, 0, sizeof(_buffer));
