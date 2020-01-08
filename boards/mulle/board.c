@@ -28,7 +28,6 @@
 #include "periph/spi.h"
 #include "nvram-spi.h"
 #include "nvram.h"
-#include "xtimer.h"
 #include "vfs.h"
 #include "fs/devfs.h"
 #include "mtd_spi_nor.h"
@@ -103,9 +102,6 @@ void board_init(void)
 
     /* initialize the CPU */
     cpu_init();
-
-    /* NVRAM requires xtimer for timing */
-    xtimer_init();
 
     /* Initialize NOR flash */
     mulle_nor_init();
