@@ -83,8 +83,8 @@ static int ccm_create_mac_iv(cipher_t *cipher, uint8_t auth_data_len, uint8_t M,
     /* copy nonce to B[1..15-L] */
     memcpy(&X1[1], nonce, min(nonce_len, 15 - L));
 
-    /* write plaintext_len to B[15..16-L] */
-    for (uint8_t i = 15; i > 16 - L; --i) {
+    /* write plaintext_len to B[15..16-L] (reverse) */
+    for (uint8_t i = 15; i > 16 - L - 1; --i) {
         X1[i] = plaintext_len & 0xff;
         plaintext_len >>= 8;
     }
