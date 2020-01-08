@@ -115,6 +115,10 @@ void auto_init(void)
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
 #endif
+#ifdef BOARD_MULLE
+    void mulle_board_init_late(void);
+    mulle_board_init_late();
+#endif
 #ifdef MODULE_SCHEDSTATISTICS
     init_schedstatistics();
 #endif

@@ -81,8 +81,6 @@ int mulle_nor_init(void);
 
 void board_init(void)
 {
-    int status;
-
     /* initialize the boards LEDs */
     gpio_init(LED0_PIN, GPIO_OUT);
     gpio_init(LED1_PIN, GPIO_OUT);
@@ -109,15 +107,18 @@ void board_init(void)
     /* NVRAM requires xtimer for timing */
     xtimer_init();
 
+    /* Initialize NOR flash */
+    mulle_nor_init();
+}
+
+void mulle_board_init_late(void)
+{
     /* Initialize NVRAM */
-    status = mulle_nvram_init();
+    int status = mulle_nvram_init();
     if (status == 0) {
         /* Increment boot counter */
         increase_boot_count();
     }
-
-    /* Initialize NOR flash */
-    mulle_nor_init();
 }
 
 static inline void power_pins_init(void)
