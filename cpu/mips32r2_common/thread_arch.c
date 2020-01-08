@@ -233,10 +233,15 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
                     irq_restore(status);
                     return;
                 }
+                else if (ctx->t2[1] == __MIPS_UHI_READ && ctx->a[0] == STDIN_FILENO) {
+                    ctx->v[0] = stdio_read((void *)ctx->a[1], ctx->a[2]);
+                    ctx->epc += 4; /* move PC past the syscall */
+                    return;
+                }
                 else if (ctx->t2[1] == __MIPS_UHI_FSTAT &&
-                         (ctx->a[0] == STDOUT_FILENO || ctx->a[0] == STDERR_FILENO)) {
+                         (ctx->a[0] == STDOUT_FILENO || ctx->a[0] == STDIN_FILENO || ctx->a[0] == STDERR_FILENO)) {
                     /*
-                     * Printf fstat's the stdout/stderr file so
+                     * Printf fstat's the stdout/stdin/stderr file so
                      * fill out a minimal struct stat.
                      */
                     struct stat *sbuf = (struct stat *)ctx->a[1];
