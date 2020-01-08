@@ -18,6 +18,3 @@ else
 endif
 
 INCLUDES += -I$(RIOTBOARD)/common/arduino-mkr/include
-
-# setup the boards dependencies
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
