@@ -53,8 +53,8 @@ extern "C" {
  *              the thread's stack size might need to be adapted if this is
  *              changed.
  */
-#ifndef GNRC_NETIF_MSG_QUEUE_SIZE
-#define GNRC_NETIF_MSG_QUEUE_SIZE  (16U)
+#ifndef CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE
+#define CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE  (16U)
 #endif
 
 /**
