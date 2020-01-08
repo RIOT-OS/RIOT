@@ -1,2 +1,5 @@
 CPU = cc2538
 CPU_MODEL = cc2538sf53
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_rtt
