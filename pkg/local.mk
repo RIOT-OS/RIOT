@@ -6,7 +6,9 @@
 #
 # WARNING: any local changes made to $(PKG_BUILDDIR) *will* get lost!
 
-.PHONY: prepare clean
+.PHONY: prepare clean all
+
+all: $(PKG_BUILDDIR)/.prepared
 
 prepare: $(PKG_BUILDDIR)/.prepared
 	@true
