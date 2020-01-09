@@ -65,6 +65,15 @@ extern "C" {
 /* @} */
 
 /**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_TYPE    ZTIMER_TYPE_PERIPH_TIMER
+#define CONFIG_ZTIMER_USEC_DEV     TIMER_DEV(0)
+#define CONFIG_ZTIMER_USEC_MIN     (8)
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 extern void board_init(void);
