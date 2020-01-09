@@ -483,7 +483,7 @@ int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
 }
 #endif /* defined(MODULE_LWIP_SOCK_UDP) || defined(MODULE_LWIP_SOCK_IP) */
 
-ssize_t lwip_sock_send(struct netconn **conn, const void *data, size_t len,
+ssize_t lwip_sock_send(struct netconn *conn, const void *data, size_t len,
                        int proto, const struct _sock_tl_ep *remote, int type)
 {
     ip_addr_t remote_addr;
@@ -513,23 +513,23 @@ ssize_t lwip_sock_send(struct netconn **conn, const void *data, size_t len,
         netbuf_delete(buf);
         return -ENOMEM;
     }
-    if (((conn == NULL) || (*conn == NULL)) && (remote != NULL)) {
+    if ((conn == NULL) && (remote != NULL)) {
         if ((res = _create(type, proto, 0, &tmp)) < 0) {
             netbuf_delete(buf);
             return res;
         }
     }
-    else if (*conn != NULL) {
+    else if (conn != NULL) {
         ip_addr_t addr;
         u16_t port;
 
         if (((remote != NULL) &&
              (remote->netif != SOCK_ADDR_ANY_NETIF) &&
-             (netconn_getaddr(*conn, &addr, &port, 1) == 0) &&
+             (netconn_getaddr(conn, &addr, &port, 1) == 0) &&
              (remote->netif != lwip_sock_bind_addr_to_netif(&addr)))) {
             return -EINVAL;
         }
-        tmp = *conn;
+        tmp = conn;
     }
     else {
         netbuf_delete(buf);
@@ -549,9 +549,6 @@ ssize_t lwip_sock_send(struct netconn **conn, const void *data, size_t len,
     }
     switch (err) {
         case ERR_OK:
-            if (conn != NULL) {
-                *conn = tmp;
-            }
             break;
         case ERR_BUF:
         case ERR_MEM:
@@ -567,6 +564,9 @@ ssize_t lwip_sock_send(struct netconn **conn, const void *data, size_t len,
             break;
     }
     netbuf_delete(buf);
+    if (conn == NULL) {
+        netconn_delete(tmp);
+    }
     return res;
 }
 

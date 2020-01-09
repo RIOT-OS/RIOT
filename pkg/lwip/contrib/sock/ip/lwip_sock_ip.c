@@ -174,7 +174,7 @@ ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
 {
     assert((sock != NULL) || (remote != NULL));
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
-    return lwip_sock_send(&sock->conn, data, len, proto,
+    return lwip_sock_send(sock ? sock->conn : NULL, data, len, proto,
                           (struct _sock_tl_ep *)remote, NETCONN_RAW);
 }
 
