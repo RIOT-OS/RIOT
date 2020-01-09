@@ -218,8 +218,13 @@ gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF] = {
     _NOT_EXIST,   /* gpio29 */
     _NOT_EXIST,   /* gpio30 */
     _NOT_EXIST,   /* gpio31 */
+#if MODULE_ESP_RTC_TIMER_32K
+    _NOT_EXIST,   /* gpio32 used for external 32K crystal */
+    _NOT_EXIST,   /* gpio33 used for external 32K crystal */
+#else
     _GPIO,        /* gpio32 */
     _GPIO,        /* gpio33 */
+#endif
     _GPIO,        /* gpio34 */
     _GPIO,        /* gpio35 */
     _GPIO,        /* gpio36 */
