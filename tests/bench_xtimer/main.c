@@ -283,6 +283,8 @@ int main(void)
     _print_result("xtimer_now()", REPEAT, diff);
     assert(!_triggers);
 
+    _print_result("sizeof(xtimer_t)", NUMOF_TIMERS, sizeof(_timers));
+
     puts("done.");
 
     return 0;
