@@ -73,8 +73,10 @@ typedef void (*xtimer_callback_t)(void*);
  */
 typedef struct xtimer {
     struct xtimer *next;         /**< reference to next timer in timer lists */
-    uint32_t target;             /**< lower 32bit absolute target time */
-    uint32_t long_target;        /**< upper 32bit absolute target time */
+    uint32_t offset;             /**< lower 32bit offset time */
+    uint32_t long_offset;        /**< upper 32bit offset time */
+    uint32_t start_time;         /**< lower 32bit absolute start time */
+    uint32_t long_start_time;    /**< upper 32bit absolute start time */
     xtimer_callback_t callback;  /**< callback function to call when timer
                                      expires */
     void *arg;                   /**< argument to pass to callback function */
@@ -218,8 +220,6 @@ static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup, uint32_
  * expired.
  *
  * @param[in] timer         timer struct to work with.
- *                          Its xtimer_t::target and xtimer_t::long_target
- *                          fields need to be initialized with 0 on first use
  * @param[in] offset        microseconds from now
  * @param[in] pid           pid of the thread that will be woken up
  */
@@ -232,8 +232,6 @@ static inline void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pi
  * expired.
  *
  * @param[in] timer         timer struct to work with.
- *                          Its xtimer_t::target and xtimer_t::long_target
- *                          fields need to be initialized with 0 on first use
  * @param[in] offset        microseconds from now
  * @param[in] pid           pid of the thread that will be woken up
  */
@@ -252,8 +250,6 @@ static inline void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_
  * know *exactly* what that means.
  *
  * @param[in] timer     the timer structure to use.
- *                      Its xtimer_t::target and xtimer_t::long_target
- *                      fields need to be initialized with 0 on first use
  * @param[in] offset    time in microseconds from now specifying that timer's
  *                      callback's execution time
  */
@@ -273,8 +269,6 @@ static inline void xtimer_set(xtimer_t *timer, uint32_t offset);
  * know *exactly* what that means.
  *
  * @param[in] timer       the timer structure to use.
- *                        Its xtimer_t::target and xtimer_t::long_target
- *                        fields need to be initialized with 0 on first use
  * @param[in] offset_us   time in microseconds from now specifying that timer's
  *                        callback's execution time
  */
@@ -426,8 +420,6 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
  * needs to point to valid memory until the message has been delivered.
  *
  * @param[in] timer         timer struct to work with.
- *                          Its xtimer_t::target and xtimer_t::long_target
- *                          fields need to be initialized with 0 on first use.
  * @param[in] offset        microseconds from now
  * @param[in] msg           ptr to msg that will be sent
  * @param[in] target_pid    pid the message will be sent to
@@ -444,8 +436,6 @@ static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, 
  * needs to point to valid memory until the message has been delivered.
  *
  * @param[in] timer         timer struct to work with.
- *                          Its xtimer_t::target and xtimer_t::long_target
- *                          fields need to be initialized with 0 on first use.
  * @param[in] offset        microseconds from now
  * @param[in] msg           ptr to msg that will be sent
  * @param[in] target_pid    pid the message will be sent to
@@ -487,29 +477,6 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
 #define XTIMER_BACKOFF 30
 #endif
 
-/**
- * @brief xtimer overhead value, in hardware ticks
- *
- * This value specifies the time a timer will be late if uncorrected, e.g.,
- * the system-specific xtimer execution time from timer ISR to executing
- * a timer's callback's first instruction.
- *
- * E.g., with XTIMER_OVERHEAD == 0
- * start=xtimer_now();
- * xtimer_set(&timer, X);
- * (in callback:)
- * overhead=xtimer_now()-start-X;
- *
- * xtimer automatically subtracts XTIMER_OVERHEAD from a timer's target time,
- * but when the timer triggers, xtimer will spin-lock until a timer's target
- * time is reached, so timers will never trigger early.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#ifndef XTIMER_OVERHEAD
-#define XTIMER_OVERHEAD 20
-#endif
-
 #ifndef XTIMER_ISR_BACKOFF
 /**
  * @brief   xtimer IRQ backoff time, in hardware ticks
@@ -520,29 +487,6 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
  * This is supposed to be defined per-device in e.g., periph_conf.h.
  */
 #define XTIMER_ISR_BACKOFF 20
-#endif
-
-#ifndef XTIMER_PERIODIC_SPIN
-/**
- * @brief   xtimer_periodic_wakeup spin cutoff
- *
- * If the difference between target time and now is less than this value, then
- * xtimer_periodic_wakeup will use xtimer_spin instead of setting a timer.
- */
-#define XTIMER_PERIODIC_SPIN (XTIMER_BACKOFF * 2)
-#endif
-
-#ifndef XTIMER_PERIODIC_RELATIVE
-/**
- * @brief   xtimer_periodic_wakeup relative target cutoff
- *
- * If the difference between target time and now is less than this value, then
- * xtimer_periodic_wakeup will set a relative target time in the future instead
- * of the true target.
- *
- * This is done to prevent target time underflows.
- */
-#define XTIMER_PERIODIC_RELATIVE (512)
 #endif
 
 /*
