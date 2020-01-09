@@ -1,5 +1,5 @@
-RIOT Documentation                                                  {#mainpage}
-==================
+Overview                                                  {#mainpage}
+========
 
 [TOC]
 
