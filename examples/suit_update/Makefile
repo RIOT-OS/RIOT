@@ -49,6 +49,9 @@ USEMODULE += suit suit_coap
 # SUIT draft v4 support:
 USEMODULE += suit_v4
 
+# Display a progress bar during firmware download
+USEMODULE += progress_bar
+
 # Optional feature to trigger suit update through gpio callback
 FEATURES_OPTIONAL += periph_gpio_irq
 

@@ -263,7 +263,7 @@ static int _dtv_fetch(suit_v4_manifest_t *manifest, int key, nanocbor_value_t *_
     int target_slot = riotboot_slot_other();
     riotboot_flashwrite_init(manifest->writer, target_slot);
     int res = suit_coap_get_blockwise_url(manifest->urlbuf, COAP_BLOCKSIZE_64, suit_flashwrite_helper,
-            manifest->writer);
+            manifest);
 
     if (res) {
         LOG_INFO("image download failed\n)");

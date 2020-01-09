@@ -44,6 +44,10 @@
 #include "suit/v4/suit.h"
 #endif
 
+#if defined(MODULE_PROGRESS_BAR)
+#include "progress_bar.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -69,6 +73,24 @@
 static char _stack[SUIT_COAP_STACKSIZE];
 static char _url[SUIT_URL_MAX];
 static uint8_t _manifest_buf[SUIT_MANIFEST_BUFSIZE];
+
+#ifdef MODULE_SUIT_V4
+static inline void _print_download_progress(size_t offset, size_t len, uint32_t image_size)
+{
+DEBUG("_suit_flashwrite(): writing %u bytes at pos %u\n", len, offset);
+#if defined(MODULE_PROGRESS_BAR) && defined(MODULE_SUIT_V4)
+    if (image_size != 0) {
+        char _suffix[7] = { 0 };
+        uint8_t _progress = 100 * (offset + len) / image_size;
+        sprintf(_suffix, " %3d%%", _progress);
+        progress_bar_print("Fetching firmware ", _suffix, _progress);
+        if (_progress == 100) {
+            puts("");
+        }
+    }
+#endif
+}
+#endif
 
 static kernel_pid_t _suit_coap_pid;
 
@@ -389,7 +411,8 @@ static void _suit_handle_url(const char *url)
 int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
                            int more)
 {
-    riotboot_flashwrite_t *writer = arg;
+    suit_v4_manifest_t *manifest = (suit_v4_manifest_t *)arg;
+    riotboot_flashwrite_t *writer = manifest->writer;
 
     if (offset == 0) {
         if (len < RIOTBOOT_FLASHWRITE_SKIPLEN) {
@@ -407,7 +430,7 @@ int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
         return -1;
     }
 
-    DEBUG("_suit_flashwrite(): writing %u bytes at pos %u\n", len, offset);
+    _print_download_progress(offset, len, manifest->components[0].size);
 
     return riotboot_flashwrite_putbytes(writer, buf, len, more);
 }
