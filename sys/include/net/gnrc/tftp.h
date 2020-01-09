@@ -127,7 +127,7 @@ typedef enum {
  *
  * @param [in] action       The action the transfer want to perform
  * @param [in] mode         The data mode of the transfer
- * @param [in] file_name    The filename of the file being transfered
+ * @param [in] file_name    The filename of the file being transferred
  * @param [in/out] data_len When a read action is performed, the application must give
  *                          the total transfer size of the data. When a write action
  *                          is performed the total transfer size will be given.

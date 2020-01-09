@@ -133,7 +133,7 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
     }
     /* the nrf52's TWI device does not support to do two consecutive transfers
      * without a repeated start condition in between. So we have to put all data
-     * to be transfered into a temporary buffer
+     * to be transferred into a temporary buffer
      *
      * CAUTION: this might become critical when transferring large blocks of
      *          data as the temporary buffer is allocated on the stack... */

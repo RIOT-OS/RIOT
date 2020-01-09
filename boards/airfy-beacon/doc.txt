@@ -98,7 +98,7 @@ file](https://github.com/texane/stlink/blob/master/README) if you need help.
 Second you need to enable the standalone ST-Link mode of the discovery board
 by removing the two `CN2` jumpers, found somewhere in the upper left part of the
 board. This disconnects the ST-Link programmer from the micro-controller part of
-the port and enables direct access through the pin-header `CN3`, also labled
+the port and enables direct access through the pin-header `CN3`, also labeled
 `SWD`.
 
 This module supports the Serial Wire Debug (SWD) interface. To access the

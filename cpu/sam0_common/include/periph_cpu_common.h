@@ -178,6 +178,7 @@ typedef enum {
     UART_FLAG_WAKEUP          = 0x2,    /**< wake from sleep on receive */
 } uart_flag_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Available SERCOM UART data size selections
  *
@@ -193,6 +194,15 @@ typedef enum {
     UART_DATA_BITS_8 = 0x0,   /**< 8 data bits */
 } uart_data_bits_t;
 /** @} */
+#endif /* ndef DOXYGEN */
+
+
+/**
+ * @brief   Size of the UART TX buffer for non-blocking mode.
+ */
+#ifndef SAM0_UART_TXBUF_SIZE
+#define SAM0_UART_TXBUF_SIZE    (64)
+#endif
 
 /**
  * @brief   UART device configuration
@@ -201,6 +211,10 @@ typedef struct {
     SercomUsart *dev;       /**< pointer to the used UART device */
     gpio_t rx_pin;          /**< pin used for RX */
     gpio_t tx_pin;          /**< pin used for TX */
+#ifdef MODULE_SAM0_PERIPH_UART_HW_FC
+    gpio_t rts_pin;          /**< pin used for RTS */
+    gpio_t cts_pin;          /**< pin used for CTS */
+#endif
     gpio_mux_t mux;         /**< alternative function for pins */
     uart_rxpad_t rx_pad;    /**< pad selection for RX line */
     uart_txpad_t tx_pad;    /**< pad selection for TX line */
@@ -228,6 +242,7 @@ typedef enum {
     SPI_PAD_MOSI_0_SCK_3 = 0x3, /**< use pad 0 for MOSI, pad 3 for SCK */
 } spi_mosipad_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Override SPI modes
  * @{
@@ -254,6 +269,7 @@ typedef enum {
     SPI_CLK_10MHZ  = 10000000U  /**< drive the SPI bus with 10MHz */
 } spi_clk_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   SPI device configuration
@@ -279,6 +295,7 @@ typedef enum {
     I2C_FLAG_RUN_STANDBY     = 0x1,    /**< run SERCOM in standby mode */
 } i2c_flag_t;
 
+#ifndef DOXYGEN
 /**
  * @name    Override I2C clock speed values
  * @{
@@ -292,6 +309,7 @@ typedef enum {
     I2C_SPEED_HIGH      = 3400000U,    /**< high speed mode:   ~3.4Mbit/s */
 } i2c_speed_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   I2C device configuration
@@ -340,42 +358,53 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
  *
  * @return              numeric id of the given SERCOM device
  */
-static inline int sercom_id(const void *sercom)
+static inline uint8_t sercom_id(const void *sercom)
 {
 #ifdef SERCOM0
-    if (sercom == SERCOM0)
+    if (sercom == SERCOM0) {
         return 0;
+    }
 #endif
 #ifdef SERCOM1
-    if (sercom == SERCOM1)
+    if (sercom == SERCOM1) {
         return 1;
+    }
 #endif
 #ifdef SERCOM2
-    if (sercom == SERCOM2)
+    if (sercom == SERCOM2) {
         return 2;
+    }
 #endif
 #ifdef SERCOM3
-    if (sercom == SERCOM3)
+    if (sercom == SERCOM3) {
         return 3;
+    }
 #endif
 #ifdef SERCOM4
-    if (sercom == SERCOM4)
+    if (sercom == SERCOM4) {
         return 4;
+    }
 #endif
 #ifdef SERCOM5
-    if (sercom == SERCOM5)
+    if (sercom == SERCOM5) {
         return 5;
+    }
 #endif
 #ifdef SERCOM6
-    if (sercom == SERCOM6)
+    if (sercom == SERCOM6) {
         return 6;
+    }
 #endif
 #ifdef SERCOM7
-    if (sercom == SERCOM7)
+    if (sercom == SERCOM7) {
         return 7;
+    }
 #endif
 
-    return -1;
+    /* should not be reached, so fail with assert */
+    assert(false);
+
+    return SERCOM_INST_NUM;
 }
 
 /**

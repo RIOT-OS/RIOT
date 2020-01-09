@@ -12,7 +12,7 @@ however show up in Wireshark, which can be confusing). So be sure to adjust your
 
 First, create a tap interface (to which RIOT will connect) and a bridge (to which Linux will connect) from the RIOT main directory run:
 
-    ./dist/tools/tapsetup/tapsetup -c 1
+    sudo ./dist/tools/tapsetup/tapsetup -c 1
 
 Now you can start the `gnrc_tftp` example by invoking `make term`. This should automatically connect to the `tap0` interface. If
 this doesn't work for some reason, run `make` without any arguments, and then run the binary manually like so (assuming you are in the `examples/gnrc_tftp` directory):

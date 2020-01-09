@@ -436,7 +436,7 @@ static inline void irq_handler(i2c_t dev)
     assert(i2c != NULL);
 
     unsigned state = i2c->SR1;
-    DEBUG("\n\n### I2C ERROR OCCURED ###\n");
+    DEBUG("\n\n### I2C ERROR OCCURRED ###\n");
     DEBUG("status: %08x\n", state);
     if (state & I2C_SR1_OVR) {
         DEBUG("OVR\n");

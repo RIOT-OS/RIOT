@@ -3,6 +3,7 @@ CPU = atmega128rfa1
 # This board is based on an atmega CPU, thus import the features from it
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart

@@ -184,7 +184,7 @@ int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes)
         size_t len = 0;
 
         for (int i = 0; i < (int) FORTUNA_POOLS; i++) {
-            if (state->reseeds | (1 << i)) {
+            if (state->reseeds | ((uint32_t)1 << i)) {
                 sha256_final(&state->pools[i].ctx, &buf[len]);
                 sha256_init(&state->pools[i].ctx);
                 state->pools[i].len = 0;

@@ -43,7 +43,7 @@ typedef struct netdev_tap {
     char tap_name[IFNAMSIZ];            /**< host dev file name */
     int tap_fd;                         /**< host file descriptor for the TAP */
     uint8_t addr[ETHERNET_ADDR_LEN];    /**< The MAC address of the TAP */
-    uint8_t promiscous;                 /**< Flag for promiscous mode */
+    uint8_t promiscuous;                 /**< Flag for promiscuous mode */
 } netdev_tap_t;
 
 /**
@@ -51,7 +51,7 @@ typedef struct netdev_tap {
  */
 typedef struct {
     char **tap_name;                    /**< Name of the host system's tap
-                                             inteface to bind to. */
+                                             interface to bind to. */
 } netdev_tap_params_t;
 
 /**

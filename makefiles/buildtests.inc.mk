@@ -23,7 +23,7 @@ buildtest:
 	$${RESULT}
 
 # Define 'buildtest-indocker' completely executed inside the container.
-# It prevents starting one container per compilation wich is slower but it
+# It prevents starting one container per compilation which is slower but it
 # could hide errors where the host toolchain would be used
 ifeq ($(BUILD_IN_DOCKER),1)
   buildtest-indocker: ..in-docker-container

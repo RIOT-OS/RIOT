@@ -62,7 +62,7 @@ struct uart_hw_t {
     uint8_t  int_src;       /* peripheral interrupt source used by the UART device */
 };
 
-/* hardware ressources */
+/* hardware resources */
 static struct uart_hw_t _uarts[] = {
     {
         .regs = &UART0,
@@ -205,8 +205,8 @@ void uart_system_init (void)
 void uart_print_config(void)
 {
     for (unsigned uart = 0; uart < UART_NUMOF; uart++) {
-        ets_printf("\tUART_DEV(%d)\ttxd=%d rxd=%d\n", uart,
-                   uart_config[uart].txd, uart_config[uart].rxd);
+        printf("\tUART_DEV(%u)\ttxd=%d rxd=%d\n", uart,
+               uart_config[uart].txd, uart_config[uart].rxd);
     }
 }
 
@@ -259,7 +259,7 @@ static uint8_t IRAM _uart_rx_one_char (uart_t uart)
 /* send one data byte with wait */
 static void _uart_tx_one_char(uart_t uart, uint8_t data)
 {
-    /* wait until at least one byte is avaiable in the TX FIFO */
+    /* wait until at least one byte is available in the TX FIFO */
     while (_uarts[uart].regs->status.txfifo_cnt >= UART_FIFO_MAX) {}
 
     /* send the byte by placing it in the TX FIFO using MPU */
@@ -281,6 +281,8 @@ static void _uart_config (uart_t uart)
 
     /* setup the baudrate */
     if (uart == UART_DEV(0) || uart == UART_DEV(1)) {
+        /* wait until TX FIFO is empty */
+        while (_uarts[uart].regs->status.txfifo_cnt) { }
         /* for UART0 and UART1, we can us the ROM function */
         uart_div_modify(uart, (UART_CLK_FREQ << 4) / _uarts[uart].baudrate);
     }

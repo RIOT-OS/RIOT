@@ -10,7 +10,7 @@
 
 import sys
 import time
-from testrunner import run, test_utils_interactive_sync
+from testrunner import run
 
 US_PER_SEC = 1000000
 EXTERNAL_JITTER = 0.15
@@ -22,7 +22,6 @@ class InvalidTimeout(Exception):
 
 def testfunc(child):
     try:
-        test_utils_interactive_sync(child)
         start_test = time.time()
         child.expect_exact("5 x usleep(i++ * 500000)")
         for i in range(5):

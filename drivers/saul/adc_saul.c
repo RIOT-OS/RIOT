@@ -30,8 +30,6 @@ static int read_adc(const void *dev, phydat_t *res)
 {
     const saul_adc_params_t *params = *((const saul_adc_params_t **)dev);
     res->val[0] = adc_sample(params->line, params->res);
-    res->val[1] = 0;
-    res->val[2] = 0;
     /* Raw ADC reading has no unit */
     res->unit = UNIT_NONE;
     res->scale = 0;

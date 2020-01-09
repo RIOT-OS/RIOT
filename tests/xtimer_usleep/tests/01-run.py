@@ -11,7 +11,7 @@
 
 import sys
 import time
-from testrunner import run, test_utils_interactive_sync
+from testrunner import run
 
 
 US_PER_SEC = 1000000
@@ -28,7 +28,6 @@ def testfunc(child):
     RUNS = int(child.match.group(1))
     SLEEP_TIMES_NUMOF = int(child.match.group(2))
     try:
-        test_utils_interactive_sync(child)
         start_test = time.time()
         for m in range(RUNS):
             for n in range(SLEEP_TIMES_NUMOF):

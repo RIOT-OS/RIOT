@@ -32,6 +32,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 
 static const gnrc_netif_ops_t ieee802154_ops = {
+    .init = gnrc_netif_default_init,
     .send = _send,
     .recv = _recv,
     .get = gnrc_netif_get_from_netdev,

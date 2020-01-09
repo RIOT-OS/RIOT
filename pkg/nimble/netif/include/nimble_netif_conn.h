@@ -159,7 +159,7 @@ int nimble_netif_conn_start_adv(void);
 /**
  * @brief   Free the connection context with the given handle
  */
-void nimble_netif_conn_free(int handle);
+void nimble_netif_conn_free(int handle, uint8_t *addr);
 
 /**
  * @brief   Find the connection context with a given GAP handle and return a

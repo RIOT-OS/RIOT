@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       TCP event loop delarations.
+ * @brief       TCP event loop declarations.
  *
 * @author       Simon Brummer <simon.brummer@posteo.de>
  */

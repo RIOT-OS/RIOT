@@ -12,7 +12,7 @@ Components:
 - nRF52832 main controller (providing Bluetooth and NFC)
 - an LIS2DH12 low-power three-axis linear accelerometer
 - an MPU-9250 nine-axis motion sensor
-- an LPS22HB air pressure and temperatur sensor
+- an LPS22HB air pressure and temperature sensor
 - an HTS221 air temperature and humidity sensor
 - a BH1745NUC color sensor
 - a CCS811 gas sensor

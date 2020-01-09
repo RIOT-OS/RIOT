@@ -45,14 +45,14 @@ static void _handle_tx_xmit(event_t *ev);
 
 static size_t _gen_full_ecm_descriptor(usbus_t *usbus, void *arg);
 
-static const usbus_hdr_gen_funcs_t _ecm_descriptor = {
-    .get_header = _gen_full_ecm_descriptor,
+static const usbus_descr_gen_funcs_t _ecm_descriptor = {
+    .fmt_post_descriptor = _gen_full_ecm_descriptor,
     .len = {
         .fixed_len = sizeof(usb_desc_cdc_t) +
                      sizeof(usb_desc_union_t) +
                      sizeof(usb_desc_ecm_t),
     },
-    .len_type = USBUS_HDR_LEN_FIXED,
+    .len_type = USBUS_DESCR_LEN_FIXED,
 };
 
 static size_t _gen_union_descriptor(usbus_t *usbus, usbus_cdcecm_device_t *cdcecm)
@@ -155,9 +155,7 @@ static void _fill_ethernet(usbus_cdcecm_device_t *cdcecm)
 {
     uint8_t ethernet[ETHERNET_ADDR_LEN];
 
-    luid_get(ethernet, ETHERNET_ADDR_LEN);
-    eui48_set_local((eui48_t*)ethernet);
-    eui48_clear_group((eui48_t*)ethernet);
+    luid_get_eui48((eui48_t*)ethernet);
     fmt_bytes_hex(cdcecm->mac_host, ethernet, sizeof(ethernet));
 
 }
@@ -183,23 +181,23 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     cdcecm->tx_xmit.handler = _handle_tx_xmit;
     cdcecm->rx_flush.handler = _handle_rx_flush_ev;
 
-    /* Set up header generators */
-    cdcecm->ecm_hdr.next = NULL;
-    cdcecm->ecm_hdr.funcs = &_ecm_descriptor;
-    cdcecm->ecm_hdr.arg = cdcecm;
+    /* Set up descriptor generators */
+    cdcecm->ecm_descr.next = NULL;
+    cdcecm->ecm_descr.funcs = &_ecm_descriptor;
+    cdcecm->ecm_descr.arg = cdcecm;
 
     /* Configure Interface 0 as control interface */
     cdcecm->iface_ctrl.class = USB_CLASS_CDC_CONTROL;
     cdcecm->iface_ctrl.subclass = USB_CDC_SUBCLASS_ENCM;
     cdcecm->iface_ctrl.protocol = USB_CDC_PROTOCOL_NONE;
-    cdcecm->iface_ctrl.hdr_gen = &cdcecm->ecm_hdr;
+    cdcecm->iface_ctrl.descr_gen = &cdcecm->ecm_descr;
     cdcecm->iface_ctrl.handler = handler;
 
     /* Configure second interface to handle data endpoint */
     cdcecm->iface_data.class = USB_CLASS_CDC_DATA;
     cdcecm->iface_data.subclass = USB_CDC_SUBCLASS_NONE;
     cdcecm->iface_data.protocol = USB_CDC_PROTOCOL_NONE;
-    cdcecm->iface_data.hdr_gen = NULL;
+    cdcecm->iface_data.descr_gen = NULL;
     cdcecm->iface_data.handler = handler;
 
     /* Add string descriptor for the host mac */
@@ -234,7 +232,6 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_enable_endpoint(cdcecm->ep_out);
     usbus_enable_endpoint(cdcecm->ep_in);
     usbus_enable_endpoint(cdcecm->ep_ctrl);
-    usbdev_ep_ready(cdcecm->ep_out->ep, 0);
     usbus_handler_set_flag(handler, USBUS_HANDLER_FLAG_RESET);
 }
 
@@ -252,6 +249,7 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
                   setup->value);
             cdcecm->active_iface = (uint8_t)setup->value;
             if (cdcecm->active_iface == 1) {
+                usbdev_ep_ready(cdcecm->ep_out->ep, 0);
                 _notify_link_up(cdcecm);
             }
             break;
@@ -296,7 +294,6 @@ static void _handle_tx_xmit(event_t *ev)
 static void _handle_rx_flush(usbus_cdcecm_device_t *cdcecm)
 {
     cdcecm->len = 0;
-    usbdev_ep_ready(cdcecm->ep_out->ep, 0);
 }
 
 static void _handle_rx_flush_ev(event_t *ev)
@@ -304,6 +301,7 @@ static void _handle_rx_flush_ev(event_t *ev)
     usbus_cdcecm_device_t *cdcecm = container_of(ev, usbus_cdcecm_device_t,
                                                  rx_flush);
 
+    usbdev_ep_ready(cdcecm->ep_out->ep, 0);
     _handle_rx_flush(cdcecm);
 }
 

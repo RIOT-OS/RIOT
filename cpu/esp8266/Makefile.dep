@@ -1,17 +1,5 @@
 # additional modules dependencies
 
-ifneq (, $(filter esp_sdk, $(USEMODULE)))
-    USEMODULE += core_thread_flags
-    INCLUDES += -I$(ESP8266_SDK_DIR)/third_party/include
-    LINKFLAGS += -Wl,-wrap=malloc
-    LINKFLAGS += -Wl,-wrap=free
-    LINKFLAGS += -Wl,-wrap=calloc
-    LINKFLAGS += -Wl,-wrap=realloc
-    LINKFLAGS += -Wl,-wrap=_malloc_r
-    LINKFLAGS += -Wl,-wrap=_free_r
-    LINKFLAGS += -Wl,-wrap=_realloc_r
-endif
-
 ifneq (, $(filter esp_spiffs, $(USEMODULE)))
     export SPIFFS_STD_OPTION = -std=c99
     USEMODULE += spiffs
@@ -19,12 +7,9 @@ ifneq (, $(filter esp_spiffs, $(USEMODULE)))
 endif
 
 ifneq (, $(filter esp_wifi, $(USEMODULE)))
-    CFLAGS += -DLWIP_OPEN_SRC
-    LINKFLAGS += -Wl,-wrap=ethernet_input
     USEMODULE += netdev_eth
 endif
 
-ifneq (,$(filter ndn-riot,$(USEPKG)))
-    USEMODULE += crypto
-    USEMODULE += cipher_modes
+ifneq (,$(filter log_color,$(USEMODULE)))
+    USEMODULE += esp_log_colored
 endif

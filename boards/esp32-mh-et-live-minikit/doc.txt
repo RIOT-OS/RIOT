@@ -39,7 +39,7 @@ MH-ET LIVE MiniKit for ESP32 belongs to the class of general purpose boards wher
 \htmlonly<style>div.image img[src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_2.png?inline=false"]{width:250px;}</style>\endhtmlonly
 @image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_2.png?inline=false" "MH-ET LIVE MiniKit for ESP32"
 
-This stackable plattform was tested in an RIOT application with:
+This stackable platform was tested in an RIOT application with:
 
 - [Micro SD-Card Shield](https://wiki.wemos.cc/products:d1_mini_shields:micro_sd_card_shield)
 - MRF24J40 IEEE 802.15.4 radio Shield (contact gunar@schorcht.net for more information)

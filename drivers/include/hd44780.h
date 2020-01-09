@@ -47,11 +47,6 @@ extern "C" {
 #define HD44780_MAX_PINS        (8U)
 
 /**
- * @brief Specific value to turn rw pin off, if unused.
- */
-#define HD44780_RW_OFF          (255U)
-
-/**
  * @brief   Size of RAM for custom chars
  *
  * Generally the driver could support 8 chars of size 5x8 or 4 of size 5x10.
@@ -68,7 +63,7 @@ typedef struct {
     gpio_t rs;                      /**< rs gpio pin */
     gpio_t rw;                      /**< rw gpio pin */
     gpio_t enable;                  /**< enable gpio pin */
-    gpio_t data[8];                 /**< data gpio pins */
+    gpio_t data[HD44780_MAX_PINS];  /**< data gpio pins */
 } hd44780_params_t;
 
 /**

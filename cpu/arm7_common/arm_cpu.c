@@ -94,3 +94,43 @@ void thread_print_stack(void)
 
     printf("STACK (%d)= %X \n", i, *s);
 }
+
+void *thread_isr_stack_start(void)
+{
+    extern uintptr_t __stack_irq_start;
+    return (void *)&__stack_irq_start;
+}
+
+void *thread_isr_stack_pointer(void)
+{
+    void *_sp;
+
+    /* If we are not in interrupt mode, the interrupt stack pointer will
+     * always point to the start of the interrupt stack.
+     */
+    if (irq_is_in()) {
+        /* read stack pointer */
+        __asm volatile ("mov %0, r13" : "=r" (_sp) );
+    } else {
+        _sp = thread_isr_stack_start();
+    }
+
+    return _sp;
+}
+
+/* This function returns the number of bytes used on the ISR stack */
+int thread_isr_stack_usage(void)
+{
+    extern uintptr_t __stack_irq_start;
+    extern uintptr_t __stack_irq_size;
+
+    uintptr_t *ptr = &__stack_irq_start - (unsigned) &__stack_irq_size;
+
+    while(((*ptr) == STACK_CANARY_WORD) && (ptr < &__stack_irq_start)) {
+        ++ptr;
+    }
+
+    ptrdiff_t num_used_words = &__stack_irq_start - ptr;
+
+    return num_used_words;
+}

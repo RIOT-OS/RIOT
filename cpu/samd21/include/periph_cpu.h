@@ -109,6 +109,7 @@ static inline int _sercom_id(SercomUsart *sercom)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
 }
 
+#ifndef DOXYGEN
 /**
  * @brief   Override the ADC resolution configuration
  * @{
@@ -123,6 +124,7 @@ typedef enum {
     ADC_RES_16BIT = 0xfd                        /**< not supported */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 #ifdef __cplusplus
 }
 #endif

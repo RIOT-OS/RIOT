@@ -48,7 +48,7 @@ static void _add_event_to_list(evtimer_t *evtimer, evtimer_event_t *event)
         list = &(*list)->next;
     }
 
-    DEBUG("evtimer: new event relativ offset %" PRIu32 " ms\n", event->offset);
+    DEBUG("evtimer: new event relative offset %" PRIu32 " ms\n", event->offset);
 
     /* Set found next bigger event after new event */
     event->next = *list;

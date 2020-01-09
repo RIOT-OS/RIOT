@@ -26,7 +26,6 @@
 #include "adc_ctrl.h"
 #include "esp_common.h"
 #include "gpio_arch.h"
-#include "rom/ets_sys.h"
 #include "soc/rtc_io_struct.h"
 #include "soc/rtc_cntl_struct.h"
 #include "soc/sens_reg.h"
@@ -271,11 +270,11 @@ static void _adc_module_init(void)
 
 void adc_print_config(void)
 {
-    ets_printf("\tADC\t\tpins=[ ");
+    printf("\tADC\t\tpins=[ ");
 #if defined(ADC_GPIOS)
     for (unsigned i = 0; i < ADC_NUMOF; i++) {
-        ets_printf("%d ", adc_channels[i]);
+        printf("%d ", adc_channels[i]);
     }
 #endif /* defined(ADC_GPIOS) */
-    ets_printf("]\n");
+    printf("]\n");
 }

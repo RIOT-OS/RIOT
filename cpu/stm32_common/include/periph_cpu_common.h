@@ -504,6 +504,7 @@ typedef struct {
 #endif
 } spi_conf_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Default mapping of I2C bus speed values
  * @{
@@ -523,6 +524,7 @@ typedef enum {
 #endif
 } i2c_speed_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Structure for I2C configuration data
@@ -603,6 +605,22 @@ void periph_clk_en(bus_t bus, uint32_t mask);
  * @param[in] bus       bus the peripheral is connected to
  * @param[in] mask      bit in the RCC enable register
  */
+void periph_lpclk_dis(bus_t bus, uint32_t mask);
+
+/**
+ * @brief   Enable the given peripheral clock in low power mode
+ *
+ * @param[in] bus       bus the peripheral is connected to
+ * @param[in] mask      bit in the RCC enable register
+ */
+void periph_lpclk_en(bus_t bus, uint32_t mask);
+
+/**
+ * @brief   Disable the given peripheral clock in low power mode
+ *
+ * @param[in] bus       bus the peripheral is connected to
+ * @param[in] mask      bit in the RCC enable register
+ */
 void periph_clk_dis(bus_t bus, uint32_t mask);
 
 /**
@@ -645,7 +663,7 @@ void dma_init(void);
  * @param[in]  mode    DMA mode
  * @param[in]  flags   DMA configuration
  *
- * @return < 0 on error, the number of transfered bytes otherwise
+ * @return < 0 on error, the number of transferred bytes otherwise
  */
 int dma_transfer(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
                  dma_mode_t mode, uint8_t flags);

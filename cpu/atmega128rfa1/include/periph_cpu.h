@@ -28,13 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @name   Length of the CPU_ID in octets
- * @{
- */
-#define CPUID_LEN           (8U)
-/** @} */
-
-/**
  * @name   Available ports on the ATmega128rfa1 MCU
  * @{
  */

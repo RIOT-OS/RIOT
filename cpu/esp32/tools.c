@@ -43,18 +43,18 @@ void esp_hexdump (const void* addr, uint32_t num, char width, uint8_t per_line)
 
     while (count < num) {
         if (count % per_line == 0) {
-            ets_printf ("%08" PRIx32 ": ", (uint32_t)((uint8_t*)addr+count*size));
+            printf ("%08" PRIx32 ": ", (uint32_t)((uint8_t*)addr+count*size));
         }
         switch (width) {
-            case 'b': ets_printf("%02" PRIx8 " ", addr8[count++]); break;
-            case 'h': ets_printf("%04" PRIx16 " ", addr16[count++]); break;
-            case 'w': ets_printf("%08" PRIx32 " ", addr32[count++]); break;
-            case 'g': ets_printf("%016" PRIx64 " ", addr64[count++]); break;
-            default : ets_printf("."); count++; break;
+            case 'b': printf("%02" PRIx8 " ", addr8[count++]); break;
+            case 'h': printf("%04" PRIx16 " ", addr16[count++]); break;
+            case 'w': printf("%08" PRIx32 " ", addr32[count++]); break;
+            case 'g': printf("%016" PRIx64 " ", addr64[count++]); break;
+            default : printf("."); count++; break;
         }
         if (count % per_line == 0) {
-            ets_printf ("\n");
+            printf ("\n");
         }
     }
-    ets_printf ("\n");
+    printf ("\n");
 }

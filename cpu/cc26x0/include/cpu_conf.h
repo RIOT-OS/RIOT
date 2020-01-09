@@ -14,40 +14,24 @@
  * @brief           Implementation specific CPU configuration options
  *
  * @author          Leon M. George <leon@georgemail.eu>
+ * @author          Anton Gerasimov <tossel@gmail.com>
  *
  */
 
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
-
-#include "cc26x0.h"
+#include "cpu_conf_cc26xx_cc13xx.h"
 
 #include "cc26x0_aux.h"
-#include "cc26x0_ccfg.h"
 #include "cc26x0_fcfg.h"
-#include "cc26x0_gpio.h"
-#include "cc26x0_gpt.h"
-#include "cc26x0_i2c.h"
-#include "cc26x0_ioc.h"
 #include "cc26x0_prcm.h"
-#include "cc26x0_uart.h"
-#include "cc26x0_vims.h"
-#include "cc26x0_wdt.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @brief   ARM Cortex-M specific CPU configuration
- * @{
- */
-#define CPU_DEFAULT_IRQ_PRIO            (1U)
-#define CPU_IRQ_NUMOF                   IRQN_COUNT
-#define CPU_FLASH_BASE                  FLASH_BASE
-/** @} */
+/* Empty, but makes linter happy */
 
 #ifdef __cplusplus
 }

@@ -19,7 +19,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "msba2_common.h"
+#include "lpc2387.h"
 #include "bitarithm.h"
 
 #ifdef __cplusplus

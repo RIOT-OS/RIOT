@@ -59,7 +59,7 @@ static void u8x8_enable_pins(gpio_t* pins, uint32_t pins_enabled)
     uint8_t i;
 
     for (i = 0; i < 32; i++) {
-        if (pins_enabled & (1 << i)) {
+        if (pins_enabled & ((uint32_t)1 << i)) {
             if (pins[i] != GPIO_UNDEF) {
                 if (i < U8X8_PIN_OUTPUT_CNT) {
                     gpio_init(pins[i], GPIO_OUT);

@@ -111,13 +111,13 @@ int main(void)
 
     asn1_tree *encrypted_data = content_type->next->child;
     if ((encrypted_data == NULL) || (encrypted_data->type != 0x30)) {
-        printf("ERROR: EncryptedData not availavble.\n");
+        printf("ERROR: EncryptedData not available.\n");
         return 1;
     }
 
     asn1_tree *cms_version = encrypted_data->child;
     if ((cms_version == NULL) || (cms_version->type != 0x02) || (cms_version->length != 1)) {
-        printf("ERROR: CMSVersion not availavble.\n");
+        printf("ERROR: CMSVersion not available.\n");
         return 1;
     }
     uint8_t version = cms_version->data[0];
@@ -125,13 +125,13 @@ int main(void)
 
     asn1_tree *encrypted_content_info = cms_version->next;
     if ((encrypted_content_info == NULL) || (encrypted_content_info->type != 0x30)) {
-        printf("ERROR: EncryptedContentInfo not availavble.\n");
+        printf("ERROR: EncryptedContentInfo not available.\n");
         return 1;
     }
 
     asn1_tree *encrypted_content_info_content_type = encrypted_content_info->child;
     if ((encrypted_content_info_content_type == NULL) || (encrypted_content_info_content_type->type != 0x06)) {
-        printf("ERROR: ContentType of EncryptedContentInfo not availavble.\n");
+        printf("ERROR: ContentType of EncryptedContentInfo not available.\n");
         return 1;
     }
     if (memcmp(encrypted_content_info_content_type->data,
@@ -190,7 +190,7 @@ int main(void)
     /* try to encode the asn1_tree and check if it has not been altered */
     uint8_t encoded[98];
     if (der_encode(&cms, encoded, sizeof(encoded)) < 0) {
-        printf("ERROR: Could not reencode the decoded data.\n");
+        printf("ERROR: Could not re-encode the decoded data.\n");
         return 1;
     }
     if (memcmp(cms_data, encoded, sizeof(cms_data)) != 0) {
@@ -203,6 +203,6 @@ int main(void)
     free(asn1_objects);
 
     /* Everything worked fine */
-    printf("Decoding finished succesfully\n");
+    printf("Decoding finished successfully\n");
     return 0;
 }

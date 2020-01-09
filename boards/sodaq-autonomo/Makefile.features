@@ -2,4 +2,7 @@ CPU_MODEL = samd21j18a
 
 FEATURES_PROVIDED += periph_pwm
 
+# Various other features (if any)
+FEATURES_PROVIDED += arduino_pwm
+
 include $(RIOTBOARD)/common/sodaq/Makefile.features

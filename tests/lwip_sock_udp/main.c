@@ -28,6 +28,8 @@
 #include "constants.h"
 #include "stack.h"
 
+#include "test_utils/interactive_sync.h"
+
 #define _TEST_BUFFER_SIZE   (128)
 
 static uint8_t _test_buffer[_TEST_BUFFER_SIZE];
@@ -1317,6 +1319,8 @@ static void test_sock_udp_send6__no_sock(void)
 
 int main(void)
 {
+    test_utils_interactive_sync();
+
     uint8_t code = 0;
 
 #ifdef SO_REUSE

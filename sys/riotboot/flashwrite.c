@@ -38,7 +38,7 @@ size_t riotboot_flashwrite_slotsize(const riotboot_flashwrite_t *state)
 {
     switch (state->target_slot) {
         case 0: return SLOT0_LEN;
-#if NUMOF_SLOTS==2
+#if NUM_SLOTS==2
         case 1: return SLOT1_LEN;
 #endif
         default: return 0;
@@ -65,7 +65,7 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
 int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
                                  const uint8_t *bytes, size_t len, bool more)
 {
-    LOG_INFO(LOG_PREFIX "processing bytes %u-%u\n", state->offset, state->offset + len - 1);
+    LOG_DEBUG(LOG_PREFIX "processing bytes %u-%u\n", state->offset, state->offset + len - 1);
 
     while (len) {
         size_t flashpage_pos = state->offset % FLASHPAGE_SIZE;

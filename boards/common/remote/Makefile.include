@@ -1,5 +1,5 @@
 # define the default flash-tool
-export PROGRAMMER ?= cc2538-bsl
+PROGRAMMER ?= cc2538-bsl
 
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk

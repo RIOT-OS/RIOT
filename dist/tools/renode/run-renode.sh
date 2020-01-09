@@ -13,14 +13,14 @@
 # Global environment variables used:
 # RENODE:              Renode command name, default: "renode"
 # RENODE_CONFIG:       Renode configuration file name,
-#                      default: "${RIOTBOARD}/${BOARD}/dist/board.resc"
+#                      default: "${BOARDSDIR}/${BOARD}/dist/board.resc"
 # RENODE_BIN_CONFIG:   Renode intermediate configuration file name,
 #                      default: "${BINDIR}/board.resc"
 #
 # @author       Bas Stottelaar <basstottelaar@gmail.com>
 
 # Default path to Renode configuration file
-: ${RENODE_CONFIG:=${RIOTBOARD}/${BOARD}/dist/board.resc}
+: ${RENODE_CONFIG:=${BOARDSDIR}/${BOARD}/dist/board.resc}
 # Default path to Renode intermediate configuration file
 : ${RENODE_BIN_CONFIG:=${BINDIR}/board.resc}
 # Default Renode command

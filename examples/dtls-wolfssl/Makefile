@@ -7,9 +7,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-# wolfSSL supports 32-bit architectures only
-FEATURES_REQUIRED += arch_32bit
-
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
@@ -43,7 +40,7 @@ CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(3*THREAD_STACKSIZE_DEFAULT\)
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-CFLAGS += -DDEVELHELP
+DEVELHELP ?= 1
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

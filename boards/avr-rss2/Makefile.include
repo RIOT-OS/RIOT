@@ -1,0 +1,20 @@
+# configure the terminal program
+PORT_LINUX  ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+# refine serial port information for pyterm
+BAUD        ?= 115200
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# PROGRAMMER defaults to wiring which is the internal flasher via USB
+# using avrdude. Can be overridden for debugging (which requires changes
+# that require to use an ISP)
+PROGRAMMER ?= stk500v2
+#
+# see /usr/include/asm-generic/termbits.h for availabel baudrates on your linux system
+
+# From current fuse configuration
+BOOTLOADER_SIZE ?= 4K
+ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+
+include $(RIOTMAKE)/tools/avrdude.inc.mk
+include $(RIOTBOARD)/common/atmega/Makefile.include

@@ -34,7 +34,7 @@ make -C examples/gnrc_networking BOARD=...
 ```
 
 @note The Wifi network interface (module `esp_wifi`) and the
-\ref esp32_esp_now_network_interface "ESP-NOW network interface" (module `esp_now`)
+\ref esp8266_esp_now_network_interface "ESP-NOW network interface" (module `esp_now`)
 can be used simultaneously, for example, to realize a border router for
 a mesh network which uses ESP-NOW.
  */

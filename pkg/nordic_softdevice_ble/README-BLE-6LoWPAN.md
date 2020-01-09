@@ -19,7 +19,7 @@ Establishing an IPv6 connection
 Use the following procedure to establish a connection between an nRF52 device
 and Linux router:
 
-First enable 6LoWPAN module. This is neccessary only once per session:
+First enable 6LoWPAN module. This is necessary only once per session:
 
 	# Log in as a root user.
 	sudo su
@@ -84,7 +84,7 @@ Next, start RADVD daemon:
 	# Run radvd daemon.
 	sudo service radvd restart
 	
-If successfull then all devices connected to the host will receive
+If successful then all devices connected to the host will receive
 a routable `2001:db8` prefix.
 
 This can be verified by sending echo request to the full address:

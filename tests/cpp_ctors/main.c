@@ -9,6 +9,7 @@
 #include "embUnit.h"
 #include "tests-cpp_ctors.h"
 #include "thread.h" /* For thread_getpid() */
+#include "test_utils/interactive_sync.h"
 
 long tests_cpp_ctors_global_value(void);
 long tests_cpp_ctors_static_value(void);
@@ -58,6 +59,8 @@ Test *tests_cpp_ctors_tests(void)
 
 int main(void)
 {
+    test_utils_interactive_sync();
+
     TESTS_START();
     TESTS_RUN(tests_cpp_ctors_tests());
     TESTS_END();

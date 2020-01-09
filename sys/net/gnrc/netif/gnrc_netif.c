@@ -1142,12 +1142,14 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
 }
 #endif  /* MODULE_GNRC_IPV6 */
 
-#if (GNRC_NETIF_NUMOF > 1) && defined(MODULE_GNRC_SIXLOWPAN)
+#if ((GNRC_NETIF_NUMOF > 1) && defined(MODULE_GNRC_SIXLOWPAN)) || \
+    defined(MODULE_GNRC_SIXLOENC)
 bool gnrc_netif_is_6lo(const gnrc_netif_t *netif)
 {
     switch (netif->device_type) {
 #ifdef MODULE_GNRC_SIXLOENC
         case NETDEV_TYPE_ETHERNET:
+            return (netif->flags & GNRC_NETIF_FLAGS_6LO);
 #endif
         case NETDEV_TYPE_IEEE802154:
         case NETDEV_TYPE_CC110X:
@@ -1159,7 +1161,8 @@ bool gnrc_netif_is_6lo(const gnrc_netif_t *netif)
             return false;
     }
 }
-#endif  /* (GNRC_NETIF_NUMOF > 1) && defined(MODULE_GNRC_SIXLOWPAN) */
+#endif  /* ((GNRC_NETIF_NUMOF > 1) && defined(MODULE_GNRC_SIXLOWPAN)) || \
+         * defined(MODULE_GNRC_SIXLOENC)*/
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif)
 {
@@ -1213,6 +1216,8 @@ static void _configure_netdev(netdev_t *dev)
 }
 
 #ifdef DEVELHELP
+static bool options_tested = false;
+
 /* checks if a device supports all required options and functions */
 static void _test_options(gnrc_netif_t *netif)
 {
@@ -1314,8 +1319,21 @@ static void _test_options(gnrc_netif_t *netif)
 #endif  /* GNRC_IPV6_NIB_CONF_6LN */
     }
 #endif /* (GNRC_NETIF_L2ADDR_MAXLEN > 0) */
+    options_tested = true;
 }
 #endif /* DEVELHELP */
+
+void gnrc_netif_default_init(gnrc_netif_t *netif)
+{
+    _init_from_device(netif);
+#ifdef DEVELHELP
+    _test_options(netif);
+#endif
+    netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
+#ifdef MODULE_GNRC_IPV6_NIB
+    gnrc_ipv6_nib_init_iface(netif);
+#endif
+}
 
 static void *_gnrc_netif_thread(void *args)
 {
@@ -1349,17 +1367,10 @@ static void *_gnrc_netif_thread(void *args)
         return NULL;
     }
     _configure_netdev(dev);
-    _init_from_device(netif);
-#ifdef DEVELHELP
-    _test_options(netif);
+    netif->ops->init(netif);
+#if DEVELHELP
+    assert(options_tested);
 #endif
-    netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
-#ifdef MODULE_GNRC_IPV6_NIB
-    gnrc_ipv6_nib_init_iface(netif);
-#endif
-    if (netif->ops->init) {
-        netif->ops->init(netif);
-    }
 #ifdef MODULE_NETSTATS_L2
     memset(&netif->stats, 0, sizeof(netstats_t));
 #endif

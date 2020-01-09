@@ -17,6 +17,8 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Francisco Molina <francois-xavier.molina@inria.fr>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @}
  */
 
@@ -40,6 +42,10 @@
 
 #ifdef MODULE_SUIT_V4
 #include "suit/v4/suit.h"
+#endif
+
+#if defined(MODULE_PROGRESS_BAR)
+#include "progress_bar.h"
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -67,6 +73,24 @@
 static char _stack[SUIT_COAP_STACKSIZE];
 static char _url[SUIT_URL_MAX];
 static uint8_t _manifest_buf[SUIT_MANIFEST_BUFSIZE];
+
+#ifdef MODULE_SUIT_V4
+static inline void _print_download_progress(size_t offset, size_t len, uint32_t image_size)
+{
+DEBUG("_suit_flashwrite(): writing %u bytes at pos %u\n", len, offset);
+#if defined(MODULE_PROGRESS_BAR) && defined(MODULE_SUIT_V4)
+    if (image_size != 0) {
+        char _suffix[7] = { 0 };
+        uint8_t _progress = 100 * (offset + len) / image_size;
+        sprintf(_suffix, " %3d%%", _progress);
+        progress_bar_print("Fetching firmware ", _suffix, _progress);
+        if (_progress == 100) {
+            puts("");
+        }
+    }
+#endif
+}
+#endif
 
 static kernel_pid_t _suit_coap_pid;
 
@@ -266,8 +290,8 @@ int suit_coap_get_blockwise_url(const char *url,
                                coap_blksize_t blksize,
                                coap_blockwise_cb_t callback, void *arg)
 {
-    char hostport[SOCK_HOSTPORT_MAXLEN];
-    char urlpath[SOCK_URLPATH_MAXLEN];
+    char hostport[CONFIG_SOCK_HOSTPORT_MAXLEN];
+    char urlpath[CONFIG_SOCK_URLPATH_MAXLEN];
     sock_udp_ep_t remote;
 
     if (strncmp(url, "coap://", 7)) {
@@ -387,7 +411,8 @@ static void _suit_handle_url(const char *url)
 int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
                            int more)
 {
-    riotboot_flashwrite_t *writer = arg;
+    suit_v4_manifest_t *manifest = (suit_v4_manifest_t *)arg;
+    riotboot_flashwrite_t *writer = manifest->writer;
 
     if (offset == 0) {
         if (len < RIOTBOOT_FLASHWRITE_SKIPLEN) {
@@ -405,7 +430,7 @@ int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
         return -1;
     }
 
-    DEBUG("_suit_flashwrite(): writing %u bytes at pos %u\n", len, offset);
+    _print_download_progress(offset, len, manifest->components[0].size);
 
     return riotboot_flashwrite_putbytes(writer, buf, len, more);
 }
@@ -480,13 +505,9 @@ static ssize_t _trigger_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
             code = COAP_CODE_REQUEST_ENTITY_TOO_LARGE;
         }
         else {
-            memcpy(_url, pkt->payload, payload_len);
-            _url[payload_len] = '\0';
-
             code = COAP_CODE_CREATED;
-            LOG_INFO("suit: received URL: \"%s\"\n", _url);
-            msg_t m = { .content.value = SUIT_MSG_TRIGGER };
-            msg_send(&m, _suit_coap_pid);
+            LOG_INFO("suit: received URL: \"%s\"\n", (char*)pkt->payload);
+            suit_coap_trigger(pkt->payload, payload_len);
         }
     }
     else {
@@ -495,6 +516,14 @@ static ssize_t _trigger_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 
     return coap_reply_simple(pkt, code, buf, len,
                              COAP_FORMAT_NONE, NULL, 0);
+}
+
+void suit_coap_trigger(const uint8_t *url, size_t len)
+{
+    memcpy(_url, url, len);
+    _url[len] = '\0';
+    msg_t m = { .content.value = SUIT_MSG_TRIGGER };
+    msg_send(&m, _suit_coap_pid);
 }
 
 static const coap_resource_t _subtree[] = {

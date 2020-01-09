@@ -26,9 +26,9 @@
 #include "log.h"
 #include "periph/rtc.h"
 
-#include "common.h"
+#include "esp_common.h"
 
-#include "sdk/ets.h"
+#include "sdk/sdk.h"
 
 void rtc_init(void)
 {

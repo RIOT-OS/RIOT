@@ -41,6 +41,13 @@ ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
     USEMODULE += esp_gdb
 endif
 
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+  # use esp_now as default netdev if no other netdev module is enabled
+  ifeq (,$(filter esp_wifi esp_eth,$(USEMODULE)))
+    USEMODULE += esp_now
+  endif
+endif
+
 ifneq (,$(filter esp_now,$(USEMODULE)))
     $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
     USEMODULE += esp_wifi_any
@@ -51,6 +58,22 @@ ifneq (,$(filter esp_wifi,$(USEMODULE)))
     USEMODULE += esp_wifi_any
 endif
 
+ifneq (,$(filter esp_eth,$(USEMODULE)))
+  $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
+endif
+
+ifneq (,$(filter spiffs,$(USEMODULE)))
+  export RIOT_TEST_TIMEOUT = 120
+endif
+
+ifneq (,$(filter littlefs,$(USEMODULE)))
+  export RIOT_TEST_TIMEOUT = 120
+endif
+
+ifneq (,$(filter 4 5,$(LOG_LEVEL)))
+  USEMODULE += esp_log_startup
+endif
+
 # ESP32 pseudomodules
 PSEUDOMODULES += esp_eth_hw
 PSEUDOMODULES += esp_gdb
@@ -59,12 +82,15 @@ PSEUDOMODULES += esp_hw_counter
 PSEUDOMODULES += esp_i2c_sw
 PSEUDOMODULES += esp_i2c_hw
 PSEUDOMODULES += esp_idf_newlib
+PSEUDOMODULES += esp_log_colored
+PSEUDOMODULES += esp_log_tagged
+PSEUDOMODULES += esp_log_startup
+PSEUDOMODULES += esp_rtc_timer
 PSEUDOMODULES += esp_spi_ram
 PSEUDOMODULES += esp_spiffs
 PSEUDOMODULES += esp_wifi_any
 
 export TARGET_ARCH ?= xtensa-esp32-elf
-export ESPTOOL ?= $(ESP32_SDK_DIR)/components/esptool_py/esptool/esptool.py
 
 USEMODULE += esp_idf
 USEMODULE += esp_idf_driver
@@ -99,7 +125,17 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/include
 INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 
-CFLAGS  += -DSCHED_PRIO_LEVELS=32
+# if any WiFi interface is used, the number of priority levels has to be 32
+ifneq (,$(filter esp_wifi_any esp_eth,$(USEMODULE)))
+  CFLAGS += -DSCHED_PRIO_LEVELS=32
+endif
+
+ifneq (,$(filter lwip,$(USEMODULE)))
+  # The thread for handling the WiFi hardware has the priority. The priority
+  # of the lwIP TCP/IP thread should be lower than this priority.
+  CFLAGS += -DTCPIP_THREAD_PRIO=2
+endif
+
 CFLAGS  += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM
 CFLAGS  += -DLOG_TAG_IN_BRACKETS
 CFLAGS  += -Wno-unused-parameter -Wformat=0
@@ -134,6 +170,16 @@ ifeq ($(QEMU), 1)
     CFLAGS += -DQEMU
 endif
 
+ifneq (,$(filter esp_log_colored,$(USEMODULE)))
+  BOOTLOADER_COLOR = _colors
+endif
+
+ifneq (,$(filter esp_log_startup,$(USEMODULE)))
+  BOOTLOADER_INFO = _info
+endif
+
+BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
+
 # LINKFLAGS += -Wl,--verbose
 
 LINKFLAGS += -L$(ESP32_SDK_DIR)/components/esp32
@@ -158,6 +204,8 @@ ifneq (,$(filter esp_cxx,$(USEMODULE)))
     UNDEF += $(BINDIR)/esp_cxx/cxa_guard.o
 endif
 
+ESPTOOL ?= $(RIOTBASE)/dist/tools/esptool/esptool.py
+
 # The ELFFILE is the base one used for flashing
 FLASHFILE ?= $(ELFFILE)
 
@@ -165,6 +213,7 @@ FLASHFILE ?= $(ELFFILE)
 FLASH_MODE ?= dout  # FIX configuration, DO NOT CHANGE
 FLASH_FREQ  = 40m   # FIX configuration, DO NOT CHANGE
 FLASH_SIZE ?= 2MB
+
 PREFLASHER = $(ESPTOOL)
 PREFFLAGS  = --chip esp32 elf2image
 PREFFLAGS += -fm $(FLASH_MODE) -fs $(FLASH_SIZE) -ff $(FLASH_FREQ)
@@ -175,7 +224,6 @@ PREFFLAGS += printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $(BINDIR)/partiti
 PREFFLAGS += printf "factory, app, factory, 0x10000, " >> $(BINDIR)/partitions.csv;
 PREFFLAGS += ls -l $(FLASHFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partitions.csv;
 
-
 PREFFLAGS += python $(RIOTCPU)/$(CPU)/gen_esp32part.py --disable-sha256sum
 PREFFLAGS += --verify $(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
 FLASHDEPS += preflash
@@ -185,7 +233,7 @@ ifeq ($(QEMU), 1)
     FLASHER = dd
     FFLAGS += if=/dev/zero bs=1M count=4  | tr "\\000" "\\377" > tmp.bin && cat tmp.bin |
     FFLAGS += head -c $$((0x1000)) |
-    FFLAGS += cat - $(RIOTCPU)/$(CPU)/bin/bootloader.bin tmp.bin |
+    FFLAGS += cat - $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN) tmp.bin |
     FFLAGS += head -c $$((0x8000)) |
     FFLAGS += cat - $(BINDIR)/partitions.bin tmp.bin |
     FFLAGS += head -c $$((0x10000)) |
@@ -199,7 +247,7 @@ else
     FFLAGS += --chip esp32 -p $(PROG_DEV) -b $(PROGRAMMER_SPEED)
     FFLAGS += --before default_reset --after hard_reset write_flash
     FFLAGS += -z -fm $(FLASH_MODE) -fs detect -ff $(FLASH_FREQ)
-    FFLAGS += 0x1000 $(RIOTCPU)/$(CPU)/bin/bootloader.bin
+    FFLAGS += 0x1000 $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN)
     FFLAGS += 0x8000 $(BINDIR)/partitions.bin
     FFLAGS += 0x10000 $(FLASHFILE).bin
 endif

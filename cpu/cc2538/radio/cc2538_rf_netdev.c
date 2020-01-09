@@ -88,7 +88,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
-            /* This tranceiver only supports page 0 */
+            /* This transceiver only supports page 0 */
             *((uint16_t *)value) = 0;
             return sizeof(uint16_t);
 
@@ -201,7 +201,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
             break;
 
         case NETOPT_CHANNEL_PAGE:
-            /* This tranceiver only supports page 0 */
+            /* This transceiver only supports page 0 */
             if (value_len != sizeof(uint16_t) ||
                 *((const uint16_t *)value) != 0 ) {
                 res = -EINVAL;

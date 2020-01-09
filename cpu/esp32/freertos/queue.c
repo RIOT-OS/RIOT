@@ -132,7 +132,7 @@ BaseType_t IRAM_ATTR _queue_generic_send(QueueHandle_t xQueue,
         /* is there still space in the queue */
         if (queue->item_level < queue->item_num || xCopyPosition == queueOVERWRITE) {
             uint32_t write_pos;
-            /* determin the write position in the queue and update positions */
+            /* determine the write position in the queue and update positions */
             if (xCopyPosition == queueSEND_TO_BACK) {
                 write_pos = queue->item_tail;
                 queue->item_tail = (queue->item_tail + 1) % queue->item_num;

@@ -21,7 +21,7 @@ USEMODULE += xtimer
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-CFLAGS += -DDEVELHELP
+DEVELHELP ?= 1
 
 # For debugging and demonstration purposes, we limit the lifetime to the minimal
 # allowed value of 60s (see draft-ietf-core-resource-directory-11, Table 2)

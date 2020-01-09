@@ -82,8 +82,8 @@ static void *_eventloop(void *arg)
 static void send(char *addr_str, char *port_str, char *data_len_str, unsigned int num,
                  unsigned int delay)
 {
-    gnrc_netif_t *netif;
-    int iface;
+    gnrc_netif_t *netif = NULL;
+    char *iface;
     char *conversion_end;
     uint16_t port;
     ipv6_addr_t addr;
@@ -91,11 +91,11 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
 
     /* get interface, if available */
     iface = ipv6_addr_split_iface(addr_str);
-    if ((iface < 0) && (gnrc_netif_numof() == 1)) {
+    if ((!iface) && (gnrc_netif_numof() == 1)) {
         netif = gnrc_netif_iter(NULL);
     }
-    else {
-        netif = gnrc_netif_get_by_pid(iface);
+    else if (iface) {
+        netif = gnrc_netif_get_by_pid(atoi(iface));
     }
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {

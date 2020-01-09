@@ -17,6 +17,9 @@
 #include <sys/uio.h>
 #include <inttypes.h>
 
+#if MODULE_LWIP_DHCP_AUTO
+#include "lwip/dhcp.h"
+#endif
 #include "lwip/err.h"
 #include "lwip/ethip6.h"
 #include "lwip/netif.h"
@@ -280,8 +283,14 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                     DEBUG("lwip_netdev: error inputing packet\n");
                     return;
                 }
+                break;
             }
-            break;
+#ifdef MODULE_LWIP_DHCP_AUTO
+            case NETDEV_EVENT_LINK_UP: {
+                dhcp_start(netif);
+                break;
+            }
+#endif
             default:
                 break;
         }

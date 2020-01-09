@@ -3,4 +3,8 @@ ifneq (,$(filter atmega_pcint,$(USEMODULE)))
   USEMODULE += atmega_pcint1
 endif
 
+ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
+  USEMODULE += at86rfr2
+endif
+
 include $(RIOTCPU)/atmega_common/Makefile.dep

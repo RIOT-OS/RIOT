@@ -586,6 +586,7 @@ ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
  *
  * @return        length of option; 0 if the option exists but is empty
  * @return        -ENOENT if option not found
+ * @return        -EINVAL if option cannot be parsed
  */
 ssize_t coap_opt_get_opaque(coap_pkt_t *pkt, unsigned opt_num, uint8_t **value);
 /**@}*/
@@ -692,7 +693,7 @@ void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
  * @param[in]   c           byte array to copy
  * @param[in]   len         length of the byte array
  *
- * @returns     Number of bytes writen to @p bufpos
+ * @returns     Number of bytes written to @p bufpos
  */
 size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
                                 const uint8_t *c, size_t len);
@@ -708,7 +709,7 @@ size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
  * @param[in]   bufpos      pointer to the current payload buffer position
  * @param[in]   c           character to write
  *
- * @returns     Number of bytes writen to @p bufpos
+ * @returns     Number of bytes written to @p bufpos
  */
 size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, uint8_t *bufpos, char c);
 

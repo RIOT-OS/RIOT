@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 #ifndef CAN_RX
-/** Default CAN tranceiver RX pin if not defined in board configuration */
+/** Default CAN transceiver RX pin if not defined in board configuration */
 #define CAN_RX  GPIO35
 #endif
 

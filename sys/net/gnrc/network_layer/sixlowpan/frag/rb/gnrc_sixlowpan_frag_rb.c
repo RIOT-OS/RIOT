@@ -21,6 +21,10 @@
 #include "net/ipv6/hdr.h"
 #include "net/gnrc.h"
 #include "net/gnrc/sixlowpan.h"
+#include "net/gnrc/sixlowpan/config.h"
+#ifdef  MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+#include "net/gnrc/sixlowpan/frag/stats.h"
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_STATS */
 #ifdef  MODULE_GNRC_SIXLOWPAN_FRAG_VRB
 #include "net/gnrc/sixlowpan/frag/vrb.h"
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
@@ -88,15 +92,6 @@ enum {
     RBUF_ADD_DUPLICATE = -3,
 };
 
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
-static gnrc_sixlowpan_frag_stats_t _stats;
-
-gnrc_sixlowpan_frag_stats_t *gnrc_sixlowpan_frag_stats_get(void)
-{
-    return &_stats;
-}
-#endif
-
 static int _check_fragments(gnrc_sixlowpan_frag_rb_base_t *entry,
                             size_t frag_size, size_t offset)
 {
@@ -115,7 +110,7 @@ static int _check_fragments(gnrc_sixlowpan_frag_rb_base_t *entry,
         }
         /* End was already checked in overlap check */
         if (ptr->start == offset) {
-            DEBUG("6lo rbuf: fragment already in reassembly buffer");
+            DEBUG("6lo rbuf: fragment already in reassembly buffer\n");
             return RBUF_ADD_DUPLICATE;
         }
         ptr = ptr->next;
@@ -155,6 +150,7 @@ void gnrc_sixlowpan_frag_rb_rm_by_datagram(const gnrc_netif_hdr_t *netif_hdr,
     gnrc_sixlowpan_frag_rb_t *e = _rbuf_get_by_tag(netif_hdr, tag);
 
     if (e != NULL) {
+        gnrc_pktbuf_release(e->pkt);
         gnrc_sixlowpan_frag_rb_remove(e);
     }
 }
@@ -360,6 +356,18 @@ static bool _rbuf_update_ints(gnrc_sixlowpan_frag_rb_base_t *entry,
     return true;
 }
 
+static void _gc_pkt(gnrc_sixlowpan_frag_rb_t *rbuf)
+{
+#if GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0
+    if (rbuf->super.current_size == 0) {
+        /* packet is scheduled for deletion, but was complete, i.e. pkt is
+         * already handed up to other layer, i.e. no need to release */
+        return;
+    }
+#endif
+    gnrc_pktbuf_release(rbuf->pkt);
+}
+
 void gnrc_sixlowpan_frag_rb_gc(void)
 {
     uint32_t now_usec = xtimer_now_usec();
@@ -380,7 +388,7 @@ void gnrc_sixlowpan_frag_rb_gc(void)
                                          l2addr_str),
                   (unsigned)rbuf[i].super.datagram_size, rbuf[i].super.tag);
 
-            gnrc_pktbuf_release(rbuf[i].pkt);
+            _gc_pkt(&rbuf[i]);
             gnrc_sixlowpan_frag_rb_remove(&(rbuf[i]));
         }
     }
@@ -419,6 +427,14 @@ static int _rbuf_get(const void *src, size_t src_len,
                                          rbuf[i].super.dst_len,
                                          l2addr_str),
                   (unsigned)rbuf[i].super.datagram_size, rbuf[i].super.tag);
+#if GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0
+            if (rbuf[i].super.current_size == 0) {
+                /* ensure that only empty reassembly buffer entries and entries
+                 * scheduled for deletion have `current_size == 0` */
+                DEBUG("6lo rfrag: scheduled for deletion, don't add fragment\n");
+                return -1;
+            }
+#endif
             rbuf[i].super.arrival = now_usec;
             _set_rbuf_timeout();
             return i;
@@ -452,12 +468,12 @@ static int _rbuf_get(const void *src, size_t src_len,
             res = oldest;
 #if GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE && \
     defined(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
-            _stats.rbuf_full++;
+            gnrc_sixlowpan_frag_stats_get()->rbuf_full++;
 #endif
         }
         else {
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
-            _stats.rbuf_full++;
+            gnrc_sixlowpan_frag_stats_get()->rbuf_full++;
 #endif
             return -1;
         }
@@ -514,7 +530,7 @@ void gnrc_sixlowpan_frag_rb_reset(void)
     for (unsigned int i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         if ((rbuf[i].pkt != NULL) &&
             (rbuf[i].pkt->users > 0)) {
-            gnrc_pktbuf_release(rbuf[i].pkt);
+            _gc_pkt(&rbuf[i]);
         }
     }
     memset(rbuf, 0, sizeof(rbuf));
@@ -539,6 +555,25 @@ void gnrc_sixlowpan_frag_rb_base_rm(gnrc_sixlowpan_frag_rb_base_t *entry)
     entry->datagram_size = 0;
 }
 
+static void _tmp_rm(gnrc_sixlowpan_frag_rb_t *rbuf)
+{
+#if GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0U
+        /* use garbage-collection to leave the entry for at least
+         * GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER in the reassembly buffer by
+         * setting the arrival time to
+         * (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US - GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER)
+         * microseconds in the past */
+        rbuf->super.arrival = xtimer_now_usec() -
+                              (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US -
+                               GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER);
+        /* reset current size to prevent late duplicates to trigger another
+         * dispatch */
+        rbuf->super.current_size = 0;
+#else   /* GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER == 0U */
+        gnrc_sixlowpan_frag_rb_remove(rbuf);
+#endif  /* GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER */
+}
+
 int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
                                                    gnrc_netif_hdr_t *netif_hdr)
 {
@@ -555,7 +590,7 @@ int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf
         if (netif == NULL) {
             DEBUG("6lo rbuf: error allocating netif header\n");
             gnrc_pktbuf_release(rbuf->pkt);
-            gnrc_sixlowpan_frag_rb_remove(rbuf);
+            _tmp_rm(rbuf);
             return -1;
         }
 
@@ -570,7 +605,7 @@ int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf
         new_netif_hdr->rssi = netif_hdr->rssi;
         LL_APPEND(rbuf->pkt, netif);
         gnrc_sixlowpan_dispatch_recv(rbuf->pkt, NULL, 0);
-        gnrc_sixlowpan_frag_rb_remove(rbuf);
+        _tmp_rm(rbuf);
     }
     return res;
 }

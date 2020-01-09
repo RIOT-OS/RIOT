@@ -310,6 +310,7 @@ int main(void)
     puts("NimBLE GATT Server Example");
 
     int rc = 0;
+    (void)rc;
 
     /* verify and add our custom services */
     rc = ble_gatts_count_cfg(gatt_svr_svcs);

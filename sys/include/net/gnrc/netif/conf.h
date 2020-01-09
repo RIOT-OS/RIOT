@@ -9,7 +9,7 @@
 /**
  * @defgroup    net_gnrc_netif_conf GNRC network interface configurations
  * @ingroup     net_gnrc_netif
- * @ingroup     config
+ * @ingroup     net_gnrc_conf
  * @{
  *
  * @file

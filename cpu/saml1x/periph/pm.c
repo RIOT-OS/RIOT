@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_saml21
+ * @ingroup     cpu_saml1x
  * @ingroup     drivers_periph_pm
  * @{
  *
@@ -31,12 +31,12 @@ void pm_set(unsigned mode)
 
         switch (mode) {
             case 0:
-                DEBUG("pm_set(): setting STANDBY mode.\n");
+                DEBUG_PUTS("pm_set(): setting STANDBY mode.");
                 _mode = PM_SLEEPCFG_SLEEPMODE_STANDBY;
                 break;
             default: /* Falls through */
             case 1:
-                DEBUG("pm_set(): setting IDLE mode.\n");
+                DEBUG_PUTS("pm_set(): setting IDLE mode.");
                 _mode = PM_SLEEPCFG_SLEEPMODE_IDLE;
                 break;
         }

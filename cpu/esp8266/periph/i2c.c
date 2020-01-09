@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,8 +7,8 @@
  */
 
 /**
- * @ingroup cpu_esp8266
- * @ingroup drivers_periph_i2c
+ * @ingroup     cpu_esp8266
+ * @ingroup     drivers_periph_i2c
  * @{
  *
  * @file
@@ -22,18 +22,16 @@
 /*
    PLEASE NOTE:
 
-   Some parts of the implementation bases on the bit-banging implementation as
-   described in [wikipedia](https://en.wikipedia.org/wiki/I%C2%B2C) as well as
-   its implementation in [esp-open-rtos](https://github.com/SuperHouse/esp-open-rtos.git).
-   These parts are under the copyright of their respective owners.
+   The implementation bases on the bit-banging I2C master implementation as
+   described in [wikipedia](https://en.wikipedia.org/wiki/I%C2%B2C#Example_of_bit-banging_the_I%C2%B2C_master_protocol).
 */
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #include <assert.h>
-#include <stdbool.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #include "cpu.h"
 #include "log.h"
@@ -42,20 +40,36 @@
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 
-#include "common.h"
+#include "esp_common.h"
+#include "gpio_arch.h"
+#include "rom/ets_sys.h"
+
+#ifdef MCU_ESP32
+
+#include "soc/gpio_reg.h"
+#include "soc/gpio_struct.h"
+
+/* max clock stretching counter */
+#define I2C_CLOCK_STRETCH 200
+
+/* gpio access macros */
+#define GPIO_SET(l,h,b) if (b < 32) GPIO.l =  BIT(b); else GPIO.h.val =  BIT(32-b)
+#define GPIO_GET(l,h,b) ((b < 32) ? GPIO.l & BIT(b) : GPIO.h.val & BIT(32-b))
+
+#else /* MCU_ESP32 */
 
 #include "esp/gpio_regs.h"
 #include "sdk/ets.h"
 
-#if defined(I2C_NUMOF) && I2C_NUMOF > 0
+/* max clock stretching counter (ca. 10 ms) */
+#define I2C_CLOCK_STRETCH 40000
 
-/* has to be declared as extern since it is not possible to include */
-/* user_interface.h due to conflicts with gpio_init */
+/* following functions have to be declared as extern since it is not possible */
+/* to include user_interface.h due to conflicts with gpio_init */
 extern uint8_t system_get_cpu_freq(void);
 extern bool system_update_cpu_freq(uint8_t freq);
 
-/* max clock stretching counter (ca. 10 ms) */
-#define I2C_CLOCK_STRETCH 40000
+#endif /* MCU_ESP32 */
 
 typedef struct
 {
@@ -71,50 +85,42 @@ typedef struct
     uint32_t sda_bit;   /* gpio bit mask for faster access */
 
     uint32_t delay;
+    mutex_t  lock;
 
 } _i2c_bus_t;
 
-static _i2c_bus_t _i2c_bus[] =
-{
-  #if defined(I2C0_SDA) && defined(I2C0_SCL)
-  {
-    .speed = I2C0_SPEED,
-    .sda = I2C0_SDA,
-    .scl = I2C0_SCL
-  },
-  #endif
-  #if defined(I2C1_SDA) && defined(I2C1_SCL)
-  {
-    .speed = I2C1_SPEED,
-    .sda = I2C1_SDA,
-    .scl = I2C1_SCL
-  },
-  #endif
-  #if defined(I2C2_SDA) && defined(I2C2_SCL)
-  {
-    .speed = I2C2_SPEED,
-    .sda = I2C2_SDA,
-    .scl = I2C2_SCL
-  },
-  #endif
-};
+static _i2c_bus_t _i2c_bus[I2C_NUMOF] = {};
 
 /* to ensure that I2C is always optimized with -O2 to use the defined delays */
 #pragma GCC optimize ("O2")
 
+#ifdef MCU_ESP32
+static const uint32_t _i2c_delays[][3] =
+{
+    /* values specify one half-period and are only valid for -O2 option     */
+    /* value = [period - 0.25 us (240 MHz) / 0.5us(160MHz) / 1.0us(80MHz)]  */
+    /*         * cycles per second / 2                                      */
+    /* 1 us = 16 cycles (80 MHz) / 32 cycles (160 MHz) / 48 cycles (240)    */
+    /* values for             80,  160,  240 MHz                            */
+    [I2C_SPEED_LOW]       = {790, 1590, 2390}, /*   10 kbps (period 100 us) */
+    [I2C_SPEED_NORMAL]    = { 70,  150,  230}, /*  100 kbps (period 10 us)  */
+    [I2C_SPEED_FAST]      = { 11,   31,   51}, /*  400 kbps (period 2.5 us) */
+    [I2C_SPEED_FAST_PLUS] = {  0,    7,   15}, /*    1 Mbps (period 1 us)   */
+    [I2C_SPEED_HIGH]      = {  0,    0,    0}  /*  3.4 Mbps (period 0.3 us) not working */
+};
+#else /* MCU_ESP32 */
 static const uint32_t _i2c_delays[][2] =
 {
-    /* values specify one half-period and are only valid for -O2 option */
+    /* values specify one half-period and are only valid for -O2 option         */
     /* value = [period - 0.5us(160MHz) or 1.0us(80MHz)] * cycles per second / 2 */
-    /* cycles per us = ca. 20 (80 MHz) / ca. 40 (160 MHz) */
-    [I2C_SPEED_LOW]       = {1990, 989}, /*   10 kbps (period 100 us) */
-    [I2C_SPEED_NORMAL]    = { 190,  89}, /*  100 kbps (period 10 us) */
-    [I2C_SPEED_FAST]      = {  40,  16}, /*  400 kbps (period 2.5 us) */
-    [I2C_SPEED_FAST_PLUS] = {  13,   0}, /*    1 Mbps (period 1 us) */
+    /* 1 us = 20 cycles (80 MHz) / 40 cycles (160 MHz)                          */
+    [I2C_SPEED_LOW]       = {989, 1990}, /*   10 kbps (period 100 us)  */
+    [I2C_SPEED_NORMAL]    = { 89,  190}, /*  100 kbps (period 10 us)   */
+    [I2C_SPEED_FAST]      = { 16,   40}, /*  400 kbps (period 2.5 us)  */
+    [I2C_SPEED_FAST_PLUS] = {  0,   13}, /*    1 Mbps (period 1 us)    */
     [I2C_SPEED_HIGH]      = {   0,   0}  /*  3.4 Mbps (period 0.3 us) is not working */
 };
-
-static mutex_t i2c_bus_lock[I2C_NUMOF] = { MUTEX_INIT };
+#endif /* MCU_ESP32 */
 
 /* forward declaration of internal functions */
 
@@ -136,51 +142,86 @@ static void _i2c_abort (_i2c_bus_t* bus, const char* func);
 static void _i2c_clear (_i2c_bus_t* bus);
 
 /* implementation of i2c interface */
+
 void i2c_init(i2c_t dev)
 {
-    if (I2C_NUMOF != ARRAY_SIZE(_i2c_bus)) {
-        LOG_INFO("I2C_NUMOF does not match number of I2C_SDA_x/I2C_SCL_x definitions\n");
-        LOG_INFO("Please check your board configuration in 'board.h'\n");
-        assert(I2C_NUMOF < ARRAY_SIZE(_i2c_bus));
+    assert(dev < I2C_NUMOF_MAX);
+    assert(dev < I2C_NUMOF);
 
+    if (i2c_config[dev].speed == I2C_SPEED_HIGH) {
+        LOG_TAG_INFO("i2c", "I2C_SPEED_HIGH is not supported\n");
         return;
     }
 
-    CHECK_PARAM (dev < I2C_NUMOF)
+    mutex_init(&_i2c_bus[dev].lock);
 
-    if (_i2c_bus[dev].speed == I2C_SPEED_HIGH) {
-        LOG_INFO("I2C_SPEED_HIGH is not supported\n");
-        return;
-    }
-
-    i2c_acquire (dev);
+    _i2c_bus[dev].scl   = i2c_config[dev].scl;
+    _i2c_bus[dev].sda   = i2c_config[dev].sda;
+    _i2c_bus[dev].speed = i2c_config[dev].speed;
 
     _i2c_bus[dev].dev     = dev;
-    _i2c_bus[dev].delay   =_i2c_delays[_i2c_bus[dev].speed][ets_get_cpu_frequency() == 80 ? 1 : 0];
     _i2c_bus[dev].scl_bit = BIT(_i2c_bus[dev].scl); /* store bit mask for faster access */
     _i2c_bus[dev].sda_bit = BIT(_i2c_bus[dev].sda); /* store bit mask for faster access */
     _i2c_bus[dev].started = false; /* for handling of repeated start condition */
 
-    DEBUG ("%s: scl=%d sda=%d speed=%d\n", __func__,
-           _i2c_bus[dev].scl, _i2c_bus[dev].sda, _i2c_bus[dev].speed);
+    switch (ets_get_cpu_frequency()) {
+        case  80: _i2c_bus[dev].delay = _i2c_delays[_i2c_bus[dev].speed][0]; break;
+        case 160: _i2c_bus[dev].delay = _i2c_delays[_i2c_bus[dev].speed][1]; break;
+#ifdef MCU_ESP32
+        case 240: _i2c_bus[dev].delay = _i2c_delays[_i2c_bus[dev].speed][2]; break;
+#endif
+        default : LOG_TAG_INFO("i2c", "I2C software implementation is not "
+                               "supported for this CPU frequency: %d MHz\n",
+                               ets_get_cpu_frequency());
+                  return;
+    }
 
+    DEBUG("%s: scl=%d sda=%d speed=%d\n", __func__,
+          _i2c_bus[dev].scl, _i2c_bus[dev].sda, _i2c_bus[dev].speed);
+
+    /* reset the GPIO usage if the pins were used for I2C before */
+    if (gpio_get_pin_usage(_i2c_bus[dev].scl) == _I2C) {
+        gpio_set_pin_usage(_i2c_bus[dev].scl, _GPIO);
+    }
+    if (gpio_get_pin_usage(_i2c_bus[dev].sda) == _I2C) {
+        gpio_set_pin_usage(_i2c_bus[dev].sda, _GPIO);
+    }
+
+    /* Configure and initialize SDA and SCL pin. */
+#ifdef MCU_ESP32
     /*
-     * Configure and initialize SDA and SCL pin.
-     * Note: Due to critical timing required by the I2C software
-     * implementation, the ESP8266 GPIOs can not be used directly in GPIO_OD_PU
-     * mode. Instead, the GPIOs are configured in GPIO_IN_PU mode with
-     * open-drain output driver. Signal levels are then realized as following:
+     * ESP32 pins are used in input/output mode with open-drain output driver.
+     * Signal levels are then realized as following:
+     *
+     * - HIGH: Output value 1 lets the pin floating and is pulled-up to high.
+     * - LOW : Output value 0 actively drives the pin to low.
+     */
+    if (gpio_init(_i2c_bus[dev].scl, GPIO_IN_OD_PU) ||
+        gpio_init(_i2c_bus[dev].sda, GPIO_IN_OD_PU)) {
+        return;
+    }
+#else /* MCU_ESP32 */
+    /*
+     * Due to critical timing required by the I2C software implementation,
+     * the ESP8266 GPIOs can not be used directly in GPIO_OD_PU mode.
+     * Instead, the GPIOs are configured in GPIO_IN_PU mode with open-drain
+     * output driver. Signal levels are then realized as following:
      *
      * - HIGH: The GPIO is used in the configured GPIO_IN_PU mode. In this
      *         mode, the output driver is in open-drain mode and pulled-up.
      * - LOW : The GPIO is temporarily switched to GPIO_OD_PU mode. In this
      *         mode, the output value 0, which is written during
-     *         initialization, actively drives the output to low.
+     *         initialization, actively drives the pin to low.
      */
-    gpio_init (_i2c_bus[dev].scl, GPIO_IN_PU);
-    gpio_init (_i2c_bus[dev].sda, GPIO_IN_PU);
-    gpio_clear (_i2c_bus[dev].scl);
-    gpio_clear (_i2c_bus[dev].sda);
+    if (gpio_init(_i2c_bus[dev].scl, GPIO_IN_PU) ||
+        gpio_init(_i2c_bus[dev].sda, GPIO_IN_PU)) {
+        return;
+    }
+#endif /* MCU_ESP32 */
+
+    /* store the usage type in GPIO table */
+    gpio_set_pin_usage(_i2c_bus[dev].scl, _I2C);
+    gpio_set_pin_usage(_i2c_bus[dev].sda, _I2C);
 
     /* set SDA and SCL to be floating and pulled-up to high */
     _i2c_sda_high (&_i2c_bus[dev]);
@@ -189,16 +230,14 @@ void i2c_init(i2c_t dev)
     /* clear the bus if necessary (SDA is driven permanently low) */
     _i2c_clear (&_i2c_bus[dev]);
 
-    i2c_release (dev);
-
     return;
 }
 
 int i2c_acquire(i2c_t dev)
 {
-    CHECK_PARAM_RET (dev < I2C_NUMOF, -1)
+    assert(dev < I2C_NUMOF);
 
-    mutex_lock(&i2c_bus_lock[dev]);
+    mutex_lock(&_i2c_bus[dev].lock);
     return 0;
 }
 
@@ -206,7 +245,7 @@ void i2c_release(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
-    mutex_unlock(&i2c_bus_lock[dev]);
+    mutex_unlock(&_i2c_bus[dev].lock);
 }
 
 int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t flags)
@@ -214,7 +253,8 @@ int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, 
     DEBUG ("%s: dev=%u addr=%02x data=%p len=%d flags=%01x\n",
            __func__, dev, addr, data, len, flags);
 
-    CHECK_PARAM_RET (dev < I2C_NUMOF, -EINVAL);
+    assert(dev < I2C_NUMOF);
+
     CHECK_PARAM_RET (len > 0, -EINVAL);
     CHECK_PARAM_RET (data != NULL, -EINVAL);
 
@@ -235,7 +275,7 @@ int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, 
             /* prepare 10 bit address bytes */
             uint8_t addr1 = 0xf0 | (addr & 0x0300) >> 7 | I2C_READ;
             uint8_t addr2 = addr & 0xff;
-            /* send address bytes wit read flag */
+            /* send address bytes with read flag */
             if ((res = _i2c_write_byte (bus, addr1)) != 0 ||
                 (res = _i2c_write_byte (bus, addr2)) != 0) {
                 /* abort transfer */
@@ -275,7 +315,8 @@ int /* IRAM */ i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_
     DEBUG ("%s: dev=%u addr=%02x data=%p len=%d flags=%01x\n",
            __func__, dev, addr, data, len, flags);
 
-    CHECK_PARAM_RET (dev < I2C_NUMOF, -EINVAL);
+    assert(dev < I2C_NUMOF);
+
     CHECK_PARAM_RET (len > 0, -EINVAL);
     CHECK_PARAM_RET (data != NULL, -EINVAL);
 
@@ -348,74 +389,99 @@ void i2c_poweroff(i2c_t dev)
 static inline void _i2c_delay (_i2c_bus_t* bus)
 {
     /* produces a delay */
-    /* ca. 20 cycles = 1 us (80 MHz) or ca. 40 cycles = 1 us (160 MHz) */
-
     uint32_t cycles = bus->delay;
     if (cycles) {
-        __asm__ volatile ("1:  _addi.n  %0, %0, -1 \n"
-                          "    bnez     %0, 1b     \n" : "=r" (cycles) : "0" (cycles));
+        __asm__ volatile ("1: _addi.n  %0, %0, -1 \n"
+                          "   bnez     %0, 1b     \n" : "=r" (cycles) : "0" (cycles));
     }
 }
 
 /*
- * Note: Due to critical timing required by the I2C software implementation,
- * the ESP8266 GPIOs can not be used directly in GPIO_OD_PU mode. Instead,
- * the GPIOs are configured in GPIO_IN_PU mode with open-drain output driver.
- * Signal levels are then realized as following:
+ * Please note: SDA and SDL pins are used in GPIO_OD_PU mode
+ *              (open-drain with pull-ups).
  *
- * - HIGH: The GPIO is used in the configured GPIO_IN_PU mode. In this mode,
- *         the output driver is in open-drain mode and pulled-up.
- * - LOW : The GPIO is temporarily switched to GPIO_OD_PU mode. In this mode,
- *         the output value 0, which is written during initialization,
- *         actively drives the output to low.
+ * Setting a pin which is in open-drain mode leaves the pin floating and
+ * the signal is pulled up to high. The signal can then be actively driven
+ * to low by a slave. A read operation returns the current signal at the pin.
+ *
+ * Clearing a pin which is in open-drain mode actively drives the signal to
+ * low.
  */
 
 static inline bool _i2c_scl_read(_i2c_bus_t* bus)
 {
-    /* read SCL status */
+    /* read SCL status (pin is in open-drain mode and set) */
+#ifdef MCU_ESP32
+    return GPIO_GET(in, in1, bus->scl);
+#else /* MCU_ESP32 */
     return GPIO.IN & bus->scl_bit;
+#endif /* MCU_ESP32 */
 }
 
 static inline bool _i2c_sda_read(_i2c_bus_t* bus)
 {
-    /* read SDA status */
+    /* read SDA status (pin is in open-drain mode and set) */
+#ifdef MCU_ESP32
+    return GPIO_GET(in, in1, bus->sda);
+#else /* MCU_ESP32 */
     return GPIO.IN & bus->sda_bit;
-}
-
-static inline void _i2c_scl_low(_i2c_bus_t* bus)
-{
-    /*
-     * set SCL signal low (switch temporarily to GPIO_OD_PU where the
-     * written output value 0 drives the pin actively to low)
-     */
-    GPIO.ENABLE_OUT_SET = bus->scl_bit;
+#endif /* MCU_ESP32 */
 }
 
 static inline void _i2c_scl_high(_i2c_bus_t* bus)
 {
+#ifdef MCU_ESP32
+    /* set SCL signal high (pin is in open-drain mode and pulled-up) */
+    GPIO_SET(out_w1ts, out1_w1ts, bus->scl);
+#else /* MCU_ESP32 */
     /*
      * set SCL signal high (switch back to GPIO_IN_PU mode, that is the pin is
      * in open-drain mode and pulled-up to high)
      */
     GPIO.ENABLE_OUT_CLEAR = bus->scl_bit;
+#endif /* MCU_ESP32 */
 }
 
-static inline void _i2c_sda_low(_i2c_bus_t* bus)
+static inline void _i2c_scl_low(_i2c_bus_t* bus)
 {
+#ifdef MCU_ESP32
+    /* set SCL signal low (actively driven to low) */
+    GPIO_SET(out_w1tc, out1_w1tc, bus->scl);
+#else /* MCU_ESP32 */
     /*
-     * set SDA signal low (switch temporarily to GPIO_OD_PU where the
+     * set SCL signal low (switch temporarily to GPIO_OD_PU where the
      * written output value 0 drives the pin actively to low)
      */
-    GPIO.ENABLE_OUT_SET = bus->sda_bit;
+    GPIO.ENABLE_OUT_SET = bus->scl_bit;
+#endif /* MCU_ESP32 */
 }
 
 static inline void _i2c_sda_high(_i2c_bus_t* bus)
 {
+#ifdef MCU_ESP32
+    /* set SDA signal high (pin is in open-drain mode and pulled-up) */
+    GPIO_SET(out_w1ts, out1_w1ts, bus->sda);
+#else /* MCU_ESP32 */
     /*
      * set SDA signal high (switch back to GPIO_IN_PU mode, that is the pin is
      * in open-drain mode and pulled-up to high)
      */
     GPIO.ENABLE_OUT_CLEAR = bus->sda_bit;
+#endif /* MCU_ESP32 */
+}
+
+static inline void _i2c_sda_low(_i2c_bus_t* bus)
+{
+#ifdef MCU_ESP32
+    /* set SDA signal low (actively driven to low) */
+    GPIO_SET(out_w1tc, out1_w1tc, bus->sda);
+#else /* MCU_ESP32 */
+    /*
+     * set SDA signal low (switch temporarily to GPIO_OD_PU where the
+     * written output value 0 drives the pin actively to low)
+     */
+    GPIO.ENABLE_OUT_SET = bus->sda_bit;
+#endif /* MCU_ESP32 */
 }
 
 static void _i2c_clear(_i2c_bus_t* bus)
@@ -500,7 +566,7 @@ static /* IRAM */ int _i2c_start_cond(_i2c_bus_t* bus)
         /* SDA = passive HIGH (floating and pulled-up) */
         _i2c_sda_high (bus);
 
-        /* t_VD;DAT not neccessary */
+        /* t_VD;DAT not necessary */
         /* _i2c_delay (bus); */
 
         /* SCL = passive HIGH (floating and pulled-up) */
@@ -724,7 +790,7 @@ static /* IRAM */ int _i2c_read_byte(_i2c_bus_t* bus, uint8_t *byte, bool ack)
         if (res != 0) {
             return res;
         }
-        *byte = (*byte << 1) | bit;
+        *byte = (*byte << 1) | (bit ? 1 : 0);
     }
 
     /* write acknowledgement flag */
@@ -735,17 +801,8 @@ static /* IRAM */ int _i2c_read_byte(_i2c_bus_t* bus, uint8_t *byte, bool ack)
 
 void i2c_print_config(void)
 {
-    for (unsigned bus = 0; bus < I2C_NUMOF; bus++) {
-        LOG_INFO("\tI2C_DEV(%d): scl=%d sda=%d\n",
-                 bus, _i2c_bus[bus].scl, _i2c_bus[bus].sda);
+    for (unsigned dev = 0; dev < I2C_NUMOF; dev++) {
+        printf("\tI2C_DEV(%u)\tscl=%d sda=%d\n",
+               dev, i2c_config[dev].scl, i2c_config[dev].sda);
     }
 }
-
-#else /* if defined(I2C_NUMOF) && I2C_NUMOF */
-
-void i2c_print_config(void)
-{
-    LOG_INFO("\tI2C: no devices\n");
-}
-
-#endif /* if defined(I2C_NUMOF) && I2C_NUMOF */

@@ -20,7 +20,7 @@ ifeq (jlink,$(PROGRAMMER))
   ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
     export JLINK_PRE_FLASH := loadfile $(BINDIR)/softdevice.hex
     export FLASH_ADDR := 0x1f000
-    export LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
+    LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
     # murdock: softdevice.hex file is used for flashing
     # It must be taken into account for the test input hash and
     # be sent to the separated testing boards

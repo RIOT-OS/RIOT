@@ -542,7 +542,7 @@ static void _isr(netdev_t *netdev)
     /* update pending bits */
     mrf24j40_update_tasks(dev);
     DEBUG("[mrf24j40] INTERRUPT (pending: %x),\n", dev->pending);
-    /* Transmit interrupt occured */
+    /* Transmit interrupt occurred */
     if (dev->pending & MRF24J40_TASK_TX_READY) {
         dev->pending &= ~(MRF24J40_TASK_TX_READY);
         DEBUG("[mrf24j40] EVT - TX_END\n");
@@ -550,7 +550,7 @@ static void _isr(netdev_t *netdev)
         if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
             uint8_t txstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
             dev->tx_retries = (txstat >> MRF24J40_TXSTAT_MAX_FRAME_RETRIES_SHIFT);
-            /* transmision failed */
+            /* transmission failed */
             if (txstat & MRF24J40_TXSTAT_TXNSTAT) {
                 /* TX_NOACK - CCAFAIL */
                 if (txstat & MRF24J40_TXSTAT_CCAFAIL) {
@@ -569,7 +569,7 @@ static void _isr(netdev_t *netdev)
         }
 #endif
     }
-    /* Receive interrupt occured */
+    /* Receive interrupt occurred */
     if (dev->pending & MRF24J40_TASK_RX_READY) {
         DEBUG("[mrf24j40] EVT - RX_END\n");
         if ((dev->netdev.flags & MRF24J40_OPT_TELL_RX_END)) {

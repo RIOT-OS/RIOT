@@ -39,12 +39,23 @@ ifneq (,$(filter nimble_addr,$(USEMODULE)))
   USEMODULE += bluetil_addr
 endif
 
+ifneq (,$(filter nimble_autoconn_%,$(USEMODULE)))
+  USEMODULE += nimble_autoconn
+endif
+
+ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
+  USEMODULE += nimble_netif
+  USEMODULE += nimble_scanner
+  USEMODULE += bluetil_ad
+endif
+
 ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
   USEMODULE += nimble_addr
   USEMODULE += bluetil_ad
 endif
 
 ifneq (,$(filter nimble_netif,$(USEMODULE)))
+  FEATURES_REQUIRED += ble_nimble_netif
   USEMODULE += l2util
   USEMODULE += bluetil_addr
   ifneq (,$(filter gnrc_ipv6_%,$(USEMODULE)))

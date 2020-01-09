@@ -31,16 +31,16 @@ void pm_set(unsigned mode)
 
         switch (mode) {
             case 0:
-                DEBUG("pm_set(): setting BACKUP mode.\n");
+                DEBUG_PUTS("pm_set(): setting BACKUP mode.");
                 _mode = PM_SLEEPCFG_SLEEPMODE_BACKUP;
                 break;
             case 1:
-                DEBUG("pm_set(): setting STANDBY mode.\n");
+                DEBUG_PUTS("pm_set(): setting STANDBY mode.");
                 _mode = PM_SLEEPCFG_SLEEPMODE_STANDBY;
                 break;
             default: /* Falls through */
             case 2:
-                DEBUG("pm_set(): setting IDLE mode.\n");
+                DEBUG_PUTS("pm_set(): setting IDLE mode.");
 #if defined(CPU_MODEL_SAMR30G18A) || defined(CPU_MODEL_SAMR34J18B)
                 _mode = PM_SLEEPCFG_SLEEPMODE_IDLE;
 #else

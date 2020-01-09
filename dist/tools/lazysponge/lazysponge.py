@@ -11,7 +11,7 @@
 """
 lazysponge
 
-Adaptation of moreutils `sponge` with added functionnality that it does not
+Adaptation of moreutils `sponge` with added functionality that it does not
 modify the output file if the content would be unchanged.
 
 Description
@@ -26,7 +26,7 @@ unchanged.
 Note
 ----
 
-It only works with input provided by a `pipe` and not interractive input.
+It only works with input provided by a `pipe` and not interactive input.
 The reason is that `ctrl+c` would not be handled properly in that case.
 
 Usage
@@ -59,7 +59,7 @@ PARSER.add_argument('--verbose', '-v', help='Verbose output', default=False,
 
 
 def _print_hash_debug_info(outfilename, oldbytes, newbytes):
-    """Print debug information on hashs."""
+    """Print debug information on hashes."""
     oldhash = hashlib.md5(oldbytes).hexdigest() if oldbytes is not None else ''
     newhash = hashlib.md5(newbytes).hexdigest()
     if oldbytes == newbytes:

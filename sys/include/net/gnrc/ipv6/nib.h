@@ -282,7 +282,7 @@ enum {
      * might however get an INCOMPLETE or STALE notification due to that, as
      * soon as the neighbor enters the neighbor cache again).
      *
-     * Be adviced to only use `ctx_addr` in the context of the callback, since
+     * Be advised to only use `ctx_addr` in the context of the callback, since
      * it might be overwritten, after the callback was left.
      */
     GNRC_IPV6_NIB_ROUTE_INFO_TYPE_NSC,

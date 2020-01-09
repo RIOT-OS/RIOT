@@ -382,7 +382,8 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
         int idx;
 
         gnrc_netif_acquire(netif);
-        invalid_src = ((idx = gnrc_netif_ipv6_addr_idx(netif, &hdr->src)) >= 0) &&
+        invalid_src = ((!ipv6_addr_is_loopback(&hdr->dst)) &&
+                       (idx = gnrc_netif_ipv6_addr_idx(netif, &hdr->src)) >= 0) &&
             (gnrc_netif_ipv6_addr_get_state(netif, idx) != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
         gnrc_netif_release(netif);
         if (invalid_src) {
@@ -490,7 +491,7 @@ static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
     if (gnrc_ipv6_nib_get_next_hop_l2addr(&ipv6_hdr->dst, netif, pkt,
                                           &nce) < 0) {
         /* packet is released by NIB */
-        DEBUG("ipv6: no link-layer address or interface for next hop to %s",
+        DEBUG("ipv6: no link-layer address or interface for next hop to %s\n",
               ipv6_addr_to_str(addr_str, &ipv6_hdr->dst, sizeof(addr_str)));
         return;
     }
@@ -830,7 +831,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
           first_nh, byteorder_ntohs(hdr->len));
 
     if ((pkt = gnrc_ipv6_ext_process_hopopt(pkt, &first_nh)) == NULL) {
-        DEBUG("ipv6: packet's extension header was errorneous or packet was "
+        DEBUG("ipv6: packet's extension header was erroneous or packet was "
               "consumed due to it\n");
         return;
     }

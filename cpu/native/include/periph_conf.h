@@ -35,13 +35,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name RealTime Clock configuration
- * @{
- */
-#define RTC_NUMOF (1)
-/** @} */
-
-/**
  * @name Timer peripheral configuration
  * @{
  */
@@ -97,7 +90,7 @@ extern "C" {
  * cable select lines. Assignment to hardware devices can be configured at
  * runtime using the `--spi` startup parameter.
  *
- * Can be overriden during compile time with a `-DSPI_NUMOF=n` flag.
+ * Can be overridden during compile time with a `-DSPI_NUMOF=n` flag.
  */
 #define SPI_NUMOF (1U)
 #endif

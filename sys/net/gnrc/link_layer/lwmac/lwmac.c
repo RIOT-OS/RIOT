@@ -676,7 +676,7 @@ static void rtt_cb(void *arg)
 {
     msg_t msg;
 
-    msg.content.value = ((uint32_t) arg) & 0xffff;
+    msg.content.value = (uint16_t)((uintptr_t) arg);
     msg.type = GNRC_LWMAC_EVENT_RTT_TYPE;
     msg_send(&msg, lwmac_pid);
 
@@ -827,7 +827,7 @@ static void _lwmac_event_cb(netdev_t *dev, netdev_event_t event)
         }
     }
 
-    /* Execute main state machine because something just happend*/
+    /* Execute main state machine because something just happened*/
     while (gnrc_lwmac_get_reschedule(netif)) {
         lwmac_update(netif);
     }
@@ -843,7 +843,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     lwmac_schedule_update(netif);
 
-    /* Execute main state machine because something just happend*/
+    /* Execute main state machine because something just happened*/
     while (gnrc_lwmac_get_reschedule(netif)) {
         lwmac_update(netif);
     }
@@ -891,7 +891,7 @@ static void _lwmac_msg_handler(gnrc_netif_t *netif, msg_t *msg)
         }
     }
 
-    /* Execute main state machine because something just happend*/
+    /* Execute main state machine because something just happened*/
     while (gnrc_lwmac_get_reschedule(netif)) {
         lwmac_update(netif);
     }
@@ -901,6 +901,7 @@ static void _lwmac_init(gnrc_netif_t *netif)
 {
     netdev_t *dev;
 
+    gnrc_netif_default_init(netif);
     dev = netif->dev;
     dev->event_callback = _lwmac_event_cb;
 

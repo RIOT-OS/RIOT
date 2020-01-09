@@ -71,3 +71,6 @@ compile_flags.txt
 
 # suit manifest keys
 keys/
+
+# clangd language server
+.clangd/

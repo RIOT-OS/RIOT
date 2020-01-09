@@ -38,6 +38,11 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup usbus_cdc_acm_conf USBUS CDC ACM compile time configurations
+ * @ingroup usb_conf
+ * @{
+ */
+/**
  * @brief Buffer size for STDIN and STDOUT data to and from USB when using
  *        the USBUS_CDC_ACM_STDIO module
  */
@@ -51,6 +56,7 @@ extern "C" {
 #ifndef USBUS_CDC_ACM_BULK_EP_SIZE
 #define USBUS_CDC_ACM_BULK_EP_SIZE    (64)
 #endif
+/** @} */
 
 /**
  * @brief USBUS CDC ACM interrupt endpoint size.
@@ -114,7 +120,7 @@ struct usbus_cdcacm_device {
     usbus_handler_t handler_ctrl;       /**< control handler                 */
     usbus_interface_t iface_ctrl;       /**< CDC control interface           */
     usbus_interface_t iface_data;       /**< CDC data interface              */
-    usbus_hdr_gen_t cdcacm_hdr;         /**< CDC header generator            */
+    usbus_descr_gen_t cdcacm_descr;     /**< CDC descriptor generator        */
     usbus_cdcacm_cb_t cb;               /**< Callback for data handlers      */
     usbus_cdcacm_coding_cb_t coding_cb; /**< Callback for ACM coding changes */
     tsrb_t tsrb;                        /**< TSRB for data to the host       */

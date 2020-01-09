@@ -18,19 +18,20 @@ any external components at a supply voltage anywhere between 2.7V and 5.5V.
 @image html "https://github.com/maribu/images/raw/master/ATmega328p.jpg" "ATmega328p DIP package on a breadboard"<br>
 
 ### MCU
-| MCU           | ATmega328p                             |
-|:------------- |:-------------------------------------- |
-| Family        | AVR/ATmega                             |
-| Vendor        | Microchip (previously Atmel)           |
-| RAM           | 2Kb                                    |
-| Flash         | 32Kb                                   |
-| Frequency     | 8MHz (up to 20MHz with external clock) |
-| Timers        | 3 (2x 8bit, 1x 16bit)                  |
-| ADCs          | 6 analog input pins                    |
-| UARTs         | 1                                      |
-| SPIs          | 1                                      |
-| I2Cs          | 1 (called TWI)                         |
-| Vcc           | 2.7V - 5.5V (when clocked at 8MHz)     |
+| MCU           | ATmega328p                                    |
+|:------------- |:--------------------------------------------- |
+| Family        | AVR/ATmega                                    |
+| Vendor        | Microchip (previously Atmel)                  |
+| RAM           | 2KiB                                          |
+| Flash         | 32KiB                                         |
+| EEPROM        | 1KiB                                          |
+| Frequency     | 1MHz/8MHz (up to 20MHz with external clock)   |
+| Timers        | 3 (2x 8bit, 1x 16bit)                         |
+| ADCs          | 6 analog input pins                           |
+| UARTs         | 1                                             |
+| SPIs          | 1                                             |
+| I2Cs          | 1 (called TWI)                                |
+| Vcc           | 2.7V - 5.5V (when clocked at 8MHz)            |
 | Datasheet     | [Official datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf) |
 
 ### Pinout
@@ -44,18 +45,24 @@ All credit for above pinout image goes to https://github.com/MCUdude/MiniCore#pi
 
 The ATmega328p has two internal oscillators clocked at 8MHz and at 128kHz that
 allow it to be operated without any external clock source or crystal. By default
-the fuses are configured to use the internal 8MHz oscillator resulting in a
-clock speed of 8MHz. By setting the `CKDIV8` fuse the clock divider can be
-enabled to operate the ATmega328p at 1MHz.
+the fuses are configured to use the internal 8MHz oscillator and a clock divider
+resulting in a clock speed of 1MHz. By clearing the `CKDIV8` fuse the clock
+divider can be disabled to operate the ATmega328p at 8MHz without an external
+clock source. This can be done like this:
+
+    avrdude -c usbtiny -p m328p -B 32 -U lfuse:w:0xe2:m
+
+(Replace `usbtiny` with the ISP programmer you are using. The `-B 32` might
+be needed on some ISP programmers to communicate with slow ATmega MCUs. It will
+not be needed anymore after the clock device has been disabled.)
 
 This "board" is configured to use 8MHz as core clock, so that the ATmega328p
-can be used without external circuitry and without any changes in the default
-fuse configuration.
+runs at the highest frequency possible without external clock sources.
 
 By setting the environment variable `ATMEGA328P_CLOCK` to a custom frequency in
 Hz (e.g. `1000000` for 1MHz), this core clock can be changed easily. Refer to
 the datasheet on how to configure the ATmega328p to use an external crystal,
-an external clock source or the clockd divider.
+an external clock source or the clock divider.
 
 ### Relation Between Supply Voltage, Clock Frequency and Power Consumption
 

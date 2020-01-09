@@ -48,7 +48,7 @@ or you can flash the board using Segger's JLink.
 The [DAPLink interface](https://www.mbed.com/en/development/hardware/prototyping-production/daplink/daplink-on-kl26z/) is the default way to flash the board and
 works out of the box. When you plug the board to your host computer, it shows up
 as a flash drive. To flash the board, you can simply copy your compiled `.hex`
-file onto the board, and thats it.
+file onto the board, and that's it.
 
 The `micro:bit` port comes with a little script that does this automatically,
 so you can flash the board as usual with

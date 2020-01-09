@@ -224,12 +224,12 @@ class SerCmd(cmd.Cmd):
                     af, socktype, proto, canonname, sa = res
                     try:
                         s = fdsocket(af, socktype, proto)
-                    except socket.error as msg:
+                    except socket.error:
                         s = None
                         continue
                     try:
                         s.connect(sa)
-                    except socket.error as msg:
+                    except socket.error:
                         s.close()
                         s = None
                         continue
@@ -274,7 +274,7 @@ class SerCmd(cmd.Cmd):
         """
         self.logger.debug("processing line #%s#" % line)
         if (line.startswith("/")):
-                return "PYTERM_" + line[1:]
+            return "PYTERM_" + line[1:]
         return line
 
     def emptyline(self):

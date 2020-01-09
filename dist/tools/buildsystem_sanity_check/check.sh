@@ -79,10 +79,15 @@ UNEXPORTED_VARIABLES+=('PROGRAMMER_SERIAL')
 UNEXPORTED_VARIABLES+=('STLINK_VERSION')
 UNEXPORTED_VARIABLES+=('PORT_LINUX' 'PORT_DARWIN')
 UNEXPORTED_VARIABLES+=('PORT[ ?=:]' 'PORT$')
+UNEXPORTED_VARIABLES+=('LINKFLAGS' 'LINKER_SCRIPT')
 
 EXPORTED_VARIABLES_ONLY_IN_VARS=()
 EXPORTED_VARIABLES_ONLY_IN_VARS+=('CPU_ARCH')
 EXPORTED_VARIABLES_ONLY_IN_VARS+=('CPU_FAM')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('TOOLCHAIN')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('WERROR')
+EXPORTED_VARIABLES_ONLY_IN_VARS+=('WPEDANTIC')
+
 check_not_exporting_variables() {
     local patterns=()
     local pathspec=()
@@ -95,7 +100,7 @@ check_not_exporting_variables() {
         | error_with_message 'Variables must not be exported:'
 
     # Some variables may still be exported in 'makefiles/vars.inc.mk' as the
-    # only place that should export commont variables
+    # only place that should export common variables
     pathspec+=('*')
     pathspec+=(':!makefiles/vars.inc.mk')
 
@@ -188,6 +193,33 @@ check_board_insufficient_memory_not_in_makefile() {
         | error_with_message 'Move BOARD_INSUFFICIENT_MEMORY to Makefile.ci'
 }
 
+# Test applications must not define the APPLICATION variable
+checks_tests_application_not_defined_in_makefile() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e '^[[:space:]]*APPLICATION[[:space:]:+]=')
+
+    pathspec+=('tests/**/Makefile')
+    pathspec+=(':!tests/external_board_native/Makefile')
+
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message "Don't define APPLICATION in test Makefile"
+}
+
+# Develhelp should not be set via CFLAGS
+checks_develhelp_not_defined_via_cflags() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e '^[[:space:]]*CFLAGS[[:space:]:+]+=[[:space:]:+]-DDEVELHELP')
+
+    pathspec+=('**/Makefile')
+
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message "Use DEVELHELP ?= 1 instead of using CFLAGS directly"
+}
+
 error_on_input() {
     ! grep ''
 }
@@ -200,6 +232,8 @@ all_checks() {
     check_cpu_cpu_model_defined_in_makefile_features
     check_not_setting_board_equal
     check_board_insufficient_memory_not_in_makefile
+    checks_tests_application_not_defined_in_makefile
+    checks_develhelp_not_defined_via_cflags
 }
 
 main() {

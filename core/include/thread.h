@@ -348,10 +348,10 @@ kernel_pid_t thread_create(char *stack,
                   const char *name);
 
 /**
- * @brief       Retreive a thread control block by PID.
+ * @brief       Retrieve a thread control block by PID.
  * @details     This is a bound-checked variant of accessing `sched_threads[pid]` directly.
  *              If you know that the PID is valid, then don't use this function.
- * @param[in]   pid   Thread to retreive.
+ * @param[in]   pid   Thread to retrieve.
  * @return      `NULL` if the PID is invalid or there is no such thread.
  */
 volatile thread_t *thread_get(kernel_pid_t pid);
@@ -397,6 +397,27 @@ void thread_yield(void);
  * @see     thread_yield()
  */
 void thread_yield_higher(void);
+
+/**
+ * @brief   Puts the current thread into zombie state.
+ *
+ * @details Does nothing when in ISR.
+ *          A thread in zombie state will never be scheduled again,
+ *          but its scheduler entry and stack will be kept.
+ *          A zombie state thread is supposed to be cleaned up
+ *          by @ref thread_kill_zombie().
+ */
+void thread_zombify(void);
+
+/**
+ * @brief Terminates zombie thread.
+ *
+ * @param[in] pid   the PID of the thread to terminate
+ *
+ * @return          `1` on success
+ * @return          `STATUS_NOT_FOUND` if pid is unknown or not a zombie
+ */
+int thread_kill_zombie(kernel_pid_t pid);
 
 /**
  * @brief Wakes up a sleeping thread.

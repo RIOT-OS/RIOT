@@ -75,7 +75,7 @@ extern "C" {
 /**
  * @name USB CDC descriptor subtypes
  */
-#define USB_CDC_DESCR_SUBTYPE_FUNCTIONAL    0x00 /**< Header functional
+#define USB_CDC_DESCR_SUBTYPE_FUNCTIONAL    0x00 /**< functional
                                                    *  descriptor */
 #define USB_CDC_DESCR_SUBTYPE_CALL_MGMT     0x01 /**< Call management
                                                       descriptor */

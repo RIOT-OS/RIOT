@@ -132,7 +132,15 @@
 /** @addtogroup Device_Included
   * @{
   */
-#if defined(STM32L011xx)
+#if defined(STM32L010xB)
+  #include "stm32l010xb.h"
+#elif defined(STM32L010x8)
+  #include "stm32l010x8.h"
+#elif defined(STM32L010x6)
+  #include "stm32l010x6.h"
+#elif defined(STM32L010x4)
+  #include "stm32l010x4.h"
+#elif defined(STM32L011xx)
   #include "stm32l011xx.h"
 #elif defined(STM32L021xx)
   #include "stm32l021xx.h"

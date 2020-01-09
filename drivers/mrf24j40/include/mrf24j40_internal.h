@@ -31,7 +31,7 @@ extern "C" {
 
 
 /**
- * @brief initialization as decribed in datasheet
+ * @brief initialization as described in datasheet
  *
  * @param[in] dev device to initialize
  *

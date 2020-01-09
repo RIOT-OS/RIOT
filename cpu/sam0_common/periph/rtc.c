@@ -15,7 +15,7 @@
  * @brief       Low-level RTC driver implementation
  *
  * @author      Baptiste Clenet <bapclenet@gmail.com>
- * @autor       ported to SAML21 by FWX <FWX@dialine.fr>
+ * @author       ported to SAML21 by FWX <FWX@dialine.fr>
  * @}
  */
 
@@ -65,10 +65,8 @@ static inline void _rtc_set_enabled(bool on)
 #ifdef CPU_SAMD21
 static void _rtc_clock_setup(void)
 {
-    /* Setup clock GCLK2 with OSC32K divided by 32 */
-    GCLK->GENDIV.reg = GCLK_GENDIV_ID(2) | GCLK_GENDIV_DIV(4);
-    GCLK->GENCTRL.bit.DIVSEL = 1;
-    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(2) | GCLK_CLKCTRL_ID_RTC;
+    /* Use 1024 Hz GCLK4 */
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(4) | GCLK_CLKCTRL_ID_RTC;
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 }
 #else

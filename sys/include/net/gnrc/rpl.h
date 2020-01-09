@@ -517,15 +517,15 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
  * @brief   Send a DIO of the @p instance to the @p destination.
  *
  * @param[in] instance          Pointer to the RPL instance.
- * @param[in] destination       IPv6 addres of the destination.
+ * @param[in] destination       IPv6 address of the destination.
  */
 void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination);
 
 /**
- * @brief   Send a DIS of the @p instace to the @p destination.
+ * @brief   Send a DIS of the @p instance to the @p destination.
  *
  * @param[in] instance          Pointer to the RPL instance, optional.
- * @param[in] destination       IPv6 addres of the destination.
+ * @param[in] destination       IPv6 address of the destination.
  * @param[in] options           Pointer to the first option to be attached.
  * @param[in] num_opts          The number of options to attach.
  */
@@ -536,7 +536,7 @@ void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination,
  * @brief   Send a DAO of the @p dodag to the @p destination.
  *
  * @param[in] instance          Pointer to the instance.
- * @param[in] destination       IPv6 addres of the destination.
+ * @param[in] destination       IPv6 address of the destination.
  * @param[in] lifetime          Lifetime of the route to announce.
  */
 void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination, uint8_t lifetime);
@@ -545,7 +545,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination, 
  * @brief   Send a DAO-ACK of the @p instance to the @p destination.
  *
  * @param[in] instance          Pointer to the RPL instance.
- * @param[in] destination       IPv6 addres of the destination.
+ * @param[in] destination       IPv6 address of the destination.
  * @param[in] seq               Sequence number to be acknowledged.
  */
 void gnrc_rpl_send_DAO_ACK(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination, uint8_t seq);

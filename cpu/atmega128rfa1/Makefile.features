@@ -4,6 +4,3 @@ include $(RIOTCPU)/atmega_common/Makefile.features
 
 # additional PCINT for atmega128rfa1
 FEATURES_PROVIDED += atmega_pcint1
-
-# Various other features (if any)
-FEATURES_PROVIDED += periph_cpuid

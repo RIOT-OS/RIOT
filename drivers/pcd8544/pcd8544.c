@@ -238,7 +238,7 @@ int pcd8544_init(pcd8544_t *dev, spi_t spi, gpio_t cs, gpio_t reset, gpio_t mode
 
     DEBUG("done setting dev members\n");
 
-    /* initialze pins */
+    /* initialize pins */
     gpio_init(reset, GPIO_OUT);
     gpio_init(mode, GPIO_OUT);
     DEBUG("done with gpios\n");

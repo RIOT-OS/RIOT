@@ -52,7 +52,7 @@ extern "C" {
  * @name Status register bits (#CCS811_REG_STATUS)
  * @{
  */
-#define CCS811_STATUS_ERROR        (0x01)  /**< error occured, details in CCS811_REG_ERROR */
+#define CCS811_STATUS_ERROR        (0x01)  /**< error occurred, details in CCS811_REG_ERROR */
 #define CCS811_STATUS_DATA_RDY     (0x08)  /**< new data sample available in ALG_RESULT_DATA */
 #define CCS811_STATUS_APP_VALID    (0x10)  /**< valid application firmware loaded */
 #define CCS811_STATUS_FW_MODE      (0x80)  /**< firmware is in application mode */

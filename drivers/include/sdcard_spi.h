@@ -187,7 +187,7 @@ typedef struct {
 typedef struct {
     sdcard_spi_params_t params;     /**< parameters for pin and spi config */
     spi_clk_t spi_clk;              /**< active SPI clock speed */
-    bool use_block_addr;            /**< true if block adressing (vs. byte adressing) is used */
+    bool use_block_addr;            /**< true if block addressing (vs. byte addressing) is used */
     bool init_done;                 /**< set to true once the init procedure completed successfully */
     sd_version_t card_type;         /**< version of SD-card */
     int csd_structure;              /**< version of the CSD register structure */
@@ -198,7 +198,7 @@ typedef struct {
 /**
  * @brief              Initializes the sd-card with the given parameters in sdcard_spi_t structure.
  *                     The init procedure also takes care of initializing the spi peripheral to master
- *                     mode and performing all neccecary steps to set the sd-card to spi-mode. Reading
+ *                     mode and performing all necessary steps to set the sd-card to spi-mode. Reading
  *                     the CID and CSD registers is also done within this routine and their
  *                     values are copied to the given sdcard_spi_t struct.
  *
@@ -206,7 +206,7 @@ typedef struct {
  * @param[in]  params  parameters for this device (pins and spi device are initialized by this driver)
  *
  * @return             0 if the card could be initialized successfully
- * @return             false if an error occured while initializing the card
+ * @return             false if an error occurred while initializing the card
  */
 int sdcard_spi_init(sdcard_spi_t *card, const sdcard_spi_params_t *params);
 
@@ -214,10 +214,10 @@ int sdcard_spi_init(sdcard_spi_t *card, const sdcard_spi_params_t *params);
  * @brief                 Reads data blocks (usually multiples of 512 Bytes) from card to buffer.
  *
  * @param[in] card        Initialized sd-card struct
- * @param[in] blockaddr   Start adress to read from. Independet of the actual adressing scheme of
- *                        the used card the adress needs to be given as block address
+ * @param[in] blockaddr   Start address to read from. Independent of the actual addressing scheme of
+ *                        the used card the address needs to be given as block address
  *                        (e.g. 0, 1, 2... NOT: 0, 512... ). The driver takes care of mapping to
- *                        byte adressing if needed.
+ *                        byte addressing if needed.
  * @param[out] data       Buffer to store the read data in. The user is responsible for providing a
  *                        suitable buffer size.
  * @param[in]  blocksize  Size of data blocks. For now only 512 byte blocks are supported because
@@ -237,10 +237,10 @@ int sdcard_spi_read_blocks(sdcard_spi_t *card, int blockaddr, uint8_t *data, int
  * @brief                 Writes data blocks (usually multiples of 512 Bytes) from buffer to card.
  *
  * @param[in] card        Initialized sd-card struct
- * @param[in] blockaddr   Start adress to read from. Independet of the actual adressing scheme of
- *                        the used card the adress needs to be given as block address
+ * @param[in] blockaddr   Start address to read from. Independent of the actual addressing scheme of
+ *                        the used card the address needs to be given as block address
  *                        (e.g. 0, 1, 2... NOT: 0, 512... ). The driver takes care of mapping to
- *                        byte adressing if needed.
+ *                        byte addressing if needed.
  * @param[out] data       Buffer that contains the data to be sent.
  * @param[in]  blocksize  Size of data blocks. For now only 512 byte blocks are supported because
  *                        only older (SDSC) cards support variable blocksizes anyway.

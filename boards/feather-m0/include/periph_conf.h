@@ -124,13 +124,17 @@ static const tc32_conf_t timer_config[] = {
  */
 static const uart_conf_t uart_config[] = {
     {
-        .dev    = &SERCOM0->USART,
-        .rx_pin = GPIO_PIN(PA, 11), /* RX pin */
-        .tx_pin = GPIO_PIN(PA, 10), /* TX pin */
-        .mux    = GPIO_MUX_C,
-        .rx_pad = UART_PAD_RX_3,
-        .tx_pad = UART_PAD_TX_2,
-        .flags  = UART_FLAG_NONE,
+        .dev      = &SERCOM0->USART,
+        .rx_pin   = GPIO_PIN(PA, 11), /* RX pin */
+        .tx_pin   = GPIO_PIN(PA, 10), /* TX pin */
+#ifdef MODULE_SAM0_PERIPH_UART_HW_FC
+        .rts_pin  = GPIO_UNDEF,
+        .cts_pin  = GPIO_UNDEF,
+#endif
+        .mux      = GPIO_MUX_C,
+        .rx_pad   = UART_PAD_RX_3,
+        .tx_pad   = UART_PAD_TX_2,
+        .flags    = UART_FLAG_NONE,
         .gclk_src = GCLK_CLKCTRL_GEN_GCLK0,
     }
 };
@@ -243,7 +247,6 @@ static const i2c_conf_t i2c_config[] = {
  * @name    RTC configuration
  * @{
  */
-#define RTC_NUMOF           (1U)
 #define RTC_DEV             RTC->MODE2
 /** @} */
 
@@ -251,7 +254,6 @@ static const i2c_conf_t i2c_config[] = {
  * @name    RTT configuration
  * @{
  */
-#define RTT_NUMOF           (1U)
 #define RTT_DEV             RTC->MODE0
 #define RTT_IRQ             RTC_IRQn
 #define RTT_IRQ_PRIO        10

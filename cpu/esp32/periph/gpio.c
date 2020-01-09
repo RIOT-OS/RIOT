@@ -189,7 +189,7 @@ gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF] = {
     _SPIF,        /* gpio7 not configurable, used as SPI MISO */
     _SPIF,        /* gpio8 not configurable, used as SPI MOSI */
     #if defined(FLASH_MODE_QIO) || defined(FLASH_MODE_QOUT)
-    /* in qio and qout mode thes pins are used for quad SPI */
+    /* in qio and qout mode these pins are used for quad SPI */
     _SPIF,        /* gpio9 not configurable, used as SPI HD */
     _SPIF,        /* gpio10 not configurable, used as SPI WP */
     #else
@@ -274,7 +274,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
             case GPIO_IN_PD:
             case GPIO_IN_PU:
-                /* GPIOs 34 ... 39 have no software controlable pullups/pulldowns */
+                /* GPIOs 34 ... 39 have no software controllable pullups/pulldowns */
                 LOG_TAG_ERROR("gpio",
                               "GPIO%d has no pullups/pulldowns\n", pin);
                 return -1;

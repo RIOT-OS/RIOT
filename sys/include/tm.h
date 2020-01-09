@@ -77,7 +77,7 @@ int tm_doomsday(int year) CONST;
 
 /**
  * @brief           Calculates the day of the year and the weekday of a given date.
- * @details         Illegal dates are not catched.
+ * @details         Illegal dates are not caught.
  * @param[in]       year   The year. Probably should be ≥ 1582, but needs to be ≥ 1.
  * @param[in]       mon    The month, TM_MON_JAN to TM_MON_DEC.
  * @param[in]       mday   The day in the month, 1 to 31.

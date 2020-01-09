@@ -22,12 +22,7 @@
 #include "periph/pm.h"
 
 #define ENABLE_DEBUG (0)
-
-#if ENABLE_DEBUG
-#define DEBUG(s) puts(s)
-#else
-#define DEBUG(s)
-#endif
+#include "debug.h"
 
 void pm_set(unsigned mode)
 {
@@ -36,23 +31,23 @@ void pm_set(unsigned mode)
 
     switch (mode) {
         case 0:
-            DEBUG("pm_set(): setting BACKUP mode.");
+            DEBUG_PUTS("pm_set(): setting BACKUP mode.");
             _mode = PM_SLEEPCFG_SLEEPMODE_BACKUP;
             deep = 1;
             break;
         case 1:
-            DEBUG("pm_set(): setting HIBERNATE mode.");
+            DEBUG_PUTS("pm_set(): setting HIBERNATE mode.");
             _mode = PM_SLEEPCFG_SLEEPMODE_HIBERNATE;
             deep = 1;
             break;
         case 2:
-            DEBUG("pm_set(): setting STANDBY mode.");
+            DEBUG_PUTS("pm_set(): setting STANDBY mode.");
             _mode = PM_SLEEPCFG_SLEEPMODE_STANDBY;
             deep = 1;
             break;
         default: /* Falls through */
         case 3:
-            DEBUG("pm_set(): setting IDLE2 mode.");
+            DEBUG_PUTS("pm_set(): setting IDLE2 mode.");
             _mode = PM_SLEEPCFG_SLEEPMODE_IDLE2;
             break;
     }

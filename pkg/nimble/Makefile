@@ -1,7 +1,9 @@
 PKG_NAME    = nimble
 PKG_URL     = https://github.com/apache/mynewt-nimble.git
-PKG_VERSION = fb7651b773734a075c47ff10210b92e6d55ef55b
+PKG_VERSION = 946cfb7ff27fcf3adacebcd50c159b89d854fbf2
 PKG_LICENSE = Apache-2.0
+
+include $(RIOTBASE)/pkg/pkg.mk
 
 TDIR = $(RIOTPKG)/$(PKG_NAME)
 PDIR = $(PKG_BUILDDIR)
@@ -21,7 +23,8 @@ else
   CFLAGS += -Wno-unused-but-set-variable
 endif
 
-SUBMODS := $(filter nimble_%,$(USEMODULE))
+IGNORE := nimble_autoconn_%
+SUBMODS := $(filter-out $(IGNORE),$(filter nimble_%,$(USEMODULE)))
 
 .PHONY: all
 
@@ -74,6 +77,9 @@ nimble_drivers_nrf5x:
 nimble_addr:
 	"$(MAKE)" -C $(TDIR)/addr/
 
+nimble_autoconn:
+	"$(MAKE)" -C $(TDIR)/autoconn
+
 nimble_netif:
 	"$(MAKE)" -C $(TDIR)/netif/
 
@@ -82,5 +88,3 @@ nimble_scanlist:
 
 nimble_scanner:
 	"$(MAKE)" -C $(TDIR)/scanner
-
-include $(RIOTBASE)/pkg/pkg.mk

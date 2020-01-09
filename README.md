@@ -91,7 +91,7 @@ you can use to create a network of tap interfaces.
 
 To create a bridge and two (or `count` at your option) tap interfaces:
 
-    ./dist/tools/tapsetup/tapsetup [-c [<count>]]
+    sudo ./dist/tools/tapsetup/tapsetup [-c [<count>]]
 
 ## CONTRIBUTE
 

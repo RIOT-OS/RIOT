@@ -159,7 +159,7 @@ typedef uint32_t fortuna_seed_t[FORTUNA_SEED_SIZE];
  *
  * @param[inout] state      PRNG state
  *
- * @return                  zero on succesful initialization
+ * @return                  zero on successful initialization
  * @return                  non-zero on error
  */
 int fortuna_init(fortuna_state_t *state);

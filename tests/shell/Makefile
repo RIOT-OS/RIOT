@@ -10,6 +10,7 @@ USEMODULE += ps
 RIOT_TERMINAL ?= socat
 
 DISABLE_MODULE += auto_init
+DISABLE_MODULE += test_utils_interactive_sync
 
 # chronos is missing a getchar implementation
 BOARD_BLACKLIST += chronos

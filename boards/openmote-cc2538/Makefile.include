@@ -5,7 +5,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 # Set default flash tool
-export PROGRAMMER ?= cc2538-bsl
+PROGRAMMER ?= cc2538-bsl
 
 ifeq ($(PROGRAMMER),jlink)
   # setup JLink for flashing

@@ -154,7 +154,7 @@ NORETURN static int _jump_back(lua_State *L)
 {
     jmp_buf *jump_buffer = *(jmp_buf **)lua_getextraspace(L);
 
-    /* FIXME: I dont think it's OK to print a message */
+    /* FIXME: I don't think it's OK to print a message */
     lua_writestringerror("PANIC: unprotected error in call to Lua API (%s)\n",
                          lua_tostring(L, -1));
 

@@ -61,7 +61,7 @@ def stop_udp_server(child):
 def udp_send(child, addr, port, length, num=1, delay=1000000):
     child.sendline("udp send {addr}%6 {port} {length} {num} {delay}"
                    .format(**vars()))
-    child.expect("Success: send {length} byte to \[[0-9a-f:]+\]:{port}"
+    child.expect(r"Success: send {length} byte to \[[0-9a-f:]+\]:{port}"
                  .format(**vars()))
 
 
@@ -125,13 +125,13 @@ def test_reass_successful_udp(child, iface, hw_dst, ll_dst, ll_src):
         s.sendto(bytes(i for i in range(byte_max)) * (payload_len // byte_max),
                  (ll_dst, port))
         child.expect(
-                "~~ SNIP  0 - size: {} byte, type: NETTYPE_UNDEF \(\d+\)"
+                r"~~ SNIP  0 - size: {} byte, type: NETTYPE_UNDEF \(\d+\)"
                 .format(payload_len)
             )
         # 4 snips: payload, UDP header, IPv6 header, netif header
         # (fragmentation header was removed)
         child.expect(
-                "~~ PKT    -  4 snips, total size: (\d+) byte"
+                r"~~ PKT    -  4 snips, total size: (\d+) byte"
             )
         size = int(child.match.group(1))
         # 40 = IPv6 header length; 8 = UDP header length
@@ -260,7 +260,7 @@ def _fwd_setup(child, ll_dst, g_src, g_dst):
     child.expect(r"fe80::1 dev #7 lladdr\s+-")
     # get TAP MAC address
     child.sendline("ifconfig 6")
-    child.expect("HWaddr: ([0-9A-F:]+)")
+    child.expect(r"HWaddr: ([0-9A-F:]+)\s")
     hwaddr = child.match.group(1)
     # consume MTU for later calls of `ifconfig 7`
     child.expect(r"MTU:(\d+)")
@@ -318,6 +318,7 @@ def test_ipv6_ext_frag_fwd_too_big(child, s, iface, ll_dst):
 def testfunc(child):
     tap = get_bridge(os.environ["TAP"])
 
+    child.sendline("unittests")
     child.expect(r"OK \((\d+) tests\)")     # wait for and check result of unittests
     print("." * int(child.match.group(1)), end="", flush=True)
 
@@ -337,7 +338,8 @@ def testfunc(child):
                 print("FAILED")
                 raise e
 
-    child.expect(r"Sending UDP test packets to port (\d+)")
+    child.sendline("send-test-pkt")
+    child.expect(r"Sending UDP test packets to port (\d+)\r\n")
 
     port = int(child.match.group(1))
     with socket.socket(socket.AF_INET6, socket.SOCK_DGRAM) as s:
@@ -368,7 +370,7 @@ def testfunc(child):
         # link-local address becomes valid
         time.sleep(1)
         child.sendline("ifconfig")
-        child.expect("HWaddr: (?P<hwaddr>[A-Fa-f:0-9]+)")
+        child.expect(r"HWaddr: (?P<hwaddr>[A-Fa-f:0-9]+)\s")
         hwaddr_dst = child.match.group("hwaddr").lower()
         res = child.expect([
             r"(?P<lladdr>fe80::[A-Fa-f:0-9]+)\s+scope:\s+link\s+VAL",

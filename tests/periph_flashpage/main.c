@@ -28,6 +28,14 @@
 
 #define LINE_LEN            (16)
 
+/* For MSP430 cpu's the last page holds the interrupt vector, although the api
+   should not limit erasing that page, we don't want to break when testing */
+#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
+#define TEST_LAST_AVAILABLE_PAGE    (FLASHPAGE_NUMOF - 2)
+#else
+#define TEST_LAST_AVAILABLE_PAGE    (FLASHPAGE_NUMOF - 1)
+#endif
+
 /* When writing raw bytes on flash, data must be correctly aligned. */
 #ifdef MODULE_PERIPH_FLASHPAGE_RAW
 #define ALIGNMENT_ATTR __attribute__ ((aligned (FLASHPAGE_RAW_ALIGNMENT)))
@@ -196,22 +204,33 @@ static uint32_t getaddr(const char *str)
 
 static int cmd_write_raw(int argc, char **argv)
 {
+#if (__SIZEOF_POINTER__ == 2)
+    uint16_t addr;
+#else
     uint32_t addr;
+#endif
 
     if (argc < 3) {
         printf("usage: %s <addr> <data>\n", argv[0]);
         return 1;
     }
 
+#if (__SIZEOF_POINTER__ == 2)
+    addr = (uint16_t) getaddr(argv[1]);
+#else
     addr = getaddr(argv[1]);
-
+#endif
     /* try to align */
     memcpy(raw_buf, argv[2], strlen(argv[2]));
 
     flashpage_write_raw((void*)addr, raw_buf, strlen(raw_buf));
-
+#if (__SIZEOF_POINTER__ == 2)
+    printf("wrote local data to flash address %#" PRIx16 " of len %u\n",
+           addr, strlen(raw_buf));
+#else
     printf("wrote local data to flash address %#" PRIx32 " of len %u\n",
            addr, strlen(raw_buf));
+#endif
     return 0;
 }
 #endif
@@ -313,8 +332,10 @@ static int cmd_test_last(int argc, char **argv)
             fill = 'a';
         }
     }
-
-    if (flashpage_write_and_verify((int)FLASHPAGE_NUMOF - 1, page_mem) != FLASHPAGE_OK) {
+#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
+    printf("The last page holds the ISR vector, so test page %d\n", TEST_LAST_AVAILABLE_PAGE);
+#endif
+    if (flashpage_write_and_verify(TEST_LAST_AVAILABLE_PAGE, page_mem) != FLASHPAGE_OK) {
         puts("error verifying the content of last page");
         return 1;
     }
@@ -338,14 +359,17 @@ static int cmd_test_last_raw(int argc, char **argv)
 
     /* try to align */
     memcpy(raw_buf, "test12344321tset", 16);
+#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
+    printf("The last page holds the ISR vector, so test page %d\n", TEST_LAST_AVAILABLE_PAGE);
+#endif
 
     /* erase the page first */
-    flashpage_write(((int)FLASHPAGE_NUMOF - 1), NULL);
+    flashpage_write(TEST_LAST_AVAILABLE_PAGE, NULL);
 
-    flashpage_write_raw(flashpage_addr((int)FLASHPAGE_NUMOF - 1), raw_buf, strlen(raw_buf));
+    flashpage_write_raw(flashpage_addr(TEST_LAST_AVAILABLE_PAGE), raw_buf, strlen(raw_buf));
 
     /* verify that previous write_raw effectively wrote the desired data */
-    if (memcmp(flashpage_addr((int)FLASHPAGE_NUMOF - 1), raw_buf, strlen(raw_buf)) != 0) {
+    if (memcmp(flashpage_addr(TEST_LAST_AVAILABLE_PAGE), raw_buf, strlen(raw_buf)) != 0) {
         puts("error verifying the content of last page");
         return 1;
     }

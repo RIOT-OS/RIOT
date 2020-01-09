@@ -28,7 +28,7 @@
 #include "test.h"
 
 /*
- * Foward declarations
+ * Forward declarations
  */
 static int cmd_distributions(int argc, char **argv);
 static int cmd_dump(int argc, char **argv);

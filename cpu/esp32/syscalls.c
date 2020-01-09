@@ -241,7 +241,7 @@ void heap_stats(void)
 
 #else /* MODULE_ESP_IDF_HEAP */
 
-/* for compatibiliy with ESP-IDF heap functions */
+/* for compatibility with ESP-IDF heap functions */
 void* IRAM heap_caps_malloc( size_t size, uint32_t caps )
 {
     (void)caps;
@@ -271,7 +271,7 @@ unsigned int IRAM get_free_heap_size (void)
 
 void heap_stats(void)
 {
-    printf("heap: %u (used %u free %u)\n", (unsigned)(&_eheap - &_sheap),
+    printf("heap: %u (used %u, free %u) [bytes]\n", (unsigned)(&_eheap - &_sheap),
            &_eheap - &_sheap - get_free_heap_size(), get_free_heap_size());
 }
 
@@ -386,11 +386,7 @@ uint32_t system_get_time (void)
 
 uint32_t system_get_time_ms (void)
 {
-    /* latch 64 bit timer value before read */
-    TIMER_SYSTEM.update = 0;
-    /* wait until instructions have been finished */
-    __asm__ volatile ("isync");
-    return TIMER_SYSTEM.cnt_low / USEC_PER_MSEC;
+    return system_get_time_64() / USEC_PER_MSEC;
 }
 
 uint64_t system_get_time_64 (void)
@@ -433,8 +429,8 @@ void system_wdt_init (void)
     TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;  /* disable write protection */
     TIMERG0.wdt_config0.stg0 = TIMG_WDT_STG_SEL_INT;          /* stage0 timeout: interrupt */
     TIMERG0.wdt_config0.stg1 = TIMG_WDT_STG_SEL_RESET_SYSTEM; /* stage1 timeout: sys reset */
-    TIMERG0.wdt_config0.sys_reset_length = 7;  /* sys reset signal lenght: 3.2 us */
-    TIMERG0.wdt_config0.cpu_reset_length = 7;  /* sys reset signal lenght: 3.2 us */
+    TIMERG0.wdt_config0.sys_reset_length = 7;  /* sys reset signal length: 3.2 us */
+    TIMERG0.wdt_config0.cpu_reset_length = 7;  /* sys reset signal length: 3.2 us */
     TIMERG0.wdt_config0.edge_int_en = 0;
     TIMERG0.wdt_config0.level_int_en = 1;
 

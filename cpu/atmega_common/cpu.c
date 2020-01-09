@@ -39,7 +39,7 @@
 /*
 * Since atmega MCUs do not feature a software reset, the watchdog timer
 * is being used. It will be set to the shortest time and then force a
-* reset. Therefore the MCUSR register needs to be resetted as fast as
+* reset. Therefore the MCUSR register needs to be reset as fast as
 * possible.
 * Which means in the bootloader or in the following init0 if no bootloader is used.
 * Bootloader resets watchdog and pass MCUSR in r2 (e.g. Optiboot) in order to pass
@@ -173,8 +173,8 @@ ISR(BADISR_vect)
 #if defined(CPU_ATMEGA128RFA1) || defined (CPU_ATMEGA256RFR2)
 ISR(BAT_LOW_vect, ISR_BLOCK)
 {
-    __enter_isr();
+    atmega_enter_isr();
     DEBUG("BAT_LOW\n");
-    __exit_isr();
+    atmega_exit_isr();
 }
 #endif

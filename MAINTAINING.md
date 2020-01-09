@@ -158,5 +158,5 @@ maintainers reasonable time to ACK before dismissing their review.
 [list of maintainers]: https://github.com/RIOT-OS/RIOT/wiki/Maintainers
 [Best Practices]: https://github.com/RIOT-OS/RIOT/wiki/Best-Practice-for-RIOT-Programming
 [Comparing build sizes]: https://github.com/RIOT-OS/RIOT/wiki/Comparing-build-sizes
-[Coding Conventions]: https://github.com/RIOT-OS/RIOT/wiki/Coding-conventions
+[Coding Conventions]: CODING_CONVENTIONS.md
 [Code of Conduct]: https://github.com/RIOT-OS/RIOT/blob/master/CODE_OF_CONDUCT.md

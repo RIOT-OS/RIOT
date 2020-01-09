@@ -161,7 +161,7 @@ static int _peer_get_psk_info_handler(struct dtls_context_t *ctx,
     switch (type) {
         case DTLS_PSK_IDENTITY:
             if (id_len) {
-                dtls_debug("got psk_identity_hint: '%.*s'\n", id_len, id);
+                dtls_debug("got psk_identity_hint: '%.*s'\n", (int)id_len, id);
             }
 
             if (result_length < psk_id_length) {
@@ -328,8 +328,8 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
     remote->port = (unsigned short) DTLS_DEFAULT_PORT;
 
     /* Parsing <address>[:<iface>]:Port */
-    int iface = ipv6_addr_split_iface(addr_str);
-    if (iface == -1) {
+    char *iface = ipv6_addr_split_iface(addr_str);
+    if (!iface) {
         if (gnrc_netif_numof() == 1) {
             /* assign the single interface found in gnrc_netif_numof() */
             dst->ifindex = (uint16_t)gnrc_netif_iter(NULL)->pid;
@@ -341,12 +341,13 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
         }
     }
     else {
-        if (gnrc_netif_get_by_pid(iface) == NULL) {
+        gnrc_netif_t *netif = gnrc_netif_get_by_pid(atoi(iface));
+        if (netif == NULL) {
             puts("ERROR: interface not valid");
             return new_context;
         }
-        dst->ifindex = (uint16_t)gnrc_netif_iter(NULL)->pid;
-        remote->netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
+        dst->ifindex = (uint16_t)netif->pid;
+        remote->netif = (uint16_t)netif->pid;
     }
 
     if (ipv6_addr_from_str((ipv6_addr_t *)remote->addr.ipv6, addr_str) == NULL) {

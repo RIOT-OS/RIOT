@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -45,7 +45,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#define ENABLE_DEBUG    0
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #include <stdio.h>
@@ -58,14 +58,22 @@
 #include "thread.h"
 #include "sched.h"
 
-#include "common.h"
-#include "esp/common_macros.h"
-#include "esp/xtensa_ops.h"
-#include "sdk/ets_task.h"
-#include "sdk/rom.h"
-#include "sdk/sdk.h"
+#include "esp_common.h"
+#include "irq_arch.h"
+#include "syscalls.h"
 #include "tools.h"
+
+#include "esp_attr.h"
+#include "esp/xtensa_ops.h"
+#include "rom/ets_sys.h"
 #include "xtensa/xtensa_context.h"
+
+#ifdef MCU_ESP32
+#include "soc/dport_reg.h"
+#else /* MCU_ESP32 */
+#include "esp8266/rom_functions.h"
+#include "sdk/sdk.h"
+#endif /* MCU_ESP32 */
 
 /* User exception dispatcher when exiting */
 extern void _xt_user_exit(void);
@@ -80,21 +88,29 @@ extern void _frxt_setup_switch(void);
 extern void vPortYield(void);
 extern void vPortYieldFromInt(void);
 
+#ifdef __XTENSA_CALL0_ABI__
+#define task_exit sched_task_exit
+#else /* __XTENSA_CALL0_ABI__ */
+/* forward declarations */
+NORETURN void task_exit(void);
+#endif /* __XTENSA_CALL0_ABI__ */
+
 char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size)
 {
-    /*
-     * Stack layout after task stack initialization
+    /* Stack layout after task stack initialization
      *
      *                                            +------------------------+
      *                                            |                        | TOP
      *                                            |  thread_control_block  |
-     *        stack_start + stack_size        ==> |                        |
+     *        stack_start + stack_size        ==> |                        | top_of_stack+1
      *                                            +------------------------+
      *        top_of_stack                    ==> |                        |
-     *                                            |      XT_CP_FRAME       |
+     *                                            |        XT_CP_SA        |
      *                                            |       (optional)       |
-     *        top_of_stack + 1 - XT_CP_SIZE   ==> |                        |
-     *                                            +------------------------+
+     *                                            | ...                    | ...
+     *                                            | cpstored               | XT_CPSTORED
+     *        top_of_stack + 1 - XT_CP_SIZE   ==> | cpenable               | XT_CPENABLE
+     *        (cp_state)                          +------------------------+
      *                                            |                        |
      *                                            |      XT_STK_FRAME      |
      *                                            |                        | XT_STK_...
@@ -126,39 +142,43 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     uint8_t *top_of_stack;
     uint8_t *sp;
 
-    top_of_stack = (uint8_t*)((uint32_t)stack_start + stack_size-1);
-
-    /* Clear whole stack with a known value to assist debugging */
-    #if !defined(DEVELHELP) && !defined(SCHED_TEST_STACK)
-        /* Unfortunatly, this affects thread_measure_stack_free function */
-        memset(stack_start, 0, stack_size);
-    #endif
+    top_of_stack = (uint8_t*)((uint32_t)stack_start + stack_size - 1);
 
     /* BEGIN - code from FreeRTOS port for Xtensa from Cadence */
 
     /* Create interrupt stack frame aligned to 16 byte boundary */
-    sp = (uint8_t*)(((uint32_t)(top_of_stack+1) - XT_STK_FRMSZ - XT_CP_SIZE) & ~0xf);
+    sp = (uint8_t*)(((uint32_t)(top_of_stack + 1) - XT_STK_FRMSZ - XT_CP_SIZE) & ~0xf);
+
+    /* Clear whole stack with a known value to assist debugging */
+    #if !defined(DEVELHELP) && !defined(SCHED_TEST_STACK)
+        /* Unfortunately, this affects thread_measure_stack_free function */
+        memset(stack_start, 0, stack_size);
+    #else
+        memset(sp, 0, XT_STK_FRMSZ + XT_CP_SIZE);
+    #endif
 
     /* ensure that stack is big enough */
     assert (sp > (uint8_t*)stack_start);
 
     XtExcFrame* exc_frame = (XtExcFrame*)sp;
 
-    /* Explicitly initialize certain saved registers */
+    /* Explicitly initialize certain saved registers for call0 ABI */
     exc_frame->pc   = (uint32_t)task_func;         /* task entry point */
-    exc_frame->a0   = (uint32_t)sched_task_exit;   /* task exit point (CHANGED) */
+    exc_frame->a0   = (uint32_t)task_exit;         /* task exit point*/
     exc_frame->a1   = (uint32_t)sp + XT_STK_FRMSZ; /* physical top of stack frame */
-    exc_frame->a2   = (uint32_t)arg;               /* parameters for task_func */
     exc_frame->exit = (uint32_t)_xt_user_exit;     /* user exception exit dispatcher */
 
     /* Set initial PS to int level 0, EXCM disabled ('rfe' will enable), user mode. */
     /* Also set entry point argument parameter. */
     #ifdef __XTENSA_CALL0_ABI__
-    /* CALL0 ABI */
+    /* for CALL0 ABI set in parameter a2 to task argument */
     exc_frame->ps = PS_UM | PS_EXCM;
+    exc_frame->a2 = (uint32_t)arg;                 /* parameters for task_func */
     #else
-    /* + for windowed ABI also set WOE and CALLINC (pretend task was 'call4'd). */
+    /* for windowed ABI also set WOE and CALLINC (pretend task was 'call4'd). */
     exc_frame->ps = PS_UM | PS_EXCM | PS_WOE | PS_CALLINC(1);
+    exc_frame->a4 = (uint32_t)task_exit;         /* task exit point*/
+    exc_frame->a6 = (uint32_t)arg;               /* parameters for task_func */
     #endif
 
     #ifdef XT_USE_SWPRI
@@ -174,7 +194,7 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
      */
     uint32_t *p;
 
-    p = (uint32_t *)(((uint32_t) pxTopOfStack - XT_CP_SIZE));
+    p = (uint32_t *)(((uint32_t)(top_of_stack + 1) - XT_CP_SIZE));
     p[0] = 0;
     p[1] = 0;
     p[2] = (((uint32_t) p) + 12 + XCHAL_TOTAL_SA_ALIGN - 1) & -XCHAL_TOTAL_SA_ALIGN;
@@ -188,53 +208,96 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     return (char*)sp;
 }
 
-
-unsigned sched_interrupt_nesting = 0;  /* Interrupt nesting level */
-
-#ifdef CONTEXT_SWITCH_BY_INT
-/**
- * Context switches are realized using software interrupts
- */
-void IRAM thread_yield_isr(void* arg)
-{
-    /* set the context switch flag (indicates that context has to be switched
-       is switch on exit from interrupt in _frxt_int_exit */
-    _frxt_setup_switch();
-}
+#ifdef MCU_ESP8266
+extern int MacIsrSigPostDefHdl(void);
+unsigned int ets_soft_int_type = ETS_SOFT_INT_NONE;
 #endif
 
-void  thread_yield_higher(void)
+/**
+ * Context switches are realized using software interrupts since interrupt
+ * entry and exit functions are the only way to save and restore complete
+ * context including spilling the register windows to the stack
+ */
+void IRAM_ATTR thread_yield_isr(void* arg)
+{
+#ifdef MCU_ESP8266
+    ETS_NMI_LOCK();
+
+    if (ets_soft_int_type == ETS_SOFT_INT_HDL_MAC) {
+        ets_soft_int_type = MacIsrSigPostDefHdl() ? ETS_SOFT_INT_YIELD
+                                                  : ETS_SOFT_INT_NONE;
+    }
+
+    if (ets_soft_int_type == ETS_SOFT_INT_YIELD) {
+        /*
+         * set the context switch flag (indicates that context has to be
+         * switched on exit from interrupt in _frxt_int_exit
+         */
+        ets_soft_int_type = ETS_SOFT_INT_NONE;
+        _frxt_setup_switch();
+    }
+
+    ETS_NMI_UNLOCK();
+#else
+    /* clear the interrupt first */
+    DPORT_WRITE_PERI_REG(DPORT_CPU_INTR_FROM_CPU_0_REG, 0);
+    /* set the context switch flag (indicates that context has to be switched
+       is switch on exit from interrupt in _frxt_int_exit */
+
+    _frxt_setup_switch();
+#endif
+}
+
+/**
+ * If we are already in an interrupt handler, the function simply sets the
+ * context switch flag, which indicates that the context has to be switched
+ * in the _frxt_int_exit function when exiting the interrupt. Otherwise, we
+ * will generate a software interrupt to force the context switch when
+ * terminating the software interrupt (see thread_yield_isr).
+ */
+void IRAM_ATTR thread_yield_higher(void)
 {
     /* reset hardware watchdog */
-    system_soft_wdt_feed();
+    system_wdt_feed();
 
     /* yield next task */
     #if defined(ENABLE_DEBUG) && defined(DEVELHELP)
     if (sched_active_thread) {
-        DEBUG("%u old task %u %s %u\n", phy_get_mactime(),
+        DEBUG("%u old task %u %s %u\n", system_get_time(),
                sched_active_thread->pid, sched_active_thread->name,
                sched_active_thread->sp - sched_active_thread-> stack_start);
     }
     #endif
-
     if (!irq_is_in()) {
-        #ifdef CONTEXT_SWITCH_BY_INT
+#ifdef MCU_ESP32
+        /* generate the software interrupt to switch the context */
+        DPORT_WRITE_PERI_REG(DPORT_CPU_INTR_FROM_CPU_0_REG, DPORT_CPU_INTR_FROM_CPU_0);
+#else /* MCU_ESP32 */
+        critical_enter();
+        ets_soft_int_type = ETS_SOFT_INT_YIELD;
         WSR(BIT(ETS_SOFT_INUM), interrupt);
-        #else
-        vPortYield();
-        #endif
+        critical_exit();
+#endif /* MCU_ESP32 */
     }
     else {
+        /* set the context switch flag */
         _frxt_setup_switch();
     }
 
     #if defined(ENABLE_DEBUG) && defined(DEVELHELP)
     if (sched_active_thread) {
-        DEBUG("%u new task %u %s %u\n", phy_get_mactime(),
+        DEBUG("%u new task %u %s %u\n", system_get_time(),
                sched_active_thread->pid, sched_active_thread->name,
                sched_active_thread->sp - sched_active_thread-> stack_start);
     }
     #endif
+
+    /*
+     * Instruction fetch synchronize: Waits for all previously fetched load,
+     * store, cache, and special register write instructions that affect
+     * instruction fetch to be performed before fetching the next instruction.
+     */
+    __asm__("isync");
 
     return;
 }
@@ -265,7 +328,7 @@ void  thread_print_stack(void)
     return;
 }
 
-#if defined(DEVELHELP)
+#ifdef DEVELHELP
 
 extern uint8_t port_IntStack;
 extern uint8_t port_IntStackTop;
@@ -273,9 +336,14 @@ extern uint8_t port_IntStackTop;
 void thread_isr_stack_init(void)
 {
     /* code from thread.c, please see the copyright notice there */
+#ifdef MCU_ESP32
+    #define sp (&port_IntStackTop)
+#else /* MCU_ESP32 */
+    register uint32_t *sp __asm__ ("a1");
+#endif /* MCU_ESP32 */
 
     /* assign each int of the stack the value of it's address */
-    uintptr_t *stackmax = (uintptr_t *)&port_IntStackTop;
+    uintptr_t *stackmax = (uintptr_t *)sp;
     uintptr_t *stackp = (uintptr_t *)&port_IntStack;
 
     while (stackp < stackmax) {
@@ -314,10 +382,71 @@ void thread_isr_stack_init(void) {}
 
 #endif /* DEVELHELP */
 
+#ifndef __XTENSA_CALL0_ABI__
+static bool _initial_exit = true;
+#endif /* __XTENSA_CALL0_ABI__ */
+
 NORETURN void cpu_switch_context_exit(void)
 {
-    /* Switch context to the highest priority ready task without context save */
-    _frxt_dispatch();
+    DEBUG("%s\n", __func__);
 
+    /* Switch context to the highest priority ready task without context save */
+#ifdef __XTENSA_CALL0_ABI__
+    _frxt_dispatch();
+#else /* __XTENSA_CALL0_ABI__ */
+    if (_initial_exit) {
+        _initial_exit = false;
+        __asm__ volatile ("call0 _frxt_dispatch");
+    }
+    else {
+        task_exit();
+    }
+#endif /* __XTENSA_CALL0_ABI__ */
     UNREACHABLE();
 }
+
+#ifndef __XTENSA_CALL0_ABI__
+/**
+ * The function is used on task exit to switch to the context to the next
+ * running task. It realizes only the second half of a complete context by
+ * simulating the exit from an interrupt handling where a context switch is
+ * forced. The old context is not saved here since it is no longer needed.
+ */
+NORETURN void task_exit(void)
+{
+    DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n",
+          sched_active_thread ? sched_active_thread->pid : KERNEL_PID_UNDEF);
+
+    (void) irq_disable();
+
+    /* remove old task from scheduling if it is not already done */
+    if (sched_active_thread) {
+        sched_threads[sched_active_pid] = NULL;
+        sched_num_threads--;
+        sched_set_status((thread_t *)sched_active_thread, STATUS_STOPPED);
+        sched_active_thread = NULL;
+    }
+
+    /* determine the new running task */
+    sched_run();
+
+    /* set the context switch flag (indicates that context has to be switched
+       is switch on exit from interrupt in _frxt_int_exit */
+    _frxt_setup_switch();
+
+    /* set interrupt nesting level to the right value */
+    irq_interrupt_nesting++;
+
+    /* reset windowed registers */
+    __asm__ volatile ("movi a2, 0\n"
+                      "wsr a2, windowstart\n"
+                      "wsr a2, windowbase\n"
+                      "rsync\n");
+
+    /* exit from simulated interrupt to switch to the new context */
+    __asm__ volatile ("call0 _frxt_int_exit");
+
+    /* should not be executed */
+    UNREACHABLE();
+}
+#endif /* __XTENSA_CALL0_ABI__ */

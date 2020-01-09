@@ -57,6 +57,16 @@ static inline void cpu_print_last_instruction(void)
     printf("%p\n", (void*) lr_ptr);
 }
 
+/**
+ * @brief   Returns true if the CPU woke from Deep Sleep
+ */
+bool cpu_woke_from_backup(void);
+
+/**
+ * @brief   The CPU has RAM that is retained in the deepest sleep mode.
+ */
+#define CPU_HAS_BACKUP_RAM  (1)
+
 #ifdef __cplusplus
 }
 #endif

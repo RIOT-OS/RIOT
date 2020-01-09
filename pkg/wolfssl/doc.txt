@@ -68,7 +68,7 @@
  * FEATURES:
  *
  * Because wolfSSL was designed with embedded systems in mind the library is
- * extremely modular. There are very few dependancies in wolfSSL Cryptographic
+ * extremely modular. There are very few dependencies in wolfSSL Cryptographic
  * library and we have chosen to setup the pkg makefile to allow for easy
  * modification by developers. We chose to include the core of our library in a
  * singular list and then separate out the features that a developer may or may

@@ -53,13 +53,13 @@ extern "C" {
 #define ENC28J60_PARAM_SPI      SPI_DEV(0)  /**< SPI_DEV(0) is used (fixed) */
 
 #ifndef ENC28J60_PARAM_CS
-#define ENC28J60_PARAM_CS       GPIO4       /**< ENC28J60 CS signal (can be overriden) */
+#define ENC28J60_PARAM_CS       GPIO4       /**< ENC28J60 CS signal (can be overridden) */
 #endif
 #ifndef ENC28J60_PARAM_INT
-#define ENC28J60_PARAM_INT      GPIO9       /**< ENC28J60 INT signal (can be overriden) */
+#define ENC28J60_PARAM_INT      GPIO9       /**< ENC28J60 INT signal (can be overridden) */
 #endif
 #ifndef ENC28J60_PARAM_RESET
-#define ENC28J60_PARAM_RESET    GPIO10      /**< ENC28J60 RESET signal (can be overriden) */
+#define ENC28J60_PARAM_RESET    GPIO10      /**< ENC28J60 RESET signal (can be overridden) */
 #endif
 /** @} */
 #endif /* defined(MODULE_ENC28J60) || defined(DOXYGEN) */
@@ -82,16 +82,16 @@ extern "C" {
 #define MRF24J40_PARAM_SPI      SPI_DEV(0)      /**< SPI_DEV(0) is used (fixed) */
 
 #ifndef MRF24J40_PARAM_SPI_CLK
-#define MRF24J40_PARAM_SPI_CLK  SPI_CLK_1MHZ    /**< SPI bus speed used (can be overriden) */
+#define MRF24J40_PARAM_SPI_CLK  SPI_CLK_1MHZ    /**< SPI bus speed used (can be overridden) */
 #endif
 #ifndef MRF24J40_PARAM_CS
-#define MRF24J40_PARAM_CS       GPIO16          /**< MRF24J40 CS signal (can be overriden) */
+#define MRF24J40_PARAM_CS       GPIO16          /**< MRF24J40 CS signal (can be overridden) */
 #endif
 #ifndef MRF24J40_PARAM_INT
-#define MRF24J40_PARAM_INT      GPIO0           /**< MRF24J40 INT signal (can be overriden) */
+#define MRF24J40_PARAM_INT      GPIO0           /**< MRF24J40 INT signal (can be overridden) */
 #endif
 #ifndef MRF24J40_PARAM_RESET
-#define MRF24J40_PARAM_RESET    GPIO2           /**< MRF24J40 RESET signal (can be overriden) */
+#define MRF24J40_PARAM_RESET    GPIO2           /**< MRF24J40 RESET signal (can be overridden) */
 #endif
 /** @} */
 #endif /* defined(MODULE_MRF24J40) || defined(DOXYGEN) */
@@ -109,14 +109,14 @@ extern "C" {
  * If not defined, the default CS signal of SPI_DEV(0) is used.
  * @{
  */
-#define SDCARD_SPI_PARAM_SPI    SPI_DEV(0)      /**< SPI_DEV(0) is used (fixed) */
-#define SDCARD_SPI_PARAM_CLK    SPI0_SCK_GPIO   /**< SPI_DEV(0) SCK  is used (fixed) */
-#define SDCARD_SPI_PARAM_MOSI   SPI0_MOSI_GPIO  /**< SPI_DEV(0) MOSI is used (fixed) */
-#define SDCARD_SPI_PARAM_MISO   SPI0_MISO_GPIO  /**< SPI_DEV(0) MISO is used (fixed) */
-#define SDCARD_SPI_PARAM_POWER  GPIO_UNDEF      /**< power control is not used (fixed) */
+#define SDCARD_SPI_PARAM_SPI    SPI_DEV(0)  /**< SPI_DEV(0) is used (fixed) */
+#define SDCARD_SPI_PARAM_CLK    SPI0_SCK    /**< SPI_DEV(0) SCK  is used (fixed) */
+#define SDCARD_SPI_PARAM_MOSI   SPI0_MOSI   /**< SPI_DEV(0) MOSI is used (fixed) */
+#define SDCARD_SPI_PARAM_MISO   SPI0_MISO   /**< SPI_DEV(0) MISO is used (fixed) */
+#define SDCARD_SPI_PARAM_POWER  GPIO_UNDEF  /**< power control is not used (fixed) */
 
 #ifndef SDCARD_SPI_PARAM_CS
-#define SDCARD_SPI_PARAM_CS     SPI0_CS0_GPIO   /**< SD-Card CS signal (can be overridden) */
+#define SDCARD_SPI_PARAM_CS     SPI0_CS0    /**< SD-Card CS signal (can be overridden) */
 #endif
 /** @} */
 #endif /* defined(MODULE_SDCARD_SPI) || defined(DOXYGEN) */

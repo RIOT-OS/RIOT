@@ -1,3 +1,7 @@
+# See doc.txt on nRF antenna selection
+BOARD_NRFANTENNA_DEFAULT ?= BUILTIN
+CFLAGS += -DBOARD_NRFANTENNA_DEFAULT=BOARD_NRFANTENNA_$(BOARD_NRFANTENNA_DEFAULT)
+
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))

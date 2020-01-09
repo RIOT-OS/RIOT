@@ -62,8 +62,8 @@
 #define TEST_STR2EP_INVALID         "[2001:db8:a:b:c:d:e:f:1]"
 #define TEST_STR2EP_INVALID2        "[2001:db8:a:b:c:d:e:f]:66000"
 
-static char addr[SOCK_URLPATH_MAXLEN];
-static char urlpath[SOCK_URLPATH_MAXLEN];
+static char addr[CONFIG_SOCK_URLPATH_MAXLEN];
+static char urlpath[CONFIG_SOCK_URLPATH_MAXLEN];
 
 
 static void setup(void)

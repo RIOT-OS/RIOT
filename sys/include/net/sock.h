@@ -115,6 +115,23 @@ extern "C" {
  * @{
  */
 #define SOCK_HAS_IPV6       /**< activate IPv6 support */
+/**
+ * @brief   activate asynchronous event functionality
+ *
+ * @see @ref net_sock_async
+ */
+#define SOCK_HAS_ASYNC
+/**
+ * @brief   Activate context for asynchronous events
+ *
+ * @see @ref net_sock_async
+ *
+ * This can be used if an asynchronous mechanism needs context (e.g. an
+ * event instance for an event loop). An event handling implementation then
+ * needs to provide a `sock_async_ctx.h` header file containing a definition
+ * for the `sock_async_ctx_t` type.
+ */
+#define SOCK_HAS_ASYNC_CTX
 /** @} */
 #endif
 
@@ -130,7 +147,7 @@ extern "C" {
 
 /**
  * @brief   Special netif ID for "any interface"
- * @todo    Use an equivalent defintion from PR #5511
+ * @todo    Use an equivalent definition from PR #5511
  */
 #define SOCK_ADDR_ANY_NETIF (0)
 

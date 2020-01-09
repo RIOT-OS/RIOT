@@ -3,8 +3,12 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-leonardo \
     arduino-nano \
     arduino-uno \
+    atmega1284p \
+    atmega256rfr2-xpro \
     atmega328p \
     chronos \
+    derfmega128 \
+    derfmega256 \
     mega-xplained \
     microduino-corerf \
     msb-430 \

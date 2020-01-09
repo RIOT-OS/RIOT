@@ -117,7 +117,7 @@ typedef struct {
     *   This value indicates what is stored in `data` of this table
     */
     uint8_t table_type;
-    /** the maximim number of entries in this FIB table */
+    /** the maximum number of entries in this FIB table */
     size_t size;
     /** table access mutex to grant exclusive operations on calls */
     mutex_t mtx_access;

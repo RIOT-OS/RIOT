@@ -114,7 +114,7 @@ RTC is clocked by a 32.768 kHz clock.
 
 Please note the manual of your MCU or SiP for the clock setting for the RTC
 module. After initialization Time Seconds Register (TSR) increments once a
-second. The TSR (also TAR) value will be converted to the stuct tm and back
+second. The TSR (also TAR) value will be converted to the struct tm and back
 with the help of stdlib functions that are defined in time.h. The driver
 supports alarm, it is stored in the Time Alarm Registers (TAR) and the unit is
 seconds.

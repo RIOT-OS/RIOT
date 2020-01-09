@@ -7,6 +7,7 @@ BOARDS_TIMER_25kHz := \
     arduino-leonardo \
     arduino-mega2560 \
     arduino-uno \
+    atmega256rfr2-xpro \
     atmega328p \
     waspmote-pro \
     #
@@ -15,6 +16,8 @@ BOARDS_TIMER_32kHz := \
     hifive1 \
     hifive1b \
     %-kw41z \
+    frdm-k64f \
+    frdm-k22f \
     #
 
 ifneq (,$(filter $(BOARDS_TIMER_25kHz),$(BOARD)))

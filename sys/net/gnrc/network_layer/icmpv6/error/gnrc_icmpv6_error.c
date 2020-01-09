@@ -32,7 +32,7 @@
 /**
  * @brief   Get packet fit.
  *
- * Get's the minimum size for an ICMPv6 error message packet, based on the
+ * Gets the minimum size for an ICMPv6 error message packet, based on the
  * invoking packet's size and the interface the invoking packet came over.
  *
  * @param[in] orig_pkt  The invoking packet

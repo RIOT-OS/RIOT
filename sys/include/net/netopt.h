@@ -38,6 +38,15 @@ extern "C" {
 #define NETOPT_MAX_PACKET_SIZE NETOPT_MAX_PDU_SIZE
 
 /**
+ * @brief       A deprecated alias for @ref NETOPT_LINK
+ *
+ * @deprecated  Please use @ref NETOPT_LINK instead of
+ *              `NETOPT_LINK_CONNECTED`. It will be removed after the
+ *              2020.07 release at the latest.
+ */
+#define NETOPT_LINK_CONNECTED NETOPT_LINK
+
+/**
  * @brief   Global list of configuration options available throughout the
  *          network stack, e.g. by netdev and netapi
  *
@@ -286,16 +295,13 @@ typedef enum {
     NETOPT_AUTOCCA,
 
     /**
-     * @brief (@ref netopt_enable_t) Phy link status.
+     * @brief (@ref netopt_enable_t) network interface link status.
      *
-     * Returns NETOPT_ENABLE when the the link of the interface is up,
-     * NETOPT_DISABLE when the link is down. If the interface is wireless or
-     * doesn't support link status detection this function will return
-     * -ENOTSUP.
+     * This option is used to set or check the link status (up or down).
      *
-     * @note Setting this option will always return -ENOTSUP.
+     * @note On error this option should return a negative number.
      */
-    NETOPT_LINK_CONNECTED,
+    NETOPT_LINK,
 
     /**
      * @brief   (@ref netopt_enable_t) CSMA/CA support
@@ -362,7 +368,7 @@ typedef enum {
     NETOPT_DEVICE_TYPE,
 
     /**
-     * @brief   (uint8_t) channel page as defined by IEEE 802.15.4
+     * @brief   (uint16_t) channel page as defined by IEEE 802.15.4
      */
     NETOPT_CHANNEL_PAGE,
 
@@ -663,6 +669,29 @@ typedef enum {
     NETOPT_RX_SYMBOL_TIMEOUT,
 
     /* add more options if needed */
+
+    /**
+     * @brief (@ref netopt_enable_t) Enable or disable OTAA activation (LoRaWAN)
+     */
+    NETOPT_OTAA,
+
+     /**
+     * @brief (uint8_t) Get the demodulation margin of the last Link Check request.
+     */
+    NETOPT_DEMOD_MARGIN,
+
+    /**
+     * @brief (uint8_t) Get the number of gateways of the last Link Check request.
+     */
+    NETOPT_NUM_GATEWAYS,
+
+    /**
+     * @brief (@ref netopt_enable_t) Perform a Link Check request (LoRaWAN)
+     *
+     * When set, the next transmission will request a Link Check and will
+     * be received on the next downlink
+     */
+    NETOPT_LINK_CHECK,
 
     /**
      * @brief   maximum number of options defined here.

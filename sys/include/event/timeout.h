@@ -12,7 +12,7 @@
  * @ingroup     sys_event
  * @brief       Provides functionality to trigger events after timeout
  *
- * event_timeout intentionally does't extend event structures in order to
+ * event_timeout intentionally doesn't extend event structures in order to
  * support events that are integrated in larger structs intrusively.
  *
  * Example:

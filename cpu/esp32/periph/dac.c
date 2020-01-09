@@ -26,7 +26,6 @@
 #include "adc_ctrl.h"
 #include "esp_common.h"
 #include "gpio_arch.h"
-#include "rom/ets_sys.h"
 #include "soc/rtc_io_struct.h"
 #include "soc/rtc_cntl_struct.h"
 #include "soc/sens_reg.h"
@@ -62,7 +61,7 @@ int8_t dac_init (dac_t line)
     uint8_t rtcio = _gpio_rtcio_map[dac_channels[line]];
     uint8_t idx;
 
-    /* try to initialize the pin as DAC ouput */
+    /* try to initialize the pin as DAC output */
     if (gpio_get_pin_usage(_adc_hw[rtcio].gpio) != _GPIO) {
         LOG_TAG_ERROR("dac", "GPIO%d is used for %s and cannot be used as "
                       "DAC output\n", _adc_hw[rtcio].gpio,
@@ -136,11 +135,11 @@ static bool _dac_conf_check(void)
 
 void dac_print_config(void)
 {
-    ets_printf("\tDAC\t\tpins=[ ");
+    printf("\tDAC\t\tpins=[ ");
 #if defined(DAC_GPIOS)
     for (unsigned i = 0; i < DAC_NUMOF; i++) {
-        ets_printf("%d ", dac_channels[i]);
+        printf("%d ", dac_channels[i]);
     }
 #endif /* defined(DAC_GPIOS) */
-    ets_printf("]\n");
+    printf("]\n");
 }

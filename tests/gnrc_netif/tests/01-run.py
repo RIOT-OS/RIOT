@@ -86,7 +86,7 @@ def testfunc(child):
     child.expect("flags: 0x0")
     child.expect("src_l2addr: 3E:E6:B5:22:FD:0B")
     child.expect("dst_l2addr: 3E:E6:B5:22:FD:0A")
-    child.expect("~~ PKT    -  2 snips, total size:  \d+ byte")
+    child.expect(r"~~ PKT    -  2 snips, total size:  \d+ byte")
     # test_netapi_recv__empty_ieee802154_payload
     child.expect(r"pktdump dumping IEEE 802\.15\.4 packet with empty payload")
     child.expect("PKTDUMP: data received:")
@@ -97,7 +97,7 @@ def testfunc(child):
     child.expect("flags: 0x0")
     child.expect("src_l2addr: 3E:E6:B5:0F:19:22:FD:0B")
     child.expect("dst_l2addr: 3E:E6:B5:0F:19:22:FD:0A")
-    child.expect("~~ PKT    -  2 snips, total size:  \d+ byte")
+    child.expect(r"~~ PKT    -  2 snips, total size:  \d+ byte")
     # test_netapi_recv__raw_ethernet_payload
     child.expect("pktdump dumping Ethernet packet with payload 12 34 45 56")
     child.expect("PKTDUMP: data received:")
@@ -109,7 +109,7 @@ def testfunc(child):
     child.expect("flags: 0x0")
     child.expect("src_l2addr: 3E:E6:B5:22:FD:0B")
     child.expect("dst_l2addr: 3E:E6:B5:22:FD:0A")
-    child.expect("~~ PKT    -  2 snips, total size:  \d+ byte")
+    child.expect(r"~~ PKT    -  2 snips, total size:  \d+ byte")
     # test_netapi_recv__raw_ieee802154_payload
     child.expect(r"pktdump dumping IEEE 802\.15\.4 packet with payload 12 34 45 56")
     child.expect("PKTDUMP: data received:")
@@ -121,7 +121,7 @@ def testfunc(child):
     child.expect("flags: 0x0")
     child.expect("src_l2addr: 3E:E6:B5:0F:19:22:FD:0B")
     child.expect("dst_l2addr: 3E:E6:B5:0F:19:22:FD:0A")
-    child.expect("~~ PKT    -  2 snips, total size:  \d+ byte")
+    child.expect(r"~~ PKT    -  2 snips, total size:  \d+ byte")
     # test_netapi_recv__ipv6_ethernet_payload
     child.expect("pktdump dumping IPv6 over Ethernet packet with payload 01")
     child.expect("PKTDUMP: data received:")
@@ -139,7 +139,7 @@ def testfunc(child):
     child.expect("flags: 0x0")
     child.expect("src_l2addr: 3E:E6:B5:22:FD:0B")
     child.expect("dst_l2addr: 3E:E6:B5:22:FD:0A")
-    child.expect("~~ PKT    -  2 snips, total size:  \d+ byte")
+    child.expect(r"~~ PKT    -  2 snips, total size:  \d+ byte")
 
 
 if __name__ == "__main__":

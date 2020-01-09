@@ -490,7 +490,7 @@ int _tftp_server(tftp_context_t *ctxt)
                 break;
             }
             else {
-                /* continue normal server opration */
+                /* continue normal server operation */
                 DEBUG("tftp: message incoming\n");
                 ret = _tftp_state_processes(ctxt, &msg);
 
@@ -576,7 +576,7 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
         return _tftp_send_start(ctxt, outbuf);
     }
     else if (m->type == TFTP_TIMEOUT_MSG) {
-        DEBUG("tftp: timeout occured\n");
+        DEBUG("tftp: timeout occurred\n");
         if (++(ctxt->retries) > GNRC_TFTP_MAX_RETRIES) {
             /* transfer failed due to lost peer */
             DEBUG("tftp: peer lost\n");

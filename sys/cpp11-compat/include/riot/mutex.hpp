@@ -33,7 +33,7 @@
 namespace riot {
 
 /**
- * @brief C++11 complient implementation of mutex, uses the time point
+ * @brief C++11 compliant implementation of mutex, uses the time point
  *              implemented in our chrono replacement instead of the specified
  *              one
  * @see   <a href="http://en.cppreference.com/w/cpp/thread/mutex">
@@ -104,7 +104,7 @@ constexpr try_to_lock_t try_to_lock = try_to_lock_t();
 constexpr adopt_lock_t adopt_lock = adopt_lock_t();
 
 /**
- * @brief C++11 complient implementation of unique lock
+ * @brief C++11 compliant implementation of unique lock
  * @see   <a href="http://en.cppreference.com/w/cpp/thread/lock_guard">
  *          std::lock_guard
  *        </a>
@@ -133,7 +133,7 @@ private:
 };
 
 /**
- * @brief C++11 complient implementation of unique lock
+ * @brief C++11 compliant implementation of unique lock
  * @see   <a href="http://en.cppreference.com/w/cpp/thread/unique_lock">
  *          std::unique_lock
  *        </a>

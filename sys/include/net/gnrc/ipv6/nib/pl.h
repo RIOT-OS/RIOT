@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief   Prefix list defintions
+ * @brief   Prefix list definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */

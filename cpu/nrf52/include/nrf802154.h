@@ -17,7 +17,7 @@
  * - NETDEV_EVENT_RX_COMPLETE
  * - NETDEV_EVENT_TX_COMPLETE
  *
- * Transmission options not yet impemented:
+ * Transmission options not yet implemented:
  * - Send acknowledgement for packages
  * - Request acknowledgement
  * - Retransmit unacked packages

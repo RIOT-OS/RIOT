@@ -528,7 +528,7 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
             assert(max_len == sizeof(gnrc_nettype_t));
             *((gnrc_nettype_t *)val) = CC110X_DEFAULT_PROTOCOL;
             return sizeof(gnrc_nettype_t);
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             assert(max_len == sizeof(uint16_t));
             *((uint16_t *)val) = CC110X_MAX_FRAME_SIZE - sizeof(cc1xxx_l2hdr_t);
             return sizeof(uint16_t);

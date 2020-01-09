@@ -59,7 +59,7 @@
 #define SPI_CLK                     SPI_CLK_10MHZ
 
 /**
- * @brief   The devices build-in buffer size
+ * @brief   The devices built-in buffer size
  *
  * This is a shared buffer that is freely configurable to be used for TX and RX
  */
@@ -250,7 +250,7 @@ static void mac_set(enc28j60_t *dev, uint8_t *mac)
 
 static void on_int(void *arg)
 {
-    /* disable gobal interupt enable bit to avoid loosing interupts */
+    /* disable global interrupt enable bit to avoid losing interrupts */
     cmd_bfc((enc28j60_t *)arg, REG_EIE, -1, EIE_INTIE);
 
     netdev_t *netdev = (netdev_t *)arg;
@@ -310,7 +310,7 @@ static int nd_send(netdev_t *netdev, const iolist_t *iolist)
  * Section 14 of errata sheet: Even values in ERXRDPT may corrupt receive
  * buffer as well as the next packet pointer. ERXRDPT need to be set always
  * at odd addresses. Following macros determine odd ERXRDPT from next packet
- * pointer and vise versa. Next packet pointer is always at even address
+ * pointer and vice versa. Next packet pointer is always at even address
  * because of hardware padding.
  */
 #define NEXT_TO_ERXRDPT(n) ((n == BUF_RX_START || n - 1 > BUF_RX_END) ? BUF_RX_END : n - 1)
@@ -331,7 +331,7 @@ static int nd_recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
     cmd_w_addr(dev, ADDR_READ_PTR, ERXRDPT_TO_NEXT(rx_rd_ptr));
     /* read packet header */
     cmd_rbm(dev, head, 6);
-    /* TODO: care for endianess */
+    /* TODO: care for endianness */
     next = (uint16_t)((head[1] << 8) | head[0]);
     size = (uint16_t)((head[3] << 8) | head[2]) - 4;  /* discard CRC */
 
@@ -493,7 +493,7 @@ static void nd_isr(netdev_t *netdev)
         }
         eir = cmd_rcr(dev, REG_EIR, -1);
     }
-    /* enable gobal interupt enable bit again */
+    /* enable global interrupt enable bit again */
     cmd_bfs(dev, REG_EIE, -1, EIE_INTIE);
 }
 

@@ -10,6 +10,8 @@
 
 #ifndef DOXYGEN
 
+#ifdef MODULE_XTIMER
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -102,5 +104,7 @@ BaseType_t xTimerStop  (TimerHandle_t xTimer, TickType_t xBlockTime)
 
     return pdTRUE;
 }
+
+#endif /* MODULE_XTIMER */
 
 #endif /* DOXYGEN */

@@ -28,7 +28,7 @@ extern "C" {
  * @brief   Result divisor (1.2 times 65535)
  *
  * The 16-bit RAW results have to be divided by 1.2. We do this by using fixed
- * floating point arithmetics by multiplying divisor and RAW value by 65535 (
+ * floating point arithmetic by multiplying divisor and RAW value by 65535 (
  * uint16_t max).
  */
 #define RES_DIV                 (78642)

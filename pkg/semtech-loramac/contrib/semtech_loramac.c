@@ -668,7 +668,7 @@ void *_semtech_loramac_event_loop(void *arg)
                                 mac->link_chk.demod_margin = confirm->DemodMargin;
                                 mac->link_chk.nb_gateways = confirm->NbGateways;
                                 DEBUG("[semtech-loramac] link check info received:\n"
-                                      "  - Demodulation marging: %d\n"
+                                      "  - Demodulation margin: %d\n"
                                       "  - Number of gateways: %d\n",
                                       mac->link_chk.demod_margin,
                                       mac->link_chk.nb_gateways);

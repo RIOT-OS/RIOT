@@ -67,7 +67,7 @@ extern "C" {
 #define OPENTHREAD_ERROR_NO_EMPTY_SERIAL_BUFFER             -1
 /** @brief   serial buffer ready to use */
 #define OPENTHREAD_SERIAL_BUFFER_STATUS_FREE                (0x0001)
-/** @brief   serial buffer ready for processsing */
+/** @brief   serial buffer ready for processing */
 #define OPENTHREAD_SERIAL_BUFFER_STATUS_READY_TO_PROCESS    (0x0002)
 /** @brief   serial buffer payload full */
 #define OPENTHREAD_SERIAL_BUFFER_STATUS_FULL                (0x0004)

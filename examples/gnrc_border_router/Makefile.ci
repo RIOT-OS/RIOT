@@ -5,6 +5,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mega2560 \
     arduino-nano \
     arduino-uno \
+    atmega1284p \
     atmega328p \
     b-l072z-lrwan1 \
     blackpill \
@@ -12,8 +13,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill \
     bluepill-128kib \
     calliope-mini \
+    cc1352-launchpad \
     cc2650-launchpad \
     cc2650stk \
+    derfmega128 \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \

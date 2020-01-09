@@ -66,11 +66,11 @@
  * handler places the interrupt event in an pending interrupt queue.
  *
  * Each interrupt event can be registered on the handler only once. That is,
- * if the same interrupt occurs multiple times, only its first occurence is
+ * if the same interrupt occurs multiple times, only its first occurrence is
  * placed to the pending interrupt queue and is handled.
  *
  * When the interrupt handler thread gets the CPU, it processes all pending
- * interrupt events in the order of their occurence before it yields.
+ * interrupt events in the order of their occurrence before it yields.
  *
  * ## Usage
  *
@@ -218,7 +218,7 @@ typedef struct {
  * structures. For the initialization of static interrupt event structures
  * use #IRQ_EVENT_INIT instead.
  *
- * @param[out]  irq     Pre-allocated #irq_event_t sturcture, must not be NULL
+ * @param[out]  irq     Pre-allocated #irq_event_t structure, must not be NULL
  */
 
 static inline void irq_event_init(irq_event_t *irq)
@@ -236,7 +236,7 @@ static inline void irq_event_init(irq_event_t *irq)
  *
  * Each interrupt event can be added only once to the pending interrupt queue.
  * That is, if the same interrupt occurs multiple times, only its first
- * occurence is placed to the pending interrupt queue and is handled.
+ * occurrence is placed to the pending interrupt queue and is handled.
  *
  * @param[in]   irq     Preallocated interrupt event
  *

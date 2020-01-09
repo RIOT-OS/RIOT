@@ -167,7 +167,7 @@ kernel_pid_t isotp_init(char *stack, int stacksize, char priority, const char *n
  * @param flags           flags for sending
  *
  * @return the number of bytes sent
- * @return < 0 if an error occured  (-EBUSY, -ENOMEM)
+ * @return < 0 if an error occurred  (-EBUSY, -ENOMEM)
  */
 int isotp_send(struct isotp *isotp, const void *buf, int len, int flags);
 
@@ -195,7 +195,7 @@ int isotp_bind(struct isotp *isotp, can_reg_entry_t *entry, void *arg,
  * Unset the filter on the DLL and remove the channel from the list
  * of bound channels
  *
- * @param isotp           the channel to relase
+ * @param isotp           the channel to release
  *
  * @return 0 on success, < 0 on error
  */

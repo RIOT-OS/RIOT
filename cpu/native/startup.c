@@ -41,9 +41,11 @@
 
 #include "board_internal.h"
 #include "native_internal.h"
+#include "stdio_base.h"
 #include "tty_uart.h"
 
 #include "periph/init.h"
+#include "periph/pm.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -310,7 +312,7 @@ void usage_exit(int status)
 "        specify Linux SPI device to use for CS line d on bus b (in RIOT)\n"
 "        Example: --spi=0:1:/dev/spidev0.0 will assign the file spidev0.0 to\n"
 "                 SPI_DEV(0) and SPI_HWCS(1).\n"
-"        Supports up to %d busses with %d CS lines each.\n", SPI_NUMOF, SPI_MAXCS
+"        Supports up to %d buses with %d CS lines each.\n", SPI_NUMOF, SPI_MAXCS
     );
 #endif
     real_exit(status);
@@ -390,9 +392,16 @@ extern init_func_t __init_array_start;
 extern init_func_t __init_array_end;
 #endif
 
+static void _reset_handler(void)
+{
+    pm_reboot();
+}
+
 __attribute__((constructor)) static void startup(int argc, char **argv, char **envp)
 {
     _native_init_syscalls();
+    /* initialize stdio as early as possible */
+    stdio_init();
 
     _native_argv = argv;
     _progname = argv[0];
@@ -541,7 +550,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
      * power off command.
      * We need all C++ global constructors and other initializers to run before
      * we enter the normal application code, which may depend on global objects
-     * having been initalized properly. Therefore, we iterate through the
+     * having been initialized properly. Therefore, we iterate through the
      * remainder of the init_array and call any constructors which have been
      * placed after startup in the initialization order.
      */
@@ -576,6 +585,8 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 
     periph_init();
     board_init();
+
+    register_interrupt(SIGUSR1, _reset_handler);
 
     puts("RIOT native hardware initialization complete.\n");
     irq_enable();

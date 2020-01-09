@@ -42,7 +42,7 @@ extern "C" {
 #define NETDEV_IEEE802154_SEND_MASK         (0x0028)    /**< flags to take for send packets */
 #define NETDEV_IEEE802154_RAW               (0x0002)    /**< pass raw frame to upper layer */
 /**
- * @brief   use long source addres (set) or short source address (unset)
+ * @brief   use long source address (set) or short source address (unset)
  */
 #define NETDEV_IEEE802154_SRC_MODE_LONG     (0x0004)
 /**
@@ -180,16 +180,16 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
                           size_t value_len);
 
 /**
- * @brief  This funtion compares destination address and pan id with addresses
+ * @brief  This function compares destination address and pan id with addresses
  * and pan id of the device
  *
- * this funciton is meant top be used by drivers that do not support address
+ * this function is meant top be used by drivers that do not support address
  * filtering in hw
  *
  * @param[in] dev       network device descriptor
  * @param[in] mhr       mac header
  *
- * @return 0            successfull if packet is for the device
+ * @return 0            successful if packet is for the device
  * @return 1            fails if packet is not for the device or pan
  */
 int netdev_ieee802154_dst_filter(netdev_ieee802154_t *dev, const uint8_t *mhr);

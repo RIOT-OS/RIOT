@@ -64,6 +64,10 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM0->USART,
         .rx_pin   = GPIO_PIN(PA, 5),
         .tx_pin   = GPIO_PIN(PA, 4),
+#ifdef MODULE_SAM0_PERIPH_UART_HW_FC
+        .rts_pin  = GPIO_UNDEF,
+        .cts_pin  = GPIO_UNDEF,
+#endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
@@ -121,7 +125,6 @@ static const i2c_conf_t i2c_config[] = {
  * @name    RTC configuration
  * @{
  */
-#define RTC_NUMOF                               (1)
 #define EXTERNAL_OSC32_SOURCE                   1
 #define INTERNAL_OSC32_SOURCE                   0
 #define ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE     0
@@ -133,7 +136,6 @@ static const i2c_conf_t i2c_config[] = {
  */
 #define RTT_FREQUENCY                           (32768U)
 #define RTT_MAX_VALUE                           (0xffffffffU)
-#define RTT_NUMOF                               (1)
 /** @} */
 
 /**

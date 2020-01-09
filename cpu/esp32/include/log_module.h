@@ -23,22 +23,35 @@
 extern "C" {
 #endif
 
-/**
- * @brief log_write overridden function
- *
- * @param[in] level (unused)
- * @param[in] format String that the function will print
- */
-void log_write(unsigned level, const char *format, ...);
+#include <stdio.h>
+#include "esp_common_log.h"
 
-/**
- * @brief log_write overridden function, tagged version
- *
- * @param[in] level     Level of the message
- * @param[in] tag       Additional information like function or module
- * @param[in] format    String that the function will print
- */
-void log_write_tagged(unsigned level, const char *tag, const char *format, ...);
+#ifdef MODULE_LOG_PRINTFNOFORMAT
+
+static inline void log_write(unsigned level, const char *format, ...) {
+    (void)level;
+    puts(format);
+}
+
+#else /* MODULE_LOG_PRINTFNOFORMAT */
+
+#define log_write(level, ...) \
+                do { \
+                    if (level == LOG_ERROR) { \
+                        LOG_TAG(LOG_ERROR, E, __func__, ##__VA_ARGS__); \
+                    } \
+                    else if (level == LOG_WARNING) { \
+                        LOG_TAG(LOG_WARNING, W, __func__, ##__VA_ARGS__); \
+                    } \
+                    else if (level == LOG_INFO) { \
+                        LOG_TAG(LOG_INFO, D, __func__, ##__VA_ARGS__); \
+                    } \
+                    else if (level == LOG_DEBUG) { \
+                        LOG_TAG(LOG_DEBUG, E, __func__, ##__VA_ARGS__); \
+                    } \
+                } while (0U);
+
+#endif /* MODULE_LOG_PRINTFNOFORMAT */
 
 #ifdef __cplusplus
 }

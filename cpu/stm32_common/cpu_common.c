@@ -169,3 +169,115 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
             break;
     }
 }
+
+#if defined(CPU_FAM_STM32L4)
+void periph_lpclk_en(bus_t bus, uint32_t mask)
+{
+    switch (bus) {
+        case APB1:
+            RCC->APB1SMENR1 |= mask;
+            break;
+        case APB2:
+            RCC->APB2SMENR |= mask;
+            break;
+        case APB12:
+            RCC->APB1SMENR2 |= mask;
+            break;
+        case AHB1:
+            RCC->AHB1SMENR |= mask;
+            break;
+        case AHB2:
+            RCC->AHB2SMENR |= mask;
+            break;
+        case AHB3:
+            RCC->AHB3SMENR |= mask;
+            break;
+        default:
+            DEBUG("unsupported bus %d\n", (int)bus);
+            break;
+    }
+}
+
+void periph_lpclk_dis(bus_t bus, uint32_t mask)
+{
+    switch (bus) {
+        case APB1:
+            RCC->APB1SMENR1 &= ~(mask);
+            break;
+        case APB2:
+            RCC->APB2SMENR &= ~(mask);
+            break;
+        case APB12:
+            RCC->APB1SMENR2 &= ~(mask);
+            break;
+        case AHB1:
+            RCC->AHB1SMENR &= ~(mask);
+            break;
+        case AHB2:
+            RCC->AHB2SMENR &= ~(mask);
+            break;
+        case AHB3:
+            RCC->AHB3SMENR &= ~(mask);
+            break;
+        default:
+            DEBUG("unsupported bus %d\n", (int)bus);
+            break;
+    }
+}
+#elif defined(CPU_FAM_STM32F2) || \
+      defined(CPU_FAM_STM32F4) || \
+      defined(CPU_FAM_STM32F7)
+void periph_lpclk_en(bus_t bus, uint32_t mask)
+{
+    switch (bus) {
+        case APB1:
+            RCC->APB1LPENR |= mask;
+            break;
+        case APB2:
+            RCC->APB2LPENR |= mask;
+            break;
+        case AHB1:
+            RCC->AHB1LPENR |= mask;
+            break;
+/* STM32F410 RCC doesn't provide AHB2 and AHB3 */
+#if !defined(CPU_LINE_STM32F410Rx)
+        case AHB2:
+            RCC->AHB2LPENR |= mask;
+            break;
+        case AHB3:
+            RCC->AHB3LPENR |= mask;
+            break;
+#endif
+        default:
+            DEBUG("unsupported bus %d\n", (int)bus);
+            break;
+    }
+}
+
+void periph_lpclk_dis(bus_t bus, uint32_t mask)
+{
+    switch (bus) {
+        case APB1:
+            RCC->APB1LPENR &= ~(mask);
+            break;
+        case APB2:
+            RCC->APB2LPENR &= ~(mask);
+            break;
+        case AHB1:
+            RCC->AHB1LPENR &= ~(mask);
+            break;
+/* STM32F410 RCC doesn't provide AHB2 and AHB3 */
+#if !defined(CPU_LINE_STM32F410Rx)
+        case AHB2:
+            RCC->AHB2LPENR &= ~(mask);
+            break;
+        case AHB3:
+            RCC->AHB3LPENR &= ~(mask);
+            break;
+#endif
+        default:
+            DEBUG("unsupported bus %d\n", (int)bus);
+            break;
+    }
+}
+#endif

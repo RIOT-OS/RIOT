@@ -1,8 +1,5 @@
 include ../Makefile.tests_common
 
-# qDSA is not 16 bit compatible
-BOARD_BLACKLIST := chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
-
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(4*THREAD_STACKSIZE_DEFAULT\)
 
 USEPKG += qDSA

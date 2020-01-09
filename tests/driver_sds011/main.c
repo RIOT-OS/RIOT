@@ -98,7 +98,7 @@ int main(void)
         puts("init [OK]");
     }
     else {
-        puts("initalization [ERROR]");
+        puts("initialization [ERROR]");
         return -1;
     }
 

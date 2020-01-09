@@ -108,6 +108,33 @@ class ErrorInTest(Exception):
         self.errorfile = errorfile
 
 
+def _expand_apps_directories(apps_dirs, riotdir, skip=False):
+    """Expand the list of applications using wildcards."""
+    # Get the full list of RIOT applications in riotdir
+    _riot_applications = _riot_applications_dirs(riotdir)
+
+    if apps_dirs is None:
+        if skip is True:
+            return []
+        return _riot_applications
+
+    ret = []
+    for app_dir in apps_dirs:
+        if os.path.isdir(app_dir):
+            # Case where the application directory exists: don't use globbing.
+            # the application directory can also be outside of riotdir and
+            # relative to it.
+            ret += [app_dir]
+        else:
+            ret += [
+                os.path.relpath(el, riotdir)
+                for el in glob.glob(os.path.join(riotdir, app_dir))
+                if os.path.relpath(el, riotdir) in _riot_applications
+            ]
+
+    return ret
+
+
 def apps_directories(riotdir, apps_dirs=None, apps_dirs_skip=None):
     """Return sorted list of test directories relative to `riotdir`.
 
@@ -600,10 +627,8 @@ PARSER.add_argument(
     help="Parallel building (0 means not limit, like '--jobs')")
 
 
-def main():
+def main(args):
     """For one board, compile all examples and tests and run test on board."""
-    args = PARSER.parse_args()
-
     logger = logging.getLogger(args.board)
     if args.loglevel:
         loglevel = logging.getLevelName(args.loglevel.upper())
@@ -617,9 +642,14 @@ def main():
     board = check_is_board(args.riot_directory, args.board)
     logger.debug('board: %s', board)
 
-    app_dirs = apps_directories(args.riot_directory,
-                                apps_dirs=args.applications,
-                                apps_dirs_skip=args.applications_exclude)
+    # Expand application directories: allows use of glob in application names
+    apps_dirs = _expand_apps_directories(args.applications,
+                                         args.riot_directory)
+    apps_dirs_skip = _expand_apps_directories(args.applications_exclude,
+                                              args.riot_directory, skip=True)
+
+    app_dirs = apps_directories(args.riot_directory, apps_dirs=apps_dirs,
+                                apps_dirs_skip=apps_dirs_skip)
 
     logger.debug('app_dirs: %s', app_dirs)
     logger.debug('resultdir: %s', args.result_directory)
@@ -658,4 +688,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(PARSER.parse_args())

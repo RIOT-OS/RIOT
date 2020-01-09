@@ -22,6 +22,11 @@ in the tests directory.
     This test mostly is a regression test for issues that were found through fuzzing. It uses
     `scapy` to interact with the node.
 
+6) 06-receive_data_closed_conn.py
+    This test covers accessing received data after receiving a FIN packet. If the connection was closed
+    by the peer, a call to gnrc_tcp_recv must return directly with all currently received data
+    or zero if there is no data. The function must return immediatly dispite any given timeout.
+
 Setup
 ==========
 The test requires a tap-device setup. This can be achieved by running 'dist/tools/tapsetup/tapsetup'

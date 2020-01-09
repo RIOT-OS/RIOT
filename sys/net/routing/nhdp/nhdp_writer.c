@@ -145,7 +145,7 @@ void nhdp_writer_add_addr(struct rfc5444_writer *wr, nhdp_addr_t *addr,
 
     switch (type) {
         case RFC5444_ADDRTLV_LOCAL_IF:
-            /* Address is mandatory for every sub-msg (if message is splitted) */
+            /* Address is mandatory for every sub-msg (if message is split) */
             wr_addr = rfc5444_writer_add_address(wr, _nhdp_message_content_provider.creator,
                                                  &n_addr, true);
             break;
@@ -154,7 +154,7 @@ void nhdp_writer_add_addr(struct rfc5444_writer *wr, nhdp_addr_t *addr,
             /* Fall through */
 
         case RFC5444_ADDRTLV_OTHER_NEIGHB:
-            /* Address only has to be included in one sub-msg (if message is splitted) */
+            /* Address only has to be included in one sub-msg (if message is split) */
             wr_addr = rfc5444_writer_add_address(wr, _nhdp_message_content_provider.creator,
                                                  &n_addr, false);
             break;

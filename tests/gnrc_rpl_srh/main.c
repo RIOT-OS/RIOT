@@ -234,11 +234,6 @@ static int _ipreg(int argc, char **argv)
     return 0;
 }
 
-static const shell_command_t shell_commands[] = {
-    { "ip", "Registers pktdump to protocol number 59 (no next header)", _ipreg },
-    { NULL, NULL, NULL }
-};
-
 static void run_unittests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -255,9 +250,23 @@ static void run_unittests(void)
     TESTS_END();
 }
 
+static int _unittests(int argc, char** argv)
+{
+    (void) argc;
+    (void) argv;
+
+    run_unittests();
+    return 0;
+}
+
+static const shell_command_t shell_commands[] = {
+    { "ip", "Registers pktdump to protocol number 59 (no next header)", _ipreg },
+    { "unittests", "Runs unitest", _unittests},
+    { NULL, NULL, NULL }
+};
+
 int main(void)
 {
-    run_unittests();
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }

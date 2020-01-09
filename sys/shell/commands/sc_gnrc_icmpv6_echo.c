@@ -171,7 +171,6 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
     for (int i = 1; i < argc; i++) {
         char *arg = argv[i];
         if (arg[0] != '-') {
-            int iface;
 
             data->hostname = arg;
 #ifdef MODULE_SOCK_DNS
@@ -179,9 +178,9 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
                 continue;
             }
 #endif
-            iface = ipv6_addr_split_iface(data->hostname);
-            if (iface != -1) {
-                data->netif = gnrc_netif_get_by_pid(iface);
+            char *iface = ipv6_addr_split_iface(data->hostname);
+            if (iface) {
+                data->netif = gnrc_netif_get_by_pid(atoi(iface));
             }
 #if GNRC_NETIF_NUMOF == 1
             else {

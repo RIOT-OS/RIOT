@@ -92,7 +92,7 @@ int pthread_condattr_getpshared(const pthread_condattr_t *attr, int *pshared);
 int pthread_condattr_setpshared(pthread_condattr_t *attr, int pshared);
 
 /**
- * @brief Get the clock selected for the conditon variable attribute attr.
+ * @brief Get the clock selected for the condition variable attribute attr.
  * @note currently NOT USED in RIOT.
  * @param[in] attr pre-allocated condition attribute variable structure.
  * @param[out] clock_id the clock ID that is used to measure the timeout service
@@ -101,7 +101,7 @@ int pthread_condattr_setpshared(pthread_condattr_t *attr, int pshared);
 int pthread_condattr_getclock(const pthread_condattr_t *attr, clockid_t *clock_id);
 
 /**
- * @brief Set the clock selected for the conditon variable attribute ATTR.
+ * @brief Set the clock selected for the condition variable attribute ATTR.
  * @note currently NOT USED in RIOT.
  * @param[in, out] attr pre-allocated condition attribute variable structure.
  * @param[in] clock_id the clock ID that shall be used to measure the timeout service

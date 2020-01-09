@@ -85,7 +85,7 @@ SECTIONS
 
   .iram0.text :
   {
-    /* Code marked as runnning out of IRAM */
+    /* Code marked as running out of IRAM */
     _iram_text_start = ABSOLUTE(.);
     *(.iram1 .iram1.*)
 
@@ -101,12 +101,14 @@ SECTIONS
     *esp_idf_spi_flash.a:*(.literal .text .literal.* .text.*)
     /* parts of RIOT that should to run in IRAM */
     *core.a:*(.literal .text .literal.* .text.*)
-    /* *spiffs_fs.a:*(.literal .text .literal.* .text.*) */
-    /* *spiffs.a:*(.literal .text .literal.* .text.*) */
+    *spiffs_fs.a:*(.literal .text .literal.* .text.*)
+    *spiffs.a:*(.literal .text .literal.* .text.*)
+    *vfs.a:*(.literal .text .literal.* .text.*)
 
     /* part of RIOT ports that should run in IRAM */
     *cpu.a:*(.literal .text .literal.* .text.*)
     *periph.a:*(.literal .text .literal.* .text.*)
+    *mtd.a:**(.literal .text .literal.* .text.*)
 
     INCLUDE esp32.spiram.rom-functions-iram.ld
     _iram_text_end = ABSOLUTE(.);

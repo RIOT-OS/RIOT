@@ -102,7 +102,7 @@
  * ## Client Operation ##
  *
  * Client operation includes two phases: creating and sending a request, and
- * handling the response aynchronously in a client supplied callback. See
+ * handling the response asynchronously in a client supplied callback. See
  * `examples/gcoap/gcoap_cli.c` for a simple example of sending a request and
  * reading the response.
  *
@@ -141,8 +141,8 @@
  *
  * Here is the expected sequence for handling a response in the callback.
  *
- * -# Test for a server response or timeout in the _req_state_ callback
- *    parameter. See the GCOAP_MEMO... constants.
+ * -# Test for a server response or timeout in the `state` field of the `memo`
+ *    callback parameter (`memo->state`). See the GCOAP_MEMO... constants.
  * -# Test the response with coap_get_code_class() and coap_get_code_detail().
  * -# Test the response payload with the coap_pkt_t _payload_len_ and
  *    _content_type_ attributes.
@@ -154,6 +154,14 @@
  * an application has registered with gcoap. An application does not need to
  * take any action to support Observe client registration. However, gcoap
  * limits registration for a given resource to a _single_ observer.
+ *
+ * It is [suggested](https://tools.ietf.org/html/rfc7641#section-6) that a
+ * server adds the 'obs' attribute to resources that are useful for observation
+ * (i.e. will produce notifications) as a hint. Keep in mind that this is not
+ * mandatory in order to enable the mechanism in RIOT, nor will it prevent a
+ * client from observing a resource that does not have this attribute in the
+ * link description. See the "Resource list creation" section above for how the
+ * gcoap example app publishes the obs attribute.
  *
  * An Observe notification is considered a response to the original client
  * registration request. So, the Observe server only needs to create and send
@@ -439,6 +447,16 @@ extern "C" {
 #define GCOAP_PAYLOAD_MARKER    (0xFF)
 
 /**
+ * @ingroup net_gcoap_conf
+ * @brief   Disables gcoap startup during system auto init
+ *
+ * If disabled, gcoap_init() must be called by some other means.
+ */
+#ifndef GCOAP_NO_AUTO_INIT
+#define GCOAP_NO_AUTO_INIT      0
+#endif
+
+/**
  * @name    States for the memo used to track waiting for a response
  * @{
  */
@@ -628,13 +646,19 @@ typedef struct gcoap_listener {
 } gcoap_listener_t;
 
 /**
+ * @brief   Forward declaration of the request memo type
+ */
+typedef struct gcoap_request_memo gcoap_request_memo_t;
+
+/**
  * @brief   Handler function for a server response, including the state for the
  *          originating request
  *
  * If request timed out, the packet header is for the request.
  */
-typedef void (*gcoap_resp_handler_t)(unsigned req_state, coap_pkt_t* pdu,
-                                     sock_udp_ep_t *remote);
+typedef void (*gcoap_resp_handler_t)(const gcoap_request_memo_t *memo,
+                                     coap_pkt_t* pdu,
+                                     const sock_udp_ep_t *remote);
 
 /**
  * @brief  Extends request memo for resending a confirmable request.
@@ -647,7 +671,7 @@ typedef struct {
 /**
  * @brief   Memo to handle a response for a request
  */
-typedef struct {
+struct gcoap_request_memo {
     unsigned state;                     /**< State of this memo, a GCOAP_MEMO... */
     int send_limit;                     /**< Remaining resends, 0 if none;
                                              GCOAP_SEND_LIMIT_NON if non-confirmable */
@@ -659,9 +683,10 @@ typedef struct {
                                              supports resending message */
     sock_udp_ep_t remote_ep;            /**< Remote endpoint */
     gcoap_resp_handler_t resp_handler;  /**< Callback for the response */
+    void *context;                      /**< ptr to user defined context data */
     xtimer_t response_timer;            /**< Limits wait for response */
     msg_t timeout_msg;                  /**< For response timer */
-} gcoap_request_memo_t;
+};
 
 /**
  * @brief   Memo for Observe registration and notifications
@@ -757,13 +782,14 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @param[in] len           Length of the buffer
  * @param[in] remote        Destination for the packet
  * @param[in] resp_handler  Callback when response received, may be NULL
+ * @param[in] context       User defined context passed to the response handler
  *
  * @return  length of the packet
  * @return  0 if cannot send
  */
 size_t gcoap_req_send(const uint8_t *buf, size_t len,
                       const sock_udp_ep_t *remote,
-                      gcoap_resp_handler_t resp_handler);
+                      gcoap_resp_handler_t resp_handler, void *context);
 
 /**
  * @brief   Sends a buffer containing a CoAP request to the provided endpoint
@@ -775,15 +801,17 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
  * @param[in] len           Length of the buffer
  * @param[in] remote        Destination for the packet
  * @param[in] resp_handler  Callback when response received, may be NULL
+ * @param[in] context       User defined context passed to the response handler
  *
  * @return  length of the packet
  * @return  0 if cannot send
  */
 static inline size_t gcoap_req_send2(const uint8_t *buf, size_t len,
                                      const sock_udp_ep_t *remote,
-                                     gcoap_resp_handler_t resp_handler)
+                                     gcoap_resp_handler_t resp_handler,
+                                     void *context)
 {
-    return gcoap_req_send(buf, len, remote, resp_handler);
+    return gcoap_req_send(buf, len, remote, resp_handler, context);
 }
 
 /**

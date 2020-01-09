@@ -30,16 +30,13 @@
 #include "cpu.h"
 #include "board.h"
 
-/*
- * local function declarations  (prefixed with __)
- */
-static void __context_save(void);
-static void __context_restore(void);
-static void __enter_thread_mode(void);
+static void atmega_context_save(void);
+static void atmega_context_restore(void);
+static void atmega_enter_thread_mode(void);
 
 /**
  * @brief Since AVR doesn't support direct manipulation of the program counter we
- * model a stack like it would be left by __context_save().
+ * model a stack like it would be left by atmega_context_save().
  * The resulting layout in memory is the following:
  * ---------------thread_t (not created by thread_stack_init) ----------
  * local variables (a temporary value and the stackpointer)
@@ -51,7 +48,7 @@ static void __enter_thread_mode(void);
  * -----------------------------------------------------------------------
  * a 16 Bit pointer to task_func
  * this is placed exactly at the place where the program counter would be
- * stored normally and thus can be returned to when __context_restore()
+ * stored normally and thus can be returned to when atmega_context_restore()
  * has been run
  * (Optional 17 bit (bit is set to zero) for devices with > 128kb FLASH)
  * -----------------------------------------------------------------------
@@ -64,9 +61,9 @@ static void __enter_thread_mode(void);
  * r26 - r31
  * -----------------------------------------------------------------------
  *
- * After the invocation of __context_restore() the pointer to task_func is
+ * After the invocation of atmega_context_restore() the pointer to task_func is
  * on top of the stack and can be returned to. This way we can actually place
- * it inside of the programm counter of the MCU.
+ * it inside of the program counter of the MCU.
  * if task_func returns sched_task_exit gets popped into the PC
  */
 char *thread_stack_init(thread_task_func_t task_func, void *arg,
@@ -172,7 +169,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
  * @brief thread_stack_print prints the stack to stdout.
  * It depends on getting the correct values for stack_start, stack_size and sp
  * from sched_active_thread.
- * Maybe it would be good to change that to way that is less dependant on
+ * Maybe it would be good to change that to way that is less dependent on
  * getting correct values elsewhere (since it is a debugging tool and in the
  * presence of bugs the data may be corrupted).
  */
@@ -201,7 +198,7 @@ void thread_stack_print(void)
 void cpu_switch_context_exit(void)
 {
     sched_run();
-    __enter_thread_mode();
+    atmega_enter_thread_mode();
 }
 
 #define STACK_POINTER  ((char *)AVR_STACK_POINTER_REG)
@@ -213,7 +210,7 @@ extern char *__brkval;
 /**
  * @brief Set the MCU into Thread-Mode and load the initial task from the stack and run it
  */
-void NORETURN __enter_thread_mode(void)
+void NORETURN atmega_enter_thread_mode(void)
 {
     irq_enable();
 
@@ -229,7 +226,7 @@ void NORETURN __enter_thread_mode(void)
         __brkval = __malloc_heap_start;
     }
 
-    __context_restore();
+    atmega_context_restore();
     __asm__ volatile ("ret");
 
     UNREACHABLE();
@@ -238,9 +235,9 @@ void NORETURN __enter_thread_mode(void)
 void thread_yield_higher(void)
 {
     if (irq_is_in() == 0) {
-        __context_save();
+        atmega_context_save();
         sched_run();
-        __context_restore();
+        atmega_context_restore();
         __asm__ volatile ("ret");
     }
     else {
@@ -248,16 +245,18 @@ void thread_yield_higher(void)
     }
 }
 
-void thread_yield_isr(void)
+void atmega_exit_isr(void)
 {
-    __context_save();
-    sched_run();
-    __context_restore();
-
-    __asm__ volatile ("reti");
+    atmega_in_isr = 0;
+    if (sched_context_switch_request) {
+        atmega_context_save();
+        sched_run();
+        atmega_context_restore();
+        __asm__ volatile ("reti");
+    }
 }
 
-__attribute__((always_inline)) static inline void __context_save(void)
+__attribute__((always_inline)) static inline void atmega_context_save(void)
 {
     __asm__ volatile (
         "push __tmp_reg__                    \n\t"
@@ -312,7 +311,7 @@ __attribute__((always_inline)) static inline void __context_save(void)
         "st   x+, __tmp_reg__                \n\t");
 }
 
-__attribute__((always_inline)) static inline void __context_restore(void)
+__attribute__((always_inline)) static inline void atmega_context_restore(void)
 {
     __asm__ volatile (
         "lds  r26, sched_active_thread       \n\t"

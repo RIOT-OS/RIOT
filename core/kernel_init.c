@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Platform-independent kernel initilization
+ * @brief       Platform-independent kernel initialization
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *

@@ -35,14 +35,10 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
+#include "atmega_gpio.h"
 
 #define ENABLE_DEBUG            (0)
 #include "debug.h"
-
-#define GPIO_BASE_PORT_A        (0x20)
-#define GPIO_OFFSET_PORT_H      (0xCB)
-#define GPIO_OFFSET_PIN_PORT    (0x02)
-#define GPIO_OFFSET_PIN_PIN     (0x03)
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 /*
@@ -69,7 +65,7 @@
 static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
 
 /**
- * @brief detects ammount of possible PCINTs
+ * @brief detects amount of possible PCINTs
  */
 #if defined(MODULE_ATMEGA_PCINT0) || defined(MODULE_ATMEGA_PCINT1) || \
     defined(MODULE_ATMEGA_PCINT2) || defined(MODULE_ATMEGA_PCINT3)
@@ -167,72 +163,21 @@ static gpio_isr_ctx_pcint_t pcint_config[8 * PCINT_NUM_BANKS];
 
 #endif  /* MODULE_PERIPH_GPIO_IRQ */
 
-/**
- * @brief     Extract the pin number of the given pin
- */
-static inline uint8_t _pin_num(gpio_t pin)
-{
-    return (pin & 0x0f);
-}
-
-/**
- * @brief     Extract the port number of the given pin
- */
-static inline uint8_t _port_num(gpio_t pin)
-{
-    return (pin >> 4) & 0x0f;
-}
-
-/**
- * @brief     Generate the PORTx address of the give pin.
- */
-static inline uint16_t _port_addr(gpio_t pin)
-{
-    uint8_t port_num = _port_num(pin);
-    uint16_t port_addr = port_num * GPIO_OFFSET_PIN_PIN;
-
-    port_addr += GPIO_BASE_PORT_A;
-    port_addr += GPIO_OFFSET_PIN_PORT;
-
-#if defined (PORTG)
-    if (port_num > PORT_G) {
-        port_addr += GPIO_OFFSET_PORT_H;
-    }
-#endif
-    return port_addr;
-}
-
-/**
- * @brief     Generate the DDRx address of the given pin
- */
-static inline uint16_t _ddr_addr(gpio_t pin)
-{
-    return (_port_addr(pin) - 0x01);
-}
-
-/**
- * @brief     Generate the PINx address of the given pin.
- */
-static inline uint16_t _pin_addr(gpio_t pin)
-{
-    return (_port_addr(pin) - 0x02);
-}
-
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    uint8_t pin_mask = (1 << _pin_num(pin));
+    uint8_t pin_mask = (1 << atmega_pin_num(pin));
 
     switch (mode) {
         case GPIO_OUT:
-            _SFR_MEM8(_ddr_addr(pin)) |= pin_mask;
+            _SFR_MEM8(atmega_ddr_addr(pin)) |= pin_mask;
             break;
         case GPIO_IN:
-            _SFR_MEM8(_ddr_addr(pin)) &= ~pin_mask;
-            _SFR_MEM8(_port_addr(pin)) &= ~pin_mask;
+            _SFR_MEM8(atmega_ddr_addr(pin)) &= ~pin_mask;
+            _SFR_MEM8(atmega_port_addr(pin)) &= ~pin_mask;
             break;
         case GPIO_IN_PU:
-            _SFR_MEM8(_ddr_addr(pin)) &= ~pin_mask;
-            _SFR_MEM8(_port_addr(pin)) |= pin_mask;
+            _SFR_MEM8(atmega_ddr_addr(pin)) &= ~pin_mask;
+            _SFR_MEM8(atmega_port_addr(pin)) |= pin_mask;
             break;
         default:
             return -1;
@@ -243,17 +188,17 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
 int gpio_read(gpio_t pin)
 {
-    return (_SFR_MEM8(_pin_addr(pin)) & (1 << _pin_num(pin)));
+    return (_SFR_MEM8(atmega_pin_addr(pin)) & (1 << atmega_pin_num(pin)));
 }
 
 void gpio_set(gpio_t pin)
 {
-    _SFR_MEM8(_port_addr(pin)) |= (1 << _pin_num(pin));
+    _SFR_MEM8(atmega_port_addr(pin)) |= (1 << atmega_pin_num(pin));
 }
 
 void gpio_clear(gpio_t pin)
 {
-    _SFR_MEM8(_port_addr(pin)) &= ~(1 << _pin_num(pin));
+    _SFR_MEM8(atmega_port_addr(pin)) &= ~(1 << atmega_pin_num(pin));
 }
 
 void gpio_toggle(gpio_t pin)
@@ -307,7 +252,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         /* If pin change interrupts are enabled, enable mask and interrupt */
  #ifdef PCINT_NUM_BANKS
         int8_t offset = -1;
-        uint8_t pin_num = _pin_num(pin);
+        uint8_t pin_num = atmega_pin_num(pin);
 
         for (unsigned i = 0; i < ARRAY_SIZE(pcint_mapping); i++) {
             if (pin != GPIO_UNDEF && pin == pcint_mapping[i]) {
@@ -365,7 +310,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                 break;
         }
         /* As ports are mixed in a bank (e.g. PCINT0), we can only save a single bit here! */
-        uint8_t port_value = (_SFR_MEM8(_pin_addr( pin )));
+        uint8_t port_value = (_SFR_MEM8(atmega_pin_addr( pin )));
         uint8_t pin_mask = (1 << pin_num);
         uint8_t pin_value = ((port_value & pin_mask) != 0);
         if (pin_value) {
@@ -429,16 +374,16 @@ void gpio_irq_disable(gpio_t pin)
 
 static inline void irq_handler(uint8_t int_num)
 {
-    __enter_isr();
+    atmega_enter_isr();
     config[int_num].cb(config[int_num].arg);
-    __exit_isr();
+    atmega_exit_isr();
 }
 
 #ifdef PCINT_NUM_BANKS
 /* inline function that is used by the PCINT ISR */
 static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
 {
-    __enter_isr();
+    atmega_enter_isr();
     /* Find right item */
     uint8_t idx = 0;
 
@@ -448,9 +393,9 @@ static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
             /* get pin from mapping (assumes 8 entries per bank!) */
             gpio_t pin = pcint_mapping[bank * 8 + idx];
             /* re-construct mask from pin */
-            uint8_t pin_mask = (1 << (_pin_num(pin)));
+            uint8_t pin_mask = (1 << (atmega_pin_num(pin)));
             uint8_t idx_mask = (1 << idx);
-            uint8_t port_value = (_SFR_MEM8(_pin_addr( pin )));
+            uint8_t port_value = (_SFR_MEM8(atmega_pin_addr( pin )));
             uint8_t pin_value = ((port_value & pin_mask) != 0);
             uint8_t old_state = ((pcint_state[bank] & idx_mask) != 0);
             gpio_isr_ctx_pcint_t *conf = &pcint_config[bank * 8 + idx];
@@ -468,7 +413,7 @@ static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
         idx++;
     }
 
-    __exit_isr();
+    atmega_exit_isr();
 }
 #if defined(PCINT0_IDX)
 ISR(PCINT0_vect, ISR_BLOCK)

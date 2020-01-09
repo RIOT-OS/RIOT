@@ -132,7 +132,7 @@ static int set_mode(CAN_TypeDef *can, can_mode_t mode)
     switch (mode) {
         case MODE_NORMAL:
             can->MCR &= ~(CAN_MCR_SLEEP | CAN_MCR_INRQ);
-            /* wait for hardare confirmation */
+            /* wait for hardware confirmation */
             while (((can->MSR & CAN_MSR_INAK) || (can->MSR & CAN_MSR_SLAK)) && max_loop != 0) {
                 max_loop--;
             }
@@ -148,7 +148,7 @@ static int set_mode(CAN_TypeDef *can, can_mode_t mode)
         case MODE_INIT:
             can->MCR &= ~CAN_MCR_SLEEP;
             can->MCR |= CAN_MCR_INRQ;
-            /* wait for hardare confirmation */
+            /* wait for hardware confirmation */
             while ((!(can->MSR & CAN_MSR_INAK) || (can->MSR & CAN_MSR_SLAK)) && max_loop != 0) {
                 max_loop--;
             }

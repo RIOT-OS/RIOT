@@ -147,7 +147,7 @@ static void test_pktsnip_search_type(void)
     gnrc_pktsnip_t snip1 = _INIT_ELEM_STATIC_TYPE(GNRC_NETTYPE_UNDEF, NULL);
     gnrc_pktsnip_t snip2 = _INIT_ELEM_STATIC_TYPE(GNRC_NETTYPE_TEST, &snip1);
     gnrc_pktsnip_t snip3 = _INIT_ELEM_STATIC_TYPE(GNRC_NETTYPE_IPV6, &snip2);
-    /* successfull searches */
+    /* successful searches */
     gnrc_pktsnip_t *res;
     TEST_ASSERT_NOT_NULL((res = gnrc_pktsnip_search_type(&snip3, GNRC_NETTYPE_UNDEF)));
     TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_UNDEF, res->type);

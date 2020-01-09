@@ -104,10 +104,10 @@ int ds18_trigger(const ds18_t *dev);
 int ds18_read(const ds18_t *dev, int16_t *temperature);
 
 /**
- * @brief   convenience fuction for triggering a conversion and reading the
+ * @brief   convenience function for triggering a conversion and reading the
  * value
  *
- * @note This function will block for the convertion time. The current
+ * @note This function will block for the conversion time. The current
  * implementation of the driver uses 12-bit resolution, so this time is 750 ms.
  *
  * @param[in] dev           device descriptor

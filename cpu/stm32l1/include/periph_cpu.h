@@ -59,6 +59,7 @@ typedef struct {
     uint8_t chan;           /**< CPU ADC channel connected to the pin */
 } adc_conf_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Override the ADC resolution configuration
  * @{
@@ -73,6 +74,7 @@ typedef enum {
     ADC_RES_16BIT = (0xff)                              /**< not applicable */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @name    EEPROM configuration

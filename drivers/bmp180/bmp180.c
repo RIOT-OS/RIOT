@@ -106,7 +106,7 @@ int bmp180_init(bmp180_t *dev, const bmp180_params_t *params)
 
 int16_t bmp180_read_temperature(const bmp180_t *dev)
 {
-    int32_t ut, b5;
+    int32_t ut = 0, b5;
     /* Acquire exclusive access */
     i2c_acquire(DEV_I2C);
 

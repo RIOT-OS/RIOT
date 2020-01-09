@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       NDN ping client and server implemetation
+ * @brief       NDN ping client and server implementation
  *
  * @author      Wentao Shang <wentaoshang@gmail.com>
  *

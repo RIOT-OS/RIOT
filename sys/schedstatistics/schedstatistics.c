@@ -31,7 +31,7 @@ void sched_statistics_cb(kernel_pid_t active_thread, kernel_pid_t next_thread)
 {
     uint32_t now = xtimer_now().ticks32;
 
-    /* Update active thread runtime, there is allways an active thread since
+    /* Update active thread runtime, there is always an active thread since
        first sched_run happens when main_trampoline gets scheduled */
     schedstat_t *active_stat = &sched_pidlist[active_thread];
     active_stat->runtime_ticks += now - active_stat->laststart;

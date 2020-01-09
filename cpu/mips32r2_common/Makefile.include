@@ -9,7 +9,7 @@ export USEMODULE += periph_timer
 
 ifeq ($(USE_UHI_SYSCALLS),1)
   #Use UHI to handle syscalls
-  export LINKFLAGS += -luhi
+  LINKFLAGS += -luhi
   export USEMODULE += newlib_syscalls_mips_uhi
   CFLAGS += -DHAVE_HEAP_STATS
 else

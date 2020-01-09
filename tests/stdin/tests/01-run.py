@@ -7,12 +7,25 @@
 # directory for more details.
 
 import sys
+import pexpect
 from testrunner import run
 
 
+TEST_INPUT = 'O'
+RETRIES = 5
+TIMEOUT = 3
+
+
 def testfunc(child):
-    child.sendline('O')
-    child.expect_exact('You entered \'O\'')
+    expected_output = 'You entered \'{}\''.format(TEST_INPUT)
+    for _ in range(0, RETRIES):
+        child.sendline(TEST_INPUT)
+        ret = child.expect_exact([expected_output, pexpect.TIMEOUT],
+                                 timeout=TIMEOUT)
+        if ret == 0:
+            break
+    else:
+        child.expect_exact(expected_output)
 
 
 if __name__ == "__main__":

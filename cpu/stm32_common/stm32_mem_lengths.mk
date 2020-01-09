@@ -81,14 +81,16 @@ ifeq ($(STM32_TYPE), F)
           RAM_LEN = 10K
         else ifneq (, $(filter $(STM32_ROMSIZE), 8 B))
           RAM_LEN = 20K
-        else ifneq (, $(filter $(STM32_ROMSIZE), C D E))
+        else ifneq (, $(filter $(STM32_ROMSIZE), C))
+          RAM_LEN = 48K
+        else ifneq (, $(filter $(STM32_ROMSIZE), D E))
           RAM_LEN = 64K
         else ifneq (, $(filter $(STM32_ROMSIZE), F G))
           RAM_LEN = 96K
         endif
-      endif
-    else ifneq (, $(filter $(STM32_MODEL), 105 107))
+      else ifneq (, $(filter $(STM32_MODEL), 105 107))
         RAM_LEN = 64K
+      endif
     endif
   else ifeq ($(STM32_FAMILY), 2)
     ifeq ($(STM32_MODEL3), 5)
@@ -190,7 +192,14 @@ ifeq ($(STM32_TYPE), F)
   endif
 else ifeq ($(STM32_TYPE), L)
   ifeq ($(STM32_FAMILY), 0)
-    ifneq (, $(filter $(STM32_MODEL2), 1 2))
+    ifeq ($(STM32_MODEL2), 1)
+      RAM_LEN = 2K
+      ifeq ($(STM32_MODEL3), 0)
+        ifeq ($(STM32_ROMSIZE), 6)
+          RAM_LEN = 8K
+        endif
+      endif
+    else ifneq (, $(filter $(STM32_MODEL2), 2))
       RAM_LEN = 2K
     else ifneq (, $(filter $(STM32_MODEL2), 3 4 5 6))
       RAM_LEN = 8K

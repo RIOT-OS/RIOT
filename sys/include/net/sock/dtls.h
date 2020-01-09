@@ -461,6 +461,13 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
+/* net/sock/async/types.h included by net/sock.h needs to re-typedef the
+ * `sock_dtls_t` to prevent cyclic includes */
+#if defined (__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wtypedef-redefinition"
+#endif
+
 #include "net/sock.h"
 #include "net/sock/udp.h"
 #include "net/credman.h"
@@ -499,6 +506,10 @@ enum {
  *          an implementation-specific `sock_dtls_types.h`.
  */
 typedef struct sock_dtls sock_dtls_t;
+
+#if defined (__clang__)
+# pragma clang diagnostic pop
+#endif
 
 /**
  * @brief Information about a created session.

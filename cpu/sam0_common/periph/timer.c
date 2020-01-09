@@ -195,7 +195,7 @@ unsigned int timer_read(tim_t tim)
     /* request syncronisation */
 #ifdef TC_CTRLBSET_CMD_READSYNC_Val
     dev(tim)->CTRLBSET.reg = TC_CTRLBSET_CMD_READSYNC;
-     /* work aroud a possible hardware bug where it takes some
+     /* work around a possible hardware bug where it takes some
         cycles for the timer peripheral to set the SYNCBUSY/READSYNC bit
         after writing the READSYNC bit
 

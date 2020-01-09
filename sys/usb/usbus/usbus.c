@@ -73,10 +73,10 @@ uint16_t usbus_add_string_descriptor(usbus_t *usbus, usbus_string_t *desc,
     return desc->idx;
 }
 
-void usbus_add_conf_descriptor(usbus_t *usbus, usbus_hdr_gen_t *hdr_gen)
+void usbus_add_conf_descriptor(usbus_t *usbus, usbus_descr_gen_t *descr_gen)
 {
-    hdr_gen->next = usbus->hdr_gen;
-    usbus->hdr_gen = hdr_gen;
+    descr_gen->next = usbus->descr_gen;
+    usbus->descr_gen = descr_gen;
 }
 
 static usbus_handler_t *_ep_to_handler(usbus_t *usbus, usbdev_ep_t *ep)
@@ -125,6 +125,18 @@ void usbus_register_event_handler(usbus_t *usbus, usbus_handler_t *handler)
         last = &(*last)->next;
     }
     *last = handler;
+}
+
+usbus_endpoint_t *usbus_interface_find_endpoint(usbus_interface_t *interface,
+                                                usb_ep_type_t type,
+                                                usb_ep_dir_t dir)
+{
+    for (usbus_endpoint_t *uep = interface->ep; uep; uep = uep->next) {
+        if (uep->ep->type == type && uep->ep->dir == dir) {
+            return uep;
+        }
+    }
+    return NULL;
 }
 
 usbus_endpoint_t *usbus_add_endpoint(usbus_t *usbus, usbus_interface_t *iface,

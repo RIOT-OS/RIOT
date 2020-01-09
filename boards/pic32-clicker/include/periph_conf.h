@@ -53,8 +53,6 @@ extern "C" {
   * @{
   */
 #define UART_NUMOF          (4)
-#define DEBUG_VIA_UART      (3)
-#define DEBUG_UART_BAUD     (9600)
 /** @} */
 
 #ifdef __cplusplus

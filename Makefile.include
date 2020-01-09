@@ -23,9 +23,10 @@ include $(RIOT_MAKEFILES_GLOBAL_PRE)
 
 # set undefined variables
 RIOTBASE       ?= $(_riotbase)
-CCACHE_BASEDIR ?= $(RIOTBASE)
 RIOTCPU        ?= $(RIOTBASE)/cpu
+# Deprecated to set RIOTBOARD, use BOARDSDIR
 RIOTBOARD      ?= $(RIOTBASE)/boards
+BOARDSDIR      ?= $(RIOTBOARD)
 RIOTMAKE       ?= $(RIOTBASE)/makefiles
 RIOTPKG        ?= $(RIOTBASE)/pkg
 RIOTTOOLS      ?= $(RIOTBASE)/dist/tools
@@ -46,7 +47,6 @@ DLCACHE_DIR    ?= $(RIOTBASE)/.dlcache
 __DIRECTORY_VARIABLES := \
   RIOTBASE \
   RIOTCPU \
-  RIOTBOARD \
   RIOTMAKE \
   RIOTPKG \
   RIOTTOOLS \
@@ -55,17 +55,27 @@ __DIRECTORY_VARIABLES := \
   BUILD_DIR \
   BINDIRBASE \
   BINDIR \
-  CCACHE_BASEDIR \
   GITCACHE \
   PKGDIRBASE \
   DLCACHE_DIR \
   #
 
+# In GNU make command line is supposed to override the value set in makefile
+# These variables can be overridden even when set from command line
+__OVERRIDE_DIRECTORY_VARIABLES := $(__DIRECTORY_VARIABLES)
+# Use absolute paths in recursive "make" even if overridden on command line.
+MAKEOVERRIDES += $(foreach v,$(__OVERRIDE_DIRECTORY_VARIABLES),$(v)=$($(v)))
+
+# Deprecation of configuring 'RIOTBOARD'
+ifneq ($(abspath $(RIOTBASE)/boards),$(abspath $(RIOTBOARD)))
+  $(warning overriding RIOTBOARD for external boards is deprecated, please use an absolute BOARDSDIR)
+  override RIOTBOARD      := $(abspath $(RIOTBOARD))
+  __DIRECTORY_VARIABLES += RIOTBOARD
+endif
+
 # Make all paths absolute.
 override RIOTBASE       := $(abspath $(RIOTBASE))
-override CCACHE_BASEDIR := $(abspath $(CCACHE_BASEDIR))
 override RIOTCPU        := $(abspath $(RIOTCPU))
-override RIOTBOARD      := $(abspath $(RIOTBOARD))
 override RIOTMAKE       := $(abspath $(RIOTMAKE))
 override RIOTPKG        := $(abspath $(RIOTPKG))
 override RIOTTOOLS      := $(abspath $(RIOTTOOLS))
@@ -78,15 +88,19 @@ override BINDIR         := $(abspath $(BINDIR))
 override PKGDIRBASE     := $(abspath $(PKGDIRBASE))
 override DLCACHE_DIR    := $(abspath $(DLCACHE_DIR))
 
+# Keep standard make behavior for new variables
+__DIRECTORY_VARIABLES += \
+  BOARDSDIR \
+  #
+
+BOARDSDIR               := $(abspath $(BOARDSDIR))
+
 # Ensure that all directories are set and don't contain spaces.
 ifneq (, $(filter-out 1, $(foreach v,$(__DIRECTORY_VARIABLES),$(words $($(v))))))
   $(info Aborting compilation for your safety.)
   $(info Related variables = $(__DIRECTORY_VARIABLES))
   $(error Make sure no path override is empty or contains spaces!)
 endif
-
-# Use absolute paths in recusive "make" even if overriden on command line.
-MAKEOVERRIDES += $(foreach v,$(__DIRECTORY_VARIABLES),$(v)=$($(v)))
 
 # Path to the current directory relative to RIOTPROJECT
 # trailing '/' is important when RIOTPROJECT == CURDIR
@@ -144,12 +158,29 @@ else
 
 all: link
 
+# Include Board and CPU configuration, if BOARD is not found in BOARDSDIR
+# e.g. when set by the environment fallback to searching in RIOTBOARD
+ifeq (,$(wildcard $(BOARDSDIR)/$(BOARD)/.))
+  ifneq ($(RIOTBOARD),$(BOARDSDIR))
+    # The specified board $(BOARD) was not found in $(BOARDSDIR) fallback to RIOTBOARD
+    BOARDSDIR = $(RIOTBOARD)
+  endif
+  ifeq ($(RIOTBOARD),$(BOARDSDIR))
+    ifeq (,$(wildcard $(BOARDSDIR)/$(BOARD)/.))
+      $(error The specified board $(BOARD) does not exist.)
+    endif
+  endif
+endif
+
 include $(RIOTMAKE)/info.inc.mk
 
 # Static code analysis tools provided by LLVM
 include $(RIOTMAKE)/scan-build.inc.mk
 
 export RIOTBUILD_CONFIG_HEADER_C = $(BINDIR)/riotbuild/riotbuild.h
+
+# Include Kconfig functionalities
+include $(RIOTMAKE)/kconfig.mk
 
 ifeq ($(OS),Darwin)
   OPEN   := open
@@ -179,20 +210,18 @@ endif
 # Override LOG_LEVEL if variable is set and if CFLAGS doesn't already contain
 # a LOG_LEVEL config
 ifdef LOG_LEVEL
-  ifneq (,$(filter -DLOG_LEVEL=%,$(CFLAGS)))
+  ifeq (,$(filter -DLOG_LEVEL=%,$(CFLAGS)))
     CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
   endif
 endif
 
 # Fail on warnings. Can be overridden by `make WERROR=0`.
 WERROR ?= 1
-export WERROR
 ifeq ($(WERROR),1)
   CFLAGS += -Werror
 endif
 
 WPEDANTIC ?= 0
-export WPEDANTIC
 ifeq ($(WPEDANTIC),1)
   CFLAGS += -Wpedantic
 endif
@@ -248,9 +277,6 @@ LAZYSPONGE_FLAGS ?= $(if $(filter 1,$(QUIET)),,--verbose)
 ifeq (, $(APPLICATION))
     $(error An application name must be specified as APPLICATION.)
 endif
-ifneq (0,$(shell test -d $(RIOTBOARD)/$(BOARD); echo $$?))
-    $(error The specified board $(BOARD) does not exist.)
-endif
 
 # Use TOOLCHAIN environment variable to select the toolchain to use.
 # Default for macOS: llvm; for other OS: gnu
@@ -278,7 +304,6 @@ ifeq (,$(TOOLCHAIN))
 override TOOLCHAIN := gnu
 endif
 
-export TOOLCHAIN
 
 # default toolchain prefix, defaults to target triple followed by a dash, you
 # will most likely not need to touch this.
@@ -306,17 +331,10 @@ include $(RIOTMAKE)/pseudomodules.inc.mk
 include $(RIOTMAKE)/defaultmodules.inc.mk
 
 # Include Board and CPU configuration
-INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/$(BOARD)/include))
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
+INCLUDES += $(addprefix -I,$(wildcard $(BOARDSDIR)/$(BOARD)/include))
+include $(BOARDSDIR)/$(BOARD)/Makefile.include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
-
-# Sanity check
-# The check is only done after 'include $(RIOTBOARD)/$(BOARD)/Makefile.include'
-# because we need to have the 'CPU' variable defined
-ifeq (,$(filter $(RIOTCPU)/$(CPU)/Makefile.features,$(MAKEFILE_LIST)))
-  $(error $$(RIOTCPU)/$$(CPU)/Makefile.features must have been included by the board / board common Makefile.features or Makefile.features)
-endif
 
 # Assume GCC/GNU as supported toolchain if CPU's Makefile.include doesn't
 # provide this macro
@@ -519,7 +537,8 @@ $(ELFFILE): $(BASELIBS)
 	$(Q)$(_LINK) -o $@
 
 $(BINDIR)/$(APPLICATION_MODULE).a: pkg-build $(BUILDDEPS)
-	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
+	$(Q)DIRS="$(DIRS)" APPLICATION_BLOBS="$(BLOBS)" \
+	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
 $(BINDIR)/$(APPLICATION_MODULE).a: FORCE
 
 # Other modules are built by application.inc.mk and packages building
@@ -665,7 +684,7 @@ term: $(TERMDEPS)
 	$(TERMPROG) $(TERMFLAGS)
 
 # Term without the pyterm added logging
-# TERMFLAGS must be exported for `jlink.sh term_rtt`.
+# PYTERMFLAGS must be exported for `jlink.sh term-rtt`.
 cleanterm: export PYTERMFLAGS += --noprefix --no-repeat-command-on-empty-line
 cleanterm: $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
@@ -706,6 +725,12 @@ TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*[^~]),\
 # See #11762.
 TEST_DEPS += $(TERMDEPS)
 
+# Export TESTRUNNER_RESET_AFTER_TERM only for the test target. This allows for
+# it to be accessed through the environment from python test script.
+# This is currently needed only by `examples/%/tests` and should be removed in
+# the future since `make reset` after `term` is not a valid synch method across
+# all platforms.
+$(call target-export-variables,test,TESTRUNNER_RESET_AFTER_TERM)
 test: $(TEST_DEPS)
 	$(Q) for t in $(TESTS); do \
 		$$t || exit 1; \
@@ -847,7 +872,8 @@ include $(RIOTTOOLS)/desvirt/Makefile.desvirt
 # The rebuild behavior could even only be done with an empty file, but currently
 # some macros definitions are passed through this file.
 $(RIOTBUILD_CONFIG_HEADER_C): $(RIOTBUILD_CONFIG_HEADER_C).in
-	$(Q)sed -n -e '1i /* Generated file do not edit */' -e '/^#.*/ p' $< > $@
+	$(Q)sed -n -e '1i\
+/* Generated file do not edit */' -e '/^#.*/ p' $< > $@
 
 .SECONDARY: $(RIOTBUILD_CONFIG_HEADER_C).in
 $(RIOTBUILD_CONFIG_HEADER_C).in: FORCE | $(CLEAN)

@@ -19,8 +19,8 @@ CFLAGS_OPT  ?= -Os
 
 CFLAGS      += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 ASFLAGS     += $(CFLAGS_CPU) $(CFLAGS_DBG)
-export LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU).ld
-export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
-export LINKFLAGS += -Wl,--gc-sections
+LINKFLAGS   += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU).ld
+LINKFLAGS   += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
+LINKFLAGS   += -Wl,--gc-sections
 
 export UNDEF += $(BINDIR)/cpu/startup.o

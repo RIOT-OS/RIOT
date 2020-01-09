@@ -82,7 +82,7 @@ class Board(object):
             pass
 
         if (name == "native") and (reset is None):
-                reset = _reset_native_execute
+            reset = _reset_native_execute
 
         self.name = name
         self.port = port
@@ -185,7 +185,7 @@ class TestStrategy(ApplicationStrategy):
 
 def get_ipv6_address(spawn):
     spawn.sendline(u"ifconfig")
-    spawn.expect(u"[A-Za-z0-9]{2}_[0-9]+:  inet6 (fe80::[0-9a-f:]+)")
+    spawn.expect(r"[A-Za-z0-9]{2}_[0-9]+:  inet6 (fe80::[0-9a-f:]+)\s")
     return spawn.match.group(1)
 
 
@@ -233,8 +233,8 @@ def test_udpv6_send(board_group, application, env=None):
         # wait for neighbor discovery to be done
         time.sleep(5)
         sender.sendline(u"udp send %s %d ab:cd:ef" % (receiver_ip, port))
-        sender.expect_exact(u"Success: send 3 byte over UDP to [%s]:%d" %
-                            (receiver_ip, port))
+        sender.expect_exact("Success: send 3 byte over UDP to [{}]:{}"
+                            .format(receiver_ip, port))
         receiver.expect(u"00000000  AB  CD  EF")
 
 

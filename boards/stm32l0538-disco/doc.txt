@@ -31,7 +31,7 @@ Then use the following command:
 ### STDIO
 
 STDIO is connected to pins PA9 (TX) and PA10 (RX) so an USB to UART adapter is
-required. Use the `term` targed to open a terminal:
+required. Use the `term` target to open a terminal:
 
     make BOARD=stm32l0538-disco -C examples/hello-world term
 

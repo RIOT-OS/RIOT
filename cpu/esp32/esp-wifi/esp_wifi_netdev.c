@@ -69,7 +69,7 @@
 
 /*
  * There is only one ESP WiFi device. We define it as static device variable
- * to have accesss to the device inside ESP WiFi interrupt routines which do
+ * to have access to the device inside ESP WiFi interrupt routines which do
  * not provide an argument that could be used as pointer to the ESP WiFi
  * device which triggers the interrupt.
  */
@@ -79,7 +79,7 @@ static const netdev_driver_t _esp_wifi_driver;
 /*
  * Ring buffer for rx_buf elements which hold a pointer to the WiFi frame
  * buffer, a pointer to the ethernet frame and the frame length for each
- * received frame. Since we have anly one device, it the ring buffer can be
+ * received frame. Since we have only one device, it the ring buffer can be
  * static and has not to be exposed as part of the network device.
  */
 #ifndef ESP_WIFI_MAX_RX_BUF
@@ -347,6 +347,9 @@ static int _esp_wifi_init(netdev_t *netdev)
     return 0;
 }
 
+/* transmit buffer should bot be on stack */
+static uint8_t tx_buf[ETHERNET_MAX_LEN];
+
 static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
 {
     ESP_WIFI_DEBUG("%p %p", netdev, iolist);
@@ -360,7 +363,6 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
     }
 
     uint16_t tx_len = 0;              /**< number of bytes in transmit buffer */
-    uint8_t tx_buf[ETHERNET_MAX_LEN]; /**< transmit buffer */
 
     /* load packet data into TX buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {

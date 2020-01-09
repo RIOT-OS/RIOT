@@ -53,9 +53,7 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     SRC += sc_gnrc_rpl.c
 endif
 ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
-ifneq (,$(filter gnrc_ipv6_nib_6lbr,$(USEMODULE)))
     SRC += sc_gnrc_6ctx.c
-endif
 endif
 ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
   SRC += sc_gnrc_6lo_frag_stats.c
@@ -93,6 +91,14 @@ endif
 
 ifneq (,$(filter nimble_netif,$(USEMODULE)))
   SRC += sc_nimble_netif.c
+endif
+
+ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
+  SRC += sc_interactive_sync.c
+endif
+
+ifneq (,$(filter suit_coap,$(USEMODULE)))
+  SRC += sc_suit.c
 endif
 
 include $(RIOTBASE)/Makefile.base

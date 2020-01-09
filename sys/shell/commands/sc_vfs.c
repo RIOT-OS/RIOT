@@ -294,7 +294,7 @@ static int _write_handler(int argc, char **argv)
     }
     w_buf = argv[4];
     nbytes = strlen(w_buf);
-    /* in hex string mode, bytes may be seperated by spaces */
+    /* in hex string mode, bytes may be separated by spaces */
     /* in ascii mode, there could be spaces */
     /* we need the total number of strings to go through */
     nb_str = argc - 4;

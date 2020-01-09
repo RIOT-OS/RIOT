@@ -26,7 +26,26 @@
 
 #include "luid.h"
 
-static uint8_t lastused = 1;
+#ifndef MAX
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#endif
+
+void __attribute__((weak)) luid_base(void *buf, size_t len)
+{
+    memset(buf, LUID_BACKUP_SEED, len);
+
+#if CPUID_LEN
+    uint8_t *out = (uint8_t *)buf;
+    uint8_t cid[CPUID_LEN];
+
+    cpuid_get(cid);
+    for (size_t i = 0; i < MAX(len, CPUID_LEN); i++) {
+        out[i % len] ^= cid[i % CPUID_LEN];
+    }
+#endif
+}
+
+static uint8_t lastused;
 
 void luid_get(void *buf, size_t len)
 {
@@ -44,19 +63,30 @@ void luid_custom(void *buf, size_t len, int gen)
     }
 }
 
-void luid_base(void *buf, size_t len)
+void luid_get_short(network_uint16_t *addr)
 {
-    assert(buf && (len > 0));
+    luid_base(addr, sizeof(*addr));
+    addr->u8[1] ^= lastused++;
 
-    memset(buf, LUID_BACKUP_SEED, len);
+    /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
+     * 0 for unicast addresses */
+    addr->u8[0] &= 0x7F;
+}
 
-#if CPUID_LEN
-    uint8_t *out = (uint8_t *)buf;
-    uint8_t cid[CPUID_LEN];
+void luid_get_eui48(eui48_t *addr)
+{
+    luid_base(addr, sizeof(*addr));
+    addr->uint8[5] ^= lastused++;
 
-    cpuid_get(cid);
-    for (size_t i = 0; i < CPUID_LEN; i++) {
-        out[i % len] ^= cid[i];
-    }
-#endif
+    eui48_set_local(addr);
+    eui48_clear_group(addr);
+}
+
+void luid_get_eui64(eui64_t *addr)
+{
+    luid_base(addr, sizeof(*addr));
+    addr->uint8[7] ^= lastused++;
+
+    eui64_set_local(addr);
+    eui64_clear_group(addr);
 }

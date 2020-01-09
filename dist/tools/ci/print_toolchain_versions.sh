@@ -44,8 +44,49 @@ get_os_info() {
     elif [ "$os" = "Darwin" ]; then
         osname="$(sw_vers -productName)"
         osvers="$(sw_vers -productVersion)"
+    elif [ "$os" = "FreeBSD" ]; then
+        osname="$os"
+        osvers="$(freebsd-version)"
     fi
     printf "%s %s" "$osname" "$osvers"
+}
+
+extract_shell_version() {
+    SHELL_NAME=$"(basename $1)"
+    SHELL_VERSION="$($1 --version 2>/dev/null)"
+    ERR=$?
+    if [ $ERR -ne 0 ] ; then # if it does not like the --version switch, it is probably dash
+        printf "%s" "$1"
+        # we do not say "probably dash" if we are sure it IS dash
+        if [ "$SHELL_NAME" != dash ] ; then
+            printf " (probably dash)"
+        fi
+    else
+        printf "%s" "$(echo "$SHELL_VERSION" | head -n 1)"
+    fi
+}
+
+get_sys_shell() {
+    case "$(uname -s)" in
+        MINGW*)
+            # MINGW has no realpath, but also no (meaningful) symlinks
+            SH_PATH=/bin/sh
+            ;;
+        *)
+            SH_PATH="$(realpath /bin/sh)"
+            ;;
+    esac
+    extract_shell_version "$SH_PATH"
+}
+
+_get_make_shell() {
+    make -sf - 2>/dev/null <<MAKEFILE
+\$(info \$(realpath \$(SHELL)))
+MAKEFILE
+}
+
+get_make_shell() {
+    extract_shell_version "$(_get_make_shell)"
 }
 
 newlib_version() {
@@ -70,24 +111,26 @@ printf "\n"
 # print operating system information
 printf "%s\n" "Operating System Environment"
 printf "%s\n" "-----------------------------"
-printf "%23s: %s\n" "Operating System" "$(get_os_info)"
-printf "%23s: %s\n" "Kernel" "$(get_kernel_info)"
+printf "%25s: %s\n" "Operating System" "$(get_os_info)"
+printf "%25s: %s\n" "Kernel" "$(get_kernel_info)"
+printf "%25s: %s\n" "System shell" "$(get_sys_shell)"
+printf "%25s: %s\n" "make's shell" "$(get_make_shell)"
 printf "\n"
 
 printf "%s\n" "Installed compiler toolchains"
 printf "%s\n" "-----------------------------"
-printf "%23s: %s\n" "native gcc" "$(get_cmd_version gcc)"
+printf "%25s: %s\n" "native gcc" "$(get_cmd_version gcc)"
 for p in \
          arm-none-eabi \
          avr mips-mti-elf \
          msp430 \
          riscv-none-embed \
          xtensa-esp32-elf \
-         xtensa-lx106-elf \
+         xtensa-esp8266-elf \
          ; do
-    printf "%23s: %s\n" "$p-gcc" "$(get_cmd_version ${p}-gcc)"
+    printf "%25s: %s\n" "$p-gcc" "$(get_cmd_version ${p}-gcc)"
 done
-printf "%23s: %s\n" "clang" "$(get_cmd_version clang)"
+printf "%25s: %s\n" "clang" "$(get_cmd_version clang)"
 printf "\n"
 printf "%s\n" "Installed compiler libs"
 printf "%s\n" "-----------------------"
@@ -97,17 +140,18 @@ for p in \
          mips-mti-elf \
          riscv-none-embed \
          xtensa-esp32-elf \
-         xtensa-lx106-elf \
+         xtensa-esp8266-elf \
          ; do
-    printf "%23s: %s\n" "$p-newlib" "$(newlib_version ${p}-gcc)"
+    printf "%25s: %s\n" "$p-newlib" "$(newlib_version ${p}-gcc)"
 done
 # avr libc version
-printf "%23s: %s\n" "avr-libc" "$(avr_libc_version avr-gcc)"
+printf "%25s: %s\n" "avr-libc" "$(avr_libc_version avr-gcc)"
 # tools
 printf "\n"
 printf "%s\n" "Installed development tools"
 printf "%s\n" "---------------------------"
 for c in \
+         ccache \
          cmake \
          cppcheck \
          doxygen \
@@ -118,9 +162,9 @@ for c in \
          python2 \
          python3 \
          ; do
-    printf "%23s: %s\n" "$c" "$(get_cmd_version "${c}")"
+    printf "%25s: %s\n" "$c" "$(get_cmd_version "${c}")"
 done
-printf "%23s: %s\n" "flake8" "$(get_cmd_version "python3 -Wignore -m flake8")"
-printf "%23s: %s\n" "coccinelle" "$(get_cmd_version spatch)"
+printf "%25s: %s\n" "flake8" "$(get_cmd_version "python3 -Wignore -m flake8")"
+printf "%25s: %s\n" "coccinelle" "$(get_cmd_version spatch)"
 
 exit 0

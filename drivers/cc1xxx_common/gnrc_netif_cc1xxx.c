@@ -159,6 +159,7 @@ static int cc1xxx_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 }
 
 static const gnrc_netif_ops_t cc1xxx_netif_ops = {
+    .init = gnrc_netif_default_init,
     .send = cc1xxx_adpt_send,
     .recv = cc1xxx_adpt_recv,
     .get = gnrc_netif_get_from_netdev,

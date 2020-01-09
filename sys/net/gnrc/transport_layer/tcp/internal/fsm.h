@@ -54,7 +54,7 @@ typedef enum {
     FSM_EVENT_CALL_RECV,          /* User function call: recv */
     FSM_EVENT_CALL_CLOSE,         /* User function call: close */
     FSM_EVENT_CALL_ABORT,         /* User function call: abort */
-    FSM_EVENT_RCVD_PKT,           /* Paket received from peer */
+    FSM_EVENT_RCVD_PKT,           /* Packet received from peer */
     FSM_EVENT_TIMEOUT_TIMEWAIT,   /* Timeout: timewait */
     FSM_EVENT_TIMEOUT_RETRANSMIT, /* Timeout: retransmit */
     FSM_EVENT_TIMEOUT_CONNECTION, /* Timeout: connection */
@@ -67,7 +67,7 @@ typedef enum {
  *
  * @param[in,out] tcb     TCB holding the connection information.
  * @param[in]     event   Current event that triggers FSM transition.
- * @param[in]     in_pkt  Incomming packet. Only not NULL in case of event RCVD_PKT.
+ * @param[in]     in_pkt  Incoming packet. Only not NULL in case of event RCVD_PKT.
  * @param[in,out] buf     Buffer for send and receive functions.
  * @param[in]     len     Number of bytes to send or receive.
  *

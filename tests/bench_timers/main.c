@@ -714,7 +714,7 @@ int main(void)
     if (res < 0) {
         print_str("Error ");
         print_s32_dec(res);
-        print_str(" intializing reference timer\n");
+        print_str(" initializing reference timer\n");
         return res;
     }
     random_init(seed);
@@ -724,7 +724,7 @@ int main(void)
     if (res < 0) {
         print_str("Error ");
         print_s32_dec(res);
-        print_str(" intializing timer under test\n");
+        print_str(" initializing timer under test\n");
         return res;
     }
 #endif

@@ -14,6 +14,7 @@
  * @brief       gcoap CLI support
  *
  * @author      Ken Bannister <kb2ma@runbox.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -31,8 +32,8 @@
 
 static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
                             size_t maxlen, coap_link_encoder_ctx_t *context);
-static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
-                          sock_udp_ep_t *remote);
+static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
+                          const sock_udp_ep_t *remote);
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 
@@ -43,7 +44,7 @@ static const coap_resource_t _resources[] = {
 };
 
 static const char *_link_params[] = {
-    ";ct=0;rt=\"count\"",
+    ";ct=0;rt=\"count\";obs",
     NULL
 };
 
@@ -84,16 +85,16 @@ static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
 /*
  * Response callback.
  */
-static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
-                          sock_udp_ep_t *remote)
+static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
+                          const sock_udp_ep_t *remote)
 {
     (void)remote;       /* not interested in the source currently */
 
-    if (req_state == GCOAP_MEMO_TIMEOUT) {
+    if (memo->state == GCOAP_MEMO_TIMEOUT) {
         printf("gcoap: timeout for msg ID %02u\n", coap_get_id(pdu));
         return;
     }
-    else if (req_state == GCOAP_MEMO_ERR) {
+    else if (memo->state == GCOAP_MEMO_ERR) {
         printf("gcoap: error in response\n");
         return;
     }
@@ -144,7 +145,8 @@ static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
             block.blknum++;
             coap_opt_add_block2_control(pdu, &block);
             int len = coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
-            gcoap_req_send((uint8_t *)pdu->hdr, len, remote, _resp_handler);
+            gcoap_req_send((uint8_t *)pdu->hdr, len, remote,
+                           _resp_handler, memo->context);
         }
         else {
             puts("--- blockwise complete ---");
@@ -221,8 +223,8 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
     remote.family = AF_INET6;
 
     /* parse for interface */
-    int iface = ipv6_addr_split_iface(addr_str);
-    if (iface == -1) {
+    char *iface = ipv6_addr_split_iface(addr_str);
+    if (!iface) {
         if (gnrc_netif_numof() == 1) {
             /* assign the single interface found in gnrc_netif_numof() */
             remote.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
@@ -232,13 +234,13 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
         }
     }
     else {
-        if (gnrc_netif_get_by_pid(iface) == NULL) {
+        int pid = atoi(iface);
+        if (gnrc_netif_get_by_pid(pid) == NULL) {
             puts("gcoap_cli: interface not valid");
             return 0;
         }
-        remote.netif = iface;
+        remote.netif = pid;
     }
-
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
         puts("gcoap_cli: unable to parse destination address");
@@ -257,7 +259,7 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
         return 0;
     }
 
-    bytes_sent = gcoap_req_send(buf, len, &remote, _resp_handler);
+    bytes_sent = gcoap_req_send(buf, len, &remote, _resp_handler, NULL);
     if (bytes_sent > 0) {
         req_count++;
     }

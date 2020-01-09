@@ -12,6 +12,7 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
     USEMODULE += netdev_eth
     USEMODULE += netopt
     USEMODULE += riot_freertos
+    USEMODULE += xtimer
     INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/ethernet
     INCLUDES += -I$(ESP32_SDK_DIR)/components/ethernet/include
 endif
@@ -38,21 +39,13 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
     USEMODULE += esp_idf_wpa_supplicant_port
     USEMODULE += esp_idf_nvs_flash
     USEMODULE += riot_freertos
-
-    # crypto and hashes produce symbol conflicts with esp_idf_wpa_supplicant_crypto
-    DISABLE_MODULE += crypto
-    DISABLE_MODULE += hashes
+    USEMODULE += xtimer
 endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
     # add additional modules required by esp_idf_nvs_flash
     USEMODULE += mtd
     USEMODULE += pthread
-endif
-
-ifneq (,$(filter riot_freertos,$(USEMODULE)))
-    # add additional modules required by riot_freertos
-    USEMODULE += xtimer
 endif
 
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
@@ -89,7 +82,10 @@ endif
 
 ifneq (,$(filter shell,$(USEMODULE)))
     USEMODULE += ps
-    USEMODULE += xtimer
+endif
+
+ifneq (,$(filter log_color,$(USEMODULE)))
+    USEMODULE += esp_log_colored
 endif
 
 # if SPI RAM is enabled, ESP-IDF heap and quot flash mode have to be used

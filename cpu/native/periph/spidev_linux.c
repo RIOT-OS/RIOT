@@ -267,7 +267,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         DEBUG("spi_transfer_bytes: ioctl failed\n");
     }
     else {
-        DEBUG("\nspi_transfer_bytes: transfered %d bytes\n", len);
+        DEBUG("\nspi_transfer_bytes: transferred %d bytes\n", len);
     }
 }
 

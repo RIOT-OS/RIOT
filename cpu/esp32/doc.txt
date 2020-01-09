@@ -73,8 +73,8 @@ The following table gives a short reference of all board configuration parameter
 Parameter | Short Description                      | Type*
 ----------|----------------------------------------|------
 [ADC_GPIOS](#esp32_adc_channels)        | GPIOs that can be used as ADC channels | m
-[CAN_TX](#esp32_can_interfaces) | GPIO used as CAN tranceiver TX signal | o
-[CAN_RX](#esp32_can_interfaces) | GPIO used as CAN tranceiver RX signal | o
+[CAN_TX](#esp32_can_interfaces) | GPIO used as CAN transceiver TX signal | o
+[CAN_RX](#esp32_can_interfaces) | GPIO used as CAN transceiver RX signal | o
 [DAC_GPIOS](#esp32_adc_channels)        | GPIOs that can be used as DAC channels | m
 [I2C0_SPEED](#esp32_i2c_interfaces)| Bus speed of I2C_DEV(0)         | o
 [I2C0_SCL](#esp32_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(0) | o
@@ -114,6 +114,9 @@ Module    | Default  | Short description
 [esp_hw_counter](#esp32_timers) | not used | use hardware counters for RIOT timers
 [esp_i2c_hw](#esp32_i2c_interfaces) | not used  | use the i2C hardware implementation
 [esp_idf_heap](#esp32_esp_idf_heap_implementation) | not used | enable ESP-IDF heap implementation
+[esp_log_colored](#esp32_esp_log_module) | not used | enable colored log output
+[esp_log_startup](#esp32_esp_log_module) | not used | enable additional startup information
+[esp_log_tagged](#esp32_esp_log_module) | not used | add additional information to the log output
 [esp_now](#esp32_esp_now_network_interface) | not used  | enable the ESP-NOW network device
 [esp_spi_ram](#esp32_spi_ram) | not used |  enable SPI RAM
 [esp_spiffs](#esp32_spiffs_device) | not used  |  enable SPIFFS for on-board flash memory
@@ -192,7 +195,6 @@ The RIOT-OS for ESP32 SoCs supports the following features at the moment:
 The implementation of RIOT-OS for ESP32 SOCs has the following limitations at the moment:
 
 - Only <b>one core</b> (the PRO CPU) is used because RIOT does not support running multiple threads  simultaneously.
-- RIOT modules <b>crypto</b> and <b>hashes</b> cannot be used together with modules <b>esp_now</b> and <b>esp_wifi</b>
 - <b>Bluetooth</b> cannot be used at the moment.
 - <b>Flash encryption</b> is not yet supported.
 
@@ -202,7 +204,7 @@ The implementation of RIOT-OS for ESP32 SOCs has the following limitations at th
 Following software components are required for compilation:
 
 - <b>Xtensa GCC</b> compiler suite for ESP32
-- <b>ESP-IDF</b> SDK which includes all ESP32 SOC definitions, the hardware abstraction library <b>```libhal.a```</b>, and the flash programmer tool <b>```esptool.py```</b>
+- <b>ESP-IDF</b> SDK which includes all ESP32 SOC definitions, basic libraries and the hardware abstraction library <b>`libhal.a`</b>
 
 There are two options to install the Toolchain:
 
@@ -216,7 +218,12 @@ The easiest way to use install the toolchain is the RIOT Docker image ```riotdoc
 1. making the RIOT application in Docker with command ```make BOARD= ...```
 2. flashing the RIOT application on the host computer with command ```make flash-only BOARD=...```
 
-where step 2 requires that the flasher program ```esptool.py``` is installed.
+where step 2 requires that the ESP flash programmer `esptool.py` is installed.
+Both steps can also be performed with a single command on the host system
+using the `BUILD_IN_DOCKER` variable:
+```
+BUILD_IN_DOCKER=1 make BOARD=... flash
+```
 
 ### <a name="esp32_preparing_the_environment"> Preparing the Environment </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -224,30 +231,14 @@ Using RIOT Docker requires at least the following software:
 
 - <b>```Docker```</b> container virtualization software
 - RIOT Docker (<b>```riotdocker```</b>) image
-- flasher tool <b>```esptool.py```</b>
+- ESP flash programmer tool <b>`esptool.py`</b>
 
 For information about installing Docker on your host, refer to the appropriate manuals for your operating system. For example, the easiest way to install Docker on the Ubuntu/Debian system is:
 ```
 sudo apt-get install docker.io
 ```
-
-The ESP flasher program <b>```esptool.py```</b> is available at [GitHub](https://github.com/espressif/esptool). Don't use the the ```esptool``` package of your OS. ```esptool.py``` requires either Python 2.7 or Python 3.4 or later. The latest stable version of ```esptool.py``` can be installed with ```pip```:
-```
-pip install esptool
-```
-
-<b>```esptool.py```</b> depends on ```pySerial``` which can be installed either using ```pip```
-
-```
-pip install pyserial
-```
-or the package manager of your OS, for example on Debian/Ubuntu systems:
-```
-apt-get install pyserial
-```
-For more information on ```esptool.py```, please refer the [git repository](https://github.com/espressif/esptool)
-
-Please make sure that ```esptool.py``` is in your ```PATH``` variable.
+For information on how to install `esptool.py`, see section
+[Installation of `esptool.py`](#esp32_installation_of_esptool).
 
 ### <a name="esp32_generating_docker_image"> Generating a riotdocker Image </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -345,6 +336,32 @@ Since we only use a few header files, ESP-IDF does not need to be compiled in an
 export ESP32_SDK_DIR=$HOME/esp/esp-idf
 ```
 
+### <a name="esp32_installation_of_esptool"> Installation of `esptool.py` (ESP flash programmer tool) </a> &nbsp;[[TOC](#esp32_toc)]
+
+The RIOT port does not work with the `esptool.py` ESP flasher program
+available on [GitHub](https://github.com/espressif/esptool) or
+as a package for your OS. Instead, a modified version is required.
+
+To avoid the installation of the complete ESP-IDF SDK, for example,
+because RIOT Docker `riotdocker` is used for compilation, `esptool.py`
+has been extracted from the SDK and placed in RIOT's
+directory `dist/tools/esptool`.
+For convenience, the build system uses always the version from this directory.
+
+Therefore, it is **not necessary to install** `esptool.py` explicitly. However
+`esptool.py` depends on `pySerial` which can be installed either
+using `pip`
+
+```
+sudo pip install pyserial
+```
+or the package manager of your OS, for example on Debian/Ubuntu systems:
+```
+apt install python-pyserial
+```
+For more information on `esptool.py`, please refer to the
+[git repository](https://github.com/espressif/esptool).
+
 
 # <a name="esp32_flashing_the_device"> Flashing the Device </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -395,6 +412,9 @@ esp_eth | Enable the Ethernet MAC (EMAC) interface as `netdev` network device, s
 esp_gdb | Enable the compilation with debug information for debugging with [QEMU and GDB](#esp32_qemu_mode_and_gdb) (```QEMU=1```) or via [JTAG interface with OpenOCD](#esp32_jtag_debugging).
 esp_i2c_hw | Use the hardware I2C implementation, see section [I2C Interfaces](#esp32_i2c_interfaces).
 esp_idf_heap | Use the ESP-IDF heap implementation, see section [ESP-IDF Heap Implementation](#esp32_esp_idf_heap_implementation).
+esp_log_colored | Enable colored log output, see section [Log output](#esp32_esp_log_module).
+esp_log_startup | Enable additional startup information, see section [Log output](#esp32_esp_log_module).
+esp_log_tagged | Add additional information to the log output, see section [Log output](#esp32_esp_log_module).
 esp_now | Enable the built-in WiFi module with the ESP-NOW protocol as `netdev` network device, see section [ESP-NOW Network Interface](#esp32_esp_now_network_interface).
 esp_spiffs  | Enable the optional SPIFFS drive in on-board flash memory, see section [SPIFFS Device](#esp32_spiffs_device).
 esp_spi_ram | Enable the optional SPI RAM, see section [SPI RAM Modules](#esp32_spi_ram).
@@ -421,6 +441,47 @@ The flash mode determines whether 2 data lines (```dio``` and ```dout```) or 4 d
 
 For more information about these flash modes, refer the documentation of [esptool.py](https://github.com/espressif/esptool/wiki/SPI-Flash-Modes).
 
+## <a name="esp32_esp_log_module"> Log output </a> &nbsp;[[TOC](#esp32_toc)]
+
+The RIOT port for ESP32 implements a log module with a bunch of macros
+to generate log output according to the interface as defined in
+[system logging header](http://doc.riot-os.org/log_8h.html). These macros
+support colored and tagged log output.
+
+The colored log output is enabled by module `esp_log_colored`. If colored log
+output is enabled, log messages are displayed in color according to their type:
+Error messages are displayed in red, warnings in yellow, information
+messages in green and all other message types in standard color.
+
+When the `esp_log_tagged` module is used, all log messages are tagged with
+additional information: the type of message, the system time in ms, and the
+module or function in which the log message is generated. For example:
+
+```
+I (663) [main_trampoline] main(): This is RIOT! (Version: 2019.10-devel-437-gf506a)
+```
+
+Either the `LOG_*` macros as defined in
+[system logging header](http://doc.riot-os.org/log_8h.html) or the tagged
+version `LOG_TAG_*` of these macros can be used to produce tagged log output.
+If the `LOG_*` macros are used, the function which generates the log message
+is used in the tag while a `tag` parameter is used for the `LOG_TAG_*` macros.
+For example,
+```
+LOG_ERROR("error message");
+```
+generates a log message in which the name of the calling function is used as
+tag. With
+```
+LOG_TAG_ERROR("mod", "error message");
+```
+a log message with string `mod` in the tag is generated.
+
+The `esp_log_startup` module can be used to enable additional information
+about the boot process, the board configuration, the system configuration,
+the CPU used by the system, and the available heap. These information may
+help to detect problems during the startup. If the application does not
+start as expected, this module should be used.
 
 ## <a name="esp32_esp_idf_heap_implementation"> ESP-IDF Heap Implementation </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -512,7 +573,11 @@ ESP32 integrates two 12-bit ADCs (ADC1 and ADC2) capable of measuring up to 18 a
 
 These GPIOs are realized by the RTC unit and are therefore also called RTC GPIOs or RTCIO GPIOs.
 
-@note GPIO37 and GPIO38 are usually not broken out on ESP32 boards and are therefore not usable.
+@note
+- GPIO37 and GPIO38 are usually not broken out on ESP32 boards and can not be
+  used therefore.
+- ADC2 is used by the WiFi module. The GPIOs connected to ADC2 are therefore not
+  available as ADC channels if the modules `esp_wifi` or `esp_now` are used.
 
 The GPIOs that can be used as ADC channels for a given board are defined by the <b>```ADC_GPIOS```</b> macro in the board-specific peripheral configuration. This configuration can be changed by [application-specific configurations](#esp32_application_specific_configurations).
 
@@ -820,11 +885,11 @@ in SJA1000 PeliCAN mode. Please refer the
 [SJA1000 Datasheet](https://www.nxp.com/documents/data_sheet/SJA1000.pdf)
 for detailed information about the CAN controller and its programming.
 
-The pin configuration of the CAN tranceiver interface is usually defined
+The pin configuration of the CAN transceiver interface is usually defined
 in board specific peripheral configuration by
 
-- <b>```CAN_TX```</b>, the GPIO used as TX tranceiver signal, and
-- <b>```CAN_RX```</b>, the GPIO used as RX tranceiver signal.
+- <b>```CAN_TX```</b>, the GPIO used as TX transceiver signal, and
+- <b>```CAN_RX```</b>, the GPIO used as RX transceiver signal.
 
 If the pin configuration is not defined, the following default configuration
 is used which can be overridden by the application, see section
@@ -837,8 +902,8 @@ CAN     | RX   | GPIO35 |`CAN_RX`       | optional, can be overridden
 
 Example:
 ```
-#define CAN_TX      GPIO10      /* CAN TX tranceiver signal */
-#define CAN_RX      GPIO9       /* CAN RX tranceiver signal */
+#define CAN_TX      GPIO10      /* CAN TX transceiver signal */
+#define CAN_RX      GPIO9       /* CAN RX transceiver signal */
 ```
 
 If the board has an external transceiver module connected to the ESP32 on-board,
@@ -927,12 +992,9 @@ The board has to have one of the supported PHY modules to be able to use the Eth
 The RIOT port for ESP32 implements in module `esp_wifi` a `netdev` driver for
 the built-in WiFi interface.
 
-@note Due to symbol conflicts with the `crypto` and `hash` modules of RIOT
-in module `esp_idf_wpa_supplicant_crypto`, which is required by module
-`esp_wifi`, `esp_wifi` cannot be used for applications that use these modules.
-Therefore, module `esp_wifi` is not automatically enabled when module
-`netdev_default` is used. Instead, if necessary, the application has to add
-the module `esp_wifi` in the Makefile.
+@note Module `esp_wifi` is not enabled automatically when the `netdev_default`
+module is used. Instead, if necessary, the application has to add the
+`esp_wifi` module in the Makefile.
 
 ```
 USEMODULE += esp_wifi
@@ -972,14 +1034,16 @@ With ESP-NOW, the ESP32 provides a connectionless communication technology, feat
 
 The RIOT port for ESP32 implements in module ```esp_now``` a ```netdev``` driver which uses ESP-NOW to provide a link layer interface to a meshed network of ESP32 nodes. In this network, each node can send short packets with up to 250 data bytes to all other nodes that are visible in its range.
 
-@note Due to symbol conflicts in the ```esp_idf_wpa_supplicant_crypto``` module used by the ```esp_now``` with RIOT's ```crypto``` and ```hashes``` modules, ESP-NOW cannot be used for application that use these modules. Therefore, the module ```esp_now``` is not enabled automatically if the ```netdev_default``` module is used. Instead, the application has to add the ```esp_now``` module in its makefile when needed.<br>
+@note Module `esp_now`module is not enabled automatically if the
+`netdev_default` module is used. Instead, the application has to add the
+`esp_now` module in its makefile when needed.<br>
 ```
 USEMODULE += esp_now
 ```
 
 For ESP-NOW, ESP32 nodes are used in WiFi SoftAP + Station mode to advertise their SSID and become visible to other ESP32 nodes. The SSID of an ESP32 node is the concatenation of the prefix ```RIOT_ESP_``` with the MAC address of its SoftAP WiFi interface. The driver periodically scans all visible ESP32 nodes.
 
-The following parameters are defined for ESP-NOW nodes. These parameters can be overriden by [application-specific board configurations](#esp32_application_specific_board_configuration).
+The following parameters are defined for ESP-NOW nodes. These parameters can be overridden by [application-specific board configurations](#esp32_application_specific_board_configuration).
 
 <center>
 
@@ -1117,7 +1181,7 @@ It is important to ensure that the application-specific driver parameter file ``
 INCLUDES += -I$(APPDIR)
 ```
 
-**Pleae note:** To make such application-specific board configurations dependent on the ESP32 MCU or a particular ESP32 board, you should always enclose these definitions in the following constructs:
+**Please note:** To make such application-specific board configurations dependent on the ESP32 MCU or a particular ESP32 board, you should always enclose these definitions in the following constructs:
 ```
 #ifdef CPU_ESP32
 ...

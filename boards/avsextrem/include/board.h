@@ -22,8 +22,9 @@
 
 #ifndef BOARD_H
 #define BOARD_H
+
+#include "lpc2387.h"
 #include "bitarithm.h"
-#include "msba2_common.h"
 
 #ifdef __cplusplus
 extern "C" {

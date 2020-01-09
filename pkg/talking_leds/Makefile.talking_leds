@@ -1,0 +1,3 @@
+MODULE = talking_leds
+
+include $(RIOTBASE)/Makefile.base

@@ -36,7 +36,7 @@ extern "C" {
 enum {
     SI70XX_OK,                 /**< All OK */
     SI70XX_ERR_NODEV,          /**< No valid device found on I2C bus */
-    SI70XX_ERR_I2C,            /**< An error occured when reading/writing on I2C bus */
+    SI70XX_ERR_I2C,            /**< An error occurred when reading/writing on I2C bus */
 };
 
 /**
@@ -68,7 +68,7 @@ typedef struct {
 int si70xx_init(si70xx_t *dev, const si70xx_params_t *params);
 
 /**
- * @brief   Read the relative humidity from the sensor. Uses clock streching.
+ * @brief   Read the relative humidity from the sensor. Uses clock stretching.
  *
  * @param[in] dev           device descriptor
  * @return                  relative humidity in centi-percent (times 100)
@@ -76,7 +76,7 @@ int si70xx_init(si70xx_t *dev, const si70xx_params_t *params);
 uint16_t si70xx_get_relative_humidity(const si70xx_t *dev);
 
 /**
- * @brief   Read the current temperature from the sensor. Uses clock streching.
+ * @brief   Read the current temperature from the sensor. Uses clock stretching.
  *
  * @param[in] dev           device descriptor
  * @return                  current temperature in centi-degrees Celsius

@@ -75,7 +75,7 @@ int irq_event_add(irq_event_t * irq)
                                             _irq_loop, NULL, "irq_handler");
         assert(_irq_handler_thread != KERNEL_PID_UNDEF);
 
-        /* intialize the queue unbind */
+        /* initialize the queue unbind */
         event_queue_init_detached(&irq_queue);
     }
 

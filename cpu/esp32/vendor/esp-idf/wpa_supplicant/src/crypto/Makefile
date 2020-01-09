@@ -4,7 +4,8 @@ include $(RIOTBASE)/Makefile.base
 
 # we have to do it in that way to avoid that $(RIOTBASE)/sys/include/crypto
 # is found first
-INCLUDES  = -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/wpa_supplicant/port/include
+INCLUDES  = -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/wpa_supplicant/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/wpa_supplicant/port/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/port/include
 CFLAGS += -D__ets__ -DESPRESSIF_USE -DESP32_IDF_CODE=1

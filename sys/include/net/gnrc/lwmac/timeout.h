@@ -90,7 +90,7 @@ void gnrc_lwmac_reset_timeouts(gnrc_netif_t *netif);
 /**
  * @brief   Make a specific LWMAC timeout expired.
  *
- * @param[in,out] timeout   LWMAC tiemout
+ * @param[in,out] timeout   LWMAC timeout
  */
 void gnrc_lwmac_timeout_make_expire(gnrc_lwmac_timeout_t *timeout);
 

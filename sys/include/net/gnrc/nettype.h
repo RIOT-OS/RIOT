@@ -119,6 +119,10 @@ typedef enum {
     GNRC_NETTYPE_NDN,           /**< Protocol is NDN */
 #endif
 
+#ifdef MODULE_GNRC_LORAWAN
+    GNRC_NETTYPE_LORAWAN,       /**< Protocol is LoRaWAN */
+#endif
+
     /**
      * @{
      * @name Testing

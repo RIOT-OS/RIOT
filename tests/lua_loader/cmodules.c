@@ -15,7 +15,7 @@
  * @author      Juan Carrano <j.carrano@fu-berlin.de>
  *
  * Normally one would not define more than one module in a single file, but
- * these modules are exacly the same: a single table with an integer value.
+ * these modules are exactly the same: a single table with an integer value.
  *
  * @}
  */

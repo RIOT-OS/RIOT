@@ -7,7 +7,7 @@ USEMODULE += pm_layered
 USEMODULE += stm32_common stm32_common_periph
 
 # For stm32 cpu's we use the stm32_common.ld linker script
-export LINKFLAGS += -L$(RIOTCPU)/stm32_common/ldscripts
+LINKFLAGS += -L$(RIOTCPU)/stm32_common/ldscripts
 LINKER_SCRIPT ?= stm32_common.ld
 
 INCLUDES += -I$(RIOTCPU)/stm32_common/include

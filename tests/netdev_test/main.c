@@ -28,6 +28,8 @@
 #include "thread.h"
 #include "utlist.h"
 
+#include "test_utils/interactive_sync.h"
+
 #define _EXP_LENGTH     (64)
 
 #define _MAC_STACKSIZE  (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
@@ -249,6 +251,8 @@ static int test_set_addr(void)
 
 int main(void)
 {
+    test_utils_interactive_sync();
+
     /* initialization */
     gnrc_pktbuf_init();
     msg_init_queue(_main_msg_queue, _MAIN_MSG_QUEUE_SIZE);

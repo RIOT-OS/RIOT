@@ -29,6 +29,8 @@
 #include "periph_conf.h"
 #include "periph/rtt.h"
 
+#include "test_utils/interactive_sync.h"
+
 #define TICKS_TO_WAIT       (5 * RTT_FREQUENCY)
 
 static volatile uint32_t last;
@@ -46,6 +48,8 @@ void cb(void *arg)
 
 int main(void)
 {
+    test_utils_interactive_sync();
+
     puts("\nRIOT RTT low-level driver test");
     puts("This test will display 'Hello' every 5 seconds\n");
 

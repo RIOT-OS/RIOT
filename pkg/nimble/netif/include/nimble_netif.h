@@ -150,8 +150,11 @@ enum {
  *
  * @param[in] handle        handle to the connection that triggered the event
  * @param[in] event         type of the event
+ * @param[in] addr          BLE address of the peer in the effected connection
  */
-typedef void(*nimble_netif_eventcb_t)(int handle, nimble_netif_event_t event);
+typedef void(*nimble_netif_eventcb_t)(int handle,
+                                      nimble_netif_event_t event,
+                                      const uint8_t *addr);
 
 /**
  * @brief   Initialize the netif implementation, spawns the netif thread

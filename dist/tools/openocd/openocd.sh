@@ -13,7 +13,7 @@
 # Global environment variables used:
 # OPENOCD:             OpenOCD command name, default: "openocd"
 # OPENOCD_CONFIG:      OpenOCD configuration file name,
-#                      default: "${RIOTBOARD}/${BOARD}/dist/openocd.cfg"
+#                      default: "${BOARDSDIR}/${BOARD}/dist/openocd.cfg"
 #
 # The script supports the following actions:
 #
@@ -66,7 +66,7 @@
 # Default TCL port, set to 0 to disable
 : ${TCL_PORT:=6333}
 # Default path to OpenOCD configuration file
-: ${OPENOCD_CONFIG:=${RIOTBOARD}/${BOARD}/dist/openocd.cfg}
+: ${OPENOCD_CONFIG:=${BOARDSDIR}/${BOARD}/dist/openocd.cfg}
 # Default OpenOCD command
 : ${OPENOCD:=openocd}
 # Extra board initialization commands to pass to OpenOCD

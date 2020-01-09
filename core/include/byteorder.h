@@ -367,7 +367,7 @@ static inline le_uint64_t byteorder_btolll(be_uint64_t v)
 }
 
 /**
- * @brief Swaps the byteorder according to the endianess
+ * @brief Swaps the byteorder according to the endianness
  */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #   define _byteorder_swap(V, T) (byteorder_swap##T((V)))

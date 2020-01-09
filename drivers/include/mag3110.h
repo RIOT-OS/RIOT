@@ -13,7 +13,7 @@
  * @ingroup     drivers_saul
  * @brief       Driver for the Freescale MAG3110 magnetometer.
  *
- * After initialization and set activ the magnetometer will make measurements
+ * After initialization and set active the magnetometer will make measurements
  * at periodic times.
  * The output rate and over sample ratio can be determined by magnetometer
  * initialization.

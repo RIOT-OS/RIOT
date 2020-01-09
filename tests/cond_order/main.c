@@ -24,7 +24,6 @@
 #include "cond.h"
 #include "mutex.h"
 #include "thread.h"
-#include "test_utils/interactive_sync.h"
 
 #define THREAD_NUMOF            (5U)
 #define THREAD_FIRSTGROUP_NUMOF (3U)
@@ -62,8 +61,6 @@ int main(void)
 {
     puts("Condition variable order test");
     puts("Please refer to the README.md for more information\n");
-
-    test_utils_interactive_sync();
 
     mutex_init(&testlock);
     cond_init(&testcond);

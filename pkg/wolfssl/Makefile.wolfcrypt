@@ -29,10 +29,5 @@ SRC +=  ge_low_mem.c
 SRC +=  sp_int.c
 SRC +=  sp_c32.c
 
-# Disable maybe-uninitialized warning raised by the optimization level used
-# by risv toolchain (-Og)
-ifeq ($(TARGET_ARCH),riscv-none-embed)
-  CFLAGS += -Wno-maybe-uninitialized
-endif
 
 include $(RIOTBASE)/Makefile.base

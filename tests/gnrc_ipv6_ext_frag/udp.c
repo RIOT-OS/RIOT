@@ -37,13 +37,16 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
                  unsigned int delay)
 {
     int iface;
+    char *iface_spec;
     char *conversion_end;
     uint16_t port;
     ipv6_addr_t addr;
     size_t data_len;
 
     /* get interface, if available */
-    iface = ipv6_addr_split_iface(addr_str);
+    iface_spec = ipv6_addr_split_iface(addr_str);
+    iface = iface_spec ? atoi(iface_spec) : -1;
+
     if ((iface < 0) && (gnrc_netif_numof() == 1)) {
         iface = gnrc_netif_iter(NULL)->pid;
     }

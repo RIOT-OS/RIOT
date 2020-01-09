@@ -26,7 +26,6 @@
 #include "bitarithm.h"
 #include "irq.h"
 #include "thread.h"
-#include "irq.h"
 #include "log.h"
 
 #ifdef MODULE_MPU_STACK_GUARD

@@ -262,11 +262,11 @@ int suit_cbor_subparse(nanocbor_value_t *bseq, nanocbor_value_t *it);
 /**
  * @brief Helper function for writing bytes on flash a specified offset
  *
- * @param[in]   arg     ptr to flash writer
+ * @param[in]   arg     ptr to the SUIT manifest
  * @param[in]   offset  offset to write to on flash
  * @param[in]   buf     bytes to write
  * @param[in]   len     length of bytes to write
- * @param[in]   more    whether more data is comming
+ * @param[in]   more    whether more data is coming
  *
  * @return              0 on success
  * @return              <0 on error

@@ -15,6 +15,10 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
   DIRS += socket_zep
 endif
 
+ifneq (,$(filter stdio_native,$(USEMODULE)))
+  DIRS += stdio_native
+endif
+
 ifneq (,$(filter mtd_native,$(USEMODULE)))
   DIRS += mtd
 endif

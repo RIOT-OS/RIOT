@@ -50,8 +50,8 @@ static const uart_conf_t uart_config[] = {
         .dev        = NRF_UARTE0,
         .rx_pin     = GPIO_PIN(0,8),
         .tx_pin     = GPIO_PIN(0,6),
-        .rts_pin    = GPIO_PIN(0,5),
-        .cts_pin    = GPIO_PIN(0,7),
+        .rts_pin    = (uint8_t)GPIO_UNDEF,
+        .cts_pin    = (uint8_t)GPIO_UNDEF,
         .irqn       = UARTE0_UART0_IRQn,
     },
     { /* Mapped to Arduino D0/D1 pins */

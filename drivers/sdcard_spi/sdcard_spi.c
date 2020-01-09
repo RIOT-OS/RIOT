@@ -228,7 +228,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
 
         case SD_INIT_SEND_CMD1:
             DEBUG("SD_INIT_SEND_CMD1\n");
-            DEBUG("COULD TRY CMD1 (for MMC-card)-> currently not suported\n");
+            DEBUG("COULD TRY CMD1 (for MMC-card)-> currently not supported\n");
             _unselect_card_spi(card);
             return SD_INIT_CARD_UNKNOWN;
 
@@ -254,13 +254,13 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
                             DEBUG("OCR: POWER UP ROUTINE FINISHED\n");
                             /* if sd card is sdhc */
                             if ((ocr & OCR_CCS) != 0) {
-                                DEBUG("OCR: CARD TYPE IS SDHC (SD_V2 with block adressing)\n");
+                                DEBUG("OCR: CARD TYPE IS SDHC (SD_V2 with block addressing)\n");
                                 card->use_block_addr = true;
                                 _unselect_card_spi(card);
                                 return SD_INIT_READ_CID;
                             }
 
-                            DEBUG("OCR: CARD TYPE IS SDSC (SD_v2 with byte adressing)\n");
+                            DEBUG("OCR: CARD TYPE IS SDSC (SD_v2 with byte addressing)\n");
                             card->use_block_addr = false;
                             return SD_INIT_SEND_CMD16;
                         }
@@ -284,7 +284,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
             DEBUG("SD_INIT_SEND_CMD16\n");
             uint8_t r1_16 = sdcard_spi_send_cmd(card, SD_CMD_16, SD_HC_BLOCK_SIZE, INIT_CMD_RETRY_CNT);
             if (R1_VALID(r1_16) && !R1_ERROR(r1_16)) {
-                DEBUG("CARD TYPE IS SDSC (SD_V1 with byte adressing)\n");
+                DEBUG("CARD TYPE IS SDSC (SD_V1 with byte addressing)\n");
                 _unselect_card_spi(card);
                 return SD_INIT_READ_CID;
             }

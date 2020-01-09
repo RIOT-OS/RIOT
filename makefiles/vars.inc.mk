@@ -5,6 +5,8 @@ export Q                     # Used in front of Makefile lines to suppress the p
 export QQ                    # as Q, but be more quiet
 export QUIET                 # The parameter to use whether to show verbose makefile commands or not.
 
+export OS                    # The operating system of the build host
+
 export APPLICATION           # The application, set in the Makefile which is run by the user.
 export APPLICATION_MODULE    # The application module name.
 export BOARD                 # The board to compile the application for.
@@ -25,7 +27,8 @@ export APPDEPS               # Files / Makefile targets that need to be created 
 
 export RIOTBASE              # The root folder of RIOT. The folder where this very file lives in.
 export RIOTCPU               # For third party CPUs this folder is the base of the CPUs.
-export RIOTBOARD             # For third party BOARDs this folder is the base of the BOARDs.
+export RIOTBOARD             # This folder is the base of the riot boards.
+export BOARDSDIR             # For third party BOARDs this folder is the base of the BOARDs.
 export RIOTPKG               # For overriding RIOT's pkg directory
 export RIOTTOOLS             # Location of host machine tools
 export RIOTPROJECT           # Top level git root of the project being built, or PWD if not a git repository
@@ -43,6 +46,7 @@ export FEATURES_PROVIDED     # List of provided features by the board
 export FEATURES_OPTIONAL     # List of nice to have features
 # TOOLCHAINS_SUPPORTED       # List of supported toolchains by an MCU (gnu/llvm/...).
 # TOOLCHAINS_BLACKLISTED     # List of unspported toolchains for a module or an application.
+export TOOLCHAIN             # Base build toolchain, i.e. GNU or LLVM
 
 export TARGET_ARCH           # The target platform name, in GCC triple notation, e.g. "arm-none-eabi", "i686-elf", "avr"
 export PREFIX                # The prefix of the toolchain commands, usually "$(TARGET_ARCH)-", e.g. "arm-none-eabi-" or "msp430-".
@@ -70,6 +74,7 @@ export SIZE                  # The command to read to size of the ELF sections.
 export SIZEFLAGS             # The optional size flags.
 export UNDEF                 # Object files that the linker must include in the ELFFILE even if no call to the functions or symbols (ex: interrupt vectors).
 export WERROR                # Treat all compiler warnings as errors if set to 1 (see -Werror flag in GCC manual)
+export WPEDANTIC             # Issue all (extensive) compiler warnings demanded by strict C/C++
 
 export GITCACHE              # path to git-cache executable
 export GIT_CACHE_DIR         # path to git-cache cache directory
@@ -91,9 +96,6 @@ export HEXFILE               # The 'intel hex' stripped result of the compilatio
 # DEBUGSERVER_FLAGS          # The parameters to supply to DEBUGSERVER.
 # RESET                      # The command to call on "make reset", this command resets/reboots the target.
 # RESET_FLAGS                # The parameters to supply to RESET.
-
-export CCACHE_BASEDIR        # ccache basedir, allows multiple riot build
-                             # directories to share a ccache directory
 
 export DLCACHE               # directory used to cache http downloads
 export DOWNLOAD_TO_FILE      # Use `$(DOWNLOAD_TO_FILE) $(DESTINATION) $(URL)` to download `$(URL)` to `$(DESTINATION)`.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -27,9 +27,10 @@
 #include "xtimer.h"
 #include "periph/timer.h"
 
-#include "common.h"
-#include "irq_arch.h"
 #include "esp/common_macros.h"
+#include "esp_common.h"
+#include "irq_arch.h"
+#include "rom/ets_sys.h"
 #include "sdk/sdk.h"
 #include "xtensa/hal.h"
 
@@ -295,17 +296,13 @@ static void IRAM __timer_channel_stop (struct hw_timer_t* timer, struct hw_chann
 
 void timer_print_config(void)
 {
-    for (int i = 0; i < HW_TIMER_NUMOF; i++) {
-        LOG_INFO("\tTIMER_DEV(%d): %d channel(s)\n", i,
-                 ARRAY_SIZE(timers[i].channels));
+    for (unsigned i = 0; i < HW_TIMER_NUMOF; i++) {
+        printf("\tTIMER_DEV(%u)\t%d channel(s)\n", i,
+               ARRAY_SIZE(timers[i].channels));
     }
 }
 
 #else /* MODULE_ESP_SW_TIMER */
-
-#ifndef MODULE_ESP_SDK
-#error Software timers are not available in Non-SDK version, use USE_SDK=1 to enable SDK-version.
-#else
 
 /* software timer based on os_timer_arm functions */
 
@@ -318,6 +315,8 @@ void timer_print_config(void)
 #define OS_TIMER_DELTA_MASK   0x0000ffff
 #define OS_TIMER_DELTA_RSHIFT 16
 #define OS_TIMER_CORRECTION   4
+
+extern void os_timer_arm_us(os_timer_t *ptimer, uint32_t time, bool repeat_flag);
 
 /* Since hardware timer FRC1 is needed to implement PWM, we have to map our */
 /* timer using the exsting ETS timer with 1 us clock rate */
@@ -560,12 +559,10 @@ static void IRAM __timer_channel_stop (struct phy_timer_t* timer, struct phy_cha
 
 void timer_print_config(void)
 {
-    for (int i = 0; i < OS_TIMER_NUMOF; i++) {
-        LOG_INFO("\tTIMER_DEV(%d): %d channel(s)\n", i,
-                 ARRAY_SIZE(timers[i].channels));
+    for (unsigned i = 0; i < OS_TIMER_NUMOF; i++) {
+        printf("\tTIMER_DEV(%u)\t%d channel(s)\n", i,
+               ARRAY_SIZE(timers[i].channels));
     }
 }
-
-#endif /* NON_SDK */
 
 #endif /* MODULE_ESP_SW_TIMER */

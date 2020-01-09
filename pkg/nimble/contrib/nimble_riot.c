@@ -35,6 +35,11 @@
 #include "services/ipss/ble_svc_ipss.h"
 #endif
 
+#if defined(MODULE_NIMBLE_AUTOCONN) && !defined(MODULE_NIMBLE_AUTOCONN_NOAUTOINIT)
+#include "nimble_autoconn.h"
+#include "nimble_autoconn_params.h"
+#endif
+
 #ifdef MODULE_NIMBLE_CONTROLLER
 #if defined(CPU_FAM_NRF52) || defined(CPU_FAM_NRF51)
 #include "nrf_clock.h"
@@ -81,6 +86,9 @@ static void *_host_thread(void *arg)
 
 void nimble_riot_init(void)
 {
+    int res;
+    (void)res;
+
     /* and finally initialize and run the host */
     thread_create(_stack_host, sizeof(_stack_host),
                   NIMBLE_HOST_PRIO,
@@ -94,11 +102,10 @@ void nimble_riot_init(void)
 
     /* for reducing code duplication, we read our own address type once here
      * so it can be re-used later on */
-    int res = ble_hs_util_ensure_addr(0);
+    res = ble_hs_util_ensure_addr(0);
     assert(res == 0);
     res = ble_hs_id_infer_auto(0, &nimble_riot_own_addr_type);
     assert(res == 0);
-    (void)res;
 
 #ifdef MODULE_NIMBLE_NETIF
     extern void nimble_netif_init(void);
@@ -109,7 +116,7 @@ void nimble_riot_init(void)
 #endif
 #endif
 
-    /* initialize the configured, build-in services */
+    /* initialize the configured, built-in services */
 #ifdef MODULE_NIMBLE_SVC_GAP
     ble_svc_gap_init();
 #endif
@@ -118,5 +125,14 @@ void nimble_riot_init(void)
 #endif
 #ifdef MODULE_NIMBLE_SVC_IPSS
     ble_svc_ipss_init();
+#endif
+
+#if defined(MODULE_NIMBLE_AUTOCONN) && !defined(MODULE_NIMBLE_AUTOCONN_NOAUTOINIT)
+    ble_gatts_start();
+    /* CAUTION: this must be called after nimble_netif_init() and also only
+     *          after the GATT server has been initialized */
+    res = nimble_autoconn_init(&nimble_autoconn_params, NULL, 0);
+    assert(res == NIMBLE_AUTOCONN_OK);
+    nimble_autoconn_enable();
 #endif
 }

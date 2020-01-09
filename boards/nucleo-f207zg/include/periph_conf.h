@@ -41,6 +41,7 @@ static const dma_conf_t dma_config[] = {
     { .stream = 4 },    /* DMA1 Stream 4 - SPI2_TX */
     { .stream = 14 },   /* DMA2 Stream 6 - USART6_TX */
     { .stream = 6 },    /* DMA1 Stream 6 - USART2_TX */
+    { .stream = 8 },    /* DMA2 Stream 0 - ETH_TX */
 };
 
 #define DMA_0_ISR  isr_dma2_stream2
@@ -49,6 +50,7 @@ static const dma_conf_t dma_config[] = {
 #define DMA_3_ISR  isr_dma1_stream4
 #define DMA_4_ISR  isr_dma2_stream6
 #define DMA_5_ISR  isr_dma1_stream6
+#define DMA_6_ISR  isr_dma2_stream0
 
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
 #endif
@@ -247,6 +249,40 @@ static const spi_conf_t spi_config[] = {
     {GPIO_PIN(PORT_C, 0), 1, 0}  \
 }
 #define ADC_NUMOF          (2)
+/** @} */
+
+/**
+ * @name ETH configuration
+ * @{
+ */
+static const eth_conf_t eth_config = {
+    .mode = RMII,
+    .mac = { 0 },
+    .speed = ETH_SPEED_100TX_FD,
+    .dma = 6,
+    .dma_chan = 8,
+    .phy_addr = 0x01,
+    .pins = {
+        GPIO_PIN(PORT_G, 13),
+        GPIO_PIN(PORT_B, 13),
+        GPIO_PIN(PORT_G, 11),
+        GPIO_PIN(PORT_C, 4),
+        GPIO_PIN(PORT_C, 5),
+        GPIO_PIN(PORT_A, 7),
+        GPIO_PIN(PORT_C, 1),
+        GPIO_PIN(PORT_A, 2),
+        GPIO_PIN(PORT_A, 1),
+    }
+};
+
+#define ETH_RX_BUFFER_COUNT (4)
+#define ETH_TX_BUFFER_COUNT (4)
+
+#define ETH_RX_BUFFER_SIZE (1524)
+#define ETH_TX_BUFFER_SIZE (1524)
+
+#define ETH_DMA_ISR        isr_dma2_stream0
+
 /** @} */
 
 #ifdef __cplusplus

@@ -2,15 +2,14 @@
 OLD_USEMODULE := $(sort $(USEMODULE))
 OLD_USEPKG := $(sort $(USEPKG))
 
-# include board dependencies
--include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+# include board specific application dependencies
+-include $(APPDIR)/Makefile.board.dep
 
-# Transitional conditional include until all boards define 'CPU' in
-# Makefile.features
-ifneq (,$(CPU))
-  # include cpu dependencies
-  -include $(RIOTCPU)/$(CPU)/Makefile.dep
-endif
+# include board dependencies
+-include $(BOARDSDIR)/$(BOARD)/Makefile.dep
+
+# include cpu dependencies
+-include $(RIOTCPU)/$(CPU)/Makefile.dep
 
 # include external modules dependencies
 # processed before RIOT ones to be evaluated before the 'default' rules.
@@ -45,6 +44,15 @@ ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += gnrc_mac
   FEATURES_REQUIRED += periph_rtt
+endif
+
+ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
+  USEMODULE += xtimer
+  USEMODULE += random
+  USEMODULE += hashes
+  USEMODULE += crypto
+  USEMODULE += netdev_layer
+  USEMODULE += gnrc_neterr
 endif
 
 ifneq (,$(filter nhdp,$(USEMODULE)))
@@ -105,6 +113,11 @@ ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
   USEMODULE += gnrc_sock
 endif
 
+ifneq (,$(filter gnrc_sock_async,$(USEMODULE)))
+  USEMODULE += sock_async
+  USEMODULE += gnrc_netapi_callbacks
+endif
+
 ifneq (,$(filter gnrc_sock_ip,$(USEMODULE)))
   USEMODULE += sock_ip
 endif
@@ -162,6 +175,9 @@ ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   ifneq (,$(filter netdev_eth,$(USEMODULE)))
     USEMODULE += gnrc_netif_ethernet
   endif
+  ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
+    USEMODULE += gnrc_netif_lorawan
+  endif
 endif
 
 ifneq (,$(filter ieee802154 nrfmin esp_now cc110x gnrc_sixloenc,$(USEMODULE)))
@@ -212,7 +228,12 @@ endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_frag_fb
   USEMODULE += gnrc_sixlowpan_frag_rb
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_fb,$(USEMODULE)))
+  USEMODULE += core_msg
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
@@ -221,6 +242,7 @@ endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_vrb,$(USEMODULE)))
   USEMODULE += xtimer
+  USEMODULE += gnrc_sixlowpan_frag_fb
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
@@ -401,7 +423,7 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   ifeq (,$(filter newlib_syscalls_%,$(USEMODULE)))
     USEMODULE += newlib_syscalls_default
   endif
-  ifeq (,$(filter stdio_rtt stdio_cdc_acm,$(USEMODULE)))
+  ifeq (,$(filter stdio_cdc_acm stdio_native stdio_null stdio_rtt,$(USEMODULE)))
     USEMODULE += stdio_uart
   endif
 endif
@@ -464,6 +486,7 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
   ifneq (,$(filter nimble_netif,$(USEMODULE)))
     USEMODULE += nimble_scanner
     USEMODULE += nimble_scanlist
+    USEMODULE += fmt
   endif
 endif
 
@@ -543,6 +566,10 @@ endif
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   USEMODULE += sema
   USEMODULE += xtimer
+endif
+
+ifneq (,$(filter lwip_dhcp_auto,$(USEMODULE)))
+  USEMODULE += lwip_dhcp
 endif
 
 ifneq (,$(filter sema,$(USEMODULE)))
@@ -633,9 +660,14 @@ endif
 
 ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_REQUIRED += arduino
+  FEATURES_OPTIONAL += arduino_pwm
   FEATURES_OPTIONAL += periph_adc
   FEATURES_REQUIRED += periph_gpio
   USEMODULE += xtimer
+endif
+
+ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))
+  FEATURES_REQUIRED += periph_pwm
 endif
 
 ifneq (,$(filter xtimer,$(USEMODULE)))
@@ -955,6 +987,11 @@ endif
 
 ifneq (,$(filter suit_%,$(USEMODULE)))
   USEMODULE += suit
+endif
+
+# Enable periph_uart when periph_uart_nonblocking is enabled
+ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
 endif
 
 # Enable periph_gpio when periph_gpio_irq is enabled

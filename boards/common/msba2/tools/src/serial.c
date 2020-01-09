@@ -131,7 +131,7 @@ static void report_open_error(const char *filename, int err)
         printf("You don't have permission to access %s\r\n", filename);
     }
 
-    //printf("Attemping to find more information about %s....\r\n", filename);
+    //printf("Attempting to find more information about %s....\r\n", filename);
     r = stat(filename, &info);
 
     if (r < 0) {

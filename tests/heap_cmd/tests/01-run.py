@@ -12,9 +12,8 @@ from testrunner import run
 
 def testfunc(child):
     # check startup message
-    child.expect('Shell-based test application for heap functions.')
     child.sendline('heap')
-    ret = child.expect(['heap: \d+ \(used \d+, free \d+\) \[bytes\]', 'heap statistics are not supported'])
+    ret = child.expect([r'heap: \d+ \(used \d+, free \d+\) \[bytes\]', 'heap statistics are not supported'])
     if ret == 1:
         return
     child.sendline('malloc 100')
@@ -23,12 +22,12 @@ def testfunc(child):
     addr = addr[:-2]
     child.expect_exact('> ')
     child.sendline('heap')
-    child.expect('heap: \d+ \(used \d+, free \d+\) \[bytes\]')
+    child.expect(r'heap: \d+ \(used \d+, free \d+\) \[bytes\]')
     child.sendline('free 0x' + addr)
     child.expect('freed 0x' + addr)
     child.expect_exact('>')
     child.sendline('heap')
-    child.expect('heap: \d+ \(used \d+, free \d+\) \[bytes\]')
+    child.expect(r'heap: \d+ \(used \d+, free \d+\) \[bytes\]')
 
 
 if __name__ == "__main__":

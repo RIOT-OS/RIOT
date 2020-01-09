@@ -21,11 +21,13 @@
  * @}
  */
 
-#include "periph/spi.h"
-#include "periph/gpio.h"
 #include "xtimer.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
+
+#if !defined(MODULE_AT86RFA1) && !defined(MODULE_AT86RFR2)
+#include "periph/spi.h"
+#include "periph/gpio.h"
 
 #define SPIDEV          (dev->params.spi)
 #define CSPIN           (dev->params.cs_pin)
@@ -101,6 +103,8 @@ void at86rf2xx_fb_stop(const at86rf2xx_t *dev)
     spi_release(SPIDEV);
 }
 
+#endif /* SPI based transceiver */
+
 uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
 {
     /* if sleeping immediately return state */
@@ -116,7 +120,13 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev)
 {
     if (at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {
         /* wake up and wait for transition to TRX_OFF */
+#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+        /* Setting SLPTR bit in TRXPR to 0 returns the radio transceiver
+         * to the TRX_OFF state */
+        *AT86RF2XX_REG__TRXPR &= ~(AT86RF2XX_TRXPR_SLPTR);
+#else
         gpio_clear(dev->params.sleep_pin);
+#endif
         xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
 
         /* update state: on some platforms, the timer behind xtimer
@@ -134,9 +144,14 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev)
 void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
 {
     /* trigger hardware reset */
+#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+    /* set reset Bit */
+    *(AT86RF2XX_REG__TRXPR) |= AT86RF2XX_TRXPR_TRXRST;
+#else
     gpio_clear(dev->params.reset_pin);
     xtimer_usleep(AT86RF2XX_RESET_PULSE_WIDTH);
     gpio_set(dev->params.reset_pin);
+#endif
     xtimer_usleep(AT86RF2XX_RESET_DELAY);
 
     /* update state: if the radio state was P_ON (initialization phase),
@@ -205,7 +220,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     at86rf2xx_set_state(dev, prev_state);
 }
 
-#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231)
+#if AT86RF2XX_RANDOM_NUMBER_GENERATOR
 void at86rf2xx_get_random(const at86rf2xx_t *dev, uint8_t *data, size_t len)
 {
     for (size_t byteCount = 0; byteCount < len; ++byteCount) {

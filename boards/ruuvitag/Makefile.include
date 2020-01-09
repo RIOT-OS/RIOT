@@ -1,7 +1,7 @@
 # for this board, we are using Segger's RTT as default terminal interface
 USEMODULE += stdio_rtt
 TERMPROG = $(RIOTTOOLS)/jlink/jlink.sh
-TERMFLAGS = term_rtt
+TERMFLAGS = term-rtt
 
 # use shared Makefile.include
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include

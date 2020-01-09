@@ -112,6 +112,12 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
             od_hex_dump(pkt->data, pkt->size, OD_WIDTH_DEFAULT);
         break;
 #endif
+#ifdef MODULE_GNRC_LORAWAN
+    case GNRC_NETTYPE_LORAWAN:
+            printf("NETTYPE_LORAWAN (%i)\n", pkt->type);
+            od_hex_dump(pkt->data, pkt->size, OD_WIDTH_DEFAULT);
+        break;
+#endif
 #ifdef TEST_SUITES
         case GNRC_NETTYPE_TEST:
             printf("NETTYPE_TEST (%i)\n", pkt->type);

@@ -40,7 +40,7 @@
  * -# build, flash, and run your application the usual RIOT-way: simply call
  *    `make all`, `make flash`, `make term`, etc.
  *
- * Thats all. As bonus you can of course use any existing RIOT code inside your
+ * That's all. As bonus you can of course use any existing RIOT code inside your
  * Arduino sketches - you simply have to add the includes to your sketch and
  * the corresponding modules to your `Makefile`.
  *
@@ -147,8 +147,6 @@
  *       functions have to be called manually from a RIOT application.
  * @todo Implement analog outputs (PWM mapping)
  * @todo Implement analog inputs (ADC mapping)
- * @todo Implement SPI interface class
- * @todo Add support for the 'Wire Library' (I2C)
  * @todo Add means to include various Arduino Libraries (maybe as pkg?)
  * @todo Implement anything else that is missing...
  * @todo Adapt Arduino build script, so sketches do not have to have the file

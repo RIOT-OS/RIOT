@@ -125,10 +125,8 @@ static inline void gnrc_sixlowpan_frag_vrb_rm(gnrc_sixlowpan_frag_vrb_t *vrb)
 {
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
     gnrc_sixlowpan_frag_rb_base_rm(&vrb->super);
-#elif   defined(TEST_SUITES)
-    /* for testing just zero src_len */
-    vrb->super.src_len = 0;
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG */
+    vrb->super.src_len = 0;
 }
 
 /**

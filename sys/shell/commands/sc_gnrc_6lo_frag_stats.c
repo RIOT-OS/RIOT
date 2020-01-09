@@ -15,7 +15,7 @@
 
 #include <stdio.h>
 
-#include "net/gnrc/sixlowpan/frag.h"
+#include "net/gnrc/sixlowpan/frag/stats.h"
 
 int _gnrc_6lo_frag_stats(int argc, char **argv)
 {

@@ -142,14 +142,14 @@ void msp430_init_dco(void)
     }
 
     CCTL2 = CCIS0 + CM0 + CAP;            /* Define CCR2, CAP, ACLK */
-    TACTL = TASSEL1 + TACLR + MC1;        /* SMCLK, continous mode */
+    TACTL = TASSEL1 + TACLR + MC1;        /* SMCLK, continuous mode */
 
     while (1) {
         unsigned int compare;
 
-        while ((CCTL2 & CCIFG) != CCIFG);   /* Wait until capture occured!*/
+        while ((CCTL2 & CCIFG) != CCIFG);   /* Wait until capture occurred!*/
 
-        CCTL2 &= ~CCIFG;                    /* Capture occured, clear flag */
+        CCTL2 &= ~CCIFG;                    /* Capture occurred, clear flag */
         compare = CCR2;                     /* Get current captured SMCLK */
         compare = compare - oldcapture;     /* SMCLK difference */
         oldcapture = CCR2;                  /* Save current captured SMCLK */

@@ -28,6 +28,7 @@ USEMODULE += gnrc_sock_udp
 USEMODULE += gnrc_icmpv6_echo
 
 # include this for printing IP addresses
+USEMODULE += shell
 USEMODULE += shell_commands
 
 # Set this to 1 to enable code in RIOT that does safety checking
@@ -47,6 +48,15 @@ USEMODULE += suit suit_coap
 
 # SUIT draft v4 support:
 USEMODULE += suit_v4
+
+# Display a progress bar during firmware download
+USEMODULE += progress_bar
+
+# Optional feature to trigger suit update through gpio callback
+FEATURES_OPTIONAL += periph_gpio_irq
+
+# Default COAP manifest resource location when fetched through gpio trigger
+CFLAGS += -DSUIT_MANIFEST_RESOURCE=\"$(SUIT_COAP_ROOT)/$(SUIT_NOTIFY_MANIFEST)\"
 
 # Change this to 0 to not use ethos
 USE_ETHOS ?= 1
@@ -78,6 +88,9 @@ endif
 # don't compile themselves and re-create signed images, thus add the required
 # files here so they will be submitted along with the test jobs.
 TEST_EXTRA_FILES += $(SLOT_RIOT_ELFS) $(SUIT_SEC) $(SUIT_PUB)
+# For now `examples/%/tests" still rely on the test applicaton being reset after
+# a terminal is opened to synchronize.
+TESTRUNNER_RESET_AFTER_TERM ?= 1
 
 include $(RIOTBASE)/Makefile.include
 
@@ -86,4 +99,4 @@ include $(RIOTBASE)/Makefile.include
 host-tools:
 	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)
 
-include $(RIOTMAKE)/default-channel.inc.mk
+include $(RIOTMAKE)/default-radio-settings.inc.mk

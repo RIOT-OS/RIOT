@@ -225,7 +225,7 @@ void timer_irq_disable(tim_t dev)
  *
  * When toolchain support is available we could move to full vector mode but
  * this does take up significant space (MCU-ASE provides 256 vectors at 32B
- * spacing (the default) thats 8KB of vector space!), So a single entry point
+ * spacing (the default) that's 8KB of vector space!), So a single entry point
  * may be better anyway.
  *
  */

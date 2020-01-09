@@ -121,7 +121,7 @@ unsigned ringbuffer_remove(ringbuffer_t *restrict rb, unsigned n)
         rb->avail -= n;
 
         /* compensate underflow */
-        if (rb->start > rb->size) {
+        if (rb->start >= rb->size) {
             rb->start -= rb->size;
         }
     }

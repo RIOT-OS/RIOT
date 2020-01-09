@@ -40,7 +40,7 @@ extern "C" {
 /**
  *  @brief  The type of the netreg entry.
  *
- *          Different types are availalbe dependent on the used modules.
+ *          Different types are available dependent on the used modules.
  */
 typedef enum {
     /**

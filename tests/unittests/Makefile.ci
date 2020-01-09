@@ -9,6 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mkrzero \
     arduino-nano \
     arduino-uno \
+    atmega256rfr2-xpro \
     atmega328p \
     arduino-zero \
     b-l072z-lrwan1 \
@@ -17,9 +18,12 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill \
     bluepill-128kib \
     calliope-mini \
+    cc1352-launchpad \
     cc2650-launchpad \
     cc2650stk \
     chronos \
+    derfmega128 \
+    derfmega256 \
     ek-lm4f120xl \
     esp8266-esp-12x \
     esp8266-olimex-mod \

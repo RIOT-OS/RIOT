@@ -1,1 +1,0 @@
-The files in this directory are either from the [ESP8266_NONOS_SDK](https://github.com/espressif/ESP8266_NONOS_SDK.git) or from the [ESP_RTOS_SDK](https://github.com/espressif/ESP8266_RTOS_SDK.git) for ESP8266. All of these files are copyright of Espressif Systems (Shanghai) Pte., Ltd. Please note the copyright notice in these files.

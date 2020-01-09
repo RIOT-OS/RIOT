@@ -22,7 +22,7 @@ USEMODULE += fmt
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-CFLAGS += -DDEVELHELP
+DEVELHELP ?= 1
 
 # For debugging and demonstration purposes, we limit the lifetime to 60s
 CFLAGS += -DCORD_LT=60

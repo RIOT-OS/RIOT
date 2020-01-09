@@ -1221,6 +1221,7 @@ static int _test_netif_set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 }
 
 static const gnrc_netif_ops_t _test_netif_ops = {
+    .init = gnrc_netif_default_init,
     .send = _test_netif_send,
     .recv = _test_netif_recv,
     .get = gnrc_netif_get_from_netdev,

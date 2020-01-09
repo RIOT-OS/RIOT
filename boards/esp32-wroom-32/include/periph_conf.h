@@ -171,7 +171,7 @@ extern "C" {
 /**
  * @name   UART configuration
  *
- * ESP32 provides 3 UART interaces at maximum:
+ * ESP32 provides 3 UART interfaces at maximum:
  *
  * UART_DEV(0) uses fixed standard configuration.<br>
  * UART_DEV(1) is defined here.<br>

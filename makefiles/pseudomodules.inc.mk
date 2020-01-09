@@ -33,15 +33,16 @@ PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
 PSEUDOMODULES += gnrc_sixlowpan_default
 PSEUDOMODULES += gnrc_sixlowpan_frag_hint
-PSEUDOMODULES += gnrc_sixlowpan_frag_stats
 PSEUDOMODULES += gnrc_sixlowpan_iphc_nhc
 PSEUDOMODULES += gnrc_sixlowpan_nd_border_router
 PSEUDOMODULES += gnrc_sixlowpan_router
 PSEUDOMODULES += gnrc_sixlowpan_router_default
+PSEUDOMODULES += gnrc_sock_async
 PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd
-PSEUDOMODULES += i2c_scan
 PSEUDOMODULES += heap_cmd
+PSEUDOMODULES += i2c_scan
+PSEUDOMODULES += ina3221_alerts
 PSEUDOMODULES += l2filter_blacklist
 PSEUDOMODULES += l2filter_whitelist
 PSEUDOMODULES += lis2dh12_i2c
@@ -58,6 +59,7 @@ PSEUDOMODULES += netstats_l2
 PSEUDOMODULES += netstats_ipv6
 PSEUDOMODULES += netstats_rpl
 PSEUDOMODULES += nimble
+PSEUDOMODULES += nimble_autoconn_%
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
@@ -67,6 +69,7 @@ PSEUDOMODULES += posix_headers
 PSEUDOMODULES += printf_float
 PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
+PSEUDOMODULES += qmc5883l_int
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_default
@@ -76,6 +79,8 @@ PSEUDOMODULES += scanf_float
 PSEUDOMODULES += sched_cb
 PSEUDOMODULES += semtech_loramac_rx
 PSEUDOMODULES += sock
+PSEUDOMODULES += sock_async
+PSEUDOMODULES += sock_dtls
 PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp
 PSEUDOMODULES += sock_udp
@@ -84,6 +89,7 @@ PSEUDOMODULES += stdio_ethos
 PSEUDOMODULES += stdio_cdc_acm
 PSEUDOMODULES += stdio_uart_rx
 PSEUDOMODULES += suit_%
+PSEUDOMODULES += wakaama_objects_%
 
 # handle suit_v4 being a distinct module
 NO_PSEUDOMODULES += suit_v4
@@ -94,10 +100,14 @@ PSEUDOMODULES += od_string
 # include variants of the AT86RF2xx drivers as pseudo modules
 PSEUDOMODULES += at86rf23%
 PSEUDOMODULES += at86rf21%
+PSEUDOMODULES += at86rfa1
+PSEUDOMODULES += at86rfr2
 
 # include variants of the BMX280 drivers as pseudo modules
-PSEUDOMODULES += bmp280
-PSEUDOMODULES += bme280
+PSEUDOMODULES += bmp280_i2c
+PSEUDOMODULES += bmp280_spi
+PSEUDOMODULES += bme280_i2c
+PSEUDOMODULES += bme280_spi
 
 # variants of TI ADCXX1C
 PSEUDOMODULES += adc081c
@@ -115,6 +125,10 @@ PSEUDOMODULES += cc1101
 # include variants of MPU9X50 drivers as pseudo modules
 PSEUDOMODULES += mpu9150
 PSEUDOMODULES += mpu9250
+
+# include variants of INA2xx drivers as pseudo modules
+PSEUDOMODULES += ina219
+PSEUDOMODULES += ina220
 
 # include variants of mrf24j40 drivers as pseudo modules
 PSEUDOMODULES += mrf24j40m%
@@ -151,6 +165,9 @@ PSEUDOMODULES += rn2903
 PSEUDOMODULES += vcnl4010
 PSEUDOMODULES += vcnl4020
 PSEUDOMODULES += vcnl4040
+
+# implementations of ws281x_write as submodules of ws281x:
+PSEUDOMODULES += ws281x_%
 
 # include variants of lpsxxx drivers as pseudo modules
 PSEUDOMODULES += lps331ap

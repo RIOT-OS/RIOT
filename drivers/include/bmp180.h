@@ -92,7 +92,7 @@ enum {
  *
  * @return                  BMP180_OK on success
  * @return                  -BMP180_ERR_NODEV if not a BMP180 at given address
- * @return                  -BMP180_ERR_NOCAL if an error occured when reading calibration values
+ * @return                  -BMP180_ERR_NOCAL if an error occurred when reading calibration values
  */
 int bmp180_init(bmp180_t *dev, const bmp180_params_t *params);
 

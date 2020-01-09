@@ -220,7 +220,7 @@ int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, 
             /* prepare 10 bit address bytes */
             uint8_t addr1 = 0xf0 | (addr & 0x0300) >> 7 | I2C_READ;
             uint8_t addr2 = addr & 0xff;
-            /* send address bytes wit read flag */
+            /* send address bytes with read flag */
             if ((res = _i2c_write_byte (bus, addr1)) != 0 ||
                 (res = _i2c_write_byte (bus, addr2)) != 0) {
                 /* abort transfer */
@@ -472,7 +472,7 @@ static /* IRAM */ int _i2c_start_cond(_i2c_bus_t* bus)
         /* SDA = passive HIGH (floating and pulled-up) */
         _i2c_sda_high (bus);
 
-        /* t_VD;DAT not neccessary */
+        /* t_VD;DAT not necessary */
         /* _i2c_delay (bus); */
 
         /* SCL = passive HIGH (floating and pulled-up) */
@@ -700,8 +700,8 @@ static /* IRAM */ int _i2c_read_byte(_i2c_bus_t* bus, uint8_t *byte, bool ack)
 void i2c_print_config(void)
 {
     for (unsigned dev = 0; dev < I2C_NUMOF; dev++) {
-        ets_printf("\tI2C_DEV(%d)\tscl=%d sda=%d\n",
-                   dev, i2c_config[dev].scl, i2c_config[dev].sda);
+        printf("\tI2C_DEV(%u)\tscl=%d sda=%d\n",
+               dev, i2c_config[dev].scl, i2c_config[dev].sda);
     }
 }
 

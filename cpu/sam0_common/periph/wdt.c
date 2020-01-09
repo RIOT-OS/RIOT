@@ -83,18 +83,9 @@ static uint32_t ms_to_per(uint32_t ms)
 #ifdef CPU_SAMD21
 static void _wdt_clock_setup(void)
 {
-/* RTC / RTT will alredy set up GCLK2 as needed */
-#if !defined(MODULE_PERIPH_RTC) && !defined(MODULE_PERIPH_RTT)
-    /* Setup clock GCLK2 with OSCULP32K divided by 32 */
-    GCLK->GENDIV.reg  = GCLK_GENDIV_ID(2) | GCLK_GENDIV_DIV(4);
-    GCLK->GENCTRL.reg = GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K | GCLK_GENCTRL_ID(2) | GCLK_GENCTRL_DIVSEL;
-
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
-#endif
-
-    /* Connect to GCLK2 (~1.024 kHz) */
+    /* Connect to GCLK4 (~1.024 kHz) */
     GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID_WDT
-                      | GCLK_CLKCTRL_GEN_GCLK2
+                      | GCLK_CLKCTRL_GEN_GCLK4
                       | GCLK_CLKCTRL_CLKEN;
 }
 #else

@@ -146,12 +146,12 @@ static int _req_str(usbus_t *usbus, uint16_t idx)
 
 static int _req_dev(usbus_t *usbus)
 {
-    return usbus_fmt_hdr_dev(usbus);
+    return usbus_fmt_descriptor_dev(usbus);
 }
 
 static int _req_config(usbus_t *usbus)
 {
-    return usbus_fmt_hdr_conf(usbus);
+    return usbus_fmt_descriptor_conf(usbus);
 }
 
 static int _req_dev_qualifier(usbus_t *usbus)

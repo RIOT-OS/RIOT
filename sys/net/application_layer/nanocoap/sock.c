@@ -144,7 +144,7 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
                 continue;
             }
             if ((res = coap_handle_req(&pkt, buf, bufsize)) > 0) {
-                res = sock_udp_send(&sock, buf, res, &remote);
+                sock_udp_send(&sock, buf, res, &remote);
             }
             else {
                 DEBUG("error handling request %d\n", (int)res);

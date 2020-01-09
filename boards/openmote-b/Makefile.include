@@ -6,7 +6,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # Set default flash tool
-export PROGRAMMER ?= cc2538-bsl
+PROGRAMMER ?= cc2538-bsl
 
 # For backward compatibility
 ifneq (,$(PORT_BSL))

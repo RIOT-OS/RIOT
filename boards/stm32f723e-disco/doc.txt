@@ -24,7 +24,7 @@ make BOARD=stm32f723e-disco flash -C examples/hello-world
 
 STDIO is available via the ST-Link programmer.
 
-Use the `term` targed to open a terminal:
+Use the `term` target to open a terminal:
 
     make BOARD=stm32f723e-disco -C examples/hello-world term
 

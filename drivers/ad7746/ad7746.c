@@ -51,7 +51,7 @@ static const unsigned char _vt_sr_times[] = {
  *
  * @return AD7746_OK on success
  * @return AD7746_NODATA if no data is available
- * @return AD7746_I2C on error getting a reponse
+ * @return AD7746_I2C on error getting a response
  */
 static int _read_capacitance(ad7746_t *dev, int *value,
                              ad7746_cap_input_t input);
@@ -67,7 +67,7 @@ static int _read_capacitance(ad7746_t *dev, int *value,
  *
  * @return AD7746_OK on success
  * @return AD7746_NODATA if no data is available
- * @return AD7746_I2C on error getting a reponse
+ * @return AD7746_I2C on error getting a response
  */
 static int _read_voltage_temp(ad7746_t *dev, int *value, ad7746_vt_mode_t mode);
 
@@ -83,7 +83,7 @@ static int _read_voltage_temp(ad7746_t *dev, int *value, ad7746_vt_mode_t mode);
  *
  * @return AD7746_OK on success
  * @return AD7746_NODATA if no data is available
- * @return AD7746_I2C on error getting a reponse
+ * @return AD7746_I2C on error getting a response
  */
 static int _read_raw_ch(const ad7746_t *dev, uint8_t ch, uint32_t *raw);
 
