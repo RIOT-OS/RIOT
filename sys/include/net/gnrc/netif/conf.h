@@ -144,8 +144,8 @@ extern "C" {
  *
  * This is purely meant as a debugging feature to slow down a radios sending.
  */
-#ifndef GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
-#define GNRC_NETIF_MIN_WAIT_AFTER_SEND_US   (0U)
+#ifndef CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
+#define CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US   (0U)
 #endif
 
 #ifdef __cplusplus

@@ -1376,7 +1376,7 @@ static void *_gnrc_netif_thread(void *args)
 #endif
     /* now let rest of GNRC use the interface */
     gnrc_netif_release(netif);
-#if (GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
+#if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
     xtimer_ticks32_t last_wakeup = xtimer_now();
 #endif
 
@@ -1401,11 +1401,11 @@ static void *_gnrc_netif_thread(void *args)
                     netif->stats.tx_bytes += res;
                 }
 #endif
-#if (GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
+#if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
                 xtimer_periodic_wakeup(&last_wakeup,
-                                       GNRC_NETIF_MIN_WAIT_AFTER_SEND_US);
+                                       CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US);
                 /* override last_wakeup in case last_wakeup +
-                 * GNRC_NETIF_MIN_WAIT_AFTER_SEND_US was in the past */
+                 * CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US was in the past */
                 last_wakeup = xtimer_now();
 #endif
                 break;
