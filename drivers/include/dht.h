@@ -107,10 +107,10 @@ int dht_init(dht_t *dev, const dht_params_t *params);
  * @param[out] temp     temperature value [in °C * 10^-1]
  * @param[out] hum      relative humidity value [in percent * 10^-1]
  *
- * @retval `DHT_OK`         Success
- * @retval `DHT_NOCSUM`     Checksum error
- * @retval `DHT_TIMEOUT`    Reading data timed out (check wires!)
- * @retval `DHT_NODEV`      Unsupported device type specified
+ * @retval DHT_OK       Success
+ * @retval DHT_NOCSUM   Checksum error
+ * @retval DHT_TIMEOUT  Reading data timed out (check wires!)
+ * @retval DHT_NODEV    Unsupported device type specified
  */
 int dht_read(dht_t *dev, int16_t *temp, int16_t *hum);
 
