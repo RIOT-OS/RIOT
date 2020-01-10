@@ -143,6 +143,7 @@ extern "C" {
 #ifndef GNRC_IPV6_MSG_QUEUE_SIZE
 #define GNRC_IPV6_MSG_QUEUE_SIZE    (8U)
 #endif
+/** @} */
 
 /**
  * @brief   The PID to the IPv6 thread.
