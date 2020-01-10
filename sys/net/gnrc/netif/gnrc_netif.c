@@ -1060,7 +1060,6 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
             return ptr;
         }
         /* Rule 2: Prefer appropriate scope. */
-        /* both link local */
         uint8_t candidate_scope = _get_scope(ptr);
         if (candidate_scope == dst_scope) {
             DEBUG("winner for rule 2 (same scope) found\n");
