@@ -24,6 +24,10 @@ RIOTBASE = (os.environ.get('RIOTBASE') or
 # default value (3)
 MAKE_TERM_STARTED_DELAY = int(os.environ.get('TESTRUNNER_START_DELAY') or 3)
 
+# Setting an empty 'TESTRUNNER_RESET_DELAY' environment variable use the
+# default value (0, no delay)
+MAKE_RESET_DELAY = int(os.environ.get('TESTRUNNER_RESET_DELAY') or 0)
+
 # Allow customizing test interactive settings with environment variables
 TEST_INTERACTIVE_RETRIES = int(os.environ.get('TEST_INTERACTIVE_RETRIES') or 5)
 TEST_INTERACTIVE_DELAY = int(os.environ.get('TEST_INTERACTIVE_DELAY') or 1)
@@ -35,6 +39,9 @@ TESTRUNNER_RESET_AFTER_TERM = int(os.environ.get('TESTRUNNER_RESET_AFTER_TERM')
 
 
 def _reset_board(env):
+    if MAKE_RESET_DELAY > 0:
+        time.sleep(MAKE_RESET_DELAY)
+
     try:
         subprocess.check_output(('make', 'reset'), env=env,
                                 stderr=subprocess.PIPE)
