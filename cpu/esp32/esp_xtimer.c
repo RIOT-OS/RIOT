@@ -148,7 +148,7 @@ void ets_timer_arm_us(ETSTimer *timer, uint32_t tmout, bool repeat)
 
     xtimer_set(&e2xt->xtimer, tmout);
 
-    e2xt->ets_timer->timer_expire = e2xt->xtimer.target;
+    e2xt->ets_timer->timer_expire = e2xt->xtimer.start_time + e2xt->xtimer.offset;
     e2xt->ets_timer->timer_period = repeat ? tmout : 0;
 }
 
