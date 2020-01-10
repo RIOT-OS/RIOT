@@ -333,6 +333,12 @@ static int _on_l2cap_client_evt(struct ble_l2cap_event *event, void *arg)
 
     switch (event->type) {
         case BLE_L2CAP_EVENT_COC_CONNECTED:
+            if (event->connect.status != 0) {
+                /* in the unlikely event the L2CAP connection establishment
+                 * fails, we close the GAP connection */
+                ble_gap_terminate(conn->gaphandle, BLE_ERR_REM_USER_CONN_TERM);
+                break;
+            }
             conn->coc = event->connect.chan;
             conn->state |= NIMBLE_NETIF_L2CAP_CLIENT;
             conn->state &= ~NIMBLE_NETIF_CONNECTING;
@@ -371,6 +377,13 @@ static int _on_l2cap_server_evt(struct ble_l2cap_event *event, void *arg)
             handle = nimble_netif_conn_get_by_gaphandle(event->connect.conn_handle);
             conn = nimble_netif_conn_get(handle);
             assert(conn);
+
+            if (event->connect.status != 0) {
+                /* in the unlikely event the L2CAP connection establishment
+                 * fails, we close the GAP connection */
+                ble_gap_terminate(conn->gaphandle, BLE_ERR_REM_USER_CONN_TERM);
+                break;
+            }
             conn->coc = event->connect.chan;
             conn->state |= NIMBLE_NETIF_L2CAP_SERVER;
             conn->state &= ~(NIMBLE_NETIF_ADV | NIMBLE_NETIF_CONNECTING);
