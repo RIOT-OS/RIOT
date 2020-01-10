@@ -98,15 +98,23 @@ static void _on_ble_evt(int handle, nimble_netif_event_t event,
 static int _conn_dump(nimble_netif_conn_t *conn, int handle, void *arg)
 {
     (void)arg;
+    struct ble_gap_conn_desc desc;
+
+    int res = ble_gap_conn_find(conn->gaphandle, &desc);
+    assert(res == 0);   /* the handle should always be valid here */
+    (void)res;
+
     char role = (conn->state & NIMBLE_NETIF_GAP_MASTER) ? 'M' : 'S';
+    unsigned itvl = ((unsigned)desc.conn_itvl * BLE_HCI_CONN_ITVL) / 1000;
+    unsigned sto = (unsigned)desc.supervision_timeout * 10;
 
     printf("[%2i] ", handle);
     bluetil_addr_print(conn->addr);
-    printf(" (%c)", role);
 #ifdef MODULE_GNRC_IPV6
-    printf(" -> ");
+    printf(" ");
     bluetil_addr_ipv6_l2ll_print(conn->addr);
 #endif
+    printf(" (%c,%ums,%ums,%i)", role, itvl, sto, (int)desc.conn_latency);
     puts("");
 
     return 0;
@@ -143,13 +151,18 @@ static int _conn_state_dump(nimble_netif_conn_t *conn, int handle, void *arg)
 
 static void _conn_list(void)
 {
-    nimble_netif_conn_foreach(NIMBLE_NETIF_L2CAP_CONNECTED, _conn_dump, NULL);
+    unsigned active = nimble_netif_conn_count(NIMBLE_NETIF_L2CAP_CONNECTED);
+    printf("Connections: %u\n", active);
+    if (active > 0) {
+        nimble_netif_conn_foreach(NIMBLE_NETIF_L2CAP_CONNECTED,
+                                  _conn_dump, NULL);
+        puts("     (role, conn itvl, superv. timeout, slave latency)");
+    }
 }
 
 static void _cmd_info(void)
 {
     unsigned free = nimble_netif_conn_count(NIMBLE_NETIF_UNUSED);
-    unsigned active = nimble_netif_conn_count(NIMBLE_NETIF_L2CAP_CONNECTED);
 
     uint8_t own_addr[BLE_ADDR_LEN];
     uint8_t tmp_addr[BLE_ADDR_LEN];
@@ -172,12 +185,9 @@ static void _cmd_info(void)
         puts("no");
     }
 
-    if (active > 0) {
-        printf("Connections: %u\n", active);
-        _conn_list();
-    }
+    _conn_list();
 
-    puts("   Contexts:");
+    puts("Slots:");
     nimble_netif_conn_foreach(NIMBLE_NETIF_ANY, _conn_state_dump, NULL);
 
     puts("");
