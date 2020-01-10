@@ -7,6 +7,7 @@ USEMODULE += xtimer
 LOW_MEMORY_BOARDS += \
   airfy-beacon \
   arduino-mega2560 \
+  atmega1284p \
   b-l072z-lrwan1 \
   blackpill \
   blackpill-128kib \
@@ -17,12 +18,15 @@ LOW_MEMORY_BOARDS += \
   cc2650-launchpad \
   cc2650stk \
   chronos \
+  derfmega128 \
   hifive1 \
   hifive1b \
   i-nucleo-lrwan1 \
   lsn50 \
   maple-mini \
+  mega-xplained \
   microbit \
+  microduino-corerf \
   msb-430 \
   msb-430h \
   nrf51dongle \
@@ -66,7 +70,7 @@ ifneq (, $(filter $(BOARD), $(LOW_MEMORY_BOARDS)))
 endif
 
 ifneq (, $(filter $(BOARD), $(SUPER_LOW_MEMORY_BOARDS)))
-  NUMOF_TIMERS ?= 20
+  NUMOF_TIMERS ?= 16
 endif
 
 NUMOF_TIMERS ?= 1000
