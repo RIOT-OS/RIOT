@@ -44,7 +44,7 @@ CFLAGS += \
   #
 
 # add the CPU specific flash configuration field for the linker
-export UNDEF += $(BINDIR)/cpu/fcfield.o
+UNDEF += $(BINDIR)/cpu/fcfield.o
 
 # select kinetis periph drivers
 ifeq (EA,$(KINETIS_SERIES))
