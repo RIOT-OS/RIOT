@@ -15,7 +15,7 @@ OPTIONAL_CFLAGS += -fno-delete-null-pointer-checks
 
 # Use colored compiler output if the compiler supports this and if this is not
 # disabled by the user
-ifeq ($(CC_NOCOLOR),0)
+ifneq ($(CC_NOCOLOR),1)
   OPTIONAL_CFLAGS += -fdiagnostics-color
 endif
 
