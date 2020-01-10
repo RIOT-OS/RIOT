@@ -27,8 +27,3 @@ void board_init(void)
     /* Stop the linker from throwing away the PIC32 config register settings */
     dummy();
 }
-
-void pm_reboot(void)
-{
-    /* TODO, note this is needed to get 'default' example to build */
-}
