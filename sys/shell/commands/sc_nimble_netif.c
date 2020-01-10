@@ -84,7 +84,8 @@ static void _on_ble_evt(int handle, nimble_netif_event_t event,
         case NIMBLE_NETIF_CLOSED_SLAVE:
             _print_evt("CONNECTION CLOSED", handle, addr);
             break;
-        case NIMBLE_NETIF_CONNECT_ABORT:
+        case NIMBLE_NETIF_ABORT_MASTER:
+        case NIMBLE_NETIF_ABORT_SLAVE:
             _print_evt("CONNECTION ABORT", handle, addr);
             break;
         case NIMBLE_NETIF_CONN_UPDATED:

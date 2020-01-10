@@ -339,8 +339,7 @@ static int _on_l2cap_client_evt(struct ble_l2cap_event *event, void *arg)
             _notify(handle, NIMBLE_NETIF_CONNECTED_MASTER, conn->addr);
             break;
         case BLE_L2CAP_EVENT_COC_DISCONNECTED:
-            assert(conn->coc);
-            conn->coc = NULL;
+            assert(conn->state & NIMBLE_NETIF_L2CAP_CLIENT);
             conn->state &= ~NIMBLE_NETIF_L2CAP_CONNECTED;
             break;
         case BLE_L2CAP_EVENT_COC_ACCEPT:
@@ -378,8 +377,7 @@ static int _on_l2cap_server_evt(struct ble_l2cap_event *event, void *arg)
             break;
         case BLE_L2CAP_EVENT_COC_DISCONNECTED:
             conn = nimble_netif_conn_from_gaphandle(event->disconnect.conn_handle);
-            assert(conn && conn->coc);
-            conn->coc = NULL;
+            assert(conn && (conn->state & NIMBLE_NETIF_L2CAP_SERVER));
             conn->state &= ~NIMBLE_NETIF_L2CAP_CONNECTED;
             break;
         case BLE_L2CAP_EVENT_COC_ACCEPT: {
@@ -427,7 +425,7 @@ static int _on_gap_master_evt(struct ble_gap_event *event, void *arg)
             if (event->connect.status != 0) {
                 uint8_t addr[BLE_ADDR_LEN];
                 nimble_netif_conn_free(handle, addr);
-                _notify(handle, NIMBLE_NETIF_CONNECT_ABORT, addr);
+                _notify(handle, NIMBLE_NETIF_ABORT_MASTER, addr);
                 return 0;
             }
             _on_gap_connected(conn, event->connect.conn_handle);
@@ -444,9 +442,12 @@ static int _on_gap_master_evt(struct ble_gap_event *event, void *arg)
             break;
         }
         case BLE_GAP_EVENT_DISCONNECT: {
+            nimble_netif_event_t type;
+            type = (conn->coc != NULL) ? NIMBLE_NETIF_CLOSED_MASTER
+                                       : NIMBLE_NETIF_ABORT_MASTER;
             uint8_t addr[BLE_ADDR_LEN];
             nimble_netif_conn_free(handle, addr);
-            _notify(handle, NIMBLE_NETIF_CLOSED_MASTER, addr);
+            _notify(handle, type, addr);
             break;
         }
         case BLE_GAP_EVENT_CONN_UPDATE:
@@ -474,18 +475,22 @@ static int _on_gap_slave_evt(struct ble_gap_event *event, void *arg)
             if (event->connect.status != 0) {
                 uint8_t addr[BLE_ADDR_LEN];
                 nimble_netif_conn_free(handle, addr);
-                _notify(handle, NIMBLE_NETIF_CONNECT_ABORT, addr);
+                _notify(handle, NIMBLE_NETIF_ABORT_SLAVE, addr);
                 break;
             }
             _on_gap_connected(conn, event->connect.conn_handle);
             assert(conn->state == NIMBLE_NETIF_ADV);
             conn->state = NIMBLE_NETIF_GAP_SLAVE;
+            _notify(handle, NIMBLE_NETIF_INIT_SLAVE, conn->addr);
             break;
         }
         case BLE_GAP_EVENT_DISCONNECT: {
+            nimble_netif_event_t type;
+            type = (conn->coc != NULL) ? NIMBLE_NETIF_CLOSED_SLAVE
+                                       : NIMBLE_NETIF_ABORT_SLAVE;
             uint8_t addr[BLE_ADDR_LEN];
             nimble_netif_conn_free(handle, addr);
-            _notify(handle, NIMBLE_NETIF_CLOSED_SLAVE, addr);
+            _notify(handle, type, addr);
             break;
         }
         case BLE_GAP_EVENT_CONN_UPDATE:
@@ -557,6 +562,8 @@ int nimble_netif_connect(const ble_addr_t *addr,
     assert(res == 0);
     (void)res;
 
+    _notify(handle, NIMBLE_NETIF_INIT_MASTER, addrn);
+
     return handle;
 }
 
@@ -601,6 +608,8 @@ int nimble_netif_accept(const uint8_t *ad, size_t ad_len,
     res = ble_gap_adv_start(nimble_riot_own_addr_type, NULL, BLE_HS_FOREVER,
                             adv_params, _on_gap_slave_evt, (void *)handle);
     assert(res == 0);
+
+    _notify(handle, NIMBLE_NETIF_ACCEPTING, NULL);
 
     return NIMBLE_NETIF_OK;
 }
