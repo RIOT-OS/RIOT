@@ -115,8 +115,10 @@ static void _update_timer(evtimer_t *evtimer)
 static uint32_t _get_offset(xtimer_t *timer)
 {
     uint64_t now_us = xtimer_now_usec64();
-    uint64_t target_us = _xtimer_usec_from_ticks64(
-                        ((uint64_t)timer->long_target) << 32 | timer->target);
+    uint64_t start_us = _xtimer_usec_from_ticks64(
+                        ((uint64_t)timer->long_start_time << 32) | timer->start_time);
+    uint64_t target_us = start_us + _xtimer_usec_from_ticks64(
+                        ((uint64_t)timer->long_offset) << 32 | timer->offset);
 
     if (target_us <= now_us) {
         return 0;
