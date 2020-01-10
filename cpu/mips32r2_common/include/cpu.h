@@ -25,6 +25,7 @@
 
 #include <stdint.h>
 #include "cpu_conf.h"
+#include "thread.h"
 #include "irq.h"
 
 #ifdef __cplusplus
@@ -45,6 +46,18 @@ static inline void cpu_print_last_instruction(void)
  * @brief Initialize the CPU, set IRQ priorities
  */
 void cpu_init(void);
+
+/**
+ * @brief   Trigger a conditional context scheduler run / context switch
+ *
+ * This function is supposed to be called in the end of each ISR.
+ */
+static inline void mips32r2_isr_end(void)
+{
+    if (sched_context_switch_request) {
+        thread_yield_higher();
+    }
+}
 
 #ifdef __cplusplus
 }
