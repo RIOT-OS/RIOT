@@ -47,11 +47,6 @@ extern "C" {
 #define STDIO_UART_DEV      UART_DEV(3)
 
 /**
- * @brief   We are using an External Interrupt Controller (all pic32 devices use this mode)
- */
-#define EIC_IRQ (1)
-
-/**
  * @name    LED pin configuration
  * @{
  */
