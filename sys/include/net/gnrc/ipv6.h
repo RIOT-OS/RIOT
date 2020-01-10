@@ -140,8 +140,8 @@ extern "C" {
 /**
  * @brief   Default message queue size to use for the IPv6 thread.
  */
-#ifndef GNRC_IPV6_MSG_QUEUE_SIZE
-#define GNRC_IPV6_MSG_QUEUE_SIZE    (8U)
+#ifndef CONFIG_GNRC_IPV6_MSG_QUEUE_SIZE
+#define CONFIG_GNRC_IPV6_MSG_QUEUE_SIZE    (8U)
 #endif
 
 #ifdef DOXYGEN
