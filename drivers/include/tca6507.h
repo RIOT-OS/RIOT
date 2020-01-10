@@ -213,8 +213,6 @@ int tca6507_intensity(const tca6507_t *dev, uint8_t intensity, uint8_t bank);
  *
  * @param[in] dev           device descriptor
  * @param[in] intensity     Intensity of the led in percent
- * @param[in] bank          The master intensity, this brightness can be configured
- *                          to overwrite the bank brightness
  *
  * @return                  TCA6507_OK on success
  * @return                  TCA6507_ERR_I2C on I2C bus error
