@@ -87,24 +87,15 @@ static void timer_isr(void)
          */
         counter += TIMER_ACCURACY;
         timer_isr_ctx.cb(timer_isr_ctx.arg, 0);
-
-        if (sched_context_switch_request) {
-            thread_yield();
-        }
+        mips32r2_isr_end();
     }
     if (counter == compares[1]) {
         timer_isr_ctx.cb(timer_isr_ctx.arg, 1);
-
-        if (sched_context_switch_request) {
-            thread_yield();
-        }
+        mips32r2_isr_end();
     }
     if (counter == compares[2]) {
         timer_isr_ctx.cb(timer_isr_ctx.arg, 2);
-
-        if (sched_context_switch_request) {
-            thread_yield();
-        }
+        mips32r2_isr_end();
     }
 
     mips_setcompare(mips_getcount() + TICKS_PER_US * TIMER_ACCURACY);
