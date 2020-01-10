@@ -33,6 +33,7 @@ The Espressif ESP-WROVER-KIT is a development board that uses the ESP32-WROVER m
 - 3.2" SPI LCD panel
 - RGB LED
 - USB bridge with JTAG interface
+- external 32.768 kHz crystal for RTC
 
 Furthermore, many GPIOs are broken out for extension. The USB bridge based on FDI FT2232HL provides a JTAG interface for OCD debugging through the USB interface.
 
@@ -90,6 +91,7 @@ ESP-WROVER-KIT has the following on-board components
 - 3.2" SPI LCD panel
 - RGB LED
 - USB bridge with JTAG interface
+- external 32.768 kHz crystal for RTC
 
 The following table shows the default board configuration sorted according to the defined functionality of GPIOs for different hardware options. This configuration can be overridden by \ref esp32_app_spec_conf "application-specific configurations".
 
@@ -192,7 +194,7 @@ GPIO39 | ADC_LINE(3)            | ADC_LINE(3)         | ADC_LINE(3)         | CA
 - GPIO2 cannot be used as PWM_DEV(0) channel 1 / LED0 when SPI_DEV(0) is used in any way. Reason is that GPIO2 is the MISO signal when SPI_DEV(0) is used and is therefore an input. PWM channels are outputs.
 - It might be necessary to remove the SD card or the peripheral hardware attached to the SPI_DEV(0) interface for flashing RIOT. Reason is that the **SPI_DEV(0)** interface uses the HSPI interface with the GPIO2 pin as the MISO signal, which has bootstrapping functionality.
 - GPIO16 and GPIO17 are used for the built-in SPI RAM and are not available on the I/O expansion connector, even though they are labeled there.
-- GPIO32 and GPIO33 are attached to a 32 kHz crystal by default. GPIO32 and GPIO33 are standard connected to a 32 kHz crystal. To make them available as a GPIO on the I/O expansion connector, SMD resistors would need to be removed and soldered.
+- GPIO32 and GPIO33 are attached to a 32 kHz crystal by default. To make them available as a GPIO on the I/O expansion connector, SMD resistors would need to be removed and soldered. Module `esp_rtc_timer_32k` is enabled by default.
 
 For detailed information about the configuration of ESP32 boards, see
 section Peripherals in \ref esp32_riot.
