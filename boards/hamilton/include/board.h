@@ -36,7 +36,6 @@ extern "C" {
  */
 #define XTIMER_DEV          TIMER_DEV(1)
 #define XTIMER_CHAN         (0)
-#define XTIMER_OVERHEAD     (0)
 /** @} */
 
 /**

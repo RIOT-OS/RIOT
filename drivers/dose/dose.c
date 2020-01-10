@@ -534,7 +534,7 @@ static const netdev_driver_t netdev_driver_dose = {
 
 void dose_setup(dose_t *ctx, const dose_params_t *params)
 {
-    static const xtimer_ticks32_t min_timeout = {.ticks32 = XTIMER_BACKOFF + XTIMER_OVERHEAD};
+    static const xtimer_ticks32_t min_timeout = {.ticks32 = XTIMER_BACKOFF};
 
     ctx->netdev.driver = &netdev_driver_dose;
 

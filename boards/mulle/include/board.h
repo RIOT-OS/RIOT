@@ -49,7 +49,6 @@
 #define XTIMER_WIDTH                (16)
 #define XTIMER_BACKOFF              (4)
 #define XTIMER_ISR_BACKOFF          (4)
-#define XTIMER_OVERHEAD             (3)
 #define XTIMER_HZ                   (32768ul)
 #else
 /* PIT xtimer configuration */
@@ -57,7 +56,6 @@
 #define XTIMER_CHAN                 (0)
 #define XTIMER_BACKOFF              (40)
 #define XTIMER_ISR_BACKOFF          (40)
-#define XTIMER_OVERHEAD             (30)
 #endif
 /** @} */
 
