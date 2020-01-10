@@ -419,7 +419,7 @@ BASELIBS += $(APPDEPS)
 
 
 # add extra include paths for packages in $(USEMODULE)
-export USEMODULE_INCLUDES =
+USEMODULE_INCLUDES =
 
 include $(RIOTBASE)/sys/Makefile.include
 include $(RIOTBASE)/drivers/Makefile.include
