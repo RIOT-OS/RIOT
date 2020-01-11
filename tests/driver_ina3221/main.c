@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <stdio.h>
 #include <string.h>
 #include "periph/gpio.h"
 #include "xtimer.h"
