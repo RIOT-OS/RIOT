@@ -67,10 +67,6 @@ int mpu_configure(uint_fast8_t region, uintptr_t base, uint_fast32_t attr) {
     MPU->RBAR = base & MPU_RBAR_ADDR_Msk;
     MPU->RASR = attr | MPU_RASR_ENABLE_Msk;
 
-    if (!mpu_enabled()) {
-        mpu_enable();
-    }
-
     return 0;
 #else
     (void)region;
