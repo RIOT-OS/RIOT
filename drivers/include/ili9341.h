@@ -88,6 +88,9 @@ typedef struct {
     gpio_t cs_pin;      /**< pin connected to the CHIP SELECT line */
     gpio_t dcx_pin;     /**< pin connected to the DC line */
     gpio_t rst_pin;     /**< pin connected to the reset line */
+    bool rgb;           /**< True when display is connected in RGB mode
+                          *  False when display is connected in BGR mode */
+    bool inverted;      /**< Display works in inverted color mode */
 } ili9341_params_t;
 
 /**

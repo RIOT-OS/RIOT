@@ -127,7 +127,8 @@ int ili9341_init(ili9341_t *dev, const ili9341_params_t *params)
     _write_cmd(dev, ILI9341_CMD_VMCTRL2, command_params, 1);
 
     /* Memory access CTL */
-    command_params[0] = ILI9341_MADCTL_HORZ_FLIP | ILI9341_MADCTL_BGR;
+    command_params[0] = ILI9341_MADCTL_HORZ_FLIP;
+    command_params[0] |= dev->params->rgb ? 0 : ILI9341_MADCTL_BGR;
     _write_cmd(dev, ILI9341_CMD_MADCTL, command_params, 1);
 
     /* Frame control */
@@ -193,6 +194,10 @@ int ili9341_init(ili9341_t *dev, const ili9341_params_t *params)
         _write_cmd(dev, ILI9341_CMD_NGAMCTRL, gamma_neg,
                    sizeof(gamma_neg));
 
+    }
+
+    if (dev->params->inverted) {
+        _write_cmd(dev, ILI9341_CMD_DINVON, NULL, 0);
     }
     /* Sleep out (turn off sleep mode) */
     _write_cmd(dev, ILI9341_CMD_SLPOUT, NULL, 0);
@@ -290,12 +295,18 @@ void ili9341_pixmap(ili9341_t *dev, uint16_t x1, uint16_t x2,
 
 void ili9341_invert_on(ili9341_t *dev)
 {
-    ili9341_write_cmd(dev, ILI9341_CMD_DINVON, NULL, 0);
+    uint8_t command = (dev->params->inverted) ? ILI9341_CMD_DINVOFF
+                                              : ILI9341_CMD_DINVON;
+
+    ili9341_write_cmd(dev, command, NULL, 0);
 }
 
 void ili9341_invert_off(ili9341_t *dev)
 {
-    ili9341_write_cmd(dev, ILI9341_CMD_DINVOFF, NULL, 0);
+    uint8_t command = (dev->params->inverted) ? ILI9341_CMD_DINVON
+                                              : ILI9341_CMD_DINVOFF;
+
+    ili9341_write_cmd(dev, command, NULL, 0);
 }
 
 void ili9341_set_brightness(ili9341_t *dev, uint8_t brightness)
