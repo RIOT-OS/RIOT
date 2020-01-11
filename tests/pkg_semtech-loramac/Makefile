@@ -2,9 +2,11 @@ BOARD ?= b-l072z-lrwan1
 
 include ../Makefile.tests_common
 
-# waspmote-pro and arduino-meag2560 don't have enough RAM to support another
-# thread dedicated to RX messages
-BOARD_WITHOUT_LORAMAC_RX := arduino-mega2560 waspmote-pro
+BOARD_WITHOUT_LORAMAC_RX := \
+    arduino-mega2560 \
+    i-nuncleo-lrwan1 \
+    stm32f0discovery \
+    waspmote-pro \
 
 LORA_DRIVER ?= sx1276
 LORA_REGION ?= EU868
