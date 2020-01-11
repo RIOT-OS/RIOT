@@ -17,52 +17,89 @@
  * @}
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <malloc.h>
-
-#include "thread.h"
-#include "irq.h"
-#include "sched.h"
-#include "thread.h"
-#include "irq.h"
 #include "cpu.h"
-#include "context_frame.h"
-#include "periph_cpu.h"
 #include "periph/init.h"
-#include "panic.h"
+#include "periph_conf.h"
+
 #include "vendor/encoding.h"
-#include "vendor/platform.h"
 #include "vendor/plic_driver.h"
 
-/* Default state of mstatus register */
-#define MSTATUS_DEFAULT     (MSTATUS_MPP | MSTATUS_MPIE)
+/*
+ * Configure the memory mapped flash for faster throughput
+ * to minimize interrupt latency on an I-Cache miss and refill
+ * from flash.  Alternatively (and faster) the interrupt
+ * routine could be put in SRAM.  The linker script supports
+ * code in SRAM using the ".hotcode" section.
+ * The flash chip on the HiFive1 is the ISSI 25LP128
+ * http://www.issi.com/WW/pdf/IS25LP128.pdf
+ * The maximum frequency it can run at is 133MHz in
+ * "Fast Read Dual I/O" mode.
+ * Note the updated data sheet:
+ * https://static.dev.sifive.com/SiFive-FE310-G000-datasheet-v1.0.4.pdf
+ * states "Address and write data using DQ[3] for transmission will not
+ * function properly."  This rules out QPI for the XIP memory mapped flash.
+ * #define MAX_FLASH_FREQ 133000000
+ * On forum SiFive says "safe" operation would be 40MHz.  50MHz seems to work
+ * fine.
+ */
+#define MAX_FLASH_FREQ 50000000
 
-volatile int __in_isr = 0;
+/* This should work for any reasonable cpu clock value. */
+#define SCKDIV_SAFE 3
 
-/* ISR trap vector */
-void trap_entry(void);
-
-/* PLIC external ISR function list */
-static external_isr_ptr_t _ext_isrs[PLIC_NUM_INTERRUPTS];
-
-/* NULL interrupt handler */
-void null_isr(int num)
+/*
+ * By default the SPI FFMT initialized as:
+ *  cmd_en = 1
+ *  addr_len = 3
+ *  cmd_code = 3
+ *  all other fields = 0
+ */
+void flash_init(void)
 {
-    (void) num;
+    /* In case we are executing from QSPI, (which is quite likely) we need to
+     * set the QSPI clock divider appropriately before boosting the clock
+     * frequency.
+     */
+    SPI0_REG(SPI_REG_SCKDIV) = SCKDIV_SAFE;
+
+    /* begin{code-style-ignore} */
+    SPI0_REG(SPI_REG_FFMT) =               /* setup "Fast Read Dual I/O" 1-1-2              */
+        SPI_INSN_CMD_EN         |          /* Enable memory-mapped flash                    */
+        SPI_INSN_ADDR_LEN(3)    |          /* 25LP128 read commands have 3 address bytes    */
+        SPI_INSN_PAD_CNT(4)     |          /* 25LP128 Table 6.9 Read Dummy Cycles P4,P3=0,0 */
+        SPI_INSN_CMD_PROTO(SPI_PROTO_S) |  /* 25LP128 Table 8.1 "Instruction                */
+        SPI_INSN_ADDR_PROTO(SPI_PROTO_D) | /*  Set" shows mode for cmd, addr, and           */
+        SPI_INSN_DATA_PROTO(SPI_PROTO_D) | /*  data protocol for given instruction          */
+        SPI_INSN_CMD_CODE(0xbb) |          /* Set the instruction to "Fast Read Dual I/O"   */
+        SPI_INSN_PAD_CODE(0x00);           /* Dummy cycle sends 0 value bits                */
+    /* end{code-style-ignore} */
+
+    /*
+     * The relationship between the input clock and SCK is given
+     * by the following formula (Fin is processor/tile-link clock):
+     *    Fsck = Fin/(2(div + 1))
+     */
+    uint32_t freq = cpu_freq();
+    uint32_t sckdiv = (freq - 1) / (MAX_FLASH_FREQ * 2);
+    if (sckdiv > SCKDIV_SAFE) {
+        SPI0_REG(SPI_REG_SCKDIV) = sckdiv;
+    }
 }
 
 /**
- * @brief Initialize the CPU, set IRQ priorities, clocks
+ * @brief Initialize the CPU, set IRQ priorities, clocks, peripheral
  */
 void cpu_init(void)
 {
-    volatile uint64_t *mtimecmp =
-        (uint64_t *) (CLINT_CTRL_ADDR + CLINT_MTIMECMP);
+    /* Initialize clock */
+    clock_init();
 
-    /* Setup trap handler function */
-    write_csr(mtvec, &trap_entry);
+#if USE_CLOCK_HFROSC_PLL
+    /* Initialize flash memory, only when using the PLL: in this
+       case the CPU core clock can be configured to be so fast that the SPI
+       flash frequency needs to be adjusted accordingly. */
+    flash_init();
+#endif
 
     /* Enable FPU if present */
     if (read_csr(misa) & (1 << ('F' - 'A'))) {
@@ -70,326 +107,12 @@ void cpu_init(void)
         write_csr(fcsr, 0);             /* initialize rounding mode, undefined at reset */
     }
 
-    /* Clear all interrupt enables */
-    write_csr(mie, 0);
+    /* Initialize IRQs */
+    irq_init();
 
-    /* Initial PLIC external interrupt controller */
-    PLIC_init(PLIC_CTRL_ADDR, PLIC_NUM_INTERRUPTS, PLIC_NUM_PRIORITIES);
+    /* Initialize newlib-nano library stubs */
+    nanostubs_init();
 
-    /* Initialize ISR function list */
-    for (int i = 0; i < PLIC_NUM_INTERRUPTS; i++) {
-        _ext_isrs[i] = null_isr;
-    }
-
-    /* Set mtimecmp to largest value to avoid spurious timer interrupts */
-    *mtimecmp = 0xFFFFFFFFFFFFFFFF;
-
-    /* Enable SW, timer and external interrupts */
-    set_csr(mie, MIP_MSIP);
-    set_csr(mie, MIP_MTIP);
-    set_csr(mie, MIP_MEIP);
-
-    /*  Set default state of mstatus */
-    set_csr(mstatus, MSTATUS_DEFAULT);
-
-    /* trigger static peripheral initialization */
+    /* Initialize static peripheral */
     periph_init();
-}
-
-/**
- * @brief Enable all maskable interrupts
- */
-unsigned int irq_enable(void)
-{
-    /* Enable all interrupts */
-    set_csr(mstatus, MSTATUS_MIE);
-    return read_csr(mstatus);
-}
-
-/**
- * @brief Disable all maskable interrupts
- */
-unsigned int irq_disable(void)
-{
-    unsigned int state = read_csr(mstatus);
-
-    /* Disable all interrupts */
-    clear_csr(mstatus, MSTATUS_MIE);
-    return state;
-}
-
-/**
- * @brief Restore the state of the IRQ flags
- */
-void irq_restore(unsigned int state)
-{
-    /* Restore all interrupts to given state */
-    write_csr(mstatus, state);
-}
-
-/**
- * @brief See if the current context is inside an ISR
- */
-int irq_is_in(void)
-{
-    return __in_isr;
-}
-
-/**
- * @brief   Set External ISR callback
- */
-void set_external_isr_cb(int intNum, external_isr_ptr_t cbFunc)
-{
-    if ((intNum > 0) && (intNum < PLIC_NUM_INTERRUPTS)) {
-        _ext_isrs[intNum] = cbFunc;
-    }
-}
-
-/**
- * @brief External interrupt handler
- */
-void external_isr(void)
-{
-    plic_source intNum = PLIC_claim_interrupt();
-
-    if ((intNum > 0) && (intNum < PLIC_NUM_INTERRUPTS)) {
-        _ext_isrs[intNum]((uint32_t) intNum);
-    }
-
-    PLIC_complete_interrupt(intNum);
-}
-
-/**
- * @brief Global trap and interrupt handler
- */
-void handle_trap(unsigned int mcause, unsigned int mepc, unsigned int mtval)
-{
-#ifndef DEVELHELP
-    (void) mepc;
-    (void) mtval;
-#endif
-    /*  Tell RIOT to set sched_context_switch_request instead of
-     *  calling thread_yield(). */
-    __in_isr = 1;
-
-    /* Check for INT or TRAP */
-    if ((mcause & MCAUSE_INT) == MCAUSE_INT) {
-        /* Cause is an interrupt - determine type */
-        switch (mcause & MCAUSE_CAUSE) {
-            case IRQ_M_SOFT:
-                /* Handle software interrupt - flag for context switch */
-                sched_context_switch_request = 1;
-                CLINT_REG(0) = 0;
-                break;
-
-#ifdef MODULE_PERIPH_TIMER
-            case IRQ_M_TIMER:
-                /* Handle timer interrupt */
-                timer_isr();
-                break;
-#endif
-            case IRQ_M_EXT:
-                /* Handle external interrupt */
-                external_isr();
-                break;
-
-            default:
-                /* Unknown interrupt */
-                core_panic(PANIC_GENERAL_ERROR, "Unhandled interrupt");
-                break;
-        }
-    }
-    else {
-#ifdef DEVELHELP
-        printf("Unhandled trap:\n");
-        printf("  mcause: 0x%08x\n", mcause);
-        printf("  mepc:   0x%08x\n", mepc);
-        printf("  mtval:  0x%08x\n", mtval);
-#endif
-        /* Unknown trap */
-        core_panic(PANIC_GENERAL_ERROR, "Unhandled trap");
-    }
-
-    /* Check if context change was requested */
-    if (sched_context_switch_request) {
-        sched_run();
-    }
-
-    /* ISR done - no more changes to thread states */
-    __in_isr = 0;
-}
-
-void panic_arch(void)
-{
-#ifdef DEVELHELP
-    while (1) {}
-#endif
-}
-
-/**
- * @brief   Noticeable marker marking the beginning of a stack segment
- *
- * This marker is used e.g. by *thread_start_threading* to identify the
- * stacks beginning.
- */
-#define STACK_MARKER                (0x77777777)
-
-/**
- * @brief Initialize a thread's stack
- *
- * RIOT saves the tasks registers on the stack, not in the task control
- * block.  thread_stack_init() is responsible for allocating space for
- * the registers on the stack and adjusting the stack pointer to account for
- * the saved registers.
- *
- * The stack_start parameter is the bottom of the stack (low address).  The
- * return value is the top of stack: stack_start + stack_size - space reserved
- * for thread context save - space reserved to align stack.
- *
- * thread_stack_init is called for each thread.
- *
- * RISCV ABI is here: https://github.com/riscv/riscv-elf-psabi-doc
- * From ABI:
- * The stack grows downwards and the stack pointer shall be aligned to a
- * 128-bit boundary upon procedure entry, except for the RV32E ABI, where it
- * need only be aligned to 32 bits. In the standard ABI, the stack pointer
- * must remain aligned throughout procedure execution. Non-standard ABI code
- * must realign the stack pointer prior to invoking standard ABI procedures.
- * The operating system must realign the stack pointer prior to invoking a
- * signal handler; hence, POSIX signal handlers need not realign the stack
- * pointer. In systems that service interrupts using the interruptee's stack,
- * the interrupt service routine must realign the stack pointer if linked
- * with any code that uses a non-standard stack-alignment discipline, but
- * need not realign the stack pointer if all code adheres to the standard ABI.
- *
- * @param[in] task_func     pointer to the thread's code
- * @param[in] arg           argument to task_func
- * @param[in] stack_start   pointer to the start address of the thread
- * @param[in] stack_size    the maximum size of the stack
- *
- * @return                  pointer to the new top of the stack (128bit aligned)
- *
- */
-char *thread_stack_init(thread_task_func_t task_func,
-                             void *arg,
-                             void *stack_start,
-                             int stack_size)
-{
-    struct context_switch_frame *sf;
-    uint32_t *stk_top;
-
-    /* calculate the top of the stack */
-    stk_top = (uint32_t *)((uintptr_t)stack_start + stack_size);
-
-    /* Put a marker at the top of the stack.  This is used by
-     * thread_stack_print to determine where to stop dumping the
-     * stack.
-     */
-    stk_top--;
-    *stk_top = STACK_MARKER;
-
-    /* per ABI align stack pointer to 16 byte boundary. */
-    stk_top = (uint32_t *)(((uint32_t)stk_top) & ~((uint32_t)0xf));
-
-    /* reserve space for the stack frame. */
-    stk_top = (uint32_t *)((uint8_t *) stk_top - sizeof(*sf));
-
-    /* populate the stack frame with default values for starting the thread. */
-    sf = (struct context_switch_frame *) stk_top;
-
-    /* Clear stack frame */
-    memset(sf, 0, sizeof(*sf));
-
-    /* set initial reg values */
-    sf->pc = (uint32_t) task_func;
-    sf->a0 = (uint32_t) arg;
-
-    /* if the thread exits go to sched_task_exit() */
-    sf->ra = (uint32_t) sched_task_exit;
-
-    return (char *) stk_top;
-}
-
-void thread_print_stack(void)
-{
-    int count = 0;
-    uint32_t *sp = (uint32_t *) ((sched_active_thread) ? sched_active_thread->sp : NULL);
-
-    if (sp == NULL) {
-        return;
-    }
-
-    printf("printing the current stack of thread %" PRIkernel_pid "\n",
-           thread_getpid());
-
-#ifdef DEVELHELP
-    printf("thread name: %s\n", sched_active_thread->name);
-    printf("stack start: 0x%08x\n", (unsigned int)(sched_active_thread->stack_start));
-    printf("stack end  : 0x%08x\n", (unsigned int)(sched_active_thread->stack_start + sched_active_thread->stack_size));
-#endif
-
-    printf("  address:      data:\n");
-
-    do {
-        printf("  0x%08x:   0x%08x\n", (unsigned int) sp, (unsigned int) *sp);
-        sp++;
-        count++;
-    } while (*sp != STACK_MARKER);
-
-    printf("current stack size: %i words\n", count);
-}
-
-int thread_isr_stack_usage(void)
-{
-    return 0;
-}
-
-void *thread_isr_stack_pointer(void)
-{
-    return NULL;
-}
-
-void *thread_isr_stack_start(void)
-{
-    return NULL;
-}
-
-/**
- * @brief Call context switching at thread exit
- *
- * This is called is two situations: 1) after the initial main and idle threads
- * have been created and 2) when a thread exits.
- *
- */
-void cpu_switch_context_exit(void)
-{
-    /* enable interrupts */
-    irq_enable();
-
-    /* force a context switch to another thread */
-    thread_yield_higher();
-    UNREACHABLE();
-}
-
-void thread_yield_higher(void)
-{
-    /* Use SW intr to schedule context switch */
-    CLINT_REG(CLINT_MSIP) = 1;
-
-    /* Latency of SW intr can be 4-7 cycles; wait for the SW intr */
-    __asm__ volatile ("wfi");
-}
-
-/**
- * @brief Print heap statistics
- */
-void heap_stats(void)
-{
-    extern char _heap_start; /* defined in linker script */
-    extern char _heap_end;   /* defined in linker script */
-
-    long int heap_size = &_heap_end - &_heap_start;
-    struct mallinfo minfo = mallinfo();
-    printf("heap: %ld (used %u, free %ld) [bytes]\n",
-           heap_size, minfo.uordblks, heap_size - minfo.uordblks);
 }

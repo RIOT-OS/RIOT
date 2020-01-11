@@ -51,6 +51,11 @@ typedef uint8_t gpio_t;
 #define GPIO_PIN(x, y)      (x | y)
 
 /**
+ * @brief   GPIO interrupt priority
+ */
+#define GPIO_INTR_PRIORITY  (3)
+
+/**
  * @brief   Structure for UART configuration data
  */
 typedef struct {
@@ -69,21 +74,6 @@ typedef struct {
  * @brief   Prevent shared timer functions from being used
  */
 #define PERIPH_TIMER_PROVIDES_SET
-
-/**
- * @brief   Timer ISR
- */
-void timer_isr(void);
-
-/**
- * @brief   External ISR callback
- */
-typedef void (*external_isr_ptr_t)(int intNum);
-
-/**
- * @brief   Set External ISR callback
- */
-void set_external_isr_cb(int intNum, external_isr_ptr_t cbFunc);
 
 #ifdef __cplusplus
 }
