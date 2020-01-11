@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <stdio.h>
+
 #include "xtimer.h"
 #include "event/callback.h"
 
