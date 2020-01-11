@@ -280,6 +280,7 @@ endif
 
 ifneq (,$(filter itg320x,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter jc42,$(USEMODULE)))
