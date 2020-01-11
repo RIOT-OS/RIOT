@@ -680,6 +680,7 @@ ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))
 endif
 
 ifneq (,$(filter xtimer,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_xtimer
   FEATURES_REQUIRED += periph_timer
   USEMODULE += div
 endif

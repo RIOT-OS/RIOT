@@ -24,7 +24,7 @@
 #include "diskio.h"
 #endif
 
-#ifdef MODULE_XTIMER
+#ifdef MODULE_AUTO_INIT_XTIMER
 #include "xtimer.h"
 #endif
 
@@ -111,7 +111,7 @@ void auto_init(void)
     void auto_init_random(void);
     auto_init_random();
 #endif
-#ifdef MODULE_XTIMER
+#ifdef MODULE_AUTO_INIT_XTIMER
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
 #endif
