@@ -451,6 +451,10 @@ void auto_init(void)
     extern void auto_init_isl29020(void);
     auto_init_isl29020();
 #endif
+#ifdef MODULE_ITG320X
+    extern void auto_init_itg320x(void);
+    auto_init_itg320x();
+#endif
 #ifdef MODULE_JC42
     extern void auto_init_jc42(void);
     auto_init_jc42();
