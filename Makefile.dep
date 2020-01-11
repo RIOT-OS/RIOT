@@ -703,9 +703,10 @@ ifneq (,$(filter saul_reg,$(USEMODULE)))
 endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_saul
   USEMODULE += saul
   USEMODULE += saul_reg
-  USEMODULE += auto_init_saul
+  DEFAULT_MODULE += auto_init_saul
 endif
 
 ifneq (,$(filter saul_adc,$(USEMODULE)))
@@ -737,8 +738,9 @@ ifneq (,$(filter can_linux,$(USEMODULE)))
 endif
 
 ifneq (,$(filter can,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_can
   USEMODULE += can_raw
-  USEMODULE += auto_init_can
+  DEFAULT_MODULE += auto_init_can
   ifneq (,$(filter can_mbox,$(USEMODULE)))
     USEMODULE += core_mbox
   endif
