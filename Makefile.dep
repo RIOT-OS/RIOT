@@ -290,6 +290,19 @@ ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   USEMODULE += icmpv6
 endif
 
+ifneq (,$(filter gnrc_icmpv4_echo,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv4
+endif
+
+ifneq (,$(filter gnrc_icmpv4_error,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv4
+endif
+
+ifneq (,$(filter gnrc_icmpv4,$(USEMODULE)))
+  USEMODULE += inet_csum
+  USEMODULE += gnrc_ipv4
+endif
+
 ifneq (,$(filter gnrc_rpl_srh,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_ext_rh
 endif
@@ -373,6 +386,15 @@ ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   ifneq (,$(filter sock_dns,$(USEMODULE)))
     USEMODULE += gnrc_ipv6_nib_dns
   endif
+endif
+
+ifneq (,$(filter gnrc_ipv4,$(USEMODULE)))
+  USEMODULE += inet_csum
+  USEMODULE += ipv4_addr
+  USEMODULE += ipv4_hdr
+  USEMODULE += gnrc_ipv4_hdr
+  USEMODULE += gnrc_ipv4_arp
+  USEMODULE += gnrc_netif
 endif
 
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))

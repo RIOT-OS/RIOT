@@ -1,3 +1,12 @@
+ifneq (,$(filter gnrc_icmpv4,$(USEMODULE)))
+  DIRS += network_layer/icmpv4
+endif
+ifneq (,$(filter gnrc_icmpv4_echo,$(USEMODULE)))
+  DIRS += network_layer/icmpv4/echo
+endif
+ifneq (,$(filter gnrc_icmpv4_error,$(USEMODULE)))
+  DIRS += network_layer/icmpv4/error
+endif
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   DIRS += network_layer/icmpv6
 endif
@@ -6,6 +15,12 @@ ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_icmpv6_error,$(USEMODULE)))
   DIRS += network_layer/icmpv6/error
+endif
+ifneq (,$(filter gnrc_ipv4,$(USEMODULE)))
+  DIRS += network_layer/ipv4
+endif
+ifneq (,$(filter gnrc_ipv4_arp,$(USEMODULE)))
+  DIRS += network_layer/ipv4/arp
 endif
 ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
   DIRS += network_layer/ipv6
@@ -18,6 +33,9 @@ ifneq (,$(filter gnrc_ipv6_ext_frag,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
   DIRS += network_layer/ipv6/ext/rh
+endif
+ifneq (,$(filter gnrc_ipv4_hdr,$(USEMODULE)))
+  DIRS += network_layer/ipv4/hdr
 endif
 ifneq (,$(filter gnrc_ipv6_hdr,$(USEMODULE)))
   DIRS += network_layer/ipv6/hdr

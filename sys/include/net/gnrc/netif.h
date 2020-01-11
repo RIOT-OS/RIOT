@@ -47,6 +47,9 @@
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/netif/ipv6.h"
 #endif
+#ifdef MODULE_GNRC_IPV4
+#include "net/gnrc/netif/ipv4.h"
+#endif
 #ifdef MODULE_GNRC_MAC
 #include "net/gnrc/netif/mac.h"
 #endif
@@ -84,6 +87,9 @@ typedef struct {
 #endif
 #if defined(MODULE_GNRC_IPV6) || DOXYGEN
     gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */
+#endif
+#if defined(MODULE_GNRC_IPV4) || DOXYGEN
+    gnrc_netif_ipv4_t ipv4;                 /**< IPv4 component */
 #endif
 #if defined(MODULE_GNRC_MAC) || DOXYGEN
     gnrc_netif_mac_t mac;                  /**< @ref net_gnrc_mac component */
@@ -344,6 +350,39 @@ static inline int gnrc_netif_ipv6_addr_add(const gnrc_netif_t *netif,
     return gnrc_netapi_set(netif->pid, NETOPT_IPV6_ADDR,
                            ((pfx_len << 8U) | flags), addr,
                            sizeof(ipv6_addr_t));
+}
+
+/**
+ * @brief   Adds an (unicast or anycast) IPv4 address to an interface (if IPv4
+ *          is supported)
+ *
+ * @pre `netif != NULL`
+ * @pre `addr != NULL`
+ * @pre `(mask > 0) && (mask <= 32)`
+ *
+ * @param[in] netif     The interface. May not be `NULL`.
+ * @param[in] addr      The address to add to @p netif. May not be `NULL`.
+ * @param[in] mask   The mask of @p addr. Must be greater than 0 and
+ *                      lesser than or equal to 32.
+ * @param[in] flags     [Flags](@ref net_gnrc_netif_ipv4_addrs_flags) for
+ *                      @p addr. Set @ref GNRC_NETIF_IPV4_ADDRS_FLAGS_STATE_VALID
+ *                      to skip duplicate address detection (when activated).
+ *
+ * @return  sizeof(ipv4_addr_t) on success.
+ * @return  -ENOMEM, if no space is left on @p netif to add @p addr or its
+ *          corresponding solicited-nodes multicast address.
+ * @return  -ENOTSUP, if @p netif doesn't support IPv4.
+ */
+static inline int gnrc_netif_ipv4_addr_add(const gnrc_netif_t *netif,
+                                           ipv4_addr_t *addr, unsigned mask,
+                                           uint8_t flags)
+{
+    assert(netif != NULL);
+    assert(addr != NULL);
+    assert((mask > 0) && (mask <= 32));
+    return gnrc_netapi_set(netif->pid, NETOPT_IPV4_ADDR,
+                           ((mask << 8U) | flags), addr,
+                           sizeof(ipv4_addr_t));
 }
 
 /**

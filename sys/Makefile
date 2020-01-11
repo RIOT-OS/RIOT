@@ -49,6 +49,9 @@ endif
 ifneq (,$(filter ipv4_addr,$(USEMODULE)))
   DIRS += net/network_layer/ipv4/addr
 endif
+ifneq (,$(filter ipv4_hdr,$(USEMODULE)))
+  DIRS += net/network_layer/ipv4/hdr
+endif
 ifneq (,$(filter ipv6_addr,$(USEMODULE)))
   DIRS += net/network_layer/ipv6/addr
 endif
