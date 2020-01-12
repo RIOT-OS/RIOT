@@ -13,44 +13,36 @@ This package patches the original source to add an interface for RIOT-OS.
 
 Only the callback for SPI peripherals is supported:
 
-* `ucg_com_riotos_hw_spi`
+* `ucg_com_hw_spi_riotos`
 
-Ucglib needs to map pin numbers to RIOT-OS pin numbers. It also needs to know which peripheral to use. The following two methods can be used to set this information.
+These methods require a structure containing peripheral information (`ucg_riotos_t`), that is set using the `ucg_SetUserPtr` function. This structure contains the peripheral and pin mapping.
 
-* `ucg_SetPins(ucg_dev, pins, bitmap)`
-* `ucg_SetDevice(ucg_dev, dev)`
-
-Note: `pins` should point to `gpio_t` array of Ucglib pin numbers to RIOT-OS pins. Due to this, `pins` can take up an additional 100 bytes, because it will use memory for the pins you do not map. You can overcome this limitation by implementing `ucg_com_riotos_hw_spi` yourself and hardcode the pins.
+If the above interface is not sufficient, it is still possible to write a dedicated interface by (re-)implementing the methods above. Refer to the [Ucglib wiki](https://github.com/olikraus/ucglib/wiki) for more information.
 
 ### Example
-```
+```c
 ucg_t ucg;
 
-gpio_t pins[] = {
-    [UCG_PIN_CS] = GPIO(PA, 0),
-    [UCG_PIN_CD] = GPIO(PA, 1),
-    [UCG_PIN_RESET] = GPIO(PA, 2)
+ucg_riotos_t user_data =
+{
+    .device_index = SPI_DEV(0),
+    .pin_cs = GPIO_PIN(PA, 0),
+    .pin_cd = GPIO_PIN(PA, 1),
+    .pin_reset = GPIO_PIN(PA, 2)
 };
 
-uint32_t bitmap = (
-    (1 << UCG_PIN_CS) +
-    (1 << UCG_PIN_CD) +
-    (1 << UCG_PIN_RESET)
-);
+ucg_SetUserPtr(&ucg, &user_data);
 
-ucg_SetPins(&ucg, pins, bitmap);
-ucg_SetDevice(&ucg, SPI_DEV(0));
-
-ucg_Init(&ucg, ucg_dev_ssd1331_18x96x64_univision, ucg_ext_ssd1331_18, ucg_com_riotos_hw_spi);
+ucg_Init(&ucg, ucg_dev_ssd1331_18x96x64_univision, ucg_ext_ssd1331_18, ucg_com_hw_spi_riotos);
 ```
 
 ## Virtual displays
-For targets without an I2C or SPI, a virtual display is available. Support for a virtual display is not compiled in by default.
+For targets without SPI, a virtual display is available. Support for a virtual display is not compiled by default.
 
 * By adding `USEMODULE += ucglib_sdl`, a SDL virtual display will be used. This is only available on native targets that have SDL2 installed. It uses `sdl2-config` to find the headers and libraries. Note that RIOT-OS builds 32-bit binaries and requires 32-bit SDL2 libraries.
 
 ### Example
-```
+```c
 ucg_t ucg;
 
 ucg_Init(&ucg, ucg_sdl_dev_cb, ucg_ext_none, NULL);

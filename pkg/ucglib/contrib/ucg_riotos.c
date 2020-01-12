@@ -18,17 +18,18 @@
  * @}
  */
 
-#include "ucg.h"
+#include <stdio.h>
+
+#include "ucg_riotos.h"
 
 #include "xtimer.h"
 
+#ifdef MODULE_PERIPH_SPI
 #include "periph/spi.h"
-#include "periph/i2c.h"
+#endif
 #include "periph/gpio.h"
 
-#include <stdio.h>
-
-#ifdef SPI_NUMOF
+#ifdef MODULE_PERIPH_SPI
 static spi_clk_t ucg_serial_clk_speed_to_spi_speed(uint32_t serial_clk_speed)
 {
     if (serial_clk_speed < 100) {
@@ -46,37 +47,47 @@ static spi_clk_t ucg_serial_clk_speed_to_spi_speed(uint32_t serial_clk_speed)
 
     return SPI_CLK_100KHZ;
 }
-#endif /* SPI_NUMOF */
+#endif /* MODULE_PERIPH_SPI */
 
-static void ucg_enable_pins(gpio_t *pins, uint32_t pins_enabled)
+/**
+ * @brief   Enable the selected pins in RIOT-OS.
+ */
+static void _enable_pins(const ucg_riotos_t *ucg_riot_ptr)
 {
-    uint8_t i;
+    /* no hardware peripheral is being used, nothing to be done */
+    if (ucg_riot_ptr == NULL) {
+        return;
+    }
 
-    for (i = 0; i < 32; i++) {
-        if (pins_enabled & ((uint32_t)1 << i)) {
-            if (pins[i] != GPIO_UNDEF) {
-                if (i < UCG_PIN_COUNT) {
-                    gpio_init(pins[i], GPIO_OUT);
-                }
-                else {
-                    gpio_init(pins[i], GPIO_IN);
-                }
-            }
-        }
+    if (ucg_riot_ptr->pin_cs != GPIO_UNDEF) {
+        gpio_init(ucg_riot_ptr->pin_cs, GPIO_OUT);
+    }
+
+    if (ucg_riot_ptr->pin_cd != GPIO_UNDEF) {
+        gpio_init(ucg_riot_ptr->pin_cd, GPIO_OUT);
+    }
+
+    if (ucg_riot_ptr->pin_reset != GPIO_UNDEF) {
+        gpio_init(ucg_riot_ptr->pin_reset, GPIO_OUT);
     }
 }
 
-#ifdef SPI_NUMOF
-int16_t ucg_com_riotos_hw_spi(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
+#ifdef MODULE_PERIPH_SPI
+int16_t ucg_com_hw_spi_riotos(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 {
-    spi_t dev = (spi_t) ucg->dev;
+    const ucg_riotos_t *ucg_riot_ptr = ucg_GetUserPtr(ucg);
+
+    /* assert that user_ptr is correctly set */
+    assert(ucg_riot_ptr != NULL);
+
+    spi_t dev = SPI_DEV(ucg_riot_ptr->device_index);
 
     switch (msg) {
         case UCG_COM_MSG_POWER_UP:
             /* setup pins */
-            ucg_enable_pins(ucg->pin_list, ucg->pins_enabled);
+            _enable_pins(ucg_riot_ptr);
 
-            /* setup Arduino SPI */
+            /* setup SPI */
             spi_init_pins(dev);
             spi_acquire(dev, GPIO_UNDEF, SPI_MODE_0,
                         ucg_serial_clk_speed_to_spi_speed(((ucg_com_info_t *)data)->serial_clk_speed));
@@ -89,18 +100,18 @@ int16_t ucg_com_riotos_hw_spi(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *da
             xtimer_usleep(arg);
             break;
         case UCG_COM_MSG_CHANGE_RESET_LINE:
-            if (ucg->pins_enabled & (1 << UCG_PIN_RST)) {
-                gpio_write(ucg->pin_list[UCG_PIN_RST], arg);
+            if (ucg_riot_ptr != NULL &&  ucg_riot_ptr->pin_reset != GPIO_UNDEF) {
+                gpio_write(ucg_riot_ptr->pin_reset, arg);
             }
             break;
         case UCG_COM_MSG_CHANGE_CS_LINE:
-            if (ucg->pins_enabled & (1 << UCG_PIN_CS)) {
-                gpio_write(ucg->pin_list[UCG_PIN_CS], arg);
+            if (ucg_riot_ptr != NULL &&  ucg_riot_ptr->pin_cs != GPIO_UNDEF) {
+                gpio_write(ucg_riot_ptr->pin_cs, arg);
             }
             break;
         case UCG_COM_MSG_CHANGE_CD_LINE:
-            if (ucg->pins_enabled & (1 << UCG_PIN_CD)) {
-                gpio_write(ucg->pin_list[UCG_PIN_CD], arg);
+            if (ucg_riot_ptr != NULL &&  ucg_riot_ptr->pin_cd != GPIO_UNDEF) {
+                gpio_write(ucg_riot_ptr->pin_cd, arg);
             }
             break;
         case UCG_COM_MSG_SEND_BYTE:
@@ -127,8 +138,8 @@ int16_t ucg_com_riotos_hw_spi(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *da
         case UCG_COM_MSG_SEND_CD_DATA_SEQUENCE:
             while (arg--) {
                 if (*data != 0) {
-                    if (ucg->pins_enabled & (1 << UCG_PIN_CD)) {
-                        gpio_write(ucg->pin_list[UCG_PIN_CD], *data);
+                    if (ucg_riot_ptr != NULL &&  ucg_riot_ptr->pin_cd != GPIO_UNDEF) {
+                        gpio_write(ucg_riot_ptr->pin_cd, *data);
                     }
                 }
 
@@ -141,9 +152,9 @@ int16_t ucg_com_riotos_hw_spi(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *da
 
     return 1;
 }
-#endif /* SPI_NUMOF */
+#endif /* MODULE_PERIPH_SPI */
 
-ucg_int_t ucg_dev_dummy_cb(ucg_t *ucg, ucg_int_t msg, void *data)
+ucg_int_t ucg_dev_dummy_riotos(ucg_t *ucg, ucg_int_t msg, void *data)
 {
     static uint32_t pixels;
 

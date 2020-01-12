@@ -1,4 +1,8 @@
 INCLUDES += -I$(PKGDIRBASE)/ucglib/csrc
+INCLUDES += -I$(RIOTBASE)/pkg/ucglib/contrib
+
+# The RIOT-OS interface needs this to store peripheral information.
+CFLAGS += -DWITH_USER_PTR
 
 # Link SDL if enabled.
 ifneq (,$(filter ucglib_sdl,$(USEMODULE)))
