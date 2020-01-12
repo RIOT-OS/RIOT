@@ -48,7 +48,7 @@ extern "C" {
  *
  * @param cipher           Already initialized cipher struct
  * @param auth_data        Additional data to authenticate in MAC
- * @param auth_data_len    Length of additional data
+ * @param auth_data_len    Length of additional data, max (2^16 - 2^8)
  * @param mac_length       length of the appended MAC (between 4 and 16 - only
  *                         even values)
  * @param length_encoding  maximal supported length of plaintext
@@ -57,7 +57,7 @@ extern "C" {
  * @param nonce_len        Length of the nonce in octets
  *                         (maximum: 15-length_encoding)
  * @param input            pointer to input data to encrypt
- * @param input_len        length of the input data
+ * @param input_len        length of the input data, max 2^32
  * @param output           pointer to allocated memory for encrypted data. It
  *                         has to be of size data_len + mac_length.
  * @return                 Length of encrypted data on a successful encryption
@@ -76,7 +76,7 @@ int cipher_encrypt_ccm(cipher_t *cipher,
  *
  * @param cipher           Already initialized cipher struct
  * @param auth_data        Additional data to authenticate in MAC
- * @param auth_data_len    Length of additional data
+ * @param auth_data_len    Length of additional data, max (2^16 - 2^8)
  * @param mac_length       length of the appended MAC (between 4 and 16 - only
  *                         even values)
  * @param length_encoding  maximal supported length of plaintext
@@ -85,7 +85,7 @@ int cipher_encrypt_ccm(cipher_t *cipher,
  * @param nonce_len        Length of the nonce in octets
  *                         (maximum: 15-length_encoding)
  * @param input            pointer to input data to decrypt
- * @param input_len        length of the input data
+ * @param input_len        length of the input data, max 2^32
  * @param output           pointer to allocated memory for decrypted data. It
  *                         has to be of size data_len - mac_length.
  *
