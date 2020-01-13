@@ -40,7 +40,7 @@ General usage:
 ```
 $ git clone https://github.com/RIOT-OS/applications/
 $ cd applications/sniffer
-$ RIOTBASE=<path/to/RIOT> BOARD=<name> make clean all flash
+$ BOARD=<name> make clean all flash
 ```
 
 2.  Run the `sniffer.py` script (change to subfolder `tools/`) as follows :
@@ -51,6 +51,14 @@ $ ./sniffer.py [-b baudrate] <tty> <channel> [outfile]
 For network socket:
 ```
 $ ./sniffer.py <host>:<port> <channel> [outfile]
+```
+
+You should see output like below:
+```
+ifconfig 3 set chan 26
+ifconfig 3 raw
+ifconfig 3 promisc
+RX: 0
 ```
 
 For detailed information on the parameters use the scripts on-line help:
