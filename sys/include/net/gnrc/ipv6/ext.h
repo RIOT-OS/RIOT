@@ -40,9 +40,9 @@ extern "C" {
 #endif
 
 /**
- * @defgroup    net_gnrc_ipv6_ext_conf IPv6 extension header compile configurations
+ * @defgroup    net_gnrc_ipv6_ext_conf GNRC IPv6 extension header compile configurations
  * @ingroup     net_gnrc_ipv6_ext
- * @ingroup     config
+ * @ingroup     net_gnrc_conf
  * @{
  */
 /**
