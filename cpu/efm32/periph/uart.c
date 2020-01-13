@@ -31,7 +31,7 @@
 /**
  * @brief   Defines whether LEUART is enabled and supported
  */
-#if EFM32_LEUART_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#if CONFIG_EFM32_FEATURE_LEUART && defined(LEUART_COUNT) && LEUART_COUNT > 0
 #define USE_LEUART
 #endif
 

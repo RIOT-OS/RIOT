@@ -1,4 +1,6 @@
-include $(RIOTCPU)/efm32/efm32-features.mk
+ifndef CONFIG_KCONFIG_CPU_EFM32
+  include $(RIOTCPU)/efm32/efm32-features.mk
+endif
 
 FEATURES_PROVIDED += arch_efm32
 FEATURES_PROVIDED += periph_cpuid
@@ -13,8 +15,10 @@ ifeq (1,$(EFM32_TNRG))
   FEATURES_PROVIDED += periph_hwrng
 endif
 
-ifeq (1,$(EFM32_LEUART_ENABLED))
-  CFLAGS += -DEFM32_LEUART_ENABLED=1
+ifndef CONFIG_KCONFIG_CPU_EFM32
+  ifeq (1,$(CONFIG_EFM32_FEATURE_LEUART))
+    CFLAGS += -DCONFIG_EFM32_FEATURE_LEUART=1
+  endif
 endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.features
