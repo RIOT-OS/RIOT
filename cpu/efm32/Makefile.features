@@ -21,4 +21,8 @@ ifndef CONFIG_KCONFIG_CPU_EFM32
   endif
 endif
 
+ifdef CONFIG_EFM32_EMLIB_ASSERTIONS
+  CFLAGS += -DDEBUG_EFM
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.features
