@@ -37,7 +37,7 @@ int main(void)
 
     int current_slot = riotboot_slot_current();
     if (current_slot != -1) {
-        /* Sometimes, udhcp output messes up the following printfs.  That
+        /* Sometimes, udhcp output messes up the following printfs. That
          * confuses the test script. As a workaround, just disable interrupts
          * for a while.
          */
