@@ -19,9 +19,9 @@ BINDIR = os.getenv("BINDIR")
 
 
 def wait_for_update(child):
-    return child.expect([r"riotboot_flashwrite: processing bytes (\d+)-(\d+)",
-                         "riotboot_flashwrite: riotboot flashing "
-                         "completed successfully"],
+    return child.expect([r"_flashwrite_handler\(\): received data: offset=\d+ "
+                         r"len=\d+ blockwise=\d+ more=\d+\r\n",
+                         "_flashwrite_handler(): finish"],
                         timeout=10)
 
 
@@ -36,7 +36,7 @@ def make_notify(client_url, slot, version):
         "-b",
         "64",
     ]
-    subprocess.Popen(cmd, cwd=BINDIR)
+    subprocess.call(cmd, cwd=BINDIR)
 
 
 def make_reset():
@@ -58,18 +58,21 @@ def make_riotboot_slots(version):
     assert not subprocess.call(cmd)
 
 
+def app_version(child):
+    # get version of currently running image
+    # "Image Version: 0x00000000"
+    child.expect(r"Image Version: (?P<app_ver>0x[0-9a-fA-F:]+)\r\n")
+    app_ver = int(child.match.group("app_ver"), 16)
+    return app_ver
+
+
 def testfunc(child):
     """For one board test if specified application is updatable"""
-
-    # Initial Setup and wait for address configuration
-    child.expect_exact("main(): This is RIOT!")
-
     # Get running slot
-    child.expect(r"running from slot ([0-1])")
+    child.expect(r"running from slot ([0-1])\r\n")
     slot = int(child.match.group(1))
-    # get version of currently running image, "Image Version: 0x00000000"
-    child.expect(r"Image Version: (?P<app_ver>0x[0-9a-fA-F:]+)")
-    current_app_ver = int(child.match.group("app_ver"), 16)
+    # get version of currently running image
+    current_app_ver = app_version(child)
 
     if USE_ETHOS == 0:
         # Get device global address
@@ -80,7 +83,12 @@ def testfunc(child):
         client = "[{}]".format(child.match.group("gladdr").lower())
     else:
         # Get device local address
-        client = "[fe80::2%{}]".format(TAP)
+        child.expect_exact("Link type: wired")
+        child.expect(
+            r"inet6 addr: (?P<lladdr>[0-9a-fA-F:]+:[A-Fa-f:0-9]+)"
+            "  scope: link  VAL"
+        )
+        client = "[{}%{}]".format(child.match.group("lladdr").lower(), TAP)
 
     for version in [current_app_ver + 1, current_app_ver + 2]:
         # Wait for nanocoap server to start
@@ -102,4 +110,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.exit(run(testfunc))
+    sys.exit(run(testfunc, echo=True))
