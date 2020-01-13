@@ -6,4 +6,6 @@
 #
 menu "CPU"
 
+rsource "efm32/Kconfig"
+
 endmenu # CPU

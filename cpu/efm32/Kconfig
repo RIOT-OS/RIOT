@@ -1,0 +1,31 @@
+# Copyright (c) 2020 Bas Stottelaar <basstottelaar@gmail.com>
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_CPU_EFM32
+    bool "Configure EFM32 CPU"
+    depends on MODULE_CPU_EFM32GG || MODULE_CPU_EFM32LG || MODULE_CPU_EFM32PG1B || MODULE_CPU_EFM3232PG12B || MODULE_CPU_EFR32MG1P || MODULE_CPU_EFR32MG12P
+    help
+        Configure EFM32 CPU via Kconfig.
+
+if KCONFIG_CPU_EFM32
+
+menu "Features"
+
+config EFM32_FEATURE_LEUART
+    bool "Enable LEUART peripheral support"
+    default y
+    help
+        Enable the LEUART peripheral in the UART driver.
+
+endmenu # Features
+
+config EFM32_EMLIB_ASSERTIONS
+    bool "Enable EMLIB assertions"
+    help
+        Additional assertions can be enabled within the EMLIB peripheral
+        library, for debugging. EMLIB is part of the Gecko SDK by Silicon Labs.
+
+endif # KCONFIG_CPU_EFM32
