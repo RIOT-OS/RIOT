@@ -1,0 +1,24 @@
+From 6b1223df6884bcfd00f4ecc8918b790baf041021 Mon Sep 17 00:00:00 2001
+From: Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
+Date: Wed, 8 Jan 2020 19:50:48 +0100
+Subject: [PATCH] update xtimer_t member names
+
+---
+ porting/npl/riot/include/nimble/nimble_npl_os.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/porting/npl/riot/include/nimble/nimble_npl_os.h b/porting/npl/riot/include/nimble/nimble_npl_os.h
+index 67eb74e1..61c1ea8a 100644
+--- a/porting/npl/riot/include/nimble/nimble_npl_os.h
++++ b/porting/npl/riot/include/nimble/nimble_npl_os.h
+@@ -209,7 +209,7 @@ ble_npl_callout_stop(struct ble_npl_callout *co)
+ static inline bool
+ ble_npl_callout_is_active(struct ble_npl_callout *c)
+ {
+-    return (c->timer.target || c->timer.long_target);
++    return (c->timer.offset || c->timer.long_offset);
+ }
+
+ static inline ble_npl_time_t
+--
+2.24.1

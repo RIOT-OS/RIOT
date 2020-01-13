@@ -67,7 +67,6 @@ void _xtimer_tsleep(uint32_t offset, uint32_t long_offset)
 
     timer.callback = _callback_unlock_mutex;
     timer.arg = (void*) &mutex;
-    timer.target = timer.long_target = 0;
 
     mutex_lock(&mutex);
     _xtimer_set64(&timer, offset, long_offset);
@@ -81,62 +80,24 @@ void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
     timer.callback = _callback_unlock_mutex;
     timer.arg = (void*) &mutex;
 
-    uint32_t target = (*last_wakeup) + period;
+    /* time sensitive until setting offset */
+    unsigned int state = irq_disable();
     uint32_t now = _xtimer_now();
-    /* make sure we're not setting a value in the past */
-    if (now < (*last_wakeup)) {
-        /* base timer overflowed between last_wakeup and now */
-        if (!((now < target) && (target < (*last_wakeup)))) {
-            /* target time has already passed */
-            goto out;
-        }
-    }
-    else {
-        /* base timer did not overflow */
-        if ((((*last_wakeup) <= target) && (target <= now))) {
-            /* target time has already passed */
-            goto out;
-        }
+    uint32_t elapsed = now - (*last_wakeup);
+    uint32_t offset = (*last_wakeup) + period - now;
+    irq_restore(state);
+
+    if (elapsed >= period) {
+        /* timer should be fired right now (some time drift might happen) */
+        *last_wakeup = now;
+        return;
     }
 
-    /*
-     * For large offsets, set an absolute target time.
-     * As that might cause an underflow, for small offsets, set a relative
-     * target time.
-     * For very small offsets, spin.
-     */
-    /*
-     * Note: last_wakeup _must never_ specify a time in the future after
-     * _xtimer_periodic_sleep returns.
-     * If this happens, last_wakeup may specify a time in the future when the
-     * next call to _xtimer_periodic_sleep is made, which in turn will trigger
-     * the overflow logic above and make the next timer fire too early, causing
-     * last_wakeup to point even further into the future, leading to a chain
-     * reaction.
-     *
-     * tl;dr Don't return too early!
-     */
-    uint32_t offset = target - now;
-    DEBUG("xps, now: %9" PRIu32 ", tgt: %9" PRIu32 ", off: %9" PRIu32 "\n", now, target, offset);
-    if (offset < XTIMER_PERIODIC_SPIN) {
-        _xtimer_spin(offset);
-    }
-    else {
-        if (offset < XTIMER_PERIODIC_RELATIVE) {
-            /* NB: This will overshoot the target by the amount of time it took
-             * to get here from the beginning of xtimer_periodic_wakeup()
-             *
-             * Since interrupts are normally enabled inside this function, this time may
-             * be undeterministic. */
-            target = _xtimer_now() + offset;
-        }
-        mutex_lock(&mutex);
-        DEBUG("xps, abs: %" PRIu32 "\n", target);
-        _xtimer_set_absolute(&timer, target);
-        mutex_lock(&mutex);
-    }
-out:
-    *last_wakeup = target;
+    mutex_lock(&mutex);
+    _xtimer_set64(&timer, offset, 0);
+    mutex_lock(&mutex);
+
+    *last_wakeup = now + offset;
 }
 
 #ifdef MODULE_CORE_MSG
@@ -158,7 +119,7 @@ static inline void _setup_msg(xtimer_t *timer, msg_t *msg, kernel_pid_t target_p
 void _xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid)
 {
     _setup_msg(timer, msg, target_pid);
-    _xtimer_set(timer, offset);
+    _xtimer_set64(timer, offset, 0);
 }
 
 void _xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid)
@@ -175,7 +136,7 @@ static void _setup_timer_msg(msg_t *m, xtimer_t *t)
     m->type = MSG_XTIMER;
     m->content.ptr = m;
 
-    t->target = t->long_target = 0;
+    t->offset = t->long_offset = 0;
 }
 
 /* Waits for incoming message or timeout. */
@@ -220,7 +181,7 @@ void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
     timer->callback = _callback_wakeup;
     timer->arg = (void*) ((intptr_t)pid);
 
-    _xtimer_set(timer, offset);
+    _xtimer_set64(timer, offset, 0);
 }
 
 void _xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
@@ -248,26 +209,23 @@ static void _mutex_timeout(void *arg)
      * If the xtimer spin is fixed in the future
      * interups disable/restore can be removed
      */
-    unsigned irqstate = irq_disable();
+    unsigned int irqstate = irq_disable();
 
     mutex_thread_t *mt = (mutex_thread_t *)arg;
 
-    if (mt->mutex->queue.next != MUTEX_LOCKED &&
-        mt->mutex->queue.next != NULL) {
-        mt->timeout = 1;
-        list_node_t *node = list_remove(&mt->mutex->queue,
-                                        (list_node_t *)&mt->thread->rq_entry);
+    mt->timeout = 1;
+    list_node_t *node = list_remove(&mt->mutex->queue,
+                                    (list_node_t *)&mt->thread->rq_entry);
 
-        /* if thread was removed from the list */
-        if (node != NULL) {
-            if (mt->mutex->queue.next == NULL) {
-                mt->mutex->queue.next = MUTEX_LOCKED;
-            }
-            sched_set_status(mt->thread, STATUS_PENDING);
-            irq_restore(irqstate);
-            sched_switch(mt->thread->priority);
-            return;
+    /* if thread was removed from the list */
+    if (node != NULL) {
+        if (mt->mutex->queue.next == NULL) {
+            mt->mutex->queue.next = MUTEX_LOCKED;
         }
+        sched_set_status(mt->thread, STATUS_PENDING);
+        irq_restore(irqstate);
+        sched_switch(mt->thread->priority);
+        return;
     }
     irq_restore(irqstate);
 }

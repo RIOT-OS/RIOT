@@ -37,10 +37,6 @@ extern "C" {
 #define XTIMER_WIDTH                (16)
 #endif
 
-#if defined(CPU_MODEL_STM32F334R8)
-#define XTIMER_OVERHEAD             (5)
-#endif
-
 #if defined(CPU_FAM_STM32F1)
 #define XTIMER_WIDTH                (16)
 #define XTIMER_BACKOFF              (19)
@@ -48,12 +44,10 @@ extern "C" {
 
 #if defined(CPU_FAM_STM32L1)
 #define XTIMER_BACKOFF              (11)
-#define XTIMER_OVERHEAD             (6)
 #endif
 
 #if defined(CPU_FAM_STM32F4) || defined(CPU_MODEL_STM32F303ZE)
 #define XTIMER_BACKOFF              (8)
-#define XTIMER_OVERHEAD             (6)
 #endif
 /** @} */
 

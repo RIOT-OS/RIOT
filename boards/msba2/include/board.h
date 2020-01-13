@@ -45,13 +45,6 @@ extern "C" {
 #define LED1_TOGGLE         (FIO3PIN ^= LED1_MASK)
 /** @} */
 
-/**
- * @name    xtimer tuning values
- * @{
- */
-#define XTIMER_OVERHEAD     7
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
