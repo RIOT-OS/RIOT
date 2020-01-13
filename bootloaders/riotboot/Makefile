@@ -7,6 +7,8 @@ BOARD ?= samr21-xpro
 # Select the boards with riotboot feature
 FEATURES_REQUIRED += riotboot
 
+# Set RIOTBOOT_BUILD to indicate a riotboot application build
+RIOTBOOT_BUILD = 1
 # Provide a define to detect if building the bootloader
 CFLAGS += -DRIOTBOOT
 
