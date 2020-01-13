@@ -1,4 +1,4 @@
-FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+FLASHER = $(RIOTBOARD)/mbed_lpc1768/dist/flash.sh
 DEBUGGER =
 DEBUGSERVER =
 
