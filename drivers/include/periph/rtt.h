@@ -144,7 +144,7 @@ uint32_t rtt_get_counter(void);
 void rtt_set_counter(uint32_t counter);
 
 /**
- * @brief Set an alarm for RTT to the specified value.
+ * @brief Set an alarm for RTT to the specified absolute target time.
  *
  * @param[in] alarm         The value to trigger an alarm when hit
  * @param[in] cb            Callback executed when alarm is hit
