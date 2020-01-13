@@ -85,7 +85,7 @@ endif
 # create final binaries with specific APP_VER values. The CI RasPi test workers
 # don't compile themselves, thus add the required files here so they will be
 # submitted along with the test jobs.
-TEST_EXTRA_FILES=$(SLOT_RIOT_ELFS)
+TEST_EXTRA_FILES += $(SLOT_RIOT_ELFS)
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
