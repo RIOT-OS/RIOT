@@ -892,7 +892,12 @@ static int _match_to_idx(const gnrc_netif_t *netif,
 
 static uint8_t _get_scope(const ipv6_addr_t *addr)
 {
-    if (ipv6_addr_is_link_local(addr)) {
+    if (ipv6_addr_is_multicast(addr)) {
+        /* return multicast scope as is, see
+         * https://tools.ietf.org/html/rfc4291#section-2.7*/
+        return addr->u8[1] & 0x0f;
+    }
+    else if (ipv6_addr_is_link_local(addr)) {
         return IPV6_ADDR_MCAST_SCP_LINK_LOCAL;
     }
     else if (ipv6_addr_is_site_local(addr)) {
