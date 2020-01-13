@@ -34,3 +34,8 @@ $(RIOTTOOLS)/setsid/setsid: $(RIOTTOOLS)/setsid/Makefile
 	@echo "[INFO] setsid binary not found - building it from source now"
 	@make -C $(RIOTTOOLS)/setsid
 	@echo "[INFO] setsid binary successfully built!"
+
+$(RIOTTOOLS)/flatc/flatc: $(RIOTTOOLS)/flatc/Makefile
+	@echo "[INFO] flatc binary not found - building it from source now"
+	make -C $(RIOTTOOLS)/flatc
+	@echo "[INFO] flatc binary successfully built!"
