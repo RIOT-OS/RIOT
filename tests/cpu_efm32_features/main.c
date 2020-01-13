@@ -20,8 +20,8 @@
 
 #include "periph/uart.h"
 
-#if EFM32_LEUART_ENABLED
-#error "Expected EFM32_LEUART_ENABLED feature to be disabled."
+#ifdef CONFIG_EFM32_FEATURE_LEUART
+#error "Expected CONFIG_EFM32_FEATURE_LEUART feature to be undefined."
 #endif
 
 int main(void)

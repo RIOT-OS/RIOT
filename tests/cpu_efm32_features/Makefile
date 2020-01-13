@@ -11,6 +11,6 @@ BOARD_WHITELIST := ikea-tradfri \
                    stk3700
 
 # see cpu/efm32/efm32-features.mk for the supported flags
-EFM32_LEUART_ENABLED = 0
+CONFIG_EFM32_FEATURE_LEUART = 0
 
 include $(RIOTBASE)/Makefile.include
