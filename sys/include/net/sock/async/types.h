@@ -79,8 +79,8 @@ typedef void (*sock_ip_cb_t)(sock_ip_t *sock, sock_async_flags_t flags);
 #endif  /* defined(MODULE_SOCK_IP) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
-typedef struct sock_tcp sock_tcp_t;         /**< forward declare for async */
-typedef struct sock_tcp sock_tcp_quee_t;    /**< forward declare for async */
+typedef struct sock_tcp sock_tcp_t;            /**< forward declare for async */
+typedef struct sock_tcp_queue sock_tcp_queue_t;/**< forward declare for async */
 
 /**
  * @brief   Event callback for @ref sock_tcp_t
