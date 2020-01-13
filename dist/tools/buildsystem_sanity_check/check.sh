@@ -220,6 +220,22 @@ checks_develhelp_not_defined_via_cflags() {
         | error_with_message "Use DEVELHELP ?= 1 instead of using CFLAGS directly"
 }
 
+
+# Common code in boards should not use $(BOARD) to reference files
+check_files_in_boards_not_reference_board_var() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e '/$(BOARD)/')
+
+    pathspec+=('boards/')
+    # boards/common/nrf52 uses a hack to resolve dependencies early
+    pathspec+=(':!boards/common/nrf52/Makefile.include')
+
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message 'Code in boards/ should not use $(BOARDS) to reference files since this breaks external BOARDS changing BOARDSDIR"'
+}
+
 error_on_input() {
     ! grep ''
 }
@@ -234,6 +250,7 @@ all_checks() {
     check_board_insufficient_memory_not_in_makefile
     checks_tests_application_not_defined_in_makefile
     checks_develhelp_not_defined_via_cflags
+    check_files_in_boards_not_reference_board_var
 }
 
 main() {
