@@ -542,7 +542,7 @@ static gnrc_pktsnip_t *_build_udp_packet(const ipv6_addr_t *dst,
     ipv6_hdr = hdr->data;
     ipv6_hdr->len = byteorder_htons(gnrc_pkt_len(payload));
     ipv6_hdr->nh = PROTNUM_UDP;
-    ipv6_hdr->hl = GNRC_NETIF_DEFAULT_HL;
+    ipv6_hdr->hl = CONFIG_GNRC_NETIF_DEFAULT_HL;
     gnrc_udp_calc_csum(payload, hdr);
     payload = hdr;
     hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
@@ -618,7 +618,7 @@ static int send_test_pkt(int argc, char **argv)
     (void) argv;
 
     printf("Sending UDP test packets to port %u\n", TEST_PORT);
-    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
         if (ipv6_addr_is_link_local(&eth_netif->ipv6.addrs[i])) {
             local_addr = &eth_netif->ipv6.addrs[i];
         }

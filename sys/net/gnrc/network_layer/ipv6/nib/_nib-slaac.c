@@ -134,7 +134,7 @@ static bool _try_addr_reconfiguration(gnrc_netif_t *netif)
     gnrc_netif_acquire(netif);
     if (hwaddr_reconf) {
         if (remove_old) {
-            for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+            for (unsigned i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
                 ipv6_addr_t *addr = &netif->ipv6.addrs[i];
                 if (addr->u64[1].u64 == orig_iid.uint64.u64) {
                     gnrc_netif_ipv6_addr_remove_internal(netif, addr);

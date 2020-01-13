@@ -53,8 +53,8 @@ extern "C" {
  *              the thread's stack size might need to be adapted if this is
  *              changed.
  */
-#ifndef GNRC_NETIF_MSG_QUEUE_SIZE
-#define GNRC_NETIF_MSG_QUEUE_SIZE  (16U)
+#ifndef CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE
+#define CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE  (16U)
 #endif
 
 /**
@@ -89,8 +89,8 @@ extern "C" {
  *
  * Default: 2 (1 link-local + 1 global address)
  */
-#ifndef GNRC_NETIF_IPV6_ADDRS_NUMOF
-#define GNRC_NETIF_IPV6_ADDRS_NUMOF    (2)
+#ifndef CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF
+#define CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF    (2)
 #endif
 
 /**
@@ -100,7 +100,7 @@ extern "C" {
  * address) + @ref GNRC_NETIF_RPL_ADDR + @ref GNRC_NETIF_IPV6_RTR_ADDR
  */
 #ifndef GNRC_NETIF_IPV6_GROUPS_NUMOF
-#define GNRC_NETIF_IPV6_GROUPS_NUMOF   (GNRC_NETIF_IPV6_ADDRS_NUMOF + \
+#define GNRC_NETIF_IPV6_GROUPS_NUMOF   (CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF + \
                                         GNRC_NETIF_RPL_ADDR + \
                                         GNRC_NETIF_IPV6_RTR_ADDR + 1)
 #endif
@@ -133,8 +133,8 @@ extern "C" {
 #endif
 #endif
 
-#ifndef GNRC_NETIF_DEFAULT_HL
-#define GNRC_NETIF_DEFAULT_HL      (64U)   /**< default hop limit */
+#ifndef CONFIG_GNRC_NETIF_DEFAULT_HL
+#define CONFIG_GNRC_NETIF_DEFAULT_HL      (64U)   /**< default hop limit */
 #endif
 
 /**
@@ -144,8 +144,8 @@ extern "C" {
  *
  * This is purely meant as a debugging feature to slow down a radios sending.
  */
-#ifndef GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
-#define GNRC_NETIF_MIN_WAIT_AFTER_SEND_US   (0U)
+#ifndef CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
+#define CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US   (0U)
 #endif
 
 #ifdef __cplusplus

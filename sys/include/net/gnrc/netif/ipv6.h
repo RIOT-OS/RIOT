@@ -83,14 +83,14 @@ typedef struct {
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      */
-    uint8_t addrs_flags[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+    uint8_t addrs_flags[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
     /**
      * @brief   IPv6 unicast and anycast addresses of the interface
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      */
-    ipv6_addr_t addrs[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+    ipv6_addr_t addrs[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
     /**
      * @brief   IPv6 multicast groups of the interface
@@ -162,7 +162,7 @@ typedef struct {
      * @note    Might also be usable in the later default SLAAC implementation
      *          for NS retransmission timers.
      */
-    evtimer_msg_event_t addrs_timers[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+    evtimer_msg_event_t addrs_timers[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
 #endif
 
 #if GNRC_IPV6_NIB_CONF_ROUTER || DOXYGEN
