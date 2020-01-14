@@ -132,8 +132,8 @@ extern "C" {
  * immediately. Use this value to prevent re-creation of a reassembly buffer
  * entry on late arriving link-layer duplicates.
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
-#define GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER              (0U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER              (0U)
 #endif
 
 /**
