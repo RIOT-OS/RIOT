@@ -36,8 +36,14 @@ ifneq (,$(filter at,$(USEMODULE)))
   USEMODULE += isrpipe_read_timeout
 endif
 
-ifneq (,$(filter at24mac,$(USEMODULE)))
+ifneq (,$(filter at24c%,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
+  USEMODULE += xtimer
+  USEMODULE += at24cxxx
+endif
+
+ifneq (,$(filter at24mac,$(USEMODULE)))
+  USEMODULE += at24cxxx
 endif
 
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
