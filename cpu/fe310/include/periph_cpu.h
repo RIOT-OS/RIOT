@@ -71,6 +71,25 @@ typedef struct {
 #define UART_ISR_PRIO       (2)
 
 /**
+ * @name    This CPU makes use of the following shared SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE  1
+#define PERIPH_SPI_NEEDS_TRANSFER_REG   1
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS  1
+/** @} */
+
+/**
+ * @brief   Structure for SPI configuration data
+ */
+typedef struct {
+    uint32_t addr;          /**< SPI control register address */
+    gpio_t mosi;            /**< MOSI pin */
+    gpio_t miso;            /**< MISO pin */
+    gpio_t sclk;            /**< SCLK pin */
+} spi_conf_t;
+
+/**
  * @brief   Prevent shared timer functions from being used
  */
 #define PERIPH_TIMER_PROVIDES_SET

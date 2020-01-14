@@ -9,6 +9,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     blackpill \
     bluepill \
     derfmega128 \
+    hifive1 \
+    hifive1b \
     i-nucleo-lrwan1 \
     mega-xplained \
     microduino-corerf \
