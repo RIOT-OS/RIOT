@@ -8,7 +8,7 @@ RIOT doesn't own any USB vendor and product ID. To compile this example, add
 your own vendor and product ID to the makefile:
 
 ```
-CFLAGS += -DUSB_CONFIG_VID=0xYOURVID -DUSB_CONFIG_PID=0xYOURPID
+CFLAGS += -DCONFIG_USB_VID=0xYOURVID -DCONFIG_USB_PID=0xYOURPID
 ```
 
 The example demonstrates basic USB communication between a host and a RIOT

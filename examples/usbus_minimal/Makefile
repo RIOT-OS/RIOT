@@ -16,17 +16,28 @@ USEMODULE += usbus
 USEMODULE += auto_init_usbus
 
 # USB device vendor and product ID
-DEFAULT_VID = 1209
-DEFAULT_PID = 0001
+export DEFAULT_VID = 1209
+export DEFAULT_PID = 7D00
 USB_VID ?= $(DEFAULT_VID)
 USB_PID ?= $(DEFAULT_PID)
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-CFLAGS += -DUSB_CONFIG_VID=0x$(USB_VID) -DUSB_CONFIG_PID=0x$(USB_PID)
-
 include $(RIOTBASE)/Makefile.include
+
+# Set USB VID/PID via CFLAGS if not being set via Kconfig
+ifndef CONFIG_USB_VID
+  CFLAGS += -DCONFIG_USB_VID=0x$(USB_VID)
+else
+  USB_VID = $(patsubst 0x%,%,$(CONFIG_USB_VID))
+endif
+
+ifndef CONFIG_USB_PID
+  CFLAGS += -DCONFIG_USB_PID=0x$(USB_PID)
+else
+  USB_PID = $(patsubst 0x%,%,$(CONFIG_USB_PID))
+endif
 
 .PHONY: usb_id_check
 usb_id_check:

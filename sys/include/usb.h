@@ -35,11 +35,11 @@ extern "C" {
  * @note You must provide your own VID/PID combination when manufacturing a
  * device with USB.
  */
-#ifndef USB_CONFIG_VID
+#ifndef CONFIG_USB_VID
 #ifdef DOXYGEN
-#define USB_CONFIG_VID
+#define CONFIG_USB_VID
 #else
-#error  Please supply your vendor ID by setting USB_CONFIG_VID
+#error  Please supply your vendor ID by setting CONFIG_USB_VID
 #endif
 #endif
 
@@ -49,33 +49,33 @@ extern "C" {
  * @note You must provide your own VID/PID combination when manufacturing a
  * device with USB.
  */
-#ifndef USB_CONFIG_PID
+#ifndef CONFIG_USB_PID
 #ifdef DOXYGEN
-#define USB_CONFIG_PID
+#define CONFIG_USB_PID
 #else
-#error  Please supply your vendor ID by setting USB_CONFIG_PID
+#error  Please supply your vendor ID by setting CONFIG_USB_PID
 #endif
 #endif
 
 /**
  * @brief USB peripheral manufacturer string
  */
-#ifndef USB_CONFIG_MANUF_STR
-#define USB_CONFIG_MANUF_STR   "RIOT-os.org"
+#ifndef CONFIG_USB_MANUF_STR
+#define CONFIG_USB_MANUF_STR   "RIOT-os.org"
 #endif
 
 /**
  * @brief USB peripheral product string
  */
-#ifndef USB_CONFIG_PRODUCT_STR
-#define USB_CONFIG_PRODUCT_STR  "USB device"
+#ifndef CONFIG_USB_PRODUCT_STR
+#define CONFIG_USB_PRODUCT_STR  "USB device"
 #endif
 
 /**
  * @brief USB peripheral configuration string
  */
-#ifndef USB_CONFIG_CONFIGURATION_STR
-#define USB_CONFIG_CONFIGURATION_STR    "USB config"
+#ifndef CONFIG_USB_CONFIGURATION_STR
+#define CONFIG_USB_CONFIGURATION_STR    "USB config"
 #endif
 
 /**
@@ -84,36 +84,42 @@ extern "C" {
  * This is the version number of this peripheral
  * @note Not to be be confused with the USB version number
  */
-#ifndef USB_CONFIG_PRODUCT_BCDVERSION
-#define USB_CONFIG_PRODUCT_BCDVERSION   0x0100
+#ifndef CONFIG_USB_PRODUCT_BCDVERSION
+#define CONFIG_USB_PRODUCT_BCDVERSION   0x0100
 #endif
 
 /**
  * @brief USB specification version
  */
-#ifndef USB_CONFIG_SPEC_BCDVERSION
-#define USB_CONFIG_SPEC_BCDVERSION      0x0200
+#ifndef CONFIG_USB_SPEC_BCDVERSION
+#if defined(CONFIG_USB_SPEC_BCDVERSION_1_1)
+#define CONFIG_USB_SPEC_BCDVERSION      0x0110
+#elif defined(CONFIG_USB_SPEC_BCDVERSION_2_0)
+#define CONFIG_USB_SPEC_BCDVERSION      0x0200
+#else
+#define CONFIG_USB_SPEC_BCDVERSION      0x0200
+#endif
 #endif
 
 /**
  * @brief USB peripheral setting to indicate self powered devices.
  */
-#ifndef USB_CONFIG_SELF_POWERED
-#define USB_CONFIG_SELF_POWERED   (0)
+#ifndef CONFIG_USB_SELF_POWERED
+#define CONFIG_USB_SELF_POWERED   (0)
 #endif
 
 /**
  * @brief USB device max power draw in mA, between 0 and 500mA
  */
-#ifndef USB_CONFIG_MAX_POWER
-#define USB_CONFIG_MAX_POWER   (100)
+#ifndef CONFIG_USB_MAX_POWER
+#define CONFIG_USB_MAX_POWER   (100)
 #endif
 
 /**
  * @brief Default LANG ID reported to the host
  */
-#ifndef USB_CONFIG_DEFAULT_LANGID
-#define USB_CONFIG_DEFAULT_LANGID   0x0409 /* EN-US */
+#ifndef CONFIG_USB_DEFAULT_LANGID
+#define CONFIG_USB_DEFAULT_LANGID   0x0409 /* EN-US */
 #endif
 /** @} */
 
