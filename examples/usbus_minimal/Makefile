@@ -17,7 +17,7 @@ USEMODULE += auto_init_usbus
 
 # USB device vendor and product ID
 export DEFAULT_VID = 1209
-export DEFAULT_PID = 0001
+export DEFAULT_PID = 7D00
 USB_VID ?= $(DEFAULT_VID)
 USB_PID ?= $(DEFAULT_PID)
 
