@@ -10,12 +10,6 @@ GENERATED_DIR = $(BINDIR)/generated
 # This file will contain all generated configuration from kconfig
 export KCONFIG_GENERATED_AUTOCONF_HEADER_C = $(GENERATED_DIR)/autoconf.h
 
-# Add configuration header to build dependencies
-BUILDDEPS += $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
-
-# Include configuration header when building
-CFLAGS += -include '$(KCONFIG_GENERATED_AUTOCONF_HEADER_C)'
-
 # Header for the generated header file
 define KCONFIG_AUTOHEADER_HEADER
 $(if $(filter MINGW% CYGWIN% MSYS%,$(OS)),/)/* RIOT Configuration File */
@@ -60,6 +54,28 @@ MERGE_SOURCES += $(wildcard $(KCONFIG_USER_CONFIG))
 $(GENERATED_DIR): $(CLEAN)
 	$(Q)mkdir -p $@
 
+# During migration this checks if Kconfig should run. It will run if any of
+# the following is true:
+# - A file with '.config' extension is present in the application directory
+# - A 'Kconfig' file is present in the application directory
+# - A previous configuration file is present (e.g. from a previous call to
+#   menuconfig)
+# - menuconfig is being called
+#
+# NOTE: This assumes that Kconfig will not generate any default configurations
+# just from the Kconfig files outside the application folder (i.e. module
+# configuration via Kconfig is disabled by default). Should this change, the
+# check would not longer be valid, and Kconfig would have to run on every
+# build.
+SHOULD_RUN_KCONFIG := $(or $(wildcard $(APPDIR)/*.config), $(wildcard $(APPDIR)/Kconfig), $(wildcard $(KCONFIG_MERGED_CONFIG)), $(filter menuconfig, $(MAKECMDGOALS)))
+
+ifneq (,$(SHOULD_RUN_KCONFIG))
+# Add configuration header to build dependencies
+BUILDDEPS += $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
+
+# Include configuration header when building
+CFLAGS += -include '$(KCONFIG_GENERATED_AUTOCONF_HEADER_C)'
+
 USEMODULE_W_PREFIX = $(addprefix MODULE_,$(USEMODULE))
 USEPKG_W_PREFIX = $(addprefix PKG_,$(USEPKG))
 
@@ -102,3 +118,4 @@ $(KCONFIG_MERGED_CONFIG): $(MERGECONFIG) $(KCONFIG_GENERATED_DEPENDENCIES) FORCE
 # any unnecessary rewrites of the header file if no configurations changed.
 $(KCONFIG_GENERATED_AUTOCONF_HEADER_C): $(KCONFIG_GENERATED_DEPENDENCIES) $(GENCONFIG) $(KCONFIG_MERGED_CONFIG) FORCE
 	$(Q)KCONFIG_CONFIG=$(KCONFIG_MERGED_CONFIG) $(GENCONFIG) --header-path $@ $(KCONFIG)
+endif
