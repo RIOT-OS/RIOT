@@ -68,8 +68,8 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_SIZE
-#define GNRC_SIXLOWPAN_FRAG_RBUF_SIZE       (4U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE       (4U)
 #endif
 
 /**
