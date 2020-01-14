@@ -176,9 +176,9 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_vrb](@ref net_gnrc_sixlowpan_frag_vrb) module.
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US
-#define GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US  (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)
-#endif  /* GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US */
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US  (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)
+#endif  /* CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US */
 
 /**
  * @name Selective fragment recovery configuration
