@@ -36,7 +36,7 @@
 extern "C" {
 #endif
 
-#ifndef GNRC_SIXLOWPAN_ND_AR_LTIME
+#ifndef CONFIG_GNRC_SIXLOWPAN_ND_AR_LTIME
 /**
  * @brief   Registration lifetime in minutes for the address registration option
  *
@@ -47,7 +47,7 @@ extern "C" {
  *          RFC 6775, section 5.8.1
  *      </a>
  */
-#define GNRC_SIXLOWPAN_ND_AR_LTIME          (15U)
+#define CONFIG_GNRC_SIXLOWPAN_ND_AR_LTIME          (15U)
 #endif
 
 /**

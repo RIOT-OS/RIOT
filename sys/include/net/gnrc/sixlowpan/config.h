@@ -150,8 +150,8 @@ extern "C" {
  *          provides capabilities to build the address registration option as a
  *          @ref gnrc_pktsnip_t
  */
-#ifndef GNRC_SIXLOWPAN_ND_AR_LTIME
-#define GNRC_SIXLOWPAN_ND_AR_LTIME          (15U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_ND_AR_LTIME
+#define CONFIG_GNRC_SIXLOWPAN_ND_AR_LTIME          (15U)
 #endif
 
 /**
