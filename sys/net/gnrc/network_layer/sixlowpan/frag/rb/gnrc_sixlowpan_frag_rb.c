@@ -383,7 +383,7 @@ void gnrc_sixlowpan_frag_rb_gc(void)
         /* since pkt occupies pktbuf, aggressivly collect garbage */
         if (!gnrc_sixlowpan_frag_rb_entry_empty(&rbuf[i]) &&
               ((now_usec - rbuf[i].super.arrival) >
-               GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
+               CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
             DEBUG("6lo rfrag: entry (%s, ",
                   gnrc_netif_addr_to_str(rbuf[i].super.src,
                                          rbuf[i].super.src_len,
@@ -405,7 +405,7 @@ void gnrc_sixlowpan_frag_rb_gc(void)
 
 static inline void _set_rbuf_timeout(void)
 {
-    xtimer_set_msg(&_gc_timer, GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US,
+    xtimer_set_msg(&_gc_timer, CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US,
                    &_gc_timer_msg, sched_active_pid);
 }
 
@@ -467,7 +467,7 @@ static int _rbuf_get(const void *src, size_t src_len,
         assert(!gnrc_sixlowpan_frag_rb_entry_empty(oldest));
         if (GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE ||
             ((now_usec - oldest->super.arrival) >
-            GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
+            CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
             DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
             gnrc_pktbuf_release(oldest->pkt);
             gnrc_sixlowpan_frag_rb_remove(oldest);
@@ -567,10 +567,10 @@ static void _tmp_rm(gnrc_sixlowpan_frag_rb_t *rbuf)
         /* use garbage-collection to leave the entry for at least
          * GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER in the reassembly buffer by
          * setting the arrival time to
-         * (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US - GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER)
+         * (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US - GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER)
          * microseconds in the past */
         rbuf->super.arrival = xtimer_now_usec() -
-                              (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US -
+                              (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US -
                                GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER);
         /* reset current size to prevent late duplicates to trigger another
          * dispatch */
