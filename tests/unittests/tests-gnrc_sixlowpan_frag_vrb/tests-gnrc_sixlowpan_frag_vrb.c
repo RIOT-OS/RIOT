@@ -108,7 +108,7 @@ static void test_vrb_add__full(void)
     gnrc_sixlowpan_frag_rb_base_t base = _base;
 
     /* fill up VRB */
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_vrb_add(&base,
                                                          &_dummy_netif,
                                                          _out_dst,

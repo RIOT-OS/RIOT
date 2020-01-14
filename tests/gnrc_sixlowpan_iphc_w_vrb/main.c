@@ -208,7 +208,7 @@ static void test_recv__vrb_full(void)
 
     TEST_ASSERT_NOT_NULL(pkt);
     /* Fill up VRB */
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         base.tag++;
         base.arrival = xtimer_now_usec();
         TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_vrb_add(&base, _mock_netif,
