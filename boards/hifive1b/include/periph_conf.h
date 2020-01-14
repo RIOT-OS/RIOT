@@ -129,6 +129,22 @@ static const uart_conf_t uart_config[] = {
 #define PWM_NUMOF                   (3)
 /** @} */
 
+/**
+ * @name    I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .addr   = I2C0_CTRL_ADDR,
+        .scl    = GPIO_PIN(0, 13),
+        .sda    = GPIO_PIN(0, 12),
+        .speed  = I2C_SPEED_NORMAL,
+     },
+};
+
+#define I2C_NUMOF                   ARRAY_SIZE(i2c_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
