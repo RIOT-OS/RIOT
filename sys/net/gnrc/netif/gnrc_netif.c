@@ -892,7 +892,12 @@ static int _match_to_idx(const gnrc_netif_t *netif,
 
 static uint8_t _get_scope(const ipv6_addr_t *addr)
 {
-    if (ipv6_addr_is_link_local(addr)) {
+    if (ipv6_addr_is_multicast(addr)) {
+        /* return multicast scope as is, see
+         * https://tools.ietf.org/html/rfc4291#section-2.7*/
+        return addr->u8[1] & 0x0f;
+    }
+    else if (ipv6_addr_is_link_local(addr)) {
         return IPV6_ADDR_MCAST_SCP_LINK_LOCAL;
     }
     else if (ipv6_addr_is_site_local(addr)) {
@@ -987,10 +992,7 @@ static int _create_candidate_set(const gnrc_netif_t *netif,
 
 /* number of "points" assigned to an source address candidate with equal scope
  * than destination address */
-#define RULE_2A_PTS         (4)
-/* number of "points" assigned to an source address candidate with smaller scope
- * than destination address */
-#define RULE_2B_PTS         (2)
+#define RULE_2_PTS          (IPV6_ADDR_MCAST_SCP_GLOBAL + 1)
 /* number of "points" assigned to an source address candidate in preferred state */
 #define RULE_3_PTS          (1)
 
@@ -1051,7 +1053,7 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
 
         DEBUG("Checking address: %s\n",
               ipv6_addr_to_str(addr_str, ptr, sizeof(addr_str)));
-        /* entries which are not  part of the candidate set can be ignored */
+        /* entries which are not part of the candidate set can be ignored */
         if (!(bf_isset(candidate_set, i))) {
             DEBUG("Not part of the candidate set - skipping\n");
             continue;
@@ -1063,15 +1065,29 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
             return ptr;
         }
         /* Rule 2: Prefer appropriate scope. */
-        /* both link local */
         uint8_t candidate_scope = _get_scope(ptr);
         if (candidate_scope == dst_scope) {
             DEBUG("winner for rule 2 (same scope) found\n");
-            winner_set[i] += RULE_2A_PTS;
+            winner_set[i] += (dst_scope + RULE_2_PTS);
         }
-        else if (candidate_scope < dst_scope) {
+        else if (candidate_scope > dst_scope) {
+            DEBUG("winner for rule 2 (larger scope) found\n");
+            /* From https://tools.ietf.org/html/rfc6724#section-5:
+             * >  Rule 2: Prefer appropriate scope.
+             * >  If Scope(SA) < Scope(SB): If Scope(SA) < Scope(D), then prefer
+             * >  SB and otherwise prefer SA.
+             * Meaning give address with larger scope than `dst` but closest to
+             * `dst` precedence.
+             * As the if above already ensures that the scope is larger than
+             * the scope of the destination address we give the address with the
+             * smallest scope that lands here the highest score */
+            winner_set[i] += (dst_scope + (RULE_2_PTS - candidate_scope));
+        }
+        else {
             DEBUG("winner for rule 2 (smaller scope) found\n");
-            winner_set[i] += RULE_2B_PTS;
+            /* don't add `dst_scope` here to keep it smaller than larger and
+             * equal scope */
+            winner_set[i] += candidate_scope;
         }
 
         /* Rule 3: Avoid deprecated addresses. */
