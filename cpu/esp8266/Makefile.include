@@ -72,6 +72,7 @@ endif
 export TARGET_ARCH ?= xtensa-esp8266-elf
 
 # ESP8266 pseudomodules
+PSEUDOMODULES += esp_esp8266
 PSEUDOMODULES += esp_gdb
 PSEUDOMODULES += esp_log_colored
 PSEUDOMODULES += esp_log_tagged
@@ -82,6 +83,7 @@ PSEUDOMODULES += esp_spiffs
 PSEUDOMODULES += esp_wifi_any
 
 USEMODULE += esp_common
+USEMODULE += esp_esp8266
 USEMODULE += esp_freertos
 USEMODULE += esp_idf
 USEMODULE += esp_idf_esp8266
