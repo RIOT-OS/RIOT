@@ -34,8 +34,8 @@ ifeq (, $(filter -std=%, $(CFLAGS)))
 endif
 CFLAGS_CPU   = -EL -mabi=$(ABI)
 CFLAGS_LINK  = -ffunction-sections -fno-builtin -fshort-enums -fdata-sections
-CFLAGS_DBG   = -g3
-CFLAGS_OPT   = -Os
+CFLAGS_DBG   ?= -g3
+CFLAGS_OPT   ?= -Os
 
 CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_OPT) $(CFLAGS_DBG)
 CFLAGS += -DCPU_MODEL_$(call uppercase_and_underscore,$(CPU_MODEL))
