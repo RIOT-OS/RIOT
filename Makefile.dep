@@ -804,6 +804,11 @@ ifneq (,$(filter vfs,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter sock_async_event,$(USEMODULE)))
+  USEMODULE += sock_async
+  USEMODULE += event
+endif
+
 ifneq (,$(filter sock_dns,$(USEMODULE)))
   USEMODULE += sock_util
   USEMODULE += posix_headers
