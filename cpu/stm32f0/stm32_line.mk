@@ -13,6 +13,8 @@ ifneq (, $(filter $(TYPE), 030 031 042 070))
     CPU_LINE = STM32F$(TYPE)x8
   else ifneq (, $(filter $(MODEL2), B))
     CPU_LINE = STM32F$(TYPE)xB
+  else ifneq (, $(filter $(MODEL2), C))
+    CPU_LINE = STM32F$(TYPE)xC
   endif
 else ifneq (, $(filter $(TYPE), 051))
   CPU_LINE = STM32F$(TYPE)x8

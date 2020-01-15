@@ -45,6 +45,7 @@ extern "C" {
 #else
 #define CPU_IRQ_NUMOF                   (32U)
 #endif
+#define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
 /**
@@ -55,7 +56,8 @@ extern "C" {
  *
  * @{
  */
-#if defined(CPU_LINE_STM32F091xC) || defined(CPU_LINE_STM32F072xB)
+#if defined(CPU_LINE_STM32F091xC) || defined(CPU_LINE_STM32F072xB) \
+   || defined(CPU_LINE_STM32F030xC)
 #define FLASHPAGE_SIZE      (2048U)
 #elif defined(CPU_LINE_STM32F051x8) || defined(CPU_LINE_STM32F042x6) \
    || defined(CPU_LINE_STM32F070xB) || defined(CPU_LINE_STM32F030x8) \
