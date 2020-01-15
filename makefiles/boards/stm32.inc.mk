@@ -1,6 +1,6 @@
 PROGRAMMER ?= openocd
 
-PROGRAMMERS_SUPPORTED := bmp dfu-util openocd
+PROGRAMMERS_SUPPORTED := bmp dfu-util openocd pyocd
 
 ifeq (,$(filter $(PROGRAMMER), $(PROGRAMMERS_SUPPORTED)))
   $(error Programmer $(PROGRAMMER) not supported)
@@ -55,4 +55,9 @@ ifeq (dfu-util,$(PROGRAMMER))
   FLASHFILE ?= $(BINFILE)
   DFU_FLAGS ?= -a 2
   FFLAGS = -d $(DFU_USB_ID) $(DFU_FLAGS) -D $(FLASHFILE)
+endif
+
+# Recent versions of PyOCD (>=0.24.1) supports several STM32 based boards
+ifeq (pyocd,$(PROGRAMMER))
+  include $(RIOTMAKE)/tools/pyocd.inc.mk
 endif
