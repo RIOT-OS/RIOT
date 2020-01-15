@@ -210,19 +210,23 @@ extern "C" {
     /* UART0 is used for stdio */
     #define UART_0              MEGA_UART0
     #define UART_0_ISR          USART0_RX_vect
+    #define UART_0_ISR_TX       USART0_TX_vect
 
     #define UART_1              MEGA_UART1
     #define UART_1_ISR          USART1_RX_vect
+    #define UART_1_ISR_TX       USART1_TX_vect
 #elif defined(CPU_ATMEGA328P)
     #define UART_NUMOF          (1U)
 
     #define UART_0              MEGA_UART0
     #define UART_0_ISR          USART_RX_vect
+    #define UART_0_ISR_TX       USART_TX_vect
 #elif defined(CPU_ATMEGA32U4)
     #define UART_NUMOF          (1U)
 
     #define UART_0              MEGA_UART1
     #define UART_0_ISR          USART1_RX_vect
+    #define UART_0_ISR_TX       USART1_TX_vect
 #else
     #define UART_NUMOF          (0U)
 #endif

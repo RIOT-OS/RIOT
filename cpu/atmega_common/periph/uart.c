@@ -80,6 +80,11 @@ static mega_uart_t *dev[] = {
  */
 static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 
+/**
+ * @brief   Allocate variable to hold transmission status, set when there
+ *          is data in UDRn or in the Transmit Shift Register
+ */
+static volatile uint8_t _tx_pending = 0;
 
 static void _update_brr(uart_t uart, uint16_t brr, bool double_speed)
 {
@@ -121,6 +126,9 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         return UART_NODEV;
     }
 
+    uint16_t count = 0xffff;
+    while (_tx_pending && count--) {}
+
     /* register interrupt context */
     isr_ctx[uart].rx_cb = rx_cb;
     isr_ctx[uart].arg = arg;
@@ -141,19 +149,19 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* set clock divider */
     _set_brr(uart, baudrate);
 
-    /* enable RX and TX and the RX interrupt */
+    /* enable RX and TX and their respective interrupt */
     if (rx_cb) {
 #ifdef CPU_ATMEGA32U4
-        dev[uart]->CSRB = ((1 << RXCIE1) | (1 << RXEN1) | (1 << TXEN1));
+        dev[uart]->CSRB = ((1 << RXCIE1) | (1 << TXCIE1) | (1 << RXEN1) | (1 << TXEN1));
 #else
-        dev[uart]->CSRB = ((1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0));
+        dev[uart]->CSRB = ((1 << RXCIE0) | (1 << TXCIE0) | (1 << RXEN0) | (1 << TXEN0));
 #endif
     }
     else {
 #ifdef CPU_ATMEGA32U4
-        dev[uart]->CSRB = (1 << TXEN1);
+        dev[uart]->CSRB = ((1 << TXEN1) | (1 << TXCIE1));
 #else
-        dev[uart]->CSRB = (1 << TXEN0);
+        dev[uart]->CSRB = ((1 << TXEN0) | (1 << TXCIE0));
 #endif
     }
 
@@ -168,6 +176,10 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 #else
         while (!(dev[uart]->CSRA & (1 << UDRE0))) {}
 #endif
+        /* start of TX won't finish until no data in UDRn and transmit shift
+           register is empty */
+        _tx_pending |= (1 << uart);
+
         dev[uart]->DR = data[i];
     }
 }
@@ -184,7 +196,7 @@ void uart_poweroff(uart_t uart)
     /* not implemented (yet) */
 }
 
-static inline void isr_handler(int num)
+static inline void _rx_isr_handler(int num)
 {
     atmega_enter_isr();
 
@@ -193,30 +205,70 @@ static inline void isr_handler(int num)
     atmega_exit_isr();
 }
 
+static inline void _tx_isr_handler(int num)
+{
+    atmega_enter_isr();
+
+    /* entire frame in the Transmit Shift Register has been shifted out and
+       there are no new data currently present in the transmit buffer */
+    _tx_pending &= ~(1 << num);
+
+    atmega_exit_isr();
+}
+
+
 #ifdef UART_0_ISR
 ISR(UART_0_ISR, ISR_BLOCK)
 {
-    isr_handler(0);
+    _rx_isr_handler(0);
 }
 #endif /* UART_0_ISR */
 
 #ifdef UART_1_ISR
 ISR(UART_1_ISR, ISR_BLOCK)
 {
-    isr_handler(1);
+    _rx_isr_handler(1);
 }
 #endif /* UART_1_ISR */
 
 #ifdef UART_2_ISR
 ISR(UART_2_ISR, ISR_BLOCK)
 {
-    isr_handler(2);
+    _rx_isr_handler(2);
 }
 #endif /* UART_2_ISR */
 
 #ifdef UART_3_ISR
 ISR(UART_3_ISR, ISR_BLOCK)
 {
-    isr_handler(3);
+    _rx_isr_handler(3);
 }
 #endif /* UART_3_ISR */
+
+#ifdef UART_0_ISR_TX
+ISR(UART_0_ISR_TX, ISR_BLOCK)
+{
+    _tx_isr_handler(0);
+}
+#endif /* UART_0_ISR_TX */
+
+#ifdef UART_1_ISR_TX
+ISR(UART_1_ISR_TX, ISR_BLOCK)
+{
+    _tx_isr_handler(1);
+}
+#endif /* UART_1_ISR_TX */
+
+#ifdef UART_2_ISR_TX
+ISR(UART_2_ISR_TX, ISR_BLOCK)
+{
+    _tx_isr_handler(2);
+}
+#endif /* UART_2_ISR_TX */
+
+#ifdef UART_3_ISR_TX
+ISR(UART_3_ISR_TX, ISR_BLOCK)
+{
+    _tx_isr_handler(3);
+}
+#endif /* UART_3_ISR_TX */
