@@ -1,3 +1,5 @@
+DEFAULT_MODULE += stdio_rtt
+
 # include common nrf52 dependencies
 include $(RIOTBOARD)/common/nrf52/nrf52832/Makefile.dep
 include $(RIOTBOARD)/common/nrf52/Makefile.dep
