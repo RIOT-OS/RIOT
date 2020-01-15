@@ -83,6 +83,34 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
                                              vrbe->super.dst_len,
                                              addr_str), vrbe->out_tag);
             }
+            /* _equal_index() => append intervals of `base`, so they don't get
+             * lost. We use append, so we don't need to change base! */
+            else if (base->ints != NULL) {
+                gnrc_sixlowpan_frag_rb_int_t *tmp = vrbe->super.ints;
+
+                if (tmp != base->ints) {
+                    /* base->ints is not already vrbe->super.ints */
+                    if (tmp != NULL) {
+                        /* iterate before appending and check if `base->ints` is
+                         * not already part of list */
+                        while (tmp->next != NULL) {
+                            if (tmp == base->ints) {
+                                tmp = NULL;
+                            }
+                            /* cppcheck-suppress nullPointer
+                             * (reason: possible bug in cppcheck, tmp can't
+                             * clearly be a NULL pointer here) */
+                            tmp = tmp->next;
+                        }
+                        if (tmp != NULL) {
+                            tmp->next = base->ints;
+                        }
+                    }
+                    else {
+                        vrbe->super.ints = base->ints;
+                    }
+                }
+            }
             break;
         }
     }

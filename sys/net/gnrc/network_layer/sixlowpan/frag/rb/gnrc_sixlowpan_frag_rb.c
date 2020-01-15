@@ -302,6 +302,12 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         memcpy(((uint8_t *)entry->pkt->data) + offset, data,
                frag_size);
     }
+    else {
+        /* no space left in rbuf interval buffer*/
+        gnrc_pktbuf_release(entry->pkt);
+        gnrc_sixlowpan_frag_rb_remove(entry);
+        res = RBUF_ADD_ERROR;
+    }
     /* no errors and not consumed => release packet */
     gnrc_pktbuf_release(pkt);
     return res;

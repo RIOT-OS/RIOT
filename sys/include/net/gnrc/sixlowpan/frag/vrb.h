@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "kernel_defines.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/sixlowpan/config.h"
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
@@ -123,9 +124,9 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
  */
 static inline void gnrc_sixlowpan_frag_vrb_rm(gnrc_sixlowpan_frag_vrb_t *vrb)
 {
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
-    gnrc_sixlowpan_frag_rb_base_rm(&vrb->super);
-#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG */
+    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_RB)) {
+        gnrc_sixlowpan_frag_rb_base_rm(&vrb->super);
+    }
     vrb->super.src_len = 0;
 }
 
