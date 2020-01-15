@@ -7,7 +7,6 @@ ifeq ($(TOOLCHAIN), llvm)
 endif
 
 INCLUDES += -I$(RIOTBASE)/pkg/tinydtls/include
-DIRS += $(RIOTBASE)/pkg/tinydtls/contrib
 
 ifneq (,$(filter tinydtls,$(USEMODULE)))
   INCLUDES += -I$(PKG_BUILDDIR)
@@ -55,4 +54,9 @@ endif
 
 ifneq (,$(filter tinydtls_ecc,$(USEMODULE)))
   DIRS += $(PKG_BUILDDIR)/ecc
+endif
+
+# For now contrib only contains sock_dtls adaption
+ifneq (,$(filter tinydtls_sock_dtls,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/tinydtls/contrib
 endif
