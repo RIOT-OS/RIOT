@@ -11,6 +11,7 @@ the manifest format specified in
 Table of contents:
 
 - [Prerequisites][prerequisites]
+  - [Ble][prerequisites-ble]
 - [Setup][setup]
   - [Signing key management][key-management]
   - [Setup a wired device using ethos][setup-wired]
@@ -19,6 +20,7 @@ Table of contents:
   - [Alternative: Setup a wireless device behind a border router][setup-wireless]
     - [Provision the wireless device][setup-wireless-provision]
     - [Configure the wireless network][setup-wireless-network]
+  - [Alternative: Setup a wireless ble device and Linux host][setup-wireless]
   - [Start aiocoap fileserver][start-aiocoap-fileserver]
 - [Perform an update][update]
   - [Build and publish the firmware update][update-build-publish]
@@ -62,6 +64,12 @@ Table of contents:
   It is possible to interact with the device over it's serial terminal as usual
   using `make term`, but that requires an already set up tap interface.
   See [update] for more information.
+
+
+### Ble
+[prerequisites-ble]: #Ble
+
+Make sure you fullfil the "Prerequisites" and "Preparing Linux" section in [README.ipv6-over-ble.md](../../pkg/nimble/README.ipv6-over-ble.md).
 
 ## Setup
 [setup]: #Setup
@@ -122,12 +130,21 @@ If the workflow for updating using ethos is successful, you can try doing the
 same over "real" network interfaces, by updating a node that is connected
 wirelessly with a border router in between.
 
+Depending on your device you can use BLE or 802.15.4.
+
 #### Configure the wireless network
+
 [setup-wireless-network]: #Configure-the-wireless-network
 
 A wireless node has no direct connection to the Internet so a border router (BR)
-between 802.15.4 and Ethernet must be configured.
-Any board providing a 802.15.4 radio can be used as BR.
+between 802.15.4/BLE and Ethernet must be configured.
+Any board providing a 802.15.4/BLE radio can be used as BR.
+
+If configuring a BLE network when flashing the device include
+`USEMODULE+=nimble_autoconn_ipsp` in the application Makefile, or prefix all
+your make commands with it (for the BR as well as the device), e.g.:
+
+     $ USEMODULE+=nimble_autoconn_ipsp make BOARD=<BR board>
 
 Plug the BR board on the computer and flash the
 [gnrc_border_router](https://github.com/RIOT-OS/RIOT/tree/master/examples/gnrc_border_router)
@@ -149,9 +166,9 @@ interface:
 
 #### Provision the wireless device
 [setup-wireless-provision]: #Provision-the-wireless-device
-First un-comment L28 in the application [Makefile](Makefile) so `gnrc_netdev_default` is included in the build.
-In this scenario the node will be connected through a border router. Ethos must
-be disabled in the firmware when building and flashing the firmware:
+First un-comment L28 in the application [Makefile](Makefile) so `gnrc_netdev_default`
+is included in the build. In this scenario the node will be connected through a border
+router. Ethos must be disabled in the firmware when building and flashing the firmware:
 
     $ USE_ETHOS=0 BOARD=samr21-xpro make -C examples/suit_update clean flash -j4
 
@@ -185,10 +202,140 @@ In this case the RIOT node can be reached from the host using its global address
 
     $ ping6 2001:db8::7b7e:3255:1313:8d96
 
+_NOTE_: when using BLE the connection might take a little longer, and you might not
+see the global address right away. But the global address will always consist of the
+the prefix (`2001:db8::`) and the EUI64 suffix, in this case `7b7e:3255:1313:8d96`.
+
+### Alternative: Setup a wireless ble device and Linux host
+
+- Complete [Ble][prerequisites-ble].
+
+- Provision the wireless ble device:
+
+```
+    $ CFLAGS=-DGNRC_IPV6_NIB_CONF_SLAAC=1 USEMODULE+=nimble_autoconn_ipsp USE_ETHOS=0 BOARD=nrf52dk make -C examples/suit_update clean flash -j4
+```
+
+- Open a serial terminal on the device to get its local address:
+
+```
+    $ USE_ETHOS=0 BOARD=nrf52dk make -C examples/suit_update term
+```
+
+    ...
+        Iface  8  HWaddr: E4:DD:E0:8F:73:65
+                  L2-PDU:1280 MTU:1280  HL:64  RTR
+                  6LO  IPHC
+                  Source address length: 6
+                  Link type: wireless
+                  inet6 addr: fe80::e4dd:e0ff:fe8f:7365  scope: local  VAL
+                  inet6 group: ff02::2
+                  inet6 group: ff02::1
+                  inet6 group: ff02::1:ff8f:7365
+    ...
+
+
+**NOTE 2:** Currently, Linux does not support 6LoWPAN neighbor discovery (which
+RIOT uses per default with BLE), so RIOT needs to be compiled to use stateless
+address auto configuration (SLAAC) -> `CFLAGS=-DGNRC_IPV6_NIB_CONF_SLAAC=1`.
+
+- Use `bluetoothctl` on Linux to scan for the device. Once `bluetoothctl` has
+  started, issue `scan on` to start scanning. The default name for the RIOT
+  device is set to `RIOT-autoconn`, so you should see it pop up. You can also
+  use `devices` to list scanned devices.
+
+      ...
+      $ bluetoothctl
+          Agent registered
+          [bluetooth]# scan on
+          Discovery started
+          [CHG] Controller F4:5C:89:9F:AC:7A Discovering: yes
+          [CHG] Device E4:DD:E0:8F:73:65 RSSI: -49
+          [CHG] Device 43:1A:39:CD:39:B9 RSSI: -94
+      ...
+      ...
+          [bluetooth]# devices
+          Device F0:36:27:6B:F1:8F Decathlon Dual HR
+          Device 69:B3:82:0B:73:C9 69-B3-82-0B-73-C9
+          Device 43:1A:39:CD:39:B9 43-1A-39-CD-39-B9
+          Device E4:DD:E0:8F:73:65 RIOT-autoconn
+      ...
+
+- Once you have the address, simply connect Linux to RIOT using the following
+command:
+
+      # Put your device address here...
+      # Note: the 2 after the address denotes a BLE public random address, default
+      #       used by `nimble_netif`
+      echo "connect UU:VV:WW:XX:YY:ZZ 2" > /sys/kernel/debug/bluetooth/6lowpan_control
+
+- Verify that the ble interface has been correctly created:
+
+
+      $ ifconfig bt0
+
+      ...
+      bt0: flags=4161<UP,RUNNING,MULTICAST>  mtu 1280
+              inet6 fe80::19:86ff:fe00:16ca  prefixlen 64  scopeid 0x20<link>
+              unspec 00-19-86-00-16-CA-00-1E-00-00-00-00-00-00-00-00  txqueuelen 1000  (UNSPEC)
+              RX packets 330  bytes 22891 (22.8 KB)
+              RX errors 0  dropped 0  overruns 0  frame 0
+              TX packets 354  bytes 30618 (30.6 KB)
+              TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+      ...
+
+
+- You should now be able to ping the device
+
+      $ ping6 fe80::e4dd:e0ff:fe8f:7365%bt0
+
+- **optional**: follow the guide for distributing a routable Prefix in
+  [README.ipv6-over-ble.md](../../pkg/nimble/README.ipv6-over-ble.md).
+
+If this was performed correctly then the `bt0` interface should now have a global
+address:
+
+    bt0: flags=4161<UP,RUNNING,MULTICAST>  mtu 1280
+            inet6 2001:db8::19:86ff:fe00:16ca  prefixlen 64  scopeid 0x0<global>
+            inet6 fe80::19:86ff:fe00:16ca  prefixlen 64  scopeid 0x20<link>
+            inet6 2001:db8::b004:c58:891f:aa09  prefixlen 64  scopeid 0x0<global>
+            unspec 00-19-86-00-16-CA-00-14-00-00-00-00-00-00-00-00  txqueuelen 1000  (UNSPEC)
+            RX packets 3  bytes 120 (120.0 B)
+            RX errors 0  dropped 0  overruns 0  frame 0
+            TX packets 34  bytes 3585 (3.5 KB)
+            TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+In this case the address to use for `SUIT_COAP_SERVER` can be either the EUI64
+generated global address `[2001:db8::19:86ff:fe00:16ca]` or the random global address
+`[2001:db8::b004:c58:891f:aa09]`.
+
+If for some reason this didn't work, you can manually set up an address for
+the subnet:
+
+    $ sudo ip address add 2001:db8::1/64 dev bt0
+
+In this case the address used for `SUIT_COAP_SERVER` should be [`2001:db8::1`].
+
+Route traffic going towards your subnet through bt0:
+
+    $ sudo route -A inet6 add 2001:db8::/64 dev bt0
+
+In either case the address used for `SUIT_CLIENT` should be the suffix of the link
+local address for that device (`e4dd:e0ff:fe8f:7365` in our examples) and the
+distributed prefix, i.e.: `SUIT_CLIENT=[2001:db8::e4dd:e0ff:fe8f:7365]`
+
+If this optional step is skipped then `SUIT_COAP_SERVER` will be
+the link local address of the `bt0` interface and `SUIT_CLIENT` will be
+the link local address of the device, with the interface specified. e.g:
+
+
+      SUIT_COAP_SERVER=[fe80::19:86ff:fe00:16ca]
+      SUIT_CLIENT=[fe80::e4dd:e0ff:fe8f:7365%bt0]
+
 ### Start aiocoap-fileserver
 [Start-aiocoap-fileserver]: #start-aiocoap-fileserver
 
-`aiocoap-fileserver` is used for hosting firmwares available for updates.
+`aiocoap-fileserver` is used for hosting the firmwares available for updates.
 Devices retrieve the new firmware using the CoAP protocol.
 
 Start `aiocoap-fileserver`:
