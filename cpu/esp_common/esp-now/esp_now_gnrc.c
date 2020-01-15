@@ -206,7 +206,7 @@ static char _esp_now_stack[ESP_NOW_STACKSIZE];
 
 void auto_init_esp_now(void)
 {
-    LOG_TAG_INFO("esp_now", "initializing ESP-NOW device\n");
+    LOG_TAG_DEBUG("esp_now", "initializing ESP-NOW device\n");
 
     esp_now_netdev_t *esp_now_dev = netdev_esp_now_setup();
     if (!esp_now_dev) {

@@ -435,7 +435,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             break;
 
         case SYSTEM_EVENT_STA_CONNECTED:
-            ESP_WIFI_LOG_INFO("connected to ssid %s, channel %d",
+            ESP_WIFI_LOG_INFO("WiFi connected to ssid %s, channel %d",
                               event->event_info.connected.ssid,
                               event->event_info.connected.channel);
 
@@ -456,7 +456,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             else if (reason <= REASON_HANDSHAKE_TIMEOUT) {
                 reason_str = _esp_wifi_disc_reasons[reason - INDEX_BEACON_TIMEOUT];
             }
-            ESP_WIFI_LOG_INFO("disconnected from ssid %s, reason %d (%s)",
+            ESP_WIFI_LOG_INFO("Wifi disconnected from ssid %s, reason %d (%s)",
                               event->event_info.disconnected.ssid,
                               event->event_info.disconnected.reason, reason_str);
 

@@ -44,6 +44,7 @@
 #include "driver/periph_ctrl.h"
 #include "esp/common_macros.h"
 #include "heap/esp_heap_caps_init.h"
+#include "log/esp_log.h"
 #include "rom/cache.h"
 #include "rom/ets_sys.h"
 #include "rom/rtc.h"
@@ -177,7 +178,7 @@ NORETURN void IRAM call_start_cpu0 (void)
     #ifdef MODULE_ESP_IDF_HEAP
     /* init heap */
     heap_caps_init();
-    #ifdef ENABLE_DEBUG
+    #if ENABLE_DEBUG
     ets_printf("Heap free: %u byte\n", get_free_heap_size());
     #endif /* ENABLE_DEBUG */
     #endif /* MODULE_ESP_IDF_HEAP */
@@ -293,6 +294,10 @@ static NORETURN void IRAM system_init (void)
      */
     extern void __libc_init_array(void);
     __libc_init_array();
+
+    /* set log levels for SDK library outputs */
+    extern void esp_log_level_set(const char* tag, esp_log_level_t level);
+    esp_log_level_set("wifi", LOG_DEBUG);
 
     /* init watchdogs */
     system_wdt_init();

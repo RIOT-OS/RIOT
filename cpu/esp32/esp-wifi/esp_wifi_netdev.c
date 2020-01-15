@@ -59,10 +59,10 @@
         DEBUG("[esp_wifi] %s: " f "\n", __func__, ## __VA_ARGS__)
 
 #define ESP_WIFI_LOG_INFO(f, ...) \
-        LOG_INFO("[esp_wifi] " f "\n", ## __VA_ARGS__)
+        LOG_TAG_INFO("esp_wifi", f "\n", ## __VA_ARGS__)
 
 #define ESP_WIFI_LOG_ERROR(f, ...) \
-        LOG_ERROR("[esp_wifi] " f "\n", ## __VA_ARGS__)
+        LOG_TAG_ERROR("esp_wifi", f "\n", ## __VA_ARGS__)
 
 #define MAC_STR                         "%02x:%02x:%02x:%02x:%02x:%02x"
 #define MAC_STR_ARG(m)                  m[0], m[1], m[2], m[3], m[4], m[5]
@@ -171,12 +171,51 @@ esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
     return ESP_OK;
 }
 
+#define REASON_BEACON_TIMEOUT      (200)
+#define REASON_HANDSHAKE_TIMEOUT   (204)
+#define INDEX_BEACON_TIMEOUT       (REASON_BEACON_TIMEOUT - 24)
+
+static const char *_esp_wifi_disc_reasons [] = {
+    "INVALID",                     /* 0 */
+    "UNSPECIFIED",                 /* 1 */
+    "AUTH_EXPIRE",                 /* 2 */
+    "AUTH_LEAVE",                  /* 3 */
+    "ASSOC_EXPIRE",                /* 4 */
+    "ASSOC_TOOMANY",               /* 5 */
+    "NOT_AUTHED",                  /* 6 */
+    "NOT_ASSOCED",                 /* 7 */
+    "ASSOC_LEAVE",                 /* 8 */
+    "ASSOC_NOT_AUTHED",            /* 9 */
+    "DISASSOC_PWRCAP_BAD",         /* 10 (11h) */
+    "DISASSOC_SUPCHAN_BAD",        /* 11 (11h) */
+    "IE_INVALID",                  /* 13 (11i) */
+    "MIC_FAILURE",                 /* 14 (11i) */
+    "4WAY_HANDSHAKE_TIMEOUT",      /* 15 (11i) */
+    "GROUP_KEY_UPDATE_TIMEOUT",    /* 16 (11i) */
+    "IE_IN_4WAY_DIFFERS",          /* 17 (11i) */
+    "GROUP_CIPHER_INVALID",        /* 18 (11i) */
+    "PAIRWISE_CIPHER_INVALID",     /* 19 (11i) */
+    "AKMP_INVALID",                /* 20 (11i) */
+    "UNSUPP_RSN_IE_VERSION",       /* 21 (11i) */
+    "INVALID_RSN_IE_CAP",          /* 22 (11i) */
+    "802_1X_AUTH_FAILED",          /* 23 (11i) */
+    "CIPHER_SUITE_REJECTED",       /* 24 (11i) */
+    "BEACON_TIMEOUT",              /* 200 */
+    "NO_AP_FOUND",                 /* 201 */
+    "AUTH_FAIL",                   /* 202 */
+    "ASSOC_FAIL",                  /* 203 */
+    "HANDSHAKE_TIMEOUT"            /* 204 */
+};
+
 /*
  * Event handler for esp system events.
  */
 static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *event)
 {
     esp_err_t result;
+
+    uint8_t reason;
+    const char* reason_str = "UNKNOWN";
 
     switch(event->event_id) {
         case SYSTEM_EVENT_STA_START:
@@ -193,8 +232,9 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             break;
 
         case SYSTEM_EVENT_STA_CONNECTED:
-            ESP_WIFI_DEBUG("WiFi connected to ssid %s",
-                           event->event_info.connected.ssid);
+            ESP_WIFI_LOG_INFO("WiFi connected to ssid %s, channel %d",
+                              event->event_info.connected.ssid,
+                              event->event_info.connected.channel);
 
             /* register RX callback function */
             esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, _esp_wifi_rx_cb);
@@ -206,9 +246,16 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             break;
 
         case SYSTEM_EVENT_STA_DISCONNECTED:
-            ESP_WIFI_DEBUG("WiFi disconnected from ssid %s, reason %d",
-                           event->event_info.disconnected.ssid,
-                           event->event_info.disconnected.reason);
+            reason = event->event_info.disconnected.reason;
+            if (reason < REASON_BEACON_TIMEOUT) {
+                reason_str = _esp_wifi_disc_reasons[reason];
+            }
+            else if (reason <= REASON_HANDSHAKE_TIMEOUT) {
+                reason_str = _esp_wifi_disc_reasons[reason - INDEX_BEACON_TIMEOUT];
+            }
+            ESP_WIFI_LOG_INFO("Wifi disconnected from ssid %s, reason %d (%s)",
+                              event->event_info.disconnected.ssid,
+                              event->event_info.disconnected.reason, reason_str);
 
             /* unregister RX callback function */
             esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, NULL);
