@@ -34,6 +34,11 @@ int main(void)
     /* initialize the sensor */
     printf("Initializing display...");
 
+#ifdef BOARD_PINETIME
+    /* on PineTime, enable the backlight */
+    gpio_clear(LCD_BACKLIGHT_LOW);
+#endif
+
     if (ili9341_init(&dev, &ili9341_params[0]) == 0) {
         puts("[OK]");
     }
