@@ -128,7 +128,6 @@ extern "C"
 #elif defined(SIM_SCGC_PIT_SHIFT)
 #define PIT_CLKEN()        (bit_set32(&SIM->SCGC, SIM_SCGC_PIT_SHIFT))
 #define PIT_CLK_IS_EN()    (SIM->SCGC & SIM_SCGC_PIT_MASK)
-
 #endif
 #ifdef SIM_SCGC6_RTC_SHIFT
 /** Enable RTC clock gate */

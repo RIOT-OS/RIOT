@@ -266,8 +266,12 @@ static inline int pit_clear(uint8_t dev)
 static inline uint32_t pit_read(uint8_t dev)
 {
     uint8_t ch = pit_config[dev].count_ch;
-
-    return pit[dev].count - PIT->CHANNEL[ch].CVAL;
+    if (PIT_CLK_IS_EN() && (PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK)) {
+        return pit[dev].count - PIT->CHANNEL[ch].CVAL;
+    }
+    else {
+        return 0;
+    }
 }
 
 static inline void pit_start(uint8_t dev)
@@ -403,7 +407,12 @@ static inline uint16_t lptmr_read(uint8_t dev)
 
     /* latch the current timer value into CNR */
     hw->CNR = 0;
-    return lptmr[dev].cnr + hw->CNR;
+    if (LPTMR_CLK_IS_EN() && (hw->CSR & LPTMR_CSR_TEN_MASK)) {
+        return lptmr[dev].cnr + hw->CNR;
+    }
+    else {
+        return 0;
+    }
 }
 
 /**
@@ -708,22 +717,10 @@ unsigned int timer_read(tim_t dev)
     /* demultiplex to handle two types of hardware timers */
     switch (_timer_variant(dev)) {
         case TIMER_PIT:
-            if (PIT_CLK_IS_EN()) {
-                return pit_read(_pit_index(dev));
-            }
-            /* uninitialized timer*/
-            else {
-                return 0;
-            }
+            return pit_read(_pit_index(dev));
 #ifdef KINETIS_HAVE_LPTMR
         case TIMER_LPTMR:
-            if (LPTMR_CLK_IS_EN()) {
-                return lptmr_read(_lptmr_index(dev));
-            }
-            /* uninitialized timer*/
-            else {
-                return 0;
-            }
+            return lptmr_read(_lptmr_index(dev));
 #endif
         default:
             return 0;
