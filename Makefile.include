@@ -515,12 +515,12 @@ BUILDDEPS += $(APPDEPS)
 # Save value to verify it is not modified later
 _BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
 
-# Linker rule
+# Linker rule creating a randomized binary through link time reordering
 $(ELFFILE): FORCE
 ifeq ($(BUILDOSXNATIVE),1)
-  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
+  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $$(find $(BASELIBS) -size +8c | $(RIOTTOOLS)/randsort/randsort.py) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
-  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
+  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $$(find $(BASELIBS) | $(RIOTTOOLS)/randsort/randsort.py) -lm $(LINKFLAGPREFIX)--end-group $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
 endif # BUILDOSXNATIVE
 
 ifeq ($(BUILD_IN_DOCKER),1)
