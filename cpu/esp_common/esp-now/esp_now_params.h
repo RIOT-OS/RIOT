@@ -22,6 +22,64 @@
 #if defined(MODULE_ESP_NOW) || defined(DOXYGEN)
 
 /**
+ * @name    Legacy definitions of default configuration parameters
+ * @{
+ */
+
+/**
+ * @brief   Legacy definition for compatibility reasons.
+ * #ESP_NOW_STACKSIZE is deprecated, please use #CONFIG_ESP_NOW_STACKSIZE
+ * instead.
+ */
+#ifndef ESP_NOW_STACKSIZE
+#define ESP_NOW_STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
+#endif
+
+/**
+ * @brief   Legacy definition for compatibility reasons.
+ * #ESP_NOW_PRIO is deprecated, please use #CONFIG_ESP_NOW_PRIO instead.
+ */
+#ifndef ESP_NOW_PRIO
+#define ESP_NOW_PRIO                (GNRC_NETIF_PRIO)
+#endif
+
+/**
+ * @brief   Legacy definition for compatibility reasons.
+ * #ESP_NOW_SCAN_PERIOD is deprecated, please use #CONFIG_ESP_NOW_SCAN_PERIOD
+ * instead.
+ */
+#ifndef ESP_NOW_SCAN_PERIOD
+#define ESP_NOW_SCAN_PERIOD         (10000000UL)
+#endif
+
+/**
+ * @brief   Legacy definition for compatibility reasons.
+ * #ESP_NOW_SOFT_AP_PASS is deprecated, please use #CONFIG_ESP_NOW_SOFT_AP_PASS
+ * instead.
+ */
+#ifndef ESP_NOW_SOFT_AP_PASS
+#define ESP_NOW_SOFT_AP_PASS        "ThisistheRIOTporttoESP"
+#endif
+
+/**
+ * @brief   Legacy definition for compatibility reasons.
+ * #ESP_NOW_CHANNEL is deprecated, please use #CONFIG_ESP_NOW_CHANNEL instead.
+ */
+#ifndef ESP_NOW_CHANNEL
+#define ESP_NOW_CHANNEL             (6)
+#endif
+
+/**
+ * @brief   Legacy definition for compatibility reasons.
+ * #ESP_NOW_KEY is deprecated, please use #CONFIG_ESP_NOW_KEY instead.
+ */
+#ifndef ESP_NOW_KEY
+#define ESP_NOW_KEY                 (NULL)
+#endif
+
+/** @} */
+
+/**
  * @name    Set default configuration parameters for the ESP-NOW netdev driver
  * @{
  */
@@ -30,8 +88,8 @@
  * @brief   The size of the stack used for the ESP-NOW netdev driver thread.
  * @ingroup cpu_esp_common_conf
  */
-#ifndef ESP_NOW_STACKSIZE
-#define ESP_NOW_STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
+#ifndef CONFIG_ESP_NOW_STACKSIZE
+#define CONFIG_ESP_NOW_STACKSIZE    ESP_NOW_STACKSIZE
 #endif
 
 /**
@@ -39,8 +97,8 @@
  *          changed.
  * @ingroup cpu_esp_common_conf
  */
-#ifndef ESP_NOW_PRIO
-#define ESP_NOW_PRIO            (GNRC_NETIF_PRIO)
+#ifndef CONFIG_ESP_NOW_PRIO
+#define CONFIG_ESP_NOW_PRIO         ESP_NOW_PRIO
 #endif
 
 /**
@@ -48,24 +106,24 @@
  *          ESP-NOW nodes in its range.
  * @ingroup cpu_esp_common_conf
  */
-#ifndef ESP_NOW_SCAN_PERIOD
-#define ESP_NOW_SCAN_PERIOD     (10000000UL)
+#ifndef CONFIG_ESP_NOW_SCAN_PERIOD
+#define CONFIG_ESP_NOW_SCAN_PERIOD  ESP_NOW_SCAN_PERIOD
 #endif
 
 /**
  * @brief   Passphrase used for the SoftAP interface of for all ESP-NOW nodes.
  * @ingroup cpu_esp_common_conf
  */
-#ifndef ESP_NOW_SOFT_AP_PASS
-#define ESP_NOW_SOFT_AP_PASS    "ThisistheRIOTporttoESP"
+#ifndef CONFIG_ESP_NOW_SOFT_AP_PASS
+#define CONFIG_ESP_NOW_SOFT_AP_PASS ESP_NOW_SOFT_AP_PASS
 #endif
 
 /**
  * @brief   Channel used as broadcast medium by all ESP-NOW nodes together
  * @ingroup cpu_esp_common_conf
  */
-#ifndef ESP_NOW_CHANNEL
-#define ESP_NOW_CHANNEL         (6)
+#ifndef CONFIG_ESP_NOW_CHANNEL
+#define CONFIG_ESP_NOW_CHANNEL      ESP_NOW_CHANNEL
 #endif
 
 /**
@@ -81,8 +139,8 @@
  * communicate with each other, while in unencrypted mode, up to 20 nodes can
  * communicate.
  */
-#ifndef ESP_NOW_KEY
-#define ESP_NOW_KEY             (NULL)
+#ifndef CONFIG_ESP_NOW_KEY
+#define CONFIG_ESP_NOW_KEY          ESP_NOW_KEY
 #endif
 
 /** @} */
@@ -91,10 +149,10 @@
  * @brief   Initializer for default configuration parameters.
  */
 #ifndef ESP_NOW_PARAMS
-#define ESP_NOW_PARAMS   { .key = ESP_NOW_KEY, \
-                           .scan_period = ESP_NOW_SCAN_PERIOD, \
-                           .softap_pass = ESP_NOW_SOFT_AP_PASS, \
-                           .channel = ESP_NOW_CHANNEL \
+#define ESP_NOW_PARAMS   { .key = CONFIG_ESP_NOW_KEY, \
+                           .scan_period = CONFIG_ESP_NOW_SCAN_PERIOD, \
+                           .softap_pass = CONFIG_ESP_NOW_SOFT_AP_PASS, \
+                           .channel = CONFIG_ESP_NOW_CHANNEL \
                          }
 #endif
 
