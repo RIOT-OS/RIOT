@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <string.h>
 #include "byteorder.h"
 #include "periph/spi.h"
@@ -85,6 +86,7 @@ static void _ili9341_set_area(ili9341_t *dev, uint16_t x1, uint16_t x2,
 
 int ili9341_init(ili9341_t *dev, const ili9341_params_t *params)
 {
+    assert(params->lines >= 16 && params->lines <= 320 && !(params->lines & 0x7));
     dev->params = params;
     uint8_t command_params[4] = { 0 };
     gpio_init(dev->params->dcx_pin, GPIO_OUT);
@@ -139,9 +141,9 @@ int ili9341_init(ili9341_t *dev, const ili9341_params_t *params)
     /* Display function control */
     command_params[0] = 0x08;
     command_params[1] = 0x82;
-    command_params[2] = 0x27; /* 320 lines */
+    /* number of lines, see datasheet p. 166 (DISCTRL::NL) */
+    command_params[2] = (params->lines >> 3) - 1;
     _write_cmd(dev, ILI9341_CMD_DFUNC, command_params, 3);
-
 
     /* Pixel format */
     command_params[0] = 0x55; /* 16 bit mode */

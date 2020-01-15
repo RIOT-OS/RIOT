@@ -55,6 +55,10 @@ extern "C" {
 #define ILI9341_PARAM_INVERTED     0
 #endif
 
+#ifndef ILI9341_PARAM_NUM_LINES
+#define ILI9341_PARAM_NUM_LINES    320U
+#endif
+
 #ifndef ILI9341_PARAMS
 #define ILI9341_PARAMS              { .spi = ILI9341_PARAM_SPI, \
                                       .spi_clk = ILI9341_PARAM_SPI_CLK, \
@@ -64,6 +68,7 @@ extern "C" {
                                       .rst_pin = ILI9341_PARAM_RST, \
                                       .rgb = ILI9341_PARAM_RGB, \
                                       .inverted = ILI9341_PARAM_INVERTED, \
+                                      .lines = ILI9341_PARAM_NUM_LINES, \
                                     }
 #endif
 /**@}*/
