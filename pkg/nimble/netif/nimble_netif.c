@@ -293,8 +293,7 @@ static void _on_data(nimble_netif_conn_t *conn, struct ble_l2cap_event *event)
     }
 
     /* we need to add the device PID to the netif header */
-    gnrc_netif_hdr_t *netif_hdr = (gnrc_netif_hdr_t *)if_snip->data;
-    netif_hdr->if_pid = _nimble_netif->pid;
+    gnrc_netif_hdr_set_netif(if_snip->data, _nimble_netif);
 
     /* allocate space in the pktbuf to store the packet */
     gnrc_pktsnip_t *payload = gnrc_pktbuf_add(if_snip, NULL, rx_len, _nettype);
