@@ -1,0 +1,39 @@
+# Copyright (c) 2020 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig KCONFIG_CPU_ESP32
+    bool "Configure ESP32 CPU"
+    depends on MODULE_ESP_ESP32
+    help
+        Configure ESP32 CPU via Kconfig.
+
+if KCONFIG_CPU_ESP32
+
+choice ESP32_DEFAULT_CPU_FREQ_MHZ
+   bool "CPU frequency in MHz"
+   default ESP32_DEFAULT_CPU_FREQ_MHZ_80
+   help
+       Defines the CPU frequency. Possible values are 80, 160 and 240.
+
+config ESP32_DEFAULT_CPU_FREQ_MHZ_80
+   bool "80 MHz"
+config ESP32_DEFAULT_CPU_FREQ_MHZ_160
+   bool "160 MHz"
+config ESP32_DEFAULT_CPU_FREQ_MHZ_240
+   bool "240 MHz"
+endchoice
+
+config ESP32_DEFAULT_CPU_FREQ_MHZ
+   int
+   default 80 if ESP32_DEFAULT_CPU_FREQ_MHZ_80
+   default 160 if ESP32_DEFAULT_CPU_FREQ_MHZ_160
+   default 240 if ESP32_DEFAULT_CPU_FREQ_MHZ_240
+
+rsource "esp-wifi/Kconfig"
+rsource "$(RIOTBASE)/cpu/esp_common/esp-now/Kconfig"
+
+endif # ESP32 settings

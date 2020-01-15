@@ -82,6 +82,7 @@ ifneq (,$(filter 4 5,$(LOG_LEVEL)))
 endif
 
 # ESP32 pseudomodules
+PSEUDOMODULES += esp_esp32
 PSEUDOMODULES += esp_eth_hw
 PSEUDOMODULES += esp_gdb
 PSEUDOMODULES += esp_gdbstub
@@ -100,6 +101,7 @@ PSEUDOMODULES += esp_wifi_any
 export TARGET_ARCH ?= xtensa-esp32-elf
 
 USEMODULE += esp_common
+USEMODULE += esp_esp32
 USEMODULE += esp_idf
 USEMODULE += esp_idf_driver
 USEMODULE += esp_idf_esp32
