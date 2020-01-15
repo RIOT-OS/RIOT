@@ -57,10 +57,20 @@ static volatile thread_t *_waiter;
 
 static uint8_t buf[BUFSIZE];
 
+static cord_ep_cb_t _evt_cb = NULL;
+static uint16_t _evt_mask = 0;
+
 static void _lock(void)
 {
     mutex_lock(&_mutex);
     _waiter = sched_active_thread;
+}
+
+static void _notify(uint16_t evt)
+{
+    if (_evt_mask & evt) {
+        _evt_cb(evt);
+    }
 }
 
 static int _sync(void)
@@ -302,28 +312,26 @@ end:
     if (retval != CORD_EP_OK) {
         _rd_loc[0] = '\0';
     }
-#ifdef MODULE_CORD_EP_STANDALONE
-    else {
-        cord_ep_standalone_signal(true);
-    }
-#endif
-
     mutex_unlock(&_mutex);
+
+    if (retval == CORD_EP_OK) {
+        _notify(CORD_EP_REGISTERED);
+    }
     return retval;
 }
 
 int cord_ep_update(void)
 {
+    uint16_t evt = CORD_EP_UPDATE_OK;
     _lock();
     int res = _update_remove(COAP_METHOD_POST, _on_update);
     if (res != CORD_EP_OK) {
-        /* in case we are not able to reach the RD, we drop the association */
-#ifdef MODULE_CORD_EP_STANDALONE
-        cord_ep_standalone_signal(false);
-#endif
         _rd_loc[0] = '\0';
+        evt = CORD_EP_UPDATE_FAILED;
     }
     mutex_unlock(&_mutex);
+    _notify(evt);
+
     return res;
 }
 
@@ -334,15 +342,24 @@ int cord_ep_remove(void)
         mutex_unlock(&_mutex);
         return CORD_EP_NORD;
     }
-#ifdef MODULE_CORD_EP_STANDALONE
-    cord_ep_standalone_signal(false);
-#endif
     _update_remove(COAP_METHOD_DELETE, _on_remove);
     /* we actually do not care about the result, we drop the RD local RD entry
      * in any case */
     _rd_loc[0] = '\0';
     mutex_unlock(&_mutex);
+    _notify(CORD_EP_DEREGISTERED);
     return CORD_EP_OK;
+}
+
+void cord_ep_event_cb(cord_ep_cb_t cb, uint16_t evt_mask)
+{
+    /* disable all events to guard against NULL pointer exceptions */
+    _evt_mask = 0;
+    _evt_cb = cb;
+    /* only enable notifications if a callback was specified */
+    if (cb) {
+        _evt_mask = evt_mask;
+    }
 }
 
 void cord_ep_dump_status(void)
