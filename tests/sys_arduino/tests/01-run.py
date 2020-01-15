@@ -11,6 +11,9 @@ from testrunner import run
 
 
 def testfunc(child):
+    # Wait for serial.begin() to complete
+    child.expect_exact("Hello Arduino!")
+
     # 1 Basic read+write test on serial with error command
     child.sendline("wrang")
     child.expect_exact("UNK")
