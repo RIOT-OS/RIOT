@@ -97,6 +97,28 @@ void gnrc_ipv6_nib_init(void)
     _nib_release();
 }
 
+static void _add_static_lladdr(gnrc_netif_t *netif)
+{
+#ifdef GNRC_IPV6_STATIC_LLADDR
+    /* parse addr from string and explicitely set a link lokal prefix
+     * if ifnum > 1 each interface will get its own link local address
+     * with GNRC_IPV6_STATIC_LLADDR + i
+     */
+    char lladdr_str[] = GNRC_IPV6_STATIC_LLADDR;
+    ipv6_addr_t lladdr;
+
+    if(ipv6_addr_from_str(&lladdr, lladdr_str) != NULL) {
+        lladdr.u8[15] += netif->pid;
+        assert(ipv6_addr_is_link_local(&lladdr));
+        gnrc_netif_ipv6_addr_add_internal(
+                netif, &lladdr, 64U, GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID
+            );
+    }
+#else
+    (void)netif;
+#endif
+}
+
 void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
 {
     assert(netif != NULL);
@@ -123,6 +145,7 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
         gnrc_netif_release(netif);
         return;
     }
+    _add_static_lladdr(netif);
     _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
     if (!(gnrc_netif_is_rtr_adv(netif)) ||
         (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_6lbr(netif))) {
