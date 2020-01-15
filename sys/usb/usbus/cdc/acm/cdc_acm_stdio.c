@@ -52,10 +52,15 @@ ssize_t stdio_read(void* buffer, size_t len)
 
 ssize_t stdio_write(const void* buffer, size_t len)
 {
-    usbus_cdc_acm_submit(&cdcacm, buffer, len);
-    usbus_cdc_acm_flush(&cdcacm);
-    /* Use tsrb and flush */
-    return len;
+    const char *start = buffer;
+    do {
+        size_t n = usbus_cdc_acm_submit(&cdcacm, buffer, len);
+        usbus_cdc_acm_flush(&cdcacm);
+        /* Use tsrb and flush */
+        buffer = (char *)buffer + n;
+        len -= n;
+    } while (len);
+    return start - (char *)buffer;
 }
 
 static void _cdc_acm_rx_pipe(usbus_cdcacm_device_t *cdcacm,
