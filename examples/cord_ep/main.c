@@ -33,7 +33,7 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 #define NODE_INFO  "SOME NODE INFORMATION"
 
 /* we will use a custom event handler for dumping cord_ep events */
-static void _on_ep_event(cord_ep_standalone_event_t event)
+static void _on_ep_event(uint16_t event)
 {
     switch (event) {
         case CORD_EP_REGISTERED:
@@ -42,8 +42,11 @@ static void _on_ep_event(cord_ep_standalone_event_t event)
         case CORD_EP_DEREGISTERED:
             puts("RD endpoint event: dropped client registration");
             break;
-        case CORD_EP_UPDATED:
+        case CORD_EP_UPDATE_OK:
             puts("RD endpoint event: successfully updated client registration");
+            break;
+        case CORD_EP_UPDATE_FAILED:
+            puts("RD endpoint event: update failed, registration was dropped");
             break;
     }
 }
@@ -99,7 +102,7 @@ int main(void)
     gcoap_register_listener(&_listener);
 
     /* register event callback with cord_ep_standalone */
-    cord_ep_standalone_reg_cb(_on_ep_event);
+    cord_ep_standalone_event_cb(_on_ep_event, CORD_EP_EVENT_ALL);
 
     puts("Client information:");
     printf("  ep: %s\n", cord_common_get_ep());
