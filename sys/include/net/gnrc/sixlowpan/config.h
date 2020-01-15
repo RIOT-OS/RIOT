@@ -21,6 +21,7 @@
 #ifndef NET_GNRC_SIXLOWPAN_CONFIG_H
 #define NET_GNRC_SIXLOWPAN_CONFIG_H
 
+#include "kernel_defines.h"
 #include "timex.h"
 
 #ifdef __cplusplus
@@ -82,6 +83,22 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Keep all but oldest fragment when reassembly buffer is full
+ *
+ * @note    Only applicable with
+ *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
+ *
+ * When not set, it will cause the reassembly buffer to override the oldest entry
+ * if a new entry has to be created and the reassembly buffer is full, no matter what.
+ * When set to 1, only incomplete entries that are older than
+ * @ref GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be overwritten (they will still timeout
+ * normally).
+ */
+#ifdef DOXYGEN
+#define GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE
+#endif
+
+/**
  * @brief   Aggressively override reassembly buffer when full
  *
  * @note    Only applicable with
@@ -92,10 +109,17 @@ extern "C" {
  * entry that is older than @ref GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be
  * overwritten (they will still timeout normally if reassembly buffer is not
  * full).
+ *
+ * @deprecated Use inverse @ref GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE instead.
+ *             Will be removed after 2020.10 release.
  */
 #ifndef GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE
+#if IS_ACTIVE(GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE)
+#define GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE    (0)
+#else /* GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE */
 #define GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE    (1)
-#endif
+#endif /* GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE */
+#endif /* GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE */
 
 /**
  * @brief   Deletion timer for reassembly buffer entries in microseconds
