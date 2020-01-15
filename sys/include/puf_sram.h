@@ -90,6 +90,13 @@ extern uint32_t puf_sram_seed;
 extern uint32_t puf_sram_state;
 
 /**
+ * @brief Counter variable allocated in puf_sram.c. It is incremented
+          during each soft reset when no new PUF measurement was taken
+          and it gets reset to zero after a power cycle was detected.
+ */
+extern uint32_t puf_sram_softreset_cnt;
+
+/**
  * @brief checks source of reboot by @p puf_sram_softreset and conditionally
           calls @p puf_sram_generate
  *
