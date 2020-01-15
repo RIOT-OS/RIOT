@@ -1004,11 +1004,11 @@ Furthermore, the following configuration parameters have to be defined:
 
 <center>
 
-Parameter          | Default                   | Description
-:------------------|:--------------------------|:------------
-ESP_WIFI_SSID      | "RIOT_AP"                 | SSID of the AP to be used.
-ESP_WIFI_PASS      | "ThisistheRIOTporttoESP"  | Passphrase used for the AP as clear text (max. 64 chars).
-ESP_WIFI_STACKSIZE | #THREAD_STACKSIZE_DEFAULT |Stack size used for the WiFi netdev driver thread.
+Parameter                  | Default                   | Description
+:--------------------------|:--------------------------|:------------
+#CONFIG_ESP_WIFI_SSID      | "RIOT_AP"                 | SSID of the AP to be used.
+#CONFIG_ESP_WIFI_PASS      | "ThisistheRIOTporttoESP"  | Passphrase used for the AP as clear text (max. 64 chars).
+#CONFIG_ESP_WIFI_STACKSIZE | #THREAD_STACKSIZE_DEFAULT |Stack size used for the WiFi netdev driver thread.
 
 </center>
 
@@ -1018,7 +1018,7 @@ line, e.g.:
 
 ```
 USEMODULE=esp_wifi \
-CFLAGS='-DESP_WIFI_SSID=\"MySSID\" -DESP_WIFI_PASS=\"MyPassphrase\"' \
+CFLAGS='-DCONFIG_ESP_WIFI_SSID=\"MySSID\" -DCONFIG_ESP_WIFI_PASS=\"MyPassphrase\"' \
 make -C examples/gnrc_networking BOARD=...
 ```
 
