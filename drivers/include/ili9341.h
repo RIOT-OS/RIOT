@@ -91,6 +91,7 @@ typedef struct {
     bool rgb;           /**< True when display is connected in RGB mode
                           *  False when display is connected in BGR mode */
     bool inverted;      /**< Display works in inverted color mode */
+    uint16_t lines;     /**< Number of lines, from 16 to 320 in 8 line steps */
 } ili9341_params_t;
 
 /**
