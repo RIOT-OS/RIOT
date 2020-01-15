@@ -318,6 +318,14 @@ class SerCmd(cmd.Cmd):
         date = time.strftime("%Y-%m-%d %H:%M:%S")
         return ["%s" % (date)]
 
+    def do_PYTERM_sleep(self, line):
+        """Pyterm command: Sleep for n seconds.
+        """
+        if line:
+            time.sleep(float(line))
+        else:
+            self.logger.error("sleep: missing operand")
+
     def do_PYTERM_reset(self, line):
         """Pyterm command: Send a reset to the node.
         """
