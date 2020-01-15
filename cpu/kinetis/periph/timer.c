@@ -708,7 +708,7 @@ unsigned int timer_read(tim_t dev)
     /* demultiplex to handle two types of hardware timers */
     switch (_timer_variant(dev)) {
         case TIMER_PIT:
-            if(PIT_CLK_IS_EN()) {
+            if (PIT_CLK_IS_EN()) {
                 return pit_read(_pit_index(dev));
             }
             /* uninitialized timer*/
@@ -717,7 +717,7 @@ unsigned int timer_read(tim_t dev)
             }
 #ifdef KINETIS_HAVE_LPTMR
         case TIMER_LPTMR:
-            if(LPTMR_CLK_IS_EN()) {
+            if (LPTMR_CLK_IS_EN()) {
                 return lptmr_read(_lptmr_index(dev));
             }
             /* uninitialized timer*/
