@@ -6,6 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill \
     bluepill-128kib \
     calliope-mini \
+    cc1312-launchpad \
     cc1352-launchpad \
     cc2650-launchpad \
     cc2650stk \
@@ -33,9 +34,9 @@ BOARD_INSUFFICIENT_MEMORY := \
     saml10-xpro \
     saml11-xpro \
     spark-core \
-    stm32f0discovery \
     stm32f030f4-demo \
+    stm32f0discovery \
     stm32l0538-disco \
     stm32mindev \
-    yunjia-nrf51822
+    yunjia-nrf51822 \
     #
