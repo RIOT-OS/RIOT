@@ -1,7 +1,11 @@
-# for this board, we are using Segger's RTT as default terminal interface
-USEMODULE += stdio_rtt
-TERMPROG = $(RIOTTOOLS)/jlink/jlink.sh
-TERMFLAGS = term-rtt
+# HACK: replicate dependency resolution in Makefile.dep, only works
+# if `USEMODULE` or `DEFAULT_MODULE` is set by the command line or in the
+# application Makefile.
+ifeq (,$(filter stdio_%,$(DISABLE_MODULE) $(USEMODULE)))
+  RIOT_TERMINAL ?= jlink
+endif
+
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 # use shared Makefile.include
 include $(RIOTBOARD)/common/nrf52/Makefile.include

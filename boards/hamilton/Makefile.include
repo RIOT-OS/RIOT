@@ -3,10 +3,8 @@ export JLINK_DEVICE := atsamr21e18a
 OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 OFLAGS := --gap-fill 0xff
 
-# Configure terminal, hamilton doesn't provide any UART, thus use RTT
-TERMPROG = $(RIOTTOOLS)/jlink/jlink.sh
-TERMFLAGS = term-rtt
-
-USEMODULE += stdio_rtt
+# use JLink Segger RTT by default
+RIOT_TERMINAL ?= jlink
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 include $(RIOTMAKE)/tools/jlink.inc.mk
