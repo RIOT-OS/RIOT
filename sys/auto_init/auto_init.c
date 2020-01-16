@@ -223,7 +223,7 @@ void auto_init(void)
     auto_init_stm32_eth();
 #endif
 
-#ifdef MODULE_AT86RF2XX
+#ifdef MODULE_AUTO_INIT_AT86RF2XX
     extern void auto_init_at86rf2xx(void);
     auto_init_at86rf2xx();
 #endif

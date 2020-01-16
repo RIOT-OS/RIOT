@@ -43,6 +43,7 @@ endif
 
 ifneq (,$(filter at86rf%,$(USEMODULE)))
   USEMODULE += at86rf2xx
+  DEFAULT_MODULE += auto_init_at86rf2xx
   USEMODULE += xtimer
   USEMODULE += luid
   USEMODULE += netif
