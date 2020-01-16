@@ -32,6 +32,16 @@ ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter dhcpv6_%,$(USEMODULE)))
+  USEMODULE += dhcpv6
+endif
+
+ifneq (,$(filter dhcpv6_client,$(USEMODULE)))
+  USEMODULE += event
+  USEMODULE += random
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter gnrc_mac,$(USEMODULE)))
   USEMODULE += gnrc_priority_pktqueue
   USEMODULE += csma_sender
@@ -74,6 +84,17 @@ endif
 ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += random
+endif
+
+ifneq (,$(filter gnrc_dhcpv6_%, $(USEMODULE)))
+  USEMODULE += gnrc_dhcpv6
+endif
+
+ifneq (,$(filter gnrc_dhcpv6_client,$(USEMODULE)))
+  USEMODULE += dhcpv6_client
+  USEMODULE += gnrc_ipv6_nib
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_sock_udp
 endif
 
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
