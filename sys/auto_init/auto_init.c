@@ -154,7 +154,7 @@ void auto_init(void)
     DEBUG("Auto init TCP module\n");
     gnrc_tcp_init();
 #endif
-#ifdef MODULE_LWIP
+#ifdef MODULE_AUTO_INIT_LWIP
     DEBUG("Bootstraping lwIP.\n");
     lwip_bootstrap();
 #endif
