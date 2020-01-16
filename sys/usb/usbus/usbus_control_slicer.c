@@ -16,6 +16,8 @@
  * @}
  */
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #include <string.h>
 #include "periph/usbdev.h"
 #include "usb/usbus.h"

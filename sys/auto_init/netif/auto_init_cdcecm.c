@@ -19,6 +19,8 @@
 
 #ifdef MODULE_USBUS_CDC_ECM
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #include "log.h"
 #include "usb/usbus/cdc/ecm.h"
 #include "net/gnrc/netif/ethernet.h"

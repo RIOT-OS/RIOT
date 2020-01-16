@@ -15,6 +15,9 @@
  * @author  Koen Zandberg <koen@bergzand.net>
  * @}
  */
+
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <errno.h>
