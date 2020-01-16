@@ -25,7 +25,6 @@
 
 #include "log.h"
 #include "msg.h"
-#include "test_utils/interactive_sync.h"
 
 #define MSG_QUEUE_LENGTH                (8)
 
@@ -33,8 +32,6 @@ msg_t msg_queue[MSG_QUEUE_LENGTH];
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     msg_t msges[MSG_QUEUE_LENGTH];
 
     msg_init_queue(msg_queue, MSG_QUEUE_LENGTH);

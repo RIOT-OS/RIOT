@@ -25,8 +25,6 @@
 #include "net/gnrc/sixlowpan/frag/rb.h"
 #include "xtimer.h"
 
-#include "test_utils/interactive_sync.h"
-
 #define TEST_NETIF_HDR_SRC      { 0xb3, 0x47, 0x60, 0x49, \
                                   0x78, 0xfe, 0x95, 0x48 }
 #define TEST_NETIF_HDR_DST      { 0xa4, 0xf2, 0xd2, 0xc9, \
@@ -648,10 +646,6 @@ static void run_unittests(void)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
-    /* no auto-init, so xtimer needs to be initialized manually*/
-    xtimer_init();
     /* netreg requires queue, but queue size one should be enough for us */
     msg_init_queue(&_msg_queue, 1U);
     run_unittests();

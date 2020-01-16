@@ -33,8 +33,6 @@
 #include "constants.h"
 #include "stack.h"
 
-#include "test_utils/interactive_sync.h"
-
 #define _TEST_BUFFER_SIZE   (128)
 #define _QUEUE_SIZE         (1)
 
@@ -960,8 +958,6 @@ static void test_tcp_write6__success(void)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     uint8_t code = 0;
 
 #ifdef SO_REUSE

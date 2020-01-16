@@ -31,8 +31,6 @@
 #include "msg.h"
 #include "od.h"
 
-#include "test_utils/interactive_sync.h"
-
 #define MSG_QUEUE_SIZE  (8)
 #define MSG_TYPE_ISR    (0x3456)
 #define RECVBUF_SIZE    (IEEE802154_FRAME_LEN_MAX)
@@ -106,8 +104,6 @@ static void test_recv(void)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     puts("Socket ZEP device driver test");
     msg_init_queue(_msg_queue, MSG_QUEUE_SIZE);
     _main_pid = sched_active_pid;

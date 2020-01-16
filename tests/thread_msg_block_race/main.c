@@ -27,8 +27,6 @@
 #include "thread.h"
 #include "msg.h"
 
-#include "test_utils/interactive_sync.h"
-
 #define CANARY_TYPE         (0x21fd)
 
 #define TIMER_FREQ          (1000000LU)
@@ -81,8 +79,6 @@ static void *_thread(void *arg)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     kernel_pid_t pid;
 
     timer_init(TIMER_DEV(0), TIMER_FREQ, _timer, NULL);
