@@ -17,6 +17,20 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
+/* These checks are deliberately outside the include guards, as they depend on
+ * a define that only RIOT-internal users set */
+
+#if !(defined(CONFIG_USB_VID) && defined(CONFIG_USB_PID))
+#ifdef USB_H_USER_IS_RIOT_INTERNAL
+/* Reserved for RIOT standard peripherals as per http://pid.codes/1209/7D00/ */
+#define CONFIG_USB_VID (0x1209)
+#define CONFIG_USB_PID (0x7D00)
+#else
+#error Please configure your vendor and product IDs. For development, you may \
+    set CONFIG_USB_VID=0x1209 CONFIG_USB_PID=0x7D01.
+#endif
+#endif
+
 #ifndef USB_H
 #define USB_H
 
@@ -35,12 +49,8 @@ extern "C" {
  * @note You must provide your own VID/PID combination when manufacturing a
  * device with USB.
  */
-#ifndef CONFIG_USB_VID
 #ifdef DOXYGEN
 #define CONFIG_USB_VID
-#else
-#error  Please supply your vendor ID by setting CONFIG_USB_VID
-#endif
 #endif
 
 /**
@@ -49,12 +59,8 @@ extern "C" {
  * @note You must provide your own VID/PID combination when manufacturing a
  * device with USB.
  */
-#ifndef CONFIG_USB_PID
 #ifdef DOXYGEN
 #define CONFIG_USB_PID
-#else
-#error  Please supply your vendor ID by setting CONFIG_USB_PID
-#endif
 #endif
 
 /**
@@ -120,6 +126,23 @@ extern "C" {
  */
 #ifndef CONFIG_USB_DEFAULT_LANGID
 #define CONFIG_USB_DEFAULT_LANGID   0x0409 /* EN-US */
+#endif
+/** @} */
+
+/**
+ * @brief RIOT-internal USB peripheral clearance indicator
+ *
+ * This define must only be set by RIOT internal users of `usb.h`, and only when
+ * they implement peripherals that can be considered default RIOT peripherals.
+ * When this is defined in all uses of `usb.h`, the board can use the
+ * 0x1209/0x7D00 VID/PID pair unless explicit configuration using @ref
+ * CONFIG_USB_VID and @ref CONFIG_USB_PID say otherwise.
+ *
+ * See http://pid.codes/1209/7D00/ for the allocation of that code.
+ * @{
+ */
+#ifdef DOXYGEN
+#define USB_H_USER_IS_RIOT_INTERNAL
 #endif
 /** @} */
 
