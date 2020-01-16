@@ -28,11 +28,11 @@
 #include "xtimer.h"
 #endif
 
-#ifdef MODULE_GNRC_SIXLOWPAN
+#ifdef MODULE_AUTO_INIT_GNRC_SIXLOWPAN
 #include "net/gnrc/sixlowpan.h"
 #endif
 
-#ifdef MODULE_GNRC_IPV6
+#ifdef MODULE_AUTO_INIT_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
 #endif
 
@@ -40,19 +40,19 @@
 #include "l2_ping.h"
 #endif
 
-#ifdef MODULE_GNRC_PKTBUF
+#ifdef MODULE_AUTO_INIT_GNRC_PKTBUF
 #include "net/gnrc/pktbuf.h"
 #endif
 
-#ifdef MODULE_GNRC_PKTDUMP
+#ifdef MODULE_AUTO_INIT_GNRC_PKTDUMP
 #include "net/gnrc/pktdump.h"
 #endif
 
-#ifdef MODULE_GNRC_UDP
+#ifdef MODULE_AUTO_INIT_GNRC_UDP
 #include "net/gnrc/udp.h"
 #endif
 
-#ifdef MODULE_GNRC_TCP
+#ifdef MODULE_AUTO_INIT_GNRC_TCP
 #include "net/gnrc/tcp.h"
 #endif
 
@@ -72,7 +72,7 @@
 #include "net/gcoap.h"
 #endif
 
-#ifdef MODULE_GNRC_IPV6_NIB
+#ifdef MODULE_AUTO_INIT_GNRC_IPV6_NIB
 #include "net/gnrc/ipv6/nib.h"
 #endif
 
@@ -130,27 +130,27 @@ void auto_init(void)
     extern void profiling_init(void);
     profiling_init();
 #endif
-#ifdef MODULE_GNRC_PKTBUF
+#ifdef MODULE_AUTO_INIT_GNRC_PKTBUF
     DEBUG("Auto init gnrc_pktbuf module\n");
     gnrc_pktbuf_init();
 #endif
-#ifdef MODULE_GNRC_PKTDUMP
+#ifdef MODULE_AUTO_INIT_GNRC_PKTDUMP
     DEBUG("Auto init gnrc_pktdump module.\n");
     gnrc_pktdump_init();
 #endif
-#ifdef MODULE_GNRC_SIXLOWPAN
+#ifdef MODULE_AUTO_INIT_GNRC_SIXLOWPAN
     DEBUG("Auto init gnrc_sixlowpan module.\n");
     gnrc_sixlowpan_init();
 #endif
-#ifdef MODULE_GNRC_IPV6
+#ifdef MODULE_AUTO_INIT_GNRC_IPV6
     DEBUG("Auto init gnrc_ipv6 module.\n");
     gnrc_ipv6_init();
 #endif
-#ifdef MODULE_GNRC_UDP
+#ifdef MODULE_AUTO_INIT_GNRC_UDP
     DEBUG("Auto init UDP module.\n");
     gnrc_udp_init();
 #endif
-#ifdef MODULE_GNRC_TCP
+#ifdef MODULE_AUTO_INIT_GNRC_TCP
     DEBUG("Auto init TCP module\n");
     gnrc_tcp_init();
 #endif
@@ -173,7 +173,7 @@ void auto_init(void)
     extern void auto_init_devfs(void);
     auto_init_devfs();
 #endif
-#ifdef MODULE_GNRC_IPV6_NIB
+#ifdef MODULE_AUTO_INIT_GNRC_IPV6_NIB
     DEBUG("Auto init gnrc_ipv6_nib module.\n");
     gnrc_ipv6_nib_init();
 #endif
@@ -342,7 +342,7 @@ void auto_init(void)
 
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
-#ifdef MODULE_GNRC_UHCPC
+#ifdef MODULE_AUTO_INIT_GNRC_UHCPC
     extern void auto_init_gnrc_uhcpc(void);
     auto_init_gnrc_uhcpc();
 #endif
@@ -592,7 +592,7 @@ void auto_init(void)
 
 #ifdef MODULE_AUTO_INIT_GNRC_RPL
 
-#ifdef MODULE_GNRC_RPL
+#ifdef MODULE_AUTO_INIT_GNRC_RPL
     extern void auto_init_gnrc_rpl(void);
     auto_init_gnrc_rpl();
 #endif
