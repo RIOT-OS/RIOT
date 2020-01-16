@@ -35,8 +35,12 @@
 #include "periph/gpio.h"
 #include "sdk_conf.h"
 
+#if MODULE_MTD
+#include "mtd.h"
+#endif
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -103,7 +107,6 @@
  * Built-in SPI flash memory is used as MTD system drive.
  * @{
  */
-#include "mtd.h"
 
 /**
  * @brief   MTD drive start address in SPI flash memory
