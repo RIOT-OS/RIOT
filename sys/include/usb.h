@@ -138,6 +138,16 @@ extern "C" {
  * 0x1209/0x7D00 VID/PID pair unless explicit configuration using @ref
  * CONFIG_USB_VID and @ref CONFIG_USB_PID say otherwise.
  *
+ * There is no sharp characterization of what consititutes an internal
+ * peripheral; a good check is this: If an application can, just by switching
+ * between boards, can have a feature provided by either RIOT's USB stack or a
+ * different mechanism, the USB version is a default RIOT peripheral.
+ *
+ * Examples are stdio access (is provided by most boards using a UART and an
+ * external USB UART adapter), Ethernet (is provided by other boards using
+ * ethos) and firmware upload and reset (is provided by other boards using an
+ * on-board programmer).
+ *
  * See http://pid.codes/1209/7D00/ for the allocation of that code.
  * @{
  */
