@@ -20,6 +20,8 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
