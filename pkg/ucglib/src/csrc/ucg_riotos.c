@@ -54,7 +54,7 @@ static void ucg_enable_pins(gpio_t *pins, uint32_t pins_enabled)
 
     for (i = 0; i < 32; i++) {
         if (pins_enabled & ((uint32_t)1 << i)) {
-            if (pins[i] != GPIO_UNDEF) {
+            if (!gpio_is_undef(pins[i])) {
                 if (i < UCG_PIN_COUNT) {
                     gpio_init(pins[i], GPIO_OUT);
                 }
