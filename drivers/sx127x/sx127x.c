@@ -105,7 +105,7 @@ int sx127x_reset(const sx127x_t *dev)
      * 2. Set NReset in Hi-Z state
      * 3. Wait at least 5 milliseconds
      */
-    if (dev->params.reset_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.reset_pin)) {
         gpio_init(dev->params.reset_pin, GPIO_OUT);
 
         /* set reset pin to the state that triggers manual reset */
@@ -138,7 +138,7 @@ int sx127x_init(sx127x_t *dev)
 
     _init_timers(dev);
 
-    if (dev->params.reset_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.reset_pin)) {
         /* reset pin should be left floating during POR */
         gpio_init(dev->params.reset_pin, GPIO_IN);
 
@@ -257,7 +257,7 @@ static int _init_gpios(sx127x_t *dev)
     int res;
 
     /* Check if DIO0 pin is defined */
-    if (dev->params.dio0_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.dio0_pin)) {
         res = gpio_init_int(dev->params.dio0_pin, SX127X_DIO_PULL_MODE,
                             GPIO_RISING, sx127x_on_dio0_isr, dev);
         if (res < 0) {
@@ -272,7 +272,7 @@ static int _init_gpios(sx127x_t *dev)
     }
 
     /* Check if DIO1 pin is defined */
-    if (dev->params.dio1_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.dio1_pin)) {
         res = gpio_init_int(dev->params.dio1_pin, SX127X_DIO_PULL_MODE,
                             GPIO_RISING, sx127x_on_dio1_isr, dev);
         if (res < 0) {
@@ -282,7 +282,7 @@ static int _init_gpios(sx127x_t *dev)
     }
 
     /* check if DIO2 pin is defined */
-    if (dev->params.dio2_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.dio2_pin)) {
         res = gpio_init_int(dev->params.dio2_pin, SX127X_DIO_PULL_MODE,
                             GPIO_RISING, sx127x_on_dio2_isr, dev);
         if (res < 0) {
@@ -296,7 +296,7 @@ static int _init_gpios(sx127x_t *dev)
     }
 
     /* check if DIO3 pin is defined */
-    if (dev->params.dio3_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.dio3_pin)) {
         res = gpio_init_int(dev->params.dio3_pin, SX127X_DIO_PULL_MODE,
                             GPIO_RISING, sx127x_on_dio3_isr, dev);
         if (res < 0) {

@@ -203,7 +203,7 @@ void sx127x_start_cad(sx127x_t *dev)
                              /* | SX127X_RF_LORA_IRQFLAGS_CADDETECTED*/
                              );
 
-            if (dev->params.dio3_pin != GPIO_UNDEF) {
+            if (gpio_is_valid(dev->params.dio3_pin)) {
                 /* DIO3 = CADDone */
                 sx127x_reg_write(dev, SX127X_REG_DIOMAPPING1,
                                  (sx127x_reg_read(dev, SX127X_REG_DIOMAPPING1) &

@@ -181,7 +181,7 @@ static int _set_interrupt_pin(const ph_oem_t *dev)
 int ph_oem_enable_interrupt(ph_oem_t *dev, ph_oem_interrupt_pin_cb_t cb,
                             void *arg)
 {
-    if (dev->params.interrupt_pin == GPIO_UNDEF) {
+    if (!gpio_is_valid(dev->params.interrupt_pin)) {
         return PH_OEM_INTERRUPT_GPIO_UNDEF;
     }
 
@@ -292,7 +292,7 @@ int ph_oem_start_new_reading(const ph_oem_t *dev)
 
     /* if interrupt pin is undefined, poll till new reading was taken and stop
      * device form taking further readings */
-    if (dev->params.interrupt_pin == GPIO_UNDEF) {
+    if (!gpio_is_valid(dev->params.interrupt_pin)) {
         int result = _new_reading_available(dev);
         if (result < 0) {
             return result;

@@ -484,11 +484,11 @@ void xbee_setup(xbee_t *dev, const xbee_params_t *params)
     dev->p = *params;
 
     /* initialize pins */
-    if (dev->p.pin_reset != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.pin_reset)) {
         gpio_init(dev->p.pin_reset, GPIO_OUT);
         gpio_set(dev->p.pin_reset);
     }
-    if (dev->p.pin_sleep != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.pin_sleep)) {
         gpio_init(dev->p.pin_sleep, GPIO_OUT);
         gpio_clear(dev->p.pin_sleep);
     }
@@ -586,7 +586,7 @@ int xbee_init(netdev_t *dev)
         return -ENXIO;
     }
     /* if reset pin is connected, do a hardware reset */
-    if (xbee->p.pin_reset != GPIO_UNDEF) {
+    if (gpio_is_valid(xbee->p.pin_reset)) {
         gpio_clear(xbee->p.pin_reset);
         xtimer_usleep(RESET_DELAY);
         gpio_set(xbee->p.pin_reset);

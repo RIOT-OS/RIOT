@@ -160,7 +160,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, touch_event
     /* clear interrupt status */
     _clear_interrupt_status(dev);
 
-    if ((dev->params.int_pin != GPIO_UNDEF) && cb) {
+    if (gpio_is_valid(dev->params.int_pin) && cb) {
         DEBUG("[stmpe811] init: configuring touchscreen interrupt\n");
         gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, cb, arg);
 

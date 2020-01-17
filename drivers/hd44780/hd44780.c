@@ -72,7 +72,7 @@ static void _send(const hd44780_t *dev, uint8_t value, hd44780_state_t state)
 {
     (state == HD44780_ON) ? gpio_set(dev->p.rs) : gpio_clear(dev->p.rs);
     /* if RW pin is available, set it to LOW */
-    if (dev->p.rw != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.rw)) {
         gpio_clear(dev->p.rw);
     }
     /* write data in 8Bit or 4Bit mode */
@@ -110,7 +110,7 @@ int hd44780_init(hd44780_t *dev, const hd44780_params_t *params)
     }
     dev->flag = 0;
     /* set mode depending on configured pins */
-    if (dev->p.data[4] != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.data[4])) {
         dev->flag |= HD44780_8BITMODE;
     }
     else {
@@ -133,7 +133,7 @@ int hd44780_init(hd44780_t *dev, const hd44780_params_t *params)
 
     gpio_init(dev->p.rs, GPIO_OUT);
     /* RW (read/write) of LCD not required, set it to GPIO_UNDEF */
-    if (dev->p.rw != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.rw)) {
         gpio_init(dev->p.rw, GPIO_OUT);
     }
     gpio_init(dev->p.enable, GPIO_OUT);
@@ -145,7 +145,7 @@ int hd44780_init(hd44780_t *dev, const hd44780_params_t *params)
     xtimer_usleep(HD44780_INIT_WAIT_XXL);
     gpio_clear(dev->p.rs);
     gpio_clear(dev->p.enable);
-    if (dev->p.rw != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.rw)) {
         gpio_clear(dev->p.rw);
     }
     /* put the LCD into 4 bit or 8 bit mode */
