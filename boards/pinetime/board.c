@@ -23,7 +23,30 @@
 
 #include "cpu.h"
 #include "board.h"
+#include "mtd.h"
+#include "mtd_spi_nor.h"
 #include "periph/gpio.h"
+#include "periph/spi.h"
+
+#ifdef MODULE_MTD
+static mtd_spi_nor_t pinetime_nor_dev = {
+    .base = {
+        .driver = &mtd_spi_nor_driver,
+        .page_size = PINETIME_NOR_PAGE_SIZE,
+        .pages_per_sector = PINETIME_NOR_PAGES_PER_SECTOR,
+        .sector_count = PINETIME_NOR_SECTOR_COUNT,
+    },
+    .flag = PINETIME_NOR_FLAGS,
+    .opcode = &mtd_spi_nor_opcode_default,
+    .spi = PINETIME_NOR_SPI_DEV,
+    .cs = PINETIME_NOR_SPI_CS,
+    .addr_width = 3,
+    .mode = PINETIME_NOR_SPI_MODE,
+    .clk = PINETIME_NOR_SPI_CLK,
+};
+
+mtd_dev_t *mtd0 = (mtd_dev_t *)&pinetime_nor_dev;
+#endif /* MODULE_MTD */
 
 void board_init(void)
 {
