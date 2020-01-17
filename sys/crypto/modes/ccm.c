@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Crypto mode - counter with CBC-MAC
+ * @brief       Crypto mode - counter with CBC-MAC (CMS) and CMS*
  *
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  *
@@ -43,6 +43,11 @@ static int ccm_compute_cbc_mac(cipher_t *cipher, const uint8_t iv[16],
     block_size = cipher_get_block_size(cipher);
     memmove(mac, iv, 16);
     offset = 0;
+
+    if(length == 0) {
+        return 0;
+    }
+
     do {
         uint8_t block_size_input = (length - offset > block_size) ?
                                    block_size : length - offset;
@@ -76,7 +81,8 @@ static int ccm_create_mac_iv(cipher_t *cipher, uint8_t auth_data_len, uint8_t M,
     /* set flags in B[0] - bit format:
             7        6     5..3  2..0
         Reserved   Adata    M_    L_    */
-    M_ = (M - 2) / 2;
+    M_ = M == 0 ? 0 : (M - 2) / 2;
+
     L_ = L - 1;
     X1[0] = 64 * (auth_data_len > 0) + 8 * M_ + L_;
 
@@ -168,7 +174,17 @@ static inline int _fits_in_nbytes(size_t value, uint8_t num_bytes)
 }
 
 
-int cipher_encrypt_ccm(cipher_t *cipher,
+static int _validate_mac_length_ccm(uint8_t mac_length)
+{
+    return (mac_length % 2 != 0 || mac_length < 4 || mac_length > 16);
+}
+
+static int _validate_mac_length_ccms(uint8_t mac_length)
+{
+    return (mac_length % 2 != 0 || mac_length > 16);
+}
+
+int _cipher_encrypt_ccm(cipher_t *cipher,
                        const uint8_t *auth_data, uint32_t auth_data_len,
                        uint8_t mac_length, uint8_t length_encoding,
                        const uint8_t *nonce, size_t nonce_len,
@@ -178,10 +194,6 @@ int cipher_encrypt_ccm(cipher_t *cipher,
     int len = -1;
     uint8_t nonce_counter[16] = { 0 }, mac_iv[16] = { 0 }, mac[16] = { 0 },
             stream_block[16] = { 0 }, zero_block[16] = { 0 }, block_size;
-
-    if (mac_length % 2 != 0  || mac_length < 4 || mac_length > 16) {
-        return CCM_ERR_INVALID_MAC_LENGTH;
-    }
 
     if (length_encoding < 2 || length_encoding > 8 ||
         !_fits_in_nbytes(input_len, length_encoding)) {
@@ -234,7 +246,7 @@ int cipher_encrypt_ccm(cipher_t *cipher,
 }
 
 
-int cipher_decrypt_ccm(cipher_t *cipher,
+int _cipher_decrypt_ccm(cipher_t *cipher,
                        const uint8_t *auth_data, uint32_t auth_data_len,
                        uint8_t mac_length, uint8_t length_encoding,
                        const uint8_t *nonce, size_t nonce_len,
@@ -247,10 +259,6 @@ int cipher_decrypt_ccm(cipher_t *cipher,
             zero_block[16] = { 0 },
             block_size;
     size_t plain_len;
-
-    if (mac_length % 2 != 0  || mac_length < 4 || mac_length > 16) {
-        return CCM_ERR_INVALID_MAC_LENGTH;
-    }
 
     if (length_encoding < 2 || length_encoding > 8 ||
         !_fits_in_nbytes(input_len, length_encoding)) {
@@ -304,4 +312,72 @@ int cipher_decrypt_ccm(cipher_t *cipher,
     }
 
     return plain_len;
+}
+
+int cipher_decrypt_ccm(cipher_t *cipher,
+                       const uint8_t *auth_data, uint32_t auth_data_len,
+                       uint8_t mac_length, uint8_t length_encoding,
+                       const uint8_t *nonce, size_t nonce_len,
+                       const uint8_t *input, size_t input_len,
+                       uint8_t *plain)
+{
+    if(_validate_mac_length_ccm(mac_length)){
+        return CCM_ERR_INVALID_MAC_LENGTH;
+    }
+    else {
+        return _cipher_decrypt_ccm(cipher, auth_data, auth_data_len, mac_length,
+                                   length_encoding, nonce, nonce_len, input,
+                                   input_len, plain);
+    }
+}
+
+int cipher_decrypt_ccms(cipher_t *cipher,
+                        const uint8_t *auth_data, uint32_t auth_data_len,
+                        uint8_t mac_length, uint8_t length_encoding,
+                        const uint8_t *nonce, size_t nonce_len,
+                        const uint8_t *input, size_t input_len,
+                        uint8_t *plain)
+{
+    if(_validate_mac_length_ccms(mac_length)){
+        return CCM_ERR_INVALID_MAC_LENGTH;
+    }
+    else {
+        return _cipher_decrypt_ccm(cipher, auth_data, auth_data_len, mac_length,
+                                   length_encoding, nonce, nonce_len, input,
+                                   input_len, plain);
+    }
+}
+
+int cipher_encrypt_ccm(cipher_t *cipher,
+                       const uint8_t *auth_data, uint32_t auth_data_len,
+                       uint8_t mac_length, uint8_t length_encoding,
+                       const uint8_t *nonce, size_t nonce_len,
+                       const uint8_t *input, size_t input_len,
+                       uint8_t *output)
+{
+    if(_validate_mac_length_ccm(mac_length)) {
+        return CCM_ERR_INVALID_MAC_LENGTH;
+    }
+    else {
+        return _cipher_encrypt_ccm(cipher, auth_data, auth_data_len, mac_length,
+                                   length_encoding, nonce, nonce_len, input,
+                                   input_len, output);
+    }
+}
+
+int cipher_encrypt_ccms(cipher_t *cipher,
+                       const uint8_t *auth_data, uint32_t auth_data_len,
+                       uint8_t mac_length, uint8_t length_encoding,
+                       const uint8_t *nonce, size_t nonce_len,
+                       const uint8_t *input, size_t input_len,
+                       uint8_t *output)
+{
+    if(_validate_mac_length_ccms(mac_length)) {
+        return CCM_ERR_INVALID_MAC_LENGTH;
+    }
+    else {
+        return _cipher_encrypt_ccm(cipher, auth_data, auth_data_len, mac_length,
+                                   length_encoding, nonce, nonce_len, input,
+                                   input_len, output);
+    }
 }
