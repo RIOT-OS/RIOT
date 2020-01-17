@@ -38,7 +38,7 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
         .dp     = GPIO_PIN(PA, 25),
         .d_mux  = GPIO_MUX_G,
         .device = &USB->DEVICE,
-        .gclk_src = 0
+        .gclk_src = SAM0_GCLK_MAIN,
     }
 };
 /** @} */

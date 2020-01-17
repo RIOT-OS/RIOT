@@ -48,7 +48,7 @@ static const uart_conf_t uart_config[] = {
         .rx_pad   = UART_PAD_RX_3,
         .tx_pad   = UART_PAD_TX_2,
         .flags    = UART_FLAG_NONE,
-        .gclk_src = 0
+        .gclk_src = SAM0_GCLK_MAIN,
     }
 };
 
@@ -73,7 +73,7 @@ static const spi_conf_t spi_config[] = {
         .clk_mux  = GPIO_MUX_C,
         .miso_pad = SPI_PAD_MISO_3,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,
-        .gclk_src = 0
+        .gclk_src = SAM0_GCLK_MAIN,
     },
     {
         .dev      = &SERCOM2->SPI,
@@ -85,7 +85,7 @@ static const spi_conf_t spi_config[] = {
         .clk_mux  = GPIO_MUX_C,
         .miso_pad = SPI_PAD_MISO_3,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,
-        .gclk_src = 0
+        .gclk_src = SAM0_GCLK_MAIN,
     }
 };
 

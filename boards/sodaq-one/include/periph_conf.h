@@ -51,7 +51,7 @@ static const uart_conf_t uart_config[] = {
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
         .flags    = UART_FLAG_NONE,
-        .gclk_src = 0
+        .gclk_src = SAM0_GCLK_MAIN,
     },
     {
         .dev      = &SERCOM2->USART,
@@ -65,7 +65,7 @@ static const uart_conf_t uart_config[] = {
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
         .flags    = UART_FLAG_NONE,
-        .gclk_src = 0
+        .gclk_src = SAM0_GCLK_MAIN,
     },
 };
 
@@ -127,7 +127,7 @@ static const spi_conf_t spi_config[] = {
         .clk_mux  = GPIO_MUX_C,
         .miso_pad = SPI_PAD_MISO_0,
         .mosi_pad = SPI_PAD_MOSI_2_SCK_3,
-        .gclk_src = 0,
+        .gclk_src = SAM0_GCLK_MAIN,
     }
 };
 
@@ -145,7 +145,7 @@ static const i2c_conf_t i2c_config[] = {
         .scl_pin  = GPIO_PIN(PA, 23),
         .sda_pin  = GPIO_PIN(PA, 22),
         .mux      = GPIO_MUX_C,
-        .gclk_src = 0,
+        .gclk_src = SAM0_GCLK_MAIN,
         .flags    = I2C_FLAG_NONE
     }
 };
