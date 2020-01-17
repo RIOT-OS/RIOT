@@ -79,15 +79,15 @@ extern "C" {
  * @{
  */
 /* LED0,2 currently unsupported due to lack of GPIO_OD support */
-#define LED1_ENABLE_PORT    DDRB  |=  LED1_PIN
-#define LED1_ON             PORTB |=  LED1_PIN
-#define LED1_OFF            PORTB &= ~LED1_PIN
-#define LED1_TOGGLE         PORTB ^=  LED1_PIN
+#define LED1_ENABLE_PORT    DDRB  |=  LED1_PIN.pin
+#define LED1_ON             PORTB |=  LED1_PIN.pin
+#define LED1_OFF            PORTB &= ~LED1_PIN.pin
+#define LED1_TOGGLE         PORTB ^=  LED1_PIN.pin
 
-#define LED3_ENABLE_PORT    DDRB  |=  LED3_PIN
-#define LED3_ON             PORTB |=  LED3_PIN
-#define LED3_OFF            PORTB &= ~LED3_PIN
-#define LED3_TOGGLE         PORTB ^=  LED3_PIN
+#define LED3_ENABLE_PORT    DDRB  |=  LED3_PIN.pin
+#define LED3_ON             PORTB |=  LED3_PIN.pin
+#define LED3_OFF            PORTB &= ~LED3_PIN.pin
+#define LED3_TOGGLE         PORTB ^=  LED3_PIN.pin
 /** @} */
 
 /**

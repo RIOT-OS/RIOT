@@ -22,6 +22,7 @@
 
 #include "cpu.h"
 #include "periph/gpio.h"
+#include "periph_cpu.h"
 
 #include "at24mac.h"
 #include "net/eui_provider.h"
