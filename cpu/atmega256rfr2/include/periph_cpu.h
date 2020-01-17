@@ -32,13 +32,26 @@ extern "C" {
  * @{
  */
 enum {
-    PORT_B  = 1,        /**< port B */
-    PORT_D  = 3,        /**< port D */
-    PORT_E  = 4,        /**< port E */
-    PORT_F  = 5,        /**< port F */
-    PORT_G  = 6,        /**< port G */
+    PORT_B = 1,         /**< port B */
+    PORT_D = 3,         /**< port D */
+    PORT_E = 4,         /**< port E */
+    PORT_F = 5,         /**< port F */
+    PORT_G = 6,         /**< port G */
+    GPIO_EXT_PORT = 7   /**< first GPIO extender port */
 };
 /** @} */
+
+/**
+ * @brief   Available ports on the ATmega256rfr2 MCU as GPIO register definitions
+ */
+#define GPIO_CPU_PORTS \
+    GPIO_CPU_PORT(0   ), /* n/a    */ \
+    GPIO_CPU_PORT(0x25), /* port B */ \
+    GPIO_CPU_PORT(0   ), /* n/a    */ \
+    GPIO_CPU_PORT(0x2b), /* port D */ \
+    GPIO_CPU_PORT(0x2e), /* port E */ \
+    GPIO_CPU_PORT(0x31), /* port F */ \
+    GPIO_CPU_PORT(0x34), /* port G */
 
 /**
  * @brief   Available external interrupt pins on the ATmega256rfr family

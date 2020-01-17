@@ -117,7 +117,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
 
     assert(out_buf || in_buf);
 
-    if (cs != SPI_CS_UNDEF) {
+    if (!gpio_is_equal(cs, SPI_CS_UNDEF)) {
         gpio_clear((gpio_t)cs);
     }
 
@@ -131,7 +131,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         }
     }
 
-    if ((!cont) && (cs != SPI_CS_UNDEF)) {
+    if ((!cont) && !gpio_is_equal(cs, SPI_CS_UNDEF)) {
         gpio_set((gpio_t)cs);
     }
 }

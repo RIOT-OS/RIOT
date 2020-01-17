@@ -31,18 +31,35 @@ extern "C" {
  * @brief   Available ports on the ATmega2560 family
  */
 enum {
-    PORT_A = 0,       /**< port A */
-    PORT_B = 1,       /**< port B */
-    PORT_C = 2,       /**< port C */
-    PORT_D = 3,       /**< port D */
-    PORT_E = 4,       /**< port E */
-    PORT_F = 5,       /**< port F */
-    PORT_G = 6,       /**< port G */
-    PORT_H = 7,       /**< port H */
-    PORT_J = 8,       /**< port J */
-    PORT_K = 9,       /**< port K */
-    PORT_L = 10       /**< port L */
+    PORT_A = 0,         /**< port A */
+    PORT_B = 1,         /**< port B */
+    PORT_C = 2,         /**< port C */
+    PORT_D = 3,         /**< port D */
+    PORT_E = 4,         /**< port E */
+    PORT_F = 5,         /**< port F */
+    PORT_G = 6,         /**< port G */
+    PORT_H = 7,         /**< port H */
+    PORT_J = 8,         /**< port J */
+    PORT_K = 9,         /**< port K */
+    PORT_L = 10,        /**< port L */
+    GPIO_EXT_PORT = 11  /**< first GPIO extender port */
 };
+
+/**
+ * @brief   Available ports on the ATmega2560 family as GPIO register definitions
+ */
+#define GPIO_CPU_PORTS \
+    GPIO_CPU_PORT(0x22),  /* port A */ \
+    GPIO_CPU_PORT(0x25),  /* port B */ \
+    GPIO_CPU_PORT(0x28),  /* port C */ \
+    GPIO_CPU_PORT(0x2b),  /* port D */ \
+    GPIO_CPU_PORT(0x2e),  /* port E */ \
+    GPIO_CPU_PORT(0x31),  /* port F */ \
+    GPIO_CPU_PORT(0x34),  /* port G */ \
+    GPIO_CPU_PORT(0x102), /* port H */ \
+    GPIO_CPU_PORT(0x105), /* port J */ \
+    GPIO_CPU_PORT(0x108), /* port K */ \
+    GPIO_CPU_PORT(0x10b), /* port L */
 
 /**
  * @brief   Available external interrupt pins on the ATmega2560 family

@@ -64,7 +64,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     /* only left implemented, max resolution 256 */
     assert(dev < PWM_NUMOF && mode == PWM_LEFT && res <= 256);
     /* resolution != 256 only valid if ch0 not used */
-    assert(!(res != 256 && pwm_conf[dev].pin_ch[0] != GPIO_UNDEF));
+    assert(!(res != 256 && !gpio_is_undef(pwm_conf[dev].pin_ch[0])));
 
     /* disable PWM */
     pwm_conf[dev].dev->CRA = 0x00;
@@ -92,7 +92,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     res -= 1;
     /* configure pins and resolution. Output must be low at initialization.
      * Force the pin low to avoid flickering. */
-    if (pwm_conf[dev].pin_ch[0] != GPIO_UNDEF) {
+    if (!gpio_is_undef(pwm_conf[dev].pin_ch[0])) {
         gpio_init(pwm_conf[dev].pin_ch[0], GPIO_OUT);
         gpio_clear(pwm_conf[dev].pin_ch[0]);
     }
@@ -101,7 +101,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
         pwm_conf[dev].dev->OCR[0] = (uint8_t)res;
     }
 
-    if (pwm_conf[dev].pin_ch[1] != GPIO_UNDEF) {
+    if (!gpio_is_undef(pwm_conf[dev].pin_ch[1])) {
         gpio_init(pwm_conf[dev].pin_ch[1], GPIO_OUT);
         gpio_clear(pwm_conf[dev].pin_ch[1]);
     }
@@ -122,8 +122,8 @@ uint8_t pwm_channels(pwm_t dev)
 
     /* a pwm with no channels enabled makes no sense. Assume at least one is
      * enabled */
-    if (pwm_conf[dev].pin_ch[0] == GPIO_UNDEF ||
-        pwm_conf[dev].pin_ch[1] == GPIO_UNDEF) {
+    if (gpio_is_undef(pwm_conf[dev].pin_ch[0]) ||
+        gpio_is_undef(pwm_conf[dev].pin_ch[1])) {
         return 1;
     }
 
@@ -132,7 +132,7 @@ uint8_t pwm_channels(pwm_t dev)
 
 void pwm_set(pwm_t dev, uint8_t ch, uint16_t value)
 {
-    assert(dev < PWM_NUMOF && ch <= 1 && pwm_conf[dev].pin_ch[ch] != GPIO_UNDEF);
+    assert(dev < PWM_NUMOF && ch <= 1 && !gpio_is_undef(pwm_conf[dev].pin_ch[ch]));
 
     /* output flickers when duty cycle is 0 or 100%. Simply force the pin
      * low or high respectively to have a clean output. */
@@ -178,11 +178,11 @@ void pwm_poweroff(pwm_t dev)
         power_timer0_disable();
     }
 
-    if (pwm_conf[dev].pin_ch[0] != GPIO_UNDEF) {
+    if (!gpio_is_undef(pwm_conf[dev].pin_ch[0])) {
         gpio_clear(pwm_conf[dev].pin_ch[0]);
     }
 
-    if (pwm_conf[dev].pin_ch[1] != GPIO_UNDEF) {
+    if (!gpio_is_undef(pwm_conf[dev].pin_ch[1])) {
         gpio_clear(pwm_conf[dev].pin_ch[1]);
     }
 }
