@@ -1,0 +1,29 @@
+# Copyright (c) 2020 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig KCONFIG_MODULE_ESP_WIFI
+    bool "Configure ESP-WiFi netdev"
+    depends on MODULE_ESP_WIFI
+    help
+        Configure ESP-Wifi netdev when module esp_wifi is used.
+
+if KCONFIG_MODULE_ESP_WIFI
+
+config ESP_WIFI_SSID
+    string "SSID"
+    default "RIOT_AP"
+    help
+        This string defines the SSID of the AP to be used.
+
+config ESP_WIFI_PASS
+    string "Passphrase for WPA2"
+    default "ThisistheRIOTporttoESP"
+    help
+        This string defines the passphrase as plain text, which is used for
+        the AP during WPA2 authentication. It can be up to 64 characters long.
+
+endif # KCONFIG_MODULE_ESP_WIFI

@@ -105,7 +105,7 @@ esp_wifi_netdev_t _esp_wifi_dev;
 static const netdev_driver_t _esp_wifi_driver;
 
 /* device thread stack */
-static char _esp_wifi_stack[ESP_WIFI_STACKSIZE];
+static char _esp_wifi_stack[CONFIG_ESP_WIFI_STACKSIZE];
 
 /** guard variable to avoid reentrance to _esp_wifi_send function */
 static bool _esp_wifi_send_is_in = false;
@@ -697,8 +697,8 @@ static const netdev_driver_t _esp_wifi_driver =
  */
 static wifi_config_t wifi_config_sta = {
     .sta = {
-        .ssid = ESP_WIFI_SSID,
-        .password = ESP_WIFI_PASS,
+        .ssid = CONFIG_ESP_WIFI_SSID,
+        .password = CONFIG_ESP_WIFI_PASS,
         .channel = 0,
         .scan_method = WIFI_ALL_CHANNEL_SCAN,
         .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
@@ -727,10 +727,10 @@ static wifi_config_t wifi_config_sta = {
  */
 static wifi_config_t wifi_config_ap = {
     .ap = {
-        .ssid = ESP_WIFI_SSID,
-        .ssid_len = ARRAY_SIZE(ESP_WIFI_SSID),
+        .ssid = CONFIG_ESP_WIFI_SSID,
+        .ssid_len = ARRAY_SIZE(CONFIG_ESP_WIFI_SSID),
         .ssid_hidden = 1,               /* don't make the AP visible */
-        .password = ESP_WIFI_PASS,
+        .password = CONFIG_ESP_WIFI_PASS,
         .authmode = WIFI_AUTH_WPA2_PSK,
         .max_connection = 0,            /* don't allow connections */
         .beacon_interval = 60000,       /* send beacon only every 60 s */
@@ -830,14 +830,14 @@ void auto_init_esp_wifi (void)
 
     esp_wifi_setup(&_esp_wifi_dev);
     _esp_wifi_dev.netif = gnrc_netif_ethernet_create(_esp_wifi_stack,
-                                                    ESP_WIFI_STACKSIZE,
+                                                     CONFIG_ESP_WIFI_STACKSIZE,
 #ifdef MODULE_ESP_NOW
-                                                    ESP_WIFI_PRIO - 1,
+                                                     CONFIG_ESP_WIFI_PRIO - 1,
 #else
-                                                    ESP_WIFI_PRIO,
+                                                     CONFIG_ESP_WIFI_PRIO,
 #endif
-                                                    "esp_wifi",
-                                                    (netdev_t *)&_esp_wifi_dev);
+                                                     "esp_wifi",
+                                                     (netdev_t *)&_esp_wifi_dev);
 }
 
 #endif /* MODULE_ESP_WIFI */

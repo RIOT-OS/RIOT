@@ -1,0 +1,41 @@
+# Copyright (c) 2020 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig KCONFIG_MODULE_ESP_NOW
+    bool "Configure ESP-NOW netdev"
+    depends on MODULE_ESP_NOW
+    help
+        Configure ESP-NOW netdev when module esp_now is used.
+
+if KCONFIG_MODULE_ESP_NOW
+
+config ESP_NOW_CHANNEL
+    int "WiFi channel"
+    default 6
+    help
+        The WiFi channel that is used as by all ESP-NOW nodes.
+
+config ESP_NOW_SCAN_PERIOD
+    int "Scan period in microseconds"
+    default 10000000
+    help
+        Period in microseconds at which an ESP-NOW node scans for other
+        ESP-NOW nodes in its range.
+
+config ESP_NOW_SOFT_AP_PASS
+    string "SoftAP interface passphrase"
+    default "ThisistheRIOTporttoESP"
+    help
+        Passphrase used for the SoftAP interface of all ESP-NOW nodes.
+
+        ESP_NOW uses the WiFi interface in Station and SoftAP mode
+        simultaneously to build a peer-to-peer network. A passphrase is
+        required for the SoftAP mode. This passphrase is used by all ESP-NOW
+        nodes to establish the connection between them in the peer-to-peer
+        network.
+
+endif # KCONFIG_MODULE_ESP_NOW

@@ -33,8 +33,12 @@ extern "C" {
  *
  * Possible values are 80 and 160 MHz.
  */
-#ifndef ESP8266_CPU_FREQUENCY
-#define ESP8266_CPU_FREQUENCY   (80)
+#ifndef CONFIG_ESP8266_CPU_FREQUENCY
+#if defined(CONFIG_ESP8266_CPU_FREQUENCY_160MHZ)
+#define CONFIG_ESP8266_CPU_FREQUENCY    (160)
+#else
+#define CONFIG_ESP8266_CPU_FREQUENCY    (80)
+#endif
 #endif
 
 /**

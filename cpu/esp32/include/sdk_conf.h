@@ -31,10 +31,16 @@ extern "C" {
 #endif
 
 /**
- * @brief   Defines the CPU frequency [values = 2, 40, 80, 160 and 240]
+ * @brief   Defines the CPU frequency [values = 80, 160 and 240]
  */
 #ifndef CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ
-#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ   80
+#if defined(CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_240)
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ               (240)
+#elif defined(CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ_160)
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ               (160)
+#else
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ               (80)
+#endif
 #endif
 
 /**

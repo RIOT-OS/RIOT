@@ -99,7 +99,7 @@ static unsigned int rx_buf_write = 0;
 static unsigned int rx_buf_read = 0;
 
 /* device thread stack */
-static char _esp_wifi_stack[ESP_WIFI_STACKSIZE];
+static char _esp_wifi_stack[CONFIG_ESP_WIFI_STACKSIZE];
 
 extern esp_err_t esp_system_event_add_handler (system_event_cb_t handler,
                                                void *arg);
@@ -291,8 +291,8 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
 /* we use predefined station configuration */
 static wifi_config_t wifi_config_sta = {
     .sta = {
-        .ssid = ESP_WIFI_SSID,
-        .password = ESP_WIFI_PASS,
+        .ssid = CONFIG_ESP_WIFI_SSID,
+        .password = CONFIG_ESP_WIFI_PASS,
         .bssid_set = 0,
         .channel = 0,
         .scan_method = WIFI_ALL_CHANNEL_SCAN,
@@ -578,14 +578,14 @@ void auto_init_esp_wifi (void)
 
     esp_wifi_setup(&_esp_wifi_dev);
     _esp_wifi_dev.netif = gnrc_netif_ethernet_create(_esp_wifi_stack,
-                                                    ESP_WIFI_STACKSIZE,
+                                                     CONFIG_ESP_WIFI_STACKSIZE,
 #ifdef MODULE_ESP_NOW
-                                                    ESP_WIFI_PRIO - 1,
+                                                     CONFIG_ESP_WIFI_PRIO - 1,
 #else
-                                                    ESP_WIFI_PRIO,
+                                                     CONFIG_ESP_WIFI_PRIO,
 #endif
-                                                    "esp-wifi",
-                                                    (netdev_t *)&_esp_wifi_dev);
+                                                     "esp-wifi",
+                                                     (netdev_t *)&_esp_wifi_dev);
 }
 
 #endif /* MODULE_ESP_WIFI */

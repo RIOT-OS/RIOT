@@ -202,7 +202,7 @@ gnrc_netif_t *gnrc_netif_esp_now_create(char *stack, int stacksize, char priorit
 }
 
 /* device thread stack */
-static char _esp_now_stack[ESP_NOW_STACKSIZE];
+static char _esp_now_stack[CONFIG_ESP_NOW_STACKSIZE];
 
 void auto_init_esp_now(void)
 {
@@ -213,7 +213,7 @@ void auto_init_esp_now(void)
         LOG_ERROR("[auto_init_netif] error initializing esp_now\n");
     } else {
         gnrc_netif_esp_now_create(_esp_now_stack, sizeof(_esp_now_stack),
-                                  ESP_NOW_PRIO,
+                                  CONFIG_ESP_NOW_PRIO,
                                   "esp-now",
                                   &esp_now_dev->netdev);
     }
