@@ -199,6 +199,7 @@ static int _cat(int argc, char **argv)
     }
     close(fd);
 #endif
+    fflush(stdout);
     return 0;
 }
 
