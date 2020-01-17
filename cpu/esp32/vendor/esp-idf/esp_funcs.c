@@ -108,7 +108,7 @@ void IRAM_ATTR esp_log_write(esp_log_level_t level,
      * We use the log level set for the given tag instead of using
      * the given log level.
      */
-    esp_log_level_t act_level;
+    esp_log_level_t act_level = LOG_DEBUG;
     size_t i;
     for (i = 0; i < ARRAY_SIZE(_log_levels); i++) {
         if (strcmp(tag, _log_levels[i].tag) == 0) {
