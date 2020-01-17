@@ -77,9 +77,9 @@ static const motor_driver_config_t motor_driver_config[] = {
         .motors          = {
             {
                 .pwm_channel            = 0,
-                .gpio_enable            = 0,
+                .gpio_enable            = GPIO_UNDEF,
                 .gpio_dir0              = ARDUINO_PIN_15,
-                .gpio_dir1_or_brake     = 0,
+                .gpio_dir1_or_brake     = GPIO_UNDEF,
                 .gpio_dir_reverse       = 0,
                 .gpio_enable_invert     = 0,
                 .gpio_brake_invert      = 0,

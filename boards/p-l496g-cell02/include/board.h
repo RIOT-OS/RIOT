@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 #include "cpu.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
