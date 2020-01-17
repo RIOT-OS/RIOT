@@ -9,6 +9,7 @@ mainmenu "RIOT Configuration"
 # For now, get used modules as macros from this file (see kconfig.mk)
 osource "$(KCONFIG_GENERATED_DEPENDENCIES)"
 
+rsource "drivers/Kconfig"
 rsource "sys/Kconfig"
 
 # The application may declare new symbols as well
