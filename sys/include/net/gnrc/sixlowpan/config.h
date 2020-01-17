@@ -91,11 +91,11 @@ extern "C" {
  * When not set, it will cause the reassembly buffer to override the oldest entry
  * if a new entry has to be created and the reassembly buffer is full, no matter what.
  * When set to 1, only incomplete entries that are older than
- * @ref GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be overwritten (they will still timeout
- * normally).
+ * @ref CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be overwritten (they will still
+ * timeout normally).
  */
 #ifdef DOXYGEN
-#define GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE
 #endif
 
 /**
@@ -110,15 +110,15 @@ extern "C" {
  * overwritten (they will still timeout normally if reassembly buffer is not
  * full).
  *
- * @deprecated Use inverse @ref GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE instead.
+ * @deprecated Use inverse @ref CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE instead.
  *             Will be removed after 2020.10 release.
  */
 #ifndef GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE
-#if IS_ACTIVE(GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE)
+#if IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE)
 #define GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE    (0)
-#else /* GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE */
+#else /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE */
 #define GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE    (1)
-#endif /* GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE */
+#endif /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE */
 #endif /* GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE */
 
 /**
