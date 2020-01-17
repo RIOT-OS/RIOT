@@ -37,7 +37,10 @@ static const sx127x_params_t sx127x_params[] =
         .dio0_pin  = GPIO_PIN(PORT_B,  0),
         .dio1_pin  = GPIO_PIN(PORT_B,  1),
         .dio2_pin  = GPIO_PIN(PORT_C,  6),
-        .dio3_pin  = GPIO_PIN(PORT_A, 10)
+        .dio3_pin  = GPIO_PIN(PORT_A, 10),
+        .dio4_pin  = GPIO_UNDEF,
+        .dio5_pin  = GPIO_UNDEF,
+        .paselect  = SX127X_PA_RFO
     }
 };
 

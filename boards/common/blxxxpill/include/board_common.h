@@ -24,6 +24,8 @@
 #ifndef BOARD_COMMON_H
 #define BOARD_COMMON_H
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
