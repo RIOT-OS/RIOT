@@ -476,8 +476,10 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
         memcpy(((uint8_t *)rbuf->pkt->data) + offset, pkt->data, pkt->size);
         /* if entry was newly created above */
         if (rbuf->pkt->next == fh_snip->next) {
-            /* we don't need the payload anymore, headers are still kept to be
-             * reused when assembled, so just remove the payload. */
+            /* we don't need the payload and fragment header anymore, the
+             * remaining headers are still kept to be reused when assembled, so
+             * just remove the payload. */
+            gnrc_pktbuf_remove_snip(pkt, fh_snip);
             gnrc_pktbuf_remove_snip(pkt, pkt);
         }
         else {
