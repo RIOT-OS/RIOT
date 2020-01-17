@@ -24,11 +24,11 @@
 
 #ifndef DOXYGEN
 
+#include "board.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "board.h"
 
 /**
  * @brief   Defines the CPU frequency [values = 2, 40, 80, 160 and 240]
