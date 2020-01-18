@@ -85,7 +85,7 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
     assert(dev);
     const uint8_t *pos = buf;
     const uint8_t *end = pos + size;
-    uint16_t port_addr = atmega_port_addr(dev->params.pin.port);
+    uint16_t port_addr = atmega_port_addr(GPIO_PORT(dev->params.pin));
     uint8_t mask_on, mask_off;
 
     {
@@ -95,7 +95,7 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
     }
 
 #if (CLOCK_CORECLOCK >= 7500000U) && (CLOCK_CORECLOCK <= 8500000U)
-    const uint8_t port_num = atmega_port_num(dev->params.pin);
+    const uint8_t port_num = atmega_port_num(GPIO_PORT(dev->params.pin));
     switch (port_num) {
         case PORT_B:
             while (pos < end) {
