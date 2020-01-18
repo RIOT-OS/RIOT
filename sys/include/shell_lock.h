@@ -42,6 +42,15 @@ extern "C" {
  */
 #define CONFIG_SHELL_LOCK_ATTEMPTS_BEFORE_TIME_LOCK 3
 
+#ifndef CONFIG_SHELL_LOCK_AUTO_LOCK_TIMEOUT_MS
+/**
+ * @brief Lock the shell after this time span without user input
+ *        Defaults to 5 minutes but can be overwritten in the applications
+ *        Makefile.
+ */
+#define CONFIG_SHELL_LOCK_AUTO_LOCK_TIMEOUT_MS (5 * 60 * 1000)
+#endif
+
 /**
  * @brief   Entry point for the lock mechanism. If locked, the user will
  *          be asked for a password. This function won't return until the

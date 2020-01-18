@@ -18,6 +18,10 @@
  * slow down brute force attacks.
  * Does not make use of any cryptographic features yet.
  *
+ * This module also provides a pseudomodule for automated locking after a given
+ * interval. Add "USEMODULE += shell_lock_auto_locking" to your Makefile to
+ * enable this feature.
+ *
  * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  *
  * @}
@@ -29,7 +33,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "shell_lock.h"
 
@@ -40,6 +44,10 @@
 #endif /* MODULE_NEWLIB || MODULE_PICOLIBC */
 
 static bool _shell_is_locked = true;
+
+#ifdef MODULE_SHELL_LOCK_AUTO_LOCKING
+static ztimer_t _shell_auto_lock_ztimer;
+#endif
 
 /* defined in shell.c */
 extern int readline(char *buf, size_t size);
@@ -135,6 +143,22 @@ static void _login_barrier(char *line_buf, size_t buf_size)
     }
 }
 
+#ifdef MODULE_SHELL_LOCK_AUTO_LOCKING
+static void _shell_auto_lock_ztimer_callback(void *arg)
+{
+    (void) arg;
+
+    _shell_is_locked = true;
+}
+
+void shell_lock_auto_lock_refresh(void)
+{
+    ztimer_remove(ZTIMER_MSEC, &_shell_auto_lock_ztimer);
+    ztimer_set(ZTIMER_MSEC, &_shell_auto_lock_ztimer,
+               CONFIG_SHELL_LOCK_AUTO_LOCK_TIMEOUT_MS);
+}
+#endif
+
 bool shell_lock_is_locked(void)
 {
     return _shell_is_locked;
@@ -147,6 +171,20 @@ void shell_lock_checkpoint(char *line_buf, int buf_size)
 
         _login_barrier(line_buf, buf_size);
 
+        if (IS_USED(MODULE_SHELL_LOCK_AUTO_LOCKING)) {
+            printf("Shell was unlocked.\n\n");
+        }
+        else {
+            printf("Shell was unlocked.\n\n"
+                   "IMPORTANT: Don't forget to lock the shell after usage, "
+                   "because it won't lock itself.\n\n");
+        }
+
         _shell_is_locked = false;
     }
+
+#ifdef MODULE_SHELL_LOCK_AUTO_LOCKING
+    _shell_auto_lock_ztimer.callback = &_shell_auto_lock_ztimer_callback;
+    shell_lock_auto_lock_refresh();
+#endif
 }

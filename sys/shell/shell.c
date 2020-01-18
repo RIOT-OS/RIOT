@@ -64,7 +64,7 @@ XFA_INIT_CONST(shell_command_t*, shell_commands_xfa);
 
 extern void shell_lock_checkpoint(char *line_buf, int len);
 extern bool shell_lock_is_locked(void);
-extern void shell_lock_reset(void);
+extern void shell_lock_auto_lock_refresh(void);
 
 enum parse_state {
     PARSE_BLANK             = 0x0,
@@ -490,6 +490,11 @@ void shell_run_once(const shell_command_t *shell_commands,
             if (shell_lock_is_locked()) {
                 break;
             }
+        }
+
+        if (IS_USED(MODULE_SHELL_LOCK_AUTO_LOCKING)) {
+            /* reset lock countdown in case of new input */
+            shell_lock_auto_lock_refresh();
         }
 
         switch (res) {

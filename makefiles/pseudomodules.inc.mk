@@ -202,6 +202,7 @@ PSEUDOMODULES += senml_saul
 PSEUDOMODULES += sha1sum
 PSEUDOMODULES += sha256sum
 PSEUDOMODULES += shell_hooks
+PSEUDOMODULES += shell_lock_auto_locking
 PSEUDOMODULES += slipdev_stdio
 PSEUDOMODULES += slipdev_l2addr
 PSEUDOMODULES += sock
