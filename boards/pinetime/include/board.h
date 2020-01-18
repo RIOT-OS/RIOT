@@ -48,7 +48,7 @@ extern "C" {
 #define VCC33                       GPIO_PIN(0, 24)
 #define POWER_PRESENCE              GPIO_PIN(0, 19)
 #define CHARGING_ACTIVE             GPIO_PIN(0, 12)
-#define BATTERY_ADC                 NRF52
+#define BATTERY_ADC                 NRF52_AIN7
 /** @} */
 
 /**
