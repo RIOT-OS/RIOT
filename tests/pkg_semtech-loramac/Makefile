@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 
 BOARD_WITHOUT_LORAMAC_RX := \
     arduino-mega2560 \
-    i-nuncleo-lrwan1 \
+    i-nucleo-lrwan1 \
     stm32f0discovery \
     waspmote-pro \
 
