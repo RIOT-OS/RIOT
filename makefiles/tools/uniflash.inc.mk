@@ -5,7 +5,7 @@ UNIFLASH_CONFIG_CCXML ?= $(BOARDSDIR)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).cc
 UNIFLASH_CONFIG_DAT ?= $(BOARDSDIR)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).dat
 UNIFLASH_CONFIG_GDB ?= $(BOARDSDIR)/$(BOARD)/dist/$(CPU_MODEL)_gdb.conf
 
-export UNIFLASH_PATH ?= "UNIFLASH_PATH unconfigured"
+UNIFLASH_PATH ?= "UNIFLASH_PATH unconfigured"
 # check which uniflash version is available, either 4.x or 3.x
 ifneq ("$(wildcard $(UNIFLASH_PATH)/dslite.sh)","")
   FLASHER ?= $(UNIFLASH_PATH)/dslite.sh
