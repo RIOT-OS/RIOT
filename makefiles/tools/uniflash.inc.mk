@@ -24,8 +24,10 @@ else
   RESET ?= $(UNIFLASH_PATH)/uniflash.sh
   RESET_FLAGS ?= -ccxml $(UNIFLASH_CONFIG_CCXML) -reset
 endif
+
+CCS_PATH ?= "CCS_PATH unconfigured"
 # configure the debug server
-DEBUGSERVER = $(UNIFLASH_PATH)/ccs_base/common/uscif/gdb_agent_console
+DEBUGSERVER = $(CCS_PATH)/ccs/ccs_base/common/uscif/gdb_agent_console
 DEBUGSERVER_FLAGS = -p 3333 $(UNIFLASH_CONFIG_DAT)
 
 # configure the debugging tool
