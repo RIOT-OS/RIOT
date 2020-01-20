@@ -83,6 +83,11 @@ ifeq (1,$(USE_ETHOS))
   TERMFLAGS = $(TAP) $(PORT)
 endif
 
+# Ensure both slot bin files are always generated and linked to avoid compiling
+# during the test. This ensures that "BUILD_IN_DOCKER=1 make test"
+# can rely on them being present without having to trigger re-compilation.
+BUILD_FILES += $(SLOT_RIOT_ELFS:%.elf=%.bin)
+
 # The test needs the linked slot binaries without header in order to be able to
 # create final binaries with specific APP_VER values. The CI RasPi test workers
 # don't compile themselves and re-create signed images, thus add the required
