@@ -8,11 +8,11 @@
  */
 
 /**
- * @ingroup         boards_cc2650_launchpad
+ * @ingroup         boards_cc1352_launchpad
  * @{
  *
  * @file
- * @brief           Peripheral MCU configuration for TI CC2650 LaunchPad
+ * @brief           Peripheral MCU configuration for TI CC1352 LaunchPad
  *
  * @author          Nicholas Jackson <nicholas.jackson@griffithuni.edu.au>
  * @author          Sebastian Meiling <s@mlng.net>
@@ -68,22 +68,15 @@ static const timer_conf_t timer_config[] = {
 /**
 * @name    UART configuration
 *
-* The used CC26x0 CPU only supports a single UART device, so all we need to
-* configure are the RX and TX pins.
+* The TI CC1352 LaunchPad board only has access to a single UART device through
+* the debugger, so all we need to configure are the RX and TX pins.
 *
 * Optionally we can enable hardware flow control, by setting UART_HW_FLOW_CTRL
-* to 1 and defining pins for UART_CTS_PIN and UART_RTS_PIN.
+* to 1 and defining pins for cts_pin and rts_pin.
+*
+* Add a second UART configuration if using external pins.
 * @{
 */
-/**
- * @name    UART configuration
- *
- * We can enable hardware flow control, by setting flow_control
- * to 1 and defining pins for cts_pin and rts_pin.
- *
- * Add a second UART configuration if using external pins.
- * @{
- */
 
 static const uart_conf_t uart_config[] = {
  {
