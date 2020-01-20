@@ -6,15 +6,15 @@
  * details.
  */
 /**
- * @ingroup         cpu_cc13x2_definitions
+ * @ingroup         cpu_cc26x2_cc13x2_definitions
  * @{
  *
  * @file
- * @brief           CC13x2 FCFG register definitions
+ * @brief           CC26x2, CC13x2 FCFG register definitions
  */
 
-#ifndef CC13X2_FCFG_H
-#define CC13X2_FCFG_H
+#ifndef CC26X2_CC13X2_FCFG_H
+#define CC26X2_CC13X2_FCFG_H
 
 #include <cc26xx_cc13xx.h>
 
@@ -142,6 +142,6 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC13X2_FCFG_H */
+#endif /* CC26X2_CC13X2_FCFG_H */
 
 /*@}*/

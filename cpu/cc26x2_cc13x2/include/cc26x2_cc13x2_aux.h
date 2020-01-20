@@ -7,15 +7,15 @@
  * details.
  */
 /**
- * @ingroup         cpu_cc13x2_definitions
+ * @ingroup         cpu_cc26x2_cc13x2_definitions
  * @{
  *
  * @file
- * @brief           CC13x2 AUX register definitions
+ * @brief           CC26x2, CC13x2 AUX register definitions
  */
 
-#ifndef CC13X2_AUX_H
-#define CC13X2_AUX_H
+#ifndef CC26X2_CC13X2_AUX_H
+#define CC26X2_CC13X2_AUX_H
 
 #include <stdbool.h>
 
@@ -341,6 +341,6 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC13X2_AUX_H */
+#endif /* CC26X2_CC13X2_AUX_H */
 
 /** @}*/

@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     cpu_cc13x2
+ * @ingroup     cpu_cc26x2_cc13x2
  * @{
  *
  * @file
@@ -23,7 +23,7 @@
 #include "periph/init.h"
 #include "stdio_base.h"
 
-#include "cc13x2_prcm.h"
+#include "cc26x2_cc13x2_prcm.h"
 
 /**
  * @brief Initialize the CPU, set IRQ priorities
