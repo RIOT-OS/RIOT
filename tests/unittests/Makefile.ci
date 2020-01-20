@@ -9,15 +9,16 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mkrzero \
     arduino-nano \
     arduino-uno \
+    arduino-zero \
     atmega256rfr2-xpro \
     atmega328p \
-    arduino-zero \
     b-l072z-lrwan1 \
     blackpill \
     blackpill-128kib \
     bluepill \
     bluepill-128kib \
     calliope-mini \
+    cc1312-launchpad \
     cc1352-launchpad \
     cc2650-launchpad \
     cc2650stk \
