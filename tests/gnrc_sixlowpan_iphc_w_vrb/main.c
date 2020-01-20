@@ -142,7 +142,7 @@ static bool _rb_is_empty(void)
     const gnrc_sixlowpan_frag_rb_t *rb = gnrc_sixlowpan_frag_rb_array();
     unsigned res = 0;
 
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         res += gnrc_sixlowpan_frag_rb_entry_empty(&rb[i]);
     }
     return res;
@@ -158,7 +158,7 @@ static void _test_no_vrbe_but_rbe_exists(void)
                                                  sizeof(_test_src),
                                                  TEST_TAG));
     /* and one reassembly buffer entry exists with the source and tag exists */
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         if (!gnrc_sixlowpan_frag_rb_entry_empty(&rb[i])) {
             rbs++;
             TEST_ASSERT_EQUAL_INT(sizeof(_test_src), rb[i].super.src_len);
@@ -208,7 +208,7 @@ static void test_recv__vrb_full(void)
 
     TEST_ASSERT_NOT_NULL(pkt);
     /* Fill up VRB */
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         base.tag++;
         base.arrival = xtimer_now_usec();
         TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_vrb_add(&base, _mock_netif,

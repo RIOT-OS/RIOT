@@ -50,7 +50,7 @@ void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
             DEBUG("nib: can't get EUI-64 of the interface for ARO\n");
             return;
         }
-        ext_opt = gnrc_sixlowpan_nd_opt_ar_build(0, GNRC_SIXLOWPAN_ND_AR_LTIME,
+        ext_opt = gnrc_sixlowpan_nd_opt_ar_build(0, CONFIG_GNRC_SIXLOWPAN_ND_AR_LTIME,
                                                  &eui64, NULL);
         if (ext_opt == NULL) {
             DEBUG("nib: error allocating ARO.\n");

@@ -45,8 +45,8 @@ extern "C" {
 /**
  * @brief   Default message queue size to use for the 6LoWPAN thread.
  */
-#ifndef GNRC_SIXLOWPAN_MSG_QUEUE_SIZE
-#define GNRC_SIXLOWPAN_MSG_QUEUE_SIZE       (8U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_MSG_QUEUE_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_MSG_QUEUE_SIZE       (8U)
 #endif
 
 /**
@@ -58,8 +58,8 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_fb](@ref net_gnrc_sixlowpan_frag_fb) module
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_FB_SIZE
-#define GNRC_SIXLOWPAN_FRAG_FB_SIZE         (1U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_FB_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_FB_SIZE         (1U)
 #endif
 
 /**
@@ -68,8 +68,8 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_SIZE
-#define GNRC_SIXLOWPAN_FRAG_RBUF_SIZE       (4U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE       (4U)
 #endif
 
 /**
@@ -78,8 +78,8 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US
-#define GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US (3U * US_PER_SEC)
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US (3U * US_PER_SEC)
 #endif
 
 /**
@@ -91,11 +91,11 @@ extern "C" {
  * When not set, it will cause the reassembly buffer to override the oldest entry
  * if a new entry has to be created and the reassembly buffer is full, no matter what.
  * When set to 1, only incomplete entries that are older than
- * @ref GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be overwritten (they will still timeout
- * normally).
+ * @ref CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be overwritten (they will still
+ * timeout normally).
  */
 #ifdef DOXYGEN
-#define GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE
 #endif
 
 /**
@@ -106,19 +106,19 @@ extern "C" {
  *
  * When set to a non-zero value this will cause the reassembly buffer to
  * override the oldest entry no matter what. When set to zero only the oldest
- * entry that is older than @ref GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be
+ * entry that is older than @ref CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be
  * overwritten (they will still timeout normally if reassembly buffer is not
  * full).
  *
- * @deprecated Use inverse @ref GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE instead.
+ * @deprecated Use inverse @ref CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE instead.
  *             Will be removed after 2020.10 release.
  */
 #ifndef GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE
-#if IS_ACTIVE(GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE)
+#if IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE)
 #define GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE    (0)
-#else /* GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE */
+#else /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE */
 #define GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE    (1)
-#endif /* GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE */
+#endif /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE */
 #endif /* GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE */
 
 /**
@@ -132,8 +132,8 @@ extern "C" {
  * immediately. Use this value to prevent re-creation of a reassembly buffer
  * entry on late arriving link-layer duplicates.
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
-#define GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER              (0U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER              (0U)
 #endif
 
 /**
@@ -150,8 +150,8 @@ extern "C" {
  *          provides capabilities to build the address registration option as a
  *          @ref gnrc_pktsnip_t
  */
-#ifndef GNRC_SIXLOWPAN_ND_AR_LTIME
-#define GNRC_SIXLOWPAN_ND_AR_LTIME          (15U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_ND_AR_LTIME
+#define CONFIG_GNRC_SIXLOWPAN_ND_AR_LTIME          (15U)
 #endif
 
 /**
@@ -162,16 +162,11 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_vrb](@ref net_gnrc_sixlowpan_frag_vrb) module,
  *          but has also a direct influence on the number of available
- *          gnrc_sixlowpan_frag_rb_int_t entries (even when
- *          `gnrc_sixlowpan_frag_vrb` is not compiled in).
+ *          gnrc_sixlowpan_frag_rb_int_t entries.
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_VRB_SIZE
-#if defined(MODULE_GNRC_SIXLOWPAN_FRAG_VRB) || defined(DOXYGEN)
-#define GNRC_SIXLOWPAN_FRAG_VRB_SIZE        (16U)
-#else   /* defined(MODULE_GNRC_SIXLOWPAN_FRAG_VRB) || defined(DOXYGEN) */
-#define GNRC_SIXLOWPAN_FRAG_VRB_SIZE        (0U)
-#endif  /* defined(MODULE_GNRC_SIXLOWPAN_FRAG_VRB) || defined(DOXYGEN) */
-#endif  /* GNRC_SIXLOWPAN_FRAG_VRB_SIZE */
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE        (16U)
+#endif  /* CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE */
 
 /**
  * @brief   Timeout for a VRB entry in microseconds
@@ -181,9 +176,9 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_vrb](@ref net_gnrc_sixlowpan_frag_vrb) module.
  */
-#ifndef GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US
-#define GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US  (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)
-#endif  /* GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US */
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US  (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)
+#endif  /* CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US */
 
 /**
  * @name Selective fragment recovery configuration
