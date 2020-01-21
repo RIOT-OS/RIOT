@@ -73,15 +73,13 @@ into a file called "RIOT_LOG-<EXPNAME>-<EXPID>".
 This target updates the application on all registered nodes of the given
 experiment to the current version of the application.
 Certain nodes can be excluded by listing them in the `IOTLAB_EXCLUDE_NODES` variable
-using the resource id string format as described above. If you do not use the default site,
-then you must specify the site with `IOTLAB_SITE`.
+using the resource id string format as described above.
 
 #### iotlab-reset
 
 This target resets all registered nodes of the given experiment.
 Certain nodes can be excluded by listing them in the `IOTLAB_EXCLUDE_NODES` variable
-using the resource id string format as described above. If you do not use the default site,
-then you must specify the site with `IOTLAB_SITE`.
+using the resource id string format as described above.
 
 #### iotlab-term
 
