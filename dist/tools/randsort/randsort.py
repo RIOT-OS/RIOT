@@ -8,6 +8,7 @@
 # directory for more details.
 #
 
+import os
 import sys
 import random
 import secrets
@@ -17,7 +18,10 @@ def secrets_random():
     return secrets.randbelow(maxval) / maxval
 
 input = sys.stdin.readlines()
-random.shuffle(input, secrets_random)
+try:
+    os.environ["RIOTINSECURE"]
+except KeyError:
+    random.shuffle(input, secrets_random)
 
 for line in input:
     print(line, end='')
