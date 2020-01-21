@@ -55,7 +55,8 @@ iotlab-exp: $(IOTLAB_AUTH) all
 	$(Q)iotlab-experiment wait -i $(NEW_ID)
 
     ifdef IOTLAB_LOGGING
-	  $(Q)ssh -t $(IOTLAB_AUTHORITY) "tmux new -d -s riot-$(NEW_ID)\
+	  $(Q)ssh -t $(IOTLAB_AUTHORITY) \
+      "$(if $(IOTLAB_TMUX),tmux new -d -s riot-$(NEW_ID),) \
 	  'script -fac "'"'"serial_aggregator -i $(NEW_ID)"'"'"\
 	   RIOT_LOG-$(IOTLAB_EXP_NAME)-$(NEW_ID)'"
     endif
@@ -85,8 +86,8 @@ iotlab-term: $(IOTLABTERMFLASHDEPS)
 	                                iotlab-auth -u $(IOTLAB_USER)"
 
 	$(Q)ssh -t $(IOTLAB_AUTHORITY) \
-	"tmux attach -t riot-$(IOTLAB_EXP_ID) || tmux new -s riot-$(IOTLAB_EXP_ID) \
-	'$(if $(IOTLAB_LOGGING), \
+	"$(if $(IOTLAB_TMUX),tmux attach -t riot-$(IOTLAB_EXP_ID) || tmux new -s riot-$(IOTLAB_EXP_ID) ',) \
+	$(if $(IOTLAB_LOGGING), \
 	script -fac "'"'"serial_aggregator -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE)"'"'" \
 	RIOT_LOG-$(IOTLAB_EXP_NAME)-$(IOTLAB_EXP_ID), \
-	serial_aggregator -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE))'"
+	serial_aggregator -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE))$(if $(IOTLAB_TMUX),',)"
