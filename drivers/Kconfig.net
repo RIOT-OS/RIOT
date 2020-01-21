@@ -4,6 +4,6 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menu "Drivers"
-rsource "Kconfig.net"
-endmenu # Drivers
+menu "Network Device Drivers"
+source "$(RIOTCPU)/nrf52/radio/nrf802154/Kconfig"
+endmenu # Network Device Drivers
