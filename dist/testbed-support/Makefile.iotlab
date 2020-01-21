@@ -78,7 +78,7 @@ iotlab-stop: $(IOTLAB_AUTH)
 	$(Q)iotlab-experiment stop -i $(IOTLAB_EXP_ID)
 
 iotlab-term:
-	$(Q)ssh -t $(IOTLAB_AUTHORITY) "iotlab-experiment get -r > /dev/null || \
+	$(Q)ssh -t $(IOTLAB_AUTHORITY) "iotlab-experiment get -r -i $(IOTLAB_EXP_ID) > /dev/null || \
 	                                iotlab-auth -u $(IOTLAB_USER)"
 
 	$(Q)ssh -t $(IOTLAB_AUTHORITY) \
