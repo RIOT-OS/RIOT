@@ -77,7 +77,10 @@ iotlab-debug-server: $(IOTLAB_AUTH)
 iotlab-stop: $(IOTLAB_AUTH)
 	$(Q)iotlab-experiment stop -i $(IOTLAB_EXP_ID)
 
-iotlab-term:
+# wait for flash if it is provided e.g. with `make iotlab-flash iotlab-term`
+IOTLABTERMFLASHDEPS ?= $(filter iotlab-flash iotlab-exp,$(MAKECMDGOALS))
+
+iotlab-term: $(IOTLABTERMFLASHDEPS)
 	$(Q)ssh -t $(IOTLAB_AUTHORITY) "iotlab-experiment get -r -i $(IOTLAB_EXP_ID) > /dev/null || \
 	                                iotlab-auth -u $(IOTLAB_USER)"
 
