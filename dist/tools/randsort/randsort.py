@@ -8,20 +8,29 @@
 # directory for more details.
 #
 
-import os
 import sys
 import random
 import secrets
+import argparse
+
 
 def secrets_random():
     maxval = 2 ** 32
     return secrets.randbelow(maxval) / maxval
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--seed', metavar='SEED', type=int,
+                    default=-1, help='Seed used for random number generator')
+args = parser.parse_args()
+
+randfn = secrets_random
+if args.seed != -1:
+    random.seed(a=args.seed)
+    randfn = random.random
+
 input = sys.stdin.readlines()
-try:
-    os.environ["RIOTINSECURE"]
-except KeyError:
-    random.shuffle(input, secrets_random)
+random.shuffle(input, randfn)
 
 for line in input:
     print(line, end='')
