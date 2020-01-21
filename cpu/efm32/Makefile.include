@@ -9,14 +9,6 @@ RIOTBOOT_LEN ?= 0x2000
 # the em_device.h header requires a global define with the cpu model
 CFLAGS += -D$(call uppercase_and_underscore,$(CPU_MODEL))
 
-# CMSIS-DSP is needed for arm_math.h on Cortex-M0+ architectures
-ifeq ($(CPU_ARCH),cortex-m0plus)
-  USEPKG += cmsis-dsp
-endif
-
-# include CPU family module
-USEMODULE += cpu_$(EFM32_FAMILY)
-
 # vectors.o is provided by 'cpu_$(EFM32_FAMILY)' and not by 'cpu'
 VECTORS_O := $(BINDIR)/cpu_$(EFM32_FAMILY)/vectors.o
 
