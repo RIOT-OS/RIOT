@@ -61,7 +61,7 @@ static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 
 #define ED_RSSISCALE        (4U)
-#define ED_RSSIOFFS         (92U)
+#define ED_RSSIOFFS         (-92)
 
 #define RX_COMPLETE         (0x1)
 #define TX_COMPLETE         (0x2)
@@ -340,7 +340,7 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
              * Intentionally using a different calculation than the one from
              * figure 122 of the v1.1 product specification. This appears to
              * match real world performance better */
-            radio_info->rssi = (int16_t)hwlqi - ED_RSSIOFFS;
+            radio_info->rssi = (int16_t)hwlqi + ED_RSSIOFFS;
         }
     }
 
