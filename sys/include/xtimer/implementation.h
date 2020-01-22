@@ -112,7 +112,7 @@ static inline uint64_t _xtimer_now64(void)
     uint32_t now, elapsed;
 
     /* time sensitive since _xtimer_current_time is updated here */
-    uint8_t state = irq_disable();
+    unsigned state = irq_disable();
     now = _xtimer_lltimer_now();
 #if XTIMER_MASK
     elapsed = _xtimer_lltimer_mask(now - _xtimer_lltimer_mask((uint32_t)_xtimer_current_time));
