@@ -19,6 +19,10 @@ OLD_USEPKG := $(sort $(USEPKG))
 include $(RIOTBASE)/sys/Makefile.dep
 include $(RIOTBASE)/drivers/Makefile.dep
 
+ifneq (,$(filter ssp,$(USEMODULE)))
+  FEATURES_REQUIRED += ssp
+endif
+
 ifneq (,$(filter ndn-riot,$(USEPKG)))
   USEMODULE += gnrc
   USEMODULE += xtimer
