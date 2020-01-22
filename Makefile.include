@@ -517,7 +517,7 @@ RIOTLINKSEED ?= -1
 ifeq ($(BUILDOSXNATIVE),1)
   SHUFLIBS = $(shell find $(BASELIBS) -size +8c | $(RIOTTOOLS)/randsort/randsort.py --seed $(RIOTLINKSEED))
 else
-  SHUFLIBS = $(shell find $(BASELIBS) | $(RIOTTOOLS)/randsort/randsort.py --seed $(RIOTLINKSEED))
+  SHUFLIBS = $(shell printf "%s\n" $(BASELIBS) | $(RIOTTOOLS)/randsort/randsort.py --seed $(RIOTLINKSEED))
 endif
 
 # Save value to verify it is not modified later
