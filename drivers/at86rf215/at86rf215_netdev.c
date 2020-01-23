@@ -992,6 +992,11 @@ static void _isr(netdev_t *netdev)
         }
     }
 
+    /* Handle Low Battery IRQ */
+    if ((rf_irq_mask & RF_IRQ_BATLOW) && dev->batlow_cb) {
+        dev->batlow_cb(dev->batlow_arg);
+    }
+
     /* exit early if the interrupt was not for this interface */
     if (!((bb_irq_mask & bb_irqs_enabled) ||
           (rf_irq_mask & (RF_IRQ_EDC | RF_IRQ_TRXRDY)) || timeout)) {

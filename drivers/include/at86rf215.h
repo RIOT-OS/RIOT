@@ -49,6 +49,14 @@ typedef struct at86rf215_RF_regs at86rf215_RF_regs_t;
 typedef struct at86rf215_BBC_regs at86rf215_BBC_regs_t;
 
 /**
+ * @brief Signature for the Battery monitor callback.
+ *
+ * @param[in] arg           optional argument which is passed to the
+ *                          callback
+ */
+typedef void (*at86rf215_batmon_cb_t)(void *arg);
+
+/**
  * @brief   Maximum possible packet size in byte
  */
 #define AT86RF215_MAX_PKT_LENGTH        (2047)
@@ -147,6 +155,8 @@ typedef struct at86rf215 {
     struct at86rf215 *sibling;              /**< The other radio */
     const at86rf215_RF_regs_t  *RF;         /**< Radio Frontend Registers */
     const at86rf215_BBC_regs_t *BBC;        /**< Baseband Registers */
+    at86rf215_batmon_cb_t batlow_cb;        /**< callback to be called on low battery */
+    void *batlow_arg;                       /**< argument for low battery callback */
     xtimer_t timer;                         /**< timer for ACK & CSMA timeout */
     msg_t timer_msg;                        /**< message for timeout timer */
     uint32_t ack_timeout_usec;              /**< time to wait before retransmission in µs */
@@ -422,6 +432,21 @@ void at86rf215_tx_done(at86rf215_t *dev);
  * @return                  false if channel is determined busy
  */
 bool at86rf215_cca(at86rf215_t *dev);
+
+/**
+ * @brief   Generate an interrupt if supply voltage drops below the configured
+ *          threshold.
+ *
+ * @param[in] dev           device to configure
+ * @param[in] voltage       Threshold voltage in mV
+ * @param[in] cb            Callback to call if supply voltage drops below
+ *                          the configured threshold.
+ * @param[in] arg           Callback argument.
+ *
+ * @return                  0 on success, error otherwise
+ */
+int at86rf215_set_batmon(at86rf215_t *dev, unsigned voltage,
+                         at86rf215_batmon_cb_t cb, void *arg);
 
 #ifdef __cplusplus
 }

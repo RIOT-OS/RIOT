@@ -381,3 +381,52 @@ bool at86rf215_set_idle_from_rx(at86rf215_t *dev, uint8_t state)
 
     return false;
 }
+
+int at86rf215_set_batmon(at86rf215_t *dev, unsigned voltage, at86rf215_batmon_cb_t cb, void *arg)
+{
+    uint16_t base;
+    uint8_t inc;
+    uint8_t bmdvc = 0;
+    int error = INT_MAX;
+
+    if (cb == NULL) {
+        /* disable interrupt */
+        dev->batlow_cb = NULL;
+        at86rf215_reg_and(dev, dev->RF->RG_IRQM, ~RF_IRQ_BATLOW);
+        return 0;
+    }
+
+    if (voltage < 1700 || voltage > 3675) {
+        return -ERANGE;
+    }
+
+    if (voltage > 2500) {
+        /* high range */
+        base = 2550;
+        inc  = 75;
+    } else {
+        /* low range */
+        base = 1700;
+        inc  = 50;
+    }
+
+    for (uint8_t i = 0; i <= 0xF; ++i) {
+        unsigned u = base + inc * i;
+        if (abs(voltage - u) < error) {
+            error = abs(voltage - u);
+            bmdvc = i;
+        }
+    }
+
+    if (inc > 50) {
+        bmdvc |= BMDVC_BMHR_MASK;
+    }
+
+    dev->batlow_cb  = cb;
+    dev->batlow_arg = arg;
+
+    at86rf215_reg_write(dev, RG_RF_BMDVC, bmdvc);
+    at86rf215_reg_or(dev, dev->RF->RG_IRQM, RF_IRQ_BATLOW);
+
+    return 0;
+}
