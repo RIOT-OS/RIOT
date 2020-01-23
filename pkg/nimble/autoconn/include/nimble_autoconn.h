@@ -143,6 +143,8 @@ typedef struct {
     uint32_t scan_itvl;
     /** scan window applied while in scanning state [in ms] */
     uint32_t scan_win;
+    /** opening a new connection is aborted after this time [in ms] */
+    uint32_t conn_timeout;
     /** connection interval used when opening a new connection [in ms] */
     uint32_t conn_itvl;
     /** slave latency used for new connections [in ms] */

@@ -42,8 +42,6 @@
 #error "NimBLE autoconn: please select a fitting submodule"
 #endif
 
-#define CONN_TIMEOUT_MUL            (5U)
-
 enum {
     STATE_SCAN,
     STATE_ADV,
@@ -268,7 +266,7 @@ int nimble_autoconn_update(const nimble_autoconn_params_t *params,
     _conn_params.supervision_timeout = (params->conn_super_to / 10);
     _conn_params.min_ce_len = 0;
     _conn_params.max_ce_len = 0;
-    _conn_timeout = params->adv_itvl * CONN_TIMEOUT_MUL;
+    _conn_timeout = ((params->conn_timeout * 1000) / BLE_HCI_SCAN_ITVL);
 
     /* we use the same values to updated existing connections */
     struct ble_gap_upd_params conn_update_params;
