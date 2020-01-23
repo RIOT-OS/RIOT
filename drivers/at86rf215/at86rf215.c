@@ -119,6 +119,11 @@ void at86rf215_reset(at86rf215_t *dev)
     at86rf215_reg_write(dev, RG_RF_CLKO, 0);
 #endif
 
+    /* allow to configure board-specific trim */
+#ifdef AT86RF215_TRIM_VAL
+    at86rf215_reg_write(dev, RG_RF_XOC, AT86RF215_TRIM_VAL | XOC_FS_MASK);
+#endif
+
     /* enable TXFE & RXFE IRQ */
     at86rf215_reg_write(dev, dev->BBC->RG_IRQM, BB_IRQ_TXFE | BB_IRQ_RXFE);
 
