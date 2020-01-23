@@ -258,7 +258,7 @@ int nimble_autoconn_update(const nimble_autoconn_params_t *params,
     ble_npl_time_ms_to_ticks(params->period_jitter, &_period_jitter);
 
     /* populate the connection parameters */
-    _conn_params.scan_itvl = ((params->scan_itvl * 1000) / BLE_HCI_SCAN_ITVL);
+    _conn_params.scan_itvl = ((params->scan_win * 1000) / BLE_HCI_SCAN_ITVL);
     _conn_params.scan_window = ((params->scan_win * 1000) / BLE_HCI_SCAN_ITVL);
     _conn_params.itvl_min = ((params->conn_itvl * 1000) / BLE_HCI_CONN_ITVL);
     _conn_params.itvl_max = ((params->conn_itvl * 1000) / BLE_HCI_CONN_ITVL);
