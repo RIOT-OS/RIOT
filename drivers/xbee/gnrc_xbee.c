@@ -116,12 +116,12 @@ static int xbee_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     hdr = (gnrc_netif_hdr_t *)pkt->data;
     if (hdr->flags & BCAST) {
         uint16_t addr = 0xffff;
-        res = xbee_build_hdr((xbee_t *)netif, xhdr, size, &addr, 2);
+        res = xbee_build_hdr((xbee_t *)netif->dev, xhdr, size, &addr, 2);
         DEBUG("[xbee-gnrc] send: preparing to send broadcast\n");
     }
     else {
         uint8_t *addr = gnrc_netif_hdr_get_dst_addr(hdr);
-        res = xbee_build_hdr((xbee_t *)netif, xhdr, size, addr,
+        res = xbee_build_hdr((xbee_t *)netif->dev, xhdr, size, addr,
                              hdr->dst_l2addr_len);
         if (res < 0) {
             if (res == -EOVERFLOW) {
