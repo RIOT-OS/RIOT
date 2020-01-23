@@ -303,7 +303,7 @@ typedef enum {
     CC110X_TX_POWER_0_DBM,                          /**< 0 dBm */
     CC110X_TX_POWER_PLUS_5_DBM,                     /**< 5 dBm */
     CC110X_TX_POWER_PLUS_7_DBM,                     /**< 7 dBm */
-    CC110X_TX_POWER_PLUS_10_DBM,                    /**< 1 dBm */
+    CC110X_TX_POWER_PLUS_10_DBM,                    /**< 10 dBm */
     CC110X_TX_POWER_NUMOF,                          /**< Number of TX power options */
 } cc110x_tx_power_t;
 
