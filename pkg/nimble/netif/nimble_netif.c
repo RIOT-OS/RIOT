@@ -621,7 +621,7 @@ int nimble_netif_accept(const uint8_t *ad, size_t ad_len,
                             adv_params, _on_gap_slave_evt, (void *)handle);
     assert(res == 0);
 
-    _notify(handle, NIMBLE_NETIF_ACCEPTING, NULL);
+    _notify(handle, NIMBLE_NETIF_ACCEPTING, _nimble_netif->l2addr);
 
     return NIMBLE_NETIF_OK;
 }
@@ -637,6 +637,7 @@ int nimble_netif_accept_stop(void)
     assert(res == 0);
     (void)res;
     nimble_netif_conn_free(handle, NULL);
+    _notify(handle, NIMBLE_NETIF_ACCEPT_STOP, _nimble_netif->l2addr);
 
     return NIMBLE_NETIF_OK;
 }
