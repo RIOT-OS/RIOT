@@ -166,6 +166,10 @@ static void _on_netif_evt(int handle, nimble_netif_event_t event,
     switch (event) {
         case NIMBLE_NETIF_ACCEPTING:
             en = 0;
+            _evt_dbg("ACCEPTING", handle, addr);
+            break;
+        case NIMBLE_NETIF_ACCEPT_STOP:
+            _evt_dbg("ACCEPT_STOP", handle, addr);
             break;
         case NIMBLE_NETIF_INIT_MASTER:
             _evt_dbg("CONN_INIT master", handle, addr);
