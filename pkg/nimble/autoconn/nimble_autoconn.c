@@ -178,6 +178,7 @@ static void _on_netif_evt(int handle, nimble_netif_event_t event,
         case NIMBLE_NETIF_INIT_SLAVE:
             _evt_dbg("CONN_INIT slave", handle, addr);
             en = 0;
+            _state = STATE_CONN;
             break;
         case NIMBLE_NETIF_CONNECTED_MASTER:
             _evt_dbg("CONNECTED master", handle, addr);
@@ -186,6 +187,7 @@ static void _on_netif_evt(int handle, nimble_netif_event_t event,
             break;
         case NIMBLE_NETIF_CONNECTED_SLAVE:
             _evt_dbg("CONNECTED slave", handle, addr);
+            _state = STATE_IDLE;
             break;
         case NIMBLE_NETIF_CLOSED_MASTER:
             _evt_dbg("CLOSED master", handle, addr);
@@ -200,6 +202,7 @@ static void _on_netif_evt(int handle, nimble_netif_event_t event,
             break;
         case NIMBLE_NETIF_ABORT_SLAVE:
             _evt_dbg("[autoconn] ABORT slave", handle, addr);
+            _state = STATE_IDLE;
             break;
         case NIMBLE_NETIF_CONN_UPDATED:
             _evt_dbg("UPDATED", handle, addr);
