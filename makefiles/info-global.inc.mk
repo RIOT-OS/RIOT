@@ -108,3 +108,7 @@ info-boards-supported:
 
 info-boards-features-missing:
 	@for f in $(BOARDS_FEATURES_MISSING); do echo $${f}; done | column -t
+
+# Reset BOARDSDIR so unchanged for makefiles included after, for now only
+# needed for buildtests.inc.mk
+BOARDSDIR := $(BOARDSDIR_GLOBAL)
