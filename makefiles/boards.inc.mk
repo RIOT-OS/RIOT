@@ -1,5 +1,6 @@
 # Default when RIOTBASE is not set and is executed from the RIOT directory
-BOARDSDIR ?= $(or $(RIOTBASE),$(CURDIR))/boards
+RIOTBOARD ?= $(or $(RIOTBASE),$(CURDIR))/boards
+BOARDSDIR ?= $(RIOTBOARD)
 
 # List all boards in a directory
 # By default, all directories in BOARDSDIR except 'common'
