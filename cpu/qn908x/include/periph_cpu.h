@@ -142,6 +142,14 @@ enum {
 };
 
 /**
+ * @brief   CPU specific timer Counter/Timers (CTIMER) configuration
+ * @{
+ */
+#define TIMER_CHANNELS      (4)
+#define TIMER_MAX_VALUE     (0xffffffff)
+/** @} */
+
+/**
  * @brief UART module configuration options
  *
  * QN908x doesn't have any UART standalone blocks, but it has two FLEXCOMM
