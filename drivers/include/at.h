@@ -163,6 +163,11 @@ extern "C" {
 #define AT_BUF_SIZE   (1 << CONFIG_AT_BUF_SIZE_EXP)
 #endif
 
+#ifndef AT_URC_FIRST_CHAR
+/** Beginning character of an unsolicited result code */
+#define AT_URC_FIRST_CHAR '+'
+#endif
+
 /**
  * @brief   Unsolicited result code callback
  *

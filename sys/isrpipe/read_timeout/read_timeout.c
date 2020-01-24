@@ -74,3 +74,24 @@ int isrpipe_read_all_timeout(isrpipe_t *isrpipe, uint8_t *buffer, size_t count, 
 
     return pos - buffer;
 }
+
+int isrpipe_peek_one_timeout(isrpipe_t *isrpipe, uint8_t *buffer, uint32_t timeout)
+{
+    int res;
+
+    _isrpipe_timeout_t _timeout = { .mutex = &isrpipe->mutex, .flag = 0 };
+
+    xtimer_t timer = { .callback = _cb, .arg = &_timeout };
+
+    xtimer_set(&timer, timeout);
+    while ((res = tsrb_peek_one(&isrpipe->tsrb, buffer)) == -1) {
+        mutex_lock(&isrpipe->mutex);
+        if (_timeout.flag) {
+            res = -ETIMEDOUT;
+            break;
+        }
+    }
+
+    xtimer_remove(&timer);
+    return res;
+}
