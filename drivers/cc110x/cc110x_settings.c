@@ -84,7 +84,7 @@ const char cc110x_conf[CC110X_CONF_SIZE] = {
      *   (e.g. a huge frame is dropped before it fully received) which reduces
      *   the system's load. Thus, it is enabled.
      */
-    0x02,
+    CC110X_PKTCTRL1_VALUE | CC110X_PKTCTRL1_ADDR_MATCH,
     /*
      * PKTCTRL0; default: 0x45
      * Data whitening enabled, use RX/TX FIFOs, CRC enabled,
@@ -291,7 +291,7 @@ const char cc110x_conf[CC110X_CONF_SIZE] = {
      * Why not default:
      * Use a reasonable TX power level instead of the lowest.
      */
-    0x14,
+    0x10 | CC110X_TX_POWER_0_DBM,
     /*
      * FSCAL3, FSCAL2, FSCAL1, FSCAL0; defaults: 0xA9, 0x0A, 0x20, 0x0d
      * These values store calibration date of the CC1100/CC1101 transceiver.
