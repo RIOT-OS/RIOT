@@ -55,6 +55,14 @@
 #endif
 #endif /* MODULE_PERIPH_INIT */
 
+#ifdef MODULE_PERIPH_INIT_ADC_NG
+__attribute__((weak))
+void periph_adc_ng_init(void)
+{
+    /* empty fallback */
+}
+#endif
+
 void periph_init(void)
 {
 #ifdef MODULE_PERIPH_INIT
@@ -115,6 +123,10 @@ void periph_init(void)
 
 #if defined(MODULE_PERIPH_INIT_VBAT)
     vbat_init();
+#endif
+
+#ifdef MODULE_PERIPH_INIT_ADC_NG
+    periph_adc_ng_init();
 #endif
 
 #endif /* MODULE_PERIPH_INIT */

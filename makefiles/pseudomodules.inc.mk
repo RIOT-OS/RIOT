@@ -20,6 +20,7 @@
 ##
 ## @{
 
+PSEUDOMODULES += adc_ng_%
 PSEUDOMODULES += atomic_utils
 PSEUDOMODULES += base64url
 
