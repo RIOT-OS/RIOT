@@ -30,8 +30,7 @@ content/uploads/2015/08/Figura2-500x467.png)
 | I2Cs       | 3                 |
 | RTC        | 1                 |
 | Vcc        | 2.0V - 3.6V           |
-| Datasheet  |
-[Datasheet](http://www.st.com/resource/en/datasheet/stm32f411re.pdf) |
+| Datasheet  | [Datasheet](http://www.st.com/resource/en/datasheet/stm32f411re.pdf) |
 | Reference Manual | [Reference Manual](http://www.st.com/resource/en/reference_manual/dm00119316.pdf) |
 | Programming Manual | [Programming Manual](http://www.st.com/resource/en/programming_manual/dm00046982.pdf) |
 | Board Manual   | [Board Manual](http://www.st.com/resource/en/user_manual/dm00105823.pdf)|

@@ -30,8 +30,7 @@ content/uploads/2015/08/Figura2-500x467.png)
 | I2Cs       | 4                 |
 | RTC        | 1                 |
 | Vcc        | 2.0V - 3.6V           |
-| Datasheet  |
-[Datasheet](http://www.st.com/resource/en/datasheet/stm32f446re.pdf) |
+| Datasheet  | [Datasheet](http://www.st.com/resource/en/datasheet/stm32f446re.pdf) |
 | Reference Manual | [Reference Manual](http://www.st.com/web/en/resource/technical/document/reference_manual/DM00031936.pdf) |
 | Programming Manual | [Programming Manual](http://www.st.com/web/en/resource/technical/document/programming_manual/DM00051352.pdf) |
 | Board Manual   | [Board Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/DM00105823.pdf)|
