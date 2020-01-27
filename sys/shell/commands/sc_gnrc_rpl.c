@@ -278,7 +278,7 @@ int _gnrc_rpl_dodag_show(void)
 
     gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-    uint64_t tc, xnow = xtimer_now_usec64();
+    uint64_t tc;
 
     for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
         if (gnrc_rpl_instances[i].state == 0) {
@@ -292,11 +292,8 @@ int _gnrc_rpl_dodag_show(void)
                 gnrc_rpl_instances[i].mop, gnrc_rpl_instances[i].of->ocp,
                 gnrc_rpl_instances[i].min_hop_rank_inc, gnrc_rpl_instances[i].max_rank_inc);
 
-        tc = _xtimer_usec_from_ticks64(((uint64_t) dodag->trickle.msg_timer.long_offset << 32)
-                                       | dodag->trickle.msg_timer.offset)
-             - (xnow - _xtimer_usec_from_ticks64(
-                         (uint64_t)dodag->trickle.msg_timer.long_start_time << 32 | dodag->trickle.msg_timer.start_time));
-        tc = (int64_t) tc < 0 ? 0 : tc / US_PER_SEC;
+        tc = xtimer_left_usec(&dodag->trickle.msg_timer);
+        tc = (int64_t) tc == 0 ? 0 : tc / US_PER_SEC;
 
         printf("\tdodag [%s | R: %d | OP: %s | PIO: %s | "
                "TR(I=[%d,%d], k=%d, c=%d, TC=%" PRIu32 "s)]\n",
