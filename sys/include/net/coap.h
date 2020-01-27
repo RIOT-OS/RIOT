@@ -178,15 +178,24 @@ extern "C" {
  * This value is for the response to the *initial* confirmable message. The
  * timeout doubles for subsequent retries. To avoid synchronization of resends
  * across hosts, the actual timeout is chosen randomly between
- * @ref COAP_ACK_TIMEOUT and (@ref COAP_ACK_TIMEOUT * @ref COAP_RANDOM_FACTOR).
+ * @ref COAP_ACK_TIMEOUT and
+ * (@ref COAP_ACK_TIMEOUT * @ref COAP_RANDOM_FACTOR_1000 / 1000).
  */
 #ifndef COAP_ACK_TIMEOUT
 #define COAP_ACK_TIMEOUT        (2U)
 #endif
 
-/** @brief   Used to calculate upper bound for timeout; see @ref COAP_ACK_TIMEOUT */
-#ifndef COAP_RANDOM_FACTOR
-#define COAP_RANDOM_FACTOR      (1.5)
+/**
+ * @brief   Used to calculate upper bound for timeout
+ *
+ * This represents the `ACK_RANDOM_FACTOR`
+ * ([RFC 7252, section 4.2](https://tools.ietf.org/html/rfc7252#section-4.2))
+ * multiplied by 1000, to avoid floating point arithmetic.
+ *
+ * See @ref COAP_ACK_TIMEOUT
+ */
+#ifndef COAP_RANDOM_FACTOR_1000
+#define COAP_RANDOM_FACTOR_1000      (1500)
 #endif
 
 /**
