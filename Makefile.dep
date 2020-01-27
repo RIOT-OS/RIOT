@@ -720,7 +720,6 @@ ifneq (,$(filter can_linux,$(USEMODULE)))
 endif
 
 ifneq (,$(filter can,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_can
   USEMODULE += can_raw
   ifneq (,$(filter can_mbox,$(USEMODULE)))
     USEMODULE += core_mbox
