@@ -15,7 +15,7 @@
  *
  * This driver provides @ref drivers_saul capabilities.
  *
- * @note This driver uses the sensors I2C interface
+ * @note This driver uses the sensors I2C or SPI interface.
  *
  * @{
  *
@@ -34,15 +34,35 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include "periph/i2c.h"
+#include "periph/comms_bus.h"
 
+#ifdef CONFIG_LPSXXX_USE_SPI
+
+/**
+ * @brief   The sensor's default SPI parameters
+ *
+ */
+#define LPSXXX_DEFAULT_DEV      SPI_DEV(0)
+#define LPSXXX_DEFAULT_SPI_CS   GPIO_PIN(0, 0)
+#define LPSXXX_DEFAULT_SPI_CLK  (spi_clk_t)(SPI_CLK_100KHZ)
+#define LPSXXX_DEFAULT_SPI_MODE (spi_mode_t)(SPI_MODE_0)
+
+#else
+
+/**
+ * @brief   The sensors default I2C device number
+ */
+#define LPSXXX_DEFAULT_DEV      I2C_DEV(0)
 /**
  * @brief   The sensors default I2C address
  *
  * Default address corresponds to SDO/SA0 pad connected to ground. If SDO/SA0
  * pad is connected to power supply, I2C address is 0x5C.
+ *
  */
 #define LPSXXX_DEFAULT_ADDRESS  (0x5d)
+
+#endif
 
 /**
  * @brief   Return codes
@@ -50,7 +70,7 @@ extern "C" {
 enum {
     LPSXXX_OK,                  /**< Everything was fine */
     LPSXXX_ERR_NODEV,           /**< No valid device found */
-    LPSXXX_ERR_I2C,             /**< An error occurred on the I2C bus */
+    LPSXXX_ERR_NOBUS,           /**< An error occurred on the I2C/SPI bus */
 };
 
 /**
@@ -87,8 +107,10 @@ typedef enum {
  * @brief   Struct holding all parameters needed for device initialization
  */
 typedef struct {
-    i2c_t i2c;                  /**< I2C bus the sensor is connected to */
-    uint8_t addr;               /**< the devices address on the bus */
+    /**
+     * @brief   The transport parameters
+     */
+    comms_transport_t transport;
     lpsxxx_rate_t rate;         /**< tell sensor to sample with this rate */
 } lpsxxx_params_t;
 
@@ -107,7 +129,7 @@ typedef struct {
  *
  * @return              LPSXXX_OK on success
  * @return              -LPSXXX_ERR_NODEV if no valid device found
- * @return              -LPSXXX_ERR_I2C on I2C error
+ * @return              -LPSXXX_ERR_NOBUS on I2C/SPI error
  */
 int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t *params);
 
@@ -118,7 +140,7 @@ int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t *params);
  * @param[out] temp     temperature value in c°C
  *
  * @return              LPSXXX_OK on success
- * @return              -LPSXXX_ERR_I2C on I2C error
+ * @return              -LPSXXX_ERR_NOBUS on I2C/SPI error
  */
 int lpsxxx_read_temp(const lpsxxx_t *dev, int16_t *temp);
 
@@ -126,12 +148,12 @@ int lpsxxx_read_temp(const lpsxxx_t *dev, int16_t *temp);
  * @brief   Read a pressure value from the given sensor, returned in hPa
  *
  * @param[in] dev       device descriptor of sensor to read from
- * @param[out] pres     pressure value in hPa
+ * @param[out] pressure pressure value in hPa
  *
  * @return              LPSXXX_OK on success
- * @return              -LPSXXX_ERR_I2C on I2C error
+ * @return              -LPSXXX_ERR_NOBUS on I2C/SPI error
  */
-int lpsxxx_read_pres(const lpsxxx_t *dev, uint16_t *pres);
+int lpsxxx_read_pres(const lpsxxx_t *dev, uint16_t *pressure);
 
 /**
  * @brief   Enable the given sensor
@@ -139,7 +161,7 @@ int lpsxxx_read_pres(const lpsxxx_t *dev, uint16_t *pres);
  * @param[in] dev       device descriptor of sensor to enable
  *
  * @return              LPSXXX_OK on success
- * @return              -LPSXXX_ERR_I2C on I2C error
+ * @return              -LPSXXX_ERR_NOBUS on I2C/SPI error
  */
 int lpsxxx_enable(const lpsxxx_t *dev);
 
@@ -149,7 +171,7 @@ int lpsxxx_enable(const lpsxxx_t *dev);
  * @param[in] dev       device descriptor of sensor to disable
  *
  * @return              LPSXXX_OK on success
- * @return              -LPSXXX_ERR_I2C on I2C error
+ * @return              -LPSXXX_ERR_NOBUS on I2C/SPI error
  */
 int lpsxxx_disable(const lpsxxx_t *dev);
 

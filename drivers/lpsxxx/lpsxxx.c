@@ -27,7 +27,6 @@
 
 #include <stdint.h>
 
-#include "periph/i2c.h"
 #include "lpsxxx.h"
 #include "lpsxxx_internal.h"
 
@@ -50,25 +49,28 @@
 #define TEMP_DIVIDER        (100U)
 #endif
 
-#define DEV_I2C      (dev->params.i2c)
-#define DEV_ADDR     (dev->params.addr)
-#define DEV_RATE     (dev->params.rate)
-
-int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t * params)
+int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t *params)
 {
     dev->params = *params;
+    comms_bus_setup(&(dev->params.transport));
+
+    const comms_bus_params_t *bus_ptr = &(dev->params.transport.bus);
+    const comms_bus_function_t *func_ptr = &(dev->params.transport.f);
+
+    func_ptr->comms_bus_init(bus_ptr);
 
     /* Acquire exclusive access to the bus. */
-    i2c_acquire(DEV_I2C);
-    uint8_t id;
-    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_WHO_AM_I, &id, 0) < 0) {
-        i2c_release(DEV_I2C);
-        DEBUG("[lpsxxx] init: cannot read WHO_AM_I register\n");
-        return -LPSXXX_ERR_I2C;
+    func_ptr->comms_bus_acquire(bus_ptr);
+    uint8_t id = 0;
+    int ret = func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_WHO_AM_I, &id);
+    if (ret < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
+        DEBUG("[lpsxxx] init: cannot read WHO_AM_I register err=%d\n", ret);
+        return -LPSXXX_ERR_NOBUS;
     }
 
     if (id != LPSXXX_WHO_AM_I) {
-        i2c_release(DEV_I2C);
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] init: not a valid device (got %02X, expected %02X)\n",
               id, LPSXXX_WHO_AM_I);
         return -LPSXXX_ERR_NODEV;
@@ -77,10 +79,10 @@ int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t * params)
     uint8_t tmp;
 
 #if MODULE_LPS22HB
-    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_CTRL_REG2, &tmp, 0) < 0) {
-        i2c_release(DEV_I2C);
+    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_CTRL_REG2, &tmp) < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] init: cannot read LPSXXX_REG_CTRL_REG2 register\n");
-        return -LPSXXX_ERR_I2C;
+        return -LPSXXX_ERR_NOBUS;
     }
 
     /* Disable automatic increment of register address during byte access
@@ -89,34 +91,38 @@ int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t * params)
 
     DEBUG("[lpsxxx] init: update reg2, %02X\n", tmp);
 
-    if (i2c_write_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_CTRL_REG2, tmp, 0) < 0) {
-        i2c_release(DEV_I2C);
+    if (func_ptr->comms_bus_write_reg(bus_ptr, LPSXXX_REG_CTRL_REG2, tmp) < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] init: cannot write in CTRL_REG2 register\n");
-        return -LPSXXX_ERR_I2C;
+        return -LPSXXX_ERR_NOBUS;
     }
 #endif
 
+    const uint8_t rate = dev->params.rate << LPSXXX_CTRL_REG1_ODR_POS;
     /* configure device, for simple operation only CTRL_REG1 needs to be touched */
 #if MODULE_LPS331AP
-    tmp = LPSXXX_CTRL_REG1_DBDU | LPSXXX_CTRL_REG1_PD |
-            (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
+    tmp = LPSXXX_CTRL_REG1_DBDU | LPSXXX_CTRL_REG1_PD | rate;
 #elif MODULE_LPS25HB
-    tmp = LPSXXX_CTRL_REG1_BDU | LPSXXX_CTRL_REG1_PD |
-            (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
+    tmp = LPSXXX_CTRL_REG1_BDU | LPSXXX_CTRL_REG1_PD | rate;
 #elif MODULE_LPS22HB
     tmp = LPSXXX_CTRL_REG1_EN_LPFP | /* Low-pass filter configuration: ODR/9 */
-            LPSXXX_CTRL_REG1_BDU | (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
+        LPSXXX_CTRL_REG1_BDU | rate;
+#else
+    /* We should actually never enter here, but we want to keep cppcheck happy. */
+    if (rate) { /* Use rate to keep cppcheck happy. */
+        tmp = 0; /* Set tmp, to keep cppcheck happy. */
+    }
 #endif
 
     DEBUG("[lpsxxx] init: update reg1, value: %02X\n", tmp);
 
-    if (i2c_write_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_CTRL_REG1, tmp, 0) < 0) {
-        i2c_release(DEV_I2C);
+    if (func_ptr->comms_bus_write_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, tmp) < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] init: cannot write in CTRL_REG1 register\n");
-        return -LPSXXX_ERR_I2C;
+        return -LPSXXX_ERR_NOBUS;
     }
 
-    i2c_release(DEV_I2C);
+    func_ptr->comms_bus_release(bus_ptr);
 
     DEBUG("[lpsxxx] initialization successful\n");
     return LPSXXX_OK;
@@ -124,24 +130,27 @@ int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t * params)
 
 int lpsxxx_read_temp(const lpsxxx_t *dev, int16_t *temp)
 {
-    uint8_t tmp;
+    uint8_t tmp = 0;
     int16_t val = 0;
     float res = TEMP_BASE;      /* reference value -> see datasheet */
 
-    i2c_acquire(DEV_I2C);
-    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_TEMP_OUT_L, &tmp, 0) < 0) {
-        i2c_release(DEV_I2C);
+    const comms_bus_params_t *bus_ptr = &(dev->params.transport.bus);
+    const comms_bus_function_t *func_ptr = &(dev->params.transport.f);
+
+    func_ptr->comms_bus_acquire(bus_ptr);
+    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_TEMP_OUT_L, &tmp) < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] read_temp: cannot read TEMP_OUT_L register\n");
-        return -LPSXXX_ERR_I2C;
+        return -LPSXXX_ERR_NOBUS;
     }
     val |= tmp;
 
-    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_TEMP_OUT_H, &tmp, 0) < 0) {
-        i2c_release(DEV_I2C);
+    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_TEMP_OUT_H, &tmp) < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] read_temp: cannot read TEMP_OUT_H register\n");
-        return -LPSXXX_ERR_I2C;
+        return -LPSXXX_ERR_NOBUS;
     }
-    i2c_release(DEV_I2C);
+    func_ptr->comms_bus_release(bus_ptr);
     val |= ((uint16_t)tmp << 8);
 
     DEBUG("[lpsxxx] read_temp: raw data %08" PRIx32 "\n", (uint32_t)val);
@@ -154,33 +163,36 @@ int lpsxxx_read_temp(const lpsxxx_t *dev, int16_t *temp)
     return LPSXXX_OK;
 }
 
-int lpsxxx_read_pres(const lpsxxx_t *dev, uint16_t *pres)
+int lpsxxx_read_pres(const lpsxxx_t *dev, uint16_t *pressure)
 {
-    uint8_t tmp;
+    uint8_t tmp = 0;
     int32_t val = 0;
 
-    i2c_acquire(DEV_I2C);
+    const comms_bus_params_t *bus_ptr = &(dev->params.transport.bus);
+    const comms_bus_function_t *func_ptr = &(dev->params.transport.f);
 
-    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_PRESS_OUT_XL, &tmp, 0) < 0) {
-        i2c_release(DEV_I2C);
+    func_ptr->comms_bus_acquire(bus_ptr);
+
+    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_PRESS_OUT_XL, &tmp) < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] read_pres: cannot read PRES_OUT_XL register\n");
-        return -LPSXXX_ERR_I2C;
+        return -LPSXXX_ERR_NOBUS;
     }
     val |= tmp;
 
-    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_PRESS_OUT_L, &tmp, 0) < 0) {
-        i2c_release(DEV_I2C);
+    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_PRESS_OUT_L, &tmp) < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] read_pres: cannot read PRES_OUT_L register\n");
-        return -LPSXXX_ERR_I2C;
+        return -LPSXXX_ERR_NOBUS;
     }
     val |= ((uint32_t)tmp << 8);
 
-    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_PRESS_OUT_H, &tmp, 0) < 0) {
-        i2c_release(DEV_I2C);
+    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_PRESS_OUT_H, &tmp) < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] read_pres: cannot read PRES_OUT_H register\n");
-        return -LPSXXX_ERR_I2C;
+        return -LPSXXX_ERR_NOBUS;
     }
-    i2c_release(DEV_I2C);
+    func_ptr->comms_bus_release(bus_ptr);
 
     val |= ((uint32_t)tmp << 16);
 
@@ -192,50 +204,58 @@ int lpsxxx_read_pres(const lpsxxx_t *dev, uint16_t *pres)
     }
 
     /* compute actual pressure value in hPa */
-    *pres = (uint16_t)(val >> PRES_DIVIDER);
+    *pressure = (uint16_t)(val >> PRES_DIVIDER);
 
     return LPSXXX_OK;
 }
 
 int lpsxxx_enable(const lpsxxx_t *dev)
 {
-    uint8_t tmp;
+    uint8_t tmp = 0;
 
-    i2c_acquire(DEV_I2C);
-    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_CTRL_REG1, &tmp, 0) < 0) {
-        i2c_release(DEV_I2C);
+    const comms_bus_params_t *bus_ptr = &(dev->params.transport.bus);
+    const comms_bus_function_t *func_ptr = &(dev->params.transport.f);
+
+    func_ptr->comms_bus_acquire(bus_ptr);
+    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, &tmp) < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] enable: cannot read CTRL_REG1 register\n");
-        return -LPSXXX_ERR_I2C;
+        return -LPSXXX_ERR_NOBUS;
     }
+
 #if MODULE_LPS331AP || MODULE_LPS25HB
     tmp |= LPSXXX_CTRL_REG1_PD;
 #else
+    const uint8_t rate = dev->params.rate << LPSXXX_CTRL_REG1_ODR_POS;
     tmp |= LPSXXX_CTRL_REG1_EN_LPFP | /* Low-pass filter configuration: ODR/9 */
-            LPSXXX_CTRL_REG1_BDU | (DEV_RATE << LPSXXX_CTRL_REG1_ODR_POS);
+        LPSXXX_CTRL_REG1_BDU | rate;
 #endif
 
 
     DEBUG("[lpsxxx] enable: update reg1 with %02X\n", tmp);
 
-    if (i2c_write_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_CTRL_REG1, tmp, 0) < 0) {
-        i2c_release(DEV_I2C);
+    if (func_ptr->comms_bus_write_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, tmp) < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] enable: cannot write CTRL_REG1 register\n");
-        return -LPSXXX_ERR_I2C;
+        return -LPSXXX_ERR_NOBUS;
     }
-    i2c_release(DEV_I2C);
+    func_ptr->comms_bus_release(bus_ptr);
 
     return LPSXXX_OK;
 }
 
 int lpsxxx_disable(const lpsxxx_t *dev)
 {
-    uint8_t tmp;
+    uint8_t tmp = 0;
 
-    i2c_acquire(DEV_I2C);
-    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_CTRL_REG1, &tmp, 0) < 0) {
-        i2c_release(DEV_I2C);
+    const comms_bus_params_t *bus_ptr = &(dev->params.transport.bus);
+    const comms_bus_function_t *func_ptr = &(dev->params.transport.f);
+
+    func_ptr->comms_bus_acquire(bus_ptr);
+    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, &tmp) < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] disable: cannot read CTRL_REG1 register\n");
-        return -LPSXXX_ERR_I2C;
+        return -LPSXXX_ERR_NOBUS;
     }
 #if MODULE_LPS331AP || MODULE_LPS25HB
     tmp &= ~LPSXXX_CTRL_REG1_PD;
@@ -245,12 +265,12 @@ int lpsxxx_disable(const lpsxxx_t *dev)
 
     DEBUG("[lpsxxx] disable: update reg1 with %02X\n", tmp);
 
-    if (i2c_write_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_CTRL_REG1, tmp, 0) < 0) {
-        i2c_release(DEV_I2C);
+    if (func_ptr->comms_bus_write_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, tmp) < 0) {
+        func_ptr->comms_bus_release(bus_ptr);
         DEBUG("[lpsxxx] disable: cannot write CTRL_REG1 register\n");
-        return -LPSXXX_ERR_I2C;
+        return -LPSXXX_ERR_NOBUS;
     }
-    i2c_release(DEV_I2C);
+    func_ptr->comms_bus_release(bus_ptr);
 
     return LPSXXX_OK;
 }

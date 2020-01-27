@@ -37,21 +37,21 @@ int main(void)
         return 1;
     }
 
-    uint16_t pres;
+    uint16_t pressure;
     int16_t temp;
     while (1) {
         lpsxxx_enable(&dev);
         xtimer_sleep(1); /* wait a bit for the measurements to complete */
 
         lpsxxx_read_temp(&dev, &temp);
-        lpsxxx_read_pres(&dev, &pres);
+        lpsxxx_read_pres(&dev, &pressure);
         lpsxxx_disable(&dev);
 
         int temp_abs = temp / 100;
         temp -= temp_abs * 100;
 
         printf("Pressure value: %ihPa - Temperature: %2i.%02i°C\n",
-               pres, temp_abs, temp);
+               pressure, temp_abs, temp);
     }
 
     return 0;
