@@ -436,6 +436,16 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout);
 #endif
 
+/**
+ * @brief   Get remaining time of timer
+ *
+ * @param[in]   timer   timer struct to use
+ *
+ * @returns time in usec until timer triggers
+ * @returns 0 if timer is not set (or has already passed)
+ */
+uint64_t xtimer_left_usec(const xtimer_t *timer);
+
 #if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
 /**
  * @brief Set a timer that sends a message
