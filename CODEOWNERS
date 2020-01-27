@@ -118,6 +118,7 @@
 /sys/xtimer/                                @kaspar030 @MichelRottleuthner
 
 /tests/                                     @smlng @leandrolanzieri @aabadie @MichelRottleuthner @fjmolinas
+/tests/candev/                              @wosym
 /tests/emb6*                                @miri64
 /tests/gnrc*                                @miri64
 /tests/lwip*                                @miri64
