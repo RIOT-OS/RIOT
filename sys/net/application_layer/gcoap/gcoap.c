@@ -40,6 +40,9 @@
 #define GCOAP_RESOURCE_WRONG_METHOD -1
 #define GCOAP_RESOURCE_NO_PATH -2
 
+/* End of the range to pick a random timeout */
+#define TIMEOUT_RANGE_END (COAP_ACK_TIMEOUT * COAP_RANDOM_FACTOR_1000 / 1000)
+
 /* Internal functions */
 static void *_event_loop(void *arg);
 static void _listen(sock_udp_t *sock);
@@ -142,9 +145,9 @@ static void *_event_loop(void *arg)
                     unsigned i        = COAP_MAX_RETRANSMIT - memo->send_limit;
 #endif
                     uint32_t timeout  = ((uint32_t)COAP_ACK_TIMEOUT << i) * US_PER_SEC;
-#if COAP_ACK_VARIANCE > 0
-                    uint32_t variance = ((uint32_t)COAP_ACK_VARIANCE << i) * US_PER_SEC;
-                    timeout = random_uint32_range(timeout, timeout + variance);
+#if COAP_RANDOM_FACTOR_1000 > 1000
+                    uint32_t end = ((uint32_t)TIMEOUT_RANGE_END << i) * US_PER_SEC;
+                    timeout = random_uint32_range(timeout, end);
 #endif
 
                     ssize_t bytes = sock_udp_send(&_sock, memo->msg.data.pdu_buf,
@@ -768,9 +771,8 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
             if (memo->msg.data.pdu_buf) {
                 memo->send_limit  = COAP_MAX_RETRANSMIT;
                 timeout           = (uint32_t)COAP_ACK_TIMEOUT * US_PER_SEC;
-#if COAP_ACK_VARIANCE > 0
-                uint32_t variance = (uint32_t)COAP_ACK_VARIANCE * US_PER_SEC;
-                timeout = random_uint32_range(timeout, timeout + variance);
+#if COAP_RANDOM_FACTOR_1000 > 1000
+                timeout = random_uint32_range(timeout, TIMEOUT_RANGE_END * US_PER_SEC);
 #endif
             }
             else {
