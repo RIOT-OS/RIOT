@@ -1,5 +1,6 @@
 # Default when RIOTBASE is not set and is executed from the RIOT directory
-BOARDSDIR ?= $(or $(RIOTBASE),$(CURDIR))/boards
+RIOTBOARD ?= $(or $(RIOTBASE),$(CURDIR))/boards
+BOARDSDIR ?= $(RIOTBOARD)
 
 # List all boards in a directory
 # By default, all directories in BOARDSDIR except 'common'
@@ -11,8 +12,8 @@ ifneq ($(RIOTBOARD),$(BOARDSDIR))
   ALLBOARDS_RIOTBOARD ?= $(call _get_boards_in_directory,$(RIOTBOARD))
 endif
 
-# Get all boards
-ALLBOARDS ?= $(sort $(call _get_boards_in_directory,$(BOARDSDIR)) $(ALLBOARDS_RIOTBOARD))
+# Use `:=` so that it is evaluated before BOARDSDIR gets eventually changed
+ALLBOARDS := $(sort $(call _get_boards_in_directory,$(BOARDSDIR)) $(ALLBOARDS_RIOTBOARD))
 
 # Set the default value from `BOARDS`
 BOARDS ?= $(ALLBOARDS)
