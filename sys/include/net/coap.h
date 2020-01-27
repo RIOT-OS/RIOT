@@ -198,22 +198,6 @@ extern "C" {
 #define COAP_RANDOM_FACTOR_1000      (1500)
 #endif
 
-/**
- * @brief   Approximation for maximum variation for confirmable timeout
- *
- * Must be an integer, defined as:
- *
- *     (COAP_ACK_TIMEOUT * COAP_RANDOM_FACTOR) - COAP_ACK_TIMEOUT
- *
- * Like @ref COAP_ACK_TIMEOUT, this value is valid for the initial confirmable
- * message, and doubles for subsequent retries.
- *
- * This parameter is nanocoap-specific, and is not defined in RFC 7252.
- */
-#ifndef COAP_ACK_VARIANCE
-#define COAP_ACK_VARIANCE       (1U)
-#endif
-
 /** @brief   Maximum number of retransmissions for a confirmable request */
 #ifndef COAP_MAX_RETRANSMIT
 #define COAP_MAX_RETRANSMIT     (4)
