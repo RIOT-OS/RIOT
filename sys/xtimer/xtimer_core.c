@@ -43,7 +43,7 @@ static xtimer_t *timer_list_head = NULL;
 static xtimer_t *long_list_head = NULL;
 static bool _lltimer_ongoing = false;
 
-static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer);
+static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer, uint32_t now);
 static void _shoot(xtimer_t *timer);
 static inline void _update_short_timers(uint64_t *now);
 static inline void _update_long_timers(uint64_t *now);
@@ -93,7 +93,7 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
     timer->long_start_time = (uint32_t)(now >> 32);
 
     if (!long_offset) {
-        _add_timer_to_list(&timer_list_head, timer);
+        _add_timer_to_list(&timer_list_head, timer, (uint32_t)now);
 
         if (timer_list_head == timer) {
             DEBUG("_xtimer_set64(): timer is new list head. updating lltimer.\n");
@@ -101,7 +101,7 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
         }
     }
     else {
-        _add_timer_to_list(&long_list_head, timer);
+        _add_timer_to_list(&long_list_head, timer, (uint32_t)now);
         DEBUG("_xtimer_set64(): added longterm timer.\n");
     }
     irq_restore(state);
@@ -148,17 +148,21 @@ static inline void _schedule_earliest_lltimer(uint32_t now)
 /**
  * @brief compare two timers. return true if timerA expires earlier than or equal to timerB and false otherwise.
  */
-static bool _timer_comparison(xtimer_t* timerA, xtimer_t* timerB)
+static bool _timer_comparison(xtimer_t* timerA, xtimer_t* timerB, uint32_t now)
 {
     if (timerA->long_offset < timerB->long_offset) {
         return true;
     }
-    if (timerA->long_offset == timerB->long_offset
-            /* this condition is needed for when timerA was already expired before timerB starts */
-        && (timerA->start_time + timerA->offset < timerB->start_time
-            /* it is necessary to compare two offsets, instead of two absolute times */
-            || timerA->start_time + timerA->offset - timerB->start_time <= timerB->offset)) {
-        return true;
+    if (timerA->long_offset == timerB->long_offset) {
+        uint32_t elapsedA = now - timerA->start_time;
+        uint32_t elapsedB = now - timerB->start_time;
+        /* it is necessary to compare two offsets, instead of two absolute times
+         * two conditions: (1) timerA was already expired
+         *                 (2) timerA will expire earlier than or equal to timerB
+         */
+        if (timerA->offset < elapsedA || timerA->offset - elapsedA <= timerB->offset - elapsedB) {
+            return true;
+        }
     }
     return false;
 }
@@ -166,9 +170,9 @@ static bool _timer_comparison(xtimer_t* timerA, xtimer_t* timerB)
 /**
  * @brief add a timer to an ordered list of timers
  */
-static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer)
+static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer, uint32_t now)
 {
-    while (*list_head && _timer_comparison((*list_head), timer)) {
+    while (*list_head && _timer_comparison((*list_head), timer, now)) {
         list_head = &((*list_head)->next);
     }
 
@@ -227,7 +231,7 @@ static inline void _update_long_timers(uint64_t *now)
             assert(timer == long_list_head);
 
             _remove_timer_from_list(&long_list_head, timer);
-            _add_timer_to_list(&timer_list_head, timer);
+            _add_timer_to_list(&timer_list_head, timer, (uint32_t)*now);
             timer = long_list_head;
         }
         else {
