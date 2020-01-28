@@ -246,19 +246,9 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     }
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            if (len < sizeof(uint16_t)) {
-                return -EOVERFLOW;
-            }
-            *((uint16_t *)value) = kw2xrf_get_addr_short(dev);
-            return sizeof(uint16_t);
-
-        case NETOPT_ADDRESS_LONG:
-            if (len < sizeof(uint64_t)) {
-                return -EOVERFLOW;
-            }
-            *((uint64_t *)value) = kw2xrf_get_addr_long(dev);
-            return sizeof(uint64_t);
+        case NETOPT_AFILTER:
+            /* we just need something different to -ENOTSUP */
+            return 0;
 
         case NETOPT_STATE:
             if (len < sizeof(netopt_state_t)) {
@@ -378,6 +368,13 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     return netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, value, len);
 }
 
+static inline void _set_addr_filter(kw2xrf_t *dev, const ieee802154_addr_filter_params_t *filter)
+{
+    kw2xrf_set_addr_short(dev, *((uint16_t *)filter->short_addr));
+    kw2xrf_set_addr_long(dev, *((uint64_t *)filter->ext_addr));
+    kw2xrf_set_pan(dev, filter->panid);
+}
+
 static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
@@ -388,37 +385,11 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
     }
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            if (len > sizeof(uint16_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                kw2xrf_set_addr_short(dev, *((uint16_t *)value));
-                res = sizeof(uint16_t);
-            }
+        case NETOPT_AFILTER:
+            assert(len == sizeof(ieee802154_addr_filter_params_t));
+            _set_addr_filter(dev, value);
+            res = sizeof(ieee802154_addr_filter_params_t);
             break;
-
-        case NETOPT_ADDRESS_LONG:
-            if (len > sizeof(uint64_t)) {
-                return -EOVERFLOW;
-            }
-            else {
-                kw2xrf_set_addr_long(dev, *((uint64_t *)value));
-                res = sizeof(uint64_t);
-            }
-            break;
-
-        case NETOPT_NID:
-            if (len > sizeof(uint16_t)) {
-                return -EOVERFLOW;
-            }
-
-            else {
-                kw2xrf_set_pan(dev, *((uint16_t *)value));
-                /* don't set res to set netdev_ieee802154_t::pan */
-            }
-            break;
-
         case NETOPT_CHANNEL:
             if (len != sizeof(uint16_t)) {
                 res = -EINVAL;
