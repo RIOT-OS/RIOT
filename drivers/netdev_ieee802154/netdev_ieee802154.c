@@ -190,12 +190,15 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
              * 0 for unicast addresses */
             dev->short_addr[0] &= 0x7F;
 #endif
+
+            netdev_ieee802154_set_addr_filter(dev, (network_uint16_t*) dev->short_addr, (eui64_t*) dev->long_addr, dev->pan);
             res = sizeof(dev->short_addr);
             break;
         case NETOPT_ADDRESS_LONG:
             assert(len <= sizeof(dev->long_addr));
             memset(dev->long_addr, 0, sizeof(dev->long_addr));
             memcpy(dev->long_addr, value, len);
+            netdev_ieee802154_set_addr_filter(dev, (network_uint16_t*) dev->short_addr, (eui64_t*) dev->long_addr, dev->pan);
             res = sizeof(dev->long_addr);
             break;
         case NETOPT_ADDR_LEN:
@@ -217,6 +220,7 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
         case NETOPT_NID:
             assert(len == sizeof(dev->pan));
             dev->pan = *((uint16_t *)value);
+            netdev_ieee802154_set_addr_filter(dev, (network_uint16_t*) dev->short_addr, (eui64_t*) dev->long_addr, dev->pan);
             res = sizeof(dev->pan);
             break;
         case NETOPT_ACK_REQ:
