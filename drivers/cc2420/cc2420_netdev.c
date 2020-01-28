@@ -172,19 +172,9 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     switch (opt) {
 
-        case NETOPT_ADDRESS:
-            assert(max_len >= sizeof(uint16_t));
-            cc2420_get_addr_short(dev, val);
-            return sizeof(uint16_t);
-
-        case NETOPT_ADDRESS_LONG:
-            assert(max_len >= 8);
-            cc2420_get_addr_long(dev, val);
-            return 8;
-
-        case NETOPT_NID:
-            assert(max_len >= sizeof(uint16_t));
-            return w_u16(val, cc2420_get_pan(dev));
+        case NETOPT_AFILTER:
+            /* we just need something different to -ENOTSUP */
+            return 0;
 
         case NETOPT_CHANNEL:
             assert(max_len >= sizeof(uint16_t));
@@ -231,6 +221,13 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     }
 }
 
+static inline void _set_addr_filter(cc2420_t *dev, const ieee802154_addr_filter_params_t *filter)
+{
+    cc2420_set_addr_short(dev, (uint8_t*) filter->short_addr);
+    cc2420_set_addr_long(dev, (uint8_t*) filter->ext_addr);
+    cc2420_set_pan(dev, filter->panid);
+}
+
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t val_len)
 {
     if (netdev == NULL) {
@@ -238,24 +235,15 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t val_len)
     }
 
     cc2420_t *dev = (cc2420_t *)netdev;
+    const ieee802154_addr_filter_params_t *filter;
 
     int ext = netdev_ieee802154_set(&dev->netdev, opt, val, val_len);
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            assert(val_len == 2);
-            cc2420_set_addr_short(dev, val);
-            return 2;
-
-        case NETOPT_ADDRESS_LONG:
-            assert(val_len == 8);
-            cc2420_set_addr_long(dev, val);
-            return 8;
-
-        case NETOPT_NID:
-            assert(val_len == sizeof(uint16_t));
-            cc2420_set_pan(dev, to_u16(val));
-            return sizeof(uint16_t);
+        case NETOPT_AFILTER:
+            filter = val;
+            _set_addr_filter(dev, filter);
+            return sizeof(ieee802154_addr_filter_params_t);
 
         case NETOPT_CHANNEL:
             assert(val_len == sizeof(uint16_t));
