@@ -49,7 +49,7 @@ static int _init(netdev_t *netdev);
 static void _isr(netdev_t *netdev);
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len);
-static void _set_addr_filter(void *dev, network_uint16_t *short_addr,
+static void _set_addr_filter(netdev_ieee802154_t *dev, network_uint16_t *short_addr,
                                eui64_t *ext_addr, uint16_t panid);
 
 const netdev_driver_t at86rf2xx_driver = {
