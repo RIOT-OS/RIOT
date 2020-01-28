@@ -42,7 +42,7 @@
 #define GCOAP_RESOURCE_NO_PATH -2
 
 /* End of the range to pick a random timeout */
-#define TIMEOUT_RANGE_END (COAP_ACK_TIMEOUT * COAP_RANDOM_FACTOR_1000 / 1000)
+#define TIMEOUT_RANGE_END (CONFIG_COAP_ACK_TIMEOUT * COAP_RANDOM_FACTOR_1000 / 1000)
 
 /* Internal functions */
 static void *_event_loop(void *arg);
@@ -249,7 +249,7 @@ static void _on_resp_timeout(void *arg) {
 #else
         unsigned i        = COAP_MAX_RETRANSMIT - memo->send_limit;
 #endif
-        uint32_t timeout  = ((uint32_t)COAP_ACK_TIMEOUT << i) * US_PER_SEC;
+        uint32_t timeout  = ((uint32_t)CONFIG_COAP_ACK_TIMEOUT << i) * US_PER_SEC;
 #if COAP_RANDOM_FACTOR_1000 > 1000
         uint32_t end = ((uint32_t)TIMEOUT_RANGE_END << i) * US_PER_SEC;
         timeout = random_uint32_range(timeout, end);
@@ -773,7 +773,7 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
             }
             if (memo->msg.data.pdu_buf) {
                 memo->send_limit  = COAP_MAX_RETRANSMIT;
-                timeout           = (uint32_t)COAP_ACK_TIMEOUT * US_PER_SEC;
+                timeout           = (uint32_t)CONFIG_COAP_ACK_TIMEOUT * US_PER_SEC;
 #if COAP_RANDOM_FACTOR_1000 > 1000
                 timeout = random_uint32_range(timeout, TIMEOUT_RANGE_END * US_PER_SEC);
 #endif

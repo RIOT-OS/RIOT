@@ -136,7 +136,7 @@ static ssize_t _nanocoap_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
 
     /* TODO: timeout random between between ACK_TIMEOUT and (ACK_TIMEOUT *
      * ACK_RANDOM_FACTOR) */
-    uint32_t timeout = COAP_ACK_TIMEOUT * US_PER_SEC;
+    uint32_t timeout = CONFIG_COAP_ACK_TIMEOUT * US_PER_SEC;
     uint32_t deadline = deadline_from_interval(timeout);
 
     /* add 1 for initial transmit */
