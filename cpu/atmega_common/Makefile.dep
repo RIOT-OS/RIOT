@@ -1,5 +1,14 @@
+# avr libc needs some RIOT-specific support code
+USEMODULE += avr_libc_extra
+
 # tell the build system to build the atmega common files
 USEMODULE += atmega_common
+
+# peripheral drivers are linked into the final binary
+USEMODULE += atmega_common_periph
+
+# the atmel port uses stdio_uart
+USEMODULE += stdio_uart
 
 # expand atmega_pcint module
 ifneq (,$(filter atmega_pcint,$(USEMODULE)))

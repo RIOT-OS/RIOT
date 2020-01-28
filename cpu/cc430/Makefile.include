@@ -1,3 +1,1 @@
 include $(RIOTCPU)/msp430_common/Makefile.include
-
-export USEMODULE += periph

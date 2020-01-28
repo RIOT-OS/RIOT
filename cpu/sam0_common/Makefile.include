@@ -31,7 +31,4 @@ LINKER_SCRIPT ?= cortexm.ld
 # define sam0 specific pseudomodules
 PSEUDOMODULES += sam0_periph_uart_hw_fc
 
-# include sam0 common periph drivers
-USEMODULE += sam0_common_periph
-
 INCLUDES += -I$(RIOTCPU)/sam0_common/include

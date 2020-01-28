@@ -3,11 +3,6 @@ export TARGET_ARCH ?= arm-none-eabi
 
 INCLUDES += -I$(RIOTBASE)/cpu/arm7_common/include/
 
-# use common ARM7 periph code
-USEMODULE += arm7_common_periph
-# use the nano-specs of Newlib when available
-USEMODULE += newlib_nano
-
 # currently only arm7tdmi-s is supported by RIOT, but allow overriding MCPU
 # if someone wants to add support for other ARM7 CPUs
 MCPU ?= arm7tdmi-s

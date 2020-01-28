@@ -1,3 +1,11 @@
+USEMODULE += newlib_nano
+
+USEMODULE += newlib_syscalls_fe310
+USEMODULE += sifive_drivers_fe310
+
+USEMODULE += periph
+USEMODULE += periph_pm
+
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
