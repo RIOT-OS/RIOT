@@ -185,6 +185,11 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
             assert(len <= sizeof(dev->short_addr));
             memset(dev->short_addr, 0, sizeof(dev->short_addr));
             memcpy(dev->short_addr, value, len);
+#ifdef MODULE_SIXLOWPAN
+            /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
+             * 0 for unicast addresses */
+            dev->short_addr[0] &= 0x7F;
+#endif
             res = sizeof(dev->short_addr);
             break;
         case NETOPT_ADDRESS_LONG:
