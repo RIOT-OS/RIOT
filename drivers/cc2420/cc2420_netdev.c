@@ -172,10 +172,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     switch (opt) {
 
-        case NETOPT_AFILTER:
-            /* we just need something different to -ENOTSUP */
-            return 0;
-
         case NETOPT_CHANNEL:
             assert(max_len >= sizeof(uint16_t));
             return w_u16(val, cc2420_get_chan(dev));
@@ -221,11 +217,12 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     }
 }
 
-static inline void _set_addr_filter(cc2420_t *dev, const ieee802154_addr_filter_params_t *filter)
+static void _set_addr_filter(netdev_ieee802154_t *dev, network_uint16_t *short_addr,
+                               eui64_t *ext_addr, uint16_t panid)
 {
-    cc2420_set_addr_short(dev, (uint8_t*) filter->short_addr);
-    cc2420_set_addr_long(dev, (uint8_t*) filter->ext_addr);
-    cc2420_set_pan(dev, filter->panid);
+    cc2420_set_addr_short((cc2420_t *)dev, (uint8_t*) short_addr);
+    cc2420_set_addr_long((cc2420_t *)dev, (uint8_t*) ext_addr);
+    cc2420_set_pan((cc2420_t *)dev, panid);
 }
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t val_len)
@@ -235,16 +232,10 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t val_len)
     }
 
     cc2420_t *dev = (cc2420_t *)netdev;
-    const ieee802154_addr_filter_params_t *filter;
 
     int ext = netdev_ieee802154_set(&dev->netdev, opt, val, val_len);
 
     switch (opt) {
-        case NETOPT_AFILTER:
-            filter = val;
-            _set_addr_filter(dev, filter);
-            return sizeof(ieee802154_addr_filter_params_t);
-
         case NETOPT_CHANNEL:
             assert(val_len == sizeof(uint16_t));
             return cc2420_set_chan(dev, to_u16(val));
@@ -288,3 +279,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t val_len)
 
     return 0;
 }
+
+const netdev_ieee802154_ops_t cc2420_ieee802154_ops = {
+    .set_hw_addr = _set_addr_filter
+};

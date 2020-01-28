@@ -37,6 +37,7 @@ void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params)
 {
     /* set pointer to the devices netdev functions */
     dev->netdev.netdev.driver = &cc2420_driver;
+    dev->netdev.ops = &cc2420_ieee802154_ops;
     /* pull in device configuration parameters */
     dev->params = *params;
     dev->state = CC2420_STATE_IDLE;
