@@ -135,12 +135,6 @@ void mrf24j40_set_addr_short(mrf24j40_t *dev, uint16_t addr)
     network_uint16_t naddr;
     naddr.u16 = addr;
 
-#ifdef MODULE_SIXLOWPAN
-    /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
-     * 0 for unicast addresses */
-    naddr.u8[0] &= 0x7F;
-#endif
-
     mrf24j40_reg_write_short(dev, MRF24J40_REG_SADRL,
                              naddr.u8[1]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_SADRH,
@@ -248,11 +242,6 @@ void mrf24j40_set_chan(mrf24j40_t *dev, uint8_t channel)
      * the RF State Machine Reset, to allow the RF circuitry to calibrate.
      */
     mrf24j40_reset_state_machine(dev);
-}
-
-uint16_t mrf24j40_get_pan(mrf24j40_t *dev)
-{
-    return dev->netdev.pan;
 }
 
 void mrf24j40_set_pan(mrf24j40_t *dev, uint16_t pan)
