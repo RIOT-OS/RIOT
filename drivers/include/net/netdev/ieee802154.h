@@ -20,6 +20,7 @@
 #ifndef NET_NETDEV_IEEE802154_H
 #define NET_NETDEV_IEEE802154_H
 
+#include <stdbool.h>
 #include "net/ieee802154.h"
 #include "net/gnrc/nettype.h"
 #include "net/netopt.h"
@@ -118,10 +119,49 @@ typedef struct {
     /** @} */
 } netdev_ieee802154_t;
 
+
 /**
  * @brief   Received packet status information for IEEE 802.15.4 radios
  */
 typedef struct netdev_radio_rx_info netdev_ieee802154_rx_info_t;
+
+/**
+ * @brief Check whether a @ref netdev_ieee802154_t device has hardware address
+ *        filter support
+ *
+ * @param[in] dev       network device descriptor
+ *
+ * @return              true if the device supports address filtering
+ */
+static inline bool netdev_ieee802154_has_addr_filter(netdev_ieee802154_t *dev)
+{
+    netdev_t *netdev = (netdev_t*) dev;
+    return netdev->driver->get(netdev, NETOPT_AFILTER, NULL, 0) == 0;
+}
+
+/**
+ * @brief Configure hardware address filter in a given network device
+ *
+ * @param[i] dev        network device descriptor
+ * @param[i] short_addr IEEE802.15.4 short address
+ * @param[i] ext_addr   IEEE802.15.4 extended address
+ * @param[i] panid      IEEE802.15.4 PAN-ID
+ *
+ * @return              0 on success
+ * @return              -ENOTSUP if the device doesn't support address filtering.
+ */
+static inline int netdev_ieee802154_set_addr_filter(netdev_ieee802154_t *dev, network_uint16_t *short_addr, eui64_t *ext_addr, uint16_t panid)
+{
+    netdev_t *netdev = (netdev_t*) dev;
+
+    ieee802154_addr_filter_params_t filter = {
+        .short_addr = short_addr,
+        .ext_addr = ext_addr,
+        .panid = panid
+    };
+
+    return netdev->driver->set(netdev, NETOPT_AFILTER, &filter, sizeof(filter));
+}
 
 /**
  * @brief   Reset function for ieee802154 common fields
