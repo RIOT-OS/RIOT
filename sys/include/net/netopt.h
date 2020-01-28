@@ -694,6 +694,17 @@ typedef enum {
     NETOPT_LINK_CHECK,
 
     /**
+     * @brief (bool, ieee802154_addr_filter_params_t) Configure or check support
+     *        for hardware address filter
+     *
+     * When get, the network device should return 0 or -ENOTSUP (if the device
+     * doesn't support source address filtering)
+     * When set, it sets all L2 addresses from @ref ieee802154_addr_filter_params_t
+     * in the address filter of the network device
+     */
+    NETOPT_AFILTER,
+
+    /**
      * @brief   maximum number of options defined here.
      *
      * @note    Interfaces are not meant to respond to this option
