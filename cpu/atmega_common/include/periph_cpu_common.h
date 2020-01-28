@@ -174,7 +174,6 @@ typedef struct {
  * @brief   WDT can be stopped on AVR
  */
 #define WDT_HAS_STOP                    (1)
-/** @} */
 
 /**
  * @name RTT configuration
