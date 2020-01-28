@@ -167,6 +167,7 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
                            size_t len)
 {
     int res = -ENOTSUP;
+    bool _set_addr = false;
 
     switch (opt) {
         case NETOPT_CHANNEL:
@@ -191,15 +192,15 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
             dev->short_addr[0] &= 0x7F;
 #endif
 
-            netdev_ieee802154_set_addr_filter(dev, (network_uint16_t*) dev->short_addr, (eui64_t*) dev->long_addr, dev->pan);
             res = sizeof(dev->short_addr);
+            _set_addr = true;
             break;
         case NETOPT_ADDRESS_LONG:
             assert(len <= sizeof(dev->long_addr));
             memset(dev->long_addr, 0, sizeof(dev->long_addr));
             memcpy(dev->long_addr, value, len);
-            netdev_ieee802154_set_addr_filter(dev, (network_uint16_t*) dev->short_addr, (eui64_t*) dev->long_addr, dev->pan);
             res = sizeof(dev->long_addr);
+            _set_addr = true;
             break;
         case NETOPT_ADDR_LEN:
         case NETOPT_SRC_LEN:
@@ -220,8 +221,8 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
         case NETOPT_NID:
             assert(len == sizeof(dev->pan));
             dev->pan = *((uint16_t *)value);
-            netdev_ieee802154_set_addr_filter(dev, (network_uint16_t*) dev->short_addr, (eui64_t*) dev->long_addr, dev->pan);
             res = sizeof(dev->pan);
+            _set_addr = true;
             break;
         case NETOPT_ACK_REQ:
             if ((*(bool *)value)) {
@@ -258,6 +259,10 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
 #endif
         default:
             break;
+    }
+    if(_set_addr && netdev_ieee802154_has_addr_filter(dev)) {
+        netdev_ieee802154_set_addr_filter(dev, (network_uint16_t*) dev->short_addr,
+                                          (eui64_t*) dev->long_addr, dev->pan);
     }
     return res;
 }
