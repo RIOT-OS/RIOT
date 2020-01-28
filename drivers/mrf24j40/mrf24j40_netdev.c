@@ -170,11 +170,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     int res;
     switch (opt) {
-        case NETOPT_AFILTER:
-            /* we just need something different to -ENOTSUP */
-            res = 0;
-            break;
-
         case NETOPT_CHANNEL_PAGE:
             if (max_len < sizeof(uint16_t)) {
                 res = -EOVERFLOW;
@@ -347,11 +342,12 @@ static int _set_state(mrf24j40_t *dev, netopt_state_t state)
     return sizeof(netopt_state_t);
 }
 
-static inline void _set_addr_filter(mrf24j40_t *dev, const ieee802154_addr_filter_params_t* filter)
+static void _set_addr_filter(netdev_ieee802154_t *dev, network_uint16_t *short_addr,
+                               eui64_t *ext_addr, uint16_t panid)
 {
-    mrf24j40_set_addr_short(dev, *((const uint16_t *) filter->short_addr));
-    mrf24j40_set_addr_long(dev, *((const uint64_t *) filter->ext_addr));
-    mrf24j40_set_pan(dev, filter->panid );
+    mrf24j40_set_addr_short((mrf24j40_t *)dev, *((const uint16_t *) short_addr));
+    mrf24j40_set_addr_long((mrf24j40_t *)dev, *((const uint64_t *) ext_addr));
+    mrf24j40_set_pan((mrf24j40_t *)dev, panid);
 }
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
@@ -364,12 +360,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     }
 
     switch (opt) {
-        case NETOPT_AFILTER:
-            assert(len == sizeof(ieee802154_addr_filter_params_t));
-            _set_addr_filter(dev, val);
-            res = sizeof(ieee802154_addr_filter_params_t);
-            break;
-
         case NETOPT_CHANNEL:
             if (len != sizeof(uint16_t)) {
                 res = -EINVAL;
@@ -555,4 +545,8 @@ const netdev_driver_t mrf24j40_driver = {
     .isr = _isr,
     .get = _get,
     .set = _set,
+};
+
+const netdev_ieee802154_ops_t mrf24j40_ieee802154_ops = {
+    .set_hw_addr = _set_addr_filter
 };

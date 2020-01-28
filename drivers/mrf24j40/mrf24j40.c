@@ -36,6 +36,7 @@ void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params)
     netdev_t *netdev = (netdev_t *)dev;
 
     netdev->driver = &mrf24j40_driver;
+    dev->netdev.ops = &mrf24j40_ieee802154_ops;
     /* initialize device descriptor */
     dev->params = *params;
 }

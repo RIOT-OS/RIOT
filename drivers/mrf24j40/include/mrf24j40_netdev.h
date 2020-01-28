@@ -32,6 +32,11 @@ extern "C" {
  */
 extern const netdev_driver_t mrf24j40_driver;
 
+/**
+ * @brief   Reference to the netdev_ieee802154 ops struct
+ */
+const netdev_ieee802154_ops_t mrf24j40_ieee802154_ops;
+
 
 #ifdef __cplusplus
 }
