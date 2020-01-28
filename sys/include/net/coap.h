@@ -181,7 +181,7 @@ extern "C" {
  * timeout doubles for subsequent retries. To avoid synchronization of resends
  * across hosts, the actual timeout is chosen randomly between
  * @ref CONFIG_COAP_ACK_TIMEOUT and
- * (@ref CONFIG_COAP_ACK_TIMEOUT * @ref COAP_RANDOM_FACTOR_1000 / 1000).
+ * (@ref CONFIG_COAP_ACK_TIMEOUT * @ref CONFIG_COAP_RANDOM_FACTOR_1000 / 1000).
  */
 #ifndef CONFIG_COAP_ACK_TIMEOUT
 #define CONFIG_COAP_ACK_TIMEOUT        (2U)
@@ -196,8 +196,8 @@ extern "C" {
  *
  * See @ref CONFIG_COAP_ACK_TIMEOUT
  */
-#ifndef COAP_RANDOM_FACTOR_1000
-#define COAP_RANDOM_FACTOR_1000      (1500)
+#ifndef CONFIG_COAP_RANDOM_FACTOR_1000
+#define CONFIG_COAP_RANDOM_FACTOR_1000      (1500)
 #endif
 
 /** @brief   Maximum number of retransmissions for a confirmable request */
