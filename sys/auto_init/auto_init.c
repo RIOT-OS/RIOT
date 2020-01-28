@@ -159,7 +159,7 @@ void auto_init(void)
     openthread_bootstrap();
 #endif
 #ifdef MODULE_GCOAP
-    if (!IS_ACTIVE(GCOAP_NO_AUTO_INIT)) {
+    if (!IS_ACTIVE(CONFIG_GCOAP_NO_AUTO_INIT)) {
         DEBUG("Auto init gcoap module.\n");
         gcoap_init();
     }
