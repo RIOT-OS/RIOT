@@ -140,7 +140,7 @@ static ssize_t _nanocoap_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
     uint32_t deadline = deadline_from_interval(timeout);
 
     /* add 1 for initial transmit */
-    unsigned tries_left = COAP_MAX_RETRANSMIT + 1;
+    unsigned tries_left = CONFIG_COAP_MAX_RETRANSMIT + 1;
 
     while (tries_left) {
         if (res == -EAGAIN) {

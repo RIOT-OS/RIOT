@@ -201,8 +201,8 @@ extern "C" {
 #endif
 
 /** @brief   Maximum number of retransmissions for a confirmable request */
-#ifndef COAP_MAX_RETRANSMIT
-#define COAP_MAX_RETRANSMIT     (4)
+#ifndef CONFIG_COAP_MAX_RETRANSMIT
+#define CONFIG_COAP_MAX_RETRANSMIT     (4)
 #endif
 /** @} */
 /** @} */
