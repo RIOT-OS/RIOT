@@ -50,10 +50,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     }
 
     switch (opt) {
-        case NETOPT_AFILTER:
-            /* we just need something different to -ENOTSUP */
-            return 0;
-
         case NETOPT_AUTOACK:
             if (RFCORE->XREG_FRMCTRL0bits.AUTOACK) {
                 *((netopt_enable_t *)value) = NETOPT_ENABLE;
@@ -134,17 +130,18 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     return -ENOTSUP;
 }
 
-static inline void _set_addr_filter(const ieee802154_addr_filter_params_t *filter)
+static void _set_addr_filter(netdev_ieee802154_t *dev, network_uint16_t *short_addr,
+                               eui64_t *ext_addr, uint16_t panid)
 {
-    cc2538_set_addr_short(*((const uint16_t*)filter->short_addr));
-    cc2538_set_addr_long(*((const uint64_t*)filter->ext_addr));
-    cc2538_set_pan(filter->panid);
+    (void) dev;
+    cc2538_set_addr_short(*((const uint16_t*)short_addr));
+    cc2538_set_addr_long(*((const uint64_t*)ext_addr));
+    cc2538_set_pan(panid);
 }
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_len)
 {
     cc2538_rf_t *dev = (cc2538_rf_t *)netdev;
-    const ieee802154_addr_filter_params_t *filter;
     int res = -ENOTSUP;
 
     if (dev == NULL) {
@@ -152,12 +149,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
     }
 
     switch (opt) {
-        case NETOPT_AFILTER:
-            filter = value;
-            _set_addr_filter(filter);
-            res = sizeof(ieee802154_addr_filter_params_t);
-            break;
-
         case NETOPT_AUTOACK:
             RFCORE->XREG_FRMCTRL0bits.AUTOACK = ((const bool *)value)[0];
             res = sizeof(netopt_enable_t);
@@ -370,4 +361,8 @@ const netdev_driver_t cc2538_rf_driver = {
     .recv = _recv,
     .isr  = _isr,
     .init = _init,
+};
+
+const netdev_ieee802154_ops_t cc2538_ieee802154_ops = {
+    .set_hw_addr = _set_addr_filter
 };

@@ -175,6 +175,7 @@ void cc2538_setup(cc2538_rf_t *dev)
     netdev_t *netdev = (netdev_t *)dev;
 
     netdev->driver = &cc2538_rf_driver;
+    dev->netdev.ops = &cc2538_ieee802154_ops;
 
     cc2538_init();
 }

@@ -31,6 +31,11 @@ extern "C" {
  */
 extern const netdev_driver_t cc2538_rf_driver;
 
+/**
+ * @brief   Reference to the netdev_ieee802154 ops struct
+ */
+extern const netdev_ieee802154_ops_t cc2538_ieee802154_ops;
+
 #ifdef __cplusplus
 }
 #endif
