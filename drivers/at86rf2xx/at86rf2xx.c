@@ -42,6 +42,7 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     netdev_t *netdev = (netdev_t *)dev;
 
     netdev->driver = &at86rf2xx_driver;
+    dev->netdev.ops = &at86rf2xx_ieee802154_ops;
     /* State to return after receiving or transmitting */
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
     /* radio state is P_ON when first powered-on */

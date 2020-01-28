@@ -49,6 +49,8 @@ static int _init(netdev_t *netdev);
 static void _isr(netdev_t *netdev);
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len);
+static void _set_addr_filter(void *dev, network_uint16_t *short_addr,
+                               eui64_t *ext_addr, uint16_t panid);
 
 const netdev_driver_t at86rf2xx_driver = {
     .send = _send,
@@ -57,6 +59,10 @@ const netdev_driver_t at86rf2xx_driver = {
     .isr = _isr,
     .get = _get,
     .set = _set,
+};
+
+const netdev_ieee802154_ops_t at86rf2xx_ieee802154_ops = {
+    .set_hw_addr = _set_addr_filter
 };
 
 #if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
@@ -300,11 +306,12 @@ netopt_state_t _get_state(at86rf2xx_t *dev)
     }
 }
 
-static inline void _set_addr_filter(at86rf2xx_t *dev, const ieee802154_addr_filter_params_t *filter)
+static void _set_addr_filter(netdev_ieee802154_t *dev, network_uint16_t *short_addr,
+                               eui64_t *ext_addr, uint16_t panid)
 {
-    at86rf2xx_set_addr_short(dev, filter->short_addr);
-    at86rf2xx_set_addr_long(dev, filter->ext_addr);
-    at86rf2xx_set_pan(dev, filter->panid);
+    at86rf2xx_set_addr_short((at86rf2xx_t* )dev, short_addr);
+    at86rf2xx_set_addr_long((at86rf2xx_t* )dev, ext_addr);
+    at86rf2xx_set_pan((at86rf2xx_t* )dev, panid);
 }
 
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
@@ -317,10 +324,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     /* getting these options doesn't require the transceiver to be responsive */
     switch (opt) {
-        case NETOPT_AFILTER:
-            /* we just need something different to -ENOTSUP */
-            return 0;
-
         case NETOPT_CHANNEL_PAGE:
             assert(max_len >= sizeof(uint16_t));
             ((uint8_t *)val)[1] = 0;
@@ -465,7 +468,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
     uint8_t old_state = at86rf2xx_get_status(dev);
     int res = -ENOTSUP;
-    const ieee802154_addr_filter_params_t *filter;
 
     if (dev == NULL) {
         return -ENODEV;
@@ -480,11 +482,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     }
 
     switch (opt) {
-        case NETOPT_AFILTER:
-            filter = val;
-            _set_addr_filter(dev, filter);
-            res = sizeof(ieee802154_addr_filter_params_t);
-            break;
         case NETOPT_CHANNEL:
             assert(len == sizeof(uint16_t));
             uint8_t chan = (((const uint16_t *)val)[0]) & UINT8_MAX;
