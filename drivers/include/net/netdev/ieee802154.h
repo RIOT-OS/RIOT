@@ -133,6 +133,7 @@ struct netdev_ieee802154_ops {
      * @brief Set IEEE addresses to the hardware accelerator of an
      * network device
      *
+     * @pre (short_addr != NULL), (ext_addr != NULL)
      * @note Set to NULL if the device doesn't support address filtering.
      *
      * @param[in] dev           network device descriptor
