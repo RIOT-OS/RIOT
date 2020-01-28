@@ -498,7 +498,6 @@ extern "C" {
  * CONFIG_GCOAP_NO_RETRANS_BACKOFF is defined this doubling does not happen.
  *
  * @see COAP_ACK_TIMEOUT
- * @see COAP_ACK_VARIANCE
  */
 #define CONFIG_GCOAP_NO_RETRANS_BACKOFF
 #endif
