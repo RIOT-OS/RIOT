@@ -36,6 +36,7 @@
 #include "debug.h"
 
 static const netdev_driver_t nrf802154_netdev_driver;
+static const netdev_ieee802154_ops_t nrf802154_ieee802154_ops;
 
 netdev_ieee802154_t nrf802154_dev = {
     {
@@ -54,7 +55,8 @@ netdev_ieee802154_t nrf802154_dev = {
     .short_addr = { 0, 0 },
     .long_addr = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .chan = IEEE802154_DEFAULT_CHANNEL,
-    .flags = 0
+    .flags = 0,
+    .ops = &nrf802154_ieee802154_ops,
 };
 
 static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
