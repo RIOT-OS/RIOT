@@ -28,6 +28,11 @@ extern "C" {
  */
 extern const netdev_driver_t kw2xrf_driver;
 
+/**
+ * @brief   Reference to the netdev_ieee802154 ops struct
+ */
+extern const netdev_ieee802154_ops_t kw2xrf_ieee802154_ops;
+
 #ifdef __cplusplus
 }
 #endif

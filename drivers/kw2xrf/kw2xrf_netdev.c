@@ -246,10 +246,6 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     }
 
     switch (opt) {
-        case NETOPT_AFILTER:
-            /* we just need something different to -ENOTSUP */
-            return 0;
-
         case NETOPT_STATE:
             if (len < sizeof(netopt_state_t)) {
                 return -EOVERFLOW;
@@ -368,11 +364,12 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     return netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, value, len);
 }
 
-static inline void _set_addr_filter(kw2xrf_t *dev, const ieee802154_addr_filter_params_t *filter)
+static void _set_addr_filter(netdev_ieee802154_t *dev, network_uint16_t *short_addr,
+                               eui64_t *ext_addr, uint16_t panid)
 {
-    kw2xrf_set_addr_short(dev, *((uint16_t *)filter->short_addr));
-    kw2xrf_set_addr_long(dev, *((uint64_t *)filter->ext_addr));
-    kw2xrf_set_pan(dev, filter->panid);
+    kw2xrf_set_addr_short((kw2xrf_t *)dev, *((uint16_t *)short_addr));
+    kw2xrf_set_addr_long((kw2xrf_t *)dev, *((uint64_t *)ext_addr));
+    kw2xrf_set_pan((kw2xrf_t *)dev, panid);
 }
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
@@ -385,11 +382,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
     }
 
     switch (opt) {
-        case NETOPT_AFILTER:
-            assert(len == sizeof(ieee802154_addr_filter_params_t));
-            _set_addr_filter(dev, value);
-            res = sizeof(ieee802154_addr_filter_params_t);
-            break;
         case NETOPT_CHANNEL:
             if (len != sizeof(uint16_t)) {
                 res = -EINVAL;
@@ -794,6 +786,10 @@ const netdev_driver_t kw2xrf_driver = {
     .get = _get,
     .set = _set,
     .isr = _isr,
+};
+
+const netdev_ieee802154_ops_t kw2xrf_ieee802154_ops = {
+    .set_hw_addr = _set_addr_filter
 };
 
 /** @} */
