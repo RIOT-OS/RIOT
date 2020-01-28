@@ -58,7 +58,7 @@ extern "C" {
 #define LPSXXX_PARAMS                    \
   {                                      \
     .transport = {                       \
-      .type = PERIPH_COMMS_BUS_SPI,      \
+      .type = COMMON_BUS_SPI,            \
       .bus = {                           \
         .spi = {                         \
           .dev  = LPSXXX_PARAM_SPI,      \
@@ -86,7 +86,7 @@ extern "C" {
 #define LPSXXX_PARAMS                \
   {                                  \
     .transport = {                   \
-      .type = PERIPH_COMMS_BUS_I2C,  \
+      .type = COMMON_BUS_I2C,        \
       .bus = {                       \
         .i2c = {                     \
           .dev = LPSXXX_PARAM_I2C,   \

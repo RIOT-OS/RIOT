@@ -8,14 +8,14 @@
  */
 
 /**
- * @defgroup    drivers_periph_comms_bus (I2C/SPI)
+ * @defgroup    drivers_periph_common_bus (I2C/SPI)
  * @ingroup     drivers_periph
  * @brief       Low-level I2C/SPI bus driver interface
  *
  * This is a kind of router for drivers that are able to support
  * either I2C or API bus interfaces.
  *
- * It is required to call the comms_bus_setup function as start-up.
+ * It is required to call the common_bus_setup function as start-up.
  * This function sets up function pointers for directing bus
  * communication to the desired bus.
  *
@@ -27,8 +27,8 @@
  * @author      Pieter du Preez <pdupreez@gmail.com>
  */
 
-#ifndef PERIPH_COMMS_BUS_H
-#define PERIPH_COMMS_BUS_H
+#ifndef PERIPH_COMMON_BUS_H
+#define PERIPH_COMMON_BUS_H
 
 #ifdef MODULE_PERIPH_SPI
 #include "spi.h"
@@ -46,10 +46,10 @@ extern "C" {
  * @brief   Supported bus types.
  */
 typedef enum {
-    PERIPH_COMMS_BUS_UNDEF = 0,
-    PERIPH_COMMS_BUS_I2C,
-    PERIPH_COMMS_BUS_SPI,
-} comms_bus_type_t;
+    COMMON_BUS_UNDEF = 0,
+    COMMON_BUS_I2C,
+    COMMON_BUS_SPI,
+} common_bus_type_t;
 
 #ifdef MODULE_PERIPH_SPI
 typedef struct  {
@@ -87,28 +87,28 @@ typedef union
      */
     int dummy_to_avoid_union_has_no_members_warning;
 #endif
-} comms_bus_params_t;
+} common_bus_params_t;
 
 /**
  * @brief   Bus initialization function prototype
  *
  * @param[in] bus       bus parameters
  */
-typedef int comms_bus_init_t(const comms_bus_params_t *bus);
+typedef int common_bus_init_t(const common_bus_params_t *bus);
 
 /**
  * @brief   Bus acquire function prototype
  *
  * @param[in] bus       bus parameters
  */
-typedef int comms_bus_acquire_t(const comms_bus_params_t *bus);
+typedef int common_bus_acquire_t(const common_bus_params_t *bus);
 
 /**
  * @brief   Bus release function prototype
  *
  * @param[in] bus       bus parameters
  */
-typedef void comms_bus_release_t(const comms_bus_params_t *bus);
+typedef void common_bus_release_t(const common_bus_params_t *bus);
 
 /**
  * @brief   Bus read register function prototype
@@ -117,7 +117,7 @@ typedef void comms_bus_release_t(const comms_bus_params_t *bus);
  * @param[in]  reg      register
  * @param[out] out      byte, read from register
  */
-typedef int comms_bus_read_reg_t(const comms_bus_params_t *bus,
+typedef int common_bus_read_reg_t(const common_bus_params_t *bus,
                                  uint16_t reg, uint8_t *out);
 /**
  * @brief   Bus read registers function prototype
@@ -127,7 +127,7 @@ typedef int comms_bus_read_reg_t(const comms_bus_params_t *bus,
  * @param[out] data     data, read from register
  * @param[in]  len      length of returned register contents
  */
-typedef int comms_bus_read_regs_t(const comms_bus_params_t *bus,
+typedef int common_bus_read_regs_t(const common_bus_params_t *bus,
                                   uint16_t reg, void *data, size_t len);
 
 /**
@@ -137,7 +137,7 @@ typedef int comms_bus_read_regs_t(const comms_bus_params_t *bus,
  * @param[in] reg       register
  * @param[in] data      data byte for register
  */
-typedef int comms_bus_write_reg_t(const comms_bus_params_t *bus,
+typedef int common_bus_write_reg_t(const common_bus_params_t *bus,
                                   uint8_t reg, uint8_t data);
 
 /**
@@ -147,28 +147,28 @@ typedef struct {
     /**
      * @brief The bus init function pointer
      */
-    comms_bus_init_t *comms_bus_init;
+    common_bus_init_t *common_bus_init;
     /**
      * @brief The bus acquire function pointer
      */
-    comms_bus_acquire_t *comms_bus_acquire;
+    common_bus_acquire_t *common_bus_acquire;
     /**
      * @brief The bus release function pointer
      */
-    comms_bus_release_t *comms_bus_release;
+    common_bus_release_t *common_bus_release;
     /**
      * @brief The bus read register function pointer
      */
-    comms_bus_read_reg_t *comms_bus_read_reg;
+    common_bus_read_reg_t *common_bus_read_reg;
     /**
      * @brief The bus read registers function pointer
      */
-    comms_bus_read_regs_t *comms_bus_read_regs;
+    common_bus_read_regs_t *common_bus_read_regs;
     /**
      * @brief The bus write register function pointer
      */
-    comms_bus_write_reg_t *comms_bus_write_reg;
-} comms_bus_function_t;
+    common_bus_write_reg_t *common_bus_write_reg;
+} common_bus_function_t;
 
 /**
  * @brief   The transport struct contains the bus type, the bus
@@ -179,26 +179,26 @@ typedef struct
     /**
      * @brief The bus type
      */
-    comms_bus_type_t type;
+    common_bus_type_t type;
     /**
      * @brief The bus parameters
      */
-    comms_bus_params_t bus;
+    common_bus_params_t bus;
     /**
      * @brief The bus function pointers
      */
-    comms_bus_function_t f;
-} comms_transport_t;
+    common_bus_function_t f;
+} common_transport_t;
 
 /**
  * @brief   Function that must be called at start-up.
  */
 
-void comms_bus_setup(comms_transport_t* transport);
+void common_bus_setup(common_transport_t* transport);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_COMMS_BUS_H */
+#endif /* PERIPH_COMMON_BUS_H */
 /** @} */

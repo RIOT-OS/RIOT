@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include "periph/comms_bus.h"
+#include "periph/common_bus.h"
 
 #ifdef CONFIG_LPSXXX_USE_SPI
 
@@ -110,7 +110,7 @@ typedef struct {
     /**
      * @brief   The transport parameters
      */
-    comms_transport_t transport;
+    common_transport_t transport;
     lpsxxx_rate_t rate;         /**< tell sensor to sample with this rate */
 } lpsxxx_params_t;
 

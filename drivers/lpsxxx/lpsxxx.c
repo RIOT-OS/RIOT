@@ -52,25 +52,25 @@
 int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t *params)
 {
     dev->params = *params;
-    comms_bus_setup(&(dev->params.transport));
+    common_bus_setup(&(dev->params.transport));
 
-    const comms_bus_params_t *bus_ptr = &(dev->params.transport.bus);
-    const comms_bus_function_t *func_ptr = &(dev->params.transport.f);
+    const common_bus_params_t *bus_ptr = &(dev->params.transport.bus);
+    const common_bus_function_t *func_ptr = &(dev->params.transport.f);
 
-    func_ptr->comms_bus_init(bus_ptr);
+    func_ptr->common_bus_init(bus_ptr);
 
     /* Acquire exclusive access to the bus. */
-    func_ptr->comms_bus_acquire(bus_ptr);
+    func_ptr->common_bus_acquire(bus_ptr);
     uint8_t id = 0;
-    int ret = func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_WHO_AM_I, &id);
+    int ret = func_ptr->common_bus_read_reg(bus_ptr, LPSXXX_REG_WHO_AM_I, &id);
     if (ret < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] init: cannot read WHO_AM_I register err=%d\n", ret);
         return -LPSXXX_ERR_NOBUS;
     }
 
     if (id != LPSXXX_WHO_AM_I) {
-        func_ptr->comms_bus_release(bus_ptr);
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] init: not a valid device (got %02X, expected %02X)\n",
               id, LPSXXX_WHO_AM_I);
         return -LPSXXX_ERR_NODEV;
@@ -79,8 +79,8 @@ int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t *params)
     uint8_t tmp;
 
 #if MODULE_LPS22HB
-    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_CTRL_REG2, &tmp) < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+    if (func_ptr->common_bus_read_reg(bus_ptr, LPSXXX_REG_CTRL_REG2, &tmp) < 0) {
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] init: cannot read LPSXXX_REG_CTRL_REG2 register\n");
         return -LPSXXX_ERR_NOBUS;
     }
@@ -91,8 +91,8 @@ int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t *params)
 
     DEBUG("[lpsxxx] init: update reg2, %02X\n", tmp);
 
-    if (func_ptr->comms_bus_write_reg(bus_ptr, LPSXXX_REG_CTRL_REG2, tmp) < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+    if (func_ptr->common_bus_write_reg(bus_ptr, LPSXXX_REG_CTRL_REG2, tmp) < 0) {
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] init: cannot write in CTRL_REG2 register\n");
         return -LPSXXX_ERR_NOBUS;
     }
@@ -116,13 +116,13 @@ int lpsxxx_init(lpsxxx_t *dev, const lpsxxx_params_t *params)
 
     DEBUG("[lpsxxx] init: update reg1, value: %02X\n", tmp);
 
-    if (func_ptr->comms_bus_write_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, tmp) < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+    if (func_ptr->common_bus_write_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, tmp) < 0) {
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] init: cannot write in CTRL_REG1 register\n");
         return -LPSXXX_ERR_NOBUS;
     }
 
-    func_ptr->comms_bus_release(bus_ptr);
+    func_ptr->common_bus_release(bus_ptr);
 
     DEBUG("[lpsxxx] initialization successful\n");
     return LPSXXX_OK;
@@ -134,23 +134,23 @@ int lpsxxx_read_temp(const lpsxxx_t *dev, int16_t *temp)
     int16_t val = 0;
     float res = TEMP_BASE;      /* reference value -> see datasheet */
 
-    const comms_bus_params_t *bus_ptr = &(dev->params.transport.bus);
-    const comms_bus_function_t *func_ptr = &(dev->params.transport.f);
+    const common_bus_params_t *bus_ptr = &(dev->params.transport.bus);
+    const common_bus_function_t *func_ptr = &(dev->params.transport.f);
 
-    func_ptr->comms_bus_acquire(bus_ptr);
-    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_TEMP_OUT_L, &tmp) < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+    func_ptr->common_bus_acquire(bus_ptr);
+    if (func_ptr->common_bus_read_reg(bus_ptr, LPSXXX_REG_TEMP_OUT_L, &tmp) < 0) {
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] read_temp: cannot read TEMP_OUT_L register\n");
         return -LPSXXX_ERR_NOBUS;
     }
     val |= tmp;
 
-    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_TEMP_OUT_H, &tmp) < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+    if (func_ptr->common_bus_read_reg(bus_ptr, LPSXXX_REG_TEMP_OUT_H, &tmp) < 0) {
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] read_temp: cannot read TEMP_OUT_H register\n");
         return -LPSXXX_ERR_NOBUS;
     }
-    func_ptr->comms_bus_release(bus_ptr);
+    func_ptr->common_bus_release(bus_ptr);
     val |= ((uint16_t)tmp << 8);
 
     DEBUG("[lpsxxx] read_temp: raw data %08" PRIx32 "\n", (uint32_t)val);
@@ -168,31 +168,31 @@ int lpsxxx_read_pres(const lpsxxx_t *dev, uint16_t *pressure)
     uint8_t tmp = 0;
     int32_t val = 0;
 
-    const comms_bus_params_t *bus_ptr = &(dev->params.transport.bus);
-    const comms_bus_function_t *func_ptr = &(dev->params.transport.f);
+    const common_bus_params_t *bus_ptr = &(dev->params.transport.bus);
+    const common_bus_function_t *func_ptr = &(dev->params.transport.f);
 
-    func_ptr->comms_bus_acquire(bus_ptr);
+    func_ptr->common_bus_acquire(bus_ptr);
 
-    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_PRESS_OUT_XL, &tmp) < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+    if (func_ptr->common_bus_read_reg(bus_ptr, LPSXXX_REG_PRESS_OUT_XL, &tmp) < 0) {
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] read_pres: cannot read PRES_OUT_XL register\n");
         return -LPSXXX_ERR_NOBUS;
     }
     val |= tmp;
 
-    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_PRESS_OUT_L, &tmp) < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+    if (func_ptr->common_bus_read_reg(bus_ptr, LPSXXX_REG_PRESS_OUT_L, &tmp) < 0) {
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] read_pres: cannot read PRES_OUT_L register\n");
         return -LPSXXX_ERR_NOBUS;
     }
     val |= ((uint32_t)tmp << 8);
 
-    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_PRESS_OUT_H, &tmp) < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+    if (func_ptr->common_bus_read_reg(bus_ptr, LPSXXX_REG_PRESS_OUT_H, &tmp) < 0) {
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] read_pres: cannot read PRES_OUT_H register\n");
         return -LPSXXX_ERR_NOBUS;
     }
-    func_ptr->comms_bus_release(bus_ptr);
+    func_ptr->common_bus_release(bus_ptr);
 
     val |= ((uint32_t)tmp << 16);
 
@@ -213,12 +213,12 @@ int lpsxxx_enable(const lpsxxx_t *dev)
 {
     uint8_t tmp = 0;
 
-    const comms_bus_params_t *bus_ptr = &(dev->params.transport.bus);
-    const comms_bus_function_t *func_ptr = &(dev->params.transport.f);
+    const common_bus_params_t *bus_ptr = &(dev->params.transport.bus);
+    const common_bus_function_t *func_ptr = &(dev->params.transport.f);
 
-    func_ptr->comms_bus_acquire(bus_ptr);
-    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, &tmp) < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+    func_ptr->common_bus_acquire(bus_ptr);
+    if (func_ptr->common_bus_read_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, &tmp) < 0) {
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] enable: cannot read CTRL_REG1 register\n");
         return -LPSXXX_ERR_NOBUS;
     }
@@ -234,12 +234,12 @@ int lpsxxx_enable(const lpsxxx_t *dev)
 
     DEBUG("[lpsxxx] enable: update reg1 with %02X\n", tmp);
 
-    if (func_ptr->comms_bus_write_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, tmp) < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+    if (func_ptr->common_bus_write_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, tmp) < 0) {
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] enable: cannot write CTRL_REG1 register\n");
         return -LPSXXX_ERR_NOBUS;
     }
-    func_ptr->comms_bus_release(bus_ptr);
+    func_ptr->common_bus_release(bus_ptr);
 
     return LPSXXX_OK;
 }
@@ -248,12 +248,12 @@ int lpsxxx_disable(const lpsxxx_t *dev)
 {
     uint8_t tmp = 0;
 
-    const comms_bus_params_t *bus_ptr = &(dev->params.transport.bus);
-    const comms_bus_function_t *func_ptr = &(dev->params.transport.f);
+    const common_bus_params_t *bus_ptr = &(dev->params.transport.bus);
+    const common_bus_function_t *func_ptr = &(dev->params.transport.f);
 
-    func_ptr->comms_bus_acquire(bus_ptr);
-    if (func_ptr->comms_bus_read_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, &tmp) < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+    func_ptr->common_bus_acquire(bus_ptr);
+    if (func_ptr->common_bus_read_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, &tmp) < 0) {
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] disable: cannot read CTRL_REG1 register\n");
         return -LPSXXX_ERR_NOBUS;
     }
@@ -265,12 +265,12 @@ int lpsxxx_disable(const lpsxxx_t *dev)
 
     DEBUG("[lpsxxx] disable: update reg1 with %02X\n", tmp);
 
-    if (func_ptr->comms_bus_write_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, tmp) < 0) {
-        func_ptr->comms_bus_release(bus_ptr);
+    if (func_ptr->common_bus_write_reg(bus_ptr, LPSXXX_REG_CTRL_REG1, tmp) < 0) {
+        func_ptr->common_bus_release(bus_ptr);
         DEBUG("[lpsxxx] disable: cannot write CTRL_REG1 register\n");
         return -LPSXXX_ERR_NOBUS;
     }
-    func_ptr->comms_bus_release(bus_ptr);
+    func_ptr->common_bus_release(bus_ptr);
 
     return LPSXXX_OK;
 }
