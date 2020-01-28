@@ -80,6 +80,11 @@ typedef enum {
 } netdev_ieee802154_cca_mode_t;
 
 /**
+ * @brief   Forward declaration for netdev_ieee802154_ops_t struct
+ */
+typedef struct netdev_ieee802154_ops netdev_ieee802154_ops_t;
+
+/**
  * @brief Extended structure to hold IEEE 802.15.4 driver state
  *
  * @extends netdev_t
@@ -116,9 +121,28 @@ typedef struct {
     uint8_t page;                           /**< channel page */
     uint16_t flags;                         /**< flags as defined above */
     int16_t txpower;                        /**< tx power in dBm */
+    const netdev_ieee802154_ops_t *ops;     /**< IEEE802.15.4 device ops */
     /** @} */
 } netdev_ieee802154_t;
 
+/**
+ * @brief Operations of an IEEEE802.15.4 device
+ */
+struct netdev_ieee802154_ops {
+    /**
+     * @brief Set IEEE addresses to the hardware accelerator of an
+     * network device
+     *
+     * @note Set to NULL if the device doesn't support address filtering.
+     *
+     * @param[in] dev           network device descriptor
+     * @param[in] short_addr    short address to be set
+     * @param[in] ext_addr      extended address to be set
+     * @param[in] panid         panid to be set
+     */
+    void (*set_hw_addr)(netdev_ieee802154_t *dev, network_uint16_t *short_addr,
+                        eui64_t *ext_addr, uint16_t panid);
+};
 
 /**
  * @brief   Received packet status information for IEEE 802.15.4 radios
@@ -135,32 +159,24 @@ typedef struct netdev_radio_rx_info netdev_ieee802154_rx_info_t;
  */
 static inline bool netdev_ieee802154_has_addr_filter(netdev_ieee802154_t *dev)
 {
-    netdev_t *netdev = (netdev_t*) dev;
-    return netdev->driver->get(netdev, NETOPT_AFILTER, NULL, 0) == 0;
+    return dev->ops->set_hw_addr != NULL;
 }
 
 /**
  * @brief Configure hardware address filter in a given network device
  *
+ * @pre   @ref dev MUST have hardware address filter! Check with
+ *        @ref netdev_ieee802154_has_addr_filter
+ *
  * @param[i] dev        network device descriptor
  * @param[i] short_addr IEEE802.15.4 short address
  * @param[i] ext_addr   IEEE802.15.4 extended address
  * @param[i] panid      IEEE802.15.4 PAN-ID
- *
- * @return              0 on success
- * @return              -ENOTSUP if the device doesn't support address filtering.
  */
-static inline int netdev_ieee802154_set_addr_filter(netdev_ieee802154_t *dev, network_uint16_t *short_addr, eui64_t *ext_addr, uint16_t panid)
+static inline void netdev_ieee802154_set_addr_filter(netdev_ieee802154_t *dev, network_uint16_t *short_addr, eui64_t *ext_addr, uint16_t panid)
 {
-    netdev_t *netdev = (netdev_t*) dev;
-
-    ieee802154_addr_filter_params_t filter = {
-        .short_addr = short_addr,
-        .ext_addr = ext_addr,
-        .panid = panid
-    };
-
-    return netdev->driver->set(netdev, NETOPT_AFILTER, &filter, sizeof(filter));
+    assert(dev->ops->set_hw_addr);
+    dev->ops->set_hw_addr(dev, short_addr, ext_addr, panid);
 }
 
 /**
