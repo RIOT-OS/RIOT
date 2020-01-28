@@ -121,7 +121,7 @@ typedef struct {
     uint8_t page;                           /**< channel page */
     uint16_t flags;                         /**< flags as defined above */
     int16_t txpower;                        /**< tx power in dBm */
-    const netdev_ieee802154_ops_t *ops;     /**< IEEE802.15.4 device ops */
+    const netdev_ieee802154_ops_t *ops;     /**< IEEE802.15.4 device ops. Must be set */
     /** @} */
 } netdev_ieee802154_t;
 
