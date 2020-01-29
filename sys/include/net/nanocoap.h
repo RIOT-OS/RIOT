@@ -142,11 +142,9 @@ extern "C" {
 #define NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)
 #endif
 
-#if defined(MODULE_GCOAP) || defined(DOXYGEN)
 /** @brief   Maximum length of a query string written to a message */
 #ifndef NANOCOAP_QS_MAX
 #define NANOCOAP_QS_MAX             (64)
-#endif
 #endif
 /** @} */
 
@@ -963,6 +961,20 @@ static inline ssize_t coap_opt_add_format(coap_pkt_t *pkt, uint16_t format)
  * @return        -ENOSPC if no available options
  */
 ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val, size_t val_len);
+
+/**
+ * @brief   Adds a single Uri-Query option in the form 'key=value' into pkt
+ *
+ * @param[in,out] pkt         The package that is being build
+ * @param[in]     key         Key to add to the query string
+ * @param[in]     val         Value to assign to @p key (may be NULL)
+ *
+ * @pre     ((pkt != NULL) && (key != NULL))
+ *
+ * @return  overall length of new query string
+ * @return  -1 on error
+ */
+ssize_t coap_opt_add_uquery(coap_pkt_t *pkt, const char *key, const char *val);
 
 /**
  * @brief   Encode the given string as option(s) into pkt

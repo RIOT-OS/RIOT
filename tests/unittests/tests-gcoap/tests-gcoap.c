@@ -177,38 +177,6 @@ static void test_gcoap__client_put_req_overfill(void)
 }
 
 /*
- * Builds on get_req test, to test gcoap_add_qstring() to add Uri-Query
- * options.
- */
-static void test_gcoap__client_get_query(void)
-{
-    uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
-    coap_pkt_t pdu;
-    char path[] = "/time";
-    char key1[] = "ab";
-    char val1[] = "cde";
-    char key2[] = "f";
-    char expected[] = "ab=cde&f";
-    int optlen;
-
-    gcoap_req_init(&pdu, buf, CONFIG_GCOAP_PDU_BUF_SIZE, COAP_METHOD_GET, path);
-
-    optlen = gcoap_add_qstring(&pdu, key1, val1);
-    TEST_ASSERT_EQUAL_INT(7, optlen);
-    optlen = gcoap_add_qstring(&pdu, key2, NULL);
-    TEST_ASSERT_EQUAL_INT(2, optlen);
-
-    size_t len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
-
-    coap_parse(&pdu, buf, len);
-
-    char query[20] = {0};
-    coap_get_uri_query(&pdu, (uint8_t *)&query[0]);
-    /* skip initial '&' from coap_get_uri_query() */
-    TEST_ASSERT_EQUAL_STRING(&expected[0], &query[1]);
-}
-
-/*
  * Builds on get_req test, to test use of NULL path with gcoap_req_init().
  * Then separately add Uri-Path option later.
  */
@@ -402,7 +370,6 @@ Test *tests_gcoap_tests(void)
         new_TestFixture(test_gcoap__client_get_resp),
         new_TestFixture(test_gcoap__client_put_req),
         new_TestFixture(test_gcoap__client_put_req_overfill),
-        new_TestFixture(test_gcoap__client_get_query),
         new_TestFixture(test_gcoap__client_get_path_defer),
         new_TestFixture(test_gcoap__server_get_req),
         new_TestFixture(test_gcoap__server_get_resp),
