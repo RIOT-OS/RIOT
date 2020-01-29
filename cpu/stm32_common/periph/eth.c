@@ -226,7 +226,7 @@ int stm32_eth_init(void)
       stm32_eth_set_mac(eth_config.mac);
     }
     else {
-      luid_get(hwaddr, ETHERNET_ADDR_LEN);
+      luid_get_eui48(hwaddr);
       stm32_eth_set_mac(hwaddr);
     }
 
