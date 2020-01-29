@@ -306,8 +306,10 @@ static void test_nanocoap__get_multi_query(void)
     coap_pkt_t pkt;
     uint16_t msgid = 0xABCD;
     uint8_t token[2] = {0xDA, 0xEC};
-    char qs[] = "ab=cde&f=gh";
-    size_t query_opt_len = 13;    /* first opt header is 2 bytes long */
+    char key1[] = "ab";
+    char val1[] = "cde";
+    char key2[] = "f";
+    char qs[] = "ab=cde&f";
 
     size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
                                 &token[0], 2, COAP_METHOD_GET, msgid);
@@ -315,8 +317,11 @@ static void test_nanocoap__get_multi_query(void)
     coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
 
     uint8_t *query_pos = &pkt.payload[0];
-    len = coap_opt_add_string(&pkt, COAP_OPT_URI_QUERY, &qs[0], '&');
-    TEST_ASSERT_EQUAL_INT(query_opt_len, len);
+    /* first opt header is 2 bytes long */
+    ssize_t optlen = coap_opt_add_uquery(&pkt, key1, val1);
+    TEST_ASSERT_EQUAL_INT(8, optlen);
+    optlen = coap_opt_add_uquery(&pkt, key2, NULL);
+    TEST_ASSERT_EQUAL_INT(2, optlen);
 
     char query[20] = {0};
     coap_get_uri_query(&pkt, (uint8_t *)&query[0]);
