@@ -114,7 +114,6 @@ int rtc_get_time(struct tm *localt)
 
 int rtc_set_alarm(struct tm *localt, rtc_alarm_cb_t cb, void *arg)
 {
-    (void) arg;
     if (localt != NULL) {
         /* normalize input */
         rtc_tm_normalize(localt);
@@ -132,6 +131,7 @@ int rtc_set_alarm(struct tm *localt, rtc_alarm_cb_t cb, void *arg)
               RTC_ALDOM, RTC_ALMON, RTC_ALYEAR, RTC_ALHOUR, RTC_ALMIN, RTC_ALSEC);
 
         _cb = cb;
+        _cb_arg = arg;
         return 0;
     }
     else if (cb == NULL) {
