@@ -67,7 +67,7 @@ $(GENERATED_DIR): $(CLEAN)
 # configuration via Kconfig is disabled by default). Should this change, the
 # check would not longer be valid, and Kconfig would have to run on every
 # build.
-SHOULD_RUN_KCONFIG := $(or $(wildcard $(APPDIR)/*.config), $(wildcard $(APPDIR)/Kconfig), $(wildcard $(KCONFIG_MERGED_CONFIG)), $(filter menuconfig, $(MAKECMDGOALS)))
+SHOULD_RUN_KCONFIG ?= $(or $(wildcard $(APPDIR)/*.config), $(wildcard $(APPDIR)/Kconfig), $(wildcard $(KCONFIG_MERGED_CONFIG)), $(filter menuconfig, $(MAKECMDGOALS)))
 
 ifneq (,$(SHOULD_RUN_KCONFIG))
 # Add configuration header to build dependencies
