@@ -41,6 +41,10 @@ USEMODULE += ps
 # So it cannot currently be run
 TEST_ON_CI_BLACKLIST += all
 
+# As there is an 'app.config' we want to explicitly disable Kconfig by setting
+# the variable to empty
+SHOULD_RUN_KCONFIG ?=
+
 .PHONY: ethos
 
 ethos:
