@@ -19,6 +19,8 @@
  * @}
  */
 
+#ifndef RIOTBOOT /* RIOTBOOT provides its own implementation */
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <errno.h>
@@ -84,3 +86,5 @@ void kernel_init(void)
 
     cpu_switch_context_exit();
 }
+
+#endif /* RIOTBOOT */

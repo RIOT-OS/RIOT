@@ -21,6 +21,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#ifndef RIOTBOOT /* RIOTBOOT provides its own implementation */
+
 #include <string.h>
 #include <stdio.h>
 
@@ -85,3 +87,5 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
        (even if we actually won't even get here...) */
     UNREACHABLE();
 }
+
+#endif /* RIOTBOOT */
