@@ -14,9 +14,9 @@ index 03f41a0..4f0ab47 100755
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env python
 +#!/usr/bin/env python3
+ # kate: replace-tabs on; indent-width 4;
  
  from __future__ import unicode_literals
- 
 -- 
 2.23.0
 
