@@ -27,7 +27,7 @@ extern "C" {
  * @brief        Datatype to identify a POSIX thread.
  * @note         The pthread ids are one off to the index in the internal array.
  */
-typedef unsigned pthread_t;
+typedef kernel_pid_t pthread_t;
 
 /**
  * @brief        Spawn a new POSIX thread.
