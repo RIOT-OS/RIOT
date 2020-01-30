@@ -243,6 +243,7 @@ int i2c_acquire(i2c_t dev)
 
 void i2c_release(i2c_t dev)
 {
+    (void)dev;
     assert(dev < I2C_NUMOF);
     DEBUG("%s\n", __FUNCTION__);
     mutex_unlock(&lock);
