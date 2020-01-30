@@ -28,6 +28,13 @@ extern "C" {
 #endif
 
 /**
+ * @name    Power management configuration
+ * @{
+ */
+#define PROVIDES_PM_SET_LOWEST
+/** @} */
+
+/**
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (12U)
