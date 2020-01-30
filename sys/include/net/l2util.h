@@ -29,6 +29,7 @@
 
 #include "luid.h"
 #include "net/eui64.h"
+#include "net/netif_ids.h"
 #include "net/ndp.h"
 
 #ifdef __cplusplus
@@ -142,13 +143,13 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
  *
  * @warning Don't call this function directly, use @ref l2util_generate_short_addr() instead.
  *
- * @param[in] driver    The driver name of the netdev
+ * @param[in] driver    The driver id of the netdev
  * @param[in] idx       The index in the <driver>_params_t struct
  * @param[out] addr     The dedicated address for the netdev
  *
  * @return              The number of bytes copied. 0 if no address is available.
  */
-size_t board_get_short_addr(const char *driver, unsigned idx, network_uint16_t *addr);
+size_t board_get_short_addr(netif_id_t driver, unsigned idx, network_uint16_t *addr);
 
 /**
  * @brief Generates an short address for the netdev interface.
@@ -158,14 +159,14 @@ size_t board_get_short_addr(const char *driver, unsigned idx, network_uint16_t *
  *       If no such function is availiable, this will fall back to
  *       @ref luid_get_short.
  *
- * @param[in] driver    The driver name of the netdev
+ * @param[in] driver    The driver id of the netdev
  *                      Will be passed on to @ref board_get_eui48.
  * @param[in] idx       The index in the <driver>_params_t struct
  *                      Will be passed on to @ref board_get_eui48.
  * @param[out] addr     The generated short address
  *
  */
-static inline void l2util_generate_short_addr(const char *driver, unsigned idx, network_uint16_t *addr)
+static inline void l2util_generate_short_addr(netif_id_t driver, unsigned idx, network_uint16_t *addr)
 {
     if (board_get_short_addr(driver, idx, addr) == sizeof(*addr)) {
         return;
@@ -182,13 +183,13 @@ static inline void l2util_generate_short_addr(const char *driver, unsigned idx, 
  *
  * @warning Don't call this function directly, use @ref l2util_generate_eui48() instead.
  *
- * @param[in] driver    The driver name of the netdev
+ * @param[in] driver    The driver id of the netdev
  * @param[in] idx       The index in the <driver>_params_t struct
  * @param[out] addr     The dedicated address for the netdev
  *
  * @return              The number of bytes copied. 0 if no address is available.
  */
-size_t board_get_eui48(const char *driver, unsigned idx, eui48_t *addr);
+size_t board_get_eui48(netif_id_t driver, unsigned idx, eui48_t *addr);
 
 /**
  * @brief Generates an EUI-48 address for the netdev interface.
@@ -198,14 +199,14 @@ size_t board_get_eui48(const char *driver, unsigned idx, eui48_t *addr);
  *       If no such function is availiable, this will fall back to
  *       @ref luid_get_eui48.
  *
- * @param[in] driver    The driver name of the netdev
+ * @param[in] driver    The driver id of the netdev
  *                      Will be passed on to @ref board_get_eui48.
  * @param[in] idx       The index in the <driver>_params_t struct
  *                      Will be passed on to @ref board_get_eui48.
  * @param[out] addr     The generated EUI-48 address
  *
  */
-static inline void l2util_generate_eui48(const char *driver, unsigned idx, eui48_t *addr)
+static inline void l2util_generate_eui48(netif_id_t driver, unsigned idx, eui48_t *addr)
 {
     if (board_get_eui48(driver, idx, addr) == sizeof(*addr)) {
         return;
@@ -222,13 +223,13 @@ static inline void l2util_generate_eui48(const char *driver, unsigned idx, eui48
  *
  * @warning Don't call this function directly, use @ref l2util_generate_eui64() instead.
  *
- * @param[in] driver    The driver name of the netdev
+ * @param[in] driver    The driver id of the netdev
  * @param[in] idx       The index in the <driver>_params_t struct
  * @param[out] addr     The dedicated address for the netdev
  *
  * @return              The number of bytes copied. 0 if no address is available.
  */
-size_t board_get_eui64(const char *driver, unsigned idx, eui64_t *addr);
+size_t board_get_eui64(netif_id_t driver, unsigned idx, eui64_t *addr);
 
 /**
  * @brief Generates an EUI-64 address for the netdev interface.
@@ -238,14 +239,14 @@ size_t board_get_eui64(const char *driver, unsigned idx, eui64_t *addr);
  *       If no such function is availiable, this will fall back to
  *       @ref luid_get_eui64.
  *
- * @param[in] driver    The driver name of the netdev
+ * @param[in] driver    The driver id of the netdev
  *                      Will be passed on to @ref board_get_eui64.
  * @param[in] idx       The index in the <driver>_params_t struct
  *                      Will be passed on to @ref board_get_eui64.
  * @param[out] addr     The generated EUI-64 address
  *
  */
-static inline void l2util_generate_eui64(const char *driver, unsigned idx, eui64_t *addr)
+static inline void l2util_generate_eui64(netif_id_t driver, unsigned idx, eui64_t *addr)
 {
     if (board_get_eui64(driver, idx, addr) == sizeof(*addr)) {
         return;

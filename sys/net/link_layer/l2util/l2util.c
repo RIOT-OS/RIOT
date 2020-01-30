@@ -239,7 +239,7 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
     return -ENOTSUP;
 }
 
-size_t __attribute__((weak)) board_get_short_addr(const char *driver, unsigned idx, network_uint16_t *addr)
+size_t __attribute__((weak)) board_get_short_addr(netif_id_t driver, unsigned idx, network_uint16_t *addr)
 {
     (void) driver;
     (void) idx;
@@ -247,7 +247,7 @@ size_t __attribute__((weak)) board_get_short_addr(const char *driver, unsigned i
     return 0;
 }
 
-size_t __attribute__((weak)) board_get_eui48(const char *driver, unsigned idx, eui48_t *addr)
+size_t __attribute__((weak)) board_get_eui48(netif_id_t driver, unsigned idx, eui48_t *addr)
 {
     (void) driver;
     (void) idx;
@@ -255,7 +255,7 @@ size_t __attribute__((weak)) board_get_eui48(const char *driver, unsigned idx, e
     return 0;
 }
 
-size_t __attribute__((weak)) board_get_eui64(const char *driver, unsigned idx, eui64_t *addr)
+size_t __attribute__((weak)) board_get_eui64(netif_id_t driver, unsigned idx, eui64_t *addr)
 {
     (void) driver;
     (void) idx;
