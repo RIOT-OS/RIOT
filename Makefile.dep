@@ -26,6 +26,10 @@ ifneq (,$(filter ssp,$(USEMODULE)))
   FEATURES_REQUIRED += ssp
 endif
 
+ifneq (,$(filter cortexm_fpu,$(FEATURES_USED)))
+  USEMODULE += cortexm_fpu
+endif
+
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += xtimer
