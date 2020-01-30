@@ -124,8 +124,8 @@ extern "C" {
  * @{
  */
 /** @brief   Maximum number of Options in a message */
-#ifndef NANOCOAP_NOPTS_MAX
-#define NANOCOAP_NOPTS_MAX          (16)
+#ifndef CONFIG_NANOCOAP_NOPTS_MAX
+#define CONFIG_NANOCOAP_NOPTS_MAX          (16)
 #endif
 
 /**
@@ -182,14 +182,14 @@ typedef struct {
  * @brief   CoAP PDU parsing context structure
  */
 typedef struct {
-    coap_hdr_t *hdr;                            /**< pointer to raw packet   */
-    uint8_t *token;                             /**< pointer to token        */
-    uint8_t *payload;                           /**< pointer to payload      */
-    uint16_t payload_len;                       /**< length of payload       */
-    uint16_t options_len;                       /**< length of options array */
-    coap_optpos_t options[NANOCOAP_NOPTS_MAX];  /**< option offset array     */
+    coap_hdr_t *hdr;                                  /**< pointer to raw packet   */
+    uint8_t *token;                                   /**< pointer to token        */
+    uint8_t *payload;                                 /**< pointer to payload      */
+    uint16_t payload_len;                             /**< length of payload       */
+    uint16_t options_len;                             /**< length of options array */
+    coap_optpos_t options[CONFIG_NANOCOAP_NOPTS_MAX]; /**< option offset array     */
 #ifdef MODULE_GCOAP
-    uint32_t observe_value;                     /**< observe value           */
+    uint32_t observe_value;                           /**< observe value           */
 #endif
 } coap_pkt_t;
 

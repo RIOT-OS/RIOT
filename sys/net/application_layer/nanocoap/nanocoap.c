@@ -108,7 +108,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
             DEBUG("option count=%u nr=%u len=%i\n", option_count, option_nr, option_len);
 
             if (option_delta) {
-                if (option_count >= NANOCOAP_NOPTS_MAX) {
+                if (option_count >= CONFIG_NANOCOAP_NOPTS_MAX) {
                     DEBUG("nanocoap: max nr of options exceeded\n");
                     return -ENOMEM;
                 }
@@ -783,7 +783,7 @@ size_t coap_opt_put_uint(uint8_t *buf, uint16_t lastonum, uint16_t onum,
 static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val,
                             size_t val_len)
 {
-    if (pkt->options_len >= NANOCOAP_NOPTS_MAX) {
+    if (pkt->options_len >= CONFIG_NANOCOAP_NOPTS_MAX) {
         return -ENOSPC;
     }
 
