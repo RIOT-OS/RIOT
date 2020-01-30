@@ -619,6 +619,15 @@ void auto_init(void)
     suit_init_conditions();
 #endif /* MODULE_SUIT */
 
+#ifdef MODULE_AUTO_INIT_SECURITY
+
+#ifdef MODULE_CRYPTOAUTHLIB
+    extern void auto_init_atca(void);
+    auto_init_atca();
+#endif  /* MODULE_CRYPTOAUTHLIB */
+
+#endif  /* MODULE_AUTO_INIT_SECURITY */
+
 #ifdef MODULE_TEST_UTILS_INTERACTIVE_SYNC
 #if !defined(MODULE_SHELL_COMMANDS) || !defined(MODULE_SHELL)
     test_utils_interactive_sync();

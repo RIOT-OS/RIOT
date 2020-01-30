@@ -1,0 +1,4 @@
+USEMODULE += xtimer
+FEATURES_REQUIRED += periph_i2c
+USEMODULE += auto_init_security
+USEMODULE += cryptoauthlib_contrib
