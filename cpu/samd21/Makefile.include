@@ -1,6 +1,3 @@
-CPU_ARCH = cortex-m0plus
-CPU_FAM  = samd21
-
 ifneq (,$(filter samd21%a,$(CPU_MODEL)))
   CFLAGS += -DCPU_SAMD21A
 endif

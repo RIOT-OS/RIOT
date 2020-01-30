@@ -1,3 +1,6 @@
+CPU_ARCH = cortex-m0plus
+CPU_FAM  = samd21
+
 FEATURES_PROVIDED += puf_sram
 
 -include $(RIOTCPU)/sam0_common/Makefile.features
