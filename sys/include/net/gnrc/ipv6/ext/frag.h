@@ -182,7 +182,7 @@ static inline void gnrc_ipv6_ext_frag_rbuf_del(gnrc_ipv6_ext_frag_rbuf_t *rbuf)
  *
  * This calls @ref gnrc_ipv6_ext_frag_rbuf_del() for all reassembly buffer
  * entries for which * gnrc_ipv6_ext_frag_rbuf_t::arrival is
- * @ref GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US in the past.
+ * @ref CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US in the past.
  */
 void gnrc_ipv6_ext_frag_rbuf_gc(void);
 /** @} */
