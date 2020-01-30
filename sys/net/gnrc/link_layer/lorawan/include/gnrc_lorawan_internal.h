@@ -46,7 +46,7 @@ extern "C" {
 #define MTYPE_CNF_UPLINK     0x4                        /**< Confirmed uplink type */
 #define MTYPE_CNF_DOWNLINK   0x5                        /**< Confirmed downlink type */
 #define MTYPE_REJOIN_REQ     0x6                        /**< Re-join request type */
-#define MTYPE_PROPIETARY     0x7                        /**< Propietary frame type */
+#define MTYPE_PROPIETARY     0x7                        /**< Proprietary frame type */
 
 #define MAJOR_MASK     0x3                              /**< Major mtype mask */
 #define MAJOR_LRWAN_R1 0x0                              /**< LoRaWAN R1 version type */
@@ -143,7 +143,7 @@ typedef struct {
     uint32_t fcnt_down;             /**< downlink frame counter */
     gnrc_pktsnip_t *outgoing_pkt;   /**< holds the outgoing packet in case of retransmissions */
     int nb_trials;              /**< holds the remaining number of retransmissions */
-    int ack_requested;          /**< wether the network server requested an ACK */
+    int ack_requested;          /**< whether the network server requested an ACK */
     int waiting_for_ack;        /**< true if the MAC layer is waiting for an ACK */
 } gnrc_lorawan_mcps_t;
 
@@ -164,7 +164,6 @@ typedef struct {
 /**
  * @brief GNRC LoRaWAN mac descriptor */
 typedef struct {
-    netdev_t netdev;                                /**< netdev for the MAC layer */
     xtimer_t rx;                                    /**< RX timer */
     msg_t msg;                                      /**< MAC layer message descriptor */
     gnrc_lorawan_mcps_t mcps;                       /**< MCPS descriptor */
@@ -211,7 +210,7 @@ void gnrc_lorawan_decrypt_join_accept(const uint8_t *key, uint8_t *pkt, int has_
 /**
  * @brief Generate LoRaWAN session keys
  *
- * Intended to be called after a successfull Join Request in order to generate
+ * Intended to be called after a successful Join Request in order to generate
  * NwkSKey and AppSKey
  *
  * @param[in] app_nonce pointer to the app_nonce of the Join Accept message
@@ -447,31 +446,12 @@ static inline void gnrc_lorawan_mac_release(gnrc_lorawan_t *mac)
 }
 
 /**
- * @brief Allocate memory to hold a GNRC LoRaWAN MCPS request
+ * @brief Set the datarate of the second reception window
  *
  * @param[in] mac pointer to the MAC descriptor
- *
- * @return pointer the allocated buffer
+ * @param[in] rx2_dr datarate of RX2
  */
-static inline void *gnrc_lorawan_mcps_allocate(gnrc_lorawan_t *mac)
-{
-    mac->netdev.event_callback((netdev_t *) mac, NETDEV_EVENT_MCPS_GET_BUFFER);
-    return mac->mcps_buf;
-}
-
-/**
- * @brief Allocate memory to hold a GNRC LoRaWAN MLME request
- *
- * @param[in] mac pointer to the MAC descriptor
- *
- * @return pointer the allocated buffer
- */
-static inline void *gnrc_lorawan_mlme_allocate(gnrc_lorawan_t *mac)
-{
-    mac->netdev.event_callback((netdev_t *) mac, NETDEV_EVENT_MLME_GET_BUFFER);
-    return mac->mlme_buf;
-}
-
+void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr);
 
 #ifdef __cplusplus
 }
