@@ -170,7 +170,6 @@ static void _init_buffer(void)
 
 int stm32_eth_init(void)
 {
-    char hwaddr[ETHERNET_ADDR_LEN];
     /* enable APB2 clock */
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 
@@ -226,8 +225,9 @@ int stm32_eth_init(void)
       stm32_eth_set_mac(eth_config.mac);
     }
     else {
-      luid_get(hwaddr, ETHERNET_ADDR_LEN);
-      stm32_eth_set_mac(hwaddr);
+      eui48_t hwaddr;
+      luid_get_eui48(&hwaddr);
+      stm32_eth_set_mac((const char *)hwaddr.uint8);
     }
 
     _init_buffer();
