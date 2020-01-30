@@ -221,7 +221,7 @@ static int _discover_internal(const sock_udp_ep_t *remote,
         return CORD_EP_ERR;
     }
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
-    gcoap_add_qstring(&pkt, "rt", "core.rd");
+    coap_opt_add_uquery(&pkt, "rt", "core.rd");
     size_t pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
     res = gcoap_req_send(buf, pkt_len, remote, _on_discover, NULL);
     if (res < 0) {
