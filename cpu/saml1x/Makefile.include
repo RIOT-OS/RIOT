@@ -1,5 +1,3 @@
-CPU_ARCH = cortex-m23
-
 ifneq (,$(filter saml10%,$(CPU_MODEL)))
   CFLAGS += -DCPU_SAML10
 endif

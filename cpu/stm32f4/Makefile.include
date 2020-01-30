@@ -1,6 +1,3 @@
-CPU_ARCH = cortex-m4f
-CPU_FAM  = stm32f4
-
 # STM32F4 uses sectors instead of pages, where the minimum sector length is 16KB
 # (the first sector), therefore RIOTBOOT_LEN must be 16KB to cover a whole sector.
 RIOTBOOT_LEN ?= 0x4000
