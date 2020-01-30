@@ -359,6 +359,26 @@ typedef struct {
 } timer_conf_t;
 /** @} */
 
+
+/**
+ * @brief   The implementation can use one LETIMER or two regular timers cascaded
+ */
+#ifndef EFM32_USE_LETIMER
+#define EFM32_USE_LETIMER   0
+#endif
+
+#ifdef EFM32_USE_LETIMER
+/**
+ * @brief   This timer implementation has two available channels
+ */
+#define TIMER_CHANNEL_NUMOF     (2)
+#else
+/**
+ * @brief   This timer implementation has three available channels
+ */
+#define TIMER_CHANNEL_NUMOF     (3)
+#endif
+
 /**
  * @brief   UART device configuration.
  */

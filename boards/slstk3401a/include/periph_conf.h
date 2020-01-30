@@ -141,25 +141,41 @@ static const spi_dev_t spi_config[] = {
 /**
  * @name    Timer configuration
  *
- * The implementation uses two timers in cascade mode.
+ * The implementation can use one low-energy timer
+ * or two regular timers in cascade mode.
  * @{
  */
+#if EFM32_USE_LETIMER
 static const timer_conf_t timer_config[] = {
     {
-        {
+        .timer = {
+            .dev = LETIMER0,
+            .cmu = cmuClock_LETIMER0
+        },
+        .irq = LETIMER0_IRQn
+    }
+};
+#define TIMER_0_ISR         isr_letimer0
+
+#else
+static const timer_conf_t timer_config[] = {
+    {
+        .prescaler = {
             .dev = TIMER0,
             .cmu = cmuClock_TIMER0
         },
-        {
+        .timer = {
             .dev = TIMER1,
             .cmu = cmuClock_TIMER1
         },
         .irq = TIMER1_IRQn
     }
 };
+#define TIMER_0_ISR         isr_timer1
+
+#endif /* EFM32_USE_LETIMER */
 
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
-#define TIMER_0_ISR         isr_timer1
 /** @} */
 
 /**
