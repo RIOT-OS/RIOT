@@ -135,6 +135,7 @@ void i2c_init(i2c_t dev)
 int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len,
                    uint8_t flags)
 {
+    (void)dev;
     assert(dev < I2C_NUMOF);
 
     /* Check for unsupported operations */
@@ -184,6 +185,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len,
 int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
                     uint8_t flags)
 {
+    (void)dev;
     assert(dev < I2C_NUMOF);
 
     /* Check for unsupported operations */
