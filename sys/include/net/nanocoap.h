@@ -132,8 +132,8 @@ extern "C" {
  * @brief    Maximum length of a resource path string read from or written to
  *           a message
  */
-#ifndef NANOCOAP_URI_MAX
-#define NANOCOAP_URI_MAX            (64)
+#ifndef CONFIG_NANOCOAP_URI_MAX
+#define CONFIG_NANOCOAP_URI_MAX            (64)
 #endif
 
 /**
@@ -516,18 +516,18 @@ static inline ssize_t coap_get_location_query(const coap_pkt_t *pkt,
  * This function decodes the pkt's URI option into a "/"-separated and
  * '\0'-terminated string.
  *
- * Caller must ensure @p target can hold at least NANOCOAP_URI_MAX bytes!
+ * Caller must ensure @p target can hold at least CONFIG_NANOCOAP_URI_MAX bytes!
  *
  * @param[in]   pkt     pkt to work on
  * @param[out]  target  buffer for target URI
  *
- * @returns     -ENOSPC     if URI option is larger than NANOCOAP_URI_MAX
+ * @returns     -ENOSPC     if URI option is larger than CONFIG_NANOCOAP_URI_MAX
  * @returns     nr of bytes written to @p target (including '\0')
  */
 static inline ssize_t coap_get_uri_path(const coap_pkt_t *pkt, uint8_t *target)
 {
     return coap_opt_get_string(pkt, COAP_OPT_URI_PATH, target,
-                               NANOCOAP_URI_MAX, '/');
+                               CONFIG_NANOCOAP_URI_MAX, '/');
 }
 
 /**
@@ -536,18 +536,18 @@ static inline ssize_t coap_get_uri_path(const coap_pkt_t *pkt, uint8_t *target)
  * This function decodes the pkt's URI_QUERY option into a "&"-separated and
  * '\0'-terminated string.
  *
- * Caller must ensure @p target can hold at least NANOCOAP_URI_MAX bytes!
+ * Caller must ensure @p target can hold at least CONFIG_NANOCOAP_URI_MAX bytes!
  *
  * @param[in]   pkt     pkt to work on
  * @param[out]  target  buffer for target URI
  *
- * @returns     -ENOSPC     if URI option is larger than NANOCOAP_URI_MAX
+ * @returns     -ENOSPC     if URI option is larger than CONFIG_NANOCOAP_URI_MAX
  * @returns     nr of bytes written to @p target (including '\0')
  */
 static inline ssize_t coap_get_uri_query(const coap_pkt_t *pkt, uint8_t *target)
 {
     return coap_opt_get_string(pkt, COAP_OPT_URI_QUERY, target,
-                               NANOCOAP_URI_MAX, '&');
+                               CONFIG_NANOCOAP_URI_MAX, '&');
 }
 
 /**

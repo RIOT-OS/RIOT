@@ -48,8 +48,8 @@
 static char *_regif_buf;
 static size_t _regif_buf_len;
 
-static char _rd_loc[NANOCOAP_URI_MAX];
-static char _rd_regif[NANOCOAP_URI_MAX];
+static char _rd_loc[CONFIG_NANOCOAP_URI_MAX];
+static char _rd_regif[CONFIG_NANOCOAP_URI_MAX];
 static sock_udp_ep_t _rd_remote;
 
 static mutex_t _mutex = MUTEX_INIT;

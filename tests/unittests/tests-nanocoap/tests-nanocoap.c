@@ -223,13 +223,13 @@ static void test_nanocoap__get_max_path(void)
     len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
     TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
 
-    char uri[NANOCOAP_URI_MAX] = {0};
+    char uri[CONFIG_NANOCOAP_URI_MAX] = {0};
     coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
     TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
 }
 
 /*
- * Builds on get_req test, to test path longer than NANOCOAP_URI_MAX. We
+ * Builds on get_req test, to test path longer than CONFIG_NANOCOAP_URI_MAX. We
  * expect coap_get_uri_path() to return -ENOSPC.
  */
 static void test_nanocoap__get_path_too_long(void)
@@ -250,7 +250,7 @@ static void test_nanocoap__get_path_too_long(void)
     len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
     TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
 
-    char uri[NANOCOAP_URI_MAX] = {0};
+    char uri[CONFIG_NANOCOAP_URI_MAX] = {0};
     int get_len = coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
     TEST_ASSERT_EQUAL_INT(-ENOSPC, get_len);
 }

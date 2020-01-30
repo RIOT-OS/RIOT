@@ -379,7 +379,7 @@ static int _find_resource(coap_pkt_t *pdu, const coap_resource_t **resource_ptr,
     /* Find path for CoAP msg among listener resources and execute callback. */
     gcoap_listener_t *listener = _coap_state.listeners;
 
-    uint8_t uri[NANOCOAP_URI_MAX];
+    uint8_t uri[CONFIG_NANOCOAP_URI_MAX];
     if (coap_get_uri_path(pdu, uri) <= 0) {
         return GCOAP_RESOURCE_NO_PATH;
     }

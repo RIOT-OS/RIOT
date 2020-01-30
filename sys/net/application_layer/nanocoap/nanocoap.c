@@ -395,7 +395,7 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
 {
     coap_method_flags_t method_flag = coap_method2flag(coap_get_code_detail(pkt));
 
-    uint8_t uri[NANOCOAP_URI_MAX];
+    uint8_t uri[CONFIG_NANOCOAP_URI_MAX];
     if (coap_get_uri_path(pkt, uri) <= 0) {
         return -EBADMSG;
     }
