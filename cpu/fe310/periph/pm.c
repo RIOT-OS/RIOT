@@ -26,10 +26,6 @@ void pm_set_lowest(void)
     __asm__ volatile ("wfi");
 }
 
-void pm_off(void)
-{
-}
-
 void pm_reboot(void)
 {
     AON_REG(AON_WDOGKEY) = AON_WDOGKEY_VALUE;
