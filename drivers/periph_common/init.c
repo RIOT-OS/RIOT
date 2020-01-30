@@ -20,6 +20,8 @@
  * @}
  */
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #ifdef MODULE_PERIPH_I2C
 #include "periph/i2c.h"
 #endif

@@ -16,6 +16,8 @@
  * @}
  */
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #include <string.h>
 
 #include "tsrb.h"

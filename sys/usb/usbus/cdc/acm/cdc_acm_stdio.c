@@ -19,6 +19,8 @@
  * @}
  */
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #include <stdio.h>
 
 #include "isrpipe.h"

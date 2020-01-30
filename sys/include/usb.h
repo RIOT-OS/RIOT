@@ -29,18 +29,26 @@ extern "C" {
  * @ingroup config
  * @{
  */
+
+#if !(defined(CONFIG_USB_VID) && defined(CONFIG_USB_PID))
+#ifdef USB_H_USER_IS_RIOT_INTERNAL
+/* Reserved for RIOT standard peripherals as per http://pid.codes/1209/7D00/ */
+#define CONFIG_USB_VID (0x1209)
+#define CONFIG_USB_PID (0x7D00)
+#else
+#error Please configure your vendor and product IDs. For development, you may \
+    set CONFIG_USB_VID=0x1209 CONFIG_USB_PID=0x7D01.
+#endif
+#endif
+
 /**
  * @brief USB peripheral device vendor ID
  *
  * @note You must provide your own VID/PID combination when manufacturing a
  * device with USB.
  */
-#ifndef CONFIG_USB_VID
 #ifdef DOXYGEN
 #define CONFIG_USB_VID
-#else
-#error  Please supply your vendor ID by setting CONFIG_USB_VID
-#endif
 #endif
 
 /**
@@ -49,12 +57,8 @@ extern "C" {
  * @note You must provide your own VID/PID combination when manufacturing a
  * device with USB.
  */
-#ifndef CONFIG_USB_PID
 #ifdef DOXYGEN
 #define CONFIG_USB_PID
-#else
-#error  Please supply your vendor ID by setting CONFIG_USB_PID
-#endif
 #endif
 
 /**
@@ -120,6 +124,35 @@ extern "C" {
  */
 #ifndef CONFIG_USB_DEFAULT_LANGID
 #define CONFIG_USB_DEFAULT_LANGID   0x0409 /* EN-US */
+#endif
+/** @} */
+
+/**
+ * @brief RIOT-internal USB peripheral clearance indicator
+ *
+ * This define must only be set in compilation units that are RIOT internal,
+ * and only when they implement peripherals that can be considered default RIOT
+ * peripherals.
+ *
+ * When this is defined in all uses of `usb.h`, the board can use the
+ * 0x1209/0x7D00 VID/PID pair unless explicit configuration using @ref
+ * CONFIG_USB_VID and @ref CONFIG_USB_PID say otherwise.
+ *
+ * There is no sharp characterization of what consititutes an internal
+ * peripheral; a good check is this: If an application can, just by switching
+ * between boards, can have a feature provided by either RIOT's USB stack or a
+ * different mechanism, the USB version is a default RIOT peripheral.
+ *
+ * Examples are stdio access (is provided by most boards using a UART and an
+ * external USB UART adapter), Ethernet (is provided by other boards using
+ * ethos) and firmware upload and reset (is provided by other boards using an
+ * on-board programmer).
+ *
+ * See http://pid.codes/1209/7D00/ for the allocation of that code.
+ * @{
+ */
+#ifdef DOXYGEN
+#define USB_H_USER_IS_RIOT_INTERNAL
 #endif
 /** @} */
 
