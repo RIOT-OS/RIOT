@@ -32,12 +32,13 @@
 #include "at86rf2xx_registers.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_netdev.h"
+#include "at86rf2xx_params.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
 
-void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
+void at86rf2xx_setup(at86rf2xx_t *dev, unsigned idx)
 {
     netdev_t *netdev = (netdev_t *)dev;
 
@@ -49,13 +50,15 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     dev->pending_tx = 0;
 
 #if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
-    (void) params;
     /* set all interrupts off */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, 0x00);
 #else
     /* initialize device descriptor */
-    dev->params = *params;
+    dev->params = at86rf2xx_params[idx];
 #endif
+
+    l2util_generate_short_addr(AT86RF2XX_DEVUID, idx, (network_uint16_t *)dev->netdev.short_addr);
+    l2util_generate_eui64(AT86RF2XX_DEVUID, idx, (eui64_t *)dev->netdev.long_addr);
 }
 
 static void at86rf2xx_disable_clock_output(at86rf2xx_t *dev)
@@ -89,8 +92,6 @@ static void at86rf2xx_enable_smart_idle(at86rf2xx_t *dev)
 
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
-    eui64_t addr_long;
-
     at86rf2xx_hardware_reset(dev);
 
     netdev_ieee802154_reset(&dev->netdev);
@@ -100,14 +101,9 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
         at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
     }
 
-    /* get an 8-byte unique ID to use as hardware address */
-    luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
-    /* make sure we mark the address as non-multicast and not globally unique */
-    addr_long.uint8[0] &= ~(0x01);
-    addr_long.uint8[0] |=  (0x02);
     /* set short and long address */
-    at86rf2xx_set_addr_long(dev, ntohll(addr_long.uint64.u64));
-    at86rf2xx_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
+    at86rf2xx_set_addr_long(dev, dev->netdev.long_addr);
+    at86rf2xx_set_addr_short(dev, dev->netdev.short_addr);
 
     /* set default channel */
     at86rf2xx_set_chan(dev, AT86RF2XX_DEFAULT_CHANNEL);

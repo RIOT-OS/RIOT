@@ -268,9 +268,9 @@ typedef struct {
  * @brief   Setup an AT86RF2xx based device state
  *
  * @param[out] dev          device descriptor
- * @param[in]  params       parameters for device initialization
+ * @param[in]  idx          index in the at86rf2xx_params struct.
  */
-void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params);
+void at86rf2xx_setup(at86rf2xx_t *dev, unsigned idx);
 
 /**
  * @brief   Trigger a hardware reset and configure radio with default values
@@ -294,7 +294,7 @@ uint16_t at86rf2xx_get_addr_short(const at86rf2xx_t *dev);
  * @param[in,out] dev       device to write to
  * @param[in] addr          (2-byte) short address to set
  */
-void at86rf2xx_set_addr_short(at86rf2xx_t *dev, uint16_t addr);
+void at86rf2xx_set_addr_short(at86rf2xx_t *dev, const uint8_t *addr);
 
 /**
  * @brief   Get the configured long address of the given device
@@ -311,7 +311,7 @@ uint64_t at86rf2xx_get_addr_long(const at86rf2xx_t *dev);
  * @param[in,out] dev       device to write to
  * @param[in] addr          (8-byte) long address to set
  */
-void at86rf2xx_set_addr_long(at86rf2xx_t *dev, uint64_t addr);
+void at86rf2xx_set_addr_long(at86rf2xx_t *dev, const uint8_t *addr);
 
 /**
  * @brief   Get the configured channel number of the given device
