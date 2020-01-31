@@ -1,5 +1,6 @@
 CPU_ARCH = cortex-m4f
 CPU_VARIANT = x2
+DRIVERLIB_CPU = cc13x2_cc26x2
 
 VECTORS_O = $(BINDIR)/cc26xx_cc13xx/vectors.o
 

@@ -1,4 +1,7 @@
+export DRIVERLIB ?= $(RIOTCPU)/cc26xx_cc13xx/vendor/ti/devices/$(DRIVERLIB_CPU)
+
 VARIANT = $(shell echo $(CPU_VARIANT) | tr 'a-z-' 'A-Z_')
 CFLAGS += -DCPU_VARIANT_$(VARIANT)
 
 INCLUDES += -I${RIOTCPU}/cc26xx_cc13xx/include
+INCLUDES += -I$(DRIVERLIB)
