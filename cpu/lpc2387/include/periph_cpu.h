@@ -111,6 +111,19 @@ typedef struct {
 } uart_conf_t;
 
 /**
+ * @brief   SPI device configuration
+ */
+typedef struct {
+    lpc23xx_spi_t *dev;         /**< pointer to the SPI device */
+    uint8_t pinsel_mosi;        /**< PINSEL# of the MOSI pin   */
+    uint8_t pinsel_miso;        /**< PINSEL# of the MISO pin   */
+    uint8_t pinsel_clk;         /**< PINSEL# of the CLK pin    */
+    uint32_t pinsel_msk_mosi;   /**< MOSI PINSEL Mask          */
+    uint32_t pinsel_msk_miso;   /**< MISO PINSEL Mask          */
+    uint32_t pinsel_msk_clk;    /**< CLK PINSEL Mask           */
+} spi_conf_t;
+
+/**
  * @brief   Number of available timer channels
  */
 #define TIMER_CHAN_NUMOF        (4U)
