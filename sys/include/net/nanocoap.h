@@ -139,8 +139,8 @@ extern "C" {
 /**
  * @brief    Maximum size for a blockwise transfer as a power of 2
  */
-#ifndef NANOCOAP_BLOCK_SIZE_EXP_MAX
-#define NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)
+#ifndef CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
+#define CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)
 #endif
 
 /** @brief   Maximum length of a query string written to a message */
@@ -616,7 +616,7 @@ ssize_t coap_opt_get_opaque(const coap_pkt_t *pkt, unsigned opt_num, uint8_t **v
  * @param[in]    blknum     offset from the beginning of content, in terms of
                             @p blksize byte blocks
  * @param[in]    blksize    size of each block; must be a power of 2 between 16
- *                          and 2 raised to #NANOCOAP_BLOCK_SIZE_EXP_MAX
+ *                          and 2 raised to #CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
  * @param[in]    more       more blocks? use 1 if yes; 0 if no or unknown
  */
 void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
@@ -686,7 +686,7 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
  * @param[in]    blknum     offset from the beginning of content, in terms of
                             @p blksize byte blocks
  * @param[in]    blksize    size of each block; must be a power of 2 between 16
- *                          and 2 raised to #NANOCOAP_BLOCK_SIZE_EXP_MAX
+ *                          and 2 raised to #CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
  */
 void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
                             size_t blksize);

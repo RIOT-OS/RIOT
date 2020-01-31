@@ -951,8 +951,8 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
     if (coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &blknum, &szx) >= 0) {
         /* Use the client requested block size if it is smaller than our own
          * maximum block size */
-        if (NANOCOAP_BLOCK_SIZE_EXP_MAX - 4 < szx) {
-            szx = NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
+        if (CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4 < szx) {
+            szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
         }
     }
 
