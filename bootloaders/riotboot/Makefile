@@ -14,7 +14,7 @@ CFLAGS += -DRIOTBOOT
 
 # Disable unused modules
 CFLAGS += -DNDEBUG -DLOG_LEVEL=LOG_NONE
-DISABLE_MODULE += core_init core_msg
+DISABLE_MODULE += core_init core_msg core_panic
 DISABLE_MODULE += auto_init
 
 # Include riotboot flash partition functionality
