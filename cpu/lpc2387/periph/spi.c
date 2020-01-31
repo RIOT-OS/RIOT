@@ -34,9 +34,9 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define SPI_TX_EMPTY                (SSP0SR & SSPSR_TFE)
-#define SPI_BUSY                    (SSP0SR & SSPSR_BSY)
-#define SPI_RX_AVAIL                (SSP0SR & SSPSR_RNE)
+#define SPI_TX_EMPTY                (SPI0->SR & SSPSR_TFE)
+#define SPI_BUSY                    (SPI0->SR & SSPSR_BSY)
+#define SPI_RX_AVAIL                (SPI0->SR & SSPSR_RNE)
 
 /**
  * @brief Array holding one pre-initialized mutex for each SPI device
@@ -80,21 +80,21 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /*  power on */
     PCONP |= (PCSSP0);
     /* interface setup */
-    SSP0CR0 = 7;
+    SPI0->CR0 = 7;
 
     /* configure bus clock */
     lpc2387_pclk_scale(CLOCK_CORECLOCK / 1000, (uint32_t)clk, &pclksel, &cpsr);
     PCLKSEL1 &= ~(BIT10 | BIT11);   /* CCLK to PCLK divider*/
     PCLKSEL1 |= pclksel << 10;
-    SSP0CPSR = cpsr;
+    SPI0->CPSR = cpsr;
 
     /* enable the bus */
-    SSP0CR1 |= BIT1;
+    SPI0->CR1 |= BIT1;
 
     /* clear RxFIFO */
     int dummy;
     while (SPI_RX_AVAIL) {         /* while RNE (Receive FIFO Not Empty)...*/
-        dummy = SSP0DR;            /* read data*/
+        dummy = SPI0->DR;            /* read data*/
     }
     (void) dummy;                  /* to suppress unused-but-set-variable */
 
@@ -105,7 +105,7 @@ void spi_release(spi_t bus)
 {
     (void) bus;
     /* disable, power off, and release the bus */
-    SSP0CR1 &= ~(BIT1);
+    SPI0->CR1 &= ~(BIT1);
     PCONP &= ~(PCSSP0);
     mutex_unlock(&lock);
 }
@@ -127,10 +127,10 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     for (size_t i = 0; i < len; i++) {
         uint8_t tmp = (out_buf) ? out_buf[i] : 0;
         while (!SPI_TX_EMPTY) {}
-        SSP0DR = tmp;
+        SPI0->DR = tmp;
         while (SPI_BUSY) {}
         while (!SPI_RX_AVAIL) {}
-        tmp = (uint8_t)SSP0DR;
+        tmp = (uint8_t)SPI0->DR;
         if (in_buf) {
             in_buf[i] = tmp;
         }
