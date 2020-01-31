@@ -73,11 +73,11 @@ extern "C" {
  * This is configured at the board level, defaulting to 40.
  */
 #ifndef CONFIG_ESP32_XTAL_FREQ
-#define CONFIG_ESP32_XTAL_FREQ                  ESP32_XTAL_FREQ
+#define CONFIG_ESP32_XTAL_FREQ                  0
 #endif
 
 #define CONFIG_ESP32_RTC_XTAL_BOOTSTRAP_CYCLES  100
-#define CONFIG_ESP32_RTC_CLK_CAL_CYCLES         1024
+#define CONFIG_ESP32_RTC_CLK_CAL_CYCLES         (8 * 1024)
 
 /**
  * System specific configuration (DO NOT CHANGE)
