@@ -19,114 +19,57 @@
   * @}
   */
 
-#include <assert.h>
-#include <stdint.h>
+#include "cpu.h"
 #include "periph/gpio.h"
-#include "board.h"
+#include "periph_conf.h"
 
-#define GPIO_PIN_NO(PIN)    (1 << ((PIN) & 0xf))
-#define GPIO_PORT(PIN)      ((PIN) >> 4)
+#define LATx(P)         ((P)[0x30/0x4])
+#define LATxCLR(P)      ((P)[0x34/0x4])
+#define LATxSET(P)      ((P)[0x38/0x4])
+#define LATxINV(P)      ((P)[0x3C/0x4])
+#define PORTx(P)        ((P)[0x20/0x4])
+#define CNPUxCLR(P)     ((P)[0x54/0x4])
+#define CNPUxSET(P)     ((P)[0x58/0x4])
+#define CNPDxCLR(P)     ((P)[0x64/0x4])
+#define CNPDxSET(P)     ((P)[0x68/0x4])
+#define ODCxCLR(P)      ((P)[0x44/0x4])
+#define ODCxSET(P)      ((P)[0x48/0x4])
+#define ANSELxCLR(P)    ((P)[0x04/0x4])
+#define TRISxCLR(P)     ((P)[0x14/0x4])
+#define TRISxSET(P)     ((P)[0x18/0x4])
 
-#define LATx(P)         (base_address[P].gpio[0x10/0x4])
-#define LATxCLR(P)      (base_address[P].gpio[0x14/0x4])
-#define LATxSET(P)      (base_address[P].gpio[0x18/0x4])
-#define LATxINV(P)      (base_address[P].gpio[0x1C/0x4])
-#define PORTx(P)        (base_address[P].gpio[0x0])
-#define CNPUxCLR(P)     (base_address[P].gpio[0x34/0x4])
-#define CNPUxSET(P)     (base_address[P].gpio[0x38/0x4])
-#define CNPDxCLR(P)     (base_address[P].gpio[0x44/0x4])
-#define CNPDxSET(P)     (base_address[P].gpio[0x48/0x4])
-#define ODCxCLR(P)      (base_address[P].gpio[0x24/0x4])
-#define ODCxSET(P)      (base_address[P].gpio[0x28/0x4])
-#define ANSELxCLR(P)    (base_address[P].ansel[0x04/0x4])
-#define TRISxCLR(P)     (base_address[P].tris[0x04/0x4])
-#define TRISxSET(P)     (base_address[P].tris[0x08/0x4])
-
-typedef struct PIC32_GPIO_tag {
-    volatile uint32_t* gpio;
-    volatile uint32_t* ansel;
-    volatile uint32_t* tris;
-} PIC32_GPIO_T;
-
-static PIC32_GPIO_T base_address[] = {
-#ifdef _PORTA_BASE_ADDRESS
-    {
-        .gpio  = (volatile uint32_t*)_PORTA_BASE_ADDRESS,
-        .ansel = (volatile uint32_t*)&ANSELA,
-        .tris  = (volatile uint32_t*)&TRISA
-    },
-#else
-    {0 , 0, 0},
-#endif
-#ifdef _PORTB_BASE_ADDRESS
-    {
-        .gpio  = (volatile uint32_t*)_PORTB_BASE_ADDRESS,
-        .ansel = (volatile uint32_t*)&ANSELB,
-        .tris  = (volatile uint32_t*)&TRISB
-    },
-#else
-    {0 , 0, 0},
-#endif
-#ifdef _PORTC_BASE_ADDRESS
-    {
-        .gpio  = (volatile uint32_t*)_PORTC_BASE_ADDRESS,
-        .ansel = (volatile uint32_t*)&ANSELC,
-        .tris  = (volatile uint32_t*)&TRISC
-    },
-#else
-    {0 , 0, 0},
-#endif
-#ifdef _PORTD_BASE_ADDRESS
-    {
-        .gpio  = (volatile uint32_t*)_PORTD_BASE_ADDRESS,
-        .ansel = (volatile uint32_t*)&ANSELD,
-        .tris  = (volatile uint32_t*)&TRISD
-    },
-#else
-    {0 , 0, 0},
-#endif
-#ifdef _PORTE_BASE_ADDRESS
-    {
-        .gpio  = (volatile uint32_t*)_PORTE_BASE_ADDRESS,
-        .ansel = (volatile uint32_t*)&ANSELE,
-        .tris  = (volatile uint32_t*)&TRISE
-    },
-#else
-    {0 , 0, 0},
-#endif
-#ifdef _PORTF_BASE_ADDRESS
-    {
-        .gpio  = (volatile uint32_t*)_PORTF_BASE_ADDRESS,
-        .ansel = (volatile uint32_t*)&ANSELF,
-        .tris  = (volatile uint32_t*)&TRISF
-    },
-#else
-    {0 , 0, 0},
-#endif
-#ifdef _PORTG_BASE_ADDRESS
-    {
-        .gpio  = (volatile uint32_t*)_PORTG_BASE_ADDRESS,
-        .ansel = (volatile uint32_t*)&ANSELG,
-        .tris  = (volatile uint32_t*)&TRISG
-    },
-#else
-    {0 , 0, 0},
-#endif
-};
-
-static inline int check_valid_port(uint8_t port)
+/**
+ * @brief   Extract the port base address from the given pin identifier
+ */
+static inline volatile unsigned int * _port(gpio_t pin)
 {
-    return port < ARRAY_SIZE(base_address)
-        && base_address[port].gpio != NULL;
+    return (volatile unsigned int *)(pin & ~(0xff));
+}
+
+/**
+ * @brief   Extract the port number form the given identifier
+ *
+ * The port number is extracted by looking at bits 8, 9, 10, 11 of the base
+ * register addresses.
+ */
+static inline int _port_num(gpio_t pin)
+{
+    return ((pin >> 8) & 0x0f);
+}
+
+/**
+ * @brief   Extract the pin number from the last 4 bit of the pin identifier
+ */
+static inline int _pin_num(gpio_t pin)
+{
+    return (pin & 0x0f);
 }
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    uint8_t port = GPIO_PORT(pin);
-    uint32_t pin_no = GPIO_PIN_NO(pin);
+    volatile unsigned int * port = _port(pin);
+    int pin_num = _pin_num(pin);
     uint8_t output = 0, pu = 0, pd = 0, od = 0;
-
-    assert(check_valid_port(port));
 
     switch (mode) {
         case GPIO_IN:
@@ -137,7 +80,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
         case GPIO_IN_PU:
             pu = 1;
             break;
-
         case GPIO_OD_PU:
             pu = 1;
         case GPIO_OD:
@@ -147,57 +89,49 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
             break;
     }
 
-    ANSELxCLR(port) = pin_no;       /* Configure GPIO as digital */
+    ANSELxCLR(port) = 1U << pin_num;       /* Configure GPIO as digital */
 
     if (pu)
-        CNPUxSET(port) = pin_no;
+        CNPUxSET(port) = 1U << pin_num;
     else
-        CNPUxCLR(port) = pin_no;
+        CNPUxCLR(port) = 1U << pin_num;
 
     if (pd)
-        CNPDxSET(port) = pin_no;
+        CNPDxSET(port) = 1U << pin_num;
     else
-        CNPDxCLR(port) = pin_no;
+        CNPDxCLR(port) = 1U << pin_num;
 
     if (od)
-        ODCxSET(port) = pin_no;
+        ODCxSET(port) = 1U << pin_num;
     else
-        ODCxCLR(port) = pin_no;
+        ODCxCLR(port) = 1U << pin_num;
 
     if (output)
-        TRISxCLR(port) = pin_no;
+        TRISxCLR(port) = 1U << pin_num;
     else
-        TRISxSET(port) = pin_no;
+        TRISxSET(port) = 1U << pin_num;
 
     return 0;
 }
 
 int gpio_read(gpio_t pin)
 {
-    assert(check_valid_port(GPIO_PORT(pin)));
-
-    return PORTx(GPIO_PORT(pin)) & GPIO_PIN_NO(pin);
+    return PORTx(_port(pin)) & (1U << _pin_num(pin));
 }
 
 void gpio_set(gpio_t pin)
 {
-    assert(check_valid_port(GPIO_PORT(pin)));
-
-    LATxSET(GPIO_PORT(pin)) = GPIO_PIN_NO(pin);
+    LATxSET(_port(pin)) = 1U << _pin_num(pin);
 }
 
 void gpio_clear(gpio_t pin)
 {
-    assert(check_valid_port(GPIO_PORT(pin)));
-
-    LATxCLR(GPIO_PORT(pin)) = GPIO_PIN_NO(pin);
+    LATxCLR(_port(pin)) = 1U << _pin_num(pin);
 }
 
 void gpio_toggle(gpio_t pin)
 {
-    assert(check_valid_port(GPIO_PORT(pin)));
-
-    LATxINV(GPIO_PORT(pin)) = GPIO_PIN_NO(pin);
+    LATxINV(_port(pin)) = 1U << _pin_num(pin);
 }
 
 void gpio_write(gpio_t pin, int value)
