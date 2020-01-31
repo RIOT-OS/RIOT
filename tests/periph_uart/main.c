@@ -31,8 +31,12 @@
 #include "stdio_uart.h"
 #include "xtimer.h"
 
+#ifndef SHELL_BUFSIZE
 #define SHELL_BUFSIZE       (128U)
+#endif
+#ifndef UART_BUFSIZE
 #define UART_BUFSIZE        (128U)
+#endif
 
 #define PRINTER_PRIO        (THREAD_PRIORITY_MAIN - 1)
 #define PRINTER_TYPE        (0xabcd)
@@ -295,7 +299,7 @@ int main(void)
                                 PRINTER_PRIO, 0, printer, NULL, "printer");
 
     /* run the shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    char line_buf[SHELL_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_BUFSIZE);
     return 0;
 }
