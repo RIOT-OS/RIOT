@@ -56,14 +56,6 @@ extern "C" {
 #define GNRC_SOCK_DYN_PORTRANGE_ERR (0)
 
 /**
- * @brief   Offset for next dynamic port
- *
- * Currently set to a static (prime) offset, but could be random, too
- * see https://tools.ietf.org/html/rfc6056#section-3.3.3
- */
-#define GNRC_SOCK_DYN_PORTRANGE_OFF (17U)
-
-/**
  * @brief   Internal helper functions for GNRC
  * @internal
  * @{

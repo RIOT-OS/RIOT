@@ -25,14 +25,13 @@
 #include "net/gnrc/udp.h"
 #include "net/sock/udp.h"
 #include "net/udp.h"
+#include "random.h"
 
 #include "gnrc_sock_internal.h"
 
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
 static sock_udp_t *_udp_socks = NULL;
 #endif
-
-static uint16_t _dyn_port_next = 0;
 
 /**
  * @brief   Checks if a given UDP port is already used by another sock
@@ -66,15 +65,15 @@ static bool _dyn_port_used(uint16_t port)
 /**
  * @brief   returns a UDP port, and checks for reuse if required
  *
- * complies to RFC 6056, see https://tools.ietf.org/html/rfc6056#section-3.3.3
+ * implements "Another Simple Port Randomization Algorithm" as specified in
+ * RFC 6056, see https://tools.ietf.org/html/rfc6056#section-3.3.2
  */
 static uint16_t _get_dyn_port(sock_udp_t *sock)
 {
     unsigned count = GNRC_SOCK_DYN_PORTRANGE_NUM;
     do {
         uint16_t port = GNRC_SOCK_DYN_PORTRANGE_MIN +
-               (_dyn_port_next * GNRC_SOCK_DYN_PORTRANGE_OFF) % GNRC_SOCK_DYN_PORTRANGE_NUM;
-        _dyn_port_next++;
+               (random_uint32() % GNRC_SOCK_DYN_PORTRANGE_NUM);
         if ((sock == NULL) || (sock->flags & SOCK_FLAGS_REUSE_EP) ||
                               !_dyn_port_used(port)) {
             return port;
