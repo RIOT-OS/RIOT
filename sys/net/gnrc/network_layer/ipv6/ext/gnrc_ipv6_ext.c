@@ -25,6 +25,11 @@
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ipv6/ext/frag.h"
 #include "net/gnrc/ipv6/ext/rh.h"
+#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && \
+    defined(MODULE_GNRC_IPV6_EXT_FRAG)
+#include "net/udp.h"
+#endif  /* defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) &&
+         * defined(MODULE_GNRC_IPV6_EXT_FRAG) */
 
 #include "net/gnrc/ipv6/ext.h"
 
@@ -101,7 +106,22 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
                                           uint8_t *protnum)
 {
     bool is_ext = true;
+#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && \
+    defined(MODULE_GNRC_IPV6_EXT_FRAG)
+    bool is_frag = false;
+#endif  /* defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) &&
+         * defined(MODULE_GNRC_IPV6_EXT_FRAG) */
+
     while (is_ext) {
+#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && \
+    defined(MODULE_GNRC_IPV6_EXT_FRAG)
+        if (*protnum == PROTNUM_IPV6_EXT_FRAG) {
+            /* just assigning the if expression might override it if
+             * fragment header is not the last extension header ;-) */
+            is_frag = true;
+        }
+#endif  /* defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) &&
+         * defined(MODULE_GNRC_IPV6_EXT_FRAG) */
         switch (*protnum) {
             case PROTNUM_IPV6_EXT_DST:
             case PROTNUM_IPV6_EXT_RH:
@@ -127,6 +147,34 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
                 }
                 break;
             }
+#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && \
+    defined(MODULE_GNRC_IPV6_EXT_FRAG)
+            case PROTNUM_UDP:
+                if (is_frag) {
+                    DEBUG("gnrc_ipv6_ext: adapting compressed header length\n");
+                    /* we can only really now determine the length of the UDP
+                     * packet, after the IPv6 datagram is fully reassembled */
+                    udp_hdr_t *udp_hdr = pkt->data;
+
+                    udp_hdr->length = byteorder_htons((uint16_t)pkt->size);
+                }
+                is_ext = false;
+                break;
+            case PROTNUM_IPV6:
+                if (is_frag) {
+                    DEBUG("gnrc_ipv6_ext: adapting compressed header length\n");
+                    /* we can only really now determine the length of the
+                     * encapsulated IPv6 header, after the IPv6 datagram is
+                     * fully reassembled */
+                    ipv6_hdr_t *ipv6_hdr = pkt->data;
+
+                    ipv6_hdr->len = byteorder_htons((uint16_t)pkt->size -
+                                                    sizeof(ipv6_hdr_t));
+                }
+                is_ext = false;
+                break;
+#endif  /* defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) &&
+         * defined(MODULE_GNRC_IPV6_EXT_FRAG) */
             default:
                 is_ext = false;
                 break;
