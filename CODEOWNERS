@@ -77,6 +77,7 @@
 /drivers/dose/                              @jue89
 /drivers/ds18/                              @leandrolanzieri
 /drivers/itg320x/                           @gschorcht
+/drivers/mcp2515/                           @wosym
 /drivers/mrf24j40/                          @bergzand
 /drivers/pca9685/                           @gschorcht
 /drivers/sht3x/                             @gschorcht

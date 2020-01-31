@@ -32,40 +32,40 @@ extern "C" {
  * @brief MCP2515 mode
  */
 enum mcp2515_mode {
-    MODE_NORMAL = MCP2515_CANSTAT_OPMOD_NORMAL,
-    MODE_SLEEP = MCP2515_CANSTAT_OPMOD_SLEEP,
-    MODE_LOOPBACK = MCP2515_CANSTAT_OPMOD_LOOPBACK,
-    MODE_LISTEN_ONLY = MCP2515_CANSTAT_OPMOD_LISTEN_ONLY,
-    MODE_CONFIG = MCP2515_CANSTAT_OPMOD_CONFIGURATION,
-    MODE_UNKNOWN = -1
+    MODE_NORMAL         = MCP2515_CANSTAT_OPMOD_NORMAL,
+    MODE_SLEEP          = MCP2515_CANSTAT_OPMOD_SLEEP,
+    MODE_LOOPBACK       = MCP2515_CANSTAT_OPMOD_LOOPBACK,
+    MODE_LISTEN_ONLY    = MCP2515_CANSTAT_OPMOD_LISTEN_ONLY,
+    MODE_CONFIG         = MCP2515_CANSTAT_OPMOD_CONFIGURATION,
+    MODE_UNKNOWN        = -1
 };
 
 /**
  * @brief MCP2515 interrupt
  */
 enum mcp2515_interrupt {
-    INT_RX0 = MCP2515_CANINTF_RX0IF,
-    INT_RX1 = MCP2515_CANINTF_RX1IF,
-    INT_TX0 = MCP2515_CANINTF_TX0IF,
-    INT_TX1 = MCP2515_CANINTF_TX1IF,
-    INT_TX2 = MCP2515_CANINTF_TX2IF,
-    INT_ERROR = MCP2515_CANINTF_ERRIF,
-    INT_WAKEUP = MCP2515_CANINTF_WAKIF,
-    INT_MESSAGE_ERROR = MCP2515_CANINTF_MERRF,
+    INT_RX0             = MCP2515_CANINTF_RX0IF,
+    INT_RX1             = MCP2515_CANINTF_RX1IF,
+    INT_TX0             = MCP2515_CANINTF_TX0IF,
+    INT_TX1             = MCP2515_CANINTF_TX1IF,
+    INT_TX2             = MCP2515_CANINTF_TX2IF,
+    INT_ERROR           = MCP2515_CANINTF_ERRIF,
+    INT_WAKEUP          = MCP2515_CANINTF_WAKIF,
+    INT_MESSAGE_ERROR   = MCP2515_CANINTF_MERRF,
 };
 
 /**
  * @brief MCP2515 error
  */
 enum mcp2515_error {
-    ERR_WARNING = MCP2515_EFLG_EWARN,
-    ERR_RX_WARNING  = MCP2515_EFLG_RXWAR,
-    ERR_TX_WARNING = MCP2515_EFLG_TXWAR,
-    ERR_RX_PASSIVE = MCP2515_EFLG_RXEP,
-    ERR_TX_PASSIVE = MCP2515_EFLG_TXEP,
-    ERR_TX_BUS_OFF = MCP2515_EFLG_TXBO,
-    ERR_RX_0_OVERFLOW = MCP2515_EFLG_RX0OVR,
-    ERR_RX_1_OVERFLOW = MCP2515_EFLG_RX1OVR,
+    ERR_WARNING         = MCP2515_EFLG_EWARN,
+    ERR_RX_WARNING      = MCP2515_EFLG_RXWAR,
+    ERR_TX_WARNING      = MCP2515_EFLG_TXWAR,
+    ERR_RX_PASSIVE      = MCP2515_EFLG_RXEP,
+    ERR_TX_PASSIVE      = MCP2515_EFLG_TXEP,
+    ERR_TX_BUS_OFF      = MCP2515_EFLG_TXBO,
+    ERR_RX_0_OVERFLOW   = MCP2515_EFLG_RX0OVR,
+    ERR_RX_1_OVERFLOW   = MCP2515_EFLG_RX1OVR,
 };
 
 /** Wake up source */
@@ -74,7 +74,7 @@ enum mcp2515_error {
 /**
  * @brief Initialize pins and SPI interface
  *
- * The device descriptor contains all informations related to pins and SPI
+ * The device descriptor contains all information related to pins and SPI
  * interface. This function initialize all corresponding fields and relies
  * the @p irq_cb callback function to the pin interruption. The pin
  * interruption should be configured in the device descriptor.
@@ -87,7 +87,7 @@ enum mcp2515_error {
  * @return                  0 on success
  * @return                  <0 on error
  */
-int mcp2515_init(candev_mcp2515_t *dev, void(*irq_cb)(void*));
+int mcp2515_init(candev_mcp2515_t *dev, void (*irq_cb)(void *));
 
 /**
  * @brief Reset MCP2515 device with dedicated pin
@@ -118,7 +118,8 @@ int mcp2515_init_irqs(candev_mcp2515_t *dev);
  * @return                  0 on success
  * @return                  <0 on error
  */
-int mcp2515_send(candev_mcp2515_t *dev, const struct can_frame *frame, int mailbox);
+int mcp2515_send(candev_mcp2515_t *dev, const struct can_frame *frame,
+                 int mailbox);
 
 /**
  * @brief Receive frame from the corresponding rx @p mailbox.
@@ -130,7 +131,8 @@ int mcp2515_send(candev_mcp2515_t *dev, const struct can_frame *frame, int mailb
  * @return                  0 on success
  * @return                  <0 on error
  */
-int mcp2515_receive(candev_mcp2515_t *dev, struct can_frame *frame, int mailbox);
+int mcp2515_receive(candev_mcp2515_t *dev, struct can_frame *frame,
+                    int mailbox);
 
 /**
  * @brief Abort communication.
@@ -160,7 +162,8 @@ enum mcp2515_mode mcp2515_get_mode(candev_mcp2515_t *dev);
  *
  * @return                  The mode actually set
  */
-enum mcp2515_mode mcp2515_set_mode(candev_mcp2515_t *dev, enum mcp2515_mode mode);
+enum mcp2515_mode mcp2515_set_mode(candev_mcp2515_t *dev,
+                                   enum mcp2515_mode mode);
 
 /**
  * @brief Wake up MCP2515
@@ -203,7 +206,7 @@ int mcp2515_tx_err_occurred(candev_mcp2515_t *dev, int mailbox);
 /**
  * @brief Configure the bit timing of the MCP2515.
  *
- * The informations about the bit timing should be contained in dev descriptor.
+ * The information about the bit timing should be contained in dev descriptor.
  *
  * @param[in]  dev          device descriptor
  *

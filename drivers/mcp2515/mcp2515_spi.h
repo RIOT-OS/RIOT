@@ -31,7 +31,7 @@ extern "C" {
 /**
  * @brief Initialize SPI interface
  *
- * The device descriptor contains all informations related to the SPI interface.
+ * The device descriptor contains all information related to the SPI interface.
  *
  * @param[out] dev          device descriptor
  *
@@ -127,8 +127,7 @@ int mcp2515_spi_rts(const candev_mcp2515_t *dev, uint8_t mailbox);
  *
  * @param[in]  dev          device descriptor
  *
- * @return                  0 on success
- * @return                  <0 on error
+ * @return                  the read status
  */
 uint8_t mcp2515_spi_read_status(const candev_mcp2515_t *dev);
 
@@ -153,7 +152,7 @@ int mcp2515_spi_rx_status(const candev_mcp2515_t *dev);
  * @param[in]  dev          device descriptor
  * @param[in]  addr         register address
  * @param[in]  mask         mask to modify individual bit
- * @param[in]  buf          regsiter value
+ * @param[in]  buf          register value
  *
  * @return                  0 on success
  * @return                  <0 on error
