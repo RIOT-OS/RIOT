@@ -50,7 +50,8 @@
 
 #include "random.h"
 #include "iolist.h"
-#include "cc13x2_rf_prop_internal.h"
+#include "rf_prop_internal.h"
+#include "cc13x2_rf_internal.h"
 #include "cc26xx_cc13xx_int.h"
 
 #include <driverlib/chipinfo.h>
@@ -74,7 +75,7 @@
 #define CC1352_RF_CMD0 0x0607
 
 /* phy state as defined by openthread */
-volatile cc13x2_PhyState_t _cc13x2_rf_state;
+volatile cc13x2_PropPhyState_t _cc13x2_rf_prop_state;
 
 /* set to max transmit power by default */
 static output_config_t const *sCurrentOutputPower = &(rgOutputPower[0]);
@@ -847,10 +848,10 @@ void _isr_rfc_cpe0(void)
     {
         HWREG(RFC_DBELL_NONBUF_BASE + RFC_DBELL_O_RFCPEIFG) = ~IRQ_LAST_COMMAND_DONE;
 
-        if (_cc13x2_rf_state == cc13x2_stateReceive && sReceiveCmd.status != ACTIVE && sReceiveCmd.status != IEEE_SUSPENDED)
+        if (_cc13x2_rf_prop_state == cc13x2_stateReceive && sReceiveCmd.status != ACTIVE && sReceiveCmd.status != IEEE_SUSPENDED)
         {
             /* the rx command was probably aborted to change the channel */
-            _cc13x2_rf_state = cc13x2_stateSleep;
+            _cc13x2_rf_prop_state = cc13x2_stateSleep;
         }
     }
 
@@ -858,7 +859,7 @@ void _isr_rfc_cpe0(void)
     {
         HWREG(RFC_DBELL_NONBUF_BASE + RFC_DBELL_O_RFCPEIFG) = ~IRQ_LAST_FG_COMMAND_DONE;
 
-        if (_cc13x2_rf_state == cc13x2_stateTransmit)
+        if (_cc13x2_rf_prop_state == cc13x2_stateTransmit)
         {
             if (sTransmitCmd.pPkt[0] & IEEE802154_ACK_REQUEST)
             {
@@ -901,7 +902,7 @@ void _isr_rfc_cpe0(void)
 
     if (HWREG(RFC_DBELL_NONBUF_BASE + RFC_DBELL_O_RFCPEIFG) & IRQ_TX_DONE) {
         sFlags |= 2;
-        _cc13x2_rf_state = cc13x2_stateReceive;
+        _cc13x2_rf_prop_state = cc13x2_stateReceive;
         HWREG(RFC_DBELL_NONBUF_BASE + RFC_DBELL_O_RFCPEIFG) = ~IRQ_TX_DONE;
     }
 
@@ -915,12 +916,12 @@ void _isr_rfc_cpe0(void)
 /**
  * Function documented in platform-cc13x2.h
  */
-void cc13x2_rf_init(void)
+void cc13x2_rf_prop_init(void)
 {
     /* Populate the RX parameters data structure with default values */
     rfCoreInitReceiveParams();
 
-    _cc13x2_rf_state = cc13x2_stateDisabled;
+    _cc13x2_rf_prop_state = cc13x2_stateDisabled;
     cc26xx_cc13xx_ints.isr_rfc_cpe0 = _isr_rfc_cpe0;
     cc26xx_cc13xx_ints.isr_rfc_cpe1 = _isr_rfc_cpe1;
 }
@@ -928,15 +929,15 @@ void cc13x2_rf_init(void)
 /**
  * Function documented in platform/radio.h
  */
-int_fast8_t cc13x2_rf_enable(void)
+int_fast8_t cc13x2_rf_prop_enable(void)
 {
     int_fast8_t error = -1;
 
-    if (_cc13x2_rf_state == cc13x2_stateSleep)
+    if (_cc13x2_rf_prop_state == cc13x2_stateSleep)
     {
         error = 0;
     }
-    else if (_cc13x2_rf_state == cc13x2_stateDisabled)
+    else if (_cc13x2_rf_prop_state == cc13x2_stateDisabled)
     {
         if (rfCorePowerOn() != CMDSTA_Done) {
             error = -1;
@@ -967,7 +968,7 @@ int_fast8_t cc13x2_rf_enable(void)
         /* Set the RF Switch to the 2.4 GHz path */
         GPIO_writeDio(IOID_30, 0);
 
-        _cc13x2_rf_state = cc13x2_stateSleep;
+        _cc13x2_rf_prop_state = cc13x2_stateSleep;
         error  = 0;
     }
 
@@ -976,28 +977,28 @@ exit:
     if (error == -1)
     {
         rfCorePowerOff();
-        _cc13x2_rf_state = cc13x2_stateDisabled;
+        _cc13x2_rf_prop_state = cc13x2_stateDisabled;
     }
 
     return error;
 }
 
-int_fast8_t cc13x2_rf_disable(void)
+int_fast8_t cc13x2_rf_prop_disable(void)
 {
     int_fast8_t error = -1;
 
-    if (_cc13x2_rf_state == cc13x2_stateDisabled)
+    if (_cc13x2_rf_prop_state == cc13x2_stateDisabled)
     {
         error = 0;
     }
-    else if (_cc13x2_rf_state == cc13x2_stateSleep)
+    else if (_cc13x2_rf_prop_state == cc13x2_stateSleep)
     {
         rfCoreSendDisableCmd();
         /* we don't want to fail if this command string doesn't work, just turn
          * off the whole core
          */
         rfCorePowerOff();
-        _cc13x2_rf_state = cc13x2_stateDisabled;
+        _cc13x2_rf_prop_state = cc13x2_stateDisabled;
         error  = 0;
     }
 
@@ -1007,12 +1008,12 @@ int_fast8_t cc13x2_rf_disable(void)
 /**
  * Function documented in platform/radio.h
  */
-int8_t cc13x2_rf_get_txpower(void)
+int8_t cc13x2_rf_prop_get_txpower(void)
 {
     return sCurrentOutputPower->dbm;
 }
 
-int_fast8_t cc13x2_rf_set_txpower(int8_t aPower)
+int_fast8_t cc13x2_rf_prop_set_txpower(int8_t aPower)
 {
     unsigned int           i;
     output_config_t const *powerCfg = &(rgOutputPower[0]);
@@ -1038,11 +1039,11 @@ int_fast8_t rfSleep(void)
 {
     int_fast8_t error = -1;
 
-    if (_cc13x2_rf_state == cc13x2_stateSleep)
+    if (_cc13x2_rf_prop_state == cc13x2_stateSleep)
     {
         error = 0;
     }
-    else if (_cc13x2_rf_state == cc13x2_stateReceive)
+    else if (_cc13x2_rf_prop_state == cc13x2_stateReceive)
     {
         if (rfCoreExecuteAbortCmd() != CMDSTA_Done)
         {
@@ -1050,25 +1051,25 @@ int_fast8_t rfSleep(void)
         }
         else
         {
-            _cc13x2_rf_state = cc13x2_stateSleep;
+            _cc13x2_rf_prop_state = cc13x2_stateSleep;
         }
     }
 
     return error;
 }
 
-int8_t cc13x2_rf_get_rssi(void)
+int8_t cc13x2_rf_prop_get_rssi(void)
 {
     return sRfStats.lastRssi;
 }
 
-int_fast8_t cc13x2_rf_rx_start(void)
+int_fast8_t cc13x2_rf_prop_rx_start(void)
 {
     int_fast8_t error = -1;
 
-    if (_cc13x2_rf_state == cc13x2_stateSleep)
+    if (_cc13x2_rf_prop_state == cc13x2_stateSleep)
     {
-        _cc13x2_rf_state = cc13x2_stateReceive;
+        _cc13x2_rf_prop_state = cc13x2_stateReceive;
 
         /* initialize the receive command
          * XXX: no memset here because we assume init has been called and we
@@ -1080,12 +1081,12 @@ int_fast8_t cc13x2_rf_rx_start(void)
         }
         error = 0;
     }
-    else if (_cc13x2_rf_state == cc13x2_stateReceive)
+    else if (_cc13x2_rf_prop_state == cc13x2_stateReceive)
     {
         if (sReceiveCmd.status == ACTIVE)
         {
             /* we are already receiving */
-            _cc13x2_rf_state = cc13x2_stateReceive;
+            _cc13x2_rf_prop_state = cc13x2_stateReceive;
             error  = -1;
         }
         else
@@ -1110,7 +1111,7 @@ int_fast8_t cc13x2_rf_rx_start(void)
                 goto exit;
             }
 
-            _cc13x2_rf_state = cc13x2_stateReceive;
+            _cc13x2_rf_prop_state = cc13x2_stateReceive;
              error  = 0;
         }
     }
@@ -1119,18 +1120,18 @@ exit:
     return error;
 }
 
-int_fast8_t cc13x2_rf_rx_stop(void)
+int_fast8_t cc13x2_rf_prop_rx_stop(void)
 {
     int_fast8_t error = 0;
 
-    if (_cc13x2_rf_state == cc13x2_stateReceive)
+    if (_cc13x2_rf_prop_state == cc13x2_stateReceive)
     {
         if (!(rfCoreExecuteAbortCmd() == CMDSTA_Done)) {
             error = -1;
             goto exit;
         }
 
-        _cc13x2_rf_state = cc13x2_stateSleep;
+        _cc13x2_rf_prop_state = cc13x2_stateSleep;
         error  = 0;
     }
 
@@ -1138,21 +1139,21 @@ exit:
     return error;
 }
 
-uint8_t cc13x2_rf_get_chan(void)
+uint8_t cc13x2_rf_prop_get_chan(void)
 {
     return _channel;
 }
 
-void cc13x2_rf_set_chan(uint16_t channel)
+void cc13x2_rf_prop_set_chan(uint16_t channel)
 {
     if (_channel == channel) {
         return;
     }
 
-    int rx_was_active = (_cc13x2_rf_state == cc13x2_stateReceive);
+    int rx_was_active = (_cc13x2_rf_prop_state == cc13x2_stateReceive);
 
     if (rx_was_active) {
-        cc13x2_rf_rx_stop();
+        cc13x2_rf_prop_rx_stop();
     }
 
     const uint32_t new_freq = ieee802154_freq(channel);
@@ -1164,9 +1165,9 @@ void cc13x2_rf_set_chan(uint16_t channel)
     _channel = channel;
 
     if (rx_was_active) {
-        cc13x2_rf_rx_start();
+        cc13x2_rf_prop_rx_start();
     }
-    // TODO: handle cc13x2_rf_state == cc13x2_stateTransmit
+    // TODO: handle cc13x2_rf_prop_state == cc13x2_stateTransmit
 
     return;
 }
@@ -1174,7 +1175,7 @@ void cc13x2_rf_set_chan(uint16_t channel)
 /**
  * Function documented in platform/radio.h
  */
-void cc13x2_rf_get_ieee_eui64(uint8_t *aIeeeEui64)
+void cc13x2_rf_prop_get_ieee_eui64(uint8_t *aIeeeEui64)
 {
     uint8_t *    eui64;
     unsigned int i;
@@ -1217,13 +1218,13 @@ void cc13x2_rf_get_ieee_eui64(uint8_t *aIeeeEui64)
     }
 }
 
-void cc13x2_rf_irq_set_handler(void(*handler)(void *), void * arg)
+void cc13x2_rf_prop_irq_set_handler(void(*handler)(void *), void * arg)
 {
     _irq_handler = handler;
     _irq_handler_arg = arg;
 }
 
-int cc13x2_rf_recv(void *buf, size_t len, netdev_ieee802154_rx_info_t *rx_info)
+int cc13x2_rf_prop_recv(void *buf, size_t len, netdev_ieee802154_rx_info_t *rx_info)
 {
     rfc_ieeeRxCorrCrc_t *   crcCorr;
     rfc_dataEntryGeneral_t *curEntry, *startEntry;
@@ -1291,7 +1292,7 @@ int cc13x2_rf_recv(void *buf, size_t len, netdev_ieee802154_rx_info_t *rx_info)
     return 0;
 }
 
-int cc13x2_rf_recv_avail(void)
+int cc13x2_rf_prop_recv_avail(void)
 {
     rfc_dataEntryGeneral_t *curEntry, *startEntry;
 
@@ -1309,11 +1310,11 @@ int cc13x2_rf_recv_avail(void)
     return 0;
 }
 
-int cc13x2_rf_send(const iolist_t *iolist)
+int cc13x2_rf_prop_send(const iolist_t *iolist)
 {
     unsigned error = -EAGAIN;
 
-    if (_cc13x2_rf_state == cc13x2_stateReceive)
+    if (_cc13x2_rf_prop_state == cc13x2_stateReceive)
     {
         size_t len = 0;
         uint8_t *bufpos = sTxBuf0;
@@ -1331,7 +1332,7 @@ int cc13x2_rf_send(const iolist_t *iolist)
             bufpos += iol->iol_len;
         }
 
-        _cc13x2_rf_state = cc13x2_stateTransmit;
+        _cc13x2_rf_prop_state = cc13x2_stateTransmit;
 
         if (!(rfCoreSendTransmitCmd(sTxBuf0, len) == CMDSTA_Done)) {
             error = -1;
@@ -1344,33 +1345,33 @@ int cc13x2_rf_send(const iolist_t *iolist)
     }
 
 exit:
-    _cc13x2_rf_state = cc13x2_stateTransmit;
+    _cc13x2_rf_prop_state = cc13x2_stateTransmit;
 
     return error;
 }
 
-unsigned cc13x2_rf_irq_is_enabled(unsigned irq)
+unsigned cc13x2_rf_prop_irq_is_enabled(unsigned irq)
 {
     return (HWREG(RFC_DBELL_NONBUF_BASE + RFC_DBELL_O_RFCPEIEN) & irq) != 0;
 }
 
-void cc13x2_rf_irq_enable(unsigned irq)
+void cc13x2_rf_prop_irq_enable(unsigned irq)
 {
     HWREG(RFC_DBELL_NONBUF_BASE + RFC_DBELL_O_RFCPEIFG) = ~irq;
     HWREG(RFC_DBELL_NONBUF_BASE + RFC_DBELL_O_RFCPEIEN) |= irq;
 }
 
-void cc13x2_rf_irq_disable(unsigned irq)
+void cc13x2_rf_prop_irq_disable(unsigned irq)
 {
     HWREG(RFC_DBELL_NONBUF_BASE + RFC_DBELL_O_RFCPEIEN) &= ~irq;
 }
 
-void cc13x2_rf_set_pan(uint16_t aPanId)
+void cc13x2_rf_prop_set_pan(uint16_t aPanId)
 {
     (void)aPanId;
 }
 
-uint16_t cc13x2_rf_get_pan(void)
+uint16_t cc13x2_rf_prop_get_pan(void)
 {
     return 0x0000;
 }
@@ -1387,7 +1388,7 @@ void cc13x2_set_short_addr(uint16_t aAddress)
     /* XXX: todo? */
 }
 
-unsigned cc13x2_rf_get_flags(void)
+unsigned cc13x2_rf_prop_get_flags(void)
 {
     unsigned flags = sFlags;
     sFlags = 0;

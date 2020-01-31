@@ -13,3 +13,9 @@ LINKER_SCRIPT ?= cortexm.ld
 
 include ${RIOTCPU}/cc26xx_cc13xx/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk
+
+ifeq (cc1312r1f3,$(CPU_MODEL))
+  CFLAGS += -DPROP_PHY=1
+else ifeq (cc1352r1,$(CPU_MODEL))
+  CFLAGS += -DPROP_PHY=1
+endif

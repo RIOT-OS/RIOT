@@ -8,4 +8,9 @@ ifneq (,$(filter cc13x2_rf,$(USEMODULE)))
   USEMODULE += cc26xx_cc13xx_interrupts
   USEMODULE += cc26xx_cc13xx_driverlib
   USEMODULE += netdev_ieee802154
+  ifeq (cc1312r1f3,$(CPU_MODEL))
+    USEMODULE += cc13x2_rf_prop
+  else ifeq (cc1352r1,$(CPU_MODEL))
+    USEMODULE += cc13x2_rf_prop
+  endif
 endif

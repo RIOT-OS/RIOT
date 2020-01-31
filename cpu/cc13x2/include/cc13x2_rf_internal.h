@@ -44,13 +44,12 @@
  * @author          Jean Pierre Dudey <jeandudey@hotmail.com>
  */
 
-#ifndef CC13X2_RF_PROP_INTERNAL_H
-#define CC13X2_RF_PROP_INTERNAL_H
+#ifndef CC13X2_RF_INTERNAL_H
+#define CC13X2_RF_INTERNAL_H
 
-#include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
 
-#include "iolist.h"
-#include "net/netdev.h"
 #include "net/ieee802154.h"
 #include "net/netdev/ieee802154.h"
 
@@ -130,122 +129,7 @@
  */
 #define IEEE802154_SYMBOLS_PER_SEC 62500
 
-/**
- * @brief   If the EUI64 read from the ccfg is all ones then the customer did
- *          not set the address
- */
-#define CCFG_UNKNOWN_EUI64 0xFF
-
-/**
- * @brief   Creates a TX power entry for the default PA.
- *
- * The values for @a bias, @a gain, @a boost and @a coefficient are usually
- * measured by Texas Instruments for a specific front-end configuration. They
- * can then be obtained from SmartRF Studio.
- */
-#define DEFAULT_PA_ENTRY(bias, gain, boost, coefficient) \
-        ((bias) << 0) | ((gain) << 6) | ((boost) << 8) | ((coefficient) << 9)
-
-/**
- * TX Power dBm lookup table
- */
-typedef struct output_config
-{
-    int      dbm;
-    uint16_t value;
-} output_config_t;
-
-/**
- * @brief     TX Power dBm lookup table
- */
-static const output_config_t rgOutputPower[] = {
-  // The original PA value (12.5 dBm) has been rounded to an integer value.
-  {13, DEFAULT_PA_ENTRY(36, 0, 0, 89) },
-  {12, DEFAULT_PA_ENTRY(16, 0, 0, 82) },
-  {11, DEFAULT_PA_ENTRY(26, 2, 0, 51) },
-  {10, DEFAULT_PA_ENTRY(18, 2, 0, 31) },
-  {9, DEFAULT_PA_ENTRY(28, 3, 0, 31) },
-  {8, DEFAULT_PA_ENTRY(24, 3, 0, 22) },
-  {7, DEFAULT_PA_ENTRY(20, 3, 0, 19) },
-  {6, DEFAULT_PA_ENTRY(17, 3, 0, 16) },
-  {5, DEFAULT_PA_ENTRY(14, 3, 0, 14) },
-  {4, DEFAULT_PA_ENTRY(13, 3, 0, 11) },
-  {3, DEFAULT_PA_ENTRY(11, 3, 0, 10) },
-  {2, DEFAULT_PA_ENTRY(10, 3, 0, 9) },
-  {1, DEFAULT_PA_ENTRY(9, 3, 0, 9) },
-  {0, DEFAULT_PA_ENTRY(8, 3, 0, 8) },
-  {-5, DEFAULT_PA_ENTRY(4, 3, 0, 5) },
-  {-10, DEFAULT_PA_ENTRY(2, 3, 0, 5) },
-  {-15, DEFAULT_PA_ENTRY(1, 3, 0, 3) },
-  {-20, DEFAULT_PA_ENTRY(0, 3, 0, 2) },
-};
-
-#define OUTPUT_CONFIG_COUNT (sizeof(rgOutputPower) / sizeof(rgOutputPower[0]))
-
-/* Max and Min Output Power in dBm */
-#define OUTPUT_POWER_MIN (rgOutputPower[OUTPUT_CONFIG_COUNT - 1].dbm)
-#define OUTPUT_POWER_MAX (rgOutputPower[0].dbm)
-#define OUTPUT_POWER_UNKNOWN 0xFFFF
-
-/**
- * number of short addresses used for source matching
- */
-#define CC1352_SHORTADD_SRC_MATCH_NUM 10
-
-#undef IEEE802154_DEFAULT_SUBGHZ_CHANNEL
-#define IEEE802154_DEFAULT_SUBGHZ_CHANNEL 7
-
-#if IEEE802154_DEFAULT_SUBGHZ_CHANNEL == 2 /* 470 MHz */
-#define IEEE802154_CHAN_MIN           0
-#define IEEE802154_CHAN_MAX           198
-#define IEEE802154_FREQ_SPACING       200
-#define IEEE802154_CHAN0_FREQ         470200
-
-#define PROP_MODE_CENTER_FREQ   0x01EA
-#define PROP_MODE_LO_DIVIDER    0x0A
-#elif IEEE802154_DEFAULT_SUBGHZ_CHANNEL == 3 /* 780 MHz */
-#define IEEE802154_CHAN_MIN           0
-#define IEEE802154_CHAN_MAX           38
-#define IEEE802154_FREQ_SPACING       200
-#define IEEE802154_CHAN0_FREQ         779200
-
-#define PROP_MODE_CENTER_FREQ   0x030F
-#define PROP_MODE_LO_DIVIDER    0x06
-#elif IEEE802154_DEFAULT_SUBGHZ_CHANNEL == 4 /* 863 MHz */
-#define IEEE802154_CHAN_MIN           0
-#define IEEE802154_CHAN_MAX           33
-#define IEEE802154_FREQ_SPACING       200
-#define IEEE802154_CHAN0_FREQ         863125
-
-#define PROP_MODE_CENTER_FREQ   0x0362
-#define PROP_MODE_LO_DIVIDER    0x05
-#elif IEEE802154_DEFAULT_SUBGHZ_CHANNEL == 7 /* 915 MHz */
-#define IEEE802154_CHAN_MIN           0
-#define IEEE802154_CHAN_MAX           128
-#define IEEE802154_FREQ_SPACING       200
-#define IEEE802154_CHAN0_FREQ         902200
-
-#define PROP_MODE_CENTER_FREQ   0x0393
-#define PROP_MODE_LO_DIVIDER    0x05
-#else
-#error "Sub-GHz channel not supported"
-#endif
-
-static inline uint32_t ieee802154_freq(const uint16_t chan)
-{
-    const uint32_t chan0 = IEEE802154_CHAN0_FREQ;
-    const uint32_t spacing = IEEE802154_FREQ_SPACING;
-    const uint32_t chan_min = IEEE802154_CHAN_MIN;
-    return chan0 + spacing * ((uint32_t)chan - chan_min);
-}
-
-/**
- * size of length field in receive struct
- *
- * defined in Table 23-10 of the cc26xx TRM
- */
-#define DATA_ENTRY_LENSZ_BYTE 1
-
+#if PROP_PHY == 1
 /**
  * @brief This enum represents the state of a radio.
  *
@@ -270,41 +154,45 @@ static inline uint32_t ieee802154_freq(const uint16_t chan)
  * | Transmit         | The RFCPE is running a transmit command string     |
  * | TransmitComplete | The transmit command string has completed          |
  */
-typedef enum cc13x2_PhyState
-{
-    cc13x2_stateDisabled = 0,
-    cc13x2_stateSleep,
-    cc13x2_stateReceive,
-    cc13x2_stateTransmit,
-} cc13x2_PhyState_t;
+typedef enum {
+    cc13x2_stateDisabled = 0, /**< Disabled, radio powered off */
+    cc13x2_stateSleep, /**< Sleep state, awaiting for actions */
+    cc13x2_stateReceive, /**< Receive state */
+    cc13x2_stateTransmit, /**< Transmitting packets */
+} cc13x2_PropPhyState_t;
 
-void cc13x2_rf_init(void);
+extern volatile cc13x2_PropPhyState_t _cc13x2_rf_prop_state;
 
-int_fast8_t cc13x2_rf_enable(void);
-int_fast8_t cc13x2_rf_disable(void);
+void cc13x2_rf_prop_init(void);
 
-int8_t cc13x2_rf_get_txpower(void);
-int_fast8_t cc13x2_rf_set_txpower(int8_t aPower);
+int_fast8_t cc13x2_rf_prop_enable(void);
+int_fast8_t cc13x2_rf_prop_disable(void);
 
-int8_t cc13x2_rf_get_rssi(void);
-int_fast8_t cc13x2_rf_rx_start(void);
-int_fast8_t cc13x2_rf_rx_stop(void);
-uint8_t cc13x2_rf_get_chan(void);
-void cc13x2_rf_set_chan(uint16_t channel);
-void cc13x2_rf_get_ieee_eui64(uint8_t *aIeeeEui64);
-void cc13x2_rf_irq_set_handler(void(*handler)(void *), void * arg);
-int cc13x2_rf_recv(void *buf, size_t len, netdev_ieee802154_rx_info_t *rx_info);
-int cc13x2_rf_recv_avail(void);
-int cc13x2_rf_send(const iolist_t *iolist);
-void cc13x2_rf_set_pan(uint16_t aPanid);
-uint16_t cc13x2_rf_get_pan(void);
+int8_t cc13x2_rf_prop_get_txpower(void);
+int_fast8_t cc13x2_rf_prop_set_txpower(int8_t power);
 
-unsigned cc13x2_rf_irq_is_enabled(unsigned irq);
-void cc13x2_rf_irq_enable(unsigned irq);
-void cc13x2_rf_irq_disable(unsigned irq);
-unsigned cc13x2_rf_get_flags(void);
+int8_t cc13x2_rf_prop_get_rssi(void);
+int_fast8_t cc13x2_rf_prop_rx_start(void);
+int_fast8_t cc13x2_rf_prop_rx_stop(void);
+uint8_t cc13x2_rf_prop_get_chan(void);
+void cc13x2_rf_prop_set_chan(uint16_t channel);
+void cc13x2_rf_prop_get_ieee_eui64(uint8_t *aIeeeEui64);
+void cc13x2_rf_prop_irq_set_handler(void(*handler)(void *), void * arg);
+int cc13x2_rf_prop_recv(void *buf, size_t len, netdev_ieee802154_rx_info_t *rx_info);
+int cc13x2_rf_prop_recv_avail(void);
+int cc13x2_rf_prop_send(const iolist_t *iolist);
+void cc13x2_rf_prop_set_pan(uint16_t aPanid);
+uint16_t cc13x2_rf_prop_get_pan(void);
 
-extern volatile cc13x2_PhyState_t _cc13x2_rf_state;
+unsigned cc13x2_rf_prop_irq_is_enabled(unsigned irq);
+void cc13x2_rf_prop_irq_enable(unsigned irq);
+void cc13x2_rf_prop_irq_disable(unsigned irq);
+unsigned cc13x2_rf_prop_get_flags(void);
+#endif
 
-#endif /* CC13X2_RF_PROP_INTERNAL_H */
+#if IEEE_PHY == 1
+/* TODO: IEEE PHY state */
+#endif
+
+#endif /* CC13X2_RF_INTERNAL_H */
 /** @} */

@@ -22,11 +22,13 @@
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
 
+#if PROP_PHY == 1
 typedef struct {
     netdev_ieee802154_t netdev;             /**< netdev parent struct */
-} cc13x2_rf_t;
+} cc13x2_rf_prop_t;
 
-void cc13x2_rf_setup(cc13x2_rf_t *dev);
+void cc13x2_rf_prop_setup(cc13x2_rf_prop_t *dev);
+#endif
 
 #endif /* CC13X2_RF_NETDEV_H */
 /** @} */

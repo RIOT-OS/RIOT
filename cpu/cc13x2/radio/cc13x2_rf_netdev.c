@@ -17,7 +17,7 @@
  * @}
  */
 
-#include "cc13x2_rf_prop_internal.h"
+#include "cc13x2_rf_internal.h"
 #include "cc13x2_rf_netdev.h"
 
 #include <string.h>
@@ -53,12 +53,12 @@ static int _init(netdev_t *netdev)
     VIMSConfigure(VIMS_BASE, true, true);
 
     /* enable & turn on hardware */
-    cc13x2_rf_enable();
+    cc13x2_rf_prop_enable();
 
     /* setup some things */
-    cc13x2_rf_t *dev = (cc13x2_rf_t *)netdev;
-    cc13x2_rf_get_ieee_eui64(dev->netdev.long_addr);
-    cc13x2_rf_irq_set_handler(_irq_handler, dev);
+    cc13x2_rf_prop_t *dev = (cc13x2_rf_prop_t *)netdev;
+    cc13x2_rf_prop_get_ieee_eui64(dev->netdev.long_addr);
+    cc13x2_rf_prop_irq_set_handler(_irq_handler, dev);
 
     /* set short addr */
     memcpy(dev->netdev.short_addr, dev->netdev.long_addr + 6, 2);
@@ -71,7 +71,7 @@ static int _init(netdev_t *netdev)
     netdev_ieee802154_reset(&dev->netdev);
 
     /* enter RX */
-    cc13x2_rf_rx_start();
+    cc13x2_rf_prop_rx_start();
 
     return 0;
 }
@@ -80,18 +80,18 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     //DEBUG("%s:%s:%u\n", __FILE__, __func__, __LINE__);
     (void)netdev;
-    return cc13x2_rf_send(iolist);
+    return cc13x2_rf_prop_send(iolist);
 }
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     //DEBUG("%s:%s:%u\n", __FILE__, __func__, __LINE__);
-    cc13x2_rf_t *dev = (cc13x2_rf_t *)netdev;
+    cc13x2_rf_prop_t *dev = (cc13x2_rf_prop_t *)netdev;
     (void)dev;
-    return cc13x2_rf_recv(buf, len, info);
+    return cc13x2_rf_prop_recv(buf, len, info);
 }
 
-static int _set_state(cc13x2_rf_t *dev, netopt_state_t state)
+static int _set_state(cc13x2_rf_prop_t *dev, netopt_state_t state)
 {
     (void)dev;
     switch (state) {
@@ -113,11 +113,11 @@ static int _set_state(cc13x2_rf_t *dev, netopt_state_t state)
     return sizeof(netopt_state_t);
 }
 
-netopt_state_t _get_state(cc13x2_rf_t *dev)
+netopt_state_t _get_state(cc13x2_rf_prop_t *dev)
 {
     (void)dev;
 
-    switch (_cc13x2_rf_state) {
+    switch (_cc13x2_rf_prop_state) {
         case cc13x2_stateDisabled:
             return NETOPT_STATE_OFF;
         case cc13x2_stateSleep:
@@ -133,7 +133,7 @@ netopt_state_t _get_state(cc13x2_rf_t *dev)
 
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
-    cc13x2_rf_t *dev = (cc13x2_rf_t *) netdev;
+    cc13x2_rf_prop_t *dev = (cc13x2_rf_prop_t *) netdev;
 
     if (netdev == NULL) {
         return -ENODEV;
@@ -147,10 +147,10 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             *((netopt_state_t *)val) = _get_state(dev);
             return sizeof(netopt_state_t);
         case NETOPT_RX_END_IRQ:
-            *((netopt_enable_t *)val) = cc13x2_rf_irq_is_enabled(IRQ_RX_OK);
+            *((netopt_enable_t *)val) = cc13x2_rf_prop_irq_is_enabled(IRQ_RX_OK);
             return sizeof(netopt_enable_t);
         case NETOPT_TX_END_IRQ:
-            *((netopt_enable_t *)val) = cc13x2_rf_irq_is_enabled(IRQ_TX_DONE);
+            *((netopt_enable_t *)val) = cc13x2_rf_prop_irq_is_enabled(IRQ_TX_DONE);
             return sizeof(netopt_enable_t);
         case NETOPT_RETRANS:
             assert(max_len >= sizeof(uint8_t));
@@ -168,14 +168,14 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_TX_POWER:
             assert(max_len >= sizeof(int16_t));
-            *((uint16_t *)val) = cc13x2_rf_get_txpower();
+            *((uint16_t *)val) = cc13x2_rf_prop_get_txpower();
             return sizeof(uint16_t);
 
 #if 0
         case NETOPT_CHANNEL_PAGE:
             assert(max_len >= sizeof(uint16_t));
             ((uint8_t *)val)[1] = 0;
-            ((uint8_t *)val)[0] = cc13x2_rf_get_page(dev);
+            ((uint8_t *)val)[0] = cc13x2_rf_prop_get_page(dev);
             return sizeof(uint16_t);
 
 
@@ -205,19 +205,19 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_CCA_THRESHOLD:
             assert(max_len >= sizeof(int8_t));
-            *((int8_t *)val) = cc13x2_rf_get_cca_threshold(dev);
+            *((int8_t *)val) = cc13x2_rf_prop_get_cca_threshold(dev);
             res = sizeof(int8_t);
             break;
 
         case NETOPT_IS_CHANNEL_CLR:
             assert(max_len >= sizeof(netopt_enable_t));
-            *((netopt_enable_t *)val) = cc13x2_rf_cca(dev);
+            *((netopt_enable_t *)val) = cc13x2_rf_prop_cca(dev);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_LAST_ED_LEVEL:
             assert(max_len >= sizeof(int8_t));
-            *((int8_t *)val) = cc13x2_rf_get_ed_level(dev);
+            *((int8_t *)val) = cc13x2_rf_prop_get_ed_level(dev);
             res = sizeof(int8_t);
             break;
 
@@ -231,7 +231,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 {
-    cc13x2_rf_t *dev = (cc13x2_rf_t *) netdev;
+    cc13x2_rf_prop_t *dev = (cc13x2_rf_prop_t *) netdev;
     int res = -ENOTSUP;
 
     if (dev == NULL) {
@@ -251,7 +251,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case NETOPT_CHANNEL:
             assert(len == sizeof(uint16_t));
             uint8_t chan = (((const uint16_t *)val)[0]) & UINT8_MAX;
-            cc13x2_rf_set_chan(chan);
+            cc13x2_rf_prop_set_chan(chan);
             /* don't set res to set netdev_ieee802154_t::chan */
             break;
 
@@ -281,7 +281,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_TX_POWER:
             assert(len <= sizeof(int16_t));
-            cc13x2_rf_set_txpower(*((const int16_t *)val));
+            cc13x2_rf_prop_set_txpower(*((const int16_t *)val));
             res = sizeof(uint16_t);
             break;
 
@@ -311,10 +311,10 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_RX_END_IRQ:
             if (((const bool *)val)[0]) {
-                cc13x2_rf_irq_enable(IRQ_RX_OK);
+                cc13x2_rf_prop_irq_enable(IRQ_RX_OK);
             }
             else {
-                cc13x2_rf_irq_disable(IRQ_RX_OK);
+                cc13x2_rf_prop_irq_disable(IRQ_RX_OK);
             }
             return sizeof(netopt_enable_t);
 
@@ -324,10 +324,10 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_TX_END_IRQ:
             if (((const bool *)val)[0]) {
-                cc13x2_rf_irq_enable(IRQ_TX_DONE);
+                cc13x2_rf_prop_irq_enable(IRQ_TX_DONE);
             }
             else {
-                cc13x2_rf_irq_disable(IRQ_TX_DONE);
+                cc13x2_rf_prop_irq_disable(IRQ_TX_DONE);
             }
             res = sizeof(netopt_enable_t);
             break;
@@ -353,15 +353,15 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
 static void _isr(netdev_t *netdev)
 {
-    cc13x2_rf_t *dev = (cc13x2_rf_t *) netdev;
+    cc13x2_rf_prop_t *dev = (cc13x2_rf_prop_t *) netdev;
     (void)dev;
 
     unsigned state = irq_disable();
-    unsigned flags = cc13x2_rf_get_flags();
+    unsigned flags = cc13x2_rf_prop_get_flags();
     irq_restore(state);
 
     if (flags & 1) {
-        while(cc13x2_rf_recv_avail()) {
+        while(cc13x2_rf_prop_recv_avail()) {
             netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
         }
     }
@@ -370,7 +370,7 @@ static void _isr(netdev_t *netdev)
     }
 }
 
-const netdev_driver_t cc13x2_rf_driver = {
+const netdev_driver_t cc13x2_rf_prop_driver = {
     .send = _send,
     .recv = _recv,
     .init = _init,
@@ -379,13 +379,13 @@ const netdev_driver_t cc13x2_rf_driver = {
     .set = _set,
 };
 
-void cc13x2_rf_setup(cc13x2_rf_t *dev)
+void cc13x2_rf_prop_setup(cc13x2_rf_prop_t *dev)
 {
     memset(dev, 0, sizeof(*dev));
 
-    cc13x2_rf_init();
+    cc13x2_rf_prop_init();
 
-    dev->netdev.netdev.driver = &cc13x2_rf_driver;
-    dev->netdev.pan = cc13x2_rf_get_pan();
-    dev->netdev.chan = cc13x2_rf_get_chan();
+    dev->netdev.netdev.driver = &cc13x2_rf_prop_driver;
+    dev->netdev.pan = cc13x2_rf_prop_get_pan();
+    dev->netdev.chan = cc13x2_rf_prop_get_chan();
 }
