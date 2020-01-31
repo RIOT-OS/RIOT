@@ -1,1 +1,11 @@
 include ${RIOTCPU}/cc26xx_cc13xx/Makefile.dep
+
+ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+  USEMODULE += cc13x2_rf
+endif
+
+ifneq (,$(filter cc13x2_rf,$(USEMODULE)))
+  USEMODULE += cc26xx_cc13xx_interrupts
+  USEMODULE += cc26xx_cc13xx_driverlib
+  USEMODULE += netdev_ieee802154
+endif
