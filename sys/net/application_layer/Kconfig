@@ -7,5 +7,6 @@
 menu "CoAP"
 
 rsource "gcoap/Kconfig"
+rsource "nanocoap/Kconfig"
 
 endmenu # CoAP
