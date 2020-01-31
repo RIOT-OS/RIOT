@@ -962,12 +962,12 @@ ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
 
 int gcoap_add_qstring(coap_pkt_t *pdu, const char *key, const char *val)
 {
-    char qs[NANOCOAP_QS_MAX];
+    char qs[CONFIG_NANOCOAP_QS_MAX];
     size_t len = strlen(key);
     size_t val_len = (val) ? (strlen(val) + 1) : 0;
 
     /* test if the query string fits, account for the zero termination */
-    if ((len + val_len + 1) >= NANOCOAP_QS_MAX) {
+    if ((len + val_len + 1) >= CONFIG_NANOCOAP_QS_MAX) {
         return -1;
     }
 

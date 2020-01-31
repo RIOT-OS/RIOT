@@ -862,12 +862,12 @@ ssize_t coap_opt_add_uri_query2(coap_pkt_t *pkt, const char *key, size_t key_len
     assert(key_len);
     assert(!val_len || (val && val_len));
 
-    char qs[NANOCOAP_QS_MAX];
+    char qs[CONFIG_NANOCOAP_QS_MAX];
     /* length including '=' */
     size_t qs_len = key_len + ((val && val_len) ? (val_len + 1) : 0);
 
     /* test if the query string fits */
-    if (qs_len > NANOCOAP_QS_MAX) {
+    if (qs_len > CONFIG_NANOCOAP_QS_MAX) {
         return -1;
     }
 

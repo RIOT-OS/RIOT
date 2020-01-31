@@ -144,8 +144,8 @@ extern "C" {
 #endif
 
 /** @brief   Maximum length of a query string written to a message */
-#ifndef NANOCOAP_QS_MAX
-#define NANOCOAP_QS_MAX             (64)
+#ifndef CONFIG_NANOCOAP_QS_MAX
+#define CONFIG_NANOCOAP_QS_MAX             (64)
 #endif
 /** @} */
 
