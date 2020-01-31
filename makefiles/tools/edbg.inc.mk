@@ -1,3 +1,5 @@
+include $(RIOTMAKE)/tools/edbg-devices.inc.mk
+
 RIOT_EDBG = $(RIOTTOOLS)/edbg/edbg
 EDBG ?= $(RIOT_EDBG)
 FLASHER ?= $(EDBG)
