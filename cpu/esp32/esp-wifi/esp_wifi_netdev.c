@@ -98,9 +98,6 @@ static rx_buf_t rx_buf[ESP_WIFI_MAX_RX_BUF] = { 0 };
 static unsigned int rx_buf_write = 0;
 static unsigned int rx_buf_read = 0;
 
-/* device thread stack */
-static char _esp_wifi_stack[ESP_WIFI_STACKSIZE];
-
 extern esp_err_t esp_system_event_add_handler (system_event_cb_t handler,
                                                void *arg);
 
@@ -571,22 +568,6 @@ static const netdev_driver_t _esp_wifi_driver =
     .get = _esp_wifi_get,
     .set = _esp_wifi_set,
 };
-
-void auto_init_esp_wifi (void)
-{
-    LOG_TAG_DEBUG("esp_wifi", "initializing ESP WiFi device\n");
-
-    esp_wifi_setup(&_esp_wifi_dev);
-    _esp_wifi_dev.netif = gnrc_netif_ethernet_create(_esp_wifi_stack,
-                                                    ESP_WIFI_STACKSIZE,
-#ifdef MODULE_ESP_NOW
-                                                    ESP_WIFI_PRIO - 1,
-#else
-                                                    ESP_WIFI_PRIO,
-#endif
-                                                    "esp-wifi",
-                                                    (netdev_t *)&_esp_wifi_dev);
-}
 
 #endif /* MODULE_ESP_WIFI */
 /**@}*/

@@ -19,6 +19,10 @@
 #ifndef ESP_WIFI_NETDEV_H
 #define ESP_WIFI_NETDEV_H
 
+#include <stdbool.h>
+
+#include "mutex.h"
+#include "net/ethernet.h"
 #include "net/netdev.h"
 
 #ifdef __cplusplus
@@ -39,8 +43,6 @@ typedef struct
 
     uint32_t event;                    /**< received event */
     bool connected;                    /**< indicates whether connected to AP */
-
-    gnrc_netif_t* netif;               /**< reference to the corresponding netif */
 
 } esp_wifi_netdev_t;
 

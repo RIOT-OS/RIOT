@@ -8,7 +8,6 @@ endif
 ifneq (,$(filter esp_eth,$(USEMODULE)))
     USEMODULE += esp_idf_eth
     USEMODULE += esp_idf_eth_phy
-    USEMODULE += gnrc
     USEMODULE += netdev_eth
     USEMODULE += netopt
     USEMODULE += riot_freertos
@@ -18,16 +17,12 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_now,$(USEMODULE)))
-    $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
     USEMODULE += esp_wifi_any
-    USEMODULE += gnrc
     USEMODULE += netopt
 endif
 
 ifneq (,$(filter esp_wifi,$(USEMODULE)))
-    $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
     USEMODULE += esp_wifi_any
-    USEMODULE += gnrc
     USEMODULE += netopt
     USEMODULE += netdev_eth
 endif

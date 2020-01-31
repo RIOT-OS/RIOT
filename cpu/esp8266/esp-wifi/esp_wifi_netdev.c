@@ -104,9 +104,6 @@
 esp_wifi_netdev_t _esp_wifi_dev;
 static const netdev_driver_t _esp_wifi_driver;
 
-/* device thread stack */
-static char _esp_wifi_stack[ESP_WIFI_STACKSIZE];
-
 /** guard variable to avoid reentrance to _esp_wifi_send function */
 static bool _esp_wifi_send_is_in = false;
 
@@ -823,22 +820,5 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     dev->event_conn = 0;
     dev->event_disc = 0;
 }
-
-void auto_init_esp_wifi (void)
-{
-    ESP_WIFI_DEBUG("initializing ESP WiFi device");
-
-    esp_wifi_setup(&_esp_wifi_dev);
-    _esp_wifi_dev.netif = gnrc_netif_ethernet_create(_esp_wifi_stack,
-                                                    ESP_WIFI_STACKSIZE,
-#ifdef MODULE_ESP_NOW
-                                                    ESP_WIFI_PRIO - 1,
-#else
-                                                    ESP_WIFI_PRIO,
-#endif
-                                                    "esp_wifi",
-                                                    (netdev_t *)&_esp_wifi_dev);
-}
-
 #endif /* MODULE_ESP_WIFI */
 /**@}*/
