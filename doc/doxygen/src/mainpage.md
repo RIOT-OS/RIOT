@@ -239,6 +239,7 @@ Further information                                      {#further-information}
 ===================
  - @ref getting-started
  - @ref creating-an-application
+ - @ref porting-boards
  - @ref creating-modules
  - @ref advanced-build-system-tricks
 
