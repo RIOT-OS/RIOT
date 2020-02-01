@@ -98,6 +98,14 @@ extern "C" {
 /* include common board definitions as last step */
 #include "board_common.h"
 
+/**
+ * @brief Initialize the board specific hardware
+ */
+static inline void board_init(void) {
+    /* there is nothing special to initialize on this board */
+    board_init_common();
+}
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

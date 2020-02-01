@@ -58,5 +58,13 @@
 /* include definitions for optional hardware modules */
 #include "board_modules.h"
 
+/**
+ * @brief Initialize the board specific hardware
+ */
+static inline void board_init(void) {
+    /* there is nothing special to initialize on this board */
+    board_init_common();
+}
+
 #endif /* BOARD_H */
 /** @} */
