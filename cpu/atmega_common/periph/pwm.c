@@ -60,6 +60,7 @@ static inline unsigned get_prescaler(pwm_t dev, uint32_t *scale)
 
 uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
+    (void)mode;
     /* only left implemented, max resolution 256 */
     assert(dev < PWM_NUMOF && mode == PWM_LEFT && res <= 256);
     /* resolution != 256 only valid if ch0 not used */
