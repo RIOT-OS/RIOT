@@ -28,6 +28,8 @@ extern "C" {
 
 SPISettings::SPISettings(uint32_t clock_hz, uint8_t bitOrder, uint8_t dataMode)
 {
+    (void)bitOrder;
+
     static const spi_clk_t clocks[] = {
         SPI_CLK_10MHZ, SPI_CLK_5MHZ, SPI_CLK_1MHZ, SPI_CLK_400KHZ
     };
@@ -80,6 +82,9 @@ void SPIClass::beginTransaction(SPISettings settings)
                              settings.mode, settings.clock);
     /* No support for exceptions (at least on AVR), resort to assert() */
     assert(retval == SPI_OK);
+    if (retval != SPI_OK) {
+        return;
+    }
     is_transaction = true;
 }
 
@@ -99,6 +104,9 @@ void SPIClass::transfer(void *buf, size_t count)
                                  settings.mode, settings.clock);
         /* No support for exceptions (at least on AVR), resort to assert() */
         assert(retval == SPI_OK);
+        if (retval != SPI_OK) {
+            return;
+        }
     }
     spi_transfer_bytes(spi_dev, SPI_CS_UNDEF, false, buf, buf, count);
     if (!is_transaction) {
@@ -110,6 +118,7 @@ void SPIClass::transfer(void *buf, size_t count)
 
 void SPIClass::setBitOrder(uint8_t order)
 {
+    (void)order;
     assert(order == MSBFIRST);
 }
 
