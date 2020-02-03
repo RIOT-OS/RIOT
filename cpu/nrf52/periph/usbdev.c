@@ -31,6 +31,7 @@
 #include "periph/usbdev.h"
 #include "usb.h"
 #include "usb/descriptor.h"
+#include "bitarithm.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"

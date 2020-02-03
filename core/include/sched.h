@@ -82,7 +82,6 @@
 
 #include <stddef.h>
 #include "kernel_defines.h"
-#include "bitarithm.h"
 #include "kernel_types.h"
 #include "native_sched.h"
 #include "clist.h"
