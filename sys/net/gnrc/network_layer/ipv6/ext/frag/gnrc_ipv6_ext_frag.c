@@ -557,7 +557,8 @@ gnrc_ipv6_ext_frag_rbuf_t *gnrc_ipv6_ext_frag_rbuf_get(ipv6_hdr_t *ipv6,
             oldest = tmp;
         }
     }
-    if (res == NULL) {
+    if ((res == NULL) &&
+        !IS_ACTIVE(CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_DO_NOT_OVERRIDE)) {
         assert(oldest != NULL); /* reassembly buffer is full, so there needs
                                  * to be an oldest entry */
         DEBUG("ipv6_ext_frag: dropping oldest entry\n");

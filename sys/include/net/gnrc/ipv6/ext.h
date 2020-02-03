@@ -88,6 +88,19 @@ extern "C" {
 #define CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US  (10U * US_PER_SEC)
 #endif
 
+/**
+ * @brief   Do not override oldest datagram when reassembly buffer is full
+ *
+ * @note    Only applicable with [gnrc_ipv6_ext_frag](@ref net_gnrc_ipv6_ext_frag) module
+ *
+ * When not set, it will cause the reassembly buffer to override the oldest
+ * entry when a fragment for a new datagram is received. When set to 1, no entry
+ * will be overwritten (they will still timeout normally)
+ */
+#ifdef DOXYGEN
+#define CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_DO_NOT_OVERRIDE
+#endif
+
 /** @} **/
 
 /**
