@@ -23,6 +23,13 @@
  * USEPKG += cryptoauthlib
  * to your Makefile.
  *
+ * ### No poll mode
+ *
+ * After sending a command to the device, responses are usually polled to enable
+ * quicker response times.
+ * Alternatively ATCA_NO_POLL can be enabled through CFLAGS to simply
+ * wait for the max execution time of a command before reading the response.
+ *
  *
  * ## Implementation status
  *
