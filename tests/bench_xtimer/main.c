@@ -19,7 +19,7 @@
  */
 
 #include <stdio.h>
-#include <assert.h>
+#include <test_utils/expect.h>
 
 #include "msg.h"
 #include "thread.h"
@@ -45,7 +45,7 @@ static xtimer_t _timers[NUMOF_TIMERS];
 
 /* This variable is set by any timer that actually triggers.  As the test is
  * only testing set/remove/now operations, timers are not supposed to trigger.
- * Thus, after every test there's an 'assert(!_triggers)'
+ * Thus, after every test there's an 'expect(!_triggers)'
  */
 static unsigned _triggers;
 
@@ -114,7 +114,7 @@ int main(void)
     diff = xtimer_now_usec() - before;
 
     _print_result("set() one", REPEAT, diff);
-    assert(!_triggers);
+    expect(!_triggers);
 
     /*
      * test removing one unset timer REPEAT times
@@ -128,7 +128,7 @@ int main(void)
     diff = xtimer_now_usec() - before;
 
     _print_result("remove() one", REPEAT, diff);
-    assert(!_triggers);
+    expect(!_triggers);
 
     /*
      * test setting / removing one timer REPEAT times
@@ -144,7 +144,7 @@ int main(void)
     diff = xtimer_now_usec() - before;
 
     _print_result("set() + remove() one", REPEAT, diff);
-    assert(!_triggers);
+    expect(!_triggers);
 
     /*
      * test setting NUMOF_TIMERS timers with increasing targets
@@ -159,7 +159,7 @@ int main(void)
     diff = xtimer_now_usec() - before;
 
     _print_result("set() many increasing target", NUMOF_TIMERS, diff);
-    assert(!_triggers);
+    expect(!_triggers);
 
     /*
      * test re-setting first timer REPEAT times
@@ -174,7 +174,7 @@ int main(void)
     diff = xtimer_now_usec() - before;
 
     _print_result("re-set()  first", REPEAT, diff);
-    assert(!_triggers);
+    expect(!_triggers);
 
     /*
      * test setting middle timer REPEAT times
@@ -189,7 +189,7 @@ int main(void)
     diff = xtimer_now_usec() - before;
 
     _print_result("re-set() middle", REPEAT, diff);
-    assert(!_triggers);
+    expect(!_triggers);
 
     /*
      * test setting last timer REPEAT times
@@ -204,7 +204,7 @@ int main(void)
     diff = xtimer_now_usec() - before;
 
     _print_result("re-set()   last", REPEAT, diff);
-    assert(!_triggers);
+    expect(!_triggers);
 
     /*
      * test removing / setting first timer REPEAT times
@@ -220,7 +220,7 @@ int main(void)
     diff = xtimer_now_usec() - before;
 
     _print_result("remove() + set()  first", REPEAT, diff);
-    assert(!_triggers);
+    expect(!_triggers);
 
     /*
      * test removing / setting middle timer REPEAT times
@@ -236,7 +236,7 @@ int main(void)
     diff = xtimer_now_usec() - before;
 
     _print_result("remove() + set() middle", REPEAT, diff);
-    assert(!_triggers);
+    expect(!_triggers);
 
     /*
      * test removing / setting last timer REPEAT times
@@ -252,7 +252,7 @@ int main(void)
     diff = xtimer_now_usec() - before;
 
     _print_result("remove() + set()   last", REPEAT, diff);
-    assert(!_triggers);
+    expect(!_triggers);
 
     /*
      * test removing NUMOF_TIMERS timers (latest first)
@@ -266,7 +266,7 @@ int main(void)
     diff = xtimer_now_usec() - before;
 
     _print_result("remove() many decreasing", NUMOF_TIMERS, diff);
-    assert(!_triggers);
+    expect(!_triggers);
 
     /*
      * test xtimer_now()
@@ -281,7 +281,7 @@ int main(void)
     diff = xtimer_now_usec() - before;
 
     _print_result("xtimer_now()", REPEAT, diff);
-    assert(!_triggers);
+    expect(!_triggers);
 
     _print_result("sizeof(xtimer_t)", NUMOF_TIMERS, sizeof(_timers));
 
