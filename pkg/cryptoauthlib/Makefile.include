@@ -14,7 +14,3 @@ ifneq (,$(filter cryptoauthlib_test,$(USEMODULE)))
   INCLUDES += -I$(PKG_TESTINCLDIR)/tng
   INCLUDES += -I$(PKG_TESTINCLDIR)/atcacert
 endif
-
-ifneq (,$(filter cortex-m%,$(CPU_ARCH)))
-  TOOLCHAINS_BLACKLIST += llvm
-endif
