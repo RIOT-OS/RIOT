@@ -19,6 +19,7 @@
 
 #include "board.h"
 #include "sps30.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,7 +32,6 @@ extern "C" {
 #ifndef SPS30_PARAM_I2C_DEV
 #define SPS30_PARAM_I2C_DEV  (I2C_DEV(0))
 #endif
-
 #ifndef SPS30_PARAMS
 #define SPS30_PARAMS         { .i2c_dev  = SPS30_PARAM_I2C_DEV }
 #endif
@@ -52,6 +52,19 @@ static const sps30_params_t sps30_params[] =
  * @brief   Define the number of configured sensors
  */
 #define SPS30_NUM               ARRAY_SIZE(sps30_params)
+
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t sps30_saul_info[] =
+{
+    SPS30_SAUL_INFO
+};
+
+/**
+ * @brief   Number of saul info structs
+ */
+#define SPS30_INFO_NUM ARRAY_SIZE(sps30_saul_info)
 
 #ifdef __cplusplus
 }
