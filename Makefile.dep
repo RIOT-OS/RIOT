@@ -300,6 +300,10 @@ ifneq (,$(filter gnrc_ipv6_ext_frag,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter gnrc_ipv6_ext_opt,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_ext
+endif
+
 ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_ext
 endif
