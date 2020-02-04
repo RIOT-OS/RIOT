@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include "periph/rtc.h"
 
 #ifndef RTC_NORMALIZE_COMPAT
@@ -194,6 +195,24 @@ uint32_t rtc_mktime(struct tm *t)
     time += (leap_years * 366 + common_years * 365) * DAY;
 
     return time;
+}
+
+void rtc_localtime(uint32_t time, struct tm *t)
+{
+    uint32_t y_secs = _is_leap_year(RIOT_EPOCH) ? (366 * DAY) : (365 * DAY);
+    unsigned year = RIOT_EPOCH;
+
+    while (time > y_secs) {
+        time -= y_secs;
+        ++year;
+        y_secs = _is_leap_year(year) ? (366 * DAY) : (365 * DAY);
+    }
+
+    memset(t, 0, sizeof(*t));
+    t->tm_sec  = time;
+    t->tm_year = year - 1900;
+
+    rtc_tm_normalize(t);
 }
 
 #define RETURN_IF_DIFFERENT(a, b, member)   \
