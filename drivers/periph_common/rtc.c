@@ -138,6 +138,10 @@ void rtc_tm_normalize(struct tm *t)
 {
     div_t d;
 
+    if (t->tm_mday == 0) {
+        t->tm_mday = 1;
+    }
+
     d = div(t->tm_sec, 60);
     t->tm_min += d.quot;
     t->tm_sec  = d.rem;
