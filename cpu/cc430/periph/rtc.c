@@ -68,16 +68,6 @@ int rtc_set_time(struct tm *localt)
     return 0;
 }
 
-/*---------------------------------------------------------------------------
-time_t rtc_time(void) {
-    time_t sec;
-    struct tm t;
-    rtc_get_localtime(&t);
-    sec = mktime(&t);
-    return sec;
-}
-*/
-
 int rtc_get_time(struct tm *localt)
 {
     uint8_t success = 0;
