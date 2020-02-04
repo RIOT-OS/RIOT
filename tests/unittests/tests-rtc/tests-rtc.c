@@ -199,6 +199,31 @@ static void test_rtc_compare(void)
     TEST_ASSERT(rtc_tm_compare(&t1, &t2) < 0);
 }
 
+static void test_rtc_mktime(void)
+{
+    struct tm t  = {
+        .tm_sec  =  11,
+        .tm_min  =  12,
+        .tm_hour =  13,
+        .tm_mday =  1,
+        .tm_mon  =  0,
+        .tm_year = 120,
+        .tm_wday =   0,
+        .tm_yday =   1,
+    };
+
+    mktime(&t);
+    TEST_ASSERT_EQUAL_INT(47531, rtc_mktime(&t));
+
+    t.tm_mday += 40;
+    mktime(&t);
+    TEST_ASSERT_EQUAL_INT(3503531, rtc_mktime(&t));
+
+    t.tm_year += 3;
+    mktime(&t);
+    TEST_ASSERT_EQUAL_INT(98197931, rtc_mktime(&t));
+}
+
 Test *tests_rtc_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -209,6 +234,7 @@ Test *tests_rtc_tests(void)
         new_TestFixture(test_rtc_ywrap),
         new_TestFixture(test_rtc_year),
         new_TestFixture(test_rtc_compare),
+        new_TestFixture(test_rtc_mktime),
     };
 
     EMB_UNIT_TESTCALLER(rtc_tests, NULL, NULL, fixtures);

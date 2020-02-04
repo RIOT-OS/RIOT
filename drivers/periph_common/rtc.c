@@ -26,6 +26,14 @@
 #define RTC_NORMALIZE_COMPAT (0)
 #endif
 
+#define MINUTE  (60U)
+#define HOUR    (60U * MINUTE)
+#define DAY     (24U * HOUR)
+
+#ifndef RIOT_EPOCH
+#define RIOT_EPOCH (2020)
+#endif
+
 /*
  * The rules here are (to be checked in that explicit order):
  *  1. If the year is not a multiple of four, it is not a leap year.
@@ -50,6 +58,26 @@ static int _is_leap_year(int year)
      * multiples of 100, !(year &15) is 0 except for those that are a multiple of 400.
      */
     return !!(year % 25) || !(year & 15);
+}
+
+/*
+ * 1. Every fourth year was a leap year.
+ * 2. Subtract all years divisible by 100, those are divisible by 4 but no leap years.
+ * 3. Add back all years divisible by 400, those are divisible by 100 but leap years.
+ */
+static unsigned _leap_years_before(unsigned year)
+{
+    --year;
+    return (year / 4) - (year / 100) + (year / 400);
+}
+
+static unsigned _leap_years_since_epoch(unsigned year)
+{
+    if (year < RIOT_EPOCH) {
+        return 0;
+    }
+
+    return _leap_years_before(year) - _leap_years_before(RIOT_EPOCH);
 }
 
 static int _month_length(int month, int year)
@@ -81,6 +109,7 @@ static int _wday(int day, int month, int year)
     year -= month < 2;
     return (year + year/4 - year/100 + year/400 + t[month] + day) % 7;
 }
+#endif /* RTC_NORMALIZE_COMPAT */
 
 static int _yday(int day, int month, int year)
 {
@@ -104,7 +133,6 @@ static int _yday(int day, int month, int year)
        2019-01-01 will be be day 0 in year 2019 */
     return d[month] + day - 1;
 }
-#endif /* RTC_NORMALIZE_COMPAT */
 
 void rtc_tm_normalize(struct tm *t)
 {
@@ -146,6 +174,22 @@ void rtc_tm_normalize(struct tm *t)
     t->tm_yday = _yday(t->tm_mday, t->tm_mon, t->tm_year + 1900);
     t->tm_wday = _wday(t->tm_mday, t->tm_mon, t->tm_year + 1900);
 #endif
+}
+
+uint32_t rtc_mktime(struct tm *t)
+{
+    unsigned year = t->tm_year + 1900;
+    uint32_t time = t->tm_sec
+                  + t->tm_min * MINUTE
+                  + t->tm_hour * HOUR
+                  + _yday(t->tm_mday, t->tm_mon, year) * DAY;
+
+    unsigned leap_years = _leap_years_since_epoch(year);
+    unsigned common_years = (year - RIOT_EPOCH) - leap_years;
+
+    time += (leap_years * 366 + common_years * 365) * DAY;
+
+    return time;
 }
 
 #define RETURN_IF_DIFFERENT(a, b, member)   \
