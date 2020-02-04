@@ -161,6 +161,14 @@ int rtc_tm_compare(const struct tm *a, const struct tm *b);
  */
 uint32_t rtc_mktime(struct tm *t);
 
+/**
+ * @brief Converts an RTC timestamp into a  time struct.
+ *
+ * @param[in]  time   elapsed seconds since `RIOT_EPOCH`
+ * @param[out] t      the corresponding timestamp
+ */
+void rtc_localtime(uint32_t time, struct tm *t);
+
 #ifdef __cplusplus
 }
 #endif

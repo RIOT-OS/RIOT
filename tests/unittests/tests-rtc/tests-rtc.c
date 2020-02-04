@@ -224,6 +224,58 @@ static void test_rtc_mktime(void)
     TEST_ASSERT_EQUAL_INT(98197931, rtc_mktime(&t));
 }
 
+static void test_rtc_localtime(void)
+{
+    struct tm t;
+
+    const struct tm t1  = {
+        .tm_sec  =  11,
+        .tm_min  =  12,
+        .tm_hour =  13,
+        .tm_mday =  1,
+        .tm_mon  =  0,
+        .tm_year = 120,
+        .tm_wday =   3,
+        .tm_yday =   0
+    };
+
+    const struct tm t2  = {
+        .tm_sec  =  11,
+        .tm_min  =  12,
+        .tm_hour =  13,
+        .tm_mday =  10,
+        .tm_mon  =  1,
+        .tm_year = 120,
+        .tm_wday =   1,
+        .tm_yday =  40,
+    };
+
+    const struct tm t3  = {
+        .tm_sec  =  11,
+        .tm_min  =  12,
+        .tm_hour =  13,
+        .tm_mday =  10,
+        .tm_mon  =  1,
+        .tm_year = 123,
+        .tm_wday =   5,
+        .tm_yday =  40,
+    };
+
+    rtc_localtime(100, &t);
+    TEST_ASSERT_EQUAL_INT(40, t.tm_sec);
+    TEST_ASSERT_EQUAL_INT(1, t.tm_min);
+    TEST_ASSERT_EQUAL_INT(120, t.tm_year);
+
+    rtc_localtime(47531, &t);
+    _test_equal_tm(&t1, &t);
+
+    rtc_localtime(3503531, &t);
+    _test_equal_tm(&t2, &t);
+
+    rtc_localtime(98197931, &t);
+    _test_equal_tm(&t3, &t);
+}
+
 Test *tests_rtc_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -235,6 +287,7 @@ Test *tests_rtc_tests(void)
         new_TestFixture(test_rtc_year),
         new_TestFixture(test_rtc_compare),
         new_TestFixture(test_rtc_mktime),
+        new_TestFixture(test_rtc_localtime),
     };
 
     EMB_UNIT_TESTCALLER(rtc_tests, NULL, NULL, fixtures);
