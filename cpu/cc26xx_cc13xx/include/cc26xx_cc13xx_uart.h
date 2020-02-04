@@ -7,11 +7,11 @@
  */
 
 /**
- * @addtogroup      cpu_cc13x2_definitions
+ * @addtogroup      cpu_cc26xx_cc13xx_definitions
  * @{
  *
  * @file
- * @brief           CC13x2 UART interface
+ * @brief           CC26xx/CC13xx UART interface
  *
  */
 
