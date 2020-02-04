@@ -2,5 +2,10 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
+# add board common drivers
+USEMODULE += boards_common_silabs
+USEMODULE += silabs_aem
+USEMODULE += silabs_bc
+
 # include board common dependencies
 include $(RIOTBOARD)/common/silabs/Makefile.dep

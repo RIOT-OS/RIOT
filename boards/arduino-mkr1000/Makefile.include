@@ -1,5 +1,3 @@
-USEMODULE += boards_common_arduino-mkr
-
 ifeq ($(PROGRAMMER),jlink)
   export MKR_JLINK_DEVICE = atsamw25
 endif

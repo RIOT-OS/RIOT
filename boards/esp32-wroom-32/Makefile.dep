@@ -1,3 +1,5 @@
+USEMODULE += boards_common_esp32
+
 include $(RIOTBOARD)/common/esp32/Makefile.dep
 
 # default parameter definitions when module enc28j60 is used

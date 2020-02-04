@@ -2,4 +2,6 @@ ifneq (,$(filter esp32_ttgo_t_beam_v1_0,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+USEMODULE += boards_common_esp32
+
 include $(RIOTBOARD)/common/esp32/Makefile.dep

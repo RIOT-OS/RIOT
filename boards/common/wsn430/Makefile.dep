@@ -1,0 +1,2 @@
+# include this module in the build
+USEMODULE += boards_common_wsn430

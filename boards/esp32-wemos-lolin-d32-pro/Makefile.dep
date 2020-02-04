@@ -1,1 +1,4 @@
+USEMODULE += boards_common_esp32
+USEMODULE += esp_spi_ram
+
 include $(RIOTBOARD)/common/esp32/Makefile.dep
