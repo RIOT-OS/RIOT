@@ -1,4 +1,5 @@
 CPU = efm32
+CPU_FAM = efm32lg
 CPU_MODEL = efm32lg990f256
 
 # Put defined MCU peripherals here (in alphabetical order)
