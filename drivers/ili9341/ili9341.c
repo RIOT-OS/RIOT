@@ -29,13 +29,13 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static void _ili9341_spi_acquire(ili9341_t *dev)
+static void _ili9341_spi_acquire(const ili9341_t *dev)
 {
     spi_acquire(dev->params->spi, dev->params->cs_pin, dev->params->spi_mode,
                 dev->params->spi_clk);
 }
 
-static void _ili9341_cmd_start(ili9341_t *dev, uint8_t cmd, bool cont)
+static void _ili9341_cmd_start(const ili9341_t *dev, uint8_t cmd, bool cont)
 {
     gpio_clear(dev->params->dcx_pin);
     spi_transfer_byte(dev->params->spi, dev->params->cs_pin, cont, cmd);
@@ -59,7 +59,7 @@ static uint8_t _ili9341_calc_vml(int16_t vcoml)
     return (vcoml + 2500) / 25;
 }
 
-static void _write_cmd(ili9341_t *dev, uint8_t cmd, const uint8_t *data,
+static void _write_cmd(const ili9341_t *dev, uint8_t cmd, const uint8_t *data,
                        size_t len)
 {
     _ili9341_cmd_start(dev, cmd, len ? true : false);
@@ -69,7 +69,7 @@ static void _write_cmd(ili9341_t *dev, uint8_t cmd, const uint8_t *data,
     }
 }
 
-static void _ili9341_set_area(ili9341_t *dev, uint16_t x1, uint16_t x2,
+static void _ili9341_set_area(const ili9341_t *dev, uint16_t x1, uint16_t x2,
                               uint16_t y1, uint16_t y2)
 {
     be_uint16_t params[2];
@@ -209,7 +209,7 @@ int ili9341_init(ili9341_t *dev, const ili9341_params_t *params)
     return 0;
 }
 
-void ili9341_write_cmd(ili9341_t *dev, uint8_t cmd, const uint8_t *data,
+void ili9341_write_cmd(const ili9341_t *dev, uint8_t cmd, const uint8_t *data,
                        size_t len)
 {
     _ili9341_spi_acquire(dev);
@@ -217,7 +217,7 @@ void ili9341_write_cmd(ili9341_t *dev, uint8_t cmd, const uint8_t *data,
     spi_release(dev->params->spi);
 }
 
-void ili9341_read_cmd(ili9341_t *dev, uint8_t cmd, uint8_t *data, size_t len)
+void ili9341_read_cmd(const ili9341_t *dev, uint8_t cmd, uint8_t *data, size_t len)
 {
     assert(len);
     _ili9341_spi_acquire(dev);
@@ -230,7 +230,7 @@ void ili9341_read_cmd(ili9341_t *dev, uint8_t cmd, uint8_t *data, size_t len)
 }
 
 
-void ili9341_fill(ili9341_t *dev, uint16_t x1, uint16_t x2, uint16_t y1,
+void ili9341_fill(const ili9341_t *dev, uint16_t x1, uint16_t x2, uint16_t y1,
                   uint16_t y2, uint16_t color)
 {
     /* Send fill area to the display */
@@ -260,7 +260,7 @@ void ili9341_fill(ili9341_t *dev, uint16_t x1, uint16_t x2, uint16_t y1,
     spi_release(dev->params->spi);
 }
 
-void ili9341_pixmap(ili9341_t *dev, uint16_t x1, uint16_t x2,
+void ili9341_pixmap(const ili9341_t *dev, uint16_t x1, uint16_t x2,
                     uint16_t y1, uint16_t y2, const uint16_t *color)
 {
     size_t num_pix = (x2 - x1 + 1) * (y2 - y1 + 1);
@@ -295,7 +295,7 @@ void ili9341_pixmap(ili9341_t *dev, uint16_t x1, uint16_t x2,
     spi_release(dev->params->spi);
 }
 
-void ili9341_invert_on(ili9341_t *dev)
+void ili9341_invert_on(const ili9341_t *dev)
 {
     uint8_t command = (dev->params->inverted) ? ILI9341_CMD_DINVOFF
                                               : ILI9341_CMD_DINVON;
@@ -303,7 +303,7 @@ void ili9341_invert_on(ili9341_t *dev)
     ili9341_write_cmd(dev, command, NULL, 0);
 }
 
-void ili9341_invert_off(ili9341_t *dev)
+void ili9341_invert_off(const ili9341_t *dev)
 {
     uint8_t command = (dev->params->inverted) ? ILI9341_CMD_DINVON
                                               : ILI9341_CMD_DINVOFF;
@@ -311,7 +311,7 @@ void ili9341_invert_off(ili9341_t *dev)
     ili9341_write_cmd(dev, command, NULL, 0);
 }
 
-void ili9341_set_brightness(ili9341_t *dev, uint8_t brightness)
+void ili9341_set_brightness(const ili9341_t *dev, uint8_t brightness)
 {
     ili9341_write_cmd(dev, ILI9341_CMD_WRDISBV, &brightness, 1);
     uint8_t param = 0x26;
