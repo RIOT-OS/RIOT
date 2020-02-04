@@ -1,4 +1,4 @@
-CPU = cc13x2
+CPU = cc26x2_cc13x2
 CPU_MODEL = cc1312r1f3
 
 # Put defined MCU peripherals here (in alphabetical order)

@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup         cpu_cc13x2_definitions
+ * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
  *
  * @file
- * @brief           CC13x2 MCU interrupt definitions
+ * @brief           CC26xx, CC13xx definitions
  *
  * @author          Leon M. George <leon@georgemail.eu>
  * @author          Anton Gerasimov <tossel@gmail.com>

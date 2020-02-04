@@ -7,15 +7,15 @@
  */
 
 /**
- * @ingroup         cpu_cc13x2_definitions
+ * @ingroup         cpu_cc26x2_cc13x2_definitions
  * @{
  *
  * @file
- * @brief           CC13x2 PRCM register definitions
+ * @brief           CC26x2, CC13x2 PRCM register definitions
  */
 
-#ifndef CC13X2_PRCM_H
-#define CC13X2_PRCM_H
+#ifndef CC26X2_CC13X2_PRCM_H
+#define CC26X2_CC13X2_PRCM_H
 
 #include <cc26xx_cc13xx.h>
 
@@ -67,7 +67,7 @@ typedef struct {
 #define DDI_0_OSC_CTL0_XTAL_IS_24M                  0x80000000
 /** @} */
 
-/** @ingroup cpu_cc13x2_peripheral_memory_map
+/** @ingroup cpu_cc26x2_cc13x2_peripheral_memory_map
   * @{
   */
 #define DDI0_OSC_BASE       0x400CA000 /**< DDI0_OSC base address */
@@ -232,6 +232,6 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC13X2_PRCM_H */
+#endif /* CC26X2_CC13X2_PRCM_H */
 
 /*@}*/
