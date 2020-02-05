@@ -63,8 +63,8 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str)
     remote.family = AF_INET6;
 
     /* parse for interface */
-    int iface = ipv6_addr_split_iface(addr_str);
-    if (iface == -1) {
+    char *iface = ipv6_addr_split_iface(addr_str);
+    if (!iface) {
         if (gnrc_netif_numof() == 1) {
             /* assign the single interface found in gnrc_netif_numof() */
             remote.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
@@ -74,11 +74,11 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str)
         }
     }
     else {
-        if (gnrc_netif_get_by_pid(iface) == NULL) {
+        if (gnrc_netif_get_by_pid(atoi(iface)) == NULL) {
             DEBUG("[CoAP] interface not valid");
             return 0;
         }
-        remote.netif = iface;
+        remote.netif = atoi(iface);
     }
 
     /* parse destination address */
@@ -95,7 +95,7 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str)
     /* parse port */
     remote.port = GCOAP_PORT;
 
-    return gcoap_req_send2(buf, len, &remote, NULL);
+    return gcoap_req_send(buf, len, &remote, NULL, NULL);
 }
 
 int coap_post(char *addr, char *msgbuf, size_t msglen)
