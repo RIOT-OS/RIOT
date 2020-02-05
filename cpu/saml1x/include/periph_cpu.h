@@ -33,6 +33,16 @@ extern "C" {
 #define PM_BLOCKER_INITIAL  { .val_u32 = 0x00000001 }
 
 /**
+ * @name   SAML1x GCLK definitions
+ * @{
+ */
+enum {
+    SAM0_GCLK_MAIN = 0,                 /**< 16 MHz main clock      */
+    SAM0_GCLK_32KHZ,                    /**< 32 kHz clock           */
+};
+/** @} */
+
+/**
  * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
  */
 static const int8_t exti_config[1][32] = {

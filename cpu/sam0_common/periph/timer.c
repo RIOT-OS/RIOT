@@ -87,11 +87,12 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     /* make sure the timer is not running */
     timer_stop(tim);
 
+    sam0_gclk_enable(cfg->gclk_src);
 #ifdef MCLK
-    GCLK->PCHCTRL[cfg->gclk_id].reg = cfg->gclk_src | GCLK_PCHCTRL_CHEN;
+    GCLK->PCHCTRL[cfg->gclk_id].reg = GCLK_PCHCTRL_GEN(cfg->gclk_src) | GCLK_PCHCTRL_CHEN;
     *cfg->mclk |= cfg->mclk_mask;
 #else
-    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | cfg->gclk_src | cfg->gclk_ctrl;
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(cfg->gclk_src) | cfg->gclk_ctrl;
     PM->APBCMASK.reg |= cfg->pm_mask;
 #endif
 

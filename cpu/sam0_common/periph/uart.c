@@ -116,7 +116,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     /* calculate and set baudrate */
-    uint32_t baud = ((((uint32_t)CLOCK_CORECLOCK * 8) / baudrate) / 16);
+    uint32_t baud = (((sam0_gclk_freq(uart_config[uart].gclk_src) * 8) / baudrate) / 16);
     dev(uart)->BAUD.FRAC.FP = (baud % 8);
     dev(uart)->BAUD.FRAC.BAUD = (baud / 8);
 

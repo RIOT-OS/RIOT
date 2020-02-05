@@ -219,7 +219,7 @@ typedef struct {
     uart_rxpad_t rx_pad;    /**< pad selection for RX line */
     uart_txpad_t tx_pad;    /**< pad selection for TX line */
     uart_flag_t flags;      /**< set optional SERCOM flags */
-    uint32_t gclk_src;      /**< GCLK source which supplys SERCOM */
+    uint8_t gclk_src;       /**< GCLK source which supplys SERCOM */
 } uart_conf_t;
 
 /**
@@ -284,6 +284,7 @@ typedef struct {
     gpio_mux_t clk_mux;     /**< alternate function for CLK pin (mux) */
     spi_misopad_t miso_pad; /**< pad to use for MISO line */
     spi_mosipad_t mosi_pad; /**< pad to use for MOSI and CLK line */
+    uint8_t gclk_src;       /**< GCLK source which supplys SERCOM */
 } spi_conf_t;
 /** @} */
 
@@ -338,7 +339,7 @@ typedef struct {
     uint32_t pm_mask;       /**< PM_APBCMASK bits to enable Timer */
     uint16_t gclk_ctrl;     /**< GCLK_CLKCTRL_ID for the Timer */
 #endif
-    uint16_t gclk_src;      /**< GCLK source which supplys Timer */
+    uint8_t gclk_src;       /**< GCLK source which supplys Timer */
     uint16_t prescaler;     /**< prescaler used by the Timer */
     uint16_t flags;         /**< flags for CTRA, e.g. TC_CTRLA_MODE_COUNT32 */
 } tc32_conf_t;
@@ -350,6 +351,22 @@ typedef struct {
  * @param[in] mux   Mux value
  */
 void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
+
+/**
+ * @brief   Returns the frequency of a GCLK provider.
+ *
+ * @param[in] id    The ID of the GCLK
+ *
+ * @return          The frequency of the GCLK with the given ID.
+ */
+uint32_t sam0_gclk_freq(uint8_t id);
+
+/**
+ * @brief   Enables an on-demand GCLK that has been configured in cpu.c
+ *
+ * @param[in] id    The ID of the GCLK
+ */
+void sam0_gclk_enable(uint8_t id);
 
 /**
  * @brief   Return the numeric id of a SERCOM device derived from its address
@@ -484,22 +501,23 @@ static inline uint8_t _sercom_gclk_id_core(uint8_t sercom_id) {
  * @param[in] sercom    SERCOM device
  * @param[in] gclk      Generator clock
  */
-static inline void sercom_set_gen(void *sercom, uint32_t gclk)
+static inline void sercom_set_gen(void *sercom, uint8_t gclk)
 {
     const uint8_t id = sercom_id(sercom);
+    sam0_gclk_enable(gclk);
 #if defined(CPU_FAM_SAMD21)
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | gclk |
+    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(gclk) |
                          (SERCOM0_GCLK_ID_CORE + id));
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 #elif defined(CPU_FAM_SAMD5X)
-    GCLK->PCHCTRL[_sercom_gclk_id_core(id)].reg = (GCLK_PCHCTRL_CHEN | gclk);
+    GCLK->PCHCTRL[_sercom_gclk_id_core(id)].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
 #else
     if (id < 5) {
-        GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + id].reg = (GCLK_PCHCTRL_CHEN | gclk);
+        GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + id].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
     }
 #if defined(CPU_FAM_SAML21)
     else {
-        GCLK->PCHCTRL[SERCOM5_GCLK_ID_CORE].reg = (GCLK_PCHCTRL_CHEN | gclk);
+        GCLK->PCHCTRL[SERCOM5_GCLK_ID_CORE].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
     }
 #endif /* CPU_FAM_SAML21 */
 #endif
@@ -534,6 +552,7 @@ typedef struct {
     gpio_t dp;              /**< D+ line gpio                           */
     gpio_mux_t d_mux;       /**< alternate function (mux) for data pins */
     UsbDevice *device;      /**< ptr to the device registers            */
+    uint8_t gclk_src;       /**< GCLK source which supplys 48 MHz       */
 } sam0_common_usb_config_t;
 #endif /* USB_INST_NUM */
 

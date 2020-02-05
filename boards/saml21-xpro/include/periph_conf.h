@@ -45,7 +45,7 @@ static const tc32_conf_t timer_config[] = {
         .mclk           = &MCLK->APBCMASK.reg,
         .mclk_mask      = MCLK_APBCMASK_TC0 | MCLK_APBCMASK_TC1,
         .gclk_id        = TC0_GCLK_ID,
-        .gclk_src       = GCLK_PCHCTRL_GEN(0),
+        .gclk_src       = SAM0_GCLK_MAIN,
         .prescaler      = TC_CTRLA_PRESCALER(4),
         .flags          = TC_CTRLA_MODE_COUNT32,
     }
@@ -74,7 +74,7 @@ static const uart_conf_t uart_config[] = {
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
         .flags    = UART_FLAG_NONE,
-        .gclk_src = GCLK_PCHCTRL_GEN_GCLK0
+        .gclk_src = SAM0_GCLK_MAIN,
     },
     {    /* EXT1 header */
         .dev      = &SERCOM4->USART,
@@ -88,7 +88,7 @@ static const uart_conf_t uart_config[] = {
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
         .flags    = UART_FLAG_NONE,
-        .gclk_src = GCLK_PCHCTRL_GEN_GCLK0
+        .gclk_src = SAM0_GCLK_MAIN,
     }
 };
 
@@ -113,8 +113,8 @@ static const spi_conf_t spi_config[] = {
         .mosi_mux = GPIO_MUX_D,
         .clk_mux  = GPIO_MUX_D,
         .miso_pad = SPI_PAD_MISO_0,
-        .mosi_pad = SPI_PAD_MOSI_2_SCK_3
-
+        .mosi_pad = SPI_PAD_MOSI_2_SCK_3,
+        .gclk_src = SAM0_GCLK_MAIN,
     }
 };
 
@@ -132,7 +132,7 @@ static const i2c_conf_t i2c_config[] = {
         .scl_pin  = GPIO_PIN(PA, 9),
         .sda_pin  = GPIO_PIN(PA, 8),
         .mux      = GPIO_MUX_D,
-        .gclk_src = GCLK_PCHCTRL_GEN_GCLK0,
+        .gclk_src = SAM0_GCLK_MAIN,
         .flags    = I2C_FLAG_NONE
     }
 };

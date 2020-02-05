@@ -45,6 +45,18 @@ extern "C" {
 /** @} */
 
 /**
+ * @name   SAMD21 GCLK definitions
+ * @{
+ */
+enum {
+    SAM0_GCLK_MAIN = 0,                 /**< 48 MHz main clock      */
+    SAM0_GCLK_1MHZ,                     /**< 1 MHz clock for xTimer */
+    SAM0_GCLK_32KHZ,                    /**< 32 kHz clock           */
+    SAM0_GCLK_1KHZ,                     /**< 1 kHz clock            */
+};
+/** @} */
+
+/**
  * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
  */
 static const int8_t exti_config[2][32] = {

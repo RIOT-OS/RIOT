@@ -92,7 +92,7 @@ void i2c_init(i2c_t dev)
     sercom_clk_en(bus(dev));
 
     /* I2C using CLK GEN 0 */
-    sercom_set_gen(bus(dev),i2c_config[dev].gclk_src);
+    sercom_set_gen(bus(dev), i2c_config[dev].gclk_src);
 
     /* Check if module is enabled. */
     if (bus(dev)->CTRLA.reg & SERCOM_I2CM_CTRLA_ENABLE) {
@@ -137,7 +137,7 @@ void i2c_init(i2c_t dev)
             return;
     }
     /* Get the baudrate */
-    tmp_baud = (int32_t)(((CLOCK_CORECLOCK +
+    tmp_baud = (int32_t)(((sam0_gclk_freq(i2c_config[dev].gclk_src) +
                (2 * (i2c_config[dev].speed)) - 1) /
                (2 * (i2c_config[dev].speed))) -
                (i2c_config[dev].speed == I2C_SPEED_HIGH ? 1 : 5));

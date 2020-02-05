@@ -230,8 +230,10 @@ static bool _syncbusy_swrst(sam0_common_usb_t *dev)
     return dev->config->device->SYNCBUSY.bit.SWRST;
 }
 
-static inline void _poweron(void)
+static inline void _poweron(sam0_common_usb_t *dev)
 {
+    sam0_gclk_enable(dev->config->gclk_src);
+
 #if defined(MCLK)
     MCLK->AHBMASK.reg |= MCLK_AHBMASK_USB;
     MCLK->APBBMASK.reg |= MCLK_APBBMASK_USB;
@@ -241,17 +243,12 @@ static inline void _poweron(void)
 #endif
 
 #if defined(CPU_FAM_SAMD21)
-    GCLK->CLKCTRL.reg = (uint32_t)(GCLK_CLKCTRL_CLKEN |
-                                   GCLK_CLKCTRL_GEN_GCLK0 |
-                                   (GCLK_CLKCTRL_ID(USB_GCLK_ID)));
-#elif defined(CPU_FAM_SAML21)
-    GCLK->PCHCTRL[USB_GCLK_ID].reg = GCLK_PCHCTRL_CHEN |
-                                     GCLK_PCHCTRL_GEN_GCLK0;
-#elif defined(CPU_FAM_SAMD5X)
-    GCLK->PCHCTRL[USB_GCLK_ID].reg = GCLK_PCHCTRL_CHEN |
-                                     GCLK_PCHCTRL_GEN_GCLK6;
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN
+                      | GCLK_CLKCTRL_GEN(dev->config->gclk_src)
+                      | GCLK_CLKCTRL_ID(USB_GCLK_ID);
 #else
-#error "Unknown CPU family for sam0 common usbdev driver"
+    GCLK->PCHCTRL[USB_GCLK_ID].reg = GCLK_PCHCTRL_CHEN
+                                   | GCLK_PCHCTRL_GEN(dev->config->gclk_src);
 #endif
 }
 
@@ -340,7 +337,7 @@ static void _usbdev_init(usbdev_t *dev)
     gpio_init(usbdev->config->dm, GPIO_IN);
     gpio_init_mux(usbdev->config->dm, usbdev->config->d_mux);
     gpio_init_mux(usbdev->config->dp, usbdev->config->d_mux);
-    _poweron();
+    _poweron(usbdev);
 
     /* Reset peripheral */
     usbdev->config->device->CTRLA.reg |= USB_CTRLA_SWRST;

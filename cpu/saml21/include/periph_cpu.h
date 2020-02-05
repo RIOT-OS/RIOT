@@ -32,6 +32,16 @@ extern "C" {
 #define CPU_BACKUP_RAM_NOT_RETAINED (1)
 
 /**
+ * @name   SAML21 GCLK definitions
+ * @{
+ */
+enum {
+    SAM0_GCLK_MAIN = 0,                 /**< 16 MHz main clock      */
+    SAM0_GCLK_32KHZ,                    /**< 32 kHz clock           */
+};
+/** @} */
+
+/**
  * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
  */
 #if defined(CPU_MODEL_SAML21E18A) || defined(CPU_MODEL_SAML21E18B) || \

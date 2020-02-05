@@ -76,11 +76,7 @@ void spi_init(spi_t bus)
            (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_SWRST)) {}
 
     /* configure base clock: using GLK GEN 0 */
-#ifdef GCLK_CLKCTRL_GEN_GCLK0
-    sercom_set_gen(dev(bus), GCLK_CLKCTRL_GEN_GCLK0);
-#else
-    sercom_set_gen(dev(bus), GCLK_PCHCTRL_GEN_GCLK0);
-#endif
+    sercom_set_gen(dev(bus), spi_config[bus].gclk_src);
 
     /* enable receiver and configure character size to 8-bit
      * no synchronization needed, as SERCOM device is not enabled */
@@ -108,7 +104,7 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /* configure bus clock, in synchronous mode its calculated from
      * BAUD.reg = (f_ref / (2 * f_bus) - 1)
      * with f_ref := CLOCK_CORECLOCK as defined by the board */
-    const uint8_t baud = (((uint32_t)CLOCK_CORECLOCK) / (2 * clk) - 1);
+    const uint8_t baud = (sam0_gclk_freq(spi_config[bus].gclk_src) / (2 * clk) - 1);
 
     /* configure device to be master and set mode and pads,
      *

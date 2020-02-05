@@ -43,6 +43,7 @@ static const spi_conf_t spi_config[] = {
         .clk_mux  = GPIO_MUX_D,
         .miso_pad = SPI_PAD_MISO_0,
         .mosi_pad = SPI_PAD_MOSI_2_SCK_3,
+        .gclk_src = SAM0_GCLK_MAIN,
     },
 };
 
