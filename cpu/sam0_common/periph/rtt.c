@@ -32,7 +32,8 @@
  * effects, but simplifies the code. (This bit is always set on SAML21xxxxA)
  */
 #ifndef RTC_MODE0_CTRLA_COUNTSYNC
-#define RTC_MODE0_CTRLA_COUNTSYNC   BIT15
+#define RTC_MODE0_CTRLA_COUNTSYNC_Pos   15
+#define RTC_MODE0_CTRLA_COUNTSYNC       (0x1ul << RTC_MODE0_CTRLA_COUNTSYNC_Pos)
 #endif
 
 static rtt_cb_t _overflow_cb;
