@@ -9,6 +9,10 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # Using connect_assert_srst removes errors on flash from invalid state
 export OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
+DEBUG_ADAPTER ?= iotlab
+
+export OPENOCD_CONFIG ?= $(RIOTBOARD)/common/iotlab/dist/openocd.cfg
+
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk
 
