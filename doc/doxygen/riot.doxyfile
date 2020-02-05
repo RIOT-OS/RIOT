@@ -768,9 +768,9 @@ INPUT                  = ../../doc.txt \
                          src/getting-started.md \
                          ../../tests/README.md \
                          src/build-system-basics.md \
+                         src/kconfig/kconfig.md \
                          src/advanced-build-system-tricks.md \
                          src/changelog.md \
-                         src/kconfig/kconfig.md \
                          ../../LOSTANDFOUND.md
 
 # This tag can be used to specify the character encoding of the source files
