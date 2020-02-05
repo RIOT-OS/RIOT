@@ -23,7 +23,12 @@
 int main(void)
 {
     /* Set device to ATECC508A */
-    atca_run_cmd("508");
+    if (ATCA_DEVTYPE == ATECC608A) {
+        atca_run_cmd("608");
+    }
+    else {
+        atca_run_cmd("508");
+    }
 
     atca_run_cmd("unit");
 
