@@ -580,6 +580,20 @@ static void _tmp_rm(gnrc_sixlowpan_frag_rb_t *rbuf)
 #endif  /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER */
 }
 
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
+static inline unsigned _count_frags(gnrc_sixlowpan_frag_rb_t *rbuf)
+{
+    unsigned frags = 0;
+    gnrc_sixlowpan_frag_rb_int_t *frag = rbuf->super.ints;
+
+    while (frag) {
+        frag = frag->next;
+        frags++;
+    }
+    return frags;
+}
+#endif
+
 int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
                                                    gnrc_netif_hdr_t *netif_hdr)
 {
@@ -610,6 +624,10 @@ int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf
         new_netif_hdr->lqi = netif_hdr->lqi;
         new_netif_hdr->rssi = netif_hdr->rssi;
         LL_APPEND(rbuf->pkt, netif);
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
+        gnrc_sixlowpan_frag_stats_get()->fragments += _count_frags(rbuf);
+        gnrc_sixlowpan_frag_stats_get()->datagrams++;
+#endif
         gnrc_sixlowpan_dispatch_recv(rbuf->pkt, NULL, 0);
         _tmp_rm(rbuf);
     }
