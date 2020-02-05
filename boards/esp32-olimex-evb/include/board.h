@@ -36,10 +36,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
  * @name    Button pin definitions
  * @{
@@ -97,6 +93,10 @@ extern "C" {
 
 /* include common board definitions as last step */
 #include "board_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Initialize the board specific hardware
