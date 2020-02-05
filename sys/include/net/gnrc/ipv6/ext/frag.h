@@ -94,6 +94,18 @@ typedef struct {
 } gnrc_ipv6_ext_frag_rbuf_t;
 
 /**
+ * @brief   Statistics on reassembly and reassembly
+ */
+typedef struct {
+    unsigned rbuf_full;     /**< counts the number of events where the
+                             *   reassembly buffer is full */
+    unsigned frag_full;     /**< counts the number of events that there where
+                             *   no @ref gnrc_sixlowpan_frag_fb_t available */
+    unsigned datagrams;     /**< reassembled datagrams */
+    unsigned fragments;     /**< total fragments of reassembled fragments */
+} gnrc_ipv6_ext_frag_stats_t;
+
+/**
  * @brief   Initializes IPv6 fragmentation and reassembly
  * @internal
  */
@@ -186,6 +198,14 @@ static inline void gnrc_ipv6_ext_frag_rbuf_del(gnrc_ipv6_ext_frag_rbuf_t *rbuf)
  */
 void gnrc_ipv6_ext_frag_rbuf_gc(void);
 /** @} */
+
+/**
+ * @brief   Get the current statistics on reassembly and fragmentation
+ *
+ * @return  The current statistics on reassembly and fragmentation.
+ * @return  NULL, if module `gnrc_ipv6_ext_frag_stats` is not compiled in.
+ */
+gnrc_ipv6_ext_frag_stats_t *gnrc_ipv6_ext_frag_stats(void);
 
 #ifdef __cplusplus
 }
