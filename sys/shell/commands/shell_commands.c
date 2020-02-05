@@ -90,11 +90,6 @@ extern int _gnrc_netif_send(int argc, char **argv);
 extern int _fib_route_handler(int argc, char **argv);
 #endif
 
-#ifdef MODULE_GNRC_IPV6_NC
-extern int _ipv6_nc_manage(int argc, char **argv);
-extern int _ipv6_nc_routers(int argc, char **argv);
-#endif
-
 #ifdef MODULE_GNRC_IPV6_WHITELIST
 extern int _whitelist(int argc, char **argv);
 #endif
@@ -116,9 +111,7 @@ extern int _gnrc_6ctx(int argc, char **argv);
 #endif
 
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
 extern int _gnrc_6lo_frag_stats(int argc, char **argv);
-#endif
 #endif
 
 #ifdef MODULE_CCN_LITE_UTILS
