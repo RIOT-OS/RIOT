@@ -1,0 +1,36 @@
+/**
+ * @defgroup pkg_ti_driverlib  WolfSSL Embedded SSL/TLS library
+ * @ingroup  pkg
+ * @brief    Provides the Texas Instrument's driverlib library
+ *
+ * # Introduction
+ *
+ * This package provides the driver library from Texas Instruments for the
+ * CC26xx/CC13xx family of devices.
+ *
+ * # License
+ *
+ * TI's driverlib is available under the BSD-3-Clause license.
+ *
+ * # Usage
+ *
+ * You can easily take advantage of the package by using the following in your
+ * application Makefile:
+ *
+ * ```makefile
+ * USEPKG += cc26xx_cc13xx_driverlib
+ * ```
+ *
+ * You can specify what driverlib to use depending on your MCU like this:
+ *
+ * ```makefile
+ * USEMODULE += cc13x2_cc26x2_driverlib
+ * ```
+ *
+ * The available driverlibs are:
+ *
+ * - cc13x0_driverlib
+ * - cc13x2_cc26x2_driverlib
+ * - cc26x0_driverlib
+ *
+ */

@@ -1,0 +1,15 @@
+ifneq (,$(filter cc13x0_driverlib,$(USEMODULE)))
+  DIRS += $(PKGDIRBASE)/cc26xx_cc13xx_driverlib/source/ti/devices/cc13x0/driverlib
+  INCLUDES += -I$(PKGDIRBASE)/cc26xx_cc13xx_driverlib/source/ti/devices/cc13x0
+endif
+ifneq (,$(filter cc13x2_cc26x2_driverlib,$(USEMODULE)))
+  DIRS += $(PKGDIRBASE)/cc26xx_cc13xx_driverlib/source/ti/devices/cc13x2_cc26x2/driverlib
+  INCLUDES += -I$(PKGDIRBASE)/cc26xx_cc13xx_driverlib/source/ti/devices/cc13x2_cc26x2
+endif
+ifneq (,$(filter cc26x0_driverlib,$(USEMODULE)))
+  DIRS += $(PKGDIRBASE)/cc26xx_cc13xx_driverlib/source/ti/devices/cc26x0/driverlib
+  INCLUDES += -I$(PKGDIRBASE)/cc26xx_cc13xx_driverlib/source/ti/devices/cc26x0
+endif
+ifneq (,$(filter cc26xx_cc13xx_driverlib,$(USEPKG)))
+  DIRS += $(PKGDIRBASE)/cc26xx_cc13xx_driverlib
+endif

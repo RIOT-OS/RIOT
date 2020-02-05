@@ -1,0 +1,7 @@
+MODULE = cc26xx_cc13xx_driverlib
+
+NO_AUTO_SRC = 1
+SUBMODULES += 1
+SUBMODULES_NOFORCE = 1
+
+include $(RIOTBASE)/Makefile.base
