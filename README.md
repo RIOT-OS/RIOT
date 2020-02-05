@@ -25,7 +25,15 @@ cd applications
 RIOTBASE="../RIOT" BOARD=samr21-xpro make -C sniffer flash
 ```
 
-Alternatively, you can step into the submodule and check out the current master:
+Alternatively you can use RIOT as a submodule. To initialize the submodule, from the
+root of the repository run:
+
+```sh
+git submodule update --init --recursive
+```
+
+If you want to use master then simply step into the submodule and checkout master or
+any other desired branch.
 
 ```sh
 cd RIOT
