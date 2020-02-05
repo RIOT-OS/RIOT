@@ -50,10 +50,13 @@ extern "C" {
 #ifndef ATCA_RX_RETRIES
 #define ATCA_RX_RETRIES          (20)
 #endif
+#ifndef ATCA_DEVTYPE
+#define ATCA_DEVTYPE            (ATECC508A)
+#endif
 
 #ifndef ATCA_PARAMS
 #define ATCA_PARAMS                {    .iface_type = ATCA_I2C_IFACE, \
-                                        .devtype = ATECC508A, \
+                                        .devtype = ATCA_DEVTYPE, \
                                         .atcai2c.slave_address = ATCA_PARAM_ADDR, \
                                         .atcai2c.bus = ATCA_PARAM_I2C, \
                                         .atcai2c.baud = -1,                        /**< Not used in RIOT */ \
