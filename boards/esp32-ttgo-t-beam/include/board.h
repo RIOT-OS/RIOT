@@ -32,10 +32,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /**
  * @name    Button pin definitions
  * @{
@@ -58,10 +54,6 @@
 #endif
 /** @} */
 
-#ifdef __cplusplus
-} /* end extern "C" */
-#endif
-
 /**
  * @name        SX127X
  *
@@ -79,10 +71,18 @@
 /* include common board definitions as last step */
 #include "board_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Initialize the board specific hardware
  */
 void board_init(void);
+
+#ifdef __cplusplus
+} /* end extern "C" */
+#endif
 
 #endif /* BOARD_H */
 /** @} */
