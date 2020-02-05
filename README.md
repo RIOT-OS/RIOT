@@ -1,5 +1,6 @@
 [![Nightly CI status master][master-ci-badge]][master-ci-link]
 [![IRC][irc-badge]][irc-link]
+[![Matrix][matrix-badge]][matrix-link]
 
                           ZZZZZZ
                         ZZZZZZZZZZZZ
@@ -127,3 +128,5 @@ https://www.riot-os.org
 [master-ci-link]: https://ci.riot-os.org/nightlies.html#master
 [irc-badge]: https://img.shields.io/badge/IRC-join%20chat%20%E2%86%92-blue.svg
 [irc-link]: https://webchat.freenode.net?channels=%23riot-os
+[matrix-badge]: https://img.shields.io/badge/Matrix-join%20chat%20%E2%86%92-blue.svg
+[matrix-link]: https://matrix.to/#/#riot-os:matrix.org
