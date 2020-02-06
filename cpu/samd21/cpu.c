@@ -49,6 +49,11 @@
 #define WAITSTATES          ((CLOCK_CORECLOCK - 1) / 14000000)
 #endif
 
+#ifndef GCLK_GENCTRL_SRC_FDPLL
+#define GCLK_GENCTRL_SRC_FDPLL_Val  _U_(0x8)
+#define GCLK_GENCTRL_SRC_FDPLL      (GCLK_GENCTRL_SRC_FDPLL_Val    << GCLK_GENCTRL_SRC_Pos)
+#endif
+
 void sam0_gclk_enable(uint8_t id)
 {
     (void) id;

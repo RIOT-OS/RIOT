@@ -29,9 +29,14 @@
 #undef LITTLE_ENDIAN
 #endif
 
-#if defined(CPU_SAMD21A) || defined(CPU_SAMD21B) || \
-    defined(CPU_SAMD21C) || defined(CPU_SAMD21D)
-#include "vendor/samd21/include/samd21.h"
+#if defined(CPU_SAMD21A)
+#include "vendor/samd21/include_a/samd21.h"
+#elif defined(CPU_SAMD21B)
+#include "vendor/samd21/include_b/samd21.h"
+#elif defined(CPU_SAMD21C)
+#include "vendor/samd21/include_c/samd21.h"
+#elif defined(CPU_SAMD21D)
+#include "vendor/samd21/include_d/samd21.h"
 #elif defined(CPU_SAMD51)
 #include "vendor/samd51/include/samd51.h"
 #elif defined(CPU_SAME54)
