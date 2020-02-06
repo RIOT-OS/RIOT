@@ -1,6 +1,9 @@
 # Define the CPU family so we can differentiate between them in the code
 CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 
+# Generate ASF compatible model definition
+CFLAGS += -D__$(call uppercase_and_underscore,$(CPU_MODEL))__
+
 # Set ROM and RAM lengths according to CPU model
 ifneq (,$(filter samd21g18a samd21j18a saml21j18b saml21j18a samr21e18a \
         samr21g18a samr30g18a samr34j18b,$(CPU_MODEL)))
