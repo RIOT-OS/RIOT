@@ -7,45 +7,31 @@ ifeq ($(TOOLCHAIN), llvm)
 endif
 
 INCLUDES += -I$(RIOTBASE)/pkg/tinydtls/include
+INCLUDES += -I$(PKG_BUILDDIR)
+# Mandatory for tinyDTLS
+CFLAGS += -DDTLSv12 -DWITH_SHA256
 
-ifneq (,$(filter tinydtls,$(USEMODULE)))
-  INCLUDES += -I$(PKG_BUILDDIR)
-  # Mandatory for tinyDTLS
-  CFLAGS += -DDTLSv12 -DWITH_SHA256
+# Dependencies partially under control of the App's requirements
 
-  # Dependencies partially under control of the App's requirements
+# The configuration for socket overrides Sock
+ifeq (,$(filter posix_sockets,$(USEMODULE)))
+  CFLAGS += -DWITH_RIOT_GNRC
+endif
 
-  # The configuration for socket overrides Sock
-  ifeq (,$(filter posix_sockets,$(USEMODULE)))
-    CFLAGS += -DWITH_RIOT_GNRC
+# NOTE: PSK should be enabled by default BUT if the user define any other cipher
+#       suite(s) it should not be enabled.
+# TODO: Create the flag DTLS_CIPHERS with keywords PSK, ECC (and future)
+ifeq (,$(filter -DDTLS_PSK,$(CFLAGS)))
+  ifeq (,$(filter -DDTLS_ECC,$(CFLAGS)))
+    CFLAGS += -DDTLS_PSK
   endif
+endif
 
-  # NOTE: PSK should be enabled by default BUT if the user define any other cipher
-  #       suite(s) it should not be enabled.
-  # TODO: Create the flag DTLS_CIPHERS with keywords PSK, ECC (and future)
-  ifeq (,$(filter -DDTLS_PSK,$(CFLAGS)))
-    ifeq (,$(filter -DDTLS_ECC,$(CFLAGS)))
-      CFLAGS += -DDTLS_PSK
-    endif
-  endif
-
-  # Enable debug when using tinydtls_sock_dtls
-  ifneq (,$(filter -DDTLS_DEBUG,$(CFLAGS)))
-    ifeq (,$(TINYDTLS_LOG))
-      CFLAGS += -DTINYDTLS_DEBUG
-    endif
-  endif
-
-  # Handles the verbosity of tinyDTLS. Default: Minimum or just error messages.
-  ifeq (,$(filter -DTINYDTLS_DEBUG,$(CFLAGS)))
-    ifeq ( , $(TINYDTLS_LOG))
-      CFLAGS += -DTINYDTLS_LOG_LVL=0
-    else
-      CFLAGS += -DTINYDTLS_LOG_LVL=$(TINYDTLS_LOG)
-    endif
-  else
-    CFLAGS += -DTINYDTLS_LOG_LVL=6
-  endif
+# Handles the verbosity of tinyDTLS. Default: Minimum or just error messages.
+ifeq (,$(filter -DDTLS_DEBUG,$(CFLAGS)))
+  CFLAGS += -DTINYDTLS_LOG_LVL=0
+else
+  CFLAGS += -DTINYDTLS_LOG_LVL=6
 endif
 
 ifneq (,$(filter tinydtls_aes,$(USEMODULE)))

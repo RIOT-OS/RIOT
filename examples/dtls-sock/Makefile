@@ -37,9 +37,6 @@ CFLAGS += -DDTLS_PSK
 
 # Uncomment to enable debug logs
 # CFLAGS += -DDTLS_DEBUG
-# When DTLS_DEBUG is set and using tinydtls, verbosity of debug log can be set with
-# Values: 0:EMERG (Default), 1:ALERT 2:CRIT 3:WARN 4:NOTICE 5:INFO 6:DEBUG
-# TINYDTLS_LOG=3
 
 # FIXME: This is a temporary patch
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(2*THREAD_STACKSIZE_LARGE\)
