@@ -39,6 +39,6 @@ USEMODULE += embunit
 #  				platform.
 
 # The rest of the parameters are configuration parameters for RELIC described in its documentation.
-export RELIC_CONFIG_FLAGS=-DARCH=NONE -DOPSYS=NONE -DQUIET=off -DWORD=32 -DFP_PRIME=255 -DWITH="BN;MD;DV;FP;EP;CP;BC;EC" -DSEED=ZERO
+export RELIC_CONFIG_FLAGS=-DARCH=NONE -DOPSYS=NONE -DQUIET=off -DWORD=32 -DFP_PRIME=255 -DWITH="BN;MD;DV;FP;EP;CP;BC;EC" -DSEED=RIOTRND
 
 include $(RIOTBASE)/Makefile.include
