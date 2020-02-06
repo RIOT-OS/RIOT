@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdint.h>
 #include "irq.h"
 #include "cpu.h"
 
@@ -32,7 +33,7 @@
 static uint8_t atmega_get_interrupt_state(void);
 static void atmega_set_interrupt_state(uint8_t state);
 
-volatile uint8_t atmega_in_isr = 0;
+uint8_t atmega_state = 0;
 
 __attribute__((always_inline)) static inline uint8_t atmega_get_interrupt_state(void)
 {
@@ -88,7 +89,6 @@ void irq_restore(unsigned int state)
  */
 int irq_is_in(void)
 {
-    int result = atmega_in_isr;
-    __asm__ volatile("" ::: "memory");
-    return result;
+    uint8_t state = atmega_get_state();
+    return (state & ATMEGA_STATE_FLAG_ISR);
 }

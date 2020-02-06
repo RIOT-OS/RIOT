@@ -247,7 +247,9 @@ void thread_yield_higher(void)
 
 void atmega_exit_isr(void)
 {
-    atmega_in_isr = 0;
+    atmega_state &= ~ATMEGA_STATE_FLAG_ISR;
+    /* Force access to atmega_state to take place */
+    __asm__ volatile ("" : : : "memory");
     if (sched_context_switch_request) {
         atmega_context_save();
         sched_run();

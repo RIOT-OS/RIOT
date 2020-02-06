@@ -59,16 +59,88 @@ extern "C"
 /** @} */
 
 /**
- * @brief global in-ISR state variable
+ * @name    Flags for the current state of the ATmega MCU
+ * @{
  */
-extern volatile uint8_t atmega_in_isr;
+#define ATMEGA_STATE_FLAG_ISR           (0x80U) /**< In ISR */
+#define ATMEGA_STATE_FLAG_UART0_TX      (0x01U) /**< TX pending for UART 0 */
+#define ATMEGA_STATE_FLAG_UART1_TX      (0x02U) /**< TX pending for UART 1 */
+#define ATMEGA_STATE_FLAG_UART_TX(x)    (0x01U << x) /**< TX pending for UART x */
+/** @} */
 
 /**
- * @brief Run this code on entering interrupt routines
+ * @brief   Global variable containing the current state of the MCU
+ *
+ * @note    This variable is updated from IRQ context; access to it should
+ *          be wrapped into @ref irq_disable and @ref irq_restore or
+ *          @ref atmega_get_state should be used.
+ *
+ * Contents:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *   7   6   5   4   3   2   1   0
+ * +---+---+---+---+---+---+---+---+
+ * |IRQ| unused            |TX1|TX0|
+ * +---+---+---+---+---+---+---+---+
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * | Label  | Description                                                   |
+ * |:-------|:--------------------------------------------------------------|
+ * | IRQ    | This bit is set when in IRQ context                           |
+ * | unused | This bits are currently not used                              |
+ * | TX1    | This bit is set when on UART1 TX is pending                   |
+ * | TX0    | This bit is set when on UART0 TX is pending                   |
+ */
+extern uint8_t atmega_state;
+
+/**
+ * @brief   Atomically read the state (@ref atmega_state)
+ *
+ * This function guarantees that the read is not optimized out, not reordered
+ * and done atomically. This does not mean that by the time return value is
+ * processed that it still reflects the value currently stored in
+ * @ref atmega_state.
+ *
+ * Using ASM rather than C11 atomics has less overhead, as not every access to
+ * the state has to be performed atomically: Those done from ISR will not be
+ * interrupted (no support for nested interrupts) and barriers at the begin and
+ * end of the ISRs make sure the access takes place before IRQ context is left.
+ */
+static inline uint8_t atmega_get_state(void)
+{
+    uint8_t state;
+    __asm__ volatile(
+        "lds   %[state], atmega_state       \n\t"
+        : [state]   "=r" (state)
+        :
+        : "memory"
+
+    );
+
+    return state;
+}
+
+/**
+ * @brief   Run this code on entering interrupt routines
  */
 static inline void atmega_enter_isr(void)
 {
-    atmega_in_isr = 1;
+    /* This flag is only called from IRQ context, and nested IRQs are not
+     * supported as of now. The flag will be unset before the IRQ context is
+     * left, so no need to use memory barriers or atomics here
+     */
+    atmega_state |= ATMEGA_STATE_FLAG_ISR;
+}
+
+/**
+ * @brief   Check if TX on any present UART device is still pending
+ *
+ * @retval  !=0     At least on UART device is still sending data out
+ * @retval  0       No UART is currently sending data
+ */
+static inline int atmega_is_uart_tx_pending(void)
+{
+    uint8_t state = atmega_get_state();
+    return (state & (ATMEGA_STATE_FLAG_UART0_TX | ATMEGA_STATE_FLAG_UART1_TX));
 }
 
 /**
