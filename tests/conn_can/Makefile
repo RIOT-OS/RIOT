@@ -1,5 +1,7 @@
 include ../Makefile.tests_common
 
+FEATURES_BLACKLIST += arch_msp430
+
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
