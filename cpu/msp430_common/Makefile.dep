@@ -1,3 +1,5 @@
+USEMODULE += msp430_common msp430_common_periph
+
 ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += newlib_nano
 endif
