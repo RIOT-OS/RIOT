@@ -72,7 +72,7 @@ typedef union at86rf2xx_devs {
          */
         at86rfr2_t at86rfr2_devs[AT86RFR2_NUM_OF];
 #endif
-    } named_devs;
+    } named_devs; /**< AT86RF2XX arrays of different device types */
     /**
      * @brief Raw memory of AT86RF2XX device structures
      */

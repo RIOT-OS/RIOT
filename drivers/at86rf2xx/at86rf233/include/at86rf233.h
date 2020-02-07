@@ -33,7 +33,7 @@ typedef struct at86rf233_params at86rf233_params_t;
 /**
  * @brief   Setup @p num transceiver devices of type AT86RF233
  *
- * @param[out]   dev        array of AT86RF233 device handles
+ * @param[out]   devs       array of AT86RF233 device handles
  * @param[in]    params     parameters
  * @param[in]    num        number of transceivers
  */

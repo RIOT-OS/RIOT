@@ -145,8 +145,8 @@ typedef struct at86rf2xx_base {
     uint8_t idle_state;                     /**< state to return to after sending */
     uint8_t pending_tx;                     /**< keep track of pending TX calls
                                                  this is required to know when to
-                                                 return to @ref at86rf2xx_t::base::idle_state */
-    int8_t dev_type;                        /**<  AT86RF2XX device type */
+                                                 return to idle_state */
+    int8_t dev_type;                        /**< AT86RF2XX device type */
 } at86rf2xx_base_t;
 
 /**
@@ -162,7 +162,7 @@ typedef struct at86rf2xx {
  * @brief AT86RF212B params
  */
 struct at86rf212b_params {
-    at86rf2xx_params_t base_params;         /*< At86RF2xx base params */
+    at86rf2xx_params_t base_params;         /**< AT86RF2xx base params */
 };
 
 /**
@@ -231,6 +231,9 @@ struct at86rfa1 {
     uint8_t irq_status;                     /**< save irq status */
 };
 
+/**
+ * @brief AT86RFR2 device
+ */
 struct at86rfr2 {
     at86rf2xx_base_t base;                  /**< AT86RF2xx base */
     /*

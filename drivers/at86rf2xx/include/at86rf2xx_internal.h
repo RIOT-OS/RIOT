@@ -82,7 +82,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev);
  * @brief   Set the channel number of the given device
  *
  * @param[in,out] dev       device to write to
- * @param[in] chan          channel number to set
+ * @param[in] channel       channel number to set
  */
 void at86rf2xx_set_channel(at86rf2xx_t *dev, uint8_t channel);
 
@@ -136,6 +136,7 @@ void at86rf2xx_set_cca_threshold(const at86rf2xx_t *dev, uint8_t thresh);
 /**
  * @brief   Configure interrupt logic
  *
+ * @param[in] dev           device
  * @param[in] polling       Indicate IRQ in IRQ_STATUS register
  * @param[in] polarity      0: IRQ active high; 1: IRQ active low
  */

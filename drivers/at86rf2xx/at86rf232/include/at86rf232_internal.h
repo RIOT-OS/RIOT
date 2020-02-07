@@ -306,7 +306,7 @@ int16_t at86rf232_get_txpower(const at86rf232_t *dev);
  * set, respectively.
  *
  * @param[in] dev           device to write to
- * @param[in] txpower       transmission power in dBm
+ * @param[in] dbm           transmission power in dBm
  */
 void at86rf232_set_txpower(at86rf232_t *dev, int16_t dbm);
 
@@ -328,7 +328,7 @@ int16_t at86rf232_get_rxsensitivity(const at86rf232_t *dev);
  * set, respectively.
  *
  * @param[in] dev           device to write to
- * @param[in] rxsens        rx sensitivity in dBm
+ * @param[in] dbm           rx sensitivity in dBm
  */
 void at86rf232_set_rxsensitivity(const at86rf232_t *dev, int16_t dbm);
 
@@ -357,7 +357,7 @@ int8_t at86rf232_get_cca_threshold(const at86rf232_t *dev);
  * @brief   Set the CCA threshold value
  *
  * @param[in] dev           device to write to
- * @param[in] value         the new CCA threshold value
+ * @param[in] thresh        the new CCA threshold value
  */
 void at86rf232_set_cca_threshold(const at86rf232_t *dev, int8_t thresh);
 
@@ -387,7 +387,6 @@ void at86rf232_set_channel(at86rf232_t *dev, uint8_t channel);
  * @brief   Configure PHY layer (modulation, data rate)
  *
  * @param[in] dev           device to be configured
- * @param[in] phy_mode      phy profile
  */
 void at86rf232_configure_phy(const at86rf232_t *dev);
 

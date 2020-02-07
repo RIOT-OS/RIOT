@@ -197,7 +197,7 @@ void at86rf2xx_set_csma_seed(const at86rf2xx_t *dev, const uint8_t entropy[2]);
  *
  * @param[in] dev           device
  * @param[in] reserved_ft   enable / disable reserved frame types
- * @param[in] upload        apply address filter to reserved frame types
+ * @param[in] filter_ft     apply address filter to reserved frame types
  */
 void at86rf2xx_set_frame_type_filter(const at86rf2xx_t *dev,
                                      bool reserved_ft, bool filter_ft);
@@ -206,7 +206,7 @@ void at86rf2xx_set_frame_type_filter(const at86rf2xx_t *dev,
  * @brief   Enable / disable external timestamping over pin 10 (DIG2)
  *
  * @param[in] dev           device
- * @param[in] timestampig   enable / disable timestamping
+ * @param[in] timestamping  enable / disable timestamping
  */
 void at86rf2xx_set_external_timestamping(const at86rf2xx_t *dev,
                                          bool timestamping);

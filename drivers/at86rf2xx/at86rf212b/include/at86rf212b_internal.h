@@ -350,7 +350,7 @@ int16_t at86rf212b_get_txpower(const at86rf212b_t *dev);
  * set, respectively.
  *
  * @param[in] dev           device to write to
- * @param[in] txpower       transmission power in dBm
+ * @param[in] dbm           transmission power in dBm
  */
 void at86rf212b_set_txpower(at86rf212b_t *dev, int16_t dbm);
 
@@ -372,7 +372,7 @@ int16_t at86rf212b_get_rxsensitivity(const at86rf212b_t *dev);
  * set, respectively.
  *
  * @param[in] dev           device to write to
- * @param[in] rxsens        rx sensitivity in dBm
+ * @param[in] dbm           rx sensitivity in dBm
  */
 void at86rf212b_set_rxsensitivity(const at86rf212b_t *dev, int16_t dbm);
 
@@ -401,7 +401,7 @@ int8_t at86rf212b_get_cca_threshold(const at86rf212b_t *dev);
  * @brief   Set the CCA threshold value
  *
  * @param[in] dev           device to write to
- * @param[in] value         the new CCA threshold value
+ * @param[in] thresh        the new CCA threshold value
  */
 void at86rf212b_set_cca_threshold(const at86rf212b_t *dev, int8_t thresh);
 

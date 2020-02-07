@@ -27,13 +27,11 @@ struct at86rfr2;
 typedef struct at86rfr2 at86rfr2_t;
 
 /**
- * @brief   Setup @p num transceiver devices of type AT86RFA1
+ * @brief   Setup @p num transceiver devices of type AT86RFR2
  *
- * @param[out]   dev        array of AT86RFA1 device handles
- * @param[in]    params     parameters
- * @param[in]    num        number of transceivers
+ * @param[out]   dev        AT86RFR2 device handle
  */
-void at86rfr2_setup(at86rfr2_t *devs);
+void at86rfr2_setup(at86rfr2_t *dev);
 
 #ifdef __cplusplus
 }
