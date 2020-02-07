@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <assert.h>
 #include "periph/spi.h"
 #include "at86rf2xx.h"
 

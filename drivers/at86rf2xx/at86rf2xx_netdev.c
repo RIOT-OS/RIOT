@@ -149,7 +149,7 @@ int _init(netdev_t *netdev)
             }
             if (at86rf212b_get_status((at86rf212b_t *)dev) ==
                 AT86RF2XX_STATE_P_ON) {
-                at86rf212b_get_state((at86rf212b_t *)dev,
+                at86rf212b_set_state((at86rf212b_t *)dev,
                                      AT86RF2XX_STATE_FORCE_TRX_OFF);
             }
             at86rf212b_reset((at86rf212b_t *)dev);
@@ -936,7 +936,7 @@ int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
                         (at86rf212b_t *)dev);
                     break;
 #endif
-#if IS_USED(MODULE_AT86RF212B)
+#if IS_USED(MODULE_AT86RF231)
                 case AT86RF2XX_DEV_TYPE_AT86RF231:
                     *((int8_t *)val) =
                         at86rf231_get_ed_level((at86rf231_t *)dev);
@@ -1116,7 +1116,7 @@ int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 case AT86RF2XX_DEV_TYPE_AT86RF212B:
                     at86rf212b_set_channel((at86rf212b_t *)dev,
                                            page,
-                                           dev->base.netdev.channel);
+                                           dev->base.netdev.chan);
                     break;
 #endif
             }
