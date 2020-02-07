@@ -137,11 +137,11 @@ extern "C" {
  *
  * Perform a write / read to a known register on startup to detect
  * if the device is connected.
- * Enable this if you want the boot not to hang if the device is
+ * Set this to 1 if you want the boot not to hang if the device is
  * not connected / there are SPI errors.
  */
-#ifndef MRF24J40_TEST_SPI_CONNECTION
-#define MRF24J40_TEST_SPI_CONNECTION    (0U)
+#if defined(DOXYGEN)
+#define CONFIG_MRF24J40_TEST_SPI_CONNECTION
 #endif
 /** @} */
 
