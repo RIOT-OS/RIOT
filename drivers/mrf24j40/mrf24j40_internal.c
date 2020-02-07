@@ -37,7 +37,7 @@ static inline void getbus(mrf24j40_t *dev)
     spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params.spi_clk);
 }
 
-#if MRF24J40_USE_EXT_PA_LNA
+#if IS_ACTIVE(CONFIG_MRF24J40_USE_EXT_PA_LNA)
 static inline void mrf24j40_reg_and_short(mrf24j40_t *dev, const uint8_t addr, uint8_t value)
 {
     value &= mrf24j40_reg_read_short(dev, addr);
@@ -97,7 +97,7 @@ void mrf24j40_enable_lna(mrf24j40_t *dev)
     mrf24j40_reg_and_short(dev, MRF24J40_REG_GPIO, ~(MRF24J40_GPIO_0 | MRF24J40_GPIO_1));
     mrf24j40_reg_or_short(dev, MRF24J40_REG_GPIO, MRF24J40_GPIO_2 | MRF24J40_GPIO_3);
 }
-#endif /* MRF24J40_USE_EXT_PA_LNA */
+#endif /* CONFIG_MRF24J40_USE_EXT_PA_LNA */
 
 int mrf24j40_init(mrf24j40_t *dev)
 {
