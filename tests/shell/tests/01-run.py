@@ -7,6 +7,7 @@
 # directory for more details.
 
 import sys
+import os
 from testrunner import run
 
 
@@ -56,6 +57,7 @@ CMDS = (
     ('reboot', ('test_shell.'))
 )
 
+BOARD = os.environ['BOARD']
 
 def check_cmd(child, cmd, expected):
     child.sendline(cmd)
@@ -72,6 +74,10 @@ def check_and_get_bufsize(child):
 
 
 def testfunc(child):
+    # avoid sending an extra empty line on native.
+    if BOARD == 'native':
+        child.crlf = '\n'
+
     bufsize = check_and_get_bufsize(child)
 
     # loop other defined commands and expected output
