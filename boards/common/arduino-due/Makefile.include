@@ -1,5 +1,4 @@
 # export this module and its includes
-USEMODULE += boards_common_arduino_due
 INCLUDES  += -I$(RIOTBOARD)/common/arduino-due/include
 
 # define the default port depending on the host OS

@@ -1,5 +1,3 @@
-USEMODULE += boards_common_saml1x
-
 include $(RIOTMAKE)/boards/sam0.inc.mk
 
 # add the common header files to the include path

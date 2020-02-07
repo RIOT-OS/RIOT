@@ -1,3 +1,1 @@
-USEMODULE += boards_common_iotlab
-
 include $(RIOTBOARD)/common/iotlab/Makefile.include

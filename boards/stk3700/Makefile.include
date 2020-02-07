@@ -9,10 +9,5 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 export JLINK_DEVICE := $(CPU_MODEL)
 include $(RIOTMAKE)/tools/jlink.inc.mk
 
-# add board common drivers
-USEMODULE += boards_common_silabs
-USEMODULE += silabs_aem
-USEMODULE += silabs_bc
-
 # include board common
 include $(RIOTBOARD)/common/silabs/Makefile.include
