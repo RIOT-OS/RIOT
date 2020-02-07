@@ -104,4 +104,8 @@ ifneq (,$(filter suit_coap,$(USEMODULE)))
   SRC += sc_suit.c
 endif
 
+ifneq (,$(filter cryptoauthlib,$(USEPKG)))
+  SRC += sc_cryptoauthlib.c
+endif
+
 include $(RIOTBASE)/Makefile.base
