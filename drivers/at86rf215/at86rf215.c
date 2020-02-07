@@ -71,7 +71,7 @@ void at86rf215_reset_and_cfg(at86rf215_t *dev)
         dev->netdev.chan = AT86RF215_DEFAULT_CHANNEL;
     }
 
-    dev->netdev.pan = IEEE802154_DEFAULT_PANID;
+    dev->netdev.pan = CONFIG_IEEE802154_DEFAULT_PANID;
 
     /* set default options */
     dev->retries_max      = AT86RF215_RETRIES_MAX_DEFAULT;

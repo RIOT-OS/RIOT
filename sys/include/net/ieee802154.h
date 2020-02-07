@@ -124,29 +124,29 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 /**
  * @brief IEEE802.15.4 default sub-GHZ channel
  */
-#ifndef IEEE802154_DEFAULT_SUBGHZ_CHANNEL
-#define IEEE802154_DEFAULT_SUBGHZ_CHANNEL   (5U)
+#ifndef CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL
+#define CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL   (5U)
 #endif
 
 /**
  * @brief IEEE802.15.4 default channel
  */
-#ifndef IEEE802154_DEFAULT_CHANNEL
-#define IEEE802154_DEFAULT_CHANNEL          (26U)
+#ifndef CONFIG_IEEE802154_DEFAULT_CHANNEL
+#define CONFIG_IEEE802154_DEFAULT_CHANNEL          (26U)
 #endif
 
 /**
  * @brief IEEE802.15.4 default sub-GHZ page
  */
-#ifndef IEEE802154_DEFAULT_SUBGHZ_PAGE
-#define IEEE802154_DEFAULT_SUBGHZ_PAGE      (2U)
+#ifndef CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE
+#define CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE      (2U)
 #endif
 
 /**
  * @brief IEEE802.15.4 default PANID
  */
-#ifndef IEEE802154_DEFAULT_PANID
-#define IEEE802154_DEFAULT_PANID            (0x0023U)
+#ifndef CONFIG_IEEE802154_DEFAULT_PANID
+#define CONFIG_IEEE802154_DEFAULT_PANID            (0x0023U)
 #endif
 
 /**
@@ -159,8 +159,8 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 /**
  * @brief IEEE802.15.4 default TX power (in dBm)
  */
-#ifndef IEEE802154_DEFAULT_TXPOWER
-#define IEEE802154_DEFAULT_TXPOWER          (0)
+#ifndef CONFIG_IEEE802154_DEFAULT_TXPOWER
+#define CONFIG_IEEE802154_DEFAULT_TXPOWER          (0)
 #endif
 /** @} */
 

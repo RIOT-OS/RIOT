@@ -48,7 +48,7 @@ extern "C" {
  * @{
  */
 #ifndef KW2XRF_DEFAULT_CHANNEL
-#define KW2XRF_DEFAULT_CHANNEL          (IEEE802154_DEFAULT_CHANNEL)
+#define KW2XRF_DEFAULT_CHANNEL          (CONFIG_IEEE802154_DEFAULT_CHANNEL)
 #endif
 /** @} */
 
@@ -64,7 +64,7 @@ extern "C" {
 /**
  * @brief   Default TX_POWER in dbm used after initialization
  */
-#define KW2XRF_DEFAULT_TX_POWER         (IEEE802154_DEFAULT_TXPOWER)
+#define KW2XRF_DEFAULT_TX_POWER         (CONFIG_IEEE802154_DEFAULT_TXPOWER)
 
 /**
  * @brief   Maximum output power of the kw2x device in dBm

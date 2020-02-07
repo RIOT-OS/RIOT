@@ -67,7 +67,7 @@ void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
 #endif
 
     /* Initialize PAN ID and call netdev::set to propagate it */
-    dev->pan = IEEE802154_DEFAULT_PANID;
+    dev->pan = CONFIG_IEEE802154_DEFAULT_PANID;
     dev->netdev.driver->set(&dev->netdev, NETOPT_NID, &dev->pan, sizeof(dev->pan));
 }
 

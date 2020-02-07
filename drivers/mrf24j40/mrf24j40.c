@@ -60,7 +60,7 @@ int mrf24j40_reset(mrf24j40_t *dev)
     mrf24j40_set_addr_long(dev, ntohll(addr_long.uint64.u64));
     mrf24j40_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
 
-    mrf24j40_set_chan(dev, IEEE802154_DEFAULT_CHANNEL);
+    mrf24j40_set_chan(dev, CONFIG_IEEE802154_DEFAULT_CHANNEL);
 
     /* configure Immediate Sleep and Wake-Up mode */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE);

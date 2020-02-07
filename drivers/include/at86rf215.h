@@ -96,14 +96,14 @@ typedef void (*at86rf215_batmon_cb_t)(void *arg);
  * @name    Channel configuration
  * @{
  */
-#define AT86RF215_DEFAULT_CHANNEL        (IEEE802154_DEFAULT_CHANNEL)
-#define AT86RF215_DEFAULT_SUBGHZ_CHANNEL (IEEE802154_DEFAULT_SUBGHZ_CHANNEL)
+#define AT86RF215_DEFAULT_CHANNEL        (CONFIG_IEEE802154_DEFAULT_CHANNEL)
+#define AT86RF215_DEFAULT_SUBGHZ_CHANNEL (CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL)
 /** @} */
 
 /**
  * @brief   Default TX power (0dBm)
  */
-#define AT86RF215_DEFAULT_TXPOWER       (IEEE802154_DEFAULT_TXPOWER)
+#define AT86RF215_DEFAULT_TXPOWER       (CONFIG_IEEE802154_DEFAULT_TXPOWER)
 
 /**
  * @name    Flags for device internal states (see datasheet)
