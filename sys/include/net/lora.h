@@ -33,11 +33,6 @@ extern "C" {
  * @ingroup  config
  * @{
  */
-/** @brief Frequency resolution in Hz */
-#ifndef LORA_FREQUENCY_RESOLUTION_DEFAULT
-#define LORA_FREQUENCY_RESOLUTION_DEFAULT      (61.03515625)
-#endif
-
 /** @brief Preamble length, same for Tx and Rx */
 #ifndef LORA_PREAMBLE_LENGTH_DEFAULT
 #define LORA_PREAMBLE_LENGTH_DEFAULT           (8U)

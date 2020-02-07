@@ -113,11 +113,34 @@ void sx127x_set_syncword(sx127x_t *dev, uint8_t syncword)
     sx127x_reg_write(dev, SX127X_REG_LR_SYNCWORD, syncword);
 }
 
+/**
+ * The carrier frequency is given by Fc = Fstep * RFR (HW value).
+ * Since Fstep is (32 MHz) / (2^19), these functions below use
+ * bit shifting and integer division to convert between reg
+ * value and the actual carrier frequency.
+ */
+
+/**
+ * Convert from carrier frequency (Hz) to HW value.
+ */
+static inline uint32_t _freq_to_hw_value(uint32_t freq)
+{
+    return (freq << 8) / 15625;
+}
+
+/**
+ * Convert from HW value to carrier frequency (Hz).
+ */
+static inline uint32_t _hw_value_to_freq(uint32_t frf)
+{
+    return (frf * 15625) >> 8;
+}
+
 uint32_t sx127x_get_channel(const sx127x_t *dev)
 {
-    return (((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16) |
+    return _hw_value_to_freq(((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16) |
             (sx127x_reg_read(dev, SX127X_REG_FRFMID) << 8) |
-            (sx127x_reg_read(dev, SX127X_REG_FRFLSB))) * LORA_FREQUENCY_RESOLUTION_DEFAULT;
+            (sx127x_reg_read(dev, SX127X_REG_FRFLSB)));
 }
 
 void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
@@ -127,7 +150,7 @@ void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
     /* Save current operating mode */
     dev->settings.channel = channel;
 
-    channel = (uint32_t)((double) channel / (double)LORA_FREQUENCY_RESOLUTION_DEFAULT);
+    channel = _freq_to_hw_value(channel);
 
     /* Write frequency settings into chip */
     sx127x_reg_write(dev, SX127X_REG_FRFMSB, (uint8_t)((channel >> 16) & 0xFF));

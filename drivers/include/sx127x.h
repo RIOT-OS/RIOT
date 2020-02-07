@@ -95,6 +95,7 @@ extern "C" {
 #ifndef SX127X_DIO_PULL_MODE
 #define SX127X_DIO_PULL_MODE             (GPIO_IN_PD) /**< pull down DIOx */
 #endif
+
 /** @} */
 
 /**

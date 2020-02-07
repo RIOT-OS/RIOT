@@ -116,13 +116,15 @@ void sx127x_read_fifo(const sx127x_t *dev, uint8_t *buffer, uint8_t size)
 void sx1276_rx_chain_calibration(sx127x_t *dev)
 {
     uint8_t reg_pa_config_init_val;
-    uint32_t initial_freq;
+    uint8_t frfmsb;
+    uint8_t frfmid;
+    uint8_t frflsb;
 
     /* Save context */
     reg_pa_config_init_val = sx127x_reg_read(dev, SX127X_REG_PACONFIG);
-    initial_freq = (double) (((uint32_t) sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16)
-                             | ((uint32_t) sx127x_reg_read(dev, SX127X_REG_FRFMID) << 8)
-                             | ((uint32_t) sx127x_reg_read(dev, SX127X_REG_FRFLSB))) * (double)LORA_FREQUENCY_RESOLUTION_DEFAULT;
+    frfmsb = sx127x_reg_read(dev, SX127X_REG_FRFMSB);
+    frfmid = sx127x_reg_read(dev, SX127X_REG_FRFMID);
+    frflsb = sx127x_reg_read(dev, SX127X_REG_FRFLSB);
 
     /* Cut the PA just in case, RFO output, power = -1 dBm */
     sx127x_reg_write(dev, SX127X_REG_PACONFIG, 0x00);
@@ -151,7 +153,9 @@ void sx1276_rx_chain_calibration(sx127x_t *dev)
 
     /* Restore context */
     sx127x_reg_write(dev, SX127X_REG_PACONFIG, reg_pa_config_init_val);
-    sx127x_set_channel(dev, initial_freq);
+    sx127x_reg_write(dev, SX127X_REG_FRFMSB, frfmsb);
+    sx127x_reg_write(dev, SX127X_REG_FRFMID, frfmid);
+    sx127x_reg_write(dev, SX127X_REG_FRFLSB, frflsb);
 }
 #endif
 
