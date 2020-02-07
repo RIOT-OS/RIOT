@@ -60,6 +60,13 @@ PROMPT = '> '
 
 BOARD = os.environ['BOARD']
 
+
+def print_error(message):
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    print(FAIL + message + ENDC)
+
+
 def check_cmd(child, cmd, expected):
     child.expect(PROMPT)
     child.sendline(cmd)
@@ -80,6 +87,22 @@ def check_and_get_bufsize(child):
     return bufsize
 
 
+def check_line_exceeded(child, bufsize):
+
+    if BOARD == 'nrf52dk':
+        # There is an issue with nrf52dk when the Virtual COM port is connected
+        # and sending more than 64 bytes over UART. If no terminal is connected
+        # to the Virtual COM and interfacing directly to the nrf52832 UART pins
+        # the issue is not present. See issue #10639 on GitHub.
+        print_error('test case "check_line_exceeded" broken for nrf52dk. SKIP')
+        return
+
+    longline = "_"*bufsize + "verylong"
+
+    child.sendline(longline)
+    child.expect('shell: maximum line length exceeded')
+
+
 def check_line_canceling(child):
     child.expect(PROMPT)
     child.sendline('garbage1234' + CONTROL_C)
@@ -97,6 +120,8 @@ def testfunc(child):
     check_startup(child)
 
     bufsize = check_and_get_bufsize(child)
+
+    check_line_exceeded(child, bufsize)
 
     check_line_canceling(child)
 
