@@ -22,12 +22,43 @@
 #define CPU_CONF_H
 
 #include "cpu_conf_common.h"
-#if defined(CPU_SAML1X)
-#include "vendor/sam23.h"
-#elif defined(CPU_SAMD5X)
-#include "vendor/samd5x.h"
-#else
-#include "vendor/sam0.h"
+
+/* Workaround redefinition of LITTLE_ENDIAN macro (part1) */
+#ifdef LITTLE_ENDIAN
+#define __TMP_LITTLE_ENDIAN     LITTLE_ENDIAN
+#undef LITTLE_ENDIAN
+#endif
+
+#if defined(CPU_SAMD21A) || defined(CPU_SAMD21B) || \
+    defined(CPU_SAMD21C) || defined(CPU_SAMD21D)
+#include "vendor/samd21/include/samd21.h"
+#elif defined(CPU_SAMD51)
+#include "vendor/samd51/include/samd51.h"
+#elif defined(CPU_SAME54)
+#include "vendor/same54/include/same54.h"
+#elif defined(CPU_SAML10)
+#include "vendor/saml10/include/sam.h"
+#elif defined(CPU_SAML11)
+#include "vendor/saml11/include/sam.h"
+#elif defined(CPU_SAML21A)
+#include "vendor/saml21/include/saml21.h"
+#elif defined(CPU_SAML21B)
+#include "vendor/saml21/include_b/saml21.h"
+#elif defined(CPU_SAMR21)
+#include "vendor/samr21/include/samr21.h"
+#elif defined(CPU_SAMR30)
+#include "vendor/samr30/include/samr30.h"
+#elif defined(CPU_SAMR34)
+#include "vendor/samr34/include/samr34.h"
+#endif
+
+/* Workaround redefinition of LITTLE_ENDIAN macro (part2) */
+#ifdef LITTLE_ENDIAN
+#undef LITTLE_ENDIAN
+#endif
+
+#ifdef __TMP_LITTLE_ENDIAN
+#define LITTLE_ENDIAN       __TMP_LITTLE_ENDIAN
 #endif
 
 #ifdef __cplusplus
