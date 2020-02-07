@@ -74,6 +74,24 @@ gnrc_netif_t *gnrc_netif_create(char *stack, int stacksize, char priority,
     return netif;
 }
 
+bool gnrc_netif_dev_is_6lo(const gnrc_netif_t *netif)
+{
+    switch (netif->device_type) {
+#ifdef MODULE_GNRC_SIXLOENC
+        case NETDEV_TYPE_ETHERNET:
+            return (netif->flags & GNRC_NETIF_FLAGS_6LO);
+#endif
+        case NETDEV_TYPE_IEEE802154:
+        case NETDEV_TYPE_CC110X:
+        case NETDEV_TYPE_BLE:
+        case NETDEV_TYPE_NRFMIN:
+        case NETDEV_TYPE_ESP_NOW:
+            return true;
+        default:
+            return false;
+    }
+}
+
 unsigned gnrc_netif_numof(void)
 {
     gnrc_netif_t *netif = NULL;

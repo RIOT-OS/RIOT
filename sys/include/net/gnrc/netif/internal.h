@@ -330,6 +330,17 @@ static inline bool gnrc_netif_is_rtr_adv(const gnrc_netif_t *netif)
 #endif
 
 /**
+ * @brief   Checks if the device type associated to a @ref gnrc_netif_t
+ *          requires 6Lo to run
+ *
+ * @param[in] netif the network interface
+ *
+ * @return true if the device requires 6Lo
+ * @return false otherwise
+ */
+bool gnrc_netif_dev_is_6lo(const gnrc_netif_t *netif);
+
+/**
  * @brief   Checks if the interface uses a protocol that requires 6Lo to run
  *
  * @attention   Requires prior locking
@@ -351,20 +362,7 @@ static inline bool gnrc_netif_is_6lo(const gnrc_netif_t *netif)
     if ((!gnrc_netif_highlander() &&
        IS_USED(MODULE_GNRC_SIXLOWPAN)) || \
        IS_USED(MODULE_GNRC_SIXLOENC)) {
-        switch (netif->device_type) {
-#ifdef MODULE_GNRC_SIXLOENC
-            case NETDEV_TYPE_ETHERNET:
-                return (netif->flags & GNRC_NETIF_FLAGS_6LO);
-#endif
-            case NETDEV_TYPE_IEEE802154:
-            case NETDEV_TYPE_CC110X:
-            case NETDEV_TYPE_BLE:
-            case NETDEV_TYPE_NRFMIN:
-            case NETDEV_TYPE_ESP_NOW:
-                return true;
-            default:
-                return false;
-        }
+        return gnrc_netif_dev_is_6lo(netif);
     }
     else if (gnrc_netif_highlander() && IS_USED(MODULE_GNRC_SIXLOWPAN)) {
         return true;
