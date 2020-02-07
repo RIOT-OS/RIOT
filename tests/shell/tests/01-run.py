@@ -57,9 +57,12 @@ CMDS = (
     ('reboot', ('test_shell.'))
 )
 
+PROMPT = '> '
+
 BOARD = os.environ['BOARD']
 
 def check_cmd(child, cmd, expected):
+    child.expect(PROMPT)
     child.sendline(cmd)
     for line in expected:
         child.expect_exact(line)
