@@ -14,7 +14,8 @@ endif
 unexport DIRS
 DIRS := $(sort $(abspath $(DIRS)))
 
-MODULE ?= $(shell basename $(CURDIR))
+_MOD := $(shell basename $(CURDIR))
+MODULE ?= $(_MOD)
 
 .PHONY: all clean $(DIRS:%=ALL--%) $(DIRS:%=CLEAN--%)
 

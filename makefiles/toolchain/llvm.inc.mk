@@ -20,13 +20,15 @@ export LINK        = $(PREFIX)gcc
 export LINKXX      = $(PREFIX)g++
 # objcopy does not have a clear substitute in LLVM, use GNU binutils
 #export OBJCOPY     = $(LLVMPREFIX)objcopy
-export OBJCOPY    ?= $(shell command -v $(PREFIX)objcopy || command -v gobjcopy || command -v objcopy)
+_OBJCOPY          := $(shell command -v $(PREFIX)objcopy || command -v gobjcopy || command -v objcopy)
+export OBJCOPY    ?= $(_OBJCOPY)
 ifeq ($(OBJCOPY),)
 $(warning objcopy not found. Hex file will not be created.)
 export OBJCOPY     = true
 endif
 # Default to the native (g)objdump, helps when using toolchain from docker
-export OBJDUMP    ?= $(or $(shell command -v $(LLVMPREFIX)objdump || command -v gobjdump),objdump)
+_OBJDUMP          := $(or $(shell command -v $(LLVMPREFIX)objdump || command -v gobjdump),objdump)
+export OBJDUMP    ?= $(_OBJDUMP)
 export SIZE        = $(LLVMPREFIX)size
 # LLVM lacks a binutils strip tool as well...
 #export STRIP      = $(LLVMPREFIX)strip
