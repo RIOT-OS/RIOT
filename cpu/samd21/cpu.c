@@ -31,6 +31,10 @@
 #define GEN2_ULP32K         1
 #endif
 
+#ifndef GEN3_ULP32K
+#define GEN3_ULP32K         1
+#endif
+
 #ifndef VDD
 /**
  * @brief   Set system voltage level in mV (determines flash wait states)
@@ -223,7 +227,7 @@ static void clk_init(void)
     GCLK->GENDIV.reg  = (GCLK_GENDIV_ID(SAM0_GCLK_1KHZ)  | GCLK_GENDIV_DIV(4));
     GCLK->GENCTRL.reg = (GCLK_GENCTRL_ID(SAM0_GCLK_1KHZ) | GCLK_GENCTRL_GENEN
                       | GCLK_GENCTRL_RUNSTDBY | GCLK_GENCTRL_DIVSEL
-#if GEN2_ULP32K
+#if GEN3_ULP32K
                       | GCLK_GENCTRL_SRC_OSCULP32K);
 #else
                       | GCLK_GENCTRL_SRC_XOSC32K);
