@@ -52,7 +52,6 @@ CMDS = (
     ('help', EXPECTED_HELP),
     ('echo a string', ('\"echo\"\"a\"\"string\"')),
     ('ps', EXPECTED_PS),
-    ('garbage1234'+CONTROL_C, ('>')),  # test cancelling a line
     ('help', EXPECTED_HELP),
     ('reboot', ('test_shell.'))
 )
@@ -81,6 +80,15 @@ def check_and_get_bufsize(child):
     return bufsize
 
 
+def check_line_canceling(child):
+    child.expect(PROMPT)
+    child.sendline('garbage1234' + CONTROL_C)
+    garbage_expected = 'garbage1234\r\r\n'
+    garbage_received = child.read(len(garbage_expected))
+
+    assert garbage_expected == garbage_received
+
+
 def testfunc(child):
     # avoid sending an extra empty line on native.
     if BOARD == 'native':
@@ -89,6 +97,8 @@ def testfunc(child):
     check_startup(child)
 
     bufsize = check_and_get_bufsize(child)
+
+    check_line_canceling(child)
 
     # loop other defined commands and expected output
     for cmd, expected in CMDS:
