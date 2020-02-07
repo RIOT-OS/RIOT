@@ -63,7 +63,17 @@ def check_cmd(child, cmd, expected):
         child.expect_exact(line)
 
 
+def check_and_get_bufsize(child):
+    child.sendline('bufsize')
+    child.expect('([0-9]+)\r\n')
+    bufsize = int(child.match.group(1))
+
+    return bufsize
+
+
 def testfunc(child):
+    bufsize = check_and_get_bufsize(child)
+
     # loop other defined commands and expected output
     for cmd, expected in CMDS:
         check_cmd(child, cmd, expected)
