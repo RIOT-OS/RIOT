@@ -275,7 +275,7 @@ size_t usbus_fmt_descriptor_dev(usbus_t *usbus)
     desc.length = sizeof(usb_descriptor_device_t);
     desc.type = USB_TYPE_DESCRIPTOR_DEVICE;
     desc.bcd_usb = CONFIG_USB_SPEC_BCDVERSION;
-    desc.max_packet_size = USBUS_EP0_SIZE;
+    desc.max_packet_size = CONFIG_USBUS_EP0_SIZE;
     desc.vendor_id = CONFIG_USB_VID;
     desc.product_id = CONFIG_USB_PID;
     desc.manufacturer_idx = usbus->manuf.idx;

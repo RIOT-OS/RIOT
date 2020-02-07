@@ -80,8 +80,8 @@ extern "C" {
  * large amount of data often over the control endpoint, a minimal size should
  * be sufficient
  */
-#ifndef USBUS_EP0_SIZE
-#define USBUS_EP0_SIZE              64
+#ifndef CONFIG_USBUS_EP0_SIZE
+#define CONFIG_USBUS_EP0_SIZE              64
 #endif
 /** @} */
 
