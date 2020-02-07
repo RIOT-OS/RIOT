@@ -29,6 +29,7 @@
 #include "clist.h"
 #include "event.h"
 #include "kernel_types.h"
+#include "kernel_defines.h"
 #include "msg.h"
 #include "thread.h"
 
@@ -62,12 +63,14 @@ extern "C" {
 /**
  * @brief USBUS auto attach setting
  *
- * When set, the USBUS thread will automatically enable the USB pull-up
+ * When set to 1, the USBUS thread will automatically enable the USB pull-up
  * resistor after initializing the thread. This will signal to the host
  * that the USB peripheral is ready for use.
  */
-#ifndef USBUS_AUTO_ATTACH
-#define USBUS_AUTO_ATTACH           (1)
+#ifndef CONFIG_USBUS_AUTO_ATTACH
+#if !IS_ACTIVE(KCONFIG_MODULE_USBUS)
+#define CONFIG_USBUS_AUTO_ATTACH            1
+#endif
 #endif
 
 /**

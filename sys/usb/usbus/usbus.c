@@ -18,6 +18,7 @@
 
 #define USB_H_USER_IS_RIOT_INTERNAL
 
+#include "kernel_defines.h"
 #include "bitarithm.h"
 #include "event.h"
 #include "thread.h"
@@ -248,11 +249,11 @@ static void *_usbus_thread(void *args)
     /* Initialize handlers */
     _usbus_init_handlers(usbus);
 
-#if (USBUS_AUTO_ATTACH)
-    static const usbopt_enable_t _enable = USBOPT_ENABLE;
-    usbdev_set(dev, USBOPT_ATTACH, &_enable,
-               sizeof(usbopt_enable_t));
-#endif
+    if (IS_ACTIVE(CONFIG_USBUS_AUTO_ATTACH)) {
+        static const usbopt_enable_t _enable = USBOPT_ENABLE;
+        usbdev_set(dev, USBOPT_ATTACH, &_enable,
+                   sizeof(usbopt_enable_t));
+    }
 
     while (1) {
         thread_flags_t flags = thread_flags_wait_any(
