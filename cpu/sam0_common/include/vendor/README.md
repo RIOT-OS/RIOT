@@ -53,6 +53,16 @@ saml11: `Atmel.SAML11_DFP.1.0.91.atpack`
 Each atpack has an include subdirectory with the files we copy into
 RIOT. The files are copied unmodified.
 
+## SAMR21 files
+
+samr21: `Atmel.SAMR21_DFP.1.1.72.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The following replacements were done for compatibility with newlib:
+
+    find -name '*.h' -exec sed -ie 's/_U(/_U_(/g' {} \;
+    find -name '*.h' -exec sed -ie 's/_L(/_L_(/g' {} \;
+
 ## SAMR34 files
 
 samr34: `Atmel.SAMR34_DFP.1.0.11.atpacks`

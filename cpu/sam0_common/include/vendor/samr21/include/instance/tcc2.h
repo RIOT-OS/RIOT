@@ -3,39 +3,24 @@
  *
  * \brief Instance description for TCC2
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2016 Atmel Corporation,
+ *                    a wholly owned subsidiary of Microchip Technology Inc.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the Licence at
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * \asf_license_stop
  *
@@ -46,51 +31,51 @@
 
 /* ========== Register definition for TCC2 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-#define REG_TCC2_CTRLA             (0x42002800U) /**< \brief (TCC2) Control A */
-#define REG_TCC2_CTRLBCLR          (0x42002804U) /**< \brief (TCC2) Control B Clear */
-#define REG_TCC2_CTRLBSET          (0x42002805U) /**< \brief (TCC2) Control B Set */
-#define REG_TCC2_SYNCBUSY          (0x42002808U) /**< \brief (TCC2) Synchronization Busy */
-#define REG_TCC2_FCTRLA            (0x4200280CU) /**< \brief (TCC2) Recoverable Fault A Configuration */
-#define REG_TCC2_FCTRLB            (0x42002810U) /**< \brief (TCC2) Recoverable Fault B Configuration */
-#define REG_TCC2_DRVCTRL           (0x42002818U) /**< \brief (TCC2) Driver Control */
-#define REG_TCC2_DBGCTRL           (0x4200281EU) /**< \brief (TCC2) Debug Control */
-#define REG_TCC2_EVCTRL            (0x42002820U) /**< \brief (TCC2) Event Control */
-#define REG_TCC2_INTENCLR          (0x42002824U) /**< \brief (TCC2) Interrupt Enable Clear */
-#define REG_TCC2_INTENSET          (0x42002828U) /**< \brief (TCC2) Interrupt Enable Set */
-#define REG_TCC2_INTFLAG           (0x4200282CU) /**< \brief (TCC2) Interrupt Flag Status and Clear */
-#define REG_TCC2_STATUS            (0x42002830U) /**< \brief (TCC2) Status */
-#define REG_TCC2_COUNT             (0x42002834U) /**< \brief (TCC2) Count */
-#define REG_TCC2_WAVE              (0x4200283CU) /**< \brief (TCC2) Waveform Control */
-#define REG_TCC2_PER               (0x42002840U) /**< \brief (TCC2) Period */
-#define REG_TCC2_CC0               (0x42002844U) /**< \brief (TCC2) Compare and Capture 0 */
-#define REG_TCC2_CC1               (0x42002848U) /**< \brief (TCC2) Compare and Capture 1 */
-#define REG_TCC2_WAVEB             (0x42002868U) /**< \brief (TCC2) Waveform Control Buffer */
-#define REG_TCC2_PERB              (0x4200286CU) /**< \brief (TCC2) Period Buffer */
-#define REG_TCC2_CCB0              (0x42002870U) /**< \brief (TCC2) Compare and Capture Buffer 0 */
-#define REG_TCC2_CCB1              (0x42002874U) /**< \brief (TCC2) Compare and Capture Buffer 1 */
+#define REG_TCC2_CTRLA             (0x42002800) /**< \brief (TCC2) Control A */
+#define REG_TCC2_CTRLBCLR          (0x42002804) /**< \brief (TCC2) Control B Clear */
+#define REG_TCC2_CTRLBSET          (0x42002805) /**< \brief (TCC2) Control B Set */
+#define REG_TCC2_SYNCBUSY          (0x42002808) /**< \brief (TCC2) Synchronization Busy */
+#define REG_TCC2_FCTRLA            (0x4200280C) /**< \brief (TCC2) Recoverable Fault A Configuration */
+#define REG_TCC2_FCTRLB            (0x42002810) /**< \brief (TCC2) Recoverable Fault B Configuration */
+#define REG_TCC2_DRVCTRL           (0x42002818) /**< \brief (TCC2) Driver Control */
+#define REG_TCC2_DBGCTRL           (0x4200281E) /**< \brief (TCC2) Debug Control */
+#define REG_TCC2_EVCTRL            (0x42002820) /**< \brief (TCC2) Event Control */
+#define REG_TCC2_INTENCLR          (0x42002824) /**< \brief (TCC2) Interrupt Enable Clear */
+#define REG_TCC2_INTENSET          (0x42002828) /**< \brief (TCC2) Interrupt Enable Set */
+#define REG_TCC2_INTFLAG           (0x4200282C) /**< \brief (TCC2) Interrupt Flag Status and Clear */
+#define REG_TCC2_STATUS            (0x42002830) /**< \brief (TCC2) Status */
+#define REG_TCC2_COUNT             (0x42002834) /**< \brief (TCC2) Count */
+#define REG_TCC2_WAVE              (0x4200283C) /**< \brief (TCC2) Waveform Control */
+#define REG_TCC2_PER               (0x42002840) /**< \brief (TCC2) Period */
+#define REG_TCC2_CC0               (0x42002844) /**< \brief (TCC2) Compare and Capture 0 */
+#define REG_TCC2_CC1               (0x42002848) /**< \brief (TCC2) Compare and Capture 1 */
+#define REG_TCC2_WAVEB             (0x42002868) /**< \brief (TCC2) Waveform Control Buffer */
+#define REG_TCC2_PERB              (0x4200286C) /**< \brief (TCC2) Period Buffer */
+#define REG_TCC2_CCB0              (0x42002870) /**< \brief (TCC2) Compare and Capture Buffer 0 */
+#define REG_TCC2_CCB1              (0x42002874) /**< \brief (TCC2) Compare and Capture Buffer 1 */
 #else
-#define REG_TCC2_CTRLA             (*(RwReg  *)0x42002800U) /**< \brief (TCC2) Control A */
-#define REG_TCC2_CTRLBCLR          (*(RwReg8 *)0x42002804U) /**< \brief (TCC2) Control B Clear */
-#define REG_TCC2_CTRLBSET          (*(RwReg8 *)0x42002805U) /**< \brief (TCC2) Control B Set */
-#define REG_TCC2_SYNCBUSY          (*(RoReg  *)0x42002808U) /**< \brief (TCC2) Synchronization Busy */
-#define REG_TCC2_FCTRLA            (*(RwReg  *)0x4200280CU) /**< \brief (TCC2) Recoverable Fault A Configuration */
-#define REG_TCC2_FCTRLB            (*(RwReg  *)0x42002810U) /**< \brief (TCC2) Recoverable Fault B Configuration */
-#define REG_TCC2_DRVCTRL           (*(RwReg  *)0x42002818U) /**< \brief (TCC2) Driver Control */
-#define REG_TCC2_DBGCTRL           (*(RwReg8 *)0x4200281EU) /**< \brief (TCC2) Debug Control */
-#define REG_TCC2_EVCTRL            (*(RwReg  *)0x42002820U) /**< \brief (TCC2) Event Control */
-#define REG_TCC2_INTENCLR          (*(RwReg  *)0x42002824U) /**< \brief (TCC2) Interrupt Enable Clear */
-#define REG_TCC2_INTENSET          (*(RwReg  *)0x42002828U) /**< \brief (TCC2) Interrupt Enable Set */
-#define REG_TCC2_INTFLAG           (*(RwReg  *)0x4200282CU) /**< \brief (TCC2) Interrupt Flag Status and Clear */
-#define REG_TCC2_STATUS            (*(RwReg  *)0x42002830U) /**< \brief (TCC2) Status */
-#define REG_TCC2_COUNT             (*(RwReg  *)0x42002834U) /**< \brief (TCC2) Count */
-#define REG_TCC2_WAVE              (*(RwReg  *)0x4200283CU) /**< \brief (TCC2) Waveform Control */
-#define REG_TCC2_PER               (*(RwReg  *)0x42002840U) /**< \brief (TCC2) Period */
-#define REG_TCC2_CC0               (*(RwReg  *)0x42002844U) /**< \brief (TCC2) Compare and Capture 0 */
-#define REG_TCC2_CC1               (*(RwReg  *)0x42002848U) /**< \brief (TCC2) Compare and Capture 1 */
-#define REG_TCC2_WAVEB             (*(RwReg  *)0x42002868U) /**< \brief (TCC2) Waveform Control Buffer */
-#define REG_TCC2_PERB              (*(RwReg  *)0x4200286CU) /**< \brief (TCC2) Period Buffer */
-#define REG_TCC2_CCB0              (*(RwReg  *)0x42002870U) /**< \brief (TCC2) Compare and Capture Buffer 0 */
-#define REG_TCC2_CCB1              (*(RwReg  *)0x42002874U) /**< \brief (TCC2) Compare and Capture Buffer 1 */
+#define REG_TCC2_CTRLA             (*(RwReg  *)0x42002800UL) /**< \brief (TCC2) Control A */
+#define REG_TCC2_CTRLBCLR          (*(RwReg8 *)0x42002804UL) /**< \brief (TCC2) Control B Clear */
+#define REG_TCC2_CTRLBSET          (*(RwReg8 *)0x42002805UL) /**< \brief (TCC2) Control B Set */
+#define REG_TCC2_SYNCBUSY          (*(RoReg  *)0x42002808UL) /**< \brief (TCC2) Synchronization Busy */
+#define REG_TCC2_FCTRLA            (*(RwReg  *)0x4200280CUL) /**< \brief (TCC2) Recoverable Fault A Configuration */
+#define REG_TCC2_FCTRLB            (*(RwReg  *)0x42002810UL) /**< \brief (TCC2) Recoverable Fault B Configuration */
+#define REG_TCC2_DRVCTRL           (*(RwReg  *)0x42002818UL) /**< \brief (TCC2) Driver Control */
+#define REG_TCC2_DBGCTRL           (*(RwReg8 *)0x4200281EUL) /**< \brief (TCC2) Debug Control */
+#define REG_TCC2_EVCTRL            (*(RwReg  *)0x42002820UL) /**< \brief (TCC2) Event Control */
+#define REG_TCC2_INTENCLR          (*(RwReg  *)0x42002824UL) /**< \brief (TCC2) Interrupt Enable Clear */
+#define REG_TCC2_INTENSET          (*(RwReg  *)0x42002828UL) /**< \brief (TCC2) Interrupt Enable Set */
+#define REG_TCC2_INTFLAG           (*(RwReg  *)0x4200282CUL) /**< \brief (TCC2) Interrupt Flag Status and Clear */
+#define REG_TCC2_STATUS            (*(RwReg  *)0x42002830UL) /**< \brief (TCC2) Status */
+#define REG_TCC2_COUNT             (*(RwReg  *)0x42002834UL) /**< \brief (TCC2) Count */
+#define REG_TCC2_WAVE              (*(RwReg  *)0x4200283CUL) /**< \brief (TCC2) Waveform Control */
+#define REG_TCC2_PER               (*(RwReg  *)0x42002840UL) /**< \brief (TCC2) Period */
+#define REG_TCC2_CC0               (*(RwReg  *)0x42002844UL) /**< \brief (TCC2) Compare and Capture 0 */
+#define REG_TCC2_CC1               (*(RwReg  *)0x42002848UL) /**< \brief (TCC2) Compare and Capture 1 */
+#define REG_TCC2_WAVEB             (*(RwReg  *)0x42002868UL) /**< \brief (TCC2) Waveform Control Buffer */
+#define REG_TCC2_PERB              (*(RwReg  *)0x4200286CUL) /**< \brief (TCC2) Period Buffer */
+#define REG_TCC2_CCB0              (*(RwReg  *)0x42002870UL) /**< \brief (TCC2) Compare and Capture Buffer 0 */
+#define REG_TCC2_CCB1              (*(RwReg  *)0x42002874UL) /**< \brief (TCC2) Compare and Capture Buffer 1 */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for TCC2 peripheral ========== */
