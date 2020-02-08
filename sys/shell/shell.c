@@ -170,20 +170,24 @@ static void print_help(const shell_command_t *command_list)
  */
 static void handle_input_line(const shell_command_t *command_list, char *line)
 {
-    static const char *INCORRECT_QUOTING = "shell: incorrect quoting";
-
     /* first we need to calculate the number of arguments */
     int argc = 0;
     char *readpos = line;
     char *writepos = readpos;
     enum PARSE_STATE pstate = PARSE_SPACE;
 
-    while (*readpos != '\0') {
+    for (; *readpos != '\0'; readpos++) {
+
+        char wordbreak = BLANK;
+        bool is_wordbreak = false;
+
         switch (pstate) {
+
             case PARSE_SPACE:
                 if (*readpos != BLANK) {
                     argc++;
                 }
+
                 if (*readpos == SQUOTE) {
                     pstate = PARSE_SINGLEQUOTE;
                 }
@@ -195,58 +199,48 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
                 }
                 else if (*readpos != BLANK) {
                     pstate = PARSE_UNQUOTED;
-                    break;
+                    *writepos++ = *readpos;
                 }
-                goto parse_end;
-                
+                break;
+
             case PARSE_UNQUOTED:
-                if (*readpos == BLANK) {
-                    pstate = PARSE_SPACE;
-                    *writepos++ = '\0';
-                    goto parse_end;
-                }
-                else if (*readpos == ESCAPECHAR) {
-                    pstate = escape_toggle(pstate);
-                    goto parse_end;
-                }
+                wordbreak = BLANK;
+                is_wordbreak = true;
                 break;
 
             case PARSE_SINGLEQUOTE:
-                if (*readpos == SQUOTE)  {
-                    pstate = PARSE_SPACE;
-                    *writepos++ = '\0';
-                    goto parse_end;
-                }
-                else if (*readpos == ESCAPECHAR) {
-                    pstate = escape_toggle(pstate);
-                    goto parse_end;
-                }
+                wordbreak = SQUOTE;
+                is_wordbreak = true;
                 break;
 
             case PARSE_DOUBLEQUOTE:
-                if (*readpos == DQUOTE) {
-                    pstate = PARSE_SPACE;
-                    *writepos++ = '\0';
-                    goto parse_end;
-                }
-                else if (*readpos == ESCAPECHAR) {
-                    pstate = escape_toggle(pstate);
-                    goto parse_end;
-                }
+                wordbreak = DQUOTE;
+                is_wordbreak = true;
                 break;
 
             default: /* QUOTED state */
                 pstate = escape_toggle(pstate);
+                *writepos++ = *readpos;
                 break;
         }
-        *writepos++ = *readpos;
-        parse_end:
-        readpos++;
+
+        if (is_wordbreak) {
+            if (*readpos == wordbreak) {
+                pstate = PARSE_SPACE;
+                *writepos++ = '\0';
+            }
+            else if (*readpos == ESCAPECHAR) {
+                pstate = escape_toggle(pstate);
+            }
+            else {
+                *writepos++ = *readpos;
+            }
+        }
     }
     *writepos = '\0';
 
     if (pstate != PARSE_SPACE && pstate != PARSE_UNQUOTED) {
-        puts(INCORRECT_QUOTING);
+        puts("shell: incorrect quoting");
         return;
     }
 
