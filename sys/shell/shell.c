@@ -39,21 +39,38 @@
 #include "shell_commands.h"
 
 #define ETX '\x03'  /** ASCII "End-of-Text", or ctrl-C */
+#define BS  '\x08'  /** ASCII "Backspace" */
+#define DEL '\x7f'  /** ASCII "Delete" */
 
-static void flush_if_needed(void)
-{
+#ifdef MODULE_SHELL_COMMANDS
+    #define MORE_COMMANDS _shell_command_list
+#else
+    #define MORE_COMMANDS
+#endif /* MODULE_SHELL_COMMANDS */
+
 #ifdef MODULE_NEWLIB
-    fflush(stdout);
-#endif
-}
+    #define flush_if_needed() fflush(stdout)
+#else
+    #define flush_if_needed()
+#endif /* MODULE_NEWLIB */
+
+#ifndef SHELL_NO_ECHO
+    #define ECHO_ON 1
+#else
+    #define ECHO_ON 0
+#endif /* SHELL_NO_ECHO */
+
+#ifndef SHELL_NO_PROMPT
+    #define PROMPT_ON 1
+#else
+    #define PROMPT_ON 0
+#endif /* SHELL_NO_PROMPT */
 
 static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
 {
     const shell_command_t *command_lists[] = {
         command_list,
-#ifdef MODULE_SHELL_COMMANDS
-        _shell_command_list,
-#endif
+        MORE_COMMANDS
     };
 
     /* iterating over command_lists */
@@ -84,9 +101,7 @@ static void print_help(const shell_command_t *command_list)
 
     const shell_command_t *command_lists[] = {
         command_list,
-#ifdef MODULE_SHELL_COMMANDS
-        _shell_command_list,
-#endif
+        MORE_COMMANDS
     };
 
     /* iterating over command_lists */
@@ -270,10 +285,11 @@ static int readline(char *buf, size_t size)
             }
 
             buf[curr_pos] = '\0';
-#ifndef SHELL_NO_ECHO
-            putchar('\r');
-            putchar('\n');
-#endif
+
+            if (ECHO_ON) {
+                putchar('\r');
+                putchar('\n');
+            }
 
             return (length_exceeded) ? -ENOBUFS : curr_pos;
         }
@@ -281,7 +297,7 @@ static int readline(char *buf, size_t size)
         /* check for backspace:
          * 0x7f (DEL) when using QEMU
          * 0x08 (BS) for most terminals */
-        if (c == 0x08 || c == 0x7f) {
+        if (c == BS || c == DEL) {
             if (curr_pos == 0) {
                 /* ignore empty line */
                 continue;
@@ -292,12 +308,13 @@ static int readline(char *buf, size_t size)
             if (!length_exceeded) {
                 buf[--curr_pos] = '\0';
             }
+
             /* white-tape the character */
-#ifndef SHELL_NO_ECHO
-            putchar('\b');
-            putchar(' ');
-            putchar('\b');
-#endif
+            if (ECHO_ON) {
+                putchar('\b');
+                putchar(' ');
+                putchar('\b');
+            }
         }
         else {
             /* Always consume characters, but do not not always store them */
@@ -307,9 +324,10 @@ static int readline(char *buf, size_t size)
             else {
                 length_exceeded = true;
             }
-#ifndef SHELL_NO_ECHO
-            putchar(c);
-#endif
+
+            if (ECHO_ON) {
+                putchar(c);
+            }
         }
         flush_if_needed();
     }
@@ -317,10 +335,10 @@ static int readline(char *buf, size_t size)
 
 static inline void print_prompt(void)
 {
-#ifndef SHELL_NO_PROMPT
-    putchar('>');
-    putchar(' ');
-#endif
+    if (PROMPT_ON) {
+        putchar('>');
+        putchar(' ');
+    }
 
     flush_if_needed();
 }
