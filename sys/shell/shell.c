@@ -66,6 +66,27 @@
     #define PROMPT_ON 0
 #endif /* SHELL_NO_PROMPT */
 
+#define SQUOTE '\''
+#define DQUOTE '"'
+#define ESCAPECHAR '\\'
+#define BLANK ' '
+
+enum PARSE_STATE {
+    PARSE_SPACE,
+    PARSE_UNQUOTED,
+    PARSE_SINGLEQUOTE,
+    PARSE_DOUBLEQUOTE,
+    PARSE_ESCAPE_MASK,
+    PARSE_UNQUOTED_ESC,
+    PARSE_SINGLEQUOTE_ESC,
+    PARSE_DOUBLEQUOTE_ESC,
+};
+
+static enum PARSE_STATE escape_toggle(enum PARSE_STATE s)
+{
+    return s ^ PARSE_ESCAPE_MASK;
+}
+
 static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
 {
     const shell_command_t *command_lists[] = {
@@ -119,107 +140,128 @@ static void print_help(const shell_command_t *command_list)
     }
 }
 
+/**
+ * Break input line into words, create argv and call the command handler.
+ *
+ * Words are broken up at spaces. A backslash escaped the character that comes
+ * after (meaning if it is taken literally and if it is a space it does not break
+ * the word). Spaces can also be protected by quoting with double or single
+ * quotes.
+ *
+ State diagram for the tokenizer:
+```
+           ┌───[\]────┐   ┌─────["]────┐   ┌───[']─────┐  ┌───[\]────┐
+           ↓          │   ↓            │   │           ↓  │          ↓
+  ┏━━━━━━━━━━┓      ┏━┷━━━━━┓        ┏━┷━━━┷━┓       ┏━━━━┷━━┓     ┏━━━━━━━━━━┓
+  ┃DQUOTE ESC┃      ┃DQUOTE ┠───["]─>┃SPACE  ┃<─[']──┨SQUOTE ┃     ┃SQUOTE ESC┃
+  ┗━━━━━━━━┯━┛      ┗━━━━━━┯┛        ┗┯━━━━┯━┛       ┗━┯━━━━━┛     ┗━━━┯━━━━━━┛
+           │         ↑     │          │    │           │     ↑(store)  │
+           │  (store)│     │   ┌─[\]──┘    └──[*]────┐ │     │         │
+           └──[*]──▶┴◀[*]┘   │                     │ └[*]▶┴◀──[*]──┘
+                               ↓     ┏━━━━━━━┓       ↓
+                               ├◀[\]┨NOQUOTE┃◀─────┼◀─┐
+                               │     ┗━━━━━┯━┛(store)↑   │
+                               │           │         │   │
+                               │           └─[*]─────┘   │
+                               │     ┏━━━━━━━━━━━┓       │
+                               └───▶┃NOQUOTE ESC┠──[*]──┘
+                                     ┗━━━━━━━━━━━┛
+```
+ */
 static void handle_input_line(const shell_command_t *command_list, char *line)
 {
     static const char *INCORRECT_QUOTING = "shell: incorrect quoting";
 
     /* first we need to calculate the number of arguments */
-    unsigned argc = 0;
-    char *pos = line;
-    int contains_esc_seq = 0;
-    while (1) {
-        if ((unsigned char) *pos > ' ') {
-            /* found an argument */
-            if (*pos == '"' || *pos == '\'') {
-                /* it's a quoted argument */
-                const char quote_char = *pos;
-                do {
-                    ++pos;
-                    if (!*pos) {
-                        puts(INCORRECT_QUOTING);
-                        return;
-                    }
-                    else if (*pos == '\\') {
-                        /* skip over the next character */
-                        ++contains_esc_seq;
-                        ++pos;
-                        if (!*pos) {
-                            puts(INCORRECT_QUOTING);
-                            return;
-                        }
-                        continue;
-                    }
-                } while (*pos != quote_char);
-                if ((unsigned char) pos[1] > ' ') {
-                    puts(INCORRECT_QUOTING);
-                    return;
+    int argc = 0;
+    char *readpos = line;
+    char *writepos = readpos;
+    enum PARSE_STATE pstate = PARSE_SPACE;
+
+    while (*readpos != '\0') {
+        switch (pstate) {
+            case PARSE_SPACE:
+                if (*readpos != BLANK) {
+                    argc++;
                 }
-            }
-            else {
-                /* it's an unquoted argument */
-                do {
-                    if (*pos == '\\') {
-                        /* skip over the next character */
-                        ++contains_esc_seq;
-                        ++pos;
-                        if (!*pos) {
-                            puts(INCORRECT_QUOTING);
-                            return;
-                        }
-                    }
-                    ++pos;
-                    if (*pos == '"') {
-                        puts(INCORRECT_QUOTING);
-                        return;
-                    }
-                } while ((unsigned char) *pos > ' ');
-            }
+                if (*readpos == SQUOTE) {
+                    pstate = PARSE_SINGLEQUOTE;
+                }
+                else if (*readpos == DQUOTE) {
+                    pstate = PARSE_DOUBLEQUOTE;
+                }
+                else if (*readpos == ESCAPECHAR) {
+                    pstate = PARSE_UNQUOTED_ESC;
+                }
+                else if (*readpos != BLANK) {
+                    pstate = PARSE_UNQUOTED;
+                    break;
+                }
+                goto parse_end;
+                
+            case PARSE_UNQUOTED:
+                if (*readpos == BLANK) {
+                    pstate = PARSE_SPACE;
+                    *writepos++ = '\0';
+                    goto parse_end;
+                }
+                else if (*readpos == ESCAPECHAR) {
+                    pstate = escape_toggle(pstate);
+                    goto parse_end;
+                }
+                break;
 
-            /* count the number of arguments we got */
-            ++argc;
-        }
+            case PARSE_SINGLEQUOTE:
+                if (*readpos == SQUOTE)  {
+                    pstate = PARSE_SPACE;
+                    *writepos++ = '\0';
+                    goto parse_end;
+                }
+                else if (*readpos == ESCAPECHAR) {
+                    pstate = escape_toggle(pstate);
+                    goto parse_end;
+                }
+                break;
 
-        /* zero out current position (space or quotation mark) and advance */
-        if (*pos > 0) {
-            *pos = 0;
-            ++pos;
+            case PARSE_DOUBLEQUOTE:
+                if (*readpos == DQUOTE) {
+                    pstate = PARSE_SPACE;
+                    *writepos++ = '\0';
+                    goto parse_end;
+                }
+                else if (*readpos == ESCAPECHAR) {
+                    pstate = escape_toggle(pstate);
+                    goto parse_end;
+                }
+                break;
+
+            default: /* QUOTED state */
+                pstate = escape_toggle(pstate);
+                break;
         }
-        else {
-            break;
-        }
+        *writepos++ = *readpos;
+        parse_end:
+        readpos++;
     }
-    if (!argc) {
+    *writepos = '\0';
+
+    if (pstate != PARSE_SPACE && pstate != PARSE_UNQUOTED) {
+        puts(INCORRECT_QUOTING);
+        return;
+    }
+
+    if (argc == 0) {
         return;
     }
 
     /* then we fill the argv array */
-    char *argv[argc + 1];
-    argv[argc] = NULL;
-    pos = line;
-    for (unsigned i = 0; i < argc; ++i) {
-        while (!*pos) {
-            ++pos;
-        }
-        if (*pos == '"' || *pos == '\'') {
-            ++pos;
-        }
-        argv[i] = pos;
-        while (*pos) {
-            ++pos;
-        }
-    }
-    for (char **arg = argv; contains_esc_seq && *arg; ++arg) {
-        for (char *c = *arg; *c; ++c) {
-            if (*c != '\\') {
-                continue;
-            }
-            for (char *d = c; *d; ++d) {
-                *d = d[1];
-            }
-            if (--contains_esc_seq == 0) {
-                break;
-            }
-        }
+    int collected;
+    char *argv[argc];
+
+    readpos = line;
+    for (collected = 0; collected < argc; collected++) {
+        argv[collected] = readpos;
+        readpos += strlen(readpos) + 1;
     }
 
     /* then we call the appropriate handler */
