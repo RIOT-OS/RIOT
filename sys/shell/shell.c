@@ -39,17 +39,6 @@
 #include "shell_commands.h"
 
 #define ETX '\x03'  /** ASCII "End-of-Text", or ctrl-C */
-#if !defined(SHELL_NO_ECHO) || !defined(SHELL_NO_PROMPT)
-#ifdef MODULE_NEWLIB
-/* use local copy of putchar, as it seems to be inlined,
- * enlarging code by 50% */
-static void _putchar(int c) {
-    putchar(c);
-}
-#else
-#define _putchar putchar
-#endif
-#endif
 
 static void flush_if_needed(void)
 {
@@ -282,8 +271,8 @@ static int readline(char *buf, size_t size)
 
             buf[curr_pos] = '\0';
 #ifndef SHELL_NO_ECHO
-            _putchar('\r');
-            _putchar('\n');
+            putchar('\r');
+            putchar('\n');
 #endif
 
             return (length_exceeded) ? -ENOBUFS : curr_pos;
@@ -305,9 +294,9 @@ static int readline(char *buf, size_t size)
             }
             /* white-tape the character */
 #ifndef SHELL_NO_ECHO
-            _putchar('\b');
-            _putchar(' ');
-            _putchar('\b');
+            putchar('\b');
+            putchar(' ');
+            putchar('\b');
 #endif
         }
         else {
@@ -319,7 +308,7 @@ static int readline(char *buf, size_t size)
                 length_exceeded = true;
             }
 #ifndef SHELL_NO_ECHO
-            _putchar(c);
+            putchar(c);
 #endif
         }
         flush_if_needed();
@@ -329,8 +318,8 @@ static int readline(char *buf, size_t size)
 static inline void print_prompt(void)
 {
 #ifndef SHELL_NO_PROMPT
-    _putchar('>');
-    _putchar(' ');
+    putchar('>');
+    putchar(' ');
 #endif
 
     flush_if_needed();
