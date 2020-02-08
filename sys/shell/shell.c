@@ -237,6 +237,40 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
     }
 }
 
+static inline void print_prompt(void)
+{
+    if (PROMPT_ON) {
+        putchar('>');
+        putchar(' ');
+    }
+
+    flush_if_needed();
+}
+
+static inline void echo_char(char c)
+{
+    if (ECHO_ON) {
+        putchar(c);
+    }
+}
+
+static inline void white_tape(void)
+{
+    if (ECHO_ON) {
+        putchar('\b');
+        putchar(' ');
+        putchar('\b');
+    }
+}
+
+static inline void new_line(void)
+{
+    if (ECHO_ON) {
+        putchar('\r');
+        putchar('\n');
+    }
+}
+
 /**
  * @brief   Read a single line from standard input into a buffer.
  *
@@ -246,6 +280,10 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
  * If the input line is too long, the input will still be consumed until the end
  * to prevent the next line from containing garbage.
  *
+ * We allow Unix (\n), DOS (\r\n), and Mac linebreaks (\r).
+ * QEMU transmits only a single '\r' == 13 on hitting enter ("-serial stdio").
+ * DOS newlines are handled like hitting enter twice.
+ *
  * @param   buf     Buffer where the input will be placed.
  * @param   size    Size of the buffer. The maximum line length will be one less
  *                  than size, to accommodate for the null terminator.
@@ -254,7 +292,7 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
  * @return  length of the read line, excluding the terminator, if reading was
  *          successful.
  * @return  EOF, if the end of the input stream was reached.
- * @return  ENOBUFS if the buffer size was exceeded.
+ * @return  -ENOBUFS if the buffer size was exceeded.
  */
 static int readline(char *buf, size_t size)
 {
@@ -264,83 +302,57 @@ static int readline(char *buf, size_t size)
     assert((size_t) size > 0);
 
     while (1) {
-        /* At the start of the loop, cur_pos should point inside of
-         * buf. This ensures the terminator can always fit. */
         assert((size_t) curr_pos < size);
 
         int c = getchar();
-        if (c < 0) {
-            return EOF;
-        }
 
-        /* We allow Unix linebreaks (\n), DOS linebreaks (\r\n), and Mac
-         * linebreaks (\r). QEMU transmits only a single '\r' == 13 on hitting
-         * enter ("-serial stdio"). DOS newlines are handled like hitting enter
-         * twice, but empty lines are ignored. Ctrl-C cancels the current line.
-         */
-        if (c == '\r' || c == '\n' || c == ETX) {
-            if (c == ETX) {
+        switch (c) {
+
+            case EOF:
+                return EOF;
+
+            case ETX:
+                /* Ctrl-C cancels the current line. */
                 curr_pos = 0;
                 length_exceeded = false;
-            }
+                /* fall-thru */
+            case '\r':
+                /* fall-thru */
+            case '\n':
+                buf[curr_pos] = '\0';
 
-            buf[curr_pos] = '\0';
+                new_line();
 
-            if (ECHO_ON) {
-                putchar('\r');
-                putchar('\n');
-            }
+                return (length_exceeded) ? -ENOBUFS : curr_pos;
 
-            return (length_exceeded) ? -ENOBUFS : curr_pos;
+            /* check for backspace: */
+            case BS:    /* 0x08 (BS) for most terminals */
+                /* fall-thru */
+            case DEL:   /* 0x7f (DEL) when using QEMU */
+                if (curr_pos > 0) {
+                    curr_pos--;
+                    if ((size_t) curr_pos < size) {
+                        buf[curr_pos] = '\0';
+                        length_exceeded = false;
+                    }
+                    white_tape();
+                }
+                break;
+
+            default:
+                /* Always consume characters, but do not not always store them */
+                if ((size_t) curr_pos < size - 1) {
+                    buf[curr_pos++] = c;
+                }
+                else {
+                    length_exceeded = true;
+                }
+                echo_char(c);
+                break;
         }
 
-        /* check for backspace:
-         * 0x7f (DEL) when using QEMU
-         * 0x08 (BS) for most terminals */
-        if (c == BS || c == DEL) {
-            if (curr_pos == 0) {
-                /* ignore empty line */
-                continue;
-            }
-
-            /* after we dropped characters don't edit the line, yet keep the
-             * visual effects */
-            if (!length_exceeded) {
-                buf[--curr_pos] = '\0';
-            }
-
-            /* white-tape the character */
-            if (ECHO_ON) {
-                putchar('\b');
-                putchar(' ');
-                putchar('\b');
-            }
-        }
-        else {
-            /* Always consume characters, but do not not always store them */
-            if ((size_t) curr_pos < size - 1) {
-                buf[curr_pos++] = c;
-            }
-            else {
-                length_exceeded = true;
-            }
-
-            if (ECHO_ON) {
-                putchar(c);
-            }
-        }
         flush_if_needed();
     }
-}
-
-static inline void print_prompt(void)
-{
-    if (PROMPT_ON) {
-        putchar('>');
-        putchar(' ');
-    }
-
-    flush_if_needed();
 }
 
 void shell_run_once(const shell_command_t *shell_commands,
