@@ -50,6 +50,8 @@ CMDS = (
      'shell: command not found: '
      '123456789012345678901234567890123456789012345678901234567890'),
     ('unknown_command', 'shell: command not found: unknown_command'),
+    ('hello-willy\b\b\b\borld', 'shell: command not found: hello-world'),
+    ('\b\b\b\becho', '\"echo\"'),
     ('help', EXPECTED_HELP),
     ('echo a string', '\"echo\"\"a\"\"string\"'),
     ('ps', EXPECTED_PS),
@@ -87,7 +89,7 @@ def check_and_get_bufsize(child):
     return bufsize
 
 
-def check_line_exceeded(child, bufsize):
+def check_line_exceeded(child, longline):
 
     if BOARD == 'nrf52dk':
         # There is an issue with nrf52dk when the Virtual COM port is connected
@@ -96,8 +98,6 @@ def check_line_exceeded(child, bufsize):
         # the issue is not present. See issue #10639 on GitHub.
         print_error('test case "check_line_exceeded" broken for nrf52dk. SKIP')
         return
-
-    longline = "_"*bufsize + "verylong"
 
     child.sendline(longline)
     child.expect('shell: maximum line length exceeded')
@@ -112,6 +112,16 @@ def check_line_canceling(child):
     assert garbage_expected == garbage_received
 
 
+def check_erase_long_line(child, longline):
+    # FIXME: this only works on native, due to #10634 combined with socat
+    # insisting in line-buffering the terminal.
+
+    if BOARD == 'native':
+        longline_erased = longline + "\b"*len(longline) + "echo"
+        child.sendline(longline_erased)
+        child.expect_exact('"echo"')
+
+
 def testfunc(child):
     # avoid sending an extra empty line on native.
     if BOARD == 'native':
@@ -120,10 +130,13 @@ def testfunc(child):
     check_startup(child)
 
     bufsize = check_and_get_bufsize(child)
+    longline = "_"*bufsize + "verylong"
 
-    check_line_exceeded(child, bufsize)
+    check_line_exceeded(child, longline)
 
     check_line_canceling(child)
+
+    check_erase_long_line(child, longline)
 
     # loop other defined commands and expected output
     for cmd, expected in CMDS:
