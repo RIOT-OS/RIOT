@@ -96,6 +96,8 @@
 # the target when starting a debug session. 'reset halt' can also be used
 # depending on the type of target.
 : ${OPENOCD_DBG_START_CMD:=-c 'halt'}
+# Extra commands to add when using debug
+: ${OPENOCD_DBG_EXTRA_CMD:=}
 # command used to reset the board
 : ${OPENOCD_CMD_RESET_RUN:="-c 'reset run'"}
 # This is an optional offset to the base address that can be used to flash an
@@ -329,6 +331,7 @@ do_debug() {
             -c 'telnet_port ${TELNET_PORT}' \
             -c 'gdb_port ${GDB_PORT}' \
             -c 'init' \
+            ${OPENOCD_DBG_EXTRA_CMD} \
             -c 'targets' \
             ${OPENOCD_DBG_START_CMD} \
             -l /dev/null & \
@@ -356,6 +359,7 @@ do_debugserver() {
             -c 'telnet_port ${TELNET_PORT}' \
             -c 'gdb_port ${GDB_PORT}' \
             -c 'init' \
+            ${OPENOCD_DBG_EXTRA_CMD} \
             -c 'targets' \
             -c 'halt'"
 }
