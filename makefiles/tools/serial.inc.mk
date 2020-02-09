@@ -33,6 +33,5 @@ else ifeq ($(RIOT_TERMINAL),semihosting)
   TERMPROG = $(DEBUGGER)
   TERMFLAGS = $(DEBUGGER_FLAGS)
   OPENOCD_DBG_EXTRA_CMD += -c 'arm semihosting enable'
-  OPENOCD_DBG_EXTRA_CMD += -c 'set remotetimeout 10000' 
   $(call target-export-variables,term cleanterm,OPENOCD_DBG_EXTRA_CMD)
 endif
