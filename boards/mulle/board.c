@@ -50,6 +50,10 @@ static devfs_t mulle_nvram_devfs = {
 
 static const mtd_spi_nor_params_t mulle_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,
+    .wait_chip_erase = 16LU * US_PER_SEC,
+    .wait_sector_erase = 40LU * US_PER_MS,
+    .wait_32k_erase = 20LU * US_PER_MS,
+    .wait_4k_erase = 10LU * US_PER_MS,
     .spi = MULLE_NOR_SPI_DEV,
     .cs = MULLE_NOR_SPI_CS,
     .addr_width = 3,
