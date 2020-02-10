@@ -30,6 +30,10 @@ ifneq (,$(filter bh1750fvi,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bh1750fvi/include
 endif
 
+ifneq (,$(filter bh1900nux,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bh1900nux/include
+endif
+
 ifneq (,$(filter bmp180,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bmp180/include
 endif

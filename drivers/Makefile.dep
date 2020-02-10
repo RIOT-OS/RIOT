@@ -70,6 +70,10 @@ ifneq (,$(filter bh1750fvi,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter bh1900nux,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter bmp180,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
