@@ -60,7 +60,14 @@ static inline void cpu_print_last_instruction(void)
 /**
  * @brief   Returns true if the CPU woke from Deep Sleep
  */
-bool cpu_woke_from_backup(void);
+static inline bool cpu_woke_from_backup(void) {
+    return RSIR == 0;
+}
+
+/**
+ * @brief   Returns true if the backup RAM has been initialized
+ */
+bool cpu_backup_ram_is_initialized(void);
 
 /**
  * @brief   The CPU has RAM that is retained in the deepest sleep mode.

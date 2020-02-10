@@ -139,11 +139,18 @@ void cpu_init(void)
 /* RSIR will only have POR bit set even when waking up from Deep Power Down
  * Use signature in battery RAM to discriminate between Deep Power Down and POR
  */
-bool cpu_woke_from_backup(void)
+bool cpu_backup_ram_is_initialized(void)
 {
     static char signature[] __attribute__((section(".backup.data"))) = {
         'R', 'I', 'O', 'T'
     };
+
+    /* Only in case when a reset occurs and the POR = 0, the BODR bit
+     * indicates if the V_DD (3V3) voltage was below 2.6 V or not.
+     */
+    if ((RSIR & (RSIR_BODR | RSIR_POR)) == (RSIR_BODR | RSIR_POR)) {
+        RSIR |= RSIR_BODR;
+    }
 
     /* external reset */
     if (RSIR & RSIR_EXTR) {
@@ -165,6 +172,11 @@ bool cpu_woke_from_backup(void)
     if (signature[3] != 'T') {
         return false;
     }
+
+    /* When we wake from Deep Sleep only POR is set, just like in the real
+     * POR case. Clear the bit to create a new, distinct state.
+     */
+    RSIR |= RSIR_POR;
 
     return true;
 }
