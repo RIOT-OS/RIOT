@@ -238,7 +238,7 @@ static const uart_conf_t uart_config[] = {
  *
  * @note UART_NUMOF definition must not be changed.
  */
-#define UART_NUMOF  (sizeof(uart_config)/sizeof(uart_config[0]))
+#define UART_NUMOF  ARRAY_SIZE(uart_config)
 /** @} */
 
 #ifdef __cplusplus
