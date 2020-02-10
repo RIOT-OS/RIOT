@@ -809,8 +809,25 @@ typedef struct {
 #define S0SPCCR        (*(volatile unsigned long *)(SPI0_BASE_ADDR + 0x0C))
 #define S0SPINT        (*(volatile unsigned long *)(SPI0_BASE_ADDR + 0x1C))
 
+/**
+ * @brief   Generic SPI register map
+ */
+typedef struct {
+    REG32 CR0;              /**< Control Register 0                 */
+    REG32 CR1;              /**< Control Register 1                 */
+    REG32 DR;               /**< Data Register                      */
+    REG32 SR;               /**< Status Register                    */
+    REG32 CPSR;             /**< Clock Prescale Register            */
+    REG32 IMSC;             /**< Interrupt Mask Set/Clear Register  */
+    REG32 RIS;              /**< Raw Interrupt Status Register      */
+    REG32 MIS;              /**< Masked Interrupt Status Register   */
+    REG32 ICR;              /**< Interrupt Clear Register           */
+    REG32 DMACR;            /**< DMA Control Register               */
+} lpc23xx_spi_t;
+
 /* SSP0 Controller */
 #define SSP0_BASE_ADDR      0xE0068000
+#define SPI0           ((lpc23xx_spi_t *)SSP0_BASE_ADDR)
 #define SSP0CR0        (*(volatile unsigned long *)(SSP0_BASE_ADDR + 0x00))
 #define SSP0CR1        (*(volatile unsigned long *)(SSP0_BASE_ADDR + 0x04))
 #define SSP0DR         (*(volatile unsigned long *)(SSP0_BASE_ADDR + 0x08))
@@ -824,6 +841,7 @@ typedef struct {
 
 /* SSP1 Controller */
 #define SSP1_BASE_ADDR      0xE0030000
+#define SPI1           ((lpc23xx_spi_t *)SSP1_BASE_ADDR)
 #define SSP1CR0        (*(volatile unsigned long *)(SSP1_BASE_ADDR + 0x00))
 #define SSP1CR1        (*(volatile unsigned long *)(SSP1_BASE_ADDR + 0x04))
 #define SSP1DR         (*(volatile unsigned long *)(SSP1_BASE_ADDR + 0x08))
