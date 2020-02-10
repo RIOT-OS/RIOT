@@ -45,6 +45,12 @@
  * @brief       Drivers for storage devices
  */
 
+/**
+ * @defgroup    drivers_display Display Device Drivers
+ * @ingroup     drivers
+ * @brief       Drivers for display devices
+ */
+
  /**
  * @defgroup    drivers_soft_periph Soft Peripheral Driver Interface
  * @ingroup     drivers
