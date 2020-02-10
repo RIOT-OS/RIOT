@@ -1,23 +1,8 @@
-# Bootloader uses stk500v1 protocol, which usually is implemented in
-# bootloaders of 2K size.
-# http://www.libelium.com/products/waspmote/hardware/
-BOOTLOADER_SIZE ?= 2K
-ROM_RESERVED ?= $(BOOTLOADER_SIZE)
-
 # configure the terminal program
 PORT_LINUX  ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 BAUD        ?= 9600
-include $(RIOTMAKE)/tools/serial.inc.mk
+WASPMOTE_PRO_BOOTLOADER ?= stk500v1
+BOOTLOADER  ?= $(WASPMOTE_PRO_BOOTLOADER)
 
-# PROGRAMMER defaults to stk500v1 which is the internal flasher via USB
-# using avrdude. Can be overridden for debugging (which requires changes
-# that require to use an ISP)
-PROGRAMMER ?= stk500v1
-# configure programmer speed in baud
-FFLAGS_EXTRA += -b 115200
-# avoid error if mcu signature doesn't match
-FFLAGS_EXTRA += -F
-
-include $(RIOTMAKE)/tools/avrdude.inc.mk
 include $(RIOTBOARD)/common/atmega/Makefile.include
