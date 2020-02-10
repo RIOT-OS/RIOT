@@ -88,6 +88,10 @@ typedef struct __attribute__((packed)) {
  */
 typedef struct {
     const mtd_spi_nor_opcode_t *opcode; /**< Opcode table for the device */
+    uint32_t wait_chip_erase;   /**< Full chip erase wait time in µs */
+    uint32_t wait_sector_erase; /**< Sector erase wait time in µs */
+    uint32_t wait_32k_erase;    /**< 32KB page erase wait time in µs */
+    uint32_t wait_4k_erase;     /**< 4KB page erase wait time in µs */
     spi_clk_t clk;           /**< SPI clock */
     uint16_t flag;           /**< Config flags */
     spi_t spi;               /**< SPI bus the device is connected to */
@@ -105,6 +109,7 @@ typedef struct {
     mtd_dev_t base;          /**< inherit from mtd_dev_t object */
     const mtd_spi_nor_params_t *params; /**< SPI NOR params */
     mtd_jedec_id_t jedec_id; /**< JEDEC ID of the chip */
+
     /**
      * @brief   bitmask to corresponding to the page address
      *
