@@ -49,22 +49,6 @@
 #define MTD_4K              (4096ul)
 #define MTD_4K_ADDR_MASK    (0xFFF)
 
-#ifndef MTD_SPI_NOR_WAIT_C_ER
-#define MTD_SPI_NOR_WAIT_C_ER       (16 * US_PER_SEC)
-#endif
-
-#ifndef MTD_SPI_NOR_WAIT_S_ER
-#define MTD_SPI_NOR_WAIT_S_ER       (40 * US_PER_MS)
-#endif
-
-#ifndef MTD_SPI_NOR_WAIT_32K_ER
-#define MTD_SPI_NOR_WAIT_32K_ER     (20 * US_PER_MS)
-#endif
-
-#ifndef MTD_SPI_NOR_WAIT_4K_ER
-#define MTD_SPI_NOR_WAIT_4K_ER      (10 * US_PER_MS)
-#endif
-
 static int mtd_spi_nor_init(mtd_dev_t *mtd);
 static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t size);
 static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t size);
@@ -514,7 +498,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         if (size == total_size) {
             mtd_spi_cmd(dev, dev->params->opcode->chip_erase);
             size -= total_size;
-            us = MTD_SPI_NOR_WAIT_C_ER;
+            us = dev->params->wait_chip_erase;
         }
         else if ((dev->params->flag & SPI_NOR_F_SECT_32K) && (size >= MTD_32K) &&
                  ((addr & MTD_32K_ADDR_MASK) == 0)) {
@@ -522,7 +506,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
             mtd_spi_cmd_addr_write(dev, dev->params->opcode->block_erase_32k, addr_be, NULL, 0);
             addr += MTD_32K;
             size -= MTD_32K;
-            us = MTD_SPI_NOR_WAIT_32K_ER;
+            us = dev->params->wait_32k_erase;
         }
         else if ((dev->params->flag & SPI_NOR_F_SECT_4K) && (size >= MTD_4K) &&
                  ((addr & MTD_4K_ADDR_MASK) == 0)) {
@@ -530,13 +514,13 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
             mtd_spi_cmd_addr_write(dev, dev->params->opcode->sector_erase, addr_be, NULL, 0);
             addr += MTD_4K;
             size -= MTD_4K;
-            us = MTD_SPI_NOR_WAIT_4K_ER;
+            us = dev->params->wait_4k_erase;
         }
         else {
             mtd_spi_cmd_addr_write(dev, dev->params->opcode->block_erase, addr_be, NULL, 0);
             addr += sector_size;
             size -= sector_size;
-            us = MTD_SPI_NOR_WAIT_S_ER;
+            us = dev->params->wait_sector_erase;
         }
 
         /* waiting for the command to complete before continuing */
