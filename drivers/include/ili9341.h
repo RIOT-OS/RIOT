@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_ili9341 ILI9341 display driver
- * @ingroup     drivers_actuators
+ * @ingroup     drivers_display
  *
  * @brief       Driver for the ILI9341 display
  *
