@@ -4,7 +4,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     blackpill \
     bluepill \
     calliope-mini \
-    cc1352-launchpad \
     cc2650-launchpad \
     cc2650stk \
     hifive1 \
