@@ -3,18 +3,7 @@ PORT_LINUX  ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 BAUD        ?= 9600
 
-PROGRAMMER ?= arduino
-
-ifeq (arduino,$(PROGRAMMER))
-  # the Arduino Nano bootloader is 2KiB in size
-  BOOTLOADER_SIZE ?= 2048
-  # the Nano's bootloader uses 57600 baud for programming
-  FFLAGS_EXTRA += -b 57600
-else
-  # not using the bootloader for programming, thus the whole flash can be used
-  BOOTLOADER_SIZE ?= 0
-endif
-
-ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+ARDUINO_NANO_BOOTLOADER ?= atmegaboot
+BOOTLOADER ?= $(ARDUINO_NANO_BOOTLOADER)
 
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.include
