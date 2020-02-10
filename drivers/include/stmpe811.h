@@ -25,6 +25,10 @@
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 
+#ifdef MODULE_TOUCH_DEV
+#include "touch_dev.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -77,9 +81,12 @@ typedef struct {
  * @brief   Device descriptor for the STMPE811 sensor
  */
 typedef struct {
-    stmpe811_params_t params;       /**< Device parameters */
-    uint16_t prev_x;                /**< Previous X coordinate */
-    uint16_t prev_y;                /**< Previous Y coordinate */
+#ifdef MODULE_TOUCH_DEV
+    touch_dev_t *dev;                   /**< Pointer to the generic touch device */
+#endif
+    stmpe811_params_t params;           /**< Device parameters */
+    uint16_t prev_x;                    /**< Previous X coordinate */
+    uint16_t prev_y;                    /**< Previous Y coordinate */
 } stmpe811_t;
 
 /**
