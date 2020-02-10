@@ -80,12 +80,6 @@ static mega_uart_t *dev[] = {
  */
 static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 
-/**
- * @brief   Allocate variable to hold transmission status, set when there
- *          is data in UDRn or in the Transmit Shift Register
- */
-static volatile uint8_t _tx_pending = 0;
-
 static void _update_brr(uart_t uart, uint16_t brr, bool double_speed)
 {
     dev[uart]->BRR = brr;
@@ -126,8 +120,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         return UART_NODEV;
     }
 
-    uint16_t count = 0xffff;
-    while (_tx_pending && count--) {}
+    uint16_t count = UINT16_MAX;
+    while (atmega_is_uart_tx_pending() && count--) {}
 
     /* register interrupt context */
     isr_ctx[uart].rx_cb = rx_cb;
@@ -178,8 +172,9 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 #endif
         /* start of TX won't finish until no data in UDRn and transmit shift
            register is empty */
-        _tx_pending |= (1 << uart);
-
+        unsigned long state = irq_disable();
+        atmega_state |= ATMEGA_STATE_FLAG_UART_TX(uart);
+        irq_restore(state);
         dev[uart]->DR = data[i];
     }
 }
@@ -211,7 +206,7 @@ static inline void _tx_isr_handler(int num)
 
     /* entire frame in the Transmit Shift Register has been shifted out and
        there are no new data currently present in the transmit buffer */
-    _tx_pending &= ~(1 << num);
+    atmega_state &= ~ATMEGA_STATE_FLAG_UART_TX(num);
 
     atmega_exit_isr();
 }
