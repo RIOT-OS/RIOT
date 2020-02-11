@@ -338,8 +338,6 @@ static_tests() {
         echo "$OUT"
         exit 1
     fi
-
-    BUILDTEST_MCU_GROUP=static-tests ./dist/tools/ci/build_and_test.sh
 }
 
 get_non_compile_jobs() {
