@@ -36,6 +36,13 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#ifndef MCUSR
+/* In older ATmegas the MCUSR register was still named MCUCSR. Current avrlibc
+ * versions provide the MCUSR macro for those as well, but adding a fallback
+ * here doesn't hurt*/
+#define MCUSR MCUCSR
+#endif /* !MCUSR */
+
 /*
 * Since atmega MCUs do not feature a software reset, the watchdog timer
 * is being used. It will be set to the shortest time and then force a
@@ -51,7 +58,7 @@
 */
 uint8_t mcusr_mirror __attribute__((section(".noinit")));
 uint8_t soft_rst __attribute__((section(".noinit")));
-void get_mcusr(void) __attribute__((naked)) __attribute__((section(".init0")));
+void get_mcusr(void) __attribute__((naked, section(".init0"), used));
 
 void get_mcusr(void)
 {
@@ -62,13 +69,8 @@ void get_mcusr(void)
     __asm__ __volatile__("mov %0, r2\n" : "=r" (mcusr_mirror) :);
 #else
     /* save the reset flags */
-#ifdef MCUCSR
-  mcusr_mirror = MCUCSR;
-  MCUSR = 0;
-#else
-  mcusr_mirror = MCUSR;
-  MCUSR = 0;
-#endif
+    mcusr_mirror = MCUSR;
+    MCUSR = 0;
     wdt_disable();
 #endif
 }
