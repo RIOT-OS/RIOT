@@ -31,6 +31,20 @@
 #define GEN2_ULP32K         1
 #endif
 
+#ifndef GEN3_ULP32K
+#define GEN3_ULP32K         1
+#endif
+
+#ifndef XOSC32_STARTUP_TIME
+/**
+ * @brief   XOSC32 start up time
+ *
+ * @note    Override this value in your boards periph_conf.h file
+ *          if a different start up time is to be used.
+ */
+#define XOSC32_STARTUP_TIME      6
+#endif
+
 #ifndef VDD
 /**
  * @brief   Set system voltage level in mV (determines flash wait states)
@@ -94,6 +108,21 @@ static void clk_init(void)
     while (!(SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_OSC8MRDY)) {}
 #endif
 
+#if CLOCK_USE_XOSC32_DFLL || !GEN2_ULP32K || !GEN3_ULP32K
+    /* Use External 32.768KHz Oscillator */
+    SYSCTRL->XOSC32K.reg =  SYSCTRL_XOSC32K_ONDEMAND |
+                            SYSCTRL_XOSC32K_EN32K |
+                            SYSCTRL_XOSC32K_XTALEN |
+                            SYSCTRL_XOSC32K_STARTUP(XOSC32_STARTUP_TIME) |
+                            SYSCTRL_XOSC32K_RUNSTDBY;
+    /* Enable XOSC32 with Separate Call */
+    SYSCTRL->XOSC32K.bit.ENABLE = 1;
+#endif
+
+    /* reset the GCLK module so it is in a known state */
+    GCLK->CTRL.reg = GCLK_CTRL_SWRST;
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+
     /* Setup GCLK2 with divider 1 (32.768kHz) */
     GCLK->GENDIV.reg  = (GCLK_GENDIV_ID(SAM0_GCLK_32KHZ)  | GCLK_GENDIV_DIV(0));
     GCLK->GENCTRL.reg = (GCLK_GENCTRL_ID(SAM0_GCLK_32KHZ) | GCLK_GENCTRL_GENEN
@@ -102,19 +131,10 @@ static void clk_init(void)
                       | GCLK_GENCTRL_SRC_OSCULP32K);
 #else
                       | GCLK_GENCTRL_SRC_XOSC32K);
-
-    SYSCTRL->XOSC32K.reg = SYSCTRL_XOSC32K_ONDEMAND
-                         | SYSCTRL_XOSC32K_EN32K
-                         | SYSCTRL_XOSC32K_XTALEN
-                         | SYSCTRL_XOSC32K_STARTUP(6)
-                         | SYSCTRL_XOSC32K_ENABLE;
 #endif
 
-#if CLOCK_USE_PLL
-    /* reset the GCLK module so it is in a known state */
-    GCLK->CTRL.reg = GCLK_CTRL_SWRST;
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 
+#if CLOCK_USE_PLL
     /* setup generic clock 1 to feed DPLL with 1MHz */
     GCLK->GENDIV.reg = (GCLK_GENDIV_DIV(8) |
                         GCLK_GENDIV_ID(SAM0_GCLK_1MHZ));
@@ -140,20 +160,6 @@ static void clk_init(void)
                          GCLK_GENCTRL_SRC_FDPLL |
                          GCLK_GENCTRL_ID(SAM0_GCLK_MAIN));
 #elif CLOCK_USE_XOSC32_DFLL
-    /* Use External 32.768KHz Oscillator */
-    SYSCTRL->XOSC32K.reg =  SYSCTRL_XOSC32K_ONDEMAND |
-                            SYSCTRL_XOSC32K_EN32K |
-                            SYSCTRL_XOSC32K_XTALEN |
-                            SYSCTRL_XOSC32K_STARTUP(6) |
-                            SYSCTRL_XOSC32K_RUNSTDBY;
-
-    /* Enable with Separate Call */
-    SYSCTRL->XOSC32K.bit.ENABLE = 1;
-
-    /* reset the GCLK module so it is in a known state */
-    GCLK->CTRL.reg = GCLK_CTRL_SWRST;
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-
     /* setup generic clock 1 as 1MHz for timer.c */
     GCLK->GENDIV.reg = (GCLK_GENDIV_DIV(8) |
                         GCLK_GENDIV_ID(SAM0_GCLK_1MHZ));
@@ -223,7 +229,7 @@ static void clk_init(void)
     GCLK->GENDIV.reg  = (GCLK_GENDIV_ID(SAM0_GCLK_1KHZ)  | GCLK_GENDIV_DIV(4));
     GCLK->GENCTRL.reg = (GCLK_GENCTRL_ID(SAM0_GCLK_1KHZ) | GCLK_GENCTRL_GENEN
                       | GCLK_GENCTRL_RUNSTDBY | GCLK_GENCTRL_DIVSEL
-#if GEN2_ULP32K
+#if GEN3_ULP32K
                       | GCLK_GENCTRL_SRC_OSCULP32K);
 #else
                       | GCLK_GENCTRL_SRC_XOSC32K);

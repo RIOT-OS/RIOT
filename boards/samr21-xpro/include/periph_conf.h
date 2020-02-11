@@ -63,7 +63,16 @@ extern "C" {
  *
  * @{
  */
-#define CLOCK_USE_PLL       (1)
+#define CLOCK_USE_PLL               (1)
+#define CLOCK_USE_XOSC32_DFLL       (0)
+/*
+ * 0: use XOSC32K (always 32.768kHz) to clock GCLK2
+ * 1: use OSCULP32K factory calibrated (~32.768kHz) to clock GCLK2
+ *
+ * OSCULP32K is factory calibrated to be around 32.768kHz but this values can
+ * be of by a couple off % points, so prefer XOSC32K as default configuration.
+ */
+#define GEN2_ULP32K                 (0)
 
 #if CLOCK_USE_PLL
 /* edit these values to adjust the PLL output frequency */
@@ -76,7 +85,6 @@ extern "C" {
 #define CLOCK_CORECLOCK     (48000000U)
 #define CLOCK_XOSC32K       (32768UL)
 #define CLOCK_8MHZ          (1)
-#define GEN2_ULP32K         (1)
 #else
 /* edit this value to your needs */
 #define CLOCK_DIV           (1U)
