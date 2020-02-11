@@ -111,3 +111,7 @@ endif
 ifneq (,$(filter clif, $(USEMODULE)))
   INCLUDES += -I$(RIOTBASE)/sys/clif/include
 endif
+
+ifneq (,$(filter zptr,$(USEMODULE)))
+  include $(RIOTBASE)/sys/zptr/Makefile.include
+endif
