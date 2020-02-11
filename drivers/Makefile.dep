@@ -237,6 +237,7 @@ endif
 ifneq (,$(filter ili9341,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
   FEATURES_REQUIRED += periph_gpio
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter ina2%,$(USEMODULE)))
