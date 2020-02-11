@@ -194,6 +194,17 @@ typedef struct {
 
 /**
  * @brief   Resource handler type
+ *
+ * Functions that implement this must be prepared to be called multiple times
+ * for the same request, as the server implementations do not perform message
+ * deduplication. That optimization is [described in the CoAP
+ * specification](https://tools.ietf.org/html/rfc7252#section-4.5).
+ *
+ * This should be trivial for requests of the GET, PUT, DELETE, FETCH and
+ * iPATCH methods, as they are defined as idempotent methods in CoAP.
+ *
+ * For POST, PATCH and other non-idempotent methods, this is an additional
+ * requirement introduced by the contract of this type.
  */
 typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context);
 
