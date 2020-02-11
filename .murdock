@@ -29,7 +29,8 @@ export OPTIONAL_CFLAGS_BLACKLIST="-gz"
 NIGHTLY=${NIGHTLY:-0}
 RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
 
-DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE -E TEST_HASH"
+DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
+         -E TEST_HASH -E CI_PULL_LABELS"
 
 check_label() {
     local label="${1}"
@@ -168,6 +169,7 @@ get_app_board_toolchain_pairs() {
 
 # use dwqc to create full "appdir board toolchain" compile job list
 get_compile_jobs() {
+    check_label "CI: skip compile test" && return
     get_apps | \
         dwqc ${DWQ_ENV} -s \
         ${DWQ_JOBID:+--subjob} \
