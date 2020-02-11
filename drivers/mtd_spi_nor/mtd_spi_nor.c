@@ -44,14 +44,26 @@
 #define TRACE(...)
 #endif
 
-#ifndef MTD_SPI_NOR_WRITE_WAIT_US
-#define MTD_SPI_NOR_WRITE_WAIT_US (50 * US_PER_MS)
-#endif
-
 #define MTD_32K             (32768ul)
 #define MTD_32K_ADDR_MASK   (0x7FFF)
 #define MTD_4K              (4096ul)
 #define MTD_4K_ADDR_MASK    (0xFFF)
+
+#ifndef MTD_SPI_NOR_WAIT_C_ER
+#define MTD_SPI_NOR_WAIT_C_ER       (16 * US_PER_SEC)
+#endif
+
+#ifndef MTD_SPI_NOR_WAIT_S_ER
+#define MTD_SPI_NOR_WAIT_S_ER       (40 * US_PER_MS)
+#endif
+
+#ifndef MTD_SPI_NOR_WAIT_32K_ER
+#define MTD_SPI_NOR_WAIT_32K_ER     (20 * US_PER_MS)
+#endif
+
+#ifndef MTD_SPI_NOR_WAIT_4K_ER
+#define MTD_SPI_NOR_WAIT_4K_ER      (10 * US_PER_MS)
+#endif
 
 static int mtd_spi_nor_init(mtd_dev_t *mtd);
 static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t size);
@@ -256,8 +268,10 @@ static int mtd_spi_read_jedec_id(const mtd_spi_nor_t *dev, mtd_jedec_id_t *out)
     return status;
 }
 
-static inline void wait_for_write_complete(const mtd_spi_nor_t *dev)
+static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us)
 {
+    unsigned i = 0, j = 0;
+    uint32_t div = 2;
     do {
         uint8_t status;
         mtd_spi_cmd_read(dev, dev->opcode->rdsr, &status, sizeof(status));
@@ -266,12 +280,31 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev)
         if ((status & 1) == 0) { /* TODO magic number */
             break;
         }
+        i++;
 #if MODULE_XTIMER
-        xtimer_usleep(MTD_SPI_NOR_WRITE_WAIT_US);
+        if (us) {
+            xtimer_usleep(us);
+            /* reduce the waiting time quickly if the estimate was too short,
+             * but still avoid busy (yield) waiting */
+            if (us > 2 * XTIMER_BACKOFF) {
+                us -= (us / div);
+                div++;
+            }
+            else {
+                us = 2 * XTIMER_BACKOFF;
+            }
+        }
+        else {
+            j++;
+            thread_yield();
+        }
 #else
+        (void)div;
+        (void) us;
         thread_yield();
 #endif
     } while (1);
+    DEBUG("wait loop %u times, yield %u times\n", i, j);
 }
 
 static int mtd_spi_nor_init(mtd_dev_t *mtd)
@@ -414,7 +447,7 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
     mtd_spi_cmd_addr_write(dev, dev->opcode->page_program, addr_be, src, size);
 
     /* waiting for the command to complete before returning */
-    wait_for_write_complete(dev);
+    wait_for_write_complete(dev, 0);
 
     spi_release(dev->spi);
     return size;
@@ -446,6 +479,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 
     spi_acquire(dev->spi, dev->cs, dev->mode, dev->clk);
     while (size) {
+        uint32_t us;
         be_uint32_t addr_be = byteorder_htonl(addr);
         /* write enable */
         mtd_spi_cmd(dev, dev->opcode->wren);
@@ -453,6 +487,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         if (size == total_size) {
             mtd_spi_cmd(dev, dev->opcode->chip_erase);
             size -= total_size;
+            us = MTD_SPI_NOR_WAIT_C_ER;
         }
         else if ((dev->flag & SPI_NOR_F_SECT_32K) && (size >= MTD_32K) &&
                  ((addr & MTD_32K_ADDR_MASK) == 0)) {
@@ -460,6 +495,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
             mtd_spi_cmd_addr_write(dev, dev->opcode->block_erase_32k, addr_be, NULL, 0);
             addr += MTD_32K;
             size -= MTD_32K;
+            us = MTD_SPI_NOR_WAIT_32K_ER;
         }
         else if ((dev->flag & SPI_NOR_F_SECT_4K) && (size >= MTD_4K) &&
                  ((addr & MTD_4K_ADDR_MASK) == 0)) {
@@ -467,15 +503,17 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
             mtd_spi_cmd_addr_write(dev, dev->opcode->sector_erase, addr_be, NULL, 0);
             addr += MTD_4K;
             size -= MTD_4K;
+            us = MTD_SPI_NOR_WAIT_4K_ER;
         }
         else {
             mtd_spi_cmd_addr_write(dev, dev->opcode->block_erase, addr_be, NULL, 0);
             addr += sector_size;
             size -= sector_size;
+            us = MTD_SPI_NOR_WAIT_S_ER;
         }
 
         /* waiting for the command to complete before continuing */
-        wait_for_write_complete(dev);
+        wait_for_write_complete(dev, us);
     }
     spi_release(dev->spi);
 
