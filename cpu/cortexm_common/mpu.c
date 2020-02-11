@@ -61,15 +61,9 @@ bool mpu_enabled(void) {
 int mpu_configure(uint_fast8_t region, uintptr_t base, uint_fast32_t attr) {
 /* Todo enable MPU support for Cortex-M23/M33 */
 #if __MPU_PRESENT && !defined(CPU_ARCH_CORTEX_M23)
-    assert(region < MPU_NUM_REGIONS);
-
     MPU->RNR  = region;
     MPU->RBAR = base & MPU_RBAR_ADDR_Msk;
     MPU->RASR = attr | MPU_RASR_ENABLE_Msk;
-
-    if (!mpu_enabled()) {
-        mpu_enable();
-    }
 
     return 0;
 #else

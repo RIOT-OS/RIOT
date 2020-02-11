@@ -140,6 +140,7 @@ void reset_handler_default(void)
 #endif /* CPU_HAS_BACKUP_RAM */
 
 #ifdef MODULE_MPU_STACK_GUARD
+    mpu_enable();
     if (((uintptr_t)&_sstack) != SRAM_BASE) {
         mpu_configure(
             0,                                              /* MPU region 0 */
@@ -147,7 +148,6 @@ void reset_handler_default(void)
             MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B) /* Attributes and Size */
         );
 
-        mpu_enable();
     }
 #endif
 
