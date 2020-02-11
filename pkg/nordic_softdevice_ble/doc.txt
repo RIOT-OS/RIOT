@@ -35,4 +35,18 @@ floating point instructions.
   Hopefully, either the RIOT community adds hard-float support, or Nordic
 releases a soft-float version of the used binaries.
 
+- Outdated
+
+  This package uses version 0.9 of the nRF IoT SDK, which has been integrated
+  into the nRF5 SDK v14.1.0 in its 1.0 version, and the nRF5 SDK has since been
+  released in several new versions.
+
+  A noteworthy shortcoming due to the old version is that the IPSP
+  implementation only interoperates with Linux kernels up to 4.12.
+
+  Unless the [efforts to update the softedevice
+  integration](https://github.com/RIOT-OS/RIOT/pull/9473) are rekindled, this
+  module should not be used in new projects, and @ref pkg_nimble should be used
+  instead.
+
  */
