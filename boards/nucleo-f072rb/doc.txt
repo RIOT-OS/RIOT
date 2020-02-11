@@ -21,7 +21,7 @@ STM32F072RB microcontroller with 16Kb of SRAM and 128Kb of ROM Flash.
 | RAM        | 16Kb |
 | Flash      | 128Kb             |
 | Frequency  | up to 48MHz) |
-| FPU        | yes               |
+| FPU        | no                |
 | Timers | 12 (2x watchdog, 1 SysTick, 8x 16-bit, 1x 32-bit) |
 | ADCs       | 1x 12-bit (up to 16 channels)         |
 | UARTs      | 4                 |

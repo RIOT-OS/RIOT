@@ -25,7 +25,7 @@ Link to [product website](http://docs.spark.io/hardware/).
 | RAM        | 20Kb  |
 | Flash      | 128Kb             |
 | Frequency  | up to 72MHz (using the on-board 8MHz Oszillator of the ST- Link) |
-| FPU        | yes               |
+| FPU        | no                |
 | Timers | 10 (9x 16-bit, 1x 32-bit [TIM2])  |
 | ADCs       | 4x 12-bit         |
 | UARTs      | 5                 |
