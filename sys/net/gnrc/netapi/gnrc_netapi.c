@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <errno.h>
+
 #include "mbox.h"
 #include "msg.h"
 #include "net/gnrc/netreg.h"
@@ -91,20 +93,20 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
 
         while (sendto) {
 #if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
-            int release = 0;
+            uint32_t status = 0;
             switch (sendto->type) {
                 case GNRC_NETREG_TYPE_DEFAULT:
                     if (_gnrc_netapi_send_recv(sendto->target.pid, pkt,
                                                cmd) < 1) {
                         /* unable to dispatch packet */
-                        release = 1;
+                        status = EIO;
                     }
                     break;
 #ifdef MODULE_GNRC_NETAPI_MBOX
                 case GNRC_NETREG_TYPE_MBOX:
                     if (_snd_rcv_mbox(sendto->target.mbox, cmd, pkt) < 1) {
                         /* unable to dispatch packet */
-                        release = 1;
+                        status = EIO;
                     }
                     break;
 #endif
@@ -115,16 +117,16 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
 #endif
                 default:
                     /* unknown dispatch type */
-                    release = 1;
+                    status = ECANCELED;
                     break;
             }
-            if (release) {
-                gnrc_pktbuf_release(pkt);
+            if (status != 0) {
+                gnrc_pktbuf_release_error(pkt, status);
             }
 #else
             if (_gnrc_netapi_send_recv(sendto->target.pid, pkt, cmd) < 1) {
                 /* unable to dispatch packet */
-                gnrc_pktbuf_release(pkt);
+                gnrc_pktbuf_release_error(pkt, EIO);
             }
 #endif
             sendto = gnrc_netreg_getnext(sendto);
