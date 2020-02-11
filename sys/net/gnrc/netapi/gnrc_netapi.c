@@ -93,20 +93,20 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
 
         while (sendto) {
 #if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
-            uint32_t errno = 0;
+            uint32_t status = 0;
             switch (sendto->type) {
                 case GNRC_NETREG_TYPE_DEFAULT:
                     if (_gnrc_netapi_send_recv(sendto->target.pid, pkt,
                                                cmd) < 1) {
                         /* unable to dispatch packet */
-                        errno = EIO;
+                        status = EIO;
                     }
                     break;
 #ifdef MODULE_GNRC_NETAPI_MBOX
                 case GNRC_NETREG_TYPE_MBOX:
                     if (_snd_rcv_mbox(sendto->target.mbox, cmd, pkt) < 1) {
                         /* unable to dispatch packet */
-                        errno = EIO;
+                        status = EIO;
                     }
                     break;
 #endif
@@ -117,11 +117,11 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
 #endif
                 default:
                     /* unknown dispatch type */
-                    errno = ECANCELED;
+                    status = ECANCELED;
                     break;
             }
-            if (errno != 0) {
-                gnrc_pktbuf_release_error(pkt, errno);
+            if (status != 0) {
+                gnrc_pktbuf_release_error(pkt, status);
             }
 #else
             if (_gnrc_netapi_send_recv(sendto->target.pid, pkt, cmd) < 1) {
