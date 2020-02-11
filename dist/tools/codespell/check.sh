@@ -41,6 +41,15 @@ CODESPELL_OPTS+=" --check-hidden"
 # "dout => doubt"
 CODESPELL_OPTS+=" --ignore-words-list=ND,nd,wan,od,dout"
 
+if [ "${CODESPELL_INTERACTIVE}" = "1" ]; then
+    # interactive mode
+    CODESPELL_OPTS+=" -w -i3"
+    exec ${CODESPELL_CMD} ${CODESPELL_OPTS} ${FILES}
+    # (exits shell)
+fi
+
+# non-interactive mode
+
 # Filter-out all false positive raising "disabled due to" messages.
 ERRORS=$(${CODESPELL_CMD} ${CODESPELL_OPTS} ${FILES} | grep -ve "disabled due to")
 
