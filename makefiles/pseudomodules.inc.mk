@@ -1,6 +1,4 @@
 PSEUDOMODULES += at_urc
-PSEUDOMODULES += auto_init_dhcpv6_client
-PSEUDOMODULES += auto_init_gnrc_rpl
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
@@ -192,8 +190,7 @@ PSEUDOMODULES += stm32_periph_%
 PSEUDOMODULES += periph_%
 NO_PSEUDOMODULES += periph_common
 
-# Submodules and auto-init code provided by Skald
-PSEUDOMODULES += auto_init_skald
+# Submodules provided by Skald
 PSEUDOMODULES += skald_ibeacon
 PSEUDOMODULES += skald_eddystone
 
@@ -204,5 +201,15 @@ PSEUDOMODULES += ds18_optimized
 PSEUDOMODULES += crypto_aes_precalculated
 # This pseudomodule causes a loop in AES to be unrolled (more flash, less CPU)
 PSEUDOMODULES += crypto_aes_unroll
+
+# All auto_init modules are pseudomodules
+PSEUDOMODULES += auto_init_%
+NO_PSEUDOMODULES += auto_init_can
+NO_PSEUDOMODULES += auto_init_loramac
+NO_PSEUDOMODULES += auto_init_gnrc_netif
+NO_PSEUDOMODULES += auto_init_saul
+NO_PSEUDOMODULES += auto_init_security
+NO_PSEUDOMODULES += auto_init_storage
+NO_PSEUDOMODULES += auto_init_usbus
 
 # Packages may also add modules to PSEUDOMODULES in their `Makefile.include`.

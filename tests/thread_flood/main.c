@@ -27,8 +27,6 @@
 #include "thread.h"
 #include "kernel_types.h"
 
-#include "test_utils/interactive_sync.h"
-
 /* One stack for all threads. DON'T TRY THIS AT HOME!! */
 static char dummy_stack[THREAD_STACKSIZE_IDLE];
 
@@ -39,8 +37,6 @@ static void *thread_func(void *arg)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     kernel_pid_t thr_id = KERNEL_PID_UNDEF;
     unsigned thr_cnt = 0;
 

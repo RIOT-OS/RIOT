@@ -88,7 +88,6 @@ void *_recv_thread(void *arg)
 int main(void)
 {
     puts("AT86RF2xx device driver test");
-    xtimer_init();
 
     unsigned dev_success = 0;
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {

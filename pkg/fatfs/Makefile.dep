@@ -1,5 +1,5 @@
 USEMODULE += fatfs_diskio_mtd
-USEMODULE += auto_init_storage
+DEFAULT_MODULE += auto_init_storage
 USEMODULE += mtd
 
 # Use RTC for timestamps if available

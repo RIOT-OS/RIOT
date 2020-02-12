@@ -32,8 +32,6 @@
 #include "thread.h"
 #include "xtimer.h"
 
-#include "test_utils/interactive_sync.h"
-
 #define SEMAPHORE_MSG_QUEUE_SIZE        (8)
 #define SEMAPHORE_TEST_THREADS          (5)
 static char test1_thread_stack[THREAD_STACKSIZE_MAIN];
@@ -294,10 +292,7 @@ void test4(void)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     msg_init_queue(main_msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
-    xtimer_init();
     puts("######################### TEST1:");
     test1();
     puts("######################### TEST2:");

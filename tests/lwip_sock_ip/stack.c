@@ -137,7 +137,6 @@ static int _netdev_send(netdev_t *dev, const iolist_t *iolist)
 
 void _net_init(void)
 {
-    xtimer_init();
     msg_init_queue(_msg_queue, _MSG_QUEUE_SIZE);
     _check_pid = sched_active_pid;
 

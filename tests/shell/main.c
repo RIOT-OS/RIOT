@@ -68,10 +68,6 @@ int main(void)
 
     printf("test_shell.\n");
 
-#if MODULE_STDIO_RTT
-    xtimer_init();
-#endif
-
     /* define buffer to be used by the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
 

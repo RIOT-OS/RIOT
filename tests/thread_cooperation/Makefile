@@ -1,7 +1,5 @@
 include ../Makefile.tests_common
 
-DISABLE_MODULE += auto_init
-
 ifneq (,$(filter nucleo-f042k6,$(BOARD)))
   PROBLEM ?= 3
 endif

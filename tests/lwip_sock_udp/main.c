@@ -28,8 +28,6 @@
 #include "constants.h"
 #include "stack.h"
 
-#include "test_utils/interactive_sync.h"
-
 #define _TEST_BUFFER_SIZE   (128)
 
 static uint8_t _test_buffer[_TEST_BUFFER_SIZE];
@@ -1319,8 +1317,6 @@ static void test_sock_udp_send6__no_sock(void)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     uint8_t code = 0;
 
 #ifdef SO_REUSE
@@ -1333,7 +1329,6 @@ int main(void)
     code |= (1 << 6);
 #endif
     printf("code 0x%02x\n", code);
-    xtimer_init();
     _net_init();
     tear_down();
 #ifdef MODULE_LWIP_IPV4
