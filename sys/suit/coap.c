@@ -77,8 +77,11 @@ static uint8_t _manifest_buf[SUIT_MANIFEST_BUFSIZE];
 #ifdef MODULE_SUIT_V4
 static inline void _print_download_progress(size_t offset, size_t len, uint32_t image_size)
 {
-DEBUG("_suit_flashwrite(): writing %u bytes at pos %u\n", len, offset);
-#if defined(MODULE_PROGRESS_BAR) && defined(MODULE_SUIT_V4)
+    (void)offset;
+    (void)len;
+    (void)image_size;
+    DEBUG("_suit_flashwrite(): writing %u bytes at pos %u\n", len, offset);
+#if defined(MODULE_PROGRESS_BAR)
     if (image_size != 0) {
         char _suffix[7] = { 0 };
         uint8_t _progress = 100 * (offset + len) / image_size;
