@@ -19,6 +19,7 @@
 
 #include <inttypes.h>
 
+#include "kernel_defines.h"
 #include "suit/conditions.h"
 #include "suit/v4/suit.h"
 #include "suit/v4/handlers.h"
