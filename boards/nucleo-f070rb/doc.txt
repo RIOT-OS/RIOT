@@ -23,7 +23,7 @@ content/uploads/2015/08/Figura2-500x467.png)
 | RAM        | 16Kb |
 | Flash      | 128Kb             |
 | Frequency  | up to 48MHz) |
-| FPU        | yes               |
+| FPU        | no                |
 | Timers | 11 (2x watchdog, 1 SysTick, 8x 16-bit)    |
 | ADCs       | 1x 12-bit         |
 | UARTs      | 4                 |

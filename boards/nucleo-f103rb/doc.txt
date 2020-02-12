@@ -20,7 +20,7 @@ STM32F103RB microcontroller with 20Kb of SRAM and 128Kb of ROM Flash.
 | RAM        | 20Kb |
 | Flash      | 128Kb             |
 | Frequency  | up to 72MHz    |
-| FPU        | yes               |
+| FPU        | no                |
 | Timers | 7 (2x watchdog, 1 SysTick, 4x 16-bit) |
 | ADCs       | 1x 12-bit         |
 | UARTs      | 3                 |
