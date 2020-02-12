@@ -764,6 +764,7 @@ INPUT                  = ../../doc.txt \
                          src/mainpage.md \
                          src/creating-modules.md \
                          src/creating-an-application.md \
+                         src/porting-boards.md \
                          src/driver-guide.md \
                          src/getting-started.md \
                          ../../tests/README.md \

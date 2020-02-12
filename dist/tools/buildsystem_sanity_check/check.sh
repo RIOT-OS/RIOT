@@ -161,6 +161,7 @@ check_cpu_cpu_model_defined_in_makefile_features() {
     # With our without space and with or without ?=
     patterns+=(-e '^ *\(export\)\? *CPU \??\?=')
     patterns+=(-e '^ *\(export\)\? *CPU_MODEL \??\?=')
+    pathspec+=(':!**.md')
     pathspec+=(':!boards/**/Makefile.features')
     pathspec+=(':!cpu/**/Makefile.features')
 
