@@ -178,17 +178,6 @@ int suit_v4_parse(suit_v4_manifest_t *manifest, const uint8_t *buf, size_t len);
 int suit_v4_policy_check(suit_v4_manifest_t *manifest);
 
 /**
- * @brief Initialize a cbor iterator for SUIT cbor map container parsing
- *
- * @param[in]   map     the cbor container
- * @param[in]   it      the cbor iterator
- *
- * @return              SUIT_OK when initialization is successful
- * @return              SUIT_ERR_INVALID_MANIFEST if the manifest is not a cbor container
- */
-int suit_cbor_map_iterate_init(nanocbor_value_t *map, nanocbor_value_t *it);
-
-/**
  * @brief Iterate over a cbor map container
  *
  * @param[in]   it      cbor container iterator
@@ -199,53 +188,6 @@ int suit_cbor_map_iterate_init(nanocbor_value_t *map, nanocbor_value_t *it);
  * @return              the number of returned (key, value) pair, e.g. 1
  */
 int suit_cbor_map_iterate(nanocbor_value_t *it, nanocbor_value_t *key, nanocbor_value_t *value);
-
-/**
- * @brief Get cbor value as int32_t
- *
- * @param[in]   it      cbor container iterator
- * @param[out]  out     address of the returned integer
- *
- * @return              SUIT_OK on success
- * @return              SUIT_ERR_INVALID_MANIFEST if value doesn't fit in an int
- */
-int suit_cbor_get_int32(nanocbor_value_t *it, int32_t *out);
-
-/**
- * @brief Get cbor value as unsigned
- *
- * @param[in]   it      cbor container iterator
- * @param[out]  out     address of the returned unsigned
- *
- * @return              SUIT_OK on success
- * @return              SUIT_ERR_INVALID_MANIFEST if value doesn't fit or cannot
- *                      be converted to unsigned
- */
-int suit_cbor_get_uint(nanocbor_value_t *it, unsigned *out);
-
-/**
- * @brief Get cbor value as unsigned long
- *
- * @param[in]   it      cbor container iterator
- * @param[out]  out     address of the returned unsigned long
- *
- * @return              SUIT_OK on success
- * @return              SUIT_ERR_INVALID_MANIFEST if value doesn't fit or cannot
- *                      be converted to unsigned long
- */
-int suit_cbor_get_uint32(nanocbor_value_t *it, uint32_t *out);
-
-/**
- * @brief Get cbor value as string
- *
- * @param[in]   it      cbor container iterator
- * @param[out]  buf     address of the string buffer
- * @param[out]  len     address of the len of the string
- *
- * @return              SUIT_OK on success
- * @return              SUIT_ERR_INVALID_MANIFEST if value is not a valid string
- */
-int suit_cbor_get_string(nanocbor_value_t *it, const uint8_t **buf, size_t *len);
 
 /**
  * @brief Parser a cbor subsequence
