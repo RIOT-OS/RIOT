@@ -60,6 +60,13 @@ saml11: `Atmel.SAML11_DFP.1.0.91.atpack`
 Each atpack has an include subdirectory with the files we copy into
 RIOT. The files are copied unmodified.
 
+## SAML21 files
+
+saml21: `Atmel.SAML21_DFP.1.2.125.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
 ## SAMR21 files
 
 samr21: `Atmel.SAMR21_DFP.1.1.72.atpack`
