@@ -71,7 +71,7 @@ ifneq (,$(filter nhdp,$(USEMODULE)))
 endif
 
 ifneq (,$(filter sntp,$(USEMODULE)))
-  USEMODULE += gnrc_sock_udp
+  USEMODULE += sock_udp
   USEMODULE += xtimer
 endif
 
@@ -624,6 +624,9 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_netif_hdr
   USEMODULE += gnrc_pktbuf
+  ifneq (,$(filter sock_udp, $(USEMODULE)))
+    USEMODULE += gnrc_sock_udp
+  endif
 endif
 
 ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
