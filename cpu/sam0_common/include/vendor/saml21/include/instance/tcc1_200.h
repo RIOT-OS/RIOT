@@ -3,39 +3,25 @@
  *
  * \brief Instance description for TCC1
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2018 Microchip Technology Inc.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * SPDX-License-Identifier: Apache-2.0
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the Licence at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * \asf_license_stop
  *
@@ -46,55 +32,55 @@
 
 /* ========== Register definition for TCC1 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-#define REG_TCC1_CTRLA             (0x42001800U) /**< \brief (TCC1) Control A */
-#define REG_TCC1_CTRLBCLR          (0x42001804U) /**< \brief (TCC1) Control B Clear */
-#define REG_TCC1_CTRLBSET          (0x42001805U) /**< \brief (TCC1) Control B Set */
-#define REG_TCC1_SYNCBUSY          (0x42001808U) /**< \brief (TCC1) Synchronization Busy */
-#define REG_TCC1_FCTRLA            (0x4200180CU) /**< \brief (TCC1) Recoverable Fault A Configuration */
-#define REG_TCC1_FCTRLB            (0x42001810U) /**< \brief (TCC1) Recoverable Fault B Configuration */
-#define REG_TCC1_DRVCTRL           (0x42001818U) /**< \brief (TCC1) Driver Control */
-#define REG_TCC1_DBGCTRL           (0x4200181EU) /**< \brief (TCC1) Debug Control */
-#define REG_TCC1_EVCTRL            (0x42001820U) /**< \brief (TCC1) Event Control */
-#define REG_TCC1_INTENCLR          (0x42001824U) /**< \brief (TCC1) Interrupt Enable Clear */
-#define REG_TCC1_INTENSET          (0x42001828U) /**< \brief (TCC1) Interrupt Enable Set */
-#define REG_TCC1_INTFLAG           (0x4200182CU) /**< \brief (TCC1) Interrupt Flag Status and Clear */
-#define REG_TCC1_STATUS            (0x42001830U) /**< \brief (TCC1) Status */
-#define REG_TCC1_COUNT             (0x42001834U) /**< \brief (TCC1) Count */
-#define REG_TCC1_PATT              (0x42001838U) /**< \brief (TCC1) Pattern */
-#define REG_TCC1_WAVE              (0x4200183CU) /**< \brief (TCC1) Waveform Control */
-#define REG_TCC1_PER               (0x42001840U) /**< \brief (TCC1) Period */
-#define REG_TCC1_CC0               (0x42001844U) /**< \brief (TCC1) Compare and Capture 0 */
-#define REG_TCC1_CC1               (0x42001848U) /**< \brief (TCC1) Compare and Capture 1 */
-#define REG_TCC1_PATTBUF           (0x42001864U) /**< \brief (TCC1) Pattern Buffer */
-#define REG_TCC1_WAVEBUF           (0x42001868U) /**< \brief (TCC1) Waveform Control Buffer */
-#define REG_TCC1_PERBUF            (0x4200186CU) /**< \brief (TCC1) Period Buffer */
-#define REG_TCC1_CCBUF0            (0x42001870U) /**< \brief (TCC1) Compare and Capture Buffer 0 */
-#define REG_TCC1_CCBUF1            (0x42001874U) /**< \brief (TCC1) Compare and Capture Buffer 1 */
+#define REG_TCC1_CTRLA             (0x42001800) /**< \brief (TCC1) Control A */
+#define REG_TCC1_CTRLBCLR          (0x42001804) /**< \brief (TCC1) Control B Clear */
+#define REG_TCC1_CTRLBSET          (0x42001805) /**< \brief (TCC1) Control B Set */
+#define REG_TCC1_SYNCBUSY          (0x42001808) /**< \brief (TCC1) Synchronization Busy */
+#define REG_TCC1_FCTRLA            (0x4200180C) /**< \brief (TCC1) Recoverable Fault A Configuration */
+#define REG_TCC1_FCTRLB            (0x42001810) /**< \brief (TCC1) Recoverable Fault B Configuration */
+#define REG_TCC1_DRVCTRL           (0x42001818) /**< \brief (TCC1) Driver Control */
+#define REG_TCC1_DBGCTRL           (0x4200181E) /**< \brief (TCC1) Debug Control */
+#define REG_TCC1_EVCTRL            (0x42001820) /**< \brief (TCC1) Event Control */
+#define REG_TCC1_INTENCLR          (0x42001824) /**< \brief (TCC1) Interrupt Enable Clear */
+#define REG_TCC1_INTENSET          (0x42001828) /**< \brief (TCC1) Interrupt Enable Set */
+#define REG_TCC1_INTFLAG           (0x4200182C) /**< \brief (TCC1) Interrupt Flag Status and Clear */
+#define REG_TCC1_STATUS            (0x42001830) /**< \brief (TCC1) Status */
+#define REG_TCC1_COUNT             (0x42001834) /**< \brief (TCC1) Count */
+#define REG_TCC1_PATT              (0x42001838) /**< \brief (TCC1) Pattern */
+#define REG_TCC1_WAVE              (0x4200183C) /**< \brief (TCC1) Waveform Control */
+#define REG_TCC1_PER               (0x42001840) /**< \brief (TCC1) Period */
+#define REG_TCC1_CC0               (0x42001844) /**< \brief (TCC1) Compare and Capture 0 */
+#define REG_TCC1_CC1               (0x42001848) /**< \brief (TCC1) Compare and Capture 1 */
+#define REG_TCC1_PATTBUF           (0x42001864) /**< \brief (TCC1) Pattern Buffer */
+#define REG_TCC1_WAVEBUF           (0x42001868) /**< \brief (TCC1) Waveform Control Buffer */
+#define REG_TCC1_PERBUF            (0x4200186C) /**< \brief (TCC1) Period Buffer */
+#define REG_TCC1_CCBUF0            (0x42001870) /**< \brief (TCC1) Compare and Capture Buffer 0 */
+#define REG_TCC1_CCBUF1            (0x42001874) /**< \brief (TCC1) Compare and Capture Buffer 1 */
 #else
-#define REG_TCC1_CTRLA             (*(RwReg  *)0x42001800U) /**< \brief (TCC1) Control A */
-#define REG_TCC1_CTRLBCLR          (*(RwReg8 *)0x42001804U) /**< \brief (TCC1) Control B Clear */
-#define REG_TCC1_CTRLBSET          (*(RwReg8 *)0x42001805U) /**< \brief (TCC1) Control B Set */
-#define REG_TCC1_SYNCBUSY          (*(RoReg  *)0x42001808U) /**< \brief (TCC1) Synchronization Busy */
-#define REG_TCC1_FCTRLA            (*(RwReg  *)0x4200180CU) /**< \brief (TCC1) Recoverable Fault A Configuration */
-#define REG_TCC1_FCTRLB            (*(RwReg  *)0x42001810U) /**< \brief (TCC1) Recoverable Fault B Configuration */
-#define REG_TCC1_DRVCTRL           (*(RwReg  *)0x42001818U) /**< \brief (TCC1) Driver Control */
-#define REG_TCC1_DBGCTRL           (*(RwReg8 *)0x4200181EU) /**< \brief (TCC1) Debug Control */
-#define REG_TCC1_EVCTRL            (*(RwReg  *)0x42001820U) /**< \brief (TCC1) Event Control */
-#define REG_TCC1_INTENCLR          (*(RwReg  *)0x42001824U) /**< \brief (TCC1) Interrupt Enable Clear */
-#define REG_TCC1_INTENSET          (*(RwReg  *)0x42001828U) /**< \brief (TCC1) Interrupt Enable Set */
-#define REG_TCC1_INTFLAG           (*(RwReg  *)0x4200182CU) /**< \brief (TCC1) Interrupt Flag Status and Clear */
-#define REG_TCC1_STATUS            (*(RwReg  *)0x42001830U) /**< \brief (TCC1) Status */
-#define REG_TCC1_COUNT             (*(RwReg  *)0x42001834U) /**< \brief (TCC1) Count */
-#define REG_TCC1_PATT              (*(RwReg16*)0x42001838U) /**< \brief (TCC1) Pattern */
-#define REG_TCC1_WAVE              (*(RwReg  *)0x4200183CU) /**< \brief (TCC1) Waveform Control */
-#define REG_TCC1_PER               (*(RwReg  *)0x42001840U) /**< \brief (TCC1) Period */
-#define REG_TCC1_CC0               (*(RwReg  *)0x42001844U) /**< \brief (TCC1) Compare and Capture 0 */
-#define REG_TCC1_CC1               (*(RwReg  *)0x42001848U) /**< \brief (TCC1) Compare and Capture 1 */
-#define REG_TCC1_PATTBUF           (*(RwReg16*)0x42001864U) /**< \brief (TCC1) Pattern Buffer */
-#define REG_TCC1_WAVEBUF           (*(RwReg  *)0x42001868U) /**< \brief (TCC1) Waveform Control Buffer */
-#define REG_TCC1_PERBUF            (*(RwReg  *)0x4200186CU) /**< \brief (TCC1) Period Buffer */
-#define REG_TCC1_CCBUF0            (*(RwReg  *)0x42001870U) /**< \brief (TCC1) Compare and Capture Buffer 0 */
-#define REG_TCC1_CCBUF1            (*(RwReg  *)0x42001874U) /**< \brief (TCC1) Compare and Capture Buffer 1 */
+#define REG_TCC1_CTRLA             (*(RwReg  *)0x42001800UL) /**< \brief (TCC1) Control A */
+#define REG_TCC1_CTRLBCLR          (*(RwReg8 *)0x42001804UL) /**< \brief (TCC1) Control B Clear */
+#define REG_TCC1_CTRLBSET          (*(RwReg8 *)0x42001805UL) /**< \brief (TCC1) Control B Set */
+#define REG_TCC1_SYNCBUSY          (*(RoReg  *)0x42001808UL) /**< \brief (TCC1) Synchronization Busy */
+#define REG_TCC1_FCTRLA            (*(RwReg  *)0x4200180CUL) /**< \brief (TCC1) Recoverable Fault A Configuration */
+#define REG_TCC1_FCTRLB            (*(RwReg  *)0x42001810UL) /**< \brief (TCC1) Recoverable Fault B Configuration */
+#define REG_TCC1_DRVCTRL           (*(RwReg  *)0x42001818UL) /**< \brief (TCC1) Driver Control */
+#define REG_TCC1_DBGCTRL           (*(RwReg8 *)0x4200181EUL) /**< \brief (TCC1) Debug Control */
+#define REG_TCC1_EVCTRL            (*(RwReg  *)0x42001820UL) /**< \brief (TCC1) Event Control */
+#define REG_TCC1_INTENCLR          (*(RwReg  *)0x42001824UL) /**< \brief (TCC1) Interrupt Enable Clear */
+#define REG_TCC1_INTENSET          (*(RwReg  *)0x42001828UL) /**< \brief (TCC1) Interrupt Enable Set */
+#define REG_TCC1_INTFLAG           (*(RwReg  *)0x4200182CUL) /**< \brief (TCC1) Interrupt Flag Status and Clear */
+#define REG_TCC1_STATUS            (*(RwReg  *)0x42001830UL) /**< \brief (TCC1) Status */
+#define REG_TCC1_COUNT             (*(RwReg  *)0x42001834UL) /**< \brief (TCC1) Count */
+#define REG_TCC1_PATT              (*(RwReg16*)0x42001838UL) /**< \brief (TCC1) Pattern */
+#define REG_TCC1_WAVE              (*(RwReg  *)0x4200183CUL) /**< \brief (TCC1) Waveform Control */
+#define REG_TCC1_PER               (*(RwReg  *)0x42001840UL) /**< \brief (TCC1) Period */
+#define REG_TCC1_CC0               (*(RwReg  *)0x42001844UL) /**< \brief (TCC1) Compare and Capture 0 */
+#define REG_TCC1_CC1               (*(RwReg  *)0x42001848UL) /**< \brief (TCC1) Compare and Capture 1 */
+#define REG_TCC1_PATTBUF           (*(RwReg16*)0x42001864UL) /**< \brief (TCC1) Pattern Buffer */
+#define REG_TCC1_WAVEBUF           (*(RwReg  *)0x42001868UL) /**< \brief (TCC1) Waveform Control Buffer */
+#define REG_TCC1_PERBUF            (*(RwReg  *)0x4200186CUL) /**< \brief (TCC1) Period Buffer */
+#define REG_TCC1_CCBUF0            (*(RwReg  *)0x42001870UL) /**< \brief (TCC1) Compare and Capture Buffer 0 */
+#define REG_TCC1_CCBUF1            (*(RwReg  *)0x42001874UL) /**< \brief (TCC1) Compare and Capture Buffer 1 */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for TCC1 peripheral ========== */
