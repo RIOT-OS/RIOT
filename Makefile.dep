@@ -875,7 +875,6 @@ endif
 
 ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += nanocoap
-  USEMODULE += gnrc_sock_udp
   USEMODULE += sock_util
 endif
 
