@@ -576,6 +576,12 @@ ifneq (,$(filter si70%,$(USEMODULE)))
   USEMODULE += si70xx
 endif
 
+ifneq (,$(filter stmpe811,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter slipdev,$(USEMODULE)))
   USEMODULE += tsrb
   FEATURES_REQUIRED += periph_uart
