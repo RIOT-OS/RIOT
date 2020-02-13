@@ -79,7 +79,8 @@ int saul_reg_add(saul_reg_t *dev);
  * @warning   This function must only be used by drivers that advise developers
  *            using them on how to prevent race conditions when using SAUL.
  *
- * None of the SAUL drivers shipped with RIOT call this function.
+ * @deprecated This function will be removed soon as it is practically unusable
+ *             for the above reasons.
  *
  * @param[in] dev       pointer to a registry entry
  *
