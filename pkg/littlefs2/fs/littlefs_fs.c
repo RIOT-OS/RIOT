@@ -146,7 +146,13 @@ static int prepare(littlefs_desc_t *fs)
     if (!fs->config.read_size) {
         fs->config.read_size = fs->dev->page_size;
     }
-    fs->config.lookahead = LITTLEFS_LOOKAHEAD_SIZE;
+    if (!fs->config.cache_size) {
+        fs->config.cache_size = fs->dev->page_size * LITTLEFS_CACHE_PAGES;
+    }
+    if (!fs->config.block_cycles) {
+        fs->config.block_cycles = LITTLEFS_BLOCK_CYCLES;
+    }
+    fs->config.lookahead_size = LITTLEFS_LOOKAHEAD_SIZE;
     fs->config.lookahead_buffer = fs->lookahead_buf;
     fs->config.context = fs;
     fs->config.read = _dev_read;
@@ -429,7 +435,7 @@ static int _statvfs(vfs_mount_t *mountp, const char *restrict path, struct statv
           (void *)mountp, path, (void *)buf);
 
     unsigned long nb_blocks = 0;
-    int ret = lfs_traverse(&fs->fs, _traverse_cb, &nb_blocks);
+    int ret = lfs_fs_traverse(&fs->fs, _traverse_cb, &nb_blocks);
     mutex_unlock(&fs->lock);
 
     buf->f_bsize = fs->fs.cfg->block_size;      /* block size */

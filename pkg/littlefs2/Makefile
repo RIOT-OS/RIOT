@@ -1,10 +1,12 @@
 PKG_NAME=littlefs
 PKG_URL=https://github.com/ARMmbed/littlefs.git
-# v1.7.2
-PKG_VERSION=7e110b44c0e796dc56e2fe86587762d685653029
+# v2.1.3
+PKG_VERSION=6b65737715039ef92d348014316b575b52547019
 PKG_LICENSE=Apache-2.0
 
-include $(RIOTBASE)/pkg/pkg.mk
+.PHONY: all
 
 all:
 	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.littlefs
+
+include $(RIOTBASE)/pkg/pkg.mk
