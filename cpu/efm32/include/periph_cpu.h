@@ -348,12 +348,12 @@ typedef struct {
  * @{
  */
 typedef struct {
-    TIMER_TypeDef *dev;     /**< Timer device used */
+    void *dev;              /**< TIMER_TypeDef or LETIMER_TypeDef device used */
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
 } timer_dev_t;
 
 typedef struct {
-    timer_dev_t prescaler;  /**< the lower numbered neighboring timer */
+    timer_dev_t prescaler;  /**< the lower neighboring timer (not initialized for LETIMER) */
     timer_dev_t timer;      /**< the higher numbered timer */
     IRQn_Type irq;          /**< number of the higher timer IRQ channel */
 } timer_conf_t;
