@@ -30,6 +30,23 @@
 #include "assert.h"
 #include "periph/pwm.h"
 
+#ifdef MODULE_PWM_LAYERED
+#include "pm_layered.h"
+#else
+#define pm_block(...)
+#define pm_unblock(...)
+#endif
+
+/* This mode will be blocked while PWM is active */
+#ifndef PWM_PM_BLOCKER
+#define PWM_PM_BLOCKER           2
+#endif
+
+/**
+ * @brief   Keeps track of whether PWM is active for power management
+ */
+static bool _is_powered_on[PWM_NUMOF];
+
 #define PRESCALER_MAX       (7U)
 
 #ifdef FTM0
@@ -46,6 +63,13 @@ static inline TPM_Type *tpm(pwm_t pwm)
 
 static void poweron(pwm_t pwm)
 {
+    if (_is_powered_on[pwm]) {
+        return;
+    }
+
+    pm_block(PWM_PM_BLOCKER);
+    _is_powered_on[pwm] = true;
+
 #ifdef FTM0
     int ftm = pwm_config[pwm].ftm_num;
 
@@ -187,6 +211,13 @@ void pwm_poweron(pwm_t pwm)
 void pwm_poweroff(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
+
+    if (!_is_powered_on[pwm]) {
+        return;
+    }
+
+    pm_unblock(PWM_PM_BLOCKER);
+    _is_powered_on[pwm] = false;
 
 #ifdef FTM0
 
