@@ -151,6 +151,15 @@ static inline void xtimer_sleep(uint32_t seconds);
 static inline void xtimer_usleep(uint32_t microseconds);
 
 /**
+ * @brief Pause the execution of a thread for some microseconds
+ *
+ * See xtimer_usleep() for more information.
+ *
+ * @param[in] microseconds  the amount of microseconds the thread should sleep
+ */
+static inline void xtimer_usleep64(uint64_t microseconds);
+
+/**
  * @brief Stop execution of a thread for some time
  *
  * Don't expect nanosecond accuracy. As of now, this function just calls
