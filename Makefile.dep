@@ -257,7 +257,6 @@ endif
 ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_sixlowpan
   USEMODULE += sixlowpan
-  DEFAULT_MODULE += auto_init_gnrc_sixlowpan
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
@@ -706,7 +705,6 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_saul
   USEMODULE += saul
   USEMODULE += saul_reg
-  DEFAULT_MODULE += auto_init_saul
 endif
 
 ifneq (,$(filter saul_adc,$(USEMODULE)))
@@ -740,7 +738,6 @@ endif
 ifneq (,$(filter can,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_can
   USEMODULE += can_raw
-  DEFAULT_MODULE += auto_init_can
   ifneq (,$(filter can_mbox,$(USEMODULE)))
     USEMODULE += core_mbox
   endif
@@ -767,7 +764,6 @@ endif
 ifneq (,$(filter random,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_random
   USEMODULE += prng
-  DEFAULT_MODULE += auto_init_random
   # select default prng
   ifeq (,$(filter prng_%,$(USEMODULE)))
     USEMODULE += prng_tinymt32
