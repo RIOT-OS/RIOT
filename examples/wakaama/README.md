@@ -83,7 +83,7 @@ For debugging purposes there are two types of messages that can be enabled:
 
 For memory allocation the TLSF package is being used, with a private heap. If
 memory usage has to be tweaked the heap size can be modified via the macro
-`LWM2M_TLSF_BUFFER`.
+`CONFIG_LWM2M_TLSF_BUFFER`.
 
 To compile run:
 
