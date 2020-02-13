@@ -1,4 +1,4 @@
-MODULE := littlefs
+MODULE := littlefs2
 
 CFLAGS += -Wno-format
 # GCC 4.9 bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=64480)

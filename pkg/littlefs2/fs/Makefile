@@ -1,3 +1,3 @@
-MODULE := littlefs_fs
+MODULE := littlefs2_fs
 
 include $(RIOTBASE)/Makefile.base
