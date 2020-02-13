@@ -80,6 +80,16 @@ extern "C" {
  * large amount of data often over the control endpoint, a minimal size should
  * be sufficient
  */
+#if IS_ACTIVE(CONFIG_USBUS_EP0_SIZE_8)
+#define CONFIG_USBUS_EP0_SIZE               8
+#elif IS_ACTIVE(CONFIG_USBUS_EP0_SIZE_16)
+#define CONFIG_USBUS_EP0_SIZE              16
+#elif IS_ACTIVE(CONFIG_USBUS_EP0_SIZE_32)
+#define CONFIG_USBUS_EP0_SIZE              32
+#elif IS_ACTIVE(CONFIG_USBUS_EP0_SIZE_64)
+#define CONFIG_USBUS_EP0_SIZE              64
+#endif
+
 #ifndef CONFIG_USBUS_EP0_SIZE
 #define CONFIG_USBUS_EP0_SIZE              64
 #endif
