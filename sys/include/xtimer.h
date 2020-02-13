@@ -398,6 +398,7 @@ static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b);
  */
 int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
 
+#if defined(MODULE_CORE_THREAD_FLAGS) || defined(DOXYGEN)
 /**
  * @brief    Set timeout thread flag after @p timeout
  *
@@ -408,6 +409,17 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
  * @param[in]   timeout timeout in usec
  */
 void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
+
+/**
+ * @brief    Set timeout thread flag after @p timeout
+ *
+ * See xtimer_set_timeout_flag() for more information.
+ *
+ * @param[in]   t       timer struct to use
+ * @param[in]   timeout timeout in usec
+ */
+void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout);
+#endif
 
 #if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
 /**

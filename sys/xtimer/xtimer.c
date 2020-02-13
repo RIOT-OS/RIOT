@@ -255,11 +255,22 @@ static void _set_timeout_flag_callback(void* arg)
     thread_flags_set(arg, THREAD_FLAG_TIMEOUT);
 }
 
-void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout)
+static void _set_timeout_flag_prepare(xtimer_t *t)
 {
     t->callback = _set_timeout_flag_callback;
     t->arg = (thread_t *)sched_active_thread;
     thread_flags_clear(THREAD_FLAG_TIMEOUT);
+}
+
+void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout)
+{
+    _set_timeout_flag_prepare(t);
     xtimer_set(t, timeout);
+}
+
+void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout)
+{
+    _set_timeout_flag_prepare(t);
+    xtimer_set64(t, timeout);
 }
 #endif
