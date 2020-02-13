@@ -112,12 +112,12 @@
 void auto_init(void)
 {
 #ifdef MODULE_AUTO_INIT_RANDOM
-    LOG_DEBUG("Auto init random module.\n");
+    LOG_DEBUG("Auto init random.\n");
     void auto_init_random(void);
     auto_init_random();
 #endif
 #ifdef MODULE_AUTO_INIT_XTIMER
-    LOG_DEBUG("Auto init xtimer module.\n");
+    LOG_DEBUG("Auto init xtimer.\n");
     xtimer_init();
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
@@ -130,7 +130,7 @@ void auto_init(void)
     auto_init_event_thread();
 #endif
 #ifdef MODULE_MCI
-    LOG_DEBUG("Auto init mci module.\n");
+    LOG_DEBUG("Auto init mci.\n");
     mci_initialize();
 #endif
 #ifdef MODULE_PROFILING
@@ -139,27 +139,27 @@ void auto_init(void)
     profiling_init();
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_PKTBUF
-    LOG_DEBUG("Auto init gnrc_pktbuf module\n");
+    LOG_DEBUG("Auto init gnrc_pktbuf.\n");
     gnrc_pktbuf_init();
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_PKTDUMP
-    LOG_DEBUG("Auto init gnrc_pktdump module.\n");
+    LOG_DEBUG("Auto init gnrc_pktdump.\n");
     gnrc_pktdump_init();
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_SIXLOWPAN
-    LOG_DEBUG("Auto init gnrc_sixlowpan module.\n");
+    LOG_DEBUG("Auto init gnrc_sixlowpan.\n");
     gnrc_sixlowpan_init();
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_IPV6
-    LOG_DEBUG("Auto init gnrc_ipv6 module.\n");
+    LOG_DEBUG("Auto init gnrc_ipv6.\n");
     gnrc_ipv6_init();
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_UDP
-    LOG_DEBUG("Auto init UDP module.\n");
+    LOG_DEBUG("Auto init gnrc_udp.\n");
     gnrc_udp_init();
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_TCP
-    LOG_DEBUG("Auto init TCP module\n");
+    LOG_DEBUG("Auto init gnrc_tcp.\n");
     gnrc_tcp_init();
 #endif
 #ifdef MODULE_AUTO_INIT_LWIP
@@ -173,39 +173,39 @@ void auto_init(void)
 #endif
 #ifdef MODULE_GCOAP
     if (!IS_ACTIVE(CONFIG_GCOAP_NO_AUTO_INIT)) {
-        LOG_DEBUG("Auto init gcoap module.\n");
+        LOG_DEBUG("Auto init gcoap.\n");
         gcoap_init();
     }
 #endif
 #ifdef MODULE_DEVFS
-    LOG_DEBUG("Mounting /dev\n");
+    LOG_DEBUG("Mounting /dev.\n");
     extern void auto_init_devfs(void);
     auto_init_devfs();
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_IPV6_NIB
-    LOG_DEBUG("Auto init gnrc_ipv6_nib module.\n");
+    LOG_DEBUG("Auto init gnrc_ipv6_nib.\n");
     gnrc_ipv6_nib_init();
 #endif
 #ifdef MODULE_SKALD
-    LOG_DEBUG("Auto init Skald\n");
+    LOG_DEBUG("Auto init Skald.\n");
     skald_init();
 #endif
 #ifdef MODULE_CORD_COMMON
-    LOG_DEBUG("Auto init cord_common module\n");
+    LOG_DEBUG("Auto init cord_common.\n");
     extern void cord_common_init(void);
     cord_common_init();
 #endif
 #ifdef MODULE_CORD_EP_STANDALONE
-    LOG_DEBUG("Auto init cord_ep_standalone\n");
+    LOG_DEBUG("Auto init cord_ep_standalone.\n");
     extern void cord_ep_standalone_run(void);
     cord_ep_standalone_run();
 #endif
 #ifdef MODULE_ASYMCUTE
-    LOG_DEBUG("Auto init Asymcute\n");
+    LOG_DEBUG("Auto init Asymcute.\n");
     asymcute_handler_run();
 #endif
 #ifdef MODULE_NIMBLE
-    LOG_DEBUG("Auto init NimBLE\n");
+    LOG_DEBUG("Auto init NimBLE.\n");
     extern void nimble_riot_init(void);
     nimble_riot_init();
 #endif
@@ -215,7 +215,7 @@ void auto_init(void)
     auto_init_loramac();
 #endif
 #ifdef MODULE_SOCK_DTLS
-    LOG_DEBUG("Auto init sock_dtls\n");
+    LOG_DEBUG("Auto init sock_dtls.\n");
     sock_dtls_init();
 #endif
 
@@ -228,7 +228,7 @@ void auto_init(void)
 
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
-    LOG_DEBUG("Auto init gnrc netif.\n");
+    LOG_DEBUG("Auto init gnrc_netif.\n");
 
 #ifdef MODULE_STM32_ETH
     extern void auto_init_stm32_eth(void);
@@ -362,7 +362,7 @@ void auto_init(void)
 
 /* initialize NDN module after the network devices are initialized */
 #ifdef MODULE_NDN_RIOT
-    LOG_DEBUG("Auto init NDN module.\n");
+    LOG_DEBUG("Auto init NDN.\n");
     ndn_init();
 #endif
 
@@ -372,13 +372,13 @@ void auto_init(void)
      * as the shell commands rely on auto-initialization. auto_init_sht1x also
      * performs SAUL registration, but only if module auto_init_saul is used.
      */
-    LOG_DEBUG("Auto init SHT1X module (SHT10/SHT11/SHT15 sensor driver).\n");
+    LOG_DEBUG("Auto init sht1x.\n");
     extern void auto_init_sht1x(void);
     auto_init_sht1x();
 #endif
 
 #ifdef MODULE_AUTO_INIT_SAUL
-    LOG_DEBUG("auto_init SAUL\n");
+    LOG_DEBUG("Auto init SAUL.\n");
 
 #ifdef MODULE_SAUL_ADC
     extern void auto_init_adc(void);
@@ -611,7 +611,7 @@ void auto_init(void)
 
 /* initialize storage devices */
 #ifdef MODULE_AUTO_INIT_STORAGE
-    LOG_DEBUG("auto_init STORAGE\n");
+    LOG_DEBUG("Auto init STORAGE.\n");
 
 #ifdef MODULE_SDCARD_SPI
     extern void auto_init_sdcard_spi(void);
@@ -621,7 +621,7 @@ void auto_init(void)
 #endif /* MODULE_AUTO_INIT_STORAGE */
 
 #ifdef MODULE_AUTO_INIT_CAN
-    LOG_DEBUG("auto_init CAN\n");
+    LOG_DEBUG("Auto init CAN.\n");
 
     extern void auto_init_candev(void);
     auto_init_candev();
@@ -651,7 +651,7 @@ void auto_init(void)
 #endif /* MODULE_TEST_UTILS_INTERACTIVE_SYNC */
 
 #ifdef MODULE_AUTO_INIT_DHCPV6_CLIENT
-    LOG_DEBUG("auto_init DHCPv6 client\n");
+    LOG_DEBUG("Auto init DHCPv6 client.\n");
     extern void dhcpv6_client_auto_init(void);
     dhcpv6_client_auto_init();
 #endif /* MODULE_AUTO_INIT_DHCPV6_CLIENT */
