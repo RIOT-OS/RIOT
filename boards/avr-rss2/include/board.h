@@ -27,6 +27,13 @@
 extern "C" {
 #endif
 
+/**
+ * @name    AT24MAC602 configuration
+ * @{
+ */
+#define AT24MAC_PARAM_I2C_DEV   I2C_DEV(0)
+#define AT24MAC_PARAM_TYPE      AT24MAC6XX
+/** @} */
 
 /**
  * @name   LED pin definitions and handlers
