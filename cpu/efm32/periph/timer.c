@@ -25,6 +25,7 @@
 #include "assert.h"
 #include "periph/timer.h"
 #include "periph_conf.h"
+#include "pm_layered.h"
 
 #include "em_cmu.h"
 #include "em_timer.h"
@@ -40,6 +41,16 @@
  * @brief   The LETIMER implementation has two available channels
  */
 #define LE_CC_CHANNELS   (2U)
+
+/**
+ * @brief   These power modes will be blocked while the timer is running
+ */
+#ifndef EFM32_TIMER_PM_BLOCKER
+#define EFM32_TIMER_PM_BLOCKER      1
+#endif
+#ifndef EFM32_LETIMER_PM_BLOCKER
+#define EFM32_LETIMER_PM_BLOCKER    0
+#endif
 
 /**
  * @brief   Timer state memory
@@ -243,9 +254,17 @@ unsigned int timer_read(tim_t dev)
 void timer_stop(tim_t dev)
 {
     if (_is_letimer(dev)) {
+        LETIMER_TypeDef *tim = timer_config[dev].timer.dev;
+        if (tim->STATUS & LETIMER_STATUS_RUNNING) {
+            pm_unblock(EFM32_LETIMER_PM_BLOCKER);
+        }
         LETIMER_Enable(timer_config[dev].timer.dev, false);
     }
     else {
+        TIMER_TypeDef *tim = timer_config[dev].timer.dev;
+        if (tim->STATUS & TIMER_STATUS_RUNNING) {
+            pm_unblock(EFM32_TIMER_PM_BLOCKER);
+        }
         TIMER_Enable(timer_config[dev].timer.dev, false);
     }
 }
@@ -253,9 +272,17 @@ void timer_stop(tim_t dev)
 void timer_start(tim_t dev)
 {
     if (_is_letimer(dev)) {
+        LETIMER_TypeDef *tim = timer_config[dev].timer.dev;
+        if (!(tim->STATUS & LETIMER_STATUS_RUNNING)) {
+            pm_block(EFM32_LETIMER_PM_BLOCKER);
+        }
         LETIMER_Enable(timer_config[dev].timer.dev, true);
     }
     else {
+        TIMER_TypeDef *tim = timer_config[dev].timer.dev;
+        if (!(tim->STATUS & TIMER_STATUS_RUNNING)) {
+            pm_block(EFM32_TIMER_PM_BLOCKER);
+        }
         TIMER_Enable(timer_config[dev].timer.dev, true);
     }
 }
