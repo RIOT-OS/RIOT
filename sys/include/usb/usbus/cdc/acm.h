@@ -46,8 +46,8 @@ extern "C" {
  * @brief Buffer size for STDIN and STDOUT data to and from USB when using
  *        the USBUS_CDC_ACM_STDIO module
  */
-#ifndef USBUS_CDC_ACM_STDIO_BUF_SIZE
-#define USBUS_CDC_ACM_STDIO_BUF_SIZE (128)
+#ifndef CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE
+#define CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE (128)
 #endif
 
 /**
