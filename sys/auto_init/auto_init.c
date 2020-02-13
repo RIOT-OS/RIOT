@@ -1,7 +1,9 @@
 /**
  * Auto initialization for used modules
  *
- * Copyright (C) 2013  INRIA.
+ * Copyright (C) 2020 Freie Universität Berlin
+ *               2020 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,6 +15,7 @@
  * @brief   initializes any used module that has a trivial init function
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @}
  */
 #include <stdint.h>
@@ -108,6 +111,7 @@
 void auto_init(void)
 {
 #ifdef MODULE_AUTO_INIT_RANDOM
+    DEBUG("Auto init random module.\n");
     void auto_init_random(void);
     auto_init_random();
 #endif
@@ -116,9 +120,11 @@ void auto_init(void)
     xtimer_init();
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
+    DEBUG("Auto init schedstatistics.\n");
     init_schedstatistics();
 #endif
 #ifdef MODULE_EVENT_THREAD
+    DEBUG("Auto init event threads.\n");
     extern void auto_init_event_thread(void);
     auto_init_event_thread();
 #endif
@@ -127,6 +133,7 @@ void auto_init(void)
     mci_initialize();
 #endif
 #ifdef MODULE_PROFILING
+    DEBUG("Auto init profiling.\n");
     extern void profiling_init(void);
     profiling_init();
 #endif
@@ -159,6 +166,7 @@ void auto_init(void)
     lwip_bootstrap();
 #endif
 #ifdef MODULE_OPENTHREAD
+    DEBUG("Bootstrapping openthread.\n");
     extern void openthread_bootstrap(void);
     openthread_bootstrap();
 #endif
@@ -201,6 +209,7 @@ void auto_init(void)
     nimble_riot_init();
 #endif
 #ifdef MODULE_AUTO_INIT_LORAMAC
+    DEBUG("Auto init loramac.\n");
     extern void auto_init_loramac(void);
     auto_init_loramac();
 #endif
@@ -211,12 +220,14 @@ void auto_init(void)
 
 /* initialize USB devices */
 #ifdef MODULE_AUTO_INIT_USBUS
+    DEBUG("Auto init USB.\n");
     extern void auto_init_usb(void);
     auto_init_usb();
 #endif
 
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
+    DEBUG("Auto init gnrc netif.\n");
 
 #ifdef MODULE_STM32_ETH
     extern void auto_init_stm32_eth(void);
@@ -343,6 +354,7 @@ void auto_init(void)
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
 #ifdef MODULE_AUTO_INIT_GNRC_UHCPC
+    DEBUG("Auto init gnrc_uhcpc.\n");
     extern void auto_init_gnrc_uhcpc(void);
     auto_init_gnrc_uhcpc();
 #endif
@@ -591,12 +603,9 @@ void auto_init(void)
 #endif /* MODULE_AUTO_INIT_SAUL */
 
 #ifdef MODULE_AUTO_INIT_GNRC_RPL
-
-#ifdef MODULE_AUTO_INIT_GNRC_RPL
+    DEBUG("Auto init gnrc_rpl.\n");
     extern void auto_init_gnrc_rpl(void);
     auto_init_gnrc_rpl();
-#endif
-
 #endif /* MODULE_AUTO_INIT_GNRC_RPL */
 
 /* initialize storage devices */
@@ -619,6 +628,7 @@ void auto_init(void)
 #endif /* MODULE_AUTO_INIT_CAN */
 
 #ifdef MODULE_SUIT
+    DEBUG("Auto init SUIT conditions.\n");
     extern void suit_init_conditions(void);
     suit_init_conditions();
 #endif /* MODULE_SUIT */
@@ -626,6 +636,7 @@ void auto_init(void)
 #ifdef MODULE_AUTO_INIT_SECURITY
 
 #ifdef MODULE_CRYPTOAUTHLIB
+    DEBUG("Auto init cryptoauthlib.\n");
     extern void auto_init_atca(void);
     auto_init_atca();
 #endif  /* MODULE_CRYPTOAUTHLIB */
@@ -639,7 +650,7 @@ void auto_init(void)
 #endif /* MODULE_TEST_UTILS_INTERACTIVE_SYNC */
 
 #ifdef MODULE_AUTO_INIT_DHCPV6_CLIENT
-    DEBUG("auto_init DHCPv6 client");
+    DEBUG("auto_init DHCPv6 client\n");
     extern void dhcpv6_client_auto_init(void);
     dhcpv6_client_auto_init();
 #endif /* MODULE_AUTO_INIT_DHCPV6_CLIENT */
