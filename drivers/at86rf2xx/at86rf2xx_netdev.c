@@ -98,6 +98,9 @@ static int _init(netdev_t *netdev)
     spi_release(dev->params.spi);
 #endif
 
+    /* reset hardware into a defined state */
+    at86rf2xx_hardware_reset(dev);
+
     /* test if the device is responding */
     if (at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM) != AT86RF2XX_PARTNUM) {
         DEBUG("[at86rf2xx] error: unable to read correct part number\n");
@@ -274,6 +277,7 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
             }
             break;
         case NETOPT_STATE_RESET:
+            at86rf2xx_hardware_reset(dev);
             at86rf2xx_reset(dev);
             break;
         default:
