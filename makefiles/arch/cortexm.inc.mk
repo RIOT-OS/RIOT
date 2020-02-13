@@ -73,7 +73,7 @@ CFLAGS += -DCPU_ARCH_$(call uppercase_and_underscore,$(CPU_ARCH))
 
 # set the compiler specific CPU and FPU options
 ifneq (,$(filter $(CPU_ARCH),cortex-m4f cortex-m7))
-  ifneq (,$(filter cortexm_fpu,$(USEMODULE)))
+  ifneq (,$(filter cortexm_fpu,$(FEATURES_USED)))
     # clang assumes there is an FPU
     ifneq (llvm,$(TOOLCHAIN))
       ifeq ($(CPU_ARCH),cortex-m7)
