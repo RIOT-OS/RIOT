@@ -232,14 +232,14 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_enable_endpoint(ep);
     ep = usbus_add_endpoint(usbus, &cdcacm->iface_data,
                             USB_EP_TYPE_BULK, USB_EP_DIR_IN,
-                            USBUS_CDC_ACM_BULK_EP_SIZE);
+                            CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
     ep->interval = 0; /* Interval is not used with bulk endpoints */
     usbus_enable_endpoint(ep);
     /* Store the endpoint reference to activate it
      * when DTE present is signalled by the host */
     ep = usbus_add_endpoint(usbus, &cdcacm->iface_data,
                             USB_EP_TYPE_BULK, USB_EP_DIR_OUT,
-                            USBUS_CDC_ACM_BULK_EP_SIZE);
+                            CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
     ep->interval = 0; /* Interval is not used with bulk endpoints */
     usbus_enable_endpoint(ep);
 
@@ -319,12 +319,12 @@ static void _handle_in(usbus_cdcacm_device_t *cdcacm,
         (cdcacm->state != USBUS_CDC_ACM_LINE_STATE_DTE)) {
         return;
     }
-    /* copy at most USBUS_CDC_ACM_BULK_EP_SIZE chars from input into ep->buf */
+    /* copy at most CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE chars from input into ep->buf */
     unsigned old = irq_disable();
     while (!tsrb_empty(&cdcacm->tsrb)) {
         int c = tsrb_get_one(&cdcacm->tsrb);
         ep->buf[cdcacm->occupied++] = (uint8_t)c;
-        if (cdcacm->occupied >= USBUS_CDC_ACM_BULK_EP_SIZE) {
+        if (cdcacm->occupied >= CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE) {
             break;
         }
     }

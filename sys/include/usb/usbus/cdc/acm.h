@@ -53,8 +53,8 @@ extern "C" {
 /**
  * @brief USB CDC ACM bulk endpoint size
  */
-#ifndef USBUS_CDC_ACM_BULK_EP_SIZE
-#define USBUS_CDC_ACM_BULK_EP_SIZE    (64)
+#ifndef CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE
+#define CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE    (64)
 #endif
 /** @} */
 
