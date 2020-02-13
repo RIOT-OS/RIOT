@@ -152,7 +152,6 @@ Test *tests_saul_reg_tests(void)
         new_TestFixture(test_reg_find_nth),
         new_TestFixture(test_reg_find_type),
         new_TestFixture(test_reg_find_name),
-        new_TestFixture(test_reg_rm)
     };
 
     EMB_UNIT_TESTCALLER(pkt_tests, NULL, NULL, fixtures);
