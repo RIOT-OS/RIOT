@@ -6,4 +6,5 @@
 
 menu "Drivers"
 rsource "Kconfig.net"
+rsource "periph_common/Kconfig"
 endmenu # Drivers
