@@ -111,8 +111,8 @@
  * This function is highly platform dependent so check the platform documentation
  * for details on its constraints.
  *
- * The callback will be executed WDT_WARNING_PERIOD before the actual reboot.
- * The value of WDT_WARNING_PERIOD may be configurable or a fixed value. But is
+ * The callback will be executed CONFIG_WDT_WARNING_PERIOD before the actual reboot.
+ * The value of CONFIG_WDT_WARNING_PERIOD may be configurable or a fixed value. But is
  * in any case defined at compile time. Specific platform implementation should
  * assert improper values.
  *
@@ -146,10 +146,10 @@
  *
  * @verbatim
  * |---------------------MAX_TIME-----------------------|
- *                             |---WDT_WARNING_PERIOD---|
- *                             ^                        ^
- *                             |                        |
- *                        wdt_cb()                   reboot
+ *                      |---CONFIG_WDT_WARNING_PERIOD---|
+ *                      ^                               ^
+ *                      |                               |
+ *                   wdt_cb()                        reboot
  * @endverbatim
  *
  * To include this feature, (If your platform supports it) in your application
@@ -276,13 +276,13 @@ void wdt_init(void);
  * @{
  */
 /**
- * @def     WDT_WARNING_PERIOD
+ * @def     CONFIG_WDT_WARNING_PERIOD
  *
  * @brief   Period (ms) before reboot where wdt_cb() is executed.
  *          Defined per implementation.
  */
-#ifndef WDT_WARNING_PERIOD
-#define WDT_WARNING_PERIOD          (1)
+#ifndef CONFIG_WDT_WARNING_PERIOD
+#define CONFIG_WDT_WARNING_PERIOD          (1)
 #endif
 /** @} */
 
