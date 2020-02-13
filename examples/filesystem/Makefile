@@ -41,7 +41,8 @@ USEMODULE += mtd
 USEMODULE += vfs
 
 # Use a file system
-USEMODULE += littlefs
+USEMODULE += littlefs2
+#USEMODULE += littlefs
 # USEMODULE += spiffs
 # USEMODULE += fatfs
 USEMODULE += constfs
@@ -49,6 +50,8 @@ USEMODULE += constfs
 
 # Set file systems specific variables
 ifneq (,$(filter littlefs, $(USEMODULE)))
+    CFLAGS += -DVFS_FILE_BUFFER_SIZE=56 -DVFS_DIR_BUFFER_SIZE=44
+else ifneq (,$(filter littlefs2, $(USEMODULE)))
     CFLAGS += -DVFS_FILE_BUFFER_SIZE=84 -DVFS_DIR_BUFFER_SIZE=52
 else ifneq (,$(filter spiffs, $(USEMODULE)))
     SPIFFS_NB_FD ?= 8
