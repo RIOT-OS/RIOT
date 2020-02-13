@@ -242,6 +242,17 @@ event_t *event_wait(event_queue_t *queue);
  * @return      NULL if timeout expired before an event was posted
  */
 event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout);
+
+/**
+ * @brief   Get next event from event queue, blocking until timeout expires
+ *
+ * @param[in]   queue    queue to query for an event
+ * @param[in]   timeout  maximum time to wait for an event to be posted in us
+ *
+ * @return      pointer to next event if event was taken from the queue
+ * @return      NULL if timeout expired before an event was posted
+ */
+event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout);
 #endif
 
 /**
