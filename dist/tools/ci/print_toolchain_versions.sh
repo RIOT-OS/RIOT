@@ -110,7 +110,7 @@ avr_libc_version() {
 printf "\n"
 # print operating system information
 printf "%s\n" "Operating System Environment"
-printf "%s\n" "-----------------------------"
+printf "%s\n" "----------------------------"
 printf "%25s: %s\n" "Operating System" "$(get_os_info)"
 printf "%25s: %s\n" "Kernel" "$(get_kernel_info)"
 printf "%25s: %s\n" "System shell" "$(get_sys_shell)"
