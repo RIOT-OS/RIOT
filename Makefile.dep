@@ -805,6 +805,13 @@ ifneq (,$(filter littlefs,$(USEMODULE)))
   USEMODULE += mtd
 endif
 
+ifneq (,$(filter littlefs2,$(USEMODULE)))
+  USEPKG += littlefs2
+  USEMODULE += vfs
+  USEMODULE += littlefs2_fs
+  USEMODULE += mtd
+endif
+
 ifneq (,$(filter l2filter_%,$(USEMODULE)))
   USEMODULE += l2filter
 endif
