@@ -115,14 +115,12 @@ event_t *event_wait(event_queue_t *queue)
 }
 
 #ifdef MODULE_XTIMER
-event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout)
+static event_t *_wait_timeout(event_queue_t *queue, xtimer_t *timer)
 {
     assert(queue);
     event_t *result;
-    xtimer_t timer;
     thread_flags_t flags = 0;
 
-    xtimer_set_timeout_flag(&timer, timeout);
     do {
         result = event_get(queue);
         if (result == NULL) {
@@ -131,10 +129,26 @@ event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout)
     } while ((result == NULL) && (flags & THREAD_FLAG_EVENT));
 
     if (result) {
-        xtimer_remove(&timer);
+        xtimer_remove(timer);
     }
 
     return result;
+}
+
+event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout)
+{
+    xtimer_t timer;
+
+    xtimer_set_timeout_flag(&timer, timeout);
+    return _wait_timeout(queue, &timer);
+}
+
+event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout)
+{
+    xtimer_t timer;
+
+    xtimer_set_timeout_flag64(&timer, timeout);
+    return _wait_timeout(queue, &timer);
 }
 #endif
 
