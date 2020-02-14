@@ -56,7 +56,7 @@ void gnrc_rpl_p2p_update(void)
             p2p_ext->lifetime_sec -= GNRC_RPL_LIFETIME_UPDATE_STEP;
             if (p2p_ext->lifetime_sec <= 0) {
                 gnrc_rpl_dodag_remove_all_parents(p2p_ext->dodag);
-                p2p_ext->dodag->instance->cleanup = GNRC_RPL_CLEANUP_TIME;
+                gnrc_rpl_cleanup_start(p2p_ext->dodag);
                 continue;
             }
             p2p_ext->dro_delay -= GNRC_RPL_LIFETIME_UPDATE_STEP;

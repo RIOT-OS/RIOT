@@ -246,6 +246,14 @@ bool gnrc_rpl_parent_remove(gnrc_rpl_parent_t *parent)
     return true;
 }
 
+void gnrc_rpl_cleanup_start(gnrc_rpl_dodag_t *dodag)
+{
+    evtimer_del((evtimer_t *)(&gnrc_rpl_evtimer), (evtimer_event_t *)&dodag->instance->cleanup_event);
+    ((evtimer_event_t *)&(dodag->instance->cleanup_event))->offset = GNRC_RPL_CLEANUP_TIME;
+    dodag->instance->cleanup_event.msg.type = GNRC_RPL_MSG_TYPE_INSTANCE_CLEANUP;
+    evtimer_add_msg(&gnrc_rpl_evtimer, &dodag->instance->cleanup_event, gnrc_rpl_pid);
+}
+
 void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
 {
     DEBUG("RPL: [INFO] Local Repair started\n");
@@ -260,10 +268,7 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
     if (dodag->my_rank != GNRC_RPL_INFINITE_RANK) {
         dodag->my_rank = GNRC_RPL_INFINITE_RANK;
         trickle_reset_timer(&dodag->trickle);
-        evtimer_del((evtimer_t *)(&gnrc_rpl_evtimer), (evtimer_event_t *)&dodag->instance->cleanup_event);
-        ((evtimer_event_t *)&(dodag->instance->cleanup_event))->offset = GNRC_RPL_CLEANUP_TIME;
-        dodag->instance->cleanup_event.msg.type = GNRC_RPL_MSG_TYPE_INSTANCE_CLEANUP;
-        evtimer_add_msg(&gnrc_rpl_evtimer, &dodag->instance->cleanup_event, gnrc_rpl_pid);
+        gnrc_rpl_cleanup_start(dodag);
     }
 }
 
