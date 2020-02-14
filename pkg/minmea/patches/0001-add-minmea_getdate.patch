@@ -1,0 +1,77 @@
+From 4dae7015b3001359ac9365663c3beb78a1a7a2d2 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Thu, 16 May 2019 14:59:07 +0200
+Subject: [PATCH] add minmea_getdate()
+
+The GPS date is internally converted to a struct tm anyway.
+Add a function to make use of this for external users too.
+---
+ minmea.c | 30 +++++++++++++++++++-----------
+ minmea.h |  5 +++++
+ 2 files changed, 24 insertions(+), 11 deletions(-)
+
+diff --git a/minmea.c b/minmea.c
+index 32f7881..e9025a8 100644
+--- a/minmea.c
++++ b/minmea.c
+@@ -612,25 +612,33 @@ bool minmea_parse_zda(struct minmea_sentence_zda *frame, const char *sentence)
+   return true;
+ }
+ 
+-int minmea_gettime(struct timespec *ts, const struct minmea_date *date, const struct minmea_time *time_)
++int minmea_getdate(struct tm *tm, const struct minmea_date *date, const struct minmea_time *time_)
+ {
+     if (date->year == -1 || time_->hours == -1)
+         return -1;
+ 
+-    struct tm tm;
+-    memset(&tm, 0, sizeof(tm));
++    memset(tm, 0, sizeof(*tm));
+     if (date->year < 80) {
+-        tm.tm_year = 2000 + date->year - 1900;  // 2000-2079
++        tm->tm_year = 2000 + date->year - 1900;  // 2000-2079
+     } else if (date->year >= 1900) {
+-        tm.tm_year = date->year - 1900; // 4 digit year, use directly
++        tm->tm_year = date->year - 1900;         // 4 digit year, use directly
+     } else {
+-        tm.tm_year = date->year;    // 1980-1999
++        tm->tm_year = date->year;                // 1980-1999
+     }
+-    tm.tm_mon = date->month - 1;
+-    tm.tm_mday = date->day;
+-    tm.tm_hour = time_->hours;
+-    tm.tm_min = time_->minutes;
+-    tm.tm_sec = time_->seconds;
++    tm->tm_mon = date->month - 1;
++    tm->tm_mday = date->day;
++    tm->tm_hour = time_->hours;
++    tm->tm_min = time_->minutes;
++    tm->tm_sec = time_->seconds;
++
++    return 0;
++}
++
++int minmea_gettime(struct timespec *ts, const struct minmea_date *date, const struct minmea_time *time_)
++{
++    struct tm tm;
++    if (minmea_getdate(&tm, date, time_))
++        return -1;
+ 
+     time_t timestamp = timegm(&tm); /* See README.md if your system lacks timegm(). */
+     if (timestamp != (time_t)-1) {
+diff --git a/minmea.h b/minmea.h
+index 181d8c7..1e01bad 100644
+--- a/minmea.h
++++ b/minmea.h
+@@ -208,6 +208,11 @@ bool minmea_parse_gsv(struct minmea_sentence_gsv *frame, const char *sentence);
+ bool minmea_parse_vtg(struct minmea_sentence_vtg *frame, const char *sentence);
+ bool minmea_parse_zda(struct minmea_sentence_zda *frame, const char *sentence);
+ 
++/**
++ * Convert GPS UTC date/time representation to a UNIX calendar time.
++ */
++int minmea_getdate(struct tm *tm, const struct minmea_date *date, const struct minmea_time *time_);
++
+ /**
+  * Convert GPS UTC date/time representation to a UNIX timestamp.
+  */
