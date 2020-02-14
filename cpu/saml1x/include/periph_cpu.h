@@ -30,7 +30,7 @@ extern "C" {
  * @brief   Override the default initial PM blocker
  * @todo   Idle modes are enabled by default, deep sleep mode blocked
  */
-#define PM_BLOCKER_INITIAL  { .val_u32 = 0x00000001 }
+#define PM_BLOCKER_INITIAL  0x00000001
 
 /**
  * @name   SAML1x GCLK definitions
