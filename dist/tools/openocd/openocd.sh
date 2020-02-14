@@ -13,6 +13,11 @@
 #
 # Global environment variables used:
 # OPENOCD:             OpenOCD command name, default: "openocd"
+#                      Care must be taken when specifying an OpenOCD version in
+#                      its build directory, as it does not look up its own
+#                      configuration files relative to the executable -- the
+#                      scripts directory needs to be passed in like this:
+#                      `OPENOCD="~/openocd/src/openocd -s ~/openocd/tcl"`.
 # OPENOCD_CONFIG:      OpenOCD configuration file name,
 #                      default: "${BOARDSDIR}/${BOARD}/dist/openocd.cfg"
 #
