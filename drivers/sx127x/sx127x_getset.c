@@ -125,7 +125,14 @@ void sx127x_set_syncword(sx127x_t *dev, uint8_t syncword)
  */
 static inline uint32_t _freq_to_hw_value(uint32_t freq)
 {
-    return (freq << 8) / 15625;
+    unsigned pow = 6;
+    do {
+        freq /= 5;
+        freq <<= 1;
+    } while (--pow);
+    freq <<= 2;
+
+    return freq;
 }
 
 /**
@@ -133,7 +140,14 @@ static inline uint32_t _freq_to_hw_value(uint32_t freq)
  */
 static inline uint32_t _hw_value_to_freq(uint32_t frf)
 {
-    return (frf * 15625) >> 8;
+    unsigned pow = 6;
+    frf >>= 2;
+    do {
+        frf *= 5;
+        frf >>= 1;
+    } while (--pow);
+
+    return frf;
 }
 
 uint32_t sx127x_get_channel(const sx127x_t *dev)
