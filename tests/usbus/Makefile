@@ -9,6 +9,4 @@ DISABLE_MODULE += auto_init_usbus
 USB_VID ?= $(USB_VID_TESTING)
 USB_PID ?= $(USB_PID_TESTING)
 
-CFLAGS += -DCONFIG_USB_VID=0x$(USB_VID) -DCONFIG_USB_PID=0x$(USB_PID)
-
 include $(RIOTBASE)/Makefile.include

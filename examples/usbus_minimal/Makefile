@@ -26,16 +26,3 @@ QUIET ?= 1
 SHOULD_RUN_KCONFIG ?=
 
 include $(RIOTBASE)/Makefile.include
-
-# Set USB VID/PID via CFLAGS if not being set via Kconfig
-ifndef CONFIG_USB_VID
-  CFLAGS += -DCONFIG_USB_VID=0x$(USB_VID)
-else
-  USB_VID = $(patsubst 0x%,%,$(CONFIG_USB_VID))
-endif
-
-ifndef CONFIG_USB_PID
-  CFLAGS += -DCONFIG_USB_PID=0x$(USB_PID)
-else
-  USB_PID = $(patsubst 0x%,%,$(CONFIG_USB_PID))
-endif
