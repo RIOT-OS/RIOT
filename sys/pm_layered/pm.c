@@ -30,7 +30,7 @@
 #endif
 
 #ifndef PM_BLOCKER_INITIAL
-#define PM_BLOCKER_INITIAL { .val_u32 = 0x01010101 }
+#define PM_BLOCKER_INITIAL 0x01010101   /* block all by default */
 #endif
 
 /**
@@ -44,7 +44,7 @@ typedef union {
 /**
  * @brief Global variable for keeping track of blocked modes
  */
-volatile pm_blocker_t pm_blocker = PM_BLOCKER_INITIAL;
+volatile pm_blocker_t pm_blocker = { .val_u32 = PM_BLOCKER_INITIAL };
 
 void pm_set_lowest(void)
 {
