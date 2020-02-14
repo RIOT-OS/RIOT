@@ -110,9 +110,9 @@ gnrc_rpl_instance_t *gnrc_rpl_p2p_root_init(uint8_t instance_id, ipv6_addr_t *do
     p2p_ext->maxrank = GNRC_RPL_P2P_MAX_RANK;
     p2p_ext->dro_delay = -1;
 
-    trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL,
-                  GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << dodag->dio_min),
-                  dodag->dio_interval_doubl, dodag->dio_redun);
+    trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
+                  (1 << dodag->dio_min), dodag->dio_interval_doubl,
+                  dodag->dio_redun);
 
     return instance;
 }
