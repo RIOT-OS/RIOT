@@ -38,23 +38,6 @@ static int _handle_command_sequence(suit_v4_manifest_t *manifest, nanocbor_value
 static int _common_handler(suit_v4_manifest_t *manifest, int key, nanocbor_value_t *it);
 static int _common_sequence_handler(suit_v4_manifest_t *manifest, int key, nanocbor_value_t *it);
 
-static int _hello_handler(suit_v4_manifest_t *manifest, int key, nanocbor_value_t *it)
-{
-    (void)manifest;
-    (void)key;
-
-    if (nanocbor_get_type(it) == NANOCBOR_TYPE_TSTR) {
-        size_t len = HELLO_HANDLER_MAX_STRLEN;
-        char buf[HELLO_HANDLER_MAX_STRLEN];
-        nanocbor_get_tstr(it, ((const uint8_t **) &buf), &len);
-        return SUIT_OK;
-    }
-    else {
-        LOG_DEBUG("_hello_handler(): unexpected value type: %u\n", nanocbor_get_type(it));
-        return -1;
-    }
-}
-
 static int _validate_uuid(suit_v4_manifest_t *manifest, nanocbor_value_t *it, uuid_t *uuid)
 {
     (void)manifest;
@@ -425,7 +408,7 @@ static int _component_handler(suit_v4_manifest_t *manifest, int key,
 
 /* begin{code-style-ignore} */
 static suit_manifest_handler_t global_handlers[] = {
-    [ 0] = _hello_handler,
+    [ 0] = NULL,
     [ 1] = _version_handler,
     [ 2] = _seq_no_handler,
     [ 3] = _dependencies_handler,
