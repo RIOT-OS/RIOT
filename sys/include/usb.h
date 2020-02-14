@@ -51,7 +51,7 @@ extern "C" {
 #define CONFIG_USB_PID INTERNAL_PERIPHERAL_PID
 #else
 #error Please configure your vendor and product IDs. For development, you may \
-    set CONFIG_USB_VID=0x1209 CONFIG_USB_PID=0x7D01.
+    set USB_VID=${USB_VID_TESTING} USB_PID=${USB_PID_TESTING}.
 #endif
 #endif
 
