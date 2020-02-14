@@ -13,7 +13,6 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup JLink for flashing
 export JLINK_DEVICE := $(MODULE_JLINK_DEVICE)
-include $(RIOTMAKE)/tools/jlink.inc.mk
 
 # include board common
 include $(RIOTBOARD)/common/silabs/Makefile.include
