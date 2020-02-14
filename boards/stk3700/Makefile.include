@@ -12,6 +12,7 @@ ifeq ($(PROGRAMMER),jlink)
   export JLINK_DEVICE := $(CPU_MODEL)
   include $(RIOTMAKE)/tools/jlink.inc.mk
 else ifeq ($(PROGRAMMER),openocd)
+  export OPENOCD_CONFIG := board/efm32.cfg
   include $(RIOTMAKE)/tools/openocd.inc.mk
 endif
 
