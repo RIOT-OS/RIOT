@@ -38,7 +38,7 @@
 /**
  * @brief   Allocate memory for the device descriptors
  */
-static ads101x_t ads101x_devs[ADS101X_NUM];
+ads101x_t ads101x_devs[ADS101X_NUM];
 
 /**
  * @brief   Memory for the SAUL registry entries

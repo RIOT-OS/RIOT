@@ -45,6 +45,10 @@ int ads101x_init(ads101x_t *dev, const ads101x_params_t *params)
     assert(dev && params);
 
     dev->params = *params;
+#if MODULE_ADC_NG
+    dev->ch_numof = ADS101X_CH_NUMOF(params->device);
+    dev->res = ADS101X_RES(params->device) - 1;
+#endif
 
     return _ads101x_init_test(DEV, ADDR);
 }
@@ -216,3 +220,87 @@ int ads101x_set_alert_parameters(const ads101x_alert_t *dev,
 
     return ADS101X_OK;
 }
+
+#if MODULE_ADC_NG
+
+int ads101x_adc_ng_init(void* handle, uint8_t chn, uint8_t res, uint8_t ref)
+{
+    ads101x_t *dev = (ads101x_t *)handle;
+    DEBUG("%s: dev %p, chn %u\n", __func__, dev, chn);
+
+    assert(dev != NULL);
+    assert(res == dev->res);
+
+    if (chn >= dev->ch_numof) {
+        return -ENXIO;
+    }
+
+    uint8_t mux_gain = 0;
+
+    if (dev->params.device == ADS101X_DEV_ADS1013 ||
+        dev->params.device == ADS101X_DEV_ADS1113) {
+        assert(ref == 0);
+        mux_gain = ADS101X_PGA_FSR_2V048;
+    }
+    else {
+        mux_gain = (5 - ref) << 1;
+    }
+
+    switch (chn) {
+        case 0: mux_gain |= ADS101X_AIN0_SINGM; break;
+        case 1: mux_gain |= ADS101X_AIN1_SINGM; break;
+        case 2: mux_gain |= ADS101X_AIN2_SINGM; break;
+        case 3: mux_gain |= ADS101X_AIN3_SINGM; break;
+        default: return -ENXIO;
+    }
+
+    /* set the channel for next conversion */
+    if (ads101x_set_mux_gain(dev, mux_gain) != ADS101X_OK) {
+        return -1;
+    }
+
+    return 0;
+}
+
+int ads101x_adc_ng_single(void *handle, int32_t *dest)
+{
+    ads101x_t *dev = (ads101x_t *)handle;
+    DEBUG("%s: dev %p, dest %p\n", __func__, dev, dest);
+
+    assert(dev != NULL);
+
+    int16_t raw;
+    /* execute one conversion for the selected channel */
+    if (ads101x_read_raw(dev, &raw) != 0) {
+        return -EIO;
+    }
+
+    *dest = raw;
+
+    return 0;
+}
+
+#if (ADC_NG_NUMOF == 1) && MODULE_SAUL
+
+extern ads101x_t ads101x_devs[];
+
+const adc_ng_driver_t ads101x_adc_ng_driver = {
+    .init = ads101x_adc_ng_init,
+    .single = ads101x_adc_ng_single,
+    .res_supported = (1UL << (ADS101X_RES(ADS101X_PARAM_DEVICE) - 2)),
+    .refs = ADS101X_REF_VOL(ADS101X_PARAM_DEVICE),
+    .ref_input_idx = ADC_NG_NO_SUCH_REF,
+    .entropy_bits = 0,
+    .highest_single_ended_channel = ADS101X_CH_NUMOF(ADS101X_PARAM_DEVICE) - 1,
+};
+
+const adc_ng_backend_t adc_ng_backends[ADC_NG_NUMOF] = {
+    {
+        .driver = &ads101x_adc_ng_driver,
+        .handle = &ads101x_devs[0]
+    }
+};
+
+#endif /* (ADC_NG_NUMOF == 1) && MODULE_SAUL */
+
+#endif /* MODULE_ADC_NG */

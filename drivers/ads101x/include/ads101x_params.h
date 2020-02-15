@@ -41,9 +41,12 @@ extern "C" {
 #define ADS101X_PARAM_ADDR       (ADS101X_I2C_ADDRESS)
 #endif
 #ifndef ADS101X_PARAM_MUX_GAIN
-#define ADS101X_PARAM_MUX_GAIN   (ADS101X_AIN0_DIFFM_AIN1 \
-                                  | ADS101X_PGA_FSR_2V048)
+#define ADS101X_PARAM_MUX_GAIN   (ADS101X_AIN0_DIFFM_AIN1 | ADS101X_PGA_FSR_2V048)
 #endif
+#ifndef ADS101X_PARAM_DEVICE
+#define ADS101X_PARAM_DEVICE     (ADS101X_DEV_ADS1115)
+#endif
+
 #ifndef ADS101X_PARAM_ALERT_PIN
 #define ADS101X_PARAM_ALERT_PIN  (GPIO_UNDEF)
 #endif
@@ -55,10 +58,17 @@ extern "C" {
 #endif
 
 #ifndef ADS101X_PARAMS
+#ifndef MODULE_ADC_NG
 #define ADS101X_PARAMS          { .i2c        = ADS101X_PARAM_I2C,        \
                                   .addr       = ADS101X_PARAM_ADDR,       \
                                   .mux_gain   = ADS101X_PARAM_MUX_GAIN }
-#endif
+#else
+#define ADS101X_PARAMS          { .i2c        = ADS101X_PARAM_I2C,        \
+                                  .addr       = ADS101X_PARAM_ADDR,       \
+                                  .mux_gain   = ADS101X_PARAM_MUX_GAIN,   \
+                                  .device     = ADS101X_PARAM_DEVICE }
+#endif /* MODULE_ADC_NG */
+#endif /* ADS101X_PARAMS */
 
 #ifndef ADS101X_ALERT_PARAMS
 #define ADS101X_ALERT_PARAMS    { .i2c        = ADS101X_PARAM_I2C,        \
