@@ -185,7 +185,9 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type)
                 switch (coap_get_type(&pdu)) {
                 case COAP_TYPE_NON:
                 case COAP_TYPE_ACK:
-                    event_timeout_clear(&memo->resp_evt_tmout);
+                    if (memo->resp_evt_tmout.queue) {
+                        event_timeout_clear(&memo->resp_evt_tmout);
+                    }
                     memo->state = GCOAP_MEMO_RESP;
                     if (memo->resp_handler) {
                         memo->resp_handler(memo, &pdu, &remote);
@@ -775,10 +777,16 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
     }
 
     /* set response timeout; may be zero for non-confirmable */
-    if ((memo != NULL) && (timeout > 0)) {
-        event_callback_init(&memo->resp_tmout_cb, _on_resp_timeout, memo);
-        event_timeout_init(&memo->resp_evt_tmout, &_queue, &memo->resp_tmout_cb.super);
-        event_timeout_set(&memo->resp_evt_tmout, timeout);
+    if (memo != NULL) {
+        if (timeout > 0) {
+            event_callback_init(&memo->resp_tmout_cb, _on_resp_timeout, memo);
+            event_timeout_init(&memo->resp_evt_tmout, &_queue,
+                               &memo->resp_tmout_cb.super);
+            event_timeout_set(&memo->resp_evt_tmout, timeout);
+        }
+        else {
+            memset(&memo->resp_evt_tmout, 0, sizeof(event_timeout_t));
+        }
     }
 
     ssize_t res = sock_udp_send(&_sock, buf, len, remote);
