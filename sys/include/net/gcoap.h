@@ -347,6 +347,8 @@
 
 #include <stdint.h>
 
+#include "event/callback.h"
+#include "event/timeout.h"
 #include "net/ipv6/addr.h"
 #include "net/sock/udp.h"
 #include "net/nanocoap.h"
@@ -496,19 +498,6 @@ extern "C" {
 #ifndef CONFIG_GCOAP_NON_TIMEOUT
 #define CONFIG_GCOAP_NON_TIMEOUT       (5000000U)
 #endif
-
-/**
- * @brief   Identifies waiting timed out for a response to a sent message
- */
-#define GCOAP_MSG_TYPE_TIMEOUT  (0x1501)
-
-/**
- * @brief   Identifies a request to interrupt listening for an incoming message
- *          on a sock
- *
- * Allows the event loop to process IPC messages.
- */
-#define GCOAP_MSG_TYPE_INTR     (0x1502)
 
 /**
  * @ingroup net_gcoap_conf
@@ -677,8 +666,8 @@ struct gcoap_request_memo {
     sock_udp_ep_t remote_ep;            /**< Remote endpoint */
     gcoap_resp_handler_t resp_handler;  /**< Callback for the response */
     void *context;                      /**< ptr to user defined context data */
-    xtimer_t response_timer;            /**< Limits wait for response */
-    msg_t timeout_msg;                  /**< For response timer */
+    event_timeout_t resp_evt_tmout;     /**< Limits wait for response */
+    event_callback_t resp_tmout_cb;     /**< Callback for response timeout */
 };
 
 /**

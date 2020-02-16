@@ -50,6 +50,7 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type);
 static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                                          sock_udp_ep_t *remote);
+static void _expire_request(gcoap_request_memo_t *memo);
 static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *pdu,
                            const sock_udp_ep_t *remote);
 static int _find_resource(coap_pkt_t *pdu, const coap_resource_t **resource_ptr,
@@ -184,7 +185,7 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type)
                 switch (coap_get_type(&pdu)) {
                 case COAP_TYPE_NON:
                 case COAP_TYPE_ACK:
-                    xtimer_remove(&memo->response_timer);
+                    event_timeout_clear(&memo->resp_evt_tmout);
                     memo->state = GCOAP_MEMO_RESP;
                     if (memo->resp_handler) {
                         memo->resp_handler(memo, &pdu, &remote);
@@ -209,6 +210,38 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type)
             break;
         default:
             DEBUG("gcoap: illegal code class: %u\n", coap_get_code_class(&pdu));
+        }
+    }
+}
+
+/* Handles response timeout for a request; resend confirmable if needed. */
+static void _on_resp_timeout(void *arg) {
+    gcoap_request_memo_t *memo = (gcoap_request_memo_t *)arg;
+
+    /* no retries remaining */
+    if ((memo->send_limit == GCOAP_SEND_LIMIT_NON) || (memo->send_limit == 0)) {
+        _expire_request(memo);
+    }
+    /* reduce retries remaining, double timeout and resend */
+    else {
+        memo->send_limit--;
+#ifdef CONFIG_GCOAP_NO_RETRANS_BACKOFF
+        unsigned i        = 0;
+#else
+        unsigned i        = COAP_MAX_RETRANSMIT - memo->send_limit;
+#endif
+        uint32_t timeout  = ((uint32_t)COAP_ACK_TIMEOUT << i) * US_PER_SEC;
+#if COAP_RANDOM_FACTOR_1000 > 1000
+        uint32_t end = ((uint32_t)TIMEOUT_RANGE_END << i) * US_PER_SEC;
+        timeout = random_uint32_range(timeout, end);
+#endif
+        event_timeout_set(&memo->resp_evt_tmout, timeout);
+
+        ssize_t bytes = sock_udp_send(&_sock, memo->msg.data.pdu_buf,
+                                      memo->msg.data.pdu_len, &memo->remote_ep);
+        if (bytes <= 0) {
+            DEBUG("gcoap: sock resend failed: %d\n", (int)bytes);
+            _expire_request(memo);
         }
     }
 }
@@ -418,6 +451,34 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
                 break;
             }
         }
+    }
+}
+
+/* Calls handler callback on receipt of a timeout message. */
+static void _expire_request(gcoap_request_memo_t *memo)
+{
+    DEBUG("coap: received timeout message\n");
+    if (memo->state == GCOAP_MEMO_WAIT) {
+        memo->state = GCOAP_MEMO_TIMEOUT;
+        /* Pass response to handler */
+        if (memo->resp_handler) {
+            coap_pkt_t req;
+            if (memo->send_limit == GCOAP_SEND_LIMIT_NON) {
+                req.hdr = (coap_hdr_t *)&memo->msg.hdr_buf[0];   /* for reference */
+            }
+            else {
+                req.hdr = (coap_hdr_t *)memo->msg.data.pdu_buf;
+            }
+            memo->resp_handler(memo, &req, NULL);
+        }
+        if (memo->send_limit != GCOAP_SEND_LIMIT_NON) {
+            *memo->msg.data.pdu_buf = 0;    /* clear resend buffer */
+        }
+        memo->state = GCOAP_MEMO_UNUSED;
+    }
+    else {
+        /* Response already handled; timeout must have fired while response */
+        /* was in queue. */
     }
 }
 
@@ -713,37 +774,21 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
         }
     }
 
-    /* Memos complete; send msg and start timer */
-    ssize_t res = sock_udp_send(&_sock, buf, len, remote);
-
-    /* timeout may be zero for non-confirmable */
-    if ((memo != NULL) && (res > 0) && (timeout > 0)) {
-        /* We assume gcoap_req_send() is called on some thread other than
-         * gcoap's. First, put a message in the mbox for the sock udp object,
-         * which will interrupt listening on the gcoap thread. (When there are
-         * no outstanding requests, gcoap blocks indefinitely in _listen() at
-         * sock_udp_recv().) While the message sent here is outstanding, the
-         * sock_udp_recv() call will be set to a short timeout so the request
-         * timer below, also on the gcoap thread, is processed in a timely
-         * manner. */
-        msg_t mbox_msg;
-        mbox_msg.type          = GCOAP_MSG_TYPE_INTR;
-        mbox_msg.content.value = 0;
-        if (mbox_try_put(&_sock.reg.mbox, &mbox_msg)) {
-            /* start response wait timer on the gcoap thread */
-            memo->timeout_msg.type        = GCOAP_MSG_TYPE_TIMEOUT;
-            memo->timeout_msg.content.ptr = (char *)memo;
-            xtimer_set_msg(&memo->response_timer, timeout, &memo->timeout_msg, _pid);
-        }
-        else {
-            res = 0;
-            DEBUG("gcoap: can't wake up mbox; no timeout for msg\n");
-        }
+    /* set response timeout; may be zero for non-confirmable */
+    if ((memo != NULL) && (timeout > 0)) {
+        event_callback_init(&memo->resp_tmout_cb, _on_resp_timeout, memo);
+        event_timeout_init(&memo->resp_evt_tmout, &_queue, &memo->resp_tmout_cb.super);
+        event_timeout_set(&memo->resp_evt_tmout, timeout);
     }
+
+    ssize_t res = sock_udp_send(&_sock, buf, len, remote);
     if (res <= 0) {
         if (memo != NULL) {
             if (msg_type == COAP_TYPE_CON) {
                 *memo->msg.data.pdu_buf = 0;    /* clear resend buffer */
+            }
+            if (timeout > 0) {
+                event_timeout_clear(&memo->resp_evt_tmout);
             }
             memo->state = GCOAP_MEMO_UNUSED;
         }
