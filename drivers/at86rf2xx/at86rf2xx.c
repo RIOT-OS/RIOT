@@ -92,8 +92,6 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     eui64_t addr_long;
     network_uint16_t addr_short;
 
-    at86rf2xx_hardware_reset(dev);
-
     netdev_ieee802154_reset(&dev->netdev);
 
     /* Reset state machine to ensure a known state */
