@@ -363,13 +363,6 @@ extern "C" {
  * @{
  */
 /**
- * @brief  Size for module message queue
- */
-#ifndef CONFIG_GCOAP_MSG_QUEUE_SIZE
-#define CONFIG_GCOAP_MSG_QUEUE_SIZE    (4)
-#endif
-
-/**
  * @brief   Server port; use RFC 7252 default if not defined
  */
 #ifndef CONFIG_GCOAP_PORT
@@ -480,14 +473,6 @@ extern "C" {
  * @brief   Value for send_limit in request memo when non-confirmable type
  */
 #define GCOAP_SEND_LIMIT_NON    (-1)
-
-/**
- * @ingroup net_gcoap_conf
- * @brief   Time in usec that the event loop waits for an incoming CoAP message
- */
-#ifndef CONFIG_GCOAP_RECV_TIMEOUT
-#define CONFIG_GCOAP_RECV_TIMEOUT      (1 * US_PER_SEC)
-#endif
 
 #ifdef DOXYGEN
 /**
