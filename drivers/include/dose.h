@@ -17,7 +17,7 @@
  * This driver enables RIOT nodes to communicate by Ethernet over a serial bus.
  * This enables them to interact in an easy and cheap manner using a single
  * bus wire with very low hardware requirements: The used microcontrollers just
- * need to feature at least one UART and one GPIO that is able to raise
+ * need to feature at least one UART and one optional GPIO that is able to raise
  * interrupts.
  *
  * Wiring
@@ -31,8 +31,9 @@
  * you could use an IC such as the SN65HVD233.)
  *
  * Basically, UART TX and RX are connected to respective pins of the
- * transceiver. In addition, the RX pin is also connected to the sense GPIO.
- * It is used to detect bus allocation.
+ * transceiver. In addition, the RX pin can also be connected to the sense GPIO.
+ * In this case, the bus allocation can be detected more precisely and
+ * collisions are less likely.
  *
  * How it works
  * ============
@@ -71,8 +72,8 @@ extern "C" {
  * @name    Escape octet definitions
  * @{
  */
-#define DOSE_OCTECT_END          (0xFF)     /**< Magic octet indicating the end of frame */
-#define DOSE_OCTECT_ESC          (0xFE)     /**< Magic octet escaping 0xFF in byte stream */
+#define DOSE_OCTET_END  (0xFF)     /**< Magic octet indicating the end of frame */
+#define DOSE_OCTET_ESC  (0xFE)     /**< Magic octet escaping 0xFF in byte stream */
 /** @} */
 
 /**

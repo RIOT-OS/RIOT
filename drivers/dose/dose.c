@@ -74,8 +74,10 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
         ctx->netdev.event_callback((netdev_t *) ctx, NETDEV_EVENT_ISR);
     }
 
-    /* Enable GPIO interrupt for start bit sensing */
-    gpio_irq_enable(ctx->sense_pin);
+    if (ctx->sense_pin != GPIO_UNDEF) {
+        /* Enable GPIO interrupt for start bit sensing */
+        gpio_irq_enable(ctx->sense_pin);
+    }
 
     /* The timeout will bring us back into IDLE state by a random time.
      * If we entered this state from RECV state, the random time lays
@@ -106,7 +108,7 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
 {
     dose_signal_t rc = DOSE_SIGNAL_NONE;
 
-    if (ctx->state != DOSE_STATE_RECV) {
+    if (ctx->state != DOSE_STATE_RECV && ctx->sense_pin != GPIO_UNDEF) {
         /* We freshly entered this state. Thus, no start bit sensing is required
          * anymore. Disable GPIO IRQs during the transmission. */
         gpio_irq_disable(ctx->sense_pin);
@@ -115,10 +117,10 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
     if (signal == DOSE_SIGNAL_UART) {
         /* We received a new octet */
         int esc = (ctx->flags & DOSE_FLAG_ESC_RECEIVED);
-        if (!esc && ctx->uart_octet == DOSE_OCTECT_ESC) {
+        if (!esc && ctx->uart_octet == DOSE_OCTET_ESC) {
             SETBIT(ctx->flags, DOSE_FLAG_ESC_RECEIVED);
         }
-        else if (!esc && ctx->uart_octet == DOSE_OCTECT_END) {
+        else if (!esc && ctx->uart_octet == DOSE_OCTET_END) {
             SETBIT(ctx->flags, DOSE_FLAG_END_RECEIVED);
             rc = DOSE_SIGNAL_END;
         }
@@ -148,7 +150,7 @@ static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal)
 {
     (void) signal;
 
-    if (ctx->state != DOSE_STATE_SEND) {
+    if (ctx->state != DOSE_STATE_SEND && ctx->sense_pin != GPIO_UNDEF) {
         /* Disable GPIO IRQs during the transmission. */
         gpio_irq_disable(ctx->sense_pin);
     }
@@ -374,8 +376,8 @@ static int send_data_octet(dose_t *ctx, uint8_t c)
     int rc;
 
     /* Escape special octets */
-    if (c == DOSE_OCTECT_ESC || c == DOSE_OCTECT_END) {
-        rc = send_octet(ctx, DOSE_OCTECT_ESC);
+    if (c == DOSE_OCTET_ESC || c == DOSE_OCTET_END) {
+        rc = send_octet(ctx, DOSE_OCTET_ESC);
         if (rc) {
             return rc;
         }
@@ -432,7 +434,7 @@ send:
     }
 
     /* Send END octet */
-    if (send_octet(ctx, DOSE_OCTECT_END)) {
+    if (send_octet(ctx, DOSE_OCTET_END)) {
         goto collision;
     }
 
@@ -550,8 +552,10 @@ void dose_setup(dose_t *ctx, const dose_params_t *params)
     uart_init(ctx->uart, params->baudrate, _isr_uart, (void *) ctx);
 
     ctx->sense_pin = params->sense_pin;
-    gpio_init_int(ctx->sense_pin, GPIO_IN, GPIO_FALLING, _isr_gpio, (void *) ctx);
-    gpio_irq_disable(ctx->sense_pin);
+    if (ctx->sense_pin != GPIO_UNDEF) {
+        gpio_init_int(ctx->sense_pin, GPIO_IN, GPIO_FALLING, _isr_gpio, (void *) ctx);
+        gpio_irq_disable(ctx->sense_pin);
+    }
 
     assert(sizeof(ctx->mac_addr.uint8) == ETHERNET_ADDR_LEN);
     luid_get_eui48(&ctx->mac_addr);
