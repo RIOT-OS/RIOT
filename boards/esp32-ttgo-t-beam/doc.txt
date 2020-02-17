@@ -94,8 +94,8 @@ TTGO T-Beam has the following on-board components:
 
 There are two hardware versions of the board:
 
-- SemTech SX1276 for LoRaWAN communication in the 433 MHz band
-- SemTech SX1278 for LoRaWAN communication in the 868/915 MHz band
+- SemTech SX1278 for LoRaWAN communication in the 433 MHz band
+- SemTech SX1276 for LoRaWAN communication in the 868/915 MHz band
 
 Since many GPIOs are broken out, they can be used for different purposes
 in different applications. For flexibility, some GPIOs might be listed in
