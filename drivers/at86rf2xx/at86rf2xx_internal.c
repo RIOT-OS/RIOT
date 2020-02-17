@@ -50,18 +50,17 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     netdev_ieee802154_reset(&dev->base.netdev);
 
     eui64_t addr_long;
-    /* get an 8-byte ID to use as hardware address */
-    luid_base(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
-    /* modify last byte to make ID unique */
-    luid_get(&addr_long.uint8[IEEE802154_LONG_ADDRESS_LEN - 1], 1);
-    /* make sure we mark the address as non-multicast and not globally unique */
-    addr_long.uint8[0] &= ~(0x01);
-    addr_long.uint8[0] |=  (0x02);
+    network_uint16_t addr_short;
+
+    /* generate EUI-64 and short address */
+    luid_get_eui64(&addr_long);
+    luid_get_short(&addr_short);
+
+
     /* set short and long address */
     at86rf2xx_set_addr_long(dev, &addr_long);
-    at86rf2xx_set_addr_short(dev,
-                             &addr_long.uint16[ARRAY_SIZE(addr_long.uint16) -
-                                               1]);
+    at86rf2xx_set_addr_short(dev, &addr_short);
+
     /* set default options */
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
