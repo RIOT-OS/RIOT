@@ -121,7 +121,7 @@ int __attribute__((used)) sched_run(void)
 
 #ifdef MODULE_MPU_STACK_GUARD
     mpu_configure(
-        1,                                                /* MPU region 1 */
+        2,                                                /* MPU region 2 */
         (uintptr_t)sched_active_thread->stack_start + 31, /* Base Address (rounded up) */
         MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B)   /* Attributes and Size */
     );

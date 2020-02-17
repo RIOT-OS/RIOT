@@ -152,7 +152,7 @@ void reset_handler_default(void)
      * executable. This is the Cortex-M SRAM region used for on-chip RAM.
      */
     mpu_configure(
-        2,                                               /* Region 0 and 1 are used by mpu_stack_guard */
+        0,                                               /* Region 0 (lowest priority) */
         (uintptr_t)&_sram,                               /* RAM base address */
         MPU_ATTR(1, AP_RW_RW, 0, 1, 0, 1, MPU_SIZE_512M) /* Allow read/write but no exec */
     );
@@ -161,7 +161,7 @@ void reset_handler_default(void)
 #ifdef MODULE_MPU_STACK_GUARD
     if (((uintptr_t)&_sstack) != SRAM_BASE) {
         mpu_configure(
-            0,                                              /* MPU region 0 */
+            1,                                              /* MPU region 1 */
             (uintptr_t)&_sstack + 31,                       /* Base Address (rounded up) */
             MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B) /* Attributes and Size */
         );
