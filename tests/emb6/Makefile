@@ -2,9 +2,6 @@
 BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
-# MSP-430 doesn't support C11's atomic functionality yet
-FEATURES_BLACKLIST += arch_msp430
-
 USEPKG += emb6
 
 USEMODULE += emb6_router
