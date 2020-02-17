@@ -1530,6 +1530,7 @@ ISR(TRX24_RX_END_vect, ISR_BLOCK)
  */
 ISR(TRX24_XAH_AMI_vect, ISR_BLOCK)
 {
+    atmega_enter_isr();
 
     DEBUG("TRX24_XAH_AMI\n");
 
@@ -1551,6 +1552,7 @@ ISR(TRX24_XAH_AMI_vect, ISR_BLOCK)
  *
  * Flow Diagram Manual p. 52 / 63
  */
+ISR(TRX24_TX_END_vect, ISR_BLOCK)
 {
     atmega_enter_isr();
 
