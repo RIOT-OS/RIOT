@@ -37,6 +37,7 @@
 #ifndef PERIPH_RTC_H
 #define PERIPH_RTC_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <time.h>
 #include "periph_conf.h"
@@ -168,6 +169,19 @@ uint32_t rtc_mktime(struct tm *t);
  * @param[out] t      the corresponding timestamp
  */
 void rtc_localtime(uint32_t time, struct tm *t);
+
+/**
+ * @brief Verify that a time struct @p t contains valid data.
+ *
+ * @note    This function checks whether the fields of the
+ *          struct @p t are positive and within the bounds set
+ *          by @ref rtc_tm_normalize.
+ *
+ * @param[in] t       The struct to be checked.
+ *
+ * @return            true when valid, false if not
+ */
+bool rtc_tm_valid(const struct tm *t);
 
 #ifdef __cplusplus
 }
