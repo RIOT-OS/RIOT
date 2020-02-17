@@ -326,7 +326,14 @@ int at86rf212b_validate(const at86rf212b_t *dev);
 uint8_t at86rf212b_set_state(at86rf212b_t *dev, uint8_t state);
 
 /**
- * @brief   Reset device
+ * @brief   Perform hard reset
+ *
+ * @param[in] dev           device to be reset
+ */
+void at86rf212b_hardware_reset(at86rf212b_t *dev);
+
+/**
+ * @brief   Perform soft reset
  *
  * @param[in] dev           device to be reset
  */

@@ -103,17 +103,6 @@ uint8_t at86rf233_dbm_to_rxsens(const at86rf233_t *dev, int16_t dbm)
     return _233_dbm_to_rx_sens[dbm];
 }
 
-static
-void at86rf233_hardware_reset(at86rf233_t *dev)
-{
-    gpio_clear(dev->params.base_params.reset_pin);
-    xtimer_usleep(AT86RF2XX_RESET_PULSE_WIDTH);
-    gpio_set(dev->params.base_params.reset_pin);
-    xtimer_usleep(AT86RF2XX_RESET_DELAY);
-    assert(at86rf233_get_status(dev) == AT86RF2XX_STATE_TRX_OFF);
-    dev->base.state = AT86RF2XX_STATE_TRX_OFF;
-}
-
 void at86rf233_setup(at86rf233_t *devs, const at86rf233_params_t *params,
                      uint8_t num)
 {
@@ -177,6 +166,7 @@ uint8_t at86rf233_set_state(at86rf233_t *dev, uint8_t state)
             at86rf233_sleep(dev);
         }
         else if (state == AT86RF2XX_STATE_RESET) {
+            at86rf233_hardware_reset(dev);
             at86rf233_reset(dev);
         }
         else {
@@ -216,11 +206,18 @@ uint8_t at86rf233_set_state(at86rf233_t *dev, uint8_t state)
     return old_state;
 }
 
+void at86rf233_hardware_reset(at86rf233_t *dev)
+{
+    gpio_clear(dev->params.base_params.reset_pin);
+    xtimer_usleep(AT86RF2XX_RESET_PULSE_WIDTH);
+    gpio_set(dev->params.base_params.reset_pin);
+    xtimer_usleep(AT86RF2XX_RESET_DELAY);
+    assert(at86rf233_get_status(dev) == AT86RF2XX_STATE_TRX_OFF);
+    dev->base.state = AT86RF2XX_STATE_TRX_OFF;
+}
+
 void at86rf233_reset(at86rf233_t *dev)
 {
-    /* hardware reset */
-    at86rf233_hardware_reset(dev);
-
     /* soft reset */
     at86rf2xx_reset((at86rf2xx_t *)dev);
 

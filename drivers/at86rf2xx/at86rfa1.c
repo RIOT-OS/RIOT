@@ -107,15 +107,6 @@ uint8_t at86rfa1_dbm_to_rxsens(const at86rfa1_t *dev, int16_t dbm)
     return _231_232_a1_r2_dbm_to_rx_sens[dbm];
 }
 
-static
-void at86rfa1_hardware_reset(at86rfa1_t *dev)
-{
-    *AT86RFA1_REG__TRXPR |= AT86RF2XX_TRXPR_MASK__TRXRST;
-    xtimer_usleep(AT86RF2XX_RESET_DELAY);
-    assert(at86rfa1_get_status(dev) == AT86RF2XX_STATE_TRX_OFF);
-    dev->base.state = AT86RF2XX_STATE_TRX_OFF;
-}
-
 void at86rfa1_setup(at86rfa1_t *dev)
 {
     dev->base.dev_type = AT86RF2XX_DEV_TYPE_AT86RFA1;
@@ -176,6 +167,7 @@ uint8_t at86rfa1_set_state(at86rfa1_t *dev, uint8_t state)
             at86rfa1_sleep(dev);
         }
         else if (state == AT86RF2XX_STATE_RESET) {
+            at86rfa1_hardware_reset(dev);
             at86rfa1_reset(dev);
         }
         else {
@@ -214,11 +206,16 @@ uint8_t at86rfa1_set_state(at86rfa1_t *dev, uint8_t state)
     return old_state;
 }
 
+void at86rfa1_hardware_reset(at86rfa1_t *dev)
+{
+    *AT86RFA1_REG__TRXPR |= AT86RF2XX_TRXPR_MASK__TRXRST;
+    xtimer_usleep(AT86RF2XX_RESET_DELAY);
+    assert(at86rfa1_get_status(dev) == AT86RF2XX_STATE_TRX_OFF);
+    dev->base.state = AT86RF2XX_STATE_TRX_OFF;
+}
+
 void at86rfa1_reset(at86rfa1_t *dev)
 {
-    /* hardware reset */
-    at86rfa1_hardware_reset(dev);
-
     /* soft reset */
     at86rf2xx_reset((at86rf2xx_t *)dev);
 

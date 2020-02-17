@@ -144,6 +144,7 @@ int _init(netdev_t *netdev)
     switch (dev->base.dev_type) {
 #if IS_USED(MODULE_AT86RF212B)
         case AT86RF2XX_DEV_TYPE_AT86RF212B: {
+            at86rf212b_hardware_reset((at86rf212b_t *)dev);
             if ((valid = at86rf212b_validate((at86rf212b_t *)dev)) != 0) {
                 return valid;
             }
@@ -159,6 +160,7 @@ int _init(netdev_t *netdev)
 #endif
 #if IS_USED(MODULE_AT86RF231)
         case AT86RF2XX_DEV_TYPE_AT86RF231: {
+            at86rf231_hardware_reset((at86rf231_t *)dev);
             if ((valid = at86rf231_validate((at86rf231_t *)dev)) != 0) {
                 return valid;
             }
@@ -174,6 +176,7 @@ int _init(netdev_t *netdev)
 #endif
 #if IS_USED(MODULE_AT86RF232)
         case AT86RF2XX_DEV_TYPE_AT86RF232: {
+            at86rf232_hardware_reset((at86rf232_t *)dev);
             if ((valid = at86rf232_validate((at86rf232_t *)dev)) != 0) {
                 return valid;
             }
@@ -189,6 +192,7 @@ int _init(netdev_t *netdev)
 #endif
 #if IS_USED(MODULE_AT86RF233)
         case AT86RF2XX_DEV_TYPE_AT86RF233: {
+            at86rf233_hardware_reset((at86rf233_t *)dev);
             if ((valid = at86rf233_validate((at86rf233_t *)dev)) != 0) {
                 return valid;
             }
@@ -204,6 +208,7 @@ int _init(netdev_t *netdev)
 #endif
 #if IS_USED(MODULE_AT86RFA1)
         case AT86RF2XX_DEV_TYPE_AT86RFA1: {
+            at86rfa1_hardware_reset((at86rfa1_t *)dev);
             if ((valid = at86rfa1_validate((at86rfa1_t *)dev)) != 0) {
                 return valid;
             }
@@ -219,6 +224,7 @@ int _init(netdev_t *netdev)
 #endif
 #if IS_USED(MODULE_AT86RFR2)
         case AT86RF2XX_DEV_TYPE_AT86RFR2: {
+            at86rfr2_hardware_reset((at86rfr2_t *)dev);
             if ((valid = at86rfr2_validate((at86rfr2_t *)dev)) != 0) {
                 return valid;
             }

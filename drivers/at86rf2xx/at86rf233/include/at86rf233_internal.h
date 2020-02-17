@@ -294,7 +294,14 @@ int at86rf233_validate(const at86rf233_t *dev);
 uint8_t at86rf233_set_state(at86rf233_t *dev, uint8_t state);
 
 /**
- * @brief   Reset device
+ * @brief   Perform hard reset
+ *
+ * @param[in] dev           device to be reset
+ */
+void at86rf233_hardware_reset(at86rf233_t *dev);
+
+/**
+ * @brief   Perform soft reset
  *
  * @param[in] dev           device to be reset
  */

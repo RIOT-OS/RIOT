@@ -259,7 +259,14 @@ int at86rfr2_validate(const at86rfr2_t *dev);
 uint8_t at86rfr2_set_state(at86rfr2_t *dev, uint8_t state);
 
 /**
- * @brief   Reset device
+ * @brief   Perform hard reset
+ *
+ * @param[in] dev           device to be reset
+ */
+void at86rfr2_hardware_reset(at86rfr2_t *dev);
+
+/**
+ * @brief   Perform soft reset
  *
  * @param[in] dev           device to be reset
  */
