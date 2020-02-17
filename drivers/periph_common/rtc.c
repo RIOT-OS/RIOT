@@ -231,3 +231,34 @@ int rtc_tm_compare(const struct tm *a, const struct tm *b)
 
     return 0;
 }
+
+bool rtc_tm_valid(const struct tm *t)
+{
+    if (t->tm_sec < 0) {
+        return false;
+    }
+
+    if (t->tm_min < 0) {
+        return false;
+    }
+
+    if (t->tm_hour < 0) {
+        return false;
+    }
+
+    if (t->tm_mday < 0) {
+        return false;
+    }
+
+    if (t->tm_mon < 0) {
+        return false;
+    }
+
+    if (t->tm_year < 0) {
+        return false;
+    }
+
+    struct tm norm = *t;
+    rtc_tm_normalize(&norm);
+    return rtc_tm_compare(t, &norm) == 0;
+}
