@@ -1458,12 +1458,25 @@ void _isr(netdev_t *netdev)
             /* check for more pending TX calls and return to idle state if
              * there are none */
             assert(dev->base.pending_tx != 0);
-            if ((--dev->base.pending_tx) == 0) {
-                _set_state(dev, dev->base.idle_state);
-                DEBUG("[at86rf2xx] return to idle state 0x%x\n",
-                      dev->base.idle_state);
-            }
+            /* Radio is idle, any TX transaction is done */
+            dev->base.pending_tx = 0;
+            _set_state(dev, dev->base.idle_state);
+            DEBUG("[at86rf2xx] return to idle state 0x%x\n", dev->base.idle_state);
             _isr_send_complete(dev, trac_status);
+        }
+        /* Only the case when an interrupt was received and the radio is busy
+         * with a next PDU transmission when _isr is called.
+         * dev->pending == 1 means a receive and immediately a send happened.
+         * The receive is discarded as the send already overwrote the internal
+         * buffer.
+         * dev->pending == 2 means two transmits occurred and this is the isr for
+         * the first.
+         */
+        else if (state == AT86RF2XX_STATE_BUSY_TX_ARET) {
+            if (dev->base.pending_tx > 1) {
+                dev->base.pending_tx--;
+                _isr_send_complete(dev, trac_status);
+            }
         }
     }
 }
