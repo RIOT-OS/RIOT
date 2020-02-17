@@ -46,8 +46,8 @@
  * - South Korea: KR920-923 (from 920.9MHz to 923.3MHz exactly)
  *
  * For more information on Semtech SX1272 and SX1276 modules see:
- * - [SX1272/73 datasheet](https://www.semtech.com/uploads/documents/sx1272.pdf)
- * - [SX1276/77/78/79 datasheet](https://www.semtech.com/uploads/documents/DS_SX1276-7-8-9_W_APP_V5.pdf)
+ * - [SX1272/73 datasheet](https://semtech.my.salesforce.com/sfc/p/E0000000JelG/a/440000001NCE/v_VBhk1IolDgxwwnOpcS_vTFxPfSEPQbuneK3mWsXlU)
+ * - [SX1276/77/78/79 datasheet](https://semtech.my.salesforce.com/sfc/p/E0000000JelG/a/2R0000001OKs/Bs97dmPXeatnbdoJNVMIDaKDlQz8q1N_gxDcgqi7g2o)
  *
  * @{
  *
