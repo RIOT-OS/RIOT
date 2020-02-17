@@ -1330,6 +1330,78 @@ inline uint8_t _get_irq_status(at86rf2xx_t *dev)
 }
 
 static
+void _isr_send_complete(at86rf2xx_t *dev, uint8_t trac_status) {
+    netdev_t *netdev = &dev->base.netdev.netdev;
+    switch (dev->base.dev_type) {
+        default:
+            break;
+#if IS_USED(MODULE_AT86RF232)
+        case AT86RF2XX_DEV_TYPE_AT86RF232:
+            ((at86rf232_t *)dev)->tx_retries =
+                at86rf232_get_frame_retries((at86rf232_t *)dev);
+            break;
+#endif
+#if IS_USED(MODULE_AT86RF233)
+        case AT86RF2XX_DEV_TYPE_AT86RF233:
+            ((at86rf233_t *)dev)->tx_retries =
+                at86rf233_get_frame_retries((at86rf233_t *)dev);
+            break;
+#endif
+    }
+
+    DEBUG("[at86rf2xx] EVT - TX_END\n");
+
+    switch (trac_status) {
+#if IS_USED(MODULE_OPENTHREAD)
+        case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
+            if (netdev->event_callback &&
+                (dev->base.flags & AT86RF2XX_OPT_TELL_TX_END)) {
+                netdev->event_callback(netdev,
+                                        NETDEV_EVENT_TX_COMPLETE);
+            }
+            DEBUG("[at86rf2xx] TX SUCCESS\n");
+            break;
+        case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
+            if (netdev->event_callback &&
+                (dev->base.flags & AT86RF2XX_OPT_TELL_TX_END)) {
+                netdev->event_callback(netdev,
+                                        NETDEV_EVENT_TX_COMPLETE_DATA_PENDING);
+            }
+            DEBUG("[at86rf2xx] TX SUCCESS DATA PENDING\n");
+            break;
+#else
+        case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
+        case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
+            if (netdev->event_callback &&
+                (dev->base.flags & AT86RF2XX_OPT_TELL_TX_END)) {
+                netdev->event_callback(netdev,
+                                        NETDEV_EVENT_TX_COMPLETE);
+            }
+            DEBUG("[at86rf2xx] TX SUCCESS\n");
+            break;
+#endif
+        case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
+            if (netdev->event_callback &&
+                (dev->base.flags & AT86RF2XX_OPT_TELL_TX_END)) {
+                netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
+            }
+            DEBUG("[at86rf2xx] TX NO_ACK\n");
+            break;
+        case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
+            if (netdev->event_callback &&
+                (dev->base.flags & AT86RF2XX_OPT_TELL_TX_END)) {
+                netdev->event_callback(netdev,
+                                        NETDEV_EVENT_TX_MEDIUM_BUSY);
+            }
+            DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
+            break;
+        default:
+            DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",
+                    trac_status >> 5);
+    }
+}
+
+static
 void _isr(netdev_t *netdev)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
@@ -1391,31 +1463,7 @@ void _isr(netdev_t *netdev)
                 DEBUG("[at86rf2xx] return to idle state 0x%x\n",
                       dev->base.idle_state);
             }
-            switch (dev->base.dev_type) {
-                default:
-                    break;
-#if IS_USED(MODULE_AT86RF232)
-                case AT86RF2XX_DEV_TYPE_AT86RF232:
-                    ((at86rf232_t *)dev)->tx_retries =
-                        at86rf232_get_frame_retries((at86rf232_t *)dev);
-                    break;
-#endif
-#if IS_USED(MODULE_AT86RF233)
-                case AT86RF2XX_DEV_TYPE_AT86RF233:
-                    ((at86rf233_t *)dev)->tx_retries =
-                        at86rf233_get_frame_retries((at86rf233_t *)dev);
-                    break;
-#endif
-            }
-
-            DEBUG("[at86rf2xx] EVT - TX_END\n");
-
-            switch (trac_status) {
-#if IS_USED(MODULE_OPENTHREAD)
-                case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
-                    DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",
-                          trac_status >> 5);
-            }
+            _isr_send_complete(dev, trac_status);
         }
     }
 }
