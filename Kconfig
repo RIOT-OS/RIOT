@@ -13,6 +13,8 @@ osource "$(KCONFIG_GENERATED_DEPENDENCIES)"
 orsource "$(RIOTBOARD)/$(BOARD)/Kconfig"
 orsource "$(RIOTCPU)/$(CPU)/Kconfig"
 
+rsource "$(RIOTBOARD)/Kconfig"
+
 # The application may declare new symbols as well
 osource "$(APPDIR)/Kconfig"
 
