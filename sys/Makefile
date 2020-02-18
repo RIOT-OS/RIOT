@@ -67,9 +67,6 @@ endif
 ifneq (,$(filter cipher_modes,$(USEMODULE)))
   DIRS += crypto/modes
 endif
-ifneq (,$(filter nhdp,$(USEMODULE)))
-  DIRS += net/routing/nhdp
-endif
 ifneq (,$(filter fib,$(USEMODULE)))
   DIRS += net/network_layer/fib
 endif
