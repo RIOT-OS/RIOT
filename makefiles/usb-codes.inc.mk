@@ -16,8 +16,8 @@ else
 endif
 
 # Exported for the benefit of Kconfig
-export USB_VID_TESTING = 1209
-export USB_PID_TESTING = 7D01
+USB_VID_TESTING = 1209
+USB_PID_TESTING = 7D01
 usb_id_check:
 	@if grep --quiet --ignore-case "^$(USB_VID) $(USB_PID)$$" $(RIOTBASE)/dist/usb_id_testing; then \
 		$(COLOR_ECHO) "$(COLOR_RED)Private testing pid.codes USB VID/PID used!, do not use it outside of test environments!$(COLOR_RESET)" 1>&2 ; \
