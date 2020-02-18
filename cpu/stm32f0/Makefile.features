@@ -1,3 +1,6 @@
+CPU_ARCH = cortex-m0
+CPU_FAM  = stm32f0
+
 ifeq (,$(filter nucleo-f031k6,$(BOARD)))
   FEATURES_PROVIDED += periph_flashpage
   FEATURES_PROVIDED += periph_flashpage_raw
