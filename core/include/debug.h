@@ -33,12 +33,6 @@ extern "C" {
 #endif
 
 /**
- * @def ENABLE_DEBUG
- * @brief   This macro can be defined as 0 or other on a file-based level.
- *          @ref DEBUG() will generate output only if ENABLE_DEBUG is non-zero.
- */
-
-/**
  * @def DEBUG_PRINT
  *
  * @brief Print debug information if the calling thread stack is large enough
@@ -67,7 +61,11 @@ extern "C" {
  * @name Debugging defines
  * @{
  */
-#ifndef ENABLE_DEBUG
+/**
+ * @brief   This macro can be defined as 0 or other on a file-based level.
+ *          @ref DEBUG() will generate output only if ENABLE_DEBUG is non-zero.
+ */
+#if !defined(ENABLE_DEBUG) || defined(DOXYGEN)
 #define ENABLE_DEBUG (0)
 #endif
 
