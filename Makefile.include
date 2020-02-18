@@ -1,5 +1,7 @@
 MATCH_MAKE_VERSION = 4.%
 
+MAKEFLAGS += --no-builtin-rules
+
 ifeq (,$(filter $(MATCH_MAKE_VERSION),$(MAKE_VERSION)))
   $(error GNU Make $(MAKE_VERSION) is not supported by RIOT since release \
       2020.01. Please upgrade your system to use GNU Make \
