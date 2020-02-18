@@ -30,6 +30,11 @@ KCONFIG_USER_CONFIG = $(APPDIR)/user.config
 # one that is used to generate the 'riotconf.h' header
 KCONFIG_MERGED_CONFIG = $(GENERATED_DIR)/merged.config
 
+# This is the output of the generated configuration. It always mirrors the
+# content of KCONFIG_GENERATED_AUTOCONF_HEADER_C, and it is used to load
+# configuration symbols to the build system.
+KCONFIG_OUT_CONFIG = $(GENERATED_DIR)/out.config
+
 # Include configuration symbols if available, only when not cleaning. This
 # allows to check for Kconfig symbols in makefiles.
 # Make tries to 'remake' all included files
@@ -39,7 +44,7 @@ KCONFIG_MERGED_CONFIG = $(GENERATED_DIR)/merged.config
 # This has the side effect of requiring a Kconfig user to run 'clean' on a
 # separate call (e.g. 'make clean && make all'), to get the symbols correctly.
 ifneq ($(CLEAN),clean)
-  -include $(KCONFIG_MERGED_CONFIG)
+  -include $(KCONFIG_OUT_CONFIG)
 endif
 
 # Flag that indicates that the configuration has been edited
@@ -116,6 +121,9 @@ $(KCONFIG_MERGED_CONFIG): $(MERGECONFIG) $(KCONFIG_GENERATED_DEPENDENCIES) FORCE
 
 # Build a header file with all the Kconfig configurations. genconfig will avoid
 # any unnecessary rewrites of the header file if no configurations changed.
-$(KCONFIG_GENERATED_AUTOCONF_HEADER_C): $(KCONFIG_GENERATED_DEPENDENCIES) $(GENCONFIG) $(KCONFIG_MERGED_CONFIG) FORCE
-	$(Q)KCONFIG_CONFIG=$(KCONFIG_MERGED_CONFIG) $(GENCONFIG) --header-path $@ $(KCONFIG)
+$(KCONFIG_OUT_CONFIG) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) &: $(KCONFIG_GENERATED_DEPENDENCIES) $(GENCONFIG) $(KCONFIG_MERGED_CONFIG) FORCE
+	$(Q) \
+	KCONFIG_CONFIG=$(KCONFIG_MERGED_CONFIG) $(GENCONFIG) \
+	  --config-out=$(KCONFIG_OUT_CONFIG) \
+	  --header-path $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) $(KCONFIG)
 endif
