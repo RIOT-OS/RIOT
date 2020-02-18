@@ -9,17 +9,15 @@ Designed and produced by PHYTEC Messtechnik GmbH, D-55129 Mainz.
 contact@phytec.de
 
 ## Overview
-The [Phytec IoT wiki](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki)
-describes the phyWAVE module and the phyNODE board more
-detailed. The links below will guide you directly to the corresponding chapter:
- * [Overview](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/)
- * [Introduction](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/Introduction)
- * Hardware descriptions for the
-[phyWAVE](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/phyWAVE-KW2x-Characteristics)
-and the
-[phyNODE](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/phyNODE-Characteristics)
- * [Toolchain, build and debug Information](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/RIOT-getting-started#toolchain-summary)
- * [A detailed step-by-step Guide that explains how to set up the Environment](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/RIOT-getting-started#step-by-step-installation-guide)
+
+The phyNODE evaluation board consists of a [phyWAVE](https://www.phytec.de/produkte/internet-of-things/phywave/)
+module mounted on a common PCB with several sensor and actuator modules.
+The board provides 2 USB ports. The one next to the white imprint *cmsis-dap*
+is meant for development (debug and flash). The second one, next to the golden
+*PHYTEC* imprint, is connected to the USB peripheral of the MCU and may be used
+by a firmware (currently not supported).
+
+
 The implementation status of the phyWAVE and phyNODE peripherals are listed
 below. You can find links to the corresponding Pull Requests which may give you
 a code reference.
@@ -27,11 +25,10 @@ a code reference.
 <img src="https://raw.githubusercontent.com/jremmert-phytec-iot/Pictures_Phytec_IOT/master/EvalBoard_3.png" width="800" />
 phyNODE board with equipped phyWAVE-KW2x processor/radio-module.
 
-### Details
-The PCB-pieces with the mounted sensors can be separated from the evaluation
-board to capture sensor values from specific spatial points.
+@note The PCB-pieces with the mounted sensors can be separated from the
+      evaluation board to capture sensor values from specific spatial points.
 
-### Pinout Reference
+## Pinout Reference
 
 The board features an Arduino like header connector to mount shields. The
 spacing of the 4 pin rows is a bit offset, thus shields might not fit perfectly.
