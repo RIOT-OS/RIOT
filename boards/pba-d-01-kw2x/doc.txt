@@ -86,5 +86,5 @@ The actual pin configuration of the board for RIOT can be found in
 | Magnetometer   | [MAG3110FCR1](http://www.nxp.com/products/sensors/magnetometers/sample-data-sets-for-inertial-and-magnetic-sensors/freescale-high-accuracy-3d-magnetometer:MAG3110)   | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2121) |
 | Light Sensor   | [TCS3772](https://ams.com/jpn/content/download/291143/1065677/file/TCS3772_Datasheet_EN_v1.pdf)   | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/3135) |
 | IR-Termopile Sensor    | [TMP006](http://www.ti.com/product/TMP006)    |yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2148) |
-| Capacitive Button  | PCB   | no        | planned |
+| Capacitive Button  | PCB   | yes        | [mainline](https://github.com/RIOT-OS/RIOT/pull/7147) |
  */
