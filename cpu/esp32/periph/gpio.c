@@ -537,11 +537,6 @@ int8_t gpio_is_rtcio (gpio_t pin)
     return _gpio_to_rtc[pin];
 }
 
-int gpio_config_sleep_mode (gpio_t pin, bool mode, bool input)
-{
-    return rtcio_config_sleep_mode (pin, mode, input);
-}
-
 int gpio_set_direction(gpio_t pin, gpio_mode_t mode)
 {
     /* TODO implementation, for the moment we simply initialize the GPIO */

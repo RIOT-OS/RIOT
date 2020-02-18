@@ -48,17 +48,7 @@ void gpio_pullup_dis (gpio_t pin);
 int8_t gpio_is_rtcio (gpio_t pin);
 
 /**
- * @brief   Configure sleep mode for an GPIO pin if the pin is an RTCIO pin
- * @param   pin     GPIO pin
- * @param   mode    active in sleep mode if true
- * @param   input   as input if true, as output otherwise
- * @return  0 on success
- * @return -1 on invalid pin
- */
-int gpio_config_sleep_mode (gpio_t pin, bool sleep_mode, bool input);
-
-/**
- * @brief   GPIO set direction init the pin calling gpio_init
+ * @brief   Set the direction of a pin (initializes the pin calling gpio_init)
  * @param   pin     GPIO pin
  * @param   mode    active in sleep mode if true
  * @return  0 on success
