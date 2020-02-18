@@ -24,7 +24,7 @@
 #
 # And when comparing two revisions, include the revision in the file names
 
-.PHONY: dependency-debug
+.PHONY: dependency-debug dependency-debug-features-provided-kconfig
 # Only generate the dependencies when the board is not disabled
 # This will allow comparing with the output of `info-boards-supported` more easily
 dependency-debug:
@@ -34,6 +34,17 @@ ifneq (,$(filter-out $(BOARD_BLACKLIST),$(filter $(if $(BOARD_WHITELIST),$(BOARD
 else
 	@echo Skipping $(BOARD) is not whitelisted or blacklisted
 endif
+
+# Generate a list of features for an specific board from Kconfig symbols. Make
+# sure that SHOULD_RUN_KCONFIG variable is set
+dependency-debug-features-provided-kconfig: $(KCONFIG_OUT_CONFIG)
+	@for i in $(sort $(FEATURES_PROVIDED_KCONFIG)); do echo $$i; done
+
+# Variable to debug modeled features in Kconfig files. As a convention features
+# are represented by symbols with the `HAS_` prefix (so
+# FEATURES_PROVIDED += periph_gpio would be HAS_PERIPH_GPIO). This filters
+# all the generated symbols beginning with that prefix.
+FEATURES_PROVIDED_KCONFIG = $(call lowercase,$(patsubst CONFIG_HAS_%,%,$(filter CONFIG_HAS_%, $(.VARIABLES))))
 
 DEPENDENCY_DEBUG_OUTPUT_DIR ?= $(CURDIR)
 
