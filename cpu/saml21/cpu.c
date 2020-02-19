@@ -119,7 +119,7 @@ void cpu_init(void)
 
     /* set OSC16M to 16MHz */
     OSCCTRL->OSC16MCTRL.bit.FSEL = 3;
-    OSCCTRL->OSC16MCTRL.bit.ONDEMAND = 0;
+    OSCCTRL->OSC16MCTRL.bit.ONDEMAND = 1;
     OSCCTRL->OSC16MCTRL.bit.RUNSTDBY = 0;
 
     _osc32k_setup();
