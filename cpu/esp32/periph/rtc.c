@@ -101,21 +101,19 @@ static void IRAM_ATTR _rtc_timer_handler(void* arg);
 
 void rtc_init(void)
 {
-    uint64_t _rtc_time_us = _rtc_time_to_us(_rtc_get_time_raw());
+    uint64_t _rtc_time = _rtc_get_time_raw();
+    uint64_t _rtc_time_us = _rtc_time_to_us(_rtc_time);
 
     if (_rtc_time_init == 0 && _rtc_time_init_us == 0) {
         /* only set it new, if it was not set before */
-        _rtc_time_init = _rtc_get_time_raw();
+        _rtc_time_init = _rtc_time;
         _rtc_time_init_us = _rtc_time_us;
-        _sys_time_off_us = 0;
 
         DEBUG("%s saved rtc_init=%lld rtc_init_us=%lld\n",
               __func__, _rtc_time_init, _rtc_time_init_us);
 
     }
-    else {
-        _sys_time_off_us = _rtc_time_us - _rtc_time_set_us;
-    }
+    _sys_time_off_us = _rtc_time_us - _rtc_time_set_us - system_get_time_64();
     _sys_time_set_us = 0;
 }
 
