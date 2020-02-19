@@ -111,6 +111,33 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
+/**
+ * @name    PDM configuration
+ * @{
+ */
+#ifndef PDM_DIN_PIN
+/**
+ * @brief   GPIO pin for the data line
+ */
+#  define PDM_DIN_PIN GPIO_PIN(0, 0)
+#endif
+
+#ifndef PDM_CLK_PIN
+/**
+ * @brief   GPIO pin for the clock
+ */
+#  define PDM_CLK_PIN GPIO_PIN(0, 1)
+#endif
+
+/**
+ * @brief   PDM pin configuration
+ */
+static const pdm_conf_t pdm_config = {
+    .din_pin = PDM_DIN_PIN,
+    .clk_pin = PDM_CLK_PIN,
+};
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
