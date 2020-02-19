@@ -25,12 +25,21 @@
 #include "soc/io_mux_reg.h"
 #include "soc/gpio_sig_map.h"
 
-#ifndef DOXYGEN
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @brief   Current an output pin can drive in active and sleep modes
+ */
+typedef enum {
+    GPIO_DRIVE_5  = 0,    /**<  5 mA */
+    GPIO_DRIVE_10 = 1,    /**< 10 mA */
+    GPIO_DRIVE_20 = 2,    /**< 20 mA (default) */
+    GPIO_DRIVE_30 = 2,    /**< 30 mA */
+} gpio_drive_strength_t;
+
+#ifndef DOXYGEN
 /**
  * @brief   Table of GPIO to IOMUX register mappings
  */
@@ -62,9 +71,29 @@ int gpio_set_direction(gpio_t pin, gpio_mode_t mode);
 void gpio_matrix_in (uint32_t gpio, uint32_t signal_idx, bool inv);
 void gpio_matrix_out(uint32_t gpio, uint32_t signal_idx, bool out_inv, bool oen_inv);
 
+#endif /* DOXYGEN */
+
+/**
+ * @brief   Set the drive-strength of an output-capable pin
+ *
+ * Sets the drive-strength for an output-capable pin in active and sleep modes.
+ * The default drive-strength is GPIO_DRIVE_20 (20 mA).
+ *
+ * @param   pin     GPIO pin
+ * @param   drive   drive-strength
+ *                  GPIO_DRIVE_5 for 5 mA
+ *                  GPIO_DRIVE_10 for 10 mA
+ *                  GPIO_DRIVE_20 for 20 mA (default)
+ *                  GPIO_DRIVE_30 for 30 mA
+ * @pre     pin is an output-capable pin
+ * @post    an assertion blows up if the pin is not output-capable
+ * @return  0 on success
+ *         -1 on error
+ */
+int gpio_set_drive_capability(gpio_t pin, gpio_drive_strength_t drive);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* DOXYGEN */
 #endif /* GPIO_ARCH_H */

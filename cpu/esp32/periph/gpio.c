@@ -153,28 +153,29 @@ struct _rtc_gpio_t {
     uint8_t  mux;      /**< mux io/rtc bit [0..31] in the register, 32 - no mux */
     uint8_t  pullup;   /**< pullup bit [0..31] in the register, 32 - no pullup */
     uint8_t  pulldown; /**< pulldown bit [0..31] in the register, 32 - no pulldown */
+    uint8_t  drive;    /**< drive strength start bit [0..30] in the register */
 };
 
 /* Table of RTCIO GPIO pins information */
 static const struct _rtc_gpio_t _rtc_gpios[] = {
-    {  0, RTC_IO_SENSOR_PADS_REG, 27, 32, 32 }, /* rtc0 (gpio36) - no pullup/pulldown */
-    {  1, RTC_IO_SENSOR_PADS_REG, 26, 32, 32 }, /* rtc1 (gpio37) - no pullup/pulldown */
-    {  2, RTC_IO_SENSOR_PADS_REG, 25, 32, 32 }, /* rtc2 (gpio38) - no pullup/pulldown */
-    {  3, RTC_IO_SENSOR_PADS_REG, 24, 32, 32 }, /* rtc3 (gpio39) - no pullup/pulldown */
-    {  4, RTC_IO_ADC_PAD_REG, 29, 32, 32 },     /* rtc4 (gpio34) - no pullup/pulldown */
-    {  5, RTC_IO_ADC_PAD_REG, 28, 32, 32 },     /* rtc5 (gpio35) - no pullup/pulldown */
-    {  6, RTC_IO_PAD_DAC1_REG, 17, 27, 28 },    /* rtc6 (gpio25) */
-    {  7, RTC_IO_PAD_DAC2_REG, 17, 27, 28 },    /* rtc7 (gpio26) */
-    {  8, RTC_IO_XTAL_32K_PAD_REG, 18, 27, 28 },/* rtc8 (gpio33) */
-    {  9, RTC_IO_XTAL_32K_PAD_REG, 17, 22, 23 },/* rtc9 (gpio32) */
-    { 10, RTC_IO_TOUCH_PAD0_REG, 19, 27, 28 },  /* rtc10 (gpio4) */
-    { 11, RTC_IO_TOUCH_PAD1_REG, 19, 27, 28 },  /* rtc11 (gpio0) */
-    { 12, RTC_IO_TOUCH_PAD2_REG, 19, 27, 28 },  /* rtc12 (gpio2) */
-    { 13, RTC_IO_TOUCH_PAD3_REG, 19, 27, 28 },  /* rtc13 (gpio15) */
-    { 14, RTC_IO_TOUCH_PAD4_REG, 19, 27, 28 },  /* rtc14 (gpio13) */
-    { 15, RTC_IO_TOUCH_PAD5_REG, 19, 27, 28 },  /* rtc15 (gpio12) */
-    { 16, RTC_IO_TOUCH_PAD6_REG, 19, 27, 28 },  /* rtc16 (gpio14) */
-    { 17, RTC_IO_TOUCH_PAD7_REG, 19, 27, 28 }   /* rtc17 (gpio27) */
+    {  0, RTC_IO_SENSOR_PADS_REG, 27, 32, 32, 32 }, /* rtc0 (gpio36) SENSOR_VP/SENSE 1 */
+    {  1, RTC_IO_SENSOR_PADS_REG, 26, 32, 32, 32 }, /* rtc1 (gpio37) SENSOR_CAPP/SENSE 2 */
+    {  2, RTC_IO_SENSOR_PADS_REG, 25, 32, 32, 32 }, /* rtc2 (gpio38) SENSOR_CAPN/SENSE 3 */
+    {  3, RTC_IO_SENSOR_PADS_REG, 24, 32, 32, 32 }, /* rtc3 (gpio39) SENSOR_VN/SENSE 4*/
+    {  4, RTC_IO_ADC_PAD_REG, 29, 32, 32, 32 },     /* rtc4 (gpio34) VDET_1/ADC1 */
+    {  5, RTC_IO_ADC_PAD_REG, 28, 32, 32, 32 },     /* rtc5 (gpio35) VDET_2/ADC2 */
+    {  6, RTC_IO_PAD_DAC1_REG, 17, 27, 28, 30 },    /* rtc6 (gpio25) DAC1 */
+    {  7, RTC_IO_PAD_DAC2_REG, 17, 27, 28, 30 },    /* rtc7 (gpio26) DAC1 */
+    {  8, RTC_IO_XTAL_32K_PAD_REG, 18, 27, 28, 30 },/* rtc8 (gpio33) XTAL_32K_N */
+    {  9, RTC_IO_XTAL_32K_PAD_REG, 17, 22, 23, 25 },/* rtc9 (gpio32) XTAL_32K_P */
+    { 10, RTC_IO_TOUCH_PAD0_REG, 19, 27, 28, 29 },  /* rtc10 (gpio4) TOUCH0 */
+    { 11, RTC_IO_TOUCH_PAD1_REG, 19, 27, 28, 29 },  /* rtc11 (gpio0) TOUCH1 */
+    { 12, RTC_IO_TOUCH_PAD2_REG, 19, 27, 28, 29 },  /* rtc12 (gpio2) TOUCH2 */
+    { 13, RTC_IO_TOUCH_PAD3_REG, 19, 27, 28, 29 },  /* rtc13 (gpio15) TOUCH3 */
+    { 14, RTC_IO_TOUCH_PAD4_REG, 19, 27, 28, 29 },  /* rtc14 (gpio13) TOUCH4 */
+    { 15, RTC_IO_TOUCH_PAD5_REG, 19, 27, 28, 29 },  /* rtc15 (gpio12) TOUCH5 */
+    { 16, RTC_IO_TOUCH_PAD6_REG, 19, 27, 28, 29 },  /* rtc16 (gpio14) TOUCH6 */
+    { 17, RTC_IO_TOUCH_PAD7_REG, 19, 27, 28, 29 }   /* rtc17 (gpio27) TOUCH7 */
 };
 
 /* Table of the usage type of each GPIO pin */
@@ -541,4 +542,20 @@ int gpio_set_direction(gpio_t pin, gpio_mode_t mode)
 {
     /* TODO implementation, for the moment we simply initialize the GPIO */
     return gpio_init(pin, mode);
+}
+
+int gpio_set_drive_capability(gpio_t pin, gpio_drive_strength_t drive)
+{
+    assert(pin < GPIO_PIN_NUMOF);
+    assert(pin < GPIO34);
+    /* TODO */
+
+    const struct _rtc_gpio_t* rtc = (_gpio_to_rtc[pin] != -1) ?
+                                     &_rtc_gpios[_gpio_to_rtc[pin]] : NULL;
+
+    SET_PERI_REG_BITS(_gpio_to_iomux_reg, FUN_DRV_V, drive, FUN_DRV_S);
+    if (rtc) {
+        SET_PERI_REG_BITS(rtc->reg, 0x3, drive, rtc->drive);
+    }
+    return 0;
 }
