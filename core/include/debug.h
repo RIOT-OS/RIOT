@@ -33,12 +33,6 @@ extern "C" {
 #endif
 
 /**
- * @def ENABLE_DEBUG
- * @brief   This macro can be defined as 0 or other on a file-based level.
- *          @ref DEBUG() will generate output only if ENABLE_DEBUG is non-zero.
- */
-
-/**
  * @def DEBUG_PRINT
  *
  * @brief Print debug information if the calling thread stack is large enough
@@ -51,14 +45,15 @@ extern "C" {
 #ifdef DEVELHELP
 #include "cpu_conf.h"
 #define DEBUG_PRINT(...) \
-    do { \
-        if ((sched_active_thread == NULL) || (sched_active_thread->stack_size >= THREAD_EXTRA_STACKSIZE_PRINTF)) { \
-            printf(__VA_ARGS__); \
-        } \
-        else { \
-            puts("Cannot debug, stack too small. Consider using DEBUG_PUTS()."); \
-        } \
-    } while (0)
+do { \
+    if ((sched_active_thread == NULL) || \
+        (sched_active_thread->stack_size >= THREAD_EXTRA_STACKSIZE_PRINTF)) { \
+        printf(__VA_ARGS__); \
+    } \
+    else { \
+        puts("Cannot debug, stack too small. Consider using DEBUG_PUTS()."); \
+    } \
+} while (0)
 #else
 #define DEBUG_PRINT(...) printf(__VA_ARGS__)
 #endif
@@ -67,7 +62,11 @@ extern "C" {
  * @name Debugging defines
  * @{
  */
-#ifndef ENABLE_DEBUG
+/**
+ * @brief   This macro can be defined as 0 or other on a file-based level.
+ *          @ref DEBUG() will generate output only if ENABLE_DEBUG is non-zero.
+ */
+#if !defined(ENABLE_DEBUG) || defined(DOXYGEN)
 #define ENABLE_DEBUG (0)
 #endif
 
@@ -94,7 +93,7 @@ extern "C" {
  *
  * @note Another name for ::DEBUG_PRINT
  */
-#define DEBUG(...) if (ENABLE_DEBUG) DEBUG_PRINT(__VA_ARGS__)
+#define DEBUG(...) if (ENABLE_DEBUG) { DEBUG_PRINT(__VA_ARGS__); }
 
 /**
  * @def DEBUG_PUTS
@@ -102,7 +101,7 @@ extern "C" {
  * @brief Print debug information to stdout using puts(), so no stack size
  *        restrictions do apply.
  */
-#define DEBUG_PUTS(str) if (ENABLE_DEBUG) puts(str)
+#define DEBUG_PUTS(str) if (ENABLE_DEBUG) { puts(str); }
 /** @} */
 
 /**

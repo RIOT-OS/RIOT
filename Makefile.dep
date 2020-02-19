@@ -64,12 +64,6 @@ ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
   USEMODULE += gnrc_neterr
 endif
 
-ifneq (,$(filter nhdp,$(USEMODULE)))
-  USEMODULE += sock_udp
-  USEMODULE += xtimer
-  USEMODULE += oonf_rfc5444
-endif
-
 ifneq (,$(filter sntp,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += xtimer

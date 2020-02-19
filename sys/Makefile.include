@@ -1,7 +1,3 @@
-ifneq (,$(filter nhdp,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/nhdp
-endif
-
 ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/gnrc/network_layer/sixlowpan/frag
 endif

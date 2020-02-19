@@ -40,6 +40,14 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### sys/net/routing/nhdp [0201a2d273fe17aa1b8eeb22776ae9670551433d]
+Author:
+- Fabian Nack <nack@inf.fu-berlin.de>
+
+Reasons for removal:
+- Not maintained anymore.
+- Does not comply with the current RIOT programming practices.
+
 ### sys/ubjson [868d37708bb674739ab4983441d6df904dd5a25f]
 Author(s):
 - René Kijewski <rene.kijewski@fu-berlin.de>
