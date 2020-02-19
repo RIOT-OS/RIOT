@@ -135,14 +135,14 @@ typedef struct sock_udp sock_udp_t;     /**< forward declare for async */
 typedef void (*sock_udp_cb_t)(sock_udp_t *sock, sock_async_flags_t type);
 #endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
 
+#ifdef SOCK_HAS_ASYNC_CTX
+#include "sock_async_ctx.h"
+#endif
+
 #include "sock_types.h"
 #ifdef MODULE_SOCK_DTLS
 #include "sock_dtls_types.h"
 #endif  /* MODULE_SOCK_DTLS */
-
-#ifdef SOCK_HAS_ASYNC_CTX
-#include "sock_async_ctx.h"
-#endif
 #endif  /* defined(SOCK_HAS_ASYNC) || defined(DOXYGEN) */
 
 #if defined (__clang__)
