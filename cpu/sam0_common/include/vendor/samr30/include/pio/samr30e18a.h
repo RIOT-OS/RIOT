@@ -182,110 +182,137 @@
 #define PINMUX_PA11H_GCLK_IO5      ((PIN_PA11H_GCLK_IO5 << 16) | MUX_PA11H_GCLK_IO5)
 #define PORT_PA11H_GCLK_IO5        (1ul << 11)
 /* ========== PORT definition for EIC peripheral ========== */
+#define PIN_PA16A_EIC_EXTINT_NUM       _L_(0)  /**< brief EIC signal: PIN_PA16 External Interrupt Line */
 #define PIN_PA16A_EIC_EXTINT0             16L  /**< \brief EIC signal: EXTINT0 on PA16 mux A */
 #define MUX_PA16A_EIC_EXTINT0              0L
 #define PINMUX_PA16A_EIC_EXTINT0   ((PIN_PA16A_EIC_EXTINT0 << 16) | MUX_PA16A_EIC_EXTINT0)
 #define PORT_PA16A_EIC_EXTINT0     (1ul << 16)
+#define PIN_PB00A_EIC_EXTINT_NUM       _L_(0)  /**< brief EIC signal: PIN_PB00 External Interrupt Line */
 #define PIN_PB00A_EIC_EXTINT0             32L  /**< \brief EIC signal: EXTINT0 on PB00 mux A */
 #define MUX_PB00A_EIC_EXTINT0              0L
 #define PINMUX_PB00A_EIC_EXTINT0   ((PIN_PB00A_EIC_EXTINT0 << 16) | MUX_PB00A_EIC_EXTINT0)
 #define PORT_PB00A_EIC_EXTINT0     (1ul <<  0)
+#define PIN_PB16A_EIC_EXTINT_NUM       _L_(0)  /**< brief EIC signal: PIN_PB16 External Interrupt Line */
 #define PIN_PB16A_EIC_EXTINT0             48L  /**< \brief EIC signal: EXTINT0 on PB16 mux A */
 #define MUX_PB16A_EIC_EXTINT0              0L
 #define PINMUX_PB16A_EIC_EXTINT0   ((PIN_PB16A_EIC_EXTINT0 << 16) | MUX_PB16A_EIC_EXTINT0)
 #define PORT_PB16A_EIC_EXTINT0     (1ul << 16)
+#define PIN_PA17A_EIC_EXTINT_NUM       _L_(1)  /**< brief EIC signal: PIN_PA17 External Interrupt Line */
 #define PIN_PA17A_EIC_EXTINT1             17L  /**< \brief EIC signal: EXTINT1 on PA17 mux A */
 #define MUX_PA17A_EIC_EXTINT1              0L
 #define PINMUX_PA17A_EIC_EXTINT1   ((PIN_PA17A_EIC_EXTINT1 << 16) | MUX_PA17A_EIC_EXTINT1)
 #define PORT_PA17A_EIC_EXTINT1     (1ul << 17)
+#define PIN_PB17A_EIC_EXTINT_NUM       _L_(1)  /**< brief EIC signal: PIN_PB17 External Interrupt Line */
 #define PIN_PB17A_EIC_EXTINT1             49L  /**< \brief EIC signal: EXTINT1 on PB17 mux A */
 #define MUX_PB17A_EIC_EXTINT1              0L
 #define PINMUX_PB17A_EIC_EXTINT1   ((PIN_PB17A_EIC_EXTINT1 << 16) | MUX_PB17A_EIC_EXTINT1)
 #define PORT_PB17A_EIC_EXTINT1     (1ul << 17)
+#define PIN_PA18A_EIC_EXTINT_NUM       _L_(2)  /**< brief EIC signal: PIN_PA18 External Interrupt Line */
 #define PIN_PA18A_EIC_EXTINT2             18L  /**< \brief EIC signal: EXTINT2 on PA18 mux A */
 #define MUX_PA18A_EIC_EXTINT2              0L
 #define PINMUX_PA18A_EIC_EXTINT2   ((PIN_PA18A_EIC_EXTINT2 << 16) | MUX_PA18A_EIC_EXTINT2)
 #define PORT_PA18A_EIC_EXTINT2     (1ul << 18)
+#define PIN_PA19A_EIC_EXTINT_NUM       _L_(3)  /**< brief EIC signal: PIN_PA19 External Interrupt Line */
 #define PIN_PA19A_EIC_EXTINT3             19L  /**< \brief EIC signal: EXTINT3 on PA19 mux A */
 #define MUX_PA19A_EIC_EXTINT3              0L
 #define PINMUX_PA19A_EIC_EXTINT3   ((PIN_PA19A_EIC_EXTINT3 << 16) | MUX_PA19A_EIC_EXTINT3)
 #define PORT_PA19A_EIC_EXTINT3     (1ul << 19)
+#define PIN_PA20A_EIC_EXTINT_NUM       _L_(4)  /**< brief EIC signal: PIN_PA20 External Interrupt Line */
 #define PIN_PA20A_EIC_EXTINT4             20L  /**< \brief EIC signal: EXTINT4 on PA20 mux A */
 #define MUX_PA20A_EIC_EXTINT4              0L
 #define PINMUX_PA20A_EIC_EXTINT4   ((PIN_PA20A_EIC_EXTINT4 << 16) | MUX_PA20A_EIC_EXTINT4)
 #define PORT_PA20A_EIC_EXTINT4     (1ul << 20)
+#define PIN_PA06A_EIC_EXTINT_NUM       _L_(6)  /**< brief EIC signal: PIN_PA06 External Interrupt Line */
 #define PIN_PA06A_EIC_EXTINT6              6L  /**< \brief EIC signal: EXTINT6 on PA06 mux A */
 #define MUX_PA06A_EIC_EXTINT6              0L
 #define PINMUX_PA06A_EIC_EXTINT6   ((PIN_PA06A_EIC_EXTINT6 << 16) | MUX_PA06A_EIC_EXTINT6)
 #define PORT_PA06A_EIC_EXTINT6     (1ul <<  6)
+#define PIN_PA07A_EIC_EXTINT_NUM       _L_(7)  /**< brief EIC signal: PIN_PA07 External Interrupt Line */
 #define PIN_PA07A_EIC_EXTINT7              7L  /**< \brief EIC signal: EXTINT7 on PA07 mux A */
 #define MUX_PA07A_EIC_EXTINT7              0L
 #define PINMUX_PA07A_EIC_EXTINT7   ((PIN_PA07A_EIC_EXTINT7 << 16) | MUX_PA07A_EIC_EXTINT7)
 #define PORT_PA07A_EIC_EXTINT7     (1ul <<  7)
+#define PIN_PB08A_EIC_EXTINT_NUM       _L_(8)  /**< brief EIC signal: PIN_PB08 External Interrupt Line */
 #define PIN_PB08A_EIC_EXTINT8             40L  /**< \brief EIC signal: EXTINT8 on PB08 mux A */
 #define MUX_PB08A_EIC_EXTINT8              0L
 #define PINMUX_PB08A_EIC_EXTINT8   ((PIN_PB08A_EIC_EXTINT8 << 16) | MUX_PB08A_EIC_EXTINT8)
 #define PORT_PB08A_EIC_EXTINT8     (1ul <<  8)
+#define PIN_PA28A_EIC_EXTINT_NUM       _L_(8)  /**< brief EIC signal: PIN_PA28 External Interrupt Line */
 #define PIN_PA28A_EIC_EXTINT8             28L  /**< \brief EIC signal: EXTINT8 on PA28 mux A */
 #define MUX_PA28A_EIC_EXTINT8              0L
 #define PINMUX_PA28A_EIC_EXTINT8   ((PIN_PA28A_EIC_EXTINT8 << 16) | MUX_PA28A_EIC_EXTINT8)
 #define PORT_PA28A_EIC_EXTINT8     (1ul << 28)
+#define PIN_PA09A_EIC_EXTINT_NUM       _L_(9)  /**< brief EIC signal: PIN_PA09 External Interrupt Line */
 #define PIN_PA09A_EIC_EXTINT9              9L  /**< \brief EIC signal: EXTINT9 on PA09 mux A */
 #define MUX_PA09A_EIC_EXTINT9              0L
 #define PINMUX_PA09A_EIC_EXTINT9   ((PIN_PA09A_EIC_EXTINT9 << 16) | MUX_PA09A_EIC_EXTINT9)
 #define PORT_PA09A_EIC_EXTINT9     (1ul <<  9)
+#define PIN_PB09A_EIC_EXTINT_NUM       _L_(9)  /**< brief EIC signal: PIN_PB09 External Interrupt Line */
 #define PIN_PB09A_EIC_EXTINT9             41L  /**< \brief EIC signal: EXTINT9 on PB09 mux A */
 #define MUX_PB09A_EIC_EXTINT9              0L
 #define PINMUX_PB09A_EIC_EXTINT9   ((PIN_PB09A_EIC_EXTINT9 << 16) | MUX_PB09A_EIC_EXTINT9)
 #define PORT_PB09A_EIC_EXTINT9     (1ul <<  9)
+#define PIN_PA10A_EIC_EXTINT_NUM       _L_(10)  /**< brief EIC signal: PIN_PA10 External Interrupt Line */
 #define PIN_PA10A_EIC_EXTINT10            10L  /**< \brief EIC signal: EXTINT10 on PA10 mux A */
 #define MUX_PA10A_EIC_EXTINT10             0L
 #define PINMUX_PA10A_EIC_EXTINT10  ((PIN_PA10A_EIC_EXTINT10 << 16) | MUX_PA10A_EIC_EXTINT10)
 #define PORT_PA10A_EIC_EXTINT10    (1ul << 10)
+#define PIN_PA30A_EIC_EXTINT_NUM       _L_(10)  /**< brief EIC signal: PIN_PA30 External Interrupt Line */
 #define PIN_PA30A_EIC_EXTINT10            30L  /**< \brief EIC signal: EXTINT10 on PA30 mux A */
 #define MUX_PA30A_EIC_EXTINT10             0L
 #define PINMUX_PA30A_EIC_EXTINT10  ((PIN_PA30A_EIC_EXTINT10 << 16) | MUX_PA30A_EIC_EXTINT10)
 #define PORT_PA30A_EIC_EXTINT10    (1ul << 30)
+#define PIN_PA11A_EIC_EXTINT_NUM       _L_(11)  /**< brief EIC signal: PIN_PA11 External Interrupt Line */
 #define PIN_PA11A_EIC_EXTINT11            11L  /**< \brief EIC signal: EXTINT11 on PA11 mux A */
 #define MUX_PA11A_EIC_EXTINT11             0L
 #define PINMUX_PA11A_EIC_EXTINT11  ((PIN_PA11A_EIC_EXTINT11 << 16) | MUX_PA11A_EIC_EXTINT11)
 #define PORT_PA11A_EIC_EXTINT11    (1ul << 11)
+#define PIN_PA31A_EIC_EXTINT_NUM       _L_(11)  /**< brief EIC signal: PIN_PA31 External Interrupt Line */
 #define PIN_PA31A_EIC_EXTINT11            31L  /**< \brief EIC signal: EXTINT11 on PA31 mux A */
 #define MUX_PA31A_EIC_EXTINT11             0L
 #define PINMUX_PA31A_EIC_EXTINT11  ((PIN_PA31A_EIC_EXTINT11 << 16) | MUX_PA31A_EIC_EXTINT11)
 #define PORT_PA31A_EIC_EXTINT11    (1ul << 31)
+#define PIN_PA24A_EIC_EXTINT_NUM       _L_(12)  /**< brief EIC signal: PIN_PA24 External Interrupt Line */
 #define PIN_PA24A_EIC_EXTINT12            24L  /**< \brief EIC signal: EXTINT12 on PA24 mux A */
 #define MUX_PA24A_EIC_EXTINT12             0L
 #define PINMUX_PA24A_EIC_EXTINT12  ((PIN_PA24A_EIC_EXTINT12 << 16) | MUX_PA24A_EIC_EXTINT12)
 #define PORT_PA24A_EIC_EXTINT12    (1ul << 24)
+#define PIN_PA25A_EIC_EXTINT_NUM       _L_(13)  /**< brief EIC signal: PIN_PA25 External Interrupt Line */
 #define PIN_PA25A_EIC_EXTINT13            25L  /**< \brief EIC signal: EXTINT13 on PA25 mux A */
 #define MUX_PA25A_EIC_EXTINT13             0L
 #define PINMUX_PA25A_EIC_EXTINT13  ((PIN_PA25A_EIC_EXTINT13 << 16) | MUX_PA25A_EIC_EXTINT13)
 #define PORT_PA25A_EIC_EXTINT13    (1ul << 25)
+#define PIN_PB14A_EIC_EXTINT_NUM       _L_(14)  /**< brief EIC signal: PIN_PB14 External Interrupt Line */
 #define PIN_PB14A_EIC_EXTINT14            46L  /**< \brief EIC signal: EXTINT14 on PB14 mux A */
 #define MUX_PB14A_EIC_EXTINT14             0L
 #define PINMUX_PB14A_EIC_EXTINT14  ((PIN_PB14A_EIC_EXTINT14 << 16) | MUX_PB14A_EIC_EXTINT14)
 #define PORT_PB14A_EIC_EXTINT14    (1ul << 14)
+#define PIN_PB30A_EIC_EXTINT_NUM       _L_(14)  /**< brief EIC signal: PIN_PB30 External Interrupt Line */
 #define PIN_PB30A_EIC_EXTINT14            62L  /**< \brief EIC signal: EXTINT14 on PB30 mux A */
 #define MUX_PB30A_EIC_EXTINT14             0L
 #define PINMUX_PB30A_EIC_EXTINT14  ((PIN_PB30A_EIC_EXTINT14 << 16) | MUX_PB30A_EIC_EXTINT14)
 #define PORT_PB30A_EIC_EXTINT14    (1ul << 30)
+#define PIN_PA14A_EIC_EXTINT_NUM       _L_(14)  /**< brief EIC signal: PIN_PA14 External Interrupt Line */
 #define PIN_PA14A_EIC_EXTINT14            14L  /**< \brief EIC signal: EXTINT14 on PA14 mux A */
 #define MUX_PA14A_EIC_EXTINT14             0L
 #define PINMUX_PA14A_EIC_EXTINT14  ((PIN_PA14A_EIC_EXTINT14 << 16) | MUX_PA14A_EIC_EXTINT14)
 #define PORT_PA14A_EIC_EXTINT14    (1ul << 14)
+#define PIN_PA27A_EIC_EXTINT_NUM       _L_(15)  /**< brief EIC signal: PIN_PA27 External Interrupt Line */
 #define PIN_PA27A_EIC_EXTINT15            27L  /**< \brief EIC signal: EXTINT15 on PA27 mux A */
 #define MUX_PA27A_EIC_EXTINT15             0L
 #define PINMUX_PA27A_EIC_EXTINT15  ((PIN_PA27A_EIC_EXTINT15 << 16) | MUX_PA27A_EIC_EXTINT15)
 #define PORT_PA27A_EIC_EXTINT15    (1ul << 27)
+#define PIN_PB15A_EIC_EXTINT_NUM       _L_(15)  /**< brief EIC signal: PIN_PB15 External Interrupt Line */
 #define PIN_PB15A_EIC_EXTINT15            47L  /**< \brief EIC signal: EXTINT15 on PB15 mux A */
 #define MUX_PB15A_EIC_EXTINT15             0L
 #define PINMUX_PB15A_EIC_EXTINT15  ((PIN_PB15A_EIC_EXTINT15 << 16) | MUX_PB15A_EIC_EXTINT15)
 #define PORT_PB15A_EIC_EXTINT15    (1ul << 15)
+#define PIN_PB31A_EIC_EXTINT_NUM       _L_(15)  /**< brief EIC signal: PIN_PB31 External Interrupt Line */
 #define PIN_PB31A_EIC_EXTINT15            63L  /**< \brief EIC signal: EXTINT15 on PB31 mux A */
 #define MUX_PB31A_EIC_EXTINT15             0L
 #define PINMUX_PB31A_EIC_EXTINT15  ((PIN_PB31A_EIC_EXTINT15 << 16) | MUX_PB31A_EIC_EXTINT15)
 #define PORT_PB31A_EIC_EXTINT15    (1ul << 31)
+#define PIN_PA15A_EIC_EXTINT_NUM       _L_(15)  /**< brief EIC signal: PIN_PA15 External Interrupt Line */
 #define PIN_PA15A_EIC_EXTINT15            15L  /**< \brief EIC signal: EXTINT15 on PA15 mux A */
 #define MUX_PA15A_EIC_EXTINT15             0L
 #define PINMUX_PA15A_EIC_EXTINT15  ((PIN_PA15A_EIC_EXTINT15 << 16) | MUX_PA15A_EIC_EXTINT15)
