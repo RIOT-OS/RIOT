@@ -99,6 +99,9 @@ static uint64_t _rtc_get_time_raw(void);        /* RTC time in cycles */
 static uint64_t _rtc_time_to_us(uint64_t raw);  /* convert RTC cycles to us */
 static void IRAM_ATTR _rtc_timer_handler(void* arg);
 
+/* alias for compatibility with espressif/esp-idf */
+int64_t esp_set_time_from_rtc(void) __attribute__((alias("rtc_init")));
+
 void rtc_init(void)
 {
     uint64_t _rtc_time = _rtc_get_time_raw();

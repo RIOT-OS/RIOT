@@ -90,6 +90,7 @@ extern "C" {
 #define CONFIG_NUMBER_OF_UNIVERSAL_MAC_ADDRESS  4
 
 #define CONFIG_NEWLIB_NANO_FORMAT               0
+#define CONFIG_ESP32_DEEP_SLEEP_WAKEUP_DELAY    2000
 
 /**
  * Bluetooth configuration (DO NOT CHANGE)
