@@ -127,9 +127,9 @@ void my_class::do_something_else() {
 
 - Use 4 spaces per indentation level.
 
-- The maximum number of characters per line is 80.
-
 - No tabs, ever.
+
+- Aim for 80 characters per line, and do not exceed a maximum of 120.
 
 - Never use C-style casts.
 
