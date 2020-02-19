@@ -11,7 +11,7 @@
   https://www.kernel.org/doc/Documentation/process/coding-style.rst with the
   following modifications and additions:
     * Line length: aim for no more than 80 characters per line, the absolute
-      maximum should be 100 characters per line.
+      maximum should be 120 characters per line.
     * All line endings shall be set to LF (`\n`). (How to handle line endings in
       Git: https://help.github.com/articles/dealing-with-line-endings)
     * There must be no trailing whitespace in any line.
