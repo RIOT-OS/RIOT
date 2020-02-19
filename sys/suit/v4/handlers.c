@@ -19,15 +19,19 @@
 
 #include <inttypes.h>
 
-#include "suit/coap.h"
 #include "suit/conditions.h"
 #include "suit/v4/suit.h"
 #include "suit/v4/handlers.h"
 #include "suit/v4/policy.h"
 #include "suit/v4/suit.h"
 #include "riotboot/hdr.h"
+#include "riotboot/flashwrite.h"
 #include "riotboot/slot.h"
 #include <nanocbor/nanocbor.h>
+
+#ifdef MODULE_SUIT_COAP
+#include "suit/coap.h"
+#endif
 
 #include "log.h"
 
@@ -242,8 +246,27 @@ static int _dtv_fetch(suit_v4_manifest_t *manifest, int key, nanocbor_value_t *_
 
     int target_slot = riotboot_slot_other();
     riotboot_flashwrite_init(manifest->writer, target_slot);
-    int res = suit_coap_get_blockwise_url(manifest->urlbuf, COAP_BLOCKSIZE_64,
-                                          suit_flashwrite_helper, manifest);
+
+    int res = -1;
+
+    if (0) {}
+#ifdef MODULE_SUIT_COAP
+    else if (strncmp(manifest->urlbuf, "coap://", 7) == 0) {
+        res = suit_coap_get_blockwise_url(manifest->urlbuf, COAP_BLOCKSIZE_64,
+                                          suit_flashwrite_helper,
+                                          manifest);
+    }
+#endif
+#ifdef MODULE_SUIT_V4_TEST
+    else if (strncmp(manifest->urlbuf, "test://", 7) == 0) {
+        res = SUIT_OK;
+    }
+
+#endif
+    else {
+        LOG_WARNING("suit: unsupported URL scheme!\n)");
+        return res;
+    }
 
     if (res) {
         LOG_INFO("image download failed\n)");
@@ -459,11 +482,9 @@ static int _common_sequence_handler(suit_v4_manifest_t *manifest, int key,
                                     nanocbor_value_t *it)
 {
 
-    suit_manifest_handler_t handler = _suit_manifest_get_handler(key,
-                                                                 _sequence_handlers,
-                                                                 _sequence_handlers_len);
-    LOG_DEBUG("Handling handler with key %d at %p\n", key, handler);
+    suit_manifest_handler_t handler = _suit_manifest_get_handler(key, _sequence_handlers, _sequence_handlers_len);
     if (handler) {
+        LOG_DEBUG("Handling handler with key %d\n", key);
         return handler(manifest, key, it);
     }
     else {
