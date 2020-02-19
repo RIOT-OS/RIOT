@@ -115,6 +115,16 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
+/**
+ * @name    PDM configuration
+ * @{
+ */
+static const pdm_conf_t pdm_config = {
+    .din_pin = GPIO_PIN(0, 0),
+    .clk_pin = GPIO_PIN(0, 1),
+};
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
