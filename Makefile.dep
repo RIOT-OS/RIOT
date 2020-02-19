@@ -599,15 +599,6 @@ ifneq (,$(filter fib,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
-ifneq (,$(filter oonf_rfc5444,$(USEMODULE)))
-  USEMODULE += oonf_common
-endif
-
-ifneq (,$(filter oonf_common,$(USEMODULE)))
-  USEPKG += oonf_api
-  USEMODULE += posix_sockets
-endif
-
 # if any log_* is used, also use LOG pseudomodule
 ifneq (,$(filter log_%,$(USEMODULE)))
   USEMODULE += log

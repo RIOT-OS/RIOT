@@ -40,6 +40,15 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### pkg/oonf_api [c829f820ee870bffc60c7df688d2da8373553212]
+Author:
+- Benjamin Valentin <benpicco@googlemail.com>
+
+Reasons for removal:
+- Package has not been update since 2013.
+- Tests were never integrated to the CI.
+- NHDP, which was the only upstream user, has been removed.
+
 ### sys/net/routing/nhdp [0201a2d273fe17aa1b8eeb22776ae9670551433d]
 Author:
 - Fabian Nack <nack@inf.fu-berlin.de>
