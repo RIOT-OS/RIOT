@@ -22,6 +22,7 @@
 #include "debug.h"
 
 #include "esp_attr.h"
+#include "esp_sleep.h"
 #include "syscalls.h"
 
 #include "rom/rtc.h"
@@ -46,47 +47,8 @@ void pm_set_lowest(void)
 
 void IRAM_ATTR pm_off(void)
 {
-    DEBUG ("%s\n", __func__);
-
-    /* suspend UARTs */
-    for (int i = 0; i < 3; ++i) {
-        REG_SET_BIT(UART_FLOW_CONF_REG(i), UART_FORCE_XOFF);
-        uart_tx_wait_idle(i);
-    }
-
-    /* set all power down flags */
-    uint32_t pd_flags = RTC_SLEEP_PD_DIG |
-                        RTC_SLEEP_PD_RTC_PERIPH |
-                        RTC_SLEEP_PD_RTC_SLOW_MEM |
-                        RTC_SLEEP_PD_RTC_FAST_MEM |
-                        RTC_SLEEP_PD_RTC_MEM_FOLLOW_CPU |
-                        RTC_SLEEP_PD_VDDSDIO;
-
-    rtc_sleep_config_t config = RTC_SLEEP_CONFIG_DEFAULT(pd_flags);
-    config.wifi_pd_en = 1;
-    config.rom_mem_pd_en = 1;
-    config.lslp_meminf_pd = 1;
-
-    /* Save current frequency and switch to XTAL */
-    rtc_cpu_freq_t cpu_freq = rtc_clk_cpu_freq_get();
-    rtc_clk_cpu_freq_set(RTC_CPU_FREQ_XTAL);
-
-    /* set deep sleep duration to forever */
-    rtc_sleep_set_wakeup_time(rtc_time_get() + ~0x0UL);
-
-    /* configure deep sleep */
-    rtc_sleep_init(config);
-    rtc_sleep_start(RTC_TIMER_TRIG_EN, 0);
-
-    /* Restore CPU frequency */
-    rtc_clk_cpu_freq_set(cpu_freq);
-
-    /* resume UARTs */
-    for (int i = 0; i < 3; ++i) {
-        REG_CLR_BIT(UART_FLOW_CONF_REG(i), UART_FORCE_XOFF);
-        REG_SET_BIT(UART_FLOW_CONF_REG(i), UART_FORCE_XON);
-        REG_CLR_BIT(UART_FLOW_CONF_REG(i), UART_FORCE_XON);
-    }
+    /* enter hibernate mode without any enabled wake-up sources */
+    esp_deep_sleep_start();
 }
 
 extern void esp_restart_noos(void) __attribute__ ((noreturn));
