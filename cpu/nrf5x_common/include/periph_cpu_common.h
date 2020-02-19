@@ -55,7 +55,7 @@ extern "C" {
 /**
  * @brief   Override GPIO_UNDEF value
  */
-#define GPIO_UNDEF          (UINT_MAX)
+#define GPIO_UNDEF          (UINT8_MAX)
 
 /**
  * @brief   Generate GPIO mode bitfields

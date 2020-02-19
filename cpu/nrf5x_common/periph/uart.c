@@ -44,8 +44,8 @@
 #define UART_PIN_TX     uart_config[uart].tx_pin
 #define UART_PIN_RTS    uart_config[uart].rts_pin
 #define UART_PIN_CTS    uart_config[uart].cts_pin
-#define UART_HWFLOWCTRL (uart_config[uart].rts_pin != (uint8_t)GPIO_UNDEF && \
-                         uart_config[uart].cts_pin != (uint8_t)GPIO_UNDEF)
+#define UART_HWFLOWCTRL (uart_config[uart].rts_pin != GPIO_UNDEF && \
+                         uart_config[uart].cts_pin != GPIO_UNDEF)
 #define ISR_CTX         isr_ctx[uart]
 #define RAM_MASK        (0x20000000)
 
