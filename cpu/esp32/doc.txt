@@ -120,7 +120,7 @@ Module    | Default  | Short description
 [esp_log_tagged](#esp32_esp_log_module) | not used | add additional information to the log output
 [esp_now](#esp32_esp_now_network_interface) | not used  | enable the ESP-NOW network device
 [esp_rtc_timer](#esp32_rtc_timer) | not used | enable RTC hardware timer with internal 150 kHz RC oscillator
-[esp_rtc_timer_32k](#esp32_rtc_timer) not used | enable RTC hardware timer with external 32.768 kHz crystal.
+[esp_rtc_timer_32k](#esp32_rtc_timer) | not used | enable RTC hardware timer with external 32.768 kHz crystal.
 [esp_spi_ram](#esp32_spi_ram) | not used |  enable SPI RAM
 [esp_spiffs](#esp32_spiffs_device) | not used  |  enable SPIFFS for on-board flash memory
 [esp_wifi](#esp32_wifi_network_interface) | not used  | enable the Wifi network device
@@ -142,7 +142,7 @@ MCU         | ESP32     | Supported by RIOT
 ------------|-----------|------------------
 Vendor      | Espressif | |
 Cores       | 1 or 2 x Tensilica Xtensa LX6 | 1 core
-FPU         | yes (ULP - Ultra low power co-processor) | no
+FPU         | ULP - Ultra low power co-processor | no
 RAM         | 520 kByte SRAM <br> 16 kByte  RTC SRAM | yes
 ROM         | 448 kByte | yes
 Flash       | 512 kByte ... 16 MByte |  yes
@@ -151,7 +151,7 @@ Power Consumption | 68 mA @ 240 MHz <br> 44 mA @ 160 MHz <br> 31 mA @ 80 MHz <br
 Timers      | 4 x 64 bit | yes
 ADCs        | 2 x SAR-ADC with up to 18 x 12 bit channels total | yes
 DACs        | 2 x DAC with 8 bit | yes
-GPIOs       | 34 (6 of them are only inputs) | yes
+GPIOs       | 34 (6 are only inputs, 18 are RTC GPIOs) | yes
 I2Cs        | 2 | yes
 SPIs        | 4 | yes (2)
 UARTs       | 3 | yes
@@ -512,7 +512,7 @@ ESP32 has 34 GPIO pins, where only a subset can be used as output, as ADC channe
 <center>
 
 Pin    | Type   | ADC | PU/PD  | Special function | Remarks
--------|--------|:---:| ------ |------------------|--------
+-------|:-------|:---:|:------:|------------------|--------
 GPIO0  | In/Out | yes | yes    | Touch sensor | Bootstrapping, pulled up
 GPIO1  | In/Out | -   | yes    | UART0 TxD    | Console
 GPIO2  | In/Out | yes | yes    | Touch sensor | Bootstrapping, pulled down
@@ -546,7 +546,7 @@ GPIO35 | In     | yes | -      | VDET | -
 GPIO36 | In     | yes | -      | SENSOR_VP | -
 GPIO37 | In     | yes | -      | SENSOR_CAPP | usually not broken out
 GPIO38 | In     | yes | -      | SENSOR_CAPN | usually not broken out
-GPIO38 | In     | yes | -      | SENSOR_VN   | -
+GPIO39 | In     | yes | -      | SENSOR_VN   | -
 
 </center>
 
