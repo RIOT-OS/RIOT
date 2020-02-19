@@ -106,6 +106,9 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     /* configure the pin cfg */
     port->PINCFG[pin_pos].reg = (mode & MODE_PINCFG_MASK);
 
+    /* reset the pin mux */
+    port->PMUX[pin_pos >> 1].reg &= ~(0xf << (4 * (pin_pos & 0x1)));
+
     /* and set pull-up/pull-down if applicable */
     if (mode == GPIO_IN_PU) {
         port->OUTSET.reg = pin_mask;
