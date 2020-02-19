@@ -85,6 +85,14 @@ extern "C" {
 
 #ifndef DOXYGEN
 /**
+ * @brief   Overwrite the default gpio_t type definition
+ * @{
+ */
+#define HAVE_GPIO_T
+typedef uint8_t gpio_t;
+/** @} */
+
+/**
  * @brief   Override GPIO modes
  *
  * We use 4 bit to encode the pin mode:
@@ -162,9 +170,9 @@ typedef enum {
  */
 typedef struct {
     NRF_SPI_Type *dev;  /**< SPI device used */
-    uint8_t sclk;       /**< CLK pin */
-    uint8_t mosi;       /**< MOSI pin */
-    uint8_t miso;       /**< MISO pin */
+    gpio_t sclk;        /**< CLK pin */
+    gpio_t mosi;        /**< MOSI pin */
+    gpio_t miso;        /**< MISO pin */
 } spi_conf_t;
 
 /**
