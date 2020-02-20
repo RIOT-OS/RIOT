@@ -313,6 +313,7 @@ static void IRAM_ATTR _rtc_timer_handler(void* arg)
         /* call back registered function */
         if (_rtc_alarm_cb) {
             _rtc_alarm_cb(_rtc_alarm_arg);
+            _rtc_alarm_cb = 0;
         }
     }
     /* clear all interrupts */
@@ -342,4 +343,12 @@ static void IRAM_ATTR _rtc_timer_handler(void* arg)
 #endif
 
     irq_isr_exit();
+}
+
+void rtc_handle_pending_alarm(void)
+{
+    if (_rtc_alarm_cb) {
+        _rtc_alarm_cb(_rtc_alarm_arg);
+        _rtc_alarm_cb = 0;
+    }
 }

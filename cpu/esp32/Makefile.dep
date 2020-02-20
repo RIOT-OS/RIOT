@@ -77,6 +77,10 @@ ifneq (,$(filter ndn-riot,$(USEPKG)))
   USEMODULE += cipher_modes
 endif
 
+ifneq (,$(filter pm_layered,$(USEMODULE)))
+  USEMODULE += periph_rtc
+endif
+
 ifneq (,$(filter shell,$(USEMODULE)))
   USEMODULE += ps
 endif
