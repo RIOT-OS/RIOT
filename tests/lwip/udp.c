@@ -23,6 +23,7 @@
 #include "common.h"
 #include "od.h"
 #include "net/af.h"
+#include "net/sock/async/event.h"
 #include "net/sock/udp.h"
 #include "shell.h"
 #include "thread.h"
@@ -43,28 +44,14 @@ static sock_udp_t server_sock;
 static char server_stack[THREAD_STACKSIZE_DEFAULT];
 static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
 
-static void *_server_thread(void *args)
+static void _udp_recv(sock_udp_t *sock, sock_async_flags_t flags)
 {
-    sock_udp_ep_t server_addr = SOCK_IP_EP_ANY;
-    int res;
-
-    msg_init_queue(server_msg_queue, SERVER_MSG_QUEUE_SIZE);
-    /* parse port */
-    server_addr.port = atoi(args);
-    if ((res = sock_udp_create(&server_sock, &server_addr, NULL, 0)) < 0) {
-        printf("Unable to open UDP server on port %" PRIu16 " (error code %d)\n",
-               server_addr.port, -res);
-        return NULL;
-    }
-    server_running = true;
-    printf("Success: started UDP server on port %" PRIu16 "\n",
-           server_addr.port);
-    while (1) {
+    if (flags & SOCK_ASYNC_MSG_RECV) {
         sock_udp_ep_t src;
         int res;
 
-        if ((res = sock_udp_recv(&server_sock, sock_inbuf, sizeof(sock_inbuf),
-                                 SOCK_NO_TIMEOUT, &src)) < 0) {
+        if ((res = sock_udp_recv(sock, sock_inbuf, sizeof(sock_inbuf),
+                                 0, &src)) < 0) {
             puts("Error on receive");
         }
         else if (res == 0) {
@@ -85,6 +72,28 @@ static void *_server_thread(void *args)
             od_hex_dump(sock_inbuf, res, 0);
         }
     }
+}
+
+static void *_server_thread(void *args)
+{
+    event_queue_t queue;
+    sock_udp_ep_t server_addr = SOCK_IP_EP_ANY;
+    int res;
+
+    msg_init_queue(server_msg_queue, SERVER_MSG_QUEUE_SIZE);
+    /* parse port */
+    server_addr.port = atoi(args);
+    if ((res = sock_udp_create(&server_sock, &server_addr, NULL, 0)) < 0) {
+        printf("Unable to open UDP server on port %" PRIu16 " (error code %d)\n",
+               server_addr.port, -res);
+        return NULL;
+    }
+    server_running = true;
+    printf("Success: started UDP server on port %" PRIu16 "\n",
+           server_addr.port);
+    event_queue_init(&queue);
+    sock_udp_event_init(&server_sock, &queue, _udp_recv);
+    event_loop(&queue);
     return NULL;
 }
 

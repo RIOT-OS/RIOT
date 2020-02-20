@@ -23,6 +23,7 @@
 #include "common.h"
 #include "od.h"
 #include "net/af.h"
+#include "net/sock/async/event.h"
 #include "net/sock/ip.h"
 #include "shell.h"
 #include "thread.h"
@@ -43,25 +44,14 @@ static sock_ip_t server_sock;
 static char server_stack[THREAD_STACKSIZE_DEFAULT];
 static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
 
-static void *_server_thread(void *args)
+static void _ip_recv(sock_ip_t *sock, sock_async_flags_t flags)
 {
-    sock_ip_ep_t server_addr = SOCK_IP_EP_ANY;
-    uint8_t protocol;
-
-    msg_init_queue(server_msg_queue, SERVER_MSG_QUEUE_SIZE);
-    /* parse protocol */
-    protocol = atoi(args);
-    if (sock_ip_create(&server_sock, &server_addr, NULL, protocol, 0) < 0) {
-        return NULL;
-    }
-    server_running = true;
-    printf("Success: started IP server on protocol %u\n", protocol);
-    while (1) {
-        int res;
+    if (flags & SOCK_ASYNC_MSG_RECV) {
         sock_ip_ep_t src;
+        int res;
 
-        if ((res = sock_ip_recv(&server_sock, sock_inbuf, sizeof(sock_inbuf),
-                                SOCK_NO_TIMEOUT, &src)) < 0) {
+        if ((res = sock_ip_recv(sock, sock_inbuf, sizeof(sock_inbuf),
+                                0, &src)) < 0) {
             puts("Error on receive");
         }
         else if (res == 0) {
@@ -82,6 +72,25 @@ static void *_server_thread(void *args)
             od_hex_dump(sock_inbuf, res, 0);
         }
     }
+}
+
+static void *_server_thread(void *args)
+{
+    event_queue_t queue;
+    sock_ip_ep_t server_addr = SOCK_IP_EP_ANY;
+    uint8_t protocol;
+
+    msg_init_queue(server_msg_queue, SERVER_MSG_QUEUE_SIZE);
+    /* parse protocol */
+    protocol = atoi(args);
+    if (sock_ip_create(&server_sock, &server_addr, NULL, protocol, 0) < 0) {
+        return NULL;
+    }
+    server_running = true;
+    printf("Success: started IP server on protocol %u\n", protocol);
+    event_queue_init(&queue);
+    sock_ip_event_init(&server_sock, &queue, _ip_recv);
+    event_loop(&queue);
     return NULL;
 }
 

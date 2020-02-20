@@ -20,6 +20,8 @@ endif
 USEMODULE += lwip lwip_sock_ip lwip_netdev
 USEMODULE += lwip_udp lwip_sock_udp
 USEMODULE += lwip_tcp lwip_sock_tcp
+USEMODULE += lwip_sock_async
+USEMODULE += sock_async_event
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
