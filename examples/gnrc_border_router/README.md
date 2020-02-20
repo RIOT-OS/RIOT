@@ -1,6 +1,7 @@
 # gnrc_border_router using automatic configuration
 This setup uses a single serial interface, ethos (Ethernet Over Serial)
-and UHCP (micro Host Configuration Protocol).
+and UHCP (micro Host Configuration Protocol) (using DHCPv6 alternatively is also
+possible).
 Ethos multiplexes serial data to separate ethernet packets from shell commands.
 UHCP is in charge of configuring the wireless interface prefix
 and routes on the BR.
@@ -10,6 +11,34 @@ The script `start_network.sh` enables a *ready-to-use* BR in only one command.
 ## Requirements
 This functionality works only on Linux machines.
 Mac OSX support will be added in the future (lack of native `tap` interface).
+
+If you want to use DHCPv6, you also need a DHCPv6 server configured for prefix
+delegation from the interface facing the border router. With the [KEA] DHCPv6
+server e.g. you can use the following configuration:
+
+```json
+"Dhcp6":
+{
+  "interfaces-config": {
+    "interfaces": [ "tap0" ]
+  },
+  ...
+  "subnet6": [
+  {    "interface": "tap0",
+       "subnet": "2001:db8::/16",
+       "pd-pools": [ { "prefix": "2001:db8::",
+                       "prefix-len": 16,
+                       "delegated-len": 64 } ] },
+  ]
+  ...
+}
+```
+
+Note that when working with TAP interfaces you might need to restart your DHCPv6
+server once *after* you started the border router application (see below), since
+Linux might not recognize the interface as connected.
+
+[KEA]: https://kea.isc.org/
 
 ## Setup
 First, you need to compile `ethos`.
@@ -30,6 +59,13 @@ Afterwards, proceed to compile and flash `gnrc_border_router` to your board:
 
 ```bash
 make clean all flash
+```
+
+If you want to use DHCPv6 instead of UHCP compile with the environment variable
+`USE_DHCPV6` set to 1
+
+```bash
+USE_DHCPV6=1 make clean all flash
 ```
 
 ## Usage

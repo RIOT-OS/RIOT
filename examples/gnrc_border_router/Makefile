@@ -50,8 +50,15 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
-# include UHCP client
-USEMODULE += gnrc_uhcpc
+USE_DHCPV6 ?= 0
+
+ifeq (1,$(USE_DHCPV6))
+  # include DHCPv6 client for 6LoWPAN border router
+  USEMODULE += gnrc_dhcpv6_client_6lbr
+else
+  # include UHCP client
+  USEMODULE += gnrc_uhcpc
+endif
 
 # Optionally include RPL as a routing protocol. When includede gnrc_uhcpc will
 # configure the node as a RPL DODAG root when receiving a prefix.
@@ -68,23 +75,44 @@ TAP ?= tap0
 IPV6_PREFIX ?= 2001:db8::/64
 
 ifeq (native,$(BOARD))
+ifneq (1,$(USE_DHCPV6))
 TERMDEPS += uhcpd-daemon
 
 .PHONY: uhcpd-daemon
 
 uhcpd-daemon: host-tools
 	$(RIOTTOOLS)/uhcpd/bin/uhcpd $(TAP) $(IPV6_PREFIX) &
+endif # USE_DHCPV6
 else
 # We override the `make term` command to use ethos
+ifeq (1,$(USE_DHCPV6))
+TERMPROG ?= sudo $(RIOTTOOLS)/ethos/ethos
+TERMFLAGS ?= $(TAP) $(PORT) $(ETHOS_BAUDRATE)
+else # USE_DHCPV6
 TERMPROG ?= sudo sh $(RIOTTOOLS)/ethos/start_network.sh
 TERMFLAGS ?= $(PORT) $(TAP) $(IPV6_PREFIX)
+endif
 
+STATIC_ROUTES ?= 1
 # We depend on the ethos host tools to run the border router, we build them
 # if necessary
 TERMDEPS += host-tools
 endif
 
+# As there is an 'Kconfig' we want to explicitly disable Kconfig by setting
+# the variable to empty
+SHOULD_RUN_KCONFIG ?=
+
 include $(RIOTBASE)/Makefile.include
+
+ifndef CONFIG_GNRC_DHCPV6_CLIENT_6LBR_STATIC_ROUTE
+ifeq (1,$(STATIC_ROUTES))
+  CFLAGS += -DCONFIG_GNRC_DHCPV6_CLIENT_6LBR_STATIC_ROUTE=1
+  # CONFIG_GNRC_DHCPV6_CLIENT_6LBR_STATIC_ROUTE=1 requires one more address for
+  # `fe80::2`.
+  CFLAGS += -DCONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF=3
+endif
+endif
 
 .PHONY: host-tools
 
