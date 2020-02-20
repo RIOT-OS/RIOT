@@ -28,7 +28,6 @@
 #include "lwip/sys.h"
 #include "lwip/sock_internal.h"
 
-
 int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
                    const sock_ip_ep_t *remote, uint8_t proto, uint16_t flags)
 {
