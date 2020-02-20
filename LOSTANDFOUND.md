@@ -40,6 +40,14 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### sys/net/gnrc/application_layer/tftp [0e2a62078850e1ecc74db2db4d639cf2d8fb96d3]
+Author:
+- DipSwitch <dipswitch@ownage4u.nl>
+
+Reasons for removal:
+- Not maintained anymore.
+- Existing quality and security defects.
+
 ### pkg/oonf_api [c829f820ee870bffc60c7df688d2da8373553212]
 Author:
 - Benjamin Valentin <benpicco@googlemail.com>
