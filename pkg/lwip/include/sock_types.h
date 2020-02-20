@@ -26,13 +26,29 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Forward declaration
+ * @internal
+ */
+typedef struct lwip_sock_base lwip_sock_base_t;
+
+/**
+ * @brief   Sock base type
+ * @warning For network stack internal purposes only. Do not access members
+ *          externally.
+ * @internal
+ */
+struct lwip_sock_base {
+    struct netconn *conn;           /**< lwIP network connection object */
+};
+
+/**
  * @brief   Raw IP sock type
  * @warning For network stack internal purposes only. Do not access members
  *          externally.
  * @internal
  */
 struct sock_ip {
-    struct netconn *conn;           /**< lwIP network connection object */
+    lwip_sock_base_t base;          /**< parent class */
 };
 
 /**
@@ -42,7 +58,7 @@ struct sock_ip {
  * @internal
  */
 struct sock_tcp {
-    struct netconn *conn;           /**< lwIP network connection object */
+    lwip_sock_base_t base;          /**< parent class */
     struct sock_tcp_queue *queue;   /**< Queue the sock might have been generated from */
     mutex_t mutex;                  /**< Mutex to protect the sock */
     struct pbuf *last_buf;          /**< Last received data */
@@ -55,7 +71,7 @@ struct sock_tcp {
  *          externally.
  */
 struct sock_tcp_queue {
-    struct netconn *conn;           /**< lwIP network connection object */
+    lwip_sock_base_t base;          /**< parent class */
     struct sock_tcp *array;         /**< Allocation array for sock objects to generate */
     mutex_t mutex;                  /**< Mutex to protect the queue */
     unsigned short len;             /**< Length of the struct sock_tcp_queue::array */
@@ -69,7 +85,7 @@ struct sock_tcp_queue {
  * @internal
  */
 struct sock_udp {
-    struct netconn *conn;           /**< lwIP network connection object */
+    lwip_sock_base_t base;          /**< parent class */
 };
 
 #ifdef __cplusplus
