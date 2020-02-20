@@ -36,11 +36,28 @@
  * @name    Button pin definitions
  * @{
  */
+
+/**
+ * @brief   Default button GPIO pin definition
+ */
 #if MODULE_ESP32_TTGO_T_BEAM_V1_0
-#define BUTTON0_PIN     GPIO38
+#define BTN0_PIN        GPIO38
 #else
-#define BUTTON0_PIN     GPIO39
+#define BTN0_PIN        GPIO39
 #endif
+
+/**
+ * @brief   Default button GPIO mode definition
+ *
+ * Since the GPIO of the button is pulled up with an external resistor, the
+ * mode for the GPIO pin has to be GPIO_IN.
+ */
+#define BTN0_MODE       GPIO_IN
+
+/**
+ * @brief   Definition for compatibility with previous versions
+ */
+#define BUTTON0_PIN     BTN0_PIN
 /** @} */
 
 /**
