@@ -40,7 +40,24 @@
  * @name    Button pin definitions
  * @{
  */
-#define BUTTON0_PIN     GPIO34
+
+/**
+ * @brief   Default button GPIO pin definition
+ */
+#define BTN0_PIN        GPIO34
+
+/**
+ * @brief   Default button GPIO mode definition
+ *
+ * Since the GPIO of the button is pulled up with an external resistor, the
+ * mode for the GPIO pin has to be GPIO_IN.
+ */
+#define BTN0_MODE       GPIO_IN
+
+/**
+ * @brief   Definition for compatibility with previous versions
+ */
+#define BUTTON0_PIN     BTN0_PIN
 /** @} */
 
 /**
