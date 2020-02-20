@@ -3,3 +3,7 @@
 FEATURES_REQUIRED += arch_32bit
 
 DEFAULT_MODULE += auto_init_lwip
+
+ifneq (,$(filter lwip_sock_async,$(USEMODULE)))
+  USEMODULE += sock_async
+endif

@@ -43,6 +43,9 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
                                 (struct _sock_tl_ep *)remote, proto, flags,
                                 NETCONN_RAW)) == 0) {
         sock->base.conn = tmp;
+#if IS_ACTIVE(SOCK_HAS_ASYNC)
+        netconn_set_callback_arg(sock->base.conn, &sock->base);
+#endif
     }
     return res;
 }
@@ -177,5 +180,19 @@ ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
     return lwip_sock_send(sock ? sock->base.conn : NULL, data, len, proto,
                           (struct _sock_tl_ep *)remote, NETCONN_RAW);
 }
+
+#ifdef SOCK_HAS_ASYNC
+void sock_ip_set_cb(sock_ip_t *sock, sock_ip_cb_t cb)
+{
+    sock->base.async_cb.ip = cb;
+}
+
+#ifdef SOCK_HAS_ASYNC_CTX
+sock_async_ctx_t *sock_ip_get_async_ctx(sock_ip_t *sock)
+{
+    return &sock->base.async_ctx;
+}
+#endif  /* SOCK_HAS_ASYNC_CTX */
+#endif  /* SOCK_HAS_ASYNC */
 
 /** @} */

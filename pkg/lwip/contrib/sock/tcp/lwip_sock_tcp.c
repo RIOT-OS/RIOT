@@ -28,6 +28,7 @@ static inline void _tcp_sock_init(sock_tcp_t *sock, struct netconn *conn,
     mutex_init(&sock->mutex);
     mutex_lock(&sock->mutex);
     sock->base.conn = conn;
+    netconn_set_callback_arg(sock->base.conn, &sock->base);
     sock->queue = queue;
     sock->last_buf = NULL;
     sock->last_offset = 0;
@@ -75,6 +76,7 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
     mutex_init(&queue->mutex);
     mutex_lock(&queue->mutex);
     queue->base.conn = tmp;
+    netconn_set_callback_arg(queue->base.conn, &queue->base);
     queue->array = queue_array;
     queue->len = queue_len;
     queue->used = 0;
@@ -369,5 +371,29 @@ ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len)
     res = lwip_sock_send(conn, data, len, 0, NULL, NETCONN_TCP);
     return res;
 }
+
+#ifdef SOCK_HAS_ASYNC
+void sock_tcp_set_cb(sock_tcp_t *sock, sock_tcp_cb_t cb)
+{
+    sock->base.async_cb.tcp = cb;
+}
+
+void sock_tcp_queue_set_cb(sock_tcp_queue_t *queue, sock_tcp_queue_cb_t cb)
+{
+    queue->base.async_cb.tcp_queue = cb;
+}
+
+#ifdef SOCK_HAS_ASYNC_CTX
+sock_async_ctx_t *sock_tcp_get_async_ctx(sock_tcp_t *sock)
+{
+    return &sock->base.async_ctx;
+}
+
+sock_async_ctx_t *sock_tcp_queue_get_async_ctx(sock_tcp_queue_t *queue)
+{
+    return &queue->base.async_ctx;
+}
+#endif  /* SOCK_HAS_ASYNC_CTX */
+#endif  /* SOCK_HAS_ASYNC */
 
 /** @} */

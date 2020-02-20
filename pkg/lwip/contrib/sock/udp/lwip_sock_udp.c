@@ -38,6 +38,9 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                                 (struct _sock_tl_ep *)remote, 0, flags,
                                 NETCONN_UDP)) == 0) {
         sock->base.conn = tmp;
+#if IS_ACTIVE(SOCK_HAS_ASYNC)
+        netconn_set_callback_arg(sock->base.conn, &sock->base);
+#endif
     }
     return res;
 }
@@ -131,5 +134,19 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     return lwip_sock_send((sock) ? sock->base.conn : NULL, data, len, 0,
                           (struct _sock_tl_ep *)remote, NETCONN_UDP);
 }
+
+#ifdef SOCK_HAS_ASYNC
+void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb)
+{
+    sock->base.async_cb.udp = cb;
+}
+
+#ifdef SOCK_HAS_ASYNC_CTX
+sock_async_ctx_t *sock_udp_get_async_ctx(sock_udp_t *sock)
+{
+    return &sock->base.async_ctx;
+}
+#endif  /* SOCK_HAS_ASYNC_CTX */
+#endif  /* SOCK_HAS_ASYNC */
 
 /** @} */
