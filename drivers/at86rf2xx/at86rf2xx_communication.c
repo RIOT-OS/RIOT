@@ -38,7 +38,7 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, uint8_t addr)
     uint8_t value = 0;
 
     switch (dev->base.dev_type) {
-        default: {
+        default:
 #if IS_USED(MODULE_AT86RF2XX_SPI)
             value = at86rf2xx_spi_reg_read(dev, addr);
 #else
@@ -46,16 +46,11 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, uint8_t addr)
             (void)addr;
 #endif
             break;
-        }
-#if IS_USED(MODULE_AT86RFA1)
-        case AT86RF2XX_DEV_TYPE_AT86RFA1: {
-            value = at86rf2xx_periph_reg_read(AT86RFA1_REG(addr));
-        }
-#endif
-#if IS_USED(MODULE_AT86RFR2)
-        case AT86RF2XX_DEV_TYPE_AT86RFR2: {
-            value = at86rf2xx_periph_reg_read(AT86RFR2_REG(addr));
-        }
+#if IS_USED(MODULE_AT86RF2XX_PERIPH)
+        case AT86RF2XX_DEV_TYPE_AT86RFA1:
+        case AT86RF2XX_DEV_TYPE_AT86RFR2:
+            value = at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(addr));
+            break;
 #endif
     }
     return value;
@@ -64,7 +59,7 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, uint8_t addr)
 void at86rf2xx_reg_write(const at86rf2xx_t *dev, uint8_t addr, uint8_t value)
 {
     switch (dev->base.dev_type) {
-        default: {
+        default:
 #if IS_USED(MODULE_AT86RF2XX_SPI)
             at86rf2xx_spi_reg_write(dev, addr, value);
 #else
@@ -73,18 +68,11 @@ void at86rf2xx_reg_write(const at86rf2xx_t *dev, uint8_t addr, uint8_t value)
             (void)value;
 #endif
             break;
-        }
-#if IS_USED(MODULE_AT86RFA1)
-        case AT86RF2XX_DEV_TYPE_AT86RFA1: {
-            at86rf2xx_periph_reg_write(AT86RFA1_REG(addr), value);
+#if IS_USED(MODULE_AT86RF2XX_PERIPH)
+        case AT86RF2XX_DEV_TYPE_AT86RFA1:
+        case AT86RF2XX_DEV_TYPE_AT86RFR2:
+            at86rf2xx_periph_reg_write(AT86RF2XX_PERIPH_REG(addr), value);
             break;
-        }
-#endif
-#if IS_USED(MODULE_AT86RFR2)
-        case AT86RF2XX_DEV_TYPE_AT86RFR2: {
-            at86rf2xx_periph_reg_write(AT86RFR2_REG(addr), value);
-            break;
-        }
 #endif
     }
 }
@@ -93,7 +81,7 @@ void at86rf2xx_sram_read(const at86rf2xx_t *dev, uint8_t offset,
                          void *data, size_t len)
 {
     switch (dev->base.dev_type) {
-        default: {
+        default:
 #if IS_USED(MODULE_AT86RF2XX_SPI)
             at86rf2xx_spi_sram_read(dev, offset, data, len);
 #else
@@ -102,21 +90,13 @@ void at86rf2xx_sram_read(const at86rf2xx_t *dev, uint8_t offset,
             (void)data;
             (void)len;
 #endif
-        }
-        break;
-#if IS_USED(MODULE_AT86RFA1)
-        case AT86RF2XX_DEV_TYPE_AT86RFA1: {
-            at86rf2xx_periph_sram_read(AT86RFA1_REG__TRXFBST,
+            break;
+#if IS_USED(MODULE_AT86RF2XX_PERIPH)
+        case AT86RF2XX_DEV_TYPE_AT86RFA1:
+        case AT86RF2XX_DEV_TYPE_AT86RFR2:
+            at86rf2xx_periph_sram_read(AT86RF2XX_PERIPH_REG__TRXFBST,
                                        offset, data, len);
             break;
-        }
-#endif
-#if IS_USED(MODULE_AT86RFR2)
-        case AT86RF2XX_DEV_TYPE_AT86RFR2: {
-            at86rf2xx_periph_sram_read(AT86RFR2_REG__TRXFBST,
-                                       offset, data, len);
-            break;
-        }
 #endif
     }
 }
@@ -125,7 +105,7 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev, uint8_t offset,
                           const void *data, size_t len)
 {
     switch (dev->base.dev_type) {
-        default: {
+        default:
 #if IS_USED(MODULE_AT86RF2XX_SPI)
             at86rf2xx_spi_sram_write(dev, offset, data, len);
 #else
@@ -135,20 +115,12 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev, uint8_t offset,
             (void)len;
 #endif
             break;
-        }
-#if IS_USED(MODULE_AT86RFA1)
-        case AT86RF2XX_DEV_TYPE_AT86RFA1: {
-            at86rf2xx_periph_sram_write(AT86RFA1_REG__TRXFBST,
+#if IS_USED(MODULE_AT86RF2XX_PERIPH)
+        case AT86RF2XX_DEV_TYPE_AT86RFA1:
+        case AT86RF2XX_DEV_TYPE_AT86RFR2:
+            at86rf2xx_periph_sram_write(AT86RF2XX_PERIPH_REG__TRXFBST,
                                         offset, data, len);
             break;
-        }
-#endif
-#if IS_USED(MODULE_AT86RFR2)
-        case AT86RF2XX_DEV_TYPE_AT86RFR2: {
-            at86rf2xx_periph_sram_write(AT86RFR2_REG__TRXFBST,
-                                        offset, data, len);
-            break;
-        }
 #endif
     }
 }
@@ -156,14 +128,13 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev, uint8_t offset,
 void at86rf2xx_fb_start(const at86rf2xx_t *dev)
 {
     switch (dev->base.dev_type) {
-        default: {
+        default:
 #if IS_USED(MODULE_AT86RF2XX_SPI)
             at86rf2xx_spi_fb_start(dev);
 #else
             (void)dev;
 #endif
             break;
-        }
 #if IS_USED(MODULE_AT86RF2XX_PERIPH)
         case AT86RF2XX_DEV_TYPE_AT86RFA1:
         case AT86RF2XX_DEV_TYPE_AT86RFR2:
@@ -185,17 +156,11 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev,
             (void)len;
 #endif
             break;
-#if IS_USED(MODULE_AT86RFA1)
-        case AT86RF2XX_DEV_TYPE_AT86RFA1: {
-            at86rf2xx_periph_fb_read(data, AT86RFA1_REG__TRXFBST, len);
+#if IS_USED(MODULE_AT86RF2XX_PERIPH)
+        case AT86RF2XX_DEV_TYPE_AT86RFA1:
+        case AT86RF2XX_DEV_TYPE_AT86RFR2:
+            at86rf2xx_periph_fb_read(data, AT86RF2XX_PERIPH_REG__TRXFBST, len);
             break;
-        }
-#endif
-#if IS_USED(MODULE_AT86RFR2)
-        case AT86RF2XX_DEV_TYPE_AT86RFR2: {
-            at86rf2xx_periph_fb_read(data, AT86RFR2_REG__TRXFBST, len);
-            break;
-        }
 #endif
     }
 }

@@ -24,7 +24,7 @@ void at86rfr2_sleep(at86rfr2_t *dev)
             at86rfr2_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
         }
         /* Discard all IRQ flags, framebuffer is lost anyway */
-        at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__IRQ_STATUS));
+        at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__IRQ_STATUS));
         /* reset interrupt states in device */
         dev->irq_status = 0;
         /* Setting SLPTR bit brings radio transceiver
@@ -48,7 +48,7 @@ void at86rfr2_assert_awake(at86rfr2_t *dev)
          */
         do {
             dev->base.state =
-                at86rf2xx_periph_reg_read(AT86RFR2_REG(
+                at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(
                                               AT86RF2XX_REG__TRX_STATUS))
                 & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
         } while (dev->base.state != AT86RF2XX_TRX_STATUS__TRX_OFF);
@@ -111,24 +111,24 @@ void at86rfr2_setup(at86rfr2_t *dev)
 {
     dev->base.dev_type = AT86RF2XX_DEV_TYPE_AT86RFR2;
     at86rf2xx_setup((at86rf2xx_t *)dev);
-    at86rf2xx_periph_reg_write(AT86RFR2_REG(AT86RF2XX_REG__IRQ_MASK), 0x00);
+    at86rf2xx_periph_reg_write(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__IRQ_MASK), 0x00);
 }
 
 int at86rfr2_validate(const at86rfr2_t *dev)
 {
     (void)dev;
     uint8_t partn =
-        at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__PART_NUM));
+        at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__PART_NUM));
     if (partn != AT86RFR2_PARTNUM) {
         DEBUG("[at86rfr2] error: unable to read correct part number\n");
         return -ENOTSUP;
     }
     DEBUG("AT86RFR2 0x%02X\n", partn);
     DEBUG("manufactorer: 0x%02X%02X\n",
-          at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__MAN_ID_1)),
-          at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__MAN_ID_0)));
+          at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__MAN_ID_1)),
+          at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__MAN_ID_0)));
     DEBUG("version: 0x%02x\n",
-          at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__VERSION_NUM)));
+          at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__VERSION_NUM)));
     return 0;
 }
 
@@ -182,7 +182,7 @@ uint8_t at86rfr2_set_state(at86rfr2_t *dev, uint8_t state)
     uint8_t trx_status;
     do {
         trx_status =
-            at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__TRX_STATUS));
+            at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__TRX_STATUS));
         trx_status &= AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
     } while (trx_status == AT86RF2XX_STATE_IN_PROGRESS);
     DEBUG("input state: 0x%02X -- device state: 0x%02X -- trx_staus: 0x%02X\n",
@@ -232,10 +232,10 @@ void at86rfr2_reset(at86rfr2_t *dev)
     at86rfr2_set_frame_buffer_protection(dev, true);
 
     /* enable and clear interrupts */
-    at86rf2xx_periph_reg_write(AT86RFR2_REG(AT86RF2XX_REG__IRQ_MASK),
+    at86rf2xx_periph_reg_write(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__IRQ_MASK),
                                AT86RF2XX_IRQ_MASK_MASK__TX_END |
                                AT86RF2XX_IRQ_MASK_MASK__RX_END);
-    at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__IRQ_STATUS));
+    at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__IRQ_STATUS));
 
     /* State to return after receiving or transmitting */
     dev->base.idle_state = AT86RF2XX_STATE_RX_AACK_ON;
@@ -246,7 +246,7 @@ void at86rfr2_reset(at86rfr2_t *dev)
 int16_t at86rfr2_get_txpower(const at86rfr2_t *dev)
 {
     uint8_t phy_tx_pwr =
-        at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__PHY_TX_PWR));
+        at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__PHY_TX_PWR));
 
     phy_tx_pwr &= AT86RFR2_PHY_TX_PWR_MASK__TX_PWR;
     DEBUG("[at86rfr2] txpower value: %x\n", phy_tx_pwr);
@@ -264,10 +264,10 @@ void at86rfr2_set_txpower(at86rfr2_t *dev, int16_t dbm)
     uint8_t txpower = at86rfr2_dbm_to_tx_pow(dev, dbm);
     DEBUG("[at86rfr2] txpower value: %x\n", txpower);
     uint8_t phy_tx_pwr =
-        at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__PHY_TX_PWR));
+        at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__PHY_TX_PWR));
     phy_tx_pwr &= ~(AT86RFR2_PHY_TX_PWR_MASK__TX_PWR);
     phy_tx_pwr |= (txpower & AT86RFR2_PHY_TX_PWR_MASK__TX_PWR);
-    at86rf2xx_periph_reg_write(AT86RFR2_REG(
+    at86rf2xx_periph_reg_write(AT86RF2XX_PERIPH_REG(
                                    AT86RF2XX_REG__PHY_TX_PWR), phy_tx_pwr);
     dev->base.netdev.txpower = dbm;
 }
@@ -275,7 +275,7 @@ void at86rfr2_set_txpower(at86rfr2_t *dev, int16_t dbm)
 int16_t at86rfr2_get_rxsensitivity(const at86rfr2_t *dev)
 {
     uint8_t rx_syn =
-        at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__RX_SYN))
+        at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__RX_SYN))
         & AT86RF2XX_RX_SYN_MASK__RX_PDT_LEVEL;
 
     return at86rfr2_rx_sens_to_dbm(dev, rx_syn);
@@ -292,10 +292,10 @@ void at86rfr2_set_rxsensitivity(const at86rfr2_t *dev, int16_t dbm)
     uint8_t rxsens = at86rfr2_dbm_to_rxsens(dev, dbm);
     DEBUG("[at86rfr2] rxsens value: %x\n", rxsens);
     uint8_t rx_syn =
-        at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__RX_SYN));
+        at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__RX_SYN));
     rx_syn &= ~(AT86RF2XX_RX_SYN_MASK__RX_PDT_LEVEL);
     rx_syn |= (rxsens & AT86RF2XX_RX_SYN_MASK__RX_PDT_LEVEL);
-    at86rf2xx_periph_reg_write(AT86RFR2_REG(AT86RF2XX_REG__RX_SYN), rx_syn);
+    at86rf2xx_periph_reg_write(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__RX_SYN), rx_syn);
 }
 
 bool at86rfr2_cca(at86rfr2_t *dev)
@@ -303,15 +303,15 @@ bool at86rfr2_cca(at86rfr2_t *dev)
     uint8_t old_state = at86rfr2_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
     /* Disable RX path */
     uint8_t rx_syn =
-        at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__RX_SYN));
+        at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__RX_SYN));
     uint8_t tmp = rx_syn | AT86RF2XX_RX_SYN_MASK__RX_PDT_DIS;
 
-    at86rf2xx_periph_reg_write(AT86RFR2_REG(AT86RF2XX_REG__RX_SYN), tmp);
+    at86rf2xx_periph_reg_write(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__RX_SYN), tmp);
     /* Manually triggered CCA is only possible in RX_ON (basic operating mode) */
     at86rfr2_set_state(dev, AT86RF2XX_STATE_RX_ON);
     bool cca =  at86rf2xx_cca((at86rf2xx_t *)dev);
     /* re-enable RX */
-    at86rf2xx_periph_reg_write(AT86RFR2_REG(AT86RF2XX_REG__RX_SYN), rx_syn);
+    at86rf2xx_periph_reg_write(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__RX_SYN), rx_syn);
     /* Step back to the old state */
     at86rfr2_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
     at86rfr2_set_state(dev, old_state);
@@ -348,7 +348,7 @@ int8_t at86rfr2_get_ed_level(const at86rfr2_t *dev)
 {
     (void)dev;
     uint8_t phy_ed_level =
-        at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__PHY_ED_LEVEL));
+        at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__PHY_ED_LEVEL));
     return (int8_t)(phy_ed_level + AT86RFR2_RSSI_BASE_VAL);
 }
 
@@ -373,28 +373,28 @@ void at86rfr2_configure_phy(const at86rfr2_t *dev, at86rfr2_phy_mode_t mode)
 {
     (void)dev;
     uint8_t trx_ctrl_2 =
-        at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__TRX_CTRL_2));
+        at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__TRX_CTRL_2));
 
     uint8_t mode_mask = AT86RFR2_TRX_CTRL_2_MASK__OQPSK_DATA_RATE;
 
     trx_ctrl_2 &= ~(mode_mask);
     trx_ctrl_2 |= (mode & mode_mask);
 
-    at86rf2xx_periph_reg_write(AT86RFR2_REG(
+    at86rf2xx_periph_reg_write(AT86RF2XX_PERIPH_REG(
                                    AT86RF2XX_REG__TRX_CTRL_2), trx_ctrl_2);
 }
 
 void at86rfr2_enable_smart_idle(at86rfr2_t *dev)
 {
     uint8_t tmp =
-        at86rf2xx_periph_reg_read(AT86RFR2_REG(AT86RF2XX_REG__TRX_RPC));
+        at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__TRX_RPC));
 
     tmp |= (AT86RF2XX_TRX_RPC_MASK__RX_RPC_EN |
             AT86RF2XX_TRX_RPC_MASK__PDT_RPC_EN |
             AT86RF2XX_TRX_RPC_MASK__PLL_RPC_EN |
             AT86RF2XX_TRX_RPC_MASK__IPAN_RPC_EN |
             AT86RF2XX_TRX_RPC_MASK__XAH_RPC_EN);
-    at86rf2xx_periph_reg_write(AT86RFR2_REG(AT86RF2XX_REG__TRX_RPC), tmp);
+    at86rf2xx_periph_reg_write(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__TRX_RPC), tmp);
     at86rfr2_set_rxsensitivity(dev, AT86RFR2_RSSI_BASE_VAL);
 }
 

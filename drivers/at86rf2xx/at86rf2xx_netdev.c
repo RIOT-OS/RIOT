@@ -575,7 +575,7 @@ int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                 *((netdev_ieee802154_rx_info_t *)info) =
                     (netdev_ieee802154_rx_info_t) {
                     .rssi = AT86RFA1_RSSI_BASE_VAL +
-                            at86rf2xx_periph_reg_read(AT86RFA1_REG(
+                            at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(
                                                           AT86RF2XX_REG__PHY_ED_LEVEL)),
                     .lqi = fb.lqi
                 };
@@ -610,7 +610,7 @@ int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                 *((netdev_ieee802154_rx_info_t *)info) =
                     (netdev_ieee802154_rx_info_t) {
                     .rssi = AT86RFR2_RSSI_BASE_VAL +
-                            at86rf2xx_periph_reg_read(AT86RFR2_REG(
+                            at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(
                                                           AT86RF2XX_REG__PHY_ED_LEVEL)),
                     .lqi = fb.lqi
                 };
@@ -976,49 +976,12 @@ int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_AUTOACK:
             assert(max_len == sizeof(netopt_enable_t));
-            switch (dev->base.dev_type) {
-#if IS_USED(MODULE_AT86RF212B) || \
-    IS_USED(MODULE_AT86RF231)  || \
-    IS_USED(MODULE_AT86RF232)  || \
-    IS_USED(MODULE_AT86RF233)
-                case AT86RF2XX_DEV_TYPE_AT86RF212B:
-                case AT86RF2XX_DEV_TYPE_AT86RF231:
-                case AT86RF2XX_DEV_TYPE_AT86RF232:
-                case AT86RF2XX_DEV_TYPE_AT86RF233: {
-                    uint8_t csma_seed_1 =
-                        at86rf2xx_spi_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
-                    *((netopt_enable_t *)val) =
-                        (csma_seed_1 & AT86RF2XX_CSMA_SEED_1_MASK__AACK_DIS_ACK)
-                            ? false
-                            : true;
-                    break;
-                }
-#endif
-#if IS_USED(MODULE_AT86RFA1)
-                case AT86RF2XX_DEV_TYPE_AT86RFA1: {
-                    uint8_t csma_seed_1 =
-                        at86rf2xx_periph_reg_read(AT86RFA1_REG(
-                                                      AT86RF2XX_REG__CSMA_SEED_1));
-                    *((netopt_enable_t *)val) =
-                        (csma_seed_1 & AT86RF2XX_CSMA_SEED_1_MASK__AACK_DIS_ACK)
-                            ? false
-                            : true;
-                    break;
-                }
-#endif
-#if IS_USED(MODULE_AT86RFR2)
-                case AT86RF2XX_DEV_TYPE_AT86RFR2: {
-                    uint8_t csma_seed_1 =
-                        at86rf2xx_periph_reg_read(AT86RFR2_REG(
-                                                      AT86RF2XX_REG__CSMA_SEED_1));
-                    *((netopt_enable_t *)val) =
-                        (csma_seed_1 & AT86RF2XX_CSMA_SEED_1_MASK__AACK_DIS_ACK)
-                            ? false
-                            : true;
-                    break;
-                }
-#endif
-            }
+            uint8_t csma_seed_1 =
+                at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
+            *((netopt_enable_t *)val) =
+                (csma_seed_1 & AT86RF2XX_CSMA_SEED_1_MASK__AACK_DIS_ACK)
+                    ? false
+                    : true;
             res = sizeof(netopt_enable_t);
             break;
 
@@ -1487,8 +1450,7 @@ void _isr(netdev_t *netdev)
     }
 }
 
-#if IS_USED(MODULE_AT86RF2XX_PERIPH)
-
+#if IS_USED(MODULE_AT86RFA1) || IS_USED(MODULE_AT86RFR2)
 /**
  * @brief ISR for transceiver's receive end interrupt
  *
@@ -1501,19 +1463,18 @@ ISR(TRX24_RX_END_vect, ISR_BLOCK)
 {
     atmega_enter_isr();
 
-#if IS_USED(MODULE_AT86RFA1)
-    uint8_t status = (*AT86RFA1_REG(AT86RF2XX_REG__TRX_STATE))
+    uint8_t status = (*AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__TRX_STATE))
                      & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
     DEBUG("TRX24_RX_END 0x%x\n", status);
+
+#if IS_USED(MODULE_AT86RFA1)
     ((at86rfa1_t *)at86rfmega_dev)->irq_status
         |= AT86RF2XX_IRQ_STATUS_MASK__RX_END;
 #elif IS_USED(MODULE_AT86RFR2)
-    uint8_t status = (*AT86RFR2_REG(AT86RF2XX_REG__TRX_STATE))
-                     & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
-    DEBUG("TRX24_RX_END 0x%x\n", status);
     ((at86rfr2_t *)at86rfmega_dev)->irq_status
         |= AT86RF2XX_IRQ_STATUS_MASK__RX_END;
 #endif
+
     /* Call upper layer to process received data */
     at86rfmega_dev->event_callback(at86rfmega_dev, NETDEV_EVENT_ISR);
 
@@ -1558,27 +1519,27 @@ ISR(TRX24_TX_END_vect, ISR_BLOCK)
 
     /* only inform upper layer when a transmission was done,
      * not for sending acknowledge frames if data was received. */
-#if IS_USED(MODULE_AT86RFA1)
-    uint8_t status = (*AT86RFA1_REG(AT86RF2XX_REG__TRX_STATE))
+
+    uint8_t status = (*AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__TRX_STATE))
                      & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
     DEBUG("TRX24_TX_END 0x%x\n", status);
+
+#if IS_USED(MODULE_AT86RFA1)
     if (status != AT86RF2XX_STATE_RX_AACK_ON) {
         ((at86rfa1_t *)at86rfmega_dev)->irq_status
             |= AT86RF2XX_IRQ_STATUS_MASK__TX_END;
     }
 #elif IS_USED(MODULE_AT86RFR2)
-    uint8_t status = (*AT86RFR2_REG(AT86RF2XX_REG__TRX_STATE))
-                     & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
-    DEBUG("TRX24_TX_END 0x%x\n", status);
     if (status != AT86RF2XX_STATE_RX_AACK_ON) {
         ((at86rfr2_t *)at86rfmega_dev)->irq_status
             |= AT86RF2XX_IRQ_STATUS_MASK__TX_END;
     }
 #endif
+
     /* Call upper layer to process if data was send successful */
     at86rfmega_dev->event_callback(at86rfmega_dev, NETDEV_EVENT_ISR);
 
     atmega_exit_isr();
 }
 
-#endif /* IS_USED(MODULE_AT86RF2XX_PERIPH) */
+#endif /* IS_USED(MODULE_AT86RFA1) || IS_USED(MODULE_AT86RFR2) */

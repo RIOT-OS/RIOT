@@ -33,51 +33,86 @@
 extern "C" {
 #endif
 
-#if IS_USED(MODULE_AT86RFA1)
+#if IS_USED(MODULE_AT86RFA1) || IS_USED(MODULE_AT86RFR2)
 #include <avr/io.h>
+#endif
 
-#define AT86RFA1_REG__TST_CTRL_DIGI                            (&TST_CTRL_DIGI)
-#define AT86RFA1_REG__TRXFBST                                  (&TRXFBST)
-#define AT86RFA1_REG__TRXFBEND                                 (&TRXFBEND)
-#define AT86RFA1_REG__TRXPR                                    (&TRXPR)
+/* Consider that there can only be one type of MCU integrated transceiver */
+#if IS_USED(MODULE_AT86RFA1)
+#define AT86RFA1_REG__TRXFBST                                   (&TRXFBST)
+#define AT86RFA1_REG__TRXFBEND                                  (&TRXFBEND)
+#define AT86RFA1_REG__TRXPR                                     (&TRXPR)
 
 /**
  * @brief   AT86RF2XX transceiver register address offset
  *          for ATmega128RFA1
  */
-#define AT86RFA1_REGISTER_OFFSET            (0x140)
+#define AT86RFA1_REGISTER_OFF                                   (0x140)
 
 /**
- * @brief AT86RFA1: access common register
+ * @brief   Perepherie register offset
  */
-#define AT86RFA1_REG(reg)       (&(_SFR_MEM8((reg) + AT86RFA1_REGISTER_OFFSET)))
-#endif
-
-#if IS_USED(MODULE_AT86RFR2)
-#include <avr/io.h>
-
+#define AT86RF2XX_PERIPH_REG_OFF                                AT86RFA1_REGISTER_OFF
+/**
+ * @brief   Perepherie frame buffer start address
+ */
+#define AT86RF2XX_PERIPH_REG__TRXFBST                           AT86RFA1_REG__TRXFBST
+/**
+ * @brief   Perepherie frame buffer end address
+ */
+#define AT86RF2XX_PERIPH_REG__TRXFBEND                          AT86RFA1_REG__TRXFBEND
+/**
+ * @brief   Transceiver pin register
+ */
+#define AT86RF2XX_PERIPH_REG__TRXPR                             AT86RFA1_REG__TRXPR
+#elif IS_USED(MODULE_AT86RFR2)
 /**
  * @name    Additional AT86RFR2 MCU register addresses
  * @{
  */
-#define AT86RFR2_REG__IRQ_MASK1                                (&IRQ_MASK1)
-#define AT86RFR2_REG__IRQ_STATUS1                              (&IRQ_STATUS1)
-#define AT86RFR2_REG__TST_CTRL_DIGI                            (&TST_CTRL_DIGI)
-#define AT86RFR2_REG__TRXFBST                                  (&TRXFBST)
-#define AT86RFR2_REG__TRXFBEND                                 (&TRXFBEND)
-#define AT86RFR2_REG__TRXPR                                    (&TRXPR)
+#define AT86RFR2_REG__IRQ_MASK1                                 (&IRQ_MASK1)
+#define AT86RFR2_REG__IRQ_STATUS1                               (&IRQ_STATUS1)
+#define AT86RFR2_REG__TRXFBST                                   (&TRXFBST)
+#define AT86RFR2_REG__TRXFBEND                                  (&TRXFBEND)
+#define AT86RFR2_REG__TRXPR                                     (&TRXPR)
 /** @} */
 
 /**
  * @brief   AT86RF2XX transceiver register address offset
  *          for ATmega256RFR2
  */
-#define AT86RFR2_REGISTER_OFFSET            (0x140)
+#define AT86RFR2_REGISTER_OFF                                   (0x140)
+/**
+ * @brief   Perepherie register offset
+ */
+#define AT86RF2XX_PERIPH_REG_OFF                                AT86RFR2_REGISTER_OFF
+/**
+ * @brief   Extended interrupt mask regiser
+ */
+#define AT86RF2XX_PERIPH_REG__IRQ_MASK1                         AT86RFR2_REG__IRQ_MASK1
+/**
+ * @brief   Extended interrupt status register
+ */
+#define AT86RF2XX_PERIPH_REG__IRQ_STATUS1                       AT86RFR2_REG__IRQ_STATUS1
+/**
+ * @brief   Transceiver frame buffer start address
+ */
+#define AT86RF2XX_PERIPH_REG__TRXFBST                           AT86RFR2_REG__TRXFBST
+/**
+ * @brief   Transceiver frame buffer end address
+ */
+#define AT86RF2XX_PERIPH_REG__TRXFBEND                          AT86RFR2_REG__TRXFBEND
+/**
+ * @brief   Transceiver pin register
+ */
+#define AT86RF2XX_PERIPH_REG__TRXPR                             AT86RFR2_REG__TRXPR
+#endif
 
 /**
- * @brief AT86RFR2: access common register
+ * @brief Access perepherie transceiver register
  */
-#define AT86RFR2_REG(reg)       (&(_SFR_MEM8((reg) + AT86RFR2_REGISTER_OFFSET)))
+#if IS_USED(MODULE_AT86RFA1) || IS_USED(MODULE_AT86RFR2)
+#define AT86RF2XX_PERIPH_REG(reg)                               (&(_SFR_MEM8((reg) + AT86RF2XX_PERIPH_REG_OFF)))
 #endif
 
 /**
@@ -132,7 +167,7 @@ extern "C" {
 #define AT86RF2XX_REG__CSMA_SEED_0                              (0x2D)  /* all */
 #define AT86RF2XX_REG__CSMA_SEED_1                              (0x2E)  /* all */
 #define AT86RF2XX_REG__CSMA_BE                                  (0x2F)  /* all */
-#define AT86RF2XX_REG__TST_CTRL_DIGI                            (0x36)  /* AT86RF232, AT86RF233 */
+#define AT86RF2XX_REG__TST_CTRL_DIGI                            (0x36)  /* AT86RF232, AT86RF233, AT86RFA1, AT86RFR2 */
 #define AT86RF2XX_REG__TST_AGC                                  (0x3C)  /* AT86RF233 */
 #define AT86RF2XX_REG__TST_SDM                                  (0x3D)  /* AT86RF233 */
 #define AT86RF2XX_REG__PHY_TX_TIME                              (0x3B)  /* AT86RF233 */
@@ -638,7 +673,7 @@ extern "C" {
  * @name    Bitfield definitions for the TST_CTRL_DIGI register
  * @{
  */
-#define AT86RF2XX_TST_CTRL_DIGI_MASK__TST_CTRL_DIG              (0x0F) /* AT86RF232, AT86RF233 */
+#define AT86RF2XX_TST_CTRL_DIGI_MASK__TST_CTRL_DIG              (0x0F) /* AT86RF232, AT86RF233, AT86RFA1, AT86RFR2 */
 /** @} */
 
 /**
