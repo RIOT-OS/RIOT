@@ -90,6 +90,10 @@ ifneq (,$(filter gnrc_dhcpv6_client,$(USEMODULE)))
   USEMODULE += gnrc_sock_udp
 endif
 
+ifneq (,$(filter gnrc_dhcpv6_client_6lbr,$(USEMODULE)))
+  USEMODULE += gnrc_dhcpv6_client
+endif
+
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_uhcpc
   USEMODULE += uhcpc

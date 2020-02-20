@@ -643,4 +643,10 @@ void auto_init(void)
     extern void dhcpv6_client_auto_init(void);
     dhcpv6_client_auto_init();
 #endif /* MODULE_AUTO_INIT_DHCPV6_CLIENT */
+
+#ifdef MODULE_GNRC_DHCPV6_CLIENT_6LBR
+    DEBUG("auto_init 6LoWPAN border router DHCPv6 client");
+    extern void gnrc_dhcpv6_client_6lbr_init(void);
+    gnrc_dhcpv6_client_6lbr_init();
+#endif /* MODULE_GNRC_DHCPV6_CLIENT_6LBR */
 }
