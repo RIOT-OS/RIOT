@@ -1,6 +1,6 @@
 FLASHFILE ?= $(BINFILE)
 FLASHER ?= $(RIOTTOOLS)/bossa/bossac
-FFLAGS  ?= -p $(PROG_DEV) -e -i -w -v -b -R $(FLASHFILE)
+FFLAGS  ?= -p $(PROG_DEV) -o $(ROM_OFFSET) -e -i -w -v -b -R $(FLASHFILE)
 
 # some arduino boards need to toggle the serial interface a little bit to get
 # them ready for flashing...
