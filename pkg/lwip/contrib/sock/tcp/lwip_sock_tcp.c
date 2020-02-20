@@ -27,7 +27,7 @@ static inline void _tcp_sock_init(sock_tcp_t *sock, struct netconn *conn,
 {
     mutex_init(&sock->mutex);
     mutex_lock(&sock->mutex);
-    sock->conn = conn;
+    sock->base.conn = conn;
     sock->queue = queue;
     sock->last_buf = NULL;
     sock->last_offset = 0;
@@ -74,13 +74,13 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
     assert(tmp != NULL); /* just in case lwIP is trolling */
     mutex_init(&queue->mutex);
     mutex_lock(&queue->mutex);
-    queue->conn = tmp;
+    queue->base.conn = tmp;
     queue->array = queue_array;
     queue->len = queue_len;
     queue->used = 0;
     memset(queue->array, 0, sizeof(sock_tcp_t) * queue_len);
     mutex_unlock(&queue->mutex);
-    switch (netconn_listen_with_backlog(queue->conn, queue->len)) {
+    switch (netconn_listen_with_backlog(queue->base.conn, queue->len)) {
         case ERR_OK:
             break;
         case ERR_MEM:
@@ -90,8 +90,8 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
         case ERR_VAL:
             return -EINVAL;
         default:
-            assert(false); /* should not happen since queue->conn is not closed
-                            * and we have a TCP conn */
+            assert(false); /* should not happen since queue->base.conn is not
+                            * closed and we have a TCP conn */
             break;
     }
     return 0;
@@ -101,10 +101,10 @@ void sock_tcp_disconnect(sock_tcp_t *sock)
 {
     assert(sock != NULL);
     mutex_lock(&sock->mutex);
-    if (sock->conn != NULL) {
-        netconn_close(sock->conn);
-        netconn_delete(sock->conn);
-        sock->conn = NULL;
+    if (sock->base.conn != NULL) {
+        netconn_close(sock->base.conn);
+        netconn_delete(sock->base.conn);
+        sock->base.conn = NULL;
         /* if sock came from a sock_tcp_queue_t: since sock is a pointer in it's
          * array it is also deleted from there, but we need to decrement the used
          * counter */
@@ -122,10 +122,10 @@ void sock_tcp_stop_listen(sock_tcp_queue_t *queue)
 {
     assert(queue != NULL);
     mutex_lock(&queue->mutex);
-    if (queue->conn != NULL) {
-        netconn_close(queue->conn);
-        netconn_delete(queue->conn);
-        queue->conn = NULL;
+    if (queue->base.conn != NULL) {
+        netconn_close(queue->base.conn);
+        netconn_delete(queue->base.conn);
+        queue->base.conn = NULL;
         /* sever connections established through this queue */
         for (unsigned i = 0; i < queue->len; i++) {
             sock_tcp_disconnect(&queue->array[i]);
@@ -143,7 +143,7 @@ int sock_tcp_get_local(sock_tcp_t *sock, sock_tcp_ep_t *ep)
     int res = 0;
     assert(sock != NULL);
     mutex_lock(&sock->mutex);
-    if ((sock->conn == NULL) || lwip_sock_get_addr(sock->conn,
+    if ((sock->base.conn == NULL) || lwip_sock_get_addr(sock->base.conn,
                                                    (struct _sock_tl_ep *)ep,
                                                    1)) {
         res = -EADDRNOTAVAIL;
@@ -157,7 +157,7 @@ int sock_tcp_get_remote(sock_tcp_t *sock, sock_tcp_ep_t *ep)
     int res = 0;
     assert(sock != NULL);
     mutex_lock(&sock->mutex);
-    if ((sock->conn == NULL) || lwip_sock_get_addr(sock->conn,
+    if ((sock->base.conn == NULL) || lwip_sock_get_addr(sock->base.conn,
                                                    (struct _sock_tl_ep *)ep,
                                                    0)) {
         res = -ENOTCONN;
@@ -172,7 +172,7 @@ int sock_tcp_queue_get_local(sock_tcp_queue_t *queue, sock_tcp_ep_t *ep)
 
     assert(queue != NULL);
     mutex_lock(&queue->mutex);
-    if ((queue->conn == NULL) || lwip_sock_get_addr(queue->conn,
+    if ((queue->base.conn == NULL) || lwip_sock_get_addr(queue->base.conn,
                                                     (struct _sock_tl_ep *)ep,
                                                     1)) {
         res = -EADDRNOTAVAIL;
@@ -188,7 +188,7 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
     int res = 0;
 
     assert((queue != NULL) && (sock != NULL));
-    if (queue->conn == NULL) {
+    if (queue->base.conn == NULL) {
         return -EINVAL;
     }
     if (timeout == 0) {
@@ -202,19 +202,19 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
     if (queue->used < queue->len) {
 #if LWIP_SO_RCVTIMEO
         if ((timeout != 0) && (timeout != SOCK_NO_TIMEOUT)) {
-            netconn_set_recvtimeout(queue->conn, timeout / US_PER_MS);
+            netconn_set_recvtimeout(queue->base.conn, timeout / US_PER_MS);
         }
         else
 #endif
-        if ((timeout == 0) && !cib_avail(&queue->conn->acceptmbox.mbox.cib)) {
+        if ((timeout == 0) && !cib_avail(&queue->base.conn->acceptmbox.mbox.cib)) {
             mutex_unlock(&queue->mutex);
             return -EAGAIN;
         }
-        switch (netconn_accept(queue->conn, &tmp)) {
+        switch (netconn_accept(queue->base.conn, &tmp)) {
             case ERR_OK:
                 for (unsigned short i = 0; i < queue->len; i++) {
                     sock_tcp_t *s = &queue->array[i];
-                    if (s->conn == NULL) {
+                    if (s->base.conn == NULL) {
                         _tcp_sock_init(s, tmp, queue);
                         queue->used++;
                         assert(queue->used > 0);
@@ -244,7 +244,7 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
         res = -ENOMEM;
     }
 #if LWIP_SO_RCVTIMEO
-    netconn_set_recvtimeout(queue->conn, 0);
+    netconn_set_recvtimeout(queue->base.conn, 0);
 #endif
     mutex_unlock(&queue->mutex);
     return res;
@@ -259,7 +259,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
     bool done = false;
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    if (sock->conn == NULL) {
+    if (sock->base.conn == NULL) {
         return -ENOTCONN;
     }
     if (timeout == 0) {
@@ -272,11 +272,11 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
     }
 #if LWIP_SO_RCVTIMEO
     if ((timeout != 0) && (timeout != SOCK_NO_TIMEOUT)) {
-        netconn_set_recvtimeout(sock->conn, timeout / US_PER_MS);
+        netconn_set_recvtimeout(sock->base.conn, timeout / US_PER_MS);
     }
     else
 #endif
-    if ((timeout == 0) && !cib_avail(&sock->conn->recvmbox.mbox.cib)) {
+    if ((timeout == 0) && !cib_avail(&sock->base.conn->recvmbox.mbox.cib)) {
         mutex_unlock(&sock->mutex);
         return -EAGAIN;
     }
@@ -287,7 +287,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
         }
         else {
             err_t err;
-            if ((err = netconn_recv_tcp_pbuf(sock->conn, &buf)) < 0) {
+            if ((err = netconn_recv_tcp_pbuf(sock->base.conn, &buf)) < 0) {
                 switch (err) {
                     case ERR_ABRT:
                         res = -ECONNABORTED;
@@ -343,9 +343,9 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
     }
     /* unset flags */
 #if LWIP_SO_RCVTIMEO
-    netconn_set_recvtimeout(sock->conn, 0);
+    netconn_set_recvtimeout(sock->base.conn, 0);
 #endif
-    netconn_set_nonblocking(sock->conn, false);
+    netconn_set_nonblocking(sock->base.conn, false);
     mutex_unlock(&sock->mutex);
     return res;
 }
@@ -358,11 +358,11 @@ ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len)
     assert(sock != NULL);
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
     mutex_lock(&sock->mutex);
-    if (sock->conn == NULL) {
+    if (sock->base.conn == NULL) {
         mutex_unlock(&sock->mutex);
         return -ENOTCONN;
     }
-    conn = sock->conn;
+    conn = sock->base.conn;
     mutex_unlock(&sock->mutex); /* we won't change anything to sock here
                                    (lwip_sock_send neither, since it remote is
                                    NULL) so we can leave the mutex */
