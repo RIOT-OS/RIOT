@@ -86,7 +86,6 @@ extern "C" {
 #define LWIP_IPV6               (0)
 #endif /* MODULE_LWIP_IPV6 */
 
-
 #ifdef MODULE_LWIP_NETIF_PPP
 #define PPP_SUPPORT             (1)
 #else  /* MODULE_LWIP_NETIF_PPP */
