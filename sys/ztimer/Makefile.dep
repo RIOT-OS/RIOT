@@ -1,0 +1,50 @@
+#
+# ztimer dependencies
+#
+
+
+# "ztimer" is the default meta-module of ztimer
+ifneq (,$(filter ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_auto_init
+  USEMODULE += ztimer_core
+  USEMODULE += ztimer_convert_frac
+  USEMODULE += ztimer_convert_shift
+endif
+
+# "ztimer_xtimer_compat" is a wrapper of the xtimer API on ztimer_used
+# (it is currently incomplete)
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+  USEMODULE += div
+  USEMODULE += ztimer_usec
+  PSEUDOMODULES += xtimer
+endif
+
+ifneq (,$(filter ztimer_%,$(USEMODULE)))
+  USEMODULE += ztimer_core
+  USEMODULE += ztimer_extend
+endif
+
+ifneq (,$(filter ztimer_convert_%,$(USEMODULE)))
+  USEMODULE += ztimer_convert
+endif
+
+ifneq (,$(filter ztimer_periph,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_timer
+endif
+
+ifneq (,$(filter ztimer_rtt,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtt
+endif
+
+ifneq (,$(filter ztimer_convert_frac,$(USEMODULE)))
+  USEMODULE += frac
+endif
+
+ifneq (,$(filter ztimer_usec,$(USEMODULE)))
+  USEMODULE += ztimer
+  USEMODULE += ztimer_periph
+endif
+
+ifneq (,$(filter ztimer_msec,$(USEMODULE)))
+  USEMODULE += ztimer
+endif

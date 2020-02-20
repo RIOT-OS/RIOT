@@ -676,18 +676,11 @@ ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))
 endif
 
 ifneq (,$(filter xtimer,$(USEMODULE)))
-  ifeq (,$(filter ztimer,$(USEMODULE)))
+  ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
     DEFAULT_MODULE += auto_init_xtimer
     FEATURES_REQUIRED += periph_timer
     USEMODULE += div
-  else
-    USEMODULE += ztimer_xtimer_compat
   endif
-endif
-
-ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-  USEMODULE += div
-  PSEUDOMODULES += xtimer
 endif
 
 ifneq (,$(filter saul,$(USEMODULE)))
@@ -1022,49 +1015,8 @@ ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
 endif
 
-#
-# ztimer dependencies
-#
-ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-  USEMODULE += ztimer_usec
-endif
-
-ifneq (,$(filter ztimer_%,$(USEMODULE)))
-  USEMODULE += ztimer_core
-  USEMODULE += ztimer_extend
-endif
-
-ifneq (,$(filter ztimer_convert_%,$(USEMODULE)))
-  USEMODULE += ztimer_convert
-endif
-
-ifneq (,$(filter ztimer_periph,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_timer
-endif
-
-ifneq (,$(filter ztimer_rtt,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_rtt
-endif
-
-ifneq (,$(filter ztimer_convert_frac,$(USEMODULE)))
-  USEMODULE += frac
-endif
-
-ifneq (,$(filter ztimer,$(USEMODULE)))
-  # this is the default module for ztimer
-  USEMODULE += ztimer_auto_init
-  USEMODULE += ztimer_core
-  USEMODULE += ztimer_convert_frac
-  USEMODULE += ztimer_convert_shift
-endif
-
-ifneq (,$(filter ztimer_usec,$(USEMODULE)))
-  USEMODULE += ztimer
-  USEMODULE += ztimer_periph
-endif
-
-ifneq (,$(filter ztimer_msec,$(USEMODULE)))
-  USEMODULE += ztimer
+ifneq (,$(filter ztimer%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/ztimer/Makefile.dep
 endif
 
 # Enable periph_gpio when periph_gpio_irq is enabled
