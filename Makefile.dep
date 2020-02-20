@@ -675,14 +675,6 @@ ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))
   FEATURES_REQUIRED += periph_pwm
 endif
 
-ifneq (,$(filter xtimer,$(USEMODULE)))
-  ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    DEFAULT_MODULE += auto_init_xtimer
-    FEATURES_REQUIRED += periph_timer
-    USEMODULE += div
-  endif
-endif
-
 ifneq (,$(filter saul,$(USEMODULE)))
   USEMODULE += phydat
 endif
@@ -1015,8 +1007,26 @@ ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
 endif
 
+# include ztimer dependencies
 ifneq (,$(filter ztimer%,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer/Makefile.dep
+endif
+
+# handle xtimer's deps. Needs to be done *after* ztimer
+ifneq (,$(filter xtimer,$(USEMODULE)))
+  ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    # xtimer is used, ztimer xtimer wrapper is not
+    DEFAULT_MODULE += auto_init_xtimer
+    USEMODULE += div
+    ifeq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
+      # ztimer is not used, so use *periph_timer as low-level timer*.
+      FEATURES_REQUIRED += periph_timer
+    else
+      # will use *ztimer_usec as low-level timer*
+    endif
+  else
+  # ztimer_xtimer_compat is used, all of *xtimer's API will be mapped on ztimer.*
+  endif
 endif
 
 # Enable periph_gpio when periph_gpio_irq is enabled

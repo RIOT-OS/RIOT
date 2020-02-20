@@ -27,8 +27,14 @@
 #error "Do not include this file directly! Use xtimer.h instead"
 #endif
 
+#ifdef MODULE_XTIMER_ON_ZTIMER
+#include "ztimer.h"
+#else
 #include "periph/timer.h"
+#endif
+
 #include "irq.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,7 +52,12 @@ extern volatile uint64_t _xtimer_current_time;
  */
 static inline uint32_t _xtimer_lltimer_now(void)
 {
+#ifndef MODULE_XTIMER_ON_ZTIMER
     return timer_read(XTIMER_DEV);
+#else
+    return ztimer_now(ZTIMER_USEC);
+#endif
+
 }
 
 /**

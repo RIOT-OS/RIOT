@@ -2,7 +2,6 @@
 # ztimer dependencies
 #
 
-
 # "ztimer" is the default meta-module of ztimer
 ifneq (,$(filter ztimer,$(USEMODULE)))
   USEMODULE += ztimer_core
@@ -24,8 +23,23 @@ ifneq (,$(filter ztimer,$(USEMODULE)))
   endif
 endif
 
+# unless ztimer_xtimer_compat is used, make xtimer use ztimer as backend.
+ifneq (,$(filter ztimer,$(USEMODULE)))
+  ifneq  (,$(filter xtimer,$(USEMODULE)))
+    ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+        USEMODULE += xtimer_on_ztimer
+    endif
+  endif
+endif
+
+# make xtimer use ztimer_usec as low level timer
+ifneq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+  PSEUDOMODULES += xtimer_on_ztimer
+endif
+
 # "ztimer_xtimer_compat" is a wrapper of the xtimer API on ztimer_used
-# (it is currently incomplete)
+# (it is currently incomplete). Unless doing testing, use "xtimer_on_ztimer".
 ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   USEMODULE += div
   USEMODULE += ztimer_usec
@@ -41,11 +55,11 @@ ifneq (,$(filter ztimer_convert_%,$(USEMODULE)))
   USEMODULE += ztimer_convert
 endif
 
-ifneq (,$(filter ztimer_periph,$(USEMODULE)))
+ifneq (,$(filter ztimer_periph_timer,$(USEMODULE)))
   FEATURES_REQUIRED += periph_timer
 endif
 
-ifneq (,$(filter ztimer_rtt,$(USEMODULE)))
+ifneq (,$(filter ztimer_periph_rtt,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
 
@@ -55,7 +69,7 @@ endif
 
 ifneq (,$(filter ztimer_usec,$(USEMODULE)))
   USEMODULE += ztimer
-  USEMODULE += ztimer_periph
+  USEMODULE += ztimer_periph_timer
 endif
 
 ifneq (,$(filter ztimer_msec,$(USEMODULE)))
