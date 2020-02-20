@@ -42,8 +42,10 @@
 #include "ztimer/xtimer_compat.h"
 #else
 
+#ifndef MODULE_XTIMER_ON_ZTIMER
 #include "board.h"
 #include "periph_conf.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
