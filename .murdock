@@ -346,7 +346,7 @@ static_tests() {
 
 get_non_compile_jobs() {
     [ "$STATIC_TESTS" = "1" ] && \
-        echo "$0 static_tests###{ \"jobdir\" : \"exclusive\" }"
+        echo "$0 static_tests###{ \"jobdir\" : \"exclusive\", \"timeout\" : 600 }"
 }
 
 get_jobs() {
