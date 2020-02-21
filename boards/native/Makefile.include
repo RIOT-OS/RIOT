@@ -91,15 +91,13 @@ debug-valgrind-server: export VALGRIND_FLAGS ?= --vgdb=yes --vgdb-error=0 -v \
 	--read-var-info=yes
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
 term-gprof: TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELFFILE)
-all-valgrind: CFLAGS += -DHAVE_VALGRIND_H -g3
+all-valgrind: CFLAGS += -DHAVE_VALGRIND_H
 all-valgrind: export NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
-all-debug: CFLAGS += -g3
-all-cachegrind: CFLAGS += -g3
 all-gprof: CFLAGS += -pg
 all-gprof: LINKFLAGS += -pg
-all-asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
+all-asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer
 all-asan: CFLAGS += -DNATIVE_MEMORY
-all-asan: LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
+all-asan: LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer
 
 INCLUDES += $(NATIVEINCLUDES)
 
@@ -130,6 +128,7 @@ endif
 all: # do not override first target
 
 all-debug: all
+	@$(COLOR_ECHO) '$(COLOR_RED)`all-debug` is deprecated, just use `all`$(COLOR_RESET)'
 
 all-gprof: all
 
