@@ -113,7 +113,12 @@
 /sys/usb/                                   @bergzand @dylad @aabadie
 /sys/xtimer/                                @kaspar030 @MichelRottleuthner
 
-/tests/                                     @miri64 @MrKevinWeiss @smlng @leandrolanzieri @aabadie @MichelRottleuthner @fjmolinas
+/tests/                                     @MrKevinWeiss @smlng @leandrolanzieri @aabadie @MichelRottleuthner @fjmolinas
+/tests/emb6*                                @miri64
+/tests/gnrc*                                @miri64
+/tests/lwip*                                @miri64
+/tests/unittests                            @miri64
+/tests/*/tests/*.py                         @miri64
 /tests/cpu_efm32_features/                  @basilfx
 
 # KConfig maintainers will be notified about all KConfig changes
