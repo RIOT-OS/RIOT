@@ -88,8 +88,8 @@ typedef enum {
  */
 typedef struct {
     NRF_TWI_Type *dev;          /**< hardware device */
-    uint8_t pin_scl;            /**< SCL pin */
-    uint8_t pin_sda;            /**< SDA pin */
+    gpio_t pin_scl;             /**< SCL pin */
+    gpio_t pin_sda;             /**< SDA pin */
     uint8_t ppi;                /**< PPI channel to use */
     i2c_speed_t speed;          /**< bus speed */
 } i2c_conf_t;
