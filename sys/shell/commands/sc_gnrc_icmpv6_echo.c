@@ -36,6 +36,9 @@
 #ifdef MODULE_GNRC_IPV6_NIB
 #include "net/gnrc/ipv6/nib/nc.h"
 #endif
+#ifdef MODULE_SOCK_DNS
+#include "net/sock/dns.h"
+#endif
 #include "net/icmpv6.h"
 #include "net/ipv6.h"
 #include "timex.h"
