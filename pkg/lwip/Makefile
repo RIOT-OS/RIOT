@@ -1,5 +1,5 @@
 PKG_NAME=lwip
-PKG_URL=https://git.savannah.nongnu.org/git/lwip.git
+PKG_URL=https://github.com/lwip-tcpip/lwip.git
 # lwIP v2.1.2
 PKG_VERSION=159e31b689577dbf69cf0683bbaffbd71fa5ee10
 PKG_LICENSE=BSD-3-Clause
