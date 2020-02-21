@@ -233,12 +233,12 @@ static inline void xtimer_set64(xtimer_t *timer, uint64_t period_us)
 #ifdef MODULE_CORE_MSG
 static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout)
 {
-    return _xtimer_msg_receive_timeout(msg, _xtimer_ticks_from_usec(timeout));
+    return _xtimer_msg_receive_timeout(msg, timeout);
 }
 
 static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout)
 {
-    return _xtimer_msg_receive_timeout64(msg, _xtimer_ticks_from_usec64(timeout));
+    return _xtimer_msg_receive_timeout64(msg, timeout);
 }
 
 static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid)
