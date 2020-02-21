@@ -39,16 +39,17 @@ typedef struct {
 } blob_t;
 
 const blob_t bad[] = {
-    { manifest0_bin, manifest0_bin_len },
-    { manifest1_bin, manifest1_bin_len },
-    { manifest2_bin, manifest2_bin_len },
-    { manifest3_bin, manifest3_bin_len },
+    /* GCC 7.3.1 can't handle manifestx_bin_len here */
+    { manifest0_bin, sizeof(manifest0_bin) },
+    { manifest1_bin, sizeof(manifest1_bin) },
+    { manifest2_bin, sizeof(manifest2_bin) },
+    { manifest3_bin, sizeof(manifest3_bin) },
 };
 
 const size_t bad_numof = ARRAY_SIZE(bad);
 
 const blob_t good[] = {
-    { manifest4_bin, manifest4_bin_len },
+    { manifest4_bin, sizeof(manifest4_bin) },
 };
 
 const size_t good_numof = ARRAY_SIZE(good);
