@@ -119,6 +119,7 @@ static int _msg_wait(msg_t *m, xtimer_t *t)
 
     if (! (flags & THREAD_FLAG_TIMEOUT)) {
         xtimer_remove(t);
+        thread_flags_clear(THREAD_FLAG_TIMEOUT);
     }
 
     return res;
