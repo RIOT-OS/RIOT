@@ -77,7 +77,7 @@ static void _usage(char *cmdname);
 static int _configure(int argc, char **argv, _ping_data_t *data);
 static void _pinger(_ping_data_t *data);
 static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
-                         ipv6_addr_t *from, unsigned hoplimit, int16_t rssi);
+                         ipv6_addr_t *from, unsigned hoplimit, gnrc_netif_hdr_t *netif_hdr);
 static void _handle_reply(_ping_data_t *data, gnrc_pktsnip_t *pkt);
 static int _finish(_ping_data_t *data);
 
@@ -322,9 +322,12 @@ error_exit:
 
 static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
                          ipv6_addr_t *from, unsigned hoplimit,
-                         int16_t rssi)
+                         gnrc_netif_hdr_t *netif_hdr)
 {
     icmpv6_echo_t *icmpv6_hdr = icmpv6->data;
+
+    kernel_pid_t if_pid = netif_hdr ? netif_hdr->if_pid : KERNEL_PID_UNDEF;
+    int16_t rssi = netif_hdr ? netif_hdr->rssi : 0;
 
     /* discard if too short */
     if (icmpv6->size < (data->datalen + sizeof(icmpv6_echo_t))) {
@@ -364,8 +367,17 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
             data->num_recv++;
             dupmsg += 7;
         }
-        printf("%u bytes from %s: icmp_seq=%u ttl=%u", (unsigned)icmpv6->size,
-               from_str, recv_seq, hoplimit);
+        if ((GNRC_NETIF_NUMOF == 1) || (if_pid == KERNEL_PID_UNDEF) ||
+            !ipv6_addr_is_link_local(from)) {
+            printf("%u bytes from %s: icmp_seq=%u ttl=%u",
+                   (unsigned)icmpv6->size,
+                   from_str, recv_seq, hoplimit);
+        } else {
+            printf("%u bytes from %s%%%u: icmp_seq=%u ttl=%u",
+                   (unsigned)icmpv6->size,
+                   from_str, if_pid, recv_seq, hoplimit);
+
+        }
         if (rssi) {
             printf(" rssi=%"PRId16" dBm", rssi);
         }
@@ -392,7 +404,7 @@ static void _handle_reply(_ping_data_t *data, gnrc_pktsnip_t *pkt)
     }
     ipv6_hdr = ipv6->data;
     netif_hdr = netif ? netif->data : NULL;
-    _print_reply(data, icmpv6, &ipv6_hdr->src, ipv6_hdr->hl, netif_hdr ? netif_hdr->rssi : 0);
+    _print_reply(data, icmpv6, &ipv6_hdr->src, ipv6_hdr->hl, netif_hdr);
 #ifdef MODULE_GNRC_IPV6_NIB
     /* successful ping to neighbor (NIB handles case if ipv6->src is not a
      * neighbor) can be taken as upper-layer hint for reachability:
