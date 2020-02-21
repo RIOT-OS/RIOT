@@ -243,6 +243,13 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
         }
     }
     else {
+        while (cib_avail(&queue->base.conn->acceptmbox.mbox.cib)) {
+            /* close connections potentially accepted by lwIP */
+            if (netconn_accept(queue->base.conn, &tmp) == ERR_OK) {
+                netconn_close(tmp);
+                netconn_delete(tmp);
+            }
+        }
         res = -ENOMEM;
     }
 #if LWIP_SO_RCVTIMEO
