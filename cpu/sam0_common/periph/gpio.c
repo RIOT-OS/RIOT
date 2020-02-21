@@ -186,14 +186,14 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     PM->APBAMASK.reg |= PM_APBAMASK_EIC;
     /* SAMD21 used GCLK2 which is supplied by either the ultra low power
        internal or external 32 kHz */
-    GCLK->CLKCTRL.reg = (EIC_GCLK_ID |
-                         GCLK_CLKCTRL_CLKEN |
-                         GCLK_CLKCTRL_GEN_GCLK2);
+    GCLK->CLKCTRL.reg = EIC_GCLK_ID
+                      | GCLK_CLKCTRL_CLKEN
+                      | GCLK_CLKCTRL_GEN(SAM0_GCLK_32KHZ);
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 #else /* CPU_FAM_SAML21 */
     /* enable clocks for the EIC module */
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_EIC;
-    GCLK->PCHCTRL[EIC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
+    GCLK->PCHCTRL[EIC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(SAM0_GCLK_MAIN);
     /* disable the EIC module*/
     _EIC->CTRLA.reg = 0;
     while (_EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE) {}
