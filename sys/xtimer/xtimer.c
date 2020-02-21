@@ -100,7 +100,35 @@ void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
     *last_wakeup = now + offset;
 }
 
-#if defined(MODULE_CORE_MSG) && defined(MODULE_CORE_THREAD_FLAGS)
+#ifdef MODULE_CORE_MSG
+static void _callback_msg(void* arg)
+{
+    msg_t *msg = (msg_t*)arg;
+    msg_send_int(msg, msg->sender_pid);
+}
+
+static inline void _setup_msg(xtimer_t *timer, msg_t *msg, kernel_pid_t target_pid)
+{
+    timer->callback = _callback_msg;
+    timer->arg = (void*) msg;
+
+    /* use sender_pid field to get target_pid into callback function */
+    msg->sender_pid = target_pid;
+}
+
+void _xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid)
+{
+    _setup_msg(timer, msg, target_pid);
+    _xtimer_set64(timer, offset, 0);
+}
+
+void _xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid)
+{
+    _setup_msg(timer, msg, target_pid);
+    _xtimer_set64(timer, offset, offset >> 32);
+}
+
+#if MODULE_CORE_THREAD_FLAGS
 /* Waits for incoming message or timeout flag. */
 static int _msg_wait(msg_t *m, xtimer_t *t)
 {
@@ -137,7 +165,8 @@ int _xtimer_msg_receive_timeout(msg_t *m, uint32_t timeout_us)
     xtimer_set_timeout_flag(&t, timeout_us);
     return _msg_wait(m, &t);
 }
-#endif /* MODULE_CORE_MSG && MODULE_CORE_THREAD_FLAGS */
+#endif /* MODULE_CORE_THREAD_FLAGS */
+#endif /* MODULE_CORE_MSG */
 
 static void _callback_wakeup(void* arg)
 {
