@@ -57,5 +57,5 @@ void pm_set(unsigned mode)
     /* make sure value has been set */
     while (PM->SLEEPCFG.bit.SLEEPMODE != _mode) {}
 
-    cortexm_sleep(deep);
+    sam0_cortexm_sleep(deep);
 }

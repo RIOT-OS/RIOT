@@ -353,6 +353,16 @@ typedef struct {
 void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
 
 /**
+ * @brief   Wrapper for cortexm_sleep calling power management callbacks
+ *
+ * @param[in] deep
+ */
+static inline void sam0_cortexm_sleep(int deep)
+{
+    cortexm_sleep(deep);
+}
+
+/**
  * @brief   Returns the frequency of a GCLK provider.
  *
  * @param[in] id    The ID of the GCLK
