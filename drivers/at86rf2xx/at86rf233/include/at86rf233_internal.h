@@ -101,7 +101,7 @@ typedef enum at86rf233_phy_mode {
 } at86rf233_phy_mode_t;
 
 /**
- * @brief Frame buffer structure of AT86RF231
+ * @brief Frame buffer structure of AT86RF233
  */
 typedef struct {
     uint8_t phr;        /**< PHR */

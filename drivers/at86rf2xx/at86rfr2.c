@@ -1,3 +1,32 @@
+/*
+ * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ * Copyright (C) 2015 Freie Universität Berlin
+ *               2017 HAW Hamburg
+ *               2019 OvGU Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     drivers_at86rf2xx
+ * @{
+ *
+ * @file
+ * @brief       Implementation of AT86RFR2 internal functions
+ *
+ * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
+ *
+ * @}
+ */
+
 #include "kernel_defines.h"
 #if IS_USED(MODULE_AT86RFR2)
 #include "xtimer.h"
