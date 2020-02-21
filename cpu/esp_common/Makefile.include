@@ -116,7 +116,7 @@ endif
 
 # if SPI RAM is enabled, the qout flash mode has to be used
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
-  export FLASH_MODE = qout
+  FLASH_MODE = qout
   CFLAGS += -DFLASH_MODE_QOUT=1
 else
   ifeq ($(FLASH_MODE), qio)
