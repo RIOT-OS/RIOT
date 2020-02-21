@@ -134,6 +134,14 @@ extern "C" {
 #define LWIP_NETCONN            (0)
 #endif
 
+#ifndef TCP_LISTEN_BACKLOG
+# if defined(MODULE_LWIP_SOCK_TCP)
+# define TCP_LISTEN_BACKLOG     (1)
+# else
+# define TCP_LISTEN_BACKLOG     (0)
+# endif
+#endif /* TCP_LISTEN_BACKLOG */
+
 #define LWIP_SOCKET             (0)
 
 #define LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
