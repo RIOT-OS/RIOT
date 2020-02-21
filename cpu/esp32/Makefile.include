@@ -49,7 +49,6 @@ USEMODULE += esp_idf_driver
 USEMODULE += esp_idf_esp32
 USEMODULE += esp_idf_soc
 USEMODULE += periph_adc_ctrl
-USEMODULE += periph_rtc
 
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include
