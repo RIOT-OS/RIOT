@@ -242,7 +242,18 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 }
 
 inline static void reenable_eic(gpio_eic_clock_t clock) {
-#if !defined(CPU_SAMD21)
+#if defined(CPU_SAMD21)
+    if (clock == _EIC_CLOCK_SLOW) {
+        GCLK->CLKCTRL.reg = EIC_GCLK_ID
+                          | GCLK_CLKCTRL_CLKEN
+                          | GCLK_CLKCTRL_GEN(SAM0_GCLK_32KHZ);
+    } else {
+        GCLK->CLKCTRL.reg = EIC_GCLK_ID
+                          | GCLK_CLKCTRL_CLKEN
+                          | GCLK_CLKCTRL_GEN(SAM0_GCLK_MAIN);
+    }
+    while (GCLK->STATUS.bit.SYNCBUSY) {}
+#else
     uint32_t ctrla_reg = EIC_CTRLA_ENABLE;
 
     EIC->CTRLA.reg = 0;
@@ -266,6 +277,11 @@ void gpio_pm_cb_enter(int deep)
         DEBUG_PUTS("gpio: switching EIC to slow clock");
         reenable_eic(_EIC_CLOCK_SLOW);
     }
+#else
+    if (deep) {
+        DEBUG_PUTS("gpio: switching EIC to slow clock");
+        reenable_eic(_EIC_CLOCK_SLOW);
+    }
 #endif
 }
 
@@ -275,6 +291,11 @@ void gpio_pm_cb_leave(int deep)
     (void) deep;
 
     if (PM->SLEEPCFG.bit.SLEEPMODE == PM_SLEEPCFG_SLEEPMODE_STANDBY) {
+        DEBUG_PUTS("gpio: switching EIC to fast clock");
+        reenable_eic(_EIC_CLOCK_FAST);
+    }
+#else
+    if (deep) {
         DEBUG_PUTS("gpio: switching EIC to fast clock");
         reenable_eic(_EIC_CLOCK_FAST);
     }
