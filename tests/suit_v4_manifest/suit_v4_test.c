@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Inria
+ *               2020 Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @{
+ *
+ * @file
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ */
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -63,7 +79,6 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
     return 0;
 }
 
-
 int riotboot_flashwrite_verify_sha256(const uint8_t *sha256_digest,
                                       size_t img_size, int target_slot)
 {
@@ -73,3 +88,4 @@ int riotboot_flashwrite_verify_sha256(const uint8_t *sha256_digest,
     puts("riotboot_flashwrite_verify_sha256() empty mock");
     return 0;
 }
+/** @} */

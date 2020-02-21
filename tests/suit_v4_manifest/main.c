@@ -35,7 +35,7 @@
 
 typedef struct {
     const unsigned char *data;
-    size_t len;
+    const size_t len;
 } blob_t;
 
 const blob_t bad[] = {
