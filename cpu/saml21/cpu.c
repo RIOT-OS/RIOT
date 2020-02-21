@@ -23,6 +23,22 @@
 #include "periph_conf.h"
 #include "stdio_base.h"
 
+/* As long as DFLL & DPLL are not used, we can default to
+ * always use the buck converter when available.
+ *
+ * An external inductor needs to be present on the board,
+ * so the feature can only be enabled by the board configuration.
+ */
+#ifndef USE_VREG_BUCK
+#define USE_VREG_BUCK   (0)
+#endif
+
+#if (CLOCK_CORECLOCK == 48000000U) || defined (MODULE_PERIPH_USBDEV)
+#define USE_DFLL        (1)
+#else
+#define USE_DFLL        (0)
+#endif
+
 static void _gclk_setup(int gclk, uint32_t reg)
 {
     GCLK->GENCTRL[gclk].reg = reg;
@@ -86,7 +102,10 @@ uint32_t sam0_gclk_freq(uint8_t id)
 
 static void _dfll_setup(void)
 {
-#if (CLOCK_CORECLOCK == 48000000U) || defined (MODULE_PERIPH_USBDEV)
+    if (!USE_DFLL) {
+        return;
+    }
+
     GCLK->PCHCTRL[OSCCTRL_GCLK_ID_DFLL48].reg = GCLK_PCHCTRL_CHEN |
                                                 GCLK_PCHCTRL_GEN_GCLK2;
 
@@ -124,19 +143,52 @@ static void _dfll_setup(void)
     MCLK->APBBMASK.reg |= MCLK_APBBMASK_NVMCTRL;
     /* Set Wait State to meet requirements */
     NVMCTRL->CTRLB.reg |= NVMCTRL_CTRLB_RWS(3);
-#endif
+}
+
+static void _set_active_mode_vreg(void)
+{
+    if (!USE_VREG_BUCK) {
+        return;
+    }
+
+    /* not compatible with 48 MHz DFLL & 96 MHz FDPLL */
+    if (USE_DFLL) {
+        sam0_set_voltage_regulator(SAM0_VREG_LDO);
+    } else {
+        sam0_set_voltage_regulator(SAM0_VREG_BUCK);
+    }
 }
 
 void cpu_pm_cb_enter(int deep)
 {
-    (void) deep;
-    /* will be called before entering sleep */
+    if (!deep) {
+        return;
+    }
+
+    /* If you are using saml21 rev. B, switch Main Clock to OSCULP32 during standby
+       to work around errata 1.2.1.
+       See discussion in #13441  */
+    assert((DSU->DID.bit.REVISION > 1) || ((PM->STDBYCFG.reg & 0x80) == 0));
+
+    /* errata 51.1.5 – When VDDCORE is supplied by the BUCK converter in performance
+                       level 0, the chip cannot wake-up from standby mode because the
+                       VCORERDY status is stuck at 0. */
+    if (USE_VREG_BUCK && !PM->PLCFG.bit.PLSEL) {
+        sam0_set_voltage_regulator(SAM0_VREG_LDO);
+    }
+
+    /* TODO: If we source Main Clock from OSCULP32 during standby and are not in
+             performance level 0, we should always be able to use the BUCK converter
+             during standby */
 }
 
 void cpu_pm_cb_leave(int deep)
 {
-    (void) deep;
-    /* will be called after wake-up */
+    if (!deep) {
+        return;
+    }
+
+    _set_active_mode_vreg();
 }
 
 /**
@@ -157,6 +209,9 @@ void cpu_init(void)
 
     /* initialize the Cortex-M core */
     cortexm_init();
+
+    /* select the right voltage regulator config for active mode */
+    _set_active_mode_vreg();
 
     /* turn on only needed APB peripherals */
     MCLK->APBAMASK.reg =
