@@ -92,6 +92,14 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux)
     port->PMUX[pin_pos >> 1].reg |=  (mux << (4 * (pin_pos & 0x1)));
 }
 
+void gpio_disable_mux(gpio_t pin)
+{
+    PortGroup* port = _port(pin);
+    int pin_pos = _pin_pos(pin);
+
+    port->PINCFG[pin_pos].reg &= ~PORT_PINCFG_PMUXEN;
+}
+
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     PortGroup* port = _port(pin);
