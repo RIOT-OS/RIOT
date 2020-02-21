@@ -563,6 +563,10 @@ void auto_init(void)
     extern void auto_init_si70xx(void);
     auto_init_si70xx();
 #endif
+#ifdef MODULE_SPS30
+    extern void auto_init_sps30(void);
+    auto_init_sps30();
+#endif
 #ifdef MODULE_TCS37727
     extern void auto_init_tcs37727(void);
     auto_init_tcs37727();

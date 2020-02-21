@@ -117,7 +117,9 @@ enum {
     UNIT_TIME,      /**< the three dimensions contain sec, min, and hours */
     UNIT_DATE,      /**< the 3 dimensions contain days, months and years */
     /* mass concentration */
-    UNIT_GPM3       /**< grams per cubic meters */
+    UNIT_GPM3,      /**< grams per cubic meter */
+    /* number concentration */
+    UNIT_CPM3       /**< count per cubic meter */
     /* extend this list as needed */
 };
 
