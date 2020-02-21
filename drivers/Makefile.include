@@ -320,6 +320,10 @@ ifneq (,$(filter srf04,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/srf04/include
 endif
 
+ifneq (,$(filter srf08,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/srf08/include
+endif
+
 ifneq (,$(filter stmpe811,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/stmpe811/include
 endif
