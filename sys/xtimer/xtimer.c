@@ -100,7 +100,7 @@ void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
     *last_wakeup = now + offset;
 }
 
-#ifdef MODULE_CORE_MSG
+#if defined(MODULE_CORE_MSG) && defined(MODULE_CORE_THREAD_FLAGS)
 /* Waits for incoming message or timeout flag. */
 static int _msg_wait(msg_t *m, xtimer_t *t)
 {
@@ -136,7 +136,7 @@ int _xtimer_msg_receive_timeout(msg_t *m, uint32_t timeout_us)
     xtimer_set_timeout_flag(&t, timeout_us);
     return _msg_wait(m, &t);
 }
-#endif /* MODULE_CORE_MSG */
+#endif /* MODULE_CORE_MSG && MODULE_CORE_THREAD_FLAGS */
 
 static void _callback_wakeup(void* arg)
 {
