@@ -5,7 +5,9 @@ include ../Makefile.tests_common
 BOARD_WITHOUT_LORAMAC_RX := \
     arduino-mega2560 \
     i-nucleo-lrwan1 \
+    nucleo-l053r8\
     stm32f0discovery \
+    stm32l0538-disco \
     waspmote-pro \
 
 LORA_DRIVER ?= sx1276

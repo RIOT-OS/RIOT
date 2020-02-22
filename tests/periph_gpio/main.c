@@ -31,7 +31,8 @@
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static void cb(void *arg)
 {
-    printf("INT: external interrupt from pin %i\n", (int)arg);
+    printf("INT: external interrupt from GPIO_PIN(%i, %i)\n",
+           (int)arg >> 8, (int)arg & 0xff);
 }
 #endif
 
@@ -143,7 +144,7 @@ static int init_int(int argc, char **argv)
         }
     }
 
-    if (gpio_init_int(GPIO_PIN(po, pi), mode, flank, cb, (void *)pi) < 0) {
+    if (gpio_init_int(GPIO_PIN(po, pi), mode, flank, cb, (void *)((po << 8) + pi)) < 0) {
         printf("error: init_int of GPIO_PIN(%i, %i) failed\n", po, pi);
         return 1;
     }
@@ -201,10 +202,10 @@ static int read(int argc, char **argv)
     pin = atoi(argv[2]);
 
     if (gpio_read(GPIO_PIN(port, pin))) {
-        printf("GPIO_PIN(%i.%02i) is HIGH\n", port, pin);
+        printf("GPIO_PIN(%i, %i) is HIGH\n", port, pin);
     }
     else {
-        printf("GPIO_PIN(%i.%02i) is LOW\n", port, pin);
+        printf("GPIO_PIN(%i, %i) is LOW\n", port, pin);
     }
 
     return 0;

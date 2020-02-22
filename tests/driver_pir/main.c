@@ -62,7 +62,12 @@ void* pir_handler(void *arg)
 int main(void)
 {
     puts("PIR motion sensor test application\n");
+#ifndef MODULE_PERIPH_GPIO_EXT
     printf("Initializing PIR sensor at GPIO_%ld... ", (long)PIR_PARAM_GPIO);
+#else
+    printf("Initializing PIR sensor at GPIO_PIN(%d, %d) ... ",
+           gpio_port_num(PIR_PARAM_GPIO), PIR_PARAM_GPIO.pin);
+#endif
     if (pir_init(&dev, &pir_params[0]) == 0) {
         puts("[OK]\n");
     }
