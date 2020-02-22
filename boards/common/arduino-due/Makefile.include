@@ -10,5 +10,5 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup flasher (using BOSSA)
 BOSSA_VERSION = 1.8
-export BOSSA_ARDUINO_PREFLASH = yes
+BOSSA_ARDUINO_PREFLASH = yes
 include $(RIOTMAKE)/tools/bossa.inc.mk
