@@ -1,0 +1,2 @@
+INCLUDES += -I$(PKGDIRBASE)/qcbor/src
+INCLUDES += -I$(PKGDIRBASE)/qcbor/inc
