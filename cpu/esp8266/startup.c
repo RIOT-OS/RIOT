@@ -73,7 +73,6 @@ void esp_riot_init(void)
     ets_printf("CPU clock frequency: %d MHz\n", system_get_cpu_freq());
     extern void heap_stats(void);
     heap_stats();
-    ets_printf("\n");
 #endif
 
     /* set exception handlers */
@@ -96,7 +95,9 @@ void esp_riot_init(void)
 #endif
 
     /* initialize stdio*/
+    extern int stdio_is_initialized;
     stdio_init();
+    stdio_is_initialized = 1;
 
     /* trigger static peripheral initialization */
     periph_init();
@@ -107,6 +108,9 @@ void esp_riot_init(void)
 #ifdef MODULE_ESP_LOG_STARTUP
     /* print the board config */
     board_print_config();
+#else
+    /* to have an empty line after the unreadable characters from ROM loader */
+    puts("");
 #endif
 
     /* initialize ESP system event loop */

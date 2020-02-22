@@ -1,0 +1,222 @@
+# Default compile configurations
+
+# FLASH_MODE=[ dout | dio | qout | qio ]
+# use flash mode dout by default to keep GPIO9 and GPIO10 free for use
+FLASH_MODE ?= dout
+
+# SPECIAL module dependencies
+# cannot be done in Makefile.dep since Makefile.dep is included too late
+
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+  ifneq (,$(filter lwip,$(USEMODULE)))
+    # for lwip, use esp_wifi as default netdev if no other netdev is enabled
+    ifeq (,$(filter esp_eth,$(USEMODULE)))
+      USEMODULE += esp_wifi
+    endif
+  else
+    # otherwise use esp_now as default netdev if no other netdev is enabled
+    ifeq (,$(filter esp_wifi esp_eth,$(USEMODULE)))
+      USEMODULE += esp_now
+    endif
+  endif
+endif
+
+ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
+  USEMODULE += esp_gdb
+endif
+
+ifneq (,$(filter log_color,$(USEMODULE)))
+  USEMODULE += esp_log_colored
+endif
+
+ifneq (,$(filter 4 5,$(LOG_LEVEL)))
+  USEMODULE += esp_log_startup
+endif
+
+# ESP* pseudomodules
+
+PSEUDOMODULES += esp_gdb
+PSEUDOMODULES += esp_i2c_sw
+PSEUDOMODULES += esp_log_colored
+PSEUDOMODULES += esp_log_tagged
+PSEUDOMODULES += esp_log_startup
+PSEUDOMODULES += esp_qemu
+PSEUDOMODULES += esp_spiffs
+PSEUDOMODULES += esp_wifi_any
+
+# Modules used by ESP*
+
+USEMODULE += esp_common
+USEMODULE += esp_common_periph
+USEMODULE += esp_freertos
+USEMODULE += esp_idf
+USEMODULE += log
+USEMODULE += newlib
+USEMODULE += periph
+USEMODULE += periph_hwrng
+USEMODULE += periph_flash
+USEMODULE += periph_uart
+USEMODULE += random
+USEMODULE += stdio_uart
+USEMODULE += xtensa
+
+# Common includes
+
+INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
+INCLUDES += -I$(RIOTCPU)/esp_common
+INCLUDES += -I$(RIOTCPU)/esp_common/include
+INCLUDES += -I$(RIOTCPU)/esp_common/include/freertos
+INCLUDES += -I$(RIOTCPU)/esp_common/vendor/
+INCLUDES += -I$(RIOTCPU)/esp_common/vendor/esp
+
+# Flags
+
+CFLAGS += -Wno-unused-parameter -Wformat=0
+CFLAGS += -mlongcalls -mtext-section-literals -fstrict-volatile-bitfields
+CFLAGS += -fdata-sections -ffunction-sections -fzero-initialized-in-bss
+
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
+OPTIONAL_CFLAGS_BLACKLIST += -gz
+
+ASFLAGS += --longcalls --text-section-literals
+
+# thin archives trigger a reboot loop - see #12258, #12035, #12346
+ARFLAGS = rcs
+
+CFLAGS_DBG ?= -ggdb -g3
+CFLAGS_OPT ?= -Os
+
+# override default CFLAGS_OPT in case module esp_gdb is enabled
+ifneq (,$(filter esp_gdb,$(USEMODULE)))
+  CFLAGS_OPT = -Og
+endif
+
+CFLAGS += $(CFLAGS_OPT) $(CFLAGS_DBG)
+
+# add -DQEMU for qemu
+ifneq (,$(filter esp_qemu,$(USEMODULE)))
+  CFLAGS += -DQEMU
+endif
+
+# use 32 priority levels if any WiFi interface or the ETH interface is used
+ifneq (,$(filter esp_wifi esp_now esp_eth,$(USEMODULE)))
+  CFLAGS += -DSCHED_PRIO_LEVELS=32
+endif
+
+ifneq (,$(filter esp_wifi esp_now esp_eth,$(USEMODULE)))
+  INCLUDES += -I$(RIOTCPU)/esp_common/esp-wifi
+endif
+
+# The threads for handling the ESP hardware have the priorities from 2 to 4.
+# The priority of lwIP TCPIP thread should be lower than these priorities.
+ifneq (,$(filter lwip,$(USEMODULE)))
+  CFLAGS += -DTCPIP_THREAD_PRIO=5
+endif
+
+# if SPI RAM is enabled, the qout flash mode has to be used
+ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
+  FLASH_MODE = qout
+  CFLAGS += -DFLASH_MODE_QOUT=1
+else
+  ifeq ($(FLASH_MODE), qio)
+    CFLAGS += -DFLASH_MODE_QIO=1
+  endif
+  ifeq ($(FLASH_MODE), qout)
+    CFLAGS += -DFLASH_MODE_QOUT=1
+  endif
+  ifeq ($(FLASH_MODE), dio)
+    CFLAGS += -DFLASH_MODE_DIO=1
+  endif
+  ifeq ($(FLASH_MODE), dout)
+    CFLAGS += -DFLASH_MODE_DOUT=1
+  endif
+endif
+
+BASELIBS += -lhal -lg -lc
+
+LINKFLAGS += $(CFLAGS_OPT) $(CFLAGS_DBG)
+LINKFLAGS += -L$(ESP_SDK_DIR)/components/$(CPU)
+LINKFLAGS += -L$(ESP_SDK_DIR)/components/$(CPU)/lib
+LINKFLAGS += -nostdlib -Wl,-gc-sections -Wl,-static
+
+# LINKFLAGS += -Wl,--verbose
+# LINKFLAGS += -Wl,--print-gc-sections
+
+ifneq (,$(filter esp_log_colored,$(USEMODULE)))
+  BOOTLOADER_COLOR = _colors
+endif
+
+ifneq (,$(filter esp_log_startup,$(USEMODULE)))
+  BOOTLOADER_INFO = _info
+endif
+
+BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
+
+ESPTOOL ?= $(RIOTTOOLS)/esptool/esptool.py
+
+# The ELFFILE is the base one used for flashing
+FLASHFILE ?= $(ELFFILE)
+
+# configure preflasher to convert .elf to .bin before flashing
+PREFLASHER = $(ESPTOOL)
+PREFFLAGS  = --chip $(FLASH_CHIP) elf2image
+PREFFLAGS += --flash_mode $(FLASH_MODE) --flash_size $(FLASH_SIZE)MB
+PREFFLAGS += --flash_freq $(FLASH_FREQ) $(FLASH_OPTS)
+PREFFLAGS += -o $(FLASHFILE).bin $(FLASHFILE);
+PREFFLAGS += printf "\n" > $(BINDIR)/partitions.csv;
+PREFFLAGS += printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $(BINDIR)/partitions.csv;
+PREFFLAGS += printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $(BINDIR)/partitions.csv;
+PREFFLAGS += printf "factory, app, factory, 0x10000, " >> $(BINDIR)/partitions.csv;
+PREFFLAGS += ls -l $(FLASHFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partitions.csv;
+
+PREFFLAGS += python $(RIOTTOOLS)/esptool/gen_esp32part.py
+PREFFLAGS += --verify $(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
+FLASHDEPS += preflash
+
+# flasher configuration
+ifneq (,$(filter esp_qemu,$(USEMODULE)))
+  FLASHER = dd
+  FFLAGS += if=/dev/zero bs=1M count=$(FLASH_SIZE) |
+  FFLAGS += tr "\\000" "\\377" > tmp.bin && cat tmp.bin |
+  FFLAGS += head -c $$(($(BOOTLOADER_POS))) |
+  FFLAGS += cat - $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN) tmp.bin |
+  FFLAGS += head -c $$((0x8000)) |
+  FFLAGS += cat - $(BINDIR)/partitions.bin tmp.bin |
+  FFLAGS += head -c $$((0x10000)) |
+  FFLAGS += cat - $(FLASHFILE).bin tmp.bin |
+  FFLAGS += head -c $(FLASH_SIZE)MB > $(BINDIR)/$(CPU)flash.bin && rm tmp.bin;
+else
+  PROGRAMMER_SPEED ?= 460800
+  FLASHER = $(ESPTOOL)
+  FFLAGS += --chip $(FLASH_CHIP) --port $(PROG_DEV) --baud $(PROGRAMMER_SPEED)
+  FFLAGS += --before default_reset write_flash -z
+  FFLAGS += --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ)
+  FFLAGS += $(BOOTLOADER_POS) $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN)
+  FFLAGS += 0x8000 $(BINDIR)/partitions.bin
+  FFLAGS += 0x10000 $(FLASHFILE).bin
+endif
+
+# increase the test timeout for file system tests that use the SPI flash drive
+
+ifneq (,$(filter spiffs,$(USEMODULE)))
+  export RIOT_TEST_TIMEOUT = 120
+endif
+
+ifneq (,$(filter littlefs,$(USEMODULE)))
+  export RIOT_TEST_TIMEOUT = 120
+endif
+
+# increase the number of netif for each enabled network interface
+
+ifneq (,$(filter esp_wifi,$(USEMODULE)))
+  $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
+endif
+
+ifneq (,$(filter esp_now,$(USEMODULE)))
+  $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
+endif
+
+ifneq (,$(filter esp_eth,$(USEMODULE)))
+  $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
+endif
