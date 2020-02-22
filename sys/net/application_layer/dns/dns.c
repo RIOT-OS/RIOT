@@ -157,7 +157,7 @@ static int _parse_dns_reply(uint8_t *buf, size_t len, void* addr_out, int family
             return -EBADMSG;
         }
         bufpos += RR_RDLENGTH_LENGTH;
-        if ((bufpos + addrlen) >= buflim) {
+        if ((bufpos + addrlen) > buflim) {
             return -EBADMSG;
         }
 
