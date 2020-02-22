@@ -92,15 +92,15 @@ static inline void done(adc_t line)
  */
 static inline GPIO_TypeDef *_port(gpio_t pin)
 {
-    return (GPIO_TypeDef *)(pin & ~(0x0f));
+    return (GPIO_TypeDef *)(GPIO_PORT(pin).reg);
 }
 
 /**
  * @brief   Extract the pin number from the last 4 bit of the pin identifier
  */
-static inline int _pin_num(gpio_t pin)
+static inline int _pin_num(gpio_t gpio)
 {
-    return (pin & 0x0f);
+    return (gpio.pin & 0x0f);
 }
 
 int adc_init(adc_t line)
