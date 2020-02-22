@@ -139,7 +139,7 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type)
         ssize_t res = sock_udp_recv(sock, _listen_buf, sizeof(_listen_buf),
                                     0, &remote);
         if (res <= 0) {
-            DEBUG("gcoap: udp recv failure: %d\n", res);
+            DEBUG("gcoap: udp recv failure: %d\n", (int)res);
             return;
         }
 
