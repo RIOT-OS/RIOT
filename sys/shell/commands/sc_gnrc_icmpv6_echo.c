@@ -178,6 +178,7 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
             data->hostname = arg;
 #ifdef MODULE_SOCK_DNS
             if (sock_dns_query(data->hostname, &data->host, AF_INET6) == 0) {
+                res = 0;
                 continue;
             }
 #endif
