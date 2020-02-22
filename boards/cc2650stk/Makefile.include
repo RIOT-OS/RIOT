@@ -1,4 +1,4 @@
-export XDEBUGGER = XDS110
+XDEBUGGER = XDS110
 
 # set default port depending on operating system
 PORT_LINUX  ?= /dev/ttyACM0
