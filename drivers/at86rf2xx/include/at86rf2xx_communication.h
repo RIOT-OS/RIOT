@@ -32,13 +32,6 @@
 
 #include "at86rf2xx.h"
 
-#if IS_USED(MODULE_AT86RF2XX_SPI)
-#include "at86rf2xx_communication_spi.h"
-#endif
-#if IS_USED(MODULE_AT86RF2XX_PERIPH)
-#include "at86rf2xx_communication_periph.h"
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif

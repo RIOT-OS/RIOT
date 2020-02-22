@@ -31,6 +31,12 @@
 #include "at86rf2xx.h"
 #include "at86rf2xx_dev_types.h"
 #include "at86rf2xx_registers.h"
+#if IS_USED(MODULE_AT86RF2XX_SPI)
+#include "at86rf2xx_communication_spi.h"
+#endif
+#if IS_USED(MODULE_AT86RF2XX_PERIPH)
+#include "at86rf2xx_communication_periph.h"
+#endif
 #include "at86rf2xx_communication.h"
 
 uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, uint8_t addr)
