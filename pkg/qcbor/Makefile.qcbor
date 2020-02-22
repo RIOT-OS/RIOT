@@ -1,0 +1,8 @@
+MODULE = qcbor
+
+SRC := UsefulBuf.c \
+       ieee754.c \
+       qcbor_decode.c \
+       qcbor_encode.c
+
+include $(RIOTBASE)/Makefile.base
