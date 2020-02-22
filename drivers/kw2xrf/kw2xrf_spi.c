@@ -89,9 +89,14 @@ int kw2xrf_spi_init(kw2xrf_t *dev)
         return 1;
     }
     spi_release(SPIDEV);
-
+#ifndef MODULE_PERIPH_GPIO_EXT
     DEBUG("[kw2xrf_spi] SPI_DEV(%u) initialized: mode: %u, clk: %u, cs_pin: %u\n",
           (unsigned)SPIDEV, (unsigned)SPIMODE, (unsigned)SPICLK, (unsigned)CSPIN);
+#else
+    DEBUG("[kw2xrf_spi] SPI_DEV(%u) initialized: mode: %u, clk: %u, cs_pin: GPIO_PIN(%d,%d)\n",
+          (unsigned)SPIDEV, (unsigned)SPIMODE, (unsigned)SPICLK,
+          gpio_port_num(CSPIN), CSPIN.pin);
+#endif
     return 0;
 }
 

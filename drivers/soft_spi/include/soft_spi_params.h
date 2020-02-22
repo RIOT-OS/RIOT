@@ -34,11 +34,15 @@ extern "C" {
 #ifndef SOFT_SPI_PARAM_CLK
 #define SOFT_SPI_PARAM_CLK          (GPIO_PIN(0, 1))
 #endif
+#ifndef SOFT_SPI_PARAM_MODE
+#define SOFT_SPI_PARAM_MODE         (SOFT_SPI_MODE_0)
+#endif
 
 #ifndef SOFT_SPI_PARAMS
 #define SOFT_SPI_PARAMS     { .miso_pin = SOFT_SPI_PARAM_MISO, \
                               .mosi_pin = SOFT_SPI_PARAM_MOSI, \
-                              .clk_pin  = SOFT_SPI_PARAM_CLK }
+                              .clk_pin  = SOFT_SPI_PARAM_CLK,  \
+                              .soft_spi_mode = SOFT_SPI_PARAM_MODE }
 #endif
 
 /**
