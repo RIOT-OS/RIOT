@@ -688,12 +688,18 @@ static const netdev_driver_t _esp_wifi_driver =
 static wifi_config_t wifi_config_sta = {
     .sta = {
         .ssid = ESP_WIFI_SSID,
+#ifdef ESP_WIFI_PASS
         .password = ESP_WIFI_PASS,
+#endif
         .channel = 0,
         .scan_method = WIFI_ALL_CHANNEL_SCAN,
         .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
         .threshold.rssi = -127,
+#ifdef ESP_WIFI_PASS
         .threshold.authmode = WIFI_AUTH_WPA_WPA2_PSK
+#else
+        .threshold.authmode = WIFI_AUTH_OPEN
+#endif
     }
 };
 
@@ -720,8 +726,12 @@ static wifi_config_t wifi_config_ap = {
         .ssid = ESP_WIFI_SSID,
         .ssid_len = ARRAY_SIZE(ESP_WIFI_SSID),
         .ssid_hidden = 1,               /* don't make the AP visible */
+#ifdef ESP_WIFI_PASS
         .password = ESP_WIFI_PASS,
         .authmode = WIFI_AUTH_WPA2_PSK,
+#else
+        .authmode = WIFI_AUTH_OPEN,
+#endif
         .max_connection = 0,            /* don't allow connections */
         .beacon_interval = 60000,       /* send beacon only every 60 s */
     }
