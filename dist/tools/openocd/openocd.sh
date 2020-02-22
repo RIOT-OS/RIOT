@@ -65,8 +65,6 @@
 : ${TELNET_PORT:=4444}
 # Default TCL port, set to 0 to disable
 : ${TCL_PORT:=6333}
-# Default path to OpenOCD configuration file
-: ${OPENOCD_CONFIG:=${BOARDSDIR}/${BOARD}/dist/openocd.cfg}
 # Default OpenOCD command
 : ${OPENOCD:=openocd}
 # Extra board initialization commands to pass to OpenOCD
