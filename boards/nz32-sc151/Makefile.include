@@ -6,7 +6,7 @@ PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
 # set the default id
-export ID ?= 0483:df11
+ID ?= 0483:df11
 
 FLASHER = dfu-util
 DEBUGGER = # dfu-util has no debugger
