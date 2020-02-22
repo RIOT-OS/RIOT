@@ -47,7 +47,7 @@ ifeq (dfu-util,$(PROGRAMMER))
     $(error DFU_USB_ID is not set)
   endif
   # Skip the space needed by the embedded bootloader
-  export ROM_OFFSET ?= 0x2000
+  ROM_OFFSET ?= 0x2000
   FLASHER = dfu-util
   DEBUGGER = # no debugger
   RESET ?= # dfu-util has no support for resetting the device
