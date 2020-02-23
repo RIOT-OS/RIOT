@@ -25,7 +25,7 @@
 
 #ifdef MODULE_AT86RF2XX
 #include "at86rf2xx.h"
-#include "at86rf2xx_devs.h"
+#include "at86rf2xx_params.h"
 #endif
 
 #ifdef MODULE_ENC28J60
@@ -100,8 +100,22 @@ static struct netif netif[LWIP_NETIF_NUMOF];
 static netdev_tap_t netdev_taps[LWIP_NETIF_NUMOF];
 #endif
 
-#ifdef MODULE_AT86RF2XX
-static at86rf2xx_devs_t at86rf2xx_devs;
+#ifdef MODULE_AT86RF212B
+static at86rf212b_t at86rf212b_devs[AT86RF212B_NUM_OF];
+#endif
+#ifdef MODULE_AT86RF231
+static at86rf231_t at86rf231_devs[AT86RF231_NUM_OF];
+#endif
+#ifdef MODULE_AT86RF232
+static at86rf232_t at86rf232_devs[AT86RF232_NUM_OF];
+#endif
+#ifdef MODULE_AT86RF233
+static at86rf233_t at86rf233_devs[AT86RF233_NUM_OF];
+#endif
+#ifdef MODULE_AT86RFA1
+static at86rfa1_t at86rfa1_dev;
+#elif defined  MODULE_AT86RFR2
+static at86rfr2_t at86rfr2_dev;
 #endif
 
 #ifdef MODULE_ENC28J60
@@ -154,16 +168,74 @@ void lwip_bootstrap(void)
         }
     }
 #elif defined(MODULE_AT86RF2XX)
-    at86rf2xx_setup_devs(&at86rf2xx_devs);
-    uint8_t *dev = at86rf2xx_devs.mem_devs;
-    for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
-        if (netif_add(&netif[i], dev, lwip_netdev_init,
+    unsigned at86rf2xx_num = 0;
+#ifdef MODULE_AT86RF212B
+    at86rf212b_setup(at86rf212b_devs, at86rf212b_params, AT86RF212B_NUM_OF);
+    for (unsigned i = 0;
+         i < AT86RF212B_NUM_OF && at86rf2xx_num < LWIP_NETIF_NUMOF;
+         i++, at86rf2xx_num++) {
+        if (netif_add(&netif[at86rf2xx_num], &at86rf212b_devs[i], lwip_netdev_init,
                       tcpip_6lowpan_input) == NULL) {
-            DEBUG("Could not add at86rf2xx device\n");
+            DEBUG("Could not add at86rf212b device\n");
             return;
         }
-        dev += at86rf2xx_get_size((at86rf2xx_t *)dev);
     }
+#endif
+#ifdef MODULE_AT86RF231
+   at86rf231_setup(at86rf231_devs, at86rf231_params, AT86RF231_NUM_OF);
+    for (unsigned i = 0;
+         i < AT86RF231_NUM_OF && at86rf2xx_num < LWIP_NETIF_NUMOF;
+         i++, at86rf2xx_num++) {
+        if (netif_add(&netif[at86rf2xx_num], &at86rf231_devs[i], lwip_netdev_init,
+                      tcpip_6lowpan_input) == NULL) {
+            DEBUG("Could not add at86rf231 device\n");
+            return;
+        }
+    }
+#endif
+#ifdef MODULE_AT86RF232
+   at86rf232_setup(at86rf232_devs, at86rf232_params, AT86RF232_NUM_OF);
+    for (unsigned i = 0;
+         i < AT86RF232_NUM_OF && at86rf2xx_num < LWIP_NETIF_NUMOF;
+         i++, at86rf2xx_num++) {
+        if (netif_add(&netif[at86rf2xx_num], &at86rf232_devs[i], lwip_netdev_init,
+                      tcpip_6lowpan_input) == NULL) {
+            DEBUG("Could not add at86rf232 device\n");
+            return;
+        }
+    }
+#endif
+#ifdef MODULE_AT86RF233
+    at86rf233_setup(at86rf233_devs, at86rf233_params, AT86RF233_NUM_OF);
+    for (unsigned i = 0;
+         i < AT86RF233_NUM_OF && at86rf2xx_num < LWIP_NETIF_NUMOF;
+         i++, at86rf2xx_num++) {
+        if (netif_add(&netif[at86rf2xx_num], &at86rf233_devs[i], lwip_netdev_init,
+                      tcpip_6lowpan_input) == NULL) {
+            DEBUG("Could not add at86rf233 device\n");
+            return;
+        }
+    }
+#endif
+#ifdef MODULE_AT86RFA1
+   at86rfa1_setup(&at86rfa1_dev);
+    if (at86rf2xx_num < LWIP_NETIF_NUMOF) {
+        if (netif_add(&netif[at86rf2xx_num++], &at86rfa1_dev, lwip_netdev_init,
+                      tcpip_6lowpan_input) == NULL) {
+            DEBUG("Could not add at86rfa1 device\n");
+            return;
+        }
+    }
+#elif defined MODULE_AT86RFR2
+   at86rfr2_setup(&at86rfr2_dev);
+    if (at86rf2xx_num < LWIP_NETIF_NUMOF) {
+        if (netif_add(&netif[at86rf2xx_num++], &at86rfr2_dev, lwip_netdev_init,
+                      tcpip_6lowpan_input) == NULL) {
+            DEBUG("Could not add at86rfr2 device\n");
+            return;
+        }
+    }
+#endif
 #elif defined(MODULE_ENC28J60)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         enc28j60_setup(&enc28j60_devs[i], &enc28j60_params[i]);
