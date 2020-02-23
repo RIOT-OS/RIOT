@@ -57,8 +57,8 @@ typedef struct {
 #define SOCK_DNS_PORT           (53)
 #define SOCK_DNS_RETRIES        (2)
 
-#define SOCK_DNS_MAX_NAME_LEN   (64U)       /* we're in embedded context. */
-#define SOCK_DNS_QUERYBUF_LEN   (sizeof(sock_dns_hdr_t) + 4 + SOCK_DNS_MAX_NAME_LEN)
+#define SOCK_DNS_BUF_LEN        (128)       /* we're in embedded context. */
+#define SOCK_DNS_MAX_NAME_LEN   (SOCK_DNS_BUF_LEN - sizeof(sock_dns_hdr_t) - 4)
 /** @} */
 
 /**
