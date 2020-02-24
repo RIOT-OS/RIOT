@@ -39,6 +39,10 @@ ifneq (,$(filter nimble_addr,$(USEMODULE)))
   USEMODULE += bluetil_addr
 endif
 
+ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
+  USEMODULE += bluetil_ad
+endif
+
 ifneq (,$(filter nimble_autoconn_%,$(USEMODULE)))
   USEMODULE += nimble_autoconn
 endif

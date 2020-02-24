@@ -145,4 +145,9 @@ void nimble_riot_init(void)
     assert(res == NIMBLE_AUTOCONN_OK);
     nimble_autoconn_enable();
 #endif
+
+#ifdef MODULE_NIMBLE_AUTOADV
+    extern void nimble_autoadv_init(void);
+    nimble_autoadv_init();
+#endif
 }

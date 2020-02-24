@@ -77,6 +77,9 @@ nimble_drivers_nrf5x:
 nimble_addr:
 	"$(MAKE)" -C $(TDIR)/addr/
 
+nimble_autoadv:
+	"$(MAKE)" -C $(TDIR)/autoadv
+
 nimble_autoconn:
 	"$(MAKE)" -C $(TDIR)/autoconn
 

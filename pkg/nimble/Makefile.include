@@ -76,6 +76,9 @@ endif
 ifneq (,$(filter nimble_addr,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/addr/include
 endif
+ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/nimble/autoadv/include
+endif
 ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/autoconn/include
 endif
