@@ -35,29 +35,3 @@
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-
-size_t at86rf2xx_get_size(const at86rf2xx_t *dev)
-{
-    switch (dev->base.dev_type) {
-        case AT86RF2XX_DEV_TYPE_AT86RF212B: {
-            return sizeof(struct at86rf212b);
-        }
-        case AT86RF2XX_DEV_TYPE_AT86RF231: {
-            return sizeof(struct at86rf231);
-        }
-        case AT86RF2XX_DEV_TYPE_AT86RF232: {
-            return sizeof(struct at86rf232);
-        }
-        case AT86RF2XX_DEV_TYPE_AT86RF233: {
-            return sizeof(struct at86rf233);
-        }
-        case AT86RF2XX_DEV_TYPE_AT86RFA1: {
-            return sizeof(struct at86rfa1);
-        }
-        case AT86RF2XX_DEV_TYPE_AT86RFR2: {
-            return sizeof(struct at86rfr2);
-        }
-        default:
-            return sizeof(at86rf2xx_t);
-    }
-}

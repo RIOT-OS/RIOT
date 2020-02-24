@@ -123,6 +123,12 @@ uint8_t at86rf232_get_status(const at86rf232_t *dev)
 }
 
 static inline
+void at86rf232_power_on(at86rf232_t *dev)
+{
+    at86rf2xx_power_on((at86rf2xx_t *)dev);
+}
+
+static inline
 void at86rf232_get_addr_short(const at86rf232_t *dev, network_uint16_t *addr)
 {
     at86rf2xx_get_addr_short((const at86rf2xx_t *)dev, addr);

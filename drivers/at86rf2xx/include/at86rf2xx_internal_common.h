@@ -73,6 +73,12 @@ int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev)
 }
 
 /**
+ * @brief   Perform initial state transition from P_ON to TRX_OFF
+ * @param[in]   dev         device to power on
+ */
+void at86rf2xx_power_on(at86rf2xx_t * dev);
+
+/**
  * @brief   Convenience function for reading the status of the given device
  *
  * @param[in] dev       device to read the status from
@@ -226,6 +232,16 @@ void at86rf2xx_set_external_timestamping(const at86rf2xx_t *dev,
  */
 void at86rf2xx_set_frame_buffer_protection(const at86rf2xx_t *dev,
                                            bool protect);
+
+/**
+ * @brief   This function should only be used inside an assert() and
+ *          verify if a state transition was successful.
+ * @param[in]   dev         device
+ * @param[in]   state       asserted state
+ *
+ * @return  1: Success, 0: You should debug
+ */
+int at86rf2xx_check_state(const at86rf2xx_t *dev, uint8_t state);
 
 #ifdef __cplusplus
 }

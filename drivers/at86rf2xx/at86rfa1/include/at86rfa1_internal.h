@@ -125,6 +125,12 @@ uint8_t at86rfa1_get_status(const at86rfa1_t *dev)
 }
 
 static inline
+void at86rfa1_power_on(at86rfa1_t *dev)
+{
+    at86rf2xx_power_on((at86rf2xx_t *)dev);
+}
+
+static inline
 void at86rfa1_get_addr_short(const at86rfa1_t *dev, network_uint16_t *addr)
 {
     at86rf2xx_get_addr_short((const at86rf2xx_t *)dev, addr);

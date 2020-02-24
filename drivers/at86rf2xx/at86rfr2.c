@@ -138,8 +138,8 @@ uint8_t at86rfr2_dbm_to_rxsens(const at86rfr2_t *dev, int16_t dbm)
 
 void at86rfr2_setup(at86rfr2_t *dev)
 {
-    dev->base.dev_type = AT86RF2XX_DEV_TYPE_AT86RFR2;
     at86rf2xx_setup((at86rf2xx_t *)dev);
+    dev->base.dev_type = AT86RF2XX_DEV_TYPE_AT86RFR2;
     at86rf2xx_periph_reg_write(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__IRQ_MASK), 0x00);
 }
 
@@ -206,32 +206,7 @@ uint8_t at86rfr2_set_state(at86rfr2_t *dev, uint8_t state)
     else if (cmd == AT86RF2XX_STATE_FORCE_TRX_OFF) {
         at86rf2xx_set_state((at86rf2xx_t *)dev, AT86RF2XX_STATE_TRX_OFF, cmd);
     }
-
-    /* check state */
-    uint8_t trx_status;
-    do {
-        trx_status =
-            at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__TRX_STATUS));
-        trx_status &= AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
-    } while (trx_status == AT86RF2XX_STATE_IN_PROGRESS);
-    DEBUG("input state: 0x%02X -- device state: 0x%02X -- trx_staus: 0x%02X\n",
-          state, dev->base.state, trx_status);
-
-    if (dev->base.state == AT86RF2XX_STATE_RX_ON) {
-        assert((trx_status == AT86RF2XX_STATE_RX_ON) ||
-               (trx_status == AT86RF2XX_STATE_BUSY_RX));
-    }
-    else if (dev->base.state == AT86RF2XX_STATE_RX_AACK_ON) {
-        assert((trx_status == AT86RF2XX_STATE_RX_AACK_ON) ||
-               (trx_status == AT86RF2XX_STATE_BUSY_RX_AACK));
-    }
-    else if (dev->base.state == AT86RF2XX_STATE_SLEEP) {
-        assert(state == AT86RF2XX_STATE_SLEEP);
-    }
-    else {
-        assert(trx_status == dev->base.state);
-    }
-
+    assert(at86rf2xx_check_state((at86rf2xx_t *)dev, state));
     return old_state;
 }
 
@@ -265,9 +240,6 @@ void at86rfr2_reset(at86rfr2_t *dev)
                                AT86RF2XX_IRQ_MASK_MASK__TX_END |
                                AT86RF2XX_IRQ_MASK_MASK__RX_END);
     at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__IRQ_STATUS));
-
-    /* State to return after receiving or transmitting */
-    dev->base.idle_state = AT86RF2XX_STATE_RX_AACK_ON;
 
     DEBUG("[at86rfr2] reset complete.\n");
 }

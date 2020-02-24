@@ -65,7 +65,7 @@
 
 #include "at86rf2xx_netdev.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 static int _send(netdev_t *netdev, const iolist_t *iolist);
@@ -106,6 +106,7 @@ int _init(netdev_t *netdev)
 {
     static int _count = 0;
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
+    assert(dev->base.dev_type < AT86RF2XX_DEV_TYPE_NUM_OF);
 
     DEBUG("[at86rf2xx] init. device #%d at %p\n", _count++, dev);
     switch (dev->base.dev_type) {
@@ -137,21 +138,15 @@ int _init(netdev_t *netdev)
             break;
 #endif
     }
+    /* Should be done before hardware reset */
+    at86rf2xx_power_on(dev);
     int valid = -ENOTSUP;
-    /* test if the device is responding and
-       reset device to default values and
-       put it into idle state */
     switch (dev->base.dev_type) {
 #if IS_USED(MODULE_AT86RF212B)
         case AT86RF2XX_DEV_TYPE_AT86RF212B: {
             at86rf212b_hardware_reset((at86rf212b_t *)dev);
             if ((valid = at86rf212b_validate((at86rf212b_t *)dev)) != 0) {
                 return valid;
-            }
-            if (at86rf212b_get_status((at86rf212b_t *)dev) ==
-                AT86RF2XX_STATE_P_ON) {
-                at86rf212b_set_state((at86rf212b_t *)dev,
-                                     AT86RF2XX_STATE_FORCE_TRX_OFF);
             }
             at86rf212b_reset((at86rf212b_t *)dev);
             at86rf212b_set_state((at86rf212b_t *)dev, dev->base.idle_state);
@@ -164,11 +159,6 @@ int _init(netdev_t *netdev)
             if ((valid = at86rf231_validate((at86rf231_t *)dev)) != 0) {
                 return valid;
             }
-            if (at86rf231_get_status((at86rf231_t *)dev) ==
-                AT86RF2XX_STATE_P_ON) {
-                at86rf231_set_state((at86rf231_t *)dev,
-                                    AT86RF2XX_STATE_FORCE_TRX_OFF);
-            }
             at86rf231_reset((at86rf231_t *)dev);
             at86rf231_set_state((at86rf231_t *)dev, dev->base.idle_state);
             break;
@@ -179,11 +169,6 @@ int _init(netdev_t *netdev)
             at86rf232_hardware_reset((at86rf232_t *)dev);
             if ((valid = at86rf232_validate((at86rf232_t *)dev)) != 0) {
                 return valid;
-            }
-            if (at86rf232_get_status((at86rf232_t *)dev) ==
-                AT86RF2XX_STATE_P_ON) {
-                at86rf232_set_state((at86rf232_t *)dev,
-                                    AT86RF2XX_STATE_FORCE_TRX_OFF);
             }
             at86rf232_reset((at86rf232_t *)dev);
             at86rf232_set_state((at86rf232_t *)dev, dev->base.idle_state);
@@ -196,11 +181,6 @@ int _init(netdev_t *netdev)
             if ((valid = at86rf233_validate((at86rf233_t *)dev)) != 0) {
                 return valid;
             }
-            if (at86rf233_get_status((at86rf233_t *)dev) ==
-                AT86RF2XX_STATE_P_ON) {
-                at86rf233_set_state((at86rf233_t *)dev,
-                                    AT86RF2XX_STATE_FORCE_TRX_OFF);
-            }
             at86rf233_reset((at86rf233_t *)dev);
             at86rf233_set_state((at86rf233_t *)dev, dev->base.idle_state);
             break;
@@ -211,11 +191,6 @@ int _init(netdev_t *netdev)
             at86rfa1_hardware_reset((at86rfa1_t *)dev);
             if ((valid = at86rfa1_validate((at86rfa1_t *)dev)) != 0) {
                 return valid;
-            }
-            if (at86rfa1_get_status((at86rfa1_t *)dev) ==
-                AT86RF2XX_STATE_P_ON) {
-                at86rfa1_set_state((at86rfa1_t *)dev,
-                                   AT86RF2XX_STATE_FORCE_TRX_OFF);
             }
             at86rfa1_reset((at86rfa1_t *)dev);
             at86rfa1_set_state((at86rfa1_t *)dev, dev->base.idle_state);
@@ -228,18 +203,12 @@ int _init(netdev_t *netdev)
             if ((valid = at86rfr2_validate((at86rfr2_t *)dev)) != 0) {
                 return valid;
             }
-            if (at86rfr2_get_status((at86rfr2_t *)dev) ==
-                AT86RF2XX_STATE_P_ON) {
-                at86rfr2_set_state((at86rfr2_t *)dev,
-                                   AT86RF2XX_STATE_FORCE_TRX_OFF);
-            }
             at86rfr2_reset((at86rfr2_t *)dev);
             at86rfr2_set_state((at86rfr2_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
     }
-
     return valid < 0 ? valid : 0;
 }
 
@@ -472,8 +441,8 @@ int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                 *((netdev_ieee802154_rx_info_t *)info) =
                     (netdev_ieee802154_rx_info_t) {
                     .rssi = AT86RF231_RSSI_BASE_VAL +
-                            at86rf2xx_spi_reg_read(dev,
-                                                   AT86RF2XX_REG__PHY_ED_LEVEL),
+                            at86rf2xx_reg_read(dev,
+                                               AT86RF2XX_REG__PHY_ED_LEVEL),
                     .lqi = fb.lqi
                 };
                 DEBUG("[at86rf231]\n\
@@ -575,8 +544,8 @@ int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                 *((netdev_ieee802154_rx_info_t *)info) =
                     (netdev_ieee802154_rx_info_t) {
                     .rssi = AT86RFA1_RSSI_BASE_VAL +
-                            at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(
-                                                          AT86RF2XX_REG__PHY_ED_LEVEL)),
+                            at86rf2xx_reg_read(dev,
+                                               AT86RF2XX_REG__PHY_ED_LEVEL),
                     .lqi = fb.lqi
                 };
                 DEBUG("[at86rfa1]\n\
@@ -610,8 +579,8 @@ int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                 *((netdev_ieee802154_rx_info_t *)info) =
                     (netdev_ieee802154_rx_info_t) {
                     .rssi = AT86RFR2_RSSI_BASE_VAL +
-                            at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(
-                                                          AT86RF2XX_REG__PHY_ED_LEVEL)),
+                            at86rf2xx_reg_read(dev,
+                                               AT86RF2XX_REG__PHY_ED_LEVEL),
                     .lqi = fb.lqi
                 };
                 DEBUG("[at86rfr2]\n\
@@ -1318,55 +1287,38 @@ void _isr_send_complete(at86rf2xx_t *dev, uint8_t trac_status) {
 #endif
     }
 
-    DEBUG("[at86rf2xx] EVT - TX_END\n");
+    DEBUG("[at86rf2xx] EVT - TX_END (%u)\n", trac_status);
 
-    switch (trac_status) {
+    if (netdev->event_callback && (dev->base.flags & AT86RF2XX_OPT_TELL_TX_END)) {
+        switch (trac_status) {
 #if IS_USED(MODULE_OPENTHREAD)
-        case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
-            if (netdev->event_callback &&
-                (dev->base.flags & AT86RF2XX_OPT_TELL_TX_END)) {
-                netdev->event_callback(netdev,
-                                        NETDEV_EVENT_TX_COMPLETE);
-            }
-            DEBUG("[at86rf2xx] TX SUCCESS\n");
-            break;
-        case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
-            if (netdev->event_callback &&
-                (dev->base.flags & AT86RF2XX_OPT_TELL_TX_END)) {
-                netdev->event_callback(netdev,
-                                        NETDEV_EVENT_TX_COMPLETE_DATA_PENDING);
-            }
-            DEBUG("[at86rf2xx] TX SUCCESS DATA PENDING\n");
-            break;
+            case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
+                netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+                DEBUG("[at86rf2xx] TX SUCCESS\n");
+                break;
+            case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
+                netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE_DATA_PENDING);
+                DEBUG("[at86rf2xx] TX SUCCESS DATA PENDING\n");
+                break;
 #else
-        case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
-        case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
-            if (netdev->event_callback &&
-                (dev->base.flags & AT86RF2XX_OPT_TELL_TX_END)) {
-                netdev->event_callback(netdev,
-                                        NETDEV_EVENT_TX_COMPLETE);
-            }
-            DEBUG("[at86rf2xx] TX SUCCESS\n");
-            break;
+            case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
+            case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
+                netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+                DEBUG("[at86rf2xx] TX SUCCESS\n");
+                break;
 #endif
-        case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
-            if (netdev->event_callback &&
-                (dev->base.flags & AT86RF2XX_OPT_TELL_TX_END)) {
+            case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
                 netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
-            }
-            DEBUG("[at86rf2xx] TX NO_ACK\n");
-            break;
-        case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
-            if (netdev->event_callback &&
-                (dev->base.flags & AT86RF2XX_OPT_TELL_TX_END)) {
-                netdev->event_callback(netdev,
-                                        NETDEV_EVENT_TX_MEDIUM_BUSY);
-            }
-            DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
-            break;
-        default:
-            DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",
-                    trac_status >> 5);
+                DEBUG("[at86rf2xx] TX NO_ACK\n");
+                break;
+            case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
+                netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
+                DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
+                break;
+            default:
+                DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",
+                        trac_status >> 5);
+        }
     }
 }
 
