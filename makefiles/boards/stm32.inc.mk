@@ -23,7 +23,7 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 ifeq (openocd,$(PROGRAMMER))
   # STM32 boards can become un-flashable after a hardfault,
   # use connect_assert_srst to always be able to flash or reset the boards.
-  export OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
+  OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
   # For STM32 boards the ST-link adapter is the default adapter, e.g. all
   # Nucleo boards have an on-board ST-link adapter
