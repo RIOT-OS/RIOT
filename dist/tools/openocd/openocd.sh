@@ -4,7 +4,8 @@
 #
 # This script is supposed to be called from RIOTs make system,
 # as it depends on certain environment variables. An OpenOCD
-# configuration file must be present in a the boards dist folder.
+# configuration file must be present in a the boards dist folder
+# or be given as "board/[...].cfg" to use an OpenOCD shipped configuration.
 #
 # Any extra command line arguments after the command name are passed on the
 # openocd command line after the configuration file name but before any other
@@ -12,6 +13,11 @@
 #
 # Global environment variables used:
 # OPENOCD:             OpenOCD command name, default: "openocd"
+#                      Care must be taken when specifying an OpenOCD version in
+#                      its build directory, as it does not look up its own
+#                      configuration files relative to the executable -- the
+#                      scripts directory needs to be passed in like this:
+#                      `OPENOCD="~/openocd/src/openocd -s ~/openocd/tcl"`.
 # OPENOCD_CONFIG:      OpenOCD configuration file name,
 #                      default: "${BOARDSDIR}/${BOARD}/dist/openocd.cfg"
 #
@@ -133,7 +139,7 @@ fi
 # a couple of tests for certain configuration options
 #
 test_config() {
-    if [ ! -f "${OPENOCD_CONFIG}" ]; then
+    if [ ! -f "${OPENOCD_CONFIG}" ] && [[ ! "${OPENOCD_CONFIG}" == board/* ]] ; then
         echo "Error: Unable to locate OpenOCD configuration file"
         echo "       (${OPENOCD_CONFIG})"
         exit 1
