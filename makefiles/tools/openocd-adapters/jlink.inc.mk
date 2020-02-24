@@ -4,4 +4,3 @@ OPENOCD_ADAPTER_INIT ?= -c 'source [find interface/jlink.cfg]'
 ifneq (,$(DEBUG_ADAPTER_ID))
   OPENOCD_ADAPTER_INIT += -c 'jlink serial $(DEBUG_ADAPTER_ID)'
 endif
-export OPENOCD_ADAPTER_INIT
