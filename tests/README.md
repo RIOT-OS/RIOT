@@ -85,6 +85,17 @@ pattern like `\r\n`, `\s`, `\)`, etc..
     child.expect(r'some string: (\d+) ,')
 ~~~
 
+Use expect() instead of assert()
+--------------------------------
+
+In order to make a test application functional in all cases, use `expect()`
+instead of `assert()`. The former works like the latter, but will still be
+compiled in if `NDEBUG` is defined. This is useful to keep a test application
+working even when compiling with -DNDEBUG, allowing for the code-under-test to
+be compiled with that flag.  Otherwise, the application would force compiling
+all tested code with assertions enabled.
+`expect()` is defined in the header `test_utils/expect.h`.
+
 Interaction through the uart
 ----------------------------
 
