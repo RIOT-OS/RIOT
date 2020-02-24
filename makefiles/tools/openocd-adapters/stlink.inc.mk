@@ -10,7 +10,6 @@ OPENOCD_ADAPTER_INIT ?= \
 ifneq (,$(DEBUG_ADAPTER_ID))
   OPENOCD_ADAPTER_INIT += -c 'hla_serial $(DEBUG_ADAPTER_ID)'
 endif
-export OPENOCD_ADAPTER_INIT
 
 # if no openocd specific configuration file, check for default locations:
 # 1. Using the default dist/openocd.cfg (automatically set by openocd.sh)
