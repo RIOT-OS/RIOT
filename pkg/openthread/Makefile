@@ -27,6 +27,7 @@ $(info $$OPENTHREAD_ARGS is [${OPENTHREAD_ARGS}])
 
 OPENTHREAD_COMMON_FLAGS = -fdata-sections -ffunction-sections -Os
 OPENTHREAD_COMMON_FLAGS += -Wno-implicit-fallthrough -Wno-unused-parameter
+OPENTHREAD_CXXFLAGS += -Wno-class-memaccess
 
 all:
 	cd $(PKG_BUILDDIR) && PREFIX="/" ./bootstrap
@@ -35,7 +36,8 @@ all:
 		STRIP="$(STRIP)" \
 		CPPFLAGS="$(OPENTHREAD_COMMON_FLAGS) $(CFLAGS_CPU) -D$(CONFIG_FILE)" \
 		CFLAGS="$(OPENTHREAD_COMMON_FLAGS) $(CFLAGS_CPU) " \
-		CXXFLAGS="$(OPENTHREAD_COMMON_FLAGS) $(CFLAGS_CPU) -fno-exceptions -fno-rtti " \
+		CXXFLAGS="$(OPENTHREAD_COMMON_FLAGS) $(OPENTHREAD_CXXFLAGS) \
+		          $(CFLAGS_CPU) -fno-exceptions -fno-rtti " \
 		LDFLAGS="$(OPENTHREAD_COMMON_FLAGS) $(CFLAGS_CPU) -nostartfiles -specs=nano.specs \
 		-specs=nosys.specs -Wl,--gc-sections -Wl,-Map=map.map " \
 		./configure --disable-docs --host=$(TARGET_ARCH) --target=$(TARGET_ARCH) \
