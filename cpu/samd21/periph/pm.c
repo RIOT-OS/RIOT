@@ -82,5 +82,5 @@ void pm_set(unsigned mode)
             break;
     }
 
-    cortexm_sleep(deep);
+    sam0_cortexm_sleep(deep);
 }
