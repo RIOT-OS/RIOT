@@ -213,6 +213,8 @@ _flash_list_raw() {
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_RESET_INIT} \
             -c 'init' \
+            -c 'targets' \
+            -c 'reset halt' \
             -c 'flash probe 0' \
             -c 'flash list' \
             -c 'shutdown'" 2>&1 && return
