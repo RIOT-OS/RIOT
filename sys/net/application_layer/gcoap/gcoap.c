@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017 Ken Bannister. All rights reserved.
+ * Copyright (c) 2015-2020 Ken Bannister. All rights reserved.
  *               2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -102,7 +102,6 @@ static char _msg_stack[GCOAP_STACK_SIZE];
 static event_queue_t _queue;
 static uint8_t _listen_buf[CONFIG_GCOAP_PDU_BUF_SIZE];
 static sock_udp_t _sock;
-
 
 /* Event loop for gcoap _pid thread. */
 static void *_event_loop(void *arg)
@@ -434,8 +433,9 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
     unsigned cmplen      = coap_get_token_len(src_pdu);
 
     for (int i = 0; i < CONFIG_GCOAP_REQ_WAITING_MAX; i++) {
-        if (_coap_state.open_reqs[i].state == GCOAP_MEMO_UNUSED)
+        if (_coap_state.open_reqs[i].state == GCOAP_MEMO_UNUSED) {
             continue;
+        }
 
         gcoap_request_memo_t *memo = &_coap_state.open_reqs[i];
         if (memo->send_limit == GCOAP_SEND_LIMIT_NON) {
