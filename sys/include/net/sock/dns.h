@@ -80,8 +80,8 @@ typedef struct {
  * @param[out]  addr_out        buffer to write result into
  * @param[in]   family          Either AF_INET, AF_INET6 or AF_UNSPEC
  *
- * @return      0 on success
- * @return      !=0 otherwise
+ * @return      the size of the resolved address on success
+ * @return      < 0 otherwise
  */
 int sock_dns_query(const char *domain_name, void *addr_out, int family);
 
