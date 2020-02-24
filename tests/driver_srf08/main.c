@@ -48,7 +48,6 @@ int main(void)
     printf("Initializing SRF08 sensor at I2C_%i... ", TEST_SRF08_I2C);
 
     int res;
-    uint16_t range_array[TEST_NUM_ECHOS];
 
     res = srf08_init(&srf08_0, TEST_SRF08_I2C, SRF08_DEFAULT_ADDR);
 
@@ -61,7 +60,7 @@ int main(void)
         puts("[Ok]\n");
 
         while(1) {
-
+            uint16_t range_array[TEST_NUM_ECHOS];
             int echo_number = srf08_get_distances(&srf08_0, range_array,
                                                   TEST_NUM_ECHOS, TEST_MODE);
 
