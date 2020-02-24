@@ -39,6 +39,8 @@ void board_init(void)
 {
     /* initialize the on-board LED */
     gpio_init(LED0_PIN, GPIO_OUT);
+    LED0_OFF;
+
     /* initialize the on-board antenna switch */
     gpio_init(RFCTL1_PIN, GPIO_OUT);
     gpio_init(RFCTL2_PIN, GPIO_OUT);
