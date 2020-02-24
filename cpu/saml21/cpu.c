@@ -136,6 +136,19 @@ static void _dfll_setup(void)
     NVMCTRL->CTRLB.reg |= NVMCTRL_CTRLB_RWS(3);
 #endif
 }
+
+void cpu_pm_cb_enter(int deep)
+{
+    (void) deep;
+    /* will be called before entering sleep */
+}
+
+void cpu_pm_cb_leave(int deep)
+{
+    (void) deep;
+    /* will be called after wake-up */
+}
+
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks
  */
