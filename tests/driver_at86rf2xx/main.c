@@ -25,22 +25,25 @@
 #include "shell_commands.h"
 #include "thread.h"
 #include "xtimer.h"
-
 #include "common.h"
+#include "at86rf2xx_params.h"
 
-#define _STACKSIZE      (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
-#define MSG_TYPE_ISR    (0x3456)
+#define _STACKSIZE          (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
+#define MSG_TYPE_ISR        (0x3456)
+#define RX_MSG_QUEUE_SIZE   (1 << 1)
 
 static char stack[_STACKSIZE];
 static kernel_pid_t _recv_pid;
-
-at86rf2xx_devs_t at86rf2xx_devs;
+static msg_t _msg_queue[RX_MSG_QUEUE_SIZE];
 
 static const shell_command_t shell_commands[] = {
     { "ifconfig", "Configure netdev", ifconfig },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
     { NULL, NULL, NULL }
 };
+
+const at86rf2xx_t *at86rf2xx_dev_ptrs[AT86RF2XX_NUM] = {0};
+unsigned at86rf2xx_num_dev_ptrs = 0;
 
 static void _event_cb(netdev_t *dev, netdev_event_t event)
 {
@@ -49,9 +52,10 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
 
         msg.type = MSG_TYPE_ISR;
         msg.content.ptr = dev;
-
-        if (msg_send(&msg, _recv_pid) <= 0) {
-            puts("gnrc_netdev: possibly lost interrupt.");
+        int msg_send_result = msg_send(&msg, _recv_pid);
+        if (msg_send_result <= 0) {
+            printf("gnrc_netdev: possibly lost interrupt. (%d)\n",
+                                                 msg_send_result);
         }
     }
     else {
@@ -63,7 +67,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                 break;
             }
             default:
-                puts("Unexpected event received");
+                printf("Unexpected event received: %d\n", event);
                 break;
         }
     }
@@ -72,6 +76,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
 void *_recv_thread(void *arg)
 {
     (void)arg;
+    msg_init_queue(_msg_queue, RX_MSG_QUEUE_SIZE);
     while (1) {
         msg_t msg;
         msg_receive(&msg);
@@ -88,27 +93,104 @@ void *_recv_thread(void *arg)
 int main(void)
 {
     puts("AT86RF2xx device driver test");
+    netopt_enable_t en = NETOPT_ENABLE;
+    netdev_t *netdev;
 
-    at86rf2xx_setup_devs(&at86rf2xx_devs);
-
-    unsigned dev_success = 0;
-    uint8_t *dev = at86rf2xx_devs.mem_devs;
-    for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
-        netopt_enable_t en = NETOPT_ENABLE;
-        netdev_t *netdev = (netdev_t *)(&(((at86rf2xx_t *)dev)->base.netdev));
-        dev += at86rf2xx_get_size((at86rf2xx_t *)dev);
-        printf("Initializing AT86RF2xx radio #%u\n", i);
+#if IS_USED(MODULE_AT86RF212B)
+    at86rf212b_t at86rf212b_devs[AT86RF212B_NUM_OF];
+    at86rf212b_setup(at86rf212b_devs, at86rf212b_params, AT86RF212B_NUM_OF);
+    for (unsigned i = 0; i < AT86RF212B_NUM_OF; i++) {
+        netdev = (netdev_t *)&((at86rf2xx_t *)&at86rf212b_devs[i])->base.netdev;
         netdev->event_callback = _event_cb;
         if (netdev->driver->init(netdev) < 0) {
-            printf("radio #%u: initialization failed\n", i);
+            printf("at86rf212b radio #%u: initialization failed\n", i);
             continue;
         }
-        printf("radio #%u: initialization successful\n", i);
-        dev_success++;
+        printf("at86rf212b radio #%u: initialization successful\n", i);
+        at86rf2xx_dev_ptrs[at86rf2xx_num_dev_ptrs++] =
+            (at86rf2xx_t *)&at86rf212b_devs[i];
         netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &en, sizeof(en));
     }
+#endif
+#if IS_USED(MODULE_AT86RF231)
+    at86rf231_t at86rf231_devs[AT86RF231_NUM_OF];
+    at86rf231_setup(at86rf231_devs, at86rf231_params, AT86RF231_NUM_OF);
+    for (unsigned i = 0; i < AT86RF231_NUM_OF; i++) {
+        netdev = (netdev_t *)&((at86rf2xx_t *)&at86rf231_devs[i])->base.netdev;
+        netdev->event_callback = _event_cb;
+        if (netdev->driver->init(netdev) < 0) {
+            printf("at86rf231 radio #%u: initialization failed\n", i);
+            continue;
+        }
+        printf("at86rf231 radio #%u: initialization successful\n", i);
+        at86rf2xx_dev_ptrs[at86rf2xx_num_dev_ptrs++] =
+            (at86rf2xx_t *)&at86rf231_devs[i];
+        netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &en, sizeof(en));
+    }
+#endif
+#if IS_USED(MODULE_AT86RF232)
+    at86rf232_t at86rf232_devs[AT86RF232_NUM_OF];
+    at86rf232_setup(at86rf232_devs, at86rf232_params, AT86RF232_NUM_OF);
+    for (unsigned i = 0; i < AT86RF232_NUM_OF; i++) {
+        netdev = (netdev_t *)&((at86rf2xx_t *)&at86rf232_devs[i])->base.netdev;
+        netdev->event_callback = _event_cb;
+        if (netdev->driver->init(netdev) < 0) {
+            printf("at86rf232 radio #%u: initialization failed\n", i);
+            continue;
+        }
+        printf("at86rf232 radio #%u: initialization successful\n", i);
+        at86rf2xx_dev_ptrs[at86rf2xx_num_dev_ptrs++] =
+            (at86rf2xx_t *)&at86rf232_devs[i];
+        netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &en, sizeof(en));
+    }
+#endif
+#if IS_USED(MODULE_AT86RF233)
+    at86rf233_t at86rf233_devs[AT86RF233_NUM_OF];
+    at86rf233_setup(at86rf233_devs, at86rf233_params, AT86RF233_NUM_OF);
+    for (unsigned i = 0; i < AT86RF233_NUM_OF; i++) {
+        netdev = (netdev_t *)&((at86rf2xx_t *)&at86rf233_devs[i])->base.netdev;
+        netdev->event_callback = _event_cb;
+        if (netdev->driver->init(netdev) < 0) {
+            printf("at86rf233 radio #%u: initialization failed\n", i);
+            continue;
+        }
+        printf("at86rf233 radio #%u: initialization successful\n", i);
+        at86rf2xx_dev_ptrs[at86rf2xx_num_dev_ptrs++] =
+            (at86rf2xx_t *)&at86rf233_devs[i];
+        netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &en, sizeof(en));
+    }
+#endif
+#if IS_USED(MODULE_AT86RFA1)
+    at86rfa1_t at86rfa1_dev;
+    at86rfa1_setup(&at86rfa1_dev);
+    netdev = (netdev_t *)&((at86rf2xx_t *)&at86rfa1_dev)->base.netdev;
+    netdev->event_callback = _event_cb;
+    if (netdev->driver->init(netdev) < 0) {
+        printf("at86rfa1 initialization failed\n");
+    }
+    else {
+        printf("at86rfa1 initialization successful\n");
+        at86rf2xx_dev_ptrs[at86rf2xx_num_dev_ptrs++] =
+            (at86rf2xx_t *)&at86rfa1_dev;
+        netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &en, sizeof(en));
+    }
+#elif IS_USED(MODULE_AT86RFR2)
+    at86rfr2_t at86rfr2_dev;
+    at86rfr2_setup(&at86rfr2_dev);
+    netdev = (netdev_t *)&((at86rf2xx_t *)&at86rfr2_dev)->base.netdev;
+    netdev->event_callback = _event_cb;
+    if (netdev->driver->init(netdev) < 0) {
+        printf("at86rfr2 initialization failed\n");
+    }
+    else {
+        printf("at86rfr2 initialization successful\n");
+        at86rf2xx_dev_ptrs[at86rf2xx_num_dev_ptrs++] =
+            (at86rf2xx_t *)&at86rfr2_dev;
+        netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &en, sizeof(en));
+    }
+#endif
 
-    if (!dev_success) {
+    if (!at86rf2xx_num_dev_ptrs) {
         puts("No device could be initialized");
         return 1;
     }

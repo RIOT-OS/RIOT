@@ -32,11 +32,10 @@ static size_t _parse_addr(uint8_t *out, size_t out_len, const char *in);
 static int send(int iface, le_uint16_t dst_pan, uint8_t *dst_addr,
                 size_t dst_len, char *data);
 
-int ifconfig_list(int idx)
+static int ifconfig_list(int idx)
 {
     int res;
-    netdev_ieee802154_t *dev = (netdev_ieee802154_t *)
-                               (at86rf2xx_get_dev(&at86rf2xx_devs, idx));
+    netdev_ieee802154_t *dev = (netdev_ieee802154_t *)at86rf2xx_dev_ptrs[idx];
 
     int (*get)(netdev_t *, netopt_t, void *, size_t) = dev->netdev.driver->get;
     netopt_enable_t enable_val;
@@ -127,7 +126,7 @@ int ifconfig(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    for (unsigned int i = 0; i < AT86RF2XX_NUM; i++) {
+    for (unsigned int i = 0; i < at86rf2xx_num_dev_ptrs; i++) {
         ifconfig_list(i);
     }
     return 0;
@@ -249,7 +248,7 @@ static int send(int iface, le_uint16_t dst_pan, uint8_t *dst, size_t dst_len,
     uint8_t flags;
     le_uint16_t src_pan;
 
-    if (((unsigned)iface) > (AT86RF2XX_NUM - 1)) {
+    if (((unsigned)iface) > (at86rf2xx_num_dev_ptrs - 1)) {
         printf("txtsnd: %d is not an interface\n", iface);
         return 1;
     }
@@ -259,7 +258,7 @@ static int send(int iface, le_uint16_t dst_pan, uint8_t *dst, size_t dst_len,
         .iol_len = strlen(data)
     };
 
-    dev = (netdev_ieee802154_t *)at86rf2xx_get_dev(&at86rf2xx_devs, iface);
+    dev = (netdev_ieee802154_t *)at86rf2xx_dev_ptrs[iface];
     flags = (uint8_t)(dev->flags & NETDEV_IEEE802154_SEND_MASK);
     flags |= IEEE802154_FCF_TYPE_DATA;
     src_pan = byteorder_btols(byteorder_htons(dev->pan));

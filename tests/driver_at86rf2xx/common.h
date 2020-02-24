@@ -21,7 +21,6 @@
 #include <stdint.h>
 
 #include "at86rf2xx.h"
-#include "at86rf2xx_devs.h"
 #include "net/netdev.h"
 #include "kernel_defines.h"
 
@@ -35,7 +34,8 @@ extern "C" {
  * @{
  */
 
-extern at86rf2xx_devs_t at86rf2xx_devs;
+extern const at86rf2xx_t *at86rf2xx_dev_ptrs[];
+extern unsigned at86rf2xx_num_dev_ptrs;
 
 void recv(netdev_t *dev);
 int ifconfig(int argc, char **argv);
