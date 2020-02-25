@@ -10,6 +10,11 @@
 # value as hex string and the original string will be crc32()ed again, until
 # `res > MIN_VALUE`.
 #
+# Usage example:
+#
+#     $ ./define2u32.py MSG_XTIMER
+#     #define MSG_XTIMER 0x8eafaa52 /* created with dist/tools/define2u32.py */
+#
 
 import binascii
 import sys
