@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 
+#include "test_utils/expect.h"
 #include "thread.h"
 #include "event.h"
 #include "event/timeout.h"
@@ -50,8 +51,8 @@ static event_t delayed_event2 = { .handler = delayed_callback2 };
 static void callback(event_t *arg)
 {
     order++;
-    assert(order == 3);
-    assert(arg == &event);
+    expect(order == 3);
+    expect(arg == &event);
     printf("triggered 0x%08x\n", (unsigned)arg);
 }
 
@@ -67,8 +68,8 @@ static event_callback_t noevent_callback = EVENT_CALLBACK_INIT(forbidden_callbac
 static void custom_callback(event_t *event)
 {
     order++;
-    assert(order == 4);
-    assert(event == (event_t *)&custom_event);
+    expect(order == 4);
+    expect(event == (event_t *)&custom_event);
     custom_event_t *custom_event = (custom_event_t *)event;
     printf("triggered custom event with text: \"%s\"\n", custom_event->text);
 }
@@ -76,10 +77,10 @@ static void custom_callback(event_t *event)
 static void timed_callback(void *arg)
 {
     order++;
-    assert(order == 5);
-    assert(arg == event_callback.arg);
+    expect(order == 5);
+    expect(arg == event_callback.arg);
     uint32_t now = xtimer_now_usec();
-    assert((now - before >= 100000LU));
+    expect((now - before >= 100000LU));
     printf("triggered timed callback with arg 0x%08x after %" PRIu32 "us\n", (unsigned)arg, now - before);
     puts("[SUCCESS]");
 }
@@ -91,23 +92,23 @@ static void forbidden_callback(void *arg)
     puts("call to forbidden callback");
     puts("[FAILED]");
     while (1) {
-        assert(false);
+        expect(false);
     }
 }
 
 static void delayed_callback1(event_t *arg)
 {
     order++;
-    assert(order == 1);
-    assert(arg == &delayed_event1);
+    expect(order == 1);
+    expect(arg == &delayed_event1);
     printf("triggered delayed event %p\n", (void *)arg);
 }
 
 static void delayed_callback2(event_t *arg)
 {
     order++;
-    assert(order == 2);
-    assert(arg == &delayed_event2);
+    expect(order == 2);
+    expect(arg == &delayed_event2);
     printf("triggered delayed event %p\n", (void *)arg);
 }
 
