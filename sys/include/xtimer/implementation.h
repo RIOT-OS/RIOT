@@ -39,7 +39,7 @@ extern volatile uint64_t _xtimer_current_time;
 /**
  * @brief IPC message type for xtimer msg callback
  */
-#define MSG_XTIMER 12345
+#define MSG_XTIMER 0x8eafaa52 /* created with dist/tools/define2u32.py */
 
 /**
  * @brief returns the (masked) low-level timer counter value.
