@@ -243,6 +243,18 @@ void at86rf2xx_set_frame_buffer_protection(const at86rf2xx_t *dev,
  */
 uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state);
 
+/**
+ * @brief   Perform one manual channel clear assessment (CCA)
+ *
+ * The CCA mode and threshold level depends on the current transceiver settings.
+ *
+ * @param[in]  dev          device to use
+ *
+ * @return                  true if channel is determined clear
+ * @return                  false if channel is determined busy
+ */
+bool at86rf2xx_cca(at86rf2xx_t *dev);
+
 #ifdef __cplusplus
 }
 #endif

@@ -911,14 +911,14 @@ int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 #endif
 #if IS_USED(MODULE_AT86RFA1)
                 case AT86RF2XX_DEV_TYPE_AT86RFA1:
-                    *((int8_t *)val) = at86rfa1_get_cca_threshold(
-                        (at86rfa1_t *)dev);
+                    *((int8_t *)val) =
+                        at86rfa1_get_cca_threshold((at86rfa1_t *)dev);
                     break;
 #endif
 #if IS_USED(MODULE_AT86RFR2)
                 case AT86RF2XX_DEV_TYPE_AT86RFR2:
-                    *((int8_t *)val) = at86rfr2_get_cca_threshold(
-                        (at86rfr2_t *)dev);
+                    *((int8_t *)val) =
+                        at86rfr2_get_cca_threshold((at86rfr2_t *)dev);
                     break;
 #endif
             }
@@ -927,44 +927,8 @@ int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_IS_CHANNEL_CLR:
             assert(max_len == sizeof(netopt_enable_t));
-            switch (dev->base.dev_type) {
-#if IS_USED(MODULE_AT86RF212B)
-                case AT86RF2XX_DEV_TYPE_AT86RF212B:
-                    *((netopt_enable_t *)val) =
-                        at86rf212b_cca((at86rf212b_t *)dev);
-                    break;
-#endif
-#if IS_USED(MODULE_AT86RF231)
-                case AT86RF2XX_DEV_TYPE_AT86RF231:
-                    *((netopt_enable_t *)val) =
-                        at86rf231_cca((at86rf231_t *)dev);
-                    break;
-#endif
-#if IS_USED(MODULE_AT86RF232)
-                case AT86RF2XX_DEV_TYPE_AT86RF232:
-                    *((netopt_enable_t *)val) =
-                        at86rf232_cca((at86rf232_t *)dev);
-                    break;
-#endif
-#if IS_USED(MODULE_AT86RF233)
-                case AT86RF2XX_DEV_TYPE_AT86RF233:
-                    *((netopt_enable_t *)val) =
-                        at86rf233_cca((at86rf233_t *)dev);
-                    break;
-#endif
-#if IS_USED(MODULE_AT86RFA1)
-                case AT86RF2XX_DEV_TYPE_AT86RFA1:
-                    *((netopt_enable_t *)val) =
-                        at86rfa1_cca((at86rfa1_t *)dev);
-                    break;
-#endif
-#if IS_USED(MODULE_AT86RFR2)
-                case AT86RF2XX_DEV_TYPE_AT86RFR2:
-                    *((netopt_enable_t *)val) =
-                        at86rfr2_cca((at86rfr2_t *)dev);
-                    break;
-#endif
-            }
+            *((netopt_enable_t *)val) =
+                at86rf2xx_cca((at86rf2xx_t *)dev);
             res = sizeof(netopt_enable_t);
             break;
 

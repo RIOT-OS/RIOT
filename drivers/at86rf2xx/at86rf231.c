@@ -253,26 +253,6 @@ void at86rf231_set_rxsensitivity(const at86rf231_t *dev, int16_t dbm)
     at86rf2xx_spi_reg_write((at86rf2xx_t *)dev, AT86RF2XX_REG__RX_SYN, rx_syn);
 }
 
-bool at86rf231_cca(at86rf231_t *dev)
-{
-    uint8_t old_state = at86rf231_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
-    /* Disable RX path */
-    uint8_t rx_syn = at86rf2xx_spi_reg_read((at86rf2xx_t *)dev,
-                                            AT86RF2XX_REG__RX_SYN);
-    uint8_t tmp = rx_syn | AT86RF2XX_RX_SYN_MASK__RX_PDT_DIS;
-
-    at86rf2xx_spi_reg_write((at86rf2xx_t *)dev, AT86RF2XX_REG__RX_SYN, tmp);
-    /* Manually triggered CCA is only possible in RX_ON (basic operating mode) */
-    at86rf231_set_state(dev, AT86RF2XX_STATE_RX_ON);
-    bool cca =  at86rf2xx_cca((at86rf2xx_t *)dev);
-    /* re-enable RX */
-    at86rf2xx_spi_reg_write((at86rf2xx_t *)dev, AT86RF2XX_REG__RX_SYN, rx_syn);
-    /* Step back to the old state */
-    at86rf231_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
-    at86rf231_set_state(dev, old_state);
-    return cca;
-}
-
 int8_t at86rf231_get_cca_threshold(const at86rf231_t *dev)
 {
     uint8_t thresh = at86rf2xx_get_cca_threshold((const at86rf2xx_t *)dev);

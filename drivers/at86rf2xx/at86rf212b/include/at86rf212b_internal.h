@@ -315,6 +315,12 @@ uint8_t at86rf212b_set_state(at86rf212b_t *dev, uint8_t state)
 {
     return at86rf2xx_set_state((at86rf2xx_t *)dev, state);
 }
+
+static inline
+bool at86rf212b_cca(at86rf212b_t *dev)
+{
+    return at86rf2xx_cca((at86rf2xx_t *)dev);
+}
 /** @} */
 
 /**
@@ -394,18 +400,6 @@ int16_t at86rf212b_get_rxsensitivity(const at86rf212b_t *dev);
  * @param[in] dbm           rx sensitivity in dBm
  */
 void at86rf212b_set_rxsensitivity(const at86rf212b_t *dev, int16_t dbm);
-
-/**
- * @brief   Perform one manual channel clear assessment (CCA)
- *
- * The CCA mode and threshold level depends on the current transceiver settings.
- *
- * @param[in]  dev          device to use
- *
- * @return                  true if channel is determined clear
- * @return                  false if channel is determined busy
- */
-bool at86rf212b_cca(at86rf212b_t *dev);
 
 /**
  * @brief   Get the CCA threshold value

@@ -94,18 +94,6 @@ uint8_t at86rf2xx_get_frame_retries(const at86rf2xx_t *dev);
 uint8_t at86rf2xx_get_csma_retries(const at86rf2xx_t *dev);
 
 /**
- * @brief   Perform a manual channel clear assessment (CCA)
- *
- * The CCA mode and threshold level depends on the current transceiver settings.
- *
- * @param[in]  dev          device to use
- *
- * @return                  true if channel is determined clear
- * @return                  false if channel is determined busy
- */
-bool at86rf2xx_cca(at86rf2xx_t *dev);
-
-/**
  * @brief   Get the CCA threshold value
  *
  * @param[in] dev           device to read value from

@@ -86,8 +86,15 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 
 bool at86rf2xx_cca(at86rf2xx_t *dev)
 {
-    uint8_t phy_cc_cca = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
+    uint8_t old_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+    /* Disable RX path */
+    uint8_t rx_syn = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
+    uint8_t tmp = rx_syn | AT86RF2XX_RX_SYN_MASK__RX_PDT_DIS;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, tmp);
+    /* Manually triggered CCA is only possible in RX_ON (basic operating mode) */
+    at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_ON);
 
+    uint8_t phy_cc_cca = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
     phy_cc_cca |= AT86RF2XX_PHY_CC_CCA_MASK__CCA_REQUEST;
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, phy_cc_cca);
     /* Spin until done (8 symbols + 12 µs = 128 µs + 12 µs for O-QPSK)*/
@@ -95,6 +102,12 @@ bool at86rf2xx_cca(at86rf2xx_t *dev)
     do {
         trx_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS);
     } while ((trx_status & AT86RF2XX_TRX_STATUS_MASK__CCA_DONE) == 0);
-    /* return true if channel is clear */
-    return !!(trx_status & AT86RF2XX_TRX_STATUS_MASK__CCA_STATUS);
+    bool cca =  !!(trx_status & AT86RF2XX_TRX_STATUS_MASK__CCA_STATUS);
+
+    /* re-enable RX */
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, rx_syn);
+    /* Step back to the old state */
+    at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+    at86rf2xx_set_state(dev, old_state);
+    return cca;
 }
