@@ -11,13 +11,25 @@ RIOTBASE ?= $(CURDIR)/../..
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += gnrc_netdev_default
-USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules
-USEMODULE += gnrc_ipv6_default
+ifeq (1,$(LWIP_IPV6))
+  USEMODULE += ipv6_addr
+  USEMODULE += lwip_netdev
+  USEMODULE += lwip_ipv6_autoconfig
+  USEMODULE += lwip_sock_ip
+  USEMODULE += lwip_sock_udp
+  USEMODULE += lwip_sock_async
+  # Activates recv timeout capability
+  CFLAGS += -DLWIP_SO_RCVTIMEO
+else
+  # GNRC default
+  USEMODULE += gnrc_netdev_default
+  USEMODULE += auto_init_gnrc_netif
+  USEMODULE += gnrc_ipv6_default
+  # Additional networking modules that can be dropped if not needed
+  USEMODULE += gnrc_icmpv6_echo
+endif
 USEMODULE += gcoap
-# Additional networking modules that can be dropped if not needed
-USEMODULE += gnrc_icmpv6_echo
 
 # Required by gcoap example
 USEMODULE += od
