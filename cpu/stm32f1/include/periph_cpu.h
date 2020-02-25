@@ -57,11 +57,6 @@ extern "C" {
 #define GPIO_MODE(mode, cnf, odr)       (mode | (cnf << 2) | (odr << 4))
 
 /**
- * @brief   Define the number of available PM modes
- */
-#define PM_NUM_MODES        (2U)
-
-/**
  * @brief  Define the config flag for stop mode
  */
 #define PM_STOP_CONFIG      (PWR_CR_LPDS)

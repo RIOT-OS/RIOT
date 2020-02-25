@@ -132,7 +132,7 @@ typedef uint16_t gpio_t;
 /**
  * @brief   number of usable power modes
  */
-#define PM_NUM_MODES    (1U)
+#define PM_NUM_MODES    (0U)
 
 #ifdef RTC
 /* All Kinetis CPUs have exactly one RTC hardware module, except for the KL02
