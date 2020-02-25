@@ -45,12 +45,10 @@ extern "C" {
  *
  * @param[in] file  The file name of the file the expectation failed in
  * @param[in] line  The code line of @p file the expectation failed in
- * @param[in] cond  The failed condition as string
  */
-NORETURN static inline void _expect_failure(const char *file, unsigned line,
-                                            const char *cond)
+NORETURN static inline void _expect_failure(const char *file, unsigned line)
 {
-    printf("%s:%u => failed condition \"%s\"\n", file, line, cond);
+    printf("%s:%u => failed condition\n", file, line);
     core_panic(PANIC_EXPECT_FAIL, "CONDITION FAILED.");
 }
 
@@ -83,7 +81,7 @@ NORETURN static inline void _expect_failure(const char *file, unsigned line,
  *
  */
 #define expect(cond) ((cond) ? (void)0 :  _expect_failure(RIOT_FILE_RELATIVE, \
-                                                          __LINE__, #cond))
+                                                          __LINE__))
 
 #ifdef __cplusplus
 }
