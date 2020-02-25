@@ -90,7 +90,6 @@ extern "C" {
 #define AT86RF2XX_STATE_RX_AACK_ON     (0x16)     /**< wait for incoming data */
 #define AT86RF2XX_STATE_TX_ARET_ON     (0x19)     /**< ready for sending data */
 #define AT86RF2XX_STATE_IN_PROGRESS    (0x1f)     /**< ongoing state conversion */
-#define AT86RF2XX_STATE_RESET          (0xff)     /**< trigger reset */
 /** @} */
 
 /**
