@@ -7,10 +7,10 @@
 .PHONY: mosquitto_rsmb
 
 # target for building the bossac binary
-$(RIOTTOOLS)/bossa/bossac:
-	@echo "[INFO] bossac binary not found - building it from source"
-	@make -C $(RIOTTOOLS)/bossa
-	@echo "[INFO] bossac binary successfully built!"
+$(RIOTTOOLS)/bossa-$(BOSSA_VERSION)/bossac:
+	@echo "[INFO] bossac $(BOSSA_VERSION) binary not found - building it from source"
+	@make -C $(RIOTTOOLS)/bossa-$(BOSSA_VERSION)
+	@echo "[INFO] bossac $(BOSSA_VERSION) binary successfully built!"
 
 $(RIOTTOOLS)/pic32prog/pic32prog: $(RIOTTOOLS)/pic32prog/Makefile
 	@echo "[INFO] $(@F) binary not found - building it from source now"
