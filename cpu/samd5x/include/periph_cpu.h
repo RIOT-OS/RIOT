@@ -44,6 +44,13 @@ extern "C" {
 #define SAM0_DPLL_FREQ_MAX_HZ   (200000000U)
 
 /**
+ * @name    Power mode configuration
+ * @{
+ */
+#define PM_NUM_MODES        (3)
+/** @} */
+
+/**
  * @name   SAMD5x GCLK definitions
  * @{
  */

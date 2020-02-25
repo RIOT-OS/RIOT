@@ -27,6 +27,13 @@ extern "C" {
 #endif
 
 /**
+ * @name    Power mode configuration
+ * @{
+ */
+#define PM_NUM_MODES        (1)
+/** @} */
+
+/**
  * @brief   Override the default initial PM blocker
  * @todo   Idle modes are enabled by default, deep sleep mode blocked
  */
