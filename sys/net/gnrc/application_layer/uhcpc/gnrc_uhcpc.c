@@ -24,6 +24,7 @@
 #include "log.h"
 #include "fmt.h"
 
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 static kernel_pid_t gnrc_border_interface;
 static kernel_pid_t gnrc_wireless_interface;
 
@@ -88,7 +89,6 @@ static void _update_6ctx(const ipv6_addr_t *prefix, uint8_t prefix_len)
         }
     }
     if (cid < GNRC_SIXLOWPAN_CTX_SIZE) {
-        static ipv6_addr_t addr_str[IPV6_ADDR_MAX_STR_LEN];
         LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): add compression context "
                  "%u for prefix %s/%u\n", cid,
                  ipv6_addr_to_str(addr_str, prefix, sizeof(addr_str)),
@@ -153,9 +153,8 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
 #endif
     gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
                     &_prefix, sizeof(_prefix));
-    print_str("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix ");
-    ipv6_addr_print((ipv6_addr_t*)prefix);
-    puts("/64");
+    LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix %s/64\n",
+             ipv6_addr_to_str(addr_str, (ipv6_addr_t *)prefix, sizeof(addr_str)));
 
     if (!ipv6_addr_is_unspecified(&_prefix)) {
         gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
@@ -164,9 +163,8 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
     GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
         gnrc_ipv6_nib_abr_del(&_prefix);
 #endif
-        print_str("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix ");
-        ipv6_addr_print(&_prefix);
-        puts("/64");
+        LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix %s/64\n",
+                 ipv6_addr_to_str(addr_str, &_prefix, sizeof(addr_str)));
     }
 
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
