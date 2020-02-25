@@ -19,7 +19,8 @@
  */
 
 #include <stdio.h>
-#include <test_utils/expect.h>
+
+#include "test_utils/expect.h"
 
 #include "msg.h"
 #include "thread.h"
