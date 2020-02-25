@@ -126,6 +126,13 @@ as shown in the NVM Row Organization figure. */
 #endif
 /** @} */
 
+/**
+ * @brief   The CPU has Low Power RAM that can be used as Heap
+ */
+#ifdef CPU_HAS_BACKUP_RAM
+#define NUM_HEAPS (2)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
