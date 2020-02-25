@@ -59,6 +59,23 @@ void at86rf2xx_power_on(at86rf2xx_t * dev)
     }
 }
 
+int at86rf2xx_validate(const at86rf2xx_t *dev, uint8_t part)
+{
+    uint8_t partn = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM);
+
+    if (partn != part) {
+        DEBUG("[at86rf2xx] error: unable to read correct part number\n");
+        return -ENOTSUP;
+    }
+    DEBUG("AT86RF2XX 0x%02X\n", partn);
+    DEBUG("manufactorer: 0x%02X%02X\n",
+          at86rf2xx_reg_read(dev, AT86RF2XX_REG__MAN_ID_1),
+          at86rf2xx_reg_read(dev, AT86RF2XX_REG__MAN_ID_0));
+    DEBUG("version: 0x%02x\n",
+          at86rf2xx_reg_read(dev, AT86RF2XX_REG__VERSION_NUM));
+    return 0;
+}
+
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
     netdev_ieee802154_reset(&dev->base.netdev);

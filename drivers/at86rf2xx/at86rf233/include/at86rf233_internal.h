@@ -129,6 +129,12 @@ uint8_t at86rf233_get_tx_retries(const at86rf233_t *dev)
  * @name Wrapper functions for AT86RF231
  */
 static inline
+int at86rf233_validate(const at86rf233_t *dev)
+{
+    return at86rf2xx_validate((const at86rf2xx_t *)dev, AT86RF233_PARTNUM);
+}
+
+static inline
 uint8_t at86rf233_get_status(const at86rf233_t *dev)
 {
     return at86rf2xx_get_status((const at86rf2xx_t *)dev);

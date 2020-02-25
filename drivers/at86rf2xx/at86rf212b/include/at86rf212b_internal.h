@@ -172,6 +172,12 @@ uint8_t at86rf212b_get_page(const at86rf212b_t *dev)
  * @name Wrapper functions for AT86RF212B
  */
 static inline
+int at86rf212b_validate(const at86rf212b_t *dev)
+{
+    return at86rf2xx_validate((const at86rf2xx_t *)dev, AT86RF212B_PARTNUM);
+}
+
+static inline
 uint8_t at86rf212b_get_status(const at86rf212b_t *dev)
 {
     return at86rf2xx_get_status((const at86rf2xx_t *)dev);
@@ -322,16 +328,6 @@ bool at86rf212b_cca(at86rf212b_t *dev)
     return at86rf2xx_cca((at86rf2xx_t *)dev);
 }
 /** @} */
-
-/**
- * @brief Check if the device is actually an AT86RF212B
- *
- * @param[in] dev           device to be checked
- *
- * @return                  0 on success
- * @return                  -ENOTSUP on mismatch
- */
-int at86rf212b_validate(const at86rf212b_t *dev);
 
 /**
  * @brief

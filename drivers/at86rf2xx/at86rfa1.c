@@ -103,24 +103,6 @@ void at86rfa1_setup(at86rfa1_t *dev)
     at86rf2xx_periph_reg_write(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__IRQ_MASK), 0x00);
 }
 
-int at86rfa1_validate(const at86rfa1_t *dev)
-{
-    (void)dev;
-    uint8_t partn =
-        at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__PART_NUM));
-    if (partn != AT86RFA1_PARTNUM) {
-        DEBUG("[at86rfa1] error: unable to read correct part number\n");
-        return -ENOTSUP;
-    }
-    DEBUG("AT86RFA1 0x%02X\n", partn);
-    DEBUG("manufactorer: 0x%02X%02X\n",
-          at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__MAN_ID_1)),
-          at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__MAN_ID_0)));
-    DEBUG("version: 0x%02x\n",
-          at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__VERSION_NUM)));
-    return 0;
-}
-
 void at86rfa1_sleep(at86rfa1_t *dev)
 {
     if (dev->base.state != AT86RF2XX_STATE_SLEEP) {

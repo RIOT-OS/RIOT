@@ -73,6 +73,16 @@ int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev)
 }
 
 /**
+ * @brief Check if the device has the expected part number @p part
+ *
+ * @param[in] dev           device to be checked
+ *
+ * @return                  0 on success
+ * @return                  -ENOTSUP on mismatch
+ */
+int at86rf2xx_validate(const at86rf2xx_t *dev, uint8_t part);
+
+/**
  * @brief   Perform initial state transition from P_ON to TRX_OFF
  * @param[in]   dev         device to power on
  */

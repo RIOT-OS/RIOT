@@ -113,6 +113,12 @@ typedef struct {
  * @name Wrapper functions for AT86RF231
  */
 static inline
+int at86rf231_validate(const at86rf231_t *dev)
+{
+    return at86rf2xx_validate((const at86rf2xx_t *)dev, AT86RF231_PARTNUM);
+}
+
+static inline
 uint8_t at86rf231_get_status(const at86rf231_t *dev)
 {
     return at86rf2xx_get_status((const at86rf2xx_t *)dev);

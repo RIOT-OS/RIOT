@@ -117,6 +117,12 @@ void at86rf232_set_tx_retries(at86rf232_t *dev, uint8_t tx_retries)
 }
 
 static inline
+int at86rf232_validate(const at86rf232_t *dev)
+{
+    return at86rf2xx_validate((const at86rf2xx_t *)dev, AT86RF232_PARTNUM);
+}
+
+static inline
 uint8_t at86rf232_get_status(const at86rf232_t *dev)
 {
     return at86rf2xx_get_status((const at86rf2xx_t *)dev);

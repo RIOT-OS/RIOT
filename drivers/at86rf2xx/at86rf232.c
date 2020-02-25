@@ -106,25 +106,6 @@ void at86rf232_setup(at86rf232_t *devs, const at86rf232_params_t *params,
     }
 }
 
-int at86rf232_validate(const at86rf232_t *dev)
-{
-    uint8_t partn = at86rf2xx_spi_reg_read((at86rf2xx_t *)dev,
-                                           AT86RF2XX_REG__PART_NUM);
-
-    if (partn != AT86RF232_PARTNUM) {
-        DEBUG("[at86rf232] error: unable to read correct part number\n");
-        return -ENOTSUP;
-    }
-    DEBUG("AT86RF232 0x%02X\n", partn);
-    DEBUG("manufactorer: 0x%02X%02X\n",
-          at86rf2xx_spi_reg_read((at86rf2xx_t *)dev, AT86RF2XX_REG__MAN_ID_1),
-          at86rf2xx_spi_reg_read((at86rf2xx_t *)dev, AT86RF2XX_REG__MAN_ID_0));
-    DEBUG("version: 0x%02x\n",
-          at86rf2xx_spi_reg_read((at86rf2xx_t *)dev,
-                                 AT86RF2XX_REG__VERSION_NUM));
-    return 0;
-}
-
 void at86rf232_sleep(at86rf232_t *dev)
 {
     if (dev->base.state != AT86RF2XX_STATE_SLEEP) {

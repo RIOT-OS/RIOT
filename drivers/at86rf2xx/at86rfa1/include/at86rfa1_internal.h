@@ -119,6 +119,12 @@ uint8_t at86rfa1_get_irq_status(const at86rfa1_t *dev)
 }
 
 static inline
+int at86rfa1_validate(const at86rfa1_t *dev)
+{
+    return at86rf2xx_validate((const at86rf2xx_t *)dev, AT86RFA1_PARTNUM);
+}
+
+static inline
 uint8_t at86rfa1_get_status(const at86rfa1_t *dev)
 {
     return at86rf2xx_get_status((const at86rf2xx_t *)dev);
