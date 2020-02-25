@@ -846,27 +846,35 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
     return write_len;
 }
 
-ssize_t coap_opt_add_uquery(coap_pkt_t *pdu, const char *key, const char *val)
+ssize_t coap_opt_add_uquery(coap_pkt_t *pkt, const char *key, const char *val)
 {
-    char qs[NANOCOAP_QS_MAX];
-    size_t len = strlen(key);
-    size_t val_len = (val) ? (strlen(val) + 1) : 0;
+    return coap_opt_add_uquery2(pkt, key, strlen(key), val, val ? strlen(val) : 0);
+}
 
-    /* test if the query string fits, account for the zero termination */
-    if ((len + val_len + 1) >= NANOCOAP_QS_MAX) {
+ssize_t coap_opt_add_uquery2(coap_pkt_t *pkt, const char *key, size_t key_len,
+                             const char *val, size_t val_len)
+{
+    assert(pkt);
+    assert(key);
+    assert(key_len);
+    assert(!val_len || (val && val_len));
+
+    char qs[NANOCOAP_QS_MAX];
+    size_t qs_len = key_len + ((val && val_len) ? (val_len + 1) : 0);
+
+    /* test if the query string fits */
+    if (qs_len >= NANOCOAP_QS_MAX) {
         return -1;
     }
 
-    memcpy(&qs[0], key, len);
-    if (val) {
-        qs[len] = '=';
-        /* the `=` character was already counted in `val_len`, so subtract it here */
-        memcpy(&qs[len + 1], val, (val_len - 1));
-        len += val_len;
+    memcpy(&qs[0], key, key_len);
+    if (val && val_len) {
+        qs[key_len] = '=';
+        memcpy(&qs[key_len + 1], val, val_len);
     }
-    qs[len] = '\0';
+    qs[qs_len] = '\0';
 
-    return coap_opt_add_string(pdu, COAP_OPT_URI_QUERY, qs, '&');
+    return coap_opt_add_string(pkt, COAP_OPT_URI_QUERY, qs, '&');
 }
 
 ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val, size_t val_len)
