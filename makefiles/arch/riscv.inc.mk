@@ -1,5 +1,5 @@
 # Target architecture for the build.
-export TARGET_ARCH ?= riscv-none-embed
+TARGET_ARCH ?= riscv-none-embed
 
 # define build specific options
 CFLAGS_CPU   = -march=rv32imac -mabi=ilp32 -mcmodel=medlow -msmall-data-limit=8

@@ -1,5 +1,5 @@
 # Target triple for the build.
-export TARGET_ARCH ?= mips-mti-elf
+TARGET_ARCH ?= mips-mti-elf
 
 ABI = 32
 
