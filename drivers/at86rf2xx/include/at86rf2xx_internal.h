@@ -94,21 +94,30 @@ uint8_t at86rf2xx_get_frame_retries(const at86rf2xx_t *dev);
 uint8_t at86rf2xx_get_csma_retries(const at86rf2xx_t *dev);
 
 /**
- * @brief   Get the CCA threshold value
+ * @brief   Get CCA_ED_THRES value
  *
  * @param[in] dev           device to read value from
  *
- * @return                  the current CCA threshold value
+ * @return                    CCA_ED_THRES value
  */
-int8_t at86rf2xx_get_cca_threshold(const at86rf2xx_t *dev);
+uint8_t at86rf2xx_get_cca_threshold(const at86rf2xx_t *dev);
 
 /**
- * @brief   Set the CCA threshold value
+ * @brief   Set the CCA_ED_THRES value value
  *
  * @param[in] dev           device to write to
- * @param[in] thresh        the new CCA threshold value
+ * @param[in] thresh        the CCA_ED_THRES value value
  */
 void at86rf2xx_set_cca_threshold(const at86rf2xx_t *dev, uint8_t thresh);
+
+/**
+ * @brief   Get PHY_ED_LEVEL register value
+ *
+ * @param[in] dev           device to read value from
+ *
+ * @return                  PHY_ED_LEVEL register value
+ */
+uint8_t at86rf2xx_get_ed_level(const at86rf2xx_t* dev);
 
 /**
  * @brief   Configure interrupt logic
@@ -138,23 +147,6 @@ void at86rf2xx_set_slotted_operation(const at86rf2xx_t *dev, bool slotted);
  */
 void at86rf2xx_set_clock_output(const at86rf2xx_t *dev,
                                 bool immediately, char mode);
-
-/**
- * @brief   Read random data from the RNG
- *
- * @note    According to the data sheet this function only works properly in
- *          Basic Operation Mode. However, sporadic testing has shown that even
- *          in Extended Operation Mode this returns random enough data to be
- *          used as a seed for @ref sys_random if no cryptographically secure
- *          randomness is required.
- *          Any further use-case needs to be evaluated, especially if
- *          crypto-relevant randomness is required.
- *
- * @param[in] dev       device to configure
- * @param[out] data     buffer to copy the random data to
- * @param[in]  len      number of random bytes to store in data
- */
-void at86rf2xx_get_random(const at86rf2xx_t *dev, uint8_t *data, size_t len);
 
 /**
  * @brief   Enable or disable driver specific options

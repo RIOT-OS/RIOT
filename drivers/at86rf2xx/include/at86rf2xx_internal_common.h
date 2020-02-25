@@ -234,6 +234,23 @@ void at86rf2xx_set_frame_buffer_protection(const at86rf2xx_t *dev,
                                            bool protect);
 
 /**
+ * @brief   Read random data from the RNG
+ *
+ * @note    According to the data sheet this function only works properly in
+ *          Basic Operation Mode. However, sporadic testing has shown that even
+ *          in Extended Operation Mode this returns random enough data to be
+ *          used as a seed for @ref sys_random if no cryptographically secure
+ *          randomness is required.
+ *          Any further use-case needs to be evaluated, especially if
+ *          crypto-relevant randomness is required.
+ *
+ * @param[in] dev       device to configure
+ * @param[out] data     buffer to copy the random data to
+ * @param[in]  len      number of random bytes to store in data
+ */
+void at86rf2xx_get_random(const at86rf2xx_t *dev, uint8_t *data, size_t len);
+
+/**
  * @brief   Set the state of the given device (trigger a state change)
  *
  * @param[in,out] dev       device to change state of

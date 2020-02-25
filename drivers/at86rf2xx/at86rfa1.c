@@ -273,9 +273,8 @@ void at86rfa1_set_cca_threshold(const at86rfa1_t *dev, int8_t thresh)
 
 int8_t at86rfa1_get_ed_level(const at86rfa1_t *dev)
 {
-    (void)dev;
     uint8_t phy_ed_level =
-        at86rf2xx_periph_reg_read(AT86RF2XX_PERIPH_REG(AT86RF2XX_REG__PHY_ED_LEVEL));
+        at86rf2xx_get_ed_level((const at86rf2xx_t *)dev);;
     return (int8_t)(phy_ed_level + AT86RFA1_RSSI_BASE_VAL);
 }
 

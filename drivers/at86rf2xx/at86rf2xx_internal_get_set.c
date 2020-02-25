@@ -59,14 +59,6 @@ void _at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
     dev->base.state = state;
 }
 
-/**
- * @brief   This function should only be used inside an assert() and
- *          verify if a state transition was successful.
- * @param[in]   dev         device
- * @param[in]   state       asserted state
- *
- * @return  1: Success, 0: You should debug
- */
 static
 int _at86rf2xx_check_state(const at86rf2xx_t *dev, uint8_t state)
 {
@@ -307,10 +299,9 @@ void at86rf2xx_set_csma_seed(const at86rf2xx_t *dev, const uint8_t entropy[2])
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, csma_seed_1);
 }
 
-int8_t at86rf2xx_get_cca_threshold(const at86rf2xx_t *dev)
+uint8_t at86rf2xx_get_cca_threshold(const at86rf2xx_t *dev)
 {
-    int8_t cca_thres = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CCA_THRES);
-
+    uint8_t cca_thres = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CCA_THRES);
     return cca_thres & AT86RF2XX_CCA_THRES_MASK__CCA_ED_THRES;
 }
 
@@ -322,6 +313,13 @@ void at86rf2xx_set_cca_threshold(const at86rf2xx_t *dev, uint8_t thresh)
     cca_thres = cca_thres | thresh;
     cca_thres |= AT86RF2XX_CCA_THRES_MASK__RSVD_HI_NIBBLE; /* What is this? */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__CCA_THRES, cca_thres);
+}
+
+uint8_t at86rf2xx_get_ed_level(const at86rf2xx_t *dev)
+{
+    uint8_t phy_ed_level =
+        at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
+    return phy_ed_level;
 }
 
 void at86rf2xx_set_clock_output(const at86rf2xx_t *dev, bool immediately,
