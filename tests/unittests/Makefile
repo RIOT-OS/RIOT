@@ -1,9 +1,6 @@
 DEVELHELP ?= 0
 include ../Makefile.tests_common
 
-# temporarily disable building, see #13456.
-BOARD_BLACKLIST := saml10-xpro saml11-xpro
-
 USEMODULE += embunit
 
 ifeq (, $(filter tests-%, $(MAKECMDGOALS)))
