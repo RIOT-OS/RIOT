@@ -32,6 +32,13 @@ extern "C" {
 #define CPU_BACKUP_RAM_NOT_RETAINED (1)
 
 /**
+ * @name    Power mode configuration
+ * @{
+ */
+#define PM_NUM_MODES        (2)
+/** @} */
+
+/**
  * @name   SAML21 GCLK definitions
  * @{
  */

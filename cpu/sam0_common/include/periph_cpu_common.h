@@ -96,17 +96,6 @@ enum {
  */
 #define GPIO_MODE(pr, ie, pe)   (pr | (ie << 1) | (pe << 2))
 
-/**
- * @name    Power mode configuration
- * @{
- */
-#ifdef CPU_SAML1X
-#define PM_NUM_MODES        (2)
-#else
-#define PM_NUM_MODES        (3)
-#endif
-/** @} */
-
 #ifndef DOXYGEN
 /**
  * @brief   Override GPIO modes
