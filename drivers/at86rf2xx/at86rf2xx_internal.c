@@ -98,35 +98,3 @@ bool at86rf2xx_cca(at86rf2xx_t *dev)
     /* return true if channel is clear */
     return !!(trx_status & AT86RF2XX_TRX_STATUS_MASK__CCA_STATUS);
 }
-
-int at86rf2xx_check_state(const at86rf2xx_t *dev, uint8_t state)
-{
-    /* Check state (be very paranoid):
-       This should only be used inside an assert()
-       after a state transission, to check if a state
-       transition was successful. So in productive use,
-       this should not be linked. */
-    uint8_t trx_status;
-    do {
-        trx_status =
-            at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS);
-        trx_status &= AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
-    } while (trx_status == AT86RF2XX_STATE_IN_PROGRESS);
-    DEBUG("input state: 0x%02X -- device state: 0x%02X -- trx_staus: 0x%02X\n",
-          state, dev->base.state, trx_status);
-
-    if (dev->base.state == AT86RF2XX_STATE_RX_ON) {
-        return((trx_status == AT86RF2XX_STATE_RX_ON) ||
-               (trx_status == AT86RF2XX_STATE_BUSY_RX));
-    }
-    else if (dev->base.state == AT86RF2XX_STATE_RX_AACK_ON) {
-        return((trx_status == AT86RF2XX_STATE_RX_AACK_ON) ||
-               (trx_status == AT86RF2XX_STATE_BUSY_RX_AACK));
-    }
-    else if (dev->base.state == AT86RF2XX_STATE_SLEEP) {
-        return(state == AT86RF2XX_STATE_SLEEP);
-    }
-    else {
-        return(trx_status == dev->base.state);
-    }
-}

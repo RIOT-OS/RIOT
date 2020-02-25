@@ -265,6 +265,12 @@ void at86rf232_get_random(const at86rf232_t *dev, uint8_t *data, size_t len)
 {
     at86rf2xx_get_random((at86rf2xx_t *)dev, data, len);
 }
+
+static inline
+uint8_t at86rf232_set_state(at86rf232_t *dev, uint8_t state)
+{
+    return at86rf2xx_set_state((at86rf2xx_t *)dev, state);
+}
 /** @} */
 
 /**
@@ -278,14 +284,14 @@ void at86rf232_get_random(const at86rf232_t *dev, uint8_t *data, size_t len)
 int at86rf232_validate(const at86rf232_t *dev);
 
 /**
- * @brief   Set the state of the given device (trigger a state change)
- *
- * @param[in,out] dev       device to change state of
- * @param[in] state         the targeted new state
- *
- * @return                  the previous state before the new state was set
+ * @brief
  */
-uint8_t at86rf232_set_state(at86rf232_t *dev, uint8_t state);
+void at86rf232_sleep(at86rf232_t *dev);
+
+/**
+ * @brief
+ */
+void at86rf232_assert_awake(at86rf232_t *dev);
 
 /**
  * @brief   Perform hard reset
@@ -293,7 +299,6 @@ uint8_t at86rf232_set_state(at86rf232_t *dev, uint8_t state);
  * @param[in] dev           device to be reset
  */
 void at86rf232_hardware_reset(at86rf232_t *dev);
-
 /**
  * @brief   Perform soft reset
  *

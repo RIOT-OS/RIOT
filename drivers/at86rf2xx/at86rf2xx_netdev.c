@@ -104,11 +104,10 @@ void _irq_handler(void *arg)
 static
 int _init(netdev_t *netdev)
 {
-    static int _count = 0;
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
     assert(dev->base.dev_type < AT86RF2XX_DEV_TYPE_NUM_OF);
 
-    DEBUG("[at86rf2xx] init. device #%d at %p\n", _count++, dev);
+    DEBUG("[at86rf2xx] init. device at %p\n", dev);
     switch (dev->base.dev_type) {
         default:
 #if IS_USED(MODULE_AT86RF2XX_SPI)
@@ -149,7 +148,6 @@ int _init(netdev_t *netdev)
                 return valid;
             }
             at86rf212b_reset((at86rf212b_t *)dev);
-            at86rf212b_set_state((at86rf212b_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
@@ -160,7 +158,6 @@ int _init(netdev_t *netdev)
                 return valid;
             }
             at86rf231_reset((at86rf231_t *)dev);
-            at86rf231_set_state((at86rf231_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
@@ -171,7 +168,6 @@ int _init(netdev_t *netdev)
                 return valid;
             }
             at86rf232_reset((at86rf232_t *)dev);
-            at86rf232_set_state((at86rf232_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
@@ -182,7 +178,6 @@ int _init(netdev_t *netdev)
                 return valid;
             }
             at86rf233_reset((at86rf233_t *)dev);
-            at86rf233_set_state((at86rf233_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
@@ -193,7 +188,6 @@ int _init(netdev_t *netdev)
                 return valid;
             }
             at86rfa1_reset((at86rfa1_t *)dev);
-            at86rfa1_set_state((at86rfa1_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
@@ -204,46 +198,126 @@ int _init(netdev_t *netdev)
                 return valid;
             }
             at86rfr2_reset((at86rfr2_t *)dev);
-            at86rfr2_set_state((at86rfr2_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
     }
-    return valid < 0 ? valid : 0;
+    at86rf2xx_set_state(dev, dev->base.idle_state);
+    return valid;
 }
 
 static
-void _set_state(at86rf2xx_t *dev, uint8_t state)
+void _sleep(at86rf2xx_t *dev)
 {
-    switch (dev->base.dev_type) {
+    switch(dev->base.state) {
 #if IS_USED(MODULE_AT86RF212B)
         case AT86RF2XX_DEV_TYPE_AT86RF212B:
-            state = at86rf212b_set_state((at86rf212b_t *)dev, state);
+            at86rf212b_sleep((at86rf212b_t *)dev);
             break;
 #endif
 #if IS_USED(MODULE_AT86RF231)
         case AT86RF2XX_DEV_TYPE_AT86RF231:
-            state = at86rf231_set_state((at86rf231_t *)dev, state);
+            at86rf231_sleep((at86rf231_t *)dev);
             break;
 #endif
 #if IS_USED(MODULE_AT86RF232)
         case AT86RF2XX_DEV_TYPE_AT86RF232:
-            state = at86rf232_set_state((at86rf232_t *)dev, state);
+            at86rf232_sleep((at86rf232_t *)dev);
             break;
 #endif
 #if IS_USED(MODULE_AT86RF233)
         case AT86RF2XX_DEV_TYPE_AT86RF233:
-            state = at86rf233_set_state((at86rf233_t *)dev, state);
+            at86rf233_sleep((at86rf233_t *)dev);
             break;
 #endif
 #if IS_USED(MODULE_AT86RFA1)
         case AT86RF2XX_DEV_TYPE_AT86RFA1:
-            state = at86rfa1_set_state((at86rfa1_t *)dev, state);
+            at86rfa1_sleep((at86rfa1_t *)dev);
             break;
 #endif
 #if IS_USED(MODULE_AT86RFR2)
         case AT86RF2XX_DEV_TYPE_AT86RFR2:
-            state = at86rfr2_set_state((at86rfr2_t *)dev, state);
+            at86rfr2_sleep((at86rfr2_t *)dev);
+            break;
+#endif
+    }
+}
+
+static
+void _assert_awake(at86rf2xx_t* dev)
+{
+    switch(dev->base.dev_type) {
+#if IS_USED(MODULE_AT86RF212B)
+        case AT86RF2XX_DEV_TYPE_AT86RF212B:
+            at86rf212b_assert_awake((at86rf212b_t *)dev);
+            break;
+#endif
+#if IS_USED(MODULE_AT86RF231)
+        case AT86RF2XX_DEV_TYPE_AT86RF231:
+            at86rf231_assert_awake((at86rf231_t *)dev);
+            break;
+#endif
+#if IS_USED(MODULE_AT86RF232)
+        case AT86RF2XX_DEV_TYPE_AT86RF232:
+            at86rf232_assert_awake((at86rf232_t *)dev);
+            break;
+#endif
+#if IS_USED(MODULE_AT86RF233)
+        case AT86RF2XX_DEV_TYPE_AT86RF233:
+            at86rf233_assert_awake((at86rf233_t *)dev);
+            break;
+#endif
+#if IS_USED(MODULE_AT86RFA1)
+        case AT86RF2XX_DEV_TYPE_AT86RFA1:
+            at86rfa1_assert_awake((at86rfa1_t *)dev);
+            break;
+#endif
+#if IS_USED(MODULE_AT86RFR2)
+        case AT86RF2XX_DEV_TYPE_AT86RFR2:
+            at86rfr2_assert_awake((at86rfr2_t *)dev);
+            break;
+#endif
+    }
+}
+
+static
+void _reset(at86rf2xx_t* dev)
+{
+    switch(dev->base.dev_type) {
+#if IS_USED(MODULE_AT86RF212B)
+        case AT86RF2XX_DEV_TYPE_AT86RF212B:
+            at86rf212b_hardware_reset((at86rf212b_t *)dev);
+            at86rf212b_reset((at86rf212b_t *)dev);
+            break;
+#endif
+#if IS_USED(MODULE_AT86RF231)
+        case AT86RF2XX_DEV_TYPE_AT86RF231:
+            at86rf231_hardware_reset((at86rf231_t *)dev);
+            at86rf231_reset((at86rf231_t *)dev);
+            break;
+#endif
+#if IS_USED(MODULE_AT86RF232)
+        case AT86RF2XX_DEV_TYPE_AT86RF232:
+            at86rf232_hardware_reset((at86rf232_t *)dev);
+            at86rf232_reset((at86rf232_t *)dev);
+            break;
+#endif
+#if IS_USED(MODULE_AT86RF233)
+        case AT86RF2XX_DEV_TYPE_AT86RF233:
+            at86rf233_hardware_reset((at86rf233_t *)dev);
+            at86rf233_reset((at86rf233_t *)dev);
+            break;
+#endif
+#if IS_USED(MODULE_AT86RFA1)
+        case AT86RF2XX_DEV_TYPE_AT86RFA1:
+            at86rfa1_hardware_reset((at86rfa1_t *)dev);
+            at86rfa1_reset((at86rfa1_t *)dev);
+            break;
+#endif
+#if IS_USED(MODULE_AT86RFR2)
+        case AT86RF2XX_DEV_TYPE_AT86RFR2:
+            at86rfr2_hardware_reset((at86rfr2_t *)dev);
+            at86rfr2_reset((at86rfr2_t *)dev);
             break;
 #endif
     }
@@ -263,7 +337,7 @@ void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
     uint8_t state = at86rf2xx_get_status(dev);
 
     dev->base.pending_tx++;
-    _set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
+    at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
     /**
      * Check what state is going to becomes the idle state
      * (the state we return to, after sending).
@@ -278,8 +352,7 @@ void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
      */
     if (state == AT86RF2XX_STATE_RX_AACK_ON ||
         state == AT86RF2XX_STATE_RX_ON      ||
-        state == AT86RF2XX_STATE_TRX_OFF    ||
-        state == AT86RF2XX_STATE_SLEEP) {
+        state == AT86RF2XX_STATE_TRX_OFF) {
         dev->base.idle_state = state;
     }
     dev->base.tx_frame_len = 0;
@@ -366,14 +439,14 @@ int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
     size_t frame_len = 0;
 
+    /* frame buffer protection will be unlocked as soon as
+     * at86rf2xx_fb_stop() is called.
+     * Set receiver to PLL_ON state to be able to free the
+     * SPI bus and avoid losing data. */
+    at86rf2xx_set_state(dev, AT86RF2XX_STATE_PLL_ON);
     switch (dev->base.dev_type) {
 #if IS_USED(MODULE_AT86RF212B)
         case AT86RF2XX_DEV_TYPE_AT86RF212B: {
-            /* frame buffer protection will be unlocked as soon as
-             * at86rf2xx_fb_stop() is called.
-             * Set receiver to PLL_ON state to be able to free the
-             * SPI bus and avoid losing data. */
-            at86rf212b_set_state((at86rf212b_t *)dev, AT86RF2XX_STATE_PLL_ON);
             /* ignore MSB (refer p.80) and subtract length of FCS field */
             frame_len = (at86rf212b_fb_read_phr((at86rf212b_t *)dev) & 0x7F)
                         - IEEE802154_FCS_LEN;
@@ -413,15 +486,11 @@ int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                       ((netdev_ieee802154_rx_info_t *)info)->lqi,
                       ((netdev_ieee802154_rx_info_t *)info)->rssi);
             }
-            /* set device back in operation state which was used before last transmission.
-             * This state is saved in at86rf2xx.c/at86rf2xx_tx_prepare() e.g RX_AACK_ON */
-            at86rf212b_set_state((at86rf212b_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
 #if IS_USED(MODULE_AT86RF231)
         case AT86RF2XX_DEV_TYPE_AT86RF231: {
-            at86rf231_set_state((at86rf231_t *)dev, AT86RF2XX_STATE_PLL_ON);
             frame_len = (at86rf231_fb_read_phr((at86rf231_t *)dev) & 0x7F)
                         - IEEE802154_FCS_LEN;
             if (!buf) {
@@ -451,13 +520,11 @@ int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                       ((netdev_ieee802154_rx_info_t *)info)->lqi,
                       ((netdev_ieee802154_rx_info_t *)info)->rssi);
             }
-            at86rf231_set_state((at86rf231_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
 #if IS_USED(MODULE_AT86RF232)
         case AT86RF2XX_DEV_TYPE_AT86RF232: {
-            at86rf232_set_state((at86rf232_t *)dev, AT86RF2XX_STATE_PLL_ON);
             frame_len = (at86rf232_fb_read_phr((at86rf232_t *)dev) & 0x7F)
                         - IEEE802154_FCS_LEN;
             if (!buf) {
@@ -485,13 +552,11 @@ int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                       ((netdev_ieee802154_rx_info_t *)info)->lqi,
                       ((netdev_ieee802154_rx_info_t *)info)->rssi);
             }
-            at86rf232_set_state((at86rf232_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
 #if IS_USED(MODULE_AT86RF233)
         case AT86RF2XX_DEV_TYPE_AT86RF233: {
-            at86rf233_set_state((at86rf233_t *)dev, AT86RF2XX_STATE_PLL_ON);
             frame_len = (at86rf233_fb_read_phr((at86rf233_t *)dev) & 0x7F)
                         - IEEE802154_FCS_LEN;
             if (!buf) {
@@ -519,13 +584,11 @@ int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                       ((netdev_ieee802154_rx_info_t *)info)->lqi,
                       ((netdev_ieee802154_rx_info_t *)info)->rssi);
             }
-            at86rf233_set_state((at86rf233_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
 #if IS_USED(MODULE_AT86RFA1)
         case AT86RF2XX_DEV_TYPE_AT86RFA1: {
-            at86rfa1_set_state((at86rfa1_t *)dev, AT86RF2XX_STATE_PLL_ON);
             frame_len = (at86rfa1_fb_read_phr((at86rfa1_t *)dev) & 0x7F)
                         - IEEE802154_FCS_LEN;
             if (!buf) {
@@ -554,13 +617,11 @@ int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                       ((netdev_ieee802154_rx_info_t *)info)->lqi,
                       ((netdev_ieee802154_rx_info_t *)info)->rssi);
             }
-            at86rfa1_set_state((at86rfa1_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
 #if IS_USED(MODULE_AT86RFR2)
         case AT86RF2XX_DEV_TYPE_AT86RFR2: {
-            at86rfr2_set_state((at86rfr2_t *)dev, AT86RF2XX_STATE_PLL_ON);
             frame_len = (at86rfr2_fb_read_phr((at86rfr2_t *)dev) & 0x7F)
                         - IEEE802154_FCS_LEN;
             if (!buf) {
@@ -589,12 +650,15 @@ int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                       ((netdev_ieee802154_rx_info_t *)info)->lqi,
                       ((netdev_ieee802154_rx_info_t *)info)->rssi);
             }
-            at86rfr2_set_state((at86rfr2_t *)dev, dev->base.idle_state);
             break;
         }
 #endif
     }
-
+    /* set device back in operation state which was used
+     * before last transmission.
+     * This state is saved in
+     * at86rf2xx.c/at86rf2xx_tx_prepare() e.g RX_AACK_ON */
+    at86rf2xx_set_state(dev, dev->base.idle_state);
     return frame_len;
 }
 
@@ -603,13 +667,13 @@ int _set_state_netopt(at86rf2xx_t *dev, netopt_state_t state)
 {
     switch (state) {
         case NETOPT_STATE_STANDBY:
-            _set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+            at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
             break;
         case NETOPT_STATE_SLEEP:
-            _set_state(dev, AT86RF2XX_STATE_SLEEP);
+            _sleep(dev);
             break;
         case NETOPT_STATE_IDLE:
-            _set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
+            at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
             break;
         case NETOPT_STATE_TX:
             if (dev->base.flags & AT86RF2XX_OPT_PRELOADING) {
@@ -629,12 +693,12 @@ int _set_state_netopt(at86rf2xx_t *dev, netopt_state_t state)
                      * know when to switch back to the idle state. */
                     ++dev->base.pending_tx;
                 }
-                _set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
+                at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
                 at86rf2xx_tx_exec(dev);
             }
             break;
         case NETOPT_STATE_RESET:
-            _set_state(dev, AT86RF2XX_STATE_RESET);
+            _reset(dev);
             break;
         default:
             return -ENOTSUP;
@@ -759,7 +823,7 @@ int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     /* temporarily wake up if sleeping */
     if (old_state == AT86RF2XX_STATE_SLEEP) {
-        _set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+        _assert_awake(dev);
     }
     /* these options require the transceiver to be not sleeping*/
     switch (opt) {
@@ -866,8 +930,8 @@ int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             switch (dev->base.dev_type) {
 #if IS_USED(MODULE_AT86RF212B)
                 case AT86RF2XX_DEV_TYPE_AT86RF212B:
-                    *((netopt_enable_t *)val) = at86rf212b_cca(
-                        (at86rf212b_t *)dev);
+                    *((netopt_enable_t *)val) =
+                        at86rf212b_cca((at86rf212b_t *)dev);
                     break;
 #endif
 #if IS_USED(MODULE_AT86RF231)
@@ -890,12 +954,14 @@ int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 #endif
 #if IS_USED(MODULE_AT86RFA1)
                 case AT86RF2XX_DEV_TYPE_AT86RFA1:
-                    *((netopt_enable_t *)val) = at86rfa1_cca((at86rfa1_t *)dev);
+                    *((netopt_enable_t *)val) =
+                        at86rfa1_cca((at86rfa1_t *)dev);
                     break;
 #endif
 #if IS_USED(MODULE_AT86RFR2)
                 case AT86RF2XX_DEV_TYPE_AT86RFR2:
-                    *((netopt_enable_t *)val) = at86rfr2_cca((at86rfr2_t *)dev);
+                    *((netopt_enable_t *)val) =
+                        at86rfr2_cca((at86rfr2_t *)dev);
                     break;
 #endif
             }
@@ -907,8 +973,8 @@ int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             switch (dev->base.dev_type) {
 #if IS_USED(MODULE_AT86RF212B)
                 case AT86RF2XX_DEV_TYPE_AT86RF212B:
-                    *((int8_t *)val) = at86rf212b_get_ed_level(
-                        (at86rf212b_t *)dev);
+                    *((int8_t *)val) =
+                        at86rf212b_get_ed_level((at86rf212b_t *)dev);
                     break;
 #endif
 #if IS_USED(MODULE_AT86RF231)
@@ -931,12 +997,14 @@ int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 #endif
 #if IS_USED(MODULE_AT86RFA1)
                 case AT86RF2XX_DEV_TYPE_AT86RFA1:
-                    *((int8_t *)val) = at86rfa1_get_ed_level((at86rfa1_t *)dev);
+                    *((int8_t *)val) =
+                        at86rfa1_get_ed_level((at86rfa1_t *)dev);
                     break;
 #endif
 #if IS_USED(MODULE_AT86RFR2)
                 case AT86RF2XX_DEV_TYPE_AT86RFR2:
-                    *((int8_t *)val) = at86rfr2_get_ed_level((at86rfr2_t *)dev);
+                    *((int8_t *)val) =
+                        at86rfr2_get_ed_level((at86rfr2_t *)dev);
                     break;
 #endif
             }
@@ -961,7 +1029,7 @@ int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     /* go back to sleep if were sleeping */
     if (old_state == AT86RF2XX_STATE_SLEEP) {
-        _set_state(dev, AT86RF2XX_STATE_SLEEP);
+        _sleep(dev);
     }
 
     return res;
@@ -978,12 +1046,9 @@ int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         return -ENODEV;
     }
 
-    /* temporarily wake up if sleeping and opt != NETOPT_STATE.
-     * opt != NETOPT_STATE check prevents redundant wake-up.
-     * when opt == NETOPT_STATE, at86rf2xx_set_state() will wake up the
-     * radio if needed. */
-    if ((old_state == AT86RF2XX_STATE_SLEEP) && (opt != NETOPT_STATE)) {
-        _set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+    /* temporarily wake up if sleeping */
+    if ((old_state == AT86RF2XX_STATE_SLEEP)) {
+        _assert_awake(dev);
     }
 
     switch (opt) {
@@ -1228,10 +1293,9 @@ int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             break;
     }
 
-    /* go back to sleep if were sleeping and state hasn't been changed */
-    if ((old_state == AT86RF2XX_STATE_SLEEP)
-        && (opt != NETOPT_STATE)) {
-        _set_state(dev, AT86RF2XX_STATE_SLEEP);
+    /* go back to sleep if were sleeping */
+    if (old_state == AT86RF2XX_STATE_SLEEP) {
+        _sleep(dev);
     }
 
     if (res == -ENOTSUP) {
@@ -1381,7 +1445,7 @@ void _isr(netdev_t *netdev)
             assert(dev->base.pending_tx != 0);
             /* Radio is idle, any TX transaction is done */
             dev->base.pending_tx = 0;
-            _set_state(dev, dev->base.idle_state);
+            at86rf2xx_set_state(dev, dev->base.idle_state);
             DEBUG("[at86rf2xx] return to idle state 0x%x\n", dev->base.idle_state);
             _isr_send_complete(dev, trac_status);
         }

@@ -234,14 +234,14 @@ void at86rf2xx_set_frame_buffer_protection(const at86rf2xx_t *dev,
                                            bool protect);
 
 /**
- * @brief   This function should only be used inside an assert() and
- *          verify if a state transition was successful.
- * @param[in]   dev         device
- * @param[in]   state       asserted state
+ * @brief   Set the state of the given device (trigger a state change)
  *
- * @return  1: Success, 0: You should debug
+ * @param[in,out] dev       device to change state of
+ * @param[in] state         the targeted new state
+ *
+ * @return                  the previous state before the new state was set
  */
-int at86rf2xx_check_state(const at86rf2xx_t *dev, uint8_t state);
+uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state);
 
 #ifdef __cplusplus
 }

@@ -60,17 +60,6 @@ extern "C" {
 void at86rf2xx_setup(at86rf2xx_t *dev);
 
 /**
- * @brief   Internal function to change state
- * @details For all cases but AT86RF2XX_STATE_FORCE_TRX_OFF state and
- *          cmd parameter are the same.
- *
- * @param[in, out] dev      device to operate on
- * @param[in] state         target state
- * @param[in] cmd           command to initiate state transition
- */
-void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd);
-
-/**
  * @brief   Trigger a hardware and software reset and configure radio with
  *          default values
  *

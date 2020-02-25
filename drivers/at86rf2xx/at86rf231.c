@@ -44,42 +44,6 @@ extern const uint8_t _231_232_dbm_to_tx_pow[21];
 extern const int16_t _231_232_rx_sens_to_dbm[16];
 extern const uint8_t _231_232_a1_r2_dbm_to_rx_sens[53];
 
-static
-void at86rf231_sleep(at86rf231_t *dev)
-{
-    if (dev->base.state != AT86RF2XX_STATE_SLEEP) {
-        /* First go to TRX_OFF */
-        if (dev->base.state != AT86RF2XX_STATE_TRX_OFF) {
-            at86rf231_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
-        }
-        /* Discard all IRQ flags, framebuffer is lost anyway */
-        at86rf2xx_spi_reg_read((at86rf2xx_t *)dev, AT86RF2XX_REG__IRQ_STATUS);
-        gpio_set(dev->params.base_params.sleep_pin);
-        dev->base.state = AT86RF2XX_STATE_SLEEP;
-    }
-}
-
-static
-void at86rf231_assert_awake(at86rf231_t *dev)
-{
-    if (dev->base.state == AT86RF2XX_STATE_SLEEP) {
-        gpio_clear(dev->params.base_params.sleep_pin);
-        xtimer_usleep(AT86RF231_WAKEUP_DELAY);
-
-        /* update state: on some platforms, the timer behind xtimer
-         * may be inaccurate or the radio itself may take longer
-         * to wake up due to extra capacitance on the oscillator.
-         * Spin until we are actually awake
-         */
-        do {
-            dev->base.state =
-                at86rf2xx_spi_reg_read((at86rf2xx_t *)dev,
-                                       AT86RF2XX_REG__TRX_STATUS)
-                & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
-        } while (dev->base.state != AT86RF2XX_TRX_STATUS__TRX_OFF);
-    }
-}
-
 /**
  * @brief   Convert TX_PWR register value to actual transmission power in dbm
  *          for AT86RF231 transceivers
@@ -161,53 +125,38 @@ int at86rf231_validate(const at86rf231_t *dev)
     return 0;
 }
 
-uint8_t at86rf231_set_state(at86rf231_t *dev, uint8_t state)
+void at86rf231_sleep(at86rf231_t *dev)
 {
-    uint8_t old_state;
-    uint8_t cmd = state;
+    if (dev->base.state != AT86RF2XX_STATE_SLEEP) {
+        /* First go to TRX_OFF */
+        if (dev->base.state != AT86RF2XX_STATE_TRX_OFF) {
+            at86rf231_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+        }
+        /* Discard all IRQ flags, framebuffer is lost anyway */
+        at86rf2xx_spi_reg_read((at86rf2xx_t *)dev, AT86RF2XX_REG__IRQ_STATUS);
+        gpio_set(dev->params.base_params.sleep_pin);
+        dev->base.state = AT86RF2XX_STATE_SLEEP;
+    }
+}
 
-    if (state == AT86RF2XX_STATE_FORCE_TRX_OFF) {
-        state = AT86RF2XX_STATE_TRX_OFF;
-    }
-    /* make sure there is no ongoing transmission, or state transmission already
-       in progress */
-    do {
-        old_state = at86rf231_get_status(dev);
-    } while (old_state == AT86RF2XX_STATE_BUSY_RX_AACK ||
-             old_state == AT86RF2XX_STATE_BUSY_TX_ARET ||
-             old_state == AT86RF2XX_STATE_IN_PROGRESS);
+void at86rf231_assert_awake(at86rf231_t *dev)
+{
+    if (dev->base.state == AT86RF2XX_STATE_SLEEP) {
+        gpio_clear(dev->params.base_params.sleep_pin);
+        xtimer_usleep(AT86RF231_WAKEUP_DELAY);
 
-    if (state != old_state) {
-        if (old_state == AT86RF2XX_STATE_SLEEP) {
-            DEBUG("at86rf231: waking up from sleep mode\n");
-            at86rf231_assert_awake(dev);
-        }
-        /* we need to go via PLL_ON if we are moving between RX_AACK_ON <-> TX_ARET_ON */
-        else if ((old_state == AT86RF2XX_STATE_RX_AACK_ON &&
-                  state == AT86RF2XX_STATE_TX_ARET_ON) ||
-                 (old_state == AT86RF2XX_STATE_TX_ARET_ON &&
-                  state == AT86RF2XX_STATE_RX_AACK_ON)) {
-            at86rf2xx_set_state((at86rf2xx_t *)dev, AT86RF2XX_STATE_PLL_ON,
-                                AT86RF2XX_STATE_PLL_ON);
-            at86rf2xx_set_state((at86rf2xx_t *)dev, state, cmd);
-        }
-        /* check if we need to wake up from sleep mode */
-        else if (state == AT86RF2XX_STATE_SLEEP) {
-            at86rf231_sleep(dev);
-        }
-        else if (state == AT86RF2XX_STATE_RESET) {
-            at86rf231_hardware_reset(dev);
-            at86rf231_reset(dev);
-        }
-        else {
-            at86rf2xx_set_state((at86rf2xx_t *)dev, state, cmd);
-        }
+        /* update state: on some platforms, the timer behind xtimer
+         * may be inaccurate or the radio itself may take longer
+         * to wake up due to extra capacitance on the oscillator.
+         * Spin until we are actually awake
+         */
+        do {
+            dev->base.state =
+                at86rf2xx_spi_reg_read((at86rf2xx_t *)dev,
+                                       AT86RF2XX_REG__TRX_STATUS)
+                & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
+        } while (dev->base.state != AT86RF2XX_TRX_STATUS__TRX_OFF);
     }
-    else if (cmd == AT86RF2XX_STATE_FORCE_TRX_OFF) {
-        at86rf2xx_set_state((at86rf2xx_t *)dev, AT86RF2XX_STATE_TRX_OFF, cmd);
-    }
-    assert(at86rf2xx_check_state((at86rf2xx_t *)dev, state));
-    return old_state;
 }
 
 void at86rf231_hardware_reset(at86rf231_t *dev)

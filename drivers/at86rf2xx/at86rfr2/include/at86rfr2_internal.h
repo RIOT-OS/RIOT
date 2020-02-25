@@ -242,6 +242,12 @@ void at86rfr2_get_random(const at86rfr2_t *dev, uint8_t *data, size_t len)
 {
     at86rf2xx_get_random((at86rf2xx_t *)dev, data, len);
 }
+
+static inline
+uint8_t at86rfr2_set_state(at86rfr2_t *dev, uint8_t state)
+{
+    return at86rf2xx_set_state((at86rf2xx_t *)dev, state);
+}
 /** @} */
 
 /**
@@ -255,14 +261,14 @@ void at86rfr2_get_random(const at86rfr2_t *dev, uint8_t *data, size_t len)
 int at86rfr2_validate(const at86rfr2_t *dev);
 
 /**
- * @brief   Set the state of the given device (trigger a state change)
- *
- * @param[in,out] dev       device to change state of
- * @param[in] state         the targeted new state
- *
- * @return                  the previous state before the new state was set
+ * @brief
  */
-uint8_t at86rfr2_set_state(at86rfr2_t *dev, uint8_t state);
+void at86rfr2_sleep(at86rfr2_t *dev);
+
+/**
+ * @brief
+ */
+void at86rfr2_assert_awake(at86rfr2_t *dev);
 
 /**
  * @brief   Perform hard reset

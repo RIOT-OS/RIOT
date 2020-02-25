@@ -31,22 +31,13 @@
 #include "at86rf2xx_registers.h"
 #include "at86rf2xx_communication.h"
 #include "at86rf2xx_internal.h"
+#include "at86rf2xx_internal_common.h"
 
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
-uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
-{
-    /* if sleeping immediately return state */
-    if (dev->base.state == AT86RF2XX_STATE_SLEEP) {
-        return dev->base.state;
-    }
-
-    return (at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
-            & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS);
-}
-
-void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
+static
+void _at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
 {
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, cmd);
 
@@ -66,6 +57,96 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
     }
 
     dev->base.state = state;
+}
+
+/**
+ * @brief   This function should only be used inside an assert() and
+ *          verify if a state transition was successful.
+ * @param[in]   dev         device
+ * @param[in]   state       asserted state
+ *
+ * @return  1: Success, 0: You should debug
+ */
+static
+int _at86rf2xx_check_state(const at86rf2xx_t *dev, uint8_t state)
+{
+    /* Check state (be very paranoid):
+       This should only be used inside an assert()
+       after a state transission, to check if a state
+       transition was successful. So in productive use,
+       this should not be linked. */
+    uint8_t trx_status;
+    do {
+        trx_status =
+            at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS);
+        trx_status &= AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
+    } while (trx_status == AT86RF2XX_STATE_IN_PROGRESS);
+    DEBUG("input state: 0x%02X -- device state: 0x%02X -- trx_staus: 0x%02X\n",
+          state, dev->base.state, trx_status);
+
+    if (dev->base.state == AT86RF2XX_STATE_RX_ON) {
+        return((trx_status == AT86RF2XX_STATE_RX_ON) ||
+               (trx_status == AT86RF2XX_STATE_BUSY_RX));
+    }
+    else if (dev->base.state == AT86RF2XX_STATE_RX_AACK_ON) {
+        return((trx_status == AT86RF2XX_STATE_RX_AACK_ON) ||
+               (trx_status == AT86RF2XX_STATE_BUSY_RX_AACK));
+    }
+    else if (dev->base.state == AT86RF2XX_STATE_SLEEP) {
+        return(state == AT86RF2XX_STATE_SLEEP);
+    }
+    else {
+        return(trx_status == dev->base.state);
+    }
+}
+
+uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
+{
+    uint8_t old_state;
+    uint8_t cmd = state;
+
+    if (state == AT86RF2XX_STATE_FORCE_TRX_OFF) {
+        state = AT86RF2XX_STATE_TRX_OFF;
+    }
+    /* make sure there is no ongoing transmission, or state transmission already
+       in progress */
+    do {
+        old_state = at86rf2xx_get_status(dev);
+    } while (old_state == AT86RF2XX_STATE_BUSY_RX_AACK ||
+             old_state == AT86RF2XX_STATE_BUSY_TX_ARET ||
+             old_state == AT86RF2XX_STATE_IN_PROGRESS);
+
+    assert(old_state != AT86RF2XX_STATE_SLEEP);
+    if (state != old_state) {
+        /* we need to go via PLL_ON if we are moving between RX_AACK_ON <-> TX_ARET_ON */
+        if ((old_state == AT86RF2XX_STATE_RX_AACK_ON &&
+            state == AT86RF2XX_STATE_TX_ARET_ON) ||
+            (old_state == AT86RF2XX_STATE_TX_ARET_ON &&
+            state == AT86RF2XX_STATE_RX_AACK_ON)) {
+            _at86rf2xx_set_state(dev, AT86RF2XX_STATE_PLL_ON,
+                                AT86RF2XX_STATE_PLL_ON);
+            _at86rf2xx_set_state(dev, state, cmd);
+        }
+        else {
+            _at86rf2xx_set_state(dev, state, cmd);
+        }
+    }
+    else if (cmd == AT86RF2XX_STATE_FORCE_TRX_OFF) {
+        _at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF, cmd);
+    }
+    assert(_at86rf2xx_check_state(dev, state));
+    return old_state;
+}
+
+uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
+{
+    /* if sleeping immediately return state */
+    if (dev->base.state == AT86RF2XX_STATE_SLEEP) {
+        return dev->base.state;
+    }
+
+    return (at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
+            & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS);
 }
 
 void at86rf2xx_get_addr_short(const at86rf2xx_t *dev, network_uint16_t *addr)
