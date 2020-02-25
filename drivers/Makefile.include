@@ -20,6 +20,10 @@ ifneq (,$(filter apa102,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/apa102/include
 endif
 
+ifneq (,$(filter at24cxxx,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at24cxxx/include
+endif
+
 ifneq (,$(filter at24mac,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/at24mac/include
 endif

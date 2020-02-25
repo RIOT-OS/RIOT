@@ -1,4 +1,5 @@
 PSEUDOMODULES += at_urc
+PSEUDOMODULES += at24c%
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
@@ -99,6 +100,9 @@ NO_PSEUDOMODULES += suit_v4
 
 # print ascii representation in function od_hex_dump()
 PSEUDOMODULES += od_string
+
+# handle at24cxxx being a distinct module
+NO_PSEUDOMODULES += at24cxxx
 
 # include variants of the AT86RF2xx drivers as pseudo modules
 PSEUDOMODULES += at86rf23%
