@@ -26,10 +26,11 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 
 #include "lua_run.h"
 #include "lua_builtin.h"
+
+#include "test_utils/expect.h"
 
 static const uint8_t pure_module_1[] = "\n\
 return {a='Quando uma lua'}\n\
@@ -81,7 +82,7 @@ int main(void)
     status = lua_riot_do_module("test", lua_mem, LUA_MEM_SIZE,
                                 LUAR_LOAD_BASE, NULL);
 
-    assert(status == LUAR_EXIT);
+    expect(status == LUAR_EXIT);
 
     while (fgets(linebuf, LINEBUF_SZ, stdin) != NULL) {
         int status;
@@ -98,7 +99,7 @@ int main(void)
         status = lua_riot_do_buffer((unsigned char *)linebuf, linelen,
                                     lua_mem, LUA_MEM_SIZE,
                                     LUAR_LOAD_BASE | LUAR_LOAD_PACKAGE, NULL);
-        assert(status == LUAR_EXIT);
+        expect(status == LUAR_EXIT);
     }
 
     return 0;
