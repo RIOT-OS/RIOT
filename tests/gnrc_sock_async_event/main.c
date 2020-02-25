@@ -29,6 +29,7 @@
 #include "net/gnrc/udp.h"
 #include "net/protnum.h"
 #include "od.h"
+#include "test_utils/expect.h"
 #include "thread.h"
 
 #include "net/sock/async/event.h"
@@ -62,9 +63,9 @@ ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt)
         return NULL;
     }
 
-    assert(tmp->data != NULL);
-    assert(tmp->size >= sizeof(ipv6_hdr_t));
-    assert(ipv6_hdr_is(tmp->data));
+    expect(tmp->data != NULL);
+    expect(tmp->size >= sizeof(ipv6_hdr_t));
+    expect(ipv6_hdr_is(tmp->data));
 
     return ((ipv6_hdr_t*) tmp->data);
 }
@@ -139,18 +140,18 @@ int main(void)
 
     /* create packet to inject for reception */
     pkt = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-    assert(pkt != NULL);
+    expect(pkt != NULL);
     memset(pkt->data, 0, pkt->size);
     pkt = gnrc_ipv6_hdr_build(pkt, (ipv6_addr_t *)&_test_remote,
                               (ipv6_addr_t *)&_test_local);
-    assert(pkt != NULL);
+    expect(pkt != NULL);
     /* module is not compiled in, so set header type manually */
     pkt->type = GNRC_NETTYPE_IPV6;
     pkt = gnrc_udp_hdr_build(pkt, TEST_PORT - 1, TEST_PORT);
-    assert(pkt != NULL);
+    expect(pkt != NULL);
     pkt = gnrc_pktbuf_add(pkt, _test_payload, sizeof(_test_payload),
                           GNRC_NETTYPE_UNDEF);
-    assert(pkt != NULL);
+    expect(pkt != NULL);
     /* we dispatch twice, so hold one time */
     gnrc_pktbuf_hold(pkt, 1);
 
