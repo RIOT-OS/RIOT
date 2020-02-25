@@ -206,6 +206,7 @@ static inline uint8_t _rtt_div(uint16_t freq)
     case   128: return 0x6;
     case    32: return 0x7;
     default   : assert(0);
+                return 0;
     }
 }
 
