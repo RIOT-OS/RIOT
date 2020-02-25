@@ -1,6 +1,7 @@
+BOSSA_VERSION ?= 1.9
 FLASHFILE ?= $(BINFILE)
-FLASHER ?= $(RIOTTOOLS)/bossa/bossac
-FFLAGS  ?= -p $(PROG_DEV) -e -i -w -v -b -R $(FLASHFILE)
+FLASHER ?= $(RIOTTOOLS)/bossa-$(BOSSA_VERSION)/bossac
+FFLAGS  ?= -p $(PROG_DEV) -o $(ROM_OFFSET) -e -i -w -v -b -R $(FLASHFILE)
 
 # some arduino boards need to toggle the serial interface a little bit to get
 # them ready for flashing...
@@ -19,6 +20,6 @@ endif
 
 # if we go with the default (BOSSA shipped with RIOT), we download and build
 # the tool if not already done
-ifeq ($(RIOTTOOLS)/bossa/bossac,$(FLASHER))
-  FLASHDEPS += $(RIOTTOOLS)/bossa/bossac
+ifeq ($(RIOTTOOLS)/bossa-$(BOSSA_VERSION)/bossac,$(FLASHER))
+  FLASHDEPS += $(FLASHER)
 endif
