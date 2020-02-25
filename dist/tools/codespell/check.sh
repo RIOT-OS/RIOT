@@ -37,9 +37,8 @@ ${CODESPELL_CMD} --version &> /dev/null || {
 
 CODESPELL_OPTS="-q 2"  # Disable "WARNING: Binary file"
 CODESPELL_OPTS+=" --check-hidden"
-# Disable false positives "nd  => and, 2nd", "WAN => WANT", "od => of",
-# "dout => doubt"
-CODESPELL_OPTS+=" --ignore-words-list=ND,nd,wan,od,dout"
+CODESPELL_OPTS+=" --ignore-words ${RIOTTOOLS}/codespell/ignored_words.txt"
+CODESPELL_OPTS+=" -c"   # Enable colored output
 
 if [ "${CODESPELL_INTERACTIVE}" = "1" ]; then
     # interactive mode
