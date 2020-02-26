@@ -8,6 +8,7 @@
 
 /**
  * @defgroup    drivers_at24cxxx AT24CXXX EEPROM unit
+ * @ingroup     drivers_misc
  * @brief       Device driver interface for the AT24CXXX EEPROM units
  *
  * @{
