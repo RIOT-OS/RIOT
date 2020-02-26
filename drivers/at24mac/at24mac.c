@@ -19,6 +19,7 @@
  */
 
 #include <errno.h>
+#include "kernel_defines.h"
 
 #include "at24mac.h"
 #include "at24mac_params.h"
