@@ -20,7 +20,9 @@ cleanup() {
     echo "Cleaning up..."
     remove_tap
     ip a d fd00:dead:beef::1/128 dev lo
-    kill ${UHCPD_PID}
+    if [ ${ETHOS_ONLY} -ne 1 ]; then
+        kill ${UHCPD_PID}
+    fi
     trap "" INT QUIT TERM EXIT
 }
 
@@ -29,14 +31,21 @@ start_uhcpd() {
     UHCPD_PID=$!
 }
 
+if [ "$1" = "-e" ] || [ "$1" = "--ethos-only" ]; then
+    ETHOS_ONLY=1
+    shift 1
+else
+    ETHOS_ONLY=0
+fi
+
 PORT=$1
 TAP=$2
 PREFIX=$3
 BAUDRATE=115200
-UHCPD="$(readlink -f "${ETHOS_DIR}/../uhcpd/bin")/uhcpd"
 
 [ -z "${PORT}" -o -z "${TAP}" -o -z "${PREFIX}" ] && {
-    echo "usage: $0 <serial-port> <tap-device> <prefix> [baudrate]"
+    echo "usage: $0 [-e|--ethos-only] <serial-port> <tap-device> <prefix> " \
+         "[baudrate]"
     exit 1
 }
 
@@ -47,4 +56,13 @@ UHCPD="$(readlink -f "${ETHOS_DIR}/../uhcpd/bin")/uhcpd"
 trap "cleanup" INT QUIT TERM EXIT
 
 
-create_tap && start_uhcpd && "${ETHOS_DIR}/ethos" ${TAP} ${PORT} ${BAUDRATE}
+create_tap && \
+if [ ${ETHOS_ONLY} -ne 1 ]; then
+    UHCPD="$(readlink -f "${ETHOS_DIR}/../uhcpd/bin")/uhcpd"
+    start_uhcpd
+    START_ETHOS=$?
+else
+    START_ETHOS=0
+fi
+
+[ ${START_ETHOS} -eq 0 ] && "${ETHOS_DIR}/ethos" ${TAP} ${PORT} ${BAUDRATE}
