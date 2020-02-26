@@ -4,7 +4,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega328p \
-    chronos \
     stm32f030f4-demo \
     telosb \
     z1 \

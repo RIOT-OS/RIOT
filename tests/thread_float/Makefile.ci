@@ -6,7 +6,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     cc2650stk \
-    chronos \
     maple-mini \
     mbed_lpc1768 \
     microbit \

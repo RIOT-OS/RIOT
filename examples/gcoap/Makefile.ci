@@ -6,7 +6,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega1284p \
     atmega328p \
-    chronos \
     derfmega128 \
     i-nucleo-lrwan1 \
     mega-xplained \

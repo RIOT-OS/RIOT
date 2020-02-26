@@ -1,5 +1,4 @@
 BOARD_INSUFFICIENT_MEMORY := \
-    chronos \
     i-nucleo-lrwan1 \
     msb-430 \
     msb-430h \
