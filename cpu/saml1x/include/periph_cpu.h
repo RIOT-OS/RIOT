@@ -42,14 +42,6 @@ enum {
 };
 /** @} */
 
-/**
- * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
- */
-static const int8_t exti_config[1][32] = {
-    { 0,  1,  2,  3,  4,  5,  6,  7, -1, 0,  1,  2, -1, -1, 3, 4,
-      5,  6,  7,  0, -1, -1,  1,  2,  3, 4, -1,  5, -1, -1, 6, 7},
-};
-
 #ifndef DOXYGEN
 #define HAVE_ADC_RES_T
 typedef enum {

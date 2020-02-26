@@ -77,6 +77,21 @@ RIOT. The following replacements were done for compatibility with newlib:
     find -name '*.h' -exec sed -ie 's/_U(/_U_(/g' {} \;
     find -name '*.h' -exec sed -ie 's/_L(/_L_(/g' {} \;
 
+## SAMR30 files
+
+samr30: `Atmel.SAMR30_DFP.1.1.35.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT.
+
+The PIN_($pin)_EIC_EXTINT_NUM macos and integer literal macros (_L_() etc)
+were added manually.
+It is expected for those to appear in the next atpack release by
+Microchip.
+
+If *_EIC_EXTINT_NUM macros are missing after an update, GPIO interrupts
+not work. See 93d536f76 for how to generate them.
+
 ## SAMR34 files
 
 samr34: `Atmel.SAMR34_DFP.1.0.11.atpacks`
