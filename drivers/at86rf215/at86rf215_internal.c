@@ -44,11 +44,6 @@ static inline uint8_t _get_rf_state_with_lock(at86rf215_t *dev)
 
 int at86rf215_hardware_reset(at86rf215_t *dev)
 {
-    /* bail out if no module is connected */
-    if (at86rf215_reg_read(dev, RG_RF_PN) == 0) {
-        return -ENODEV;
-    }
-
     /* prevent access during reset */
     getbus(dev);
 
@@ -58,8 +53,15 @@ int at86rf215_hardware_reset(at86rf215_t *dev)
     gpio_set(dev->params.reset_pin);
     xtimer_usleep(AT86RF215_RESET_DELAY);
 
-    while (_get_rf_state_with_lock(dev) != RF_STATE_TRXOFF) {}
+    unsigned tries = 100;
+    while (_get_rf_state_with_lock(dev) != RF_STATE_TRXOFF &&
+           --tries) {}
     spi_release(SPIDEV);
+
+    /* bail out if no module is connected */
+    if (tries == 0) {
+        return -ENODEV;
+    }
 
     /* clear interrupts */
     at86rf215_reg_read(dev, RG_RF09_IRQS);
