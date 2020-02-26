@@ -68,13 +68,13 @@ int sleep_cmd(int argc, char **argv)
     return 0;
 }
 
-extern void auto_init_gnrc_netif(void);
+extern void gnrc_netif_init(void);
 int start_networking_cmd(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
 
-    auto_init_gnrc_netif();
+    gnrc_netif_init();
 
     return 0;
 }
