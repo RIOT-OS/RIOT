@@ -5,13 +5,13 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
 /**
- * @ingroup     sys_suit_v3
+ * @ingroup     sys_suit
  * @{
  *
  * @file
- * @brief       SUIT draft-ietf-suit-manifest-03 content handler helper
- *              functions
+ * @brief       SUIT content handler helper functions
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  *

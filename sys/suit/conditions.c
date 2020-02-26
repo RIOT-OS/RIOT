@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief       SUIT conditions
+ * @brief       SUIT condition initializers
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

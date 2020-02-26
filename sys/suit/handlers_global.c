@@ -7,12 +7,11 @@
  * directory for more details.
  */
 /**
- * @ingroup     sys_suit_v3
+ * @ingroup     sys_suit
  * @{
  *
  * @file
- * @brief       SUIT draft-ietf-suit-manifest-03 Handlers for the global SUIT
- *              manifest content.
+ * @brief       SUIT handlers for the global SUIT manifest content.
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  *

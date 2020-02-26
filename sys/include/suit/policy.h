@@ -9,7 +9,7 @@
  * directory for more details.
  */
 /**
- * @ingroup     sys_suit_v3
+ * @ingroup     sys_suit
  * @brief       SUIT policy definitions
  *
  * @{
@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SUIT_V3_POLICY_H
-#define SUIT_V3_POLICY_H
+#ifndef SUIT_POLICY_H
+#define SUIT_POLICY_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -55,5 +55,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SUIT_V3_POLICY_H */
+#endif /* SUIT_POLICY_H */
 /** @} */

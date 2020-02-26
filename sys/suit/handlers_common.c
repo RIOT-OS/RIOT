@@ -7,12 +7,11 @@
  * directory for more details.
  */
 /**
- * @ingroup     sys_suit_v3
+ * @ingroup     sys_suit
  * @{
  *
  * @file
- * @brief       SUIT draft-ietf-suit-manifest-03 Handler implementations for
- *              the Common manifest sections
+ * @brief       SUIT handler implementations for the Common manifest sections
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  *
@@ -21,10 +20,6 @@
 
 #include <inttypes.h>
 #include <nanocbor/nanocbor.h>
-
-#ifdef MODULE_SUIT_COAP
-#include "suit/coap.h"
-#endif
 
 #include "kernel_defines.h"
 #include "suit/handlers.h"

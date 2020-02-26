@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       SUIT draft-ietf-suit-manifest-03 manifest parser library for
+ * @brief       SUIT secure OTA firmware upgrade implementation for
  *              CBOR based manifests
  *
  * @author      Koen Zandberg <koen@bergzand.net>

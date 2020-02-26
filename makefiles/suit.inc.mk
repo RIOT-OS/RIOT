@@ -1,7 +1,7 @@
 #
 # This file contains stuff related to SUIT manifest generation.
 # It depends on SUIT key generation, which can be found in
-# makefiles/suit.v3.base.inc.mk
+# makefiles/suit.base.inc.mk
 #
 #
 SUIT_COAP_BASEPATH ?= fw/$(BOARD)

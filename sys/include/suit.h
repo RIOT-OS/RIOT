@@ -7,9 +7,15 @@
  * directory for more details.
  */
 /**
- * @defgroup    sys_suit_v3 SUIT IETF draft v3
- * @ingroup     sys_suit
+ * @defgroup    sys_suit SUIT secure firmware OTA upgrade infrastructure
+ * @ingroup     sys
  * @brief       SUIT manifest handling
+ *
+ * @experimental
+ *
+ * @note The current implementation of this specification is based on the
+ *       IETF-SUIT-v3 draft. The module is still experimental and will change to
+ *       match future draft specifications
  *
  * @see https://tools.ietf.org/html/draft-ietf-suit-manifest-03
  *
@@ -21,8 +27,8 @@
  *
  */
 
-#ifndef SUIT_V3_SUIT_H
-#define SUIT_V3_SUIT_H
+#ifndef SUIT_H
+#define SUIT_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -40,13 +46,13 @@ extern "C" {
  * @brief   Buffer size used for Cose
  */
 #ifndef SUIT_COSE_BUF_SIZE
-#define SUIT_COSE_BUF_SIZE              (180U)
+#define SUIT_COSE_BUF_SIZE                  (180U)
 #endif
 
 /**
  * @brief   Maximum number of components supported in a SUIT manifest
  */
-#define SUIT_V3_COMPONENT_MAX           (1U)
+#define SUIT_COMPONENT_MAX                  (1U)
 
 /**
  * @brief Current SUIT serialization format version
@@ -54,17 +60,17 @@ extern "C" {
  * see https://tools.ietf.org/html/draft-ietf-suit-manifest-03#section-7 for
  * details
  */
-#define SUIT_VERSION                    (1)
+#define SUIT_VERSION                        (1)
 
 /**
  * @brief COSE signature OK
  */
-#define SUIT_STATE_COSE_AUTHENTICATED        (1 << 1)
+#define SUIT_STATE_COSE_AUTHENTICATED       (1 << 1)
 
 /**
  * @brief COSE payload matches SUIT manifest digest
  */
-#define SUIT_STATE_FULLY_AUTHENTICATED        (1 << 2)
+#define SUIT_STATE_FULLY_AUTHENTICATED      (1 << 2)
 
 /**
  * @brief SUIT error codes
@@ -140,7 +146,7 @@ typedef struct {
     uint32_t validated;             /**< bitfield of validated policies */
     uint32_t state;                 /**< bitfield holding state information */
     /** List of components in the manifest */
-    suit_component_t components[SUIT_V3_COMPONENT_MAX];
+    suit_component_t components[SUIT_COMPONENT_MAX];
     unsigned components_len;        /**< Current number of components */
     uint32_t component_current;     /**< Current component index */
     riotboot_flashwrite_t *writer;  /**< Pointer to the riotboot flash writer */
@@ -203,5 +209,5 @@ int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
 }
 #endif
 
-#endif /* SUIT_V3_SUIT_H */
+#endif /* SUIT_H */
 /** @} */

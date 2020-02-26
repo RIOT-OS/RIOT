@@ -7,12 +7,11 @@
  * directory for more details.
  */
 /**
- * @ingroup     sys_suit_v3
+ * @ingroup     sys_suit
  * @{
  *
  * @file
- * @brief       SUIT draft-ietf-suit-manifest-03 Handlers for the outer SUIT
- *              container
+ * @brief       SUIT handlers for the SUIT envelope container
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  *

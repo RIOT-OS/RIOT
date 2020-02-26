@@ -9,11 +9,9 @@
  */
 
 /**
- * @defgroup    sys_suit SUIT secure firmware updates
- * @ingroup     sys
- * @brief       SUIT secure firmware updates
- *
- * @experimental
+ * @ingroup     sys_suit
+ * @defgroup    sys_suit_transport_coap SUIT firmware CoAP transport
+ * @brief       SUIT secure firmware updates over CoAP
  *
  * @{
  *
@@ -24,8 +22,8 @@
  *
  */
 
-#ifndef SUIT_COAP_H
-#define SUIT_COAP_H
+#ifndef SUIT_TRANSPORT_COAP_H
+#define SUIT_TRANSPORT_COAP_H
 
 #include "net/nanocoap.h"
 
@@ -157,5 +155,5 @@ void suit_coap_trigger(const uint8_t *url, size_t len);
 }
 #endif
 
-#endif /* SUIT_COAP_H */
+#endif /* SUIT_TRANSPORT_COAP_H */
 /** @} */
