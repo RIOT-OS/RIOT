@@ -216,7 +216,7 @@ void auto_init(void)
 #endif
 
 /* initialize network devices */
-#ifdef MODULE_AUTO_INIT_GNRC_NETIF
+#if defined(MODULE_AUTO_INIT_GNRC_NETIF) && !defined(MODULE_GNRC_NETIF_MANUAL_INIT)
     extern void auto_init_gnrc_netif(void);
     auto_init_gnrc_netif();
 #endif
