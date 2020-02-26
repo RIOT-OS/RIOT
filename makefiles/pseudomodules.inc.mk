@@ -1,5 +1,6 @@
 PSEUDOMODULES += at_urc
 PSEUDOMODULES += at24c%
+PSEUDOMODULES += auto_init_gnrc_netif
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
@@ -32,7 +33,6 @@ PSEUDOMODULES += gnrc_netapi_mbox
 PSEUDOMODULES += gnrc_pktbuf_cmd
 PSEUDOMODULES += gnrc_netif_cmd_%
 PSEUDOMODULES += gnrc_netif_dedup
-PSEUDOMODULES += gnrc_netif_manual_init
 PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
 PSEUDOMODULES += gnrc_sixlowpan_default

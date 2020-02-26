@@ -13,4 +13,8 @@ ifneq (,$(filter gnrc_netif_lorawan,$(USEMODULE)))
   DIRS += lorawan
 endif
 
+ifneq (,$(filter gnrc_netif_init,$(USEMODULE)))
+  DIRS += init
+endif
+
 include $(RIOTBASE)/Makefile.base

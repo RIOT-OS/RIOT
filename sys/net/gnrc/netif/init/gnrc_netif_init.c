@@ -17,7 +17,7 @@
  * @}
  */
 
-void auto_init_gnrc_netif(void)
+void gnrc_netif_init(void)
 {
 #ifdef MODULE_STM32_ETH
     extern void auto_init_stm32_eth(void);
