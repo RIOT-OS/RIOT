@@ -107,18 +107,21 @@ void dhcpv6_client_conf_prefix(unsigned iface, const ipv6_addr_t *pfx,
                          (UINT32_MAX - 1) : pref * MS_PER_SEC;
         }
         gnrc_ipv6_nib_pl_set(netif->pid, pfx, pfx_len, valid, pref);
-#if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
-        GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
-        gnrc_ipv6_nib_abr_add(&addr);
-#endif
-#ifdef MODULE_GNRC_RPL
-        gnrc_rpl_init(netif->pid);
-        gnrc_rpl_instance_t *inst = gnrc_rpl_instance_get(GNRC_RPL_DEFAULT_INSTANCE);
-        if (inst) {
-            gnrc_rpl_instance_remove(inst);
+        if (IS_USED(MODULE_GNRC_IPV6_NIB) &&
+            GNRC_IPV6_NIB_CONF_6LBR &&
+            GNRC_IPV6_NIB_CONF_MULTIHOP_P6C) {
+            (void)gnrc_ipv6_nib_abr_add(&addr);
         }
-        gnrc_rpl_root_init(GNRC_RPL_DEFAULT_INSTANCE, &addr, false, false);
-#endif
+        if (IS_USED(MODULE_GNRC_RPL)) {
+            gnrc_rpl_init(netif->pid);
+            gnrc_rpl_instance_t *inst = gnrc_rpl_instance_get(
+                    GNRC_RPL_DEFAULT_INSTANCE
+                );
+            if (inst) {
+                gnrc_rpl_instance_remove(inst);
+            }
+            gnrc_rpl_root_init(GNRC_RPL_DEFAULT_INSTANCE, &addr, false, false);
+        }
     }
 }
 
