@@ -36,6 +36,7 @@ def testfunc(child):
         child.expect(r'.*rtc_set_alarm: not implemented')
     child.expect(r'   Alarm is set to   ({})'.format(DATE_PATTERN))
     alarm_value = child.match.group(1)
+    child.expect(r'\[[0-9]+\] First alarm expected at [0-9]+ microseconds')
     if BOARD != 'native':
         # Set alarm is not implemented for native board so no need to compare
         # alarm values
@@ -43,7 +44,11 @@ def testfunc(child):
 
     if BOARD != 'native':
         for _ in range(alarm_count):
-            child.expect_exact('Alarm!')
+            child.expect(r'\[[0-9]+\] Alarm! after [0-9]+ microseconds \(error'
+                         r' ([0-9]+) microseconds\)')
+            eus = int(child.match.group(1))
+            assert abs(eus) <= 100, \
+                "Error ({}us) out of range, alarm_count={}".format(eus, _)
 
 
 if __name__ == "__main__":
