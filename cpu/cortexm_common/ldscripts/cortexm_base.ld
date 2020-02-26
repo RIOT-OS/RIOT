@@ -185,4 +185,9 @@ SECTIONS
         /* Round size so that we can use 4 byte copy in init */
         . = ALIGN(4);
     } > bkup-ram
+
+    .heap3 (NOLOAD) : ALIGN(4) {
+        _sheap1 = . ;
+        _eheap1 = ORIGIN(bkup-ram) + LENGTH(bkup-ram);
+    } > bkup-ram
 }

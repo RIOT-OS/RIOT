@@ -40,6 +40,31 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### sys/net/gnrc/application_layer/tftp [0e2a62078850e1ecc74db2db4d639cf2d8fb96d3]
+Author:
+- DipSwitch <dipswitch@ownage4u.nl>
+
+Reasons for removal:
+- Not maintained anymore.
+- Existing quality and security defects.
+
+### pkg/oonf_api [c829f820ee870bffc60c7df688d2da8373553212]
+Author:
+- Benjamin Valentin <benpicco@googlemail.com>
+
+Reasons for removal:
+- Package has not been update since 2013.
+- Tests were never integrated to the CI.
+- NHDP, which was the only upstream user, has been removed.
+
+### sys/net/routing/nhdp [0201a2d273fe17aa1b8eeb22776ae9670551433d]
+Author:
+- Fabian Nack <nack@inf.fu-berlin.de>
+
+Reasons for removal:
+- Not maintained anymore.
+- Does not comply with the current RIOT programming practices.
+
 ### sys/ubjson [868d37708bb674739ab4983441d6df904dd5a25f]
 Author(s):
 - René Kijewski <rene.kijewski@fu-berlin.de>

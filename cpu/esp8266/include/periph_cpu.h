@@ -207,6 +207,17 @@ typedef struct {
 /** @} */
 
 /**
+ * @name    RNG configuration
+ * @{
+ */
+
+/**
+ * @brief   The address of the register for accessing the hardware RNG.
+ */
+#define RNG_DATA_REG_ADDR   (0x3ff20e44)
+/** @} */
+
+/**
  * @name    SPI configuration
  *
  * ESP8266 has two SPI controllers:

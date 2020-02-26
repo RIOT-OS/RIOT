@@ -20,7 +20,9 @@ export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
 # basic cflags:
-CFLAGS += -Wall -Wextra -pedantic
+CFLAGS += -Wall -Wextra -pedantic $(CFLAGS_DBG)
+CFLAGS_DBG ?= -g3
+
 # default std set to gnu99 of not overwritten by user
 ifeq (,$(filter -std=%, $(CFLAGS)))
   CFLAGS += -std=gnu11
@@ -89,15 +91,13 @@ debug-valgrind-server: export VALGRIND_FLAGS ?= --vgdb=yes --vgdb-error=0 -v \
 	--read-var-info=yes
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
 term-gprof: TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELFFILE)
-all-valgrind: CFLAGS += -DHAVE_VALGRIND_H -g3
+all-valgrind: CFLAGS += -DHAVE_VALGRIND_H
 all-valgrind: export NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
-all-debug: CFLAGS += -g3
-all-cachegrind: CFLAGS += -g3
 all-gprof: CFLAGS += -pg
 all-gprof: LINKFLAGS += -pg
-all-asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
+all-asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer
 all-asan: CFLAGS += -DNATIVE_MEMORY
-all-asan: LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
+all-asan: LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer
 
 INCLUDES += $(NATIVEINCLUDES)
 
@@ -128,6 +128,7 @@ endif
 all: # do not override first target
 
 all-debug: all
+	@$(COLOR_ECHO) '$(COLOR_RED)`all-debug` is deprecated, just use `all`$(COLOR_RESET)'
 
 all-gprof: all
 
@@ -159,4 +160,4 @@ eval-gprof:
 eval-cachegrind:
 	$(CGANNOTATE) $(shell ls -rt cachegrind.out* | tail -1)
 
-export UNDEF += $(BINDIR)/cpu/startup.o
+UNDEF += $(BINDIR)/cpu/startup.o

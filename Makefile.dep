@@ -64,12 +64,6 @@ ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
   USEMODULE += gnrc_neterr
 endif
 
-ifneq (,$(filter nhdp,$(USEMODULE)))
-  USEMODULE += sock_udp
-  USEMODULE += xtimer
-  USEMODULE += oonf_rfc5444
-endif
-
 ifneq (,$(filter sntp,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += xtimer
@@ -94,6 +88,10 @@ ifneq (,$(filter gnrc_dhcpv6_client,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_nib
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_sock_udp
+endif
+
+ifneq (,$(filter gnrc_dhcpv6_client_6lbr,$(USEMODULE)))
+  USEMODULE += gnrc_dhcpv6_client
 endif
 
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
@@ -143,11 +141,6 @@ ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += netdev_eth
   USEMODULE += iolist
-endif
-
-ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
-  USEMODULE += gnrc_udp
-  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
@@ -605,15 +598,6 @@ ifneq (,$(filter fib,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
-ifneq (,$(filter oonf_rfc5444,$(USEMODULE)))
-  USEMODULE += oonf_common
-endif
-
-ifneq (,$(filter oonf_common,$(USEMODULE)))
-  USEPKG += oonf_api
-  USEMODULE += posix_sockets
-endif
-
 # if any log_* is used, also use LOG pseudomodule
 ifneq (,$(filter log_%,$(USEMODULE)))
   USEMODULE += log
@@ -871,8 +855,11 @@ endif
 
 ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += nanocoap
-  USEMODULE += gnrc_sock_udp
+  USEMODULE += gnrc_sock_async
+  USEMODULE += sock_async_event
   USEMODULE += sock_util
+  USEMODULE += event_callback
+  USEMODULE += event_timeout
 endif
 
 ifneq (,$(filter luid,$(USEMODULE)))

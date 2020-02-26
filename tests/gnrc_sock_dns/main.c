@@ -26,6 +26,9 @@
 #include "net/sock/dns.h"
 #include "shell.h"
 
+#define MAIN_QUEUE_SIZE     (8)
+static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+
 static int _dns(int argc, char **argv);
 
 static const shell_command_t _shell_commands[] = {
@@ -102,6 +105,10 @@ static int _dns(int argc, char **argv)
 
 int main(void)
 {
+    /* we need a message queue for the thread running the shell in order to
+     * receive potentially fast incoming networking packets */
+    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
+
     /* start shell */
     shell_run(_shell_commands, _shell_buffer, sizeof(_shell_buffer));
     return 0;

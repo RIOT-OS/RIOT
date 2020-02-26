@@ -47,5 +47,5 @@ void pm_set(unsigned mode)
         while (PM->SLEEPCFG.bit.SLEEPMODE != _mode) {}
     }
 
-    cortexm_sleep(0);
+    sam0_cortexm_sleep(0);
 }

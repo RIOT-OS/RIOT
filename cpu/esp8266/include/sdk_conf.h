@@ -76,7 +76,6 @@ extern "C" {
 #define CONFIG_SCAN_AP_MAX              (32)
 
 #define CONFIG_USING_NEW_ETS_VPRINTF
-#define CONFIG_NEWLIB_STDOUT_LINE_ENDING_CRLF
 
 #ifdef __cplusplus
 }

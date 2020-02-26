@@ -37,12 +37,30 @@
  * @name    Button pin definitions
  * @{
  */
+
 /**
-  * Generic ESP32 boards have a BOOT button, which can be used as normal button
-  * during normal operation. Since the GPIO0 pin is pulled up, the button
-  * signal is inverted, i.e., pressing the button will give a low signal.
-  */
-#define BUTTON0_PIN         GPIO0
+ * @brief   Default button GPIO pin definition
+ *
+ * Generic ESP32 boards have a BOOT button connected to GPIO0, which can be
+ * used as button during normal operation. Since the GPIO0 pin is pulled up,
+ * the button signal is inverted, i.e., pressing the button will give a
+ * low signal.
+ */
+#define BTN0_PIN        GPIO0
+
+/**
+ * @brief   Default button GPIO mode definition
+ *
+ * Since the GPIO of the button is pulled up with an external resistor, the
+ * mode for the GPIO pin has to be GPIO_IN.
+ */
+#define BTN0_MODE       GPIO_IN
+
+/**
+ * @brief   Definition for compatibility with previous versions
+ */
+#define BUTTON0_PIN     BTN0_PIN
+
 /** @} */
 
 /**

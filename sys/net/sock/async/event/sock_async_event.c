@@ -13,14 +13,20 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include "irq.h"
 #include "net/sock/async/event.h"
 
 static void _event_handler(event_t *ev)
 {
     sock_event_t *event = (sock_event_t *)ev;
+    unsigned state = irq_disable();
+    sock_async_flags_t _type = event->type;
 
-    event->cb.generic(event->sock, event->type);
     event->type = 0;
+    irq_restore(state);
+    if (_type) {
+        event->cb.generic(event->sock, _type);
+    }
 }
 
 static inline void _cb(void *sock, sock_async_flags_t type,

@@ -30,6 +30,7 @@
 /boards/slwstk6000b/                        @basilfx
 /boards/sodaq-sara-aff/                     @leandrolanzieri
 /boards/stk3*00/                            @basilfx
+/boards/openmote*/                          @MrKevinWeiss
 
 /core/                                      @kaspar030
 
@@ -55,6 +56,7 @@
 /cpu/saml1x/                                @dylad
 /cpu/saml21/                                @dylad
 /cpu/stm32*/                                @aabadie @fjmolinas @DipSwitch @vincent-d
+/cpu/*/periph/                              @MrKevinWeiss
 
 /doc/                                       @aabadie @jia200x
 
@@ -77,6 +79,8 @@
 /drivers/sx127x/                            @aabadie @jia200x
 /drivers/ws281x/                            @maribu
 /drivers/xbee/                              @haukepetersen @miri64
+/drivers/include/periph/                    @MrKevinWeiss
+/drivers/periph_common/                     @MrKevinWeiss
 
 /pkg/cryptoauthlib/                         @Einhornhool @PeterKietzmann
 /pkg/lua/                                   @jcarrano
@@ -113,8 +117,14 @@
 /sys/usb/                                   @bergzand @dylad @aabadie
 /sys/xtimer/                                @kaspar030 @MichelRottleuthner
 
-/tests/                                     @miri64 @MrKevinWeiss @smlng @leandrolanzieri @aabadie @MichelRottleuthner @fjmolinas
+/tests/                                     @smlng @leandrolanzieri @aabadie @MichelRottleuthner @fjmolinas
+/tests/emb6*                                @miri64
+/tests/gnrc*                                @miri64
+/tests/lwip*                                @miri64
+/tests/unittests                            @miri64
+/tests/*/tests/*.py                         @miri64
 /tests/cpu_efm32_features/                  @basilfx
+/tests/periph*/                             @MrKevinWeiss
 
 # KConfig maintainers will be notified about all KConfig changes
 Kconfig                                     @leandrolanzieri @jia200x @cgundogan

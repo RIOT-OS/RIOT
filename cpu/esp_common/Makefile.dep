@@ -1,0 +1,31 @@
+# additional modules dependencies
+
+# each device has SPI flash memory, but it has to be enabled explicitly
+ifneq (,$(filter esp_spiffs,$(USEMODULE)))
+  USEMODULE += spiffs
+endif
+
+ifneq (,$(filter esp_freertos,$(USEMODULE)))
+  USEMODULE += esp_freertos_common
+endif
+
+ifneq (,$(filter esp_now,$(USEMODULE)))
+  USEMODULE += esp_wifi_any
+endif
+
+ifneq (,$(filter esp_wifi,$(USEMODULE)))
+  USEMODULE += esp_wifi_any
+  USEMODULE += netdev_eth
+endif
+
+ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
+  USEMODULE += netopt
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
+  LINKFLAGS += -Wl,-wrap,_malloc_r
+  LINKFLAGS += -Wl,-wrap,_calloc_r
+  LINKFLAGS += -Wl,-wrap,_realloc_r
+  LINKFLAGS += -Wl,-wrap,_free_r
+endif

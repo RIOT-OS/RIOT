@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "board_common.h"
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,6 +65,28 @@ extern "C" {
 #define ILI9341_PARAM_RGB          1
 #define ILI9341_PARAM_INVERTED     1
 #define ILI9341_PARAM_NUM_LINES    240U
+/** @} */
+
+/**
+ * @name PineTime NOR flash hardware configuration
+ * @{
+ */
+#define PINETIME_NOR_PAGE_SIZE          (256)
+#define PINETIME_NOR_PAGES_PER_SECTOR   (16)
+#define PINETIME_NOR_SECTOR_COUNT       (2048)
+#define PINETIME_NOR_FLAGS              (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K)
+#define PINETIME_NOR_SPI_DEV            SPI_DEV(0)
+#define PINETIME_NOR_SPI_CLK            SPI_CLK_10MHZ
+#define PINETIME_NOR_SPI_CS             GPIO_PIN(0, 5)
+#define PINETIME_NOR_SPI_MODE           SPI_MODE_3
+/** @} */
+
+/**
+ * @name MTD configuration
+ * @{
+ */
+extern mtd_dev_t *mtd0;
+#define MTD_0 mtd0
 /** @} */
 
 #ifdef __cplusplus

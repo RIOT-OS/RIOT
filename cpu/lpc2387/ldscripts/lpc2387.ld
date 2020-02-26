@@ -175,10 +175,10 @@ SECTIONS
     _sram = ORIGIN(ram);
     _eram = ORIGIN(ram) + LENGTH(ram);
 
-    __heap2_size = LENGTH(ram_ethernet);
-    .heap2 (NOLOAD) :
+    .heap1 ALIGN(4) (NOLOAD) :
     {
-        PROVIDE(__heap2_start = . );
+        _sheap1 = ORIGIN(ram_ethernet);
+        _eheap1 = ORIGIN(ram_ethernet) + LENGTH(ram_ethernet);
     } > ram_ethernet
 
     . = ORIGIN(ram_usb);
@@ -187,12 +187,11 @@ SECTIONS
         *(.usbdata)
     } > ram_usb
 
-    .heap3 ALIGN(0x1000) (NOLOAD) :
+    .heap2 ALIGN(4) (NOLOAD) :
     {
-        __heap3_size = ORIGIN(ram_usb) + LENGTH(ram_usb) - ABSOLUTE(.);
-        PROVIDE(__heap3_start = . );
+        _sheap2 = . ;
+        _eheap2 = ORIGIN(ram_usb) + LENGTH(ram_usb);
     } > ram_usb
-    __heap_size = SIZEOF(.heap3);
 
     _sbackup_data_load = LOADADDR(.backup.data);
     .backup.data :  ALIGN(4) {
@@ -209,5 +208,10 @@ SECTIONS
         _ebackup_bss = .;
         /* Round size so that we can use 4 byte copy in init */
         . = ALIGN(4);
+    } > ram_battery
+
+    .heap3 (NOLOAD) : ALIGN(4) {
+        _sheap3 = . ;
+        _eheap3 = ORIGIN(ram_battery) + LENGTH(ram_battery);
     } > ram_battery
 }

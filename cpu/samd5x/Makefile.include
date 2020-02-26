@@ -1,6 +1,3 @@
-CPU_ARCH = cortex-m4f
-CPU_FAM  = samd5x
-
 ifneq (,$(filter samd51%,$(CPU_MODEL)))
   CFLAGS += -DCPU_SAMD51
 endif

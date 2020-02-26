@@ -11,7 +11,7 @@ export OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
 DEBUG_ADAPTER ?= iotlab
 
-export OPENOCD_CONFIG ?= $(RIOTBOARD)/common/iotlab/dist/openocd.cfg
+OPENOCD_CONFIG ?= $(RIOTBOARD)/common/iotlab/dist/openocd.cfg
 
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk

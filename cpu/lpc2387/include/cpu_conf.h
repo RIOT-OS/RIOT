@@ -83,6 +83,12 @@ extern unsigned __stack_irq_size;
 #define ISR_STACKSIZE                   ((unsigned) &__stack_irq_size)
 /** @} */
 
+/**
+ * @brief   The CPU has 4 blocks of SRAM at different addresses.
+ *          (primary RAM, USB RAM, Ethernet RAM & Backup RAM)
+ */
+#define NUM_HEAPS (4)
+
 #ifdef __cplusplus
 }
 #endif

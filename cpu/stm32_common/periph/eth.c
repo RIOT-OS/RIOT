@@ -118,14 +118,14 @@ void stm32_eth_get_mac(char *out)
     unsigned t;
 
     t = ETH->MACA0HR;
-    out[0] = (t >> 8);
-    out[1] = (t & 0xff);
+    out[5] = (t >> 8);
+    out[4] = (t & 0xff);
 
     t = ETH->MACA0LR;
-    out[2] = (t >> 24);
-    out[3] = (t >> 16);
-    out[4] = (t >> 8);
-    out[5] = (t & 0xff);
+    out[3] = (t >> 24);
+    out[2] = (t >> 16);
+    out[1] = (t >> 8);
+    out[0] = (t & 0xff);
 }
 
 /** Set the mac address. The peripheral supports up to 4 MACs but only one is
@@ -133,8 +133,8 @@ void stm32_eth_get_mac(char *out)
 void stm32_eth_set_mac(const char *mac)
 {
     ETH->MACA0HR &= 0xffff0000;
-    ETH->MACA0HR |= ((mac[0] << 8) | mac[1]);
-    ETH->MACA0LR = ((mac[2] << 24) | (mac[3] << 16) | (mac[4] << 8) | mac[5]);
+    ETH->MACA0HR |= ((mac[5] << 8) | mac[4]);
+    ETH->MACA0LR = ((mac[3] << 24) | (mac[2] << 16) | (mac[1] << 8) | mac[0]);
 }
 
 /** Initialization of the DMA descriptors to be used */
@@ -211,8 +211,6 @@ int stm32_eth_init(void)
 
     /* pass all */
     //ETH->MACFFR |= ETH_MACFFR_RA;
-    /* perfect filter on address */
-    ETH->MACFFR |= (ETH_MACFFR_PAM | ETH_MACFFR_DAIF);
 
     /* store forward */
     ETH->DMAOMR |= (ETH_DMAOMR_RSF | ETH_DMAOMR_TSF | ETH_DMAOMR_OSF);

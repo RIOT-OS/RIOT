@@ -56,6 +56,14 @@
 #define _EIC EIC
 #endif
 
+/**
+ * @brief   Clock source for the External Interrupt Controller
+ */
+typedef enum {
+    _EIC_CLOCK_FAST,
+    _EIC_CLOCK_SLOW
+} gpio_eic_clock_t;
+
 static gpio_isr_ctx_t gpio_config[NUMOF_IRQS];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
@@ -155,6 +163,13 @@ void gpio_write(gpio_t pin, int value)
 }
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
+
+#ifdef CPU_FAM_SAMD21
+#define EIC_SYNC() while (_EIC->STATUS.bit.SYNCBUSY)
+#else
+#define EIC_SYNC() while (_EIC->SYNCBUSY.bit.ENABLE)
+#endif
+
 static int _exti(gpio_t pin)
 {
     unsigned port_num = ((pin >> 7) & 0x03);
@@ -186,17 +201,17 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     PM->APBAMASK.reg |= PM_APBAMASK_EIC;
     /* SAMD21 used GCLK2 which is supplied by either the ultra low power
        internal or external 32 kHz */
-    GCLK->CLKCTRL.reg = (EIC_GCLK_ID |
-                         GCLK_CLKCTRL_CLKEN |
-                         GCLK_CLKCTRL_GEN_GCLK2);
+    GCLK->CLKCTRL.reg = EIC_GCLK_ID
+                      | GCLK_CLKCTRL_CLKEN
+                      | GCLK_CLKCTRL_GEN(SAM0_GCLK_32KHZ);
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 #else /* CPU_FAM_SAML21 */
     /* enable clocks for the EIC module */
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_EIC;
-    GCLK->PCHCTRL[EIC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
+    GCLK->PCHCTRL[EIC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(SAM0_GCLK_MAIN);
     /* disable the EIC module*/
     _EIC->CTRLA.reg = 0;
-    while (_EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE) {}
+    EIC_SYNC();
 #endif
     /* configure the active flank */
     _EIC->CONFIG[exti >> 3].reg &= ~(0xf << ((exti & 0x7) * 4));
@@ -217,13 +232,74 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     _EIC->WAKEUP.reg |= (1 << exti);
     /* enable the EIC module*/
     _EIC->CTRL.reg = EIC_CTRL_ENABLE;
-    while (_EIC->STATUS.reg & EIC_STATUS_SYNCBUSY) {}
+    EIC_SYNC();
 #else /* CPU_FAM_SAML21 */
     /* enable the EIC module*/
     _EIC->CTRLA.reg = EIC_CTRLA_ENABLE;
-    while (_EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE) {}
+    EIC_SYNC();
 #endif
     return 0;
+}
+
+inline static void reenable_eic(gpio_eic_clock_t clock) {
+#if defined(CPU_SAMD21)
+    if (clock == _EIC_CLOCK_SLOW) {
+        GCLK->CLKCTRL.reg = EIC_GCLK_ID
+                          | GCLK_CLKCTRL_CLKEN
+                          | GCLK_CLKCTRL_GEN(SAM0_GCLK_32KHZ);
+    } else {
+        GCLK->CLKCTRL.reg = EIC_GCLK_ID
+                          | GCLK_CLKCTRL_CLKEN
+                          | GCLK_CLKCTRL_GEN(SAM0_GCLK_MAIN);
+    }
+    while (GCLK->STATUS.bit.SYNCBUSY) {}
+#else
+    uint32_t ctrla_reg = EIC_CTRLA_ENABLE;
+
+    EIC->CTRLA.reg = 0;
+    EIC_SYNC();
+
+    if (clock == _EIC_CLOCK_SLOW) {
+        ctrla_reg |= EIC_CTRLA_CKSEL;
+    }
+
+    EIC->CTRLA.reg = ctrla_reg;
+    EIC_SYNC();
+#endif
+}
+
+void gpio_pm_cb_enter(int deep)
+{
+#if defined(PM_SLEEPCFG_SLEEPMODE_STANDBY)
+    (void) deep;
+
+    if (PM->SLEEPCFG.bit.SLEEPMODE == PM_SLEEPCFG_SLEEPMODE_STANDBY) {
+        DEBUG_PUTS("gpio: switching EIC to slow clock");
+        reenable_eic(_EIC_CLOCK_SLOW);
+    }
+#else
+    if (deep) {
+        DEBUG_PUTS("gpio: switching EIC to slow clock");
+        reenable_eic(_EIC_CLOCK_SLOW);
+    }
+#endif
+}
+
+void gpio_pm_cb_leave(int deep)
+{
+#if defined(PM_SLEEPCFG_SLEEPMODE_STANDBY)
+    (void) deep;
+
+    if (PM->SLEEPCFG.bit.SLEEPMODE == PM_SLEEPCFG_SLEEPMODE_STANDBY) {
+        DEBUG_PUTS("gpio: switching EIC to fast clock");
+        reenable_eic(_EIC_CLOCK_FAST);
+    }
+#else
+    if (deep) {
+        DEBUG_PUTS("gpio: switching EIC to fast clock");
+        reenable_eic(_EIC_CLOCK_FAST);
+    }
+#endif
 }
 
 void gpio_irq_enable(gpio_t pin)
@@ -284,5 +360,17 @@ ISR_EICn(15)
 ISR_EICn(_other)
 #endif /* CPU_SAML1X */
 #endif /* CPU_SAML1X || CPU_SAMD5X */
+
+#else /* MODULE_PERIPH_GPIO_IRQ */
+
+void gpio_pm_cb_enter(int deep)
+{
+    (void) deep;
+}
+
+void gpio_pm_cb_leave(int deep)
+{
+    (void) deep;
+}
 
 #endif /* MODULE_PERIPH_GPIO_IRQ */

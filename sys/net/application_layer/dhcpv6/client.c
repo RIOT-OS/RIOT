@@ -411,7 +411,7 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
     if ((cid == NULL) || (sid == NULL) || (ia_pd == NULL)) {
         DEBUG("DHCPv6 client: ADVERTISE does not contain either server ID, "
               "client ID or IA_PD option\n");
-        return false;
+        return -1;
     }
     if (!_check_status_opt(status) || !_check_cid_opt(cid)) {
         return -1;
@@ -466,6 +466,10 @@ static void _parse_advertise(uint8_t *adv, size_t len)
     /* might not have been executed when not received in first retransmission
      * window => redo even if already done */
     if (_preparse_advertise(adv, len, NULL) < 0) {
+        uint32_t delay = _irt_us(DHCPV6_SOL_TIMEOUT, true);
+        /* SOLICIT new server */
+        timer.callback = _post_solicit_servers;
+        xtimer_set(&timer, delay);
         return;
     }
     DEBUG("DHCPv6 client: scheduling REQUEST\n");

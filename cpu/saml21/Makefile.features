@@ -1,3 +1,6 @@
+CPU_ARCH = cortex-m0plus
+CPU_FAM  = saml21
+
 # The SAMR30 line of MCUs does not contain a TRNG
 BOARDS_WITHOUT_HWRNG += samr30-xpro
 

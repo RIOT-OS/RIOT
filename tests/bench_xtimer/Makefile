@@ -71,7 +71,7 @@ ifneq (, $(filter $(BOARD), $(LOW_MEMORY_BOARDS)))
 endif
 
 ifneq (, $(filter $(BOARD), $(SUPER_LOW_MEMORY_BOARDS)))
-  NUMOF_TIMERS ?= 16
+  NUMOF_TIMERS ?= 12
 endif
 
 NUMOF_TIMERS ?= 1000

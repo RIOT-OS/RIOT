@@ -58,6 +58,6 @@ else ifeq (openocd,$(PROGRAMMER))
     $(BINDIR)/softdevice.hex: | $(ELFFILE)
   endif
   DEBUG_ADAPTER ?= jlink
-  export OPENOCD_CONFIG := $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
+  OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
   include $(RIOTMAKE)/tools/openocd.inc.mk
 endif

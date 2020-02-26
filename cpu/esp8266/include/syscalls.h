@@ -21,38 +21,17 @@
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
+#include "syscalls_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** Necessary initializations of system call functions */
-extern void syscalls_init (void);
+#ifndef DOXYGEN
 
-/** System standard printf function */
-extern int printf(const char* format, ...);
+#define MALLOC_CAP_DEFAULT  MALLOC_CAP_8BIT
 
-/** Determine free heap size */
-unsigned int get_free_heap_size (void);
-
-/** System standard puts function */
-extern int puts(const char * str);
-
-/** Determine free heap size */
-extern unsigned int get_free_heap_size (void);
-
-/** Time since boot in us (32bit version) */
-uint32_t system_get_time (void);
-
-/** Time since boot in ms (32bit version) */
-uint32_t system_get_time_ms (void);
-
-/** memset version that the compiler should not be allowed to optimize this */
-void *system_secure_memset(void *s, int c, size_t n);
+#endif /* DOXYGEN */
 
 #ifdef __cplusplus
 }
