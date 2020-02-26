@@ -24,7 +24,6 @@
 #include "debug.h"
 #include "dtls_debug.h"
 
-#define DTLS_EVENT_READ         (0x01E0)
 #define DTLS_EVENT_TIMEOUT      (0x01E1)
 
 #define DTLS_HANDSHAKE_BUFSIZE  (256)       /**< Size buffer used in handshake
@@ -84,19 +83,11 @@ static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
                  size_t len)
 {
     (void)session;
-    msg_t msg = { .type = DTLS_EVENT_READ };
     sock_dtls_t *sock = dtls_get_app_data(ctx);
 
     DEBUG("sock_dtls: decrypted message arrived\n");
-    if (sock->buflen < len && sock->buf) {
-        DEBUG("sock_dtls: not enough place on buffer for decrypted message\n");
-        msg.content.value = -ENOBUFS;
-    }
-    else {
-        memmove(sock->buf, buf, len);
-        msg.content.value = len;
-    }
-    mbox_put(&sock->mbox, &msg);
+    sock->buf = buf;
+    sock->buflen = len;
     return len;
 }
 
@@ -267,6 +258,7 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
     }
 
     sock->udp_sock = udp_sock;
+    sock->buf = NULL;
     sock->role = role;
     sock->tag = tag;
     sock->dtls_ctx = dtls_new_context(sock);
@@ -383,6 +375,21 @@ ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
                       len);
 }
 
+static ssize_t _copy_buffer(sock_dtls_t *sock, void *data, size_t max_len)
+{
+    uint8_t *buf = sock->buf;
+    size_t buflen = sock->buflen;
+
+    sock->buf = NULL;
+    if (buflen > max_len) {
+        return -ENOBUFS;
+    }
+    /* use `memmove()` as tinydtls reuses `data` to store decrypted data with an
+     * offset in `buf`. This prevents problems with overlapping buffers. */
+    memmove(data, buf, buflen);
+    return buflen;
+}
+
 ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
                        void *data, size_t max_len, uint32_t timeout)
 {
@@ -392,15 +399,15 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
     assert(data);
     assert(remote);
 
+    if (sock->buf != NULL) {
+        /* there is already decrypted data available */
+        return _copy_buffer(sock, data, max_len);
+    }
     if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
         timeout_timer.callback = _timeout_callback;
         timeout_timer.arg = sock;
         xtimer_set(&timeout_timer, timeout);
     }
-
-    /* save location to result buffer */
-    sock->buf = data;
-    sock->buflen = max_len;
 
     /* loop breaks when timeout or application data read */
     while(1) {
@@ -422,13 +429,14 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
         res = dtls_handle_message(sock->dtls_ctx, &remote->dtls_session,
                                   (uint8_t *)data, res);
 
+        if (sock->buf != NULL) {
+            xtimer_remove(&timeout_timer);
+            return _copy_buffer(sock, data, max_len);
+        }
         /* reset msg type */
         msg_t msg;
         if (mbox_try_get(&sock->mbox, &msg)) {
             switch(msg.type) {
-                case DTLS_EVENT_READ:
-                    xtimer_remove(&timeout_timer);
-                    return msg.content.value;
                 case DTLS_EVENT_TIMEOUT:
                     DEBUG("sock_dtls: timed out while decrypting message\n");
                     return -ETIMEDOUT;
