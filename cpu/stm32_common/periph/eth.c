@@ -211,6 +211,8 @@ int stm32_eth_init(void)
 
     /* pass all */
     //ETH->MACFFR |= ETH_MACFFR_RA;
+    /* pass on perfect filter match and pass all multicast address matches */
+    ETH->MACFFR |= ETH_MACFFR_PAM;
 
     /* store forward */
     ETH->DMAOMR |= (ETH_DMAOMR_RSF | ETH_DMAOMR_TSF | ETH_DMAOMR_OSF);
