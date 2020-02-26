@@ -10,9 +10,10 @@ import os
 import sys
 from testrunner import run
 
-
 BOARD = os.getenv('BOARD', 'native')
 DATE_PATTERN = r'\d{4}\-\d{2}\-\d{2} \d{2}\:\d{2}\:\d{2}'
+
+max_offset_us = 250000  # 250 ms
 
 
 def testfunc(child):
@@ -38,7 +39,11 @@ def testfunc(child):
 
     child.expect(r"  Setting alarm to   ({})".format(DATE_PATTERN))
     for _ in range(alarm_count):
-        child.expect_exact('Alarm!')
+        child.expect(r'\[[0-9]+\] Alarm! after [0-9]+ µs \(error'
+                     r' (\-)*([0-9]+) µs\)')
+        eus = int(child.match.group(2))
+        assert abs(eus) <= max_offset_us, \
+            "Error ({}us) out of range, alarm_count={}".format(eus, _)
 
 
 if __name__ == "__main__":

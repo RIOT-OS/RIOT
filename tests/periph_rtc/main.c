@@ -35,6 +35,8 @@
 #define TM_YEAR_OFFSET      (1900)
 
 static unsigned cnt = 0;
+static uint32_t start_usecs = 0;
+static uint32_t alarm_expected_usecs = 0;
 
 static void print_time(const char *label, const struct tm *time)
 {
@@ -59,14 +61,20 @@ static void print_time_ms(const char *label, const struct tm *time, uint16_t ms)
             ms);
 }
 
-static void inc_secs(struct tm *time, unsigned val)
-{
-    time->tm_sec += val;
-}
-
 static void cb(void *arg)
 {
     mutex_unlock(arg);
+}
+
+static void rtc_wait(unsigned secs)
+{
+    struct tm time;
+    mutex_t rtc_mtx = MUTEX_INIT_LOCKED;
+
+    rtc_get_time(&time);
+    time.tm_sec += secs;
+    rtc_set_alarm(&time, cb, &rtc_mtx);
+    mutex_lock(&rtc_mtx);
 }
 
 int main(void)
@@ -103,7 +111,7 @@ int main(void)
     }
 
     /* set initial alarm */
-    inc_secs(&time, PERIOD);
+    time.tm_sec += PERIOD;
     print_time("  Setting alarm to ", &time);
     rtc_set_alarm(&time, cb, &rtc_mtx);
 
@@ -141,24 +149,42 @@ int main(void)
         print_time(message, &time);
     }
 
+    /* sync to start of second */
+    rtc_wait(1);
+
     /* set alarm */
     rtc_get_time(&time);
-    inc_secs(&time, PERIOD);
+    start_usecs = xtimer_now_usec();
+    alarm_expected_usecs = start_usecs + US_PER_SEC * PERIOD;
+    time.tm_sec += PERIOD;
     rtc_set_alarm(&time, cb, &rtc_mtx);
     print_time("  Setting alarm to ", &time);
     puts("");
 
+    printf("[%" PRIu32 "] First alarm expected at %" PRIu32 " µs\n",
+           xtimer_now_usec(),
+           alarm_expected_usecs);
+
     /* loop over a few alarm cycles */
     while (1) {
         mutex_lock(&rtc_mtx);
-        puts("Alarm!");
 
+        /* capture time before printf */
+        uint32_t now_usecs = xtimer_now_usec();
         if (++cnt < REPEAT) {
             struct tm time;
-            rtc_get_alarm(&time);
-            inc_secs(&time, PERIOD);
+            rtc_get_time(&time);
+            time.tm_sec += PERIOD;
             rtc_set_alarm(&time, cb, &rtc_mtx);
         }
+
+        printf("[%" PRIu32 "] Alarm! after %" PRIu32 " µs "
+               "(error %" PRId32 " µs)\n",
+               now_usecs,
+               now_usecs - start_usecs,
+               (int32_t)now_usecs - alarm_expected_usecs);
+
+        alarm_expected_usecs = now_usecs + US_PER_SEC * PERIOD;
     }
 
     return 0;
