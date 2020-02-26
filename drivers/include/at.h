@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_at AT (Hayes) command set library
- * @ingroup     drivers
+ * @ingroup     drivers_misc
  * @brief       AT (Hayes) command set library
  *
  * This module provides functions to interact with devices using AT commands.
