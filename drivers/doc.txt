@@ -51,17 +51,24 @@
  * @brief       Drivers for display devices
  */
 
- /**
+/**
  * @defgroup    drivers_soft_periph Soft Peripheral Driver Interface
  * @ingroup     drivers
  * @brief       Software emulated @ref drivers_periph for UART, SPI, etc
  */
 
- /**
+/**
  * @defgroup    drivers_power Power Supply Drivers
  * @ingroup     drivers
  * @brief       Drivers for power supply devices
  *
  * The group of power supply drivers indludes all kinds of AC/DC, DC/DC supply devices
  * or charger ICs which can be controlled from the host e.g by config pin settings or by bus.
+ */
+
+/**
+ * @defgroup    drivers_misc Miscellaneous Drivers
+ * @ingroup     drivers
+ * @brief       Drivers for different kinds of devices that do not match any
+ *              other category
  */
