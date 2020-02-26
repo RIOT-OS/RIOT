@@ -127,7 +127,7 @@ In another terminal, run:
 [setup-wireless]: #Setup-a-wireless-device-behind-a-border-router
 
 If the workflow for updating using ethos is successful, you can try doing the
-same over "real" network interfaces, by updating a node that is connected
+same over wireless network interfaces, by updating a node that is connected
 wirelessly with a border router in between.
 
 Depending on your device you can use BLE or 802.15.4.
@@ -369,22 +369,59 @@ see 6 pairs of messages indicating where (filepath) the file was published and
 the corresponding coap resource URI
 
     ...
-    published "/home/francisco/workspace/RIOT/examples/suit_update/bin/samr21-xpro/suit_update-riot.suitv4_signed.1557135946.bin"
-           as "coap://[2001:db8::1]/fw/samr21-xpro/suit_update-riot.suitv4_signed.1557135946.bin"
-    published "/home/francisco/workspace/RIOT/examples/suit_update/bin/samr21-xpro/suit_update-riot.suitv4_signed.latest.bin"
-           as "coap://[2001:db8::1]/fw/samr21-xpro/suit_update-riot.suitv4_signed.latest.bin"
+    published "/home/francisco/workspace/RIOT/examples/suit_update/bin/samr21-xpro/suit_update-riot.suitv3_signed.1557135946.bin"
+           as "coap://[2001:db8::1]/fw/samr21-xpro/suit_update-riot.suitv3_signed.1557135946.bin"
+    published "/home/francisco/workspace/RIOT/examples/suit_update/bin/samr21-xpro/suit_update-riot.suitv3_signed.latest.bin"
+           as "coap://[2001:db8::1]/fw/samr21-xpro/suit_update-riot.suitv3_signed.latest.bin"
     ...
 
 ### Notify an update to the device
 [update-notify]: #Norify-an-update-to-the-device
 
 If the network has been started with a standalone node, the RIOT node should be
-reachable via link-local `fe80::2%riot0` on the ethos interface. If it was setup as a
-wireless device it will be reachable via its global address, something like `2001:db8::7b7e:3255:1313:8d96`
+reachable via link-local EUI64 address on the ethos interface, e.g:
+
+
+    Iface  5  HWaddr: 02:BE:74:C0:2F:B9
+            L2-PDU:1500 MTU:1500  HL:64  RTR
+            RTR_ADV
+            Source address length: 6
+            Link type: wired
+            inet6 addr: fe80::7b7e:3255:1313:8d96  scope: link  VAL
+            inet6 addr: fe80::2  scope: link  VAL
+            inet6 group: ff02::2
+            inet6 group: ff02::1
+            inet6 group: ff02::1:ffc0:2fb9
+            inet6 group: ff02::1:ff00:2
+
+the EUI64 link local address is `fe80::7b7e:3255:1313:8d96` and
+SUIT_CLIENT=[fe80::7b7e:3255:1313:8d96%riot0].
+
+If it was setup as a wireless device it will be reachable via its global
+address, e.g:
+
+
+    Iface  6  HWaddr: 0D:96  Channel: 26  Page: 0  NID: 0x23
+            Long HWaddr: 79:7E:32:55:13:13:8D:96
+             TX-Power: 0dBm  State: IDLE  max. Retrans.: 3  CSMA Retries: 4
+            AUTOACK  ACK_REQ  CSMA  L2-PDU:102 MTU:1280  HL:64  RTR
+            RTR_ADV  6LO  IPHC
+            Source address length: 8
+            Link type: wireless
+            inet6 addr: fe80::7b7e:3255:1313:8d96  scope: link  VAL
+            inet6 addr: 2001:db8::7b7e:3255:1313:8d96  scope: global  VAL
+            inet6 group: ff02::2
+            inet6 group: ff02::1
+            inet6 group: ff02::1:ff17:dd59
+            inet6 group: ff02::1:ff00:2
+
+
+the global address is `2001:db8::7b7e:3255:1313:8d96` and
+SUIT_CLIENT=[2001:db8::7b7e:3255:1313:8d96].
 
 - In wired mode:
 
-      $ SUIT_COAP_SERVER=[2001:db8::1] SUIT_CLIENT=[fe80::2%riot0] BOARD=samr21-xpro make -C examples/suit_update suit/notify
+      $ SUIT_COAP_SERVER=[2001:db8::1] SUIT_CLIENT=[fe80::7b7e:3255:1313:8d96%riot] BOARD=samr21-xpro make -C examples/suit_update suit/notify
 
 - In wireless mode:
 
@@ -394,16 +431,12 @@ wireless device it will be reachable via its global address, something like `200
 This notifies the node of a new available manifest. Once the notification is
 received by the device, it fetches it.
 
-If using `suit-v4` the node hangs for a couple of seconds when verifying the
+If using `suit-v3` the node hangs for a couple of seconds when verifying the
 signature:
 
     ....
-    INFO # suit_coap: got manifest with size 545
-    INFO # jumping into map
-    INFO # )got key val=1
-    INFO # handler res=0
-    INFO # got key val=2
-    INFO # suit: verifying manifest signature...
+    suit_coap: got manifest with size 470
+    suit: verifying manifest signature
     ....
 
 Once the signature is validated it continues validating other parts of the
@@ -412,12 +445,12 @@ Among these validations it checks some condition like firmware offset position
 in regards to the running slot to see witch firmware image to fetch.
 
     ....
-    INFO # Handling handler with key 10 at 0x2b981
-    INFO # Comparing manifest offset 4096 with other slot offset 4096
-    ....
-    INFO # Handling handler with key 10 at 0x2b981
-    INFO # Comparing manifest offset 133120 with other slot offset 4096
-    INFO # Sequence handler error
+    suit: validated manifest version
+    )suit: validated sequence number
+    )validating vendor ID
+    Comparing 547d0d74-6d3a-5a92-9662-4881afd9407b to 547d0d74-6d3a-5a92-9662-4881afd9407b from manifest
+    validating vendor ID: OK
+    validating class id
     ....
 
 Once the manifest validation is complete, the application fetches the image
@@ -432,27 +465,22 @@ displayed during this step:
 Once the new image is written, a final validation is performed and, in case of
 success, the application reboots on the new slot:
 
-    2019-04-05 16:19:26,363 - INFO # riotboot: verifying digest at 0x20003f37 (img at: 0x20800 size: 80212)
-    2019-04-05 16:19:26,704 - INFO # handler res=0
-    2019-04-05 16:19:26,705 - INFO # got key val=10
-    2019-04-05 16:19:26,707 - INFO # no handler found
-    2019-04-05 16:19:26,708 - INFO # got key val=12
-    2019-04-05 16:19:26,709 - INFO # no handler found
-    2019-04-05 16:19:26,711 - INFO # handler res=0
-    2019-04-05 16:19:26,713 - INFO # suit_v4_parse() success
-    2019-04-05 16:19:26,715 - INFO # SUIT policy check OK.
-    2019-04-05 16:19:26,718 - INFO # suit_coap: finalizing image flash
-    2019-04-05 16:19:26,725 - INFO # riotboot_flashwrite: riotboot flashing completed successfully
-    2019-04-05 16:19:26,728 - INFO # Image magic_number: 0x544f4952
-    2019-04-05 16:19:26,730 - INFO # Image Version: 0x5ca76390
-    2019-04-05 16:19:26,733 - INFO # Image start address: 0x00020900
-    2019-04-05 16:19:26,738 - INFO # Header chksum: 0x13b466db
+    Verifying image digest
+    riotboot: verifying digest at 0x1fffbd15 (img at: 0x1000 size: 77448)
+    Verifying image digest
+    riotboot: verifying digest at 0x1fffbd15 (img at: 0x1000 size: 77448)
+    suit_parse() success
+    SUIT policy check OK.
+    suit_coap: finalizing image flash
+    riotboot_flashwrite: riotboot flashing completed successfully
+    Image magic_number: 0x544f4952
+    Image Version: 0x5e71f662
+    Image start address: 0x00001100
+    Header chksum: 0x745a0376
 
-
-    main(): This is RIOT! (Version: 2019.04-devel-606-gaa7b-ota_suit_v2)
+    main(): This is RIOT! (Version: 2020.04)
     RIOT SUIT update example application
     running from slot 1
-    Waiting for address autoconfiguration...
 
 The slot number should have changed from after the application reboots.
 You can do the publish-notify sequence several times to verify this.
@@ -466,11 +494,9 @@ For the suit_update to work there are important modules that aren't normally bui
 in a RIOT application:
 
 * riotboot
-    * riotboot_hdr
-* riotboot_slot
+    * riotboot_flashwrite
 * suit
-    * suit_coap
-    * suit_v4
+    * suit_transport_coap
 
 #### riotboot
 
@@ -492,20 +518,20 @@ The flash memory will be divided in the following way:
 The riotboot part of the flash will not be changed during suit_updates but
 be flashed a first time with at least one slot with suit_capable fw.
 
-    $ BOARD=samr21-xpro make -C examples/suit_update clean riotboot/flash
+    $ BOARD=samr21-xpro make -C examples/suit_update clean flash
 
-When calling make with the riotboot/flash argument it will flash the bootloader
+When calling make with the `flash` argument it will flash the bootloader
 and then to slot0 a copy of the firmware you intend to build.
 
 New images must be of course written to the inactive slot, the device mist be able
 to boot from the previous image in case the update had some kind of error, eg:
 the image corresponds to the wrong slot.
 
-The active/inactive coap resources is used so the publisher can send a manifest
-built for the inactive slot.
-
-On boot the bootloader will check the riotboot_hdr and boot on the newest
+On boot the bootloader will check the `riotboot_hdr` and boot on the newest
 image.
+
+`riotboot_flashwrite` module is needed to be able to write the new firmware to
+the inactive slot.
 
 riotboot is not supported by all boards. The default board is `samr21-xpro`,
 but any board supporting `riotboot`, `flashpage` and with 256kB of flash should
@@ -516,7 +542,7 @@ be able to run the demo.
 The suit module encloses all the other suit_related module. Formally this only
 includes the `sys/suit` directory into the build system dirs.
 
-- **suit_coap**
+- **suit_transport_coap**
 
 To enable support for suit_updates over coap a new thread is created.
 This thread will expose 4 suit related resources:
@@ -533,9 +559,9 @@ When a new manifest url is received on the trigger resource a message is resent
 to the coap thread with the manifest's url. The thread will then fetch the
 manifest by a block coap request to the specified url.
 
-- **support for v4**
+- **support for v3**
 
-This includes v4 manifest support. When a url is received in the /suit/trigger
+This includes v3 manifest support. When a url is received in the /suit/trigger
 coap resource it will trigger a coap blockwise fetch of the manifest. When this
 manifest is received it will be parsed. The signature of the manifest will be
 verified and then the rest of the manifest content. If the received manifest is valid it
@@ -610,20 +636,19 @@ The following variables are defined in makefiles/suit.inc.mk:
 
 The following convention is used when naming a manifest
 
-    SUIT_MANIFEST ?= $(BINDIR_APP)-riot.suitv4.$(APP_VER).bin
-    SUIT_MANIFEST_LATEST ?= $(BINDIR_APP)-riot.suitv4.latest.bin
-    SUIT_MANIFEST_SIGNED ?= $(BINDIR_APP)-riot.suitv4_signed.$(APP_VER).bin
-    SUIT_MANIFEST_SIGNED_LATEST ?= $(BINDIR_APP)-riot.suitv4_signed.latest.bin
+    SUIT_MANIFEST ?= $(BINDIR_APP)-riot.suitv3.$(APP_VER).bin
+    SUIT_MANIFEST_LATEST ?= $(BINDIR_APP)-riot.suitv3.latest.bin
+    SUIT_MANIFEST_SIGNED ?= $(BINDIR_APP)-riot.suitv3_signed.$(APP_VER).bin
+    SUIT_MANIFEST_SIGNED_LATEST ?= $(BINDIR_APP)-riot.suitv3_signed.latest.bin
 
 The following default values are using for generating the manifest:
 
-    SUIT_VENDOR ?= RIOT
-    SUIT_VERSION ?= $(APP_VER)
+    SUIT_VENDOR ?= "riot-os.org"
+    SUIT_SEQNR ?= $(APP_VER)
     SUIT_CLASS ?= $(BOARD)
     SUIT_KEY ?= default
     SUIT_KEY_DIR ?= $(RIOTBASE)/keys
-    SUIT_SEC ?= $(SUIT_KEY_DIR)/$(SUIT_KEY)
-    SUIT_PUB ?= $(SUIT_KEY_DIR)/$(SUIT_KEY).pub
+    SUIT_SEC ?= $(SUIT_KEY_DIR)/$(SUIT_KEY).pem
 
 All files (both slot binaries, both manifests, copies of manifests with
 "latest" instead of `$APP_VER` in riotboot build) are copied into the folder
@@ -640,7 +665,7 @@ The following recipes are defined in makefiles/suit.inc.mk:
 suit/manifest: creates a non signed and signed manifest, and also a latest tag for these.
     It uses following parameters:
 
-    - $(SUIT_KEY): name of keypair to sign the manifest
+    - $(SUIT_KEY): name of key to sign the manifest
     - $(SUIT_COAP_ROOT): coap root address
     - $(SUIT_CLASS)
     - $(SUIT_VERSION)

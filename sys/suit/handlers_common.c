@@ -11,7 +11,10 @@
  * @{
  *
  * @file
- * @brief       SUIT handler implementations for the Common manifest sections
+ * @brief       SUIT handler implementations for the manifest Common sections
+ *
+ * This file contains functions to handle the common info sections of a manifest.
+ * This includes components, dependencies and command sequences.
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  *
@@ -92,8 +95,8 @@ int _common_sequence_handler(suit_manifest_t *manifest, int key,
     (void)key;
     LOG_DEBUG("Starting conditional sequence handler\n");
     return suit_handle_manifest_structure_bstr(manifest, it,
-                                               suit_sequence_handlers,
-                                               suit_sequence_handlers_len);
+                                               suit_command_sequence_handlers,
+                                               suit_command_sequence_handlers_len);
 }
 
 /* begin{code-style-ignore} */

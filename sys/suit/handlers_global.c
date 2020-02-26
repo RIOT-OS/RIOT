@@ -13,6 +13,8 @@
  * @file
  * @brief       SUIT handlers for the global SUIT manifest content.
  *
+ * This file includes the implementation of the SUIT manifest content.
+ *
  * @author      Koen Zandberg <koen@bergzand.net>
  *
  * @}

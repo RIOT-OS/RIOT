@@ -11,7 +11,10 @@
  * @{
  *
  * @file
- * @brief       SUIT handlers for the SUIT envelope container
+ * @brief       SUIT handlers for the SUIT outer wrapper
+ *
+ * This file contains the handlers for the content of the SUIT outer wrapper.
+ * This includes the authentication wrapper and the manifest itself.
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  *

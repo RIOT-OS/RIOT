@@ -12,7 +12,10 @@
  *
  * @file
  * @brief       SUIT Handlers for the command sequences in the common section of
- *              a SUIT manifest
+ *              a SUIT manifest.
+ *
+ * This file contains the functions to handle command sequences from a SUIT
+ * manifest. This includes both directives and conditions.
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  *
@@ -134,8 +137,8 @@ static int _dtv_run_seq_cond(suit_manifest_t *manifest,
     (void)key;
     LOG_DEBUG("Starting conditional sequence handler\n");
     return suit_handle_manifest_structure_bstr(manifest, it,
-                                               suit_sequence_handlers,
-                                               suit_sequence_handlers_len);
+                                               suit_command_sequence_handlers,
+                                               suit_command_sequence_handlers_len);
 }
 
 static int _dtv_try_each(suit_manifest_t *manifest,
@@ -156,8 +159,8 @@ static int _dtv_try_each(suit_manifest_t *manifest,
         /* `_container` should be CBOR _bstr wrapped according to the spec, but
          * it is not */
         res = suit_handle_manifest_structure(manifest, &_container,
-                                             suit_sequence_handlers,
-                                             suit_sequence_handlers_len);
+                                             suit_command_sequence_handlers,
+                                             suit_command_sequence_handlers_len);
 
         nanocbor_skip(&container);
 
@@ -321,7 +324,7 @@ static int _dtv_verify_image_match(suit_manifest_t *manifest, int key,
 }
 
 /* begin{code-style-ignore} */
-const suit_manifest_handler_t suit_sequence_handlers[] = {
+const suit_manifest_handler_t suit_command_sequence_handlers[] = {
     [SUIT_COND_VENDOR_ID]        = _cond_vendor_handler,
     [SUIT_COND_CLASS_ID]         = _cond_class_handler,
     [SUIT_COND_IMAGE_MATCH]      = _dtv_verify_image_match,
@@ -335,4 +338,4 @@ const suit_manifest_handler_t suit_sequence_handlers[] = {
 };
 /* end{code-style-ignore} */
 
-const size_t suit_sequence_handlers_len = ARRAY_SIZE(suit_sequence_handlers);
+const size_t suit_command_sequence_handlers_len = ARRAY_SIZE(suit_command_sequence_handlers);

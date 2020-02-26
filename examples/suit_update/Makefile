@@ -44,10 +44,7 @@ QUIET ?= 1
 #
 
 USEMODULE += nanocoap_sock sock_util
-USEMODULE += suit suit_coap
-
-# SUIT draft v4 support:
-USEMODULE += suit_v4
+USEMODULE += suit suit_transport_coap
 
 # Display a progress bar during firmware download
 USEMODULE += progress_bar
@@ -96,6 +93,10 @@ TEST_EXTRA_FILES += $(SLOT_RIOT_ELFS) $(SUIT_SEC) $(SUIT_PUB)
 # For now `examples/%/tests" still rely on the test applicaton being reset after
 # a terminal is opened to synchronize.
 TESTRUNNER_RESET_AFTER_TERM ?= 1
+
+# This can be removed as soon as the Pi-fleet runners support an Openssl version
+# with ed25519 support.
+TEST_ON_CI_BLACKLIST = all
 
 include $(RIOTBASE)/Makefile.include
 

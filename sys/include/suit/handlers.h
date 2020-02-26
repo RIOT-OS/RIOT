@@ -127,12 +127,12 @@ extern const size_t suit_global_handlers_len;
 /**
  * @brief SUIT sequence handler reference
  */
-extern const suit_manifest_handler_t suit_sequence_handlers[];
+extern const suit_manifest_handler_t suit_command_sequence_handlers[];
 
 /**
  * @brief SUIT sequence handler length
  */
-extern const size_t suit_sequence_handlers_len;
+extern const size_t suit_command_sequence_handlers_len;
 
 /**
  * @brief SUIT container handlers reference
@@ -185,7 +185,7 @@ int suit_handle_manifest_structure(suit_manifest_t *manifest,
  * @param   handlers        Array of SUIT manifest handlers to use
  * @param   handlers_len    Length of the SUIT manifest handlers
  *
- * @returns     SUIT_OK if all handlers executed succesfully
+ * @returns     SUIT_OK if all handlers executed successfully
  * @returns     negative on error, see @ref suit_v3_error_t
  */
 int suit_handle_manifest_structure_bstr(suit_manifest_t *manifest,
