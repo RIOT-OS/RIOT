@@ -91,12 +91,9 @@ PSEUDOMODULES += stdin
 PSEUDOMODULES += stdio_ethos
 PSEUDOMODULES += stdio_cdc_acm
 PSEUDOMODULES += stdio_uart_rx
-PSEUDOMODULES += suit_%
+PSEUDOMODULES += suit_transport_%
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += zptr
-
-# handle suit_v4 being a distinct module
-NO_PSEUDOMODULES += suit_v4
 
 # print ascii representation in function od_hex_dump()
 PSEUDOMODULES += od_string
