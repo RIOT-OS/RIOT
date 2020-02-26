@@ -29,6 +29,16 @@
 #include "periph/spi.h"
 
 #ifdef MODULE_MTD
+static const mtd_spi_nor_params_t _pinetime_nor_params = {
+    .opcode = &mtd_spi_nor_opcode_default,
+    .clk = PINETIME_NOR_SPI_CLK,
+    .flag = PINETIME_NOR_FLAGS,
+    .spi = PINETIME_NOR_SPI_DEV,
+    .mode = PINETIME_NOR_SPI_MODE,
+    .cs = PINETIME_NOR_SPI_CS,
+    .addr_width = 3,
+};
+
 static mtd_spi_nor_t pinetime_nor_dev = {
     .base = {
         .driver = &mtd_spi_nor_driver,
@@ -36,13 +46,7 @@ static mtd_spi_nor_t pinetime_nor_dev = {
         .pages_per_sector = PINETIME_NOR_PAGES_PER_SECTOR,
         .sector_count = PINETIME_NOR_SECTOR_COUNT,
     },
-    .flag = PINETIME_NOR_FLAGS,
-    .opcode = &mtd_spi_nor_opcode_default,
-    .spi = PINETIME_NOR_SPI_DEV,
-    .cs = PINETIME_NOR_SPI_CS,
-    .addr_width = 3,
-    .mode = PINETIME_NOR_SPI_MODE,
-    .clk = PINETIME_NOR_SPI_CLK,
+    .params = &_pinetime_nor_params,
 };
 
 mtd_dev_t *mtd0 = (mtd_dev_t *)&pinetime_nor_dev;
