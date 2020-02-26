@@ -76,11 +76,45 @@ extern "C" {
 #define PUF_SRAM_ATTRIBUTES __attribute__((used, section(".noinit")))
 
 /**
- * @brief   Stack size used for the exception (ISR) stack
+ * @brief   Stack size used for the undefined instruction interrupt stack
  * @{
  */
-extern unsigned __stack_irq_size;
-#define ISR_STACKSIZE                   ((unsigned) &__stack_irq_size)
+#define UND_STACKSIZE                   (4)
+/** @} */
+
+/**
+ * @brief   Stack size used for the abort interrupt stack
+ * @{
+ */
+#define ABT_STACKSIZE                   (4)
+/** @} */
+
+/**
+ * @brief   Stack size used for the interrupt (ISR) stack
+ * @{
+ */
+#define ISR_STACKSIZE                   (400)
+/** @} */
+
+/**
+ * @brief   Stack size used for the fast interrupt (FIQ) stack
+ * @{
+ */
+#define FIQ_STACKSIZE                   (64)
+/** @} */
+
+/**
+ * @brief   Stack size used for the supervisor mode (SVC) stack
+ * @{
+ */
+#define SVC_STACKSIZE                   (400)
+/** @} */
+
+/**
+ * @brief   Stack size used for the user mode/kernel init stack
+ * @{
+ */
+#define USR_STACKSIZE                   (4096)
 /** @} */
 
 /**
