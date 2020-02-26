@@ -35,6 +35,18 @@ extern "C" {
 #endif
 
 /**
+ * @brief   6LoWPAN compression context lifetime for configured prefixes in
+ *          minutes
+ *
+ * Must be between 1 and 255
+ *
+ * @see     [RFC 6775, section 4.2](https://tools.ietf.org/html/rfc6775#section-4.2)
+ */
+#ifndef CONFIG_GNRC_DHCPV6_CLIENT_6LBR_6LO_CTX_MIN
+#define CONFIG_GNRC_DHCPV6_CLIENT_6LBR_6LO_CTX_MIN  (60U)
+#endif
+
+/**
  * @brief   Use static routes to upstream router
  *
  * If set the border router will be configured to have a default route via

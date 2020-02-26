@@ -13,6 +13,14 @@ config GNRC_DHCPV6_CLIENT_6LBR_UPSTREAM
     help
         Leave 0 to let the client pick the first non-6LoWPAN interface it finds
 
+config GNRC_DHCPV6_CLIENT_6LBR_6LO_CTX_MIN
+    int "6LoWPAN compression context lifetime for configured prefixes in minutes"
+    default 60
+    range 1 255
+    help
+        @see [RFC 6775, section 4.2](https://tools.ietf.org/html/rfc6775#section-4.2)
+
+
 config GNRC_DHCPV6_CLIENT_6LBR_STATIC_ROUTE
     bool "Use static routes to upstream interface"
     help
