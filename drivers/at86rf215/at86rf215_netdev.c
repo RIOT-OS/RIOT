@@ -176,6 +176,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _set_state(at86rf215_t *dev, netopt_state_t state)
 {
+    at86rf215_block_while_busy(dev);
+
     switch (state) {
         case NETOPT_STATE_STANDBY:
             at86rf215_set_idle_from_rx(dev, CMD_RF_TRXOFF);

@@ -237,17 +237,21 @@ static void _block_while_busy(at86rf215_t *dev)
     gpio_irq_enable(dev->params.int_pin);
 }
 
+void at86rf215_block_while_busy(at86rf215_t *dev)
+{
+    if (_tx_ongoing(dev)) {
+        DEBUG("[at86rf215] Block while TXing\n");
+        _block_while_busy(dev);
+    }
+}
+
 int at86rf215_tx_prepare(at86rf215_t *dev)
 {
     if (dev->state == AT86RF215_STATE_SLEEP) {
         return -EAGAIN;
     }
 
-    if (_tx_ongoing(dev)) {
-        DEBUG("[at86rf215] Block while TXing\n");
-        _block_while_busy(dev);
-    }
-
+    at86rf215_block_while_busy(dev);
     dev->tx_frame_len = IEEE802154_FCS_LEN;
 
     return 0;
