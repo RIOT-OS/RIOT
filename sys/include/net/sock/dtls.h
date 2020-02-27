@@ -618,6 +618,10 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
  * @note Function may block until a session is created if there is no
  *       existing session with @p remote.
  *
+ * @note Initiating a session through this function will require
+ * @ref sock_dtls_recv() called from another thread to receive the handshake
+ * messages.
+ *
  * @return The number of bytes sent on success
  * @return  -EADDRINUSE, if sock_dtls_t::udp_sock has no local end-point.
  * @return  -EAFNOSUPPORT, if `remote->ep != NULL` and
