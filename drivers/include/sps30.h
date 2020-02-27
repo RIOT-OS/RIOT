@@ -7,9 +7,10 @@
  */
 
 /**
- * @defgroup    drivers_sps30 Sensirion SPS30 Particulate Matter Sensor
+ * @defgroup    drivers_sps30 SPS30 Particulate Matter Sensor
  * @ingroup     drivers_sensors
  * @ingroup     drivers_saul
+ * @brief       Driver for the Sensirion SPS30 Particulate Matter Sensor
  *
  * About
  * =====
