@@ -99,6 +99,7 @@ enum {
     UNIT_DBM,       /**< decibel-milliwatts */
     UNIT_COULOMB,   /**< coulomb */
     UNIT_F,         /**< Farad */
+    UNIT_OHM,       /**< Ohm */
     /* electrochemical */
     UNIT_PH,        /**< pH  */
     /* pressure */

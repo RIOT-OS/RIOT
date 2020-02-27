@@ -127,6 +127,7 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_F:        return "F";
         case UNIT_PH:       return "pH";
         case UNIT_CPM3:     return "#/m^3";
+        case UNIT_OHM:      return "ohm";
 
         default:            return "";
     }
