@@ -9,8 +9,7 @@
  */
 
 /**
- * @defgroup    drivers_bmx280 BMP280/BME280 temperature, pressure and humidity
- *                             sensor
+ * @defgroup    drivers_bmx280 BMP280/BME280 temperature, pressure and humidity sensor
  * @ingroup     drivers_sensors
  * @brief       Device driver interface for the Bosch BMP280 and BME280 sensors
  *
