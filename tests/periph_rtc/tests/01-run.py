@@ -8,7 +8,7 @@
 
 import os
 import sys
-from testrunner import run
+#from testrunner import run
 
 
 BOARD = os.getenv('BOARD', 'native')
@@ -45,11 +45,12 @@ def testfunc(child):
     if BOARD != 'native':
         for _ in range(alarm_count):
             child.expect(r'\[[0-9]+\] Alarm! after [0-9]+ microseconds \(error'
-                         r' ([0-9]+) microseconds\)')
-            eus = int(child.match.group(1))
+                         r' (\-)*([0-9]+) microseconds\)')
+            eus = int(child.match.group(2))
             assert abs(eus) <= 100, \
                 "Error ({}us) out of range, alarm_count={}".format(eus, _)
 
 
 if __name__ == "__main__":
+    assert abs(-378) <= 100
     sys.exit(run(testfunc))
