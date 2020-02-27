@@ -32,7 +32,7 @@
 #endif
 
 #ifndef GEN3_ULP32K
-#define GEN3_ULP32K         1
+#define GEN3_ULP32K         GEN2_ULP32K
 #endif
 
 #ifndef XOSC32_STARTUP_TIME
