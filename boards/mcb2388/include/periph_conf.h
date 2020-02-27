@@ -101,6 +101,33 @@ static const adc_conf_t adc_config[] = {
 };
 
 #define ADC_NUMOF           (1)
+
+/**
+ * @name I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev        = I2C0,
+        .speed      = I2C_SPEED_NORMAL,
+        .irq_prio   = 5,
+        .pinsel_sda = 1,
+        .pinsel_scl = 1,
+        .pinsel_msk_sda = BIT22,        /* P0.27 */
+        .pinsel_msk_scl = BIT24,        /* P0.28 */
+    },
+    {
+        .dev        = I2C1,
+        .speed      = I2C_SPEED_NORMAL,
+        .irq_prio   = 5,
+        .pinsel_sda = 1,
+        .pinsel_scl = 1,
+        .pinsel_msk_sda = BIT6 | BIT7,  /* P0.19 */
+        .pinsel_msk_scl = BIT8 | BIT9,  /* P0.20 */
+    },
+};
+
+#define I2C_NUMOF           (2)
 /** @} */
 
 #ifdef __cplusplus

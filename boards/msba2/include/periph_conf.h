@@ -155,6 +155,25 @@ static const adc_conf_t adc_config[] = {
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
+/**
+ * @name I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {   /* JP3 */
+        .dev        = I2C2,
+        .speed      = I2C_SPEED_NORMAL,
+        .irq_prio   = 5,
+        .pinsel_sda = 0,
+        .pinsel_scl = 0,
+        .pinsel_msk_sda = BIT21, /* P0.10 */
+        .pinsel_msk_scl = BIT23, /* P0.11 */
+    },
+};
+
+/* used in arithmetic preprocessor expression, so no ARRAY_SIZE() */
+#define I2C_NUMOF           (1)
+/** @} */
 
 #ifdef __cplusplus
 }
