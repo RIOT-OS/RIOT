@@ -7,7 +7,8 @@
  */
 
 /**
- * @defgroup    drivers_at24mac unique ID chip
+ * @defgroup    drivers_at24mac AT24MAC unique ID chip
+ * @ingroup     drivers_misc
  * @brief       Device driver interface for the AT24MAC I2C chip
  * @{
  *
