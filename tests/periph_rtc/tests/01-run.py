@@ -8,7 +8,7 @@
 
 import os
 import sys
-#from testrunner import run
+from testrunner import run
 
 
 BOARD = os.getenv('BOARD', 'native')
@@ -52,5 +52,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    assert abs(-378) <= 100
     sys.exit(run(testfunc))
