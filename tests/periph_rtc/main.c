@@ -103,9 +103,10 @@ int main(void)
     while (1) {
         mutex_lock(&rtc_mtx);
         uint32_t now_usecs = xtimer_now_usec();
-        printf("[%" PRIu32 "] Alarm! after %" PRIu32 " microseconds (error %" PRId32 " microseconds)\n",
-           now_usecs,
-           now_usecs - start_usecs,
+        printf("[%" PRIu32 "] Alarm! after %" PRIu32 " microseconds "
+            "(error %" PRId32 " microseconds)\n",
+            now_usecs,
+            now_usecs - start_usecs,
            (int32_t)now_usecs - alarm_expected_usecs);
         if (++cnt < REPEAT) {
             struct tm time;
