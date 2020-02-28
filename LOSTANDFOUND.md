@@ -48,6 +48,18 @@ Reasons for removal:
 - Not maintained anymore
 - Not used in GNRC
 
+### boards/chronos [f7ef85d6559eb421d3ddf313c5ad4e5c3c10c64c]
+Author(s):
+- Oliver Hahm <oliver.hahm@inria.fr>
+- Kaspar Schleiser <kaspar@schleiser.de>
+
+Reason for removal:
+- board is quite outdated
+- board cannot be automatically tested for lack of UART
+- board has many special cases, which hurt upgrade to msp430-elf-gcc 9.x
+- the onboard radio has been unsupported for a while
+- noone seems to use the board, noone seems to maintain it
+
 ### sys/net/gnrc/application_layer/tftp [0e2a62078850e1ecc74db2db4d639cf2d8fb96d3]
 Author:
 - DipSwitch <dipswitch@ownage4u.nl>
