@@ -161,7 +161,11 @@ static int _msg_wait(msg_t *m, msg_t *tmsg, xtimer_t *t)
     }
 }
 
-int _xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout_ticks) {
+int _xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout_ticks)
+{
+    if (msg_try_receive(m) == 1) {
+        return 1;
+    }
     msg_t tmsg;
     xtimer_t t;
     _setup_timer_msg(&tmsg, &t);
@@ -171,6 +175,9 @@ int _xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout_ticks) {
 
 int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout_ticks)
 {
+    if (msg_try_receive(msg) == 1) {
+        return 1;
+    }
     msg_t tmsg;
     xtimer_t t;
     _setup_timer_msg(&tmsg, &t);
