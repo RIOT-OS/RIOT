@@ -98,7 +98,7 @@ static int _write(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
 
     ssize_t res = sock_udp_send(sock->udp_sock, buf, len, &remote);
     if (res < 0) {
-        DEBUG("sock_dtls: failed to send DTLS record: %zd\n", res);
+        DEBUG("sock_dtls: failed to send DTLS record: %d\n", (int)res);
     }
     return res;
 }
@@ -287,7 +287,7 @@ int sock_dtls_session_create(sock_dtls_t *sock, const sock_udp_ep_t *ep,
     DEBUG("sock_dtls: starting handshake\n");
     res = dtls_connect(sock->dtls_ctx, &remote->dtls_session);
     if (res < 0) {
-        DEBUG("sock_dtls: error establishing a session: %zd\n", res);
+        DEBUG("sock_dtls: error establishing a session: %d\n", (int)res);
         return -ENOMEM;
     }
     else if (res == 0) {
@@ -301,7 +301,7 @@ int sock_dtls_session_create(sock_dtls_t *sock, const sock_udp_ep_t *ep,
         res = sock_udp_recv(sock->udp_sock, rcv_buffer, sizeof(rcv_buffer),
                             DTLS_HANDSHAKE_TIMEOUT, &remote->ep);
         if (res <= 0) {
-            DEBUG("sock_dtls: error receiving handshake messages: %zd\n", res);
+            DEBUG("sock_dtls: error receiving handshake messages: %d\n", (int)res);
             /* deletes peer created in dtls_connect() */
             dtls_peer_t *peer = dtls_get_peer(sock->dtls_ctx,
                                               &remote->dtls_session);
@@ -397,7 +397,7 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
         ssize_t res = sock_udp_recv(sock->udp_sock, data, max_len, timeout,
                                     &remote->ep);
         if (res <= 0) {
-            DEBUG("sock_dtls: error receiving UDP packet: %zd\n", res);
+            DEBUG("sock_dtls: error receiving UDP packet: %d\n", (int)res);
             return res;
         }
 
