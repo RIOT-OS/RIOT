@@ -70,22 +70,26 @@ void phydat_dump(phydat_t *data, uint8_t dim)
             printf("[%u] ", (unsigned int)i);
         }
         else {
-            printf("     ");
+            printf("    ");
         }
         if (scale_prefix) {
-            printf("%6d %c", (int)data->val[i], scale_prefix);
+            printf("%11d %c", (int)data->val[i], scale_prefix);
         }
         else if (data->scale == 0) {
-            printf("%6d", (int)data->val[i]);
+            printf("%11d ", (int)data->val[i]);
         }
-        else if ((data->scale > -5) && (data->scale < 0)) {
-            char num[8];
+        else if ((data->scale > -6) && (data->scale < 0)) {
+            char num[9];
             size_t len = fmt_s16_dfp(num, data->val[i], data->scale);
+            assert(len < 9);
             num[len] = '\0';
-            printf("%s", num);
+            printf("%11s ", num);
         }
         else {
-            printf("%iE%i", (int)data->val[i], (int)data->scale);
+            char num[12];
+            snprintf(num, sizeof(num), "%ie%i",
+                     (int)data->val[i], (int)data->scale);
+            printf("%11s ", num);
         }
 
         printf("%s\n", phydat_unit_to_str(data->unit));
