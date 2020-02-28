@@ -53,10 +53,10 @@ typedef uint32_t gpio_t;
 /** @} */
 
 /**
- * @name    Power management configuration
+ * @name    Power mode configuration
  * @{
  */
-#define PROVIDES_PM_SET_LOWEST_CORTEXM
+#define PM_NUM_MODES        (4)
 /** @} */
 
 /**
