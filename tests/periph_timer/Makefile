@@ -16,6 +16,7 @@ BOARDS_TIMER_32kHz := \
     hifive1 \
     hifive1b \
     %-kw41z \
+    openlabs-kw41z-mini \
     frdm-k64f \
     frdm-k22f \
     #
