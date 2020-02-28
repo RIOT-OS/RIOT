@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "assert.h"
 #include "fmt.h"
 #include "phydat.h"
 
@@ -31,6 +32,20 @@ void phydat_dump(phydat_t *data, uint8_t dim)
         return;
     }
     printf("Data:");
+
+    if (data->unit == UNIT_TIME) {
+        assert(dim == 3);
+        printf("\t%02d:%02d:%02d\n",
+               data->val[2], data->val[1], data->val[0]);
+        return;
+    }
+    if (data->unit == UNIT_DATE) {
+        assert(dim == 3);
+        printf("\t%04d-%02d-%02d\n",
+               data->val[2], data->val[1], data->val[0]);
+        return;
+    }
+
     for (uint8_t i = 0; i < dim; i++) {
         char scale_prefix;
 
