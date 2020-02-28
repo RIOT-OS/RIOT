@@ -29,7 +29,7 @@
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
 
-#ifdef RIOT_VERSION
+#ifdef MODULE_FMT
 #include "fmt.h"
 #endif
 
@@ -63,7 +63,7 @@ int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *por
 
 #if defined(SOCK_HAS_IPV6)
     if ((endpoint->family == AF_INET6) && endpoint->netif) {
-#ifdef RIOT_VERSION
+#ifdef MODULE_FMT
         char *tmp = addr_str + strlen(addr_str);
         *tmp++ = '%';
         tmp += fmt_u16_dec(tmp, endpoint->netif);
