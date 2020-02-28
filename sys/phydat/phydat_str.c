@@ -97,6 +97,7 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_GS:       return "Gs";
         case UNIT_BAR:      return "Bar";
         case UNIT_PA:       return "Pa";
+        case UNIT_PERMILL:  return "permille";
         case UNIT_PPM:      return "ppm";
         case UNIT_PPB:      return "ppb";
         case UNIT_CD:       return "cd";
