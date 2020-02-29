@@ -82,6 +82,20 @@ IOTLAB_ARCHI_wsn430-v1_3b   = wsn430:cc1101
 IOTLAB_ARCHI_wsn430-v1_4    = wsn430:cc2420
 IOTLAB_ARCHI := $(IOTLAB_ARCHI_$(BOARD))
 
+# There are several deprecated and incompatible features used here that were
+# introduced between versions 2 and 3 of the IoT-LAB cli tools.
+# For backward compatibility, we manage these changes here.
+_CLI_TOOLS_MAJOR_VERSION ?= $(shell iotlab-experiment --version | cut -f1 -d.)
+ifeq (2,$(_CLI_TOOLS_MAJOR_VERSION))
+  _NODES_DEPLOYED = $(shell iotlab-experiment --jmespath='deploymentresults."0"' --format='" ".join' get $(_IOTLAB_EXP_ID) --print)
+  _NODES_LIST_OPTION = --resources
+  _NODES_FLASH_OPTION = --update
+else
+  _NODES_DEPLOYED = $(shell iotlab-experiment --jmespath='"0"' --format='" ".join' get $(_IOTLAB_EXP_ID) --deployment)
+  _NODES_LIST_OPTION = --nodes
+  _NODES_FLASH_OPTION = --flash
+endif
+
 # Try detecting the node automatically
 #  * It takes the first working node that match BOARD
 #    * Check correctly deployed nodes with 'deploymentresults == "0"'
@@ -92,11 +106,10 @@ ifneq (,$(filter auto auto-ssh,$(IOTLAB_NODE)))
     $(error Could not find 'archi' for $(BOARD), update mapping in $(lastword $(MAKEFILE_LIST)))
   endif
 
-  _NODES_DEPLOYED = $(shell iotlab-experiment --jmespath='deploymentresults."0"' --format='" ".join' get $(_IOTLAB_EXP_ID) --print)
   ifeq (auto,$(IOTLAB_NODE))
     _NODES_DEPLOYED := $(filter %.$(shell hostname).iot-lab.info, $(_NODES_DEPLOYED))
   endif
-  _NODES_FOR_BOARD = $(shell iotlab-experiment --jmespath="items[?archi=='$(IOTLAB_ARCHI)'].network_address" --format='" ".join' get $(_IOTLAB_EXP_ID) --resources)
+  _NODES_FOR_BOARD = $(shell iotlab-experiment --jmespath="items[?archi=='$(IOTLAB_ARCHI)'].network_address" --format='" ".join' get $(_IOTLAB_EXP_ID) $(_NODES_LIST_OPTION))
 
   _IOTLAB_NODE := $(word $(IOTLAB_NODE_AUTO_NUM),$(filter $(_NODES_DEPLOYED),$(_NODES_FOR_BOARD)))
   ifeq (auto,$(IOTLAB_NODE))
@@ -160,7 +173,7 @@ ifneq (iotlab-a8-m3,$(BOARD))
   FLASHER     = iotlab-node
   RESET       = iotlab-node
   _NODE_FMT   = --jmespath='keys(@)[0]' --format='int'
-  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) --update $(FLASHFILE) | $(_STDIN_EQ_0)
+  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) $(_NODES_FLASH_OPTION) $(FLASHFILE) | $(_STDIN_EQ_0)
   RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) --reset | $(_STDIN_EQ_0)
 
   ifeq (,$(_IOTLAB_ON_FRONTEND))
