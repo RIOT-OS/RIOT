@@ -32,6 +32,8 @@ static void *alarm_arg;
 static rtt_cb_t overflow_cb = NULL;
 static void *overflow_arg;
 
+static uint32_t rtt_offset = 0;
+
 static inline void _rtt_irq_enable(void)
 {
     NVIC_SetPriority(SM_TIMER_ALT_IRQn, RTT_IRQ_PRIO);
@@ -60,12 +62,22 @@ void rtt_init(void)
     rtt_poweron();
 }
 
+static inline uint32_t _rtt_get_counter(void)
+{
+    return ((SMWDTHROSC_ST0 & 0xFF)
+         | ((SMWDTHROSC_ST1 & 0xFF) << 8)
+         | ((SMWDTHROSC_ST2 & 0xFF) << 16)
+         | ((SMWDTHROSC_ST3 & 0xFF) << 24));
+}
+
 uint32_t rtt_get_counter(void)
 {
-    return ((SMWDTHROSC_ST0 & 0xFF) |
-            ((SMWDTHROSC_ST1 & 0xFF) << 8) |
-            ((SMWDTHROSC_ST2 & 0xFF) << 16) |
-            ((SMWDTHROSC_ST3 & 0xFF) << 24));
+    return _rtt_get_counter() - rtt_offset;
+}
+
+void rtt_set_counter(uint32_t counter)
+{
+    rtt_offset = _rtt_get_counter() + counter;
 }
 
 void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
@@ -73,6 +85,8 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     assert(cb && !(alarm & ~RTT_MAX_VALUE));
 
     unsigned irq = irq_disable();
+
+    alarm += rtt_offset;
 
     /* set alarm value */
     while (!(SMWDTHROSC_STLOAD & SMWDTHROSC_STLOAD_STLOAD_MASK)) {}
@@ -103,10 +117,10 @@ void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
 
     /* set threshold to RTT_MAX_VALUE */
     while (!(SMWDTHROSC_STLOAD & SMWDTHROSC_STLOAD_STLOAD_MASK)) {}
-    SMWDTHROSC_ST3 = (RTT_MAX_VALUE >> 24) & 0xFF;
-    SMWDTHROSC_ST2 = (RTT_MAX_VALUE >> 16) & 0xFF;
-    SMWDTHROSC_ST1 = (RTT_MAX_VALUE >>  8) & 0xFF;
-    SMWDTHROSC_ST0 = RTT_MAX_VALUE & 0xFF;
+    SMWDTHROSC_ST3 = (rtt_offset >> 24) & 0xFF;
+    SMWDTHROSC_ST2 = (rtt_offset >> 16) & 0xFF;
+    SMWDTHROSC_ST1 = (rtt_offset >>  8) & 0xFF;
+    SMWDTHROSC_ST0 =  rtt_offset & 0xFF;
 
     /* set callback*/
     overflow_cb = cb;
