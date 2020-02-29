@@ -209,7 +209,12 @@ void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
 __attribute__((weak)) void heap_stats(void)
 {
     struct mallinfo minfo = mallinfo();
-    long int heap_size = &_eheap - &_sheap;
+    long int heap_size = 0;
+
+    for (unsigned int i = 0; i < NUM_HEAPS; i++) {
+        heap_size += heaps[i].end - heaps[i].start;
+    }
+
     printf("heap: %ld (used %d, free %ld) [bytes]\n",
            heap_size, minfo.uordblks, heap_size - minfo.uordblks);
 }
