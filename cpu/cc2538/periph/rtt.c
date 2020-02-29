@@ -24,6 +24,9 @@
 #include "cpu.h"
 #include "periph/rtt.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 #define SMWDTHROSC_STLOAD_STLOAD_MASK  (0x00000001)
 
 /* allocate memory for alarm and overflow callbacks + args */
@@ -34,6 +37,11 @@ static void *overflow_arg;
 
 static uint32_t rtt_alarm;
 static uint32_t rtt_offset;
+
+static enum {
+    RTT_ALARM,
+    RTT_OVERFLOW
+} rtt_next_alarm;
 
 static inline void _rtt_irq_enable(void)
 {
@@ -78,7 +86,23 @@ uint32_t rtt_get_counter(void)
 
 void rtt_set_counter(uint32_t counter)
 {
+    rtt_alarm -= rtt_offset;
     rtt_offset = _rtt_get_counter() + counter;
+    rtt_alarm += rtt_offset;
+
+    /* re-set the overflow callback */
+    if (overflow_cb) {
+        rtt_set_overflow_cb(overflow_cb, overflow_arg);
+    }
+}
+
+static void _set_alarm(uint32_t alarm)
+{
+    while (!(SMWDTHROSC_STLOAD & SMWDTHROSC_STLOAD_STLOAD_MASK)) {}
+    SMWDTHROSC_ST3 = (alarm >> 24) & 0xFF;
+    SMWDTHROSC_ST2 = (alarm >> 16) & 0xFF;
+    SMWDTHROSC_ST1 = (alarm >>  8) & 0xFF;
+    SMWDTHROSC_ST0 = alarm & 0xFF;
 }
 
 void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
@@ -86,21 +110,21 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     assert(cb && !(alarm & ~RTT_MAX_VALUE));
 
     unsigned irq = irq_disable();
-
-    alarm += rtt_offset;
-
-    /* set alarm value */
-    while (!(SMWDTHROSC_STLOAD & SMWDTHROSC_STLOAD_STLOAD_MASK)) {}
-    SMWDTHROSC_ST3 = (alarm >> 24) & 0xFF;
-    SMWDTHROSC_ST2 = (alarm >> 16) & 0xFF;
-    SMWDTHROSC_ST1 = (alarm >>  8) & 0xFF;
-    SMWDTHROSC_ST0 = alarm & 0xFF;
-
-    rtt_alarm = alarm;
+    rtt_alarm = alarm + rtt_offset;
 
     /* set callback*/
     alarm_cb = cb;
     alarm_arg = arg;
+
+    DEBUG("rtt_set_alarm(%lu), alarm in %lu ticks, overflow in %lu ticks\n",
+          alarm, rtt_alarm - _rtt_get_counter(),
+          rtt_offset - _rtt_get_counter());
+
+    /* only set overflow alarm if it happens before the scheduled alarm */
+    if (overflow_cb == NULL || (rtt_offset >= rtt_alarm )) {
+        rtt_next_alarm = RTT_ALARM;
+        _set_alarm(rtt_alarm);
+    }
 
     irq_restore(irq);
 }
@@ -123,16 +147,15 @@ void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
 {
     unsigned irq = irq_disable();
 
-    /* set threshold to RTT_MAX_VALUE */
-    while (!(SMWDTHROSC_STLOAD & SMWDTHROSC_STLOAD_STLOAD_MASK)) {}
-    SMWDTHROSC_ST3 = (rtt_offset >> 24) & 0xFF;
-    SMWDTHROSC_ST2 = (rtt_offset >> 16) & 0xFF;
-    SMWDTHROSC_ST1 = (rtt_offset >>  8) & 0xFF;
-    SMWDTHROSC_ST0 =  rtt_offset & 0xFF;
-
     /* set callback*/
     overflow_cb = cb;
     overflow_arg = arg;
+
+    /* only set overflow alarm if it happens before the scheduled alarm */
+    if (alarm_cb == NULL || (rtt_alarm > rtt_offset)) {
+        rtt_next_alarm = RTT_OVERFLOW;
+        _set_alarm(rtt_offset);
+    }
 
     irq_restore(irq);
 }
@@ -148,17 +171,40 @@ void rtt_clear_overflow_cb(void)
 
 void isr_sleepmode(void)
 {
-    if (alarm_cb) {
+    rtt_cb_t tmp;
+    bool both = (rtt_alarm == rtt_offset);
+
+    switch (rtt_next_alarm) {
+    case RTT_ALARM:
         /* 'consume' the callback (as it might be set again in the cb) */
-        rtt_cb_t tmp = alarm_cb;
+        tmp = alarm_cb;
         alarm_cb = NULL;
         tmp(alarm_arg);
-    }
-    else if (overflow_cb) {
+
+        if (!both) {
+            break;
+        } /* fall-through */
+    case RTT_OVERFLOW:
         /* 'consume' the callback (as it might be set again in the cb) */
-        rtt_cb_t tmp = overflow_cb;
+        tmp = overflow_cb;
         overflow_cb = NULL;
         tmp(overflow_arg);
+        break;
     }
+
+    if (alarm_cb && (rtt_offset >= rtt_alarm)) {
+        DEBUG("rtt: next alarm in %lu ticks (RTT)\n",
+              rtt_alarm - _rtt_get_counter());
+
+        rtt_next_alarm = RTT_ALARM;
+        _set_alarm(rtt_alarm);
+    } else if (overflow_cb && (rtt_alarm > rtt_offset)) {
+        DEBUG("rtt: next alarm in %lu ticks (OVERFLOW)\n",
+               rtt_offset - _rtt_get_counter());
+
+        rtt_next_alarm = RTT_OVERFLOW;
+        _set_alarm(rtt_offset);
+    }
+
     cortexm_isr_end();
 }
