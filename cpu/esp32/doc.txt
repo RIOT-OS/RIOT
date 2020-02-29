@@ -9,7 +9,7 @@
 /**
 @defgroup   cpu_esp32 ESP32
 @ingroup    cpu
-@brief      Implementation for Espressif ESP32 MCUs
+@brief      Implementation for Espressif ESP32 SoCs
 @author     Gunar Schorcht <gunar@schorcht.net>
 
 \section esp32_riot  RIOT-OS on ESP32 boards
