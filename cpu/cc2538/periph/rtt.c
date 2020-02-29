@@ -32,7 +32,8 @@ static void *alarm_arg;
 static rtt_cb_t overflow_cb = NULL;
 static void *overflow_arg;
 
-static uint32_t rtt_offset = 0;
+static uint32_t rtt_alarm;
+static uint32_t rtt_offset;
 
 static inline void _rtt_irq_enable(void)
 {
@@ -95,11 +96,18 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     SMWDTHROSC_ST1 = (alarm >>  8) & 0xFF;
     SMWDTHROSC_ST0 = alarm & 0xFF;
 
+    rtt_alarm = alarm;
+
     /* set callback*/
     alarm_cb = cb;
     alarm_arg = arg;
 
     irq_restore(irq);
+}
+
+uint32_t rtt_get_alarm(void)
+{
+    return rtt_alarm - rtt_offset;
 }
 
 void rtt_clear_alarm(void)
