@@ -136,7 +136,7 @@ int rtc_set_time(struct tm *ttime)
     _rtc_time_set = _rtc_get_time_raw();
     _rtc_time_set_us = _rtc_time_to_us(_rtc_time_set);
 
-    _sys_time_set = mktime(ttime);
+    _sys_time_set = rtc_mktime(ttime);
     _sys_time_set_us = system_get_time_64();
     _sys_time_off_us = 0;
 
@@ -148,31 +148,18 @@ int rtc_set_time(struct tm *ttime)
 
 int rtc_get_time(struct tm *ttime)
 {
-    time_t _sys_time = _sys_get_time();
+    rtc_localtime(_sys_get_time(), ttime);
 
     DEBUG("%s sys_time=%ld rtc_time=%lld rtc_time_us=%lld\n", __func__,
-          _sys_time, _rtc_get_time_raw(), _rtc_time_to_us(_rtc_get_time_raw()));
+          _sys_get_time(), _rtc_get_time_raw(), _rtc_time_to_us(_rtc_get_time_raw()));
 
-    struct tm* _time = localtime(&_sys_time);
-    if (_time) {
-        memcpy(ttime, _time, sizeof(struct tm));
-        return 0;
-    }
-    else {
-        return -1;
-    }
+    return 0;
 }
 
 int rtc_get_alarm(struct tm *time)
 {
-    struct tm* _time = localtime(&_sys_alarm_time);
-    if (_time) {
-        memcpy(time, _time, sizeof(struct tm));
-        return 0;
-    }
-    else {
-        return -1;
-    }
+    rtc_localtime(_sys_alarm_time, time);
+    return 0;
 }
 
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
@@ -181,7 +168,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     _rtc_alarm_arg = arg;
 
     /* determine the offset of alarm time to the set time in seconds */
-    _sys_alarm_time = mktime(time);
+    _sys_alarm_time = rtc_mktime(time);
     time_t _sys_time_offset = _sys_alarm_time - _sys_time_set;
 
 #if MODULE_ESP_RTC_TIMER
