@@ -19,8 +19,8 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
+#ifndef CPU_CONF_COMMON_H
+#define CPU_CONF_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,5 +30,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
+#endif /* CPU_CONF_COMMON_H */
 /** @} */

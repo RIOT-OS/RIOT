@@ -23,6 +23,8 @@
 #define CPU_CONF_H
 
 #include <stdint.h>
+
+#include "cpu_conf_common.h"
 #include "esp_common_log.h"
 #include "xtensa_conf.h"
 #include "xtensa/xtensa_context.h"
