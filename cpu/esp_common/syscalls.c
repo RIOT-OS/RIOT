@@ -332,13 +332,6 @@ unsigned int IRAM_ATTR get_free_heap_size(void)
     return &_eheap - &_sheap - minfo.uordblks;
 }
 
-void heap_stats(void)
-{
-    ets_printf("heap: %u (used %u, free %u) [bytes]\n",
-               &_eheap - &_sheap, &_eheap - &_sheap - get_free_heap_size(),
-               get_free_heap_size());
-}
-
 /* alias for compatibility with espressif/wifi_libs */
 uint32_t esp_get_free_heap_size( void ) __attribute__((alias("get_free_heap_size")));
 

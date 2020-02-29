@@ -22,6 +22,16 @@
 #ifndef CPU_CONF_COMMON_H
 #define CPU_CONF_COMMON_H
 
+/**
+ * @brief   Declare the heap_stats function as available
+ *
+ * Only if module esp_idf_heap is used, a platform specific heap_stats function
+ * has to be used.
+ */
+#ifdef MODULE_ESP_IDF_HEAP
+#define HAVE_HEAP_STATS
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
