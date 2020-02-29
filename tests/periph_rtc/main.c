@@ -60,11 +60,11 @@ static void cb(void *arg)
 int main(void)
 {
     struct tm time = {
-        .tm_year = 2011 - TM_YEAR_OFFSET,   /* years are counted from 1900 */
-        .tm_mon  = 11,                      /* 0 = January, 11 = December */
-        .tm_mday = 13,
-        .tm_hour = 14,
-        .tm_min  = 15,
+        .tm_year = 2020 - TM_YEAR_OFFSET,   /* years are counted from 1900 */
+        .tm_mon  =  1,                      /* 0 = January, 11 = December */
+        .tm_mday = 28,
+        .tm_hour = 23,
+        .tm_min  = 59,
         .tm_sec  = 57
     };
 
