@@ -41,6 +41,20 @@ SECTIONS
     _rtc_data_end = ABSOLUTE(.);
   } > rtc_slow_seg
 
+  /* This section holds data that should not be initialized at power up
+     and will be retained during deep sleep. The section located in
+     RTC SLOW Memory area. User data marked with RTC_NOINIT_ATTR will be placed
+     into this section. See the file "esp_attr.h" for more information.
+  */
+  .rtc.noinit (NOLOAD):
+  {
+    . = ALIGN(4);
+    _rtc_noinit_start = ABSOLUTE(.);
+    *(.rtc_noinit .rtc_noinit.*)
+    . = ALIGN(4) ;
+    _rtc_noinit_end = ABSOLUTE(.);
+  } > rtc_slow_seg
+
   /* Send .iram0 code to iram */
   .iram0.vectors :
   {
@@ -142,6 +156,22 @@ SECTIONS
     _data_end = ABSOLUTE(.);
     . = ALIGN(4);
   } >dram0_0_seg
+
+  /* This section holds data that should not be initialized at power up.
+     The section located in Internal SRAM memory region. The macro _NOINIT
+     can be used as attribute to place data into this section.
+     See the esp_attr.h file for more information.
+  */
+  .noinit (NOLOAD):
+  {
+    . = ALIGN(4);
+    _noinit_start = ABSOLUTE(.);
+    __noinit_start = ABSOLUTE(.);
+    *(.noinit .noinit.*)
+    . = ALIGN(4) ;
+    _noinit_end = ABSOLUTE(.);
+    __noinit_end = ABSOLUTE(.);
+  } > dram0_0_seg
 
   /* Shared RAM */
   .dram0.bss (NOLOAD) :
