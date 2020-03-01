@@ -90,9 +90,9 @@ SECTIONS
     *(.iram1 .iram1.*)
 
     *libhal.a:(.literal .text .literal.* .text.*)
-    *libgcc.a:lib2funcs.o(.literal .text .literal.* .text.*)
+    *libgcc.a:(.literal .text .literal.* .text.*)
     *libgcov.a:(.literal .text .literal.* .text.*)
-    /* *libc.a:(.literal .text .literal.* .text.*) */
+    *libc.a:*(.literal .text .literal.* .text.*)
 
     /* Xtensa basic functionality written in assembler should be placed in iram */
     *xtensa.a:*(.literal .text .literal.* .text.*)
