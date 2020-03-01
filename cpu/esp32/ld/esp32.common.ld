@@ -111,6 +111,7 @@ SECTIONS
 
     /* part of the RIOT port that should run in IRAM */
     *cpu.a:*(.literal .text .literal.* .text.*)
+    *esp_common.a:*(.literal .text .literal.* .text.*)
     *periph.a:*(.literal .text .literal.* .text.*)
     *mtd.a:**(.literal .text .literal.* .text.*)
 
