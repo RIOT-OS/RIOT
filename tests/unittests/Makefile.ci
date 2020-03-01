@@ -63,6 +63,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l433rc \
     nz32-sc151 \
     opencm904 \
+    openlabs-kw41z-mini-256kib \
     pba-d-01-kw2x \
     samd21-xpro \
     saml10-xpro \

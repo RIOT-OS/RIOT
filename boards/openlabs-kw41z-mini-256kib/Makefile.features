@@ -1,0 +1,2 @@
+CPU_MODEL = mkw41z256vht4
+include $(RIOTBOARD)/openlabs-kw41z-mini/Makefile.features
