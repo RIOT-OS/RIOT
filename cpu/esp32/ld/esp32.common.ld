@@ -103,8 +103,10 @@ SECTIONS
     *core.a:*(.literal .text .literal.* .text.*)
     *littlefs.a:*(.literal .text .literal.* .text.*)
     *littlefs2.a:*(.literal .text .literal.* .text.*)
+    *newlib_syscalls_default.a:*(.literal .text .literal.* .text.*)
     *spiffs_fs.a:*(.literal .text .literal.* .text.*)
     *spiffs.a:*(.literal .text .literal.* .text.*)
+    *syscalls.o(.literal .text .literal.* .text.*)
     *vfs.a:*(.literal .text .literal.* .text.*)
 
     /* part of the RIOT port that should run in IRAM */
