@@ -29,7 +29,7 @@
 #include "net/bluetil/ad.h"
 #include "net/bluetil/addr.h"
 
-#ifndef MODULE_NIMBLE_AUTOCONN
+#if !IS_USED(MODULE_NIMBLE_AUTOCONN) && !IS_USED(MODULE_NIMBLE_STATCONN)
 #include "nimble_scanlist.h"
 #include "nimble_scanner.h"
 #endif
@@ -38,7 +38,7 @@
 #define DEFAULT_SCAN_DURATION       (500U)      /* 500ms */
 #define DEFAULT_CONN_TIMEOUT        (500U)      /* 500ms */
 
-#ifndef MODULE_NIMBLE_AUTOCONN
+#if !IS_USED(MODULE_NIMBLE_AUTOCONN) && !IS_USED(MODULE_NIMBLE_STATCONN)
 static const char *_name_to_connect = NULL;
 
 static void _scan_for_name(uint8_t type, const ble_addr_t *addr, int8_t rssi,
@@ -194,7 +194,7 @@ static void _cmd_info(void)
     puts("");
 }
 
-#ifndef MODULE_NIMBLE_AUTOCONN
+#if !IS_USED(MODULE_NIMBLE_AUTOCONN) && !IS_USED(MODULE_NIMBLE_STATCONN)
 static void _cmd_adv(const char *name)
 {
     int res;
@@ -366,7 +366,7 @@ static int _ishelp(char *argv)
 
 void sc_nimble_netif_init(void)
 {
-#ifndef MODULE_NIMBLE_AUTOCONN
+#if !IS_USED(MODULE_NIMBLE_AUTOCONN) && !IS_USED(MODULE_NIMBLE_STATCONN)
     /* setup the scanning environment */
     nimble_scanlist_init();
 
@@ -378,7 +378,7 @@ void sc_nimble_netif_init(void)
 int _nimble_netif_handler(int argc, char **argv)
 {
     if ((argc == 1) || _ishelp(argv[1])) {
-#ifndef MODULE_NIMBLE_AUTOCONN
+#if !IS_USED(MODULE_NIMBLE_AUTOCONN) && !IS_USED(MODULE_NIMBLE_STATCONN)
         printf("usage: %s [help|info|adv|scan|connect|close|update]\n", argv[0]);
 #else
         printf("usage: %s [help|info|close|update]\n", argv[0]);
@@ -389,7 +389,7 @@ int _nimble_netif_handler(int argc, char **argv)
         _cmd_info();
     }
 
-#ifndef MODULE_NIMBLE_AUTOCONN
+#if !IS_USED(MODULE_NIMBLE_AUTOCONN) && !IS_USED(MODULE_NIMBLE_STATCONN)
     else if (memcmp(argv[1], "adv", 3) == 0) {
         char *name = NULL;
         if (argc > 2) {
