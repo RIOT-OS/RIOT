@@ -33,11 +33,11 @@ fi
 
 for file in ${FILES}; do
     echo "Checking ${file} ..."
-    URL_LINES=`cat ${file} | grep -noP "(?=https|http)[^ )\]\"]+"`
+    URL_LINES=`cat ${file} | grep -noP "(?=https|http)[^ )\]>\"]+"`
     for url_line in $URL_LINES; do
-        url=`echo "$url_line" | grep -oP "(?=https|http)[^ )\]\"]+"`
+        url=`echo "$url_line" | grep -oP "(?=https|http)[^ )\]>\"]+"`
         line=`echo "$url_line" | cut -d ':' -f1`
-        wget --spider --tries=1 --quiet $url
+        wget -4 --spider --tries=1 --quiet $url
         if [ $? != 0 ]; then
             echo "Invalid URL in ${file}:${line} ${url}"
         fi
