@@ -184,7 +184,7 @@ void nimble_netif_eventcb(nimble_netif_eventcb_t cb);
  * @param[in] addr          address of the advertising BLE slave, in the NimBLE
  *                          addr format (little endian)
  * @param[in] conn_params   connection (timing) parameters
- * @param[in] timeout       connect timeout
+ * @param[in] timeout       connect timeout [in ms]
  *
  * @return  the used connection handle on success
  * @return  NIMBLE_NETIF_BUSY if already connected to the given address or if
