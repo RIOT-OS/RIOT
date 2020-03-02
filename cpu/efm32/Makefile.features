@@ -4,6 +4,7 @@ include $(RIOTCPU)/efm32/efm32-features.mk
 CPU_ARCH = $(EFM32_ARCHITECTURE)
 
 FEATURES_PROVIDED += arch_efm32
+FEATURES_PROVIDED += cortexm_mpu
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_raw
