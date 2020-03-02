@@ -117,6 +117,10 @@
 /sys/usb/                                   @bergzand @dylad @aabadie
 /sys/xtimer/                                @kaspar030 @MichelRottleuthner
 
+/sys/include/ztimer.h                       @kaspar030 @bergzand
+/sys/include/ztimer/                        @kaspar030 @bergzand
+/sys/ztimer/                                @kaspar030 @bergzand
+
 /tests/                                     @smlng @leandrolanzieri @aabadie @MichelRottleuthner @fjmolinas
 /tests/emb6*                                @miri64
 /tests/gnrc*                                @miri64
