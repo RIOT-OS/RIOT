@@ -393,6 +393,39 @@ static inline void sam0_cortexm_sleep(int deep)
 void gpio_disable_mux(gpio_t pin);
 
 /**
+ * @brief   Available voltage regulators on the supply controller.
+ */
+typedef enum {
+    SAM0_VREG_LDO,  /*< LDO, always available but not very power efficient */
+    SAM0_VREG_BUCK  /*< Buck converter, efficient but may clash with internal
+                        fast clock generators (see errata sheets) */
+} sam0_supc_t;
+
+/**
+ * @brief       Switch the internal voltage regulator used for generating the
+ *              internal MCU voltages.
+ *              Available options are:
+ *
+ *               - LDO: not very efficient, but will always work
+ *               - BUCK converter: Most efficient, but incompatible with the
+ *                 use of DFLL or DPLL.
+ *                 Please refer to the errata sheet, further restrictions may
+ *                 apply depending on the MCU.
+ *
+ * @param[in]   src
+ */
+static inline void sam0_set_voltage_regulator(sam0_supc_t src)
+{
+#ifdef REG_SUPC_VREG
+    SUPC->VREG.bit.SEL = src;
+    while (!SUPC->STATUS.bit.VREGRDY) {}
+#else
+    (void) src;
+    assert(0);
+#endif
+}
+
+/**
  * @brief   Returns the frequency of a GCLK provider.
  *
  * @param[in] id    The ID of the GCLK
