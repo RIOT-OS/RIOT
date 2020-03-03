@@ -36,7 +36,7 @@ if [ -z "${FILES}" ]; then
     exit
 fi
 
-URL_REGEX='(?=https|http)[^ )\]>\"]+'
+URL_REGEX='(?=https://|http://)[^ )\]>\"]+'
 
 for file in ${FILES}; do
     echo "Checking ${file} ..."
