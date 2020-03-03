@@ -8,34 +8,34 @@
  */
 
 /**
- * @ingroup     boards_remote-reva
+ * @ingroup     boards_common_remote
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the RE-Mote board revision A
+ * @brief       Common default clock configuration for the RE-Mote board revision A
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Antonio Lignan <alinan@zolertia.com>
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
-
-#include "cfg_adc_default.h"
-#include "cfg_clk_default.h"
-#include "cfg_i2c_default.h"
-#include "cfg_spi_default.h"
-#include "cfg_timer_default.h"
-#include "cfg_uart_default.h"
+#ifndef CFG_CLK_DEFAULT_H
+#define CFG_CLK_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @name Clock system configuration
+ * @{
+ */
+#define CLOCK_CORECLOCK     (32000000U) /* 32MHz */
+/** @} */
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H */
+#endif /* CFG_CLK_DEFAULT_H */
 /** @} */
