@@ -10,8 +10,14 @@ IOTLAB_EXP_NAME     ?= RIOT_EXP
 IOTLAB_DEBUG_PORT   ?= 3333
 IOTLAB_DEBUG_NODE   ?= $(shell iotlab-experiment get -i $(IOTLAB_EXP_ID) --resources | \
                          grep -m 1 "network_address" | sed 's/.*-\([0-9]*\)\..*/\1/')
-
 IOTLAB_AUTHORITY    = "$(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info"
+
+ifeq (,$(filter iotlab-exp,$(MAKECMDGOALS)))
+  # derive experiment site from IOTLAB_EXP_ID, if not given and not used with
+  # `iotlab_exp`
+  IOTLAB_SITE     ?= $(shell iotlab-experiment --format=str --jmespath "keys(items[0])[0]" \
+                             get -ri -i $(IOTLAB_EXP_ID))
+endif
 
 ifneq (,$(findstring m3,$(IOTLAB_TYPE)))
   BINARY := $(ELFFILE)
@@ -49,18 +55,19 @@ iotlab-exp: $(IOTLAB_AUTH) all
 	$(Q)iotlab-experiment wait -i $(NEW_ID)
 
     ifdef IOTLAB_LOGGING
-	  $(Q)ssh -t $(IOTLAB_AUTHORITY) "tmux new -d -s riot-$(NEW_ID)\
+	  $(Q)ssh -t $(IOTLAB_AUTHORITY) \
+      "$(if $(IOTLAB_TMUX),tmux new -d -s riot-$(NEW_ID),) \
 	  'script -fac "'"'"serial_aggregator -i $(NEW_ID)"'"'"\
 	   RIOT_LOG-$(IOTLAB_EXP_NAME)-$(NEW_ID)'"
     endif
 
-iotlab-flash: $(IOTLAB_AUTH) iotlab-check-exp all
+iotlab-flash: $(IOTLAB_AUTH) all
 	$(Q)iotlab-node --update $(BINARY) -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE) $(EXCLUDE_PARAM)
 
-iotlab-reset: $(IOTLAB_AUTH) iotlab-check-exp
+iotlab-reset: $(IOTLAB_AUTH)
 	$(Q)iotlab-node --reset -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE) $(EXCLUDE_PARAM)
 
-iotlab-debug-server: $(IOTLAB_AUTH) iotlab-check-exp
+iotlab-debug-server: $(IOTLAB_AUTH)
 	$(eval DEBUG_TYPE := $(shell echo $(IOTLAB_TYPE) | cut -d: -f1))
 	$(eval DEBUG_NODE := $(shell echo $(IOTLAB_DEBUG_NODE) | sed 's/$(DEBUG_TYPE)-\([0-9]*\)/\1/'))
 
@@ -68,18 +75,19 @@ iotlab-debug-server: $(IOTLAB_AUTH) iotlab-check-exp
 	@echo "Debug on node $(IOTLAB_DEBUG_NODE)"
 	$(Q)ssh -N -L $(IOTLAB_DEBUG_PORT):$(IOTLAB_DEBUG_NODE):3333 $(IOTLAB_AUTHORITY)
 
-iotlab-stop: $(IOTLAB_AUTH) iotlab-check-exp
+iotlab-stop: $(IOTLAB_AUTH)
 	$(Q)iotlab-experiment stop -i $(IOTLAB_EXP_ID)
 
-iotlab-term: iotlab-check-exp
-	$(Q)ssh -t $(IOTLAB_AUTHORITY) "iotlab-experiment get -r > /dev/null || \
+# wait for flash if it is provided e.g. with `make iotlab-flash iotlab-term`
+IOTLABTERMFLASHDEPS ?= $(filter iotlab-flash iotlab-exp,$(MAKECMDGOALS))
+
+iotlab-term: $(IOTLABTERMFLASHDEPS)
+	$(Q)ssh -t $(IOTLAB_AUTHORITY) "iotlab-experiment get -r -i $(IOTLAB_EXP_ID) > /dev/null || \
 	                                iotlab-auth -u $(IOTLAB_USER)"
 
 	$(Q)ssh -t $(IOTLAB_AUTHORITY) \
-	"tmux attach -t riot-$(IOTLAB_EXP_ID) || tmux new -s riot-$(IOTLAB_EXP_ID) \
-	'$(if $(IOTLAB_LOGGING), \
+	"$(if $(IOTLAB_TMUX),tmux attach -t riot-$(IOTLAB_EXP_ID) || tmux new -s riot-$(IOTLAB_EXP_ID) ',) \
+	$(if $(IOTLAB_LOGGING), \
 	script -fac "'"'"serial_aggregator -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE)"'"'" \
 	RIOT_LOG-$(IOTLAB_EXP_NAME)-$(IOTLAB_EXP_ID), \
-	serial_aggregator -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE))'"
-
-iotlab-check-exp: IOTLAB_SITE ?= $(shell iotlab-experiment get -ri -i $(IOTLAB_EXP_ID) | sed -n 4p | cut -d\" -f2)
+	serial_aggregator -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE))$(if $(IOTLAB_TMUX),',)"
