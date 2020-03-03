@@ -5,4 +5,3 @@ OPENOCD_ADAPTER_INIT ?= -c 'source [find interface/ftdi/iotlab-usb.cfg]'
 ifneq (,$(DEBUG_ADAPTER_ID))
   OPENOCD_ADAPTER_INIT += -c 'ftdi_serial $(DEBUG_ADAPTER_ID)'
 endif
-export OPENOCD_ADAPTER_INIT

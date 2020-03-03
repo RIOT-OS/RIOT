@@ -4,4 +4,3 @@ OPENOCD_ADAPTER_INIT ?= -c 'source [find interface/cmsis-dap.cfg]'
 ifneq (,$(DEBUG_ADAPTER_ID))
   OPENOCD_ADAPTER_INIT += -c 'cmsis_dap_serial $(DEBUG_ADAPTER_ID)'
 endif
-export OPENOCD_ADAPTER_INIT
