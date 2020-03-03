@@ -64,7 +64,8 @@ static ipv6_addr_t _prefix;
 static bool _ctx_match(const gnrc_sixlowpan_ctx_t *ctx,
                        const ipv6_addr_t *prefix, uint8_t prefix_len)
 {
-    return (ctx->prefix_len == prefix_len) &&
+    return (ctx != NULL) &&
+           (ctx->prefix_len == prefix_len) &&
            (ipv6_addr_match_prefix(&ctx->prefix, prefix) >= prefix_len);
 }
 
