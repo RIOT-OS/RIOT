@@ -7,7 +7,7 @@ ifneq (, $(filter enc28j60, $(USEMODULE)))
 
     # avoid multiple definitions when package depenedencies are resolved recursively
     ifndef ENC28J60_PARAM_DEFINED
-        export ENC28J60_PARAM_DEFINED = 1
+        ENC28J60_PARAM_DEFINED = 1
 
         # default definitions
         ENC28J60_PARAM_SPI   ?= SPI_DEV\(0\)
@@ -33,7 +33,7 @@ ifneq (, $(filter mrf24j40, $(USEMODULE)))
 
     # avoid multiple definitions when package depenedencies are resolved recursively
     ifndef MRF24J40_PARAM_DEFINED
-        export MRF24J40_PARAM_DEFINED = 1
+        MRF24J40_PARAM_DEFINED = 1
 
         # default definitions
         MRF24J40_PARAM_SPI     = SPI_DEV\(0\)

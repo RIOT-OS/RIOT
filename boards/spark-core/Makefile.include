@@ -11,7 +11,7 @@ FLASHFILE ?= $(BINFILE)
 FFLAGS = -d 1d50:607f -a 0 -s 0x08005000:leave -D $(FLASHFILE)
 
 # Skip the space needed by the embedded bootloader
-export ROM_OFFSET ?= 0x5000
+ROM_OFFSET ?= 0x5000
 
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk
