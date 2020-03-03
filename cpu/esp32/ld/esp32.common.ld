@@ -104,9 +104,9 @@ SECTIONS
     *(.iram1 .iram1.*)
 
     *libhal.a:(.literal .text .literal.* .text.*)
-    *libgcc.a:lib2funcs.o(.literal .text .literal.* .text.*)
+    *libgcc.a:(.literal .text .literal.* .text.*)
     *libgcov.a:(.literal .text .literal.* .text.*)
-    /* *libc.a:(.literal .text .literal.* .text.*) */
+    *libc.a:*(.literal .text .literal.* .text.*)
 
     /* Xtensa basic functionality written in assembler should be placed in iram */
     *xtensa.a:*(.literal .text .literal.* .text.*)
@@ -117,12 +117,15 @@ SECTIONS
     *core.a:*(.literal .text .literal.* .text.*)
     *littlefs.a:*(.literal .text .literal.* .text.*)
     *littlefs2.a:*(.literal .text .literal.* .text.*)
+    *newlib_syscalls_default.a:*(.literal .text .literal.* .text.*)
     *spiffs_fs.a:*(.literal .text .literal.* .text.*)
     *spiffs.a:*(.literal .text .literal.* .text.*)
+    *syscalls.o(.literal .text .literal.* .text.*)
     *vfs.a:*(.literal .text .literal.* .text.*)
 
     /* part of the RIOT port that should run in IRAM */
     *cpu.a:*(.literal .text .literal.* .text.*)
+    *esp_common.a:*(.literal .text .literal.* .text.*)
     *periph.a:*(.literal .text .literal.* .text.*)
     *mtd.a:**(.literal .text .literal.* .text.*)
 
