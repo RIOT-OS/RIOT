@@ -27,10 +27,15 @@
 #include "mtd_spi_nor.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
+#include "timex.h"
 
 #ifdef MODULE_MTD
 static const mtd_spi_nor_params_t _pinetime_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,
+    .wait_chip_erase = 9LU * US_PER_SEC,
+    .wait_32k_erase = 160LU *US_PER_MS,
+    .wait_sector_erase = 70LU * US_PER_MS,
+    .wait_4k_erase = 70LU * US_PER_MS,
     .clk = PINETIME_NOR_SPI_CLK,
     .flag = PINETIME_NOR_FLAGS,
     .spi = PINETIME_NOR_SPI_DEV,
