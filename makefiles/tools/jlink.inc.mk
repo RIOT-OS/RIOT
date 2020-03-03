@@ -15,3 +15,6 @@ JLINK_SERIAL ?= $(DEBUG_ADAPTER_ID)
 # Export JLINK_SERIAL to required targets
 JLINK_TARGETS = debug% flash% reset term-rtt
 $(call target-export-variables,$(JLINK_TARGETS),JLINK_SERIAL)
+
+# Export JLINK_DEVICE to required targets
+$(call target-export-variables,$(JLINK_TARGETS),JLINK_DEVICE)
