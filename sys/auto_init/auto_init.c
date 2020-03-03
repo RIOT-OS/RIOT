@@ -24,88 +24,6 @@
 #include "auto_init.h"
 #include "log.h"
 
-#ifdef MODULE_MCI
-#include "diskio.h"
-#endif
-
-#ifdef MODULE_AUTO_INIT_XTIMER
-#include "xtimer.h"
-#endif
-
-#ifdef MODULE_AUTO_INIT_GNRC_SIXLOWPAN
-#include "net/gnrc/sixlowpan.h"
-#endif
-
-#ifdef MODULE_AUTO_INIT_GNRC_IPV6
-#include "net/gnrc/ipv6.h"
-#endif
-
-#ifdef MODULE_L2_PING
-#include "l2_ping.h"
-#endif
-
-#ifdef MODULE_AUTO_INIT_GNRC_PKTBUF
-#include "net/gnrc/pktbuf.h"
-#endif
-
-#ifdef MODULE_AUTO_INIT_GNRC_PKTDUMP
-#include "net/gnrc/pktdump.h"
-#endif
-
-#ifdef MODULE_AUTO_INIT_GNRC_UDP
-#include "net/gnrc/udp.h"
-#endif
-
-#ifdef MODULE_AUTO_INIT_GNRC_TCP
-#include "net/gnrc/tcp.h"
-#endif
-
-#ifdef MODULE_LWIP
-#include "lwip.h"
-#endif
-
-#ifdef MODULE_OPENTHREAD
-#include "ot.h"
-#endif
-
-#ifdef MODULE_FIB
-#include "net/fib.h"
-#endif
-
-#ifdef MODULE_GCOAP
-#include "net/gcoap.h"
-#endif
-
-#ifdef MODULE_AUTO_INIT_GNRC_IPV6_NIB
-#include "net/gnrc/ipv6/nib.h"
-#endif
-
-#ifdef MODULE_SKALD
-#include "net/skald.h"
-#endif
-
-#ifdef MODULE_NDN_RIOT
-#include "ndn-riot/ndn.h"
-#endif
-
-#ifdef MODULE_ASYMCUTE
-#include "net/asymcute.h"
-#endif
-
-#ifdef MODULE_SOCK_DTLS
-#include "net/sock/dtls.h"
-#endif
-
-#ifdef MODULE_SCHEDSTATISTICS
-#include "schedstatistics.h"
-#endif
-
-#ifdef MODULE_TEST_UTILS_INTERACTIVE_SYNC
-#if !defined(MODULE_SHELL_COMMANDS) || !defined(MODULE_SHELL)
-#include "test_utils/interactive_sync.h"
-#endif
-#endif
-
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -113,15 +31,17 @@ void auto_init(void)
 {
 #ifdef MODULE_AUTO_INIT_RANDOM
     LOG_DEBUG("Auto init random.\n");
-    void auto_init_random(void);
+    extern void auto_init_random(void);
     auto_init_random();
 #endif
 #ifdef MODULE_AUTO_INIT_XTIMER
     LOG_DEBUG("Auto init xtimer.\n");
+    extern void xtimer_init(void);
     xtimer_init();
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
     LOG_DEBUG("Auto init schedstatistics.\n");
+    extern void init_schedstatistics(void);
     init_schedstatistics();
 #endif
 #ifdef MODULE_EVENT_THREAD
@@ -131,6 +51,7 @@ void auto_init(void)
 #endif
 #ifdef MODULE_MCI
     LOG_DEBUG("Auto init mci.\n");
+    extern void mci_initialize(void);
     mci_initialize();
 #endif
 #ifdef MODULE_PROFILING
@@ -140,30 +61,37 @@ void auto_init(void)
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_PKTBUF
     LOG_DEBUG("Auto init gnrc_pktbuf.\n");
+    extern void gnrc_pktbuf_init(void);
     gnrc_pktbuf_init();
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_PKTDUMP
     LOG_DEBUG("Auto init gnrc_pktdump.\n");
+    extern void gnrc_pktdump_init(void);
     gnrc_pktdump_init();
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_SIXLOWPAN
     LOG_DEBUG("Auto init gnrc_sixlowpan.\n");
+    extern void gnrc_sixlowpan_init(void);
     gnrc_sixlowpan_init();
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_IPV6
     LOG_DEBUG("Auto init gnrc_ipv6.\n");
+    extern void gnrc_ipv6_init(void);
     gnrc_ipv6_init();
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_UDP
     LOG_DEBUG("Auto init gnrc_udp.\n");
+    extern void gnrc_udp_init(void);
     gnrc_udp_init();
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_TCP
     LOG_DEBUG("Auto init gnrc_tcp.\n");
+    extern void gnrc_tcp_init(void);
     gnrc_tcp_init();
 #endif
 #ifdef MODULE_AUTO_INIT_LWIP
     LOG_DEBUG("Bootstraping lwIP.\n");
+    extern void lwip_bootstrap(void);
     lwip_bootstrap();
 #endif
 #ifdef MODULE_OPENTHREAD
@@ -174,6 +102,7 @@ void auto_init(void)
 #ifdef MODULE_GCOAP
     if (!IS_ACTIVE(CONFIG_GCOAP_NO_AUTO_INIT)) {
         LOG_DEBUG("Auto init gcoap.\n");
+        extern void gcoap_init(void);
         gcoap_init();
     }
 #endif
@@ -184,10 +113,12 @@ void auto_init(void)
 #endif
 #ifdef MODULE_AUTO_INIT_GNRC_IPV6_NIB
     LOG_DEBUG("Auto init gnrc_ipv6_nib.\n");
+    extern void gnrc_ipv6_nib_init(void);
     gnrc_ipv6_nib_init();
 #endif
 #ifdef MODULE_SKALD
     LOG_DEBUG("Auto init Skald.\n");
+    extern void skald_init(void);
     skald_init();
 #endif
 #ifdef MODULE_CORD_COMMON
@@ -202,6 +133,7 @@ void auto_init(void)
 #endif
 #ifdef MODULE_ASYMCUTE
     LOG_DEBUG("Auto init Asymcute.\n");
+    extern void asymcute_handler_run(void);
     asymcute_handler_run();
 #endif
 #ifdef MODULE_NIMBLE
@@ -216,6 +148,7 @@ void auto_init(void)
 #endif
 #ifdef MODULE_SOCK_DTLS
     LOG_DEBUG("Auto init sock_dtls.\n");
+    extern void sock_dtls_init(void);
     sock_dtls_init();
 #endif
 
@@ -363,6 +296,7 @@ void auto_init(void)
 /* initialize NDN module after the network devices are initialized */
 #ifdef MODULE_NDN_RIOT
     LOG_DEBUG("Auto init NDN.\n");
+    extern void ndn_init(void);
     ndn_init();
 #endif
 
@@ -650,6 +584,7 @@ void auto_init(void)
 
 #ifdef MODULE_TEST_UTILS_INTERACTIVE_SYNC
 #if !defined(MODULE_SHELL_COMMANDS) || !defined(MODULE_SHELL)
+    extern void test_utils_interactive_sync(void);
     test_utils_interactive_sync();
 #endif
 #endif /* MODULE_TEST_UTILS_INTERACTIVE_SYNC */
