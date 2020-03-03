@@ -16,6 +16,7 @@
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  * @}
  */
 #include <stdint.h>
@@ -24,142 +25,12 @@
 #include "auto_init.h"
 #include "log.h"
 
-void auto_init(void)
-{
-#ifdef MODULE_AUTO_INIT_RANDOM
-    LOG_DEBUG("Auto init random.\n");
-    extern void auto_init_random(void);
-    auto_init_random();
-#endif
-#ifdef MODULE_AUTO_INIT_XTIMER
-    LOG_DEBUG("Auto init xtimer.\n");
-    extern void xtimer_init(void);
-    xtimer_init();
-#endif
-#ifdef MODULE_SCHEDSTATISTICS
-    LOG_DEBUG("Auto init schedstatistics.\n");
-    extern void init_schedstatistics(void);
-    init_schedstatistics();
-#endif
-#ifdef MODULE_EVENT_THREAD
-    LOG_DEBUG("Auto init event threads.\n");
-    extern void auto_init_event_thread(void);
-    auto_init_event_thread();
-#endif
-#ifdef MODULE_MCI
-    LOG_DEBUG("Auto init mci.\n");
-    extern void mci_initialize(void);
-    mci_initialize();
-#endif
-#ifdef MODULE_PROFILING
-    LOG_DEBUG("Auto init profiling.\n");
-    extern void profiling_init(void);
-    profiling_init();
-#endif
-#ifdef MODULE_AUTO_INIT_GNRC_PKTBUF
-    LOG_DEBUG("Auto init gnrc_pktbuf.\n");
-    extern void gnrc_pktbuf_init(void);
-    gnrc_pktbuf_init();
-#endif
-#ifdef MODULE_AUTO_INIT_GNRC_PKTDUMP
-    LOG_DEBUG("Auto init gnrc_pktdump.\n");
-    extern void gnrc_pktdump_init(void);
-    gnrc_pktdump_init();
-#endif
-#ifdef MODULE_AUTO_INIT_GNRC_SIXLOWPAN
-    LOG_DEBUG("Auto init gnrc_sixlowpan.\n");
-    extern void gnrc_sixlowpan_init(void);
-    gnrc_sixlowpan_init();
-#endif
-#ifdef MODULE_AUTO_INIT_GNRC_IPV6
-    LOG_DEBUG("Auto init gnrc_ipv6.\n");
-    extern void gnrc_ipv6_init(void);
-    gnrc_ipv6_init();
-#endif
-#ifdef MODULE_AUTO_INIT_GNRC_UDP
-    LOG_DEBUG("Auto init gnrc_udp.\n");
-    extern void gnrc_udp_init(void);
-    gnrc_udp_init();
-#endif
-#ifdef MODULE_AUTO_INIT_GNRC_TCP
-    LOG_DEBUG("Auto init gnrc_tcp.\n");
-    extern void gnrc_tcp_init(void);
-    gnrc_tcp_init();
-#endif
-#ifdef MODULE_AUTO_INIT_LWIP
-    LOG_DEBUG("Bootstraping lwIP.\n");
-    extern void lwip_bootstrap(void);
-    lwip_bootstrap();
-#endif
-#ifdef MODULE_OPENTHREAD
-    LOG_DEBUG("Bootstrapping openthread.\n");
-    extern void openthread_bootstrap(void);
-    openthread_bootstrap();
-#endif
-#ifdef MODULE_GCOAP
-    if (!IS_ACTIVE(CONFIG_GCOAP_NO_AUTO_INIT)) {
-        LOG_DEBUG("Auto init gcoap.\n");
-        extern void gcoap_init(void);
-        gcoap_init();
-    }
-#endif
-#ifdef MODULE_DEVFS
-    LOG_DEBUG("Mounting /dev.\n");
-    extern void auto_init_devfs(void);
-    auto_init_devfs();
-#endif
-#ifdef MODULE_AUTO_INIT_GNRC_IPV6_NIB
-    LOG_DEBUG("Auto init gnrc_ipv6_nib.\n");
-    extern void gnrc_ipv6_nib_init(void);
-    gnrc_ipv6_nib_init();
-#endif
-#ifdef MODULE_SKALD
-    LOG_DEBUG("Auto init Skald.\n");
-    extern void skald_init(void);
-    skald_init();
-#endif
-#ifdef MODULE_CORD_COMMON
-    LOG_DEBUG("Auto init cord_common.\n");
-    extern void cord_common_init(void);
-    cord_common_init();
-#endif
-#ifdef MODULE_CORD_EP_STANDALONE
-    LOG_DEBUG("Auto init cord_ep_standalone.\n");
-    extern void cord_ep_standalone_run(void);
-    cord_ep_standalone_run();
-#endif
-#ifdef MODULE_ASYMCUTE
-    LOG_DEBUG("Auto init Asymcute.\n");
-    extern void asymcute_handler_run(void);
-    asymcute_handler_run();
-#endif
-#ifdef MODULE_NIMBLE
-    LOG_DEBUG("Auto init NimBLE.\n");
-    extern void nimble_riot_init(void);
-    nimble_riot_init();
-#endif
-#ifdef MODULE_AUTO_INIT_LORAMAC
-    LOG_DEBUG("Auto init loramac.\n");
-    extern void auto_init_loramac(void);
-    auto_init_loramac();
-#endif
-#ifdef MODULE_SOCK_DTLS
-    LOG_DEBUG("Auto init sock_dtls.\n");
-    extern void sock_dtls_init(void);
-    sock_dtls_init();
-#endif
-
-/* initialize USB devices */
-#ifdef MODULE_AUTO_INIT_USBUS
-    LOG_DEBUG("Auto init USB.\n");
-    extern void auto_init_usb(void);
-    auto_init_usb();
-#endif
-
-/* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
-    LOG_DEBUG("Auto init gnrc_netif.\n");
-
+/**
+ * @brief   Initializes network devices
+ */
+static void _auto_init_gnrc_netif(void)
+{
 #ifdef MODULE_STM32_ETH
     extern void auto_init_stm32_eth(void);
     auto_init_stm32_eth();
@@ -281,36 +152,15 @@ void auto_init(void)
     extern void auto_init_nrf802154(void);
     auto_init_nrf802154();
 #endif
-
+}
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
-#ifdef MODULE_AUTO_INIT_GNRC_UHCPC
-    LOG_DEBUG("Auto init gnrc_uhcpc.\n");
-    extern void auto_init_gnrc_uhcpc(void);
-    auto_init_gnrc_uhcpc();
-#endif
-
-/* initialize NDN module after the network devices are initialized */
-#ifdef MODULE_NDN_RIOT
-    LOG_DEBUG("Auto init NDN.\n");
-    extern void ndn_init(void);
-    ndn_init();
-#endif
-
-/* initialize sensors and actuators */
-#ifdef MODULE_SHT1X
-    /* The sht1x module needs to be initialized regardless of SAUL being used,
-     * as the shell commands rely on auto-initialization. auto_init_sht1x also
-     * performs SAUL registration, but only if module auto_init_saul is used.
-     */
-    LOG_DEBUG("Auto init sht1x.\n");
-    extern void auto_init_sht1x(void);
-    auto_init_sht1x();
-#endif
-
 #ifdef MODULE_AUTO_INIT_SAUL
-    LOG_DEBUG("Auto init SAUL.\n");
-
+/**
+ * @brief   Initializes sensors and actuators for SAUL
+ */
+void _auto_init_saul(void)
+{
 #ifdef MODULE_SAUL_ADC
     extern void auto_init_adc(void);
     auto_init_adc();
@@ -536,6 +386,173 @@ void auto_init(void)
     auto_init_veml6070();
 #endif
 
+}
+#endif /* MODULE_AUTO_INIT_SAUL*/
+
+void auto_init(void)
+{
+#ifdef MODULE_AUTO_INIT_RANDOM
+    LOG_DEBUG("Auto init random.\n");
+    extern void auto_init_random(void);
+    auto_init_random();
+#endif
+#ifdef MODULE_AUTO_INIT_XTIMER
+    LOG_DEBUG("Auto init xtimer.\n");
+    extern void xtimer_init(void);
+    xtimer_init();
+#endif
+#ifdef MODULE_SCHEDSTATISTICS
+    LOG_DEBUG("Auto init schedstatistics.\n");
+    extern void init_schedstatistics(void);
+    init_schedstatistics();
+#endif
+#ifdef MODULE_EVENT_THREAD
+    LOG_DEBUG("Auto init event threads.\n");
+    extern void auto_init_event_thread(void);
+    auto_init_event_thread();
+#endif
+#ifdef MODULE_MCI
+    LOG_DEBUG("Auto init mci.\n");
+    extern void mci_initialize(void);
+    mci_initialize();
+#endif
+#ifdef MODULE_PROFILING
+    LOG_DEBUG("Auto init profiling.\n");
+    extern void profiling_init(void);
+    profiling_init();
+#endif
+#ifdef MODULE_AUTO_INIT_GNRC_PKTBUF
+    LOG_DEBUG("Auto init gnrc_pktbuf.\n");
+    extern void gnrc_pktbuf_init(void);
+    gnrc_pktbuf_init();
+#endif
+#ifdef MODULE_AUTO_INIT_GNRC_PKTDUMP
+    LOG_DEBUG("Auto init gnrc_pktdump.\n");
+    extern void gnrc_pktdump_init(void);
+    gnrc_pktdump_init();
+#endif
+#ifdef MODULE_AUTO_INIT_GNRC_SIXLOWPAN
+    LOG_DEBUG("Auto init gnrc_sixlowpan.\n");
+    extern void gnrc_sixlowpan_init(void);
+    gnrc_sixlowpan_init();
+#endif
+#ifdef MODULE_AUTO_INIT_GNRC_IPV6
+    LOG_DEBUG("Auto init gnrc_ipv6.\n");
+    extern void gnrc_ipv6_init(void);
+    gnrc_ipv6_init();
+#endif
+#ifdef MODULE_AUTO_INIT_GNRC_UDP
+    LOG_DEBUG("Auto init gnrc_udp.\n");
+    extern void gnrc_udp_init(void);
+    gnrc_udp_init();
+#endif
+#ifdef MODULE_AUTO_INIT_GNRC_TCP
+    LOG_DEBUG("Auto init gnrc_tcp.\n");
+    extern void gnrc_tcp_init(void);
+    gnrc_tcp_init();
+#endif
+#ifdef MODULE_AUTO_INIT_LWIP
+    LOG_DEBUG("Bootstraping lwIP.\n");
+    extern void lwip_bootstrap(void);
+    lwip_bootstrap();
+#endif
+#ifdef MODULE_OPENTHREAD
+    LOG_DEBUG("Bootstrapping openthread.\n");
+    extern void openthread_bootstrap(void);
+    openthread_bootstrap();
+#endif
+#ifdef MODULE_GCOAP
+    if (!IS_ACTIVE(CONFIG_GCOAP_NO_AUTO_INIT)) {
+        LOG_DEBUG("Auto init gcoap.\n");
+        extern void gcoap_init(void);
+        gcoap_init();
+    }
+#endif
+#ifdef MODULE_DEVFS
+    LOG_DEBUG("Mounting /dev.\n");
+    extern void auto_init_devfs(void);
+    auto_init_devfs();
+#endif
+#ifdef MODULE_AUTO_INIT_GNRC_IPV6_NIB
+    LOG_DEBUG("Auto init gnrc_ipv6_nib.\n");
+    extern void gnrc_ipv6_nib_init(void);
+    gnrc_ipv6_nib_init();
+#endif
+#ifdef MODULE_SKALD
+    LOG_DEBUG("Auto init Skald.\n");
+    extern void skald_init(void);
+    skald_init();
+#endif
+#ifdef MODULE_CORD_COMMON
+    LOG_DEBUG("Auto init cord_common.\n");
+    extern void cord_common_init(void);
+    cord_common_init();
+#endif
+#ifdef MODULE_CORD_EP_STANDALONE
+    LOG_DEBUG("Auto init cord_ep_standalone.\n");
+    extern void cord_ep_standalone_run(void);
+    cord_ep_standalone_run();
+#endif
+#ifdef MODULE_ASYMCUTE
+    LOG_DEBUG("Auto init Asymcute.\n");
+    extern void asymcute_handler_run(void);
+    asymcute_handler_run();
+#endif
+#ifdef MODULE_NIMBLE
+    LOG_DEBUG("Auto init NimBLE.\n");
+    extern void nimble_riot_init(void);
+    nimble_riot_init();
+#endif
+#ifdef MODULE_AUTO_INIT_LORAMAC
+    LOG_DEBUG("Auto init loramac.\n");
+    extern void auto_init_loramac(void);
+    auto_init_loramac();
+#endif
+#ifdef MODULE_SOCK_DTLS
+    LOG_DEBUG("Auto init sock_dtls.\n");
+    extern void sock_dtls_init(void);
+    sock_dtls_init();
+#endif
+
+/* initialize USB devices */
+#ifdef MODULE_AUTO_INIT_USBUS
+    LOG_DEBUG("Auto init USB.\n");
+    extern void auto_init_usb(void);
+    auto_init_usb();
+#endif
+
+#ifdef MODULE_AUTO_INIT_GNRC_NETIF
+    LOG_DEBUG("Auto init gnrc_netif.\n");
+    _auto_init_gnrc_netif();
+#endif /* MODULE_AUTO_INIT_GNRC_NETIF */
+
+#ifdef MODULE_AUTO_INIT_GNRC_UHCPC
+    LOG_DEBUG("Auto init gnrc_uhcpc.\n");
+    extern void auto_init_gnrc_uhcpc(void);
+    auto_init_gnrc_uhcpc();
+#endif
+
+/* initialize NDN module after the network devices are initialized */
+#ifdef MODULE_NDN_RIOT
+    LOG_DEBUG("Auto init NDN.\n");
+    extern void ndn_init(void);
+    ndn_init();
+#endif
+
+/* initialize sensors and actuators */
+#ifdef MODULE_SHT1X
+    /* The sht1x module needs to be initialized regardless of SAUL being used,
+     * as the shell commands rely on auto-initialization. auto_init_sht1x also
+     * performs SAUL registration, but only if module auto_init_saul is used.
+     */
+    LOG_DEBUG("Auto init sht1x.\n");
+    extern void auto_init_sht1x(void);
+    auto_init_sht1x();
+#endif
+
+#ifdef MODULE_AUTO_INIT_SAUL
+    LOG_DEBUG("Auto init SAUL.\n");
+    _auto_init_saul();
 #endif /* MODULE_AUTO_INIT_SAUL */
 
 #ifdef MODULE_AUTO_INIT_GNRC_RPL
