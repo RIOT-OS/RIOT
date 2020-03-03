@@ -1,5 +1,5 @@
 # debugger config
-export JLINK_DEVICE := atsamr21e18a
+JLINK_DEVICE = atsamr21e18a
 OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 OFLAGS := --gap-fill 0xff
 

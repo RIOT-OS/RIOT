@@ -14,7 +14,7 @@ include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 PROGRAMMER ?= jlink
 ifeq (jlink,$(PROGRAMMER))
   # setup JLink for flashing
-  export JLINK_DEVICE := nrf52
+  JLINK_DEVICE = nrf52
 
   # special options when using SoftDevice
   ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
