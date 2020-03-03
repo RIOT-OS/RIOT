@@ -7,7 +7,7 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup JLink for flashing
 JLINK_DEVICE = EFR32MG1PxxxF256
-export JLINK_PRE_FLASH = r
+JLINK_PRE_FLASH = r
 
 # include board common
 include $(RIOTBOARD)/common/silabs/Makefile.include
