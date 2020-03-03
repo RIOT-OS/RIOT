@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "assert.h"
 #include "fmt.h"
 #include "phydat.h"
 
@@ -31,6 +32,20 @@ void phydat_dump(phydat_t *data, uint8_t dim)
         return;
     }
     printf("Data:");
+
+    if (data->unit == UNIT_TIME) {
+        assert(dim == 3);
+        printf("\t%02d:%02d:%02d\n",
+               data->val[2], data->val[1], data->val[0]);
+        return;
+    }
+    if (data->unit == UNIT_DATE) {
+        assert(dim == 3);
+        printf("\t%04d-%02d-%02d\n",
+               data->val[2], data->val[1], data->val[0]);
+        return;
+    }
+
     for (uint8_t i = 0; i < dim; i++) {
         char scale_prefix;
 
@@ -55,22 +70,26 @@ void phydat_dump(phydat_t *data, uint8_t dim)
             printf("[%u] ", (unsigned int)i);
         }
         else {
-            printf("     ");
+            printf("    ");
         }
         if (scale_prefix) {
-            printf("%6d %c", (int)data->val[i], scale_prefix);
+            printf("%11d %c", (int)data->val[i], scale_prefix);
         }
         else if (data->scale == 0) {
-            printf("%6d", (int)data->val[i]);
+            printf("%11d ", (int)data->val[i]);
         }
-        else if ((data->scale > -5) && (data->scale < 0)) {
-            char num[8];
+        else if ((data->scale > -6) && (data->scale < 0)) {
+            char num[9];
             size_t len = fmt_s16_dfp(num, data->val[i], data->scale);
+            assert(len < 9);
             num[len] = '\0';
-            printf("%s", num);
+            printf("%11s ", num);
         }
         else {
-            printf("%iE%i", (int)data->val[i], (int)data->scale);
+            char num[12];
+            snprintf(num, sizeof(num), "%ie%i",
+                     (int)data->val[i], (int)data->scale);
+            printf("%11s ", num);
         }
 
         printf("%s\n", phydat_unit_to_str(data->unit));
@@ -97,6 +116,7 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_GS:       return "Gs";
         case UNIT_BAR:      return "Bar";
         case UNIT_PA:       return "Pa";
+        case UNIT_PERMILL:  return "permille";
         case UNIT_PPM:      return "ppm";
         case UNIT_PPB:      return "ppb";
         case UNIT_CD:       return "cd";
