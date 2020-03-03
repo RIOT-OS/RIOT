@@ -36,6 +36,10 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 
+#ifdef MODULE_DISP_DEV
+#include "disp_dev.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -98,6 +102,9 @@ typedef struct {
  * @brief   Device descriptor for a ili9341
  */
 typedef struct {
+#ifdef MODULE_DISP_DEV
+    disp_dev_t *dev;                    /**< Pointer to the generic display device */
+#endif
     const ili9341_params_t *params;     /**< Device initialization parameters */
 } ili9341_t;
 
