@@ -24,9 +24,6 @@
 #include "auto_init.h"
 #include "log.h"
 
-#define ENABLE_DEBUG (0)
-#include "debug.h"
-
 void auto_init(void)
 {
 #ifdef MODULE_AUTO_INIT_RANDOM
@@ -596,7 +593,7 @@ void auto_init(void)
 #endif /* MODULE_AUTO_INIT_DHCPV6_CLIENT */
 
 #ifdef MODULE_GNRC_DHCPV6_CLIENT_6LBR
-    DEBUG("auto_init 6LoWPAN border router DHCPv6 client");
+    LOG_DEBUG("Auto init 6LoWPAN border router DHCPv6 client\n");
     extern void gnrc_dhcpv6_client_6lbr_init(void);
     gnrc_dhcpv6_client_6lbr_init();
 #endif /* MODULE_GNRC_DHCPV6_CLIENT_6LBR */
