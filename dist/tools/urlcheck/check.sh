@@ -39,7 +39,7 @@ for file in ${FILES}; do
     for url_line in $URL_LINES; do
         url=`echo "$url_line" | grep -oP "${URL_REGEX}"`
         line=`echo "$url_line" | cut -d ':' -f1`
-        wget -4 --spider --tries=1 --quiet $url
+        wget -4 --spider --tries=1 --quiet --no-check-certificate $url
         if [ $? != 0 ]; then
             echo "Invalid URL in ${file}:${line} ${url}"
         fi
