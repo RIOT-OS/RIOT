@@ -135,6 +135,20 @@ def main():
     if status != 200:
         print("Could not retrieve user: {}".format(user['message']))
         exit(1)
+    # Token-scope-check: Is the token is powerful enough to complete
+    # the Backport?
+    response_headers = dict(g.getheaders())
+    # agithub documentation says it's lower case header field-names but
+    # at this moment it's not
+    if 'X-OAuth-Scopes' in response_headers:
+        scopes = response_headers['X-OAuth-Scopes']
+    else:
+        scopes = response_headers['x-oauth-scopes']
+    scopes_list = [x.strip() for x in scopes.split(',')]
+    if not ('public_repo' in scopes_list or 'repo' in scopes_list):
+        print("missing public_repo scope from token settings."
+              " Please add it on the GitHub webinterface")
+        exit(1)
     username = user['login']
     status, pulldata = g.repos[ORG][REPO].pulls[args.PR].get()
     if status != 200:
