@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup tests
+ * @ingroup drivers_slipdev
  * @{
  *
  * @file
@@ -25,11 +25,13 @@
 extern "C" {
 #endif
 
+#ifndef SLIPDEV_PARAMS
+#define SLIPDEV_PARAMS  { .uart     = SLIP_UART,     \
+                          .baudrate = SLIP_BAUDRATE, }
+#endif
+
 static slipdev_params_t slipdev_params[] = {
-    {
-        .uart = SLIP_UART,
-        .baudrate = SLIP_BAUDRATE,
-    },
+    SLIPDEV_PARAMS
 };
 
 #ifdef __cplusplus
