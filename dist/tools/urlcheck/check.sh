@@ -31,11 +31,13 @@ if [ -z "${FILES}" ]; then
     exit
 fi
 
+URL_REGEX='(?=https|http)[^ )\]>\"]+'
+
 for file in ${FILES}; do
     echo "Checking ${file} ..."
-    URL_LINES=`cat ${file} | grep -noP "(?=https|http)[^ )\]>\"]+"`
+    URL_LINES=`cat ${file} | grep -noP "${URL_REGEX}"`
     for url_line in $URL_LINES; do
-        url=`echo "$url_line" | grep -oP "(?=https|http)[^ )\]>\"]+"`
+        url=`echo "$url_line" | grep -oP "${URL_REGEX}"`
         line=`echo "$url_line" | cut -d ':' -f1`
         wget -4 --spider --tries=1 --quiet $url
         if [ $? != 0 ]; then
