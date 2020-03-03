@@ -121,6 +121,10 @@ PSEUDOMODULES += adc081c
 PSEUDOMODULES += adc101c
 PSEUDOMODULES += adc121c
 
+# variants of MCP27x17
+PSEUDOMODULES += mcp23017
+PSEUDOMODULES += mcp23s17
+
 # full featured version of CCS811 driver as pseudo module
 PSEUDOMODULES += ccs811_full
 

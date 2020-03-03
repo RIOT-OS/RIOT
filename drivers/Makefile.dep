@@ -379,6 +379,24 @@ ifneq (,$(filter mag3110,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter mcp23017,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += mcp23x17
+endif
+
+ifneq (,$(filter mcp23s17,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+  USEMODULE += mcp23x17
+endif
+
+ifneq (,$(filter mcp23x17,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  USEMODULE += xtimer
+  ifneq (,$(filter periph_gpio_irq,$(USEMODULE)))
+    USEMODULE += event
+  endif
+endif
+
 ifneq (,$(filter mma7660,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
