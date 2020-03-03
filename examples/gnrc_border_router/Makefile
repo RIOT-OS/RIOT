@@ -7,6 +7,18 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
+# Default to using ethos for providing the uplink when not on native
+UPLINK ?= ethos
+
+# Check if the selected Uplink is valid
+ifeq (,$(filter ethos slip wifi,$(UPLINK)))
+  $(error Supported uplinks are `ethos`, `slip` and `wifi`)
+endif
+
+# Set the SSID and password of your WiFi network here
+WIFI_SSID ?= "Your_WiFi_name"
+WIFI_PASS ?= "Your_secure_password"
+
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
@@ -24,8 +36,12 @@ USEMODULE += ps
 # configure the node as a RPL DODAG root when receiving a prefix.
 #USEMODULE += gnrc_rpl
 
-# Optionally use DHCPv6 instead of UHCP
-USE_DHCPV6 ?= 0
+# When using a WiFi uplink we should use DHCPv6
+ifeq (wifi,$(UPLINK))
+  USE_DHCPV6 ?= 1
+else
+  USE_DHCPV6 ?= 0
+endif
 
 ifeq (1,$(USE_DHCPV6))
   # include DHCPv6 client for 6LoWPAN border router
@@ -34,10 +50,6 @@ else
   # include UHCP client
   USEMODULE += gnrc_uhcpc
 endif
-
-# Optionally use SLIP instead of ethos when not on native
-# (added to USEMODULE in Makefile.board.dep)
-USE_SLIP ?= 0
 
 # Use two network interfaces
 GNRC_NETIF_NUMOF := 2
@@ -60,14 +72,17 @@ IPV6_PREFIX ?= 2001:db8::/64
 # communication and stdio over UART, but not on native, as native has a tap
 # interface towards the host.
 ifeq (,$(filter native,$(BOARD)))
-  ifeq (1,$(USE_SLIP))
+  ifeq (slip,$(UPLINK))
     # SLIP baudrate and UART device can be configured from make command
     SLIP_BAUDRATE ?= 115200
     include $(CURDIR)/Makefile.slip.conf
-  else
+  else ifeq (ethos,$(UPLINK))
     # ethos baudrate can be configured from make command
     ETHOS_BAUDRATE ?= 115200
     include $(CURDIR)/Makefile.ethos.conf
+  else ifeq (wifi,$(UPLINK))
+    # SSID and Password need to be configured
+    include $(CURDIR)/Makefile.wifi.conf
   endif
 else
   include $(CURDIR)/Makefile.native.conf
