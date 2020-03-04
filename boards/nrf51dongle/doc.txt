@@ -18,7 +18,8 @@ While the pca10000 contains an on-board J-Link debugger, the pca10005 boards
 have to be flashed/debugged using the (included) external J-Link device.
 
 ## Hardware:
-![Nordic Semiconductor nrF51822 Development Kit](https://www.nordicsemi.com/var/ezwebin_site/storage/images/media/images/products/nrf51822-dk/422047-1-eng-GB/nRF51822-DK.jpg)
+![Nordic Semiconductor nrF51822 Development Kit]
+(https://www.nordicsemi.com/-/media/Images/Products/DevKits/nRF51-Series/nRF51-Dongle-promo.png)
 
 | MCU        | NRF51822QFAA      |
 |:------------- |:--------------------- |
@@ -35,8 +36,8 @@ have to be flashed/debugged using the (included) external J-Link device.
 | I2Cs       | 2                 |
 | Radio         | 2.4GHz BLE compatiple, +4dBm to -20 dBm output, -93 dBm RX sensitivity |
 | Vcc        | 1.8V - 3.6V           |
-| Datasheet  | [Datasheet](http://www.freqchina.com/cn/down.asp?ID=135) (pdf file) |
-| Reference Manual | [Reference Manual](http://www.100y.com.tw/pdf_file/39-Nordic-NRF51822.pdf) |
+| Datasheet  | [Datasheet](https://infocenter.nordicsemi.com/pdf/nRF51822_PS_v3.3.pdf) |
+| Reference Manual | [Reference Manual](https://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.1.pdf) |
 
 
 ## Flashing the Device:
