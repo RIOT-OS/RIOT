@@ -14,6 +14,7 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
-TEST_ON_CI_WHITELIST += nrf52dk
+# softdevice currently broken on CI
+TEST_ON_CI_BLACKLIST += all
 
 include $(RIOTBASE)/Makefile.include
