@@ -234,6 +234,16 @@ struct gnrc_netif_ops {
 };
 
 /**
+ * @brief   Initialize all available network interfaces.
+ *          This function is called automatically if the auto_init_gnrc_netif
+ *          module is used.
+ *          If only the gnrc_netif_init module is used instead, you can call
+ *          this function to manually set up the network interfaces at a later
+ *          time.
+ */
+void gnrc_netif_init_devs(void);
+
+/**
  * @brief   Creates a network interface
  *
  * @param[in] stack     The stack for the network interface's thread.
