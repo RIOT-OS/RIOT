@@ -1052,10 +1052,12 @@ USEMODULE := $(sort $(USEMODULE))
 USEPKG := $(sort $(USEPKG))
 ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
   include $(RIOTBASE)/Makefile.dep
-endif
-
-# Add auto_init_% DEFAULT_MODULES. This is done after the recursive cach since
-# none of these modules can trigger dependency resolution.
-ifneq (,$(filter auto_init,$(USEMODULE)))
-  USEMODULE += $(filter auto_init_%,$(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE)))
+else
+  # Add auto_init_% DEFAULT_MODULES. This is done after the recursive cach since
+  # none of these modules can trigger dependency resolution.
+  ifneq (,$(filter auto_init,$(USEMODULE)))
+    DEFAULT_MODULE := $(sort $(DEFAULT_MODULE))
+    USEMODULE += $(filter auto_init_%,$(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE)))
+    USEMODULE := $(sort $(USEMODULE))
+  endif
 endif
