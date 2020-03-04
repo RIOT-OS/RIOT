@@ -13,16 +13,20 @@ from testrunner import run
 def testfunc(child):
     child.expect(r'MAX_NUMBER_BLOCKS: (\d+)\r\n')
     max_number_blocks = int(child.match.group(1))
+    child.expect(r'NUMBER_OF_LOOPS: (\d+)\r\n')
+    number_of_loops = int(child.match.group(1))
     child.expect(r'NUMBER_OF_TESTS: (\d+)\r\n')
     number_of_tests = int(child.match.group(1))
-    for test in range(number_of_tests):
-        child.expect_exact("TEST #{}:".format(test + 1))
-        for i in range(max_number_blocks):
-            child.expect(r'\({}, @@@@@@@\) Allocated \d+ Bytes at 0x[a-z0-9]+,'
-                         r' total [0-9]+\r\n'.format(i))
-        for i in range(max_number_blocks):
-            child.expect(r'Free \({}\) \d+ Bytes at 0x[a-z0-9]+,'
-                         ' total [0-9]+\r\n'.format(i))
+    for loop in range(number_of_loops):
+        child.expect_exact("LOOP #{}:".format(loop + 1))
+        for test in range(number_of_tests):
+            child.expect_exact("TEST #{}:".format(test + 1))
+            for i in range(max_number_blocks):
+                child.expect(r'\({}, @@@@@@@\) Allocated \d+ Bytes at 0x[a-z0-9]+,'
+                             r' total [0-9]+\r\n'.format(i))
+            for i in range(max_number_blocks):
+                child.expect(r'Free \({}\) \d+ Bytes at 0x[a-z0-9]+,'
+                             ' total [0-9]+\r\n'.format(i))
     child.expect_exact("Finishing")
 
 
