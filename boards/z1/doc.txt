@@ -24,7 +24,7 @@ the link right here.
 The Z1 starter platform -- an extended version with some supplementary basic
 actuators, phidgets and ziglets connectors, SMA-RP connector for a concrete
 antenna, battery (2xAA) enclosure, and MSP430 JTAG connector
--- is [also available](http://zolertia.com/products/Z1_Starter_Platform).
+-- is [also available](https://github.com/Zolertia/Resources/wiki/The-Z1-mote).
 This RIOT port also supports this version, except that supplementary
 actuators (multi-color LED, wheel potentiometer, buzzer) are not directly
 defined. This will be done as soon as possible.
