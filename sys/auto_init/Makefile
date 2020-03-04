@@ -2,7 +2,7 @@ ifneq (,$(filter gnrc_netif_init,$(USEMODULE)))
   DIRS += netif
 endif
 
-ifneq (,$(filter auto_init_saul,$(USEMODULE)))
+ifneq (,$(filter saul_init,$(USEMODULE)))
   DIRS += saul
 endif
 
