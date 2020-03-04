@@ -16,7 +16,7 @@
  *              "SD Specifications Part 1 Physical Layer Simplified Specification".
  *              References to the sd specs in this file apply to Version 5.00
  *              from August 10, 2016. For further details see
- *              https://www.sdcard.org/downloads/pls/pdf/part1_500.pdf.
+ *              https://www.sdcard.org/downloads/pls/
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
