@@ -1,3 +1,3 @@
-MODULE = auto_init_gnrc_netif
+MODULE = gnrc_netif_init_devs
 
 include $(RIOTBASE)/Makefile.base

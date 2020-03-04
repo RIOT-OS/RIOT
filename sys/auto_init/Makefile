@@ -1,4 +1,4 @@
-ifneq (,$(filter auto_init_gnrc_netif,$(USEMODULE)))
+ifneq (,$(filter gnrc_netif_init,$(USEMODULE)))
   DIRS += netif
 endif
 

@@ -27,134 +27,6 @@
 #include "log.h"
 
 /**
- * @brief   Initializes network devices
- */
-static void _auto_init_gnrc_netif(void)
-{
-    if (IS_USED(MODULE_STM32_ETH)) {
-        extern void auto_init_stm32_eth(void);
-        auto_init_stm32_eth();
-    }
-
-    if (IS_USED(MODULE_AUTO_INIT_AT86RF2XX)) {
-        extern void auto_init_at86rf2xx(void);
-        auto_init_at86rf2xx();
-    }
-
-    if (IS_USED(MODULE_MRF24J40)) {
-        extern void auto_init_mrf24j40(void);
-        auto_init_mrf24j40();
-    }
-
-    if (IS_USED(MODULE_CC110X)) {
-        extern void auto_init_cc110x(void);
-        auto_init_cc110x();
-    }
-
-    if (IS_USED(MODULE_CC2420)) {
-        extern void auto_init_cc2420(void);
-        auto_init_cc2420();
-    }
-
-    if (IS_USED(MODULE_ENCX24J600)) {
-        extern void auto_init_encx24j600(void);
-        auto_init_encx24j600();
-    }
-
-    if (IS_USED(MODULE_ENC28J60)) {
-        extern void auto_init_enc28j60(void);
-        auto_init_enc28j60();
-    }
-
-    if (IS_USED(MODULE_ESP_ETH)) {
-        extern void auto_init_esp_eth(void);
-        auto_init_esp_eth();
-    }
-
-    /* don't change the order of auto_init_esp_now and auto_init_esp_wifi */
-    if (IS_USED(MODULE_ESP_NOW)) {
-        extern void auto_init_esp_now(void);
-        auto_init_esp_now();
-    }
-
-    /* don't change the order of auto_init_esp_now and auto_init_esp_wifi */
-    if (IS_USED(MODULE_ESP_WIFI)) {
-        extern void auto_init_esp_wifi(void);
-        auto_init_esp_wifi();
-    }
-
-    if (IS_USED(MODULE_ETHOS)) {
-        extern void auto_init_ethos(void);
-        auto_init_ethos();
-    }
-
-    if (IS_USED(MODULE_DOSE)) {
-        extern void auto_init_dose(void);
-        auto_init_dose();
-    }
-
-    if (IS_USED(MODULE_SLIPDEV)) {
-        extern void auto_init_slipdev(void);
-        auto_init_slipdev();
-    }
-
-    if (IS_USED(MODULE_CC2538_RF)) {
-        extern void auto_init_cc2538_rf(void);
-        auto_init_cc2538_rf();
-    }
-
-    if (IS_USED(MODULE_XBEE)) {
-        extern void auto_init_xbee(void);
-        auto_init_xbee();
-    }
-
-    if (IS_USED(MODULE_KW2XRF)) {
-        extern void auto_init_kw2xrf(void);
-        auto_init_kw2xrf();
-    }
-
-    if (IS_USED(MODULE_USBUS_CDC_ECM)) {
-        extern void auto_init_netdev_cdcecm(void);
-        auto_init_netdev_cdcecm();
-    }
-
-    if (IS_USED(MODULE_NETDEV_TAP)) {
-        extern void auto_init_netdev_tap(void);
-        auto_init_netdev_tap();
-    }
-
-    if (IS_USED(MODULE_SOCKET_ZEP)) {
-        extern void auto_init_socket_zep(void);
-        auto_init_socket_zep();
-    }
-
-    if (IS_USED(MODULE_NORDIC_SOFTDEVICE_BLE)) {
-        extern void gnrc_nordic_ble_6lowpan_init(void);
-        gnrc_nordic_ble_6lowpan_init();
-    }
-
-    if (IS_USED(MODULE_NRFMIN)) {
-        extern void gnrc_nrfmin_init(void);
-        gnrc_nrfmin_init();
-    }
-
-    if (IS_USED(MODULE_W5100)) {
-        extern void auto_init_w5100(void);
-        auto_init_w5100();
-    }
-
-    if (IS_USED(MODULE_SX127X) && !IS_USED(MODULE_SEMTECH_LORAMAC)) {
-        extern void auto_init_sx127x(void);
-        auto_init_sx127x();
-    }
-
-    if (IS_USED(MODULE_NRF802154)) {
-        extern void auto_init_nrf802154(void);
-        auto_init_nrf802154();
-    }
-}
-
-/**
  * @brief   Initializes sensors and actuators for SAUL
  */
 void _auto_init_saul(void)
@@ -519,7 +391,8 @@ void auto_init(void)
     /* initialize network devices */
     if (IS_USED(MODULE_AUTO_INIT_GNRC_NETIF)) {
         LOG_DEBUG("Auto init gnrc_netif.\n");
-        _auto_init_gnrc_netif();
+        extern void gnrc_netif_init_devs(void);
+        gnrc_netif_init_devs();
     }
 
     if (IS_USED(MODULE_AUTO_INIT_GNRC_UHCPC)) {
