@@ -10,8 +10,8 @@ STM32F446RE microcontroller with 128Kb of RAM and 512Kb of ROM Flash.
 
 ## Hardware
 
-![Nucleo64 F446RE](http://www.open-electronics.org/wp-
-content/uploads/2015/08/Figura2-500x467.png)
+![Nucleo64 F446RE]
+(http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
 
 ### MCU
 
@@ -68,7 +68,6 @@ make BOARD=nucleo-f446re debug
 ## Supported Toolchains
 
 For using the ST Nucleo-F446RE board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-
-embedded)
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
  */
