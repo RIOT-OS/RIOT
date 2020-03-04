@@ -155,6 +155,11 @@ void ztimer_init(void)
             FREQ_1MHZ, CONFIG_ZTIMER_USEC_FREQ);
 #    endif
 #  endif
+#  ifdef CONFIG_ZTIMER_USEC_ADJUST
+    LOG_DEBUG("ztimer_init(): ZTIMER_USEC setting adjust value to %i\n",
+            CONFIG_ZTIMER_USEC_ADJUST);
+    ZTIMER_USEC->adjust = CONFIG_ZTIMER_USEC_ADJUST;
+#  endif
 #endif
 
 #ifdef ZTIMER_RTT_INIT
@@ -169,6 +174,11 @@ void ztimer_init(void)
     ztimer_convert_frac_init(&_ztimer_convert_frac_msec,
                              ZTIMER_MSEC_CONVERT_LOWER,
                              FREQ_1KHZ, ZTIMER_MSEC_CONVERT_LOWER_FREQ);
+#  endif
+#  ifdef CONFIG_ZTIMER_MSEC_ADJUST
+    LOG_DEBUG("ztimer_init(): ZTIMER_MSEC setting adjust value to %i\n",
+            CONFIG_ZTIMER_MSEC_ADJUST);
+    ZTIMER_MSEC->adjust = CONFIG_ZTIMER_MSEC_ADJUST;
 #  endif
 #endif
 }
