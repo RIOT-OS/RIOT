@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <inttypes.h>
 
 #include "ztimer.h"
@@ -32,16 +33,17 @@ int main(void)
 {
     uint32_t total = 0;
 
-    uint16_t min = 0xFFFF;
-    uint16_t max = 0;
+    int32_t min = INT32_MAX;
+    int32_t max = INT32_MIN;
 
     /* unset configured adjustment */
     /* ZTIMER_USEC->adjust = 0; */
+    printf("ZTIMER_USEC->adjust = %" PRIu32 "\n", ZTIMER_USEC->adjust);
 
     unsigned n = SAMPLES;
     while (n--) {
-        unsigned overhead = ztimer_overhead(ZTIMER_USEC, BASE);
-        total += overhead;
+        int32_t overhead = ztimer_overhead(ZTIMER_USEC, BASE);
+        total += labs(overhead);
         if (overhead < min) {
             min = overhead;
         }
@@ -50,7 +52,8 @@ int main(void)
         }
     }
 
-    printf("min=%u max=%u avg=%" PRIu32 "\n", min, max, (total / SAMPLES));
+    printf("min=%" PRIi32 " max=%" PRIi32 " avg_diff=%" PRIi32 "\n", min, max,
+           (total / SAMPLES));
 
     return 0;
 }
