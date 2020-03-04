@@ -103,8 +103,11 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* configure bus clock, in synchronous mode its calculated from
      * BAUD.reg = (f_ref / (2 * f_bus) - 1)
-     * with f_ref := CLOCK_CORECLOCK as defined by the board */
-    const uint8_t baud = (sam0_gclk_freq(spi_config[bus].gclk_src) / (2 * clk) - 1);
+     * with f_ref := CLOCK_CORECLOCK as defined by the board
+     * to mitigate the rounding error due to integer arithmetic, the
+     * equation is modified to
+     * BAUD.reg = ((f_ref + f_bus) / (2 * f_bus) - 1) */
+    const uint8_t baud = ((sam0_gclk_freq(spi_config[bus].gclk_src) + clk) / (2 * clk) - 1);
 
     /* configure device to be master and set mode and pads,
      *
