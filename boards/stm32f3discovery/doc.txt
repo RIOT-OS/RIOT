@@ -20,7 +20,7 @@ for a quick getting started guide.
 
 ## Hardware
 
-![STM32F3discovery image](http://www.st.com/st-web-ui/static/active/en/fragment/product_related/rpn_information/board_photo/stm32f3discovery.jpg)
+![STM32F3discovery image](https://www.st.com/bin/ecommerce/api/image.PF254044.en.feature-description-include-personalized-no-cpn-large.jpg)
 
 
 ### MCU
