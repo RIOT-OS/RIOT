@@ -16,8 +16,7 @@ again.
 
 ## Hardware
 
-![Arduino Mega2560](http://userpage.zedat.fu-
-berlin.de/~hvbruinehsen/IMG_20140923_100817.jpg)
+![Arduino Mega2560](https://store-cdn.arduino.cc/uni/catalog/product/cache/1/image/500x375/f8876a31b63532bbba4e781c30024a0a/a/0/a000067_front_1_.jpg)
 
 ### MCU
 | MCU        | ATmega2560        |
