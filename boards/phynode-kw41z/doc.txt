@@ -22,7 +22,7 @@ There board also provides an SSD1673 Active Matrix EPD 150x200 Display Driver
 <img src="https://www.phytec.eu/fileadmin/user_upload/images/content/1.Products/IoT/ePaper_IoTKit_4.png"
      alt="PhyNODE-KW41Z" />
 
-[board-web-page]: https://www.phytec.eu/product-eu/internet-of-things/iot-enablement-kit-4/
+[board-web-page]: https://www.phytec.de/fileadmin/user_upload/downloads/Manuals/L-847e_0.pdf
 
 ### Flash the board
 
