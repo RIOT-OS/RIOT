@@ -27,6 +27,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Override the default initial PM blocker
+ *
+ * STANDBY and BACKUP mode are blocked by default. Idle modes are enabled.
+ */
+#define PM_BLOCKER_INITIAL      0x00000101
+
+/**
  * @brief   The Low Power SRAM is not retained during deep sleep.
  */
 #define CPU_BACKUP_RAM_NOT_RETAINED (1)
