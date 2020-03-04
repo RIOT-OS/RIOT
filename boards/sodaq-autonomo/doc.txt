@@ -13,7 +13,7 @@ The Autonomo is available from the SODAQ [shop](http://shop.sodaq.com/).
 
 ## Hardware
 
-![sodaq-autonomo image](http://static.webshopapp.com/shops/104792/files/050759716/sodaq-sodaq-autonomo.jpg)
+![sodaq-autonomo image](https://support.sodaq.com/Boards/Autonomo/sodaq_autonomo.png)
 
 
 ### MCU
