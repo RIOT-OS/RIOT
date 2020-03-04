@@ -41,7 +41,7 @@ extern "C" {
  * @param[in]   base    base interval to use
  * @return  (time from ztimer_set() until callback) - base
  */
-uint32_t ztimer_overhead(ztimer_clock_t *clock, uint32_t base);
+int32_t ztimer_overhead(ztimer_clock_t *clock, uint32_t base);
 
 #endif /* ZTIMER_OVERHEAD_H */
 /** @} */
