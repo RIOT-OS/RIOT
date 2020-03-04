@@ -8,8 +8,7 @@
  * General information about this board can be found on the
  * [SODAQ support](http://support.sodaq.com/sodaq-one/sodaq-sara-r410m/)
  * website.
- * ![SODAQ SARA AFF]( https://support.sodaq.com/wp-content/uploads/2018/07/sodaq-sara-pins-768x862.png
-)
+ * ![SODAQ SARA AFF](https://support.sodaq.com/Boards/Sara_AFF/sodaq_sara_aff.png)
  *
  * ### Flash the board
  *
