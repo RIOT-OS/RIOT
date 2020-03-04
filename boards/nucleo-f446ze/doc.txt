@@ -67,7 +67,6 @@ make BOARD=nucleo-f446ze debug
 ## Supported Toolchains
 
 For using the ST Nucleo-F446ZE board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-
-embedded)
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
  */
