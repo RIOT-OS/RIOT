@@ -24,7 +24,7 @@ while [ $# -gt 0 ]; do
 done
 
 FILEREGEX='\.([Hh]|[Hh]pp|txt|md)$'
-EXCLUDE='^(.+/vendor/|dist/tools/coccinelle/include|boards/common/msba2/tools/src)'
+EXCLUDE='^(.+/vendor/|.+/bin/|.+dist/tools/|dist/tools/coccinelle/include|boards/common/msba2/tools/src)'
 
 if [ -z "${FILES}" ]; then
     FILES=$(FILEREGEX=${FILEREGEX} EXCLUDE=${EXCLUDE} changed_files)
