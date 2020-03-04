@@ -49,6 +49,7 @@ PSEUDOMODULES += ina3221_alerts
 PSEUDOMODULES += l2filter_blacklist
 PSEUDOMODULES += l2filter_whitelist
 PSEUDOMODULES += lis2dh12_i2c
+PSEUDOMODULES += lis2dh12_int
 PSEUDOMODULES += lis2dh12_spi
 PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
