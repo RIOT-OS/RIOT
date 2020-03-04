@@ -210,7 +210,6 @@ PSEUDOMODULES += crypto_aes_unroll
 PSEUDOMODULES += auto_init_%
 NO_PSEUDOMODULES += auto_init_can
 NO_PSEUDOMODULES += auto_init_loramac
-NO_PSEUDOMODULES += auto_init_saul
 NO_PSEUDOMODULES += auto_init_security
 NO_PSEUDOMODULES += auto_init_storage
 NO_PSEUDOMODULES += auto_init_usbus

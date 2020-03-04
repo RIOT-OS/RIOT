@@ -280,6 +280,16 @@ typedef struct {
 } saul_driver_t;
 
 /**
+ * @brief   Initialize all available SAUL drivers.
+ *          This function is called automatically if the auto_init_saul
+ *          module is used.
+ *          If only the saul_init module is used instead, you can call
+ *          this function to manually set up all SAUL sensors at a later
+ *          time.
+ */
+void saul_init_devs(void);
+
+/**
  * @brief   Default not supported function
  */
 int saul_notsup(const void *dev, phydat_t *dat);

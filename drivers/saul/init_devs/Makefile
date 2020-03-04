@@ -1,3 +1,3 @@
-MODULE = auto_init_saul
+MODULE = saul_init_devs
 
 include $(RIOTBASE)/Makefile.base
