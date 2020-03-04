@@ -66,8 +66,7 @@ make BOARD=nucleo-f401re debug
 ## Supported Toolchains
 
 For using the ST Nucleo-F401RE board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-
-embedded)
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
 
 ## Issues with old Hardware Revisions
