@@ -37,6 +37,8 @@
 #ifndef PERIPH_RTC_H
 #define PERIPH_RTC_H
 
+#include <stdbool.h>
+#include <stdint.h>
 #include <time.h>
 #include "periph_conf.h"
 
@@ -146,6 +148,40 @@ void rtc_tm_normalize(struct tm *time);
  * @return              0 if a and b are equal
  */
 int rtc_tm_compare(const struct tm *a, const struct tm *b);
+
+/**
+ * @brief Convert time struct into timestamp.
+ *
+ * @pre   The time structs @p a and @p b are assumed to be normalized.
+ *        Use @ref rtc_tm_normalize to normalize a struct tm that has been
+ *        manually edited.
+ *
+ * @param[in] t       The time struct to convert
+ *
+ * @return            elapsed seconds since `RIOT_EPOCH`
+ */
+uint32_t rtc_mktime(struct tm *t);
+
+/**
+ * @brief Converts an RTC timestamp into a  time struct.
+ *
+ * @param[in]  time   elapsed seconds since `RIOT_EPOCH`
+ * @param[out] t      the corresponding timestamp
+ */
+void rtc_localtime(uint32_t time, struct tm *t);
+
+/**
+ * @brief Verify that a time struct @p t contains valid data.
+ *
+ * @note    This function checks whether the fields of the
+ *          struct @p t are positive and within the bounds set
+ *          by @ref rtc_tm_normalize.
+ *
+ * @param[in] t       The struct to be checked.
+ *
+ * @return            true when valid, false if not
+ */
+bool rtc_tm_valid(const struct tm *t);
 
 #ifdef __cplusplus
 }

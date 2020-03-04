@@ -6,3 +6,6 @@ FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_wdt
+
+FEATURES_CONFLICT += periph_rtc:periph_rtt
+FEATURES_CONFLICT_MSG += "On ATmega, the RTC and RTT use to the same hardware timer."

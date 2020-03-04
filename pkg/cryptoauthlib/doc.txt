@@ -1,6 +1,6 @@
 /**
  * @defgroup pkg_cryptoauthlib Microchip CryptoAuthentication Library
- * @ingroup  pkg drivers sys_crypto
+ * @ingroup  pkg drivers_misc sys_crypto
  * @brief    Provides the library for Microchip CryptoAuth devices
  * @see      https://github.com/MicrochipTech/cryptoauthlib
  *

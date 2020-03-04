@@ -14,4 +14,4 @@ FFLAGS = $(PROG_DEV) $(FLASHFILE)
 DEBUGGER_FLAGS =
 
 # Skip the space needed by the embedded bootloader
-export ROM_OFFSET ?= 0x3000
+ROM_OFFSET ?= 0x3000

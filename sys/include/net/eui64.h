@@ -54,8 +54,9 @@ extern "C" {
  */
 typedef union {
     network_uint64_t uint64;     /**< represented as 64 bit value */
-    uint8_t uint8[8];            /**< split into 8 8-bit words. */
-    network_uint16_t uint16[4];  /**< split into 4 16-bit words. */
+    uint8_t uint8[8];            /**< split into 8 8-bit words.   */
+    network_uint16_t uint16[4];  /**< split into 4 16-bit words.  */
+    network_uint32_t uint32[2];  /**< split into 2 32-bit words.  */
 } eui64_t;
 
 /**

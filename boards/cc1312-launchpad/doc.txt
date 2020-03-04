@@ -40,7 +40,9 @@ provides the default pinout for the board.
 The LAUNCHXL-CC1312R1 comes with an XDS110 on-board debug probe that provides
 programming, flashing and debugging capabilities.
 
-### Installing CCS and Uniflash
+### Using TI tools
+
+#### Installing CCS and Uniflash
 
 The TI's Code Composer Studio provides the necessary tools to use the debug
 features of the XDS110; Uniflash provides flashing tools. Both programs can
@@ -53,7 +55,7 @@ Before using the XDS110 with the latest CCS/Uniflash versions the firmware for
 it needs to be updated. Texas Instruments has a guide to correctly update it
 [here](http://software-dl.ti.com/ccs/esd/documents/xdsdebugprobes/emu_xds110.html#updating-the-xds110-firmware).
 
-### Setting up the environment
+#### Setting up the environment
 
 In order to make use of the programming and debugging capabilities of the XDS110
 some environment variable needs to be set:
@@ -81,9 +83,40 @@ make debug
 
 It will open GDB and connect to the debug server automatically.
 
-### Reset
+#### Reset
 
 The LAUNCHXL-CC1312R1 provides a reset button but it can also be reset from
 a computer using the `make reset` command.
+
+### Using OpenOCD
+
+To use OpenOCD with the XDS110 you need to use the an special version of
+OpenOCD made by TI (upstream version is not _yet_ compatible). You can
+clone and compile it from source:
+
+```
+# Clone into the openocd-ti folder
+git clone https://git.ti.com/cgit/sdo-emu/openocd openocd-ti
+
+# Change directory to the openocd source code
+cd openocd-ti/openocd
+
+# Configure, build, install
+./configure
+make
+sudo make install
+```
+
+#### Setting up the environment
+
+Now that we have the TI version of OpenOCD we need to export the `PROGRAMMER`
+environment variable, this is to enable OpenOCD instead of Uniflash.
+
+```
+export PROGRAMMER=openocd
+```
+
+Now we can just do `make debug-server` and then `make debug`, this all using
+OpenOCD.
 
 */

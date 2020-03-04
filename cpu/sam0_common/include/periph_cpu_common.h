@@ -22,6 +22,7 @@
 #define PERIPH_CPU_COMMON_H
 
 #include "cpu.h"
+#include "exti_config.h"
 
 #ifdef __cplusplus
 extern "C" {

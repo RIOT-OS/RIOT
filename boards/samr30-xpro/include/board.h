@@ -36,7 +36,7 @@ extern "C" {
 #define AT86RF2XX_PARAM_INT         GPIO_PIN(PB, 0)
 #define AT86RF2XX_PARAM_SLEEP       GPIO_PIN(PA, 20)
 #define AT86RF2XX_PARAM_RESET       GPIO_PIN(PB, 15)
-#define AT86RF2XX_PARAM_SPI_CLK     SPI_CLK_5MHZ
+#define AT86RF2XX_PARAM_SPI_CLK     SPI_CLK_1MHZ
 /** @}*/
 
 /**

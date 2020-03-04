@@ -26,6 +26,11 @@ static void test_atomic_flag(void)
     TEST_ASSERT_EQUAL_INT(0, atomic_flag_test_and_set(&flag));
 }
 
+/* Prevent compiler optimization for SAML1X because of gcc internal bug */
+#ifdef CPU_ARCH_CORTEX_M23
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+#endif
 /* Test atomic_fetch_add */
 static void test_atomic_inc_positive(void)
 {
@@ -51,11 +56,7 @@ static void test_atomic_inc_negative(void)
         TEST_ASSERT_EQUAL_INT(i + 1, atomic_load(&res));
     }
 }
-/* Prevent compiler optimization for SAML1X because of gcc internal bug */
-#ifdef CPU_SAML1X
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
-#endif
+
 static void test_atomic_inc_rollover(void)
 {
     atomic_int res = ATOMIC_VAR_INIT(INT_MAX - 30);

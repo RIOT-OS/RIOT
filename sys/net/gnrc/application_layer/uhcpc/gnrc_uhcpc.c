@@ -13,6 +13,9 @@
 #ifdef MODULE_GNRC_RPL
 #include "net/gnrc/rpl.h"
 #endif
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+#include "net/gnrc/sixlowpan/ctx.h"
+#endif
 #include "net/ipv6/addr.h"
 #include "net/netdev.h"
 #include "net/netopt.h"
@@ -21,6 +24,7 @@
 #include "log.h"
 #include "fmt.h"
 
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 static kernel_pid_t gnrc_border_interface;
 static kernel_pid_t gnrc_wireless_interface;
 
@@ -54,6 +58,48 @@ static void set_interface_roles(void)
 
 static ipv6_addr_t _prefix;
 
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+#define SIXLO_CTX_LTIME_MIN (60U)   /**< context lifetime in minutes */
+
+static bool _ctx_match(const gnrc_sixlowpan_ctx_t *ctx,
+                       const ipv6_addr_t *prefix, uint8_t prefix_len)
+{
+    return (ctx != NULL) &&
+           (ctx->prefix_len == prefix_len) &&
+           (ipv6_addr_match_prefix(&ctx->prefix, prefix) >= prefix_len);
+}
+
+static void _update_6ctx(const ipv6_addr_t *prefix, uint8_t prefix_len)
+{
+    gnrc_sixlowpan_ctx_t *ctx = gnrc_sixlowpan_ctx_lookup_addr(prefix);
+    uint8_t cid = 0;
+
+    if (!_ctx_match(ctx, prefix, prefix_len)) {
+        /* While the context is a prefix match, the defined prefix within the
+         * context does not match => use new context */
+        ctx = NULL;
+    }
+    else {
+        cid = ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK;
+    }
+    /* find first free context ID */
+    if (ctx == NULL) {
+        while (((ctx = gnrc_sixlowpan_ctx_lookup_id(cid)) != NULL) &&
+               !_ctx_match(ctx, prefix, prefix_len)) {
+            cid++;
+        }
+    }
+    if (cid < GNRC_SIXLOWPAN_CTX_SIZE) {
+        LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): add compression context "
+                 "%u for prefix %s/%u\n", cid,
+                 ipv6_addr_to_str(addr_str, prefix, sizeof(addr_str)),
+                 prefix_len);
+        gnrc_sixlowpan_ctx_update(cid, (ipv6_addr_t *)prefix, prefix_len,
+                                  SIXLO_CTX_LTIME_MIN, true);
+    }
+}
+#endif
+
 void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, uint8_t *src, uhcp_iface_t iface)
 {
     (void)prefix_len;
@@ -82,10 +128,17 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
 
     if (ipv6_addr_equal(&_prefix, (ipv6_addr_t*)prefix)) {
         LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): got same prefix again\n");
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+        /* always update 6LoWPAN compression context so it does not time out, we
+         * can't just remove it anyway according to the RFC */
+        _update_6ctx((ipv6_addr_t *)prefix, 64);
+#endif
         return;
     }
 
     gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR, (64 << 8),
+        /* always update 6LoWPAN compression context so it does not time out, we
+         * can't just remove it anyway according to the RFC */
                     prefix, sizeof(ipv6_addr_t));
 #if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
     GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
@@ -101,9 +154,8 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
 #endif
     gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
                     &_prefix, sizeof(_prefix));
-    print_str("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix ");
-    ipv6_addr_print((ipv6_addr_t*)prefix);
-    puts("/64");
+    LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix %s/64\n",
+             ipv6_addr_to_str(addr_str, (ipv6_addr_t *)prefix, sizeof(addr_str)));
 
     if (!ipv6_addr_is_unspecified(&_prefix)) {
         gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
@@ -112,11 +164,15 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
     GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
         gnrc_ipv6_nib_abr_del(&_prefix);
 #endif
-        print_str("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix ");
-        ipv6_addr_print(&_prefix);
-        puts("/64");
+        LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix %s/64\n",
+                 ipv6_addr_to_str(addr_str, &_prefix, sizeof(addr_str)));
     }
 
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+    /* update compression context last in case previous context was removed by
+     * gnrc_ipv6_nib_abr_del() above */
+    _update_6ctx((ipv6_addr_t *)prefix, 64);
+#endif
     memcpy(&_prefix, prefix, 16);
 }
 

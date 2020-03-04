@@ -1,3 +1,4 @@
+CFLAGS += -Wno-unused-parameter -Wno-unused
 CFLAGS += -DWOLFSSL_USER_SETTINGS=1
 CFLAGS += -DWOLFSSL_RIOT_OS=1
 INCLUDES += -I$(PKGDIRBASE)/../../../

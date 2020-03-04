@@ -27,8 +27,23 @@
 #include "mtd_spi_nor.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
+#include "timex.h"
 
 #ifdef MODULE_MTD
+static const mtd_spi_nor_params_t _pinetime_nor_params = {
+    .opcode = &mtd_spi_nor_opcode_default,
+    .wait_chip_erase = 9LU * US_PER_SEC,
+    .wait_32k_erase = 160LU *US_PER_MS,
+    .wait_sector_erase = 70LU * US_PER_MS,
+    .wait_4k_erase = 70LU * US_PER_MS,
+    .clk = PINETIME_NOR_SPI_CLK,
+    .flag = PINETIME_NOR_FLAGS,
+    .spi = PINETIME_NOR_SPI_DEV,
+    .mode = PINETIME_NOR_SPI_MODE,
+    .cs = PINETIME_NOR_SPI_CS,
+    .addr_width = 3,
+};
+
 static mtd_spi_nor_t pinetime_nor_dev = {
     .base = {
         .driver = &mtd_spi_nor_driver,
@@ -36,13 +51,7 @@ static mtd_spi_nor_t pinetime_nor_dev = {
         .pages_per_sector = PINETIME_NOR_PAGES_PER_SECTOR,
         .sector_count = PINETIME_NOR_SECTOR_COUNT,
     },
-    .flag = PINETIME_NOR_FLAGS,
-    .opcode = &mtd_spi_nor_opcode_default,
-    .spi = PINETIME_NOR_SPI_DEV,
-    .cs = PINETIME_NOR_SPI_CS,
-    .addr_width = 3,
-    .mode = PINETIME_NOR_SPI_MODE,
-    .clk = PINETIME_NOR_SPI_CLK,
+    .params = &_pinetime_nor_params,
 };
 
 mtd_dev_t *mtd0 = (mtd_dev_t *)&pinetime_nor_dev;

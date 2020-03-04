@@ -23,6 +23,8 @@
 #define CPU_CONF_H
 
 #include <stdint.h>
+
+#include "cpu_conf_common.h"
 #include "esp_common_log.h"
 #include "xtensa_conf.h"
 #include "xtensa/xtensa_context.h"
@@ -30,11 +32,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   Declare the heap_stats function as available
- */
-#define HAVE_HEAP_STATS
 
 /**
  * @name   Stack size configuration

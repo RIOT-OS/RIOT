@@ -42,7 +42,7 @@ def testfunc(child):
 
     # Setup RIOT Node to connect to Hostsystems TCP Server
     child.sendline('gnrc_tcp_tcb_init')
-    child.sendline('gnrc_tcp_open_active AF_INET6 ' + target_addr + " " + str(port) + ' 0')
+    child.sendline('gnrc_tcp_open_active [{}]:{} 0'.format(target_addr, str(port)))
     child.expect_exact('gnrc_tcp_open_active: returns 0')
 
     # Initiate connection teardown from test host
@@ -60,7 +60,7 @@ def testfunc(child):
     child.expect_exact('gnrc_tcp_recv: received ' + str(half_data_len))
     assert read_data_from_internal_buffer(child, half_data_len) == data[half_data_len:]
 
-    # Buffer should have been read entirly and the connection was closed, there can be no new data.
+    # Buffer should have been read entirely and the connection was closed, there can be no new data.
     # Reading with a timeout must return 0 not -ETIMEOUT
     child.sendline('gnrc_tcp_recv 1000000 ' + str(half_data_len))
     child.expect_exact('gnrc_tcp_recv: returns 0')

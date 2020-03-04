@@ -22,6 +22,7 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "cpu_conf_common.h"
 #include "xtensa_conf.h"
 
 #ifdef __cplusplus

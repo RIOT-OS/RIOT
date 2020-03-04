@@ -83,5 +83,6 @@ Pseudomodules                                                  {#pseudomodules}
 Pseudomodules are modules that do not have any code. Their main use cases are
 to provide base information for dependencies to other modules or information to
 the code base via the `MODULE_<MODULENAME>` macro. Pseudomodules can provide
-header files too, if need be. To create a pseudomodule just add its name to the
-`PSEUDOMODULES` macro in `Makefile.pseudomodules`.
+header files too, if need be. To create a pseudomodule just add its name to
+`makefiles/pseudomodules.inc.mk` with `PSEUDOMODULES += <modulename>` in
+alphabetical order.

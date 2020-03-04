@@ -11,5 +11,3 @@ OPENOCD_ADAPTER_INIT ?= \
   -c 'sysfsgpio_srst_num $(SRST_PIN)' \
   -c 'adapter_nsrst_delay 100' \
   -c 'adapter_nsrst_assert_width 100'
-
-export OPENOCD_ADAPTER_INIT

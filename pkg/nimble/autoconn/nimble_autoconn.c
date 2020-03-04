@@ -218,7 +218,7 @@ static void _on_netif_evt(int handle, nimble_netif_event_t event,
             _state = STATE_IDLE;
             break;
         case NIMBLE_NETIF_ABORT_SLAVE:
-            _evt_dbg("[autoconn] ABORT slave", handle, addr);
+            _evt_dbg("ABORT slave", handle, addr);
             _state = STATE_IDLE;
             break;
         case NIMBLE_NETIF_CONN_UPDATED:

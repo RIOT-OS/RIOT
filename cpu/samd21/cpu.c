@@ -32,7 +32,7 @@
 #endif
 
 #ifndef GEN3_ULP32K
-#define GEN3_ULP32K         1
+#define GEN3_ULP32K         GEN2_ULP32K
 #endif
 
 #ifndef XOSC32_STARTUP_TIME
@@ -115,8 +115,7 @@ static void clk_init(void)
 
 #if CLOCK_USE_XOSC32_DFLL || !GEN2_ULP32K || !GEN3_ULP32K
     /* Use External 32.768KHz Oscillator */
-    SYSCTRL->XOSC32K.reg =  SYSCTRL_XOSC32K_ONDEMAND |
-                            SYSCTRL_XOSC32K_EN32K |
+    SYSCTRL->XOSC32K.reg =  SYSCTRL_XOSC32K_EN32K |
                             SYSCTRL_XOSC32K_XTALEN |
                             SYSCTRL_XOSC32K_STARTUP(XOSC32_STARTUP_TIME) |
                             SYSCTRL_XOSC32K_RUNSTDBY;
