@@ -20,6 +20,7 @@
 #ifndef ATCA_PARAMS_H
 #define ATCA_PARAMS_H
 
+#include "board.h"
 #include "cryptoauthlib.h"
 
 #ifdef __cplusplus
