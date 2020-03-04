@@ -107,8 +107,8 @@ struct can_filter {
  * @brief CAN bit-timing parameters
  *
  * For further information, please read chapter "8 BIT TIMING
- * REQUIREMENTS" of the "Bosch CAN Specification version 2.0"
- * at http://www.semiconductors.bosch.de/pdf/can2spec.pdf.
+ * REQUIREMENTS" of the "Bosch CAN Specification version 2.0":
+ * https://www.kvaser.com/software/7330130980914/V1/can2spec.pdf
  */
 struct can_bittiming {
     uint32_t bitrate;      /**< Bit-rate in bits/second */
