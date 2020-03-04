@@ -38,7 +38,7 @@ board](https://github.com/d00616/temp/raw/master/nrf52-minidev.jpg)
 | Radio         | 2.4GHz BLE compatiple, -20 dBm to +4 dBm output, -96 dBm RX sensitivity |
 | Vcc        | 1.7V - 3.6V           |
 | Datasheet  | [Datasheet](https://www.nordicsemi.com/eng/Products/Bluetooth-low-energy/nRF52832) |
-| Reference Manual | [Reference Manual](http://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.nrf52%2Fdita%2Fnrf52%2Fnrf52_series.html&cp=1) |
+| Reference Manual | [Reference Manual](https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.4.pdf) |
 
 ##Pin layout
 
