@@ -8,4 +8,7 @@ FEATURES_PROVIDED += periph_adc
 # feature to mark this
 FEATURES_PROVIDED += ble_nimble_netif
 
+# all nrf52 have an MPU
+FEATURES_PROVIDED += cortexm_mpu
+
 -include $(RIOTCPU)/nrf5x_common/Makefile.features
