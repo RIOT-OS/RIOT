@@ -1164,7 +1164,7 @@ for example:
 ```
 #include "esp/common_macros.h"
 ...
-voir IRAM my_func(void)
+void IRAM my_func(void)
 {
     ...
 }
