@@ -737,3 +737,7 @@ ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += netif
 endif
+
+ifneq (,$(filter netdev_%,$(USEMODULE)))
+  USEMODULE += netdev
+endif
