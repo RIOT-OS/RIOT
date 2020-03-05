@@ -44,6 +44,11 @@
 #define TRACE(...)
 #endif
 
+/* after power up, on an invalid JEDEC ID, wait and read N times */
+#ifndef MTD_POWER_UP_WAIT_FOR_ID
+#define MTD_POWER_UP_WAIT_FOR_ID    (0x0F)
+#endif
+
 #define MTD_32K             (32768ul)
 #define MTD_32K_ADDR_MASK   (0x7FFF)
 #define MTD_4K              (4096ul)
@@ -349,6 +354,13 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     DEBUG("mtd_spi_nor_init: CS init\n");
     spi_init_cs(dev->params->spi, dev->params->cs);
 
+    /* power up the MTD device*/
+    DEBUG("mtd_spi_nor_init: power up MTD device");
+    if (mtd_spi_nor_power(mtd, MTD_POWER_UP)) {
+        DEBUG("mtd_spi_nor_init: failed to power up MTD device");
+        return -EIO;
+    }
+
     mtd_spi_acquire(dev);
     int res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
     if (res < 0) {
@@ -544,6 +556,20 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
     switch (power) {
         case MTD_POWER_UP:
             mtd_spi_cmd(dev, dev->params->opcode->wake);
+#if defined(MODULE_XTIMER)
+            /* No sense in trying multiple times if no xtimer to wait between
+               reads */
+            uint8_t retries = 0;
+            int res = 0;
+            do {
+                xtimer_usleep(dev->params->wait_chip_wake_up);
+                res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
+                retries++;
+            } while (res < 0 || retries < MTD_POWER_UP_WAIT_FOR_ID);
+            if (res < 0) {
+                return -EIO;
+            }
+#endif
             break;
         case MTD_POWER_DOWN:
             mtd_spi_cmd(dev, dev->params->opcode->sleep);

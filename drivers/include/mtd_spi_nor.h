@@ -92,6 +92,7 @@ typedef struct {
     uint32_t wait_sector_erase; /**< Sector erase wait time in µs */
     uint32_t wait_32k_erase;    /**< 32KB page erase wait time in µs */
     uint32_t wait_4k_erase;     /**< 4KB page erase wait time in µs */
+    uint32_t wait_chip_wake_up; /**< Chip wake up time in µs */
     spi_clk_t clk;           /**< SPI clock */
     uint16_t flag;           /**< Config flags */
     spi_t spi;               /**< SPI bus the device is connected to */
