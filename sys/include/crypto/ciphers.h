@@ -30,16 +30,9 @@ extern "C" {
 
 /* Shared header file for all cipher algorithms */
 
-/* Set the algorithms that should be compiled in here. When these defines
- * are set, then packets will be compiled 5 times.
- */
-// #define CRYPTO_THREEDES
-// #define CRYPTO_AES
-
 /** @brief the length of keys in bytes */
 #define CIPHERS_MAX_KEY_SIZE 20
 #define CIPHER_MAX_BLOCK_SIZE 16
-
 
 /**
  * Context sizes needed for the different ciphers.
@@ -48,9 +41,9 @@ extern "C" {
  * threedes     needs 24  bytes                           <br>
  * aes          needs CIPHERS_MAX_KEY_SIZE bytes          <br>
  */
-#if defined(CRYPTO_THREEDES)
+#if defined(MODULE_CRYPTO_3DES)
     #define CIPHER_MAX_CONTEXT_SIZE 24
-#elif defined(CRYPTO_AES)
+#elif defined(MODULE_CRYPTO_AES)
     #define CIPHER_MAX_CONTEXT_SIZE CIPHERS_MAX_KEY_SIZE
 #else
 /* 0 is not a possibility because 0-sized arrays are not allowed in ISO C */
