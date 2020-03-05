@@ -81,7 +81,7 @@ void _test_trigger_recv(gnrc_netif_t *netif, const uint8_t *data,
         tmp_buffer_bytes = 0;
     }
     assert(dev->event_callback);
-    dev->event_callback(dev, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr(dev);
 }
 
 static int _netdev_recv(netdev_t *dev, char *buf, int len, void *info)

@@ -63,9 +63,7 @@ static void _irq_handler(void *arg)
     /* We use this counter to avoid filling the message queue with redundant ISR events */
     if (num_irqs_queued == num_irqs_handled) {
         ++num_irqs_queued;
-        if (netdev->event_callback) {
-            netdev->event_callback(netdev, NETDEV_EVENT_ISR);
-        }
+        netdev_trigger_event_isr(netdev);
     }
 }
 

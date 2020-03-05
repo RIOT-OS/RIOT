@@ -36,9 +36,7 @@ static netdev_t *_dev;
 
 void _irq_handler(void)
 {
-    if (_dev->event_callback) {
-        _dev->event_callback(_dev, NETDEV_EVENT_ISR);
-    }
+    netdev_trigger_event_isr(_dev);
 }
 
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)

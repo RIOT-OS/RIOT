@@ -106,9 +106,7 @@ static void extint(void *arg)
 {
     w5100_t *dev = (w5100_t *)arg;
 
-    if (dev->nd.event_callback) {
-        dev->nd.event_callback(&dev->nd, NETDEV_EVENT_ISR);
-    }
+    netdev_trigger_event_isr(&dev->nd);
 }
 
 void w5100_setup(w5100_t *dev, const w5100_params_t *params)
