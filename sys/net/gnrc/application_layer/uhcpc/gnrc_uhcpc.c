@@ -135,11 +135,23 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
 #endif
         return;
     }
-
+    else if (!ipv6_addr_is_unspecified(&_prefix)) {
+        gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
+                        &_prefix, sizeof(_prefix));
+#if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
+    GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+        gnrc_ipv6_nib_abr_del(&_prefix);
+#endif
+        LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix %s/64\n",
+                 ipv6_addr_to_str(addr_str, &_prefix, sizeof(addr_str)));
+    }
+    memcpy(&_prefix, prefix, sizeof(_prefix));
     gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR, (64 << 8),
-        /* always update 6LoWPAN compression context so it does not time out, we
-         * can't just remove it anyway according to the RFC */
                     prefix, sizeof(ipv6_addr_t));
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+    /* add compression before ABR to add it automatically to its context list */
+    _update_6ctx((ipv6_addr_t *)prefix, 64);
+#endif
 #if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
     GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
     gnrc_ipv6_nib_abr_add((ipv6_addr_t *)prefix);
@@ -152,28 +164,8 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
     }
     gnrc_rpl_root_init(GNRC_RPL_DEFAULT_INSTANCE, (ipv6_addr_t*)prefix, false, false);
 #endif
-    gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
-                    &_prefix, sizeof(_prefix));
     LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix %s/64\n",
              ipv6_addr_to_str(addr_str, (ipv6_addr_t *)prefix, sizeof(addr_str)));
-
-    if (!ipv6_addr_is_unspecified(&_prefix)) {
-        gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
-                        &_prefix, sizeof(_prefix));
-#if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
-    GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
-        gnrc_ipv6_nib_abr_del(&_prefix);
-#endif
-        LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix %s/64\n",
-                 ipv6_addr_to_str(addr_str, &_prefix, sizeof(addr_str)));
-    }
-
-#ifdef MODULE_GNRC_SIXLOWPAN_CTX
-    /* update compression context last in case previous context was removed by
-     * gnrc_ipv6_nib_abr_del() above */
-    _update_6ctx((ipv6_addr_t *)prefix, 64);
-#endif
-    memcpy(&_prefix, prefix, 16);
 }
 
 extern void uhcp_client(uhcp_iface_t iface);
