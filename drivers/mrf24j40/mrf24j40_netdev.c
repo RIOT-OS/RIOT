@@ -41,9 +41,8 @@ static void _irq_handler(void *arg)
 {
     netdev_t *dev = (netdev_t *) arg;
 
-    if (dev->event_callback) {
-        dev->event_callback(dev, NETDEV_EVENT_ISR);
-    }
+    netdev_trigger_event_isr(dev);
+
     ((mrf24j40_t *)arg)->irq_flag = 1;
 }
 

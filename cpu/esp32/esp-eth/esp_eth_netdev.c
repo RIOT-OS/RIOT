@@ -99,7 +99,7 @@ static esp_err_t IRAM_ATTR _eth_input_callback(void *buffer, uint16_t len, void 
     memcpy(_esp_eth_dev.rx_buf, buffer, len);
     _esp_eth_dev.rx_len = len;
     _esp_eth_dev.event = SYSTEM_EVENT_ETH_RX_DONE;
-    _esp_eth_dev.netdev.event_callback(&_esp_eth_dev.netdev, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr(&_esp_eth_dev.netdev);
 
     mutex_unlock(&_esp_eth_dev.dev_lock);
 
@@ -351,7 +351,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             _esp_eth_dev.link_up = true;
             if (SYSTEM_EVENT_MAX) {
                 _esp_eth_dev.event = SYSTEM_EVENT_ETH_CONNECTED;
-                _esp_eth_dev.netdev.event_callback(&_esp_eth_dev.netdev, NETDEV_EVENT_ISR);
+                netdev_trigger_event_isr(&_esp_eth_dev.netdev);
             }
             break;
         case SYSTEM_EVENT_ETH_DISCONNECTED:
@@ -359,7 +359,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             _esp_eth_dev.link_up = false;
             if (SYSTEM_EVENT_MAX) {
                 _esp_eth_dev.event = SYSTEM_EVENT_ETH_DISCONNECTED;
-                _esp_eth_dev.netdev.event_callback(&_esp_eth_dev.netdev, NETDEV_EVENT_ISR);
+                netdev_trigger_event_isr(&_esp_eth_dev.netdev);
             }
             break;
         default:

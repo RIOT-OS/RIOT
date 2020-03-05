@@ -302,7 +302,7 @@ static void _tap_isr(int fd, void *arg) {
     netdev_t *netdev = (netdev_t *)arg;
 
     if (netdev->event_callback) {
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
     }
     else {
         puts("netdev_tap: _isr: no event callback.");

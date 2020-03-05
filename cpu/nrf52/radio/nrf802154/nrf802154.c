@@ -526,7 +526,7 @@ void isr_radio(void)
                 DEBUG("[nrf802154] Unhandled state: %x\n", (uint8_t)NRF_RADIO->STATE);
         }
         if (_state) {
-            nrf802154_dev.netdev.event_callback(&nrf802154_dev.netdev, NETDEV_EVENT_ISR);
+            netdev_trigger_event_isr(&nrf802154_dev.netdev);
         }
     }
     else {

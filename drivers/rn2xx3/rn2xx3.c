@@ -62,15 +62,11 @@ static void _rx_cb(void *arg, uint8_t c)
         if (dev->int_state == RN2XX3_INT_STATE_MAC_RX_MESSAGE) {
             /* RX state: closing RX buffer */
             dev->rx_buf[(dev->rx_size + 1) / 2] = 0;
-            if (netdev->event_callback) {
-                netdev->event_callback(netdev, NETDEV_EVENT_ISR);
-            }
+            netdev_trigger_event_isr(netdev);
         }
         else if (dev->int_state == RN2XX3_INT_STATE_MAC_TX) {
             /* still in TX state: transmission complete but no data received */
-            if (netdev->event_callback) {
-                netdev->event_callback(netdev, NETDEV_EVENT_ISR);
-            }
+            netdev_trigger_event_isr(netdev);
         }
         dev->resp_size = 0;
         dev->rx_size = 0;

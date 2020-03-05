@@ -247,7 +247,7 @@ bool _inject_4packet(uint32_t src, uint32_t dst, uint8_t proto, void *data,
     _netdev_buffer_size = sizeof(ethernet_hdr_t) + sizeof(struct ip_hdr) +
                           data_len;
     mutex_unlock(&_netdev_buffer_mutex);
-    ((netdev_t *)&netdev)->event_callback((netdev_t *)&netdev, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr((netdev_t *)&netdev);
 
     return true;
 #else
@@ -279,7 +279,7 @@ bool _inject_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     _netdev_buffer_size = sizeof(ethernet_hdr_t) + sizeof(ipv6_hdr_t) +
                           data_len;
     mutex_unlock(&_netdev_buffer_mutex);
-    ((netdev_t *)&netdev)->event_callback((netdev_t *)&netdev, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr((netdev_t *)&netdev);
 
     return true;
 #else

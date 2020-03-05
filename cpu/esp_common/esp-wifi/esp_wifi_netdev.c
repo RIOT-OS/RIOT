@@ -353,7 +353,7 @@ esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
 
     /* trigger netdev event to read the data */
     _esp_wifi_dev.event_recv++;
-    _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr(&_esp_wifi_dev.netdev);
 
     /* reset IRQ nesting counter */
     irq_interrupt_nesting--;
@@ -434,7 +434,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
 
             _esp_wifi_dev.connected = true;
             _esp_wifi_dev.event_conn++;
-            _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
+            netdev_trigger_event_isr(&_esp_wifi_dev.netdev);
 
             break;
 
@@ -455,7 +455,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
 
             _esp_wifi_dev.connected = false;
             _esp_wifi_dev.event_disc++;
-            _esp_wifi_dev.netdev.event_callback(&_esp_wifi_dev.netdev, NETDEV_EVENT_ISR);
+            netdev_trigger_event_isr(&_esp_wifi_dev.netdev);
 
             /* call disconnect to reset internal state */
             result = esp_wifi_disconnect();

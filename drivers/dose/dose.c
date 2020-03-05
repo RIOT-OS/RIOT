@@ -71,7 +71,7 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
          * if this frame should be processed. By queuing NETDEV_EVENT_ISR,
          * the netif thread will call _isr at some time. */
         SETBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
-        ctx->netdev.event_callback((netdev_t *) ctx, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr((netdev_t *) ctx);
     }
 
     if (ctx->sense_pin != GPIO_UNDEF) {
