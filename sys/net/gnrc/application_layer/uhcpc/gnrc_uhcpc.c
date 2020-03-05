@@ -147,8 +147,6 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
     }
     memcpy(&_prefix, prefix, sizeof(_prefix));
     gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR, (64 << 8),
-        /* always update 6LoWPAN compression context so it does not time out, we
-         * can't just remove it anyway according to the RFC */
                     prefix, sizeof(ipv6_addr_t));
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
     /* add compression before ABR to add it automatically to its context list */
