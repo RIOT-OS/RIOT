@@ -1,3 +1,3 @@
-MODULE = auto_init_gnrc_netif
+MODULE = saul_init_devs
 
 include $(RIOTBASE)/Makefile.base
