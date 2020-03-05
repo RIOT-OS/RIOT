@@ -140,3 +140,7 @@ endif
 ifneq (,$(filter ws281x_%,$(USEMODULE)))
   USEMODULE += ws281x
 endif
+
+ifneq (,$(filter netdev_%,$(USEMODULE)))
+  USEMODULE += netdev
+endif
