@@ -129,9 +129,11 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
     if (ipv6_addr_equal(&_prefix, (ipv6_addr_t*)prefix)) {
         LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): got same prefix again\n");
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
-        /* always update 6LoWPAN compression context so it does not time out, we
-         * can't just remove it anyway according to the RFC */
-        _update_6ctx((ipv6_addr_t *)prefix, 64);
+        if (gnrc_netif_is_6ln(gnrc_netif_get_by_pid(gnrc_wireless_interface))) {
+            /* always update 6LoWPAN compression context so it does not time
+             * out, we can't just remove it anyway according to the RFC */
+            _update_6ctx((ipv6_addr_t *)prefix, 64);
+        }
 #endif
         return;
     }
@@ -148,14 +150,19 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
     memcpy(&_prefix, prefix, sizeof(_prefix));
     gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR, (64 << 8),
                     prefix, sizeof(ipv6_addr_t));
+    /* only configure 6Lo-ND features when wireless interface uses
+     * 6Lo-ND */
+    if (gnrc_netif_is_6ln(gnrc_netif_get_by_pid(gnrc_wireless_interface))) {
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
-    /* add compression before ABR to add it automatically to its context list */
-    _update_6ctx((ipv6_addr_t *)prefix, 64);
+        /* add compression before ABR to add it automatically to its context
+         * list */
+        _update_6ctx((ipv6_addr_t *)prefix, 64);
 #endif
 #if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
-    GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
-    gnrc_ipv6_nib_abr_add((ipv6_addr_t *)prefix);
+        GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+        gnrc_ipv6_nib_abr_add((ipv6_addr_t *)prefix);
 #endif
+    }
 #ifdef MODULE_GNRC_RPL
     gnrc_rpl_init(gnrc_wireless_interface);
     gnrc_rpl_instance_t *inst = gnrc_rpl_instance_get(GNRC_RPL_DEFAULT_INSTANCE);
