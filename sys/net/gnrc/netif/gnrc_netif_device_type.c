@@ -105,6 +105,9 @@ void gnrc_netif_init_6ln(gnrc_netif_t *netif)
 #ifdef MODULE_CC110X
         case NETDEV_TYPE_CC110X:
 #endif
+#ifdef MODULE_ESP_NOW
+        case NETDEV_TYPE_ESP_NOW:
+#endif
         case NETDEV_TYPE_NRFMIN:
 #if GNRC_IPV6_NIB_CONF_6LN
             netif->flags |= GNRC_NETIF_FLAGS_6LN;
