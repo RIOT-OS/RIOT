@@ -19,9 +19,6 @@ DRIVER ?= sx1276
 
 USEMODULE += $(DRIVER)
 
-# Required for the cipher module */
-CFLAGS += -DCRYPTO_AES
-#
 # We can reduce the size of the packet buffer for LoRaWAN, since there's no IP
 # support. This will reduce RAM consumption.
 CFLAGS += -DGNRC_PKTBUF_SIZE=512
