@@ -96,9 +96,7 @@ iotlab-stop: $(IOTLAB_AUTH)
 IOTLABTERMFLASHDEPS ?= $(filter iotlab-flash iotlab-exp,$(MAKECMDGOALS))
 
 iotlab-term: $(IOTLABTERMFLASHDEPS)
-	$(Q)ssh -t $(IOTLAB_AUTHORITY) "iotlab-experiment get $(_NODES_LIST_OPTION) -i $(IOTLAB_EXP_ID) > /dev/null || \
-	                                iotlab-auth -u $(IOTLAB_USER)"
-
+	$(Q)ssh -t $(IOTLAB_AUTHORITY) "iotlab-experiment get -i $(IOTLAB_EXP_ID) --print > /dev/null || iotlab-auth -u $(IOTLAB_USER)"
 	$(Q)ssh -t $(IOTLAB_AUTHORITY) \
 	"$(if $(IOTLAB_TMUX),tmux attach -t riot-$(IOTLAB_EXP_ID) || tmux new -s riot-$(IOTLAB_EXP_ID) ',) \
 	$(if $(IOTLAB_LOGGING), \
