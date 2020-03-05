@@ -62,7 +62,6 @@ IPV6_PREFIX ?= 2001:db8::/64
 ifeq (,$(filter native,$(BOARD)))
   ifeq (1,$(USE_SLIP))
     # SLIP baudrate and UART device can be configured from make command
-    SLIP_UART ?= "UART_DEV(UART_NUMOF-1)"
     SLIP_BAUDRATE ?= 115200
     include $(CURDIR)/Makefile.slip.conf
   else
@@ -107,6 +106,11 @@ ifneq (1,$(USE_DHCPV6))
 uhcpd-daemon: host-tools
 	$(RIOTTOOLS)/uhcpd/bin/uhcpd $(TAP) $(IPV6_PREFIX) &
 endif
+endif
+
+ifeq (1,$(USE_SLIP))
+sliptty:
+	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)/sliptty
 endif
 
 # Set a custom channel if needed
