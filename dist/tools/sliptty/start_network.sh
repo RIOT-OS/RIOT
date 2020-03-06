@@ -99,7 +99,7 @@ SLIP_ONLY=0
 
 while getopts ehI: opt; do
     case ${opt} in
-        e)  SLIP_ONLY=1;;
+        e)  SLIP_ONLY=1; shift 1;;
         I)  TUN=${OPTARG}; shift 2;;
         h)  usage $0; exit 0;;
     esac
