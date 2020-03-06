@@ -1,0 +1,77 @@
+#
+# ztimer dependencies
+#
+
+# "ztimer" is the default meta-module of ztimer
+ifneq (,$(filter ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_core
+  USEMODULE += ztimer_convert_frac
+  USEMODULE += ztimer_convert_shift
+
+  # ztimer's auto_init code resides in it's submodule "ztimer_auto_init",
+  # but RIOT's auto_init scheme expects "auto_init_ztimer" in DEFAULT_MODULES so
+  # it can be disabled (by adding to DISABLE_MODULES).
+  #
+  # "auto_init_%" modules cannot have further dependencies, so we cannot do
+  # "if auto_init_ztimer: use ztimer_auto_init".
+  #
+  # So, if neither "auto_init" nor "auto_init_ztimer" are disabled, pull in
+  # "ztimer_auto_init".
+  DEFAULT_MODULE += auto_init_ztimer
+  ifeq (,$(filter auto_init auto_init_ztimer,$(DISABLE_MODULE)))
+    USEMODULE += ztimer_auto_init
+  endif
+endif
+
+# unless ztimer_xtimer_compat is used, make xtimer use ztimer as backend.
+ifneq (,$(filter ztimer,$(USEMODULE)))
+  ifneq  (,$(filter xtimer,$(USEMODULE)))
+    ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+        USEMODULE += xtimer_on_ztimer
+    endif
+  endif
+endif
+
+# make xtimer use ztimer_usec as low level timer
+ifneq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+  PSEUDOMODULES += xtimer_on_ztimer
+endif
+
+# "ztimer_xtimer_compat" is a wrapper of the xtimer API on ztimer_used
+# (it is currently incomplete). Unless doing testing, use "xtimer_on_ztimer".
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+  USEMODULE += div
+  USEMODULE += ztimer_usec
+  PSEUDOMODULES += xtimer
+endif
+
+ifneq (,$(filter ztimer_%,$(USEMODULE)))
+  USEMODULE += ztimer_core
+  USEMODULE += ztimer_extend
+endif
+
+ifneq (,$(filter ztimer_convert_%,$(USEMODULE)))
+  USEMODULE += ztimer_convert
+endif
+
+ifneq (,$(filter ztimer_periph_timer,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_timer
+endif
+
+ifneq (,$(filter ztimer_periph_rtt,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtt
+endif
+
+ifneq (,$(filter ztimer_convert_frac,$(USEMODULE)))
+  USEMODULE += frac
+endif
+
+ifneq (,$(filter ztimer_usec,$(USEMODULE)))
+  USEMODULE += ztimer
+  USEMODULE += ztimer_periph_timer
+endif
+
+ifneq (,$(filter ztimer_msec,$(USEMODULE)))
+  USEMODULE += ztimer
+endif

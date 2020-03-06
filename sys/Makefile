@@ -76,8 +76,8 @@ endif
 ifneq (,$(filter log_%,$(USEMODULE)))
   DIRS += log
 endif
-ifneq (,$(filter xtimer,$(USEMODULE)))
-  DIRS += xtimer
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+  FILTER += xtimer
 endif
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   DIRS += cpp11-compat
@@ -163,7 +163,10 @@ endif
 ifneq (,$(filter netif,$(USEMODULE)))
     DIRS += net/netif
 endif
+ifneq (,$(filter ztimer_core,$(USEMODULE)))
+    DIRS += ztimer
+endif
 
-DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(USEMODULE))))
+DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(filter-out $(FILTER), $(USEMODULE)))))
 
 include $(RIOTBASE)/Makefile.base

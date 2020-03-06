@@ -33,7 +33,13 @@ void auto_init(void)
         extern void auto_init_random(void);
         auto_init_random();
     }
-    if (IS_USED(MODULE_AUTO_INIT_XTIMER)) {
+    if (IS_USED(MODULE_AUTO_INIT_ZTIMER)) {
+        LOG_DEBUG("Auto init ztimer.\n");
+        void ztimer_init(void);
+        ztimer_init();
+    }
+    if (IS_USED(MODULE_AUTO_INIT_XTIMER) &&
+            !IS_USED(MODULE_ZTIMER_XTIMER_COMPAT)) {
         LOG_DEBUG("Auto init xtimer.\n");
         extern void xtimer_init(void);
         xtimer_init();
