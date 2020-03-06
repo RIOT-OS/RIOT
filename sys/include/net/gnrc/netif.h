@@ -527,6 +527,20 @@ char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
  */
 size_t gnrc_netif_addr_from_str(const char *str, uint8_t *out);
 
+/**
+ * @brief   Send a GNRC packet via a given @ref gnrc_netif_t interface.
+ *
+ * @param netif         pointer to the interface
+ * @param pkt           packet to be sent.
+ *
+ * @return              1 if packet was successfully delivered
+ * @return              -1 on error
+ */
+static inline int gnrc_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
+{
+    return gnrc_netapi_send(netif->pid, pkt);
+}
+
 #ifdef __cplusplus
 }
 #endif
