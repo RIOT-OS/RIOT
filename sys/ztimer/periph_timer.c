@@ -70,6 +70,8 @@ static const ztimer_ops_t _ztimer_periph_timer_ops = {
     .set = _ztimer_periph_timer_set,
     .now = _ztimer_periph_timer_now,
     .cancel = _ztimer_periph_timer_cancel,
+    .acquire = NULL,
+    .release = NULL,
 };
 
 void ztimer_periph_timer_init(ztimer_periph_timer_t *clock, tim_t dev, unsigned long freq,

@@ -86,6 +86,12 @@ void ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, uint32_t val)
     }
 
     timer->base.offset = val;
+
+    /* if this is the first timer for this clock, acquire it */
+    if (clock->ops->acquire && clock->list.next == NULL) {
+        clock->ops->acquire(clock);
+    }
+
     _add_entry_to_list(clock, &timer->base);
     if (clock->list.next == &timer->base) {
 #ifdef MODULE_ZTIMER_EXTEND
@@ -263,6 +269,11 @@ static void _ztimer_update(ztimer_clock_t *clock)
             clock->ops->cancel(clock);
         }
     }
+
+    /* there are not timers left */
+    if (clock->ops->release && clock->list.next == NULL) {
+        clock->ops->release(clock);
+    }
 }
 
 void ztimer_handler(ztimer_clock_t *clock)
@@ -292,6 +303,9 @@ void ztimer_handler(ztimer_clock_t *clock)
         else {
             DEBUG("ztimer_handler(): %p intermediate\n", (void *)clock);
             clock->ops->set(clock, clock->max_value >> 1);
+            if (clock->ops->release) {
+                clock->ops->release(clock);
+            }
             return;
         }
     }

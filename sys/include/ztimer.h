@@ -281,6 +281,16 @@ typedef struct {
      * @brief   Cancel any set target
      */
     void (*cancel)(ztimer_clock_t *clock);
+
+    /**
+     * @brief   Acquire the underlying hardware clock
+     */
+    void (*acquire)(ztimer_clock_t *clock);
+
+    /**
+     * @brief   Release the underlying hardware clock
+     */
+    void (*release)(ztimer_clock_t *clock);
 } ztimer_ops_t;
 
 /**
