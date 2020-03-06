@@ -89,8 +89,8 @@ start_uhcpd() {
 }
 
 usage() {
-    echo "usage: $1 [-I <sl0>] <prefix> serial [baudrate]"
-    echo "usage: $1 [-I <sl0>] <prefix> tcp:host [port]"
+    echo "usage: $1 [-I <sl0>] [-e] <prefix> serial [baudrate]"
+    echo "usage: $1 [-I <sl0>] [-e] <prefix> tcp:host [port]"
 }
 
 trap "cleanup" INT QUIT TERM EXIT
