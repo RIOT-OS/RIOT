@@ -23,12 +23,12 @@
  *
  * For `TLS_PSK_WITH_AES_128_CCM_8` support (default):
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- * CFLAGS += -DDTLS_PSK
+ * CFLAGS += -DCONFIG_DTLS_PSK
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * For `TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8` support:
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- * CFLAGS += -DDTLS_ECC
+ * CFLAGS += -DCONFIG_DTLS_ECC
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 
@@ -42,51 +42,51 @@
 
  /**
  * @brief Adds support for TLS_PSK_WITH_AES_128_CCM_8 when defined
- * @note  Activated by default if @ref DTLS_ECC is not defined
+ * @note  Activated by default if @ref CONFIG_DTLS_ECC is not defined
  */
-#ifndef DTLS_PSK
-#define DTLS_PSK
+#ifndef CONFIG_DTLS_PSK
+#define CONFIG_DTLS_PSK
 #endif
 
 /**
  * @brief Adds support for TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8 when defined
  */
-#ifndef DTLS_ECC
-#define DTLS_ECC
+#ifndef CONFIG_DTLS_ECC
+#define CONFIG_DTLS_ECC
 #endif
 
 /**
  * @brief The maximum number of DTLS context at the same time
  */
-#ifndef DTLS_CONTEXT_MAX
-#define DTLS_CONTEXT_MAX    (2)
+#ifndef CONFIG_DTLS_CONTEXT_MAX
+#define CONFIG_DTLS_CONTEXT_MAX    (2)
 #endif
 
  /**
  * @brief The maximum number DTLS peers (i.e. sessions)
  */
-#ifndef DTLS_PEER_MAX
-#define DTLS_PEER_MAX       (1)
+#ifndef CONFIG_DTLS_PEER_MAX
+#define CONFIG_DTLS_PEER_MAX       (1)
 #endif
 
  /**
  * @brief The maximum number of concurrent DTLS handshakes
  */
-#ifndef DTLS_HANDSHAKE_MAX
-#define DTLS_HANDSHAKE_MAX  (2)
+#ifndef CONFIG_DTLS_HANDSHAKE_MAX
+#define CONFIG_DTLS_HANDSHAKE_MAX  (2)
 #endif
 
  /**
  * @brief The maximum number of concurrently used cipher keys
  */
 #ifndef DTLS_SECURITY_MAX
-#define DTLS_SECURITY_MAX   (DTLS_HANDSHAKE_MAX + DTLS_PEER_MAX)
+#define DTLS_SECURITY_MAX   (CONFIG_DTLS_HANDSHAKE_MAX + CONFIG_DTLS_PEER_MAX)
 #endif
 
  /**
  * @brief The maximum number of hash functions that can be used in parallel
  */
 #ifndef DTLS_HASH_MAX
-#define DTLS_HASH_MAX       (3 * DTLS_PEER_MAX)
+#define DTLS_HASH_MAX       (3 * CONFIG_DTLS_PEER_MAX)
 #endif
 /** @} */

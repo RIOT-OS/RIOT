@@ -29,22 +29,22 @@
 #define DTLS_HANDSHAKE_BUFSIZE  (256)       /**< Size buffer used in handshake
                                                 to hold credentials */
 /* ECC handshake takes more time */
-#ifdef DTLS_ECC
+#ifdef CONFIG_DTLS_ECC
 #define DTLS_HANDSHAKE_TIMEOUT  (30 * US_PER_SEC)
 #else
 #define DTLS_HANDSHAKE_TIMEOUT  (1 * US_PER_SEC)
-#endif  /* DTLS_ECC */
+#endif  /* CONFIG_DTLS_ECC */
 
 static void _timeout_callback(void *arg);
 
-#ifdef DTLS_PSK
+#ifdef CONFIG_DTLS_PSK
 static int _get_psk_info(struct dtls_context_t *ctx, const session_t *session,
                          dtls_credentials_type_t type,
                          const unsigned char *id, size_t id_len,
                          unsigned char *result, size_t result_length);
-#endif /* DTLS_PSK */
+#endif /* CONFIG_DTLS_PSK */
 
-#ifdef DTLS_ECC
+#ifdef CONFIG_DTLS_ECC
 static int _get_ecdsa_key(struct dtls_context_t *ctx, const session_t *session,
                           const dtls_ecdsa_key_t **result);
 
@@ -53,7 +53,7 @@ static int _verify_ecdsa_key(struct dtls_context_t *ctx,
                              const unsigned char *other_pub_x,
                              const unsigned char *other_pub_y,
                              size_t key_size);
-#endif /* DTLS_ECC */
+#endif /* CONFIG_DTLS_ECC */
 
 static int _write(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
                   size_t len);
@@ -70,13 +70,13 @@ static dtls_handler_t _dtls_handler = {
     .event = _event,
     .write = _write,
     .read = _read,
-#ifdef DTLS_PSK
+#ifdef CONFIG_DTLS_PSK
     .get_psk_info = _get_psk_info,
-#endif /* DTLS_PSK */
-#ifdef DTLS_ECC
+#endif /* CONFIG_DTLS_PSK */
+#ifdef CONFIG_DTLS_ECC
     .get_ecdsa_key = _get_ecdsa_key,
     .verify_ecdsa_key = _verify_ecdsa_key,
-#endif /* DTLS_ECC */
+#endif /* CONFIG_DTLS_ECC */
 };
 
 static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
@@ -132,7 +132,7 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
     return 0;
 }
 
-#ifdef DTLS_PSK
+#ifdef CONFIG_DTLS_PSK
 static int _get_psk_info(struct dtls_context_t *ctx, const session_t *session,
                          dtls_credentials_type_t type,
                          const unsigned char *desc, size_t desc_len,
@@ -190,9 +190,9 @@ static int _get_psk_info(struct dtls_context_t *ctx, const session_t *session,
     memcpy(result, c, c_len);
     return c_len;
 }
-#endif /* DTLS_PSK */
+#endif /* CONFIG_DTLS_PSK */
 
-#ifdef DTLS_ECC
+#ifdef CONFIG_DTLS_ECC
 static int _get_ecdsa_key(struct dtls_context_t *ctx, const session_t *session,
                           const dtls_ecdsa_key_t **result)
 {
@@ -229,7 +229,7 @@ static int _verify_ecdsa_key(struct dtls_context_t *ctx,
 
     return 0;
 }
-#endif /* DTLS_ECC */
+#endif /* CONFIG_DTLS_ECC */
 
 int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
                      credman_tag_t tag, unsigned version, unsigned role)

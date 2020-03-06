@@ -14,6 +14,7 @@ osource "$(APPDIR)/Kconfig"
 
 rsource "drivers/Kconfig"
 rsource "sys/Kconfig"
+rsource "pkg/Kconfig"
 
 comment "RIOT is in a migration phase."
 comment "Some configuration options may not be here. Use CFLAGS instead."
