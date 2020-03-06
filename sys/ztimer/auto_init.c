@@ -105,12 +105,12 @@ ztimer_clock_t *const ZTIMER_USEC = &_ztimer_convert_frac_usec.super.super;
 #endif
 
 #if MODULE_ZTIMER_MSEC
-#  if MODULE_PERIPH_TIMER_RTT
-static ztimer_periph_timer_rtt_t _ztimer_periph_timer_rtt_msec;
+#  if MODULE_PERIPH_RTT
+static ztimer_periph_rtt_t _ztimer_periph_timer_rtt_msec;
 #  define ZTIMER_RTT_INIT (&_ztimer_periph_timer_rtt_msec)
 #    if RTT_FREQUENCY!=FREQ_1MHZ
 static ztimer_convert_frac_t _ztimer_convert_frac_msec;
-ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_convert_frac_msec.super;
+ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_convert_frac_msec.super.super;
 #  define ZTIMER_MSEC_CONVERT_LOWER_FREQ    RTT_FREQUENCY
 #  define ZTIMER_MSEC_CONVERT_LOWER         (&_ztimer_periph_timer_rtt_msec)
 #    else
@@ -159,13 +159,13 @@ void ztimer_init(void)
 
 #ifdef ZTIMER_RTT_INIT
     LOG_DEBUG("ztimer_init(): initializing rtt\n");
-    ztimer_periph_timer_rtt_init(ZTIMER_RTT_INIT);
+    ztimer_periph_rtt_init(ZTIMER_RTT_INIT);
 #endif
 
 #if MODULE_ZTIMER_MSEC
 #  if ZTIMER_MSEC_CONVERT_LOWER_FREQ
     LOG_DEBUG("ztimer_init(): ZTIMER_MSEC convert_frac from %lu to 1000\n",
-          ZTIMER_MSEC_CONVERT_LOWER_FREQ);
+            (long unsigned) ZTIMER_MSEC_CONVERT_LOWER_FREQ);
     ztimer_convert_frac_init(&_ztimer_convert_frac_msec,
                              ZTIMER_MSEC_CONVERT_LOWER,
                              FREQ_1KHZ, ZTIMER_MSEC_CONVERT_LOWER_FREQ);
