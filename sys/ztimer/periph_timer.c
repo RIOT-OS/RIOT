@@ -22,6 +22,9 @@
 
 #include "irq.h"
 #include "ztimer/periph_timer.h"
+#if defined(MODULE_PM_LAYERED)
+#include "pm_layered.h"
+#endif
 
 static void _ztimer_periph_timer_set(ztimer_clock_t *clock, uint32_t val)
 {
@@ -66,12 +69,31 @@ static void _ztimer_periph_timer_callback(void *arg, int channel)
     ztimer_handler((ztimer_clock_t *)arg);
 }
 
+#if defined(MODULE_PM_LAYERED) && defined(CONFIG_ZTIMER_PERIPH_TIMER_PM_LAYER)
+static void _ztimer_periph_timer_acquire(ztimer_clock_t *clock)
+{
+    (void) clock;
+    pm_block(CONFIG_ZTIMER_PERIPH_TIMER_PM_LAYER);
+}
+
+static void _ztimer_periph_timer_release(ztimer_clock_t *clock)
+{
+    (void) clock;
+    pm_unblock(CONFIG_ZTIMER_PERIPH_TIMER_PM_LAYER);
+}
+#endif
+
 static const ztimer_ops_t _ztimer_periph_timer_ops = {
     .set = _ztimer_periph_timer_set,
     .now = _ztimer_periph_timer_now,
     .cancel = _ztimer_periph_timer_cancel,
+#if defined(MODULE_PM_LAYERED) && defined(CONFIG_ZTIMER_PERIPH_TIMER_PM_LAYER)
+    .acquire = _ztimer_periph_timer_acquire,
+    .release = _ztimer_periph_timer_release,
+#else
     .acquire = NULL,
     .release = NULL,
+#endif
 };
 
 void ztimer_periph_timer_init(ztimer_periph_timer_t *clock, tim_t dev, unsigned long freq,
