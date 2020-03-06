@@ -45,6 +45,27 @@ extern "C" {
 #endif
 
 /**
+ * @name    Device state definitions
+ * @anchor  drivers_slipdev_states
+ * @{
+ */
+enum {
+    /**
+     * @brief   Device is in no mode (currently did not receiving any data frame)
+     */
+    SLIPDEV_STATE_NONE = 0,
+    /**
+     * @brief   Device writes handles data as network device
+     */
+    SLIPDEV_STATE_NET,
+    /**
+     * @brief   Device writes received data to stdin
+     */
+    SLIPDEV_STATE_STDIN,
+};
+/** @} */
+
+/**
  * @brief   Configuration parameters for a slipdev
  */
 typedef struct {
@@ -62,8 +83,11 @@ typedef struct {
     slipdev_params_t config;                /**< configuration parameters */
     tsrb_t inbuf;                           /**< RX buffer */
     uint8_t rxmem[SLIPDEV_BUFSIZE];         /**< memory used by RX buffer */
-    uint16_t inesc;                         /**< device previously received an escape
-                                             *   byte */
+    /**
+     * @brief   Device state
+     * @see     [Device state definitions](@ref drivers_slipdev_states)
+     */
+    uint8_t state;
 } slipdev_t;
 
 /**

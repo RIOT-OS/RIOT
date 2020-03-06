@@ -1,7 +1,7 @@
 # Put board specific dependencies here
 ifeq (,$(filter native,$(BOARD)))
   ifeq (1,$(USE_SLIP))
-    USEMODULE += slipdev
+    USEMODULE += slipdev_stdio
   else
     USEMODULE += stdio_ethos
   endif
