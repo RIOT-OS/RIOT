@@ -200,8 +200,15 @@ extern "C" {
 #include "iolist.h"
 #include "net/netopt.h"
 
+#include "kernel_defines.h"
+
 #ifdef MODULE_L2FILTER
 #include "net/l2filter.h"
+#endif
+
+#if IS_USED(MODULE_NETDEV_EVENT_THREAD)
+#include "event.h"
+#include "event/thread.h"
 #endif
 
 /**
@@ -289,6 +296,9 @@ struct netdev {
 #endif
 #ifdef MODULE_L2FILTER
     l2filter_t filter[L2FILTER_LISTSIZE];   /**< link layer address filters */
+#endif
+#if IS_USED(MODULE_NETDEV_EVENT_THREAD)
+    event_t irq_handler;                    /**< event that stores the irq handler */
 #endif
 };
 
@@ -469,6 +479,31 @@ static inline int netdev_set_notsup(netdev_t *dev, netopt_t opt,
     return -ENOTSUP;
 }
 
+#if IS_USED(MODULE_NETDEV_EVENT_THREAD) || DOXYGEN
+
+/**
+ * @brief default event handler for the `netdev_event_thread` module.
+ *
+ * @param event pointer to the irq handler event.
+ */
+extern void netdev_event_thread_handler(event_t *event);
+
+/**
+ * @brief Initialize the event handler for a given device.
+ *
+ *        This function is only available if the `netdev_event_thread` module
+ *        is used.
+ *
+ * @note  This function MUST be called before `dev->driver->init`.
+ *
+ * @param netdev network device descriptor
+ */
+static inline void netdev_event_thread_init(netdev_t *netdev)
+{
+    netdev->irq_handler.handler = netdev_event_thread_handler;
+}
+#endif
+
 /**
  * @brief Informs netdev there was an interrupt request from the network device.
  *
@@ -479,9 +514,13 @@ static inline int netdev_set_notsup(netdev_t *dev, netopt_t opt,
  */
 static inline void netdev_trigger_event_isr(netdev_t *netdev)
 {
+#if IS_USED(MODULE_NETDEV_EVENT_THREAD)
+    event_post(EVENT_PRIO_HIGHEST, &netdev->irq_handler);
+#else
     if (netdev->event_callback) {
         netdev->event_callback(netdev, NETDEV_EVENT_ISR);
     }
+#endif
 }
 #ifdef __cplusplus
 }

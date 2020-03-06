@@ -86,6 +86,10 @@ ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += gnrc_netif
 endif
 
+ifneq (,$(filter netdev_event_thread,$(USEMODULE)))
+  USEMODULE += event_thread_highest
+endif
+
 ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += random

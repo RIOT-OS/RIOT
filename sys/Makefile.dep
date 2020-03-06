@@ -19,4 +19,9 @@ ifneq (,$(filter prng_fortuna,$(USEMODULE)))
   CFLAGS += -DCRYPTO_AES
 endif
 
+ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+  USEMODULE += netdev_event_thread
+endif
+
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
