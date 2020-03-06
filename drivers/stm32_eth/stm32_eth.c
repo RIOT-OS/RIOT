@@ -57,7 +57,7 @@ void isr_eth(void)
         ETH->DMASR = ETH_DMASR_RS | ETH_DMASR_NIS;
         mutex_unlock(&_rx);
         if (_netdev) {
-            _netdev->event_callback(_netdev, NETDEV_EVENT_ISR);
+            netdev_trigger_event_isr(_netdev);
         }
     }
 

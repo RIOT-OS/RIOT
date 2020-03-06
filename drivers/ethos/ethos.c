@@ -123,7 +123,8 @@ static void _end_of_frame(ethos_t *dev)
             if (dev->framesize) {
                 assert(dev->last_framesize == 0);
                 dev->last_framesize = dev->framesize;
-                dev->netdev.event_callback((netdev_t*) dev, NETDEV_EVENT_ISR);
+                netdev_trigger_event_isr((netdev_t*) dev);
+
             }
             break;
         case ETHOS_FRAME_TYPE_HELLO:

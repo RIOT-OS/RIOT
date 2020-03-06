@@ -185,7 +185,7 @@ static void IRAM_ATTR esp_now_scan_peers_timer_cb(void* arg)
 
     if (dev->netdev.event_callback) {
         dev->scan_event++;
-        dev->netdev.event_callback((netdev_t*)dev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr((netdev_t*)dev);
     }
 }
 

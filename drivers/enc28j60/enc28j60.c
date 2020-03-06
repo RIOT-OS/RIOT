@@ -253,8 +253,7 @@ static void on_int(void *arg)
     /* disable global interrupt enable bit to avoid losing interrupts */
     cmd_bfc((enc28j60_t *)arg, REG_EIE, -1, EIE_INTIE);
 
-    netdev_t *netdev = (netdev_t *)arg;
-    netdev->event_callback(arg, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr(arg);
 }
 
 static int nd_send(netdev_t *netdev, const iolist_t *iolist)
