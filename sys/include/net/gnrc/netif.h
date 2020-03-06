@@ -294,6 +294,44 @@ gnrc_netif_t *gnrc_netif_iter(const gnrc_netif_t *prev);
 gnrc_netif_t *gnrc_netif_get_by_pid(kernel_pid_t pid);
 
 /**
+ * @brief   Set an option to a given interface
+ *
+ * @param[in] netif     pointer to the network interface
+ * @param[in] opt       option to set
+ * @param[in] context   (optional) context to the given option
+ * @param[in] data      data to set the given option to
+ * @param[in] data_len  size of @p data
+ *
+ * @return  0 on success
+ * @return  negative errno on error
+ */
+static inline int gnrc_netif_set(const gnrc_netif_t *netif, netopt_t opt,
+                                  uint16_t context, const void *data,
+                                  size_t data_len)
+{
+    return gnrc_netapi_set(netif->pid, opt, context, data, data_len);
+}
+
+/**
+ * @brief   Get an option from a given interface
+ *
+ * @param[in] netif     pointer to the network interface
+ * @param[in] opt       option to get
+ * @param[in] context   (optional) context to the given option
+ * @param[in] data      pointer to buffer for reading the option's value
+ * @param[in] data_len  (maximum) number of bytes in @p data
+ *
+ * @return  0 on success
+ * @return  negative errno on error
+ */
+static inline int gnrc_netif_get(const gnrc_netif_t *netif, netopt_t opt,
+                                  uint16_t context, void *data,
+                                  size_t data_len)
+{
+    return gnrc_netapi_get(netif->pid, opt, context, data, data_len);
+}
+
+/**
  * @brief   Gets the (unicast on anycast) IPv6 address of an interface (if IPv6
  *          is supported)
  *
