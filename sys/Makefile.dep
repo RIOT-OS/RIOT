@@ -19,6 +19,10 @@ ifneq (,$(filter prng_fortuna,$(USEMODULE)))
   USEMODULE += crypto_aes
 endif
 
+ifneq (,$(filter crypto_aes_%,$(USEMODULE)))
+  USEMODULE += crypto_aes
+endif
+
 ifneq (,$(filter crypto_%,$(USEMODULE)))
   USEMODULE += crypto
 endif
