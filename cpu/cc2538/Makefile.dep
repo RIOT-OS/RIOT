@@ -1,0 +1,4 @@
+ifneq (,$(filter cc2538_rf,$(USEMODULE)))
+  USEMODULE += netdev_ieee802154
+  USEMODULE += netif
+endif
