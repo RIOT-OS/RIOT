@@ -20,6 +20,7 @@ PROGRAMMER ?= cc2538-bsl
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
   FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
+  FLASHDEPS += $(FLASHER)
   FFLAGS  = -p "$(PROG_DEV)" -e -w -v $(FLASHFILE)
 else ifeq ($(PROGRAMMER),jlink)
   FLASHER = $(RIOTBOARD)/cc2538dk/dist/flash.sh
