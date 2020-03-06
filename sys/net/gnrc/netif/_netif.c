@@ -37,14 +37,14 @@ int netif_get_opt(netif_t *netif, netopt_t opt, uint16_t context,
                   void *value, size_t max_len)
 {
     gnrc_netif_t *iface = (gnrc_netif_t*) netif;
-    return gnrc_netapi_get(iface->pid, opt, context, value, max_len);
+    return gnrc_netif_get(iface, opt, context, value, max_len);
 }
 
 int netif_set_opt(netif_t *netif, netopt_t opt, uint16_t context,
                   void *value, size_t value_len)
 {
     gnrc_netif_t *iface = (gnrc_netif_t*) netif;
-    return gnrc_netapi_set(iface->pid, opt, context, value, value_len);
+    return gnrc_netif_set(iface, opt, context, value, value_len);
 }
 
 /** @} */

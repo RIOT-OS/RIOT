@@ -44,7 +44,7 @@ unsigned dhcpv6_client_get_duid_l2(unsigned iface, dhcpv6_duid_l2_t *duid)
         netif = gnrc_netif_get_by_pid(iface);
     }
     assert(netif != NULL);
-    if ((res = gnrc_netapi_get(netif->pid, NETOPT_ADDRESS_LONG, 0,
+    if ((res = gnrc_netif_get(netif, NETOPT_ADDRESS_LONG, 0,
                                l2addr, GNRC_NETIF_L2ADDR_MAXLEN)) > 0) {
         duid->l2type = byteorder_htons(ARP_HWTYPE_EUI64);
     }
@@ -53,7 +53,7 @@ unsigned dhcpv6_client_get_duid_l2(unsigned iface, dhcpv6_duid_l2_t *duid)
             case NETDEV_TYPE_ETHERNET:
             case NETDEV_TYPE_BLE:
             case NETDEV_TYPE_ESP_NOW:
-                if ((res = gnrc_netapi_get(netif->pid,
+                if ((res = gnrc_netif_get(netif,
                                            NETOPT_ADDRESS,
                                            0, l2addr,
                                            GNRC_NETIF_L2ADDR_MAXLEN)) > 0) {
@@ -81,7 +81,7 @@ void dhcpv6_client_conf_prefix(unsigned iface, const ipv6_addr_t *pfx,
     assert(netif != NULL);
     DEBUG("GNRC DHCPv6 client: (re-)configure prefix %s/%d\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)), pfx_len);
-    if (gnrc_netapi_get(netif->pid, NETOPT_IPV6_IID, 0, &iid,
+    if (gnrc_netif_get(netif, NETOPT_IPV6_IID, 0, &iid,
                         sizeof(eui64_t)) >= 0) {
         ipv6_addr_set_aiid(&addr, iid.uint8);
     }

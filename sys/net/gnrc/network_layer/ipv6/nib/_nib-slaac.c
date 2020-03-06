@@ -96,21 +96,21 @@ static bool _try_l2addr_reconfiguration(gnrc_netif_t *netif)
     uint8_t hwaddr[GNRC_NETIF_L2ADDR_MAXLEN];
     uint16_t hwaddr_len;
 
-    if (gnrc_netapi_get(netif->pid, NETOPT_SRC_LEN, 0, &hwaddr_len,
+    if (gnrc_netif_get(netif, NETOPT_SRC_LEN, 0, &hwaddr_len,
                         sizeof(hwaddr_len)) < 0) {
         return false;
     }
     luid_get(hwaddr, hwaddr_len);
 #if GNRC_IPV6_NIB_CONF_6LN
     if (hwaddr_len == IEEE802154_LONG_ADDRESS_LEN) {
-        if (gnrc_netapi_set(netif->pid, NETOPT_ADDRESS_LONG, 0, hwaddr,
+        if (gnrc_netif_set(netif, NETOPT_ADDRESS_LONG, 0, hwaddr,
                             hwaddr_len) < 0) {
             return false;
         }
     }
     else
 #endif
-    if (gnrc_netapi_set(netif->pid, NETOPT_ADDRESS, 0, hwaddr,
+    if (gnrc_netif_set(netif, NETOPT_ADDRESS, 0, hwaddr,
                         hwaddr_len) < 0) {
         return false;
     }

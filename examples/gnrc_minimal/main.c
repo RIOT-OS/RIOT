@@ -34,7 +34,7 @@ int main(void)
     gnrc_netif_t *netif = NULL;
     while ((netif = gnrc_netif_iter(netif))) {
         ipv6_addr_t ipv6_addrs[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
-        int res = gnrc_netapi_get(netif->pid, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
+        int res = gnrc_netif_get(netif, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
                                   sizeof(ipv6_addrs));
 
         if (res < 0) {

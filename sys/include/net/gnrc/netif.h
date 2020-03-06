@@ -358,7 +358,7 @@ static inline int gnrc_netif_ipv6_addrs_get(const gnrc_netif_t *netif,
     assert(netif != NULL);
     assert(addrs != NULL);
     assert(max_len >= sizeof(ipv6_addr_t));
-    return gnrc_netapi_get(netif->pid, NETOPT_IPV6_ADDR, 0, addrs, max_len);
+    return gnrc_netif_get(netif, NETOPT_IPV6_ADDR, 0, addrs, max_len);
 }
 
 /**
@@ -389,7 +389,7 @@ static inline int gnrc_netif_ipv6_addr_add(const gnrc_netif_t *netif,
     assert(netif != NULL);
     assert(addr != NULL);
     assert((pfx_len > 0) && (pfx_len <= 128));
-    return gnrc_netapi_set(netif->pid, NETOPT_IPV6_ADDR,
+    return gnrc_netif_set(netif, NETOPT_IPV6_ADDR,
                            ((pfx_len << 8U) | flags), addr,
                            sizeof(ipv6_addr_t));
 }
@@ -412,7 +412,7 @@ static inline int gnrc_netif_ipv6_addr_remove(const gnrc_netif_t *netif,
 {
     assert(netif != NULL);
     assert(addr != NULL);
-    return gnrc_netapi_set(netif->pid, NETOPT_IPV6_ADDR_REMOVE,
+    return gnrc_netif_set(netif, NETOPT_IPV6_ADDR_REMOVE,
                            0, addr, sizeof(ipv6_addr_t));
 }
 
@@ -443,7 +443,7 @@ static inline int gnrc_netif_ipv6_groups_get(const gnrc_netif_t *netif,
     assert(netif != NULL);
     assert(groups != NULL);
     assert(max_len >= sizeof(ipv6_addr_t));
-    return gnrc_netapi_get(netif->pid, NETOPT_IPV6_GROUP, 0, groups, max_len);
+    return gnrc_netif_get(netif, NETOPT_IPV6_GROUP, 0, groups, max_len);
 }
 
 /**
@@ -465,7 +465,7 @@ static inline int gnrc_netif_ipv6_group_join(const gnrc_netif_t *netif,
 {
     assert(netif != NULL);
     assert(group != NULL);
-    return gnrc_netapi_set(netif->pid, NETOPT_IPV6_GROUP, 0, group,
+    return gnrc_netif_set(netif, NETOPT_IPV6_GROUP, 0, group,
                            sizeof(ipv6_addr_t));
 }
 
@@ -487,7 +487,7 @@ static inline int gnrc_netif_ipv6_group_leave(const gnrc_netif_t *netif,
 {
     assert(netif != NULL);
     assert(group != NULL);
-    return gnrc_netapi_set(netif->pid, NETOPT_IPV6_GROUP_LEAVE, 0, group,
+    return gnrc_netif_set(netif, NETOPT_IPV6_GROUP_LEAVE, 0, group,
                            sizeof(ipv6_addr_t));
 }
 
