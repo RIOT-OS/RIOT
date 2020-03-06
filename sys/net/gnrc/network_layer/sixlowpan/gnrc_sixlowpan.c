@@ -95,7 +95,7 @@ void gnrc_sixlowpan_dispatch_send(gnrc_pktsnip_t *pkt, void *context,
     (void)page;
     assert(pkt->type == GNRC_NETTYPE_NETIF);
     gnrc_netif_hdr_t *hdr = pkt->data;
-    if (gnrc_netapi_send(hdr->if_pid, pkt) < 1) {
+    if (gnrc_netif_send(gnrc_netif_get_by_pid(hdr->if_pid), pkt) < 1) {
         DEBUG("6lo: unable to send %p over interface %u\n", (void *)pkt,
               hdr->if_pid);
         gnrc_pktbuf_release(pkt);
