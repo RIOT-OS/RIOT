@@ -1401,7 +1401,7 @@ int _gnrc_netif_send(int argc, char **argv)
     nethdr = (gnrc_netif_hdr_t *)hdr->data;
     nethdr->flags = flags;
     /* and send it */
-    if (gnrc_netapi_send(((gnrc_netif_t *)iface)->pid, pkt) < 1) {
+    if (gnrc_netif_send((gnrc_netif_t *)iface, pkt) < 1) {
         puts("error: unable to send");
         gnrc_pktbuf_release(pkt);
         return 1;
