@@ -104,7 +104,7 @@ void sock_tcp_queue_event_init(sock_tcp_queue_t *queue,
                                event_queue_t *ev_queue,
                                sock_tcp_queue_cb_t handler)
 {
-    sock_async_ctx_t *ctx = sock_tcp_queue_get_async_ctx(sock);
+    sock_async_ctx_t *ctx = sock_tcp_queue_get_async_ctx(queue);
 
     _set_ctx(ctx, ev_queue);
     ctx->event.cb.tcp_queue = handler;
