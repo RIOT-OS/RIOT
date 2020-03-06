@@ -13,6 +13,7 @@ endif
 ifeq ($(PROGRAMMER),cc2538-bsl)
   RESET ?= $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py -p "$(PROG_DEV)"
   FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
+  FLASHDEPS += $(FLASHER)
   FFLAGS  = -p "$(PROG_DEV)" -e -w -v -b 115200 $(FLASHFILE)
 else ifeq ($(PROGRAMMER),jlink)
   FLASHER = $(RIOTBOARD)/common/remote/dist/flash.sh
