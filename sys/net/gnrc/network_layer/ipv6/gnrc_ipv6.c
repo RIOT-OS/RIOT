@@ -285,7 +285,7 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         return;
     }
 #endif
-    if (gnrc_netapi_send(netif->pid, pkt) < 1) {
+    if (gnrc_netif_send(netif, pkt) < 1) {
         DEBUG("ipv6: unable to send packet\n");
         gnrc_pktbuf_release(pkt);
     }

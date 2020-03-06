@@ -115,7 +115,7 @@ static int test_send(void)
         return 0;
     }
     /* send packet to MAC layer */
-    gnrc_netapi_send(_mac_pid, pkt);
+    gnrc_netif_send(gnrc_netif_get_by_pid(_mac_pid), pkt);
     /* wait for packet status and check */
     msg_receive(&msg);
     if ((msg.type != GNRC_NETERR_MSG_TYPE) ||
