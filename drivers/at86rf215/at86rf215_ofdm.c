@@ -184,9 +184,9 @@ static void _set_option(at86rf215_t *dev, uint8_t option)
 
     /* set channel center frequency */
     if (superGHz) {
-        at86rf215_reg_write16(dev, dev->RF->RG_CCF0L, _channel_center_freq_kHz_2400MHz(option) / 25);
+        at86rf215_reg_write16(dev, dev->RF->RG_CCF0L, 1 + _channel_center_freq_kHz_2400MHz(option) / 25);
     } else {
-        at86rf215_reg_write16(dev, dev->RF->RG_CCF0L, _channel_center_freq_kHz_868MHz(option) / 25);
+        at86rf215_reg_write16(dev, dev->RF->RG_CCF0L, 1 + _channel_center_freq_kHz_868MHz(option) / 25);
     }
 
     at86rf215_reg_write(dev, dev->BBC->RG_OFDMC, option - 1);
