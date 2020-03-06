@@ -60,6 +60,8 @@
 
 /doc/                                       @aabadie @jia200x
 
+/dist/tools/sliptty/                        @miri64
+
 /drivers/ad7746/                            @leandrolanzieri
 /drivers/at24mac/                           @benpicco
 /drivers/at86rf2xx/                         @daniel-k @Hyungsin @jia200x @smlng @miri64
@@ -76,6 +78,7 @@
 /drivers/pca9685/                           @gschorcht
 /drivers/sht3x/                             @gschorcht
 /drivers/si70xx/                            @basilfx
+/drivers/slipdev/                           @miri64
 /drivers/sx127x/                            @aabadie @jia200x
 /drivers/ws281x/                            @maribu
 /drivers/xbee/                              @haukepetersen @miri64
@@ -125,6 +128,7 @@
 /tests/emb6*                                @miri64
 /tests/gnrc*                                @miri64
 /tests/lwip*                                @miri64
+/tests/slip/                                @miri64
 /tests/unittests                            @miri64
 /tests/*/tests/*.py                         @miri64
 /tests/cpu_efm32_features/                  @basilfx
