@@ -351,7 +351,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
     switch(opt) {
         case NETOPT_STATE:
-            assert(len <= sizeof(netopt_state_t));
+            assert(len == sizeof(netopt_state_t));
             return _set_state(dev, *((const netopt_state_t*) val));
 
         case NETOPT_DEVICE_TYPE:
