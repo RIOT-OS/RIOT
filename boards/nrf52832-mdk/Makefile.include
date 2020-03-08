@@ -6,7 +6,7 @@ PROGRAMMER ?= pyocd
 ifeq (pyocd,$(PROGRAMMER))
   # The board is not recognized automatically by pyocd, so the CPU target
   # option is passed explicitly
-  export FLASH_TARGET_TYPE ?= -t $(CPU)
+  FLASH_TARGET_TYPE ?= -t $(CPU)
   include $(RIOTMAKE)/tools/pyocd.inc.mk
 else ifeq (openocd,$(PROGRAMMER))
   DEBUG_ADAPTER = dap
