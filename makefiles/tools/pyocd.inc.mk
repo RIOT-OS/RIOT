@@ -19,5 +19,6 @@ endif
 
 # Add serial matching command, only if DEBUG_ADAPTER_ID was specified
 ifneq (,$(DEBUG_ADAPTER_ID))
-  export PYOCD_ADAPTER_INIT += -u $(DEBUG_ADAPTER_ID)
+  PYOCD_ADAPTER_INIT += -u $(DEBUG_ADAPTER_ID)
+  $(call target-export-variables,$(PYOCD_TARGETS),PYOCD_ADAPTER_INIT)
 endif
