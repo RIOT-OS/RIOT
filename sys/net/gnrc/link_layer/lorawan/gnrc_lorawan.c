@@ -143,7 +143,7 @@ void gnrc_lorawan_open_rx_window(gnrc_lorawan_t *mac)
     if (mac->state == LORAWAN_STATE_RX_1) {
         xtimer_set_msg(&mac->rx, _DRIFT_FACTOR, &mac->msg, thread_getpid());
     }
-    uint8_t state = NETOPT_STATE_RX;
+    netopt_state_t state = NETOPT_STATE_RX;
     dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
 }
 
