@@ -3,6 +3,7 @@
 SLIPTTY_DIR="$(cd "$(dirname "$0")" && pwd -P)"
 UHCPD="$(cd "${SLIPTTY_DIR}/../uhcpd/bin" && pwd -P)/uhcpd"
 TUN=sl0
+TUN_GLB="fdea:dbee:f::1/64"
 UHCPD_PID=
 CREATED_IFACE=0
 
@@ -39,6 +40,7 @@ create_tun() {
             ${SUDO} sysctl -w net.ipv6.conf.${TUN}.accept_ra=2
             ${SUDO} ip link set ${TUN} up || exit 1
             ${SUDO} ip address add fe80::1/64 dev ${TUN}
+            ${SUDO} ip address add ${TUN_GLB} dev ${TUN}
             ${SUDO} ip neigh add fe80::2 dev ${TUN}
             ${SUDO} ip route add ${PREFIX} via fe80::2 dev ${TUN}
             ;;
@@ -55,6 +57,16 @@ create_tun() {
             read _
             ${SUDO} ifconfig ${TUN} up || exit 1
             ${SUDO} ifconfig ${TUN} inet6 fe80::1 prefixlen 64
+            TUN_GLB_ADDR=$(echo "${TUN_GLB}" | cut -d/ -f1)
+            TUN_GLB_LEN=$(echo "${TUN_GLB}" | cut -d/ -f2)
+            if [ -z "${TUN_GLB_ADDR}" ] || [ -z "${TUN_GLB_LEN}" ]; then
+                echo "TUN global address (-g) must be of format " \
+                     "<addr>/<prefix_len>" >&2
+                exit 1
+            fi
+            ${SUDO} ifconfig ${TUN} inet6 fe80::1 prefixlen 64
+            ${SUDO} ifconfig ${TUN} inet6 ${TUN_GLB_ADDR} prefixlen \
+                ${TUN_GLB_LEN}
             ${SUDO} route -n add -interface ${TUN} -inet6 -prefixlen 64 \
                     ${PREFIX} fe80::2 || exit 1
             ;;
@@ -89,8 +101,8 @@ start_uhcpd() {
 }
 
 usage() {
-    echo "usage: $1 [-I <sl0>] <prefix> serial [baudrate]"
-    echo "usage: $1 [-I <sl0>] <prefix> tcp:host [port]"
+    echo "usage: $1 [-I <sl0>] [-e] [-g <addr>/<prefix_len>] <prefix> serial [baudrate]"
+    echo "usage: $1 [-I <sl0>] [-e] [-g <addr>/<prefix_len>] <prefix> tcp:host [port]"
 }
 
 trap "cleanup" INT QUIT TERM EXIT
@@ -99,8 +111,9 @@ SLIP_ONLY=0
 
 while getopts ehI: opt; do
     case ${opt} in
-        e)  SLIP_ONLY=1;;
+        e)  SLIP_ONLY=1; shift 1;;
         I)  TUN=${OPTARG}; shift 2;;
+        g)  TUN_GLB=${OPTARG}; shift 2;;
         h)  usage $0; exit 0;;
     esac
 done
