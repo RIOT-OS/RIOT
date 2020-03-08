@@ -37,6 +37,7 @@
 #include "stmclk.h"
 #include "periph_cpu.h"
 #include "periph/init.h"
+#include "board.h"
 
 #if defined (CPU_FAM_STM32L4)
 #define BIT_APB_PWREN       RCC_APB1ENR1_PWREN
@@ -163,6 +164,12 @@ void cpu_init(void)
 #endif
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
     stdio_init();
+
+#ifdef STM32F1_DISABLE_JTAG
+    RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+    AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
+#endif
+
     /* trigger static peripheral initialization */
     periph_init();
 }
