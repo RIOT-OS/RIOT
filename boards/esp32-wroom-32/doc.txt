@@ -107,9 +107,10 @@ MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network i
 #ifdef BOARD_ESP32_WROOM-32
 
 #if MODULE_MRF24J40
-#define MRF24J40_PARAM_CS       GPIO16      /* MRF24J40 CS signal    */
-#define MRF24J40_PARAM_RESET    GPIO17      /* MRF24J40 RESET signal */
-#define MRF24J40_PARAM_INT      GPIO34      /* MRF24J40 INT signal   */
+#define MRF24J40_PARAM_CS       GPIO16       /* MRF24J40 CS signal    */
+#define MRF24J40_PARAM_RESET    GPIO17       /* MRF24J40 RESET signal */
+#define MRF24J40_PARAM_INT      GPIO34       /* MRF24J40 INT signal   */
+#define MRF24J40_PARAM_SPI_CLK  SPI_CLK_1MHZ /* SPI clock frequency */
 #endif
 
 #if MODULE_ENC28J80
