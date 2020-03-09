@@ -68,10 +68,9 @@ LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.nanofmt.ld
 LINKFLAGS += -nostdlib -lgcc -Wl,-gc-sections
 
-
-ifneq (,$(filter cpp,$(FEATURES_USED)))
-  UNDEF += $(BINDIR)/esp_cxx/cxa_guard.o
-endif
+# NOTE: This check can be turned into a normal conditional after #9913 is fixed
+UNDEF += $(if $(filter cpp,$(FEATURES_USED)),$(BINDIR)/esp_cxx/cxa_guard.o)
+BASELIBS += $(if $(filter cpp,$(FEATURES_USED)),-lstdc++)
 
 # additional flasher configuration for ESP32 QEMU
 ifneq (,$(filter esp_qemu,$(USEMODULE)))

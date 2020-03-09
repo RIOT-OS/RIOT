@@ -9,7 +9,6 @@ USEMODULE += pm_layered
 
 ifneq (,$(filter cpp,$(FEATURES_USED)))
   USEMODULE += pthread
-  BASELIBS += -lstdc++
   USEMODULE += esp_cxx
 endif
 
