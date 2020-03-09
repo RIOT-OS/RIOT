@@ -14,9 +14,7 @@ ifeq ($(PROGRAMMER),jlink)
   export JLINK_IF := JTAG
   export TUI := 1
   include $(RIOTMAKE)/tools/jlink.inc.mk
-else
-  FLASHFILE ?= $(BINFILE)
-  FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
-  FLASHDEPS += $(FLASHER)
-  FFLAGS  = -p "$(PROG_DEV)" -e -w -v -b 460800 $(FLASHFILE)
+else ifeq ($(PROGRAMMER),cc2538-bsl)
+  PROG_BAUD ?= 460800
+  include $(RIOTMAKE)/tools/cc2538-bsl.inc.mk
 endif

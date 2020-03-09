@@ -16,11 +16,9 @@ endif
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
   FLASHFILE ?= $(HEXFILE)
-  FLASHER = $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
-  FLASHDEPS += $(FLASHER)
-  FFLAGS  = -p "$(PROG_DEV)" --bootloader-invert-lines -e -w -v -b 460800 $(FLASHFILE)
-  RESET ?= $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
-  RESET_FLAGS ?= -p "$(PROG_DEV)" --bootloader-invert-lines
+  FFLAGS_OPTS ?= --bootloader-invert-lines
+  PROG_BAUD ?= 460800
+  include $(RIOTMAKE)/tools/cc2538-bsl.inc.mk
 else ifeq ($(PROGRAMMER),jlink)
   # Special flashing and reset scripts are required due to board hardware
   export FLASH_ADDR = 0x200000
