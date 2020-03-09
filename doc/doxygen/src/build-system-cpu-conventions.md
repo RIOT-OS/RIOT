@@ -10,8 +10,8 @@ This page describes some conventions for defining CPU in the build system.
 Not all of them are currently listed but only particular ones.
 
 
-`CPU` defining multiple `CPU_MODEL`s         {#cpu-defining-multiple-cpu-models}
-====================================
+CPU defining multiple CPU_MODELs             {#cpu-defining-multiple-cpu-models}
+================================
 
 Context                                                               {#context}
 -------
@@ -30,7 +30,7 @@ shell `sed` magic.
 This causes both issue to read the definition and slow execution time for
 definitions that are a static mapping from the exact CPU model.
 
-With the way of defining boards and CPU, some informations should be defined
+With the way of defining boards and CPU, some information should be defined
 either for the description, dependency resolution or compilation
 (respectively in the `Makefile.features`, the `Makefile.dep` or `Makefile.include`)
 so may want to define only each piece of information required for each step.
@@ -39,7 +39,8 @@ so may want to define only each piece of information required for each step.
 Different solutions                                       {#different-solutions}
 -------------------
 
-This describes different possible solutions, and the cases on which each of them applies.
+This describes different possible solutions, and the cases on which each of them
+applies.
 
 If only one should be used, then it should be solution 1 to go toward
 declarative syntax and support all cases.
@@ -69,7 +70,7 @@ $(RIOTCPU)/$(CPU)/models/$(CPU_MODEL)/Makefile.include
 $(RIOTCPU)/$(CPU)/models/$(CPU_MODEL)/doc.txt
 ~~~~~~~~~~~~~~~~~~~
 
-And then each main `$(CPU)` file will include the `$(CPU_MODEL)` specific one.
+And then each specific `CPU_MODEL` file will include the common `CPU` one.
 
 This would match the way to do it in RIOT but could create many
 directories and files for maybe no or only few lines.
@@ -103,11 +104,12 @@ methods.
 
 ### 3. Exhaustive per model definition        {#exhaustive-per-model-definition}
 
-In the case of only declarative values of specific variables, handling different
-`CPU_MODEL` is simply defining one per `CPU_MODEL`.
-When not relying on an `if` evaluation as before, one could define dictionaries
-which are implemented in `make` when using only one file with "namespaced"
-variables names including the `key` and so the `CPU_MODEL` value in the name.
+In the case of only declaring values for variables (declarative approach),
+handling different `CPU_MODEL` is simply defining one value per `CPU_MODEL`.
+Instead of relying on an `if` evaluation as before, one could define
+dictionaries which are implemented in `make` when using only one file with
+"namespaced" variables names including the `key` and so the `CPU_MODEL` value in
+the name.
 
 ~~~~~~~~~~~~~~~~~~~ {.mk}
 ROM_LEN_stm32f103c8 = 64K
@@ -128,19 +130,20 @@ It is easy to read and to grep, but can give quite indigests lists if all
 `ROM_LEN`, `ROM_ADDR`, `RAM_LEN`, `RAM_ADDR` are all defined for many models.
 
 To not clutter the main `CPU` definition makefiles, these definitions can be
-moved to separate files `models/features.inc.mk` `models/include.inc.mk` or
-similar names. We would still put the `ROM_LEN = ROM_LEN_$(CPU_MODEL)` in the
+moved to separate files `models/features.inc.mk`, `models/include.inc.mk` or
+similar names. We would still put the `"ROM_LEN = ROM_LEN_$(CPU_MODEL)"` in the
 main file to separate the "database" from setting the value.
 
 
 ### 4. Grouped per model definition              {#grouped-per-model-definition}
 
-Again in the case only delcarative values of specific variables, it can happen
-that many variables are somehow highly correlated.
-For example the `ROM`, `RAM` size and address or different classification
-that makes sense for that manufacturer like "family", "series", "core".
-In that case, defining one variable for each may seem tedious and one could
-prefer defining one variable for all of these and refer to the array index.
+In the case declarative approach (as described in
+[Exhaustive per model definition](#exhaustive-per-model-definition) section), it
+can happen that many variables are highly correlated. For example the `ROM`,
+`RAM` size and address or different classification that makes sense for that
+manufacturer like "family", "series", "core". In that case, defining one
+variable for each may seem tedious and one could prefer defining one variable
+for all of these and refer to the array index.
 
 Defining `Makefile.features` variables:
 
