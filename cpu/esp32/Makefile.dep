@@ -5,6 +5,7 @@ include $(RIOTCPU)/esp_common/Makefile.dep
 ifneq (,$(filter cpp,$(FEATURES_USED)))
   USEMODULE += pthread
   BASELIBS += -lstdc++
+  USEMODULE += esp_cxx
 endif
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))

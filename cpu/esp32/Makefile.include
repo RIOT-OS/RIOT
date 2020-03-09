@@ -21,10 +21,6 @@ BOOTLOADER_POS = 0x1000
 # SPECIAL module dependencies
 # cannot be done in Makefile.dep since Makefile.dep is included too late
 
-ifneq (,$(filter cpp,$(FEATURES_USED)))
-  USEMODULE += esp_cxx
-endif
-
 ifneq (,$(filter esp_now esp_wifi esp_spi_ram,$(USEMODULE)))
   # the ESP-IDF heap has to be used if any WiFi interface or SPI RAM is used
   USEMODULE += esp_idf_heap
@@ -86,7 +82,8 @@ LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.nanofmt.ld
 LINKFLAGS += -nostdlib -lgcc -Wl,-gc-sections
 
-ifneq (,$(filter esp_cxx,$(USEMODULE)))
+
+ifneq (,$(filter cpp,$(FEATURES_USED)))
   UNDEF += $(BINDIR)/esp_cxx/cxa_guard.o
 endif
 
