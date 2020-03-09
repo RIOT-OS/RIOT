@@ -139,9 +139,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         for (size_t i = 0; i < len; i++) {
             while (!(dev(bus)->SR & SSI_SR_TNF)) {}
             dev(bus)->DR = out_buf[i];
-        }
-        /* flush RX FIFO while busy*/
-        while ((dev(bus)->SR & SSI_SR_BSY)) {
+            while (!(dev(bus)->SR & SSI_SR_RNE)) {}
             dev(bus)->DR;
         }
     }
