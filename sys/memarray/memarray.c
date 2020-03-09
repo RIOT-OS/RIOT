@@ -28,6 +28,7 @@ void memarray_init(memarray_t *mem, void *data, size_t size, size_t num)
         void *next = ((char *)mem->free_data) + ((i + 1) * mem->size);
         memcpy(((char *)mem->free_data) + (i * mem->size), &next, sizeof(void *));
     }
+    memset(((char *)mem->free_data) + ((mem->num - 1) * (mem->size)), 0, sizeof(void *));
 }
 
 void *memarray_alloc(memarray_t *mem)
