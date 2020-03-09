@@ -386,6 +386,13 @@ static inline void sam0_cortexm_sleep(int deep)
 }
 
 /**
+ * @brief   Disable alternate function (PMUX setting) for a PORT pin
+ *
+ * @param[in] pin   Pin to reset the multiplexing for
+ */
+void gpio_disable_mux(gpio_t pin);
+
+/**
  * @brief   Returns the frequency of a GCLK provider.
  *
  * @param[in] id    The ID of the GCLK
