@@ -266,7 +266,7 @@ int listen_cmd(int argc, char **argv)
     netdev->driver->set(netdev, NETOPT_RX_TIMEOUT, &timeout, sizeof(timeout));
 
     /* Switch to RX state */
-    uint8_t state = NETOPT_STATE_RX;
+    netopt_state_t state = NETOPT_STATE_RX;
     netdev->driver->set(netdev, NETOPT_STATE, &state, sizeof(state));
 
     printf("Listen mode set\n");
