@@ -16,7 +16,15 @@ ifneq (,$(filter i2c_scan,$(USEMODULE)))
 endif
 
 ifneq (,$(filter prng_fortuna,$(USEMODULE)))
-  CFLAGS += -DCRYPTO_AES
+  USEMODULE += crypto_aes
+endif
+
+ifneq (,$(filter crypto_aes_%,$(USEMODULE)))
+  USEMODULE += crypto_aes
+endif
+
+ifneq (,$(filter crypto_%,$(USEMODULE)))
+  USEMODULE += crypto
 endif
 
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
