@@ -2,6 +2,11 @@
 
 include $(RIOTCPU)/esp_common/Makefile.dep
 
+USEMODULE += esp_idf_driver
+USEMODULE += esp_idf_esp32
+USEMODULE += esp_idf_soc
+USEMODULE += pm_layered
+
 ifneq (,$(filter cpp,$(FEATURES_USED)))
   USEMODULE += pthread
   BASELIBS += -lstdc++
