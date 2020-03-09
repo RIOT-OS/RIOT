@@ -86,17 +86,23 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt
         goto out;
     }
 
-    if (pkt->size && !(fport = gnrc_pktbuf_mark(pkt, 1, GNRC_NETTYPE_UNDEF))) {
-        DEBUG("gnrc_lorawan: failed to allocate fport\n");
-        goto out;
-    }
+    assert(pkt != NULL);
 
-    assert(pkt != NULL && fport->data);
+    int fopts_in_payload = 0;
+    /* only for download frames with payload the FPort must be present */
+    if (pkt->size) {
+        if ((fport = gnrc_pktbuf_mark(pkt, 1, GNRC_NETTYPE_UNDEF)) == NULL) {
+            DEBUG("gnrc_lorawan: failed to allocate fport\n");
+            goto out;
+        }
 
-    int fopts_in_payload = *((uint8_t *) fport->data) == 0;
-    if (fopts && fopts_in_payload) {
-        DEBUG("gnrc_lorawan: packet with fopts and port == 0. Drop\n");
-        goto out;
+        assert(fport->data);
+
+        fopts_in_payload = *((uint8_t *) fport->data) == 0;
+        if (fopts && fopts_in_payload) {
+            DEBUG("gnrc_lorawan: packet with fopts and port == 0. Drop\n");
+            goto out;
+        }
     }
 
     lorawan_hdr_t *lw_hdr = hdr->data;
@@ -122,7 +128,10 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt
 
     iolist_t payload = { .iol_base = pkt->data, .iol_len = pkt->size };
     if (pkt->data) {
-        gnrc_lorawan_encrypt_payload(&payload, &lw_hdr->addr, byteorder_ntohs(byteorder_ltobs(lw_hdr->fcnt)), GNRC_LORAWAN_DIR_DOWNLINK, fopts_in_payload ? mac->nwkskey : mac->appskey);
+        gnrc_lorawan_encrypt_payload(&payload, &lw_hdr->addr,
+                                     byteorder_ntohs(byteorder_ltobs(lw_hdr->fcnt)),
+                                     GNRC_LORAWAN_DIR_DOWNLINK,
+                                     fopts_in_payload ? mac->nwkskey : mac->appskey);
     }
 
     /* if there are fopts, it's either an empty packet or application payload */
@@ -134,7 +143,7 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt
     }
 
     gnrc_lorawan_mcps_event(mac, MCPS_EVENT_RX, lorawan_hdr_get_ack(lw_hdr));
-    if (pkt->data && *((uint8_t *) fport->data) != 0) {
+    if (pkt->data && fport && *((uint8_t *) fport->data) != 0) {
         pkt->type = GNRC_NETTYPE_LORAWAN;
         release = false;
 
