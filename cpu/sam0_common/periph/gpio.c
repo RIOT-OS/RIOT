@@ -322,12 +322,18 @@ void gpio_irq_disable(gpio_t pin)
 
 void isr_eic(void)
 {
-    for (unsigned i = 0; i < NUMOF_IRQS; i++) {
-        if (_EIC->INTFLAG.reg & (1 << i)) {
-            _EIC->INTFLAG.reg = (1 << i);
-            gpio_config[i].cb(gpio_config[i].arg);
-        }
+    /* read & clear interrupt flags */
+    uint32_t state = _EIC->INTFLAG.reg;
+    state &= (1 << NUMOF_IRQS) - 1;
+    _EIC->INTFLAG.reg = state;
+
+    /* execute interrupt callbacks */
+    while (state) {
+        unsigned pin = 8 * sizeof(state) - __builtin_clz(state) - 1;
+        state &= ~(1 << pin);
+        gpio_config[pin].cb(gpio_config[pin].arg);
     }
+
     cortexm_isr_end();
 }
 
