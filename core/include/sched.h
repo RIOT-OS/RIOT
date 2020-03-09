@@ -96,8 +96,8 @@
 typedef struct _thread thread_t;
 
 /**
- * @name Thread states supported by RIOT
- * @{
+ * @enum thread_status_t
+ * Thread states supported by RIOT
  */
 typedef enum {
     STATUS_STOPPED,                 /**< has terminated                           */
@@ -115,7 +115,6 @@ typedef enum {
     STATUS_PENDING,                 /**< waiting to be scheduled to run           */
     STATUS_NUMOF                    /**< number of supported thread states        */
 } thread_status_t;
-/** @} */
 
 /**
  * @name Helpers to work with thread states
