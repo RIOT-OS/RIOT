@@ -18,14 +18,6 @@ FLASH_FREQ  = 40m   # DO NOT CHANGE
 FLASH_SIZE ?= 4
 BOOTLOADER_POS = 0x1000
 
-# SPECIAL module dependencies
-# cannot be done in Makefile.dep since Makefile.dep is included too late
-
-ifneq (,$(filter esp_now esp_wifi esp_spi_ram,$(USEMODULE)))
-  # the ESP-IDF heap has to be used if any WiFi interface or SPI RAM is used
-  USEMODULE += esp_idf_heap
-endif
-
 include $(RIOTCPU)/esp_common/Makefile.include
 
 # regular Makefile
