@@ -1631,6 +1631,19 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 }
 
+void gnrc_netif_msg_handler_netdev(gnrc_netif_t *netif, msg_t *msg)
+{
+    netdev_t *dev = netif->dev;
+    switch(msg->type) {
+        case NETDEV_MSG_TYPE_EVENT:
+            DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_EVENT received\n");
+            dev->driver->isr(dev);
+            break;
+        default:
+            break;
+    }
+}
+
 static void *_gnrc_netif_thread(void *args)
 {
     gnrc_netapi_opt_t *opt;
