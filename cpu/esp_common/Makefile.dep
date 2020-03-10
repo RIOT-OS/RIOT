@@ -16,6 +16,25 @@ USEMODULE += random
 USEMODULE += stdio_uart
 USEMODULE += xtensa
 
+ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_wifi_enterprise
+  USEMODULE += esp_wifi
+endif
+
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+  ifneq (,$(filter lwip,$(USEMODULE)))
+    # for lwip, use esp_wifi as default netdev if no other netdev is enabled
+    ifeq (,$(filter esp_eth,$(USEMODULE)))
+      USEMODULE += esp_wifi
+    endif
+  else
+    # otherwise use esp_now as default netdev if no other netdev is enabled
+    ifeq (,$(filter esp_wifi esp_eth,$(USEMODULE)))
+      USEMODULE += esp_now
+    endif
+  endif
+endif
+
 # each device has SPI flash memory, but it has to be enabled explicitly
 ifneq (,$(filter esp_spiffs,$(USEMODULE)))
   USEMODULE += spiffs
