@@ -1978,6 +1978,10 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 static void _gomach_msg_handler(gnrc_netif_t *netif, msg_t *msg)
 {
     switch (msg->type) {
+        case NETDEV_MSG_TYPE_EVENT:
+            gnrc_netif_msg_handler_netdev(netif, msg);
+            break;
+
         case GNRC_GOMACH_EVENT_RTT_TYPE: {
             _gomach_rtt_handler(msg->content.value, netif);
             break;
