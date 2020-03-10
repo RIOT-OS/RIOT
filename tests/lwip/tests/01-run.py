@@ -181,6 +181,8 @@ class TestStrategy(ApplicationStrategy):
                 test_case(board_group, self.app_dir, env=None)
                 sys.stdout.write('.')
                 sys.stdout.flush()
+                # wait a bit for tear down of test case
+                time.sleep(.2)
             print()
 
 
