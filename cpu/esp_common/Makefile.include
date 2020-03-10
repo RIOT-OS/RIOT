@@ -4,13 +4,6 @@
 # use flash mode dout by default to keep GPIO9 and GPIO10 free for use
 FLASH_MODE ?= dout
 
-# SPECIAL module dependencies
-# cannot be done in Makefile.dep since Makefile.dep is included too late
-
-ifneq (,$(filter 4 5,$(LOG_LEVEL)))
-  USEMODULE += esp_log_startup
-endif
-
 # ESP* pseudomodules
 
 PSEUDOMODULES += esp_gdb
@@ -97,11 +90,9 @@ LINKFLAGS += -nostdlib -Wl,-gc-sections -Wl,-static
 # LINKFLAGS += -Wl,--verbose
 # LINKFLAGS += -Wl,--print-gc-sections
 
+# NOTE: These checks can be turned into normal conditionals when #9913 is fixed
 BOOTLOADER_COLOR = $(if $(filter esp_log_colored,$(USEMODULE)),_colors)
-
-ifneq (,$(filter esp_log_startup,$(USEMODULE)))
-  BOOTLOADER_INFO = _info
-endif
+BOOTLOADER_INFO = $(if $(filter esp_log_startup,$(USEMODULE)),_info)
 
 BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
 

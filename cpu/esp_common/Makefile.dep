@@ -43,6 +43,10 @@ ifneq (,$(filter log_color,$(USEMODULE)))
   USEMODULE += esp_log_colored
 endif
 
+ifneq (,$(filter 4 5,$(LOG_LEVEL)))
+  USEMODULE += esp_log_startup
+endif
+
 # each device has SPI flash memory, but it has to be enabled explicitly
 ifneq (,$(filter esp_spiffs,$(USEMODULE)))
   USEMODULE += spiffs
