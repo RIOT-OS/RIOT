@@ -721,6 +721,11 @@ void _on_dio3_irq(void *arg)
             break;
         default:
             DEBUG("[sx127x] netdev: sx127x_on_dio3: unknown state");
+            /* at least the related interrupts should be cleared in this case */
+            sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS,
+                             SX127X_RF_LORA_IRQFLAGS_VALIDHEADER |
+                             SX127X_RF_LORA_IRQFLAGS_CADDETECTED |
+                             SX127X_RF_LORA_IRQFLAGS_CADDONE);
             break;
     }
 }
