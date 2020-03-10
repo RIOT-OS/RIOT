@@ -91,7 +91,8 @@
 #endif
 
 /**
- * @brief forward declaration for thread_t, defined in thread.h
+ * @typedef thread_t
+ * Forward declaration for thread_t, defined in thread.h
  */
 typedef struct _thread thread_t;
 
