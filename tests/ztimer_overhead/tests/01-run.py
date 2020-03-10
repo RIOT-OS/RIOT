@@ -11,7 +11,7 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect(r"min=\d+ max=\d+ avg=\d+\r\n")
+    child.expect(r"min=-?\d+ max=-?\d+ avg_diff=\d+\r\n")
 
 
 if __name__ == "__main__":
