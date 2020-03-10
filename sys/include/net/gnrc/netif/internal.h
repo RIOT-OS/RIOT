@@ -702,6 +702,31 @@ static inline int gnrc_netif_ndp_addr_len_from_l2ao(gnrc_netif_t *netif,
 #endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN) */
 /** @} */
 
+/**
+ * @brief Post an ISR process request to the event queue
+ *
+ * @note Only available with module `gnrc_netif_events`.
+ *
+ * @param netif pointer to the network interface
+ */
+static inline void gnrc_netif_event_isr(gnrc_netif_t *netif)
+{
+#if IS_USED(MODULE_GNRC_NETIF_EVENTS)
+    event_post(&netif->evq, &netif->event_isr);
+#else
+    (void)netif;
+#endif
+}
+
+/**
+ * @brief Send a queued packet
+ *
+ * @note Only available with module `gnrc_netif_events`.
+ *
+ * @param netif pointer to the network interface
+ */
+void gnrc_netif_send_queued_pkt(gnrc_netif_t *netif);
+
 #ifdef __cplusplus
 }
 #endif
