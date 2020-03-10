@@ -48,6 +48,16 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Enable external oscillator for driving the slow clock
+ *
+ * @warning Many (older?) arduino-due boards do not have the external 32khz
+ *          oscillator soldered on, so only enable this after you make sure its
+ *          equipped on your specific board */
+#ifndef CLOCK_SCLK_XTAL
+#define CLOCK_SCLK_XTAL     (0)
+#endif
+
+/**
  * @name    Timer peripheral configuration
  * @{
  */
