@@ -10,7 +10,7 @@ ifeq (openocd,$(PROGRAMMER))
 else ifeq (pyocd,$(PROGRAMMER))
   # PyOCD doesn't recognize automatically the board ID, so target type has to
   # be passed explicitly
-  export FLASH_TARGET_TYPE ?= -t nrf51
+  FLASH_TARGET_TYPE ?= -t nrf51
   include $(RIOTMAKE)/tools/pyocd.inc.mk
 endif
 
