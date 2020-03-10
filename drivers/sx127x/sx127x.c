@@ -289,6 +289,10 @@ static int _init_gpios(sx127x_t *dev)
             return res;
         }
     }
+    else {
+        /* if frequency hopping is enabled, DIO2 pin must be defined */
+        assert(LORA_FREQUENCY_HOPPING_DEFAULT == false);
+    }
 
     /* check if DIO3 pin is defined */
     if (dev->params.dio3_pin != GPIO_UNDEF) {
