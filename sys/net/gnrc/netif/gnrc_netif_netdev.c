@@ -514,7 +514,7 @@ static void _event_handler_isr(event_t *evp)
 }
 #endif
 
-int gnrc_netif_default_init(gnrc_netif_t *netif)
+int gnrc_netif_default_init_netdev(gnrc_netif_t *netif)
 {
     gnrc_netif_acquire(netif);
     netdev_t *dev = netif->dev;

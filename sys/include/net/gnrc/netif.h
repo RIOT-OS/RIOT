@@ -541,16 +541,30 @@ static inline int gnrc_netif_ipv6_group_leave(const gnrc_netif_t *netif,
 }
 
 /**
+ * @brief   Operation to initialize a @ ref gnrc_netif_t that uses netdev.
+ *
+ * @param[in] netif     The network interface
+ *
+ * @return  0 on success
+ * @return  negative errno on error
+ */
+int gnrc_netif_default_init_netdev(gnrc_netif_t *netif);
+
+/**
  * @brief   Default operation for gnrc_netif_ops_t::init()
+ *
+ *          This is a wrapper for @ref gnrc_netif_default_init_netdev
  *
  * @note    Can also be used to be called *before* a custom operation.
  *
  * @param[in] netif     The network interface.
- * 
- * @return  0 on success
- * @return  negative errno on error
+ *
+ * @return  result of @ref gnrc_netif_default_init_netdev
  */
-int gnrc_netif_default_init(gnrc_netif_t *netif);
+static inline int gnrc_netif_default_init(gnrc_netif_t *netif)
+{
+    return gnrc_netif_default_init_netdev(netif);
+}
 
 /**
  * @brief   Default operation for gnrc_netif_ops_t::get()
