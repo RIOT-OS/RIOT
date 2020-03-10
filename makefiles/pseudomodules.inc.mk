@@ -117,6 +117,11 @@ PSEUDOMODULES += at86rf21%
 PSEUDOMODULES += at86rfa1
 PSEUDOMODULES += at86rfr2
 
+# include variants of the BME680 drivers as pseudo modules
+PSEUDOMODULES += bme680_i2c
+PSEUDOMODULES += bme680_spi
+PSEUDOMODULES += bme680_fp
+
 # include variants of the BMX280 drivers as pseudo modules
 PSEUDOMODULES += bmp280_i2c
 PSEUDOMODULES += bmp280_spi
