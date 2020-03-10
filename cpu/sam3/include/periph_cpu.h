@@ -71,6 +71,11 @@ typedef uint32_t gpio_t;
 #define TIMER_CHANNELS      (3)
 
 /**
+ * @brief   The RTT width is fixed to 32-bit
+ */
+#define RTT_MAX_VALUE       (0xffffffff)
+
+/**
  * @brief   Generate GPIO mode bitfields
  *
  * We use 3 bit to determine the pin functions:
