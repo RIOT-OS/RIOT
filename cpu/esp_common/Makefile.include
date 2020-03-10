@@ -88,14 +88,9 @@ ifneq (,$(filter esp_qemu,$(USEMODULE)))
   CFLAGS += -DQEMU
 endif
 
+# NOTE: These checks can be turned into normal conditionals when #9913 is fixed
 # use 32 priority levels if any WiFi interface or the ETH interface is used
-ifneq (,$(filter esp_wifi esp_now esp_eth,$(USEMODULE)))
-  CFLAGS += -DSCHED_PRIO_LEVELS=32
-endif
-
-ifneq (,$(filter esp_wifi esp_now esp_eth,$(USEMODULE)))
-  INCLUDES += -I$(RIOTCPU)/esp_common/esp-wifi
-endif
+CFLAGS += $(if $(filter esp_wifi_any esp_eth,$(USEMODULE)),-DSCHED_PRIO_LEVELS=32)
 
 # The threads for handling the ESP hardware have the priorities from 2 to 4.
 # The priority of lwIP TCPIP thread should be lower than these priorities.
