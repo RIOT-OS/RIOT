@@ -7,9 +7,9 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup JLink for flashing
 # export JLINK := JLink
-export JLINK_DEVICE := FE310
-export JLINK_IF := JTAG
-export FLASH_ADDR := 0x20010000
+JLINK_DEVICE = FE310
+JLINK_IF = JTAG
+FLASH_ADDR = 0x20010000
 include $(RIOTMAKE)/tools/jlink.inc.mk
 
 TESTRUNNER_RESET_DELAY = 1

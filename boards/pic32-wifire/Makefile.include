@@ -20,7 +20,7 @@ ifeq ($(PROGRAMMER),pic32prog)
   include $(RIOTMAKE)/tools/pic32prog.inc.mk
 else ifeq ($(PROGRAMMER),jlink)
   FLASHFILE ?= $(HEXFILE)
-  export JLINK_DEVICE := PIC32MZ2048EFG100
-  export JLINK_IF := JTAG
+  JLINK_DEVICE = PIC32MZ2048EFG100
+  JLINK_IF = JTAG
   include $(RIOTMAKE)/tools/jlink.inc.mk
 endif

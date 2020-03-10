@@ -15,6 +15,6 @@ ifeq ($(PROGRAMMER),openocd)
   include $(RIOTMAKE)/tools/openocd.inc.mk
 else ifeq ($(PROGRAMMER),jlink)
   # setup JLink for flashing
-  export JLINK_DEVICE := nrf51822
+  JLINK_DEVICE = nrf51822
   include $(RIOTMAKE)/tools/jlink.inc.mk
 endif
