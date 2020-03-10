@@ -298,14 +298,15 @@ int gnrc_netif_ipv6_group_idx(gnrc_netif_t *netif,
  * @return  true, if the interface represents a router
  * @return  false, if the interface does not represent a router
  */
-#if defined(MODULE_GNRC_IPV6_ROUTER) || defined(DOXYGEN)
 static inline bool gnrc_netif_is_rtr(const gnrc_netif_t *netif)
 {
-    return (netif->flags & GNRC_NETIF_FLAGS_IPV6_FORWARDING);
+    if (IS_USED(MODULE_GNRC_IPV6_ROUTER)) {
+        return (netif->flags & GNRC_NETIF_FLAGS_IPV6_FORWARDING);
+    }
+    else {
+        return false;
+    }
 }
-#else
-#define gnrc_netif_is_rtr(netif)                (false)
-#endif
 
 /**
  * @brief   Checks if the interface is allowed to send out router advertisements
@@ -320,14 +321,15 @@ static inline bool gnrc_netif_is_rtr(const gnrc_netif_t *netif)
  * @return  false, if the interface is not allowed to send out router
  *          advertisements
  */
-#if defined(MODULE_GNRC_IPV6_ROUTER) || defined(DOXYGEN)
 static inline bool gnrc_netif_is_rtr_adv(const gnrc_netif_t *netif)
 {
-    return (netif->flags & GNRC_NETIF_FLAGS_IPV6_RTR_ADV);
+    if (IS_USED(MODULE_GNRC_IPV6_ROUTER)) {
+        return (netif->flags & GNRC_NETIF_FLAGS_IPV6_RTR_ADV);
+    }
+    else {
+        return false;
+    }
 }
-#else
-#define gnrc_netif_is_rtr_adv(netif)            (false)
-#endif
 
 /**
  * @brief   Checks if the device type associated to a @ref gnrc_netif_t
@@ -386,14 +388,15 @@ static inline bool gnrc_netif_is_6lo(const gnrc_netif_t *netif)
  * @return  true, if the interface represents a 6LN
  * @return  false, if the interface does not represent a 6LN
  */
-#if GNRC_IPV6_NIB_CONF_6LN || defined(DOXYGEN)
 static inline bool gnrc_netif_is_6ln(const gnrc_netif_t *netif)
 {
-    return (netif->flags & GNRC_NETIF_FLAGS_6LN);
+    if (IS_ACTIVE(GNRC_IPV6_NIB_CONF_6LN)) {
+        return (netif->flags & GNRC_NETIF_FLAGS_6LN);
+    }
+    else {
+        return false;
+    }
 }
-#else
-#define gnrc_netif_is_6ln(netif)                (false)
-#endif
 
 /**
  * @brief   Checks if the interface represents a 6Lo router (6LR) according to
@@ -436,15 +439,16 @@ static inline bool gnrc_netif_is_6lr(const gnrc_netif_t *netif)
  * @return  true, if the interface represents a 6LBR
  * @return  false, if the interface does not represent a 6LBR
  */
-#if GNRC_IPV6_NIB_CONF_6LBR
 static inline bool gnrc_netif_is_6lbr(const gnrc_netif_t *netif)
 {
-    return (netif->flags & GNRC_NETIF_FLAGS_6LO_ABR) &&
-           gnrc_netif_is_6lr(netif);
+    if (IS_ACTIVE(GNRC_IPV6_NIB_CONF_6LBR)) {
+        return (netif->flags & GNRC_NETIF_FLAGS_6LO_ABR) &&
+               gnrc_netif_is_6lr(netif);
+    }
+    else {
+        return false;
+    }
 }
-#else
-#define gnrc_netif_is_6lbr(netif)               (false)
-#endif
 
 /**
  * @name    Device type based function
