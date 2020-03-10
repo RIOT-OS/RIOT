@@ -207,7 +207,7 @@ struct gnrc_netif_ops {
      * recommended to call @ref gnrc_netif_default_init() at the start of the
      * custom initialization function set here.
      */
-    void (*init)(gnrc_netif_t *netif);
+    int (*init)(gnrc_netif_t *netif);
 
     /**
      * @brief   Send a @ref net_gnrc_pkt "packet" over the network interface
@@ -546,8 +546,11 @@ static inline int gnrc_netif_ipv6_group_leave(const gnrc_netif_t *netif,
  * @note    Can also be used to be called *before* a custom operation.
  *
  * @param[in] netif     The network interface.
+ * 
+ * @return  0 on success
+ * @return  negative errno on error
  */
-void gnrc_netif_default_init(gnrc_netif_t *netif);
+int gnrc_netif_default_init(gnrc_netif_t *netif);
 
 /**
  * @brief   Default operation for gnrc_netif_ops_t::get()

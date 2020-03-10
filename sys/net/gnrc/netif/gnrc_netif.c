@@ -1285,7 +1285,7 @@ static void _test_options(gnrc_netif_t *netif)
 }
 #endif /* DEVELHELP */
 
-void gnrc_netif_default_init(gnrc_netif_t *netif)
+int gnrc_netif_default_init(gnrc_netif_t *netif)
 {
     _init_from_device(netif);
 #ifdef DEVELHELP
@@ -1295,6 +1295,7 @@ void gnrc_netif_default_init(gnrc_netif_t *netif)
 #ifdef MODULE_GNRC_IPV6_NIB
     gnrc_ipv6_nib_init_iface(netif);
 #endif
+    return 0;
 }
 
 static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back);

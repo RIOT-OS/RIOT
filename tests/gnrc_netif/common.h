@@ -20,6 +20,7 @@
 #define COMMON_H
 
 
+#include "net/netdev.h"
 #include "net/gnrc/netif.h"
 
 #ifdef __cplusplus

@@ -50,7 +50,7 @@ static char ieee802154_netif_stack[ETHERNET_STACKSIZE];
 static char netifs_stack[DEFAULT_DEVS_NUMOF][THREAD_STACKSIZE_DEFAULT];
 static bool init_called = false;
 
-static inline void _test_init(gnrc_netif_t *netif);
+static inline int _test_init(gnrc_netif_t *netif);
 static inline int _mock_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static inline gnrc_pktsnip_t *_mock_netif_recv(gnrc_netif_t * netif);
 static int _get_netdev_address(netdev_t *dev, void *value, size_t max_len);
@@ -101,11 +101,15 @@ static void _set_up(void)
     while (msg_try_receive(&msg) > 0) {}
 }
 
-static inline void _test_init(gnrc_netif_t *netif)
+static inline int _test_init(gnrc_netif_t *netif)
 {
     (void)netif;
-    gnrc_netif_default_init(netif);
+    int res = gnrc_netif_default_init(netif);
+    if (res < 0) {
+        return res;
+    }
     init_called = true;
+    return 0;
 }
 
 static void test_creation(void)
