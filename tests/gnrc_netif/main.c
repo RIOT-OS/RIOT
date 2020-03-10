@@ -69,7 +69,7 @@ static const gnrc_netif_ops_t default_ops = {
     .recv = _mock_netif_recv,
     .get = gnrc_netif_get_from_netdev,
     .set = gnrc_netif_set_from_netdev,
-    .msg_handler = NULL,
+    .msg_handler = gnrc_netif_msg_handler_netdev,
 };
 
 static void _set_up(void)

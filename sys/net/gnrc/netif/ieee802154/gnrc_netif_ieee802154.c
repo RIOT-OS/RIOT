@@ -37,6 +37,7 @@ static const gnrc_netif_ops_t ieee802154_ops = {
     .recv = _recv,
     .get = gnrc_netif_get_from_netdev,
     .set = gnrc_netif_set_from_netdev,
+    .msg_handler = gnrc_netif_msg_handler_netdev,
 };
 
 int gnrc_netif_ieee802154_create(gnrc_netif_t *netif, char *stack, int stacksize,

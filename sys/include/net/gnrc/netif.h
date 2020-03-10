@@ -306,6 +306,17 @@ struct gnrc_netif_ops {
 void gnrc_netif_init_devs(void);
 
 /**
+ * @brief   Default msg handler for netdev.
+ *
+ *          This function process the NETDEV_MSG_TYPE_EVENT calling
+ *          `netdev_t::driver::isr`.
+ *
+ * @param[in] netif The network interface.
+ * @param[in] msg   Message to be handled.
+ */
+void gnrc_netif_msg_handler_netdev(gnrc_netif_t *netif, msg_t *msg);
+
+/**
  * @brief   Creates a network interface
  *
  * @param[out] netif    The interface. May not be `NULL`.

@@ -192,7 +192,7 @@ static const gnrc_netif_ops_t _nimble_netif_ops = {
     .recv = _netif_recv,
     .get = gnrc_netif_get_from_netdev,
     .set = gnrc_netif_set_from_netdev,
-    .msg_handler = NULL,
+    .msg_handler = gnrc_netif_msg_handler_netdev,
 };
 
 static inline int _netdev_init(netdev_t *dev)

@@ -1229,6 +1229,7 @@ static const gnrc_netif_ops_t _test_netif_ops = {
     .recv = _test_netif_recv,
     .get = gnrc_netif_get_from_netdev,
     .set = _test_netif_set,
+    .msg_handler = gnrc_netif_msg_handler_netdev,
 };
 
 static int _netdev_test_address_long(netdev_t *dev, void *value, size_t max_len)

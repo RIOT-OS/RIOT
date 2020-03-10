@@ -1465,6 +1465,18 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
         netif->stats.tx_bytes += res;
     }
 #endif
+
+void gnrc_netif_msg_handler_netdev(gnrc_netif_t *netif, msg_t *msg)
+{
+    netdev_t *dev = netif->dev;
+    switch(msg->type) {
+        case NETDEV_MSG_TYPE_EVENT:
+            DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_EVENT received\n");
+            dev->driver->isr(dev);
+            break;
+        default:
+            break;
+    }
 }
 
 static void *_gnrc_netif_thread(void *args)
@@ -1534,10 +1546,6 @@ static void *_gnrc_netif_thread(void *args)
                 _send_queued_pkt(netif);
                 break;
 #endif  /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
-            case NETDEV_MSG_TYPE_EVENT:
-                DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_EVENT received\n");
-                dev->driver->isr(dev);
-                break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
                 _send(netif, msg.content.ptr, false);

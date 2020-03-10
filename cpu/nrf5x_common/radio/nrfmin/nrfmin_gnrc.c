@@ -179,6 +179,7 @@ static const gnrc_netif_ops_t gnrc_nrfmin_ops = {
     .recv = gnrc_nrfmin_recv,
     .get = gnrc_netif_get_from_netdev,
     .set = gnrc_netif_set_from_netdev,
+    .msg_handler = gnrc_netif_msg_handler_netdev,
 };
 
 void gnrc_nrfmin_init(void)

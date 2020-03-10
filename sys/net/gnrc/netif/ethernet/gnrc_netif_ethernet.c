@@ -47,6 +47,7 @@ static const gnrc_netif_ops_t ethernet_ops = {
     .recv = _recv,
     .get = gnrc_netif_get_from_netdev,
     .set = _set,
+    .msg_handler = gnrc_netif_msg_handler_netdev,
 };
 
 int gnrc_netif_ethernet_create(gnrc_netif_t *netif, char *stack, int stacksize,
