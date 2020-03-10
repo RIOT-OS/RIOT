@@ -71,7 +71,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
         .irqn       = USART1_IRQn,
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF7,
@@ -87,7 +87,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_PIN(PORT_D, 3),
         .rts_pin    = GPIO_PIN(PORT_D, 4),
         .cts_af     = GPIO_AF7,
@@ -103,7 +103,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF8,
@@ -119,7 +119,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART3_IRQn,
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF7,

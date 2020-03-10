@@ -75,15 +75,16 @@ static const timer_conf_t timer_config[] = {
  */
 
 static const uart_conf_t uart_config[] = {
- {
-     .regs = UART0,
-     .tx_pin = 29,
-     .rx_pin = 28,
-     .rts_pin = 0,      /* ignored when flow_control is 0 */
-     .cts_pin = 0,      /* ignored when flow_control is 0 */
-     .flow_control = 0,
-     .intn = UART0_IRQN
- }
+    {
+        .regs = UART0,
+        .tx_pin = 29,
+        .rx_pin = 28,
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin = GPIO_UNDEF,
+        .cts_pin = GPIO_UNDEF,
+#endif
+        .intn = UART0_IRQN
+    }
 };
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */

@@ -71,23 +71,30 @@ static const timer_conf_t timer_config[] = {
 * The TI CC1352 LaunchPad board only has access to a single UART device through
 * the debugger, so all we need to configure are the RX and TX pins.
 *
-* Optionally we can enable hardware flow control, by setting UART_HW_FLOW_CTRL
-* to 1 and defining pins for cts_pin and rts_pin.
-*
-* Add a second UART configuration if using external pins.
+* Optionally we can enable hardware flow control, by using periph_uart_hw_fc
+* module (USEMODULE += periph_uart_hw_fc) and defining pins for cts_pin and
+* rts_pin.
 * @{
 */
+/**
+ * @name    UART configuration
+ *
+ *
+ * Add a second UART configuration if using external pins.
+ * @{
+ */
 
 static const uart_conf_t uart_config[] = {
- {
-     .regs = UART0,
-     .tx_pin = 13,
-     .rx_pin = 12,
-     .rts_pin = 0,      /* ignored when flow_control is 0 */
-     .cts_pin = 0,      /* ignored when flow_control is 0 */
-     .flow_control = 0,
-     .intn = UART0_IRQN
- }
+    {
+        .regs = UART0,
+        .tx_pin = 13,
+        .rx_pin = 12,
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin = GPIO_UNDEF,
+        .cts_pin = GPIO_UNDEF,
+#endif
+        .intn = UART0_IRQN
+    }
 };
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */

@@ -461,7 +461,7 @@ typedef struct {
 #endif
     uint8_t bus;            /**< APB bus */
     uint8_t irqn;           /**< IRQ channel */
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
     gpio_t cts_pin;         /**< CTS pin - set to GPIO_UNDEF when not using HW flow control */
     gpio_t rts_pin;         /**< RTS pin */
 #ifndef CPU_FAM_STM32F1

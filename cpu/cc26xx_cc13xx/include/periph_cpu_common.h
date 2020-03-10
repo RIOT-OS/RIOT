@@ -119,9 +119,10 @@ typedef struct {
    uart_regs_t *regs;
    int tx_pin;
    int rx_pin;
+#ifdef MODULE_PERIPH_UART_HW_FC
    int rts_pin;
    int cts_pin;
-   int flow_control;
+#endif
    int intn;
 } uart_conf_t;
 /** @} */

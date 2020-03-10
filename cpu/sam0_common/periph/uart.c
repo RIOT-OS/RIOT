@@ -80,7 +80,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     gpio_set(uart_config[uart].tx_pin);
     gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
 
-#ifdef MODULE_SAM0_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
     /* If RTS/CTS needed, enable them */
     if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
         /* Ensure RTS is defined */
