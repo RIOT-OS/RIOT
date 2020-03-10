@@ -169,8 +169,10 @@ typedef struct {
     NRF_UARTE_Type *dev;    /**< UART with EasyDMA device base register address */
     gpio_t rx_pin;          /**< RX pin */
     gpio_t tx_pin;          /**< TX pin */
-    gpio_t rts_pin;         /**< RTS pin - set to GPIO_UNDEF when not using HW flow control */
-    gpio_t cts_pin;         /**< CTS pin - set to GPIO_UNDEF when not using HW flow control */
+#ifdef MODULE_PERIPH_UART_HW_FC
+    gpio_t rts_pin;         /**< RTS pin */
+    gpio_t cts_pin;         /**< CTS pin */
+#endif
     uint8_t irqn;           /**< IRQ channel */
 } uart_conf_t;
 #endif
