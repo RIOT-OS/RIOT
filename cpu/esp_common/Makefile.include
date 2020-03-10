@@ -62,23 +62,15 @@ ifneq (,$(filter lwip,$(USEMODULE)))
 endif
 
 # if SPI RAM is enabled, the qout flash mode has to be used
-ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
-  FLASH_MODE = qout
-  CFLAGS += -DFLASH_MODE_QOUT=1
-else
-  ifeq ($(FLASH_MODE), qio)
-    CFLAGS += -DFLASH_MODE_QIO=1
-  endif
-  ifeq ($(FLASH_MODE), qout)
-    CFLAGS += -DFLASH_MODE_QOUT=1
-  endif
-  ifeq ($(FLASH_MODE), dio)
-    CFLAGS += -DFLASH_MODE_DIO=1
-  endif
-  ifeq ($(FLASH_MODE), dout)
-    CFLAGS += -DFLASH_MODE_DOUT=1
-  endif
-endif
+# NOTE: These checks can be turned into normal conditionals when #9913 is fixed
+_FLASH_MODE_PREV := $(FLASH_MODE)
+FLASH_MODE = $(if $(filter esp_spi_ram,$(USEMODULE)),qout,$(_FLASH_MODE_PREV))
+
+# set CFLAG for the correspondant FLASH_MODE
+CFLAGS += $(if $(findstring qout,$(FLASH_MODE)),-DFLASH_MODE_QOUT=1)
+CFLAGS += $(if $(findstring qio,$(FLASH_MODE)),-DFLASH_MODE_QIO=1)
+CFLAGS += $(if $(findstring dio,$(FLASH_MODE)),-DFLASH_MODE_DIO=1)
+CFLAGS += $(if $(findstring dout,$(FLASH_MODE)),-DFLASH_MODE_DOUT=1)
 
 BASELIBS += -lhal -lg -lc
 
