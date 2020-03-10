@@ -75,7 +75,7 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate);
 #endif
 #endif
 
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
 static inline void uart_init_rts_pin(uart_t uart)
 {
     if (uart_config[uart].rts_pin != GPIO_UNDEF) {
@@ -117,7 +117,7 @@ static inline void uart_init_pins(uart_t uart, uart_rx_cb_t rx_cb)
         gpio_init_af(uart_config[uart].rx_pin, uart_config[uart].rx_af);
 #endif
     }
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
     uart_init_cts_pin(uart);
     uart_init_rts_pin(uart);
 #endif
@@ -187,7 +187,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         dev(uart)->CR1 = (USART_CR1_UE | USART_CR1_TE);
     }
 
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
     if (uart_config[uart].cts_pin != GPIO_UNDEF) {
         dev(uart)->CR3 |= USART_CR3_CTSE;
     }
@@ -372,7 +372,7 @@ void uart_poweron(uart_t uart)
 
     dev(uart)->CR1 |= (USART_CR1_UE);
 
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
     /* STM32F4 errata 2.10.9: nRTS is active while RE or UE = 0
      * we should only configure nRTS pin after setting UE */
     uart_init_rts_pin(uart);
@@ -383,7 +383,7 @@ void uart_poweroff(uart_t uart)
 {
     assert(uart < UART_NUMOF);
 
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
     /* the uart peripheral does not put RTS high from hardware when
      * UE flag is cleared, so we need to do this manually */
     if (uart_config[uart].rts_pin != GPIO_UNDEF) {
