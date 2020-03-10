@@ -28,10 +28,10 @@ extern "C" {
 /* some pseudo-module based configuration, doc: see below */
 #ifdef MODULE_GNRC_IPV6_NIB_6LBR
 #ifndef GNRC_IPV6_NIB_CONF_6LBR
-#define GNRC_IPV6_NIB_CONF_6LBR         (1)
+#define GNRC_IPV6_NIB_CONF_6LBR         1
 #endif
 #ifndef GNRC_IPV6_NIB_CONF_SLAAC
-#define GNRC_IPV6_NIB_CONF_SLAAC        (1)
+#define GNRC_IPV6_NIB_CONF_SLAAC        1
 #endif
 #ifndef GNRC_IPV6_NIB_NUMOF
 #define GNRC_IPV6_NIB_NUMOF             (16)
@@ -40,26 +40,26 @@ extern "C" {
 
 #ifdef MODULE_GNRC_IPV6_NIB_6LR
 #ifndef GNRC_IPV6_NIB_CONF_6LR
-#define GNRC_IPV6_NIB_CONF_6LR          (1)
+#define GNRC_IPV6_NIB_CONF_6LR          1
 #endif
 #ifndef GNRC_IPV6_NIB_CONF_SLAAC
-#define GNRC_IPV6_NIB_CONF_SLAAC        (0)
+#define GNRC_IPV6_NIB_CONF_SLAAC        0
 #endif
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_6LN
 #ifndef GNRC_IPV6_NIB_CONF_6LN
-#define GNRC_IPV6_NIB_CONF_6LN          (1)
+#define GNRC_IPV6_NIB_CONF_6LN          1
 #endif
 #ifndef GNRC_IPV6_NIB_CONF_SLAAC
-#define GNRC_IPV6_NIB_CONF_SLAAC        (0)
+#define GNRC_IPV6_NIB_CONF_SLAAC        0
 #endif
 #ifndef GNRC_IPV6_NIB_CONF_QUEUE_PKT
-#define GNRC_IPV6_NIB_CONF_QUEUE_PKT    (0)
+#define GNRC_IPV6_NIB_CONF_QUEUE_PKT    0
 #endif
 #if !GNRC_IPV6_NIB_CONF_6LR
 # ifndef GNRC_IPV6_NIB_CONF_ARSM
-# define GNRC_IPV6_NIB_CONF_ARSM        (0)
+# define GNRC_IPV6_NIB_CONF_ARSM        0
 # endif
 # ifndef GNRC_IPV6_NIB_NUMOF
 /* only needs to store default router */
@@ -69,11 +69,11 @@ extern "C" {
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_ROUTER
-#define GNRC_IPV6_NIB_CONF_ROUTER       (1)
+#define GNRC_IPV6_NIB_CONF_ROUTER       1
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_DNS
-#define GNRC_IPV6_NIB_CONF_DNS          (1)
+#define GNRC_IPV6_NIB_CONF_DNS          1
 #endif
 
 /**
@@ -85,7 +85,7 @@ extern "C" {
  * @brief   enable features for 6Lo border router
  */
 #ifndef GNRC_IPV6_NIB_CONF_6LBR
-#define GNRC_IPV6_NIB_CONF_6LBR         (0)
+#define GNRC_IPV6_NIB_CONF_6LBR         0
 #endif
 
 /**
@@ -93,9 +93,9 @@ extern "C" {
  */
 #ifndef GNRC_IPV6_NIB_CONF_6LR
 #if GNRC_IPV6_NIB_CONF_6LBR
-#define GNRC_IPV6_NIB_CONF_6LR          (1)
+#define GNRC_IPV6_NIB_CONF_6LR          1
 #else
-#define GNRC_IPV6_NIB_CONF_6LR          (0)
+#define GNRC_IPV6_NIB_CONF_6LR          0
 #endif
 #endif
 
@@ -104,9 +104,9 @@ extern "C" {
  */
 #ifndef GNRC_IPV6_NIB_CONF_6LN
 #if GNRC_IPV6_NIB_CONF_6LR
-#define GNRC_IPV6_NIB_CONF_6LN          (1)
+#define GNRC_IPV6_NIB_CONF_6LN          1
 #else
-#define GNRC_IPV6_NIB_CONF_6LN          (0)
+#define GNRC_IPV6_NIB_CONF_6LN          0
 #endif
 #endif
 
@@ -115,9 +115,9 @@ extern "C" {
  */
 #ifndef GNRC_IPV6_NIB_CONF_ROUTER
 #if GNRC_IPV6_NIB_CONF_6LR
-#define GNRC_IPV6_NIB_CONF_ROUTER       (1)
+#define GNRC_IPV6_NIB_CONF_ROUTER       1
 #else
-#define GNRC_IPV6_NIB_CONF_ROUTER       (0)
+#define GNRC_IPV6_NIB_CONF_ROUTER       0
 #endif
 #endif
 
@@ -127,9 +127,9 @@ extern "C" {
 #ifndef GNRC_IPV6_NIB_CONF_ADV_ROUTER
 #if GNRC_IPV6_NIB_CONF_ROUTER && \
     (!GNRC_IPV6_NIB_CONF_6LR || GNRC_IPV6_NIB_CONF_6LBR)
-#define GNRC_IPV6_NIB_CONF_ADV_ROUTER   (1)
+#define GNRC_IPV6_NIB_CONF_ADV_ROUTER   1
 #else
-#define GNRC_IPV6_NIB_CONF_ADV_ROUTER   (0)
+#define GNRC_IPV6_NIB_CONF_ADV_ROUTER   0
 #endif
 #endif
 
@@ -137,7 +137,7 @@ extern "C" {
  * @brief   (de-)activate NDP address resolution state-machine
  */
 #ifndef GNRC_IPV6_NIB_CONF_ARSM
-#define GNRC_IPV6_NIB_CONF_ARSM         (1)
+#define GNRC_IPV6_NIB_CONF_ARSM         1
 #endif
 
 /**
@@ -145,9 +145,9 @@ extern "C" {
  */
 #ifndef GNRC_IPV6_NIB_CONF_QUEUE_PKT
 #if GNRC_IPV6_NIB_CONF_6LN
-#define GNRC_IPV6_NIB_CONF_QUEUE_PKT    (0)
+#define GNRC_IPV6_NIB_CONF_QUEUE_PKT    0
 #else
-#define GNRC_IPV6_NIB_CONF_QUEUE_PKT    (1)
+#define GNRC_IPV6_NIB_CONF_QUEUE_PKT    1
 #endif
 #endif
 
@@ -158,14 +158,14 @@ extern "C" {
  * @see [RFC 4862](https://tools.ietf.org/html/rfc4862)
  */
 #ifndef GNRC_IPV6_NIB_CONF_SLAAC
-#define GNRC_IPV6_NIB_CONF_SLAAC        (1)
+#define GNRC_IPV6_NIB_CONF_SLAAC        1
 #endif
 
 /**
  * @brief    handle Redirect Messages
  */
 #ifndef GNRC_IPV6_NIB_CONF_REDIRECT
-#define GNRC_IPV6_NIB_CONF_REDIRECT     (0)
+#define GNRC_IPV6_NIB_CONF_REDIRECT     0
 #endif
 
 /**
@@ -173,9 +173,9 @@ extern "C" {
  */
 #ifndef GNRC_IPV6_NIB_CONF_DC
 #if GNRC_IPV6_NIB_CONF_REDIRECT
-#define GNRC_IPV6_NIB_CONF_DC           (1)
+#define GNRC_IPV6_NIB_CONF_DC           1
 #else
-#define GNRC_IPV6_NIB_CONF_DC           (0)
+#define GNRC_IPV6_NIB_CONF_DC           0
 #endif
 #endif
 
@@ -185,7 +185,7 @@ extern "C" {
  * @see [RFC 8106](https://tools.ietf.org/html/rfc8106)
  */
 #ifndef GNRC_IPV6_NIB_CONF_DNS
-#define GNRC_IPV6_NIB_CONF_DNS          (0)
+#define GNRC_IPV6_NIB_CONF_DNS          0
 #endif
 
 /**
@@ -195,9 +195,9 @@ extern "C" {
  */
 #ifndef GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
 #if GNRC_IPV6_NIB_CONF_6LR
-#define GNRC_IPV6_NIB_CONF_MULTIHOP_P6C (1)
+#define GNRC_IPV6_NIB_CONF_MULTIHOP_P6C 1
 #else
-#define GNRC_IPV6_NIB_CONF_MULTIHOP_P6C (0)
+#define GNRC_IPV6_NIB_CONF_MULTIHOP_P6C 0
 #endif
 #endif
 
@@ -207,7 +207,7 @@ extern "C" {
  * @see [RFC 6775, section 8.2](https://tools.ietf.org/html/rfc6775#section-8.2)
  */
 #ifndef GNRC_IPV6_NIB_CONF_MULTIHOP_DAD
-#define GNRC_IPV6_NIB_CONF_MULTIHOP_DAD (0)
+#define GNRC_IPV6_NIB_CONF_MULTIHOP_DAD 0
 #endif
 /** @} */
 
@@ -226,7 +226,7 @@ extern "C" {
  * @warning Only do this if you know what you're doing
  */
 #ifndef GNRC_IPV6_NIB_CONF_NO_RTR_SOL
-#define GNRC_IPV6_NIB_CONF_NO_RTR_SOL       (0)
+#define GNRC_IPV6_NIB_CONF_NO_RTR_SOL       0
 #endif
 
 /**
