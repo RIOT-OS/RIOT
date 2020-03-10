@@ -63,7 +63,8 @@ class _SingletonMeta(type):
 class DHCPv6Server(metaclass=_SingletonMeta):
     """
     Inspired by Daemon class
-    https://web.archive.org/web/20160305151936/http://www.jejik.com/articles/2007/02/a_simple_unix_linux_daemon_in_python/
+    https://web.archive.org/web/20160305151936/\
+    http://www.jejik.com/articles/2007/02/a_simple_unix_linux_daemon_in_python/
     """
     PORT = 547
     command = None
@@ -118,7 +119,8 @@ class DHCPv6Server(metaclass=_SingletonMeta):
                 # exit from second parent
                 sys.exit(0)
         except OSError as e:
-            sys.stderr.write("fork #2 failed: %d (%s)\n" % (e.errno, e.strerror))
+            sys.stderr.write("fork #2 failed: %d (%s)\n" %
+                             (e.errno, e.strerror))
             sys.exit(1)
 
         # redirect standard file descriptors
