@@ -49,22 +49,6 @@ PSEUDOMODULES += esp_qemu
 PSEUDOMODULES += esp_spiffs
 PSEUDOMODULES += esp_wifi_any
 
-# Modules used by ESP*
-
-USEMODULE += esp_common
-USEMODULE += esp_common_periph
-USEMODULE += esp_freertos
-USEMODULE += esp_idf
-USEMODULE += log
-USEMODULE += newlib
-USEMODULE += periph
-USEMODULE += periph_hwrng
-USEMODULE += periph_flash
-USEMODULE += periph_uart
-USEMODULE += random
-USEMODULE += stdio_uart
-USEMODULE += xtensa
-
 # Common includes
 
 INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
