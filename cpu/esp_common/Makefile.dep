@@ -39,6 +39,10 @@ ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
   USEMODULE += esp_gdb
 endif
 
+ifneq (,$(filter log_color,$(USEMODULE)))
+  USEMODULE += esp_log_colored
+endif
+
 # each device has SPI flash memory, but it has to be enabled explicitly
 ifneq (,$(filter esp_spiffs,$(USEMODULE)))
   USEMODULE += spiffs

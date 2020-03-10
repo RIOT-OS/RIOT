@@ -7,10 +7,6 @@ FLASH_MODE ?= dout
 # SPECIAL module dependencies
 # cannot be done in Makefile.dep since Makefile.dep is included too late
 
-ifneq (,$(filter log_color,$(USEMODULE)))
-  USEMODULE += esp_log_colored
-endif
-
 ifneq (,$(filter 4 5,$(LOG_LEVEL)))
   USEMODULE += esp_log_startup
 endif
@@ -101,9 +97,7 @@ LINKFLAGS += -nostdlib -Wl,-gc-sections -Wl,-static
 # LINKFLAGS += -Wl,--verbose
 # LINKFLAGS += -Wl,--print-gc-sections
 
-ifneq (,$(filter esp_log_colored,$(USEMODULE)))
-  BOOTLOADER_COLOR = _colors
-endif
+BOOTLOADER_COLOR = $(if $(filter esp_log_colored,$(USEMODULE)),_colors)
 
 ifneq (,$(filter esp_log_startup,$(USEMODULE)))
   BOOTLOADER_INFO = _info
