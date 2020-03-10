@@ -52,7 +52,7 @@ QUIET ?= 1
 
 # Ethos/native TAP interface and UHCP prefix can be configured from make command
 TAP ?= tap0
-IPV6_PREFIX ?= 2001:db8::/64
+IPV6_PREFIX ?= 2001:db8::/32
 
 # MODULE DEPENDENT CONFIGURATION IMPORT
 # =====================================
