@@ -35,6 +35,10 @@ ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
+  USEMODULE += esp_gdb
+endif
+
 # each device has SPI flash memory, but it has to be enabled explicitly
 ifneq (,$(filter esp_spiffs,$(USEMODULE)))
   USEMODULE += spiffs

@@ -7,10 +7,6 @@ FLASH_MODE ?= dout
 # SPECIAL module dependencies
 # cannot be done in Makefile.dep since Makefile.dep is included too late
 
-ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
-  USEMODULE += esp_gdb
-endif
-
 ifneq (,$(filter log_color,$(USEMODULE)))
   USEMODULE += esp_log_colored
 endif
@@ -55,12 +51,9 @@ ASFLAGS += --longcalls --text-section-literals
 ARFLAGS = rcs
 
 CFLAGS_DBG ?= -ggdb -g3
-CFLAGS_OPT ?= -Os
 
 # override default CFLAGS_OPT in case module esp_gdb is enabled
-ifneq (,$(filter esp_gdb,$(USEMODULE)))
-  CFLAGS_OPT = -Og
-endif
+CFLAGS_OPT ?= $(if $(filter esp_gdb,$(USEMODULE)),-Og,-Os)
 
 CFLAGS += $(CFLAGS_OPT) $(CFLAGS_DBG)
 
