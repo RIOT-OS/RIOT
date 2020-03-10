@@ -132,11 +132,7 @@ else
   FFLAGS += 0x10000 $(FLASHFILE).bin
 endif
 
+# NOTE: These checks can be turned into normal conditionals when #9913 is fixed
 # increase the test timeout for file system tests that use the SPI flash drive
-ifneq (,$(filter spiffs,$(USEMODULE)))
-  export RIOT_TEST_TIMEOUT = 120
-endif
-
-ifneq (,$(filter littlefs,$(USEMODULE)))
-  export RIOT_TEST_TIMEOUT = 120
-endif
+RIOT_TEST_TIMEOUT = $(if $(filter spiffs littlefs,$(USEMODULE)),120)
+$(call target-export-variables,test,RIOT_TEST_TIMEOUT)
