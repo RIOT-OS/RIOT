@@ -1,4 +1,4 @@
-MODULE = cc26xx_cc13xx_driverlib
+MODULE = cc26xx_cc13xx_sdk
 
 NO_AUTO_SRC = 1
 SUBMODULES += 1

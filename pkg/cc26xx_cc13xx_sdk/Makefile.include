@@ -1,0 +1,21 @@
+INCLUDES += -I$(PKGDIRBASE)/cc26xx_cc13xx_sdk/source
+INCLUDES += -I$(PKGDIRBASE)/cc26xx_cc13xx_sdk/source/ti/devices/cc13x2_cc26x2
+
+ifneq (,$(filter cc26xx_cc13xx_driverlib,$(USEMODULE)))
+  DIRS += $(PKGDIRBASE)/cc26xx_cc13xx_sdk/source/ti/devices/cc13x2_cc26x2/driverlib
+  CFLAGS += -DDeviceFamily_CC13X2
+endif
+
+ifneq (,$(filter cc26xx_cc13xx_rf_patches,$(USEMODULE)))
+  DIRS += $(PKGDIRBASE)/cc26xx_cc13xx_sdk/source/ti/devices/cc13x2_cc26x2/rf_patches
+  CFLAGS += -DDeviceFamily_CC13X2
+endif
+
+ifneq (,$(filter cc26xx_cc13xx_drivers,$(USEMODULE)))
+  DIRS += $(PKGDIRBASE)/cc26xx_cc13xx_sdk/source/ti/drivers
+  CFLAGS += -DDeviceFamily_CC13X2
+endif
+
+ifneq (,$(filter cc26xx_cc13xx_sdk,$(USEPKG)))
+  DIRS += $(PKGDIRBASE)/cc26xx_cc13xx_sdk
+endif

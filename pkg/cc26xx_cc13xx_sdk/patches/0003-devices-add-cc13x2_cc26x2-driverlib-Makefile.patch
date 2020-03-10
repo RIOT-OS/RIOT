@@ -1,0 +1,25 @@
+From f64c948e0a1a1e4ff448e5ee72745c22c0bc8d24 Mon Sep 17 00:00:00 2001
+From: Jean Pierre Dudey <jeandudey@hotmail.com>
+Date: Mon, 9 Mar 2020 16:22:11 -0500
+Subject: [PATCH 3/3] devices: add cc13x2_cc26x2/driverlib Makefile
+
+Signed-off-by: Jean Pierre Dudey <jeandudey@hotmail.com>
+---
+ source/ti/devices/cc13x2_cc26x2/driverlib/Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
+ create mode 100644 source/ti/devices/cc13x2_cc26x2/driverlib/Makefile
+
+diff --git a/source/ti/devices/cc13x2_cc26x2/driverlib/Makefile b/source/ti/devices/cc13x2_cc26x2/driverlib/Makefile
+new file mode 100644
+index 0000000..77610d7
+--- /dev/null
++++ b/source/ti/devices/cc13x2_cc26x2/driverlib/Makefile
+@@ -0,0 +1,5 @@
++MODULE = cc26xx_cc13xx_driverlib
++
++CFLAGS += -Wno-unused-parameter -Wno-implicit-fallthrough -Wno-sign-compare
++
++include $(RIOTBASE)/Makefile.base
+-- 
+2.17.1
+

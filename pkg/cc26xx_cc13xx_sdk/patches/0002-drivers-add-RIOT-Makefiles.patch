@@ -1,0 +1,109 @@
+From 4940109201a566963f296f29afecffe3cb8b8878 Mon Sep 17 00:00:00 2001
+From: Jean Pierre Dudey <jeandudey@hotmail.com>
+Date: Mon, 9 Mar 2020 16:00:27 -0500
+Subject: [PATCH 2/3] drivers: add RIOT Makefiles
+
+Signed-off-by: Jean Pierre Dudey <jeandudey@hotmail.com>
+---
+ source/ti/drivers/Makefile       | 22 ++++++++++++++++++++++
+ source/ti/drivers/Makefile.dep   |  7 +++++++
+ source/ti/drivers/power/Makefile | 10 ++++++++++
+ source/ti/drivers/rf/Makefile    | 10 ++++++++++
+ source/ti/drivers/utils/Makefile |  8 ++++++++
+ 5 files changed, 57 insertions(+)
+ create mode 100644 source/ti/drivers/Makefile
+ create mode 100644 source/ti/drivers/Makefile.dep
+ create mode 100644 source/ti/drivers/power/Makefile
+ create mode 100644 source/ti/drivers/rf/Makefile
+ create mode 100644 source/ti/drivers/utils/Makefile
+
+diff --git a/source/ti/drivers/Makefile b/source/ti/drivers/Makefile
+new file mode 100644
+index 0000000..a5f9d2c
+--- /dev/null
++++ b/source/ti/drivers/Makefile
+@@ -0,0 +1,22 @@
++MODULE = cc26xx_cc13xx_drivers
++
++NO_AUTO_SRC = 1
++SUBMODULES += 1
++SUBMODULES_NOFORCE = 1
++
++CFLAGS += -Wno-strict-prototypes
++CFLAGS += -Wno-old-style-definition
++
++ifneq (,$(filter cc26xx_cc13xx_rf,$(USEMODULE)))
++  DIRS += rf
++endif
++
++ifneq (,$(filter cc26xx_cc13xx_power,$(USEMODULE)))
++  DIRS += power
++endif
++
++ifneq (,$(filter cc26xx_cc13xx_utils,$(USEMODULE)))
++  DIRS += utils
++endif
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/source/ti/drivers/Makefile.dep b/source/ti/drivers/Makefile.dep
+new file mode 100644
+index 0000000..f54a6af
+--- /dev/null
++++ b/source/ti/drivers/Makefile.dep
+@@ -0,0 +1,7 @@
++ifneq (,$(filter cc26xx_cc13xx_rf,$(USEMODULE)))
++  USEMODULE += cc26xx_cc13xx_power
++endif
++
++ifneq (,$(filter cc26xx_cc13xx_power,$(USEMODULE)))
++  USEMODULE += cc26xx_cc13xx_utils
++endif
+diff --git a/source/ti/drivers/power/Makefile b/source/ti/drivers/power/Makefile
+new file mode 100644
+index 0000000..8391bcd
+--- /dev/null
++++ b/source/ti/drivers/power/Makefile
+@@ -0,0 +1,10 @@
++MODULE = cc26xx_cc13xx_power
++
++CFLAGS += -Wno-strict-prototypes
++CFLAGS += -Wno-old-style-definition
++CFLAGS += -Wno-unused-parameter
++CFLAGS += -Wno-sign-compare
++CFLAGS += -Wno-strict-aliasing
++CLFAGS += -Wno-cast-function-type
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/source/ti/drivers/rf/Makefile b/source/ti/drivers/rf/Makefile
+new file mode 100644
+index 0000000..271da4f
+--- /dev/null
++++ b/source/ti/drivers/rf/Makefile
+@@ -0,0 +1,10 @@
++MODULE = cc26xx_cc13xx_rf
++
++CFLAGS += -Wno-strict-prototypes
++CFLAGS += -Wno-old-style-definition
++CFLAGS += -Wno-unused-parameter
++CFLAGS += -Wno-sign-compare
++CFLAGS += -Wno-strict-aliasing
++CFLAGS += -Wno-cast-function-type
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/source/ti/drivers/utils/Makefile b/source/ti/drivers/utils/Makefile
+new file mode 100644
+index 0000000..069f501
+--- /dev/null
++++ b/source/ti/drivers/utils/Makefile
+@@ -0,0 +1,8 @@
++MODULE = cc26xx_cc13xx_utils
++
++CFLAGS += -Wno-strict-prototypes
++CFLAGS += -Wno-old-style-definition
++CFLAGS += -Wno-unused-parameter
++CFLAGS += -Wno-sign-compare
++
++include $(RIOTBASE)/Makefile.base
+-- 
+2.17.1
+

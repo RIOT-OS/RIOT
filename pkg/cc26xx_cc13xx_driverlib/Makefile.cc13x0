@@ -1,5 +1,0 @@
-MODULE = cc13x0_driverlib
-
-CFLAGS += -Wno-unused-parameter -Wno-implicit-fallthrough -Wno-sign-compare
-
-include $(RIOTBASE)/Makefile.base

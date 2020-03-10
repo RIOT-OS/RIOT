@@ -1,0 +1,1643 @@
+From d4bf47563ee63435178f763c257d035b87801d9b Mon Sep 17 00:00:00 2001
+From: Jean Pierre Dudey <jeandudey@hotmail.com>
+Date: Mon, 9 Mar 2020 15:58:47 -0500
+Subject: [PATCH 1/3] drivers: remove unused files
+
+Signed-off-by: Jean Pierre Dudey <jeandudey@hotmail.com>
+---
+ source/ti/drivers/SDFatFS.c     | 370 -----------------
+ source/ti/drivers/SDFatFS.h     | 166 --------
+ source/ti/drivers/libBuilder.xs | 150 -------
+ source/ti/drivers/makefile      |  53 ---
+ source/ti/drivers/package.bld   | 706 --------------------------------
+ source/ti/drivers/package.xdc   |  40 --
+ source/ti/drivers/package.xs    |  90 ----
+ 7 files changed, 1575 deletions(-)
+ delete mode 100644 source/ti/drivers/SDFatFS.c
+ delete mode 100644 source/ti/drivers/SDFatFS.h
+ delete mode 100644 source/ti/drivers/libBuilder.xs
+ delete mode 100644 source/ti/drivers/makefile
+ delete mode 100644 source/ti/drivers/package.bld
+ delete mode 100644 source/ti/drivers/package.xdc
+ delete mode 100644 source/ti/drivers/package.xs
+
+diff --git a/source/ti/drivers/SDFatFS.c b/source/ti/drivers/SDFatFS.c
+deleted file mode 100644
+index 12fcf10..0000000
+--- a/source/ti/drivers/SDFatFS.c
++++ /dev/null
+@@ -1,370 +0,0 @@
+-/*
+- * Copyright (c) 2016-2018, Texas Instruments Incorporated
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * *  Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- * *  Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in the
+- *    documentation and/or other materials provided with the distribution.
+- *
+- * *  Neither the name of Texas Instruments Incorporated nor the names of
+- *    its contributors may be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-
+-#include <stdbool.h>
+-#include <stdint.h>
+-#include <stdlib.h>
+-
+-/*
+- * By default disable both asserts and log for this module.
+- * This must be done before DebugP.h is included.
+- */
+-#ifndef DebugP_ASSERT_ENABLED
+-#define DebugP_ASSERT_ENABLED 0
+-#endif
+-#ifndef DebugP_LOG_ENABLED
+-#define DebugP_LOG_ENABLED 0
+-#endif
+-
+-#include <ti/drivers/dpl/DebugP.h>
+-#include <ti/drivers/dpl/HwiP.h>
+-#include <ti/drivers/SD.h>
+-#include <ti/drivers/SDFatFS.h>
+-
+-#include <third_party/fatfs/ff.h>
+-
+-/* SDFatFS Specific Defines */
+-#define DRIVE_NOT_MOUNTED    (~(0U))
+-
+-extern const SDFatFS_Config SDFatFS_config[];
+-extern const uint_least8_t SDFatFS_count;
+-
+-static bool isInitialized = false;
+-
+-/*
+- * Array of SDFatFS_Handles to determine the association of the
+- * FatFs drive number with a SDFatFS_Handle.
+- * FF_VOLUMES is defined in <third_party/fatfs/ffconf.h>.
+- */
+-static SDFatFS_Handle sdFatFSHandles[FF_VOLUMES];
+-
+-/* FatFS function prototypes */
+-DSTATUS SDFatFS_diskInitialize(BYTE drive);
+-DRESULT SDFatFS_diskIOctrl(BYTE drive, BYTE ctrl, void *buffer);
+-DRESULT SDFatFS_diskRead(BYTE drive, BYTE *buffer,
+-    DWORD sector, UINT secCount);
+-DSTATUS SDFatFS_diskStatus(BYTE drive);
+-DRESULT SDFatFS_diskWrite(BYTE drive, const BYTE *buffer,
+-    DWORD sector, UINT secCount);
+-
+-/*
+- *  ======== SDFatFS_close ========
+- */
+-void SDFatFS_close(SDFatFS_Handle handle)
+-{
+-    TCHAR           path[3];
+-    DRESULT         dresult;
+-    FRESULT         fresult;
+-    SDFatFS_Object *obj = handle->object;
+-
+-    /* Construct base directory path */
+-    path[0] = (TCHAR)'0' + obj->driveNum;
+-    path[1] = (TCHAR)':';
+-    path[2] = (TCHAR)'\0';
+-
+-    /* Close the SD driver */
+-    SD_close(obj->sdHandle);
+-
+-    /* Unmount the FatFs drive */
+-    fresult = f_mount(NULL, path, 0);
+-    if (fresult != FR_OK) {
+-        DebugP_log1("SDFatFS: Could not unmount FatFs volume @ drive"
+-            " number %d", obj->driveNum);
+-    }
+-
+-    /* Unregister the disk_*() functions */
+-    dresult = disk_unregister(obj->driveNum);
+-    if (dresult != RES_OK) {
+-        DebugP_log1("SDFatFS: Error unregistering disk"
+-            " functions @ drive number %d", obj->driveNum);
+-    }
+-
+-    obj->driveNum = DRIVE_NOT_MOUNTED;
+-    DebugP_log0("SDFatFS closed");
+-}
+-
+-/*
+- *  ======== SDFatFS_diskInitialize ========
+- */
+-DSTATUS SDFatFS_diskInitialize(BYTE drive)
+-{
+-    int_fast8_t     result;
+-    SDFatFS_Object *obj = sdFatFSHandles[drive]->object;
+-
+-    result = SD_initialize(obj->sdHandle);
+-
+-    /* Convert lower level driver status code */
+-    if (result == SD_STATUS_SUCCESS) {
+-        obj->diskState = ((DSTATUS) obj->diskState) & ~((DSTATUS)STA_NOINIT);
+-    }
+-
+-    return (obj->diskState);
+-}
+-
+-/*
+- *  ======== SDFatFS_diskIOctrl ========
+- *  Function to perform specified disk operations. This function is called by the
+- *  FatFs module and must not be called by the application!
+- */
+-DRESULT SDFatFS_diskIOctrl(BYTE drive, BYTE ctrl, void *buffer)
+-{
+-    SDFatFS_Object *obj   = sdFatFSHandles[drive]->object;
+-    DRESULT         fatfsRes = RES_ERROR;
+-
+-    switch (ctrl) {
+-        case CTRL_SYNC:
+-            fatfsRes = RES_OK;
+-            break;
+-
+-        case (BYTE)GET_SECTOR_COUNT:
+-            *(uint32_t*)buffer = (uint32_t)SD_getNumSectors(obj->sdHandle);
+-
+-            DebugP_log1("SDFatFS: Disk IO control: sector count: %d",
+-                *(uint32_t*)buffer);
+-            fatfsRes = RES_OK;
+-            break;
+-
+-        case (BYTE)GET_SECTOR_SIZE:
+-            *(WORD*)buffer = (WORD)SD_getSectorSize(obj->sdHandle);
+-            DebugP_log1("SDFatFS: Disk IO control: sector size: %d",
+-                *(WORD*)buffer);
+-            fatfsRes = RES_OK;
+-            break;
+-
+-        case (BYTE)GET_BLOCK_SIZE:
+-            *(WORD*)buffer = (WORD)SD_getSectorSize(obj->sdHandle);
+-            DebugP_log1("SDFatFS: Disk IO control: block size: %d",
+-                *(WORD*)buffer);
+-            fatfsRes = RES_OK;
+-            break;
+-
+-        default:
+-            DebugP_log0("SDFatFS: Disk IO control parameter error");
+-            fatfsRes = RES_PARERR;
+-            break;
+-    }
+-    return (fatfsRes);
+-}
+-
+-/*
+- *  ======== SDFatFS_diskRead ========
+- *  Function to perform a disk read from the SDCard. This function is called by
+- *  the FatFs module and must not be called by the application!
+- */
+-DRESULT SDFatFS_diskRead(BYTE drive, BYTE *buffer,
+-    DWORD sector, UINT secCount)
+-{
+-    int_fast32_t    result;
+-    DRESULT         fatfsRes = RES_ERROR;
+-    SDFatFS_Object *obj   = sdFatFSHandles[drive]->object;
+-
+-    /* Return if disk not initialized */
+-    if ((obj->diskState & (DSTATUS)STA_NOINIT) != 0) {
+-        fatfsRes = RES_PARERR;
+-    }
+-    else {
+-        result = SD_read(obj->sdHandle, (uint_least8_t *)buffer,
+-            (int_least32_t)sector, (uint_least32_t)secCount);
+-
+-        /* Convert lower level driver status code */
+-        if (result == SD_STATUS_SUCCESS) {
+-            fatfsRes = RES_OK;
+-        }
+-    }
+-
+-    return (fatfsRes);
+-}
+-
+-/*
+- *  ======== SDFatFS_diskStatus ========
+- *  Function to return the current disk status. This function is called by
+- *  the FatFs module and must not be called by the application!
+- */
+-DSTATUS SDFatFS_diskStatus(BYTE drive)
+-{
+-    return (((SDFatFS_Object *)sdFatFSHandles[drive]->object)->diskState);
+-}
+-
+-
+-#if (_READONLY == 0)
+-/*
+- *  ======== SDFatFS_diskWrite ========
+- *  Function to perform a write to the SDCard. This function is called by
+- *  the FatFs module and must not be called by the application!
+- */
+-DRESULT SDFatFS_diskWrite(BYTE drive, const BYTE *buffer, DWORD sector,
+-    UINT secCount)
+-{
+-    int_fast32_t    result;
+-    DRESULT         fatfsRes = RES_ERROR;
+-    SDFatFS_Object *obj = sdFatFSHandles[drive]->object;
+-
+-    /* Return if disk not initialized */
+-    if ((obj->diskState & (DSTATUS)STA_NOINIT) != 0) {
+-        fatfsRes = RES_PARERR;
+-    }
+-    else {
+-        result = SD_write(obj->sdHandle, (const uint_least8_t *)buffer,
+-            (int_least32_t)sector, (uint_least32_t)secCount);
+-
+-        /* Convert lower level driver status code */
+-        if (result == SD_STATUS_SUCCESS) {
+-            fatfsRes = RES_OK;
+-        }
+-    }
+-
+-    return (fatfsRes);
+-}
+-#endif
+-
+-/*
+- *  ======== SDFatFS_init ========
+- */
+-void SDFatFS_init(void)
+-{
+-    uint_least8_t   i;
+-    uint_fast32_t   key;
+-    SDFatFS_Object *obj;
+-
+-    key = HwiP_disable();
+-
+-    if (!isInitialized) {
+-        isInitialized = (bool) true;
+-
+-        /* Initialize each SDFatFS object */
+-        for (i = 0; i < SDFatFS_count; i++) {
+-            obj = ((SDFatFS_Handle)&(SDFatFS_config[i]))->object;
+-
+-            obj->diskState = STA_NOINIT;
+-            obj->driveNum = DRIVE_NOT_MOUNTED;
+-        }
+-
+-        /* Initialize the SD Driver */
+-        SD_init();
+-    }
+-
+-    HwiP_restore(key);
+-}
+-
+-
+-/*
+- *  ======== SDFatFS_open ========
+- *  Note: The index passed into this function must correspond directly
+- *  to the SD driver index.
+- */
+-SDFatFS_Handle SDFatFS_open(uint_least8_t idx, uint_least8_t drive)
+-{
+-    uintptr_t       key;
+-    DRESULT         dresult;
+-    FRESULT         fresult;
+-    TCHAR           path[3];
+-    SDFatFS_Handle  handle = NULL;
+-    SDFatFS_Object *obj;
+-
+-    /* Verify driver index and state */
+-    if (isInitialized && (idx < SDFatFS_count)) {
+-        /* Get handle for this driver instance */
+-        handle = (SDFatFS_Handle)&(SDFatFS_config[idx]);
+-        obj = handle->object;
+-
+-        /* Determine if the device was already opened */
+-        key = HwiP_disable();
+-        if (obj->driveNum != DRIVE_NOT_MOUNTED) {
+-            HwiP_restore(key);
+-            DebugP_log1("SDFatFS Drive %d already in use!", obj->driveNum);
+-            handle = NULL;
+-        }
+-        else {
+-            obj->driveNum = drive;
+-
+-            /* Open SD Driver */
+-            obj->sdHandle = SD_open(idx, NULL);
+-
+-            HwiP_restore(key);
+-
+-            if (obj->sdHandle == NULL) {
+-                obj->driveNum = DRIVE_NOT_MOUNTED;
+-                /* Error occurred in lower level driver */
+-                handle = NULL;
+-            }
+-            else {
+-
+-                /* Register FATFS Functions */
+-                dresult = disk_register(obj->driveNum,
+-                    SDFatFS_diskInitialize,
+-                    SDFatFS_diskStatus,
+-                    SDFatFS_diskRead,
+-                    SDFatFS_diskWrite,
+-                    SDFatFS_diskIOctrl);
+-
+-                /* Check for drive errors */
+-                if (dresult != RES_OK) {
+-                    DebugP_log0("SDFatFS: Disk functions not registered");
+-                    SDFatFS_close(handle);
+-                    handle = NULL;
+-                }
+-                else {
+-
+-                    /* Construct base directory path */
+-                    path[0] = (TCHAR)'0' + obj->driveNum;
+-                    path[1] = (TCHAR)':';
+-                    path[2] = (TCHAR)'\0';
+-
+-                    /*
+-                     * Register the filesystem with FatFs. This operation does
+-                     * not access the SDCard yet.
+-                     */
+-                    fresult = f_mount(&(obj->filesystem), path, 0);
+-                    if (fresult != FR_OK) {
+-                        DebugP_log1("SDFatFS: Drive %d not mounted",
+-                                    obj->driveNum);
+-
+-                        SDFatFS_close(handle);
+-                        handle = NULL;
+-                    }
+-                    else {
+-
+-                        /*
+-                         * Store the new sdfatfs handle for the input drive
+-                         * number
+-                         */
+-                        sdFatFSHandles[obj->driveNum] = handle;
+-
+-                        DebugP_log0("SDFatFS: opened");
+-                    }
+-                }
+-            }
+-        }
+-    }
+-
+-    return (handle);
+-}
+diff --git a/source/ti/drivers/SDFatFS.h b/source/ti/drivers/SDFatFS.h
+deleted file mode 100644
+index 340f979..0000000
+--- a/source/ti/drivers/SDFatFS.h
++++ /dev/null
+@@ -1,166 +0,0 @@
+-/*
+- * Copyright (c) 2016-2019, Texas Instruments Incorporated
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * *  Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- * *  Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in the
+- *    documentation and/or other materials provided with the distribution.
+- *
+- * *  Neither the name of Texas Instruments Incorporated nor the names of
+- *    its contributors may be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-/*!****************************************************************************
+- *  @file       SDFatFS.h
+- *
+- *  @brief      File Allocation Table File System (FATFS) Driver
+- *
+- *  The SDFatFS header file should be included in an application as follows:
+- *  @code
+- *  #include <ti/drivers/SDFatFS.h>
+- *  #include <ti/drivers/SD.h>
+- *  @endcode
+- *
+- *  @anchor ti_drivers_SDFatFS_Overview
+- *  # Overview #
+- *
+- *  The SDFatFS driver is designed to hook into FatFs by implementing a
+- *  set of functions that FatFs needs to call to perform basic block data
+- *  transfers. This driver makes use of the SD driver for lower level disk IO
+- *  operations.
+- *
+- *  The only functions that should be called by the application are the
+- *  standard driver framework functions (_open, _close, etc...).
+- *
+- *  The application may use the FatFs APIs or the standard C
+- *  runtime file I/O calls (fopen, fclose, etc...) given that SDFatFS_open has
+- *  has been successfully called. After the SDFatFS_close API is called,
+- *  ensure the application does NOT make any file I/O calls.
+- *
+- *  ## Opening the driver #
+- *
+- *  @code
+- *  SDFatFS_Handle handle;
+- *
+- *  handle = SDFatFS_open(CONFIG_SDFatFS0, driveNum, NULL);
+- *  if (handle == NULL) {
+- *      //Error opening SDFatFS driver
+- *      while (1);
+- *  }
+- *  @endcode
+- *
+- *  # Instrumentation #
+- *
+- *  The SDFatFS driver interface produces log statements if
+- *  instrumentation is enabled.
+- *
+- *  Diagnostics Mask | Log details                   |
+- *  ---------------- | -----------                   |
+- *  Diags_USER1      | basic operations performed    |
+- *  Diags_USER2      | detailed operations performed |
+- *  ============================================================================
+- */
+-
+-#ifndef ti_drivers_SDFatFS__include
+-#define ti_drivers_SDFatFS__include
+-
+-#include <stdint.h>
+-
+-#include <ti/drivers/SD.h>
+-
+-#include <third_party/fatfs/ff.h>
+-#include <third_party/fatfs/diskio.h>
+-
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+-/*!
+- *  @brief SDFatFS Object
+- *  The application must not access any member variables of this structure!
+- */
+-typedef struct {
+-    uint_fast32_t driveNum;
+-    DSTATUS       diskState;
+-    FATFS         filesystem; /* FATFS data object */
+-    SD_Handle     sdHandle;
+-} SDFatFS_Object;
+-
+-/*!
+- *  @brief SDFatFS Global configuration
+- *
+- *  The #SDFatFS_Config structure contains a single pointer used to characterize
+- *  the SDFatFS driver implementation.
+- *
+- *  This structure needs to be defined before calling SDFatFS_init() and it must
+- *  not be changed thereafter.
+- *
+- *  @sa SDFatFS_init()
+- */
+-typedef struct {
+-    /*! Pointer to a SDFatFS object */
+-    SDFatFS_Object *object;
+-} SDFatFS_Config;
+-
+-
+-/*!
+- *  @brief A handle that is returned from a SDFatFS_open() call.
+- */
+-typedef SDFatFS_Config *SDFatFS_Handle;
+-
+-/*!
+- *  @brief Function to open a SDFatFS instance on the specified drive.
+- *
+- *  Function to mount the FatFs filesystem and register the SDFatFS disk
+- *  I/O functions with the FatFS module.
+- *
+- *  @param idx Logical peripheral number indexed into the HWAttrs
+- *             table.
+- *  @param drive Drive Number
+- */
+-extern SDFatFS_Handle SDFatFS_open(uint_least8_t idx, uint_least8_t drive);
+-
+-/*!
+- *  @brief Function to close a SDFatFS instance specified by the SDFatFS
+- *         handle.
+- *
+- *         This function unmounts the file system mounted by SDFatFS_open() and
+- *         unregisters the SDFatFS driver from the FatFs module.
+- *
+- *  @pre SDFatFS_open() had to be called first.
+- *
+- *  @param handle A #SDFatFS_Handle returned from SDFatFS_open()
+- *
+- *  @sa SDFatFS_open()
+- */
+-extern void SDFatFS_close(SDFatFS_Handle handle);
+-
+-/*!
+- *  Function to initialize a SDFatFS instance
+- */
+-extern void SDFatFS_init(void);
+-
+-#ifdef __cplusplus
+-}
+-#endif
+-
+-#endif /* ti_drivers_SDFatFS__include */
+diff --git a/source/ti/drivers/libBuilder.xs b/source/ti/drivers/libBuilder.xs
+deleted file mode 100644
+index 0864cf0..0000000
+--- a/source/ti/drivers/libBuilder.xs
++++ /dev/null
+@@ -1,150 +0,0 @@
+-/*
+- * Copyright (c) 2016-2019, Texas Instruments Incorporated
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * *  Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- * *  Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in the
+- *    documentation and/or other materials provided with the distribution.
+- *
+- * *  Neither the name of Texas Instruments Incorporated nor the names of
+- *    its contributors may be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-
+-/*
+- *  ======== libBuilder.xs ========
+- */
+-
+-var buildInstrumentedLibrary = false; /* don't build instrumented libraries */
+-
+-/*
+- *  ======== makeLibs ========
+- */
+-function makeLibs(name, targets, objects, cOpts)
+-{
+-    var lib;
+-    var gccOpts;
+-    var attrs = {
+-        copts: "",
+-        profile: "release"
+-    };
+-
+-    for each (var targetName in targets) {
+-        /* Only proceed if target already in Build object */
+-        if (Build.printBuildTargets().indexOf(targetName + "\n") < 0) {
+-            continue;
+-        }
+-
+-        /* Load target module */
+-        var target = xdc.module(targetName);
+-
+-        var objs = objects.concat();
+-
+-        /*
+-         *  Exlude incompatible assembly files from the object list.
+-         *  The objects parameter includes the super-set list. We prune that here.
+-         *  This code assumes that assembly files follow the form xyz_ccs.asm,
+-         *  xyz_gnu.asm, and xyz_iar.asm.
+-         */
+-        if (!targetName.match('clang')) {
+-            for (var i = objs.length - 1; i >= 0; i--) {
+-                if (objs[i].match('_clang.asm')) {
+-                    objs.splice(i, 1);
+-                }
+-            }
+-        }
+-        if (!targetName.match('ti.targets') || targetName.match('clang')) {
+-            for (var i = objs.length - 1; i >= 0; i--) {
+-                if (objs[i].match('_ccs.asm')) {
+-                    objs.splice(i, 1);
+-                }
+-            }
+-        }
+-        if (!targetName.match('gnu.targets')) {
+-            for (var i = objs.length - 1; i >= 0; i--) {
+-                if (objs[i].match('_gnu.asm')) {
+-                    objs.splice(i, 1);
+-                }
+-            }
+-        }
+-        if (!targetName.match('iar.targets')) {
+-            for (var i = objs.length - 1; i >= 0; i--) {
+-                if (objs[i].match('_iar.asm')) {
+-                    objs.splice(i, 1);
+-                }
+-            }
+-        }
+-
+-        /*
+-         *  Suppress GCC 4.90's auto check-for-null-pointer-dereference
+-         *  'UDF' instruction generation
+-         */
+-        if (targetName.match('gnu.targets')) {
+-            gccOpts = " -fno-isolate-erroneous-paths-dereference ";
+-        }
+-        else {
+-            gccOpts = "";
+-        }
+-
+-        /* Disable asserts & logs for the non-instrumented library */
+-        attrs.copts = cOpts + gccOpts +
+-            " -Dxdc_runtime_Log_DISABLE_ALL -Dxdc_runtime_Assert_DISABLE_ALL";
+-        lib = Pkg.addLibrary(name, target, attrs);
+-        lib.addObjects(objs);
+-
+-        if (buildInstrumentedLibrary) {
+-            /* Enable asserts & logs for the instrumented library */
+-            attrs.copts = cOpts + gccOpts +
+-                " -Dxdc_runtime_Assert_DISABLE_CONDITIONAL_ASSERT" +
+-                " -DDebugP_ASSERT_ENABLED -DDebugP_LOG_ENABLED";
+-            lib = Pkg.addLibrary(name + "_instrumented", target, attrs);
+-            lib.addObjects(objs);
+-        }
+-    }
+-}
+-
+-var m3Targets = [
+-    "ti.targets.arm.elf.M3",
+-    "iar.targets.arm.M3",
+-    "gnu.targets.arm.M3",
+-];
+-
+-var m4Targets = [
+-    "ti.targets.arm.elf.M4",
+-    "gnu.targets.arm.M4",
+-    "iar.targets.arm.M4",
+-];
+-
+-var m4fTargets = [
+-    "ti.targets.arm.clang.M4F",
+-    "ti.targets.arm.elf.M4F",
+-    "gnu.targets.arm.M4F",
+-    "iar.targets.arm.M4F",
+-];
+-
+-var m33fTargets = [
+-    "ti.targets.arm.clang.M33F",
+-];
+-
+-var m33Targets = [
+-    "ti.targets.arm.clang.M33",
+-];
+diff --git a/source/ti/drivers/makefile b/source/ti/drivers/makefile
+deleted file mode 100644
+index 4f11491..0000000
+--- a/source/ti/drivers/makefile
++++ /dev/null
+@@ -1,53 +0,0 @@
+-#
+-#  ======== makefile ======== 
+-#
+-
+-CORESDK_INSTALL_DIR ?= $(abspath ../../..)
+-include $(CORESDK_INSTALL_DIR)/imports.mak
+-
+-#
+-# Set XDCARGS to some of the variables above.  XDCARGS are passed
+-# to the XDC build engine... which will load tirtos.bld... which will
+-# extract these variables and use them to determine what to build and which
+-# toolchains to use.
+-#
+-# Note that not all of these variables need to be set to something valid.
+-# If you leave one or more of them unassigned, the libraries for that target
+-# will not be built.
+-#
+-# Some background is here:
+-#     http://rtsc.eclipse.org/docs-tip/Command_-_xdc#Environment_Variables
+-#
+-XDCARGS= \
+-    ti.targets.arm.elf.M4F=\"$(CCS_ARMCOMPILER)\" \
+-    gnu.targets.arm.M4F=\"$(GCC_ARMCOMPILER)\" \
+-    iar.targets.arm.M4F=\"$(IAR_ARMCOMPILER)\" \
+-    CC26XXWARE=$(CORESDK_INSTALL_DIR)
+-
+-#
+-# Set XDCPATH to contain necessary repositories.
+-#
+-XDCPATH=$(CORESDK_INSTALL_DIR)/source;$(CORESDK_INSTALL_DIR)/kernel/tirtos/packages
+-
+-#
+-# Set XDCOPTIONS.  Use -v for a verbose build.
+-#
+-# XDCOPTIONS=v
+-XDCOPTIONS=
+-export XDCOPTIONS
+-
+-j = 1
+-#
+-# Set XDC executable command
+-# Note that XDCBUILDCFG points to the coresdk.bld file which uses
+-# the arguments specified by XDCARGS
+-#
+-XDC = $(XDC_INSTALL_DIR)/xdc -j $(j) XDCBUILDCFG=$(CORESDK_INSTALL_DIR)/kernel/tirtos/packages/coresdk.bld
+-
+-all:
+-	@ echo building packages ...
+-	@ $(XDC) XDCARGS="$(XDCARGS)" XDCPATH="$(XDCPATH)" all -PR .
+-
+-clean:
+-	@ echo cleaning packages ...
+-	@ $(XDC) XDCARGS="$(XDCARGS)" XDCPATH="$(XDCPATH)" clean -PR .
+diff --git a/source/ti/drivers/package.bld b/source/ti/drivers/package.bld
+deleted file mode 100644
+index abab0a1..0000000
+--- a/source/ti/drivers/package.bld
++++ /dev/null
+@@ -1,706 +0,0 @@
+-/*
+- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * *  Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- * *  Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in the
+- *    documentation and/or other materials provided with the distribution.
+- *
+- * *  Neither the name of Texas Instruments Incorporated nor the names of
+- *    its contributors may be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-
+-/*
+- *  ======== package.bld ========
+- */
+-
+-/* Device agnostic drivers */
+-var genericDriverSrc = [
+-    "NVS.c",
+-    "./nvs/NVSRAM.c",
+-    "./nvs/NVSSPI25X.c",
+-    "SD.c",
+-    "./sd/SDSPI.c",
+-    "SDFatFS.c",
+-    "./utils/List.c",
+-    "./utils/RingBuf.c",
+-    "./utils/Random.c",
+-    "./utils/StructRingBuf.c",
+-    "./apps/LED.c",
+-    "./apps/Button.c"
+-];
+-
+-var genericDriverHdrs = [
+-    "Board.h",
+-    "NVS.h",
+-    "./nvs/NVSRAM.h",
+-    "./nvs/NVSSPI25X.h",
+-    "SD.h",
+-    "./sd/SDSPI.h",
+-    "SDFatFS.h",
+-    "./dpl/ClockP.h",
+-    "./dpl/DebugP.h",
+-    "./dpl/HwiP.h",
+-    "./dpl/MutexP.h",
+-    "./dpl/SemaphoreP.h",
+-    "./dpl/SwiP.h",
+-    "./dpl/SystemP.h",
+-    "./utils/List.h",
+-    "./utils/RingBuf.h",
+-    "./utils/Random.h",
+-    "./utils/StructRingBuf.h",
+-    "./apps/LED.h",
+-    "./apps/Button.h"
+-];
+-
+-var cc26xxSrcList = genericDriverSrc.concat([
+-    "ADC.c",
+-    "./adc/ADCCC26XX.c",
+-    "ADCBuf.c",
+-    "./adcbuf/ADCBufCC26XX.c",
+-    "./crypto/CryptoCC26XX.c",
+-    "AESCBC.c",
+-    "./aescbc/AESCBCCC26XX.c",
+-    "AESCTR.c",
+-    "./aesctr/AESCTRCC26XX.c",
+-    "AESCTRDRBG.c",
+-    "./aesctrdrbg/AESCTRDRBGXX.c",
+-    "AESCCM.c",
+-    "./aesccm/AESCCMCC26XX.c",
+-    "AESECB.c",
+-    "./aesecb/AESECBCC26XX.c",
+-    "./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c",
+-    "./cryptoutils/sharedresources/CryptoResourceCC26XX.c",
+-    "./cryptoutils/utils/CryptoUtils.c",
+-    "./dma/UDMACC26XX.c",
+-    "./gpio/GPIOCC26XX.c",
+-    "I2C.c",
+-    "./i2c/I2CCC26XX.c",
+-    "I2S.c",
+-    "./i2s/I2SCC26XX.c",
+-    "./nvs/NVSCC26XX.c",
+-    "./pdm/Codec1.c",
+-    "./pdm/PDMCC26XX.c",
+-    "./pdm/PDMCC26XX_util.c",
+-    "./pin/PINCC26XX.c",
+-    "./power/PowerCC26XX.c",
+-    "./power/PowerCC26XX_calibrateRCOSC.c",
+-    "PWM.c",
+-    "./pwm/PWMTimerCC26XX.c",
+-    "SPI.c",
+-    "./spi/SPICC26XXDMA.c",
+-    "Timer.c",
+-    "./timer/TimerCC26XX.c",
+-    "TRNG.c",
+-    "./trng/TRNGCC26XX.c",
+-    "./timer/GPTimerCC26XX.c",
+-    "UART.c",
+-    "./uart/UARTCC26XX.c",
+-    "./uart/UARTCC26X0.c",
+-    "Watchdog.c",
+-    "./watchdog/WatchdogCC26XX.c",
+-
+-    /* these .asm files gets pruned per target by libBuilder() function */
+-    "pdm/pdm2pcm_ccs.asm",
+-    "pdm/pdm2pcm_gnu.asm",
+-    "pdm/pdm2pcm_iar.asm"
+-]);
+-
+-var cc26xxHdrList = genericDriverHdrs.concat([
+-    "ADC.h",
+-    "./adc/ADCCC26XX.h",
+-    "ADCBuf.h",
+-    "./adcbuf/ADCBufCC26XX.h",
+-    "AESCBC.h",
+-    "./aescbc/AESCBCCC26XX.h",
+-    "AESCTR.h",
+-    "./aesctr/AESCTRCC26XX.h",
+-    "AESCTRDRBG.h",
+-    "./aesctrdrbg/AESCTRDRBGXX.h",
+-    "AESCCM.h",
+-    "./aesccm/AESCCMCC26XX.h",
+-    "AESECB.h",
+-    "./aesecb/AESECBCC26XX.h",
+-    "./cryptoutils/cryptokey/CryptoKey.h",
+-    "./cryptoutils/cryptokey/CryptoKeyPlaintext.h",
+-    "./cryptoutils/ecc/ECCParams.h",
+-    "./cryptoutils/sharedresources/CryptoResourceCC26XX.h",
+-    "./cryptoutils/utils/CryptoUtils.h",
+-    "./crypto/CryptoCC26XX.h",
+-    "./dma/UDMACC26XX.h",
+-    "GPIO.h",
+-    "./gpio/GPIOCC26XX.h",
+-    "I2C.h",
+-    "./i2c/I2CCC26XX.h",
+-    "I2S.h",
+-    "./i2s/I2SCC26XX.h",
+-    "./nvs/NVSCC26XX.h",
+-    "./pdm/Codec1.h",
+-    "./pdm/PDMCC26XX.h",
+-    "./pdm/PDMCC26XX_util.h",
+-    "PIN.h",
+-    "./pin/PINCC26XX.h",
+-    "Power.h",
+-    "./power/PowerCC26XX.h",
+-    "PWM.h",
+-    "./pwm/PWMTimerCC26XX.h",
+-    "SPI.h",
+-    "./spi/SPICC26XXDMA.h",
+-    "Timer.h",
+-    "./timer/TimerCC26XX.h",
+-    "TRNG.h",
+-    "./trng/TRNGCC26XX.h",
+-    "./timer/GPTimerCC26XX.h",
+-    "UART.h",
+-    "./uart/UARTCC26XX.h",
+-    "./uart/UARTCC26X0.h",
+-    "Watchdog.h",
+-    "./watchdog/WatchdogCC26XX.h"
+-]);
+-
+-var cc26x2SrcList = genericDriverSrc.concat([
+-    "ADC.c",
+-    "./adc/ADCCC26XX.c",
+-    "ADCBuf.c",
+-    "./adcbuf/ADCBufCC26X2.c",
+-    "AESCBC.c",
+-    "./aescbc/AESCBCCC26XX.c",
+-    "AESCTR.c",
+-    "./aesctr/AESCTRCC26XX.c",
+-    "AESCTRDRBG.c",
+-    "./aesctrdrbg/AESCTRDRBGXX.c",
+-    "AESCCM.c",
+-    "./aesccm/AESCCMCC26XX.c",
+-    "AESGCM.c",
+-    "./aesgcm/AESGCMCC26XX.c",
+-    "AESECB.c",
+-    "./aesecb/AESECBCC26XX.c",
+-    "./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c",
+-    "./cryptoutils/ecc/ECCParamsCC26X2.c",
+-    "./cryptoutils/sharedresources/CryptoResourceCC26XX.c",
+-    "./cryptoutils/utils/CryptoUtils.c",
+-    "./cryptoutils/sharedresources/PKAResourceCC26XX.c",
+-    "./dma/UDMACC26XX.c",
+-    "ECDH.c",
+-    "./ecdh/ECDHCC26X2.c",
+-    "ECDSA.c",
+-    "./ecdsa/ECDSACC26X2.c",
+-    "ECJPAKE.c",
+-    "./ecjpake/ECJPAKECC26X2.c",
+-    "./gpio/GPIOCC26XX.c",
+-    "I2C.c",
+-    "./i2c/I2CCC26XX.c",
+-    "I2S.c",
+-    "./i2s/I2SCC26XX.c",
+-    "./nvs/NVSCC26XX.c",
+-    "./pdm/Codec1.c",
+-    "./pdm/PDMCC26XX.c",
+-    "./pdm/PDMCC26XX_util.c",
+-    "./pin/PINCC26XX.c",
+-    "./power/PowerCC26X2.c",
+-    "./power/PowerCC26X2_calibrateRCOSC.c",
+-    "PWM.c",
+-    "./pwm/PWMTimerCC26XX.c",
+-    "SHA2.c",
+-    "./sha2/SHA2CC26X2.c",
+-    "SPI.c",
+-    "./spi/SPICC26XXDMA.c",
+-    "./spi/SPICC26X2DMA.c",
+-    "Timer.c",
+-    "./timer/TimerCC26XX.c",
+-    "TRNG.c",
+-    "./trng/TRNGCC26XX.c",
+-    "./timer/GPTimerCC26XX.c",
+-    "UART.c",
+-    "UART2.c",
+-    "./uart2/UART2CC26X2.c",
+-    "./uart/UARTCC26XX.c",
+-    "./uart/UARTCC26X2.c",
+-    "Watchdog.c",
+-    "./watchdog/WatchdogCC26XX.c",
+-
+-    /* these .asm files gets pruned per target by libBuilder() function */
+-    "pdm/pdm2pcm_cc26x2_ccs.asm",
+-    "pdm/pdm2pcm_cc26x2_gnu.asm",
+-    "pdm/pdm2pcm_cc26x2_iar.asm"
+-]);
+-
+-var cc26x2HdrList = genericDriverHdrs.concat([
+-    "ADC.h",
+-    "./adc/ADCCC26XX.h",
+-    "ADCBuf.h",
+-    "./adcbuf/ADCBufCC26X2.h",
+-    "AESCBC.h",
+-    "./aescbc/AESCBCCC26XX.h",
+-    "AESCTR.h",
+-    "./aesctr/AESCTRCC26XX.h",
+-    "AESCTRDRBG.h",
+-    "./aesctrdrbg/AESCTRDRBGXX.h",
+-    "AESCCM.h",
+-    "./aesccm/AESCCMCC26XX.h",
+-    "AESGCM.h",
+-    "./aesgcm/AESGCMCC26XX.h",
+-    "AESECB.h",
+-    "./aesecb/AESECBCC26XX.h",
+-    "./cryptoutils/cryptokey/CryptoKey.h",
+-    "./cryptoutils/cryptokey/CryptoKeyPlaintext.h",
+-    "./cryptoutils/ecc/ECCParams.h",
+-    "./cryptoutils/sharedresources/CryptoResourceCC26XX.h",
+-    "./cryptoutils/sharedresources/PKAResourceCC26XX.h",
+-    "./cryptoutils/utils/CryptoUtils.h",
+-    "./dma/UDMACC26XX.h",
+-    "ECDH.h",
+-    "./ecdh/ECDHCC26X2.h",
+-    "ECDSA.h",
+-    "./ecdsa/ECDSACC26X2.h",
+-    "ECJPAKE.h",
+-    "./ecjpake/ECJPAKECC26X2.h",
+-    "GPIO.h",
+-    "./gpio/GPIOCC26XX.h",
+-    "I2C.h",
+-    "./i2c/I2CCC26XX.h",
+-    "I2S.h",
+-    "./i2s/I2SCC26XX.h",
+-    "./nvs/NVSCC26XX.h",
+-    "./pdm/Codec1.h",
+-    "./pdm/PDMCC26XX.h",
+-    "./pdm/PDMCC26XX_util.h",
+-    "PIN.h",
+-    "./pin/PINCC26XX.h",
+-    "Power.h",
+-    "./power/PowerCC26X2.h",
+-    "PWM.h",
+-    "./pwm/PWMTimerCC26XX.h",
+-    "SHA2.h",
+-    "./sha2/SHA2CC26X2.h",
+-    "SPI.h",
+-    "./spi/SPICC26XXDMA.h",
+-    "./spi/SPICC26X2DMA.h",
+-    "Timer.h",
+-    "./timer/TimerCC26XX.h",
+-    "TRNG.h",
+-    "./trng/TRNGCC26XX.h",
+-    "./timer/GPTimerCC26XX.h",
+-    "UART.h",
+-    "UART2.h",
+-    "./uart2/UART2CC26X2.h",
+-    "./uart/UARTCC26XX.h",
+-    "./uart/UARTCC26X2.h",
+-    "Watchdog.h",
+-    "./watchdog/WatchdogCC26XX.h"
+-]);
+-
+-var cc32xxSrcList = genericDriverSrc.concat([
+-    "ADC.c",
+-    "./adc/ADCCC32XX.c",
+-    "Camera.c",
+-    "./camera/CameraCC32XXDMA.c",
+-    "Capture.c",
+-    "./capture/CaptureCC32XX.c",
+-    "./crypto/CryptoCC32XX.c",
+-    "./cryptoutils/utils/CryptoUtils.c",
+-    "./dma/UDMACC32XX.c",
+-    "./gpio/GPIOCC32XX.c",
+-    "I2C.c",
+-    "./i2c/I2CCC32XX.c",
+-    "I2S.c",
+-    "./i2s/I2SCC32XX.c",
+-    "./power/PowerCC32XX.c",
+-    "./power/PowerCC32XX_asm",
+-    "PWM.c",
+-    "./pwm/PWMTimerCC32XX.c",
+-    "./sd/SDHostCC32XX.c",
+-    "SPI.c",
+-    "./spi/SPICC32XXDMA.c",
+-    "Timer.c",
+-    "./timer/TimerCC32XX.c",
+-    "UART.c",
+-    "./uart/UARTCC32XX.c",
+-    "./uart/UARTCC32XXDMA.c",
+-    "Watchdog.c",
+-    "./watchdog/WatchdogCC32XX.c"
+-]);
+-
+-var cc32xxHdrList = genericDriverHdrs.concat([
+-    "ADC.h",
+-    "./adc/ADCCC32XX.h",
+-    "Camera.h",
+-    "./camera/CameraCC32XXDMA.h",
+-    "Capture.h",
+-    "./capture/CaptureCC32XX.h",
+-    "./crypto/CryptoCC32XX.h",
+-    "./cryptoutils/utils/CryptoUtils.h",
+-    "./dma/UDMACC32XX.h",
+-    "GPIO.h",
+-    "./gpio/GPIOCC32XX.h",
+-    "I2C.h",
+-    "./i2c/I2CCC32XX.h",
+-    "I2S.h",
+-    "./i2s/I2SCC32XX.h",
+-    "Power.h",
+-    "./power/PowerCC32XX.h",
+-    "PWM.h",
+-    "./pwm/PWMTimerCC32XX.h",
+-    "./sd/SDHostCC32XX.h",
+-    "SPI.h",
+-    "./spi/SPICC32XXDMA.h",
+-    "Timer.h",
+-    "./timer/TimerCC32XX.h",
+-    "UART.h",
+-    "./uart/UARTCC32XX.h",
+-    "./uart/UARTCC32XXDMA.h",
+-    "Watchdog.h",
+-    "./watchdog/WatchdogCC32XX.h"
+-]);
+-
+-var msp432SrcList = genericDriverSrc.concat([
+-    "ADC.c",
+-    "./adc/ADCMSP432.c",
+-    "ADCBuf.c",
+-    "./adcbuf/ADCBufMSP432.c",
+-    "Capture.c",
+-    "./capture/CaptureMSP432.c",
+-    "./dma/UDMAMSP432.c",
+-    "./gpio/GPIOMSP432.c",
+-    "I2C.c",
+-    "./i2c/I2CMSP432.c",
+-    "I2CSlave.c",
+-    "./i2cslave/I2CSlaveMSP432.c",
+-    "./nvs/NVSMSP432.c",
+-    "./power/PowerMSP432.c",
+-    "PWM.c",
+-    "./pwm/PWMTimerMSP432.c",
+-    "SPI.c",
+-    "./spi/SPIMSP432DMA.c",
+-    "Timer.c",
+-    "./timer/TimerMSP432.c",
+-    "UART.c",
+-    "./uart/UARTMSP432.c",
+-    "Watchdog.c",
+-    "./watchdog/WatchdogMSP432.c"
+-]);
+-
+-var msp432HdrList = genericDriverHdrs.concat([
+-    "ADC.h",
+-    "./adc/ADCMSP432.h",
+-    "ADCBuf.h",
+-    "./adcbuf/ADCBufMSP432.h",
+-    "Capture.h",
+-    "./capture/CaptureMSP432.h",
+-    "./dma/UDMAMSP432.h",
+-    "GPIO.h",
+-    "./gpio/GPIOMSP432.h",
+-    "I2C.h",
+-    "./i2c/I2CMSP432.h",
+-    "I2CSlave.h",
+-    "./i2cslave/I2CSlaveMSP432.h",
+-    "./nvs/NVSMSP432.h",
+-    "Power.h",
+-    "./power/PowerMSP432.h",
+-    "PWM.h",
+-    "./pwm/PWMTimerMSP432.h",
+-    "SPI.h",
+-    "./spi/SPIMSP432DMA.h",
+-    "Timer.h",
+-    "./timer/TimerMSP432.h",
+-    "UART.h",
+-    "./uart/UARTMSP432.h",
+-    "Watchdog.h",
+-    "./watchdog/WatchdogMSP432.h"
+-]);
+-
+-var msp432e4SrcList = genericDriverSrc.concat([
+-    "ADC.c",
+-    "ADCBuf.c",
+-    "./adc/ADCMSP432E4.c",
+-    "./adcbuf/ADCBufMSP432E4.c",
+-    "AESCBC.c",
+-    "./aescbc/AESCBCMSP432E4.c",
+-    "AESCTR.c",
+-    "./aesctr/AESCTRMSP432E4.c",
+-    "AESCTRDRBG.c",
+-    "./aesctrdrbg/AESCTRDRBGXX.c",
+-    "AESCCM.c",
+-    "./aesccm/AESCCMMSP432E4.c",
+-    "AESECB.c",
+-    "./aesecb/AESECBMSP432E4.c",
+-    "AESGCM.c",
+-    "./aesgcm/AESGCMMSP432E4.c",
+-    "./cryptoutils/cryptokey/CryptoKeyPlaintextMSP432E4.c",
+-    "./cryptoutils/sharedresources/CryptoResourceMSP432E4.c",
+-    "./cryptoutils/utils/CryptoUtils.c",
+-    "CAN.c",
+-    "./can/CANMSP432E4.c",
+-    "Comparator.c",
+-    "./comparator/ComparatorMSP432E4.c",
+-    "CRC.c",
+-    "./crc/CRCMSP432E4.c",
+-    "./dma/UDMAMSP432E4.c",
+-    "./emac/EMACMSP432E4.c",
+-    "./gpio/GPIOMSP432E4.c",
+-    "I2C.c",
+-    "./i2c/I2CMSP432E4.c",
+-    "./nvs/NVSMSP432E4.c",
+-    "./power/PowerMSP432E4.c",
+-    "PWM.c",
+-    "./pwm/PWMMSP432E4.c",
+-    "SPI.c",
+-    "./spi/SPIMSP432E4DMA.c",
+-    "SHA2.c",
+-    "./sha2/SHA2MSP432E4.c",
+-    "Timer.c",
+-    "./timer/TimerMSP432E4.c",
+-    "UART.c",
+-    "./uart/UARTMSP432E4.c",
+-    "Watchdog.c",
+-    "./watchdog/WatchdogMSP432E4.c"
+-]);
+-
+-var msp432e4HdrList = genericDriverHdrs.concat([
+-    "ADC.h",
+-    "ADCBuf.h",
+-    "./adc/ADCMSP432E4.h",
+-    "./adcbuf/ADCBufMSP432E4.h",
+-    "AESCBC.h",
+-    "./aescbc/AESCBCMSP432E4.h",
+-    "AESCTR.h",
+-    "./aesctr/AESCTRMSP432E4.h",
+-    "AESCTRDRBG.h",
+-    "./aesctrdrbg/AESCTRDRBGXX.h",
+-    "AESCCM.h",
+-    "./aesccm/AESCCMMSP432E4.h",
+-    "AESECB.h",
+-    "./aesecb/AESECBMSP432E4.h",
+-    "AESGCM.h",
+-    "./aesgcm/AESGCMMSP432E4.h",
+-    "./cryptoutils/cryptokey/CryptoKey.h",
+-    "./cryptoutils/cryptokey/CryptoKeyPlaintext.h",
+-    "./cryptoutils/sharedresources/CryptoResourceMSP432E4.h",
+-    "./cryptoutils/utils/CryptoUtils.h",
+-    "CAN.h",
+-    "./can/CANMSP432E4.h",
+-    "Comparator.h",
+-    "./comparator/ComparatorMSP432E4.h",
+-    "CRC.h",
+-    "./crc/CRCMSP432E4.h",
+-    "./can/types.h",
+-    "./dma/UDMAMSP432E4.h",
+-    "./emac/EMACMSP432E4.h",
+-    "GPIO.h",
+-    "./gpio/GPIOMSP432E4.h",
+-    "I2C.h",
+-    "./i2c/I2CMSP432E4.h",
+-    "./nvs/NVSMSP432E4.h",
+-    "Power.h",
+-    "./power/PowerMSP432E4.h",
+-    "PWM.h",
+-    "./pwm/PWMMSP432E4.h",
+-    "SHA2.h",
+-    "./sha2/SHA2MSP432E4.h",
+-    "SPI.h",
+-    "./spi/SPIMSP432E4DMA.h",
+-    "Timer.h",
+-    "./timer/TimerMSP432E4.h",
+-    "UART.h",
+-    "./uart/UARTMSP432E4.h",
+-    "Watchdog.h",
+-    "./watchdog/WatchdogMSP432E4.h"
+-]);
+-
+-var mtxxSrcList = [
+-    "AESCCM.c",
+-    "./aesccm/AESCCMMTXX.c",
+-    "AESCMAC.c",
+-    "./aescmac/AESCMACMTXX.c",
+-    "AESECB.c",
+-    "./aesecb/AESECBMTXX.c",
+-    "Capture.c",
+-    "./capture/CaptureTDCMTXX.c",
+-    "./cryptoutils/cryptokey/CryptoKeyPlaintextMTXX.c",
+-    "./cryptoutils/ecc/ECCParamsMTXX.c",
+-    "./cryptoutils/secssjobdriver/SecSSDoorbellMTXX.c",
+-    "./cryptoutils/secssjobdriver/SecSSJobDriverMTXX.c",
+-    "./cryptoutils/secssjobdriver/SecSSJobListMTXX.c",
+-    "Comparator.c",
+-    "./comparator/ComparatorMTXX.c",
+-    "ECDH.c",
+-    "./ecdh/ECDHMTXX.c",
+-    "ECDSA.c",
+-    "./ecdsa/ECDSAMTXX.c",
+-    "ECJPAKE.c",
+-    "./ecjpake/ECJPAKEMTXX.c",
+-    "./dma/DMAMTXX.c",    "./gpio/GPIOMTXX.c",
+-    "./iomux/IOMUXMTXX.c",
+-    "./power/PowerMTXX.c",
+-    "SHA2.c",
+-    "./sha2/SHA2MTXX.c",
+-    "SPI.c",
+-    "UART.c",
+-    "UART2.c",
+-    "./uart/UARTMTXX.c",
+-    "./utils/List.c",
+-    "./utils/RingBuf.c"
+-];
+-
+-var mtxxHdrList = genericDriverHdrs.concat([
+-    "ADC.h",
+-    "ADCBuf.h",
+-    "AESCCM.h",
+-    "./aesccm/AESCCMMTXX.h",
+-    "AESCMAC.h",
+-    "./aescmac/AESCMACMTXX.h",
+-    "AESECB.h",
+-    "./aesecb/AESECBMTXX.h",
+-    "Capture.h",
+-    "./capture/CaptureTDCMTXX.h",
+-    "Comparator.h",
+-    "./comparator/ComparatorMTXX.h",
+-    "./cryptoutils/cryptokey/CryptoKey.h",
+-    "./cryptoutils/cryptokey/CryptoKeyPlaintext.h",
+-    "./cryptoutils/ecc/ECCParams.h",
+-    "./cryptoutils/secssjobdriver/SecSSDoorbellMTXX.h",
+-    "./cryptoutils/secssjobdriver/SecSSJobDriverCommonMTXX.h",
+-    "./cryptoutils/secssjobdriver/SecSSJobDriverMTXX.h",
+-    "./cryptoutils/secssjobdriver/SecSSJobListMTXX.h",
+-    "ECDH.h",
+-    "./ecdh/ECDHMTXX.h",
+-    "ECDSA.h",
+-    "./ecdsa/ECDSAMTXX.h",
+-    "ECJPAKE.h",
+-    "./ecjpake/ECJPAKEMTXX.h",
+-    "DAC.h",
+-    "./dma/DMAMTXX.h",
+-    "GPIO.h",
+-    "./gpio/GPIOMTXX.h",
+-    "./iomux/IOMUXMTXX.h",
+-    "./iomux/MTL1_IOMUX.h",
+-    "OpAmp.h",
+-    "Power.h",
+-    "PWM.h",
+-    "./power/PowerMTXX.h",
+-    "SHA2.h",
+-    "./sha2/SHA2MTXX.h",
+-    "SPI.h",
+-    "TDC.h",
+-    "UART.h",
+-    "UART2.h",
+-    "./uart/UARTMTXX.h",
+-    "VREF.h"
+-]);
+-
+-/* Get deviceWare directories from XDCARGS */
+-var xdcArgs = java.lang.System.getenv("XDCARGS");
+-var deviceWareOpts =
+-    xdc.loadCapsule("ti/drivers/xdcArgParser.xs").getDeviceWareOpts(xdcArgs);
+-var libBuilder = xdc.loadCapsule("ti/drivers/libBuilder.xs");
+-
+-/* List of files (besides *.c files) which need to be packaged with drivers */
+-var packageFiles = [
+-    "libBuilder.xs",
+-    "package.bld",
+-    "xdcArgParser.xs"
+-];
+-
+-/* Generate libraries for products which have been defined */
+-if (deviceWareOpts.cc26xxware) {
+-    /* optimize IAR object files for size (not speed) */
+-    var iarM4F = xdc.module('iar.targets.arm.M4F');
+-    var iarM4FCopts = iarM4F.profiles["release"].compileOpts.copts; /* must restore after use */
+-    iarM4F.profiles["release"].compileOpts.copts =
+-        iarM4F.profiles["release"].compileOpts.copts.replace("Ohs", "Ohz");
+-
+-    /* optimize TI object files for size (not speed) & set -O3 */
+-    var tiM4F = xdc.module('ti.targets.arm.elf.M4F');
+-    var tiM4FCopts = tiM4F.profiles["release"].compileOpts.copts; /* must restore after use */
+-    tiM4F.profiles["release"].compileOpts.copts =
+-        tiM4F.profiles["release"].compileOpts.copts.replace("-O2", "-O3");
+-
+-    if ((tiM4F.profiles["release"].compileOpts.copts).indexOf(" --opt_for_speed=0") < 0) {
+-        tiM4F.profiles["release"].compileOpts.copts += " --opt_for_speed=0";
+-    }
+-
+-    packageFiles = packageFiles.concat(cc26xxHdrList);
+-    packageFiles = packageFiles.concat(cc26x2HdrList);
+-
+-    libBuilder.makeLibs("lib/drivers_cc13x2", libBuilder.m4fTargets,
+-        cc26x2SrcList, " -DDeviceFamily_CC13X2");
+-
+-    libBuilder.makeLibs("lib/drivers_cc26x2", libBuilder.m4fTargets,
+-        cc26x2SrcList, " -DDeviceFamily_CC26X2");
+-
+-    /* restore M4F profile options for subsequent users */
+-    iarM4F.profiles["release"].compileOpts.copts = iarM4FCopts;
+-    tiM4F.profiles["release"].compileOpts.copts = tiM4FCopts;
+-}
+-
+-if (deviceWareOpts.cc32xxware) {
+-    var copts = " -DUSE_CC3220_ROM_DRV_API -DDeviceFamily_CC3220";
+-
+-    packageFiles = packageFiles.concat(cc32xxHdrList);
+-
+-    libBuilder.makeLibs("lib/drivers_cc32xx", libBuilder.m4Targets,
+-        cc32xxSrcList, copts);
+-}
+-
+-if (deviceWareOpts.msp432DriverLib) {
+-    packageFiles = packageFiles.concat(msp432HdrList);
+-
+-    /* Build library for backwards compatibility */
+-    libBuilder.makeLibs("lib/drivers_msp432p4xx", libBuilder.m4fTargets,
+-        msp432SrcList, " -DDeviceFamily_MSP432P401x");
+-
+-    /* Build library for MSP432P401x devices */
+-    libBuilder.makeLibs("lib/drivers_msp432p401x", libBuilder.m4fTargets,
+-        msp432SrcList, " -DDeviceFamily_MSP432P401x");
+-
+-    /* Build library for MSP432P4x1xI devices */
+-    libBuilder.makeLibs("lib/drivers_msp432p4x1xi", libBuilder.m4fTargets,
+-        msp432SrcList, " -DDeviceFamily_MSP432P4x1xI");
+-
+-    /* Build library for MSP432P4x1xt devices */
+-    libBuilder.makeLibs("lib/drivers_msp432p4x1xt", libBuilder.m4fTargets,
+-        msp432SrcList, " -DDeviceFamily_MSP432P4x1xT");
+-}
+-
+-if (deviceWareOpts.msp432e4DriverLib) {
+-    packageFiles = packageFiles.concat(msp432e4HdrList);
+-
+-    /* build one library for the super-set part */
+-    libBuilder.makeLibs("lib/drivers_msp432e4", libBuilder.m4fTargets,
+-        msp432e4SrcList, " -D__MSP432E411Y__ -DDeviceFamily_MSP432E411Y");
+-}
+-
+-if (deviceWareOpts.hwpi_mtxx) {
+-    var copts = " ";
+-
+-    packageFiles = packageFiles.concat(mtxxHdrList);
+-
+-    libBuilder.makeLibs("lib/drivers_mtxx", libBuilder.m33fTargets,
+-        mtxxSrcList, copts);
+-
+-    libBuilder.makeLibs("lib/drivers_mtxx", libBuilder.m33Targets,
+-        mtxxSrcList, copts);
+-}
+-
+-Pkg.otherFiles = packageFiles;
+-Pkg.attrs.exportSrc = true;
+diff --git a/source/ti/drivers/package.xdc b/source/ti/drivers/package.xdc
+deleted file mode 100644
+index 741c97b..0000000
+--- a/source/ti/drivers/package.xdc
++++ /dev/null
+@@ -1,40 +0,0 @@
+-/*
+- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * *  Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- * *  Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in the
+- *    documentation and/or other materials provided with the distribution.
+- *
+- * *  Neither the name of Texas Instruments Incorporated nor the names of
+- *    its contributors may be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-
+-requires ti.sysbios;
+-requires ti.dpl;
+-
+-/*!
+- *  ======== package.xdc ========
+- */
+-package ti.drivers [1,0,0] {
+-};
+diff --git a/source/ti/drivers/package.xs b/source/ti/drivers/package.xs
+deleted file mode 100644
+index 4800c8a..0000000
+--- a/source/ti/drivers/package.xs
++++ /dev/null
+@@ -1,90 +0,0 @@
+-/*
+- * Copyright (c) 2015-2018, Texas Instruments Incorporated
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * *  Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- * *  Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in the
+- *    documentation and/or other materials provided with the distribution.
+- *
+- * *  Neither the name of Texas Instruments Incorporated nor the names of
+- *    its contributors may be used to endorse or promote products derived
+- *    from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-/*
+- *  ======== package.xs ========
+- */
+-
+-/*
+- *  ======== getLibs ========
+- *  This package does not build any libraries.
+- */
+-function getLibs()
+-{
+-    var driversBase = xdc.loadPackage("ti.drivers").packageBase;
+-
+-    var driverString = "";
+-    var retString = "";
+-    var targetSuffix = "";
+-
+-    /* Determine libraries required by device name. */
+-    if (Program.cpu.deviceName.match(/CC13.2/)) {
+-        driverString = "_cc13x2";
+-    }
+-    else if (Program.cpu.deviceName.match(/CC13.0/)) {
+-        driverString = "_cc13x0";
+-    }
+-    else if (Program.cpu.deviceName.match(/CC26.0R2/)) {
+-        driverString = "_cc26x0r2";
+-    }
+-    else if (Program.cpu.deviceName.match(/CC26.2/)) {
+-        driverString = "_cc26x2";
+-    }
+-    else if (Program.cpu.deviceName.match(/CC26.0/)) {
+-        driverString = "_cc26x0";
+-    }
+-    else if (Program.cpu.deviceName.match(/CC3220/)) {
+-        driverString = "_cc32xx";
+-    }
+-    else if (Program.cpu.deviceName.match(/MSP432E4.*/)) {
+-        driverString = "_msp432e4";
+-    }
+-    else if (Program.cpu.deviceName.match(/MSP432P4.1.I/)) {
+-        driverString = "_msp432p4x1xi";
+-    }
+-    else if (Program.cpu.deviceName.match(/MSP432P4.1.T/)) {
+-        driverString = "_msp432p4x1xt";
+-    }
+-    else if (Program.cpu.deviceName.match(/MSP432P401/)) {
+-        driverString = "_msp432p401x";
+-    }
+-    else {
+-        throw ("Driver not found for this device " + Program.cpu.deviceName +
+-               " and target " + Program.build.target.suffix);
+-    }
+-
+-    targetSuffix = ".a" + Program.build.target.suffix + ";";
+-
+-    retString += driversBase + "/lib/drivers" + driverString + targetSuffix;
+-
+-    /* strip duplicate '//' characters from the library list */
+-    return (retString.replace(/\/\/+/g, '/'));
+-}
+-- 
+2.17.1
+
