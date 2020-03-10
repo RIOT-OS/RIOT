@@ -1,1 +1,18 @@
+ifneq (,$(filter cc26x2_cc13x2_rf,$(USEMODULE)))
+  USEPKG += cc26xx_cc13xx_sdk
+
+  USEMODULE += cc26xx_cc13xx_driverlib
+  USEMODULE += cc26xx_cc13xx_rf_patches
+  USEMODULE += cc26xx_cc13xx_drivers
+  USEMODULE += cc26xx_cc13xx_power
+  USEMODULE += cc26xx_cc13xx_rf
+  USEMODULE += cc26xx_cc13xx_utils
+
+  USEMODULE += cc26x2_cc13x2_dpl
+  USEMODULE += cc26x2_cc13x2_rf
+
+  USEMODULE += netdev_ieee802154
+  USEMODULE += netif
+endif
+
 include ${RIOTCPU}/cc26xx_cc13xx/Makefile.dep
