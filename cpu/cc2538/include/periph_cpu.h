@@ -167,8 +167,10 @@ typedef struct {
     cc2538_uart_t *dev;       /**< pointer to the used UART device */
     gpio_t rx_pin;            /**< pin used for RX */
     gpio_t tx_pin;            /**< pin used for TX */
+#ifdef MODULE_PERIPH_UART_HW_FC
     gpio_t cts_pin;           /**< CTS pin - set to GPIO_UNDEF when not using */
     gpio_t rts_pin;           /**< RTS pin - set to GPIO_UNDEF when not using */
+#endif
 } uart_conf_t;
 /** @} */
 
