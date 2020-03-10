@@ -282,13 +282,14 @@ void sx127x_set_rx(sx127x_t *dev)
                                  /* SX127X_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL | */
                                  SX127X_RF_LORA_IRQFLAGS_CADDETECTED);
 
-                /* DIO0=RxDone, DIO2=FhssChangeChannel, DIO3=ValidHeader */
+                /* DIO0=RxDone, DIO1=RxTimeout, DIO2=FhssChangeChannel, DIO3=ValidHeader */
                 sx127x_reg_write(dev, SX127X_REG_DIOMAPPING1,
                                  (sx127x_reg_read(dev, SX127X_REG_DIOMAPPING1) &
                                   SX127X_RF_LORA_DIOMAPPING1_DIO0_MASK &
                                   SX127X_RF_LORA_DIOMAPPING1_DIO2_MASK &
                                   SX127X_RF_LORA_DIOMAPPING1_DIO3_MASK) |
                                  SX127X_RF_LORA_DIOMAPPING1_DIO0_00 |
+                                 SX127X_RF_LORA_DIOMAPPING1_DIO1_00 |
                                  SX127X_RF_LORA_DIOMAPPING1_DIO2_00 |
                                  SX127X_RF_LORA_DIOMAPPING1_DIO3_01);
             }
@@ -303,12 +304,13 @@ void sx127x_set_rx(sx127x_t *dev)
                                  SX127X_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL |
                                  SX127X_RF_LORA_IRQFLAGS_CADDETECTED);
 
-                /* DIO0=RxDone, DIO3=ValidHeader */
+                /* DIO0=RxDone, DIO1=RxTimeout, DIO3=ValidHeader */
                 sx127x_reg_write(dev, SX127X_REG_DIOMAPPING1,
                                  (sx127x_reg_read(dev, SX127X_REG_DIOMAPPING1) &
                                   SX127X_RF_LORA_DIOMAPPING1_DIO0_MASK &
                                   SX127X_RF_LORA_DIOMAPPING1_DIO3_MASK) |
                                  SX127X_RF_LORA_DIOMAPPING1_DIO0_00 |
+                                 SX127X_RF_LORA_DIOMAPPING1_DIO1_00 |
                                  SX127X_RF_LORA_DIOMAPPING1_DIO3_01);
             }
 
@@ -353,9 +355,9 @@ void sx127x_set_tx(sx127x_t *dev)
                                  SX127X_RF_LORA_IRQFLAGS_RXDONE |
                                  SX127X_RF_LORA_IRQFLAGS_PAYLOADCRCERROR |
                                  SX127X_RF_LORA_IRQFLAGS_VALIDHEADER |
-                                 /* RFLR_IRQFLAGS_TXDONE | */
+                                 /* SX127X_RF_LORA_IRQFLAGS_TXDONE | */
                                  SX127X_RF_LORA_IRQFLAGS_CADDONE |
-                                 /* RFLR_IRQFLAGS_FHSSCHANGEDCHANNEL | */
+                                 /* SX127X_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL | */
                                  SX127X_RF_LORA_IRQFLAGS_CADDETECTED);
 
                 /* DIO0=TxDone, DIO2=FhssChangeChannel */
