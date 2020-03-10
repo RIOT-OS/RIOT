@@ -1,0 +1,56 @@
+From 60f0355beaeea25bf3cee187b8ce8244cc1bbf6a Mon Sep 17 00:00:00 2001
+From: dylad <dylan.laduranty@mesotic.com>
+Date: Fri, 8 Nov 2019 20:05:46 +0100
+Subject: [PATCH] reword files and functions
+
+---
+ bme680.c => bme680_internal.c | 4 ++--
+ bme680.h => bme680_internal.h | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+ rename bme680.c => bme680_internal.c (96%)
+ rename bme680.h => bme680_internal.h (96%)
+
+diff --git a/bme680.c b/bme680_internal.c
+similarity index 96%
+rename from bme680.c
+rename to bme680_internal.c
+index ccd1bf8..33ffb90 100644
+--- a/bme680.c
++++ b/bme680_internal.c
+@@ -47,7 +47,7 @@
+ 
+ /*! @file bme680.c
+  @brief Sensor driver for BME680 sensor */
+-#include "bme680.h"
++#include "bme680_internal.h"
+ 
+ /*!
+  * @brief This internal API is used to read the calibrated data from the sensor.
+@@ -284,7 +284,7 @@ static int8_t boundary_check(uint8_t *value, uint8_t min, uint8_t max, struct bm
+  *@brief This API is the entry point.
+  *It reads the chip-id and calibration data from the sensor.
+  */
+-int8_t bme680_init(struct bme680_dev *dev)
++int8_t bme680_init_internal(struct bme680_dev *dev)
+ {
+ 	int8_t rslt;
+ 
+diff --git a/bme680.h b/bme680_internal.h
+similarity index 96%
+rename from bme680.h
+rename to bme680_internal.h
+index 8274a8e..6578b3c 100644
+--- a/bme680.h
++++ b/bme680_internal.h
+@@ -72,7 +72,7 @@ extern "C"
+  *  @return Result of API execution status
+  *  @retval zero -> Success / +ve value -> Warning / -ve value -> Error
+  */
+-int8_t bme680_init(struct bme680_dev *dev);
++int8_t bme680_init_internal(struct bme680_dev *dev);
+ 
+ /*!
+  * @brief This API writes the given data to the register address
+-- 
+2.17.1
+
