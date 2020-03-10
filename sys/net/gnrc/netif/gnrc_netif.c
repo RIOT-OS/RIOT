@@ -1287,6 +1287,29 @@ static void _test_options(gnrc_netif_t *netif)
 
 int gnrc_netif_default_init(gnrc_netif_t *netif)
 {
+    gnrc_netif_acquire(netif);
+    netdev_t *dev = netif->dev;
+    netif->pid = sched_active_pid;
+
+#if IS_USED(MODULE_GNRC_NETIF_EVENTS)
+    netif->event_isr.handler = _event_handler_isr,
+    /* set up the event queue */
+    event_queue_init(&netif->evq);
+#endif /* MODULE_GNRC_NETIF_EVENTS */
+
+    /* register the event callback with the device driver */
+    dev->event_callback = _event_cb;
+    dev->context = netif;
+    /* initialize low-level driver */
+    int res = dev->driver->init(dev);
+    if (res < 0) {
+        LOG_ERROR("gnrc_netif: netdev init failed: %d\n", res);
+        /* unregister this netif instance */
+        dev->event_callback = NULL;
+        dev->context = NULL;
+        return -EINVAL;
+    }
+    _configure_netdev(dev);
     _init_from_device(netif);
 #ifdef DEVELHELP
     _test_options(netif);
@@ -1295,6 +1318,11 @@ int gnrc_netif_default_init(gnrc_netif_t *netif)
 #ifdef MODULE_GNRC_IPV6_NIB
     gnrc_ipv6_nib_init_iface(netif);
 #endif
+#ifdef MODULE_NETSTATS_L2
+    memset(&netif->stats, 0, sizeof(netstats_t));
+#endif
+    /* now let rest of GNRC use the interface */
+    gnrc_netif_release(netif);
     return 0;
 }
 
@@ -1484,50 +1512,30 @@ static void *_gnrc_netif_thread(void *args)
 {
     gnrc_netapi_opt_t *opt;
     gnrc_netif_t *netif;
-    netdev_t *dev;
     int res;
     msg_t reply = { .type = GNRC_NETAPI_MSG_TYPE_ACK };
     msg_t msg_queue[GNRC_NETIF_MSG_QUEUE_SIZE];
 
     DEBUG("gnrc_netif: starting thread %i\n", thread_getpid());
     netif = args;
-    gnrc_netif_acquire(netif);
-    dev = netif->dev;
-    netif->pid = thread_getpid();
-
+    /* setup the link-layer's message queue */
+    msg_init_queue(msg_queue, GNRC_NETIF_MSG_QUEUE_SIZE);
 #if IS_USED(MODULE_GNRC_NETIF_EVENTS)
-    netif->event_isr.handler = _event_handler_isr,
     /* set up the event queue */
     event_queue_init(&netif->evq);
 #endif /* MODULE_GNRC_NETIF_EVENTS */
 
-    /* setup the link-layer's message queue */
-    msg_init_queue(msg_queue, GNRC_NETIF_MSG_QUEUE_SIZE);
-    /* register the event callback with the device driver */
-    dev->event_callback = _event_cb;
-    dev->context = netif;
-    /* initialize low-level driver */
-    res = dev->driver->init(dev);
-    if (res < 0) {
+    if ((res = netif->ops->init(netif)) < 0) {
         LOG_ERROR("gnrc_netif: netdev init failed: %d\n", res);
         /* unregister this netif instance */
         netif->ops = NULL;
         netif->pid = KERNEL_PID_UNDEF;
         netif->dev = NULL;
-        dev->event_callback = NULL;
-        dev->context = NULL;
         return NULL;
     }
-    _configure_netdev(dev);
-    netif->ops->init(netif);
 #if DEVELHELP
     assert(options_tested);
 #endif
-#ifdef MODULE_NETSTATS_L2
-    memset(&netif->stats, 0, sizeof(netstats_t));
-#endif
-    /* now let rest of GNRC use the interface */
-    gnrc_netif_release(netif);
 #if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
     xtimer_ticks32_t last_wakeup = xtimer_now();
 #endif
