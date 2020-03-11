@@ -1,0 +1,1 @@
+FEATURES_BLACKLIST += arch_msp430
