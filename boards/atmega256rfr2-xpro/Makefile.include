@@ -5,7 +5,4 @@ BAUD ?= 115200
 # Use EDBG (xplainedpro) programmer with avrdude
 PROGRAMMER ?= xplainedpro
 
-# Use edbg interface for debugging
-DEBUGSERVER_INTERFACE ?= --edbg
-
 include $(RIOTBOARD)/common/atmega/Makefile.include

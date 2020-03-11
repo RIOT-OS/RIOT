@@ -98,4 +98,51 @@ Connect a TTL adapter with pins 14/RXD0 and 15/TXD0 an run
 Please note that the supply voltage should be compatible with the logic level of
 the TTL adapter. Usually everything between 3.3 V and 5 V should work.
 
+## On-Chip Debugging
+
+In order to debug the ATmega1284P, an compatible debugger is needed. The AVR
+Dragon is the ~~cheapest~~ least expensive option currently available. (But at
+least it can program and debug pretty much all AVRs and can even be used to
+de-brick ATmega MCUs using high voltage programming.)
+
+Once the AVR Dragon is correctly connected, the ATmega1284P has the JTAG
+interface enabled, and the required software is installed, debugging can be
+started using
+
+    make debug
+
+@note       If you are using a different debugger than the AVR Dragon, you have
+            to export the `AVR_DEBUGDEVICE` environment variable to the required
+            flag to pass to AVaRICE, e.g. when using the Atmel-ICE you have to
+            export `AVR_DEBUGDEVICE=--edbg`. If the debug device is not
+            connected via USB, you also need to export `AVR_DEBUGINTERFACE` to
+            the correct value.
+
+#### Software Requirements
+
+In order to debug you'll need an GDB version with AVR support and
+[AVaRICE](http://avarice.sourceforge.net/). Note that AVaRICE sadly is not
+being actively maintained and the latest release will not compile on most
+systems. Thus, unless your distribution already ships a package of the SVN
+version of AVaRICE, you'll have to build the tool from source.
+
+### JTAG Pin Mapping
+
+| Pin Name  | Pin   | Signal    | AVR Dragon Pin    |
+|:----------|:------|:----------|:------------------|
+| PC5       | 27    | TDI       | JTAG-9            |
+| PC4       | 26    | TDO       | JTAG-3            |
+| PC3       | 25    | TMS       | JTAG-5            |
+| PC2       | 24    | TCK       | JTAG-1            |
+| VCC       | 10    | VTG       | JTAG-4            |
+| GND       | 11    | GND       | JTAG-2            |
+
+### Fuse Settings
+
+The `JTAGEN` fuse has to be set in order to use the JTAG interface. The JTAG
+pins will no longer be available as GPIOs when this fuse is set. With the
+default settings the MCUs are preprogrammed during manufacturing, the `JTAGEN`
+fuse is already set. So with a new and unused package, you're ready directly
+ready to go.
+
  */
