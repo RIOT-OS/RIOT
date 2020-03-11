@@ -13,3 +13,6 @@ od
 
 # dout (Digital out) => doubt
 dout
+
+# ALS (Ambient Light Sensing) => ALSO
+als

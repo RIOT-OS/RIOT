@@ -29,6 +29,15 @@ ifneq (,$(filter apa102,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
 endif
 
+ifneq (,$(filter apds99%full,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+endif
+
+ifneq (,$(filter apds99%,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += apds99xx
+endif
+
 ifneq (,$(filter at,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
   USEMODULE += fmt
