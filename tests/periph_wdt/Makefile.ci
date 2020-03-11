@@ -1,0 +1,8 @@
+# workaround to make this test compilable on CI with `shell_commands` in.
+# Remove when https://github.com/RIOT-OS/RIOT/pull/13613 is merged.
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-duemilanove \
+    arduino-nano \
+    arduino-uno \
+    atmega328p \
+    #
