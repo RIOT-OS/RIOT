@@ -57,7 +57,7 @@ void at86rf215_setup(at86rf215_t *dev_09, at86rf215_t *dev_24, const at86rf215_p
     }
 }
 
-void at86rf215_reset_cfg(at86rf215_t *dev)
+void at86rf215_reset_and_cfg(at86rf215_t *dev)
 {
     netdev_ieee802154_reset(&dev->netdev);
 
@@ -191,7 +191,7 @@ void at86rf215_tx_done(at86rf215_t *dev)
 {
     uint8_t amcs = at86rf215_reg_read(dev, dev->BBC->RG_AMCS);
 
-    /* enable AACK, disable TX2RX */
+    /* re-enable AACK, disable TX2RX */
     amcs &= ~AMCS_TX2RX_MASK;
     if (dev->flags & AT86RF215_OPT_AUTOACK) {
         amcs |= AMCS_AACK_MASK;
@@ -260,7 +260,7 @@ int at86rf215_tx_prepare(at86rf215_t *dev)
 size_t at86rf215_tx_load(at86rf215_t *dev, const uint8_t *data,
                          size_t len, size_t offset)
 {
-    /* set bit if ACK was requested */
+    /* set bit if ACK was requested and retransmission is enabled */
     if (offset == 0 && (data[0] & IEEE802154_FCF_ACK_REQ) && dev->retries_max) {
         dev->flags |= AT86RF215_OPT_ACK_REQUESTED;
     }

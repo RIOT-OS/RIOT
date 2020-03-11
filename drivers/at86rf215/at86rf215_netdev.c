@@ -102,7 +102,7 @@ static int _init(netdev_t *netdev)
     }
 
     /* reset device to default values and put it into RX state */
-    at86rf215_reset_cfg(dev);
+    at86rf215_reset_and_cfg(dev);
 
     return 0;
 }
@@ -844,7 +844,7 @@ static void _start_ack_timer(at86rf215_t *dev)
 /* wake up the radio thread after CSMA backoff period */
 static void _start_backoff_timer(at86rf215_t *dev)
 {
-    uint8_t be;
+    uint8_t be; /* backoff exponent */
     uint32_t base;
 
     at86rf215_get_random(dev, &base, sizeof(base));
@@ -873,7 +873,7 @@ static void _start_backoff_timer(at86rf215_t *dev)
 
 static inline bool _ack_frame_received(at86rf215_t *dev)
 {
-    /* check if the sequence numbers match */
+    /* check if the sequence numbers (3rd byte) match */
     return at86rf215_reg_read(dev, dev->BBC->RG_FBRXS + 2)
         == at86rf215_reg_read(dev, dev->BBC->RG_FBTXS + 2);
 }

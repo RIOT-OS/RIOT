@@ -108,6 +108,7 @@ void at86rf215_set_chan(at86rf215_t *dev, uint16_t channel)
 }
 
 uint16_t at86rf215_get_channel_spacing(at86rf215_t *dev) {
+    /* 25 kHz resolution */
     return 25 * at86rf215_reg_read(dev, dev->RF->RG_CS);
 }
 

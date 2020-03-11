@@ -31,14 +31,14 @@ extern "C" {
 /**
  * @brief Minimum reset pulse width (tRST) in µs
  */
-#define AT86RF215_RESET_PULSE_WIDTH     (16U)
+#define AT86RF215_RESET_PULSE_WIDTH_US  (16U)
 
 /**
  * @brief The typical transition time to TRX_OFF after reset (tPOWERON) in µs
  */
-#define AT86RF215_RESET_DELAY           (16U)
+#define AT86RF215_RESET_DELAY_US        (16U)
 
-/** Default energy detect threshold for CSMA */
+/** Default energy detect threshold for CSMA (reset value) */
 #define AT86RF215_EDT_DEFAULT           (-84) /* dBm */
 
 /**
@@ -51,7 +51,7 @@ extern "C" {
 
 /** For the SUN PHYs, the value is 1 ms expressed in symbol periods, rounded up to the next
     integer number of symbol periods using the ceiling() function */
-#define AT86RF215_TURNAROUND_TIME_US        (1000)
+#define AT86RF215_TURNAROUND_TIME_US        (1 * US_PER_MS)
 
 /** An ACK consists of 5 payload bytes */
 #define AT86RF215_ACK_PSDU_BYTES            (5)
@@ -606,8 +606,8 @@ static inline void at86rf215_await_state_end(const at86rf215_t *dev, uint8_t sta
 /**
  * @brief Switch device back to IDLE-RX from non-RX idle
  *
- * @param[in] dev         Device to update
- * @param[out] old_state  Pointer to store the previous state, may be NULL
+ * @param[in] dev         device to update
+ * @param[out] old_state  pointer to store the previous state, may be NULL
  *
  * @return  true if the operation was possible
  */
@@ -616,7 +616,7 @@ bool at86rf215_set_rx_from_idle(at86rf215_t *dev, uint8_t *old_state);
 /**
  * @brief Switch device to non-RX idle state from RX
  *
- * @param[in] dev         Device to update
+ * @param[in] dev         device to update
  * @param[out] state      the new state (may be CMD_RF_TRXOFF or CMD_RF_SLEEP)
  *
  * @return  true if the operation was possible
@@ -658,14 +658,16 @@ static inline void at86rf215_enable_radio(at86rf215_t *dev, uint8_t modulation)
 }
 
 /**
- * @brief Internal convenience function to disable reduced power mode for energy detection.
+ * @brief Internal convenience function to disable reduced power
+ *        consumption (RPC) for energy detection.
  *
  * @param[in] dev           device to configure
  */
 void at86rf215_disable_rpc(at86rf215_t *dev);
 
 /**
- * @brief Internal convenience function to re-enable reduced power mode after energy detection.
+ * @brief Internal convenience function to re-enable reduced power
+ *        consumption (RPC) after energy detection.
  *
  * @param[in] dev           device to configure
  */

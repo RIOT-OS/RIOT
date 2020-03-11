@@ -141,6 +141,7 @@ static uint8_t _RXDFE_RCUT(uint8_t chips)
 static inline uint8_t _AGCC(uint8_t chips)
 {
     if (chips > BB_FCHIP200) {
+        /* 32 samples */
         return (2 << AGCC_AVGS_SHIFT) | AGCC_EN_MASK;
     } else {
         return AGCC_EN_MASK;
@@ -193,7 +194,7 @@ static void _set_chips(at86rf215_t *dev, uint8_t chips)
     /* enable direct modulation if the chip supports it */
     uint8_t direct_modulation;
     if (chips < BB_FCHIP1000 && at86rf215_reg_read(dev, RG_RF_VN) >= 3) {
-        direct_modulation = 1 << 4;
+        direct_modulation = TXDFE_DM_MASK;
     } else {
         direct_modulation = 0;
     }
@@ -211,7 +212,7 @@ static void _set_chips(at86rf215_t *dev, uint8_t chips)
                                               | _TXDFE_RCUT(chips)
                                               | direct_modulation);
 
-    /* set receiver gain target according to data sheet */
+    /* set receiver gain target according to data sheet, p125 */
     at86rf215_reg_write(dev, dev->RF->RG_AGCS, 3 << AGCS_TGT_SHIFT);
     at86rf215_reg_write(dev, dev->RF->RG_AGCC, _AGCC(chips));
 
@@ -223,7 +224,7 @@ static void _set_legacy(at86rf215_t *dev, bool high_rate)
 {
     uint8_t chips;
 
-    /* enable/disable legacy high data rate */
+    /* enable/disable legacy high data rate, only use SFD_1 */
     if (high_rate) {
         at86rf215_reg_write(dev, dev->BBC->RG_OQPSKC3, OQPSKC3_HRLEG_MASK);
     } else {
@@ -250,7 +251,7 @@ static void _set_legacy(at86rf215_t *dev, bool high_rate)
 
 static void _set_ack_timeout(at86rf215_t *dev, uint8_t chips, uint8_t mode)
 {
-    dev->ack_timeout_usec = AT86RF215_ACK_PERIOD_IN_BITS * 1000000UL / _get_bitrate(chips, mode);
+    dev->ack_timeout_usec = AT86RF215_ACK_PERIOD_IN_BITS * US_PER_SEC / _get_bitrate(chips, mode);
 
     if (dev->mode == AT86RF215_MODE_MR_OQPSK) {
         dev->ack_timeout_usec *= 10;
@@ -261,7 +262,7 @@ static void _set_ack_timeout(at86rf215_t *dev, uint8_t chips, uint8_t mode)
 
 static void _set_csma_backoff_period(at86rf215_t *dev, uint8_t chips, uint8_t mode)
 {
-    dev->csma_backoff_period =  AT86RF215_BACKOFF_PERIOD_IN_BITS * 1000000UL / _get_bitrate(chips, mode);
+    dev->csma_backoff_period =  AT86RF215_BACKOFF_PERIOD_IN_BITS * US_PER_SEC / _get_bitrate(chips, mode);
 
     if (dev->mode == AT86RF215_MODE_MR_OQPSK) {
         dev->csma_backoff_period *= 10;
@@ -272,7 +273,7 @@ static void _set_csma_backoff_period(at86rf215_t *dev, uint8_t chips, uint8_t mo
 
 void _end_configure_OQPSK(at86rf215_t *dev)
 {
-    /* set channel spacing */
+    /* set channel spacing with 25 kHz resolution */
     if (is_subGHz(dev)) {
         at86rf215_reg_write(dev, dev->RF->RG_CS, QPSK_CHANNEL_SPACING_SUBGHZ / 25);
         at86rf215_reg_write16(dev, dev->RF->RG_CCF0L, QPSK_CENTER_FREQUENCY_SUBGHZ / 25);
@@ -281,8 +282,8 @@ void _end_configure_OQPSK(at86rf215_t *dev)
         at86rf215_reg_write16(dev, dev->RF->RG_CCF0L, QPSK_CENTER_FREQUENCY_24GHZ / 25);
     }
 
-    /* lowest preamble detection sensitivity */
-    at86rf215_reg_write(dev, dev->BBC->RG_OQPSKC1, 0);
+    /* lowest preamble detection sensitivity, enable receiver override */
+    at86rf215_reg_write(dev, dev->BBC->RG_OQPSKC1, OQPSKC1_RXO_MASK | OQPSKC1_RXOLEG_MASK);
 
     /* make sure the channel config is still valid */
     dev->num_chans = is_subGHz(dev) ? 3 : 16;

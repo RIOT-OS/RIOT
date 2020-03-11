@@ -192,7 +192,7 @@ void at86rf215_setup(at86rf215_t *dev_09, at86rf215_t *dev_24, const at86rf215_p
  *
  * @param[in,out] dev       device to configure
  */
-void at86rf215_reset_cfg(at86rf215_t *dev);
+void at86rf215_reset_and_cfg(at86rf215_t *dev);
 
 /**
  * @brief   Trigger a hardware reset, configuration is retained.
@@ -415,7 +415,7 @@ void at86rf215_tx_abort(at86rf215_t *dev);
 
 /**
  * @brief   Signal that the transfer of the frame (and optional ACK reception)
- *          has finished.
+ *          has finished. Sets the radio in RX mode.
  *
  * @param[in] dev           device to use
  */

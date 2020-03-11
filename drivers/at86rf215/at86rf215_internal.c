@@ -49,9 +49,9 @@ int at86rf215_hardware_reset(at86rf215_t *dev)
 
     /* trigger hardware reset */
     gpio_clear(dev->params.reset_pin);
-    xtimer_usleep(AT86RF215_RESET_PULSE_WIDTH);
+    xtimer_usleep(AT86RF215_RESET_PULSE_WIDTH_US);
     gpio_set(dev->params.reset_pin);
-    xtimer_usleep(AT86RF215_RESET_DELAY);
+    xtimer_usleep(AT86RF215_RESET_DELAY_US);
 
     unsigned tries = 100;
     while (_get_rf_state_with_lock(dev) != RF_STATE_TRXOFF &&

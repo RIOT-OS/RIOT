@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2019 ML!PA Consulting GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,7 +14,7 @@
  * @file
  * @brief   Auto initialization for at86rf215 network interfaces
  *
- * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
 #ifdef MODULE_AT86RF215
