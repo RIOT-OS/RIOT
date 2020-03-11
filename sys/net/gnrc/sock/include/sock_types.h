@@ -87,6 +87,7 @@ struct gnrc_sock_reg {
         sock_udp_cb_t udp;              /**< UDP version */
 #endif
     } async_cb;
+    void *async_cb_arg;                 /**< asynchronous callback argument */
 #ifdef SOCK_HAS_ASYNC_CTX
     sock_async_ctx_t async_ctx;         /**< asynchronous event context */
 #endif
