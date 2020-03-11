@@ -59,7 +59,7 @@ void sock_dtls_event_init(sock_dtls_t *sock, event_queue_t *ev_queue,
 
     _set_ctx(ctx, ev_queue);
     ctx->event.cb.dtls = handler;
-    sock_dtls_set_cb(sock, _dtls_cb);
+    sock_dtls_set_cb(sock, _dtls_cb, NULL);
 }
 #endif /* MODULE_SOCK_DTLS */
 
@@ -77,7 +77,7 @@ void sock_ip_event_init(sock_ip_t *sock, event_queue_t *ev_queue,
 
     _set_ctx(ctx, ev_queue);
     ctx->event.cb.ip = handler;
-    sock_ip_set_cb(sock, _ip_cb);
+    sock_ip_set_cb(sock, _ip_cb, NULL);
 }
 #endif  /* MODULE_SOCK_IP */
 
@@ -95,7 +95,7 @@ void sock_tcp_event_init(sock_tcp_t *sock, event_queue_t *ev_queue,
 
     _set_ctx(ctx, ev_queue);
     ctx->event.cb.tcp = handler;
-    sock_tcp_set_cb(sock, _tcp_cb);
+    sock_tcp_set_cb(sock, _tcp_cb, NULL);
 }
 
 static void _tcp_queue_cb(sock_tcp_queue_t *queue, sock_async_flags_t type,
@@ -113,7 +113,7 @@ void sock_tcp_queue_event_init(sock_tcp_queue_t *queue,
 
     _set_ctx(ctx, ev_queue);
     ctx->event.cb.tcp_queue = handler;
-    sock_tcp_queue_set_cb(queue, _tcp_queue_cb);
+    sock_tcp_queue_set_cb(queue, _tcp_queue_cb, NULL);
 }
 #endif /* MODULE_SOCK_TCP */
 
@@ -131,7 +131,7 @@ void sock_udp_event_init(sock_udp_t *sock, event_queue_t *ev_queue,
 
     _set_ctx(ctx, ev_queue);
     ctx->event.cb.udp = handler;
-    sock_udp_set_cb(sock, _udp_cb);
+    sock_udp_set_cb(sock, _udp_cb, NULL);
 }
 #endif /* MODULE_SOCK_UDP */
 

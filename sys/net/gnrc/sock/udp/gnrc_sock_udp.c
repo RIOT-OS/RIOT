@@ -327,8 +327,9 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
 }
 
 #ifdef SOCK_HAS_ASYNC
-void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb)
+void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb, void *arg)
 {
+    (void)arg;
     sock->reg.async_cb.udp = cb;
 }
 

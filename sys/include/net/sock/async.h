@@ -42,10 +42,11 @@ extern "C" {
  *
  * @note    Only available with @ref SOCK_HAS_ASYNC defined.
  *
- * @param[in] sock  A DTLS sock object.
- * @param[in] cb    An event callback. May be NULL to unset event callback.
+ * @param[in] sock      A DTLS sock object.
+ * @param[in] cb        An event callback. May be NULL to unset event callback.
+ * @param[in] cb_arg    Argument to provide to @p cb. May be NULL.
  */
-void sock_dtls_set_cb(sock_dtls_t *sock, sock_dtls_cb_t cb);
+void sock_dtls_set_cb(sock_dtls_t *sock, sock_dtls_cb_t cb, void *cb_arg);
 #endif  /* defined(MODULE_SOCK_DTLS) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
@@ -61,8 +62,9 @@ void sock_dtls_set_cb(sock_dtls_t *sock, sock_dtls_cb_t cb);
  *
  * @param[in] sock  A raw IPv4/IPv6 sock object.
  * @param[in] cb    An event callback. May be NULL to unset event callback.
+ * @param[in] cb_arg    Argument to provide to @p cb. May be NULL.
  */
-void sock_ip_set_cb(sock_ip_t *sock, sock_ip_cb_t cb);
+void sock_ip_set_cb(sock_ip_t *sock, sock_ip_cb_t cb, void *cb_arg);
 #endif  /* defined(MODULE_SOCK_IP) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
@@ -76,10 +78,11 @@ void sock_ip_set_cb(sock_ip_t *sock, sock_ip_cb_t cb);
  *
  * @note    Only available with @ref SOCK_HAS_ASYNC defined.
  *
- * @param[in] sock  A TCP sock object.
- * @param[in] cb    An event callback. May be NULL to unset event callback.
+ * @param[in] sock      A TCP sock object.
+ * @param[in] cb        An event callback. May be NULL to unset event callback.
+ * @param[in] cb_arg    Argument to provide to @p cb. May be NULL.
  */
-void sock_tcp_set_cb(sock_tcp_t *sock, sock_tcp_cb_t cb);
+void sock_tcp_set_cb(sock_tcp_t *sock, sock_tcp_cb_t cb, void *cb_arg);
 
 /**
  * @brief   Sets event callback for @ref sock_tcp_queue_t
@@ -91,10 +94,12 @@ void sock_tcp_set_cb(sock_tcp_t *sock, sock_tcp_cb_t cb);
  *
  * @note    Only available with @ref SOCK_HAS_ASYNC defined.
  *
- * @param[in] queue A TCP listening queue.
- * @param[in] cb    An event callback. May be NULL to unset event callback.
+ * @param[in] queue     A TCP listening queue.
+ * @param[in] cb        An event callback. May be NULL to unset event callback.
+ * @param[in] cb_arg    Argument to provide to @p cb. May be NULL.
  */
-void sock_tcp_queue_set_cb(sock_tcp_queue_t *queue, sock_tcp_queue_cb_t cb);
+void sock_tcp_queue_set_cb(sock_tcp_queue_t *queue, sock_tcp_queue_cb_t cb,
+                           void *cb_arg);
 #endif  /* defined(MODULE_SOCK_TCP) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
@@ -108,10 +113,11 @@ void sock_tcp_queue_set_cb(sock_tcp_queue_t *queue, sock_tcp_queue_cb_t cb);
  *
  * @note    Only available with @ref SOCK_HAS_ASYNC defined.
  *
- * @param[in] sock  A UDP sock object.
- * @param[in] cb    An event callback. May be NULL to unset event callback.
+ * @param[in] sock      A UDP sock object.
+ * @param[in] cb        An event callback. May be NULL to unset event callback.
+ * @param[in] cb_arg    Argument to provide to @p cb
  */
-void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb);
+void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb, void *cb_arg);
 #endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
 
 #if defined(SOCK_HAS_ASYNC_CTX) || defined(DOXYGEN)

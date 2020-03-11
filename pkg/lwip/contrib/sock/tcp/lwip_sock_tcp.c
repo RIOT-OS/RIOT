@@ -380,13 +380,16 @@ ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len)
 }
 
 #ifdef SOCK_HAS_ASYNC
-void sock_tcp_set_cb(sock_tcp_t *sock, sock_tcp_cb_t cb)
+void sock_tcp_set_cb(sock_tcp_t *sock, sock_tcp_cb_t cb, void *arg)
 {
+    (void)arg;
     sock->base.async_cb.tcp = cb;
 }
 
-void sock_tcp_queue_set_cb(sock_tcp_queue_t *queue, sock_tcp_queue_cb_t cb)
+void sock_tcp_queue_set_cb(sock_tcp_queue_t *queue, sock_tcp_queue_cb_t cb,
+                           void *arg)
 {
+    (void)arg;
     queue->base.async_cb.tcp_queue = cb;
 }
 
