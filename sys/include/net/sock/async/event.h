@@ -36,8 +36,9 @@
  * event_queue_t queue;
  * uint8_t buf[128];
  *
- * void handler(sock_udp_t *sock, sock_async_flags_t type)
+ * void handler(sock_udp_t *sock, sock_async_flags_t type, void *arg)
  * {
+ *     (void)arg;
  *     if (type & SOCK_ASYNC_MSG_RECV) {
  *         sock_udp_ep_t remote;
  *         ssize_t res;
@@ -101,8 +102,9 @@
  * send, we print an according message:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
- * void handler(sock_udp_t *sock, sock_async_flags_t type)
+ * void handler(sock_udp_t *sock, sock_async_flags_t type, void *arg)
  * {
+ *     (void)arg;
  *     if (type & SOCK_ASYNC_MSG_RECV) {
  *         sock_udp_ep_t remote;
  *         ssize_t res;

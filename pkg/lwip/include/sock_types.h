@@ -40,7 +40,8 @@ typedef struct lwip_sock_base lwip_sock_base_t;
  * @internal
  */
 typedef void (*lwip_sock_cb_t)(lwip_sock_base_t *sock,
-                               sock_async_flags_t flags);
+                               sock_async_flags_t flags,
+                               void *arg);
 #endif  /* SOCK_HAS_ASYNC */
 
 /**

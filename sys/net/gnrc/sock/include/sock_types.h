@@ -55,7 +55,8 @@ typedef struct gnrc_sock_reg gnrc_sock_reg_t;
  * @internal
  */
 typedef void (*gnrc_sock_reg_cb_t)(gnrc_sock_reg_t *sock,
-                                   sock_async_flags_t flags);
+                                   sock_async_flags_t flags,
+                                   void *arg);
 #endif  /* SOCK_HAS_ASYNC */
 
 /**

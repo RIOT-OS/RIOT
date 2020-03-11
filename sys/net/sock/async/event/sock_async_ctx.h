@@ -28,7 +28,10 @@ extern "C" {
  * @brief   Generalized callback type
  */
 typedef union {
-    void (*generic)(void *, sock_async_flags_t);    /**< anything goes */
+    /**
+     * @brief   anything goes
+     */
+    void (*generic)(void *, sock_async_flags_t, void *);
 #ifdef MODULE_SOCK_DTLS
     sock_dtls_cb_t dtls;                            /**< DTLS callback */
 #endif

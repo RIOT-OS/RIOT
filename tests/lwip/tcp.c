@@ -47,10 +47,11 @@ static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
 static char _addr_str[IPV6_ADDR_MAX_STR_LEN];
 static event_queue_t _ev_queue;
 
-static void _tcp_recv(sock_tcp_t *sock, sock_async_flags_t flags)
+static void _tcp_recv(sock_tcp_t *sock, sock_async_flags_t flags, void *arg)
 {
     sock_tcp_ep_t client;
 
+    (void)arg;
     if (sock_tcp_get_remote(sock, &client) < 0) {
         /* socket was disconnected between event firing and this handler */
         return;
@@ -85,8 +86,10 @@ static void _tcp_recv(sock_tcp_t *sock, sock_async_flags_t flags)
     }
 }
 
-static void _tcp_accept(sock_tcp_queue_t *queue, sock_async_flags_t flags)
+static void _tcp_accept(sock_tcp_queue_t *queue, sock_async_flags_t flags,
+                        void *arg)
 {
+    (void)arg;
     if (flags & SOCK_ASYNC_CONN_RECV) {
         sock_tcp_t *sock = NULL;
         int res;

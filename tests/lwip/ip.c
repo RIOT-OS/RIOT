@@ -44,8 +44,9 @@ static sock_ip_t server_sock;
 static char server_stack[THREAD_STACKSIZE_DEFAULT];
 static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
 
-static void _ip_recv(sock_ip_t *sock, sock_async_flags_t flags)
+static void _ip_recv(sock_ip_t *sock, sock_async_flags_t flags, void *arg)
 {
+    (void)arg;
     if (flags & SOCK_ASYNC_MSG_RECV) {
         sock_ip_ep_t src;
         int res;

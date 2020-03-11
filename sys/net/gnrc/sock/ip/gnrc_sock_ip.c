@@ -197,7 +197,8 @@ ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
     }
 #ifdef SOCK_HAS_ASYNC
     if ((sock != NULL) && (sock->reg.async_cb.ip)) {
-        sock->reg.async_cb.ip(sock, SOCK_ASYNC_MSG_SENT);
+        sock->reg.async_cb.ip(sock, SOCK_ASYNC_MSG_SENT,
+                              NULL);
     }
 #endif  /* SOCK_HAS_ASYNC */
     return res;
