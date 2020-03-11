@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <stdio.h>
+
 #include "periph/pm.h"
 
 int _reboot_handler(int argc, char **argv)
@@ -26,6 +28,16 @@ int _reboot_handler(int argc, char **argv)
     (void) argv;
 
     pm_reboot();
+
+    return 0;
+}
+
+int _version_handler(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    puts(RIOT_VERSION);
 
     return 0;
 }
