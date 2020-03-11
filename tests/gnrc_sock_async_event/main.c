@@ -71,7 +71,7 @@ ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt)
 
 static void _recv_udp(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
 {
-    (void)arg;
+    assert(strcmp(arg, "test") == 0);
     printf("UDP event triggered: %04X\n", flags);
     if (flags & SOCK_ASYNC_MSG_RECV) {
         sock_udp_ep_t remote;
@@ -93,7 +93,7 @@ static void _recv_udp(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
 
 static void _recv_ip(sock_ip_t *sock, sock_async_flags_t flags, void *arg)
 {
-    (void)arg;
+    assert(strcmp(arg, "test") == 0);
     printf("IP event triggered: %04X\n", flags);
     if (flags & SOCK_ASYNC_MSG_RECV) {
         sock_ip_ep_t remote;
@@ -128,8 +128,8 @@ int main(void)
     sock_udp_create(&_udp_sock, &local, NULL, 0);
     sock_ip_create(&_ip_sock, (sock_ip_ep_t *)&local, NULL, PROTNUM_UDP, 0);
 
-    sock_udp_event_init(&_udp_sock, &_ev_queue, _recv_udp, NULL);
-    sock_ip_event_init(&_ip_sock, &_ev_queue, _recv_ip, NULL);
+    sock_udp_event_init(&_udp_sock, &_ev_queue, _recv_udp, "test");
+    sock_ip_event_init(&_ip_sock, &_ev_queue, _recv_ip, "test");
     memcpy(remote.addr.ipv6, _test_remote, sizeof(_test_remote));
     remote.port = TEST_PORT - 1;
 
