@@ -131,7 +131,7 @@ void at86rf215_reset(at86rf215_t *dev)
     at86rf215_reg_write(dev, dev->RF->RG_IRQM, RF_IRQ_EDC | RF_IRQ_TRXRDY);
 
     /* set energy detect threshold to -84 dBm */
-    at86rf215_reg_write(dev, dev->BBC->RG_AMEDT, AT86RF215_EDT_DEFAULT);
+    at86rf215_set_cca_threshold(dev, AT86RF215_EDT_DEFAULT);
 
     /* enable address filter 0 */
     at86rf215_reg_write(dev, dev->BBC->RG_AFC0, AFC0_AFEN0_MASK );
