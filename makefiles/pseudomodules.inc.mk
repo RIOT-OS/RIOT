@@ -227,6 +227,9 @@ PSEUDOMODULES += crypto_aes_precalculated
 # This pseudomodule causes a loop in AES to be unrolled (more flash, less CPU)
 PSEUDOMODULES += crypto_aes_unroll
 
+# declare shell version of test_utils_interactive_sync
+PSEUDOMODULES += test_utils_interactive_sync_shell
+
 # All auto_init modules are pseudomodules
 PSEUDOMODULES += auto_init_%
 NO_PSEUDOMODULES += auto_init_can
