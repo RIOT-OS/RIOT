@@ -137,6 +137,8 @@ void at86rf215_filter_ack(at86rf215_t *dev, bool on);
 /**
  * @brief   Read random data from the RNG
  *
+ * @pre     The device has to be in state RX with PLL locked.
+ *
  * @param[in]  dev      device to configure
  * @param[out] data     buffer to copy the random data to
  * @param[in]  len      number of random bytes to store in data

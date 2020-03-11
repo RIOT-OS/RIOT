@@ -847,6 +847,7 @@ static void _start_backoff_timer(at86rf215_t *dev)
     uint8_t be; /* backoff exponent */
     uint32_t base;
 
+    /* energy detect interrupt happened -> hardware is still in RX mode */
     at86rf215_get_random(dev, &base, sizeof(base));
 
     be = ((dev->csma_retries_max - dev->csma_retries) - 1) + dev->csma_minbe;
