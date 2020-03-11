@@ -427,6 +427,42 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
                      uint32_t timeout, sock_ip_ep_t *remote);
 
 /**
+ * @brief   Provides stack-internal buffer space containing an IPv4/IPv6
+ *          message from remote end point
+ *
+ * @pre `(sock != NULL) && (data != NULL) && (buf_ctx != NULL)`
+ *
+ * @param[in] sock      A raw IPv4/IPv6 sock object.
+ * @param[out] data     Pointer to a stack-internal buffer space containing the
+ *                      received data.
+ * @param[out] buf_ctx  Stack-internal buffer context. Must be used to release
+ *                      the buffer space using @ref sock_recv_buf_free() after
+ *                      the data in @p data was handled.
+ * @param[in] timeout   Timeout for receive in microseconds.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be @ref SOCK_NO_TIMEOUT for no timeout (wait until
+ *                      data is available).
+ * @param[out] remote   Remote end point of the received data.
+ *                      May be NULL, if it is not required by the application.
+ *
+ * @note    Function blocks if no packet is currently waiting.
+ *
+ * @return  The number of bytes received on success.
+ * @return  0, if no received data is available, but everything is in order.
+ * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
+ * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
+ *          initialized (or closed while sock_ip_recv() blocks).
+ * @return  -ENOMEM, if no memory was available to receive @p data.
+ * @return  -EPROTO, if source address of received packet did not equal
+ *          the remote of @p sock.
+ * @return  -ETIMEDOUT, if @p timeout expired.
+ */
+ssize_t sock_ip_recv_buf(sock_ip_t *sock, void **data, void **buf_ctx,
+                         uint32_t timeout, sock_ip_ep_t *remote);
+
+/**
  * @brief   Sends a message over IPv4/IPv6 to remote end point
  *
  * @pre `((sock != NULL || remote != NULL)) && (if (len != 0): (data != NULL))`

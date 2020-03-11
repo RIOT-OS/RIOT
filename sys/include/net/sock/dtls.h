@@ -607,6 +607,37 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
                        void *data, size_t maxlen, uint32_t timeout);
 
 /**
+ * @brief Decrypts and provides stack-internal buffer space containing a
+ *        message from a remote peer.
+ *
+ * @param[in] sock      DTLS sock to use.
+ * @param[out] remote   Remote DTLS session of the received data.
+ *                      Cannot be NULL.
+ * @param[out] data     Pointer to a stack-internal buffer space containing the
+ *                      received data.
+ * @param[out] buf_ctx  Stack-internal buffer context. Must be used to release
+ *                      the buffer space using @ref sock_recv_buf_free() after
+ *                      the data in @p data was handled.
+ * @param[in] timeout   Receive timeout in microseconds.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be SOCK_NO_TIMEOUT to wait until data
+ *                      is available.
+ *
+ * @note Function may block if data is not available and @p timeout != 0
+ *
+ * @return The number of bytes received on success
+ * @return  -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
+ * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
+ *          initialized (or closed while sock_dtls_recv() blocks).
+ * @return  -ENOMEM, if no memory was available to receive @p data.
+ * @return  -ETIMEDOUT, if @p timeout expired.
+ */
+ssize_t sock_dtls_recv_buf(sock_dtls_t *sock, sock_dtls_session_t *remote,
+                           void **data, void **buf_ctx, uint32_t timeout);
+
+/**
  * @brief Encrypts and sends a message to a remote peer
  *
  * @param[in] sock      DTLS sock to use
