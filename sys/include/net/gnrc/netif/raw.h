@@ -19,6 +19,7 @@
 #ifndef NET_GNRC_NETIF_RAW_H
 #define NET_GNRC_NETIF_RAW_H
 
+#include "net/netdev.h"
 #include "net/gnrc/netif.h"
 
 #ifdef __cplusplus

@@ -19,6 +19,7 @@
 #define NET_GNRC_NETIF_IEEE802154_H
 
 #include "net/gnrc/netif.h"
+#include "net/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {

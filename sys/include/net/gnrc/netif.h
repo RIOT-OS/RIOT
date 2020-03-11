@@ -63,8 +63,8 @@
 #include "net/gnrc/netif/pktq/type.h"
 #endif
 #include "net/ndp.h"
-#include "net/netdev.h"
 #include "net/netopt.h"
+#include "errno.h"
 #ifdef MODULE_NETSTATS_L2
 #include "net/netstats.h"
 #endif

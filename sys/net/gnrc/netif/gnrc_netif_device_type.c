@@ -21,6 +21,7 @@
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
 #include "net/ipv6.h"
 #endif
+#include "net/netdev.h"
 #include "net/gnrc/netif.h"
 #include "net/eui48.h"
 #include "net/ethernet.h"

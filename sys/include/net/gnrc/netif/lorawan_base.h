@@ -19,6 +19,7 @@
 #define NET_GNRC_NETIF_LORAWAN_BASE_H
 
 #include "net/gnrc/netif.h"
+#include "net/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
