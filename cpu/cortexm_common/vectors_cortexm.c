@@ -17,6 +17,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Daniel Krebs <github@daniel-krebs.net>
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Sören Tempel <tempel@uni-bremen.de>
  *
  * @}
  */
@@ -139,11 +140,28 @@ void reset_handler_default(void)
     }
 #endif /* CPU_HAS_BACKUP_RAM */
 
-#ifdef MODULE_MPU_STACK_GUARD
+#if defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_MPU_NOEXEC_RAM)
     mpu_enable();
+#endif
+
+#ifdef MODULE_MPU_NOEXEC_RAM
+    /* Mark the RAM non executable. This is a protection mechanism which
+     * makes exploitation of buffer overflows significantly harder.
+     *
+     * This marks the memory region from 0x20000000 to 0x3FFFFFFF as non
+     * executable. This is the Cortex-M SRAM region used for on-chip RAM.
+     */
+    mpu_configure(
+        0,                                               /* Region 0 (lowest priority) */
+        (uintptr_t)&_sram,                               /* RAM base address */
+        MPU_ATTR(1, AP_RW_RW, 0, 1, 0, 1, MPU_SIZE_512M) /* Allow read/write but no exec */
+    );
+#endif
+
+#ifdef MODULE_MPU_STACK_GUARD
     if (((uintptr_t)&_sstack) != SRAM_BASE) {
         mpu_configure(
-            0,                                              /* MPU region 0 */
+            1,                                              /* MPU region 1 */
             (uintptr_t)&_sstack + 31,                       /* Base Address (rounded up) */
             MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B) /* Attributes and Size */
         );

@@ -30,6 +30,10 @@ ifneq (,$(filter mpu_stack_guard,$(USEMODULE)))
   FEATURES_REQUIRED += cortexm_mpu
 endif
 
+ifneq (,$(filter mpu_noexec_ram,$(USEMODULE)))
+  FEATURES_REQUIRED += cortexm_mpu
+endif
+
 ifneq (,$(filter auto_init_gnrc_netif,$(USEMODULE)))
   USEMODULE += gnrc_netif_init_devs
 endif
