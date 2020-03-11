@@ -46,7 +46,7 @@
 
 /* Internal functions */
 static void *_event_loop(void *arg);
-static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type);
+static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg);
 static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                                          sock_udp_ep_t *remote);
@@ -121,19 +121,20 @@ static void *_event_loop(void *arg)
     }
 
     event_queue_init(&_queue);
-    sock_udp_event_init(&_sock, &_queue, _on_sock_evt);
+    sock_udp_event_init(&_sock, &_queue, _on_sock_evt, NULL);
     event_loop(&_queue);
 
     return 0;
 }
 
 /* Handles sock events from the event queue. */
-static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type)
+static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
 {
     coap_pkt_t pdu;
     sock_udp_ep_t remote;
     gcoap_request_memo_t *memo = NULL;
 
+    (void)arg;
     if (type & SOCK_ASYNC_MSG_RECV) {
         ssize_t res = sock_udp_recv(sock, _listen_buf, sizeof(_listen_buf),
                                     0, &remote);

@@ -319,15 +319,17 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     }
 #ifdef SOCK_HAS_ASYNC
     if ((sock != NULL) && (sock->reg.async_cb.udp)) {
-        sock->reg.async_cb.udp(sock, SOCK_ASYNC_MSG_SENT);
+        sock->reg.async_cb.udp(sock, SOCK_ASYNC_MSG_SENT,
+                               sock->reg.async_cb_arg);
     }
 #endif  /* SOCK_HAS_ASYNC */
     return res;
 }
 
 #ifdef SOCK_HAS_ASYNC
-void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb)
+void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb, void *arg)
 {
+    sock->reg.async_cb_arg = arg;
     sock->reg.async_cb.udp = cb;
 }
 

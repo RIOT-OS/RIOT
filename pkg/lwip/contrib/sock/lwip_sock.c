@@ -312,7 +312,7 @@ static void _netconn_cb(struct netconn *conn, enum netconn_evt evt,
                 break;
         }
         if (flags && sock->async_cb.gen) {
-            sock->async_cb.gen(sock, flags);
+            sock->async_cb.gen(sock, flags, sock->async_cb_arg);
         }
     }
 #else

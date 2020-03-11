@@ -40,7 +40,8 @@ typedef struct lwip_sock_base lwip_sock_base_t;
  * @internal
  */
 typedef void (*lwip_sock_cb_t)(lwip_sock_base_t *sock,
-                               sock_async_flags_t flags);
+                               sock_async_flags_t flags,
+                               void *arg);
 #endif  /* SOCK_HAS_ASYNC */
 
 /**
@@ -74,6 +75,7 @@ struct lwip_sock_base {
         sock_udp_cb_t udp;          /**< UDP version */
 #endif
     } async_cb;
+    void *async_cb_arg;             /**< asynchronous callback argument */
 #ifdef SOCK_HAS_ASYNC_CTX
     sock_async_ctx_t async_ctx;     /**< asynchronous event context */
 #endif  /* SOCK_HAS_ASYNC_CTX */

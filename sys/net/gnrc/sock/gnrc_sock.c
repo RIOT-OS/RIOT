@@ -58,7 +58,7 @@ static void _netapi_cb(uint16_t cmd, gnrc_pktsnip_t *pkt, void *ctx)
                         (void *)&reg->mbox);
         }
         if (reg->async_cb.generic) {
-            reg->async_cb.generic(reg, SOCK_ASYNC_MSG_RECV);
+            reg->async_cb.generic(reg, SOCK_ASYNC_MSG_RECV, reg->async_cb_arg);
         }
     }
 }

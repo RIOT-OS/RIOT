@@ -36,8 +36,9 @@
  * event_queue_t queue;
  * uint8_t buf[128];
  *
- * void handler(sock_udp_t *sock, sock_async_flags_t type)
+ * void handler(sock_udp_t *sock, sock_async_flags_t type, void *arg)
  * {
+ *     (void)arg;
  *     if (type & SOCK_ASYNC_MSG_RECV) {
  *         sock_udp_ep_t remote;
  *         ssize_t res;
@@ -65,7 +66,7 @@
  *     }
  *
  *     event_queue_init(&queue);
- *     sock_udp_event_init(&sock, &queue, handler);
+ *     sock_udp_event_init(&sock, &queue, handler, NULL);
  *     event_loop(&queue);
  *     return 0;
  * }
@@ -101,8 +102,9 @@
  * send, we print an according message:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
- * void handler(sock_udp_t *sock, sock_async_flags_t type)
+ * void handler(sock_udp_t *sock, sock_async_flags_t type, void *arg)
  * {
+ *     (void)arg;
  *     if (type & SOCK_ASYNC_MSG_RECV) {
  *         sock_udp_ep_t remote;
  *         ssize_t res;
@@ -144,7 +146,7 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  *     event_queue_init(&queue);
- *     sock_udp_event_init(&sock, &queue, handler);
+ *     sock_udp_event_init(&sock, &queue, handler, NULL);
  *     event_loop(&queue);
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
@@ -179,15 +181,16 @@ extern "C" {
  * @brief   Makes a DTLS sock able to handle asynchronous events using
  *          @ref sys_event.
  *
- * @param[in] sock      A DTLS sock object.
- * @param[in] ev_queue  The queue the events on @p sock will be added to.
- * @param[in] handler   The event handler function to call on an event on
- *                      @p sock.
+ * @param[in] sock          A DTLS sock object.
+ * @param[in] ev_queue      The queue the events on @p sock will be added to.
+ * @param[in] handler       The event handler function to call on an event on
+ *                          @p sock.
+ * @param[in] handler_arg   Argument to provided to @p handler.
  *
  * @note    Only available with module `sock_dtls`.
  */
 void sock_dtls_event_init(sock_dtls_t *sock, event_queue_t *ev_queue,
-                          sock_dtls_cb_t handler);
+                          sock_dtls_cb_t handler, void *handler_arg);
 #endif  /* defined(MODULE_SOCK_DTLS) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
@@ -195,15 +198,16 @@ void sock_dtls_event_init(sock_dtls_t *sock, event_queue_t *ev_queue,
  * @brief   Makes a raw IPv4/IPv6 sock able to handle asynchronous events using
  *          @ref sys_event.
  *
- * @param[in] sock      A raw IPv4/IPv6 sock object.
- * @param[in] ev_queue  The queue the events on @p sock will be added to.
- * @param[in] handler   The event handler function to call on an event on
- *                      @p sock.
+ * @param[in] sock          A raw IPv4/IPv6 sock object.
+ * @param[in] ev_queue      The queue the events on @p sock will be added to.
+ * @param[in] handler       The event handler function to call on an event on
+ *                          @p sock.
+ * @param[in] handler_arg   Argument to provided to @p handler.
  *
  * @note    Only available with module `sock_ip`.
  */
 void sock_ip_event_init(sock_ip_t *sock, event_queue_t *ev_queue,
-                        sock_ip_cb_t handler);
+                        sock_ip_cb_t handler, void *handler_arg);
 #endif  /* defined(MODULE_SOCK_IP) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
@@ -211,29 +215,31 @@ void sock_ip_event_init(sock_ip_t *sock, event_queue_t *ev_queue,
  * @brief   Makes a TCP sock able to handle asynchronous events using
  *          @ref sys_event.
  *
- * @param[in] sock      A TCP sock object.
- * @param[in] ev_queue  The queue the events on @p sock will be added to.
- * @param[in] handler   The event handler function to call on an event on
- *                      @p sock.
+ * @param[in] sock          A TCP sock object.
+ * @param[in] ev_queue      The queue the events on @p sock will be added to.
+ * @param[in] handler       The event handler function to call on an event on
+ *                          @p sock.
+ * @param[in] handler_arg   Argument to provided to @p handler.
  *
  * @note    Only available with module `sock_tcp`.
  */
 void sock_tcp_event_init(sock_tcp_t *sock, event_queue_t *ev_queue,
-                         sock_tcp_cb_t handler);
+                         sock_tcp_cb_t handler, void *handler_arg);
 
 /**
  * @brief   Makes a TCP listening queue able to handle asynchronous events using
  *          @ref sys_event.
  *
- * @param[in] queue     A TCP listening queue.
- * @param[in] ev_queue  The queue the events on @p sock will be added to.
- * @param[in] handler   The event handler function to call on an event on
- *                      @p sock.
+ * @param[in] queue         A TCP listening queue.
+ * @param[in] ev_queue      The queue the events on @p sock will be added to.
+ * @param[in] handler       The event handler function to call on an event on
+ *                          @p sock.
+ * @param[in] handler_arg   Argument to provided to @p handler.
  *
  * @note    Only available with module `sock_tcp`.
  */
 void sock_tcp_queue_event_init(sock_tcp_queue_t *queue, event_queue_t *ev_queue,
-                               sock_tcp_queue_cb_t handler);
+                               sock_tcp_queue_cb_t handler, void *handler_arg);
 #endif  /* defined(MODULE_SOCK_TCP) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
@@ -241,15 +247,16 @@ void sock_tcp_queue_event_init(sock_tcp_queue_t *queue, event_queue_t *ev_queue,
  * @brief   Makes a UDP sock able to handle asynchronous events using
  *          @ref sys_event.
  *
- * @param[in] sock      A UDP sock object.
- * @param[in] ev_queue  The queue the events on @p sock will be added to.
- * @param[in] handler   The event handler function to call on an event on
- *                      @p sock.
+ * @param[in] sock          A UDP sock object.
+ * @param[in] ev_queue      The queue the events on @p sock will be added to.
+ * @param[in] handler       The event handler function to call on an event on
+ *                          @p sock.
+ * @param[in] handler_arg   Argument to provided to @p handler.
  *
  * @note    Only available with module `sock_udp`.
  */
 void sock_udp_event_init(sock_udp_t *sock, event_queue_t *ev_queue,
-                         sock_udp_cb_t handler);
+                         sock_udp_cb_t handler, void *handler_arg);
 #endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
 
 #ifdef __cplusplus

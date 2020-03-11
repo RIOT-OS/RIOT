@@ -28,7 +28,10 @@ extern "C" {
  * @brief   Generalized callback type
  */
 typedef union {
-    void (*generic)(void *, sock_async_flags_t);    /**< anything goes */
+    /**
+     * @brief   anything goes
+     */
+    void (*generic)(void *, sock_async_flags_t, void *);
 #ifdef MODULE_SOCK_DTLS
     sock_dtls_cb_t dtls;                            /**< DTLS callback */
 #endif
@@ -51,6 +54,7 @@ typedef struct {
     event_t super;              /**< event structure that gets extended */
     sock_event_cb_t cb;         /**< callback */
     void *sock;                 /**< generic pointer to a @ref net_sock object */
+    void *cb_arg;               /**< callback argument */
     sock_async_flags_t type;    /**< types of the event */
 } sock_event_t;
 
