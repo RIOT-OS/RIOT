@@ -1,5 +1,5 @@
 CPU = kinetis
-CPU_MODEL = mkw41z512vht4
+CPU_MODEL ?= mkw41z512vht4
 
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
