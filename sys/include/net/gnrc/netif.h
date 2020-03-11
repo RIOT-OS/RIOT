@@ -324,7 +324,7 @@ void gnrc_netif_msg_handler_netdev(gnrc_netif_t *netif, msg_t *msg);
  * @param[in] stacksize Size of @p stack.
  * @param[in] priority  Priority for the network interface's thread.
  * @param[in] name      Name for the network interface. May be NULL.
- * @param[in] dev       Device for the interface.
+ * @param[in] context   Context for the interface
  * @param[in] ops       Operations for the network interface.
  *
  * @note If @ref DEVELHELP is defined netif_params_t::name is used as the
@@ -334,7 +334,7 @@ void gnrc_netif_msg_handler_netdev(gnrc_netif_t *netif, msg_t *msg);
  * @return  negative number on error
  */
 int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
-                      char priority, const char *name, netdev_t *dev,
+                      char priority, const char *name, void *context,
                       const gnrc_netif_ops_t *ops);
 
 /**

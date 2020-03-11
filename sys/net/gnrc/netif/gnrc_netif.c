@@ -53,7 +53,7 @@ extern bool options_tested;
 static void *_gnrc_netif_thread(void *args);
 
 int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
-                      char priority, const char *name, netdev_t *netdev,
+                      char priority, const char *name, void *context,
                       const gnrc_netif_ops_t *ops)
 {
     int res;
@@ -72,7 +72,7 @@ int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
     netif->ops = ops;
     netif_register((netif_t*) netif);
     assert(netif->context == NULL);
-    netif->context = netdev;
+    netif->context = context;
     res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,
                         _gnrc_netif_thread, (void *)netif, name);
     (void)res;
