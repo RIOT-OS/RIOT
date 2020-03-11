@@ -129,9 +129,13 @@ void at86rf215_filter_ack(at86rf215_t *dev, bool on)
 
 void at86rf215_get_random(at86rf215_t *dev, void *data, size_t len)
 {
-    uint8_t state = at86rf215_reg_read(dev, dev->BBC->RG_PC);
-    at86rf215_disable_baseband(dev);
+    /* store previous PHY control state */
+    uint8_t state_pc = at86rf215_reg_read(dev, dev->BBC->RG_PC);
 
+    /* disable baseband processor */
+    at86rf215_reg_write(dev, dev->BBC->RG_PC, state_pc & ~PC_BBEN_MASK);
+
+    /* store previous RX bandwith settings */
     uint8_t rxbwc = at86rf215_reg_read(dev, dev->RF->RG_RXBWC);
 
     /* The analog frontend of the radio must be configured to the
@@ -143,9 +147,11 @@ void at86rf215_get_random(at86rf215_t *dev, void *data, size_t len)
         *data8++ = at86rf215_reg_read(dev, dev->RF->RG_RNDV);
     }
 
+    /* restore RX bandwith settings */
     at86rf215_reg_write(dev, dev->RF->RG_RXBWC, rxbwc);
-    /* set baseband in prior state */
-    at86rf215_reg_write(dev, dev->BBC->RG_PC, state);
+
+    /* restore PHY control settings */
+    at86rf215_reg_write(dev, dev->BBC->RG_PC, state_pc);
 
 }
 
