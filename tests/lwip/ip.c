@@ -90,7 +90,7 @@ static void *_server_thread(void *args)
     server_running = true;
     printf("Success: started IP server on protocol %u\n", protocol);
     event_queue_init(&queue);
-    sock_ip_event_init(&server_sock, &queue, _ip_recv);
+    sock_ip_event_init(&server_sock, &queue, _ip_recv, NULL);
     event_loop(&queue);
     return NULL;
 }

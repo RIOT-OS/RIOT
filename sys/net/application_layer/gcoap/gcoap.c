@@ -121,7 +121,7 @@ static void *_event_loop(void *arg)
     }
 
     event_queue_init(&_queue);
-    sock_udp_event_init(&_sock, &_queue, _on_sock_evt);
+    sock_udp_event_init(&_sock, &_queue, _on_sock_evt, NULL);
     event_loop(&_queue);
 
     return 0;

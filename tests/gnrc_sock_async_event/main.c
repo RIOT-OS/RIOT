@@ -128,8 +128,8 @@ int main(void)
     sock_udp_create(&_udp_sock, &local, NULL, 0);
     sock_ip_create(&_ip_sock, (sock_ip_ep_t *)&local, NULL, PROTNUM_UDP, 0);
 
-    sock_udp_event_init(&_udp_sock, &_ev_queue, _recv_udp);
-    sock_ip_event_init(&_ip_sock, &_ev_queue, _recv_ip);
+    sock_udp_event_init(&_udp_sock, &_ev_queue, _recv_udp, NULL);
+    sock_ip_event_init(&_ip_sock, &_ev_queue, _recv_ip, NULL);
     memcpy(remote.addr.ipv6, _test_remote, sizeof(_test_remote));
     remote.port = TEST_PORT - 1;
 

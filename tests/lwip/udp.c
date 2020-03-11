@@ -93,7 +93,7 @@ static void *_server_thread(void *args)
     printf("Success: started UDP server on port %" PRIu16 "\n",
            server_addr.port);
     event_queue_init(&queue);
-    sock_udp_event_init(&server_sock, &queue, _udp_recv);
+    sock_udp_event_init(&server_sock, &queue, _udp_recv, NULL);
     event_loop(&queue);
     return NULL;
 }
