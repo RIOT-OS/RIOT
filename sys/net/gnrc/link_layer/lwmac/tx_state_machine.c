@@ -53,6 +53,7 @@ static uint8_t _send_bcast(gnrc_netif_t *netif)
 {
     assert(netif != NULL);
 
+    netdev_t *dev = netif->context;
     uint8_t tx_info = 0;
     gnrc_pktsnip_t *pkt = netif->mac.tx.packet;
     bool first = false;
@@ -94,7 +95,7 @@ static uint8_t _send_bcast(gnrc_netif_t *netif)
 
         /* No Auto-ACK for broadcast packets */
         netopt_enable_t autoack = NETOPT_DISABLE;
-        netif->dev->driver->set(netif->dev, NETOPT_AUTOACK, &autoack,
+        dev->driver->set(dev, NETOPT_AUTOACK, &autoack,
                                 sizeof(autoack));
         first = true;
     }
@@ -146,6 +147,7 @@ static uint8_t _send_wr(gnrc_netif_t *netif)
 {
     assert(netif != NULL);
 
+    netdev_t *dev = netif->context;
     uint8_t tx_info = 0;
     gnrc_pktsnip_t *pkt;
     gnrc_pktsnip_t *pkt_lwmac;
@@ -209,7 +211,7 @@ static uint8_t _send_wr(gnrc_netif_t *netif)
 
     /* Disable Auto ACK */
     netopt_enable_t autoack = NETOPT_DISABLE;
-    netif->dev->driver->set(netif->dev, NETOPT_AUTOACK, &autoack,
+    dev->driver->set(dev, NETOPT_AUTOACK, &autoack,
                             sizeof(autoack));
 
     /* Prepare WR, this will discard any frame in the transceiver that has
@@ -374,24 +376,25 @@ static bool _send_data(gnrc_netif_t *netif)
 {
     assert(netif != NULL);
 
+    netdev_t *dev = netif->context;
     gnrc_pktsnip_t *pkt = netif->mac.tx.packet;
     gnrc_pktsnip_t *pkt_payload;
 
     assert(pkt != NULL);
     /* Enable Auto ACK again */
     netopt_enable_t autoack = NETOPT_ENABLE;
-    netif->dev->driver->set(netif->dev, NETOPT_AUTOACK,
+    dev->driver->set(dev, NETOPT_AUTOACK,
                             &autoack, sizeof(autoack));
 
     /* It's okay to retry sending DATA. Timing doesn't matter anymore and
      * destination is waiting for a certain amount of time. */
     uint8_t csma_retries = CONFIG_GNRC_LWMAC_DATA_CSMA_RETRIES;
-    netif->dev->driver->set(netif->dev, NETOPT_CSMA_RETRIES,
+    dev->driver->set(dev, NETOPT_CSMA_RETRIES,
                             &csma_retries, sizeof(csma_retries));
 
     netif->mac.mac_info |= GNRC_NETIF_MAC_INFO_CSMA_ENABLED;
     netopt_enable_t csma_enable = NETOPT_ENABLE;
-    netif->dev->driver->set(netif->dev, NETOPT_CSMA,
+    dev->driver->set(dev, NETOPT_CSMA,
                             &csma_enable, sizeof(csma_enable));
 
     pkt_payload = pkt->next;
@@ -530,6 +533,7 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
 {
     assert(netif != NULL);
 
+    netdev_t *dev = netif->context;
     bool reschedule = false;
 
     switch (netif->mac.tx.state) {
@@ -558,11 +562,11 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
                 (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
                 /* Set CSMA retries as configured and enable */
                 uint8_t csma_retries = CONFIG_GNRC_LWMAC_BROADCAST_CSMA_RETRIES;
-                netif->dev->driver->set(netif->dev, NETOPT_CSMA_RETRIES,
+                dev->driver->set(dev, NETOPT_CSMA_RETRIES,
                                         &csma_retries, sizeof(csma_retries));
                 netif->mac.mac_info |= GNRC_NETIF_MAC_INFO_CSMA_ENABLED;
                 netopt_enable_t csma_enable = NETOPT_ENABLE;
-                netif->dev->driver->set(netif->dev, NETOPT_CSMA,
+                dev->driver->set(dev, NETOPT_CSMA,
                                         &csma_enable, sizeof(csma_enable));
 
                 netif->mac.tx.state = GNRC_LWMAC_TX_STATE_SEND_BROADCAST;
@@ -573,7 +577,7 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
                 /* Use CSMA for the first WR */
                 netif->mac.mac_info |= GNRC_NETIF_MAC_INFO_CSMA_ENABLED;
                 netopt_enable_t csma_disable = NETOPT_ENABLE;
-                netif->dev->driver->set(netif->dev, NETOPT_CSMA,
+                dev->driver->set(dev, NETOPT_CSMA,
                                         &csma_disable, sizeof(csma_disable));
                 /* Set a timeout for the maximum transmission procedure */
                 gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_NO_RESPONSE, GNRC_LWMAC_PREAMBLE_DURATION_US);
@@ -656,7 +660,7 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
                 /* Only the first WR use CSMA */
                 netif->mac.mac_info &= ~GNRC_NETIF_MAC_INFO_CSMA_ENABLED;
                 netopt_enable_t csma_disable = NETOPT_DISABLE;
-                netif->dev->driver->set(netif->dev, NETOPT_CSMA,
+                dev->driver->set(dev, NETOPT_CSMA,
                                         &csma_disable, sizeof(csma_disable));
             }
 

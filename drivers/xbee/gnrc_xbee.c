@@ -30,7 +30,7 @@
 
 static gnrc_pktsnip_t *xbee_adpt_recv(gnrc_netif_t *netif)
 {
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     int pktlen;
     int xhdr_len;
     gnrc_pktsnip_t *payload;
@@ -116,12 +116,12 @@ static int xbee_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     hdr = (gnrc_netif_hdr_t *)pkt->data;
     if (hdr->flags & BCAST) {
         uint16_t addr = 0xffff;
-        res = xbee_build_hdr((xbee_t *)netif->dev, xhdr, size, &addr, 2);
+        res = xbee_build_hdr((xbee_t *)netif->context, xhdr, size, &addr, 2);
         DEBUG("[xbee-gnrc] send: preparing to send broadcast\n");
     }
     else {
         uint8_t *addr = gnrc_netif_hdr_get_dst_addr(hdr);
-        res = xbee_build_hdr((xbee_t *)netif->dev, xhdr, size, addr,
+        res = xbee_build_hdr((xbee_t *)netif->context, xhdr, size, addr,
                              hdr->dst_l2addr_len);
         if (res < 0) {
             if (res == -EOVERFLOW) {
@@ -152,7 +152,8 @@ static int xbee_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     };
 
     DEBUG("[xbee-gnrc] send: triggering the drivers send function\n");
-    res = netif->dev->driver->send(netif->dev, &iolist);
+    netdev_t *_dev = netif->context;
+    res = _dev->driver->send(_dev, &iolist);
 
     gnrc_pktbuf_release(pkt);
 

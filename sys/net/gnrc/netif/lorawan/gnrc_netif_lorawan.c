@@ -161,7 +161,7 @@ static void _memcpy_reversed(uint8_t *dst, uint8_t *src, size_t size)
 netdev_t *gnrc_lorawan_get_netdev(gnrc_lorawan_t *mac)
 {
     gnrc_netif_t *netif = container_of(mac, gnrc_netif_t, lorawan.mac);
-    return netif->dev;
+    return netif->context;
 }
 
 static int _init(gnrc_netif_t *netif)
@@ -170,7 +170,8 @@ static int _init(gnrc_netif_t *netif)
     if (res < 0) {
         return res;
     }
-    netif->dev->event_callback = _driver_cb;
+    netdev_t *dev = netif->context;
+    dev->event_callback = _driver_cb;
     _reset(netif);
 
     /* Initialize default keys, address and EUIs */
@@ -218,7 +219,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
 
 static void _msg_handler(gnrc_netif_t *netif, msg_t *msg)
 {
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     switch (msg->type) {
         case NETDEV_MSG_TYPE_EVENT:
             dev->driver->isr(dev);
@@ -241,6 +242,7 @@ static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
     int res = 0;
     uint32_t tmp;
 
+    netdev_t *dev = netif->context;
     mlme_confirm_t mlme_confirm;
     mlme_request_t mlme_request;
     switch (opt->opt) {
@@ -278,7 +280,7 @@ static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             res = sizeof(uint32_t);
             break;
         default:
-            res = netif->dev->driver->get(netif->dev, opt->opt, opt->data, opt->data_len);
+            res = dev->driver->get(dev, opt->opt, opt->data, opt->data_len);
             break;
     }
     return res;
@@ -289,6 +291,7 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
     int res = 0;
     mlme_confirm_t mlme_confirm;
     mlme_request_t mlme_request;
+    netdev_t *dev = netif->context;
 
     gnrc_netif_acquire(netif);
     switch (opt->opt) {
@@ -373,7 +376,7 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
             gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request, &mlme_confirm);
             break;
         default:
-            res = netif->dev->driver->set(netif->dev, opt->opt, opt->data, opt->data_len);
+            res = dev->driver->set(dev, opt->opt, opt->data, opt->data_len);
             break;
     }
     gnrc_netif_release(netif);

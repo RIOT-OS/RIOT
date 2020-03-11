@@ -47,8 +47,8 @@
 
 int _gnrc_gomach_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
-    netdev_t *dev = netif->dev;
-    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
+    netdev_t *dev = netif->context;
+    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->context;
     gnrc_netif_hdr_t *netif_hdr;
     const uint8_t *src, *dst = NULL;
     int res = 0;
@@ -158,7 +158,7 @@ static int _parse_packet(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
     assert(info != NULL);
     assert(pkt != NULL);
 
-    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
+    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->context;
     /* Get the packet sequence number */
     info->seq = ieee802154_get_seq(pkt->next->data);
 
@@ -298,7 +298,8 @@ void gnrc_gomach_set_netdev_state(gnrc_netif_t *netif, netopt_state_t devstate)
 {
     assert(netif != NULL);
 
-    netif->dev->driver->set(netif->dev,
+    netdev_t *dev = netif->context;
+    dev->driver->set(dev,
                             NETOPT_STATE,
                             &devstate,
                             sizeof(devstate));
@@ -328,9 +329,10 @@ int gnrc_gomach_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, netopt_enable_t c
 {
     assert(netif != NULL);
     assert(pkt != NULL);
+    netdev_t *dev = netif->context;
 
     /* Enable/disable CSMA according to the input. */
-    netif->dev->driver->set(netif->dev, NETOPT_CSMA, &csma_enable,
+    dev->driver->set(dev, NETOPT_CSMA, &csma_enable,
                             sizeof(netopt_enable_t));
 
     gnrc_gomach_set_tx_finish(netif, false);

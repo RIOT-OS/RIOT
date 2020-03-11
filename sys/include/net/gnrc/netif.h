@@ -115,7 +115,7 @@ typedef struct gnrc_netif_ops gnrc_netif_ops_t;
 typedef struct {
     netif_t netif;                          /**< network interface descriptor */
     const gnrc_netif_ops_t *ops;            /**< Operations of the network interface */
-    netdev_t *dev;                          /**< Network device of the network interface */
+    void *context;                          /**< Network device of the network interface */
     rmutex_t mutex;                         /**< Mutex of the interface */
 #ifdef MODULE_NETSTATS_L2
     netstats_t stats;                       /**< transceiver's statistics */

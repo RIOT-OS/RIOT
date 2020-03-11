@@ -71,8 +71,8 @@ int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
     rmutex_init(&netif->mutex);
     netif->ops = ops;
     netif_register((netif_t*) netif);
-    assert(netif->dev == NULL);
-    netif->dev = netdev;
+    assert(netif->context == NULL);
+    netif->context = netdev;
     res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,
                         _gnrc_netif_thread, (void *)netif, name);
     (void)res;
@@ -990,7 +990,7 @@ static void *_gnrc_netif_thread(void *args)
         /* unregister this netif instance */
         netif->ops = NULL;
         netif->pid = KERNEL_PID_UNDEF;
-        netif->dev = NULL;
+        netif->context = NULL;
         return NULL;
     }
 #if DEVELHELP

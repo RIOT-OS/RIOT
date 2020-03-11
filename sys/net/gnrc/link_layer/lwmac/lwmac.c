@@ -144,9 +144,9 @@ static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
 
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     netdev_ieee802154_rx_info_t rx_info;
-    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
+    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->context;
     gnrc_pktsnip_t *pkt = NULL;
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
 
@@ -893,7 +893,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
 static void _lwmac_msg_handler(gnrc_netif_t *netif, msg_t *msg)
 {
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     switch (msg->type) {
         case NETDEV_MSG_TYPE_EVENT:
             dev->driver->isr(dev);
@@ -949,7 +949,7 @@ static int _lwmac_init(gnrc_netif_t *netif)
     if (res < 0) {
         return res;
     }
-    dev = netif->dev;
+    dev = netif->context;
     dev->event_callback = _lwmac_event_cb;
 
     /* RTT is used for scheduling wakeup */

@@ -158,7 +158,7 @@ static int _run_test(int argc, char **argv)
         xtimer_usleep(200);
     }
     /* activate dumping of sent ethernet frames */
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->context,
                             _dump_etherframe);
     /* first, test forwarding without subscription */
     subscribers = gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6,

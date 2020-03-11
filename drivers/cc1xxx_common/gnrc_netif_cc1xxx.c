@@ -35,7 +35,7 @@
 
 static gnrc_pktsnip_t *cc1xxx_adpt_recv(gnrc_netif_t *netif)
 {
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     cc1xxx_rx_info_t rx_info;
     int pktlen;
     gnrc_pktsnip_t *payload;
@@ -110,7 +110,7 @@ static int cc1xxx_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     int res;
     size_t size;
-    cc1xxx_t *cc1xxx_dev = (cc1xxx_t *)netif->dev;
+    cc1xxx_t *cc1xxx_dev = (cc1xxx_t *)netif->context;
     gnrc_netif_hdr_t *netif_hdr;
     cc1xxx_l2hdr_t l2hdr;
 
@@ -151,7 +151,8 @@ static int cc1xxx_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     };
 
     DEBUG("[cc1xxx-gnrc] send: triggering the drivers send function\n");
-    res = netif->dev->driver->send(netif->dev, &iolist);
+    netdev_t *_dev = netif->context;
+    res = _dev->driver->send(_dev, &iolist);
 
     gnrc_pktbuf_release(pkt);
 

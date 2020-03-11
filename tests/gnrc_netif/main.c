@@ -126,7 +126,7 @@ static void test_creation(void)
     TEST_ASSERT_NOT_NULL((ptr = gnrc_netif_iter(ptr)));
     TEST_ASSERT_NULL((ptr = gnrc_netif_iter(ptr)));
     TEST_ASSERT_NOT_NULL(ethernet_netif.ops);
-    TEST_ASSERT_NOT_NULL(ethernet_netif.dev);
+    TEST_ASSERT_NOT_NULL(ethernet_netif.context);
     TEST_ASSERT_EQUAL_INT(ETHERNET_DATA_LEN, ethernet_netif.ipv6.mtu);
     TEST_ASSERT_EQUAL_INT(CONFIG_GNRC_NETIF_DEFAULT_HL, ethernet_netif.cur_hl);
     TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_ETHERNET, ethernet_netif.device_type);
@@ -145,7 +145,7 @@ static void test_creation(void)
     TEST_ASSERT_NOT_NULL((ptr = gnrc_netif_iter(ptr)));
     TEST_ASSERT_NULL((ptr = gnrc_netif_iter(ptr)));
     TEST_ASSERT_NOT_NULL(ieee802154_netif.ops);
-    TEST_ASSERT_NOT_NULL(ieee802154_netif.dev);
+    TEST_ASSERT_NOT_NULL(ieee802154_netif.context);
     TEST_ASSERT_EQUAL_INT(IPV6_MIN_MTU, ieee802154_netif.ipv6.mtu);
     TEST_ASSERT_EQUAL_INT(TEST_IEEE802154_MAX_FRAG_SIZE,
                           ieee802154_netif.sixlo.max_frag_size);
@@ -164,7 +164,7 @@ static void test_creation(void)
                 GNRC_NETIF_PRIO, "netif", devs[i], &default_ops
             )), 0);
         TEST_ASSERT_NOT_NULL(netifs[i].ops);
-        TEST_ASSERT_NOT_NULL(netifs[i].dev);
+        TEST_ASSERT_NOT_NULL(netifs[i].context);
         TEST_ASSERT_EQUAL_INT(CONFIG_GNRC_NETIF_DEFAULT_HL, netifs[i].cur_hl);
         TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_TEST, netifs[i].device_type);
         TEST_ASSERT(netifs[i].pid > KERNEL_PID_UNDEF);

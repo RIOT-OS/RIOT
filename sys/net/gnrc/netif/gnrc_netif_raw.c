@@ -50,7 +50,7 @@ static inline uint8_t _get_version(uint8_t *data)
 
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
     gnrc_pktsnip_t *pkt = NULL;
 
@@ -105,7 +105,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         pkt = gnrc_pktbuf_remove_snip(pkt, pkt);
     }
 
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
 
 #ifdef MODULE_NETSTATS_L2
     netif->stats.tx_unicast_count++;

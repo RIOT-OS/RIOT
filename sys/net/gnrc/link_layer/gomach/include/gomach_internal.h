@@ -637,7 +637,8 @@ static inline void gnrc_gomach_set_autoack(gnrc_netif_t *netif, netopt_enable_t 
 {
     assert(netif != NULL);
 
-    netif->dev->driver->set(netif->dev,
+    netdev_t *dev = netif->context;
+    dev->driver->set(dev,
                             NETOPT_AUTOACK,
                             &autoack,
                             sizeof(autoack));
@@ -654,7 +655,8 @@ static inline void gnrc_gomach_set_ack_req(gnrc_netif_t *netif, netopt_enable_t 
 {
     assert(netif != NULL);
 
-    netif->dev->driver->set(netif->dev,
+    netdev_t *dev = netif->context;
+    dev->driver->set(dev,
                             NETOPT_ACK_REQ,
                             &ack_req,
                             sizeof(ack_req));
@@ -672,9 +674,10 @@ static inline netopt_state_t gnrc_gomach_get_netdev_state(gnrc_netif_t *netif)
 {
     assert(netif != NULL);
 
+    netdev_t *dev = netif->context;
     netopt_state_t state;
 
-    if (0 < netif->dev->driver->get(netif->dev,
+    if (0 < dev->driver->get(dev,
                                     NETOPT_STATE,
                                     &state,
                                     sizeof(state))) {
@@ -694,7 +697,7 @@ static inline void gnrc_gomach_turn_channel(gnrc_netif_t *netif, uint16_t channe
 {
     assert(netif != NULL);
 
-    netif->dev->driver->set(netif->dev,
+    dev->driver->set(dev,
                             NETOPT_CHANNEL,
                             &channel_num,
                             sizeof(channel_num));

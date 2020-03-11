@@ -37,7 +37,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     uint8_t mac[ESP_NOW_ADDR_LEN];
     esp_now_pkt_hdr_t esp_hdr;
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
 
     assert(pkt != NULL);
 
@@ -96,7 +96,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     esp_now_netdev_t *esp_now = (esp_now_netdev_t*)dev;
 
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);

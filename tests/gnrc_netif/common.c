@@ -71,7 +71,7 @@ static int _dump_send_packet(netdev_t *netdev, const iolist_t *iolist)
 void _test_trigger_recv(gnrc_netif_t *netif, const uint8_t *data,
                         size_t data_len)
 {
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
 
     expect(data_len <= ETHERNET_DATA_LEN);
     if ((data != NULL) || (data_len > 0)) {

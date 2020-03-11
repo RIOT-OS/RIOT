@@ -103,8 +103,9 @@ static int gnrc_nrfmin_send(gnrc_netif_t *dev, gnrc_pktsnip_t *pkt)
         .iol_len = NRFMIN_HDR_LEN
     };
 
+    netdev_t *_dev = netif->context;
     /* and finally send out the data and release the packet */
-    res = dev->dev->driver->send(dev->dev, &iolist);
+    res = _dev->driver->send(_dev, &iolist);
 
 out:
     gnrc_pktbuf_release(pkt);

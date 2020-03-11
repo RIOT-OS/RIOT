@@ -34,8 +34,8 @@
 
 int _gnrc_lwmac_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
-    netdev_t *dev = netif->dev;
-    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
+    netdev_t *dev = netif->context;
+    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->context;
     gnrc_netif_hdr_t *netif_hdr;
     const uint8_t *src, *dst = NULL;
     int res = 0;
@@ -186,7 +186,8 @@ int _gnrc_lwmac_parse_packet(gnrc_pktsnip_t *pkt, gnrc_lwmac_packet_info_t *info
 
 void _gnrc_lwmac_set_netdev_state(gnrc_netif_t *netif, netopt_state_t devstate)
 {
-    netif->dev->driver->set(netif->dev,
+    netdev_t *dev = netif->context;
+    dev->driver->set(dev,
                             NETOPT_STATE,
                             &devstate,
                             sizeof(devstate));
@@ -216,7 +217,8 @@ netopt_state_t _gnrc_lwmac_get_netdev_state(gnrc_netif_t *netif)
 {
     netopt_state_t state;
 
-    if (0 < netif->dev->driver->get(netif->dev,
+    netdev_t *dev = netif->context;
+    if (0 < dev->driver->get(dev,
                                     NETOPT_STATE,
                                     &state,
                                     sizeof(state))) {

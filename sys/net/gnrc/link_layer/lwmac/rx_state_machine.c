@@ -178,7 +178,8 @@ static bool _send_wa(gnrc_netif_t *netif)
 
     /* Disable Auto ACK */
     netopt_enable_t autoack = NETOPT_DISABLE;
-    netif->dev->driver->set(netif->dev, NETOPT_AUTOACK, &autoack,
+    netdev_t *dev = netif->context;
+    dev->driver->set(dev, NETOPT_AUTOACK, &autoack,
                             sizeof(autoack));
 
     /* Send WA */
@@ -191,7 +192,7 @@ static bool _send_wa(gnrc_netif_t *netif)
 
     /* Enable Auto ACK again for data reception */
     autoack = NETOPT_ENABLE;
-    netif->dev->driver->set(netif->dev, NETOPT_AUTOACK, &autoack,
+    dev->driver->set(dev, NETOPT_AUTOACK, &autoack,
                             sizeof(autoack));
 
     return true;
@@ -278,6 +279,8 @@ static uint8_t _packet_process_in_wait_for_data(gnrc_netif_t *netif)
 
 void gnrc_lwmac_rx_start(gnrc_netif_t *netif)
 {
+    netdev_t *dev = netif->context;
+
     if (netif == NULL) {
         return;
     }
@@ -288,7 +291,7 @@ void gnrc_lwmac_rx_start(gnrc_netif_t *netif)
     /* Don't attempt to send a WA if channel is busy to get timings right */
     netif->mac.mac_info &= ~GNRC_NETIF_MAC_INFO_CSMA_ENABLED;
     netopt_enable_t csma_disable = NETOPT_DISABLE;
-    netif->dev->driver->set(netif->dev, NETOPT_CSMA, &csma_disable,
+    dev->driver->set(dev, NETOPT_CSMA, &csma_disable,
                             sizeof(csma_disable));
 
     netif->mac.rx.state = GNRC_LWMAC_RX_STATE_INIT;

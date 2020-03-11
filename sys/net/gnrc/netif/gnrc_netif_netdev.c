@@ -177,8 +177,8 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             break;
     }
     if (res == -ENOTSUP) {
-        res = netif->dev->driver->get(netif->dev, opt->opt, opt->data,
-                                      opt->data_len);
+        netdev_t *dev = netif->context;
+        res = dev->driver->get(dev, opt->opt, opt->data, opt->data_len);
     }
     gnrc_netif_release(netif);
     return res;
@@ -188,6 +188,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                                const gnrc_netapi_opt_t *opt)
 {
     int res = -ENOTSUP;
+    netdev_t *dev = netif->context;
 
     gnrc_netif_acquire(netif);
     switch (opt->opt) {
@@ -286,7 +287,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                 netif->flags &= ~GNRC_NETIF_FLAGS_RAWMODE;
             }
             /* Also propagate to the netdev device */
-            netif->dev->driver->set(netif->dev, NETOPT_RAWMODE, opt->data,
+            dev->driver->set(dev, NETOPT_RAWMODE, opt->data,
                                       opt->data_len);
             res = sizeof(netopt_enable_t);
             break;
@@ -294,7 +295,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             break;
     }
     if (res == -ENOTSUP) {
-        res = netif->dev->driver->set(netif->dev, opt->opt, opt->data,
+        res = dev->driver->set(dev, opt->opt, opt->data,
                                       opt->data_len);
         if (res > 0) {
             switch (opt->opt) {
@@ -309,7 +310,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                     break;
                 case NETOPT_STATE:
                     if (*((netopt_state_t *)opt->data) == NETOPT_STATE_RESET) {
-                        _configure_netdev(netif->dev);
+                        _configure_netdev(dev);
                     }
                     break;
                 default:
@@ -340,7 +341,7 @@ static void _configure_netdev(netdev_t *dev)
 static void _init_from_device(gnrc_netif_t *netif)
 {
     int res;
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     uint16_t tmp;
 
     res = dev->driver->get(dev, NETOPT_DEVICE_TYPE, &tmp, sizeof(tmp));
@@ -353,7 +354,7 @@ static void _init_from_device(gnrc_netif_t *netif)
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif)
 {
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     int res;
     netopt_t opt = gnrc_netif_get_l2addr_opt(netif);
 
@@ -399,10 +400,12 @@ static void _test_options(gnrc_netif_t *netif)
     uint8_t dummy_addr[GNRC_NETIF_L2ADDR_MAXLEN] = { 0 };
     ndp_opt_t dummy_opt = { .len = 1U };
     uint64_t tmp64 = 0ULL;
+    netdev_t *dev = netif->context;
 
     (void)dummy_addr;
     (void)dummy_opt;
     (void)tmp64;
+    (void)dev;
 #if (GNRC_NETIF_L2ADDR_MAXLEN > 0)
     /* check if address was set in _update_l2addr_from_dev()
      * (NETOPT_DEVICE_TYPE already tested in _configure_netdev()) and
@@ -450,15 +453,15 @@ static void _test_options(gnrc_netif_t *netif)
 #else /* IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU) */
             assert(netif->ipv6.mtu == IPV6_MIN_MTU);
 #endif /* IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU) */
-            assert(-ENOTSUP != netif->dev->driver->get(netif->dev, NETOPT_PROTO,
-                                                       &tmp, sizeof(tmp)));
+            assert(-ENOTSUP != dev->driver->get(dev, NETOPT_PROTO,
+                                                &tmp, sizeof(tmp)));
 #else   /* IS_USED(MODULE_GNRC_NETIF_6LO) */
             assert(netif->ipv6.mtu < UINT16_MAX);
 #endif  /* IS_USED(MODULE_GNRC_NETIF_6LO) */
 #endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
             assert((netif->device_type != NETDEV_TYPE_IEEE802154) ||
-                   (-ENOTSUP != netif->dev->driver->get(netif->dev,
+                   (-ENOTSUP != dev->driver->get(dev,
                                                         NETOPT_ADDRESS_LONG,
                                                         &dummy_addr,
                                                         sizeof(dummy_addr))));
@@ -517,7 +520,7 @@ static void _event_handler_isr(event_t *evp)
 int gnrc_netif_default_init_netdev(gnrc_netif_t *netif)
 {
     gnrc_netif_acquire(netif);
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     netif->pid = sched_active_pid;
 
 #if IS_USED(MODULE_GNRC_NETIF_EVENTS)
@@ -556,7 +559,7 @@ int gnrc_netif_default_init_netdev(gnrc_netif_t *netif)
 
 void gnrc_netif_msg_handler_netdev(gnrc_netif_t *netif, msg_t *msg)
 {
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     switch(msg->type) {
         case NETDEV_MSG_TYPE_EVENT:
             DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_EVENT received\n");

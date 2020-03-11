@@ -42,7 +42,7 @@ netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif)
     defined(MODULE_NORDIC_SOFTDEVICE_BLE) || defined(MODULE_NIMBLE_NETIF)
         case NETDEV_TYPE_IEEE802154:
         case NETDEV_TYPE_BLE: {
-                netdev_t *dev = netif->dev;
+                netdev_t *dev = netif->context;
                 int r;
                 uint16_t tmp;
 
@@ -75,7 +75,7 @@ int gnrc_netif_eui64_from_addr(const gnrc_netif_t *netif,
                  * provided */
                 switch (addr_len) {
                     case IEEE802154_SHORT_ADDRESS_LEN: {
-                        netdev_t *dev = netif->dev;
+                        netdev_t *dev = netif->context;
                         return dev->driver->get(dev, NETOPT_ADDRESS_LONG, eui64,
                                                 sizeof(eui64_t));
                     }
@@ -128,7 +128,7 @@ void gnrc_netif_init_6ln(gnrc_netif_t *netif)
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
 void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
 {
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     int res;
     uint16_t tmp;
 

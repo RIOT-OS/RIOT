@@ -87,7 +87,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     gnrc_pktsnip_t *payload;
     int res;
 
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
 
     if (pkt == NULL) {
         DEBUG("gnrc_netif_ethernet: pkt was NULL\n");
@@ -168,7 +168,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
-    netdev_t *dev = netif->dev;
+    netdev_t *dev = netif->context;
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
     gnrc_pktsnip_t *pkt = NULL;
 
