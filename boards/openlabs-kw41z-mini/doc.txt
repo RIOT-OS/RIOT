@@ -11,6 +11,9 @@ source files located at https://openlabs.co/OSHW/kw41z-mini
 A driver for the radio transceiver is available in [#12277](https://github.com/RIOT-OS/RIOT/pull/12277)
 (802.15.4 only).
 
+@note A version of this board exists that comes with the `M41W8VT4` (256k ROM)
+instead of the `M41W9VT4` (512k ROM). The boards are otherwise identical.
+See @ref boards_openlabs-kw41z-mini-256kib if you happen to have this version.
 
 ### Programming Pinout
 
