@@ -51,7 +51,7 @@ static void _tcp_recv(sock_tcp_t *sock, sock_async_flags_t flags, void *arg)
 {
     sock_tcp_ep_t client;
 
-    (void)arg;
+    assert(strcmp(arg, "test") == 0);
     if (sock_tcp_get_remote(sock, &client) < 0) {
         /* socket was disconnected between event firing and this handler */
         return;
@@ -89,7 +89,7 @@ static void _tcp_recv(sock_tcp_t *sock, sock_async_flags_t flags, void *arg)
 static void _tcp_accept(sock_tcp_queue_t *queue, sock_async_flags_t flags,
                         void *arg)
 {
-    (void)arg;
+    assert(strcmp(arg, "test") == 0);
     if (flags & SOCK_ASYNC_CONN_RECV) {
         sock_tcp_t *sock = NULL;
         int res;
@@ -100,7 +100,7 @@ static void _tcp_accept(sock_tcp_queue_t *queue, sock_async_flags_t flags,
         else {
             sock_tcp_ep_t client;
 
-            sock_tcp_event_init(sock, &_ev_queue, _tcp_recv, NULL);
+            sock_tcp_event_init(sock, &_ev_queue, _tcp_recv, "test");
             sock_tcp_get_remote(sock, &client);
 #ifdef MODULE_LWIP_IPV6
             ipv6_addr_to_str(_addr_str, (ipv6_addr_t *)&client.addr.ipv6,
@@ -132,7 +132,7 @@ static void *_server_thread(void *args)
     printf("Success: started TCP server on port %" PRIu16 "\n",
            server_addr.port);
     event_queue_init(&_ev_queue);
-    sock_tcp_queue_event_init(&server_queue, &_ev_queue, _tcp_accept, NULL);
+    sock_tcp_queue_event_init(&server_queue, &_ev_queue, _tcp_accept, "test");
     event_loop(&_ev_queue);
     return NULL;
 }

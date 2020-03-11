@@ -46,7 +46,7 @@ static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
 
 static void _ip_recv(sock_ip_t *sock, sock_async_flags_t flags, void *arg)
 {
-    (void)arg;
+    assert(strcmp(arg, "test") == 0);
     if (flags & SOCK_ASYNC_MSG_RECV) {
         sock_ip_ep_t src;
         int res;
@@ -90,7 +90,7 @@ static void *_server_thread(void *args)
     server_running = true;
     printf("Success: started IP server on protocol %u\n", protocol);
     event_queue_init(&queue);
-    sock_ip_event_init(&server_sock, &queue, _ip_recv, NULL);
+    sock_ip_event_init(&server_sock, &queue, _ip_recv, "test");
     event_loop(&queue);
     return NULL;
 }
