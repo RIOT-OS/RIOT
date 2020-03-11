@@ -119,12 +119,11 @@ while getopts ehI: opt; do
 done
 
 PREFIX="$1"
-shift
-
 if [ -z "$PREFIX" ]; then
     usage $0
     exit 1
 fi
+shift
 
 create_tun && \
 if [ ${SLIP_ONLY} -ne 1 ]; then
