@@ -14,6 +14,7 @@
  */
 
 #include <stdio.h>
+#include <kernel_defines.h>
 
 #include "net/gnrc/ipv6/nib/abr.h"
 
@@ -21,7 +22,7 @@
 #include "_nib-internal.h"
 
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
-#if GNRC_IPV6_NIB_CONF_6LBR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
 int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr)
 {
     _nib_abr_entry_t *abr;
@@ -55,7 +56,7 @@ void gnrc_ipv6_nib_abr_del(const ipv6_addr_t *addr)
     _nib_abr_remove(addr);
     _nib_release();
 }
-#endif  /* GNRC_IPV6_NIB_CONF_6LBR */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LBR */
 
 bool gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *entry)
 {

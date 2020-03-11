@@ -148,7 +148,7 @@ void dhcpv6_client_conf_prefix(unsigned iface, const ipv6_addr_t *pfx,
         }
         gnrc_ipv6_nib_pl_set(netif->pid, pfx, pfx_len, valid, pref);
         if (IS_USED(MODULE_GNRC_IPV6_NIB) &&
-            GNRC_IPV6_NIB_CONF_6LBR &&
+            IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) &&
             GNRC_IPV6_NIB_CONF_MULTIHOP_P6C &&
             gnrc_netif_is_6ln(netif)) {
             if (IS_USED(MODULE_GNRC_SIXLOWPAN_CTX)) {

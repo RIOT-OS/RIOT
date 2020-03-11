@@ -14,6 +14,7 @@
  */
 
 #include <stdio.h>
+#include <kernel_defines.h>
 
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif.h"
@@ -297,14 +298,14 @@ static int _nib_route(int argc, char **argv)
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
 static void _usage_nib_abr(char **argv)
 {
-#if GNRC_IPV6_NIB_CONF_6LBR
-    printf("usage: %s %s [show|add|del|help]\n", argv[0], argv[1]);
-    printf("       %s %s add <ipv6 global addr>\n",
-           argv[0], argv[1]);
-    printf("       %s %s del <ipv6 global addr>\n", argv[0], argv[1]);
-#else   /* GNRC_IPV6_NIB_CONF_6LBR */
-    printf("usage: %s %s [show|help]\n", argv[0], argv[1]);
-#endif  /* GNRC_IPV6_NIB_CONF_6LBR */
+    if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
+        printf("usage: %s %s [show|add|del|help]\n", argv[0], argv[1]);
+        printf("       %s %s add <ipv6 global addr>\n", argv[0], argv[1]);
+        printf("       %s %s del <ipv6 global addr>\n", argv[0], argv[1]);
+    }
+    else {
+        printf("usage: %s %s [show|help]\n", argv[0], argv[1]);
+    }
     printf("       %s %s show\n", argv[0], argv[1]);
 }
 
@@ -321,7 +322,7 @@ static int _nib_abr(int argc, char **argv)
     else if ((argc > 2) && (strcmp(argv[2], "help") == 0)) {
         _usage_nib_abr(argv);
     }
-#if GNRC_IPV6_NIB_CONF_6LBR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
     else if ((argc > 3) && (strcmp(argv[2], "del") == 0)) {
         ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
 
@@ -355,7 +356,7 @@ static int _nib_abr(int argc, char **argv)
             return 1;
         }
     }
-#endif  /* GNRC_IPV6_NIB_CONF_6LBR */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LBR */
     else {
         _usage_nib_abr(argv);
         return 1;

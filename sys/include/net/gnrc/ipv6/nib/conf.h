@@ -21,14 +21,16 @@
 #ifndef NET_GNRC_IPV6_NIB_CONF_H
 #define NET_GNRC_IPV6_NIB_CONF_H
 
+#include <kernel_defines.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* some pseudo-module based configuration, doc: see below */
 #ifdef MODULE_GNRC_IPV6_NIB_6LBR
-#ifndef GNRC_IPV6_NIB_CONF_6LBR
-#define GNRC_IPV6_NIB_CONF_6LBR         1
+#ifndef CONFIG_GNRC_IPV6_NIB_6LBR
+#define CONFIG_GNRC_IPV6_NIB_6LBR      1
 #endif
 #ifndef GNRC_IPV6_NIB_CONF_SLAAC
 #define GNRC_IPV6_NIB_CONF_SLAAC        1
@@ -84,15 +86,15 @@ extern "C" {
 /**
  * @brief   enable features for 6Lo border router
  */
-#ifndef GNRC_IPV6_NIB_CONF_6LBR
-#define GNRC_IPV6_NIB_CONF_6LBR         0
+#ifndef CONFIG_GNRC_IPV6_NIB_6LBR
+#define CONFIG_GNRC_IPV6_NIB_6LBR         0
 #endif
 
 /**
  * @brief    enable features for 6Lo router
  */
 #ifndef GNRC_IPV6_NIB_CONF_6LR
-#if GNRC_IPV6_NIB_CONF_6LBR
+#if CONFIG_GNRC_IPV6_NIB_6LBR
 #define GNRC_IPV6_NIB_CONF_6LR          1
 #else
 #define GNRC_IPV6_NIB_CONF_6LR          0
@@ -126,7 +128,7 @@ extern "C" {
  */
 #ifndef GNRC_IPV6_NIB_CONF_ADV_ROUTER
 #if GNRC_IPV6_NIB_CONF_ROUTER && \
-    (!GNRC_IPV6_NIB_CONF_6LR || GNRC_IPV6_NIB_CONF_6LBR)
+    (!GNRC_IPV6_NIB_CONF_6LR || CONFIG_GNRC_IPV6_NIB_6LBR)
 #define GNRC_IPV6_NIB_CONF_ADV_ROUTER   1
 #else
 #define GNRC_IPV6_NIB_CONF_ADV_ROUTER   0

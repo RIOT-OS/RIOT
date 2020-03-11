@@ -15,6 +15,7 @@
 
 #include <errno.h>
 #include <stdbool.h>
+#include <kernel_defines.h>
 
 #include "log.h"
 #include "net/ipv6/addr.h"
@@ -637,13 +638,13 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                             byteorder_ntohs(abro->ltime) * SEC_PER_MIN *
                             MS_PER_SEC);
     }
-#if !GNRC_IPV6_NIB_CONF_6LBR
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
     else if (gnrc_netif_is_6lr(netif)) {
         DEBUG("nib: multihop prefix and context dissemination on router activated,\n"
               "     but no ABRO found. Discarding router advertisement silently\n");
         return;
     }
-#endif  /* !GNRC_IPV6_NIB_CONF_6LBR */
+#endif  /* !CONFIG_GNRC_IPV6_NIB_6LBR */
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
     if (rtr_adv->ltime.u16 != 0) {
         uint16_t rtr_ltime = byteorder_ntohs(rtr_adv->ltime);

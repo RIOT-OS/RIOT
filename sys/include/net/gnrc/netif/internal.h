@@ -21,6 +21,8 @@
 #ifndef NET_GNRC_NETIF_INTERNAL_H
 #define NET_GNRC_NETIF_INTERNAL_H
 
+#include <kernel_defines.h>
+
 #include "net/gnrc/netif.h"
 #include "net/l2util.h"
 #include "net/netopt.h"
@@ -430,7 +432,7 @@ static inline bool gnrc_netif_is_6lr(const gnrc_netif_t *netif)
  *          according to RFC 6775
  *
  * @attention   Requires prior locking
- * @note        Assumed to be false, when @ref GNRC_IPV6_NIB_CONF_6LBR == 0.
+ * @note        Assumed to be false, when @ref CONFIG_GNRC_IPV6_NIB_6LBR == 0.
  *
  * @param[in] netif the network interface
  *
@@ -441,7 +443,7 @@ static inline bool gnrc_netif_is_6lr(const gnrc_netif_t *netif)
  */
 static inline bool gnrc_netif_is_6lbr(const gnrc_netif_t *netif)
 {
-    if (IS_ACTIVE(GNRC_IPV6_NIB_CONF_6LBR)) {
+    if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
         return (netif->flags & GNRC_NETIF_FLAGS_6LO_ABR) &&
                gnrc_netif_is_6lr(netif);
     }

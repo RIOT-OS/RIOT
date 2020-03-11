@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#include <kernel_defines.h>
+
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/netapi.h"
@@ -151,7 +153,7 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
     else if (!ipv6_addr_is_unspecified(&_prefix)) {
         gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
                         &_prefix, sizeof(_prefix));
-#if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
+#if defined(MODULE_GNRC_IPV6_NIB) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) && \
     GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
         gnrc_ipv6_nib_abr_del(&_prefix);
 #endif
@@ -171,7 +173,7 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
          * list */
         _update_6ctx((ipv6_addr_t *)prefix, prefix_len);
 #endif
-#if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
+#if defined(MODULE_GNRC_IPV6_NIB) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) && \
         GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
         gnrc_ipv6_nib_abr_add((ipv6_addr_t *)prefix);
 #endif
