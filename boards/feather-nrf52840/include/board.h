@@ -40,12 +40,12 @@ extern "C" {
 #define LED1_MASK           (1 << 10)
 #define LED_MASK            (LED0_MASK | LED1_MASK)
 
-#define LED0_ON             (LED_PORT->OUTCLR = LED0_MASK)
-#define LED0_OFF            (LED_PORT->OUTSET = LED0_MASK)
+#define LED0_ON             (LED_PORT->OUTSET = LED0_MASK)
+#define LED0_OFF            (LED_PORT->OUTCLR = LED0_MASK)
 #define LED0_TOGGLE         (LED_PORT->OUT   ^= LED0_MASK)
 
-#define LED1_ON             (LED_PORT->OUTCLR = LED1_MASK)
-#define LED1_OFF            (LED_PORT->OUTSET = LED1_MASK)
+#define LED1_ON             (LED_PORT->OUTSET = LED1_MASK)
+#define LED1_OFF            (LED_PORT->OUTCLR = LED1_MASK)
 #define LED1_TOGGLE         (LED_PORT->OUT   ^= LED1_MASK)
 /** @} */
 
