@@ -19,9 +19,8 @@
 
 #ifdef MODULE_AT86RF215
 
-#ifndef AT86RF215_DISABLE_SUBGHZ
-#define USE_DUALBAND (GNRC_NETIF_NUMOF >= 2)
-#endif
+/* AT86RF215M only has a sub-GHz interface */
+#define USE_DUALBAND !(IS_USED(AT86RF215_DISABLE_SUBGHZ) || IS_USED(MODULE_AT86RF215M))
 
 #include "log.h"
 #include "board.h"
