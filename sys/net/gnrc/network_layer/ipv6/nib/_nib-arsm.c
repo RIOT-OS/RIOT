@@ -415,7 +415,7 @@ void _recalc_reach_time(gnrc_netif_ipv6_t *netif)
                                             netif->reach_time_base + half);
     _evtimer_add(netif, GNRC_IPV6_NIB_RECALC_REACH_TIME,
                  &netif->recalc_reach_time,
-                 GNRC_IPV6_NIB_CONF_REACH_TIME_RESET);
+                 CONFIG_GNRC_IPV6_NIB_REACH_TIME_RESET);
 }
 
 void _set_reachable(gnrc_netif_t *netif, _nib_onl_entry_t *nce)

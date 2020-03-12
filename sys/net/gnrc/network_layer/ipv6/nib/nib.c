@@ -681,7 +681,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         if (reach_time != netif->ipv6.reach_time_base) {
             _evtimer_add(netif, GNRC_IPV6_NIB_RECALC_REACH_TIME,
                          &netif->ipv6.recalc_reach_time,
-                         GNRC_IPV6_NIB_CONF_REACH_TIME_RESET);
+                         CONFIG_GNRC_IPV6_NIB_REACH_TIME_RESET);
             netif->ipv6.reach_time_base = reach_time;
             _recalc_reach_time(&netif->ipv6);
         }

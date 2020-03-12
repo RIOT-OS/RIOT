@@ -218,8 +218,8 @@ extern "C" {
  *
  * @see [RFC 4861, section 6.3.4](https://tools.ietf.org/html/rfc4861#section-6.3.4)
  */
-#ifndef GNRC_IPV6_NIB_CONF_REACH_TIME_RESET
-#define GNRC_IPV6_NIB_CONF_REACH_TIME_RESET (7200000U)
+#ifndef CONFIG_GNRC_IPV6_NIB_REACH_TIME_RESET
+#define CONFIG_GNRC_IPV6_NIB_REACH_TIME_RESET (7200000U)
 #endif
 
 /**
