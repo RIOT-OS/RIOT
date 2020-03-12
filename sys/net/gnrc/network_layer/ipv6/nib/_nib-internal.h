@@ -585,7 +585,7 @@ static inline void _nib_offl_remove(_nib_offl_entry_t *nib_offl, uint8_t mode)
     _nib_offl_clear(nib_offl);
 }
 
-#if GNRC_IPV6_NIB_CONF_DC || DOXYGEN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DC) || DOXYGEN
 /**
  * @brief   Creates or gets an existing destination cache entry by its addresses
  *
@@ -596,7 +596,7 @@ static inline void _nib_offl_remove(_nib_offl_entry_t *nib_offl, uint8_t mode)
  *                      *May also be a global address!*
  * @param[in] iface     The interface to the destination.
  *
- * @note    Only available if @ref GNRC_IPV6_NIB_CONF_DC.
+ * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_DC.
  *
  * @return  A new or existing off-link entry with _nib_offl_entry_t::pfx set to
  *          @p pfx.
@@ -617,13 +617,13 @@ static inline _nib_offl_entry_t *_nib_dc_add(const ipv6_addr_t *next_hop,
  *
  * Corresponding on-link entry is removed, too.
  *
- * @note    Only available if @ref GNRC_IPV6_NIB_CONF_DC.
+ * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_DC.
  */
 static inline void _nib_dc_remove(_nib_offl_entry_t *nib_offl)
 {
     _nib_offl_remove(nib_offl, _DC);
 }
-#endif /* GNRC_IPV6_NIB_CONF_DC */
+#endif /* CONFIG_GNRC_IPV6_NIB_DC */
 
 /**
  * @brief   Creates or gets an existing prefix list entry by its prefix

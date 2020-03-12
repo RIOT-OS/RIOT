@@ -173,11 +173,11 @@ extern "C" {
 /**
  * @brief   (de-)activate destination cache
  */
-#ifndef GNRC_IPV6_NIB_CONF_DC
+#ifndef CONFIG_GNRC_IPV6_NIB_DC
 #if CONFIG_GNRC_IPV6_NIB_REDIRECT
-#define GNRC_IPV6_NIB_CONF_DC               1
+#define CONFIG_GNRC_IPV6_NIB_DC               1
 #else
-#define GNRC_IPV6_NIB_CONF_DC               0
+#define CONFIG_GNRC_IPV6_NIB_DC               0
 #endif
 #endif
 

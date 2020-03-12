@@ -13,6 +13,7 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <kernel_defines.h>
 #include <inttypes.h>
 
 #include "net/ipv6/addr.h"
@@ -1634,7 +1635,7 @@ static void test_nib_offl_iter__three_elem_middle_removed(void)
     TEST_ASSERT_NULL(_nib_offl_iter(res));
 }
 
-#if GNRC_IPV6_NIB_CONF_DC
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DC)
 /*
  * Creates a destination cache entry.
  * Expected result: new entry should contain the given address and interface
@@ -2077,7 +2078,7 @@ Test *tests_gnrc_ipv6_nib_internal_tests(void)
         new_TestFixture(test_nib_offl_iter__one_elem),
         new_TestFixture(test_nib_offl_iter__three_elem),
         new_TestFixture(test_nib_offl_iter__three_elem_middle_removed),
-#if GNRC_IPV6_NIB_CONF_DC
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DC)
         new_TestFixture(test_nib_dc_add__success),
         new_TestFixture(test_nib_dc_remove),
 #endif

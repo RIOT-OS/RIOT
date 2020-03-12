@@ -269,9 +269,9 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                                     GNRC_IPV6_NIB_ROUTE_INFO_TYPE_RN,
                                     &route.dst,
                                     (void *)((intptr_t)route.dst_len));
-#if GNRC_IPV6_NIB_CONF_DC
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DC)
                 _nib_dc_add(&route.next_hop, netif->pid, dst);
-#endif  /* GNRC_IPV6_NIB_CONF_DC */
+#endif  /* CONFIG_GNRC_IPV6_NIB_DC */
             }
             else {
                 /* _resolve_addr releases pkt if not queued (in which case
