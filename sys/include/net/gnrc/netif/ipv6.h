@@ -19,6 +19,7 @@
 #define NET_GNRC_NETIF_IPV6_H
 
 #include <assert.h>
+#include <kernel_defines.h>
 
 #include "evtimer_msg.h"
 #include "net/ipv6/addr.h"
@@ -151,13 +152,13 @@ typedef struct {
      *          and @ref net_gnrc_ipv6_nib "NIB"
      */
     evtimer_msg_event_t search_rtr;
-#if GNRC_IPV6_NIB_CONF_6LN || GNRC_IPV6_NIB_CONF_SLAAC || DOXYGEN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || GNRC_IPV6_NIB_CONF_SLAAC || DOXYGEN
     /**
      * @brief   Timers for address re-registration
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6" and
      *          @ref net_gnrc_ipv6_nib "NIB" and if
-     *          @ref GNRC_IPV6_NIB_CONF_6LN != 0 or
+     *          @ref CONFIG_GNRC_IPV6_NIB_6LN != 0 or
      *          @ref GNRC_IPV6_NIB_CONF_SLAAC != 0
      * @note    Might also be usable in the later default SLAAC implementation
      *          for NS retransmission timers.

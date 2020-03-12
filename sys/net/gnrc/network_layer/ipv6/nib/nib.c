@@ -128,16 +128,16 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
 
     _init_iface_arsm(netif);
     netif->ipv6.retrans_time = NDP_RETRANS_TIMER_MS;
-#if GNRC_IPV6_NIB_CONF_SLAAC || GNRC_IPV6_NIB_CONF_6LN
+#if GNRC_IPV6_NIB_CONF_SLAAC || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     /* TODO: set differently dependent on GNRC_IPV6_NIB_CONF_SLAAC if
      * alternatives exist */
     netif->ipv6.aac_mode = GNRC_NETIF_AAC_AUTO;
-#endif  /* GNRC_IPV6_NIB_CONF_SLAAC || GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* GNRC_IPV6_NIB_CONF_SLAAC || CONFIG_GNRC_IPV6_NIB_6LN */
     _init_iface_router(netif);
     gnrc_netif_init_6ln(netif);
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     netif->ipv6.rs_sent = 0;
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     netif->ipv6.na_sent = 0;
     if (gnrc_netif_ipv6_group_join_internal(netif,
                                             &ipv6_addr_all_nodes_link_local) < 0) {
@@ -167,13 +167,13 @@ static bool _on_link(const ipv6_addr_t *dst, unsigned *iface)
 {
     _nib_offl_entry_t *entry = NULL;
 
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (*iface != 0) {
         if (gnrc_netif_is_6ln(gnrc_netif_get_by_pid(*iface))) {
             return ipv6_addr_is_link_local(dst);
         }
     }
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     while ((entry = _nib_offl_iter(entry))) {
         if ((entry->mode & _PL) && (entry->flags & _PFX_ON_LINK) &&
             (ipv6_addr_match_prefix(dst, &entry->pfx) >= entry->pfx_len)) {
@@ -377,11 +377,11 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
         case GNRC_IPV6_NIB_RTR_TIMEOUT:
             _handle_rtr_timeout(ctx);
             break;
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         case GNRC_IPV6_NIB_REREG_ADDRESS:
             _handle_rereg_address(ctx);
             break;
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
         case GNRC_IPV6_NIB_DAD:
             _handle_dad(ctx);
             break;
@@ -543,7 +543,7 @@ static void _handle_rtr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         _snd_rtr_advs(netif, &ipv6->src, false);
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     (void)nce;  /* NCE is not used */
 #endif
 }
@@ -690,7 +690,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     if (rtr_adv->retrans_timer.u32 != 0) {
         netif->ipv6.retrans_time = byteorder_ntohl(rtr_adv->retrans_timer);
     }
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if ((dr != NULL) && gnrc_netif_is_6ln(netif) &&
         !gnrc_netif_is_6lbr(netif)) {
         /* (register addresses already assigned but not valid yet)*/
@@ -701,7 +701,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             }
         }
     }
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     tmp_len = icmpv6_len - sizeof(ndp_rtr_adv_t);
     FOREACH_OPT(rtr_adv, opt, tmp_len) {
         switch (opt->type) {
@@ -729,7 +729,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                 break;
             }
             /* ABRO was already secured in the option check above */
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
             case NDP_OPT_6CTX:
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
                 next_timeout = _min(_handle_6co((icmpv6_hdr_t *)rtr_adv,
@@ -741,7 +741,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                                     next_timeout);
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
                 break;
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
 #if GNRC_IPV6_NIB_CONF_DNS
             case NDP_OPT_RDNSS:
                 next_timeout = _min(_handle_rdnsso(netif,
@@ -757,7 +757,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     /* stop sending router solicitations
      * see https://tools.ietf.org/html/rfc4861#section-6.3.7 */
     evtimer_del(&_nib_evtimer, &netif->ipv6.search_rtr.event);
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_6lbr(netif)) {
         _set_rtr_adv(netif);
         /* but re-fetch information from router in time */
@@ -765,7 +765,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                      &netif->ipv6.search_rtr, (next_timeout >> 2) * 3);
         /* i.e. 3/4 of the time before the earliest expires */
     }
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
 }
 
 static inline size_t _get_l2src(const gnrc_netif_t *netif, uint8_t *l2src)
@@ -1065,7 +1065,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 #if GNRC_IPV6_NIB_CONF_ARSM
         bool tl2ao_avail = false;
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         uint8_t aro_status = _ADDR_REG_STATUS_UNAVAIL;
 #endif
 
@@ -1078,14 +1078,14 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                     tl2ao_avail = true;
                     break;
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
                 case NDP_OPT_AR:
                     aro_status = _handle_aro(netif, ipv6,
                                              (const icmpv6_hdr_t *)nbr_adv,
                                              (const sixlowpan_nd_opt_ar_t *)opt,
                                              opt, nce);
                     break;
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
                 default:
                     DEBUG("nib: Ignoring unrecognized option type %u for NA\n",
                           opt->type);
@@ -1101,7 +1101,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             _handle_adv_l2(netif, nce, (icmpv6_hdr_t *)nbr_adv, NULL);
         }
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
-#if GNRC_IPV6_NIB_CONF_SLAAC && GNRC_IPV6_NIB_CONF_6LN
+#if GNRC_IPV6_NIB_CONF_SLAAC && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         /* 6Lo-ND duplicate address detection (DAD) was ignored by neighbor, try
          * traditional DAD */
         if ((aro_status == _ADDR_REG_STATUS_UNAVAIL) &&
@@ -1109,7 +1109,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             DEBUG("nib: No ARO in NA, falling back to classic DAD\n");
             _handle_dad(&ipv6->dst);
         }
-#elif GNRC_IPV6_NIB_CONF_6LN
+#elif IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         (void)aro_status;
 #endif
     }

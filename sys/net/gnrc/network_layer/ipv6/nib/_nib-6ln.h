@@ -12,13 +12,14 @@
  *
  * @file
  * @brief   Definitions related to 6Lo node (6LN) functionality of the NIB
- * @see     @ref GNRC_IPV6_NIB_CONF_6LN
+ * @see     @ref CONFIG_GNRC_IPV6_NIB_6LN
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 #ifndef PRIV_NIB_6LN_H
 #define PRIV_NIB_6LN_H
 
+#include <kernel_defines.h>
 #include <stdint.h>
 
 #include "net/gnrc/ipv6/nib/conf.h"
@@ -33,7 +34,7 @@
 extern "C" {
 #endif
 
-#if GNRC_IPV6_NIB_CONF_6LN || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || defined(DOXYGEN)
 /**
  * @brief   Additional (local) status to ARO status values for tentative
  *          addresses
@@ -134,7 +135,7 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
 uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
                      const sixlowpan_nd_opt_6ctx_t *sixco);
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
-#else   /* GNRC_IPV6_NIB_CONF_6LN || defined(DOXYGEN) */
+#else   /* CONFIG_GNRC_IPV6_NIB_6LN || defined(DOXYGEN) */
 #define _resolve_addr_from_ipv6(dst, netif, nce)    (false)
 /* _handle_aro() doesn't make sense without 6LR so don't even use it
  * => throw error in case it is compiled in => don't define it here as NOP macro
@@ -147,7 +148,7 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
 #else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
 #define _handle_6co(icmpv6, sixco)                  (UINT32_MAX)
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
-#endif  /* GNRC_IPV6_NIB_CONF_6LN || defined(DOXYGEN) */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN || defined(DOXYGEN) */
 
 
 #ifdef __cplusplus

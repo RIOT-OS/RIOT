@@ -189,7 +189,7 @@ extern "C" {
  * upstream router. The expected message context is an IPv6 address assigned to
  * one of the nodes interfaces.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_6LN != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_6LN != 0
  */
 #define GNRC_IPV6_NIB_REREG_ADDRESS         (0x4fcfU)
 

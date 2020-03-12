@@ -24,7 +24,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
@@ -293,9 +293,9 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
 #endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
     return ltime * SEC_PER_MIN * MS_PER_SEC;
 }
-#else  /* GNRC_IPV6_NIB_CONF_6LN */
+#else  /* CONFIG_GNRC_IPV6_NIB_6LN */
 typedef int dont_be_pedantic;
-#endif /* GNRC_IPV6_NIB_CONF_6LN */
+#endif /* CONFIG_GNRC_IPV6_NIB_6LN */
 
 
 /** @} */

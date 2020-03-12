@@ -16,6 +16,7 @@
  */
 
 #include <string.h>
+#include <kernel_defines.h>
 
 #include "bitfield.h"
 #include "net/ethernet.h"
@@ -1309,10 +1310,10 @@ static void _test_options(gnrc_netif_t *netif)
         assert(-ENOTSUP != gnrc_netif_ndp_addr_len_from_l2ao(netif,
                                                              &dummy_opt));
 #endif  /* MODULE_GNRC_IPV6 */
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         assert(-ENOTSUP != gnrc_netif_ipv6_iid_to_addr(netif, (eui64_t *)&tmp64,
                                                        dummy_addr));
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     }
 #endif /* (GNRC_NETIF_L2ADDR_MAXLEN > 0) */
     options_tested = true;

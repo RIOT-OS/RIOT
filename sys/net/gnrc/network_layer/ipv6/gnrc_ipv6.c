@@ -14,6 +14,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <kernel_defines.h>
 #include <stdbool.h>
 
 #include "byteorder.h"
@@ -387,7 +388,7 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
             (gnrc_netif_ipv6_addr_get_state(netif, idx) != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
         gnrc_netif_release(netif);
         if (invalid_src) {
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
             gnrc_pktsnip_t *icmpv6 = gnrc_pktsnip_search_type(ipv6,
                                                               GNRC_NETTYPE_ICMPV6);
             icmpv6_hdr_t *icmpv6_hdr;
@@ -402,11 +403,11 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
                       ipv6_addr_to_str(addr_str, &hdr->src, sizeof(addr_str)));
                 return -EADDRNOTAVAIL;
             }
-#else   /* GNRC_IPV6_NIB_CONF_6LN */
+#else   /* CONFIG_GNRC_IPV6_NIB_6LN */
             DEBUG("ipv6: preset packet source address %s is invalid\n",
                   ipv6_addr_to_str(addr_str, &hdr->src, sizeof(addr_str)));
             return -EADDRNOTAVAIL;
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
         }
     }
 

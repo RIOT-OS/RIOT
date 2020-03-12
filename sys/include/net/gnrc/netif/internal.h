@@ -381,7 +381,7 @@ static inline bool gnrc_netif_is_6lo(const gnrc_netif_t *netif)
  *          RFC 6775
  *
  * @attention   Requires prior locking
- * @note        Assumed to be false, when @ref GNRC_IPV6_NIB_CONF_6LN is 0.
+ * @note        Assumed to be false, when @ref CONFIG_GNRC_IPV6_NIB_6LN is 0.
  *
  * @param[in] netif the network interface
  *
@@ -392,7 +392,7 @@ static inline bool gnrc_netif_is_6lo(const gnrc_netif_t *netif)
  */
 static inline bool gnrc_netif_is_6ln(const gnrc_netif_t *netif)
 {
-    if (IS_ACTIVE(GNRC_IPV6_NIB_CONF_6LN)) {
+    if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)) {
         return (netif->flags & GNRC_NETIF_FLAGS_6LN);
     }
     else {

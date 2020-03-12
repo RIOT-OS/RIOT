@@ -50,8 +50,8 @@ extern "C" {
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_6LN
-#ifndef GNRC_IPV6_NIB_CONF_6LN
-#define GNRC_IPV6_NIB_CONF_6LN          1
+#ifndef CONFIG_GNRC_IPV6_NIB_6LN
+#define CONFIG_GNRC_IPV6_NIB_6LN           1
 #endif
 #ifndef GNRC_IPV6_NIB_CONF_SLAAC
 #define GNRC_IPV6_NIB_CONF_SLAAC        0
@@ -104,11 +104,11 @@ extern "C" {
 /**
  * @brief    enable features for 6Lo node
  */
-#ifndef GNRC_IPV6_NIB_CONF_6LN
+#ifndef CONFIG_GNRC_IPV6_NIB_6LN
 #if CONFIG_GNRC_IPV6_NIB_6LR
-#define GNRC_IPV6_NIB_CONF_6LN          1
+#define CONFIG_GNRC_IPV6_NIB_6LN   1
 #else
-#define GNRC_IPV6_NIB_CONF_6LN          0
+#define CONFIG_GNRC_IPV6_NIB_6LN   0
 #endif
 #endif
 
@@ -146,7 +146,7 @@ extern "C" {
  * @brief    queue packets for address resolution
  */
 #ifndef GNRC_IPV6_NIB_CONF_QUEUE_PKT
-#if GNRC_IPV6_NIB_CONF_6LN
+#if CONFIG_GNRC_IPV6_NIB_6LN
 #define GNRC_IPV6_NIB_CONF_QUEUE_PKT    0
 #else
 #define GNRC_IPV6_NIB_CONF_QUEUE_PKT    1
