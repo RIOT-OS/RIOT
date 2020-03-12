@@ -155,6 +155,9 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
             return;
         }
 
+        /* remember set senders port and address for later use */
+        pdu.udp_remote = &remote;
+
         /* validate class and type for incoming */
         switch (coap_get_code_class(&pdu)) {
         /* incoming request */
