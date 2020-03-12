@@ -9,6 +9,7 @@
 
 import os
 import sys
+from functools import partial
 from traceback import print_tb
 import pexpect
 
@@ -44,3 +45,16 @@ def run(testfunc, timeout=TIMEOUT, echo=True, traceback=False):
         print("")
         teardown_child(child)
     return 0
+
+
+def check_unittests(child, timeout=TIMEOUT, nb_tests=None):
+    _tests = r'\d+' if nb_tests is None else int(nb_tests)
+    child.expect(r'OK \({} tests\)'.format(_tests), timeout=timeout)
+
+
+def run_check_unittests(timeout=TIMEOUT, echo=True, traceback=False,
+                        nb_tests=None):
+    _unittests_func = partial(check_unittests,
+                              timeout=timeout, nb_tests=nb_tests)
+
+    return run(_unittests_func, timeout, echo, traceback)
