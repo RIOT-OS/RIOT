@@ -307,11 +307,11 @@ void gnrc_ipv6_nib_handle_pkt(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         case ICMPV6_NBR_ADV:
             _handle_nbr_adv(netif, ipv6, (ndp_nbr_adv_t *)icmpv6, icmpv6_len);
             break;
-#if GNRC_IPV6_NIB_CONF_REDIRECT
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_REDIRECT)
         case ICMPV6_REDIRECT:
             /* TODO */
             break;
-#endif  /* GNRC_IPV6_NIB_CONF_REDIRECT */
+#endif  /* CONFIG_GNRC_IPV6_NIB_REDIRECT */
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_DAD
         case ICMPV6_DAR:
             /* TODO */

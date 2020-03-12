@@ -174,7 +174,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
  */
 static inline uint32_t _exp_backoff_retrans_timer(uint8_t ns_sent,
                                                   uint32_t retrans_timer);
-#if GNRC_IPV6_NIB_CONF_REDIRECT
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_REDIRECT)
 /**
  * @brief   Checks if the carrier of the TL2AO was a redirect message
  *
@@ -185,10 +185,10 @@ static inline uint32_t _exp_backoff_retrans_timer(uint8_t ns_sent,
  *          ndp_opt_t::type == NDP_OPT_TL2A for @p tl2ao.
  */
 static inline bool _redirect_with_tl2ao(icmpv6_hdr_t *icmpv6, ndp_opt_t *tl2ao);
-#else   /* GNRC_IPV6_NIB_CONF_REDIRECT */
+#else   /* CONFIG_GNRC_IPV6_NIB_REDIRECT */
 /* just fall through if redirect not handled */
 #define _redirect_with_tl2ao(a, b)  (false)
-#endif  /* GNRC_IPV6_NIB_CONF_REDIRECT */
+#endif  /* CONFIG_GNRC_IPV6_NIB_REDIRECT */
 
 static inline bool _oflag_set(const ndp_nbr_adv_t *nbr_adv);
 static inline bool _sflag_set(const ndp_nbr_adv_t *nbr_adv);
@@ -467,12 +467,12 @@ static inline uint32_t _exp_backoff_retrans_timer(uint8_t ns_sent,
     return _exp_backoff_retrans_timer_factor(ns_sent, retrans_timer, factor);
 }
 
-#if GNRC_IPV6_NIB_CONF_REDIRECT
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_REDIRECT)
 static inline bool _redirect_with_tl2ao(icmpv6_hdr_t *icmpv6, ndp_opt_t *tl2ao)
 {
     return (icmpv6->type == ICMPV6_REDIRECT) && (tl2ao != NULL);
 }
-#endif  /* GNRC_IPV6_NIB_CONF_REDIRECT */
+#endif  /* CONFIG_GNRC_IPV6_NIB_REDIRECT */
 
 static inline bool _tl2ao_changes_nce(_nib_onl_entry_t *nce,
                                       const ndp_opt_t *tl2ao,

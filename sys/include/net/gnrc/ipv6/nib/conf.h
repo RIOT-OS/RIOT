@@ -166,18 +166,18 @@ extern "C" {
 /**
  * @brief    handle Redirect Messages
  */
-#ifndef GNRC_IPV6_NIB_CONF_REDIRECT
-#define GNRC_IPV6_NIB_CONF_REDIRECT     0
+#ifndef CONFIG_GNRC_IPV6_NIB_REDIRECT
+#define CONFIG_GNRC_IPV6_NIB_REDIRECT  0
 #endif
 
 /**
  * @brief   (de-)activate destination cache
  */
 #ifndef GNRC_IPV6_NIB_CONF_DC
-#if GNRC_IPV6_NIB_CONF_REDIRECT
-#define GNRC_IPV6_NIB_CONF_DC           1
+#if CONFIG_GNRC_IPV6_NIB_REDIRECT
+#define GNRC_IPV6_NIB_CONF_DC               1
 #else
-#define GNRC_IPV6_NIB_CONF_DC           0
+#define GNRC_IPV6_NIB_CONF_DC               0
 #endif
 #endif
 
