@@ -486,8 +486,19 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
     gpio_irq_enable(dev->params.gdo2);
 
     while ((dev->state & 0x07) == CC110X_STATE_TX_MODE) {
-        /* Block until mutex is unlocked from ISR */
-        mutex_lock(&dev->isr_signal);
+        uint64_t timeout = (dev->state != CC110X_STATE_TX_COMPLETING) ?
+                           2048 : 1024;
+        /* Block until mutex is unlocked from ISR, or a timeout occurs. The
+         * timeout prevents deadlocks when IRQs are lost. If the TX FIFO
+         * still needs to be filled, the timeout is 1024 µs - or after 32 Byte
+         * (= 50%) of the FIFO have been transmitted at 250 kbps. If
+         * no additional data needs to be fed into the FIFO, a timeout of
+         * 2048 µs is used instead to allow the frame to be completely drained
+         * before the timeout triggers. The ISR handler is prepared to be
+         * called prematurely, so we don't need to worry about extra calls
+         * to cc110x_isr() introduced by accident.
+         */
+        xtimer_mutex_lock_timeout(&dev->isr_signal, timeout);
         cc110x_isr(&dev->netdev);
     }
 
