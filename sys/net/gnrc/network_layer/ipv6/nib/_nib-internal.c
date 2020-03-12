@@ -36,7 +36,7 @@
 _nib_dr_entry_t *_prime_def_router = NULL;
 static clist_node_t _next_removable = { NULL };
 
-static _nib_onl_entry_t _nodes[GNRC_IPV6_NIB_NUMOF];
+static _nib_onl_entry_t _nodes[CONFIG_GNRC_IPV6_NIB_NUMOF];
 static _nib_offl_entry_t _dsts[GNRC_IPV6_NIB_OFFL_NUMOF];
 static _nib_dr_entry_t _def_routers[GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF];
 
@@ -93,7 +93,7 @@ _nib_onl_entry_t *_nib_onl_alloc(const ipv6_addr_t *addr, unsigned iface)
     DEBUG("nib: Allocating on-link node entry (addr = %s, iface = %u)\n",
           (addr == NULL) ? "NULL" : ipv6_addr_to_str(addr_str, addr,
                                                      sizeof(addr_str)), iface);
-    for (unsigned i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         _nib_onl_entry_t *tmp = &_nodes[i];
 
         if ((_nib_onl_get_if(tmp) == iface) && _addr_equals(addr, tmp)) {
@@ -204,7 +204,7 @@ _nib_onl_entry_t *_nib_nc_add(const ipv6_addr_t *addr, unsigned iface,
 _nib_onl_entry_t *_nib_onl_iter(const _nib_onl_entry_t *last)
 {
     for (const _nib_onl_entry_t *node = (last) ? last + 1 : _nodes;
-         node < (_nodes + GNRC_IPV6_NIB_NUMOF);
+         node < (_nodes + CONFIG_GNRC_IPV6_NIB_NUMOF);
          node++) {
         if (node->mode != _EMPTY) {
             /* const modifier provided to assure internal consistency.
@@ -220,7 +220,7 @@ _nib_onl_entry_t *_nib_onl_get(const ipv6_addr_t *addr, unsigned iface)
     assert(addr != NULL);
     DEBUG("nib: Getting on-link node entry (addr = %s, iface = %u)\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)), iface);
-    for (unsigned i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         _nib_onl_entry_t *node = &_nodes[i];
 
         if ((node->mode != _EMPTY) &&

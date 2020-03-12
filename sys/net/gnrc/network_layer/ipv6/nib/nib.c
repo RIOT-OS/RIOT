@@ -48,7 +48,7 @@
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
-static gnrc_pktqueue_t _queue_pool[GNRC_IPV6_NIB_NUMOF];
+static gnrc_pktqueue_t _queue_pool[CONFIG_GNRC_IPV6_NIB_NUMOF];
 #endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
@@ -1118,7 +1118,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
 static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
 {
-    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         if (_queue_pool[i].pkt == NULL) {
             _queue_pool[i].pkt = pkt;
             return &_queue_pool[i];

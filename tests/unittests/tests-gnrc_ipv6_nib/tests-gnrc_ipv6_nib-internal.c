@@ -39,7 +39,7 @@ static void set_up(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_NUMOF persistent entries with different IP addresses
+ * Creates CONFIG_GNRC_IPV6_NIB_NUMOF persistent entries with different IP addresses
  * and then tries to add another.
  * Expected result: should return NULL
  */
@@ -48,7 +48,7 @@ static void test_nib_alloc__no_space_left_diff_addr(void)
     ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                   { .u64 = TEST_UINT64 } } };
 
-    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         _nib_onl_entry_t *node;
 
         TEST_ASSERT_NOT_NULL((node = _nib_onl_alloc(&addr, IFACE)));
@@ -59,7 +59,7 @@ static void test_nib_alloc__no_space_left_diff_addr(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_NUMOF persistent entries with different interface
+ * Creates CONFIG_GNRC_IPV6_NIB_NUMOF persistent entries with different interface
  * identifiers and then tries to add another.
  * Expected result: should return NULL
  */
@@ -69,7 +69,7 @@ static void test_nib_alloc__no_space_left_diff_iface(void)
                                   { .u64 = TEST_UINT64 } } };
     unsigned iface = 1;
 
-    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         _nib_onl_entry_t *node;
 
         TEST_ASSERT_NOT_NULL((node = _nib_onl_alloc(&addr, iface)));
@@ -80,7 +80,7 @@ static void test_nib_alloc__no_space_left_diff_iface(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_NUMOF persistent entries with different IP addresses
+ * Creates CONFIG_GNRC_IPV6_NIB_NUMOF persistent entries with different IP addresses
  * and interface identifiers and then tries to add another.
  * Expected result: should return NULL
  */
@@ -90,7 +90,7 @@ static void test_nib_alloc__no_space_left_diff_addr_iface(void)
                                   { .u64 = TEST_UINT64 } } };
     unsigned iface = 1;
 
-    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         _nib_onl_entry_t *node;
 
         TEST_ASSERT_NOT_NULL((node = _nib_onl_alloc(&addr, iface)));
@@ -102,7 +102,7 @@ static void test_nib_alloc__no_space_left_diff_addr_iface(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_NUMOF persistent entries with different IP addresses
+ * Creates CONFIG_GNRC_IPV6_NIB_NUMOF persistent entries with different IP addresses
  * and interface identifiers and then tries to add another that is equal to the
  * last.
  * Expected result: should return not NULL (the last)
@@ -114,7 +114,7 @@ static void test_nib_alloc__success_duplicate(void)
                                   { .u64 = TEST_UINT64 } } };
     unsigned iface = 1;
 
-    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         addr.u64[1].u64++;
         iface++;
         TEST_ASSERT_NOT_NULL((node = _nib_onl_alloc(&addr, iface)));
@@ -362,7 +362,7 @@ static void test_nib_get__empty(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_NUMOF neighbor cache entries with different IP
+ * Creates CONFIG_GNRC_IPV6_NIB_NUMOF neighbor cache entries with different IP
  * addresses and a non-garbage-collectible AR state and then tries to add
  * another.
  * Expected result: should return NULL
@@ -372,7 +372,7 @@ static void test_nib_nc_add__no_space_left_diff_addr(void)
     ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                   { .u64 = TEST_UINT64 } } };
 
-    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         _nib_onl_entry_t *node;
 
         TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, IFACE,
@@ -385,7 +385,7 @@ static void test_nib_nc_add__no_space_left_diff_addr(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_NUMOF neighbor cache entries with different interface
+ * Creates CONFIG_GNRC_IPV6_NIB_NUMOF neighbor cache entries with different interface
  * identifiers and a non-garbage-collectible AR state and then tries to add
  * another.
  * Expected result: should return NULL
@@ -396,7 +396,7 @@ static void test_nib_nc_add__no_space_left_diff_iface(void)
                                   { .u64 = TEST_UINT64 } } };
     unsigned iface = 1;
 
-    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         _nib_onl_entry_t *node;
 
         TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, iface,
@@ -409,7 +409,7 @@ static void test_nib_nc_add__no_space_left_diff_iface(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_NUMOF neighbor cache entries with different IP
+ * Creates CONFIG_GNRC_IPV6_NIB_NUMOF neighbor cache entries with different IP
  * addresses and interface identifiers and a non-garbage-collectible AR state
  * and then tries to add another.
  * Expected result: should return NULL
@@ -420,7 +420,7 @@ static void test_nib_nc_add__no_space_left_diff_addr_iface(void)
                                   { .u64 = TEST_UINT64 } } };
     unsigned iface = 1;
 
-    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         _nib_onl_entry_t *node;
 
         TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, iface,
@@ -434,7 +434,7 @@ static void test_nib_nc_add__no_space_left_diff_addr_iface(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_NUMOF neighbor cache entries with different IP
+ * Creates CONFIG_GNRC_IPV6_NIB_NUMOF neighbor cache entries with different IP
  * addresses and interface identifiers and a non-garbage-collectible AR state
  * and then tries to add another that is equal to the last.
  * Expected result: should return not NULL (the last)
@@ -446,7 +446,7 @@ static void test_nib_nc_add__success_duplicate(void)
                                   { .u64 = TEST_UINT64 } } };
     unsigned iface = 0;
 
-    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         addr.u64[1].u64++;
         iface++;
         TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, iface,
@@ -477,7 +477,7 @@ static void test_nib_nc_add__success(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_NUMOF neighbor cache entries with different IP address.
+ * Creates CONFIG_GNRC_IPV6_NIB_NUMOF neighbor cache entries with different IP address.
  * Expected result: new entries should still be able to be created and further
  * should be different than the previous created ones
  */
@@ -487,7 +487,7 @@ static void test_nib_nc_add__success_full_but_garbage_collectible(void)
     ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                   { .u64 = TEST_UINT64 } } };
 
-    for (int i = 0; i < (3 * GNRC_IPV6_NIB_NUMOF); i++) {
+    for (int i = 0; i < (3 * CONFIG_GNRC_IPV6_NIB_NUMOF); i++) {
         TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, IFACE,
                                                  GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE)));
         TEST_ASSERT(last != node);
@@ -499,7 +499,7 @@ static void test_nib_nc_add__success_full_but_garbage_collectible(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_NUMOF neighbor cache entries with different IP
+ * Creates CONFIG_GNRC_IPV6_NIB_NUMOF neighbor cache entries with different IP
  * addresses and a garbage-collectible AR state and then tries to add
  * 3 more after removing two.
  * Expected result: should not crash
@@ -512,7 +512,7 @@ static void test_nib_nc_add__cache_out_crash(void)
     ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                   { .u64 = TEST_UINT64 } } };
 
-    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF - 2; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF - 2; i++) {
         TEST_ASSERT_NOT_NULL(_nib_nc_add(&addr, IFACE,
                                          GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE));
         addr.u64[1].u64++;
@@ -603,7 +603,7 @@ static void test_nib_drl_add__no_space_left_diff_addr(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_NUMOF persistent enties entries with
+ * Creates CONFIG_GNRC_IPV6_NIB_NUMOF persistent enties entries with
  * different IP addresses and then tries to add a default router list entry with
  * yet another address.
  * Expected result: should return NULL
@@ -613,7 +613,7 @@ static void test_nib_drl_add__no_space_left_nib_full(void)
     ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                   { .u64 = TEST_UINT64 } } };
 
-    for (int i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         _nib_onl_entry_t *node;
 
         TEST_ASSERT_NOT_NULL((node = _nib_onl_alloc(&addr, IFACE)));
@@ -1021,9 +1021,9 @@ static void test_nib_drl_get_dr__success4(void)
     TEST_ASSERT(nib_res != node2);
 }
 
-#if GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF
-#define MAX_NUMOF   (GNRC_IPV6_NIB_NUMOF)
-#else /* GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF */
+#if CONFIG_GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF
+#define MAX_NUMOF   (CONFIG_GNRC_IPV6_NIB_NUMOF)
+#else /* CONFIG_GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF */
 #define MAX_NUMOF   (GNRC_IPV6_NIB_OFFL_NUMOF)
 #endif
 

@@ -96,9 +96,9 @@ static void test_nib_pl_set__EINVAL_pfx_len(void)
                                                         UINT32_MAX));
 }
 
-#if GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF
-#define MAX_NUMOF   (GNRC_IPV6_NIB_NUMOF)
-#else /* GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF */
+#if CONFIG_GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF
+#define MAX_NUMOF   (CONFIG_GNRC_IPV6_NIB_NUMOF)
+#else /* CONFIG_GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF */
 #define MAX_NUMOF   (GNRC_IPV6_NIB_OFFL_NUMOF)
 #endif
 
@@ -335,7 +335,7 @@ static void test_nib_pl_set__success(void)
 /*
  * Creates MAX_NUMOF prefix list entries with different prefix and interfaces
  * and then tries to delete one with yet another prefix and interface.
- * Expected result: There should be still GNRC_IPV6_NIB_NUMOF entries in the
+ * Expected result: There should be still CONFIG_GNRC_IPV6_NIB_NUMOF entries in the
  * neighbor cache
  */
 static void test_nib_pl_del__unknown(void)

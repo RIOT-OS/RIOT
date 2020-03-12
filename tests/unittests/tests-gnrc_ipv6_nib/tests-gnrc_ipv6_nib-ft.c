@@ -212,9 +212,9 @@ static void test_nib_ft_add__EINVAL_iface0(void)
                                                         &next_hop, 0, 0));
 }
 
-#if GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF
-#define MAX_NUMOF   (GNRC_IPV6_NIB_NUMOF)
-#else /* GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF */
+#if CONFIG_GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF
+#define MAX_NUMOF   (CONFIG_GNRC_IPV6_NIB_NUMOF)
+#else /* CONFIG_GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF */
 #define MAX_NUMOF   (GNRC_IPV6_NIB_OFFL_NUMOF)
 #endif
 

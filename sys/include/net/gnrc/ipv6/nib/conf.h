@@ -35,8 +35,8 @@ extern "C" {
 #ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
 #define CONFIG_GNRC_IPV6_NIB_SLAAC     1
 #endif
-#ifndef GNRC_IPV6_NIB_NUMOF
-#define GNRC_IPV6_NIB_NUMOF             (16)
+#ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
+#define CONFIG_GNRC_IPV6_NIB_NUMOF          (16)
 #endif
 #endif
 
@@ -63,9 +63,9 @@ extern "C" {
 # ifndef CONFIG_GNRC_IPV6_NIB_ARSM
 # define CONFIG_GNRC_IPV6_NIB_ARSM         0
 # endif
-# ifndef GNRC_IPV6_NIB_NUMOF
+# ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
 /* only needs to store default router */
-# define GNRC_IPV6_NIB_NUMOF            (1)
+# define CONFIG_GNRC_IPV6_NIB_NUMOF            (1)
 # endif
 #endif
 #endif
@@ -254,8 +254,8 @@ extern "C" {
  * @attention   This number has direct influence on the maximum number of
  *              neighbors and duplicate address detection table entries
  */
-#ifndef GNRC_IPV6_NIB_NUMOF
-#define GNRC_IPV6_NIB_NUMOF                 (4)
+#ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
+#define CONFIG_GNRC_IPV6_NIB_NUMOF          (4)
 #endif
 
 /**
