@@ -75,7 +75,7 @@ void ps(void)
 #endif
            "state");
 
-#if defined(DEVELHELP) && defined(ISR_STACKSIZE)
+#if defined(DEVELHELP) && ISR_STACKSIZE
     int isr_usage = thread_isr_stack_usage();
     void *isr_start = thread_isr_stack_start();
     void *isr_sp = thread_isr_stack_pointer();

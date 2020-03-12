@@ -48,7 +48,9 @@ extern "C" {
 /* keep THREAD_STACKSIZE_IDLE > THREAD_EXTRA_STACKSIZE_PRINTF
  * to avoid not printing of debug in interrupts
  */
+#ifndef THREAD_STACKSIZE_IDLE
 #define THREAD_STACKSIZE_IDLE      (128)
+#endif
 /** @} */
 
 /**
