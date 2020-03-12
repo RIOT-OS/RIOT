@@ -234,7 +234,7 @@ typedef struct {
      * @brief   Bitfield marking the prefixes in the NIB's off-link entries
      *          disseminated by _nib_abr_entry_t::addr
      */
-    BITFIELD(pfxs, GNRC_IPV6_NIB_OFFL_NUMOF);
+    BITFIELD(pfxs, CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF);
     /**
      * @brief   Bitfield marking the contexts disseminated by
      *          _nib_abr_entry_t::addr

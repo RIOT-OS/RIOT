@@ -37,7 +37,7 @@ _nib_dr_entry_t *_prime_def_router = NULL;
 static clist_node_t _next_removable = { NULL };
 
 static _nib_onl_entry_t _nodes[CONFIG_GNRC_IPV6_NIB_NUMOF];
-static _nib_offl_entry_t _dsts[GNRC_IPV6_NIB_OFFL_NUMOF];
+static _nib_offl_entry_t _dsts[CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF];
 static _nib_dr_entry_t _def_routers[CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF];
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
@@ -480,7 +480,7 @@ _nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
           iface);
     DEBUG("pfx = %s/%u)\n", ipv6_addr_to_str(addr_str, pfx,
                                              sizeof(addr_str)), pfx_len);
-    for (unsigned i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         _nib_offl_entry_t *tmp = &_dsts[i];
         _nib_onl_entry_t *tmp_node = tmp->next_hop;
 
@@ -519,7 +519,7 @@ _nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
 
 static inline bool _in_dsts(const _nib_offl_entry_t *dst)
 {
-    return (dst < (_dsts + GNRC_IPV6_NIB_OFFL_NUMOF));
+    return (dst < (_dsts + CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF));
 }
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
@@ -662,7 +662,7 @@ void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
     _nib_offl_remove(nib_offl, _PL);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     unsigned idx = _idx_dsts(nib_offl);
-    if (idx < GNRC_IPV6_NIB_OFFL_NUMOF) {
+    if (idx < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF) {
         for (_nib_abr_entry_t *abr = _abrs; _in_abrs(abr); abr++) {
             if (bf_isset(abr->pfxs, idx)) {
                 DEBUG("nib: Removing prefix %s/%u ",
@@ -717,7 +717,7 @@ void _nib_abr_remove(const ipv6_addr_t *addr)
                                                                sizeof(addr_str)));
     for (_nib_abr_entry_t *abr = _abrs; _in_abrs(abr); abr++) {
         if (ipv6_addr_equal(addr, &abr->addr)) {
-            for (int i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
+            for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
                 if (bf_isset(abr->pfxs, i)) {
                     _nib_pl_remove(&_dsts[i]);
                 }
@@ -744,7 +744,7 @@ void _nib_abr_add_pfx(_nib_abr_entry_t *abr, const _nib_offl_entry_t *offl)
           offl->pfx_len);
     DEBUG("came from border router %s\n", ipv6_addr_to_str(addr_str, &abr->addr,
                                                            sizeof(addr_str)));
-    if (idx < GNRC_IPV6_NIB_OFFL_NUMOF) {
+    if (idx < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF) {
         bf_set(abr->pfxs, idx);
     }
 }
@@ -753,7 +753,7 @@ _nib_offl_entry_t *_nib_abr_iter_pfx(const _nib_abr_entry_t *abr,
                                      const _nib_offl_entry_t *last)
 {
     if ((last == NULL) ||
-        (_idx_dsts(last) < GNRC_IPV6_NIB_OFFL_NUMOF)) {
+        (_idx_dsts(last) < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF)) {
         /* we don't change `ptr`, so dropping const qualifier for now is okay */
         _nib_offl_entry_t *ptr = (_nib_offl_entry_t *)last;
 

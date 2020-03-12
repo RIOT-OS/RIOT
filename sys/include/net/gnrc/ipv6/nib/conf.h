@@ -255,7 +255,7 @@ extern "C" {
  *              neighbors and duplicate address detection table entries
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
-#define CONFIG_GNRC_IPV6_NIB_NUMOF          (4)
+#define CONFIG_GNRC_IPV6_NIB_NUMOF                 (4)
 #endif
 
 /**
@@ -264,8 +264,8 @@ extern "C" {
  * @attention   This number is equal to the maximum number of forwarding table
  *              and prefix list entries in NIB
  */
-#ifndef GNRC_IPV6_NIB_OFFL_NUMOF
-#define GNRC_IPV6_NIB_OFFL_NUMOF            (8)
+#ifndef CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF
+#define CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF            (8)
 #endif
 
 #if CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN)

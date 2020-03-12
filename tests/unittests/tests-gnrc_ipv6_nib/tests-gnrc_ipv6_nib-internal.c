@@ -1021,10 +1021,10 @@ static void test_nib_drl_get_dr__success4(void)
     TEST_ASSERT(nib_res != node2);
 }
 
-#if CONFIG_GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF
+#if CONFIG_GNRC_IPV6_NIB_NUMOF < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF
 #define MAX_NUMOF   (CONFIG_GNRC_IPV6_NIB_NUMOF)
-#else /* CONFIG_GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF */
-#define MAX_NUMOF   (GNRC_IPV6_NIB_OFFL_NUMOF)
+#else /* CONFIG_GNRC_IPV6_NIB_NUMOF < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF */
+#define MAX_NUMOF   (CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF)
 #endif
 
 /*
@@ -1099,7 +1099,7 @@ static void test_nib_offl_alloc__no_space_left_diff_next_hop_iface(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_OFFL_NUMOF off-link entries with different prefixes
+ * Creates CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF off-link entries with different prefixes
  * of the same length and then tries to add another.
  * Expected result: should return NULL
  */
@@ -1109,7 +1109,7 @@ static void test_nib_offl_alloc__no_space_left_diff_pfx(void)
                                                  { .u64 = TEST_UINT64 } } };
     ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
 
-    for (int i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         _nib_offl_entry_t *dst;
 
         TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
@@ -1198,7 +1198,7 @@ static void test_nib_offl_alloc__no_space_left_diff_next_hop_iface_pfx(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_OFFL_NUMOF off-link entries with different prefix
+ * Creates CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF off-link entries with different prefix
  * lengths and then tries to add another.
  * Expected result: should return NULL
  */
@@ -1209,7 +1209,7 @@ static void test_nib_offl_alloc__no_space_left_diff_pfx_len(void)
     static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
     unsigned pfx_len = GLOBAL_PREFIX_LEN;
 
-    for (int i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         _nib_offl_entry_t *dst;
         TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
                                                     pfx_len)));
@@ -1294,7 +1294,7 @@ static void test_nib_offl_alloc__no_space_left_diff_next_hop_iface_pfx_len(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_OFFL_NUMOF off-link entries with different prefixes
+ * Creates CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF off-link entries with different prefixes
  * and then tries to add another.
  * Expected result: should return NULL
  */
@@ -1305,7 +1305,7 @@ static void test_nib_offl_alloc__no_space_left_diff_pfx_pfx_len(void)
     ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
     unsigned pfx_len = GLOBAL_PREFIX_LEN;
 
-    for (int i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         _nib_offl_entry_t *dst;
 
         TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
