@@ -91,6 +91,10 @@
 #include <arpa/inet.h>
 #endif
 
+#ifdef MODULE_GCOAP
+#include "net/sock/udp.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -189,6 +193,11 @@ typedef struct {
     coap_optpos_t options[NANOCOAP_NOPTS_MAX];  /**< option offset array     */
 #ifdef MODULE_GCOAP
     uint32_t observe_value;                     /**< observe value           */
+    /**
+     * remote UDP endpoint. As of now, gcoap supports only UDP as transport, so
+     * we use sock_udp_ep_t here directly. If gcoap is extended to provide other
+     * transports, this probably needs to be changed to some union type here */
+    sock_udp_ep_t *udp_remote;
 #endif
 } coap_pkt_t;
 
