@@ -24,6 +24,7 @@
 
 #include "periph/timer.h"
 #include "random.h"
+#include "test_utils/expect.h"
 #include "thread.h"
 #include "msg.h"
 
@@ -95,7 +96,7 @@ int main(void)
     pid = thread_create(_stack, sizeof(_stack), THREAD_PRIORITY_MAIN + 1,
                         THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                         _thread, NULL, "nr2");
-    assert(pid != KERNEL_PID_UNDEF);
+    expect(pid != KERNEL_PID_UNDEF);
 
     while (1) {
         msg_t msg = { .type = CANARY_TYPE };

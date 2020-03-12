@@ -205,6 +205,9 @@ void usbdev_init_lowlevel(void)
     for (size_t i = 0; i < USBDEV_NUMOF; i++) {
         ep_idx += _setup(&_usbdevs[i], &stm32_usb_otg_fshs_config[i], ep_idx);
     }
+#ifdef NDEBUG
+    (void)ep_idx;
+#endif
     assert(ep_idx == _TOTAL_NUM_ENDPOINTS);
 }
 
@@ -416,7 +419,7 @@ static usbdev_ep_t *_get_ep(stm32_usb_otg_fshs_t *usbdev, unsigned num,
     return dir == USB_EP_DIR_IN ? &usbdev->in[num] : &usbdev->out[num];
 }
 
-#ifdef DEVELHELP
+#if defined(DEVELHELP) && !defined(NDEBUG)
 static size_t _total_fifo_size(const stm32_usb_otg_fshs_config_t *conf)
 {
     if (conf->type == STM32_USB_OTG_FS) {
@@ -435,7 +438,7 @@ static size_t _total_fifo_size(const stm32_usb_otg_fshs_config_t *conf)
     }
 
 }
-#endif /* DEVELHELP */
+#endif /* defined(DEVELHELP) && !defined(NDEBUG) */
 
 static void _configure_tx_fifo(stm32_usb_otg_fshs_t *usbdev, size_t num,
                                size_t len)

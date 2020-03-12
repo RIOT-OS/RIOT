@@ -23,6 +23,7 @@
 #include "net/ipv6.h"
 #include "net/netdev_test.h"
 #include "od.h"
+#include "test_utils/expect.h"
 
 static netdev_test_t _devs[GNRC_NETIF_NUMOF];
 
@@ -72,7 +73,7 @@ void _test_trigger_recv(gnrc_netif_t *netif, const uint8_t *data,
 {
     netdev_t *dev = netif->dev;
 
-    assert(data_len <= ETHERNET_DATA_LEN);
+    expect(data_len <= ETHERNET_DATA_LEN);
     if ((data != NULL) || (data_len > 0)) {
         tmp_buffer_bytes = data_len;
         memcpy(tmp_buffer, data, data_len);
@@ -80,7 +81,7 @@ void _test_trigger_recv(gnrc_netif_t *netif, const uint8_t *data,
     else {
         tmp_buffer_bytes = 0;
     }
-    assert(dev->event_callback);
+    expect(dev->event_callback);
     netdev_trigger_event_isr(dev);
 }
 
@@ -106,13 +107,13 @@ static int _netdev_recv(netdev_t *dev, char *buf, int len, void *info)
 
 static void _netdev_isr(netdev_t *dev)
 {
-    assert(dev->event_callback);
+    expect(dev->event_callback);
     dev->event_callback(dev, NETDEV_EVENT_RX_COMPLETE);
 }
 
 static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len)
 {
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     (void)max_len;
 
     netdev_test_t *dev = (netdev_test_t *)netdev;
@@ -131,15 +132,15 @@ static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len
 
 static int _get_netdev_proto(netdev_t *dev, void *value, size_t max_len)
 {
-    assert(dev == ieee802154_dev);
-    assert(max_len == sizeof(gnrc_nettype_t));
+    expect(dev == ieee802154_dev);
+    expect(max_len == sizeof(gnrc_nettype_t));
     *((gnrc_nettype_t *)value) = GNRC_NETTYPE_UNDEF;
     return sizeof(gnrc_nettype_t);
 }
 
 static int _get_netdev_max_packet_size(netdev_t *netdev, void *value, size_t max_len)
 {
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     (void)max_len;
 
     netdev_test_t *dev = (netdev_test_t *)netdev;

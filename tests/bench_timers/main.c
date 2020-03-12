@@ -39,6 +39,7 @@
 #include "board.h"
 #include "cpu.h"
 #include "periph/timer.h"
+#include "test_utils/expect.h"
 
 #include "print_results.h"
 #include "spin_random.h"
@@ -676,7 +677,7 @@ int main(void)
     print_str("state vector total memory usage = ");
     print_u32_dec(sizeof(ref_states));
     print_str(" bytes\n");
-    assert(log2test < TEST_LOG2NUM);
+    expect(log2test < TEST_LOG2NUM);
     print_str("TIM_TEST_DEV = ");
     print_u32_dec(TIM_TEST_DEV);
     print_str(", TIM_TEST_FREQ = ");

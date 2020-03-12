@@ -26,6 +26,7 @@
 #include "net/gnrc/sixlowpan/frag/vrb.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/netdev_test.h"
+#include "test_utils/expect.h"
 #include "thread.h"
 #include "xtimer.h"
 
@@ -252,7 +253,7 @@ static void run_unittests(void)
 
 static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len)
 {
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     (void)netdev;
 
     *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
@@ -261,7 +262,7 @@ static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len
 
 static int _get_netdev_proto(netdev_t *netdev, void *value, size_t max_len)
 {
-    assert(max_len == sizeof(gnrc_nettype_t));
+    expect(max_len == sizeof(gnrc_nettype_t));
     (void)netdev;
 
     *((gnrc_nettype_t *)value) = GNRC_NETTYPE_SIXLOWPAN;
@@ -271,7 +272,7 @@ static int _get_netdev_proto(netdev_t *netdev, void *value, size_t max_len)
 static int _get_netdev_max_pdu_size(netdev_t *netdev, void *value,
                                     size_t max_len)
 {
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     (void)netdev;
 
     *((uint16_t *)value) = sizeof(_test_6lo_payload);
@@ -281,7 +282,7 @@ static int _get_netdev_max_pdu_size(netdev_t *netdev, void *value,
 static int _get_netdev_src_len(netdev_t *netdev, void *value, size_t max_len)
 {
     (void)netdev;
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     *((uint16_t *)value) = sizeof(_test_dst);
     return sizeof(uint16_t);
 }
@@ -289,7 +290,7 @@ static int _get_netdev_src_len(netdev_t *netdev, void *value, size_t max_len)
 static int _get_netdev_addr_long(netdev_t *netdev, void *value, size_t max_len)
 {
     (void)netdev;
-    assert(max_len >= sizeof(_test_dst));
+    expect(max_len >= sizeof(_test_dst));
     memcpy(value, _test_dst, sizeof(_test_dst));
     return sizeof(_test_dst);
 }

@@ -39,6 +39,7 @@
 #include "od.h"
 #include "random.h"
 #include "shell.h"
+#include "test_utils/expect.h"
 #include "xtimer.h"
 
 #define TEST_SAMPLE         "This is a test. Failure might sometimes be an " \
@@ -640,7 +641,7 @@ static int unittests(int argc, char** argv)
 static int mock_get_device_type(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     *((uint16_t *)value) = NETDEV_TYPE_TEST;
     return sizeof(uint16_t);
 }
@@ -648,8 +649,8 @@ static int mock_get_device_type(netdev_t *dev, void *value, size_t max_len)
 static int mock_get_max_packet_size(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
-    assert(max_len == sizeof(uint16_t));
-    assert(eth_netif != NULL);
+    expect(max_len == sizeof(uint16_t));
+    expect(eth_netif != NULL);
     *((uint16_t *)value) = eth_netif->ipv6.mtu - 8;
     return sizeof(uint16_t);
 }

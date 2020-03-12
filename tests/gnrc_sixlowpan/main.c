@@ -35,6 +35,7 @@
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pktdump.h"
 #include "net/netdev_test.h"
+#include "test_utils/expect.h"
 #include "xtimer.h"
 
 #define IEEE802154_MAX_FRAG_SIZE    (102)
@@ -51,7 +52,7 @@ static const uint8_t _ieee802154_local_eui64[] = IEEE802154_LOCAL_EUI64;
 
 static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len)
 {
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     (void)netdev;
 
     *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
@@ -60,7 +61,7 @@ static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len
 
 static int _get_netdev_proto(netdev_t *netdev, void *value, size_t max_len)
 {
-    assert(max_len == sizeof(gnrc_nettype_t));
+    expect(max_len == sizeof(gnrc_nettype_t));
     (void)netdev;
 
     *((gnrc_nettype_t *)value) = GNRC_NETTYPE_SIXLOWPAN;
@@ -70,7 +71,7 @@ static int _get_netdev_proto(netdev_t *netdev, void *value, size_t max_len)
 static int _get_netdev_max_packet_size(netdev_t *netdev, void *value,
                                        size_t max_len)
 {
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     (void)netdev;
 
     *((uint16_t *)value) = IEEE802154_MAX_FRAG_SIZE;
@@ -80,7 +81,7 @@ static int _get_netdev_max_packet_size(netdev_t *netdev, void *value,
 static int _get_netdev_src_len(netdev_t *netdev, void *value, size_t max_len)
 {
     (void)netdev;
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     *((uint16_t *)value) = sizeof(_ieee802154_local_eui64);
     return sizeof(uint16_t);
 }
@@ -88,7 +89,7 @@ static int _get_netdev_src_len(netdev_t *netdev, void *value, size_t max_len)
 static int _get_netdev_addr_long(netdev_t *netdev, void *value, size_t max_len)
 {
     (void)netdev;
-    assert(max_len >= sizeof(_ieee802154_local_eui64));
+    expect(max_len >= sizeof(_ieee802154_local_eui64));
     memcpy(value, _ieee802154_local_eui64, sizeof(_ieee802154_local_eui64));
     return sizeof(_ieee802154_local_eui64);
 }

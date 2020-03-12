@@ -35,6 +35,7 @@
 #include "net/netdev_test.h"
 #include "net/netopt.h"
 #include "sched.h"
+#include "test_utils/expect.h"
 
 #include "net/gnrc/ndp.h"
 
@@ -1231,7 +1232,7 @@ static const gnrc_netif_ops_t _test_netif_ops = {
 static int _netdev_test_address_long(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
-    assert(max_len >= sizeof(test_src_l2));
+    expect(max_len >= sizeof(test_src_l2));
     memcpy(value, test_src_l2, sizeof(test_src_l2));
     return sizeof(test_src_l2);
 }
@@ -1239,7 +1240,7 @@ static int _netdev_test_address_long(netdev_t *dev, void *value, size_t max_len)
 static int _netdev_test_proto(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
-     assert(max_len == sizeof(gnrc_nettype_t));
+     expect(max_len == sizeof(gnrc_nettype_t));
      *((gnrc_nettype_t *)value) = GNRC_NETTYPE_UNDEF;
      return sizeof(gnrc_nettype_t);
 }
@@ -1247,7 +1248,7 @@ static int _netdev_test_proto(netdev_t *dev, void *value, size_t max_len)
 static int _netdev_test_src_len(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
-     assert(max_len == sizeof(uint16_t));
+     expect(max_len == sizeof(uint16_t));
      *((uint16_t *)value) = sizeof(test_src_l2);
      return sizeof(uint16_t);
 }
@@ -1255,7 +1256,7 @@ static int _netdev_test_src_len(netdev_t *dev, void *value, size_t max_len)
 static int _netdev_test_max_pdu_size(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
-     assert(max_len == sizeof(uint16_t));
+     expect(max_len == sizeof(uint16_t));
      *((uint16_t *)value) = 100U;
      return sizeof(uint16_t);
 }
@@ -1263,7 +1264,7 @@ static int _netdev_test_max_pdu_size(netdev_t *dev, void *value, size_t max_len)
 static int _netdev_test_device_type(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
-     assert(max_len == sizeof(uint16_t));
+     expect(max_len == sizeof(uint16_t));
      *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
      return sizeof(uint16_t);
 }

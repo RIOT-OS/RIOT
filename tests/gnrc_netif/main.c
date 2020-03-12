@@ -35,6 +35,7 @@
 #include "net/gnrc/netif/internal.h"
 #include "net/netdev_test.h"
 #include "net/netif.h"
+#include "test_utils/expect.h"
 #include "utlist.h"
 #include "xtimer.h"
 
@@ -1669,12 +1670,12 @@ static int _get_netdev_address(netdev_t *dev, void *value, size_t max_len)
     (void)max_len;
 
     if (dev == ethernet_dev) {
-        assert(max_len >= sizeof(ethernet_l2addr));
+        expect(max_len >= sizeof(ethernet_l2addr));
         memcpy(value, ethernet_l2addr, sizeof(ethernet_l2addr));
         return sizeof(ethernet_l2addr);
     }
     else if (dev == ieee802154_dev) {
-        assert(max_len >= sizeof(ieee802154_l2addr_short));
+        expect(max_len >= sizeof(ieee802154_l2addr_short));
         memcpy(value, ieee802154_l2addr_short, sizeof(ieee802154_l2addr_short));
         return sizeof(ieee802154_l2addr_short);
     }
@@ -1685,12 +1686,12 @@ static int _set_netdev_address(netdev_t *dev, const void *value,
                                size_t value_len)
 {
     if (dev == ethernet_dev) {
-        assert(value_len <= sizeof(ethernet_l2addr));
+        expect(value_len <= sizeof(ethernet_l2addr));
         memcpy(ethernet_l2addr, value, value_len);
         return value_len;
     }
     else if (dev == ieee802154_dev) {
-        assert(value_len <= sizeof(ieee802154_l2addr_short));
+        expect(value_len <= sizeof(ieee802154_l2addr_short));
         memcpy(ieee802154_l2addr_short, value, value_len);
         return value_len;
     }
@@ -1702,7 +1703,7 @@ static int _get_netdev_address_long(netdev_t *dev, void *value, size_t max_len)
     (void)max_len;
 
     if (dev == ieee802154_dev) {
-        assert(max_len >= sizeof(ieee802154_l2addr_long));
+        expect(max_len >= sizeof(ieee802154_l2addr_long));
         memcpy(value, ieee802154_l2addr_long, sizeof(ieee802154_l2addr_long));
         return sizeof(ieee802154_l2addr_long);
     }
@@ -1713,7 +1714,7 @@ static int _set_netdev_address_long(netdev_t *dev, const void *value,
                                     size_t value_len)
 {
     if (dev == ieee802154_dev) {
-        assert(value_len <= sizeof(ieee802154_l2addr_long));
+        expect(value_len <= sizeof(ieee802154_l2addr_long));
         memcpy(ieee802154_l2addr_long, value, value_len);
         return value_len;
     }
@@ -1725,7 +1726,7 @@ static int _get_netdev_src_len(netdev_t *dev, void *value, size_t max_len)
     (void)max_len;
 
     if (dev == ieee802154_dev) {
-        assert(max_len == sizeof(uint16_t));
+        expect(max_len == sizeof(uint16_t));
         *((uint16_t *)value) = ieee802154_l2addr_len;
         return sizeof(uint16_t);
     }
@@ -1738,7 +1739,7 @@ static int _set_netdev_src_len(netdev_t *dev, const void *value,
     (void)value_len;
 
     if (dev == ieee802154_dev) {
-        assert(value_len == sizeof(uint16_t));
+        expect(value_len == sizeof(uint16_t));
         ieee802154_l2addr_len = *((uint16_t *)value);
         return sizeof(uint16_t);
     }

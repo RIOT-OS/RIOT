@@ -26,6 +26,7 @@
 #include "net/sock/async/event.h"
 #include "net/sock/tcp.h"
 #include "shell.h"
+#include "test_utils/expect.h"
 #include "thread.h"
 #include "xtimer.h"
 
@@ -51,7 +52,7 @@ static void _tcp_recv(sock_tcp_t *sock, sock_async_flags_t flags, void *arg)
 {
     sock_tcp_ep_t client;
 
-    assert(strcmp(arg, "test") == 0);
+    expect(strcmp(arg, "test") == 0);
     if (sock_tcp_get_remote(sock, &client) < 0) {
         /* socket was disconnected between event firing and this handler */
         return;
@@ -89,7 +90,7 @@ static void _tcp_recv(sock_tcp_t *sock, sock_async_flags_t flags, void *arg)
 static void _tcp_accept(sock_tcp_queue_t *queue, sock_async_flags_t flags,
                         void *arg)
 {
-    assert(strcmp(arg, "test") == 0);
+    expect(strcmp(arg, "test") == 0);
     if (flags & SOCK_ASYNC_CONN_RECV) {
         sock_tcp_t *sock = NULL;
         int res;
