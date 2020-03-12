@@ -312,14 +312,14 @@ void gnrc_ipv6_nib_handle_pkt(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             /* TODO */
             break;
 #endif  /* CONFIG_GNRC_IPV6_NIB_REDIRECT */
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_DAD
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD)
         case ICMPV6_DAR:
             /* TODO */
             break;
         case ICMPV6_DAC:
             /* TODO */
             break;
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_DAD */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD */
     }
     _nib_release();
     gnrc_netif_release(netif);

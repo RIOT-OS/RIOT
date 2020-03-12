@@ -62,9 +62,9 @@ uint8_t _reg_addr_upstream(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
               aro->eui64.uint8[6], aro->eui64.uint8[7]);
         if ((nce == NULL) || !(nce->mode & _NC) ||
             (memcmp(&nce->eui64, &aro->eui64, sizeof(aro->eui64)) == 0)) {
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_DAD
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD)
             /* TODO */
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_DAD */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD */
             if (aro->ltime.u16 != 0) {
                 _handle_sl2ao(netif, ipv6, icmpv6, sl2ao);
                 /* re-get NCE in case it was updated */
@@ -112,12 +112,12 @@ gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif_t *netif,
                 DEBUG("nib: No space left in packet buffer. Not replying NS");
             }
         }
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_DAD
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD)
         else if (status != _ADDR_REG_STATUS_IGNORE) {
             DEBUG("nib: Address was marked TENTATIVE => not replying NS, "
                   "waiting for DAC\n");
         }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_DAD */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD */
     }
     return reply_aro;
 }

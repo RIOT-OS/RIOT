@@ -208,8 +208,8 @@ extern "C" {
  *
  * @see [RFC 6775, section 8.2](https://tools.ietf.org/html/rfc6775#section-8.2)
  */
-#ifndef GNRC_IPV6_NIB_CONF_MULTIHOP_DAD
-#define GNRC_IPV6_NIB_CONF_MULTIHOP_DAD 0
+#ifndef CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD
+#define CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD  0
 #endif
 /** @} */
 
