@@ -35,6 +35,8 @@ uint16_t at86rf215_get_addr_short(const at86rf215_t *dev, uint8_t filter)
         return 0;
     }
 
+    /* Each frame filter has a 2 byte short addr + 2 byte PAN ID, so we have to
+       skip 4 bytes per filter */
     return ntohs(at86rf215_reg_read16(dev, dev->BBC->RG_MACSHA0F0 + (4 * filter)));
 }
 
