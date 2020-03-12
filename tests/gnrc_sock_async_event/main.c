@@ -72,7 +72,7 @@ ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt)
 
 static void _recv_udp(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
 {
-    assert(strcmp(arg, "test") == 0);
+    expect(strcmp(arg, "test") == 0);
     printf("UDP event triggered: %04X\n", flags);
     if (flags & SOCK_ASYNC_MSG_RECV) {
         sock_udp_ep_t remote;
@@ -94,7 +94,7 @@ static void _recv_udp(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
 
 static void _recv_ip(sock_ip_t *sock, sock_async_flags_t flags, void *arg)
 {
-    assert(strcmp(arg, "test") == 0);
+    expect(strcmp(arg, "test") == 0);
     printf("IP event triggered: %04X\n", flags);
     if (flags & SOCK_ASYNC_MSG_RECV) {
         sock_ip_ep_t remote;
