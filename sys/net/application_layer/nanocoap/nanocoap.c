@@ -860,10 +860,11 @@ ssize_t coap_opt_add_uquery2(coap_pkt_t *pkt, const char *key, size_t key_len,
     assert(!val_len || (val && val_len));
 
     char qs[NANOCOAP_QS_MAX];
+    /* length including '=' */
     size_t qs_len = key_len + ((val && val_len) ? (val_len + 1) : 0);
 
     /* test if the query string fits */
-    if (qs_len >= NANOCOAP_QS_MAX) {
+    if (qs_len > NANOCOAP_QS_MAX) {
         return -1;
     }
 
@@ -872,9 +873,8 @@ ssize_t coap_opt_add_uquery2(coap_pkt_t *pkt, const char *key, size_t key_len,
         qs[key_len] = '=';
         memcpy(&qs[key_len + 1], val, val_len);
     }
-    qs[qs_len] = '\0';
 
-    return coap_opt_add_string(pkt, COAP_OPT_URI_QUERY, qs, '&');
+    return _add_opt_pkt(pkt, COAP_OPT_URI_QUERY, (uint8_t *)qs, qs_len);
 }
 
 ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val, size_t val_len)
