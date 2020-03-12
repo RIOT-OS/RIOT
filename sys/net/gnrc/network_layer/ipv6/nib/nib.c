@@ -47,9 +47,9 @@
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
-#if GNRC_IPV6_NIB_CONF_QUEUE_PKT
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
 static gnrc_pktqueue_t _queue_pool[GNRC_IPV6_NIB_NUMOF];
-#endif  /* GNRC_IPV6_NIB_CONF_QUEUE_PKT */
+#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
 
 #if GNRC_IPV6_NIB_CONF_DNS
 static evtimer_msg_event_t _rdnss_timeout;
@@ -1115,7 +1115,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
 }
 
-#if GNRC_IPV6_NIB_CONF_QUEUE_PKT
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
 static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
 {
     for (int i = 0; i < GNRC_IPV6_NIB_NUMOF; i++) {
@@ -1126,7 +1126,7 @@ static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
     }
     return NULL;
 }
-#endif  /* GNRC_IPV6_NIB_CONF_QUEUE_PKT */
+#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
 
 static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                           gnrc_pktsnip_t *pkt, gnrc_ipv6_nib_nc_t *nce,
@@ -1198,7 +1198,7 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
         }
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
         if (pkt != NULL) {
-#if GNRC_IPV6_NIB_CONF_QUEUE_PKT
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
             if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE) {
                 gnrc_pktqueue_t *queue_entry = _alloc_queue_entry(pkt);
 
@@ -1231,11 +1231,11 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                                                pkt);
                 gnrc_pktbuf_release_error(pkt, EHOSTUNREACH);
             }
-#else   /* GNRC_IPV6_NIB_CONF_QUEUE_PKT */
+#else   /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
             gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR,
                                            pkt);
             gnrc_pktbuf_release_error(pkt, EHOSTUNREACH);
-#endif  /* GNRC_IPV6_NIB_CONF_QUEUE_PKT */
+#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
         }
 #if GNRC_IPV6_NIB_CONF_ARSM
         _probe_nbr(entry, reset);

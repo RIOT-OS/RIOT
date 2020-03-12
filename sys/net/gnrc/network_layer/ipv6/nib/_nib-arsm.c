@@ -376,7 +376,7 @@ void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
                 nce->info &= ~GNRC_IPV6_NIB_NC_INFO_IS_ROUTER;
             }
         }
-#if GNRC_IPV6_NIB_CONF_QUEUE_PKT && MODULE_GNRC_IPV6
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT) && MODULE_GNRC_IPV6
         /* send queued packets */
         gnrc_pktqueue_t *ptr;
         DEBUG("nib: Sending queued packets\n");
@@ -389,7 +389,7 @@ void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
             }
             ptr->pkt = NULL;
         }
-#endif  /* GNRC_IPV6_NIB_CONF_QUEUE_PKT */
+#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
         if ((icmpv6->type == ICMPV6_NBR_ADV) &&
             !_sflag_set((ndp_nbr_adv_t *)icmpv6) &&
             (_get_nud_state(nce) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE) &&

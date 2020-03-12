@@ -92,11 +92,11 @@ extern "C" {
  */
 typedef struct _nib_onl_entry {
     struct _nib_onl_entry *next;        /**< next removable entry */
-#if GNRC_IPV6_NIB_CONF_QUEUE_PKT || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT) || defined(DOXYGEN)
     /**
      * @brief   queue for packets currently in address resolution
      *
-     * @note    Only available if @ref GNRC_IPV6_NIB_CONF_QUEUE_PKT != 0.
+     * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_QUEUE_PKT != 0.
      */
     gnrc_pktqueue_t *pktqueue;
 #endif

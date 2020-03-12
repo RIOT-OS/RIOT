@@ -56,8 +56,8 @@ extern "C" {
 #ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
 #define CONFIG_GNRC_IPV6_NIB_SLAAC         0
 #endif
-#ifndef GNRC_IPV6_NIB_CONF_QUEUE_PKT
-#define GNRC_IPV6_NIB_CONF_QUEUE_PKT    0
+#ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT
+#define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT     0
 #endif
 #if !CONFIG_GNRC_IPV6_NIB_6LR
 # ifndef GNRC_IPV6_NIB_CONF_ARSM
@@ -145,11 +145,11 @@ extern "C" {
 /**
  * @brief    queue packets for address resolution
  */
-#ifndef GNRC_IPV6_NIB_CONF_QUEUE_PKT
+#ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT
 #if CONFIG_GNRC_IPV6_NIB_6LN
-#define GNRC_IPV6_NIB_CONF_QUEUE_PKT    0
+#define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT    0
 #else
-#define GNRC_IPV6_NIB_CONF_QUEUE_PKT    1
+#define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT    1
 #endif
 #endif
 
