@@ -39,7 +39,9 @@ extern "C" {
 #define THREAD_STACKSIZE_DEFAULT   (256)
 #endif
 
+#ifndef THREAD_STACKSIZE_IDLE
 #define THREAD_STACKSIZE_IDLE      (128)
+#endif
 /** @} */
 
 #ifdef __cplusplus
