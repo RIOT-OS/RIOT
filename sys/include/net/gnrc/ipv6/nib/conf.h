@@ -126,12 +126,12 @@ extern "C" {
 /**
  * @brief    (de-)activate router advertising at interface start-up
  */
-#ifndef GNRC_IPV6_NIB_CONF_ADV_ROUTER
+#ifndef CONFIG_GNRC_IPV6_NIB_ADV_ROUTER
 #if CONFIG_GNRC_IPV6_NIB_ROUTER && \
     (!CONFIG_GNRC_IPV6_NIB_6LR || CONFIG_GNRC_IPV6_NIB_6LBR)
-#define GNRC_IPV6_NIB_CONF_ADV_ROUTER   1
+#define CONFIG_GNRC_IPV6_NIB_ADV_ROUTER   1
 #else
-#define GNRC_IPV6_NIB_CONF_ADV_ROUTER   0
+#define CONFIG_GNRC_IPV6_NIB_ADV_ROUTER   0
 #endif
 #endif
 
