@@ -38,7 +38,7 @@ static clist_node_t _next_removable = { NULL };
 
 static _nib_onl_entry_t _nodes[CONFIG_GNRC_IPV6_NIB_NUMOF];
 static _nib_offl_entry_t _dsts[GNRC_IPV6_NIB_OFFL_NUMOF];
-static _nib_dr_entry_t _def_routers[GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF];
+static _nib_dr_entry_t _def_routers[CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF];
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 static _nib_abr_entry_t _abrs[GNRC_IPV6_NIB_ABR_NUMOF];
@@ -345,7 +345,7 @@ _nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *router_addr, unsigned iface)
     DEBUG("nib: Allocating default router list entry "
           "(router_addr = %s, iface = %u)\n",
           ipv6_addr_to_str(addr_str, router_addr, sizeof(addr_str)), iface);
-    for (unsigned i = 0; i < GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
         _nib_dr_entry_t *tmp = &_def_routers[i];
         _nib_onl_entry_t *tmp_node = tmp->next_hop;
 
@@ -389,7 +389,7 @@ void _nib_drl_remove(_nib_dr_entry_t *nib_dr)
 _nib_dr_entry_t *_nib_drl_iter(const _nib_dr_entry_t *last)
 {
     for (const _nib_dr_entry_t *def_router = (last) ? (last + 1) : _def_routers;
-         def_router < (_def_routers + GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF);
+         def_router < (_def_routers + CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF);
          def_router++) {
         _nib_onl_entry_t *node = def_router->next_hop;
         if ((node != NULL) && (node->mode != _EMPTY)) {
@@ -403,7 +403,7 @@ _nib_dr_entry_t *_nib_drl_iter(const _nib_dr_entry_t *last)
 
 _nib_dr_entry_t *_nib_drl_get(const ipv6_addr_t *router_addr, unsigned iface)
 {
-    for (unsigned i = 0; i < GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
         _nib_dr_entry_t *def_router = &_def_routers[i];
         _nib_onl_entry_t *node = def_router->next_hop;
 

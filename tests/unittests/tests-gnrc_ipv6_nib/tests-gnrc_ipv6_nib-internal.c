@@ -586,7 +586,7 @@ static void test_nib_nc_remove__cleared(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF default router list entries with
+ * Creates CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF default router list entries with
  * different IP addresses and then tries to add another.
  * Expected result: should return NULL
  */
@@ -595,7 +595,7 @@ static void test_nib_drl_add__no_space_left_diff_addr(void)
     ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                   { .u64 = TEST_UINT64 } } };
 
-    for (int i = 0; i < GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
         TEST_ASSERT_NOT_NULL(_nib_drl_add(&addr, IFACE));
         addr.u64[1].u64++;
     }
@@ -624,7 +624,7 @@ static void test_nib_drl_add__no_space_left_nib_full(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF default router list entries with
+ * Creates CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF default router list entries with
  * different interface identifiers and then tries to add another.
  * Expected result: should return NULL
  */
@@ -634,7 +634,7 @@ static void test_nib_drl_add__no_space_left_diff_iface(void)
                                   { .u64 = TEST_UINT64 } } };
     unsigned iface = 1;
 
-    for (int i = 0; i < GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
         TEST_ASSERT_NOT_NULL(_nib_drl_add(&addr, iface));
         iface++;
     }
@@ -642,7 +642,7 @@ static void test_nib_drl_add__no_space_left_diff_iface(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF default router list entries with
+ * Creates CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF default router list entries with
  * different IP addresses and interface identifiers and then tries to add
  * another.
  * Expected result: should return NULL
@@ -653,7 +653,7 @@ static void test_nib_drl_add__no_space_left_diff_addr_iface(void)
                                   { .u64 = TEST_UINT64 } } };
     unsigned iface = 1;
 
-    for (int i = 0; i < GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
         TEST_ASSERT_NOT_NULL(_nib_drl_add(&addr, iface));
         addr.u64[1].u64++;
         iface++;
@@ -662,7 +662,7 @@ static void test_nib_drl_add__no_space_left_diff_addr_iface(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF default router list entries with
+ * Creates CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF default router list entries with
  * different IP addresses and interface identifiers and then tries to add
  * another that is equal to the last.
  * Expected result: should return not NULL (the last)
@@ -674,7 +674,7 @@ static void test_nib_drl_add__success_duplicate(void)
                                   { .u64 = TEST_UINT64 } } };
     unsigned iface = 1;
 
-    for (int i = 0; i < GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
         addr.u64[1].u64++;
         iface++;
         TEST_ASSERT_NOT_NULL((nib_dr = _nib_drl_add(&addr, iface)));

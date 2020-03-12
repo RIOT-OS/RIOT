@@ -219,7 +219,7 @@ static void test_nib_ft_add__EINVAL_iface0(void)
 #endif
 
 /*
- * Creates GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF default route entries and then
+ * Creates CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF default route entries and then
  * tries to create another one
  * Expected result: gnrc_ipv6_nib_ft_add() returns -ENOMEM
  */
@@ -228,7 +228,7 @@ static void test_nib_ft_add__ENOMEM_diff_def_router(void)
     ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
                                     { .u64 = TEST_UINT64 } } };
 
-    for (unsigned i = 0; i < GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0, &next_hop,
                                                       IFACE, 0));
         next_hop.u64[1].u64++;
