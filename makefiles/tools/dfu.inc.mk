@@ -2,7 +2,17 @@ DFU ?= dfu-util
 FLASHER ?= $(DFU)
 FLASHFILE ?= $(BINFILE)
 
-FFLAGS ?= -D $(FLASHFILE) --reset $(DFU_ARGS)
+DFU_ALT ?= 0
+ROM_OFFSET ?= 0
 
-RESET ?= $(DFU)
-RESET_FLAGS ?= $(DFU_ARGS) -t $(DFU_DEVICE_TYPE)
+_ROM_ADDR_WITH_OFFSET ?= $(shell printf "0x%x" $$(($(ROM_START_ADDR) + $(ROM_OFFSET))))
+FLASH_ADDR ?= $(if $(ROM_OFFSET),$(_ROM_ADDR_WITH_OFFSET),$(ROM_START_ADDR))
+
+# Optional flasher flags
+FFLAGS_OPTS ?=
+
+FFLAGS ?= --device $(DFU_USB_ID) \
+          --alt $(DFU_ALT) \
+          --dfuse-address $(FLASH_ADDR):leave \
+          --download $(FLASHFILE) \
+          $(FFLAGS_OPTS)
