@@ -94,6 +94,23 @@ ifneq (,$(filter bh1900nux,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter bme680_%,$(USEMODULE)))
+  USEPKG += driver_bme680
+  USEMODULE += bme680
+  ifneq (,$(filter saul%,$(USEMODULE)))
+    USEMODULE += xtimer
+  endif
+endif
+
+ifneq (,$(filter bme680_i2c,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter bme680_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_spi
+endif
+
 ifneq (,$(filter bmp180,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer

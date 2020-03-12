@@ -124,6 +124,7 @@ enum {
     SAUL_SENSE_ID_DISTANCE,         /**< sensor: distance */
     SAUL_SENSE_ID_CO2,              /**< sensor: CO2 Gas */
     SAUL_SENSE_ID_TVOC,             /**< sensor: TVOC Gas */
+    SAUL_SENSE_ID_GAS,              /**< sensor: Gas common */
     SAUL_SENSE_ID_OCCUP,            /**< sensor: occupancy */
     SAUL_SENSE_ID_PROXIMITY,        /**< sensor: proximity */
     SAUL_SENSE_ID_RSSI,             /**< sensor: RSSI */
@@ -194,6 +195,8 @@ enum {
     SAUL_SENSE_CO2          = SAUL_CAT_SENSE | SAUL_SENSE_ID_CO2,
     /** sensor: TVOC Gas */
     SAUL_SENSE_TVOC         = SAUL_CAT_SENSE | SAUL_SENSE_ID_TVOC,
+    /** sensor: Gas common */
+    SAUL_SENSE_GAS          = SAUL_CAT_SENSE | SAUL_SENSE_ID_GAS,
     /** sensor: occupancy */
     SAUL_SENSE_OCCUP        = SAUL_CAT_SENSE | SAUL_SENSE_ID_OCCUP,
     /** sensor: proximity */
