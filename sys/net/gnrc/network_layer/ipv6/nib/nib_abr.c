@@ -21,7 +21,7 @@
 #include "_nib-6ln.h"
 #include "_nib-internal.h"
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
 int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr)
 {
@@ -89,6 +89,6 @@ void gnrc_ipv6_nib_abr_print(gnrc_ipv6_nib_abr_t *abr)
 }
 #else
 typedef int dont_be_pedantic;
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 
 /** @} */

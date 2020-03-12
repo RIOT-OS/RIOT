@@ -72,7 +72,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     if (netif->ipv6.aac_mode == GNRC_NETIF_AAC_AUTO) {
         dst->flags |= _PFX_SLAAC;
     }
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) && GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     if (gnrc_netif_is_6lbr(netif)) {
         _nib_abr_entry_t *abr = NULL;
 

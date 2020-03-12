@@ -22,9 +22,9 @@
 #include "net/sock/dns.h"
 #endif
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 #include "_nib-6ln.h"
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 #include "_nib-router.h"
 
 #define ENABLE_DEBUG    (0)
@@ -84,7 +84,7 @@ void _handle_snd_mc_ra(gnrc_netif_t *netif)
 
 void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst, bool final)
 {
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     _nib_abr_entry_t *abr = NULL;
 
     DEBUG("nib: Send router advertisements for each border router:\n");
@@ -93,9 +93,9 @@ void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst, bool final)
                                              sizeof(addr_str)));
         _snd_ra(netif, dst, final, abr);
     }
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     _snd_ra(netif, dst, final, NULL);
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 }
 
 static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
@@ -162,7 +162,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         ext_opts = rdnsso;
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_DNS */
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     uint16_t ltime;
     gnrc_pktsnip_t *abro;
 
@@ -200,7 +200,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         return NULL;
     }
     ext_opts = abro;
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     (void)abr;
     while ((pfx = _nib_offl_iter(pfx))) {
         if ((pfx->mode & _PL) && (_nib_onl_get_if(pfx->next_hop) == id)) {
@@ -209,7 +209,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
             }
         }
     }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     return ext_opts;
 }
 

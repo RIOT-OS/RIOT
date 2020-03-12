@@ -705,7 +705,7 @@ static inline void _nib_ft_remove(_nib_offl_entry_t *nib_offl)
 }
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) || defined(DOXYGEN)
 /**
  * @brief   Creates or gets an existing authoritative border router.
  *

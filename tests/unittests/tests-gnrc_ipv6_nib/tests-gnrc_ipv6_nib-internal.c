@@ -1754,7 +1754,7 @@ static void test_nib_ft_remove(void)
     TEST_ASSERT_NULL(_nib_offl_iter(NULL));
 }
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 /*
  * Creates GNRC_IPV6_NIB_ABR_NUMOF ABR entries with different addresses and
  * then tries to add another.
@@ -2086,7 +2086,7 @@ Test *tests_gnrc_ipv6_nib_internal_tests(void)
         new_TestFixture(test_nib_pl_remove),
         new_TestFixture(test_nib_ft_add__success),
         new_TestFixture(test_nib_ft_remove),
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
         new_TestFixture(test_nib_abr_add__no_space_left),
         new_TestFixture(test_nib_abr_add__success_duplicate),
         new_TestFixture(test_nib_abr_add__success),

@@ -24,9 +24,9 @@ static void _usage(char **argv);
 static int _nib_neigh(int argc, char **argv);
 static int _nib_prefix(int argc, char **argv);
 static int _nib_route(int argc, char **argv);
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 static int _nib_abr(int argc, char **argv);
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 
 int _gnrc_ipv6_nib(int argc, char **argv)
 {
@@ -45,11 +45,11 @@ int _gnrc_ipv6_nib(int argc, char **argv)
     else if (strcmp(argv[1], "route") == 0) {
         res = _nib_route(argc, argv);
     }
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     else if (strcmp(argv[1], "abr") == 0) {
         res = _nib_abr(argc, argv);
     }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     else {
         _usage(argv);
     }
@@ -58,11 +58,11 @@ int _gnrc_ipv6_nib(int argc, char **argv)
 
 static void _usage(char **argv)
 {
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     printf("usage: %s {neigh|prefix|route|abr|help} ...\n", argv[0]);
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     printf("usage: %s {neigh|prefix|route|help} ...\n", argv[0]);
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 }
 
 static void _usage_nib_neigh(char **argv)
@@ -295,7 +295,7 @@ static int _nib_route(int argc, char **argv)
     return 0;
 }
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 static void _usage_nib_abr(char **argv)
 {
     if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
@@ -363,6 +363,6 @@ static int _nib_abr(int argc, char **argv)
     }
     return 0;
 }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 
 /** @} */

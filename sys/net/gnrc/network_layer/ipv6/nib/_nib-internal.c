@@ -40,9 +40,9 @@ static _nib_onl_entry_t _nodes[GNRC_IPV6_NIB_NUMOF];
 static _nib_offl_entry_t _dsts[GNRC_IPV6_NIB_OFFL_NUMOF];
 static _nib_dr_entry_t _def_routers[GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF];
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 static _nib_abr_entry_t _abrs[GNRC_IPV6_NIB_ABR_NUMOF];
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 static rmutex_t _nib_mutex = RMUTEX_INIT;
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -61,9 +61,9 @@ void _nib_init(void)
     memset(_nodes, 0, sizeof(_nodes));
     memset(_def_routers, 0, sizeof(_def_routers));
     memset(_dsts, 0, sizeof(_dsts));
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     memset(_abrs, 0, sizeof(_abrs));
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 #endif  /* TEST_SUITES */
     evtimer_init_msg(&_nib_evtimer);
     /* TODO: load ABR information from persistent memory */
@@ -522,7 +522,7 @@ static inline bool _in_dsts(const _nib_offl_entry_t *dst)
     return (dst < (_dsts + GNRC_IPV6_NIB_OFFL_NUMOF));
 }
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 static inline unsigned _idx_dsts(const _nib_offl_entry_t *dst)
 {
     return (dst - _dsts) / sizeof(*dst);
@@ -532,7 +532,7 @@ static inline bool _in_abrs(const _nib_abr_entry_t *abr)
 {
     return (abr < (_abrs + GNRC_IPV6_NIB_ABR_NUMOF));
 }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 
 void _nib_offl_clear(_nib_offl_entry_t *dst)
 {
@@ -660,7 +660,7 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
 void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
 {
     _nib_offl_remove(nib_offl, _PL);
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     unsigned idx = _idx_dsts(nib_offl);
     if (idx < GNRC_IPV6_NIB_OFFL_NUMOF) {
         for (_nib_abr_entry_t *abr = _abrs; _in_abrs(abr); abr++) {
@@ -675,10 +675,10 @@ void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
             }
         }
     }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 }
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 _nib_abr_entry_t *_nib_abr_add(const ipv6_addr_t *addr)
 {
     _nib_abr_entry_t *abr = NULL;
@@ -780,7 +780,7 @@ _nib_abr_entry_t *_nib_abr_iter(const _nib_abr_entry_t *last)
     }
     return NULL;
 }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 
 _nib_offl_entry_t *_nib_pl_add(unsigned iface,
                                const ipv6_addr_t *pfx,

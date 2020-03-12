@@ -195,11 +195,11 @@ extern "C" {
  *
  * @see [RFC 6775, section 8.1](https://tools.ietf.org/html/rfc6775#section-8.1)
  */
-#ifndef GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#ifndef CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C
 #if CONFIG_GNRC_IPV6_NIB_6LR
-#define GNRC_IPV6_NIB_CONF_MULTIHOP_P6C 1
+#define CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C  1
 #else
-#define GNRC_IPV6_NIB_CONF_MULTIHOP_P6C 0
+#define CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C  0
 #endif
 #endif
 
@@ -268,7 +268,7 @@ extern "C" {
 #define GNRC_IPV6_NIB_OFFL_NUMOF            (8)
 #endif
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN)
+#if CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN)
 /**
  * @brief   Number of authoritative border router entries in NIB
  */

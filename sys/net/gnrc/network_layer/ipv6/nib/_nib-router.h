@@ -108,7 +108,7 @@ void _set_rtr_adv(gnrc_netif_t *netif);
 /**
  * @brief   Send router advertisements
  *
- * If @ref GNRC_IPV6_NIB_CONF_MULTIHOP_P6C is not 0 this sends one router
+ * If @ref CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C is not 0 this sends one router
  * advertisement per configured ABR, otherwise it just sends one single router
  * advertisement for the interface.
  *

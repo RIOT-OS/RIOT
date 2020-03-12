@@ -151,7 +151,7 @@ extern "C" {
  * The expected message context is the NIB-internal state of the authoritative
  * border router.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_MULTIHOP_P6C != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C != 0
  */
 #define GNRC_IPV6_NIB_ABR_TIMEOUT           (0x4fcbU)
 
