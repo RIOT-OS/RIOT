@@ -104,8 +104,8 @@ static const uart_conf_t uart_config[] = {
     {
         .dev      = USART1,
         .rcc_mask = RCC_APB2ENR_USART1EN,
-        .rx_pin   = GPIO_PIN(PORT_A, 9),
-        .tx_pin   = GPIO_PIN(PORT_A, 10),
+        .rx_pin   = GPIO_PIN(PORT_A, 10),
+        .tx_pin   = GPIO_PIN(PORT_A, 9),
         .rx_af    = GPIO_AF7,
         .tx_af    = GPIO_AF7,
         .bus      = APB2,
