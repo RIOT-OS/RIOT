@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include <kernel_defines.h>
 
 #include "bitfield.h"
 #include "evtimer_msg.h"
@@ -103,11 +104,11 @@ typedef struct _nib_onl_entry {
      * @brief Neighbors IPv6 address
      */
     ipv6_addr_t ipv6;
-#if GNRC_IPV6_NIB_CONF_6LR || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR) || defined(DOXYGEN)
     /**
      * @brief   The neighbors EUI-64 (used for DAD)
      *
-     * @note    Only available if @ref GNRC_IPV6_NIB_CONF_6LR != 0.
+     * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_6LR != 0.
      */
     eui64_t eui64;
 #endif
@@ -144,7 +145,7 @@ typedef struct _nib_onl_entry {
 #if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
     evtimer_msg_event_t reply_rs;           /**< Event for @ref GNRC_IPV6_NIB_REPLY_RS */
 #endif
-#if GNRC_IPV6_NIB_CONF_6LR || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR) || defined(DOXYGEN)
     evtimer_msg_event_t addr_reg_timeout;   /**< Event for @ref GNRC_IPV6_NIB_ADDR_REG_TIMEOUT */
 #endif
 

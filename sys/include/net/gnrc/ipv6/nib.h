@@ -140,7 +140,7 @@ extern "C" {
  * timeout. The expected message context is a pointer to a valid on-link entry
  * representing the neighbor which faces a timeout of its address registration.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_6LR != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_6LR != 0
  */
 #define GNRC_IPV6_NIB_ADDR_REG_TIMEOUT      (0x4fc9U)
 

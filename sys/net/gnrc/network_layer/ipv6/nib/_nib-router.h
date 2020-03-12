@@ -45,12 +45,16 @@ static inline void _init_iface_router(gnrc_netif_t *netif)
     netif->ipv6.last_ra = UINT32_MAX;
     netif->ipv6.ra_sent = 0;
     netif->flags |= GNRC_NETIF_FLAGS_IPV6_FORWARDING;
-#if !GNRC_IPV6_NIB_CONF_6LR || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
-    netif->flags |= GNRC_NETIF_FLAGS_IPV6_RTR_ADV;
-#endif  /* !GNRC_IPV6_NIB_CONF_6LR || CONFIG_GNRC_IPV6_NIB_6LBR */
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
-    netif->flags |= GNRC_NETIF_FLAGS_6LO_ABR;
-#endif  /* CONFIG_GNRC_IPV6_NIB_6LBR */
+
+    if (!IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR) ||
+        IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
+        netif->flags |= GNRC_NETIF_FLAGS_IPV6_RTR_ADV;
+    }
+
+    if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
+        netif->flags |= GNRC_NETIF_FLAGS_6LO_ABR;
+    }
+
     gnrc_netif_ipv6_group_join_internal(netif, &ipv6_addr_all_routers_link_local);
 }
 

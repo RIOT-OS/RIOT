@@ -117,7 +117,7 @@ static const char *_nud_str[] = {
 };
 #endif
 
-#if GNRC_IPV6_NIB_CONF_6LR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
 #define _AR_STR_IDX(state)      ((state) >> GNRC_IPV6_NIB_NC_INFO_AR_STATE_POS)
 
 static const char *_ar_str[] = {
@@ -146,7 +146,7 @@ void gnrc_ipv6_nib_nc_print(gnrc_ipv6_nib_nc_t *entry)
 #if GNRC_IPV6_NIB_CONF_ARSM
     printf(" %s", _nud_str[gnrc_ipv6_nib_nc_get_nud_state(entry)]);
 #endif
-#if GNRC_IPV6_NIB_CONF_6LR
+#if CONFIG_GNRC_IPV6_NIB_6LR
     printf(" %s",_ar_str[_AR_STR_IDX(gnrc_ipv6_nib_nc_get_ar_state(entry))]);
 #endif
     puts("");

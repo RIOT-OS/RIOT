@@ -12,6 +12,7 @@
  * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#include <kernel_defines.h>
 
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"
@@ -22,7 +23,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if GNRC_IPV6_NIB_CONF_6LR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
@@ -120,8 +121,8 @@ gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif_t *netif,
     }
     return reply_aro;
 }
-#else  /* GNRC_IPV6_NIB_CONF_6LR */
+#else  /* CONFIG_GNRC_IPV6_NIB_6LR */
 typedef int dont_be_pedantic;
-#endif /* GNRC_IPV6_NIB_CONF_6LR */
+#endif /* CONFIG_GNRC_IPV6_NIB_6LR */
 
 /** @} */

@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <string.h>
+#include <kernel_defines.h>
 
 #include "net/gnrc/icmpv6/error.h"
 #include "net/gnrc/ipv6.h"
@@ -272,9 +273,9 @@ void _nib_nc_remove(_nib_onl_entry_t *node)
 #if GNRC_IPV6_NIB_CONF_ROUTER
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->reply_rs.event);
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
-#if GNRC_IPV6_NIB_CONF_6LR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->addr_reg_timeout.event);
-#endif  /* GNRC_IPV6_NIB_CONF_6LR */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
 #if GNRC_IPV6_NIB_CONF_QUEUE_PKT
     gnrc_pktqueue_t *tmp;
     for (gnrc_pktqueue_t *ptr = node->pktqueue;

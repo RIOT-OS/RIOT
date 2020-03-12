@@ -361,11 +361,11 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
             _nib_ft_remove(ctx);
             break;
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
-#if GNRC_IPV6_NIB_CONF_6LR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
         case GNRC_IPV6_NIB_ADDR_REG_TIMEOUT:
             _nib_nc_remove(ctx);
             break;
-#endif  /* GNRC_IPV6_NIB_CONF_6LR */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
         case GNRC_IPV6_NIB_ABR_TIMEOUT:
             _nib_abr_remove(&((_nib_abr_entry_t *)ctx)->addr);
@@ -538,11 +538,11 @@ static void _handle_rtr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                          next_ra_delay);
         }
     }
-#if GNRC_IPV6_NIB_CONF_6LR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
     else if (gnrc_netif_is_rtr(netif) && gnrc_netif_is_rtr_adv(netif)) {
         _snd_rtr_advs(netif, &ipv6->src, false);
     }
-#endif  /* GNRC_IPV6_NIB_CONF_6LR */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
 #if GNRC_IPV6_NIB_CONF_6LN
     (void)nce;  /* NCE is not used */
 #endif
@@ -935,13 +935,13 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
     else {
         gnrc_pktsnip_t *reply_aro = NULL;
-#if GNRC_IPV6_NIB_CONF_6LR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
         ndp_opt_t *sl2ao = NULL;
         sixlowpan_nd_opt_ar_t *aro = NULL;
-#else   /* GNRC_IPV6_NIB_CONF_6LR */
+#else   /* CONFIG_GNRC_IPV6_NIB_6LR */
 #define sl2ao   (NULL)
 #define aro     (NULL)
-#endif  /* GNRC_IPV6_NIB_CONF_6LR */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
         tmp_len = icmpv6_len - sizeof(ndp_nbr_sol_t);
 
         if (!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR)) {
@@ -952,22 +952,22 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         FOREACH_OPT(nbr_sol, opt, tmp_len) {
             switch (opt->type) {
                 case NDP_OPT_SL2A:
-#if GNRC_IPV6_NIB_CONF_6LR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
                     if (gnrc_netif_is_6lr(netif)) {
                         DEBUG("nib: Storing SL2AO for later handling\n");
                         sl2ao = opt;
                         break;
                     }
-#endif  /* GNRC_IPV6_NIB_CONF_6LR */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
                     _handle_sl2ao(netif, ipv6, (const icmpv6_hdr_t *)nbr_sol,
                                   opt);
                     break;
-#if GNRC_IPV6_NIB_CONF_6LR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
                 case NDP_OPT_AR:
                     DEBUG("nib: Storing ARO for later handling\n");
                     aro = (sixlowpan_nd_opt_ar_t *)opt;
                     break;
-#endif  /* GNRC_IPV6_NIB_CONF_6LR */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
                 default:
                     DEBUG("nib: Ignoring unrecognized option type %u for NS\n",
                           opt->type);

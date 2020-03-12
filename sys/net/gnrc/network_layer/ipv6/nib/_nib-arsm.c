@@ -12,6 +12,7 @@
  * @file
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#include <kernel_defines.h>
 
 #include "evtimer.h"
 #include "net/gnrc/ndp.h"
@@ -120,7 +121,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             if (icmpv6->type == ICMPV6_NBR_SOL) {
                 nce->info &= ~GNRC_IPV6_NIB_NC_INFO_IS_ROUTER;
             }
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_DAD && GNRC_IPV6_NIB_CONF_6LR
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_DAD && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
             else if (_rtr_sol_on_6lr(netif, icmpv6)) {
                 DEBUG("nib: Setting newly created entry to tentative\n");
                 _set_ar_state(nce, GNRC_IPV6_NIB_NC_INFO_AR_STATE_TENTATIVE);
@@ -128,7 +129,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                              &nce->addr_reg_timeout,
                              SIXLOWPAN_ND_TENTATIVE_NCE_SEC_LTIME * MS_PER_SEC);
             }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_DAD && GNRC_IPV6_NIB_CONF_6LR */
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_DAD && CONFIG_GNRC_IPV6_NIB_6LR */
         }
 #if ENABLE_DEBUG
         else {

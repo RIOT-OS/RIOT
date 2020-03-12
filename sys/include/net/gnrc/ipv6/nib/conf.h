@@ -41,8 +41,8 @@ extern "C" {
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_6LR
-#ifndef GNRC_IPV6_NIB_CONF_6LR
-#define GNRC_IPV6_NIB_CONF_6LR          1
+#ifndef CONFIG_GNRC_IPV6_NIB_6LR
+#define CONFIG_GNRC_IPV6_NIB_6LR       1
 #endif
 #ifndef GNRC_IPV6_NIB_CONF_SLAAC
 #define GNRC_IPV6_NIB_CONF_SLAAC        0
@@ -59,7 +59,7 @@ extern "C" {
 #ifndef GNRC_IPV6_NIB_CONF_QUEUE_PKT
 #define GNRC_IPV6_NIB_CONF_QUEUE_PKT    0
 #endif
-#if !GNRC_IPV6_NIB_CONF_6LR
+#if !CONFIG_GNRC_IPV6_NIB_6LR
 # ifndef GNRC_IPV6_NIB_CONF_ARSM
 # define GNRC_IPV6_NIB_CONF_ARSM        0
 # endif
@@ -93,11 +93,11 @@ extern "C" {
 /**
  * @brief    enable features for 6Lo router
  */
-#ifndef GNRC_IPV6_NIB_CONF_6LR
+#ifndef CONFIG_GNRC_IPV6_NIB_6LR
 #if CONFIG_GNRC_IPV6_NIB_6LBR
-#define GNRC_IPV6_NIB_CONF_6LR          1
+#define CONFIG_GNRC_IPV6_NIB_6LR   1
 #else
-#define GNRC_IPV6_NIB_CONF_6LR          0
+#define CONFIG_GNRC_IPV6_NIB_6LR   0
 #endif
 #endif
 
@@ -105,7 +105,7 @@ extern "C" {
  * @brief    enable features for 6Lo node
  */
 #ifndef GNRC_IPV6_NIB_CONF_6LN
-#if GNRC_IPV6_NIB_CONF_6LR
+#if CONFIG_GNRC_IPV6_NIB_6LR
 #define GNRC_IPV6_NIB_CONF_6LN          1
 #else
 #define GNRC_IPV6_NIB_CONF_6LN          0
@@ -116,7 +116,7 @@ extern "C" {
  * @brief   enable features for IPv6 routers
  */
 #ifndef GNRC_IPV6_NIB_CONF_ROUTER
-#if GNRC_IPV6_NIB_CONF_6LR
+#if CONFIG_GNRC_IPV6_NIB_6LR
 #define GNRC_IPV6_NIB_CONF_ROUTER       1
 #else
 #define GNRC_IPV6_NIB_CONF_ROUTER       0
@@ -128,7 +128,7 @@ extern "C" {
  */
 #ifndef GNRC_IPV6_NIB_CONF_ADV_ROUTER
 #if GNRC_IPV6_NIB_CONF_ROUTER && \
-    (!GNRC_IPV6_NIB_CONF_6LR || CONFIG_GNRC_IPV6_NIB_6LBR)
+    (!CONFIG_GNRC_IPV6_NIB_6LR || CONFIG_GNRC_IPV6_NIB_6LBR)
 #define GNRC_IPV6_NIB_CONF_ADV_ROUTER   1
 #else
 #define GNRC_IPV6_NIB_CONF_ADV_ROUTER   0
@@ -196,7 +196,7 @@ extern "C" {
  * @see [RFC 6775, section 8.1](https://tools.ietf.org/html/rfc6775#section-8.1)
  */
 #ifndef GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
-#if GNRC_IPV6_NIB_CONF_6LR
+#if CONFIG_GNRC_IPV6_NIB_6LR
 #define GNRC_IPV6_NIB_CONF_MULTIHOP_P6C 1
 #else
 #define GNRC_IPV6_NIB_CONF_MULTIHOP_P6C 0
