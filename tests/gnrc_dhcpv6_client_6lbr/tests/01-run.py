@@ -140,7 +140,7 @@ def testfunc(child):
     sniffer = start_sniffer(iface,
                             stop_filter=lambda pkt: DHCP6_Request in pkt)
     sendp(build_reply_headers(pkt) / DHCP6_Advertise(trid=trid) /
-          cli_id / srv_id / ia_pd, iface=iface, verbose=False)
+          ia_pd / cli_id / srv_id, iface=iface, verbose=False)
 
     # wait for request
     pkt = wait_for_dhcpv6_pkt(iface, sniffer)
@@ -158,7 +158,7 @@ def testfunc(child):
     # reply to request with reply and a prefix provided
     trid = pkt[DHCP6_Request].trid
     sendp(build_reply_headers(pkt) / DHCP6_Reply(trid=trid) /
-          cli_id / srv_id / ia_pd, iface=iface, verbose=False)
+          ia_pd / cli_id / srv_id, iface=iface, verbose=False)
     time.sleep(1)
 
     # check if global address was configured
