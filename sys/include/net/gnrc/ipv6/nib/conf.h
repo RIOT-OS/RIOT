@@ -227,8 +227,8 @@ extern "C" {
  *
  * @warning Only do this if you know what you're doing
  */
-#ifndef GNRC_IPV6_NIB_CONF_NO_RTR_SOL
-#define GNRC_IPV6_NIB_CONF_NO_RTR_SOL       0
+#ifndef CONFIG_GNRC_IPV6_NIB_NO_RTR_SOL
+#define CONFIG_GNRC_IPV6_NIB_NO_RTR_SOL        0
 #endif
 
 /**
