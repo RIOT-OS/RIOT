@@ -119,7 +119,7 @@ static int _nib_neigh(int argc, char **argv)
     }
     else if ((argc > 4) && (strcmp(argv[2], "add") == 0)) {
         ipv6_addr_t ipv6_addr;
-        uint8_t l2addr[GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
+        uint8_t l2addr[CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
         size_t l2addr_len = 0;
         unsigned iface = atoi(argv[3]);
 

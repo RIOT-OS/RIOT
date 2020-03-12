@@ -30,7 +30,7 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
     _nib_onl_entry_t *node;
 
     assert(ipv6 != NULL);
-    assert(l2addr_len <= GNRC_IPV6_NIB_L2ADDR_MAX_LEN);
+    assert(l2addr_len <= CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN);
     assert((iface > KERNEL_PID_UNDEF) && (iface <= KERNEL_PID_LAST));
     _nib_acquire();
     node = _nib_nc_add(ipv6, iface, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNMANAGED);
@@ -130,8 +130,8 @@ static const char *_ar_str[] = {
 
 void gnrc_ipv6_nib_nc_print(gnrc_ipv6_nib_nc_t *entry)
 {
-    char addr_str[(IPV6_ADDR_MAX_STR_LEN > GNRC_IPV6_NIB_L2ADDR_MAX_LEN) ?
-                   IPV6_ADDR_MAX_STR_LEN : GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
+    char addr_str[(IPV6_ADDR_MAX_STR_LEN > CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN) ?
+                   IPV6_ADDR_MAX_STR_LEN : CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
 
     printf("%s ", ipv6_addr_to_str(addr_str, &entry->ipv6, sizeof(addr_str)));
     if (gnrc_ipv6_nib_nc_get_iface(entry) != KERNEL_PID_UNDEF) {

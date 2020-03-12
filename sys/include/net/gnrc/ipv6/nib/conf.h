@@ -234,8 +234,8 @@ extern "C" {
 /**
  * @brief   Maximum link-layer address length (aligned)
  */
-#ifndef GNRC_IPV6_NIB_L2ADDR_MAX_LEN
-#define GNRC_IPV6_NIB_L2ADDR_MAX_LEN        (8U)
+#ifndef CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN
+#define CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN        (8U)
 #endif
 
 /**

@@ -118,7 +118,7 @@ typedef struct _nib_onl_entry {
      *
      * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0.
      */
-    uint8_t l2addr[GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
+    uint8_t l2addr[CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
 #endif
     /**
      * @brief Event for @ref GNRC_IPV6_NIB_SND_UC_NS,
