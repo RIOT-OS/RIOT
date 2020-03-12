@@ -49,6 +49,14 @@ extern "C" {
 /** in 802.15.4 oqpsk each symble is 4 bits, not about the others */
 #define AT86RF215_BACKOFF_PERIOD_IN_BITS    (AT86RF215_BACKOFF_PERIOD_IN_SYMBOLS * 4)
 
+/**
+ * Default Parameters for 802.15.4 retransmissions & CSMA
+ */
+#define AT86RF215_RETRIES_MAX_DEFAULT       (3)
+#define AT86RF215_CSMA_RETRIES_MAX_DEFAULT  (4)
+#define AT86RF215_CSMA_MIN_BE_DEFAULT       (3)
+#define AT86RF215_CSMA_MAX_BE_DEFAULT       (5)
+
 /** For the SUN PHYs, the value is 1 ms expressed in symbol periods, rounded up to the next
     integer number of symbol periods using the ceiling() function */
 #define AT86RF215_TURNAROUND_TIME_US        (1 * US_PER_MS)

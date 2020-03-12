@@ -74,10 +74,10 @@ void at86rf215_reset_and_cfg(at86rf215_t *dev)
     dev->netdev.pan = IEEE802154_DEFAULT_PANID;
 
     /* set default options */
-    dev->retries_max = 3;
-    dev->csma_retries_max = 4;
-    dev->csma_maxbe = 5;
-    dev->csma_minbe = 3;
+    dev->retries_max      = AT86RF215_RETRIES_MAX_DEFAULT;
+    dev->csma_retries_max = AT86RF215_CSMA_RETRIES_MAX_DEFAULT;
+    dev->csma_maxbe       = AT86RF215_CSMA_MAX_BE_DEFAULT;
+    dev->csma_minbe       = AT86RF215_CSMA_MIN_BE_DEFAULT;
 
     dev->flags |= AT86RF215_OPT_AUTOACK
                |  AT86RF215_OPT_CSMA;
