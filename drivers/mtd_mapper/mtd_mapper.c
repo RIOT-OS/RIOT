@@ -73,6 +73,9 @@ static int _init(mtd_dev_t *mtd)
            backing_mtd->pages_per_sector * backing_mtd->sector_count *
            backing_mtd->page_size);
 
+    /* avoid unused variable warning if compiled with NDEBUG */
+    (void)backing_mtd;
+
     _lock(region);
     int res = _init_target(region);
     _unlock(region);
