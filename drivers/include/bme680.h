@@ -10,7 +10,7 @@
 /**
  * @defgroup    drivers_bme680 BME680 Temperature/Humidity/Pressure/Gas sensor
  * @ingroup     drivers_sensors
- * @brief       Driver for the Bosch BME680  sensor
+ * @brief       Driver for the Bosch BME680 sensor
  *
  * ### Introduction
  *

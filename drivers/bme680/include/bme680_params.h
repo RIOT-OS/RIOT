@@ -23,6 +23,7 @@
 
 #include "board.h"
 #include "bme680.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -96,6 +97,18 @@ extern "C" {
         .intf.spi.dev       = BME680_PARAM_SPI_DEV,     \
         .intf.spi.nss_pin   = BME680_PARAM_SPI_NSS_PIN, \
 }
+
+/**
+ * @brief   Default SAUL meta information
+ */
+#ifndef BME680_SAUL_INFO
+#if MODULE_BME680_I2C && MODULE_BME680_SPI
+#define BME680_SAUL_INFO    { .name = "bme680:0" }, \
+                            { .name = "bme680:1" },
+#else /* MODULE_BME680_I2C && MODULE_BME680_SPI */
+#define BME680_SAUL_INFO    { .name = "bme680" }
+#endif /* MODULE_BME680_I2C && MODULE_BME680_SPI */
+#endif /* BME680_SAUL_INFO */
 /**@}*/
 
 /**
@@ -109,6 +122,14 @@ static const bme680_params_t bme680_params[] =
 #if MODULE_BME680_SPI || DOXYGEN
     BME680_PARAMS_SPI,
 #endif
+};
+
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t bme680_saul_info[] =
+{
+    BME680_SAUL_INFO
 };
 
 /**

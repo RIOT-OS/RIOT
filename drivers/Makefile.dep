@@ -97,6 +97,9 @@ endif
 ifneq (,$(filter bme680_%,$(USEMODULE)))
   USEPKG += driver_bme680
   USEMODULE += bme680
+  ifneq (,$(filter saul%,$(USEMODULE)))
+    USEMODULE += xtimer
+  endif
 endif
 
 ifneq (,$(filter bme680_i2c,$(USEMODULE)))
