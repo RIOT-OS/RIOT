@@ -270,9 +270,9 @@ void _nib_nc_remove(_nib_onl_entry_t *node)
 #if GNRC_IPV6_NIB_CONF_ARSM
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->nud_timeout.event);
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->reply_rs.event);
-#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->addr_reg_timeout.event);
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
@@ -631,7 +631,7 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
         _nib_dr_entry_t *router = _nib_drl_get_dr();
 
         if ((router == NULL) && (offl == NULL)) {
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
             gnrc_netif_t *ptr = NULL;
 
             while ((ptr = gnrc_netif_iter(ptr))) {
@@ -639,9 +639,9 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
                                     GNRC_IPV6_NIB_ROUTE_INFO_TYPE_RRQ,
                                     dst, pkt);
             }
-#else   /* GNRC_IPV6_NIB_CONF_ROUTER */
+#else   /* CONFIG_GNRC_IPV6_NIB_ROUTER */
             (void)pkt;
-#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
             return -ENETUNREACH;
         }
         else if (router != NULL) {

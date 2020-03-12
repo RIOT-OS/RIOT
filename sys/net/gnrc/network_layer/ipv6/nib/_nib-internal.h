@@ -142,7 +142,7 @@ typedef struct _nib_onl_entry {
      * @brief Event for @ref GNRC_IPV6_NIB_SND_NA
      */
     evtimer_msg_event_t snd_na;
-#if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) || defined(DOXYGEN)
     evtimer_msg_event_t reply_rs;           /**< Event for @ref GNRC_IPV6_NIB_REPLY_RS */
 #endif
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR) || defined(DOXYGEN)
@@ -202,7 +202,7 @@ typedef struct {
      * @brief   Event for @ref GNRC_IPV6_NIB_PFX_TIMEOUT
      */
     evtimer_msg_event_t pfx_timeout;
-#ifdef GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     /**
      * @brief   Event for @ref GNRC_IPV6_NIB_ROUTE_TIMEOUT
      */
@@ -661,7 +661,7 @@ _nib_offl_entry_t *_nib_pl_add(unsigned iface,
  */
 void _nib_pl_remove(_nib_offl_entry_t *nib_offl);
 
-#if GNRC_IPV6_NIB_CONF_ROUTER || DOXYGEN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) || DOXYGEN
 /**
  * @brief   Creates or gets an existing forwarding table entry by its prefix
  *
@@ -676,7 +676,7 @@ void _nib_pl_remove(_nib_offl_entry_t *nib_offl);
  *                      @ref _nib_drl_add() for default route destinations.
  * @param[in] pfx_len   The length in bits of @p pfx in bits.
  *
- * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ROUTER.
+ * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_ROUTER.
  *
  * @return  A new or existing off-link entry with _nib_offl_entry_t::pfx set to
  *          @p pfx.
@@ -697,13 +697,13 @@ static inline _nib_offl_entry_t *_nib_ft_add(const ipv6_addr_t *next_hop,
  *
  * Corresponding on-link entry is removed, too.
  *
- * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ROUTER.
+ * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_ROUTER.
  */
 static inline void _nib_ft_remove(_nib_offl_entry_t *nib_offl)
 {
     _nib_offl_remove(nib_offl, _FT);
 }
-#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN)
 /**

@@ -71,7 +71,7 @@ extern "C" {
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_ROUTER
-#define GNRC_IPV6_NIB_CONF_ROUTER       1
+#define CONFIG_GNRC_IPV6_NIB_ROUTER   1
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_DNS
@@ -115,11 +115,11 @@ extern "C" {
 /**
  * @brief   enable features for IPv6 routers
  */
-#ifndef GNRC_IPV6_NIB_CONF_ROUTER
+#ifndef CONFIG_GNRC_IPV6_NIB_ROUTER
 #if CONFIG_GNRC_IPV6_NIB_6LR
-#define GNRC_IPV6_NIB_CONF_ROUTER       1
+#define CONFIG_GNRC_IPV6_NIB_ROUTER   1
 #else
-#define GNRC_IPV6_NIB_CONF_ROUTER       0
+#define CONFIG_GNRC_IPV6_NIB_ROUTER   0
 #endif
 #endif
 
@@ -127,7 +127,7 @@ extern "C" {
  * @brief    (de-)activate router advertising at interface start-up
  */
 #ifndef GNRC_IPV6_NIB_CONF_ADV_ROUTER
-#if GNRC_IPV6_NIB_CONF_ROUTER && \
+#if CONFIG_GNRC_IPV6_NIB_ROUTER && \
     (!CONFIG_GNRC_IPV6_NIB_6LR || CONFIG_GNRC_IPV6_NIB_6LBR)
 #define GNRC_IPV6_NIB_CONF_ADV_ROUTER   1
 #else

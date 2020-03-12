@@ -434,16 +434,16 @@ void _set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
     nce->info &= ~GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK;
     nce->info |= state;
 
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     gnrc_netif_acquire(netif);
     if (netif != NULL) {
         _call_route_info_cb(netif, GNRC_IPV6_NIB_ROUTE_INFO_TYPE_NSC,
                             &nce->ipv6, (void *)((intptr_t)state));
     }
     gnrc_netif_release(netif);
-#else   /* GNRC_IPV6_NIB_CONF_ROUTER */
+#else   /* CONFIG_GNRC_IPV6_NIB_ROUTER */
     (void)netif;
-#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 }
 
 bool _is_reachable(_nib_onl_entry_t *entry)

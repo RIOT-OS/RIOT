@@ -12,6 +12,7 @@
  * @file
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#include <kernel_defines.h>
 
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ndp.h"
@@ -29,7 +30,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
@@ -231,8 +232,8 @@ static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
 
     gnrc_ndp_rtr_adv_send(netif, NULL, dst, final, ext_opts);
 }
-#else  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#else  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 typedef int dont_be_pedantic;
-#endif /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 
 /** @} */

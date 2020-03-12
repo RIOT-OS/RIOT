@@ -20,6 +20,8 @@
 #ifndef NET_GNRC_NETIF_CONF_H
 #define NET_GNRC_NETIF_CONF_H
 
+#include <kernel_defines.h>
+
 #include "net/ieee802154.h"
 #include "net/ethernet/hdr.h"
 #include "net/gnrc/ipv6/nib/conf.h"
@@ -76,7 +78,7 @@ extern "C" {
  *
  * @note    Used for calculation of @ref GNRC_NETIF_IPV6_GROUPS_NUMOF
  */
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
 #define GNRC_NETIF_IPV6_RTR_ADDR   (1)
 #else
 #define GNRC_NETIF_IPV6_RTR_ADDR   (0)

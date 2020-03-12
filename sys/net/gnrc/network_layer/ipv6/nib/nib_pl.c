@@ -85,7 +85,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     gnrc_netif_release(netif);
 #endif  /* MODULE_GNRC_NETIF */
     _nib_release();
-#if defined(MODULE_GNRC_NETIF) && GNRC_IPV6_NIB_CONF_ROUTER
+#if defined(MODULE_GNRC_NETIF) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     /* update prefixes down-stream */
     _handle_snd_mc_ra(netif);
 #endif
@@ -106,7 +106,7 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
             (ipv6_addr_match_prefix(pfx, &dst->pfx) >= pfx_len)) {
             _nib_pl_remove(dst);
             _nib_release();
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
             gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
 
             if (netif) {

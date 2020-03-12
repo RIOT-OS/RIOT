@@ -33,7 +33,7 @@
 extern "C" {
 #endif
 
-#if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) || defined(DOXYGEN)
 /**
  * @brief   Initializes interface for router behavior
  *
@@ -119,7 +119,7 @@ void _set_rtr_adv(gnrc_netif_t *netif);
  */
 void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst,
                   bool final);
-#else  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#else  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 #define _init_iface_router(netif)                       (void)netif
 #define _call_route_info_cb(netif, type, ctx_addr, ctx) (void)netif; \
                                                         (void)type; \
@@ -131,7 +131,7 @@ void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst,
 #define _snd_rtr_advs(netif, dst, final)                (void)netif; \
                                                         (void)dst; \
                                                         (void)final
-#endif /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 
 #ifdef __cplusplus
 }

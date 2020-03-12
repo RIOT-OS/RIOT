@@ -95,7 +95,7 @@ extern "C" {
  * pointer to a valid on-link entry representing the neighbor that sent the
  * Router Solicitation.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_ROUTER != 0
  */
 #define GNRC_IPV6_NIB_REPLY_RS              (0x4fc5U)
 
@@ -107,7 +107,7 @@ extern "C" {
  * which the Router Advertisement will be sent and by which parameters it will
  * be configured.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_ROUTER != 0
  */
 #define GNRC_IPV6_NIB_SND_MC_RA             (0x4fc6U)
 
@@ -199,7 +199,7 @@ extern "C" {
  * This message type is for the event of a route timeout. The expected message
  * context is a valid off-link entry representing the route.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_ROUTER != 0
  */
 #define GNRC_IPV6_NIB_ROUTE_TIMEOUT         (0x4fd0U)
 
@@ -379,7 +379,7 @@ void gnrc_ipv6_nib_handle_pkt(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
  */
 void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type);
 
-#if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) || defined(DOXYGEN)
 /**
  * @brief   Changes the state if an interface advertises itself as a router
  *          or not

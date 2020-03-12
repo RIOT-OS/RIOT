@@ -108,7 +108,7 @@ typedef struct {
     netstats_t stats;
 #endif
 #if defined(MODULE_GNRC_IPV6_NIB) || DOXYGEN
-#if GNRC_IPV6_NIB_CONF_ROUTER || DOXYGEN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) || DOXYGEN
     /**
      * @brief   Route info callback
      *
@@ -131,10 +131,10 @@ typedef struct {
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      *          and @ref net_gnrc_ipv6_nib "NIB" and if
-     *          @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
+     *          @ref CONFIG_GNRC_IPV6_NIB_ROUTER != 0
      */
     evtimer_msg_event_t snd_mc_ra;
-#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 #if GNRC_IPV6_NIB_CONF_ARSM || DOXYGEN
     /**
      * @brief   Event for @ref GNRC_IPV6_NIB_RECALC_REACH_TIME
@@ -166,17 +166,17 @@ typedef struct {
     evtimer_msg_event_t addrs_timers[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
 #endif
 
-#if GNRC_IPV6_NIB_CONF_ROUTER || DOXYGEN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) || DOXYGEN
     /**
      * @brief   Timestamp in milliseconds of last unsolicited router
      *          advertisement
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      *          and @ref net_gnrc_ipv6_nib "NIB" and if
-     *          @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
+     *          @ref CONFIG_GNRC_IPV6_NIB_ROUTER != 0
      */
     uint32_t last_ra;
-#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 #if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
     /**
      * @brief   Base for random reachable time calculation and advertised
@@ -205,13 +205,13 @@ typedef struct {
      *          @ref net_gnrc_ipv6_nib "NIB"
      */
     uint32_t retrans_time;
-#if GNRC_IPV6_NIB_CONF_ROUTER || DOXYGEN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) || DOXYGEN
     /**
      * @brief   (Advertised) Router lifetime (default 1800).
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      *          and @ref net_gnrc_ipv6_nib "NIB" and if
-     *          @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
+     *          @ref CONFIG_GNRC_IPV6_NIB_ROUTER != 0
      */
     uint16_t rtr_ltime;
     /**
@@ -223,7 +223,7 @@ typedef struct {
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      *          and @ref net_gnrc_ipv6_nib "NIB" and if
-     *          @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
+     *          @ref CONFIG_GNRC_IPV6_NIB_ROUTER != 0
      */
     uint8_t ra_sent;
 #endif

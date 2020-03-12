@@ -203,7 +203,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             }
             /* else ask device */
             break;
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
         case NETOPT_IPV6_FORWARDING:
             assert(opt->data_len == sizeof(netopt_enable_t));
             *((netopt_enable_t *)opt->data) = (gnrc_netif_is_rtr(netif)) ?
@@ -216,7 +216,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
                                               NETOPT_ENABLE : NETOPT_DISABLE;
             res = sizeof(netopt_enable_t);
             break;
-#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 #endif  /* MODULE_GNRC_IPV6 */
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
         case NETOPT_6LO_IPHC:
@@ -296,7 +296,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             }
             /* else set device */
             break;
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
         case NETOPT_IPV6_FORWARDING:
             assert(opt->data_len == sizeof(netopt_enable_t));
             if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
@@ -316,7 +316,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                     (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE));
             res = sizeof(netopt_enable_t);
             break;
-#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 #endif  /* MODULE_GNRC_IPV6 */
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
         case NETOPT_6LO_IPHC:
