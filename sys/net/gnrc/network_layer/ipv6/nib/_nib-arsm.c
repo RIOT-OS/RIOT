@@ -71,20 +71,20 @@ void _snd_uc_ns(_nib_onl_entry_t *nbr, bool reset)
     DEBUG("nib: unicast to %s (retrans. timer = %ums)\n",
           ipv6_addr_to_str(addr_str, &nbr->ipv6, sizeof(addr_str)),
           (unsigned)netif->ipv6.retrans_time);
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     if (reset) {
         nbr->ns_sent = 0;
     }
-#else   /* GNRC_IPV6_NIB_CONF_ARSM */
+#else   /* CONFIG_GNRC_IPV6_NIB_ARSM */
     (void)reset;
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
     _snd_ns(&nbr->ipv6, netif, NULL, &nbr->ipv6);
     _evtimer_add(nbr, GNRC_IPV6_NIB_SND_UC_NS, &nbr->nud_timeout,
                  netif->ipv6.retrans_time);
     gnrc_netif_release(netif);
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     nbr->ns_sent++;
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
 }
 
 void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
@@ -99,7 +99,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         DEBUG("nib: Unexpected SL2AO length. Ignoring SL2AO\n");
         return;
     }
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     if ((nce != NULL) && (nce->mode & _NC) &&
         ((nce->l2addr_len != l2addr_len) ||
          (memcmp(nce->l2addr, sl2ao + 1, nce->l2addr_len) != 0)) &&
@@ -110,7 +110,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
         _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
     }
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
     if ((nce == NULL) || !(nce->mode & _NC)) {
         DEBUG("nib: Creating NCE for (ipv6 = %s, iface = %u, nud_state = STALE)\n",
               ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)),
@@ -151,18 +151,18 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                   netif->pid);
             nce->info &= ~GNRC_IPV6_NIB_NC_INFO_IS_ROUTER;
         }
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         /* a 6LR MUST NOT modify an existing NCE based on an SL2AO in an RS
          * see https://tools.ietf.org/html/rfc6775#section-6.3 */
         if (!_rtr_sol_on_6lr(netif, icmpv6)) {
             nce->l2addr_len = l2addr_len;
             memcpy(nce->l2addr, sl2ao + 1, l2addr_len);
         }
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
     }
 }
 
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
 /**
  * @brief   Calculates exponential back-off for retransmission timer for
  *          neighbor solicitations
@@ -502,6 +502,6 @@ static inline bool _rflag_set(const ndp_nbr_adv_t *nbr_adv)
     return (nbr_adv->type == ICMPV6_NBR_ADV) &&
            (nbr_adv->flags & NDP_NBR_ADV_FLAGS_R);
 }
-#endif /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
 
 /** @} */

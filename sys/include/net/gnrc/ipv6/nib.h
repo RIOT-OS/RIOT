@@ -118,7 +118,7 @@ extern "C" {
  * The expected message context is a pointer to a valid on-link entry
  * representing the neighbor cache entry that faces a state change.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ARSM != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0
  */
 #define GNRC_IPV6_NIB_REACH_TIMEOUT         (0x4fc7U)
 
@@ -129,7 +129,7 @@ extern "C" {
  * The expected message context is a pointer to a valid on-link entry
  * representing the neighbor cache entry that faces a state change.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ARSM != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0
  */
 #define GNRC_IPV6_NIB_DELAY_TIMEOUT         (0x4fc8U)
 
@@ -178,7 +178,7 @@ extern "C" {
  * time. The expected message context is a valid
  * [interface](@ref net_gnrc_netif).
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ARSM != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0
  */
 #define GNRC_IPV6_NIB_RECALC_REACH_TIME     (0x4fceU)
 

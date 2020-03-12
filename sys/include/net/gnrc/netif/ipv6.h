@@ -135,16 +135,16 @@ typedef struct {
      */
     evtimer_msg_event_t snd_mc_ra;
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
-#if GNRC_IPV6_NIB_CONF_ARSM || DOXYGEN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM) || DOXYGEN
     /**
      * @brief   Event for @ref GNRC_IPV6_NIB_RECALC_REACH_TIME
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      *          and @ref net_gnrc_ipv6_nib "NIB" and if
-     *          @ref GNRC_IPV6_NIB_CONF_ARSM != 0
+     *          @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0
      */
     evtimer_msg_event_t recalc_reach_time;
-#endif /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
     /**
      * @brief   Event for @ref GNRC_IPV6_NIB_SEARCH_RTR
      *
@@ -177,7 +177,7 @@ typedef struct {
      */
     uint32_t last_ra;
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
-#if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM) || defined(DOXYGEN)
     /**
      * @brief   Base for random reachable time calculation and advertised
      *          reachable time in ms (if @ref GNRC_NETIF_FLAGS_IPV6_RTR_ADV is
@@ -185,7 +185,7 @@ typedef struct {
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      *          and @ref net_gnrc_ipv6_nib "NIB" and if
-     *          @ref GNRC_IPV6_NIB_CONF_ARSM != 0
+     *          @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0
      */
     uint32_t reach_time_base;
 
@@ -194,10 +194,10 @@ typedef struct {
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      *          and @ref net_gnrc_ipv6_nib "NIB" and if
-     *          @ref GNRC_IPV6_NIB_CONF_ARSM != 0
+     *          @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0
      */
     uint32_t reach_time;
-#endif /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
     /**
      * @brief   Retransmission time and advertised retransmission time (in ms)
      *

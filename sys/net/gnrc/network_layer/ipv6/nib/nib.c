@@ -331,7 +331,7 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
           ctx, type, (unsigned)evtimer_now_msec());
     _nib_acquire();
     switch (type) {
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         case GNRC_IPV6_NIB_SND_UC_NS:
         case GNRC_IPV6_NIB_SND_MC_NS:
             _handle_snd_ns(ctx);
@@ -343,7 +343,7 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
         case GNRC_IPV6_NIB_RECALC_REACH_TIME:
             _recalc_reach_time(ctx);
             break;
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
         case GNRC_IPV6_NIB_SND_NA:
             _handle_snd_na(ctx);
             break;
@@ -674,7 +674,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     if (rtr_adv->cur_hl != 0) {
         netif->cur_hl = rtr_adv->cur_hl;
     }
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     if (rtr_adv->reach_time.u32 != 0) {
         uint32_t reach_time = byteorder_ntohl(rtr_adv->reach_time);
 
@@ -686,7 +686,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             _recalc_reach_time(&netif->ipv6);
         }
     }
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
     if (rtr_adv->retrans_timer.u32 != 0) {
         netif->ipv6.retrans_time = byteorder_ntohl(rtr_adv->retrans_timer);
     }
@@ -1062,9 +1062,9 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 #endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC */
     if (((nce = _nib_onl_get(&nbr_adv->tgt, netif->pid)) != NULL) &&
         (nce->mode & _NC)) {
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         bool tl2ao_avail = false;
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         uint8_t aro_status = _ADDR_REG_STATUS_UNAVAIL;
 #endif
@@ -1072,12 +1072,12 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         tmp_len = icmpv6_len - sizeof(ndp_nbr_adv_t);
         FOREACH_OPT(nbr_adv, opt, tmp_len) {
             switch (opt->type) {
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
                 case NDP_OPT_TL2A:
                     _handle_adv_l2(netif, nce, (icmpv6_hdr_t *)nbr_adv, opt);
                     tl2ao_avail = true;
                     break;
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
                 case NDP_OPT_AR:
                     aro_status = _handle_aro(netif, ipv6,
@@ -1091,7 +1091,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                           opt->type);
             }
         }
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         if (!tl2ao_avail && (nbr_adv->flags & NDP_NBR_ADV_FLAGS_S) &&
             (_get_nud_state(nce) != GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE)) {
             /* reachability confirmed without TL2AO */
@@ -1100,7 +1100,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         if (!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR)) {
             _handle_adv_l2(netif, nce, (icmpv6_hdr_t *)nbr_adv, NULL);
         }
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         /* 6Lo-ND duplicate address detection (DAD) was ignored by neighbor, try
          * traditional DAD */
@@ -1143,7 +1143,7 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
         nce->l2addr_len = 0;
         return true;
     }
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     if ((entry != NULL) && (entry->mode & _NC) && _is_reachable(entry)) {
         if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE) {
             _set_nud_state(netif, entry, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_DELAY);
@@ -1156,7 +1156,7 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
         _nib_nc_get(entry, nce);
         res = true;
     }
-#else   /* GNRC_IPV6_NIB_CONF_ARSM */
+#else   /* CONFIG_GNRC_IPV6_NIB_ARSM */
     if (entry != NULL) {
         DEBUG("nib: resolve address %s%%%u from neighbor cache\n",
               ipv6_addr_to_str(addr_str, &entry->ipv6, sizeof(addr_str)),
@@ -1164,11 +1164,11 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
         _nib_nc_get(entry, nce);
         res = true;
     }
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
     else if (!(res = _resolve_addr_from_ipv6(dst, netif, nce))) {
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         bool reset = false;
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
 
         DEBUG("nib: resolve address %s by probing neighbors\n",
               ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
@@ -1187,16 +1187,16 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                                     (void *)GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
             }
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
             reset = true;
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
         }
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         else if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE) {
             /* reduce back-off to possibly resolve neighbor sooner again */
             entry->ns_sent = 3;
         }
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
         if (pkt != NULL) {
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
             if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE) {
@@ -1237,9 +1237,9 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
             gnrc_pktbuf_release_error(pkt, EHOSTUNREACH);
 #endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
         }
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         _probe_nbr(entry, reset);
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
     }
     return res;
 }

@@ -60,8 +60,8 @@ extern "C" {
 #define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT     0
 #endif
 #if !CONFIG_GNRC_IPV6_NIB_6LR
-# ifndef GNRC_IPV6_NIB_CONF_ARSM
-# define GNRC_IPV6_NIB_CONF_ARSM        0
+# ifndef CONFIG_GNRC_IPV6_NIB_ARSM
+# define CONFIG_GNRC_IPV6_NIB_ARSM         0
 # endif
 # ifndef GNRC_IPV6_NIB_NUMOF
 /* only needs to store default router */
@@ -138,8 +138,8 @@ extern "C" {
 /**
  * @brief   (de-)activate NDP address resolution state-machine
  */
-#ifndef GNRC_IPV6_NIB_CONF_ARSM
-#define GNRC_IPV6_NIB_CONF_ARSM         1
+#ifndef CONFIG_GNRC_IPV6_NIB_ARSM
+#define CONFIG_GNRC_IPV6_NIB_ARSM         1
 #endif
 
 /**

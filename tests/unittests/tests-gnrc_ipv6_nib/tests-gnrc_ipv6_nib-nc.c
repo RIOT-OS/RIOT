@@ -14,6 +14,7 @@
  */
 
 #include <inttypes.h>
+#include <kernel_defines.h>
 
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6/nib/nc.h"
@@ -294,7 +295,7 @@ static void test_nib_nc_mark_reachable__success(void)
 
     iter_state = NULL;
     TEST_ASSERT(gnrc_ipv6_nib_nc_iter(0, &iter_state, &nce));
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     /* check if entry is reachable */
     TEST_ASSERT_EQUAL_INT(GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE,
                           gnrc_ipv6_nib_nc_get_nud_state(&nce));

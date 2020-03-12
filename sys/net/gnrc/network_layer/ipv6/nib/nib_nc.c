@@ -38,7 +38,7 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
         _nib_release();
         return -ENOMEM;
     }
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     if ((l2addr != NULL) && (l2addr_len > 0)) {
         memcpy(node->l2addr, l2addr, l2addr_len);
     }
@@ -105,7 +105,7 @@ bool gnrc_ipv6_nib_nc_iter(unsigned iface, void **state,
     return (*state != NULL);
 }
 
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
 static const char *_nud_str[] = {
     [GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNMANAGED]     = "-",
     [GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE]   = "UNREACHABLE",
@@ -143,7 +143,7 @@ void gnrc_ipv6_nib_nc_print(gnrc_ipv6_nib_nc_t *entry)
     if (gnrc_ipv6_nib_nc_is_router(entry)) {
         printf("router");
     }
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     printf(" %s", _nud_str[gnrc_ipv6_nib_nc_get_nud_state(entry)]);
 #endif
 #if CONFIG_GNRC_IPV6_NIB_6LR

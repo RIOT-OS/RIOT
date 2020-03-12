@@ -239,7 +239,7 @@ _nib_onl_entry_t *_nib_onl_get(const ipv6_addr_t *addr, unsigned iface)
 
 void _nib_nc_set_reachable(_nib_onl_entry_t *node)
 {
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
 
     node->info &= ~GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK;
@@ -255,9 +255,9 @@ void _nib_nc_set_reachable(_nib_onl_entry_t *node)
           _nib_onl_get_if(node), (unsigned)netif->ipv6.reach_time);
     _evtimer_add(node, GNRC_IPV6_NIB_REACH_TIMEOUT, &node->nud_timeout,
                  netif->ipv6.reach_time);
-#else   /* GNRC_IPV6_NIB_CONF_ARSM */
+#else   /* CONFIG_GNRC_IPV6_NIB_ARSM */
     (void)node;
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
 }
 
 void _nib_nc_remove(_nib_onl_entry_t *node)
@@ -267,9 +267,9 @@ void _nib_nc_remove(_nib_onl_entry_t *node)
           _nib_onl_get_if(node));
     node->mode &= ~(_NC);
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->snd_na.event);
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->nud_timeout.event);
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->reply_rs.event);
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
@@ -293,7 +293,7 @@ void _nib_nc_remove(_nib_onl_entry_t *node)
     _nib_onl_clear(node);
 }
 
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || !GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
 static inline int _get_l2addr_from_ipv6(const gnrc_netif_t *netif,
                                         const _nib_onl_entry_t *node,
                                         gnrc_ipv6_nib_nc_t *nce)
@@ -309,14 +309,14 @@ static inline int _get_l2addr_from_ipv6(const gnrc_netif_t *netif,
     }
     return res;
 }
-#endif /* CONFIG_GNRC_IPV6_NIB_6LN || !GNRC_IPV6_NIB_CONF_ARSM */
+#endif /* CONFIG_GNRC_IPV6_NIB_6LN || !CONFIG_GNRC_IPV6_NIB_ARSM */
 
 void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce)
 {
     assert((node != NULL) && (nce != NULL));
     memcpy(&nce->ipv6, &node->ipv6, sizeof(nce->ipv6));
     nce->info = node->info;
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (ipv6_addr_is_link_local(&nce->ipv6)) {
         gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
@@ -330,12 +330,12 @@ void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce)
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     nce->l2addr_len = node->l2addr_len;
     memcpy(&nce->l2addr, &node->l2addr, node->l2addr_len);
-#else   /* GNRC_IPV6_NIB_CONF_ARSM */
+#else   /* CONFIG_GNRC_IPV6_NIB_ARSM */
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
     assert(ipv6_addr_is_link_local(&nce->ipv6));
     assert(netif != NULL);
     _get_l2addr_from_ipv6(netif, node, nce);
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
 }
 
 _nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *router_addr, unsigned iface)

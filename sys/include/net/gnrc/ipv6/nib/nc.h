@@ -222,7 +222,7 @@ static inline unsigned gnrc_ipv6_nib_nc_get_ar_state(const gnrc_ipv6_nib_nc_t *e
  * If an entry pointing to the same IPv6 address as @p ipv6 exists already it
  * will be overwritten and marked as unmanaged.
  *
- * If @ref GNRC_IPV6_NIB_CONF_ARSM != 0 @p l2addr and @p l2addr_len won't be set.
+ * If @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0 @p l2addr and @p l2addr_len won't be set.
  *
  * @return  0 on success.
  * @return  -ENOMEM, if no space is left in neighbor cache.

@@ -112,11 +112,11 @@ typedef struct _nib_onl_entry {
      */
     eui64_t eui64;
 #endif
-#if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM) || defined(DOXYGEN)
     /**
      * @brief   Link-layer address of _nib_onl_entry_t::next_hop
      *
-     * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ARSM != 0.
+     * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0.
      */
     uint8_t l2addr[GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
 #endif
@@ -133,7 +133,7 @@ typedef struct _nib_onl_entry {
      *             one of these states). Because of this we can use one event
      *             for all of them (but need the different types, since the
      *             events are handled differently).
-     * @note    This is also available with @ref GNRC_IPV6_NIB_CONF_ARSM == 0,
+     * @note    This is also available with @ref CONFIG_GNRC_IPV6_NIB_ARSM == 0,
      *          since 6Lo address registration uses it to time the sending of
      *          neighbor solicitations.
      */
@@ -164,18 +164,18 @@ typedef struct _nib_onl_entry {
      * @see [Mode flags for entries](@ref net_gnrc_ipv6_nib_mode).
      */
     uint8_t mode;
-#if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM) || defined(DOXYGEN)
     /**
      * @brief   Neighbor solicitations sent for probing
      *
-     * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ARSM != 0.
+     * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0.
      */
     uint8_t ns_sent;
 
     /**
      * @brief   length in bytes of _nib_onl_entry_t::l2addr
      *
-     * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ARSM != 0.
+     * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0.
      */
     uint8_t l2addr_len;
 #endif
