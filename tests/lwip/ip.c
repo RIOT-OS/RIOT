@@ -27,6 +27,7 @@
 #include "net/sock/ip.h"
 #include "shell.h"
 #include "thread.h"
+#include "test_utils/expect.h"
 #include "xtimer.h"
 
 #ifdef MODULE_LWIP_IPV6
@@ -46,7 +47,7 @@ static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
 
 static void _ip_recv(sock_ip_t *sock, sock_async_flags_t flags, void *arg)
 {
-    assert(strcmp(arg, "test") == 0);
+    expect(strcmp(arg, "test") == 0);
     if (flags & SOCK_ASYNC_MSG_RECV) {
         sock_ip_ep_t src;
         int res;

@@ -26,6 +26,7 @@
 #include "net/sock/async/event.h"
 #include "net/sock/udp.h"
 #include "shell.h"
+#include "test_utils/expect.h"
 #include "thread.h"
 #include "xtimer.h"
 
@@ -46,7 +47,7 @@ static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
 
 static void _udp_recv(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
 {
-    assert(strcmp(arg, "test") == 0);
+    expect(strcmp(arg, "test") == 0);
     if (flags & SOCK_ASYNC_MSG_RECV) {
         sock_udp_ep_t src;
         int res;
