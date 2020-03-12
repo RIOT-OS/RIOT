@@ -230,7 +230,7 @@ extern "C" {
  * The expected message context is the [UDP end point](@ref sock_udp_ep_t)
  * representing the DNS server.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_DNS != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_DNS != 0
  */
 #define GNRC_IPV6_NIB_RDNSS_TIMEOUT         (0x4fd3U)
 /** @} */

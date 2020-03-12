@@ -18,7 +18,7 @@
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/sixlowpan/nd.h"
-#if GNRC_IPV6_NIB_CONF_DNS
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 #include "net/sock/dns.h"
 #endif
 
@@ -142,7 +142,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
     _nib_offl_entry_t *pfx = NULL;
     unsigned id = netif->pid;
 
-#if GNRC_IPV6_NIB_CONF_DNS && SOCK_HAS_IPV6
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS) && SOCK_HAS_IPV6
     uint32_t rdnss_ltime = _evtimer_lookup(&sock_dns_server,
                                            GNRC_IPV6_NIB_RDNSS_TIMEOUT);
 
@@ -161,7 +161,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         }
         ext_opts = rdnsso;
     }
-#endif  /* GNRC_IPV6_NIB_CONF_DNS */
+#endif  /* CONFIG_GNRC_IPV6_NIB_DNS */
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
     uint16_t ltime;
     gnrc_pktsnip_t *abro;

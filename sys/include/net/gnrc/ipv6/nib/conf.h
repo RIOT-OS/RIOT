@@ -75,7 +75,7 @@ extern "C" {
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_DNS
-#define GNRC_IPV6_NIB_CONF_DNS          1
+#define CONFIG_GNRC_IPV6_NIB_DNS      1
 #endif
 
 /**
@@ -186,8 +186,8 @@ extern "C" {
  *
  * @see [RFC 8106](https://tools.ietf.org/html/rfc8106)
  */
-#ifndef GNRC_IPV6_NIB_CONF_DNS
-#define GNRC_IPV6_NIB_CONF_DNS          0
+#ifndef CONFIG_GNRC_IPV6_NIB_DNS
+#define CONFIG_GNRC_IPV6_NIB_DNS    0
 #endif
 
 /**

@@ -28,7 +28,7 @@
 #include "net/gnrc/sixlowpan/nd.h"
 #include "net/ndp.h"
 #include "net/sixlowpan/nd.h"
-#if GNRC_IPV6_NIB_CONF_DNS
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 #include "net/sock/dns.h"
 #endif
 
@@ -51,7 +51,7 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 static gnrc_pktqueue_t _queue_pool[GNRC_IPV6_NIB_NUMOF];
 #endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
 
-#if GNRC_IPV6_NIB_CONF_DNS
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 static evtimer_msg_event_t _rdnss_timeout;
 #endif
 
@@ -79,7 +79,7 @@ static void _handle_rtr_timeout(_nib_dr_entry_t *router);
 static void _handle_snd_na(gnrc_pktsnip_t *pkt);
 /* needs to be exported for 6LN's ARO handling */
 void _handle_search_rtr(gnrc_netif_t *netif);
-#if GNRC_IPV6_NIB_CONF_DNS
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 static void _handle_rdnss_timeout(sock_udp_ep_t *dns_server);
 #endif
 /** @} */
@@ -388,7 +388,7 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
         case GNRC_IPV6_NIB_VALID_ADDR:
             _handle_valid_addr(ctx);
             break;
-#if GNRC_IPV6_NIB_CONF_DNS
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
         case GNRC_IPV6_NIB_RDNSS_TIMEOUT:
             _handle_rdnss_timeout(ctx);
 #endif
@@ -425,7 +425,7 @@ void gnrc_ipv6_nib_change_rtr_adv_iface(gnrc_netif_t *netif, bool enable)
  */
 static void _handle_mtuo(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
                          const ndp_opt_mtu_t *mtuo);
-#if GNRC_IPV6_NIB_CONF_DNS
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 static uint32_t _handle_rdnsso(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
                                const ndp_opt_rdnss_impl_t *rdnsso);
 #endif
@@ -742,7 +742,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
                 break;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
-#if GNRC_IPV6_NIB_CONF_DNS
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
             case NDP_OPT_RDNSS:
                 next_timeout = _min(_handle_rdnsso(netif,
                                                    (icmpv6_hdr_t *)rtr_adv,
@@ -1346,7 +1346,7 @@ void _handle_search_rtr(gnrc_netif_t *netif)
 #endif /* !GNRC_IPV6_NIB_CONF_NO_RTR_SOL */
 }
 
-#if GNRC_IPV6_NIB_CONF_DNS
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 static void _handle_rdnss_timeout(sock_udp_ep_t *dns_server)
 {
     memset(dns_server, 0, sizeof(sock_udp_ep_t));
@@ -1364,7 +1364,7 @@ static void _handle_mtuo(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
     }
 }
 
-#if GNRC_IPV6_NIB_CONF_DNS
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 static uint32_t _handle_rdnsso(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
                                const ndp_opt_rdnss_impl_t *rdnsso)
 {
