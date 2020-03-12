@@ -128,11 +128,11 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
 
     _init_iface_arsm(netif);
     netif->ipv6.retrans_time = NDP_RETRANS_TIMER_MS;
-#if GNRC_IPV6_NIB_CONF_SLAAC || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
-    /* TODO: set differently dependent on GNRC_IPV6_NIB_CONF_SLAAC if
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
+    /* TODO: set differently dependent on CONFIG_GNRC_IPV6_NIB_SLAAC if
      * alternatives exist */
     netif->ipv6.aac_mode = GNRC_NETIF_AAC_AUTO;
-#endif  /* GNRC_IPV6_NIB_CONF_SLAAC || CONFIG_GNRC_IPV6_NIB_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC || CONFIG_GNRC_IPV6_NIB_6LN */
     _init_iface_router(netif);
     gnrc_netif_init_6ln(netif);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
@@ -909,7 +909,7 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
           ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
     DEBUG("     - Destination address: %s\n",
           ipv6_addr_to_str(addr_str, &ipv6->dst, sizeof(addr_str)));
-#if GNRC_IPV6_NIB_CONF_SLAAC
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
     gnrc_netif_t *tgt_netif = gnrc_netif_get_by_ipv6_addr(&nbr_sol->tgt);
 
     if (tgt_netif != NULL) {
@@ -929,7 +929,7 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             return;
         }
     }
-#endif  /* GNRC_IPV6_NIB_CONF_SLAAC */
+#endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC */
     if (ipv6_addr_is_unspecified(&ipv6->src)) {
         gnrc_ndp_nbr_adv_send(&nbr_sol->tgt, netif, &ipv6->src, false, NULL);
     }
@@ -1041,7 +1041,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
           (nbr_adv->flags & NDP_NBR_ADV_FLAGS_R) ? 'R' : '-',
           (nbr_adv->flags & NDP_NBR_ADV_FLAGS_S) ? 'S' : '-',
           (nbr_adv->flags & NDP_NBR_ADV_FLAGS_O) ? 'O' : '-');
-#if GNRC_IPV6_NIB_CONF_SLAAC
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
     gnrc_netif_t *tgt_netif = gnrc_netif_get_by_ipv6_addr(&nbr_adv->tgt);
 
     if (tgt_netif != NULL) {
@@ -1059,7 +1059,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         /* else case beyond scope of RFC4862:
          * https://tools.ietf.org/html/rfc4862#section-5.4.4 */
     }
-#endif  /* GNRC_IPV6_NIB_CONF_SLAAC */
+#endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC */
     if (((nce = _nib_onl_get(&nbr_adv->tgt, netif->pid)) != NULL) &&
         (nce->mode & _NC)) {
 #if GNRC_IPV6_NIB_CONF_ARSM
@@ -1101,7 +1101,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             _handle_adv_l2(netif, nce, (icmpv6_hdr_t *)nbr_adv, NULL);
         }
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
-#if GNRC_IPV6_NIB_CONF_SLAAC && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         /* 6Lo-ND duplicate address detection (DAD) was ignored by neighbor, try
          * traditional DAD */
         if ((aro_status == _ADDR_REG_STATUS_UNAVAIL) &&

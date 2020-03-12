@@ -26,7 +26,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || GNRC_IPV6_NIB_CONF_SLAAC
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
@@ -36,11 +36,11 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
     int idx;
     uint8_t flags = GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE;
 
-#if !GNRC_IPV6_NIB_CONF_SLAAC
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
     if (!gnrc_netif_is_6ln(netif)) {
         LOG_WARNING("SLAAC not activated; will not auto-configure IPv6 address "
                          "for interface %u.\n"
-                    "    Use GNRC_IPV6_NIB_CONF_SLAAC=1 to activate.\n",
+                    "    Use CONFIG_GNRC_IPV6_NIB_SLAAC=1 to activate.\n",
                     netif->pid);
         return;
     }
@@ -89,9 +89,9 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
     (void)idx;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
 }
-#endif  /* CONFIG_GNRC_IPV6_NIB_6LN || GNRC_IPV6_NIB_CONF_SLAAC */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
-#if GNRC_IPV6_NIB_CONF_SLAAC
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
 static bool _try_l2addr_reconfiguration(gnrc_netif_t *netif)
 {
     uint8_t hwaddr[GNRC_NETIF_L2ADDR_MAXLEN];
@@ -217,8 +217,8 @@ void _handle_valid_addr(const ipv6_addr_t *addr)
         gnrc_netif_release(netif);
     }
 }
-#else  /* GNRC_IPV6_NIB_CONF_SLAAC */
+#else  /* CONFIG_GNRC_IPV6_NIB_SLAAC */
 typedef int dont_be_pedantic;
-#endif /* GNRC_IPV6_NIB_CONF_SLAAC */
+#endif /* CONFIG_GNRC_IPV6_NIB_SLAAC */
 
 /** @} */

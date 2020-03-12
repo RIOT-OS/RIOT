@@ -152,14 +152,14 @@ typedef struct {
      *          and @ref net_gnrc_ipv6_nib "NIB"
      */
     evtimer_msg_event_t search_rtr;
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || GNRC_IPV6_NIB_CONF_SLAAC || DOXYGEN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || DOXYGEN
     /**
      * @brief   Timers for address re-registration
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6" and
      *          @ref net_gnrc_ipv6_nib "NIB" and if
      *          @ref CONFIG_GNRC_IPV6_NIB_6LN != 0 or
-     *          @ref GNRC_IPV6_NIB_CONF_SLAAC != 0
+     *          @ref CONFIG_GNRC_IPV6_NIB_SLAAC != 0
      * @note    Might also be usable in the later default SLAAC implementation
      *          for NS retransmission timers.
      */

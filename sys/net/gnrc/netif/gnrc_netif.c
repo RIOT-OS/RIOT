@@ -637,7 +637,7 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
                                  UINT32_MAX, UINT32_MAX);
         }
     }
-#if GNRC_IPV6_NIB_CONF_SLAAC
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
     else if (!gnrc_netif_is_6ln(netif)) {
         /* cast to remove const qualifier (will still be used NIB internally as
          * const) */

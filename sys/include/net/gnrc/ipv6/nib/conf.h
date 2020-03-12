@@ -32,8 +32,8 @@ extern "C" {
 #ifndef CONFIG_GNRC_IPV6_NIB_6LBR
 #define CONFIG_GNRC_IPV6_NIB_6LBR      1
 #endif
-#ifndef GNRC_IPV6_NIB_CONF_SLAAC
-#define GNRC_IPV6_NIB_CONF_SLAAC        1
+#ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
+#define CONFIG_GNRC_IPV6_NIB_SLAAC     1
 #endif
 #ifndef GNRC_IPV6_NIB_NUMOF
 #define GNRC_IPV6_NIB_NUMOF             (16)
@@ -44,8 +44,8 @@ extern "C" {
 #ifndef CONFIG_GNRC_IPV6_NIB_6LR
 #define CONFIG_GNRC_IPV6_NIB_6LR       1
 #endif
-#ifndef GNRC_IPV6_NIB_CONF_SLAAC
-#define GNRC_IPV6_NIB_CONF_SLAAC        0
+#ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
+#define CONFIG_GNRC_IPV6_NIB_SLAAC     0
 #endif
 #endif
 
@@ -53,8 +53,8 @@ extern "C" {
 #ifndef CONFIG_GNRC_IPV6_NIB_6LN
 #define CONFIG_GNRC_IPV6_NIB_6LN           1
 #endif
-#ifndef GNRC_IPV6_NIB_CONF_SLAAC
-#define GNRC_IPV6_NIB_CONF_SLAAC        0
+#ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
+#define CONFIG_GNRC_IPV6_NIB_SLAAC         0
 #endif
 #ifndef GNRC_IPV6_NIB_CONF_QUEUE_PKT
 #define GNRC_IPV6_NIB_CONF_QUEUE_PKT    0
@@ -159,8 +159,8 @@ extern "C" {
  *
  * @see [RFC 4862](https://tools.ietf.org/html/rfc4862)
  */
-#ifndef GNRC_IPV6_NIB_CONF_SLAAC
-#define GNRC_IPV6_NIB_CONF_SLAAC        1
+#ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
+#define CONFIG_GNRC_IPV6_NIB_SLAAC     1
 #endif
 
 /**
