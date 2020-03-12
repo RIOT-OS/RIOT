@@ -69,6 +69,14 @@ extern "C" {
 #ifndef TCPIP_THREAD_STACKSIZE
 #define TCPIP_THREAD_STACKSIZE        (3072)
 #endif
+
+#ifndef GCOAP_STACK_SIZE
+#ifdef MODULE_GNRC
+#define GCOAP_STACK_SIZE              (1536 + DEBUG_EXTRA_STACKSIZE)
+#elif MODULE_LWIP
+#define GCOAP_STACK_SIZE              (2048 + DEBUG_EXTRA_STACKSIZE)
+#endif
+#endif
 /** @} */
 
 /**
