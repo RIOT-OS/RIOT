@@ -1756,7 +1756,7 @@ static void test_nib_ft_remove(void)
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 /*
- * Creates GNRC_IPV6_NIB_ABR_NUMOF ABR entries with different addresses and
+ * Creates CONFIG_GNRC_IPV6_NIB_ABR_NUMOF ABR entries with different addresses and
  * then tries to add another.
  * Expected result: should return NULL
  */
@@ -1765,7 +1765,7 @@ static void test_nib_abr_add__no_space_left(void)
     ipv6_addr_t addr = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
                                 { .u64 = TEST_UINT64 } } };
 
-    for (int i = 0; i < GNRC_IPV6_NIB_ABR_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_ABR_NUMOF; i++) {
         TEST_ASSERT_NOT_NULL(_nib_abr_add(&addr));
         addr.u64[1].u64++;
     }
@@ -1773,7 +1773,7 @@ static void test_nib_abr_add__no_space_left(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_ABR_NUMOF ABR entries with different addresses and then
+ * Creates CONFIG_GNRC_IPV6_NIB_ABR_NUMOF ABR entries with different addresses and then
  * tries to add another that is equal to the last.
  * Expected result: should return not NULL (the last)
  */
@@ -1783,7 +1783,7 @@ static void test_nib_abr_add__success_duplicate(void)
     ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                   { .u64 = TEST_UINT64 } } };
 
-    for (int i = 0; i < GNRC_IPV6_NIB_ABR_NUMOF; i++) {
+    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_ABR_NUMOF; i++) {
         addr.u64[1].u64++;
         TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
     }

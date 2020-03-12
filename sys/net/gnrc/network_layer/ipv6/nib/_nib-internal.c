@@ -41,7 +41,7 @@ static _nib_offl_entry_t _dsts[CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF];
 static _nib_dr_entry_t _def_routers[CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF];
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
-static _nib_abr_entry_t _abrs[GNRC_IPV6_NIB_ABR_NUMOF];
+static _nib_abr_entry_t _abrs[CONFIG_GNRC_IPV6_NIB_ABR_NUMOF];
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 static rmutex_t _nib_mutex = RMUTEX_INIT;
 
@@ -530,7 +530,7 @@ static inline unsigned _idx_dsts(const _nib_offl_entry_t *dst)
 
 static inline bool _in_abrs(const _nib_abr_entry_t *abr)
 {
-    return (abr < (_abrs + GNRC_IPV6_NIB_ABR_NUMOF));
+    return (abr < (_abrs + CONFIG_GNRC_IPV6_NIB_ABR_NUMOF));
 }
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 
@@ -686,7 +686,7 @@ _nib_abr_entry_t *_nib_abr_add(const ipv6_addr_t *addr)
     assert(addr != NULL);
     DEBUG("nib: Allocating authoritative border router entry (addr = %s)\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
-    for (unsigned i = 0; i < GNRC_IPV6_NIB_ABR_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_ABR_NUMOF; i++) {
         _nib_abr_entry_t *tmp = &_abrs[i];
 
         if (ipv6_addr_equal(addr, &tmp->addr)) {

@@ -272,8 +272,8 @@ extern "C" {
 /**
  * @brief   Number of authoritative border router entries in NIB
  */
-#ifndef GNRC_IPV6_NIB_ABR_NUMOF
-#define GNRC_IPV6_NIB_ABR_NUMOF             (1)
+#ifndef CONFIG_GNRC_IPV6_NIB_ABR_NUMOF
+#define CONFIG_GNRC_IPV6_NIB_ABR_NUMOF             (1)
 #endif
 #endif
 
