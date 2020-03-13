@@ -33,6 +33,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     hifive1b \
     i-nucleo-lrwan1 \
     ikea-tradfri \
+    im880b \
     limifrog-v1 \
     lobaro-lorabox \
     lsn50 \

@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     cc2650-launchpad \
     cc2650stk \
     i-nucleo-lrwan1 \
+    im880b \
     lobaro-lorabox \
     maple-mini \
     microbit \

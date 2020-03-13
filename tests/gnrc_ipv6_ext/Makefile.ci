@@ -9,6 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     derfmega128 \
     hifive1 \
     hifive1b \
+    im880b \
     i-nucleo-lrwan1 \
     mega-xplained \
     microduino-corerf \
