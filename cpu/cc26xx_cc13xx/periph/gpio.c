@@ -38,9 +38,12 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     if ((unsigned int)pin > 31)
         return -1;
 
+    /* enable peripherals power domain */
+    if (!power_is_domain_enabled(POWER_DOMAIN_PERIPHERALS)) {
+        power_enable_domain(POWER_DOMAIN_PERIPHERALS);
+    }
+
     /* enable GPIO clock */
-    PRCM->PDCTL0 |= PDCTL0_PERIPH_ON;
-    while(!(PRCM->PDSTAT0 & PDSTAT0_PERIPH_ON)) ;
     PRCM->GPIOCLKGR |= 1;
     PRCM->CLKLOADCTL |= CLKLOADCTL_LOAD;
     while (!(PRCM->CLKLOADCTL & CLKLOADCTL_LOADDONE)) ;

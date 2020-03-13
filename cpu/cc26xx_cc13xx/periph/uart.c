@@ -57,9 +57,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     int rts_pin = uart_config[uart].rts_pin;
     int cts_pin = uart_config[uart].cts_pin;
 #endif
+
     /* enable clocks: serial power domain and UART */
-    PRCM->PDCTL0SERIAL = 1;
-    while (!(PRCM->PDSTAT0 & PDSTAT0_SERIAL_ON)) ;
+    if (!power_is_domain_enabled(POWER_DOMAIN_SERIAL)) {
+        power_enable_domain(POWER_DOMAIN_SERIAL);
+    }
     uart_poweron(uart);
 
     /* disable and reset the UART */
