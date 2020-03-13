@@ -895,6 +895,9 @@ ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
  * To add multiple Uri-Query options, simply call this function multiple times.
  * The Uri-Query options will be added in the order those calls.
  *
+ * @deprecated  Will not be available after the 2020.10 release. Use
+ * coap_opt_add_uquery() instead.
+ *
  * @param[out] pdu      The package that is being build
  * @param[in]  key      Key to add to the query string
  * @param[in]  val      Value to assign to @p key (may be NULL)
