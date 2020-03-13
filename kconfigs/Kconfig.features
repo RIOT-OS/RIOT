@@ -256,6 +256,11 @@ config HAS_PERIPH_UART_NONBLOCKING
     help
         Indicates that the UART peripheral allows non-blocking operations.
 
+config HAS_PERIPH_UART_RECONFIGURE
+    bool
+    help
+        Indicates that the UART pins can be re-configured as GPIOs.
+
 config HAS_PERIPH_USBDEV
     bool
     help
