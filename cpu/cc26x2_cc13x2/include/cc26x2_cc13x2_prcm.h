@@ -254,6 +254,11 @@ typedef struct {
 #define PDSTAT1_CPU_ON      0x2
 #define PDSTAT1_RFC_ON      0x4
 #define PDSTAT1_VIMS_ON     0x8
+
+#define GPIOCLKGR_CLK_EN       0x1
+#define I2CCLKGR_CLK_EN        0x1
+#define UARTCLKGR_CLK_EN_UART0 0x1
+#define UARTCLKGR_CLK_EN_UART1 0x1
 /** @} */
 
 /** @ingroup cpu_specific_peripheral_memory_map

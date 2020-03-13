@@ -22,6 +22,8 @@
 #include <cc26xx_cc13xx.h>
 #include <stdbool.h>
 
+#include "periph/uart.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -50,9 +52,40 @@ bool power_is_domain_enabled(const power_domain_t domain);
 /**
  * @brief   Enable the specified power domain.
  *
- * @params[in] domain The domain.
+ * @param[in] domain The domain.
  */
 void power_enable_domain(const power_domain_t domain);
+
+/**
+ * @brief   Enable GPIO clock
+ */
+void power_clock_enable_gpio(void);
+
+/**
+ * @brief   Enable General Purpose Timer clock
+ *
+ * @param[in] tim The timer to enable
+ */
+void power_clock_enable_gpt(uint32_t tim);
+
+/**
+ * @brief   Enable I2C clock
+ */
+void power_clock_enable_i2c(void);
+
+/**
+ * @brief   Enable UART clocks
+ *
+ * @param[in] uart The UART number
+ */
+void power_clock_enable_uart(uart_t uart);
+
+/**
+ * @brief   Disable UART clocks
+ *
+ * @param[in] uart The UART number
+ */
+void power_clock_disable_uart(uart_t uart);
 
 #ifdef __cplusplus
 } /* end extern "C" */

@@ -24,6 +24,8 @@
 #include "periph/uart.h"
 #include "periph_conf.h"
 
+#include "cc26xx_cc13xx_power.h"
+
 /**
  * @brief   Bit mask for the fractional part of the baudrate
  */
@@ -161,9 +163,8 @@ void uart_poweron(uart_t uart)
 
     uart_regs_t *uart_reg = uart_config[uart].regs;
 
-    PRCM->UARTCLKGR |= 0x1;
-    PRCM->CLKLOADCTL = CLKLOADCTL_LOAD;
-    while (!(PRCM->CLKLOADCTL & CLKLOADCTL_LOADDONE)) {}
+    /* Enable clock for this UART */
+    power_clock_enable_uart(uart);
 
     uart_reg->CTL = ENABLE_MASK;
 }
@@ -176,10 +177,8 @@ void uart_poweroff(uart_t uart)
 
     uart_reg->CTL = 0;
 
-    PRCM->UARTCLKGR = 0;
-    PRCM->CLKLOADCTL = CLKLOADCTL_LOAD;
-    while (!(PRCM->CLKLOADCTL & CLKLOADCTL_LOADDONE)) {}
-
+    /* Disable clock for this UART */
+    power_clock_disable_uart(uart);
 }
 
 static void isr_uart(uart_t uart)

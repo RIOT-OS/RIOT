@@ -29,6 +29,8 @@
 #include "periph_conf.h"
 #include "periph/timer.h"
 
+#include "cc26xx_cc13xx_power.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -105,9 +107,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     }
 
     /* enable the timer clock */
-    PRCM->GPTCLKGR |= (1 << tim);
-    PRCM->CLKLOADCTL = CLKLOADCTL_LOAD;
-    while (!(PRCM->CLKLOADCTL & CLKLOADCTL_LOADDONE)) {}
+    power_clock_enable_gpt(tim);
 
     /* disable (and reset) timer */
     dev(tim)->CTL = 0;
