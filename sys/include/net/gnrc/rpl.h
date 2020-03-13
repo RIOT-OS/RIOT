@@ -488,6 +488,13 @@ extern netstats_rpl_t gnrc_rpl_netstats;
 #endif
 
 /**
+ * @brief Default network interface for GNRC RPL
+ */
+#ifndef GNRC_RPL_DEFAULT_NETIF
+#define GNRC_RPL_DEFAULT_NETIF (KERNEL_PID_UNDEF)
+#endif
+
+/**
  * @brief Initialization of the RPL thread.
  *
  * @param[in] if_pid            PID of the interface
