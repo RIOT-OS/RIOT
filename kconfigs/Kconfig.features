@@ -195,6 +195,11 @@ config HAS_PERIPH_SPI
     help
         Indicates that an SPI peripheral is present.
 
+config HAS_PERIPH_SPI_RECONFIGURE
+    bool
+    help
+        Indicates that the SPI peripheral allows pin reconfiguration.
+
 config HAS_PERIPH_SPI_GPIO_MODE
     bool
     help
