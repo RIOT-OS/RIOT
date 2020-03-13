@@ -22,7 +22,6 @@
  */
 
 #include <string.h>
-#include <stdio.h>
 
 #include "assert.h"
 #include "kernel_defines.h"

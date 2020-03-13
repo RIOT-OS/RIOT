@@ -13,14 +13,16 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#include <stdio.h>
-
 #include "assert.h"
+#include "fmt.h"
 
 #ifdef DEBUG_ASSERT_VERBOSE
 NORETURN void _assert_failure(const char *file, unsigned line)
 {
-    printf("%s:%u => ", file, line); \
+    print_str(file);
+    print_str(":");
+    print_u32_dec(line);
+    print_str(" => ");
     core_panic(PANIC_ASSERT_FAIL, assert_crash_message); \
 }
 #else

@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 #ifdef BOARD_NATIVE
-#include <stdio.h>
+#include "fmt.h"
 
 /*
  * Required to use some C++11 headers with g++ on the native board.
@@ -45,7 +45,7 @@ typedef struct {
  */
 inline int sched_yield(void)
 {
-    puts("[ERROR] sched_yield called (defined in sched.h)\n");
+    print_str("[ERROR] sched_yield called (defined in sched.h)\n");
     return 0;
 }
 #else
