@@ -68,9 +68,39 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Antenna configuration pin interface
+ * @{
+ */
+#define RFCTL1_PIN                  GPIO_PIN(PA, 9)
+#define RFCTL2_PIN                  GPIO_PIN(PA, 12)
+/** @} */
+
+/**
+ * @brief   Antenna configuration values
+ */
+enum {
+    RFCTL_ANTENNA_BOARD,
+    RFCTL_ANTENNA_EXT,
+};
+
+/**
+ * @name    Default antenna configuration
+ * @{
+ */
+#ifndef RFCTL_ANTENNA_DEFAULT
+#define RFCTL_ANTENNA_DEFAULT      RFCTL_ANTENNA_BOARD
+#endif
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
+
+/**
+ * @brief   Set antenna switch
+ */
+void board_antenna_config(uint8_t antenna);
 
 #ifdef __cplusplus
 }
