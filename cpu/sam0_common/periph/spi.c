@@ -134,6 +134,16 @@ void spi_init_pins(spi_t bus)
     gpio_init_mux(spi_config[bus].miso_pin, spi_config[bus].miso_mux);
     gpio_init_mux(spi_config[bus].mosi_pin, spi_config[bus].mosi_mux);
     /* clk_pin will be muxed during acquire / release */
+
+    mutex_unlock(&locks[bus]);
+}
+
+void spi_deinit_pins(spi_t bus)
+{
+    mutex_lock(&locks[bus]);
+
+    gpio_disable_mux(spi_config[bus].miso_pin);
+    gpio_disable_mux(spi_config[bus].mosi_pin);
 }
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
