@@ -95,13 +95,13 @@ void i2c_init(i2c_t devnum)
     assert(devnum < I2C_NUMOF);
 
     /* Make sure everything is shut off in case of reinit */
-    PRCM->PDCTL0SERIAL = 0;
     I2C->MCR = 0;
     PRCM->I2CCLKGR = 0;
 
-    /* enable SERIAL power domain */
-    PRCM->PDCTL0SERIAL = 1;
-    while (!(PRCM->PDSTAT0 & PDSTAT0_SERIAL_ON)) {}
+    /* Enable serial power domain */
+    if (!power_is_domain_enabled(POWER_DOMAIN_SERIAL)) {
+        power_enable_domain(POWER_DOMAIN_SERIAL);
+    }
 
     /* enable i2c clock in run mode */
     PRCM->I2CCLKGR = 1;
