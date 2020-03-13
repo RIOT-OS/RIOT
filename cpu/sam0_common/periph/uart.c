@@ -188,6 +188,42 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return UART_OK;
 }
 
+void uart_init_pins(uart_t uart)
+{
+    _configure_pins(uart);
+
+    uart_poweron(uart);
+}
+
+void uart_deinit_pins(uart_t uart)
+{
+    uart_poweroff(uart);
+
+    /* de-configure RX pin */
+    if (uart_config[uart].rx_pin != GPIO_UNDEF) {
+        gpio_disable_mux(uart_config[uart].rx_pin);
+    }
+
+    /* de-configure TX pin */
+    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+        gpio_disable_mux(uart_config[uart].tx_pin);
+    }
+
+#ifdef MODULE_PERIPH_UART_HW_FC
+    /* If RTS/CTS needed, enable them */
+    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
+        /* Ensure RTS is defined */
+        if (uart_config[uart].rts_pin != GPIO_UNDEF) {
+            gpio_disable_mux(uart_config[uart].rts_pin);
+        }
+        /* Ensure CTS is defined */
+        if (uart_config[uart].cts_pin != GPIO_UNDEF) {
+            gpio_disable_mux(uart_config[uart].cts_pin);
+        }
+    }
+#endif
+}
+
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     if (uart_config[uart].tx_pin == GPIO_UNDEF) {
