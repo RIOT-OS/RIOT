@@ -8,6 +8,10 @@ ifneq (,$(filter eepreg,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eeprom
 endif
 
+ifneq (,$(filter shell,$(USEMODULE)))
+  USEMODULE += fmt_table
+endif
+
 ifneq (,$(filter fmt_table,$(USEMODULE)))
   USEMODULE += fmt
 endif
