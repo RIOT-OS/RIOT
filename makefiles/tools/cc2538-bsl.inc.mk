@@ -6,4 +6,6 @@ FFLAGS  = -p "$(PROG_DEV)" $(FFLAGS_OPTS) -e -w -v -b $(PROG_BAUD) $(FLASHFILE)
 
 RESET ?= $(FLASHER) -p "$(PROG_DEV)" $(FFLAGS_OPTS)
 
-FLASHDEPS += $(FLASHER)
+ifeq ($(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py,$(FLASHER))
+  FLASHDEPS += $(FLASHER)
+endif
