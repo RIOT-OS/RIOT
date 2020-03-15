@@ -12,6 +12,10 @@ ifneq (,$(filter phydat,$(USEMODULE)))
   USEMODULE += fmt_table
 endif
 
+ifneq (,$(filter ps,$(USEMODULE)))
+  USEMODULE += fmt_table
+endif
+
 ifneq (,$(filter shell,$(USEMODULE)))
   USEMODULE += fmt_table
 endif
