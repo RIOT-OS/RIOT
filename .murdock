@@ -227,6 +227,9 @@ compile() {
 
     print_worker
 
+    echo "failing intentionally"
+    exit 1
+
     # sanity checks
     [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board:\$toolchain)"
     [ ! -d "$appdir" ] && error "$0: compile: error: application directory \"$appdir\" doesn't exist"
