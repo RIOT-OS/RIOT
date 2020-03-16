@@ -50,9 +50,11 @@ ifeq (dfu-util,$(PROGRAMMER))
 endif
 
 ifeq (stm32flash,$(PROGRAMMER))
+	ROM_OFFSET ?= 0x0
 	FLASHER = stm32flash
 	DEBUGGER =
 	FLASHFILE ?= $(BINFILE)
 	PROG_BAUD ?= 57600
-	FFLAGS = -b $(PROG_BAUD) -w $(FLASHFILE) -g 0x0 $(PORT)
+	BIN_ADDR ?= $(shell echo  $$(($(ROM_START_ADDR) + $(ROM_OFFSET))))
+	FFLAGS = -v -b $(PROG_BAUD) -w $(FLASHFILE) -S $(BIN_ADDR) -g $(BIN_ADDR) $(PORT)
 endif
