@@ -105,15 +105,11 @@ static void test_ztimer_mock_now8(void)
     TEST_ASSERT_EQUAL_INT(0, now);
 
     ztimer_mock_advance(&zmock, 123);
-    puts("advanced 123");
     now = ztimer_now(z);
-    puts("advanced 123 now");
     TEST_ASSERT_EQUAL_INT(123, now);
 
     ztimer_mock_advance(&zmock, 0x100);
-    puts("advanced");
     now = ztimer_now(z);
-    puts("now");
     TEST_ASSERT_EQUAL_INT(0x100 + 123, now);
 
     ztimer_mock_advance(&zmock, 180);
