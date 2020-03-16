@@ -137,7 +137,4 @@
 
 # KConfig maintainers will be notified about all KConfig changes
 Kconfig                                     @leandrolanzieri @jia200x @cgundogan
-Makefile.dep                                @aabadie @fjmolinas
-Makefile.features                           @aabadie @fjmolinas
-Makefile.include                            @aabadie @fjmolinas
 pm.c                                        @roberthartung @kaspar030
