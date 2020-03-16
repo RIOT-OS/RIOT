@@ -39,7 +39,7 @@ int main(void)
      * counter anyway after wakeup, we did not sleep properly.
      */
     static int counter_noinit __attribute__((section(".noinit")));
-    static int counter __attribute__((section(".backup.bss")));
+    static int counter BACKUP_RAM;
 
     if (counter == 0) {
         puts("\nBackup RAM test\n");
