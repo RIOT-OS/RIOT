@@ -1,7 +1,6 @@
 include ../Makefile.tests_common
 
 USEMODULE += shell
-USEMODULE += shell_commands
 USEMODULE += timex
 
 # The MSP-430 toolchain lacks sscanf:

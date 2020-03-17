@@ -15,9 +15,6 @@ TIMEOUT = 30
 
 
 def testfunc(child):
-    child.expect_exact("GPIO peripheral driver test")
-    child.expect_exact(">")
-
     for pin in range(0, 8):
         child.sendline("bench 0 {}".format(pin))
         child.expect(r" *nop loop: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")

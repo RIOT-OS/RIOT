@@ -238,8 +238,7 @@ void auto_init(void)
         }
     }
 
-    if (IS_USED(MODULE_TEST_UTILS_INTERACTIVE_SYNC) &&
-        (!IS_USED(MODULE_SHELL_COMMANDS) || !IS_USED(MODULE_SHELL))) {
+    if (IS_USED(MODULE_TEST_UTILS_INTERACTIVE_SYNC) && !IS_USED(MODULE_SHELL)) {
         extern void test_utils_interactive_sync(void);
         test_utils_interactive_sync();
     }

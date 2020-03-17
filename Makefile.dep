@@ -1078,6 +1078,12 @@ ifneq (,$(filter ecc_%,$(USEMODULE)))
   USEMODULE += ecc
 endif
 
+ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
+  ifneq (,$(filter shell,$(USEMODULE)))
+    DEFAULT_MODULE += test_utils_interactive_sync_shell
+  endif
+endif
+
 # recursively catch transitive dependencies
 USEMODULE := $(sort $(USEMODULE))
 USEPKG := $(sort $(USEPKG))
@@ -1100,6 +1106,12 @@ else
   # cach since none of these modules can trigger dependency resolution.
   ifneq (,$(filter periph_init,$(USEMODULE)))
     USEMODULE += $(filter periph_init_%,$(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE)))
+  endif
+
+  # Add test_utils_interactive_sync_shell
+  ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
+    USEMODULE += $(filter test_utils_interactive_sync_%, \
+      $(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE)))
   endif
 
   USEMODULE := $(sort $(USEMODULE))

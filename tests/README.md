@@ -26,6 +26,14 @@ default module in `Makefile.tests_common`. It can be disabled by setting in the
 application makefile `DISABLE_MODULE += test_utils_interactive_sync`. The python
 test script will adapt to it automatically.
 
+When using the `shell` module, `test_utils_interactive_sync` will use the shell
+itself to synchronize, and will not use `test_utils_interactive_sync();` function
+to synchronize. Some times you will want to synchronize before the start of the
+script and use `test_utils_interactive_sync();` function (e.g.:
+[tests/ps_schedstatistics](tests/ps_schedstatistics/main.c)). For these cases
+you can disable `test_utils_interactive_sync_shell` module in the application
+`Makefile`: `DISABLE_MODULE += test_utils_interactive_sync_shell`.
+
 
 Running automated tests
 -----------------------
