@@ -187,11 +187,10 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
             if (iface) {
                 data->netif = gnrc_netif_get_by_pid(atoi(iface));
             }
-#if GNRC_NETIF_NUMOF == 1
-            else {
+            else if (gnrc_netif_highlander()) {
                 data->netif = gnrc_netif_iter(NULL);
             }
-#endif
+
             if (ipv6_addr_from_str(&data->host, data->hostname) == NULL) {
                 break;
             }

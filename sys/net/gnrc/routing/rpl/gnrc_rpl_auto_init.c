@@ -28,7 +28,7 @@
 
 void auto_init_gnrc_rpl(void)
 {
-    if (GNRC_NETIF_NUMOF == 1) {
+    if (gnrc_netif_highlander()) {
         gnrc_netif_t *netif = gnrc_netif_iter(NULL);
         if (netif == NULL) {
             /* XXX this is just a work-around ideally this would happen with
@@ -57,7 +57,8 @@ void auto_init_gnrc_rpl(void)
     else {
         /* XXX this is just a work-around ideally this should be defined in some
          * run-time interface configuration */
-        DEBUG("auto_init_gnrc_rpl: please specify an interface by setting GNRC_RPL_DEFAULT_NETIF\n");
+        DEBUG("auto_init_gnrc_rpl: please specify an interface "
+               "by setting GNRC_RPL_DEFAULT_NETIF\n");
     }
 }
 #else

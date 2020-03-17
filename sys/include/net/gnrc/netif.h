@@ -274,6 +274,22 @@ gnrc_netif_t *gnrc_netif_create(char *stack, int stacksize, char priority,
 unsigned gnrc_netif_numof(void);
 
 /**
+ * @brief Check if there can only be one @ref gnrc_netif_t interface.
+ *
+ * > There can only be one!
+ *
+ * This function is used to allow compile time optimizations for
+ * single interface applications
+ *
+ * @return true, if there can only only one interface
+ * @return false, if there can be more than one interface
+ */
+static inline bool gnrc_netif_highlander(void)
+{
+    return (GNRC_NETIF_NUMOF == 1);
+}
+
+/**
  * @brief   Iterate over all network interfaces.
  *
  * @param[in] prev  previous interface in iteration. NULL to start iteration.
