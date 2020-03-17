@@ -49,9 +49,9 @@ int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize, char prio
 {
     int res;
 
-    if (IS_ACTIVE(DEVELHELP) && IS_ACTIVE(GNRC_NETIF_SINGLE) && netif_iter(NULL)) {
-        LOG_WARNING("gnrc_netif: GNRC_NETIF_SINGLE set but more than one "
-                    "interface is being registered.");
+    if (IS_ACTIVE(DEVELHELP) && gnrc_netif_highlander() && netif_iter(NULL)) {
+        LOG_WARNING("gnrc_netif: gnrc_netif_highlander() returned true but "
+                    "more than one interface is being registered.\n");
         assert(netif_iter(NULL) == NULL);
     }
     rmutex_init(&netif->mutex);
