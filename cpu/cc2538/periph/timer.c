@@ -93,6 +93,34 @@ static inline void _irq_enable(tim_t tim)
     }
 }
 
+static inline void _timer_clock_enable(tim_t tim)
+{
+    DEBUG("%s\n", __FUNCTION__);
+
+    SYS_CTRL->RCGCGPT |= (1UL << tim);
+    SYS_CTRL->SCGCGPT |= (1UL << tim);
+    SYS_CTRL->DCGCGPT |= (1UL << tim);
+    /* Wait for the clock enabling to take effect */
+    while (!(SYS_CTRL->RCGCGPT &= (1UL << tim)) || \
+           !(SYS_CTRL->SCGCGPT &= (1UL << tim)) || \
+           !(SYS_CTRL->DCGCGPT &= (1UL << tim))
+           ) {}
+}
+
+static inline void _timer_clock_disable(tim_t tim)
+{
+    DEBUG("%s\n", __FUNCTION__);
+
+    SYS_CTRL->RCGCGPT &= ~(1UL << tim);
+    SYS_CTRL->SCGCGPT &= ~(1UL << tim);
+    SYS_CTRL->DCGCGPT &= ~(1UL << tim);
+    /* Wait for the clock gating to take effect */
+    while ((SYS_CTRL->RCGCGPT &= (1UL << tim)) || \
+           (SYS_CTRL->SCGCGPT &= (1UL << tim)) || \
+           (SYS_CTRL->DCGCGPT &= (1UL << tim))
+           ) {}
+}
+
 static inline cc2538_gptimer_t *dev(tim_t tim)
 {
     assert(tim < TIMER_NUMOF);
@@ -116,8 +144,8 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     isr_ctx[tim].cb  = cb;
     isr_ctx[tim].arg = arg;
 
-    /* Enable the clock for this timer: */
-    SYS_CTRL->RCGCGPT |= (1 << tim);
+    /* Enable timer clock while in Active, Sleep or PM0 */
+    _timer_clock_enable(tim);
 
     /* Disable this timer before configuring it: */
     dev(tim)->CTL = 0;
@@ -233,21 +261,31 @@ void timer_stop(tim_t tim)
 {
     DEBUG("%s(%u)\n", __FUNCTION__, tim);
 
+    _timer_clock_disable(tim);
+
     if (tim < TIMER_NUMOF) {
-        dev(tim)->CTL = 0;
+        if (timer_config[tim].chn == 1) {
+            dev(tim)->CTL &= ~TAEN;
+        }
+        else if (timer_config[tim].chn == 2) {
+            dev(tim)->CTL &= ~(TBEN | TAEN);
+        }
     }
+
 }
 
 void timer_start(tim_t tim)
 {
     DEBUG("%s(%u)\n", __FUNCTION__, tim);
 
+    _timer_clock_enable(tim);
+
     if (tim < TIMER_NUMOF) {
         if (timer_config[tim].chn == 1) {
-            dev(tim)->CTL = TAEN;
+            dev(tim)->CTL |= TAEN;
         }
         else if (timer_config[tim].chn == 2) {
-            dev(tim)->CTL = TBEN | TAEN;
+            dev(tim)->CTL |= TBEN | TAEN;
         }
     }
 }
