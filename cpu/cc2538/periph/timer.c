@@ -61,6 +61,49 @@ static const _isr_cfg_t chn_isr_cfg[] = {
  */
 static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
 
+/* pending timer compare values TxMATCHR */
+static union {
+    uint16_t u16[2];    /* TIMERA, TIMERB 16bit mode */
+    uint32_t u32;       /* extended TIMERA 32bit mode */
+} _set_values[TIMER_NUMOF];
+
+/* 2 channels per timer, TIMER_NUMOF <= 4 */
+static uint8_t _set_timers;
+
+static void _set_absolute_disabled(tim_t tim, int chan, unsigned int value)
+{
+     /* each timer can have two channels*/
+    _set_timers |= ((chan + 1) << (2 * tim));
+
+    if (timer_config[tim].cfg == GPTMCFG_32_BIT_TIMER) {
+        _set_values[tim].u32 = value;
+    } else {
+        _set_values[tim].u16[chan] = value;
+    }
+}
+
+static void _set_pending(tim_t tim)
+{
+    /* create mask to get set channels of the current timer */
+    const unsigned ch1_msk = (1 << (2 * tim));
+    const unsigned ch2_msk = (2 << (2 * tim));
+
+    if (_set_timers & ch1_msk) {
+        _set_timers &= ~ch1_msk;
+
+        if (timer_config[tim].cfg == GPTMCFG_32_BIT_TIMER) {
+            timer_set_absolute(tim, 0, _set_values[tim].u32);
+            return;
+        } else {
+            timer_set_absolute(tim, 0, _set_values[tim].u16[0]);
+        }
+    }
+    if (_set_timers & ch2_msk) {
+        _set_timers &= ~ch2_msk;
+        timer_set_absolute(tim, 1, _set_values[tim].u16[1]);
+    }
+}
+
 /* enable timer interrupts */
 static inline void _irq_enable(tim_t tim)
 {
@@ -97,22 +140,33 @@ static inline void _timer_clock_enable(tim_t tim)
 {
     DEBUG("%s\n", __FUNCTION__);
 
+    /* enable GPT(tim) clock in active mode */
     SYS_CTRL->RCGCGPT |= (1UL << tim);
+    /* enable GPT(tim) clock in sleep mode */
     SYS_CTRL->SCGCGPT |= (1UL << tim);
+    /* enable GPT(tim) clock in PM0 (system clock always powered down
+        in PM1-3) */
     SYS_CTRL->DCGCGPT |= (1UL << tim);
-    /* Wait for the clock enabling to take effect */
+    /* wait for the clock enabling to take effect */
     while (!(SYS_CTRL->RCGCGPT &= (1UL << tim)) || \
            !(SYS_CTRL->SCGCGPT &= (1UL << tim)) || \
            !(SYS_CTRL->DCGCGPT &= (1UL << tim))
            ) {}
+
+    /* set pending timers */
+    _set_pending(tim);
 }
 
 static inline void _timer_clock_disable(tim_t tim)
 {
     DEBUG("%s\n", __FUNCTION__);
 
+    /* gate GPT(tim) clock in active mode */
     SYS_CTRL->RCGCGPT &= ~(1UL << tim);
+    /* gate GPT(tim) clock in sleep mode */
     SYS_CTRL->SCGCGPT &= ~(1UL << tim);
+    /* gate GPT(tim) clock in PM0 (system clock always powered down
+       in PM1-3) */
     SYS_CTRL->DCGCGPT &= ~(1UL << tim);
     /* Wait for the clock gating to take effect */
     while ((SYS_CTRL->RCGCGPT &= (1UL << tim)) || \
@@ -144,7 +198,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     isr_ctx[tim].cb  = cb;
     isr_ctx[tim].arg = arg;
 
-    /* Enable timer clock while in Active, Sleep or PM0 */
+    /* enable timer clock in active, sleep or PM0 */
     _timer_clock_enable(tim);
 
     /* Disable this timer before configuring it: */
@@ -207,6 +261,16 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     if ((tim >= TIMER_NUMOF) || (channel >= (int)timer_config[tim].chn) ) {
         return -1;
     }
+
+    /* GPT timer needs to be gated to write to registers */
+    bool timer_on = (SYS_CTRL->RCGCGPT & (1UL << tim));
+    /* if timer is stopped then set the desired timer compare values (TxMARCHR)
+       the next time the timer is started */
+    if (!timer_on) {
+        _set_absolute_disabled(tim, channel, value);
+        return 0;
+    }
+
     /* clear any pending match interrupts */
     dev(tim)->ICR = chn_isr_cfg[channel].flag;
     if (channel == 0) {
@@ -220,6 +284,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
     return 0;
 }
+
 
 int timer_clear(tim_t tim, int channel)
 {
