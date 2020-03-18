@@ -440,9 +440,6 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   ifeq (,$(filter newlib_syscalls_%,$(USEMODULE)))
     USEMODULE += newlib_syscalls_default
   endif
-  ifeq (,$(filter stdio_cdc_acm stdio_native stdio_null stdio_rtt slipdev_stdio,$(USEMODULE)))
-    USEMODULE += stdio_uart
-  endif
 endif
 
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
@@ -453,55 +450,12 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
-  USEMODULE += usbus_cdc_acm
-  USEMODULE += isrpipe
-endif
-
-ifneq (,$(filter stdio_rtt,$(USEMODULE)))
-  USEMODULE += xtimer
-endif
-
 ifneq (,$(filter shell,$(USEMODULE)))
   USEMODULE += stdin
 endif
 
-ifneq (,$(filter stdio_ethos,$(USEMODULE)))
-  USEMODULE += ethos
-  USEMODULE += stdin
-  USEMODULE += stdio_uart
-endif
-
-ifneq (,$(filter stdin,$(USEMODULE)))
-  ifneq (,$(filter stdio_uart,$(USEMODULE)))
-    USEMODULE += stdio_uart_rx
-  endif
-endif
-
-ifneq (,$(filter stdio_uart_rx,$(USEMODULE)))
-  USEMODULE += isrpipe
-  USEMODULE += stdio_uart
-endif
-
-ifneq (,$(filter stdio_uart,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_uart
-endif
-
-ifneq (,$(filter stdio_cdc_acm stdio_null stdio_uart slipdev_stdio,$(USEMODULE)))
-  # stdio_rtt cannot be used when another STDIO is loaded
-  DISABLE_MODULE += stdio_rtt
-endif
-
-ifneq (,$(filter stdio_rtt stdio_null stdio_uart slipdev_stdio,$(USEMODULE)))
-  # stdio_cdc_acm cannot be used when another STDIO is loaded
-  DISABLE_MODULE += stdio_cdc_acm
-endif
-
-ifeq (,$(filter stdio_cdc_acm,$(USEMODULE)))
-  # The arduino bootloader feature cannot be used if the stdio_cdc_acm module
-  # is not used
-  FEATURES_BLACKLIST += bootloader_arduino
-endif
+# Include all stdio_% dependencies after all USEMODULE += stdio_%
+include $(RIOTBASE)/makefiles/stdio.inc.mk
 
 ifneq (,$(filter isrpipe,$(USEMODULE)))
   USEMODULE += tsrb
