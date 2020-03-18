@@ -7,6 +7,10 @@ USEMODULE += xtimer
 LOW_MEMORY_BOARDS += \
   airfy-beacon \
   arduino-mega2560 \
+  arduino-mkr1000 \
+  arduino-mkrfox1200 \
+  arduino-mkrwan1300 \
+  arduino-mkrzero \
   atmega1284p \
   b-l072z-lrwan1 \
   blackpill \
@@ -20,6 +24,7 @@ LOW_MEMORY_BOARDS += \
   cc2650stk \
   chronos \
   derfmega128 \
+  feather-m0 \
   hifive1 \
   hifive1b \
   i-nucleo-lrwan1 \
@@ -45,6 +50,10 @@ LOW_MEMORY_BOARDS += \
   opencm904 \
   saml10-xpro \
   saml11-xpro \
+  sodaq-autonomo \
+  sodaq-explorer \
+  sodaq-one \
+  sodaq-sara-aff \
   spark-core \
   stm32f0discovery \
   stm32l0538-disco \

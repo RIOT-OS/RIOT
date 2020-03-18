@@ -1,0 +1,13 @@
+# Provide stdio over USB by default
+# This is a temporary solution until management of stdio is correctly
+# handled by the build system
+DEFAULT_MODULE += stdio_cdc_acm
+
+# Default auto-initialization of usbus for stdio other USB
+USEMODULE += auto_init_usbus
+
+# This boards requires support for Arduino bootloader.
+USEMODULE += usb_board_reset
+USEMODULE += boards_common_samd21-arduino-bootloader
+
+FEATURES_REQUIRED += bootloader_arduino
