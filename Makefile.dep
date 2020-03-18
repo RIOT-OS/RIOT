@@ -904,6 +904,13 @@ ifneq (,$(filter usbus,$(USEMODULE)))
   FEATURES_REQUIRED += periph_usbdev
   USEMODULE += core_thread_flags
   USEMODULE += event
+
+  ifneq (,$(CONFIG_USB_VID))
+    CFLAGS += -DCONFIG_USB_VID=0x$(CONFIG_USB_VID)
+  endif
+  ifneq (,$(CONFIG_USB_PID))
+    CFLAGS += -DCONFIG_USB_PID=0x$(CONFIG_USB_PID)
+  endif
 endif
 
 ifneq (,$(filter usbus_cdc_acm,$(USEMODULE)))
