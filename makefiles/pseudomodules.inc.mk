@@ -77,6 +77,7 @@ PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
 PSEUDOMODULES += qmc5883l_int
 PSEUDOMODULES += riotboot_%
+PSEUDOMODULES += rtt_cmd
 PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_default
 PSEUDOMODULES += saul_gpio
