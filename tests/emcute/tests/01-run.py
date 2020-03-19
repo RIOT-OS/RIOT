@@ -105,9 +105,9 @@ class MQTTSNServer(Automaton):
     # >>> automaton states <<< #
     @ATMT.state(initial=1)
     def BEGIN(self):
-        utils.test_utils_interactive_sync(self.spawn,
-                                          TEST_INTERACTIVE_RETRIES,
-                                          TEST_INTERACTIVE_DELAY)
+        utils.test_utils_interactive_sync_shell(self.spawn,
+                                                TEST_INTERACTIVE_RETRIES,
+                                                TEST_INTERACTIVE_DELAY)
         raise self.CONNECT_FROM_NODE()
 
     @ATMT.state()
