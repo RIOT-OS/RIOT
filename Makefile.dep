@@ -1,7 +1,3 @@
-#
-OLD_USEMODULE := $(sort $(USEMODULE))
-OLD_USEPKG := $(sort $(USEPKG))
-
 # include board specific application dependencies
 -include $(APPDIR)/Makefile.board.dep
 
@@ -1036,18 +1032,6 @@ FEATURES_OPTIONAL += periph_pm
 # always select provided architecture features
 FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
 
-# all periph features correspond to a periph submodule
-# FEATURES_USED is defined in Makefile.features
-USEMODULE += $(filter periph_%,$(FEATURES_USED))
-
-# select cpu_check_address pseudomodule if the corresponding feature is used
-USEMODULE += $(filter cpu_check_address, $(FEATURES_USED))
-
-# include periph_common if any periph_* driver is used
-ifneq (,$(filter periph_%, $(USEMODULE)))
-  USEMODULE += periph_common
-endif
-
 ifneq (,$(filter ecc_%,$(USEMODULE)))
   USEMODULE += ecc
 endif
@@ -1056,45 +1040,4 @@ ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
   ifneq (,$(filter shell,$(USEMODULE)))
     DEFAULT_MODULE += test_utils_interactive_sync_shell
   endif
-endif
-
-# recursively catch transitive dependencies
-USEMODULE := $(sort $(USEMODULE))
-USEPKG := $(sort $(USEPKG))
-ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
-  include $(RIOTBASE)/Makefile.dep
-else
-
-  # set all USED periph_% init modules as DEFAULT_MODULE
-  ifneq (,$(filter periph_init, $(USEMODULE)))
-      # To enable adding periph_% modules through the environment we cant use
-      # FEATURES_USED since the MODULE might be added directly as USEMODULE
-      PERIPH_MODULES_NO_INIT = periph_init% periph_common
-      PERIPH_MODULES = $(filter periph_%,$(USEMODULE))
-      PERIPH_INIT_MODULES = $(subst periph_,periph_init_,\
-        $(filter-out $(PERIPH_MODULES_NO_INIT),$(PERIPH_MODULES)))
-      DEFAULT_MODULE += $(PERIPH_INIT_MODULES)
-  endif
-
-  # add periph_init_% modules to USEMODULE unless disabled
-  ifneq (,$(filter periph_init, $(USEMODULE)))
-    USEMODULE += $(filter $(PERIPH_INIT_MODULES),\
-      $(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE)))
-  endif
-
-  # Add auto_init_% DEFAULT_MODULES. This is done after the recursive cach since
-  # none of these modules can trigger dependency resolution.
-  ifneq (,$(filter auto_init,$(USEMODULE)))
-    USEMODULE += $(filter auto_init_%,$(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE)))
-  endif
-
-  # Add test_utils_interactive_sync_shell
-  ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
-    USEMODULE += $(filter test_utils_interactive_sync_%, \
-      $(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE)))
-  endif
-
-  # Sort and remove duplicates
-  DEFAULT_MODULE := $(sort $(DEFAULT_MODULE))
-  USEMODULE := $(sort $(USEMODULE))
 endif
