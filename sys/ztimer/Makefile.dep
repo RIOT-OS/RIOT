@@ -30,11 +30,20 @@ ifneq (,$(filter ztimer_periph_timer,$(USEMODULE)))
       USEMODULE += xtimer_on_ztimer
     endif
   endif
+  ifneq (,$(filter evtimer,$(USEMODULE)))
+    USEMODULE += evtimer_on_ztimer
+  endif
 endif
 
 # make xtimer use ztimer_usec as low level timer
 ifneq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
   USEMODULE += ztimer_usec
+endif
+
+# make evtimer use ztimer_msec as low level timer
+ifneq (,$(filter evtimer_on_ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_msec
+  USEMODULE += ztimer_now64
 endif
 
 # "ztimer_xtimer_compat" is a wrapper of the xtimer API on ztimer_used
