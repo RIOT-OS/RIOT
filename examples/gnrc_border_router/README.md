@@ -8,6 +8,40 @@ and routes on the BR.
 
 The script `start_network.sh` enables a *ready-to-use* BR in only one command.
 
+## Uplink
+
+The border router will route packets between a 6Lo network (PAN) and a 'normal'
+IPv6 network (i.e. the Internet).
+
+This requires the border router to have two interfaces: A downstream interface
+to run 6LoWPAN on and an IPv6 uplink.
+
+This example comes with support for three uplink types pre-configured:
+
+ - [`ethos`](https://doc.riot-os.org/group__drivers__ethos.html) (default)
+ - [`slip`](https://tools.ietf.org/html/rfc1055)
+ - `wifi`
+
+For `native` the host-facing [`netdev_tap`](https://doc.riot-os.org/netdev__tap_8h.html) device
+is configured, providing connectivity via a TAP interface to the RIOT instance.
+
+To select an uplink, set the UPLINK environment variable. For instance, use `UPLINK=slip`
+for a SLIP uplink.
+
+`ethos` and `slip` will make use of the existing serial interface that is used for the
+RIOT shell to provide an upstream interface. Your computer will act as the upstream
+router, stdio is multiplexed over the same line.
+
+The `wifi` uplink will connect to an existing WiFi (IEEE 802.11) network.
+The network must provide a DHCPv6 server that supports prefix delegation (IA_PD) when
+`USE_DHCPV6=1` is set (default).
+
+Use `WIFI_SSID="SSID" WIFI_PASS="password"` in your `make` command to set your WiFi's
+credentials. You can alternatively edit the `Makefile`.
+
+Currently, `wifi` requires an esp8266 or esp32 for the border router and will default
+to using `esp_now` for the downstream interface.
+
 ## Requirements
 This functionality works only on Linux machines.
 Mac OSX support will be added in the future (lack of native `tap` interface).
@@ -41,21 +75,8 @@ Linux might not recognize the interface as connected.
 [KEA]: https://kea.isc.org/
 
 ## Setup
-First, you need to compile `ethos`.
-Go to `/dist/tools/ethos` and type:
 
-```bash
-make clean all
-```
-
-Then, you need to compile UHCP.
-This tool is found in `/dist/tools/uhcpd`. So, as for `ethos`:
-
-```bash
-make clean all
-```
-
-Afterwards, proceed to compile and flash `gnrc_border_router` to your board:
+To compile and flash `gnrc_border_router` to your board:
 
 ```bash
 make clean all flash
@@ -69,18 +90,19 @@ USE_DHCPV6=1 make clean all flash
 ```
 
 ## Usage
-Start the `start_network.sh` script by doing on `dist/tools/ethos`:
+The `start_network.sh` script needed for `ethos` and `slip` is automatically run
+if you type
 
 ```bash
-sudo sh start_network.sh /dev/ttyACMx tap0 2001:db8::/64
+make term
 ```
 
-This will execute the needed commands to setup a `tap` interface
-and configure the BR.
+This will execute the needed commands to setup a `tap` (`ethos`) or `tun` (`slip`)
+interface and configure the BR.
 Notice that this will also configure `2001:db8::/64` as a prefix.
 This prefix should be announced to other motes through the wireless interface.
 
-As said previously, `ethos` allows to send IP packets and shell commands.
+As said previously, `ethos` and `slipdev` allow to send IP packets and shell commands.
 This is done through the same serial interface.
 By typing `help` you will get the list of available shell commands.
 
@@ -208,7 +230,7 @@ standard [1]. The example application in this folder assumes as a default to be
 run on an Atmel SAM R21 Xplained Pro evaluation board using an external UART
 adapter for the second serial interface. However, it is feasible to run the
 example on any RIOT supported platform that offers either more than one UART or
-be equipped with an IPv6 capable network device. In this case only the Makefile
+be equipped with an IPv6 capable network device. In this case only the Makefile.board.dep
 of this application has to be slightly modified, e.g. by replacing the line
 ```
 USEMODULE += ethos
@@ -218,31 +240,13 @@ with something like
 USEMODULE += encx24j600
 ```
 and specify the target platform as `BOARD = myplatform`.
-In order to use the border router over SLIP, please check the `periph_conf.h`
-of the corresponding board and look out for the `UART_NUMOF` parameter. Its
-value has to be bigger than 1.
 
 Be sure that you have replaced on your `Makefile` the lines to use SLIP.
 You should have something like this:
 
 ```make
-ifeq (,$(SLIP_UART))
-# set default (last available UART)
-SLIP_UART="UART_DEV(UART_NUMOF-1)"
-endif		
-ifeq (,$(SLIP_BAUDRATE))		
-# set default		
-SLIP_BAUDRATE=115200
-endif
-
-GNRC_NETIF_NUMOF := 2
-INCLUDES += -I$(CURDIR)
-CFLAGS += -DSLIP_UART=$(SLIP_UART)
-CFLAGS += -DSLIP_BAUDRATE=$(SLIP_BAUDRATE)
-# Include SLIP package for IP over Serial communication
-USEMODULE += slipdev
+UPLINK ?= slip
 ```
-
 
 ## Configuration
 
@@ -288,4 +292,3 @@ for further help.
 [1] https://tools.ietf.org/html/rfc1055
 
 [2] https://github.com/contiki-os/contiki/blob/master/tools/tunslip.c
-
