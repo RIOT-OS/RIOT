@@ -27,4 +27,8 @@ ifneq (,$(filter crypto_%,$(USEMODULE)))
   USEMODULE += crypto
 endif
 
+ifneq (,$(filter rtt_cmd,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtt
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
