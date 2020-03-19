@@ -53,6 +53,17 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Backlight control defines, default uses LCD_BACKLIGHT_LOW values
+ * @{
+ */
+#ifndef BACKLIGHT_MASK
+#define BACKLIGHT_MASK              (1 << 14)
+#endif
+#define BACKLIGHT_ON                (NRF_P0->OUTCLR = BACKLIGHT_MASK)
+#define BACKLIGHT_OFF               (NRF_P0->OUTSET = BACKLIGHT_MASK)
+/** @ */
+
+/**
  * @name LCD configuration
  * @{
  */
