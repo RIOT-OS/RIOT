@@ -63,14 +63,14 @@ void periph_init(void)
     }
 #endif
 
+    /* Initialize RTT before RTC to allow for RTT based RTC implementations */
+#ifdef MODULE_PERIPH_INIT_RTT
+    rtt_init();
+#endif
+
     /* Initialize RTC */
 #ifdef MODULE_PERIPH_INIT_RTC
     rtc_init();
-#endif
-
-    /* Initialize RTT */
-#ifdef MODULE_PERIPH_INIT_RTT
-    rtt_init();
 #endif
 
 #ifdef MODULE_PERIPH_INIT_HWRNG

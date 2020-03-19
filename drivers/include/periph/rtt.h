@@ -43,8 +43,16 @@ extern "C" {
 #endif
 
 #ifndef RTT_FREQUENCY
+
+/* Allow mock-RTT for unit tests */
+#ifdef MOCK_RTT_FREQUENCY
+#define RTT_FREQUENCY MOCK_RTT_FREQUENCY
+#define RTT_MAX_VALUE MOCK_RTT_MAX_VALUE
+#else
+
 #warning "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the number of ticks" \
          "per second for the current architecture."
+#endif
 #endif
 
 /**

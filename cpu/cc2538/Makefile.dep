@@ -3,4 +3,8 @@ ifneq (,$(filter cc2538_rf,$(USEMODULE)))
   USEMODULE += netif
 endif
 
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
+  USEMODULE += rtt_rtc
+endif
+
 USEMODULE += pm_layered

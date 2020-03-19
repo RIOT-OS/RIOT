@@ -558,6 +558,14 @@ ifneq (,$(filter rgbled,$(USEMODULE)))
   USEMODULE += color
 endif
 
+ifneq (,$(filter rtt_rtc,$(USEMODULE)))
+  # Unit tests will use a mock implementation
+  ifeq (,$(UNIT_TESTS))
+    FEATURES_REQUIRED += periph_rtt
+  endif
+  FEATURES_PROVIDED += periph_rtc
+endif
+
 ifneq (,$(filter rn2%3,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_uart
