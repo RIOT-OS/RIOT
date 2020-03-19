@@ -131,6 +131,9 @@ int main(void)
     disp_dev_t *disp_dev = (disp_dev_t *)&dev;
     disp_dev->driver = &ili9341_disp_dev_driver;
 
+    /* Enable backlight */
+    disp_dev_backlight_on();
+
     /* Initialize the concrete display driver */
     ili9341_init(&dev, &ili9341_params[0]);
 

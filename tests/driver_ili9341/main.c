@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include "xtimer.h"
+#include "board.h"
 #include "ili9341.h"
 #include "ili9341_params.h"
 
@@ -34,9 +35,9 @@ int main(void)
     /* initialize the sensor */
     printf("Initializing display...");
 
-#ifdef BOARD_PINETIME
-    /* on PineTime, enable the backlight */
-    gpio_clear(LCD_BACKLIGHT_LOW);
+    /* Enable backlight if macro is defined */
+#ifdef BACKLIGHT_ON
+    BACKLIGHT_ON;
 #endif
 
     if (ili9341_init(&dev, &ili9341_params[0]) == 0) {
