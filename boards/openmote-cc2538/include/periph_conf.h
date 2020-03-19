@@ -31,7 +31,7 @@
  * @name    Clock system configuration
  * @{
  */
-#define CLOCK_CORECLOCK     (32000000U)     /* desired core clock frequency, 32MHz */
+#define CLOCK_CORECLOCK     (16000000U)     /* desired core clock frequency, 16MHz */
 /** @} */
 
 /**

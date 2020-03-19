@@ -30,7 +30,7 @@ extern "C" {
  * @name Clock system configuration
  * @{
  */
-#define CLOCK_CORECLOCK     (32000000U) /* 32MHz */
+#define CLOCK_CORECLOCK     (16000000U) /* 16MHz */
 /** @} */
 
 #ifdef __cplusplus
