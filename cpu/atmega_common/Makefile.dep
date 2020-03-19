@@ -10,6 +10,9 @@ USEMODULE += atmega_common_periph
 # the atmel port uses stdio_uart
 USEMODULE += stdio_uart
 
+# used by cpu_print_last_instruction(), needed by module core_panic
+USEMODULE += fmt
+
 # expand atmega_pcint module
 ifneq (,$(filter atmega_pcint,$(USEMODULE)))
   USEMODULE += atmega_pcint0

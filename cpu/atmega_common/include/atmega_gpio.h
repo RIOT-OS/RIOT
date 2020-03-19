@@ -24,7 +24,6 @@
 
 #ifndef ATMEGA_GPIO_H
 #define ATMEGA_GPIO_H
-#include <stdio.h>
 
 #include <avr/interrupt.h>
 
