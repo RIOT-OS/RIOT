@@ -26,7 +26,7 @@
 
 void pm_set_lowest(void)
 {
-    DEBUG ("%s enter to sleep @%u\n", __func__, system_get_time());
+    DEBUG("%s enter to sleep @%u\n", __func__, system_get_time());
 
     /* reset system watchdog timer */
     system_wdt_feed();
@@ -36,7 +36,7 @@ void pm_set_lowest(void)
     __asm__ volatile ("waiti 0");
     #endif
 
-    DEBUG ("%s exit from sleep @%u\n", __func__, system_get_time());
+    DEBUG("%s exit from sleep @%u\n", __func__, system_get_time());
 
     /* reset system watchdog timer */
     system_wdt_feed();
@@ -44,13 +44,19 @@ void pm_set_lowest(void)
 
 void pm_off(void)
 {
-    DEBUG ("%s\n", __func__);
+    DEBUG("%s\n", __func__);
     system_deep_sleep(0);
 }
 
 void pm_reboot(void)
 {
-    DEBUG ("%s\n", __func__);
+    DEBUG("%s\n", __func__);
+
+#ifdef MODULE_PERIPH_RTT
+    /* save counters */
+    extern void rtt_save_counter(void);
+    rtt_save_counter();
+#endif
 
     /* shut down WIFI and call system_restart_local after timer */
     system_restart ();

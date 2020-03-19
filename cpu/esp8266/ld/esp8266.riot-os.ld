@@ -84,6 +84,13 @@ SECTIONS
     _rtc_data_end = ABSOLUTE(.);
   } > rtc_seg
 
+  .rtc.bss :
+  {
+    _rtc_bss_start = ABSOLUTE(.);
+    *(.rtc.bss)
+    _rtc_bss_end = ABSOLUTE(.);
+  } > rtc_seg
+
   .data : ALIGN(4)
   {
     _data_start = ABSOLUTE(.);
