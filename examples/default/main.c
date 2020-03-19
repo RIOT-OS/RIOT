@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "thread.h"
+#include "fmt.h"
 #include "shell.h"
 #include "shell_commands.h"
 
@@ -42,7 +43,7 @@ int main(void)
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 #endif
 
-    (void) puts("Welcome to RIOT!");
+    print_str("Welcome to RIOT!\n");
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
