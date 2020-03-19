@@ -37,11 +37,19 @@
 #include "xtensa/xtensa_api.h"
 
 #include "esp_common.h"
+#include "esp_sleep.h"
 #include "adc_arch.h"
 #include "adc_ctrl.h"
 #include "gpio_arch.h"
 #include "irq_arch.h"
 #include "syscalls.h"
+
+#define ESP_PM_WUP_PINS_ANY_HIGH    ESP_EXT1_WAKEUP_ANY_HIGH
+#define ESP_PM_WUP_PINS_ALL_LOW     ESP_EXT1_WAKEUP_ALL_LOW
+
+#ifndef ESP_PM_WUP_LEVEL
+#define ESP_PM_WUP_LEVEL    ESP_PM_WUP_PINS_ANY_HIGH
+#endif
 
 #define GPIO_PRO_CPU_INTR_ENA      (BIT(2))
 
@@ -426,6 +434,8 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     if (flank != GPIO_NONE) {
         gpio_int_enabled_table [pin] = (gpio_isr_ctx_table[pin].cb != NULL);
         GPIO.pin[pin].int_ena = GPIO_PRO_CPU_INTR_ENA;
+        GPIO.pin[pin].int_type = flank;
+        GPIO.pin[pin].wakeup_enable = 1;
 
         intr_matrix_set(PRO_CPU_NUM, ETS_GPIO_INTR_SOURCE, CPU_INUM_GPIO);
         xt_set_interrupt_handler(CPU_INUM_GPIO, gpio_int_handler, NULL);
@@ -548,7 +558,6 @@ int gpio_set_drive_capability(gpio_t pin, gpio_drive_strength_t drive)
 {
     assert(pin < GPIO_PIN_NUMOF);
     assert(pin < GPIO34);
-    /* TODO */
 
     const struct _rtc_gpio_t* rtc = (_gpio_to_rtc[pin] != -1) ?
                                      &_rtc_gpios[_gpio_to_rtc[pin]] : NULL;
@@ -558,4 +567,87 @@ int gpio_set_drive_capability(gpio_t pin, gpio_drive_strength_t drive)
         SET_PERI_REG_BITS(rtc->reg, 0x3, drive, rtc->drive);
     }
     return 0;
+}
+
+#if MODULE_PERIPH_GPIO_IRQ
+static uint32_t gpio_int_saved_type[GPIO_PIN_NUMOF];
+#endif
+
+void gpio_pm_sleep_enter(unsigned mode)
+{
+    /*
+     * Activate the power domain for RTC peripherals either when
+     * ESP_PM_GPIO_HOLD is defined or when light sleep mode is activated.
+     * As long as the RTC peripherals are active, the pad state of RTC GPIOs
+     * is held in deep sleep and the pad state of all GPIOs is held in light
+     * sleep.
+     */
+#ifdef ESP_PM_GPIO_HOLD
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+#else
+    if (mode == ESP_PM_LIGHT_SLEEP) {
+        esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+    }
+#endif
+
+    if (mode == ESP_PM_DEEP_SLEEP) {
+#ifdef ESP_PM_WUP_PINS
+        static const gpio_t wup_pins[] = { ESP_PM_WUP_PINS };
+        /*
+         * Prepare the wake-up pins if a single pin or a comma-separated list of
+         * pins is defined for wake-up.
+         */
+        uint64_t wup_pin_mask = 0;
+        for (unsigned i = 0; i < ARRAY_SIZE(wup_pins); i++) {
+            wup_pin_mask |= 1ULL << wup_pins[i];
+        }
+        esp_sleep_enable_ext1_wakeup(wup_pin_mask, ESP_PM_WUP_LEVEL);
+#endif /* ESP_PM_WUP_PINS */
+    }
+    else {
+#if MODULE_PERIPH_GPIO_IRQ
+        esp_sleep_enable_gpio_wakeup();
+        for (unsigned i = 0; i < GPIO_PIN_NUMOF; i++) {
+            const struct _rtc_gpio_t* rtc =
+                (_gpio_to_rtc[i] != -1) ? &_rtc_gpios[_gpio_to_rtc[i]] : NULL;
+
+            if (gpio_int_enabled_table[i] && GPIO.pin[i].int_type) {
+                gpio_int_saved_type[i] = GPIO.pin[i].int_type;
+                switch (GPIO.pin[i].int_type) {
+                    case GPIO_FALLING:
+                        GPIO.pin[i].int_type = GPIO_LOW;
+                        DEBUG("%s gpio=%u GPIO_LOW\n", __func__, i);
+                        break;
+                    case GPIO_RISING:
+                        GPIO.pin[i].int_type = GPIO_HIGH;
+                        DEBUG("%s gpio=%u GPIO_HIGH\n", __func__, i);
+                        break;
+                    case GPIO_BOTH:
+                        DEBUG("%s gpio=%u GPIO_BOTH not supported\n",
+                               __func__, i);
+                        break;
+                    default:
+                        break;
+                }
+                if (rtc) {
+                    RTCIO.pin[rtc->num].wakeup_enable = 1;
+                    RTCIO.pin[rtc->num].int_type = GPIO.pin[i].int_type;
+                }
+            }
+        }
+#endif
+    }
+}
+
+void gpio_pm_sleep_exit(uint32_t cause)
+{
+    (void)cause;
+#if MODULE_PERIPH_GPIO_IRQ
+    DEBUG("%s\n", __func__);
+    for (unsigned i = 0; i < GPIO_PIN_NUMOF; i++) {
+        if (gpio_int_enabled_table[i]) {
+            GPIO.pin[i].int_type = gpio_int_saved_type[i];
+        }
+    }
+#endif
 }

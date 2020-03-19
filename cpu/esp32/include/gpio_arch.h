@@ -92,6 +92,18 @@ void gpio_matrix_out(uint32_t gpio, uint32_t signal_idx, bool out_inv, bool oen_
  */
 int gpio_set_drive_capability(gpio_t pin, gpio_drive_strength_t drive);
 
+/**
+ * @brief   Called before the power management enters a light or deep sleep mode
+ * @param   mode    sleep mode that is entered
+ */
+void gpio_pm_sleep_enter(unsigned mode);
+
+/**
+ * @brief   Called after the power management left light sleep mode
+ * @param   cause   wake-up cause
+ */
+void gpio_pm_sleep_exit(uint32_t cause);
+
 #ifdef __cplusplus
 }
 #endif
