@@ -97,12 +97,12 @@ enum {
 #ifdef MODULE_LOG
 #include "log_module.h"
 #else
-#include <stdio.h>
+#include "fmt_stdio.h"
 
 /**
- * @brief Default log_write function, just maps to printf
+ * @brief Default log_write function, just maps to printf_nano
  */
-#define log_write(level, ...) printf(__VA_ARGS__)
+#define log_write(level, ...) printf_nano(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

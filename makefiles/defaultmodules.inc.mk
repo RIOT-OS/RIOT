@@ -1,6 +1,6 @@
 DEFAULT_MODULE += board cpu core core_init core_msg core_panic sys
 
-DEFAULT_MODULE += fmt
+DEFAULT_MODULE += fmt fmt_stdio
 
 DEFAULT_MODULE += auto_init
 
