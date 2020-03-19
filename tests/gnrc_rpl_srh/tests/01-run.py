@@ -18,7 +18,7 @@ from scapy.all import Ether, IPv6, UDP, \
                       IPv6ExtHdrFragment, IPv6ExtHdrRouting, \
                       ICMPv6ParamProblem, ICMPv6TimeExceeded, \
                       sendp, srp1, sniff
-from testrunner import run
+from testrunner import run, check_unittests
 
 
 EXT_HDR_NH = {
@@ -338,7 +338,7 @@ def testfunc(child):
     global sniffer
     tap = get_bridge(os.environ["TAP"])
     child.sendline("unittests")
-    child.expect(r"OK \((\d+) tests\)")     # wait for and check result of unittests
+    check_unittests(child)  # wait for and check result of unittests
     print("." * int(child.match.group(1)), end="", flush=True)
     lladdr_src = get_host_lladdr(tap)
     child.sendline("ifconfig")

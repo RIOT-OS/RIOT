@@ -8,12 +8,12 @@
 # directory for more details.
 
 import sys
-from testrunner import run
+from testrunner import run, check_unittests
 
 
 def testfunc(child):
     # embUnit tests
-    child.expect(r"OK \(\d+ tests\)")
+    check_unittests(child)
     # output cross-checked hex data with WireShark -> "Import from Hex Dump..."
     # test_netapi_send__raw_unicast_ethernet_packet
     child.expect("Sending data from Ethernet device:")

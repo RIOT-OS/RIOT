@@ -7,7 +7,7 @@
 # directory for more details.
 
 import sys
-from testrunner import run
+from testrunner import run_check_unittests
 
 
 # increase the default timeout to 30s, on samr30-xpro this test takes 20s to
@@ -15,9 +15,5 @@ from testrunner import run
 TIMEOUT = 30
 
 
-def testfunc(child):
-    child.expect(r'OK \(\d+ tests\)', timeout=TIMEOUT)
-
-
 if __name__ == "__main__":
-    sys.exit(run(testfunc))
+    sys.exit(run_check_unittests(timeout=TIMEOUT))
