@@ -33,6 +33,7 @@
 
 #include "esp/common_macros.h"
 #include "esp_log.h"
+#include "esp_system.h"
 #include "exceptions.h"
 #include "stdio_base.h"
 #include "syscalls.h"
@@ -50,6 +51,13 @@ extern uint32_t hwrand (void);
 
 void esp_riot_init(void)
 {
+    /* clear RTC bss data */
+    extern uint8_t _rtc_bss_start, _rtc_bss_end;
+    esp_reset_reason_t reset_reason = esp_reset_reason();
+    if (reset_reason != ESP_RST_DEEPSLEEP && reset_reason != ESP_RST_SW) {
+        memset(&_rtc_bss_start, 0, (&_rtc_bss_end - &_rtc_bss_start));
+    }
+
     /* enable cached read from flash */
     Cache_Read_Enable_New();
 
