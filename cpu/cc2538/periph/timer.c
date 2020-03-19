@@ -67,8 +67,21 @@ static inline void _irq_enable(tim_t tim)
     DEBUG("%s(%u)\n", __FUNCTION__, tim);
 
     if (tim < TIMER_NUMOF) {
-        IRQn_Type irqn = GPTIMER_0A_IRQn + (2 * tim);
-
+        IRQn_Type irqn;
+        switch (tim) {
+            case 0:
+                irqn = GPTIMER_0A_IRQn;
+                break;
+            case 1:
+                irqn = GPTIMER_1A_IRQn;
+                break;
+            case 2:
+                irqn = GPTIMER_2A_IRQn;
+                break;
+            case 3:
+                irqn = GPTIMER_3A_IRQn;
+                break;
+        }
         NVIC_SetPriority(irqn, TIMER_IRQ_PRIO);
         NVIC_EnableIRQ(irqn);
 
