@@ -23,15 +23,15 @@
  */
 
 #include <stdint.h>
-#include <stdio.h>
 #include <inttypes.h>
 
-#include "cpu.h"
-#include "periph_cpu.h"
-#include "kernel_init.h"
 #include "board.h"
+#include "cpu.h"
+#include "fmt.h"
+#include "kernel_init.h"
 #include "mpu.h"
 #include "panic.h"
+#include "periph_cpu.h"
 #include "vectors_cortexm.h"
 #ifdef MODULE_PUF_SRAM
 #include "puf_sram.h"
@@ -315,11 +315,11 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
     /* Check if the ISR stack overflowed previously. Not possible to detect
      * after output may also have overflowed it. */
     if(*(&_sstack) != STACK_CANARY_WORD) {
-        puts("\nISR stack overflowed");
+        print_str("\nISR stack overflowed\n");
     }
     /* Sanity check stack pointer and give additional feedback about hard fault */
     if(corrupted) {
-        puts("Stack pointer corrupted, reset to top of stack");
+        print_str("Stack pointer corrupted, reset to top of stack\n");
     }
     else {
         uint32_t  r0 = sp[0];
@@ -339,44 +339,64 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
             orig_sp += 1;
         }
 #endif /* SCB_CCR_STKALIGN_Msk */
-        puts("\nContext before hardfault:");
+        print_str("\nContext before hardfault:\n");
 
-        /* TODO: printf in ISR context might be a bad idea */
-        printf("   r0: 0x%08" PRIx32 "\n"
-               "   r1: 0x%08" PRIx32 "\n"
-               "   r2: 0x%08" PRIx32 "\n"
-               "   r3: 0x%08" PRIx32 "\n",
-               r0, r1, r2, r3);
-        printf("  r12: 0x%08" PRIx32 "\n"
-               "   lr: 0x%08" PRIx32 "\n"
-               "   pc: 0x%08" PRIx32 "\n"
-               "  psr: 0x%08" PRIx32 "\n\n",
-               r12, lr, pc, psr);
+        print_str("   r0: 0x");
+        print_u32_hex(r0);
+        print_str("\n   r1: 0x");
+        print_u32_hex(r1);
+        print_str("\n   r2: 0x");
+        print_u32_hex(r2);
+        print_str("\n   r3: 0x");
+        print_u32_hex(r3);
+        print_str("\n  r12: 0x");
+        print_u32_hex(r12);
+        print_str("\n   lr: 0x");
+        print_u32_hex(lr);
+        print_str("\n   pc: 0x");
+        print_u32_hex(pc);
+        print_str("\n  psr: 0x");
+        print_u32_hex(psr);
+        print_str("\n");
     }
 #if CPU_HAS_EXTENDED_FAULT_REGISTERS
-    puts("FSR/FAR:");
-    printf(" CFSR: 0x%08" PRIx32 "\n", cfsr);
-    printf(" HFSR: 0x%08" PRIx32 "\n", hfsr);
-    printf(" DFSR: 0x%08" PRIx32 "\n", dfsr);
-    printf(" AFSR: 0x%08" PRIx32 "\n", afsr);
+    print_str("FSR/FAR:\n");
+    print_str("\tCFSR: 0x");
+    print_u32_hex(cfsr);
+    print_str("\n\tHFSR: 0x");
+    print_u32_hex(hfsr);
+    print_str("\n\tDFSR: 0x");
+    print_u32_hex(dfsr);
+    print_str("\n\tAFSR: 0x");
+    print_u32_hex(afsr);
+    print_str("\n");
     if (cfsr & BFARVALID_MASK) {
         /* BFAR valid flag set */
-        printf(" BFAR: 0x%08" PRIx32 "\n", bfar);
+        print_str("\n\tBFAR: 0x");
+        print_u32_hex(bfar);
+        print_str("\n");
     }
     if (cfsr & MMARVALID_MASK) {
         /* MMFAR valid flag set */
-        printf("MMFAR: 0x%08" PRIx32 "\n", mmfar);
+        print_str("\n\tMMFAR: 0x");
+        print_u32_hex(mmfar);
+        print_str("\n");
     }
 #endif
-    puts("Misc");
-    printf("EXC_RET: 0x%08" PRIx32 "\n", exc_return);
+    print_str("Misc\nEXC_RET: 0x");
+    print_u32_hex(exc_return);
+    print_str("\n");
 
     if (!corrupted) {
-        puts("Attempting to reconstruct state for debugging...");
-        printf("In GDB:\n  set $pc=0x%" PRIx32 "\n  frame 0\n  bt\n", pc);
+        print_str("Attempting to reconstruct state for debugging...\n");
+        print_str("In GDB:\n  set $pc=0x");
+        print_u32_hex(pc);
+        print_str("\n  frame 0\n  bt\n");
         int stack_left = _stack_size_left(HARDFAULT_HANDLER_REQUIRED_STACK_SPACE);
         if(stack_left < 0) {
-            printf("\nISR stack overflowed by at least %d bytes.\n", (-1 * stack_left));
+            print_str("\nISR stack overflowed by at least ");
+            print_u32_dec((uint32_t)(-1 * stack_left));
+            print_str(" bytes.\n");
         }
         __asm__ volatile (
             "mov r0, %[sp]\n"
