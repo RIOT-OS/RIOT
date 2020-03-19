@@ -27,6 +27,16 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "board.h"
+
+#ifndef BACKLIGHT_ON
+#define BACKLIGHT_ON
+#endif
+
+#ifndef BACKLIGHT_OFF
+#define BACKLIGHT_OFF
+#endif
+
 /**
  * @brief   Forward declaration for display device struct
  */
@@ -133,10 +143,26 @@ uint8_t disp_dev_color_depth(disp_dev_t *dev);
 /**
  * @brief   Invert the display device colors
  *
- * @param[in] dev       Network device descriptor
+ * @param[in] dev       Pointer to the display device
  * @param[in] invert    Invert mode (true if invert, false otherwise)
  */
 void disp_dev_set_invert(disp_dev_t *dev, bool invert);
+
+/**
+ * @brief   Enable the backlight pin
+ */
+static inline void disp_dev_backlight_on(void)
+{
+    BACKLIGHT_ON;
+}
+
+/**
+ * @brief   Disable the backlight pin
+ */
+static inline void disp_dev_backlight_off(void)
+{
+    BACKLIGHT_OFF;
+}
 
 #ifdef __cplusplus
 }
