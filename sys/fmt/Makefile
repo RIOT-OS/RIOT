@@ -1,5 +1,5 @@
 # exclude submodule sources from *.c wildcard source selection
-SRC := $(filter-out table.c,$(wildcard *.c))
+SRC := fmt.c
 
 # enable submodules
 SUBMODULES := 1
