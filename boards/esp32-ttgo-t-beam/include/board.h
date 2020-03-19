@@ -61,6 +61,13 @@
 /** @} */
 
 /**
+ * @brief   Default interrupt flank definition for the button GPIO
+ */
+#ifndef BTN0_INT_FLANK
+#define BTN0_INT_FLANK  GPIO_FALLING
+#endif
+
+/**
  * @name    LED (on-board) configuration
  *
  * @{

@@ -55,6 +55,13 @@
 #define BTN0_MODE       GPIO_IN
 
 /**
+ * @brief   Default interrupt flank definition for the button GPIO
+ */
+#ifndef BTN0_INT_FLANK
+#define BTN0_INT_FLANK  GPIO_FALLING
+#endif
+
+/**
  * @brief   Definition for compatibility with previous versions
  */
 #define BUTTON0_PIN     BTN0_PIN
