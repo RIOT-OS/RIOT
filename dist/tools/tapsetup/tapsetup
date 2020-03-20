@@ -6,6 +6,7 @@ COMMAND=""
 BRNAME="tapbr0"
 TAPNAME="tap"
 DEACTIVATE_IPV6=""
+UPLINK=""
 
 usage() {
     echo "usage: ${PROGRAM} [arguments]" >&2
@@ -22,12 +23,24 @@ usage() {
     echo "                                 (default: tap; ignored on OSX and FreeBSD)" >&2
     echo "   -6, --deactivate-ipv6:        Deactivate IPv6 for the interfaces and bridge" >&2
     echo "                                 (ignored on OSX and FreeBSD)" >&2
+    echo "   -u, --uplink:                 Optional uplink interface" >&2
+    echo "                                 (ignored on OSX and FreeBSD)" >&2
     echo "   -h, --help:                   Prints this text" >&2
 }
 
 unsupported_plattform() {
     echo "unsupported platform" >&2
     echo "(currently supported \`uname -s\` 'Darvin', 'FreeBSD', and 'Linux')" >&2
+}
+
+update_uplink() {
+    if command -v dhclient > /dev/null; then
+        dhclient $1
+    else
+        echo "DHCP client \`dhclient\` not found." >&2
+        echo "Please reconfigure your DHCP client for interface $1" >&2
+        echo "to keep up-link's IPv4 connection." >&2
+    fi
 }
 
 create_bridge() {
@@ -39,6 +52,10 @@ create_bridge() {
             ifconfig ${BRNAME} create || exit 1 ;;
         Linux)
             ip link add name ${BRNAME} type bridge || exit 1
+            if [ -n "${UPLINK}" ]; then
+                echo "using uplink ${UPLINK}"
+                ip link set dev ${UPLINK} master ${BRNAME} || exit 1
+            fi
             if [ -n "${DEACTIVATE_IPV6}" ]; then
                 echo 1 > /proc/sys/net/ipv6/conf/${BRNAME}/disable_ipv6 || exit 1
             fi ;;
@@ -54,7 +71,12 @@ up_bridge() {
         FreeBSD|OSX)
             ifconfig ${BRNAME} up || exit 1 ;;
         Linux)
-            ip link set ${BRNAME} up || exit 1 ;;
+            ip link set ${BRNAME} up || exit 1
+
+            # The bridge is now the new uplink
+            if [ -n "${UPLINK}" ]; then
+                update_uplink ${BRNAME}
+            fi ;;
         *)
             ;;
     esac
@@ -70,10 +92,17 @@ delete_bridge() {
             kldunload if_bridge || exit 1 ;;
         Linux)
             for IF in $(ls /sys/class/net/${BRNAME}/brif); do
-                ip link delete "${IF}"
+                if [ ${IF} != ${UPLINK} ]; then
+                    ip link delete "${IF}"
+                fi
             done
 
-            ip link delete ${BRNAME} || exit 1 ;;
+            ip link delete ${BRNAME} || exit 1
+
+            # restore the old uplink
+            if [ -n "${UPLINK}" ]; then
+                update_uplink ${UPLINK}
+            fi ;;
         OSX)
             ifconfig ${BRNAME} destroy || exit 1 ;;
         *)
@@ -158,6 +187,15 @@ while true ; do
         -h|--help)
             usage
             exit ;;
+        -u|--uplink)
+            case "$2" in
+                "")
+                    usage
+                    exit 2 ;;
+                *)
+                    UPLINK="$2"
+                    shift 2 ;;
+            esac ;;
         -t|--tap)
             case "$2" in
                 "")
