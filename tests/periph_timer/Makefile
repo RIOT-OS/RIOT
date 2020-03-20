@@ -21,7 +21,7 @@ BOARDS_TIMER_32kHz := \
     frdm-k22f \
     #
 
-BOARDS_TIMER_16MHz := \
+BOARDS_TIMER_CLOCK_CORECLOCK := \
   cc2538dk \
   openmote-b \
   openmote-cc2538 \
@@ -33,8 +33,8 @@ ifneq (,$(filter $(BOARDS_TIMER_25kHz),$(BOARD)))
   TIMER_SPEED ?= 250000
 else ifneq (,$(filter $(BOARDS_TIMER_32kHz),$(BOARD)))
   TIMER_SPEED ?= 32768
-else ifneq (,$(filter $(BOARDS_TIMER_16MHz),$(BOARD)))
-  TIMER_SPEED ?= 16000000
+else ifneq (,$(filter $(BOARDS_TIMER_CLOCK_CORECLOCK),$(BOARD)))
+  TIMER_SPEED ?= CLOCK_CORECLOCK
 endif
 
 TIMER_SPEED ?= 1000000
