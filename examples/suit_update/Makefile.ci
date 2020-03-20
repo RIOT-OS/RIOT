@@ -18,6 +18,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l031k6 \
     nucleo-l053r8 \
     nucleo-l073rz \
+    nucleo-l412kb \
     saml10-xpro \
     saml11-xpro \
     stm32f0discovery \

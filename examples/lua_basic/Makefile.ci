@@ -25,6 +25,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f410rb \
     nucleo-l031k6 \
     nucleo-l053r8 \
+    nucleo-l412kb \
     olimexino-stm32 \
     opencm904 \
     saml10-xpro \

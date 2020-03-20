@@ -60,6 +60,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l031k6 \
     nucleo-l053r8 \
     nucleo-l073rz \
+    nucleo-l412kb \
     nucleo-l432kc \
     nucleo-l433rc \
     nz32-sc151 \
