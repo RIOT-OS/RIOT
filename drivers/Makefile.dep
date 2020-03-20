@@ -60,9 +60,30 @@ ifneq (,$(filter at30tse75x,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
-ifneq (,$(filter at86rf%,$(USEMODULE)))
+ifneq (,$(filter at86rf215%,$(USEMODULE)))
+  USEMODULE += at86rf215
+  DEFAULT_MODULE += auto_init_at86rf215
+  DEFAULT_MODULE += at86rf215_subghz
+
+  ifeq (,$(filter at86rf215m,$(USEMODULE)))
+    DEFAULT_MODULE += at86rf215_24ghz
+  endif
+
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_spi
+
+  USEMODULE += xtimer
+  USEMODULE += luid
+  USEMODULE += netif
+  USEMODULE += ieee802154
+  USEMODULE += netdev_ieee802154
+endif
+
+ifneq (,$(filter at86rf%, $(filter-out at86rf215%, $(USEMODULE))))
   USEMODULE += at86rf2xx
   DEFAULT_MODULE += auto_init_at86rf2xx
+
   USEMODULE += xtimer
   USEMODULE += luid
   USEMODULE += netif

@@ -64,6 +64,7 @@
 
 /drivers/ad7746/                            @leandrolanzieri
 /drivers/at24mac/                           @benpicco
+/drivers/at86rf215/                         @benpicco
 /drivers/at86rf2xx/                         @daniel-k @Hyungsin @jia200x @smlng @miri64
 /drivers/bh1900nux/                         @wosym
 /drivers/cc110x/                            @maribu
