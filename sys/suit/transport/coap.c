@@ -32,7 +32,7 @@
 #include "thread.h"
 #include "periph/pm.h"
 
-#include "suit/coap.h"
+#include "suit/transport/coap.h"
 #include "net/sock/util.h"
 
 #ifdef MODULE_RIOTBOOT_SLOT
@@ -40,8 +40,8 @@
 #include "riotboot/flashwrite.h"
 #endif
 
-#ifdef MODULE_SUIT_V4
-#include "suit/v4/suit.h"
+#ifdef MODULE_SUIT
+#include "suit.h"
 #endif
 
 #if defined(MODULE_PROGRESS_BAR)
@@ -53,7 +53,7 @@
 
 #ifndef SUIT_COAP_STACKSIZE
 /* allocate stack needed to keep a page buffer and do manifest validation */
-#define SUIT_COAP_STACKSIZE (3*THREAD_STACKSIZE_LARGE + FLASHPAGE_SIZE)
+#define SUIT_COAP_STACKSIZE (3 * THREAD_STACKSIZE_LARGE + FLASHPAGE_SIZE)
 #endif
 
 #ifndef SUIT_COAP_PRIO
@@ -74,8 +74,9 @@ static char _stack[SUIT_COAP_STACKSIZE];
 static char _url[SUIT_URL_MAX];
 static uint8_t _manifest_buf[SUIT_MANIFEST_BUFSIZE];
 
-#ifdef MODULE_SUIT_V4
-static inline void _print_download_progress(size_t offset, size_t len, uint32_t image_size)
+#ifdef MODULE_SUIT
+static inline void _print_download_progress(size_t offset, size_t len,
+                                            uint32_t image_size)
 {
     (void)offset;
     (void)len;
@@ -145,6 +146,7 @@ static inline uint32_t deadline_from_interval(int32_t interval)
 static inline uint32_t deadline_left(uint32_t deadline)
 {
     int32_t left = (int32_t)(deadline - _now());
+
     if (left < 0) {
         left = 0;
     }
@@ -155,7 +157,7 @@ static ssize_t _nanocoap_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
 {
     ssize_t res = -EAGAIN;
     size_t pdu_len = (pkt->payload - (uint8_t *)pkt->hdr) + pkt->payload_len;
-    uint8_t *buf = (uint8_t*)pkt->hdr;
+    uint8_t *buf = (uint8_t *)pkt->hdr;
     uint32_t id = coap_get_id(pkt);
 
     /* TODO: timeout random between between ACK_TIMEOUT and (ACK_TIMEOUT *
@@ -163,7 +165,9 @@ static ssize_t _nanocoap_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
     uint32_t timeout = COAP_ACK_TIMEOUT * US_PER_SEC;
     uint32_t deadline = deadline_from_interval(timeout);
 
-    unsigned tries_left = COAP_MAX_RETRANSMIT + 1;  /* add 1 for initial transmit */
+    /* add 1 for initial transmit */
+    unsigned tries_left = COAP_MAX_RETRANSMIT + 1;
+
     while (tries_left) {
         if (res == -EAGAIN) {
             res = sock_udp_send(sock, buf, pdu_len, NULL);
@@ -210,14 +214,19 @@ static ssize_t _nanocoap_request(sock_udp_t *sock, coap_pkt_t *pkt, size_t len)
     return res;
 }
 
-static int _fetch_block(coap_pkt_t *pkt, uint8_t *buf, sock_udp_t *sock, const char *path, coap_blksize_t blksize, size_t num)
+static int _fetch_block(coap_pkt_t *pkt, uint8_t *buf, sock_udp_t *sock,
+                        const char *path, coap_blksize_t blksize, size_t num)
 {
     uint8_t *pktpos = buf;
+
     pkt->hdr = (coap_hdr_t *)buf;
 
-    pktpos += coap_build_hdr(pkt->hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET, num);
+    pktpos += coap_build_hdr(pkt->hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET,
+                             num);
     pktpos += coap_opt_put_uri_path(pktpos, 0, path);
-    pktpos += coap_opt_put_uint(pktpos, COAP_OPT_URI_PATH, COAP_OPT_BLOCK2, (num << 4) | blksize);
+    pktpos +=
+        coap_opt_put_uint(pktpos, COAP_OPT_URI_PATH, COAP_OPT_BLOCK2,
+                          (num << 4) | blksize);
 
     pkt->payload = pktpos;
     pkt->payload_len = 0;
@@ -237,8 +246,8 @@ static int _fetch_block(coap_pkt_t *pkt, uint8_t *buf, sock_udp_t *sock, const c
 }
 
 int suit_coap_get_blockwise(sock_udp_ep_t *remote, const char *path,
-                               coap_blksize_t blksize,
-                               coap_blockwise_cb_t callback, void *arg)
+                            coap_blksize_t blksize,
+                            coap_blockwise_cb_t callback, void *arg)
 {
     /* mmmmh dynamically sized array */
     uint8_t buf[64 + (0x1 << (blksize + 4))];
@@ -248,13 +257,11 @@ int suit_coap_get_blockwise(sock_udp_ep_t *remote, const char *path,
     /* HACK: use random local port */
     local.port = 0x8000 + (xtimer_now_usec() % 0XFFF);
 
-
     sock_udp_t sock;
     int res = sock_udp_create(&sock, &local, remote, 0);
     if (res < 0) {
         return res;
     }
-
 
     int more = 1;
     size_t num = 0;
@@ -269,7 +276,8 @@ int suit_coap_get_blockwise(sock_udp_ep_t *remote, const char *path,
             coap_get_block2(&pkt, &block2);
             more = block2.more;
 
-            if (callback(arg, block2.offset, pkt.payload, pkt.payload_len, more)) {
+            if (callback(arg, block2.offset, pkt.payload, pkt.payload_len,
+                         more)) {
                 DEBUG("callback res != 0, aborting.\n");
                 res = -1;
                 goto out;
@@ -290,8 +298,8 @@ out:
 }
 
 int suit_coap_get_blockwise_url(const char *url,
-                               coap_blksize_t blksize,
-                               coap_blockwise_cb_t callback, void *arg)
+                                coap_blksize_t blksize,
+                                coap_blockwise_cb_t callback, void *arg)
 {
     char hostport[CONFIG_SOCK_HOSTPORT_MAXLEN];
     char urlpath[CONFIG_SOCK_URLPATH_MAXLEN];
@@ -346,25 +354,27 @@ static int _2buf(void *arg, size_t offset, uint8_t *buf, size_t len, int more)
 }
 
 ssize_t suit_coap_get_blockwise_url_buf(const char *url,
-                               coap_blksize_t blksize,
-                               uint8_t *buf, size_t len)
+                                        coap_blksize_t blksize,
+                                        uint8_t *buf, size_t len)
 {
-    _buf_t _buf = { .ptr=buf, .len=len };
+    _buf_t _buf = { .ptr = buf, .len = len };
     int res = suit_coap_get_blockwise_url(url, blksize, _2buf, &_buf);
+
     return (res < 0) ? (ssize_t)res : (ssize_t)_buf.offset;
 }
 
 static void _suit_handle_url(const char *url)
 {
     LOG_INFO("suit_coap: downloading \"%s\"\n", url);
-    ssize_t size = suit_coap_get_blockwise_url_buf(url, COAP_BLOCKSIZE_64, _manifest_buf,
-                                              SUIT_MANIFEST_BUFSIZE);
+    ssize_t size = suit_coap_get_blockwise_url_buf(url, COAP_BLOCKSIZE_64,
+                                                   _manifest_buf,
+                                                   SUIT_MANIFEST_BUFSIZE);
     if (size >= 0) {
         LOG_INFO("suit_coap: got manifest with size %u\n", (unsigned)size);
 
         riotboot_flashwrite_t writer;
-#ifdef MODULE_SUIT_V4
-        suit_v4_manifest_t manifest;
+#ifdef MODULE_SUIT
+        suit_manifest_t manifest;
         memset(&manifest, 0, sizeof(manifest));
 
         manifest.writer = &writer;
@@ -372,18 +382,18 @@ static void _suit_handle_url(const char *url)
         manifest.urlbuf_len = SUIT_URL_MAX;
 
         int res;
-        if ((res = suit_v4_parse(&manifest, _manifest_buf, size)) != SUIT_OK) {
-            LOG_INFO("suit_v4_parse() failed. res=%i\n", res);
+        if ((res = suit_parse(&manifest, _manifest_buf, size)) != SUIT_OK) {
+            LOG_INFO("suit_parse() failed. res=%i\n", res);
             return;
         }
 
-        LOG_INFO("suit_v4_parse() success\n");
+        LOG_INFO("suit_parse() success\n");
         if (!(manifest.state & SUIT_MANIFEST_HAVE_IMAGE)) {
             LOG_INFO("manifest parsed, but no image fetched\n");
             return;
         }
 
-        res = suit_v4_policy_check(&manifest);
+        res = suit_policy_check(&manifest);
         if (res) {
             return;
         }
@@ -393,7 +403,8 @@ static void _suit_handle_url(const char *url)
             LOG_INFO("suit_coap: finalizing image flash\n");
             riotboot_flashwrite_finish(&writer);
 
-            const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(riotboot_slot_other());
+            const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(
+                riotboot_slot_other());
             riotboot_hdr_print(hdr);
             xtimer_sleep(1);
 
@@ -414,7 +425,7 @@ static void _suit_handle_url(const char *url)
 int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
                            int more)
 {
-    suit_v4_manifest_t *manifest = (suit_v4_manifest_t *)arg;
+    suit_manifest_t *manifest = (suit_manifest_t *)arg;
     riotboot_flashwrite_t *writer = manifest->writer;
 
     if (offset == 0) {
@@ -428,8 +439,9 @@ int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
     }
 
     if (writer->offset != offset) {
-        LOG_WARNING("_suit_flashwrite(): writer->offset=%u, offset==%u, aborting\n",
-                    (unsigned)writer->offset, (unsigned)offset);
+        LOG_WARNING(
+            "_suit_flashwrite(): writer->offset=%u, offset==%u, aborting\n",
+            (unsigned)writer->offset, (unsigned)offset);
         return -1;
     }
 
@@ -481,10 +493,11 @@ static ssize_t _version_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 
 #ifdef MODULE_RIOTBOOT_SLOT
 static ssize_t _slot_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
-                                void *context)
+                             void *context)
 {
     /* context is passed either as NULL or 0x1 for /active or /inactive */
     char c = '0';
+
     if (context) {
         c += riotboot_slot_other();
     }
@@ -509,7 +522,7 @@ static ssize_t _trigger_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
         }
         else {
             code = COAP_CODE_CREATED;
-            LOG_INFO("suit: received URL: \"%s\"\n", (char*)pkt->payload);
+            LOG_INFO("suit: received URL: \"%s\"\n", (char *)pkt->payload);
             suit_coap_trigger(pkt->payload, payload_len);
         }
     }
@@ -532,9 +545,10 @@ void suit_coap_trigger(const uint8_t *url, size_t len)
 static const coap_resource_t _subtree[] = {
 #ifdef MODULE_RIOTBOOT_SLOT
     { "/suit/slot/active", COAP_METHOD_GET, _slot_handler, NULL },
-    { "/suit/slot/inactive", COAP_METHOD_GET, _slot_handler, (void*)0x1 },
+    { "/suit/slot/inactive", COAP_METHOD_GET, _slot_handler, (void *)0x1 },
 #endif
-    { "/suit/trigger", COAP_METHOD_PUT | COAP_METHOD_POST, _trigger_handler, NULL },
+    { "/suit/trigger", COAP_METHOD_PUT | COAP_METHOD_POST, _trigger_handler,
+      NULL },
     { "/suit/version", COAP_METHOD_GET, _version_handler, NULL },
 };
 

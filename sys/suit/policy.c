@@ -8,23 +8,22 @@
  * directory for more details.
  */
 /**
- * @ingroup     sys_suit_v4
+ * @ingroup     sys_suit
  * @{
  *
  * @file
- * @brief       SUIT v4 policy checking code
+ * @brief       SUIT update policy checking code
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
 
-#include "suit/v4/suit.h"
-#include "suit/v4/policy.h"
-
 #include "log.h"
+#include "suit/policy.h"
+#include "suit.h"
 
-int suit_v4_policy_check(suit_v4_manifest_t *manifest)
+int suit_policy_check(suit_manifest_t *manifest)
 {
     if (SUIT_DEFAULT_POLICY & ~(manifest->validated)) {
         LOG_INFO("SUIT policy check failed!\n");

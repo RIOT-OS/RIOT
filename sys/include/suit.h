@@ -7,9 +7,17 @@
  * directory for more details.
  */
 /**
- * @defgroup    sys_suit_v4 SUIT draft v4
- * @ingroup     sys_suit
+ * @defgroup    sys_suit SUIT secure firmware OTA upgrade infrastructure
+ * @ingroup     sys
  * @brief       SUIT manifest handling
+ *
+ * @experimental
+ *
+ * @note The current implementation of this specification is based on the
+ *       IETF-SUIT-v3 draft. The module is still experimental and will change to
+ *       match future draft specifications
+ *
+ * @see https://tools.ietf.org/html/draft-ietf-suit-manifest-03
  *
  * @{
  *
@@ -19,8 +27,8 @@
  *
  */
 
-#ifndef SUIT_V4_SUIT_H
-#define SUIT_V4_SUIT_H
+#ifndef SUIT_H
+#define SUIT_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -38,40 +46,46 @@ extern "C" {
  * @brief   Buffer size used for Cose
  */
 #ifndef SUIT_COSE_BUF_SIZE
-#define SUIT_COSE_BUF_SIZE              (512U)
+#define SUIT_COSE_BUF_SIZE                  (180U)
 #endif
 
 /**
- * @brief   Maximum number of components used for SUIT v4
+ * @brief   Maximum number of components supported in a SUIT manifest
  */
-#define SUIT_V4_COMPONENT_MAX           (1U)
-
-/**
- * @brief Supported SUIT manifest version
- */
-#define SUIT_MANIFEST_VERSION           (4)
+#define SUIT_COMPONENT_MAX                  (1U)
 
 /**
  * @brief Current SUIT serialization format version
  *
- * see https://tools.ietf.org/html/draft-moran-suit-manifest-04#section-8.2 for
+ * see https://tools.ietf.org/html/draft-ietf-suit-manifest-03#section-7 for
  * details
  */
-#define SUIT_VERSION                    (1)
+#define SUIT_VERSION                        (1)
+
+/**
+ * @brief COSE signature OK
+ */
+#define SUIT_STATE_COSE_AUTHENTICATED       (1 << 1)
+
+/**
+ * @brief COSE payload matches SUIT manifest digest
+ */
+#define SUIT_STATE_FULLY_AUTHENTICATED      (1 << 2)
 
 /**
  * @brief SUIT error codes
  */
 typedef enum {
-    SUIT_OK                     = 0,    /**< Manifest parsed and validated */
-    SUIT_ERR_INVALID_MANIFEST   = -1,   /**< Unexpected CBOR structure detected */
-    SUIT_ERR_UNSUPPORTED        = -2,   /**< Unsupported SUIT feature detected */
-    SUIT_ERR_NOT_SUPPORTED      = -3,   /**< Unsupported manifest features detected */
-    SUIT_ERR_COND               = -4,   /**< Conditionals evaluate to false */
-    SUIT_ERR_SEQUENCE_NUMBER    = -5,   /**< Sequence number less or equal to
-                                             current sequence number */
-    SUIT_ERR_SIGNATURE          = -6,   /**< Unable to verify signature */
-} suit_v4_error_t;
+    SUIT_OK                   =  0, /**< Manifest parsed and validated */
+    SUIT_ERR_INVALID_MANIFEST = -1, /**< Unexpected CBOR structure detected */
+    SUIT_ERR_UNSUPPORTED      = -2, /**< Unsupported SUIT feature detected */
+    SUIT_ERR_NOT_SUPPORTED    = -3, /**< Unsupported features detected */
+    SUIT_ERR_COND             = -4, /**< Conditionals evaluate to false */
+    SUIT_ERR_SEQUENCE_NUMBER  = -5, /**< Sequence number less or equal to
+                                         current sequence number */
+    SUIT_ERR_SIGNATURE        = -6, /**< Unable to verify signature */
+    SUIT_ERR_DIGEST_MISMATCH  = -7, /**< Digest mismatch with COSE and SUIT */
+} suit_error_t;
 
 /**
  * @brief SUIT payload digest algorithms
@@ -84,7 +98,7 @@ typedef enum {
     SUIT_DIGEST_SHA256  = 1,    /**< SHA256 */
     SUIT_DIGEST_SHA384  = 2,    /**< SHA384 */
     SUIT_DIGEST_SHA512  = 3,    /**< SHA512 */
-} suit_v4_digest_t;
+} suit_digest_t;
 
 /**
  * @brief SUIT payload digest types
@@ -97,7 +111,7 @@ typedef enum {
     SUIT_DIGEST_TYPE_INSTALLED  = 2,    /**< Installed firmware digest */
     SUIT_DIGEST_TYPE_CIPHERTEXT = 3,    /**< Ciphertext digest */
     SUIT_DIGEST_TYPE_PREIMAGE   = 4     /**< Pre-image digest */
-} suit_v4_digest_type_t;
+} suit_digest_type_t;
 
 /**
  * @brief SUIT component types
@@ -112,36 +126,35 @@ enum {
 };
 
 /**
- * @brief SUIT v4 component struct
+ * @brief SUIT component struct
  */
 typedef struct {
     uint32_t size;                      /**< Size */
-    nanocbor_value_t identifier;        /**< Identifier*/
+    nanocbor_value_t identifier;        /**< Identifier */
     nanocbor_value_t url;               /**< Url */
     nanocbor_value_t digest;            /**< Digest */
-} suit_v4_component_t;
+} suit_component_t;
 
 /**
  * @brief SUIT manifest struct
  */
 typedef struct {
-    cose_sign_dec_t verify;         /**< COSE signature validation struct */
     const uint8_t *buf;             /**< ptr to the buffer of the manifest */
     size_t len;                     /**< length of the manifest */
+    const uint8_t *cose_payload;    /**< ptr to the payload of the COSE sign */
+    size_t cose_payload_len;        /**< length of the COSE payload */
     uint32_t validated;             /**< bitfield of validated policies */
     uint32_t state;                 /**< bitfield holding state information */
-
     /** List of components in the manifest */
-    suit_v4_component_t components[SUIT_V4_COMPONENT_MAX];
+    suit_component_t components[SUIT_COMPONENT_MAX];
     unsigned components_len;        /**< Current number of components */
-    int32_t component_current;      /**< Current component index */
+    uint32_t component_current;     /**< Current component index */
     riotboot_flashwrite_t *writer;  /**< Pointer to the riotboot flash writer */
     /** Manifest validation buffer */
     uint8_t validation_buf[SUIT_COSE_BUF_SIZE];
-    cose_key_t *key;                /**< Ptr to the public key for validation */
     char *urlbuf;                   /**< Buffer containing the manifest url */
     size_t urlbuf_len;              /**< Length of the manifest url */
-} suit_v4_manifest_t;
+} suit_manifest_t;
 
 /**
  * @brief Bit flags used to determine if SUIT manifest contains components
@@ -163,9 +176,9 @@ typedef struct {
  * @param[in]   len         length of the manifest data in the buffer
  *
  * @return                  SUIT_OK on parseable manifest
- * @return                  negative @ref suit_v4_error_t code on error
+ * @return                  negative @ref suit_error_t code on error
  */
-int suit_v4_parse(suit_v4_manifest_t *manifest, const uint8_t *buf, size_t len);
+int suit_parse(suit_manifest_t *manifest, const uint8_t *buf, size_t len);
 
 /**
  * @brief Check a manifest policy
@@ -175,31 +188,7 @@ int suit_v4_parse(suit_v4_manifest_t *manifest, const uint8_t *buf, size_t len);
  * @return                  0 on valid manifest policy
  * @return                  -1 on invalid manifest policy
  */
-int suit_v4_policy_check(suit_v4_manifest_t *manifest);
-
-/**
- * @brief Iterate over a cbor map container
- *
- * @param[in]   it      cbor container iterator
- * @param[out]  key     the returned key
- * @param[out]  value   the returned value
- *
- * @return              0 when the iterator is already at the end of the container
- * @return              the number of returned (key, value) pair, e.g. 1
- */
-int suit_cbor_map_iterate(nanocbor_value_t *it, nanocbor_value_t *key, nanocbor_value_t *value);
-
-/**
- * @brief Parser a cbor subsequence
- *
- * @param[in]   bseq        subsequence value
- * @param[out]  it          cbor iterator
- *
- * @return                  0 on success
- * @return                  -1 if bseq is not a cbor string
- * @return                  CborError code on other cbor parser errors
- */
-int suit_cbor_subparse(nanocbor_value_t *bseq, nanocbor_value_t *it);
+int suit_policy_check(suit_manifest_t *manifest);
 
 /**
  * @brief Helper function for writing bytes on flash a specified offset
@@ -220,5 +209,5 @@ int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
 }
 #endif
 
-#endif /* SUIT_V4_SUIT_H */
+#endif /* SUIT_H */
 /** @} */

@@ -9,7 +9,7 @@
  * directory for more details.
  */
 /**
- * @ingroup     sys_suit_v4
+ * @ingroup     sys_suit
  * @brief       SUIT policy definitions
  *
  * @{
@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SUIT_V4_POLICY_H
-#define SUIT_V4_POLICY_H
+#ifndef SUIT_POLICY_H
+#define SUIT_POLICY_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -48,11 +48,12 @@ extern "C" {
  * @brief   SUIT default policy
  */
 #define SUIT_DEFAULT_POLICY \
-          (SUIT_VALIDATED_VERSION | SUIT_VALIDATED_SEQ_NR | SUIT_VALIDATED_VENDOR | SUIT_VALIDATED_CLASS)
+    (SUIT_VALIDATED_VERSION | SUIT_VALIDATED_SEQ_NR | SUIT_VALIDATED_VENDOR | \
+     SUIT_VALIDATED_CLASS)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* SUIT_V4_POLICY_H */
+#endif /* SUIT_POLICY_H */
 /** @} */

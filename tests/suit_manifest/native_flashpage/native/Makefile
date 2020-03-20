@@ -1,2 +1,3 @@
-MODULE := suit_v4
+DIRS += $(RIOTBOARD)/native
+
 include $(RIOTBASE)/Makefile.base
