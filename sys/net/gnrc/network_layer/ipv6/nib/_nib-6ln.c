@@ -234,7 +234,7 @@ _nib_abr_entry_t *_handle_abro(const sixlowpan_nd_opt_abr_t *abro)
 
         if (abr->version >= abro_version) {
             abr->version = abro_version;
-            abr->valid_until = _now_min() + ltime;
+            abr->valid_until = evtimer_now_min() + ltime;
         }
         /* correct for default value */
         ltime = (ltime == 0) ? SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT : ltime;

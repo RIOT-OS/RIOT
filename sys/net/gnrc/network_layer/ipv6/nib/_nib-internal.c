@@ -788,7 +788,7 @@ _nib_offl_entry_t *_nib_pl_add(unsigned iface,
     }
     assert(valid_ltime >= pref_ltime);
     if ((valid_ltime != UINT32_MAX) || (pref_ltime != UINT32_MAX)) {
-        uint32_t now = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
+        uint32_t now = evtimer_now_msec();
         if (pref_ltime != UINT32_MAX) {
             _evtimer_add(dst, GNRC_IPV6_NIB_PFX_TIMEOUT, &dst->pfx_timeout,
                          pref_ltime);

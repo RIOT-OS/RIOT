@@ -20,7 +20,7 @@
 #include "net/gnrc/ipv6/nib/pl.h"
 #include "net/gnrc/netif/internal.h"
 #include "timex.h"
-#include "xtimer.h"
+#include "evtimer.h"
 
 #include "_nib-internal.h"
 #include "_nib-router.h"
@@ -142,7 +142,7 @@ void gnrc_ipv6_nib_pl_print(gnrc_ipv6_nib_pl_t *entry)
 {
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
     ipv6_addr_t pfx = IPV6_ADDR_UNSPECIFIED;
-    uint32_t now = ((xtimer_now_usec64() / US_PER_MS)) & UINT32_MAX;
+    uint32_t now = evtimer_now_msec();
 
     ipv6_addr_init_prefix(&pfx, &entry->pfx, entry->pfx_len);
     printf("%s/%u ", ipv6_addr_to_str(addr_str, &pfx, sizeof(addr_str)),

@@ -63,7 +63,7 @@ void _handle_snd_mc_ra(gnrc_netif_t *netif)
         if ((final_ra && (next_scheduled > NDP_MAX_RA_INTERVAL_MS)) ||
             gnrc_netif_is_rtr_adv(netif)) {
             _snd_rtr_advs(netif, NULL, final_ra);
-            netif->ipv6.last_ra = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
+            netif->ipv6.last_ra = evtimer_now_msec();
             if ((netif->ipv6.ra_sent < NDP_MAX_INIT_RA_NUMOF) || final_ra) {
                 if ((netif->ipv6.ra_sent < NDP_MAX_INIT_RA_NUMOF) &&
                     (next_ra_time > NDP_MAX_INIT_RA_INTERVAL)) {
@@ -100,7 +100,7 @@ void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst, bool final)
 static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
                                     gnrc_pktsnip_t *ext_opts)
 {
-    uint32_t now = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
+    uint32_t now = evtimer_now_msec();
     gnrc_pktsnip_t *pio;
     uint8_t flags = 0;
     uint32_t valid_ltime = (offl->valid_until == UINT32_MAX) ? UINT32_MAX :
@@ -183,7 +183,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
     }
     ltime = (gnrc_netif_is_6lbr(netif)) ?
             (SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT) :
-            (abr->valid_until - _now_min());
+            (abr->valid_until - evtimer_now_min());
     (void)ltime;    /* gnrc_sixlowpan_nd_opt_abr_build might evaluate to NOP */
     abro = gnrc_sixlowpan_nd_opt_abr_build(abr->version, ltime, &abr->addr,
                                            ext_opts);
