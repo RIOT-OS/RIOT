@@ -27,6 +27,13 @@ extern "C" {
 #endif
 
 /**
+ * @name    Clock system configuration
+ * @{
+ */
+#define CLOCK_CORECLOCK     (16000000U)     /* desired core clock frequency, 16MHz */
+/** @} */
+
+/**
  * @name    Timer configuration
  *
  * General purpose timers (GPT[0-3]) are configured consecutively and in order
