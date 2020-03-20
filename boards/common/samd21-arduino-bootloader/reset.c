@@ -19,6 +19,8 @@
  * @}
  */
 
+#ifdef MODULE_BOARDS_COMMON_SAMD21_ARDUINO_BOOTLOADER
+
 #define USB_H_USER_IS_RIOT_INTERNAL
 
 #include "usb_board_reset.h"
@@ -41,3 +43,6 @@ void usb_board_reset_in_bootloader(void)
 
     usb_board_reset_in_application();
 }
+#else
+typedef int dont_be_pedantic;
+#endif /* MODULE_BOARDS_COMMON_SAMD21_ARDUINO_BOOTLOADER */
