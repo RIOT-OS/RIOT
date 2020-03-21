@@ -1,7 +1,6 @@
 export DOCKER_IMAGE ?= riot/riotbuild:latest
 export DOCKER_BUILD_ROOT ?= /data/riotbuild
 DOCKER_RIOTBASE ?= $(DOCKER_BUILD_ROOT)/riotbase
-export DOCKER_FLAGS ?= --rm
 # List of Docker-enabled make goals
 export DOCKER_MAKECMDGOALS_POSSIBLE = \
   all \
@@ -91,8 +90,15 @@ DOCKER_OVERRIDE_CMDLINE += $(strip $(DOCKER_OVERRIDE_CMDLINE_AUTO))
 # Overwrite if you want to use `docker` with sudo
 DOCKER ?= docker
 
-# 'make' arguments inside docker
-DOCKER_MAKE_ARGS += $(DOCKER_MAKECMDGOALS) $(DOCKER_OVERRIDE_CMDLINE)
+# Set default run flags:
+# - allocate a pseudo-tty
+# - remove container on exit
+# - set username/UID to executor
+DOCKER_USER ?= $$(id -u)
+DOCKER_RUN_FLAGS ?= --rm --tty --user $(DOCKER_USER)
+
+# allow setting make args from command line like '-j'
+DOCKER_MAKE_ARGS ?=
 
 # Resolve symlink of /etc/localtime to its real path
 # This is a workaround for docker on macOS, for more information see:
@@ -274,6 +280,19 @@ _is_git_worktree = $(shell grep '^gitdir: ' $(RIOTBASE)/.git 2>/dev/null)
 GIT_WORKTREE_COMMONDIR = $(abspath $(shell git rev-parse --git-common-dir))
 DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),$(call docker_volume,$(GIT_WORKTREE_COMMONDIR),$(GIT_WORKTREE_COMMONDIR)))
 
+# Run a make command in a docker container
+#   $1: make targets to run in docker
+#   $2: docker image to use
+#   $3: additional docker flags for specific targets
+#   $4: additional make args like '-j'
+docker_run_make = \
+	$(DOCKER) run $(DOCKER_RUN_FLAGS) \
+	$(DOCKER_VOLUMES_AND_ENV) \
+	$(DOCKER_ENVIRONMENT_CMDLINE) \
+	$3 \
+	-w '$(DOCKER_APPDIR)' '$2' \
+	make $(DOCKER_OVERRIDE_CMDLINE) $4 $1
+
 # This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
 # We do not push the regular $(MAKECMDGOALS) to the container's make command in
 # order to only perform building inside the container and defer executing any
@@ -283,10 +302,4 @@ DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),$(call docker_volume,$(GIT_WO
 # hardware which may not be reachable from inside the container.
 ..in-docker-container:
 	@$(COLOR_ECHO) '$(COLOR_GREEN)Launching build container using image "$(DOCKER_IMAGE)".$(COLOR_RESET)'
-	@# HACK: Handle directory creation here until it is provided globally
-	$(Q)mkdir -p $(BUILD_DIR)
-	$(DOCKER) run $(DOCKER_FLAGS) -t -u "$$(id -u)" \
-	    $(DOCKER_VOLUMES_AND_ENV) \
-	    $(DOCKER_ENVIRONMENT_CMDLINE) \
-	    -w '$(DOCKER_APPDIR)' \
-	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKE_ARGS)
+	$(call docker_run_make,$(DOCKER_MAKECMDGOALS),$(DOCKER_IMAGE),,$(DOCKER_MAKE_ARGS))
