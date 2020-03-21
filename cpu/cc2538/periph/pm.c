@@ -58,12 +58,15 @@ void pm_set(unsigned mode)
 
         /* If we used the 32 MHz clock, we have to switch to 16 MHz for deep sleep */
         switch_osc = !SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.OSC;
+        /* set to 0 in order to ensure that the 32 MHz XOSC is started as quick
+           as possible after power mode */
+        SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.OSC_PD = 0;
     }
 
     /* switch to 16 MHz clock */
     if (switch_osc) {
         SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.OSC = 1;
-        while (!SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.OSC) {}
+        while (!SYS_CTRL->cc2538_sys_ctrl_clk_sta.CLOCK_STAbits.OSC) {}
     }
 
     cortexm_sleep(deep);
@@ -71,6 +74,8 @@ void pm_set(unsigned mode)
     /* switch back to 32 MHz clock */
     if (switch_osc) {
         SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.OSC = 0;
-        while (SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.OSC) {}
+        /* Power down the oscillator not selected by OSC bit */
+        SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.OSC_PD = 1;
+        while (SYS_CTRL->cc2538_sys_ctrl_clk_sta.CLOCK_STAbits.OSC) {}
     }
 }
