@@ -147,6 +147,11 @@ int apds99xx_init(apds99xx_t *dev, const apds99xx_params_t *params)
         return -APDS99XX_ERROR_I2C;
     }
 
+    if (_update_reg(dev, APDS99XX_REG_CONFIG, APDS99XX_REG_WLONG,
+                    dev->params.wait_long)) {
+        return -APDS99XX_ERROR_I2C;
+    }
+
     return APDS99XX_OK;
 }
 
