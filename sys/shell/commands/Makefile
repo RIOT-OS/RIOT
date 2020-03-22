@@ -104,4 +104,8 @@ ifneq (,$(filter suit_coap,$(USEMODULE)))
   SRC += sc_suit.c
 endif
 
+ifneq (,$(filter pm_cmd,$(USEMODULE)))
+  SRC += sc_pm.c
+endif
+
 include $(RIOTBASE)/Makefile.base

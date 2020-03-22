@@ -167,6 +167,10 @@ extern int _nimble_netif_handler(int argc, char **argv);
 extern int _suit_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_PM_CMD
+extern int _pm_cmd_handler(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
     {"version", "Prints current RIOT_VERSION", _version_handler},
@@ -279,6 +283,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_SUIT_COAP
     { "suit", "Trigger a SUIT firmware update", _suit_handler },
+#endif
+#ifdef MODULE_PM_CMD
+    {"pm", "Power management commands",  _pm_cmd_handler},
 #endif
     {NULL, NULL, NULL}
 };

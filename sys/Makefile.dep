@@ -32,4 +32,9 @@ ifneq (,$(filter rtt_cmd,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
 
+ifneq (,$(filter pm_cmd,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_pm
+  FEATURES_OPTIONAL += periph_rtc
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
