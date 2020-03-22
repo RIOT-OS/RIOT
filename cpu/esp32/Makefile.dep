@@ -27,6 +27,13 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += esp_idf_wpa_supplicant_port
 endif
 
+ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
+  # add additional modules used for WPA2 Enterprise mode
+  USEMODULE += esp_idf_wpa_supplicant_wpa2_eap_peer
+  USEMODULE += esp_idf_wpa_supplicant_wpa2_tls
+  USEMODULE += esp_idf_wpa_supplicant_wpa2_utils
+endif
+
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
   # add additional modules required by esp_idf_nvs_flash
   USEMODULE += mtd

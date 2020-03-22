@@ -157,7 +157,9 @@ extern "C" {
 #define CONFIG_ESP32_WIFI_CSI_ENABLED           0
 #define CONFIG_ESP32_WIFI_TASK_PINNED_TO_CORE_0 1
 #define CONFIG_ESP32_WIFI_TASK_PINNED_TO_CORE_1 0
-#define CONFIG_ESP32_WIFI_NVS_ENABLED           0
+#if MODULE_ESP_IDF_NVS_ENABLED
+#define CONFIG_ESP32_WIFI_NVS_ENABLED           1
+#endif
 
 /**
  * PHY configuration

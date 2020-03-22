@@ -39,6 +39,10 @@
 
 #include "nvs_flash/include/nvs_flash.h"
 
+#ifdef MODULE_ESP_WIFI_ENTERPRISE
+#include "esp_wpa2.h"
+#endif
+
 #include "esp_wifi_params.h"
 #include "esp_wifi_netdev.h"
 
@@ -688,14 +692,16 @@ static const netdev_driver_t _esp_wifi_driver =
 static wifi_config_t wifi_config_sta = {
     .sta = {
         .ssid = ESP_WIFI_SSID,
-#ifdef ESP_WIFI_PASS
+#if !defined(MODULE_ESP_WIFI_ENTERPRISE) && defined(ESP_WIFI_PASS)
         .password = ESP_WIFI_PASS,
 #endif
         .channel = 0,
         .scan_method = WIFI_ALL_CHANNEL_SCAN,
         .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
         .threshold.rssi = -127,
-#ifdef ESP_WIFI_PASS
+#if defined(MODULE_ESP_WIFI_ENTERPRISE)
+        .threshold.authmode = WIFI_AUTH_WPA2_ENTERPRISE
+#elif defined(ESP_WIFI_PASS)
         .threshold.authmode = WIFI_AUTH_WPA_WPA2_PSK
 #else
         .threshold.authmode = WIFI_AUTH_OPEN
@@ -803,6 +809,27 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
         ESP_WIFI_LOG_ERROR("esp_wifi_set_config station failed with return value %d", result);
         return;
     }
+
+#ifdef MODULE_ESP_WIFI_ENTERPRISE
+
+    esp_wpa2_config_t wifi_config_wpa2 = WPA2_CONFIG_INIT_DEFAULT();
+#ifdef ESP_WIFI_EAP_ID
+    esp_wifi_sta_wpa2_ent_set_identity((const unsigned char *)ESP_WIFI_EAP_ID,
+                                       strlen(ESP_WIFI_EAP_ID));
+#endif
+#if defined(ESP_WIFI_EAP_USER) && defined(ESP_WIFI_EAP_PASS)
+    ESP_WIFI_DEBUG("eap_user=%s eap_pass=%s\n",
+                   ESP_WIFI_EAP_USER, ESP_WIFI_EAP_PASS);
+    esp_wifi_sta_wpa2_ent_set_username((const unsigned char *)ESP_WIFI_EAP_USER,
+                                       strlen(ESP_WIFI_EAP_USER));
+    esp_wifi_sta_wpa2_ent_set_password((const unsigned char *)ESP_WIFI_EAP_PASS,
+                                       strlen(ESP_WIFI_EAP_PASS));
+#else
+#error ESP_WIFI_EAP_USER and ESP_WIFI_EAP_PASS have to define the user name \
+       and the password for EAP phase 2 authentication in esp_wifi_enterprise
+#endif
+    esp_wifi_sta_wpa2_ent_enable(&wifi_config_wpa2);
+#endif
 
     /* start the WiFi driver */
     result = esp_wifi_start();

@@ -44,6 +44,7 @@ PSEUDOMODULES += esp_idf_newlib
 PSEUDOMODULES += esp_rtc_timer
 PSEUDOMODULES += esp_rtc_timer_32k
 PSEUDOMODULES += esp_spi_ram
+PSEUDOMODULES += esp_wifi_enterprise
 
 USEMODULE += esp_idf_driver
 USEMODULE += esp_idf_esp32
