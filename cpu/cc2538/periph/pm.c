@@ -51,6 +51,10 @@ void pm_set(unsigned mode)
             deep = true;
             SYS_CTRL_PMCTL = 0x0;
             break;
+            /* FIXME: Timers don't work when using cortexm_sleep()
+                      So don't sleep at all until we have figured this out. */
+        default:
+            return;
     }
 
     if (deep) {
