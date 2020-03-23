@@ -123,7 +123,7 @@ uhcpd-daemon: host-tools
 endif
 endif
 
-ifeq (1,$(USE_SLIP))
+ifeq (slip,$(UPLINK))
 sliptty:
 	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)/sliptty
 endif
