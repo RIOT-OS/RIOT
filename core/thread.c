@@ -61,9 +61,9 @@ void thread_zombify(void)
         return;
     }
 
-    unsigned state = irq_disable();
+    irq_disable();
     sched_set_status((thread_t *)sched_active_thread, STATUS_ZOMBIE);
-    irq_restore(state);
+    irq_enable();
     thread_yield_higher();
 
     /* this line should never be reached */
