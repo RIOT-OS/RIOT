@@ -16,6 +16,7 @@ CFLAGS += -DRIOTBOOT
 CFLAGS += -DNDEBUG -DLOG_LEVEL=LOG_NONE
 DISABLE_MODULE += core_init core_msg core_panic
 DISABLE_MODULE += auto_init
+DISABLE_MODULE += stdio_cdc_acm
 
 # Include riotboot flash partition functionality
 USEMODULE += riotboot_slot
