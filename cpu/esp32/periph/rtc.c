@@ -52,6 +52,7 @@
 
 #include "cpu.h"
 #include "esp_attr.h"
+#include "esp_sleep.h"
 #include "log.h"
 #include "irq_arch.h"
 #include "periph/rtc.h"
@@ -99,23 +100,24 @@ static uint64_t _rtc_get_time_raw(void);        /* RTC time in cycles */
 static uint64_t _rtc_time_to_us(uint64_t raw);  /* convert RTC cycles to us */
 static void IRAM_ATTR _rtc_timer_handler(void* arg);
 
+/* alias for compatibility with espressif/esp-idf */
+int64_t esp_set_time_from_rtc(void) __attribute__((alias("rtc_init")));
+
 void rtc_init(void)
 {
-    uint64_t _rtc_time_us = _rtc_time_to_us(_rtc_get_time_raw());
+    uint64_t _rtc_time = _rtc_get_time_raw();
+    uint64_t _rtc_time_us = _rtc_time_to_us(_rtc_time);
 
     if (_rtc_time_init == 0 && _rtc_time_init_us == 0) {
         /* only set it new, if it was not set before */
-        _rtc_time_init = _rtc_get_time_raw();
+        _rtc_time_init = _rtc_time;
         _rtc_time_init_us = _rtc_time_us;
-        _sys_time_off_us = 0;
 
         DEBUG("%s saved rtc_init=%lld rtc_init_us=%lld\n",
               __func__, _rtc_time_init, _rtc_time_init_us);
 
     }
-    else {
-        _sys_time_off_us = _rtc_time_us - _rtc_time_set_us;
-    }
+    _sys_time_off_us = _rtc_time_us - _rtc_time_set_us - system_get_time_64();
     _sys_time_set_us = 0;
 }
 
@@ -312,6 +314,7 @@ static void IRAM_ATTR _rtc_timer_handler(void* arg)
         /* call back registered function */
         if (_rtc_alarm_cb) {
             _rtc_alarm_cb(_rtc_alarm_arg);
+            _rtc_alarm_cb = 0;
         }
     }
     /* clear all interrupts */
@@ -341,4 +344,24 @@ static void IRAM_ATTR _rtc_timer_handler(void* arg)
 #endif
 
     irq_isr_exit();
+}
+
+uint64_t rtc_pm_sleep_enter(unsigned mode)
+{
+    (void)mode;
+    if (_rtc_alarm_cb) {
+        uint64_t sleep = (_sys_alarm_time - _sys_get_time()) * US_PER_SEC;
+        esp_sleep_enable_timer_wakeup(sleep);
+        return sleep;
+    }
+    return 0;
+}
+
+void rtc_pm_sleep_exit(uint32_t cause)
+{
+    /* call the RTC time was the wakeup source and an RTC alarm was set */
+    if (cause == ESP_SLEEP_WAKEUP_TIMER && _rtc_alarm_cb) {
+        _rtc_alarm_cb(_rtc_alarm_arg);
+        _rtc_alarm_cb = 0;
+    }
 }

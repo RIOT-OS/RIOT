@@ -32,6 +32,22 @@ extern "C" {
 #define PROVIDES_PM_SET_LOWEST
 #define PROVIDES_PM_RESTART
 #define PROVIDES_PM_OFF
+#define PROVIDES_PM_LAYERED_OFF
+
+/**
+ * @brief   Number of usable low power modes
+ */
+#define PM_NUM_MODES            (2U)
+
+/**
+ * @name    Power modes
+ * @{
+ */
+#define ESP_PM_MODEM_SLEEP      (2U)
+#define ESP_PM_LIGHT_SLEEP      (1U)
+#define ESP_PM_DEEP_SLEEP       (0U)
+/** @} */
+
 /** @} */
 
 /**

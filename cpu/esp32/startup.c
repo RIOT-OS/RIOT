@@ -43,6 +43,7 @@
 
 #include "driver/periph_ctrl.h"
 #include "esp/common_macros.h"
+#include "esp32/esp_sleep.h"
 #include "heap/esp_heap_caps_init.h"
 #include "log/esp_log.h"
 #include "rom/cache.h"
@@ -152,6 +153,13 @@ NORETURN void IRAM call_start_cpu0 (void)
     }
     ets_printf("\n");
 #endif
+
+    if (reset_reason == DEEPSLEEP_RESET) {
+        /* the cause has to be read to clear it */
+        esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
+        (void)cause;
+        LOG_STARTUP("Restart after deep sleep, wake-up cause: %d\n", cause);
+    }
 
     LOG_STARTUP("Current clocks in Hz: CPU=%d APB=%d XTAL=%d SLOW=%d\n",
                 rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()),
