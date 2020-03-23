@@ -34,6 +34,23 @@
 #include "soc/rtc.h"
 #include "soc/rtc_cntl_reg.h"
 
+static inline esp_sleep_wakeup_cause_t pm_get_wakeup_cause(void)
+{
+    return esp_sleep_get_wakeup_cause();
+}
+
+/* function that is required by pm_set if esp_now and esp_wifi are not used */
+esp_err_t __attribute__((weak)) esp_wifi_start(void)
+{
+    return ESP_OK;
+}
+
+/* function that is required by pm_set if esp_now and esp_wifi are not used */
+esp_err_t __attribute__((weak)) esp_wifi_stop(void)
+{
+    return ESP_OK;
+}
+
 static inline void pm_set_lowest_normal(void)
 {
     /* reset system watchdog timer */
@@ -64,6 +81,11 @@ extern void esp_restart_noos(void) __attribute__ ((noreturn));
 void pm_reboot(void)
 {
     DEBUG ("%s\n", __func__);
+
+    if (IS_USED(MODULE_ESP_WIFI_ANY)) {
+        /* stop WiFi if necessary */
+        esp_wifi_stop();
+    }
 
     /* suspend and flush UARTs */
     for (int i = 0; i < 3; ++i) {
@@ -121,6 +143,10 @@ void pm_set(unsigned mode)
         UNREACHABLE();
     }
     else if (mode == ESP_PM_LIGHT_SLEEP) {
+        if (IS_USED(MODULE_ESP_WIFI_ANY)) {
+            /* stop WiFi if necessary */
+            esp_wifi_stop();
+        }
 
         esp_light_sleep_start();
 
@@ -130,6 +156,10 @@ void pm_set(unsigned mode)
 
         DEBUG ("%s exit from power mode %d @%u with reason %d\n", __func__,
                mode, system_get_time(), wakeup_reason);
+
+        /* restart WiFi if necessary */
+        if (IS_USED(MODULE_ESP_WIFI_ANY) && (esp_wifi_start() != ESP_OK)) {
+            LOG_ERROR("esp_wifi_start failed\n");
         }
     }
 }
