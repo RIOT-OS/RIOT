@@ -99,6 +99,10 @@ void saul_init_devs(void)
         extern void auto_init_grove_ledbar(void);
         auto_init_grove_ledbar();
     }
+    if (IS_USED(MODULE_HMC5883L)) {
+        extern void auto_init_hmc5883l(void);
+        auto_init_hmc5883l();
+    }
     if (IS_USED(MODULE_HDC1000)) {
         extern void auto_init_hdc1000(void);
         auto_init_hdc1000();
