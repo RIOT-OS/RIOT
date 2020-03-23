@@ -342,10 +342,12 @@ typedef struct {
 /** @ingroup cpu_specific_peripheral_memory_map
   * @{
   */
-#define PRCM_BASE       0x40082000 /**< PRCM base address */
+#define PRCM_BASE        (PERIPH_BASE + 0x82000) /**< PRCM base address */
+#define PRCM_BASE_NONBUF (PERIPH_BASE_NONBUF + 0x82000) /**< PRCM base address (nonbuf) */
 /*@}*/
 
-#define PRCM ((prcm_regs_t *) (PRCM_BASE)) /**< PRCM register bank */
+#define PRCM        ((prcm_regs_t *) (PRCM_BASE)) /**< PRCM register bank */
+#define PRCM_NONBUF ((prcm_regs_t *) (PRCM_BASE_NONBUF)) /**< PRCM register bank (nonbuf) */
 
 #ifdef __cplusplus
 } /* end extern "C" */
