@@ -480,8 +480,9 @@ ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
 BINFILE ?= $(ELFFILE:.elf=.bin)
 
-# include basic suit-tool and key handling
-include $(RIOTMAKE)/suit.base.inc.mk
+ifneq (,$(filter suit, $(USEMODULE)))
+  include $(RIOTMAKE)/suit.base.inc.mk
+endif
 
 # include bootloaders support. It should be included early to allow using
 # variables defined in `riotboot.mk` for `FLASHFILE` before it is evaluated.
