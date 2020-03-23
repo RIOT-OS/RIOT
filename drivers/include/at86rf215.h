@@ -57,6 +57,16 @@ typedef struct at86rf215_BBC_regs at86rf215_BBC_regs_t;
 typedef void (*at86rf215_batmon_cb_t)(void *arg);
 
 /**
+ * @brief MR-O-QPSK chip rates (kChip/s)
+ */
+enum {
+    AT86RF215_FCHIP_100,
+    AT86RF215_FCHIP_200,
+    AT86RF215_FCHIP_1000,
+    AT86RF215_FCHIP_2000,
+};
+
+/**
  * @brief   Maximum possible packet size in byte
  */
 #define AT86RF215_MAX_PKT_LENGTH        (2047)
@@ -98,6 +108,33 @@ typedef void (*at86rf215_batmon_cb_t)(void *arg);
  */
 #define AT86RF215_DEFAULT_CHANNEL        (CONFIG_IEEE802154_DEFAULT_CHANNEL)
 #define AT86RF215_DEFAULT_SUBGHZ_CHANNEL (CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL)
+/** @} */
+
+/**
+ * @name    Default PHY Mode
+ * @{
+ */
+#ifndef AT86RF215_DEFAULT_PHY_MODE
+#define AT86RF215_DEFAULT_PHY_MODE      (IEEE802154_PHY_OQPSK)
+#endif
+/** @} */
+
+/**
+ * @name    Default MR-O-QPSK Chip Rate
+ * @{
+ */
+#ifndef AT86RF215_DEFAULT_MR_OQPSK_CHIPS
+#define AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_1000)
+#endif
+/** @} */
+
+/**
+ * @name    Default MR-O-QPSK Rate Mode
+ * @{
+ */
+#ifndef AT86RF215_DEFAULT_MR_OQPSK_RATE
+#define AT86RF215_DEFAULT_MR_OQPSK_RATE  (2)
+#endif
 /** @} */
 
 /**
