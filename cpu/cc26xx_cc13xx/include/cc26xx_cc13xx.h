@@ -119,8 +119,9 @@ typedef enum IRQn
 /** @ingroup cpu_specific_peripheral_memory_map
   * @{
   */
-#define FLASH_BASE                  0x00000000 /**< FLASH base address */
-#define PERIPH_BASE                 0x40000000 /**< Peripheral base address */
+#define FLASH_BASE         0x00000000 /**< FLASH base address */
+#define PERIPH_BASE        0x40000000 /**< Peripheral base address */
+#define PERIPH_BASE_NONBUF 0x60000000 /**< Peripheral base address (nonbuf) */
 /*@}*/
 
 #ifdef __cplusplus
