@@ -35,11 +35,11 @@ static inline void getbus(const at86rf215_t *dev)
 /* only to be used by at86rf215_hardware_reset()
    can't use normal at86rf215_reg_read() because
    we already hold the lock */
-static inline uint8_t _get_rf_state_with_lock(at86rf215_t *dev)
+static inline uint8_t _get_reg_with_lock(at86rf215_t *dev, uint16_t r)
 {
-    uint16_t reg = htons(dev->RF->RG_STATE | FLAG_READ);
+    uint16_t reg = htons(r | FLAG_READ);
     spi_transfer_bytes(SPIDEV, CSPIN, true, &reg, NULL, sizeof(reg));
-    return spi_transfer_byte(SPIDEV, CSPIN, false, 0) & STATE_STATE_MASK;
+    return spi_transfer_byte(SPIDEV, CSPIN, false, 0);
 }
 
 int at86rf215_hardware_reset(at86rf215_t *dev)
@@ -53,15 +53,21 @@ int at86rf215_hardware_reset(at86rf215_t *dev)
     gpio_set(dev->params.reset_pin);
     xtimer_usleep(AT86RF215_RESET_DELAY_US);
 
-    unsigned tries = 100;
-    while (_get_rf_state_with_lock(dev) != RF_STATE_TRXOFF &&
-           --tries) {}
-    spi_release(SPIDEV);
-
-    /* bail out if no module is connected */
-    if (tries == 0) {
+    uint8_t state = _get_reg_with_lock(dev, dev->RF->RG_STATE) & STATE_STATE_MASK;
+    if (state != RF_STATE_TRXOFF && state != RF_STATE_RESET) {
+        spi_release(SPIDEV);
         return -ENODEV;
     }
+
+    /* While the device is in RESET / DEEP SLEEP, all registers
+       but STATE will read 0xFF.
+       WAKEUP IRQ signals that the device is ready. */
+    state = 0;
+    while (state == 0xFF || !(state & IRQS_WAKEUP_MASK)) {
+        state = _get_reg_with_lock(dev, dev->RF->RG_IRQS);
+    }
+
+    spi_release(SPIDEV);
 
     /* clear interrupts */
     at86rf215_reg_read(dev, RG_RF09_IRQS);
@@ -135,7 +141,7 @@ void at86rf215_get_random(at86rf215_t *dev, void *data, size_t len)
     /* disable baseband processor */
     at86rf215_reg_write(dev, dev->BBC->RG_PC, state_pc & ~PC_BBEN_MASK);
 
-    /* store previous RX bandwith settings */
+    /* store previous RX bandwidth settings */
     uint8_t rxbwc = at86rf215_reg_read(dev, dev->RF->RG_RXBWC);
 
     /* The analog frontend of the radio must be configured to the
@@ -147,7 +153,7 @@ void at86rf215_get_random(at86rf215_t *dev, void *data, size_t len)
         *data8++ = at86rf215_reg_read(dev, dev->RF->RG_RNDV);
     }
 
-    /* restore RX bandwith settings */
+    /* restore RX bandwidth settings */
     at86rf215_reg_write(dev, dev->RF->RG_RXBWC, rxbwc);
 
     /* restore PHY control settings */

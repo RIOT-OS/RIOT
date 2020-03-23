@@ -21,7 +21,6 @@
 #include <string.h>
 #include <assert.h>
 #include <errno.h>
-#include <strings.h>
 
 #include "iolist.h"
 
@@ -75,6 +74,15 @@ static void _irq_handler(void *arg)
     netdev->event_callback(netdev, NETDEV_EVENT_ISR);
 }
 
+/* if only one interface is active, but the other one to sleep */
+static inline void _put_sibling_to_sleep(at86rf215_t *dev) {
+    if (is_subGHz(dev)) {
+        at86rf215_reg_write(dev, RG_RF24_CMD, CMD_RF_SLEEP);
+    } else {
+        at86rf215_reg_write(dev, RG_RF09_CMD, CMD_RF_SLEEP);
+    }
+}
+
 static int _init(netdev_t *netdev)
 {
     int res;
@@ -90,6 +98,11 @@ static int _init(netdev_t *netdev)
         /* reset the entire chip */
         if ((res = at86rf215_hardware_reset(dev))) {
             return res;
+        }
+
+        /* turn off unused interface */
+        if (dev->sibling == NULL) {
+            _put_sibling_to_sleep(dev);
         }
 
         gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
@@ -860,7 +873,7 @@ static void _start_backoff_timer(at86rf215_t *dev)
     /* limit the 32bit random value to the current backoff */
     csma_backoff_usec = base % csma_backoff_usec;
 
-    DEBUG("Set CSMA backoff to %lu (be %u min %u max %u base: %lu)\n",
+    DEBUG("Set CSMA backoff to %"PRIu32" (be %u min %u max %u base: %"PRIu32")\n",
           csma_backoff_usec, be, dev->csma_minbe, dev->csma_maxbe, base);
 
     dev->timer_msg.type = NETDEV_MSG_TYPE_EVENT;
