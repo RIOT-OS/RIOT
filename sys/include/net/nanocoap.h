@@ -1406,6 +1406,26 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
 ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len);
 
 /**
+ * @brief   Pass a coap request to a matching handler
+ *
+ * This function will try to find a matching handler in @p resources and call
+ * the handler.
+ *
+ * @param[in]   pkt             pointer to (parsed) CoAP packet
+ * @param[out]  resp_buf        buffer for response
+ * @param[in]   resp_buf_len    size of response buffer
+ * @param[in]   resources       Array of coap endpoint resources
+ * @param[in]   resources_numof length of the coap endpoint resources
+ *
+ * @returns     size of the reply packet on success
+ * @returns     <0 on error
+ */
+ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
+                          unsigned resp_buf_len,
+                          const coap_resource_t *resources,
+                          size_t resources_numof);
+
+/**
  * @brief   Convert message code (request method) into a corresponding bit field
  *
  * @param[in]   code    request code denoting the request method
