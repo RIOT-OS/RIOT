@@ -149,6 +149,9 @@ PSEUDOMODULES += cc1100
 PSEUDOMODULES += cc1100e
 PSEUDOMODULES += cc1101
 
+# interrupt variant of the HMC5883L driver
+PSEUDOMODULES += hmc5883l_int
+
 # interrupt variant of the ITG320X driver as pseudo module
 PSEUDOMODULES += itg320x_int
 
