@@ -14,10 +14,10 @@
  * @experimental
  *
  * @note The current implementation of this specification is based on the
- *       IETF-SUIT-v3 draft. The module is still experimental and will change to
+ *       IETF-SUIT-v9 draft. The module is still experimental and will change to
  *       match future draft specifications
  *
- * @see https://tools.ietf.org/html/draft-ietf-suit-manifest-03
+ * @see https://tools.ietf.org/html/draft-ietf-suit-manifest-09
  *
  * @{
  *
@@ -52,7 +52,9 @@ extern "C" {
 /**
  * @brief   Maximum number of components supported in a SUIT manifest
  */
-#define SUIT_COMPONENT_MAX                  (1U)
+#ifndef CONFIG_SUIT_COMPONENT_MAX
+#define CONFIG_SUIT_COMPONENT_MAX                  (1U)
+#endif
 
 /**
  * @brief Current SUIT serialization format version
@@ -126,13 +128,59 @@ enum {
 };
 
 /**
- * @brief SUIT component struct
+ * @name SUIT parameters
+ * @{
+ */
+typedef enum {
+    SUIT_PARAMETER_VENDOR_IDENTIFIER = 1,
+    SUIT_PARAMETER_CLASS_IDENTIFIER  = 2,
+    SUIT_PARAMETER_IMAGE_DIGEST      = 3,
+    SUIT_PARAMETER_USE_BEFORE        = 4,
+    SUIT_PARAMETER_COMPONENT_OFFSET  = 5,
+    SUIT_PARAMETER_STRICT_ORDER      = 12,
+    SUIT_PARAMETER_SOFT_FAILURE      = 13,
+    SUIT_PARAMETER_IMAGE_SIZE        = 14,
+    SUIT_PARAMETER_ENCRYPTION_INFO   = 18,
+    SUIT_PARAMETER_COMPRESSION_INFO  = 19,
+    SUIT_PARAMETER_UNPACK_INFO       = 20,
+    SUIT_PARAMETER_URI               = 21,
+    SUIT_PARAMETER_SOURCE_COMPONENT  = 22,
+    SUIT_PARAMETER_RUN_ARGS          = 23,
+    SUIT_PARAMETER_DEVICE_IDENTIFIER = 24,
+    SUIT_PARAMETER_MINIMUM_BATTERY   = 26,
+    SUIT_PARAMETER_UPDATE_PRIORITY   = 27,
+    SUIT_PARAMETER_VERSION           = 28,
+    SUIT_PARAMETER_WAIT_INFO         = 29,
+    SUIT_PARAMETER_URI_LIST          = 30,
+} suit_parameter_t;
+/** @} */
+
+/**
+ * @brief SUIT parameter reference
+ *
+ * A 16-bit offset is enough to reference content inside the manifest itself.
  */
 typedef struct {
-    uint32_t size;                      /**< Size */
-    nanocbor_value_t identifier;        /**< Identifier */
-    nanocbor_value_t url;               /**< Url */
-    nanocbor_value_t digest;            /**< Digest */
+    uint16_t offset;    /**< offset to the start of the content */
+} suit_param_ref_t;
+
+/**
+ * @brief SUIT component struct as decoded from the manifest
+ *
+ * The parameters are references to CBOR-encoded information in the manifest.
+ */
+typedef struct {
+    suit_param_ref_t identifier;                /**< Component identifier */
+    suit_param_ref_t param_vendor_id;           /**< Vendor ID */
+    suit_param_ref_t param_class_id;            /**< Class ID */
+    suit_param_ref_t param_digest;              /**< Payload verification digest */
+    suit_param_ref_t param_uri;                 /**< Payload fetch URI */
+    suit_param_ref_t param_size;                /**< Payload size */
+
+    /**
+     * @brief Component offset inside the device memory.
+     */
+    suit_param_ref_t param_component_offset;
 } suit_component_t;
 
 /**
@@ -146,9 +194,9 @@ typedef struct {
     uint32_t validated;             /**< bitfield of validated policies */
     uint32_t state;                 /**< bitfield holding state information */
     /** List of components in the manifest */
-    suit_component_t components[SUIT_COMPONENT_MAX];
+    suit_component_t components[CONFIG_SUIT_COMPONENT_MAX];
     unsigned components_len;        /**< Current number of components */
-    uint32_t component_current;     /**< Current component index */
+    uint8_t component_current;      /**< Current component index */
     riotboot_flashwrite_t *writer;  /**< Pointer to the riotboot flash writer */
     /** Manifest validation buffer */
     uint8_t validation_buf[SUIT_COSE_BUF_SIZE];
@@ -164,6 +212,20 @@ typedef struct {
  * @brief Bit flags used to determine if SUIT manifest contains an image
  */
 #define SUIT_MANIFEST_HAVE_IMAGE        (0x2)
+
+/**
+ * @brief Component index representing all components
+ *
+ * Used when suit-directive-set-component-index = True
+ */
+#define SUIT_MANIFEST_COMPONENT_ALL     (UINT8_MAX)
+
+/**
+ * @brief Component index representing no components
+ *
+ * Used when suit-directive-set-component-index = False
+ */
+#define SUIT_MANIFEST_COMPONENT_NONE    (SUIT_MANIFEST_COMPONENT_ALL - 1)
 
 /**
  * @brief Parse a manifest
