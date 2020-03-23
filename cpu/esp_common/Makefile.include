@@ -133,25 +133,10 @@ else
 endif
 
 # increase the test timeout for file system tests that use the SPI flash drive
-
 ifneq (,$(filter spiffs,$(USEMODULE)))
   export RIOT_TEST_TIMEOUT = 120
 endif
 
 ifneq (,$(filter littlefs,$(USEMODULE)))
   export RIOT_TEST_TIMEOUT = 120
-endif
-
-# increase the number of netif for each enabled network interface
-
-ifneq (,$(filter esp_wifi,$(USEMODULE)))
-  $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
-endif
-
-ifneq (,$(filter esp_now,$(USEMODULE)))
-  $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
-endif
-
-ifneq (,$(filter esp_eth,$(USEMODULE)))
-  $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
 endif
