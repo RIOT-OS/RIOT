@@ -35,7 +35,6 @@ extern "C" {
  */
 #define UART_NUMOF          (1U)
 /* UART pin configuration */
-#define UART_HWFLOWCTRL     0
 #define UART_PIN_RX         25
 #define UART_PIN_TX         24
 /** @} */
