@@ -39,18 +39,26 @@ static const can_conf_t candev_conf[] = {
         .irqn = CEC_CAN_IRQn,
 #else
         .can = CAN1,
+#if defined(CPU_FAM_STM32L4)
+        .rcc_mask = RCC_APB1ENR1_CAN1EN,
+#else
         .rcc_mask = RCC_APB1ENR_CAN1EN,
         .can_master = CAN1,
         .master_rcc_mask = RCC_APB1ENR_CAN1EN,
         .first_filter = 0,
         .nb_filters = 14,
-#ifndef CPU_FAM_STM32F1
+#endif
+#if  defined(CPU_FAM_STM32F1)
+        .rx_pin = GPIO_PIN(PORT_A, 11),
+        .tx_pin = GPIO_PIN(PORT_A, 12),
+#elif defined(CPU_FAM_STM32L4)
+        .rx_pin = GPIO_PIN(PORT_B, 8),
+        .tx_pin = GPIO_PIN(PORT_B, 9),
+        .af = GPIO_AF9,
+#else
         .rx_pin = GPIO_PIN(PORT_D, 0),
         .tx_pin = GPIO_PIN(PORT_D, 1),
         .af = GPIO_AF9,
-#else
-        .rx_pin = GPIO_PIN(PORT_A, 11),
-        .tx_pin = GPIO_PIN(PORT_A, 12),
 #endif
         .tx_irqn = CAN1_TX_IRQn,
         .rx0_irqn = CAN1_RX0_IRQn,
