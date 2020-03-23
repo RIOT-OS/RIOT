@@ -30,10 +30,17 @@ extern "C" {
  * @name    AT24MAC402 configuration
  * @{
  */
-#define AT24MAC_PARAM_I2C_DEV   I2C_DEV(0)
+#define AT24MAC_PARAM_I2C_DEV   I2C_DEV(1)
 #define AT24MAC_PARAM_I2C_ADDR  (0x5E)
 #define AT24MAC_PARAM_TYPE      AT24MAC4XX
 #define AT24CXXX_PARAM_ADDR     (0x56)
+/** @} */
+
+/**
+ * @name    ATECC508A configuration
+ * @{
+ */
+#define ATCA_PARAM_I2C           I2C_DEV(1)
 /** @} */
 
 /**
