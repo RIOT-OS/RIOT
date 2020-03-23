@@ -384,7 +384,15 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
     if (pkt->hdr->code == 0) {
         return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
     }
+    return coap_tree_handler(pkt, resp_buf, resp_buf_len, coap_resources,
+                             coap_resources_numof);
+}
 
+ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
+                          unsigned resp_buf_len,
+                          const coap_resource_t *resources,
+                          size_t resources_numof)
+{
     coap_method_flags_t method_flag = coap_method2flag(coap_get_code_detail(pkt));
 
     uint8_t uri[NANOCOAP_URI_MAX];
@@ -393,8 +401,8 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
     }
     DEBUG("nanocoap: URI path: \"%s\"\n", uri);
 
-    for (unsigned i = 0; i < coap_resources_numof; i++) {
-        const coap_resource_t *resource = &coap_resources[i];
+    for (unsigned i = 0; i < resources_numof; i++) {
+        const coap_resource_t *resource = &resources[i];
         if (!(resource->methods & method_flag)) {
             continue;
         }
