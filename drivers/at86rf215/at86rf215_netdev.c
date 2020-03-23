@@ -384,6 +384,12 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = max_len;
             break;
 
+        case NETOPT_IEEE802154_PHY:
+            assert(max_len >= sizeof(int8_t));
+            *((int8_t *)val) = at86rf215_get_phy_mode(dev);
+            res = max_len;
+            break;
+
         default:
             res = -ENOTSUP;
             break;
@@ -528,6 +534,16 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             res = sizeof(int8_t);
             break;
 
+        case NETOPT_IEEE802154_PHY:
+            assert(len <= sizeof(uint8_t));
+            switch (*(uint8_t *)val) {
+            case IEEE802154_PHY_OQPSK:
+                at86rf215_configure_legacy_OQPSK(dev, at86rf215_OQPSK_get_mode_legacy(dev));
+                res = sizeof(uint8_t);
+                break;
+            default:
+                return -ENOTSUP;
+            }
         default:
             break;
     }

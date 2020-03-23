@@ -119,6 +119,13 @@ typedef enum {
 } at86rf215_state_t;
 /** @} */
 
+enum {
+    AT86RF215_MODE_LEGACY_OQPSK,
+    AT86RF215_MODE_MR_OQPSK,
+    AT86RF215_MODE_MR_OFDM,
+    AT86RF215_MODE_MR_FSK
+};
+
 /**
  * @name    Internal device option flags
  * @{

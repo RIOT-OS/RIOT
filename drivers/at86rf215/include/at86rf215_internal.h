@@ -159,6 +159,18 @@ void at86rf215_get_random(at86rf215_t *dev, void *data, size_t len);
 int at86rf215_configure_legacy_OQPSK(at86rf215_t *dev, bool high_rate);
 
 /**
+ * @brief   Get the current PHY modulation.
+ *          May be @ref IEEE802154_PHY_MR_FSK, @ref IEEE802154_PHY_MR_OFDM,
+ *          @ref IEEE802154_PHY_MR_OQPSK, @ref IEEE802154_PHY_OQPSK
+ *          or @ref IEEE802154_PHY_DISABLED.
+ *
+ * @param[in] dev       device to read from
+ *
+ * @return              the current PHY mode the device is operating with
+ */
+uint8_t at86rf215_get_phy_mode(at86rf215_t *dev);
+
+/**
  * @brief   Check if a channel number is valid.
  *          The function takes the current frequency band and modulation into
  *          account to determine if `chan` would be a legal channel number.
