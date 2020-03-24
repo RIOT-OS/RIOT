@@ -22,11 +22,6 @@ include $(RIOTCPU)/$(CPU)/Makefile.features
 # Resolve FEATURES_ variables
 # Their value will only be complete after resolving dependencies
 
-# Features that are required by the application but not provided by the BSP and
-# features that are used but blacklisted (prepended with "!").
-# Having features missing may case the build to fail.
-FEATURES_MISSING = $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_REQUIRED)))
-
 # Features that are only optional and not required at the same time.
 # The policy is to by default use by features if they are provided by the BSP.
 FEATURES_OPTIONAL_ONLY = $(sort $(filter-out $(FEATURES_REQUIRED),$(FEATURES_OPTIONAL)))
@@ -34,8 +29,39 @@ FEATURES_OPTIONAL_USED = $(sort $(filter $(FEATURES_PROVIDED),$(FEATURES_OPTIONA
 # Optional features that will not be used because they are not provided
 FEATURES_OPTIONAL_MISSING = $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
 
+# Features that are used without taking "one out of" dependencies into account
+FEATURES_USED_SO_FAR = $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
+
+# Features that are provided and not blacklisted
+FEATURES_USABLE = $(filter-out $(FEATURES_BLACKLIST),$(FEATURES_PROVIDED))
+
+# Additionally required features due to the "one out of" dependencies
+FEATURES_REQUIRED_ONE_OUT_OF = $(foreach ooo,$(FEATURES_REQUIRED_ANY),$(call _features_any_unresolved,$(subst |, ,$(ooo)),$(ooo)))
+
+# Checks if the any of the features given $1 is already used
+# Returns: Non-empty if one (or more) feature is already provided, and empty
+#          if none is provided yet
+_is_features_any_resolved = $(filter $1,$(FEATURES_USED_SO_FAR))
+
+# Pick out of $1 the first useable features
+# Returns: The first item in $1 that is listed in $(FEATURES_USABLE)
+_get_first_usable_feature = $(word 1,$(filter $1,$(FEATURES_USABLE)))
+
+# Returns:
+# - If one (or more) of the features in $1 is already used
+#   (listed in FEATURES_USED_SO_FAR): An empty string
+# - If none of the features in $1 is used:
+#    - If none of the features in $1 is provided (not counting blacklisted
+#      features): $2
+#    - Else: First feature in the list that is both provided and listed in $1
+_features_any_unresolved = $(if $(call _is_features_any_resolved,$1),,$(word 1,$(call _get_first_usable_feature,$1) $2))
+
+# Features that are required by the application but not provided by the BSP
+# Having features missing may case the build to fail.
+FEATURES_MISSING = $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_REQUIRED) $(FEATURES_REQUIRED_ONE_OUT_OF)))
+
 # Features that are used for an application
-FEATURES_USED = $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
+FEATURES_USED = $(sort $(FEATURES_REQUIRED) $(FEATURES_REQUIRED_ONE_OUT_OF) $(FEATURES_OPTIONAL_USED))
 
 # Used features that conflict when used together
 FEATURES_CONFLICTING = $(sort $(foreach conflict,$(FEATURES_CONFLICT),$(call _features_conflicting,$(conflict))))
