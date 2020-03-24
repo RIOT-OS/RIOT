@@ -7,7 +7,6 @@ USEPKG += libcose
 # crypto backend.
 USEMODULE += libcose_crypt_hacl
 # USEMODULE += libcose_crypt_c25519
-# USEMODULE += libcose_crypt_monocypher
 USEMODULE += memarray
 USEMODULE += embunit
 
