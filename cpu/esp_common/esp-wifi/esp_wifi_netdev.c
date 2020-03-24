@@ -445,7 +445,10 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
                               event->event_info.connected.ssid,
                               event->event_info.connected.channel);
             _esp_wifi_channel = event->event_info.connected.channel;
-
+#ifdef MODULE_ESP_NOW
+            extern void esp_now_set_channel(uint8_t channel);
+            esp_now_set_channel(_esp_wifi_channel);
+#endif
             /* register RX callback function */
             esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, _esp_wifi_rx_cb);
 
