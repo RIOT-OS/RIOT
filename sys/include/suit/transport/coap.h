@@ -79,8 +79,8 @@ void suit_coap_run(void);
  *
  * @returns     ssize_t     Size of the reply
  */
-ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
-                             void *context);
+ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf,
+                             size_t len, void *context);
 
 /**
  * @brief   Type for CoAP resource subtrees
