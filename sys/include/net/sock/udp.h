@@ -384,7 +384,7 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep);
  *
  * @pre `(sock != NULL) && (data != NULL) && (max_len > 0)`
  *
- * @param[in] sock      A raw IPv4/IPv6 sock object.
+ * @param[in] sock      A UDP sock object.
  * @param[out] data     Pointer where the received data should be stored.
  * @param[in] max_len   Maximum space available at @p data.
  * @param[in] timeout   Timeout for receive in microseconds.
@@ -454,7 +454,7 @@ ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
  *
  * @pre `((sock != NULL || remote != NULL)) && (if (len != 0): (data != NULL))`
  *
- * @param[in] sock      A raw IPv4/IPv6 sock object. May be `NULL`.
+ * @param[in] sock      A UDP sock object. May be `NULL`.
  *                      A sensible local end point should be selected by the
  *                      implementation in that case.
  * @param[in] data      Pointer where the received data should be stored.
