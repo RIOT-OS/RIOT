@@ -2,9 +2,14 @@
 
 include $(RIOTCPU)/esp_common/Makefile.dep
 
+USEMODULE += esp_idf_driver
+USEMODULE += esp_idf_esp32
+USEMODULE += esp_idf_soc
+USEMODULE += pm_layered
+
 ifneq (,$(filter cpp,$(FEATURES_USED)))
   USEMODULE += pthread
-  BASELIBS += -lstdc++
+  USEMODULE += esp_cxx
 endif
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
@@ -50,6 +55,10 @@ endif
 
 ifneq (,$(filter esp_rtc_timer_32k,$(USEMODULE)))
     USEMODULE += esp_rtc_timer
+endif
+
+ifneq (,$(filter periph_adc periph_dac,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc_ctrl
 endif
 
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
