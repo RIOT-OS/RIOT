@@ -28,6 +28,13 @@ lock_depth = {
         7:  5
         }
 
+timeouts = {
+        3: 100000,
+        4: 200000,
+        5: 300000,
+        6: 400000,
+        7: 500000
+        }
 
 def thread_prio_sort(x):
     return thread_prio.get(x)*1000 + x
@@ -43,6 +50,24 @@ def testfunc(child):
         for depth in range(lock_depth[T]):
             child.expect_exact("T{} (prio {}, depth {}): locked rmutex now"
                                .format(T, thread_prio[T], depth))
+
+    # xtimer_rmutex_lock_timeout() test
+    for k in thread_prio.keys():
+        child.expect_exact("T{} (prio {}, depth 0, timeout {}): trying to lock rmutex now"
+                           .format(k, thread_prio[k], timeouts[k]))
+    child.expect_exact("main: waiting 250ms")
+    for k in range(3, 4):
+        child.expect_exact("T{} (prio {}, depth 0): timeout"
+                           .format(k, thread_prio[k]))
+    child.expect_exact
+    child.expect_exact("main: unlocking recursive mutex")
+    pri_sorted = sorted({k:thread_prio[k] for k in (5, 6, 7)}, key=thread_prio_sort)
+    for T in pri_sorted:
+        for depth in range(3):
+            child.expect_exact("T{} (prio {}, depth {}): locked rmutex now"
+                               .format(T, thread_prio[T], depth))
+
+    child.expect_exact("Test END, check the order of priorities above.")
 
 
 if __name__ == "__main__":
