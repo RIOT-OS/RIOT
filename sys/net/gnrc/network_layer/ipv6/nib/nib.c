@@ -100,7 +100,7 @@ void gnrc_ipv6_nib_init(void)
 static void _add_static_lladdr(gnrc_netif_t *netif)
 {
 #ifdef GNRC_IPV6_STATIC_LLADDR
-    /* parse addr from string and explicitely set a link lokal prefix
+    /* parse addr from string and explicitly set a link local prefix
      * if ifnum > 1 each interface will get its own link local address
      * with GNRC_IPV6_STATIC_LLADDR + i
      */
