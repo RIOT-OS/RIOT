@@ -8,11 +8,11 @@
  */
 
 /**
- * @ingroup     boards_common_remote
+ * @ingroup     boards_common_cc2538
  * @{
  *
  * @file
- * @brief       Common default timer configuration for the RE-Mote board revision A
+ * @brief       Common default timer configuration for cc2538 boards
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Antonio Lignan <alinan@zolertia.com>
