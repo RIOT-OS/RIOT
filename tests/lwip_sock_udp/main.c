@@ -393,6 +393,29 @@ static void test_sock_udp_recv4__non_blocking(void)
     expect(_check_net());
 }
 
+static void test_sock_udp_recv_buf4__success(void)
+{
+    static const sock_udp_ep_t local = { .family = AF_INET,
+                                          .port = _TEST_PORT_LOCAL };
+    static const sock_udp_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+                                          .family = AF_INET,
+                                          .port = _TEST_PORT_REMOTE };
+    void *data = NULL, *ctx = NULL;
+
+    expect(0 == sock_udp_create(&_sock, &local, &remote, SOCK_FLAGS_REUSE_EP));
+    expect(_inject_4packet(_TEST_ADDR4_REMOTE, _TEST_ADDR4_LOCAL, _TEST_PORT_REMOTE,
+                           _TEST_PORT_LOCAL, "ABCD", sizeof("ABCD"),
+                           _TEST_NETIF));
+    assert(sizeof("ABCD") == sock_udp_recv_buf(&_sock, &data, &ctx,
+                                               SOCK_NO_TIMEOUT, NULL));
+    assert(data != NULL);
+    assert(ctx != NULL);
+    assert(0 == sock_udp_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT, NULL));
+    assert(data == NULL);
+    assert(ctx == NULL);
+    assert(_check_net());
+}
+
 static void test_sock_udp_send4__EAFNOSUPPORT(void)
 {
     static const sock_udp_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
@@ -1033,6 +1056,31 @@ static void test_sock_udp_recv6__non_blocking(void)
     expect(_check_net());
 }
 
+static void test_sock_udp_recv_buf6__success(void)
+{
+    static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR6_REMOTE };
+    static const ipv6_addr_t dst_addr = { .u8 = _TEST_ADDR6_LOCAL };
+    static const sock_udp_ep_t local = { .family = AF_INET6,
+                                         .port = _TEST_PORT_LOCAL };
+    static const sock_udp_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR6_REMOTE },
+                                          .family = AF_INET6,
+                                          .port = _TEST_PORT_REMOTE };
+    void *data = NULL, *ctx = NULL;
+
+    assert(0 == sock_udp_create(&_sock, &local, &remote, SOCK_FLAGS_REUSE_EP));
+    assert(_inject_6packet(&src_addr, &dst_addr, _TEST_PORT_REMOTE,
+                           _TEST_PORT_LOCAL, "ABCD", sizeof("ABCD"),
+                           _TEST_NETIF));
+    assert(sizeof("ABCD") == sock_udp_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT,
+                                               NULL));
+    assert(data != NULL);
+    assert(ctx != NULL);
+    assert(0 == sock_udp_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT, NULL));
+    assert(data == NULL);
+    assert(ctx == NULL);
+    assert(_check_net());
+}
+
 static void test_sock_udp_send6__EAFNOSUPPORT(void)
 {
     static const sock_udp_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR6_REMOTE },
@@ -1360,6 +1408,7 @@ int main(void)
     CALL(test_sock_udp_recv4__unsocketed_with_remote());
     CALL(test_sock_udp_recv4__with_timeout());
     CALL(test_sock_udp_recv4__non_blocking());
+    CALL(test_sock_udp_recv_buf4__success());
     _prepare_send_checks();
     CALL(test_sock_udp_send4__EAFNOSUPPORT());
     CALL(test_sock_udp_send4__EINVAL_addr());
@@ -1407,6 +1456,7 @@ int main(void)
     CALL(test_sock_udp_recv6__unsocketed_with_remote());
     CALL(test_sock_udp_recv6__with_timeout());
     CALL(test_sock_udp_recv6__non_blocking());
+    CALL(test_sock_udp_recv_buf6__success());
     _prepare_send_checks();
     CALL(test_sock_udp_send6__EAFNOSUPPORT());
     CALL(test_sock_udp_send6__EINVAL_addr());
