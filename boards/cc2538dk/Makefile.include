@@ -31,3 +31,6 @@ DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 RESET_FLAGS ?= $(BINDIR)
 
 OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
+
+# include common cc2538 includes
+INCLUDES += -I$(RIOTBOARD)/common/cc2538/include
