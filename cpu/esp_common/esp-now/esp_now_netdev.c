@@ -636,6 +636,12 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = sizeof(dev->addr);
             break;
 
+        case NETOPT_CHANNEL:
+            CHECK_PARAM_RET(max_len >= sizeof(uint16_t), -EOVERFLOW);
+            *((uint16_t *)val) = ESP_NOW_CHANNEL;
+            res = sizeof(uint16_t);
+            break;
+
         default:
             DEBUG("%s: %s not supported\n", __func__, netopt2str(opt));
             break;

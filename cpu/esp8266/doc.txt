@@ -710,6 +710,9 @@ make -C examples/gnrc_networking BOARD=...
 [ESP-NOW network interface](#esp8266_esp_now_network_interface)
 (module `esp_now`) can be used simultaneously, for example, to realize a
 border router for a mesh network which uses ESP-NOW.
+In this case the ESP-NOW interface must use the same channel as the AP of the
+infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
 
 \anchor esp8266_esp_now_network_interface
 ## <a name="esp8266_esp_now_network_interface"> ESP-NOW Network Interface </a> &nbsp;[[TOC](#esp8266_toc)]
@@ -756,6 +759,9 @@ Parameter | Default | Description
 [Wifi network interface](#esp8266_wifi_network_interface) (module `esp_wifi`)
 can be used simultaneously, for example, to realize a border router for
 a mesh network which uses ESP-NOW.
+In this case the ESP-NOW interface must use the same channel as the AP of the
+infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
 
 # <a name="esp8266_preconfigured_devices"> Preconfigured Devices </a> &nbsp;[[TOC](#esp8266_toc)]
 

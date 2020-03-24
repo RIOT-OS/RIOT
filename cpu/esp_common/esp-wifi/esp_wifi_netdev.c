@@ -402,7 +402,11 @@ static const char *_esp_wifi_disc_reasons [] = {
     "HANDSHAKE_TIMEOUT"            /* 204 */
 };
 
+/* indicator whether the WiFi interface is started */
 static unsigned _esp_wifi_started = 0;
+
+/* current channel used by the WiFi interface */
+static unsigned _esp_wifi_channel = 0;
 
 /*
  * Event handler for esp system events.
@@ -440,6 +444,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             ESP_WIFI_LOG_INFO("WiFi connected to ssid %s, channel %d",
                               event->event_info.connected.ssid,
                               event->event_info.connected.channel);
+            _esp_wifi_channel = event->event_info.connected.channel;
 
             /* register RX callback function */
             esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, _esp_wifi_rx_cb);
@@ -623,6 +628,10 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
     switch (opt) {
         case NETOPT_IS_WIRED:
             return -ENOTSUP;
+        case NETOPT_CHANNEL:
+            CHECK_PARAM_RET(max_len >= sizeof(uint16_t), -EOVERFLOW);
+            *((uint16_t *)val) = _esp_wifi_channel;
+            return sizeof(uint16_t);
         case NETOPT_ADDRESS:
             assert(max_len >= ETHERNET_ADDR_LEN);
             esp_wifi_get_mac(ESP_MAC_WIFI_STA,(uint8_t *)val);

@@ -1260,6 +1260,9 @@ the verification of the AP certificate is not yet supported.
 [ESP-NOW network interface](#esp32_esp_now_network_interface) (module `esp_now`)
 can be used simultaneously, for example, to realize a border router for
 a mesh network which uses ESP-NOW.
+In this case the ESP-NOW interface must use the same channel as the AP of the
+infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+the channel of the AP as value for the parameter 'ESP_NOW_CHANNEL'.
 
 \anchor esp32_esp_now_network_interface
 ## <a name="esp32_esp_now_network_interface"> ESP-NOW Network Interface </a> &nbsp;[[TOC](#esp32_toc)]
@@ -1294,6 +1297,9 @@ ESP_NOW_KEY | NULL | Defines a key that is used for encrypted communication betw
 [Wifi network interface](#esp32_wifi_network_interface) (module `esp_wifi` or `esp_wifi_enterprise`)
 can be used simultaneously, for example, to realize a border router for
 a mesh network which uses ESP-NOW.
+In this case the ESP-NOW interface must use the same channel as the AP of the
+infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
 
 ## <a name="esp32_other_network_devices"> Other Network Devices </a> &nbsp;[[TOC](#esp32_toc)]
 

@@ -114,4 +114,8 @@ the verification of the AP certificate is not yet supported.
 ESP-NOW network interface (module `esp_now`)
 can be used simultaneously, for example, to realize a border router for
 a mesh network which uses ESP-NOW.
+In this case the ESP-NOW interface must use the same channel as the AP of the
+infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
+
  */
