@@ -223,6 +223,10 @@ void saul_init_devs(void)
         extern void auto_init_pca9685(void);
         auto_init_pca9685();
     }
+    if (IS_USED(MODULE_PCF857X)) {
+        extern void auto_init_pcf857x(void);
+        auto_init_pcf857x();
+    }
     if (IS_USED(MODULE_PH_OEM)) {
         extern void auto_init_ph_oem(void);
         auto_init_ph_oem();
