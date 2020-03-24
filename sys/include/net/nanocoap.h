@@ -274,6 +274,14 @@ typedef struct {
 } coap_resource_t;
 
 /**
+ * @brief   Type for CoAP resource subtrees
+ */
+typedef const struct {
+    const coap_resource_t *resources;   /**< ptr to resource array  */
+    const size_t resources_numof;       /**< number of entries in array */
+} coap_resource_subtree_t;
+
+/**
  * @brief   Block1 helper struct
  */
 typedef struct {
@@ -1750,6 +1758,25 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
                           unsigned resp_buf_len,
                           const coap_resource_t *resources,
                           size_t resources_numof);
+
+/**
+ * @brief   Generic coap subtree handler
+ *
+ * This function can be used as a generic handler for resources with the
+ * @ref COAP_MATCH_SUBTREE where a new @ref coap_resource_t is to be parsed.
+ *
+ * @note The @p context must be of type @ref coap_resource_subtree_t.
+ *
+ * @param[in]   pkt             pointer to (parsed) CoAP packet
+ * @param[out]  resp_buf        buffer for response
+ * @param[in]   resp_buf_len    size of response buffer
+ * @param[in]   context         ptr to a @ref coap_resource_subtree_t instance
+ *
+ * @returns     size of the reply packet on success
+ * @returns     <0 on error
+ */
+ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
+                             size_t resp_buf_len, void *context);
 
 /**
  * @brief   Convert message code (request method) into a corresponding bit field

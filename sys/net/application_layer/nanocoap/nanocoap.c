@@ -424,6 +424,15 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
                              coap_resources_numof);
 }
 
+ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+                             void *context)
+{
+    assert(context);
+    coap_resource_subtree_t *subtree = context;
+    return coap_tree_handler(pkt, buf, len, subtree->resources,
+                             subtree->resources_numof);
+}
+
 ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
                           unsigned resp_buf_len,
                           const coap_resource_t *resources,
