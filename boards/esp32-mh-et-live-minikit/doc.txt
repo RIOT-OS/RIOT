@@ -24,7 +24,11 @@
 
 ## <a name="overview"> Overview </a> &nbsp;&nbsp; [[TOC](#toc)]
 
-The MH-ET LIVE MiniKit for ESP32 uses the ESP32-WROOM-32 module. It is a very interesting development kit as it uses in the stackable Wemos D1 Mini format. Thus, all [shields for Wemos D1 mini](https://wiki.wemos.cc/products:d1_mini_shields) for ESP8266 can also be used with ESP32. Examples for such shields are:
+The MH-ET LIVE MiniKit for ESP32 uses the ESP32-WROOM-32 module. It is a very
+interesting development kit as it uses in the stackable Wemos D1 Mini format.
+Thus, all [shields for Wemos D1 mini]
+(https://docs.wemos.cc/en/latest/d1_mini_shiled/index.html) for ESP8266
+can also be used with ESP32. Examples for such shields are:
 
 - Micro SD-Card Shield
 - MRF24J40 IEEE 802.15.4 radio Shield
@@ -41,7 +45,7 @@ MH-ET LIVE MiniKit for ESP32 belongs to the class of general purpose boards wher
 
 This stackable platform was tested in an RIOT application with:
 
-- [Micro SD-Card Shield](https://wiki.wemos.cc/products:d1_mini_shields:micro_sd_card_shield)
+- [Micro SD-Card Shield](https://docs.wemos.cc/en/latest/d1_mini_shiled/micro_sd.html)
 - MRF24J40 IEEE 802.15.4 radio Shield (contact gunar@schorcht.net for more information)
 - BMP180 Pressure Sensor Shield
 

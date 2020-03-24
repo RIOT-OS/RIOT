@@ -84,7 +84,7 @@ The actual pin configuration of the board for RIOT can be found in
 | Pressure Sensor    | [MPL3115A2](http://www.nxp.com/products/sensors/pressure-sensors/barometric-pressure-15-to-115-kpa/20-to-110kpa-absolute-digital-pressure-sensor:MPL3115A2?) | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2123) |
 | Tri-axis Accelerometer | [MMA8652FC](http://www.nxp.com/products/sensors/accelerometers/3-axis-accelerometers/2g-4g-8g-low-g-12-bit-digital-accelerometer:MMA8652FC)   | yes | [mainline](https://github.com/RIOT-OS/RIOT/pull/2119) |
 | Magnetometer   | [MAG3110FCR1](http://www.nxp.com/products/sensors/magnetometers/sample-data-sets-for-inertial-and-magnetic-sensors/freescale-high-accuracy-3d-magnetometer:MAG3110)   | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2121) |
-| Light Sensor   | [TCS3772](https://ams.com/jpn/content/download/291143/1065677/file/TCS3772_Datasheet_EN_v1.pdf)   | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/3135) |
-| IR-Termopile Sensor    | [TMP006](http://www.ti.com/product/TMP006)    |yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2148) |
+| Light Sensor   | [TCS3772](https://ams.com/documents/20143/36005/TCS3772_DS000175_3-00.pdf/8689a345-f46b-d3f0-f839-eb8d38ead80d)   | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/3135) |
+| IR-Termopile Sensor    | [TMP006](http://www.ti.com/ww/eu/sensampbook/tmp006.pdf)    |yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2148) |
 | Capacitive Button  | PCB   | yes        | [mainline](https://github.com/RIOT-OS/RIOT/pull/7147) |
  */

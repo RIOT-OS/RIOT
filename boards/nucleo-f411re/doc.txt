@@ -66,7 +66,6 @@ make BOARD=nucleo-f411re debug
 ## Supported Toolchains
 
 For using the ST Nucleo-F411RE board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-
-embedded)
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
  */

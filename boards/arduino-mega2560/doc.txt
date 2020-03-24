@@ -72,22 +72,18 @@ to overwrite the bootloader on the MCU. Because of that it is a necessity to use
 an ISP (in system programmer) to do the debugging. This isn't an issue because
 all of the afore mentioned devices have ISP capabilities, but it requires some
 additional steps to get back normal operation after debugging:
- * flash a new arduino bootloader on the device, e.g. [this one](https://raw.
-githubusercontent.com/arduino/Arduino/master/hardware/arduino/bootloaders/stk500
-v2/stk500boot_v2_mega2560.hex)
+ * flash a new arduino bootloader on the device, e.g. [this one]
+(https://raw.githubusercontent.com/arduino/Arduino-stk500v2-bootloader/master/goodHexFiles/stk500boot_v2_mega2560.hex)
  * restore the fuses to the default state.
 
 
 
 ### Wiring for the AVR Dragon
-![Wiring for dubugging](http://userpage.zedat.fu-
-berlin.de/~hvbruinehsen/IMG_20140923_100714.jpg)
 
 In contrast to normal use (USB only), for debugging there are two separate
 wiring changes to do:
-* connecting the ISP headers (picture: orange cables).
-* connecting the JTAG header to the respective pins on the Arduino (picture:
-blue cables)
+* connecting the ISP headers
+* connecting the JTAG header to the respective pins on the Arduino
 
 Connecting the ISP headers is straight forward: Pin1 on the Dragon connects
 to Pin1 on the Arduino Mega2560 and so on.
@@ -107,7 +103,6 @@ JTAG2 and JTAG10 on the AVR Dragon are both GND, one connection suffices.
 All other JTAG Pins are not needed for debugging the Arduino Mega2560
 
 Additional information can be found
-[here](http://automation.binarysage.net/?p=1515) or
 [here](http://arduino.cc/en/Hacking/PinMapping2560).
 
 ### Fuses
@@ -194,8 +189,8 @@ In OSX El Capitan, there is no native driver working for the serial
 connection.
 
 In order to install it, you must download and install a CDC-ACM driver from
-[here](http://eng.aten.eu/products/Mobility-&-USB/USB-Converters/USB-to-Serial-
-Converter~UC232A.html) (Go to Resources/Software & Driver/Mac Software).
+[here](https://www.aten.com/global/en/products/usb-&-thunderbolt/usb-converters/uc232a/)
+(Go to Support and Downloads/Software & Driver/Mac Software).
 
 A reboot should be enough to find your Arduino on `/dev/tty.usbmodem*`
  */

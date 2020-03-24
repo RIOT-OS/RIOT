@@ -64,7 +64,7 @@ extern "C" {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * @see <a href="https://www.lora-alliance.org/portals/0/specs/LoRaWAN%20Specification%201R0.pdf">
+ * @see <a href="https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf">
  *          LoRaWAN spcefication, section 4
  *      </a>
  */

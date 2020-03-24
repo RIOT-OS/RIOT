@@ -11,7 +11,7 @@
  * @ingroup  sys
  * @brief RIOT Unittests based on the EmbUnit Framework
  *
- * @see http://embunit.sourceforge.net/embunit/
+ * @see https://sourceforge.net/projects/embunit
  *
  * @note Please refer to https://github.com/RIOT-OS/RIOT/wiki/Testing-RIOT
  *

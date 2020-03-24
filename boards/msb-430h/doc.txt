@@ -23,8 +23,8 @@
 | SPIs       | 2 |
 | I2Cs       | 1     |
 | Vcc        | 2.0V - 3.6V           |
-| Datasheet / Reference Manual   | [Datasheet](http://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/Z_Finished_Projects/ScatterWeb/moduleComponents/msp430f1612.pdf?1346661398) |
-| User Guide | [User Guide](http://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/Z_Finished_Projects/ScatterWeb/moduleComponents/MSP430slau049f.pdf?1346661398)|
+| Datasheet / Reference Manual   | [Datasheet](https://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/ScatterWeb/moduleComponents/msp430f1612.pdf) |
+| User Guide | [User Guide](https://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/ScatterWeb/moduleComponents/MSP430slau049f.pdf)|
 
 ## Radio
 
@@ -54,9 +54,9 @@ This should take care of everything!
 ## Using the shell
 
 The shell is using the UART interface of the MSB-430H at 115200 baud. You
-need a 3.3V TTL serial cable. For USB connections you could use a [FTDI connector](http://apple.clickandbuild.com/cnb/shop/ftdichip?productID=53&op=catalogue-product_info-null&prodCategoryID=105)
+need a 3.3V TTL serial cable. For USB connections you could use a FTDI connector.
 
 ## More information
 
-[FU Berlin info page on the MSB-430H](http://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/Z_Finished_Projects/ScatterWeb/modules/mod_MSB-430H.html)
+[FU Berlin info page on the MSB-430H](https://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/ScatterWeb/modules/mod_MSB-430H.html)
  */

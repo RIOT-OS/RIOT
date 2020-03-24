@@ -23,7 +23,7 @@ sports an ATmega328p MCU. It is like many Arduinos extensible by using shields.
 | SPIs                         | 1                     |
 | I2Cs                         | 1 (called TWI)        |
 | Vcc                          | 5.0 V                 |
-| Datasheet / Reference Manual | [Datasheet and Reference Manual](http://www.atmel.com/images/atmel-8271-8-bit-avr-microcontroller-atmega48a-48pa-88a-88pa-168a-168pa-328-328p_datasheet_complete.pdf) |
+| Datasheet / Reference Manual | [Datasheet and Reference Manual](http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf) |
 | Board Manual                 | [Board Manual](https://www.arduino.cc/en/Main/ArduinoBoardUno) |
 
 ## Flashing the device

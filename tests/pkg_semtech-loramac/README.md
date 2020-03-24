@@ -11,8 +11,8 @@ See [Semtech LoRamac-node repository](https://github.com/Lora-net/LoRaMac-node)
 to have a look at the original package code.
 
 This application can only be used with Semtech
-[SX1272](http://www.semtech.com/images/datasheet/sx1272.pdf) or
-[SX1276](http://www.semtech.com/images/datasheet/sx1276.pdf) radio devices.
+[SX1272](https://semtech.my.salesforce.com/sfc/p/#E0000000JelG/a/440000001NCE/v_VBhk1IolDgxwwnOpcS_vTFxPfSEPQbuneK3mWsXlU) or
+[SX1276](https://semtech.my.salesforce.com/sfc/p/#E0000000JelG/a/2R0000001OKs/Bs97dmPXeatnbdoJNVMIDaKDlQz8q1N_gxDcgqi7g2o) radio devices.
 
 ## Application configuration
 

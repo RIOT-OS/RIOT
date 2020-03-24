@@ -31,7 +31,7 @@ This board is available [here](https://store.arduino.cc/product/GBX00003).
 | SPIs       | max 6 (see UART)                  |
 | I2Cs       | max 6 (see UART)              |
 | Vcc        | 1.8V - 3.6V           |
-| Datasheet  | [Datasheet](http://www.atmel.com/Images/Atmel-42181-SAM-D21_Datasheet.pdf) |
+| Datasheet  | [Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/SAM_D21_DA1_Family_Data%20Sheet_DS40001882E.pdf) |
 
 ### User Interface
 

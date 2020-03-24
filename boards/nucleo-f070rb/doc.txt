@@ -10,8 +10,8 @@ STM32F070RB microcontroller with 16Kb of SRAM and 128Kb of ROM Flash.
 
 ## Hardware
 
-![Nucleo64 F070RB](http://www.open-electronics.org/wp-
-content/uploads/2015/08/Figura2-500x467.png)
+![Nucleo64 F070RB]
+(http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
 
 
 

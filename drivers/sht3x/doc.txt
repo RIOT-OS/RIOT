@@ -89,7 +89,13 @@ All driver functions return 0 on success or one of a negative error code defined
 
 ## Repeatability
 
-The SHT3x sensor supports **three levels of repeatability** (low, medium and high). The stated repeatability is 3 times the standard deviation of multiple consecutive measurements at the stated repeatability and at constant ambient conditions. It is a measure for the noise on the physical sensor output. Different measurement modes allow for high/medium/low repeatability. [Datasheet SHT3x-DIS](https://www.sensirion.com/fileadmin/user_upload/customers/sensirion/Dokumente/0_Datasheets/Humidity/Sensirion_Humidity_Sensors_SHT3x_Datasheet_digital.pdf)
+The SHT3x sensor supports **three levels of repeatability** (low, medium and
+high). The stated repeatability is 3 times the standard deviation of multiple
+consecutive measurements at the stated repeatability and at constant ambient
+conditions. It is a measure for the noise on the physical sensor output.
+Different measurement modes allow for high/medium/low repeatability.
+[Datasheet SHT3x-DIS]
+(https://developer.sensirion.com/fileadmin/user_upload/customers/sensirion/Dokumente/2_Humidity_Sensors/Datasheets/Sensirion_Humidity_Sensors_SHT3x_Datasheet_digital.pdf)
 
 The repeatability settings influences the measurement duration as well as the power consumption of the sensor. The measurement takes typically 2.5 ms with low repeatability, 4.5 ms with medium repeatability and 12.5 ms with high repeatability. That is, the measurement produces a noticeable delay in execution.
 

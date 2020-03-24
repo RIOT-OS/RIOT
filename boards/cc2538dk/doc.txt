@@ -42,9 +42,9 @@ internal bootloader, then run:
 
 Activating this bootloader is NOT enabled if the flash content is in factory
 default state (e.g. after unboxing). To set the bits in the CCA accordingly you
-have to follow the guidelines found
-[here](http://processors.wiki.ti.com/index.php/CC2538_Bootloader_Backdoor). To
-manage this first time access you have to download the
+have to follow the guidelines found [here]
+(https://web.archive.org/web/20170610111337/http://processors.wiki.ti.com/index.php/CC2538_Bootloader_Backdoor).
+To manage this first time access you have to download the
 ["Uniflash"](http://processors.wiki.ti.com/index.php/Category:CCS_UniFlash) tool
 at TI's website.
 
@@ -58,8 +58,9 @@ FTDI driver manually:
 If the path `/sys/bus/usb-serial/drivers/ftdi_sio/` doesn't exist, you also
 have to load the module `ftdi_sio` by hand.  Alternatively, you can install a
 `udev` rule that configures this on device connection, see [this post on TI's
-E2E site](https://e2e.ti.com/support/microcontrollers/c2000/f/171/p/359074/18434
-85#1843485) for details.
+E2E site]
+(https://e2e.ti.com/support/microcontrollers/c2000/f/171/p/359074/1843485#1843485)
+for details.
 
 RIOT will use /dev/ttyUSB1 by default, but if the UART is given a different
 device name, you can specity it to RIOT using the PORT variable:
@@ -109,8 +110,8 @@ $ csrutil status
 System Integrity Protection status: disabled.
 ```
 
-Afterwards you'll be able to install this [driver](https://cdn.sparkfun.com/a
-ssets/learn_tutorials/7/4/FTDIUSBSerialDriver_v2_3.dmg).
+Afterwards you'll be able to install this [driver]
+(https://cdn.sparkfun.com/assets/learn_tutorials/7/4/FTDIUSBSerialDriver_v2_3.dmg).
 
 If everything goes OK reboot your Mac and then edit
 `/System/Library/Extensions/FTDIUSBSerialDriver.kext/Contents/Info.plist` with a

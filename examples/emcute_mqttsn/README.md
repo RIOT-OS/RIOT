@@ -14,7 +14,7 @@ In general, any MQTT-SN capable broker or broker/gateway setup will do.
 Following a quick instruction on how-to setup the Mosquitto Real Simple Message
 Broker:
 
-1. Get the RSMB here: https://github.com/eclipse/mosquitto.rsmb:
+1. Get the RSMB here: https://github.com/eclipse/mosquitto.rsmb
 ```
 git clone https://github.com/eclipse/mosquitto.rsmb.git
 ```

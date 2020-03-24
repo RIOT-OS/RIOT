@@ -10,8 +10,8 @@ STM32F030R8 microcontroller with 8Kb of SRAM and 64Kb of ROM Flash.
 
 ## Hardware
 
-![Nucleo64 F030R8](http://www.open-electronics.org/wp-
-content/uploads/2015/08/Figura2-500x467.png)
+![Nucleo64 F030R8]
+(http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
 
 
 
