@@ -1,7 +1,7 @@
 PKG_NAME=lwip
 PKG_URL=https://github.com/lwip-tcpip/lwip.git
-# lwIP v2.1.2
-PKG_VERSION=159e31b689577dbf69cf0683bbaffbd71fa5ee10
+# lwIP v2.1.3
+PKG_VERSION=6ca936f6b588cee702c638eee75c2436e6cf75de
 PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
