@@ -45,6 +45,13 @@ static void _callback_put(void *arg)
 }
 #endif
 
+void sock_recv_buf_free(void *buf_ctx)
+{
+    if (buf_ctx) {
+        gnrc_pktbuf_release(buf_ctx);
+    }
+}
+
 #ifdef SOCK_HAS_ASYNC
 static void _netapi_cb(uint16_t cmd, gnrc_pktsnip_t *pkt, void *ctx)
 {

@@ -178,12 +178,32 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *remote)
 ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
                       uint32_t timeout, sock_udp_ep_t *remote)
 {
+    void *pkt = NULL, *ctx = NULL;
+    ssize_t res;
+
+    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    res = sock_udp_recv_buf(sock, &pkt, &ctx, timeout, remote);
+    if (res >= 0) {
+        if (res > (ssize_t)max_len) {
+            res = -ENOBUFS;
+        }
+        else if (res != 0) {
+            memcpy(data, pkt, res);
+        }
+        sock_recv_buf_free(ctx);
+    }
+    return res;
+}
+
+ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
+                          uint32_t timeout, sock_udp_ep_t *remote)
+{
     gnrc_pktsnip_t *pkt, *udp;
     udp_hdr_t *hdr;
     sock_ip_ep_t tmp;
     int res;
 
-    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    assert((sock != NULL) && (data != NULL) && (buf_ctx != NULL));
     if (sock->local.family == AF_UNSPEC) {
         return -EADDRNOTAVAIL;
     }
@@ -191,10 +211,6 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp);
     if (res < 0) {
         return res;
-    }
-    if (pkt->size > max_len) {
-        gnrc_pktbuf_release(pkt);
-        return -ENOBUFS;
     }
     udp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UDP);
     assert(udp);
@@ -214,9 +230,9 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
         gnrc_pktbuf_release(pkt);
         return -EPROTO;
     }
-    memcpy(data, pkt->data, pkt->size);
+    *data = pkt->data;
+    *buf_ctx = pkt;
     res = (int)pkt->size;
-    gnrc_pktbuf_release(pkt);
     return res;
 }
 
