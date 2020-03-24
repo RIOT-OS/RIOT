@@ -2,7 +2,6 @@ BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
 USEMODULE += auto_init_gnrc_netif
-USEMODULE += auto_init_usbus
 USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_icmpv6_echo
 USEMODULE += usbus_cdc_ecm
