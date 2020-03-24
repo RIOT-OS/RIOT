@@ -343,6 +343,27 @@ static void test_sock_ip_recv__non_blocking(void)
     expect(_check_net());
 }
 
+static void test_sock_ip_recv_buf__success(void)
+{
+    static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR_REMOTE };
+    static const ipv6_addr_t dst_addr = { .u8 = _TEST_ADDR_LOCAL };
+    static const sock_ip_ep_t local = { .family = AF_INET6 };
+    static const sock_ip_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR_REMOTE },
+                                         .family = AF_INET6 };
+    void *data = NULL, *ctx = NULL;
+
+    assert(0 == sock_ip_create(&_sock, &local, &remote, _TEST_PROTO,
+                               SOCK_FLAGS_REUSE_EP));
+    assert(_inject_packet(&src_addr, &dst_addr, _TEST_PROTO, "ABCD",
+                          sizeof("ABCD"), _TEST_NETIF));
+    assert(sizeof("ABCD") == sock_ip_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT,
+                                              NULL));
+    assert(data != NULL);
+    assert(ctx != NULL);
+    sock_recv_buf_free(ctx);
+    assert(_check_net());
+}
+
 static void test_sock_ip_send__EAFNOSUPPORT(void)
 {
     static const sock_ip_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR_REMOTE },
@@ -616,6 +637,7 @@ int main(void)
     CALL(test_sock_ip_recv__unsocketed_with_remote());
     CALL(test_sock_ip_recv__with_timeout());
     CALL(test_sock_ip_recv__non_blocking());
+    CALL(test_sock_ip_recv_buf__success());
     _prepare_send_checks();
     CALL(test_sock_ip_send__EAFNOSUPPORT());
     CALL(test_sock_ip_send__EINVAL_addr());
