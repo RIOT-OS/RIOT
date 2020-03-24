@@ -905,6 +905,14 @@ ssize_t coap_opt_add_block(coap_pkt_t *pkt, coap_block_slicer_t *slicer,
     return coap_opt_add_uint(pkt, option, _slicer2blkopt(slicer, more));
 }
 
+ssize_t coap_opt_add_proxy_uri(coap_pkt_t *pkt, const char *uri)
+{
+    assert(pkt);
+    assert(uri);
+
+    return _add_opt_pkt(pkt, COAP_OPT_PROXY_URI, (uint8_t *)uri, strlen(uri));
+}
+
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
 {
     if (flags & COAP_OPT_FINISH_PAYLOAD) {
