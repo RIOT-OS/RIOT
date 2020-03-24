@@ -37,6 +37,7 @@
  * - Client Operation
  * - Observe Server Operation
  * - Block Operation
+ * - Proxy Operation
  * - Implementation Notes
  * - Implementation Status
  *
@@ -304,6 +305,38 @@
  *   in the slicer.
  * - Finally, use coap_block1_finish() to finalize the block option with the
  *   proper value for the _more_ parameter.
+ *
+ * ## Proxy Operation ##
+ *
+ * A [CoAP proxy](https://tools.ietf.org/html/rfc7252#section-5.7.1)
+ * forwards incoming requests to an origin server, or again to another
+ * proxy server.
+ *
+ * ### Proxy Client Handling
+ *
+ * The current implementation only allows the use of `Proxy-Uri` to
+ * specify the absolute URI for the origin server and resource. A
+ * request that includes a `Proxy-Uri` option must not contain any of
+ * the `Uri-*` options. An example:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * // endpoint for the proxy server
+ *  sock_udp_ep_t *proxy_remote = ...;
+ * // absolute URI for the origin server and resource
+ * char *uri = "coap://[2001:db8::1]:5683/.well-known/core";
+ *
+ * gcoap_req_init(&pdu, buf, CONFIG_GCOAP_PDU_BUF_SIZE, COAP_METHOD_GET, NULL);
+ * coap_opt_add_proxy_uri(&pdu, uri);
+ * unsigned len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
+ *
+ * gcoap_req_send((uint8_t *) pdu->hdr, len, proxy_remote, _resp_handler, NULL);
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * See the gcoap example for a sample implementation.
+ *
+ * ### Proxy Server Handling
+ *
+ * Not implemented yet.
  *
  * ## Implementation Notes ##
  *
