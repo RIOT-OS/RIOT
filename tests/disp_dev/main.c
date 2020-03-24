@@ -35,17 +35,13 @@ static ili9341_t ili9341;
 
 int main(void)
 {
-#ifdef BOARD_PINETIME
-    /* on PineTime, enable the backlight */
-    gpio_clear(LCD_BACKLIGHT_LOW);
-#endif
-
     ili9341_init(&ili9341, &ili9341_params[0]);
 
     disp_dev_t *dev = (disp_dev_t *)&ili9341;
     dev->driver = &ili9341_disp_dev_driver;
 
     disp_dev_set_invert(dev, true);
+    disp_dev_backlight_on();
 
     uint16_t max_width = disp_dev_width(dev);
     uint16_t max_height = disp_dev_height(dev);
