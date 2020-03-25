@@ -788,6 +788,9 @@ ifneq (,$(filter ws281x,$(USEMODULE)))
     ifneq (,$(filter arch_native,$(FEATURES_USED)))
       USEMODULE += ws281x_vt100
     endif
+    ifneq (,$(filter arch_esp32,$(FEATURES_USED)))
+      USEMODULE += ws281x_esp32
+    endif
   endif
   ifneq (,$(filter ws281x_atmega,$(USEMODULE)))
     FEATURES_REQUIRED += arch_avr8

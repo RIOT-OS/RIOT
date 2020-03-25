@@ -33,6 +33,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Properties of the ESP32 backend.
+ * @{
+ */
+#ifdef MODULE_WS281X_ESP32
+#define WS281X_HAVE_INIT                    (1)
+#endif
+/** @} */
+
+/**
  * @name    Properties of the VT100 terminal backend.
  * @{
  */
