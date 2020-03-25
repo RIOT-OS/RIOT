@@ -158,6 +158,9 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
         payload_offset++;
     }
 
+    /* bits of the uncompressed address might not be written in decompression,
+     * so zero the whole header first */
+    memset(ipv6_hdr, 0, sizeof(*ipv6_hdr));
     ipv6_hdr_set_version(ipv6_hdr);
 
     switch (iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_TF) {
