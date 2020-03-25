@@ -17,3 +17,6 @@ ifeq (,$(CPU))
 endif
 
 include $(RIOTCPU)/$(CPU)/Makefile.features
+
+# Provide CPU as a feature to allow listing all boards with a CPU
+FEATURES_PROVIDED += cpu_$(CPU)
