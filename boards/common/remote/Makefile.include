@@ -27,5 +27,8 @@ FLASHFILE ?= $(BINFILE)
 DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
+# include common cc2538 includes
+INCLUDES += -I$(RIOTBOARD)/common/cc2538/include
+
 # include common remote includes
 INCLUDES += -I$(RIOTBOARD)/common/remote/include

@@ -22,78 +22,12 @@
 #include "cpu.h"
 #include "periph_cpu.h"
 
+#include "cfg_clk_default.h"
+#include "cfg_timer_default.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Clock system configuration
- * @{
- */
-/*
- * 0: use internal 32KHz RCOSC
- * 1: use external 32KHz XOSC
- */
-#ifndef SYS_CTRL_OSC32K_USE_XTAL
-#define SYS_CTRL_OSC32K_USE_XTAL        (1)
-#endif
-/*
- * 0: use internal 16MHz RCOSC
- * 1: use external 32MHz XOSC, required for RF operation
- */
-#ifndef SYS_CTRL_OSC_USE_XTAL
-#define SYS_CTRL_OSC_USE_XTAL           (1)
-#endif
-
-#if SYS_CTRL_OSC_USE_XTAL
-#define CLOCK_OSC           (XOSC32M_FREQ)
-#else
-#define CLOCK_OSC           (RCOSC16M_FREQ)
-#endif
-
-#if SYS_CTRL_OSC32K_USE_XTAL
-#define CLOCK_OSC32K        (XOSC32K_FREQ)    /* XCOSC frequency */
-#else
-#define CLOCK_OSC32K        (RCOSC32K_FREQ)    /* XCOSC frequency */
-#endif
-
-/* System clock frequency 32MHz */
-#define CLOCK_CORECLOCK     (CLOCK_OSC)
-/* I/O clock rate setting 16MHz */
-#define CLOCK_IO            (CLOCK_OSC / 2)
-/** @} */
-
-/**
- * @name    Timer configuration
- *
- * General purpose timers (GPT[0-3]) are configured consecutively and in order
- * (without gaps) starting from GPT0, i.e. if multiple timers are enabled.
- *
- * @{
- */
-static const timer_conf_t timer_config[] = {
-    {
-        .chn = 2,
-        .cfg = GPTMCFG_16_BIT_TIMER, /* required for XTIMER */
-    },
-    {
-        .chn = 1,
-        .cfg = GPTMCFG_32_BIT_TIMER,
-    },
-    {
-        .chn = 2,
-        .cfg = GPTMCFG_16_BIT_TIMER,
-    },
-    {
-        .chn = 1,
-        .cfg = GPTMCFG_32_BIT_TIMER,
-    },
-};
-
-#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
-
-#define TIMER_IRQ_PRIO      1
-/** @} */
 
 /**
  * @name    UART configuration

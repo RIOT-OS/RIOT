@@ -18,3 +18,6 @@ else ifeq ($(PROGRAMMER),cc2538-bsl)
   PROG_BAUD ?= 460800
   include $(RIOTMAKE)/tools/cc2538-bsl.inc.mk
 endif
+
+# include common cc2538 includes
+INCLUDES += -I$(RIOTBOARD)/common/cc2538/include
