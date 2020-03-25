@@ -144,9 +144,9 @@ static inline void _timer_clock_enable(tim_t tim)
         in PM1-3) */
     SYS_CTRL->DCGCGPT |= (1UL << tim);
     /* wait for the clock enabling to take effect */
-    while (!(SYS_CTRL->RCGCGPT &= (1UL << tim)) || \
-           !(SYS_CTRL->SCGCGPT &= (1UL << tim)) || \
-           !(SYS_CTRL->DCGCGPT &= (1UL << tim))
+    while (!(SYS_CTRL->RCGCGPT & (1UL << tim)) || \
+           !(SYS_CTRL->SCGCGPT & (1UL << tim)) || \
+           !(SYS_CTRL->DCGCGPT & (1UL << tim))
            ) {}
 
     /* set pending timers */
@@ -165,9 +165,9 @@ static inline void _timer_clock_disable(tim_t tim)
        in PM1-3) */
     SYS_CTRL->DCGCGPT &= ~(1UL << tim);
     /* Wait for the clock gating to take effect */
-    while ((SYS_CTRL->RCGCGPT &= (1UL << tim)) || \
-           (SYS_CTRL->SCGCGPT &= (1UL << tim)) || \
-           (SYS_CTRL->DCGCGPT &= (1UL << tim))
+    while ((SYS_CTRL->RCGCGPT & (1UL << tim)) || \
+           (SYS_CTRL->SCGCGPT & (1UL << tim)) || \
+           (SYS_CTRL->DCGCGPT & (1UL << tim))
            ) {}
 }
 
