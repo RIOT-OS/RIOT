@@ -57,6 +57,7 @@ static void set_interface_roles(void)
 }
 
 static ipv6_addr_t _prefix;
+static uint8_t _prefix_len;
 
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
 #define SIXLO_CTX_LTIME_MIN (60U)   /**< context lifetime in minutes */
@@ -102,7 +103,6 @@ static void _update_6ctx(const ipv6_addr_t *prefix, uint8_t prefix_len)
 
 void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, uint8_t *src, uhcp_iface_t iface)
 {
-    (void)prefix_len;
     (void)lifetime;
     (void)src;
 
@@ -126,13 +126,15 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
         return;
     }
 
-    if (ipv6_addr_equal(&_prefix, (ipv6_addr_t*)prefix)) {
+    if ((_prefix_len == prefix_len) &&
+        (ipv6_addr_match_prefix(&_prefix,
+                                (ipv6_addr_t *)prefix) >= prefix_len)) {
         LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): got same prefix again\n");
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
         if (gnrc_netif_is_6ln(gnrc_netif_get_by_pid(gnrc_wireless_interface))) {
             /* always update 6LoWPAN compression context so it does not time
              * out, we can't just remove it anyway according to the RFC */
-            _update_6ctx((ipv6_addr_t *)prefix, 64);
+            _update_6ctx((ipv6_addr_t *)prefix, prefix_len);
         }
 #endif
         return;
@@ -144,11 +146,13 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
     GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
         gnrc_ipv6_nib_abr_del(&_prefix);
 #endif
-        LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix %s/64\n",
-                 ipv6_addr_to_str(addr_str, &_prefix, sizeof(addr_str)));
+        LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix %s/%u\n",
+                 ipv6_addr_to_str(addr_str, &_prefix, sizeof(addr_str)),
+                 prefix_len);
     }
     memcpy(&_prefix, prefix, sizeof(_prefix));
-    gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR, (64 << 8),
+    _prefix_len = prefix_len;
+    gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR, (prefix_len << 8),
                     prefix, sizeof(ipv6_addr_t));
     /* only configure 6Lo-ND features when wireless interface uses
      * 6Lo-ND */
@@ -156,7 +160,7 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
         /* add compression before ABR to add it automatically to its context
          * list */
-        _update_6ctx((ipv6_addr_t *)prefix, 64);
+        _update_6ctx((ipv6_addr_t *)prefix, prefix_len);
 #endif
 #if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
         GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
@@ -171,8 +175,9 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
     }
     gnrc_rpl_root_init(GNRC_RPL_DEFAULT_INSTANCE, (ipv6_addr_t*)prefix, false, false);
 #endif
-    LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix %s/64\n",
-             ipv6_addr_to_str(addr_str, (ipv6_addr_t *)prefix, sizeof(addr_str)));
+    LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix %s/%u\n",
+             ipv6_addr_to_str(addr_str, (ipv6_addr_t *)prefix, sizeof(addr_str)),
+             prefix_len);
 }
 
 extern void uhcp_client(uhcp_iface_t iface);
