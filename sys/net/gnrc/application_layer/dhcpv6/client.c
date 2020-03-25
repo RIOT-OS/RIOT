@@ -16,7 +16,9 @@
 #include "log.h"
 #include "net/arp.h"
 #include "net/dhcpv6.h"
+#include "net/gnrc/dhcpv6/client/6lbr.h"
 #include "net/gnrc/ipv6/nib/pl.h"
+#include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/rpl.h"
 #include "net/sock.h"
@@ -70,6 +72,44 @@ unsigned dhcpv6_client_get_duid_l2(unsigned iface, dhcpv6_duid_l2_t *duid)
     return (uint8_t)res + sizeof(dhcpv6_duid_l2_t);
 }
 
+static bool _ctx_match(const gnrc_sixlowpan_ctx_t *ctx,
+                       const ipv6_addr_t *prefix, uint8_t prefix_len)
+{
+    return (ctx != NULL) &&
+           (ctx->prefix_len == prefix_len) &&
+           (ipv6_addr_match_prefix(&ctx->prefix, prefix) >= prefix_len);
+}
+
+static void _update_6ctx(const ipv6_addr_t *prefix, uint8_t prefix_len)
+{
+    gnrc_sixlowpan_ctx_t *ctx = gnrc_sixlowpan_ctx_lookup_addr(prefix);
+    uint8_t cid = 0;
+
+    if (!_ctx_match(ctx, prefix, prefix_len)) {
+        /* While the context is a prefix match, the defined prefix within the
+         * context does not match => use new context */
+        ctx = NULL;
+    }
+    else {
+        cid = ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK;
+    }
+    /* find first free context ID */
+    if (ctx == NULL) {
+        while (((ctx = gnrc_sixlowpan_ctx_lookup_id(cid)) != NULL) &&
+               !_ctx_match(ctx, prefix, prefix_len)) {
+            cid++;
+        }
+    }
+    if (cid < GNRC_SIXLOWPAN_CTX_SIZE) {
+        DEBUG("DHCP client: add compression context %u for prefix %s/%u\n", cid,
+              ipv6_addr_to_str(addr_str, prefix, sizeof(addr_str)),
+              prefix_len);
+        gnrc_sixlowpan_ctx_update(cid, (ipv6_addr_t *)prefix, prefix_len,
+                                  CONFIG_GNRC_DHCPV6_CLIENT_6LBR_6LO_CTX_MIN,
+                                  true);
+    }
+}
+
 void dhcpv6_client_conf_prefix(unsigned iface, const ipv6_addr_t *pfx,
                                unsigned pfx_len, uint32_t valid,
                                uint32_t pref)
@@ -107,18 +147,25 @@ void dhcpv6_client_conf_prefix(unsigned iface, const ipv6_addr_t *pfx,
                          (UINT32_MAX - 1) : pref * MS_PER_SEC;
         }
         gnrc_ipv6_nib_pl_set(netif->pid, pfx, pfx_len, valid, pref);
-#if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
-        GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
-        gnrc_ipv6_nib_abr_add(&addr);
-#endif
-#ifdef MODULE_GNRC_RPL
-        gnrc_rpl_init(netif->pid);
-        gnrc_rpl_instance_t *inst = gnrc_rpl_instance_get(GNRC_RPL_DEFAULT_INSTANCE);
-        if (inst) {
-            gnrc_rpl_instance_remove(inst);
+        if (IS_USED(MODULE_GNRC_IPV6_NIB) &&
+            GNRC_IPV6_NIB_CONF_6LBR &&
+            GNRC_IPV6_NIB_CONF_MULTIHOP_P6C &&
+            gnrc_netif_is_6ln(netif)) {
+            if (IS_USED(MODULE_GNRC_SIXLOWPAN_CTX)) {
+                _update_6ctx(pfx, pfx_len);
+            }
+            (void)gnrc_ipv6_nib_abr_add(&addr);
         }
-        gnrc_rpl_root_init(GNRC_RPL_DEFAULT_INSTANCE, &addr, false, false);
-#endif
+        if (IS_USED(MODULE_GNRC_RPL)) {
+            gnrc_rpl_init(netif->pid);
+            gnrc_rpl_instance_t *inst = gnrc_rpl_instance_get(
+                    GNRC_RPL_DEFAULT_INSTANCE
+                );
+            if (inst) {
+                gnrc_rpl_instance_remove(inst);
+            }
+            gnrc_rpl_root_init(GNRC_RPL_DEFAULT_INSTANCE, &addr, false, false);
+        }
     }
 }
 
