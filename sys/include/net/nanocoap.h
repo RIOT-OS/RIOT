@@ -615,6 +615,22 @@ ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
 ssize_t coap_opt_get_opaque(const coap_pkt_t *pkt, unsigned opt_num, uint8_t **value);
 /**@}*/
 
+/**
+ * @brief   Convenience function for getting the packet's Proxy-Uri option
+ *
+ * @param[in]   pkt     pkt to work on
+ * @param[out]  target  pointer to the PROXY_URI in @p pkt
+ *
+ * @pre     ((pkt != NULL) && (target != NULL))
+ *
+ * @return      length of the Proxy-Uri option
+ * @return      -ENOENT if Proxy-Uri option not found
+ * @return      -EINVAL if Proxy-Uri option cannot be parsed
+ */
+static inline ssize_t coap_get_proxy_uri(const coap_pkt_t *pkt, char **target)
+{
+    return coap_opt_get_opaque(pkt, COAP_OPT_PROXY_URI, (uint8_t **)target);
+}
 
 /**
  * @name    Functions -- Options for Block
