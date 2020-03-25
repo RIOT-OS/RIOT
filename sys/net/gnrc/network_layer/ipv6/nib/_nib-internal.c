@@ -619,7 +619,9 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
           (void *)pkt);
     _nib_offl_entry_t *offl = _nib_offl_get_match(dst);
 
-    if (offl == NULL) {
+    if ((offl == NULL) ||
+        /* give default route precedence over off-link PLEs */
+        ((offl->mode == _PL) && !(offl->flags & _PFX_ON_LINK))) {
         _nib_dr_entry_t *router = _nib_drl_get_dr();
 
         if ((router == NULL) && (offl == NULL)) {

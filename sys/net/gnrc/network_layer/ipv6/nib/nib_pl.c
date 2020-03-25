@@ -58,7 +58,12 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
         return 0;
     }
     gnrc_netif_acquire(netif);
-    if (!gnrc_netif_is_6ln(netif) &&
+    /* prefixes within a 6Lo-ND-performing network are typically off-link, the
+     * border router however should configure the prefix as on-link to only do
+     * address resolution towards the LoWPAN and not the upstream interface
+     * See https://github.com/RIOT-OS/RIOT/pull/10627 and follow-ups
+     */
+    if ((!gnrc_netif_is_6ln(netif) || gnrc_netif_is_6lbr(netif)) &&
         ((idx = gnrc_netif_ipv6_addr_match(netif, pfx)) >= 0) &&
         (ipv6_addr_match_prefix(&netif->ipv6.addrs[idx], pfx) >= pfx_len)) {
         dst->flags |= _PFX_ON_LINK;
