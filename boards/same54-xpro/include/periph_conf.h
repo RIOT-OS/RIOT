@@ -65,6 +65,12 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief Enable the internal DC/DC converter
+ *        The board is equipped with the necessary inductor.
+ */
+#define USE_VREG_BUCK       (1)
+
+/**
  * @name Timer peripheral configuration
  * @{
  */
