@@ -27,6 +27,23 @@ extern "C" {
  * @name    Timing parameters for WS2812/SK6812 RGB LEDs
  * @{
  */
+
+/**
+ * @brief   Data transmission time in nanoseconds
+ *
+ * For the SK6812, WS2812 and WS2812b this is 1.25 µs. This is the total time
+ * required to transmit one bit.
+ */
+#define WS281X_T_DATA_NS                (1250U)
+
+/**
+ * @brief The high-times in nanoseconds.
+ * @{
+ */
+#define WS281X_T_DATA_ONE_NS            (650U)
+#define WS281X_T_DATA_ZERO_NS           (325U)
+/**@}*/
+
 /**
  * @brief   Time in microseconds to pull the data line low to signal end of data
  *

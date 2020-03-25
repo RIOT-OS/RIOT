@@ -15,7 +15,8 @@
  *
  * The WS2812 or SK6812 RGB LEDs, or more commonly known as NeoPixels, can be
  * chained so that a single data pin of the MCU can control an arbitrary number
- * of RGB LEDs.
+ * of RGB LEDs. This driver supports both the WS2812/SK6812 and the WS2812b
+ * LEDs.
  *
  * # Support
  *
@@ -35,6 +36,15 @@
  *
  * @warning On 8MHz ATmegas, only pins at GPIO ports B, C, and D are supported.
  *          (On 16MHz ATmegas, any pin is fine.)
+ *
+ * ## ESP32
+ *
+ * The ESP32 implementation is frequency independent, as frequencies above 80MHz
+ * are high enough to support big banging without assembly.
+ *
+ * ## Native/VT100
+ *
+ * The native (VT100) implementation writes the LED state to the console.
  *
  * ### Usage
  *
