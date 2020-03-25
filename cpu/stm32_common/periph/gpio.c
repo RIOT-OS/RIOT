@@ -83,7 +83,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
 #elif defined (CPU_FAM_STM32L0)
     periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
-#elif defined (CPU_FAM_STM32L4)
+#elif defined (CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
     periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
 #ifdef PWR_CR2_IOSV
     if (port == GPIOG) {
@@ -132,7 +132,7 @@ void gpio_init_analog(gpio_t pin)
     periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
 #elif defined (CPU_FAM_STM32L0)
     periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
-#elif defined (CPU_FAM_STM32L4)
+#elif defined (CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
     periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
 #else
     periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
@@ -196,7 +196,13 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     isr_ctx[pin_num].arg = arg;
 
     /* enable clock of the SYSCFG module for EXTI configuration */
+#ifndef CPU_FAM_STM32WB
+#ifdef CPU_FAM_STM32F0
+    periph_clk_en(APB2, RCC_APB2ENR_SYSCFGCOMPEN);
+#else
     periph_clk_en(APB2, RCC_APB2ENR_SYSCFGEN);
+#endif
+#endif
 
     /* initialize pin as input */
     gpio_init(pin, mode);
