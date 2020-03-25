@@ -23,7 +23,7 @@ def testfunc(child):
         # check if output is correct
         expected = int(child.match.group(2))
         actual = int(child.match.group(1))
-        assert(actual in range(expected - ACCEPTED_ERROR, expected + ACCEPTED_ERROR))
+        assert(actual in range(expected - ACCEPTED_ERROR, expected + ACCEPTED_ERROR + 1))
         print(".", end="", flush=True)
     print("")
     print("All tests successful")
