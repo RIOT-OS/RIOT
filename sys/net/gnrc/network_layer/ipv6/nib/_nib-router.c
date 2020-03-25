@@ -102,6 +102,9 @@ static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
 {
     uint32_t now = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
     gnrc_pktsnip_t *pio;
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(
+            _nib_onl_get_if(offl->next_hop)
+        );
     uint8_t flags = 0;
     uint32_t valid_ltime = (offl->valid_until == UINT32_MAX) ? UINT32_MAX :
                            ((offl->valid_until - now) / MS_PER_SEC);
@@ -111,7 +114,11 @@ static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
     DEBUG("nib: Build PIO for %s/%u\n",
           ipv6_addr_to_str(addr_str, &offl->pfx, sizeof(addr_str)),
           offl->pfx_len);
-    if (offl->flags & _PFX_ON_LINK) {
+    /* do not advertise as on-link if 6LN
+     * https://tools.ietf.org/html/rfc6775#section-6.1 otherwise the PIO will be
+     * ignored by other nodes (https://tools.ietf.org/html/rfc6775#section-5.4)
+     */
+    if ((offl->flags & _PFX_ON_LINK) && !gnrc_netif_is_6ln(netif)) {
         flags |= NDP_OPT_PI_FLAGS_L;
     }
     if (offl->flags & _PFX_SLAAC) {
