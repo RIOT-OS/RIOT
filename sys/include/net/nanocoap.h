@@ -597,7 +597,7 @@ ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
  * @return        -ENOENT if option not found
  * @return        -EINVAL if option cannot be parsed
  */
-ssize_t coap_opt_get_opaque(coap_pkt_t *pkt, unsigned opt_num, uint8_t **value);
+ssize_t coap_opt_get_opaque(const coap_pkt_t *pkt, unsigned opt_num, uint8_t **value);
 /**@}*/
 
 
