@@ -1,0 +1,37 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MOD_CORE
+    bool
+    default y
+    help
+        RIOT's core module.
+
+config MOD_CORE_IDLE_THREAD
+    bool
+    prompt "Use Idle thread"  if HAS_NO_IDLE_THREAD
+    default y if !HAS_NO_IDLE_THREAD
+    help
+        Select y to include the Idle thread. This is mandatory for some CPUs.
+
+config MOD_CORE_INIT
+    bool "Kernel initialization module"
+    default y
+    help
+        Kernel initialization module.
+
+config MOD_CORE_MSG
+    bool "Kernel messaging module"
+    default y
+    help
+        Kernel messaging module.
+
+config MOD_CORE_PANIC
+    bool "Kernel crash handling module"
+    default y
+    help
+        Kernel crash handling module.

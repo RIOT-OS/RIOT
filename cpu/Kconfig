@@ -51,3 +51,9 @@ config CPU_ARCH
     string
     help
         Architecture of the currently selected CPU.
+
+config MOD_CPU
+    bool
+    default y
+    help
+        Module which holds all CPU-specific files.

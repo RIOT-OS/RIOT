@@ -8,3 +8,9 @@ config BOARD
     string
     help
         Name of the currently selected board.
+
+config MOD_BOARD
+    bool
+    default y
+    help
+        Module which holds all board-specific files.

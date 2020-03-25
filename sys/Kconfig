@@ -6,7 +6,14 @@
 #
 menu "System"
 
+rsource "auto_init/Kconfig"
 rsource "net/Kconfig"
 rsource "usb/Kconfig"
 
 endmenu # System
+
+config MOD_SYS
+    bool
+    default y
+    help
+        System module, it serves to pull in all the rest of system modules.
