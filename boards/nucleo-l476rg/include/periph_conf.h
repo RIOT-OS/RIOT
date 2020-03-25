@@ -45,7 +45,7 @@ extern "C" {
  * This defaults to 0 because hardware revision 'MB1136 C-01' of the nucleo-64
  * board disconnects LSE by default. You may safely set this to 1 on revisions
  * newer than 'MB1136 C-01' */
-#define CLOCK_LSE           (0)
+#define CLOCK_LSE           (1)
 #endif
 
 /* 0: enable MSI only if HSE isn't available
