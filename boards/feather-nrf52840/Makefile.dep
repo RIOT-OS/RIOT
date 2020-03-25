@@ -1,5 +1,7 @@
-# Use Segger's RTT by default for stdio on this board
-DEFAULT_MODULE += stdio_rtt
+# Provide stdio over USB by default
+# This is a temporary solution until management of stdio is correctly
+# handled by the build system
+DEFAULT_MODULE += stdio_cdc_acm
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
