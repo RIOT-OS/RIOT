@@ -29,22 +29,45 @@
 #include "net/sock/udp.h"
 #include "od.h"
 
-static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str)
+static void _dump_payload(coap_pkt_t *pkt)
+{
+    unsigned format = coap_get_content_type(pkt);
+    if (format == COAP_FORMAT_TEXT
+            || format == COAP_FORMAT_LINK
+            || coap_get_code_class(pkt) == COAP_CLASS_CLIENT_FAILURE
+            || coap_get_code_class(pkt) == COAP_CLASS_SERVER_FAILURE) {
+        /* Expecting diagnostic payload in failure cases */
+        printf(", %u bytes\n%.*s\n", pkt->payload_len, pkt->payload_len,
+               (char *)pkt->payload);
+    }
+    else {
+        printf(", %u bytes\n", pkt->payload_len);
+        od_hex_dump(pkt->payload, pkt->payload_len, OD_WIDTH_DEFAULT);
+    }
+}
+
+static int _blockwise_handler(coap_pkt_t *pkt, void *arg)
+{
+    (void)arg;
+    _dump_payload(pkt);
+    return 0;
+}
+
+static int _prepare(sock_udp_ep_t *remote, char *addr_str, char *port_str)
 {
     ipv6_addr_t addr;
-    sock_udp_ep_t remote;
 
-    remote.family = AF_INET6;
+    remote->family = AF_INET6;
 
     /* parse for interface */
     char *iface = ipv6_addr_split_iface(addr_str);
     if (!iface) {
         if (gnrc_netif_numof() == 1) {
             /* assign the single interface found in gnrc_netif_numof() */
-            remote.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
+            remote->netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
         }
         else {
-            remote.netif = SOCK_ADDR_ANY_NETIF;
+            remote->netif = SOCK_ADDR_ANY_NETIF;
         }
     }
     else {
@@ -53,7 +76,7 @@ static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str
             puts("nanocli: interface not valid");
             return 0;
         }
-        remote.netif = pid;
+        remote->netif = pid;
     }
 
     /* parse destination address */
@@ -61,17 +84,28 @@ static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str
         puts("nanocli: unable to parse destination address");
         return 0;
     }
-    if ((remote.netif == SOCK_ADDR_ANY_NETIF) && ipv6_addr_is_link_local(&addr)) {
+    if ((remote->netif == SOCK_ADDR_ANY_NETIF) && ipv6_addr_is_link_local(&addr)) {
         puts("nanocli: must specify interface for link local target");
         return 0;
     }
-    memcpy(&remote.addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
+    memcpy(&remote->addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
 
     /* parse port */
-    remote.port = atoi(port_str);
-    if (remote.port == 0) {
+    remote->port = atoi(port_str);
+    if (remote->port == 0) {
         puts("nanocli: unable to parse destination port");
         return 0;
+    }
+    return 1;
+}
+
+static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str)
+{
+    sock_udp_ep_t remote;
+
+    int res = _prepare(&remote, addr_str, port_str);
+    if (res < 0) {
+        return res;
     }
 
     return nanocoap_request(pkt, NULL, &remote, len);
@@ -135,19 +169,7 @@ int nanotest_client_cmd(int argc, char **argv)
             printf("nanocli: response %s, code %1u.%02u", class_str,
                    coap_get_code_class(&pkt), coap_get_code_detail(&pkt));
             if (pkt.payload_len) {
-                unsigned format = coap_get_content_type(&pkt);
-                if (format == COAP_FORMAT_TEXT
-                        || format == COAP_FORMAT_LINK
-                        || coap_get_code_class(&pkt) == COAP_CLASS_CLIENT_FAILURE
-                        || coap_get_code_class(&pkt) == COAP_CLASS_SERVER_FAILURE) {
-                    /* Expecting diagnostic payload in failure cases */
-                    printf(", %u bytes\n%.*s\n", pkt.payload_len, pkt.payload_len,
-                                                                  (char *)pkt.payload);
-                }
-                else {
-                    printf(", %u bytes\n", pkt.payload_len);
-                    od_hex_dump(pkt.payload, pkt.payload_len, OD_WIDTH_DEFAULT);
-                }
+                _dump_payload(&pkt);
             }
             else {
                 printf(", empty payload\n");
@@ -158,6 +180,41 @@ int nanotest_client_cmd(int argc, char **argv)
 
     end:
     printf("usage: %s <get|post|put> <addr>[%%iface] <port> <path> [data]\n",
+           argv[0]);
+    return 1;
+}
+
+
+
+int nanotest_client_get_cmd(int argc, char **argv)
+{
+    size_t buflen = 128;
+    uint8_t buf[buflen];
+
+    /* parse options */
+    if (argc == 4 || argc == 5) {
+        ssize_t len = 0;
+        sock_udp_ep_t remote;
+
+        if (_prepare(&remote, argv[1], argv[2]) < 0) {
+            goto end;
+        }
+
+        if (argc == 5 && atoi(argv[4]) != 0) {
+            len = nanocoap_get_blockwise(&remote, argv[3], buf, buflen,
+                                         COAP_BLOCKSIZE_16,
+                                         _blockwise_handler, NULL);
+        }
+        else {
+            len = nanocoap_get(&remote, argv[3], buf, buflen);
+            if (len > 0) {
+                od_hex_dump(buf, len, OD_WIDTH_DEFAULT);
+            }
+        }
+        return 0;
+    }
+end:
+    printf("usage: %s <addr>[%%iface] <port> <path> [blockwise]\n",
            argv[0]);
     return 1;
 }
