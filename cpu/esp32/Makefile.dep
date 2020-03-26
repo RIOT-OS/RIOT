@@ -19,8 +19,6 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
   USEMODULE += netdev_eth
   USEMODULE += netopt
   USEMODULE += xtimer
-  INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/ethernet
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/ethernet/include
 endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))

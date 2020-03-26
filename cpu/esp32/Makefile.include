@@ -48,6 +48,9 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/esp32/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 
+INCLUDES += $(if $(filter esp_eth,$(USEMODULE)),-I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/ethernet)
+INCLUDES += $(if $(filter esp_eth,$(USEMODULE)),-I$(ESP32_SDK_DIR)/components/ethernet/include)
+
 CFLAGS += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM
 CFLAGS += -DLOG_TAG_IN_BRACKETS
 
