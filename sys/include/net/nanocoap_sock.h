@@ -139,6 +139,21 @@
 extern "C" {
 #endif
 
+
+/**
+ * @brief   Coap blockwise request callback descriptor
+ *
+ * @param[in] arg      Pointer to be passed as arguments to the callback
+ * @param[in] offset   Offset of received data
+ * @param[in] buf      Pointer to the received data
+ * @param[in] len      Length of the received data
+ * @param[in] more     -1 for no option, 0 for last block, 1 for more blocks
+ *
+ * @returns    0       on success
+ * @returns   -1       on error
+ */
+typedef int (*coap_blockwise_cb_t)(coap_pkt_t *pkt, void *arg);
+
 /**
  * @brief   Start a nanocoap server instance
  *
@@ -166,6 +181,26 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize);
  */
 ssize_t nanocoap_get(sock_udp_ep_t *remote, const char *path, uint8_t *buf,
                      size_t len);
+
+/**
+ * @brief   Simple synchronous blockwise CoAP get request
+ *
+ * @p callback is called for every valid received blockwise answer
+ *
+ * @param[in]   remote   remote UDP endpoint
+ * @param[in]   path     remote path
+ * @param[in]   buf      buffer to use for the packet
+ * @param[in]   len      length of @p buffer
+ * @param[in]   size     CoAP blockwise size to use for requests
+ * @param[in]   callback function to call on valid response received
+ * @param[in]   arg      context to pass to @p callback
+ *
+ * @returns     length of response payload on success
+ * @returns     <0 on error
+ */
+int nanocoap_get_blockwise(sock_udp_ep_t *remote, const char *path,
+                           uint8_t *buf, size_t len, coap_blockwise_t size,
+                           coap_blockwise_cb_t callback, void *arg);
 
 /**
  * @brief   Simple synchronous CoAP request
