@@ -15,4 +15,4 @@ include $(RIOTMAKE)/tools/openocd.inc.mk
 export PRE_FLASH_CHECK_SCRIPT = lpc_checksum --format hex
 
 # remap flash to address 0x0, otherwise it verifies the rom bootloader
-export OPENOCD_PRE_VERIFY_CMDS += '-c reset init'
+OPENOCD_PRE_VERIFY_CMDS += '-c reset init'
