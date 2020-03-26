@@ -374,16 +374,6 @@ int ztimer_msg_receive_timeout(ztimer_clock_t *clock, msg_t *msg,
  /* created with dist/tools/define2u16.py */
 #define MSG_ZTIMER 0xc83e   /**< msg type used by ztimer_msg_receive_timeout */
 
-/*
- * @brief ztimer_now() for extending timers
- *
- * @internal
- *
- * @param[in]   clock          ztimer clock to operate on
- * @return  Current count on the clock @p clock
- */
-ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock);
-
 /**
  * @brief ztimer_now() for extending timers
  *
