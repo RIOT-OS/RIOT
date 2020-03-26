@@ -46,6 +46,7 @@
 #include <stdint.h>
 
 #include "xtimer.h"
+#include "timex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -104,6 +105,22 @@ void evtimer_del(evtimer_t *evtimer, evtimer_event_t *event);
  * @param[in] evtimer   An event timer
  */
 void evtimer_print(const evtimer_t *evtimer);
+
+/**
+ * @brief   Return the current system time in msec
+ */
+static inline uint32_t evtimer_now_msec(void)
+{
+    return xtimer_now_usec64() / US_PER_MS;
+}
+
+/**
+ * @brief   Return the current system time in minutes
+ */
+static inline uint32_t evtimer_now_min(void)
+{
+    return xtimer_now_usec64() / (US_PER_SEC * SEC_PER_MIN);
+}
 
 #ifdef __cplusplus
 }

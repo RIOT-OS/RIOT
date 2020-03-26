@@ -41,7 +41,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 #if ENABLE_DEBUG
-#include "xtimer.h"
+#include "evtimer.h"
 #endif
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -100,7 +100,7 @@ void gnrc_ipv6_nib_init(void)
 static void _add_static_lladdr(gnrc_netif_t *netif)
 {
 #ifdef GNRC_IPV6_STATIC_LLADDR
-    /* parse addr from string and explicitely set a link lokal prefix
+    /* parse addr from string and explicitly set a link local prefix
      * if ifnum > 1 each interface will get its own link local address
      * with GNRC_IPV6_STATIC_LLADDR + i
      */
@@ -327,7 +327,7 @@ void gnrc_ipv6_nib_handle_pkt(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
 {
     DEBUG("nib: Handle timer event (ctx = %p, type = 0x%04x, now = %ums)\n",
-          ctx, type, (unsigned)xtimer_now_usec() / 1000);
+          ctx, type, (unsigned)evtimer_now_msec());
     _nib_acquire();
     switch (type) {
 #if GNRC_IPV6_NIB_CONF_ARSM
@@ -525,7 +525,7 @@ static void _handle_rtr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                          next_ra_delay);
         }
         else {
-            uint32_t now = (xtimer_now_usec64() / MS_PER_SEC) & UINT32_MAX;
+            uint32_t now = evtimer_now_msec();
 
             /* check for integer overflows and initial value of last_ra */
             if (((netif->ipv6.last_ra > (UINT32_MAX - NDP_MIN_MS_DELAY_BETWEEN_RAS) &&
@@ -1261,7 +1261,7 @@ static void _handle_snd_na(gnrc_pktsnip_t *pkt)
 static void _handle_pfx_timeout(_nib_offl_entry_t *pfx)
 {
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
-    uint32_t now = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
+    uint32_t now = evtimer_now_msec();
 
     gnrc_netif_acquire(netif);
     if (now >= pfx->valid_until) {

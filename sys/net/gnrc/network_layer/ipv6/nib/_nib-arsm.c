@@ -13,7 +13,7 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
-#include "xtimer.h"
+#include "evtimer.h"
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"

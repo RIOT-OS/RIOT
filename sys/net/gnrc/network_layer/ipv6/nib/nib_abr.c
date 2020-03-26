@@ -78,7 +78,7 @@ bool gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *entry)
 void gnrc_ipv6_nib_abr_print(gnrc_ipv6_nib_abr_t *abr)
 {
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-    uint32_t now = _now_min();
+    uint32_t now = evtimer_now_min();
 
     printf("%s v%" PRIu32 " expires %" PRIu32 "min\n",
            ipv6_addr_to_str(addr_str, &abr->addr, sizeof(addr_str)),
