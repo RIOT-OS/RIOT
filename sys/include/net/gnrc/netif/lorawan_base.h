@@ -27,7 +27,7 @@ extern "C" {
 /**
  * @brief   Creates a raw network interface
  *
- * @param[in] netif     The interface. May not be `NULL`.
+ * @param[out] netif    The interface. May not be `NULL`.
  * @param[in] stack     The stack for the network interface's thread.
  * @param[in] stacksize Size of @p stack.
  * @param[in] priority  Priority for the network interface's thread.

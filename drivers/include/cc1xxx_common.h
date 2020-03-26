@@ -115,7 +115,7 @@ typedef struct netdev_radio_rx_info cc1xxx_rx_info_t;
 /**
  * @brief   Creates a CC110x/CC1200 network interface
  *
- * @param[in] netif     The interface. May not be `NULL`.
+ * @param[out] netif    The interface. May not be `NULL`.
  * @param[in] stack     The stack for the network interface's thread.
  * @param[in] stacksize Size of @p stack.
  * @param[in] priority  Priority for the network interface's thread.
