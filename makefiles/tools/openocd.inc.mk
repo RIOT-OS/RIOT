@@ -29,3 +29,8 @@ ifneq (,$(OPENOCD_PRE_VERIFY_CMDS))
   # Export OPENOCD_PRE_VERIFY_CMDS only to the flash/flash-only target
   $(call target-export-variables,flash%,OPENOCD_PRE_VERIFY_CMDS)
 endif
+
+ifneq (,$(OPENOCD_PRE_FLASH_CMDS))
+  # Export OPENOCD_PRE_FLASH_CMDS only to the flash/flash-only targets
+  $(call target-export-variables,flash%,OPENOCD_PRE_FLASH_CMDS)
+endif
