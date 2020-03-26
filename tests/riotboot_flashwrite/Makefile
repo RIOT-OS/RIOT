@@ -28,8 +28,6 @@ USEMODULE += shell_commands
 # boards
 LOW_MEMORY_BOARDS := nucleo-f334r8
 
-GNRC_NETIF_NUMOF := 2
-
 # uncomment these to use ethos
 #USEMODULE += stdio_ethos gnrc_uhcpc
 #

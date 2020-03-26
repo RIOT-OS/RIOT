@@ -63,6 +63,7 @@
  * @brief   Statically allocate memory for device descriptors
  */
 cc110x_t _cc110x_devs[CC110X_NUM];
+static gnrc_netif_t _netif[CC110X_NUM];
 /**
  * @brief   Statically allocate memory for the MAC layer thread(s)
  */
@@ -74,7 +75,7 @@ void auto_init_cc110x(void)
         LOG_DEBUG("[auto_init_netif] initializing cc110x #%u\n", i);
 
         cc110x_setup(&_cc110x_devs[i], &cc110x_params[i]);
-        gnrc_netif_cc1xxx_create(stacks[i], CC110X_MAC_STACKSIZE, CC110X_MAC_PRIO,
+        gnrc_netif_cc1xxx_create(&_netif[i], stacks[i], CC110X_MAC_STACKSIZE, CC110X_MAC_PRIO,
                                  "cc110x", (netdev_t *)&_cc110x_devs[i]);
     }
 }

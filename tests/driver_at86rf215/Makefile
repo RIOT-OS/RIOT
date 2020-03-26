@@ -8,7 +8,6 @@ USEMODULE += ps
 
 # the radio driver to test
 USEMODULE += at86rf215
-GNRC_NETIF_NUMOF ?= 2
 
 # gnrc is a meta module including all required, basic gnrc networking modules
 USEMODULE += gnrc

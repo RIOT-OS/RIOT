@@ -28,6 +28,7 @@
 #define _MSG_QUEUE_SIZE  (2)
 
 gnrc_netif_t *_mock_netif = NULL;
+static gnrc_netif_t _netif;
 
 static netdev_test_t _mock_netdev;
 static char _mock_netif_stack[THREAD_STACKSIZE_DEFAULT];
@@ -100,11 +101,12 @@ void _tests_init(void)
                            _get_address_long);
     netdev_test_set_get_cb(&_mock_netdev, NETOPT_PROTO,
                            _get_proto);
-    _mock_netif = gnrc_netif_ieee802154_create(
+    int res = gnrc_netif_ieee802154_create(&_netif,
            _mock_netif_stack, THREAD_STACKSIZE_DEFAULT, GNRC_NETIF_PRIO,
             "mockup_wpan", &_mock_netdev.netdev.netdev
         );
-    expect(_mock_netif != NULL);
+    _mock_netif = &_netif;
+    expect(res == 0);
     gnrc_netreg_entry_init_pid(&dumper, GNRC_NETREG_DEMUX_CTX_ALL,
                                sched_active_pid);
     gnrc_netreg_register(GNRC_NETTYPE_NDP, &dumper);

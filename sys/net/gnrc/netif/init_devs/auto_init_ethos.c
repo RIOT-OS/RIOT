@@ -30,6 +30,8 @@
  */
 ethos_t ethos;
 
+static gnrc_netif_t _netif;
+
 /**
  * @brief   Define stack parameters for the MAC layer thread
  * @{
@@ -59,7 +61,7 @@ void auto_init_ethos(void)
     ethos_setup(&ethos, &p);
 
     /* initialize netdev<->gnrc adapter state */
-    gnrc_netif_ethernet_create(_netdev_eth_stack, ETHOS_MAC_STACKSIZE,
+    gnrc_netif_ethernet_create(&_netif, _netdev_eth_stack, ETHOS_MAC_STACKSIZE,
                                ETHOS_MAC_PRIO, "ethos", (netdev_t *)&ethos);
 }
 

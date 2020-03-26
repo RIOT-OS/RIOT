@@ -76,11 +76,10 @@ static const gnrc_netif_ops_t lwmac_ops = {
     .msg_handler = _lwmac_msg_handler,
 };
 
-gnrc_netif_t *gnrc_netif_lwmac_create(char *stack, int stacksize,
-                                      char priority, char *name,
-                                      netdev_t *dev)
+int gnrc_netif_lwmac_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                            char priority, char *name, netdev_t *dev)
 {
-    return gnrc_netif_create(stack, stacksize, priority, name, dev,
+    return gnrc_netif_create(netif, stack, stacksize, priority, name, dev,
                              &lwmac_ops);
 }
 

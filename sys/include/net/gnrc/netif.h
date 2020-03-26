@@ -246,6 +246,7 @@ void gnrc_netif_init_devs(void);
 /**
  * @brief   Creates a network interface
  *
+ * @param[in] netif     The interface. May not be `NULL`.
  * @param[in] stack     The stack for the network interface's thread.
  * @param[in] stacksize Size of @p stack.
  * @param[in] priority  Priority for the network interface's thread.
@@ -256,15 +257,12 @@ void gnrc_netif_init_devs(void);
  * @note If @ref DEVELHELP is defined netif_params_t::name is used as the
  *       name of the network interface's thread.
  *
- * @attention   Fails and crashes (assertion error with @ref DEVELHELP or
- *              segmentation fault without) if `GNRC_NETIF_NUMOF` is lower than
- *              the number of calls to this function.
- *
- * @return  The network interface on success.
+ * @return  0 on success
+ * @return  negative number on error
  */
-gnrc_netif_t *gnrc_netif_create(char *stack, int stacksize, char priority,
-                                const char *name, netdev_t *dev,
-                                const gnrc_netif_ops_t *ops);
+int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                      char priority, const char *name, netdev_t *dev,
+                      const gnrc_netif_ops_t *ops);
 
 /**
  * @brief   Get number of network interfaces actually allocated
@@ -286,7 +284,7 @@ unsigned gnrc_netif_numof(void);
  */
 static inline bool gnrc_netif_highlander(void)
 {
-    return (GNRC_NETIF_NUMOF == 1);
+    return IS_ACTIVE(GNRC_NETIF_SINGLE);
 }
 
 /**

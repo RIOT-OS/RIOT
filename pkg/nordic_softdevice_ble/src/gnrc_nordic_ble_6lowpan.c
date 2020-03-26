@@ -70,6 +70,7 @@
 static char _stack[(THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)];
 
 static gnrc_netif_t *_ble_netif = NULL;
+static gnrc_netif_t _netif;
 
 static uint8_t _sendbuf[BLE_SIXLOWPAN_MTU];
 
@@ -281,6 +282,6 @@ static netdev_t _ble_dummy_dev = {
 
 void gnrc_nordic_ble_6lowpan_init(void)
 {
-    gnrc_netif_create(_stack, sizeof(_stack), BLE_PRIO,
+    gnrc_netif_create(&_netif, _stack, sizeof(_stack), BLE_PRIO,
                       "ble", &_ble_dummy_dev, &_ble_ops);
 }

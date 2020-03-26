@@ -30,13 +30,15 @@ extern "C" {
 #endif
 
 /**
- * @brief   Maximum number of network interfaces
+ * @brief   Single interface optimizations
  *
- * @note    Intentionally not calling it `GNRC_NETIF_NUMOF` to not require
- *          rewrites throughout the stack.
+ *          Define to 1 to allow GNRC optimizations when only one interface
+ *          is available.
+ *
+ * @note    This MUST NOT be enabled if there's more than one interface.
  */
-#ifndef GNRC_NETIF_NUMOF
-#define GNRC_NETIF_NUMOF            (1)
+#if DOXYGEN
+#define GNRC_NETIF_SINGLE
 #endif
 
 /**

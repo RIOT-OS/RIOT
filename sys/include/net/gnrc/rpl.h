@@ -32,11 +32,12 @@
  * Auto-Initialization
  * -------------------
  *
- * If the application defines only one interface (`GNRC_NETIF_NUMOF == 1`),
- * then RPL will be initialized on this interface.
+ * If the application defines only one interface (@ref gnrc_netif_highlander()
+ * returns true), then RPL will be initialized on this interface.
  *
- * If the application defines several interfaces (`GNRC_NETIF_NUMOF > 1`),
- * then RPL will be initialized on the interface `GNRC_RPL_DEFAULT_NETIF`.
+ * If the application defines several interfaces (@ref gnrc_netif_highlander()
+ * returns false), then RPL will be initialized on the interface
+ * `GNRC_RPL_DEFAULT_NETIF`.
  * Your application is responsible for setting `GNRC_RPL_DEFAULT_NETIF` to a
  * valid interface PID, e.g. via `CFLAGS`.
  *
@@ -69,7 +70,7 @@
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - Set interface for auto-initialization if more than one
- *   interface exists (`GNRC_NETIF_NUMOF > 1`)
+ *   interface exists (@ref gnrc_netif_highlander() returns false)
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  *   CFLAGS += -DGNRC_RPL_DEFAULT_NETIF=6
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

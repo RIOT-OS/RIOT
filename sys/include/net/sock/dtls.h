@@ -314,7 +314,7 @@
  *
  *     sock_udp_ep_t remote;
  *     remote.port = DTLS_DEFAULT_PORT;
- *     remote.netif = gnrc_netif_iter(NULL)->pid;   // only if GNRC_NETIF_NUMOF == 1
+ *     remote.netif = gnrc_netif_iter(NULL)->pid;   // only if gnrc_netif_highlander() returns true
  *
  *     sock_dtls_t dtls_sock;
  *     sock_dtls_session_t session;
@@ -380,7 +380,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * sock_udp_ep_t remote;
  * remote.port = DTLS_DEFAULT_PORT;
- * remote.netif = gnrc_netif_iter(NULL)->pid;   // only if GNRC_NETIF_NUMOF == 1
+ * remote.netif = gnrc_netif_iter(NULL)->pid;   // only if gnrc_netif_highlander() returns true
  *
  * if (!ipv6_addr_from_str((ipv6_addr_t *)remote.addr.ipv6, SERVER_ADDR)) {
  *     puts("Error parsing destination address");

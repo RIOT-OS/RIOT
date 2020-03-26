@@ -518,6 +518,7 @@ static int _on_gap_slave_evt(struct ble_gap_event *event, void *arg)
     return 0;
 }
 
+static gnrc_netif_t _netif;
 void nimble_netif_init(void)
 {
     int res;
@@ -537,7 +538,7 @@ void nimble_netif_init(void)
     assert(res == 0);
     (void)res;
 
-    gnrc_netif_create(_stack, sizeof(_stack), GNRC_NETIF_PRIO,
+    gnrc_netif_create(&_netif, _stack, sizeof(_stack), GNRC_NETIF_PRIO,
                       "nimble_netif", &_nimble_netdev_dummy, &_nimble_netif_ops);
 }
 
