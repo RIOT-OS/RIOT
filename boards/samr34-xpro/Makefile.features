@@ -10,3 +10,5 @@ FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
+
+include $(RIOTBOARD)/common/sam0/Makefile.features

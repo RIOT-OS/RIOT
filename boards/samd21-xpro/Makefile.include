@@ -1,1 +1,1 @@
-include $(RIOTMAKE)/boards/sam0.inc.mk
+include $(RIOTBOARD)/common/sam0/Makefile.include
