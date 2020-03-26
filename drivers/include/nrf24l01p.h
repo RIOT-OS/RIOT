@@ -60,7 +60,8 @@ typedef struct __attribute__((packed)) {
      */
     uint8_t :                   5;
     /**
-     * @brief   Currently configured protocol (Do not change after initialization)
+     * @brief   Currently configured protocol
+     *          (Do not change after initialization)
      *          @see nrf24l01p_protocol_t
      */
     uint8_t cfg_protocol :       1;
@@ -84,7 +85,8 @@ typedef struct __attribute__((packed)) {
      */
     uint8_t cfg_channel :        4;
     /**
-     * @brief   Current address width configuration value (Do not change after initialization
+     * @brief   Current address width configuration value
+     *          (Do not change after initialization
      *          @see nrf24l01p_aw_t
      */
     uint8_t cfg_addr_width :     2;
@@ -276,7 +278,8 @@ int nrf24l01p_set_tx_power(nrf24l01p_t *dev, nrf24l01p_tx_power_t power);
  *
  * @return                  Tx power in [dbm]
  */
-int8_t nrf24l01p_get_tx_power(const nrf24l01p_t *dev, nrf24l01p_tx_power_t *power);
+int8_t nrf24l01p_get_tx_power(const nrf24l01p_t *dev,
+                              nrf24l01p_tx_power_t *power);
 
 /**
  * @brief   Set transceiver channel
@@ -363,7 +366,8 @@ int nrf24l01p_get_rx_address(const nrf24l01p_t *dev, uint8_t *addr,
  * @retval 0                Success
  * @retval -ENOTSUP         Protocol is SB
  * @retval -EINVAL          Unsupported number of retransmissions
- * @retval -EAGAIN          State does not permit changing the maximum number of retransmissions
+ * @retval -EAGAIN          State does not permit changing the maximum number
+ *                          of retransmissions
  */
 int nrf24l01p_set_max_retransm(nrf24l01p_t *dev, uint8_t max_rt);
 
@@ -385,7 +389,8 @@ uint8_t nrf24l01p_get_max_retransm(const nrf24l01p_t *dev);
  * @return 0
  * @retval -ENOTSUP         Protocol is SB
  * @return -EINVAL          Bad retransmission delay value
- * @return -EAGAIN          Current state does not permit changing retransmission delay
+ * @return -EAGAIN          Current state does not permit changing the
+ *                          retransmission delay
  */
 int nrf24l01p_set_retransm_delay(nrf24l01p_t *dev, nrf24l01p_ard_t rt_delay);
 
@@ -410,7 +415,7 @@ uint16_t nrf24l01p_get_retransm_delay(const nrf24l01p_t *dev,
  * @param[in] state         State
  *
  * @return                  Old state
- * @retval -EAGAIN          Device is currently not permitted to change it´s state
+ * @retval -EAGAIN          Device is currently not permitted to change state
  * @retval -ENOTSUP         Device is not permitted to change state to @p state
  */
 int nrf24l01p_set_state(nrf24l01p_t *dev, nrf24l01p_state_t state);

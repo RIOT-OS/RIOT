@@ -228,7 +228,6 @@ extern "C" {
 #define NRF24L01P_PARAM_PLW_PADD_P5         (0)
 #endif
 
-
 #ifndef NRF24L01P_PARAMS
 /**
  * @brief Default NRF24L01P device parameters

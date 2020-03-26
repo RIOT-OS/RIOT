@@ -31,7 +31,8 @@ void nrf24l01p_diagnostics_print_all_regs(const nrf24l01p_t *dev)
     nrf24l01p_read_reg(dev, NRF24L01P_REG_CONFIG, &config, 1);
     puts("");
     printf(
-        "CONFIG         [MASK_RX_DR %u MASK_TX_DS %u MASK_MAX_RT %u EN_CRC %u CRCO %u PWR_UP %u PRIM_RX %u]\n",
+        "CONFIG         [MASK_RX_DR %u MASK_TX_DS %u MASK_MAX_RT %u EN_CRC %u "
+                        "CRCO %u PWR_UP %u PRIM_RX %u]\n",
         (unsigned)NRF24L01P_VAL_MASK_RX_DR(config),
         (unsigned)NRF24L01P_VAL_MASK_TX_DS(config),
         (unsigned)NRF24L01P_VAL_MAX_RT(config),
@@ -43,7 +44,8 @@ void nrf24l01p_diagnostics_print_all_regs(const nrf24l01p_t *dev)
     nrf24l01p_reg8_en_aa_t en_aa;
     nrf24l01p_read_reg(dev, NRF24L01P_REG_EN_AA, &en_aa, 1);
     printf(
-        "EN_AA          [ENAA_P5 %u ENAA_P4 %u ENAA_P3 %u ENAA_P2 %u ENAA_P1 %u ENAA_P0 %u]\n",
+        "EN_AA          [ENAA_P5 %u ENAA_P4 %u ENAA_P3 %u ENAA_P2 %u "
+                        "ENAA_P1 %u ENAA_P0 %u]\n",
         (unsigned)NRF24L01P_VAL_ENAA_P5(en_aa),
         (unsigned)NRF24L01P_VAL_ENAA_P4(en_aa),
         (unsigned)NRF24L01P_VAL_ENAA_P3(en_aa),
@@ -54,7 +56,8 @@ void nrf24l01p_diagnostics_print_all_regs(const nrf24l01p_t *dev)
     nrf24l01p_reg8_en_rxaddr_t en_rxaddr;
     nrf24l01p_read_reg(dev, NRF24L01P_REG_EN_RXADDR, &en_rxaddr, 1);
     printf(
-        "EN_RXADDR      [ERX_P5 %u ERX_P4 %u ERX_P3 %u ERX_P2 %u ERX_P1 %u ERX_P0 %u]\n",
+        "EN_RXADDR      [ERX_P5 %u ERX_P4 %u ERX_P3 %u ERX_P2 %u ERX_P1 %u "
+                        "ERX_P0 %u]\n",
         (unsigned)NRF24L01P_VAL_ERX_P5(en_rxaddr),
         (unsigned)NRF24L01P_VAL_ERX_P4(en_rxaddr),
         (unsigned)NRF24L01P_VAL_ERX_P3(en_rxaddr),
@@ -84,7 +87,8 @@ void nrf24l01p_diagnostics_print_all_regs(const nrf24l01p_t *dev)
     nrf24l01p_reg8_rf_setup_t rf_setup;
     nrf24l01p_read_reg(dev, NRF24L01P_REG_RF_SETUP, &rf_setup, 1);
     printf(
-        "RF_SETUP       [CONT_WAVE %u RF_DR_LOW %u PLL_LOCK %u RF_DR_HIGH %u RF_PWR %u]\n",
+        "RF_SETUP       [CONT_WAVE %u RF_DR_LOW %u PLL_LOCK %u RF_DR_HIGH %u "
+                        "RF_PWR %u]\n",
         (unsigned)NRF24L01P_VAL_CONT_WAVE(rf_setup),
         (unsigned)NRF24L01P_VAL_RF_DR_LOW(rf_setup),
         (unsigned)NRF24L01P_VAL_PLL_LOCK(rf_setup),
@@ -201,7 +205,8 @@ void nrf24l01p_diagnostics_print_all_regs(const nrf24l01p_t *dev)
     nrf24l01p_reg8_fifo_status_t fifo_status;
     nrf24l01p_read_reg(dev, NRF24L01P_REG_FIFO_STATUS, &fifo_status, 1);
     printf(
-        "FIFO_STATUS    [TX_REUSE %u TX_FULL %u TX_EMPTY %u RX_FULL %u RX_EMPTY %u]\n",
+        "FIFO_STATUS    [TX_REUSE %u TX_FULL %u TX_EMPTY %u RX_FULL %u "
+                        "RX_EMPTY %u]\n",
         (unsigned)NRF24L01P_VAL_TX_REUSE(fifo_status),
         (unsigned)NRF24L01P_VAL_TX_FULL_(fifo_status),
         (unsigned)NRF24L01P_VAL_TX_EMPTY(fifo_status),
@@ -211,7 +216,8 @@ void nrf24l01p_diagnostics_print_all_regs(const nrf24l01p_t *dev)
     nrf24l01p_reg8_dynpd_t dynpd;
     nrf24l01p_read_reg(dev, NRF24L01P_REG_DYNPD, &dynpd, 1);
     printf(
-        "DYNDP          [DPL_P5 %u DPL_P4 %u DPL_P3 %u DPL_P2 %u DPL_P1 %u DPL_P0 %u]\n",
+        "DYNDP          [DPL_P5 %u DPL_P4 %u DPL_P3 %u DPL_P2 %u DPL_P1 %u "
+                        "DPL_P0 %u]\n",
         (unsigned)NRF24L01P_VAL_DPL_P5(dynpd),
         (unsigned)NRF24L01P_VAL_DPL_P4(dynpd),
         (unsigned)NRF24L01P_VAL_DPL_P3(dynpd),
@@ -293,7 +299,8 @@ void nrf24l01p_diagnostics_print_dev_info(const nrf24l01p_t *dev)
 #endif
 }
 
-void nrf24l01p_diagnostics_print_frame(const nrf24l01p_t *dev, const void *frame, size_t len)
+void nrf24l01p_diagnostics_print_frame(const nrf24l01p_t *dev,
+                                       const void *frame, size_t len)
 {
     (void)dev;
     printf("Rx frame\n");

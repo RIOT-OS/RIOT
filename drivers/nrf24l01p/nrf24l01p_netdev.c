@@ -116,42 +116,53 @@ static int nrf24l01p_init(netdev_t *netdev)
     uint8_t pipes = 0;
     uint8_t ls_addr_byte = 1;
     uint8_t l2addr_addr_p0[] = NRF24L01P_L2ADDR_AUTO;
-    if (memcmp(dev->params.urxaddr.rxaddrpx.rx_pipe_0_addr, l2addr_addr_p0, l2addr_size) == 0) {
+    if (memcmp(dev->params.urxaddr.rxaddrpx.rx_pipe_0_addr,
+               l2addr_addr_p0, l2addr_size) == 0) {
         luid_base(dev->params.urxaddr.rxaddrpx.rx_pipe_0_addr, l2addr_size);
-        dev->params.urxaddr.rxaddrpx.rx_pipe_0_addr[l2addr_size - 1] = ls_addr_byte++;
+        dev->params.urxaddr.rxaddrpx.rx_pipe_0_addr[l2addr_size - 1]
+            = ls_addr_byte++;
     }
-    memcpy(l2addr_addr_p0, dev->params.urxaddr.rxaddrpx.rx_pipe_0_addr, l2addr_size);
-    nrf24l01p_write_reg(dev, NRF24L01P_REG_RX_ADDR_P0, l2addr_addr_p0, l2addr_size);
+    memcpy(l2addr_addr_p0, dev->params.urxaddr.rxaddrpx.rx_pipe_0_addr,
+           l2addr_size);
+    nrf24l01p_write_reg(dev, NRF24L01P_REG_RX_ADDR_P0, l2addr_addr_p0,
+                        l2addr_size);
     pipes |= (1 << NRF24L01P_P0);
     uint8_t l2addr_addr_p1[] = NRF24L01P_L2ADDR_AUTO;
-    if (memcmp(dev->params.urxaddr.rxaddrpx.rx_pipe_1_addr, l2addr_addr_p1, l2addr_size) == 0
-        || l2addr_addr_p0[l2addr_size - 1] == l2addr_addr_p1[l2addr_size - 1]) {
+    if ((memcmp(dev->params.urxaddr.rxaddrpx.rx_pipe_1_addr,
+                l2addr_addr_p1, l2addr_size) == 0) ||
+        (l2addr_addr_p0[l2addr_size - 1] == l2addr_addr_p1[l2addr_size - 1])) {
         luid_base(dev->params.urxaddr.rxaddrpx.rx_pipe_1_addr, l2addr_size);
-        dev->params.urxaddr.rxaddrpx.rx_pipe_1_addr[l2addr_size - 1] = ls_addr_byte++;
+        dev->params.urxaddr.rxaddrpx.rx_pipe_1_addr[l2addr_size - 1]
+            = ls_addr_byte++;
     }
-    memcpy(l2addr_addr_p1, dev->params.urxaddr.rxaddrpx.rx_pipe_1_addr, l2addr_size);
+    memcpy(l2addr_addr_p1, dev->params.urxaddr.rxaddrpx.rx_pipe_1_addr,
+           l2addr_size);
     nrf24l01p_write_reg(dev, NRF24L01P_REG_RX_ADDR_P1, l2addr_addr_p1,
                         l2addr_size);
     pipes |= (1 << NRF24L01P_P1);
-    if (dev->params.urxaddr.rxaddrpx.rx_pipe_2_addr != NRF24L01P_L2ADDR_UNDEF) {
+    if (dev->params.urxaddr.rxaddrpx.rx_pipe_2_addr
+        != NRF24L01P_L2ADDR_UNDEF) {
         dev->params.urxaddr.rxaddrpx.rx_pipe_2_addr = ls_addr_byte++;
         nrf24l01p_write_reg(dev, NRF24L01P_REG_RX_ADDR_P2,
                             &dev->params.urxaddr.rxaddrpx.rx_pipe_2_addr, 1);
         pipes |= (1 << NRF24L01P_P2);
     }
-    if (dev->params.urxaddr.rxaddrpx.rx_pipe_3_addr != NRF24L01P_L2ADDR_UNDEF) {
+    if (dev->params.urxaddr.rxaddrpx.rx_pipe_3_addr
+        != NRF24L01P_L2ADDR_UNDEF) {
         dev->params.urxaddr.rxaddrpx.rx_pipe_3_addr = ls_addr_byte++;
         nrf24l01p_write_reg(dev, NRF24L01P_REG_RX_ADDR_P3,
                             &dev->params.urxaddr.rxaddrpx.rx_pipe_3_addr, 1);
         pipes |= (1 << NRF24L01P_P3);
     }
-    if (dev->params.urxaddr.rxaddrpx.rx_pipe_4_addr != NRF24L01P_L2ADDR_UNDEF) {
+    if (dev->params.urxaddr.rxaddrpx.rx_pipe_4_addr
+        != NRF24L01P_L2ADDR_UNDEF) {
         dev->params.urxaddr.rxaddrpx.rx_pipe_4_addr = ls_addr_byte++;
         nrf24l01p_write_reg(dev, NRF24L01P_REG_RX_ADDR_P4,
                             &dev->params.urxaddr.rxaddrpx.rx_pipe_4_addr, 1);
         pipes |= (1 << NRF24L01P_P4);
     }
-    if (dev->params.urxaddr.rxaddrpx.rx_pipe_5_addr != NRF24L01P_L2ADDR_UNDEF) {
+    if (dev->params.urxaddr.rxaddrpx.rx_pipe_5_addr
+        != NRF24L01P_L2ADDR_UNDEF) {
         dev->params.urxaddr.rxaddrpx.rx_pipe_5_addr = ls_addr_byte++;
         nrf24l01p_write_reg(dev, NRF24L01P_REG_RX_ADDR_P5,
                             &dev->params.urxaddr.rxaddrpx.rx_pipe_5_addr, 1);
@@ -274,7 +285,8 @@ static int nrf24l01p_init(netdev_t *netdev)
  *                          (frame is dropped)
  * @retval -ENOBUFS         @p buf != NULL and @p len < actual frame width
  *                          (frame is dropped)
- * @retval -EINVAL          @p buf == NULL (and none of the above cases are true)
+ * @retval -EINVAL          @p buf == NULL
+ *                          (and none of the above cases are true)
  * @retval -ENOTSUP         Malformed header
  * @retval 0                No data to read from Rx FIFO
  */
@@ -331,7 +343,8 @@ static int nrf24l01p_recv(netdev_t *netdev, void *buf, size_t len, void *info)
     else {
         memcpy(dst_pipe_addr, dev->params.urxaddr.rxaddrpx.rx_pipe_1_addr, aw);
         if (pno > NRF24L01P_P1) {
-            dst_pipe_addr[aw - 1] = dev->params.urxaddr.arxaddr.rx_addr_short[pno - 2];
+            dst_pipe_addr[aw - 1]
+                = dev->params.urxaddr.arxaddr.rx_addr_short[pno - 2];
         }
     }
     uint8_t frame_len = 1U + sizeof(dst_pipe_addr) + pl_width;
@@ -361,7 +374,8 @@ static int nrf24l01p_recv(netdev_t *netdev, void *buf, size_t len, void *info)
     DEBUG("[nrf24l01p] Handle received frame\n");
     uint8_t *frame = (uint8_t *)buf;
     sb_hdr_init((shockburst_hdr_t *)frame);
-    sb_hdr_set_dst_addr_width((shockburst_hdr_t *)frame, sizeof(dst_pipe_addr));
+    sb_hdr_set_dst_addr_width((shockburst_hdr_t *)frame,
+                              sizeof(dst_pipe_addr));
 #if NRF24L01P_CUSTOM_HEADER
     uint8_t payload[NRF24L01P_MAX_PAYLOAD_WIDTH];
     nrf24l01p_read_rx_payload(dev, payload, pl_width);
@@ -490,7 +504,8 @@ static int nrf24l01p_send(netdev_t *netdev, const iolist_t *iolist)
         for (uint8_t i = 1; i <= pl_width; i++) {
             payload[sizeof(payload) - i] = payload[pl_width - i];
         }
-        memset(payload, NRF24L01P_CSTM_HDR_PADDING, (sizeof(payload) - pl_width));
+        memset(payload, NRF24L01P_CSTM_HDR_PADDING,
+               (sizeof(payload) - pl_width));
         pl_width = sizeof(payload);
     }
 #endif
@@ -660,7 +675,8 @@ static int nrf24l01p_get(netdev_t *netdev, netopt_t opt, void *val,
         } break;
         case NETOPT_ADDRESS: {
             assert(max_len >= NRF24L01P_MAX_ADDR_WIDTH);
-            uint8_t aw = nrf24l01p_etoval_aw(dev->params.config.cfg_addr_width);
+            uint8_t aw =
+                nrf24l01p_etoval_aw(dev->params.config.cfg_addr_width);
             memcpy(val, dev->params.urxaddr.rxaddrpx.rx_pipe_0_addr, aw);
             return aw;
         } break;
@@ -699,7 +715,8 @@ static int nrf24l01p_get(netdev_t *netdev, netopt_t opt, void *val,
         /* upper layer PDU? (needed by 6LoWPAN)*/
         case NETOPT_MAX_PDU_SIZE: {
             assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)val) = (uint16_t)nrf24l01p_get_mtu(dev, NRF24L01P_P0);
+            *((uint16_t *)val) = (uint16_t)nrf24l01p_get_mtu(dev,
+                                                             NRF24L01P_P0);
             return sizeof(uint16_t);
         } break;
         case NETOPT_PROTO: {
@@ -796,7 +813,8 @@ static int nrf24l01p_set(netdev_t *netdev, netopt_t opt, const void *val,
         case NETOPT_TX_POWER: {
             assert(len == sizeof(int16_t));
             int16_t dbm = *((int16_t *)val);
-            int ret = nrf24l01p_set_tx_power(dev, nrf24l01p_valtoe_tx_power(dbm));
+            int ret = nrf24l01p_set_tx_power(dev,
+                                             nrf24l01p_valtoe_tx_power(dbm));
             return ret ? ret : (int)sizeof(int16_t);
         } break;
         default:

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2019 Otto-von-Guericke-Universität Magdeburg
  *
@@ -11,8 +10,8 @@
  * @{
  *
  * @file
- * @brief     Implementation of gnrc_netif Rx/Tx adaptation functions for the NRF24L01P
- *            transceiver
+ * @brief     Implementation of gnrc_netif Rx/Tx adaptation functions for the
+ *            NRF24L01P transceiver
  *
  * @author Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
@@ -43,7 +42,7 @@ static gnrc_pktsnip_t *_nrf24l01p_pkt_recv(gnrc_netif_t *netif)
     /* copy the payload into the packet buffer */
     int frame_len = netif->dev->driver->recv(netif->dev, frame_buffer,
                                                  upper_frame_len, NULL);
-    if(frame_len <= 0) {
+    if (frame_len <= 0) {
         return NULL;
     }
 

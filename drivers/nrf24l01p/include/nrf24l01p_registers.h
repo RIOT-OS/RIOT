@@ -117,7 +117,6 @@ typedef uint8_t nrf24l01p_reg8_config_t;
 #define NRF24L01P_VAL_PRIM_RX(reg)         ((reg) & NRF24L01P_FLG_PRIM_RX)
 /** @} */
 
-
 /**
  * @name    NRF24L01P EN_AA register
  *
@@ -506,14 +505,14 @@ typedef uint8_t nrf24l01p_reg8_rf_setup_t;
  * @brief   FLG RF_DR
  */
 #define NRF24L01P_FLG_RF_DR(val)           (((val & 1) << 5) | \
-                                             ((val & 2) << 2))
+                                            ((val & 2) << 2))
 /**
  * @brief   Value of: RF_DR
  */
 #define NRF24L01P_VAL_RF_DR(reg)           ((((reg) & \
-                                               NRF24L01P_FLG_RF_DR_LOW) >> 5) | \
-                                             (((reg) & \
-                                               NRF24L01P_FLG_RF_DR_HIGH) >> 2))
+                                            NRF24L01P_FLG_RF_DR_LOW) >> 5) | \
+                                            (((reg) & \
+                                            NRF24L01P_FLG_RF_DR_HIGH) >> 2))
 /**
  * @brief   Flag: RF_PWR - -18 dbm
  */

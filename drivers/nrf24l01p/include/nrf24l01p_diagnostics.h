@@ -46,8 +46,8 @@ void nrf24l01p_diagnostics_print_dev_info(const nrf24l01p_t *dev);
  * @param[in] frame         Frame
  * @param[in] len           Frame length
  */
-void nrf24l01p_diagnostics_print_frame(const nrf24l01p_t *dev, const void *frame, size_t len);
-
+void nrf24l01p_diagnostics_print_frame(const nrf24l01p_t *dev,
+                                       const void *frame, size_t len);
 
 #ifdef __cplusplus
 }

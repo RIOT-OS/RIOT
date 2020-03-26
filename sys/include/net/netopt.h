@@ -494,10 +494,10 @@ typedef enum {
     NETOPT_CHANNEL_HOP_PERIOD,
 
     /**
-     * @brief   (@ref netopt_enable_t) single frame reception
-     *
-     * If enabled, RX is turned off upon reception of a frame
-     */
+      * @brief   (@ref netopt_enable_t) single frame reception
+      *
+      * If enabled, RX is turned off upon reception of a frame
+      */
     NETOPT_SINGLE_RECEIVE,
 
     /**
@@ -604,9 +604,9 @@ typedef enum {
     NETOPT_LORAWAN_APPSKEY,
 
      /**
-      * @brief   (uint8_t) LoRaWAN device class (A, B, C)
-      * - LoRaWAN: @ref loramac_class_t
-      */
+     * @brief   (uint8_t) LoRaWAN device class (A, B, C)
+     * - LoRaWAN: @ref loramac_class_t
+     */
     NETOPT_LORAWAN_DEVICE_CLASS,
 
     /**
