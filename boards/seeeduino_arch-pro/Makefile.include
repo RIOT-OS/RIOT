@@ -12,7 +12,7 @@ FLASHFILE ?= $(HEXFILE)
 include $(RIOTMAKE)/tools/openocd.inc.mk
 
 # generate image checksum from hex file
-export PRE_FLASH_CHECK_SCRIPT = lpc_checksum --format hex
+PRE_FLASH_CHECK_SCRIPT = lpc_checksum --format hex
 
 # remap flash to address 0x0, otherwise it verifies the rom bootloader
 OPENOCD_PRE_VERIFY_CMDS += '-c reset init'
