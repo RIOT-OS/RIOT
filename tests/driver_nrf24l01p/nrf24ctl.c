@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2019 Otto-von-Guericke Universität Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     tests
+ * @{
+ *
+ * @file
+ * @brief       Tool to configure NRF24L01+ transceiver
+ *
+ * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
+ *
+ * @}
+ */
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -20,14 +39,20 @@ extern nrf24l01p_t _nrf24l01p_devs[NRF24L01P_NUM];
 static void print_help(void)
 {
     puts(
-        "Usage:\n\
-    nrf24ctl <device index> --set <ack_payload | address | mtu> <value> <pipe index>\n\
-    nrf24ctl <device index> --set <channel | crc | data_rate | power | retr_delay | state |  max_retr> <value>\n\
-    nrf24ctl <device index> --get <address | mtu> <pipe index>\n\
-    nrf24ctl <device index> --get <channel | crc | data_rate | power | retr_delay | stata | max_retr>\n\
-    nrf24ctl <device index> --regs\n\
-    nrf24ctl <device index> --info\n\
-    ");
+    "Usage:\n"
+    "nrf24ctl <device index> "
+    "--set <ack_payload | address | mtu> <value> <pipe index>\n"
+    "nrf24ctl <device index> "
+    "--set <channel | crc | data_rate | power | retr_delay | state |"
+           " max_retr> <value>\n"
+    "nrf24ctl <device index> "
+    "--get <address | mtu> <pipe index>\n"
+    "nrf24ctl <device index> "
+    "--get <channel | crc | data_rate | power | retr_delay | stata |"
+           " max_retr>\n"
+    "nrf24ctl <device index> --regs\n"
+    "nrf24ctl <device index> --info\n"
+    );
 }
 
 int sc_nrf24ctl(int argc, char *argv[])
@@ -120,8 +145,8 @@ int sc_nrf24ctl(int argc, char *argv[])
                 }
                 else if (!(strcmp(argv[3], "data_rate"))) {
                     int dr = atoi(argv[4]);
-                    ret = nrf24l01p_set_air_data_rate(dev, nrf24l01p_valtoe_rfdr(
-                                                          dr));
+                    ret = nrf24l01p_set_air_data_rate(dev,
+                        nrf24l01p_valtoe_rfdr(dr));
                     if (ret < 0) {
                         printf("[nrf24ctl] Could not set air data rate (%d)\n",
                                ret);
@@ -130,8 +155,8 @@ int sc_nrf24ctl(int argc, char *argv[])
                 }
                 else if (!(strcmp(argv[3], "power"))) {
                     int pwr = atoi(argv[4]);
-                    ret = nrf24l01p_set_tx_power(dev, nrf24l01p_valtoe_tx_power(
-                                                     pwr));
+                    ret = nrf24l01p_set_tx_power(dev,
+                        nrf24l01p_valtoe_tx_power(pwr));
                     if (ret < 0) {
                         printf("[nrf24ctl] Could not set Tx power (%d)\n",
                                ret);
@@ -140,10 +165,11 @@ int sc_nrf24ctl(int argc, char *argv[])
                 }
                 else if (!(strcmp(argv[3], "retr_delay"))) {
                     int del = atoi(argv[4]);
-                    ret = nrf24l01p_set_retransm_delay(dev, nrf24l01p_valtoe_ard(
-                                                           del));
+                    ret = nrf24l01p_set_retransm_delay(dev,
+                        nrf24l01p_valtoe_ard(del));
                     if (ret < 0) {
-                        printf("[nrf24ctl] Could not set retransmission delay (%d)\n",
+                        printf("[nrf24ctl] "
+                               "Could not set retransmission delay (%d)\n",
                                ret);
                         goto PRINT_HELP_EXIT;
                     }
@@ -152,7 +178,8 @@ int sc_nrf24ctl(int argc, char *argv[])
                     nrf24l01p_state_t s = nrf24l01p_string_to_state(argv[4]);
                     ret = nrf24l01p_set_state(dev, s);
                     if (ret < 0) {
-                        printf("[nrf24l01p] Could not change device state (%d)",
+                        printf("[nrf24l01p] "
+                               "Could not change device state (%d)",
                                ret);
                         goto PRINT_HELP_EXIT;
                     }
@@ -161,7 +188,8 @@ int sc_nrf24ctl(int argc, char *argv[])
                     int retr = atoi(argv[4]);
                     ret = nrf24l01p_set_max_retransm(dev, retr);
                     if (ret < 0) {
-                        printf("[nrf24ctl] Could not set max. retransmissions (%d)\n",
+                        printf("[nrf24ctl] "
+                               "Could not set max. retransmissions (%d)\n",
                                ret);
                         goto PRINT_HELP_EXIT;
                     }
@@ -220,8 +248,10 @@ int sc_nrf24ctl(int argc, char *argv[])
                            dev_index,  crc_len);
                 }
                 else if (!(strcmp(argv[3], "data_rate"))) {
-                    uint16_t data_rate = nrf24l01p_get_air_data_rate(dev, NULL);
-                    printf("nrf24l01p device %d - Air data rate: %u [kbit/s]\n",
+                    uint16_t data_rate
+                        = nrf24l01p_get_air_data_rate(dev, NULL);
+                    printf("nrf24l01p device %d "
+                           "- Air data rate: %u [kbit/s]\n",
                            dev_index, data_rate);
                 }
                 else if (!(strcmp(argv[3], "power"))) {
@@ -232,7 +262,8 @@ int sc_nrf24ctl(int argc, char *argv[])
                 else if (!(strcmp(argv[3], "retr_delay"))) {
                     uint16_t delay = nrf24l01p_get_retransm_delay(dev, NULL);
                     printf(
-                        "nrf24l01p device %d - Retransmission delay: %u [us]\n",
+                        "nrf24l01p device %d "
+                        "- Retransmission delay: %u [us]\n",
                         dev_index, delay);
                 }
                 else if (!(strcmp(argv[3], "state"))) {
@@ -262,7 +293,8 @@ int sc_nrf24ctl(int argc, char *argv[])
                 nrf24l01p_print_all_regs(dev);
             }
             /* nrf24ctl <dev_index> --info */
-            else if ((!strcmp(argv[2], "-i")) || (!strcmp(argv[2], "--info"))) {
+            else if ((!strcmp(argv[2], "-i")) ||
+                     (!strcmp(argv[2], "--info"))) {
                 nrf24l01p_print_dev_info(dev);
             }
             else {
