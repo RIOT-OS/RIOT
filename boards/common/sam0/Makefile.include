@@ -1,0 +1,3 @@
+OPENOCD_CONFIG ?= $(RIOTBOARD)/common/sam0/dist/openocd.cfg
+
+include $(RIOTMAKE)/boards/sam0.inc.mk
