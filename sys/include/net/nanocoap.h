@@ -1470,6 +1470,48 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len);
 void coap_pkt_init(coap_pkt_t *pkt, uint8_t *buf, size_t len, size_t header_len);
 
 /**
+ * @brief   Advance the payload pointer.
+ *
+ * @pre     You added @p len bytes of data to `pkt->payload`.
+ *
+ * You can add payload to a CoAP request by writing data directly to
+ * `pkt->payload`.
+ * This convenience function takes care of advancing the payload pointer
+ * afterwards.
+ *
+ * @param[out]   pkt        pkt to which payload was added
+ * @param[in]    len        length of payload
+ */
+static inline void coap_payload_advance_bytes(coap_pkt_t *pkt, size_t len)
+{
+    pkt->payload += len;
+    pkt->payload_len -= len;
+}
+
+/**
+ * @brief   Add payload data to the CoAP request.
+ *
+ * @pre     @ref coap_opt_finish must have been called before with
+ *               the @ref COAP_OPT_FINISH_PAYLOAD option.
+ *
+ * The function copies @p data into the payload buffer of @p pkt and
+ * advances the payload pointer.
+ *
+ * This is just a convenience function, you can also directly write
+ * to `pkt->payload` if you have a function that outputs payload to
+ * a buffer.
+ * In this case you should instead call @ref coap_payload_advance_bytes.
+ *
+ * @param[out]   pkt        pkt to add payload to
+ * @param[in]    data       payload data
+ * @param[in]    len        length of payload
+ *
+ * @returns      number of payload bytes added on success
+ * @returns      < 0 on error
+ */
+ssize_t coap_payload_put_bytes(coap_pkt_t *pkt, const void *data, size_t len);
+
+/**
  * @brief   Create CoAP reply (convenience function)
  *
  * This is a simple wrapper that allows for building CoAP replies for simple
