@@ -27,6 +27,9 @@
 
 #include "kernel_defines.h"
 #include "irq.h"
+#ifdef MODULE_PM_LAYERED
+#include "pm_layered.h"
+#endif
 #include "ztimer.h"
 
 #define ENABLE_DEBUG (0)
@@ -105,6 +108,13 @@ static void _add_entry_to_list(ztimer_clock_t *clock, ztimer_base_t *entry)
     uint32_t delta_sum = 0;
 
     ztimer_base_t *list = &clock->list;
+
+#ifdef MODULE_PM_LAYERED
+    /* First timer on the clock's linked list */
+    if (list->next == NULL && clock->required_pm_mode != ZTIMER_CLOCK_NO_REQUIRED_PM_MODE) {
+        pm_block(clock->required_pm_mode);
+    }
+#endif
 
     /* Jump past all entries which are set to an earlier target than the new entry */
     while (list->next) {
@@ -223,6 +233,13 @@ static void _del_entry_from_list(ztimer_clock_t *clock, ztimer_base_t *entry)
         }
         list = list->next;
     }
+
+#ifdef MODULE_PM_LAYERED
+    /* The last timer just got removed from the clock's linked list */
+    if (clock->list.next == NULL && clock->required_pm_mode != ZTIMER_CLOCK_NO_REQUIRED_PM_MODE) {
+        pm_unblock(clock->required_pm_mode);
+    }
+#endif
 }
 
 static ztimer_t *_now_next(ztimer_clock_t *clock)
@@ -232,7 +249,13 @@ static ztimer_t *_now_next(ztimer_clock_t *clock)
     if (entry && (entry->offset == 0)) {
         clock->list.next = entry->next;
         if (!entry->next) {
+            /* The last timer just got removed from the clock's linked list */
             clock->last = NULL;
+#ifdef MODULE_PM_LAYERED
+            if (clock->required_pm_mode != ZTIMER_CLOCK_NO_REQUIRED_PM_MODE) {
+                pm_unblock(clock->required_pm_mode);
+            }
+#endif
         }
         return (ztimer_t*)entry;
     }

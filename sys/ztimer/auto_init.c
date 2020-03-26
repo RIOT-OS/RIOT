@@ -86,6 +86,14 @@
 #define CONFIG_ZTIMER_USEC_WIDTH (32)
 #endif
 
+#ifndef CONFIG_ZTIMER_USEC_REQUIRED_PM_MODE
+#define CONFIG_ZTIMER_USEC_REQUIRED_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
+#endif
+
+#ifndef CONFIG_ZTIMER_MSEC_REQUIRED_PM_MODE
+#define CONFIG_ZTIMER_MSEC_REQUIRED_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
+#endif
+
 #if MODULE_ZTIMER_USEC
 #  if CONFIG_ZTIMER_USEC_TYPE_PERIPH_TIMER
 static ztimer_periph_timer_t _ztimer_periph_timer_usec = { .min = CONFIG_ZTIMER_USEC_MIN };
@@ -160,6 +168,11 @@ void ztimer_init(void)
             CONFIG_ZTIMER_USEC_ADJUST);
     ZTIMER_USEC->adjust = CONFIG_ZTIMER_USEC_ADJUST;
 #  endif
+#  ifdef MODULE_PM_LAYERED
+    LOG_DEBUG("ztimer_init(): ZTIMER_USEC setting required_pm_mode to %i\n",
+            CONFIG_ZTIMER_USEC_REQUIRED_PM_MODE);
+    ZTIMER_USEC->required_pm_mode = CONFIG_ZTIMER_USEC_REQUIRED_PM_MODE;
+#  endif
 #endif
 
 #ifdef ZTIMER_RTT_INIT
@@ -179,6 +192,11 @@ void ztimer_init(void)
     LOG_DEBUG("ztimer_init(): ZTIMER_MSEC setting adjust value to %i\n",
             CONFIG_ZTIMER_MSEC_ADJUST);
     ZTIMER_MSEC->adjust = CONFIG_ZTIMER_MSEC_ADJUST;
+#  endif
+#  ifdef MODULE_PM_LAYERED
+    LOG_DEBUG("ztimer_init(): ZTIMER_MSEC setting required_pm_mode to %i\n",
+            CONFIG_ZTIMER_MSEC_REQUIRED_PM_MODE);
+    ZTIMER_MSEC->required_pm_mode = CONFIG_ZTIMER_MSEC_REQUIRED_PM_MODE;
 #  endif
 #endif
 }
