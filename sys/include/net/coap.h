@@ -47,6 +47,22 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Generate a custom CoAP option number
+ *
+ * @param[in]  num      Custom number, will be the base for the CoAP option number.
+ * @param[in]  crit     Set to 1 if the option is critical, that is the option is
+ *                      mandatory.
+ * @param[in]  safe     Set to 1 if the option is safe to forward.
+ * @param[in]  cKey     If the option is safe to forward, set to 1 if the Option is
+ *                      a cache key.
+ */
+#define COAP_OPT_CUSTOM(num, crit, safe, cKey) ( \
+                        ((crit) ? (1) : (0))   | \
+                        ((safe) ? (0) : (2))   | \
+                        ((cKey) ? (0) : (0x1c))| \
+                        ((num) << 11)          )
+
+/**
  * @name    Message types -- confirmable, non-confirmable, etc.
  * @{
  */
