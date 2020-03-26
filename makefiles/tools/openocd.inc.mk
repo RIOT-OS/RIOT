@@ -24,3 +24,8 @@ $(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_ADAPTER_INIT)
 
 # Export OPENOCD_RESET_USE_CONNECT_ASSERT_SRST to required targets
 $(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_RESET_USE_CONNECT_ASSERT_SRST)
+
+ifneq (,$(OPENOCD_PRE_VERIFY_CMDS))
+  # Export OPENOCD_PRE_VERIFY_CMDS only to the flash/flash-only target
+  $(call target-export-variables,flash%,OPENOCD_PRE_VERIFY_CMDS)
+endif
