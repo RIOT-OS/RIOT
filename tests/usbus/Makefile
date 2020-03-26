@@ -3,6 +3,8 @@ USEMODULE += embunit
 USEMODULE += usbus
 FEATURES_PROVIDED += periph_usbdev
 
+DISABLE_MODULE += auto_init_usbus
+
 # USB device vendor and product ID
 DEFAULT_VID = 1209
 DEFAULT_PID = 7D00
