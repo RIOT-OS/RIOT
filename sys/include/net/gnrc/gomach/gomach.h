@@ -354,7 +354,7 @@ extern "C" {
 /**
  * @brief   Creates an IEEE 802.15.4 GoMacH network interface
  *
- * @param[in] netif     The interface. May not be `NULL`.
+ * @param[out] netif    The interface. May not be `NULL`.
  * @param[in] stack     The stack for the GoMacH network interface's thread.
  * @param[in] stacksize Size of @p stack.
  * @param[in] priority  Priority for the GoMacH network interface's thread.

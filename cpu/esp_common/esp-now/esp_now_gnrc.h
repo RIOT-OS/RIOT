@@ -27,7 +27,7 @@ extern "C" {
 /**
  * @brief   Creates the ESP-NOW network interface
  * @see     gnrc_netif_create
- * @param   [in]    netif       The interface. May not be `NULL`.
+ * @param   [out]   netif       The interface. May not be `NULL`.
  * @param   [in]    stack       The stack for the network interface's thread.
  * @param   [in]    stacksize   Size of stack.
  * @param   [in]    priority    Priority for the network interface's thread.
