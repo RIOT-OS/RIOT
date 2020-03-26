@@ -30,7 +30,13 @@
  * so the feature can only be enabled by the board configuration.
  */
 #ifndef USE_VREG_BUCK
-#define USE_VREG_BUCK (0)
+#define USE_VREG_BUCK   (0)
+#endif
+
+#if (CLOCK_CORECLOCK == 48000000U) || defined (MODULE_PERIPH_USBDEV)
+#define USE_DFLL        (1)
+#else
+#define USE_DFLL        (0)
 #endif
 
 static void _gclk_setup(int gclk, uint32_t reg)
@@ -96,7 +102,10 @@ uint32_t sam0_gclk_freq(uint8_t id)
 
 static void _dfll_setup(void)
 {
-#if (CLOCK_CORECLOCK == 48000000U) || defined (MODULE_PERIPH_USBDEV)
+    if (!USE_DFLL) {
+        return;
+    }
+
     GCLK->PCHCTRL[OSCCTRL_GCLK_ID_DFLL48].reg = GCLK_PCHCTRL_CHEN |
                                                 GCLK_PCHCTRL_GEN_GCLK2;
 
@@ -134,7 +143,20 @@ static void _dfll_setup(void)
     MCLK->APBBMASK.reg |= MCLK_APBBMASK_NVMCTRL;
     /* Set Wait State to meet requirements */
     NVMCTRL->CTRLB.reg |= NVMCTRL_CTRLB_RWS(3);
-#endif
+}
+
+static void _set_active_mode_vreg(void)
+{
+    if (!USE_VREG_BUCK) {
+        return;
+    }
+
+    /* not compatible with 48 MHz DFLL & 96 MHz FDPLL */
+    if (USE_DFLL) {
+        sam0_set_voltage_regulator(SAM0_VREG_LDO);
+    } else {
+        sam0_set_voltage_regulator(SAM0_VREG_BUCK);
+    }
 }
 
 void cpu_pm_cb_enter(int deep)
@@ -153,6 +175,9 @@ void cpu_pm_cb_enter(int deep)
                        VCORERDY status is stuck at 0. */
     if (USE_VREG_BUCK && !PM->PLCFG.bit.PLSEL) {
         sam0_set_voltage_regulator(SAM0_VREG_LDO);
+    } else if (USE_VREG_BUCK && USE_DFLL) {
+        /* we can still use the buck converter in (deep) sleep */
+        sam0_set_voltage_regulator(SAM0_VREG_BUCK);
     }
 }
 
@@ -162,10 +187,7 @@ void cpu_pm_cb_leave(int deep)
         return;
     }
 
-    /* select buck voltage regulator */
-    if (USE_VREG_BUCK) {
-        sam0_set_voltage_regulator(SAM0_VREG_BUCK);
-    }
+    _set_active_mode_vreg();
 }
 
 /**
@@ -187,10 +209,8 @@ void cpu_init(void)
     /* initialize the Cortex-M core */
     cortexm_init();
 
-    /* not compatible with 48 MHz DFLL & 96 MHz FDPLL */
-    if (USE_VREG_BUCK) {
-        sam0_set_voltage_regulator(SAM0_VREG_BUCK);
-    }
+    /* select the right voltage regulator config for active mode */
+    _set_active_mode_vreg();
 
     /* turn on only needed APB peripherals */
     MCLK->APBAMASK.reg =
