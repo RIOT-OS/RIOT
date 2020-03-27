@@ -12,3 +12,9 @@ USEMODULE += newlib_nano
 
 # Export the peripheral drivers to be linked into the final binary:
 USEMODULE += periph
+
+# Use Hardware FPU by default if present
+FEATURES_OPTIONAL += cortexm_fpu
+ifneq (,$(filter cortexm_fpu,$(FEATURES_USED)))
+  DEFAULT_MODULE += cortexm_fpu
+endif
