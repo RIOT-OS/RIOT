@@ -199,7 +199,7 @@ ssize_t nanocoap_get(sock_udp_ep_t *remote, const char *path, uint8_t *buf,
  * @returns     <0 on error
  */
 int nanocoap_get_blockwise(sock_udp_ep_t *remote, const char *path,
-                           uint8_t *buf, size_t len, coap_blockwise_t size,
+                           uint8_t *buf, size_t len, coap_blocksize_t size,
                            coap_blockwise_cb_t callback, void *arg);
 
 /**

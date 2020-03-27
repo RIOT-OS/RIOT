@@ -127,22 +127,22 @@ static ssize_t _nanocoap_req_raw(coap_pkt_t *pkt, sock_udp_t *sock, size_t len)
     return res;
 }
 
-uint8_t *_fmt_hdr(uint8_t *buf, coap_pkt_t *pkt, const char *path)
+uint8_t *_fmt_hdr(uint8_t *buf, coap_pkt_t *pkt, uint16_t id, const char *path)
 {
     uint8_t *pktpos = buf;
     pkt->hdr = (coap_hdr_t*)buf;
     pktpos += coap_build_hdr(pkt->hdr, COAP_TYPE_CON, NULL, 0,
-                             COAP_METHOD_GET, 1);
+                             COAP_METHOD_GET, id);
     pktpos += coap_opt_put_uri_path(pktpos, 0, path);
     pkt->payload = pktpos;
     pkt->payload_len = 0;
     return pktpos;
 }
 
-static int _fetch_block(coap_pkt_t *pkt, uint8_t *buf, sock_udp_t *sock,
-                        const char *path, coap_block1_t *block, size_t len)
+static int _fetch_block(coap_pkt_t *pkt, sock_udp_t *sock,
+                        coap_block1_t *block, size_t len)
 {
-    uint8_t *pktpos = _fmt_hdr(buf, pkt, path);
+    uint8_t *pktpos = pkt->payload;
     pktpos += coap_opt_put_block2_control(pktpos, COAP_OPT_URI_PATH, block);
     pkt->payload = pktpos;
     pkt->payload_len = 0;
@@ -167,7 +167,7 @@ ssize_t nanocoap_get(sock_udp_ep_t *remote, const char *path,
     ssize_t res;
     coap_pkt_t pkt;
 
-    _fmt_hdr(buf, &pkt, path);
+    _fmt_hdr(buf, &pkt, 0x01, path);
 
     res = nanocoap_request(&pkt, NULL, remote, len);
     if (res < 0) {
@@ -206,11 +206,12 @@ int nanocoap_get_blockwise(sock_udp_ep_t *remote, const char *path,
     }
 
     int more = 1;
-    size_t num = 0;
     res = -1;
+    uint16_t id = 1;
     while (more == 1) {
-        DEBUG("fetching block %u\n", (unsigned)num);
-        res = _fetch_block(&pkt, buf, &sock, path, &block, len);
+        DEBUG("fetching block %u\n", (unsigned)block.blknum);
+        _fmt_hdr(buf, &pkt, id++, path);
+        res = _fetch_block(&pkt, &sock, &block, len);
         DEBUG("res=%i\n", res);
 
         if (!res) {
