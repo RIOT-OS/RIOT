@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 OTA keys S.A.
+ * Copyright (C) 2020 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -141,6 +141,11 @@ extern "C" {
 #define LSM6DSL_CTRL_FS_MASK                (0x0C)
 
 #define LSM6DSL_CTRL3_C_BOOT                (0x80)
+
+#define LSM6DSL_CTRL6_C_USR_OFF_W_MASK      (0x08)
+#define LSM6DSL_CTRL6_C_USR_OFF_W_SHIFT     (3)
+
+#define LSM6DSL_CTRL8_XL_LP_ON_D6_MASK      (0x01)
 /** @} */
 
 /**
@@ -154,14 +159,137 @@ extern "C" {
 /** @} */
 
 /**
- * @brief	Offset for temperature calculation
+ * @brief   Offset for temperature calculation
  */
 #define LSM6DSL_TEMP_OFFSET                 (0x1900)
 
 /**
- * @brief 	Reboot wait interval in us (15ms)
+ * @brief   Reboot wait interval in us (15ms)
  */
 #define LSM6DSL_BOOT_WAIT                   (15 * US_PER_MS)
+
+/**
+ * @brief TAP_CFG register
+ * @{
+ */
+#define LSM6DSL_TAP_CFG_INT_ENABLE_MASK     (0x80)
+#define LSM6DSL_TAP_CFG_SLOPE_FDS_SHIFT     (4)
+#define LSM6DSL_TAP_CFG_SLOPE_FDS_MASK      (0x10)
+#define LSM6DSL_TAP_CFG_LIR_MASK            (0x01)
+/** @} */
+
+/**
+ * @brief TAP_THS_6D register
+ * @{
+ */
+#define LSM6DSL_TAP_THS_6D_D4D_EN_MASK      (0x80)
+#define LSM6DSL_TAP_THS_6D_D4D_EN_SHIFT     (7)
+#define LSM6DSL_TAP_THS_6D_SIXD_THS_MASK    (0x60)
+#define LSM6DSL_TAP_THS_6D_SIXD_THS_SHIFT   (5)
+#define LSM6DSL_TAP_THS_6D_TAP_THS_MASK     (0x1F)
+/** @} */
+
+/**
+ * @brief WAKE_UP_DUR register
+ * @{
+ */
+#define LSM6DSL_WAKE_UP_DUR_FF_DUR5_MASK    (0x80)
+#define LSM6DSL_WAKE_UP_DUR_FF_DUR5_SHIFT   (7)
+#define LSM6DSL_WAKE_UP_DUR_WAKE_DUR_MASK   (0x60)
+#define LSM6DSL_WAKE_UP_DUR_WAKE_DUR_SHIFT  (5)
+#define LSM6DSL_WAKE_UP_DUR_TIMER_HR_MASK   (0x10)
+#define LSM6DSL_WAKE_UP_DUR_SLEEP_DUR_MASK  (0x0F)
+/** @} */
+
+/**
+ * @brief FREE_FALL register
+ * @{
+ */
+#define LSM6DSL_FREE_FALL_FF_DUR_MASK       (0xF8)
+#define LSM6DSL_FREE_FALL_FF_DUR_SHIFT      (3)
+#define LSM6DSL_FREE_FALL_FF_THS_MASK       (0x07)
+/** @} */
+
+/**
+ * @brief INT_DUR2 register
+ * @{
+ */
+#define LSM6DSL_INT_DUR2_DUR_MASK           (0xF0)
+#define LSM6DSL_INT_DUR2_DUR_SHIFT          (0x4)
+#define LSM6DSL_INT_DUR2_QUIET_MASK         (0x0C)
+#define LSM6DSL_INT_DUR2_QUIET_SHIFT        (0x2)
+#define LSM6DSL_INT_DUR2_SHOCK_MASK         (0x03)
+/** @} */
+
+/**
+ * @brief WAKE_UP_THS register
+ * @{
+ */
+#define LSM6DSL_WAKE_UP_THS_SD_TAP_MASK     (0x80)
+#define LSM6DSL_WAKE_UP_THS_SD_TAP_SHIFT    (0x7)
+#define LSM6DSL_WAKE_UP_THS_WK_TH_MASK      (0x3F)
+/** @} */
+
+/**
+ * @brief WAKE_UP_SRC register
+ * @{
+ */
+#define LSM6DSL_WAKE_UP_SRC_FF_IA_MASK      (0x20)
+#define LSM6DSL_WAKE_UP_SRC_FF_IA_SHIFT     (5)
+#define LSM6DSL_WAKE_UP_SRC_SLEEP_MASK      (0x10)
+#define LSM6DSL_WAKE_UP_SRC_SLEEP_SHIFT     (4)
+#define LSM6DSL_WAKE_UP_SRC_WU_IA_MASK      (0x08)
+#define LSM6DSL_WAKE_UP_SRC_WU_IA_SHIFT     (3)
+#define LSM6DSL_WAKE_UP_SRC_X_WU_MASK       (0x04)
+#define LSM6DSL_WAKE_UP_SRC_X_WU_SHIFT      (2)
+#define LSM6DSL_WAKE_UP_SRC_Y_WU_MASK       (0x02)
+#define LSM6DSL_WAKE_UP_SRC_Y_WU_SHIFT      (1)
+#define LSM6DSL_WAKE_UP_SRC_Z_WU_MASK       (0x01)
+/** @} */
+
+/**
+ * @brief TAP_SRC register
+ * @{
+ */
+#define LSM6DSL_TAP_SRC_TAP_IA_SHIFT        (6)
+#define LSM6DSL_TAP_SRC_TAP_IA_MASK         (0x40)
+#define LSM6DSL_TAP_SRC_S_TAP_MASK          (0x02)
+#define LSM6DSL_TAP_SRC_S_TAP_SHIFT         (5)
+#define LSM6DSL_TAP_SRC_D_TAP_MASK          (0x01)
+#define LSM6DSL_TAP_SRC_D_TAP_SHIFT         (4)
+#define LSM6DSL_TAP_SRC_TAP_SIGN_MASK       (0x08)
+#define LSM6DSL_TAP_SRC_TAP_SIGN_SHIFT      (3)
+#define LSM6DSL_TAP_SRC_X_TAP_MASK          (0x04)
+#define LSM6DSL_TAP_SRC_X_TAP_SHIFT         (2)
+#define LSM6DSL_TAP_SRC_Y_TAP_MASK          (0x02)
+#define LSM6DSL_TAP_SRC_Y_TAP_SHIFT         (1)
+#define LSM6DSL_TAP_SRC_Z_TAP_MASK          (0x01)
+/** @} */
+
+/**
+ * @brief D6D_SRC register
+ * @{
+ */
+#define LSM6DSL_D6D_SRC_ZH_MASK             (0x20)
+#define LSM6DSL_D6D_SRC_ZH_SHIFT            (5)
+#define LSM6DSL_D6D_SRC_ZL_MASK             (0x10)
+#define LSM6DSL_D6D_SRC_ZL_SHIFT            (4)
+#define LSM6DSL_D6D_SRC_YH_MASK             (0x08)
+#define LSM6DSL_D6D_SRC_YH_SHIFT            (3)
+#define LSM6DSL_D6D_SRC_YL_MASK             (0x04)
+#define LSM6DSL_D6D_SRC_YL_SHIFT            (2)
+#define LSM6DSL_D6D_SRC_XH_MASK             (0x02)
+#define LSM6DSL_D6D_SRC_XH_SHIFT            (1)
+#define LSM6DSL_D6D_SRC_XL_MASK             (0x01)
+/** @} */
+
+/**
+ * @brief MDx_CFG registers
+ * @{
+ */
+#define LSM6DSL_MDx_CFG_INTx_WU_MASK        (0x20)
+#define LSM6DSL_MDx_CFG_INTx_WU_SHIFT       (5)
+/** @} */
 
 #ifdef __cplusplus
 }
