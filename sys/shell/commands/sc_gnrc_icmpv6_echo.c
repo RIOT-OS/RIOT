@@ -165,6 +165,16 @@ static void _usage(char *cmdname)
               "of any responses, otherwise wait for two RTTs");
 }
 
+/* get the next netif, returns true if there are more */
+static bool _netif_get(gnrc_netif_t **current_netif)
+{
+    gnrc_netif_t *netif = *current_netif;
+    netif = gnrc_netif_iter(netif);
+
+    *current_netif = netif;
+    return !gnrc_netif_highlander() && gnrc_netif_iter(netif);
+}
+
 static int _configure(int argc, char **argv, _ping_data_t *data)
 {
     char *cmdname = argv[0];
@@ -187,8 +197,10 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
             if (iface) {
                 data->netif = gnrc_netif_get_by_pid(atoi(iface));
             }
-            else if (gnrc_netif_highlander()) {
-                data->netif = gnrc_netif_iter(NULL);
+            /* preliminary select the first interface */
+            else if (_netif_get(&data->netif)) {
+                /* don't take it if there is more than one interface */
+                data->netif = NULL;
             }
 
             if (ipv6_addr_from_str(&data->host, data->hostname) == NULL) {
