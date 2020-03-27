@@ -189,5 +189,15 @@ void stmclk_init_sysclk(void)
 
     stmclk_disable_hsi();
     irq_restore(is);
+
+#ifdef MODULE_PERIPH_RTT
+    /* Ensure LPTIM1 clock source (LSI or LSE) is correctly reset when initializing
+       the clock, this is particularly useful after waking up from deep sleep */
+#if CLOCK_LSE
+    RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0 | RCC_CCIPR_LPTIM1SEL_1;
+#else
+    RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0;
+#endif /* CLOCK_LSE */
+#endif /* MODULE_PERIPH_RTT */
 }
 #endif
