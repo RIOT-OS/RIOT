@@ -36,6 +36,11 @@ USEMODULE += ps
 # configure the node as a RPL DODAG root when receiving a prefix.
 #USEMODULE += gnrc_rpl
 
+# Optionally include DNS support. This includes resolution of names at an
+# upstream DNS server and the handling of RDNSS options in Router Advertisements
+# to auto-configure that upstream DNS server.
+#USEMODULE += sock_dns
+
 # When using a WiFi uplink we should use DHCPv6
 ifeq (wifi,$(UPLINK))
   USE_DHCPV6 ?= 1
