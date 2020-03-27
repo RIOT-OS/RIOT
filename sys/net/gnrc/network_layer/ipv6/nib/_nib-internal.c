@@ -522,6 +522,11 @@ static inline bool _in_dsts(const _nib_offl_entry_t *dst)
 }
 
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+static inline unsigned _idx_dsts(const _nib_offl_entry_t *dst)
+{
+    return (dst - _dsts) / sizeof(*dst);
+}
+
 static inline bool _in_abrs(const _nib_abr_entry_t *abr)
 {
     return (abr < (_abrs + GNRC_IPV6_NIB_ABR_NUMOF));
@@ -655,7 +660,7 @@ void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
 {
     _nib_offl_remove(nib_offl, _PL);
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
-    unsigned idx = nib_offl - _dsts;
+    unsigned idx = _idx_dsts(nib_offl);
     if (idx < GNRC_IPV6_NIB_OFFL_NUMOF) {
         for (_nib_abr_entry_t *abr = _abrs; _in_abrs(abr); abr++) {
             if (bf_isset(abr->pfxs, idx)) {
@@ -731,7 +736,7 @@ void _nib_abr_remove(const ipv6_addr_t *addr)
 void _nib_abr_add_pfx(_nib_abr_entry_t *abr, const _nib_offl_entry_t *offl)
 {
     assert((abr != NULL) && (offl != NULL) && (offl->mode & _PL));
-    unsigned idx = (unsigned)(_dsts - offl);
+    unsigned idx = _idx_dsts(offl);
 
     DEBUG("nib: Prefix %s/%u ",
           ipv6_addr_to_str(addr_str, &offl->pfx, sizeof(addr_str)),
@@ -747,14 +752,14 @@ _nib_offl_entry_t *_nib_abr_iter_pfx(const _nib_abr_entry_t *abr,
                                      const _nib_offl_entry_t *last)
 {
     if ((last == NULL) ||
-        (((unsigned)(_dsts - last)) < GNRC_IPV6_NIB_OFFL_NUMOF)) {
+        (_idx_dsts(last) < GNRC_IPV6_NIB_OFFL_NUMOF)) {
         /* we don't change `ptr`, so dropping const qualifier for now is okay */
         _nib_offl_entry_t *ptr = (_nib_offl_entry_t *)last;
 
         while ((ptr = _nib_offl_iter(ptr))) {
             /* bf_isset() discards const, but doesn't change the array, so
              * discarding it on purpose */
-            if ((ptr->mode & _PL) && (bf_isset((uint8_t *)abr->pfxs, ptr - _dsts))) {
+            if ((ptr->mode & _PL) && (bf_isset((uint8_t *)abr->pfxs, _idx_dsts(ptr)))) {
                 return ptr;
             }
         }

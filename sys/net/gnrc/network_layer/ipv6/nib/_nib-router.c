@@ -172,7 +172,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
             ((ctx = gnrc_sixlowpan_ctx_lookup_id(i)) != NULL)) {
             gnrc_pktsnip_t *sixco = gnrc_sixlowpan_nd_opt_6ctx_build(
                                             ctx->prefix_len, ctx->flags_id,
-                                            ctx->ltime, &ctx->prefix, NULL);
+                                            ctx->ltime, &ctx->prefix, ext_opts);
             if (sixco == NULL) {
                 DEBUG("nib: No space left in packet buffer. Not adding 6LO\n");
                 return NULL;
