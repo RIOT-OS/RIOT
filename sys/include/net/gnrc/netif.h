@@ -284,7 +284,11 @@ unsigned gnrc_netif_numof(void);
  */
 static inline bool gnrc_netif_highlander(void)
 {
-    return IS_ACTIVE(GNRC_NETIF_SINGLE);
+    if (IS_ACTIVE(GNRC_NETIF_SINGLE)) {
+        return true;
+    } else {
+        return gnrc_netif_numof() == 1;
+    }
 }
 
 /**
