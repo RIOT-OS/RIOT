@@ -262,7 +262,7 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
         t.arg = (void *)((mutex_thread_t *)&mt);
         xtimer_set64(&t, timeout);
     }
-    int ret = _mutex_lock(mutex, mt.blocking);
+    int ret = _mutex_lock(mutex, &mt.blocking);
     if (ret == 0) {
         return -1;
     }
