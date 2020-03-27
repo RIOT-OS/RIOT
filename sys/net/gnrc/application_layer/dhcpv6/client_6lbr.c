@@ -20,6 +20,7 @@
 #include "net/dhcpv6/client.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc.h"
+#include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6/nib/ft.h"
 #include "net/gnrc/netif/internal.h"
 
@@ -85,6 +86,15 @@ static void _configure_upstream_netif(gnrc_netif_t *upstream_netif)
         addr.u8[15] = 2;
         gnrc_netif_ipv6_addr_add(upstream_netif, &addr, 64, 0);
     }
+
+    /* Disable router advertisements on upstream interface. With this, the border
+     * router
+     * 1. Does not confuse the upstream router to add the border router to its
+     *    default router list and
+     * 2. Solicits upstream Router Advertisements quicker to auto-configure its
+     *    upstream global address.
+     */
+    gnrc_ipv6_nib_change_rtr_adv_iface(upstream_netif, false);
 }
 
 /**

@@ -43,6 +43,15 @@ static void set_interface_roles(void)
             gnrc_netapi_set(dev, NETOPT_IPV6_ADDR, 64 << 8, &addr, sizeof(addr));
             ipv6_addr_from_str(&addr, "fe80::1");
             gnrc_ipv6_nib_ft_add(&defroute, IPV6_ADDR_BIT_LEN, &addr, dev, 0);
+
+            /* Disable router advertisements on upstream interface. With this, the border
+             * router
+             * 1. Does not confuse the upstream router to add the border router to its
+             *    default router list and
+             * 2. Solicits upstream Router Advertisements quicker to auto-configure its
+             *    upstream global address.
+             */
+            gnrc_ipv6_nib_change_rtr_adv_iface(netif, false);
         }
         else if ((!gnrc_wireless_interface) && (is_wired != 1)) {
             gnrc_wireless_interface = dev;
