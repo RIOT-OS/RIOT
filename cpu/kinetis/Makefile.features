@@ -1,4 +1,5 @@
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_pm
 
 # TRNG driver is not implemented for mkw41z models
 _KINETIS_CPU_MODELS_WITHOUT_HWRNG += mkw41z256vht4 mkw41z512vht4
