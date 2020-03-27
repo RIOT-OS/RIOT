@@ -92,8 +92,19 @@ extern "C" {
 #define SX127X_IRQ_DIO3                  (1<<3)  /**< DIO3 IRQ */
 #define SX127X_IRQ_DIO4                  (1<<4)  /**< DIO4 IRQ */
 #define SX127X_IRQ_DIO5                  (1<<5)  /**< DIO5 IRQ */
+/** @} */
+
+/**
+ * @defgroup drivers_sx127x_config     Semtech SX1272 and SX1276 driver compile configuration
+ * @ingroup config
+ * @{
+ */
+
+/**
+ * @brief GPIO mode of DIOx Pins.
+ */
 #ifndef SX127X_DIO_PULL_MODE
-#define SX127X_DIO_PULL_MODE             (GPIO_IN_PD) /**< pull down DIOx */
+#define SX127X_DIO_PULL_MODE             (GPIO_IN_PD)
 #endif
 /** @} */
 
