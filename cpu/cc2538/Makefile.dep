@@ -8,3 +8,5 @@ ifneq (,$(filter periph_rtc,$(USEMODULE)))
 endif
 
 USEMODULE += pm_layered
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

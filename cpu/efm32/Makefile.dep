@@ -19,3 +19,5 @@ endif
 
 # include CPU family module
 USEMODULE += cpu_$(CPU_FAM)
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

@@ -33,17 +33,6 @@ LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
 LINKFLAGS += -Wl,--gc-sections
 
-# Tell the build system that the CPU depends on the Cortex-M common files:
-USEMODULE += cortexm_common
-# Export the peripheral drivers to be linked into the final binary:
-USEMODULE += periph
-# include common periph code
-USEMODULE += cortexm_common_periph
-
-# all cortex MCU's use newlib as libc
-USEMODULE += newlib
-
-
 # extract version inside the first parentheses
 ARM_GCC_VERSION = $(shell $(TARGET_ARCH)-gcc --version | sed -n '1 s/[^(]*(\([^\)]*\)).*/\1/p')
 
@@ -125,9 +114,6 @@ endif
 
 # CPU depends on the cortex-m common module, so include it:
 include $(RIOTCPU)/cortexm_common/Makefile.include
-
-# use the nano-specs of Newlib when available
-USEMODULE += newlib_nano
 
 # Avoid overriding the default rule:
 all:
