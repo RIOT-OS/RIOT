@@ -279,7 +279,7 @@ int xtimer_rmutex_lock_timeout(rmutex_t *rmutex, uint64_t timeout)
     if (xtimer_mutex_lock_timeout(&rmutex->mutex, timeout) < 0) {
         return -1;
     }
-    /* the mutex is locked, upadte the owner */
+    /* the mutex is locked, update the owner */
     /* ensure that owner is written atomically, since others need a consistent value */
     atomic_store_explicit(&rmutex->owner, thread_getpid(), memory_order_relaxed);
     /* increase the refcount */

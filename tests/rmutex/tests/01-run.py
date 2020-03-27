@@ -36,6 +36,7 @@ timeouts = {
         7: 500000
         }
 
+
 def thread_prio_sort(x):
     return thread_prio.get(x)*1000 + x
 
@@ -61,7 +62,7 @@ def testfunc(child):
                            .format(k, thread_prio[k]))
     child.expect_exact
     child.expect_exact("main: unlocking recursive mutex")
-    pri_sorted = sorted({k:thread_prio[k] for k in (5, 6, 7)}, key=thread_prio_sort)
+    pri_sorted = sorted({k: thread_prio[k] for k in (5, 6, 7)}, key=thread_prio_sort)
     for T in pri_sorted:
         for depth in range(3):
             child.expect_exact("T{} (prio {}, depth {}): locked rmutex now"
