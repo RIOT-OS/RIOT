@@ -44,6 +44,8 @@ extern "C" {
 #define COAP_OPT_LOCATION_QUERY (20)
 #define COAP_OPT_BLOCK2         (23)
 #define COAP_OPT_BLOCK1         (27)
+#define COAP_OPT_PROXY_URI      (35)
+#define COAP_OPT_PROXY_SCHEME   (39)
 /** @} */
 
 /**

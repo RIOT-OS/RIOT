@@ -1012,6 +1012,22 @@ ssize_t coap_opt_add_uquery2(coap_pkt_t *pkt, const char *key, size_t key_len,
                              const char *val, size_t val_len);
 
 /**
+ * @brief   Adds a single Proxy-URI option into @p pkt
+ *
+ * @note @p uri must be a NULL-terminated absolute URI
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     uri         absolute proxy URI
+ *
+ * @pre     ((pkt != NULL) && (uri != NULL))
+ *
+ * @return        number of bytes written to pkt buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or pkt full
+ */
+ssize_t coap_opt_add_proxy_uri(coap_pkt_t *pkt, const char *uri);
+
+/**
  * @brief   Encode the given string as option(s) into pkt
  *
  * Use separator to split string into multiple options.
@@ -1247,6 +1263,23 @@ static inline size_t coap_opt_put_uri_query(uint8_t *buf, uint16_t lastonum,
 {
     return coap_opt_put_string(buf, lastonum, COAP_OPT_URI_QUERY, uri, '&');
 }
+
+/**
+ * @brief   Convenience function for inserting PROXY_URI option into buffer
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in]   lastonum    number of previous option (for delta calculation),
+ *                          or 0 if first option
+ * @param[in]   uri         ptr to source URI
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+static inline size_t coap_opt_put_proxy_uri(uint8_t *buf, uint16_t lastonum,
+                                            const char *uri)
+{
+    return coap_opt_put_string(buf, lastonum, COAP_OPT_PROXY_URI, uri, '\0');
+}
+
 
 /**
  * @brief   Insert block1 option into buffer (from coap_block1_t)
