@@ -79,14 +79,15 @@ static const clock_config_t clock_config = {
         .count_ch = 3,           \
     },                           \
 }
-#define LPTMR_NUMOF             (1U)
-#define LPTMR_CONFIG {          \
-    {                           \
-        .dev = LPTMR0,          \
-        .irqn = LPTMR0_IRQn,    \
-        .src = 2,               \
-        .base_freq = 32768u,    \
-    },                          \
+#define LPTMR_NUMOF                                (1U)
+#define LPTMR_CONFIG {                              \
+    {                                               \
+        .dev =          LPTMR0,                     \
+        .irqn =         LPTMR0_IRQn,                \
+        .base_freq =    32768u,                     \
+        .src =          2,                          \
+        .llwu =         LLWU_WAKEUP_MODULE_LPTMR0,  \
+    },                                              \
 }
 #define TIMER_NUMOF             ((PIT_NUMOF) + (LPTMR_NUMOF))
 

@@ -30,7 +30,11 @@
 #include "bit.h"
 #include "board.h"
 #include "periph_conf.h"
+#if MODULE_PERIPH_LLWU
+#include "llwu.h"
+#endif
 #include "periph/timer.h"
+
 
 #ifdef PIT_LTMR64H_LTH_MASK
 /* The KW41Z PIT module provides only one IRQ for all PIT channels combined. */
@@ -409,6 +413,9 @@ static inline int lptmr_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *ar
     /* Enable IRQs on the counting channel */
     NVIC_ClearPendingIRQ(lptmr_config[dev].irqn);
     NVIC_EnableIRQ(lptmr_config[dev].irqn);
+#if MODULE_PERIPH_LLWU
+    llwu_wakeup_module_enable(lptmr_config[dev].llwu);
+#endif
 
     _lptmr_set_cb_config(dev, cb, arg);
 
