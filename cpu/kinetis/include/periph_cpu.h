@@ -140,6 +140,14 @@ enum {
     KINETIS_PM_STOP = 2,
     KINETIS_PM_WAIT = 3,
 };
+
+/**
+ * @brief   Override the default initial PM blocker to unblock all modes
+ */
+#ifndef PM_BLOCKER_INITIAL
+#define PM_BLOCKER_INITIAL  0x00000000
+#endif
+
 #if MODULE_PM_LAYERED
 #include "pm_layered.h"
 /**
