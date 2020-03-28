@@ -525,6 +525,11 @@ typedef struct {
     uart_type_t type;             /**< Hardware module type (KINETIS_UART or KINETIS_LPUART)*/
 } uart_conf_t;
 
+/**
+ * @brief  Override the default uart_isr_ctx_t in uart.c
+ */
+#define HAVE_UART_ISR_CTX_T
+
 #if !defined(KINETIS_HAVE_PLL)
 #if defined(MCG_C6_PLLS_MASK) || DOXYGEN
 /**
