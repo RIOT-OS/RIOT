@@ -22,3 +22,6 @@ USEMODULE += periph_wdog
 USEMODULE += pm_layered
 
 include $(RIOTCPU)/cortexm_common/Makefile.dep
+ifneq (,$(filter periph_uart,$(USEMODULE)))
+  FEATURES_OPTIONAL += periph_gpio_irq
+endif

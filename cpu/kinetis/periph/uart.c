@@ -20,14 +20,17 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Thomas Stilwell <stilwellt@openlabs.co>
  *
  * @}
  */
 
+#include "log.h"
 #include "cpu.h"
 #include "bit.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
+#include "periph/gpio.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -84,9 +87,29 @@
 #define LPUART_IDLECFG      (0b001)
 #endif
 
-/* This power mode is blocked while the LP/UART clock needs to stay running */
+/* This power mode is blocked while the LP/UART clock needs to stay running.
+ * This happens if an RX callback is configured and the UART cannot wake on a
+ * start bit without a clock running. This also happens if an RX callback
+ * is configured and the baudrate is higher than
+ * (UART_MAX_UNCLOCKED_BAUDRATE * 1.2). It happens also while a frame is being
+ * received.
+ * This default value is safe for all configurations and should be lowered
+ * by the board configuration to the highest power mode which disables the
+ * configured UART clock */
 #ifndef UART_CLOCK_PM_BLOCKER
 #define UART_CLOCK_PM_BLOCKER           KINETIS_PM_STOP
+#endif
+
+/* In power modes <= UART_CLOCK_PM_BLOCKER an LP/UART clock is not running.
+ * Waking for UART RX can occur from LLWU or other sources but it takes time
+ * to start a UART sampling clock after waking on a start bit. Therefore the
+ * maximum usable baudrate depends on the UART clock source and the wakeup
+ * source, but 9600 should be a safe default with most configurations. Using a
+ * baudrate faster than (UART_MAX_UNCLOCKED_BAUDRATE * 1.2) will block
+ * UART_CLOCK_PM_BLOCKER while an RX callback is configured.
+ * This should be increased by the board configuration in most cases. */
+#ifndef UART_MAX_UNCLOCKED_BAUDRATE
+#define UART_MAX_UNCLOCKED_BAUDRATE     9600ul
 #endif
 
 typedef struct {
@@ -128,6 +151,64 @@ KINETIS_UART_WRITE_INLINE void uart_write_lpuart(uart_t uart, const uint8_t *dat
 #define uart_write_lpuart uart_write
 #endif
 #endif
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
+/**
+ * @brief   pin interrupt callback for UART RX pin
+ *
+ * This function is called only when we're waiting for a start bit to cause
+ * a pin interrupt so we can start the UART clock.
+ */
+static void uart_pin_int_cb(void *arg)
+{
+    uart_t uart = (uart_t)arg;
+    if (!config[uart].active) {
+        config[uart].active = 1;
+
+        /* Keep UART clock on until we are finished with RX */
+        PM_BLOCK(UART_CLOCK_PM_BLOCKER);
+
+        /* We don't need the pin interrupt until the bus goes idle again */
+        gpio_irq_disable(uart_config[uart].pin_rx);
+
+        DEBUG("UART pin IRQ\n");
+    }
+}
+#endif
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
+static uint32_t _get_baudrate(uart_t uart)
+{
+    uint32_t baudrate = 0;
+
+    switch (uart_config[uart].type) {
+#if KINETIS_HAVE_UART
+        case KINETIS_UART: {
+            UART_Type *dev = uart_config[uart].dev;
+            uint16_t sbr = 0;
+            sbr += (dev->BDL & UART_BDL_SBR_MASK) >> UART_BDL_SBR_SHIFT;
+            sbr += (dev->BDH & UART_BDH_SBR_MASK) >> UART_BDH_SBR_SHIFT << 8;
+            baudrate = uart_config[uart].freq / sbr / 16;
+            break;
+        }
+#endif
+#if KINETIS_HAVE_LPUART
+        case KINETIS_LPUART: {
+            LPUART_Type *dev = uart_config[uart].dev;
+            uint8_t osr = (dev->BAUD & LPUART_BAUD_OSR_MASK)
+                           >> LPUART_BAUD_OSR_SHIFT;
+            uint16_t sbr = (dev->BAUD & LPUART_BAUD_SBR_MASK)
+                            >> LPUART_BAUD_SBR_SHIFT;
+            baudrate = uart_config[uart].freq / ((osr + 1) * sbr);
+            break;
+        }
+#endif
+        default:
+            break;
+    }
+    return baudrate;
+}
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
@@ -180,12 +261,6 @@ void uart_poweron(uart_t uart)
     assert(uart < UART_NUMOF);
     unsigned state = irq_disable();
 
-    if (config[uart].rx_cb && !config[uart].enabled) {
-        config[uart].enabled = 1;
-        DEBUG("uart: Blocking power mode %u\n", UART_CLOCK_PM_BLOCKER);
-        PM_BLOCK(UART_CLOCK_PM_BLOCKER);
-    }
-
     switch (uart_config[uart].type) {
 #if KINETIS_HAVE_UART
         case KINETIS_UART:
@@ -201,6 +276,44 @@ void uart_poweron(uart_t uart)
             break;
     }
 
+    if (!config[uart].enabled) {
+        config[uart].enabled = 1;
+
+        if (config[uart].rx_cb) {
+
+            /* As long as the baudrate isn't too fast, we can avoid needing
+             * to keep the UART clocked continuously by detecting the falling
+             * edge of a start bit using a pin interrupt. */
+#ifdef MODULE_PERIPH_GPIO_IRQ
+            if (_get_baudrate(uart) < UART_MAX_UNCLOCKED_BAUDRATE * 1.2) {
+
+                /* This will block power modes appropriate for maintaining a
+                 * working interrupt as a wakeup source. */
+                gpio_init_int(uart_config[uart].pin_rx, GPIO_IN, GPIO_FALLING,
+                              uart_pin_int_cb, (void*)uart);
+
+                /* gpio_init_int() has reconfigured pin_rx to GPIO mode */
+                uart_init_pins(uart);
+            }
+            else
+            {
+                /* We can't wake fast enough from a pin interrupt to start
+                 * the UART clock in time to catch the incoming frame, so we
+                 * need to keep the UART clock running */
+                LOG_INFO("[uart] Blocking power mode %u because baudrate > %"
+                         PRIu32 "\n",
+                         UART_CLOCK_PM_BLOCKER, UART_MAX_UNCLOCKED_BAUDRATE);
+                PM_BLOCK(UART_CLOCK_PM_BLOCKER);
+            }
+#else
+            LOG_INFO("[uart] Blocking power mode %u because module "
+                     "periph_gpio_irq is needed to sleep with RX enabled\n",
+                     UART_CLOCK_PM_BLOCKER);
+            PM_BLOCK(UART_CLOCK_PM_BLOCKER);
+#endif /* MODULE_PERIPH_GPIO_IRQ */
+        }
+    }
+
     irq_restore(state);
 }
 
@@ -208,19 +321,36 @@ void uart_poweroff(uart_t uart)
 {
     assert(uart < UART_NUMOF);
     unsigned state = irq_disable();
-    if (config[uart].rx_cb && config[uart].enabled) {
-        config[uart].enabled = 0;
-        DEBUG("uart: Unblocking power mode %u\n", UART_CLOCK_PM_BLOCKER);
-        PM_UNBLOCK(UART_CLOCK_PM_BLOCKER);
+    if (config[uart].rx_cb) {
+        if (config[uart].enabled) {
+            config[uart].enabled = 0;
 
-        if (config[uart].active) {
-            /* We were in the middle of a RX sequence, need to release that
-                * clock blocker as well */
-            PM_UNBLOCK(UART_CLOCK_PM_BLOCKER);
-            config[uart].active = 0;
+            /* We may have been using a pin interrupt to wake the UART clock. */
+#ifdef MODULE_PERIPH_GPIO_IRQ
+            if (_get_baudrate(uart) < UART_MAX_UNCLOCKED_BAUDRATE * 1.2) {
+                /* IRQ was already disabled if active is set */
+                if (!config[uart].active) {
+                    gpio_irq_disable(uart_config[uart].pin_rx);
+                }
+            }
+            else
+            {
+#else
+            {
+#endif
+                LOG_INFO("[uart] Unblocking power mode %u\n",
+                      UART_CLOCK_PM_BLOCKER);
+                PM_UNBLOCK(UART_CLOCK_PM_BLOCKER);
+            }
+
+            if (config[uart].active) {
+                config[uart].active = 0;
+                /* We were in the middle of a RX sequence, need to release that
+                 * clock blocker as well */
+                PM_UNBLOCK(UART_CLOCK_PM_BLOCKER);
+            }
         }
     }
-
     switch (uart_config[uart].type) {
 #if KINETIS_HAVE_UART
         case KINETIS_UART:
@@ -235,7 +365,6 @@ void uart_poweroff(uart_t uart)
         default:
             break;
     }
-
     irq_restore(state);
 }
 
@@ -320,8 +449,6 @@ static inline void uart_init_uart(uart_t uart, uint32_t baudrate)
 #endif /* KINETIS_UART_ADVANCED */
 
     if (config[uart].rx_cb) {
-        /* enable RX active edge interrupt */
-        bit_set8(&dev->BDH, UART_BDH_RXEDGIE_SHIFT);
         /* enable receiver + RX interrupt + IDLE interrupt */
         dev->C2 = UART_C2_RIE_MASK | UART_C2_ILIE_MASK;
         /* enable interrupts on failure flags */
@@ -334,6 +461,10 @@ static inline void uart_init_uart(uart_t uart, uint32_t baudrate)
 
 KINETIS_UART_WRITE_INLINE void uart_write_uart(uart_t uart, const uint8_t *data, size_t len)
 {
+    if (!config[uart].enabled) {
+        return;
+    }
+
     UART_Type *dev = uart_config[uart].dev;
 
     for (size_t i = 0; i < len; i++) {
@@ -388,14 +519,6 @@ static inline void irq_handler_uart(uart_t uart)
         DEBUG("UART RXUF\n");
     }
     DEBUG("U: %c\n", data);
-    if (s2 & UART_S2_RXEDGIF_MASK) {
-        if (!config[uart].active) {
-            config[uart].active = 1;
-            /* Keep UART clock on until we are finished with RX */
-            DEBUG("UART ACTIVE\n");
-            PM_BLOCK(UART_CLOCK_PM_BLOCKER);
-        }
-    }
     if (s1 & UART_S1_OR_MASK) {
         /* UART overrun, some data has been lost */
         DEBUG("UART OR\n");
@@ -426,6 +549,10 @@ static inline void irq_handler_uart(uart_t uart)
             config[uart].active = 0;
             /* UART clock can stop now that RX is complete */
             PM_UNBLOCK(UART_CLOCK_PM_BLOCKER);
+#ifdef MODULE_PERIPH_GPIO_IRQ
+            /* Need an interrupt source to wake for the next start bit */
+            gpio_irq_enable(uart_config[uart].pin_rx);
+#endif
             DEBUG("UART IDLE\n");
         }
     }
@@ -514,8 +641,6 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
     dev->BAUD = LPUART_BAUD_OSR(best_osr - 1) | LPUART_BAUD_SBR(sbr);
 
     if (config[uart].rx_cb) {
-        /* enable RX active edge interrupt */
-        bit_set32(&dev->BAUD, LPUART_BAUD_RXEDGIE_SHIFT);
         /* enable RX interrupt + error interrupts */
         dev->CTRL |= LPUART_CTRL_RIE_MASK |
             LPUART_CTRL_ILIE_MASK | LPUART_CTRL_IDLECFG(LPUART_IDLECFG) |
@@ -529,6 +654,10 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 
 KINETIS_UART_WRITE_INLINE void uart_write_lpuart(uart_t uart, const uint8_t *data, size_t len)
 {
+    if (!config[uart].enabled) {
+        return;
+    }
+
     LPUART_Type *dev = uart_config[uart].dev;
 
     for (size_t i = 0; i < len; i++) {
@@ -570,14 +699,6 @@ static inline void irq_handler_lpuart(uart_t uart)
     /* Clear all IRQ flags */
     dev->STAT = stat;
 
-    if (stat & LPUART_STAT_RXEDGIF_MASK) {
-        if (!config[uart].active) {
-            config[uart].active = 1;
-            /* Keep UART clock on until we are finished with RX */
-            DEBUG("LPUART ACTIVE\n");
-            PM_BLOCK(UART_CLOCK_PM_BLOCKER);
-        }
-    }
     if (stat & LPUART_STAT_RDRF_MASK) {
         /* RDRF flag will be cleared when LPUART_DATA is read */
         uint8_t data = dev->DATA;
@@ -609,6 +730,10 @@ static inline void irq_handler_lpuart(uart_t uart)
             config[uart].active = 0;
             /* UART clock can stop now that RX is complete */
             PM_UNBLOCK(UART_CLOCK_PM_BLOCKER);
+#ifdef MODULE_PERIPH_GPIO_IRQ
+            /* Need an interrupt source to wake for the next start bit */
+            gpio_irq_enable(uart_config[uart].pin_rx);
+#endif
             DEBUG("LPUART IDLE\n");
         }
     }
