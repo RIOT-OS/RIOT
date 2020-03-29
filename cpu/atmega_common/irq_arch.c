@@ -22,7 +22,6 @@
  */
 
 #include <stdint.h>
-#include <stdio.h>
 #include <stdint.h>
 #include "irq.h"
 #include "cpu.h"

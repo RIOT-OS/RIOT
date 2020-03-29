@@ -30,12 +30,13 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include <stdio.h>
+#include <stdint.h>
 
+#include "cpu_conf.h"
+#include "fmt.h"
 #include "irq.h"
 #include "sched.h"
 #include "thread.h"
-#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -138,7 +139,8 @@ static inline void cpu_print_last_instruction(void)
 {
     uint32_t *lr_ptr;
     __asm__ __volatile__("mov %0, lr" : "=r"(lr_ptr));
-    printf("%p\n", (void*) lr_ptr);
+    print_str("0x");
+    print_u32_hex((uintptr_t)lr_ptr);
 }
 
 /**

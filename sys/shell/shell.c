@@ -25,32 +25,23 @@
  * @}
  */
 
-#include <string.h>
-#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "fmt.h"
+#include "fmt_table.h"
 #include "shell.h"
 #include "shell_commands.h"
+#include "stdio_base.h"
 
+#define EOF -1
 #define ETX '\x03'  /** ASCII "End-of-Text", or ctrl-C */
 #if !defined(SHELL_NO_ECHO) || !defined(SHELL_NO_PROMPT)
-#ifdef MODULE_NEWLIB
-/* use local copy of putchar, as it seems to be inlined,
- * enlarging code by 50% */
-static void _putchar(int c) {
-    putchar(c);
+static inline void _putchar(char c) {
+    print(&c, 1);
 }
-#else
-#define _putchar putchar
 #endif
-#endif
-
-static void flush_if_needed(void)
-{
-#ifdef MODULE_NEWLIB
-    fflush(stdout);
-#endif
-}
 
 static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
 {
@@ -84,8 +75,9 @@ static shell_command_handler_t find_handler(const shell_command_t *command_list,
 
 static void print_help(const shell_command_t *command_list)
 {
-    printf("%-20s %s\n", "Command", "Description");
-    puts("---------------------------------------");
+    print_str_fill_right("Command", 20, ' ');
+    print_str_fill_right("Description", 20, ' ');
+    print_str_fill_right("\n", 40, '-');
 
     const shell_command_t *command_lists[] = {
         command_list,
@@ -102,7 +94,9 @@ static void print_help(const shell_command_t *command_list)
         if ((entry = command_lists[i])) {
             /* iterating over commands in command_lists entry */
             while (entry->name != NULL) {
-                printf("%-20s %s\n", entry->name, entry->desc);
+                print_str_fill_right(entry->name, 20, ' ');
+                print_str(entry->desc);
+                print_str("\n");
                 entry++;
             }
         }
@@ -111,7 +105,7 @@ static void print_help(const shell_command_t *command_list)
 
 static void handle_input_line(const shell_command_t *command_list, char *line)
 {
-    static const char *INCORRECT_QUOTING = "shell: incorrect quoting";
+    static const char *INCORRECT_QUOTING = "shell: incorrect quoting\n";
 
     /* first we need to calculate the number of arguments */
     unsigned argc = 0;
@@ -126,7 +120,7 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
                 do {
                     ++pos;
                     if (!*pos) {
-                        puts(INCORRECT_QUOTING);
+                        print_str(INCORRECT_QUOTING);
                         return;
                     }
                     else if (*pos == '\\') {
@@ -134,14 +128,14 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
                         ++contains_esc_seq;
                         ++pos;
                         if (!*pos) {
-                            puts(INCORRECT_QUOTING);
+                            print_str(INCORRECT_QUOTING);
                             return;
                         }
                         continue;
                     }
                 } while (*pos != quote_char);
                 if ((unsigned char) pos[1] > ' ') {
-                    puts(INCORRECT_QUOTING);
+                    print_str(INCORRECT_QUOTING);
                     return;
                 }
             }
@@ -153,13 +147,13 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
                         ++contains_esc_seq;
                         ++pos;
                         if (!*pos) {
-                            puts(INCORRECT_QUOTING);
+                            print_str(INCORRECT_QUOTING);
                             return;
                         }
                     }
                     ++pos;
                     if (*pos == '"') {
-                        puts(INCORRECT_QUOTING);
+                        print_str(INCORRECT_QUOTING);
                         return;
                     }
                 } while ((unsigned char) *pos > ' ');
@@ -222,7 +216,9 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
             print_help(command_list);
         }
         else {
-            printf("shell: command not found: %s\n", argv[0]);
+            print_str("shell: command not found: ");
+            print_str(argv[0]);
+            print_str("\n");
         }
     }
 }
@@ -236,8 +232,8 @@ static int readline(char *buf, size_t size)
             return -1;
         }
 
-        int c = getchar();
-        if (c < 0) {
+        char c;
+        if (stdio_read(&c, sizeof(c)) != 1) {
             return EOF;
         }
 
@@ -276,7 +272,6 @@ static int readline(char *buf, size_t size)
             _putchar(c);
 #endif
         }
-        flush_if_needed();
     }
 }
 
@@ -286,8 +281,6 @@ static inline void print_prompt(void)
     _putchar('>');
     _putchar(' ');
 #endif
-
-    flush_if_needed();
 }
 
 void shell_run_once(const shell_command_t *shell_commands,

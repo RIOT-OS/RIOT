@@ -18,31 +18,37 @@
  * @}
  */
 
-#include <stdio.h>
 #include <stdint.h>
 
 #include "assert.h"
 #include "fmt.h"
+#include "fmt_table.h"
 #include "phydat.h"
 
 void phydat_dump(phydat_t *data, uint8_t dim)
 {
     if (data == NULL || dim > PHYDAT_DIM) {
-        puts("Unable to display data object");
+        print_str("Unable to display data object\n");
         return;
     }
-    printf("Data:");
+    print_str("Data:");
 
     if (data->unit == UNIT_TIME) {
         assert(dim == 3);
-        printf("\t%02d:%02d:%02d\n",
-               data->val[2], data->val[1], data->val[0]);
+        print_u32_dec_zeros(data->val[2], 2);
+        print_str(":");
+        print_u32_dec_zeros(data->val[1], 2);
+        print_str(":");
+        print_u32_dec_zeros(data->val[0], 2);
         return;
     }
     if (data->unit == UNIT_DATE) {
         assert(dim == 3);
-        printf("\t%04d-%02d-%02d\n",
-               data->val[2], data->val[1], data->val[0]);
+        print_u32_dec_zeros(data->val[2], 4);
+        print_str("-");
+        print_u32_dec_zeros(data->val[1], 2);
+        print_str("-");
+        print_u32_dec_zeros(data->val[0], 2);
         return;
     }
 
@@ -65,34 +71,47 @@ void phydat_dump(phydat_t *data, uint8_t dim)
                 scale_prefix = phydat_prefix_from_scale(data->scale);
         }
 
-        printf("\t");
+        print_str("\t");
         if (dim > 1) {
-            printf("[%u] ", (unsigned int)i);
+            print_str("[");
+            print_u32_dec(i);
+            print_str("]");
         }
         else {
-            printf("    ");
+            print_str("    ");
         }
         if (scale_prefix) {
-            printf("%11d %c", (int)data->val[i], scale_prefix);
+            print_col_s32_dec(data->val[i], 11);
+            print(" ", 1);
+            print(&scale_prefix, 1);
         }
         else if (data->scale == 0) {
-            printf("%11d ", (int)data->val[i]);
+            print_col_s32_dec(data->val[i], 11);
         }
         else if ((data->scale > -6) && (data->scale < 0)) {
-            char num[9];
+            char num[8];
             size_t len = fmt_s16_dfp(num, data->val[i], data->scale);
-            assert(len < 9);
-            num[len] = '\0';
-            printf("%11s ", num);
+            assert(len <= 8);
+            for (unsigned i = 11; i > len; i--) {
+                print_str(" ");
+            }
+            print(num, len);
         }
         else {
-            char num[12];
-            snprintf(num, sizeof(num), "%ie%i",
-                     (int)data->val[i], (int)data->scale);
-            printf("%11s ", num);
+            char m[8], e[3];
+            size_t m_len, e_len;
+            m_len = fmt_s32_dec(m, data->val[i]);
+            e_len = fmt_s32_dec(e, data->scale);
+            for (unsigned i = 11; i > m_len + e_len + 1; i--) {
+                print_str(" ");
+            }
+            print(m, m_len);
+            print_str("e");
+            print(e, e_len);
         }
 
-        printf("%s\n", phydat_unit_to_str(data->unit));
+        print_str(phydat_unit_to_str(data->unit));
+        print_str("\n");
     }
 }
 

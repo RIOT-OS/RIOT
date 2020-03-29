@@ -27,48 +27,74 @@
 
 #include "fmt.h"
 
-static const char fmt_table_spaces[16] = "                ";
-
-/**
- * @brief Prints @p fill_size bytes of the given pattern, repeating the
- *        pattern if needed
- * @param pat       Pattern to print
- * @param pat_size  Size of the pattern in bytes
- * @param fill_size Number of bytes to print (if bigger than @p pat_size, the
- *                  pattern will be repeated)
- *
- * E.g. `print_pattern("ab", 2, 5);` will print `ababa` to the console.
- * This can be used to fill table columns with spaces, draw lines, etc.
- */
-static void print_pattern(const char *pat, size_t pat_size, size_t fill_size)
-{
-    while (fill_size > pat_size) {
-        print(pat, pat_size);
-    }
-
-    print(pat, fill_size);
-}
-
-void print_col_u32_dec(uint32_t number, size_t width)
+void print_u32_dec_fill(uint32_t number, size_t width, char fill)
 {
     char sbuf[10]; /* "4294967295" */
     size_t slen;
 
     slen = fmt_u32_dec(sbuf, number);
-    if (width > slen) {
-        print_pattern(fmt_table_spaces, sizeof(fmt_table_spaces), width - slen);
+    while (width > slen) {
+        print(&fill, 1);
+        width--;
     }
     print(sbuf, slen);
 }
 
-void print_col_s32_dec(int32_t number, size_t width)
+void print_u32_dec_fill_right(uint32_t number, size_t width, char fill)
+{
+    char sbuf[10]; /* "4294967295" */
+    size_t slen;
+
+    slen = fmt_u32_dec(sbuf, number);
+    print(sbuf, slen);
+    while (width > slen) {
+        print(&fill, 1);
+        width--;
+    }
+}
+
+void print_s32_dec_fill(int32_t number, size_t width, char fill)
 {
     char sbuf[11]; /* "-2147483648" */
     size_t slen;
 
     slen = fmt_s32_dec(sbuf, number);
-    if (width > slen) {
-        print_pattern(fmt_table_spaces, sizeof(fmt_table_spaces), width - slen);
+    while (width > slen) {
+        print(&fill, 1);
+        width--;
     }
     print(sbuf, slen);
+}
+
+void print_s32_dec_fill_right(int32_t number, size_t width, char fill)
+{
+    char sbuf[11]; /* "-2147483648" */
+    size_t slen;
+
+    slen = fmt_s32_dec(sbuf, number);
+    print(sbuf, slen);
+    while (width > slen) {
+        print(&fill, 1);
+        width--;
+    }
+}
+
+void print_str_fill(const char *str, size_t width, char fill)
+{
+    size_t slen = strlen(str);
+    while (width > slen) {
+        print(&fill, 1);
+        width--;
+    }
+    print(str, slen);
+}
+
+void print_str_fill_right(const char *str, size_t width, char fill)
+{
+    size_t slen = strlen(str);
+    print(str, slen);
+    while (width > slen) {
+        print(&fill, 1);
+        width--;
+    }
 }

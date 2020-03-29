@@ -47,7 +47,4 @@ void atmega_stdio_init(void)
 
     stdout = &_uart_stdout;
     stdin = &_uart_stdin;
-
-    /* Flush stdout */
-    puts("\f");
 }

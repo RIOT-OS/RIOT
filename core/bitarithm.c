@@ -19,8 +19,6 @@
  * @}
  */
 
-#include <stdio.h>
-
 #include "bitarithm.h"
 
 unsigned bitarithm_msb(unsigned v)

@@ -22,13 +22,12 @@
  * @}
  */
 
-#include <stdio.h>
-
-#include "thread.h"
-#include "sched.h"
-#include "irq.h"
-#include "cpu.h"
 #include "board.h"
+#include "cpu.h"
+#include "fmt.h"
+#include "irq.h"
+#include "sched.h"
+#include "thread.h"
 
 static void atmega_context_save(void);
 static void atmega_context_restore(void);
@@ -179,11 +178,16 @@ void thread_stack_print(void)
     uint8_t *sp = (uint8_t *)sched_active_thread->sp;
     uint16_t size = 0;
 
-    printf("Printing current stack of thread %" PRIkernel_pid "\n", thread_getpid());
-    printf("\taddress:\tdata:\n");
+    print_str("Printing current stack of thread ");
+    print_u32_dec(thread_getpid());
+    print_str("\n\taddress:\tdata:\n");
 
     do {
-        printf("\t0x%04x:\t\t0x%04x\n", (unsigned int)sp, (unsigned int)*sp);
+        print_str("\t0x");
+        print_u32_hex((uintptr_t)sp);
+        print_str(":\t\t0x");
+        print_u32_hex(*sp);
+        print_str("\n");
         sp++;
         size++;
 
@@ -192,7 +196,9 @@ void thread_stack_print(void)
         }
     } while (found_marker == 1);
 
-    printf("stack size: %u bytes\n", size);
+    print_str("stack size: ");
+    print_u32_dec(size);
+    print_str(" bytes\n");
 }
 
 void cpu_switch_context_exit(void)

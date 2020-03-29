@@ -23,15 +23,18 @@
 #include <stddef.h>
 #include <inttypes.h>
 #include <assert.h>
-#include "sched.h"
-#include "msg.h"
+
+#include "cib.h"
+#include "fmt.h"
+#include "irq.h"
 #include "list.h"
+#include "msg.h"
+#include "sched.h"
 #include "thread.h"
+
 #if MODULE_CORE_THREAD_FLAGS
 #include "thread_flags.h"
 #endif
-#include "irq.h"
-#include "cib.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -405,16 +408,28 @@ void msg_queue_print(void)
     msg_t *msg_array = thread->msg_array;
     unsigned int i = msg_queue->read_count & msg_queue->mask;
 
-    printf("Message queue of thread %" PRIkernel_pid "\n", thread->pid);
-    printf("    size: %u (avail: %d)\n", msg_queue->mask + 1,
-           cib_avail(msg_queue));
+    print_str("Message queue of thread ");
+    print_u32_dec(thread->pid);
+    print_str("\n\tsize: ");
+    print_u32_dec(msg_queue->mask + 1);
+    print_str(" (avail: ");
+    print_u32_dec(cib_avail(msg_queue));
+    print_str(")\n");
 
     for (; i != (msg_queue->write_count & msg_queue->mask);
          i = (i + 1) & msg_queue->mask) {
         msg_t *m = &msg_array[i];
-        printf("    * %u: sender: %" PRIkernel_pid ", type: 0x%04" PRIu16
-               ", content: %" PRIu32 " (%p)\n", i, m->sender_pid, m->type,
-               m->content.value, m->content.ptr);
+        print_str("\t* ");
+        print_u32_dec(i);
+        print_str(": sender: ");
+        print_u32_dec(m->sender_pid);
+        print_str(", type: 0x");
+        print_u32_hex(m->type);
+        print_str(", content: ");
+        print_u32_dec(m->content.value);
+        print_str(" (0x");
+        print_u32_hex((uintptr_t)m->content.ptr);
+        print_str(")\n");
     }
 
     irq_restore(state);

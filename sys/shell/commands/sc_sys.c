@@ -18,8 +18,7 @@
  * @}
  */
 
-#include <stdio.h>
-
+#include "fmt.h"
 #include "periph/pm.h"
 
 int _reboot_handler(int argc, char **argv)
@@ -37,7 +36,7 @@ int _version_handler(int argc, char **argv)
     (void) argc;
     (void) argv;
 
-    puts(RIOT_VERSION);
+    print_str(RIOT_VERSION "\n");
 
     return 0;
 }

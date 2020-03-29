@@ -20,18 +20,19 @@
  * @}
  */
 
-#include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 
+#include "fmt.h"
+#include "fmt_table.h"
 #include "periph/rtc.h"
 
 static void _alarm_handler(void *arg)
 {
     (void) arg;
 
-    puts("The alarm rang");
+    print_str("The alarm rang\n");
 }
 
 static int dow(int year, int month, int day)
@@ -74,10 +75,18 @@ static int _parse_time(char **argv, struct tm *time)
 
 static int _print_time(struct tm *time)
 {
-    printf("%04i-%02i-%02i %02i:%02i:%02i\n",
-            time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-            time->tm_hour, time->tm_min, time->tm_sec
-          );
+    print_u32_dec_zeros(time->tm_year + 1900, 4);
+    print_str("-");
+    print_u32_dec_zeros(time->tm_mon, 2);
+    print_str("-");
+    print_u32_dec_zeros(time->tm_mday, 2);
+    print_str(" ");
+    print_u32_dec_zeros(time->tm_hour, 2);
+    print_str(":");
+    print_u32_dec_zeros(time->tm_min, 2);
+    print_str(":");
+    print_u32_dec_zeros(time->tm_sec, 2);
+    print_str("\n");
     return 0;
 }
 
@@ -89,7 +98,7 @@ static int _rtc_getalarm(void)
         return 0;
     }
     else {
-        puts("rtc: error getting alarm");
+        print_str("rtc: error getting alarm\n");
         return 1;
     }
 }
@@ -100,7 +109,7 @@ static int _rtc_setalarm(char **argv)
 
     if (_parse_time(argv, &now) == 0) {
         if (rtc_set_alarm(&now, _alarm_handler, NULL) == -1) {
-            puts("rtc: error setting alarm");
+            print_str("rtc: error setting alarm\n");
             return 1;
         }
         return 0;
@@ -116,7 +125,7 @@ static int _rtc_gettime(void)
         return 0;
     }
     else {
-        puts("rtc: error getting time");
+        print_str("rtc: error getting time\n");
         return 1;
     }
 }
@@ -127,7 +136,7 @@ static int _rtc_settime(char **argv)
 
     if (_parse_time(argv, &now) == 0) {
         if (rtc_set_time(&now) == -1) {
-            puts("rtc: error setting time");
+            print_str("rtc: error setting time\n");
             return 1;
         }
         return 0;
@@ -137,15 +146,17 @@ static int _rtc_settime(char **argv)
 
 static int _rtc_usage(void)
 {
-    puts("usage: rtc <command> [arguments]");
-    puts("commands:");
-    puts("\tpoweron\t\tpower the interface on");
-    puts("\tpoweroff\tpower the interface off");
-    puts("\tclearalarm\tdeactivate the current alarm");
-    puts("\tgetalarm\tprint the currently alarm time");
-    puts("\tsetalarm YYYY-MM-DD HH:MM:SS\n\t\t\tset an alarm for the specified time");
-    puts("\tgettime\t\tprint the current time");
-    puts("\tsettime YYYY-MM-DD HH:MM:SS\n\t\t\tset the current time");
+    print_str(
+        "usage: rtc <command> [arguments]\n"
+        "commands:\n"
+        "\tpoweron\t\tpower the interface on\n"
+        "\tpoweroff\tpower the interface off\n"
+        "\tclearalarm\tdeactivate the current alarm\n"
+        "\tgetalarm\tprint the currently alarm time\n"
+        "\tsetalarm YYYY-MM-DD HH:MM:SS\n\t\t\tset an alarm for the specified time\n"
+        "\tgettime\t\tprint the current time\n"
+        "\tsettime YYYY-MM-DD HH:MM:SS\n\t\t\tset the current time\n"
+    );
     return 0;
 }
 
@@ -177,7 +188,9 @@ int _rtc_handler(int argc, char **argv)
         _rtc_settime(argv + 2);
     }
     else {
-        printf("unknown command or missing parameters: %s\n\n", argv[1]);
+        print_str("unknown command or missing parameters: ");
+        print_str(argv[1]);
+        print_str("\n\n");
         _rtc_usage();
         return 1;
     }

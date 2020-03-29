@@ -15,12 +15,13 @@
  * @}
  */
 
-#include <stdio.h>
+#include <stdint.h>
 
-#include "thread.h"
+#include "fmt.h"
+#include "fmt_table.h"
+#include "kernel_types.h"
 #include "sched.h"
 #include "thread.h"
-#include "kernel_types.h"
 
 #ifdef MODULE_SCHEDSTATISTICS
 #include "schedstatistics.h"
@@ -48,6 +49,46 @@ static const char *state_names[] = {
     [STATUS_COND_BLOCKED] = "bl cond",
 };
 
+static void _col_str(const char *s, size_t width)
+{
+    print_str(" ");
+    print_str_fill(s, width, ' ');
+    print_str(" |");
+}
+
+static void _col_u32_dec(uint32_t num, size_t width)
+{
+    print_str(" ");
+    print_col_u32_dec(num, width);
+    print_str(" |");
+}
+
+static void _col_ptr(void *ptr, size_t width)
+{
+    print_str(" ");
+    while (width-- > 10) {
+        print_str(" ");
+    }
+    print_str("0x");
+    print_u32_hex((uintptr_t)ptr);
+    print_str(" |");
+}
+
+#ifdef MODULE_SCHEDSTATISTICS
+static _col_runtime(kernel_pid_t pid, uint64_t rt_sum)
+{
+    /* multiply with 100 for percentage and to avoid floats/doubles */
+    uint64_t runtime_ticks = sched_pidlist[pid].runtime_ticks * 100;
+    unsigned runtime_major = runtime_ticks / rt_sum;
+    unsigned runtime_minor = ((runtime_ticks % rt_sum) * 1000) / rt_sum;
+    print_str(" ");
+    print_col_u32_dec(runtime_major, 2);
+    print_str(".");
+    print_u32_dec_zeros(runtime_minor, 3);
+    print_str("% |");
+}
+#endif
+
 /**
  * @brief Prints a list of running threads including stack usage to stdout.
  */
@@ -58,33 +99,50 @@ void ps(void)
     int overall_stacksz = 0, overall_used = 0;
 #endif
 
-    printf("\tpid | "
+    print_str("\t|");
+    _col_str("pid", 3);
 #ifdef DEVELHELP
-            "%-21s| "
+    _col_str("name", 20);
 #endif
-            "%-9sQ | pri "
+    _col_str("state", 8);
+    _col_str("Q", 1);
+    _col_str("pri", 3);
 #ifdef DEVELHELP
-           "| stack  ( used) | base addr  | current     "
+    _col_str("stack", 10);
+    _col_str("stack used", 10);
+    _col_str("base addr", 10);
+    _col_str("current", 10);
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
-           "| runtime  | switches"
+    _col_str("runtime", 8);
+    _col_str("switches", 8);
 #endif
-           "\n",
-#ifdef DEVELHELP
-           "name",
-#endif
-           "state");
+    print_str("\n");
 
 #if defined(DEVELHELP) && ISR_STACKSIZE
     int isr_usage = thread_isr_stack_usage();
     void *isr_start = thread_isr_stack_start();
     void *isr_sp = thread_isr_stack_pointer();
-    printf("\t  - | isr_stack            | -        - |"
-           "   - | %6i (%5i) | %10p | %10p\n", ISR_STACKSIZE, isr_usage, isr_start, isr_sp);
+    print_str("\t|");
+    _col_str("-", 3);
+    _col_str("isr_stack", 20);
+    _col_str("-", 8);
+    _col_str("-", 1);
+    _col_str("-", 3);
+    _col_u32_dec(ISR_STACKSIZE, 10);
+    _col_u32_dec(isr_usage, 10);
+    _col_ptr(isr_start, 10);
+    _col_ptr(isr_sp, 10);
+
     overall_stacksz += ISR_STACKSIZE;
     if (isr_usage > 0) {
         overall_used += isr_usage;
     }
+#ifdef MODULE_SCHEDSTATISTICS
+    _col_str("-", 8);
+    _col_str("-", 8);
+#endif
+    print_str("\n");
 #endif
 
 #ifdef MODULE_SCHEDSTATISTICS
@@ -110,49 +168,52 @@ void ps(void)
             stacksz -= thread_measure_stack_free(p->stack_start);
             overall_used += stacksz;
 #endif
-#ifdef MODULE_SCHEDSTATISTICS
-            /* multiply with 100 for percentage and to avoid floats/doubles */
-            uint64_t runtime_ticks = sched_pidlist[i].runtime_ticks * 100;
-            unsigned runtime_major = runtime_ticks / rt_sum;
-            unsigned runtime_minor = ((runtime_ticks % rt_sum) * 1000) / rt_sum;
-            unsigned switches = sched_pidlist[i].schedules;
-#endif
-            printf("\t%3" PRIkernel_pid
+            print_str("\t|");
+            _col_u32_dec(p->pid, 3);
 #ifdef DEVELHELP
-                   " | %-20s"
+            _col_str(p->name, 20);
 #endif
-                   " | %-8s %.1s | %3i"
+            _col_str(sname, 8);
+            _col_str(queued, 1);
+            _col_u32_dec(p->priority, 3);
 #ifdef DEVELHELP
-                   " | %6i (%5i) | %10p | %10p "
-#endif
-#ifdef MODULE_SCHEDSTATISTICS
-                   " | %2d.%03d%% |  %8u"
-#endif
-                   "\n",
-                   p->pid,
-#ifdef DEVELHELP
-                   p->name,
-#endif
-                   sname, queued, p->priority
-#ifdef DEVELHELP
-                   , p->stack_size, stacksz, (void *)p->stack_start, (void *)p->sp
+            _col_u32_dec(p->stack_size, 10);
+            _col_u32_dec(stacksz, 10);
+            _col_ptr(p->stack_start, 10);
+            _col_ptr(p->sp, 10);
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
-                   , runtime_major, runtime_minor, switches
+            _col_runtime(i, rt_sum);
+            _col_u32_dec(sched_pidlist[i].schedules, 8);
 #endif
-                  );
+            print_str("\n");
         }
     }
 
 #ifdef DEVELHELP
-    printf("\t%5s %-21s|%13s%6s %6i (%5i)\n", "|", "SUM", "|", "|",
-           overall_stacksz, overall_used);
+    print_str("\t|");
+    _col_str("-", 3);
+    _col_str("SUM", 20);
+    _col_str("-", 8);
+    _col_str("-", 1);
+    _col_str("-", 3);
+    _col_u32_dec(overall_stacksz, 10);
+    _col_u32_dec(overall_used, 10);
+    _col_str("-", 10);
+    _col_str("-", 10);
+#   ifdef MODULE_SCHEDSTATISTICS
+    _col_str("10.000%", 8);
+    _col_str("-", 8);
+#   endif
 #   ifdef MODULE_TLSF_MALLOC
-    puts("\nHeap usage:");
+    print_str("\nHeap usage:\n");
     tlsf_size_container_t sizes = { .free = 0, .used = 0 };
     tlsf_walk_pool(tlsf_get_pool(_tlsf_get_global_control()), tlsf_size_walker, &sizes);
-    printf("\tTotal free size: %u\n", sizes.free);
-    printf("\tTotal used size: %u\n", sizes.used);
+    print_str("\tTotal free size: ");
+    print_u32_dec(sizes.free);
+    print_str("\n\tTotal used size: ");
+    print_u32_dec(sizes.used);
+    print_str("\n");
 #   endif
 #endif
 }

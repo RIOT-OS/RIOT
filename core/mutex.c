@@ -20,7 +20,6 @@
  * @}
  */
 
-#include <stdio.h>
 #include <inttypes.h>
 
 #include "mutex.h"

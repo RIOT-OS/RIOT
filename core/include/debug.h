@@ -24,7 +24,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include <stdio.h>
+#include "fmt_stdio.h"
 #include "sched.h"
 #include "thread.h"
 
@@ -35,28 +35,9 @@ extern "C" {
 /**
  * @def DEBUG_PRINT
  *
- * @brief Print debug information if the calling thread stack is large enough
- *
- * Use this macro the same as `printf`. When `DEVELHELP` is defined inside an
- * implementation file, all usages of ::DEBUG_PRINT will print the given
- * information to stdout after verifying the stack is big enough. If `DEVELHELP`
- * is not set, this check is not performed. (CPU exception may occur)
+ * @brief Print debug information
  */
-#ifdef DEVELHELP
-#include "cpu_conf.h"
-#define DEBUG_PRINT(...) \
-do { \
-    if ((sched_active_thread == NULL) || \
-        (sched_active_thread->stack_size >= THREAD_EXTRA_STACKSIZE_PRINTF)) { \
-        printf(__VA_ARGS__); \
-    } \
-    else { \
-        puts("Cannot debug, stack too small. Consider using DEBUG_PUTS()."); \
-    } \
-} while (0)
-#else
-#define DEBUG_PRINT(...) printf(__VA_ARGS__)
-#endif
+#define DEBUG_PRINT(...) printf_nano(__VA_ARGS__)
 
 /**
  * @name Debugging defines

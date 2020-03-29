@@ -30,11 +30,11 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include <stdio.h>
 #include <stdint.h>
 
 #include <avr/interrupt.h>
 #include "cpu_conf.h"
+#include "fmt.h"
 #include "sched.h"
 #include "thread.h"
 /**
@@ -164,13 +164,15 @@ static inline void __attribute__((always_inline)) cpu_print_last_instruction(voi
 
     __asm__ volatile ("in __tmp_reg__, __SP_H__  \n\t"
                       "mov %0, __tmp_reg__       \n\t"
-                      : "=g" (hi));
+                      : "=r" (hi));
 
     __asm__ volatile ("in __tmp_reg__, __SP_L__  \n\t"
                       "mov %0, __tmp_reg__       \n\t"
-                      : "=g" (lo));
+                      : "=r" (lo));
     ptr = hi << 8 | lo;
-    printf("Stack Pointer: 0x%04x\n", ptr);
+    print_str("Stack Pointer: 0x");
+    print_u32_hex(ptr);
+    print_str("\n");
 }
 
 /**
