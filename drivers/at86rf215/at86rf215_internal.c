@@ -53,21 +53,21 @@ int at86rf215_hardware_reset(at86rf215_t *dev)
     gpio_set(dev->params.reset_pin);
     xtimer_usleep(AT86RF215_RESET_DELAY_US);
 
-    uint8_t state = _get_reg_with_lock(dev, dev->RF->RG_STATE) & STATE_STATE_MASK;
-    if (state != RF_STATE_TRXOFF && state != RF_STATE_RESET) {
-        spi_release(SPIDEV);
-        return -ENODEV;
-    }
-
     /* While the device is in RESET / DEEP SLEEP, all registers
        but STATE will read 0xFF.
        WAKEUP IRQ signals that the device is ready. */
-    state = 0;
-    while (state == 0xFF || !(state & IRQS_WAKEUP_MASK)) {
+    uint8_t state = 0;
+    uint8_t tries = 255;
+    while (--tries && (state == 0xFF || !(state & IRQS_WAKEUP_MASK))) {
         state = _get_reg_with_lock(dev, dev->RF->RG_IRQS);
     }
 
     spi_release(SPIDEV);
+
+    /* no device connected */
+    if (!tries) {
+        return -ENODEV;
+    }
 
     /* clear interrupts */
     at86rf215_reg_read(dev, RG_RF09_IRQS);
