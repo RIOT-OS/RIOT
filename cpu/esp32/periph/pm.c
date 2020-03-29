@@ -24,7 +24,7 @@
 #include "esp_attr.h"
 #include "esp_sleep.h"
 #include "gpio_arch.h"
-#include "rtc_arch.h"
+#include "rtt_arch.h"
 #include "syscalls.h"
 #include "xtimer.h"
 
@@ -33,6 +33,9 @@
 #include "rom/uart.h"
 #include "soc/rtc.h"
 #include "soc/rtc_cntl_reg.h"
+
+extern void rtt_save_counter(void);
+extern void rtt_restore_counter(void);
 
 static inline esp_sleep_wakeup_cause_t pm_get_wakeup_cause(void)
 {
@@ -93,6 +96,9 @@ void pm_reboot(void)
         uart_tx_wait_idle(i);
     }
 
+    /* save RTT counters */
+    rtt_save_counter();
+
     software_reset();
 }
 
@@ -135,7 +141,7 @@ void pm_set(unsigned mode)
     esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
 
     /* Prepare the RTC timer if an RTC alarm is set to wake up. */
-    rtc_pm_sleep_enter(mode);
+    rtt_pm_sleep_enter(mode);
 
     /* Prepare GPIOs as wakeup source */
     gpio_pm_sleep_enter(mode);
@@ -155,7 +161,7 @@ void pm_set(unsigned mode)
 
         esp_sleep_wakeup_cause_t wakeup_reason = pm_get_wakeup_cause();
         gpio_pm_sleep_exit(wakeup_reason);
-        rtc_pm_sleep_exit(wakeup_reason);
+        rtt_pm_sleep_exit(wakeup_reason);
 
         DEBUG ("%s exit from power mode %d @%u with reason %d\n", __func__,
                mode, system_get_time(), wakeup_reason);

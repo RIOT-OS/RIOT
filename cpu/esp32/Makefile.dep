@@ -92,7 +92,7 @@ ifneq (,$(filter ndn-riot,$(USEPKG)))
 endif
 
 ifneq (,$(filter pm_layered,$(USEMODULE)))
-  USEMODULE += periph_rtc
+  USEMODULE += periph_rtt
 endif
 
 ifneq (,$(filter periph_rtt,$(USEMODULE)))
