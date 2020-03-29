@@ -131,6 +131,9 @@ void pm_set(unsigned mode)
         esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_ON);
     }
 
+    /* first disable all wake-up sources */
+    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+
     /* Prepare the RTC timer if an RTC alarm is set to wake up. */
     rtc_pm_sleep_enter(mode);
 
