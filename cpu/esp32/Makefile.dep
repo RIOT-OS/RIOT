@@ -51,10 +51,6 @@ ifneq (,$(filter esp_rtc_timer_32k,$(FEATURES_USED)))
     USEMODULE += esp_rtc_timer_32k
 endif
 
-ifneq (,$(filter esp_rtc_timer_32k,$(USEMODULE)))
-    USEMODULE += esp_rtc_timer
-endif
-
 ifneq (,$(filter periph_adc periph_dac,$(USEMODULE)))
   FEATURES_REQUIRED += periph_adc_ctrl
 endif
@@ -89,6 +85,10 @@ endif
 ifneq (,$(filter ndn-riot,$(USEPKG)))
   USEMODULE += crypto
   USEMODULE += cipher_modes
+endif
+
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
+  USEMODULE += rtt_rtc
 endif
 
 ifneq (,$(filter pm_layered,$(USEMODULE)))
