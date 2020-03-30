@@ -77,6 +77,32 @@ int base64_encode(const void *data_in, size_t data_in_size,
                   unsigned char *base64_out, size_t *base64_out_size);
 
 /**
+ * @brief           Encodes a given datum to base64 with URL and Filename Safe Alphabet
+ *                  and save the result to the given destination.
+ *
+ * @see             [RFC 4648, section 5](https://tools.ietf.org/html/rfc4648#section-5)
+ *
+ * @note            Requires the use of the `base64url` module.
+ *
+ * @param[in]       data_in           pointer to the datum to encode
+ * @param[in]       data_in_size      the size of `data_in`
+ * @param[out]      base64_out        pointer to store the encoded base64 string
+ * @param[in,out]   base64_out_size   pointer to the variable containing the size of `base64_out.`
+                                      This value is overwritten with the estimated size used for
+                                      the encoded base64 string on BASE64_ERROR_BUFFER_OUT_SIZE.
+                                      This value is overwritten with the actual used size for the
+                                      encoded base64 string on BASE64_SUCCESS.
+
+ * @returns BASE64_SUCCESS on success,
+            BASE64_ERROR_BUFFER_OUT_SIZE on insufficient size for encoding to `base64_out`,
+            BASE64_ERROR_BUFFER_OUT if `base64_out` equals NULL
+                                    but the `base64_out_size` is sufficient,
+            BASE64_ERROR_DATA_IN if `data_in` equals NULL.
+ */
+int base64url_encode(const void *data_in, size_t data_in_size,
+                     unsigned char *base64_out, size_t *base64_out_size);
+
+/**
  * @brief           Decodes a given base64 string and save the result to the given destination.
  * @param[out]      base64_in        pointer to store the encoded base64 string
  * @param[in]       base64_in_size   pointer to the variable containing the size of `base64_out.`

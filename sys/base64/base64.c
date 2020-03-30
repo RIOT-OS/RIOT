@@ -18,26 +18,42 @@
  *
  */
 
+#include <stdbool.h>
 #include "base64.h"
+#include "kernel_defines.h"
 
 #define BASE64_CAPITAL_UPPER_BOUND     (25)     /**< base64 'Z'           */
 #define BASE64_SMALL_UPPER_BOUND       (51)     /**< base64 'z'           */
 #define BASE64_NUMBER_UPPER_BOUND      (61)     /**< base64 '9'           */
 #define BASE64_PLUS                    (62)     /**< base64 '+'           */
+#define BASE64_MINUS                   (62)     /**< base64 '-'           */
 #define BASE64_SLASH                   (63)     /**< base64 '/'           */
+#define BASE64_UNDERLINE               (63)     /**< base64 '_'           */
 #define BASE64_EQUALS                  (0xFE)   /**< no base64 symbol '=' */
 #define BASE64_NOT_DEFINED             (0xFF)   /**< no base64 symbol     */
 
 /*
  * returns the corresponding ascii symbol value for the given base64 code
  */
-static char getsymbol(unsigned char code)
+static char getsymbol(unsigned char code, bool urlsafe)
 {
-    if (code == BASE64_SLASH) {
+    if (!IS_ACTIVE(MODULE_BASE64URL)) {
+        urlsafe = false;
+    }
+
+    if (urlsafe && code == BASE64_UNDERLINE) {
+        return '_';
+    }
+
+    if (urlsafe && code == BASE64_MINUS) {
+        return '-';
+    }
+
+    if (!urlsafe && code == BASE64_SLASH) {
         return '/';
     }
 
-    if (code == BASE64_PLUS) {
+    if (!urlsafe && code == BASE64_PLUS) {
         return '+';
     }
 
@@ -56,8 +72,9 @@ static char getsymbol(unsigned char code)
     return (char)BASE64_NOT_DEFINED;
 }
 
-int base64_encode(const void *data_in, size_t data_in_size,
-                  unsigned char *base64_out, size_t *base64_out_size)
+static int base64_encode_base(const void *data_in, size_t data_in_size,
+                              unsigned char *base64_out, size_t *base64_out_size,
+                              bool urlsafe)
 {
     const unsigned char *in = data_in;
     size_t required_size = base64_estimate_encode_size(data_in_size);
@@ -103,14 +120,14 @@ int base64_encode(const void *data_in, size_t data_in_size,
             nLst =  tmpval & ((1 << njump * 2) - 1);
         }
 
-        base64_out[iterate_base64_buffer++] = getsymbol(nNum);
+        base64_out[iterate_base64_buffer++] = getsymbol(nNum, urlsafe);
     }
 
     /* The last character is not finished yet */
     njump++;
 
     nNum = nLst << (8 - 2 * njump);
-    base64_out[iterate_base64_buffer++] = getsymbol(nNum);
+    base64_out[iterate_base64_buffer++] = getsymbol(nNum, urlsafe);
 
     /* if required we append '=' for the required dividability */
     while (iterate_base64_buffer % 4) {
@@ -122,6 +139,20 @@ int base64_encode(const void *data_in, size_t data_in_size,
     return BASE64_SUCCESS;
 }
 
+int base64_encode(const void *data_in, size_t data_in_size,
+                  unsigned char *base64_out, size_t *base64_out_size)
+{
+    return base64_encode_base(data_in, data_in_size, base64_out, base64_out_size, false);
+}
+
+#if IS_ACTIVE(MODULE_BASE64URL)
+int base64url_encode(const void *data_in, size_t data_in_size,
+                     unsigned char *base64_out, size_t *base64_out_size)
+{
+    return base64_encode_base(data_in, data_in_size, base64_out, base64_out_size, true);
+}
+#endif
+
 /*
  *  returns the corresponding base64 code for the given ascii symbol
  */
@@ -131,8 +162,16 @@ static int getcode(char symbol)
         return BASE64_SLASH;
     }
 
+    if (symbol == '_') {
+        return BASE64_UNDERLINE;
+    }
+
     if (symbol == '+') {
         return BASE64_PLUS;
+    }
+
+    if (symbol == '-') {
+        return BASE64_MINUS;
     }
 
     if (symbol == '=') {

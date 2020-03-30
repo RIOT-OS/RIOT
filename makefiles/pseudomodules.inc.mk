@@ -1,5 +1,6 @@
 PSEUDOMODULES += at_urc
 PSEUDOMODULES += at24c%
+PSEUDOMODULES += base64url
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
