@@ -112,7 +112,6 @@ static int cmd_unblock_rtc(int argc, char **argv)
 
     rtc_get_time(&time);
     time.tm_sec += duration;
-    mktime(&time);
     rtc_set_alarm(&time, cb_rtc, (void *)mode);
 
     pm_unblock(mode);
