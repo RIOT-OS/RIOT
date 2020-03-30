@@ -45,8 +45,9 @@ static void _configure_netdev(netdev_t *dev);
 static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 
-int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize, char priority,
-                      const char *name, netdev_t *netdev, const gnrc_netif_ops_t *ops)
+int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                      char priority, const char *name, netdev_t *netdev,
+                      const gnrc_netif_ops_t *ops)
 {
     int res;
 
@@ -149,7 +150,8 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 
                 res = 0;
                 for (unsigned i = 0;
-                     (res < (int)opt->data_len) && (i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF);
+                     (res < (int)opt->data_len) &&
+                     (i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF);
                      i++) {
                     if (netif->ipv6.addrs_flags[i] != 0) {
                         memcpy(tgt, &netif->ipv6.addrs[i], sizeof(ipv6_addr_t));
@@ -165,7 +167,8 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 
                 res = 0;
                 for (unsigned i = 0;
-                     (res < (int)opt->data_len) && (i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF);
+                     (res < (int)opt->data_len) &&
+                     (i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF);
                      i++) {
                     if (netif->ipv6.addrs_flags[i] != 0) {
                         *tgt = netif->ipv6.addrs_flags[i];
@@ -181,10 +184,12 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 
                 res = 0;
                 for (unsigned i = 0;
-                     (res < (int)opt->data_len) && (i < GNRC_NETIF_IPV6_GROUPS_NUMOF);
+                     (res < (int)opt->data_len) &&
+                     (i < GNRC_NETIF_IPV6_GROUPS_NUMOF);
                      i++) {
                     if (!ipv6_addr_is_unspecified(&netif->ipv6.groups[i])) {
-                        memcpy(tgt, &netif->ipv6.groups[i], sizeof(ipv6_addr_t));
+                        memcpy(tgt, &netif->ipv6.groups[i],
+                               sizeof(ipv6_addr_t));
                         res += sizeof(ipv6_addr_t);
                         tgt++;
                     }
@@ -221,8 +226,9 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
         case NETOPT_6LO_IPHC:
             assert(opt->data_len == sizeof(netopt_enable_t));
-            *((netopt_enable_t *)opt->data) = (netif->flags & GNRC_NETIF_FLAGS_6LO_HC) ?
-                                              NETOPT_ENABLE : NETOPT_DISABLE;
+            *((netopt_enable_t *)opt->data) = (netif->flags &
+                                               GNRC_NETIF_FLAGS_6LO_HC)
+                                            ? NETOPT_ENABLE : NETOPT_DISABLE;
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* MODULE_GNRC_SIXLOWPAN_IPHC */
@@ -230,7 +236,8 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             break;
     }
     if (res == -ENOTSUP) {
-        res = netif->dev->driver->get(netif->dev, opt->opt, opt->data, opt->data_len);
+        res = netif->dev->driver->get(netif->dev, opt->opt, opt->data,
+                                      opt->data_len);
     }
     gnrc_netif_release(netif);
     return res;
@@ -606,7 +613,8 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
     ipv6_addr_set_solicited_nodes(&sol_nodes, addr);
     res = gnrc_netif_ipv6_group_join_internal(netif, &sol_nodes);
     if (res < 0) {
-        DEBUG("gnrc_netif: Can't join solicited-nodes of %s on interface %" PRIkernel_pid "\n",
+        DEBUG("gnrc_netif: Can't join solicited-nodes of %s on interface %"
+              PRIkernel_pid "\n",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               netif->pid);
         return res;
@@ -614,9 +622,11 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
 #else  /* CONFIG_GNRC_IPV6_NIB_ARSM */
     if (!gnrc_netif_is_6ln(netif)) {
         LOG_WARNING("Address-resolution state-machine not activated. Neighbors "
-                    "from interface %u\nwill not be able to resolve address %s\n"
+                    "from interface %u\nwill not be able to resolve address "
+                    "%s\n"
                     "    Use CONFIG_GNRC_IPV6_NIB_ARSM=1 to activate.\n",
-                    netif->pid, ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
+                    netif->pid, ipv6_addr_to_str(addr_str, addr,
+                                                 sizeof(addr_str)));
     }
 #endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
     netif->ipv6.addrs_flags[idx] = flags;
@@ -780,7 +790,8 @@ int gnrc_netif_ipv6_group_join_internal(gnrc_netif_t *netif,
             gnrc_netif_release(netif);
             return i;
         }
-        if ((idx == UINT_MAX) && (ipv6_addr_is_unspecified(&netif->ipv6.groups[i]))) {
+        if ((idx == UINT_MAX) &&
+            (ipv6_addr_is_unspecified(&netif->ipv6.groups[i]))) {
             idx = i;
         }
     }
@@ -826,8 +837,10 @@ int gnrc_netif_ipv6_group_idx(gnrc_netif_t *netif, const ipv6_addr_t *addr)
 static int _idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr, bool mcast)
 {
     if (!ipv6_addr_is_unspecified(addr)) {
-        const ipv6_addr_t *iplist = (mcast) ? netif->ipv6.groups : netif->ipv6.addrs;
-        unsigned ipmax = (mcast) ? GNRC_NETIF_IPV6_GROUPS_NUMOF : CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF;
+        const ipv6_addr_t *iplist = (mcast) ? netif->ipv6.groups :
+                                              netif->ipv6.addrs;
+        unsigned ipmax = (mcast) ? GNRC_NETIF_IPV6_GROUPS_NUMOF :
+                                   CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF;
         for (unsigned i = 0; i < ipmax; i++) {
             if (ipv6_addr_equal(&iplist[i], addr)) {
                 return i;
@@ -885,7 +898,8 @@ static int _match_to_idx(const gnrc_netif_t *netif,
               best_match);
     }
     else {
-        DEBUG("gnrc_netif: Did not found any address on interface %" PRIkernel_pid
+        DEBUG("gnrc_netif: Did not found any address on interface %"
+              PRIkernel_pid
               " matching %s\n",
               netif->pid,
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
@@ -951,8 +965,8 @@ static int _create_candidate_set(const gnrc_netif_t *netif,
 
         DEBUG("Checking address: %s\n",
               ipv6_addr_to_str(addr_str, tmp, sizeof(addr_str)));
-        /* "In any case, multicast addresses and the unspecified address MUST NOT
-         *  be included in a candidate set."
+        /* "In any case, multicast addresses and the unspecified address MUST
+         * NOT be included in a candidate set."
          *
          * flags are set if not unspecfied and multicast addresses are in
          * `netif->ipv6.groups` so not considered here.
@@ -996,7 +1010,8 @@ static int _create_candidate_set(const gnrc_netif_t *netif,
 /* number of "points" assigned to an source address candidate with equal scope
  * than destination address */
 #define RULE_2_PTS          (IPV6_ADDR_MCAST_SCP_GLOBAL + 1)
-/* number of "points" assigned to an source address candidate in preferred state */
+/* number of "points" assigned to an source address candidate in preferred
+ * state */
 #define RULE_3_PTS          (1)
 
 /**
@@ -1094,7 +1109,8 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
         }
 
         /* Rule 3: Avoid deprecated addresses. */
-        if (_get_state(netif, i) != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED) {
+        if (_get_state(netif, i) !=
+            GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED) {
             DEBUG("winner for rule 3 found\n");
             winner_set[i] += RULE_3_PTS;
         }
@@ -1399,8 +1415,10 @@ static void *_gnrc_netif_thread(void *args)
                 }
 #endif
 #if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
-                xtimer_periodic_wakeup(&last_wakeup,
-                                       CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US);
+                xtimer_periodic_wakeup(
+                        &last_wakeup,
+                        CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
+                    );
                 /* override last_wakeup in case last_wakeup +
                  * CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US was in the past */
                 last_wakeup = xtimer_now();
@@ -1456,7 +1474,8 @@ static void *_gnrc_netif_thread(void *args)
 static void _pass_on_packet(gnrc_pktsnip_t *pkt)
 {
     /* throw away packet if no one is interested */
-    if (!gnrc_netapi_dispatch_receive(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
+    if (!gnrc_netapi_dispatch_receive(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL,
+                                      pkt)) {
         DEBUG("gnrc_netif: unable to forward packet of type %i\n", pkt->type);
         gnrc_pktbuf_release(pkt);
         return;
