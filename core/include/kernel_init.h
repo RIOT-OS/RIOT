@@ -22,7 +22,7 @@
 #define KERNEL_INIT_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**

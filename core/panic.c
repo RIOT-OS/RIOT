@@ -41,13 +41,16 @@ const char assert_crash_message[] = "FAILED ASSERTION.";
 /* flag preventing "recursive crash printing loop" */
 static int crashed = 0;
 
-void __attribute__((weak)) panic_arch(void) {}
+void __attribute__((weak)) panic_arch(void)
+{
+    return;
+}
 
 /* WARNING: this function NEVER returns! */
 NORETURN void core_panic(core_panic_t crash_code, const char *message)
 {
 #ifdef NDEBUG
-    (void) crash_code;
+    (void)crash_code;
 #endif
 
     if (crashed == 0) {

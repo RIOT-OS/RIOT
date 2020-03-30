@@ -24,8 +24,11 @@
 #include <stddef.h>
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+/* uncrustify gets mightily confused by these macros... */
+/* begin{code-style-ignore} */
 
 /**
  * @def         container_of(PTR, TYPE, MEMBER)
@@ -215,6 +218,8 @@
 /**
  * @endcond
  */
+
+/* end{code-style-ignore} */
 
 #ifdef __cplusplus
 }

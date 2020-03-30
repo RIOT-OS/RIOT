@@ -58,7 +58,8 @@ static void _cond_signal(cond_t *cond, bool broadcast)
     uint16_t min_prio = THREAD_PRIORITY_MIN + 1;
 
     while ((next = list_remove_head(&cond->queue)) != NULL) {
-        thread_t *process = container_of((clist_node_t *)next, thread_t, rq_entry);
+        thread_t *process = container_of((clist_node_t *)next, thread_t,
+                                         rq_entry);
         sched_set_status(process, STATUS_PENDING);
         uint16_t process_priority = process->priority;
         if (process_priority < min_prio) {

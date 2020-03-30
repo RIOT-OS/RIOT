@@ -28,7 +28,7 @@
 #include "list.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -102,6 +102,7 @@ int _mutex_lock(mutex_t *mutex, volatile uint8_t *blocking);
 static inline int mutex_trylock(mutex_t *mutex)
 {
     volatile uint8_t blocking = 0;
+
     return _mutex_lock(mutex, &blocking);
 }
 
@@ -113,6 +114,7 @@ static inline int mutex_trylock(mutex_t *mutex)
 static inline void mutex_lock(mutex_t *mutex)
 {
     volatile uint8_t blocking = 1;
+
     _mutex_lock(mutex, &blocking);
 }
 

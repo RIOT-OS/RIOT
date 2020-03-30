@@ -41,6 +41,11 @@
 #include <string.h>
 #include "irq.h"
 
+/*
+ * uncrustify mis-formats the macros in this file, so disable it for them.
+ * begin{code-style-ignore}
+ */
+
 /* GCC documentation refers to the types as I1, I2, I4, I8, I16 */
 typedef uint8_t  I1;
 typedef uint16_t I2;
@@ -245,6 +250,8 @@ TEMPLATE_ATOMIC_OP_FETCH_N(nand, &, 2, ~) /* __atomic_nand_fetch_2 */
 TEMPLATE_ATOMIC_OP_FETCH_N(nand, &, 4, ~) /* __atomic_nand_fetch_4 */
 TEMPLATE_ATOMIC_OP_FETCH_N(nand, &, 8, ~) /* __atomic_nand_fetch_8 */
 
+/* end{code-style-ignore} */
+
 /* ***** Generic versions below ***** */
 
 /* Clang objects if you redefine a builtin.  This little hack allows us to
@@ -265,7 +272,7 @@ TEMPLATE_ATOMIC_OP_FETCH_N(nand, &, 8, ~) /* __atomic_nand_fetch_8 */
  */
 void __atomic_load_c(size_t size, const void *src, void *dest, int memorder)
 {
-    (void) memorder;
+    (void)memorder;
     unsigned int mask = irq_disable();
     memcpy(dest, src, size);
     irq_restore(mask);
@@ -281,7 +288,7 @@ void __atomic_load_c(size_t size, const void *src, void *dest, int memorder)
  */
 void __atomic_store_c(size_t size, void *dest, const void *src, int memorder)
 {
-    (void) memorder;
+    (void)memorder;
     unsigned int mask = irq_disable();
     memcpy(dest, src, size);
     irq_restore(mask);
@@ -296,9 +303,10 @@ void __atomic_store_c(size_t size, void *dest, const void *src, int memorder)
  * @param[in]  ret        put the old value from @p ptr in @p ret
  * @param[in]  memorder   memory ordering, ignored in this implementation
  */
-void __atomic_exchange_c(size_t size, void *ptr, void *val, void *ret, int memorder)
+void __atomic_exchange_c(size_t size, void *ptr, void *val, void *ret,
+                         int memorder)
 {
-    (void) memorder;
+    (void)memorder;
     unsigned int mask = irq_disable();
     memcpy(ret, ptr, size);
     memcpy(ptr, val, size);
@@ -338,7 +346,8 @@ void __atomic_exchange_c(size_t size, void *ptr, void *val, void *ret, int memor
  * @return false otherwise
  */
 bool __atomic_compare_exchange_c(size_t len, void *ptr, void *expected,
-    void *desired, bool weak, int success_memorder, int failure_memorder)
+                                 void *desired, bool weak, int success_memorder,
+                                 int failure_memorder)
 {
     (void)weak;
     (void)success_memorder;
@@ -359,7 +368,8 @@ bool __atomic_compare_exchange_c(size_t len, void *ptr, void *expected,
 #if !defined(__llvm__) && !defined(__clang__)
 /* Memory barrier helper function, for platforms without barrier instructions */
 void __sync_synchronize(void) __attribute__((__weak__));
-void __sync_synchronize(void) {
+void __sync_synchronize(void)
+{
     /* ARMv4, ARMv5 do not have any hardware support for memory barriers,
      * This is a software only barrier and a no-op, and will likely break on SMP
      * systems, but we don't support any multi-CPU ARMv5 or ARMv4 boards in RIOT
