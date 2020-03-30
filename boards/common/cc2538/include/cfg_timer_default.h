@@ -42,12 +42,12 @@ static const timer_conf_t timer_config[] = {
         .cfg = GPTMCFG_16_BIT_TIMER, /* required for XTIMER */
     },
     {
-        .chn = 1,
-        .cfg = GPTMCFG_32_BIT_TIMER,
-    },
-    {
         .chn = 2,
         .cfg = GPTMCFG_16_BIT_TIMER,
+    },
+    {
+        .chn = 1,
+        .cfg = GPTMCFG_32_BIT_TIMER,
     },
     {
         .chn = 1,
