@@ -42,6 +42,11 @@ void gnrc_netif_init_devs(void)
         auto_init_at86rf2xx();
     }
 
+    if (IS_USED(MODULE_ATWINC15X0)) {
+        extern void auto_init_atwinc15x0(void);
+        auto_init_atwinc15x0();
+    }
+
     if (IS_USED(MODULE_MRF24J40)) {
         extern void auto_init_mrf24j40(void);
         auto_init_mrf24j40();
