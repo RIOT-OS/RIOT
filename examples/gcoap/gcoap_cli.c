@@ -222,41 +222,41 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
 
     remote.family = AF_INET6;
 
-#ifdef MODULE_GNRC_SOCK_UDP
-    /* parse for interface */
-    char *iface = ipv6_addr_split_iface(addr_str);
-    if (!iface) {
-        if (gnrc_netif_numof() == 1) {
-            /* assign the single interface found in gnrc_netif_numof() */
-            remote.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
+    if (IS_USED(MODULE_GNRC_SOCK_UDP)) {
+        /* parse for interface */
+        char *iface = ipv6_addr_split_iface(addr_str);
+        if (!iface) {
+            if (gnrc_netif_numof() == 1) {
+                /* assign the single interface found in gnrc_netif_numof() */
+                remote.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
+            }
+            else {
+                remote.netif = SOCK_ADDR_ANY_NETIF;
+            }
         }
         else {
-            remote.netif = SOCK_ADDR_ANY_NETIF;
+            int pid = atoi(iface);
+            if (gnrc_netif_get_by_pid(pid) == NULL) {
+                puts("gcoap_cli: interface not valid");
+                return 0;
+            }
+            remote.netif = pid;
         }
     }
     else {
-        int pid = atoi(iface);
-        if (gnrc_netif_get_by_pid(pid) == NULL) {
-            puts("gcoap_cli: interface not valid");
-            return 0;
-        }
-        remote.netif = pid;
+        remote.netif = SOCK_ADDR_ANY_NETIF;
     }
-#else
-    remote.netif = SOCK_ADDR_ANY_NETIF;
-#endif
 
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
         puts("gcoap_cli: unable to parse destination address");
         return 0;
     }
-#ifdef MODULE_GNRC_SOCK_UDP
-    if ((remote.netif == SOCK_ADDR_ANY_NETIF) && ipv6_addr_is_link_local(&addr)) {
+    if (IS_USED(MODULE_GNRC_SOCK_UDP) && (remote.netif == SOCK_ADDR_ANY_NETIF)
+            && ipv6_addr_is_link_local(&addr)) {
         puts("gcoap_cli: must specify interface for link local target");
         return 0;
     }
-#endif
     memcpy(&remote.addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
 
     /* parse port */
