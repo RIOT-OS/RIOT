@@ -11,7 +11,7 @@ else
   UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
 endif
 
-DISABLE_MODULE += auto_init
+DISABLE_MODULE += auto_init auto_init_%
 
 # boards using arduino bootloader require auto_init to
 # automatically initialize stdio over USB. Without this, the bootloader

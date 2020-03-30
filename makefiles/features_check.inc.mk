@@ -39,13 +39,19 @@ FEATURES_REQUIRED_ONE_OUT_OF := $(foreach item,\
 
 # Features that are required by the application but not provided by the BSP
 # Having features missing may case the build to fail.
-FEATURES_MISSING := $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_REQUIRED) $(FEATURES_REQUIRED_ONE_OUT_OF)))
+FEATURES_MISSING := $(sort \
+                      $(filter-out $(FEATURES_PROVIDED),\
+                        $(FEATURES_REQUIRED) $(FEATURES_REQUIRED_ONE_OUT_OF)))
 
 # Features that are used for an application
-FEATURES_USED := $(sort $(FEATURES_REQUIRED) $(FEATURES_REQUIRED_ONE_OUT_OF) $(FEATURES_OPTIONAL_USED))
+FEATURES_USED := $(sort $(FEATURES_REQUIRED) \
+                        $(FEATURES_REQUIRED_ONE_OUT_OF) \
+                        $(FEATURES_OPTIONAL_USED))
 
 # Used features that conflict when used together
-FEATURES_CONFLICTING := $(sort $(foreach conflict,$(FEATURES_CONFLICT),$(call _features_conflicting,$(conflict))))
+FEATURES_CONFLICTING := $(sort $(foreach conflict,\
+                                 $(FEATURES_CONFLICT),\
+                                 $(call _features_conflicting,$(conflict))))
 
 # Return conflicting features from the conflict string feature1:feature2
 #   $1: feature1:feature2
