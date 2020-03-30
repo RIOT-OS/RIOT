@@ -36,9 +36,9 @@ static int _lock(rmutex_t *rmutex, int trylock)
     kernel_pid_t owner;
 
     /* try to lock the mutex */
-    DEBUG("rmutex %" PRIi16" : trylock\n", thread_getpid());
+    DEBUG("rmutex %" PRIi16 " : trylock\n", thread_getpid());
     if (mutex_trylock(&rmutex->mutex) == 0) {
-        DEBUG("rmutex %" PRIi16" : mutex already held\n", thread_getpid());
+        DEBUG("rmutex %" PRIi16 " : mutex already held\n", thread_getpid());
         /* Mutex is already held
          *
          * Case 1: Mutex is not held by me
@@ -79,12 +79,13 @@ static int _lock(rmutex_t *rmutex, int trylock)
 
         /* ensure that owner is read atomically, since I need a consistent value */
         owner = atomic_load_explicit(&rmutex->owner, memory_order_relaxed);
-        DEBUG("rmutex %" PRIi16" : mutex held by %" PRIi16" \n", thread_getpid(), owner);
+        DEBUG("rmutex %" PRIi16 " : mutex held by %" PRIi16 " \n",
+              thread_getpid(), owner);
 
         /* Case 1: Mutex is not held by me */
         if (owner != thread_getpid()) {
             /* wait for the mutex */
-            DEBUG("rmutex %" PRIi16" : locking mutex\n", thread_getpid());
+            DEBUG("rmutex %" PRIi16 " : locking mutex\n", thread_getpid());
 
             if (trylock) {
                 return 0;
@@ -97,15 +98,16 @@ static int _lock(rmutex_t *rmutex, int trylock)
         /* Note: There is nothing to do for Case 2; refcount is incremented below */
     }
 
-    DEBUG("rmutex %" PRIi16" : I am now holding the mutex\n", thread_getpid());
+    DEBUG("rmutex %" PRIi16 " : I am now holding the mutex\n", thread_getpid());
 
     /* I am holding the recursive mutex */
-    DEBUG("rmutex %" PRIi16" : setting the owner\n", thread_getpid());
+    DEBUG("rmutex %" PRIi16 " : setting the owner\n", thread_getpid());
 
     /* ensure that owner is written atomically, since others need a consistent value */
-    atomic_store_explicit(&rmutex->owner, thread_getpid(), memory_order_relaxed);
+    atomic_store_explicit(&rmutex->owner, thread_getpid(),
+                          memory_order_relaxed);
 
-    DEBUG("rmutex %" PRIi16" : increasing refs\n", thread_getpid());
+    DEBUG("rmutex %" PRIi16 " : increasing refs\n", thread_getpid());
 
     /* increase the refcount */
     rmutex->refcount++;
@@ -125,10 +127,11 @@ int rmutex_trylock(rmutex_t *rmutex)
 
 void rmutex_unlock(rmutex_t *rmutex)
 {
-    assert(atomic_load_explicit(&rmutex->owner,memory_order_relaxed) == thread_getpid());
+    assert(atomic_load_explicit(&rmutex->owner,
+                                memory_order_relaxed) == thread_getpid());
     assert(rmutex->refcount > 0);
 
-    DEBUG("rmutex %" PRIi16" : decrementing refs refs\n", thread_getpid());
+    DEBUG("rmutex %" PRIi16 " : decrementing refs refs\n", thread_getpid());
 
     /* decrement refcount */
     rmutex->refcount--;
@@ -137,12 +140,13 @@ void rmutex_unlock(rmutex_t *rmutex)
     if (rmutex->refcount == 0) {
         /* if not release the mutex */
 
-        DEBUG("rmutex %" PRIi16" : resetting owner\n", thread_getpid());
+        DEBUG("rmutex %" PRIi16 " : resetting owner\n", thread_getpid());
 
         /* ensure that owner is written only once */
-        atomic_store_explicit(&rmutex->owner, KERNEL_PID_UNDEF, memory_order_relaxed);
+        atomic_store_explicit(&rmutex->owner, KERNEL_PID_UNDEF,
+                              memory_order_relaxed);
 
-        DEBUG("rmutex %" PRIi16" : releasing mutex\n", thread_getpid());
+        DEBUG("rmutex %" PRIi16 " : releasing mutex\n", thread_getpid());
 
         mutex_unlock(&rmutex->mutex);
     }

@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -56,9 +56,10 @@ typedef struct {
  *          pre-allocated priority_queue_node_t object, must not be NULL.
  */
 static inline void priority_queue_node_init(
-        priority_queue_node_t *priority_queue_node)
+    priority_queue_node_t *priority_queue_node)
 {
     priority_queue_node_t qn = PRIORITY_QUEUE_NODE_INIT;
+
     *priority_queue_node = qn;
 }
 
@@ -78,6 +79,7 @@ static inline void priority_queue_node_init(
 static inline void priority_queue_init(priority_queue_t *priority_queue)
 {
     priority_queue_t q = PRIORITY_QUEUE_INIT;
+
     *priority_queue = q;
 }
 

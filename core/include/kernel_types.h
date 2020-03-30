@@ -36,17 +36,17 @@
 #       ifdef _POSIX_SSIZE_MAX
 #           define SSIZE_MAX _POSIX_SSIZE_MAX
 #       else
-#           define SSIZE_MAX ((ssize_t) (SIZE_MAX / 2))
+#           define SSIZE_MAX ((ssize_t)(SIZE_MAX / 2))
 #       endif
 #   endif
 
 #   ifdef MODULE_MSP430_COMMON
-        typedef signed ssize_t;
+typedef signed ssize_t;
 #   endif
 #endif
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**

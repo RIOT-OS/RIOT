@@ -47,12 +47,12 @@ int _mutex_lock(mutex_t *mutex, volatile uint8_t *blocking)
         return 1;
     }
     else if (*blocking) {
-        thread_t *me = (thread_t*)sched_active_thread;
+        thread_t *me = (thread_t *)sched_active_thread;
         DEBUG("PID[%" PRIkernel_pid "]: Adding node to mutex queue: prio: %"
               PRIu32 "\n", sched_active_pid, (uint32_t)me->priority);
         sched_set_status(me, STATUS_MUTEX_BLOCKED);
         if (mutex->queue.next == MUTEX_LOCKED) {
-            mutex->queue.next = (list_node_t*)&me->rq_entry;
+            mutex->queue.next = (list_node_t *)&me->rq_entry;
             mutex->queue.next->next = NULL;
         }
         else {
@@ -92,7 +92,7 @@ void mutex_unlock(mutex_t *mutex)
 
     list_node_t *next = list_remove_head(&mutex->queue);
 
-    thread_t *process = container_of((clist_node_t*)next, thread_t, rq_entry);
+    thread_t *process = container_of((clist_node_t *)next, thread_t, rq_entry);
 
     DEBUG("mutex_unlock: waking up waiting thread %" PRIkernel_pid "\n",
           process->pid);
@@ -119,7 +119,7 @@ void mutex_unlock_and_sleep(mutex_t *mutex)
         }
         else {
             list_node_t *next = list_remove_head(&mutex->queue);
-            thread_t *process = container_of((clist_node_t*)next, thread_t,
+            thread_t *process = container_of((clist_node_t *)next, thread_t,
                                              rq_entry);
             DEBUG("PID[%" PRIkernel_pid "]: waking up waiter.\n", process->pid);
             sched_set_status(process, STATUS_PENDING);
@@ -130,7 +130,7 @@ void mutex_unlock_and_sleep(mutex_t *mutex)
     }
 
     DEBUG("PID[%" PRIkernel_pid "]: going to sleep.\n", sched_active_pid);
-    sched_set_status((thread_t*)sched_active_thread, STATUS_SLEEPING);
+    sched_set_status((thread_t *)sched_active_thread, STATUS_SLEEPING);
     irq_restore(irqstate);
     thread_yield_higher();
 }

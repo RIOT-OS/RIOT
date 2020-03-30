@@ -26,7 +26,7 @@
 #include "cpu_conf.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -147,7 +147,8 @@ static inline unsigned bitarithm_lsb(unsigned v)
 {
 /* Source: http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup */
     extern const uint8_t MultiplyDeBruijnBitPosition[32];
-    return MultiplyDeBruijnBitPosition[((uint32_t)((v & -v) * 0x077CB531U)) >> 27];
+    return MultiplyDeBruijnBitPosition[((uint32_t)((v & -v) * 0x077CB531U)) >>
+                                       27];
 }
 #else
 {
@@ -157,7 +158,7 @@ static inline unsigned bitarithm_lsb(unsigned v)
     while ((v & 0x01) == 0) {
         v >>= 1;
         r++;
-    };
+    }
 
     return r;
 }

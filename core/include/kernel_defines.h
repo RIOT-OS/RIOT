@@ -24,7 +24,7 @@
 #include <stddef.h>
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* uncrustify gets mightily confused by these macros... */
