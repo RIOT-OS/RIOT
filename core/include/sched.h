@@ -171,17 +171,17 @@ NORETURN void cpu_switch_context_exit(void);
  * Flag indicating whether a context switch is necessary after handling an
  * interrupt. Supposed to be set in an ISR.
  */
-extern volatile unsigned int sched_context_switch_request;
+extern unsigned int sched_context_switch_request;
 
 /**
  *  Thread table
  */
-extern volatile thread_t *sched_threads[KERNEL_PID_LAST + 1];
+extern thread_t *sched_threads[KERNEL_PID_LAST + 1];
 
 /**
  *  Currently active thread
  */
-extern volatile thread_t *sched_active_thread;
+extern thread_t *sched_active_thread;
 
 /**
  *  Number of running (non-terminated) threads
@@ -191,7 +191,7 @@ extern volatile int sched_num_threads;
 /**
  *  Process ID of active thread
  */
-extern volatile kernel_pid_t sched_active_pid;
+extern kernel_pid_t sched_active_pid;
 
 /**
  * List of runqueues per priority level

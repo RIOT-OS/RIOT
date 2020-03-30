@@ -24,7 +24,7 @@
 
 #define THREAD_NUMOF            (5U)
 
-extern volatile thread_t *sched_active_thread;
+extern thread_t *sched_active_thread;
 
 static char stacks[THREAD_NUMOF][THREAD_STACKSIZE_MAIN];
 
@@ -35,7 +35,7 @@ static mutex_t testlock;
 static void *lockme(void *arg)
 {
     (void)arg;
-    volatile thread_t *t = sched_active_thread;
+    thread_t *t = sched_active_thread;
 
     printf("T%i (prio %i): trying to lock mutex now\n",
            (int)t->pid, (int)t->priority);
