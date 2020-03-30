@@ -494,9 +494,10 @@ static void _netif_list(netif_t *iface)
         printf(" CR: %s ", _netopt_coding_rate_str[u8]);
     }
 #endif
-    res = netif_get_opt(iface, NETOPT_LINK, 0, &u8, sizeof(u8));
+    netopt_enable_t link;
+    res = netif_get_opt(iface, NETOPT_LINK, 0, &link, sizeof(netopt_enable_t));
     if (res >= 0) {
-        printf(" Link: %s ", (netopt_enable_t)u8 ? "up" : "down" );
+        printf(" Link: %s ", (link == NETOPT_ENABLE) ? "up" : "down" );
     }
     line_thresh = _newline(0U, line_thresh);
     res = netif_get_opt(iface, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
