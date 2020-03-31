@@ -173,15 +173,16 @@ static inline int _fits_in_nbytes(size_t value, uint8_t num_bytes)
     return (value >> shift) <= 1;
 }
 
-
+/* Valid mac_length are are 4, 6, 8 ... 16 octets */
 static int _validate_mac_length_ccm(uint8_t mac_length)
 {
     return (mac_length % 2 != 0 || mac_length < 4 || mac_length > 16);
 }
 
+/* Valid mac_length are are 0, 4, 6, 8 ... 16 octets */
 static int _validate_mac_length_ccms(uint8_t mac_length)
 {
-    return (mac_length % 2 != 0 || mac_length > 16);
+    return (mac_length % 2 != 0 || mac_length == 2 || mac_length > 16);
 }
 
 int _cipher_encrypt_ccm(cipher_t *cipher,
