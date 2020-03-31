@@ -74,7 +74,24 @@ typedef void (*at86rf215_batmon_cb_t)(void *arg);
 #ifndef AT86RF215_USE_CLOCK_OUTPUT
 #define AT86RF215_USE_CLOCK_OUTPUT      (0)
 #endif
+
+#if defined(DOXYGEN) && !defined(AT86RF215_TRIM_VAL)
+/**
+ * @brief   Trim value for the external crystal oscillator.
+ *
+ *          Each increment adds 300nF capacitance between the crystal oscillator pins
+ *          TCXO and XTAL2.
+ *
+ *          Range: 0..15
+ *
+ *          Use in conjunction with @see AT86RF215_USE_CLOCK_OUTPUT and a frequency
+ *          meter connected to the clock output pin of the AT86RF215.
+ *          Tweak the value until the measured clock output matches 26 MHz the best.
+ */
+#define AT86RF215_TRIM_VAL              (0)
+#endif
 /** @} */
+
 /**
  * @name    Channel configuration
  * @{
