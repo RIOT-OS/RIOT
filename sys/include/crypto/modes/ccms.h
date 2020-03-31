@@ -32,7 +32,7 @@ extern "C" {
  * @param auth_data        Additional data to authenticate in MAC
  * @param auth_data_len    Length of additional data, max (2^16 - 2^8)
  * @param mac_length       length of the appended MAC (between 0 and 16 - only
- *                         even values)
+ *                         even values, 2 excluded)
  * @param length_encoding  maximal supported length of plaintext
  *                         (2^(8*length_enc)), implementation supports (2^32)
  * @param nonce            Nounce for ctr mode encryption
