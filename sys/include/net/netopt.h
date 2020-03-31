@@ -68,6 +68,7 @@ typedef enum {
      * Ethernet      | 6      | device MAC address
      * nrfmin        | 2      | device short address
      * CC110x        | 1      | device address
+     * NRF24L01+     | 5      | device address
      * LoRaWAN       | 4      | device address
      */
     NETOPT_ADDRESS,

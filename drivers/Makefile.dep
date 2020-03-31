@@ -101,6 +101,10 @@ ifneq (,$(filter nrfmin,$(USEMODULE)))
   USEMODULE += netif
 endif
 
+ifneq (,$(filter nrf24l01p_ng_%,$(USEMODULE)))
+  USEMODULE += nrf24l01p_ng
+endif
+
 ifneq (,$(filter periph_ptp_timer periph_ptp_speed_adjustment,$(FEATURES_USED)))
   FEATURES_REQUIRED += periph_ptp
 endif

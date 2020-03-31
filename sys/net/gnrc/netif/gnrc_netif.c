@@ -95,6 +95,7 @@ bool gnrc_netif_dev_is_6lo(const gnrc_netif_t *netif)
         case NETDEV_TYPE_CC110X:
         case NETDEV_TYPE_BLE:
         case NETDEV_TYPE_NRFMIN:
+        case NETDEV_TYPE_NRF24L01P_NG:
         case NETDEV_TYPE_ESP_NOW:
             return true;
         default:
@@ -1357,6 +1358,10 @@ static void _test_options(gnrc_netif_t *netif)
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
             assert(netif->ipv6.mtu < UINT16_MAX);
 #endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
+            break;
+        case NETDEV_TYPE_NRF24L01P_NG:
+            assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
+            assert(netif->l2addr_len >= 3U && netif->l2addr_len <= 5U);
             break;
         case NETDEV_TYPE_LORA: /* LoRa doesn't provide L2 ADDR */
         case NETDEV_TYPE_SLIP:
