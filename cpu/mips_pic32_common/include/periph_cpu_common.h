@@ -78,6 +78,47 @@ enum {
  */
 #define PERIPH_TIMER_PROVIDES_SET
 
+
+/**
+ * @brief   Available MUX values for configuring a pin's alternate function
+ */
+typedef enum {
+    GPIO_AF0 = 0,           /**< use alternate function 0 */
+    GPIO_AF1,               /**< use alternate function 1 */
+    GPIO_AF2,               /**< use alternate function 2 */
+    GPIO_AF3,               /**< use alternate function 3 */
+    GPIO_AF4,               /**< use alternate function 4 */
+    GPIO_AF5,               /**< use alternate function 5 */
+    GPIO_AF6,               /**< use alternate function 6 */
+    GPIO_AF7,               /**< use alternate function 7 */
+    GPIO_AF8,               /**< use alternate function 8 */
+    GPIO_AF9,               /**< use alternate function 9 */
+    GPIO_AF10,              /**< use alternate function 10 */
+    GPIO_AF11,              /**< use alternate function 11 */
+    GPIO_AF12,              /**< use alternate function 12 */
+    GPIO_AF13,              /**< use alternate function 13 */
+    GPIO_AF14,              /**< use alternate function 14 */
+    GPIO_AF15               /**< use alternate function 15 */
+} gpio_af_t;
+
+/**
+ * @brief   Structure for UART configuration data
+ */
+typedef struct {
+    volatile unsigned int * base;           /**< UART device base register address */
+    uint32_t clock;                         /**< Peripheral clock frequency */
+    gpio_t rx_pin;                          /**< RX pin */
+    gpio_t tx_pin;                          /**< TX pin */
+    volatile unsigned int *rx_mux_reg;      /**< Address of RX mux register*/
+    volatile unsigned int *tx_mux_reg;      /**< Address of TX mux register */
+    gpio_af_t rx_af;                        /**< alternate function for RX pin */
+    gpio_af_t tx_af;                        /**< alternate function for TX pin */
+    uint32_t vector;                        /**< vector number */
+#ifdef CPU_FAM_PIC32MX
+    uint32_t irq;                           /**< interrupt number */
+#endif
+} uart_conf_t;
+
 #ifdef __cplusplus
 }
 #endif

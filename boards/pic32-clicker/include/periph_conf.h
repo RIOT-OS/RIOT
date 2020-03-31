@@ -21,6 +21,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "cpu.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
@@ -45,14 +46,25 @@ extern "C" {
 
 /**
   * @name    UART Definitions
-  *          There are 4 UARTS available on this CPU.
-  *          We route debug via UART3 on this board,
-  *          this is the UART connected to the MikroBUS
-  *
-  *          Note Microchip number the UARTS 1->4
   * @{
   */
-#define UART_NUMOF          (4)
+static const uart_conf_t uart_config[] = {
+    {   /* UART port available on MikroBus */
+        .base       = (volatile unsigned int *)_UART3_BASE_ADDRESS,
+        .clock      = PERIPHERAL_CLOCK,
+        .rx_pin     = GPIO_PIN(PORT_F, 5),
+        .tx_pin     = GPIO_PIN(PORT_F, 4),
+        .rx_mux_reg = &U3RXR,
+        .tx_mux_reg = &RPF4R,
+        .rx_af      = GPIO_AF2,
+        .tx_af      = GPIO_AF1,
+        .vector     = _UART_3_VECTOR,
+        .irq        = _UART3_RX_IRQ,
+    },
+};
+
+#define UART_0_ISR          (isr_usart3)
+#define UART_NUMOF          ((unsigned int)ARRAY_SIZE(uart_config))
 /** @} */
 
 #ifdef __cplusplus

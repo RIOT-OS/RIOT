@@ -40,18 +40,6 @@ extern "C" {
 #define TICKS_PER_US (48)
 
 /**
- * @brief   Use the 3rd UART for STDIO on this board
- *
- * This is the UART connected to the MikroBus.
- */
-#define STDIO_UART_DEV      UART_DEV(3)
-
-/**
- * @brief   We are using an External Interrupt Controller (all pic32 devices use this mode)
- */
-#define EIC_IRQ (1)
-
-/**
  * @name    LED pin configuration
  * @{
  */
