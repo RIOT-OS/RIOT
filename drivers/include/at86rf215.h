@@ -62,6 +62,11 @@ typedef void (*at86rf215_batmon_cb_t)(void *arg);
 #define AT86RF215_MAX_PKT_LENGTH        (2047)
 
 /**
+ * @defgroup drivers_at86rf215_config     AT86RF215 driver compile configuration
+ * @ingroup config
+ * @{
+ */
+/**
  * @brief   Set to 1 if the clock output of the AT86RF215 is used
  *          as a clock source on the board.
  *          Otherwise it is turned off to save energy.
@@ -69,7 +74,7 @@ typedef void (*at86rf215_batmon_cb_t)(void *arg);
 #ifndef AT86RF215_USE_CLOCK_OUTPUT
 #define AT86RF215_USE_CLOCK_OUTPUT      (0)
 #endif
-
+/** @} */
 /**
  * @name    Channel configuration
  * @{
