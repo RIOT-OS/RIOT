@@ -1,6 +1,4 @@
-BOARD ?= openmote-b
-
 # the radio driver to test
-USEMODULE += at86rf215
+USEMODULE = mrf24j40md
 
 include ../driver_netdev_common/Makefile

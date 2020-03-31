@@ -36,7 +36,7 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal);
 static dose_signal_t state_transit_idle(dose_t *ctx, dose_signal_t signal);
 static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal);
 static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal);
-static void state(dose_t *ctx, uint8_t src);
+static void state(dose_t *ctx, dose_signal_t src);
 static void _isr_uart(void *arg, uint8_t c);
 static void _isr_gpio(void *arg);
 static void _isr_xtimer(void *arg);
