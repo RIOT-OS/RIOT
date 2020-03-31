@@ -826,6 +826,32 @@ static const size_t TEST_NIST_3_EXPECTED_LEN = 52;
 /* Tests from Project Wycheproof */
 /* See https://github.com/google/wycheproof/blob/master/testvectors/aes_ccm_test.json */
 
+/* tcId" : 1 */
+static const uint8_t TEST_WYCHEPROOF_1_KEY[] = {
+    0xbe, 0xdc, 0xfb, 0x5a, 0x01, 0x1e, 0xbc, 0x84,
+    0x60, 0x0f, 0xcb, 0x29, 0x6c, 0x15, 0xaf, 0x0d
+};
+static const size_t TEST_WYCHEPROOF_1_KEY_LEN = 16;
+static const uint8_t TEST_WYCHEPROOF_1_NONCE[] = {
+    0x43, 0x8a, 0x54, 0x7a, 0x94, 0xea, 0x88, 0xdc,
+    0xe4, 0x6c, 0x6c, 0x85
+};
+static const size_t TEST_WYCHEPROOF_1_NONCE_LEN = 12;
+static const size_t TEST_WYCHEPROOF_1_MAC_LEN = 16;
+static const uint8_t TEST_WYCHEPROOF_1_INPUT[] = {
+    /* PLAINTEXT */
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+static const size_t TEST_WYCHEPROOF_1_INPUT_LEN = 0;
+static const size_t TEST_WYCHEPROOF_1_ADATA_LEN = 0;
+static const uint8_t TEST_WYCHEPROOF_1_EXPECTED[] = {
+    /* MAC */
+    0x25, 0xd1, 0xa3, 0x84, 0x95, 0xa7, 0xde, 0xa4,
+    0x5b, 0xda, 0x04, 0x97, 0x05, 0x62, 0x7d, 0x10
+};
+static const size_t TEST_WYCHEPROOF_1_EXPECTED_LEN = 16;
+
+/* tcId" : 28 */
 static const uint8_t TEST_WYCHEPROOF_28_KEY[] = {
     0x20, 0xbb, 0xf7, 0x4c, 0x1e, 0x63, 0x98, 0x2c,
     0x47, 0x2c, 0x47, 0x43, 0x56, 0x9e, 0x4c, 0x84,
@@ -863,7 +889,6 @@ static const uint8_t TEST_WYCHEPROOF_28_EXPECTED[] = {
     0x16, 0xc4, 0x2f, 0x6f, 0xe8, 0x78, 0xde, 0xef,
 };
 static const size_t TEST_WYCHEPROOF_28_EXPECTED_LEN = 63;
-
 
 /* Manually created test vectors */
 /* This is neccessary, because no test vectors are published with input length > 256 */
@@ -1113,7 +1138,7 @@ static void test_decrypt_op(const uint8_t *key, uint8_t key_len,
     len = cipher_decrypt_ccm(&cipher, adata, adata_len,
                              mac_length, len_encoding,
                              nonce, nonce_len, encrypted, encrypted_len, data);
-    TEST_ASSERT_MESSAGE(len > 0, "Decryption failed");
+    TEST_ASSERT_MESSAGE(len >= 0, "Decryption failed");
 
     TEST_ASSERT_EQUAL_INT(output_expected_len, len);
     cmp = compare(output_expected, data, len);
@@ -1168,6 +1193,7 @@ static void test_crypto_modes_ccm_encrypt(void)
     do_test_encrypt_op(NIST_2);
     do_test_encrypt_op(NIST_3);
 
+    do_test_encrypt_op(WYCHEPROOF_1);
     do_test_encrypt_op(WYCHEPROOF_28);
 
     do_test_encrypt_op(MANUAL_01);
@@ -1220,6 +1246,7 @@ static void test_crypto_modes_ccm_decrypt(void)
     do_test_decrypt_op(NIST_2);
     do_test_decrypt_op(NIST_3);
 
+    do_test_decrypt_op(WYCHEPROOF_1);
     do_test_decrypt_op(WYCHEPROOF_28);
 
     do_test_decrypt_op(MANUAL_01);

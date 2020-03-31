@@ -44,6 +44,7 @@ static int ccm_compute_cbc_mac(cipher_t *cipher, const uint8_t iv[16],
     memmove(mac, iv, 16);
     offset = 0;
 
+    /* no input message */
     if(length == 0) {
         return 0;
     }
