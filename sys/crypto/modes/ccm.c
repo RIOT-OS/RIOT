@@ -81,6 +81,7 @@ static int ccm_create_mac_iv(cipher_t *cipher, uint8_t auth_data_len, uint8_t M,
     /* set flags in B[0] - bit format:
             7        6     5..3  2..0
         Reserved   Adata    M_    L_    */
+    /* valid M values include 0 for CCMS */
     M_ = M == 0 ? 0 : (M - 2) / 2;
 
     L_ = L - 1;
