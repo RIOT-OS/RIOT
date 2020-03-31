@@ -45,38 +45,57 @@
 extern "C" {
 #endif
 
+/**
+ * @defgroup drivers_at_config     AT driver compile configuration
+ * @ingroup config
+ * @{
+ */
+
+/**
+ * @brief End of line character to send after the AT command.
+ */
 #ifndef AT_SEND_EOL
-/** End of line character to send after the AT command */
 #define AT_SEND_EOL "\r"
 #endif
 
+/**
+ * @brief Enable/disable the expected echo after an AT command is sent.
+ */
 #ifndef AT_SEND_ECHO
-/** Enable/disable the expected echo after an AT command is sent */
 #define AT_SEND_ECHO 1
 #endif
 
-/** Shortcut for getting send end of line length */
-#define AT_SEND_EOL_LEN  (sizeof(AT_SEND_EOL) - 1)
-
+/**
+ * @brief 1st end of line character received (S3 aka CR character for a modem).
+ */
 #ifndef AT_RECV_EOL_1
-/** 1st end of line character received (S3 aka CR character for a modem) */
 #define AT_RECV_EOL_1   "\r"
 #endif
 
+/**
+ * @brief 1st end of line character received (S4 aka LF character for a modem).
+ */
 #ifndef AT_RECV_EOL_2
-/** 1st end of line character received (S4 aka LF character for a modem) */
 #define AT_RECV_EOL_2   "\n"
 #endif
 
+/**
+ * @brief default OK reply of an AT device.
+ */
 #ifndef AT_RECV_OK
-/** default OK reply of an AT device */
 #define AT_RECV_OK "OK"
 #endif
 
+/**
+ * @brief default ERROR reply of an AT device.
+ */
 #ifndef AT_RECV_ERROR
-/** default ERROR reply of an AT device */
 #define AT_RECV_ERROR "ERROR"
 #endif
+/** @} */
+
+/** Shortcut for getting send end of line length */
+#define AT_SEND_EOL_LEN  (sizeof(AT_SEND_EOL) - 1)
 
 #if defined(MODULE_AT_URC) || DOXYGEN
 #ifndef AT_BUF_SIZE
