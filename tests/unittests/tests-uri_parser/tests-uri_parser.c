@@ -24,7 +24,7 @@
     { .uri = u, .scheme = s, .userinfo = us, .host = h, .port = po,     \
       .path = pa, .query = q, .expected = e}
 
-#define VEC_CHECK(comp)                                                 \
+#define VEC_CHECK(comp, i)                                              \
     do {                                                                \
         if (ures.comp == NULL) {                                        \
             TEST_ASSERT(validate_uris[i].comp[0] == '\0');              \
@@ -281,12 +281,12 @@ static void test_uri_parser__validate(void)
         int res = uri_parser_process_string(&ures, validate_uris[i].uri);
         TEST_ASSERT_EQUAL_INT(validate_uris[i].expected, res);
         if (res == 0) {
-            VEC_CHECK(scheme);
-            VEC_CHECK(userinfo);
-            VEC_CHECK(host);
-            VEC_CHECK(port);
-            VEC_CHECK(path);
-            VEC_CHECK(query);
+            VEC_CHECK(scheme, i);
+            VEC_CHECK(userinfo, i);
+            VEC_CHECK(host, i);
+            VEC_CHECK(port, i);
+            VEC_CHECK(path, i);
+            VEC_CHECK(query, i);
         }
     }
 }
