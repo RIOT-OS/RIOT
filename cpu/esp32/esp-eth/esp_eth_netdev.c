@@ -280,7 +280,7 @@ static int _esp_eth_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_le
             assert(max_len >= ETHERNET_ADDR_LEN);
             esp_eth_get_mac((uint8_t *)val);
             return ETHERNET_ADDR_LEN;
-        case NETOPT_LINK_CONNECTED:
+        case NETOPT_LINK:
             assert(max_len == sizeof(netopt_enable_t));
             *((netopt_enable_t *)val) = (dev->link_up) ? NETOPT_ENABLE
                                                        : NETOPT_DISABLE;
