@@ -54,10 +54,6 @@
 #ifndef THREAD_FLAGS_H
 #define THREAD_FLAGS_H
 
-#ifndef MODULE_CORE_THREAD_FLAGS
-#error Missing USEMODULE += core_thread_flags
-#endif
-
 #include "kernel_types.h"
 #include "sched.h"  /* for thread_t typedef */
 
