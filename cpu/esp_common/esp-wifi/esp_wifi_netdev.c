@@ -639,11 +639,11 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
             assert(max_len >= ETHERNET_ADDR_LEN);
             esp_wifi_get_mac(ESP_MAC_WIFI_STA,(uint8_t *)val);
             return ETHERNET_ADDR_LEN;
-        case NETOPT_LINK_CONNECTED:
-            assert(max_len == 1);
+        case NETOPT_LINK:
+            assert(max_len == sizeof(netopt_enable_t));
             *((netopt_enable_t *)val) = (dev->connected) ? NETOPT_ENABLE
                                                          : NETOPT_DISABLE;
-            return 1;
+            return sizeof(netopt_enable_t);
         default:
             return netdev_eth_get(netdev, opt, val, max_len);
     }
