@@ -23,6 +23,17 @@
  * USEPKG += cryptoauthlib
  * to your Makefile.
  *
+ *
+ * ### Shell
+ *
+ * To facilitate the device configuration the RIOT shell provides some
+ * helper commands. Currently there are shell commands to read the device's
+ * config zone, to lock the config zone (this will lock the config zone permanently
+ * and cannot be undone) and to check whether config and data zone are locked.
+ * The shell handler is enabled, if cryptoauthlib is included as a package in the
+ * Makefile of an application that also includes the shell (e.g. examples/default).
+ *
+ *
  * ### No poll mode
  *
  * After sending a command to the device, responses are usually polled to enable
