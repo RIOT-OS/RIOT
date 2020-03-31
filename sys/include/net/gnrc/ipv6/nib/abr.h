@@ -21,6 +21,8 @@
 #ifndef NET_GNRC_IPV6_NIB_ABR_H
 #define NET_GNRC_IPV6_NIB_ABR_H
 
+#include <kernel_defines.h>
+
 #include "net/ipv6/addr.h"
 #include "net/gnrc/ipv6/nib/conf.h"
 
@@ -38,8 +40,8 @@ typedef struct {
                              *   information is valid */
 } gnrc_ipv6_nib_abr_t;
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN)
-#if GNRC_IPV6_NIB_CONF_6LBR || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) || defined(DOXYGEN)
 /**
  * @brief   Adds the address of an authoritative border router to the NIB
  *
@@ -47,8 +49,8 @@ typedef struct {
  *
  * @return  0 on success.
  * @return  -ENOMEM, if no space is left in the neighbor cache.
- * @return  -ENOTSUP, if @ref GNRC_IPV6_NIB_CONF_6LBR or
- *          @ref GNRC_IPV6_NIB_CONF_MULTIHOP_P6C is not defined
+ * @return  -ENOTSUP, if @ref CONFIG_GNRC_IPV6_NIB_6LBR or
+ *          @ref CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C is not defined
  */
 int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr);
 
@@ -58,10 +60,10 @@ int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr);
  * @param[in] addr  The address of an authoritative border router.
  */
 void gnrc_ipv6_nib_abr_del(const ipv6_addr_t *addr);
-#else   /* GNRC_IPV6_NIB_CONF_6LBR || defined(DOXYGEN) */
+#else   /* CONFIG_GNRC_IPV6_NIB_6LBR || defined(DOXYGEN) */
 #define gnrc_ipv6_nib_abr_add(addr)     (-ENOTSUP)
 #define gnrc_ipv6_nib_abr_del(addr)     (void)(addr)
-#endif  /* GNRC_IPV6_NIB_CONF_6LBR || defined(DOXYGEN) */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LBR || defined(DOXYGEN) */
 
 /**
  * @brief   Iterates over all authoritative border router in the NIB
@@ -105,12 +107,12 @@ bool gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *abr);
  * @param[in] abr   An authoritative border router list entry
  */
 void gnrc_ipv6_nib_abr_print(gnrc_ipv6_nib_abr_t *abr);
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN) */
 #define gnrc_ipv6_nib_abr_add(addr)         (-ENOTSUP)
 #define gnrc_ipv6_nib_abr_del(addr)         (void)(addr)
 #define gnrc_ipv6_nib_abr_iter(state, abr)  (false)
 #define gnrc_ipv6_nib_abr_print(abr)        (void)(abr)
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }

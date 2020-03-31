@@ -13,6 +13,7 @@ rsource "netif/Kconfig"
 rsource "network_layer/ipv6/Kconfig"
 rsource "network_layer/ipv6/blacklist/Kconfig"
 rsource "network_layer/ipv6/ext/frag/Kconfig"
+rsource "network_layer/ipv6/nib/Kconfig"
 rsource "network_layer/ipv6/whitelist/Kconfig"
 rsource "network_layer/sixlowpan/Kconfig"
 

@@ -213,7 +213,7 @@ the prefix (`2001:db8::`) and the EUI64 suffix, in this case `7b7e:3255:1313:8d9
 - Provision the wireless ble device:
 
 ```
-    $ CFLAGS=-DGNRC_IPV6_NIB_CONF_SLAAC=1 USEMODULE+=nimble_autoconn_ipsp USE_ETHOS=0 BOARD=nrf52dk make -C examples/suit_update clean flash -j4
+    $ CFLAGS=-DCONFIG_GNRC_IPV6_NIB_SLAAC=1 USEMODULE+=nimble_autoconn_ipsp USE_ETHOS=0 BOARD=nrf52dk make -C examples/suit_update clean flash -j4
 ```
 
 - Open a serial terminal on the device to get its local address:
@@ -237,7 +237,7 @@ the prefix (`2001:db8::`) and the EUI64 suffix, in this case `7b7e:3255:1313:8d9
 
 **NOTE 2:** Currently, Linux does not support 6LoWPAN neighbor discovery (which
 RIOT uses per default with BLE), so RIOT needs to be compiled to use stateless
-address auto configuration (SLAAC) -> `CFLAGS=-DGNRC_IPV6_NIB_CONF_SLAAC=1`.
+address auto configuration (SLAAC) -> `CFLAGS=-DCONFIG_GNRC_IPV6_NIB_SLAAC=1`.
 
 - Use `bluetoothctl` on Linux to scan for the device. Once `bluetoothctl` has
   started, issue `scan on` to start scanning. The default name for the RIOT

@@ -472,7 +472,7 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
                            const ipv6_addr_t *dst, bool fin,
                            gnrc_pktsnip_t *ext_opts)
 {
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     gnrc_pktsnip_t *hdr = NULL, *pkt = ext_opts;
     uint32_t reach_time = 0, retrans_timer = 0;
     uint16_t adv_ltime = 0;
@@ -528,7 +528,7 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
         if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_CUR_HL) {
             cur_hl = netif->cur_hl;
         }
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         /* netif->ipv6.reach_time_base is only available with Address Resolution
          * State Machine */
         if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_REACH_TIME) {
@@ -540,7 +540,7 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
                 reach_time = netif->ipv6.reach_time_base;
             }
         }
-#endif /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
         if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_RETRANS_TIMER) {
             retrans_timer = netif->ipv6.retrans_time;
         }
@@ -586,7 +586,7 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
     (void)fin;
     DEBUG("ndp: not a router, dropping ext_opts\n");
     gnrc_pktbuf_release(ext_opts);
-#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 }
 
 static gnrc_pktsnip_t *_build_headers(gnrc_netif_t *netif,

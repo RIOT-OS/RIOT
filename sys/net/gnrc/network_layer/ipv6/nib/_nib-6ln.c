@@ -12,6 +12,7 @@
  * @file
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#include <kernel_defines.h>
 
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/ipv6/nib.h"
@@ -23,7 +24,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
@@ -140,15 +141,15 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             }
             return aro->status;
         }
-#if GNRC_IPV6_NIB_CONF_6LR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
         else if (gnrc_netif_is_6lr(netif) &&
                  (icmpv6->type == ICMPV6_NBR_SOL)) {
             return _reg_addr_upstream(netif, ipv6, icmpv6, aro, sl2ao, nce);
         }
-#else   /* GNRC_IPV6_NIB_CONF_6LR */
+#else   /* CONFIG_GNRC_IPV6_NIB_6LR */
         (void)sl2ao;
         (void)nce;
-#endif  /* GNRC_IPV6_NIB_CONF_6LR */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
     }
 #if ENABLE_DEBUG
     else if (aro->len != SIXLOWPAN_ND_OPT_AR_LEN) {
@@ -218,7 +219,7 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
     }
 }
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 _nib_abr_entry_t *_handle_abro(const sixlowpan_nd_opt_abr_t *abro)
 {
     _nib_abr_entry_t *abr = NULL;
@@ -244,16 +245,16 @@ _nib_abr_entry_t *_handle_abro(const sixlowpan_nd_opt_abr_t *abro)
     }
     return abr;
 }
-#endif /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
                      const sixlowpan_nd_opt_6ctx_t *sixco,
                      _nib_abr_entry_t *abr)
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
                      const sixlowpan_nd_opt_6ctx_t *sixco)
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 {
     uint16_t ltime;
 
@@ -278,7 +279,7 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
     cid = sixlowpan_nd_opt_6ctx_get_cid(sixco);
     gnrc_sixlowpan_ctx_update(cid, (ipv6_addr_t *)(sixco + 1), sixco->ctx_len,
                               ltime, sixlowpan_nd_opt_6ctx_is_comp(sixco));
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     assert(abr != NULL);    /* should have been set in _handle_abro() */
     if (ltime == 0) {
         bf_unset(abr->ctxs, cid);
@@ -286,15 +287,15 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
     else {
         bf_set(abr->ctxs, cid);
     }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 #else   /* MODULE_GNRC_SIXLOWPAN_CTX */
     (void)abr;
 #endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
     return ltime * SEC_PER_MIN * MS_PER_SEC;
 }
-#else  /* GNRC_IPV6_NIB_CONF_6LN */
+#else  /* CONFIG_GNRC_IPV6_NIB_6LN */
 typedef int dont_be_pedantic;
-#endif /* GNRC_IPV6_NIB_CONF_6LN */
+#endif /* CONFIG_GNRC_IPV6_NIB_6LN */
 
 
 /** @} */

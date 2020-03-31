@@ -16,6 +16,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <kernel_defines.h>
 
 #include "net/gnrc/ipv6/nib/pl.h"
 #include "net/gnrc/netif/internal.h"
@@ -71,7 +72,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     if (netif->ipv6.aac_mode == GNRC_NETIF_AAC_AUTO) {
         dst->flags |= _PFX_SLAAC;
     }
-#if GNRC_IPV6_NIB_CONF_6LBR && GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     if (gnrc_netif_is_6lbr(netif)) {
         _nib_abr_entry_t *abr = NULL;
 
@@ -84,7 +85,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     gnrc_netif_release(netif);
 #endif  /* MODULE_GNRC_NETIF */
     _nib_release();
-#if defined(MODULE_GNRC_NETIF) && GNRC_IPV6_NIB_CONF_ROUTER
+#if defined(MODULE_GNRC_NETIF) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     /* update prefixes down-stream */
     _handle_snd_mc_ra(netif);
 #endif
@@ -105,7 +106,7 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
             (ipv6_addr_match_prefix(pfx, &dst->pfx) >= pfx_len)) {
             _nib_pl_remove(dst);
             _nib_release();
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
             gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
 
             if (netif) {

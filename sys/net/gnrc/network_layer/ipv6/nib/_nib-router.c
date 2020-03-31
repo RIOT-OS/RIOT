@@ -12,24 +12,25 @@
  * @file
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#include <kernel_defines.h>
 
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/sixlowpan/nd.h"
-#if GNRC_IPV6_NIB_CONF_DNS
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 #include "net/sock/dns.h"
 #endif
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 #include "_nib-6ln.h"
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 #include "_nib-router.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
@@ -83,7 +84,7 @@ void _handle_snd_mc_ra(gnrc_netif_t *netif)
 
 void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst, bool final)
 {
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     _nib_abr_entry_t *abr = NULL;
 
     DEBUG("nib: Send router advertisements for each border router:\n");
@@ -92,9 +93,9 @@ void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst, bool final)
                                              sizeof(addr_str)));
         _snd_ra(netif, dst, final, abr);
     }
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     _snd_ra(netif, dst, final, NULL);
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 }
 
 static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
@@ -141,7 +142,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
     _nib_offl_entry_t *pfx = NULL;
     unsigned id = netif->pid;
 
-#if GNRC_IPV6_NIB_CONF_DNS && SOCK_HAS_IPV6
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS) && SOCK_HAS_IPV6
     uint32_t rdnss_ltime = _evtimer_lookup(&sock_dns_server,
                                            GNRC_IPV6_NIB_RDNSS_TIMEOUT);
 
@@ -160,8 +161,8 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         }
         ext_opts = rdnsso;
     }
-#endif  /* GNRC_IPV6_NIB_CONF_DNS */
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#endif  /* CONFIG_GNRC_IPV6_NIB_DNS */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     uint16_t ltime;
     gnrc_pktsnip_t *abro;
 
@@ -199,7 +200,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         return NULL;
     }
     ext_opts = abro;
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     (void)abr;
     while ((pfx = _nib_offl_iter(pfx))) {
         if ((pfx->mode & _PL) && (_nib_onl_get_if(pfx->next_hop) == id)) {
@@ -208,7 +209,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
             }
         }
     }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     return ext_opts;
 }
 
@@ -231,8 +232,8 @@ static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
 
     gnrc_ndp_rtr_adv_send(netif, NULL, dst, final, ext_opts);
 }
-#else  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#else  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 typedef int dont_be_pedantic;
-#endif /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 
 /** @} */
