@@ -32,10 +32,11 @@
         else {                                                          \
             TEST_ASSERT_EQUAL_INT(strlen(validate_uris[i].comp),        \
                                   ures.comp##_len);                     \
-            TEST_ASSERT_EQUAL_INT(0,                                    \
-                                  memcmp(ures.comp,                     \
-                                         validate_uris[i].comp,         \
-                                         strlen(validate_uris[i].comp))); \
+            TEST_ASSERT_MESSAGE(0 ==                                    \
+                                  strncmp(ures.comp,                    \
+                                          validate_uris[i].comp,        \
+                                          strlen(validate_uris[i].comp)), \
+                                "Unexpected " # comp " member");        \
         }                                                               \
     } while (0)
 
