@@ -92,7 +92,7 @@ delete_bridge() {
             kldunload if_bridge || exit 1 ;;
         Linux)
             for IF in $(ls /sys/class/net/${BRNAME}/brif); do
-                if [ ${IF} != ${UPLINK} ]; then
+                if [ "${IF}" != "${UPLINK}" ]; then
                     ip link delete "${IF}"
                 fi
             done
