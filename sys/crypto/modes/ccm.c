@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Crypto mode - counter with CBC-MAC (CMS) and CMS*
+ * @brief       Crypto mode - counter with CBC-MAC (CCM) and CCM*
  *
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  *
