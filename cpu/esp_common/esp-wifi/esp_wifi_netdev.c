@@ -730,14 +730,14 @@ static wifi_config_t wifi_config_sta = {
     }
 };
 
-#ifndef MODULE_ESP_NOW
+#if defined(MCU_ESP8266) && !defined(MODULE_ESP_NOW)
 /**
  * Static configuration for the SoftAP interface if ESP-NOW is not enabled.
  *
  * Although only the Station interface is needed, the SoftAP interface must
  * also be enabled for stability reasons to prevent the Station interface
  * from being shut down by power management in the event of silence.
- * Otherwise, the WLAN module and the WLAN task will hang sporadically.
+ * Otherwise, the WiFi module and the WiFi task will hang sporadically.
  *
  * Since the SoftAP interface is not required, we make it invisible and
  * unusable. This configuration
@@ -763,7 +763,7 @@ static wifi_config_t wifi_config_ap = {
         .beacon_interval = 60000,       /* send beacon only every 60 s */
     }
 };
-#endif
+#endif /* defined(MCU_ESP8266) && !defined(MODULE_ESP_NOW) */
 
 void esp_wifi_setup (esp_wifi_netdev_t* dev)
 {
@@ -808,19 +808,33 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     /* TODO */
 #endif
 
+#ifdef MCU_ESP8266
+    /*
+     * Although only the Station interface is needed, the SoftAP interface must
+     * also be enabled on ESP8266 for stability reasons to prevent the Station
+     * interface from being shut down by power management in the event of
+     * silence. Otherwise, the WiFi module and the WiFi task will hang
+     * sporadically.
+     */
     /* activate the Station and the SoftAP interface */
     result = esp_wifi_set_mode(WIFI_MODE_APSTA);
+#else /* MCU_ESP8266 */
+    /* activate only the Station interface */
+    result = esp_wifi_set_mode(WIFI_MODE_STA);
+#endif /* MCU_ESP8266 */
     if (result != ESP_OK) {
         ESP_WIFI_LOG_ERROR("esp_wifi_set_mode failed with return value %d", result);
         return;
     }
 
+#ifdef MCU_ESP8266
     /* set the SoftAP configuration */
     result = esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config_ap);
     if (result != ESP_OK) {
         ESP_WIFI_LOG_ERROR("esp_wifi_set_config softap failed with return value %d", result);
         return;
     }
+#endif /* MCU_ESP8266 */
 
 #endif /* MODULE_ESP_NOW */
 
@@ -837,7 +851,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 #ifdef ESP_WIFI_EAP_ID
     esp_wifi_sta_wpa2_ent_set_identity((const unsigned char *)ESP_WIFI_EAP_ID,
                                        strlen(ESP_WIFI_EAP_ID));
-#endif
+#endif /* ESP_WIFI_EAP_ID */
 #if defined(ESP_WIFI_EAP_USER) && defined(ESP_WIFI_EAP_PASS)
     ESP_WIFI_DEBUG("eap_user=%s eap_pass=%s\n",
                    ESP_WIFI_EAP_USER, ESP_WIFI_EAP_PASS);
@@ -845,12 +859,12 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
                                        strlen(ESP_WIFI_EAP_USER));
     esp_wifi_sta_wpa2_ent_set_password((const unsigned char *)ESP_WIFI_EAP_PASS,
                                        strlen(ESP_WIFI_EAP_PASS));
-#else
+#else /* defined(ESP_WIFI_EAP_USER) && defined(ESP_WIFI_EAP_PASS) */
 #error ESP_WIFI_EAP_USER and ESP_WIFI_EAP_PASS have to define the user name \
        and the password for EAP phase 2 authentication in esp_wifi_enterprise
-#endif
+#endif /* defined(ESP_WIFI_EAP_USER) && defined(ESP_WIFI_EAP_PASS) */
     esp_wifi_sta_wpa2_ent_enable(&wifi_config_wpa2);
-#endif
+#endif /* MODULE_ESP_WIFI_ENTERPRISE */
 
     /* start the WiFi driver */
     result = esp_wifi_start();
