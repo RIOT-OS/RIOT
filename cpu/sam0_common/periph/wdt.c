@@ -193,7 +193,7 @@ void wdt_setup_reboot_with_callback(uint32_t min_time, uint32_t max_time,
     cb_arg = arg;
 
     if (cb != NULL) {
-        uint32_t warning_offset = ms_to_per(WDT_WARNING_PERIOD);
+        uint32_t warning_offset = ms_to_per(CONFIG_WDT_WARNING_PERIOD);
 
         if (warning_offset == 0) {
             warning_offset = 1;
