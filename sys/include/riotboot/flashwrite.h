@@ -59,6 +59,9 @@ extern "C" {
 
 /**
  * @brief   firmware update state structure
+ *
+ * @note    @ref FLASHPAGE_SIZE can be very large on some platforms, don't place
+ *          this struct on the stack or increase the thread stack size accordingly.
  */
 typedef struct {
     int target_slot;                        /**< update targets this slot     */
