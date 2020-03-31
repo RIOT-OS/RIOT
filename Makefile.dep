@@ -42,6 +42,10 @@ ifneq (,$(filter auto_init_saul,$(USEMODULE)))
   USEMODULE += saul_init_devs
 endif
 
+ifneq (,$(filter base64url,$(USEMODULE)))
+  USEMODULE += base64
+endif
+
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += xtimer
