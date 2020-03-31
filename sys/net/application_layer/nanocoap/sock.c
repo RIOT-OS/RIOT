@@ -83,6 +83,8 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *r
             }
         }
 
+        /* Ensure that the total combined wait time is equal to `timeout`, even
+         * when multiple incorrect messages are received in between */
         res = sock_udp_recv(&sock, buf, len, deadline_left(deadline), NULL);
         if (res <= 0) {
             if (res == -ETIMEDOUT) {
@@ -110,6 +112,8 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *r
             }
             else if (coap_get_id(pkt) != id) {
                 res = -EBADMSG;
+                /* don't send the request again, continue waiting for the
+                 * correct reply */
                 continue;
             }
 
