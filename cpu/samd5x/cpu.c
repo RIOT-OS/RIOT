@@ -149,6 +149,14 @@ uint32_t sam0_gclk_freq(uint8_t id)
  */
 void cpu_init(void)
 {
+    /* Disable the RTC module to prevent synchronization issues during CPU init
+       if the RTC was running from a previous boot (e.g wakeup from backup) */
+    if (RTC->MODE2.CTRLA.bit.ENABLE) {
+        while (RTC->MODE2.SYNCBUSY.reg) {}
+        RTC->MODE2.CTRLA.bit.ENABLE = 0;
+        while (RTC->MODE2.SYNCBUSY.reg) {}
+    }
+
     /* initialize the Cortex-M core */
     cortexm_init();
 
