@@ -20,6 +20,7 @@
  * See epd_bw_spi_params_t and @ref epd_bw_spi_params.h for more details on the parameters.
  * Note that while the reset and busy pins are optional, using them is highly recommended.
  *
+ * This driver has @ref drivers_disp_dev support.
  *
  * @{
  * @file
@@ -33,6 +34,10 @@
 
 #include "periph/spi.h"
 #include "periph/gpio.h"
+
+#ifdef MODULE_DISP_DEV
+#include "disp_dev.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -99,6 +104,9 @@ typedef struct {
  * @brief   Device initialisation parameters.
  */
 typedef struct {
+    #ifdef MODULE_DISP_DEV
+    disp_dev_t *dev;                    /**< pointer to the generic display device */
+    #endif
     epd_bw_spi_params_t params;         /**< SPI display parameters */
     uint16_t partial_refresh_count;     /**< number of partial refreshes since
                                              the last full refresh */
