@@ -26,6 +26,3 @@ term-delay:
 
 TESTRUNNER_CONNECT_DELAY ?= $(TERM_DELAY)
 $(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)
-
-# Add the samd21-arduino-bootloader directory to the build
-DIRS += $(RIOTBOARD)/common/samd21-arduino-bootloader
