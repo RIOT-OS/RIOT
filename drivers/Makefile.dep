@@ -62,11 +62,11 @@ endif
 
 ifneq (,$(filter at86rf215%,$(USEMODULE)))
   USEMODULE += at86rf215
-  DEFAULT_MODULE += auto_init_at86rf215
-  DEFAULT_MODULE += at86rf215_subghz
+  DEFAULT_MODULE_DELAYED += auto_init_at86rf215
+  DEFAULT_MODULE_DELAYED += at86rf215_subghz
 
   ifeq (,$(filter at86rf215m,$(USEMODULE)))
-    DEFAULT_MODULE += at86rf215_24ghz
+    DEFAULT_MODULE_DELAYED += at86rf215_24ghz
   endif
 
   FEATURES_REQUIRED += periph_gpio
@@ -82,7 +82,7 @@ endif
 
 ifneq (,$(filter at86rf%, $(filter-out at86rf215%, $(USEMODULE))))
   USEMODULE += at86rf2xx
-  DEFAULT_MODULE += auto_init_at86rf2xx
+  DEFAULT_MODULE_DELAYED += auto_init_at86rf2xx
 
   USEMODULE += xtimer
   USEMODULE += luid

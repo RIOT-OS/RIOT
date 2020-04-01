@@ -17,7 +17,7 @@ ifneq (,$(filter ztimer,$(USEMODULE)))
   #
   # So, if neither "auto_init" nor "auto_init_ztimer" are disabled, pull in
   # "ztimer_auto_init".
-  DEFAULT_MODULE += auto_init_ztimer
+  DEFAULT_MODULE_DELAYED += auto_init_ztimer
   ifeq (,$(filter auto_init auto_init_ztimer,$(DISABLE_MODULE)))
     USEMODULE += ztimer_auto_init
   endif

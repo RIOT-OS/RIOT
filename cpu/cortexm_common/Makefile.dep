@@ -16,5 +16,5 @@ USEMODULE += periph
 # Use Hardware FPU by default if present
 FEATURES_OPTIONAL += cortexm_fpu
 ifneq (,$(filter cortexm_fpu,$(FEATURES_USED)))
-  DEFAULT_MODULE += cortexm_fpu
+  DEFAULT_MODULE_DELAYED += cortexm_fpu
 endif

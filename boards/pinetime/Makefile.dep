@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 # Use Segger's RTT unless another stdio_% is already used
 ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_rtt
 endif
+=======
+DEFAULT_MODULE_DELAYED += stdio_rtt
+>>>>>>> 0f356beb61... %/Makefile.dep: use DEFAULT_MODULE_DELAYED
 
 ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += mtd_spi_nor

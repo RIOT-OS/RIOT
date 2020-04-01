@@ -12,7 +12,7 @@ USEMODULE += $(PERIPH_FEATURES)
 # Add all USED periph_% init modules unless they are blacklisted
 PERIPH_MODULES := $(filter-out periph_init% periph_common,$(filter periph_%,$(USEMODULE)))
 PERIPH_INIT_MODULES := $(subst periph_,periph_init_,$(PERIPH_MODULES))
-DEFAULT_MODULE += $(PERIPH_INIT_MODULES)
+DEFAULT_MODULE_DELAYED += $(PERIPH_INIT_MODULES)
 
 # select cpu_check_address pseudomodule if the corresponding feature is used
 USEMODULE += $(filter cpu_check_address, $(FEATURES_USED))

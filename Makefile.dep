@@ -111,7 +111,7 @@ ifneq (,$(filter gnrc_dhcpv6_client_6lbr,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_gnrc_uhcpc
+  DEFAULT_MODULE_DELAYED += auto_init_gnrc_uhcpc
   USEMODULE += uhcpc
   USEMODULE += gnrc_sock_udp
   USEMODULE += fmt
@@ -264,7 +264,7 @@ ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_gnrc_sixlowpan
+  DEFAULT_MODULE_DELAYED += auto_init_gnrc_sixlowpan
   USEMODULE += sixlowpan
 endif
 
@@ -333,7 +333,7 @@ ifneq (,$(filter gnrc_ipv6_router,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_gnrc_ipv6
+  DEFAULT_MODULE_DELAYED += auto_init_gnrc_ipv6
   USEMODULE += inet_csum
   USEMODULE += ipv6_addr
   USEMODULE += gnrc_ipv6_hdr
@@ -378,7 +378,7 @@ ifneq (,$(filter gnrc_ipv6_nib_router,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_gnrc_ipv6_nib
+  DEFAULT_MODULE_DELAYED += auto_init_gnrc_ipv6_nib
   USEMODULE += evtimer
   USEMODULE += gnrc_ndp
   USEMODULE += gnrc_netif
@@ -390,13 +390,13 @@ ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_gnrc_udp
+  DEFAULT_MODULE_DELAYED += auto_init_gnrc_udp
   USEMODULE += inet_csum
   USEMODULE += udp
 endif
 
 ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_gnrc_tcp
+  DEFAULT_MODULE_DELAYED += auto_init_gnrc_tcp
   USEMODULE += inet_csum
   USEMODULE += random
   USEMODULE += tcp
@@ -413,7 +413,7 @@ ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_gnrc_pktdump
+  DEFAULT_MODULE_DELAYED += auto_init_gnrc_pktdump
   USEMODULE += gnrc_pktbuf
   USEMODULE += od
 endif
@@ -608,7 +608,7 @@ ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
   ifeq (gnrc_pktbuf_cmd,$(filter gnrc_pktbuf_%, $(USEMODULE)))
     USEMODULE += gnrc_pktbuf_static
   endif
-  DEFAULT_MODULE += auto_init_gnrc_pktbuf
+  DEFAULT_MODULE_DELAYED += auto_init_gnrc_pktbuf
   USEMODULE += gnrc_pkt
 endif
 
@@ -661,7 +661,7 @@ ifneq (,$(filter saul_reg,$(USEMODULE)))
 endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_saul
+  DEFAULT_MODULE_DELAYED += auto_init_saul
   USEMODULE += saul
   USEMODULE += saul_reg
 endif
@@ -720,7 +720,7 @@ ifneq (,$(filter puf_sram,$(USEMODULE)))
 endif
 
 ifneq (,$(filter random,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_random
+  DEFAULT_MODULE_DELAYED += auto_init_random
   USEMODULE += prng
   # select default prng
   ifeq (,$(filter prng_%,$(USEMODULE)))
@@ -901,7 +901,7 @@ ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
 endif
 
 ifneq (,$(filter usbus,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_usbus
+  DEFAULT_MODULE_DELAYED += auto_init_usbus
   FEATURES_REQUIRED += periph_usbdev
   USEMODULE += core_thread_flags
   USEMODULE += event
@@ -997,7 +997,7 @@ endif
 ifneq (,$(filter xtimer,$(USEMODULE)))
   ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
     # xtimer is used, ztimer xtimer wrapper is not
-    DEFAULT_MODULE += auto_init_xtimer
+    DEFAULT_MODULE_DELAYED += auto_init_xtimer
     USEMODULE += div
     ifeq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
       # ztimer is not used, so use *periph_timer as low-level timer*.
@@ -1038,7 +1038,7 @@ endif
 
 ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
   ifneq (,$(filter shell,$(USEMODULE)))
-    DEFAULT_MODULE += test_utils_interactive_sync_shell
+    DEFAULT_MODULE_DELAYED += test_utils_interactive_sync_shell
   endif
 endif
 
