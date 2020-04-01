@@ -448,6 +448,10 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
  * @param[out] remote   Remote end point of the received data.
  *                      May be NULL, if it is not required by the application.
  *
+ * @experimental    This function is quite new, not implemented for all stacks
+ *                  yet, and may be subject to sudden API changes. Do not use in
+ *                  production if this is unacceptable.
+ *
  * @note    Function blocks if no packet is currently waiting.
  *
  * @return  The number of bytes received on success. May not be the complete

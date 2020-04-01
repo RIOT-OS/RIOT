@@ -626,6 +626,10 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
  *                      May be SOCK_NO_TIMEOUT to wait until data
  *                      is available.
  *
+ * @experimental    This function is quite new, not implemented for all stacks
+ *                  yet, and may be subject to sudden API changes. Do not use in
+ *                  production if this is unacceptable.
+ *
  * @note Function may block if data is not available and @p timeout != 0
  *
  * @note    Function blocks if no packet is currently waiting.
