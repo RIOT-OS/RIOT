@@ -24,20 +24,30 @@
     { .uri = u, .scheme = s, .userinfo = us, .host = h, .port = po,     \
       .path = pa, .query = q, .expected = e}
 
-#define VEC_CHECK(comp)                                                 \
-    do {                                                                \
-        if (ures.comp == NULL) {                                        \
-            TEST_ASSERT(validate_uris[i].comp[0] == '\0');              \
-        }                                                               \
-        else {                                                          \
-            TEST_ASSERT_EQUAL_INT(strlen(validate_uris[i].comp),        \
-                                  ures.comp##_len);                     \
-            TEST_ASSERT_EQUAL_INT(0,                                    \
-                                  memcmp(ures.comp,                     \
-                                         validate_uris[i].comp,         \
-                                         strlen(validate_uris[i].comp))); \
-        }                                                               \
+#define VEC_CHECK(comp, i, vec_msg)                                         \
+    do {                                                                    \
+        if (ures.comp == NULL) {                                            \
+            TEST_ASSERT(validate_uris[i].comp[0] == '\0');                  \
+        }                                                                   \
+        else {                                                              \
+            TEST_ASSERT_EQUAL_INT(strlen(validate_uris[i].comp),            \
+                                  ures.comp##_len);                         \
+            vec_msg[0] = '\0';                                              \
+            stdimpl_strcat(vec_msg, "Unexpected " # comp " member \"");     \
+            stdimpl_strcat(vec_msg, validate_uris[i].comp);                 \
+            stdimpl_strcat(vec_msg, "\" for \"");                           \
+            stdimpl_strcat(vec_msg, validate_uris[i].uri);                  \
+            stdimpl_strcat(vec_msg, "\"");                                  \
+            TEST_ASSERT_MESSAGE(0 ==                                        \
+                                  strncmp(ures.comp,                        \
+                                          validate_uris[i].comp,            \
+                                          strlen(validate_uris[i].comp)),   \
+                                vec_msg);                                   \
+        }                                                                   \
     } while (0)
+
+#define VEC_MSG_LEN (sizeof("Unexpected userinfo member \"\" for \"\"") + \
+                     64U + 8U)
 
 typedef struct {
     char uri[64];
@@ -274,6 +284,8 @@ static const validate_t validate_uris[26] = {
         0),
 };
 
+static char _failure_msg[VEC_MSG_LEN];
+
 static void test_uri_parser__validate(void)
 {
     uri_parser_result_t ures;
@@ -281,12 +293,12 @@ static void test_uri_parser__validate(void)
         int res = uri_parser_process_string(&ures, validate_uris[i].uri);
         TEST_ASSERT_EQUAL_INT(validate_uris[i].expected, res);
         if (res == 0) {
-            VEC_CHECK(scheme);
-            VEC_CHECK(userinfo);
-            VEC_CHECK(host);
-            VEC_CHECK(port);
-            VEC_CHECK(path);
-            VEC_CHECK(query);
+            VEC_CHECK(scheme, i, _failure_msg);
+            VEC_CHECK(userinfo, i, _failure_msg);
+            VEC_CHECK(host, i, _failure_msg);
+            VEC_CHECK(port, i, _failure_msg);
+            VEC_CHECK(path, i, _failure_msg);
+            VEC_CHECK(query, i, _failure_msg);
         }
     }
 }
