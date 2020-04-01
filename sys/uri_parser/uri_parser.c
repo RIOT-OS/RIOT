@@ -38,7 +38,9 @@ static char *_consume_scheme(uri_parser_result_t *result, char *uri,
                              char *uri_end, bool *has_authority)
 {
     assert(uri);
-    assert(!has_authority);
+
+    /* assume no authority section first */
+    *has_authority = false;
 
     /* cannot have empty scheme */
     if (uri[0] == ':') {
@@ -186,7 +188,7 @@ static int _parse_relative(uri_parser_result_t *result, char *uri,
 static int _parse_absolute(uri_parser_result_t *result, char *uri,
                            char *uri_end)
 {
-    bool has_authority = false;
+    bool has_authority;
 
     uri = _consume_scheme(result, uri, uri_end, &has_authority);
     if (uri == NULL) {
