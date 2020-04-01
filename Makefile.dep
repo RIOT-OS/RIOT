@@ -1041,3 +1041,13 @@ ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
     DEFAULT_MODULE += test_utils_interactive_sync_shell
   endif
 endif
+
+# If module auto_init is not used, silently disable all of its submodules
+ifeq (,$(filter auto_init,$(USEMODULE)))
+  DISABLE_MODULE += auto_init_%
+endif
+
+# If module periph_init is not used, silently disable all of its submodules
+ifeq (,$(filter periph_init,$(USEMODULE)))
+  DISABLE_MODULE += periph_init_%
+endif
