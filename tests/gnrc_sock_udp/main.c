@@ -441,7 +441,9 @@ static void test_sock_udp_recv_buf__success(void)
                                                SOCK_NO_TIMEOUT, NULL));
     assert(data != NULL);
     assert(ctx != NULL);
-    sock_recv_buf_free(ctx);
+    assert(0 == sock_udp_recv_buf(&_sock, &data, &ctx, SOCK_NO_TIMEOUT, NULL));
+    assert(data == NULL);
+    assert(ctx == NULL);
     assert(_check_net());
 }
 
