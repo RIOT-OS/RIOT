@@ -422,9 +422,11 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
  * @param[in] sock      A UDP sock object.
  * @param[out] data     Pointer to a stack-internal buffer space containing the
  *                      received data.
- * @param[out] buf_ctx  Stack-internal buffer context. Must be used to release
- *                      the buffer space using @ref sock_recv_buf_free() after
- *                      the data in @p data was handled.
+ * @param[in,out] buf_ctx  Stack-internal buffer context. If it points to a
+ *                      `NULL` pointer, the stack returns a new buffer space
+ *                      for a new packet. If it does not point to a `NULL`
+ *                      pointer, an existing context is assumed to get a next
+ *                      segment in a buffer.
  * @param[in] timeout   Timeout for receive in microseconds.
  *                      If 0 and no data is available, the function returns
  *                      immediately.
@@ -433,10 +435,17 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
  * @param[out] remote   Remote end point of the received data.
  *                      May be `NULL`, if it is not required by the application.
  *
+ * @experimental    This function is quite new, not implemented for all stacks
+ *                  yet, and may be subject to sudden API changes. Do not use in
+ *                  production if this is unacceptable.
+ *
  * @note    Function blocks if no packet is currently waiting.
  *
- * @return  The number of bytes received on success.
+ * @return  The number of bytes received on success. May not be the complete
+ *          payload. Continue calling with the returned `buf_ctx` to get more
+ *          buffers until result is 0 or an error.
  * @return  0, if no received data is available, but everything is in order.
+ *          If @p buf_ctx was provided, it was released.
  * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
  * @return  -EAGAIN, if @p timeout is `0` and no data is available.
  * @return  -EINVAL, if @p remote is invalid or @p sock is not properly

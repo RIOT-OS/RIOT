@@ -615,18 +615,30 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
  *                      Cannot be NULL.
  * @param[out] data     Pointer to a stack-internal buffer space containing the
  *                      received data.
- * @param[out] buf_ctx  Stack-internal buffer context. Must be used to release
- *                      the buffer space using @ref sock_recv_buf_free() after
- *                      the data in @p data was handled.
+ * @param[in,out] buf_ctx   Stack-internal buffer context. If it points to a
+ *                      `NULL` pointer, the stack returns a new buffer space for
+ *                      a new packet. If it does not point to a `NULL` pointer,
+ *                      an existing context is assumed to get a next segment in
+ *                      a buffer.
  * @param[in] timeout   Receive timeout in microseconds.
  *                      If 0 and no data is available, the function returns
  *                      immediately.
  *                      May be SOCK_NO_TIMEOUT to wait until data
  *                      is available.
  *
+ * @experimental    This function is quite new, not implemented for all stacks
+ *                  yet, and may be subject to sudden API changes. Do not use in
+ *                  production if this is unacceptable.
+ *
  * @note Function may block if data is not available and @p timeout != 0
  *
- * @return The number of bytes received on success
+ * @note    Function blocks if no packet is currently waiting.
+ *
+ * @return  The number of bytes received on success. May not be the complete
+ *          payload. Continue calling with the returned @p buf_ctx to get more
+ *          buffers until result is 0 or an error.
+ * @return  0, if no received data is available, but everything is in order.
+ *          If @p buf_ctx was provided, it was released.
  * @return  -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.
  * @return  -EAGAIN, if @p timeout is `0` and no data is available.
  * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
