@@ -177,20 +177,21 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
                       uint32_t timeout, sock_udp_ep_t *remote)
 {
     void *pkt = NULL, *ctx = NULL;
-    ssize_t res;
+    uint8_t *ptr = data;
+    ssize_t res, ret = 0;
+    bool nobufs = false;
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    res = sock_udp_recv_buf(sock, &pkt, &ctx, timeout, remote);
-    if (res >= 0) {
+    while ((res = sock_udp_recv_buf(sock, &pkt, &ctx, timeout, remote)) > 0) {
         if (res > (ssize_t)max_len) {
-            res = -ENOBUFS;
+            nobufs = true;
+            continue;
         }
-        else if (res != 0) {
-            memcpy(data, pkt, res);
-        }
-        sock_recv_buf_free(ctx);
+        memcpy(ptr, pkt, res);
+        ptr += res;
+        ret += res;
     }
-    return res;
+    return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
 ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
@@ -202,6 +203,12 @@ ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
     int res;
 
     assert((sock != NULL) && (data != NULL) && (buf_ctx != NULL));
+    if (*buf_ctx != NULL) {
+        *data = NULL;
+        gnrc_pktbuf_release(*buf_ctx);
+        *buf_ctx = NULL;
+        return 0;
+    }
     if (sock->local.family == AF_UNSPEC) {
         return -EADDRNOTAVAIL;
     }
