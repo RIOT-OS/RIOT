@@ -33,17 +33,6 @@ LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
 LINKFLAGS += -Wl,--gc-sections
 
-# Tell the build system that the CPU depends on the Cortex-M common files:
-USEMODULE += cortexm_common
-# Export the peripheral drivers to be linked into the final binary:
-USEMODULE += periph
-# include common periph code
-USEMODULE += cortexm_common_periph
-
-# all cortex MCU's use newlib as libc
-USEMODULE += newlib
-
-
 # extract version inside the first parentheses
 ARM_GCC_VERSION = $(shell $(TARGET_ARCH)-gcc --version | sed -n '1 s/[^(]*(\([^\)]*\)).*/\1/p')
 
@@ -71,24 +60,18 @@ endif # BUILD_IN_DOCKER
 CFLAGS += -DCPU_MODEL_$(call uppercase_and_underscore,$(CPU_MODEL))
 CFLAGS += -DCPU_ARCH_$(call uppercase_and_underscore,$(CPU_ARCH))
 
-# set the compiler specific CPU and FPU options
-ifneq (,$(filter $(CPU_ARCH),cortex-m4f cortex-m7))
-  ifneq (,$(filter cortexm_fpu,$(DISABLE_MODULE)))
-    CFLAGS_FPU ?= -mfloat-abi=soft
+# Add corresponding FPU CFLAGS
+# clang assumes there is an FPU, no CFLAGS necessary
+ifneq (llvm, $(TOOLCHAIN))
+  ifeq ($(CPU_ARCH),cortex-m7)
+    _CORTEX_HW_FPU_CFLAGS = -mfloat-abi=hard -mfpu=fpv5-sp-d16
   else
-    USEMODULE += cortexm_fpu
-    # clang assumes there is an FPU
-    ifneq (llvm,$(TOOLCHAIN))
-      ifeq ($(CPU_ARCH),cortex-m7)
-        CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv5-sp-d16
-      else
-        CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv4-sp-d16
-      endif
-    endif
+    _CORTEX_HW_FPU_CFLAGS = -mfloat-abi=hard -mfpu=fpv4-sp-d16
   endif
-else
-  CFLAGS_FPU ?= -mfloat-abi=soft
 endif
+# Add soft or hard FPU CFLAGS depending on the module
+# NOTE: This can be turned into normal conditional syntax once #9913 is fixed
+CFLAGS_FPU ?= $(if $(filter cortexm_fpu,$(USEMODULE)),$(_CORTEX_HW_FPU_CFLAGS),-mfloat-abi=soft)
 
 ifeq ($(CPU_ARCH),cortex-m4f)
   MCPU = cortex-m4
@@ -125,9 +108,6 @@ endif
 
 # CPU depends on the cortex-m common module, so include it:
 include $(RIOTCPU)/cortexm_common/Makefile.include
-
-# use the nano-specs of Newlib when available
-USEMODULE += newlib_nano
 
 # Avoid overriding the default rule:
 all:

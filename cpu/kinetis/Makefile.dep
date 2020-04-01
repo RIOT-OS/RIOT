@@ -4,3 +4,5 @@ endif
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
   USEMODULE += core_thread_flags
 endif
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep
