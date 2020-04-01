@@ -819,28 +819,31 @@ static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val
     return optlen;
 }
 
-ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string,
-                           char separator)
+ssize_t coap_opt_add_chars(coap_pkt_t *pkt, uint16_t optnum, const char *chars,
+                           size_t chars_len, char separator)
 {
-    size_t unread_len = strlen(string);
-    if (!unread_len) {
+    /* chars_len denotes the length of the chars buffer and is
+     * gradually decremented below while iterating over the buffer */
+    if (!chars_len) {
         return 0;
     }
-    char *uripos = (char *)string;
+
+    char *uripos = (char *)chars;
+    char *endpos = ((char *)chars + chars_len);
     size_t write_len = 0;
 
-    while (unread_len) {
+    while (chars_len) {
         size_t part_len;
         if (*uripos == separator) {
             uripos++;
         }
         uint8_t *part_start = (uint8_t *)uripos;
 
-        while (unread_len) {
+        while (chars_len) {
             /* must decrement separately from while loop test to ensure
              * the value remains non-negative */
-            unread_len--;
-            if ((*uripos == separator) || (*uripos == '\0')) {
+            chars_len--;
+            if ((*uripos == separator) || (uripos == endpos)) {
                 break;
             }
             uripos++;

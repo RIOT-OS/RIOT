@@ -1047,6 +1047,27 @@ static inline ssize_t coap_opt_add_uri_query(coap_pkt_t *pkt, const char *key,
 ssize_t coap_opt_add_proxy_uri(coap_pkt_t *pkt, const char *uri);
 
 /**
+ * @brief   Encode the given array of characters as option(s) into pkt
+ *
+ * Use separator to split array of characters into multiple options.
+ *
+ * @post pkt.payload advanced to first byte after option(s)
+ * @post pkt.payload_len reduced by option(s) length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     optnum      option number to use
+ * @param[in]     chars       array of characters to encode as option
+ * @param[in]     chars_len   length of @p chars
+ * @param[in]     separator   character used in @p string to separate parts
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
+ */
+ssize_t coap_opt_add_chars(coap_pkt_t *pkt, uint16_t optnum, const char *chars,
+                           size_t chars_len, char separator);
+
+/**
  * @brief   Encode the given string as option(s) into pkt
  *
  * Use separator to split string into multiple options.
@@ -1063,7 +1084,11 @@ ssize_t coap_opt_add_proxy_uri(coap_pkt_t *pkt, const char *uri);
  * @return        <0 on error
  * @return        -ENOSPC if no available options or insufficient buffer space
  */
-ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string, char separator);
+static inline ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum,
+                                          const char *string, char separator)
+{
+    return coap_opt_add_chars(pkt, optnum, string, strlen(string), separator);
+}
 
 /**
  * @brief   Adds one or multiple Uri-Path options in the form '/path' into pkt
