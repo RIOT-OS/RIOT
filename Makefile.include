@@ -353,9 +353,6 @@ include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 # For more information, see http://petereisentraut.blogspot.com/2011/09/ccache-and-clang-part-2.html
 export CCACHE_CPP2=yes
 
-# handle removal of default modules
-USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
-
 # process dependencies
 include $(RIOTMAKE)/dependency_resolution.inc.mk
 

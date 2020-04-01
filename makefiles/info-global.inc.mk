@@ -7,8 +7,6 @@
 # used modules and requirements that is present in for *all* boards, so this can
 # be cached to speed up individual dependency checks
 include $(RIOTMAKE)/defaultmodules.inc.mk
-# add default modules
-USEMODULE += $(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE))
 include $(RIOTMAKE)/dependency_resolution.inc.mk
 
 BOARDSDIR_GLOBAL := $(BOARDSDIR)
