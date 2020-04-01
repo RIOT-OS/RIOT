@@ -144,6 +144,18 @@ uint32_t sam0_gclk_freq(uint8_t id)
     }
 }
 
+void cpu_pm_cb_enter(int deep)
+{
+    (void) deep;
+    /* will be called before entering sleep */
+}
+
+void cpu_pm_cb_leave(int deep)
+{
+    (void) deep;
+    /* will be called after wake-up */
+}
+
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks
  */
