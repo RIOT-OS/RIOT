@@ -237,7 +237,7 @@ static void _block_while_busy(at86rf215_t *dev)
     gpio_irq_enable(dev->params.int_pin);
 }
 
-void at86rf215_block_while_busy(at86rf215_t *dev)
+static void at86rf215_block_while_busy(at86rf215_t *dev)
 {
     if (_tx_ongoing(dev)) {
         DEBUG("[at86rf215] Block while TXing\n");
