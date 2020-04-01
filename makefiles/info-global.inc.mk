@@ -43,6 +43,8 @@ define board_unsatisfied_features
   # Some are sometime set as `?=`
   undefine CPU
   undefine CPU_MODEL
+  undefine CPU_ARCH
+  undefine CPU_FAM
 
   # Replicate Makefile.include handling that sets BOARDSDIR to RIOTBOARD
   # when BOARD is not found in BOARDSDIR
