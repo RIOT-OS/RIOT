@@ -20,7 +20,9 @@ export CXXINCLUDES           # The extra include paths for c++, set by the vario
 
 export USEMODULE             # Sys Module dependencies of the application. Set in the application's Makefile.
 export USEPKG                # Pkg dependencies (third party modules) of the application. Set in the application's Makefile.
-export DISABLE_MODULE        # Used in the application's Makefile to suppress DEFAULT_MODULEs.
+# DEFAULT_MODULE             # Modules allways included unless explicitly disabled through DISABLE_MODULE. They MUST be declared in %/defaulmodules.inc.mk. They MAY have dependencies declared in Makefile.dep.
+# DEFAULT_MODULE_DELAYED     # Modules allways included unless explicitly disabled through DISABLE_MODULE. They CAN be declared in Makefile.dep or %/defaulmodules.inc.mk. They MUST NOT declare dependencies in Makefile.dep.
+# DISABLE_MODULE             # Used in the application's Makefile to suppress DEFAULT_MODULEs. Or anywhere to supress DEFAULT_MODULE_DELAYED.
 export APPDEPS               # Files / Makefile targets that need to be created before the application can be build. Set in the application's Makefile.
 # BUILDDEPS                  # Files / Makefile targets that need to be created before starting to build.
 # DEBUGDEPS                  # Files / Makefile targets that need to be created before starting a debug session.

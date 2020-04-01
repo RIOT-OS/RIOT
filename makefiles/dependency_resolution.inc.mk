@@ -30,7 +30,11 @@ else
   # during dependency processing
   USEMODULE += $(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE))
 
+  # Add DEFAULT_MODULE_DELAYED once
+  USEMODULE += $(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE_DELAYED))
+
   # Sort and de-duplicate used modules and default modules for readability
   USEMODULE := $(sort $(USEMODULE))
   DEFAULT_MODULE := $(sort $(DEFAULT_MODULE))
+  DEFAULT_MODULE_DELAYED := $(sort $(DEFAULT_MODULE_DELAYED))
 endif
