@@ -124,9 +124,21 @@ typedef enum {
 #define DOSE_OPT_PROMISCUOUS     (BIT0)     /**< Don't check the destination MAC - pass every frame to upper layers */
 /** @} */
 
+/**
+ * @defgroup drivers_dose_config    Differentially Operated Serial Ethernet (DOSE) driver compile configuration
+ * @ingroup config
+ * @{
+ */
+
+/**
+ * @brief Timeout that brings the driver back into idle state.
+ *
+ *  Fallback to idle if the remote side died within a transaction.
+ */
 #ifndef DOSE_TIMEOUT_USEC
-#define DOSE_TIMEOUT_USEC        (5000)     /**< Timeout that brings the driver back into idle state if the remote side died within a transaction */
+#define DOSE_TIMEOUT_USEC        (5000)
 #endif
+/** @} */
 
 #define DOSE_FRAME_CRC_LEN          (2)     /**< CRC16 is used */
 #define DOSE_FRAME_LEN (ETHERNET_FRAME_LEN + DOSE_FRAME_CRC_LEN) /**< dose frame length */
