@@ -245,19 +245,6 @@ struct _sock_tl_ep {
     uint16_t port;          /**< transport layer port (in host byte order) */
 };
 
-/**
- * @brief   Releases the stack-internal buffer space provided by the
- *          `sock_*_recv_buf()` functions.
- *
- * @see
- *  - @ref sock_dtls_recv_buf()
- *  - @ref sock_ip_recv_buf()
- *  - @ref sock_udp_recv_buf()
- *
- * @param[in] buf_ctx   Stack-internal buffer context to release.
- */
-void sock_recv_buf_free(void *buf_ctx);
-
 #ifdef __cplusplus
 }
 #endif
