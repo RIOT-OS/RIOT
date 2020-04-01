@@ -37,6 +37,12 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup drivers_fxos8700_config     FXOS8700 accelerometer/magnetometer driver compile configuration
+ * @ingroup config
+ * @{
+ */
+
+/**
  * @brief   Default raw value mode for accelerator
  *
  * If set to 0, measurements will be converted to mg.
@@ -45,7 +51,7 @@ extern "C" {
 #ifndef FXOS8700_USE_ACC_RAW_VALUES
 #define FXOS8700_USE_ACC_RAW_VALUES (0)
 #endif
-
+/** @} */
 /**
  * @brief   FXOS8700 specific return values
  */
