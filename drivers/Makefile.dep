@@ -292,6 +292,14 @@ ifneq (,$(filter hih6130,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter hmc5883l,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter hmc5883l_int,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+endif
+
 ifneq (,$(filter hts221,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
