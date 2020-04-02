@@ -167,8 +167,16 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
         (pwm_config[dev].chan[channel].pin == GPIO_UNDEF)) {
         return;
     }
-    _tcc(dev)->CC[_chan(dev, channel)].reg = value;
-    while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << _chan(dev, channel))) {}
+
+    uint8_t chan = _chan(dev, channel);
+    if (chan < 4) {
+        _tcc(dev)->CC[chan].reg = value;
+        while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << chan)) {}
+    } else {
+        chan -= 4;
+        _tcc(dev)->CCB[chan].reg = value;
+        while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CCB0 << chan)) {}
+    }
 }
 
 void pwm_poweron(pwm_t dev)
