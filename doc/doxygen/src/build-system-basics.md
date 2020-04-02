@@ -55,6 +55,12 @@ For a `FEATURE` to be provided by a `board` it must meet 2 criteria, and for
 - `FEATURES_OPTIONAL` are "nice to have" `FEATURES`, not needed but useful. If
   available they are always included.
 
+- `FEATURES_REQUIRED_ANY` are `FEATURES` of which (at least) one of
+  is needed by a `MODULE` or `APPLICATION`. Alternatives are separated by
+  a pipe (`|`) in order of preference, e.g.:
+  `FEATURES_REQUIRED_ANY += arch_avr8|arch_native` if both are provide then
+  `arch_avr8` will be used.
+
 - `FEATURES_BLACKLIST` are `FEATURES` that can't be used by a `MODULE` or `APPLCIATION`.
   They are usually used for _hw_ characteristics like `arch_` to easily resolve
   unsupported configurations for a group.
@@ -66,9 +72,9 @@ For a `FEATURE` to be provided by a `board` it must meet 2 criteria, and for
 - `FEATURES_PROVIDED`, `FEATURES_CONFLICT` and `FEATURES_CONFLICT_MSG ` are
    defined in `Makefile.features`
 
-- `FEATURES_REQUIRED`, `FEATURES_OPTIONAL`, `FEATURES_BLACKLIST` are defined by
-   the application `Makefile` (`examples/%/Makefile`, `tests/%/Makfile`, etc.)
-   or in `Makefile.dep`
+- `FEATURES_REQUIRED`, `FEATURES_OPTIONAL`, `FEATURES_REQUIRED_ANY`,
+   and `FEATURES_BLACKLIST` are defined by the application `Makefile`
+   (`examples/%/Makefile`, `tests/%/Makefile`, etc.) or in `Makefile.dep`
 
 ## CPU/CPU_MODEL                                                            {#cpu}
 

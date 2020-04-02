@@ -357,7 +357,7 @@ export CCACHE_CPP2=yes
 USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
 # process dependencies
-include $(RIOTBASE)/Makefile.dep
+include $(RIOTMAKE)/dependency_resolution.inc.mk
 
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)

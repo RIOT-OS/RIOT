@@ -52,6 +52,8 @@ info-build:
 	@echo '         $(or $(FEATURES_USED), -none-)'
 	@echo 'FEATURES_REQUIRED:'
 	@echo '         $(or $(sort $(FEATURES_REQUIRED)), -none-)'
+	@echo 'FEATURES_REQUIRED_ANY:'
+	@echo '         $(or $(sort $(FEATURES_REQUIRED_ANY)), -none-)'
 	@echo 'FEATURES_OPTIONAL_ONLY (optional that are not required, strictly "nice to have"):'
 	@echo '         $(or $(FEATURES_OPTIONAL_ONLY), -none-)'
 	@echo 'FEATURES_OPTIONAL_MISSING (missing optional features):'
