@@ -1,7 +1,7 @@
-# Provide stdio over USB by default
-# This is a temporary solution until management of stdio is correctly
-# handled by the build system
-DEFAULT_MODULE += stdio_cdc_acm
+# Use stdio_cdc_acm unless another stdio_% is already used
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_cdc_acm
+endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio

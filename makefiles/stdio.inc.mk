@@ -7,20 +7,6 @@ STDIO_MODULES = \
   stdio_uart \
   #
 
-# Since USEMODULE and DEFAULT_MODULEs are recursively expanded we need to
-# disable DEFAULT_MODULEs before any of there dependencies are evaluated,
-# otherwise the disabled MODULE will be in USEMODULE (triggering) its
-# dependencies, and then removed but leaving its dependencies
-ifneq (,$(filter $(filter-out stdio_rtt,$(STDIO_MODULES)),$(USEMODULE)))
-  # stdio_rtt cannot be used when another STDIO is loaded
-  DISABLE_MODULE += stdio_rtt
-endif
-
-ifneq (,$(filter $(filter-out stdio_cdc_acm,$(STDIO_MODULES)),$(USEMODULE)))
-  # stdio_cdc_acm cannot be used when another STDIO is loaded
-  DISABLE_MODULE += stdio_cdc_acm
-endif
-
 ifneq (,$(filter newlib,$(USEMODULE)))
   ifeq (,$(filter $(STDIO_MODULES),$(USEMODULE)))
     USEMODULE += stdio_uart
