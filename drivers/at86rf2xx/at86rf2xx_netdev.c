@@ -704,6 +704,25 @@ static void _isr_send_complete(at86rf2xx_t *dev, uint8_t trac_status)
             }
 }
 
+static inline void _isr_recv_complete(netdev_t *netdev)
+{
+    at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
+    if (IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
+        uint8_t phy_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_RSSI);
+        bool crc_ok = phy_status & AT86RF2XX_PHY_RSSI_MASK__RX_CRC_VALID;
+
+        if (crc_ok) {
+            netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+        }
+        else {
+            netdev->event_callback(netdev, NETDEV_EVENT_CRC_ERROR);
+        }
+    }
+    else {
+        netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+    }
+}
+
 static void _isr(netdev_t *netdev)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
@@ -742,7 +761,9 @@ static void _isr(netdev_t *netdev)
             if (!(dev->flags & AT86RF2XX_OPT_TELL_RX_END)) {
                 return;
             }
-            netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+
+            _isr_recv_complete(netdev);
+
         }
         else if (state == AT86RF2XX_PHY_STATE_TX) {
             /* check for more pending TX calls and return to idle state if
