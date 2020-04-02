@@ -88,8 +88,7 @@ def testfunc(child):
         )
         child.expect_exact("Original fragmentation header:")
         child.expect_exact("IPHC headers + payload:")
-        check_unittests(child)
-        assert int(child.match.group(1)) >= 4
+        assert check_unittests(child) >= 4
 
 
 if __name__ == "__main__":
