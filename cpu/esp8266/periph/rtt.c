@@ -26,14 +26,13 @@
 #include "log.h"
 #include "periph/rtt.h"
 
+#include "esp_common.h"
 #include "esp/common_macros.h"
 #include "esp/dport_regs.h"
 #include "esp/rtc_regs.h"
 #include "sdk/sdk.h"
 
 #define FRC2_CLK_DIV_256    2   /* divider for the 80 MHz AHB clock */
-
-#define RTC_BSS_ATTR __attribute__((section(".rtc.bss")))
 
 /**
  * FRC2 is a 32-bit countup timer, triggers interrupt when reaches alarm value.
