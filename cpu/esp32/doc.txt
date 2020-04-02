@@ -38,7 +38,7 @@
     5. [PWM Channels](#esp32_pwm_channels)
     6. [SPI Interfaces](#esp32_spi_interfaces)
     7. [Timers](#esp32_timers)
-    8. [RTC Timer](#esp32_rtc_timer)
+    8. [RTT Implementation](#esp32_rtt_counter)
     9. [UART Interfaces](#esp32_uart_interfaces)
     10. [CAN Interfaces](#esp32_can_interfaces)
     11. [Power Management](#esp32_power_management)
@@ -120,8 +120,7 @@ Module    | Default  | Short description
 [esp_log_startup](#esp32_esp_log_module) | not used | enable additional startup information
 [esp_log_tagged](#esp32_esp_log_module) | not used | add additional information to the log output
 [esp_now](#esp32_esp_now_network_interface) | not used  | enable the ESP-NOW network device
-[esp_rtc_timer](#esp32_rtc_timer) | not used | enable RTC hardware timer with internal 150 kHz RC oscillator
-[esp_rtc_timer_32k](#esp32_rtc_timer) | not used | enable RTC hardware timer with external 32.768 kHz crystal.
+[esp_rtc_timer_32k](#esp32_rtt_counter) | not used | use RTC timer with external 32.768 kHz crystal as RTT
 [esp_spi_ram](#esp32_spi_ram) | not used |  enable SPI RAM
 [esp_spiffs](#esp32_spiffs_device) | not used  |  enable SPIFFS for on-board flash memory
 [esp_wifi](#esp32_wifi_network_interface) | not used  | enable the Wifi network device in WPA2 personal mode
@@ -422,7 +421,6 @@ esp_log_colored | Enable colored log output, see section [Log output](#esp32_esp
 esp_log_startup | Enable additional startup information, see section [Log output](#esp32_esp_log_module).
 esp_log_tagged | Add additional information to the log output, see section [Log output](#esp32_esp_log_module).
 esp_now | Enable the built-in WiFi module with the ESP-NOW protocol as `netdev` network device, see section [ESP-NOW Network Interface](#esp32_esp_now_network_interface).
-esp_rtc_timer | Enable RTC hardware timer with internal 150 kHz RC oscillator.
 esp_rtc_timer_32k | Enable RTC hardware timer with external 32.768 kHz crystal.
 esp_spiffs  | Enable the optional SPIFFS drive in on-board flash memory, see section [SPIFFS Device](#esp32_spiffs_device).
 esp_spi_ram | Enable the optional SPI RAM, see section [SPI RAM Modules](#esp32_spi_ram).
@@ -839,37 +837,31 @@ to application's makefile.
 
 Timers are MCU built-in features and not board-specific. There is nothing to be configured.
 
-\anchor esp32_rtc_timer
-## <a name="esp32_rtc_timer"> RTC Timer </a> &nbsp;[[TOC](#esp32_toc)]
+\anchor esp32_rtt_counter
+## <a name="esp32_rtt_counter"> RTT implementation </a> &nbsp;[[TOC](#esp32_toc)]
 
-The RTC hardware timer of the ESP32 can be clocked with either an external
-32.768 kHz crystal or the internal adjustable 150 kHz RC oscillator. If the
-the external 32.768 kHz crystal is not available, the internal 150 kHz RC
-oscillator is used automatically. However, since this internal 150 kHz RC
-oscillator is not very accurate, the RTC low-level driver uses by default
-the PLL-controlled 64-bit microsecond system timer to emulate the RTC timer.
+The RTT peripheral low-level driver provides a RTT (Real Time Timer) with
+a frequency of 32.768 kHz. It either uses the RTC hardware timer if an
+external 32.768 kHz crystal is connected to the ESP32 or the PLL-controlled
+64-bit microsecond system timer to emulate the RTC timer.
 
-To allow the use of the RTC hardware timer for boards with an external
-32 kHz crystal, the pseudomodules `esp_rtc_timer` and `esp_rtc_timer_32k`
-can be used to control which timer is used by the RTC low-level driver
-as following:
+Whether an external 32.768 kHz crystal is connected to the ESP32 is
+specified as a feature by the board definition using the pseudomodule
+`esp_rtc_timer_32k`. If the feature `esp_rtc_timer_32k` is defined but the
+external 32.768 kHz crystal is not recognized during startup, the
+PLL controlled 64 bit microsecond system timer is used to emulate the
+RTC timer.
 
-- **esp_rtc_timer**:
-  Use always the RTC hardware timer with the **internal 150 kHz RC** oscillator.
+The RTT is retained during light and deep sleep as well as during a restart.
+The RTC hardware timer is used for this purpose, regardless of whether an
+external 32.768 kHz crystal is connected to the ESP32 or the internal 150 kHz
+RC oscillator is used. All current timer values are saved in the RTC memory
+before entering a sleep mode or restart and are restored after when waking up
+or restarting.
 
-- **esp_rtc_timer_32k**:
-  Use the RTC hardware timer with the **external 32.768 kHz crystal**. If the
-  external 32.768 kHz crystal is not  available, the RTC hardware timer
-  is used with the internal 150 kHz RC oscillator.
-
-If none of the modules above is enabled, the PLL-driven **emulated RTC timer**
-is used. In this case, the RTC hardware timer with the internal RC 150 kHz
-oscillator is only used in deep sleep mode and during a reset.
-
-@note The accuracy of the emulated RTC timer is better than the accuracy of the
-RTC hardware timer with the internal 150 kHz RC oscillator. If you have not
-connected an external 32.768 kHz crystal, you should use the default
-configuration.
+@note The RTT implementation is also used to implement a RTC (Real Time Clock)
+peripheral. For this purpose the module `rt_rtc` is automatically enabled
+when the feature `periph_rtc` is used.
 
 \anchor esp32_uart_interfaces
 ## <a name="esp32_uart_interfaces"> UART Interfaces </a> &nbsp;[[TOC](#esp32_toc)]
