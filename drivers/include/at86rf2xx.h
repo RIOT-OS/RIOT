@@ -33,6 +33,7 @@
 #include <stdbool.h>
 
 #include "board.h"
+#include "kernel_defines.h"
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
 #include "net/gnrc/nettype.h"
@@ -206,6 +207,30 @@ extern "C" {
                                                      *   pending */
 
 /** @} */
+
+#if IS_ACTIVE(AT86RF2XX_BASIC_MODE) || defined(DOXYGEN)
+/**
+ * @brief Internal radio state equivalent to RX_ON
+ */
+#define AT86RF2XX_PHY_STATE_RX       AT86RF2XX_STATE_RX_ON
+/**
+ * @brief Internal radio state equivalent to RX_BUSY
+ */
+#define AT86RF2XX_PHY_STATE_RX_BUSY  AT86RF2XX_STATE_BUSY_RX
+/**
+ * @brief Internal radio state equivalent to TX_ON
+ */
+#define AT86RF2XX_PHY_STATE_TX       AT86RF2XX_STATE_PLL_ON
+/**
+ * @brief Internal radio state equivalent to TX_BUSY
+ */
+#define AT86RF2XX_PHY_STATE_TX_BUSY  AT86RF2XX_STATE_BUSY_TX
+#else
+#define AT86RF2XX_PHY_STATE_RX       AT86RF2XX_STATE_RX_AACK_ON
+#define AT86RF2XX_PHY_STATE_RX_BUSY  AT86RF2XX_STATE_BUSY_RX_AACK
+#define AT86RF2XX_PHY_STATE_TX       AT86RF2XX_STATE_TX_ARET_ON
+#define AT86RF2XX_PHY_STATE_TX_BUSY  AT86RF2XX_STATE_BUSY_TX_ARET
+#endif /* IS_ACTIVE(AT86RF2XX_BASIC_MODE) */
 
 #if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
 /**
