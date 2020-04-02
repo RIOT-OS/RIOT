@@ -235,6 +235,5 @@ void cpu_init(void)
 
     /* set ONDEMAND bit after all clocks have been configured */
     /* This is to avoid setting the source for the main clock to ONDEMAND before using it. */
-    OSCCTRL->DFLLCTRLA.reg |= OSCCTRL_DFLLCTRLA_ONDEMAND;
     OSCCTRL->Dpll[0].DPLLCTRLA.reg |= OSCCTRL_DPLLCTRLA_ONDEMAND;
 }
