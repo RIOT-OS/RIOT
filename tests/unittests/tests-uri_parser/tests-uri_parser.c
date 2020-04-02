@@ -303,10 +303,31 @@ static void test_uri_parser__validate(void)
     }
 }
 
+static void test_uri_parser__unterminated_string(void)
+{
+    uri_parser_result_t ures;
+    char uri[64];
+    /* initialize with a non-null character */
+    memset(uri, 'Z', sizeof(uri));
+
+    memcpy(uri, validate_uris[0].uri, strlen(validate_uris[0].uri));
+
+    int res = uri_parser_process(&ures, uri, strlen(validate_uris[0].uri));
+
+    TEST_ASSERT_EQUAL_INT(0, res);
+    VEC_CHECK(scheme, 0, _failure_msg);
+    VEC_CHECK(userinfo, 0, _failure_msg);
+    VEC_CHECK(host, 0, _failure_msg);
+    VEC_CHECK(port, 0, _failure_msg);
+    VEC_CHECK(path, 0, _failure_msg);
+    VEC_CHECK(query, 0, _failure_msg);
+}
+
 Test *tests_uri_parser_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_uri_parser__validate),
+        new_TestFixture(test_uri_parser__unterminated_string),
     };
 
     EMB_UNIT_TESTCALLER(uri_parser_tests, NULL, NULL, fixtures);
