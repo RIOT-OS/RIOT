@@ -67,7 +67,7 @@ typedef struct {
       scheme, userinfo, host, port,
       path, query, expected return value)
 */
-static const validate_t validate_uris[26] = {
+static const validate_t validate_uris[27] = {
         /* uri to parse */
     VEC("coap://RIOT:test@[2001:db8::1]:5683/.well-known/core?v=1",
         /* is URI */
@@ -177,12 +177,12 @@ static const validate_t validate_uris[26] = {
         "",
         -1),
     VEC("coa[:////[2001:db5ow:5own/Ov=1",
-        true, // This is contested, but consistent with the rest of the output
-        "coa[",
+        false,
         "",
         "",
         "",
-        "//[2001:db5ow:5own/Ov=1",
+        "",
+        "coa[:////[2001:db5ow:5own/Ov=1",
         "",
         0),
     VEC("tel:+1-816-555-1212",
@@ -309,6 +309,15 @@ static const validate_t validate_uris[26] = {
         "",
         "",
         "/",
+        "",
+        0),
+    VEC("./this:that",
+        false,
+        "",
+        "",
+        "",
+        "",
+        "./this:that",
         "",
         0),
 };
