@@ -42,6 +42,7 @@ PORT=$1
 TAP=$2
 PREFIX=$3
 BAUDRATE=115200
+START_ETHOS=1
 
 [ -z "${PORT}" -o -z "${TAP}" -o -z "${PREFIX}" ] && {
     echo "usage: $0 [-e|--ethos-only] <serial-port> <tap-device> <prefix> " \
