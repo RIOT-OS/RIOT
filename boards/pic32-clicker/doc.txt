@@ -60,7 +60,7 @@ found in the [manual](https://download.mikroe.com/documents/starter-boards/click
 | Low-level driver | GPIO            | partly    | gpio_irq not supported |
 |                  | ADC             | no        |                        |
 |                  | PWM             | no        |                        |
-|                  | UART            | partly    | only TX                |
+|                  | UART            | yes       |                        |
 |                  | I2C             | no        |                        |
 |                  | SPI             | no        |                        |
 |                  | USB             | no        |                        |
