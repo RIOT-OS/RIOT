@@ -20,8 +20,8 @@ else
   IFACE ?= tap0
   ETHOS_BAUDRATE ?= 115200
   CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)
-  TERMPROG ?= sudo sh $(RIOTBASE)/dist/tools/ethos/ethos
-  TERMFLAGS ?= $(IFACE) $(PORT) $(ETHOS_BAUDRATE)
+  TERMPROG ?= sudo $(RIOTTOOLS)/ethos/start_network.sh
+  TERMFLAGS ?= -e $(PORT) $(TAP) "2001:db8::/64" $(ETHOS_BAUDRATE)
   TERMDEPS += ethos
 endif
 USEMODULE += auto_init_gnrc_netif

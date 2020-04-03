@@ -19,8 +19,8 @@ else
   ETHOS_BAUDRATE ?= 115200
   CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)
   TERMDEPS += ethos
-  TERMPROG ?= sudo $(RIOTTOOLS)/ethos/ethos
-  TERMFLAGS ?= $(TAP) $(PORT) $(ETHOS_BAUDRATE)
+  TERMPROG ?= sudo $(RIOTTOOLS)/ethos/start_network.sh
+  TERMFLAGS ?= -e $(PORT) $(TAP) "2001:db8::/64" $(ETHOS_BAUDRATE)
   STATIC_ROUTES ?= 1
 endif
 
