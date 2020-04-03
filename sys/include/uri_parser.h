@@ -8,7 +8,12 @@
 /**
  * @defgroup    sys_uri_parser A minimal, non-destructive URI parser
  * @ingroup     sys
- * @brief       A minimal, non-destructive URI parser
+ * @brief       A minimal, non-destructive parser for URI references
+ *
+ * This module acts on URI references, and thus process both relative
+ * references and URIs.
+ *
+ * Note that fragment identifiers are not handled by the implementation.
  *
  * @see https://tools.ietf.org/html/rfc3986
  *
@@ -49,32 +54,32 @@ typedef struct {
 } uri_parser_result_t;
 
 /**
- * @brief Checks whether @p uri is absolute or relative
+ * @brief Checks whether @p uri is in absolute form
  *
- * @param[in]   uri       URI to check. Must not be `NULL`
+ * @param[in]   uri       URI reference to check. Must not be `NULL`
  * @param[in]   uri_len   Length of @p uri
  *
  * @pre `uri != NULL`
  *
- * @return      true      if @p uri is an absolute URI
- * @return      false     if @p uri is a relative URI
+ * @return      true      if @p uri is a URI
+ * @return      false     if @p uri is a relative reference
  */
 bool uri_parser_is_absolute(const char *uri, size_t uri_len);
 
 /**
- * @brief Checks whether @p uri is absolute or relative
+ * @brief Checks whether @p uri is in absolute form
  *
- * @param[in]   uri       Zero-terminated URI to check. Must not be `Null`
+ * @param[in]   uri       Zero-terminated URI reference to check. Must not be `Null`
  *
  * @pre `uri != NULL`
  *
- * @return      true      if @p uri is an absolute URI
- * @return      false     if @p uri is a relative URI
+ * @return      true      if @p uri is a URI
+ * @return      false     if @p uri is a relative reference
  */
 bool uri_parser_is_absolute_string(const char *uri);
 
 /**
- * @brief Parse a URI
+ * @brief Parse a URI reference
  *
  * @param[out]  result    pointer to a container that will hold the result
  * @param[in]   uri       URI to parse. Must not be `NULL`
@@ -89,7 +94,7 @@ int uri_parser_process(uri_parser_result_t *result, const char *uri,
                        size_t uri_len);
 
 /**
- * @brief Parse a URI
+ * @brief Parse a URI reference
  *
  * @param[out]  result    pointer to a container that will hold the result
  * @param[in]   uri       Zero-terminated URI to parse. Must not be `NULL`
