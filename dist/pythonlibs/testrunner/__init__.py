@@ -48,8 +48,17 @@ def run(testfunc, timeout=TIMEOUT, echo=True, traceback=False):
 
 
 def check_unittests(child, timeout=TIMEOUT, nb_tests=None):
-    _tests = r'\d+' if nb_tests is None else int(nb_tests)
-    child.expect(r'OK \({} tests\)'.format(_tests), timeout=timeout)
+    """ Check the number of unit tests that passed, and return the amount.
+
+        If the amount of expected tests to pass is known, nd_tests can be set
+        to perform an exact match against that number.
+    """
+    if nb_tests is None:
+        child.expect(r'OK \((\d+) tests\)', timeout=timeout)
+        return int(child.match.group(1))
+    _tests = int(nb_tests)
+    child.expect_exact('OK ({} tests)'.format(_tests), timeout=timeout)
+    return _tests
 
 
 def run_check_unittests(timeout=TIMEOUT, echo=True, traceback=False,
