@@ -61,6 +61,7 @@
 /doc/                                       @aabadie @jia200x
 
 /dist/tools/sliptty/                        @miri64
+/dist/tools/dhcpv6-pd_ia/                   @miri64
 
 /drivers/ad7746/                            @leandrolanzieri
 /drivers/at24mac/                           @benpicco
