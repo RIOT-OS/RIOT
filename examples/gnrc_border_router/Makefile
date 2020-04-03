@@ -87,6 +87,8 @@ ifeq (,$(filter native,$(BOARD)))
     include $(CURDIR)/Makefile.wifi.conf
   endif
 else
+  # The number of native (emulated) ZigBee/6LoWPAN devices
+  ZEP_DEVICES ?= 1
   include $(CURDIR)/Makefile.native.conf
 endif
 
