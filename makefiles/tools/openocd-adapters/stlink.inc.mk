@@ -11,6 +11,16 @@ ifneq (,$(DEBUG_ADAPTER_ID))
   OPENOCD_ADAPTER_INIT += -c 'hla_serial $(DEBUG_ADAPTER_ID)'
 endif
 
+
+# Some stlink clones cannot signal reset properly,
+# In this case, use SRST=none
+ifneq (,$(SRST))
+  #Change the adapter init to it
+  # Use STLINK_VERSION to select which stlink version is used
+  OPENOCD_ADAPTER_INIT += \
+    -c 'set SRST_OPT $(SRST)'
+endif
+
 # if no openocd specific configuration file, check for default locations:
 # 1. Using the default dist/openocd.cfg (automatically set by openocd.sh)
 # 2. Using the common cpu specific config file

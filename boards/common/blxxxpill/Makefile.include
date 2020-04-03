@@ -7,6 +7,22 @@ ifeq (dfu-util,$(PROGRAMMER))
 
   # Leave some space at the beginning of the flash for the bootloader
   ROM_OFFSET ?= 0x2000
+
+  # If using STM32duino bootloader, this change is necessary.
+  # Bootloader available at
+  # github.com/rogerclarkmelbourne/STM32duino-bootloader/tree/master/binaries
+  ifeq (stm32duino,$(BOOTLOADER))
+    FFLAGS_OPTS ?= -R
+    FFLAGS ?= --device $(DFU_USB_ID) \
+              --alt $(DFU_ALT) \
+              --download $(FLASHFILE) \
+              $(FFLAGS_OPTS)
+
+    # Flashing may be easier if using a software USB reset.
+    # Future updates may provide USB support for stm32f1 which benefits
+    # from this software reset.
+  endif
+
 else ifeq (openocd,$(PROGRAMMER))
   STLINK_VERSION ?= 2
 endif
