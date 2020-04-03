@@ -176,9 +176,10 @@ static char *_consume_path(uri_parser_result_t *result, char *uri,
 static int _parse_relative(uri_parser_result_t *result, char *uri,
                            char *uri_end)
 {
-    /* we expect '\0', i.e., end of string */
     uri = _consume_path(result, uri, uri_end);
-    if (uri[0] != '\0') {
+    /* uri should point to uri_end, otherwise there's something left
+     * to consume ... */
+    if (uri != uri_end) {
         return -1;
     }
 
