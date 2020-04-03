@@ -33,9 +33,14 @@ extern const void *_isr_vectors;
 
 CORTEXM_STATIC_INLINE void cortexm_init_isr_priorities(void)
 {
+#if CPU_CORTEXM_PRIORITY_GROUPING != 0
+    /* If defined, initialise priority subgrouping, see cpu_conf_common.h */
+    NVIC_SetPriorityGrouping(CPU_CORTEXM_PRIORITY_GROUPING);
+#endif
+
     /* initialize the interrupt priorities */
-    /* set pendSV interrupt to same priority as the rest */
-    NVIC_SetPriority(PendSV_IRQn, CPU_DEFAULT_IRQ_PRIO);
+    /* set pendSV interrupt to its own priority */
+    NVIC_SetPriority(PendSV_IRQn, CPU_CORTEXM_PENDSV_IRQ_PRIO);
     /* set SVC interrupt to same priority as the rest */
     NVIC_SetPriority(SVCall_IRQn, CPU_DEFAULT_IRQ_PRIO);
     /* initialize all vendor specific interrupts with the same value */
