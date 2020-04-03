@@ -13,6 +13,8 @@
  * This module acts on URI references, and thus process both relative
  * references and URIs.
  *
+ * Note that fragment identifiers are not handled by the implementation.
+ *
  * @see https://tools.ietf.org/html/rfc3986
  *
  * @{
