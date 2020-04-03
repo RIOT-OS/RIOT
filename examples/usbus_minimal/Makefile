@@ -16,10 +16,8 @@ USEMODULE += usbus
 USEMODULE += auto_init_usbus
 
 # USB device vendor and product ID
-export DEFAULT_VID = 1209
-export DEFAULT_PID = 7D00
-USB_VID ?= $(DEFAULT_VID)
-USB_PID ?= $(DEFAULT_PID)
+USB_VID ?= $(USB_VID_TESTING)
+USB_PID ?= $(USB_PID_TESTING)
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
@@ -41,12 +39,3 @@ ifndef CONFIG_USB_PID
 else
   USB_PID = $(patsubst 0x%,%,$(CONFIG_USB_PID))
 endif
-
-.PHONY: usb_id_check
-usb_id_check:
-	@if [ $(USB_VID) = $(DEFAULT_VID) -o $(USB_PID) = $(DEFAULT_PID) ] ; then \
-		$(COLOR_ECHO) "$(COLOR_RED)Private testing pid.codes USB VID/PID used!, do not use it outside of test environments!$(COLOR_RESET)" 1>&2 ; \
-		$(COLOR_ECHO) "$(COLOR_RED)MUST NOT be used on any device redistributed, sold or manufactured, VID/PID is not unique!$(COLOR_RESET)" 1>&2 ; \
-	fi
-
-all: | usb_id_check

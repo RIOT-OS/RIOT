@@ -45,12 +45,14 @@ endchoice
 config USB_PID
     hex "Product ID"
     range 0x0000 0xFFFF
+    default 0x$(USB_PID_TESTING) if KCONFIG_USB
     help
         You must provide your own PID.
 
 config USB_VID
     hex "Vendor ID"
     range 0x0000 0xFFFF
+    default 0x$(USB_VID_TESTING) if KCONFIG_USB
     help
         You must provide your own VID.
 
