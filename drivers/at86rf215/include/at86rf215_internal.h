@@ -374,13 +374,6 @@ void at86rf215_enable_rpc(at86rf215_t *dev);
 bool at86rf215_switch_mode(at86rf215_t *dev, uint8_t new_mode);
 
 /**
- * @brief Block while the device is busy sending
- *
- * @param[in] dev           device that might be TXing
- */
-void at86rf215_block_while_busy(at86rf215_t *dev);
-
-/**
  * @brief Checks whether the device operates in the sub-GHz band.
  *
  * @param[in] dev   device to read from

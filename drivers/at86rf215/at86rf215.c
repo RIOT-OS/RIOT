@@ -206,6 +206,8 @@ static bool _tx_ongoing(at86rf215_t *dev)
         return true;
     }
 
+    /* we can still fill the TX buffer and queue TX
+       when in AT86RF215_STATE_RX_SEND_ACK */
     if (dev->state == AT86RF215_STATE_TX ||
         dev->state == AT86RF215_STATE_TX_WAIT_ACK) {
         return true;
@@ -237,7 +239,7 @@ static void _block_while_busy(at86rf215_t *dev)
     gpio_irq_enable(dev->params.int_pin);
 }
 
-void at86rf215_block_while_busy(at86rf215_t *dev)
+static void at86rf215_block_while_busy(at86rf215_t *dev)
 {
     if (_tx_ongoing(dev)) {
         DEBUG("[at86rf215] Block while TXing\n");
