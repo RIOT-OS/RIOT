@@ -41,7 +41,7 @@
 #define BTN3_INT_FLANK  GPIO_FALLING
 #endif
 
-#ifdef BTN0_PIN /* assuming that first button is always BTN0 */
+#if defined (BTN0_PIN) || defined (BTN1_PIN) || defined (BTN2_PIN) || defined (BTN3_PIN)
 static void cb(void *arg)
 {
     printf("Pressed BTN%d\n", (int)arg);
