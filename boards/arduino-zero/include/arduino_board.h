@@ -22,6 +22,7 @@
 #define ARDUINO_BOARD_H
 
 #include "arduino_pinmap.h"
+#include "periph/pwm.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,6 +69,21 @@ static const adc_t arduino_analog_map[] = {
     ARDUINO_A3,
     ARDUINO_A4,
     ARDUINO_A5,
+};
+
+/**
+ * @brief   PWM frequency
+ */
+#define ARDUINO_PWM_FREQU       (732U)
+
+/**
+ * @brief   List of PWM GPIO mappings
+ */
+static const arduino_pwm_t arduino_pwm_list[] = {
+    { .pin = 3, .dev = PWM_DEV(0), .chan = 1 },
+    { .pin = 4, .dev = PWM_DEV(0), .chan = 0 },
+    { .pin = 8, .dev = PWM_DEV(1), .chan = 0 },
+    { .pin = 9, .dev = PWM_DEV(1), .chan = 1 },
 };
 
 #ifdef __cplusplus

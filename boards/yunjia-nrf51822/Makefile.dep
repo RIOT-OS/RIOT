@@ -1,3 +1,4 @@
-ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
-  USEMODULE += nrfmin
-endif
+# include common nrf51 boards module into the build
+USEMODULE += boards_common_nrf51
+
+include $(RIOTBOARD)/common/nrf51/Makefile.dep

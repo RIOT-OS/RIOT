@@ -5,12 +5,16 @@ MODEL1 := $(word 2, $(LINE))
 MODEL2 := $(word 3, $(LINE))
 
 ifneq (, $(filter $(TYPE), 030 031 042 070))
-  ifneq (, $(filter $(MODEL2), 4 6))
+  ifneq (, $(filter $(MODEL2), 4))
+    CPU_LINE = STM32F$(TYPE)x4
+  else ifneq (, $(filter $(MODEL2), 6))
     CPU_LINE = STM32F$(TYPE)x6
   else ifneq (, $(filter $(MODEL2), 8))
     CPU_LINE = STM32F$(TYPE)x8
   else ifneq (, $(filter $(MODEL2), B))
     CPU_LINE = STM32F$(TYPE)xB
+  else ifneq (, $(filter $(MODEL2), C))
+    CPU_LINE = STM32F$(TYPE)xC
   endif
 else ifneq (, $(filter $(TYPE), 051))
   CPU_LINE = STM32F$(TYPE)x8

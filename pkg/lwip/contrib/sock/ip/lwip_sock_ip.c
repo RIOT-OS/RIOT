@@ -28,7 +28,6 @@
 #include "lwip/sys.h"
 #include "lwip/sock_internal.h"
 
-
 int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
                    const sock_ip_ep_t *remote, uint8_t proto, uint16_t flags)
 {
@@ -42,7 +41,10 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
     if ((res = lwip_sock_create(&tmp, (struct _sock_tl_ep *)local,
                                 (struct _sock_tl_ep *)remote, proto, flags,
                                 NETCONN_RAW)) == 0) {
-        sock->conn = tmp;
+        sock->base.conn = tmp;
+#if IS_ACTIVE(SOCK_HAS_ASYNC)
+        netconn_set_callback_arg(sock->base.conn, &sock->base);
+#endif
     }
     return res;
 }
@@ -50,23 +52,23 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
 void sock_ip_close(sock_ip_t *sock)
 {
     assert(sock != NULL);
-    if (sock->conn != NULL) {
-        netconn_delete(sock->conn);
-        sock->conn = NULL;
+    if (sock->base.conn != NULL) {
+        netconn_delete(sock->base.conn);
+        sock->base.conn = NULL;
     }
 }
 
 int sock_ip_get_local(sock_ip_t *sock, sock_ip_ep_t *ep)
 {
     assert(sock != NULL);
-    return (lwip_sock_get_addr(sock->conn, (struct _sock_tl_ep *)ep,
+    return (lwip_sock_get_addr(sock->base.conn, (struct _sock_tl_ep *)ep,
                                1)) ? -EADDRNOTAVAIL : 0;
 }
 
 int sock_ip_get_remote(sock_ip_t *sock, sock_ip_ep_t *ep)
 {
     assert(sock != NULL);
-    return (lwip_sock_get_addr(sock->conn, (struct _sock_tl_ep *)ep,
+    return (lwip_sock_get_addr(sock->base.conn, (struct _sock_tl_ep *)ep,
                                0)) ? -ENOTCONN : 0;
 }
 
@@ -161,7 +163,7 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
     int res;
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    if ((res = lwip_sock_recv(sock->conn, timeout, &buf)) < 0) {
+    if ((res = lwip_sock_recv(sock->base.conn, timeout, &buf)) < 0) {
         return res;
     }
     res = _parse_iphdr(buf, data, max_len, remote);
@@ -174,8 +176,23 @@ ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
 {
     assert((sock != NULL) || (remote != NULL));
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
-    return lwip_sock_send(&sock->conn, data, len, proto,
+    return lwip_sock_send(sock ? sock->base.conn : NULL, data, len, proto,
                           (struct _sock_tl_ep *)remote, NETCONN_RAW);
 }
+
+#ifdef SOCK_HAS_ASYNC
+void sock_ip_set_cb(sock_ip_t *sock, sock_ip_cb_t cb, void *arg)
+{
+    sock->base.async_cb_arg = arg;
+    sock->base.async_cb.ip = cb;
+}
+
+#ifdef SOCK_HAS_ASYNC_CTX
+sock_async_ctx_t *sock_ip_get_async_ctx(sock_ip_t *sock)
+{
+    return &sock->base.async_ctx;
+}
+#endif  /* SOCK_HAS_ASYNC_CTX */
+#endif  /* SOCK_HAS_ASYNC */
 
 /** @} */

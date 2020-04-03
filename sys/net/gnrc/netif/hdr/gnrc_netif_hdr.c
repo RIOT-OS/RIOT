@@ -15,7 +15,8 @@
 
 #include "net/gnrc/netif/hdr.h"
 
-gnrc_pktsnip_t *gnrc_netif_hdr_build(uint8_t *src, uint8_t src_len, uint8_t *dst, uint8_t dst_len)
+gnrc_pktsnip_t *gnrc_netif_hdr_build(const uint8_t *src, uint8_t src_len,
+                                     const uint8_t *dst, uint8_t dst_len)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL,
                                           sizeof(gnrc_netif_hdr_t) + src_len + dst_len,

@@ -1,53 +1,17 @@
-# define the cpu used by the Mulle board
-export CPU = kinetis
-
 # MULLE_SERIAL is used to select which specific Mulle board we are compiling for.
 ifdef MULLE_SERIAL
   CFLAGS += -DMULLE_SERIAL=$(MULLE_SERIAL)
 endif
 
-### CPU part number (must have a specific linker script for each part)
-# Note that MK60DN256ZVLL10 (version 1.x) and MK60DN256VLL10 (version 2.x, no Z)
-# only differ in some register locations etc, not in the actual memory layout,
-# so it is safe to use the same linker script for both version 1.x and version
-# 2.x silicon.
-# The linker script needs to know the flash and RAM sizes of the device.
-
-ifeq ($(CPU_MODEL),)
-  CPU_MODEL = mk60dn512vll10
-endif
-
-export CPU_MODEL
-
 # Default debug adapter choice is to use the Mulle programmer board
-export DEBUG_ADAPTER ?= mulle
-# Host OS name
-OS := $(shell uname)
+DEBUG_ADAPTER ?= mulle
 
 # Fall back to PROGRAMMER_SERIAL for backwards compatibility
-export DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
+DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
 
-ifeq ($(PORT),)
-  # try to find tty name by serial number, only works on Linux currently.
-  ifeq ($(OS),Linux)
-    ifneq ($(DEBUG_ADAPTER_ID),)
-      PORT := $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh '^$(DEBUG_ADAPTER_ID)$$'))
-    else
-      # find-tty.sh will return the first USB tty if no serial is given.
-      PORT := $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh))
-  endif
-  else ifeq ($(OS),Darwin)
-    ifneq ($(DEBUG_ADAPTER_ID),)
-      PORT := /dev/tty.usbserial-$(DEBUG_ADAPTER_ID)B
-    else
-      PORT := $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
-    endif
-  endif
-endif
-ifeq ($(PORT),)
-  # fall back to a sensible default
-  PORT := /dev/ttyUSB0
-endif
+# Define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.
@@ -56,10 +20,7 @@ endif
 export OPENOCD_PRE_VERIFY_CMDS += \
   -c 'load_image $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin 0x20000000 bin' \
   -c 'resume 0x20000000'
-export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield-elf.sh
-
-.PHONY: flash
-flash: $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin
+export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
 
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk

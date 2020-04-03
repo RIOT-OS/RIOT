@@ -84,3 +84,20 @@ Invalid timeout 1464 ,expected 1172 < 1234 < 1295
 Host max error  61
 error           291
 ```
+
+Test also fails with negative offset as xtimer_usleep must sleep for at least
+the expected time.
+
+```
+XXXX-XX-XX XX:XX:XX,XXX - INFO # Connect to serial port /dev/ttyACM0
+Welcome to pyterm!
+Type '/exit' to exit.
+XXXX-XX-XX XX:XX:XX,XXX - INFO # main(): This is RIOT! (XXX)
+XXXX-XX-XX XX:XX:XX,XXX - INFO # Running test 5 times with 7 distinct sleep times
+XXXX-XX-XX XX:XX:XX,XXX - INFO # Please hit any key and then ENTER to continue
+a
+XXXX-XX-XX XX:XX:XX,XXX - INFO # Slept for 9979 us (expected: 10000 us) Offset: -21 us
+Invalid timeout 9979 ,expected 10000 < 10500
+Host max error  500
+error           -21
+```

@@ -37,9 +37,6 @@ typedef uint32_t u32;
 typedef uint16_t u16;
 typedef uint8_t u8;
 
-
-/* This controls loop-unrolling in aes_core.c */
-#undef FULL_UNROLL
 # define GETU32(pt) (((u32)(pt)[0] << 24) ^ ((u32)(pt)[1] << 16) ^ \
                      ((u32)(pt)[2] <<  8) ^ ((u32)(pt)[3]))
 # define PUTU32(ct, st) { (ct)[0] = (u8)((st) >> 24); \
@@ -78,6 +75,8 @@ typedef struct {
  * @param       context   the cipher_context_t-struct to save the
  *                        initialization of the cipher in
  * @param       keySize   the size of the key
+ *                        Must be 16, since this implementation does not
+ *                        support key lengths of 24 or 32 bytes
  * @param       key       a pointer to the key
  *
  * @return  CIPHER_INIT_SUCCESS if the initialization was successful.

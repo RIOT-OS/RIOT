@@ -27,7 +27,7 @@
 #include "jerryscript-ext/handler.h"
 
 /* include header generated from main.js */
-#include "main.js.h"
+#include "blob/main.js.h"
 
 int js_run(const jerry_char_t *script, size_t script_size)
 {

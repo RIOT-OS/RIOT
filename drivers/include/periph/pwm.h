@@ -103,6 +103,17 @@ typedef enum {
 } pwm_mode_t;
 #endif
 
+#ifdef MODULE_ARDUINO
+/**
+ * @brief   RIOT GPIO mapping between Arduino pin, PWM device and channel
+ */
+typedef struct {
+    int pin;        /**< Arduino pin number */
+    int dev;        /**< PWM device index of pin */
+    int chan;       /**< PWM channel index */
+} arduino_pwm_t;
+#endif
+
 /**
  * @brief   Initialize a PWM device
  *

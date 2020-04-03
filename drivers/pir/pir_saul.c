@@ -29,7 +29,8 @@ static int read_occup(const void *dev, phydat_t *res) {
         /* Read failure */
         return -ECANCELED;
     }
-    memset(&(res->val[1]), 0, 2 * sizeof(int16_t));
+    res->val[1] = 0;
+    res->val[2] = 0;
     res->unit = UNIT_PERCENT;
     res->scale = -2;
     return 1;

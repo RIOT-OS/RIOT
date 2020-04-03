@@ -20,70 +20,31 @@
 #ifndef GPIO_ARCH_H
 #define GPIO_ARCH_H
 
+#include "gpio_arch_common.h"
 #include "periph/gpio.h"
 #include "soc/io_mux_reg.h"
 #include "soc/gpio_sig_map.h"
-
-#ifndef DOXYGEN
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   Definitions for source code compatibility with ESP-IDF
+ * @brief   Current an output pin can drive in active and sleep modes
  */
-#define GPIO_MODE_INPUT         GPIO_IN
-#define GPIO_MODE_OUTPUT        GPIO_OUT
-#define GPIO_MODE_INPUT_OUTPUT  GPIO_IN_OUT
-/**
- * @brief   Definition of possible GPIO usage types (for internal use only)
- */
-typedef enum
-{
-    _GPIO = 0,  /**< pin used as standard GPIO */
-    _ADC,       /**< pin used as ADC input */
-    _CAN,       /**< pin used as CAN signal */
-    _DAC,       /**< pin used as DAC output */
-    _EMAC,      /**< pin used as EMAC signal */
-    _I2C,       /**< pin used as I2C signal */
-    _PWM,       /**< pin used as PWM output */
-    _SPI,       /**< pin used as SPI interface */
-    _SPIF,      /**< pin used as SPI flash interface */
-    _UART,      /**< pin used as UART interface */
-    _NOT_EXIST  /**< pin cannot be used at all */
-} gpio_pin_usage_t;
+typedef enum {
+    GPIO_DRIVE_5  = 0,    /**<  5 mA */
+    GPIO_DRIVE_10 = 1,    /**< 10 mA */
+    GPIO_DRIVE_20 = 2,    /**< 20 mA (default) */
+    GPIO_DRIVE_30 = 2,    /**< 30 mA */
+} gpio_drive_strength_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Table of GPIO to IOMUX register mappings
  */
 extern const uint32_t _gpio_to_iomux_reg[];
 #define GPIO_PIN_MUX_REG _gpio_to_iomux_reg
-
-/**
- * @brief   Set the usage type of the pin
- * @param   pin     GPIO pin
- * @param   usage   GPIO pin usage type
- * @return  0 on succes
- *         -1 on error
- */
-int gpio_set_pin_usage(gpio_t pin, gpio_pin_usage_t usage);
-
-/**
- * @brief   Get the usage type of the pin
- * @param   pin     GPIO pin
- * @return  GPIO pin usage type on succes
- *          _NOT_EXIST on error
- */
-gpio_pin_usage_t gpio_get_pin_usage(gpio_t pin);
-
-/**
- * @brief   Get the usage type of the pin as string
- * @param   pin     GPIO pin
- * @return  GPIO pin usage type string on succes
- *          _NOT_EXIST on error
- */
-const char* gpio_get_pin_usage_str(gpio_t pin);
 
 /**
  * @brief   Disable the pullup of the pin
@@ -96,17 +57,7 @@ void gpio_pullup_dis (gpio_t pin);
 int8_t gpio_is_rtcio (gpio_t pin);
 
 /**
- * @brief   Configure sleep mode for an GPIO pin if the pin is an RTCIO pin
- * @param   pin     GPIO pin
- * @param   mode    active in sleep mode if true
- * @param   input   as input if true, as output otherwise
- * @return  0 on success
- * @return -1 on invalid pin
- */
-int gpio_config_sleep_mode (gpio_t pin, bool sleep_mode, bool input);
-
-/**
- * @brief   GPIO set direction init the pin calling gpio_init
+ * @brief   Set the direction of a pin (initializes the pin calling gpio_init)
  * @param   pin     GPIO pin
  * @param   mode    active in sleep mode if true
  * @return  0 on success
@@ -120,9 +71,41 @@ int gpio_set_direction(gpio_t pin, gpio_mode_t mode);
 void gpio_matrix_in (uint32_t gpio, uint32_t signal_idx, bool inv);
 void gpio_matrix_out(uint32_t gpio, uint32_t signal_idx, bool out_inv, bool oen_inv);
 
+#endif /* DOXYGEN */
+
+/**
+ * @brief   Set the drive-strength of an output-capable pin
+ *
+ * Sets the drive-strength for an output-capable pin in active and sleep modes.
+ * The default drive-strength is GPIO_DRIVE_20 (20 mA).
+ *
+ * @param   pin     GPIO pin
+ * @param   drive   drive-strength
+ *                  GPIO_DRIVE_5 for 5 mA
+ *                  GPIO_DRIVE_10 for 10 mA
+ *                  GPIO_DRIVE_20 for 20 mA (default)
+ *                  GPIO_DRIVE_30 for 30 mA
+ * @pre     pin is an output-capable pin
+ * @post    an assertion blows up if the pin is not output-capable
+ * @return  0 on success
+ *         -1 on error
+ */
+int gpio_set_drive_capability(gpio_t pin, gpio_drive_strength_t drive);
+
+/**
+ * @brief   Called before the power management enters a light or deep sleep mode
+ * @param   mode    sleep mode that is entered
+ */
+void gpio_pm_sleep_enter(unsigned mode);
+
+/**
+ * @brief   Called after the power management left light sleep mode
+ * @param   cause   wake-up cause
+ */
+void gpio_pm_sleep_exit(uint32_t cause);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* DOXYGEN */
 #endif /* GPIO_ARCH_H */

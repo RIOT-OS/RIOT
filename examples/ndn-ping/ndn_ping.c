@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       NDN ping client and server implemetation
+ * @brief       NDN ping client and server implementation
  *
  * @author      Wentao Shang <wentaoshang@gmail.com>
  *
@@ -23,6 +23,7 @@
 
 #include "thread.h"
 #include "random.h"
+#include "test_utils/expect.h"
 
 #include "ndn-riot/app.h"
 #include "ndn-riot/ndn.h"
@@ -57,7 +58,7 @@ static int on_data(ndn_block_t* interest, ndn_block_t* data)
 
     ndn_block_t name;
     int r = ndn_data_get_name(data, &name);
-    assert(r == 0);
+    expect(r == 0);
     printf("client (pid=%" PRIkernel_pid "): data received, name=",
            handle->id);
     ndn_name_print(&name);
@@ -65,8 +66,8 @@ static int on_data(ndn_block_t* interest, ndn_block_t* data)
 
     ndn_block_t content;
     r = ndn_data_get_content(data, &content);
-    assert(r == 0);
-    assert(content.len == 6);
+    expect(r == 0);
+    expect(content.len == 6);
 
     printf("client (pid=%" PRIkernel_pid "): content=%02X%02X%02X%02X\n",
            handle->id, *(content.buf + 2), *(content.buf + 3),
@@ -90,7 +91,7 @@ static int on_timeout(ndn_block_t* interest)
 {
     ndn_block_t name;
     int r = ndn_interest_get_name(interest, &name);
-    assert(r == 0);
+    expect(r == 0);
 
     printf("client (pid=%" PRIkernel_pid "): interest timeout, name=",
            handle->id);

@@ -25,9 +25,20 @@
 
 #include "memarray.h"
 
-#define MAX_NUMBER_BLOCKS    (10)
 #define MESSAGE_SIZE         (8U)
+
+#ifndef MAX_NUMBER_BLOCKS
+#define MAX_NUMBER_BLOCKS    (10)
+#endif
+
+#ifndef NUMBER_OF_TESTS
 #define NUMBER_OF_TESTS      (12)
+#endif
+
+#ifndef NUMBER_OF_LOOPS
+#define NUMBER_OF_LOOPS      (2)
+#endif
+
 
 extern int _ps_handler(int argc, char **argv);
 
@@ -94,13 +105,33 @@ void free_memory(struct block_t *head)
 
 int main(void)
 {
+    printf("MAX_NUMBER_BLOCKS: %d\n", MAX_NUMBER_BLOCKS);
+    printf("NUMBER_OF_LOOPS: %d\n", NUMBER_OF_LOOPS);
+    printf("NUMBER_OF_TESTS: %d\n", NUMBER_OF_TESTS);
+
     memory_block_init();
     int count = 0;
+    int loop = 0;
 
     printf("Starting (%d, %u)\n", MAX_NUMBER_BLOCKS, MESSAGE_SIZE);
     _ps_handler(0, NULL);
 
+    printf("LOOP #%i:\n", loop + 1);
+    while (count <  NUMBER_OF_TESTS) {
+        struct block_t *head = (struct block_t *) memarray_alloc(&block_storage);
+
+        printf("TEST #%i:\n", count + 1 );
+        fill_memory(head);
+        free_memory(head);
+
+        count++;
+    }
+
+    count = 0;
+    loop++;
+    printf("LOOP #%i:\n", loop + 1);
     while (count < NUMBER_OF_TESTS) {
+        memory_block_init();
         struct block_t *head = (struct block_t *) memarray_alloc(&block_storage);
 
         printf("TEST #%i:\n", count + 1 );

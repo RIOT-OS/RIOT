@@ -12,6 +12,7 @@ The MSB-IoT was developed at FU Berlin and is based on a STM32F415RG MCU.
 
 # Hardware
 
+
 ### MCU
 
 The centerpiece of the MSB-IoT is the STM32F415RG MCU. With a maximum
@@ -19,123 +20,101 @@ frequency of 168 MHz it offers high performance for a microcontroller of its
 category. The STM32F415RG comes with a huge set of accessible communication
 interfaces and features that are listed [here](http://www.st.com/web/catalog/mmc/FM141/SC1169/SS1577/LN1035/PF252143?sc=internet/mcu/product/252143.jsp).
 
-| MCU        | STM32F415RG       |
-|:------------- |:--------------------- |
-| Family | ARM Cortex-M4     |
-| Vendor | ST Microelectronics   |
-| RAM        | 192Kb (128Kb RAM + 64Kb CCMRAM)   |
-| Flash      | 1024Kb                |
-| Frequency  | up to 168MHz |
-| FPU        | yes               |
-| Timers | 14 (12x 16bit, 2x 32bit [TIM2 + TIM5])    |
-| ADCs       | 3x 12-bit (16 channel)            |
-| UARTs      | 6 (4 USART, 2 UART)               |
-| SPIs       | 3                 |
-| I2Cs       | 3                 |
-| Vcc        | 1.8V - 3.6V           |
-| Datasheet  | [Datasheet](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00035129.pdf) |
-| Reference Manual | [Reference Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/reference_manual/DM00031020.pdf)|
-| Programming Manual | [Programming Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/programming_manual/DM00046982.pdf) |
+| MCU                   | STM32F415RG                               |
+|:--------------------- |:----------------------------------------- |
+| Family                | ARM Cortex-M4                             |
+| Vendor                | ST Microelectronics                       |
+| RAM                   | 192KiB (128KiB RAM + 64KiB CCMRAM)        |
+| Flash                 | 1024KiB                                   |
+| Frequency             | up to 168MHz                              |
+| FPU                   | yes                                       |
+| Timers                | 14 (12x 16bit, 2x 32bit [TIM2 + TIM5])    |
+| ADCs                  | 3x 12-bit (16 channel)                    |
+| UARTs                 | 6 (4 USART, 2 UART)                       |
+| SPIs                  | 3                                         |
+| I2Cs                  | 3                                         |
+| Vcc                   | 1.8V - 3.6V                               |
+| Datasheet             | [Datasheet](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00035129.pdf)                    |
+| Reference Manual      | [Reference Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/reference_manual/DM00031020.pdf)      |
+| Programming Manual    | [Programming Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/programming_manual/DM00046982.pdf)  |
 
-Due to licensing issues, RIOT's driver implementations for the STM32F4 series
-are not based on ST's standard peripheral library. Therefore, not every feature
-of the MCU is currently supported in RIOT.
 
-For an overview on the currently supported functional units please check the
-following directories:
-* [Peripheral implementations](https://github.com/RIOT-OS/RIOT/tree/master/cpu/stm32f4/periph) and corresponding
-[Interfaces](https://github.com/RIOT-OS/RIOT/tree/master/drivers/include/periph)
-* Main [STM32F4 directory](https://github.com/RIOT-OS/RIOT/tree/master/cpu/stm32f4)
- and [Cortex M4 directory](https://github.com/RIOT-OS/RIOT/tree/master/cpu/cortex-m4_common)
-
-### RIOT pin mapping
+### GPIO Pins
 
 The following picture shows the easily accessible pins of the board:
+
 ![MSB-IoT Pinout](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/msbiot-pinout.png)
-
-RIOT uses its own naming scheme for GPIO pins and other functionality. The
-actual STM32F4 specific pins and functional units are mapped to RIOT internal
-enum values. Please refer to [this document](https://docs.google.com/spreadsheets/d/1RLn1j5h7VIQ1zezRs5Z3A7SYCMvEukHaKjhcsyrDz6g/pubhtml)
-for RIOTs pin mapping
-for the MSB-IoT (the document only lists ports where a PIN is mapped).
-
-The pin mapping can be altered freely by editing the
-`boards/msbiot/include/periph_conf.h` header file found
-[here](https://github.com/RIOT-OS/RIOT/tree/master/boards/msbiot/include).
-Please keep in mind that changing pin mappings that are important for the
-integrated hardware could affect the corresponding driver implementations. The
-most important mappings needed for correct operation of the MSB-IoT with RIOT
-can be extracted from the `boards/msbiot/include/board.h` found
-[here](https://github.com/RIOT-OS/RIOT/tree/master/boards/msbiot/include).
 
 ### User Interface
 
-**3 Buttons:**
+#### 3 Buttons
 
-| NAME   | User Button T1    | User Button T2    | T RESET|
-|:----- |:----- |:--------- |:------|
-| Pin    | PB13 | PA0    | NRST|
+| NAME  | User Button T1    | User Button T2    | T RESET   |
+|:----- |:----------------- |:----------------- |:--------- |
+| Pin   | PB13              | PA0               | NRST      |
+
 The user buttons are mapped to GPIO_0 (Button T2) and GPIO_8 (Button T1) in
 the board's default configuration file for RIOT. To configure and use the
-buttons, you can use the provided interface functions from RIOT's
-[GPIO](https://github.com/RIOT-OS/RIOT/blob/master/drivers/include/periph/gpio.h) low-level driver interface.
+buttons, you can use RIOT's @ref drivers_periph_gpio.
 
 Pushing the reset button will always reset the board and restart your
 application.
 
-**3 user controllable LEDs:**
+#### 3 user controllable LEDs
 
-| NAME  | LED_RED   | LED_YELLOW | LED_GREEN |
-| ----- | --------- | ---------- | --------- |
-| Color | red       | yellow     | green     |
-| Pin   | PB8       | PB14       | PB15      |
+| NAME      | LED_RED           | LED_YELLOW        | LED_GREEN         |
+| --------- | ----------------- | ----------------- | ----------------- |
+| Color     | red               | yellow            | green             |
+| Pin       | PB8               | PB14              | PB15              |
+| Pin Alias | @ref LED0_PIN     | @ref LED1_PIN     | @ref LED2_PIN     |
+| Macros    | @ref LED0_ON, ... | @ref LED1_ON, ... | @ref LED2_ON, ... |
+
 The LEDs can be controlled inside your RIOT application by using the LED
-macros provided [here](https://github.com/RIOT-OS/RIOT/blob/master/boards/msbiot/include/board.h).
+macros @ref LED0_ON, @ref LED0_OFF, and @ref LED0_TOGGLE for the red LED,
+@ref LED1_ON, @ref LED1_OFF, and @ref LED1_TOGGLE for the yellow LED, and
+@ref LED2_ON, @ref LED2_OFF, and @ref LED2_TOGGLE for the green LED.
 
 There is also a yellow charge LED on the board indicating the charging
 process of the battery.
 
-**1 Beeper:**
+#### 1 Beeper
 
-| NAME | Beeper |
-|:----- |:----- |
-| Pin    | PB09 |
+| NAME  | Beeper    |
+|:----- |:--------- |
+| Pin   | PB09      |
+
 The board's beeper allows for acoustic feedback. It needs a PWM signal
-between 1-5 kHz and is mapped to GPIO_5 and PWM_0 in RIOT. To configure and use
-the beeper inside your application, you can use the provided interface functions
-from RIOT's [GPIO](https://github.com/RIOT-OS/RIOT/blob/master/drivers/include/periph/gpio.h) and
-[PWM](https://github.com/RIOT-OS/RIOT/blob/master/drivers/include/periph/pwm.h)
-low-level driver interfaces.
+between 1-5 kHz and is connected to pin PB9 and mapped to PWM_0 in RIOT. To
+configure and use the beeper inside your application, you can use RIOT's
+@ref drivers_periph_pwm.
 
 
 ### CC1101 Sub-1GHz RF Transceiver
 
 The board has an integrated CC1101 Sub-1GHz RF Transceiver which is connected
 to the MCU using the SPI. The transceiver allows for energy-efficient local
-communication in the frequency band below 1 GHz. The CC1101 is configured as the
-`defaulttransceiver` for the MSB-IoT in RIOT (see
-[here](https://github.com/RIOT-OS/RIOT/blob/master/boards/msbiot/Makefile.include)) and the necessary driver
-files are automatically included for applications that use the
-`defaulttransceiver` module.
+communication in the frequency band below 1 GHz. The driver for the CC1101
+automatically loaded when the pseudo module `netdev_default` is used.
 
-| Product    | CC1101        |
-|:------------- |:--------------------- |
-| Type       | Sub-1GHz RF Transceiver |
-| Vendor | Texas Instruments |
-| Datasheet  | [Datasheet](http://www.ti.com/lit/ds/symlink/cc1101.pdf)|
-| Errata Sheet  | [Errata Sheet](http://www.ti.com/lit/er/swrz020d/swrz020d.pdf) |
+| Product                   | CC1101                                                            |
+|:------------------------- |:----------------------------------------------------------------- |
+| Type                      | Sub-1GHz RF Transceiver                                           |
+| Vendor                    | Texas Instruments                                                 |
+| Datasheet                 | [Datasheet](http://www.ti.com/lit/ds/symlink/cc1101.pdf)          |
+| Errata Sheet              | [Errata Sheet](https://www.ti.com/lit/er/swrz020e/swrz020e.pdf)   |
 | Other Technical Documents | [TI Webpage](http://www.ti.com/product/CC1101/technicaldocuments) |
-| Driver | [Implementation](https://github.com/RIOT-OS/RIOT/tree/master/drivers/cc110x) and [Interface](https://github.com/RIOT-OS/RIOT/tree/master/drivers/include/cc110x) |
-| SPI Device | SPI1 (Mapped to SPI_0 in RIOT)|
-| SCL        | PA5   |
-| MISO       | PA6   |
-| MOSI       | PA7       |
-| CS     | PB12 (Mapped to GPIO_7 in RIOT)|
-| GDO0       | PC4 (Mapped to GPIO_11 in RIOT)|
-| GDO2       | PC5 (Mapped to GPIO_12 in RIOT)|
+| Driver                    | @ref drivers_cc110x                                               |
+| SPI Device                | SPI1 (Mapped to SPI_0 in RIOT)                                    |
+| SCL                       | PA5                                                               |
+| MISO                      | PA6                                                               |
+| MOSI                      | PA7                                                               |
+| CS                        | PB12                                                              |
+| GDO0                      | PC4                                                               |
+| GDO2                      | PC5                                                               |
 
 
 ### CC3000 802.11b/g Wi-Fi Module
+
 In addition to the CC1101, the MSB-IoT also features a CC3000 Wi-Fi Module.
 The CC3000 is a self-contained wireless network module with a full embedded IPv4
 TCP/IP stack that for example allows to use the MSB-IoT as a gateway node to the
@@ -153,24 +132,26 @@ The driver for the CC3000 is not yet merged into RIOT's master branch. Please
 see pull request [#2603](https://github.com/RIOT-OS/RIOT/pull/2603) for progress
 on the inclusion.
 
-| Product    | CC3000        |
-|:------------- |:--------------------- |
-| Type       | 802.11b/g Wi-Fi Module |
-| Vendor | Texas Instruments |
-| Datasheet  | [Datasheet](http://www.ti.com/lit/ds/symlink/cc3000.pdf)|
-| Errata Sheet  | [Errata Sheet](http://www.ti.com/lit/er/swrz044b/swrz044b.pdf) |
-| Other Technical Documents | [TI Webpage](http://www.ti.com/product/CC3000/technicaldocuments) |
-| TI Wiki | [Wiki](http://processors.wiki.ti.com/index.php/CC3000) |
-| Driver | [Pull Request](https://github.com/RIOT-OS/RIOT/pull/2603) |
-| SPI Device | SPI2 (Mapped to SPI_1 in RIOT)|
-| SCL        | PB10  |
-| MISO       | PC2   |
-| MOSI       | PC3   |
-| CS     | PC1 (Mapped to GPIO_10 in RIOT)|
-| WLAN_ENABLE    | PC13 (Mapped to GPIO_14 in RIOT)|
-| IRQ Line   | PA10 (Mapped to GPIO_3 in RIOT)|
+| Product                   | CC3000                                                            |
+|:------------------------- |:----------------------------------------------------------------- |
+| Type                      | 802.11b/g Wi-Fi Module                                            |
+| Vendor                    | Texas Instruments                                                 |
+| Datasheet                 | [Datasheet](https://web.archive.org/web/20171109015601/http://www.ti.com/lit/ds/symlink/cc3000.pdf) |
+| Errata Sheet              | [Errata Sheet](http://www.ti.com/lit/er/swrz044b/swrz044b.pdf)    |
+| Other Technical Documents | [TI Webpage](https://web.archive.org/web/20190825013529/http://www.ti.com/product/CC3000/technicaldocuments) |
+| TI Support Forum          | [WiFi Forum](https://e2e.ti.com/support/wireless-connectivity/wifi/f/968) |
+| Driver                    | [Pull Request](https://github.com/RIOT-OS/RIOT/pull/2603)         |
+| SPI Device                | SPI2 (Mapped to SPI_1 in RIOT)                                    |
+| SCL                       | PB10                                                              |
+| MISO                      | PC2                                                               |
+| MOSI                      | PC3                                                               |
+| CS                        | PC1                                                               |
+| WLAN_ENABLE               | PC13                                                              |
+| IRQ Line                  | PA10                                                              |
+
 
 ### MPU-9150 Nine-Axis MotionTracking Device
+
 The MSB-IoT is equipped with a MPU-9150 MotionTracking Device from
 Invensense. The device combines a gyroscope, a magnetometer and an accelerometer
 in one module.
@@ -179,36 +160,42 @@ Due to licensing issues, the current MPU-9150 driver implementation for RIOT
 is not based on Invensense's 'Motion Driver' library and offers only a limited
 set of features. Nonetheless, the RIOT driver allows to configure and read
 values from all three sensors of the device. For an overview on the supported
-features, you can check the [driver's interface](https://github.com/RIOT-OS/RIOT/blob/master/drivers/include/mpu9150.h).
+features, you can check the driver's documentation in @ref drivers_mpu9x50.
 
 A sample RIOT application for the MPU-9150 that utilizes the driver can be
-found [here](https://github.com/RIOT-OS/RIOT/tree/master/tests/driver_mpu9150).
+found [here](https://github.com/RIOT-OS/RIOT/tree/master/tests/driver_mpu9x50).
 
-| Product    | MPU-9150      |
-|:------------- |:--------------------- |
-| Type       | Nine-Axis MotionTracking Device (Gyro, Accel and Compass) |
-| Vendor | Invensense    |
-| Product Specification | [Product Specification](http://www.invensense.com/mems/gyro/documents/PS-MPU-9150A-00v4_3.pdf) |
-| Register Map | [Register Map](http://www.invensense.com/mems/gyro/documents/RM-MPU-9150A-00v4_2.pdf) |
-| Driver | [Implementation](https://github.com/RIOT-OS/RIOT/tree/master/drivers/mpu9150) and [Interface](https://github.com/RIOT-OS/RIOT/blob/master/drivers/include/mpu9150.h) |
-| I²C Device | I2C1 (Mapped to I2C_0 in RIOT)|
-| SCL        | PB6   |
-| SDA        | PB7   |
-| IRQ Line | PB11 (Mapped to GPIO_6 in RIOT) |
+| Product               | MPU-9150                                                                                          |
+|:--------------------- |:------------------------------------------------------------------------------------------------- |
+| Type                  | Nine-Axis MotionTracking Device (Gyro, Accel and Compass)                                         |
+| Vendor                | Invensense                                                                                        |
+| Product Specification | [Product Specification](https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9150-Datasheet.pdf)    |
+| Register Map          | [Register Map](https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9150-Register-Map.pdf)             |
+| Driver                | @ref drivers_mpu9x50                                                                              |
+| I²C Device            | I2C1 (Mapped to I2C_0 in RIOT)                                                                    |
+| SCL                   | PB6                                                                                               |
+| SDA                   | PB7                                                                                               |
+| IRQ Line              | PB11                                                                                              |
+
 
 ### Other components
+
 For the following components of the MSB-IoT, there is currently no support in
 RIOT:
 * [TCA6416 16-Bit I/O Expander](http://www.ti.com/product/tca6416)
 * Micro-SD-Card Interface
 
+
 # Compiling, Flashing and Debugging
+
 This section only covers the automated functionality provided by RIOT's
 makefile system. If you don't want to rely on RIOT's make targets for flashing
 or debugging (for instance to use a different flashing tool), please check the
 documentation of your used tools.
 
+
 ### Prerequisites
+
 We strongly recommend the usage of the [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded) toolchain for the MSB-IoT.
 Support for other toolchains was not tested!
 
@@ -217,12 +204,16 @@ on the [Open On-Chip Debugger](http://openocd.org/) tool. A wiki page with
 installation instructions and some other information can be found
 [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD).
 
+
 ### Quick start
+
 For a quick getting started guide you can stick to the steps explained on
 [this page](https://github.com/RIOT-OS/RIOT/wiki/Getting-started-with-STM32F%5B0%7C3%7C4%5Ddiscovery-boards). Just make sure to use "msbiot" as the
 respective board name.
 
+
 ### Compiling
+
 ```
 fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/hello-world$ BOARD=msbiot
 make
@@ -241,7 +232,9 @@ Building application "hello-world" for "msbiot" with MCU "stm32f4".
 /home/fabian/myriot/RIOT/examples/hello-world/bin/msbiot/hello-world.elf
 ```
 
+
 ### Flashing
+
 ```
 fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/hello-world$ BOARD=msbiot
 make flash
@@ -308,7 +301,9 @@ shutdown command invoked
 Done flashing
 ```
 
+
 ### Debugging
+
 ```
 fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/hello-world$ BOARD=msbiot
 make debug
@@ -335,7 +330,9 @@ reset_handler () at /home/fabian/myriot/RIOT/cpu/stm32f4/startup.c:54
 (gdb)
 ```
 
+
 ### Using the UART for STDIO
+
 The MCU's USART2 is set as the default input/output for the MSB-IoT inside
 RIOT (mapped to UART_0). It is initialized and configured automatically for
 every RIOT application and can be used for communication with your computer. The

@@ -25,14 +25,13 @@
 #include "net/gnrc/udp.h"
 #include "net/sock/udp.h"
 #include "net/udp.h"
+#include "random.h"
 
 #include "gnrc_sock_internal.h"
 
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
 static sock_udp_t *_udp_socks = NULL;
 #endif
-
-static uint16_t _dyn_port_next = 0;
 
 /**
  * @brief   Checks if a given UDP port is already used by another sock
@@ -66,17 +65,16 @@ static bool _dyn_port_used(uint16_t port)
 /**
  * @brief   returns a UDP port, and checks for reuse if required
  *
- * complies to RFC 6056, see https://tools.ietf.org/html/rfc6056#section-3.3.3
+ * implements "Another Simple Port Randomization Algorithm" as specified in
+ * RFC 6056, see https://tools.ietf.org/html/rfc6056#section-3.3.2
  */
 static uint16_t _get_dyn_port(sock_udp_t *sock)
 {
     unsigned count = GNRC_SOCK_DYN_PORTRANGE_NUM;
     do {
         uint16_t port = GNRC_SOCK_DYN_PORTRANGE_MIN +
-               (_dyn_port_next * GNRC_SOCK_DYN_PORTRANGE_OFF) % GNRC_SOCK_DYN_PORTRANGE_NUM;
-        _dyn_port_next++;
-        if ((sock == NULL) || (sock->flags & SOCK_FLAGS_REUSE_EP) ||
-                              !_dyn_port_used(port)) {
+               (random_uint32() % GNRC_SOCK_DYN_PORTRANGE_NUM);
+        if ((sock && (sock->flags & SOCK_FLAGS_REUSE_EP)) || !_dyn_port_used(port)) {
             return port;
         }
         --count;
@@ -178,12 +176,39 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *remote)
 ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
                       uint32_t timeout, sock_udp_ep_t *remote)
 {
+    void *pkt = NULL, *ctx = NULL;
+    uint8_t *ptr = data;
+    ssize_t res, ret = 0;
+    bool nobufs = false;
+
+    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    while ((res = sock_udp_recv_buf(sock, &pkt, &ctx, timeout, remote)) > 0) {
+        if (res > (ssize_t)max_len) {
+            nobufs = true;
+            continue;
+        }
+        memcpy(ptr, pkt, res);
+        ptr += res;
+        ret += res;
+    }
+    return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
+}
+
+ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
+                          uint32_t timeout, sock_udp_ep_t *remote)
+{
     gnrc_pktsnip_t *pkt, *udp;
     udp_hdr_t *hdr;
     sock_ip_ep_t tmp;
     int res;
 
-    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    assert((sock != NULL) && (data != NULL) && (buf_ctx != NULL));
+    if (*buf_ctx != NULL) {
+        *data = NULL;
+        gnrc_pktbuf_release(*buf_ctx);
+        *buf_ctx = NULL;
+        return 0;
+    }
     if (sock->local.family == AF_UNSPEC) {
         return -EADDRNOTAVAIL;
     }
@@ -191,10 +216,6 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp);
     if (res < 0) {
         return res;
-    }
-    if (pkt->size > max_len) {
-        gnrc_pktbuf_release(pkt);
-        return -ENOBUFS;
     }
     udp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UDP);
     assert(udp);
@@ -214,9 +235,9 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
         gnrc_pktbuf_release(pkt);
         return -EPROTO;
     }
-    memcpy(data, pkt->data, pkt->size);
+    *data = pkt->data;
+    *buf_ctx = pkt;
     res = (int)pkt->size;
-    gnrc_pktbuf_release(pkt);
     return res;
 }
 
@@ -317,7 +338,28 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     if (res > 0) {
         res -= sizeof(udp_hdr_t);
     }
+#ifdef SOCK_HAS_ASYNC
+    if ((sock != NULL) && (sock->reg.async_cb.udp)) {
+        sock->reg.async_cb.udp(sock, SOCK_ASYNC_MSG_SENT,
+                               sock->reg.async_cb_arg);
+    }
+#endif  /* SOCK_HAS_ASYNC */
     return res;
 }
+
+#ifdef SOCK_HAS_ASYNC
+void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb, void *arg)
+{
+    sock->reg.async_cb_arg = arg;
+    sock->reg.async_cb.udp = cb;
+}
+
+#ifdef SOCK_HAS_ASYNC_CTX
+sock_async_ctx_t *sock_udp_get_async_ctx(sock_udp_t *sock)
+{
+    return &sock->reg.async_ctx;
+}
+#endif  /* SOCK_HAS_ASYNC_CTX */
+#endif  /* SOCK_HAS_ASYNC */
 
 /** @} */

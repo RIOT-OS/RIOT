@@ -1,0 +1,10 @@
+# configure the flash tool
+PROGRAMMER ?= uniflash
+
+OPENOCD_CONFIG ?= $(RIOTBOARD)/common/cc26x2_cc13x2/dist/openocd.cfg
+
+ifeq ($(PROGRAMMER),uniflash)
+  include $(RIOTMAKE)/tools/uniflash.inc.mk
+else ifeq ($(PROGRAMMER),openocd)
+  include $(RIOTMAKE)/tools/openocd.inc.mk
+endif

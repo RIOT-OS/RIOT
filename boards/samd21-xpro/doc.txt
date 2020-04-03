@@ -33,7 +33,7 @@ The samd21-xpro is available from various hardware vendors for ~30USD (as of
 | SPIs       | max 6 (see UART)                  |
 | I2Cs       | max 6 (see UART)              |
 | Vcc        | 1.62V - 3.63V         |
-| Datasheet  | [Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/40001882A.pdf) |
+| Datasheet  | [Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/SAM_D21_DA1_Family_Data%20Sheet_DS40001882E.pdf) |
 | Board Manual   | [Board Manual](http://www.atmel.com/Images/Atmel-42220-SAMD21-Xplained-Pro_User-Guide.pdf)|
 
 ### User Interface

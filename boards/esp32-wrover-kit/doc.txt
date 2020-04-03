@@ -22,6 +22,7 @@
     4. [Optional Hardware Configurations](#optional_hardware)
 3. [Flashing the Device](#flashing)
 4. [On-Chip Debugging with the device](#debugging)
+5. [Other Documentation Resources](#other-resources)
 
 ## <a name="overview"> Overview </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -32,10 +33,11 @@ The Espressif ESP-WROVER-KIT is a development board that uses the ESP32-WROVER m
 - 3.2" SPI LCD panel
 - RGB LED
 - USB bridge with JTAG interface
+- external 32.768 kHz crystal for RTC
 
 Furthermore, many GPIOs are broken out for extension. The USB bridge based on FDI FT2232HL provides a JTAG interface for OCD debugging through the USB interface.
 
-\htmlonly<style>div.image img[src="https://docs.espressif.com/projects/esp-idf/en/latest/_images/esp32-wrover-kit-layout-front.jpg"]{width:600px;}</style>\endhtmlonly@image html "https://docs.espressif.com/projects/esp-idf/en/latest/_images/esp32-wrover-kit-layout-front.jpg" "ESP-WROVER-KIT V3"
+\htmlonly<style>div.image img[src="https://dl.espressif.com/dl/schematics/pictures/esp-wrover-kit-v3.jpg"]{width:600px;}</style>\endhtmlonly@image html "https://dl.espressif.com/dl/schematics/pictures/esp-wrover-kit-v3.jpg" "ESP-WROVER-KIT V3"
 
 ## <a name="hardware"> Hardware </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -48,37 +50,8 @@ This section describes
 
 ### <a name="mcu"> MCU </a> &nbsp;&nbsp; [[TOC](#toc)]
 
-Most features of the board are provided by the ESP32 SoC. The following table summarizes these features and gives an overview of which of these features are supported by RIOT. For detailed information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
-
-<center>
-MCU         | ESP32     | Supported by RIOT
-------------|-----------|------------------
-Vendor      | Espressif | |
-Cores       | 1 or 2 x Tensilica Xtensa LX6 | 1 core
-FPU         | yes (ULP - Ultra low power co-processor) | no
-RAM         | 520 kByte SRAM <br> 16 kByte  RTC SRAM | yes
-ROM         | 520 kByte | yes
-Flash       | 512 kByte ... 16 MByte |  yes
-Frequency   | 240 MHz, 160 MHz, 80 MHz | yes
-Power Consumption | 68 mA @ 240 MHz <br> 44 mA @ 160 MHz <br> 31 mA @ 80 MHz <br> 5 uA in deep sleep mode | yes <br> yes <br> yes <br> no
-Timers      | 4 x 64 bit | yes
-ADCs        | 2 x SAR-ADC with up to 18 x 12 bit channels total | yes
-DACs        | 2 x DAC with 8 bit | yes
-GPIOs       | 34 (6 of them are only inputs) | yes
-I2Cs        | 2 | yes
-SPIs        | 4 | yes
-UARTs       | 3 | yes
-WiFi        | IEEE 802.11 b/g/n built in | yes
-Bluetooth   | v4.2 BR/EDR and BLE | no
-Ethernet    | MAC interface with dedicated DMA and IEEE 1588 support | yes
-CAN         | version 2.0 | no
-IR          | up to 8 channels TX/RX | no
-Motor PWM   | 2 devices x 6 channels | yes
-LED PWM     | 16 channels | no
-Crypto      | Hardware acceleration of AES, SHA-2, RSA, ECC, RNG | no
-Vcc         | 2.5 - 3.6 V | |
-Documents   | [Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) <br> [Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp32_technical_reference_manual_en.pdf) | |
-</center>
+Most features of the board are provided by the ESP32 SoC. For detailed
+information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
 
 ### <a name="board_configuration"> Board Configuration </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -89,10 +62,11 @@ ESP-WROVER-KIT has the following on-board components
 - 3.2" SPI LCD panel
 - RGB LED
 - USB bridge with JTAG interface
+- external 32.768 kHz crystal for RTC
 
 The following table shows the default board configuration sorted according to the defined functionality of GPIOs for different hardware options. This configuration can be overridden by \ref esp32_app_spec_conf "application-specific configurations".
 
-In the following table following abbreviations are used:
+These abbreviations are used in subsequent tables:
 
 <b>SDC</b> = SD-Card interface is used (module **sdcard_spi** is enabled)<br>
 <b>CAM</b> = Camera is plugged in/used
@@ -191,7 +165,7 @@ GPIO39 | ADC_LINE(3)            | ADC_LINE(3)         | ADC_LINE(3)         | CA
 - GPIO2 cannot be used as PWM_DEV(0) channel 1 / LED0 when SPI_DEV(0) is used in any way. Reason is that GPIO2 is the MISO signal when SPI_DEV(0) is used and is therefore an input. PWM channels are outputs.
 - It might be necessary to remove the SD card or the peripheral hardware attached to the SPI_DEV(0) interface for flashing RIOT. Reason is that the **SPI_DEV(0)** interface uses the HSPI interface with the GPIO2 pin as the MISO signal, which has bootstrapping functionality.
 - GPIO16 and GPIO17 are used for the built-in SPI RAM and are not available on the I/O expansion connector, even though they are labeled there.
-- GPIO32 and GPIO33 are attached to a 32 kHz crystal by default. GPIO32 and GPIO33 are standard connected to a 32 kHz crystal. To make them available as a GPIO on the I/O expansion connector, SMD resistors would need to be removed and soldered.
+- GPIO32 and GPIO33 are attached to a 32 kHz crystal by default. To make them available as a GPIO on the I/O expansion connector, SMD resistors would need to be removed and soldered. Module `esp_rtc_timer_32k` is enabled by default.
 
 For detailed information about the configuration of ESP32 boards, see
 section Peripherals in \ref esp32_riot.
@@ -215,7 +189,7 @@ MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network i
 #define ENC28J80_PARAM_CS       GPIO9       /* ENC28J80 CS signal    */
 #define ENC28J80_PARAM_INT      GPIO10      /* ENC28J80 INT signal   */
 #define ENC28J80_PARAM_RESET    GPIO12      /* ENC28J80 RESET signal */
-endif
+#endif
 
 #endif
 ```
@@ -247,7 +221,7 @@ The USB bridge is based on FDI FT2232HL and offers two USB interfaces:
 - the first interface is the JTAG interface for [On-Chip debugging](#debugging)
 - the second interface is the console interface, which is also used for flashing
 
-Therefore, you have to declare the USB interface in the make command. For example, if the ESP32-WROVER-KIT is connected to the host computer through the USB interfaces **/dev/ttyUSB0** and **/dev/ttyUSB1**, the make command would be used as following:
+Therefore, you have to declare the USB interface in the make command. For example, if the ESP32-WROVER-KIT is connected to the host computer through the USB interfaces `/dev/ttyUSB0` and `/dev/ttyUSB1`, the make command would be used as following:
 ```
 make flash BOARD=esp32-wrover-kit PORT=/dev/ttyUSB1 ...
 ```
@@ -256,5 +230,9 @@ For detailed information about ESP32 as well as configuring and compiling RIOT f
 
 ## <a name="debugging"> On-Chip Debugging with the Device </a> &nbsp;&nbsp; [[TOC](#toc)]
 
-Since the USB bridge based on FDI FT2232HL provides a JTAG interface for debugging through an USB interface, using ESP-ROVER-KIT is the easiest and most convinient way for On-Chip debugging. Please refer the [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/jtag-debugging/index.html) for details on how to setup and how to use ESP-WROVER-KIT and OpenOCD.
+Since the USB bridge based on FDI FT2232HL provides a JTAG interface for debugging through an USB interface, using ESP-ROVER-KIT is the easiest and most convenient way for On-Chip debugging. Please refer the [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/jtag-debugging/index.html) for details on how to setup and how to use ESP-WROVER-KIT and OpenOCD.
+
+## <a name="other-resources"> Other Documentation Resources </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+There is a comprehensive [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/get-started-wrover-kit-v3.html) for the ESP-WROVER-KIT with a lot information about hardware configuration.
  */

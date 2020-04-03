@@ -1,3 +1,7 @@
+CPU_ARCH = cortex-m3
+CPU_FAM  = stm32l1
+
+FEATURES_PROVIDED += cortexm_mpu
 FEATURES_PROVIDED += periph_eeprom
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_raw

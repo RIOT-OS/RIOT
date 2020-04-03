@@ -1,7 +1,5 @@
-USEMODULE += boards_common_arduino-mkr
-
 ifeq ($(PROGRAMMER),jlink)
-  export MKR_JLINK_DEVICE = atsamd21
+  MKR_JLINK_DEVICE = atsamd21
 endif
 
 include $(RIOTBOARD)/common/arduino-mkr/Makefile.include

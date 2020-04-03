@@ -51,6 +51,11 @@ uint32_t periph_apb_clk(uint8_t bus)
     if (bus == APB1) {
         return CLOCK_APB1;
     }
+#if defined (CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
+    else if (bus == APB12) {
+        return CLOCK_APB1;
+    }
+#endif
     else {
         return CLOCK_APB2;
     }
@@ -65,7 +70,7 @@ void periph_clk_en(bus_t bus, uint32_t mask)
 {
     switch (bus) {
         case APB1:
-#if defined(CPU_FAM_STM32L4)
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
             RCC->APB1ENR1 |= mask;
 #else
             RCC->APB1ENR |= mask;
@@ -74,6 +79,11 @@ void periph_clk_en(bus_t bus, uint32_t mask)
         case APB2:
             RCC->APB2ENR |= mask;
             break;
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
+        case APB12:
+            RCC->APB1ENR2 |= mask;
+            break;
+#endif
 #if defined(CPU_FAM_STM32L0)
         case AHB:
             RCC->AHBENR |= mask;
@@ -81,13 +91,14 @@ void periph_clk_en(bus_t bus, uint32_t mask)
         case IOP:
             RCC->IOPENR |= mask;
             break;
-#elif defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) \
-      || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+#elif defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) || \
+      defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
         case AHB:
             RCC->AHBENR |= mask;
             break;
-#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) \
-      || defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7)
+#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
+      defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7) || \
+      defined(CPU_FAM_STM32WB)
         case AHB1:
             RCC->AHB1ENR |= mask;
             break;
@@ -113,7 +124,7 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
 {
     switch (bus) {
         case APB1:
-#if defined(CPU_FAM_STM32L4)
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
             RCC->APB1ENR1 &= ~(mask);
 #else
             RCC->APB1ENR &= ~(mask);
@@ -122,6 +133,11 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
         case APB2:
             RCC->APB2ENR &= ~(mask);
             break;
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
+        case APB12:
+            RCC->APB1ENR2 &= ~(mask);
+            break;
+#endif
 #if defined(CPU_FAM_STM32L0)
         case AHB:
             RCC->AHBENR &= ~(mask);
@@ -129,13 +145,14 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
         case IOP:
             RCC->IOPENR &= ~(mask);
             break;
-#elif defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) \
-      || defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+#elif defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) || \
+      defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
         case AHB:
             RCC->AHBENR &= ~(mask);
             break;
-#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) \
-      || defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7)
+#elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
+      defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7) || \
+      defined(CPU_FAM_STM32WB)
         case AHB1:
             RCC->AHB1ENR &= ~(mask);
             break;
@@ -148,9 +165,126 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
             RCC->AHB3ENR &= ~(mask);
             break;
 #endif
+#if defined(CPU_FAM_STM32WB)
+        case AHB4:
+            RCC->AHB3ENR &= ~(mask);
+            break;
+#endif
 #endif
         default:
             DEBUG("unsupported bus %d\n", (int)bus);
             break;
     }
 }
+
+#if defined(CPU_FAM_STM32L4)
+void periph_lpclk_en(bus_t bus, uint32_t mask)
+{
+    switch (bus) {
+        case APB1:
+            RCC->APB1SMENR1 |= mask;
+            break;
+        case APB2:
+            RCC->APB2SMENR |= mask;
+            break;
+        case APB12:
+            RCC->APB1SMENR2 |= mask;
+            break;
+        case AHB1:
+            RCC->AHB1SMENR |= mask;
+            break;
+        case AHB2:
+            RCC->AHB2SMENR |= mask;
+            break;
+        case AHB3:
+            RCC->AHB3SMENR |= mask;
+            break;
+        default:
+            DEBUG("unsupported bus %d\n", (int)bus);
+            break;
+    }
+}
+
+void periph_lpclk_dis(bus_t bus, uint32_t mask)
+{
+    switch (bus) {
+        case APB1:
+            RCC->APB1SMENR1 &= ~(mask);
+            break;
+        case APB2:
+            RCC->APB2SMENR &= ~(mask);
+            break;
+        case APB12:
+            RCC->APB1SMENR2 &= ~(mask);
+            break;
+        case AHB1:
+            RCC->AHB1SMENR &= ~(mask);
+            break;
+        case AHB2:
+            RCC->AHB2SMENR &= ~(mask);
+            break;
+        case AHB3:
+            RCC->AHB3SMENR &= ~(mask);
+            break;
+        default:
+            DEBUG("unsupported bus %d\n", (int)bus);
+            break;
+    }
+}
+#elif defined(CPU_FAM_STM32F2) || \
+      defined(CPU_FAM_STM32F4) || \
+      defined(CPU_FAM_STM32F7)
+void periph_lpclk_en(bus_t bus, uint32_t mask)
+{
+    switch (bus) {
+        case APB1:
+            RCC->APB1LPENR |= mask;
+            break;
+        case APB2:
+            RCC->APB2LPENR |= mask;
+            break;
+        case AHB1:
+            RCC->AHB1LPENR |= mask;
+            break;
+/* STM32F410 RCC doesn't provide AHB2 and AHB3 */
+#if !defined(CPU_LINE_STM32F410Rx)
+        case AHB2:
+            RCC->AHB2LPENR |= mask;
+            break;
+        case AHB3:
+            RCC->AHB3LPENR |= mask;
+            break;
+#endif
+        default:
+            DEBUG("unsupported bus %d\n", (int)bus);
+            break;
+    }
+}
+
+void periph_lpclk_dis(bus_t bus, uint32_t mask)
+{
+    switch (bus) {
+        case APB1:
+            RCC->APB1LPENR &= ~(mask);
+            break;
+        case APB2:
+            RCC->APB2LPENR &= ~(mask);
+            break;
+        case AHB1:
+            RCC->AHB1LPENR &= ~(mask);
+            break;
+/* STM32F410 RCC doesn't provide AHB2 and AHB3 */
+#if !defined(CPU_LINE_STM32F410Rx)
+        case AHB2:
+            RCC->AHB2LPENR &= ~(mask);
+            break;
+        case AHB3:
+            RCC->AHB3LPENR &= ~(mask);
+            break;
+#endif
+        default:
+            DEBUG("unsupported bus %d\n", (int)bus);
+            break;
+    }
+}
+#endif

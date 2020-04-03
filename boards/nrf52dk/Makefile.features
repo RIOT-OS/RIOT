@@ -1,3 +1,3 @@
-include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.features
+CPU_MODEL = nrf52832xxaa
 
-FEATURES_PROVIDED += periph_pwm
+include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.features

@@ -37,7 +37,7 @@
  * automatically using the `auto_init` module.
  * To do so, each driver implementation must provide default initialization
  * parameters in the `DRIVER_params.h` file.
- * These parameters can be overriden from the application code in several ways
+ * These parameters can be overridden from the application code in several ways
  * (examples with the @ref drivers_bmp180 oversampling parameter
  * `BMP180_PARAM_OVERSAMPLING`):
  *
@@ -100,7 +100,7 @@ extern "C" {
  * @brief Initializes all high level modules that do not require parameters for
  *        initialization or uses default values.
  *
- *        This function gets called - if not explicitely disabled - by @ref
+ *        This function gets called - if not explicitly disabled - by @ref
  *        kernel_init right before jumping into @e main.
  */
 void auto_init(void);

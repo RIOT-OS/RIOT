@@ -26,9 +26,9 @@ int gnrc_ipv6_nib_ft_get(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
     int res;
 
     assert((dst != NULL) && (fte != NULL));
-    mutex_lock(&_nib_mutex);
+    _nib_acquire();
     res = _nib_get_route(dst, pkt, fte);
-    mutex_unlock(&_nib_mutex);
+    _nib_release();
     return res;
 }
 
@@ -43,7 +43,7 @@ int gnrc_ipv6_nib_ft_add(const ipv6_addr_t *dst, unsigned dst_len,
     if ((iface == 0) || ((is_default_route) && (next_hop == NULL))) {
         return -EINVAL;
     }
-    mutex_lock(&_nib_mutex);
+    _nib_acquire();
     if (is_default_route) {
         _nib_dr_entry_t *ptr;
 
@@ -59,7 +59,7 @@ int gnrc_ipv6_nib_ft_add(const ipv6_addr_t *dst, unsigned dst_len,
             }
         }
     }
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     else {
         _nib_offl_entry_t *ptr;
 
@@ -73,18 +73,18 @@ int gnrc_ipv6_nib_ft_add(const ipv6_addr_t *dst, unsigned dst_len,
                          &ptr->route_timeout, ltime * MS_PER_SEC);
         }
     }
-#else /* GNRC_IPV6_NIB_CONF_ROUTER */
+#else /* CONFIG_GNRC_IPV6_NIB_ROUTER */
     else {
         res = -ENOTSUP;
     }
 #endif
-    mutex_unlock(&_nib_mutex);
+    _nib_release();
     return res;
 }
 
 void gnrc_ipv6_nib_ft_del(const ipv6_addr_t *dst, unsigned dst_len)
 {
-    mutex_lock(&_nib_mutex);
+    _nib_acquire();
     if ((dst == NULL) || (dst_len == 0) || ipv6_addr_is_unspecified(dst)) {
         _nib_dr_entry_t *entry = _nib_drl_get_dr();
 
@@ -92,7 +92,7 @@ void gnrc_ipv6_nib_ft_del(const ipv6_addr_t *dst, unsigned dst_len)
             _nib_drl_remove(entry);
         }
     }
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     else {
         _nib_offl_entry_t *entry = NULL;
 
@@ -105,7 +105,7 @@ void gnrc_ipv6_nib_ft_del(const ipv6_addr_t *dst, unsigned dst_len)
         }
     }
 #endif
-    mutex_unlock(&_nib_mutex);
+    _nib_release();
 }
 
 bool gnrc_ipv6_nib_ft_iter(const ipv6_addr_t *next_hop, unsigned iface,

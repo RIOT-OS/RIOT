@@ -38,7 +38,7 @@ void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params)
     /* set pointer to the devices netdev functions */
     dev->netdev.netdev.driver = &cc2420_driver;
     /* pull in device configuration parameters */
-    memcpy(&dev->params, params, sizeof(cc2420_params_t));
+    dev->params = *params;
     dev->state = CC2420_STATE_IDLE;
     /* reset device descriptor fields */
     dev->options = 0;
@@ -58,7 +58,6 @@ int cc2420_init(cc2420_t *dev)
     addr[0] |= 0x02;
     cc2420_set_addr_short(dev, &addr[6]);
     cc2420_set_addr_long(dev, addr);
-    cc2420_set_pan(dev, CC2420_PANID_DEFAULT);
     cc2420_set_chan(dev, CC2420_CHAN_DEFAULT);
     cc2420_set_txpower(dev, CC2420_TXPOWER_DEFAULT);
 
@@ -132,9 +131,11 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const iolist_t *iolist)
     cc2420_strobe(dev, CC2420_STROBE_FLUSHTX);
     /* push packet length to TX FIFO */
     cc2420_fifo_write(dev, (uint8_t *)&pkt_len, 1);
-    /* push packet to TX FIFO */
+    /* push packet to TX FIFO, only if iol->iol_len > 0 */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
-        cc2420_fifo_write(dev, iol->iol_base, iol->iol_len);
+        if (iol->iol_len > 0) {
+            cc2420_fifo_write(dev, iol->iol_base, iol->iol_len);
+        }
     }
     DEBUG("cc2420: tx_prep: loaded %i byte into the TX FIFO\n", (int)pkt_len);
 
@@ -159,6 +160,15 @@ void cc2420_tx_exec(cc2420_t *dev)
     }
 }
 
+static inline void _flush_rx_fifo(cc2420_t *dev)
+{
+    /* as stated in the CC2420 datasheet (section 14.3), the SFLUSHRX command
+     * strobe should be issued twice to ensure that the SFD pin goes back to its
+     * idle state */
+    cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
+    cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
+}
+
 int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
 {
     (void)info;
@@ -172,14 +182,21 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
         cc2420_ram_read(dev, CC2420_RAM_RXFIFO, &len, 1);
         len -= 2;   /* subtract RSSI and FCF */
         DEBUG("cc2420: recv: packet of length %i in RX FIFO\n", (int)len);
+        if (max_len != 0) {
+            DEBUG("cc2420: recv: Dropping frame as requested\n");
+            _flush_rx_fifo(dev);
+        }
     }
     else {
         /* read length byte */
         cc2420_fifo_read(dev, &len, 1);
         len -= 2;   /* subtract RSSI and FCF */
 
-        /* if a buffer is given, read (and drop) the packet */
-        len = (len > max_len) ? max_len : len;
+        if (len > max_len) {
+            DEBUG("cc2420: recv: Supplied buffer to small\n");
+            _flush_rx_fifo(dev);
+            return -ENOBUFS;
+        }
 
         /* read fifo contents */
         DEBUG("cc2420: recv: reading %i byte of the packet\n", (int)len);
@@ -203,8 +220,7 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
         }
 
         /* finally flush the FIFO */
-        cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
-        cc2420_strobe(dev, CC2420_STROBE_FLUSHRX);
+        _flush_rx_fifo(dev);
     }
 
     return (int)len;

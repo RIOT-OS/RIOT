@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_common_esp32 ESP32 Board Commons
- * @ingroup     boards_common
- * @brief       Common definitions for all ESP32 boards
+ * @ingroup     boards_common_esp32
  * @{
  *
  * @file
@@ -32,7 +30,7 @@
  extern "C" {
 #endif
 
-void board_init(void)
+void board_init_common(void)
 {
     #ifdef LED0_PIN
     gpio_init (LED0_PIN, GPIO_OUT);
@@ -49,23 +47,37 @@ void board_init(void)
 }
 
 extern void adc_print_config(void);
+extern void dac_print_config(void);
 extern void pwm_print_config(void);
 extern void i2c_print_config(void);
 extern void spi_print_config(void);
 extern void uart_print_config(void);
 extern void can_print_config(void);
 
-void print_board_config (void)
+void print_board_config(void)
 {
     ets_printf("\nBoard configuration:\n");
 
+    #if MODULE_PERIPH_ADC
     adc_print_config();
+    #endif
+    #if MODULE_PERIPH_DAC
+    dac_print_config();
+    #endif
+    #if MODULE_PERIPH_PWM
     pwm_print_config();
+    #endif
+    #if MODULE_PERIPH_I2C
     i2c_print_config();
+    #endif
+    #if MODULE_PERIPH_SPI
     spi_print_config();
+    #endif
+    #if MODULE_PERIPH_UART
     uart_print_config();
+    #endif
 
-    #ifdef MODULE_ESP_CAN
+    #ifdef MODULE_PERIPH_CAN
     can_print_config();
     #endif
 

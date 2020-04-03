@@ -31,12 +31,36 @@ extern "C" {
  * @name    Set default configuration parameters for LIS2DH12 devices
  * @{
  */
+#ifdef MODULE_LIS2DH12_SPI          /* default configuration for SPI mode */
 #ifndef LIS2DH12_PARAM_SPI
 #define LIS2DH12_PARAM_SPI          SPI_DEV(0)
 #endif
 #ifndef LIS2DH12_PARAM_CS
 #define LIS2DH12_PARAM_CS           GPIO_PIN(0, 0)
 #endif
+#define LIS2DH12_PARAMS_BUSCFG      .spi = LIS2DH12_PARAM_SPI, \
+                                    .cs  = LIS2DH12_PARAM_CS
+
+#else                               /* default configuration for I2C mode */
+#ifndef LIS2DH12_PARAM_I2C
+#define LIS2DH12_PARAM_I2C          I2C_DEV(0)
+#endif
+#ifndef LIS2DH12_PARAM_ADDR
+#define LIS2DH12_PARAM_ADDR         LIS2DH12_ADDR_DEFAULT
+#endif
+#define LIS2DH12_PARAMS_BUSCFG      .i2c  = LIS2DH12_PARAM_I2C, \
+                                    .addr = LIS2DH12_PARAM_ADDR
+
+#endif
+
+#ifndef LIS2DH12_PARAM_INT_PIN1
+#define LIS2DH12_PARAM_INT_PIN1     GPIO_UNDEF
+#endif
+
+#ifndef LIS2DH12_PARAM_INT_PIN2
+#define LIS2DH12_PARAM_INT_PIN2     GPIO_UNDEF
+#endif
+
 #ifndef LIS2DH12_PARAM_SCALE
 #define LIS2DH12_PARAM_SCALE        LIS2DH12_SCALE_2G
 #endif
@@ -45,11 +69,22 @@ extern "C" {
 #endif
 
 #ifndef LIS2DH12_PARAMS
-#define LIS2DH12_PARAMS             { .spi = LIS2DH12_PARAM_SPI,     \
-                                      .cs = LIS2DH12_PARAM_CS,       \
-                                      .scale = LIS2DH12_PARAM_SCALE, \
-                                      .rate  = LIS2DH12_PARAM_RATE }
-#endif
+#ifdef MODULE_LIS2DH12_INT
+#define LIS2DH12_PARAMS         {  \
+                                    LIS2DH12_PARAMS_BUSCFG,  \
+                                    .int1_pin = LIS2DH12_PARAM_INT_PIN1,  \
+                                    .int2_pin = LIS2DH12_PARAM_INT_PIN2,  \
+                                    .scale = LIS2DH12_PARAM_SCALE,  \
+                                    .rate  = LIS2DH12_PARAM_RATE,  \
+                                }
+#else /* MODULE_LIS2DH12_INT */
+#define LIS2DH12_PARAMS         {  \
+                                    LIS2DH12_PARAMS_BUSCFG,  \
+                                    .scale = LIS2DH12_PARAM_SCALE,  \
+                                    .rate  = LIS2DH12_PARAM_RATE,  \
+                                }
+#endif /* MODULE_LIS2DH12_INT */
+#endif /* LIS2DH12_PARAMS */
 
 #ifndef LIS2DH12_SAULINFO
 #define LIS2DH12_SAULINFO           { .name = "lis2dh12" }

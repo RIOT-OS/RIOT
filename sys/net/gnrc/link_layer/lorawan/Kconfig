@@ -1,0 +1,30 @@
+# Copyright (c) 2019 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_MODULE_GNRC_LORAWAN
+    bool "Configure GNRC LoRaWAN"
+    depends on MODULE_GNRC_LORAWAN
+    help
+        Configure GNRC LoRaWAN module using Kconfig.
+
+if KCONFIG_MODULE_GNRC_LORAWAN
+
+config GNRC_LORAWAN_TIMER_DRIFT
+    int "Maximum timer drift"
+    default 10
+    range -1000 1000
+    help
+        The value is expressed in per mille. This is only a workaround to
+        compensate inaccurate timers. E.g. a value of 1 means there's a
+        positive drift of 0.1% (set timeout to 1000 ms => triggers after
+        1001 ms)
+
+config GNRC_LORAWAN_MIN_SYMBOLS_TIMEOUT
+    int "Minimum symbols to detect a LoRa preamble"
+    default 30
+    range 0 1024
+
+endif # KCONFIG_MODULE_GNRC_LORAWAN

@@ -20,7 +20,7 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "periph_conf.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -105,11 +105,6 @@ extern "C" {
 #define LORA_RESET_ON       (LORA_RESET_PORT.OUTCLR.reg = LORA_RESET_MASK)
 #define LORA_RESET_TOGGLE   (LORA_RESET_PORT.OUTTGL.reg = LORA_RESET_MASK)
 /** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

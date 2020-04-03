@@ -60,7 +60,7 @@ void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
 
     netdev->driver = &kw2xrf_driver;
     /* initialize device descriptor */
-    memcpy(&dev->params, params, sizeof(kw2xrf_params_t));
+    dev->params = *params;
     dev->idle_state = XCVSEQ_RECEIVE;
     dev->state = 0;
     dev->pending_tx = 0;
@@ -97,7 +97,6 @@ void kw2xrf_reset_phy(kw2xrf_t *dev)
 
     kw2xrf_set_channel(dev, KW2XRF_DEFAULT_CHANNEL);
 
-    kw2xrf_set_pan(dev, KW2XRF_DEFAULT_PANID);
     kw2xrf_set_address(dev);
 
     kw2xrf_set_cca_mode(dev, 1);
@@ -115,6 +114,6 @@ void kw2xrf_reset_phy(kw2xrf_t *dev)
 
     kw2xrf_enable_irq_b(dev);
 
-    DEBUG("[kw2xrf] init phy and (re)set to channel %d and pan %d.\n",
-          KW2XRF_DEFAULT_CHANNEL, KW2XRF_DEFAULT_PANID);
+    DEBUG("[kw2xrf] init phy and (re)set to channel %d.\n",
+          KW2XRF_DEFAULT_CHANNEL);
 }

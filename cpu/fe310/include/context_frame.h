@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 JP Bonn
+ * Copyright (C) 2017, 2019 JP Bonn, Ken Rabold
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -40,8 +40,6 @@ extern "C" {
  *
  */
 struct context_switch_frame {
-    uint32_t pad[2];                /**< padding to maintain 16 byte alignment */
-    uint32_t pc;                    /**< program counter */
     /* Callee saved registers */
     uint32_t s0;                    /**< s0 register */
     uint32_t s1;                    /**< s1 register */
@@ -57,7 +55,6 @@ struct context_switch_frame {
     uint32_t s11;                   /**< s11 register */
     /* Caller saved registers */
     uint32_t ra;                    /**< ra register */
-    uint32_t tp;                    /**< tp register */
     uint32_t t0;                    /**< t0 register */
     uint32_t t1;                    /**< t1 register */
     uint32_t t2;                    /**< t2 register */
@@ -73,6 +70,9 @@ struct context_switch_frame {
     uint32_t a5;                    /**< a5 register */
     uint32_t a6;                    /**< a6 register */
     uint32_t a7;                    /**< a7 register */
+    /* Saved PC for return from ISR */
+    uint32_t pc;                    /**< program counter */
+    uint32_t pad[3];                /**< padding to maintain 16 byte alignment */
 };
 
 #endif /* __ASSEMBLER__ */
@@ -83,43 +83,42 @@ struct context_switch_frame {
  * @{
  */
 /* These values are checked for correctness in context_frame.c */
-#define pad_OFFSET    0
-#define pc_OFFSET     8
-#define s0_OFFSET     12
-#define s1_OFFSET     16
-#define s2_OFFSET     20
-#define s3_OFFSET     24
-#define s4_OFFSET     28
-#define s5_OFFSET     32
-#define s6_OFFSET     36
-#define s7_OFFSET     40
-#define s8_OFFSET     44
-#define s9_OFFSET     48
-#define s10_OFFSET    52
-#define s11_OFFSET    56
-#define ra_OFFSET     60
-#define tp_OFFSET     64
-#define t0_OFFSET     68
-#define t1_OFFSET     72
-#define t2_OFFSET     76
-#define t3_OFFSET     80
-#define t4_OFFSET     84
-#define t5_OFFSET     88
-#define t6_OFFSET     92
-#define a0_OFFSET     96
-#define a1_OFFSET     100
-#define a2_OFFSET     104
-#define a3_OFFSET     108
-#define a4_OFFSET     112
-#define a5_OFFSET     116
-#define a6_OFFSET     120
-#define a7_OFFSET     124
+#define s0_OFFSET     0
+#define s1_OFFSET     4
+#define s2_OFFSET     8
+#define s3_OFFSET     12
+#define s4_OFFSET     16
+#define s5_OFFSET     20
+#define s6_OFFSET     24
+#define s7_OFFSET     28
+#define s8_OFFSET     32
+#define s9_OFFSET     36
+#define s10_OFFSET    40
+#define s11_OFFSET    44
+#define ra_OFFSET     48
+#define t0_OFFSET     52
+#define t1_OFFSET     56
+#define t2_OFFSET     60
+#define t3_OFFSET     64
+#define t4_OFFSET     68
+#define t5_OFFSET     72
+#define t6_OFFSET     76
+#define a0_OFFSET     80
+#define a1_OFFSET     84
+#define a2_OFFSET     88
+#define a3_OFFSET     92
+#define a4_OFFSET     96
+#define a5_OFFSET     100
+#define a6_OFFSET     104
+#define a7_OFFSET     108
+#define pc_OFFSET     112
+#define pad_OFFSET    116
 /** @} */
 
 /**
  * @brief Size of context switch frame
  */
-#define CONTEXT_FRAME_SIZE (a7_OFFSET + 4)
+#define CONTEXT_FRAME_SIZE (pad_OFFSET + 12)
 
 /**
  * @brief Offset of stack pointer in struct _thread

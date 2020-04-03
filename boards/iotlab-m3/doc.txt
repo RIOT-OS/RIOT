@@ -7,24 +7,24 @@
 
 | MCU    | [ST2M32F103REY](http://www.st.com/web/catalog/mmc/FM141/SC1169/SS1031/LN1565/PF164485) – 32-bits, 64kB RAM |
 |-------|-------------------------------------------------------------------------------------------------------------------|
-|sensors | Light ([ISL29020](http://www.intersil.com/en/products/optoelectronics/ambient-light-sensors/light-to-digital-sensors/ISL29020.html)) |
+|sensors | Light ([ISL29020](https://www.renesas.com/kr/en/products/sensors/ambient-light-sensors/light-to-digital-sensors/device/ISL29020.html)) |
 | | Pressure ([LPS331AP](http://www.st.com/web/catalog/sense_power/FM89/SC1316/PF251601)) |
 | | Tri-axis accelerometer/magnetometer ([LSM303DLHC](http://www.st.com/web/catalog/sense_power/FM89/SC1449/PF251940)) |
 | | Tri-axis gyrometer ([L3G4200D](http://www.st.com/web/catalog/sense_power/FM89/SC1288/PF250373)) |
-| external memory    | 128 Mbits external Nor flash ([N25Q128A13E1240F](http://www.datasheet4u.com/download.php?id=683085)) |
+| external memory    | 128 Mbits external Nor flash ([N25Q128A13E1240F](https://www.micron.com/-/media/client/global/documents/products/data-sheet/nor-flash/serial-nor/n25q/n25q_128mb_3v_65nm.pdf)) |
 | power  | 3,7V LiPo battery – 650 mAh ([063040](http://www.gmbattery.com/Datasheet/LIPO/LIPO-063040.pdf)) |
 | radio chipset   | [AT86RF231](http://www.atmel.com/images/doc8111.pdf) |
 | | a IEEE802.15.4-compliant radio at 2.4 GHz |
 
 ## Board HW overview
 
-![IoT-LAB M3 Layout](https://www.iot-lab.info/wp-
-content/uploads/2013/10/m3opennode.png)
+![IoT-LAB M3 Layout]
+(https://www.iot-lab.info/wp-content/uploads/2013/10/m3opennode.png)
 
 ### Board Architecture
 
-![IoT-LAB M3 Architecture](https://github.com/iot-lab/iot-
-lab/wiki/Images/archiopenm3.png)
+![IoT-LAB M3 Architecture]
+(https://github.com/iot-lab/iot-lab/wiki/Images/archiopenm3.png)
 
 ### [Board schematics](http://github.com/iot-lab/iot-lab/wiki/Docs/openm3-schematics.pdf)
 , wiring, pinouts, etc...
@@ -67,7 +67,7 @@ eabi-gdb`), which provided by most toolchains. Most Linux distributions provide
 also a package for OpenOCD. The required configuration files are provided by
 RIOT.
 When starting the debugger with `make debug BOARD=iotlab-m3` GDB connects to
-openocd, loads the elf-file and puts the MCU into halt state. Befor setting
+openocd, loads the elf-file and puts the MCU into halt state. Before setting
 breakpoints it is sometimes needed to use the following workflow
 ```
 bash
@@ -148,7 +148,7 @@ In some cases it
 seems necessary to prepend a `monitor reset run` before executing continue.
 In general you can
 use openocd commands prepended by `monitor`.
-In the case the node crashes it can be reseted with the following sequence
+In the case the node crashes it can be reset with the following sequence
 ```
 Bash
 (gdb) monitor reset halt

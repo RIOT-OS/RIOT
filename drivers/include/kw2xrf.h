@@ -43,11 +43,6 @@ extern "C" {
 #define KW2XRF_MAX_PKT_LENGTH           (IEEE802154_FRAME_LEN_MAX)
 
 /**
- * @brief   Default PAN ID used after initialization
- */
-#define KW2XRF_DEFAULT_PANID            (IEEE802154_DEFAULT_PANID)
-
-/**
  * @name    Default channel used after initialization
  *
  * @{
@@ -93,7 +88,7 @@ extern "C" {
 #define KW2XRF_OPT_RAWDUMP          (NETDEV_IEEE802154_RAW)            /**< legacy define */
 #define KW2XRF_OPT_ACK_REQ          (NETDEV_IEEE802154_ACK_REQ)        /**< legacy define */
 
-#define KW2XRF_OPT_AUTOCCA          (0x0100)    /**< CCA befor TX active */
+#define KW2XRF_OPT_AUTOCCA          (0x0100)    /**< CCA before TX active */
 #define KW2XRF_OPT_PROMISCUOUS      (0x0200)    /**< promiscuous mode
                                                   *   active */
 #define KW2XRF_OPT_PRELOADING       (0x0400)    /**< preloading enabled */

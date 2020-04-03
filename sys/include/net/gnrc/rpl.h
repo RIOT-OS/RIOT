@@ -32,11 +32,12 @@
  * Auto-Initialization
  * -------------------
  *
- * If the application defines only one interface (`GNRC_NETIF_NUMOF == 1`),
- * then RPL will be initialized on this interface.
+ * If the application defines only one interface (@ref gnrc_netif_highlander()
+ * returns true), then RPL will be initialized on this interface.
  *
- * If the application defines several interfaces (`GNRC_NETIF_NUMOF > 1`),
- * then RPL will be initialized on the interface `GNRC_RPL_DEFAULT_NETIF`.
+ * If the application defines several interfaces (@ref gnrc_netif_highlander()
+ * returns false), then RPL will be initialized on the interface
+ * `GNRC_RPL_DEFAULT_NETIF`.
  * Your application is responsible for setting `GNRC_RPL_DEFAULT_NETIF` to a
  * valid interface PID, e.g. via `CFLAGS`.
  *
@@ -69,7 +70,7 @@
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - Set interface for auto-initialization if more than one
- *   interface exists (`GNRC_NETIF_NUMOF > 1`)
+ *   interface exists (@ref gnrc_netif_highlander() returns false)
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  *   CFLAGS += -DGNRC_RPL_DEFAULT_NETIF=6
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -488,6 +489,13 @@ extern netstats_rpl_t gnrc_rpl_netstats;
 #endif
 
 /**
+ * @brief Default network interface for GNRC RPL
+ */
+#ifndef GNRC_RPL_DEFAULT_NETIF
+#define GNRC_RPL_DEFAULT_NETIF (KERNEL_PID_UNDEF)
+#endif
+
+/**
  * @brief Initialization of the RPL thread.
  *
  * @param[in] if_pid            PID of the interface
@@ -517,15 +525,15 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
  * @brief   Send a DIO of the @p instance to the @p destination.
  *
  * @param[in] instance          Pointer to the RPL instance.
- * @param[in] destination       IPv6 addres of the destination.
+ * @param[in] destination       IPv6 address of the destination.
  */
 void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination);
 
 /**
- * @brief   Send a DIS of the @p instace to the @p destination.
+ * @brief   Send a DIS of the @p instance to the @p destination.
  *
  * @param[in] instance          Pointer to the RPL instance, optional.
- * @param[in] destination       IPv6 addres of the destination.
+ * @param[in] destination       IPv6 address of the destination.
  * @param[in] options           Pointer to the first option to be attached.
  * @param[in] num_opts          The number of options to attach.
  */
@@ -536,7 +544,7 @@ void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination,
  * @brief   Send a DAO of the @p dodag to the @p destination.
  *
  * @param[in] instance          Pointer to the instance.
- * @param[in] destination       IPv6 addres of the destination.
+ * @param[in] destination       IPv6 address of the destination.
  * @param[in] lifetime          Lifetime of the route to announce.
  */
 void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination, uint8_t lifetime);
@@ -545,7 +553,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination, 
  * @brief   Send a DAO-ACK of the @p instance to the @p destination.
  *
  * @param[in] instance          Pointer to the RPL instance.
- * @param[in] destination       IPv6 addres of the destination.
+ * @param[in] destination       IPv6 address of the destination.
  * @param[in] seq               Sequence number to be acknowledged.
  */
 void gnrc_rpl_send_DAO_ACK(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination, uint8_t seq);

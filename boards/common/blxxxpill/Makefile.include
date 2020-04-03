@@ -1,0 +1,15 @@
+INCLUDES += -I$(RIOTBOARD)/common/blxxxpill/include
+
+ifeq (dfu-util,$(PROGRAMMER))
+  # For older versions of the DFU bootloader, set DFU_USB_ID to 1d50:6017
+  DFU_USB_ID ?= 1eaf:0003
+  DFU_ALT ?= 2
+
+  # Leave some space at the beginning of the flash for the bootloader
+  ROM_OFFSET ?= 0x2000
+else ifeq (openocd,$(PROGRAMMER))
+  STLINK_VERSION ?= 2
+endif
+
+# Setup of programmer and serial is shared between STM32 based boards
+include $(RIOTMAKE)/boards/stm32.inc.mk

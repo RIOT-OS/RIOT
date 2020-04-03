@@ -18,14 +18,28 @@
 
 #include <stdio.h>
 #include "arm_cpu.h"
+#include "irq.h"
+#include "sched.h"
 #include "thread.h"
 
 #define STACK_MARKER    (0x77777777)
 #define REGISTER_CNT    (12)
 
+__attribute__((used, section(".usr_stack"))) uint8_t usr_stack[USR_STACKSIZE];
+__attribute__((used, section(".und_stack"))) uint8_t und_stack[UND_STACKSIZE];
+__attribute__((used, section(".fiq_stack"))) uint8_t fiq_stack[FIQ_STACKSIZE];
+__attribute__((used, section(".irq_stack"))) uint8_t irq_stack[ISR_STACKSIZE];
+__attribute__((used, section(".abt_stack"))) uint8_t abt_stack[ABT_STACKSIZE];
+__attribute__((used, section(".svc_stack"))) uint8_t svc_stack[ISR_STACKSIZE];
+
 void thread_yield_higher(void)
 {
-    __asm__("svc 0\n");
+    if (irq_is_in()) {
+        sched_context_switch_request = 1;
+    }
+    else {
+        __asm__("svc 0\n");
+    }
 }
 
 /*----------------------------------------------------------------------------
@@ -86,4 +100,41 @@ void thread_print_stack(void)
     }
 
     printf("STACK (%d)= %X \n", i, *s);
+}
+
+void *thread_isr_stack_start(void)
+{
+    extern uintptr_t __stack_irq_start;
+    return (void *)&__stack_irq_start;
+}
+
+void *thread_isr_stack_pointer(void)
+{
+    void *_sp;
+
+    /* If we are not in interrupt mode, the interrupt stack pointer will
+     * always point to the start of the interrupt stack.
+     */
+    if (irq_is_in()) {
+        /* read stack pointer */
+        __asm volatile ("mov %0, r13" : "=r" (_sp) );
+    } else {
+        _sp = thread_isr_stack_start();
+    }
+
+    return _sp;
+}
+
+/* This function returns the number of bytes used on the ISR stack */
+int thread_isr_stack_usage(void)
+{
+    uint32_t *ptr = (uint32_t*) &irq_stack[0];
+
+    while(((*ptr) == STACK_CANARY_WORD) && (ptr < (uint32_t*) &irq_stack[ISR_STACKSIZE])) {
+        ++ptr;
+    }
+
+    ptrdiff_t num_used_words = (uint32_t*) &irq_stack[ISR_STACKSIZE] - ptr;
+
+    return num_used_words;
 }

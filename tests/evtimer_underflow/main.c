@@ -40,7 +40,7 @@ static evtimer_msg_event_t events[] = {
     { .event = { .offset = 0 }, .msg = { .content = { .ptr = "8" } } },
 };
 
-#define NEVENTS (sizeof(events) / sizeof(evtimer_msg_event_t))
+#define NEVENTS ARRAY_SIZE(events)
 
 /* This thread will print the drift to stdout once per second */
 void *worker_thread(void *arg)

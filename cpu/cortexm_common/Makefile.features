@@ -1,2 +1,12 @@
+FEATURES_PROVIDED += arch_32bit
+FEATURES_PROVIDED += arch_arm
+FEATURES_PROVIDED += arch_cortexm
 FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += cpp
+FEATURES_PROVIDED += cpu_check_address
+FEATURES_PROVIDED += ssp
+
+# cortex-m4f and cortex-m7 provide FPU support
+ifneq (,$(filter $(CPU_ARCH),cortex-m4f cortex-m7))
+  FEATURES_PROVIDED += cortexm_fpu
+endif

@@ -12,7 +12,7 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect('Decoding finished succesfully')
+    child.expect('Decoding finished successfully')
 
 
 if __name__ == "__main__":

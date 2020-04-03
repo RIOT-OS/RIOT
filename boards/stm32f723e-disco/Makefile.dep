@@ -1,0 +1,8 @@
+USEMODULE += periph_uart_hw_fc
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+# TODO: remove the stdin dependency
+USEMODULE += stdin

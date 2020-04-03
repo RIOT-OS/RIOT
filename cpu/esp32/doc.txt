@@ -38,16 +38,19 @@
     5. [PWM Channels](#esp32_pwm_channels)
     6. [SPI Interfaces](#esp32_spi_interfaces)
     7. [Timers](#esp32_timers)
-    8. [UART Interfaces](#esp32_uart_interfaces)
-    9. [CAN Interfaces](#esp32_can_interfaces)
-    10. [Other Peripherals](#esp32_other_peripherals)
+    8. [RTC Timer](#esp32_rtc_timer)
+    9. [UART Interfaces](#esp32_uart_interfaces)
+    10. [CAN Interfaces](#esp32_can_interfaces)
+    11. [Power Management](#esp32_power_management)
+    12. [Other Peripherals](#esp32_other_peripherals)
 7. [Special On-board Peripherals](#esp32_special_on_board_peripherals)
     1. [SPI RAM Modules](#esp32_spi_ram)
     2. [SPIFFS Device](#esp32_spiffs_device)
 8. [Network Interfaces](#esp32_network_interfaces)
     1. [Ethernet MAC Network Interface](#esp32_ethernet_network_interface)
-    2. [ESP-NOW Network Interface](#esp32_esp_now_network_interface)
-    3. [Other Network Devices](#esp32_other_network_devices)
+    2. [WiFi Network Interface](#esp32_wifi_network_interface)
+    3. [ESP-NOW Network Interface](#esp32_esp_now_network_interface)
+    4. [Other Network Devices](#esp32_other_network_devices)
 10. [Application-Specific Configurations](#esp32_application_specific_configurations)
     1. [Make Variable ```CONFIGS```](#esp32_config_make_variable)
     2. [Application-Specific Board Configuration](#esp32_application_specific_board_configuration)
@@ -72,8 +75,8 @@ The following table gives a short reference of all board configuration parameter
 Parameter | Short Description                      | Type*
 ----------|----------------------------------------|------
 [ADC_GPIOS](#esp32_adc_channels)        | GPIOs that can be used as ADC channels | m
-[CAN_TX](#esp32_can_interfaces) | GPIO used as CAN tranceiver TX signal | o
-[CAN_RX](#esp32_can_interfaces) | GPIO used as CAN tranceiver RX signal | o
+[CAN_TX](#esp32_can_interfaces) | GPIO used as CAN transceiver TX signal | o
+[CAN_RX](#esp32_can_interfaces) | GPIO used as CAN transceiver RX signal | o
 [DAC_GPIOS](#esp32_adc_channels)        | GPIOs that can be used as DAC channels | m
 [I2C0_SPEED](#esp32_i2c_interfaces)| Bus speed of I2C_DEV(0)         | o
 [I2C0_SCL](#esp32_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(0) | o
@@ -83,21 +86,16 @@ Parameter | Short Description                      | Type*
 [I2C1_SDA](#esp32_i2c_interfaces)  | GPIO used as SCL for I2C_DEV(1) | o
 [PWM0_GPIOS](#esp32_pwm_channels)       | GPIOs that can be used at channels of PWM_DEV(0) | o
 [PWM1_GPIOS](#esp32_pwm_channels)       | GPIOs that can be used at channels of PWM_DEV(1) | o
-[SPI0_DEV](#esp32_spi_interfaces)  | SPI Interface used as SPI_DEV(0), can be ```VSPI``` ```HSPI``` (```FSPI```) | o
+[SPI0_CTRL](#esp32_spi_interfaces)  | SPI Controller used for SPI_DEV(0), can be ```VSPI``` ```HSPI``` | o
 [SPI0_SCK](#esp32_spi_interfaces)  | GPIO used as SCK for SPI_DEV(0)        | o
 [SPI0_MOSI](#esp32_spi_interfaces) | GPIO used as MOSI for SPI_DEV(0)       | o
 [SPI0_MISO](#esp32_spi_interfaces) | GPIO used as MISO for SPI_DEV(0)       | o
 [SPI0_CS0](#esp32_spi_interfaces)  | GPIO used as default CS for SPI_DEV(0) | o
-[SPI1_DEV](#esp32_spi_interfaces)  | SPI Interface used as SPI_DEV(1), can be ```VSPI``` ```HSPI``` (```FSPI```) | o
+[SPI1_CTRL](#esp32_spi_interfaces)  | SPI Controller used for SPI_DEV(1), can be ```VSPI``` ```HSPI``` | o
 [SPI1_SCK](#esp32_spi_interfaces)  | GPIO used as SCK for SPI_DEV(1)        | o
 [SPI1_MOSI](#esp32_spi_interfaces) | GPIO used as MOSI for SPI_DEV(1)       | o
 [SPI1_MISO](#esp32_spi_interfaces) | GPIO used as MISO for SPI_DEV(1)       | o
 [SPI1_CS0](#esp32_spi_interfaces)  | GPIO used as default CS for SPI_DEV(1) | o
-[SPI2_DEV](#esp32_spi_interfaces)  | SPI Interface used as SPI_DEV(2), can be ```VSPI``` ```HSPI``` (```FSPI```) | o
-[SPI2_SCK](#esp32_spi_interfaces)  | GPIO used as SCK for SPI_DEV(2)        | o
-[SPI2_MOSI](#esp32_spi_interfaces) | GPIO used as MOSI for SPI_DEV(2)       | o
-[SPI2_MISO](#esp32_spi_interfaces) | GPIO used as MISO for SPI_DEV(2)       | o
-[SPI2_CS0](#esp32_spi_interfaces)  | GPIO used as default CS for SPI_DEV(2) | o
 [UART1_TXD](#esp32_uart_interfaces) | GPIO used as TxD for UART_DEV(1) | o
 [UART1_RXD](#esp32_uart_interfaces) | GPIO used as RxD for UART_DEV(1) | o
 [UART2_TXD](#esp32_uart_interfaces) | GPIO used as TxD for UART_DEV(2) | o
@@ -113,15 +111,21 @@ The following table gives a short reference  in alphabetical order of modules th
 
 Module    | Default  | Short description
 ----------|----------|-------------------
-[esp_can](#esp32_can_interfaces) | not used | enable the ESP32 CAN device
-[esp_eth](#esp32_ethernet_network_interface) | not used | enable the ESP32 EMAC network device
+[esp_eth](#esp32_ethernet_network_interface) | not used | enable the Ethernet MAC (EMAC) network device
 [esp_gdb](#esp32_debugging) | not used | enable the compilation with debug information for debugging
 [esp_hw_counter](#esp32_timers) | not used | use hardware counters for RIOT timers
 [esp_i2c_hw](#esp32_i2c_interfaces) | not used  | use the i2C hardware implementation
 [esp_idf_heap](#esp32_esp_idf_heap_implementation) | not used | enable ESP-IDF heap implementation
+[esp_log_colored](#esp32_esp_log_module) | not used | enable colored log output
+[esp_log_startup](#esp32_esp_log_module) | not used | enable additional startup information
+[esp_log_tagged](#esp32_esp_log_module) | not used | add additional information to the log output
 [esp_now](#esp32_esp_now_network_interface) | not used  | enable the ESP-NOW network device
+[esp_rtc_timer](#esp32_rtc_timer) | not used | enable RTC hardware timer with internal 150 kHz RC oscillator
+[esp_rtc_timer_32k](#esp32_rtc_timer) | not used | enable RTC hardware timer with external 32.768 kHz crystal.
 [esp_spi_ram](#esp32_spi_ram) | not used |  enable SPI RAM
 [esp_spiffs](#esp32_spiffs_device) | not used  |  enable SPIFFS for on-board flash memory
+[esp_wifi](#esp32_wifi_network_interface) | not used  | enable the Wifi network device in WPA2 personal mode
+[esp_wifi_enterprise](#esp32_wifi_network_interface) | not used  | enable the Wifi network device in WPA2 enterprise mode
 
 </center>
 
@@ -140,23 +144,23 @@ MCU         | ESP32     | Supported by RIOT
 ------------|-----------|------------------
 Vendor      | Espressif | |
 Cores       | 1 or 2 x Tensilica Xtensa LX6 | 1 core
-FPU         | yes (ULP - Ultra low power co-processor) | no
-RAM         | 520 kByte SRAM <br> 16 kByte  RTC SRAM | yes
-ROM         | 520 kByte | yes
+FPU         | ULP - Ultra low power co-processor | no
+RAM         | 520 kByte SRAM <br> 8 kByte slow RTC SRAM <br> 8 kByte fast RTC SRAM | yes <br> yes <br> yes
+ROM         | 448 kByte | yes
 Flash       | 512 kByte ... 16 MByte |  yes
 Frequency   | 240 MHz, 160 MHz, 80 MHz | yes
-Power Consumption | 68 mA @ 240 MHz <br> 44 mA @ 160 MHz <br> 31 mA @ 80 MHz <br> 5 uA in deep sleep mode | yes <br> yes <br> yes <br> no
+Power Consumption | 68 mA @ 240 MHz <br> 44 mA @ 160 MHz (34 mA @ 160 MHz single core) <br> 31 mA @ 80 MHz (25 mA @ 80 MHz single core) <br> 800 uA in light sleep mode <br> 10 uA in deep sleep mode | yes <br> yes <br> yes <br> yes <br> yes
 Timers      | 4 x 64 bit | yes
 ADCs        | 2 x SAR-ADC with up to 18 x 12 bit channels total | yes
 DACs        | 2 x DAC with 8 bit | yes
-GPIOs       | 34 (6 of them are only inputs) | yes
+GPIOs       | 34 (6 are only inputs, 18 are RTC GPIOs) | yes
 I2Cs        | 2 | yes
-SPIs        | 4 | yes
+SPIs        | 4 | yes (2)
 UARTs       | 3 | yes
 WiFi        | IEEE 802.11 b/g/n built in | yes
 Bluetooth   | v4.2 BR/EDR and BLE | no
 Ethernet    | MAC interface with dedicated DMA and IEEE 1588 support | yes
-CAN         | version 2.0 | no
+CAN         | version 2.0 | yes
 IR          | up to 8 channels TX/RX | no
 Motor PWM   | 2 devices x 6 channels | yes
 LED PWM     | 16 channels | no
@@ -179,12 +183,14 @@ The RIOT-OS for ESP32 SoCs supports the following features at the moment:
 - I2C interfaces
 - SPI interfaces
 - UART interfaces
+- CAN interface
 - CPU ID access
 - RTC module
 - ADC and DAC channels
 - PWM channels
 - SPI RAM
 - SPI Flash Drive (MTD with SPIFFS and VFS)
+- Layered Power Management
 - Hardware number generator
 - Hardware timer devices
 - ESP-NOW netdev interface
@@ -195,8 +201,6 @@ The RIOT-OS for ESP32 SoCs supports the following features at the moment:
 The implementation of RIOT-OS for ESP32 SOCs has the following limitations at the moment:
 
 - Only <b>one core</b> (the PRO CPU) is used because RIOT does not support running multiple threads  simultaneously.
-- <b>AP-based WiFi</b> is experimental and not stable.
-- RIOT modules <b>crypto</b> and <b>hashes</b> cannot be used together with modules <b>esp_now</b> and <b>esp_wifi</b>
 - <b>Bluetooth</b> cannot be used at the moment.
 - <b>Flash encryption</b> is not yet supported.
 
@@ -206,7 +210,7 @@ The implementation of RIOT-OS for ESP32 SOCs has the following limitations at th
 Following software components are required for compilation:
 
 - <b>Xtensa GCC</b> compiler suite for ESP32
-- <b>ESP-IDF</b> SDK which includes all ESP32 SOC definitions, the hardware abstraction library <b>```libhal.a```</b>, and the flash programmer tool <b>```esptool.py```</b>
+- <b>ESP-IDF</b> SDK which includes all ESP32 SOC definitions, basic libraries and the hardware abstraction library <b>`libhal.a`</b>
 
 There are two options to install the Toolchain:
 
@@ -220,7 +224,12 @@ The easiest way to use install the toolchain is the RIOT Docker image ```riotdoc
 1. making the RIOT application in Docker with command ```make BOARD= ...```
 2. flashing the RIOT application on the host computer with command ```make flash-only BOARD=...```
 
-where step 2 requires that the flasher program ```esptool.py``` is installed.
+where step 2 requires that the ESP flash programmer `esptool.py` is installed.
+Both steps can also be performed with a single command on the host system
+using the `BUILD_IN_DOCKER` variable:
+```
+BUILD_IN_DOCKER=1 make BOARD=... flash
+```
 
 ### <a name="esp32_preparing_the_environment"> Preparing the Environment </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -228,30 +237,14 @@ Using RIOT Docker requires at least the following software:
 
 - <b>```Docker```</b> container virtualization software
 - RIOT Docker (<b>```riotdocker```</b>) image
-- flasher tool <b>```esptool.py```</b>
+- ESP flash programmer tool <b>`esptool.py`</b>
 
 For information about installing Docker on your host, refer to the appropriate manuals for your operating system. For example, the easiest way to install Docker on the Ubuntu/Debian system is:
 ```
 sudo apt-get install docker.io
 ```
-
-The ESP flasher program <b>```esptool.py```</b> is available at [GitHub](https://github.com/espressif/esptool). Don't use the the ```esptool``` package of your OS. ```esptool.py``` requires either Python 2.7 or Python 3.4 or later. The latest stable version of ```esptool.py``` can be installed with ```pip```:
-```
-pip install esptool
-```
-
-<b>```esptool.py```</b> depends on ```pySerial``` which can be installed either using ```pip```
-
-```
-pip install pyserial
-```
-or the package manager of your OS, for example on Debian/Ubuntu systems:
-```
-apt-get install pyserial
-```
-For more information on ```esptool.py```, please refer the [git repository](https://github.com/espressif/esptool)
-
-Please make sure that ```esptool.py``` is in your ```PATH``` variable.
+For information on how to install `esptool.py`, see section
+[Installation of `esptool.py`](#esp32_installation_of_esptool).
 
 ### <a name="esp32_generating_docker_image"> Generating a riotdocker Image </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -335,11 +328,11 @@ ESP-IDF, the official SDK from Espressif, can be downloaded and installed as GIT
 
 ```
 cd $HOME/esp
-git clone --recursive https://github.com/espressif/esp-idf.git
+git clone https://github.com/espressif/esp-idf.git
 cd esp-idf
-git checkout -q f198339ec09e90666150672884535802304d23ec
-cd components/esp32/lib
-git checkout -q 534a9b14101af90231d40a4f94924d67bc848d5f
+git checkout f198339ec09e90666150672884535802304d23ec
+git submodule init
+git submodule update
 ```
 
 @note Please take care to checkout correct branches which were used for the port. Newer versions might also work but were not tested.
@@ -348,6 +341,32 @@ Since we only use a few header files, ESP-IDF does not need to be compiled in an
 ```
 export ESP32_SDK_DIR=$HOME/esp/esp-idf
 ```
+
+### <a name="esp32_installation_of_esptool"> Installation of `esptool.py` (ESP flash programmer tool) </a> &nbsp;[[TOC](#esp32_toc)]
+
+The RIOT port does not work with the `esptool.py` ESP flasher program
+available on [GitHub](https://github.com/espressif/esptool) or
+as a package for your OS. Instead, a modified version is required.
+
+To avoid the installation of the complete ESP-IDF SDK, for example,
+because RIOT Docker `riotdocker` is used for compilation, `esptool.py`
+has been extracted from the SDK and placed in RIOT's
+directory `dist/tools/esptool`.
+For convenience, the build system uses always the version from this directory.
+
+Therefore, it is **not necessary to install** `esptool.py` explicitly. However
+`esptool.py` depends on `pySerial` which can be installed either
+using `pip`
+
+```
+sudo pip install pyserial
+```
+or the package manager of your OS, for example on Debian/Ubuntu systems:
+```
+apt install python-pyserial
+```
+For more information on `esptool.py`, please refer to the
+[git repository](https://github.com/espressif/esptool).
 
 
 # <a name="esp32_flashing_the_device"> Flashing the Device </a> &nbsp;[[TOC](#esp32_toc)]
@@ -395,14 +414,20 @@ Optional features of ESP32 can be enabled by ```USEMODULE``` definitions in the 
 
 Module | Description
 -------|------------
-esp_now | Use the built-in WiFi module with the ESP-NOW protocol as ```netdev``` network device, see section [ESP-NOW Network Interface](#esp32_esp_now_network_interface).
-esp_eth | Use the Ethernet MAC (EMAC) interface as ```netdev``` network device, see section [Ethernet Network Interface](#esp32_ethernet_network_interface).
+esp_eth | Enable the Ethernet MAC (EMAC) interface as `netdev` network device, see section [Ethernet Network Interface](#esp32_ethernet_network_interface).
 esp_gdb | Enable the compilation with debug information for debugging with [QEMU and GDB](#esp32_qemu_mode_and_gdb) (```QEMU=1```) or via [JTAG interface with OpenOCD](#esp32_jtag_debugging).
 esp_i2c_hw | Use the hardware I2C implementation, see section [I2C Interfaces](#esp32_i2c_interfaces).
 esp_idf_heap | Use the ESP-IDF heap implementation, see section [ESP-IDF Heap Implementation](#esp32_esp_idf_heap_implementation).
+esp_log_colored | Enable colored log output, see section [Log output](#esp32_esp_log_module).
+esp_log_startup | Enable additional startup information, see section [Log output](#esp32_esp_log_module).
+esp_log_tagged | Add additional information to the log output, see section [Log output](#esp32_esp_log_module).
+esp_now | Enable the built-in WiFi module with the ESP-NOW protocol as `netdev` network device, see section [ESP-NOW Network Interface](#esp32_esp_now_network_interface).
+esp_rtc_timer | Enable RTC hardware timer with internal 150 kHz RC oscillator.
+esp_rtc_timer_32k | Enable RTC hardware timer with external 32.768 kHz crystal.
 esp_spiffs  | Enable the optional SPIFFS drive in on-board flash memory, see section [SPIFFS Device](#esp32_spiffs_device).
 esp_spi_ram | Enable the optional SPI RAM, see section [SPI RAM Modules](#esp32_spi_ram).
-esp_can | Enable the ESP32 CAN device, see section [CAN Interfaces](#esp32_can_interfaces).
+esp_wifi | Enable the built-in WiFi module as `netdev` network device in WPA2 personal mode, see section [WiFi Network Interface](#esp32_wifi_network_interface).
+esp_wifi_enterprise | Enable the built-in WiFi module as `netdev` network device in WPA2 enterprise mode, see section [WiFi Network Interface](#esp32_wifi_network_interface).
 
 </center>
 
@@ -425,6 +450,47 @@ The flash mode determines whether 2 data lines (```dio``` and ```dout```) or 4 d
 
 For more information about these flash modes, refer the documentation of [esptool.py](https://github.com/espressif/esptool/wiki/SPI-Flash-Modes).
 
+## <a name="esp32_esp_log_module"> Log output </a> &nbsp;[[TOC](#esp32_toc)]
+
+The RIOT port for ESP32 implements a log module with a bunch of macros
+to generate log output according to the interface as defined in
+[system logging header](http://doc.riot-os.org/log_8h.html). These macros
+support colored and tagged log output.
+
+The colored log output is enabled by module `esp_log_colored`. If colored log
+output is enabled, log messages are displayed in color according to their type:
+Error messages are displayed in red, warnings in yellow, information
+messages in green and all other message types in standard color.
+
+When the `esp_log_tagged` module is used, all log messages are tagged with
+additional information: the type of message, the system time in ms, and the
+module or function in which the log message is generated. For example:
+
+```
+I (663) [main_trampoline] main(): This is RIOT! (Version: 2019.10-devel-437-gf506a)
+```
+
+Either the `LOG_*` macros as defined in
+[system logging header](http://doc.riot-os.org/log_8h.html) or the tagged
+version `LOG_TAG_*` of these macros can be used to produce tagged log output.
+If the `LOG_*` macros are used, the function which generates the log message
+is used in the tag while a `tag` parameter is used for the `LOG_TAG_*` macros.
+For example,
+```
+LOG_ERROR("error message");
+```
+generates a log message in which the name of the calling function is used as
+tag. With
+```
+LOG_TAG_ERROR("mod", "error message");
+```
+a log message with string `mod` in the tag is generated.
+
+The `esp_log_startup` module can be used to enable additional information
+about the boot process, the board configuration, the system configuration,
+the CPU used by the system, and the available heap. These information may
+help to detect problems during the startup. If the application does not
+start as expected, this module should be used.
 
 ## <a name="esp32_esp_idf_heap_implementation"> ESP-IDF Heap Implementation </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -445,12 +511,15 @@ ESP32 is an SoC and has a lot of peripherals that are not all supported by the R
 \anchor esp32_gpio_pins
 ## <a name="esp32_gpio_pins"> GPIO pins </a> &nbsp;[[TOC](#esp32_toc)]
 
-ESP32 has 34 GPIO pins, where only a subset can be used as output, as ADC channel, as DAC channel and in deep sleep mode. Some of them are used by special SoC components, e.g., as touch sensors. The following table gives a short overview.
+ESP32 has 34 GPIO pins, where only a subset can be used as output, as
+ADC channel, as DAC channel and as GPIOs in deep-sleep mode, the so-called
+RTC GPIOs. Some of them are used by special SoC components, e.g., as touch
+sensors. The following table gives a short overview.
 
 <center>
 
-Pin    | Type   | ADC | PU/PD  | Special function | Remarks
--------|--------|:---:| ------ |------------------|--------
+Pin    | Type   | ADC / RTC | PU / PD  | Special function | Remarks
+-------|:-------|:---:|:------:|------------------|--------
 GPIO0  | In/Out | yes | yes    | Touch sensor | Bootstrapping, pulled up
 GPIO1  | In/Out | -   | yes    | UART0 TxD    | Console
 GPIO2  | In/Out | yes | yes    | Touch sensor | Bootstrapping, pulled down
@@ -484,11 +553,12 @@ GPIO35 | In     | yes | -      | VDET | -
 GPIO36 | In     | yes | -      | SENSOR_VP | -
 GPIO37 | In     | yes | -      | SENSOR_CAPP | usually not broken out
 GPIO38 | In     | yes | -      | SENSOR_CAPN | usually not broken out
-GPIO38 | In     | yes | -      | SENSOR_VN   | -
+GPIO39 | In     | yes | -      | SENSOR_VN   | -
 
 </center>
 
 <b>ADC:</b> these pins can be used as ADC inputs<br>
+<b>RTC:</b> these pins are RTC GPIOs and can be used in deep-sleep mode<br>
 <b>PU/PD:</b> these pins have software configurable pull-up/pull-down functionality.<br>
 
 @note GPIOs that can be used as ADC channels are also available as low power digital inputs/outputs in deep sleep mode.
@@ -516,7 +586,11 @@ ESP32 integrates two 12-bit ADCs (ADC1 and ADC2) capable of measuring up to 18 a
 
 These GPIOs are realized by the RTC unit and are therefore also called RTC GPIOs or RTCIO GPIOs.
 
-@note GPIO37 and GPIO38 are usually not broken out on ESP32 boards and are therefore not usable.
+@note
+- GPIO37 and GPIO38 are usually not broken out on ESP32 boards and can not be
+  used therefore.
+- ADC2 is used by the WiFi module. The GPIOs connected to ADC2 are therefore not
+  available as ADC channels if the modules `esp_wifi` or `esp_now` are used.
 
 The GPIOs that can be used as ADC channels for a given board are defined by the <b>```ADC_GPIOS```</b> macro in the board-specific peripheral configuration. This configuration can be changed by [application-specific configurations](#esp32_application_specific_configurations).
 
@@ -662,43 +736,37 @@ The order of the listed GPIOs determines the mapping between RIOT's PWM channels
 
 ESP32 integrates four SPI controllers:
 
-- controller SPI0 is reserved for accessing flash memory
-- controller SPI1 realizes interface <b>```FSPI```</b> and shares its signals with SPI0
+- controller SPI0 is reserved for caching the flash memory
+- controller SPI1 is reserved for interface <b>```FSPI```</b> to external memories like flash and PSRAM
 - controller SPI2 realizes interface <b>```HSPI```</b> that can be used for peripherals
 - controller SPI3 realizes interface <b>```VSPI```</b> that can be used for peripherals
 
-Since controller SPI0 is used to access flash and other external memories, at most three interfaces can be used:
+Thus, a maximum of two SPI controllers can be used as peripheral interfaces:
 
-- <b>```VSPI```</b>: with configurable pin definitions
-- <b>```HSPI```</b>: with configurable pin definitions
-- <b>```FSPI```</b>: with fixed pin definitions except the CS signal.
+- <b>```VSPI```</b>
+- <b>```HSPI```</b>
 
 All SPI interfaces could be used in quad SPI mode, but RIOT's low level device driver doesn't support it.
 
-@note
-- Since the ```FSPI``` interface shares its bus signals with the controller that implements the flash memory interface, we use the name FSPI for this interface. In the technical reference, this interface is misleadingly simply referred to as SPI.
-- Since the ```FSPI``` interface shares its bus signals with flash memory interface and optionally other external memories, you can only use this SPI interface to attach external memory with same SPI mode and same bus speed but with a different CS. It is strictly not recommended to use this interface for other peripherals.
-- Using ```FSPI``` for anything else can disturb flash memory access which causes a number of problems. If not really necessary, you should not use this interface.
-
 The board-specific configuration of the SPI interface <b>```SPI_DEV(n)```</b> requires the definition of
 
-- <b>```SPIn_DEV```</b>, the interface used for ```SPI_DEV(n)```, can be ```VSPI```, ```HSPI```, or ```FSPI```,
-- <b>```SPIn_SCK```</b>, the GPIO used as clock signal for ```SPI_DEV(n)``` (fixed for ```FSPI```),
-- <b>```SPIn_MISO```</b>, the GPIO used as MISO signal for ```SPI_DEV(n)``` (fixed for ```FSPI```),
-- <b>```SPIn_MOSI```</b>, the GPIO used as MOSI signal for ```SPI_DEV(n)``` (fixed for ```FSPI```), and
-- <b>```SPIn_CS0```</b>, the GPIO used as CS signal for ```SPI_DEV(n)``` when cs parameter in spi_acquire is ```GPIO_UNDEF```,
+- <b>```SPIn_CTRL```</b>, the SPI controller which is used for ```SPI_DEV(n)```, can be ```VSPI``` or ```HSPI```,
+- <b>```SPIn_SCK```</b>, the GPIO used as clock signal for ```SPI_DEV(n)```,
+- <b>```SPIn_MISO```</b>, the GPIO used as MISO signal for ```SPI_DEV(n)```,
+- <b>```SPIn_MOSI```</b>, the GPIO used as MOSI signal for ```SPI_DEV(n)```, and
+- <b>```SPIn_CS0```</b>, the GPIO used as CS signal for ```SPI_DEV(n)``` when the cs parameter in spi_acquire is ```GPIO_UNDEF```,
 
-where ```n``` can be 0, 1 or 2. If they are not defined, the SPI interface ```SPI_DEV(n)``` is not used.
+where ```n``` can be 0 or 1. If they are not defined, the SPI interface ```SPI_DEV(n)``` is not used.
 
 Example:
 ```
-#define SPI0_DEV    VSPI
+#define SPI0_CTRL    VSPI
 #define SPI0_SCK    GPIO18      /* SCK  Periphery */
 #define SPI0_MISO   GPIO19      /* MISO Periphery */
 #define SPI0_MOSI   GPIO23      /* MOSI Periphery */
 #define SPI0_CS0    GPIO5       /* CS0  Periphery */
 
-#define SPI1_DEV    HSPI
+#define SPI1_CTRL    HSPI
 #define SPI1_SCK    GPIO14      /* SCK  Camera */
 #define SPI1_MISO   GPIO12      /* MISO Camera */
 #define SPI1_MOSI   GPIO13      /* MOSI Camera */
@@ -708,8 +776,8 @@ Example:
 The pin configuration of ```VSPI``` interface and the ```HSPI``` interface can be changed by [application specific configurations](#esp32_application_specific_configurations).
 
 @note
-- The configuration of the SPI interfaces ```SPI_DEV(n)``` must be in continuous ascending order of ```n```.
-- The order in which the interfaces ```VSPI```, ```HSPI```, and ```FSPI``` are used doesn't matter. For example, while one board may only use the ```HSPI``` interface as ```SPI_DEV(0)```, another board may use the ```VSPI``` interface as ```SPI_DEV(0)``` and the ```HSPI``` interface as ```SPI_DEV(1)```.
+- The configuration of the SPI interfaces ```SPI_DEV(n)``` should be in continuous ascending order of ```n```.
+- The order in which the interfaces ```VSPI``` and ```HSPI``` are used doesn't matter. For example, while one board may only use the ```HSPI``` interface as ```SPI_DEV(0)```, another board may use the ```VSPI``` interface as ```SPI_DEV(0)``` and the ```HSPI``` interface as ```SPI_DEV(1)```.
 - The GPIOs listed in the configuration are first initialized as SPI signals when the corresponding SPI interface is used by calling either the ```spi_init_cs``` function or the ```spi_acquire``` function. That is, they are not allocated as SPI signals before and can be used for other purposes as long as the SPI interface is not used.
 - GPIO2 becomes the MISO signal in SPI mode on boards that use the HSPI as the SD card interface in 4-bit SD mode. Because of the bootstrapping functionality of the GPIO2, it can be necessary to either press the **Boot** button, remove the SD card or remove the peripheral hardware to flash RIOT.
 
@@ -721,20 +789,20 @@ The following table shows the pin configuration used for most boards, even thoug
 
 Device|Signal|Pin     |Symbol         | Remarks
 :-----|:----:|:-------|:-------------:|:---------------------------
-VSPI  | SCK  | GPIO18 |```SPI0_SCK``` | optional, can be overridden
-VSPI  | MISO | GPIO19 |```SPI0_MISO```| optional, can be overridden
-VSPI  | MOSI | GPIO23 |```SPI0_MOSI```| optional, can be overridden
-VSPI  | CS0  | GPIO18 |```SPI0_CS0``` | optional, can be overridden
-HSPI  | SCK  | GPIO14 |```SPI1_SCK``` | optional, can be overridden
-HSPI  | MISO | GPIO12 |```SPI1_MISO```| optional, can be overridden
-HSPI  | MOSI | GPIO13 |```SPI1_MOSI```| optional, can be overridden
-HSPI  | CS0  | GPIO15 |```SPI1_CS0``` | optional, can be overridden
-FSPI  | SCK  | GPIO6  |-              | not configurable
-FSPI  | CMD  | GPIO11 |-              | not configurable
-FSPI  | SD0  | GPIO7  |-              | not configurable
-FSPI  | SD1  | GPIO8  |-              | not configurable
-FSPI  | SD2  | GPIO9  |-              | not configurable, only used in ```qio``` or ```qout``` mode
-FSPI  | SD3  | GPIO10 |-              | not configurable, only used in ```qio``` or ```qout``` mode
+VSPI  | SCK  | GPIO18 |```SPI0_SCK``` | can be used for peripherals
+VSPI  | MISO | GPIO19 |```SPI0_MISO```| can be used for peripherals
+VSPI  | MOSI | GPIO23 |```SPI0_MOSI```| can be used for peripherals
+VSPI  | CS0  | GPIO18 |```SPI0_CS0``` | can be used for peripherals
+HSPI  | SCK  | GPIO14 |```SPI1_SCK``` | can be used for peripherals
+HSPI  | MISO | GPIO12 |```SPI1_MISO```| can be used for peripherals
+HSPI  | MOSI | GPIO13 |```SPI1_MOSI```| can be used for peripherals
+HSPI  | CS0  | GPIO15 |```SPI1_CS0``` | can be used for peripherals
+FSPI  | SCK  | GPIO6  |-              | reserved for flash and PSRAM
+FSPI  | CMD  | GPIO11 |-              | reserved for flash and PSRAM
+FSPI  | SD0  | GPIO7  |-              | reserved for flash and PSRAM
+FSPI  | SD1  | GPIO8  |-              | reserved for flash and PSRAM
+FSPI  | SD2  | GPIO9  |-              | reserved for flash and PSRAM (only in ```qio``` or ```qout``` mode)
+FSPI  | SD3  | GPIO10 |-              | reserved for flash and PSRAM (only in ```qio``` or ```qout``` mode)
 
 </center>
 
@@ -771,6 +839,38 @@ to application's makefile.
 
 Timers are MCU built-in features and not board-specific. There is nothing to be configured.
 
+\anchor esp32_rtc_timer
+## <a name="esp32_rtc_timer"> RTC Timer </a> &nbsp;[[TOC](#esp32_toc)]
+
+The RTC hardware timer of the ESP32 can be clocked with either an external
+32.768 kHz crystal or the internal adjustable 150 kHz RC oscillator. If the
+the external 32.768 kHz crystal is not available, the internal 150 kHz RC
+oscillator is used automatically. However, since this internal 150 kHz RC
+oscillator is not very accurate, the RTC low-level driver uses by default
+the PLL-controlled 64-bit microsecond system timer to emulate the RTC timer.
+
+To allow the use of the RTC hardware timer for boards with an external
+32 kHz crystal, the pseudomodules `esp_rtc_timer` and `esp_rtc_timer_32k`
+can be used to control which timer is used by the RTC low-level driver
+as following:
+
+- **esp_rtc_timer**:
+  Use always the RTC hardware timer with the **internal 150 kHz RC** oscillator.
+
+- **esp_rtc_timer_32k**:
+  Use the RTC hardware timer with the **external 32.768 kHz crystal**. If the
+  external 32.768 kHz crystal is not  available, the RTC hardware timer
+  is used with the internal 150 kHz RC oscillator.
+
+If none of the modules above is enabled, the PLL-driven **emulated RTC timer**
+is used. In this case, the RTC hardware timer with the internal RC 150 kHz
+oscillator is only used in deep sleep mode and during a reset.
+
+@note The accuracy of the emulated RTC timer is better than the accuracy of the
+RTC hardware timer with the internal 150 kHz RC oscillator. If you have not
+connected an external 32.768 kHz crystal, you should use the default
+configuration.
+
 \anchor esp32_uart_interfaces
 ## <a name="esp32_uart_interfaces"> UART Interfaces </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -805,7 +905,9 @@ Example:
 \anchor esp32_can_interfaces
 ## <a name="esp32_can_interfaces"> CAN Interfaces </a> &nbsp;[[TOC](#esp32_toc)]
 
-The ESP32 intregates a CAN controller which is compatible with the NXP SJA1000 CAN controller. Thus, it is CAN 2.0B specification compliant and supports two message formats:
+The ESP32 intregates a CAN controller which is compatible with the NXP SJA1000
+CAN controller. Thus, it is CAN 2.0B specification compliant and supports two
+message formats:
 
 - Base Frame Format (11-bit ID)
 - Extended Frame Format (29-bit ID)
@@ -814,47 +916,190 @@ The ESP32 intregates a CAN controller which is compatible with the NXP SJA1000 C
 - ESP32 CAN does not support CAN-FD and is not CAN-FD tolerant.
 - ESP32 CAN does not support SJA1000's sleep mode and wake-up functionality.
 
-As with the SJA1000, the ESP32 CAN controller provides only the data link layer and physical layer signaling sublayer. Therefore, depending on the physical layer requirements, an external transceiver module is required which converts the CAN-RX and CAN-TX signals of the ESP32 into CAN_H and CAN_L bus signals, e.g., the MCP2551 or SN65HVD23X transceiver for compatibility with ISO 11898-2.
+As with the SJA1000, the ESP32 CAN controller provides only the data link layer
+and the physical layer signaling sublayer. Therefore, depending on physical
+layer requirements, an external transceiver module is required which converts
+the `CAN-RX` and `CAN-TX` signals of the ESP32 into `CAN_H` and `CAN_L` bus
+signals, e.g., the MCP2551 or SN65HVD23X transceiver for compatibility with
+ISO 11898-2.
 
-The ```esp_can``` module realizes a low-level CAN driver interface for the ESP32 CAN controller and provides a CAN DLL device that can be used with RIOT's CAN protocol stack. It uses the ESP32 CAN controller in SJA1000 PeliCAN mode. Please refer the [SJA1000 Datasheet](https://www.nxp.com/documents/data_sheet/SJA1000.pdf) for detailed information about the CAN controller and its programming.
+If module `periph_can` is used, the low-level CAN driver for the
+ESP32 CAN controller is enabled. It provides a CAN DLL device that can be
+used with RIOT's CAN protocol stack. It uses the ESP32 CAN controller
+in SJA1000 PeliCAN mode. Please refer the
+[SJA1000 Datasheet](https://www.nxp.com/documents/data_sheet/SJA1000.pdf)
+for detailed information about the CAN controller and its programming.
 
-The pin configuration of the CAN interface is usually defined in board specific peripheral configuration by
+The pin configuration of the CAN transceiver interface is usually defined
+in board specific peripheral configuration by
 
-- <b>```CAN_TX```</b>, the GPIO used as TX tranceiver signal, and
-- <b>```CAN_RX```</b>, the GPIO used as RX tranceiver signal.
+- <b>```CAN_TX```</b>, the GPIO used as TX transceiver signal, and
+- <b>```CAN_RX```</b>, the GPIO used as RX transceiver signal.
 
-If the pin configuration is not defined, the following default configuration is used which can be overridden by the application, see section [Application-Specific Configurations](#esp32_application_specific_configurations).
+If the pin configuration is not defined, the following default configuration
+is used which can be overridden by the application, see section
+[Application-Specific Configurations](#esp32_application_specific_configurations).
 
-Device      |Signal|Pin     |Symbol         |Remarks
-:-----------|:-----|:-------|:--------------|:----------------
-CAN         | TX   | GPIO5  |```CAN_TX```   | optional, can be overridden
-CAN         | RX   | GPIO35 |```CAN_RX```   | optional, can be overridden
+Device  |Signal|Pin     |Symbol         |Remarks
+:-------|:-----|:-------|:--------------|:----------------
+CAN     | TX   | GPIO5  |`CAN_TX`       | optional, can be overridden
+CAN     | RX   | GPIO35 |`CAN_RX`       | optional, can be overridden
 
 Example:
 ```
-#define CAN_TX      GPIO10      /* CAN TX tranceiver signal */
-#define CAN_RX      GPIO9       /* CAN RX tranceiver signal */
+#define CAN_TX      GPIO10      /* CAN TX transceiver signal */
+#define CAN_RX      GPIO9       /* CAN RX transceiver signal */
 ```
 
-<b>```CAN_DLL_NUMOF```</b> is not defined by the ```esp_can``` module. It uses the default value of 1. If you have further CAN interfaces, make sure to define the correct value of ```CAN_DLL_NUMOF```.
+If the board has an external transceiver module connected to the ESP32 on-board,
+module `periph_can` should be provided as feature in board's `Makefile.features`
+```
+FEATURES_PROVIDED += periph_can     # CAN peripheral interface
+```
 
-If the board has an external transceiver module connected to the ESP32 on board, the ```esp_can``` module should be enabled by default in board's ```Makefile.dep``` when module ```can``` is used.
+Otherwise, the application has to add the `periph_can` module in its makefile
+when needed.
+
+\anchor esp32_power_management
+## <a name="esp32_power_management"> Power Management </a> &nbsp;[[TOC](#esp32_toc)]
+
+### Power Modes
+
+The RIOT port for the ESP32 implements RIOT's layered power management. It
+supports the following operating modes:
+
+- The **Modem-sleep** mode is the default operating mode when the WiFi
+  interface is disabled.
+- The **Active** mode is the default operating mode when the WiFi interface
+  is used by either the `esp-wifi` or `esp-now` module.
+- In **Light-sleep** mode, the CPUs including peripherals are stalled, but
+  the SRAM is retained. The system can continue when it returns from this mode.
+- In **Deep-sleep** the CPU and the SRAM are powered down. The RTC memory can
+  be retained. The system must be restarted when it returns from this mode.
+
+Since the peripherals are not working during _Light-sleep_/_Deep-sleep_, the
+CPU cannot be woken up by internal interrupt sources such as timers. Therefore,
+RIOT's layered power management can't select them as idle power mode. They are
+therefore blocked for normal operation. The application has to select them
+explicitly using the `pm_set` function. RIOT's layered power management
+can only select either _Modem-sleep_ or _Active_ as the lowest unblocked mode.
+
+But also in _Modem-sleep_ or _Active_ mode, the lowest possible power level
+is used. For this purpose, the Xtensa ISA instruction `waiti` is used,
+which saves power by setting the current interrupt level, turning off the
+processor logic and waiting for an interrupt.
+
+### Using Power Modes
+
+_Modem-sleep_ mode and _Active_ mode are the default operating modes
+dependent on whether the WiFi interface is used. They are selected
+automatically by the system.
+
+To enter the _Light-sleep_ or the _Deep-sleep_ mode, function `pm_set` has
+to be used with the according mode `ESP_PM_LIGHT_SLEEP` or `ESP_PM_DEEP_SLEEP`
+as parameter. To exit from these modes, several wake-up sources can be used.
+
+#### Wake-up Sources in _Light-sleep_ Mode
+
+Possible wake-up sources for the _Light-sleep_ mode are:
+
+- RTC timer (set the RTC timer alarm using `rtc_set` before calling `pm_set`)
+- GPIOs that are configured as input with enabled interrupt
+- RxD signal of UART0 and/or UART1 (configured with `ESP_PM_WUP_UART0` and
+  `ESP_PM_WUP_UART1`)
+
+@note Since the digital core (MCU) is stalled during _Light-sleep_, it
+is not possible timers like `periph_timer` or `xtimer` as wake-up source.
+
+@warning
+Since only level interrupts are supported in _Light-sleep_ mode,
+defined edge interrupts of type `GPIO_RISING` and `GPIO_FALLING` are
+implicitly mapped to `GPIO_HIGH`  and `GPIO_LOW`, respectively, when
+entering _Light-sleep_ mode.
+
+#### Wake-up Sources in _Light-sleep_ Mode
+
+Possible Wake-up sources for the _Deep-sleep_ mode are:
+
+- RTC timer (set the RTC timer alarm using `rtc_set` before calling `pm_set`)
+- RTC GPIOs (configured by `ESP_PM_WUP_PINS` and `ESP_PM_WUP_LEVEL`)
+
+@note RTC GPIOs are the GPIOs that are realized by the RTC unit and can also
+be used as ADC channels. See section [GPIO pins](#esp32_gpio_pins) and
+[ADC Channels](#esp32_adc_channels) for more information.
+
+### Configuration
+
+Several definitions can be used during compile time to configure the
+_Light-sleep_ and the _Deep-sleep_ mode:
+
+<center>
+
+Parameter        | Default                  | Mode  | Description
+:----------------|:-------------------------|:------|:------------
+ESP_PM_GPIO_HOLD | not defined              | Deep  | Hold GPIO output level if defined
+ESP_PM_WUP_PINS  | none                     | Deep  | GPIOs used as wake-up source
+ESP_PM_WUP_LEVEL | ESP_PM_WUP_PINS_ANY_HIGH | Deep  | Level for wake-up pins to wake-up
+ESP_PM_WUP_UART0 | disabled                 | Light | Positive UART0 RxD signal edges to wake-up
+ESP_PM_WUP_UART1 | disabled                 | Light | Positive UART1 RxD signal edges to wake-up
+
+</center>
+
+- If `ESP_PM_GPIO_HOLD` is defined, GPIOs hold their last output level
+  when entering _Deep-sleep_ mode. Please note that only RTC GPIOs
+  can hold their output value in _Deep-sleep_ mode.
+- `ESP_PM_WUP_PINS` specifies either a single RTC GPIO or a comma separated
+  list of RTC GPIOs that are used as wake-up source in _Deep-sleep_ mode.
+- `ESP_PM_WUP_LEVEL` specifies the level for the wake-up pins in _Deep-sleep_
+  mode:
+  - `ESP_PM_WUP_PINS_ANY_HIGH` (default) - The system is woken up when any of
+     the GPIOs specified in `ESP_PM_WUP_PINS` becomes HIGH.
+  - `ESP_PM_WUP_PINS_ALL_LOW` - The system is woken up when all GPIOs specified
+    in `ESP_PM_WUP_PINS` become LOW.
+- `ESP_PM_WUP_UART0` and `ESP_PM_WUP_UART1` define the number of positive
+  edges of the RxD signal of the respective UART that are necessary to wake
+  up the system in the _Light-sleep_ mode. The value must be greater than 2,
+  otherwise UART is not activated as wake-up source. The specified value is
+  reduced by 2 so that `ESP_PM_WUP_UART0` or `ESP_PM_WUP_UART1` plus 2 is
+  the number of positive edges required to wake up.
+
+In the following example the system shall be woken up from _Deep-sleep_ if
+the pulled-up pin `GPIO25` (`ESP_PM_WUP_PINS=GPIO25`) goes LOW
+(`ESP_PM_WUP_LEVEL=ESP_PM_WUP_PINS_ALL_LOW`). The last GPIO output values
+are held (`ESP_PM_GPIO_HOLD`) in _Deep-sleep_ mode. From _Light-sleep_ the
+system can be woken up by any of the GPIOs defined as input with enabled
+interrupt or if the RxD signal of UART0 goes HIGH at least 4 times
+(`ESP_PM_WUP_UART0=6`).
 ```
-ifneq (,$(filter can,$(USEMODULE)))
-    USEMODULE += esp_can
-endif
+CFLAGS='-DESP_PM_WUP_PINS=GPIO25 -DESP_PM_WUP_LEVEL=ESP_PM_WUP_PINS_ALL_LOW \
+        -DESP_PM_WUP_UART0=6 -DESP_PM_GPIO_HOLD' \
+make BOARD=esp32-wroom-32 -C tests/periph_pm
 ```
-Otherwise, the application has to add the ```esp_can``` module in its makefile when needed.
+
+### Saving Data in _Deep-sleep_ Mode
+
+In _Deep-sleep_ mode the SRAM is powered down. However, the slow RTC memory
+can be retained. Therefore, data that must be retained during _Deep-sleep_ and
+the subsequent system restart, must be stored in the slow RTC memory. For
+that purpose, use
+- `__attribute__((section(".rtc.bss")))` to place uninitialized
+data in section `.rtc.bss`, and
+- `__attribute__((section(".rtc.data")))` to
+place initialized data in section `.rtc.data`.
+
+For example:
+```
+static int _i_value __attribute__((section(".rtc.bss")));      /* set to 0 at power on */
+static int _u_value __attribute__((section(".rtc.data"))) = 1; /* initialized */
+```
 
 ## <a name="esp32_other_peripherals"> Other Peripherals </a> &nbsp;[[TOC](#esp32_toc)]
 
 The ESP32 port of RIOT also supports:
 
 - hardware number generator with 32 bit
-- RTC device
 - CPU-ID function
 - Vref measurement function
-- power management functions
 
 # <a name="esp32_special_on_board_peripherals"> Special On-board Peripherals </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -895,7 +1140,7 @@ Please refer file ```$RIOTBASE/tests/unittests/test-spiffs/tests-spiffs.c``` for
 ESP32 provides different built-in possibilities to realize network devices:
 
 - <b>EMAC</b>, an Ethernet MAC implementation (requires an external PHY module)
-- <b>ESP WiFi</b>, usual AP-based wireless LAN (not yet supported)
+- <b>ESP WiFi</b>, usual AP-based wireless LAN
 - <b>ESP-NOW</b>, a WiFi based AP-less and connectionless peer to peer communication protocol
 - <b>ESP-MESH</b>, a WiFi based mesh technology (not yet supported)
 
@@ -917,6 +1162,108 @@ Otherwise, the application has to add the ```esp_eth``` module in its makefile w
 @note
 The board has to have one of the supported PHY modules to be able to use the Ethernet MAC module.
 
+\anchor esp32_wifi_network_interface
+## <a name="esp32_wifi_network_interface"> WiFi Network Interface </a> &nbsp;[[TOC](#esp32_toc)]
+
+The RIOT port for ESP32 implements a `netdev` driver for the built-in WiFi
+interface. This `netdev` driver supports WPA2 personal mode as well as WPA2
+enterprise mode.
+
+### WPA2 personal mode
+
+To use the WiFi `netdev` driver in WPA2 personal mode with a
+preshared key (PSK), module `esp_wifi` has to be enabled.
+
+```
+USEMODULE += esp_wifi
+```
+
+Furthermore, the following configuration parameters have to be defined:
+
+<center>
+
+Parameter          | Default                   | Description
+:------------------|:--------------------------|:------------
+ESP_WIFI_SSID      | "RIOT_AP"                 | SSID of the AP to be used.
+ESP_WIFI_PASS      | -                         | Passphrase used for the AP as clear text (max. 64 chars).
+ESP_WIFI_STACKSIZE | #THREAD_STACKSIZE_DEFAULT | Stack size used for the WiFi netdev driver thread.
+
+</center>
+
+These configuration parameter definitions, as well as enabling the `esp_wifi`
+module, can be done either in the makefile of the project or at make command
+line, for example:
+
+```
+USEMODULE=esp_wifi \
+CFLAGS='-DESP_WIFI_SSID=\"MySSID\" -DESP_WIFI_PASS=\"MyPassphrase\"' \
+make -C examples/gnrc_networking BOARD=...
+```
+
+@note
+- Module `esp_wifi` is not enabled automatically when module
+`netdev_default` is used.
+- Leave 'ESP_WIFI_PASS' undefined to connect to an open WiFi access point.
+- The Wifi network interface (module `esp_wifi`) and the
+[ESP-NOW network interface](#esp32_esp_now_network_interface) (module `esp_now`)
+can be used simultaneously, for example, to realize a border router for
+a mesh network which uses ESP-NOW.
+
+### WPA2 Enterprise Mode
+
+To use the WiFi `netdev` driver in WPA2 enterprise mode with IEEE 802.1X/EAP
+authentication, module `esp_wifi_enterprise` has to be enabled.
+
+```
+USEMODULE += esp_wifi_enterprise
+```
+
+It supports the following EAP authentication methods:
+
+- PEAPv0
+- PEAPv1
+- TTLS
+
+As inner (phase 2) EAP authentication method, only MSCHAPv2 is supported.
+
+To use module `esp_wifi_enterprise` with these authentication methods, the
+following configuration parameters have to be defined:
+
+<center>
+
+Parameter          | Default   | Description
+:------------------|:----------|:------------
+ESP_WIFI_SSID      | "RIOT_AP" | SSID of the AP to be used.
+ESP_WIFI_EAP_ID    | none      | Optional anonymous identity used in phase 1 (outer) EAP authentication. If it is not defined, the user name defined for phase 2 (inner) EAP authentication is used as identity in phase 1.
+ESP_WIFI_EAP_USER  | none      | User name used in phase 2 (inner) EAP authentication.
+ESP_WIFI_EAP_PASS  | none      | Password used in phase 2 (inner) EAP authentication.
+ESP_WIFI_STACKSIZE | #THREAD_STACKSIZE_DEFAULT | Stack size used for the WiFi netdev driver thread.
+
+</center>
+
+These configuration parameter definitions, as well as enabling the `esp_wifi`
+module, can be done either in the makefile of the project or at make command
+line, for example:
+
+```
+USEMODULE=esp_wifi_enterprise \
+CFLAGS='-DESP_WIFI_SSID=\"MySSID\" -DESP_WIFI_EAP_ID=\"anonymous\" -DESP_WIFI_EAP_USER=\"MyUserName\" -DESP_WIFI_EAP_PASS=\"MyPassphrase\"' \
+make -C examples/gnrc_networking BOARD=...
+```
+
+@note
+- Since there is no possibility to add the CA certificate to the RIOT image,
+the verification of the AP certificate is not yet supported.
+- Module `esp_wifi_enterprise` is not enabled automatically when module
+`netdev_default` is used.
+- The Wifi network interface (module `esp_wifi_enterprise`) and the
+[ESP-NOW network interface](#esp32_esp_now_network_interface) (module `esp_now`)
+can be used simultaneously, for example, to realize a border router for
+a mesh network which uses ESP-NOW.
+In this case the ESP-NOW interface must use the same channel as the AP of the
+infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+the channel of the AP as value for the parameter 'ESP_NOW_CHANNEL'.
+
 \anchor esp32_esp_now_network_interface
 ## <a name="esp32_esp_now_network_interface"> ESP-NOW Network Interface </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -924,26 +1271,35 @@ With ESP-NOW, the ESP32 provides a connectionless communication technology, feat
 
 The RIOT port for ESP32 implements in module ```esp_now``` a ```netdev``` driver which uses ESP-NOW to provide a link layer interface to a meshed network of ESP32 nodes. In this network, each node can send short packets with up to 250 data bytes to all other nodes that are visible in its range.
 
-@note Due to symbol conflicts in the ```esp_idf_wpa_supplicant_crypto``` module used by the ```esp_now``` with RIOT's ```crypto``` and ```hashes``` modules, ESP-NOW cannot be used for application that use these modules. Therefore, the module ```esp_now``` is not enabled automatically if the ```netdev_default``` module is used. Instead, the application has to add the ```esp_now``` module in its makefile when needed.<br>
+@note Module `esp_now`module is not enabled automatically if the
+`netdev_default` module is used. Instead, the application has to add the
+`esp_now` module in its makefile when needed.<br>
 ```
 USEMODULE += esp_now
 ```
 
 For ESP-NOW, ESP32 nodes are used in WiFi SoftAP + Station mode to advertise their SSID and become visible to other ESP32 nodes. The SSID of an ESP32 node is the concatenation of the prefix ```RIOT_ESP_``` with the MAC address of its SoftAP WiFi interface. The driver periodically scans all visible ESP32 nodes.
 
-The following parameters are defined for ESP-NOW nodes. These parameters can be overriden by [application-specific board configurations](#esp32_application_specific_board_configuration).
+The following parameters are defined for ESP-NOW nodes. These parameters can be overridden by [application-specific board configurations](#esp32_application_specific_board_configuration).
 
 <center>
 
 Parameter | Default | Description
 :---------|:--------|:-----------
 ESP_NOW_SCAN_PERIOD | 10000000UL | Defines the period in us at which an node scans for other nodes in its range. The default period is 10 s.
-ESP_NOW_SOFT_AP_PASSPHRASE | ThisistheRIOTporttoESP | Defines the passphrase (max. 64 chars) that is used for the SoftAP interface of an nodes. It has to be same for all nodes in one network.
+ESP_NOW_SOFT_AP_PASS | "ThisistheRIOTporttoESP" | Defines the passphrase as clear text (max. 64 chars) that is used for the SoftAP interface of ESP-NOW nodes. It has to be same for all nodes in one network.
 ESP_NOW_CHANNEL | 6 | Defines the channel that is used as the broadcast medium by all nodes together.
 ESP_NOW_KEY | NULL | Defines a key that is used for encrypted communication between nodes. If it is NULL, encryption is disabled. The key has to be of type ```uint8_t[16]``` and has to be exactly 16 bytes long.
 
 </center>
 
+@note The ESP-NOW network interface (module `esp_now`) and the
+[Wifi network interface](#esp32_wifi_network_interface) (module `esp_wifi` or `esp_wifi_enterprise`)
+can be used simultaneously, for example, to realize a border router for
+a mesh network which uses ESP-NOW.
+In this case the ESP-NOW interface must use the same channel as the AP of the
+infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
 
 ## <a name="esp32_other_network_devices"> Other Network Devices </a> &nbsp;[[TOC](#esp32_toc)]
 
@@ -1002,19 +1358,18 @@ Therefore, it is often necessary to change some of these default configurations 
 
 There are two ways to give the application the ability to change some of these default configurations:
 
-- make variable ```CONFIGS```
+- make variable `CFLAGS`
 - application-specific board or driver configuration file
 
 
-## <a name="esp32_config_make_variable"> Make Variable ```CONFIGS``` </a> &nbsp;[[TOC](#esp32_toc)]
+## <a name="esp32_config_make_variable"> Make Variable `CFLAGS` </a> &nbsp;[[TOC](#esp32_toc)]
 
-
-Using the ```CONFIGS``` make variable at the command line, board or driver parameter definitions can be overridden.
+Using the `CFLAGS` make variable at the command line, board or driver parameter definitions can be overridden.
 
 Example:
-```
-CONFIGS='-DESP_LCD_PLUGGED_IN=1 -DLIS3DH_PARAM_INT2=GPIO4'
-```
+`
+CFLAGS='-DESP_LCD_PLUGGED_IN=1 -DLIS3DH_PARAM_INT2=GPIO4'
+`
 
 When a larger number of board definitions needs be overridden, this approach becomes impractical. In that case, an application-specific board configuration file located in application directory can be used, see sections below.
 
@@ -1065,7 +1420,7 @@ It is important to ensure that the application-specific driver parameter file ``
 INCLUDES += -I$(APPDIR)
 ```
 
-**Pleae note:** To make such application-specific board configurations dependent on the ESP32 MCU or a particular ESP32 board, you should always enclose these definitions in the following constructs:
+**Please note:** To make such application-specific board configurations dependent on the ESP32 MCU or a particular ESP32 board, you should always enclose these definitions in the following constructs:
 ```
 #ifdef CPU_ESP32
 ...

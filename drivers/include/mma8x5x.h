@@ -59,14 +59,14 @@ enum {
  * @brief   Available sampling rates
  */
 enum {
-    MMA8X5X_RATE_800HZ = (0 << 3),  /**< 800 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_400HZ = (1 << 3),  /**< 400 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_200HZ = (2 << 3),  /**< 200 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_100HZ = (3 << 3),  /**< 100 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_50HZ  = (4 << 3),  /**< 50 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_1HZ25 = (5 << 3),  /**< 12.5 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_6HZ25 = (6 << 3),  /**< 6.25 Hz Ouput Data Rate in WAKE mode */
-    MMA8X5X_RATE_1HZ56 = (7 << 3)   /**< 1.56 Hz Ouput Data Rate in WAKE mode */
+    MMA8X5X_RATE_800HZ = (0 << 3),  /**< 800 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_400HZ = (1 << 3),  /**< 400 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_200HZ = (2 << 3),  /**< 200 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_100HZ = (3 << 3),  /**< 100 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_50HZ  = (4 << 3),  /**< 50 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_1HZ25 = (5 << 3),  /**< 12.5 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_6HZ25 = (6 << 3),  /**< 6.25 Hz Output Data Rate in WAKE mode */
+    MMA8X5X_RATE_1HZ56 = (7 << 3)   /**< 1.56 Hz Output Data Rate in WAKE mode */
 };
 
 /**
@@ -95,7 +95,6 @@ enum {
 typedef struct {
     i2c_t i2c;                  /**< I2C bus the device is connected to */
     uint8_t addr;               /**< I2C bus address of the device */
-    uint8_t type;               /**< device type */
     uint8_t rate;               /**< sampling rate to use */
     uint8_t range;              /**< scale range to use */
     uint8_t offset[3];          /**< data offset in X, Y, and Z direction */

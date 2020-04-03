@@ -52,7 +52,7 @@
 #endif
 
 typedef struct {
-  uint8_t peer_addr[8];
+  uint8_t peer_addr[BLE_L2_ADDR_LEN];
   ble_ipsp_handle_t handle;
 } ble_mac_interface_t;
 
@@ -96,14 +96,14 @@ static ble_mac_interface_t *ble_mac_interface_lookup(ble_ipsp_handle_t *handle)
  * @return  a pointer to an interface structure on success
  * @return  NULL if interface table is full
  */
-static ble_mac_interface_t *ble_mac_interface_add(uint8_t peer[8],
+static ble_mac_interface_t *ble_mac_interface_add(uint8_t peer[BLE_L2_ADDR_LEN],
                                                   ble_ipsp_handle_t *handle)
 {
     DEBUG("ble_mac_interface_add()\n");
     for (int i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
         if (interfaces[i].handle.conn_handle == 0 && interfaces[i].handle.cid == 0) {
             memcpy(&interfaces[i].handle, handle, sizeof(ble_ipsp_handle_t));
-            memcpy(&interfaces[i].peer_addr, peer, 8);
+            memcpy(&interfaces[i].peer_addr, peer, BLE_L2_ADDR_LEN);
 
             /* notify handler thread */
             /* msg_t m = { .type = BLE_IFACE_ADDED, .content.ptr = &interfaces[i] }; */
@@ -135,7 +135,7 @@ static void ble_mac_interface_delete(ble_mac_interface_t *interface)
 static ble_ipsp_handle_t *_find_handle(const uint8_t *addr)
 {
     for (int i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
-        if (memcmp(interfaces[i].peer_addr, addr, BLE_SIXLOWPAN_L2_ADDR_LEN) == 0) {
+        if (memcmp(interfaces[i].peer_addr, addr, BLE_L2_ADDR_LEN) == 0) {
             return &interfaces[i].handle;
         }
     }
@@ -155,7 +155,7 @@ static int _send_to_peer(ble_ipsp_handle_t *handle, void *data, size_t len)
   return ble_ipsp_send(handle, data, len);
 }
 
-static int _is_broadcast(uint8_t dest[8])
+static int _is_broadcast(uint8_t dest[BLE_L2_ADDR_LEN])
 {
     uint32_t *_dest = (uint32_t*)dest;
     for (int i = 0; i < 2; i++) {
@@ -166,12 +166,12 @@ static int _is_broadcast(uint8_t dest[8])
     return 1;
 }
 
-int ble_mac_send(uint8_t dest[8], void *data, size_t len)
+int ble_mac_send(uint8_t dest[BLE_L2_ADDR_LEN], void *data, size_t len)
 {
     DEBUG("ble_mac_send(): sending pkt with len %u\n", (unsigned)len);
 
 #if defined(MODULE_OD) && ENABLE_DEBUG
-    od_hex_dump(dest, 8, OD_WIDTH_DEFAULT);
+    od_hex_dump(dest, BLE_L2_ADDR_LEN, OD_WIDTH_DEFAULT);
     od_hex_dump(data, len, OD_WIDTH_DEFAULT);
 #endif
 
@@ -217,13 +217,13 @@ static uint32_t ble_mac_ipsp_evt_handler_irq(ble_ipsp_handle_t *p_handle, ble_ip
 
     switch (p_evt->evt_id) {
         case BLE_IPSP_EVT_CHANNEL_CONNECTED: {
-            uint8_t peer_addr[8];
+            uint8_t peer_addr[BLE_L2_ADDR_LEN];
 
             DEBUG("ble-mac: channel connected\n");
-            ble_eui64_from_eui48(peer_addr, p_evt->evt_param->params.ch_conn_request.peer_addr.addr,
-                                 p_evt->evt_param->params.ch_conn_request.peer_addr.addr_type ==
-                                 BLE_GAP_ADDR_TYPE_PUBLIC);
-
+            ble_eui48(peer_addr,
+                      p_evt->evt_param->params.ch_conn_request.peer_addr.addr,
+                      p_evt->evt_param->params.ch_conn_request.peer_addr.addr_type ==
+                              BLE_GAP_ADDR_TYPE_PUBLIC);
             p_instance = ble_mac_interface_add(peer_addr, p_handle);
 
             if (p_instance != NULL) {
@@ -262,7 +262,7 @@ static uint32_t ble_mac_ipsp_evt_handler_irq(ble_ipsp_handle_t *p_handle, ble_ip
 
                 inbuf.len = p_evt->evt_param->params.ch_rx.len;
                 memcpy(inbuf.payload, p_evt->evt_param->params.ch_rx.p_data, inbuf.len);
-                memcpy(inbuf.src, p_instance->peer_addr, 8);
+                memcpy(inbuf.src, p_instance->peer_addr, BLE_L2_ADDR_LEN);
                 sd_ble_gap_rssi_get(p_handle->conn_handle, &inbuf.rssi);
 
                 _callback(BLE_EVENT_RX_DONE, &inbuf);

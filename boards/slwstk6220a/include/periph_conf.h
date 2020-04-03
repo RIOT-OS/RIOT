@@ -63,7 +63,7 @@ static const timer_conf_t timer_config[] = {
 
 #define TIMER_0_ISR         isr_timer1
 #define TIMER_0_MAX_VALUE   (0xffff)            /* 16-bit timer */
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -82,7 +82,7 @@ static const uart_conf_t uart_config[] = {
 };
 
 #define UART_0_ISR_RX       isr_usart2_rx
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 #ifdef __cplusplus

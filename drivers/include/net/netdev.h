@@ -195,19 +195,25 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <errno.h>
 
 #include "iolist.h"
 #include "net/netopt.h"
 
-#ifdef MODULE_NETSTATS_L2
-#include "net/netstats.h"
-#endif
 #ifdef MODULE_L2FILTER
 #include "net/l2filter.h"
 #endif
 
+/**
+ * @name        Network device types
+ * @anchor      net_netdev_type
+ * @attention   When implementing a new type that is able to carry IPv6, have
+ *              a look if you need to update @ref net_l2util as well.
+ * @{
+ */
 enum {
     NETDEV_TYPE_UNKNOWN,
+    NETDEV_TYPE_TEST,
     NETDEV_TYPE_RAW,
     NETDEV_TYPE_ETHERNET,
     NETDEV_TYPE_IEEE802154,
@@ -216,7 +222,9 @@ enum {
     NETDEV_TYPE_LORA,
     NETDEV_TYPE_NRFMIN,
     NETDEV_TYPE_SLIP,
+    NETDEV_TYPE_ESP_NOW,
 };
+/** @} */
 
 /**
  * @brief   Possible event types that are send from the device driver to the
@@ -275,12 +283,9 @@ typedef void (*netdev_event_cb_t)(netdev_t *dev, netdev_event_t event);
 struct netdev {
     const struct netdev_driver *driver;     /**< ptr to that driver's interface. */
     netdev_event_cb_t event_callback;       /**< callback for device events */
-    void* context;                          /**< ptr to network stack context */
+    void *context;                          /**< ptr to network stack context */
 #ifdef MODULE_NETDEV_LAYER
     netdev_t *lower;                        /**< ptr to the lower netdev layer */
-#endif
-#ifdef MODULE_NETSTATS_L2
-    netstats_t stats;                       /**< transceiver's statistics */
 #endif
 #ifdef MODULE_L2FILTER
     l2filter_t filter[L2FILTER_LISTSIZE];   /**< link layer address filters */
@@ -300,7 +305,11 @@ typedef struct netdev_driver {
      * @pre `(dev != NULL) && (iolist != NULL`
      *
      * @param[in] dev       Network device descriptor. Must not be NULL.
-     * @param[in] iolist    io vector list to send
+     * @param[in] iolist    IO vector list to send. Elements of this list may
+     *                      have iolist_t::iol_data == NULL or
+     *                      iolist_t::iol_size == 0. However, unless otherwise
+     *                      specified by the device, the *first* element
+     *                      must contain data.
      *
      * @return negative errno on error
      * @return number of bytes sent
@@ -308,18 +317,25 @@ typedef struct netdev_driver {
     int (*send)(netdev_t *dev, const iolist_t *iolist);
 
     /**
-     * @brief Get a received frame
+     * @brief Drop a received frame, **OR** get the length of a received frame,
+     *        **OR** get a received frame.
      *
      * @pre `(dev != NULL)`
-     * @pre `(buf != NULL) && (len > 0)`
      *
      * Supposed to be called from
      * @ref netdev_t::event_callback "netdev->event_callback()"
      *
-     * If @p buf == NULL and @p len == 0, returns the packet size without
-     * dropping it.
+     * If @p buf == NULL and @p len == 0, returns the packet size -- or an upper
+     * bound estimation of the size -- without dropping the packet.
      * If @p buf == NULL and @p len > 0, drops the packet and returns the packet
      * size.
+     *
+     * If called with @p buf != NULL and @p len is smaller than the received
+     * packet:
+     *  - The received packet is dropped
+     *  - The content in @p buf becomes invalid. (The driver may use the memory
+     *    to implement the dropping - or may not change it.)
+     *  - `-ENOBUFS` is returned
      *
      * @param[in]   dev     network device descriptor. Must not be NULL.
      * @param[out]  buf     buffer to write into or NULL to return the packet
@@ -333,7 +349,7 @@ typedef struct netdev_driver {
      *
      * @return `-ENOBUFS` if supplied buffer is too small
      * @return number of bytes read if buf != NULL
-     * @return packet size if buf == NULL
+     * @return packet size (or upper bound estimation) if buf == NULL
      */
     int (*recv)(netdev_t *dev, void *buf, size_t len, void *info);
 
@@ -413,6 +429,60 @@ typedef struct netdev_driver {
                const void *value, size_t value_len);
 } netdev_driver_t;
 
+/**
+ * @brief   Convenience function for declaring get() as not supported in general
+ *
+ * @param[in] dev           ignored
+ * @param[in] opt           ignored
+ * @param[in] value         ignored
+ * @param[in] max_len       ignored
+ *
+ * @return  always returns `-ENOTSUP`
+ */
+static inline int netdev_get_notsup(netdev_t *dev, netopt_t opt,
+                                    void *value, size_t max_len)
+{
+    (void)dev;
+    (void)opt;
+    (void)value;
+    (void)max_len;
+    return -ENOTSUP;
+}
+
+/**
+ * @brief   Convenience function for declaring set() as not supported in general
+ *
+ * @param[in] dev           ignored
+ * @param[in] opt           ignored
+ * @param[in] value         ignored
+ * @param[in] value_len     ignored
+ *
+ * @return  always returns `-ENOTSUP`
+ */
+static inline int netdev_set_notsup(netdev_t *dev, netopt_t opt,
+                                    const void *value, size_t value_len)
+{
+    (void)dev;
+    (void)opt;
+    (void)value;
+    (void)value_len;
+    return -ENOTSUP;
+}
+
+/**
+ * @brief Informs netdev there was an interrupt request from the network device.
+ *
+ *        This function calls @ref netdev_t::event_callback with
+ *        NETDEV_EVENT_ISR event.
+ *
+ * @param netdev netdev instance of the device associated to the interrupt.
+ */
+static inline void netdev_trigger_event_isr(netdev_t *netdev)
+{
+    if (netdev->event_callback) {
+        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+    }
+}
 #ifdef __cplusplus
 }
 #endif

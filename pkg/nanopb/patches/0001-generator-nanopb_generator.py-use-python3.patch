@@ -1,0 +1,22 @@
+From 416436502170cfd77d19c6e967cc79267b4513d6 Mon Sep 17 00:00:00 2001
+From: Kaspar Schleiser <kaspar@schleiser.de>
+Date: Sat, 12 Oct 2019 00:26:19 +0200
+Subject: [PATCH] generator/nanopb_generator.py: use python3
+
+---
+ generator/nanopb_generator.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/generator/nanopb_generator.py b/generator/nanopb_generator.py
+index 03f41a0..4f0ab47 100755
+--- a/generator/nanopb_generator.py
++++ b/generator/nanopb_generator.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # kate: replace-tabs on; indent-width 4;
+ 
+ from __future__ import unicode_literals
+-- 
+2.23.0
+

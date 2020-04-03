@@ -40,7 +40,7 @@ extern "C" {
 /**  @} */
 
 /**
- * @name    LIS3DML controll register
+ * @name    LIS3DML control register
  * @{
  */
 #define LIS3MDL_CTRL_REG1                 (0x20)

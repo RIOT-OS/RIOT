@@ -1,0 +1,17 @@
+# include contrib code (platform adaption and client implementation)
+USEMODULE += wakaama_contrib
+
+# this allows us to include our own objects, implemented in the 'objects'
+# folder, by adding 'wakaama_objects_<objectName>' modules
+USEMODULE += wakaama_objects
+
+# include the 'device' object implementation (mandatory)
+USEMODULE += wakaama_objects_device
+
+USEMODULE += xtimer
+USEPKG += tlsf
+
+# If logs for the package are active, we need fmt
+ifneq (,$(filter -DLWM2M_WITH_LOGS,$(CFLAGS)))
+    USEMODULE += fmt
+endif

@@ -81,9 +81,9 @@ void spi_init_pins(spi_t bus)
     gpio_init(spi_config[bus].mosi_pin, GPIO_OUT);
     gpio_init(spi_config[bus].miso_pin, GPIO_IN);
     gpio_init(spi_config[bus].sclk_pin, GPIO_OUT);
-    gpio_init_af(spi_config[bus].mosi_pin, spi_config[bus].af);
-    gpio_init_af(spi_config[bus].miso_pin, spi_config[bus].af);
-    gpio_init_af(spi_config[bus].sclk_pin, spi_config[bus].af);
+    gpio_init_af(spi_config[bus].mosi_pin, spi_config[bus].mosi_af);
+    gpio_init_af(spi_config[bus].miso_pin, spi_config[bus].miso_af);
+    gpio_init_af(spi_config[bus].sclk_pin, spi_config[bus].sclk_af);
 #endif
 }
 
@@ -105,7 +105,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
         gpio_init_af(spi_config[bus].cs_pin, GPIO_AF_OUT_PP);
 #else
         gpio_init(spi_config[bus].cs_pin, GPIO_OUT);
-        gpio_init_af(spi_config[bus].cs_pin, spi_config[bus].af);
+        gpio_init_af(spi_config[bus].cs_pin, spi_config[bus].cs_af);
 #endif
     }
     else {
@@ -115,6 +115,28 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
 
     return SPI_OK;
 }
+
+#ifdef MODULE_PERIPH_SPI_GPIO_MODE
+int spi_init_with_gpio_mode(spi_t bus, spi_gpio_mode_t mode)
+{
+    assert(bus < SPI_NUMOF);
+
+    int ret = 0;
+
+#ifdef CPU_FAM_STM32F1
+    /* This has no effect on STM32F1 */
+    return ret;
+#else
+    ret += gpio_init(spi_config[bus].mosi_pin, mode.mosi);
+    ret += gpio_init(spi_config[bus].miso_pin, mode.miso);
+    ret += gpio_init(spi_config[bus].sclk_pin, mode.sclk);
+    gpio_init_af(spi_config[bus].mosi_pin, spi_config[bus].mosi_af);
+    gpio_init_af(spi_config[bus].miso_pin, spi_config[bus].miso_af);
+    gpio_init_af(spi_config[bus].sclk_pin, spi_config[bus].sclk_af);
+    return ret;
+#endif
+}
+#endif
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
@@ -169,19 +191,19 @@ static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
 
     if (!out) {
         dma_configure(spi_config[bus].tx_dma, spi_config[bus].tx_dma_chan, &tmp,
-                      (void *)&(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, 0);
+                      &(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, 0);
     }
     else {
         dma_configure(spi_config[bus].tx_dma, spi_config[bus].tx_dma_chan, out,
-                      (void *)&(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR);
+                      &(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR);
     }
     if (!in) {
         dma_configure(spi_config[bus].rx_dma, spi_config[bus].rx_dma_chan,
-                      (void *)&(dev(bus)->DR), &tmp, len, DMA_PERIPH_TO_MEM, 0);
+                      &(dev(bus)->DR), &tmp, len, DMA_PERIPH_TO_MEM, 0);
     }
     else {
         dma_configure(spi_config[bus].rx_dma, spi_config[bus].rx_dma_chan,
-                      (void *)&(dev(bus)->DR), in, len, DMA_PERIPH_TO_MEM, DMA_INC_DST_ADDR);
+                      &(dev(bus)->DR), in, len, DMA_PERIPH_TO_MEM, DMA_INC_DST_ADDR);
     }
     dev(bus)->CR2 |= SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
 

@@ -9,9 +9,8 @@ The CC2650STK is an 'IoT kit' with 10 sensors, a fancy case, and a radio unit
 that is capable of irradiating IEEE802.15.4 and BLE (or SMART or whatever they
 call it now).
 
- - [Official homepage](http://www.ti.com/tool/cc2650stk)
- - [Another official homepage](http://www.ti.com/ww/en/wireless_connectivity/sensortag2015)
- - [Platform](http://www.ti.com/product/CC2650) <- CPU data sheet here
+ - [Official homepage](https://www.ti.com/tool/cc2650stk)
+ - [Platform](https://www.ti.com/product/CC2650) <- CPU data sheet here
 
 Use `BOARD=cc2650stk` for building RIOT for this platform.
 
@@ -33,7 +32,7 @@ Use `BOARD=cc2650stk` for building RIOT for this platform.
 | I2C        | 1                 |
 | I2S        | 1                 |
 | Datasheet  | [Datasheet](http://www.ti.com/lit/ds/symlink/cc2650.pdf) |
-| Reference Manual | [Reference Manual](http://www.ti.com/lit/ug/swcu117d/swcu117d.pdf) |
+| Reference Manual | [Reference Manual](https://www.ti.com/lit/ug/swcu117h/swcu117h.pdf) |
 
 ## Implementation Status
 
@@ -55,8 +54,9 @@ The arm-none-eabi toolchain works fine. You can get it
 
 ## Programming and Debugging
 
-You'll need [debugging hardware](http://processors.wiki.ti.com/index.php/CC13xx_CC26xx_Tools_Overview#Debuggers).
-So far, the [XDS110 debug probe](http://www.ti.com/tool/CC-DEVPACK-DEBUG) has
+You'll need [debugging hardware]
+(https://processors.wiki.ti.com/index.php?title=CC13xx_CC26xx_Tools_Overview#Debuggers).
+So far, the [XDS110 debug probe](https://www.ti.com/tool/CC-DEVPACK-DEBUG) has
 been tested. That bugger requires you to load a firmware onto it each time it
 powers up. The tool is contained in the Uniflash utility or the `CodeComposer
 Studio` from TI. Look for a folder called `uscif` in the installation directory,
@@ -67,7 +67,7 @@ The process is relying on proprietary TI softsoftware. If you're on Windows
 you can use the stuff linked to on the product websites.
 
 On Linux, there's an application called
-[Uniflash](http://www.ti.com/tool/uniflash). Sadly, you'll have to install the
+[Uniflash](https://www.ti.com/tool/uniflash). Sadly, you'll have to install the
 whole IDE just to get the scripting interface :-[
 
 No idea about MacOSX.
@@ -107,7 +107,7 @@ implement the most common roles of a BLE network.
 
 References: [BlueTooth Core Specification v4.2](https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439),
 [Core Specification Supplement v6](https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=302735),
-[BLE Becons by TI](http://www.ti.com.cn/cn/lit/an/swra475/swra475.pdf)
+[BLE Becons by TI](https://www.ti.com/lit/an/swra475a/swra475a.pdf)
 
 ## BLE packet format for advertising channels
 
@@ -143,10 +143,10 @@ rfc_ble_param_advertiser_t
 
 | Field                 | Size    | RIOT variable | Description|
 |:----------------------|:--------|:--------------|:------------------------------------------------------------|
-| PDU Type              | 4 bits | `ropCmd.commandNo` | PDU Type is solely dependant on the command type. See below. |
+| PDU Type              | 4 bits | `ropCmd.commandNo` | PDU Type is solely dependent on the command type. See below. |
 | RFU                   | 2 bits | - | Reserved for Future Use (RFU): [You can't touch this.](https://www.youtube.com/watch?v=otCpCn0l4Wo) Assumed to be 0.|
 | TxAdd                 | 1 bit  | `pParams->advConfig.deviceAddrType` | The field value is specific to the PDU type. |
-| RxAdd                 | 1 bit  | - | The field value is specific to the PDU type. According to the TI documentation ([23.6.4.4](http://www.ti.com/lit/ug/swcu117d/swcu117d.pdf)), this field is not available to configure and thus assumed to be 0. |
+| RxAdd                 | 1 bit  | - | The field value is specific to the PDU type. According to the TI documentation ([23.6.4.4](https://www.ti.com/lit/ug/swcu117h/swcu117h.pdf)), this field is not available to configure and thus assumed to be 0. |
 | Length                | 6 bits | `pParams->advLen` + 6| Indicates the length of the payload field in bytes. 6 is added to account for the advertiser address. The payload length ranges from 6 to 37 bytes. |
 | RFU                   | 2 bits | - | Reserved for Future Use (RFU): [You can't touch this.](https://www.youtube.com/watch?v=otCpCn0l4Wo) Assumed to be 0 |
 | Advertiser address | 6 bytes | `pParams->pDeviceAddress` | First element of the payload. The different formats of address types are illustrated [here](https://cloud.githubusercontent.com/assets/14371243/15826564/4c7f5f54-2c08-11e6-8051-dc0a018f6e42.png).|

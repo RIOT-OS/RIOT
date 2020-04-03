@@ -1,0 +1,4 @@
+agithub==2.1
+gitdb2==2.0.3
+GitPython==2.1.9
+smmap2==2.0.3

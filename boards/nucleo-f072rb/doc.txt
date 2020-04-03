@@ -5,33 +5,35 @@
 
 ## Overview
 
-The Nucleo-F072 is a board from ST's Nucleo family supporting a ARM Cortex-M0
+The Nucleo-F072RB is a board from ST's Nucleo family supporting a ARM Cortex-M0
 STM32F072RB microcontroller with 16Kb of SRAM and 128Kb of ROM Flash.
 
 ## Hardware
 
-![Nucleo64 F072](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
+![Nucleo64 F072RB](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
 
 
 ### MCU
-| MCU        | STM32F072RB           |
-|:------------- |:--------------------- |
-| Family | ARM Cortex-M0     |
-| Vendor | ST Microelectronics   |
-| RAM        | 16Kb |
+| MCU        | STM32F072RB       |
+|:---------- |:----------------- |
+| Family     | ARM Cortex-M0     |
+| Vendor     | ST Microelectronics |
+| RAM        | 16Kb              |
 | Flash      | 128Kb             |
-| Frequency  | up to 48MHz) |
-| FPU        | yes               |
-| Timers | 12 (2x watchdog, 1 SysTick, 8x 16-bit, 1x 32-bit) |
-| ADCs       | 1x 12-bit (up to 16 channels)         |
+| Frequency  | up to 48MHz       |
+| FPU        | no                |
+| Timers     | 12 (2x watchdog, 1 SysTick, 8x 16-bit, 1x 32-bit) |
+| ADCs       | 1x 12-bit (up to 16 channels) |
 | UARTs      | 4                 |
 | SPIs       | 2                 |
 | I2Cs       | 2                 |
+| CAN        | 1                 |
+| USB        | 1                 |
 | RTC        | 1                 |
-| Vcc        | 2.0V - 3.6V           |
-| Datasheet  | [Datasheet](http://www.st.com/en/evaluation-tools/nucleo-f072rb.html) |
-| Reference Manual | [Reference Manual](http://www.st.com/resource/en/datasheet/stm32f072rb.pdf) |
-| Programming Manual | [Programming Manual](http://www.st.com/resource/en/reference_manual/dm00031936.pdf) |
+| Vcc        | 2.0V - 3.6V       |
+| Datasheet  | [Datasheet](http://www.st.com/resource/en/datasheet/stm32f072rb.pdf) |
+| Reference Manual | [Reference Manual](http://www.st.com/resource/en/reference_manual/dm00031936.pdf) |
+| Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/dm00051352.pdf) |
 | Board Manual   | [Board Manual](http://www.st.com/resource/en/user_manual/dm00105823.pdf)|
 
 
@@ -52,22 +54,22 @@ STM32F072RB microcontroller with 16Kb of SRAM and 128Kb of ROM Flash.
 
 
 ## Flashing the device
-The ST Nucleo-F072 board includes an on-board ST-LINK V2 programmer. The
+The ST Nucleo-F072RB board includes an on-board ST-LINK V2 programmer. The
 easiest way to program the board is to use OpenOCD. Once you have installed
 OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
 installation instructions), you can flash the board simply by typing
 
 ```
-make BOARD=nucleo-f072 flash
+make BOARD=nucleo-f072rb flash
 ```
 and debug via GDB by simply typing
 ```
-make BOARD=nucleo-f072 debug
+make BOARD=nucleo-f072rb debug
 ```
 
 
 ## Supported Toolchains
-For using the ST Nucleo-F072 board we strongly recommend the usage of the
+For using the ST Nucleo-F072RB board we strongly recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
  */

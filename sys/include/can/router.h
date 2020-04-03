@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 OTA keys S.A.
+ * Copyright (C) 2016-2018 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -28,6 +28,11 @@ extern "C" {
 
 #include "can/can.h"
 #include "can/pkt.h"
+
+/**
+ * @brief Initialize CAN router
+ */
+void can_router_init(void);
 
 /**
  * @brief Register a user @p entry to receive a frame @p can_id

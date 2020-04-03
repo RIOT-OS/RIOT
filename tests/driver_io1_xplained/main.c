@@ -54,7 +54,7 @@ int main(void)
 {
     float temperature;
 
-    puts("IO1 Xplained extention test application\n");
+    puts("IO1 Xplained extension test application\n");
     puts("+-------------Initializing------------+\n");
 
     if (io1_xplained_init(&dev, &io1_xplained_params[0]) != IO1_XPLAINED_OK) {
@@ -67,9 +67,10 @@ int main(void)
     while (1) {
         /* Get temperature in degrees celsius */
         at30tse75x_get_temperature(&dev.temp, &temperature);
-        printf("Temperature [°C]: %.2f\n"
+        printf("Temperature [°C]: %i.%03u\n"
                "+-------------------------------------+\n",
-               temperature);
+               (int)temperature,
+               (unsigned)((temperature - (int)temperature) * 1000));
         xtimer_sleep(DELAY_1S);
 
         /* Card detect pin is inverted */

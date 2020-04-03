@@ -25,7 +25,7 @@
 #include "shell_commands.h"
 #include "sht1x_params.h"
 
-#define SHT1X_NUM     (sizeof(sht1x_params) / sizeof(sht1x_params[0]))
+#define SHT1X_NUM     ARRAY_SIZE(sht1x_params)
 extern sht1x_dev_t sht1x_devs[SHT1X_NUM];
 static sht1x_dev_t *dev = &sht1x_devs[0];
 

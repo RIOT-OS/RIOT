@@ -6,12 +6,13 @@
 ## Overview
 LimiFrog-v1 arose from the La BlueFrog board. LimiFrog-v1 contains the first
 hardware revision of that kickstarter project. LimiFrog-v2 is already there and
-the RIOT support will follow. [LimiFrog](http://www.limifrog.io/home-en-
-kickstarter/) features a variety of sensors as well as an OLED Display and a BLE
+the RIOT support will follow.
+[LimiFrog](https://github.com/LimiFrog/LimiFrog-HW)
+features a variety of sensors as well as an OLED Display and a BLE
 (Bluetooth Low-Energy) module.
 
 ## Hardware
-![Limifrog-v1](http://www.limifrog.io/wordpress/wp-content/uploads/2015/07/LeadingPhoto-W500px.jpg)
+![Limifrog-v1](https://www.cnx-software.com/wp-content/uploads/2015/09/Limifrog.jpg)
 ![limifrog-v1 pinout](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/limifrog-v1_pinout.png)
 
 ### MCU
@@ -73,7 +74,8 @@ kickstarter/) features a variety of sensors as well as an OLED Display and a BLE
 
 The LimiFrog-v1 has no on-board programmer nor an USB-UART converter. It can
 be programmed by using the integrated ST-Link/V2 programmer of any STM32Fx-
-discovery board. See Hardware section [here](@ref boards_yunjia-nrf51822) for an example.
+discovery board. See the Hardware subsection in Flashing and Debugging section
+[here](@ref boards_yunjia-nrf51822) for an example.
 Another way is to use a stand-alone ST-Link V2 programmer as shown in the
 picture.
 

@@ -142,7 +142,7 @@ void _native_syscall_leave(void)
 /* make use of TLSF if it is included, except when building with valgrind
  * support, where one probably wants to make use of valgrind's memory leak
  * detection abilities*/
-#if !(defined MODULE_TLSF) || (defined(HAVE_VALGRIND_H))
+#if (!(defined MODULE_TLSF) && !(defined NATIVE_MEMORY)) || (defined(HAVE_VALGRIND_H))
 int _native_in_malloc = 0;
 void *malloc(size_t size)
 {
@@ -176,11 +176,7 @@ void free(void *ptr)
     _native_syscall_leave();
 }
 
-#ifdef NATIVE_IN_CALLOC
-int _native_in_calloc = 1;
-#else
 int _native_in_calloc = 0;
-#endif
 void *calloc(size_t nmemb, size_t size)
 {
     /* dynamically load calloc when it's needed - this is necessary to

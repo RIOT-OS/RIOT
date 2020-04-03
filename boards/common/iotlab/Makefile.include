@@ -1,18 +1,17 @@
-# the cpu to build for
-export CPU = stm32f1
-export CPU_MODEL = stm32f103re
-
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB1
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*B)))
 
 # setup serial terminal
-export BAUD = 500000
+BAUD = 500000
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-# call a 'reset halt' command before starting the debugger
-# it is required as `connect_assert_srst` is set
-export OPENOCD_DBG_START_CMD = -c 'reset halt'
+# Using connect_assert_srst removes errors on flash from invalid state
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
+
+DEBUG_ADAPTER ?= iotlab
+
+OPENOCD_CONFIG ?= $(RIOTBOARD)/common/iotlab/dist/openocd.cfg
 
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk

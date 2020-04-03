@@ -39,6 +39,74 @@ void setup(void)
     Serial.println("Hello Arduino!");
 }
 
+static void print_test(void)
+{
+    const SerialFormat formats[] = { BIN, OCT, DEC, HEX };
+    const char *s_formats[] = {
+        [BIN] = "BIN",
+        [OCT] = "OCT",
+        [DEC] = "DEC",
+        [HEX] = "HEX",
+    };
+
+    const int si = -1337;
+    const int ui = 42;
+    const long sl = -1234567890;
+    const long ul = 1234567890;
+
+    for (unsigned i = 0; i < ARRAY_SIZE(formats); i++) {
+        SerialFormat f = formats[i];
+        Serial.print("print(int, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.print(si, f);
+        Serial.println();
+        Serial.print("println(int, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.println(si, f);
+    }
+
+    for (unsigned i = 0; i < ARRAY_SIZE(formats); i++) {
+        SerialFormat f = formats[i];
+        Serial.print("print(unsigned int, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.print(ui, f);
+        Serial.println();
+        Serial.print("println(unsigned int, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.println(ui, f);
+    }
+
+    for (unsigned i = 0; i < ARRAY_SIZE(formats); i++) {
+        SerialFormat f = formats[i];
+        Serial.print("print(long, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.print(sl, f);
+        Serial.println();
+        Serial.print("println(long, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.println(sl, f);
+    }
+
+    for (unsigned i = 0; i < ARRAY_SIZE(formats); i++) {
+        SerialFormat f = formats[i];
+        Serial.print("print(unsigned long, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.print(ul, f);
+        Serial.println();
+        Serial.print("println(unsigned long, ");
+        Serial.print(s_formats[f]);
+        Serial.print("): ");
+        Serial.println(ul, f);
+    }
+}
+
 void loop(void)
 {
     /* Read chars if available and seek for CR or LF */
@@ -69,15 +137,15 @@ void loop(void)
                     unsigned long curtime = micros();
                     unsigned long curtime2, curtime3;
 
-                    Serial.print((int) curtime);
+                    Serial.print(curtime);
                     delay(36);
                     Serial.print(" ");
                     curtime2=micros();
-                    Serial.print((int) curtime2);
+                    Serial.print(curtime2);
                     delayMicroseconds(36000);
                     Serial.print(" ");
                     curtime3=micros();
-                    Serial.print((int) curtime3);
+                    Serial.print(curtime3);
 
                     /* test also that time is actually running */
                     if ((curtime3 > curtime2) && (curtime2 > curtime)) {
@@ -85,6 +153,8 @@ void loop(void)
                     } else {
                         Serial.print(" ERR END");
                     }
+                } else if (strncmp(buf, "print", 5) == 0) {
+                    print_test();
                 } else {
                     Serial.write("UNK");
                 }

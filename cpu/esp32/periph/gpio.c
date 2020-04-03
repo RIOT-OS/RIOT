@@ -37,10 +37,19 @@
 #include "xtensa/xtensa_api.h"
 
 #include "esp_common.h"
+#include "esp_sleep.h"
 #include "adc_arch.h"
+#include "adc_ctrl.h"
 #include "gpio_arch.h"
 #include "irq_arch.h"
 #include "syscalls.h"
+
+#define ESP_PM_WUP_PINS_ANY_HIGH    ESP_EXT1_WAKEUP_ANY_HIGH
+#define ESP_PM_WUP_PINS_ALL_LOW     ESP_EXT1_WAKEUP_ALL_LOW
+
+#ifndef ESP_PM_WUP_LEVEL
+#define ESP_PM_WUP_LEVEL    ESP_PM_WUP_PINS_ANY_HIGH
+#endif
 
 #define GPIO_PRO_CPU_INTR_ENA      (BIT(2))
 
@@ -152,28 +161,29 @@ struct _rtc_gpio_t {
     uint8_t  mux;      /**< mux io/rtc bit [0..31] in the register, 32 - no mux */
     uint8_t  pullup;   /**< pullup bit [0..31] in the register, 32 - no pullup */
     uint8_t  pulldown; /**< pulldown bit [0..31] in the register, 32 - no pulldown */
+    uint8_t  drive;    /**< drive strength start bit [0..30] in the register */
 };
 
 /* Table of RTCIO GPIO pins information */
 static const struct _rtc_gpio_t _rtc_gpios[] = {
-    {  0, RTC_IO_SENSOR_PADS_REG, 27, 32, 32 }, /* rtc0 (gpio36) - no pullup/pulldown */
-    {  1, RTC_IO_SENSOR_PADS_REG, 26, 32, 32 }, /* rtc1 (gpio37) - no pullup/pulldown */
-    {  2, RTC_IO_SENSOR_PADS_REG, 25, 32, 32 }, /* rtc2 (gpio38) - no pullup/pulldown */
-    {  3, RTC_IO_SENSOR_PADS_REG, 24, 32, 32 }, /* rtc3 (gpio39) - no pullup/pulldown */
-    {  4, RTC_IO_ADC_PAD_REG, 29, 32, 32 },     /* rtc4 (gpio34) - no pullup/pulldown */
-    {  5, RTC_IO_ADC_PAD_REG, 28, 32, 32 },     /* rtc5 (gpio35) - no pullup/pulldown */
-    {  6, RTC_IO_PAD_DAC1_REG, 17, 27, 28 },    /* rtc6 (gpio25) */
-    {  7, RTC_IO_PAD_DAC2_REG, 17, 27, 28 },    /* rtc7 (gpio26) */
-    {  8, RTC_IO_XTAL_32K_PAD_REG, 18, 27, 28 },/* rtc8 (gpio33) */
-    {  9, RTC_IO_XTAL_32K_PAD_REG, 17, 22, 23 },/* rtc9 (gpio32) */
-    { 10, RTC_IO_TOUCH_PAD0_REG, 19, 27, 28 },  /* rtc10 (gpio4) */
-    { 11, RTC_IO_TOUCH_PAD1_REG, 19, 27, 28 },  /* rtc11 (gpio0) */
-    { 12, RTC_IO_TOUCH_PAD2_REG, 19, 27, 28 },  /* rtc12 (gpio2) */
-    { 13, RTC_IO_TOUCH_PAD3_REG, 19, 27, 28 },  /* rtc13 (gpio15) */
-    { 14, RTC_IO_TOUCH_PAD4_REG, 19, 27, 28 },  /* rtc14 (gpio13) */
-    { 15, RTC_IO_TOUCH_PAD5_REG, 19, 27, 28 },  /* rtc15 (gpio12) */
-    { 16, RTC_IO_TOUCH_PAD6_REG, 19, 27, 28 },  /* rtc16 (gpio14) */
-    { 17, RTC_IO_TOUCH_PAD7_REG, 19, 27, 28 }   /* rtc17 (gpio27) */
+    {  0, RTC_IO_SENSOR_PADS_REG, 27, 32, 32, 32 }, /* rtc0 (gpio36) SENSOR_VP/SENSE 1 */
+    {  1, RTC_IO_SENSOR_PADS_REG, 26, 32, 32, 32 }, /* rtc1 (gpio37) SENSOR_CAPP/SENSE 2 */
+    {  2, RTC_IO_SENSOR_PADS_REG, 25, 32, 32, 32 }, /* rtc2 (gpio38) SENSOR_CAPN/SENSE 3 */
+    {  3, RTC_IO_SENSOR_PADS_REG, 24, 32, 32, 32 }, /* rtc3 (gpio39) SENSOR_VN/SENSE 4*/
+    {  4, RTC_IO_ADC_PAD_REG, 29, 32, 32, 32 },     /* rtc4 (gpio34) VDET_1/ADC1 */
+    {  5, RTC_IO_ADC_PAD_REG, 28, 32, 32, 32 },     /* rtc5 (gpio35) VDET_2/ADC2 */
+    {  6, RTC_IO_PAD_DAC1_REG, 17, 27, 28, 30 },    /* rtc6 (gpio25) DAC1 */
+    {  7, RTC_IO_PAD_DAC2_REG, 17, 27, 28, 30 },    /* rtc7 (gpio26) DAC1 */
+    {  8, RTC_IO_XTAL_32K_PAD_REG, 18, 27, 28, 30 },/* rtc8 (gpio33) XTAL_32K_N */
+    {  9, RTC_IO_XTAL_32K_PAD_REG, 17, 22, 23, 25 },/* rtc9 (gpio32) XTAL_32K_P */
+    { 10, RTC_IO_TOUCH_PAD0_REG, 19, 27, 28, 29 },  /* rtc10 (gpio4) TOUCH0 */
+    { 11, RTC_IO_TOUCH_PAD1_REG, 19, 27, 28, 29 },  /* rtc11 (gpio0) TOUCH1 */
+    { 12, RTC_IO_TOUCH_PAD2_REG, 19, 27, 28, 29 },  /* rtc12 (gpio2) TOUCH2 */
+    { 13, RTC_IO_TOUCH_PAD3_REG, 19, 27, 28, 29 },  /* rtc13 (gpio15) TOUCH3 */
+    { 14, RTC_IO_TOUCH_PAD4_REG, 19, 27, 28, 29 },  /* rtc14 (gpio13) TOUCH4 */
+    { 15, RTC_IO_TOUCH_PAD5_REG, 19, 27, 28, 29 },  /* rtc15 (gpio12) TOUCH5 */
+    { 16, RTC_IO_TOUCH_PAD6_REG, 19, 27, 28, 29 },  /* rtc16 (gpio14) TOUCH6 */
+    { 17, RTC_IO_TOUCH_PAD7_REG, 19, 27, 28, 29 }   /* rtc17 (gpio27) TOUCH7 */
 };
 
 /* Table of the usage type of each GPIO pin */
@@ -188,7 +198,7 @@ gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF] = {
     _SPIF,        /* gpio7 not configurable, used as SPI MISO */
     _SPIF,        /* gpio8 not configurable, used as SPI MOSI */
     #if defined(FLASH_MODE_QIO) || defined(FLASH_MODE_QOUT)
-    /* in qio and qout mode thes pins are used for quad SPI */
+    /* in qio and qout mode these pins are used for quad SPI */
     _SPIF,        /* gpio9 not configurable, used as SPI HD */
     _SPIF,        /* gpio10 not configurable, used as SPI WP */
     #else
@@ -217,8 +227,13 @@ gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF] = {
     _NOT_EXIST,   /* gpio29 */
     _NOT_EXIST,   /* gpio30 */
     _NOT_EXIST,   /* gpio31 */
+#if MODULE_ESP_RTC_TIMER_32K
+    _NOT_EXIST,   /* gpio32 used for external 32K crystal */
+    _NOT_EXIST,   /* gpio33 used for external 32K crystal */
+#else
     _GPIO,        /* gpio32 */
     _GPIO,        /* gpio33 */
+#endif
     _GPIO,        /* gpio34 */
     _GPIO,        /* gpio35 */
     _GPIO,        /* gpio36 */
@@ -238,6 +253,7 @@ const char* _gpio_pin_usage_str[] =
 
 #define GPIO_PIN_SET(b) if (b < 32) GPIO.out_w1ts = BIT(b); else GPIO.out1_w1ts.val = BIT(b-32)
 #define GPIO_PIN_CLR(b) if (b < 32) GPIO.out_w1tc = BIT(b); else GPIO.out1_w1tc.val = BIT(b-32)
+#define GPIO_PIN_GET(b) (b < 32) ? (GPIO.out >> b) & 1 : (GPIO.out1.val >> (b-32)) & 1
 
 #define GPIO_REG_BIT_GET(l,h,b) ((b < 32) ? GPIO.l & BIT(b) : GPIO.h.val & BIT(b-32))
 #define GPIO_REG_BIT_SET(l,h,b) if (b < 32) GPIO.l |=  BIT(b); else GPIO.h.val |=  BIT(b-32)
@@ -272,7 +288,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
             case GPIO_IN_PD:
             case GPIO_IN_PU:
-                /* GPIOs 34 ... 39 have no software controlable pullups/pulldowns */
+                /* GPIOs 34 ... 39 have no software controllable pullups/pulldowns */
                 LOG_TAG_ERROR("gpio",
                               "GPIO%d has no pullups/pulldowns\n", pin);
                 return -1;
@@ -418,6 +434,8 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     if (flank != GPIO_NONE) {
         gpio_int_enabled_table [pin] = (gpio_isr_ctx_table[pin].cb != NULL);
         GPIO.pin[pin].int_ena = GPIO_PRO_CPU_INTR_ENA;
+        GPIO.pin[pin].int_type = flank;
+        GPIO.pin[pin].wakeup_enable = 1;
 
         intr_matrix_set(PRO_CPU_NUM, ETS_GPIO_INTR_SOURCE, CPU_INUM_GPIO);
         xt_set_interrupt_handler(CPU_INUM_GPIO, gpio_int_handler, NULL);
@@ -446,7 +464,18 @@ void gpio_irq_disable (gpio_t pin)
 int gpio_read (gpio_t pin)
 {
     CHECK_PARAM_RET(pin < GPIO_PIN_NUMOF, -1);
-    return GPIO_REG_BIT_GET(in, in1, pin) ? 1 : 0;
+    int value;
+
+    if (REG_GET_BIT(_gpio_to_iomux_reg[pin], FUN_IE)) {
+        /* in case the pin is any kind of input, read from input register */
+        value = GPIO_REG_BIT_GET(in, in1, pin) ? 1 : 0;
+    }
+    else {
+        /* otherwise read the last value written to the output register */
+        value = GPIO_PIN_GET(pin);
+    }
+    DEBUG("%s gpio=%u val=%d\n", __func__, pin, value);
+    return value;
 }
 
 void gpio_write (gpio_t pin, int value)
@@ -519,13 +548,106 @@ int8_t gpio_is_rtcio (gpio_t pin)
     return _gpio_to_rtc[pin];
 }
 
-int gpio_config_sleep_mode (gpio_t pin, bool mode, bool input)
-{
-    return rtcio_config_sleep_mode (pin, mode, input);
-}
-
 int gpio_set_direction(gpio_t pin, gpio_mode_t mode)
 {
     /* TODO implementation, for the moment we simply initialize the GPIO */
     return gpio_init(pin, mode);
+}
+
+int gpio_set_drive_capability(gpio_t pin, gpio_drive_strength_t drive)
+{
+    assert(pin < GPIO_PIN_NUMOF);
+    assert(pin < GPIO34);
+
+    const struct _rtc_gpio_t* rtc = (_gpio_to_rtc[pin] != -1) ?
+                                     &_rtc_gpios[_gpio_to_rtc[pin]] : NULL;
+
+    SET_PERI_REG_BITS(_gpio_to_iomux_reg, FUN_DRV_V, drive, FUN_DRV_S);
+    if (rtc) {
+        SET_PERI_REG_BITS(rtc->reg, 0x3, drive, rtc->drive);
+    }
+    return 0;
+}
+
+#if MODULE_PERIPH_GPIO_IRQ
+static uint32_t gpio_int_saved_type[GPIO_PIN_NUMOF];
+#endif
+
+void gpio_pm_sleep_enter(unsigned mode)
+{
+    /*
+     * Activate the power domain for RTC peripherals either when
+     * ESP_PM_GPIO_HOLD is defined or when light sleep mode is activated.
+     * As long as the RTC peripherals are active, the pad state of RTC GPIOs
+     * is held in deep sleep and the pad state of all GPIOs is held in light
+     * sleep.
+     */
+#ifdef ESP_PM_GPIO_HOLD
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+#else
+    if (mode == ESP_PM_LIGHT_SLEEP) {
+        esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+    }
+#endif
+
+    if (mode == ESP_PM_DEEP_SLEEP) {
+#ifdef ESP_PM_WUP_PINS
+        static const gpio_t wup_pins[] = { ESP_PM_WUP_PINS };
+        /*
+         * Prepare the wake-up pins if a single pin or a comma-separated list of
+         * pins is defined for wake-up.
+         */
+        uint64_t wup_pin_mask = 0;
+        for (unsigned i = 0; i < ARRAY_SIZE(wup_pins); i++) {
+            wup_pin_mask |= 1ULL << wup_pins[i];
+        }
+        esp_sleep_enable_ext1_wakeup(wup_pin_mask, ESP_PM_WUP_LEVEL);
+#endif /* ESP_PM_WUP_PINS */
+    }
+    else {
+#if MODULE_PERIPH_GPIO_IRQ
+        esp_sleep_enable_gpio_wakeup();
+        for (unsigned i = 0; i < GPIO_PIN_NUMOF; i++) {
+            const struct _rtc_gpio_t* rtc =
+                (_gpio_to_rtc[i] != -1) ? &_rtc_gpios[_gpio_to_rtc[i]] : NULL;
+
+            if (gpio_int_enabled_table[i] && GPIO.pin[i].int_type) {
+                gpio_int_saved_type[i] = GPIO.pin[i].int_type;
+                switch (GPIO.pin[i].int_type) {
+                    case GPIO_FALLING:
+                        GPIO.pin[i].int_type = GPIO_LOW;
+                        DEBUG("%s gpio=%u GPIO_LOW\n", __func__, i);
+                        break;
+                    case GPIO_RISING:
+                        GPIO.pin[i].int_type = GPIO_HIGH;
+                        DEBUG("%s gpio=%u GPIO_HIGH\n", __func__, i);
+                        break;
+                    case GPIO_BOTH:
+                        DEBUG("%s gpio=%u GPIO_BOTH not supported\n",
+                               __func__, i);
+                        break;
+                    default:
+                        break;
+                }
+                if (rtc) {
+                    RTCIO.pin[rtc->num].wakeup_enable = 1;
+                    RTCIO.pin[rtc->num].int_type = GPIO.pin[i].int_type;
+                }
+            }
+        }
+#endif
+    }
+}
+
+void gpio_pm_sleep_exit(uint32_t cause)
+{
+    (void)cause;
+#if MODULE_PERIPH_GPIO_IRQ
+    DEBUG("%s\n", __func__);
+    for (unsigned i = 0; i < GPIO_PIN_NUMOF; i++) {
+        if (gpio_int_enabled_table[i]) {
+            GPIO.pin[i].int_type = gpio_int_saved_type[i];
+        }
+    }
+#endif
 }

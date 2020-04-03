@@ -1,0 +1,4 @@
+include $(RIOTMAKE)/boards/sam0.inc.mk
+
+# add the common header files to the include path
+INCLUDES += -I$(RIOTBOARD)/common/saml1x/include

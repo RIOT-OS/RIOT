@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_skald Skald, who advertises to the world
- * @ingroup     net
+ * @defgroup    ble_skald Skald, who advertises to the world
+ * @ingroup     ble
  * @brief       Skald, a minimalistic BLE advertising stack
  *
  * # About

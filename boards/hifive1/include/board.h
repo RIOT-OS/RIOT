@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    boards_hifive SiFive HiFive1 RISC-V board
+ * @defgroup    boards_hifive1 SiFive HiFive1 RISC-V board
  * @ingroup     boards
  * @brief       Support for the SiFive HiFive1 RISC-V board
  * @{
@@ -26,6 +26,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name    Xtimer configuration
+ * @{
+ */
+#define XTIMER_HZ                   (32768UL)
+/** @} */
 
 /**
  * @name    Macros for controlling the on-board LEDs

@@ -25,7 +25,7 @@
  * the array) given by the struct definition.
  *
  * For example, given the following struct and array definitions and assuming
- * a 32 bit platform with strict aligment:
+ * a 32 bit platform with strict alignment:
  *  struct s1 {
  *      int a;      // Takes up 4 bytes
  *      char *name; // Takes up 4 bytes
@@ -60,14 +60,14 @@ extern "C" {
  * UNSAFE MACRO: Difference in bytes between the addresses of two consecutive
  * array elements.
  */
-#define _ARRAY_STRIDE(arr) ((size_t)((uint8_t *)((arr) + 1) - (uint8_t *)(arr)))
+#define _ARRAY_STRIDE(arr) ((size_t)((const uint8_t *)((arr) + 1) - (const uint8_t *)(arr)))
 
 /**
  * UNSAFE MACRO: Offset in bytes from the start of the array to member "member"
  * of the first element.
  */
 #define _ARRAY_MEMBER_OFFS(arr, member) \
-    ((size_t)((uint8_t *)(&((arr)->member)) - (uint8_t *)(arr)))
+    ((size_t)((const uint8_t *)(&((arr)->member)) - (const uint8_t *)(arr)))
 
 /**
  * Find the index of the array element that contains "str" in

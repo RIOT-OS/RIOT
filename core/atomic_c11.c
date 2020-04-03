@@ -41,10 +41,23 @@
 #include <string.h>
 #include "irq.h"
 
+/*
+ * uncrustify mis-formats the macros in this file, so disable it for them.
+ * begin{code-style-ignore}
+ */
+
 /* GCC documentation refers to the types as I1, I2, I4, I8, I16 */
 typedef uint8_t  I1;
 typedef uint16_t I2;
+
+/* the builtins are declared with "unsigned int", but "uint32_t" is typedef'ed
+ * to "long unsigned int" on most platforms where "sizeof(int) == 4. */
+#if __SIZEOF_INT__ == 4
+typedef unsigned int I4;
+#else
 typedef uint32_t I4;
+#endif
+
 typedef uint64_t I8;
 /* typedef __uint128_t I16; */ /* No 128 bit integer support yet */
 
@@ -54,13 +67,13 @@ typedef uint64_t I8;
  * @param[in]  n         width of the data, in bytes
  */
 #define TEMPLATE_ATOMIC_LOAD_N(n) \
-    I##n __atomic_load_##n (I##n *ptr, int memorder) \
+    I##n __atomic_load_##n (const volatile void *ptr, int memorder) \
     { \
-        (void) memorder;                   \
-        unsigned int mask = irq_disable(); \
-        I##n old = *ptr;                   \
-        irq_restore(mask);                 \
-        return old;                        \
+        (void) memorder;                           \
+        unsigned int mask = irq_disable();         \
+        I##n old = *(const volatile I##n *)ptr;    \
+        irq_restore(mask);                         \
+        return old;                                \
     }
 
 /**
@@ -69,11 +82,11 @@ typedef uint64_t I8;
  * @param[in]  n         width of the data, in bytes
  */
 #define TEMPLATE_ATOMIC_STORE_N(n) \
-    void __atomic_store_##n (I##n *ptr, I##n val, int memorder) \
+    void __atomic_store_##n (volatile void *ptr, I##n val, int memorder) \
     { \
         (void) memorder;                   \
         unsigned int mask = irq_disable(); \
-        *ptr = val;                        \
+        *(volatile I##n *)ptr = val;       \
         irq_restore(mask);                 \
     }
 
@@ -83,12 +96,12 @@ typedef uint64_t I8;
  * @param[in]  n         width of the data, in bytes
  */
 #define TEMPLATE_ATOMIC_EXCHANGE_N(n) \
-    I##n __atomic_exchange_##n (I##n *ptr, I##n desired, int memorder) \
+    I##n __atomic_exchange_##n (volatile void *ptr, I##n desired, int memorder) \
     { \
         (void) memorder;                   \
         unsigned int mask = irq_disable(); \
-        I##n old = *ptr;                   \
-        *ptr = desired;                    \
+        I##n old = *(volatile I##n *)ptr;  \
+        *(volatile I##n *)ptr = desired;   \
         irq_restore(mask);                 \
         return old;                        \
     }
@@ -99,21 +112,21 @@ typedef uint64_t I8;
  * @param[in]  n         width of the data, in bytes
  */
 #define TEMPLATE_ATOMIC_COMPARE_EXCHANGE_N(n) \
-    bool __atomic_compare_exchange_##n (I##n *ptr, I##n *expected, I##n desired, \
+    bool __atomic_compare_exchange_##n (volatile void *ptr, void *expected, I##n desired, \
         bool weak, int success_memorder, int failure_memorder) \
     { \
         (void) weak;                       \
         (void) success_memorder;           \
         (void) failure_memorder;           \
         unsigned int mask = irq_disable(); \
-        I##n cur = *ptr;                   \
-        if (cur != *expected) {            \
-            *expected = cur;               \
+        I##n cur = *(volatile I##n *)ptr;  \
+        if (cur != *(I##n *)expected) {    \
+            *(I##n *)expected = cur;       \
             irq_restore(mask);             \
             return false;                  \
         }                                  \
                                            \
-        *ptr = desired;                    \
+        *(volatile I##n *)ptr = desired;   \
         irq_restore(mask);                 \
         return true;                       \
     }
@@ -127,14 +140,14 @@ typedef uint64_t I8;
  * @param[in]  prefixop  optional prefix unary operator (use ~ for inverting, NAND, NOR etc)
  */
 #define TEMPLATE_ATOMIC_FETCH_OP_N(opname, op, n, prefixop) \
-    I##n __atomic_fetch_##opname##_##n(I##n *ptr, I##n val, int memmodel) \
+    I##n __atomic_fetch_##opname##_##n(volatile void *ptr, I##n val, int memmodel) \
     { \
-        unsigned int mask = irq_disable();    \
-        (void)memmodel;                       \
-        I##n tmp = *ptr;                      \
-        *ptr = prefixop(tmp op val);          \
-        irq_restore(mask);                    \
-        return tmp;                           \
+        unsigned int mask = irq_disable();             \
+        (void)memmodel;                                \
+        I##n tmp = *(volatile I##n *)ptr;              \
+        *(volatile I##n *)ptr = prefixop(tmp op val);  \
+        irq_restore(mask);                             \
+        return tmp;                                    \
     }
 
 /**
@@ -146,14 +159,14 @@ typedef uint64_t I8;
  * @param[in]  prefixop  optional prefix unary operator (use ~ for inverting, NAND, NOR etc)
  */
 #define TEMPLATE_ATOMIC_OP_FETCH_N(opname, op, n, prefixop) \
-    I##n __atomic_##opname##_fetch_##n(I##n *ptr, I##n val, int memmodel) \
+    I##n __atomic_##opname##_fetch_##n(volatile void *ptr, I##n val, int memmodel) \
     { \
-        (void)memmodel;                                 \
-        unsigned int mask = irq_disable();              \
-        I##n tmp = prefixop((*ptr) op val);             \
-        *ptr = tmp;                                     \
-        irq_restore(mask);                              \
-        return tmp;                                     \
+        (void)memmodel;                                        \
+        unsigned int mask = irq_disable();                     \
+        I##n tmp = prefixop((*(volatile I##n *)ptr) op val);   \
+        *(volatile I##n *)ptr = tmp;                           \
+        irq_restore(mask);                                     \
+        return tmp;                                            \
     }
 
 /* Template instantiations below */
@@ -237,6 +250,8 @@ TEMPLATE_ATOMIC_OP_FETCH_N(nand, &, 2, ~) /* __atomic_nand_fetch_2 */
 TEMPLATE_ATOMIC_OP_FETCH_N(nand, &, 4, ~) /* __atomic_nand_fetch_4 */
 TEMPLATE_ATOMIC_OP_FETCH_N(nand, &, 8, ~) /* __atomic_nand_fetch_8 */
 
+/* end{code-style-ignore} */
+
 /* ***** Generic versions below ***** */
 
 /* Clang objects if you redefine a builtin.  This little hack allows us to
@@ -257,7 +272,7 @@ TEMPLATE_ATOMIC_OP_FETCH_N(nand, &, 8, ~) /* __atomic_nand_fetch_8 */
  */
 void __atomic_load_c(size_t size, const void *src, void *dest, int memorder)
 {
-    (void) memorder;
+    (void)memorder;
     unsigned int mask = irq_disable();
     memcpy(dest, src, size);
     irq_restore(mask);
@@ -273,7 +288,7 @@ void __atomic_load_c(size_t size, const void *src, void *dest, int memorder)
  */
 void __atomic_store_c(size_t size, void *dest, const void *src, int memorder)
 {
-    (void) memorder;
+    (void)memorder;
     unsigned int mask = irq_disable();
     memcpy(dest, src, size);
     irq_restore(mask);
@@ -288,9 +303,10 @@ void __atomic_store_c(size_t size, void *dest, const void *src, int memorder)
  * @param[in]  ret        put the old value from @p ptr in @p ret
  * @param[in]  memorder   memory ordering, ignored in this implementation
  */
-void __atomic_exchange_c(size_t size, void *ptr, void *val, void *ret, int memorder)
+void __atomic_exchange_c(size_t size, void *ptr, void *val, void *ret,
+                         int memorder)
 {
-    (void) memorder;
+    (void)memorder;
     unsigned int mask = irq_disable();
     memcpy(ret, ptr, size);
     memcpy(ptr, val, size);
@@ -330,7 +346,8 @@ void __atomic_exchange_c(size_t size, void *ptr, void *val, void *ret, int memor
  * @return false otherwise
  */
 bool __atomic_compare_exchange_c(size_t len, void *ptr, void *expected,
-    void *desired, bool weak, int success_memorder, int failure_memorder)
+                                 void *desired, bool weak, int success_memorder,
+                                 int failure_memorder)
 {
     (void)weak;
     (void)success_memorder;
@@ -351,7 +368,8 @@ bool __atomic_compare_exchange_c(size_t len, void *ptr, void *expected,
 #if !defined(__llvm__) && !defined(__clang__)
 /* Memory barrier helper function, for platforms without barrier instructions */
 void __sync_synchronize(void) __attribute__((__weak__));
-void __sync_synchronize(void) {
+void __sync_synchronize(void)
+{
     /* ARMv4, ARMv5 do not have any hardware support for memory barriers,
      * This is a software only barrier and a no-op, and will likely break on SMP
      * systems, but we don't support any multi-CPU ARMv5 or ARMv4 boards in RIOT

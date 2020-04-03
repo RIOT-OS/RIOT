@@ -25,7 +25,7 @@
 #include <stdbool.h>
 
 #include "kernel_types.h"
-#include "net/gnrc.h"
+#include "net/gnrc/pkt.h"
 #include "net/gnrc/priority_pktqueue.h"
 #include "net/ieee802154.h"
 #include "net/gnrc/mac/mac.h"

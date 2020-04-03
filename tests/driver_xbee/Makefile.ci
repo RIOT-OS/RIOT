@@ -1,0 +1,14 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-duemilanove \
+    arduino-leonardo \
+    arduino-nano \
+    arduino-uno \
+    atmega328p \
+    nucleo-f030r8 \
+    nucleo-f031k6 \
+    nucleo-f042k6 \
+    nucleo-f334r8 \
+    stm32f030f4-demo \
+    stm32f0discovery \
+    waspmote-pro \
+    #

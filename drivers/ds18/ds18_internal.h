@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     drivers_sensors
+ * @ingroup     drivers_ds18
  * @{
  *
  * @file

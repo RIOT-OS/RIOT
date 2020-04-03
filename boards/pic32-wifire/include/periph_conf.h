@@ -20,6 +20,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "cpu.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
@@ -42,16 +43,24 @@ extern "C" {
 
 /**
   * @name    UART Definitions
-  *          There are 6 UARTS available on this CPU.
-  *          We route debug via UART4 on this board,
-  *          this is the UART connected to the FTDI USB <-> UART device.
-  *
-  *          Note Microchip number the UARTS 1->4.
   * @{
   */
-#define UART_NUMOF          (6)
-#define DEBUG_VIA_UART      (4)
-#define DEBUG_UART_BAUD     (9600)
+static const uart_conf_t uart_config[] = {
+    {   /* Virtual COM port */
+        .base       = (volatile unsigned int *)_UART4_BASE_ADDRESS,
+        .clock      = PERIPHERAL_CLOCK,
+        .rx_pin     = GPIO_PIN(PORT_F, 2),
+        .tx_pin     = GPIO_PIN(PORT_F, 8),
+        .rx_mux_reg = &U4RXR,
+        .tx_mux_reg = &RPF8R,
+        .rx_af      = GPIO_AF11,
+        .tx_af      = GPIO_AF2,
+        .vector     = _UART4_RX_VECTOR,
+    },
+};
+
+#define UART_0_ISR          (isr_usart4)
+#define UART_NUMOF          ((unsigned int)ARRAY_SIZE(uart_config))
 /** @} */
 
 #ifdef __cplusplus

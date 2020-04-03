@@ -1,11 +1,6 @@
-## the cpu to build for
-export CPU = cc430
-export CPU_MODEL = cc430f6137
-
 # flasher configuration
-export FLASHER = mspdebug
-export FFLAGS = rf2500 "prog $(HEXFILE)"
+FLASHFILE ?= $(HEXFILE)
+FLASHER = mspdebug
+FFLAGS = rf2500 "prog $(FLASHFILE)"
 
-INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include
-
-USEMODULE += chronos-drivers
+INCLUDES += -I$(RIOTBOARD)/chronos/drivers/include

@@ -95,7 +95,7 @@ extern "C" {
  * pointer to a valid on-link entry representing the neighbor that sent the
  * Router Solicitation.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_ROUTER != 0
  */
 #define GNRC_IPV6_NIB_REPLY_RS              (0x4fc5U)
 
@@ -107,7 +107,7 @@ extern "C" {
  * which the Router Advertisement will be sent and by which parameters it will
  * be configured.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_ROUTER != 0
  */
 #define GNRC_IPV6_NIB_SND_MC_RA             (0x4fc6U)
 
@@ -118,7 +118,7 @@ extern "C" {
  * The expected message context is a pointer to a valid on-link entry
  * representing the neighbor cache entry that faces a state change.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ARSM != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0
  */
 #define GNRC_IPV6_NIB_REACH_TIMEOUT         (0x4fc7U)
 
@@ -129,7 +129,7 @@ extern "C" {
  * The expected message context is a pointer to a valid on-link entry
  * representing the neighbor cache entry that faces a state change.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ARSM != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0
  */
 #define GNRC_IPV6_NIB_DELAY_TIMEOUT         (0x4fc8U)
 
@@ -140,7 +140,7 @@ extern "C" {
  * timeout. The expected message context is a pointer to a valid on-link entry
  * representing the neighbor which faces a timeout of its address registration.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_6LR != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_6LR != 0
  */
 #define GNRC_IPV6_NIB_ADDR_REG_TIMEOUT      (0x4fc9U)
 
@@ -151,7 +151,7 @@ extern "C" {
  * The expected message context is the NIB-internal state of the authoritative
  * border router.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_MULTIHOP_P6C != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C != 0
  */
 #define GNRC_IPV6_NIB_ABR_TIMEOUT           (0x4fcbU)
 
@@ -178,7 +178,7 @@ extern "C" {
  * time. The expected message context is a valid
  * [interface](@ref net_gnrc_netif).
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ARSM != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0
  */
 #define GNRC_IPV6_NIB_RECALC_REACH_TIME     (0x4fceU)
 
@@ -189,7 +189,7 @@ extern "C" {
  * upstream router. The expected message context is an IPv6 address assigned to
  * one of the nodes interfaces.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_6LN != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_6LN != 0
  */
 #define GNRC_IPV6_NIB_REREG_ADDRESS         (0x4fcfU)
 
@@ -199,7 +199,7 @@ extern "C" {
  * This message type is for the event of a route timeout. The expected message
  * context is a valid off-link entry representing the route.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_ROUTER != 0
  */
 #define GNRC_IPV6_NIB_ROUTE_TIMEOUT         (0x4fd0U)
 
@@ -209,7 +209,7 @@ extern "C" {
  * This message type is for performing DAD for a given address. The expected
  * message context is a TENTATIVE IPv6 address.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_SLAAC != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_SLAAC != 0
  */
 #define GNRC_IPV6_NIB_DAD                   (0x4fd1U)
 
@@ -219,7 +219,7 @@ extern "C" {
  * Moves a TENTATIVE address to VALID state. The expected message context is a
  * TENTATIVE IPv6 address.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_SLAAC != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_SLAAC != 0
  */
 #define GNRC_IPV6_NIB_VALID_ADDR            (0x4fd2U)
 
@@ -230,7 +230,7 @@ extern "C" {
  * The expected message context is the [UDP end point](@ref sock_udp_ep_t)
  * representing the DNS server.
  *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_DNS != 0
+ * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_DNS != 0
  */
 #define GNRC_IPV6_NIB_RDNSS_TIMEOUT         (0x4fd3U)
 /** @} */
@@ -282,7 +282,7 @@ enum {
      * might however get an INCOMPLETE or STALE notification due to that, as
      * soon as the neighbor enters the neighbor cache again).
      *
-     * Be adviced to only use `ctx_addr` in the context of the callback, since
+     * Be advised to only use `ctx_addr` in the context of the callback, since
      * it might be overwritten, after the callback was left.
      */
     GNRC_IPV6_NIB_ROUTE_INFO_TYPE_NSC,
@@ -379,7 +379,7 @@ void gnrc_ipv6_nib_handle_pkt(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
  */
 void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type);
 
-#if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) || defined(DOXYGEN)
 /**
  * @brief   Changes the state if an interface advertises itself as a router
  *          or not

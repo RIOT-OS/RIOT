@@ -1,0 +1,120 @@
+From 59d78b78b683c9212949d4950355ea5f424c1da9 Mon Sep 17 00:00:00 2001
+From: Simon Goldschmidt <goldsimon@gmx.de>
+Date: Sat, 13 Jul 2019 20:46:36 +0200
+Subject: [PATCH] netconn: add callback arg storage
+
+This reuses the member 'int socket' by making it a union containing
+both int and void pointer.
+
+See bug #56593.
+
+Signed-off-by: Simon Goldschmidt <goldsimon@gmx.de>
+Suggested-by: Wilfred <wilfrednilsen@hotmail.com>
+(cherry picked from commit 5465fdfd6988354e77dc0e7a6117303d4c87cbd0)
+---
+ src/api/api_msg.c      |  4 +---
+ src/api/sockets.c      | 14 +++++++-------
+ src/include/lwip/api.h | 11 +++++++----
+ 3 files changed, 15 insertions(+), 14 deletions(-)
+
+diff --git a/src/api/api_msg.c b/src/api/api_msg.c
+index 39531024..19218de3 100644
+--- a/src/api/api_msg.c
++++ b/src/api/api_msg.c
+@@ -756,10 +756,8 @@ netconn_alloc(enum netconn_type t, netconn_callback callback)
+   sys_mbox_set_invalid(&conn->acceptmbox);
+ #endif
+   conn->state        = NETCONN_NONE;
+-#if LWIP_SOCKET
+   /* initialize socket to -1 since 0 is a valid socket */
+-  conn->socket       = -1;
+-#endif /* LWIP_SOCKET */
++  conn->callback_arg.socket = -1;
+   conn->callback     = callback;
+ #if LWIP_TCP
+   conn->current_msg  = NULL;
+diff --git a/src/api/sockets.c b/src/api/sockets.c
+index cb7df914..ce12af1e 100644
+--- a/src/api/sockets.c
++++ b/src/api/sockets.c
+@@ -666,8 +666,8 @@ lwip_accept(int s, struct sockaddr *addr, socklen_t *addrlen)
+    * so nsock->rcvevent is >= 1 here!
+    */
+   SYS_ARCH_PROTECT(lev);
+-  recvevent = (s16_t)(-1 - newconn->socket);
+-  newconn->socket = newsock;
++  recvevent = (s16_t)(-1 - newconn->callback_arg.socket);
++  newconn->callback_arg.socket = newsock;
+   SYS_ARCH_UNPROTECT(lev);
+ 
+   if (newconn->callback) {
+@@ -1735,7 +1735,7 @@ lwip_socket(int domain, int type, int protocol)
+     set_errno(ENFILE);
+     return -1;
+   }
+-  conn->socket = i;
++  conn->callback_arg.socket = i;
+   done_socket(&sockets[i - LWIP_SOCKET_OFFSET]);
+   LWIP_DEBUGF(SOCKETS_DEBUG, ("%d\n", i));
+   set_errno(0);
+@@ -2484,7 +2484,7 @@ event_callback(struct netconn *conn, enum netconn_evt evt, u16_t len)
+ 
+   /* Get socket */
+   if (conn) {
+-    s = conn->socket;
++    s = conn->callback_arg.socket;
+     if (s < 0) {
+       /* Data comes in right away after an accept, even though
+        * the server task might not have created a new socket yet.
+@@ -2492,16 +2492,16 @@ event_callback(struct netconn *conn, enum netconn_evt evt, u16_t len)
+        * will use the data later. Note that only receive events
+        * can happen before the new socket is set up. */
+       SYS_ARCH_PROTECT(lev);
+-      if (conn->socket < 0) {
++      if (conn->callback_arg.socket < 0) {
+         if (evt == NETCONN_EVT_RCVPLUS) {
+           /* conn->socket is -1 on initialization
+              lwip_accept adjusts sock->recvevent if conn->socket < -1 */
+-          conn->socket--;
++          conn->callback_arg.socket--;
+         }
+         SYS_ARCH_UNPROTECT(lev);
+         return;
+       }
+-      s = conn->socket;
++      s = conn->callback_arg.socket;
+       SYS_ARCH_UNPROTECT(lev);
+     }
+ 
+diff --git a/src/include/lwip/api.h b/src/include/lwip/api.h
+index c2afaf26..d6e8fa1f 100644
+--- a/src/include/lwip/api.h
++++ b/src/include/lwip/api.h
+@@ -246,10 +246,10 @@ struct netconn {
+       all threads when closing while threads are waiting. */
+   int mbox_threads_waiting;
+ #endif
+-  /** only used for socket layer */
+-#if LWIP_SOCKET
+-  int socket;
+-#endif /* LWIP_SOCKET */
++  union {
++    int socket;
++    void *ptr;
++  } callback_arg;
+ #if LWIP_SO_SNDTIMEO
+   /** timeout to wait for sending data (which means enqueueing data for sending
+       in internal buffers) in milliseconds */
+@@ -373,6 +373,9 @@ err_t   netconn_err(struct netconn *conn);
+ #define netconn_clear_flags(conn, clr_flags)   do { (conn)->flags = (u8_t)((conn)->flags & (u8_t)(~(clr_flags) & 0xff)); } while(0)
+ #define netconn_is_flag_set(conn, flag)        (((conn)->flags & (flag)) != 0)
+ 
++#define netconn_set_callback_arg(conn, arg)   do { (conn)->callback_arg.ptr = (arg); } while(0)
++#define netconn_get_callback_arg(conn)        ((conn)->callback_arg.ptr)
++
+ /** Set the blocking status of netconn calls (@todo: write/send is missing) */
+ #define netconn_set_nonblocking(conn, val)  do { if(val) { \
+   netconn_set_flags(conn, NETCONN_FLAG_NON_BLOCKING); \
+-- 
+2.25.1
+

@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 void gdbstub_init(void);
+void gdbstub_do_break(void);
 
 #ifdef __cplusplus
 }

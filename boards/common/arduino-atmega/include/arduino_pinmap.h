@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
  *               2016 Laurent Navet <laurent.navet@gmail.com>
+ *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,6 +21,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Daniel Nordahl <nordahl.d@gmail.com>
  * @author      Laurent Navet <laurent.navet@gmail.com>
+ * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  */
 
 #ifndef ARDUINO_PINMAP_H
@@ -69,6 +71,51 @@ extern "C" {
 #define ARDUINO_PIN_A3          ARDUINO_PIN_17
 #define ARDUINO_PIN_A4          ARDUINO_PIN_18
 #define ARDUINO_PIN_A5          ARDUINO_PIN_19
+#endif
+
+#ifdef CPU_ATMEGA32U4
+/* Digital pins */
+#define ARDUINO_PIN_0           GPIO_PIN(PORT_D, 2)
+#define ARDUINO_PIN_1           GPIO_PIN(PORT_D, 3)
+#define ARDUINO_PIN_2           GPIO_PIN(PORT_D, 1)
+#define ARDUINO_PIN_3           GPIO_PIN(PORT_D, 0)
+#define ARDUINO_PIN_5           GPIO_PIN(PORT_C, 6)
+#define ARDUINO_PIN_7           GPIO_PIN(PORT_E, 6)
+#define ARDUINO_PIN_11          GPIO_PIN(PORT_B, 7)
+#define ARDUINO_PIN_13          GPIO_PIN(PORT_C, 7)
+#define ARDUINO_PIN_14          GPIO_PIN(PORT_B, 3)
+#define ARDUINO_PIN_15          GPIO_PIN(PORT_B, 1)
+#define ARDUINO_PIN_16          GPIO_PIN(PORT_B, 2)
+#define ARDUINO_PIN_17          GPIO_PIN(PORT_B, 0)
+#define ARDUINO_PIN_30          GPIO_PIN(PORT_D, 5)
+
+/* Analog pins */
+#define ARDUINO_PIN_4           GPIO_PIN(PORT_D, 4)
+#define ARDUINO_PIN_6           GPIO_PIN(PORT_D, 7)
+#define ARDUINO_PIN_8           GPIO_PIN(PORT_B, 4)
+#define ARDUINO_PIN_9           GPIO_PIN(PORT_B, 5)
+#define ARDUINO_PIN_10          GPIO_PIN(PORT_B, 6)
+#define ARDUINO_PIN_12          GPIO_PIN(PORT_D, 6)
+#define ARDUINO_PIN_18          GPIO_PIN(PORT_F, 7)
+#define ARDUINO_PIN_19          GPIO_PIN(PORT_F, 6)
+#define ARDUINO_PIN_20          GPIO_PIN(PORT_F, 5)
+#define ARDUINO_PIN_21          GPIO_PIN(PORT_F, 4)
+#define ARDUINO_PIN_22          GPIO_PIN(PORT_F, 3)
+#define ARDUINO_PIN_23          GPIO_PIN(PORT_F, 2)
+
+/* Analog input */
+#define ARDUINO_PIN_A0          ARDUINO_PIN_18
+#define ARDUINO_PIN_A1          ARDUINO_PIN_19
+#define ARDUINO_PIN_A2          ARDUINO_PIN_20
+#define ARDUINO_PIN_A3          ARDUINO_PIN_21
+#define ARDUINO_PIN_A4          ARDUINO_PIN_22
+#define ARDUINO_PIN_A5          ARDUINO_PIN_23
+#define ARDUINO_PIN_A6          ARDUINO_PIN_4
+#define ARDUINO_PIN_A7          ARDUINO_PIN_6
+#define ARDUINO_PIN_A8          ARDUINO_PIN_8
+#define ARDUINO_PIN_A9          ARDUINO_PIN_9
+#define ARDUINO_PIN_A10         ARDUINO_PIN_10
+#define ARDUINO_PIN_A11         ARDUINO_PIN_12
 #endif
 
 #ifdef CPU_ATMEGA2560

@@ -96,10 +96,10 @@ static void test_nib_pl_set__EINVAL_pfx_len(void)
                                                         UINT32_MAX));
 }
 
-#if GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF
-#define MAX_NUMOF   (GNRC_IPV6_NIB_NUMOF)
-#else /* GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF */
-#define MAX_NUMOF   (GNRC_IPV6_NIB_OFFL_NUMOF)
+#if CONFIG_GNRC_IPV6_NIB_NUMOF < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF
+#define MAX_NUMOF   (CONFIG_GNRC_IPV6_NIB_NUMOF)
+#else /* CONFIG_GNRC_IPV6_NIB_NUMOF < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF */
+#define MAX_NUMOF   (CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF)
 #endif
 
 /*
@@ -126,7 +126,7 @@ static void test_nib_pl_set__ENOMEM_diff_iface(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_OFFL_NUMOF prefix list entries with different prefix of
+ * Creates CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF prefix list entries with different prefix of
  * the same length and then tries to create another one
  * Expected result: gnrc_ipv6_nib_pl_set() returns -ENOMEM
  */
@@ -135,7 +135,7 @@ static void test_nib_pl_set__ENOMEM_diff_pfx(void)
     ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                { .u64 = TEST_UINT64 } } };
 
-    for (unsigned i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx,
                                                       GLOBAL_PREFIX_LEN,
                                                       UINT32_MAX, UINT32_MAX));
@@ -148,7 +148,7 @@ static void test_nib_pl_set__ENOMEM_diff_pfx(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_OFFL_NUMOF prefix list entries with different prefix of
+ * Creates CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF prefix list entries with different prefix of
  * the same length and different interfaces and then tries to create another one
  * Expected result: gnrc_ipv6_nib_pl_set() returns -ENOMEM
  */
@@ -172,7 +172,7 @@ static void test_nib_pl_set__ENOMEM_diff_iface_pfx(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_OFFL_NUMOF prefix list entries with prefixes of
+ * Creates CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF prefix list entries with prefixes of
  * different length and then tries to create another one
  * Expected result: gnrc_ipv6_nib_pl_set() returns -ENOMEM
  */
@@ -182,7 +182,7 @@ static void test_nib_pl_set__ENOMEM_diff_pfx_len(void)
                                             { .u64 = TEST_UINT64 } } };
     unsigned pfx_len = GLOBAL_PREFIX_LEN;
 
-    for (unsigned i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx, pfx_len,
                                                       UINT32_MAX, UINT32_MAX));
         pfx_len--;
@@ -215,7 +215,7 @@ static void test_nib_pl_set__ENOMEM_diff_iface_pfx_len(void)
 }
 
 /*
- * Creates GNRC_IPV6_NIB_OFFL_NUMOF prefix list entries with different prefixes
+ * Creates CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF prefix list entries with different prefixes
  * and then tries to create another one
  * Expected result: gnrc_ipv6_nib_pl_set() returns -ENOMEM
  */
@@ -225,7 +225,7 @@ static void test_nib_pl_set__ENOMEM_diff_pfx_pfx_len(void)
                                  { .u64 = TEST_UINT64 } } };
     unsigned pfx_len = GLOBAL_PREFIX_LEN;
 
-    for (unsigned i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx, pfx_len,
                                                       UINT32_MAX, UINT32_MAX));
         pfx_len--;
@@ -335,8 +335,8 @@ static void test_nib_pl_set__success(void)
 /*
  * Creates MAX_NUMOF prefix list entries with different prefix and interfaces
  * and then tries to delete one with yet another prefix and interface.
- * Expected result: There should be still GNRC_IPV6_NIB_NUMOF entries in the
- * neigbor cache
+ * Expected result: There should be still CONFIG_GNRC_IPV6_NIB_NUMOF entries in the
+ * neighbor cache
  */
 static void test_nib_pl_del__unknown(void)
 {

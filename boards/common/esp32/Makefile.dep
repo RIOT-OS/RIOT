@@ -1,4 +1,4 @@
-include $(RIOTCPU)/esp32/Makefile.dep
+USEMODULE += boards_common_esp32
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio

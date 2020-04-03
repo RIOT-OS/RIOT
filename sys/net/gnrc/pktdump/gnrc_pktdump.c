@@ -73,6 +73,12 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
             hdr_len = sizeof(ipv6_hdr_t);
             break;
 #endif
+#ifdef MODULE_GNRC_IPV6_EXT
+        case GNRC_NETTYPE_IPV6_EXT:
+            printf("NETTYPE_IPV6_EXT (%i)\n", pkt->type);
+            od_hex_dump(pkt->data, pkt->size, OD_WIDTH_DEFAULT);
+            break;
+#endif
 #ifdef MODULE_GNRC_ICMPV6
         case GNRC_NETTYPE_ICMPV6:
             printf("NETTYPE_ICMPV6 (%i)\n", pkt->type);
@@ -103,6 +109,12 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
 #ifdef MODULE_NDN_RIOT
     case GNRC_NETTYPE_NDN:
             printf("NETTYPE_NDN (%i)\n", pkt->type);
+            od_hex_dump(pkt->data, pkt->size, OD_WIDTH_DEFAULT);
+        break;
+#endif
+#ifdef MODULE_GNRC_LORAWAN
+    case GNRC_NETTYPE_LORAWAN:
+            printf("NETTYPE_LORAWAN (%i)\n", pkt->type);
             od_hex_dump(pkt->data, pkt->size, OD_WIDTH_DEFAULT);
         break;
 #endif

@@ -24,7 +24,7 @@
  * synchronous or asynchronous manner. For synchronous operation, the application
  * can call tsl4531x_simple_read, and the driver will block for the integration
  * time defined in the initialization parameters (plus a small margin, to encompass
- * the max times indicated in the datasheet). For asyncronous operation, the
+ * the max times indicated in the datasheet). For asynchronous operation, the
  * application needs to use the functions tsl4531x_start_sample,
  * tsl4531x_time_until_sample_ready and tsl4531x_get_sample, as described in those
  * functions' descriptions.

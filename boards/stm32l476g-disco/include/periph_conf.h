@@ -20,6 +20,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "cfg_rtt_default.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -85,7 +86,7 @@ static const timer_conf_t timer_config[] = {
 
 #define TIMER_0_ISR         isr_tim5
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -102,6 +103,8 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
+        .type       = STM32_USART,
+        .clk_src    = 0, /* Use APB clock */
 #ifdef UART_USE_DMA
         .dma_stream = 6,
         .dma_chan   = 4
@@ -111,32 +114,7 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_0_ISR          (isr_usart2)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
-/** @} */
-
-/**
- * @name    ADC configuration
- * @{
- */
-#define ADC_NUMOF           (0)
-/** @} */
-
-/**
- * @name    RTT configuration
- *
- * On the STM32Lx platforms, we always utilize the LPTIM1.
- * @{
- */
-#define RTT_NUMOF           (1)
-#define RTT_FREQUENCY       (1024U)             /* 32768 / 2^n */
-#define RTT_MAX_VALUE       (0x0000ffff)        /* 16-bit timer */
-/** @} */
-
-/**
- * @name   RTC configuration
- * @{
- */
-#define RTC_NUMOF           (1)
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 #ifdef __cplusplus

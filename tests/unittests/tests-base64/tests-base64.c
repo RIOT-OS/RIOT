@@ -11,6 +11,7 @@
 #if (TEST_BASE64_SHOW_OUTPUT == 1)
 #include <stdio.h>
 #endif
+#include <stdint.h>
 #include <string.h>
 #include "embUnit.h"
 #include "tests-base64.h"
@@ -383,6 +384,106 @@ static void test_base64_09_encode_size_determination(void)
     TEST_ASSERT_EQUAL_INT(required_out_size, expected_out_size);
 }
 
+static void test_base64_10_encode_empty(void)
+{
+    unsigned char data_in[] = "";
+
+    size_t base64_out_size = 8;
+    unsigned char base64_out[8];
+
+    int ret = base64_encode(data_in, 0, base64_out, &base64_out_size);
+
+    TEST_ASSERT_EQUAL_INT(BASE64_SUCCESS, ret);
+    TEST_ASSERT_EQUAL_INT(0, base64_out_size);
+}
+
+static void test_base64_10_decode_empty(void)
+{
+    unsigned char data_in[] = "";
+
+    size_t base64_out_size = 8;
+    unsigned char base64_out[8];
+
+    int ret = base64_decode(data_in, 0, base64_out, &base64_out_size);
+
+    TEST_ASSERT_EQUAL_INT(BASE64_SUCCESS, ret);
+    TEST_ASSERT_EQUAL_INT(0, base64_out_size);
+}
+
+static void test_base64_11_urlsafe_encode_int(void)
+{
+    uint32_t data_in = 4345;
+    unsigned char expected_encoding[] = "-RAAAA==";
+
+    size_t base64_out_size = 0;
+    unsigned char base64_out[ strlen((char *)expected_encoding) ];
+
+    /*
+    * @Note:
+    * The first encoding attempt fails, but reveals the required out size.
+    *
+    * This size is a lower bound estimation,
+    * thus it can require few more bytes then the actual used size for the output.
+    */
+    int ret = base64url_encode((void *)&data_in, sizeof(data_in), NULL, &base64_out_size);
+
+    TEST_ASSERT_EQUAL_INT(BASE64_ERROR_BUFFER_OUT_SIZE, ret);
+
+    ret = base64url_encode((void *)&data_in, sizeof(data_in), base64_out, &base64_out_size);
+
+    TEST_ASSERT_EQUAL_INT(BASE64_SUCCESS, ret);
+
+    for (int i = 0; i < (int)base64_out_size; ++i) {
+        TEST_ASSERT_MESSAGE(base64_out[i] == expected_encoding[i], \
+                            "encoding failed!(produced unexpected output)");
+    }
+
+#if (TEST_BASE64_SHOW_OUTPUT == 1)
+    puts("Test 11 Encoded:");
+
+    for (int i = 0; i < (int)base64_out_size; ++i) {
+        printf("%c", base64_out[i]);
+    }
+
+    printf("\nFrom:\n%x\n", data_in);
+#endif
+}
+
+static void test_base64_12_urlsafe_decode_int(void)
+{
+    unsigned char encoded_base64[] = "_____wAA==";
+    unsigned char expected[]       = {0xFF, 0xFF, 0xFF, 0xFF, 0x0, 0x0};
+
+    size_t base64_size = strlen((char *)encoded_base64);
+
+    size_t data_out_size = 0;
+    unsigned char data_out[ sizeof(expected) ];
+
+    int ret = base64_decode(encoded_base64, base64_size, NULL, &data_out_size);
+    TEST_ASSERT_EQUAL_INT(BASE64_ERROR_BUFFER_OUT_SIZE, ret);
+
+    ret = base64_decode(encoded_base64, base64_size, NULL, &data_out_size);
+    TEST_ASSERT_EQUAL_INT(BASE64_ERROR_BUFFER_OUT, ret);
+
+    ret = base64_decode(encoded_base64, base64_size, data_out, &data_out_size);
+    TEST_ASSERT_EQUAL_INT(BASE64_SUCCESS, ret);
+
+    for (int i = 0; i < (int)data_out_size; ++i) {
+        TEST_ASSERT_MESSAGE(data_out[i] == expected[i], \
+                            "decoding failed!(produced unexpected output)");
+    }
+
+#if (TEST_BASE64_SHOW_OUTPUT == 1)
+    puts("Test 11 Decoded:");
+
+    for (int i = 0; i < (int)data_out_size; ++i) {
+        printf("%x", data_out[i]);
+    }
+
+    printf("\nFrom:\n%x\n", (char *)encoded_base64);
+#endif
+}
+
 Test *tests_base64_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -395,6 +496,10 @@ Test *tests_base64_tests(void)
         new_TestFixture(test_base64_07_stream_decode),
         new_TestFixture(test_base64_08_encode_16_bytes),
         new_TestFixture(test_base64_09_encode_size_determination),
+        new_TestFixture(test_base64_10_encode_empty),
+        new_TestFixture(test_base64_10_decode_empty),
+        new_TestFixture(test_base64_11_urlsafe_encode_int),
+        new_TestFixture(test_base64_12_urlsafe_decode_int),
     };
 
     EMB_UNIT_TESTCALLER(base64_tests, NULL, NULL, fixtures);

@@ -19,7 +19,7 @@
 #include "crypto/ciphers.h"
 
 
-int cipher_init(cipher_t* cipher, cipher_id_t cipher_id, const uint8_t* key,
+int cipher_init(cipher_t *cipher, cipher_id_t cipher_id, const uint8_t *key,
                 uint8_t key_size)
 {
     if (key_size > cipher_id->max_key_size) {
@@ -32,19 +32,21 @@ int cipher_init(cipher_t* cipher, cipher_id_t cipher_id, const uint8_t* key,
 }
 
 
-int cipher_encrypt(const cipher_t* cipher, const uint8_t* input, uint8_t* output)
+int cipher_encrypt(const cipher_t *cipher, const uint8_t *input,
+                   uint8_t *output)
 {
     return cipher->interface->encrypt(&cipher->context, input, output);
 }
 
 
-int cipher_decrypt(const cipher_t* cipher, const uint8_t* input, uint8_t* output)
+int cipher_decrypt(const cipher_t *cipher, const uint8_t *input,
+                   uint8_t *output)
 {
     return cipher->interface->decrypt(&cipher->context, input, output);
 }
 
 
-int cipher_get_block_size(const cipher_t* cipher)
+int cipher_get_block_size(const cipher_t *cipher)
 {
     return cipher->interface->block_size;
 }

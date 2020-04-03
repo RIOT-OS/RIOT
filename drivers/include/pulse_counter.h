@@ -61,11 +61,11 @@ int pulse_counter_init(pulse_counter_t *dev, const pulse_counter_params_t *param
 /**
  * @brief   Read and reset pulse counter value
  *
- * @param[in]  dev          device descriptor of sensor
+ * @param[out] dev          device descriptor of sensor
  *
  * @return                  Accumulated pulse counts
  */
-int16_t pulse_counter_read_with_reset(const void *dev);
+int16_t pulse_counter_read_with_reset(pulse_counter_t *dev);
 
 /**
  * @brief   Read pulse counter value
@@ -74,14 +74,14 @@ int16_t pulse_counter_read_with_reset(const void *dev);
  *
  * @return                  Accumulated pulse counts
  */
-int16_t pulse_counter_read_without_reset(const void *dev);
+int16_t pulse_counter_read_without_reset(const pulse_counter_t *dev);
 
 /**
  * @brief   Reset pulse counter value
  *
- * @param[in]  dev          device descriptor of sensor
+ * @param[out] dev         device descriptor of sensor
  */
-void pulse_counter_reset(const void *dev);
+void pulse_counter_reset(pulse_counter_t *dev);
 
 #ifdef __cplusplus
 }

@@ -40,7 +40,7 @@ int nrf24l01p_read_reg(const nrf24l01p_t *dev, char reg, char *answer)
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
     *answer = (char)spi_transfer_reg(dev->spi, dev->cs,
                                      (CMD_R_REGISTER | (REGISTER_MASK & reg)),
-                                     CMD_NOP);
+                                     CMD_NOOP);
     /* Release the bus for other threads. */
     spi_release(dev->spi);
 
@@ -106,7 +106,7 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
         return status;
     }
 
-    /* Setup adress width */
+    /* Setup address width */
     status = nrf24l01p_set_address_width(dev, NRF24L01P_AW_5BYTE);
 
     if (status < 0) {
@@ -148,7 +148,7 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
         return status;
     }
 
-    /* Set RX Adress */
+    /* Set RX Address */
     status = nrf24l01p_set_rx_address(dev, NRF24L01P_PIPE0, INITIAL_RX_ADDRESS, INITIAL_ADDRESS_WIDTH);
 
     if (status < 0) {
@@ -581,7 +581,7 @@ int nrf24l01p_get_status(const nrf24l01p_t *dev)
 
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
-    status = spi_transfer_byte(dev->spi, dev->cs, false, CMD_NOP);
+    status = spi_transfer_byte(dev->spi, dev->cs, false, CMD_NOOP);
     /* Release the bus for other threads. */
     spi_release(dev->spi);
 
@@ -618,30 +618,13 @@ int nrf24l01p_set_power(const nrf24l01p_t *dev, int pwr)
     return nrf24l01p_write_reg(dev, REG_RF_SETUP, rf_setup);
 }
 
+static const int8_t _nrf24l01p_power_map[4] = { -18, -12, -6, 0 };
+
 int nrf24l01p_get_power(const nrf24l01p_t *dev)
 {
     char rf_setup;
-    int pwr;
-
     nrf24l01p_read_reg(dev, REG_RF_SETUP, &rf_setup);
-
-    if ((rf_setup & 0x6) == 0) {
-        pwr = -18;
-    }
-
-    if ((rf_setup & 0x6) == 2) {
-        pwr = -12;
-    }
-
-    if ((rf_setup & 0x6) == 4) {
-        pwr = -6;
-    }
-
-    if ((rf_setup & 0x6) == 6) {
-        pwr = 0;
-    }
-
-    return pwr;
+    return _nrf24l01p_power_map[(rf_setup & 0x6) >> 1];
 }
 
 

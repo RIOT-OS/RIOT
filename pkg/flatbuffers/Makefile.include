@@ -1,0 +1,11 @@
+INCLUDES += -I$(PKGDIRBASE)/flatbuffers/include
+
+FLATC ?= flatc
+
+ifneq (0,$(shell which flatc 2>&1 > /dev/null ; echo $$?))
+  FLATC = $(RIOTTOOLS)/flatc/flatc
+  $(call target-export-variables,all,FLATC)
+endif
+
+# This module requires cpp11 support
+CXXEXFLAGS += -std=c++11

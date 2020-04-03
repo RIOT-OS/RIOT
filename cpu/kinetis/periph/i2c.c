@@ -23,6 +23,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <errno.h>
 
@@ -114,22 +115,22 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
+    assert(dev < I2C_NUMOF);
     /* Check that the bus was properly stopped before releasing */
     /* It is a programming error to release the bus after sending a start
      * condition but before sending a stop condition */
     assert(i2c_state[dev].active == 0);
 
     mutex_unlock(&i2c_state[dev].mtx);
-    return 0;
 }
 
 static uint8_t i2c_find_divider(unsigned freq, unsigned speed)
 {
     unsigned diff = UINT_MAX;
     /* Use maximum divider if nothing matches */
-    uint8_t F = sizeof(i2c_dividers) / sizeof(i2c_dividers[0]) - 1;
+    uint8_t F = ARRAY_SIZE(i2c_dividers) - 1;
     /* We avoid using the MULT field to simplify the driver and avoid having to
      * work around hardware errata on some Kinetis parts
      *
@@ -151,7 +152,7 @@ static uint8_t i2c_find_divider(unsigned freq, unsigned speed)
      *    the I2Cx_F [MULT] field to the original value after the repeated start
      *    has occurred
      */
-    for (unsigned k = 0; k < sizeof(i2c_dividers) / sizeof(i2c_dividers[0]); ++k) {
+    for (unsigned k = 0; k < ARRAY_SIZE(i2c_dividers); ++k) {
         /* Test dividers until we find one that gives a good match */
         unsigned lim = (speed * i2c_dividers[k]);
         if (lim >= freq) {
@@ -380,8 +381,10 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t fla
         /* Initiate master receive mode by reading the data register once when
          * the C1[TX] bit is cleared and C1[MST] is set */
         volatile uint8_t dummy;
+        /* cppcheck-suppress unreadVariable
+         * (reason: needed to empty D register) */
         dummy = i2c->D;
-        ++dummy;
+        (void)dummy;
         /* Wait until the ISR signals back */
         TRACE("i2c: read C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
         thread_flags_t tflg = thread_flags_wait_any(THREAD_FLAG_KINETIS_I2C | THREAD_FLAG_TIMEOUT);
@@ -471,21 +474,21 @@ static void i2c_irq_mst_tx_handler(I2C_Type *i2c, i2c_state_t *state, uint8_t S)
     assert(len != 0); /* This only happens if this periph driver is broken */
     --len;
     state->tx.bytes_left = len;
-    if (len == 0) {
+    if (S & I2C_S_RXAK_MASK) {
+        /* NACK */
+        /* Abort master transfer */
+        DEBUG("i2c: NACK\n");
+        bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
+        state->active = 0;
+        state->retval = -EIO;
+        i2c_irq_signal_done(i2c, state->pid);
+    }
+    else if (len == 0) {
         /* We are done, NACK on the last byte is OK */
         DEBUG("i2c: TX done\n");
         i2c_irq_signal_done(i2c, state->pid);
     }
     else {
-        if (S & I2C_S_RXAK_MASK) {
-            /* NACK */
-            /* Abort master transfer */
-            DEBUG("i2c: NACK\n");
-            bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
-            state->active = 0;
-            state->retval = -EIO;
-            i2c_irq_signal_done(i2c, state->pid);
-        }
         /* transmit the next byte */
         /* Increment first, datap points to the last byte transmitted */
         ++state->tx.datap;

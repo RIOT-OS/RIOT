@@ -28,12 +28,23 @@ extern "C" {
 #endif
 
 /**
+ * @name    Button pin definitions
+ * @{
+ */
+#define BTN0_PIN            GPIO_PIN(5, 4)
+#define BTN1_PIN            GPIO_PIN(5, 0)
+
+#define BTN0_MODE           GPIO_IN_PU
+#define BTN1_MODE           GPIO_IN_PU
+/** @} */
+
+/**
  * @name    LED pin definitions and handlers
  * @{
  */
-#define LED0_PIN            GPIO_PIN(5, 7)
+#define LED0_PIN            GPIO_PIN(5, 1)
 #define LED1_PIN            GPIO_PIN(5, 2)
-#define LED2_PIN            GPIO_PIN(5, 1)
+#define LED2_PIN            GPIO_PIN(5, 3)
 
 #define LED_PORT            (GPIO_PORTF_DATA_R)
 #define LED0_MASK           (1 << 7)
@@ -52,6 +63,15 @@ extern "C" {
 #define LED2_OFF            (LED_PORT &= ~LED2_MASK)
 #define LED2_TOGGLE         (LED_PORT ^=  LED2_MASK)
 /* @} */
+
+/**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_TYPE    ZTIMER_TYPE_PERIPH_TIMER
+#define CONFIG_ZTIMER_USEC_DEV     TIMER_DEV(0)
+#define CONFIG_ZTIMER_USEC_MIN     (8)
+/** @} */
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO

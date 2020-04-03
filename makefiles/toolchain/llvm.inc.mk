@@ -20,12 +20,15 @@ export LINK        = $(PREFIX)gcc
 export LINKXX      = $(PREFIX)g++
 # objcopy does not have a clear substitute in LLVM, use GNU binutils
 #export OBJCOPY     = $(LLVMPREFIX)objcopy
-export OBJCOPY    ?= $(shell command -v $(PREFIX)objcopy gobjcopy objcopy | head -n 1)
+_OBJCOPY          := $(shell command -v $(PREFIX)objcopy || command -v gobjcopy || command -v objcopy)
+export OBJCOPY    ?= $(_OBJCOPY)
 ifeq ($(OBJCOPY),)
 $(warning objcopy not found. Hex file will not be created.)
 export OBJCOPY     = true
 endif
-export OBJDUMP     = $(LLVMPREFIX)objdump
+# Default to the native (g)objdump, helps when using toolchain from docker
+_OBJDUMP          := $(or $(shell command -v $(LLVMPREFIX)objdump || command -v gobjdump),objdump)
+export OBJDUMP    ?= $(_OBJDUMP)
 export SIZE        = $(LLVMPREFIX)size
 # LLVM lacks a binutils strip tool as well...
 #export STRIP      = $(LLVMPREFIX)strip
@@ -70,3 +73,19 @@ ifneq (,$(TARGET_ARCH))
   INCLUDES    += $(GCC_C_INCLUDES)
   CXXINCLUDES += $(GCC_CXX_INCLUDES)
 endif
+
+# For bare metal targets the performance penalty of atomic operations being
+# implemented with library calls is totally insignificant. In case LTO is
+# is enabled, the overhead compared to manually disabling interrupts is fully
+# optimized out (unless atomic operations could be grouped together to a single
+# critical section). So there is - in our use case - no value in having the
+# warning
+CFLAGS += -Wno-atomic-alignment
+
+# For compatibility with older clang versions we also disable warnings on
+# unsupported warning flags:
+CFLAGS += -Wno-unknown-warning-option
+
+OPTIONAL_CFLAGS_BLACKLIST += -fno-delete-null-pointer-checks
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
+OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation

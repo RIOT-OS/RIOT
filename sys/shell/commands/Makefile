@@ -2,11 +2,17 @@ MODULE = shell_commands
 
 SRC = shell_commands.c sc_sys.c
 
+ifneq (,$(filter app_metadata,$(USEMODULE)))
+  SRC += sc_app_metadata.c
+endif
 ifneq (,$(filter mci,$(USEMODULE)))
   SRC += sc_disk.c
 endif
 ifneq (,$(filter ps,$(USEMODULE)))
   SRC += sc_ps.c
+endif
+ifneq (,$(filter heap_cmd,$(USEMODULE)))
+  SRC += sc_heap.c
 endif
 ifneq (,$(filter sht1x,$(USEMODULE)))
   SRC += sc_sht1x.c
@@ -26,6 +32,9 @@ endif
 ifneq (,$(filter fib,$(USEMODULE)))
   SRC += sc_fib.c
 endif
+ifneq (,$(filter gnrc_ipv6_ext_frag_stats,$(USEMODULE)))
+  SRC += sc_gnrc_ipv6_frag_stats.c
+endif
 ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   SRC += sc_gnrc_ipv6_nib.c
 endif
@@ -37,7 +46,7 @@ ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
 ifneq (,$(filter xtimer,$(USEMODULE)))
-  SRC += sc_icmpv6_echo.c
+  SRC += sc_gnrc_icmpv6_echo.c
 endif
 endif
 ifneq (,$(filter gnrc_pktbuf_cmd,$(USEMODULE)))
@@ -47,9 +56,10 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     SRC += sc_gnrc_rpl.c
 endif
 ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
-ifneq (,$(filter gnrc_ipv6_nib_6lbr,$(USEMODULE)))
     SRC += sc_gnrc_6ctx.c
 endif
+ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
+  SRC += sc_gnrc_6lo_frag_stats.c
 endif
 ifneq (,$(filter saul_reg,$(USEMODULE)))
   SRC += sc_saul_reg.c
@@ -70,8 +80,32 @@ ifneq (,$(filter cord_ep,$(USEMODULE)))
   SRC += sc_cord_ep.c
 endif
 
-ifneq (,$(filter periph_rtc,$(FEATURES_PROVIDED)))
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
   SRC += sc_rtc.c
+endif
+
+ifneq (,$(filter rtt_cmd,$(USEMODULE)))
+  SRC += sc_rtt.c
+endif
+
+ifneq (,$(filter i2c_scan,$(USEMODULE)))
+  SRC += sc_i2c_scan.c
+endif
+
+ifneq (,$(filter semtech-loramac,$(USEPKG)))
+  SRC += sc_loramac.c
+endif
+
+ifneq (,$(filter nimble_netif,$(USEMODULE)))
+  SRC += sc_nimble_netif.c
+endif
+
+ifneq (,$(filter suit_coap,$(USEMODULE)))
+  SRC += sc_suit.c
+endif
+
+ifneq (,$(filter cryptoauthlib,$(USEPKG)))
+  SRC += sc_cryptoauthlib.c
 endif
 
 include $(RIOTBASE)/Makefile.base

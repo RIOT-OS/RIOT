@@ -1,28 +1,26 @@
-ifneq (,$(filter nhdp,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/nhdp
+ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/gnrc/network_layer/sixlowpan/frag
 endif
 
-ifneq (,$(filter fib,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
+ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/gnrc/link_layer/lorawan/include
 endif
-ifneq (,$(filter gnrc_netif,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/gnrc/netif/include
-endif
+
 ifneq (,$(filter gnrc_sock,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/gnrc/sock/include
   ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
     CFLAGS += -DSOCK_HAS_IPV6
   endif
 endif
-ifneq (,$(filter posix,$(USEMODULE)))
+
+ifneq (,$(filter gnrc_sock_async,$(USEMODULE)))
+  CFLAGS += -DSOCK_HAS_ASYNC
+endif
+
+ifneq (,$(filter posix_headers,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
-ifneq (,$(filter posix_semaphore,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
-endif
-ifneq (,$(filter posix_sockets,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
-endif
+
 ifneq (,$(filter pthread,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/pthread/include
 endif
@@ -31,15 +29,21 @@ ifneq (,$(filter oneway_malloc,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/oneway-malloc/include
 endif
 
-ifneq (,$(filter vfs,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
+ifneq (,$(filter app_metadata,$(USEMODULE)))
+  # Overwrite the application shell formats.
+  # This is an optional macro that can be used to coordinate
+  # standardized shell formats, as an example it can point to an RDM
+  # that specifies semantics.
+  ifdef APP_SHELL_FMT
+    CFLAGS += -DAPP_SHELL_FMT=\"$(APP_SHELL_FMT)\"
+  endif
 endif
 
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/cpp11-compat/include
   # make sure cppsupport.o is linked explicitly because __dso_handle is not
   # found if it is hidden away inside a static object.
-  export UNDEF += $(BINDIR)/cpp11-compat/cppsupport.o
+  UNDEF += $(BINDIR)/cpp11-compat/cppsupport.o
 endif
 
 ifneq (,$(filter embunit,$(USEMODULE)))
@@ -73,9 +77,23 @@ ifneq (,$(filter arduino,$(USEMODULE)))
 endif
 
 ifneq (,$(filter printf_float,$(USEMODULE)))
-  ifeq (1,$(USE_NANO_SPECS))
-    export LINKFLAGS += -u _printf_float
+  ifneq (,$(filter newlib_nano,$(USEMODULE)))
+    LINKFLAGS += -u _printf_float
   endif
+endif
+
+ifneq (,$(filter scanf_float,$(USEMODULE)))
+  ifneq (,$(filter newlib_nano,$(USEMODULE)))
+    LINKFLAGS += -u _scanf_float
+  endif
+endif
+
+ifneq (,$(filter riotboot,$(FEATURES_USED)))
+  include $(RIOTBASE)/sys/riotboot/Makefile.include
+endif
+
+ifneq (,$(filter sock_async_event,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/sock/async/event/Makefile.include
 endif
 
 ifneq (,$(filter ssp,$(USEMODULE)))
@@ -84,4 +102,12 @@ endif
 
 ifneq (native,$(BOARD))
   INCLUDES += -I$(RIOTBASE)/sys/libc/include
+endif
+
+ifneq (,$(filter clif, $(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/sys/clif/include
+endif
+
+ifneq (,$(filter zptr,$(USEMODULE)))
+  include $(RIOTBASE)/sys/zptr/Makefile.include
 endif

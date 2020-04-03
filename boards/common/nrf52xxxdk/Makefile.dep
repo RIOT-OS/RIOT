@@ -2,6 +2,4 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
-ifneq (,$(filter skald,$(USEMODULE)))
-  USEMODULE += nrfble
-endif
+include $(RIOTBOARD)/common/nrf52/Makefile.dep

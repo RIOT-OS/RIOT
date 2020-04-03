@@ -26,6 +26,16 @@ extern "C" {
  */
 #define REG32       volatile uint32_t
 
+/**
+ * @brief   Type for 16-bit registers
+ */
+#define REG16       volatile uint16_t
+
+/**
+ * @brief   Type for 8-bit registers
+ */
+#define REG8        volatile uint8_t
+
 /* Vectored Interrupt Controller (VIC) */
 #define VIC_BASE_ADDR   0xFFFFF000
 #define VICIRQStatus   (*(volatile unsigned long *)(VIC_BASE_ADDR + 0x000))
@@ -414,6 +424,10 @@ Reset, and Code Security/Debugging */
 
 /* Reset, reset source identification */
 #define RSIR           (*(volatile unsigned long *)(SCB_BASE_ADDR + 0x180))
+#define RSIR_POR       (BIT0)
+#define RSIR_EXTR      (BIT1)
+#define RSIR_WDTR      (BIT2)
+#define RSIR_BODR      (BIT3)
 
 /* RSID, code security protection */
 #define CSPR           (*(volatile unsigned long *)(SCB_BASE_ADDR + 0x184))
@@ -655,9 +669,38 @@ typedef struct {
 #define PWM1LER         (*(volatile unsigned long *)(PWM1_BASE_ADDR + 0x50))
 #define PWM1CTCR        (*(volatile unsigned long *)(PWM1_BASE_ADDR + 0x70))
 
+/**
+ * @brief   Generic UART register map
+ */
+typedef struct {
+    union {
+        REG32   RBR;            /**< Receiver Buffer Register  */
+        REG32   THR;            /**< Transmit Holding Register */
+        REG8    DLL;            /**< Divisor Latch LSB         */
+    };
+    union {
+        REG32   IER;            /**< Interrupt Enable Register */
+        REG8    DLM;            /**< Divisor Latch MSB         */
+    };
+    union {
+        REG32   IIR;            /**< Interrupt ID Register     */
+        REG32   FCR;            /**< FIFO Control Register     */
+    };
+    REG32   LCR;                /**< Line Control Register     */
+    REG32   MCR;                /**< Modem Control Register    */
+    REG32   LSR;                /**< Line Status Register      */
+    REG32   MSR;                /**< Modem Status Register     */
+    REG32   SCR;                /**< Scratch Pad Register      */
+    REG32   ACR;                /**< Auto-baud Control Register*/
+    REG32   ICR;                /**< IrDA Control Register     */
+    REG32   FDR;                /**< Fractional Divider        */
+    REG32   reserved;           /**< unused                    */
+    REG8    TER;                /**< Transmit Enable Register  */
+} lpc23xx_uart_t;
 
 /* Universal Asynchronous Receiver Transmitter 0 (UART0) */
 #define UART0_BASE_ADDR     0xE000C000
+#define UART0          ((lpc23xx_uart_t *)UART0_BASE_ADDR)
 #define U0RBR          (*(volatile unsigned long *)(UART0_BASE_ADDR + 0x00))
 #define U0THR          (*(volatile unsigned long *)(UART0_BASE_ADDR + 0x00))
 #define U0DLL          (*(volatile unsigned long *)(UART0_BASE_ADDR + 0x00))
@@ -675,6 +718,7 @@ typedef struct {
 
 /* Universal Asynchronous Receiver Transmitter 1 (UART1) */
 #define UART1_BASE_ADDR     0xE0010000
+#define UART1          ((lpc23xx_uart_t *)UART1_BASE_ADDR)
 #define U1RBR          (*(volatile unsigned long *)(UART1_BASE_ADDR + 0x00))
 #define U1THR          (*(volatile unsigned long *)(UART1_BASE_ADDR + 0x00))
 #define U1DLL          (*(volatile unsigned long *)(UART1_BASE_ADDR + 0x00))
@@ -693,6 +737,7 @@ typedef struct {
 
 /* Universal Asynchronous Receiver Transmitter 2 (UART2) */
 #define UART2_BASE_ADDR     0xE0078000
+#define UART2          ((lpc23xx_uart_t *)UART2_BASE_ADDR)
 #define U2RBR          (*(volatile unsigned long *)(UART2_BASE_ADDR + 0x00))
 #define U2THR          (*(volatile unsigned long *)(UART2_BASE_ADDR + 0x00))
 #define U2DLL          (*(volatile unsigned long *)(UART2_BASE_ADDR + 0x00))
@@ -710,6 +755,7 @@ typedef struct {
 
 /* Universal Asynchronous Receiver Transmitter 3 (UART3) */
 #define UART3_BASE_ADDR     0xE007C000
+#define UART3          ((lpc23xx_uart_t *)UART3_BASE_ADDR)
 #define U3RBR          (*(volatile unsigned long *)(UART3_BASE_ADDR + 0x00))
 #define U3THR          (*(volatile unsigned long *)(UART3_BASE_ADDR + 0x00))
 #define U3DLL          (*(volatile unsigned long *)(UART3_BASE_ADDR + 0x00))
@@ -725,8 +771,35 @@ typedef struct {
 #define U3FDR          (*(volatile unsigned long *)(UART3_BASE_ADDR + 0x28))
 #define U3TER          (*(volatile unsigned long *)(UART3_BASE_ADDR + 0x30))
 
+/**
+ * @brief   Generic I2C register map
+ */
+typedef struct {
+    REG32   CONSET;         /**< Control Set Register       */
+    REG32   STAT;           /**< Status Register            */
+    REG32   DAT;            /**< Data Register              */
+    REG32   ADR;            /**< Slave Address Register     */
+    REG32   SCLH;           /**< Duty Cycle High Half Word  */
+    REG32   SCLL;           /**< Duty Cycle Low Half Word   */
+    REG32   CONCLR;         /**< Control Clear Register     */
+} lpc23xx_i2c_t;
+
+/* I2C Control Set Register */
+#define I2CONSET_AA             0x00000004  /**< Assert acknowledge */
+#define I2CONSET_SI             0x00000008  /**< Interrupt flag     */
+#define I2CONSET_STO            0x00000010  /**< STOP flag          */
+#define I2CONSET_STA            0x00000020  /**< START flag         */
+#define I2CONSET_I2EN           0x00000040  /**< Interface enable   */
+
+/* I2C Control clear Register */
+#define I2CONCLR_AAC            0x00000004  /**< clear Assert ACK   */
+#define I2CONCLR_SIC            0x00000008  /**< clear Interrupt    */
+#define I2CONCLR_STAC           0x00000020  /**< clear START flag   */
+#define I2CONCLR_I2ENC          0x00000040  /**< Interface disable  */
+
 /* I2C Interface 0 */
 #define I2C0_BASE_ADDR      0xE001C000
+#define I2C0           ((lpc23xx_i2c_t *)I2C0_BASE_ADDR)
 #define I20CONSET      (*(volatile unsigned long *)(I2C0_BASE_ADDR + 0x00))
 #define I20STAT        (*(volatile unsigned long *)(I2C0_BASE_ADDR + 0x04))
 #define I20DAT         (*(volatile unsigned long *)(I2C0_BASE_ADDR + 0x08))
@@ -737,6 +810,7 @@ typedef struct {
 
 /* I2C Interface 1 */
 #define I2C1_BASE_ADDR      0xE005C000
+#define I2C1           ((lpc23xx_i2c_t *)I2C1_BASE_ADDR)
 #define I21CONSET      (*(volatile unsigned long *)(I2C1_BASE_ADDR + 0x00))
 #define I21STAT        (*(volatile unsigned long *)(I2C1_BASE_ADDR + 0x04))
 #define I21DAT         (*(volatile unsigned long *)(I2C1_BASE_ADDR + 0x08))
@@ -747,6 +821,7 @@ typedef struct {
 
 /* I2C Interface 2 */
 #define I2C2_BASE_ADDR      0xE0080000
+#define I2C2           ((lpc23xx_i2c_t *)I2C2_BASE_ADDR)
 #define I22CONSET      (*(volatile unsigned long *)(I2C2_BASE_ADDR + 0x00))
 #define I22STAT        (*(volatile unsigned long *)(I2C2_BASE_ADDR + 0x04))
 #define I22DAT         (*(volatile unsigned long *)(I2C2_BASE_ADDR + 0x08))
@@ -763,8 +838,25 @@ typedef struct {
 #define S0SPCCR        (*(volatile unsigned long *)(SPI0_BASE_ADDR + 0x0C))
 #define S0SPINT        (*(volatile unsigned long *)(SPI0_BASE_ADDR + 0x1C))
 
+/**
+ * @brief   Generic SPI register map
+ */
+typedef struct {
+    REG32 CR0;              /**< Control Register 0                 */
+    REG32 CR1;              /**< Control Register 1                 */
+    REG32 DR;               /**< Data Register                      */
+    REG32 SR;               /**< Status Register                    */
+    REG32 CPSR;             /**< Clock Prescale Register            */
+    REG32 IMSC;             /**< Interrupt Mask Set/Clear Register  */
+    REG32 RIS;              /**< Raw Interrupt Status Register      */
+    REG32 MIS;              /**< Masked Interrupt Status Register   */
+    REG32 ICR;              /**< Interrupt Clear Register           */
+    REG32 DMACR;            /**< DMA Control Register               */
+} lpc23xx_spi_t;
+
 /* SSP0 Controller */
 #define SSP0_BASE_ADDR      0xE0068000
+#define SPI0           ((lpc23xx_spi_t *)SSP0_BASE_ADDR)
 #define SSP0CR0        (*(volatile unsigned long *)(SSP0_BASE_ADDR + 0x00))
 #define SSP0CR1        (*(volatile unsigned long *)(SSP0_BASE_ADDR + 0x04))
 #define SSP0DR         (*(volatile unsigned long *)(SSP0_BASE_ADDR + 0x08))
@@ -778,6 +870,7 @@ typedef struct {
 
 /* SSP1 Controller */
 #define SSP1_BASE_ADDR      0xE0030000
+#define SPI1           ((lpc23xx_spi_t *)SSP1_BASE_ADDR)
 #define SSP1CR0        (*(volatile unsigned long *)(SSP1_BASE_ADDR + 0x00))
 #define SSP1CR1        (*(volatile unsigned long *)(SSP1_BASE_ADDR + 0x04))
 #define SSP1DR         (*(volatile unsigned long *)(SSP1_BASE_ADDR + 0x08))

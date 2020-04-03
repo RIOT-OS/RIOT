@@ -8,11 +8,11 @@
  */
 
 /**
- * @addtogroup  core_internal
+ * @ingroup     core_internal
  * @{
  *
  * @file
- * @brief       prototypes for kernel intitialization
+ * @brief       prototypes for kernel initialization
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
@@ -22,7 +22,7 @@
 #define KERNEL_INIT_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**

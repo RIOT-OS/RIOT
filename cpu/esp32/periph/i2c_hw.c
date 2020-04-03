@@ -39,6 +39,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <string.h>
@@ -87,8 +88,6 @@ struct i2c_hw_t {
     i2c_dev_t* regs;        /* pointer to register data struct of the I2C device */
     uint8_t mod;            /* peripheral hardware module of the I2C interface */
     uint8_t int_src;        /* peripheral interrupt source used by the I2C device */
-    uint8_t pin_scl;        /* SCL pin */
-    uint8_t pin_sda;        /* SDA pin */
     uint8_t signal_scl_in;  /* SCL signal to the controller */
     uint8_t signal_scl_out; /* SCL signal from the controller */
     uint8_t signal_sda_in;  /* SDA signal to the controller */
@@ -96,32 +95,24 @@ struct i2c_hw_t {
 };
 
 static const struct i2c_hw_t _i2c_hw[] = {
-    #if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
     {
         .regs = &I2C0,
         .mod = PERIPH_I2C0_MODULE,
         .int_src = ETS_I2C_EXT0_INTR_SOURCE,
-        .pin_scl = I2C0_SCL,
-        .pin_sda = I2C0_SDA,
         .signal_scl_in = I2CEXT0_SCL_IN_IDX,
         .signal_scl_out = I2CEXT0_SCL_OUT_IDX,
         .signal_sda_in = I2CEXT0_SDA_IN_IDX,
         .signal_sda_out = I2CEXT0_SDA_OUT_IDX,
     },
-    #endif
-    #if defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
     {
         .regs = &I2C1,
         .mod = PERIPH_I2C1_MODULE,
         .int_src = ETS_I2C_EXT1_INTR_SOURCE,
-        .pin_scl = I2C1_SCL,
-        .pin_sda = I2C1_SDA,
         .signal_scl_in = I2CEXT1_SCL_IN_IDX,
         .signal_scl_out = I2CEXT1_SCL_OUT_IDX,
         .signal_sda_in = I2CEXT1_SDA_IN_IDX,
         .signal_sda_out = I2CEXT1_SDA_OUT_IDX,
     }
-    #endif
 };
 
 struct _i2c_bus_t
@@ -134,28 +125,7 @@ struct _i2c_bus_t
     uint32_t results;  /* results of a transfer */
 };
 
-static struct _i2c_bus_t _i2c_bus[] =
-{
-    #if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
-    {
-        .speed = I2C0_SPEED,
-        .cmd = 0,
-        .data = 0,
-        .lock = MUTEX_INIT
-    },
-    #endif
-    #if defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
-    {
-        .speed = I2C1_SPEED,
-        .cmd = 0,
-        .data = 0,
-        .lock = MUTEX_INIT
-    },
-    #endif
-};
-
-/* the number of I2C bus devices used */
-const unsigned i2c_bus_num = sizeof(_i2c_bus) / sizeof(_i2c_bus[0]);
+static struct _i2c_bus_t _i2c_bus[I2C_NUMOF] = {};
 
 /* forward declaration of internal functions */
 
@@ -175,22 +145,25 @@ static inline void _i2c_delay (uint32_t delay);
 
 void i2c_init(i2c_t dev)
 {
-    CHECK_PARAM (dev < i2c_bus_num)
+    CHECK_PARAM (dev < I2C_NUMOF)
 
-    if (_i2c_bus[dev].speed == I2C_SPEED_FAST_PLUS ||
-        _i2c_bus[dev].speed == I2C_SPEED_HIGH) {
+    if (i2c_config[dev].speed == I2C_SPEED_FAST_PLUS ||
+        i2c_config[dev].speed == I2C_SPEED_HIGH) {
         LOG_TAG_INFO("i2c", "I2C_SPEED_FAST_PLUS and I2C_SPEED_HIGH "
                      "are not supported\n");
         return;
     }
 
+    mutex_init(&_i2c_bus[dev].lock);
+
     i2c_acquire (dev);
 
     _i2c_bus[dev].cmd = 0;
     _i2c_bus[dev].data = 0;
+    _i2c_bus[dev].speed = i2c_config[dev].speed;
 
     DEBUG ("%s scl=%d sda=%d speed=%d\n", __func__,
-           _i2c_hw[dev].pin_scl, _i2c_hw[dev].pin_sda, _i2c_bus[dev].speed);
+           i2c_config[dev].scl, i2c_config[dev].sda, _i2c_bus[dev].speed);
 
     /* enable (power on) the according I2C module */
     periph_module_enable(_i2c_hw[dev].mod);
@@ -298,41 +271,85 @@ int i2c_acquire(i2c_t dev)
 {
     DEBUG ("%s\n", __func__);
 
-    CHECK_PARAM_RET (dev < i2c_bus_num, -1)
+    CHECK_PARAM_RET (dev < I2C_NUMOF, -1)
 
     mutex_lock(&_i2c_bus[dev].lock);
     _i2c_reset_hw(dev);
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
     DEBUG ("%s\n", __func__);
 
-    CHECK_PARAM_RET (dev < i2c_bus_num, -1)
+    assert(dev < I2C_NUMOF);
 
     _i2c_reset_hw (dev);
     mutex_unlock(&_i2c_bus[dev].lock);
-    return 0;
 }
 
-#define _i2c_return_on_error(dev) \
+/*
+ * This macro checks the result of a read transfer. In case of an error,
+ * the hardware is reset and returned with a corresponding error code.
+ *
+ * @note:
+ * In a read transfer, an ACK is only expected for the address field. Thus,
+ * an ACK error can only happen for the address field. Therefore, we always
+ * return -ENXIO in case of an ACK error.
+ */
+#define _i2c_return_on_error_read(dev) \
     if (_i2c_bus[dev].results & I2C_ARBITRATION_LOST_INT_ENA) { \
-        LOG_TAG_ERROR("i2c", "arbitration lost dev=%u\n", dev); \
+        LOG_TAG_DEBUG("i2c", "arbitration lost dev=%u\n", dev); \
         _i2c_reset_hw (dev); \
-__asm__ volatile ("isync"); \
+        __asm__ volatile ("isync"); \
         return -EAGAIN; \
     } \
     else if (_i2c_bus[dev].results & I2C_ACK_ERR_INT_ENA) { \
-        LOG_TAG_ERROR("i2c", "ack error dev=%u\n", dev); \
+        LOG_TAG_DEBUG("i2c", "ack error dev=%u\n", dev); \
         _i2c_reset_hw (dev); \
-__asm__ volatile ("isync"); \
-        return -EIO; \
+        __asm__ volatile ("isync"); \
+        return -ENXIO; \
     } \
     else if (_i2c_bus[dev].results & I2C_TIME_OUT_INT_ENA) { \
-        LOG_TAG_ERROR("i2c", "bus timeout dev=%u\n", dev); \
+        LOG_TAG_DEBUG("i2c", "bus timeout dev=%u\n", dev); \
         _i2c_reset_hw (dev); \
-__asm__ volatile ("isync"); \
+        __asm__ volatile ("isync"); \
+        return -ETIMEDOUT; \
+    }
+
+/*
+ * This macro checks the result of a write transfer. In case of an error,
+ * the hardware is reset and returned with a corresponding error code.
+ *
+ * @note:
+ * In a write transfer, an ACK error can happen for the address field
+ * as well as for data. If the FIFO still contains all data bytes,
+ * (i.e. _i2c_hw[dev].regs->status_reg.tx_fifo_cnt >= len), the ACK error
+ * happened in address field and we have to returen -ENXIO. Otherwise, the
+ * ACK error happened in data field and we have to return -EIO.
+ */
+#define _i2c_return_on_error_write(dev) \
+    if (_i2c_bus[dev].results & I2C_ARBITRATION_LOST_INT_ENA) { \
+        LOG_TAG_DEBUG("i2c", "arbitration lost dev=%u\n", dev); \
+        _i2c_reset_hw (dev); \
+        __asm__ volatile ("isync"); \
+        return -EAGAIN; \
+    } \
+    else if (_i2c_bus[dev].results & I2C_ACK_ERR_INT_ENA) { \
+        LOG_TAG_DEBUG("i2c", "ack error dev=%u\n", dev); \
+        _i2c_reset_hw (dev); \
+        __asm__ volatile ("isync"); \
+        if (_i2c_hw[dev].regs->status_reg.tx_fifo_cnt >= len) { \
+            return -ENXIO; \
+        } \
+        else { \
+            return -EIO; \
+        } \
+    } \
+    else if (_i2c_bus[dev].results & I2C_TIME_OUT_INT_ENA) { \
+        LOG_TAG_DEBUG("i2c", "bus timeout dev=%u\n", dev); \
+        _i2c_reset_hw (dev); \
+        __asm__ volatile ("isync"); \
         return -ETIMEDOUT; \
     }
 
@@ -341,7 +358,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t fla
     DEBUG ("%s dev=%u addr=%02x data=%p len=%d flags=%01x\n",
            __func__, dev, addr, data, len, flags);
 
-    CHECK_PARAM_RET (dev < i2c_bus_num, -EINVAL);
+    CHECK_PARAM_RET (dev < I2C_NUMOF, -EINVAL);
     CHECK_PARAM_RET (len > 0, -EINVAL);
     CHECK_PARAM_RET (data != NULL, -EINVAL);
 
@@ -378,7 +395,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t fla
         _i2c_read_cmd (dev, data, I2C_MAX_DATA, false);
         _i2c_end_cmd (dev);
         _i2c_transfer (dev);
-        _i2c_return_on_error (dev);
+        _i2c_return_on_error_read (dev);
 
         /* if transfer was successful, fetch the data from I2C RAM */
         for (unsigned i = 0; i < I2C_MAX_DATA; i++) {
@@ -408,7 +425,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t fla
 
     /* finish operation by executing the command pipeline */
     _i2c_transfer (dev);
-    _i2c_return_on_error (dev);
+    _i2c_return_on_error_read (dev);
 
     /* if transfer was successful, fetch data from I2C RAM */
     for (unsigned i = 0; i < len; i++) {
@@ -428,7 +445,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
     DEBUG ("%s dev=%u addr=%02x data=%p len=%d flags=%01x\n",
            __func__, dev, addr, data, len, flags);
 
-    CHECK_PARAM_RET (dev < i2c_bus_num, -EINVAL);
+    CHECK_PARAM_RET (dev < I2C_NUMOF, -EINVAL);
     CHECK_PARAM_RET (len > 0, -EINVAL);
     CHECK_PARAM_RET (data != NULL, -EINVAL);
 
@@ -465,7 +482,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
         _i2c_write_cmd (dev, ((uint8_t*)data) + off, I2C_MAX_DATA);
         _i2c_end_cmd (dev);
         _i2c_transfer (dev);
-        _i2c_return_on_error (dev);
+        _i2c_return_on_error_write (dev);
 
         len -= I2C_MAX_DATA;
         off += I2C_MAX_DATA;
@@ -486,7 +503,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
 
     /* finish operation by executing the command pipeline */
     _i2c_transfer (dev);
-    _i2c_return_on_error (dev);
+    _i2c_return_on_error_write (dev);
 
     /* return 0 on success */
     return 0;
@@ -500,38 +517,38 @@ static int _i2c_init_pins(i2c_t dev)
      * reset GPIO usage type if the pins were used already for I2C before to
      * make it possible to reinitialize I2C
      */
-    if (gpio_get_pin_usage(_i2c_hw[dev].pin_scl) == _I2C) {
-        gpio_set_pin_usage(_i2c_hw[dev].pin_scl, _GPIO);
+    if (gpio_get_pin_usage(i2c_config[dev].scl) == _I2C) {
+        gpio_set_pin_usage(i2c_config[dev].scl, _GPIO);
     }
-    if (gpio_get_pin_usage(_i2c_hw[dev].pin_sda) == _I2C) {
-        gpio_set_pin_usage(_i2c_hw[dev].pin_sda, _GPIO);
+    if (gpio_get_pin_usage(i2c_config[dev].sda) == _I2C) {
+        gpio_set_pin_usage(i2c_config[dev].sda, _GPIO);
     }
 
     /* try to configure SDA and SCL pin as GPIO in open-drain mode with enabled pull-ups */
-    if (gpio_init (_i2c_hw[dev].pin_scl, GPIO_IN_OD_PU) ||
-        gpio_init (_i2c_hw[dev].pin_sda, GPIO_IN_OD_PU)) {
+    if (gpio_init (i2c_config[dev].scl, GPIO_IN_OD_PU) ||
+        gpio_init (i2c_config[dev].sda, GPIO_IN_OD_PU)) {
         return -ENODEV;
     }
 
     /* bring signals to high */
-    gpio_set(_i2c_hw[dev].pin_scl);
-    gpio_set(_i2c_hw[dev].pin_sda);
+    gpio_set(i2c_config[dev].scl);
+    gpio_set(i2c_config[dev].sda);
 
     /* store the usage type in GPIO table */
-    gpio_set_pin_usage(_i2c_hw[dev].pin_scl, _I2C);
-    gpio_set_pin_usage(_i2c_hw[dev].pin_sda, _I2C);
+    gpio_set_pin_usage(i2c_config[dev].scl, _I2C);
+    gpio_set_pin_usage(i2c_config[dev].sda, _I2C);
 
     /* connect SCL and SDA pins to output signals through the GPIO matrix */
-    GPIO.func_out_sel_cfg[_i2c_hw[dev].pin_scl].func_sel = _i2c_hw[dev].signal_scl_out;
-    GPIO.func_out_sel_cfg[_i2c_hw[dev].pin_sda].func_sel = _i2c_hw[dev].signal_sda_out;
+    GPIO.func_out_sel_cfg[i2c_config[dev].scl].func_sel = _i2c_hw[dev].signal_scl_out;
+    GPIO.func_out_sel_cfg[i2c_config[dev].sda].func_sel = _i2c_hw[dev].signal_sda_out;
 
     /* connect SCL and SDA input signals to pins through the GPIO matrix */
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].sig_in_sel = 1;
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].sig_in_inv = 0;
-    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].func_sel = _i2c_hw[dev].pin_scl;
+    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].func_sel = i2c_config[dev].scl;
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].sig_in_sel = 1;
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].sig_in_inv = 0;
-    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].func_sel = _i2c_hw[dev].pin_sda;
+    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].func_sel = i2c_config[dev].sda;
 
     return 0;
 }
@@ -668,7 +685,7 @@ void _i2c_transfer_timeout (void *arg)
 {
     i2c_t dev = (i2c_t)arg;
 
-    /* reset the hardware if it I2C got stucked */
+    /* reset the hardware if it I2C got stuck */
     _i2c_reset_hw(dev);
 
     /* set result to timeout */
@@ -733,7 +750,7 @@ static void IRAM_ATTR _i2c_intr_handler (void *arg)
 
     /* all I2C peripheral interrupt sources are routed to the same interrupt,
        so we have to use the status register to distinguish interruptees */
-    for (unsigned dev = 0; dev < i2c_bus_num; dev++) {
+    for (unsigned dev = 0; dev < I2C_NUMOF; dev++) {
         /* test for transfer related interrupts */
         if (_i2c_hw[dev].regs->int_status.val & transfer_int_mask) {
             /* set transfer result */
@@ -761,37 +778,37 @@ static void IRAM_ATTR _i2c_intr_handler (void *arg)
 static void _i2c_clear_bus(i2c_t dev)
 {
     /* reset the usage type in GPIO table */
-    gpio_set_pin_usage(_i2c_hw[dev].pin_scl, _GPIO);
-    gpio_set_pin_usage(_i2c_hw[dev].pin_sda, _GPIO);
+    gpio_set_pin_usage(i2c_config[dev].scl, _GPIO);
+    gpio_set_pin_usage(i2c_config[dev].sda, _GPIO);
 
     /* configure SDA and SCL pin as GPIO in open-drain mode temporarily */
-    gpio_init (_i2c_hw[dev].pin_scl, GPIO_IN_OD_PU);
-    gpio_init (_i2c_hw[dev].pin_sda, GPIO_IN_OD_PU);
+    gpio_init (i2c_config[dev].scl, GPIO_IN_OD_PU);
+    gpio_init (i2c_config[dev].sda, GPIO_IN_OD_PU);
 
     /* master send some clock pulses to make the slave release the bus */
-    gpio_set (_i2c_hw[dev].pin_scl);
-    gpio_set (_i2c_hw[dev].pin_sda);
-    gpio_clear (_i2c_hw[dev].pin_sda);
+    gpio_set (i2c_config[dev].scl);
+    gpio_set (i2c_config[dev].sda);
+    gpio_clear (i2c_config[dev].sda);
     for (int i = 0; i < 20; i++) {
-        gpio_toggle(_i2c_hw[dev].pin_scl);
+        gpio_toggle(i2c_config[dev].scl);
     }
-    gpio_set(_i2c_hw[dev].pin_sda);
+    gpio_set(i2c_config[dev].sda);
 
     /* store the usage type in GPIO table */
-    gpio_set_pin_usage(_i2c_hw[dev].pin_scl, _I2C);
-    gpio_set_pin_usage(_i2c_hw[dev].pin_sda, _I2C);
+    gpio_set_pin_usage(i2c_config[dev].scl, _I2C);
+    gpio_set_pin_usage(i2c_config[dev].sda, _I2C);
 
     /* connect SCL and SDA pins to output signals through the GPIO matrix */
-    GPIO.func_out_sel_cfg[_i2c_hw[dev].pin_scl].func_sel = _i2c_hw[dev].signal_scl_out;
-    GPIO.func_out_sel_cfg[_i2c_hw[dev].pin_sda].func_sel = _i2c_hw[dev].signal_sda_out;
+    GPIO.func_out_sel_cfg[i2c_config[dev].scl].func_sel = _i2c_hw[dev].signal_scl_out;
+    GPIO.func_out_sel_cfg[i2c_config[dev].sda].func_sel = _i2c_hw[dev].signal_sda_out;
 
     /* connect SCL and SDA input signals to pins through the GPIO matrix */
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].sig_in_sel = 1;
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].sig_in_inv = 0;
-    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].func_sel = _i2c_hw[dev].pin_scl;
+    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].func_sel = i2c_config[dev].scl;
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].sig_in_sel = 1;
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].sig_in_inv = 0;
-    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].func_sel = _i2c_hw[dev].pin_sda;
+    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].func_sel = i2c_config[dev].sda;
 
     return;
 }
@@ -851,9 +868,9 @@ static void _i2c_reset_hw (i2c_t dev)
 
 void i2c_print_config(void)
 {
-    for (unsigned bus = 0; bus < i2c_bus_num; bus++) {
-        ets_printf("\tI2C_DEV(%d)\tscl=%d sda=%d\n",
-                   bus, _i2c_hw[bus].pin_scl, _i2c_hw[bus].pin_sda);
+    for (unsigned dev = 0; dev < I2C_NUMOF; dev++) {
+        printf("\tI2C_DEV(%u)\tscl=%d sda=%d\n",
+               dev, i2c_config[dev].scl, i2c_config[dev].sda);
     }
 }
 

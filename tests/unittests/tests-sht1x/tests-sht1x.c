@@ -16,6 +16,25 @@ static const int16_t max_diff_temp = 1;
 /** @brief Maximum difference from correct humidity value [in e-02 %] */
 static const int16_t max_diff_hum = 10;
 
+/*
+ * Configure tested values steps
+ *
+ * Verify less values on boards as without hwfloat it takes minutes to test.
+ * Checking that the trend is valid is enough to find int overflow
+ * or similar errors.
+ *
+ * Keep the full range test on native as it is "instant"
+ */
+
+#ifdef CPU_NATIVE
+#define TEMPERATURE_TEST_STEPS      1
+/* Use 0.13°c steps. */
+#define HUMIDITY_TEST_TEMP_STEPS    13
+#else /* CPU_NATIVE */
+#define TEMPERATURE_TEST_STEPS      100
+#define HUMIDITY_TEST_TEMP_STEPS    1300
+#endif /* CPU_NATIVE */
+
 static int16_t expected_temp(const sht1x_dev_t *dev, uint16_t _raw)
 {
     static const double d1_table[] = { -40.1, -39.8, -39.7, -39.6, -39.4 };
@@ -62,13 +81,14 @@ static void test_sht1x_conversion(void)
     const uint16_t max_raw_hums[] = { 0xff, 0xfff };
     sht1x_dev_t dev = { .conf = 0 };
 
-    for (size_t i_res = 0; i_res < sizeof(confs) / sizeof(confs[0]); i_res++) {
+    for (size_t i_res = 0; i_res < ARRAY_SIZE(confs); i_res++) {
         dev.conf = confs[i_res];
         uint16_t max_raw_temp = max_raw_temps[i_res];
         uint16_t max_raw_hum = max_raw_hums[i_res];
-        for (size_t i_vdd = 0; i_vdd < sizeof(vdds) / sizeof(vdds[0]); i_vdd++) {
+        for (size_t i_vdd = 0; i_vdd < ARRAY_SIZE(vdds); i_vdd++) {
             dev.vdd = vdds[i_vdd];
-            for (uint16_t raw_temp = 0; raw_temp <= max_raw_temp; raw_temp++) {
+            for (uint16_t raw_temp = 0; raw_temp <= max_raw_temp;
+                    raw_temp += TEMPERATURE_TEST_STEPS) {
                 int16_t got_temp = sht1x_temperature(&dev, raw_temp);
                 int16_t exp_temp = expected_temp(&dev, raw_temp);
 
@@ -77,8 +97,9 @@ static void test_sht1x_conversion(void)
             }
         }
 
-        /* Testing for temperatures in -10.00°C and 65.00°C in steps of 0.13°C */
-        for (int16_t temp = -1000; temp < 6500; temp += 13) {
+        /* Testing for temperatures between -10.00°C and 65.00°C */
+        for (int16_t temp = -1000; temp < 6500;
+                temp += HUMIDITY_TEST_TEMP_STEPS) {
             for (uint16_t raw_hum = 0; raw_hum <= max_raw_hum; raw_hum++) {
                 int16_t exp_hum = expected_hum(&dev, raw_hum, temp);
                 if ((exp_hum < 0) || (exp_hum > 10000)) {

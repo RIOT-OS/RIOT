@@ -8,9 +8,9 @@ RIOT in a nutshell                                        {#riot-in-a-nutshell}
 RIOT is an open-source  microkernel-based operating system, designed to match
 the requirements of Internet of Things (IoT) devices and other embedded
 devices. These requirements include a very low memory footprint (on the order
-of a few kilobytes), high energy efficiency, real-time capabilities,
-communication stacks for both wireless and wired networks, and support for a
-wide range of low-power hardware.
+of a few kilobytes), high energy efficiency, real-time capabilities, support
+for a wide range of low-power hardware, communication stacks for wireless and
+communication stacks for wired networks.
 
 RIOT provides a microkernel, multiple network stacks, and utilities which
 include cryptographic libraries, data structures (bloom filters, hash tables,
@@ -22,6 +22,11 @@ Boards etc. (see the list of
 Across all supported hardware (32-bit, 16-bit, and 8-bit platforms). RIOT
 provides a consistent API and enables ANSI C and C++ application programming,
 with  multithreading, IPC, system timers, mutexes etc.
+
+A good high-level overview can be found in the article
+[RIOT: An Open Source Operating System for Low-End Embedded Devices in
+the IoT](https://riot-os.org/docs/riot-ieeeiotjournal-2018.pdf)
+(IEEE Internet of Things Journal, December 2018).
 
 Contribute to RIOT                                        {#contribute-to-riot}
 ==================
@@ -57,7 +62,7 @@ call this the `native` port). Try it right now in your terminal window:
 git clone git://github.com/RIOT-OS/RIOT.git # assumption: git is pre-installed
 cd RIOT
 git checkout <LATEST_RELEASE>
-./dist/tools/tapsetup/tapsetup              # create virtual Ethernet
+sudo ./dist/tools/tapsetup/tapsetup         # create virtual Ethernet
                                             # interfaces to connect multiple
                                             # RIOT instances
 cd examples/default/
@@ -104,9 +109,9 @@ top-level directories:
 
 core
 ----
-This directory contains the actual kernel. The kernel consists of the
-scheduler, inter-process-communication (messaging), threading, thread
-synchronization, and supporting data-structures and type definitions.
+This directory contains the actual kernel. The kernel consists of the scheduler,
+inter-process-communication (messaging), threading, and thread
+synchronization, as well as supporting data-structures and type definitions.
 
 See @ref core for further information and API documentations.
 
@@ -225,7 +230,7 @@ output after running `make doc`.
 Lastly, the `dist` directory contains tools to help you with RIOT. These
 include
 the serial terminal application `pyterm`, generic scripts for flashing,
-debugging, reseting (e.g. support for [OpenOCD](http://openocd.org/),
+debugging, resetting (e.g. support for [OpenOCD](http://openocd.org/),
 [Jlink](https://www.segger.com/jlink_base.html)), as well as code enabling easy
 integration to open testbeds such as the [IoT-LAB](https://www.iot-lab.info/).
 Furthermore you can find here scripts to do all kind of code and style checks.
@@ -234,7 +239,9 @@ Further information                                      {#further-information}
 ===================
  - @ref getting-started
  - @ref creating-an-application
+ - @ref porting-boards
  - @ref creating-modules
+ - @ref advanced-build-system-tricks
 
 <!--
 Idea for this section: just name each of RIOT's main features/concepts and link

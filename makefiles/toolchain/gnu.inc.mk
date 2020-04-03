@@ -13,11 +13,14 @@ export NM         = $(PREFIX)nm
 export LINK       = $(PREFIX)gcc
 export LINKXX     = $(PREFIX)g++
 export SIZE       = $(PREFIX)size
-export OBJCOPY   ?= $(shell command -v $(PREFIX)objcopy gobjcopy objcopy | head -n 1)
+_OBJCOPY          := $(shell command -v $(PREFIX)objcopy || command -v gobjcopy || command -v objcopy)
+export OBJCOPY   ?= $(_OBJCOPY)
 ifeq ($(OBJCOPY),)
 $(warning objcopy not found. Hex file will not be created.)
 export OBJCOPY    = true
 endif
-export OBJDUMP    = $(PREFIX)objdump
+# Default to the native (g)objdump, helps when using toolchain from docker
+_OBJDUMP         := $(or $(shell command -v $(PREFIX)objdump || command -v gobjdump),objdump)
+export OBJDUMP   ?= $(_OBJDUMP)
 # We use GDB for debugging
 include $(RIOTMAKE)/tools/gdb.inc.mk

@@ -1,5 +1,6 @@
 [![Nightly CI status master][master-ci-badge]][master-ci-link]
 [![IRC][irc-badge]][irc-link]
+[![Matrix][matrix-badge]][matrix-link]
 
                           ZZZZZZ
                         ZZZZZZZZZZZZ
@@ -53,7 +54,8 @@ but not limited to:
 * a preemptive, tickless scheduler with priorities
 * flexible memory management
 * high resolution, long-term timers
-* support 100+ boards based on AVR, MSP430, ESP8266, MIPS, ARM7 and ARM Cortex-M
+* support 100+ boards based on AVR, MSP430, ESP8266, ESP32, MIPS, RISC-V,
+  ARM7 and ARM Cortex-M
 * the native port allows to run RIOT as-is on Linux, BSD, and MacOS. Multiple
   instances of RIOT running on a single machine can also be interconnected via
   a simple virtual Ethernet bridge
@@ -90,7 +92,7 @@ you can use to create a network of tap interfaces.
 
 To create a bridge and two (or `count` at your option) tap interfaces:
 
-    ./dist/tools/tapsetup/tapsetup [-c [<count>]]
+    sudo ./dist/tools/tapsetup/tapsetup [-c [<count>]]
 
 ## CONTRIBUTE
 
@@ -126,3 +128,5 @@ https://www.riot-os.org
 [master-ci-link]: https://ci.riot-os.org/nightlies.html#master
 [irc-badge]: https://img.shields.io/badge/IRC-join%20chat%20%E2%86%92-blue.svg
 [irc-link]: https://webchat.freenode.net?channels=%23riot-os
+[matrix-badge]: https://img.shields.io/badge/Matrix-join%20chat%20%E2%86%92-blue.svg
+[matrix-link]: https://matrix.to/#/#riot-os:matrix.org

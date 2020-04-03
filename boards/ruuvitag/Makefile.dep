@@ -1,11 +1,14 @@
-include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.dep
-
 ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+  USEMODULE += bme280_spi
   USEMODULE += lis2dh12_spi
-  # TODO: enable drivers once their adaption/implementations are merged
-  # USEMODULE += bme280_spi
 endif
 
-ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-  USEMODULE += nrfmin
+# Use Segger's RTT unless another stdio_% is already used
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_rtt
 endif
+
+USEMODULE += boards_common_nrf52xxdk
+
+include $(RIOTBOARD)/common/nrf52/Makefile.dep

@@ -11,7 +11,7 @@ priced module utilizing Nordics NRF51822QFAA SoC. The SoC features 16Kb of RAM,
 with a 2.4GHz radio that supports both Nordics proprietary ShockBurst as well as
 Bluetooth Low Energy (BLE).
 
-The board is available for example on [ebay](http://www.ebay.com/sch/i.html?_from=R40&_trksid=p2050601.m570.l1313.TR0.TRC0.H0.Xnrf51822&_nkw=nrf51822&_sacat=0)
+The board is available for example on [ebay](https://www.ebay.com/sch/i.html?_nkw=nrf51822)
 or at [aliexpress](http://www.aliexpress.com/wholesale?SearchText=nrf51822&catId=0&initiative_id=SB_20140804233951) for something around 8-10 USD.
 
 ## Hardware
@@ -32,8 +32,8 @@ or at [aliexpress](http://www.aliexpress.com/wholesale?SearchText=nrf51822&catId
 | SPIs       | 2                 |
 | I2Cs       | 2                 |
 | Vcc        | 1.8V - 3.6V           |
-| Datasheet  | [Datasheet](http://www.freqchina.com/cn/down.asp?ID=135) (pdf file) |
-| Reference Manual | [Reference Manual](http://www.100y.com.tw/pdf_file/39-Nordic-NRF51822.pdf) |
+| Datasheet  | [Datasheet](https://infocenter.nordicsemi.com/pdf/nRF51822_PS_v3.3.pdf) |
+| Reference Manual | [Reference Manual](https://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.1.pdf) |
 
 
 ##  Flashing and Debugging
@@ -52,7 +52,7 @@ First of all make sure the your ST-Link device is detected and can be
 accessed properly. In Linux you might have to adept your `udev` rules
 accordingly:
 ```
-wget https://raw.githubusercontent.com/texane/stlink/master/49-stlinkv2.rules
+wget https://raw.githubusercontent.com/texane/stlink/master/etc/udev/rules.d/49-stlinkv2.rules
 sudo cp 49-stlinkv2.rules /etc/udev/rules.d/
 sudo udevadm control --reload-rules
 sudo udevadm trigger
@@ -60,14 +60,14 @@ sudo udevadm trigger
 now replug the usb cable and flash.
 
 Have a look at the 'Setting up udev rules' section in this
-[README file](https://github.com/texane/stlink/blob/master/README)
+[README file](https://github.com/texane/stlink/)
 if you need help.
 
 Second you need to enable the stand-alone ST-Link mode of the discovery board
 by removing the two `CN2` jumpers, found somewhere in the upper right part of
 the board. This disconnects the ST-Link programmer from the micro-controller
 part of the port and enables direct access through the pin-header `CN3`, also
-labled `SWD`.
+labeled `SWD`.
 
 The Yunjia NRF51822 module supports the Serial Wire Debug (SWD) interface. To
 access the device the following four lines need to be connected with the

@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_tcp TCP
- * @ingroup     net_gnrc
- * @brief       RIOT's TCP implementation for the GNRC network stack.
+ * @ingroup     net_gnrc_tcp
  *
  * @{
  *
@@ -43,7 +41,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Maximum Segement Size (MSS).
+ * @brief Maximum Segment Size (MSS).
  */
 #ifndef GNRC_TCP_MSS
 #ifdef  MODULE_GNRC_IPV6

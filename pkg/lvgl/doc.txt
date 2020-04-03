@@ -1,0 +1,41 @@
+/**
+@defgroup pkg_lvgl LittlevGL - Open-Source Embedded GUI Library
+@ingroup  pkg
+@brief    LittlevGL package for RIOT
+
+@see      https://github.com/littlevgl/lvgl
+
+## Configuration options
+
+The package can be configured with using several variables. These variables can
+either be passed directly to build command line or set in the application
+Makefile.
+
+### Graphical settings
+
+- `LVGL_COLOR_DEPTH`: configure the color depth in bit of the screen (default: 16)
+- `LVGL_COLOR_16_SWAP`: enable byte swap when communicating with the screen
+  driver (default: 1, enabled)
+
+### Memory settings
+
+`LVGL_MEM_SIZE`: configure the maximum memory size used by lvgl. This depends
+on the number of lvgl widgets and objects used by the interface (default:
+5U*1024U, 5KiB). Must be greater than 2KiB.
+
+### Engine settings
+
+- `LVGL_INACTIVITY_PERIOD_MS`: maximum inactivity period before going to sleep in ms.
+  (default: 1s)
+- `LVGL_TASK_HANDLER_DELAY_US`: delay between lvgl task handle call in ms.
+  (default: 5ms)
+- `LVGL_TASK_THREAD_PRIO`: lvgl task handler thread priority.
+  (default: THREAD_PRIORITY_MAIN - 1)
+
+Example of command line for changing the max activity period to 5s:
+
+```
+LVGL_ACTIVITY_PERIOD=5000 make -C tests/pkg_lvgl
+```
+
+ */

@@ -20,18 +20,11 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "periph_conf.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    xtimer configuration
- * @{
- */
-#define XTIMER_WIDTH        (16)
-/** @} */
 
 /**
  * @name    LED pin definitions and handlers
@@ -61,11 +54,6 @@ extern "C" {
 #define RN2XX3_PARAM_UART         UART_DEV(2)
 #define RN2XX3_PARAM_PIN_RESET    GPIO_PIN(PA, 7)
 /** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

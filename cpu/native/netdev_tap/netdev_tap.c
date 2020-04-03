@@ -84,13 +84,13 @@ static inline void _set_mac_addr(netdev_t *netdev, const uint8_t *src)
 static inline int _get_promiscous(netdev_t *netdev)
 {
     netdev_tap_t *dev = (netdev_tap_t*)netdev;
-    return dev->promiscous;
+    return dev->promiscuous;
 }
 
 static inline int _set_promiscous(netdev_t *netdev, int value)
 {
     netdev_tap_t *dev = (netdev_tap_t*)netdev;
-    dev->promiscous = value;
+    dev->promiscuous = value;
     return value;
 }
 
@@ -239,7 +239,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     if (nread > 0) {
         ethernet_hdr_t *hdr = (ethernet_hdr_t *)buf;
-        if (!(dev->promiscous) && !_is_addr_multicast(hdr->dst) &&
+        if (!(dev->promiscuous) && !_is_addr_multicast(hdr->dst) &&
             !_is_addr_broadcast(hdr->dst) &&
             (memcmp(hdr->dst, dev->addr, ETHERNET_ADDR_LEN) != 0)) {
             DEBUG("netdev_tap: received for %02x:%02x:%02x:%02x:%02x:%02x\n"
@@ -254,10 +254,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
         _continue_reading(dev);
 
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += nread;
-#endif
         return nread;
     }
     else if (nread == -1) {
@@ -284,14 +280,10 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     struct iovec iov[iolist_count(iolist)];
 
     unsigned n;
-    size_t bytes = iolist_to_iovec(iolist, iov, &n);
+    iolist_to_iovec(iolist, iov, &n);
 
     int res = _native_writev(dev->tap_fd, iov, n);
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += bytes;
-#else
-    (void)bytes;
-#endif
+
     if (netdev->event_callback) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     }
@@ -310,7 +302,7 @@ static void _tap_isr(int fd, void *arg) {
     netdev_t *netdev = (netdev_t *)arg;
 
     if (netdev->event_callback) {
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
     }
     else {
         puts("netdev_tap: _isr: no event callback.");
@@ -340,7 +332,7 @@ static int _init(netdev_t *netdev)
     const char *clonedev = "/dev/net/tun";
 #endif
     /* initialize device descriptor */
-    dev->promiscous = 0;
+    dev->promiscuous = 0;
     /* implicitly create the tap interface */
     if ((dev->tap_fd = real_open(clonedev, O_RDWR | O_NONBLOCK)) == -1) {
         err(EXIT_FAILURE, "open(%s)", clonedev);
@@ -392,9 +384,6 @@ static int _init(netdev_t *netdev)
     native_async_read_setup();
     native_async_read_add_handler(dev->tap_fd, netdev, _tap_isr);
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
     DEBUG("gnrc_tapnet: initialized.\n");
     return 0;
 }

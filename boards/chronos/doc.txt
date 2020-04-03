@@ -5,8 +5,8 @@
 
 # Hardware
 
-![TI eZ430-Chronos running RIOT](http://riot-os.org/images/hardware-watch-
-riot.png)
+![TI eZ430-Chronos running RIOT]
+(http://riot-os.org/images/hardware-watch-riot.png)
 
 # MCU
 | MCU        | TI CC430F6137     |

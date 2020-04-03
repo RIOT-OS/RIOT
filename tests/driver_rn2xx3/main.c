@@ -358,10 +358,10 @@ int rn2xx3_mac_cmd(int argc, char **argv) {
         }
         else if (strcmp(argv[2], "txmode") == 0) {
             loramac_tx_mode_t mode;
-            if (strcmp(argv[2], "cnf") == 0) {
+            if (strcmp(argv[3], "cnf") == 0) {
                 mode = LORAMAC_TX_CNF;
             }
-            else if (strcmp(argv[2], "uncnf") == 0) {
+            else if (strcmp(argv[3], "uncnf") == 0) {
                 mode = LORAMAC_TX_UNCNF;
             }
             else {

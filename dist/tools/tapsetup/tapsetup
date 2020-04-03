@@ -6,6 +6,7 @@ COMMAND=""
 BRNAME="tapbr0"
 TAPNAME="tap"
 DEACTIVATE_IPV6=""
+UPLINK=""
 
 usage() {
     echo "usage: ${PROGRAM} [arguments]" >&2
@@ -22,6 +23,8 @@ usage() {
     echo "                                 (default: tap; ignored on OSX and FreeBSD)" >&2
     echo "   -6, --deactivate-ipv6:        Deactivate IPv6 for the interfaces and bridge" >&2
     echo "                                 (ignored on OSX and FreeBSD)" >&2
+    echo "   -u, --uplink:                 Optional uplink interface" >&2
+    echo "                                 (ignored on OSX and FreeBSD)" >&2
     echo "   -h, --help:                   Prints this text" >&2
 }
 
@@ -30,20 +33,34 @@ unsupported_plattform() {
     echo "(currently supported \`uname -s\` 'Darvin', 'FreeBSD', and 'Linux')" >&2
 }
 
+update_uplink() {
+    if command -v dhclient > /dev/null; then
+        dhclient $1
+    else
+        echo "DHCP client \`dhclient\` not found." >&2
+        echo "Please reconfigure your DHCP client for interface $1" >&2
+        echo "to keep up-link's IPv4 connection." >&2
+    fi
+}
+
 create_bridge() {
     echo "creating ${BRNAME}"
 
     case "${PLATFORM}" in
         FreeBSD)
-            sudo kldload if_bridge
-            sudo ifconfig ${BRNAME} create || exit 1 ;;
+            kldload if_bridge
+            ifconfig ${BRNAME} create || exit 1 ;;
         Linux)
-            sudo ip link add name ${BRNAME} type bridge || exit 1
+            ip link add name ${BRNAME} type bridge || exit 1
+            if [ -n "${UPLINK}" ]; then
+                echo "using uplink ${UPLINK}"
+                ip link set dev ${UPLINK} master ${BRNAME} || exit 1
+            fi
             if [ -n "${DEACTIVATE_IPV6}" ]; then
-                sudo -s sh -c "echo 1  > /proc/sys/net/ipv6/conf/${BRNAME}/disable_ipv6" || exit 1
+                echo 1 > /proc/sys/net/ipv6/conf/${BRNAME}/disable_ipv6 || exit 1
             fi ;;
         OSX)
-            sudo ifconfig ${BRNAME} create || exit 1 ;;
+            ifconfig ${BRNAME} create || exit 1 ;;
         *)
             ;;
     esac
@@ -52,9 +69,14 @@ create_bridge() {
 up_bridge() {
     case "${PLATFORM}" in
         FreeBSD|OSX)
-            sudo ifconfig ${BRNAME} up || exit 1 ;;
+            ifconfig ${BRNAME} up || exit 1 ;;
         Linux)
-            sudo ip link set ${BRNAME} up || exit 1 ;;
+            ip link set ${BRNAME} up || exit 1
+
+            # The bridge is now the new uplink
+            if [ -n "${UPLINK}" ]; then
+                update_uplink ${BRNAME}
+            fi ;;
         *)
             ;;
     esac
@@ -65,17 +87,24 @@ delete_bridge() {
 
     case "${PLATFORM}" in
         FreeBSD)
-            sudo sysctl net.link.tap.user_open=0
-            sudo kldunload if_tap || exit 1
-            sudo kldunload if_bridge || exit 1 ;;
+            sysctl net.link.tap.user_open=0
+            kldunload if_tap || exit 1
+            kldunload if_bridge || exit 1 ;;
         Linux)
             for IF in $(ls /sys/class/net/${BRNAME}/brif); do
-                sudo ip link delete "${IF}"
+                if [ "${IF}" != "${UPLINK}" ]; then
+                    ip link delete "${IF}"
+                fi
             done
 
-            sudo ip link delete ${BRNAME} || exit 1 ;;
+            ip link delete ${BRNAME} || exit 1
+
+            # restore the old uplink
+            if [ -n "${UPLINK}" ]; then
+                update_uplink ${UPLINK}
+            fi ;;
         OSX)
-            sudo ifconfig ${BRNAME} destroy || exit 1 ;;
+            ifconfig ${BRNAME} destroy || exit 1 ;;
         *)
             ;;
     esac
@@ -84,8 +113,8 @@ delete_bridge() {
 begin_tap() {
     case "${PLATFORM}" in
         FreeBSD)
-            sudo kldload if_tap || exit 1
-            sudo sysctl net.link.tap.user_open=1 ;;
+            kldload if_tap || exit 1
+            sysctl net.link.tap.user_open=1 ;;
         *)
             ;;
     esac
@@ -95,24 +124,24 @@ create_tap() {
     case "${PLATFORM}" in
         FreeBSD)
             echo "creating ${TAPNAME}${N}" || exit 1
-            sudo ifconfig tap${N} create || exit 1
-            sudo chown ${USER} /dev/tap${N} || exit 1
-            sudo ifconfig ${BRNAME} addm tap${N} || exit 1
-            sudo ifconfig tap${N} up || exit 1 ;;
+            ifconfig tap${N} create || exit 1
+            chown ${SUDO_USER} /dev/tap${N} || exit 1
+            ifconfig ${BRNAME} addm tap${N} || exit 1
+            ifconfig tap${N} up || exit 1 ;;
         Linux)
             echo "creating ${TAPNAME}${N}"
-            sudo ip tuntap add dev ${TAPNAME}${N} mode tap user ${USER} || exit 1
+            ip tuntap add dev ${TAPNAME}${N} mode tap user ${SUDO_USER} || exit 1
             if [ -n "${DEACTIVATE_IPV6}" ]; then
-                sudo -s sh -c "echo 1  > /proc/sys/net/ipv6/conf/${TAPNAME}${N}/disable_ipv6" || exit 1
+                echo 1 > /proc/sys/net/ipv6/conf/${TAPNAME}${N}/disable_ipv6 || exit 1
             fi
-            sudo ip link set dev ${TAPNAME}${N} master ${BRNAME} || exit 1
-            sudo ip link set ${TAPNAME}${N} up || exit 1 ;;
+            ip link set dev ${TAPNAME}${N} master ${BRNAME} || exit 1
+            ip link set ${TAPNAME}${N} up || exit 1 ;;
         OSX)
-            sudo chown ${USER} /dev/tap${N} || exit 1
+            chown ${SUDO_USER} /dev/tap${N} || exit 1
             echo "start RIOT instance for tap${N} now and hit enter"
             read
-            sudo ifconfig ${BRNAME} addm tap${N} || exit 1
-            sudo ifconfig tap${N} up || exit 1 ;;
+            ifconfig ${BRNAME} addm tap${N} || exit 1
+            ifconfig tap${N} up || exit 1 ;;
         *)
             ;;
     esac
@@ -158,6 +187,15 @@ while true ; do
         -h|--help)
             usage
             exit ;;
+        -u|--uplink)
+            case "$2" in
+                "")
+                    usage
+                    exit 2 ;;
+                *)
+                    UPLINK="$2"
+                    shift 2 ;;
+            esac ;;
         -t|--tap)
             case "$2" in
                 "")
@@ -174,12 +212,9 @@ while true ; do
     esac
 done
 
-if [ -z "${USER}" ]; then
-    export USER=$(id -un)
-    if [ -z "${USER}" ]; then
-        echo 'need to export $USER'
-        exit 1
-    fi
+if [ -z "${SUDO_USER}" ]; then
+    echo 'Environment variable $SUDO_USER required; Please run with `sudo`'
+    exit 1
 fi
 if [ -z "${COMMAND}" ]; then
     COMMAND="create"

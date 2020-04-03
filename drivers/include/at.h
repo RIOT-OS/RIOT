@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_at AT (Hayes) command set library
- * @ingroup     drivers
+ * @ingroup     drivers_misc
  * @brief       AT (Hayes) command set library
  *
  * This module provides functions to interact with devices using AT commands.
@@ -45,38 +45,57 @@
 extern "C" {
 #endif
 
+/**
+ * @defgroup drivers_at_config     AT driver compile configuration
+ * @ingroup config
+ * @{
+ */
+
+/**
+ * @brief End of line character to send after the AT command.
+ */
 #ifndef AT_SEND_EOL
-/** End of line character to send after the AT command */
 #define AT_SEND_EOL "\r"
 #endif
 
+/**
+ * @brief Enable/disable the expected echo after an AT command is sent.
+ */
 #ifndef AT_SEND_ECHO
-/** Enable/disable the expected echo after an AT command is sent */
 #define AT_SEND_ECHO 1
 #endif
 
-/** Shortcut for getting send end of line length */
-#define AT_SEND_EOL_LEN  (sizeof(AT_SEND_EOL) - 1)
-
+/**
+ * @brief 1st end of line character received (S3 aka CR character for a modem).
+ */
 #ifndef AT_RECV_EOL_1
-/** 1st end of line character received (S3 aka CR character for a modem) */
 #define AT_RECV_EOL_1   "\r"
 #endif
 
+/**
+ * @brief 1st end of line character received (S4 aka LF character for a modem).
+ */
 #ifndef AT_RECV_EOL_2
-/** 1st end of line character received (S4 aka LF character for a modem) */
 #define AT_RECV_EOL_2   "\n"
 #endif
 
+/**
+ * @brief default OK reply of an AT device.
+ */
 #ifndef AT_RECV_OK
-/** default OK reply of an AT device */
 #define AT_RECV_OK "OK"
 #endif
 
+/**
+ * @brief default ERROR reply of an AT device.
+ */
 #ifndef AT_RECV_ERROR
-/** default ERROR reply of an AT device */
 #define AT_RECV_ERROR "ERROR"
 #endif
+/** @} */
+
+/** Shortcut for getting send end of line length */
+#define AT_SEND_EOL_LEN  (sizeof(AT_SEND_EOL) - 1)
 
 #if defined(MODULE_AT_URC) || DOXYGEN
 #ifndef AT_BUF_SIZE
@@ -124,8 +143,8 @@ typedef struct {
  * @param[in]   buf         input buffer
  * @param[in]   bufsize     size of @p buf
  *
- * @returns     0 on success
- * @returns     <0 otherwise
+ * @returns     success code UART_OK on success
+ * @returns     error code UART_NODEV or UART_NOBAUD otherwise
  */
 int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize);
 
@@ -183,8 +202,9 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * This function sends the supplied @p command, then returns all response
  * lines until the device sends "OK".
  *
- * If a line starts with "ERROR" or "+CME ERROR:", or the buffer is full, the
- * function returns -1.
+ * If a line starts with "ERROR" or the buffer is full, the function returns -1.
+ * If a line starts with "+CME ERROR" or +CMS ERROR", the function returns -2.
+ * In this case resp_buf contains the error string.
  *
  * @param[in]   dev         device to operate on
  * @param[in]   command     command to send
@@ -194,7 +214,8 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * @param[in]   timeout     timeout (in usec)
  *
  * @returns     length of response on success
- * @returns     <0 on error
+ * @returns     -1 on error
+ * @returns     -2 on CMS or CME error
  */
 ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf,
                               size_t len, bool keep_eol, uint32_t timeout);
@@ -212,6 +233,25 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
 int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
 
 /**
+ * @brief   Receives bytes into @p bytes buffer until the string pattern
+ * @p string is received or the buffer is full.
+ *
+ * @param[in] dev               device to operate on
+ * @param[in] string            string pattern to expect
+ * @param[out] bytes            buffer to store received bytes
+ * @param[in, out] bytes_len    pointer to the maximum number of bytes to
+ *                              receive. On return stores the amount of received
+ *                              bytes.
+ * @param[in] timeout           timeout (in usec) of inactivity to finish read
+ *
+ * @returns                     0 on success
+ * @returns                     <0 on error
+ */
+int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
+                               char *bytes, size_t *bytes_len,
+                               uint32_t timeout);
+
+/**
  * @brief   Send raw bytes to a device
  *
  * @param[in]   dev     device to operate on
@@ -219,6 +259,18 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
  * @param[in]   len     number of bytes to send
  */
 void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len);
+
+/**
+ * @brief   Receive raw bytes from a device
+ *
+ * @param[in]   dev     device to operate on
+ * @param[in]   bytes   buffer where store received bytes
+ * @param[in]   len     maximum number of bytes to receive
+ * @param[in]   timeout timeout (in usec) of inactivity to finish read
+ *
+ * @returns     Number of bytes read, eventually zero if no bytes available
+ */
+ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout);
 
 /**
  * @brief   Send command to device

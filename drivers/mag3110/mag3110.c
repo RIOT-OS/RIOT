@@ -46,7 +46,7 @@ int mag3110_init(mag3110_t *dev, const mag3110_params_t *params)
     assert(params);
 
     /* write device descriptor */
-    memcpy(dev, params, sizeof(mag3110_params_t));
+    dev->params = *params;
 
     i2c_acquire(BUS);
     /* test device */

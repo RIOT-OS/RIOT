@@ -29,7 +29,22 @@
 #include <string.h>
 #include "irq.h"
 
-#if !defined(__llvm__) && !defined(__clang__)
+/*
+ * uncrustify mis-formats the macros in this file, so disable it globally.
+ * begin{code-style-ignore}
+ */
+
+/* use gcc/clang implementation if available */
+#if defined(__GNUC__) \
+    && (__GNUC__ > 4 || \
+       (__GNUC__ == 4 && (__GNUC_MINOR__ > 7 || \
+       (__GNUC_MINOR__ == 7 && __GNUC_PATCHLEVEL__ > 0)))) \
+    || defined(__llvm__) || defined(__clang__)
+#define HAVE_C11_SYNC
+#endif
+
+#if !defined(HAVE_C11_SYNC)
+
 /* GCC documentation refers to the types as I1, I2, I4, I8, I16 */
 typedef uint8_t  I1;
 typedef uint16_t I2;
@@ -224,4 +239,5 @@ TEMPLATE_SYNC_OP_AND_FETCH_N(nand, &, 2, ~) /* __sync_nand_and_fetch_2 */
 TEMPLATE_SYNC_OP_AND_FETCH_N(nand, &, 4, ~) /* __sync_nand_and_fetch_4 */
 TEMPLATE_SYNC_OP_AND_FETCH_N(nand, &, 8, ~) /* __sync_nand_and_fetch_8 */
 #endif
+/* end{code-style-ignore} */
 /** @} */

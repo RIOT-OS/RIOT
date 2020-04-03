@@ -27,7 +27,15 @@
 
 #include "em_usart.h"
 #include "em_usart_utils.h"
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+
+/**
+ * @brief   Defines whether LEUART is enabled and supported
+ */
+#if EFM32_LEUART_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#define USE_LEUART
+#endif
+
+#ifdef USE_LEUART
 #include "em_leuart.h"
 #include "em_leuart_utils.h"
 #endif
@@ -37,6 +45,7 @@
  */
 static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 
+#ifdef USE_LEUART
 /**
  * @brief   Check if device is a U(S)ART device.
  */
@@ -44,6 +53,7 @@ static inline bool _is_usart(uart_t dev)
 {
     return ((uint32_t) uart_config[dev].dev) < LEUART0_BASE;
 }
+#endif
 
 int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
@@ -57,11 +67,11 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     isr_ctx[dev].arg = arg;
 
     /* initialize the pins */
-    gpio_init(uart_config[dev].rx_pin, GPIO_IN);
-    gpio_init(uart_config[dev].tx_pin, GPIO_OUT);
+    gpio_init(uart_config[dev].rx_pin, GPIO_IN_PU);
+    gpio_init(uart_config[dev].tx_pin, GPIO_OUT | 1); /* 1 for high */
 
     /* initialize the UART/USART/LEUART device */
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#ifdef USE_LEUART
     if (_is_usart(dev)) {
 #endif
         USART_TypeDef *uart = (USART_TypeDef *) uart_config[dev].dev;
@@ -75,11 +85,6 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
         init.enable = usartDisable;
         init.baudrate = baudrate;
-#if EFM32_UART_MODES
-        init.databits = USART_DataBits2Def((uart_config[dev].mode >> 0) & 0xf);
-        init.stopbits = USART_StopBits2Def((uart_config[dev].mode >> 4) & 0xf);
-        init.parity = USART_Parity2Def((uart_config[dev].mode >> 8) & 0xf);
-#endif
 
         USART_InitAsync(uart, &init);
 
@@ -96,9 +101,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         /* enable receive interrupt */
         USART_IntEnable(uart, USART_IEN_RXDATAV);
 
-        /* enable peripheral */
-        USART_Enable(uart, usartEnable);
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#ifdef USE_LEUART
     } else {
         LEUART_TypeDef *leuart = (LEUART_TypeDef *) uart_config[dev].dev;
 
@@ -111,11 +114,6 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
         init.enable = leuartDisable;
         init.baudrate = baudrate;
-#if EFM32_UART_MODES
-        init.databits = LEUART_DataBits2Def((uart_config[dev].mode >> 0) & 0xf);
-        init.stopbits = LEUART_StopBits2Def((uart_config[dev].mode >> 4) & 0xf);
-        init.parity = LEUART_Parity2Def((uart_config[dev].mode >> 8) & 0xf);
-#endif
 
         LEUART_Init(leuart, &init);
 
@@ -131,32 +129,80 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
         /* enable receive interrupt */
         LEUART_IntEnable(leuart, LEUART_IEN_RXDATAV);
-
-        /* enable peripheral */
-        LEUART_Enable(leuart, leuartEnable);
     }
 #endif
 
     /* enable the interrupt */
-    NVIC_ClearPendingIRQ(uart_config[dev].irq);
-    NVIC_EnableIRQ(uart_config[dev].irq);
+    if (rx_cb) {
+        NVIC_ClearPendingIRQ(uart_config[dev].irq);
+        NVIC_EnableIRQ(uart_config[dev].irq);
+    }
+
+    uart_poweron(dev);
 
     return 0;
 }
 
-void uart_write(uart_t dev, const uint8_t *data, size_t len)
+#ifdef MODULE_PERIPH_UART_MODECFG
+int uart_mode(uart_t dev, uart_data_bits_t data_bits, uart_parity_t parity,
+              uart_stop_bits_t stop_bits)
 {
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+    if (parity == UART_PARITY_MARK || parity == UART_PARITY_SPACE) {
+        return UART_NOMODE;
+    }
+
+#ifdef USE_LEUART
     if (_is_usart(dev)) {
 #endif
-        while (len--) {
-            USART_Tx(uart_config[dev].dev, *(data++));
-        }
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+        USART_TypeDef *uart = (USART_TypeDef *) uart_config[dev].dev;
+
+        USART_FrameSet(uart,
+                       USART_DataBits2Def(data_bits),
+                       USART_StopBits2Def(stop_bits),
+                       USART_Parity2Def(parity));
+#ifdef USE_LEUART
     } else {
-        while (len--) {
-            LEUART_Tx(uart_config[dev].dev, *(data++));
+        if (data_bits != UART_DATA_BITS_8) {
+            return UART_NOMODE;
         }
+
+        LEUART_TypeDef *leuart = (LEUART_TypeDef *) uart_config[dev].dev;
+
+        LEUART_FrameSet(leuart,
+                        LEUART_DataBits2Def(data_bits),
+                        LEUART_StopBits2Def(stop_bits),
+                        LEUART_Parity2Def(parity));
+    }
+#endif
+
+    return UART_OK;
+}
+#endif
+
+void uart_write(uart_t dev, const uint8_t *data, size_t len)
+{
+#ifdef USE_LEUART
+    if (_is_usart(dev)) {
+#endif
+        USART_TypeDef *usart = uart_config[dev].dev;
+
+        while (len--) {
+            USART_Tx(usart, *(data++));
+        }
+
+        /* spin until transmission is complete */
+        while (!(usart->STATUS & USART_STATUS_TXC)) {}
+
+#ifdef USE_LEUART
+    } else {
+        LEUART_TypeDef *leuart = uart_config[dev].dev;
+
+        while (len--) {
+            LEUART_Tx(leuart, *(data++));
+        }
+
+        /* spin until transmission is complete */
+        while (!(leuart->STATUS & LEUART_STATUS_TXC)) {}
     }
 #endif
 }
@@ -164,25 +210,79 @@ void uart_write(uart_t dev, const uint8_t *data, size_t len)
 void uart_poweron(uart_t dev)
 {
     CMU_ClockEnable(uart_config[dev].cmu, true);
+
+#ifdef USE_LEUART
+    if (_is_usart(dev)) {
+#endif
+        USART_TypeDef *usart = uart_config[dev].dev;
+
+        /* enable tx */
+        USART_Enable_TypeDef enable = usartEnableTx;
+
+        /* enable rx if needed */
+        if (isr_ctx[dev].rx_cb) {
+            enable |= usartEnableRx;
+        }
+
+        USART_Enable(usart, enable);
+#ifdef USE_LEUART
+    }
+    else {
+        LEUART_TypeDef *leuart = uart_config[dev].dev;
+
+        /* enable tx */
+        LEUART_Enable_TypeDef enable = leuartEnableTx;
+
+        /* enable rx if needed */
+        if (isr_ctx[dev].rx_cb) {
+            enable |= leuartEnableRx;
+        }
+
+        LEUART_Enable(leuart, enable);
+    }
+#endif
 }
 
 void uart_poweroff(uart_t dev)
 {
+#ifdef USE_LEUART
+    if (_is_usart(dev)) {
+#endif
+        USART_TypeDef *usart = uart_config[dev].dev;
+
+        /* disable tx and rx */
+        USART_Enable(usart, usartDisable);
+#ifdef USE_LEUART
+    }
+    else {
+        LEUART_TypeDef *leuart = uart_config[dev].dev;
+
+        /* disable tx and rx */
+        LEUART_Enable(leuart, leuartDisable);
+    }
+#endif
+
     CMU_ClockEnable(uart_config[dev].cmu, false);
 }
 
 static void rx_irq(uart_t dev)
 {
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#ifdef USE_LEUART
     if (_is_usart(dev)) {
 #endif
         if (USART_IntGet(uart_config[dev].dev) & USART_IF_RXDATAV) {
-            isr_ctx[dev].rx_cb(isr_ctx[dev].arg, USART_RxDataGet(uart_config[dev].dev));
+            uint8_t c = USART_RxDataGet(uart_config[dev].dev);
+            if (isr_ctx[dev].rx_cb) {
+                isr_ctx[dev].rx_cb(isr_ctx[dev].arg, c);
+            }
         }
-#if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
+#ifdef USE_LEUART
     } else {
         if (LEUART_IntGet(uart_config[dev].dev) & LEUART_IF_RXDATAV) {
-            isr_ctx[dev].rx_cb(isr_ctx[dev].arg, LEUART_RxDataGet(uart_config[dev].dev));
+            uint8_t c = LEUART_RxDataGet(uart_config[dev].dev);
+            if (isr_ctx[dev].rx_cb) {
+                isr_ctx[dev].rx_cb(isr_ctx[dev].arg, c);
+            }
         }
     }
 #endif

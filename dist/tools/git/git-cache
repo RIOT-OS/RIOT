@@ -136,8 +136,9 @@ _check_tag_or_commit() {
     local REMOTE_NAME=$2
 
     if _check_commit $SHA1 ; then
-        git_cache tag commit$SHA1 $SHA1 2> /dev/null || true # ignore possibly already existing tag
-        echo "commit$SHA1"
+        local tag=commit$SHA1-$$
+        git_cache tag $tag $SHA1 2> /dev/null || true # ignore possibly already existing tag
+        echo "$tag"
     elif _tag_to_sha1 ${REMOTE_NAME}/$SHA1 > /dev/null; then
         echo "${REMOTE_NAME}/$SHA1"
     fi
@@ -187,7 +188,23 @@ clone() {
         if [ -n "$tag" ]; then
             echo "git-cache: cloning from cache. tag=$tag"
             git -c advice.detachedHead=false clone $Q --reference "${GIT_CACHE_DIR}" --shared "${GIT_CACHE_DIR}" "${TARGET_PATH}" --branch $tag
+
+            # rename tags from <remote-hash>/* to *
             git -C "${TARGET_PATH}" fetch $Q origin "refs/tags/${REMOTE_NAME}/*:refs/tags/*"
+
+            # remove all commit* and <remote-hash>/* tags
+            git -C "${TARGET_PATH}" tag -l \
+                | grep -P '(^[a-f0-9]{40}/|^commit[a-f0-9]{40}(-\d+)?$)' \
+                | xargs git -C "${TARGET_PATH}" tag -d > /dev/null
+
+            # cleanup possibly created helper tag
+            case $tag in
+                commit*)
+                    git_cache tag -d $tag 2>&1 > /dev/null || true
+                    ;;
+            esac
+
+
             if [ $pull -eq 1 ]; then
                 git -C "${TARGET_PATH}" fetch $Q $REMOTE $SHA1:$SHA1
                 git -C "${TARGET_PATH}" checkout $Q $SHA1
@@ -201,6 +218,12 @@ clone() {
             git clone "${REMOTE}" "${TARGET_PATH}"
             git -c advice.detachedHead=false -C "${TARGET_PATH}" checkout $SHA1
     fi
+}
+
+cleanup() {
+    git_cache tag -l \
+        | grep -P '(^commit[a-f0-9]{40}(-\d+)?$)' \
+        | xargs git -C "${GIT_CACHE_DIR}" tag -d > /dev/null
 }
 
 usage() {
@@ -217,6 +240,9 @@ usage() {
     echo "    git cache clone <url> <SHA1>  clone repository <url> from cache"
     echo "    git cache show-path           print's the path that can be used as "
     echo "                                  '--reference' parameter"
+    echo "    git cache cleanup             cleanup dangling temporary tags"
+    echo "                                  (appear if git-cache gets inter-"
+    echo "                                   rupted, but are harmless)"
     echo ""
     echo "To retrieve objects from cache (will use remote repository if needed):"
     echo '    git clone --reference $(git cache show-path) <repo>'
@@ -253,6 +279,9 @@ case $ACTION in
         ;;
     clone)
         clone $*
+        ;;
+    cleanup)
+        cleanup
         ;;
     *)
         usage

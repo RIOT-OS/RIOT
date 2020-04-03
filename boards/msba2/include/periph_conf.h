@@ -19,7 +19,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "lpc2387.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,6 +29,8 @@ extern "C" {
  * @name    Clock configuration
  * @{
  */
+#define XTAL_HZ             (16000000U)         /* the board provides a 16 MHz XTAL */
+
 #define CLOCK_CORECLOCK     (72000000U)         /* the msba2 runs with 72MHz */
 
 #define CLOCK_PCLK          (CLOCK_CORECLOCK)
@@ -66,29 +68,111 @@ extern "C" {
 #define PWM_FUNC          (1)
 /** @} */
 
-/**
- * @name    Real Time Clock configuration
- * @{
- */
-#define RTC_NUMOF           (1)
-/** @} */
 
 /**
  * @name    UART configuration
  * @{
  */
-#define UART_NUMOF          (1)
-#define UART_0_EN           (1)
+static const uart_conf_t uart_config[] = {
+    {
+        .dev = UART0,
+        .irq_prio_rx = 6,
+        .pinsel_rx   = 0,
+        .pinsel_tx   = 0,
+        .pinsel_msk_rx = BIT4,
+        .pinsel_msk_tx = BIT6,
+    },
+    {
+        .dev = UART1,
+        .irq_prio_rx = 6,
+        .pinsel_rx   = 4,
+        .pinsel_tx   = 4,
+        .pinsel_msk_rx = BIT3,
+        .pinsel_msk_tx = BIT1,
+    },
+    {
+        .dev = UART2,
+        .irq_prio_rx = 6,
+        .pinsel_rx   = 0,
+        .pinsel_tx   = 0,
+        .pinsel_msk_rx = BIT22,
+        .pinsel_msk_tx = BIT20,
+    },
+    {
+        .dev = UART3,
+        .irq_prio_rx = 6,
+        .pinsel_rx   = 9,
+        .pinsel_tx   = 9,
+        .pinsel_msk_rx = BIT26 | BIT27,
+        .pinsel_msk_tx = BIT24 | BIT25,
+    },
+};
+
+#define UART_NUMOF          (4)
 /** @} */
 
 /**
  * @name    SPI configuration
- *
- * The SPI implementation is very much fixed, so we don't need to configure
- * anything besides the mandatory SPI_NUMOF.
  * @{
  */
+static const spi_conf_t spi_config[] = {
+    {
+        .dev = SPI0,
+        .pinsel_mosi = 3,
+        .pinsel_miso = 3,
+        .pinsel_clk  = 3,
+        .pinsel_msk_mosi = (BIT16 | BIT17),
+        .pinsel_msk_miso = (BIT14 | BIT15),
+        .pinsel_msk_clk  = (BIT8  | BIT9),
+    },
+};
+
 #define SPI_NUMOF           (1)
+/** @} */
+
+/**
+ * @name ADC configuration
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    {   /* P0.23 */
+        .chan       = 0,
+        .pinsel     = 1,
+        .pinsel_msk = BIT14,
+    },
+    {   /* P0.24 */
+        .chan       = 1,
+        .pinsel     = 1,
+        .pinsel_msk = BIT16,
+    },
+    {   /* P0.25 */
+        .chan       = 2,
+        .pinsel     = 1,
+        .pinsel_msk = BIT18,
+    },
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+/** @} */
+
+/**
+ * @name I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {   /* JP3 */
+        .dev        = I2C2,
+        .speed      = I2C_SPEED_NORMAL,
+        .irq_prio   = 5,
+        .pinsel_sda = 0,
+        .pinsel_scl = 0,
+        .pinsel_msk_sda = BIT21, /* P0.10 */
+        .pinsel_msk_scl = BIT23, /* P0.11 */
+    },
+};
+
+/* used in arithmetic preprocessor expression, so no ARRAY_SIZE() */
+#define I2C_NUMOF           (1)
 /** @} */
 
 #ifdef __cplusplus

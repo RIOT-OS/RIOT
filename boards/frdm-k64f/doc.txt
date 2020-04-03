@@ -8,8 +8,7 @@ The board has a K64F Kinetis MCU and is supported by `cpu/kinetis_common`.
 
 ## Hardware
 
-![frdm-k64f](http://cache.freescale.com/files/graphic/block_diagram/31958-FRD
-M-K64F_BDTN.jpg)
+![frdm-k64f](https://www.nxp.com/assets/images/en/dev-board-image/BOARD-FRDM-K64F-PRODUCT-SHOT.png)
 
 | MCU        | MK64FN1M0VLL12        |
 |:------------- |:--------------------- |
@@ -31,7 +30,7 @@ M-K64F_BDTN.jpg)
 | Vcc        | TODO          |
 | Reference Manual | TODO |
 
-The board has an integrated debuger adapter (k20dx128) with the firmware from
+The board has an integrated debugger adapter (k20dx128) with the firmware from
 ARMmbed.
 There are three interfaces available:
 * Drag-n-drop programming over Mass Storage Device

@@ -32,7 +32,6 @@
 #endif
 
 #define MAX_CHANNELS        (10U)
-#define TIM_SPEED           (1000000ul) /* try to run with 1MHz */
 #define CHAN_OFFSET         (5000U)     /* fire every 5ms */
 #define COOKIE              (100U)      /* for checking if arg is passed */
 
@@ -61,7 +60,7 @@ static int test_timer(unsigned num)
     }
 
     /* initialize and halt timer */
-    if (timer_init(TIMER_DEV(num), TIM_SPEED, cb, (void *)(COOKIE * num)) < 0) {
+    if (timer_init(TIMER_DEV(num), TIMER_SPEED, cb, (void *)(COOKIE * num)) < 0) {
         printf("TIMER_%u: ERROR on initialization - skipping\n\n", num);
         return 0;
     }
@@ -115,16 +114,6 @@ int main(void)
     int res = 0;
 
     puts("\nTest for peripheral TIMERs\n");
-    puts("This test will test all configured peripheral timers of the\n"
-         "targeted platform. For each timer, it will set each channel with\n"
-         "an incrementing timeout. CH0 set to 5ms, CH1 to 10ms, CH2 to 15ms\n"
-         "and so on.\n"
-         "In the output you should see that every channel fired, after an\n"
-         "evenly distributed amount of time -> the shown diff values should\n"
-         "be pretty much equal (to some jitter...)\n"
-         "This test does however NOT show, if the timeouts were correct in\n"
-         "relation to the expected real-time ~ use e.g. tests/xtimer_msg for\n"
-         "this.\n\n");
 
     printf("Available timers: %i\n", TIMER_NUMOF);
 

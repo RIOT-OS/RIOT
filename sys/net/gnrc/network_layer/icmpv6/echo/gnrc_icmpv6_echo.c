@@ -93,13 +93,13 @@ void gnrc_icmpv6_echo_req_handle(gnrc_netif_t *netif, ipv6_hdr_t *ipv6_hdr,
     pkt = hdr;
     hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
 
-    if (netif != NULL) {
-        ((gnrc_netif_hdr_t *)hdr->data)->if_pid = netif->pid;
+    if (hdr == NULL) {
+        DEBUG("icmpv6_echo: no space left in packet buffer\n");
+        gnrc_pktbuf_release(pkt);
+        return;
     }
-    else {
-        /* ipv6_hdr->dst is loopback address */
-        ((gnrc_netif_hdr_t *)hdr->data)->if_pid = KERNEL_PID_UNDEF;
-    }
+    /* (netif == NULL) => ipv6_hdr->dst is loopback address */
+    gnrc_netif_hdr_set_netif(hdr->data, netif);
 
     LL_PREPEND(pkt, hdr);
 

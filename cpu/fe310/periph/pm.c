@@ -17,17 +17,24 @@
  * @}
  */
 
+#include <stdint.h>
 #include "periph/pm.h"
+#include "vendor/platform.h"
 
 void pm_set_lowest(void)
 {
-    /* __asm__("wfi"); */
-}
-
-void pm_off(void)
-{
+    __asm__ volatile ("wfi");
 }
 
 void pm_reboot(void)
 {
+    AON_REG(AON_WDOGKEY) = AON_WDOGKEY_VALUE;
+    AON_REG(AON_WDOGCMP) = 0;
+    //wdogconfig: : wdogrsten | enablealways | reset to 0 | max scale
+    AON_REG(AON_WDOGKEY) = AON_WDOGKEY_VALUE;
+    AON_REG(AON_WDOGCFG) |= (AON_WDOGCFG_RSTEN | AON_WDOGCFG_ENALWAYS |\
+            AON_WDOGCFG_ZEROCMP | AON_WDOGCFG_SCALE) ;
+    AON_REG(AON_WDOGKEY) = AON_WDOGKEY_VALUE;
+    AON_REG(AON_WDOGFEED) = AON_WDOGFEED_VALUE;
+    while(1) {}
 }

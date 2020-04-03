@@ -13,4 +13,18 @@ this, RIOT provides a little tool in `dist/tools/nrf52_resetpin_cfg`.
 Simply compile, flash, and run that tool on your board, and the reset pin should
 work for the time being.
 
+## Flash the board
+
+See the `Flashing` section in @ref boards_common_nrf52.
+
+## Accessing STDIO via UART
+
+The STDIO is directly accessible via the USB port. On a Linux host, it's
+generally mapped to `/dev/ttyACM0`.
+
+Use the `term` target to connect to the board serial port<br/>
+```
+    make BOARD=nrf52840dk -C examples/hello-world term
+```
+
  */

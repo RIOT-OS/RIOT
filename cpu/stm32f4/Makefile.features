@@ -1,3 +1,7 @@
+CPU_ARCH = cortex-m4f
+CPU_FAM  = stm32f4
+
+FEATURES_PROVIDED += cortexm_mpu
 FEATURES_PROVIDED += periph_hwrng
 
 # the granularity of provided feature definition for STMs is currently by CPU

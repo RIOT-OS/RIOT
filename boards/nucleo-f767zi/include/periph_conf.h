@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f767zi STM32 Nucleo-F767ZI
- * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo-F767ZI
+ * @ingroup     boards_nucleo-f767zi
  * @{
  *
  * @file
@@ -22,59 +20,36 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "f7/cfg_clock_216_8_1.h"
+#include "cfg_i2c1_pb8_pb9.h"
+#include "cfg_spi_divtable.h"
+#include "cfg_rtt_default.h"
+#include "cfg_timer_tim2.h"
+#include "cfg_usb_otg_fs.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @name    Clock settings
- *
- * @note    This is auto-generated from
- *          `cpu/stm32_common/dist/clk_conf/clk_conf.c`
+ * @name    DMA streams configuration
  * @{
  */
-/* give the target core clock (HCLK) frequency [in Hz],
- * maximum: 216MHz */
-#define CLOCK_CORECLOCK     (216000000U)
-/* 0: no external high speed crystal available
- * else: actual crystal frequency [in Hz] */
-#define CLOCK_HSE           (8000000U)
-/* 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (1)
-/* peripheral clock setup */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4     /* max 54MHz */
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2     /* max 108MHz */
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
-
-/* Main PLL factors */
-#define CLOCK_PLL_M          (4)
-#define CLOCK_PLL_N          (216)
-#define CLOCK_PLL_P          (2)
-#define CLOCK_PLL_Q          (9)
-/** @} */
-
-/**
- * @name    Timer configuration
- * @{
- */
-static const timer_conf_t timer_config[] = {
-    {
-        .dev      = TIM2,
-        .max      = 0xffffffff,
-        .rcc_mask = RCC_APB1ENR_TIM2EN,
-        .bus      = APB1,
-        .irqn     = TIM2_IRQn
-    }
+#ifdef MODULE_PERIPH_DMA
+static const dma_conf_t dma_config[] = {
+    { .stream = 4 },    /* DMA1 Stream 4 - USART3_TX */
+    { .stream = 14 },   /* DMA2 Stream 6 - USART6_TX */
+    { .stream = 6 },    /* DMA1 Stream 6 - USART2_TX */
+    { .stream = 8 },    /* DMA2 Stream 0 - ETH_TX    */
 };
 
-#define TIMER_0_ISR         isr_tim2
+#define DMA_0_ISR  isr_dma1_stream4
+#define DMA_1_ISR  isr_dma2_stream6
+#define DMA_2_ISR  isr_dma1_stream6
+#define DMA_3_ISR  isr_dma2_stream0
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
+#endif
 /** @} */
 
 /**
@@ -91,9 +66,9 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART3_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 6,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 0,
+        .dma_chan   = 7
 #endif
     },
     {
@@ -105,9 +80,9 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 5,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 1,
+        .dma_chan   = 5
 #endif
     },
     {
@@ -119,28 +94,91 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 4,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 2,
         .dma_chan   = 4
 #endif
     }
 };
 
 #define UART_0_ISR          (isr_usart3)
-#define UART_0_DMA_ISR      (isr_dma1_stream6)
 #define UART_1_ISR          (isr_usart6)
-#define UART_1_DMA_ISR      (isr_dma1_stream5)
 #define UART_2_ISR          (isr_usart2)
-#define UART_2_DMA_ISR      (isr_dma1_stream4)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
- * @name    ADC configuration
+ * @name   SPI configuration
+ *
+ * @note    The spi_divtable is auto-generated from
+ *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-#define ADC_NUMOF           (0)
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_A, 7),
+        .miso_pin = GPIO_PIN(PORT_A, 6),
+        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .cs_pin   = GPIO_UNDEF,
+        .mosi_af  = GPIO_AF5,
+        .miso_af  = GPIO_AF5,
+        .sclk_af  = GPIO_AF5,
+        .cs_af    = GPIO_AF5,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2
+    },
+    {
+        .dev      = SPI4,
+        .mosi_pin = GPIO_PIN(PORT_E, 6),
+        .miso_pin = GPIO_PIN(PORT_E, 5),
+        .sclk_pin = GPIO_PIN(PORT_E, 2),
+        .cs_pin   = GPIO_UNDEF,
+        .mosi_af  = GPIO_AF5,
+        .miso_af  = GPIO_AF5,
+        .sclk_af  = GPIO_AF5,
+        .cs_af    = GPIO_AF5,
+        .rccmask  = RCC_APB2ENR_SPI4EN,
+        .apbbus   = APB2
+    }
+};
+
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
+/**
+ * @name ETH configuration
+ * @{
+ */
+static const eth_conf_t eth_config = {
+    .mode = RMII,
+    .mac = { 0 },
+    .speed = ETH_SPEED_100TX_FD,
+    .dma = 3,
+    .dma_chan = 8,
+    .phy_addr = 0x01,
+    .pins = {
+        GPIO_PIN(PORT_G, 13),
+        GPIO_PIN(PORT_B, 13),
+        GPIO_PIN(PORT_G, 11),
+        GPIO_PIN(PORT_C, 4),
+        GPIO_PIN(PORT_C, 5),
+        GPIO_PIN(PORT_A, 7),
+        GPIO_PIN(PORT_C, 1),
+        GPIO_PIN(PORT_A, 2),
+        GPIO_PIN(PORT_A, 1),
+    }
+};
+
+#define ETH_RX_BUFFER_COUNT (4)
+#define ETH_TX_BUFFER_COUNT (4)
+
+#define ETH_RX_BUFFER_SIZE (1524)
+#define ETH_TX_BUFFER_SIZE (1524)
+
+#define ETH_DMA_ISR        isr_dma2_stream0
+
 /** @} */
 
 #ifdef __cplusplus

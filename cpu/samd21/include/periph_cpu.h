@@ -29,33 +29,39 @@ extern "C" {
 #endif
 
 /**
- * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
+ * @name    Power mode configuration
+ * @{
  */
-static const int8_t exti_config[2][32] = {
-#ifdef CPU_MODEL_SAMD21J18A
-    { 0,  1,  2,  3,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
-      0,  1,  2,  3,  4,  5,  6,  7, 12, 13, -1, 15,  8, -1, 10, 11},
-    { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-      0,  1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1, -1, -1, 14, 15},
-#elif CPU_MODEL_SAMD21G18A
-    { 0,  1,  2,  3,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
-      0,  1,  2,  3,  4,  5,  6,  7, 12, 13, -1, 15,  8, -1, 10, 11},
-    {-1, -1,  2,  3, -1, -1, -1, -1,  8,  9, 10, 11, -1, -1, -1, -1,
-     -1, -1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1, -1, -1, -1, -1},
-#elif CPU_MODEL_SAMR21G18A
-    {-1,  1, -1, -1,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
-     -1,  1,  2,  3, -1, -1,  6,  7, 12, 13, -1, 15,  8, -1, 10, 11},
-    { 0, -1,  2,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-      0,  1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1,  8, -1, -1, -1},
-#elif CPU_MODEL_SAMR21E18A
-    {-1, -1, -1, -1, -1, -1,  6,  7, -1,  9, 10, 11, -1, -1, 14, 15,
-     -1,  1,  2,  3, -1, -1, -1, -1, 12, 13, -1, 15,  8, -1, 10, 11},
-    { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-      0,  1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-#else
-    #error Please define a proper CPU_MODEL.
-#endif
+#define PM_NUM_MODES        (3)
+/** @} */
+
+/**
+ * @brief   Override the default initial PM blocker
+ * @todo   Idle modes are enabled by default, deep sleep mode blocked
+ */
+#define PM_BLOCKER_INITIAL      0x00000001
+
+/**
+ * @name   SAMD21 sleep modes for PM
+ * @{
+ */
+#define SAMD21_PM_STANDBY       (0U)    /**< Standby mode (stops main clock) */
+#define SAMD21_PM_IDLE_2        (1U)    /**< Idle 2 (stops AHB, APB and CPU) */
+#define SAMD21_PM_IDLE_1        (2U)    /**< Idle 1 (stops AHB and CPU)      */
+#define SAMD21_PM_IDLE_0        (3U)    /**< Idle 0 (stops CPU)              */
+/** @} */
+
+/**
+ * @name   SAMD21 GCLK definitions
+ * @{
+ */
+enum {
+    SAM0_GCLK_MAIN = 0,                 /**< 48 MHz main clock      */
+    SAM0_GCLK_1MHZ,                     /**< 1 MHz clock for xTimer */
+    SAM0_GCLK_32KHZ,                    /**< 32 kHz clock           */
+    SAM0_GCLK_1KHZ,                     /**< 1 kHz clock            */
 };
+/** @} */
 
 /**
  * @brief   Override SPI hardware chip select macro
@@ -93,6 +99,7 @@ static inline int _sercom_id(SercomUsart *sercom)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
 }
 
+#ifndef DOXYGEN
 /**
  * @brief   Override the ADC resolution configuration
  * @{
@@ -107,6 +114,7 @@ typedef enum {
     ADC_RES_16BIT = 0xfd                        /**< not supported */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 #ifdef __cplusplus
 }
 #endif

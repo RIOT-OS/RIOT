@@ -1,21 +1,23 @@
 PKG_NAME=lwip
-PKG_URL=git://git.savannah.nongnu.org/lwip.git
-# lwIP v2.1.0
-PKG_VERSION=e6a8415df332ee34d7af02255b2aa1e8ee74348f
+PKG_URL=https://github.com/lwip-tcpip/lwip.git
+# lwIP v2.1.2
+PKG_VERSION=159e31b689577dbf69cf0683bbaffbd71fa5ee10
 PKG_LICENSE=BSD-3-Clause
+
+include $(RIOTBASE)/pkg/pkg.mk
 
 LWIP_MODULES         = lwip_api lwip_core lwip_ipv4 lwip_ipv6 \
                        lwip_netif lwip_netif_ppp lwip_polarssl
 LWIP_USEMODULE       = $(filter $(LWIP_MODULES),$(USEMODULE))
 LWIP_MODULE_MAKEFILE = $(RIOTBASE)/Makefile.base
 
-.PHONY: all $(LWIP_MODULES)
+.PHONY: $(LWIP_MODULES)
 
 CFLAGS += -Wno-address
 
 make_module = "$(MAKE)" -f $(LWIP_MODULE_MAKEFILE) MODULE=$(1) -C $(2)
 
-all: git-download lwip
+all: lwip
 
 lwip: $(LWIP_USEMODULE)
 	$(call make_module,$@,$(PKG_BUILDDIR))
@@ -40,5 +42,3 @@ lwip_netif_ppp:
 
 lwip_polarssl:
 	$(call make_module,$@,$(PKG_BUILDDIR)/src/netif/ppp/polarssl)
-
-include $(RIOTBASE)/pkg/pkg.mk

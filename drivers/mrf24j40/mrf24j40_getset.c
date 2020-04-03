@@ -20,6 +20,7 @@
  * @}
  */
 
+#include "byteorder.h"
 #include "mrf24j40.h"
 #include "mrf24j40_internal.h"
 #include "mrf24j40_registers.h"
@@ -122,42 +123,48 @@ static const uint8_t RSSI_value[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
 
 uint16_t mrf24j40_get_addr_short(mrf24j40_t *dev)
 {
-    return (dev->netdev.short_addr[0] << 8) | dev->netdev.short_addr[1];
+    network_uint16_t naddr;
+    naddr.u8[1] = mrf24j40_reg_read_short(dev, MRF24J40_REG_SADRL);
+    naddr.u8[0] = mrf24j40_reg_read_short(dev, MRF24J40_REG_SADRH);
+
+    return naddr.u16;
 }
 
 void mrf24j40_set_addr_short(mrf24j40_t *dev, uint16_t addr)
 {
+    network_uint16_t naddr;
+    naddr.u16 = addr;
+
 #ifdef MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
-    dev->netdev.short_addr[0] &= 0x7F;
+    naddr.u8[0] &= 0x7F;
 #endif
-    dev->netdev.short_addr[0] = (uint8_t)(addr);
-    dev->netdev.short_addr[1] = (uint8_t)(addr >> 8);
+
     mrf24j40_reg_write_short(dev, MRF24J40_REG_SADRL,
-                             dev->netdev.short_addr[1]);
+                             naddr.u8[1]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_SADRH,
-                             dev->netdev.short_addr[0]);
+                             naddr.u8[0]);
 }
 
 uint64_t mrf24j40_get_addr_long(mrf24j40_t *dev)
 {
-    uint64_t addr;
-
-    uint8_t *ap = (uint8_t *)(&addr);
+    network_uint64_t naddr;
 
     for (int i = 0; i < 8; i++) {
-        ap[i] = dev->netdev.long_addr[i];
+        naddr.u8[7 - i] = mrf24j40_reg_read_short(dev, (MRF24J40_REG_EADR0 + i));
     }
-    return addr;
+    return naddr.u64;
 }
 
 void mrf24j40_set_addr_long(mrf24j40_t *dev, uint64_t addr)
 {
+    network_uint64_t naddr;
+    naddr.u64 = addr;
+
     for (int i = 0; i < 8; i++) {
-        dev->netdev.long_addr[i] = (uint8_t)(addr >> (i * 8));
         mrf24j40_reg_write_short(dev, (MRF24J40_REG_EADR0 + i),
-                                 (addr >> ((7 - i) * 8)));
+                                 (naddr.u8[7 - i]));
     }
 }
 
@@ -252,7 +259,6 @@ void mrf24j40_set_pan(mrf24j40_t *dev, uint16_t pan)
 {
     le_uint16_t le_pan = byteorder_btols(byteorder_htons(pan));
 
-    dev->netdev.pan = pan;
     DEBUG("pan0: %u, pan1: %u\n", le_pan.u8[0], le_pan.u8[1]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_PANIDL, le_pan.u8[0]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_PANIDH, le_pan.u8[1]);
@@ -401,7 +407,6 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
     }
 }
 
-
 void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
 {
     uint8_t old_state;
@@ -428,6 +433,9 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
 void mrf24j40_sleep(mrf24j40_t *dev)
 {
     DEBUG("[mrf24j40] Putting into sleep mode\n");
+
+    /* disable the PA & LNA */
+    mrf24j40_disable_auto_pa_lna(dev);
     /* Datasheet chapter 3.15.2 IMMEDIATE SLEEP AND WAKE-UP MODE */
     /* First force a Power Management Reset */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_SOFTRST, MRF24J40_SOFTRST_RSTPWR);
@@ -461,20 +469,16 @@ void mrf24j40_assert_awake(mrf24j40_t *dev)
         xtimer_usleep(MRF24J40_WAKEUP_DELAY);
         /* reset interrupts */
         mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
+        mrf24j40_enable_auto_pa_lna(dev);
         dev->state = MRF24J40_PSEUDO_STATE_IDLE;
     }
 }
 
 void mrf24j40_reset_state_machine(mrf24j40_t *dev)
 {
-    uint8_t rfstate;
-
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, MRF24J40_RFCTL_RFRST);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x00);
     xtimer_usleep(MRF24J40_STATE_RESET_DELAY);             /* Delay at least 192us */
-    do {
-        rfstate = mrf24j40_reg_read_long(dev, MRF24J40_REG_RFSTATE);
-    } while ((rfstate & MRF24J40_RFSTATE_MASK) != MRF24J40_RFSTATE_RX);
 }
 
 void mrf24j40_software_reset(mrf24j40_t *dev)

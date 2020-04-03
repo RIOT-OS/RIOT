@@ -47,12 +47,12 @@ void *malloc(size_t size);
 
 /**
  * @brief       Allocated a new block of memory and move the existing content.
- * @details     This function allocates a new block of memory and memcpy()s the content of the ond `ptr` there.
+ * @details     This function allocates a new block of memory and memcpy()s the content of the one `ptr` there.
  *
  *              We do not know the size of the old block, so illegal reads would be likely,
  *              if it was not for the fact that the memory heap up.
  * @param[in]   ptr    Old memory block that was allocated with malloc(), calloc() or realloc().
- * @param[in]   size   Size of the new block to allocted in bytes.
+ * @param[in]   size   Size of the new block to allocated in bytes.
  * @returns     The new memory block. `NULL` if the "heap" is exhausted.
  */
 void *realloc(void *ptr, size_t size);

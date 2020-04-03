@@ -171,10 +171,11 @@ static inline void cortexm_sleep(int deep)
     __DSB();
     __WFI();
 #if defined(CPU_MODEL_STM32L152RE)
-    /* STM32L152RE crashes without this __NOP(). See #8518. */
-    __NOP();
-#endif
+    /* STM32L152RE crashes if branching to irq_restore(state). See #11830. */
+    __set_PRIMASK(state);
+#else
     irq_restore(state);
+#endif
 }
 
 /**
@@ -188,6 +189,67 @@ static inline void cortexm_isr_end(void)
         thread_yield_higher();
     }
 }
+
+/**
+ * @brief   Jumps to another image in flash
+ *
+ * This function is supposed to be called by a bootloader application.
+ *
+ * @param[in]   image_address   address in flash of other image
+ */
+static inline void cpu_jump_to_image(uint32_t image_address)
+{
+    /* On Cortex-M platforms, the flash begins with:
+     *
+     * 1. 4 byte pointer to stack to be used at startup
+     * 2. 4 byte pointer to the reset vector function
+     *
+     * On powerup, the CPU sets the stack pointer and starts executing the
+     * reset vector.
+     *
+     * We're doing the same here, but we'd like to start at image_address.
+     *
+     * This function must be called while executing from MSP (Master Stack
+     * Pointer).
+     */
+
+    /* set MSP */
+    __set_MSP(*(uint32_t*)image_address);
+
+    /* skip stack pointer */
+    image_address += 4;
+
+    /* load the images reset_vector address */
+    uint32_t destination_address = *(uint32_t*)image_address;
+
+    /* Make sure the Thumb State bit is set. */
+    destination_address |= 0x1;
+
+    /* Branch execution */
+    __asm("BX %0" :: "r" (destination_address));
+}
+
+/* The following register is only present for
+   Cortex-M0+, -M3, -M4, -M7 and -M23 CPUs */
+#if defined(CPU_ARCH_CORTEX_M0PLUS) || defined(CPU_ARCH_CORTEX_M3) || \
+    defined(CPU_ARCH_CORTEX_M4) || defined(CPU_ARCH_CORTEX_M4F) || \
+    defined(CPU_ARCH_CORTEX_M7) || defined(CPU_ARCH_CORTEX_M23)
+static inline uint32_t cpu_get_image_baseaddr(void)
+{
+    return SCB->VTOR;
+}
+#endif
+
+/**
+ * @brief   Checks is memory address valid or not
+ *
+ * This function can be used to check for memory size,
+ * peripherals availability, etc.
+ *
+ * @param[in]	address     Address to check
+ * @return                  true if address is valid
+ */
+bool cpu_check_address(volatile const char *address);
 
 #ifdef __cplusplus
 }

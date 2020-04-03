@@ -51,7 +51,7 @@ static fib_table_t test_fib_sr_table;
 
 /*
  * @brief helper function to create source routes.
- *        The enrties are constructed with the given prefix and numbers
+ *        The entries are constructed with the given prefix and numbers
  *        counted from the given count borders (from and to).
  * @param[in] pre prefix string to use
  * @param[in] from starting index to count from

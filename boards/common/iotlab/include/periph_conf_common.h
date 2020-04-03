@@ -69,6 +69,23 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    DMA streams configuration
+ * @{
+ */
+#ifdef MODULE_PERIPH_DMA
+static const dma_conf_t dma_config[] = {
+    { .stream = 3 },    /* DMA1 Channel 4 - USART1_TX */
+    { .stream = 5 },    /* DMA1 Channel 6 - USART2_TX */
+};
+
+#define DMA_0_ISR  isr_dma1_channel4
+#define DMA_1_ISR  isr_dma1_channel6
+
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
+#endif
+/** @} */
+
+/**
  * @name    Timer configuration
  * @{
  */
@@ -92,7 +109,7 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_0_ISR         isr_tim2
 #define TIMER_1_ISR         isr_tim3
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -106,7 +123,11 @@ static const uart_conf_t uart_config[] = {
         .rx_pin   = GPIO_PIN(PORT_A, 10),
         .tx_pin   = GPIO_PIN(PORT_A, 9),
         .bus      = APB2,
-        .irqn     = USART1_IRQn
+        .irqn     = USART1_IRQn,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 0,
+        .dma_chan   = 2
+#endif
     },
     {
         .dev      = USART2,
@@ -114,21 +135,24 @@ static const uart_conf_t uart_config[] = {
         .rx_pin   = GPIO_PIN(PORT_A, 3),
         .tx_pin   = GPIO_PIN(PORT_A, 2),
         .bus      = APB1,
-        .irqn     = USART2_IRQn
+        .irqn     = USART2_IRQn,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 1,
+        .dma_chan   = 2
+#endif
     }
 };
 
 #define UART_0_ISR          (isr_usart1)
 #define UART_1_ISR          (isr_usart2)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
  * @name    Real time counter configuration
  * @{
  */
-#define RTT_NUMOF           (1U)
 #define RTT_IRQ_PRIO        1
 
 #define RTT_DEV             RTC
@@ -158,7 +182,7 @@ static const i2c_conf_t i2c_config[] = {
 
 #define I2C_0_ISR           isr_i2c1_ev
 
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**

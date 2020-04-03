@@ -27,13 +27,15 @@
  * @}
  */
 
+#include <errno.h>
+
 #include "stdio_uart.h"
 
 #include "board.h"
 #include "periph/uart.h"
 #include "isrpipe.h"
 
-#ifdef USE_ETHOS_FOR_STDIO
+#ifdef MODULE_STDIO_ETHOS
 #include "ethos.h"
 extern ethos_t ethos;
 #endif
@@ -45,17 +47,30 @@ extern ethos_t ethos;
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-
-static char _rx_buf_mem[STDIO_UART_RX_BUFSIZE];
+#ifdef MODULE_STDIO_UART_RX
+static uint8_t _rx_buf_mem[STDIO_UART_RX_BUFSIZE];
 isrpipe_t stdio_uart_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
+#endif
 
 void stdio_init(void)
 {
-#ifndef USE_ETHOS_FOR_STDIO
-    uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, (uart_rx_cb_t) isrpipe_write_one, &stdio_uart_isrpipe);
+    uart_rx_cb_t cb;
+    void *arg;
+
+#ifdef MODULE_STDIO_UART_RX
+    cb = (uart_rx_cb_t) isrpipe_write_one;
+    arg = &stdio_uart_isrpipe;
 #else
-    uart_init(ETHOS_UART, ETHOS_BAUDRATE, (uart_rx_cb_t) isrpipe_write_one, &stdio_uart_isrpipe);
+    cb = NULL;
+    arg = NULL;
 #endif
+
+#ifdef MODULE_STDIO_ETHOS
+    uart_init(ETHOS_UART, ETHOS_BAUDRATE, cb, arg);
+#else
+    uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, cb, arg);
+#endif
+
 #if MODULE_VFS
     vfs_bind_stdio();
 #endif
@@ -63,15 +78,21 @@ void stdio_init(void)
 
 ssize_t stdio_read(void* buffer, size_t count)
 {
-    return (ssize_t)isrpipe_read(&stdio_uart_isrpipe, (char *)buffer, count);
+#ifdef MODULE_STDIO_UART_RX
+    return (ssize_t)isrpipe_read(&stdio_uart_isrpipe, buffer, count);
+#else
+    (void)buffer;
+    (void)count;
+    return -ENOTSUP;
+#endif
 }
 
 ssize_t stdio_write(const void* buffer, size_t len)
 {
-#ifndef USE_ETHOS_FOR_STDIO
-    uart_write(STDIO_UART_DEV, (const uint8_t *)buffer, len);
-#else
+#ifdef MODULE_STDIO_ETHOS
     ethos_send_frame(&ethos, (const uint8_t *)buffer, len, ETHOS_FRAME_TYPE_TEXT);
+#else
+    uart_write(STDIO_UART_DEV, (const uint8_t *)buffer, len);
 #endif
     return len;
 }

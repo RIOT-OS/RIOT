@@ -1,14 +1,11 @@
-## the cpu to build for
-export CPU = msp430fxyz
-export CPU_MODEL = msp430f1611
-
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial-MXV*)))
 # setup serial terminal
-export BAUD ?= 9600
+BAUD ?= 9600
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # flash tool configuration
-export FLASHER = $(RIOTTOOLS)/goodfet/goodfet.bsl
-export FFLAGS = --telosb -c $(PORT) -r -e -I -p $(HEXFILE)
+FLASHER = $(RIOTTOOLS)/goodfet/goodfet.bsl
+FLASHFILE ?= $(HEXFILE)
+FFLAGS = --telosb -c $(PROG_DEV) -r -e -I -p $(FLASHFILE)

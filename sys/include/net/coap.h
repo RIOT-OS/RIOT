@@ -44,6 +44,8 @@ extern "C" {
 #define COAP_OPT_LOCATION_QUERY (20)
 #define COAP_OPT_BLOCK2         (23)
 #define COAP_OPT_BLOCK1         (27)
+#define COAP_OPT_PROXY_URI      (35)
+#define COAP_OPT_PROXY_SCHEME   (39)
 /** @} */
 
 /**
@@ -65,6 +67,9 @@ extern "C" {
 #define COAP_METHOD_POST        (2)
 #define COAP_METHOD_PUT         (3)
 #define COAP_METHOD_DELETE      (4)
+#define COAP_METHOD_FETCH       (5)
+#define COAP_METHOD_PATCH       (6)
+#define COAP_METHOD_IPATCH      (7)
 /** @} */
 
 /**
@@ -86,6 +91,7 @@ extern "C" {
 #define COAP_CODE_204          ((2 << 5) | 4)
 #define COAP_CODE_CONTENT      ((2 << 5) | 5)
 #define COAP_CODE_205          ((2 << 5) | 5)
+#define COAP_CODE_CONTINUE     ((2 << 5) | 31)
 #define COAP_CODE_231          ((2 << 5) | 31)
 /** @} */
 
@@ -103,9 +109,11 @@ extern "C" {
 #define COAP_CODE_METHOD_NOT_ALLOWED         ((4 << 5) | 5)
 #define COAP_CODE_NOT_ACCEPTABLE             ((4 << 5) | 6)
 #define COAP_CODE_REQUEST_ENTITY_INCOMPLETE  ((4 << 5) | 8)
-#define COAP_CODE_PRECONDITION_FAILED        ((4 << 5) | 0xC)
-#define COAP_CODE_REQUEST_ENTITY_TOO_LARGE   ((4 << 5) | 0xD)
-#define COAP_CODE_UNSUPPORTED_CONTENT_FORMAT ((4 << 5) | 0xF)
+#define COAP_CODE_CONFLICT                   ((4 << 5) | 9)
+#define COAP_CODE_PRECONDITION_FAILED        ((4 << 5) | 12)
+#define COAP_CODE_REQUEST_ENTITY_TOO_LARGE   ((4 << 5) | 13)
+#define COAP_CODE_UNSUPPORTED_CONTENT_FORMAT ((4 << 5) | 15)
+#define COAP_CODE_UNPROCESSABLE_ENTITY       ((4 << 5) | 22)
 /** @} */
 
 /**
@@ -122,30 +130,27 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Content types
- * @deprecated  Deprecated in favour of [COAP_FORMAT_](@ref net_coap_format)
- *              style defines
- * @{
- */
-#define COAP_CT_LINK_FORMAT     (40)
-#define COAP_CT_XML             (41)
-#define COAP_CT_OCTET_STREAM    (42)
-#define COAP_CT_EXI             (47)
-#define COAP_CT_JSON            (50)
-/** @} */
-
-/**
  * @name    Content-Format option codes
  * @anchor  net_coap_format
  * @{
  */
-#define COAP_FORMAT_TEXT         (0)
-#define COAP_FORMAT_LINK        (40)
-#define COAP_FORMAT_XML         (41)
-#define COAP_FORMAT_OCTET       (42)
-#define COAP_FORMAT_EXI         (47)
-#define COAP_FORMAT_JSON        (50)
-#define COAP_FORMAT_CBOR        (60)
+#define COAP_FORMAT_TEXT                      (0)
+#define COAP_FORMAT_LINK                     (40)
+#define COAP_FORMAT_XML                      (41)
+#define COAP_FORMAT_OCTET                    (42)
+#define COAP_FORMAT_EXI                      (47)
+#define COAP_FORMAT_JSON                     (50)
+#define COAP_FORMAT_JSON_PATCH_JSON          (51)
+#define COAP_FORMAT_MERGE_PATCH_JSON         (52)
+#define COAP_FORMAT_CBOR                     (60)
+#define COAP_FORMAT_SENML_JSON              (110)
+#define COAP_FORMAT_SENSML_JSON             (111)
+#define COAP_FORMAT_SENML_CBOR              (112)
+#define COAP_FORMAT_SENSML_CBOR             (113)
+#define COAP_FORMAT_SENML_EXI               (114)
+#define COAP_FORMAT_SENSML_EXI              (115)
+#define COAP_FORMAT_SENML_XML               (310)
+#define COAP_FORMAT_SENSML_XML              (311)
 /** @} */
 
 /**
@@ -157,20 +162,55 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Timing parameters
+ * @defgroup net_coap_conf    CoAP compile configurations
+ * @ingroup  net_coap
+ * @ingroup  config
  * @{
  */
-#define COAP_ACK_TIMEOUT        (2U)
-#define COAP_RANDOM_FACTOR      (1.5)
 /**
- * @brief   Maximum variation for confirmable timeout.
+ * @name    Timing parameters
  *
- * Must be an integer, defined as:
- *
- *     (COAP_ACK_TIMEOUT * COAP_RANDOM_FACTOR) - COAP_ACK_TIMEOUT
+ * These parameters are defined as configurable in [RFC 7252, section 4.8.1]
+ * (https://tools.ietf.org/html/rfc7252#section-4.8.1).
+ * @{
  */
-#define COAP_ACK_VARIANCE       (1U)
+/**
+ * @brief    Timeout in seconds for a response to a confirmable request
+ *
+ * This value is for the response to the *initial* confirmable message. The
+ * timeout doubles for subsequent retries. To avoid synchronization of resends
+ * across hosts, the actual timeout is chosen randomly between
+ * @ref COAP_ACK_TIMEOUT and
+ * (@ref COAP_ACK_TIMEOUT * @ref COAP_RANDOM_FACTOR_1000 / 1000).
+ */
+#ifndef COAP_ACK_TIMEOUT
+#define COAP_ACK_TIMEOUT        (2U)
+#endif
+
+/**
+ * @brief   Used to calculate upper bound for timeout
+ *
+ * This represents the `ACK_RANDOM_FACTOR`
+ * ([RFC 7252, section 4.2](https://tools.ietf.org/html/rfc7252#section-4.2))
+ * multiplied by 1000, to avoid floating point arithmetic.
+ *
+ * See @ref COAP_ACK_TIMEOUT
+ */
+#ifndef COAP_RANDOM_FACTOR_1000
+#define COAP_RANDOM_FACTOR_1000      (1500)
+#endif
+
+/** @brief   Maximum number of retransmissions for a confirmable request */
+#ifndef COAP_MAX_RETRANSMIT
 #define COAP_MAX_RETRANSMIT     (4)
+#endif
+/** @} */
+/** @} */
+
+/**
+ * @name    Fixed timing parameters
+ * @{
+ */
 #define COAP_NSTART             (1)
 #define COAP_DEFAULT_LEISURE    (5)
 /** @} */

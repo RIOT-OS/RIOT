@@ -28,9 +28,6 @@
  * @name   I2C configuration
  * @{
  */
-#ifndef I2C_NUMOF
-#define I2C_NUMOF       (1)             /**< Number of I2C interfaces */
-#endif
 #ifndef I2C0_SPEED
 #define I2C0_SPEED      I2C_SPEED_FAST  /**< I2C bus speed of I2C_DEV(0) */
 #endif
@@ -41,6 +38,23 @@
 #define I2C0_SCL        GPIO5           /**< SCL signal of I2C_DEV(0) */
 #endif
 /** @} */
+
+/**
+ * @name   PWM channel configuration
+ *
+ * @{
+ */
+
+/**
+ * @brief Declaration of the channels for device PWM_DEV(0),
+ *        at maximum 8 channels.
+ *
+ * @note As long as PWM_DEV(0) is not initialized with \ref pwm_init, the GPIOs
+ * declared as PWM channels can be used for other purposes.
+ */
+#ifndef PWM0_GPIOS
+#define PWM0_GPIOS  { GPIO0, GPIO5, GPIO16 }
+#endif
 
 #ifdef __cplusplus
 } /* end extern "C" */

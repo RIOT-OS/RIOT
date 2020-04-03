@@ -1,0 +1,3 @@
+USEMODULE += periph_common cc26xx_cc13xx_periph
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

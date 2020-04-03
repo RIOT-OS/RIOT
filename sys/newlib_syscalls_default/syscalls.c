@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <reent.h>
 #include <errno.h>
+#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,12 +56,79 @@
 #include "xtimer.h"
 #endif
 
+#ifndef NUM_HEAPS
+#define NUM_HEAPS 1
+#endif
+
 /**
  * @brief manage the heap
  */
 extern char _sheap;                 /* start of the heap */
 extern char _eheap;                 /* end of the heap */
-char *heap_top = &_sheap + 4;
+
+/**
+ * @brief Additional heap sections that may be defined in the linkerscript.
+ *
+ *        The compiler should not generate references to those symbols if
+ *        they are not used, so only provide them if additional memory sections
+ *        that can be used as heap are available.
+ * @{
+ */
+extern char _sheap1;
+extern char _eheap1;
+
+extern char _sheap2;
+extern char _eheap2;
+
+extern char _sheap3;
+extern char _eheap3;
+/* @} */
+
+struct heap {
+    char* start;
+    char* end;
+};
+
+static char *heap_top[NUM_HEAPS] = {
+    &_sheap,
+#if NUM_HEAPS > 1
+    &_sheap1,
+#endif
+#if NUM_HEAPS > 2
+    &_sheap2,
+#endif
+#if NUM_HEAPS > 3
+    &_sheap3,
+#endif
+#if NUM_HEAPS > 4
+#error "Unsupported NUM_HEAPS value, edit newlib_syscalls_default/syscalls.c to add more heaps."
+#endif
+};
+
+static const struct heap heaps[NUM_HEAPS] = {
+    {
+        .start = &_sheap,
+        .end   = &_eheap
+    },
+#if NUM_HEAPS > 1
+    {
+        .start = &_sheap1,
+        .end   = &_eheap1
+    },
+#endif
+#if NUM_HEAPS > 2
+    {
+        .start = &_sheap2,
+        .end   = &_eheap2
+    },
+#endif
+#if NUM_HEAPS > 3
+    {
+        .start = &_sheap3,
+        .end   = &_eheap3
+    },
+#endif
+};
 
 /* MIPS newlib crt implements _init,_fini and _exit and manages the heap */
 #ifndef __mips__
@@ -69,7 +137,7 @@ char *heap_top = &_sheap + 4;
  */
 void _init(void)
 {
-    stdio_init();
+    /* nothing to do here */
 }
 
 /**
@@ -107,20 +175,50 @@ void _exit(int n)
  */
 void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
 {
+    void *res = (void*)UINTPTR_MAX;
     unsigned int state = irq_disable();
-    void *res = heap_top;
 
-    if ((heap_top + incr > &_eheap) || (heap_top + incr < &_sheap)) {
-        r->_errno = ENOMEM;
-        res = (void *)-1;
+    for (unsigned i = 0; i < NUM_HEAPS; ++i) {
+        if ((heap_top[i] + incr > heaps[i].end) ||
+            (heap_top[i] + incr < heaps[i].start)) {
+            continue;
+        }
+
+        res = heap_top[i];
+        heap_top[i] += incr;
+        break;
     }
-    else {
-        heap_top += incr;
+
+    if (res == (void*)UINTPTR_MAX) {
+        r->_errno = ENOMEM;
     }
 
     irq_restore(state);
     return res;
 }
+
+/**
+ * @brief Print heap statistics
+ *
+ * If the CPU does not provide its own heap handling and heap_stats function,
+ * but instead uses the newlib_syscall_default function, this function outputs
+ * the heap statistics. If the CPU provides its own heap_stats function, it
+ * should define HAVE_HEAP_STATS in its cpu_conf.h file.
+ */
+#ifndef HAVE_HEAP_STATS
+__attribute__((weak)) void heap_stats(void)
+{
+    struct mallinfo minfo = mallinfo();
+    long int heap_size = 0;
+
+    for (unsigned int i = 0; i < NUM_HEAPS; i++) {
+        heap_size += heaps[i].end - heaps[i].start;
+    }
+
+    printf("heap: %ld (used %d, free %ld) [bytes]\n",
+           heap_size, minfo.uordblks, heap_size - minfo.uordblks);
+}
+#endif /* HAVE_HEAP_STATS */
 
 #endif /*__mips__*/
 

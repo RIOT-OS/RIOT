@@ -1,0 +1,18 @@
+# This file contains ignored words that triggered false positive with codespell
+#
+# Extend it when needed, one word per line with documentation in a comment.
+
+# nd (Neighbor Discovery) => and, 2nd
+nd
+
+# wan (Wide Area Network) => want
+wan
+
+# od (Object Dump) => of
+od
+
+# dout (Digital out) => doubt
+dout
+
+# ALS (Ambient Light Sensing) => ALSO
+als

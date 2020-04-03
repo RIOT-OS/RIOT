@@ -36,17 +36,26 @@
 #ifndef LIS2DH12_H
 #define LIS2DH12_H
 
+#include <stdint.h>
+
 #include "saul.h"
-#include "periph/spi.h"
+
 #include "periph/gpio.h"
+#ifdef MODULE_LIS2DH12_SPI
+#include "periph/spi.h"
+#else
+#include "periph/i2c.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* I2C support is not implemented (yet), so throw an error when selected */
-#ifndef MODULE_LIS2DH12_SPI
-#error "LIS2DH12 error: I2C mode is not supported, yet. Use module li2dh12_spi"
+#if defined(MODULE_LIS2DH12) || defined(DOXYGEN)
+/**
+ * @brief   Default I2C slave address for LIS2DH12 devices
+ */
+#define LIS2DH12_ADDR_DEFAULT       (0x19)
 #endif
 
 /**
@@ -79,8 +88,17 @@ typedef enum {
  * @brief   LIS2DH12 configuration parameters
  */
 typedef struct {
+#if MODULE_LIS2DH12_SPI || DOXYGEN
     spi_t spi;                      /**< SPI bus the device is connected to */
     gpio_t cs;                      /**< connected chip select pin */
+#else
+    i2c_t i2c;                      /**< I2C bus the device is connected to */
+    uint8_t addr;                   /**< device address on the I2C bus */
+#endif
+#if MODULE_LIS2DH12_INT || DOXYGEN
+    gpio_t int1_pin;                /**< first interrupt pin */
+    gpio_t int2_pin;                /**< second interrupt pin */
+#endif
     lis2dh12_scale_t scale;         /**< sampling sensitivity used */
     lis2dh12_rate_t rate;           /**< sampling rate used */
 } lis2dh12_params_t;
@@ -100,12 +118,120 @@ enum {
     LIS2DH12_OK    =  0,            /**< everything was fine */
     LIS2DH12_NOBUS = -1,            /**< bus interface error */
     LIS2DH12_NODEV = -2,            /**< unable to talk to device */
+    LIS2DH12_NOINT = -3,            /**< wrong interrupt line (has to be LIS2DH12_INT1 or LIS2DH12_INT2) */
+    LIS2DH12_NODATA= -4,            /**< no data available */
 };
+
+#if MODULE_LIS2DH12_INT || DOXYGEN
+/*
+ * @brief Interrupt lines
+ */
+enum{
+    LIS2DH12_INT1 = 1,              /**< first interrupt line */
+    LIS2DH12_INT2 = 2,              /**< second interrupt line */
+};
+
+/**
+ * @brief   Interrupt config register values
+ */
+enum {
+    LIS2DH12_INT_CFG_XLIE = 0x01,   /**< enable X low evnt */
+    LIS2DH12_INT_CFG_XHIE = 0x02,   /**< enable X high event */
+    LIS2DH12_INT_CFG_YLIE = 0x04,   /**< enable Y low event */
+    LIS2DH12_INT_CFG_YHIE = 0x08,   /**< enable Y high event */
+    LIS2DH12_INT_CFG_ZLIE = 0x10,   /**< enable Z low event */
+    LIS2DH12_INT_CFG_ZHIE = 0x20,   /**< enable Z high event */
+    LIS2DH12_INT_CFG_6D   = 0x40,   /**< enable 6-direction detection */
+    LIS2DH12_INT_CFG_AOI  = 0x80,   /**< and/or combination interrupt events */
+};
+
+/**
+ * @brief   Interrupt type values
+ */
+enum {
+    /* for interrupt 1 (CTRL_REG3) */
+    LIS2DH12_INT_TYPE_I1_OVERRUN = 0x02, /**< FIFO overrun interrupt on INT1 */
+    LIS2DH12_INT_TYPE_I1_WTM     = 0x04, /**< FIFO watermark inter. on INT1 */
+    LIS2DH12_INT_TYPE_I1_ZYXDA   = 0x10, /**< ZYXDA interrupt on INT1 */
+    LIS2DH12_INT_TYPE_I1_IA2     = 0x20, /**< IA2 interrupt on INT1 */
+    LIS2DH12_INT_TYPE_I1_IA1     = 0x40, /**< IA1 interrupt on INT1 */
+    LIS2DH12_INT_TYPE_I1_CLICK   = 0x80, /**< click interrupt on INT1 */
+
+    /* for interrupt 2 (CTRL_REG6) */
+    LIS2DH12_INT_TYPE_INT_POLARITY = 0x02, /**< INT1 and INT2 pin polarity */
+    LIS2DH12_INT_TYPE_I2_ACT       = 0x08, /**< enable activity interrupt on INT2 */
+    LIS2DH12_INT_TYPE_I2_BOOT      = 0x10, /**< enable boot on INT2 */
+    LIS2DH12_INT_TYPE_I2_IA2       = 0x20, /**< IA2 on INT2 */
+    LIS2DH12_INT_TYPE_I2_IA1       = 0x40, /**< IA1 on INT2 */
+    LIS2DH12_INT_TYPE_I2_CLICK     = 0x80, /**< click interrupt on INT2 */
+};
+
+/**
+ * @brief    Parameter for interrupt configuration
+ */
+typedef struct {
+    uint8_t int_config;             /**< values for configuration */
+    uint8_t int_threshold:7;        /**< the threshold for triggering interrupt, threshold in range 0-127 */
+    uint8_t int_duration:7;         /**< time between two interrupts ODR section in CTRL_REG1, duration in range 0-127 */
+    uint8_t int_type;               /**< values for type of interrupts */
+    gpio_cb_t cb;                   /**< the callback to execute */
+    void *arg;                      /**< the callback argument */
+} lis2dh12_int_params_t;
+
+/**
+ * @brief   Status of INT_SRC register
+ */
+#define LIS2DH12_INT_SRC_XL     (0x01)  /**< X low event has occurred */
+#define LIS2DH12_INT_SRC_XH     (0x02)  /**< X high event has occurred */
+#define LIS2DH12_INT_SRC_YL     (0x04)  /**< Y low event has occurred */
+#define LIS2DH12_INT_SRC_YH     (0x08)  /**< Y high event has occurred */
+#define LIS2DH12_INT_SRC_ZL     (0x10)  /**< Z low event has occurred */
+#define LIS2DH12_INT_SRC_ZH     (0x20)  /**< Z high event has occurred */
+#define LIS2DH12_INT_SRC_IA     (0x40)  /**< 1 if interrupt occurred */
+#endif /* MODULE_LIS2DH12_INT */
+
+/**
+ * @brief   Status of INT_SRC register
+ */
+#define LIS2DH12_STATUS_XDA     (0x01)  /**< X-axis new data available */
+#define LIS2DH12_STATUS_YDA     (0x02)  /**< Y-axis new data available */
+#define LIS2DH12_STATUS_ZDA     (0x04)  /**< Z-axis new data available */
+#define LIS2DH12_STATUS_ZYXDA   (0x08)  /**< on X-, Y-, Z-axis new data available */
+#define LIS2DH12_STATUS_XOR     (0x10)  /**< X-axis data overrun */
+#define LIS2DH12_STATUS_YOR     (0x20)  /**< Y-axis data overrun */
+#define LIS2DH12_STATUS_ZOR     (0x40)  /**< Y-axis data overrun */
+#define LIS2DH12_STATUS_ZYXOR   (0x80)  /**< on X-, Y-, Z-axis data overrun */
 
 /**
  * @brief   Export the SAUL interface for this driver
  */
 extern const saul_driver_t lis2dh12_saul_driver;
+
+#if MODULE_LIS2DH12_INT || DOXYGEN
+/**
+ * @brief   Set the interrupt values in LIS2DH12 sensor device
+ *
+ * @param[in] dev      device descriptor
+ * @param[in] params   device interrupt configuration
+ * @param[in] int_line number of interrupt line (LIS2DH12_INT1 or LIS2DH12_INT2)
+ *
+ * @return  LIS2DH12_OK on success
+ * @return  LIS2DH12_NOBUS on bus errors
+ */
+int lis2dh12_set_int(const lis2dh12_t *dev, const lis2dh12_int_params_t *params, uint8_t int_line);
+
+/**
+ * @brief   Read an interrupt event on LIS2DH12 sensor device
+ *
+ * @param[in] dev      device descriptor
+ * @param[out] data    device interrupt data
+ * @param[in] int_line number of interrupt line (LIS2DH12_INT1 or LIS2DH12_INT2)
+ *
+ * @return  LIS2DH12_OK on success
+ * @return  LIS2DH12_NOBUS on bus errors
+ */
+int lis2dh12_read_int_src(const lis2dh12_t *dev, uint8_t *data, uint8_t int_line);
+#endif /* MODULE_LIS2DH12_INT */
 
 /**
  * @brief   Initialize the given LIS2DH12 sensor device

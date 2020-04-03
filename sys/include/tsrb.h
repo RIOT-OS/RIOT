@@ -28,6 +28,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +38,7 @@ extern "C" {
  * @brief     thread-safe ringbuffer struct
  */
 typedef struct tsrb {
-    char *buf;                  /**< Buffer to operate on. */
+    uint8_t *buf;               /**< Buffer to operate on. */
     unsigned int size;          /**< Size of buffer, must be power of 2. */
     volatile unsigned reads;    /**< total number of reads */
     volatile unsigned writes;   /**< total number of writes */
@@ -54,7 +55,7 @@ typedef struct tsrb {
  * @param[in]    buffer    Buffer to use by tsrb.
  * @param[in]    bufsize   `sizeof (buffer)`, must be power of 2.
  */
-static inline void tsrb_init(tsrb_t *rb, char *buffer, unsigned bufsize)
+static inline void tsrb_init(tsrb_t *rb, uint8_t *buffer, unsigned bufsize)
 {
     /* make sure bufsize is a power of two.
      * http://www.exploringbinary.com/ten-ways-to-check-if-an-integer-is-a-power-of-two-in-c/
@@ -125,7 +126,7 @@ int tsrb_get_one(tsrb_t *rb);
  * @param[in]   n   max number of bytes to write to @p dst
  * @return      nr of bytes written to @p dst
  */
-int tsrb_get(tsrb_t *rb, char *dst, size_t n);
+int tsrb_get(tsrb_t *rb, uint8_t *dst, size_t n);
 
 /**
  * @brief       Drop bytes from ringbuffer
@@ -142,7 +143,7 @@ int tsrb_drop(tsrb_t *rb, size_t n);
  * @return      0   on success
  * @return      -1  if no space available
  */
-int tsrb_add_one(tsrb_t *rb, char c);
+int tsrb_add_one(tsrb_t *rb, uint8_t c);
 
 /**
  * @brief       Add bytes to ringbuffer
@@ -151,7 +152,7 @@ int tsrb_add_one(tsrb_t *rb, char c);
  * @param[in]   n   max number of bytes to read from @p src
  * @return      nr of bytes read from @p src
  */
-int tsrb_add(tsrb_t *rb, const char *src, size_t n);
+int tsrb_add(tsrb_t *rb, const uint8_t *src, size_t n);
 
 #ifdef __cplusplus
 }

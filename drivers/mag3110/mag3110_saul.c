@@ -26,7 +26,7 @@
 
 static int read_mag(const void *dev, phydat_t *res)
 {
-    mag3110_read((const mag3110_t *)dev, (mag3110_data_t *)res);
+    mag3110_read((const mag3110_t *)dev, (mag3110_data_t *)res->val);
 
     res->unit = UNIT_GS;
     res->scale = 2;

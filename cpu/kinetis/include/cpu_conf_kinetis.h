@@ -120,9 +120,11 @@ extern "C"
 /** Enable LPTMR clock gate */
 #define LPTMR_CLKEN()  (bit_set32(&SIM->SCGC5, SIM_SCGC5_LPTMR_SHIFT))
 #endif
-#ifdef SIM_SCGC6_PIT_SHIFT
+#if defined(SIM_SCGC6_PIT_SHIFT)
 /** Enable PIT clock gate */
 #define PIT_CLKEN()    (bit_set32(&SIM->SCGC6, SIM_SCGC6_PIT_SHIFT))
+#elif defined(SIM_SCGC_PIT_SHIFT)
+#define PIT_CLKEN()    (bit_set32(&SIM->SCGC, SIM_SCGC_PIT_SHIFT))
 #endif
 #ifdef SIM_SCGC6_RTC_SHIFT
 /** Enable RTC clock gate */
@@ -152,15 +154,19 @@ extern "C"
  * @name Hardware random number generator module configuration
  * @{
  */
-#if !defined(HWRNG_CLKEN) && defined(RNG) && !defined(RNG_CMD_ST_MASK)
-#define KINETIS_RNGA RNG
+#if !defined(HWRNG_CLK_REG) && !defined(HWRNG_CLK_REG_SHIFT)
 #if defined(SIM_SCGC3_RNGA_SHIFT)
-#define HWRNG_CLKEN()       (bit_set32(&SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT))
-#define HWRNG_CLKDIS()      (bit_clear32(&SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT))
+#define HWRNG_CLK_REG           SIM->SCGC3
+#define HWRNG_CLK_REG_SHIFT     SIM_SCGC3_RNGA_SHIFT
 #elif defined(SIM_SCGC6_RNGA_SHIFT)
-#define HWRNG_CLKEN()       (bit_set32(&SIM->SCGC6, SIM_SCGC6_RNGA_SHIFT))
-#define HWRNG_CLKDIS()      (bit_clear32(&SIM->SCGC6, SIM_SCGC6_RNGA_SHIFT))
+#define HWRNG_CLK_REG           SIM->SCGC6
+#define HWRNG_CLK_REG_SHIFT     SIM_SCGC6_RNGA_SHIFT
 #endif
+#endif
+#if defined(RNG)
+#define KINETIS_RNGA RNG
+#define HWRNG_CLKEN()       (bit_set32(&HWRNG_CLK_REG, HWRNG_CLK_REG_SHIFT))
+#define HWRNG_CLKDIS()      (bit_clear32(&HWRNG_CLK_REG, HWRNG_CLK_REG_SHIFT))
 #endif /* KINETIS_RNGA */
 /** @} */
 

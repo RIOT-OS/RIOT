@@ -12,19 +12,20 @@
  *
  * @file
  * @brief   Definitions related to 6Lo node (6LN) functionality of the NIB
- * @see     @ref GNRC_IPV6_NIB_CONF_6LN
+ * @see     @ref CONFIG_GNRC_IPV6_NIB_6LN
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 #ifndef PRIV_NIB_6LN_H
 #define PRIV_NIB_6LN_H
 
+#include <kernel_defines.h>
 #include <stdint.h>
 
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/sixlowpan/nd.h"
 #include "timex.h"
-#include "xtimer.h"
+#include "evtimer.h"
 
 #include "_nib-arsm.h"
 #include "_nib-internal.h"
@@ -33,13 +34,7 @@
 extern "C" {
 #endif
 
-static inline uint32_t _now_min(void)
-{
-    return (uint32_t)((xtimer_now_usec64() / (US_PER_SEC * SEC_PER_MIN)) &
-                      UINT32_MAX);
-}
-
-#if GNRC_IPV6_NIB_CONF_6LN || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || defined(DOXYGEN)
 /**
  * @brief   Additional (local) status to ARO status values for tentative
  *          addresses
@@ -131,29 +126,29 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
  */
 void _handle_rereg_address(const ipv6_addr_t *addr);
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) || defined(DOXYGEN)
 _nib_abr_entry_t *_handle_abro(const sixlowpan_nd_opt_abr_t *abro);
 uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
                      const sixlowpan_nd_opt_6ctx_t *sixco,
                      _nib_abr_entry_t *abr);
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN) */
 uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
                      const sixlowpan_nd_opt_6ctx_t *sixco);
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
-#else   /* GNRC_IPV6_NIB_CONF_6LN || defined(DOXYGEN) */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN) */
+#else   /* CONFIG_GNRC_IPV6_NIB_6LN || defined(DOXYGEN) */
 #define _resolve_addr_from_ipv6(dst, netif, nce)    (false)
 /* _handle_aro() doesn't make sense without 6LR so don't even use it
  * => throw error in case it is compiled in => don't define it here as NOP macro
  */
 #define _get_next_rs_interval(netif)                (NDP_RS_MS_INTERVAL)
 #define _handle_rereg_address(netif)                (void)netif
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) || defined(DOXYGEN)
 #define _handle_abro(abro)                          (NULL)
 #define _handle_6co(icmpv6, sixco, abr)             (UINT32_MAX)
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN) */
 #define _handle_6co(icmpv6, sixco)                  (UINT32_MAX)
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
-#endif  /* GNRC_IPV6_NIB_CONF_6LN || defined(DOXYGEN) */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN) */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN || defined(DOXYGEN) */
 
 
 #ifdef __cplusplus

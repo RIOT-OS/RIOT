@@ -66,7 +66,7 @@
  * in ascending order by this key.
  *
  * The definitions for the table types are in `lua_builtin.h`. The loader module
- * containes empty tables, defined as weak symbols so they can be ovewritten
+ * contains empty tables, defined as weak symbols so they can be ovewritten
  * by the application. The variables that must be defined are:
  *
  * ```
@@ -110,9 +110,9 @@
  *
  * ### Patches
  *
- * A version of Lua with the patches applied is available at
- * https://github.com/riot-appstore/lua. It can be downloaded and compiled in
- * desktop computer, and the official test suite (https://www.lua.org/tests/)
+ * A version of Lua with the patches applied is available at [GitHub]
+ * (https://github.com/riot-appstore/lua) It can be downloaded and compiled in
+ * desktop computer, and the official [test suite](https://www.lua.org/tests/)
  * can then be run.
  *
  * Alternatively, the patches in this package can be directly applied to the

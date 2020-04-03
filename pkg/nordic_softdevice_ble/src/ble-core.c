@@ -46,6 +46,7 @@
  */
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 //#include "boards.h"
 //#include "nordic_common.h"
@@ -109,8 +110,9 @@ ble_stack_init(void)
  * @brief Return device EUI64 MAC address
  * @param addr pointer to a buffer to store the address
  */
+#include "ble-mac.h"
 void
-ble_get_mac(uint8_t addr[8])
+ble_get_mac(uint8_t addr[6])
 {
   uint32_t err_code;
   ble_gap_addr_t ble_addr;
@@ -118,7 +120,8 @@ ble_get_mac(uint8_t addr[8])
   err_code = sd_ble_gap_address_get(&ble_addr);
   APP_ERROR_CHECK(err_code);
 
-  IPV6_EUI64_CREATE_FROM_EUI48(addr, ble_addr.addr, ble_addr.addr_type);
+  ble_eui48(addr, ble_addr.addr,
+            ble_addr.addr_type == BLE_GAP_ADDR_TYPE_PUBLIC);
 }
 /*---------------------------------------------------------------------------*/
 /**
@@ -146,7 +149,7 @@ ble_advertising_init(const char *name)
 
   advdata.name_type = BLE_ADVDATA_FULL_NAME;
   advdata.flags = flags;
-  advdata.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
+  advdata.uuids_complete.uuid_cnt = ARRAY_SIZE(adv_uuids);
   advdata.uuids_complete.p_uuids = adv_uuids;
 
   err_code = ble_advdata_set(&advdata, NULL);

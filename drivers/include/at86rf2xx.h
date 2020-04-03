@@ -33,11 +33,15 @@
 #include <stdbool.h>
 
 #include "board.h"
-#include "periph/spi.h"
-#include "periph/gpio.h"
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
 #include "net/gnrc/nettype.h"
+
+/* we need no peripherals for memory mapped radios */
+#if !defined(MODULE_AT86RFA1) && !defined(MODULE_AT86RFR2)
+#include "periph/spi.h"
+#include "periph/gpio.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,13 +72,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Default PAN ID
- *
- * @todo    Read some global network stack specific configuration value
- */
-#define AT86RF2XX_DEFAULT_PANID         (IEEE802154_DEFAULT_PANID)
-
-/**
  * @brief   Default TX power (0dBm)
  */
 #define AT86RF2XX_DEFAULT_TXPOWER       (IEEE802154_DEFAULT_TXPOWER)
@@ -90,6 +87,8 @@ extern "C" {
  *       for other seetings this value may change.
  */
 #   define RSSI_BASE_VAL                   (-98)
+#elif MODULE_AT86RFA1 || MODULE_AT86RFR2
+#   define RSSI_BASE_VAL                   (-90)
 #else
 #   define RSSI_BASE_VAL                   (-91)
 #endif
@@ -101,6 +100,8 @@ extern "C" {
 #   define MAX_RX_SENSITIVITY              (-52)
 #elif MODULE_AT86RF212B
 #   define MAX_RX_SENSITIVITY              (-54)
+#elif MODULE_AT86RFA1 || MODULE_AT86RFR2
+#   define MAX_RX_SENSITIVITY              (-48)
 #else
 #   define MAX_RX_SENSITIVITY              (-49)
 #endif
@@ -112,6 +113,8 @@ extern "C" {
 #   define MIN_RX_SENSITIVITY              (-101)
 #elif MODULE_AT86RF212B
 #   define MIN_RX_SENSITIVITY              (-110)
+#elif MODULE_AT86RFA1 || MODULE_AT86RFR2
+#   define MIN_RX_SENSITIVITY              (-100)
 #else
 #   define MIN_RX_SENSITIVITY              (-101)
 #endif
@@ -131,6 +134,23 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Random Number Generator
+ *
+ * Most AT86RF radios have the option to use the highest bits of the RSSI
+ * register as a source of randomness.
+ * See Section 11.2 of the at86rf233 reference manual. (RND_VALUE)
+ */
+#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231) || defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#ifndef AT86RF2XX_RANDOM_NUMBER_GENERATOR
+#define AT86RF2XX_RANDOM_NUMBER_GENERATOR  (1)
+#endif
+#else
+#ifndef AT86RF2XX_RANDOM_NUMBER_GENERATOR
+#define AT86RF2XX_RANDOM_NUMBER_GENERATOR  (0)
+#endif
+#endif
+
+/**
  * @brief   Smart idle listening feature
  *
  * This feature optimizes radio operation in the listening mode, reducing
@@ -138,7 +158,7 @@ extern "C" {
  * manual recommends to disable this feature for RSSI measurements or random number
  * generation (Section 8.4 and Section 11.2).
  */
-#ifdef MODULE_AT86RF233
+#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RFR2)
 #ifndef AT86RF2XX_SMART_IDLE_LISTENING
 #define AT86RF2XX_SMART_IDLE_LISTENING     (1)
 #endif
@@ -187,6 +207,12 @@ extern "C" {
 
 /** @} */
 
+#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+/**
+ * @brief   memory mapped radio needs no parameters
+ */
+typedef void at86rf2xx_params_t;
+#else
 /**
  * @brief   struct holding all params needed for device initialization
  */
@@ -198,6 +224,7 @@ typedef struct at86rf2xx_params {
     gpio_t sleep_pin;       /**< GPIO pin connected to the sleep pin */
     gpio_t reset_pin;       /**< GPIO pin connected to the reset pin */
 } at86rf2xx_params_t;
+#endif
 
 /**
  * @brief   Device descriptor for AT86RF2XX radio devices
@@ -206,8 +233,19 @@ typedef struct at86rf2xx_params {
  */
 typedef struct {
     netdev_ieee802154_t netdev;             /**< netdev parent struct */
+#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+    /* ATmega256rfr2 signals transceiver events with different interrupts
+     * they have to be stored to mimic the same flow as external transceiver
+     * Use irq_status to map saved interrupts of SOC transceiver,
+     * as they clear after IRQ callback.
+     *
+     *  irq_status = IRQ_STATUS
+     */
+    uint8_t irq_status;                     /**< save irq status */
+#else
     /* device specific fields */
     at86rf2xx_params_t params;              /**< parameters for initialization */
+#endif
     uint16_t flags;                         /**< Device specific flags */
     uint8_t state;                          /**< current state of the radio */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */
@@ -244,11 +282,12 @@ void at86rf2xx_reset(at86rf2xx_t *dev);
 /**
  * @brief   Get the short address of the given device
  *
- * @param[in] dev           device to read from
+ * @param[in]   dev         device to read from
+ * @param[out]  addr        the short address will be stored here
  *
  * @return                  the currently set (2-byte) short address
  */
-uint16_t at86rf2xx_get_addr_short(const at86rf2xx_t *dev);
+void at86rf2xx_get_addr_short(const at86rf2xx_t *dev, network_uint16_t *addr);
 
 /**
  * @brief   Set the short address of the given device
@@ -256,16 +295,17 @@ uint16_t at86rf2xx_get_addr_short(const at86rf2xx_t *dev);
  * @param[in,out] dev       device to write to
  * @param[in] addr          (2-byte) short address to set
  */
-void at86rf2xx_set_addr_short(at86rf2xx_t *dev, uint16_t addr);
+void at86rf2xx_set_addr_short(at86rf2xx_t *dev, const network_uint16_t *addr);
 
 /**
  * @brief   Get the configured long address of the given device
  *
- * @param[in] dev           device to read from
+ * @param[in]   dev         device to read from
+ * @param[out]  addr        the long address will be stored here
  *
  * @return                  the currently set (8-byte) long address
  */
-uint64_t at86rf2xx_get_addr_long(const at86rf2xx_t *dev);
+void at86rf2xx_get_addr_long(const at86rf2xx_t *dev, eui64_t *addr);
 
 /**
  * @brief   Set the long address of the given device
@@ -273,7 +313,7 @@ uint64_t at86rf2xx_get_addr_long(const at86rf2xx_t *dev);
  * @param[in,out] dev       device to write to
  * @param[in] addr          (8-byte) long address to set
  */
-void at86rf2xx_set_addr_long(at86rf2xx_t *dev, uint64_t addr);
+void at86rf2xx_set_addr_long(at86rf2xx_t *dev, const eui64_t *addr);
 
 /**
  * @brief   Get the configured channel number of the given device

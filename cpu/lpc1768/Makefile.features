@@ -1,3 +1,8 @@
+CPU_ARCH = cortex-m3
+# This CPU only implements one CPU_MODEL with the same name
+CPU_MODEL = lpc1768
+
+FEATURES_PROVIDED += cortexm_mpu
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_pm
 

@@ -95,15 +95,6 @@ extern "C" {
 #define ASYMCUTE_LISTENER_STACKSIZE (THREAD_STACKSIZE_DEFAULT)
 #endif
 
-#ifndef ASYMCUTE_ID_MAXLEN
-/**
- * @brief   Maximum client ID length
- *
- * @note    Must be less than (256 - 8) and less than (ASYMCUTE_BUFSIZE - 8)
- */
-#define ASYMCUTE_ID_MAXLEN          (32U)
-#endif
-
 #ifndef ASYMCUTE_TOPIC_MAXLEN
 /**
  * @brief   Maximum topic length
@@ -273,7 +264,7 @@ struct asymcute_con {
     uint8_t keepalive_retry_cnt;        /**< keep alive transmission counter */
     uint8_t state;                      /**< connection state */
     uint8_t rxbuf[ASYMCUTE_BUFSIZE];    /**< connection specific receive buf */
-    char cli_id[ASYMCUTE_ID_MAXLEN + 1];/**< buffer to store client ID */
+    char cli_id[MQTTSN_CLI_ID_MAXLEN + 1];  /**< buffer to store client ID */
 };
 
 /**

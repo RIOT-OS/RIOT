@@ -1,1 +1,4 @@
-INCLUDES += -I$(RIOTPKG)/wakaama/wakaama
+DIRS += $(RIOTBASE)/pkg/wakaama/contrib
+
+INCLUDES += -I$(RIOTBASE)/pkg/wakaama/include
+INCLUDES += -I$(PKGDIRBASE)/wakaama

@@ -46,21 +46,25 @@ static const uint32_t _tenmap[] = {
     10000000LU,
 };
 
-#define TENMAP_SIZE  (sizeof(_tenmap) / sizeof(_tenmap[0]))
-
-static inline int _is_digit(char c)
-{
-    return (c >= '0' && c <= '9');
-}
-
-static inline int _is_upper(char c)
-{
-    return (c >= 'A' && c <= 'Z');
-}
+#define TENMAP_SIZE  ARRAY_SIZE(_tenmap)
 
 static inline char _to_lower(char c)
 {
     return 'a' + (c - 'A');
+}
+
+int fmt_is_number(const char *str)
+{
+    if (!str || !*str) {
+        return 0;
+    }
+    for (; *str; str++) {
+        if (!fmt_is_digit(*str)) {
+            return 0;
+        }
+    }
+
+    return 1;
 }
 
 size_t fmt_byte_hex(char *out, uint8_t byte)
@@ -265,25 +269,33 @@ size_t fmt_u16_dec(char *out, uint16_t val)
 size_t fmt_s64_dec(char *out, int64_t val)
 {
     unsigned negative = (val < 0);
+    uint64_t sval;
     if (negative) {
         if (out) {
             *out++ = '-';
         }
-        val = -val;
+        sval = -(uint64_t)(val);
     }
-    return fmt_u64_dec(out, val) + negative;
+    else {
+        sval = +(uint64_t)(val);
+    }
+    return fmt_u64_dec(out, sval) + negative;
 }
 
 size_t fmt_s32_dec(char *out, int32_t val)
 {
     unsigned negative = (val < 0);
+    uint32_t sval;
     if (negative) {
         if (out) {
             *out++ = '-';
         }
-        val = -val;
+        sval = -((uint32_t)(val));
     }
-    return fmt_u32_dec(out, val) + negative;
+    else {
+        sval = +((uint32_t)(val));
+    }
+    return fmt_u32_dec(out, sval) + negative;
 }
 
 size_t fmt_s16_dec(char *out, int16_t val)
@@ -429,7 +441,7 @@ size_t fmt_to_lower(char *out, const char *str)
     size_t len = 0;
 
     while (str && *str) {
-        if (_is_upper(*str)) {
+        if (fmt_is_upper(*str)) {
             if (out) {
                 *out++ = _to_lower(*str);
             }
@@ -449,7 +461,7 @@ uint32_t scn_u32_dec(const char *str, size_t n)
     uint32_t res = 0;
     while(n--) {
         char c = *str++;
-        if (!_is_digit(c)) {
+        if (!fmt_is_digit(c)) {
             break;
         }
         else {
@@ -466,8 +478,8 @@ uint32_t scn_u32_hex(const char *str, size_t n)
 
     while (n--) {
         char c = *str++;
-        if (!_is_digit(c)) {
-            if (_is_upper(c)) {
+        if (!fmt_is_digit(c)) {
+            if (fmt_is_upper(c)) {
                 c = _to_lower(c);
             }
             if (c == '\0' || c > 'f') {

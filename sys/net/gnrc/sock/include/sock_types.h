@@ -29,6 +29,9 @@
 #include "net/af.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netreg.h"
+#ifdef SOCK_HAS_ASYNC
+#include "net/sock/async/types.h"
+#endif
 #include "net/sock/ip.h"
 #include "net/sock/udp.h"
 
@@ -41,17 +44,55 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Forward declaration
+ * @internal
+ */
+typedef struct gnrc_sock_reg gnrc_sock_reg_t;
+
+#ifdef SOCK_HAS_ASYNC
+/**
+ * @brief   Event callback for @ref gnrc_sock_reg_t
+ * @internal
+ */
+typedef void (*gnrc_sock_reg_cb_t)(gnrc_sock_reg_t *sock,
+                                   sock_async_flags_t flags,
+                                   void *arg);
+#endif  /* SOCK_HAS_ASYNC */
+
+/**
  * @brief   sock @ref net_gnrc_netreg info
  * @internal
  */
-typedef struct gnrc_sock_reg {
+struct gnrc_sock_reg {
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
     struct gnrc_sock_reg *next;         /**< list-like for internal storage */
 #endif
     gnrc_netreg_entry_t entry;          /**< @ref net_gnrc_netreg entry for mbox */
     mbox_t mbox;                        /**< @ref core_mbox target for the sock */
     msg_t mbox_queue[SOCK_MBOX_SIZE];   /**< queue for gnrc_sock_reg_t::mbox */
-} gnrc_sock_reg_t;
+#ifdef SOCK_HAS_ASYNC
+    gnrc_netreg_entry_cbd_t netreg_cb;  /**< netreg callback */
+    /**
+     * @brief   asynchronous upper layer callback
+     *
+     * @note    All have void return value and a (sock pointer, sock_async_flags_t)
+     *          pair, so casting between these function pointers is okay.
+     */
+    union {
+        gnrc_sock_reg_cb_t generic;     /**< generic version */
+#ifdef MODULE_SOCK_IP
+        sock_ip_cb_t ip;                /**< IP version */
+#endif
+#ifdef MODULE_SOCK_UDP
+        sock_udp_cb_t udp;              /**< UDP version */
+#endif
+    } async_cb;
+    void *async_cb_arg;                 /**< asynchronous callback argument */
+#ifdef SOCK_HAS_ASYNC_CTX
+    sock_async_ctx_t async_ctx;         /**< asynchronous event context */
+#endif
+#endif  /* SOCK_HAS_ASYNC */
+};
 
 /**
  * @brief   Raw IP sock type

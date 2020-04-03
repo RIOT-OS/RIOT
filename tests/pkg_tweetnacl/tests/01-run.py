@@ -8,14 +8,14 @@
 
 import os
 import sys
-from testrunner import run
+from testrunner import run, check_unittests
 
 
 def testfunc(child):
     board = os.environ['BOARD']
     # Increase timeout on "real" hardware
-    timeout = 120 if board is not 'native' else -1
-    child.expect(r'OK \(\d+ tests\)', timeout=timeout)
+    timeout = 120 if board != 'native' else -1
+    check_unittests(child, timeout=timeout)
 
 
 if __name__ == "__main__":

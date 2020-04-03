@@ -17,25 +17,25 @@ typedef struct MD4Context {
     u8 buffer[MD4_BLOCK_LENGTH];
 } MD4_CTX;
 
-static void MD4Init(MD4_CTX *ctx);
-static void MD4Update(MD4_CTX *ctx, const unsigned char *input, size_t len);
-static void MD4Final(unsigned char digest[MD4_DIGEST_LENGTH], MD4_CTX *ctx);
+static void wpa_MD4Init(MD4_CTX *ctx);
+static void wpa_MD4Update(MD4_CTX *ctx, const unsigned char *input, size_t len);
+static void wpa_MD4Final(unsigned char digest[MD4_DIGEST_LENGTH], MD4_CTX *ctx);
 
-int md4_vector(size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac)
+int wpa_md4_vector(size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac)
 {
     MD4_CTX ctx;
     size_t i;
 
-    MD4Init(&ctx);
+    wpa_MD4Init(&ctx);
     for (i = 0; i < num_elem; i++)
-        MD4Update(&ctx, addr[i], len[i]);
-    MD4Final(mac, &ctx);
+        wpa_MD4Update(&ctx, addr[i], len[i]);
+    wpa_MD4Final(mac, &ctx);
     return 0;
 }
 
 #define MD4_DIGEST_STRING_LENGTH    (MD4_DIGEST_LENGTH * 2 + 1)
 
-static void MD4Transform(u32 state[4], const u8 block[MD4_BLOCK_LENGTH]);
+static void wpa_MD4Transform(u32 state[4], const u8 block[MD4_BLOCK_LENGTH]);
 
 #define PUT_64BIT_LE(cp, value) do {    \
     (cp)[7] = (value) >> 56;    \
@@ -60,7 +60,7 @@ static u8 PADDING[MD4_BLOCK_LENGTH] = {
     0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-static void MD4Init(MD4_CTX *ctx)
+static void wpa_MD4Init(MD4_CTX *ctx)
 {
     ctx->count = 0;
     ctx->state[0] = 0x67452301;
@@ -69,7 +69,7 @@ static void MD4Init(MD4_CTX *ctx)
     ctx->state[3] = 0x10325476;
 }
 
-static void MD4Update(MD4_CTX *ctx, const unsigned char *input, size_t len)
+static void wpa_MD4Update(MD4_CTX *ctx, const unsigned char *input, size_t len)
 {
     size_t have, need;
 
@@ -81,14 +81,14 @@ static void MD4Update(MD4_CTX *ctx, const unsigned char *input, size_t len)
     if (len >= need) {
         if (have != 0) {
             os_memcpy(ctx->buffer + have, input, need);
-            MD4Transform(ctx->state, ctx->buffer);
+            wpa_MD4Transform(ctx->state, ctx->buffer);
             input += need;
             len -= need;
             have = 0;
         }
 
         while (len >= MD4_BLOCK_LENGTH) {
-            MD4Transform(ctx->state, input);
+            wpa_MD4Transform(ctx->state, input);
             input += MD4_BLOCK_LENGTH;
             len -= MD4_BLOCK_LENGTH;
         }
@@ -98,7 +98,7 @@ static void MD4Update(MD4_CTX *ctx, const unsigned char *input, size_t len)
         os_memcpy(ctx->buffer + have, input, len);
 }
 
-static void MD4Pad(MD4_CTX *ctx)
+static void wpa_MD4Pad(MD4_CTX *ctx)
 {
     u8 count[8];
     size_t padlen;
@@ -109,15 +109,15 @@ static void MD4Pad(MD4_CTX *ctx)
         ((ctx->count >> 3) & (MD4_BLOCK_LENGTH - 1));
     if (padlen < 1 + 8)
         padlen += MD4_BLOCK_LENGTH;
-    MD4Update(ctx, PADDING, padlen - 8);
-    MD4Update(ctx, count, 8);
+    wpa_MD4Update(ctx, PADDING, padlen - 8);
+    wpa_MD4Update(ctx, count, 8);
 }
 
-static void MD4Final(unsigned char digest[MD4_DIGEST_LENGTH], MD4_CTX *ctx)
+static void wpa_MD4Final(unsigned char digest[MD4_DIGEST_LENGTH], MD4_CTX *ctx)
 {
     int i;
 
-    MD4Pad(ctx);
+    wpa_MD4Pad(ctx);
     if (digest != NULL) {
         for (i = 0; i < 4; i ++)
             PUT_32BIT_LE(digest + i * 4, ctx->state[i]);
@@ -132,7 +132,7 @@ static void MD4Final(unsigned char digest[MD4_DIGEST_LENGTH], MD4_CTX *ctx)
 #define MD4SETP(f, w, x, y, z, data, s)    \
     ( w += f(x, y, z) + data, w = w<<s | w>>(32-s) )
 
-static void MD4Transform(u32 state[4], const u8 block[MD4_BLOCK_LENGTH])
+static void wpa_MD4Transform(u32 state[4], const u8 block[MD4_BLOCK_LENGTH])
 {
     u32 a, b, c, d, in[MD4_BLOCK_LENGTH / 4];
 

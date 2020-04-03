@@ -41,6 +41,20 @@ SECTIONS
     _rtc_data_end = ABSOLUTE(.);
   } > rtc_slow_seg
 
+  /* This section holds data that should not be initialized at power up
+     and will be retained during deep sleep. The section located in
+     RTC SLOW Memory area. User data marked with RTC_NOINIT_ATTR will be placed
+     into this section. See the file "esp_attr.h" for more information.
+  */
+  .rtc.noinit (NOLOAD):
+  {
+    . = ALIGN(4);
+    _rtc_noinit_start = ABSOLUTE(.);
+    *(.rtc_noinit .rtc_noinit.*)
+    . = ALIGN(4) ;
+    _rtc_noinit_end = ABSOLUTE(.);
+  } > rtc_slow_seg
+
   /* Send .iram0 code to iram */
   .iram0.vectors :
   {
@@ -85,14 +99,14 @@ SECTIONS
 
   .iram0.text :
   {
-    /* Code marked as runnning out of IRAM */
+    /* Code marked as running out of IRAM */
     _iram_text_start = ABSOLUTE(.);
     *(.iram1 .iram1.*)
 
     *libhal.a:(.literal .text .literal.* .text.*)
-    *libgcc.a:lib2funcs.o(.literal .text .literal.* .text.*)
+    *libgcc.a:(.literal .text .literal.* .text.*)
     *libgcov.a:(.literal .text .literal.* .text.*)
-    /* *libc.a:(.literal .text .literal.* .text.*) */
+    *libc.a:*(.literal .text .literal.* .text.*)
 
     /* Xtensa basic functionality written in assembler should be placed in iram */
     *xtensa.a:*(.literal .text .literal.* .text.*)
@@ -101,12 +115,19 @@ SECTIONS
     *esp_idf_spi_flash.a:*(.literal .text .literal.* .text.*)
     /* parts of RIOT that should to run in IRAM */
     *core.a:*(.literal .text .literal.* .text.*)
-    /* *spiffs_fs.a:*(.literal .text .literal.* .text.*) */
-    /* *spiffs.a:*(.literal .text .literal.* .text.*) */
+    *littlefs.a:*(.literal .text .literal.* .text.*)
+    *littlefs2.a:*(.literal .text .literal.* .text.*)
+    *newlib_syscalls_default.a:*(.literal .text .literal.* .text.*)
+    *spiffs_fs.a:*(.literal .text .literal.* .text.*)
+    *spiffs.a:*(.literal .text .literal.* .text.*)
+    *syscalls.o(.literal .text .literal.* .text.*)
+    *vfs.a:*(.literal .text .literal.* .text.*)
 
-    /* part of RIOT ports that should run in IRAM */
+    /* part of the RIOT port that should run in IRAM */
     *cpu.a:*(.literal .text .literal.* .text.*)
+    *esp_common.a:*(.literal .text .literal.* .text.*)
     *periph.a:*(.literal .text .literal.* .text.*)
+    *mtd.a:**(.literal .text .literal.* .text.*)
 
     INCLUDE esp32.spiram.rom-functions-iram.ld
     _iram_text_end = ABSOLUTE(.);
@@ -138,6 +159,22 @@ SECTIONS
     _data_end = ABSOLUTE(.);
     . = ALIGN(4);
   } >dram0_0_seg
+
+  /* This section holds data that should not be initialized at power up.
+     The section located in Internal SRAM memory region. The macro _NOINIT
+     can be used as attribute to place data into this section.
+     See the esp_attr.h file for more information.
+  */
+  .noinit (NOLOAD):
+  {
+    . = ALIGN(4);
+    _noinit_start = ABSOLUTE(.);
+    __noinit_start = ABSOLUTE(.);
+    *(.noinit .noinit.*)
+    . = ALIGN(4) ;
+    _noinit_end = ABSOLUTE(.);
+    __noinit_end = ABSOLUTE(.);
+  } > dram0_0_seg
 
   /* Shared RAM */
   .dram0.bss (NOLOAD) :

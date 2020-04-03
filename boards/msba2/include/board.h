@@ -19,7 +19,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "msba2_common.h"
+#include "lpc2387.h"
 #include "bitarithm.h"
 
 #ifdef __cplusplus
@@ -44,19 +44,6 @@ extern "C" {
 #define LED1_ON             (FIO3CLR  = LED1_MASK)
 #define LED1_TOGGLE         (FIO3PIN ^= LED1_MASK)
 /** @} */
-
-/**
- * @name    xtimer tuning values
- * @{
- */
-#define XTIMER_OVERHEAD     7
-#define XTIMER_SHOOT_EARLY  3
-/** @} */
-
-/**
- * @brief   initialize the board's clock system
- */
-void init_clks1(void);
 
 #ifdef __cplusplus
 }

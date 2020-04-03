@@ -273,6 +273,13 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
+/* net/sock/async/types.h included by net/sock.h needs to re-typedef the
+ * `sock_ip_t` to prevent cyclic includes */
+#if defined (__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wtypedef-redefinition"
+#endif
+
 #include "net/sock.h"
 
 #ifdef __cplusplus
@@ -288,6 +295,10 @@ typedef struct _sock_tl_ep sock_udp_ep_t;   /**< An end point for a UDP sock obj
  *         implementation-specific `sock_types.h`.
  */
 typedef struct sock_udp sock_udp_t;
+
+#if defined (__clang__)
+# pragma clang diagnostic pop
+#endif
 
 /**
  * @brief   Creates a new UDP sock object
@@ -373,7 +384,7 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep);
  *
  * @pre `(sock != NULL) && (data != NULL) && (max_len > 0)`
  *
- * @param[in] sock      A raw IPv4/IPv6 sock object.
+ * @param[in] sock      A UDP sock object.
  * @param[out] data     Pointer where the received data should be stored.
  * @param[in] max_len   Maximum space available at @p data.
  * @param[in] timeout   Timeout for receive in microseconds.
@@ -403,11 +414,56 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
                       uint32_t timeout, sock_udp_ep_t *remote);
 
 /**
+ * @brief   Provides stack-internal buffer space containing a UDP message from
+ *          a remote end point
+ *
+ * @pre `(sock != NULL) && (data != NULL) && (buf_ctx != NULL)`
+ *
+ * @param[in] sock      A UDP sock object.
+ * @param[out] data     Pointer to a stack-internal buffer space containing the
+ *                      received data.
+ * @param[in,out] buf_ctx  Stack-internal buffer context. If it points to a
+ *                      `NULL` pointer, the stack returns a new buffer space
+ *                      for a new packet. If it does not point to a `NULL`
+ *                      pointer, an existing context is assumed to get a next
+ *                      segment in a buffer.
+ * @param[in] timeout   Timeout for receive in microseconds.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be @ref SOCK_NO_TIMEOUT for no timeout (wait until
+ *                      data is available).
+ * @param[out] remote   Remote end point of the received data.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @experimental    This function is quite new, not implemented for all stacks
+ *                  yet, and may be subject to sudden API changes. Do not use in
+ *                  production if this is unacceptable.
+ *
+ * @note    Function blocks if no packet is currently waiting.
+ *
+ * @return  The number of bytes received on success. May not be the complete
+ *          payload. Continue calling with the returned `buf_ctx` to get more
+ *          buffers until result is 0 or an error.
+ * @return  0, if no received data is available, but everything is in order.
+ *          If @p buf_ctx was provided, it was released.
+ * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
+ * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
+ *          initialized (or closed while sock_udp_recv() blocks).
+ * @return  -ENOMEM, if no memory was available to receive @p data.
+ * @return  -EPROTO, if source address of received packet did not equal
+ *          the remote of @p sock.
+ * @return  -ETIMEDOUT, if @p timeout expired.
+ */
+ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
+                          uint32_t timeout, sock_udp_ep_t *remote);
+
+/**
  * @brief   Sends a UDP message to remote end point
  *
  * @pre `((sock != NULL || remote != NULL)) && (if (len != 0): (data != NULL))`
  *
- * @param[in] sock      A raw IPv4/IPv6 sock object. May be `NULL`.
+ * @param[in] sock      A UDP sock object. May be `NULL`.
  *                      A sensible local end point should be selected by the
  *                      implementation in that case.
  * @param[in] data      Pointer where the received data should be stored.

@@ -9,16 +9,8 @@
  */
 
 /**
- * @defgroup    boards_blackpill Black pill
- * @ingroup     boards
+ * @ingroup     boards_blackpill
  * @brief       Support for the stm32f103c8 based Black pill.
- *
- * This board can be bought very cheaply on sides like eBay or
- * AliExpress. Although the MCU nominally has 64 KiB ROM, most of them
- * have 128 KiB ROM. This board is almost identical to the bluepill board,
- * except for the pin layout and the on board LED is connected to PB12 instead
- * of PC13. For more information see:
- * http://wiki.stm32duino.com/index.php?title=Black_Pill
  *
  * @{
  *
@@ -35,6 +27,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,36 +36,17 @@ extern "C" {
  * @name   Macros for controlling the on-board LED.
  * @{
  */
-#define LED0_PORT           GPIOB
-#define LED0_PIN            GPIO_PIN(PORT_B, 12)
-#define LED0_MASK           (1 << 12)
-
-#define LED0_ON             (LED0_PORT->BSRR = (LED0_MASK << 16))
-#define LED0_OFF            (LED0_PORT->BSRR = LED0_MASK)
-#define LED0_TOGGLE         (LED0_PORT->ODR  ^= LED0_MASK)
-/** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
-/**
- * @brief   Use the 2nd UART for STDIO on this board
- */
-#define STDIO_UART_DEV      UART_DEV(1)
-
-/**
- * @name    xtimer configuration
- * @{
- */
-#define XTIMER_WIDTH        (16)
-#define XTIMER_BACKOFF      5
+#define LED0_PORT           GPIOB   /**< GPIO-Port the LED is connected to */
+#define LED0_PORTNUM        PORT_B  /**< GPIO Port number the LED is connected to */
+#define LED0_PINNUM         (12)    /**< Pin number the LED is connected to */
 /** @} */
 
 #ifdef __cplusplus
 }
 #endif
+
+/* Beware: This include must come *after* LED0 parameters have been defined */
+#include "board_common.h"
 
 #endif /* BOARD_H */
 /** @} */

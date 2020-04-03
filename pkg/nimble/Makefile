@@ -1,7 +1,9 @@
 PKG_NAME    = nimble
 PKG_URL     = https://github.com/apache/mynewt-nimble.git
-PKG_VERSION = ef58876024218e488dcbc15c8631db016241ab1f
+PKG_VERSION = 37245d0c3f239c35c0c734a337c7b6301fcfd70b
 PKG_LICENSE = Apache-2.0
+
+include $(RIOTBASE)/pkg/pkg.mk
 
 TDIR = $(RIOTPKG)/$(PKG_NAME)
 PDIR = $(PKG_BUILDDIR)
@@ -14,27 +16,75 @@ ifeq (llvm,$(TOOLCHAIN))
 # `nimble/controller/src/ble_ll_adv.c` isn't used in our compilation path, so
 # tell LLVM/clang not to be so pedantic with this.
   CFLAGS += -Wno-unused-function
+# Workaround, until https://github.com/apache/mynewt-nimble/pull/566 is merged
+# upstream and the NimBLE version in RIOT is updated.
   CFLAGS += -Wno-sometimes-uninitialized
 else
   CFLAGS += -Wno-unused-but-set-variable
 endif
 
+IGNORE := nimble_autoconn_%
+SUBMODS := $(filter-out $(IGNORE),$(filter nimble_%,$(USEMODULE)))
+
 .PHONY: all
 
-all: git-download
-	"$(MAKE)" -C $(PDIR)/ext/tinycrypt/src/ -f $(TDIR)/ext.tinycrypt.mk
-	"$(MAKE)" -C $(PDIR)/nimble/host/src/ -f $(TDIR)/nimble.host.mk
-	"$(MAKE)" -C $(PDIR)/nimble/host/services/gap/src/ -f $(TDIR)/service.gap.mk
-	"$(MAKE)" -C $(PDIR)/nimble/host/services/gatt/src/ -f $(TDIR)/service.gatt.mk
-	"$(MAKE)" -C $(PDIR)/nimble/host/util/src/ -f $(TDIR)/nimble.host.util.mk
-	"$(MAKE)" -C $(PDIR)/nimble/host/store/ram/src/ -f $(TDIR)/nimble.host.store.ram.mk
-	"$(MAKE)" -C $(PDIR)/porting/nimble/src/ -f $(TDIR)/porting.nimble.mk
-	"$(MAKE)" -C $(PDIR)/porting/npl/riot/src/ -f $(TDIR)/porting.npl.riot.mk
+all: $(SUBMODS)
 
-	"$(MAKE)" -C $(PDIR)/nimble/transport/ram/src/ -f $(TDIR)/transport.ram.mk
-	"$(MAKE)" -C $(PDIR)/nimble/controller/src/ -f $(TDIR)/controller.mk
-	"$(MAKE)" -C $(PDIR)/nimble/drivers/nrf52/src/ -f $(TDIR)/drivers.nrf52.mk
-
+# blue code and RIOT port modules
+nimble_riot_contrib:
 	"$(MAKE)" -C $(TDIR)/contrib/
 
-include $(RIOTBASE)/pkg/pkg.mk
+nimble_porting_nimble:
+	"$(MAKE)" -C $(PDIR)/porting/nimble/src/ -f $(TDIR)/porting.nimble.mk
+
+nimble_npl_riot:
+	"$(MAKE)" -C $(PDIR)/porting/npl/riot/src/ -f $(TDIR)/porting.npl.riot.mk
+
+# host modules
+nimble_host:
+	"$(MAKE)" -C $(PDIR)/nimble/host/src/ -f $(TDIR)/nimble.host.mk
+
+nimble_host_util:
+	"$(MAKE)" -C $(PDIR)/nimble/host/util/src/ -f $(TDIR)/nimble.host.util.mk
+
+nimble_host_store_ram:
+	"$(MAKE)" -C $(PDIR)/nimble/host/store/ram/src/ -f $(TDIR)/nimble.host.store.ram.mk
+
+nimble_tinycrypt:
+	"$(MAKE)" -C $(PDIR)/ext/tinycrypt/src/ -f $(TDIR)/ext.tinycrypt.mk
+
+# service implementations
+nimble_svc_gap:
+	"$(MAKE)" -C $(PDIR)/nimble/host/services/gap/src/ -f $(TDIR)/svc.gap.mk
+
+nimble_svc_gatt:
+	"$(MAKE)" -C $(PDIR)/nimble/host/services/gatt/src/ -f $(TDIR)/svc.gatt.mk
+
+nimble_svc_ipss:
+	"$(MAKE)" -C $(PDIR)/nimble/host/services/ipss/src/ -f $(TDIR)/svc.ipss.mk
+
+# controller specific modules
+nimble_transport_ram:
+	"$(MAKE)" -C $(PDIR)/nimble/transport/ram/src/ -f $(TDIR)/transport.ram.mk
+
+nimble_controller:
+	"$(MAKE)" -C $(PDIR)/nimble/controller/src/ -f $(TDIR)/controller.mk
+
+nimble_drivers_nrf5x:
+	"$(MAKE)" -C $(PDIR)/nimble/drivers/$(CPU_FAM)/src/ -f $(TDIR)/drivers.nrf5x.mk
+
+# additional, RIOT specific nimble modules
+nimble_addr:
+	"$(MAKE)" -C $(TDIR)/addr/
+
+nimble_autoconn:
+	"$(MAKE)" -C $(TDIR)/autoconn
+
+nimble_netif:
+	"$(MAKE)" -C $(TDIR)/netif/
+
+nimble_scanlist:
+	"$(MAKE)" -C $(TDIR)/scanlist
+
+nimble_scanner:
+	"$(MAKE)" -C $(TDIR)/scanner

@@ -40,6 +40,7 @@ extern "C" {
 #define SPI_MISOSEL         (dev(bus)->PSELMISO)
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override I2C speed settings
  * @{
@@ -53,6 +54,7 @@ typedef enum {
     I2C_SPEED_HIGH      = 0x03,                         /**< not supported */
 } i2c_speed_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @name    Use the shared I2C functions
@@ -64,6 +66,7 @@ typedef enum {
 #define PERIPH_I2C_NEED_WRITE_REG
 /** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override ADC resolution values
  * @{
@@ -78,14 +81,15 @@ typedef enum {
     ADC_RES_16BIT = 0xf3    /**< ADC resolution: 16 bit (not supported) */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   I2C (TWI) configuration options
  */
 typedef struct {
     NRF_TWI_Type *dev;          /**< hardware device */
-    uint8_t pin_scl;            /**< SCL pin */
-    uint8_t pin_sda;            /**< SDA pin */
+    gpio_t pin_scl;             /**< SCL pin */
+    gpio_t pin_sda;             /**< SDA pin */
     uint8_t ppi;                /**< PPI channel to use */
     i2c_speed_t speed;          /**< bus speed */
 } i2c_conf_t;

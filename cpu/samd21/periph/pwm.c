@@ -158,7 +158,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
 uint8_t pwm_channels(pwm_t dev)
 {
-    return sizeof(pwm_config[dev].chan) / sizeof(pwm_config[dev].chan[0]);
+    return ARRAY_SIZE(pwm_config[dev].chan);
 }
 
 void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)

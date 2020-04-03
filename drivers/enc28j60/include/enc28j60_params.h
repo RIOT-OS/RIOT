@@ -46,7 +46,7 @@ extern "C" {
 #define ENC28J60_PARAMS         { .spi = ENC28J60_PARAM_SPI,     \
                                   .cs_pin = ENC28J60_PARAM_CS,   \
                                   .int_pin = ENC28J60_PARAM_INT, \
-                                  .reset_pin = ENC28J60_PARAM_RESET }
+                                  .rst_pin = ENC28J60_PARAM_RESET }
 #endif
 /** @} */
 

@@ -48,8 +48,20 @@ extern "C" {
 /* keep THREAD_STACKSIZE_IDLE > THREAD_EXTRA_STACKSIZE_PRINTF
  * to avoid not printing of debug in interrupts
  */
+#ifndef THREAD_STACKSIZE_IDLE
 #define THREAD_STACKSIZE_IDLE      (128)
+#endif
 /** @} */
+
+/**
+ * @brief   Attribute for memory sections required by SRAM PUF
+ */
+#define PUF_SRAM_ATTRIBUTES __attribute__((used, section(".noinit")))
+
+/**
+ * @brief   Declare the heap_stats function as available
+ */
+#define HAVE_HEAP_STATS
 
 #ifdef __cplusplus
 }

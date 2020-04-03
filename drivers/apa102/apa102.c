@@ -49,7 +49,7 @@ void apa102_init(apa102_t *dev, const apa102_params_t *params)
 {
     assert(dev && params);
 
-    memcpy(dev, params, sizeof(apa102_params_t));
+    *dev = *params;
 
     gpio_init(dev->data_pin, GPIO_OUT);
     gpio_init(dev->clk_pin, GPIO_OUT);
@@ -65,7 +65,7 @@ void apa102_load_rgba(const apa102_t *dev, const color_rgba_t vals[])
     for (int i = 0; i < dev->led_numof; i++) {
         uint32_t data = HEAD;
         /* we scale the 8-bit alpha value to a 5-bit value by cutting off the
-         * 3 leas significant bits */
+         * 3 least significant bits */
         data |= (((uint32_t)vals[i].alpha << BRIGHT_SHIFT) & BRIGHT);
         data |= ((uint32_t)vals[i].color.b << BLUE_SHIFT);
         data |= ((uint32_t)vals[i].color.g << GREEN_SHIFT);

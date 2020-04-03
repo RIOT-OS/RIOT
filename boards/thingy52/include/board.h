@@ -34,6 +34,28 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Power switch pins definitions
+ * @{
+ */
+#define SPK_PWR_CTRL_PIN    GPIO_PIN(0, 29) /**< Speaker power switch */
+#define VDD_PWR_CTRL_PIN    GPIO_PIN(0, 30) /**< VDD power switch */
+/** @} */
+
+/**
+ * @name    LIS2DH12 low power accelerometer configuration
+ * @{
+ */
+#define LIS2DH12_PARAM_I2C  I2C_DEV(1)
+/** @} */
+
+/**
+ * @name    LPS22HB device address
+ * @{
+ */
+#define LPSXXX_PARAM_ADDR   (0x5c)
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware
  */
 void board_init(void);

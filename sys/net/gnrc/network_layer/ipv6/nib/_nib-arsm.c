@@ -12,8 +12,9 @@
  * @file
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#include <kernel_defines.h>
 
-#include "xtimer.h"
+#include "evtimer.h"
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"
@@ -30,18 +31,6 @@
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
-/**
- * @brief   Determines supposed link-layer address from interface and option
- *          length
- *
- * @param[in] netif A network interface.
- * @param[in] opt   A SL2AO or TL2AO.
- *
- * @return  The length of the L2 address carried in @p opt.
- */
-static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
-                                       const ndp_opt_t *opt);
-
 void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
              const ipv6_addr_t *src, const ipv6_addr_t *dst)
 {
@@ -55,16 +44,15 @@ void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
     if ((src != NULL) && gnrc_netif_is_6ln(netif) &&
         (_nib_onl_get_if(dr->next_hop) == (unsigned)netif->pid) &&
         ipv6_addr_equal(&dr->next_hop->ipv6, dst)) {
-        netdev_t *dev = netif->dev;
-        uint8_t l2src[GNRC_NETIF_L2ADDR_MAXLEN];
-        size_t l2src_len = (uint16_t)dev->driver->get(dev, NETOPT_ADDRESS_LONG,
-                                                      l2src, sizeof(l2src));
-        if (l2src_len != sizeof(eui64_t)) {
+        eui64_t eui64;
+        int res = gnrc_netif_get_eui64(netif, &eui64);
+
+        if (res != sizeof(eui64_t)) {
             DEBUG("nib: can't get EUI-64 of the interface for ARO\n");
             return;
         }
-        ext_opt = gnrc_sixlowpan_nd_opt_ar_build(0, GNRC_SIXLOWPAN_ND_AR_LTIME,
-                                                 (eui64_t *)l2src, NULL);
+        ext_opt = gnrc_sixlowpan_nd_opt_ar_build(0, CONFIG_GNRC_SIXLOWPAN_ND_AR_LTIME,
+                                                 &eui64, NULL);
         if (ext_opt == NULL) {
             DEBUG("nib: error allocating ARO.\n");
             return;
@@ -83,20 +71,20 @@ void _snd_uc_ns(_nib_onl_entry_t *nbr, bool reset)
     DEBUG("nib: unicast to %s (retrans. timer = %ums)\n",
           ipv6_addr_to_str(addr_str, &nbr->ipv6, sizeof(addr_str)),
           (unsigned)netif->ipv6.retrans_time);
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     if (reset) {
         nbr->ns_sent = 0;
     }
-#else   /* GNRC_IPV6_NIB_CONF_ARSM */
+#else   /* CONFIG_GNRC_IPV6_NIB_ARSM */
     (void)reset;
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
     _snd_ns(&nbr->ipv6, netif, NULL, &nbr->ipv6);
     _evtimer_add(nbr, GNRC_IPV6_NIB_SND_UC_NS, &nbr->nud_timeout,
                  netif->ipv6.retrans_time);
     gnrc_netif_release(netif);
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     nbr->ns_sent++;
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
 }
 
 void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
@@ -104,14 +92,14 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 {
     assert(netif != NULL);
     _nib_onl_entry_t *nce = _nib_onl_get(&ipv6->src, netif->pid);
-    unsigned l2addr_len;
+    int l2addr_len;
 
-    l2addr_len = _get_l2addr_len(netif, sl2ao);
-    if (l2addr_len == 0U) {
+    l2addr_len = gnrc_netif_ndp_addr_len_from_l2ao(netif, sl2ao);
+    if (l2addr_len < 0) {
         DEBUG("nib: Unexpected SL2AO length. Ignoring SL2AO\n");
         return;
     }
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     if ((nce != NULL) && (nce->mode & _NC) &&
         ((nce->l2addr_len != l2addr_len) ||
          (memcmp(nce->l2addr, sl2ao + 1, nce->l2addr_len) != 0)) &&
@@ -122,7 +110,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
         _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
     }
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
     if ((nce == NULL) || !(nce->mode & _NC)) {
         DEBUG("nib: Creating NCE for (ipv6 = %s, iface = %u, nud_state = STALE)\n",
               ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)),
@@ -133,7 +121,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             if (icmpv6->type == ICMPV6_NBR_SOL) {
                 nce->info &= ~GNRC_IPV6_NIB_NC_INFO_IS_ROUTER;
             }
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_DAD && GNRC_IPV6_NIB_CONF_6LR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
             else if (_rtr_sol_on_6lr(netif, icmpv6)) {
                 DEBUG("nib: Setting newly created entry to tentative\n");
                 _set_ar_state(nce, GNRC_IPV6_NIB_NC_INFO_AR_STATE_TENTATIVE);
@@ -141,7 +129,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                              &nce->addr_reg_timeout,
                              SIXLOWPAN_ND_TENTATIVE_NCE_SEC_LTIME * MS_PER_SEC);
             }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_DAD && GNRC_IPV6_NIB_CONF_6LR */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD && CONFIG_GNRC_IPV6_NIB_6LR */
         }
 #if ENABLE_DEBUG
         else {
@@ -163,59 +151,18 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                   netif->pid);
             nce->info &= ~GNRC_IPV6_NIB_NC_INFO_IS_ROUTER;
         }
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         /* a 6LR MUST NOT modify an existing NCE based on an SL2AO in an RS
          * see https://tools.ietf.org/html/rfc6775#section-6.3 */
         if (!_rtr_sol_on_6lr(netif, icmpv6)) {
             nce->l2addr_len = l2addr_len;
             memcpy(nce->l2addr, sl2ao + 1, l2addr_len);
         }
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
     }
 }
 
-static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
-                                       const ndp_opt_t *opt)
-{
-    switch (netif->device_type) {
-#ifdef MODULE_CC110X
-        case NETDEV_TYPE_CC110X:
-            (void)opt;
-            return sizeof(uint8_t);
-#endif  /* MODULE_CC110X */
-#ifdef MODULE_NETDEV_ETH
-        case NETDEV_TYPE_ETHERNET:
-            (void)opt;
-            return ETHERNET_ADDR_LEN;
-#endif  /* MODULE_NETDEV_ETH */
-#ifdef MODULE_NRFMIN
-        case NETDEV_TYPE_NRFMIN:
-            (void)opt;
-            return sizeof(uint16_t);
-#endif  /* MODULE_NRFMIN */
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
-        case NETDEV_TYPE_IEEE802154:
-            switch (opt->len) {
-                case 1U:
-                    return IEEE802154_SHORT_ADDRESS_LEN;
-                case 2U:
-                    return IEEE802154_LONG_ADDRESS_LEN;
-                default:
-                    return 0U;
-            }
-#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
-#ifdef MODULE_ESP_NOW
-        case NETDEV_TYPE_RAW:
-            (void)opt;
-            return ETHERNET_ADDR_LEN;
-#endif  /* MODULE_ESP_NOW */
-        default:
-            (void)opt;
-            return 0U;
-    }
-}
-
-#if GNRC_IPV6_NIB_CONF_ARSM
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
 /**
  * @brief   Calculates exponential back-off for retransmission timer for
  *          neighbor solicitations
@@ -227,7 +174,7 @@ static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
  */
 static inline uint32_t _exp_backoff_retrans_timer(uint8_t ns_sent,
                                                   uint32_t retrans_timer);
-#if GNRC_IPV6_NIB_CONF_REDIRECT
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_REDIRECT)
 /**
  * @brief   Checks if the carrier of the TL2AO was a redirect message
  *
@@ -238,10 +185,10 @@ static inline uint32_t _exp_backoff_retrans_timer(uint8_t ns_sent,
  *          ndp_opt_t::type == NDP_OPT_TL2A for @p tl2ao.
  */
 static inline bool _redirect_with_tl2ao(icmpv6_hdr_t *icmpv6, ndp_opt_t *tl2ao);
-#else   /* GNRC_IPV6_NIB_CONF_REDIRECT */
+#else   /* CONFIG_GNRC_IPV6_NIB_REDIRECT */
 /* just fall through if redirect not handled */
 #define _redirect_with_tl2ao(a, b)  (false)
-#endif  /* GNRC_IPV6_NIB_CONF_REDIRECT */
+#endif  /* CONFIG_GNRC_IPV6_NIB_REDIRECT */
 
 static inline bool _oflag_set(const ndp_nbr_adv_t *nbr_adv);
 static inline bool _sflag_set(const ndp_nbr_adv_t *nbr_adv);
@@ -383,13 +330,13 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
 void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
                     const icmpv6_hdr_t *icmpv6, const ndp_opt_t *tl2ao)
 {
-    unsigned l2addr_len = 0;
+    int l2addr_len = 0;
 
     assert(nce != NULL);
     assert(netif != NULL);
     if (tl2ao != NULL) {
-        l2addr_len = _get_l2addr_len(netif, tl2ao);
-        if (l2addr_len == 0U) {
+        l2addr_len = gnrc_netif_ndp_addr_len_from_l2ao(netif, tl2ao);
+        if (l2addr_len < 0) {
             DEBUG("nib: Unexpected TL2AO length. Ignoring TL2AO\n");
             return;
         }
@@ -429,7 +376,7 @@ void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
                 nce->info &= ~GNRC_IPV6_NIB_NC_INFO_IS_ROUTER;
             }
         }
-#if GNRC_IPV6_NIB_CONF_QUEUE_PKT && MODULE_GNRC_IPV6
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT) && MODULE_GNRC_IPV6
         /* send queued packets */
         gnrc_pktqueue_t *ptr;
         DEBUG("nib: Sending queued packets\n");
@@ -442,7 +389,7 @@ void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
             }
             ptr->pkt = NULL;
         }
-#endif  /* GNRC_IPV6_NIB_CONF_QUEUE_PKT */
+#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
         if ((icmpv6->type == ICMPV6_NBR_ADV) &&
             !_sflag_set((ndp_nbr_adv_t *)icmpv6) &&
             (_get_nud_state(nce) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE) &&
@@ -468,7 +415,7 @@ void _recalc_reach_time(gnrc_netif_ipv6_t *netif)
                                             netif->reach_time_base + half);
     _evtimer_add(netif, GNRC_IPV6_NIB_RECALC_REACH_TIME,
                  &netif->recalc_reach_time,
-                 GNRC_IPV6_NIB_CONF_REACH_TIME_RESET);
+                 CONFIG_GNRC_IPV6_NIB_REACH_TIME_RESET);
 }
 
 void _set_reachable(gnrc_netif_t *netif, _nib_onl_entry_t *nce)
@@ -487,16 +434,16 @@ void _set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
     nce->info &= ~GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK;
     nce->info |= state;
 
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     gnrc_netif_acquire(netif);
     if (netif != NULL) {
         _call_route_info_cb(netif, GNRC_IPV6_NIB_ROUTE_INFO_TYPE_NSC,
                             &nce->ipv6, (void *)((intptr_t)state));
     }
     gnrc_netif_release(netif);
-#else   /* GNRC_IPV6_NIB_CONF_ROUTER */
+#else   /* CONFIG_GNRC_IPV6_NIB_ROUTER */
     (void)netif;
-#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 }
 
 bool _is_reachable(_nib_onl_entry_t *entry)
@@ -514,25 +461,18 @@ bool _is_reachable(_nib_onl_entry_t *entry)
 static inline uint32_t _exp_backoff_retrans_timer(uint8_t ns_sent,
                                                   uint32_t retrans_timer)
 {
-    uint32_t tmp = random_uint32_range(NDP_MIN_RANDOM_FACTOR,
-                                       NDP_MAX_RANDOM_FACTOR);
+    uint32_t factor = random_uint32_range(NDP_MIN_RANDOM_FACTOR,
+                                          NDP_MAX_RANDOM_FACTOR);
 
-    /* backoff according to  https://tools.ietf.org/html/rfc7048 with
-     * BACKOFF_MULTIPLE == 2 */
-    tmp = ((1 << ns_sent) * retrans_timer * tmp) / US_PER_MS;
-    /* random factors were statically multiplied with 1000 ^ */
-    if (tmp > NDP_MAX_RETRANS_TIMER_MS) {
-        tmp = NDP_MAX_RETRANS_TIMER_MS;
-    }
-    return tmp;
+    return _exp_backoff_retrans_timer_factor(ns_sent, retrans_timer, factor);
 }
 
-#if GNRC_IPV6_NIB_CONF_REDIRECT
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_REDIRECT)
 static inline bool _redirect_with_tl2ao(icmpv6_hdr_t *icmpv6, ndp_opt_t *tl2ao)
 {
     return (icmpv6->type == ICMPV6_REDIRECT) && (tl2ao != NULL);
 }
-#endif  /* GNRC_IPV6_NIB_CONF_REDIRECT */
+#endif  /* CONFIG_GNRC_IPV6_NIB_REDIRECT */
 
 static inline bool _tl2ao_changes_nce(_nib_onl_entry_t *nce,
                                       const ndp_opt_t *tl2ao,
@@ -562,6 +502,6 @@ static inline bool _rflag_set(const ndp_nbr_adv_t *nbr_adv)
     return (nbr_adv->type == ICMPV6_NBR_ADV) &&
            (nbr_adv->flags & NDP_NBR_ADV_FLAGS_R);
 }
-#endif /* GNRC_IPV6_NIB_CONF_ARSM */
+#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
 
 /** @} */

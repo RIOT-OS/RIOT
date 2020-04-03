@@ -20,20 +20,20 @@ compiled and linked binary, bindist.a, abc.a and Makefiles.
 In order to recompile RIOT, adjust "RIOTBASE" in Makefile to point to a RIOT
 source checkout, then call "make check_bindist".
 
-RIOT will be build as usual, but just take the pre-compiled bindist.a and
-abc.a.  Their source is not necessary.  The resulting binary will then be
-compared with te precompiled  "bindist.elf" (using md5sum) and the result gets
-printed.  If the same RIOT source tree and build environment (compiler version,
+RIOT will be built as usual, but just take the pre-compiled bindist.a and
+abc.a. Their source is not necessary. The resulting binary will then be
+compared with the precompiled "bindist.elf" (using md5sum) and the result gets
+printed. If the same RIOT source tree and build environment (compiler version,
 etc.) was used, the binaries should match.
 
 Step-by-step:
 
-1. # cd <riot-checkout>/examples/bindist
-2. # make all
-3. # make bindist
-4. # cd bindist
-5. <adjust RIOTBASE variable (../.. -> ../../..)
-6. # make check_bindist
+    $ cd <riot-checkout>/examples/bindist
+    $ make all
+    $ make bindist
+    $ cd bindist
+    <adjust RIOTBASE variable (../.. -> ../../..)
+    $ make check_bindist
 
 ## Needed Makefile changes
 

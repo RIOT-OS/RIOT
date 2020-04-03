@@ -7,12 +7,11 @@
 # directory for more details.
 
 import sys
-from testrunner import run
+from testrunner import run_check_unittests
 
 
-def testfunc(child):
-    child.expect(u"OK \\([0-9]+ tests\\)")
+TIMEOUT = 120
 
 
 if __name__ == "__main__":
-    sys.exit(run(testfunc, timeout=120))
+    sys.exit(run_check_unittests(timeout=TIMEOUT))

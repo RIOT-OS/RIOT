@@ -3,7 +3,7 @@
 # programmer board serial number.
 
 # Fall back to PROGRAMMER_SERIAL for backwards compatibility
-export DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
+DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
 
 ifneq (,$(DEBUG_ADAPTER_ID))
   # Makefile-way of comparing numbers, using lexicographical sorting since we
@@ -30,4 +30,3 @@ OPENOCD_ADAPTER_INIT ?= -f '$(RIOTBASE)/boards/mulle/dist/openocd/mulle-programm
 ifneq (,$(DEBUG_ADAPTER_ID))
   OPENOCD_ADAPTER_INIT += -c 'ftdi_serial $(DEBUG_ADAPTER_ID)'
 endif
-export OPENOCD_ADAPTER_INIT

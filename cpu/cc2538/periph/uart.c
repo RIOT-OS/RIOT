@@ -99,6 +99,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     u->CC = 0;
 
     /* On the CC2538, hardware flow control is supported only on UART1 */
+#ifdef MODULE_PERIPH_UART_HW_FC
     if (uart_config[uart].rts_pin != GPIO_UNDEF) {
         assert(u != UART0_BASEADDR);
         gpio_init_af(uart_config[uart].rts_pin, UART1_RTS, GPIO_OUT);
@@ -110,6 +111,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         gpio_init_af(uart_config[uart].cts_pin, UART1_CTS, GPIO_IN);
         u->cc2538_uart_ctl.CTLbits.CTSEN = 1;
     }
+#endif
 
     /*
      * UART Interrupt Setup:
@@ -156,6 +158,35 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     return UART_OK;
 }
+
+#ifdef MODULE_PERIPH_UART_MODECFG
+int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
+              uart_stop_bits_t stop_bits)
+{
+    assert(uart < UART_NUMOF);
+
+    assert(data_bits == UART_DATA_BITS_5 ||
+           data_bits == UART_DATA_BITS_6 ||
+           data_bits == UART_DATA_BITS_7 ||
+           data_bits == UART_DATA_BITS_8);
+
+    assert(parity == UART_PARITY_NONE ||
+           parity == UART_PARITY_EVEN ||
+           parity == UART_PARITY_ODD ||
+           parity == UART_PARITY_MARK ||
+           parity == UART_PARITY_SPACE);
+
+    assert(stop_bits == UART_STOP_BITS_1 ||
+           stop_bits == UART_STOP_BITS_2);
+
+    cc2538_reg_t *lcrh = &(uart_config[uart].dev->cc2538_uart_lcrh.LCRH);
+    uint32_t tmp = *lcrh;
+    tmp &= ~(UART_LCRH_WLEN_M | UART_LCRH_FEN_M | UART_LCRH_STP2_M |
+             UART_LCRH_PEN | UART_LCRH_EPS | UART_LCRH_SPS);
+    *lcrh = tmp | data_bits | parity | stop_bits;
+    return 0;
+}
+#endif
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {

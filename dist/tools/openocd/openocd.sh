@@ -1,10 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Unified OpenOCD script for RIOT
 #
 # This script is supposed to be called from RIOTs make system,
 # as it depends on certain environment variables. An OpenOCD
-# configuration file must be present in a the boards dist folder.
+# configuration file must be present in a the boards dist folder
+# or be given as "board/[...].cfg" to use an OpenOCD shipped configuration.
 #
 # Any extra command line arguments after the command name are passed on the
 # openocd command line after the configuration file name but before any other
@@ -12,35 +13,43 @@
 #
 # Global environment variables used:
 # OPENOCD:             OpenOCD command name, default: "openocd"
+#                      Care must be taken when specifying an OpenOCD version in
+#                      its build directory, as it does not look up its own
+#                      configuration files relative to the executable -- the
+#                      scripts directory needs to be passed in like this:
+#                      `OPENOCD="~/openocd/src/openocd -s ~/openocd/tcl"`.
 # OPENOCD_CONFIG:      OpenOCD configuration file name,
-#                      default: "${RIOTBOARD}/${BOARD}/dist/openocd.cfg"
+#                      default: "${BOARDSDIR}/${BOARD}/dist/openocd.cfg"
 #
 # The script supports the following actions:
 #
-# flash:        flash a given ELF file to the target.
+# flash:        flash <image_file>
+#               flash given file to the target.
 #
 #               options:
-#               IMAGE_FILE: Filename of the file that will be flashed
+#               <image_file>:   Filename of the file that will be flashed
 #               PRE_FLASH_CHECK_SCRIPT: a command to run before flashing to
-#               verify the integrity of the image to be flashed. ELFFILE is
+#               verify the integrity of the image to be flashed. <image_file> is
 #               passed as a command line argument to this command.
-#               Even though the file name variable is named ELFFILE, flashing
-#               works with any file format recognized by OpenOCD (elf, ihex, s19, bin).
 #
-# debug:        starts OpenOCD as GDB server in the background and
+#               Flashing works with any file format recognized by OpenOCD
+#               (elf, ihex, s19, bin).
+#
+# debug:        debug <elfile>
+#               starts OpenOCD as GDB server in the background and
 #               connects to the server with the GDB client specified by
 #               the board
 #
 #               options:
+#               <elffile>:      path to the file to debug, must be in a format
+#                               recognized by GDB (preferably ELF, it will not
+#                               work with .bin, .hex or .s19 because they lack
+#                               symbol information)
 #               GDB_PORT:       port opened for GDB connections
 #               TCL_PORT:       port opened for TCL connections
 #               TELNET_PORT:    port opened for telnet connections
 #               DBG:            debugger client command, default: 'gdb -q'
 #               TUI:            if TUI!=null, the -tui option will be used
-#               ELFFILE:        path to the file to debug, must be in a format
-#                               recognized by GDB (preferably ELF, it will not
-#                               work with .bin, .hex or .s19 because they lack
-#                               symbol information)
 #
 # debug-server: starts OpenOCD as GDB server, but does not connect to
 #               to it with any frontend. This might be useful when using
@@ -62,14 +71,14 @@
 : ${TELNET_PORT:=4444}
 # Default TCL port, set to 0 to disable
 : ${TCL_PORT:=6333}
-# Default path to OpenOCD configuration file
-: ${OPENOCD_CONFIG:=${RIOTBOARD}/${BOARD}/dist/openocd.cfg}
 # Default OpenOCD command
 : ${OPENOCD:=openocd}
 # Extra board initialization commands to pass to OpenOCD
 : ${OPENOCD_EXTRA_INIT:=}
 # Debugger interface initialization commands to pass to OpenOCD
 : ${OPENOCD_ADAPTER_INIT:=}
+# If set to 1 'reset_config' will use 'connect_assert_srst' before 'flash' or 'reset.
+: ${OPENOCD_RESET_USE_CONNECT_ASSERT_SRST:=}
 # The setsid command is needed so that Ctrl+C in GDB doesn't kill OpenOCD
 : ${SETSID:=setsid}
 # GDB command, usually a separate command for each platform (e.g. arm-none-eabi-gdb)
@@ -87,16 +96,14 @@
 # the target when starting a debug session. 'reset halt' can also be used
 # depending on the type of target.
 : ${OPENOCD_DBG_START_CMD:=-c 'halt'}
+# command used to reset the board
+: ${OPENOCD_CMD_RESET_RUN:="-c 'reset run'"}
 # This is an optional offset to the base address that can be used to flash an
 # image in a different location than it is linked at. This feature can be useful
 # when flashing images for firmware swapping/remapping boot loaders.
 # Default offset is 0, meaning the image will be flashed at the address that it
 # was linked at.
 : ${IMAGE_OFFSET:=0}
-# Image file used for flashing. Must be in a format that OpenOCD can handle (ELF,
-# Intel hex, S19, or raw binary)
-# Default is to use $ELFFILE
-: ${IMAGE_FILE:=${ELFFILE}}
 # Type of image, leave empty to let OpenOCD automatically detect the type from
 # the file (default).
 # Valid values: elf, hex, s19, bin (see OpenOCD manual for more information)
@@ -105,7 +112,6 @@
 #
 # Examples of alternative debugger configurations
 #
-
 # Using the GDB text UI:
 # DBG_EXTRA_FLAGS=-tui make debug
 # or to always use TUI, put in your .profile:
@@ -118,11 +124,16 @@
 # export DBG_FLAGS='--debugger "${GDB} ${DBG_DEFAULT_FLAGS}"'
 # The single quotes are important on the line above, or it will not work.
 
+# Handle OPENOCD_RESET_USE_CONNECT_ASSERT_SRST
+if [ "${OPENOCD_RESET_USE_CONNECT_ASSERT_SRST}" = "1" ]; then
+  OPENOCD_EXTRA_RESET_INIT+="-c 'reset_config connect_assert_srst'"
+fi
+
 #
 # a couple of tests for certain configuration options
 #
 test_config() {
-    if [ ! -f "${OPENOCD_CONFIG}" ]; then
+    if [ ! -f "${OPENOCD_CONFIG}" ] && [[ ! "${OPENOCD_CONFIG}" == board/* ]] ; then
         echo "Error: Unable to locate OpenOCD configuration file"
         echo "       (${OPENOCD_CONFIG})"
         exit 1
@@ -183,17 +194,52 @@ _split_banks() {
     }'
 }
 
-# Outputs bank info on different lines without the '{}'
-_flash_list() {
+_flash_list_raw() {
     # Openocd output for 'flash list' is
     # ....
     # {name nrf51 base 0 size 0 bus_width 1 chip_width 1} {name nrf51 base 268439552 size 0 bus_width 1 chip_width 1}
     # ....
+    #
+    # Before printing the flash list, try to init and probe the board
+    # to get the actual address.
+    # Some openocd configuration put an address of 0 and rely on probing to
+    # find the real flash address like 0x08000000
+    #
+    # If it does not work, fallback to only query the configured value
+    #
+    # Probing can fail when the board is in a non flashable state or
+    # maybe probing would need a different init procedure.
+    # At least, currently fallback to returning the configured value
+
+    # Probe the real value
+    sh -c "${OPENOCD} \
+            ${OPENOCD_ADAPTER_INIT} \
+            -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_RESET_INIT} \
+            -c 'init' \
+            -c 'targets' \
+            -c 'reset halt' \
+            -c 'flash probe 0' \
+            -c 'flash list' \
+            -c 'shutdown'" 2>&1 && return
+
+    # Fallback to return the value stored in openocd
+    echo "WARN: Failed to probe board flash." >&2
+    echo "WARN: Falling back to using the openocd configuration value." >&2
     sh -c "${OPENOCD} \
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             -c 'flash list' \
-            -c 'shutdown'" 2>&1 | _split_banks
+            -c 'shutdown'" 2>&1
+}
+
+# Outputs bank info on different lines without the '{}'
+_flash_list() {
+    # ....
+    # name nrf51 base 0 size 0 bus_width 1 chip_width 1
+    # name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
+    # ....
+    _flash_list_raw | _split_banks
 }
 
 # Print flash address for 'bank_num' num defaults to 1
@@ -210,6 +256,7 @@ _flash_address() {
 # now comes the actual actions
 #
 do_flash() {
+    IMAGE_FILE=$1
     test_config
     test_imagefile
     if [ -n "${PRE_FLASH_CHECK_SCRIPT}" ]; then
@@ -240,6 +287,7 @@ do_flash() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            ${OPENOCD_EXTRA_RESET_INIT} \
             -c 'tcl_port 0' \
             -c 'telnet_port 0' \
             -c 'gdb_port 0' \
@@ -256,6 +304,7 @@ do_flash() {
 }
 
 do_debug() {
+    ELFFILE=$1
     test_config
     test_elffile
     # temporary file that saves OpenOCD pid
@@ -318,11 +367,12 @@ do_reset() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            ${OPENOCD_EXTRA_RESET_INIT} \
             -c 'tcl_port 0' \
             -c 'telnet_port 0' \
             -c 'gdb_port 0' \
             -c 'init' \
-            -c 'reset run' \
+            ${OPENOCD_CMD_RESET_RUN} \
             -c 'shutdown'"
 }
 
@@ -330,15 +380,16 @@ do_reset() {
 # parameter dispatching
 #
 ACTION="$1"
+shift # pop $1 from $@
 
 case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
-    do_flash
+    do_flash "$@"
     ;;
   debug)
     echo "### Starting Debugging ###"
-    do_debug
+    do_debug "$@"
     ;;
   debug-server)
     echo "### Starting GDB Server ###"
@@ -350,6 +401,8 @@ case "${ACTION}" in
     ;;
   *)
     echo "Usage: $0 {flash|debug|debug-server|reset}"
+    echo "          flash <flashfile>"
+    echo "          debug <elffile>"
     exit 2
     ;;
 esac

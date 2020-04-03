@@ -1,8 +1,19 @@
-dist: trusty
+sudo: required
+
+language: minimal
+
+services:
+  - docker
 
 before_install:
-  - sudo apt-get install coreutils realpath doxygen graphviz python-lesscpy cppcheck coccinelle pcregrep python3-pip
-  - sudo pip3 install flake8
+  - docker pull riot/riotbuild
+
+before_script:
+  # Fetch the base branch when it is not `master`
+  - git fetch origin "${TRAVIS_BRANCH}:${TRAVIS_BRANCH}"
 
 script:
-  - make static-test
+  - docker run -a STDIN -a STDOUT -a STDERR --rm -u "$(id -u)"
+      -e CI_BASE_BRANCH="${TRAVIS_BRANCH}"
+      -v "${PWD}:/data/riotbuild" -v /etc/localtime:/etc/localtime:ro
+      riot/riotbuild make static-test

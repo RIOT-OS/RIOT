@@ -22,8 +22,6 @@ class InvalidTimeout(Exception):
 
 def testfunc(child):
     try:
-        child.expect_exact("Please hit any key and then ENTER to continue")
-        child.sendline("a")
         start_test = time.time()
         child.expect_exact("5 x usleep(i++ * 500000)")
         for i in range(5):

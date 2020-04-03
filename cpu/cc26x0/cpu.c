@@ -20,6 +20,7 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph/init.h"
+#include "stdio_base.h"
 
 #ifndef HF_CLOCK_SOURCE
 #define HF_CLOCK_SOURCE DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL_RCOSC /* set 48MHz RCOSC */
@@ -43,6 +44,9 @@ void cpu_init(void)
 
     /* initialize the system clock */
     cpu_clock_init();
+
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
 
     /* trigger static peripheral initialization */
     periph_init();

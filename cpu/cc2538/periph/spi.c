@@ -121,6 +121,14 @@ void spi_release(spi_t bus)
     mutex_unlock(&locks[bus]);
 }
 
+static uint8_t _trx(cc2538_ssi_t *dev, uint8_t in)
+{
+    while (!(dev->SR & SSI_SR_TNF)) {}
+    dev->DR = in;
+    while (!(dev->SR & SSI_SR_RNE)) {}
+    return dev->DR;
+}
+
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
@@ -136,38 +144,19 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     }
 
     if (!in_buf) {
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SSI_SR_TNF)) {}
-            dev(bus)->DR = out_buf[i];
-        }
-        /* flush RX FIFO while busy*/
-        while ((dev(bus)->SR & SSI_SR_BSY)) {
-            dev(bus)->DR;
+        for (const void *end = out_buf + len; out_buf != end; ++out_buf) {
+            _trx(dev(bus), *out_buf);
         }
     }
-    else if (!out_buf) { /*TODO this case is currently untested */
-        size_t in_cnt = 0;
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SSI_SR_TNF)) {}
-            dev(bus)->DR = 0;
-            if (dev(bus)->SR & SSI_SR_RNE) {
-                in_buf[in_cnt++] = dev(bus)->DR;
-            }
-        }
-        /* get remaining bytes */
-        while (dev(bus)->SR & SSI_SR_RNE) {
-            in_buf[in_cnt++] = dev(bus)->DR;
+    else if (!out_buf) {
+        for (void *end = in_buf + len; in_buf != end; ++in_buf) {
+            *in_buf = _trx(dev(bus), 0);
         }
     }
     else {
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SSI_SR_TNF)) {}
-            dev(bus)->DR = out_buf[i];
-            while (!(dev(bus)->SR & SSI_SR_RNE)){}
-            in_buf[i] = dev(bus)->DR;
+        for (void *end = in_buf + len; in_buf != end; ++in_buf, ++out_buf) {
+            *in_buf = _trx(dev(bus), *out_buf);
         }
-        /* wait until no more busy */
-        while ((dev(bus)->SR & SSI_SR_BSY)) {}
     }
 
     if ((!cont) && (cs != SPI_CS_UNDEF)) {

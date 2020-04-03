@@ -6,7 +6,7 @@ Using FatFs (with VFS) on RIOT
 To use this test on native you can either use a FAT-formatted image file or
 directly use the mkfs command from the RIOT shell. Use `make image` to extract
 a prepared image file that already contains a simple test.txt file. This is
-only a convinience function to allow testing against a "default linux"
+only a convenience function to allow testing against a "default linux"
 formatted fat volume without the need to call mount or other stuff that may
 require super user privileges. Optionally `make compressed-image` can be used
 to generate the compressed image that is in turn used by `make image`.

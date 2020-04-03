@@ -6,37 +6,39 @@ ifeq ($(TOOLCHAIN), llvm)
   CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function
 endif
 
-ifneq (,$(filter tinydtls,$(USEMODULE)))
-  INCLUDES += -I$(PKG_BUILDDIR)
-  # Mandatory for tinyDTLS
-  CFLAGS += -DDTLSv12 -DWITH_SHA256
+INCLUDES += -I$(RIOTBASE)/pkg/tinydtls/include
+INCLUDES += -I$(PKG_BUILDDIR)
+# Mandatory for tinyDTLS
+CFLAGS += -DDTLSv12 -DWITH_SHA256
 
-  # Dependencies partially under control of the App's requirements
+# Dependencies partially under control of the App's requirements
 
-  # The configuration for socket overrides Sock
-  ifeq (,$(filter WITH_RIOT_SOCKETS,$(CFLAGS)))
-    CFLAGS += -DWITH_RIOT_GNRC
-  endif
+# The configuration for socket overrides Sock
+ifeq (,$(filter posix_sockets,$(USEMODULE)))
+  CFLAGS += -DWITH_RIOT_GNRC
+endif
 
+# Default cipher suite when not using Kconfig
+ifeq (,$(CONFIG_KCONFIG_PKG_TINYDTLS))
   # NOTE: PSK should be enabled by default BUT if the user define any other cipher
   #       suite(s) it should not be enabled.
   # TODO: Create the flag DTLS_CIPHERS with keywords PSK, ECC (and future)
-  ifeq (,$(filter -DDTLS_PSK,$(CFLAGS)))
-    ifeq (,$(filter -DDTLS_ECC,$(CFLAGS)))
-      CFLAGS += -DDTLS_PSK
-    endif
+  PSK_ENABLED := $(or $(filter -DCONFIG_DTLS_PSK,$(CFLAGS)), $(filter -DDTLS_PSK,$(CFLAGS)))
+  ECC_ENABLED := $(or $(filter -DCONFIG_DTLS_ECC,$(CFLAGS)), $(filter -DDTLS_ECC,$(CFLAGS)))
+  ifeq (, $(or $(PSK_ENABLED),$(ECC_ENABLED)))
+    CFLAGS += -DCONFIG_DTLS_PSK
   endif
+endif
 
-  # Handles the verbosity of tinyDTLS. Default: Minimum or just error messages.
-  ifeq (,$(filter -DTINYDTLS_DEBUG,$(CFLAGS)))
-    ifeq ( , $(TINYDTLS_LOG))
-      CFLAGS += -DTINYDTLS_LOG_LVL=0
-    else
-      CFLAGS += -DTINYDTLS_LOG_LVL=$(TINYDTLS_LOG)
-    endif
-  else
-    CFLAGS += -DTINYDTLS_LOG_LVL=6
-  endif
+ifneq (,$(filter -DDTLS_DEBUG,$(CFLAGS)))
+  # For backwards compability. This can be removed after release 2020.10
+  $(warning Warning! DTLS_DEBUG is deprecated use CONFIG_DTLS_DEBUG)
+  CFLAGS += -DCONFIG_DTLS_DEBUG
+endif
+ifneq (,$(or $(CONFIG_DTLS_DEBUG),$(filter -DCONFIG_DTLS_DEBUG,$(CFLAGS))))
+  CFLAGS += -DTINYDTLS_LOG_LVL=6
+else
+  CFLAGS += -DTINYDTLS_LOG_LVL=0
 endif
 
 ifneq (,$(filter tinydtls_aes,$(USEMODULE)))
@@ -45,4 +47,45 @@ endif
 
 ifneq (,$(filter tinydtls_ecc,$(USEMODULE)))
   DIRS += $(PKG_BUILDDIR)/ecc
+endif
+
+# For now contrib only contains sock_dtls adaption
+ifneq (,$(filter tinydtls_sock_dtls,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/tinydtls/contrib
+endif
+
+# Translate 'CONFIG_' options to package specific flags. This checks if the
+# option is being set via Kconfig or CFLAGS
+
+ifneq (,$(filter -DDTLS_PSK,$(CFLAGS)))
+  # For backwards compability. This can be removed after release 2020.10
+  $(warning Warning! DTLS_PSK is deprecated use CONFIG_DTLS_PSK)
+  CFLAGS += -DCONFIG_DTLS_PSK
+endif
+ifneq (,$(or $(CONFIG_DTLS_PSK),$(filter -DCONFIG_DTLS_PSK,$(CFLAGS))))
+    CFLAGS += -DDTLS_PSK
+endif
+
+ifneq (,$(filter -DDTLS_ECC,$(CFLAGS)))
+  # For backwards compability. This can be removed after release 2020.10
+  $(warning Warning! DTLS_ECC is deprecated use CONFIG_DTLS_ECC)
+  CFLAGS += -DCONFIG_DTLS_ECC
+endif
+ifneq (,$(or $(CONFIG_DTLS_ECC),$(filter -DCONFIG_DTLS_ECC,$(CFLAGS))))
+    CFLAGS += -DDTLS_ECC
+endif
+
+CONTEXT_MAX := $(or $(CONFIG_DTLS_CONTEXT_MAX),$(patsubst -DCONFIG_DTLS_CONTEXT_MAX=%,%,$(filter -DCONFIG_DTLS_CONTEXT_MAX=%,$(CFLAGS))))
+ifneq (,$(CONTEXT_MAX))
+    CFLAGS += -DDTLS_CONTEXT_MAX=$(CONTEXT_MAX)
+endif
+
+PEER_MAX := $(or $(CONFIG_DTLS_PEER_MAX),$(patsubst -DCONFIG_DTLS_PEER_MAX=%,%,$(filter -DCONFIG_DTLS_PEER_MAX=%,$(CFLAGS))))
+ifneq (,$(PEER_MAX))
+    CFLAGS += -DDTLS_PEER_MAX=$(PEER_MAX)
+endif
+
+HANDSHAKE_MAX := $(or $(CONFIG_DTLS_HANDSHAKE_MAX),$(patsubst -DCONFIG_DTLS_HANDSHAKE_MAX=%,%,$(filter -DCONFIG_DTLS_HANDSHAKE_MAX=%,$(CFLAGS))))
+ifneq (,$(HANDSHAKE_MAX))
+    CFLAGS += -DDTLS_HANDSHAKE_MAX=$(HANDSHAKE_MAX)
 endif

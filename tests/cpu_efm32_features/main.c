@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Bas Stottelaar <basstottelaar@gmail.com>
+ * Copyright (C) 2018-2019 Bas Stottelaar <basstottelaar@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,23 +20,13 @@
 
 #include "periph/uart.h"
 
+#if EFM32_LEUART_ENABLED
+#error "Expected EFM32_LEUART_ENABLED feature to be disabled."
+#endif
+
 int main(void)
 {
-    /* test if uart_config[i].mode is set to a know value */
-    for (unsigned i = 0; i < UART_NUMOF; i++) {
-        printf("UART %u mode: ", i);
-
-        switch (uart_config[i].mode) {
-            case UART_MODE_8N1:
-                puts("8N1");
-                break;
-            case UART_MODE_8E1:
-                puts("8E1");
-                break;
-            default:
-                puts("unknown");
-        }
-    }
+    puts("Board booted, with some EFM32 features enabled or disabled.");
 
     return 0;
 }

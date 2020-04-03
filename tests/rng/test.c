@@ -154,7 +154,7 @@ void test_distributions(uint32_t samples)
 
         /* count bits */
         for (int i = 0; i < 32; i++) {
-            if (value & (1 << i)) {
+            if (value & (UINT32_C(1) << i)) {
                 distributions[i]++;
             }
         }
@@ -382,7 +382,15 @@ void test_entropy(uint32_t samples)
     }
 
     /* print results */
-    printf("Calculated %02f bits of entropy from %" PRIu32 " samples.\n", (double) entropy, samples);
+    /* Use 'fmt/print_float' to work on all platforms (atmega)
+     * Stdout should be flushed before to prevent garbled output. */
+    printf("Calculated ");
+#ifdef MODULE_NEWLIB
+    /* no fflush on msp430 */
+    fflush(stdout);
+#endif
+    print_float(entropy, 6);
+    printf(" bits of entropy from %" PRIu32 " samples.\n", samples);
 }
 
 void cb_speed_timeout(void *arg)
@@ -404,8 +412,10 @@ void test_speed(uint32_t duration)
     /* collect samples as long as timer has not expired */
     unsigned running = 1;
     xtimer_t xt = {
-        .target = 0,
-        .long_target = 0,
+        .start_time = 0,
+        .long_start_time = 0,
+        .offset = 0,
+        .long_offset = 0,
         .callback = cb_speed_timeout,
         .arg = &running,
     };
@@ -436,8 +446,10 @@ void test_speed_range(uint32_t duration, uint32_t low_thresh, uint32_t high_thre
     /* collect samples as long as timer has not expired */
     unsigned running = 1;
     xtimer_t xt = {
-        .target = 0,
-        .long_target = 0,
+        .start_time = 0,
+        .long_start_time = 0,
+        .offset = 0,
+        .long_offset = 0,
         .callback = cb_speed_timeout,
         .arg = &running,
     };

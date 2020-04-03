@@ -156,7 +156,7 @@ typedef struct {
  **************************************************************************/
 int tun_alloc(char *dev, int flags) {
 
-  struct ifreq ifr;
+  struct ifreq ifr = { 0 };
   int fd, err;
 
   if( (fd = open("/dev/net/tun", O_RDWR)) < 0 ) {
@@ -164,12 +164,10 @@ int tun_alloc(char *dev, int flags) {
     return fd;
   }
 
-  memset(&ifr, 0, sizeof(ifr));
-
   ifr.ifr_flags = flags;
 
   if (*dev) {
-    strncpy(ifr.ifr_name, dev, IFNAMSIZ);
+    strncpy(ifr.ifr_name, dev, IFNAMSIZ - 1);
   }
 
   if( (err = ioctl(fd, TUNSETIFF, (void *)&ifr)) < 0 ) {
@@ -261,7 +259,6 @@ static void _write_escaped(int fd, char* buf, ssize_t n)
     /* Our workaround is to prepare the data to send in a local buffer and then
      * call write() on the buffer instead of one char at a time */
     uint8_t out[SERIAL_BUFFER_SIZE];
-    size_t escaped = 0;
     size_t buffered = 0;
 
     while(n--) {
@@ -269,7 +266,6 @@ static void _write_escaped(int fd, char* buf, ssize_t n)
         if (c == LINE_FRAME_DELIMITER || c == LINE_ESC_CHAR) {
             out[buffered++] = LINE_ESC_CHAR;
             c ^= 0x20;
-            ++escaped;
             if (buffered >= SERIAL_BUFFER_SIZE) {
                 checked_write(fd, out, buffered);
                 buffered = 0;
@@ -328,7 +324,7 @@ static int _parse_baudrate(const char *arg, unsigned *baudrate)
         *baudrate = B115200;
         break;
     /* the following baudrates might not be available on all platforms */
-    #ifdef B234000
+    #ifdef B230400
         case_baudrate(230400);
     #endif
     #ifdef B460800
@@ -517,8 +513,8 @@ int main(int argc, char *argv[])
         serial_option = argv[3];
     }
 
-    char ifname[IFNAMSIZ];
-    strncpy(ifname, argv[1], IFNAMSIZ);
+    char ifname[IFNAMSIZ] = { 0 };
+    strncpy(ifname, argv[1], IFNAMSIZ - 1);
     int tap_fd = tun_alloc(ifname, IFF_TAP | IFF_NO_PI);
 
     if (tap_fd < 0) {

@@ -30,16 +30,9 @@ extern "C" {
 
 /* Shared header file for all cipher algorithms */
 
-/* Set the algorithms that should be compiled in here. When these defines
- * are set, then packets will be compiled 5 times.
- */
-// #define CRYPTO_THREEDES
-// #define CRYPTO_AES
-
 /** @brief the length of keys in bytes */
 #define CIPHERS_MAX_KEY_SIZE 20
 #define CIPHER_MAX_BLOCK_SIZE 16
-
 
 /**
  * Context sizes needed for the different ciphers.
@@ -48,9 +41,9 @@ extern "C" {
  * threedes     needs 24  bytes                           <br>
  * aes          needs CIPHERS_MAX_KEY_SIZE bytes          <br>
  */
-#if defined(CRYPTO_THREEDES)
+#if defined(MODULE_CRYPTO_3DES)
     #define CIPHER_MAX_CONTEXT_SIZE 24
-#elif defined(CRYPTO_AES)
+#elif defined(MODULE_CRYPTO_AES)
     #define CIPHER_MAX_CONTEXT_SIZE CIPHERS_MAX_KEY_SIZE
 #else
 /* 0 is not a possibility because 0-sized arrays are not allowed in ISO C */
@@ -63,9 +56,9 @@ extern "C" {
 #define CIPHER_ERR_INVALID_LENGTH     -4
 #define CIPHER_ERR_ENC_FAILED         -5
 #define CIPHER_ERR_DEC_FAILED         -6
-/** Is returned by the cipher_init functions, if the coresponding alogirithm has not been included in the build */
+/** Is returned by the cipher_init functions, if the corresponding alogirithm has not been included in the build */
 #define CIPHER_ERR_BAD_CONTEXT_SIZE    0
-/**  Returned by cipher_init upon succesful initialization of a cipher. */
+/**  Returned by cipher_init upon successful initialization of a cipher. */
 #define CIPHER_INIT_SUCCESS            1
 
 /**
@@ -148,7 +141,8 @@ int cipher_init(cipher_t *cipher, cipher_id_t cipher_id, const uint8_t *key,
  *                   cipher, which is always 1 in case of success
  * @return           A negative value for an error
  */
-int cipher_encrypt(const cipher_t *cipher, const uint8_t *input, uint8_t *output);
+int cipher_encrypt(const cipher_t *cipher, const uint8_t *input,
+                   uint8_t *output);
 
 
 /**
@@ -164,7 +158,8 @@ int cipher_encrypt(const cipher_t *cipher, const uint8_t *input, uint8_t *output
  *                   cipher, which is always 1 in case of success
  * @return           A negative value for an error
  */
-int cipher_decrypt(const cipher_t *cipher, const uint8_t *input, uint8_t *output);
+int cipher_decrypt(const cipher_t *cipher, const uint8_t *input,
+                   uint8_t *output);
 
 
 /**

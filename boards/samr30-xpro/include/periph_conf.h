@@ -28,20 +28,29 @@ extern "C" {
 /**
  * @brief   GCLK reference speed
  */
-#define CLOCK_CORECLOCK     (16000000U)
+#define CLOCK_CORECLOCK     (48000000U)
 
 /**
  * @name    Timer peripheral configuration
  * @{
  */
-#define TIMER_NUMOF        (1U)
-#define TIMER_0_EN         1
+static const tc32_conf_t timer_config[] = {
+    {   /* Timer 0 - System Clock */
+        .dev            = TC0,
+        .irq            = TC0_IRQn,
+        .mclk           = &MCLK->APBCMASK.reg,
+        .mclk_mask      = MCLK_APBCMASK_TC0 | MCLK_APBCMASK_TC1,
+        .gclk_id        = TC0_GCLK_ID,
+        .gclk_src       = SAM0_GCLK_8MHZ,
+        .prescaler      = TC_CTRLA_PRESCALER(3),
+        .flags          = TC_CTRLA_MODE_COUNT32,
+    }
+};
 
 /* Timer 0 configuration */
-#define TIMER_0_DEV        TC0->COUNT32
-#define TIMER_0_CHANNELS   1
-#define TIMER_0_MAX_VALUE  (0xffffffff)
-#define TIMER_0_ISR        isr_tc0
+#define TIMER_0_CHANNELS    2
+#define TIMER_0_ISR         isr_tc0
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -53,18 +62,22 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM0->USART,
         .rx_pin   = GPIO_PIN(PA,5),
         .tx_pin   = GPIO_PIN(PA,4),
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin  = GPIO_UNDEF,
+        .cts_pin  = GPIO_UNDEF,
+#endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
         .flags    = UART_FLAG_NONE,
-        .gclk_src = GCLK_PCHCTRL_GEN_GCLK0
+        .gclk_src = SAM0_GCLK_MAIN,
     }
 };
 
 /* interrupt function name mapping */
 #define UART_0_ISR          isr_sercom0
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -81,11 +94,12 @@ static const spi_conf_t spi_config[] = {
         .mosi_mux = GPIO_MUX_F,
         .clk_mux  = GPIO_MUX_F,
         .miso_pad = SPI_PAD_MISO_0,
-        .mosi_pad = SPI_PAD_MOSI_2_SCK_3
+        .mosi_pad = SPI_PAD_MOSI_2_SCK_3,
+        .gclk_src = SAM0_GCLK_MAIN,
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -99,18 +113,17 @@ static const i2c_conf_t i2c_config[] = {
         .scl_pin  = GPIO_PIN(PA, 17),
         .sda_pin  = GPIO_PIN(PA, 16),
         .mux      = GPIO_MUX_C,
-        .gclk_src = GCLK_PCHCTRL_GEN_GCLK0,
+        .gclk_src = SAM0_GCLK_MAIN,
         .flags    = I2C_FLAG_NONE
      }
 };
-#define I2C_NUMOF          (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF          ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**
  * @name    RTC configuration
  * @{
  */
-#define RTC_NUMOF                               (1)
 #define EXTERNAL_OSC32_SOURCE                   1
 #define INTERNAL_OSC32_SOURCE                   0
 #define ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE     0
@@ -122,18 +135,18 @@ static const i2c_conf_t i2c_config[] = {
  */
 #define RTT_FREQUENCY                           (32768U)
 #define RTT_MAX_VALUE                           (0xffffffffU)
-#define RTT_NUMOF                               (1)
 /** @} */
 
 /**
  * @name ADC Configuration
  * @{
  */
-#define ADC_NUMOF                               (5U)
 
-/* ADC 0 Default values */
-#define ADC_0_CLK_SOURCE                        0 /* GCLK_GENERATOR_0 */
-#define ADC_0_PRESCALER                         ADC_CTRLB_PRESCALER_DIV256
+/* ADC Default values */
+#define ADC_PRESCALER                           ADC_CTRLB_PRESCALER_DIV256
+
+#define ADC_NEG_INPUT                           ADC_INPUTCTRL_MUXNEG(0x18u)
+#define ADC_REF_DEFAULT                         ADC_REFCTRL_REFSEL_INTVCC2
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
@@ -144,8 +157,7 @@ static const adc_conf_chan_t adc_channels[] = {
     {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN0)}
 };
 
-#define ADC_0_NEG_INPUT                         ADC_INPUTCTRL_MUXNEG(0x18u)
-#define ADC_0_REF_DEFAULT                       ADC_REFCTRL_REFSEL_INTVCC2
+#define ADC_NUMOF                               ARRAY_SIZE(adc_channels)
 /** @} */
 
 #ifdef __cplusplus

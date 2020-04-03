@@ -1,0 +1,12 @@
+ifneq (,$(filter cc2538_rf,$(USEMODULE)))
+  USEMODULE += netdev_ieee802154
+  USEMODULE += netif
+endif
+
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
+  USEMODULE += rtt_rtc
+endif
+
+USEMODULE += pm_layered
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

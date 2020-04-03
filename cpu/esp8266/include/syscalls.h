@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2019 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -21,25 +21,17 @@
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdlib.h>
+#include "syscalls_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** Necessary initializations of system call functions */
-extern void syscalls_init (void);
+#ifndef DOXYGEN
 
-/** System standard printf function */
-extern int printf(const char* format, ...);
+#define MALLOC_CAP_DEFAULT  MALLOC_CAP_8BIT
 
-/** System standard puts function */
-extern int puts(const char * str);
-
-/** Determine free heap size */
-extern unsigned int get_free_heap_size (void);
+#endif /* DOXYGEN */
 
 #ifdef __cplusplus
 }

@@ -89,11 +89,38 @@ int sock_ip_get_remote(sock_ip_t *sock, sock_ip_ep_t *remote)
 ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
                      uint32_t timeout, sock_ip_ep_t *remote)
 {
+    void *pkt = NULL, *ctx = NULL;
+    uint8_t *ptr = data;
+    ssize_t res, ret = 0;
+    bool nobufs = false;
+
+    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    while ((res = sock_ip_recv_buf(sock, &pkt, &ctx, timeout, remote)) > 0) {
+        if (res > (ssize_t)max_len) {
+            nobufs = true;
+            continue;
+        }
+        memcpy(ptr, pkt, res);
+        ptr += res;
+        ret += res;
+    }
+    return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
+}
+
+ssize_t sock_ip_recv_buf(sock_ip_t *sock, void **data, void **buf_ctx,
+                         uint32_t timeout, sock_ip_ep_t *remote)
+{
     gnrc_pktsnip_t *pkt;
     sock_ip_ep_t tmp;
     int res;
 
-    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    assert((sock != NULL) && (data != NULL) && (buf_ctx != NULL));
+    if (*buf_ctx != NULL) {
+        *data = NULL;
+        gnrc_pktbuf_release(*buf_ctx);
+        *buf_ctx = NULL;
+        return 0;
+    }
     if (sock->local.family == 0) {
         return -EADDRNOTAVAIL;
     }
@@ -101,10 +128,6 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
     res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp);
     if (res < 0) {
         return res;
-    }
-    if (pkt->size > max_len) {
-        gnrc_pktbuf_release(pkt);
-        return -ENOBUFS;
     }
     if (remote != NULL) {
         /* return remote to possibly block if wrong remote */
@@ -119,9 +142,9 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
         gnrc_pktbuf_release(pkt);
         return -EPROTO;
     }
-    memcpy(data, pkt->data, pkt->size);
+    *data = pkt->data;
+    *buf_ctx = pkt;
     res = (int)pkt->size;
-    gnrc_pktbuf_release(pkt);
     return res;
 }
 
@@ -195,7 +218,28 @@ ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
     if (res <= 0) {
         return res;
     }
+#ifdef SOCK_HAS_ASYNC
+    if ((sock != NULL) && (sock->reg.async_cb.ip)) {
+        sock->reg.async_cb.ip(sock, SOCK_ASYNC_MSG_SENT,
+                              sock->reg.async_cb_arg);
+    }
+#endif  /* SOCK_HAS_ASYNC */
     return res;
 }
+
+#ifdef SOCK_HAS_ASYNC
+void sock_ip_set_cb(sock_ip_t *sock, sock_ip_cb_t cb, void *arg)
+{
+    sock->reg.async_cb_arg = arg;
+    sock->reg.async_cb.ip = cb;
+}
+
+#ifdef SOCK_HAS_ASYNC_CTX
+sock_async_ctx_t *sock_ip_get_async_ctx(sock_ip_t *sock)
+{
+    return &sock->reg.async_ctx;
+}
+#endif  /* SOCK_HAS_ASYNC_CTX */
+#endif  /* SOCK_HAS_ASYNC */
 
 /** @} */

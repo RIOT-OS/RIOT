@@ -53,13 +53,15 @@ int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *por
  * "host.name:1234" and "/url/path".
  *
  * @note Caller has to make sure hostport and urlpath can hold the results!
- *       Make sure to provide space for @ref SOCK_HOSTPORT_MAXLEN respectively
- *       @ref SOCK_URLPATH_MAXLEN bytes.
- *       Scheme part of the URL is limited to @ref SOCK_SCHEME_MAXLEN length.
+ *       Make sure to provide space for @ref CONFIG_SOCK_HOSTPORT_MAXLEN respectively
+ *       @ref CONFIG_SOCK_URLPATH_MAXLEN bytes, if pointers are not NULL.
+ *       Scheme part of the URL is limited to @ref CONFIG_SOCK_SCHEME_MAXLEN length.
  *
- * @param[in]   url         URL to split
- * @param[out]  hostport    where to write host:port
- * @param[out]  urlpath     where to write url path
+ * @pre `url != NULL`
+ *
+ * @param[in]   url         URL to split. Must not be NULL.
+ * @param[out]  hostport    where to write host:port. Can be NULL.
+ * @param[out]  urlpath     where to write url path. Can be NULL.
  *
  * @returns     0 on success
  * @returns     <0 otherwise
@@ -96,16 +98,35 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str);
 bool sock_udp_ep_equal(const sock_udp_ep_t *a, const sock_udp_ep_t *b);
 
 /**
- * @name helper definitions
+ * @defgroup    net_sock_util_conf SOCK utility functions compile configurations
+ * @ingroup     net_sock_util
+ * @ingroup     config
  * @{
  */
-#define SOCK_SCHEME_MAXLEN      (16U)   /**< maximum length of the scheme part
-                                             for sock_urlsplit. Ensures a hard
-                                             limit on the string iterator */
-#define SOCK_HOSTPORT_MAXLEN    (64U)   /**< maximum length of host:port part for
-                                             sock_urlsplit() */
-#define SOCK_URLPATH_MAXLEN     (64U)   /**< maximum length path for
-                                             sock_urlsplit() */
+
+/**
+ * @brief maximum length of the scheme part for sock_urlsplit.
+ *
+ * Ensures a hard limit on the string iterator
+ * */
+#ifndef CONFIG_SOCK_SCHEME_MAXLEN
+#define CONFIG_SOCK_SCHEME_MAXLEN      (16U)
+#endif
+
+/**
+ * @brief maximum length of host:port part for sock_urlsplit()
+ */
+#ifndef CONFIG_SOCK_HOSTPORT_MAXLEN
+#define CONFIG_SOCK_HOSTPORT_MAXLEN    (64U)
+#endif
+
+/**
+ * @brief maximum length path for sock_urlsplit()
+ */
+#ifndef CONFIG_SOCK_URLPATH_MAXLEN
+#define CONFIG_SOCK_URLPATH_MAXLEN     (64U)
+#endif
+
 /** @} */
 
 #ifdef __cplusplus

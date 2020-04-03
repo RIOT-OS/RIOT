@@ -11,13 +11,13 @@ usual micro-controller peripherals with a 2.4GHz radio that supports both
 Nordics proprietary ShockBurst as well as Bluetooth Low Energy (BLE).
 
 The board was available via
-[Indiegogo](https://www.indiegogo.com/projects/airfy-beacon-make-your-smart-
-home-even-smarter).
+[Indiegogo]
+(https://www.indiegogo.com/projects/airfy-beacon-make-your-smart-home-even-smarter).
 
 ## Hardware
 
-![airfy-beacon](https://raw.githubusercontent.com/wiki/RIOT-
-OS/RIOT/images/airfy-beacon.jpg)
+![airfy-beacon]
+(https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/airfy-beacon.jpg)
 
 | MCU        | NRF51822QFAA      |
 |:------------- |:--------------------- |
@@ -33,8 +33,8 @@ OS/RIOT/images/airfy-beacon.jpg)
 | SPIs       | 2                 |
 | I2Cs       | 2                 |
 | Vcc        | 1.8V - 3.6V           |
-| Reference Manual | [Reference Manual](http://www.100y.com.tw/pdf_file/39-Nordic-NRF51822.pdf) |
-
+| Product Specification | [Product Specification](https://infocenter.nordicsemi.com/pdf/nRF51822_PS_v3.3.pdf) |
+| Reference Manual | [Reference Manual](https://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.1.pdf) |
 
 ## Unlocking the flash memory
 
@@ -47,8 +47,8 @@ registers. Just follow these steps:
 
 1. Follow the steps described above for manually flashing the device:
 
-   1. start openocd using the correct config file `openocd -f boards/airfy-
-beacon/dist/openocd.cfg`
+   1. start openocd using the correct config file
+      `openocd -f boards/airfy-beacon/dist/openocd.cfg`
    2. connect to openocd using telnet `telnet localhost 4444`
 
 2. type `halt` to stop the device
@@ -92,13 +92,13 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3748", \
 ```
 now replug the usb cable and flash.
 
-Have a look at the 'Setting up udev rules' section in this [README
-file](https://github.com/texane/stlink/blob/master/README) if you need help.
+Have a look at the 'Setting up udev rules' section in the
+[README file](https://github.com/texane/stlink) if you need help.
 
 Second you need to enable the standalone ST-Link mode of the discovery board
 by removing the two `CN2` jumpers, found somewhere in the upper left part of the
 board. This disconnects the ST-Link programmer from the micro-controller part of
-the port and enables direct access through the pin-header `CN3`, also labled
+the port and enables direct access through the pin-header `CN3`, also labeled
 `SWD`.
 
 This module supports the Serial Wire Debug (SWD) interface. To access the
@@ -114,11 +114,12 @@ SWD data I/O:      SWDIO <-----------> SWDIO (CN3, pin4)
 
 The following image shows the wiring for an SWD flasher board:
 
-![airfy-beacon-flash-connect](https://raw.githubusercontent.com/wiki/RIOT-
-OS/RIOT/images/airfy-beacon-flash-connect.jpg)
+![airfy-beacon-flash-connect]
+(https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/airfy-beacon-flash-connect.jpg)
 
 ### Software
-Debugging and programming this module works well with [[OpenOCD]].
+Debugging and programming this module works well with
+[OpenOCD](http://openocd.org/).
 
 We suggest to use a fairly recent version, best use the upstream version from
 their [git repository](http://sourceforge.net/p/openocd/code/ci/master/tree/).

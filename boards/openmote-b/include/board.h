@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_openmote-b OpenMote-B
- * @ingroup     boards
- * @brief       Support for the OpenMote-B board
+ * @ingroup     boards_openmote-b
  * @{
  *
  * @file
@@ -38,10 +36,10 @@
 #define LED1_PIN                    GPIO_PIN(2, 7)
 #define LED2_PIN                    GPIO_PIN(2, 6)
 #define LED3_PIN                    GPIO_PIN(2, 5)
-#define LED3_PIN                    GPIO_PIN(2, 5)
-#define USER_BUTTON_PIN             GPIO_PIN(2, 5)
-#define RF_SWITCH_2_4_GHZ_PIN       GPIO_PIN(3, 4)  /**< PD4 -- 2.4ghz */
-#define RF_SWITCH_SUB_GHZ_PIN       GPIO_PIN(3, 3)  /**< PD3 -- subghz */
+#define BTN0_PIN                    GPIO_PIN(3, 5)
+#define BTN0_MODE                   GPIO_IN
+#define RF24_SWITCH_CC2538_PIN      GPIO_PIN(3, 4)  /**< PD4 -- CC2538 */
+#define RF24_SWITCH_AT86RF215_PIN   GPIO_PIN(3, 3)  /**< PD3 -- AT86RF215 */
 
 #define LED_PORT                    GPIO_C
 #define LED0_MASK                   (1 << 4)
@@ -50,8 +48,8 @@
 #define LED3_MASK                   (1 << 5)
 
 #define RF_SWITCH_PORT              GPIO_D
-#define RF_SWITCH_2_4_GHZ_MASK      (1 << 4)
-#define RF_SWITCH_SUB_GHZ_MASK      (1 << 3)
+#define RF24_SWITCH_CC2538_MASK     (1 << 4)
+#define RF24_SWITCH_AT86RF215_MASK  (1 << 3)
 
 #define LED0_ON                     (LED_PORT->DATA &= ~LED0_MASK)
 #define LED0_OFF                    (LED_PORT->DATA |=  LED0_MASK)
@@ -69,13 +67,23 @@
 #define LED3_OFF                    (LED_PORT->DATA |=  LED3_MASK)
 #define LED3_TOGGLE                 (LED_PORT->DATA ^=  LED3_MASK)
 
-#define RF_SWITCH_2_4_GHZ_ON        (RF_SWITCH_PORT->DATA &= ~RF_SWITCH_2_4_GHZ_MASK)
-#define RF_SWITCH_2_4_GHZ_OFF       (RF_SWITCH_PORT->DATA |=  RF_SWITCH_2_4_GHZ_MASK)
-#define RF_SWITCH_2_4_GHZ_TOGGLE    (RF_SWITCH_PORT->DATA ^=  RF_SWITCH_2_4_GHZ_MASK)
+#define RF24_SWITCH_CC2538_ON       (RF_SWITCH_PORT->DATA &= ~RF24_SWITCH_CC2538_MASK)
+#define RF24_SWITCH_CC2538_OFF      (RF_SWITCH_PORT->DATA |=  RF24_SWITCH_CC2538_MASK)
+#define RF24_SWITCH_CC2538_TOGGLE   (RF_SWITCH_PORT->DATA ^=  RF24_SWITCH_CC2538_MASK)
 
-#define RF_SWITCH_SUB_GHZ_ON        (RF_SWITCH_PORT->DATA &= ~RF_SWITCH_SUB_GHZ_MASK)
-#define RF_SWITCH_SUB_GHZ_OFF       (RF_SWITCH_PORT->DATA |=  RF_SWITCH_SUB_GHZ_MASK)
-#define RF_SWITCH_SUB_GHZ_TOGGLE    (RF_SWITCH_PORT->DATA ^=  RF_SWITCH_SUB_GHZ_MASK)
+#define RF24_SWITCH_AT86RF215_ON     (RF_SWITCH_PORT->DATA &= ~RF24_SWITCH_AT86RF215_MASK)
+#define RF24_SWITCH_AT86RF215_OFF    (RF_SWITCH_PORT->DATA |=  RF24_SWITCH_AT86RF215_MASK)
+#define RF24_SWITCH_AT86RF215_TOGGLE (RF_SWITCH_PORT->DATA ^=  RF24_SWITCH_AT86RF215_MASK)
+/** @} */
+
+/**
+ * @name    AT86RF215 configuration
+ * @{
+ */
+#define AT86RF215_PARAM_SPI        SPI_DEV(0)
+#define AT86RF215_PARAM_CS         GPIO_PIN(0, 3) /* A3 */
+#define AT86RF215_PARAM_INT        GPIO_PIN(3, 0) /* D0 */
+#define AT86RF215_PARAM_RESET      GPIO_PIN(3, 1) /* D1 */
 /** @} */
 
 /**
@@ -98,6 +106,8 @@
 #define CCA_BACKDOOR_ENABLE       (1)
 #define CCA_BACKDOOR_PORT_A_PIN   (6) /**< BSL_BOOT Pin */
 #define CCA_BACKDOOR_ACTIVE_LEVEL (0) /**< Active low */
+
+#define BOOT_PIN    GPIO_PIN(0, CCA_BACKDOOR_PORT_A_PIN) /**< BSL_BOOT Pin */
 /** @} */
 
 /**

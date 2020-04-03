@@ -1,0 +1,8 @@
+MODULE = wolfcrypt-benchmark
+
+NO_AUTO_SRC = 1
+
+#Add to enable wolfcrypt crypto benchmark
+SRC += benchmark.c
+
+include $(RIOTBASE)/Makefile.base

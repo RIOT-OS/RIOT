@@ -4,6 +4,8 @@ PKG_VERSION  = 9b99a3be9a26635b93aec8fa2ed744e8c49e7262
 PKG_LICENSE  = EPL-1.0
 PKG_BUILDDIR = $(CURDIR)/bin
 
+include $(RIOTBASE)/pkg/pkg.mk
+
 # set default configuration file
 RSMB_CFG ?= $(CURDIR)/config.cnf
 
@@ -14,9 +16,7 @@ GITCACHE ?= $(RIOTTOOLS)/git/git-cache
 
 $(info $(RIOTBASE))
 
-.PHONY: all clean
-
-all: git-download
+all:
 # Start mosquitto_rsmb build in a clean environment, so variables set by RIOT's
 # build process for cross compiling a specific target platform are reset and
 # mosquitto_rsmb can be built cleanly for the host platform.
@@ -32,5 +32,3 @@ clean::
 	@rm -f $(CURDIR)/mosquitto_rsmb
 	@rm -f $(CURDIR)/Messages.1.*
 	@rm -f $(CURDIR)/FFDC.CWNAN.*.dmp
-
-include $(RIOTBASE)/pkg/pkg.mk

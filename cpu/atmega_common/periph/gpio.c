@@ -19,6 +19,9 @@
  * @author      René Herthel <rene-herthel@outlook.de>
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
  * @author      Laurent Navet <laurent.navet@gmail.com>
+ * @author      Robert Hartung <hartung@ibr.cs.tu-bs.de>
+ * @author      Torben Petersen <petersen@ibr.cs.tu-bs.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
  * @}
  */
@@ -28,20 +31,21 @@
 #include <avr/interrupt.h>
 
 #include "cpu.h"
+#include "board.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
+#include "atmega_gpio.h"
 
-#define GPIO_BASE_PORT_A        (0x20)
-#define GPIO_OFFSET_PORT_H      (0xCB)
-#define GPIO_OFFSET_PIN_PORT    (0x02)
-#define GPIO_OFFSET_PIN_PIN     (0x03)
+#define ENABLE_DEBUG            (0)
+#include "debug.h"
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 /*
  * @brief     Define GPIO interruptions for an specific atmega CPU, by default
  *            2 (for small atmega CPUs)
  */
+
 #if defined(INT7_vect)
 #define GPIO_EXT_INT_NUMOF      (8U)
 #elif defined(INT6_vect)
@@ -59,73 +63,108 @@
 #endif
 
 static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
-#endif /* MODULE_PERIPH_GPIO_IRQ */
 
-/**
- * @brief     Extract the pin number of the given pin
- */
-static inline uint8_t _pin_num(gpio_t pin)
-{
-    return (pin & 0x0f);
-}
+/* Detects amount of possible PCINTs */
+#if defined(MODULE_ATMEGA_PCINT0) || defined(MODULE_ATMEGA_PCINT1) || \
+    defined(MODULE_ATMEGA_PCINT2) || defined(MODULE_ATMEGA_PCINT3)
+#include "atmega_pcint.h"
 
-/**
- * @brief     Extract the port number of the given pin
- */
-static inline uint8_t _port_num(gpio_t pin)
-{
-    return (pin >> 4) & 0x0f;
-}
+#define ENABLE_PCINT
 
-/**
- * @brief     Generate the PORTx address of the give pin.
- */
-static inline uint16_t _port_addr(gpio_t pin)
-{
-    uint8_t port_num = _port_num(pin);
-    uint16_t port_addr = port_num * GPIO_OFFSET_PIN_PIN;
-
-    port_addr += GPIO_BASE_PORT_A;
-    port_addr += GPIO_OFFSET_PIN_PORT;
-
-#if defined (PORTG)
-    if (port_num > PORT_G) {
-        port_addr += GPIO_OFFSET_PORT_H;
-    }
+/* Check which pcints should be enabled */
+#if defined(MODULE_ATMEGA_PCINT0) && !defined(ATMEGA_PCINT_MAP_PCINT0)
+#error \
+    Either mapping for pin change interrupt bank 0 is missing or not supported by the MCU
 #endif
-    return port_addr;
-}
+
+#if defined(MODULE_ATMEGA_PCINT1) && !defined(ATMEGA_PCINT_MAP_PCINT1)
+#error \
+    Either mapping for pin change interrupt bank 1 is missing or not supported by the MCU
+#endif
+
+#if defined(MODULE_ATMEGA_PCINT2) && !defined(ATMEGA_PCINT_MAP_PCINT2)
+#error \
+    Either mapping for pin change interrupt bank 2 is missing or not supported by the MCU
+#endif
+
+#if defined(MODULE_ATMEGA_PCINT3) && !defined(ATMEGA_PCINT_MAP_PCINT3)
+#error \
+    Either mapping for pin change interrupt bank 3 is missing or not supported by the MCU
+#endif
 
 /**
- * @brief     Generate the DDRx address of the given pin
+ * @brief   Use anonymous enum as for addressing the @ref pcint_state
  */
-static inline uint16_t _ddr_addr(gpio_t pin)
-{
-    return (_port_addr(pin) - 0x01);
-}
+enum {
+#ifdef MODULE_ATMEGA_PCINT0
+    PCINT0_IDX,     /**< Index of PCINT0, if used */
+#endif /* MODULE_ATMEGA_PCINT0 */
+#ifdef MODULE_ATMEGA_PCINT1
+    PCINT1_IDX,     /**< Index of PCINT1, if used */
+#endif /* MODULE_ATMEGA_PCINT1 */
+#ifdef MODULE_ATMEGA_PCINT2
+    PCINT2_IDX,     /**< Index of PCINT2, if used */
+#endif /* MODULE_ATMEGA_PCINT2 */
+#ifdef MODULE_ATMEGA_PCINT3
+    PCINT3_IDX,     /**< Index of PCINT3, if used */
+#endif /* MODULE_ATMEGA_PCINT3 */
+    PCINT_NUM_BANKS     /**< Number of PCINT banks used */
+};
 
 /**
- * @brief     Generate the PINx address of the given pin.
+ * @brief stores the last pcint state of each port
  */
-static inline uint16_t _pin_addr(gpio_t pin)
-{
-    return (_port_addr(pin) - 0x02);
-}
+static uint8_t pcint_state[PCINT_NUM_BANKS];
+
+/**
+ * @brief stores all cb and args for all defined pcint.
+ */
+typedef struct {
+    gpio_flank_t flank;     /**< type of interrupt the flank should be triggered on */
+    gpio_cb_t cb;           /**< interrupt callback */
+    void *arg;              /**< optional argument */
+} gpio_isr_ctx_pcint_t;
+
+/**
+ * @brief
+ */
+static const gpio_t pcint_mapping[] = {
+#ifdef MODULE_ATMEGA_PCINT0
+    ATMEGA_PCINT_MAP_PCINT0,
+#endif /* PCINT0_IDX */
+#ifdef MODULE_ATMEGA_PCINT1
+    ATMEGA_PCINT_MAP_PCINT1,
+#endif /* PCINT1_IDX */
+#ifdef MODULE_ATMEGA_PCINT2
+    ATMEGA_PCINT_MAP_PCINT2,
+#endif /* PCINT2_IDX */
+#ifdef MODULE_ATMEGA_PCINT3
+    ATMEGA_PCINT_MAP_PCINT3,
+#endif /* PCINT3_IDX */
+};
+/**
+ * @brief
+ */
+static gpio_isr_ctx_pcint_t pcint_config[8 * PCINT_NUM_BANKS];
+#endif  /* MODULE_ATMEGA_PCINTn */
+
+#endif  /* MODULE_PERIPH_GPIO_IRQ */
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    uint8_t pin_mask = (1 << _pin_num(pin));
+    uint8_t pin_mask = (1 << atmega_pin_num(pin));
+
     switch (mode) {
         case GPIO_OUT:
-            _SFR_MEM8(_ddr_addr(pin)) |= pin_mask;
+            _SFR_MEM8(atmega_ddr_addr(pin)) |= pin_mask;
             break;
         case GPIO_IN:
-            _SFR_MEM8(_ddr_addr(pin)) &= ~pin_mask;
-            _SFR_MEM8(_port_addr(pin)) &= ~pin_mask;
+            _SFR_MEM8(atmega_ddr_addr(pin)) &= ~pin_mask;
+            _SFR_MEM8(atmega_port_addr(pin)) &= ~pin_mask;
             break;
         case GPIO_IN_PU:
-            _SFR_MEM8(_ddr_addr(pin)) &= ~pin_mask;
-            _SFR_MEM8(_port_addr(pin)) |= pin_mask;
+            _SFR_MEM8(atmega_ddr_addr(pin)) &= ~pin_mask;
+            _SFR_MEM8(atmega_port_addr(pin)) |= pin_mask;
             break;
         default:
             return -1;
@@ -136,17 +175,17 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
 int gpio_read(gpio_t pin)
 {
-    return (_SFR_MEM8(_pin_addr(pin)) & (1 << _pin_num(pin)));
+    return (_SFR_MEM8(atmega_pin_addr(pin)) & (1 << atmega_pin_num(pin)));
 }
 
 void gpio_set(gpio_t pin)
 {
-    _SFR_MEM8(_port_addr(pin)) |= (1 << _pin_num(pin));
+    _SFR_MEM8(atmega_port_addr(pin)) |= (1 << atmega_pin_num(pin));
 }
 
 void gpio_clear(gpio_t pin)
 {
-    _SFR_MEM8(_port_addr(pin)) &= ~(1 << _pin_num(pin));
+    _SFR_MEM8(atmega_port_addr(pin)) &= ~(1 << atmega_pin_num(pin));
 }
 
 void gpio_toggle(gpio_t pin)
@@ -185,6 +224,84 @@ static inline int8_t _int_num(gpio_t pin)
     return -1;
 }
 
+#ifdef ENABLE_PCINT
+static inline int pcint_init_int(gpio_t pin, gpio_mode_t mode,
+                                 gpio_flank_t flank,
+                                 gpio_cb_t cb, void *arg)
+{
+    int8_t offset = -1;
+    uint8_t pin_num = atmega_pin_num(pin);
+
+    for (unsigned i = 0; i < ARRAY_SIZE(pcint_mapping); i++) {
+        if (pin != GPIO_UNDEF && pin == pcint_mapping[i]) {
+            offset = i;
+            break;
+        }
+    }
+
+    /* if pcint was not found: return -1  */
+    if (offset < 0) {
+        return offset;
+    }
+
+    uint8_t bank = offset / 8;
+    uint8_t bank_idx = offset % 8;
+    DEBUG("PCINT enabled for bank %u offset %u\n",
+          (unsigned)bank, (unsigned)offset);
+
+    /* save configuration for pin change interrupt */
+    pcint_config[offset].flank = flank;
+    pcint_config[offset].arg = arg;
+    pcint_config[offset].cb = cb;
+
+    /* init gpio */
+    gpio_init(pin, mode);
+    /* configure pcint */
+    cli();
+    switch (bank) {
+#ifdef MODULE_ATMEGA_PCINT0
+        case PCINT0_IDX:
+            PCMSK0 |= (1 << bank_idx);
+            PCICR |= (1 << PCIE0);
+            break;
+#endif /* MODULE_ATMEGA_PCINT0 */
+#ifdef MODULE_ATMEGA_PCINT1
+        case PCINT1_IDX:
+            PCMSK1 |= (1 << bank_idx);
+            PCICR |= (1 << PCIE1);
+            break;
+#endif /* MODULE_ATMEGA_PCINT1 */
+#ifdef MODULE_ATMEGA_PCINT2
+        case PCINT2_IDX:
+            PCMSK2 |= (1 << bank_idx);
+            PCICR |= (1 << PCIE2);
+            break;
+#endif /* MODULE_ATMEGA_PCINT2 */
+#ifdef MODULE_ATMEGA_PCINT3
+        case PCINT3_IDX:
+            PCMSK3 |= (1 << bank_idx);
+            PCICR |= (1 << PCIE3);
+            break;
+#endif /* MODULE_ATMEGA_PCINT3 */
+        default:
+            return -1;
+            break;
+    }
+    /* As ports are mixed in a bank (e.g. PCINT0), we can only save a single bit here! */
+    uint8_t port_value = (_SFR_MEM8(atmega_pin_addr( pin )));
+    uint8_t pin_mask = (1 << pin_num);
+    uint8_t pin_value = ((port_value & pin_mask) != 0);
+    if (pin_value) {
+        pcint_state[bank] |= pin_mask;
+    }
+    else {
+        pcint_state[bank] &= ~pin_mask;
+    }
+    sei();
+    return 0;
+}
+#endif /* ENABLE_PCINT */
+
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
@@ -195,9 +312,14 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         return -1;
     }
 
-    /* not a valid interrupt pin */
+    /* not a valid interrupt pin. Set as pcint instead if pcints are enabled */
     if (int_num < 0) {
+#ifdef ENABLE_PCINT
+        /* If pin change interrupts are enabled, enable mask and interrupt */
+        return pcint_init_int(pin, mode, flank, cb, arg);
+#else
         return -1;
+#endif /* ENABLE_PCINT */
     }
 
     /* flank not supported */
@@ -219,12 +341,12 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         EICRA &= ~(0x3 << (int_num * 2));
         EICRA |= (flank << (int_num * 2));
     }
-#if defined(EICRB)
+    #if defined(EICRB)
     else {
         EICRB &= ~(0x3 << ((int_num % 4) * 2));
         EICRB |= (flank << ((int_num % 4) * 2));
     }
-#endif
+    #endif
 
     /* set callback */
     config[int_num].cb = cb;
@@ -249,10 +371,76 @@ void gpio_irq_disable(gpio_t pin)
 
 static inline void irq_handler(uint8_t int_num)
 {
-    __enter_isr();
+    atmega_enter_isr();
     config[int_num].cb(config[int_num].arg);
-    __exit_isr();
+    atmega_exit_isr();
 }
+
+#ifdef ENABLE_PCINT
+/* inline function that is used by the PCINT ISR */
+static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
+{
+    atmega_enter_isr();
+    /* Find right item */
+    uint8_t idx = 0;
+
+    while (enabled_pcints > 0) {
+        /* check if this pin is enabled & has changed */
+        if (enabled_pcints & 0x1) {
+            /* get pin from mapping (assumes 8 entries per bank!) */
+            gpio_t pin = pcint_mapping[bank * 8 + idx];
+            /* re-construct mask from pin */
+            uint8_t pin_mask = (1 << (atmega_pin_num(pin)));
+            uint8_t idx_mask = (1 << idx);
+            uint8_t port_value = (_SFR_MEM8(atmega_pin_addr( pin )));
+            uint8_t pin_value = ((port_value & pin_mask) != 0);
+            uint8_t old_state = ((pcint_state[bank] & idx_mask) != 0);
+            gpio_isr_ctx_pcint_t *conf = &pcint_config[bank * 8 + idx];
+            if (old_state != pin_value) {
+                pcint_state[bank] ^= idx_mask;
+                if ((conf->flank == GPIO_BOTH ||
+                     (pin_value && conf->flank == GPIO_RISING) ||
+                     (!pin_value && conf->flank == GPIO_FALLING))) {
+                    /* execute callback routine */
+                    conf->cb(conf->arg);
+                }
+            }
+        }
+        enabled_pcints = enabled_pcints >> 1;
+        idx++;
+    }
+
+    atmega_exit_isr();
+}
+#ifdef MODULE_ATMEGA_PCINT0
+ISR(PCINT0_vect, ISR_BLOCK)
+{
+    pcint_handler(PCINT0_IDX, PCMSK0);
+}
+#endif /* MODULE_ATMEGA_PCINT0 */
+
+#ifdef MODULE_ATMEGA_PCINT1
+ISR(PCINT1_vect, ISR_BLOCK)
+{
+    pcint_handler(PCINT1_IDX, PCMSK1);
+}
+#endif  /* MODULE_ATMEGA_PCINT1 */
+
+#ifdef MODULE_ATMEGA_PCINT2
+ISR(PCINT2_vect, ISR_BLOCK)
+{
+    pcint_handler(PCINT2_IDX, PCMSK2);
+}
+#endif  /* MODULE_ATMEGA_PCINT2 */
+
+#ifdef MODULE_ATMEGA_PCINT3
+ISR(PCINT3_vect, ISR_BLOCK)
+{
+    pcint_handler(PCINT3_IDX, PCMSK3);
+}
+#endif  /* MODULE_ATMEGA_PCINT3 */
+
+#endif  /* ENABLE_PCINT */
 
 ISR(INT0_vect, ISR_BLOCK)
 {

@@ -1,0 +1,69 @@
+/**
+@defgroup    boards_mcb2388 MCB2388 Evaluation Board
+@ingroup     boards
+@brief       Support for the MCB2388 Evaluation Board
+
+## Overview
+
+![MCB2388 image](http://www.keil.com/support/man/docs/mcb2300/mcb2388_board.jpg)
+
+## Hardware
+
+| MCU:      | LPC2388 ARM7-TDMI |
+|-----------|-------------------|
+| RAM:      | 96kb              |
+| Flash:    | 512kb             |
+
+# More info
+
+## Board Schematics
+[Board schematics](http://www.keil.com/mcb2300/mcb2300-schematics.pdf)
+
+## Flashing
+
+The MCB2388 is programmed via an ISP bootloader over UART. For this you have to
+connect an USB-RS232 converter to the COM0 port.
+
+Make sure to have the ISP Jumper set.
+
+Connect the MCB2388 to your PC using the serial port and run from within the
+folder of your application to flash:
+
+    BOARD=mcb2388 make flash
+
+You'll notice that during the first invocation takes a bit longer, as the tool
+`lpc2k_pgm` used to flash the MCB2388 is also compiled.
+
+You can connect to the shell by running:
+
+    BOARD=mcb2388 make term
+
+## Serial Terminal
+
+By default the RST line is connected to the RTS/CTS line of COM0.
+This will pull the MCU into reset when connecting a terminal. Use `pyterm -tg` to
+toggle the pins and complete the reset.
+
+If you want to connect a terminal application that does not support this, remove
+the RST jumper from the board.
+You will not be able to flash the board using `lpc2k_pgm` if the RST jumper is
+disconnected.
+
+## Debugging
+
+The development kit comes with a ULINK-ME Debug Unit that supports the CMSIS-DAP
+protocol.
+Connect it with the JTAG port on the board, the debugging should work by typing
+
+    BOARD=mcb2388 make debug
+
+### Flashing via OpenOCD
+
+Theoretically you should be able to flash also via JTAG.
+Unfortunately OpenOCD support for this chip family seems to be pretty buggy.
+I was unable to flash the board using the ULINK-ME adapter and OpenOCD. (2019)
+
+The board might get stuck when using OpenOCD, you have to power-cycle it to
+being able to use ISP programming again.
+
+ */

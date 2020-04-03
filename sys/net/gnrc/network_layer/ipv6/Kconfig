@@ -1,0 +1,28 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menu "IPv6"
+
+menuconfig KCONFIG_MODULE_GNRC_IPV6
+    bool "Configure GNRC IPv6 module"
+    depends on MODULE_GNRC_IPV6
+    help
+        Configure GNRC IPv6 module using Kconfig.
+
+if KCONFIG_MODULE_GNRC_IPV6
+
+config GNRC_IPV6_MSG_QUEUE_SIZE
+    int "Default message queue size to use for the IPv6 thread"
+    default 8
+
+endif # KCONFIG_MODULE_GNRC_IPV6
+
+rsource "blacklist/Kconfig"
+rsource "ext/frag/Kconfig"
+rsource "nib/Kconfig"
+rsource "whitelist/Kconfig"
+
+endmenu # IPv6

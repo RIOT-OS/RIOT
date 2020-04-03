@@ -18,6 +18,7 @@
  * @}
  */
 
+#include "unaligned.h"
 #include "checksum/fletcher32.h"
 
 uint32_t fletcher32(const uint16_t *data, size_t words)
@@ -28,7 +29,7 @@ uint32_t fletcher32(const uint16_t *data, size_t words)
         unsigned tlen = words > 359 ? 359 : words;
         words -= tlen;
         do {
-            sum2 += sum1 += *data++;
+            sum2 += sum1 += unaligned_get_u16(data++);
         } while (--tlen);
         sum1 = (sum1 & 0xffff) + (sum1 >> 16);
         sum2 = (sum2 & 0xffff) + (sum2 >> 16);

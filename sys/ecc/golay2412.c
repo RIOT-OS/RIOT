@@ -146,7 +146,7 @@ static uint32_t golay2412_matrix_mul(uint32_t _v,
 static uint32_t golay2412_encode_symbol(uint32_t _sym_dec, const uint32_t *_A)
 {
     /* validate input */
-    assert(_sym_dec > (1 << 12));
+    assert(_sym_dec < (1 << 12));
 
     /* compute encoded/transmitted message: v = m*G */
     return golay2412_matrix_mul(_sym_dec, _A, 24);
@@ -273,7 +273,7 @@ static uint32_t golay2412_decode_symbol(uint32_t _sym_enc,
     /* step 8: compute estimated transmitted message: v_hat = r + e_hat */
     v_hat = _sym_enc ^ e_hat;
 #if DEBUG_FEC_GOLAY2412
-    printf("r (recevied vector):            ");
+    printf("r (received vector):            ");
     liquid_print_bitstring(_sym_enc, 24); printf("\n");
     printf("e-hat (estimated error vector): ");
     liquid_print_bitstring(e_hat, 24);    printf("\n");

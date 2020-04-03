@@ -77,7 +77,7 @@ int main()
     return 0;
 }
 
-/* thread A function implemetation */
+/* thread A function implementation */
 void *threadA_func(void *)
 {
     int day = 13, month = 6, year = 2014;

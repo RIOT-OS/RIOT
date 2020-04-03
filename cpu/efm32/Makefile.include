@@ -1,33 +1,20 @@
 include $(RIOTCPU)/efm32/efm32-info.mk
 
-export CPU_ARCH = $(EFM32_ARCHITECTURE)
-export CPU_FAM = $(EFM32_FAMILY)
+# HACK: here we would want to look into USEMODULE to include Makefile.include
+# but since Makefile.dep is still resolved after Makefile.include we can't do
+# something like `$(filter cpu_efm32%,$(USEMODULE))`. This is why we use
+# `cpu_$(CPU_FAM)` for something that is MODULE related.
+include $(RIOTCPU)/efm32/families/$(CPU_FAM)/Makefile.include
 
-# the em_device.h header requires a global define with the cpu model
-export CFLAGS += -D$(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
-
-# include Gecko SDK package
-USEPKG += gecko_sdk
-
-# CMSIS-DSP is needed for arm_math.h on Cortex-M0+ architectures
-ifeq ($(CPU_ARCH),cortex-m0plus)
-  USEPKG += cmsis-dsp
+ifeq (,$(EFM32_HEADER))
+  $(error Header file for $(CPU_MODEL) is missing)
 endif
 
-# include CPU family module
-USEMODULE += cpu_$(EFM32_FAMILY)
+# the size of riotboot on the EFM32 exceeds the default value
+RIOTBOOT_LEN ?= 0x2000
 
-# vectors.o is provided by 'cpu_$(EFM32_FAMILY)' and not by 'cpu'
-VECTORS_O := $(BINDIR)/cpu_$(EFM32_FAMILY)/vectors.o
-
-# include common periph module
-USEMODULE += periph_common
-
-# include layered power management
-USEMODULE += pm_layered
-
-# include vendor device headers
-INCLUDES += -I$(RIOTCPU)/efm32/families/$(EFM32_FAMILY)/include/vendor
+# the em_device.h header requires a global define with the cpu model
+CFLAGS += -D$(call uppercase_and_underscore,$(CPU_MODEL))
 
 # include cortexm_common
 LINKER_SCRIPT = cortexm.ld

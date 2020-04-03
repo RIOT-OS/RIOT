@@ -14,7 +14,7 @@
  *
  * This is a malloc/free implementation built on top of the TLSF allocator.
  * It defines a global tlsf_control block and performs allocations on that
- * block. This implemetation replaces the system malloc
+ * block. This implementation replaces the system malloc
  *
  * Additionally, the calls to TLSF are wrapped in irq_disable()/irq_restore(),
  * to make it thread-safe.
@@ -37,6 +37,7 @@
 #define TLSF_MALLOC_H
 
 #include <stddef.h>
+
 #include "tlsf.h"
 
 #ifdef __cplusplus
@@ -86,7 +87,7 @@ int tlsf_add_global_pool(void *mem, size_t bytes);
  *
  * Use for debugging purposes only.
  */
-tlsf_t *_tlsf_get_global_control(void);
+tlsf_t _tlsf_get_global_control(void);
 
 
 #ifdef __cplusplus

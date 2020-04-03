@@ -62,8 +62,8 @@
 #define TEST_STR2EP_INVALID         "[2001:db8:a:b:c:d:e:f:1]"
 #define TEST_STR2EP_INVALID2        "[2001:db8:a:b:c:d:e:f]:66000"
 
-static char addr[SOCK_URLPATH_MAXLEN];
-static char urlpath[SOCK_URLPATH_MAXLEN];
+static char addr[CONFIG_SOCK_URLPATH_MAXLEN];
+static char urlpath[CONFIG_SOCK_URLPATH_MAXLEN];
 
 
 static void setup(void)
@@ -152,6 +152,18 @@ static void test_sock_util_urlsplit__urlpath_too_long(void)
             sock_urlsplit(TEST_URL_LONG_URLPATH, addr, urlpath));
 }
 
+static void test_sock_util_urlsplit__null_addr_buffer(void)
+{
+    TEST_ASSERT_EQUAL_INT(0, sock_urlsplit(TEST_URL, addr, NULL));
+    TEST_ASSERT_EQUAL_STRING(TEST_URL_HOSTPART, (char*)addr);
+}
+
+static void test_sock_util_urlsplit__null_path_buffer(void)
+{
+    TEST_ASSERT_EQUAL_INT(0, sock_urlsplit(TEST_URL, NULL, urlpath));
+    TEST_ASSERT_EQUAL_STRING(TEST_URL_LOCALPART, (char*)urlpath);
+}
+
 static void test_sock_util_str2ep__ipv6_noport(void)
 {
     sock_udp_ep_t ep;
@@ -210,6 +222,8 @@ Test *tests_sock_util_all(void)
         new_TestFixture(test_sock_util_urlsplit__no_schema),
         new_TestFixture(test_sock_util_urlsplit__hostport_too_long),
         new_TestFixture(test_sock_util_urlsplit__urlpath_too_long),
+        new_TestFixture(test_sock_util_urlsplit__null_addr_buffer),
+        new_TestFixture(test_sock_util_urlsplit__null_path_buffer),
         new_TestFixture(test_sock_util_str2ep__ipv6_noport),
         new_TestFixture(test_sock_util_str2ep__ipv4_noport),
         new_TestFixture(test_sock_util_str2ep__ipv4_port),

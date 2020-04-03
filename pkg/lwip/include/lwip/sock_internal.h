@@ -11,10 +11,11 @@
  * @ingroup     pkg_lwip
  * @brief       Provides an implementation of the @ref net_sock for the
  *              @ref pkg_lwip
+ * @internal
  * @{
  *
  * @file
- * @brief       lwIP-specific function @ref  definitions
+ * @brief       lwIP-specific function @ref net_sock definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -55,7 +56,7 @@ int lwip_sock_get_addr(struct netconn *conn, struct _sock_tl_ep *ep, u8_t local)
 #if defined(MODULE_LWIP_SOCK_UDP) || defined(MODULE_LWIP_SOCK_IP)
 int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf);
 #endif
-ssize_t lwip_sock_send(struct netconn **conn, const void *data, size_t len,
+ssize_t lwip_sock_send(struct netconn *conn, const void *data, size_t len,
                        int proto, const struct _sock_tl_ep *remote, int type);
 /**
  * @}

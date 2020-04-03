@@ -1,0 +1,3 @@
+SRCS := pb_encode.c pb_decode.c pb_common.c
+
+include $(RIOTBASE)/Makefile.base

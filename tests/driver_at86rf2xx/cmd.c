@@ -35,7 +35,6 @@ static int send(int iface, le_uint16_t dst_pan, uint8_t *dst_addr,
 int ifconfig_list(int idx)
 {
     int res;
-    uint8_t array_val[_MAX_ADDR_LEN];
     netdev_ieee802154_t *dev = (netdev_ieee802154_t *)(&devs[idx]);
 
     int (*get)(netdev_t *, netopt_t, void *, size_t) = dev->netdev.driver->get;
@@ -62,20 +61,13 @@ int ifconfig_list(int idx)
     }
     printf(", Source address length: %u", (unsigned)u16_val);
 
-    res = get((netdev_t *)dev, NETOPT_MAX_PACKET_SIZE, &u16_val,
+    res = get((netdev_t *)dev, NETOPT_MAX_PDU_SIZE, &u16_val,
               sizeof(u16_val));
     if (res < 0) {
         puts("(err)");
         return 1;
     }
     printf(", Max.Payload: %u", (unsigned)u16_val);
-
-    res = get((netdev_t *)dev, NETOPT_IPV6_IID, array_val, sizeof(array_val));
-    if (res > 0) {
-        printf("\n           IPv6 IID: ");
-        print_addr(array_val, res);
-    }
-
     printf("\n           Channel: %u", dev->chan);
 
     res = get((netdev_t *)dev, NETOPT_CHANNEL_PAGE, &u16_val, sizeof(u16_val));

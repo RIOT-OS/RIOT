@@ -11,8 +11,8 @@ See [Semtech LoRamac-node repository](https://github.com/Lora-net/LoRaMac-node)
 to have a look at the original package code.
 
 This application can only be used with Semtech
-[SX1272](http://www.semtech.com/images/datasheet/sx1272.pdf) or
-[SX1276](http://www.semtech.com/images/datasheet/sx1276.pdf) radio devices.
+[SX1272](https://semtech.my.salesforce.com/sfc/p/#E0000000JelG/a/440000001NCE/v_VBhk1IolDgxwwnOpcS_vTFxPfSEPQbuneK3mWsXlU) or
+[SX1276](https://semtech.my.salesforce.com/sfc/p/#E0000000JelG/a/2R0000001OKs/Bs97dmPXeatnbdoJNVMIDaKDlQz8q1N_gxDcgqi7g2o) radio devices.
 
 ## Application configuration
 
@@ -50,7 +50,7 @@ board.
 Depending on the type of radio device, set the `LORA_DRIVER` variable accordingly:
 For example:
 
-    LORA_DRIVER=sx1272 make BOARD=nucleo-f411re -C pkg/semtech-loramac flash term
+    LORA_DRIVER=sx1272 make BOARD=nucleo-f411re -C tests/pkg_semtech-loramac flash term
 
 will build the application for a nucleo-f411re with an SX1272 based mbed LoRa shield.
 
@@ -59,12 +59,17 @@ The SX1276 is the default value.
 The other parameter that has to be set at build time is the geographic region:
 `EU868`, `US915`, etc. See LoRaWAN regional parameters for more information.
 
-    LORA_REGION=US915 LORA_DRIVER=sx1272 make BOARD=nucleo-f411re -C pkg/semtech-loramac flash term
+    LORA_REGION=US915 LORA_DRIVER=sx1272 make BOARD=nucleo-f411re -C tests/pkg_semtech-loramac flash term
 
 will build the application for a nucleo-f411re with an SX1272 based mbed LoRa shield
 for US915 region.
 
 The default region is `EU868`.
+
+**For testing purpose**, it is possible to disable the duty-cycle restriction
+implemented in the MAC layer with the `DISABLE_LORAMAC_DUTYCYCLE` macro:
+
+      CFLAGS=-DDISABLE_LORAMAC_DUTYCYCLE LORA_REGION=US915 LORA_DRIVER=sx1272 make ...
 
 ## Using the shell
 
@@ -88,7 +93,7 @@ is activated by default.
 
 ### Joining with Activation By Personalization
 
-OTAA is always prefered in real world scenarios.
+OTAA is always preferred in real world scenarios.
 However, ABP can be practical for testing or workshops.
 
 * Set your Device Address, Network Session Key , Application Session Key:
@@ -194,7 +199,7 @@ After sending some data from the node, the subscribed MQTT client will display:
 
     {"app_id":"<your application>","dev_id":"<your node>","hardware_serial":"XXXXXXXXXXXX","port":2,"counter":7,"confirmed":true,"payload_raw":"dGVzdA==","metadata":    {"time":"2017-12-14T09:47:24.84548586Z","frequency":868.1,"modulation":"LORA","data_rate":"SF12BW125","coding_rate":"4/5","gateways":[{"gtw_id":"eui-xxxxxxxx","timestamp":3910359076, "time":"2017-12-14T09:47:24.85112Z","channel":0,"rssi":-10,"snr":12.2,"rf_chain":1,"latitude":48.715027,"longitude":2.2059395,"altitude":157,"location_source":"registry"}]}}
 
-The payload sent is in the `payload_raw` json field and is formated in base64
+The payload sent is in the `payload_raw` json field and is formatted in base64
 (`dGVzdA==` in this example).
 
 The node will also print the data received:

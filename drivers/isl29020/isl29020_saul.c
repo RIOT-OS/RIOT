@@ -26,7 +26,8 @@
 static int read(const void *dev, phydat_t *res)
 {
     res->val[0] = (int16_t)isl29020_read((const isl29020_t *)dev);
-    memset(&(res->val[1]), 0, 2 * sizeof(int16_t));
+    res->val[1] = 0;
+    res->val[2] = 0;
     res->unit = UNIT_CD;
     res->scale = 0;
     return 1;

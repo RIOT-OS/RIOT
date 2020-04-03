@@ -131,9 +131,6 @@ typedef struct {
     const struct netdev_driver *driver;     /**< ptr to that driver's interface. */
     netdev_event_cb_t event_callback;       /**< callback for device events */
     void* context;                          /**< ptr to network stack context */
-#ifdef MODULE_NETSTATS_L2
-    netstats_t stats;                       /**< transceiver's statistics */
-#endif
     /* device driver specific fields */
     xbee_params_t p;                    /**< configuration parameters */
     uint8_t options;                    /**< options field */

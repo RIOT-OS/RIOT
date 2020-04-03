@@ -27,6 +27,12 @@ extern "C" {
 #endif
 
 /**
+ * @brief   The CPU supports unaligned memory access.
+ *          Even if the underlying architecture does not support it, the kernel will take care of it.
+ */
+#define CPU_HAS_UNALIGNED_ACCESS
+
+/**
  * @brief   Prints the address the callee will return to
  */
 __attribute__((always_inline)) static inline void cpu_print_last_instruction(void)

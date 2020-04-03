@@ -8,7 +8,7 @@ Any board with a default netdev can be used to run this example.
 
 Create `tap` and `tapbr` devices using RIOT's `tapsetup` script before stating the application:
 ```bash
-./RIOTDIR/dist/tools/tapsetup/tapsetup
+sudo ./RIOTDIR/dist/tools/tapsetup/tapsetup
 ```
 
 Then run the application on 2 different terminals :

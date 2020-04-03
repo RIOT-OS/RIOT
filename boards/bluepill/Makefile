@@ -1,5 +1,5 @@
 MODULE = board
 
-DIRS = $(RIOTBOARD)/common/stm32f103c8
+DIRS = $(RIOTBOARD)/common/blxxxpill
 
 include $(RIOTBASE)/Makefile.base

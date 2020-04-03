@@ -13,43 +13,7 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
-#include <sys/uio.h>
-
 #include "net/gnrc/pktbuf.h"
-
-gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len)
-{
-    size_t length;
-    gnrc_pktsnip_t *head;
-    struct iovec *vec;
-
-    assert(len != NULL);
-    if (pkt == NULL) {
-        *len = 0;
-        return NULL;
-    }
-
-    /* count the number of snips in the packet and allocate the IOVEC */
-    length = gnrc_pkt_count(pkt);
-    head = gnrc_pktbuf_add(pkt, NULL, (length * sizeof(struct iovec)),
-                           GNRC_NETTYPE_IOVEC);
-    if (head == NULL) {
-        *len = 0;
-        return NULL;
-    }
-
-    assert(head->data != NULL);
-    vec = (struct iovec *)(head->data);
-    /* fill the IOVEC */
-    while (pkt != NULL) {
-        vec->iov_base = pkt->data;
-        vec->iov_len = pkt->size;
-        ++vec;
-        pkt = pkt->next;
-    }
-    *len = length;
-    return head;
-}
 
 gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt,
                                         gnrc_pktsnip_t *snip)
@@ -109,5 +73,32 @@ gnrc_pktsnip_t *gnrc_pktbuf_reverse_snips(gnrc_pktsnip_t *pkt)
     return reversed;
 }
 
+int gnrc_pktbuf_merge(gnrc_pktsnip_t *pkt)
+{
+    size_t offset = pkt->size;
+    size_t size = gnrc_pkt_len(pkt);
+    int res = 0;
+
+    if (pkt->size == size) {
+        return res;
+    }
+
+    /* Re-allocate data */
+    res = gnrc_pktbuf_realloc_data(pkt, size);
+    if (res != 0) {
+        return res;
+    }
+
+    /* Copy data to new buffer */
+    for (gnrc_pktsnip_t *ptr = pkt->next; ptr != NULL; ptr = ptr->next) {
+        memcpy(((uint8_t *)pkt->data) + offset, ptr->data, ptr->size);
+        offset += ptr->size;
+    }
+
+    /* Release old pktsnips and data*/
+    gnrc_pktbuf_release(pkt->next);
+    pkt->next = NULL;
+    return res;
+}
 
 /** @} */

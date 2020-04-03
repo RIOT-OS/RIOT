@@ -39,11 +39,18 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup drivers_ds1307_config   DS1307 RTC driver compile configuration
+ * @ingroup config
+ * @{
+ */
+
+/**
  * @brief   Maximum I2C bus speed to use with the device
  */
 #ifndef DS1307_I2C_MAX_CLK
 #define DS1307_I2C_MAX_CLK      (I2C_SPEED_FAST)
 #endif
+/** @} */
 
 /**
  * @brief   Maximum size in byte of on-chip NVRAM

@@ -4,6 +4,9 @@ Thank you for your interest in contributing to RIOT! There are many ways to
 contribute, and we appreciate all of them. You can jump to the major sections
 of this document using the following links:
 
+* [Getting Started][getting-started]
+* [Help wanted][help-wanted]
+* [General Tips][general-tips]
 * [Feature Requests][feature-requests]
 * [Bug Reports][bug-reports]
 * [Pull Requests][pull-requests]
@@ -16,6 +19,103 @@ As a reminder, all contributors are expected to follow our
 [Code of Conduct](CODE_OF_CONDUCT.md).
 
 [riot-chat]: http://webchat.freenode.net?channels=riot-os
+
+## Getting Started
+[getting-started]: #getting-started
+If you are just beginning to work with RIOT you might first want to read our
+[documentation]. Especially the following sections might be of interest to you
+
+- [Getting Started](https://doc.riot-os.org/getting-started.html)
+- [Creating modules](https://doc.riot-os.org/creating-modules.html)
+- [Creating an application](https://doc.riot-os.org/creating-an-application.html)
+
+[documentation]: https://doc.riot-os.org
+
+## General Tips
+[general-tips]: #general-tips
+From experience, the following recommendations help to get a software
+contribution into RIOT master faster:
+
+- **Ask around for help!** Either offline or through one of our communication
+  channels (see above). The earlier you check your feature design with other
+  people, the less likely it is that it is denied during the review process.
+- **Verify your concept early!** If you work on your own until the code
+  *looks* good enough to show publicly, you might miss some design flaws others
+  might have spotted earlier.
+- **Keep it simple!** Try to use what is already there and don't change existing
+  APIs if not absolutely necessary.
+- **Keep it small!** A PR with >1000 lines of changes will very likely make
+  even the most active reviewer put your review on their long to-do list.
+- **Keep it modular!** Make extensions to a feature or new features for a
+  platform optionally to use.
+- **Provide tests!** They should be comprehensible and easy to be executed.
+  Alternatively comprehensive testing procedures should be provided with your
+  pull request.
+
+## Help Wanted
+[help-wanted]: #help-wanted
+In case you're not really sure where to start, we've created a list of suggestions.
+
+### Documentation
+If you've found yourself struggling to understand a particular aspect, chances
+are you're not the first and won't be the last. Writing down what you've learned
+is a great way to recap your new knowledge and share it with others. You can
+also start to learn about RIOT by combing through existing documentation and
+fixing errors and typos. Any help with improving the documentation is greatly
+appreciated and makes a big difference to the RIOT project.
+After you've finished writing, please publish your documentation in one of the
+following ways, depending on its type.
+
+#### General knowledge, HOWTOs
+Articles that focus on design aspects or how to use a particular module should
+be contributed to the [RIOT wiki](https://github.com/RIOT-OS/RIOT/wiki). After
+you've added your entry, please share it on the riot-dev mailing list so
+everyone is aware of its existence (and thank you).
+If you'd like to document a solution to minor annoyances or common pitfalls,
+please do not hesitate to extend the [Troubleshooting wiki
+page](https://github.com/RIOT-OS/RIOT/wiki/Troubleshooting). Again, please share
+your additions with the riot-dev mailing list.
+
+#### Code comments, HOWTOs for particular projects
+Documentation that relates directly to the code at hand like the HOWTO files
+that can be found in some of the directories in ``RIOT/examples/`` or comments
+in the code itself should be submitted through a [pull request][pull-requests].
+
+If you're not sure about the correct way to submit your writing, please ask on
+the mailing list or open an issue saying which documentation is missing. The
+other RIOTers will help you find the right format.
+
+### Issues
+If RIOT behaves oddly, please do not hesitate to [open an issue][open-an-issue].
+Other RIOT developers will be happy to help figure out what the problem is and
+fix possible bugs. Please notice that we use a bunch of tags to label the
+issues. If you have permission to use them, do it. Their meanings are explained
+[here][labels].
+
+### Contribute code
+If you think your work should be integrated in the main RIOT repository, take
+the following steps: (short version, the more detailed version can be found
+[below][pull-requests])
+
+  0. Fork the RIOT git repository (if you haven't done this already)
+  1. Create a branch
+  2. Make commits
+  3. Make sure your code is in compliance with RIOTs
+     [coding conventions][coding-conventions]
+  1. Push this branch to your fork on GitHub
+  1. Do a [pull request][open-a-pull-request] (use the [labels] if you have
+     permission to use them)
+  1. RIOT maintainers will provide feedback
+  1. Address this feedback
+  1. Your code is merged in RIOT master branch
+
+If you do not receive feedback after a reasonable time, feel free to address
+maintainers directly. This is especially true if you addressed previous feedback
+and got no response.
+
+[open-an-issue]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+bug"
+[labels]: https://github.com/RIOT-OS/RIOT/wiki/RIOT%27s-labeling-system
+[open-a-pull-request]: https://help.github.com/articles/using-pull-requests
 
 ## Feature Requests
 [feature-requests]: #feature-requests
@@ -46,7 +146,7 @@ public channels, to allow us adequate time to release the fix.
 Before reporting a bug, have a look at [open bugs][existing-bugs-link]. Maybe
 someone has already reported your error.
 
-Once you have verified that they haven't, opening an issue is as easy as
+Once you have verified that the bug you have found hasn't been reported, opening an issue is as easy as
 clicking on [this link][bug-report-link] and filling out the fields.
 
 [existing-bugs-link]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+bug"
@@ -68,11 +168,11 @@ other contributors understand your issue and eventually reproduce it:
 To fill the `Versions` section, you can use the script provided in the RIOT git
 repository:
 ```
-./dist/tools/ci/print_toolchain_versions.sh
+make print-versions
 ```
 
-In summary, try to include as much information as possible, to help maintainers
-or other developers to fix the bug quickly.
+In summary, try to include as much information as possible to help maintainers
+or other developers fix the bug quickly.
 
 ## Pull Requests
 [pull-requests]: #pull-requests
@@ -92,12 +192,13 @@ into the source repository.
 * Before opening a new Pull Request, have a look at
   [existing ones][existing-pull-requests]. Maybe someone has already opened one
   about the same thing. If it's the case, you might be able to help with the
-  contribution. Just comment on the PR and ask.
+  contribution. Just comment on the PR and ask. Include closed PR's in your
+  search, as previous work might have been closed for lack of interest.
   Old and stalled [PRs are sometimes archived][archived-pull-requests] with the
   "State: archived" label, maybe one of them is also about the same topic.
 
-* Each Pull Request form uses a template with 3 sections that are here to help
-  maintainers understand your contribution and help them testing it:
+* Each Pull Request form uses a template with 3 sections that are there to help
+  maintainers understand your contribution and help them in testing it:
 
       #### Contribution description
 
@@ -150,7 +251,7 @@ into the source repository.
 
 * Maintainers try their best to review every PR as fast as possible, but they
   are also only human and it can happen that they miss a few PRs or might be
-  preoccupied with other PRs. If it happens that your PR receive no review for
+  preoccupied with other PRs. If it happens that your PR receives no review for
   a long time, don't hesitate to gently solicit a review by commenting or
   by explicitly mentioning a maintainer that you know is knowledgeable in the
   area of the PR. You can also advertise the PR on devel@riot-os.org mailing
@@ -161,7 +262,7 @@ You can find more information about RIOT development procedure on this
 
 [existing-pull-requests]: https://github.com/RIOT-OS/RIOT/pulls
 [archived-pull-requests]: https://github.com/RIOT-OS/RIOT/pulls?q=is:pr+label:"State:+archived"
-[coding-conventions]: https://github.com/RIOT-OS/RIOT/wiki/Coding-conventions
+[coding-conventions]: CODING_CONVENTIONS.md
 [uncrustify]: http://uncrustify.sourceforge.net
 [development-procedures]: https://github.com/RIOT-OS/RIOT/wiki/Development-procedures
 
@@ -252,6 +353,20 @@ Otherwise the history of review changes is lost and for large PRs, it
 makes it difficult for the reviewer to follow them. It might also happen that
 you introduce regression and won't be able to recover them from previous
 commits.
+
+If you encounter a merge conflict you could either resolve it by hand with an
+editor and use
+
+    $ git add -p
+
+To add your changes or use a merge tool like [meld](https://meldmerge.org/) to
+resolve your merge conflict.
+
+    $ git mergetool
+
+After the merge conflict is resolved you can continue to rebase by using
+
+    $ git rebase --continue
 
 Once squashing is done, you will have to force push your branch to update the
 PR:

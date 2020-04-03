@@ -12,7 +12,7 @@ Linux version of TinyDTLS. However, this is not tested yet.
 
 Preparing the logical interfaces:
 
-    ./../../dist/tools/tapsetup/tapsetup --create 2
+    sudo ./../../dist/tools/tapsetup/tapsetup --create 2
 
 For the server instance:
 
@@ -45,13 +45,13 @@ compile time. Their default values are considered for having two DTLS
 contexts (for purpose of DTLS renegotiation).
 
 The resources handled by memarray are:
-* `DTLS_CONTEXT_MAX` (default 2) The maximum number of DTLS context at the
+* `CONFIG_DTLS_CONTEXT_MAX` (default 2) The maximum number of DTLS context at the
    same time.
-* `DTLS_PEER_MAX` (default 1) The maximum number DTLS peers (i.e. sessions).
-* `DTLS_HANDSHAKE_MAX` (default 1) The maximum number of concurrent DTLS handshakes.
+* `CONFIG_DTLS_PEER_MAX` (default 1) The maximum number DTLS peers (i.e. sessions).
+* `CONFIG_DTLS_HANDSHAKE_MAX` (default 1) The maximum number of concurrent DTLS handshakes.
 * `DTLS_SECURITY_MAX` (the sum of the previous two) The maximum number of
    concurrently used cipher keys.
-* `DTLS_HASH_MAX` (Default: `3 * DTLS_PEER_MAX`) The maximum number of hash
+* `DTLS_HASH_MAX` (Default: `3 * CONFIG_DTLS_PEER_MAX`) The maximum number of hash
   functions that can be used in parallel.
 
 ## Handling retransmissions

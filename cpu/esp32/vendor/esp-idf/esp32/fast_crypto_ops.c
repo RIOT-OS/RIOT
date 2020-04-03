@@ -136,25 +136,25 @@ const mesh_crypto_funcs_t g_wifi_default_mesh_crypto_funcs = {
 const wpa_crypto_funcs_t g_wifi_default_wpa_crypto_funcs = {
     .size = sizeof(wpa_crypto_funcs_t),
     .version = ESP_WIFI_CRYPTO_VERSION,
-    .aes_wrap = (esp_aes_wrap_t)aes_wrap,
-    .aes_unwrap = (esp_aes_unwrap_t)aes_unwrap,
-    .hmac_sha256_vector = (esp_hmac_sha256_vector_t)hmac_sha256_vector,
-    .sha256_prf = (esp_sha256_prf_t)sha256_prf,
-    .hmac_md5 = (esp_hmac_md5_t)hmac_md5,
-    .hamc_md5_vector = (esp_hmac_md5_vector_t)hmac_md5_vector,
-    .hmac_sha1 = (esp_hmac_sha1_t)hmac_sha1,
-    .hmac_sha1_vector = (esp_hmac_sha1_vector_t)hmac_sha1_vector,
-    .sha1_prf = (esp_sha1_prf_t)sha1_prf,
-    .sha1_vector = (esp_sha1_vector_t)sha1_vector,
-    .pbkdf2_sha1 = (esp_pbkdf2_sha1_t)pbkdf2_sha1,
-    .rc4_skip = (esp_rc4_skip_t)rc4_skip,
-    .md5_vector = (esp_md5_vector_t)md5_vector,
-    .aes_encrypt = (esp_aes_encrypt_t)aes_encrypt,
-    .aes_encrypt_init = (esp_aes_encrypt_init_t)aes_encrypt_init,
-    .aes_encrypt_deinit = (esp_aes_encrypt_deinit_t)aes_encrypt_deinit,
-    .aes_decrypt = (esp_aes_decrypt_t)aes_decrypt,
-    .aes_decrypt_init = (esp_aes_decrypt_init_t)aes_decrypt_init,
-    .aes_decrypt_deinit = (esp_aes_decrypt_deinit_t)aes_decrypt_deinit
+    .aes_wrap = (esp_aes_wrap_t)wpa_aes_wrap,
+    .aes_unwrap = (esp_aes_unwrap_t)wpa_aes_unwrap,
+    .hmac_sha256_vector = (esp_hmac_sha256_vector_t)wpa_hmac_sha256_vector,
+    .sha256_prf = (esp_sha256_prf_t)wpa_sha256_prf,
+    .hmac_md5 = (esp_hmac_md5_t)wpa_hmac_md5,
+    .hamc_md5_vector = (esp_hmac_md5_vector_t)wpa_hmac_md5_vector,
+    .hmac_sha1 = (esp_hmac_sha1_t)wpa_hmac_sha1,
+    .hmac_sha1_vector = (esp_hmac_sha1_vector_t)wpa_hmac_sha1_vector,
+    .sha1_prf = (esp_sha1_prf_t)wpa_sha1_prf,
+    .sha1_vector = (esp_sha1_vector_t)wpa_sha1_vector,
+    .pbkdf2_sha1 = (esp_pbkdf2_sha1_t)wpa_pbkdf2_sha1,
+    .rc4_skip = (esp_rc4_skip_t)wpa_rc4_skip,
+    .md5_vector = (esp_md5_vector_t)wpa_md5_vector,
+    .aes_encrypt = (esp_aes_encrypt_t)wpa_aes_encrypt,
+    .aes_encrypt_init = (esp_aes_encrypt_init_t)wpa_aes_encrypt_init,
+    .aes_encrypt_deinit = (esp_aes_encrypt_deinit_t)wpa_aes_encrypt_deinit,
+    .aes_decrypt = (esp_aes_decrypt_t)wpa_aes_decrypt,
+    .aes_decrypt_init = (esp_aes_decrypt_init_t)wpa_aes_decrypt_init,
+    .aes_decrypt_deinit = (esp_aes_decrypt_deinit_t)wpa_aes_decrypt_deinit
 };
 #if 0 /* WPS not supported at the moment */
 const wps_crypto_funcs_t g_wifi_default_wps_crypto_funcs = {
@@ -187,7 +187,6 @@ const wps_crypto_funcs_t g_wifi_default_wps_crypto_funcs = {
  * fast_crypto_hash_finish for finish hash calculate, rather than call crypto_hash_update and
  * crypto_hash_finish, so do crypto_cipher.
  */
-#if 0 /* WPA2 enterprise not supported at the moment */
 const wpa2_crypto_funcs_t g_wifi_default_wpa2_crypto_funcs = {
     .size = sizeof(wpa2_crypto_funcs_t),
     .version = ESP_WIFI_CRYPTO_VERSION,
@@ -199,7 +198,7 @@ const wpa2_crypto_funcs_t g_wifi_default_wpa2_crypto_funcs = {
     .crypto_cipher_decrypt = (esp_crypto_cipher_decrypt_t)crypto_cipher_decrypt,
     .crypto_cipher_deinit = (esp_crypto_cipher_deinit_t)crypto_cipher_deinit,
     .crypto_mod_exp = (esp_crypto_mod_exp_t)crypto_mod_exp,
-    .sha256_vector = (esp_sha256_vector_t)sha256_vector,
+    .sha256_vector = (esp_sha256_vector_t)wpa_sha256_vector,
     .tls_init = (esp_tls_init_t)tls_init,
     .tls_deinit = (esp_tls_deinit_t)tls_deinit,
     .eap_peer_blob_init = (esp_eap_peer_blob_init_t)eap_peer_blob_init,
@@ -215,10 +214,9 @@ const wpa2_crypto_funcs_t g_wifi_default_wpa2_crypto_funcs = {
     .eap_sm_build_identity_resp = (esp_eap_sm_build_identity_resp_t)eap_sm_build_identity_resp,
     .eap_msg_alloc = (esp_eap_msg_alloc_t)eap_msg_alloc
 };
-#endif
 
 const mesh_crypto_funcs_t g_wifi_default_mesh_crypto_funcs = {
-    .aes_128_encrypt = (esp_aes_128_encrypt_t)aes_128_cbc_encrypt,
-    .aes_128_decrypt = (esp_aes_128_decrypt_t)aes_128_cbc_decrypt,
+    .aes_128_encrypt = (esp_aes_128_encrypt_t)wpa_aes_128_cbc_encrypt,
+    .aes_128_decrypt = (esp_aes_128_decrypt_t)wpa_aes_128_cbc_decrypt,
 };
 #endif

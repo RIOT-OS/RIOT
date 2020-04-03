@@ -103,10 +103,10 @@ int _gnrc_gomach_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 #ifdef MODULE_NETSTATS_L2
     if (netif_hdr->flags &
             (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-        netif->dev->stats.tx_mcast_count++;
+        netif->stats.tx_mcast_count++;
     }
     else {
-        netif->dev->stats.tx_unicast_count++;
+        netif->stats.tx_unicast_count++;
     }
 #endif
 #ifdef MODULE_GNRC_MAC
@@ -172,7 +172,7 @@ static int _parse_packet(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
     gnrc_netif_hdr_t *netif_hdr = netif_snip->data;
     netif_hdr->lqi = netif->mac.prot.gomach.rx_pkt_lqi;
     netif_hdr->rssi = netif->mac.prot.gomach.rx_pkt_rssi;
-    netif_hdr->if_pid = netif->pid;
+    gnrc_netif_hdr_set_netif(netif_hdr, netif);
     pkt->type = state->proto;
     gnrc_pktbuf_remove_snip(pkt, pkt->next);
     LL_APPEND(pkt, netif_snip);
@@ -343,8 +343,8 @@ int gnrc_gomach_send_preamble_ack(gnrc_netif_t *netif, gnrc_gomach_packet_info_t
     assert(netif != NULL);
     assert(info != NULL);
 
+    gnrc_pktsnip_t *pkt;
     gnrc_pktsnip_t *gomach_pkt = NULL;
-    gnrc_pktsnip_t *pkt = NULL;
     gnrc_netif_hdr_t *nethdr_preamble_ack = NULL;
 
     /* Start assemble the preamble-ACK packet according to preamble packet info. */
@@ -747,7 +747,7 @@ void gnrc_gomach_cp_packet_process(gnrc_netif_t *netif)
     gnrc_gomach_packet_info_t receive_packet_info;
 
     while ((pkt = gnrc_priority_pktqueue_pop(&netif->mac.rx.queue)) != NULL) {
-        /* Parse the received packet, fetch key MAC informations. */
+        /* Parse the received packet, fetch key MAC information. */
         int res = _parse_packet(netif, pkt, &receive_packet_info);
         if (res != 0) {
             LOG_DEBUG("[GOMACH] CP: Packet could not be parsed: %i\n", res);

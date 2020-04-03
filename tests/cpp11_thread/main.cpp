@@ -20,13 +20,14 @@
 
 #include <string>
 #include <cstdio>
-#include <cassert>
 #include <system_error>
 
 #include "riot/mutex.hpp"
 #include "riot/chrono.hpp"
 #include "riot/thread.hpp"
 #include "riot/condition_variable.hpp"
+
+#include "test_utils/expect.h"
 
 using namespace std;
 using namespace riot;
@@ -35,89 +36,89 @@ using namespace riot;
 int main() {
   puts("\n************ C++ thread test ***********");
 
-  assert(sched_num_threads == 2); // main + idle
+  expect(sched_num_threads == 2); // main + idle
 
   puts("Creating one thread and passing an argument ...");
   {
     constexpr int i = 3;
-    thread t([=](const int j) { assert(j == i); }, i);
+    thread t([=](const int j) { expect(j == i); }, i);
     try {
       t.join();
     }
     catch (const std::system_error& e) {
-      assert(false);
+      expect(false);
     }
   }
   puts("Done\n");
 
-  assert(sched_num_threads == 2);
+  expect(sched_num_threads == 2);
 
   puts("Creating detached thread ...");
   {
     thread t([] {
       // nop
     });
-    assert(t.joinable() == 1);
+    expect(t.joinable() == 1);
     t.detach();
-    assert(t.joinable() == 0);
+    expect(t.joinable() == 0);
   }
   puts("Done\n");
 
-  assert(sched_num_threads == 2);
+  expect(sched_num_threads == 2);
 
   puts("Join on 'finished' thread ...");
   {
     thread t;
-    assert(t.joinable() == 0);
+    expect(t.joinable() == 0);
     t = thread([] {
       // nop
     });
-    assert(t.joinable() == 1);
+    expect(t.joinable() == 1);
     try {
       t.join();
     }
     catch (const std::system_error& e) {
-      assert(false);
+      expect(false);
     }
   }
   puts("Done\n");
 
-  assert(sched_num_threads == 2);
+  expect(sched_num_threads == 2);
 
   puts("Join on 'running' thread ...");
   {
     mutex m;
     thread t1, t2;
     condition_variable cv;
-    assert(t1.joinable() == 0);
-    assert(t2.joinable() == 0);
+    expect(t1.joinable() == 0);
+    expect(t2.joinable() == 0);
     t1 = thread([&m, &cv] {
       unique_lock<mutex> lk(m);
       cv.wait(lk);
     });
-    assert(t1.joinable() == 1);
+    expect(t1.joinable() == 1);
     t2 = thread([&t1] {
       try {
         t1.join();
       }
       catch (const std::system_error& e) {
-        assert(false);
+        expect(false);
       }
     });
-    assert(t2.joinable() == 1);
+    expect(t2.joinable() == 1);
     cv.notify_one();
     try {
       t2.join();
     }
     catch (const std::system_error& e) {
-      assert(false);
+      expect(false);
     }
-    assert(t1.joinable() == 0);
-    assert(t2.joinable() == 0);
+    expect(t1.joinable() == 0);
+    expect(t2.joinable() == 0);
   }
   puts("Done\n");
 
-  assert(sched_num_threads == 2);
+  expect(sched_num_threads == 2);
 
   puts("Testing sleep_for ...");
   {
@@ -126,11 +127,11 @@ int main() {
     this_thread::sleep_for(chrono::seconds(1));
     xtimer_now_timex(&after);
     auto diff = timex_sub(after, before);
-    assert(diff.seconds >= 1);
+    expect(diff.seconds >= 1);
   }
   puts("Done\n");
 
-  assert(sched_num_threads == 2);
+  expect(sched_num_threads == 2);
 
   puts("Testing sleep_until ...");
   {
@@ -139,11 +140,11 @@ int main() {
     this_thread::sleep_until(riot::now() += chrono::seconds(1));
     xtimer_now_timex(&after);
     auto diff = timex_sub(after, before);
-    assert(diff.seconds >= 1);
+    expect(diff.seconds >= 1);
   }
   puts("Done\n");
 
-  assert(sched_num_threads == 2);
+  expect(sched_num_threads == 2);
 
   puts("Swapping two threads ...");
   {
@@ -156,14 +157,14 @@ int main() {
     auto t1_old = t1.get_id();
     auto t2_old = t2.get_id();
     t1.swap(t2);
-    assert(t1_old == t2.get_id());
-    assert(t2_old == t1.get_id());
+    expect(t1_old == t2.get_id());
+    expect(t2_old == t1.get_id());
     t1.join();
     t2.join();
   }
   puts("Done\n");
 
-  assert(sched_num_threads == 2);
+  expect(sched_num_threads == 2);
 
   puts("Move constructor ...");
   {
@@ -171,13 +172,13 @@ int main() {
       // nop
     });
     thread t2(move(t1));
-    assert(t1.joinable() == 0);
-    assert(t2.joinable() == 1);
+    expect(t1.joinable() == 0);
+    expect(t2.joinable() == 1);
     t2.join();
   }
   puts("Done\n");
 
-  assert(sched_num_threads == 2);
+  expect(sched_num_threads == 2);
 
   puts("Bye, bye.");
   puts("******************************************");

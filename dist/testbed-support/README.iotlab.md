@@ -36,6 +36,7 @@ brackets):
  * IOTLAB_PROFILE
  * IOTLAB_EXCLUDE_NODES
  * IOTLAB_LOGGING
+ * IOTLAB_TMUX
 
 ### Format of a Resource ID
 Both variables `IOTLAB_PHY_NODES` and `IOTLAB_EXCLUDE_NODES` use the resource id
@@ -73,20 +74,19 @@ into a file called "RIOT_LOG-<EXPNAME>-<EXPID>".
 This target updates the application on all registered nodes of the given
 experiment to the current version of the application.
 Certain nodes can be excluded by listing them in the `IOTLAB_EXCLUDE_NODES` variable
-using the resource id string format as described above. If you do not use the default site,
-then you must specify the site with `IOTLAB_SITE`.
+using the resource id string format as described above.
 
 #### iotlab-reset
 
 This target resets all registered nodes of the given experiment.
 Certain nodes can be excluded by listing them in the `IOTLAB_EXCLUDE_NODES` variable
-using the resource id string format as described above. If you do not use the default site,
-then you must specify the site with `IOTLAB_SITE`.
+using the resource id string format as described above.
 
 #### iotlab-term
 
 Uses ssh to login the user on the IoT-LAB server of the specified site and
 start the `serial_aggregator` to communication with all registered nodes.
 If `IOTLAB_LOGGING` is set to `1`, then closing the connection with `CTRL+C/D` will also quit
-the logging process. Detach from the server-side tmux process with `CTRL+A-D`
-(or as defined in your server-side `.tmux.conf` file)
+the logging process. If you enabled TMUX with `IOTLAB_TMUX`, detach from the
+server-side tmux process with `CTRL+A-D` (or as defined in your server-side
+`.tmux.conf` file)

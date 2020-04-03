@@ -23,7 +23,6 @@
 
 #include "stdio_uart.h"
 #include "periph/uart.h"
-#include "openthread/types.h"
 #include "openthread/platform/uart.h"
 #include "ot.h"
 

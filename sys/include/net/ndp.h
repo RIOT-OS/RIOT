@@ -194,6 +194,18 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Hop-limit required for most NDP messages to ensure link-local
+ *          communication
+ *
+ * @see     [RFC 4861, section 4.1](https://tools.ietf.org/html/rfc4861#section-4.1)
+ * @see     [RFC 4861, section 4.2](https://tools.ietf.org/html/rfc4861#section-4.2)
+ * @see     [RFC 4861, section 4.3](https://tools.ietf.org/html/rfc4861#section-4.3)
+ * @see     [RFC 4861, section 4.4](https://tools.ietf.org/html/rfc4861#section-4.4)
+ * @see     [RFC 4861, section 4.5](https://tools.ietf.org/html/rfc4861#section-4.5)
+ */
+#define NDP_HOP_LIMIT               (255U)
+
+/**
  * @brief   Router solicitation message format.
  * @extends icmpv6_hdr_t
  *
@@ -322,8 +334,25 @@ typedef struct __attribute__((packed)) {
 } ndp_opt_mtu_t;
 
 /**
- * @brief   Recursive DNS server option format
+ * @brief   Recursive DNS server option format without payload
  * @extends ndp_opt_t
+ *
+ * @see     [RFC 8106, section 5.1](https://tools.ietf.org/html/rfc8106#section-5.1)
+ * @see     ndp_opt_rdnss_impl_t
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t type;           /**< option type */
+    uint8_t len;            /**< length in units of 8 octets */
+    network_uint16_t resv;  /**< reserved field */
+    network_uint32_t ltime; /**< lifetime in seconds */
+} ndp_opt_rdnss_t;
+
+#ifndef __cplusplus
+/**
+ * @brief   Recursive DNS server option format with payload
+ * @extends ndp_opt_rdnss_t
+ * @details Auxiliary struct that contains a zero-length array as convenience
+ *          pointer to the addresses. Only for use in C, invalid in ISO-C++.
  *
  * @see     [RFC 8106, section 5.1](https://tools.ietf.org/html/rfc8106#section-5.1)
  */
@@ -333,7 +362,8 @@ typedef struct __attribute__((packed)) {
     network_uint16_t resv;  /**< reserved field */
     network_uint32_t ltime; /**< lifetime in seconds */
     ipv6_addr_t addrs[];    /**< addresses of IPv6 recursive DNS servers */
-} ndp_opt_rdnss_t;
+} ndp_opt_rdnss_impl_t;
+#endif
 
 #ifdef __cplusplus
 }

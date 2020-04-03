@@ -21,11 +21,14 @@
 #ifndef NET_GNRC_NETIF_HDR_H
 #define NET_GNRC_NETIF_HDR_H
 
+#include <errno.h>
 #include <string.h>
 #include <stdint.h>
 
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/pktbuf.h"
+#include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -130,7 +133,7 @@ static inline void gnrc_netif_hdr_init(gnrc_netif_hdr_t *hdr, uint8_t src_l2addr
  * @return                  the size of the given header, including link layer
  *                          addresses
  */
-static inline size_t gnrc_netif_hdr_sizeof(gnrc_netif_hdr_t *hdr)
+static inline size_t gnrc_netif_hdr_sizeof(const gnrc_netif_hdr_t *hdr)
 {
     return sizeof(gnrc_netif_hdr_t) + hdr->src_l2addr_len + hdr->dst_l2addr_len;
 }
@@ -143,7 +146,7 @@ static inline size_t gnrc_netif_hdr_sizeof(gnrc_netif_hdr_t *hdr)
  * @return                  pointer to source address on success
  * @return                  NULL on error
  */
-static inline uint8_t *gnrc_netif_hdr_get_src_addr(gnrc_netif_hdr_t *hdr)
+static inline uint8_t *gnrc_netif_hdr_get_src_addr(const gnrc_netif_hdr_t *hdr)
 {
     return ((uint8_t *)(hdr + 1));
 }
@@ -155,8 +158,9 @@ static inline uint8_t *gnrc_netif_hdr_get_src_addr(gnrc_netif_hdr_t *hdr)
  * @param[in] addr          new source address
  * @param[in] addr_len      *addr* length
  */
-static inline void gnrc_netif_hdr_set_src_addr(gnrc_netif_hdr_t *hdr, uint8_t *addr,
-        uint8_t addr_len)
+static inline void gnrc_netif_hdr_set_src_addr(gnrc_netif_hdr_t *hdr,
+                                               const uint8_t *addr,
+                                               uint8_t addr_len)
 {
     if (addr_len != hdr->src_l2addr_len) {
         return;
@@ -174,7 +178,7 @@ static inline void gnrc_netif_hdr_set_src_addr(gnrc_netif_hdr_t *hdr, uint8_t *a
  * @return                  pointer to destination address on success
  * @return                  NULL on error
  */
-static inline uint8_t *gnrc_netif_hdr_get_dst_addr(gnrc_netif_hdr_t *hdr)
+static inline uint8_t *gnrc_netif_hdr_get_dst_addr(const gnrc_netif_hdr_t *hdr)
 {
     return (((uint8_t *)(hdr + 1)) + hdr->src_l2addr_len);
 }
@@ -186,8 +190,9 @@ static inline uint8_t *gnrc_netif_hdr_get_dst_addr(gnrc_netif_hdr_t *hdr)
  * @param[in] addr          new destination address
  * @param[in] addr_len      *addr* length
  */
-static inline void gnrc_netif_hdr_set_dst_addr(gnrc_netif_hdr_t *hdr, uint8_t *addr,
-        uint8_t addr_len)
+static inline void gnrc_netif_hdr_set_dst_addr(gnrc_netif_hdr_t *hdr,
+                                               const uint8_t *addr,
+                                               uint8_t addr_len)
 {
     if (addr_len != hdr->dst_l2addr_len) {
         return;
@@ -195,6 +200,65 @@ static inline void gnrc_netif_hdr_set_dst_addr(gnrc_netif_hdr_t *hdr, uint8_t *a
 
     memcpy(((uint8_t *)(hdr + 1)) + hdr->src_l2addr_len, addr, addr_len);
 }
+
+#if defined(MODULE_GNRC_IPV6) || defined(DOXYGEN)
+/**
+ * @brief   Converts the source address of a given @ref net_gnrc_netif_hdr to
+ *          an IPv6 IID
+ *
+ * @note    @p netif is intentionally required to be provided so that the caller
+ *          needs to retrieve it from gnrc_netif_hdr_t::if_pid of @p hdr only
+ *          once instead of this function retrieving it at every call.
+ *
+ * @pre `netif->pid == hdr->if_pid`
+ *
+ * @param[in] netif A network interface. gnrc_netif_t::pid must be equal to
+ *                  gnrc_netif_hdr_t::if_pid of @p hdr.
+ * @param[in] hdr   Header to convert source address from.
+ * @param[out] iid  The IID based on gnrc_netif_t::device_type.
+ *
+ * @return  same as gnrc_netif_ipv6_iid_from_addr().
+ */
+static inline int gnrc_netif_hdr_ipv6_iid_from_src(const gnrc_netif_t *netif,
+                                                   const gnrc_netif_hdr_t *hdr,
+                                                   eui64_t *iid)
+{
+    return gnrc_netif_ipv6_iid_from_addr(netif,
+                                         gnrc_netif_hdr_get_src_addr(hdr),
+                                         hdr->src_l2addr_len,
+                                         iid);
+}
+
+/**
+ * @brief   Converts the destination address of a given @ref net_gnrc_netif_hdr
+ *          to an IPv6 IID
+ *
+ * @note    @p netif is intentionally required to be provided so that the caller
+ *          needs to retrieve it from gnrc_netif_hdr_t::if_pid of @p hdr only
+ *          once instead of this function retrieving it at every call.
+ *
+ * @pre `netif->pid == hdr->if_pid`
+ *
+ * @param[in] netif A network interface. gnrc_netif_t::pid must be equal to
+ *                  gnrc_netif_hdr_t::if_pid of @p hdr.
+ * @param[in] hdr   Header to convert destination address from.
+ * @param[out] iid  The IID based on gnrc_netif_t::device_type.
+ *
+ * @return  same as gnrc_netif_ipv6_iid_from_addr().
+ */
+static inline int gnrc_netif_hdr_ipv6_iid_from_dst(const gnrc_netif_t *netif,
+                                                   const gnrc_netif_hdr_t *hdr,
+                                                   eui64_t *iid)
+{
+    return gnrc_netif_ipv6_iid_from_addr(netif,
+                                         gnrc_netif_hdr_get_dst_addr(hdr),
+                                         hdr->dst_l2addr_len,
+                                         iid);
+}
+#else   /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
+#define gnrc_netif_hdr_ipv6_iid_from_src(netif, hdr, iid)   (-ENOTSUP);
+#define gnrc_netif_hdr_ipv6_iid_from_dst(netif, hdr, iid)   (-ENOTSUP);
+#endif  /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
 
 /**
  * @brief   Builds a generic network interface header for sending and
@@ -210,7 +274,38 @@ static inline void gnrc_netif_hdr_set_dst_addr(gnrc_netif_hdr_t *hdr, uint8_t *a
  * @return  The generic network layer header on success.
  * @return  NULL on error.
  */
-gnrc_pktsnip_t *gnrc_netif_hdr_build(uint8_t *src, uint8_t src_len, uint8_t *dst, uint8_t dst_len);
+gnrc_pktsnip_t *gnrc_netif_hdr_build(const uint8_t *src, uint8_t src_len,
+                                     const uint8_t *dst, uint8_t dst_len);
+
+/**
+ * @brief   Convenience function to get the corresponding interface struct for
+ *          a given interface header
+ *
+ * @pre `hdr != NULL`
+ *
+ * @param[in] hdr   Header to read interface from.
+ *
+ * @return  The @ref gnrc_netif_t representation of the interface on success
+ * @return  NULL, on error.
+ */
+static inline gnrc_netif_t *gnrc_netif_hdr_get_netif(const gnrc_netif_hdr_t *hdr)
+{
+    assert(hdr != NULL);
+    return gnrc_netif_get_by_pid(hdr->if_pid);
+}
+
+/**
+ * @brief   Convenience function to set the interface of an interface header,
+ *          given the network interface
+ *
+ * @param[out] hdr  Header to set the interface for.
+ * @param[in] netif Network interface to set for @p hdr.
+ */
+static inline void gnrc_netif_hdr_set_netif(gnrc_netif_hdr_t *hdr,
+                                            const gnrc_netif_t *netif)
+{
+    hdr->if_pid = (netif != NULL) ? netif->pid : KERNEL_PID_UNDEF;
+}
 
 /**
  * @brief   Outputs a generic interface header to stdout.

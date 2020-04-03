@@ -1,33 +1,36 @@
-# export the CPU family so we can differentiate between them in the code
-FAM = $(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
-export CFLAGS += -DCPU_FAM_$(FAM)
-
-# include common periph module
-USEMODULE += periph_common
-
-# include stm32 common functions and stm32 common periph drivers
-USEMODULE += stm32_common stm32_common_periph
+CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 
 # For stm32 cpu's we use the stm32_common.ld linker script
-export LINKFLAGS += -L$(RIOTCPU)/stm32_common/ldscripts
+LINKFLAGS += -L$(RIOTCPU)/stm32_common/ldscripts
 LINKER_SCRIPT ?= stm32_common.ld
 
-# export the common include directory
-export INCLUDES += -I$(RIOTCPU)/stm32_common/include
+INCLUDES += -I$(RIOTCPU)/stm32_common/include
 
 # Compute ROM_LEN and RAM_LEN
 include $(RIOTCPU)/stm32_common/stm32_mem_lengths.mk
 KB := 1024
-LEN := $(shell echo $(ROM_LEN) | sed 's/K//')
-FLASHSIZE := $(shell echo $$(( $(LEN) * $(KB) )) )
+ROM_LEN_K := $(shell echo $(ROM_LEN) | sed 's/K//')
+
+ifeq (stm32wb55rg,$(CPU_MODEL))
+  # adjust RAM_LEN and ROM_LEN according to CPU2 RAM_LEN and ROM_LEN
+  RAM_LEN_K := $(shell echo $(RAM_LEN) | sed 's/K//')
+  CPU2_RAM_LEN_K := $(shell echo $(CPU2_RAM_LEN) | sed 's/K//')
+  RAM_LEN := $(shell echo $$(( ($(RAM_LEN_K) - $(CPU2_RAM_LEN_K) ) ))K)
+
+  CPU2_ROM_LEN_K := $(shell echo $(CPU2_ROM_LEN) | sed 's/K//')
+  FLASHSIZE := $(shell echo $$(( ($(ROM_LEN_K) - $(CPU2_ROM_LEN_K) )* $(KB) )) )
+  ROM_LEN := $(shell echo $$(( ($(ROM_LEN_K) - $(CPU2_ROM_LEN_K) ) ))K)
+else
+  FLASHSIZE := $(shell echo $$(( $(ROM_LEN_K) * $(KB) )) )
+endif
 
 # Get CPU_LINE_ variable
 -include $(RIOTCPU)/$(CPU)/stm32_line.mk
 CPU_LINE ?= $(shell echo $(CPU_MODEL) | cut -c -9 | tr 'a-z-' 'A-Z_')xx
 
 # Set CFLAGS
-export CFLAGS += -D$(CPU_LINE) -DCPU_LINE_$(CPU_LINE)
-export CFLAGS += -DSTM32_FLASHSIZE=$(FLASHSIZE)U
+CFLAGS += -D$(CPU_LINE) -DCPU_LINE_$(CPU_LINE)
+CFLAGS += -DSTM32_FLASHSIZE=$(FLASHSIZE)U
 
 info-stm32:
 	@$(COLOR_ECHO) "CPU: $(CPU_MODEL)"

@@ -1,1 +1,1 @@
-USEMODULE += base64
+USEMODULE += base64url

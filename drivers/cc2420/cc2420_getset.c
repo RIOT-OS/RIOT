@@ -114,7 +114,6 @@ uint16_t cc2420_get_pan(cc2420_t *dev)
 
 void cc2420_set_pan(cc2420_t *dev, uint16_t pan)
 {
-    dev->netdev.pan = pan;
     cc2420_ram_write(dev, CC2420_RAM_PANID, (uint8_t *)&pan, 2);
 }
 

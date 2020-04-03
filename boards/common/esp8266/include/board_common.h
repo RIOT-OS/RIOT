@@ -17,6 +17,9 @@
  * @{
  */
 
+/* not required when compiling ESP vendor code parts */
+#ifndef ESP_PLATFORM
+
 #include <stdint.h>
 
 #include "cpu.h"
@@ -70,8 +73,6 @@ extern "C" {
  * @name    XTimer configuration
  * @{
  */
-#define XTIMER_OVERHEAD             (0U)
-
 #if defined(MODULE_ESP_SW_TIMER)
 #define XTIMER_BACKOFF              (100U)
 #define XTIMER_ISR_BACKOFF          (100U)
@@ -124,7 +125,7 @@ extern mtd_dev_t *mtd0;
  * initializations are done during the CPU initialization that is called from
  * boot loader.
  */
-extern void board_init(void);
+void board_init (void);
 
 /**
   * @brief Print the board configuration in a human readable format
@@ -140,4 +141,5 @@ void board_print_config (void);
 
 /** @} */
 
+#endif /* ESP_PLATFORM */
 #endif /* BOARD_COMMON_H */

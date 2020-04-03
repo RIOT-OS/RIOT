@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_skald_eddystone Skald meets Eddy
- * @ingroup     net_skald
+ * @defgroup    ble_skald_eddystone Skald meets Eddy
+ * @ingroup     ble_skald
  * @brief       Skald's Eddystone implementation
  *
  * # About

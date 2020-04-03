@@ -1,17 +1,14 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno \
-                             chronos msb-430 msb-430h nucleo-f030r8 \
-                             nucleo-l053r8 nucleo-f031k6 nucleo-f042k6 \
-                             nucleo-l031k6 stm32f0discovery telosb \
-                             wsn430-v1_3b wsn430-v1_4 z1
-
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += schedstatistics
 USEMODULE += printf_float
 
-TEST_ON_CI_WHITELIST += all
+# For this test we don't want to use the shell version of
+# test_utils_interactive_sync, since we want to synchronize before
+# the start of the shell
+DISABLE_MODULE += test_utils_interactive_sync_shell
 
 include $(RIOTBASE)/Makefile.include

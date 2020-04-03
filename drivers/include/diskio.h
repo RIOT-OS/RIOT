@@ -68,7 +68,7 @@ typedef enum {
 } diskio_sta_t;
 
 /**
- * @name    Command code for disk_ioctrl fucntion
+ * @name    Command code for disk_ioctrl function
  * @{
  */
 

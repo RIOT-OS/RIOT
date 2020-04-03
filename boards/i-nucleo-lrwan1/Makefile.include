@@ -1,0 +1,19 @@
+# we use shared STM32 configuration snippets
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# to flash this board, use an ST-link adapter
+DEBUG_ADAPTER ?= stlink
+
+# this board can become un-flashable after a hardfault,
+# use connect_assert_srst to always be able to flash or reset the boards.
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
+
+# this board uses openocd
+include $(RIOTMAKE)/tools/openocd.inc.mk

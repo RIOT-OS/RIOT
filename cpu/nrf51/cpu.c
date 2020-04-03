@@ -19,8 +19,10 @@
 
 #include "cpu.h"
 #include "nrf_clock.h"
+#include "nrfx.h"
 #include "periph_conf.h"
 #include "periph/init.h"
+#include "stdio_base.h"
 
 /**
  * @brief Initialize the CPU, set IRQ priorities
@@ -29,8 +31,12 @@ void cpu_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();
+    /* Enable the DC/DC power converter */
+    nrfx_dcdc_init();
     /* setup the HF clock */
     clock_init_hf();
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
     /* trigger static peripheral initialization */
     periph_init();
 }

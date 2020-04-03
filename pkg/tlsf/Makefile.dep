@@ -1,0 +1,12 @@
+ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
+  ifneq (,$(filter newlib,$(USEMODULE)))
+    USEMODULE += tlsf-malloc_newlib
+  else ifneq (,$(filter native,$(BOARD)))
+    USEMODULE += tlsf-malloc_native
+  else
+    $(warning tlsf-malloc can only be used on native or on platforms using newlib)
+  endif
+endif
+
+# tlsf is not compatible with 8bit and 16bit architectures
+FEATURES_REQUIRED += arch_32bit

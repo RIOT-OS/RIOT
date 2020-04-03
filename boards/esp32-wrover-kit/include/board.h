@@ -47,10 +47,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /**
  * @name    LED (on-board) configuration
  * @{
@@ -101,12 +97,24 @@
 #endif
 /** @} */
 
+/* include common board definitions as last step */
+#include "board_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief Initialize the board specific hardware
+ */
+static inline void board_init(void) {
+    /* there is nothing special to initialize on this board */
+    board_init_common();
+}
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-
-/* include common board definitions as last step */
-#include "board_common.h"
 
 #endif /* BOARD_H */
 /** @} */

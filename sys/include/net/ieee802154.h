@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-16 Freie Universität Berlin
+ * Copyright (C) 2015-2019 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -30,6 +30,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Default start frame delimiter
+ */
+#define IEEE802154_SFD                      (0xa7)
 
 /**
  * @brief IEEE 802.15.4 address lengths
@@ -92,7 +97,7 @@ extern "C" {
 #define IEEE802154_FRAME_LEN_MAX        (127U)  /**< maximum frame length */
 
 /**
- * @brief   Special address defintions
+ * @brief   Special address definitions
  * @{
  */
 /**
@@ -112,28 +117,50 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 /** @} */
 
 /**
+ * @defgroup net_ieee802154_conf    IEEE802.15.4 compile configurations
+ * @ingroup  config
  * @{
- * @name    Default values
- * @brief   Default values for devices to choose
+ */
+/**
+ * @brief IEEE802.15.4 default sub-GHZ channel
  */
 #ifndef IEEE802154_DEFAULT_SUBGHZ_CHANNEL
 #define IEEE802154_DEFAULT_SUBGHZ_CHANNEL   (5U)
 #endif
 
+/**
+ * @brief IEEE802.15.4 default channel
+ */
 #ifndef IEEE802154_DEFAULT_CHANNEL
 #define IEEE802154_DEFAULT_CHANNEL          (26U)
 #endif
 
+/**
+ * @brief IEEE802.15.4 default sub-GHZ page
+ */
 #ifndef IEEE802154_DEFAULT_SUBGHZ_PAGE
 #define IEEE802154_DEFAULT_SUBGHZ_PAGE      (2U)
 #endif
 
+/**
+ * @brief IEEE802.15.4 default PANID
+ */
 #ifndef IEEE802154_DEFAULT_PANID
 #define IEEE802154_DEFAULT_PANID            (0x0023U)
 #endif
 
+/**
+ * @brief IEEE802.15.4 Broadcast PANID
+ */
+#ifndef IEEE802154_PANID_BCAST
+#define IEEE802154_PANID_BCAST              { 0xff, 0xff }
+#endif
+
+/**
+ * @brief IEEE802.15.4 default TX power (in dBm)
+ */
 #ifndef IEEE802154_DEFAULT_TXPOWER
-#define IEEE802154_DEFAULT_TXPOWER          (0) /* in dBm */
+#define IEEE802154_DEFAULT_TXPOWER          (0)
 #endif
 /** @} */
 
@@ -167,7 +194,7 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
  *                      Otherwise, it will be ignored, when
  *                      @ref IEEE802154_FCF_PAN_COMP is set.
  * @param[in] dst_pan   Destination PAN ID in little-endian.
- * @param[in] flags     Flags for the frame. These are interchangable with the
+ * @param[in] flags     Flags for the frame. These are interchangeable with the
  *                      first byte of the IEEE 802.15.4 FCF. This means that
  *                      it encompasses the type values,
  *                      @ref IEEE802154_FCF_SECURITY_EN,

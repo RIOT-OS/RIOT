@@ -1,3 +1,7 @@
+CPU_ARCH = cortex-m4f
+
+FEATURES_PROVIDED += cortexm_mpu
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 
 -include $(RIOTCPU)/cortexm_common/Makefile.features

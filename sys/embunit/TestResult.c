@@ -36,11 +36,11 @@
 #include "TestListener.h"
 #include "TestResult.h"
 
-void TestResult_init(TestResult* self,TestListner* listner)
+void TestResult_init(TestResult* self,TestListner* listener)
 {
     self->runCount = 0;
     self->failureCount = 0;
-    self->listener = listner;
+    self->listener = listener;
 }
 
 void TestResult_startTest(TestResult* self,Test* test)

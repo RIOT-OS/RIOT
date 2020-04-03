@@ -70,11 +70,10 @@ static const gnrc_netif_ops_t gomach_ops = {
     .msg_handler = _gomach_msg_handler,
 };
 
-gnrc_netif_t *gnrc_netif_gomach_create(char *stack, int stacksize,
-                                       char priority, char *name,
-                                       netdev_t *dev)
+int gnrc_netif_gomach_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                             char priority, char *name, netdev_t *dev)
 {
-    return gnrc_netif_create(stack, stacksize, priority, name, dev,
+    return gnrc_netif_create(netif, stack, stacksize, priority, name, dev,
                              &gomach_ops);
 }
 
@@ -162,7 +161,8 @@ static void _gomach_rtt_cb(void *arg)
 {
     msg_t msg;
 
-    msg.content.value = ((uint32_t) arg) & 0xffff;
+    (void)arg;
+    msg.content.value = GNRC_GOMACH_EVENT_RTT_NEW_CYCLE;
     msg.type = GNRC_GOMACH_EVENT_RTT_TYPE;
     msg_send(&msg, gomach_pid);
 
@@ -194,7 +194,7 @@ static void _gomach_rtt_handler(uint32_t event, gnrc_netif_t *netif)
             /* Set next cycle's starting time. */
             uint32_t alarm = netif->mac.prot.gomach.last_wakeup +
                              RTT_US_TO_TICKS(GNRC_GOMACH_SUPERFRAME_DURATION_US);
-            rtt_set_alarm(alarm, _gomach_rtt_cb, (void *) GNRC_GOMACH_EVENT_RTT_NEW_CYCLE);
+            rtt_set_alarm(alarm, _gomach_rtt_cb, NULL);
 
             /* Update neighbors' public channel phases. */
             gnrc_gomach_update_neighbor_pubchan(netif);
@@ -305,7 +305,7 @@ static void gomach_wait_bcast_tx_finish(gnrc_netif_t *netif)
     }
 
     /* This is to handle no-TX-complete issue. In case there is no no-TX-complete event,
-     * we will quit broadcasting, i.e., not getting stucked here. */
+     * we will quit broadcasting, i.e., not getting stuck here. */
     if (gnrc_gomach_timeout_is_expired(netif, GNRC_GOMACH_TIMEOUT_BCAST_FINISH)) {
         gnrc_gomach_clear_timeout(netif, GNRC_GOMACH_TIMEOUT_BCAST_INTERVAL);
         netif->mac.tx.bcast_state = GNRC_GOMACH_BCAST_END;
@@ -1104,7 +1104,7 @@ static void gomach_t2u_wait_preamble_tx(gnrc_netif_t *netif)
 
     /* This is mainly to handle no-TX-complete error. Once the max preamble interval
      * timeout expired here (i.e., no-TX-complete error), we will quit waiting here
-     * and go to send the next preamble, thus the MAC will not get stucked here. */
+     * and go to send the next preamble, thus the MAC will not get stuck here. */
     if (gnrc_gomach_timeout_is_expired(netif, GNRC_GOMACH_TIMEOUT_MAX_PREAM_INTERVAL)) {
         gnrc_priority_pktqueue_flush(&netif->mac.rx.queue);
         netif->mac.tx.t2u_state = GNRC_GOMACH_T2U_PREAMBLE_PREPARE;
@@ -1451,7 +1451,7 @@ static void _gomach_phase_backoff(gnrc_netif_t *netif)
     uint32_t alarm = netif->mac.prot.gomach.last_wakeup +
                      RTT_US_TO_TICKS(GNRC_GOMACH_SUPERFRAME_DURATION_US);
 
-    rtt_set_alarm(alarm, _gomach_rtt_cb, (void *) GNRC_GOMACH_EVENT_RTT_NEW_CYCLE);
+    rtt_set_alarm(alarm, _gomach_rtt_cb, NULL);
 
     gnrc_gomach_update_neighbor_phase(netif);
 
@@ -2108,6 +2108,7 @@ static void _gomach_init(gnrc_netif_t *netif)
 {
     netdev_t *dev;
 
+    gnrc_netif_default_init(netif);
     dev = netif->dev;
     dev->event_callback = _gomach_event_cb;
 

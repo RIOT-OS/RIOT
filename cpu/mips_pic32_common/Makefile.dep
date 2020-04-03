@@ -1,0 +1,7 @@
+USEMODULE += mips_pic32_common
+USEMODULE += mips_pic32_common_periph
+
+# mips32 needs periph_timer for its gettimeofday() implementation
+USEMODULE += periph_timer
+
+include $(RIOTCPU)/mips32r2_common/Makefile.dep

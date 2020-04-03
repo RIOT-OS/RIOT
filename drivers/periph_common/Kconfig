@@ -1,0 +1,26 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig KCONFIG_MODULE_PERIPH_WDT
+    bool "Configure Watchdog peripheral"
+    depends on MODULE_PERIPH_WDT
+    help
+        Configure Watchdog peripheral using Kconfig.
+
+if KCONFIG_MODULE_PERIPH_WDT
+
+config WDT_WARNING_PERIOD
+    int "Warning period (in ms)"
+    depends on HAS_WDT_WARNING_PERIOD
+    help
+        Period in ms before reboot where wdt_cb() is executed.
+
+endif # KCONFIG_MODULE_PERIPH_WDT
+
+config HAS_WDT_WARNING_PERIOD
+    bool
+    help
+        Indicates that a CPU provides a warning period configuration option.

@@ -27,14 +27,20 @@
 
 static char worker_stack[THREAD_STACKSIZE_MAIN];
 static evtimer_t evtimer;
-static evtimer_msg_event_t events[] = {
-    { .event = { .offset = 1000 }, .msg = { .content = { .ptr = "supposed to be 1000" } } },
-    { .event = { .offset = 1500 }, .msg = { .content = { .ptr = "supposed to be 1500" } } },
-    { .event = { .offset = 659 }, .msg = { .content = { .ptr = "supposed to be 659" } } },
-    { .event = { .offset = 3954 }, .msg = { .content = { .ptr = "supposed to be 3954" } } },
+#define NEVENTS (unsigned)(4)
+/*
+ * The events (.offset) are modified by evtimer_add.
+ * This list of offsets is used to populate the events
+ * before adding (or re-adding).
+ */
+static uint32_t offsets[NEVENTS] = {
+        1000,
+        1500,
+        659,
+        3954,
 };
-
-#define NEVENTS ((unsigned)(sizeof(events) / sizeof(evtimer_msg_event_t)))
+static evtimer_msg_event_t events[NEVENTS];
+static char texts[NEVENTS][40];
 
 /* This thread will print the drift to stdout once per second */
 void *worker_thread(void *arg)
@@ -56,7 +62,7 @@ void *worker_thread(void *arg)
 
 int main(void)
 {
-    uint32_t now = xtimer_now_usec() / US_PER_MS;
+    uint32_t now;
 
     evtimer_init_msg(&evtimer);
 
@@ -65,11 +71,47 @@ int main(void)
                                      THREAD_PRIORITY_MAIN - 1,
                                      THREAD_CREATE_STACKTEST,
                                      worker_thread, NULL, "worker");
-    printf("Testing generic evtimer (start time = %" PRIu32 " ms)\n", now);
+
+    printf("Testing generic evtimer\n");
+
+    /* Add all the events */
     for (unsigned i = 0; i < NEVENTS; i++) {
+        events[i].event.offset = offsets[i];
+        now = xtimer_now_usec() / US_PER_MS;
+        snprintf(texts[i], sizeof(texts[i]) - 1, "#%u supposed to be %" PRIu32, i, now + events[i].event.offset);
+        events[i].msg.content.ptr = texts[i];
         evtimer_add_msg(&evtimer, &events[i], pid);
     }
+
+    /* Delete all the events */
+    /* First we delete the last, to test deleting the last */
+    /* Then we delete the first, to test deleting the first */
+    evtimer_del(&evtimer, &events[3].event);
+    evtimer_del(&evtimer, &events[2].event);
+    printf("This should list %u items\n", NEVENTS - 2);
+    evtimer_print(&evtimer);
+
+    /* Delete the remaining entries */
+    for (unsigned i = 0; i < NEVENTS; i++) {
+        evtimer_del(&evtimer, &events[i].event);
+    }
+
+    /* Add all the events, again */
+    for (unsigned i = 0; i < NEVENTS; i++) {
+        events[i].event.offset = offsets[i];
+        now = xtimer_now_usec() / US_PER_MS;
+        snprintf(texts[i], sizeof(texts[i]) - 1, "#%u supposed to be %" PRIu32, i, now + events[i].event.offset);
+        events[i].msg.content.ptr = texts[i];
+        evtimer_add_msg(&evtimer, &events[i], pid);
+    }
+    printf("This should list %u items\n", NEVENTS);
+    evtimer_print(&evtimer);
+
     printf("Are the reception times of all %u msgs close to the supposed values?\n",
            NEVENTS);
+
+    /* The last offset is the largest, wait for it and a tiny bit more */
+    xtimer_usleep((offsets[3] + 10) * US_PER_MS);
+    puts("By now all msgs should have been received");
     puts("If yes, the tests were successful");
 }

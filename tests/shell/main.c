@@ -24,6 +24,10 @@
 #include "shell_commands.h"
 #include "shell.h"
 
+#if MODULE_STDIO_RTT
+#include "xtimer.h"
+#endif
+
 static int print_teststart(int argc, char **argv)
 {
     (void) argc;
@@ -52,7 +56,17 @@ static int print_echo(int argc, char **argv)
     return 0;
 }
 
+static int print_shell_bufsize(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+    printf("%d\n", SHELL_DEFAULT_BUFSIZE);
+
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
+    { "bufsize", "Get the shell's buffer size", print_shell_bufsize },
     { "start_test", "starts a test", print_teststart },
     { "end_test", "ends a test", print_testend },
     { "echo", "prints the input command", print_echo },
@@ -63,7 +77,6 @@ int main(void)
 {
 
     printf("test_shell.\n");
-
 
     /* define buffer to be used by the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];

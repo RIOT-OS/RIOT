@@ -1,6 +1,11 @@
 APPLICATION ?= tests_$(notdir $(patsubst %/,%,$(CURDIR)))
+
+ifneq (,$(wildcard $(CURDIR)/tests/.))
+  DEFAULT_MODULE += test_utils_interactive_sync
+endif
+
 ifneq (,$(filter tests_driver_%,$(APPLICATION)))
-    BOARD ?= samr21-xpro
+  BOARD ?= samr21-xpro
 endif
 BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..

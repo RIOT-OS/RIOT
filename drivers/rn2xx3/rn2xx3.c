@@ -62,15 +62,11 @@ static void _rx_cb(void *arg, uint8_t c)
         if (dev->int_state == RN2XX3_INT_STATE_MAC_RX_MESSAGE) {
             /* RX state: closing RX buffer */
             dev->rx_buf[(dev->rx_size + 1) / 2] = 0;
-            if (netdev->event_callback) {
-                netdev->event_callback(netdev, NETDEV_EVENT_ISR);
-            }
+            netdev_trigger_event_isr(netdev);
         }
         else if (dev->int_state == RN2XX3_INT_STATE_MAC_TX) {
             /* still in TX state: transmission complete but no data received */
-            if (netdev->event_callback) {
-                netdev->event_callback(netdev, NETDEV_EVENT_ISR);
-            }
+            netdev_trigger_event_isr(netdev);
         }
         dev->resp_size = 0;
         dev->rx_size = 0;
@@ -141,7 +137,7 @@ void rn2xx3_setup(rn2xx3_t *dev, const rn2xx3_params_t *params)
     assert(dev && (params->uart < UART_NUMOF));
 
     /* initialize device parameters */
-    memcpy(&dev->p, params, sizeof(rn2xx3_params_t));
+    dev->p = *params;
 
     /* initialize pins and perform hardware reset */
     if (dev->p.pin_reset != GPIO_UNDEF) {
@@ -222,9 +218,23 @@ int rn2xx3_sys_factory_reset(rn2xx3_t *dev)
 int rn2xx3_sys_sleep(rn2xx3_t *dev)
 {
     size_t p = snprintf(dev->cmd_buf, sizeof(dev->cmd_buf) - 1,
-                        "sys sleep %lu", (unsigned long)dev->sleep);
+                        "sys sleep %" PRIu32 "", dev->sleep);
     dev->cmd_buf[p] = 0;
-    if (rn2xx3_write_cmd_no_wait(dev) == RN2XX3_ERR_INVALID_PARAM) {
+
+    if (dev->int_state == RN2XX3_INT_STATE_SLEEP) {
+        DEBUG("[rn2xx3] sleep: device already in sleep mode\n");
+        return RN2XX3_ERR_SLEEP_MODE;
+    }
+
+    /* always succeeds */
+    rn2xx3_write_cmd_no_wait(dev);
+
+    /* Wait a little to check if the device could go to sleep. No answer means
+       it worked. */
+    xtimer_usleep(US_PER_MS);
+
+    DEBUG("[rn2xx3] RESP: %s\n", dev->resp_buf);
+    if (rn2xx3_process_response(dev) == RN2XX3_ERR_INVALID_PARAM) {
         DEBUG("[rn2xx3] sleep: cannot put module in sleep mode\n");
         return RN2XX3_ERR_INVALID_PARAM;
     }

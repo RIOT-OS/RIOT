@@ -23,8 +23,9 @@
 #include "net/ipv6.h"
 #include "net/netdev_test.h"
 #include "od.h"
+#include "test_utils/expect.h"
 
-static netdev_test_t _devs[GNRC_NETIF_NUMOF];
+static netdev_test_t _devs[NETIF_NUMOF];
 
 netdev_t *ethernet_dev = (netdev_t *)&_devs[0];
 netdev_t *ieee802154_dev = (netdev_t *)&_devs[1];
@@ -72,7 +73,7 @@ void _test_trigger_recv(gnrc_netif_t *netif, const uint8_t *data,
 {
     netdev_t *dev = netif->dev;
 
-    assert(data_len <= ETHERNET_DATA_LEN);
+    expect(data_len <= ETHERNET_DATA_LEN);
     if ((data != NULL) || (data_len > 0)) {
         tmp_buffer_bytes = data_len;
         memcpy(tmp_buffer, data, data_len);
@@ -80,8 +81,8 @@ void _test_trigger_recv(gnrc_netif_t *netif, const uint8_t *data,
     else {
         tmp_buffer_bytes = 0;
     }
-    assert(dev->event_callback);
-    dev->event_callback(dev, NETDEV_EVENT_ISR);
+    expect(dev->event_callback);
+    netdev_trigger_event_isr(dev);
 }
 
 static int _netdev_recv(netdev_t *dev, char *buf, int len, void *info)
@@ -106,13 +107,13 @@ static int _netdev_recv(netdev_t *dev, char *buf, int len, void *info)
 
 static void _netdev_isr(netdev_t *dev)
 {
-    assert(dev->event_callback);
+    expect(dev->event_callback);
     dev->event_callback(dev, NETDEV_EVENT_RX_COMPLETE);
 }
 
 static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len)
 {
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     (void)max_len;
 
     netdev_test_t *dev = (netdev_test_t *)netdev;
@@ -124,14 +125,22 @@ static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len
         *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
     }
     else {
-        *((uint16_t *)value) = NETDEV_TYPE_UNKNOWN;
+        *((uint16_t *)value) = NETDEV_TYPE_TEST;
     }
     return sizeof(uint16_t);
 }
 
+static int _get_netdev_proto(netdev_t *dev, void *value, size_t max_len)
+{
+    expect(dev == ieee802154_dev);
+    expect(max_len == sizeof(gnrc_nettype_t));
+    *((gnrc_nettype_t *)value) = GNRC_NETTYPE_UNDEF;
+    return sizeof(gnrc_nettype_t);
+}
+
 static int _get_netdev_max_packet_size(netdev_t *netdev, void *value, size_t max_len)
 {
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     (void)max_len;
 
     netdev_test_t *dev = (netdev_test_t *)netdev;
@@ -158,7 +167,7 @@ void _tests_init(void)
     netdev_test_set_isr_cb((netdev_test_t *)ethernet_dev, _netdev_isr);
     netdev_test_set_get_cb((netdev_test_t *)ethernet_dev, NETOPT_DEVICE_TYPE,
                            _get_netdev_device_type);
-    netdev_test_set_get_cb((netdev_test_t *)ethernet_dev, NETOPT_MAX_PACKET_SIZE,
+    netdev_test_set_get_cb((netdev_test_t *)ethernet_dev, NETOPT_MAX_PDU_SIZE,
                            _get_netdev_max_packet_size);
     netdev_test_setup((netdev_test_t *)ieee802154_dev, (void *)1);
     netdev_test_set_send_cb((netdev_test_t *)ieee802154_dev, _dump_send_packet);
@@ -166,14 +175,16 @@ void _tests_init(void)
     netdev_test_set_isr_cb((netdev_test_t *)ieee802154_dev, _netdev_isr);
     netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev, NETOPT_DEVICE_TYPE,
                            _get_netdev_device_type);
+    netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev, NETOPT_PROTO,
+                           _get_netdev_proto);
     netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev,
-                           NETOPT_MAX_PACKET_SIZE, _get_netdev_max_packet_size);
-    for (intptr_t i = SPECIAL_DEVS; i < GNRC_NETIF_NUMOF; i++) {
+                           NETOPT_MAX_PDU_SIZE, _get_netdev_max_packet_size);
+    for (intptr_t i = SPECIAL_DEVS; i < NETIF_NUMOF; i++) {
         devs[i - SPECIAL_DEVS] = (netdev_t *)&_devs[i];
         netdev_test_setup(&_devs[i], (void *)i);
         netdev_test_set_get_cb(&_devs[i], NETOPT_DEVICE_TYPE,
                                _get_netdev_device_type);
-        netdev_test_set_get_cb(&_devs[i], NETOPT_MAX_PACKET_SIZE,
+        netdev_test_set_get_cb(&_devs[i], NETOPT_MAX_PDU_SIZE,
                                _get_netdev_max_packet_size);
     }
     gnrc_netreg_entry_init_pid(&dumper_undef, GNRC_NETREG_DEMUX_CTX_ALL,

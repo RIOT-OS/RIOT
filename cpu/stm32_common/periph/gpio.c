@@ -83,8 +83,15 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
 #elif defined (CPU_FAM_STM32L0)
     periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
-#elif defined (CPU_FAM_STM32L4)
+#elif defined (CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
     periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
+#ifdef PWR_CR2_IOSV
+    if (port == GPIOG) {
+        /* Port G requires external power supply */
+        periph_clk_en(APB1, RCC_APB1ENR1_PWREN);
+        PWR->CR2 |= PWR_CR2_IOSV;
+    }
+#endif /* PWR_CR2_IOSV */
 #else
     periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
 #endif
@@ -125,7 +132,7 @@ void gpio_init_analog(gpio_t pin)
     periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
 #elif defined (CPU_FAM_STM32L0)
     periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
-#elif defined (CPU_FAM_STM32L4)
+#elif defined (CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
     periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
 #else
     periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
@@ -189,10 +196,12 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     isr_ctx[pin_num].arg = arg;
 
     /* enable clock of the SYSCFG module for EXTI configuration */
-#ifdef CPU_FAN_STM32F0
+#ifndef CPU_FAM_STM32WB
+#ifdef CPU_FAM_STM32F0
     periph_clk_en(APB2, RCC_APB2ENR_SYSCFGCOMPEN);
 #else
     periph_clk_en(APB2, RCC_APB2ENR_SYSCFGEN);
+#endif
 #endif
 
     /* initialize pin as input */
@@ -230,9 +239,9 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     SYSCFG->EXTICR[pin_num >> 2] |= (port_num << ((pin_num & 0x03) * 4));
 
     /* clear any pending requests */
-    EXTI->PR = (1 << pin);
+    EXTI->PR = (1 << pin_num);
     /* unmask the pins interrupt channel */
-    EXTI->IMR |= (1 << pin);
+    EXTI->IMR |= (1 << pin_num);
 
     return 0;
 }

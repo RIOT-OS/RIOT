@@ -46,8 +46,8 @@
  * - South Korea: KR920-923 (from 920.9MHz to 923.3MHz exactly)
  *
  * For more information on Semtech SX1272 and SX1276 modules see:
- * - [SX1272/73 datasheet](http://www.semtech.com/images/datasheet/sx1272.pdf)
- * - [SX1276/77/78/79 datasheet](http://www.semtech.com/images/datasheet/sx1276_77_78_79.pdf)
+ * - [SX1272/73 datasheet](https://semtech.my.salesforce.com/sfc/p/E0000000JelG/a/440000001NCE/v_VBhk1IolDgxwwnOpcS_vTFxPfSEPQbuneK3mWsXlU)
+ * - [SX1276/77/78/79 datasheet](https://semtech.my.salesforce.com/sfc/p/E0000000JelG/a/2R0000001OKs/Bs97dmPXeatnbdoJNVMIDaKDlQz8q1N_gxDcgqi7g2o)
  *
  * @{
  *
@@ -92,8 +92,19 @@ extern "C" {
 #define SX127X_IRQ_DIO3                  (1<<3)  /**< DIO3 IRQ */
 #define SX127X_IRQ_DIO4                  (1<<4)  /**< DIO4 IRQ */
 #define SX127X_IRQ_DIO5                  (1<<5)  /**< DIO5 IRQ */
-#ifdef SX127X_USE_DIO_MULTI
-#define SX127X_IRQ_DIO_MULTI             (1<<6)  /**< DIO MULTI IRQ */
+/** @} */
+
+/**
+ * @defgroup drivers_sx127x_config     Semtech SX1272 and SX1276 driver compile configuration
+ * @ingroup config
+ * @{
+ */
+
+/**
+ * @brief GPIO mode of DIOx Pins.
+ */
+#ifndef SX127X_DIO_PULL_MODE
+#define SX127X_DIO_PULL_MODE             (GPIO_IN_PD)
 #endif
 /** @} */
 
@@ -211,8 +222,9 @@ typedef struct {
     gpio_t dio3_pin;                   /**< Interrupt line DIO3 (CAD done) */
     gpio_t dio4_pin;                   /**< Interrupt line DIO4 (not used) */
     gpio_t dio5_pin;                   /**< Interrupt line DIO5 (not used) */
-#ifdef SX127X_USE_DIO_MULTI
-    gpio_t dio_multi_pin;              /**< Interrupt line for multiple IRQs */
+#if defined(SX127X_USE_TX_SWITCH) || defined(SX127X_USE_RX_SWITCH)
+    gpio_t rx_switch_pin;              /**< Rx antenna switch */
+    gpio_t tx_switch_pin;              /**< Tx antenna switch */
 #endif
     uint8_t paselect;                  /**< Power amplifier mode (RFO or PABOOST) */
 } sx127x_params_t;

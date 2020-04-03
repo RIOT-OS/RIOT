@@ -1,5 +1,20 @@
+MATCH_MAKE_VERSION = 4.%
+
+MAKEFLAGS += --no-builtin-rules
+
+ifeq (,$(filter $(MATCH_MAKE_VERSION),$(MAKE_VERSION)))
+  $(error GNU Make $(MAKE_VERSION) is not supported by RIOT since release \
+      2020.01. Please upgrade your system to use GNU Make \
+      $(MATCH_MAKE_VERSION) or later.)
+endif
+
 # 'Makefile.include' directory, must be evaluated before other 'include'
 _riotbase := $(dir $(lastword $(MAKEFILE_LIST)))
+
+# include RIOT_MAKEFILES_GLOBAL_PRE configuration files
+# allows setting user specific system wide configuration parsed before the body
+# of $(RIOTBASE)/Makefile.include
+include $(RIOT_MAKEFILES_GLOBAL_PRE)
 
 # Globally set default goal to `all`
 .DEFAULT_GOAL := all
@@ -9,15 +24,17 @@ _riotbase := $(dir $(lastword $(MAKEFILE_LIST)))
 
 # set undefined variables
 RIOTBASE       ?= $(_riotbase)
-CCACHE_BASEDIR ?= $(RIOTBASE)
 RIOTCPU        ?= $(RIOTBASE)/cpu
+# Deprecated to set RIOTBOARD, use BOARDSDIR
 RIOTBOARD      ?= $(RIOTBASE)/boards
+BOARDSDIR      ?= $(RIOTBOARD)
 RIOTMAKE       ?= $(RIOTBASE)/makefiles
 RIOTPKG        ?= $(RIOTBASE)/pkg
 RIOTTOOLS      ?= $(RIOTBASE)/dist/tools
 RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 GITCACHE       ?= $(RIOTTOOLS)/git/git-cache
 GIT_CACHE_DIR  ?= $(HOME)/.gitcache
+BUILD_DIR      ?= $(RIOTBASE)/build
 APPDIR         ?= $(CURDIR)
 BINDIRBASE     ?= $(APPDIR)/bin
 BINDIR         ?= $(BINDIRBASE)/$(BOARD)
@@ -25,38 +42,59 @@ PKGDIRBASE     ?= $(BINDIRBASE)/pkg/$(BOARD)
 DLCACHE        ?= $(RIOTTOOLS)/dlcache/dlcache.sh
 DLCACHE_DIR    ?= $(RIOTBASE)/.dlcache
 
+# include CI info such as BOARD_INSUFFICIENT_MEMORY, if existing
+-include Makefile.ci
+
 __DIRECTORY_VARIABLES := \
   RIOTBASE \
   RIOTCPU \
-  RIOTBOARD \
   RIOTMAKE \
   RIOTPKG \
   RIOTTOOLS \
   RIOTPROJECT \
   APPDIR \
+  BUILD_DIR \
   BINDIRBASE \
   BINDIR \
-  CCACHE_BASEDIR \
   GITCACHE \
   PKGDIRBASE \
   DLCACHE_DIR \
   #
 
+# In GNU make command line is supposed to override the value set in makefile
+# These variables can be overridden even when set from command line
+__OVERRIDE_DIRECTORY_VARIABLES := $(__DIRECTORY_VARIABLES)
+# Use absolute paths in recursive "make" even if overridden on command line.
+MAKEOVERRIDES += $(foreach v,$(__OVERRIDE_DIRECTORY_VARIABLES),$(v)=$($(v)))
+
+# Deprecation of configuring 'RIOTBOARD'
+ifneq ($(abspath $(RIOTBASE)/boards),$(abspath $(RIOTBOARD)))
+  $(warning overriding RIOTBOARD for external boards is deprecated, please use an absolute BOARDSDIR)
+  override RIOTBOARD      := $(abspath $(RIOTBOARD))
+  __DIRECTORY_VARIABLES += RIOTBOARD
+endif
+
 # Make all paths absolute.
 override RIOTBASE       := $(abspath $(RIOTBASE))
-override CCACHE_BASEDIR := $(abspath $(CCACHE_BASEDIR))
 override RIOTCPU        := $(abspath $(RIOTCPU))
-override RIOTBOARD      := $(abspath $(RIOTBOARD))
 override RIOTMAKE       := $(abspath $(RIOTMAKE))
 override RIOTPKG        := $(abspath $(RIOTPKG))
 override RIOTTOOLS      := $(abspath $(RIOTTOOLS))
 override RIOTPROJECT    := $(abspath $(RIOTPROJECT))
 override GITCACHE       := $(abspath $(GITCACHE))
 override APPDIR         := $(abspath $(APPDIR))
+override BUILD_DIR      := $(abspath $(BUILD_DIR))
 override BINDIRBASE     := $(abspath $(BINDIRBASE))
 override BINDIR         := $(abspath $(BINDIR))
 override PKGDIRBASE     := $(abspath $(PKGDIRBASE))
 override DLCACHE_DIR    := $(abspath $(DLCACHE_DIR))
+
+# Keep standard make behavior for new variables
+__DIRECTORY_VARIABLES += \
+  BOARDSDIR \
+  #
+
+BOARDSDIR               := $(abspath $(BOARDSDIR))
 
 # Ensure that all directories are set and don't contain spaces.
 ifneq (, $(filter-out 1, $(foreach v,$(__DIRECTORY_VARIABLES),$(words $($(v))))))
@@ -65,18 +103,32 @@ ifneq (, $(filter-out 1, $(foreach v,$(__DIRECTORY_VARIABLES),$(words $($(v)))))
   $(error Make sure no path override is empty or contains spaces!)
 endif
 
-# Use absolute paths in recusive "make" even if overriden on command line.
-MAKEOVERRIDES += $(foreach v,$(__DIRECTORY_VARIABLES),$(v)=$($(v)))
-
 # Path to the current directory relative to RIOTPROJECT
 # trailing '/' is important when RIOTPROJECT == CURDIR
 BUILDRELPATH ?= $(patsubst $(RIOTPROJECT)/%,%,$(CURDIR)/)
 
-# get host operating system
-OS := $(shell uname)
+# Set CLEAN to "clean" if that target was requested.
+# Allows recipes to be run after cleaning, without triggering it implicitly:
+#
+# all: | $(CLEAN)
+#
+CLEAN = $(filter clean, $(MAKECMDGOALS))
+
+# include makefiles utils tools
+include $(RIOTMAKE)/utils/variables.mk
+include $(RIOTMAKE)/utils/strings.mk
+
+
+# UNAME is always needed so use simple variable expansion so only evaluated once
+UNAME := $(shell uname -m -s)
+OS = $(word 1, $(UNAME))
+OS_ARCH = $(word 2, $(UNAME))
 
 # set python path, e.g. for tests
 PYTHONPATH := $(RIOTBASE)/dist/pythonlibs/:$(PYTHONPATH)
+
+# Basic utilities included before anything else
+include $(RIOTMAKE)/utils/checks.mk
 
 # Include Docker settings near the top because we need to build the environment
 # command line before some of the variable origins are overwritten below when
@@ -89,7 +141,13 @@ include $(RIOTMAKE)/color.inc.mk
 # include concurrency helpers
 include $(RIOTMAKE)/info-nproc.inc.mk
 
-GLOBAL_GOALS := buildtest info-boards-supported info-boards-features-missing info-buildsizes info-buildsizes-diff
+# List of boards variables
+include $(RIOTMAKE)/boards.inc.mk
+
+# Debug targets for build system migration
+include $(RIOTMAKE)/dependencies_debug.inc.mk
+
+GLOBAL_GOALS += buildtest buildtest-indocker info-boards-supported info-boards-features-missing info-buildsizes info-buildsizes-diff
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
   BOARD=none
 endif
@@ -101,12 +159,29 @@ else
 
 all: link
 
+# Include Board and CPU configuration, if BOARD is not found in BOARDSDIR
+# e.g. when set by the environment fallback to searching in RIOTBOARD
+ifeq (,$(wildcard $(BOARDSDIR)/$(BOARD)/.))
+  ifneq ($(RIOTBOARD),$(BOARDSDIR))
+    # The specified board $(BOARD) was not found in $(BOARDSDIR) fallback to RIOTBOARD
+    BOARDSDIR = $(RIOTBOARD)
+  endif
+  ifeq ($(RIOTBOARD),$(BOARDSDIR))
+    ifeq (,$(wildcard $(BOARDSDIR)/$(BOARD)/.))
+      $(error The specified board $(BOARD) does not exist.)
+    endif
+  endif
+endif
+
 include $(RIOTMAKE)/info.inc.mk
 
 # Static code analysis tools provided by LLVM
 include $(RIOTMAKE)/scan-build.inc.mk
 
 export RIOTBUILD_CONFIG_HEADER_C = $(BINDIR)/riotbuild/riotbuild.h
+
+# Include Kconfig functionalities
+include $(RIOTMAKE)/kconfig.mk
 
 ifeq ($(OS),Darwin)
   OPEN   := open
@@ -133,20 +208,24 @@ ifeq ($(DEVELHELP),1)
   CFLAGS += -DDEVELHELP
 endif
 
+# Override LOG_LEVEL if variable is set and if CFLAGS doesn't already contain
+# a LOG_LEVEL config
+ifdef LOG_LEVEL
+  ifeq (,$(filter -DLOG_LEVEL=%,$(CFLAGS)))
+    CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
+  endif
+endif
+
 # Fail on warnings. Can be overridden by `make WERROR=0`.
 WERROR ?= 1
-export WERROR
 ifeq ($(WERROR),1)
   CFLAGS += -Werror
 endif
 
 WPEDANTIC ?= 0
-export WPEDANTIC
 ifeq ($(WPEDANTIC),1)
   CFLAGS += -Wpedantic
 endif
-
-ifneq (10,$(if $(RIOT_VERSION),1,0)$(if $(__RIOTBUILD_FLAG),1,0))
 
 # Provide a shallow sanity check. You cannot call `make` in a module directory.
 export __RIOTBUILD_FLAG := RIOT
@@ -199,9 +278,6 @@ LAZYSPONGE_FLAGS ?= $(if $(filter 1,$(QUIET)),,--verbose)
 ifeq (, $(APPLICATION))
     $(error An application name must be specified as APPLICATION.)
 endif
-ifneq (0,$(shell test -d $(RIOTBOARD)/$(BOARD); echo $$?))
-    $(error The specified board $(BOARD) does not exist.)
-endif
 
 # Use TOOLCHAIN environment variable to select the toolchain to use.
 # Default for macOS: llvm; for other OS: gnu
@@ -229,34 +305,37 @@ ifeq (,$(TOOLCHAIN))
 override TOOLCHAIN := gnu
 endif
 
-export TOOLCHAIN
 
 # default toolchain prefix, defaults to target triple followed by a dash, you
 # will most likely not need to touch this.
 export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
 
+# set default PROGRAMMER value if flashing a board on IoT-LAB
+# This must be done before parsing the Makefile.include of the board and cannot
+# be done in makefile.iotlab.single.inc.mk which is included after.
+ifneq (,$(IOTLAB_NODE))
+  PROGRAMMER ?= iotlab
+  # iotlab uses ELFFILE by default for flashing boards, except for WSN430.
+  ifeq (,$(filter wsn430-%,$(BOARD)))
+    FLASHFILE ?= $(ELFFILE)
+  endif
+endif
+
 # Add standard include directories
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 
 # process provided features
-include $(RIOTBOARD)/$(BOARD)/Makefile.features
+include $(RIOTBASE)/Makefile.features
 
 # mandatory includes!
 include $(RIOTMAKE)/pseudomodules.inc.mk
 include $(RIOTMAKE)/defaultmodules.inc.mk
 
 # Include Board and CPU configuration
-INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/$(BOARD)/include))
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
+INCLUDES += $(addprefix -I,$(wildcard $(BOARDSDIR)/$(BOARD)/include))
+include $(BOARDSDIR)/$(BOARD)/Makefile.include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
-
-# Sanity check
-# The check is only done after 'include $(RIOTBOARD)/$(BOARD)/Makefile.include'
-# because we need to have the 'CPU' variable defined
-ifeq (,$(filter $(RIOTCPU)/$(CPU)/Makefile.features,$(MAKEFILE_LIST)))
-  $(error $$(RIOTCPU)/$$(CPU)/Makefile.features must have been included by the board / board common Makefile.features)
-endif
 
 # Assume GCC/GNU as supported toolchain if CPU's Makefile.include doesn't
 # provide this macro
@@ -274,17 +353,11 @@ include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 # For more information, see http://petereisentraut.blogspot.com/2011/09/ccache-and-clang-part-2.html
 export CCACHE_CPP2=yes
 
-# get number of interfaces straight before resolving dependencies
-GNRC_NETIF_NUMOF ?= 1
-
-ifneq ($(GNRC_NETIF_NUMOF),1)
-  CFLAGS += -DGNRC_NETIF_NUMOF=$(GNRC_NETIF_NUMOF)
-endif
+# handle removal of default modules
+USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
 # process dependencies
-include $(RIOTBASE)/Makefile.dep
-
-USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
+include $(RIOTMAKE)/dependency_resolution.inc.mk
 
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
@@ -292,7 +365,7 @@ endif
 
 # set some settings useful for continuous integration builds
 ifeq ($(RIOT_CI_BUILD),1)
-    RIOT_VERSION_OVERRIDE:=buildtest
+    RIOT_VERSION ?= buildtest
     ifneq ($(filter $(BOARD_INSUFFICIENT_MEMORY), $(BOARD)),)
         $(info CI-build: skipping link step)
         RIOTNOLINK:=1
@@ -302,9 +375,10 @@ ifeq ($(RIOT_CI_BUILD),1)
 endif
 
 # if you want to publish the board into the sources as an uppercase #define
-BOARDDEF := $(shell echo $(BOARD) | tr 'a-z' 'A-Z' | tr '-' '_')
-CPUDEF := $(shell echo $(CPU) | tr 'a-z' 'A-Z' | tr '-' '_')
-MCUDEF := $(shell echo $(MCU) | tr 'a-z' 'A-Z' | tr '-' '_')
+BOARDDEF = $(call uppercase_and_underscore,$(BOARD))
+CPUDEF = $(call uppercase_and_underscore,$(CPU))
+MCUDEF = $(call uppercase_and_underscore,$(MCU))
+CFLAGS += -DRIOT_APPLICATION=\"$(APPLICATION)\"
 CFLAGS += -DBOARD_$(BOARDDEF)=\"$(BOARD)\" -DRIOT_BOARD=BOARD_$(BOARDDEF)
 CFLAGS += -DCPU_$(CPUDEF)=\"$(CPU)\" -DRIOT_CPU=CPU_$(CPUDEF)
 CFLAGS += -DMCU_$(MCUDEF)=\"$(MCU)\" -DRIOT_MCU=MCU_$(MCUDEF)
@@ -321,19 +395,13 @@ include $(RIOTMAKE)/cflags.inc.mk
 # Include VERSION for releases
 -include $(RIOTBASE)/VERSION
 
-# make the RIOT version available to the program
-ifeq ($(origin RIOT_VERSION), undefined)
-  GIT_STRING := $(shell git --git-dir="$(RIOTBASE)/.git" describe --always --abbrev=4 2> /dev/null)
-  ifneq (,$(GIT_STRING))
-    GIT_BRANCH := $(shell git --git-dir="$(RIOTBASE)/.git" rev-parse --abbrev-ref HEAD)
-    ifeq ($(strip $(GIT_BRANCH)),master)
-      RIOT_VERSION := $(GIT_STRING)
-    else
-      RIOT_VERSION := $(GIT_STRING)-$(GIT_BRANCH)
-    endif
-  else
-    RIOT_VERSION := 'UNKNOWN (builddir: $(RIOTBASE))'
-  endif
+include $(RIOTMAKE)/git_version.inc.mk
+RIOT_VERSION ?= $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
+
+# Deprecate using RIOT_VERSION_OVERRIDE but currently keep the behavior
+ifneq (,$(RIOT_VERSION_OVERRIDE))
+  $(warning 'RIOT_VERSION_OVERRIDE' is deprecated, it can now be set with 'RIOT_VERSION' directly.)
+  RIOT_VERSION = $(RIOT_VERSION_OVERRIDE)
 endif
 
 # Set module by prepending APPLICATION name with 'application_'.
@@ -346,16 +414,12 @@ BASELIBS += $(APPDEPS)
 
 
 # add extra include paths for packages in $(USEMODULE)
-export USEMODULE_INCLUDES =
+USEMODULE_INCLUDES =
 
 include $(RIOTBASE)/sys/Makefile.include
 include $(RIOTBASE)/drivers/Makefile.include
 
 # include Makefile.includes for packages in $(USEPKG)
-$(RIOTPKG)/%/Makefile.include::
-	$(Q)"$(MAKE)" -C $(RIOTPKG)/$* Makefile.include
-
-$(USEPKG:%=$(RIOTPKG)/%/Makefile.include): FORCE
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 
 # include external modules configuration
@@ -381,8 +445,8 @@ include $(RIOTMAKE)/bindist.inc.mk
 include $(RIOTMAKE)/modules.inc.mk
 
 
-.PHONY: all link clean flash flash-only term doc debug debug-server reset objdump help info-modules
-.PHONY: print-size elffile binfile hexfile
+.PHONY: all link clean flash flash-only termdeps term doc debug debug-server reset objdump help info-modules
+.PHONY: print-size elffile binfile hexfile flashfile
 .PHONY: ..in-docker-container
 
 # Targets that depend on FORCE will always be rebuilt. Contrary to a .PHONY
@@ -400,14 +464,39 @@ include $(RIOTMAKE)/modules.inc.mk
 # https://www.gnu.org/software/make/manual/html_node/Force-Targets.html
 .PHONY: FORCE
 
+ifneq (,$(IOTLAB_NODE))
+  # iot-lab serial and flasher
+  include $(RIOTBASE)/dist/testbed-support/makefile.iotlab.single.inc.mk
+endif
+
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
 BINFILE ?= $(ELFFILE:.elf=.bin)
+
+ifneq (,$(filter suit, $(USEMODULE)))
+  include $(RIOTMAKE)/suit.base.inc.mk
+endif
+
+# include bootloaders support. It should be included early to allow using
+# variables defined in `riotboot.mk` for `FLASHFILE` before it is evaluated.
+# It should be included after defining 'BINFILE' for 'riotboot.bin' handling.
+include $(RIOTMAKE)/boot/riotboot.mk
 
 # Targets to get given file
 elffile: $(ELFFILE)
 hexfile: $(HEXFILE)
 binfile: $(BINFILE)
+# FLASHFILE is the file used by the flasher
+# Usually set to $(ELFFILE), $(HEXFILE) or $(BINFILE) in the board/flasher
+# or application specific files
+flashfile: $(FLASHFILE)
+
+ifeq (,$(FLASHFILE))
+  $(error FLASHFILE is not defined for this board: $(FLASHFILE))
+endif
+
+# By default always build ELFFILE and FLASHFILE
+BUILD_FILES += $(ELFFILE) $(FLASHFILE)
 
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
@@ -437,7 +526,7 @@ ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
 else
 ifeq (,$(RIOTNOLINK))
-link: ..compiler-check ..build-message $(ELFFILE) $(HEXFILE) print-size
+link: ..compiler-check ..build-message $(BUILD_FILES) print-size
 else
 link: ..compiler-check ..build-message $(BASELIBS)
 endif # RIOTNOLINK
@@ -446,7 +535,8 @@ $(ELFFILE): $(BASELIBS)
 	$(Q)$(_LINK) -o $@
 
 $(BINDIR)/$(APPLICATION_MODULE).a: pkg-build $(BUILDDEPS)
-	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
+	$(Q)DIRS="$(DIRS)" APPLICATION_BLOBS="$(BLOBS)" \
+	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
 $(BINDIR)/$(APPLICATION_MODULE).a: FORCE
 
 # Other modules are built by application.inc.mk and packages building
@@ -465,6 +555,50 @@ print-size: $(ELFFILE)
 
 endif # BUILD_IN_DOCKER
 
+# Rules to check the correctness of thin archives.
+
+# OS independant relpath as 'realpath --relative-to' is not supported on OSx
+relpath = $(shell python3 -c 'import pathlib; print(pathlib.Path("$1").relative_to("$(CURDIR)"))')
+
+# Each ARCHECK file contains all the absolute paths found inside the archive.
+BASELIB_ARCHECKS = $(patsubst %.a,%.a-check,$(filter %.a,$(BASELIBS)))
+
+# For each a file, print the absolute paths found inside it
+# If "ar t" is called with an absolute path it will print an abs path regardless
+# of how the archive is internally
+# In case of a malformed archive, ar prints to stderr (and sets an error code).
+# Doing `2>&1` is hacky, the correct thing would be to get the exit code.
+# The `| %.a` is necessary to be able to check file produced in docker.
+%.a-check: %.a
+	$(Q)$(AR) t $(call relpath,$<) 2>&1 | grep '^/' | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
+
+# There's no point on keeping files whose content is later copied to another file
+.INTERMEDIATE: $(BASELIB_ARCHECKS)
+
+ARCHIVE_CHECK = $(BINDIR)/$(APPLICATION).archive-check
+
+$(ARCHIVE_CHECK): $(BASELIB_ARCHECKS)
+	$(Q)cat $^ | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
+
+# Rule to check if thin archives are correctly produced, that is, with a correct
+# relative path.
+ifeq ($(BUILD_IN_DOCKER),1)
+archive-check: ..in-docker-container
+else
+archive-check: $(ARCHIVE_CHECK) FORCE
+	@if [ -s '$<' ] ; then \
+		$(COLOR_ECHO) '$(COLOR_RED)Found the following absolute paths in archives' ;\
+		cat '$<';\
+		$(COLOR_ECHO) '$(COLOR_RESET)' ;\
+		exit 1;\
+	elif [ -f '$<' ] ; then \
+		$(COLOR_ECHO) '$(COLOR_GREEN)Archives correctly formed$(COLOR_RESET)' ;\
+	else \
+		$(COLOR_ECHO) '$(COLOR_RED)Unexpected error (file not found)$(COLOR_RESET)' ;\
+		exit 1;\
+	fi
+endif # BUILD_IN_DOCKER
+
 # Check given command is available in the path
 #   check_cmd 'command' 'description'
 define check_cmd
@@ -474,6 +608,16 @@ define check_cmd
 	    exit 1;}
 endef
 
+# Check if setsid command is available on the system for debug target
+# This is not the case on MacOSX, so it must be built on the fly
+ifneq (,$(filter debug, $(MAKECMDGOALS)))
+  ifneq (0,$(shell which setsid 2>&1 > /dev/null ; echo $$?))
+    SETSID = $(RIOTTOOLS)/setsid/setsid
+    $(call target-export-variables,debug,$(SETSID))
+    DEBUGDEPS += $(SETSID)
+  endif
+endif
+
 ..compiler-check:
 	$(call check_cmd,$(CC),Compiler)
 
@@ -482,9 +626,7 @@ endef
 	@$(COLOR_ECHO)
 
 # The `clean` needs to be serialized before everything else.
-ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(BUILDDEPS): clean
-endif
+all $(BASELIBS) $(BUILDDEPS) ..in-docker-container: | $(CLEAN)
 
 .PHONY: pkg-prepare pkg-build pkg-build-%
 pkg-prepare:
@@ -511,21 +653,38 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
-# if make target != 'flash-only', add target 'all' to ensure build before flash
-ifeq (,$(filter flash-only, $(MAKECMDGOALS)))
-  BUILD_BEFORE_FLASH = all
-endif
+# Define flash-recipe with a default value
+define default-flash-recipe
+  $(call check_cmd,$(FLASHER),Flash program)
+  $(FLASHER) $(FFLAGS)
+endef
+flash-recipe ?= $(default-flash-recipe)
 
-flash: $(BUILD_BEFORE_FLASH) $(FLASHDEPS)
-	$(call check_cmd,$(FLASHER),Flash program)
-	$(FLASHER) $(FFLAGS)
+# Do not add dependencies to "flash" directly, use FLASHDEPS, as this is shared
+# with flash-only too
 
-flash-only: flash
+flash: all $(FLASHDEPS)
+	$(flash-recipe)
+
+flash-only: $(FLASHDEPS)
+	$(flash-recipe)
 
 preflash: $(BUILD_BEFORE_FLASH)
 	$(PREFLASHER) $(PREFFLAGS)
 
-term: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
+TERMFLASHDEPS ?= $(filter flash flash-only,$(MAKECMDGOALS))
+# Add TERMFLASHDEPS to TERMDEPS so it also applies to `test`
+TERMDEPS += $(TERMFLASHDEPS)
+termdeps: $(TERMDEPS)
+
+term: $(TERMDEPS)
+	$(call check_cmd,$(TERMPROG),Terminal program)
+	$(TERMPROG) $(TERMFLAGS)
+
+# Term without the pyterm added logging
+# PYTERMFLAGS must be exported for `jlink.sh term-rtt`.
+cleanterm: export PYTERMFLAGS += --no-reconnect --noprefix --no-repeat-command-on-empty-line
+cleanterm: $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	$(TERMPROG) $(TERMFLAGS)
 
@@ -535,7 +694,7 @@ list-ttys:
 doc:
 	make -BC $(RIOTBASE) doc
 
-debug:
+debug: $(DEBUGDEPS)
 	$(call check_cmd,$(DEBUGGER),Debug program)
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
@@ -551,12 +710,42 @@ reset:
 	$(call check_cmd,$(RESET),Reset program)
 	$(RESET) $(RESET_FLAGS)
 
-TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*),\
+.PHONY: test test/available
+TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*[^~]),\
                         $(shell test -f $(file) -a -x $(file) && echo $(file)))
+
+# "make test" calls "make term" which would implicitly build it's dependencies,
+# but that increases the time "make test" needs to get ready. That can cause
+# problems ("make term" missing some lines) as terminal startup is not properly
+# sychronized, but depends on a static timeout (TESTRUNNER_START_DELAY).
+# Murdock builds the term dependencies before running "make test" to circumvent
+# this. In order to make local builds behave similar, add the term deps here.
+# See #11762.
+TEST_DEPS += $(TERMDEPS)
+
+# Export TESTRUNNER_RESET_AFTER_TERM only for the test target. This allows for
+# it to be accessed through the environment from python test script.
+# This is currently needed only by `examples/%/tests` and should be removed in
+# the future since `make reset` after `term` is not a valid synch method across
+# all platforms.
+$(call target-export-variables,test,TESTRUNNER_RESET_AFTER_TERM)
 test: $(TEST_DEPS)
 	$(Q) for t in $(TESTS); do \
 		$$t || exit 1; \
 	done
+
+test/available:
+	$(Q)test -n "$(strip $(TESTS))"
+
+# this target only makes sense if an ELFFILE is actually created, thus guard by
+# RIOTNOLINK="".
+ifeq (,$(RIOTNOLINK))
+test-input-hash: $(TESTS) $(ELFFILE) $(TEST_EXTRA_FILES)
+	sha1sum $^ > $(BINDIR)/test-input-hash.sha1
+else
+test-input-hash:
+	true
+endif
 
 # Default OBJDUMPFLAGS for platforms which do not specify it:
 OBJDUMPFLAGS ?= -S -D -h
@@ -565,15 +754,8 @@ objdump:
 	$(call check_cmd,$(OBJDUMP),Objdump program)
 	$(OBJDUMP) $(OBJDUMPFLAGS) $(ELFFILE) | less
 
-# Generate an XML file containing all macro definitions and include paths for
-# use in Eclipse CDT
-.PHONY: eclipsesym eclipsesym.xml
-eclipsesym: $(CURDIR)/eclipsesym.xml
-eclipsesym.xml: $(CURDIR)/eclipsesym.xml
-
-$(CURDIR)/eclipsesym.xml: FORCE
-	$(Q)printf "%s\n" $(CC) $(CFLAGS_WITH_MACROS) $(INCLUDES) | \
-		$(RIOTTOOLS)/eclipsesym/cmdline2xml.sh > $@
+# Support Eclipse IDE.
+include $(RIOTMAKE)/eclipse.inc.mk
 
 # Export variables used throughout the whole make system:
 include $(RIOTMAKE)/vars.inc.mk
@@ -595,17 +777,23 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   endif
 
   # Test if all feature requirements were met by the selected board.
-  ifneq (, $(filter-out $(FEATURES_PROVIDED) $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED)))
+  ifneq (,$(FEATURES_MISSING))
     $(shell $(COLOR_ECHO) "$(COLOR_RED)There are unsatisfied feature requirements:$(COLOR_RESET)"\
-                          "$(sort $(filter-out $(FEATURES_PROVIDED) $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED)))" 1>&2)
+                          "$(FEATURES_MISSING)" 1>&2)
+    EXPECT_ERRORS := 1
+  endif
+
+  # Test if no feature in the requirements used is blacklisted for the selected board.
+  ifneq (,$(FEATURES_USED_BLACKLISTED))
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)Some feature requirements are blacklisted:$(COLOR_RESET)"\
+                          "$(FEATURES_USED_BLACKLISTED)" 1>&2)
     EXPECT_ERRORS := 1
   endif
 
   # Test if any used feature conflict with another one.
-  CONFLICT := $(foreach var,$(FEATURES_CONFLICT),$(if $(filter $(words $(subst :, ,$(var))),$(words $(filter $(FEATURES_USED),$(subst :, ,$(var))))),$(subst :, ,$(var))))
-  ifneq (, $(strip $(CONFLICT)))
+  ifneq (,$(FEATURES_CONFLICTING))
     $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)The following features may conflict:$(COLOR_RESET)"\
-                          "$(COLOR_GREEN)$(sort $(filter $(FEATURES_USED), $(CONFLICT)))$(COLOR_RESET)" 1>&2)
+                          "$(FEATURES_CONFLICTING)" 1>&2)
     ifneq (, $(FEATURES_CONFLICT_MSG))
         $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Rationale: $(COLOR_RESET)$(FEATURES_CONFLICT_MSG)" 1>&2)
     endif
@@ -646,38 +834,14 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
     $(shell $(COLOR_ECHO) "\n$(COLOR_YELLOW)EXPECT undesired behaviour!$(COLOR_RESET)" 1>&2)
   endif
 
+  # Fail by default when errors are expected
+  CONTINUE_ON_EXPECTED_ERRORS ?= 0
   ifneq (, $(EXPECT_ERRORS))
+    ifneq (1,$(CONTINUE_ON_EXPECTED_ERRORS))
+      $(error You can let the build continue on expected errors by setting CONTINUE_ON_EXPECTED_ERRORS=1 to the command line)
+    endif
     $(shell $(COLOR_ECHO) "\n\n$(COLOR_RED)EXPECT ERRORS!$(COLOR_RESET)\n\n" 1>&2)
   endif
-
-endif
-
-else # RIOT_VERSION
-
-  export __RIOTBUILD_FLAG := RIOT
-
-  NUM_RIOT_VERSION := $(shell cd $(RIOTBASE) && git rev-parse --verify --short "$(RIOT_VERSION)" 2>/dev/null)
-  ifeq (, $(NUM_RIOT_VERSION))
-    $(error The supplied RIOT_VERSION=$(RIOT_VERSION) is invalid!)
-  endif
-
-  all $(filter-out clean, $(MAKECMDGOALS)): ..delegate
-  ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    all $(filter-out clean, $(MAKECMDGOALS)): clean
-  endif
-
-  clean:
-	-$(Q)rm -rf $(BINDIR)
-
-  $(BINDIR)/riot-version/$(NUM_RIOT_VERSION)/Makefile.include:
-	$(Q)rm -rf $(@D)
-	$(Q)mkdir -p $(@D)
-	$(Q)cd $(RIOTBASE) && git archive --format=tar $(NUM_RIOT_VERSION) | ( cd $(@D) && tar x 1>&2 )
-
-  ..delegate: $(BINDIR)/riot-version/$(NUM_RIOT_VERSION)/Makefile.include
-	@$(COLOR_ECHO) '$(COLOR_GREEN)Using RIOT_VERSION=$(NUM_RIOT_VERSION)$(COLOR_RESET)' 1>&2
-	@$(COLOR_ECHO)
-	$(MAKE) RIOTBASE=$(<D) $(filter-out clean, $(MAKECMDGOALS))
 
 endif
 
@@ -689,32 +853,37 @@ ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
     include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
   endif
 endif
-ifneq (,$(IOTLAB_NODE))
-  # iot-lab serial and flasher
-  include $(RIOTBASE)/dist/testbed-support/makefile.iotlab.single.inc.mk
-endif
 
 # Include desvirt Makefile
 include $(RIOTTOOLS)/desvirt/Makefile.desvirt
 
 # Build a header file with all common macro definitions and undefinitions
-# make it depend on FORCE to re-run of the script every time even if the file exists
-# The script will only touch the file if anything has changed since last time.
-$(RIOTBUILD_CONFIG_HEADER_C): FORCE
+# Everytime the header is updated, it will trigger a new compilation.
+#
+# The file is created first through a `.in` file that will be modified if
+# any CFLAGS changed. It depends on FORCE to re-run of the script every time
+# even if the file exists but the file will only be updated on modifications.
+#
+# The header is then created by keeping only the macros. Keeping the
+# comments added absolute path in the file that screwed caching.
+#
+# The rebuild behavior could even only be done with an empty file, but currently
+# some macros definitions are passed through this file.
+$(RIOTBUILD_CONFIG_HEADER_C): $(RIOTBUILD_CONFIG_HEADER_C).in
+	$(Q)sed -n -e '1i\
+/* Generated file do not edit */' -e '/^#.*/ p' $< > $@
+
+.SECONDARY: $(RIOTBUILD_CONFIG_HEADER_C).in
+$(RIOTBUILD_CONFIG_HEADER_C).in: FORCE | $(CLEAN)
 	@mkdir -p '$(dir $@)'
 	$(Q)'$(RIOTTOOLS)/genconfigheader/genconfigheader.sh' $(CFLAGS_WITH_MACROS) \
 		| '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
 
-CFLAGS_WITH_MACROS := $(CFLAGS)
+CFLAGS_WITH_MACROS += $(CFLAGS)
+CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
+# MODULE_NAME defines. Declared in 'makefiles/modules.inc.mk'
+CFLAGS_WITH_MACROS += $(EXTDEFINES)
 
-ifneq (,$(RIOT_VERSION_OVERRIDE))
-export CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION_OVERRIDE)\"
-else
-export CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
-endif
-
-CFLAGS := $(patsubst -D%,,$(CFLAGS))
-CFLAGS := $(patsubst -U%,,$(CFLAGS))
 CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
 
 # include mcuboot support
@@ -737,3 +906,8 @@ ifneq ($(_BASELIBS_VALUE_BEFORE_USAGE),$(BASELIBS))
 endif
 
 endif # BOARD=none
+
+# include RIOT_MAKEFILES_GLOBAL_POST configuration files
+# allows setting user specific system wide configuration parsed after the body
+# of $(RIOTBASE)/Makefile.include
+include $(RIOT_MAKEFILES_GLOBAL_POST)

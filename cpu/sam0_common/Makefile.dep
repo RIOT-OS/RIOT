@@ -1,0 +1,11 @@
+ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
+  USEMODULE += tsrb
+endif
+
+# All SAM0 based CPUs provide PM
+USEMODULE += pm_layered
+
+# include sam0 common periph drivers
+USEMODULE += sam0_common_periph
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

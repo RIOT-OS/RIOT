@@ -52,6 +52,8 @@ static uint8_t _dev_addr[] = { 0x6c, 0x5d, 0xff, 0x73, 0x84, 0x6f };
 static const uint8_t _test_dst[] = { 0xf5, 0x19, 0x9a, 0x1d, 0xd8, 0x8f };
 static const uint8_t _test_src[] = { 0x41, 0x9b, 0x9f, 0x56, 0x36, 0x46 };
 
+static gnrc_netif_t _netif;
+
 static char _mac_stack[_MAC_STACKSIZE];
 static netdev_test_t _dev;
 static msg_t _main_msg_queue[_MAIN_MSG_QUEUE_SIZE];
@@ -115,7 +117,7 @@ static int test_send(void)
         return 0;
     }
     /* send packet to MAC layer */
-    gnrc_netapi_send(_mac_pid, pkt);
+    gnrc_netif_send(gnrc_netif_get_by_pid(_mac_pid), pkt);
     /* wait for packet status and check */
     msg_receive(&msg);
     if ((msg.type != GNRC_NETERR_MSG_TYPE) ||
@@ -152,7 +154,7 @@ static int test_receive(void)
     /* register for GNRC_NETTYPE_UNDEF */
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &me);
     /* fire ISR event */
-    _dev.netdev.event_callback((netdev_t *)&_dev.netdev, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr((netdev_t *)&_dev.netdev);
     /* wait for packet from MAC layer*/
     msg_receive(&msg);
     /* check message */
@@ -258,8 +260,9 @@ int main(void)
     netdev_test_set_send_cb(&_dev, _dev_send);
     netdev_test_set_get_cb(&_dev, NETOPT_ADDRESS, _dev_get_addr);
     netdev_test_set_set_cb(&_dev, NETOPT_ADDRESS, _dev_set_addr);
-    _mac_pid = gnrc_netif_ethernet_create(_mac_stack, _MAC_STACKSIZE, _MAC_PRIO,
-                                          "netdev_test", (netdev_t *)&_dev)->pid;
+    gnrc_netif_ethernet_create(&_netif, _mac_stack, _MAC_STACKSIZE, _MAC_PRIO,
+                                         "netdev_test", (netdev_t *)&_dev);
+    _mac_pid = _netif.pid;
 
     /* test execution */
     EXECUTE(test_get_addr);

@@ -98,7 +98,7 @@ static constfs_file_t constfs_files[] = {
 
 /* this is the constfs specific descriptor */
 static constfs_t constfs_desc = {
-    .nfiles = sizeof(constfs_files) / sizeof(constfs_files[0]),
+    .nfiles = ARRAY_SIZE(constfs_files),
     .files = constfs_files,
 };
 

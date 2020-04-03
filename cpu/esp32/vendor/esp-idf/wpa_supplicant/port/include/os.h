@@ -19,6 +19,11 @@
 extern "C" {
 #endif
 
+#ifdef RIOT_VERSION
+#include "syscalls.h"
+#define os_memset   system_secure_memset
+#endif
+
 #include "esp_types.h"
 #include <string.h>
 #include <stdio.h>

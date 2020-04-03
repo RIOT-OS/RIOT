@@ -19,6 +19,8 @@
 #ifndef PRIV_NIB_ROUTER_H
 #define PRIV_NIB_ROUTER_H
 
+#include <kernel_defines.h>
+
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/netif/ipv6.h"
@@ -31,7 +33,7 @@
 extern "C" {
 #endif
 
-#if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) || defined(DOXYGEN)
 /**
  * @brief   Initializes interface for router behavior
  *
@@ -43,12 +45,16 @@ static inline void _init_iface_router(gnrc_netif_t *netif)
     netif->ipv6.last_ra = UINT32_MAX;
     netif->ipv6.ra_sent = 0;
     netif->flags |= GNRC_NETIF_FLAGS_IPV6_FORWARDING;
-#if !GNRC_IPV6_NIB_CONF_6LR || GNRC_IPV6_NIB_CONF_6LBR
-    netif->flags |= GNRC_NETIF_FLAGS_IPV6_RTR_ADV;
-#endif  /* !GNRC_IPV6_NIB_CONF_6LR || GNRC_IPV6_NIB_CONF_6LBR */
-#if GNRC_IPV6_NIB_CONF_6LBR
-    netif->flags |= GNRC_NETIF_FLAGS_6LO_ABR;
-#endif  /* GNRC_IPV6_NIB_CONF_6LBR */
+
+    if (!IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR) ||
+        IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
+        netif->flags |= GNRC_NETIF_FLAGS_IPV6_RTR_ADV;
+    }
+
+    if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
+        netif->flags |= GNRC_NETIF_FLAGS_6LO_ABR;
+    }
+
     gnrc_netif_ipv6_group_join_internal(netif, &ipv6_addr_all_routers_link_local);
 }
 
@@ -56,6 +62,8 @@ static inline void _init_iface_router(gnrc_netif_t *netif)
  * @brief   Helper function to safely call the
  *          [route info callback](@ref gnrc_netif_ipv6_t::route_info_cb) of an
  *          interface
+ *
+ * @pre `netif != NULL`.
  *
  * @param[in] netif     An interface.
  * @param[in] type      [Type](@ref net_gnrc_ipv6_nib_route_info_type) of the
@@ -67,6 +75,7 @@ static inline void _call_route_info_cb(gnrc_netif_t *netif, unsigned type,
                                        const ipv6_addr_t *ctx_addr,
                                        const void *ctx)
 {
+    assert(netif != NULL);
     if (netif->ipv6.route_info_cb != NULL) {
         netif->ipv6.route_info_cb(type, ctx_addr, ctx);
     }
@@ -99,7 +108,7 @@ void _set_rtr_adv(gnrc_netif_t *netif);
 /**
  * @brief   Send router advertisements
  *
- * If @ref GNRC_IPV6_NIB_CONF_MULTIHOP_P6C is not 0 this sends one router
+ * If @ref CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C is not 0 this sends one router
  * advertisement per configured ABR, otherwise it just sends one single router
  * advertisement for the interface.
  *
@@ -110,7 +119,7 @@ void _set_rtr_adv(gnrc_netif_t *netif);
  */
 void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst,
                   bool final);
-#else  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#else  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 #define _init_iface_router(netif)                       (void)netif
 #define _call_route_info_cb(netif, type, ctx_addr, ctx) (void)netif; \
                                                         (void)type; \
@@ -122,7 +131,7 @@ void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst,
 #define _snd_rtr_advs(netif, dst, final)                (void)netif; \
                                                         (void)dst; \
                                                         (void)final
-#endif /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 
 #ifdef __cplusplus
 }

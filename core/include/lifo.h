@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup  core_util
+ * @ingroup     core_util
  * @{
  *
  * @file
@@ -24,7 +24,7 @@
 #define LIFO_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**

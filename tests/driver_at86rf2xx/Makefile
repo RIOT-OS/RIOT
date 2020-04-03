@@ -1,9 +1,6 @@
 include ../Makefile.tests_common
 
-# exclude boards with insufficient memory
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
-
-DISABLE_MODULE += auto_init
+DISABLE_MODULE += auto_init_at86rf2xx
 
 USEMODULE += od
 USEMODULE += shell

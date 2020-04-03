@@ -17,7 +17,7 @@
 #ifndef CC26X0_PRCM_H
 #define CC26X0_PRCM_H
 
-#include <cc26x0.h>
+#include <cc26xx_cc13xx.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -140,7 +140,7 @@ typedef struct {
 
 #define AUXCLK_SRC_HF               0x1 /* SCLK for AUX */
 #define AUXCLK_SRC_LF               0x4
-#define AUXCLK_SRC_mask             0x7 /* garuanteed to be glitchless */
+#define AUXCLK_SRC_mask             0x7 /* guaranteed to be glitchless */
 #define AUXCLK_SCLK_HF_DIV_pos      8 /* don't set while SCLK_HF active for AUX */
 #define AUXCLK_SCLK_HF_DIV_mask     0x700 /* divisor will be 2^(value+1) */
 #define AUXCLK_PWR_DWN_SRC_pos      11 /* SCLK_LF in powerdown when SCLK_HF is source (no clock elsewise?!)  */
@@ -201,6 +201,40 @@ typedef struct {
 /*@}*/
 
 #define AON_WUC ((aon_wuc_regs_t *) (AON_WUC_BASE)) /**< AON_WUC register bank */
+
+/**
+ * AON_RTC registers
+ */
+typedef struct {
+    reg32_t CTL; /**< Control */
+    reg32_t EVFLAGS; /**< Event Flags, RTC Status */
+    reg32_t SEC; /**< Second Counter Value, Integer Part */
+    reg32_t SUBSEC; /**< Second Counter Value, Fractional Part */
+    reg32_t SUBSECINC; /**< Subseconds Increment */
+    reg32_t CHCTL; /**< Channel Configuration */
+    reg32_t CH0CMP; /**< Channel 0 Compare Value */
+    reg32_t CH1CMP; /**< Channel 1 Compare Value */
+    reg32_t CH2CMP; /**< Channel 2 Compare Value */
+    reg32_t CH2CMPINC; /**< Channel 2 Compare Value Auto-increment */
+    reg32_t CH1CAPT; /**< Channel 1 Capture Value */
+    reg32_t SYNC; /**< AON Synchronization */
+} aon_rtc_regs_t;
+
+/**
+ * @brief   RTC_UPD is a 16 KHz signal used to sync up the radio timer. The
+ *          16 Khz is SCLK_LF divided by 2
+ * @details 0h = RTC_UPD signal is forced to 0
+ *          1h = RTC_UPD signal is toggling @16 kHz
+ */
+#define AON_RTC_CTL_RTC_UPD_EN 0x00000002
+
+/** @ingroup cpu_specific_peripheral_memory_map
+  * @{
+  */
+#define AON_RTC_BASE (PERIPH_BASE + 0x92000) /**< AON_RTC base address */
+/** @} */
+
+#define AON_RTC ((aon_rtc_regs_t *) (AON_RTC_BASE)) /**< AON_RTC register bank */
 
 
 /**
@@ -303,15 +337,21 @@ typedef struct {
 #define PDSTAT1_CPU_ON      0x2
 #define PDSTAT1_RFC_ON      0x4
 #define PDSTAT1_VIMS_ON     0x8
+
+#define GPIOCLKGR_CLK_EN       0x1
+#define I2CCLKGR_CLK_EN        0x1
+#define UARTCLKGR_CLK_EN_UART0 0x1
 /** @} */
 
 /** @ingroup cpu_specific_peripheral_memory_map
   * @{
   */
-#define PRCM_BASE       0x40082000 /**< PRCM base address */
+#define PRCM_BASE        (PERIPH_BASE + 0x82000) /**< PRCM base address */
+#define PRCM_BASE_NONBUF (PERIPH_BASE_NONBUF + 0x82000) /**< PRCM base address (nonbuf) */
 /*@}*/
 
-#define PRCM ((prcm_regs_t *) (PRCM_BASE)) /**< PRCM register bank */
+#define PRCM        ((prcm_regs_t *) (PRCM_BASE)) /**< PRCM register bank */
+#define PRCM_NONBUF ((prcm_regs_t *) (PRCM_BASE_NONBUF)) /**< PRCM register bank (nonbuf) */
 
 #ifdef __cplusplus
 } /* end extern "C" */

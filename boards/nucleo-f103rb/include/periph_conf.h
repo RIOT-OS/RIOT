@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f103rb STM32 Nucleo-F103RB
- * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F103RB
+ * @ingroup     boards_nucleo-f103rb
  * @{
  *
  * @file
@@ -57,13 +55,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name ADC configuration
- * @{
- */
-#define ADC_NUMOF           (0)
-/** @} */
-
-/**
  * @name   Timer configuration
  * @{
  */
@@ -87,7 +78,7 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_0_ISR         isr_tim2
 #define TIMER_1_ISR         isr_tim3
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -125,14 +116,13 @@ static const uart_conf_t uart_config[] = {
 #define UART_1_ISR          (isr_usart1)
 #define UART_2_ISR          (isr_usart3)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
  * @name    Real time counter configuration
  * @{
  */
-#define RTT_NUMOF           (1U)
 #define RTT_IRQ_PRIO        1
 
 #define RTT_DEV             RTC
@@ -144,7 +134,8 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
+ * @note    This board may require external pullup resistors for i2c operation.
  * @{
  */
 static const i2c_conf_t i2c_config[] = {
@@ -173,7 +164,7 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_0_ISR           isr_i2c1_ev
 #define I2C_1_ISR           isr_i2c2_ev
 
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**
@@ -221,7 +212,7 @@ static const spi_conf_t spi_config[] = {
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 #ifdef __cplusplus

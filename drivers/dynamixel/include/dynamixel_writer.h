@@ -52,7 +52,7 @@ void dynamixel_writer_init(dynamixel_writer_t *writer, uint8_t *buffer, size_t l
  *
  * @param[out] writer    the packet writer
  *
- * @return the begining address of the buffer
+ * @return the beginning address of the buffer
  */
 const uint8_t *dynamixel_writer_get_data(const dynamixel_writer_t *writer);
 

@@ -71,6 +71,11 @@ typedef uint32_t gpio_t;
 #define TIMER_CHANNELS      (3)
 
 /**
+ * @brief   The RTT width is fixed to 32-bit
+ */
+#define RTT_MAX_VALUE       (0xffffffff)
+
+/**
  * @brief   Generate GPIO mode bitfields
  *
  * We use 3 bit to determine the pin functions:
@@ -149,6 +154,7 @@ typedef enum {
     GPIO_MUX_B = 1,         /**< alternate function B */
 } gpio_mux_t;
 
+#ifndef DOXYGEN
 /**
  * @brief   Override default SPI modes
  * @{
@@ -175,7 +181,9 @@ typedef enum {
     SPI_CLK_10MHZ  = (10000000)                     /**< 10MHz */
 } spi_clk_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
+#ifndef DOXYGEN
 /**
  * @brief   Override ADC resolution values
  * @{
@@ -190,6 +198,7 @@ typedef enum {
     ADC_RES_16BIT = 0x8                     /**< not applicable */
 } adc_res_t;
 /** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Timer configuration data

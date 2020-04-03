@@ -28,7 +28,7 @@ In terms of hardware support, the following drivers have been implemented:
     * LEDs
     * Buttons
     * ADC
-    * RF switch to programatically drive either 2.4GHz or sub-1GHz to a single RP-SMA
+    * RF switch to programmatically drive either 2.4GHz or sub-1GHz to a single RP-SMA
     * RF 2.4GHz built-in in CC2538
 
 And under work or pending at cc2538 base cpu:
@@ -67,7 +67,7 @@ Else install from <https://launchpad.net/gcc-arm-embedded>
 Drivers
 -------
 The RE-Mote features a CP2104 serial-to-USB module, the driver is commonly found in most OS, but if required it can be downloaded
-from <https://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx>
+from <https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers>
 
 
 ### For the CC2538EM (USB CDC-ACM)
@@ -105,7 +105,7 @@ More Reading
 2. [CC2538 System-on-Chip Solution for 2.4-GHz IEEE 802.15.4 and ZigBee applications (SWRU319B)][cc2538]
 3. [CC1200 sub-1GHz RF transceiver][cc1200]
 
-[remote-site]: https://zolertia.io/product/re-mote-suite/ "Zolertia RE-Mote"
+[remote-site]: https://zolertia.io/product/re-mote/ "Zolertia RE-Mote"
 [zolertia-wiki]: https://github.com/Zolertia/Resources/wiki
 [cc1200]: http://www.ti.com/product/cc1200     "CC1200"
 [cc2538]: http://www.ti.com/product/cc2538     "CC2538"

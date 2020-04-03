@@ -1,3 +1,0 @@
-USEMODULE += crypto
-USEMODULE += cipher_modes
-CFLAGS += -DCRYPTO_THREEDES

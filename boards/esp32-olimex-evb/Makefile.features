@@ -2,8 +2,9 @@
 include $(RIOTBOARD)/common/esp32/Makefile.features
 
 # additional features provided by the board (no ADC and no DAC)
-FEATURES_PROVIDED += periph_adc
-FEATURES_PROVIDED += periph_dac
+ifneq (,$(filter olimex_esp32_gateway,$(USEMODULE)))
+    FEATURES_PROVIDED += periph_adc
+endif
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_spi

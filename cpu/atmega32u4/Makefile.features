@@ -1,0 +1,2 @@
+# atmega_common provides atmega_pcint0
+include $(RIOTCPU)/atmega_common/Makefile.features

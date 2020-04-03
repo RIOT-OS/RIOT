@@ -37,6 +37,7 @@ int main(void)
     msg_init_queue(msg_queue, MSG_QUEUE_LENGTH);
 
     puts("[START]");
+
     /* add message to own queue */
     for (int idx = 0; idx < MSG_QUEUE_LENGTH; ++idx) {
         msges[idx].type = idx;

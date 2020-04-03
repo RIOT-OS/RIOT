@@ -1,7 +1,18 @@
-export CPU_ARCH = cortex-m0plus
-export CPU_FAM  = samd21
-
-USEMODULE += pm_layered
+ifneq (,$(filter samd21%a,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAMD21A
+endif
+ifneq (,$(filter samd21%b,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAMD21B
+endif
+ifneq (,$(filter samd21%c,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAMD21C
+endif
+ifneq (,$(filter samd21%d,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAMD21D
+endif
+ifneq (,$(filter samr21%,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAMR21
+endif
 
 include $(RIOTCPU)/sam0_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk

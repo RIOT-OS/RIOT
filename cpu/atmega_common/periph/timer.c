@@ -33,11 +33,6 @@
 #include "debug.h"
 
 /**
- * @brief   All timers have three channels
- */
-#define CHANNELS (3)
-
-/**
  * @brief   We have 5 possible prescaler values
  */
 #define PRESCALE_NUMOF (5U)
@@ -137,7 +132,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (channel >= CHANNELS) {
+    if (channel >= TIMER_CHANNELS) {
         return -1;
     }
 
@@ -145,12 +140,12 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     *ctx[tim].flag &= ~(1 << (channel + OCF1A));
     *ctx[tim].mask |= (1 << (channel + OCIE1A));
 
-    return 1;
+    return 0;
 }
 
 int timer_clear(tim_t tim, int channel)
 {
-    if (channel >= CHANNELS) {
+    if (channel >= TIMER_CHANNELS) {
         return -1;
     }
 
@@ -181,7 +176,7 @@ static inline void _isr(tim_t tim, int chan)
     DEBUG_TIMER_PORT |= (1 << DEBUG_TIMER_PIN);
 #endif
 
-    __enter_isr();
+    atmega_enter_isr();
 
     *ctx[tim].mask &= ~(1 << (chan + OCIE1A));
     ctx[tim].cb(ctx[tim].arg, chan);
@@ -190,7 +185,7 @@ static inline void _isr(tim_t tim, int chan)
     DEBUG_TIMER_PORT &= ~(1 << DEBUG_TIMER_PIN);
 #endif
 
-    __exit_isr();
+    atmega_exit_isr();
 }
 #endif
 

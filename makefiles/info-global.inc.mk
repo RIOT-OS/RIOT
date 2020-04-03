@@ -1,48 +1,97 @@
 .PHONY: info-buildsizes info-buildsizes-diff info-features-missing \
         info-boards-features-missing
 
+# Perform dependency resolution without having included
+# $(RIOTBASE)/Makefile.features for now. This results in no optional modules and
+# no architecture specific handling being done. The result will be a subset of
+# used modules and requirements that is present in for *all* boards, so this can
+# be cached to speed up individual dependency checks
+include $(RIOTMAKE)/defaultmodules.inc.mk
+# add default modules
+USEMODULE += $(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE))
+include $(RIOTMAKE)/dependency_resolution.inc.mk
+
+BOARDSDIR_GLOBAL := $(BOARDSDIR)
 USEMODULE_GLOBAL := $(USEMODULE)
 USEPKG_GLOBAL := $(USEPKG)
 FEATURES_REQUIRED_GLOBAL := $(FEATURES_REQUIRED)
 FEATURES_OPTIONAL_GLOBAL := $(FEATURES_OPTIONAL)
-DISABLE_MODULE_GLOBAL := $(DISABLE_MODULE_GLOBAL)
+FEATURES_CONFLICT_GLOBAL := $(FEATURES_CONFLICT)
+FEATURES_CONFLICT_MSG_GLOBAL := $(FEATURES_MSG_CONFLICT)
+DISABLE_MODULE_GLOBAL := $(DISABLE_MODULE)
+DEFAULT_MODULE_GLOBAL := $(DEFAULT_MODULE)
+FEATURES_BLACKLIST_GLOBAL := $(FEATURES_BLACKLIST)
 
-define board_missing_features
+define board_unsatisfied_features
   BOARD             := $(1)
+  BOARDSDIR         := $(BOARDSDIR_GLOBAL)
   USEMODULE         := $(USEMODULE_GLOBAL)
   USEPKG            := $(USEPKG_GLOBAL)
   DISABLE_MODULE    := $(DISABLE_MODULE_GLOBAL)
+  DEFAULT_MODULE    := $(DEFAULT_MODULE_GLOBAL)
   FEATURES_REQUIRED := $(FEATURES_REQUIRED_GLOBAL)
   FEATURES_OPTIONAL := $(FEATURES_OPTIONAL_GLOBAL)
-  FEATURES_MISSING  :=
+  FEATURES_CONFLICT := $(FEATURES_CONFLICT_GLOBAL)
+  FEATURES_CONFLICT_MSG := $(FEATURES_CONFLICT_MSG_GLOBAL)
+  FEATURES_BLACKLIST:= $(FEATURES_BLACKLIST_GLOBAL)
+
+  # Remove board specific variables set by Makefile.features/Makefile.dep
   FEATURES_PROVIDED :=
-  include $$(RIOTBOARD)/$(1)/Makefile.features
-  ifdef BUILDTEST_MCU_GROUP
-    ifneq ($(BUILDTEST_MCU_GROUP), $$(FEATURES_MCU_GROUP))
-      BOARDS_FEATURES_MISSING += "$(1) $(BUILDTEST_MCU_GROUP)"
+  FEATURES_USED :=
+
+  # Undefine variables that must not be defined when starting.
+  # Some are sometime set as `?=`
+  undefine CPU
+  undefine CPU_MODEL
+  undefine CPU_ARCH
+  undefine CPU_FAM
+
+  # Replicate Makefile.include handling that sets BOARDSDIR to RIOTBOARD
+  # when BOARD is not found in BOARDSDIR
+  ifeq (,$(wildcard $(BOARDSDIR_GLOBAL)/$(BOARD)/.))
+    BOARDSDIR = $(RIOTBOARD)
+  endif
+
+  include $(RIOTBASE)/Makefile.features
+  # FEATURES_USED must be populated first in this case so that dependency
+  # resolution can take optional features into account during the first pass.
+  # Also: This allows us to skip resolution if already a missing feature is
+  # detected
+  include $(RIOTMAKE)/features_check.inc.mk
+  ifneq (,$$(FEATURES_MISSING))
+    # Skip full dependency resolution, as even without optional modules features
+    # and architecture specific limitations already some features are missing
+    BOARDS_FEATURES_MISSING += "$(1) $$(FEATURES_MISSING)"
     BOARDS_WITH_MISSING_FEATURES += $(1)
+  else
+    include $(RIOTMAKE)/dependency_resolution.inc.mk
+
+    ifneq (,$$(FEATURES_MISSING))
+      BOARDS_FEATURES_MISSING += "$(1) $$(FEATURES_MISSING)"
+      BOARDS_WITH_MISSING_FEATURES += $(1)
+    endif
+
+    ifneq (,$$(FEATURES_USED_BLACKLISTED))
+      BOARDS_FEATURES_USED_BLACKLISTED += "$(1) $$(FEATURES_USED_BLACKLISTED)"
+      BOARDS_WITH_BLACKLISTED_FEATURES += $(1)
     endif
   endif
 
-  include $(RIOTBASE)/Makefile.dep
-
-  FEATURES_MISSING := $$(sort $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED)))
-  ifneq (, $$(FEATURES_MISSING))
-    BOARDS_FEATURES_MISSING += "$(1) $$(FEATURES_MISSING)"
-    ifneq (, $$(filter-out $$(FEATURES_OPTIONAL), $$(FEATURES_MISSING)))
-      BOARDS_WITH_MISSING_FEATURES += $(1)
-    endif
+  ifneq (,$$(DEPENDENCY_DEBUG))
+    $$(call file_save_dependencies_variables,dependencies_info-boards-supported)
   endif
 endef
 
-BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name "common" -exec basename {} \;)
 BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
 BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
 
 BOARDS_WITH_MISSING_FEATURES :=
 BOARDS_FEATURES_MISSING :=
-$(foreach BOARD, $(BOARDS), $(eval $(call board_missing_features,$(BOARD))))
-BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES), $(BOARDS))
+BOARDS_WITH_BLACKLISTED_FEATURES :=
+BOARDS_FEATURES_USED_BLACKLISTED :=
+
+$(foreach BOARD, $(BOARDS), $(eval $(call board_unsatisfied_features,$(BOARD))))
+BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES) $(BOARDS_WITH_BLACKLISTED_FEATURES), $(BOARDS))
 
 info-buildsizes: SHELL=bash
 info-buildsizes:
@@ -80,3 +129,7 @@ info-boards-supported:
 
 info-boards-features-missing:
 	@for f in $(BOARDS_FEATURES_MISSING); do echo $${f}; done | column -t
+
+# Reset BOARDSDIR so unchanged for makefiles included after, for now only
+# needed for buildtests.inc.mk
+BOARDSDIR := $(BOARDSDIR_GLOBAL)

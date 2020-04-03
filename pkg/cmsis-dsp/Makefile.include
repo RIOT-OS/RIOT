@@ -1,1 +1,1 @@
-INCLUDES += -I$(PKGDIRBASE)/cmsis-dsp/include
+INCLUDES += -I$(PKGDIRBASE)/cmsis-dsp/CMSIS/DSP/Include

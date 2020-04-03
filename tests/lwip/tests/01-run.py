@@ -14,6 +14,7 @@ import subprocess
 import time
 import types
 import pexpect
+import socket
 
 DEFAULT_TIMEOUT = 5
 
@@ -82,7 +83,7 @@ class Board(object):
             pass
 
         if (name == "native") and (reset is None):
-                reset = _reset_native_execute
+            reset = _reset_native_execute
 
         self.name = name
         self.port = port
@@ -180,12 +181,14 @@ class TestStrategy(ApplicationStrategy):
                 test_case(board_group, self.app_dir, env=None)
                 sys.stdout.write('.')
                 sys.stdout.flush()
+                # wait a bit for tear down of test case
+                time.sleep(.2)
             print()
 
 
 def get_ipv6_address(spawn):
     spawn.sendline(u"ifconfig")
-    spawn.expect(u"[A-Za-z0-9]{2}_[0-9]+:  inet6 (fe80::[0-9a-f:]+)")
+    spawn.expect(r"[A-Za-z0-9]{2}_[0-9]+:  inet6 (fe80::[0-9a-f:]+)\s")
     return spawn.match.group(1)
 
 
@@ -233,8 +236,8 @@ def test_udpv6_send(board_group, application, env=None):
         # wait for neighbor discovery to be done
         time.sleep(5)
         sender.sendline(u"udp send %s %d ab:cd:ef" % (receiver_ip, port))
-        sender.expect_exact(u"Success: send 3 byte over UDP to [%s]:%d" %
-                            (receiver_ip, port))
+        sender.expect_exact("Success: send 3 byte over UDP to [{}]:{}"
+                            .format(receiver_ip, port))
         receiver.expect(u"00000000  AB  CD  EF")
 
 
@@ -266,6 +269,53 @@ def test_tcpv6_send(board_group, application, env=None):
         client.sendline(u"tcp disconnect")
         client.sendline(u"tcp send affe:abe")
         client.expect_exact(u"could not send")
+
+
+def test_tcpv6_multiconnect(board_group, application, env=None):
+    if any(b.name != "native" for b in board_group.boards):
+        # run test only with native
+        print("SKIP_TEST INFO found non-native board")
+        return
+    env_client = os.environ.copy()
+    if env is not None:
+        env_client.update(env)
+    env_client.update(board_group.boards[0].to_env())
+    env_server = os.environ.copy()
+    if env is not None:
+        env_server.update(env)
+    env_server.update(board_group.boards[1].to_env())
+    with pexpect.spawnu("make", ["-C", application, "term"], env=env_client,
+                        timeout=DEFAULT_TIMEOUT) as client, \
+        pexpect.spawnu("make", ["-C", application, "term"], env=env_server,
+                       timeout=DEFAULT_TIMEOUT) as server:
+        port = random.randint(0x0000, 0xffff)
+        server_ip = get_ipv6_address(server)
+        client_ip = get_ipv6_address(client)
+
+        try:
+            connect_addr = socket.getaddrinfo(
+                "%s%%tapbr0" % server_ip, port)[0][4]
+        except socket.gaierror as e:
+            print("SKIP_TEST INFO", e)
+            return
+        server.sendline(u"tcp server start %d" % port)
+        # wait for neighbor discovery to be done
+        time.sleep(5)
+        client.sendline(u"tcp connect %s %d" % (server_ip, port))
+        server.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % client_ip)
+        with socket.socket(socket.AF_INET6) as sock:
+            sock.connect(connect_addr)
+            server.expect(u"Error on TCP accept \\[-[0-9]+\\]")
+        client.sendline(u"tcp disconnect")
+        server.expect(u"TCP connection to \\[%s\\]:[0-9]+ reset" % client_ip)
+        client.sendline(u"tcp connect %s %d" % (server_ip, port))
+        server.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % client_ip)
+        client.sendline(u"tcp disconnect")
+        server.expect(u"TCP connection to \\[%s\\]:[0-9]+ reset" % client_ip)
+        with socket.socket(socket.AF_INET6) as sock:
+            sock.connect(connect_addr)
+            server.expect(u"TCP client \\[[0-9a-f:]+\\]:[0-9]+ connected")
+        server.expect(u"TCP connection to \\[[0-9a-f:]+\\]:[0-9]+ reset")
 
 
 def test_triple_send(board_group, application, env=None):
@@ -312,4 +362,4 @@ if __name__ == "__main__":
     TestStrategy().execute([BoardGroup((Board("native", "tap0"),
                             Board("native", "tap1")))],
                            [test_ipv6_send, test_udpv6_send, test_tcpv6_send,
-                            test_triple_send])
+                            test_tcpv6_multiconnect, test_triple_send])

@@ -23,7 +23,10 @@ int gpio_init(gpio_t pin, gpio_mode_t mode) {
   (void) pin;
   (void) mode;
 
-  return -1;
+  if (mode >= GPIO_OUT)
+    return 0;
+  else
+    return -1;
 }
 
 int gpio_read(gpio_t pin) {

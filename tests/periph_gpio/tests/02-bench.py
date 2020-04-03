@@ -10,10 +10,11 @@ import sys
 from testrunner import run
 
 
-def testfunc(child):
-    child.expect_exact("GPIO peripheral driver test")
-    child.expect_exact(">")
+# On slow platforms, like AVR, this test can take some time to complete.
+TIMEOUT = 30
 
+
+def testfunc(child):
     for pin in range(0, 8):
         child.sendline("bench 0 {}".format(pin))
         child.expect(r" *nop loop: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
@@ -33,4 +34,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.exit(run(testfunc, timeout=10))
+    sys.exit(run(testfunc, timeout=TIMEOUT))

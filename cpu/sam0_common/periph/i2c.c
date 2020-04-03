@@ -22,6 +22,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <errno.h>
 
@@ -44,7 +45,7 @@
 #define BUSSTATE_OWNER SERCOM_I2CM_STATUS_BUSSTATE(2)
 #define BUSSTATE_BUSY SERCOM_I2CM_STATUS_BUSSTATE(3)
 
-#if defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
+#if defined(CPU_SAML21) || defined(CPU_SAML1X) || defined(CPU_SAMD5X)
 #define SERCOM_I2CM_CTRLA_MODE_I2C_MASTER SERCOM_I2CM_CTRLA_MODE(5)
 #endif
 
@@ -91,20 +92,7 @@ void i2c_init(i2c_t dev)
     sercom_clk_en(bus(dev));
 
     /* I2C using CLK GEN 0 */
-    sercom_set_gen(bus(dev),i2c_config[dev].gclk_src);
-#if defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
-    /* GCLK_ID_SLOW is shared for SERCOM[0..4] */
-    GCLK->PCHCTRL[(sercom_id(bus(dev)) < 5 ?
-                  SERCOM0_GCLK_ID_SLOW : SERCOM5_GCLK_ID_SLOW)].reg =
-    (GCLK_PCHCTRL_CHEN | i2c_config[dev].gclk_src  );
-    while (GCLK->SYNCBUSY.bit.GENCTRL) {}
-#else
-    /* GCLK_SERCOMx_SLOW is shared for all sercom */
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
-                         i2c_config[dev].gclk_src |
-                         SERCOM0_GCLK_ID_SLOW);
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
-#endif
+    sercom_set_gen(bus(dev), i2c_config[dev].gclk_src);
 
     /* Check if module is enabled. */
     if (bus(dev)->CTRLA.reg & SERCOM_I2CM_CTRLA_ENABLE) {
@@ -149,7 +137,7 @@ void i2c_init(i2c_t dev)
             return;
     }
     /* Get the baudrate */
-    tmp_baud = (int32_t)(((CLOCK_CORECLOCK +
+    tmp_baud = (int32_t)(((sam0_gclk_freq(i2c_config[dev].gclk_src) +
                (2 * (i2c_config[dev].speed)) - 1) /
                (2 * (i2c_config[dev].speed))) -
                (i2c_config[dev].speed == I2C_SPEED_HIGH ? 1 : 5));
@@ -177,11 +165,10 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
     mutex_unlock(&locks[dev]);
-    return 0;
 }
 
 int i2c_read_bytes(i2c_t dev, uint16_t addr,

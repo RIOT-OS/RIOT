@@ -1,0 +1,4 @@
+humanize
+pygdbmi
+pyserial
+progressbar

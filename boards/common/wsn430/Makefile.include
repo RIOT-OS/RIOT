@@ -1,11 +1,5 @@
-# select the used CPU
-export CPU = msp430fxyz
-export CPU_MODEL = msp430f1611
-
-# include this module in the build
-USEMODULE += boards_common_wsn430
 # use common wsn430 includes
-export INCLUDES += -I$(RIOTBOARD)/common/wsn430/include
+INCLUDES += -I$(RIOTBOARD)/common/wsn430/include
 
 # configure the serial interface
 PORT_LINUX ?= /dev/ttyUSB0
@@ -13,8 +7,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # configure the flash tool
-export FLASHER = mspdebug
-export FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
-
-# Use the HEXFILE when using iot-lab.single.inc.mk
-IOTLAB_FLASHFILE = $(HEXFILE)
+FLASHER = mspdebug
+FLASHFILE ?= $(HEXFILE)
+FFLAGS = -d $(PROG_DEV) -j uif "prog $(FLASHFILE)"

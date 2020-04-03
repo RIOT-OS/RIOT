@@ -54,6 +54,20 @@ extern "C"
 /** @} */
 
 /**
+ * @name    Button pin definitions
+ * @{
+ */
+/* SW2, SW3 will short these pins to ground when pushed. PTA4 has an external
+ * pull-up resistor to VDD, but there is no external pull resistor on PTC6 */
+/* BTN0 is mapped to SW2 */
+#define BTN0_PIN            GPIO_PIN(PORT_C,  6)
+#define BTN0_MODE           GPIO_IN_PU
+/* BTN1 is mapped to SW3 */
+#define BTN1_PIN            GPIO_PIN(PORT_A,  4)
+#define BTN1_MODE           GPIO_IN_PU
+/** @} */
+
+/**
  * @name    FXOS8700CQ 3-axis accelerometer and magnetometer bus configuration
  * @{
  */

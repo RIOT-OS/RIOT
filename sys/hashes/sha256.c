@@ -223,7 +223,9 @@ void sha256_update(sha256_context_t *ctx, const void *data, size_t len)
 
     /* Handle the case where we don't need to perform any transforms */
     if (len < 64 - r) {
-        memcpy(&ctx->buf[r], data, len);
+        if (len > 0) {
+            memcpy(&ctx->buf[r], data, len);
+        }
         return;
     }
 

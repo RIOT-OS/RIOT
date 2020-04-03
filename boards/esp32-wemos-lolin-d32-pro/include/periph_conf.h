@@ -140,8 +140,8 @@
  *
  * @{
  */
-#ifndef SPI0_DEV
-#define SPI0_DEV    VSPI    /**< VSPI is used as SPI_DEV(0) */
+#ifndef SPI0_CTRL
+#define SPI0_CTRL   VSPI    /**< VSPI is used as SPI_DEV(0) */
 #endif
 #ifndef SPI0_SCK
 #define SPI0_SCK    GPIO18  /**< VSPI SCK */
@@ -170,7 +170,7 @@
 /**
  * @name   UART configuration
  *
- * ESP32 provides 3 UART interaces at maximum:
+ * ESP32 provides 3 UART interfaces at maximum:
  *
  * UART_DEV(0) uses fixed standard configuration.<br>
  * UART_DEV(1) is not used.<br>

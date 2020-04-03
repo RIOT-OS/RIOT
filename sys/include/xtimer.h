@@ -29,13 +29,23 @@
 #ifndef XTIMER_H
 #define XTIMER_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include "timex.h"
+#ifdef MODULE_CORE_MSG
 #include "msg.h"
+#endif /* MODULE_CORE_MSG */
 #include "mutex.h"
+#include "kernel_types.h"
 
+#ifdef MODULE_ZTIMER_XTIMER_COMPAT
+#include "ztimer/xtimer_compat.h"
+#else
+
+#ifndef MODULE_XTIMER_ON_ZTIMER
 #include "board.h"
 #include "periph_conf.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,8 +79,10 @@ typedef void (*xtimer_callback_t)(void*);
  */
 typedef struct xtimer {
     struct xtimer *next;         /**< reference to next timer in timer lists */
-    uint32_t target;             /**< lower 32bit absolute target time */
-    uint32_t long_target;        /**< upper 32bit absolute target time */
+    uint32_t offset;             /**< lower 32bit offset time */
+    uint32_t long_offset;        /**< upper 32bit offset time */
+    uint32_t start_time;         /**< lower 32bit absolute start time */
+    uint32_t long_start_time;    /**< upper 32bit absolute start time */
     xtimer_callback_t callback;  /**< callback function to call when timer
                                      expires */
     void *arg;                   /**< argument to pass to callback function */
@@ -145,6 +157,15 @@ static inline void xtimer_sleep(uint32_t seconds);
 static inline void xtimer_usleep(uint32_t microseconds);
 
 /**
+ * @brief Pause the execution of a thread for some microseconds
+ *
+ * See xtimer_usleep() for more information.
+ *
+ * @param[in] microseconds  the amount of microseconds the thread should sleep
+ */
+static inline void xtimer_usleep64(uint64_t microseconds);
+
+/**
  * @brief Stop execution of a thread for some time
  *
  * Don't expect nanosecond accuracy. As of now, this function just calls
@@ -208,50 +229,12 @@ static inline void xtimer_spin(xtimer_ticks32_t ticks);
 static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup, uint32_t period);
 
 /**
- * @brief Set a timer that sends a message
- *
- * This function sets a timer that will send a message @p offset ticks
- * from now.
- *
- * The mesage struct specified by msg parameter will not be copied, e.g., it
- * needs to point to valid memory until the message has been delivered.
- *
- * @param[in] timer         timer struct to work with.
- *                          Its xtimer_t::target and xtimer_t::long_target
- *                          fields need to be initialized with 0 on first use.
- * @param[in] offset        microseconds from now
- * @param[in] msg           ptr to msg that will be sent
- * @param[in] target_pid    pid the message will be sent to
- */
-static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid);
-
-/**
- * @brief Set a timer that sends a message, 64bit version
- *
- * This function sets a timer that will send a message @p offset microseconds
- * from now.
- *
- * The mesage struct specified by msg parameter will not be copied, e.g., it
- * needs to point to valid memory until the message has been delivered.
- *
- * @param[in] timer         timer struct to work with.
- *                          Its xtimer_t::target and xtimer_t::long_target
- *                          fields need to be initialized with 0 on first use.
- * @param[in] offset        microseconds from now
- * @param[in] msg           ptr to msg that will be sent
- * @param[in] target_pid    pid the message will be sent to
- */
-static inline void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid);
-
-/**
  * @brief Set a timer that wakes up a thread
  *
  * This function sets a timer that will wake up a thread when the timer has
  * expired.
  *
  * @param[in] timer         timer struct to work with.
- *                          Its xtimer_t::target and xtimer_t::long_target
- *                          fields need to be initialized with 0 on first use
  * @param[in] offset        microseconds from now
  * @param[in] pid           pid of the thread that will be woken up
  */
@@ -264,8 +247,6 @@ static inline void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pi
  * expired.
  *
  * @param[in] timer         timer struct to work with.
- *                          Its xtimer_t::target and xtimer_t::long_target
- *                          fields need to be initialized with 0 on first use
  * @param[in] offset        microseconds from now
  * @param[in] pid           pid of the thread that will be woken up
  */
@@ -284,8 +265,6 @@ static inline void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_
  * know *exactly* what that means.
  *
  * @param[in] timer     the timer structure to use.
- *                      Its xtimer_t::target and xtimer_t::long_target
- *                      fields need to be initialized with 0 on first use
  * @param[in] offset    time in microseconds from now specifying that timer's
  *                      callback's execution time
  */
@@ -305,8 +284,6 @@ static inline void xtimer_set(xtimer_t *timer, uint32_t offset);
  * know *exactly* what that means.
  *
  * @param[in] timer       the timer structure to use.
- *                        Its xtimer_t::target and xtimer_t::long_target
- *                        fields need to be initialized with 0 on first use
  * @param[in] offset_us   time in microseconds from now specifying that timer's
  *                        callback's execution time
  */
@@ -320,28 +297,6 @@ static inline void xtimer_set64(xtimer_t *timer, uint64_t offset_us);
  * @param[in] timer ptr to timer structure that will be removed
  */
 void xtimer_remove(xtimer_t *timer);
-
-/**
- * @brief receive a message blocking but with timeout
- *
- * @param[out] msg      pointer to a msg_t which will be filled in case of
- *                      no timeout
- * @param[in]  timeout  timeout in microseconds relative
- *
- * @return     < 0 on error, other value otherwise
- */
-static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout);
-
-/**
- * @brief receive a message blocking but with timeout, 64bit version
- *
- * @param[out] msg      pointer to a msg_t which will be filled in case of no
- *                      timeout
- * @param[in]  timeout  timeout in microseconds relative
- *
- * @return     < 0 on error, other value otherwise
- */
-static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
 
 /**
  * @brief Convert microseconds to xtimer ticks
@@ -450,8 +405,6 @@ static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b);
 /**
  * @brief lock a mutex but with timeout
  *
- * @note this requires core_thread_flags to be enabled
- *
  * @param[in]    mutex  mutex to lock
  * @param[in]    us     timeout in microseconds relative
  *
@@ -460,6 +413,7 @@ static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b);
  */
 int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
 
+#if defined(MODULE_CORE_THREAD_FLAGS) || defined(DOXYGEN)
 /**
  * @brief    Set timeout thread flag after @p timeout
  *
@@ -470,6 +424,73 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
  * @param[in]   timeout timeout in usec
  */
 void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
+
+/**
+ * @brief    Set timeout thread flag after @p timeout
+ *
+ * See xtimer_set_timeout_flag() for more information.
+ *
+ * @param[in]   t       timer struct to use
+ * @param[in]   timeout timeout in usec
+ */
+void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout);
+#endif
+
+#if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
+/**
+ * @brief Set a timer that sends a message
+ *
+ * This function sets a timer that will send a message @p offset ticks
+ * from now.
+ *
+ * The message struct specified by msg parameter will not be copied, e.g., it
+ * needs to point to valid memory until the message has been delivered.
+ *
+ * @param[in] timer         timer struct to work with.
+ * @param[in] offset        microseconds from now
+ * @param[in] msg           ptr to msg that will be sent
+ * @param[in] target_pid    pid the message will be sent to
+ */
+static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid);
+
+/**
+ * @brief Set a timer that sends a message, 64bit version
+ *
+ * This function sets a timer that will send a message @p offset microseconds
+ * from now.
+ *
+ * The message struct specified by msg parameter will not be copied, e.g., it
+ * needs to point to valid memory until the message has been delivered.
+ *
+ * @param[in] timer         timer struct to work with.
+ * @param[in] offset        microseconds from now
+ * @param[in] msg           ptr to msg that will be sent
+ * @param[in] target_pid    pid the message will be sent to
+ */
+static inline void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid);
+
+/**
+ * @brief receive a message blocking but with timeout
+ *
+ * @param[out] msg      pointer to a msg_t which will be filled in case of
+ *                      no timeout
+ * @param[in]  timeout  timeout in microseconds relative
+ *
+ * @return     < 0 on error, other value otherwise
+ */
+static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout);
+
+/**
+ * @brief receive a message blocking but with timeout, 64bit version
+ *
+ * @param[out] msg      pointer to a msg_t which will be filled in case of no
+ *                      timeout
+ * @param[in]  timeout  timeout in microseconds relative
+ *
+ * @return     < 0 on error, other value otherwise
+ */
+static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
+#endif
 
 /**
  * @brief xtimer backoff value
@@ -483,29 +504,6 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 #define XTIMER_BACKOFF 30
 #endif
 
-/**
- * @brief xtimer overhead value, in hardware ticks
- *
- * This value specifies the time a timer will be late if uncorrected, e.g.,
- * the system-specific xtimer execution time from timer ISR to executing
- * a timer's callback's first instruction.
- *
- * E.g., with XTIMER_OVERHEAD == 0
- * start=xtimer_now();
- * xtimer_set(&timer, X);
- * (in callback:)
- * overhead=xtimer_now()-start-X;
- *
- * xtimer automatically substracts XTIMER_OVERHEAD from a timer's target time,
- * but when the timer triggers, xtimer will spin-lock until a timer's target
- * time is reached, so timers will never trigger early.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#ifndef XTIMER_OVERHEAD
-#define XTIMER_OVERHEAD 20
-#endif
-
 #ifndef XTIMER_ISR_BACKOFF
 /**
  * @brief   xtimer IRQ backoff time, in hardware ticks
@@ -516,29 +514,6 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
  * This is supposed to be defined per-device in e.g., periph_conf.h.
  */
 #define XTIMER_ISR_BACKOFF 20
-#endif
-
-#ifndef XTIMER_PERIODIC_SPIN
-/**
- * @brief   xtimer_periodic_wakeup spin cutoff
- *
- * If the difference between target time and now is less than this value, then
- * xtimer_periodic_wakeup will use xtimer_spin instead of setting a timer.
- */
-#define XTIMER_PERIODIC_SPIN (XTIMER_BACKOFF * 2)
-#endif
-
-#ifndef XTIMER_PERIODIC_RELATIVE
-/**
- * @brief   xtimer_periodic_wakeup relative target cutoff
- *
- * If the difference between target time and now is less than this value, then
- * xtimer_periodic_wakeup will set a relative target time in the future instead
- * of the true target.
- *
- * This is done to prevent target time underflows.
- */
-#define XTIMER_PERIODIC_RELATIVE (512)
 #endif
 
 /*
@@ -647,6 +622,8 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* MODULE_XTIMER_ON_ZTIMER */
 
 /** @} */
 #endif /* XTIMER_H */

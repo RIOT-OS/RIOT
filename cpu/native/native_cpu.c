@@ -208,6 +208,8 @@ void isr_thread_yield(void)
 
 void thread_yield_higher(void)
 {
+    sched_context_switch_request = 1;
+
     if (_native_in_isr == 0) {
         ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
         _native_in_isr = 1;
@@ -223,9 +225,6 @@ void thread_yield_higher(void)
             err(EXIT_FAILURE, "thread_yield_higher: swapcontext");
         }
         irq_enable();
-    }
-    else {
-        sched_context_switch_request = 1;
     }
 }
 

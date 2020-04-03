@@ -25,8 +25,6 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-#include "irq.h"
-
 #include "net/lora.h"
 
 #include "sx127x.h"
@@ -83,26 +81,18 @@ uint8_t sx127x_reg_read(const sx127x_t *dev, uint8_t addr)
 void sx127x_reg_write_burst(const sx127x_t *dev, uint8_t addr, uint8_t *buffer,
                             uint8_t size)
 {
-    unsigned int cpsr;
-
     spi_acquire(dev->params.spi, SPI_CS_UNDEF, SX127X_SPI_MODE, SX127X_SPI_SPEED);
-    cpsr = irq_disable();
 
     gpio_clear(dev->params.nss_pin);
     spi_transfer_regs(dev->params.spi, SPI_CS_UNDEF, addr | 0x80, (char *) buffer, NULL, size);
     gpio_set(dev->params.nss_pin);
 
-    irq_restore(cpsr);
     spi_release(dev->params.spi);
 }
 
 void sx127x_reg_read_burst(const sx127x_t *dev, uint8_t addr, uint8_t *buffer,
                            uint8_t size)
 {
-    unsigned int cpsr;
-
-    cpsr = irq_disable();
-
     spi_acquire(dev->params.spi, SPI_CS_UNDEF, SX127X_SPI_MODE, SX127X_SPI_SPEED);
 
     gpio_clear(dev->params.nss_pin);
@@ -110,8 +100,6 @@ void sx127x_reg_read_burst(const sx127x_t *dev, uint8_t addr, uint8_t *buffer,
     gpio_set(dev->params.nss_pin);
 
     spi_release(dev->params.spi);
-
-    irq_restore(cpsr);
 }
 
 void sx127x_write_fifo(const sx127x_t *dev, uint8_t *buffer, uint8_t size)

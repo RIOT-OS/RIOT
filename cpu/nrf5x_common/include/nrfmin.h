@@ -21,7 +21,7 @@
  *    -> we define host byte order := network byte order
  *
  * The driver is using a Nordic proprietary physical layer, configured to a
- * bitrate of 2Mbit. The maximum payload length can be freely configured, but
+ * bitrate of 1 Mbit/s. The maximum payload length can be freely configured, but
  * the maximal supported value is 250 byte (default is 200 byte).
  *
  * We define the nrfmin link layer to use 16-bit addresses. On the physical
@@ -161,16 +161,6 @@ uint16_t nrfmin_get_addr(void);
  * @param[in] addr      address to set
  */
 void nrfmin_set_addr(uint16_t addr);
-
-/**
- * @brief   Get a pseudo 64-bit long address (needed by IPv6 and 6LoWPAN)
- *
- * As we do not support 64-bit addresses, we just make one up, for this we
- * simply return 4 times concatenated the 16-bit address.
- *
- * @param[out] addr     64-bit pseudo long address, as array of 4 * 16-bit
- */
-void nrfmin_get_pseudo_long_addr(uint16_t *addr);
 
 /**
  * @brief   Get the IID build from the 16-bit node address

@@ -1,0 +1,3 @@
+MODULE = qcbor
+
+include $(RIOTBASE)/Makefile.base

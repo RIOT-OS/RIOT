@@ -40,9 +40,6 @@ static rtc_alarm_cb_t _cb;
 /* Argument to alarm callback */
 static void *_cb_arg;
 
-/* internal function to set time based on time_t */
-static void _rtc_set(time_t time);
-
 void RTC_IRQHandler(void) __attribute__((interrupt("IRQ")));
 
 void rtc_init(void)
@@ -56,11 +53,15 @@ void rtc_init(void)
 
     RTC_CCR = CCR_CLKSRC;                   /* Clock from external 32 kHz Osc. */
 
-    /* initialize clock with valid unix compatible values
-     * If RTC_YEAR contains an value larger unix time_t we must reset. */
-    if (RTC_YEAR > 2037) {
-        _rtc_set(0);
+    /* Initialize clock to a a sane and predictable default
+     * after cold boot or external reset.
+     */
+    if ((RSIR == RSIR_POR) || (RSIR == (RSIR_POR | RSIR_EXTR))) {
+        struct tm localt = { .tm_year = 70 };
+        rtc_set_time(&localt);
     }
+
+    rtc_poweron();
 
     DEBUG("%2lu.%2lu.%4lu  %2lu:%2lu:%2lu\n",
             RTC_DOM, RTC_MONTH, RTC_YEAR, RTC_HOUR, RTC_MIN, RTC_SEC);
@@ -75,6 +76,9 @@ int rtc_set_time(struct tm *localt)
     if (localt == NULL) {
         return -1;
     }
+
+    /* normalize input */
+    rtc_tm_normalize(localt);
 
     /* set clock */
     RTC_SEC = localt->tm_sec;
@@ -109,8 +113,10 @@ int rtc_get_time(struct tm *localt)
 
 int rtc_set_alarm(struct tm *localt, rtc_alarm_cb_t cb, void *arg)
 {
-    (void) arg;
     if (localt != NULL) {
+        /* normalize input */
+        rtc_tm_normalize(localt);
+
         RTC_ALSEC = localt->tm_sec;
         RTC_ALMIN = localt->tm_min;
         RTC_ALHOUR = localt->tm_hour;
@@ -119,11 +125,12 @@ int rtc_set_alarm(struct tm *localt, rtc_alarm_cb_t cb, void *arg)
         RTC_ALDOY = localt->tm_yday;
         RTC_ALMON = localt->tm_mon + 1;
         RTC_ALYEAR = localt->tm_year;
-        RTC_AMR = 0;                                            /* set wich alarm fields to check */
+        RTC_AMR = 0;                                            /* set which alarm fields to check */
         DEBUG("alarm set %2lu.%2lu.%4lu  %2lu:%2lu:%2lu\n",
               RTC_ALDOM, RTC_ALMON, RTC_ALYEAR, RTC_ALHOUR, RTC_ALMIN, RTC_ALSEC);
 
         _cb = cb;
+        _cb_arg = arg;
         return 0;
     }
     else if (cb == NULL) {
@@ -192,11 +199,4 @@ void RTC_IRQHandler(void)
     }
 
     VICVectAddr = 0;                        /* Acknowledge Interrupt */
-}
-
-static void _rtc_set(time_t time)
-{
-    struct tm *localt;
-    localt = localtime(&time);                      /* convert seconds to broken-down time */
-    rtc_set_time(localt);
 }

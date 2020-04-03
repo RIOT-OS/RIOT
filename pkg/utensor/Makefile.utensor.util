@@ -1,0 +1,5 @@
+MODULE = utensor-util
+
+CXXEXFLAGS += -Wno-c++14-binary-literal
+
+include $(RIOTBASE)/Makefile.base

@@ -30,7 +30,7 @@
 #include "mag3110.h"
 #include "mag3110_params.h"
 
-#define SLEEP       (1U * US_PER_SEC)
+#define SLEEP_USEC  (1U * US_PER_SEC)
 
 static mag3110_t dev;
 
@@ -49,7 +49,7 @@ int main(void)
     puts("[SUCCESS]");
 
     while (1) {
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
         mag3110_read(&dev, &data);
         printf("Field strength: X: %d Y: %d Z: %d\n", data.x, data.y, data.z);
         mag3110_read_dtemp(&dev, &temp);

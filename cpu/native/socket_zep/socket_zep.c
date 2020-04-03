@@ -21,6 +21,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
 #include <sys/time.h>
 
 #include "async_read.h"
@@ -35,6 +36,9 @@
 #include "debug.h"
 
 #define _UNIX_NTP_ERA_OFFSET    (2208988800U)
+/* can't use timex.h's US_PER_SEC as timeval's tv_usec is signed long
+ * (https://pubs.opengroup.org/onlinepubs/9699919799.2016edition/basedefs/time.h.html) */
+#define TV_USEC_PER_SEC         (1000000L)
 
 static size_t _zep_hdr_fill_v2_data(socket_zep_t *dev, zep_v2_data_hdr_t *hdr,
                                     size_t payload_len)
@@ -49,7 +53,10 @@ static size_t _zep_hdr_fill_v2_data(socket_zep_t *dev, zep_v2_data_hdr_t *hdr,
     hdr->lqi_mode = 1;
     hdr->lqi_val = 0xff;                /* TODO: set */
     hdr->time.seconds = byteorder_htonl(tv.tv_sec + _UNIX_NTP_ERA_OFFSET);
-    hdr->time.fraction = byteorder_htonl((tv.tv_usec * 1000000) / 232);
+    assert(tv.tv_usec < TV_USEC_PER_SEC);
+    hdr->time.fraction = byteorder_htonl(
+            (uint32_t)((uint64_t)tv.tv_usec * TV_USEC_PER_SEC) / 232U
+        );
     hdr->seq = byteorder_htonl(dev->seq);
     memset(hdr->resv, 0, sizeof(hdr->resv));
     hdr->length = payload_len;
@@ -97,16 +104,15 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     socket_zep_t *dev = (socket_zep_t *)netdev;
     unsigned n = iolist_count(iolist);
     struct iovec v[n + 2];
-    size_t bytes;
     int res;
 
     assert((dev != NULL) && (dev->sock_fd != 0));
-    bytes = _prep_vector(dev, iolist, n, v);
+    _prep_vector(dev, iolist, n, v);
     DEBUG("socket_zep::send(%p, %p, %u)\n", (void *)netdev, (void *)iolist, n);
     /* simulate TX_STARTED interrupt */
     if (netdev->event_callback) {
         dev->last_event = NETDEV_EVENT_TX_STARTED;
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
         thread_yield();
     }
     res = writev(dev->sock_fd, v, n + 2);
@@ -117,14 +123,9 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* simulate TX_COMPLETE interrupt */
     if (netdev->event_callback) {
         dev->last_event = NETDEV_EVENT_TX_COMPLETE;
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
         thread_yield();
     }
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += bytes;
-#else
-    (void)bytes;
-#endif
 
     return res - v[0].iov_len - v[n + 1].iov_len;
 }
@@ -208,13 +209,13 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                     void *payload = &dev->rcv_buf[sizeof(zep_v2_data_hdr_t)];
 
                     if (zep->type != ZEP_V2_TYPE_DATA) {
-                        DEBUG("socket_zep::recv: unexpect ZEP type\n");
+                        DEBUG("socket_zep::recv: unexpected ZEP type\n");
                         /* don't support ACK frames for now*/
                         return -1;
                     }
                     if (((sizeof(zep_v2_data_hdr_t) + zep->length) != (unsigned)size) ||
                         (zep->length > len) || (zep->chan != dev->netdev.chan) ||
-                        /* TODO promiscous mode */
+                        /* TODO promiscuous mode */
                         _dst_not_me(dev, payload)) {
                         /* TODO: check checksum */
                         return -1;
@@ -252,10 +253,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         }
     }
     _continue_reading(dev);
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += size;
-#endif
+
     return size;
 }
 
@@ -285,7 +283,7 @@ static void _socket_isr(int fd, void *arg)
         socket_zep_t *dev = (socket_zep_t *)netdev;
 
         dev->last_event = NETDEV_EVENT_RX_COMPLETE;
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
     }
 }
 
@@ -297,7 +295,6 @@ static int _init(netdev_t *netdev)
 
     assert(dev != NULL);
     dev->netdev.chan = IEEE802154_DEFAULT_CHANNEL;
-    dev->netdev.pan = IEEE802154_DEFAULT_PANID;
 
     return 0;
 }
@@ -399,9 +396,6 @@ void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params)
     dev->netdev.short_addr[1] = dev->netdev.long_addr[7];
     native_async_read_setup();
     native_async_read_add_handler(dev->sock_fd, dev, _socket_isr);
-#ifdef MODULE_NETSTATS_L2
-    memset(&dev->netdev.netdev.stats, 0, sizeof(netstats_t));
-#endif
 }
 
 void socket_zep_cleanup(socket_zep_t *dev)

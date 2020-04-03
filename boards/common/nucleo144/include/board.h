@@ -37,7 +37,7 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
-#if defined(CPU_MODEL_STM32L496ZG)
+#if defined(CPU_MODEL_STM32L496ZG) || defined(CPU_MODEL_STM32L4R5ZI)
 #define LED0_PORT           GPIOC
 #define LED0_PIN            GPIO_PIN(PORT_C, 7)
 #define LED0_MASK           (1 << 7)
@@ -63,7 +63,9 @@ extern "C" {
 #define LED2_TOGGLE         (GPIOB->ODR  ^= LED2_MASK)
 
 /* the Nucleo144 boards always use LED0, as there is no dual use of its pin */
+#ifndef AUTO_INIT_LED0
 #define AUTO_INIT_LED0
+#endif
 /** @} */
 
 /**

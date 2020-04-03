@@ -54,21 +54,20 @@ extern "C" {
 
 
 /**
- * @brief   Device descriptor for a ds18 device
- */
-typedef struct {
-    gpio_t pin;             /**< Pin the sensor is connected to */
-    gpio_mode_t out_mode;  /**< Pin output mode */
-    gpio_mode_t in_mode;    /**< Pin input mode */
-} ds18_t;
-
-/**
  * @brief Device initialization parameters
  */
 typedef struct {
     gpio_t pin;             /**< Pin the sensor is connected to */
-    gpio_mode_t out_mode;    /**< Pin output mode */
+    gpio_mode_t out_mode;   /**< Pin output mode */
+    gpio_mode_t in_mode;    /**< Pin input mode (usually deduced from output mode) */
 } ds18_params_t;
+
+/**
+ * @brief   Device descriptor for a ds18 device
+ */
+typedef struct {
+    ds18_params_t params;   /**< Device Parameters */
+} ds18_t;
 
 /**
  * @brief   Initialize a ds18 device
@@ -91,7 +90,7 @@ int ds18_init(ds18_t *dev, const ds18_params_t *params);
  * @return                  0 on success
  * @return                 -1 on error
  */
-int ds18_trigger(ds18_t *dev);
+int ds18_trigger(const ds18_t *dev);
 
 /**
  * @brief Reads the scratchpad for the last conversion
@@ -102,13 +101,13 @@ int ds18_trigger(ds18_t *dev);
  * @return                  0 on success
  * @return                 -1 on error
  */
-int ds18_read(ds18_t *dev, int16_t *temperature);
+int ds18_read(const ds18_t *dev, int16_t *temperature);
 
 /**
- * @brief   convenience fuction for triggering a conversion and reading the
+ * @brief   convenience function for triggering a conversion and reading the
  * value
  *
- * @note This function will block for the convertion time. The current
+ * @note This function will block for the conversion time. The current
  * implementation of the driver uses 12-bit resolution, so this time is 750 ms.
  *
  * @param[in] dev           device descriptor
@@ -117,7 +116,7 @@ int ds18_read(ds18_t *dev, int16_t *temperature);
  * @return                   0 on success
  * @return                  -1 on error
  */
-int ds18_get_temperature(ds18_t *dev, int16_t *temperature);
+int ds18_get_temperature(const ds18_t *dev, int16_t *temperature);
 
 #ifdef __cplusplus
 }

@@ -25,7 +25,9 @@
 
 static int read_pulse_counter(const void *dev, phydat_t *res)
 {
-    res->val[0] = pulse_counter_read_with_reset(dev);
+    /* Using non-const dev !! */
+    pulse_counter_t *mydev = (pulse_counter_t *)dev;
+    res->val[0] = pulse_counter_read_with_reset(mydev);
     res->unit  = UNIT_NONE;
     res->scale = 0;
     return 1;
@@ -33,7 +35,9 @@ static int read_pulse_counter(const void *dev, phydat_t *res)
 
 static int write_pulse_counter(const void *dev, phydat_t *data)
 {
-    pulse_counter_reset(dev);
+    /* Using non-const dev !! */
+    pulse_counter_t *mydev = (pulse_counter_t *)dev;
+    pulse_counter_reset(mydev);
     (void) data;
     return 1;
 }

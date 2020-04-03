@@ -1,1 +1,2 @@
-Since there is no official public repository for the CMSIS-DSP library, we are using our own repo.
+This package uses DSP ARM CMSIS header from the official
+[ARM github repo](https://github.com/ARM-software/CMSIS_5)

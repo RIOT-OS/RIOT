@@ -12,24 +12,25 @@
  * @file
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#include <kernel_defines.h>
 
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/sixlowpan/nd.h"
-#if GNRC_IPV6_NIB_CONF_DNS
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 #include "net/sock/dns.h"
 #endif
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 #include "_nib-6ln.h"
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 #include "_nib-router.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
@@ -63,7 +64,7 @@ void _handle_snd_mc_ra(gnrc_netif_t *netif)
         if ((final_ra && (next_scheduled > NDP_MAX_RA_INTERVAL_MS)) ||
             gnrc_netif_is_rtr_adv(netif)) {
             _snd_rtr_advs(netif, NULL, final_ra);
-            netif->ipv6.last_ra = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
+            netif->ipv6.last_ra = evtimer_now_msec();
             if ((netif->ipv6.ra_sent < NDP_MAX_INIT_RA_NUMOF) || final_ra) {
                 if ((netif->ipv6.ra_sent < NDP_MAX_INIT_RA_NUMOF) &&
                     (next_ra_time > NDP_MAX_INIT_RA_INTERVAL)) {
@@ -83,7 +84,7 @@ void _handle_snd_mc_ra(gnrc_netif_t *netif)
 
 void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst, bool final)
 {
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     _nib_abr_entry_t *abr = NULL;
 
     DEBUG("nib: Send router advertisements for each border router:\n");
@@ -92,16 +93,19 @@ void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst, bool final)
                                              sizeof(addr_str)));
         _snd_ra(netif, dst, final, abr);
     }
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     _snd_ra(netif, dst, final, NULL);
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 }
 
 static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
                                     gnrc_pktsnip_t *ext_opts)
 {
-    uint32_t now = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
+    uint32_t now = evtimer_now_msec();
     gnrc_pktsnip_t *pio;
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(
+            _nib_onl_get_if(offl->next_hop)
+        );
     uint8_t flags = 0;
     uint32_t valid_ltime = (offl->valid_until == UINT32_MAX) ? UINT32_MAX :
                            ((offl->valid_until - now) / MS_PER_SEC);
@@ -111,7 +115,11 @@ static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
     DEBUG("nib: Build PIO for %s/%u\n",
           ipv6_addr_to_str(addr_str, &offl->pfx, sizeof(addr_str)),
           offl->pfx_len);
-    if (offl->flags & _PFX_ON_LINK) {
+    /* do not advertise as on-link if 6LN
+     * https://tools.ietf.org/html/rfc6775#section-6.1 otherwise the PIO will be
+     * ignored by other nodes (https://tools.ietf.org/html/rfc6775#section-5.4)
+     */
+    if ((offl->flags & _PFX_ON_LINK) && !gnrc_netif_is_6ln(netif)) {
         flags |= NDP_OPT_PI_FLAGS_L;
     }
     if (offl->flags & _PFX_SLAAC) {
@@ -134,7 +142,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
     _nib_offl_entry_t *pfx = NULL;
     unsigned id = netif->pid;
 
-#if GNRC_IPV6_NIB_CONF_DNS && SOCK_HAS_IPV6
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS) && SOCK_HAS_IPV6
     uint32_t rdnss_ltime = _evtimer_lookup(&sock_dns_server,
                                            GNRC_IPV6_NIB_RDNSS_TIMEOUT);
 
@@ -153,8 +161,8 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         }
         ext_opts = rdnsso;
     }
-#endif  /* GNRC_IPV6_NIB_CONF_DNS */
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#endif  /* CONFIG_GNRC_IPV6_NIB_DNS */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     uint16_t ltime;
     gnrc_pktsnip_t *abro;
 
@@ -165,7 +173,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
             ((ctx = gnrc_sixlowpan_ctx_lookup_id(i)) != NULL)) {
             gnrc_pktsnip_t *sixco = gnrc_sixlowpan_nd_opt_6ctx_build(
                                             ctx->prefix_len, ctx->flags_id,
-                                            ctx->ltime, &ctx->prefix, NULL);
+                                            ctx->ltime, &ctx->prefix, ext_opts);
             if (sixco == NULL) {
                 DEBUG("nib: No space left in packet buffer. Not adding 6LO\n");
                 return NULL;
@@ -183,7 +191,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
     }
     ltime = (gnrc_netif_is_6lbr(netif)) ?
             (SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT) :
-            (abr->valid_until - _now_min());
+            (abr->valid_until - evtimer_now_min());
     (void)ltime;    /* gnrc_sixlowpan_nd_opt_abr_build might evaluate to NOP */
     abro = gnrc_sixlowpan_nd_opt_abr_build(abr->version, ltime, &abr->addr,
                                            ext_opts);
@@ -192,7 +200,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         return NULL;
     }
     ext_opts = abro;
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     (void)abr;
     while ((pfx = _nib_offl_iter(pfx))) {
         if ((pfx->mode & _PL) && (_nib_onl_get_if(pfx->next_hop) == id)) {
@@ -201,7 +209,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
             }
         }
     }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     return ext_opts;
 }
 
@@ -224,8 +232,8 @@ static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
 
     gnrc_ndp_rtr_adv_send(netif, NULL, dst, final, ext_opts);
 }
-#else  /* GNRC_IPV6_NIB_CONF_ROUTER */
+#else  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 typedef int dont_be_pedantic;
-#endif /* GNRC_IPV6_NIB_CONF_ROUTER */
+#endif /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 
 /** @} */

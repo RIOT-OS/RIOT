@@ -1,3 +1,7 @@
+CPU_ARCH = cortex-m3
+CPU_FAM  = sam3
+
+FEATURES_PROVIDED += cortexm_mpu
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_hwrng
 

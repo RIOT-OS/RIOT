@@ -26,7 +26,7 @@
 #include "mma8x5x.h"
 #include "mma8x5x_params.h"
 
-#define SLEEP       (100 * 1000U)
+#define SLEEP_USEC  (100 * 1000U)
 
 static mma8x5x_t dev;
 
@@ -50,7 +50,7 @@ int main(void)
         mma8x5x_read(&dev, &data);
         printf("Acceleration [in mg]: X: %d Y: %d Z: %d\n",
                 data.x, data.y, data.z);
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_USEC);
     }
 
     return 0;

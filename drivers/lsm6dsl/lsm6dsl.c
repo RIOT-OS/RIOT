@@ -34,13 +34,13 @@
 #define ADDR        (dev->params.addr)
 
 /**
- * order in arry [0, 1, 2, 3] is
+ * order in array [0, 1, 2, 3] is
  * LSM6DSL_ACC_FS_2G, LSM6DSL_ACC_FS_16G, LSM6DSL_ACC_FS_4G, LSM6DSL_ACC_FS_8G
  */
 static const int16_t range_acc[] = { 2000, 16000, 4000, 8000 };
 
 /**
- * order in arry [0, 1, 2, 3] is
+ * order in array [0, 1, 2, 3] is
  * LSM6DSL_GYRO_FS_245DPS, LSM6DSL_GYRO_FS_500DPS,
  * LSM6DSL_GYRO_FS_1000DPS, LSM6DSL_GYRO_FS_2000DPS
  */

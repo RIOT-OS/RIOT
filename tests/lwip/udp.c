@@ -23,11 +23,20 @@
 #include "common.h"
 #include "od.h"
 #include "net/af.h"
+#include "net/sock/async/event.h"
 #include "net/sock/udp.h"
-#include "net/ipv6.h"
 #include "shell.h"
+#include "test_utils/expect.h"
 #include "thread.h"
 #include "xtimer.h"
+
+#ifdef MODULE_LWIP_IPV6
+#include "net/ipv6.h"
+#define SOCK_IP_EP_ANY  SOCK_IPV6_EP_ANY
+#else
+#include "net/ipv4.h"
+#define SOCK_IP_EP_ANY  SOCK_IPV4_EP_ANY
+#endif
 
 #ifdef MODULE_SOCK_UDP
 static char sock_inbuf[SOCK_INBUF_SIZE];
@@ -36,9 +45,41 @@ static sock_udp_t server_sock;
 static char server_stack[THREAD_STACKSIZE_DEFAULT];
 static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
 
+static void _udp_recv(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
+{
+    expect(strcmp(arg, "test") == 0);
+    if (flags & SOCK_ASYNC_MSG_RECV) {
+        sock_udp_ep_t src;
+        int res;
+
+        if ((res = sock_udp_recv(sock, sock_inbuf, sizeof(sock_inbuf),
+                                 0, &src)) < 0) {
+            puts("Error on receive");
+        }
+        else if (res == 0) {
+            puts("No data received");
+        }
+        else {
+            char addrstr[IPV6_ADDR_MAX_STR_LEN];
+
+#ifdef MODULE_LWIP_IPV6
+            printf("Received UDP data from [%s]:%" PRIu16 ":\n",
+                   ipv6_addr_to_str(addrstr, (ipv6_addr_t *)&src.addr.ipv6,
+                                    sizeof(addrstr)), src.port);
+#else
+            printf("Received UDP data from [%s]:%" PRIu16 ":\n",
+                   ipv4_addr_to_str(addrstr, (ipv4_addr_t *)&src.addr.ipv4,
+                                    sizeof(addrstr)), src.port);
+#endif
+            od_hex_dump(sock_inbuf, res, 0);
+        }
+    }
+}
+
 static void *_server_thread(void *args)
 {
-    sock_udp_ep_t server_addr = SOCK_IPV6_EP_ANY;
+    event_queue_t queue;
+    sock_udp_ep_t server_addr = SOCK_IP_EP_ANY;
     int res;
 
     msg_init_queue(server_msg_queue, SERVER_MSG_QUEUE_SIZE);
@@ -52,38 +93,25 @@ static void *_server_thread(void *args)
     server_running = true;
     printf("Success: started UDP server on port %" PRIu16 "\n",
            server_addr.port);
-    while (1) {
-        sock_udp_ep_t src;
-        int res;
-
-        if ((res = sock_udp_recv(&server_sock, sock_inbuf, sizeof(sock_inbuf),
-                                 SOCK_NO_TIMEOUT, &src)) < 0) {
-            puts("Error on receive");
-        }
-        else if (res == 0) {
-            puts("No data received");
-        }
-        else {
-            char addrstr[IPV6_ADDR_MAX_STR_LEN];
-
-            printf("Received UDP data from [%s]:%" PRIu16 ":\n",
-                   ipv6_addr_to_str(addrstr, (ipv6_addr_t *)&src.addr.ipv6,
-                                    sizeof(addrstr)), src.port);
-            od_hex_dump(sock_inbuf, res, 0);
-        }
-    }
+    event_queue_init(&queue);
+    sock_udp_event_init(&server_sock, &queue, _udp_recv, "test");
+    event_loop(&queue);
     return NULL;
 }
 
 static int udp_send(char *addr_str, char *port_str, char *data, unsigned int num,
                     unsigned int delay)
 {
-    sock_udp_ep_t dst = SOCK_IPV6_EP_ANY;
+    sock_udp_ep_t dst = SOCK_IP_EP_ANY;
     uint8_t byte_data[SHELL_DEFAULT_BUFSIZE / 2];
     size_t data_len;
 
     /* parse destination address */
+#ifdef MODULE_LWIP_IPV6
     if (ipv6_addr_from_str((ipv6_addr_t *)&dst.addr.ipv6, addr_str) == NULL) {
+#else
+    if (ipv4_addr_from_str((ipv4_addr_t *)&dst.addr.ipv4, addr_str) == NULL) {
+#endif
         puts("Error: unable to parse destination address");
         return 1;
     }

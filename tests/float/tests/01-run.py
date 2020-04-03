@@ -14,7 +14,7 @@ TIMEOUT = 45
 
 
 def testfunc(child):
-    child.expect_exact("Testing floating point arithmetics...")
+    child.expect_exact("Testing floating point arithmetic...")
     child.expect_exact("[SUCCESS]", timeout=TIMEOUT)
 
 

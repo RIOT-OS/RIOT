@@ -19,7 +19,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "lpc2387.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,6 +29,8 @@ extern "C" {
  * @name    Clock configuration
  * @{
  */
+#define XTAL_HZ             (16000000U)         /* the board provides a 16 MHz XTAL */
+
 #define CLOCK_CORECLOCK     (72000000U)         /* this board runs with 72MHz */
 
 #define CLOCK_PCLK          (CLOCK_CORECLOCK)
@@ -42,24 +44,40 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Real Time Clock configuration
- */
-#define RTC_NUMOF           (1U)
-/** @} */
-
-/**
  * @name    UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
-#define UART_0_EN           (1)
+static const uart_conf_t uart_config[] = {
+    {
+        .dev = UART0,
+        .irq_prio_rx = 6,
+        .pinsel_rx   = 0,
+        .pinsel_tx   = 0,
+        .pinsel_msk_rx = BIT4,
+        .pinsel_msk_tx = BIT6,
+    }
+};
+
+#define UART_NUMOF          (1)
 /** @} */
 
 /**
  * @name    SPI configuration
  * @{
  */
-#define SPI_NUMOF           (1U)
+static const spi_conf_t spi_config[] = {
+    {
+        .dev = SPI0,
+        .pinsel_mosi = 3,
+        .pinsel_miso = 3,
+        .pinsel_clk  = 3,
+        .pinsel_msk_mosi = (BIT16 | BIT17),
+        .pinsel_msk_miso = (BIT14 | BIT15),
+        .pinsel_msk_clk  = (BIT8  | BIT9),
+    },
+};
+
+#define SPI_NUMOF           (1)
 /** @} */
 
 #ifdef __cplusplus

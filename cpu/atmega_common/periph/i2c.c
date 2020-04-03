@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Low-level I2C driver implementation fot atmega common
+ * @brief       Low-level I2C driver implementation for atmega common
  *
  * @note        This implementation only implements the 7-bit addressing mode.
  *
@@ -135,6 +135,7 @@ void i2c_init(i2c_t dev)
 int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len,
                    uint8_t flags)
 {
+    (void)dev;
     assert(dev < I2C_NUMOF);
 
     /* Check for unsupported operations */
@@ -184,6 +185,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len,
 int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
                     uint8_t flags)
 {
+    (void)dev;
     assert(dev < I2C_NUMOF);
 
     /* Check for unsupported operations */
@@ -226,12 +228,11 @@ int i2c_acquire(i2c_t dev)
     return 0;
 }
 
-int i2c_release(i2c_t dev)
+void i2c_release(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
     mutex_unlock(&locks[dev]);
-    return 0;
 }
 
 static void i2c_poweron(i2c_t dev)

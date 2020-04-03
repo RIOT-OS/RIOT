@@ -22,8 +22,9 @@
 
 #ifndef BOARD_H
 #define BOARD_H
+
+#include "lpc2387.h"
 #include "bitarithm.h"
-#include "msba2_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,11 +48,6 @@ extern "C" {
 #define LED1_ON             (FIO3CLR  = LED1_MASK)
 #define LED1_TOGGLE         (FIO3PIN ^= LED1_MASK)
 /** @} */
-
-/**
- * @brief   Initialize the board's clock system
- */
-void init_clks1(void);
 
 #ifdef __cplusplus
 }

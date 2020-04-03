@@ -212,7 +212,7 @@ static void test_matstat_merge_variance_regr1(void)
         { .count = 2414, .sum = 4859, .sum_sq = 1074, .min = 1, .max = 3, .mean = 2 },
     };
     matstat_state_t merged = MATSTAT_STATE_INIT;
-    for (unsigned k = 0; k < sizeof(inputs) / sizeof(inputs[0]); ++k) {
+    for (unsigned k = 0; k < ARRAY_SIZE(inputs); ++k) {
         matstat_merge(&merged, &inputs[k]);
     }
     int64_t var = (int64_t)matstat_variance(&merged);

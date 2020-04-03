@@ -25,6 +25,7 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
+#include "mtd_sdcard.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -120,7 +121,9 @@ extern "C" {
  * @name        SX127X
  *
  * SX127X configuration (on XBEE1 port). This particular board has
- * merged DIO0 and DIO1 interupt pins into one (defined as DIOMULTI).
+ * merged DIO0 and DIO1 interrupt pins into one. The driver will always
+ * check the interrupt type in the ISR handler, so it's enough to set
+ * the DIO0 pin in order to handle both DIO0 and DIO1.
  * @{
  */
 #define SX127X_PARAM_SPI                    (SPI_DEV(0))
@@ -129,15 +132,13 @@ extern "C" {
 
 #define SX127X_PARAM_RESET                  GPIO_UNDEF
 
-#define SX127X_PARAM_DIO0                   GPIO_UNDEF
+#define SX127X_PARAM_DIO0                   XBEE1_INT_PIN       /* D24 */
 
 #define SX127X_PARAM_DIO1                   GPIO_UNDEF
 
 #define SX127X_PARAM_DIO2                   GPIO_UNDEF
 
 #define SX127X_PARAM_DIO3                   GPIO_UNDEF
-
-#define SX127X_PARAM_DIO_MULTI              XBEE1_INT_PIN       /* D24 */
 
 #define SX127X_PARAM_PASELECT               (SX127X_PA_BOOST)
 /** @} */
@@ -161,6 +162,33 @@ extern "C" {
  * @brief    BMP280 Pressure and temperature sensor
  */
 #define BMX280_PARAM_I2C_ADDR        (0x76)
+
+#if defined(MODULE_MTD_SDCARD) || defined(DOXYGEN)
+/**
+ * @brief MTD device 0 (SD Card) definition. mtd0 is defined in board.c
+ * @{
+ */
+extern mtd_dev_t *mtd0;
+#define MTD_0 mtd0
+/** @} */
+
+/**
+ * @brief Attributes for the mtd_sdcard driver
+ * @{
+ */
+#ifndef MTD_SD_CARD_PAGE_SIZE
+#define MTD_SD_CARD_PAGE_SIZE           (512)
+#endif
+
+#ifndef MTD_SD_CARD_PAGES_PER_SECTOR
+#define MTD_SD_CARD_PAGES_PER_SECTOR    (128)
+#endif
+
+#ifndef MTD_SD_CARD_SECTOR_COUNT
+#define MTD_SD_CARD_SECTOR_COUNT        (3921920UL)
+#endif
+/** @} */
+#endif /* MODULE_MTD_SDCARD || DOXYGEN */
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO

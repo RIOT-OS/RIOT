@@ -58,7 +58,7 @@ struct __TestResult {
         (TestListner*)listener,\
     }
 
-void TestResult_init(TestResult* self,TestListner* listner);
+void TestResult_init(TestResult* self,TestListner* listener);
 void TestResult_startTest(TestResult* self,Test* test);
 void TestResult_endTest(TestResult* self,Test* test);
 void TestResult_addFailure(TestResult* self,Test* test,const char* msg,int line,const char* file);

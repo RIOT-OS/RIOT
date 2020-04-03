@@ -28,7 +28,6 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
-#define AUTO_INIT_LED0
 #define LED0_PORT           GPIOA
 #define LED0_PIN            GPIO_PIN(PORT_A, 1)
 #define LED0_MASK           (1 << 1)
@@ -52,31 +51,12 @@ extern "C" {
  * SX127X configuration.
  * @{
  */
-#define SX127X_PARAM_SPI                (SPI_DEV(0))
-
 #define SX127X_PARAM_SPI_NSS            GPIO_PIN(PORT_B, 0)
-
 #define SX127X_PARAM_RESET              GPIO_PIN(PORT_A, 4)
-
 #define SX127X_PARAM_DIO0               GPIO_PIN(PORT_B, 1)
-
 #define SX127X_PARAM_DIO1               GPIO_PIN(PORT_B, 10)
-
 #define SX127X_PARAM_DIO2               GPIO_PIN(PORT_B, 11)
-
 #define SX127X_PARAM_DIO3               GPIO_PIN(PORT_B, 7)
-
-#define SX127X_PARAM_PASELECT           (SX127X_PA_RFO)
-
-#define SX127X_PARAMS                   {   .spi       = SX127X_PARAM_SPI,     \
-                                            .nss_pin   = SX127X_PARAM_SPI_NSS, \
-                                            .reset_pin = SX127X_PARAM_RESET,   \
-                                            .dio0_pin  = SX127X_PARAM_DIO0,    \
-                                            .dio1_pin  = SX127X_PARAM_DIO1,    \
-                                            .dio2_pin  = SX127X_PARAM_DIO2,    \
-                                            .dio3_pin  = SX127X_PARAM_DIO3,    \
-                                            .paselect  = SX127X_PARAM_PASELECT \
-                                        }
 /** @} */
 
 /**

@@ -28,8 +28,10 @@
 #include "net/emcute.h"
 #include "net/ipv6/addr.h"
 
-#define EMCUTE_PORT         (1883U)
+#ifndef EMCUTE_ID
 #define EMCUTE_ID           ("gertrud")
+#endif
+#define EMCUTE_PORT         (1883U)
 #define EMCUTE_PRIO         (THREAD_PRIORITY_MAIN - 1)
 
 #define NUMOFSUBS           (16U)
@@ -263,7 +265,7 @@ int main(void)
          "information.");
 
     /* the main thread needs a msg queue to be able to run `ping6`*/
-    msg_init_queue(queue, (sizeof(queue) / sizeof(msg_t)));
+    msg_init_queue(queue, ARRAY_SIZE(queue));
 
     /* initialize our subscription buffers */
     memset(subscriptions, 0, (NUMOFSUBS * sizeof(emcute_sub_t)));

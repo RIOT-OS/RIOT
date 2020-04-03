@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_ble BLE defines
- * @ingroup     net
+ * @defgroup    ble_defs Generic BLE defines
+ * @ingroup     ble
  * @brief       General values defined by the BT standard
  * @{
  *
@@ -46,6 +46,8 @@ extern "C" {
 #define BLE_CHAN_NUMOF          (40U)   /**< number of available channels */
 #define BLE_CHAN_ADV_NUMOF      (3U)    /**< number of advertising channels */
 #define BLE_CHAN_DAT_NUMOF      (37U)   /**< number of data channels */
+#define BLE_ADV_PDU_LEN         (31U)   /**< max size of legacy ADV packets */
+#define BLE_ADV_PDU_LEN_EXT     (251U)  /**< max size of extended ADV packets */
 /** @} */
 
 /**
@@ -81,6 +83,41 @@ extern "C" {
 #define BLE_DESC_TIME_TRIGGER_SETTING       (0x290e)
 #define BLE_DESC_VALID_RANGE                (0x2906)
 #define BLE_DESC_VALUE_TRIGGER_SETTING      (0x290a)
+/** @} */
+
+/**
+ * @name    Selected GATT service UUIDs (16-bit)
+ *
+ * @see https://www.bluetooth.com/specifications/gatt/services
+ * @{
+ */
+#define BLE_GATT_SVC_GAP                    (0x1800)    /**< GAP service */
+#define BLE_GATT_SVC_GATT                   (0x1801)    /**< GATT service */
+#define BLE_GATT_SVC_DEVINFO                (0x180a)    /**< device info */
+#define BLE_GATT_SVC_HRS                    (0x180d)    /**< heart rate service */
+#define BLE_GATT_SVC_BAS                    (0x180f)    /**< battery service */
+#define BLE_GATT_SVC_IPSS                   (0x1820)    /**< IP protocol support */
+/* XXX: custom services not defined by the BT SIG (random values) */
+#define BLE_GATT_SVC_NDNSS                  (0x7e5e)    /**< NDN support service */
+/* add more on demand */
+/** @} */
+
+/**
+ * @name    Selected GATT characteristic UUIDs (16-bit)
+ *
+ * @see https://www.bluetooth.com/specifications/gatt/characteristics/
+ * @{
+ */
+#define BLE_GATT_CHAR_BATTERY_LEVEL         (0x2a19)    /**< battery level */
+#define BLE_GATT_CHAR_SYSTEM_ID             (0x2a23)    /**< system ID */
+#define BLE_GATT_CHAR_MODEL_NUMBER_STR      (0x2a24)    /**< model number */
+#define BLE_GATT_CHAR_SERIAL_NUMBER_STR     (0x2a25)    /**< serial number */
+#define BLE_GATT_CHAR_FW_REV_STR            (0x2a26)    /**< firmware revision */
+#define BLE_GATT_CHAR_HW_REV_STR            (0x2a27)    /**< hardware revision */
+#define BLE_GATT_CHAR_SW_REV_STR            (0x2a28)    /**< software revision */
+#define BLE_GATT_CHAR_MANUFACTURER_NAME     (0x2a29)    /**< manufacturer name */
+#define BLE_GATT_CHAR_HEART_RATE_MEASURE    (0x2a37)    /**< heart rate measurement */
+#define BLE_GATT_CHAR_BODY_SENSE_LOC        (0x2a38)    /**< body sensor location */
 /** @} */
 
 /**
@@ -247,6 +284,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Channel identifiers defined for L2CAP LE-U link layers
+ * @{
+ */
+#define BLE_L2CAP_CID_IPSP                  (0x0023)
+#define BLE_L2CAP_CID_CB_MIN                (0x0040)
+#define BLE_L2CAP_CID_CB_MAX                (0x007f)
+/** @} */
+
+/**
  * @name    ATT protocol opcodes
  * @{
  */
@@ -323,6 +369,55 @@ extern "C" {
  */
 #define BLE_ATT_FORMAT_U16      (0x01)  /**< used in FIND_INFO_RESP */
 #define BLE_ATT_FORMAT_U128     (0x02)  /**< used in FIND_INFO_RESP */
+/** @} */
+
+/**
+ * @name    GAP advertisement data type values
+ *
+ * @see https://www.bluetooth.com/specifications/assigned-numbers/generic-access-profile
+ * @{
+ */
+#define BLE_GAP_AD_FLAGS                    (0x01)
+#define BLE_GAP_AD_UUID16_INCOMP            (0x02)
+#define BLE_GAP_AD_UUID16_COMP              (0x03)
+#define BLE_GAP_AD_UUID32_INCOMP            (0x04)
+#define BLE_GAP_AD_UUID32_COMP              (0x05)
+#define BLE_GAP_AD_UUID128_INCOMP           (0x06)
+#define BLE_GAP_AD_UUID128_COMP             (0x07)
+#define BLE_GAP_AD_NAME_SHORT               (0x08)
+#define BLE_GAP_AD_NAME                     (0x09)
+#define BLE_GAP_AD_TX_POWER_LEVEL           (0x0a)
+#define BLE_GAP_AD_CLASS_OF_DEVICE          (0x0d)
+#define BLE_GAP_AD_PAIRING_HASH_192         (0x0e)
+#define BLE_GAP_AD_PAIRING_RAND_192         (0x0f)
+#define BLE_GAP_AD_DEVICE_ID                (0x10)
+#define BLE_GAP_AD_SEC_MANAGER_TK_VAL       (0x10)
+#define BLE_GAP_AD_SEC_MANAGER_OOB_FLAGS    (0x11)
+#define BLE_GAP_AD_SLAVE_CON_INTERVAL       (0x12)
+#define BLE_GAP_AD_LIST_SOL_UUID_16         (0x14)
+#define BLE_GAP_AD_LIST_SOL_UUID_128        (0x15)
+#define BLE_GAP_AD_SERVICE_DATA             (0x16)
+#define BLE_GAP_AD_SERVICE_DATA_UUID16      (0x16)
+#define BLE_GAP_AD_ADDR_PUBLIC              (0x17)
+#define BLE_GAP_AD_ADDR_RANDOM              (0x18)
+#define BLE_GAP_AD_APPEARANCE               (0x19)
+#define BLE_GAP_AD_ADV_INTERVAL             (0x1a)
+#define BLE_GAP_AD_LE_DEVICE_ADDR           (0x1b)
+#define BLE_GAP_AD_LE_ROLE                  (0x1c)
+#define BLE_GAP_AD_PAIRING_HASH_256         (0x1d)
+#define BLE_GAP_AD_PAIRING_RAND_256         (0x1e)
+#define BLE_GAP_AD_LIST_SOL_UUID_32         (0x1f)
+#define BLE_GAP_AD_SERVICE_DATA_32          (0x20)
+#define BLE_GAP_AD_SERVICE_DATA_128         (0x21)
+#define BLE_GAP_AD_LE_SEC_CON_CONF_VAL      (0x22)
+#define BLE_GAP_AD_LE_SEC_CON_RAND_VAL      (0x23)
+#define BLE_GAP_AD_URI                      (0x24)
+#define BLE_GAP_AD_INDOOR_POSITIONING       (0x25)
+#define BLE_GAP_AD_TRANSPORT_DISC_DATA      (0x26)
+#define BLE_GAP_AD_LE_SUP_FEATURES          (0x27)
+#define BLE_GAP_AD_CHAN_MAP_UPDATE_IND      (0x28)
+#define BLE_GAP_AD_3D_INFO_DATA             (0x3d)
+#define BLE_GAP_AD_VENDOR                   (0xff)
 /** @} */
 
 /**

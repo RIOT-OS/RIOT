@@ -1,0 +1,19 @@
+USEMODULE += lvgl_core
+USEMODULE += lvgl_draw
+USEMODULE += lvgl_font
+USEMODULE += lvgl_hal
+USEMODULE += lvgl_misc
+USEMODULE += lvgl_objx
+USEMODULE += lvgl_themes
+
+ifneq (,$(filter lvgl_contrib,$(USEMODULE)))
+  USEMODULE += disp_dev
+  USEMODULE += core_thread_flags
+  USEMODULE += xtimer
+endif
+
+# lvgl is not compatible with non 32bit platforms
+# Building lv_misc triggers the error:
+# "left shift count >= width of type [-Werror=shift-count-overflow]"
+FEATURES_BLACKLIST += arch_8bit
+FEATURES_BLACKLIST += arch_16bit

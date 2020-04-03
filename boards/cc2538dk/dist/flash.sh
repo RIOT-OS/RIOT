@@ -8,12 +8,12 @@
 # @author Hauke Petersen <hauke.petersen@fu-berlin.de>
 
 BINDIR=$1
-HEXFILE=$2
+BINFILE=$2
 FLASHADDR=200000
 
 # setup JLink command file
 echo "speed 1000" > $BINDIR/burn.seg
-echo "loadbin $HEXFILE $FLASHADDR" >> $BINDIR/burn.seg
+echo "loadbin $BINFILE $FLASHADDR" >> $BINDIR/burn.seg
 echo "r" >> $BINDIR/burn.seg
 echo "g" >> $BINDIR/burn.seg
 echo "exit" >> $BINDIR/burn.seg

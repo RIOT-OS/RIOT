@@ -43,6 +43,7 @@ enum {
     PORT_F = 5,             /**< port F */
     PORT_G = 6,             /**< port G */
     PORT_H = 7,             /**< port H */
+    PORT_I = 8,             /**< port I */
 };
 
 /**

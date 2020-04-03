@@ -1,11 +1,9 @@
 include ../Makefile.tests_common
 
-# the stm32f4discovery does not have the arduino pinout
-BOARD_BLACKLIST := stm32f4discovery jiminy-mega256rfr2
-
-# currently the test provides config params for arduinos only
-FEATURES_REQUIRED += arduino
-
 USEMODULE += hd44780
+
+# Fails on esp32 because the driver defines default GPIOs that are used for the
+# SPI flash interface.
+TEST_ON_CI_BLACKLIST += esp32-wroom-32
 
 include $(RIOTBASE)/Makefile.include

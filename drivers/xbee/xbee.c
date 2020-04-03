@@ -233,9 +233,7 @@ static void _rx_cb(void *arg, uint8_t c)
             dev->rx_buf[dev->rx_count++] = c;
             if (dev->rx_count == dev->rx_limit) {
                 /* packet is complete */
-                if (dev->event_callback) {
-                    dev->event_callback((netdev_t *)dev, NETDEV_EVENT_ISR);
-                }
+                netdev_trigger_event_isr((netdev_t*) dev);
                 dev->int_state = XBEE_INT_STATE_IDLE;
             }
             break;
@@ -483,7 +481,7 @@ void xbee_setup(xbee_t *dev, const xbee_params_t *params)
     dev->context = dev;
 
     /* set peripherals to use */
-    memcpy(&dev->p, params, sizeof(xbee_params_t));
+    dev->p = *params;
 
     /* initialize pins */
     if (dev->p.pin_reset != GPIO_UNDEF) {
@@ -664,7 +662,9 @@ static int xbee_send(netdev_t *dev, const iolist_t *iolist)
     DEBUG("[xbee] send: now sending out %i byte\n", (int)size);
     mutex_lock(&(xbee->tx_lock));
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
-        uart_write(xbee->p.uart, iol->iol_base, iol->iol_len);
+        if (iol->iol_len > 0) {
+            uart_write(xbee->p.uart, iol->iol_base, iol->iol_len);
+        }
     }
     uart_write(xbee->p.uart, &csum, 1);
     mutex_unlock(&(xbee->tx_lock));
@@ -770,7 +770,7 @@ static int xbee_get(netdev_t *ndev, netopt_t opt, void *value, size_t max_len)
             return sizeof(eui64_t);
         case NETOPT_CHANNEL:
             return _get_channel(dev, (uint8_t *)value, max_len);
-        case NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PDU_SIZE:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }

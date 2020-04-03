@@ -230,9 +230,6 @@ netdev_t *nrfble_setup(void)
     _nrfble_dev.driver = &netdev_driver;
     _nrfble_dev.event_callback = NULL;
     _nrfble_dev.context = NULL;
-#ifdef MODULE_NETSTATS_L2
-    memset(&_nrfble_dev.stats, 0, sizeof(netstats_t));;
-#endif
     return &_nrfble_dev;
 }
 
@@ -250,7 +247,7 @@ static int _nrfble_init(netdev_t *dev)
     NRF_RADIO->RXADDRESSES = 0x01UL;
     /* load driver specific configuration */
     NRF_RADIO->MODE = CONF_MODE;
-    /* configure data fields and packet length whitening and endianess */
+    /* configure data fields and packet length whitening and endianness */
     NRF_RADIO->PCNF0 = ((CONF_S1 << RADIO_PCNF0_S1LEN_Pos) |
                         (CONF_S0 << RADIO_PCNF0_S0LEN_Pos) |
                         (CONF_LEN << RADIO_PCNF0_LFLEN_Pos));

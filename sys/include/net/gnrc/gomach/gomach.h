@@ -85,6 +85,9 @@ extern "C" {
 #define GNRC_GOMACH_SUPERFRAME_DURATION_US        (300LU * US_PER_MS)
 #endif
 
+#ifndef RTT_FREQUENCY
+#error "RTT_FREQUENCY undefined."
+#else
 #if ((GNRC_GOMACH_SUPERFRAME_DURATION_US < ((1000LU *US_PER_MS) / RTT_FREQUENCY)) || \
      (GNRC_GOMACH_SUPERFRAME_DURATION_US < (10 *GNRC_GOMACH_CP_DURATION_US)))
 #undef GNRC_GOMACH_SUPERFRAME_DURATION_US
@@ -92,6 +95,7 @@ extern "C" {
 #define GNRC_GOMACH_SUPERFRAME_DURATION_US        ((1000LU * US_PER_MS) / RTT_FREQUENCY)
 #else
 #define GNRC_GOMACH_SUPERFRAME_DURATION_US        (10 * GNRC_GOMACH_CP_DURATION_US)
+#endif
 #endif
 #endif
 
@@ -350,6 +354,7 @@ extern "C" {
 /**
  * @brief   Creates an IEEE 802.15.4 GoMacH network interface
  *
+ * @param[out] netif    The interface. May not be `NULL`.
  * @param[in] stack     The stack for the GoMacH network interface's thread.
  * @param[in] stacksize Size of @p stack.
  * @param[in] priority  Priority for the GoMacH network interface's thread.
@@ -358,12 +363,11 @@ extern "C" {
  *
  * @see @ref gnrc_netif_create()
  *
- * @return  The network interface on success.
- * @return  NULL, on error.
+ * @return  0 on success
+ * @return  negative number on error
  */
-gnrc_netif_t *gnrc_netif_gomach_create(char *stack, int stacksize,
-                                       char priority, char *name,
-                                       netdev_t *dev);
+int gnrc_netif_gomach_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                             char priority, char *name, netdev_t *dev);
 
 #ifdef __cplusplus
 }

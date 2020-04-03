@@ -1,3 +1,5 @@
-FEATURES_PROVIDED += periph_cpuid
+CPU_ARCH = cortex-m3
 
--include $(RIOTCPU)/cortexm_common/Makefile.features
+FEATURES_PROVIDED += cortexm_mpu
+
+-include $(RIOTCPU)/cc26xx_cc13xx/Makefile.features

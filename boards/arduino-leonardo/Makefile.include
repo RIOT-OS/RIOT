@@ -1,0 +1,16 @@
+# For backward compatibility
+ifneq (,$(AVRDUDE_PORT))
+  $(warning Warning! AVRDUDE_PORT is deprecated use PROG_DEV)
+  PROG_DEV ?= $(AVRDUDE_PORT)
+endif
+
+PORT_LINUX      ?= /dev/ttyUSB0
+PROG_DEV        ?= /dev/ttyACM0
+PORT_DARWIN     ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+BAUD            ?= 9600
+
+# PROGRAMMER defaults to avr109 which is the internal flasher via USB. Can be
+# overridden for debugging (which requires changes that require to use an ISP)
+BOOTLOADER ?= avr109
+
+include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

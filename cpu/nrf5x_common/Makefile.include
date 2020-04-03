@@ -1,15 +1,3 @@
-# export the CPU family so we can differentiate between them in the code
-FAM = $(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
-export CFLAGS += -DCPU_FAM_$(FAM)
+CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 
-# use common periph functions
-USEMODULE += periph_common
-
-# include nrf5x common periph drivers
-USEMODULE += nrf5x_common_periph
-
-# link common cpu code
-USEMODULE += cpu_common
-
-# export the common include directory
-export INCLUDES += -I$(RIOTCPU)/nrf5x_common/include
+INCLUDES += -I$(RIOTCPU)/nrf5x_common/include

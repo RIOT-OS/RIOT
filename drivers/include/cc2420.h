@@ -39,11 +39,6 @@ extern "C" {
 #define CC2420_PKT_MAXLEN       (IEEE802154_FRAME_LEN_MAX)
 
 /**
- * @brief   PAN ID configuration
- */
-#define CC2420_PANID_DEFAULT    (IEEE802154_DEFAULT_PANID)
-
-/**
   * @name    Channel configuration
   * @{
   */

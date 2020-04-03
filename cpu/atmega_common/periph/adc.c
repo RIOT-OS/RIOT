@@ -99,7 +99,7 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
     int sample = 0;
 
@@ -111,10 +111,10 @@ int adc_sample(adc_t line, adc_res_t res)
     _prep();
 
     /* set conversion channel */
-#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P)
+#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P) || defined(CPU_ATMEGA32U4)
     ADMUX &= 0xf0;
     ADMUX |= line;
-#elif defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA256RFR2)
+#elif defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2)
     if (line < 8) {
         ADCSRB &= ~(1 << MUX5);
         ADMUX &= 0xf0;

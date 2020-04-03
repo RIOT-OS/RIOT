@@ -20,39 +20,13 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "cfg_clock_16_0.h"
+#include "cfg_timer_012.h"
+#include "cfg_rtt_default.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Clock configuration
- *
- * @note    The radio will not work with the internal RC oscillator!
- *
- * @{
- */
-#define CLOCK_HFCLK         (16U)           /* set to  0: internal RC oscillator
-                                                      16: 16MHz crystal
-                                                      32: 32MHz crystal */
-#define CLOCK_LFCLK         (0)             /* set to  0: internal RC oscillator
-                                             *         1: 32.768 kHz crystal
-                                             *         2: derived from HFCLK */
-/** @} */
-
-/**
- * @name Timer configuration
- * @{
- */
-static const timer_conf_t timer_config[] = {
-    /* dev, channels, width */
-    { NRF_TIMER0, 3, TIMER_BITMODE_BITMODE_24Bit, TIMER0_IRQn }
-};
-
-#define TIMER_0_ISR         isr_timer0
-
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
-/** @} */
 
 /**
  * @name UART configuration
@@ -62,16 +36,6 @@ static const timer_conf_t timer_config[] = {
 /* UART pin configuration */
 #define UART_PIN_RX         1
 #define UART_PIN_TX         2
-/** @} */
-
-/**
- * @name    Real time counter configuration
- * @{
- */
-#define RTT_NUMOF           (1U)
-#define RTT_DEV             (1)             /* NRF_RTC1 */
-#define RTT_MAX_VALUE       (0x00ffffff)
-#define RTT_FREQUENCY       (1024)
 /** @} */
 
 /**
@@ -93,7 +57,7 @@ static const spi_conf_t spi_config[] = {
     }
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -110,7 +74,7 @@ static const i2c_conf_t i2c_config[] = {
     }
 };
 
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**

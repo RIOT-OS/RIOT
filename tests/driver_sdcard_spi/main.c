@@ -36,10 +36,10 @@
 
 /* this is provided by the sdcard_spi driver
  * see sys/auto_init/storage/auto_init_sdcard_spi.c */
-extern sdcard_spi_t sdcard_spi_devs[sizeof(sdcard_spi_params) / sizeof(sdcard_spi_params[0])];
+extern sdcard_spi_t sdcard_spi_devs[ARRAY_SIZE(sdcard_spi_params)];
 sdcard_spi_t *card = &sdcard_spi_devs[0];
 
-char buffer[SD_HC_BLOCK_SIZE * MAX_BLOCKS_IN_BUFFER];
+uint8_t buffer[SD_HC_BLOCK_SIZE * MAX_BLOCKS_IN_BUFFER];
 
 static int _init(int argc, char **argv)
 {
@@ -293,18 +293,18 @@ static int _write(int argc, char **argv)
     }
 
     /* copy data to a full-block-sized buffer an fill remaining block space according to -r param*/
-    char buffer[SD_HC_BLOCK_SIZE];
-    for (unsigned i = 0; i < sizeof(buffer); i++) {
+    uint8_t write_buffer[SD_HC_BLOCK_SIZE];
+    for (unsigned i = 0; i < sizeof(write_buffer); i++) {
         if (repeat_data || ((int)i < size)) {
-            buffer[i] = data[i % size];
+            write_buffer[i] = data[i % size];
         }
         else {
-            buffer[i] = 0;
+            write_buffer[i] = 0;
         }
     }
 
     sd_rw_response_t state;
-    int chunks_written = sdcard_spi_write_blocks(card, bladdr, buffer, SD_HC_BLOCK_SIZE, 1, &state);
+    int chunks_written = sdcard_spi_write_blocks(card, bladdr, write_buffer, SD_HC_BLOCK_SIZE, 1, &state);
 
     if (state != SD_RW_OK) {
         printf("write error %d (wrote %d/%d blocks)\n", state, chunks_written, 1);
@@ -319,7 +319,7 @@ static int _copy(int argc, char **argv)
 {
     int src_block;
     int dst_block;
-    char tmp_copy[SD_HC_BLOCK_SIZE];
+    uint8_t tmp_copy[SD_HC_BLOCK_SIZE];
 
     if (argc != 3) {
         printf("usage: %s src_block dst_block\n", argv[0]);

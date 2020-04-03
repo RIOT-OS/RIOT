@@ -2,7 +2,7 @@
 This application demonstrates the usage of the emCute (MQTT-SN) module in RIOT.
 
 ## Setup
-For using this example, two prerequisites have to be fullfilled:
+For using this example, two prerequisites have to be fulfilled:
 
 1. You need a running MQTT broker that supports MQTT-SN or a running MQTT-SN
    gateway that is connected to a running MQTT broker
@@ -14,7 +14,7 @@ In general, any MQTT-SN capable broker or broker/gateway setup will do.
 Following a quick instruction on how-to setup the Mosquitto Real Simple Message
 Broker:
 
-1. Get the RSMB here: https://github.com/eclipse/mosquitto.rsmb:
+1. Get the RSMB here: https://github.com/eclipse/mosquitto.rsmb
 ```
 git clone https://github.com/eclipse/mosquitto.rsmb.git
 ```
@@ -58,7 +58,7 @@ single RIOT native instance, we can do the following:
 
 1. Setup `tap` and `tapbr` devices using RIOT's `tapsetup` script:
 ```
-./RIOTDIR/dist/tools/tapsetup/tapsetup
+sudo ./RIOTDIR/dist/tools/tapsetup/tapsetup
 ```
 
 2. Assign a site-global prefix to the `tapbr0` interface (the name could be
@@ -67,8 +67,8 @@ single RIOT native instance, we can do the following:
 sudo ip a a fec0:affe::1/64 dev tapbr0
 ```
 
-3. Assign a site-global address with the same prefix to the RIOT `native`
-   instance:
+3. Assign a site-global address with the same prefix within the RIOT `native`
+   instance (open first with `BOARD=native make term`):
 ```
 ifconfig 5 add fec0:affe::99
 ```
@@ -95,3 +95,13 @@ pub hello/world "One more beer, please."
 ```
 
 That's it, happy publishing!
+
+
+## FAQ
+
+### I can't connect multiple RIOT nodes to a broker, what can I do?
+Each node that connects to the broker must have a unique node ID string set. Per
+default, this example sets this statically ID to `gertrud`. If you want to
+connect more than one node to the broker, you need to set a custom ID for each
+node during compile time. Simply use the `EMCUTE_ID` environment variable for
+this, e.g. build with `EMCUTE_ID=horst make all`.

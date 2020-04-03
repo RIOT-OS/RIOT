@@ -28,13 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @name   Length of the CPU_ID in octets
- * @{
- */
-#define CPUID_LEN           (8U)
-/** @} */
-
-/**
  * @name   Available ports on the ATmega256rfr family
  * @{
  */
@@ -45,6 +38,7 @@ enum {
     PORT_F  = 5,        /**< port F */
     PORT_G  = 6,        /**< port G */
 };
+/** @} */
 
 /**
  * @brief   Available external interrupt pins on the ATmega256rfr family
@@ -69,19 +63,10 @@ enum {
 /** @} */
 
 /**
- * @name   GPIO pin not defined
- * @{
- */
-#ifndef GPIO_UNDEF
-#define GPIO_UNDEF          (0xFFFF)
-#endif
-/** @}*/
-
-/**
  * @name    EEPROM configuration
  * @{
  */
-#define EEPROM_SIZE                (8192U)  /* 8kB */
+#define EEPROM_SIZE             (8192U)  /* 8kB */
 /** @} */
 
 #ifdef __cplusplus

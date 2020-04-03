@@ -1,7 +1,20 @@
-export CPU_ARCH = cortex-m0plus
-export CPU_FAM  = saml21
+ifneq (,$(filter saml21%a,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAML21A
+endif
+ifneq (,$(filter saml21%b,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAML21B
+endif
+ifneq (,$(filter samr30%,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAMR30
+endif
+ifneq (,$(filter samr34%,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAMR34
+endif
 
-USEMODULE += pm_layered
+ifneq (,$(filter saml21j18b saml21j18a samr30g18a samr34j18b,$(CPU_MODEL)))
+  BACKUP_RAM_ADDR = 0x30000000
+  BACKUP_RAM_LEN  = 0x2000
+endif
 
 include $(RIOTCPU)/sam0_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk

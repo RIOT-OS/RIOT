@@ -17,9 +17,8 @@
 #include "cpu.h"
 #include "irq.h"
 #include "cpu_conf.h"
-#include "periph_conf.h" /* for debug uart number */
-#include "periph/uart.h"
 #include "malloc.h"
+#include "stdio_uart.h"
 
 #define STACK_END_PAINT    (0xdeadc0de)
 #define C0_STATUS_EXL      (2)
@@ -182,11 +181,21 @@ mem_rw(const void *vaddr)
 extern int _dsp_save(struct dspctx *ctx);
 extern int _dsp_load(struct dspctx *ctx);
 #endif
+
 /*
- * The nomips16 attribute should not really be needed, it works around a toolchain
- * issue in 2016.05-03.
+ * The official mips toolchain version 2016.05-03 needs this attribute.
+ * Newer versions (>=2017.10-05) don't. Those started being based on gcc 6,
+ * thus use that to guard the attribute.
+ *
+ * See https://github.com/RIOT-OS/RIOT/pull/11986.
  */
+#if __GNUC__ <= 4
 void __attribute__((nomips16))
+#else
+void
+#endif
+
+/* note return type from above #ifdef */
 _mips_handle_exception(struct gpctx *ctx, int exception)
 {
     unsigned int syscall_num = 0;
@@ -206,7 +215,7 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
             syscall_num = (mem_rw((const void *)ctx->epc) >> 6) & 0xFFFF;
 #endif
 
-#ifdef DEBUG_VIA_UART
+#ifdef MODULE_STDIO_UART
 #include <mips/uhi_syscalls.h>
             /*
              * intercept UHI write syscalls (printf) which would normally
@@ -218,16 +227,21 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
                 if (ctx->t2[1] == __MIPS_UHI_WRITE &&
                     (ctx->a[0] == STDOUT_FILENO || ctx->a[0] == STDERR_FILENO)) {
                     uint32_t status = irq_disable();
-                    uart_write(DEBUG_VIA_UART, (uint8_t *)ctx->a[1], ctx->a[2]);
+                    stdio_write((void *)ctx->a[1], ctx->a[2]);
                     ctx->v[0] = ctx->a[2];
                     ctx->epc += 4; /* move PC past the syscall */
                     irq_restore(status);
                     return;
                 }
+                else if (ctx->t2[1] == __MIPS_UHI_READ && ctx->a[0] == STDIN_FILENO) {
+                    ctx->v[0] = stdio_read((void *)ctx->a[1], ctx->a[2]);
+                    ctx->epc += 4; /* move PC past the syscall */
+                    return;
+                }
                 else if (ctx->t2[1] == __MIPS_UHI_FSTAT &&
-                         (ctx->a[0] == STDOUT_FILENO || ctx->a[0] == STDERR_FILENO)) {
+                         (ctx->a[0] == STDOUT_FILENO || ctx->a[0] == STDIN_FILENO || ctx->a[0] == STDERR_FILENO)) {
                     /*
-                     * Printf fstat's the stdout/stderr file so
+                     * Printf fstat's the stdout/stdin/stderr file so
                      * fill out a minimal struct stat.
                      */
                     struct stat *sbuf = (struct stat *)ctx->a[1];
@@ -306,9 +320,9 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
 
                 /*
                  * The toolchain Exception restore code just wholesale copies the
-                 * status register from the context back to the register loosing
-                 * any changes that may have occured, 'status' is really global state
-                 * You dont enable interrupts on one thread and not another...
+                 * status register from the context back to the register losing
+                 * any changes that may have occurred, 'status' is really global state
+                 * You don't enable interrupts on one thread and not another...
                  * So we just copy the current status value into the saved value
                  * so nothing changes on the restore
                  */

@@ -49,15 +49,7 @@
 #endif
 
 
-#if !defined(CPU_FAM_STM32F4)
-#define CLOCK_SRC_REG       RCC->CCIPR
-#define CLOCK_SRC_MASK      RCC_CCIPR_LPTIM1SEL
-#if CLOCK_LSE
-#define CLOCK_SRC_CFG       (RCC_CCIPR_LPTIM1SEL_1 | RCC_CCIPR_LPTIM1SEL_0)
-#else
-#define CLOCK_SRC_CFG       (RCC_CCIPR_LPTIM1SEL_0)
-#endif
-#else
+#if defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7)
 #define CLOCK_SRC_REG       RCC->DCKCFGR2
 #define CLOCK_SRC_MASK      RCC_DCKCFGR2_LPTIM1SEL
 #if CLOCK_LSE
@@ -65,6 +57,31 @@
 #else
 #define CLOCK_SRC_CFG       (RCC_DCKCFGR2_LPTIM1SEL_0)
 #endif
+#else
+#define CLOCK_SRC_REG       RCC->CCIPR
+#define CLOCK_SRC_MASK      RCC_CCIPR_LPTIM1SEL
+#if CLOCK_LSE
+#define CLOCK_SRC_CFG       (RCC_CCIPR_LPTIM1SEL_1 | RCC_CCIPR_LPTIM1SEL_0)
+#else
+#define CLOCK_SRC_CFG       (RCC_CCIPR_LPTIM1SEL_0)
+#endif
+#endif
+
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
+#define IMR_REG             IMR2
+#define EXTI_IMR_BIT        EXTI_IMR2_IM32
+#elif defined(CPU_FAM_STM32L0)
+#define IMR_REG             IMR
+#define EXTI_IMR_BIT        EXTI_IMR_IM29
+#else
+#define IMR_REG             IMR
+#define FTSR_REG            FTSR
+#define RTSR_REG            RTSR
+#define PR_REG              PR
+#define EXTI_FTSR_BIT       EXTI_FTSR_TR23
+#define EXTI_RTSR_BIT       EXTI_RTSR_TR23
+#define EXTI_IMR_BIT        EXTI_IMR_MR23
+#define EXTI_PR_BIT         EXTI_PR_PR23
 #endif
 
 
@@ -91,18 +108,33 @@ void rtt_init(void)
     LPTIM1->CFGR = PRE;
     /* enable overflow and compare interrupts */
     LPTIM1->IER = (LPTIM_IER_ARRMIE | LPTIM_IER_CMPMIE);
+    /* configure the EXTI channel, as RTT interrupts are routed through it.
+     * Needs to be configured to trigger on rising edges. */
+    EXTI->IMR_REG |= EXTI_IMR_BIT;
+#if !defined(CPU_FAM_STM32L4) && !defined(CPU_FAM_STM32L0) && \
+    !defined(CPU_FAM_STM32WB)
+    EXTI->FTSR_REG &= ~(EXTI_FTSR_BIT);
+    EXTI->RTSR_REG |= EXTI_RTSR_BIT;
+    EXTI->PR_REG |= EXTI_PR_BIT;
+#endif
     NVIC_EnableIRQ(LPTIM1_IRQn);
     /* enable timer */
     LPTIM1->CR = LPTIM_CR_ENABLE;
     /* set auto-reload value (timer needs to be enabled for this) */
+    LPTIM1->ICR = LPTIM_ICR_ARROKCF;
     LPTIM1->ARR = RTT_MAX_VALUE;
+    while (!(LPTIM1->ISR & LPTIM_ISR_ARROK)) {}
     /* start the timer */
     LPTIM1->CR |= LPTIM_CR_CNTSTRT;
 }
 
 uint32_t rtt_get_counter(void)
 {
-    return (uint32_t)LPTIM1->CNT;
+    uint32_t cnt;
+    do {
+        cnt = LPTIM1->CNT;
+    } while (cnt != LPTIM1->CNT);
+    return cnt;
 }
 
 void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
@@ -125,9 +157,11 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     assert(cb && !(alarm & ~RTT_MAX_VALUE));
 
     unsigned is = irq_disable();
+    LPTIM1->ICR = LPTIM_ICR_CMPOKCF;
     to_cb  = cb;
     to_arg = arg;
     LPTIM1->CMP = (uint16_t)alarm;
+    while (!(LPTIM1->ISR & LPTIM_ISR_CMPOK)) {}
     irq_restore(is);
 }
 
@@ -170,6 +204,10 @@ void isr_lptim1(void)
         }
     }
     LPTIM1->ICR = (LPTIM_ICR_ARRMCF | LPTIM_ICR_CMPMCF);
+#if !defined(CPU_FAM_STM32L4) && !defined(CPU_FAM_STM32L0) && \
+    !defined(CPU_FAM_STM32WB)
+    EXTI->PR_REG |= EXTI_PR_BIT;
+#endif
 
     cortexm_isr_end();
 }

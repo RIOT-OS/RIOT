@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup    emb6    emb6 network stack
- * @ingroup pkg
+ * @addtogroup  pkg_emb6
  * @brief
  * @{
  *

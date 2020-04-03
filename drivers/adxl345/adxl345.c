@@ -31,8 +31,8 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-#define ADXL345_BUS                 (dev->params->i2c)
-#define ADXL345_ADDR                (dev->params->addr)
+#define ADXL345_BUS                 (dev->params.i2c)
+#define ADXL345_ADDR                (dev->params.addr)
 
 #define ADXL345_PARAM_SCALE_FACTOR  (4)
 
@@ -43,10 +43,10 @@ int adxl345_init(adxl345_t *dev, const adxl345_params_t* params)
     assert(dev && params);
 
     /* get device descriptor */
-    dev->params = (adxl345_params_t*)params;
+    dev->params = *params;
 
     /* get scale_factor from full_res and range parameters */
-    dev->scale_factor = (dev->params->full_res ? ADXL345_PARAM_SCALE_FACTOR : (4 << dev->params->range));
+    dev->scale_factor = (dev->params.full_res ? ADXL345_PARAM_SCALE_FACTOR : (4 << dev->params.range));
 
     /* Acquire exclusive access */
     i2c_acquire(ADXL345_BUS);
@@ -59,12 +59,12 @@ int adxl345_init(adxl345_t *dev, const adxl345_params_t* params)
         return ADXL345_NODEV;
     }
     /* configure the user offset */
-    i2c_write_regs(ADXL345_BUS, ADXL345_ADDR, ADXL345_OFFSET_X, dev->params->offset, 3, 0);
+    i2c_write_regs(ADXL345_BUS, ADXL345_ADDR, ADXL345_OFFSET_X, dev->params.offset, 3, 0);
     /* Basic device setup */
-    reg = (dev->params->full_res ? ADXL345_FULL_RES : 0);
-    reg |= dev->params->range;
+    reg = (dev->params.full_res ? ADXL345_FULL_RES : 0);
+    reg |= dev->params.range;
     i2c_write_reg(ADXL345_BUS, ADXL345_ADDR, ADXL345_DATA_FORMAT, reg, 0);
-    i2c_write_reg(ADXL345_BUS, ADXL345_ADDR, ADXL345_BW_RATE, dev->params->rate, 0);
+    i2c_write_reg(ADXL345_BUS, ADXL345_ADDR, ADXL345_BW_RATE, dev->params.rate, 0);
     /* Put device in measure mode */
     i2c_write_reg(ADXL345_BUS, ADXL345_ADDR, ADXL345_POWER_CTL, ADXL345_MEASURE_BIT, 0);
 

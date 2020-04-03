@@ -99,7 +99,7 @@ static void test_phydat_fit(void)
         { .val = { -32766, -32766, -32766 }, .unit = UNIT_NONE, .scale =  0 },
     };
 
-    for (unsigned int i = 0; i < sizeof(dims) / sizeof(dims[0]); i++) {
+    for (unsigned int i = 0; i < ARRAY_SIZE(dims); i++) {
         phydat_t dat = {
             .val = { -1, -1, -1 },
             .scale = scales[i],

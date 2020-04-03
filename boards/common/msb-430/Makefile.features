@@ -1,1 +1,2 @@
-include $(RIOTCPU)/msp430fxyz/Makefile.features
+CPU = msp430fxyz
+CPU_MODEL = msp430f1612

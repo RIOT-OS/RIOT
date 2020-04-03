@@ -30,7 +30,7 @@ void *run(void *parameter)
 
     (void)parameter;
 
-    printf("\n-= TEST 1 - create %d tls with sequencial values 0...%d =-\n",
+    printf("\n-= TEST 1 - create %d tls with sequential values 0...%d =-\n",
            NUMBER_OF_TLS, NUMBER_OF_TLS - 1);
 
     for (int i = 0; i < NUMBER_OF_TLS; ++i) {
@@ -39,7 +39,7 @@ void *run(void *parameter)
         pthread_setspecific(aKeys[i], &aTLS_values[i]);
     }
 
-    printf("now rise sequencial by one values 1...%d\n", NUMBER_OF_TLS);
+    printf("now rise sequential by one values 1...%d\n", NUMBER_OF_TLS);
 
     for (int i = 0; i < NUMBER_OF_TLS; ++i) {
         aTLS_values[i]++;

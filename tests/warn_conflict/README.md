@@ -1,6 +1,6 @@
 Test warning on conflicting features
 ==================================================
-Using conflicting features provided by boards was invisible for the user until the used features resulted in a traceable problem or the user was aware of the conflict in advance from documentation ect.
+Using conflicting features provided by boards was invisible for the user until the used features resulted in a traceable problem or the user was aware of the conflict in advance from documentation etc.
 Now, existing and known conflicts can be recorded into `FEATURES_CONFLICT` for each board to inform the user on a conflict situation during compile time.
 
 This test requires conflicting features in its `Makefile`, i.e. `FEATURES_REQUIRED = periph_dac periph_spi`.

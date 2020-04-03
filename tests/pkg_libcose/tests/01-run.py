@@ -8,15 +8,15 @@
 
 import os
 import sys
-from testrunner import run
+from testrunner import run_check_unittests
+from testrunner import TIMEOUT as DEFAULT_TIMEOUT
 
 
-def testfunc(child):
-    board = os.environ['BOARD']
-    # Increase timeout on "real" hardware
-    timeout = 120 if board is not 'native' else -1
-    child.expect('OK \(\d+ tests\)', timeout=timeout)
+BOARD = os.environ['BOARD']
+# on real hardware, this test application can take several minutes to
+# complete (~4min on microbit)
+TIMEOUT = 300 if BOARD != 'native' else DEFAULT_TIMEOUT
 
 
 if __name__ == "__main__":
-    sys.exit(run(testfunc))
+    sys.exit(run_check_unittests(timeout=TIMEOUT))

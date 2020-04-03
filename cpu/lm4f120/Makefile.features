@@ -1,1 +1,5 @@
+CPU_ARCH = cortex-m4f
+
+FEATURES_PROVIDED += cortexm_mpu
+
 -include $(RIOTCPU)/cortexm_common/Makefile.features

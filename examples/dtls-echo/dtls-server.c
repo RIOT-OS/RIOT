@@ -77,7 +77,7 @@ char _dtls_server_stack[THREAD_STACKSIZE_MAIN +
  * DTLS records. Also, it determines if said DTLS record is coming from a new
  * peer or a currently established peer.
  */
-static void dtls_handle_read(dtls_context_t *ctx)
+static int dtls_handle_read(dtls_context_t *ctx)
 {
     static session_t session;
     static uint8_t packet_rcvd[DTLS_MAX_BUF];
@@ -87,25 +87,26 @@ static void dtls_handle_read(dtls_context_t *ctx)
 
     if (!ctx) {
         DEBUG("No DTLS context!\n");
-        return;
+        return 0;
     }
 
     if (!dtls_get_app_data(ctx)) {
         DEBUG("No app_data stored!\n");
-        return;
+        return 0;
     }
 
     dtls_remote_peer_t *remote_peer;
     remote_peer = (dtls_remote_peer_t *)dtls_get_app_data(ctx);
 
-    ssize_t res = sock_udp_recv(remote_peer->sock, packet_rcvd, DTLS_MAX_BUF,
-                                1 * US_PER_SEC, remote_peer->remote);
+    ssize_t res = sock_udp_recv(remote_peer->sock, packet_rcvd,
+                                sizeof(packet_rcvd), 1 * US_PER_SEC,
+                                remote_peer->remote);
 
     if (res <= 0) {
         if ((ENABLE_DEBUG) && (res != -EAGAIN) && (res != -ETIMEDOUT)) {
-            DEBUG("sock_udp_recv unexepcted code error: %i\n", (int)res);
+            DEBUG("sock_udp_recv unexpected code error: %i\n", (int)res);
         }
-        return;
+        return 0;
     }
 
     DEBUG("DBG-Server: Record Rcvd\n");
@@ -120,14 +121,8 @@ static void dtls_handle_read(dtls_context_t *ctx)
         session.ifindex = remote_peer->remote->netif;
     }
 
-    if (memcpy(&session.addr, &remote_peer->remote->addr.ipv6, 16) == NULL) {
-        puts("ERROR: memcpy failed!");
-        return;
-    }
-
-    dtls_handle_message(ctx, &session, packet_rcvd, (int)DTLS_MAX_BUF);
-
-    return;
+    memcpy(&session.addr, &remote_peer->remote->addr.ipv6, sizeof(session.addr));
+    return dtls_handle_message(ctx, &session, packet_rcvd, res);
 }
 
 /* Reception of a DTLS Application data record. */
@@ -172,7 +167,7 @@ static int _send_to_peer_handler(struct dtls_context_t *ctx,
     return sock_udp_send(remote_peer->sock, buf, len, remote_peer->remote);
 }
 
-#ifdef DTLS_PSK
+#ifdef CONFIG_DTLS_PSK
 static unsigned char psk_id[PSK_ID_MAXLEN] = PSK_DEFAULT_IDENTITY;
 static size_t psk_id_length = sizeof(PSK_DEFAULT_IDENTITY) - 1;
 static unsigned char psk_key[PSK_MAXLEN] = PSK_DEFAULT_KEY;
@@ -210,7 +205,7 @@ static int _peer_get_psk_info_handler(struct dtls_context_t *ctx, const session_
 
     if (id) {
         uint8_t i;
-        for (i = 0; i < sizeof(psk) / sizeof(struct keymap_t); i++) {
+        for (i = 0; i < ARRAY_SIZE(psk); i++) {
             if (id_len == psk[i].id_length && memcmp(id, psk[i].id, id_len) == 0) {
                 if (result_length < psk[i].key_length) {
                     dtls_warn("buffer too small for PSK");
@@ -225,9 +220,9 @@ static int _peer_get_psk_info_handler(struct dtls_context_t *ctx, const session_
 
     return dtls_alert_fatal_create(DTLS_ALERT_DECRYPT_ERROR);
 }
-#endif /* DTLS_PSK */
+#endif /* CONFIG_DTLS_PSK */
 
-#ifdef DTLS_ECC
+#ifdef CONFIG_DTLS_ECC
 static int _peer_get_ecdsa_key_handler(struct dtls_context_t *ctx,
                                        const session_t *session,
                                        const dtls_ecdsa_key_t **result)
@@ -263,30 +258,30 @@ static int _peer_verify_ecdsa_key_handler(struct dtls_context_t *ctx,
 
     return 0;
 }
-#endif /* DTLS_ECC */
+#endif /* CONFIG_DTLS_ECC */
 
 /* DTLS variables and register are initialized. */
 dtls_context_t *_server_init_dtls(dtls_remote_peer_t *remote_peer)
 {
-    dtls_context_t *new_context = NULL;
+    dtls_context_t *new_context;
 
     static dtls_handler_t cb = {
         .write = _send_to_peer_handler,
         .read = _read_from_peer_handler,
         .event = NULL,
-#ifdef DTLS_PSK
+#ifdef CONFIG_DTLS_PSK
         .get_psk_info = _peer_get_psk_info_handler,
-#endif  /* DTLS_PSK */
-#ifdef DTLS_ECC
+#endif  /* CONFIG_DTLS_PSK */
+#ifdef CONFIG_DTLS_ECC
         .get_ecdsa_key = _peer_get_ecdsa_key_handler,
         .verify_ecdsa_key = _peer_verify_ecdsa_key_handler
-#endif  /* DTLS_ECC */
+#endif  /* CONFIG_DTLS_ECC */
     };
 
-#ifdef DTLS_PSK
+#ifdef CONFIG_DTLS_PSK
     DEBUG("Server support PSK\n");
 #endif
-#ifdef DTLS_ECC
+#ifdef CONFIG_DTLS_ECC
     DEBUG("Server support ECC\n");
 #endif
 
@@ -350,14 +345,14 @@ void *_dtls_server_wrapper(void *arg)
     }
 
     while (active) {
-
-        msg_try_receive(&msg); /* Check if we got an (thread) message */
-        if (msg.type == DTLS_STOP_SERVER_MSG) {
+        if ((msg_try_receive(&msg) == -1) && (msg.type == DTLS_STOP_SERVER_MSG)) {
             active = false;
         }
         else {
             /* Listening for any DTLS recodrd */
-            dtls_handle_read(dtls_context);
+            if (dtls_handle_read(dtls_context) < 0) {
+                printf("Received alert from client\n");
+            }
         }
     }
 

@@ -1,9 +1,5 @@
-# Define the cpu used by the CC2538DK board:
-export CPU        = cc2538
-export CPU_MODEL ?= cc2538nf53
-
 # the SmartRF06 Evaluation Board serial numbers all begin with "06EB":
-export PROGRAMMER_SERIAL ?= 06EB
+PROGRAMMER_SERIAL ?= 06EB
 
 # setup serial terminal
 # the debug UART is always the second tty with the matching serial number:
@@ -15,24 +11,26 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 include $(RIOTMAKE)/tools/renode.inc.mk
 
 # debugger config
-export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
-export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
-export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+DEBUGGER = $(RIOTBOARD)/cc2538dk/dist/debug.sh
+DEBUGSERVER = JLinkGDBServer -device CC2538SF53
+RESET ?= $(RIOTBOARD)/cc2538dk/dist/reset.sh
 
 # Define the flash-tool and default port:
-export PROGRAMMER ?= cc2538-bsl
+PROGRAMMER ?= cc2538-bsl
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
-  export FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
-  export FFLAGS  = -p "$(PORT)" -e -w -v $(HEXFILE)
+  include $(RIOTMAKE)/tools/cc2538-bsl.inc.mk
 else ifeq ($(PROGRAMMER),jlink)
-  export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-  export FFLAGS  = $(BINDIR) $(HEXFILE)
+  FLASHER = $(RIOTBOARD)/cc2538dk/dist/flash.sh
+  FFLAGS  = $(BINDIR) $(FLASHFILE)
 endif
 
 OFLAGS = --gap-fill 0xff
-HEXFILE = $(BINFILE)
-export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
-export RESET_FLAGS = $(BINDIR)
+FLASHFILE ?= $(BINFILE)
+DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
+RESET_FLAGS ?= $(BINDIR)
 
-export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
+OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
+
+# include common cc2538 includes
+INCLUDES += -I$(RIOTBOARD)/common/cc2538/include

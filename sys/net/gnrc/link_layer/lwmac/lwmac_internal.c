@@ -90,10 +90,10 @@ int _gnrc_lwmac_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 #ifdef MODULE_NETSTATS_L2
     if (netif_hdr->flags &
             (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-        netif->dev->stats.tx_mcast_count++;
+        netif->stats.tx_mcast_count++;
     }
     else {
-        netif->dev->stats.tx_unicast_count++;
+        netif->stats.tx_unicast_count++;
     }
 #endif
 #ifdef MODULE_GNRC_MAC
@@ -191,7 +191,7 @@ void _gnrc_lwmac_set_netdev_state(gnrc_netif_t *netif, netopt_state_t devstate)
                             &devstate,
                             sizeof(devstate));
 
-#if (GNRC_LWMAC_ENABLE_DUTYCYLE_RECORD == 1)
+#if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
     if (devstate == NETOPT_STATE_IDLE) {
         if (!(netif->mac.prot.lwmac.lwmac_info & GNRC_LWMAC_RADIO_IS_ON)) {
             netif->mac.prot.lwmac.last_radio_on_time_ticks = rtt_get_counter();

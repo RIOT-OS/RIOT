@@ -27,6 +27,7 @@
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc.h"
+#include "net/gnrc/icmpv6/error.h"
 #include "net/inet_csum.h"
 
 
@@ -157,6 +158,8 @@ static void _receive(gnrc_pktsnip_t *pkt)
     /* send payload to receivers */
     if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_UDP, port, pkt)) {
         DEBUG("udp: unable to forward packet as no one is interested in it\n");
+        /* TODO determine if IPv6 packet, when IPv4 is implemented */
+        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PORT, pkt);
         gnrc_pktbuf_release(pkt);
     }
 }

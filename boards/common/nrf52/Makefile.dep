@@ -1,0 +1,11 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_nrf_temperature
+endif
+
+ifneq (,$(findstring nrf52832, $(CPU_MODEL)))
+  # include common nrf52832 dependencies
+  include $(RIOTBOARD)/common/nrf52/nrf52832/Makefile.dep
+else ifneq (,$(findstring nrf52840, $(CPU_MODEL)))
+  # include common nrf52840 dependencies
+  include $(RIOTBOARD)/common/nrf52/nrf52840/Makefile.dep
+endif

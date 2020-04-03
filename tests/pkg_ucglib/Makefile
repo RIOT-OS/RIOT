@@ -1,8 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             waspmote-pro
-
 USEMODULE += xtimer
 
 USEPKG += ucglib

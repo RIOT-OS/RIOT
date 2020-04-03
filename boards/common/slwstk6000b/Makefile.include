@@ -1,0 +1,17 @@
+INCLUDES += -I$(RIOTBOARD)/common/slwstk6000b/include
+# add BOARD_MODULE specific includes
+INCLUDES += -I$(RIOTBOARD)/common/slwstk6000b/modules/$(BOARD_MODULE)/include
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# setup JLink for flashing
+include $(RIOTBOARD)/common/slwstk6000b/slwstk6000b.info.mk
+JLINK_DEVICE = $(word 2, $(SLWSTK6000B_MAINBOARD_VARS_$(BOARD_MODULE)))
+
+# include board common
+include $(RIOTBOARD)/common/silabs/Makefile.include

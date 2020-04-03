@@ -33,18 +33,19 @@
 
 static int read_adc(const void *dev, phydat_t *res)
 {
+    const ads101x_t *mydev = dev;
+
     /* Change the mux channel */
-    ads101x_set_mux_gain((const ads101x_t *)dev,
-                         ((ads101x_t *)dev)->params.mux_gain);
+    ads101x_set_mux_gain(mydev, mydev->params.mux_gain);
 
     /* Read raw value */
-    if (ads101x_read_raw((const ads101x_t *)dev, res->val) < 0) {
+    if (ads101x_read_raw(mydev, res->val) < 0) {
         return ECANCELED;
     }
 
     /* Special case for 2.048V */
     /* (this is the fixed FSR of ADS1013 and ADS1113) */
-    if ((((ads101x_t *)dev)->params.mux_gain & ADS101X_PGA_MASK)
+    if ((mydev->params.mux_gain & ADS101X_PGA_MASK)
         == ADS101X_PGA_FSR_2V048) {
 
         /* LSB == 62.5uV to LSB == 100uV */

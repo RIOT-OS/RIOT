@@ -52,7 +52,7 @@ static const constfs_file_t _files[] = {
 
 static const constfs_t fs_data = {
     .files = _files,
-    .nfiles = sizeof(_files) / sizeof(_files[0]),
+    .nfiles = ARRAY_SIZE(_files),
 };
 
 static vfs_mount_t _test_vfs_mount_invalid_mount = {

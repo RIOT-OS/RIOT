@@ -128,7 +128,7 @@ static int _topic_find(asymcute_topic_t *t, const char *name)
         if (asymcute_topic_is_reg(&_topics[i]) &&
             (strncmp(name, _topics[i].name, sizeof(_topics[i].name)) == 0)) {
             if (t) {
-                memcpy(t, &_topics[i], sizeof(asymcute_topic_t));
+                *t = _topics[i];
             }
             return 0;
         }

@@ -42,7 +42,8 @@ typedef struct {
 /**
  * @brief   Static initializer for irspipe
  */
-#define ISRPIPE_INIT(tsrb_buf) { .mutex = MUTEX_INIT, .tsrb = TSRB_INIT(tsrb_buf) }
+#define ISRPIPE_INIT(tsrb_buf) { .mutex = MUTEX_INIT, \
+                                 .tsrb = TSRB_INIT(tsrb_buf) }
 
 /**
  * @brief   Initialisation function for isrpipe
@@ -51,7 +52,7 @@ typedef struct {
  * @param[in]   buf         buffer to use as ringbuffer (must be power of two sized!)
  * @param[in]   bufsize     size of @p buf
  */
-void isrpipe_init(isrpipe_t *isrpipe, char *buf, size_t bufsize);
+void isrpipe_init(isrpipe_t *isrpipe, uint8_t *buf, size_t bufsize);
 
 /**
  * @brief   Put one character into the isrpipe's buffer
@@ -62,7 +63,7 @@ void isrpipe_init(isrpipe_t *isrpipe, char *buf, size_t bufsize);
  * @returns     0 if character could be added
  * @returns     -1 if buffer was full
  */
-int isrpipe_write_one(isrpipe_t *isrpipe, char c);
+int isrpipe_write_one(isrpipe_t *isrpipe, uint8_t c);
 
 /**
  * @brief   Read data from isrpipe (blocking)
@@ -73,41 +74,7 @@ int isrpipe_write_one(isrpipe_t *isrpipe, char c);
  *
  * @returns     number of bytes read
  */
-int isrpipe_read(isrpipe_t *isrpipe, char *buf, size_t count);
-
-/**
- * @brief   Read data from isrpipe (with timeout, blocking)
- *
- * Currently, the timeout parameter is applied on every underlying read, which
- * might be *per single byte*.
- *
- * @note This function might return less than @p count bytes
- *
- * @param[in]   isrpipe    isrpipe object to operate on
- * @param[in]   buf        buffer to write to
- * @param[in]   count      number of bytes to read
- * @param[in]   timeout    timeout in microseconds
- *
- * @returns     number of bytes read
- * @returns     -ETIMEDOUT on timeout
- */
-int isrpipe_read_timeout(isrpipe_t *isrpipe, char *buf, size_t count, uint32_t timeout);
-
-/**
- * @brief   Read data from isrpipe (with timeout, blocking, wait until all read)
- *
- * This function is like @ref isrpipe_read_timeout, but will only return on
- * timeout or when @p count bytes have been received.
- *
- * @param[in]   isrpipe    isrpipe object to operate on
- * @param[in]   buf        buffer to write to
- * @param[in]   count      number of bytes to read
- * @param[in]   timeout    timeout in microseconds
- *
- * @returns     number of bytes read
- * @returns     -ETIMEDOUT on timeout
- */
-int isrpipe_read_all_timeout(isrpipe_t *isrpipe, char *buf, size_t count, uint32_t timeout);
+int isrpipe_read(isrpipe_t *isrpipe, uint8_t *buf, size_t count);
 
 #ifdef __cplusplus
 }

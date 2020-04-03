@@ -44,10 +44,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /**
  * @name LED (on-board) configuration
  * @{
@@ -60,7 +56,7 @@
  * @name   SD card interface configuration
  *
  * SD card interface uses SPI_DEV(0) on this board. This configuration cannot
- * be overriden.
+ * be overridden.
  * @{
  */
 #if MODULE_SDCARD_SPI
@@ -73,12 +69,24 @@
 #endif
 /** @} */
 
+/* include common board definitions as last step */
+#include "board_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief Initialize the board specific hardware
+ */
+static inline void board_init(void) {
+    /* there is nothing special to initialize on this board */
+    board_init_common();
+}
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-
-/* include common board definitions as last step */
-#include "board_common.h"
 
 #endif /* BOARD_H */
 /** @} */
