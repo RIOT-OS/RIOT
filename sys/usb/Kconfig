@@ -79,4 +79,6 @@ config USB_DEFAULT_LANGID
     help
         The default value is EN-US (0x0409).
 
+
+rsource "usbus/Kconfig"
 endif # KCONFIG_USB

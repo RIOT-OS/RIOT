@@ -331,9 +331,9 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     ep0_handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_READY;
 
     ep0_handler->in = usbus_add_endpoint(usbus, NULL, USB_EP_TYPE_CONTROL,
-                                         USB_EP_DIR_IN, USBUS_EP0_SIZE)->ep;
+                                         USB_EP_DIR_IN, CONFIG_USBUS_EP0_SIZE)->ep;
     ep0_handler->out = usbus_add_endpoint(usbus, NULL, USB_EP_TYPE_CONTROL,
-                                          USB_EP_DIR_OUT, USBUS_EP0_SIZE)->ep;
+                                          USB_EP_DIR_OUT, CONFIG_USBUS_EP0_SIZE)->ep;
 }
 
 static int _handle_tr_complete(usbus_t *usbus,
