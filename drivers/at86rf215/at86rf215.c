@@ -206,6 +206,8 @@ static bool _tx_ongoing(at86rf215_t *dev)
         return true;
     }
 
+    /* we can still fill the TX buffer and queue TX
+       when in AT86RF215_STATE_RX_SEND_ACK */
     if (dev->state == AT86RF215_STATE_TX ||
         dev->state == AT86RF215_STATE_TX_WAIT_ACK) {
         return true;
