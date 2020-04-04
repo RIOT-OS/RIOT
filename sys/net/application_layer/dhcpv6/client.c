@@ -155,6 +155,7 @@ void dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len)
             lease->parent.ia_id.info.netif = netif;
             lease->parent.ia_id.info.type = DHCPV6_OPT_IA_PD;
             lease->pfx_len = pfx_len;
+            break;
         }
     }
 }
@@ -662,7 +663,6 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                                     lease->pfx_len, valid, pref
                                 );
                         }
-                        return true;
                     }
                 }
                 break;
