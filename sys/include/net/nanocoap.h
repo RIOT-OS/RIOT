@@ -976,6 +976,44 @@ ssize_t coap_opt_add_opaque(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val
 /**
  * @brief   Adds a single Uri-Query option in the form 'key=value' into pkt
  *
+ * @note Use this only for null-terminated string. See @ref coap_opt_add_uri_query2()
+ *       for non null-terminated string.
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     key         Key to add to the query string
+ * @param[in]     val         Value to assign to @p key (may be NULL)
+ *
+ * @pre     ((pkt != NULL) && (key != NULL))
+ *
+ * @return        number of bytes written to pkt buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or pkt full
+ */
+ssize_t coap_opt_add_uri_query(coap_pkt_t *pkt, const char *key, const char *val);
+
+/**
+ * @brief   Adds a single Uri-Query option in the form 'key=value' into pkt
+ *
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     key         Key to add to the query string
+ * @param[in]     key_len     Length of @p key
+ * @param[in]     val         Value to assign to @p key (may be NULL)
+ * @param[in]     val_len     Length of @p val. 0 if @p val is NULL
+ *
+ * @pre     ((pkt != NULL) && (key != NULL) && (key_len > 0)
+ *              && ((val_len == 0) || ((val != NULL) && (val_len > 0))))
+ *
+ * @return        number of bytes written to pkt buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or pkt full
+ */
+ssize_t coap_opt_add_uri_query2(coap_pkt_t *pkt, const char *key, size_t key_len,
+                                const char *val, size_t val_len);
+
+/**
+ * @brief   Adds a single Uri-Query option in the form 'key=value' into pkt
+ *
  * @note Use this only for null-terminated string. See @ref coap_opt_add_uquery2()
  *       for non null-terminated string.
  *
