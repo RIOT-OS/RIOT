@@ -29,7 +29,7 @@
  * @brief   Check the board config to make sure we do not exceed max number of
  *          timers
  */
-#if TIMER_NUMOF > 3
+#if TIMER_NUMOF > 4
 #error "ERROR in timer configuration: too many timers defined"
 #endif
 
