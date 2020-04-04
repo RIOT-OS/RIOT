@@ -854,13 +854,8 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
     return write_len;
 }
 
-ssize_t coap_opt_add_uquery(coap_pkt_t *pkt, const char *key, const char *val)
-{
-    return coap_opt_add_uquery2(pkt, key, strlen(key), val, val ? strlen(val) : 0);
-}
-
-ssize_t coap_opt_add_uquery2(coap_pkt_t *pkt, const char *key, size_t key_len,
-                             const char *val, size_t val_len)
+ssize_t coap_opt_add_uri_query2(coap_pkt_t *pkt, const char *key, size_t key_len,
+                                const char *val, size_t val_len)
 {
     assert(pkt);
     assert(key);
