@@ -1,3 +1,4 @@
+# vairable can pass like: make BOARD=samr30-xpro ISM=EU flash term
 ifneq (EU,$(ISM))
   # Default setting for US ISM band (Channel 26 for 2.4 GHz, Channel 5/Page 2 for sub-GHz)
   ifneq (,$(DEFAULT_CHANNEL))
