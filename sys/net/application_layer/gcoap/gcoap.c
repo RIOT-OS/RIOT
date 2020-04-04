@@ -659,7 +659,7 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 
     coap_pkt_init(pdu, buf, len - CONFIG_GCOAP_REQ_OPTIONS_BUF, res);
     if (path != NULL) {
-        res = coap_opt_add_string(pdu, COAP_OPT_URI_PATH, path, '/');
+        res = coap_opt_add_uri_path(pdu, path);
     }
     return (res > 0) ? 0 : res;
 }
