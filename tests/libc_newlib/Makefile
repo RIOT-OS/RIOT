@@ -2,6 +2,8 @@ include ../Makefile.tests_common
 
 USEMODULE += embunit
 
+FEATURES_BLACKLIST += arch_esp32
+
 include $(RIOTBASE)/Makefile.include
 
 # Compile time tests
