@@ -1,5 +1,5 @@
 ifneq (EU,$(ISM))
-  # Default seeting which working on US (Channel 26 for 2.4 GHz, Channel 5/Page 2 for sub-GHz)
+  # Default setting for US ISM band (Channel 26 for 2.4 GHz, Channel 5/Page 2 for sub-GHz)
   ifneq (,$(DEFAULT_CHANNEL))
     ifneq (,$(filter cc110x,$(USEMODULE)))        # radio is cc110x sub-GHz
       CFLAGS += -DCC110X_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
