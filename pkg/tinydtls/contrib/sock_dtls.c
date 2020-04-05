@@ -410,10 +410,6 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
             timeout = (time_passed > timeout) ? 0: timeout - time_passed;
         }
 
-        _ep_to_session(&remote->ep, &remote->dtls_session);
-        res = dtls_handle_message(sock->dtls_ctx, &remote->dtls_session,
-                                  (uint8_t *)data, res);
-
         if (sock->buf != NULL) {
             return _copy_buffer(sock, data, max_len);
         }
