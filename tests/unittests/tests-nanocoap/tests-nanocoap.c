@@ -745,6 +745,35 @@ static void test_nanocoap__empty(void)
     TEST_ASSERT_EQUAL_INT(-EBADMSG, res);
 }
 
+/*
+ * Test adding a path from an unterminated string
+ */
+static void test_nanocoap__add_path_unterminated_string(void)
+{
+    uint8_t buf[_BUF_SIZE];
+    coap_pkt_t pkt;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+    char path[16] = "/time";
+    size_t path_len = strlen("/time");
+
+    /* some random non-zero character at the end of /time */
+    path[path_len] = 'Z';
+
+    size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                &token[0], 2, COAP_METHOD_GET, msgid);
+
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_opt_add_chars(&pkt, COAP_OPT_URI_PATH, &path[0], path_len, '/');
+
+    char uri[10] = {0};
+    ssize_t parsed_path_len = coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
+
+    /* we subtract one byte for '\0' at the end from parsed_uri_path */
+    TEST_ASSERT_EQUAL_INT(path_len, parsed_path_len - 1);
+    TEST_ASSERT_EQUAL_INT(0, strncmp(path, uri, path_len));
+}
+
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -769,6 +798,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__server_option_count_overflow_check),
         new_TestFixture(test_nanocoap__server_option_count_overflow),
         new_TestFixture(test_nanocoap__empty),
+        new_TestFixture(test_nanocoap__add_path_unterminated_string),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);
