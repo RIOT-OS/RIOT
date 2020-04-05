@@ -219,6 +219,17 @@ bool uri_parser_is_absolute(const char *uri, size_t uri_len)
             /* relative */
             return false;
         }
+        for (int i = 0; &uri[i] < colon; ++i) {
+            if (!(((uri[i] >= 'A') && (uri[i] <= 'Z')) ||
+                  ((uri[i] >= 'a') && (uri[i] <= 'z')) ||
+                  ((uri[i] >= '0') && (uri[i] <= '9')) ||
+                  (uri[i] == '+') ||
+                  (uri[i] == '-') ||
+                  (uri[i] == '.'))) {
+                /* relative */
+                return false;
+            }
+        }
 
         /* absolute */
         return true;
