@@ -352,7 +352,11 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         return -1;
     }
 
-    ssize_t pdu_len = resource->handler(pdu, buf, len, resource->context);
+    gcoap_req_ctx_t req_ctx;
+    req_ctx.remote = remote;
+    req_ctx.resource = resource;
+
+    ssize_t pdu_len = resource->handler(pdu, buf, len, &req_ctx);
     if (pdu_len < 0) {
         pdu_len = gcoap_response(pdu, buf, len,
                                  COAP_CODE_INTERNAL_SERVER_ERROR);

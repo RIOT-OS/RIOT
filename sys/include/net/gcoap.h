@@ -60,8 +60,15 @@
  *
  * ### Creating a response ###
  *
- * An application resource includes a callback function, a coap_handler_t. After
- * reading the request, the callback must use functions provided by gcoap to
+ * An application resource includes a coap_handler_t callback function, which
+ * is called to notify the application of an incoming request. This function
+ * includes a coap_pkt_t parsed representation of the incoming message, as
+ * well as the raw message buffer. The callback also includes a context
+ * parameter as a generic void pointer. gcoap sets this parameter to a
+ * gcoap_req_ctx_t, which includes the remote endpoint and the application
+ * resource for the request.
+ *
+ * After reading the request, the callback must use functions provided by gcoap to
  * format the response, as described below. The callback *must* read the request
  * thoroughly before calling the functions, because the response buffer likely
  * reuses the request buffer. See `examples/gcoap/gcoap_cli.c` for a simple
@@ -712,6 +719,14 @@ typedef struct {
     uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
     unsigned token_len;                 /**< Actual length of token attribute */
 } gcoap_observe_memo_t;
+
+/**
+ * @brief   Context data about an incoming request, for application handler
+ */
+typedef struct {
+    sock_udp_ep_t *remote;              /**< Endpoint that sent request */
+    const coap_resource_t *resource;    /**< Resource for request */
+} gcoap_req_ctx_t;
 
 /**
  * @brief   Initializes the gcoap thread and device
