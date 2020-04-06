@@ -73,15 +73,21 @@ typedef struct {
 } pn532_t;
 
 /**
+ * @defgroup drivers_pn532_config     PN532 NFC Radio driver compile configuration
+ * @ingroup config_drivers_netdev
+ * @{
+ */
+/**
  * @brief   Internal buffer size
  *
- * A small buffer size is enough for most applications, however if large NDEF
+ * @note A small buffer size is enough for most applications, however if large NDEF
  * files are to be written this size shall be increased. Otherwise the files
  * can be written in chunks.
  */
 #ifndef PN532_BUFFER_LEN
 #define PN532_BUFFER_LEN     (64)
 #endif
+/** @} */
 
 /**
  * @name    Helpers to extract firmware information from word
