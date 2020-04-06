@@ -1,9 +1,6 @@
 # Frequency Band (FBAND) variable can pass like: make BOARD=samr30-xpro FBAND=868 flash term
-# with FBAND=868 changes channel/page setting only if transceiver is at86rf212b 
+# with FBAND=868 changes channel/page setting only if transceiver is at86rf212b
 ifeq (868, $(FBAND))
-  ifneq (,$(filter cc110x,$(USEMODULE)))        # radio is cc110x sub-GHz
-    CFLAGS += -DCC110X_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
-  endif
   # radio is at86rf212b sub GHz at FBAND=868MHz (channel = 0 / page = 0）
   ifneq (,$(filter at86rf212b,$(USEMODULE)))     
     FBAND_CHANNEL ?= 0
