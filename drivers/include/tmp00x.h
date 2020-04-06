@@ -93,7 +93,15 @@ extern "C"
 #define ADDR                        (dev->p.addr) /**< ADDR */
 
 /**
- * @brief   TMP00X Default Address
+ * @defgroup drivers_tmp00x_config     TMP006/TMP007 Infrared Thermopile Sensor driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+/**
+ * @brief   Default Address
+ *
+ * I2C Address depends on the state of ADR0 and ADR1 Pins
+ * For more information, please refer to section 7.3.6.2 of TMP007 datasheet (SBOS685B).
  */
 #ifndef TMP00X_I2C_ADDRESS
 #define TMP00X_I2C_ADDRESS         (0x40)
@@ -127,6 +135,7 @@ extern "C"
 #ifndef TMP00X_USE_RAW_VALUES
 #define TMP00X_USE_RAW_VALUES (0)
 #endif
+/** @} */
 
 /**
  * @name    Conversion rate and AVG sampling configuration
