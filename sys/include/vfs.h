@@ -58,9 +58,7 @@
  * see: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60932
  */
 #ifdef __cplusplus
-#include <atomic>
-/* Make atomic_int available without namespace specifier */
-using std::atomic_int;
+#include "c11_atomics_compat.hpp"
 #else
 #include <stdatomic.h> /* for atomic_int */
 #endif
