@@ -99,6 +99,9 @@
 #include "irq.h"
 #include "cpu.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 extern uint32_t _estack;
 extern uint32_t _sstack;
 
@@ -153,7 +156,7 @@ char *thread_stack_init(thread_task_func_t task_func,
     /* ****************************** */
 
     /* The following eight stacked registers are popped by the hardware upon
-     * return from exception. (bx instruction in context_restore) */
+     * return from exception. (bx instruction in select_and_restore_context) */
 
     /* xPSR - initial status register */
     stk--;
@@ -181,7 +184,7 @@ char *thread_stack_init(thread_task_func_t task_func,
     /* ************************* */
 
     /* The following registers are not handled by hardware in return from
-     * exception, but manually by context_restore.
+     * exception, but manually by select_and_restore_context.
      * For the Cortex-M0(plus) we write registers R11-R4 in two groups to allow
      * for more efficient context save/restore code.
      * For the Cortex-M3 and Cortex-M4 we write them continuously onto the stack
@@ -286,9 +289,17 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     /* save context by pushing unsaved registers to the stack */
     /* {r0-r3,r12,LR,PC,xPSR,s0-s15,FPSCR} are saved automatically on exception entry */
     ".thumb_func                      \n"
+
+    /* skip context saving if sched_active_thread == NULL */
+    "ldr    r1, =sched_active_thread  \n" /* r1 = &sched_active_thread  */
+    "ldr    r1, [r1]                  \n" /* r1 = sched_active_thread   */
+    "cmp    r1, #0                    \n" /* if r1 == NULL:             */
+    "beq select_and_restore_context   \n" /*   goto select_and_restore_context */
+
     "mrs    r0, psp                   \n" /* get stack pointer from user mode */
 #if defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS) \
     || defined(CPU_ARCH_CORTEX_M23)
+    "push   {r1}                      \n" /* push sched_active_thread */
     "mov    r12, sp                   \n" /* remember the exception SP */
     "mov    sp, r0                    \n" /* set user mode SP as active SP */
     /* we can not push high registers directly, so we move R11-R8 into
@@ -302,6 +313,7 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     "push   {r0}                      \n"
     "mov    r0, sp                    \n" /* switch back to the exception SP */
     "mov    sp, r12                   \n"
+    "pop    {r1}                      \n" /* r1 = sched_active_thread */
 #else
 #if (defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)) && defined(MODULE_CORTEXM_FPU)
     "tst    lr, #0x10                 \n"
@@ -311,23 +323,15 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     "stmdb  r0!,{r4-r11}              \n" /* save regs */
     "stmdb  r0!,{lr}                  \n" /* exception return value */
 #endif
-    "ldr    r1, =sched_active_thread  \n" /* load address of current tcb */
-    "ldr    r1, [r1]                  \n" /* dereference pdc */
-    "str    r0, [r1]                  \n" /* write r0 to pdc->sp */
-    "bl     isr_svc                   \n" /* continue with svc */
-    );
-}
+    "str    r0, [r1]                  \n" /* write r0 to thread->sp */
 
-void __attribute__((naked)) __attribute__((used)) isr_svc(void) {
-    __asm__ volatile (
-    /* SVC handler entry point */
-    /* PendSV will continue here as well (via jump) */
-    ".thumb_func                      \n"
-    /* perform scheduling */
-    "bl     sched_run                 \n"
-    /* restore context and return from exception */
-    ".thumb_func                      \n"
-    "context_restore:                 \n"
+    /* current thread context is now saved */
+
+    "select_and_restore_context:      \n"
+
+    "bl     sched_run                 \n" /* perform scheduling */
+
+    /* restore now current thread context */
 #if defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS) \
     || defined(CPU_ARCH_CORTEX_M23)
     "mov    lr, sp                    \n" /* save MSR stack pointer for later */
@@ -366,3 +370,79 @@ void __attribute__((naked)) __attribute__((used)) isr_svc(void) {
     /* {r0-r3,r12,LR,PC,xPSR,s0-s15,FPSCR} are restored automatically on exception return */
     );
 }
+
+#ifdef MODULE_CORTEXM_SVC
+void __attribute__((naked)) __attribute__((used)) isr_svc(void)
+{
+    /* these two variants do exactly the same, but Cortex-M3 can use Thumb2
+     * conditional execution, which are a bit faster. */
+
+    /* TODO: currently, cpu_switch_context_exit() is used to start threading
+     * from kernel_init(), which executes on MSP.  That could probably be
+     * rewritten to not use the supervisor call at all. Then we can assume that
+     * svc is only used by threads, saving a couple of instructions. /Kaspar
+     */
+
+#if defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS) \
+    || defined(CPU_ARCH_CORTEX_M23)
+    __asm__ volatile (
+    ".thumb_func            \n"
+    "movs   r0, #4          \n" /* if bit4(lr) == 1):       */
+    "mov    r1, lr          \n"
+    "tst    r0, r1          \n"
+    "beq    came_from_msp   \n" /*     goto came_from_msp   */
+    "mrs    r0, psp         \n" /* r0 = psp                 */
+    "b      _svc_dispatch   \n" /* return svc_dispatch(r0)  */
+    "came_from_msp:         \n"
+    "mrs    r0, msp         \n" /* r0 = msp                 */
+    "b      _svc_dispatch   \n" /* return svc_dispatch(r0)  */
+    );
+#else
+    __asm__ volatile (
+    ".thumb_func            \n"
+    "tst    lr, #4          \n" /* switch bit4(lr) == 1):   */
+    "ite    eq              \n"
+    "mrseq  r0, msp         \n" /* case 1: r0 = msp         */
+    "mrsne  r0, psp         \n" /* case 0: r0 = psp         */
+    "b      _svc_dispatch   \n" /* return svc_dispatch()    */
+    );
+#endif
+}
+
+static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
+{
+    /* stack frame:
+     * r0, r1, r2, r3, r12, r14, the return address and xPSR
+     * - r0   = svc_args[0]
+     * - r1   = svc_args[1]
+     * - r2   = svc_args[2]
+     * - r3   = svc_args[3]
+     * - r12  = svc_args[4]
+     * - lr   = svc_args[5]
+     * - pc   = svc_args[6]
+     * - xPSR = svc_args[7]
+     */
+
+    /* svc_args[6] is the stacked PC / return address. It is the address of the
+     * instruction after the SVC.  The SVC instruction is located in the memory
+     * address [stacked_PC - 2], because SVC is a 2 byte instruction.  The SVC
+     * number is the lower byte of the instruction.
+     */
+    unsigned int svc_number = ((char *)svc_args[6])[-2];
+
+    switch (svc_number) {
+        case 1: /* SVC number used by cpu_switch_context_exit */
+            SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+            break;
+        default:
+            DEBUG("svc: unhandled SVC #%u\n", svc_number);
+            break;
+    }
+}
+
+#else /* MODULE_CORTEXM_SVC */
+void __attribute__((used)) isr_svc(void)
+{
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+}
+#endif /* MODULE_CORTEXM_SVC */

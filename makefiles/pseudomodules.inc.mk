@@ -9,6 +9,7 @@ PSEUDOMODULES += conn_can_isotp_multi
 PSEUDOMODULES += cord_ep_standalone
 PSEUDOMODULES += core_%
 PSEUDOMODULES += cortexm_fpu
+PSEUDOMODULES += cortexm_svc
 PSEUDOMODULES += cpu_check_address
 PSEUDOMODULES += crypto_%	# crypto_aes or crypto_3des
 PSEUDOMODULES += devfs_%
