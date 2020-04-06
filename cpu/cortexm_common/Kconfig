@@ -7,6 +7,7 @@
 config MOD_CORTEXM_COMMON
     bool
     default y if CPU_CORE_CORTEX_M
+    select MOD_PERIPH
     help
         Common code for Cortex-M cores.
 
