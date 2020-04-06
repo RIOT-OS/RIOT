@@ -33,6 +33,11 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup drivers_slipdev_config     SLIP Network driver compile configuration
+ * @ingroup config_drivers_netdev
+ * @{
+ */
+/**
  * @brief   UART buffer size used for TX and RX buffers
  *
  * Reduce this value if your expected traffic does not include full IPv6 MTU
@@ -43,6 +48,7 @@ extern "C" {
 #ifndef SLIPDEV_BUFSIZE
 #define SLIPDEV_BUFSIZE (2048U)
 #endif
+/** @} */
 
 /**
  * @name    Device state definitions
