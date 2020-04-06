@@ -27,7 +27,7 @@ all: $(BINDIR)/$(MODULE).a ..nothing
 clean:: $(DIRS:%=CLEAN--%)
 
 $(DIRS:%=ALL--%):
-	$(QQ)"$(MAKE)" -C $(@:ALL--%=%)
+	$(QQ)"$(MAKE)" -j $(NPROC) -C $(@:ALL--%=%)
 
 $(DIRS:%=CLEAN--%):
 	$(QQ)"$(MAKE)" -C $(@:CLEAN--%=%) clean
