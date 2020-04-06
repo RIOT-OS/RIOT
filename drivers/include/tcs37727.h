@@ -40,9 +40,18 @@ extern "C"
 #define TCS37727_I2C_ADDRESS    0x29    /**< Default Device Address */
 #endif
 
+/**
+ * @defgroup drivers_tcs37727_config     TCS37727 RGB Light Sensor driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+/**
+ * @brief   Default RGBC integration time.
+ */
 #ifndef TCS37727_ATIME_DEFAULT
-#define TCS37727_ATIME_DEFAULT  200000  /**< Default RGBC integration time */
+#define TCS37727_ATIME_DEFAULT  200000
 #endif
+/** @} */
 
 /**
  * @brief   Struct for storing TCS37727 sensor data
