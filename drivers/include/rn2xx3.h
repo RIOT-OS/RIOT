@@ -57,11 +57,17 @@ extern "C" {
 #define RN2XX3_SLEEP_MIN                (100U)
 
 /**
+ * @defgroup drivers_rn2xx3_config     RN2483/RN2903 Radio driver compile configuration
+ * @ingroup config_drivers_netdev
+ * @{
+ */
+/**
  * @brief   Default sleep duration (in ms)
  */
 #ifndef RN2XX3_DEFAULT_SLEEP
 #define RN2XX3_DEFAULT_SLEEP            (5000U)
 #endif
+/** @} */
 
 #if defined(MODULE_RN2903)
 #define RN2XX3_FREQ_BAND                (915U)
