@@ -128,6 +128,11 @@ typedef enum {
 #define SPS30_DEFAULT_ACI_S  (604800UL)
 
 /**
+ * @defgroup drivers_SPS30_config     SPS30 PM Sensor driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+/**
  * @brief     Maximum number of automatic retries on communication errors
  *
  * @details   If no delays happen between individual requests to the sensor, it
@@ -142,6 +147,7 @@ typedef enum {
 #ifndef SPS30_ERROR_RETRY
 #define SPS30_ERROR_RETRY    (500U)
 #endif
+/** @} */
 
 /**
  * @brief       Initialize SPS30 sensor driver.
