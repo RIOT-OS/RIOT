@@ -1,6 +1,22 @@
-# ISM vairable can pass like: make BOARD=samr30-xpro ISM=EU flash term
-ifneq (EU,$(ISM))
-  # Default setting for US ISM band (Channel 26 for 2.4 GHz, Channel 5/Page 2 for sub-GHz)
+# Frequency Band (FBAND) vairable can pass like: make BOARD=samr30-xpro FBAND=868 flash term
+# with FBAND=868 changes channel/page setting only if transceiver is at86rf212b 
+ifeq (868, $(FBAND))
+  ifneq (,$(filter cc110x,$(USEMODULE)))        # radio is cc110x sub-GHz
+    CFLAGS += -DCC110X_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
+  endif
+  # radio is at86rf212b sub GHz at FBAND=868MHz (channel = 0 / page = 0）
+  ifneq (,$(filter at86rf212b,$(USEMODULE)))     
+    FBAND_CHANNEL ?= 0
+    CFLAGS += -DIEEE802154_DEFAULT_SUBGHZ_CHANNEL=$(FBAND_CHANNEL)
+    FBAND_PAGE ?= 0
+    CFLAGS += -DIEEE802154_DEFAULT_SUBGHZ_PAGE=$(FBAND_PAGE)
+  # if not using samr30-xpro radio is the same as default IEEE 802.15.4 2.4 GHz
+  else                                        # radio is IEEE 802.15.4 2.4 GHz
+    GHZ_CHANNEL ?= 26                                        
+    CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(GHZ_CHANNEL)
+  endif
+# Applying default setting if FBAND is 915MHz (Channel = 26 for 2.4 GHz, Channel = 5/Page = 2 for sub-GHz)
+else                                          
   ifneq (,$(DEFAULT_CHANNEL))
     ifneq (,$(filter cc110x,$(USEMODULE)))        # radio is cc110x sub-GHz
       CFLAGS += -DCC110X_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
@@ -10,18 +26,6 @@ ifneq (EU,$(ISM))
     else                                          # radio is IEEE 802.15.4 2.4 GHz
       CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
     endif
-  endif
-else      # Switching to ISM-EU if ISM=EU when make (sub-GHz channel = 0 / sub-GHz page = 0)
-  ifneq (,$(filter cc110x,$(USEMODULE)))        # radio is cc110x sub-GHz
-    CFLAGS += -DCC110X_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
-  endif
-  ifneq (,$(filter at86rf212b,$(USEMODULE)))    # radio sub-GHz channel = 0 / sub-GHz page = 0
-    EU_CHANNEL ?= 0
-    CFLAGS += -DIEEE802154_DEFAULT_SUBGHZ_CHANNEL=$(EU_CHANNEL)
-    EU_PAGE ?= 0
-    CFLAGS += -DIEEE802154_DEFAULT_SUBGHZ_PAGE=$(EU_PAGE)
-  else                                          # radio is IEEE 802.15.4 2.4 GHz
-    CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
   endif
 endif
 
