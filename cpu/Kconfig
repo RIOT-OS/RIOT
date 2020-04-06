@@ -57,3 +57,8 @@ config MOD_CPU
     default y
     help
         Module which holds all CPU-specific files.
+
+config MOD_PERIPH
+    bool
+    help
+        CPU peripheral implementations module.
