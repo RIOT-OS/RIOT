@@ -24,31 +24,28 @@
 extern "C" {
 #endif
 
-#define UART0_BASE       (0x40001000) /**< UART0 base address */
-#define UART1_BASE       (0x40008000) /**< UART1 base address */
-
 /**
- * @brief UART component registers
+ * @brief    UART component registers
  */
 typedef struct {
-    reg32_t DR; /**< data */
+    reg32_t DR; /**< Data */
     union {
-        reg32_t RSR; /**< status */
-        reg32_t ECR; /**< error clear */
+        reg32_t RSR; /**< Status */
+        reg32_t ECR; /**< Error clear */
     };
-    reg32_t __reserved1[4]; /**< meh */
+    reg32_t __reserved1[4]; /**< Reserved */
     reg32_t FR; /**< flag */
-    reg32_t __reserved2[2]; /**< meh */
-    reg32_t IBRD; /**< integer baud-rate divisor */
-    reg32_t FBRD; /**< fractional baud-rate divisor */
-    reg32_t LCRH; /**< line control */
-    reg32_t CTL; /**< control */
-    reg32_t IFLS; /**< interrupt fifo level select */
-    reg32_t IMSC; /**< interrupt mask set/clear */
-    reg32_t RIS; /**< raw interrupt status */
-    reg32_t MIS; /**< masked interrupt status */
-    reg32_t ICR; /**< interrupt clear */
-    reg32_t DMACTL; /**< DMA control */
+    reg32_t __reserved2[2]; /**< Reserved */
+    reg32_t IBRD; /**< Integer baud-rate divisor */
+    reg32_t FBRD; /**< Fractional baud-rate divisor */
+    reg32_t LCRH; /**< Line control */
+    reg32_t CTL; /**< Control */
+    reg32_t IFLS; /**< Interrupt fifo level select */
+    reg32_t IMSC; /**< Interrupt mask set/clear */
+    reg32_t RIS; /**< Raw interrupt status */
+    reg32_t MIS; /**< Masked interrupt status */
+    reg32_t ICR; /**< Interrupt clear */
+    reg32_t DMACTL; /**< MMA control */
 } uart_regs_t;
 
 /**
@@ -123,8 +120,22 @@ typedef struct {
 #define UART_IFLS_RXSEL_7_8     0x20
 /** @} */
 
-#define UART0 ((uart_regs_t *) (UART0_BASE)) /**< UART0 register bank */
-#define UART1 ((uart_regs_t *) (UART1_BASE)) /**< UART0 register bank */
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
+#define UART0_BASE       (PERIPH_BASE + 0x1000) /**< UART0 base address */
+#define UART1_BASE       (PERIPH_BASE + 0xB000) /**< UART1 base address */
+/** @} */
+
+/**
+ * @brief   UART0 register bank
+ */
+#define UART0            ((uart_regs_t *) (UART0_BASE))
+/**
+ * @brief   UART1 register bank
+ */
+#define UART1            ((uart_regs_t *) (UART1_BASE))
 
 #ifdef __cplusplus
 } /* end extern "C" */

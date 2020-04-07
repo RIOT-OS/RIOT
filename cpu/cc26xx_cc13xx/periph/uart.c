@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Leon George
+ * Copyright (C) 2020 Locha Inc
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author      Leon M. George <leon@georgemail.eu>
  * @author      Anton Gerasimov <tossel@gmail.com>
+ * @author      Jean Pierre Dudey <jeandudey@hotmail.com>
  *
  * @}
  */
@@ -60,10 +62,21 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     int cts_pin = uart_config[uart].cts_pin;
 #endif
 
-    /* enable clocks: serial power domain and UART */
-    if (!power_is_domain_enabled(POWER_DOMAIN_SERIAL)) {
-        power_enable_domain(POWER_DOMAIN_SERIAL);
+    if (uart == 0) {
+        /* UART0 requires serial domain to be enabled */
+        if (!power_is_domain_enabled(POWER_DOMAIN_SERIAL)) {
+            power_enable_domain(POWER_DOMAIN_SERIAL);
+        }
     }
+#ifdef CPU_VARIANT_X2
+    else if (uart == 1) {
+        /* UART1 requires periph domain to be enabled */
+        if (!power_is_domain_enabled(POWER_DOMAIN_PERIPHERALS)) {
+            power_enable_domain(POWER_DOMAIN_PERIPHERALS);
+        }
+    }
+#endif
+
     uart_poweron(uart);
 
     /* disable and reset the UART */
@@ -74,12 +87,26 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     ctx[uart].arg = arg;
 
     /* configure pins */
-    IOC->CFG[tx_pin] =  IOCFG_PORTID_UART0_TX;
-    IOC->CFG[rx_pin] = (IOCFG_PORTID_UART0_RX | IOCFG_INPUT_ENABLE);
+    if (uart == 0) {
+        IOC->CFG[tx_pin] =  IOCFG_PORTID_UART0_TX;
+        IOC->CFG[rx_pin] = (IOCFG_PORTID_UART0_RX | IOCFG_INPUT_ENABLE);
 #ifdef MODULE_PERIPH_UART_HW_FC
-    if (rts_pin != GPIO_UNDEF && cts_pin != GPIO_UNDEF) {
-        IOC->CFG[rts_pin] =  IOCFG_PORTID_UART0_RTS;
-        IOC->CFG[cts_pin] = (IOCFG_PORTID_UART0_CTS | IOCFG_INPUT_ENABLE);
+        if (rts_pin != GPIO_UNDEF && cts_pin != GPIO_UNDEF) {
+            IOC->CFG[rts_pin] =  IOCFG_PORTID_UART0_RTS;
+            IOC->CFG[cts_pin] = (IOCFG_PORTID_UART0_CTS | IOCFG_INPUT_ENABLE);
+        }
+#endif
+    }
+#ifdef CPU_VARIANT_X2
+    else if (uart == 1) {
+        IOC->CFG[tx_pin] =  IOCFG_PORTID_UART1_TX;
+        IOC->CFG[rx_pin] = (IOCFG_PORTID_UART1_RX | IOCFG_INPUT_ENABLE);
+#ifdef MODULE_PERIPH_UART_HW_FC
+        if (rts_pin != GPIO_UNDEF && cts_pin != GPIO_UNDEF) {
+            IOC->CFG[rts_pin] =  IOCFG_PORTID_UART1_RTS;
+            IOC->CFG[cts_pin] = (IOCFG_PORTID_UART1_CTS | IOCFG_INPUT_ENABLE);
+        }
+#endif
     }
 #endif
 
