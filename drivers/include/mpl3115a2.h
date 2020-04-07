@@ -50,12 +50,10 @@ enum {
     MPL3115A2_ERROR_CNF,        /**< Device configuration failed */
 };
 
-#ifndef MPL3115A2_I2C_ADDRESS
 /**
  * @brief   MPL3115A2 Default Address
  */
 #define MPL3115A2_I2C_ADDRESS   (0x60)
-#endif
 
 /**
  * @name    Oversample Ratio configuration
