@@ -34,9 +34,7 @@ extern "C" {
 /**
  * @brief   I2C address of DS1307 RTC
  */
-#ifndef DS1307_I2C_ADDRESS
 #define DS1307_I2C_ADDRESS      (0x68)
-#endif
 
 /**
  * @defgroup drivers_ds1307_config   DS1307 RTC driver compile configuration
