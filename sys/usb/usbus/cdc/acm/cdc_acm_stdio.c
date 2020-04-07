@@ -38,8 +38,8 @@
 #endif
 
 static usbus_cdcacm_device_t cdcacm;
-static uint8_t _cdc_tx_buf_mem[USBUS_CDC_ACM_STDIO_BUF_SIZE];
-static uint8_t _cdc_rx_buf_mem[USBUS_CDC_ACM_STDIO_BUF_SIZE];
+static uint8_t _cdc_tx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
+static uint8_t _cdc_rx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
 static isrpipe_t _cdc_stdio_isrpipe = ISRPIPE_INIT(_cdc_rx_buf_mem);
 
 void stdio_init(void)
