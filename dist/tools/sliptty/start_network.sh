@@ -107,7 +107,7 @@ start_uhcpd() {
 
 start_dhcpd() {
     DHCPD_PIDFILE=$(mktemp)
-    ${DHCPD} -d -p ${DHCPD_PIDFILE} ${TAP} ${PREFIX} 2> /dev/null
+    ${DHCPD} -d -p ${DHCPD_PIDFILE} ${TUN} ${PREFIX} 2> /dev/null
 }
 
 usage() {
