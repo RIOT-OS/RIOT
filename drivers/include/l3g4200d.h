@@ -37,9 +37,22 @@
 #endif
 
 /**
- * @brief   The sensors default I2C address
+ * @defgroup drivers_l3g4200d_config     L3G4200D gyroscope driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
  */
+/**
+ * @brief Default address
+ *
+ * The address depends on the status of SDO Pin.
+ * Default address corresponds to SD0 connected to GND.
+ * For more information on SerialBus Address, refer Section 5.1.1
+ * I2C Operation on datasheet.
+ */
+#ifndef L3G4200D_DEFAULT_ADDRESS
 #define L3G4200D_DEFAULT_ADDRESS        0x68
+#endif
+/** @} */
 
 /**
  * @brief   Result vector for gyro measurement
