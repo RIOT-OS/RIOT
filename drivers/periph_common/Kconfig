@@ -4,23 +4,212 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig KCONFIG_MODULE_PERIPH_WDT
-    bool "Configure Watchdog peripheral"
-    depends on MODULE_PERIPH_WDT
-    help
-        Configure Watchdog peripheral using Kconfig.
+menu "Peripheral drivers"
 
-if KCONFIG_MODULE_PERIPH_WDT
+config MOD_PERIPH_COMMON
+    bool
+    help
+        Common peripherals module.
+
+config MOD_PERIPH_INIT
+    bool "Peripheral auto-initialization"
+    default y
+    help
+        Auto-initialization of all used peripherals.
+
+# Common peripheral modules and auto-init
+config MOD_PERIPH_ADC
+    bool "ADC peripheral driver"
+    depends on HAS_PERIPH_ADC
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_ADC
+    bool "Auto initialize ADC peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_ADC
+
+config MOD_PERIPH_CPUID
+    bool "CPU unique ID"
+    depends on HAS_PERIPH_CPUID
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_CPUID
+    bool "Auto initialize CPU unique ID driver"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_CPUID
+
+config MOD_PERIPH_DAC
+    bool "DAC peripheral driver"
+    depends on HAS_PERIPH_DAC
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_DAC
+    bool "Auto initialize DAC peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_DAC
+
+config MOD_PERIPH_DMA
+    bool "DMA peripheral driver"
+    depends on HAS_PERIPH_DMA
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_DMA
+    bool "Auto initialize DMA peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_DMA
+
+config MOD_PERIPH_EEPROM
+    bool "EEPROM peripheral driver"
+    depends on HAS_PERIPH_EEPROM
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_EEPROM
+    bool "Auto initialize EEPROM peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_EEPROM
+
+config MOD_PERIPH_GPIO
+    bool "GPIO peripheral driver"
+    default y
+    depends on HAS_PERIPH_GPIO
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_GPIO
+    bool "Auto initialize GPIO peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_GPIO
+
+config MOD_PERIPH_GPIO_IRQ
+    bool "GPIO interrupt peripheral driver"
+    depends on HAS_PERIPH_GPIO_IRQ
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_HWRNG
+    bool "HWRNG peripheral driver"
+    depends on HAS_PERIPH_HWRNG
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_HWRNG
+    bool "Auto initialize HWRNG peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_HWRNG
+
+config MOD_PERIPH_INIT_GPIO_IRQ
+    bool "Auto initialize GPIO interrupt peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_GPIO_IRQ
+
+config MOD_PERIPH_I2C
+    bool "I2C peripheral driver"
+    depends on HAS_PERIPH_I2C
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_I2C
+    bool "Auto initialize I2C peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_I2C
+
+config MOD_PERIPH_PWM
+    bool "PWM peripheral driver"
+    depends on HAS_PERIPH_PWM
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_PWM
+    bool "Auto initialize PWM peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_PWM
+
+config MOD_PERIPH_PM
+    bool "Power Management (PM) peripheral driver"
+    default y
+    depends on HAS_PERIPH_PM
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_PM
+    bool "Auto initialize Power Management (PM) peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_PM
+
+config MOD_PERIPH_RTC
+    bool "RTC peripheral driver"
+    depends on HAS_PERIPH_RTC
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_RTC
+    bool "Auto initialize RTC peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_RTC
+
+config MOD_PERIPH_RTT
+    bool "RTT peripheral driver"
+    depends on HAS_PERIPH_RTT
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_RTT
+    bool "Auto initialize RTT peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_RTT
+
+config MOD_PERIPH_SPI
+    bool "SPI peripheral driver"
+    depends on HAS_PERIPH_SPI
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_SPI
+    bool "Auto initialize SPI peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_SPI
+
+config MOD_PERIPH_TIMER
+    bool "Timer peripheral driver"
+    depends on HAS_PERIPH_TIMER
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_TIMER
+    bool "Auto initialize Timer peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_TIMER
+
+config MOD_PERIPH_UART
+    bool "UART peripheral driver"
+    depends on HAS_PERIPH_UART
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_UART
+    bool "Auto initialize UART peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_UART
+
+config MOD_PERIPH_USBDEV
+    bool "USBDEV peripheral driver"
+    depends on HAS_PERIPH_USBDEV
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_USBDEV
+    bool "Auto initialize USBDEV peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_USBDEV
+
+menuconfig MOD_PERIPH_WDT
+    bool "Watchdog Timer peripheral driver"
+    depends on HAS_PERIPH_WDT
+    select MOD_PERIPH_COMMON
+
+if MOD_PERIPH_WDT
+
+config MOD_PERIPH_INIT_WDT
+    bool "Auto initialize the Watchdog Timer peripheral"
+    default y if MOD_PERIPH_INIT
 
 config WDT_WARNING_PERIOD
     int "Warning period (in ms)"
     depends on HAS_PERIPH_WDT_WARNING_PERIOD
-    help
-        Period in ms before reboot where wdt_cb() is executed.
 
-endif # KCONFIG_MODULE_PERIPH_WDT
+endif # MOD_PERIPH_WDT
 
 config HAS_PERIPH_WDT_WARNING_PERIOD
     bool
     help
         Indicates that a CPU provides a warning period configuration option.
+
+endmenu # Peripheral drivers
