@@ -13,6 +13,9 @@ DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.
 # wdog-disable.bin is a precompiled binary which will disable the watchdog and
@@ -24,6 +27,3 @@ PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
 
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
