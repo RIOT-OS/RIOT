@@ -57,7 +57,7 @@ void cord_common_init(void)
 int cord_common_add_qstring(coap_pkt_t *pkt)
 {
     /* extend the url with some query string options */
-    int res = coap_opt_add_uquery(pkt, "ep", cord_common_ep);
+    int res = coap_opt_add_uri_query(pkt, "ep", cord_common_ep);
     if (res < 0) {
         return res;
     }
@@ -66,7 +66,7 @@ int cord_common_add_qstring(coap_pkt_t *pkt)
 #if CORD_LT
     char lt[11];
     lt[fmt_u32_dec(lt, CORD_LT)] = '\0';
-    res = coap_opt_add_uquery(pkt, "lt", lt);
+    res = coap_opt_add_uri_query(pkt, "lt", lt);
     if (res < 0) {
         return res;
     }
@@ -74,7 +74,7 @@ int cord_common_add_qstring(coap_pkt_t *pkt)
 
     /* [optional] set the domain parameter */
 #ifdef CORD_D
-    res = coap_opt_add_uquery(pkt, "d", CORD_D);
+    res = coap_opt_add_uri_query(pkt, "d", CORD_D);
     if (res < 0) {
         return res;
     }

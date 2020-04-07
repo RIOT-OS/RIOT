@@ -929,7 +929,7 @@ ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
  * The Uri-Query options will be added in the order those calls.
  *
  * @deprecated  Will not be available after the 2020.10 release. Use
- * coap_opt_add_uquery() instead.
+ * coap_opt_add_uri_query() instead.
  *
  * @param[out] pdu      The package that is being build
  * @param[in]  key      Key to add to the query string

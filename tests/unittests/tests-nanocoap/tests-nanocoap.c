@@ -318,9 +318,9 @@ static void test_nanocoap__get_multi_query(void)
 
     uint8_t *query_pos = &pkt.payload[0];
     /* first opt header is 2 bytes long */
-    ssize_t optlen = coap_opt_add_uquery(&pkt, key1, val1);
+    ssize_t optlen = coap_opt_add_uri_query(&pkt, key1, val1);
     TEST_ASSERT_EQUAL_INT(8, optlen);
-    optlen = coap_opt_add_uquery(&pkt, key2, NULL);
+    optlen = coap_opt_add_uri_query(&pkt, key2, NULL);
     TEST_ASSERT_EQUAL_INT(2, optlen);
 
     char query[20] = {0};
@@ -335,9 +335,9 @@ static void test_nanocoap__get_multi_query(void)
     TEST_ASSERT_EQUAL_STRING((char *)qs, &query[1]);
 }
 /*
- * Builds on get_multi_query test, to use coap_opt_add_uquery2().
+ * Builds on get_multi_query test, to use coap_opt_add_uri_query2().
  */
-static void test_nanocoap__add_uquery2(void)
+static void test_nanocoap__add_uri_query2(void)
 {
     uint8_t buf[_BUF_SIZE];
     coap_pkt_t pkt;
@@ -362,7 +362,7 @@ static void test_nanocoap__add_uquery2(void)
 
     /* includes key and value */
     char query[20] = {0};
-    len = coap_opt_add_uquery2(&pkt, keys, key1_len, vals, val1_len);
+    len = coap_opt_add_uri_query2(&pkt, keys, key1_len, vals, val1_len);
     TEST_ASSERT_EQUAL_INT(query1_opt_len, len);
     coap_get_uri_query(&pkt, (uint8_t *)&query[0]);
     /* skip initial '&' from coap_get_uri_query() */
@@ -370,7 +370,7 @@ static void test_nanocoap__add_uquery2(void)
 
     /* includes key only */
     memset(query, 0, 20);
-    len = coap_opt_add_uquery2(&pkt, &keys[2], key2_len, NULL, 0);
+    len = coap_opt_add_uri_query2(&pkt, &keys[2], key2_len, NULL, 0);
     TEST_ASSERT_EQUAL_INT(query2_opt_len, len);
     coap_get_uri_query(&pkt, (uint8_t *)&query[0]);
     /* skip initial '&' from coap_get_uri_query() */
@@ -378,7 +378,7 @@ static void test_nanocoap__add_uquery2(void)
 
     /* includes key only; value not NULL but zero length */
     memset(query, 0, 20);
-    len = coap_opt_add_uquery2(&pkt, &keys[2], key2_len, &vals[3], 0);
+    len = coap_opt_add_uri_query2(&pkt, &keys[2], key2_len, &vals[3], 0);
     TEST_ASSERT_EQUAL_INT(query3_opt_len, len);
     coap_get_uri_query(&pkt, (uint8_t *)&query[0]);
     /* skip initial '&' from coap_get_uri_query() */
@@ -391,7 +391,7 @@ static void test_nanocoap__add_uquery2(void)
 
     /* includes key only; value NULL and length > 0 */
     memset(query, 0, 20);
-    len = coap_opt_add_uquery2(&pkt, &keys[2], key2_len, NULL, 1);
+    len = coap_opt_add_uri_query2(&pkt, &keys[2], key2_len, NULL, 1);
     TEST_ASSERT_EQUAL_INT(query4_opt_len, len);
     coap_get_uri_query(&pkt, (uint8_t *)&query[0]);
     /* skip initial '&' from coap_get_uri_query() */
@@ -726,7 +726,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__get_path_too_long),
         new_TestFixture(test_nanocoap__get_query),
         new_TestFixture(test_nanocoap__get_multi_query),
-        new_TestFixture(test_nanocoap__add_uquery2),
+        new_TestFixture(test_nanocoap__add_uri_query2),
         new_TestFixture(test_nanocoap__option_add_buffer_max),
         new_TestFixture(test_nanocoap__options_get_opaque),
         new_TestFixture(test_nanocoap__options_iterate),
