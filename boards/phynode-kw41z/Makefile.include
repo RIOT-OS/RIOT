@@ -7,7 +7,7 @@ ifeq (openocd,$(PROGRAMMER))
 endif
 
 # Enable direct write to FCF (required for setting FOPT byte).
-export OPENOCD_PRE_FLASH_CMDS += "-c kinetis fcf_source write"
+OPENOCD_PRE_FLASH_CMDS += "-c kinetis fcf_source write"
 
 # Include default FRDM board config
 include $(RIOTBOARD)/common/kw41z/Makefile.include

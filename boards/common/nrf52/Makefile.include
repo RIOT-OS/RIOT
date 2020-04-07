@@ -43,8 +43,8 @@ else ifeq (openocd,$(PROGRAMMER))
   ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
     LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
 
-    export OPENOCD_PRE_FLASH_CMDS += -c 'flash write_image erase "$(BINDIR)/softdevice.hex"'
-    export OPENOCD_PRE_VERIFY_CMDS += -c 'verify_image "$(BINDIR)/softdevice.hex"'
+    OPENOCD_PRE_FLASH_CMDS += -c 'flash write_image erase "$(BINDIR)/softdevice.hex"'
+    OPENOCD_PRE_VERIFY_CMDS += -c 'verify_image "$(BINDIR)/softdevice.hex"'
 
     # Cannot use the 'ELFFILE' here
     # The segments are 0x10000 aligned so padding bytes are copied and verified

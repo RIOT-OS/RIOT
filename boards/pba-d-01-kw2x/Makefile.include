@@ -2,17 +2,6 @@
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
-# We need special handling of the watchdog if we want to speed up the flash
-# verification by using the MCU to compute the image checksum after flashing.
-# wdog-disable.bin is a precompiled binary which will disable the watchdog and
-# return control to the debugger (OpenOCD)
-export OPENOCD_PRE_VERIFY_CMDS += \
-  -c 'load_image $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin 0x20000000 bin' \
-  -c 'resume 0x20000000'
-export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
-
-DEBUG_ADAPTER ?= dap
-
 # Add board selector (USB serial) to OpenOCD options if specified.
 # Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
 #   Usage: SERIAL="0200..." BOARD="pba-d-01-kw2x" make flash
@@ -28,6 +17,17 @@ endif
 
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
+
+# We need special handling of the watchdog if we want to speed up the flash
+# verification by using the MCU to compute the image checksum after flashing.
+# wdog-disable.bin is a precompiled binary which will disable the watchdog and
+# return control to the debugger (OpenOCD)
+OPENOCD_PRE_VERIFY_CMDS += \
+  -c 'load_image $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin 0x20000000 bin' \
+  -c 'resume 0x20000000'
+PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
+
+DEBUG_ADAPTER ?= dap
 
 # The board can become un-flashable after some firmware, use connect_assert_srst
 # to always be able to flash or reset the board.

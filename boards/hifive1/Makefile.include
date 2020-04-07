@@ -6,7 +6,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # this board uses openocd with a custom reset command
-export OPENOCD_CMD_RESET_RUN=-c _reset
+OPENOCD_CMD_RESET_RUN =-c _reset
 include $(RIOTMAKE)/tools/openocd.inc.mk
 
 # use our own openocd script to flash since HiFive1 has reset problems.
