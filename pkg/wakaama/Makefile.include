@@ -2,3 +2,16 @@ DIRS += $(RIOTBASE)/pkg/wakaama/contrib
 
 INCLUDES += -I$(RIOTBASE)/pkg/wakaama/include
 INCLUDES += -I$(PKGDIRBASE)/wakaama
+
+# NOTE: Use wakaama in client mode
+CFLAGS += -DLWM2M_CLIENT_MODE
+
+# Translate 'CONFIG_' options to package specific flags. This checks if the
+# option is being set via Kconfig or CFLAGS
+ifneq (,$(or $(CONFIG_LWM2M_BOOTSTRAP),$(filter -DCONFIG_LWM2M_BOOTSTRAP=1,$(CFLAGS))))
+    CFLAGS += -DLWM2M_BOOTSTRAP=1
+endif
+
+ifneq (,$(or $(CONFIG_LWM2M_WITH_LOGS),$(filter -DCONFIG_LWM2M_WITH_LOGS=1,$(CFLAGS))))
+    CFLAGS += -DLWM2M_WITH_LOGS=1
+endif

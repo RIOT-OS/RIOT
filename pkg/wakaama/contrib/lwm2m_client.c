@@ -71,7 +71,7 @@ lwm2m_context_t *lwm2m_client_run(lwm2m_client_data_t *client_data,
     _client_data->local_ep.netif = SOCK_ADDR_ANY_NETIF;
 
     /* create sock for UDP server */
-    _client_data->local_ep.port = atoi(LWM2M_LOCAL_PORT);
+    _client_data->local_ep.port = atoi(CONFIG_LWM2M_LOCAL_PORT);
     if (sock_udp_create(&_client_data->sock, &_client_data->local_ep, NULL, 0)) {
         DEBUG("[lwm2m_client_run] Can't create server socket\n");
         return NULL;
@@ -84,8 +84,8 @@ lwm2m_context_t *lwm2m_client_run(lwm2m_client_data_t *client_data,
         return NULL;
     }
 
-    res = lwm2m_configure(_client_data->lwm2m_ctx, LWM2M_DEVICE_NAME, NULL,
-                          LWM2M_ALT_PATH, obj_numof, obj_list);
+    res = lwm2m_configure(_client_data->lwm2m_ctx, CONFIG_LWM2M_DEVICE_NAME, NULL,
+                          CONFIG_LWM2M_ALT_PATH, obj_numof, obj_list);
     if (res) {
         DEBUG("[lwm2m_client_run] Failed to configure LwM2M\n");
         return NULL;

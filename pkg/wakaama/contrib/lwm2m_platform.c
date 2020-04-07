@@ -40,7 +40,7 @@
 #include "lwm2m_platform.h"
 #include "lwm2m_client_config.h"
 
-static uint32_t _tlsf_heap[(LWM2M_TLSF_BUFFER / sizeof(uint32_t))];
+static uint32_t _tlsf_heap[(CONFIG_LWM2M_TLSF_BUFFER / sizeof(uint32_t))];
 static tlsf_t _tlsf;
 
 typedef struct {

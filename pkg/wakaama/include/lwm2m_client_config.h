@@ -34,43 +34,43 @@ extern "C" {
 /**
  * @brief CoAP default port of the LwM2M server
  */
-#ifndef LWM2M_STANDARD_PORT
-#define LWM2M_STANDARD_PORT "5683"
+#ifndef CONFIG_LWM2M_STANDARD_PORT
+#define CONFIG_LWM2M_STANDARD_PORT "5683"
 #endif
 
 /**
  * @brief CoAPS default port of the LwM2M server
  */
-#ifndef LWM2M_DTLS_PORT
-#define LWM2M_DTLS_PORT     "5684"
+#ifndef CONFIG_LWM2M_DTLS_PORT
+#define CONFIG_LWM2M_DTLS_PORT     "5684"
 #endif
 
 /**
  * @brief CoAP default port of the LwM2M bootstrap server
  */
-#ifndef LWM2M_BSSERVER_PORT
-#define LWM2M_BSSERVER_PORT "5685"
+#ifndef CONFIG_LWM2M_BSSERVER_PORT
+#define CONFIG_LWM2M_BSSERVER_PORT "5685"
 #endif
 
 /**
  * @brief Default port for the local LwM2M instance
  */
-#ifndef LWM2M_LOCAL_PORT
-#define LWM2M_LOCAL_PORT    "5683"
+#ifndef CONFIG_LWM2M_LOCAL_PORT
+#define CONFIG_LWM2M_LOCAL_PORT    "5683"
 #endif
 
 /**
  * @brief Device name used to register at the LwM2M server
  */
-#ifndef LWM2M_DEVICE_NAME
-#define LWM2M_DEVICE_NAME "testRIOTDevice"
+#ifndef CONFIG_LWM2M_DEVICE_NAME
+#define CONFIG_LWM2M_DEVICE_NAME "testRIOTDevice"
 #endif
 
 /**
  * @brief Lifetime of the device object on the LwM2M server
  */
-#ifndef LWM2M_DEVICE_TTL
-#define LWM2M_DEVICE_TTL 300
+#ifndef CONFIG_LWM2M_DEVICE_TTL
+#define CONFIG_LWM2M_DEVICE_TTL 300
 #endif
 
 /**
@@ -79,42 +79,42 @@ extern "C" {
  * @note The host part of the URI MUST be a valid IPv6 address. Host names can
  * not be resolved at this time.
  */
-#ifndef LWM2M_SERVER_URI
-#define LWM2M_SERVER_URI "coap://[fd00:dead:beef::1]"
+#ifndef CONFIG_LWM2M_SERVER_URI
+#define CONFIG_LWM2M_SERVER_URI "coap://[fd00:dead:beef::1]"
 #endif
 
 /**
- * @brief Numeric ID of LWM2M_SERVER_URI
+ * @brief Numeric ID of CONFIG_LWM2M_SERVER_URI
  */
-#ifndef LWM2M_SERVER_ID
-#define LWM2M_SERVER_ID 10
+#ifndef CONFIG_LWM2M_SERVER_ID
+#define CONFIG_LWM2M_SERVER_ID 10
 #endif
 
 /**
  * @brief Alternate path to place LwM2M resources
  */
-#ifndef LWM2M_ALT_PATH
-#define LWM2M_ALT_PATH  NULL
+#ifndef CONFIG_LWM2M_ALT_PATH
+#define CONFIG_LWM2M_ALT_PATH  NULL
 #endif
 
 /**
- * @brief Define to 1 to specify that @ref LWM2M_SERVER_URI is a bootstrap server
+ * @brief Define to 1 to specify that @ref CONFIG_LWM2M_SERVER_URI is a bootstrap server
  *
  * To define just add it to your `CFLAGS` in your application's Makefile:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- * CFLAGS += -DLWM2M_BOOTSTRAP=1
+ * CFLAGS += -DCONFIG_LWM2M_BOOTSTRAP=1
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 #ifdef DOXYGEN
-#define LWM2M_BOOTSTRAP
+#define CONFIG_LWM2M_BOOTSTRAP
 #endif
 
 /**
  * @brief Device object manufacturer string
  */
-#ifndef LWM2M_DEVICE_MANUFACTURER
-#define LWM2M_DEVICE_MANUFACTURER "A RIOT maker"
+#ifndef CONFIG_LWM2M_DEVICE_MANUFACTURER
+#define CONFIG_LWM2M_DEVICE_MANUFACTURER "A RIOT maker"
 #endif
 
 /**
@@ -122,15 +122,15 @@ extern "C" {
  *
  * @note Defaults to the board name
  */
-#ifndef LWM2M_DEVICE_MODEL
-#define LWM2M_DEVICE_MODEL RIOT_BOARD
+#ifndef CONFIG_LWM2M_DEVICE_MODEL
+#define CONFIG_LWM2M_DEVICE_MODEL RIOT_BOARD
 #endif
 
 /**
  * @brief Device object serial number
  */
-#ifndef LWM2M_DEVICE_SERIAL
-#define LWM2M_DEVICE_SERIAL "undefined"
+#ifndef CONFIG_LWM2M_DEVICE_SERIAL
+#define CONFIG_LWM2M_DEVICE_SERIAL "undefined"
 #endif
 
 /**
@@ -138,30 +138,62 @@ extern "C" {
  *
  * @note Defaults to the running RIOT version
  */
-#ifndef LWM2M_DEVICE_FW_VERSION
-#define LWM2M_DEVICE_FW_VERSION RIOT_VERSION
+#ifndef CONFIG_LWM2M_DEVICE_FW_VERSION
+#define CONFIG_LWM2M_DEVICE_FW_VERSION RIOT_VERSION
 #endif
 
 /**
- * @brief Device object binding and queue mode
+ * @{
+ * @name Device bindings and queue modes
  *
- * Valid values are:
- * - U: UDP
- * - UQ: UDP with Queue mode
- * - S: SMS
- * - SQ: SMS with Queue mode
- * - US: UDP and SMS
- * - UQS: UDP with Queue mode and SMS
+ * This options are meant to be set either via Kconfig or CFLAGS:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ * CFLAGS += -DCONFIG_LWM2M_DEVICE_BINDING_UQ
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * @note Only one option should be selected. If more than one is defined the
+ *       priority follows this order. By default
+ *       @ref CONFIG_LWM2M_DEVICE_BINDING_U is assumed.
  */
-#ifndef LWM2M_DEVICE_BINDINGS
-#define LWM2M_DEVICE_BINDINGS "U"
+#ifdef DOXYGEN
+/**
+ * @brief UDP binding
+ */
+#define CONFIG_LWM2M_DEVICE_BINDING_U
+
+/**
+ * @brief UDP binding with Queue mode
+ */
+#define CONFIG_LWM2M_DEVICE_BINDING_UQ
+
+/**
+ * @brief SMS binding
+ */
+#define CONFIG_LWM2M_DEVICE_BINDING_S
+
+/**
+ * @brief SMS binding with Queue mode
+ */
+#define CONFIG_LWM2M_DEVICE_BINDING_SQ
+
+/**
+ * @brief UDP and SMS bindings
+ */
+#define CONFIG_LWM2M_DEVICE_BINDING_US
+
+/**
+ * @brief UDP and SMS bindins with Queue mode
+ */
+#define CONFIG_LWM2M_DEVICE_BINDING_UQS
 #endif
+/** @} */
 
 /**
  * @brief Device object device type
  */
-#ifndef LWM2M_DEVICE_TYPE
-#define LWM2M_DEVICE_TYPE "RIOT device"
+#ifndef CONFIG_LWM2M_DEVICE_TYPE
+#define CONFIG_LWM2M_DEVICE_TYPE "RIOT device"
 #endif
 
 /**
@@ -169,8 +201,8 @@ extern "C" {
  *
  * @note Defaults to the board name
  */
-#ifndef LWM2M_DEVICE_HW_VERSION
-#define LWM2M_DEVICE_HW_VERSION RIOT_BOARD
+#ifndef CONFIG_LWM2M_DEVICE_HW_VERSION
+#define CONFIG_LWM2M_DEVICE_HW_VERSION RIOT_BOARD
 #endif
 
 /**
@@ -178,10 +210,29 @@ extern "C" {
  *
  * @note Defaults to the running RIOT version
  */
-#ifndef LWM2M_DEVICE_SW_VERSION
-#define LWM2M_DEVICE_SW_VERSION RIOT_VERSION
+#ifndef CONFIG_LWM2M_DEVICE_SW_VERSION
+#define CONFIG_LWM2M_DEVICE_SW_VERSION RIOT_VERSION
 #endif
 /** @} */
+
+/**
+ * @brief Device binding and queue mode
+ */
+#if defined(CONFIG_LWM2M_DEVICE_BINDING_U)
+#define CONFIG_LWM2M_DEVICE_BINDINGS "U"
+#elif defined(CONFIG_LWM2M_DEVICE_BINDING_UQ)
+#define CONFIG_LWM2M_DEVICE_BINDINGS "UQ"
+#elif defined(CONFIG_LWM2M_DEVICE_BINDING_S)
+#define CONFIG_LWM2M_DEVICE_BINDINGS "S"
+#elif defined(CONFIG_LWM2M_DEVICE_BINDING_SQ)
+#define CONFIG_LWM2M_DEVICE_BINDINGS "SQ"
+#elif defined(CONFIG_LWM2M_DEVICE_BINDING_US)
+#define CONFIG_LWM2M_DEVICE_BINDINGS "US"
+#elif defined(CONFIG_LWM2M_DEVICE_BINDING_UQS)
+#define CONFIG_LWM2M_DEVICE_BINDINGS "UQS"
+#else
+#define CONFIG_LWM2M_DEVICE_BINDINGS "U"
+#endif
 
 #ifdef __cplusplus
 }
