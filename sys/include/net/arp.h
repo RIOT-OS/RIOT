@@ -32,6 +32,7 @@ extern "C" {
  * @{
  */
 #define ARP_HWTYPE_ETHERNET (1U)        /**< Ethernet */
+#define ARP_HWTYPE_SERIAL   (20U)       /**< Serial Line */
 #define ARP_HWTYPE_EUI64    (27U)       /**< EUI-64 */
 /** @} */
 
