@@ -118,7 +118,7 @@ usage() {
 trap "cleanup" INT QUIT TERM EXIT
 
 SLIP_ONLY=0
-USE_DHCPV6=1
+USE_DHCPV6=0
 
 while getopts dehI: opt; do
     case ${opt} in
