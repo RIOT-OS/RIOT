@@ -1017,50 +1017,6 @@ static inline ssize_t coap_opt_add_uri_query(coap_pkt_t *pkt, const char *key,
 }
 
 /**
- * @brief   Adds a single Uri-Query option in the form 'key=value' into pkt
- *
- * @note Use this only for null-terminated string. See @ref coap_opt_add_uquery2()
- *       for non null-terminated string.
- *
- * @param[in,out] pkt         Packet being built
- * @param[in]     key         Key to add to the query string
- * @param[in]     val         Value to assign to @p key (may be NULL)
- *
- * @pre     ((pkt != NULL) && (key != NULL))
- *
- * @return        number of bytes written to pkt buffer
- * @return        <0 on error
- * @return        -ENOSPC if no available options or pkt full
- */
-static inline ssize_t coap_opt_add_uquery(coap_pkt_t *pkt, const char *key, const char *val)
-{
-    return coap_opt_add_uri_query(pkt, key, val);
-}
-
-/**
- * @brief   Adds a single Uri-Query option in the form 'key=value' into pkt
- *
- *
- * @param[in,out] pkt         Packet being built
- * @param[in]     key         Key to add to the query string
- * @param[in]     key_len     Length of @p key
- * @param[in]     val         Value to assign to @p key (may be NULL)
- * @param[in]     val_len     Length of @p val. 0 if @p val is NULL
- *
- * @pre     ((pkt != NULL) && (key != NULL) && (key_len > 0)
- *              && ((val_len == 0) || ((val != NULL) && (val_len > 0))))
- *
- * @return        number of bytes written to pkt buffer
- * @return        <0 on error
- * @return        -ENOSPC if no available options or pkt full
- */
-static inline ssize_t coap_opt_add_uquery2(coap_pkt_t *pkt, const char *key, size_t key_len,
-                                           const char *val, size_t val_len)
-{
-    return coap_opt_add_uri_query2(pkt, key, key_len, val, val_len);
-}
-
-/**
  * @brief   Adds a single Proxy-URI option into @p pkt
  *
  * @note @p uri must be a NULL-terminated absolute URI
