@@ -8,6 +8,7 @@ menu "System"
 
 rsource "auto_init/Kconfig"
 rsource "div/Kconfig"
+rsource "isrpipe/Kconfig"
 rsource "net/Kconfig"
 rsource "Kconfig.newlib"
 rsource "Kconfig.stdio"
