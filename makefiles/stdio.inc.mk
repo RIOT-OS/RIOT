@@ -44,7 +44,8 @@ ifneq (,$(filter stdio_uart,$(USEMODULE)))
 endif
 
 ifeq (,$(filter stdio_cdc_acm,$(USEMODULE)))
-  # The arduino bootloader feature cannot be used if the stdio_cdc_acm module
-  # is not used
+  # The arduino and nrfutil bootloader features cannot be used if the
+  # stdio_cdc_acm module is not used
   FEATURES_BLACKLIST += bootloader_arduino
+  FEATURES_BLACKLIST += bootloader_nrfutil
 endif

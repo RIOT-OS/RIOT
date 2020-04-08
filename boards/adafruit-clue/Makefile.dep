@@ -1,0 +1,18 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+  USEMODULE += apds9960
+  USEMODULE += bmp280_i2c
+  USEMODULE += lis3mdl
+  USEMODULE += sht3x
+endif
+
+# use nrfutil-bootloader/stdio_cdc_acm only if no other stdio_% other than stdio_cdc_acm
+# is requested
+ifeq (,$(filter-out stdio_cdc_acm,$(filter stdio_% slipdev_stdio,$(USEMODULE))))
+  FEATURES_REQUIRED += bootloader_nrfutil
+  USEMODULE += usb_board_reset
+  USEMODULE += stdio_cdc_acm
+endif
+
+# include common nrf52 dependencies
+include $(RIOTBOARD)/common/nrf52/Makefile.dep
