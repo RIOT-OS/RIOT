@@ -52,6 +52,11 @@ unsigned dhcpv6_client_get_duid_l2(unsigned iface, dhcpv6_duid_l2_t *duid)
     }
     else {
         switch (netif->device_type) {
+            case NETDEV_TYPE_SLIP:
+                duid->l2type = byteorder_htons(ARP_HWTYPE_SERIAL);
+                /* L2 address length is 0 */
+                res = 0;
+                break;
             case NETDEV_TYPE_ETHERNET:
             case NETDEV_TYPE_BLE:
             case NETDEV_TYPE_ESP_NOW:
