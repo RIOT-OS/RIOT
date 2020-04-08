@@ -248,7 +248,11 @@ extern "C" {
  *              default routers
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF
+#if IS_USED(MODULE_GNRC_RPL)
+#define CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF    (2)
+#else
 #define CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF    (1)
+#endif
 #endif
 
 /**

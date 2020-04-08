@@ -94,6 +94,7 @@ config GNRC_IPV6_NIB_L2ADDR_MAX_LEN
 
 config GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF
     int "Number of default routers in the default router list"
+    default 2 if MODULE_GNRC_RPL
     default 1
     help
         @attention This number has direct influence on the maximum number of
