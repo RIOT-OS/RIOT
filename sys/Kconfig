@@ -7,7 +7,9 @@
 menu "System"
 
 rsource "auto_init/Kconfig"
+rsource "isrpipe/Kconfig"
 rsource "net/Kconfig"
+rsource "tsrb/Kconfig"
 rsource "usb/Kconfig"
 
 endmenu # System
