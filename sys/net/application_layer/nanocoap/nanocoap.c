@@ -108,7 +108,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
             DEBUG("option count=%u nr=%u len=%i\n", option_count, option_nr, option_len);
 
             if (option_delta) {
-                if (option_count >= NANOCOAP_NOPTS_MAX) {
+                if (option_count >= CONFIG_NANOCOAP_NOPTS_MAX) {
                     DEBUG("nanocoap: max nr of options exceeded\n");
                     return -ENOMEM;
                 }
@@ -395,7 +395,7 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
 {
     coap_method_flags_t method_flag = coap_method2flag(coap_get_code_detail(pkt));
 
-    uint8_t uri[NANOCOAP_URI_MAX];
+    uint8_t uri[CONFIG_NANOCOAP_URI_MAX];
     if (coap_get_uri_path(pkt, uri) <= 0) {
         return -EBADMSG;
     }
@@ -783,7 +783,7 @@ size_t coap_opt_put_uint(uint8_t *buf, uint16_t lastonum, uint16_t onum,
 static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, const uint8_t *val,
                             size_t val_len)
 {
-    if (pkt->options_len >= NANOCOAP_NOPTS_MAX) {
+    if (pkt->options_len >= CONFIG_NANOCOAP_NOPTS_MAX) {
         return -ENOSPC;
     }
 
@@ -862,12 +862,12 @@ ssize_t coap_opt_add_uri_query2(coap_pkt_t *pkt, const char *key, size_t key_len
     assert(key_len);
     assert(!val_len || (val && val_len));
 
-    char qs[NANOCOAP_QS_MAX];
+    char qs[CONFIG_NANOCOAP_QS_MAX];
     /* length including '=' */
     size_t qs_len = key_len + ((val && val_len) ? (val_len + 1) : 0);
 
     /* test if the query string fits */
-    if (qs_len > NANOCOAP_QS_MAX) {
+    if (qs_len > CONFIG_NANOCOAP_QS_MAX) {
         return -1;
     }
 
@@ -951,8 +951,8 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
     if (coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &blknum, &szx) >= 0) {
         /* Use the client requested block size if it is smaller than our own
          * maximum block size */
-        if (NANOCOAP_BLOCK_SIZE_EXP_MAX - 4 < szx) {
-            szx = NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
+        if (CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4 < szx) {
+            szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
         }
     }
 

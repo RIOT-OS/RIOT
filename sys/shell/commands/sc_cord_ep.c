@@ -73,7 +73,7 @@ int _cord_ep_handler(int argc, char **argv)
             printf("usage: %s discover <server address>\n", argv[0]);
             return 1;
         }
-        char regif[NANOCOAP_URI_MAX];
+        char regif[CONFIG_NANOCOAP_URI_MAX];
         sock_udp_ep_t remote;
         if (make_sock_ep(&remote, argv[2]) < 0) {
             printf("error: unable to parse address\n");

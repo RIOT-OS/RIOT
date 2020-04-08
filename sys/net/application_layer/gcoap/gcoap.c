@@ -379,7 +379,7 @@ static int _find_resource(coap_pkt_t *pdu, const coap_resource_t **resource_ptr,
     /* Find path for CoAP msg among listener resources and execute callback. */
     gcoap_listener_t *listener = _coap_state.listeners;
 
-    uint8_t uri[NANOCOAP_URI_MAX];
+    uint8_t uri[CONFIG_NANOCOAP_URI_MAX];
     if (coap_get_uri_path(pdu, uri) <= 0) {
         return GCOAP_RESOURCE_NO_PATH;
     }
@@ -962,12 +962,12 @@ ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
 
 int gcoap_add_qstring(coap_pkt_t *pdu, const char *key, const char *val)
 {
-    char qs[NANOCOAP_QS_MAX];
+    char qs[CONFIG_NANOCOAP_QS_MAX];
     size_t len = strlen(key);
     size_t val_len = (val) ? (strlen(val) + 1) : 0;
 
     /* test if the query string fits, account for the zero termination */
-    if ((len + val_len + 1) >= NANOCOAP_QS_MAX) {
+    if ((len + val_len + 1) >= CONFIG_NANOCOAP_QS_MAX) {
         return -1;
     }
 
