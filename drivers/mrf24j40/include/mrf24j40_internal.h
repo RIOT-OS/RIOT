@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 #include "mrf24j40.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -123,7 +124,7 @@ void mrf24j40_hardware_reset(mrf24j40_t *dev);
  *
  * @param[in] dev       device to enable the PA & LNA on
  */
-#if MRF24J40_USE_EXT_PA_LNA
+#if IS_ACTIVE(CONFIG_MRF24J40_USE_EXT_PA_LNA)
 void mrf24j40_enable_auto_pa_lna(mrf24j40_t *dev);
 #else
 static inline void mrf24j40_enable_auto_pa_lna(mrf24j40_t *dev) { (void) dev; }
@@ -134,7 +135,7 @@ static inline void mrf24j40_enable_auto_pa_lna(mrf24j40_t *dev) { (void) dev; }
  *
  * @param[in] dev       device to disable the PA & LNA on
  */
-#if MRF24J40_USE_EXT_PA_LNA
+#if IS_ACTIVE(CONFIG_MRF24J40_USE_EXT_PA_LNA)
 void mrf24j40_disable_auto_pa_lna(mrf24j40_t *dev);
 #else
 static inline void mrf24j40_disable_auto_pa_lna(mrf24j40_t *dev) { (void) dev; }
@@ -145,7 +146,7 @@ static inline void mrf24j40_disable_auto_pa_lna(mrf24j40_t *dev) { (void) dev; }
  *
  * @param[in] dev       device enable the LNA on
  */
-#if MRF24J40_USE_EXT_PA_LNA
+#if IS_ACTIVE(CONFIG_MRF24J40_USE_EXT_PA_LNA)
 void mrf24j40_enable_lna(mrf24j40_t *dev);
 #else
 static inline void mrf24j40_enable_lna(mrf24j40_t *dev) { (void) dev; }

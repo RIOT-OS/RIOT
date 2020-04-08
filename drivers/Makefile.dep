@@ -482,9 +482,11 @@ endif
 ifneq (,$(filter mrf24j40m%,$(USEMODULE)))
   USEMODULE += mrf24j40
 
-  # all modules but mrf24j40ma have an external PA
-  ifeq (,$(filter mrf24j40ma,$(USEMODULE)))
-    CFLAGS += -DMRF24J40_USE_EXT_PA_LNA
+  ifndef CONFIG_KCONFIG_MODULE_MRF24J40
+    # all modules but mrf24j40ma have an external PA
+    ifeq (,$(filter mrf24j40ma,$(USEMODULE)))
+      CFLAGS += -DCONFIG_MRF24J40_USE_EXT_PA_LNA
+    endif
   endif
 endif
 

@@ -125,11 +125,12 @@ extern "C" {
 /**
  * @brief Enable external PA/LNA control
  *
- * Increase RSSI for MRF24J40MC/MD/ME devices. No effect on MRF24J40MA.
- * For more information, please refer to section 4.2 of MRF24J40 datasheet.
+ * Set to 1 to increase RSSI for MRF24J40MC/MD/ME devices. No effect on
+ * MRF24J40MA. For more information, please refer to section 4.2 of MRF24J40
+ * datasheet.
  */
-#ifndef MRF24J40_USE_EXT_PA_LNA
-#define MRF24J40_USE_EXT_PA_LNA         (0U)
+#if defined(DOXYGEN)
+#define CONFIG_MRF24J40_USE_EXT_PA_LNA
 #endif
 
 /**
@@ -137,11 +138,11 @@ extern "C" {
  *
  * Perform a write / read to a known register on startup to detect
  * if the device is connected.
- * Enable this if you want the boot not to hang if the device is
+ * Set this to 1 if you want the boot not to hang if the device is
  * not connected / there are SPI errors.
  */
-#ifndef MRF24J40_TEST_SPI_CONNECTION
-#define MRF24J40_TEST_SPI_CONNECTION    (0U)
+#if defined(DOXYGEN)
+#define CONFIG_MRF24J40_TEST_SPI_CONNECTION
 #endif
 /** @} */
 
