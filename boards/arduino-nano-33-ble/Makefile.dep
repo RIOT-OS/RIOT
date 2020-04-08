@@ -1,0 +1,17 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+# use arduino-bootloader only if no other stdio_% other than stdio_cdc_acm
+# is requested
+ifeq (,$(filter-out stdio_cdc_acm,$(filter stdio_% slipdev_stdio,$(USEMODULE))))
+  # Provide stdio over USB by default
+  USEMODULE += stdio_cdc_acm
+
+  # This board requires support for Arduino bootloader.
+  FEATURES_REQUIRED += bootloader_arduino
+  USEMODULE += usb_board_reset
+endif
+
+# include common nrf52 dependencies
+include $(RIOTBOARD)/common/nrf52/Makefile.dep
