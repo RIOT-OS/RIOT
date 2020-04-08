@@ -25,6 +25,8 @@ USEMODULE += sock_util
 
 CFLAGS += -DEMCUTE_TOPIC_MAXLEN="249"   # 256 - 7
 CFLAGS += -DSTDIO_UART_RX_BUFSIZE="512" # Adapt to SHELL_BUFSIZE in app
+CFLAGS += -DGNRC_NETIF_SINGLE           # Only one interface used and it makes
+                                        # shell commands easier
 
 # The test requires some setup and to be run as root
 # So it cannot currently be run

@@ -4,6 +4,9 @@ RIOTBASE ?= $(CURDIR)/../..
 
 export TAP ?= tap0
 
+CFLAGS += -DGNRC_NETIF_SINGLE           # Only one interface used and it makes
+                                        # shell commands easier
+
 USEMODULE += sock_dns
 USEMODULE += gnrc_sock_udp
 USEMODULE += gnrc_ipv6_default
