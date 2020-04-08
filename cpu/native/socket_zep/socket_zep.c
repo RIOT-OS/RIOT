@@ -294,7 +294,7 @@ static int _init(netdev_t *netdev)
     netdev_ieee802154_reset(&dev->netdev);
 
     assert(dev != NULL);
-    dev->netdev.chan = IEEE802154_DEFAULT_CHANNEL;
+    dev->netdev.chan = CONFIG_IEEE802154_DEFAULT_CHANNEL;
 
     return 0;
 }

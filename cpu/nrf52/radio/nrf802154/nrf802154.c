@@ -51,10 +51,10 @@ netdev_ieee802154_t nrf802154_dev = {
     .proto = GNRC_NETTYPE_UNDEF,
 #endif
 #endif
-    .pan = IEEE802154_DEFAULT_PANID,
+    .pan = CONFIG_IEEE802154_DEFAULT_PANID,
     .short_addr = { 0, 0 },
     .long_addr = { 0, 0, 0, 0, 0, 0, 0, 0 },
-    .chan = IEEE802154_DEFAULT_CHANNEL,
+    .chan = CONFIG_IEEE802154_DEFAULT_CHANNEL,
     .flags = 0
 };
 
