@@ -24,6 +24,9 @@ USB_PID ?= $(DEFAULT_PID)
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# Do not run Kconfig by default
+SHOULD_RUN_KCONFIG ?=
+
 include $(RIOTBASE)/Makefile.include
 
 # Set USB VID/PID via CFLAGS if not being set via Kconfig
