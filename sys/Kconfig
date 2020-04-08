@@ -15,6 +15,7 @@ rsource "Kconfig.stdio"
 rsource "pm_layered/Kconfig"
 rsource "test_utils/Kconfig"
 rsource "usb/Kconfig"
+rsource "tsrb/Kconfig"
 rsource "xtimer/Kconfig"
 
 config MODULE_SYS
