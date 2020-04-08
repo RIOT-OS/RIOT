@@ -7,6 +7,7 @@ TUN=sl0
 TUN_GLB="fdea:dbee:f::1/64"
 UHCPD_PID=
 CREATED_IFACE=0
+START_SLIP=1
 
 SUDO=${SUDO:-sudo}
 
