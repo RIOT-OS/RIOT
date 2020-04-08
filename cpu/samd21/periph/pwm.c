@@ -30,11 +30,6 @@
 #include "periph/gpio.h"
 #include "periph/pwm.h"
 
-static inline int _num(pwm_t dev)
-{
-    return ((int)(pwm_config[dev].dev) & 0xc00) >> 10;
-}
-
 static inline Tcc *_tcc(pwm_t dev)
 {
     return pwm_config[dev].dev;
@@ -47,10 +42,52 @@ static inline uint8_t _chan(pwm_t dev, int chan)
 
 static int _clk_id(pwm_t dev)
 {
-    if (_num(dev) == 2) {
+    Tcc *tcc = _tcc(dev);
+
+    if (tcc == TCC0) {
+        return TCC0_GCLK_ID;
+    }
+
+    if (tcc == TCC1) {
+        return TCC1_GCLK_ID;
+    }
+
+    if (tcc == TCC2) {
         return TCC2_GCLK_ID;
     }
-    return TCC0_GCLK_ID;
+#ifdef TCC3
+    if (tcc == TCC3) {
+        return TCC3_GCLK_ID;
+    }
+#endif
+
+    assert(0);
+    return 0;
+}
+
+static uint32_t _apbcmask_tcc(pwm_t dev)
+{
+    Tcc *tcc = _tcc(dev);
+
+    if (tcc == TCC0) {
+        return PM_APBCMASK_TCC0;
+    }
+
+    if (tcc == TCC1) {
+        return PM_APBCMASK_TCC1;
+    }
+
+    if (tcc == TCC2) {
+        return PM_APBCMASK_TCC2;
+    }
+#ifdef TCC3
+    if (tcc == TCC3) {
+        return PM_APBCMASK_TCC3;
+    }
+#endif
+
+    assert(0);
+    return 0;
 }
 
 static uint8_t get_prescaler(unsigned int target, int *scale)
@@ -89,7 +126,7 @@ static uint8_t get_prescaler(unsigned int target, int *scale)
 
 static void poweron(pwm_t dev)
 {
-    PM->APBCMASK.reg |= (PM_APBCMASK_TCC0 << _num(dev));
+    PM->APBCMASK.reg |= _apbcmask_tcc(dev);
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
                          GCLK_CLKCTRL_GEN_GCLK0 |
                          GCLK_CLKCTRL_ID(_clk_id(dev)));
@@ -167,8 +204,16 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
         (pwm_config[dev].chan[channel].pin == GPIO_UNDEF)) {
         return;
     }
-    _tcc(dev)->CC[_chan(dev, channel)].reg = value;
-    while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << _chan(dev, channel))) {}
+
+    uint8_t chan = _chan(dev, channel);
+    if (chan < 4) {
+        _tcc(dev)->CC[chan].reg = value;
+        while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << chan)) {}
+    } else {
+        chan -= 4;
+        _tcc(dev)->CCB[chan].reg = value;
+        while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CCB0 << chan)) {}
+    }
 }
 
 void pwm_poweron(pwm_t dev)
@@ -181,7 +226,7 @@ void pwm_poweroff(pwm_t dev)
 {
     _tcc(dev)->CTRLA.reg &= ~(TCC_CTRLA_ENABLE);
 
-    PM->APBCMASK.reg &= ~(PM_APBCMASK_TCC0 << _num(dev));
+    PM->APBCMASK.reg &= ~_apbcmask_tcc(dev);
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_GEN_GCLK7 |
                          GCLK_CLKCTRL_ID(_clk_id(dev)));
     while (GCLK->STATUS.bit.SYNCBUSY) {}
