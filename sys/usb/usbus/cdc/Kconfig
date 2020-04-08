@@ -1,1 +1,2 @@
 rsource "acm/Kconfig"
+rsource "ecm/Kconfig"
