@@ -9,7 +9,12 @@ mainmenu "RIOT Configuration"
 # For now, get used modules as macros from this file (see kconfig.mk)
 osource "$(KCONFIG_GENERATED_DEPENDENCIES)"
 
+# Load first board configurations, which might override CPU's
+orsource "$(RIOTBOARD)/$(BOARD)/Kconfig"
 orsource "$(RIOTCPU)/$(CPU)/Kconfig"
+
+rsource "$(RIOTBOARD)/Kconfig"
+rsource "$(RIOTCPU)/Kconfig"
 
 # The application may declare new symbols as well
 osource "$(APPDIR)/Kconfig"
