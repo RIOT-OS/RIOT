@@ -1,7 +1,7 @@
 PKG_NAME=littlefs2
 PKG_URL=https://github.com/ARMmbed/littlefs.git
-# v2.1.4
-PKG_VERSION=ce2c01f098f4d2b9479de5a796c3bb531f1fe14c
+# v2.2.0
+PKG_VERSION=a049f1318eecbe502549f9d74a41951985fb956f
 PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
