@@ -794,7 +794,7 @@ ifneq (,$(filter ws281x_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ws281x,$(USEMODULE)))
-  FEATURES_REQUIRED_ANY += arch_avr8|arch_native
+  FEATURES_REQUIRED_ANY += arch_avr8|arch_esp32|arch_native
 
   ifeq (,$(filter ws281x_%,$(USEMODULE)))
     ifneq (,$(filter arch_avr8,$(FEATURES_USED)))
