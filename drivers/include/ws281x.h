@@ -48,7 +48,17 @@
  *
  * ### Usage
  *
- * Add the following to your `Makefile` to use:
+ * Add the following to your `Makefile`:
+ *
+ * * Auto-selecting the backend:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
+ * USEMODULE += ws281x
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * This will automatically pull in one of the backends supported by your board.
+ * In case multiple backends apply and the automatic selection does not pick
+ * your preferred backend, you can manually pick your preferred backend as
+ * described below.
  *
  * * the ATmega backend:
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
