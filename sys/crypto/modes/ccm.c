@@ -176,15 +176,16 @@ static inline int _fits_in_nbytes(size_t value, uint8_t num_bytes)
 }
 
 /* Valid mac_length are 4, 6, 8 ... 16 octets */
-static int _validate_mac_length_ccm(uint8_t mac_length)
+static bool _valid_mac_length_ccm(uint8_t mac_length)
 {
-    return (mac_length % 2 != 0 || mac_length < 4 || mac_length > 16);
+    return (mac_length % 2 == 0 && mac_length >= 4 && mac_length <= 16);
 }
 
 /* Valid mac_length are 0, 4, 6, 8 ... 16 octets */
-static int _validate_mac_length_ccms(uint8_t mac_length)
+static bool _valid_mac_length_ccms(uint8_t mac_length)
 {
-    return (mac_length % 2 != 0 || mac_length == 2 || mac_length > 16);
+    return (mac_length == 0) || \
+        (mac_length % 2 == 0 && mac_length >=4 && mac_length <= 16);
 }
 
 int _cipher_encrypt_ccm(cipher_t *cipher,
@@ -324,13 +325,13 @@ int cipher_decrypt_ccm(cipher_t *cipher,
                        const uint8_t *input, size_t input_len,
                        uint8_t *plain)
 {
-    if(_validate_mac_length_ccm(mac_length)){
-        return CCM_ERR_INVALID_MAC_LENGTH;
-    }
-    else {
+    if(_valid_mac_length_ccm(mac_length)){
         return _cipher_decrypt_ccm(cipher, auth_data, auth_data_len, mac_length,
                                    length_encoding, nonce, nonce_len, input,
                                    input_len, plain);
+    }
+    else {
+        return CCM_ERR_INVALID_MAC_LENGTH;
     }
 }
 
@@ -341,13 +342,13 @@ int cipher_decrypt_ccms(cipher_t *cipher,
                         const uint8_t *input, size_t input_len,
                         uint8_t *plain)
 {
-    if(_validate_mac_length_ccms(mac_length)){
-        return CCM_ERR_INVALID_MAC_LENGTH;
-    }
-    else {
+    if(_valid_mac_length_ccms(mac_length)){
         return _cipher_decrypt_ccm(cipher, auth_data, auth_data_len, mac_length,
                                    length_encoding, nonce, nonce_len, input,
                                    input_len, plain);
+    }
+    else {
+        return CCM_ERR_INVALID_MAC_LENGTH;
     }
 }
 
@@ -358,13 +359,13 @@ int cipher_encrypt_ccm(cipher_t *cipher,
                        const uint8_t *input, size_t input_len,
                        uint8_t *output)
 {
-    if(_validate_mac_length_ccm(mac_length)) {
-        return CCM_ERR_INVALID_MAC_LENGTH;
-    }
-    else {
+    if(_valid_mac_length_ccm(mac_length)) {
         return _cipher_encrypt_ccm(cipher, auth_data, auth_data_len, mac_length,
                                    length_encoding, nonce, nonce_len, input,
                                    input_len, output);
+    }
+    else {
+        return CCM_ERR_INVALID_MAC_LENGTH;
     }
 }
 
@@ -375,12 +376,12 @@ int cipher_encrypt_ccms(cipher_t *cipher,
                        const uint8_t *input, size_t input_len,
                        uint8_t *output)
 {
-    if(_validate_mac_length_ccms(mac_length)) {
-        return CCM_ERR_INVALID_MAC_LENGTH;
-    }
-    else {
+    if(_valid_mac_length_ccms(mac_length)) {
         return _cipher_encrypt_ccm(cipher, auth_data, auth_data_len, mac_length,
                                    length_encoding, nonce, nonce_len, input,
                                    input_len, output);
+    }
+    else {
+        return CCM_ERR_INVALID_MAC_LENGTH;
     }
 }
