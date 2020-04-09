@@ -292,7 +292,7 @@ static inline void _update_short_timers(uint64_t *now)
             /* assign new head */
             timer = timer_list_head;
             /* update current_time */
-            *now = _xtimer_now();
+            *now = _xtimer_now64();
         }
         else {
             timer->offset -= elapsed;
