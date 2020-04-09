@@ -498,6 +498,8 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         old_state = at86rf2xx_get_status(dev);
     } while (old_state == AT86RF2XX_STATE_BUSY_RX_AACK ||
              old_state == AT86RF2XX_STATE_BUSY_TX_ARET ||
+             old_state == AT86RF2XX_STATE_BUSY_RX      ||
+             old_state == AT86RF2XX_STATE_BUSY_TX      ||
              old_state == AT86RF2XX_STATE_IN_PROGRESS);
 
     if (state == AT86RF2XX_STATE_FORCE_TRX_OFF) {

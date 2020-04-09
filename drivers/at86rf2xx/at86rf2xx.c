@@ -112,12 +112,15 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* set default TX power */
     at86rf2xx_set_txpower(dev, AT86RF2XX_DEFAULT_TXPOWER);
     /* set default options */
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
 
-    static const netopt_enable_t enable = NETOPT_ENABLE;
-    netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
-                          &enable, sizeof(enable));
+    if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
+        at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
+        at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
+
+        static const netopt_enable_t enable = NETOPT_ENABLE;
+        netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
+                              &enable, sizeof(enable));
+    }
 
     /* enable safe mode (protect RX FIFO until reading data starts) */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
@@ -146,9 +149,9 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
 
     /* State to return after receiving or transmitting */
-    dev->idle_state = AT86RF2XX_STATE_RX_AACK_ON;
+    dev->idle_state = AT86RF2XX_PHY_STATE_RX;
     /* go into RX state */
-    at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
+    at86rf2xx_set_state(dev, AT86RF2XX_PHY_STATE_RX);
 
     DEBUG("at86rf2xx_reset(): reset complete.\n");
 }
@@ -171,8 +174,8 @@ void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
     uint8_t state;
 
     dev->pending_tx++;
-    state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
-    if (state != AT86RF2XX_STATE_TX_ARET_ON) {
+    state = at86rf2xx_set_state(dev, AT86RF2XX_PHY_STATE_TX);
+    if (state != AT86RF2XX_PHY_STATE_TX) {
         dev->idle_state = state;
     }
     dev->tx_frame_len = IEEE802154_FCS_LEN;
