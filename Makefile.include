@@ -8,8 +8,11 @@ ifeq (,$(filter $(MATCH_MAKE_VERSION),$(MAKE_VERSION)))
       $(MATCH_MAKE_VERSION) or later.)
 endif
 
+# will evaluate to the absolute path of the Makefile it's evaluated in
+MAKEFILEDIR = $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+
 # 'Makefile.include' directory, must be evaluated before other 'include'
-_riotbase := $(dir $(lastword $(MAKEFILE_LIST)))
+_riotbase := $(MAKEFILEDIR)
 
 # include RIOT_MAKEFILES_GLOBAL_PRE configuration files
 # allows setting user specific system wide configuration parsed before the body
