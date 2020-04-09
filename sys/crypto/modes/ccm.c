@@ -82,8 +82,7 @@ static int ccm_create_mac_iv(cipher_t *cipher, uint8_t auth_data_len, uint8_t M,
     /* set flags in B[0] - bit format:
             7        6     5..3  2..0
         Reserved   Adata    M_    L_    */
-    /* valid M values include 0 for CCMS */
-    M_ = M == 0 ? 0 : (M - 2) / 2;
+    M_ = (M - 2) / 2;
 
     L_ = L - 1;
     X1[0] = 64 * (auth_data_len > 0) + 8 * M_ + L_;
@@ -207,15 +206,22 @@ int _cipher_encrypt_ccm(cipher_t *cipher,
     /* Create B0, encrypt it (X1) and use it as mac_iv */
     block_size = cipher_get_block_size(cipher);
     assert(block_size == CCM_BLOCK_SIZE);
-    if (ccm_create_mac_iv(cipher, auth_data_len, mac_length, length_encoding,
-                          nonce, nonce_len, input_len, mac_iv) < 0) {
-        return CCM_ERR_INVALID_DATA_LENGTH;
-    }
 
-    /* MAC calculation (T) with additional data and plaintext */
-    len = ccm_compute_adata_mac(cipher, auth_data, auth_data_len, mac_iv);
-    if (len < 0) {
-        return len;
+    /* The value M = 0 (mac_length = 0) corresponds to disabling authenticity,
+       since then the authentication field is the empty string, this is only
+       possible in ccms, in ccm mac_lenth !=0 would have been checked by
+       _valid_mac_length_ccm() */
+    if (mac_length != 0) {
+        if (ccm_create_mac_iv(cipher, auth_data_len, mac_length, length_encoding,
+                            nonce, nonce_len, input_len, mac_iv) < 0) {
+            return CCM_ERR_INVALID_DATA_LENGTH;
+        }
+
+        /* MAC calculation (T) with additional data and plaintext */
+        len = ccm_compute_adata_mac(cipher, auth_data, auth_data_len, mac_iv);
+        if (len < 0) {
+            return len;
+        }
     }
 
     len = ccm_compute_cbc_mac(cipher, mac_iv, input, input_len, mac);
@@ -290,17 +296,24 @@ int _cipher_decrypt_ccm(cipher_t *cipher,
         return len;
     }
 
-    /* Create B0, encrypt it (X1) and use it as mac_iv */
-    if (ccm_create_mac_iv(cipher, auth_data_len, mac_length, length_encoding,
-                          nonce, nonce_len, plain_len, mac_iv) < 0) {
-        return CCM_ERR_INVALID_DATA_LENGTH;
+    /* The value M = 0 (mac_length = 0) corresponds to disabling authenticity,
+       since then the authentication field is the empty string, this is only
+       possible in ccms, in ccm mac_lenth !=0 would have been checked by
+       _valid_mac_length_ccm() */
+    if (mac_length != 0) {
+        /* Create B0, encrypt it (X1) and use it as mac_iv */
+        if (ccm_create_mac_iv(cipher, auth_data_len, mac_length, length_encoding,
+                            nonce, nonce_len, plain_len, mac_iv) < 0) {
+            return CCM_ERR_INVALID_DATA_LENGTH;
+        }
+
+        /* MAC calculation (T) with additional data and plaintext */
+        len = ccm_compute_adata_mac(cipher, auth_data, auth_data_len, mac_iv);
+        if (len < 0) {
+            return len;
+        }
     }
 
-    /* MAC calculation (T) with additional data and plaintext */
-    len = ccm_compute_adata_mac(cipher, auth_data, auth_data_len, mac_iv);
-    if (len < 0) {
-        return len;
-    }
     len = ccm_compute_cbc_mac(cipher, mac_iv, plain, plain_len, mac);
     if (len < 0) {
         return len;
