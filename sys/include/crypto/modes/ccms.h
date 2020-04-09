@@ -13,6 +13,19 @@
  * @file        ccms.h
  * @brief       Counter with CCM* mode of operation for block ciphers
  *
+ * CCM* coincides with CCM for messages that require authentication and possibly
+ * encryption, but it also support messages only requiring encryption. This is
+ * advantageuos in cases where you would want a single mechanism to provide for
+ * confidentiality and authenticity.
+ *
+ * CCM* also specifices that the nonce shall encode the potential values for M
+ * in a way that one could uniquely determine M from the nonce N. But, it does
+ * not specify how this encoding should be implemented, and leaves this to the
+ * application. This is currently not implemented.
+ *
+ * @note       Allthough CCM* support only encrypting data, it is not recommended
+ *             if only generic encryption is needed.
+ *
  * @author      Francisco Molina <francisco.molina@inria.cl>
  */
 
