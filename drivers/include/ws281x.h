@@ -40,7 +40,7 @@
  * ## ESP32
  *
  * The ESP32 implementation is frequency independent, as frequencies above 80MHz
- * are high enough to support big banging without assembly.
+ * are high enough to support bit banging without assembly.
  *
  * ## Native/VT100
  *
@@ -48,10 +48,21 @@
  *
  * ### Usage
  *
- * Add the following to your `Makefile` to use the ATmega backend:
+ * Add the following to your `Makefile` to use:
  *
+ * * the ATmega backend:
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
  * USEMODULE += ws281x_atmega
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * * the ESP32 backend:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
+ * USEMODULE += ws281x_esp32
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * * the native/VT100 backend:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
+ * USEMODULE += ws281x_vt100
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @{
