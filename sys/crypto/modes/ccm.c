@@ -43,6 +43,12 @@ static int ccm_compute_cbc_mac(cipher_t *cipher, const uint8_t iv[16],
     block_size = cipher_get_block_size(cipher);
     memmove(mac, iv, 16);
     offset = 0;
+
+    /* no input message */
+    if(length == 0) {
+        return 0;
+    }
+
     do {
         uint8_t block_size_input = (length - offset > block_size) ?
                                    block_size : length - offset;
