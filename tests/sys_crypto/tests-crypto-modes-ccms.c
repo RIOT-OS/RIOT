@@ -453,7 +453,7 @@ static int _test_ccms_len(func_ccms_t func, uint8_t len_encoding,
 }
 
 
-/* Test length checking in ccm functions. */
+/* Test length checking in ccms functions. */
 static void test_crypto_modes_ccms_check_len(void)
 {
     int ret;
@@ -498,7 +498,7 @@ static void test_crypto_modes_ccms_check_len(void)
     ret = _test_ccms_len(cipher_decrypt_ccms, 8, einput, 16, 0);
     TEST_ASSERT_MESSAGE(ret > 0, "Decryption : failed with valid input_len");
 
-    /* ccm library does not support auth_data_len > 0xFEFF */
+    /* ccms library does not support auth_data_len > 0xFEFF */
     ret = _test_ccms_len(cipher_encrypt_ccms, 2, NULL, 0, 0xFEFF + 1);
     TEST_ASSERT_EQUAL_INT(-1, ret);
 }
