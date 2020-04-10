@@ -38,10 +38,9 @@ extern "C" {
 
 /**
  * @defgroup drivers_fxos8700_config     FXOS8700 accelerometer/magnetometer driver compile configuration
- * @ingroup config
+ * @ingroup config_drivers_sensors
  * @{
  */
-
 /**
  * @brief   Default raw value mode for accelerator
  *
@@ -52,6 +51,7 @@ extern "C" {
 #define FXOS8700_USE_ACC_RAW_VALUES (0)
 #endif
 /** @} */
+
 /**
  * @brief   FXOS8700 specific return values
  */
