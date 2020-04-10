@@ -455,7 +455,9 @@ __attribute__((weak,alias("dummy_handler_default"))) void isr_svc(void);
 __attribute__((weak,alias("dummy_handler_default"))) void isr_pendsv(void);
 __attribute__((weak,alias("dummy_handler_default"))) void isr_systick(void);
 
-/* define Cortex-M base interrupt vectors */
+/* define Cortex-M base interrupt vectors
+ * IRQ entries -9 to -6 inclusive (offsets 0x1c to 0x2c of cortexm_base_t)
+ * are reserved entries. */
 ISR_VECTOR(0) const cortexm_base_t cortex_vector_base = {
     &_estack,
     {
@@ -471,6 +473,20 @@ ISR_VECTOR(0) const cortexm_base_t cortex_vector_base = {
         [13] = isr_pendsv,
         /* [-1] SysTick interrupt, not used in RIOT */
         [14] = isr_systick,
+
+        /* -9 to -6 reserved entries can be defined by the cpu module */
+        #ifdef CORTEXM_VECTOR_RESERVED_0X1C
+        [6] = (isr_t)(CORTEXM_VECTOR_RESERVED_0X1C),
+        #endif  /* CORTEXM_VECTOR_RESERVED_0X1C */
+        #ifdef CORTEXM_VECTOR_RESERVED_0X20
+        [7] = (isr_t)(CORTEXM_VECTOR_RESERVED_0X20),
+        #endif  /* CORTEXM_VECTOR_RESERVED_0X20 */
+        #ifdef CORTEXM_VECTOR_RESERVED_0X24
+        [8] = (isr_t)(CORTEXM_VECTOR_RESERVED_0X24),
+        #endif  /* CORTEXM_VECTOR_RESERVED_0X24 */
+        #ifdef CORTEXM_VECTOR_RESERVED_0X28
+        [9] = (isr_t)(CORTEXM_VECTOR_RESERVED_0X28),
+        #endif  /* CORTEXM_VECTOR_RESERVED_0X28 */
 
         /* additional vectors used by M3, M4(F), and M7 */
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
