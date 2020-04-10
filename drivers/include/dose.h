@@ -126,10 +126,9 @@ typedef enum {
 
 /**
  * @defgroup drivers_dose_config    Differentially Operated Serial Ethernet (DOSE) driver compile configuration
- * @ingroup config
+ * @ingroup config_drivers_netdev
  * @{
  */
-
 /**
  * @brief Timeout that brings the driver back into idle state.
  *
