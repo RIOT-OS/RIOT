@@ -40,7 +40,7 @@ extern "C" {
 
 /**
  * @defgroup drivers_ds1307_config   DS1307 RTC driver compile configuration
- * @ingroup config
+ * @ingroup config_drivers_sensors
  * @{
  */
 
