@@ -35,7 +35,6 @@ usbus_cdcecm_device_t cdcecm;
 #endif
 #ifdef MODULE_USBUS_DFU
 #include "usb/dfu.h"
-usbus_dfu_device_t dfu;
 #endif
 
 static char _stack[USBUS_STACKSIZE];
@@ -61,6 +60,7 @@ void auto_init_usb(void)
 #endif
 
 #ifdef MODULE_USBUS_DFU
+    static usbus_dfu_device_t dfu;
     usbus_dfu_init(&usbus, &dfu, USBUS_APP_MODE);
 #endif
 

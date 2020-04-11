@@ -28,6 +28,10 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef MODULE_USBUS_DFU
+#include "usb/dfu.h"
+#endif
+
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
@@ -254,12 +258,20 @@ static int _recv_interface_setup(usbus_t *usbus, usb_setup_t *pkt)
 static void _recv_setup(usbus_t *usbus, usbus_control_handler_t *handler)
 {
     usb_setup_t *pkt = &handler->setup;
+    int res = 0;
 
     DEBUG("usbus_control: Received setup %x %x @ %d\n", pkt->type,
           pkt->request, pkt->length);
 
+    if (pkt->type & USB_SETUP_REQUEST_TYPE_CLASS) {
+        if (pkt->type & USB_SETUP_REQUEST_RECIPIENT_INTERFACE) {
+            dfu_control_req(usbus, handler);
+            res = 1;
+        }
+    }
+
     uint8_t destination = pkt->type & USB_SETUP_REQUEST_RECIPIENT_MASK;
-    int res = 0;
+
     switch (destination) {
         case USB_SETUP_REQUEST_RECIPIENT_DEVICE:
             res = _recv_dev_setup(usbus, pkt);

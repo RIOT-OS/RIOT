@@ -995,6 +995,12 @@ ifneq (,$(filter usbus_cdc_ecm,$(USEMODULE)))
   USEMODULE += luid
 endif
 
+ifneq (,$(filter usbus_dfu,$(USEMODULE)))
+  USEMODULE += usbus
+  USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_flashpage
+endif
+
 ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += random

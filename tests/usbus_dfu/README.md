@@ -1,25 +1,28 @@
-Expected result
-===============
+# Dependencies
 
-Use the network related shell commands to verify the network link between the
-board under test and the host computer. Ping to the link local address from and
-to the host computer must work.
+Install dfu-util package.
+* On Ubuntu based system:
+        apt-get install dfu-util
 
-On the host computer, using tools such as `ethtool` must show the USB CDC ECM
-interface as link detected:
+# Expected result
 
-```
-# ethtool enp0s20u9u4
-Settings for enp0s20u9u4:
-        Current message level: 0x00000007 (7)
-                               drv probe link
-        Link detected: yes
-```
+Build the RIOT firmware you want to flash.
+Build and flash the riotboot bootloader
+        make -C tests/riotboot riotboot/flash-bootloader
+Build and flash the DFU test application onto SLOT1 (avoid SLOT0 for now)
+        APP_VER=2 make -C tests/usbus_dfu riotboot/flash-slot1
+Finally use dfu-util to flash your firmware (use a .bin file)
+        dfu-util  -a 0 -R -D /path/to/your/firmware.bin
 
-Background
-==========
+Please not that it will erase the riotboot bootloader, this is known limitation
+as this feature is still experimental as long as DFU is not properly integrated
+to riotboot or any other bootloader
 
-This test application can be used to verify the USBUS CDC ECM implementation.
-Assuming drivers available, the board under test should show up on the host
-computer as an USB network interface. Drivers are available for both Linux and
-macOS.
+# Background
+
+This test application can be used to verify the USBUS Device Firmware Upgrade
+(DFU) implementation.
+Assuming dfu-util package is installed on your system, the board under test
+should show up on the host computer with a runtime DFU interface. dfu-util will
+detect the device and will switch it to DFU mode. After flashing, the board will
+be reset to run the newly flashed firmware.
