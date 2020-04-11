@@ -140,6 +140,61 @@ enum {
     GPIO_PORTS_NUMOF        /**< overall number of available ports */
 };
 
+/**
+ * @brief UART module configuration options
+ *
+ * QN908x doesn't have any UART standalone blocks, but it has two FLEXCOMM
+ * blocks that can be put in UART mode. The USART_Type* address is one of the
+ * FLEXCOMM_Type* addresses as well.
+ */
+typedef struct {
+    USART_Type *dev;    /**< Pointer to module hardware registers */
+    gpio_t rx_pin;      /**< RX pin, GPIO_UNDEF disables RX. */
+    gpio_t tx_pin;      /**< TX pin, GPIO_UNDEF disables TX. */
+} uart_conf_t;
+
+/**
+ * @brief   Definition of possible parity modes
+ *
+ * These are defined to match the values of the USART->CFG : PARITYSEL bit
+ * field.
+ * @{
+ */
+typedef enum {
+    UART_PARITY_NONE    = 0,    /**< no parity */
+    UART_PARITY_EVEN    = 2,    /**< even parity */
+    UART_PARITY_ODD     = 3,    /**< odd parity */
+} uart_parity_t;
+#define HAVE_UART_PARITY_T
+/** @} */
+
+/**
+ * @brief   Definition of possible data bits lengths in a UART frame
+ *
+ * These are defined to match the values of the USART->CFG : DATALEN bit field.
+ * @{
+ */
+typedef enum {
+    UART_DATA_BITS_7    = 0,    /**< 7 data bits */
+    UART_DATA_BITS_8    = 1,    /**< 8 data bits */
+    /* Note: There's a UART_DATA_BITS_9 possible in this hardware. */
+} uart_data_bits_t;
+#define HAVE_UART_DATA_BITS_T
+/** @} */
+
+/**
+ * @brief   Definition of possible stop bits lengths
+ *
+ * These are defined to match the values of the USART->CFG : STOPLEN bit field.
+ * @{
+ */
+typedef enum {
+    UART_STOP_BITS_1    = 0,    /**< 1 stop bit */
+    UART_STOP_BITS_2    = 1,    /**< 2 stop bits */
+} uart_stop_bits_t;
+#define HAVE_UART_STOP_BITS_T
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

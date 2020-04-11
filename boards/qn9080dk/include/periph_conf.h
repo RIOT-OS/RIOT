@@ -28,10 +28,24 @@
 extern "C" {
 #endif
 
+/**
+ * @name   UART configuration
+ * @{
+ */
+static const uart_conf_t uart_config[] = {
+    {
+        .dev          = USART0,
+        .rx_pin       = GPIO_PIN(PORT_A, 17),
+        .tx_pin       = GPIO_PIN(PORT_A, 16),
+    },
+};
+
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
+/** @} */
+
 /* put here the board peripherals definitions:
    - Available clocks
    - Timers
-   - UARTs
    - PWMs
    - SPIs
    - I2C
