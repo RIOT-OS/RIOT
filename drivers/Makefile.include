@@ -1,4 +1,7 @@
 # driver includes (in alphabetical order)
+ifneq (,$(filter adc_ng,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/adc_ng/include
+endif
 
 ifneq (,$(filter ad7746,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ad7746/include

@@ -10,6 +10,15 @@ ifneq (,$(filter adc%1c,$(USEMODULE)))
   USEMODULE += adcxx1c
 endif
 
+ifneq (,$(filter adc_ng,$(USEMODULE)))
+  FEATURES_REQUIRED += adc_ng
+endif
+
+ifneq (,$(filter adc_ng_default,$(USEMODULE)))
+  USEMODULE += adc_ng
+  FEATURES_OPTIONAL += periph_adc_ng
+endif
+
 ifneq (,$(filter ads101%,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_i2c

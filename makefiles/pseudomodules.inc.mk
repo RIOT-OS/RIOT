@@ -1,3 +1,4 @@
+PSEUDOMODULES += adc_ng_%
 PSEUDOMODULES += at_urc
 PSEUDOMODULES += at24c%
 PSEUDOMODULES += base64url
