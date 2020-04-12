@@ -268,11 +268,10 @@ void gpio_irq_disable(gpio_t dev)
     _gpio_configure(dev, 0, 0);
 }
 
-static void test_irq(int port, unsigned long f_mask, unsigned long r_mask)
+static void test_irq(int port, unsigned long active_pins)
 {
     /* Test each bit of rising and falling masks, if set trigger interrupt
      * on corresponding device */
-    unsigned long active_pins = f_mask | r_mask;
 
     while (active_pins) {
         /* we want the position of the first one bit, so N_bits - (N_leading_zeros + 1) */
@@ -295,24 +294,18 @@ void GPIO_IRQHandler(void) __attribute__((interrupt("IRQ")));
 
 void GPIO_IRQHandler(void)
 {
+    unsigned long int_stat;
+
     if (IO_INT_STAT & BIT0) {                       /* interrupt(s) on PORT0 pending */
-        unsigned long int_stat_f = IO0_INT_STAT_F;  /* save content */
-        unsigned long int_stat_r = IO0_INT_STAT_R;  /* save content */
-
-        IO0_INT_CLR = int_stat_f;                   /* clear flags of fallen pins */
-        IO0_INT_CLR = int_stat_r;                   /* clear flags of risen pins */
-
-        test_irq(0, int_stat_f, int_stat_r);
+        int_stat = IO0_INT_STAT_F | IO0_INT_STAT_R; /* get risen & fallen pin IRQs */
+        IO0_INT_CLR = int_stat;                     /* clear IRQ flags */
+        test_irq(0, int_stat);
     }
 
     if (IO_INT_STAT & BIT2) {                       /* interrupt(s) on PORT2 pending */
-        unsigned long int_stat_f = IO2_INT_STAT_F;  /* save content */
-        unsigned long int_stat_r = IO2_INT_STAT_R;  /* save content */
-
-        IO2_INT_CLR = int_stat_f;                   /* clear flags of fallen pins */
-        IO2_INT_CLR = int_stat_r;                   /* clear flags of risen pins */
-
-        test_irq(2, int_stat_f, int_stat_r);
+        int_stat = IO2_INT_STAT_F | IO2_INT_STAT_R; /* get risen & fallen pin IRQs */
+        IO2_INT_CLR = int_stat;                     /* clear IRQ flags */
+        test_irq(2, int_stat);
     }
 
     VICVectAddr = 0;                                /* Acknowledge Interrupt */
