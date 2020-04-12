@@ -41,7 +41,7 @@ extern "C" {
  * @name    Timer configuration, select a number from 1 to 4
  * @{
  */
-#define TIMER_NUMOF         (1U)
+#define TIMER_NUMOF         (4U)
 /** @} */
 
 /**
