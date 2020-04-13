@@ -20,6 +20,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,9 +84,18 @@ static const spi_conf_t spi_config[] = {
         .pinsel_msk_miso = (BIT14 | BIT15), /* P1.23 */
         .pinsel_msk_clk  = (BIT8  | BIT9),  /* P1.20 */
     },
+    {
+        .dev = SPI1,
+        .pinsel_mosi = 0,
+        .pinsel_miso = 0,
+        .pinsel_clk  = 0,
+        .pinsel_msk_mosi = (BIT19), /* P0.9 */
+        .pinsel_msk_miso = (BIT17), /* P0.8 */
+        .pinsel_msk_clk  = (BIT15), /* P0.7 */
+    },
 };
 
-#define SPI_NUMOF           (1)
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
