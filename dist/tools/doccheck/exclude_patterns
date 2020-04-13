@@ -14966,3 +14966,13 @@ pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMB
 pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_FILTER_POLICY \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
 pkg/nimble/autoadv/include/nimble_autoadv_params\.h:[0-9]+: warning: Member NIMBLE_AUTOADV_PARAMS \(macro definition\) of file nimble_autoadv_params\.h is not documented\.
 cpu/esp32/include/periph_cpu_esp32\.h:[0-9]+: warning: Member GPIO[0-9]+ \(macro definition\) of file periph_cpu_esp32\.h is not documented.
+boards/waveshare\-nrf52840\-eval\-kit/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_[A0-9]+ \(macro definition\) of file arduino_pinmap\.h is not documented.
+boards/waveshare\-nrf52840\-eval\-kit/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_[A0-9]+ \(macro definition\) of file arduino_pinmap\.h is not documented.
+boards/waveshare\-nrf52840\-eval\-kit/include/board\.h:[0-9]+: warning: Member LED0_PIN \(macro definition\) of file board\.h is not documented.
+boards/waveshare\-nrf52840\-eval\-kit/include/board\.h:[0-9]+: warning: Member LED[A-Z0-9_]+ \(macro definition\) of file board\.h is not documented.
+boards/waveshare\-nrf52840\-eval\-kit/include/board\.h:[0-9]+: warning: Member BTN[A-Z0-9_]+ \(macro definition\) of file board\.h is not documented.
+boards/waveshare\-nrf52840\-eval\-kit/include/board\.h:[0-9]+: warning: Member SDCARD_SPI_PARAM_[A-Z]+ \(macro definition\) of file board\.h is not documented.
+boards/waveshare\-nrf52840\-eval\-kit/include/board\.h:[0-9]+: warning: Member SDCARD_SPI_PARAM_[A-Z]+ \(macro definition\) of file board\.h is not documented.
+boards/waveshare\-nrf52840\-eval\-kit/include/periph_conf\.h:[0-9]+: warning: Member UART_[A-Z0-9_]+ \(macro definition\) of file periph_conf\.h is not documented.
+boards/waveshare\-nrf52840\-eval\-kit/include/periph_conf\.h:[0-9]+: warning: Member [A-Z0-9_]+NUMOF \(macro definition\) of file periph_conf\.h is not documented.
+boards/waveshare\-nrf52840\-eval\-kit/include/periph_conf\.h:[0-9]+: warning: Member [a-z0-9_]+config\[\] \(variable\) of file periph_conf\.h is not documented.
