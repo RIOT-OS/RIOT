@@ -28,7 +28,7 @@ ifeq ($(DEBUG_ADAPTER),dap)
   PROGRAMMER ?= edbg
 else ifeq ($(DEBUG_ADAPTER),jlink)
   # only use JLinkExe if it's installed
-  ifneq (,$(shell command -v JLinkExe))
+  ifneq (,$(shell which JLinkExe))
     PROGRAMMER ?= jlink
   else
     PROGRAMMER ?= openocd
