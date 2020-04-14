@@ -9,7 +9,7 @@
 #   Moving 'CPU/CPU_MODEL' to Makefile.features is an ongoing work and may not
 #   reflect the state of all boards for the moment.
 
-include $(BOARDSDIR)/$(BOARD)/Makefile.features
+include $(BOARDDIR)/Makefile.features
 
 # Sanity check
 ifeq (,$(CPU))
