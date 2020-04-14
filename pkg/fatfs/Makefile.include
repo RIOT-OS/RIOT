@@ -3,7 +3,6 @@ INCLUDES += -I$(RIOTPKG)/fatfs/fatfs_diskio/mtd/include
 
 DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_diskio/mtd
 
-
 ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_vfs
 endif
@@ -18,3 +17,6 @@ endif
 ifeq ($(OS),Darwin)
   CFLAGS += -Wno-empty-body
 endif
+
+# Set vfs file and dir buffer sizes
+CFLAGS += -DVFS_FILE_BUFFER_SIZE=72 -DVFS_DIR_BUFFER_SIZE=44
