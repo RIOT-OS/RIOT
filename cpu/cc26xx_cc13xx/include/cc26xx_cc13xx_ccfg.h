@@ -22,17 +22,8 @@
 extern "C" {
 #endif
 
-/** @ingroup cpu_specific_peripheral_memory_map
- * @{
- */
-#define CCFG_BASE                           0x50003000 /**<  base address of CCFG memory */
-/*@}*/
-
-/* TODO not present in datasheet but explained in cc26x0ware-lds */
-#define CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM   0x00000004 /**< CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM */
-
 /**
- * CCFG registers
+ * @brief   CCFG registers
  */
 typedef struct {
     reg32_t EXT_LF_CLK; /**< extern LF clock config */
@@ -59,7 +50,34 @@ typedef struct {
     reg32_t CCFG_PROT_127_96; /**< protect sectors 96-127 */
 } ccfg_regs_t;
 
-#define CCFG ((ccfg_regs_t *) (CCFG_BASE + 0xFA8)) /**< CCFG register bank */
+/**
+ * @brief   CCFG register values
+ * @{
+ */
+#define CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM 0x00000004
+/** @} */
+
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
+/**
+ * @brief   CCFG base address
+ */
+#define CCFG_BASE            (0x50003000)
+/** @} */
+
+#ifdef CPU_VARIANT_X0
+/**
+ * @brief   CCFG register bank
+ */
+#define CCFG                 ((ccfg_regs_t *) (CCFG_BASE + 0xFA8))
+#else
+/**
+ * @brief   CCFG register bank
+ */
+#define CCFG                 ((ccfg_regs_t *) (CCFG_BASE + 0x1FA8))
+#endif
 
 #ifdef __cplusplus
 } /* end extern "C" */
@@ -67,4 +85,4 @@ typedef struct {
 
 #endif /* CC26XX_CC13XX_CCFG_H */
 
-/*@}*/
+/** @} */
