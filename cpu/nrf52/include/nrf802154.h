@@ -45,7 +45,7 @@ extern "C" {
 /**
  * @defgroup drivers_nrf52_802154_conf  nrf802154 driver compile configuration
  * @ingroup drivers_nrf52_802154
- * @ingroup config
+ * @ingroup config_drivers_netdev
  * @{
  */
 

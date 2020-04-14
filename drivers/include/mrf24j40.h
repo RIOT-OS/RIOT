@@ -118,7 +118,7 @@ extern "C" {
 /**
  * @defgroup drivers_mrf24j40_config     mrf24j40 driver compile configuration
  * @ingroup drivers_mrf24j40
- * @ingroup config
+ * @ingroup config_drivers_netdev
  * @{
  */
 

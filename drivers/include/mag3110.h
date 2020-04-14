@@ -54,9 +54,21 @@ enum {
     MAG3110_ERROR_CNF,          /**< Device configuration failed */
 };
 
+/**
+ * @defgroup drivers_mag3110_config     MAG3110 Magnetometer driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+/**
+ * @brief Magnetometer default address
+ *
+ * The address depends on part number of MAG3110.
+ * For more information on SerialBus Address, refer Table 1 in Technical datasheet(MAG3110).
+ */
 #ifndef MAG3110_I2C_ADDRESS
-#define MAG3110_I2C_ADDRESS             0x0E /**< Magnetometer Default Address */
+#define MAG3110_I2C_ADDRESS             0x0E
 #endif
+/** @} */
 
 /**
  * @name    Output data rate macros

@@ -52,7 +52,15 @@ extern "C"
 #endif
 
 /**
+ * @defgroup drivers_hdc1000_config     HDC1000 Humidity and Temperature Sensor driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+/**
  * @brief   Default I2C bus address of HDC1000 devices
+ *
+ * The address value depends on the state of ADR0 and ADR1 Pins
+ * For more details refer Section 8.5.1 of datasheet
  */
 #ifndef HDC1000_I2C_ADDRESS
 #define HDC1000_I2C_ADDRESS           (0x43)
@@ -68,6 +76,7 @@ extern "C"
 #ifndef HDC1000_CONVERSION_TIME
 #define HDC1000_CONVERSION_TIME       (26000)
 #endif
+/** @} */
 
 /**
  * @brief   HDC1000 specific return values

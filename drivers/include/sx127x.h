@@ -96,12 +96,11 @@ extern "C" {
 
 /**
  * @defgroup drivers_sx127x_config     Semtech SX1272 and SX1276 driver compile configuration
- * @ingroup config
+ * @ingroup config_drivers_netdev
  * @{
  */
-
 /**
- * @brief GPIO mode of DIOx Pins.
+ * @brief   GPIO mode of DIOx Pins.
  */
 #ifndef SX127X_DIO_PULL_MODE
 #define SX127X_DIO_PULL_MODE             (GPIO_IN_PD)

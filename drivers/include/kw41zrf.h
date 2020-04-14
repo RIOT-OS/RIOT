@@ -39,29 +39,26 @@ extern "C" {
 #define KW41ZRF_MAX_PKT_LENGTH           (IEEE802154_FRAME_LEN_MAX)
 
 /**
- * @brief   Default channel used after initialization
- *
+ * @defgroup drivers_kw41zrf_config     KW41Z, KW21Z in-cpu transceiver driver compile configuration
+ * @ingroup config_drivers_netdev
  * @{
+ */
+/**
+ * @brief   Default channel used after initialization
  */
 #ifndef KW41ZRF_DEFAULT_CHANNEL
 #define KW41ZRF_DEFAULT_CHANNEL          (CONFIG_IEEE802154_DEFAULT_CHANNEL)
 #endif
-/** @} */
 
 /**
  * @brief   Default CCA threshold
- *
- * @{
  */
 #ifndef KW41ZRF_DEFAULT_CCA_THRESHOLD
 #define KW41ZRF_DEFAULT_CCA_THRESHOLD    (-60)
 #endif
-/** @} */
 
 /**
  * @brief   Default LQI compensation
- *
- * @{
  */
 #ifndef KW41ZRF_DEFAULT_LQI_COMPENSATION
 #define KW41ZRF_DEFAULT_LQI_COMPENSATION (102)

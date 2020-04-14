@@ -37,6 +37,11 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup drivers_softspi_config      Software SPI driver compile configuration
+ * @ingroup config_drivers_soft_periph
+ * @{
+ */
+/**
  * @brief   Default SPI device access macro
  */
 #ifndef SOFT_SPI_DEV
@@ -56,6 +61,7 @@ extern "C" {
 #ifndef SOFT_SPI_CS_UNDEF
 #define SOFT_SPI_CS_UNDEF    (GPIO_UNDEF)
 #endif
+/** @} */
 
 /**
  * @brief   Default type for SPI devices

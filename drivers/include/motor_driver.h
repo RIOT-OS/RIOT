@@ -92,11 +92,17 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup drivers_motor_driver_config     Motor_Driver driver compile configuration
+ * @ingroup config_drivers_actuators
+ * @{
+ */
+/**
  * @brief Maximum number of motors by motor driver
  */
 #ifndef MOTOR_DRIVER_MAX
 #define MOTOR_DRIVER_MAX    (2)
-#endif /* MOTOR_DRIVER_MAX */
+#endif
+/** @} */
 
 /**
  * @brief Macro to return motor driver id

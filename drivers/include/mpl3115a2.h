@@ -74,14 +74,20 @@ enum {
 #define MPL3115A2_OS_RATIO_DEFAULT  MPL3115A2_OS_RATIO_16 /**< Default Ratio */
 /** @} */
 
-#ifndef MPL3115A2_CONVERSION_TIME
+/**
+ * @defgroup drivers_mpl3115a2_config     MPL3115A2 Pressure Sensor driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
 /**
  * @brief   Maximum Conversion Time in microseconds [us]
  *
  * @note    Conversion time is: ((oversampling ratio * 4) + 2) * 1000 us
  */
+#ifndef MPL3115A2_CONVERSION_TIME
 #define MPL3115A2_CONVERSION_TIME   (514000UL)
 #endif
+/** @} */
 
 /**
  * @brief   Configuration parameters

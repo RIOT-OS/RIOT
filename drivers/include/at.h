@@ -47,10 +47,9 @@ extern "C" {
 
 /**
  * @defgroup drivers_at_config     AT driver compile configuration
- * @ingroup config
+ * @ingroup config_drivers_misc
  * @{
  */
-
 /**
  * @brief End of line character to send after the AT command.
  */

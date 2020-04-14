@@ -40,7 +40,7 @@ extern "C" {
 
 /**
  * @defgroup drivers_ads101x_config    ADS101 driver compile configuration
- * @ingroup config
+ * @ingroup config_drivers_sensors
  * @{
  */
 

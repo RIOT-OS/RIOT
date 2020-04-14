@@ -44,43 +44,48 @@
 extern "C" {
 #endif
 
-#ifndef ILI9341_GVDD
 /**
- * @brief ili9341 gvdd level.
+ * @defgroup drivers_ili9341_config     ILI9341 display driver compile configuration
+ * @ingroup config_drivers_display
+ * @{
+ */
+/**
+ * @brief ILI9341 gvdd level.
  *
  * Default GVDD voltage of 4.8V
  */
+#ifndef ILI9341_GVDD
 #define ILI9341_GVDD    4800
+#endif
 
-#endif /* ILI9341_GVDD */
-
-#ifndef ILI9341_VCOMH
 /**
- * @brief ili9341 VCOMH voltage level.
+ * @brief ILI9341 VCOMH voltage level.
  *
  * Default VCOMH voltage of 4.25V
  */
+#ifndef ILI9341_VCOMH
 #define ILI9341_VCOMH   4250
+#endif
 
-#endif /* ILI9341_VCOMH */
-
-#ifndef ILI9341_VCOML
 /**
- * @brief ili9341 VCOML voltage level.
+ * @brief ILI9341 VCOML voltage level.
  *
  * Default VCOMH voltage of -2V
  */
+#ifndef ILI9341_VCOML
 #define ILI9341_VCOML   -2000
+#endif
 
-#endif /* ILI9341_VCOML */
-
-#ifndef ILI9341_LE_MODE
 /**
- * @brief Compile time switch to change the driver to convert little endian
- *        colors to big endian.
+ * @brief Convert little endian colors to big endian.
+ *
+ * Compile time switch to change the driver to convert little endian
+ * colors to big endian.
  */
+#ifndef ILI9341_LE_MODE
 #define ILI9341_LE_MODE     (0)
 #endif
+/** @} */
 
 /**
  * @brief   Device initialization parameters

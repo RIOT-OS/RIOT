@@ -63,7 +63,7 @@ typedef void (*at86rf215_batmon_cb_t)(void *arg);
 
 /**
  * @defgroup drivers_at86rf215_config     AT86RF215 driver compile configuration
- * @ingroup config
+ * @ingroup config_drivers_netdev
  * @{
  */
 /**
