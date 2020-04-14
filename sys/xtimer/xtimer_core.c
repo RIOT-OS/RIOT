@@ -169,7 +169,8 @@ static inline void _schedule_earliest_lltimer(uint32_t now)
 }
 
 /**
- * @brief compare two timers. return true if timerA expires earlier than or equal to timerB and false otherwise.
+ * @brief   compare two timers. return true if timerA expires earlier than or
+ *          equal to timerB and false otherwise.
  */
 static bool _timer_comparison(xtimer_t* timerA, xtimer_t* timerB, uint32_t now)
 {
@@ -278,7 +279,7 @@ static inline void _update_short_timers(uint64_t *now)
 
             /* make sure we don't fire too early */
             if (timer->offset > elapsed) {
-                while(_xtimer_now() - timer->start_time < timer->offset) {}
+                while (_xtimer_now() - timer->start_time < timer->offset) {}
             }
             /* advance list */
             timer_list_head = timer->next;
@@ -292,7 +293,7 @@ static inline void _update_short_timers(uint64_t *now)
             /* assign new head */
             timer = timer_list_head;
             /* update current_time */
-            *now = _xtimer_now();
+            *now = _xtimer_now64();
         }
         else {
             timer->offset -= elapsed;
