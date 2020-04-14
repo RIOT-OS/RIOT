@@ -248,6 +248,11 @@ static int mtd_spi_read_jedec_id(const mtd_spi_nor_t *dev, mtd_jedec_id_t *out)
             status = -2;
             break;
         }
+        if (jedec.manuf == 0xFF || jedec.manuf == 0x00) {
+            DEBUG_PUTS("mtd_spi_read_jedec_id: failed to read manufacturer ID");
+            status = -3;
+            break;
+        }
         else {
             /* all OK! */
             break;
