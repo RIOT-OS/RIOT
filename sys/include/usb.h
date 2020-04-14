@@ -24,17 +24,31 @@
 extern "C" {
 #endif
 
+#include "board.h"
+
 /**
  * @defgroup usb_conf USB peripheral compile time configurations
  * @ingroup config
  * @{
  */
 
+/* These can be overridden by boards that should come up with their board
+ * supplier VID/PID pair. Boards should only override this if the RIOT built-in
+ * peripherals are compatible with whatever is usually shipped with that pair
+ * */
+#ifndef INTERNAL_PERIPHERAL_VID
+/** Reserved for RIOT standard peripherals as per http://pid.codes/1209/7D00/ */
+#define INTERNAL_PERIPHERAL_VID (0x1209)
+#endif
+#ifndef INTERNAL_PERIPHERAL_PID
+/** Reserved for RIOT standard peripherals as per http://pid.codes/1209/7D00/ */
+#define INTERNAL_PERIPHERAL_PID (0x7D00)
+#endif
+
 #if !(defined(CONFIG_USB_VID) && defined(CONFIG_USB_PID))
 #ifdef USB_H_USER_IS_RIOT_INTERNAL
-/* Reserved for RIOT standard peripherals as per http://pid.codes/1209/7D00/ */
-#define CONFIG_USB_VID (0x1209)
-#define CONFIG_USB_PID (0x7D00)
+#define CONFIG_USB_VID INTERNAL_PERIPHERAL_VID
+#define CONFIG_USB_PID INTERNAL_PERIPHERAL_PID
 #else
 #error Please configure your vendor and product IDs. For development, you may \
     set CONFIG_USB_VID=0x1209 CONFIG_USB_PID=0x7D01.
