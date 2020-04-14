@@ -40,9 +40,21 @@
 extern "C" {
 #endif
 
+/**
+ * @defgroup drivers_mma8x5x_config     MMA8x5x Accelerometer driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+/**
+ * @brief   Accelerometer Default Address
+ *
+ * The address value depends on the state of SA0 Address Pin in the case of MMA845x series.
+ * For more details refer Table 1 in datasheet (MMA8451Q/MMA8452Q/MMA8453Q)
+ */
 #ifndef MMA8X5X_I2C_ADDRESS
-#define MMA8X5X_I2C_ADDRESS           0x1D /**< Accelerometer Default Address */
+#define MMA8X5X_I2C_ADDRESS           0x1D
 #endif
+/** @} */
 
 /**
  * @brief   Devices supported by this driver
