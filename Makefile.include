@@ -213,6 +213,10 @@ include $(RIOTMAKE)/scan-build.inc.mk
 export RIOTBUILD_CONFIG_HEADER_C = $(BINDIR)/riotbuild/riotbuild.h
 
 # Include Kconfig functionalities
+ifeq (1,$(TEST_KCONFIG))
+ SHOULD_RUN_KCONFIG = 1
+endif
+
 include $(RIOTMAKE)/kconfig.mk
 
 ifeq ($(OS),Darwin)
@@ -389,6 +393,22 @@ include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 # For more information, see http://petereisentraut.blogspot.com/2011/09/ccache-and-clang-part-2.html
 export CCACHE_CPP2=yes
 
+# For testing, use TEST_KCONFIG as a switch between Makefile.dep and Kconfig
+ifneq (1,$(TEST_KCONFIG))
+  # handle removal of default modules
+  USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
+
+  # process dependencies
+  include $(RIOTMAKE)/dependency_resolution.inc.mk
+endif
+
+KCONFIG_MODULES := $(call lowercase,$(patsubst CONFIG_MOD_%,%,$(filter CONFIG_MOD_%,$(.VARIABLES))))
+
+ifeq (1,$(TEST_KCONFIG))
+  $(info === [ATTENTION] Testing Kconfig dependency modelling ===)
+  USEMODULE := $(KCONFIG_MODULES)
+endif
+
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
 endif
@@ -450,6 +470,11 @@ include $(RIOTBASE)/sys/Makefile.include
 
 # include Makefile.includes of each driver modules if they exist
 -include $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.include)
+
+# If testing Kconfig dependencies, use packages selected via Kconfig
+ifeq (1,$(TEST_KCONFIG))
+  USEPKG := $(KCONFIG_PACKAGES)
+endif
 
 # include Makefile.includes for packages in $(USEPKG)
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
