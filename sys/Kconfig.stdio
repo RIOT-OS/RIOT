@@ -1,0 +1,64 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "Standard Input/Ouput (STDIO)"
+
+choice
+    bool "STDIO implementation"
+    default MOD_STDIO_UART
+
+config MOD_STDIO_CDC_ACM
+    bool "CDC ACM"
+    depends on MOD_USB_CDC_ACM
+    select MOD_ISRPIPE
+    help
+        STDIO implementation over USB CDC abstract control model.
+
+config MOD_STDIO_NULL
+    bool "Null"
+    help
+        Empty implementation.
+
+config MOD_STDIO_RTT
+    bool "RTT"
+    depends on MOD_XTIMER
+
+config MOD_STDIO_UART
+    bool "UART"
+    depends on HAS_PERIPH_UART
+    select MOD_PERIPH_UART
+
+config MOD_SLIPDEV_STDIO
+    bool "SlipDev"
+
+config MOD_STDIO_NATIVE
+    bool "Native"
+    depends on CPU_ARCH_NATIVE
+
+endchoice
+
+config MOD_STDIO_ETHOS
+    bool "STDIO over Ethos"
+    depends on MOD_ETHOS
+    depends on MOD_STDIO_UART
+    depends on MOD_STDIN
+    help
+        Enable the Ethernet over Serial module (ethos). Requires the UART stdio
+        module to work.
+
+config MOD_STDIO_UART_RX
+    bool "STDIO UART reception"
+    default y if MOD_STDIN
+    depends on MOD_STDIO_UART
+    select MOD_ISRPIPE
+    help
+        Reception when using UART-based (or ethos) STDIO needs to be enabled.
+
+config MOD_STDIN
+    bool "Standard Input support"
+
+endmenu # Standard Input/Ouput (STDIO)

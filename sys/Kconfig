@@ -15,6 +15,7 @@ rsource "tsrb/Kconfig"
 rsource "usb/Kconfig"
 
 rsource "Kconfig.newlib"
+rsource "Kconfig.stdio"
 
 endmenu # System
 
