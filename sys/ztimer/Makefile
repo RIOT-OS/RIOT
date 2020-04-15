@@ -10,9 +10,6 @@ SRC := core.c util.c
 # enable submodules
 SUBMODULES := 1
 
-# "ztimer_extend" does not have corresponding .c
-SUBMODULES_NOFORCE := 1
-
 # disable obsolete warning
 CFLAGS += -Wno-missing-field-initializers
 
