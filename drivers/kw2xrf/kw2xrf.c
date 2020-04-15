@@ -110,6 +110,7 @@ void kw2xrf_reset_phy(kw2xrf_t *dev)
     kw2xrf_set_power_mode(dev, KW2XRF_AUTODOZE);
     kw2xrf_set_sequence(dev, dev->idle_state);
 
+    kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_CRC_MSK);
     kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_SEQMSK);
 
     kw2xrf_enable_irq_b(dev);
