@@ -10,7 +10,7 @@ RIOTBASE ?= $(CURDIR)/../..
 # Uncomment these lines if you want to use platform support from external
 # repositories:
 #RIOTCPU ?= $(CURDIR)/../../RIOT/thirdparty_cpu
-#BOARDSDIR ?= $(CURDIR)/../../RIOT/thirdparty_boards
+#EXTERNAL_BOARD_DIRS ?= $(CURDIR)/../../RIOT/thirdparty_boards
 
 # Uncomment this to enable scheduler statistics for ps:
 #USEMODULE += schedstatistics

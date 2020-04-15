@@ -22,7 +22,7 @@ USEMODULE += suit_transport_mock
 
 # Use a version of 'native' that includes flash page support
 ifeq (native, $(BOARD))
-  BOARDSDIR = $(CURDIR)/native_flashpage
+  EXTERNAL_BOARD_DIRS = $(CURDIR)/native_flashpage
 endif
 
 FEATURES_REQUIRED += periph_flashpage
