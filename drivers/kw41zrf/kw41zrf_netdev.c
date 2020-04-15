@@ -321,6 +321,8 @@ static int kw41zrf_netdev_recv(netdev_t *netdev, void *buf, size_t len, void *in
 
     if (info != NULL) {
         netdev_ieee802154_rx_info_t *radio_info = info;
+        /* ZLL_PHY_CTRL_CRC_MSK_MASK is set so only valid CRC frames are reported */
+        radio_info->crc_valid = 1;
         radio_info->lqi = (ZLL->LQI_AND_RSSI & ZLL_LQI_AND_RSSI_LQI_VALUE_MASK)
                           >> ZLL_LQI_AND_RSSI_LQI_VALUE_SHIFT;
         radio_info->rssi = (int8_t)((ZLL->LQI_AND_RSSI & ZLL_LQI_AND_RSSI_RSSI_MASK)
