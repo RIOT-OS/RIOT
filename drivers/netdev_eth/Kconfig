@@ -1,0 +1,17 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MOD_NETDEV_ETH
+    bool "Netdev Ethernet"
+    default y if HAVE_NETDEV_ETHERNET && MOD_NETDEV_DEFAULT
+    help
+        "Common netdev ethernet driver functionalities"
+
+config HAVE_NETDEV_ETHERNET
+    bool
+    help
+        Indicates that an Ethernet compatible device is present.
