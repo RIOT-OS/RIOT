@@ -53,6 +53,7 @@ KCONFIG_EDITED_CONFIG = $(GENERATED_DIR)/.editedconfig
 # Add configurations to merge, in ascendent priority (i.e. a file overrides the
 # previous ones)
 MERGE_SOURCES += $(wildcard $(KCONFIG_APP_CONFIG))
+MERGE_SOURCES += $(wildcard $(KCONFIG_APP_CONFIG).$(BOARD))
 MERGE_SOURCES += $(wildcard $(KCONFIG_USER_CONFIG))
 
 # Create directory to place generated files
@@ -88,12 +89,16 @@ USEPKG_W_PREFIX = $(addprefix PKG_,$(USEPKG))
 # defining symbols like 'MODULE_<MODULE_NAME>' or PKG_<PACKAGE_NAME> which
 # default to 'y'. Then, every module and package Kconfig menu will depend on
 # that symbol being set to show its options.
+ifeq (1,$(TEST_KCONFIG))
+$(KCONFIG_GENERATED_DEPENDENCIES): FORCE | $(GENERATED_DIR)
+	$(Q)touch $@
+else
 $(KCONFIG_GENERATED_DEPENDENCIES): FORCE | $(GENERATED_DIR)
 	$(Q)printf "%s " $(USEMODULE_W_PREFIX) $(USEPKG_W_PREFIX) \
 	  | awk 'BEGIN {RS=" "}{ gsub("-", "_", $$0); \
 	      printf "config %s\n\tbool\n\tdefault y\n", toupper($$0)}' \
 	  | $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@
-
+endif
 .PHONY: menuconfig
 
 # Opens the menuconfig interface for configuration of modules using the Kconfig
