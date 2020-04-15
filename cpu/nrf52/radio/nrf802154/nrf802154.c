@@ -402,6 +402,8 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
              * figure 122 of the v1.1 product specification. This appears to
              * match real world performance better */
             radio_info->rssi = (int16_t)hwlqi + ED_RSSIOFFS;
+            /* Only frames with CRCSTATUS == CRCOK are processed */
+            radio_info->crc_valid = 1;
         }
     }
 
