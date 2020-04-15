@@ -90,7 +90,17 @@ static const uart_conf_t uart_config[] = {
      .cts_pin = 19,
 #endif
      .intn = UART0_IRQN
- }
+ },
+ {
+     .regs = UART1,
+     .tx_pin = 11,
+     .rx_pin = 12,
+#ifdef MODULE_PERIPH_UART_HW_FC
+     .rts_pin = 8,
+     .cts_pin = 9,
+#endif
+     .intn = UART1_IRQN
+  }
 };
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
