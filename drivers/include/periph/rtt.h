@@ -42,16 +42,70 @@
 extern "C" {
 #endif
 
-#ifndef RTT_FREQUENCY
 
+/**
+ * @def     RTT_MAX_FREQUENCY
+ *
+ * @brief   The maximum RTT_FREQUENCY that can be configured for this platform
+ */
+#ifdef DOXYGEN
+#define RTT_MAX_FREQUENCY
+#endif
+
+/**
+ * @def     RTT_MIN_FREQUENCY
+ *
+ * @brief   The minimum RTT_FREQUENCY that can be configured for this platform
+ */
+#ifdef DOXYGEN
+#define RTT_MIN_FREQUENCY
+#endif
+
+/**
+ * @def     RTT_CLOCK_FREQUENCY
+ *
+ * @brief   The frequency of the clock source for the RTT
+ *
+ */
+#ifdef DOXYGEN
+#define RTT_CLOCK_FREQUENCY
+#endif
+
+/**
+ * @def     RTT_MAX_VALUE
+ *
+ * @brief   rtt counter max value
+ */
+#ifdef DOXYGEN
+#define RTT_MAX_VALUE
+#endif
+
+#ifndef RTT_MAX_FREQUENCY
+#error "periph/rtt: RTT_MAX_FREQUENCY not defined"
+#endif
+#ifndef RTT_MIN_FREQUENCY
+#error "periph/rtt: RTT_MIN_FREQUENCY not defined"
+#endif
+#ifndef RTT_CLOCK_FREQUENCY
+#error "periph/rtt: RTT_CLOCK_FREQUENCY not defined"
+#endif
+#ifndef RTT_MAX_VALUE
+#error "periph/rtt: RTT_MAX_VALUE not defined"
+#endif
+
+#ifndef RTT_FREQUENCY
 /* Allow mock-RTT for unit tests */
 #ifdef MOCK_RTT_FREQUENCY
 #define RTT_FREQUENCY MOCK_RTT_FREQUENCY
 #define RTT_MAX_VALUE MOCK_RTT_MAX_VALUE
 #else
-
-#warning "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the number of ticks" \
-         "per second for the current architecture."
+#warning "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the desired number of" \
+         " ticks per second for the current architecture."
+#endif
+#else
+#if (RTT_FREQUENCY > RTT_MAX_FREQUENCY) || (RTT_FREQUENCY < RTT_MIN_FREQUENCY)
+#warning "RTT_FREQUENCY is out of the allowed range, " \
+         "RTT_MIN_FREQUENCY < RTT_FREQUENCY < RTT_MAX_FREQUENCY"
 #endif
 #endif
 
