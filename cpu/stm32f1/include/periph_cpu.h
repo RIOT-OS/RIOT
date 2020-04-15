@@ -133,6 +133,29 @@ typedef struct {
     uint8_t chan;           /**< CPU ADC channel connected to the pin */
 } adc_conf_t;
 
+/**
+ * @name    Real time counter configuration
+ * @{
+ */
+#define RTT_IRQ_PRIO        1
+
+#define RTT_DEV             RTC
+#define RTT_IRQ             RTC_IRQn
+#define RTT_ISR             isr_rtc
+
+#define RTT_MAX_VALUE       (0xffffffff)
+#define RTT_MAX_FREQUENCY   (16384U)             /* in Hz */
+#define RTT_MIN_FREQUENCY   (1U)                 /* in Hz */
+#define RTT_CLOCK_FREQUENCY (32768U)             /* in Hz */
+
+#ifndef RTT_FREQUENCY
+#define RTT_FREQUENCY       (RTT_MAX_FREQUENCY)  /* in Hz */
+#endif
+
+#define RTT_PRESCALER       ((RTT_CLOCK_FREQUENCY - RTT_FREQUENCY) \
+                                / RTT_FREQUENCY)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
