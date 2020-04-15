@@ -1,0 +1,25 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MOD_NEWLIB
+    bool "NewLib"
+
+if MOD_NEWLIB
+
+config MOD_NEWLIB_NANO
+    bool "NewLib Nano"
+
+config MOD_NEWLIB_GNU_SOURCE
+    bool "NewLib GNU source"
+
+config MOD_NEWLIB_SYSCALLS_DEFAULT
+    bool "NewLib Syscalls default module"
+    default y
+    depends on !HAS_CUSTOM_NEWLIB_SYSCALLS
+
+endif # MOD_NEWLIB
+
