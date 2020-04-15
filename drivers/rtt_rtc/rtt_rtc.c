@@ -36,7 +36,7 @@
 
 #define _RTT(n)         ((n) & RTT_MAX_VALUE)
 
-#define RTT_SECOND_MAX  (RTT_MAX_VALUE/RTT_FREQUENCY)
+#define RTT_SECOND_MAX  ((RTT_MAX_VALUE/RTT_FREQUENCY) - 1)
 
 #define TICKS(x)        (    (x) * RTT_SECOND)
 #define SECONDS(x)      (_RTT(x) / RTT_SECOND)
