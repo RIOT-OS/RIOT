@@ -26,6 +26,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#define RTT_PRESCALER        ((RTT_CLOCK_FREQUENCY / RTT_FREQUENCY) - 1 )
+
 #define RTT_FLAG_RTOFF       ((uint16_t)0x0020)  /**< RTC Operation OFF flag */
 #define RTT_FLAG_RSF         ((uint16_t)0x0008)  /**< Registers Synchronized flag */
 #define RTT_FLAG_OW          ((uint16_t)0x0004)  /**< Overflow flag */

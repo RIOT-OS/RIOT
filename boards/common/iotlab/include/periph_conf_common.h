@@ -153,14 +153,9 @@ static const uart_conf_t uart_config[] = {
  * @name    Real time counter configuration
  * @{
  */
-#define RTT_IRQ_PRIO        1
-
-#define RTT_DEV             RTC
-#define RTT_IRQ             RTC_IRQn
-#define RTT_ISR             isr_rtc
-#define RTT_MAX_VALUE       (0xffffffff)
+#ifndef RTT_FREQUENCY
 #define RTT_FREQUENCY       (1)             /* in Hz */
-#define RTT_PRESCALER       (0x7fff)        /* run with 1 Hz */
+#endif
 /** @} */
 
 /**
