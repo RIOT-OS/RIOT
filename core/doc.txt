@@ -31,3 +31,9 @@
   * @ingroup     core
   * @brief       Thread synchronization mechanisms of the kernel
   */
+
+/**
+ * @defgroup    core_macros Common Macros
+ * @ingroup     core
+ * @brief       Commonly used macros header definitions
+ */
