@@ -28,14 +28,9 @@ extern "C" {
 
 #include "log.h"
 #include "esp_common_log.h"
+#include "macros/xtstr.h"
 
 #define asm __asm__
-
-/** string representation of x */
-#ifndef XTSTR
-#define _XTSTR(x)    # x
-#define XTSTR(x)    _XTSTR(x)
-#endif /* XSTR */
 
 #if !defined(ICACHE_FLASH)
 #ifndef ICACHE_RAM_ATTR
