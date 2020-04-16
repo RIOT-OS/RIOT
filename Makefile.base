@@ -43,10 +43,8 @@ ifeq (1, $(SUBMODULES))
   # for each $(BASE_MODULE)_<name> in USEMODULE, add <name>.c to SRC
   SRC += $(wildcard $(patsubst $(BASE_MODULE)_%,%.c,$(filter $(BASE_MODULE)_%,$(USEMODULE))))
 
-  # don't fail if a selected *.c file does not exist
-  ifeq (1, $(SUBMODULES_NOFORCE))
-    SRC := $(filter $(SRC), $(wildcard *.c))
-  endif
+  # remove duplicates
+  SRC := $(sort $(SRC))
 endif
 
 # By default consider C++ files has a .cpp extension
