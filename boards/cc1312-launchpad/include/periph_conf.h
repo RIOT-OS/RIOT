@@ -70,7 +70,7 @@ static const timer_conf_t timer_config[] = {
 /**
  * @name    UART configuration
  *
- * The used LAUNCHXL-CC1312R board has available a single UART device throught
+ * The used LAUNCHXL-CC1312R board has a single UART device available through
  * the debugger, so all we need to configure are the RX and TX pins.
  *
  * Optionally we can enable hardware flow control, by setting UART_HW_FLOW_CTRL
