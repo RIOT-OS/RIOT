@@ -2,7 +2,7 @@
 ifndef CONFIG_KCONFIG_MODULE_IEEE802154
   ifneq (,$(DEFAULT_CHANNEL))
     ifneq (,$(filter cc110x,$(USEMODULE)))        # radio is cc110x sub-GHz
-      CFLAGS += -DCC110X_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
+      CFLAGS += -DCONFIG_CC110X_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
     endif
 
     ifneq (,$(filter at86rf212b,$(USEMODULE)))    # radio is IEEE 802.15.4 sub-GHz

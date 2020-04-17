@@ -248,8 +248,8 @@ extern "C" {
 /**
  * @brief The default channel to set up after initializing the device
  */
-#ifndef CC110X_DEFAULT_CHANNEL
-#define CC110X_DEFAULT_CHANNEL      (0U)
+#ifndef CONFIG_CC110X_DEFAULT_CHANNEL
+#define CONFIG_CC110X_DEFAULT_CHANNEL      (0U)
 #endif
 /** @} */
 
