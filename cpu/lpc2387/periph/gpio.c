@@ -248,6 +248,28 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
+void gpio_update_int(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    int _state_index = _gpio_isr_map[_isr_map_entry(pin)];
+
+    unsigned state = irq_disable();
+    _gpio_states[_state_index].cb = cb;
+    _gpio_states[_state_index].arg = arg;
+    irq_restore(state);
+}
+
+void gpio_update_cb(gpio_t pin, gpio_cb_t cb)
+{
+    int _state_index = _gpio_isr_map[_isr_map_entry(pin)];
+    _gpio_states[_state_index].cb = cb;
+}
+
+void gpio_update_arg(gpio_t pin, void *arg)
+{
+    int _state_index = _gpio_isr_map[_isr_map_entry(pin)];
+    _gpio_states[_state_index].arg = arg;
+}
+
 void gpio_irq_enable(gpio_t pin)
 {
     int isr_map_entry =_isr_map_entry(pin);
