@@ -228,6 +228,7 @@ static void IRAM system_clk_init (void)
     rtc_select_slow_clk(RTC_SLOW_FREQ_32K_XTAL);
 #else
     /* set SLOW_CLK to internal low power clock of 150 kHz */
+    rtc_clk_32k_enable(false);
     rtc_select_slow_clk(RTC_SLOW_FREQ_RTC);
 #endif
 
