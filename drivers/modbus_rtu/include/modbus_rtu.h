@@ -38,7 +38,7 @@ enum MB_FC {
 typedef struct {
   modbus_rtu_id_t id;
   modbus_rtu_func_t func;
-  uint16_t no_reg;
+  uint16_t addr;
   uint16_t count;
   uint16_t *regs;
 } modbus_rtu_message_t;
@@ -48,14 +48,15 @@ typedef struct {
   uint32_t baudrate;
   gpio_t pin_tx_enable;
   modbus_rtu_id_t id; // 0 - master, otherwice slave
-  uint32_t timeout;   // while slave start response
+  uint32_t timeout;   // while slave start response; us
   uint8_t _buffer[MODBUS_RTU_PACKET_SIZE_MAX];
   uint8_t _size_buffer;
-  uint32_t _rx_timeout;
+  uint32_t _rx_timeout;       // beetwen byte; us
   modbus_rtu_message_t *_msg; // now process
   kernel_pid_t _pid;          // who get messege
 } modbus_rtu_t;
 
 int modbus_rtu_init(modbus_rtu_t *modbus);
 int modbus_rtu_send_request(modbus_rtu_t *modbus, modbus_rtu_message_t *message);
-int poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message);
+int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message);
+int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message);

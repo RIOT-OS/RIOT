@@ -16,7 +16,7 @@ static uint16_t regs_master[10];
 static modbus_rtu_message_t message_master = {
     .id = SLAVE_ID,
     .func = MB_FC_READ_REGISTERS,
-    .no_reg = 0,
+    .addr = 0,
     .regs = regs_master,
     .count = 10};
 
@@ -26,8 +26,6 @@ static void init_master(void) {
   master.timeout = 1000000;
   master.id = 0;
   master.pin_tx_enable = GPIO_PIN(PORT_A, 1);
-  uint8_t m[] = {1, 2, 3, 4, 5};
-  memcpy(master._buffer, m, 5);
 
   if (modbus_rtu_init(&master)) {
     puts("fail UART init");
@@ -42,7 +40,11 @@ static void *thread_master(void *arg __attribute__((unused))) {
     xtimer_usleep(master._rx_timeout * 3);
     puts("try request");
     res = modbus_rtu_send_request(&master, &message_master);
-    puts("request");
+    if (res) {
+      puts("fail request");
+    } else {
+      puts("ok request");
+    }
   }
   return NULL;
 }
@@ -58,7 +60,7 @@ static void init_slave(void) {
   slave.uart = UART_DEV(0);
   slave.baudrate = BAUDRATE;
   slave.id = SLAVE_ID;
-  slave.pin_tx_enable = 0;
+  slave.pin_tx_enable = GPIO_PIN(PORT_B, 15);
 
   if (modbus_rtu_init(&slave)) {
     puts("fail UART init");
@@ -70,10 +72,18 @@ static void *thread_slave(void *arg __attribute__((unused))) {
   init_slave();
   while (1) {
     puts("try poll");
-    res = poll(&slave, &message_slave);
-    if (res == 0) {
+    res = modbus_rtu_poll(&slave, &message_slave);
+    if (res) {
+      puts("fail poll");
+    } else {
+      assert(message_slave.id == SLAVE_ID);
+      assert(message_slave.func == message_master.func);
+      assert(message_slave.addr == message_master.addr);
+      assert(message_slave.count == message_master.count);
+      assert(message_slave.regs == regs_slave);
+      modbus_rtu_send_response(&slave, &message_slave);
+      puts("ok poll");
     }
-    puts("poll");
   }
 
   return NULL;

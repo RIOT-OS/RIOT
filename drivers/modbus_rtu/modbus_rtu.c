@@ -8,6 +8,7 @@
     send, poll,
     modbus_rtu_send_request
   todo: add timer between end prev
+  fixme: then slave copy message in buffer and on uart receive byte
 */
 
 #include "modbus_rtu.h"
@@ -31,10 +32,13 @@ enum MESSAGE {
   BYTE_CNT //!< byte counter
 };
 
-static void enamdle_trasmit(modbus_rtu_t *modbus);
-static void disamdle_trasmit(modbus_rtu_t *modbus);
-static void send(modbus_rtu_t *modbus);
-static int prepare_request(modbus_rtu_t *modbus);
+#define lowByte(w) ((uint8_t)((w)&0xff))
+#define highByte(w) ((uint8_t)((w) >> 8))
+
+static inline void enamdle_trasmit(modbus_rtu_t *modbus);
+static inline void disamdle_trasmit(modbus_rtu_t *modbus);
+static inline void send(modbus_rtu_t *modbus);
+static inline int prepare_request(modbus_rtu_t *modbus);
 static void rx_cb_master(void *arg, uint8_t data);
 static void rx_cb_slave(void *arg, uint8_t data);
 
@@ -58,7 +62,7 @@ int modbus_rtu_init(modbus_rtu_t *modbus) {
   // usec in sec / byte per second * 1.5
   modbus->_rx_timeout = 1000000 / (modbus->baudrate / 10) * 1.5;
 
-  modbus->_size_buffer = 5; // todo: set size to 0
+  modbus->_size_buffer = 0;
   modbus->_msg = NULL;
 
   puts("modbus_init");
@@ -81,23 +85,42 @@ int modbus_rtu_send_request(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
     // receive aswer
     while (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) >= 0) {
     }
+    modbus->_size_buffer = 0;
     return 0;
   }
   return 0;
 }
 
-static int prepare_request(modbus_rtu_t *modbus) {
-  (void)(modbus);
+static inline int prepare_request(modbus_rtu_t *modbus) {
+  modbus->_buffer[ID] = modbus->_msg->id;
+  modbus->_buffer[FUNC] = modbus->_msg->func;
+  modbus->_buffer[ADD_HI] = modbus->_msg->addr;
+  modbus->_buffer[ADD_LO] = modbus->_msg->addr;
+
+  switch (modbus->_msg->func) {
+  case MB_FC_READ_COILS:
+  case MB_FC_READ_DISCRETE_INPUT:
+  case MB_FC_READ_REGISTERS:
+  case MB_FC_READ_INPUT_REGISTER:
+    modbus->_buffer[NB_HI] = highByte(modbus->_msg->count);
+    modbus->_buffer[NB_LO] = lowByte(modbus->_msg->count);
+    modbus->_size_buffer = 6;
+    break;
+  default:
+    return -1;
+    break;
+  }
+
   return 0;
 }
 
-static void send(modbus_rtu_t *modbus) {
+static inline void send(modbus_rtu_t *modbus) {
   enamdle_trasmit(modbus);
   uart_write(modbus->uart, modbus->_buffer, modbus->_size_buffer);
   disamdle_trasmit(modbus);
 }
 
-int poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
+int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
   modbus->_pid = thread_getpid();
   modbus->_msg = message;
   msg_t msg;
@@ -109,16 +132,67 @@ int poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
       // wait the end of transfer for other slave
       while (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) >= 0) {
       }
-
       modbus->_size_buffer = 0;
       continue;
     }
+    modbus->_msg->id = modbus->_buffer[ID];
 
-    while (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) >= 0) {
+    //  6 is minimal size of request
+    while (modbus->_size_buffer < 6) {
+      if (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) < 0) {
+        goto error;
+      }
     }
-    return 0;
+    modbus->_msg->func = modbus->_buffer[FUNC];
+    switch (modbus->_buffer[FUNC]) {
+    case MB_FC_READ_COILS:
+    case MB_FC_READ_DISCRETE_INPUT:
+      return -1;
+      break;
+    case MB_FC_READ_REGISTERS:
+    case MB_FC_READ_INPUT_REGISTER:
+      modbus->_msg->addr = ((modbus->_buffer[ADD_HI]) << 8) | modbus->_buffer[ADD_LO];
+      modbus->_msg->count = ((modbus->_buffer[NB_HI]) << 8) | modbus->_buffer[NB_LO];
+      break;
+    default:
+      goto error;
+      break;
+    }
+
+    goto OK;
   }
+error:
+  modbus->_size_buffer = 0;
+  modbus->_msg = NULL;
   return -1;
+OK:
+  modbus->_size_buffer = 0;
+  modbus->_msg = NULL;
+  return 0;
+}
+
+int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
+  modbus->_msg = message;
+  modbus->_buffer[0] = modbus->_msg->func;
+  switch (modbus->_msg->func) {
+  case MB_FC_READ_COILS:
+  case MB_FC_READ_DISCRETE_INPUT:
+    return -1;
+    break;
+  case MB_FC_READ_REGISTERS:
+  case MB_FC_READ_INPUT_REGISTER:
+    modbus->_buffer[1] = modbus->_msg->count * 2;
+    modbus->_size_buffer = 2 + modbus->_buffer[1];
+    memcpy(modbus->_buffer + 2, modbus->_msg->regs, modbus->_size_buffer);
+    printf("buff size: %u \n", modbus->_size_buffer);
+    break;
+  default:
+    return -1;
+    break;
+  }
+  send(modbus);
+  modbus->_size_buffer = 0;
+  return 0;
 }
 
 static inline void enamdle_trasmit(modbus_rtu_t *modbus) {
@@ -148,7 +222,7 @@ static void rx_cb_master(void *arg, uint8_t data) {
 static void rx_cb_slave(void *arg, uint8_t data) {
   static msg_t msg;
   modbus_rtu_t *modbus = (modbus_rtu_t *)arg;
-  // printf("%x ", data);
+  // printf("%x_", data);
 
   modbus->_buffer[modbus->_size_buffer] = data;
   modbus->_size_buffer++;
