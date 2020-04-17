@@ -75,7 +75,7 @@ typedef void (*at86rf215_batmon_cb_t)(void *arg);
 #define CONFIG_AT86RF215_USE_CLOCK_OUTPUT
 #endif
 
-#if defined(DOXYGEN) && !defined(AT86RF215_TRIM_VAL)
+#if defined(DOXYGEN) && !defined(CONFIG_AT86RF215_TRIM_VAL)
 /**
  * @brief   Trim value for the external crystal oscillator.
  *
@@ -88,7 +88,7 @@ typedef void (*at86rf215_batmon_cb_t)(void *arg);
  *          meter connected to the clock output pin of the AT86RF215.
  *          Tweak the value until the measured clock output matches 26 MHz the best.
  */
-#define AT86RF215_TRIM_VAL              (0)
+#define CONFIG_AT86RF215_TRIM_VAL              (0)
 #endif
 /** @} */
 

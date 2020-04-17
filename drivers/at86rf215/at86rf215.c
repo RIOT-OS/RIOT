@@ -120,8 +120,8 @@ if (!IS_ACTIVE(CONFIG_AT86RF215_USE_CLOCK_OUTPUT)){
     at86rf215_reg_write(dev, RG_RF_CLKO, 0);
 }
     /* allow to configure board-specific trim */
-#ifdef AT86RF215_TRIM_VAL
-    at86rf215_reg_write(dev, RG_RF_XOC, AT86RF215_TRIM_VAL | XOC_FS_MASK);
+#ifdef CONFIG_AT86RF215_TRIM_VAL
+    at86rf215_reg_write(dev, RG_RF_XOC, CONFIG_AT86RF215_TRIM_VAL | XOC_FS_MASK);
 #endif
 
     /* enable TXFE & RXFE IRQ */
