@@ -358,6 +358,28 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
+void gpio_update_cb(gpio_t pin, gpio_cb_t cb)
+{
+    int8_t int_num = _int_num(pin);
+    config[int_num].cb = cb;
+}
+
+void gpio_update_arg(gpio_t pin, void *arg)
+{
+    int8_t int_num = _int_num(pin);
+    config[int_num].arg = arg;
+}
+
+void gpio_update_int(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    int8_t int_num = _int_num(pin);
+
+    EIMSK &= ~(1 << int_num);
+    config[int_num].cb = cb;
+    config[int_num].arg = arg;
+    EIMSK |= (1 << int_num);
+}
+
 void gpio_irq_enable(gpio_t pin)
 {
     EIFR |= (1 << _int_num(pin));
