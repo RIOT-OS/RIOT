@@ -403,3 +403,7 @@ endif
 ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/xbee/include
 endif
+
+ifneq (,$(filter modbus_rtu,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/modbus_rtu/include
+endif
