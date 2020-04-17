@@ -10,5 +10,6 @@ source "$(RIOTCPU)/nrf52/radio/nrf802154/Kconfig"
 endmenu # Network Device Drivers
 
 menu "Sensor Device Drivers"
+rsource "ads101x/Kconfig"
 rsource "hdc1000/Kconfig"
 endmenu # Sensor Device Drivers

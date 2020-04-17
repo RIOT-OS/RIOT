@@ -49,8 +49,8 @@ extern "C" {
  *
  * Address pin tied to: GND (0x48), Vcc (0x49), SDA (0x50), SCL (0x51)
  */
-#ifndef ADS101X_I2C_ADDRESS
-#define ADS101X_I2C_ADDRESS    (0x48)
+#ifndef CONFIG_ADS101X_I2C_ADDRESS
+#define CONFIG_ADS101X_I2C_ADDRESS    (0x48)
 #endif
 /** @} */
 
