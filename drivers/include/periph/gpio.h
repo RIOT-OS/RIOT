@@ -209,6 +209,39 @@ void gpio_irq_enable(gpio_t pin);
  */
 void gpio_irq_disable(gpio_t pin);
 
+/**
+ * @brief   Update the interrupt callback function & argument for a pin
+ *
+ * @pre     @ref gpio_init_int has been called on @p pin
+ *
+ * @param[in] pin       pin to initialize
+ * @param[in] cb        callback that is called from interrupt context
+ *                      must not be NULL
+ * @param[in] arg       optional argument passed to the callback
+ */
+void gpio_update_int(gpio_t pin, gpio_cb_t cb, void *arg);
+
+/**
+ * @brief   Update the interrupt callback function for a pin
+ *
+ * @pre     @ref gpio_init_int has been called on @p pin
+ *
+ * @param[in] pin       pin to initialize
+ * @param[in] cb        callback that is called from interrupt context
+ *                      must not be NULL
+ */
+void gpio_update_cb(gpio_t pin, gpio_cb_t cb);
+
+/**
+ * @brief   Update the interrupt callback argument for a pin
+ *
+ * @pre     @ref gpio_init_int has been called on @p pin
+ *
+ * @param[in] pin       pin to initialize
+ * @param[in] arg       optional argument passed to the callback
+ */
+void gpio_update_arg(gpio_t pin, void *arg);
+
 #endif /* defined(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN) */
 
 /**
