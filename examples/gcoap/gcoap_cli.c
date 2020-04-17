@@ -185,7 +185,7 @@ static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *c
     /* read coap method type in packet */
     unsigned method_flag = coap_method2flag(coap_get_code_detail(pdu));
 
-    switch(method_flag) {
+    switch (method_flag) {
         case COAP_GET:
             gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
             coap_opt_add_format(pdu, COAP_FORMAT_TEXT);
@@ -279,14 +279,13 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
 static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
 {
     size_t bytes_sent;
-
     sock_udp_ep_t *remote;
+    sock_udp_ep_t new_remote;
 
     if (_proxied) {
         remote = &_proxy_remote;
     }
     else {
-        sock_udp_ep_t new_remote;
         if (!_parse_endpoint(&new_remote, addr_str, port_str)) {
             return 0;
         }
