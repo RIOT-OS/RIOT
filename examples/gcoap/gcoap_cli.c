@@ -185,7 +185,7 @@ static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *c
     /* read coap method type in packet */
     unsigned method_flag = coap_method2flag(coap_get_code_detail(pdu));
 
-    switch(method_flag) {
+    switch (method_flag) {
         case COAP_GET:
             gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
             coap_opt_add_format(pdu, COAP_FORMAT_TEXT);
