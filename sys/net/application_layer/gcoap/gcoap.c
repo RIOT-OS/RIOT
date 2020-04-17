@@ -657,22 +657,28 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     pdu->hdr = (coap_hdr_t *)buf;
 
     /* generate token */
+    uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
+    ssize_t res;
+    if (code) {
 #if CONFIG_GCOAP_TOKENLEN
-    uint8_t token[CONFIG_GCOAP_TOKENLEN];
-    for (size_t i = 0; i < CONFIG_GCOAP_TOKENLEN; i += 4) {
-        uint32_t rand = random_uint32();
-        memcpy(&token[i],
-               &rand,
-               (CONFIG_GCOAP_TOKENLEN - i >= 4) ? 4 : CONFIG_GCOAP_TOKENLEN - i);
-    }
-    uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
-    ssize_t res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &token[0],
-                                 CONFIG_GCOAP_TOKENLEN, code, msgid);
+        uint8_t token[CONFIG_GCOAP_TOKENLEN];
+        for (size_t i = 0; i < CONFIG_GCOAP_TOKENLEN; i += 4) {
+            uint32_t rand = random_uint32();
+            memcpy(&token[i],
+                   &rand,
+                   (CONFIG_GCOAP_TOKENLEN - i >= 4) ? 4 : CONFIG_GCOAP_TOKENLEN - i);
+        }
+        res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &token[0],
+                             CONFIG_GCOAP_TOKENLEN, code, msgid);
 #else
-    uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
-    ssize_t res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, NULL,
-                                 CONFIG_GCOAP_TOKENLEN, code, msgid);
+        res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, NULL,
+                             CONFIG_GCOAP_TOKENLEN, code, msgid);
 #endif
+    }
+    else {
+        /* ping request */
+        res = coap_build_hdr(pdu->hdr, COAP_TYPE_CON, NULL, 0, code, msgid);
+    }
 
     coap_pkt_init(pdu, buf, len - CONFIG_GCOAP_REQ_OPTIONS_BUF, res);
     if (path != NULL) {
