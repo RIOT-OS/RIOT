@@ -89,11 +89,19 @@ def setup_child(timeout=10, spawnclass=pexpect.spawnu, env=None, logfile=None):
 
 
 def teardown_child(child):
+    pid = child.pid
     try:
-        os.killpg(os.getpgid(child.pid), signal.SIGKILL)
+        os.killpg(os.getpgid(pid), signal.SIGTERM)
     except ProcessLookupError:
         print("Process already stopped")
-
+    else:
+        time.sleep(1)
+        # kill still lingering processes
+        try:
+            os.killpg(os.getpgid(pid), signal.SIGKILL)
+        except ProcessLookupError:
+            # This is what we actually wanted
+            pass
     child.close()
 
 
