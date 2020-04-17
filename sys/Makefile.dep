@@ -662,6 +662,11 @@ ifneq (,$(filter nanocoap_sock,$(USEMODULE)))
   USEMODULE += ztimer_msec
 endif
 
+ifneq (,$(filter nanocoap_cache,$(USEMODULE)))
+  USEMODULE += ztimer_sec
+  USEMODULE += hashes
+endif
+
 ifneq (,$(filter nanocoap_%,$(USEMODULE)))
   USEMODULE += nanocoap
 endif

@@ -40,6 +40,7 @@ extern "C" {
 #define COAP_OPT_LOCATION_PATH  (8)
 #define COAP_OPT_URI_PATH       (11)
 #define COAP_OPT_CONTENT_FORMAT (12)
+#define COAP_OPT_MAX_AGE        (14)
 #define COAP_OPT_URI_QUERY      (15)
 #define COAP_OPT_ACCEPT         (17)
 #define COAP_OPT_LOCATION_QUERY (20)
