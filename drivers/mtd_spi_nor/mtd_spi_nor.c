@@ -432,7 +432,7 @@ static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t 
     mtd_spi_cmd_addr_read(dev, dev->params->opcode->read, addr_be, dest, size);
     mtd_spi_release(dev);
 
-    return size;
+    return 0;
 }
 
 static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t size)
@@ -470,7 +470,7 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
     wait_for_write_complete(dev, 0);
 
     mtd_spi_release(dev);
-    return size;
+    return 0;
 }
 
 static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)

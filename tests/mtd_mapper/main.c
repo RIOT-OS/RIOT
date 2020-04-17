@@ -62,7 +62,7 @@ static int _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
     }
     memcpy(buff, _dummy_memory + addr, size);
 
-    return size;
+    return 0;
 }
 
 static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr,
@@ -78,7 +78,7 @@ static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr,
     }
     memcpy(_dummy_memory + addr, buff, size);
 
-    return size;
+    return 0;
 }
 
 static int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)

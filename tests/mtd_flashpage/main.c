@@ -98,7 +98,7 @@ static void test_mtd_write_erase(void)
     memset(buf_read, 0, sizeof(buf_read));
 
     int ret = mtd_write(dev, buf, TEST_ADDRESS1, sizeof(buf));
-    TEST_ASSERT_EQUAL_INT(sizeof(buf), ret);
+    TEST_ASSERT_EQUAL_INT(0, ret);
 
     ret = mtd_erase(dev, TEST_ADDRESS1, dev->pages_per_sector * dev->page_size);
     TEST_ASSERT_EQUAL_INT(0, ret);
@@ -110,7 +110,7 @@ static void test_mtd_write_erase(void)
     memset(expected, 0xff, sizeof(expected));
 #endif
     ret = mtd_read(dev, buf_read, TEST_ADDRESS1, sizeof(buf_read));
-    TEST_ASSERT_EQUAL_INT(sizeof(buf_read), ret);
+    TEST_ASSERT_EQUAL_INT(0, ret);
     TEST_ASSERT_EQUAL_INT(0, memcmp(expected, buf_read, sizeof(buf_read)));
 }
 
@@ -129,10 +129,10 @@ static void test_mtd_write_read(void)
 
     /* Basic write / read */
     int ret = mtd_write(dev, buf, TEST_ADDRESS1, sizeof(buf));
-    TEST_ASSERT_EQUAL_INT(sizeof(buf), ret);
+    TEST_ASSERT_EQUAL_INT(0, ret);
 
     ret = mtd_read(dev, buf_read, TEST_ADDRESS1, sizeof(buf_read));
-    TEST_ASSERT_EQUAL_INT(sizeof(buf_read), ret);
+    TEST_ASSERT_EQUAL_INT(0, ret);
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf, buf_read, sizeof(buf)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf_empty, buf_read + sizeof(buf), sizeof(buf_empty)));
 

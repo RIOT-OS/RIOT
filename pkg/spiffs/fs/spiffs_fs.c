@@ -39,12 +39,7 @@ static int32_t _dev_read(struct spiffs_t *fs, u32_t addr, u32_t size, u8_t *dst)
 
     DEBUG("spiffs: read: from addr 0x%" PRIx32 " size 0x%" PRIx32 "\n", addr, size);
 
-    if (mtd_read(dev, dst, addr, size) > 0) {
-        return 0;
-    }
-    else {
-        return -EIO;
-    }
+    return mtd_read(dev, dst, addr, size);
 }
 
 static int32_t _dev_write(struct spiffs_t *fs, u32_t addr, u32_t size, const u8_t *src)
@@ -53,12 +48,7 @@ static int32_t _dev_write(struct spiffs_t *fs, u32_t addr, u32_t size, const u8_
 
     DEBUG("spiffs: write: from addr 0x%" PRIx32 " size 0x%" PRIx32 "\n", addr, size);
 
-    if (mtd_write(dev, src, addr, size) > 0) {
-        return 0;
-    }
-    else {
-        return -EIO;
-    }
+    return mtd_write(dev, src, addr, size);
 }
 
 static int32_t _dev_erase(struct spiffs_t *fs, u32_t addr, u32_t size)
@@ -77,24 +67,14 @@ static int32_t _dev_read(u32_t addr, u32_t size, u8_t *dst)
 {
     DEBUG("spiffs: read: from addr 0x%" PRIx32 " size 0x%" PRIx32 "\n", addr, size);
 
-    if (mtd_read(SPIFFS_MTD_DEV, dst, addr, size) > 0) {
-        return 0;
-    }
-    else {
-        return -EIO;
-    }
+    return mtd_read(SPIFFS_MTD_DEV, dst, addr, size);
 }
 
 static int32_t _dev_write(u32_t addr, u32_t size, const u8_t *src)
 {
     DEBUG("spiffs: write: from addr 0x%" PRIx32 " size 0x%" PRIx32 "\n", addr, size);
 
-    if (mtd_write(SPIFFS_MTD_DEV, src, addr, size) > 0) {
-        return 0;
-    }
-    else {
-        return -EIO;
-    }
+    return mtd_write(SPIFFS_MTD_DEV, src, addr, size);
 }
 
 static int32_t _dev_erase(u32_t addr, u32_t size)

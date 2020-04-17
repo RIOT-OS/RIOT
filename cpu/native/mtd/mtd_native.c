@@ -69,10 +69,10 @@ static int _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
         return -EIO;
     }
     real_fseek(f, addr, SEEK_SET);
-    size = real_fread(buff, 1, size, f);
+    size_t nread = real_fread(buff, 1, size, f);
     real_fclose(f);
 
-    return size;
+    return (nread == size) ? 0 : -EIO;
 }
 
 static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
@@ -101,7 +101,7 @@ static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size
     }
     real_fclose(f);
 
-    return size;
+    return 0;
 }
 
 static int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
