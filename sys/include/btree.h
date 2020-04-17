@@ -142,6 +142,9 @@ typedef void (*btree_cb_t)(btree_node_t *node, size_t depth, void *ctx);
  * @brief Traverse the full tree, visiting every node exactly once in ascending
  *        order.
  *
+ * @warning     Modifying the btree during the traverse is not supported and
+ *              consistency of the tree can't be guaranteed.
+ *
  * @param   btree   Tree to traverse
  * @param   cb      Callback to call for every node
  * @param   ctx     Context to pass to every callback
