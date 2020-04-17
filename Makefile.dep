@@ -1050,6 +1050,10 @@ ifneq (,$(filter periph_gpio_irq,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
 endif
 
+ifneq (,$(filter periph_timer_periodic,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_timer
+endif
+
 ifneq (,$(filter devfs_hwrng,$(USEMODULE)))
   FEATURES_REQUIRED += periph_hwrng
 endif
