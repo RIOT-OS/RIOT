@@ -160,6 +160,25 @@ typedef struct {
  */
 #define WDT_HAS_STOP                    (1)
 
+/**
+ * @name    RTT/RTC configuration
+ *
+ * @{
+ */
+#define RTT_INTR_PRIORITY   (2)
+
+#define RTT_MAX_VALUE       (0xffffffff)
+#define RTT_CLOCK_FREQUENCY (32768U)                /* in Hz */
+#define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY)   /* in Hz */
+#define RTT_MIN_FREQUENCY   (1U)                    /* in Hz */
+
+#ifndef RTT_FREQUENCY
+#define RTT_FREQUENCY       (RTT_MAX_FREQUENCY)     /* in Hz */
+#endif
+
+
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
