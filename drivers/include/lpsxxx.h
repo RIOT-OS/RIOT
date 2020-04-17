@@ -37,12 +37,21 @@ extern "C" {
 #include "periph/i2c.h"
 
 /**
+ * @defgroup drivers_lpsxxx_config     LPS331AP/LPS25HB/LPS22HB driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+/**
  * @brief   The sensors default I2C address
  *
  * Default address corresponds to SDO/SA0 pad connected to ground. If SDO/SA0
  * pad is connected to power supply, I2C address is 0x5C.
+ * Refer to 'I2C Operation' section on the datasheet
  */
+#ifndef LPSXXX_DEFAULT_ADDRESS
 #define LPSXXX_DEFAULT_ADDRESS  (0x5d)
+#endif
+/** @} */
 
 /**
  * @brief   Return codes

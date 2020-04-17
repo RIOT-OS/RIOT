@@ -36,9 +36,10 @@ extern "C"
 {
 #endif
 
-#ifndef TCS37727_I2C_ADDRESS
-#define TCS37727_I2C_ADDRESS    0x29    /**< Default Device Address */
-#endif
+/**
+ * @brief   Default Device Address
+ */
+#define TCS37727_I2C_ADDRESS    0x29
 
 /**
  * @defgroup drivers_tcs37727_config     TCS37727 RGB Light Sensor driver compile configuration
