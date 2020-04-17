@@ -145,7 +145,7 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, k
     dodag->my_rank = GNRC_RPL_INFINITE_RANK;
     dodag->trickle.callback.func = &_rpl_trickle_send_dio;
     dodag->trickle.callback.args = instance;
-    dodag->dio_interval_doubl = GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS;
+    dodag->dio_interval_doubl = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS;
     dodag->dio_min = GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN;
     dodag->dio_redun = GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT;
     dodag->default_lifetime = GNRC_RPL_DEFAULT_LIFETIME;
