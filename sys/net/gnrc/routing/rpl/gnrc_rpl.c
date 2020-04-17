@@ -123,7 +123,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
     dodag->dtsn = 1;
     dodag->prf = 0;
     dodag->dio_interval_doubl = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS;
-    dodag->dio_min = GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN;
+    dodag->dio_min = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN;
     dodag->dio_redun = GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT;
     dodag->default_lifetime = GNRC_RPL_DEFAULT_LIFETIME;
     dodag->lifetime_unit = GNRC_RPL_LIFETIME_UNIT;
