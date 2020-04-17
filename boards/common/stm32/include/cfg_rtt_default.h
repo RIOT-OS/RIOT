@@ -31,8 +31,21 @@ extern "C" {
  * On the STM32Lx platforms, we always utilize the LPTIM1.
  * @{
  */
-#define RTT_FREQUENCY       (1024U)             /* 32768 / 2^n */
-#define RTT_MAX_VALUE       (0x0000ffff)        /* 16-bit timer */
+#ifdef LPTIM1
+#ifdef CLOCK_LSE
+#define RTT_CLOCK_FREQUENCY (32768U)                    /* in Hz */
+#else
+#define RTT_CLOCK_FREQUENCY (CLOCK_LSI)                 /* in Hz */
+#endif
+
+#define RTT_MAX_VALUE       (0x0000ffff)                /* 16-bit timer */
+#define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY)       /* 32768H at @32768Hz */
+#define RTT_MIN_FREQUENCY   (RTT_CLOCK_FREQUENCY / 128) /* 256Hz at @32768Hz */
+
+#ifndef RTT_FREQUENCY
+#define RTT_FREQUENCY       (RTT_MAX_FREQUENCY)   /* in Hz */
+#endif
+#endif /* LPTIM1 */
 /** @} */
 
 #ifdef __cplusplus
