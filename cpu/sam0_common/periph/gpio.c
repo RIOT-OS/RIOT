@@ -82,6 +82,16 @@ static inline int _pin_mask(gpio_t pin)
     return (1 << _pin_pos(pin));
 }
 
+static inline void _enable_irq(int exti)
+{
+    _EIC->INTENSET.reg = (1 << exti);
+}
+
+static inline void _disable_irq(int exti)
+{
+    _EIC->INTENCLR.reg = (1 << exti);
+}
+
 void gpio_init_mux(gpio_t pin, gpio_mux_t mux)
 {
     PortGroup* port = _port(pin);
@@ -186,6 +196,30 @@ static int _exti(gpio_t pin)
         return -1;
     }
     return exti_config[port_num][_pin_pos(pin)];
+}
+
+void gpio_update_cb(gpio_t pin, gpio_cb_t cb)
+{
+    int exti = _exti(pin);
+
+    gpio_config[exti].cb = cb;
+}
+
+void gpio_update_arg(gpio_t pin, void *arg)
+{
+    int exti = _exti(pin);
+
+    gpio_config[exti].arg = arg;
+}
+
+void gpio_update_int(gpio_t pin, gpio_cb_t cb, void *arg)
+{
+    int exti = _exti(pin);
+
+    _disable_irq(exti);
+    gpio_config[exti].arg = arg;
+    gpio_config[exti].cb = cb;
+    _enable_irq(exti);
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
@@ -316,7 +350,7 @@ void gpio_irq_enable(gpio_t pin)
     if (exti == -1) {
         return;
     }
-    _EIC->INTENSET.reg = (1 << exti);
+    _enable_irq(exti);
 }
 
 void gpio_irq_disable(gpio_t pin)
@@ -325,7 +359,7 @@ void gpio_irq_disable(gpio_t pin)
     if (exti == -1) {
         return;
     }
-    _EIC->INTENCLR.reg = (1 << exti);
+    _disable_irq(exti);
 }
 
 void isr_eic(void)
