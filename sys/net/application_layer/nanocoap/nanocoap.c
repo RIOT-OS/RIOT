@@ -42,7 +42,6 @@
 /** @} */
 
 static int _decode_value(unsigned val, uint8_t **pkt_pos_ptr, uint8_t *pkt_end);
-int coap_get_option_uint(coap_pkt_t *pkt, unsigned opt_num, uint32_t *target);
 static uint32_t _decode_uint(uint8_t *pkt_pos, unsigned nbytes);
 static size_t _encode_uint(uint32_t *val);
 
@@ -135,7 +134,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     }
 
 #ifdef MODULE_GCOAP
-    if (coap_get_option_uint(pkt, COAP_OPT_OBSERVE, &pkt->observe_value) != 0) {
+    if (coap_opt_get_uint(pkt, COAP_OPT_OBSERVE, &pkt->observe_value) != 0) {
         pkt->observe_value = UINT32_MAX;
     }
 #endif
@@ -224,7 +223,7 @@ ssize_t coap_opt_get_opaque(const coap_pkt_t *pkt, unsigned opt_num, uint8_t **v
     return len;
 }
 
-int coap_get_option_uint(coap_pkt_t *pkt, unsigned opt_num, uint32_t *target)
+int coap_opt_get_uint(const coap_pkt_t *pkt, uint16_t opt_num, uint32_t *target)
 {
     assert(target);
 
@@ -246,7 +245,7 @@ int coap_get_option_uint(coap_pkt_t *pkt, unsigned opt_num, uint32_t *target)
             return -EBADMSG;
         }
     }
-    return -1;
+    return -ENOENT;
 }
 
 uint8_t *coap_iterate_option(const coap_pkt_t *pkt, uint8_t **optpos,

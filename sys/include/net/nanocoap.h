@@ -447,6 +447,20 @@ static inline void coap_hdr_set_type(coap_hdr_t *hdr, unsigned type)
 unsigned coap_get_content_type(coap_pkt_t *pkt);
 
 /**
+ * @brief   Get a uint32 option value
+ *
+ * @param[in]   pkt         packet to read from
+ * @param[in]   optnum      absolute option number
+ * @param[out]  value       the parsed option value
+ *
+ * @return      0 if the option was found and the value was parsed correctly
+ * @return      -ENOENT if the option was not found in @p pkt
+ * @return      -ENOSPC if option length is greater than 4 octets
+ * @return      -EBADMSG if option value is invalid
+ */
+int coap_opt_get_uint(const coap_pkt_t *pkt, uint16_t optnum, uint32_t *value);
+
+/**
  * @brief   Read a full option as null terminated string into the target buffer
  *
  * This function is for reading and concatenating string based, multi-part CoAP
