@@ -150,16 +150,29 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
             return;
         }
 
-        if (pdu.hdr->code == COAP_CODE_EMPTY) {
-            DEBUG("gcoap: empty messages not handled yet\n");
-            return;
-        }
-
         /* validate class and type for incoming */
         switch (coap_get_code_class(&pdu)) {
-        /* incoming request */
+        /* incoming request or empty */
         case COAP_CLASS_REQ:
-            if (coap_get_type(&pdu) == COAP_TYPE_NON
+            if (coap_get_code_raw(&pdu) == COAP_CODE_EMPTY) {
+                /* ping request */
+                if (coap_get_type(&pdu) == COAP_TYPE_CON) {
+                    coap_hdr_set_type(pdu.hdr, COAP_TYPE_RST);
+
+                    ssize_t bytes = sock_udp_send(sock, _listen_buf,
+                                                  sizeof(coap_hdr_t), &remote);
+                    if (bytes <= 0) {
+                        DEBUG("gcoap: ping response failed: %d\n", (int)bytes);
+                    }
+                } else if (coap_get_type(&pdu) == COAP_TYPE_NON) {
+                    DEBUG("gcoap: empty NON msg\n");
+                }
+                else {
+                    goto empty_as_response;
+                }
+            }
+            /* normal request */
+            else if (coap_get_type(&pdu) == COAP_TYPE_NON
                     || coap_get_type(&pdu) == COAP_TYPE_CON) {
                 size_t pdu_len = _handle_req(&pdu, _listen_buf, sizeof(_listen_buf),
                                              &remote);
@@ -175,6 +188,10 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
                 DEBUG("gcoap: illegal request type: %u\n", coap_get_type(&pdu));
             }
             break;
+
+empty_as_response:
+            DEBUG("gcoap: empty ack/reset not handled yet\n");
+            return;
 
         /* incoming response */
         case COAP_CLASS_SUCCESS:
