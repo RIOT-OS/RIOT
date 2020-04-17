@@ -113,7 +113,7 @@ static ssize_t _write_page(const at25xxx_t *dev, uint32_t pos, const void *data,
 
 int at25xxx_write(const at25xxx_t *dev, uint32_t pos, const void *data, size_t len)
 {
-    int res = 0;
+    int res = len;
     const uint8_t *d = data;
 
     if (pos + len > dev->params.size) {
@@ -164,7 +164,7 @@ int at25xxx_read(const at25xxx_t *dev, uint32_t pos, void *data, size_t len)
 
     spi_release(dev->params.spi);
 
-    return 0;
+    return len;
 }
 
 uint8_t at25xxx_read_byte(const at25xxx_t *dev, uint32_t pos)

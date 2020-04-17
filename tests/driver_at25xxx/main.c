@@ -34,12 +34,12 @@ static void test_normal_write(void)
     const char data_in_b[] = "This is a test.";
     char data_out[32];
 
-    TEST_ASSERT_EQUAL_INT(0, at25xxx_write(&dev, 0, data_in_a, sizeof(data_in_a)));
-    TEST_ASSERT_EQUAL_INT(0, at25xxx_read(&dev, 0, data_out, sizeof(data_out)));
+    TEST_ASSERT_EQUAL_INT(sizeof(data_in_a), at25xxx_write(&dev, 0, data_in_a, sizeof(data_in_a)));
+    TEST_ASSERT_EQUAL_INT(sizeof(data_out), at25xxx_read(&dev, 0, data_out, sizeof(data_out)));
     TEST_ASSERT_EQUAL_STRING(data_in_a, data_out);
 
-    TEST_ASSERT_EQUAL_INT(0, at25xxx_write(&dev, 0, data_in_b, sizeof(data_in_b)));
-    TEST_ASSERT_EQUAL_INT(0, at25xxx_read(&dev, 0, data_out, sizeof(data_out)));
+    TEST_ASSERT_EQUAL_INT(sizeof(data_in_b), at25xxx_write(&dev, 0, data_in_b, sizeof(data_in_b)));
+    TEST_ASSERT_EQUAL_INT(sizeof(data_out), at25xxx_read(&dev, 0, data_out, sizeof(data_out)));
     TEST_ASSERT_EQUAL_STRING(data_in_b, data_out);
 }
 
@@ -49,12 +49,16 @@ static void test_page_write(void)
     const char data_in_b[] = "This is a test.";
     char data_out[32];
 
-    TEST_ASSERT_EQUAL_INT(0, at25xxx_write(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_in_a, sizeof(data_in_a)));
-    TEST_ASSERT_EQUAL_INT(0, at25xxx_read(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_out, sizeof(data_out)));
+    TEST_ASSERT_EQUAL_INT(sizeof(data_in_a),
+                          at25xxx_write(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_in_a, sizeof(data_in_a)));
+    TEST_ASSERT_EQUAL_INT(sizeof(data_out),
+                          at25xxx_read(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_out, sizeof(data_out)));
     TEST_ASSERT_EQUAL_STRING(data_in_a, data_out);
 
-    TEST_ASSERT_EQUAL_INT(0, at25xxx_write(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_in_b, sizeof(data_in_b)));
-    TEST_ASSERT_EQUAL_INT(0, at25xxx_read(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_out, sizeof(data_out)));
+    TEST_ASSERT_EQUAL_INT(sizeof(data_in_b),
+                          at25xxx_write(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_in_b, sizeof(data_in_b)));
+    TEST_ASSERT_EQUAL_INT(sizeof(data_out),
+                          at25xxx_read(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_out, sizeof(data_out)));
     TEST_ASSERT_EQUAL_STRING(data_in_b, data_out);
 }
 
@@ -66,12 +70,15 @@ static void test_page_clear(void)
 
     memset(data_clr, 0, sizeof(data_clr));
 
-    TEST_ASSERT_EQUAL_INT(0, at25xxx_write(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_in_a, sizeof(data_in_a)));
-    TEST_ASSERT_EQUAL_INT(0, at25xxx_read(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_out, sizeof(data_out)));
+    TEST_ASSERT_EQUAL_INT(sizeof(data_in_a),
+                          at25xxx_write(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_in_a, sizeof(data_in_a)));
+    TEST_ASSERT_EQUAL_INT(sizeof(data_out),
+                          at25xxx_read(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_out, sizeof(data_out)));
     TEST_ASSERT_EQUAL_STRING(data_in_a, data_out);
 
     TEST_ASSERT_EQUAL_INT(0, at25xxx_clear(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, sizeof(data_out)));
-    TEST_ASSERT_EQUAL_INT(0, at25xxx_read(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_out, sizeof(data_out)));
+    TEST_ASSERT_EQUAL_INT(sizeof(data_out),
+                          at25xxx_read(&dev, AT25XXX_PARAM_PAGE_SIZE - 5, data_out, sizeof(data_out)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(data_out, data_clr, sizeof(data_clr)));
 }
 
