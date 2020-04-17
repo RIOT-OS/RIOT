@@ -342,8 +342,17 @@ typedef gpio_t adc_conf_t;
 #define RTT_IRQ             SM_TIMER_ALT_IRQn
 #define RTT_IRQ_PRIO        1
 #define RTT_ISR             isr_sleepmode
+
 #define RTT_MAX_VALUE       (0xffffffff)
+
+#define RTT_CLOCK_FREQUENCY (CLOCK_OSC32K)
+#define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY)
+#define RTT_MIN_FREQUENCY   (RTT_CLOCK_FREQUENCY)
+
+/* not configurable, but allow application to override it (to the same value) */
+#ifndef RTT_FREQUENCY
 #define RTT_FREQUENCY       (CLOCK_OSC32K)
+#ifndef
 /** @} */
 
 /**
