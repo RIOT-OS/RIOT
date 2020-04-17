@@ -279,14 +279,13 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
 static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
 {
     size_t bytes_sent;
-
     sock_udp_ep_t *remote;
+    sock_udp_ep_t new_remote;
 
     if (_proxied) {
         remote = &_proxy_remote;
     }
     else {
-        sock_udp_ep_t new_remote;
         if (!_parse_endpoint(&new_remote, addr_str, port_str)) {
             return 0;
         }
