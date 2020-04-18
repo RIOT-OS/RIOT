@@ -58,6 +58,9 @@ static inline void prep(adc_t line)
     mutex_lock(&locks[adc_config[line].dev]);
     periph_clk_en(APB2, (RCC_APB2ENR_ADC1EN << adc_config[line].dev));
 
+    /* enable the ADC module */
+    dev(line)->CR2 |= ADC_CR2_ADON;
+
     /* check if this channel is an internal ADC channel, if so
      * enable the internal temperature and Vref */
     if (adc_config[line].chan == 16 || adc_config[line].chan == 17) {
@@ -67,11 +70,11 @@ static inline void prep(adc_t line)
 
 static inline void done(adc_t line)
 {
-    /* check if this channel is an internal ADC channel, if so
-     * disable the internal temperature and Vref */
-    if (adc_config[line].chan == 16 || adc_config[line].chan == 17) {
-        dev(line)->CR2 &= ~ADC_CR2_TSVREFE;
-    }
+    /* disable the internal temperature and Vref */
+    dev(line)->CR2 &= ~ADC_CR2_TSVREFE;
+
+    /* disable the ADC module */
+    dev(line)->CR2 &= ~ADC_CR2_ADON;
 
     periph_clk_dis(APB2, (RCC_APB2ENR_ADC1EN << adc_config[line].dev));
     mutex_unlock(&locks[adc_config[line].dev]);
@@ -101,9 +104,6 @@ int adc_init(adc_t line)
     }
     RCC->CFGR &= ~(RCC_CFGR_ADCPRE);
     RCC->CFGR |= ((clk_div / 2) - 1) << 14;
-
-    /* enable the ADC module */
-    dev(line)->CR2 |= ADC_CR2_ADON;
 
     /* resets the selected ADC calibration registers */
     dev(line)->CR2 |= ADC_CR2_RSTCAL;
