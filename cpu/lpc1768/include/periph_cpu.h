@@ -66,6 +66,11 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
+ * @brief   Number of available timer channels
+ */
+#define TIMER_CHANNELS      (4U)
+
+/**
  * @brief   CPU provides own pm_off() function
  */
 #define PROVIDES_PM_LAYERED_OFF
