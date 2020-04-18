@@ -93,7 +93,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     gnrc_pktsnip_t *pkt, *netif;
     msg_t msg;
 
-#ifdef MODULE_FUZZING
+#if defined(MODULE_FUZZING) && !defined(MODULE_SOCK_ASYNC_EVENT)
     if (gnrc_sock_prevpkt && gnrc_sock_prevpkt == gnrc_pktbuf_fuzzptr) {
         exit(EXIT_SUCCESS);
     }

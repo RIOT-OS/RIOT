@@ -16,6 +16,11 @@
 #include "irq.h"
 #include "net/sock/async/event.h"
 
+#ifdef MODULE_FUZZING
+extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
+extern gnrc_pktsnip_t *gnrc_sock_prevpkt;
+#endif
+
 static void _event_handler(event_t *ev)
 {
     sock_event_t *event = (sock_event_t *)ev;
@@ -36,6 +41,12 @@ static inline void _cb(void *sock, sock_async_flags_t type, void *arg,
     ctx->event.cb_arg = arg;
     ctx->event.type |= type;
     event_post(ctx->queue, &ctx->event.super);
+
+#ifdef MODULE_FUZZING
+    if (gnrc_sock_prevpkt && gnrc_sock_prevpkt == gnrc_pktbuf_fuzzptr) {
+        exit(EXIT_SUCCESS);
+    }
+#endif
 }
 
 static void _set_ctx(sock_async_ctx_t *ctx, event_queue_t *ev_queue)
