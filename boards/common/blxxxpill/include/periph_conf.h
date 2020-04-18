@@ -74,9 +74,13 @@ extern "C" {
     { .dev = 0, .pin = GPIO_PIN(PORT_A, 7), .chan = 7 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_B, 0), .chan = 8 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_B, 1), .chan = 9 }, \
+    /* ADC Temperature channel */                        \
+    { .dev = 0, .pin = GPIO_UNDEF, .chan = 16 },         \
+    /* ADC VREF channel */                               \
+    { .dev = 0, .pin = GPIO_UNDEF, .chan = 17 },         \
 }
 
-#define ADC_NUMOF           10
+#define ADC_NUMOF           12
 /** @} */
 
 /**
