@@ -98,6 +98,7 @@ all-gprof: LINKFLAGS += -pg
 all-asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer
 all-asan: CFLAGS += -DNATIVE_MEMORY
 all-asan: LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer
+all-asan: export AFL_USE_ASAN=1
 
 INCLUDES += $(NATIVEINCLUDES)
 

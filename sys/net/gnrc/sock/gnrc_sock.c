@@ -14,6 +14,7 @@
  */
 
 #include <errno.h>
+#include <stdlib.h>
 
 #include "log.h"
 #include "net/af.h"
@@ -27,6 +28,10 @@
 
 #include "sock_types.h"
 #include "gnrc_sock_internal.h"
+
+#ifdef MODULE_FUZZING
+extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
+#endif
 
 #ifdef MODULE_XTIMER
 #define _TIMEOUT_MAGIC      (0xF38A0B63U)
@@ -84,6 +89,13 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     gnrc_pktsnip_t *pkt, *netif;
     msg_t msg;
 
+#ifdef MODULE_FUZZING
+    static gnrc_pktsnip_t *prevpkt;
+    if (prevpkt && prevpkt == gnrc_pktbuf_fuzzptr) {
+        exit(EXIT_SUCCESS);
+    }
+#endif
+
     if (reg->mbox.cib.mask != (SOCK_MBOX_SIZE - 1)) {
         return -EINVAL;
     }
@@ -137,6 +149,11 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
         remote->netif = (uint16_t)netif_hdr->if_pid;
     }
     *pkt_out = pkt; /* set out parameter */
+
+#ifdef MODULE_FUZZING
+    prevpkt = pkt;
+#endif
+
     return 0;
 }
 

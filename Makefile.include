@@ -747,6 +747,11 @@ test-input-hash:
 	true
 endif
 
+.PHONY: fuzz
+fuzz:
+	env FLASHFILE="$(FLASHFILE)" PORT="$(PORT)" TERMFLAGS="$(TERMFLAGS)" \
+		"$(RIOTBASE)"/dist/tools/fuzzing/afl.sh $(AFL_FLAGS)
+
 # Default OBJDUMPFLAGS for platforms which do not specify it:
 OBJDUMPFLAGS ?= -S -D -h
 

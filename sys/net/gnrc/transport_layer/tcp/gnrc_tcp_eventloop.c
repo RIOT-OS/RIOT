@@ -174,8 +174,10 @@ static int _receive(gnrc_pktsnip_t *pkt)
     /* Validate checksum */
     if (byteorder_ntohs(hdr->checksum) != _pkt_calc_csum(tcp, ip, pkt)) {
         DEBUG("gnrc_tcp_eventloop.c : _receive() : Invalid checksum\n");
+#ifndef MODULE_FUZZING
         gnrc_pktbuf_release(pkt);
         return -EINVAL;
+#endif
     }
 
     /* Find TCB to for this packet */
