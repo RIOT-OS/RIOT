@@ -71,16 +71,40 @@ static inline void _irq_enable(tim_t tim)
     NVIC_EnableIRQ(timer_config[tim].irq);
 }
 
+static uint8_t _get_prescaler(unsigned long freq_out, unsigned long freq_in)
+{
+    uint8_t scale = 0;
+    while (freq_in > freq_out) {
+        freq_in >>= 1;
+
+        /* after DIV16 the prescaler gets more coarse */
+        if (++scale > TC_CTRLA_PRESCALER_DIV16_Val) {
+            freq_in >>= 1;
+        }
+    }
+
+    /* fail if output frequency can't be derived from input frequency */
+    assert(freq_in == freq_out);
+
+    return scale;
+}
+
 /**
  * @brief Setup the given timer
  */
 int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
-    (void) freq;
     const tc32_conf_t *cfg = &timer_config[tim];
+    uint8_t scale = _get_prescaler(freq, sam0_gclk_freq(cfg->gclk_src));
 
     /* make sure given device is valid */
     if (tim >= TIMER_NUMOF) {
+        return -1;
+    }
+
+    /* make sure the prescaler is withing range */
+    if (scale > TC_CTRLA_PRESCALER_DIV1024_Val) {
+        DEBUG("[timer %d] scale %d is out of range\n", tim, scale);
         return -1;
     }
 
@@ -104,7 +128,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 #ifdef TC_CTRLA_WAVEGEN_NFRQ
                   | TC_CTRLA_WAVEGEN_NFRQ
 #endif
-                  | cfg->prescaler
+                  | TC_CTRLA_PRESCALER(scale)
                   | TC_CTRLA_PRESCSYNC_RESYNC;
 
 #ifdef TC_WAVE_WAVEGEN_NFRQ
