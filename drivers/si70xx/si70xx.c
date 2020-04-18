@@ -53,10 +53,7 @@ static uint16_t _do_measure(const si70xx_t *dev, uint8_t command)
     return ((uint16_t)result[0] << 8) + (result[1] & 0xfc);
 }
 
-/**
- * @brief   Internal helper function that reads the device serial number.
- */
-static uint64_t _get_serial(const si70xx_t *dev)
+uint64_t si70xx_get_serial(const si70xx_t *dev)
 {
     uint8_t out[2];
     uint8_t in_first[8] = { 0 };
@@ -95,18 +92,12 @@ static uint64_t _get_serial(const si70xx_t *dev)
     return (((uint64_t) id_first) << 32) + id_second;
 }
 
-/**
- * @brief   Internal helper function that reads the device identifier.
- */
-static uint8_t _get_id(const si70xx_t *dev)
+uint8_t si70xx_get_id(const si70xx_t *dev)
 {
-    return (_get_serial(dev) >> 24) & 0xff;
+    return (si70xx_get_serial(dev) >> 24) & 0xff;
 }
 
-/**
- * @brief   Internal helper function that reads the device serial revision.
- */
-static uint8_t _get_revision(const si70xx_t *dev)
+uint8_t si70xx_get_revision(const si70xx_t *dev)
 {
     uint8_t out[2];
     uint8_t in = 0;
@@ -128,17 +119,19 @@ static uint8_t _get_revision(const si70xx_t *dev)
 
 static int _test_device(const si70xx_t *dev)
 {
-    uint8_t revision = _get_revision(dev);
+    uint8_t revision = si70xx_get_revision(dev);
 
     if (revision != SI70XX_REVISION_1 && revision != SI70XX_REVISION_2) {
         DEBUG("[ERROR] Bad device revision (%d).\n", revision);
         return -SI70XX_ERR_NODEV;
     }
 
-    uint8_t id = _get_id(dev);
+    uint8_t id = si70xx_get_id(dev);
 
-    if (id != SI70XX_ID) {
-        DEBUG("[ERROR] Not a valid Si7006/13/20/21 device\n");
+    const bool valid_id = (id == SI70XX_ID);
+    if (!valid_id) {
+        DEBUG("[ERROR] Not a valid Si7006/13/20/21/5x device: %u\n",
+              (unsigned)id);
         return -SI70XX_ERR_NODEV;;
     }
 
