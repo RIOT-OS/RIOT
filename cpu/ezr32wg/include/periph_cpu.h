@@ -39,6 +39,11 @@ typedef uint32_t tim_t;
 /** @} */
 
 /**
+ * @brief   This timer implementation has three available channels
+ */
+#define TIMER_CHANNELS          (3)
+
+/**
  * @brief   Starting offset of CPU_ID
  */
 #define CPUID_ADDR          (&DEVINFO->UNIQUEL)
