@@ -31,6 +31,7 @@
 
 #ifdef MODULE_FUZZING
 extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
+gnrc_pktsnip_t *gnrc_sock_prevpkt = NULL;
 #endif
 
 #ifdef MODULE_XTIMER
@@ -93,8 +94,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     msg_t msg;
 
 #ifdef MODULE_FUZZING
-    static gnrc_pktsnip_t *prevpkt;
-    if (prevpkt && prevpkt == gnrc_pktbuf_fuzzptr) {
+    if (gnrc_sock_prevpkt && gnrc_sock_prevpkt == gnrc_pktbuf_fuzzptr) {
         exit(EXIT_SUCCESS);
     }
 #endif
@@ -159,7 +159,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     }
 #endif
 #ifdef MODULE_FUZZING
-    prevpkt = pkt;
+    gnrc_sock_prevpkt = pkt;
 #endif
 
     return 0;
