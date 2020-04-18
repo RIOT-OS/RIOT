@@ -335,6 +335,11 @@ typedef struct {
 } tc32_conf_t;
 
 /**
+ * @brief   Number of available timer channels
+ */
+#define TIMER_CHANNELS      (2)
+
+/**
  * @brief   Set up alternate function (PMUX setting) for a PORT pin
  *
  * @param[in] pin   Pin to set the multiplexing for
