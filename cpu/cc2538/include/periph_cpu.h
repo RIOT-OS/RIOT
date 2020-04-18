@@ -290,6 +290,11 @@ typedef struct {
     uint_fast8_t cfg;   /**< timer config word */
 } timer_conf_t;
 
+/**
+ * @brief   Number of maximal available timer channels
+ */
+#define TIMER_CHANNELS      (2U)
+
 #ifndef DOXYGEN
 /**
  * @name   Override resolution options
